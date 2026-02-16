@@ -5,6 +5,7 @@ export type TaskPriority = 'low' | 'medium' | 'high' | 'urgent';
 export type VehicleType = 'car' | 'electric';
 export type VehicleStatus = 'available' | 'in_use' | 'maintenance';
 export type TransportStatus = 'scheduled' | 'in_progress' | 'completed' | 'cancelled';
+export type RecurrenceType = 'none' | 'daily' | 'weekdays' | 'weekly';
 
 export interface TeamMember {
   id: string;
@@ -12,6 +13,14 @@ export interface TeamMember {
   role: string;
   avatar?: string;
   color: string;
+  schedule?: WorkSchedule[];
+}
+
+export interface WorkSchedule {
+  date: string;
+  startTime: string;
+  endTime: string;
+  note?: string;
 }
 
 export interface Vehicle {
@@ -27,6 +36,8 @@ export interface Vehicle {
 export interface Transport {
   id: string;
   guestName: string;
+  guestPhone?: string;
+  guestEmail?: string;
   from: string;
   to: string;
   dateTime: string;
@@ -42,6 +53,8 @@ export interface Task {
   title: string;
   description?: string;
   date: string;
+  time?: string;
+  recurrence: RecurrenceType;
   status: TaskStatus;
   priority: TaskPriority;
   assignedTo?: string;
@@ -60,13 +73,14 @@ export interface AgendaEvent {
   location?: string;
   category: string;
   isVIP?: boolean;
+  source?: 'manual' | 'google';
 }
 
 const TEAM_COLORS = [
-  'hsl(195, 80%, 30%)', 'hsl(38, 92%, 50%)', 'hsl(152, 60%, 40%)',
-  'hsl(280, 60%, 50%)', 'hsl(340, 70%, 50%)', 'hsl(210, 80%, 55%)',
-  'hsl(160, 70%, 35%)', 'hsl(20, 80%, 50%)', 'hsl(260, 50%, 55%)',
-  'hsl(0, 70%, 55%)',
+  'hsl(142, 50%, 35%)', 'hsl(38, 85%, 50%)', 'hsl(152, 55%, 40%)',
+  'hsl(280, 50%, 50%)', 'hsl(340, 60%, 50%)', 'hsl(210, 65%, 50%)',
+  'hsl(160, 55%, 35%)', 'hsl(20, 70%, 50%)', 'hsl(260, 45%, 50%)',
+  'hsl(0, 65%, 50%)',
 ];
 
 const today = new Date().toISOString().split('T')[0];
@@ -95,28 +109,28 @@ const initialVehicles: Vehicle[] = [
 ];
 
 const initialTransports: Transport[] = [
-  { id: 't1', guestName: 'Dr. Roberto Mendes', from: 'Aeroporto GRU', to: 'Hotel Fasano', dateTime: `${today}T14:00`, vehicleId: 'v2', driverId: '2', status: 'in_progress', isVIP: true },
+  { id: 't1', guestName: 'Dr. Roberto Mendes', guestPhone: '(11) 99999-1234', guestEmail: 'roberto@email.com', from: 'Aeroporto GRU', to: 'Hotel Fasano', dateTime: `${today}T14:00`, vehicleId: 'v2', driverId: '2', status: 'in_progress', isVIP: true },
   { id: 't2', guestName: 'Delegação Japão (5 pax)', from: 'Hotel Hilton', to: 'Centro de Convenções', dateTime: `${today}T09:00`, vehicleId: 'v5', driverId: '6', status: 'completed' },
-  { id: 't3', guestName: 'Sra. Elena Vasquez', from: 'Rodoviária', to: 'Hotel Ibis', dateTime: `${today}T16:30`, status: 'scheduled', isVIP: false },
-  { id: 't4', guestName: 'Min. Paulo Guedes', from: 'Aeroporto Congonhas', to: 'Hotel Fasano', dateTime: `${tomorrow}T08:00`, vehicleId: 'v3', driverId: '4', status: 'scheduled', isVIP: true },
+  { id: 't3', guestName: 'Sra. Elena Vasquez', guestPhone: '(51) 98888-5678', from: 'Rodoviária', to: 'Hotel Ibis', dateTime: `${today}T16:30`, status: 'scheduled', isVIP: false },
+  { id: 't4', guestName: 'Min. Paulo Guedes', guestPhone: '(61) 97777-0000', guestEmail: 'assessoria@gov.br', from: 'Aeroporto Congonhas', to: 'Hotel Fasano', dateTime: `${tomorrow}T08:00`, vehicleId: 'v3', driverId: '4', status: 'scheduled', isVIP: true },
 ];
 
 const initialTasks: Task[] = [
-  { id: 'tk1', title: 'Verificar carregamento dos veículos elétricos', date: tomorrow, status: 'pending', priority: 'high', assignedTo: '5', category: 'logistics' },
-  { id: 'tk2', title: 'Preparar kits de boas-vindas VIP', date: tomorrow, status: 'pending', priority: 'urgent', assignedTo: '3', category: 'reception' },
-  { id: 'tk3', title: 'Confirmar reservas de hotel', date: today, status: 'done', priority: 'high', assignedTo: '9', category: 'general', completedAt: `${today}T10:30`, completedBy: '9' },
-  { id: 'tk4', title: 'Revisar rota aeroporto-hotel', date: tomorrow, status: 'pending', priority: 'medium', assignedTo: '2', category: 'transport' },
-  { id: 'tk5', title: 'Testar Wi-Fi no centro de convenções', date: today, status: 'in_progress', priority: 'medium', assignedTo: '8', category: 'logistics' },
-  { id: 'tk6', title: 'Organizar credenciais de acesso', date: tomorrow, status: 'pending', priority: 'high', assignedTo: '7', category: 'reception' },
+  { id: 'tk1', title: 'Verificar carregamento dos veículos elétricos', date: tomorrow, status: 'pending', priority: 'high', assignedTo: '5', category: 'logistics', recurrence: 'daily', time: '07:00' },
+  { id: 'tk2', title: 'Preparar kits de boas-vindas VIP', date: tomorrow, status: 'pending', priority: 'urgent', assignedTo: '3', category: 'reception', recurrence: 'none', time: '08:00' },
+  { id: 'tk3', title: 'Confirmar reservas de hotel', date: today, status: 'done', priority: 'high', assignedTo: '9', category: 'general', completedAt: `${today}T10:30`, completedBy: '9', recurrence: 'none' },
+  { id: 'tk4', title: 'Revisar rota aeroporto-hotel', date: tomorrow, status: 'pending', priority: 'medium', assignedTo: '2', category: 'transport', recurrence: 'none', time: '06:30' },
+  { id: 'tk5', title: 'Testar Wi-Fi no centro de convenções', date: today, status: 'in_progress', priority: 'medium', assignedTo: '8', category: 'logistics', recurrence: 'none' },
+  { id: 'tk6', title: 'Organizar credenciais de acesso', date: tomorrow, status: 'pending', priority: 'high', assignedTo: '7', category: 'reception', recurrence: 'daily', time: '07:30' },
 ];
 
 const initialEvents: AgendaEvent[] = [
-  { id: 'e1', title: 'Abertura Oficial da Feira', date: today, startTime: '09:00', endTime: '10:00', location: 'Auditório Principal', category: 'cerimônia', isVIP: true },
-  { id: 'e2', title: 'Painel: Sustentabilidade nos Negócios', date: today, startTime: '10:30', endTime: '12:00', location: 'Sala 1', category: 'painel' },
-  { id: 'e3', title: 'Almoço VIP', date: today, startTime: '12:30', endTime: '14:00', location: 'Restaurante Rooftop', category: 'refeição', isVIP: true },
-  { id: 'e4', title: 'Workshop: Mobilidade Elétrica', date: today, startTime: '14:30', endTime: '16:00', location: 'Sala 3', category: 'workshop' },
-  { id: 'e5', title: 'Recepção de Boas-Vindas', date: tomorrow, startTime: '08:00', endTime: '09:00', location: 'Lobby Hotel Fasano', category: 'recepção', isVIP: true },
-  { id: 'e6', title: 'Mesa Redonda: Exportação', date: tomorrow, startTime: '09:30', endTime: '11:30', location: 'Sala 2', category: 'painel' },
+  { id: 'e1', title: 'Abertura Oficial da Feira', date: today, startTime: '09:00', endTime: '10:00', location: 'Auditório Principal', category: 'cerimônia', isVIP: true, source: 'manual' },
+  { id: 'e2', title: 'Painel: Sustentabilidade nos Negócios', date: today, startTime: '10:30', endTime: '12:00', location: 'Sala 1', category: 'painel', source: 'manual' },
+  { id: 'e3', title: 'Almoço VIP', date: today, startTime: '12:30', endTime: '14:00', location: 'Restaurante Rooftop', category: 'refeição', isVIP: true, source: 'manual' },
+  { id: 'e4', title: 'Workshop: Mobilidade Elétrica', date: today, startTime: '14:30', endTime: '16:00', location: 'Sala 3', category: 'workshop', source: 'manual' },
+  { id: 'e5', title: 'Recepção de Boas-Vindas', date: tomorrow, startTime: '08:00', endTime: '09:00', location: 'Lobby Hotel Fasano', category: 'recepção', isVIP: true, source: 'manual' },
+  { id: 'e6', title: 'Mesa Redonda: Exportação', date: tomorrow, startTime: '09:30', endTime: '11:30', location: 'Sala 2', category: 'painel', source: 'manual' },
 ];
 
 interface AppState {
@@ -132,6 +146,8 @@ interface AppState {
   addTask: (task: Task) => void;
   addEvent: (event: AgendaEvent) => void;
   updateEvent: (id: string, data: Partial<AgendaEvent>) => void;
+  updateTeamMember: (id: string, data: Partial<TeamMember>) => void;
+  addSchedule: (memberId: string, schedule: WorkSchedule) => void;
 }
 
 export const useAppStore = create<AppState>((set) => ({
@@ -154,4 +170,14 @@ export const useAppStore = create<AppState>((set) => ({
     set((s) => ({ events: [...s.events, event] })),
   updateEvent: (id, data) =>
     set((s) => ({ events: s.events.map((e) => (e.id === id ? { ...e, ...data } : e)) })),
+  updateTeamMember: (id, data) =>
+    set((s) => ({ team: s.team.map((m) => (m.id === id ? { ...m, ...data } : m)) })),
+  addSchedule: (memberId, schedule) =>
+    set((s) => ({
+      team: s.team.map((m) =>
+        m.id === memberId
+          ? { ...m, schedule: [...(m.schedule || []), schedule] }
+          : m
+      ),
+    })),
 }));

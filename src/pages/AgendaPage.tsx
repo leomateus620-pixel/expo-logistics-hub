@@ -1,16 +1,19 @@
 import { useAppStore } from '@/store/useAppStore';
 import { Badge } from '@/components/ui/badge';
-import { CalendarDays, Plus, Clock, MapPin } from 'lucide-react';
+import { CalendarDays, Plus, Clock, MapPin, Download } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { toast } from '@/hooks/use-toast';
 
 export default function AgendaPage() {
   const { events, addEvent } = useAppStore();
   const [open, setOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
+  const [calendarUrl, setCalendarUrl] = useState('');
   const [form, setForm] = useState({ title: '', description: '', date: '', startTime: '', endTime: '', location: '', category: 'geral', isVIP: false });
 
   const today = new Date().toISOString().split('T')[0];
@@ -18,9 +21,19 @@ export default function AgendaPage() {
 
   const handleAdd = () => {
     if (!form.title || !form.date || !form.startTime || !form.endTime) return;
-    addEvent({ id: `e${Date.now()}`, ...form });
+    addEvent({ id: `e${Date.now()}`, ...form, source: 'manual' });
     setForm({ title: '', description: '', date: '', startTime: '', endTime: '', location: '', category: 'geral', isVIP: false });
     setOpen(false);
+  };
+
+  const handleImportGoogle = () => {
+    if (!calendarUrl.trim()) return;
+    toast({
+      title: 'Importação iniciada',
+      description: 'A integração com Google Agenda requer configuração de backend. Habilite o Lovable Cloud para ativar esta funcionalidade.',
+    });
+    setCalendarUrl('');
+    setImportOpen(false);
   };
 
   const dates = [...new Set(events.map((e) => e.date))].sort();
@@ -33,30 +46,46 @@ export default function AgendaPage() {
           <h1 className="text-2xl font-bold tracking-tight">Agenda da Feira</h1>
           <p className="text-sm text-muted-foreground mt-1">Programação e eventos</p>
         </div>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button size="sm"><Plus className="w-4 h-4 mr-1" /> Novo Evento</Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader><DialogTitle>Criar Evento</DialogTitle></DialogHeader>
-            <div className="space-y-3">
-              <Input placeholder="Título do evento" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
-              <Input placeholder="Descrição (opcional)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
-              <Input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
-              <div className="grid grid-cols-2 gap-3">
-                <Input type="time" value={form.startTime} onChange={(e) => setForm({ ...form, startTime: e.target.value })} />
-                <Input type="time" value={form.endTime} onChange={(e) => setForm({ ...form, endTime: e.target.value })} />
+        <div className="flex items-center gap-2">
+          <Dialog open={importOpen} onOpenChange={setImportOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="sm"><Download className="w-4 h-4 mr-1" /> Importar Google Agenda</Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader><DialogTitle>Importar Agenda Google</DialogTitle></DialogHeader>
+              <div className="space-y-3">
+                <p className="text-sm text-muted-foreground">Cole o link público ou ID da sua agenda Google para importar os eventos.</p>
+                <Input placeholder="Link ou ID da Agenda Google" value={calendarUrl} onChange={(e) => setCalendarUrl(e.target.value)} />
+                <p className="text-xs text-muted-foreground">Ex: nome@gmail.com ou link público do Google Calendar</p>
+                <Button onClick={handleImportGoogle} className="w-full">Importar Eventos</Button>
               </div>
-              <Input placeholder="Local" value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} />
-              <Input placeholder="Categoria" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} />
-              <label className="flex items-center gap-2 text-sm">
-                <input type="checkbox" checked={form.isVIP} onChange={(e) => setForm({ ...form, isVIP: e.target.checked })} className="rounded" />
-                Evento VIP
-              </label>
-              <Button onClick={handleAdd} className="w-full">Criar Evento</Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+            </DialogContent>
+          </Dialog>
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button size="sm"><Plus className="w-4 h-4 mr-1" /> Novo Evento</Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader><DialogTitle>Criar Evento</DialogTitle></DialogHeader>
+              <div className="space-y-3">
+                <Input placeholder="Título do evento" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
+                <Input placeholder="Descrição (opcional)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
+                <Input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
+                <div className="grid grid-cols-2 gap-3">
+                  <Input type="time" value={form.startTime} onChange={(e) => setForm({ ...form, startTime: e.target.value })} />
+                  <Input type="time" value={form.endTime} onChange={(e) => setForm({ ...form, endTime: e.target.value })} />
+                </div>
+                <Input placeholder="Local" value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} />
+                <Input placeholder="Categoria" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} />
+                <label className="flex items-center gap-2 text-sm">
+                  <input type="checkbox" checked={form.isVIP} onChange={(e) => setForm({ ...form, isVIP: e.target.checked })} className="rounded" />
+                  Evento VIP
+                </label>
+                <Button onClick={handleAdd} className="w-full">Criar Evento</Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       <Tabs defaultValue={today} className="space-y-4">
@@ -89,6 +118,7 @@ export default function AgendaPage() {
                         <p className="text-sm font-semibold flex items-center gap-1.5">
                           {e.isVIP && <span className="text-accent">★</span>}
                           {e.title}
+                          {e.source === 'google' && <Badge variant="outline" className="text-[9px] ml-1">Google</Badge>}
                         </p>
                         {e.description && <p className="text-xs text-muted-foreground mt-0.5">{e.description}</p>}
                         <div className="flex items-center gap-3 mt-1">

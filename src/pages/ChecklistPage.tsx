@@ -1,6 +1,6 @@
-import { useAppStore, TaskPriority, TaskStatus } from '@/store/useAppStore';
+import { useAppStore, TaskPriority, TaskStatus, RecurrenceType } from '@/store/useAppStore';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Check } from 'lucide-react';
+import { Plus, Check, Clock, Repeat } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -16,18 +16,31 @@ const priorityConfig: Record<TaskPriority, { label: string; class: string }> = {
   low: { label: 'Baixa', class: 'bg-muted text-muted-foreground' },
 };
 
+const recurrenceLabels: Record<RecurrenceType, string> = {
+  none: 'Sem recorrência',
+  daily: 'Diária',
+  weekdays: 'Dias úteis',
+  weekly: 'Semanal',
+};
+
 export default function ChecklistPage() {
   const { tasks, team, addTask, updateTask } = useAppStore();
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ title: '', description: '', date: '', priority: 'medium' as TaskPriority, assignedTo: '', category: 'general' as any });
+  const [form, setForm] = useState({ title: '', description: '', date: '', time: '', priority: 'medium' as TaskPriority, assignedTo: '', category: 'general' as any, recurrence: 'none' as RecurrenceType });
 
   const today = new Date().toISOString().split('T')[0];
   const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
 
   const handleAdd = () => {
     if (!form.title || !form.date) return;
-    addTask({ id: `tk${Date.now()}`, ...form, status: 'pending', assignedTo: form.assignedTo || undefined });
-    setForm({ title: '', description: '', date: '', priority: 'medium', assignedTo: '', category: 'general' });
+    addTask({
+      id: `tk${Date.now()}`,
+      ...form,
+      status: 'pending',
+      assignedTo: form.assignedTo || undefined,
+      time: form.time || undefined,
+    });
+    setForm({ title: '', description: '', date: '', time: '', priority: 'medium', assignedTo: '', category: 'general', recurrence: 'none' });
     setOpen(false);
   };
 
@@ -58,7 +71,10 @@ export default function ChecklistPage() {
             <div className="space-y-3">
               <Input placeholder="Título da tarefa" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
               <Input placeholder="Descrição (opcional)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
-              <Input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
+              <div className="grid grid-cols-2 gap-3">
+                <Input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
+                <Input type="time" value={form.time} onChange={(e) => setForm({ ...form, time: e.target.value })} placeholder="Horário" />
+              </div>
               <div className="grid grid-cols-2 gap-3">
                 <Select value={form.priority} onValueChange={(v) => setForm({ ...form, priority: v as TaskPriority })}>
                   <SelectTrigger><SelectValue placeholder="Prioridade" /></SelectTrigger>
@@ -69,6 +85,17 @@ export default function ChecklistPage() {
                     <SelectItem value="low">Baixa</SelectItem>
                   </SelectContent>
                 </Select>
+                <Select value={form.recurrence} onValueChange={(v) => setForm({ ...form, recurrence: v as RecurrenceType })}>
+                  <SelectTrigger><SelectValue placeholder="Recorrência" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Sem recorrência</SelectItem>
+                    <SelectItem value="daily">Diária</SelectItem>
+                    <SelectItem value="weekdays">Dias úteis</SelectItem>
+                    <SelectItem value="weekly">Semanal</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="grid grid-cols-2 gap-3">
                 <Select value={form.assignedTo} onValueChange={(v) => setForm({ ...form, assignedTo: v })}>
                   <SelectTrigger><SelectValue placeholder="Responsável" /></SelectTrigger>
                   <SelectContent>
@@ -77,16 +104,16 @@ export default function ChecklistPage() {
                     ))}
                   </SelectContent>
                 </Select>
+                <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v })}>
+                  <SelectTrigger><SelectValue placeholder="Categoria" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="logistics">Logística</SelectItem>
+                    <SelectItem value="reception">Recepção</SelectItem>
+                    <SelectItem value="transport">Transporte</SelectItem>
+                    <SelectItem value="general">Geral</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-              <Select value={form.category} onValueChange={(v) => setForm({ ...form, category: v })}>
-                <SelectTrigger><SelectValue placeholder="Categoria" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="logistics">Logística</SelectItem>
-                  <SelectItem value="reception">Recepção</SelectItem>
-                  <SelectItem value="transport">Transporte</SelectItem>
-                  <SelectItem value="general">Geral</SelectItem>
-                </SelectContent>
-              </Select>
               <Button onClick={handleAdd} className="w-full">Criar Tarefa</Button>
             </div>
           </DialogContent>
@@ -119,8 +146,10 @@ export default function ChecklistPage() {
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium">{t.title}</p>
                         {t.description && <p className="text-xs text-muted-foreground">{t.description}</p>}
-                        <div className="flex items-center gap-2 mt-1">
+                        <div className="flex items-center gap-2 mt-1 flex-wrap">
                           <Badge variant="outline" className={cn('text-[10px]', pc.class)}>{pc.label}</Badge>
+                          {t.time && <span className="text-[10px] text-muted-foreground flex items-center gap-0.5"><Clock className="w-2.5 h-2.5" />{t.time}</span>}
+                          {t.recurrence !== 'none' && <span className="text-[10px] text-primary flex items-center gap-0.5"><Repeat className="w-2.5 h-2.5" />{recurrenceLabels[t.recurrence]}</span>}
                           {member && <span className="text-[10px] text-muted-foreground">→ {member.name.split(' ')[0]}</span>}
                         </div>
                       </div>

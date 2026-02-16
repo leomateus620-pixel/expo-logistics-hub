@@ -6,8 +6,8 @@ import {
   CalendarDays,
   CheckSquare,
   Users,
-  Zap,
 } from 'lucide-react';
+import logo from '@/assets/logofeira26.webp';
 
 const links = [
   { to: '/', icon: LayoutDashboard, label: 'Painel' },
@@ -21,17 +21,15 @@ const links = [
 export default function Sidebar() {
   return (
     <aside className="fixed left-0 top-0 bottom-0 w-64 bg-sidebar flex flex-col z-50">
-      <div className="p-6 flex items-center gap-3">
-        <div className="w-9 h-9 rounded-lg bg-sidebar-primary flex items-center justify-center">
-          <Zap className="w-5 h-5 text-sidebar-primary-foreground" />
-        </div>
+      <div className="p-5 flex items-center gap-3 border-b border-sidebar-border">
+        <img src={logo} alt="Fenasoja" className="w-10 h-10 rounded-lg object-contain bg-white/10 p-0.5" />
         <div>
-          <h1 className="text-sm font-bold text-sidebar-primary-foreground tracking-tight">FeiraPro</h1>
+          <h1 className="text-sm font-bold text-sidebar-primary-foreground tracking-tight">Fenasoja</h1>
           <p className="text-[10px] text-sidebar-foreground/60 uppercase tracking-widest">Logística</p>
         </div>
       </div>
 
-      <nav className="flex-1 px-3 space-y-1">
+      <nav className="flex-1 px-3 pt-4 space-y-1">
         {links.map(({ to, icon: Icon, label }) => (
           <RouterNavLink
             key={to}
@@ -57,7 +55,7 @@ export default function Sidebar() {
             <div
               key={i}
               className="w-7 h-7 rounded-full border-2 border-sidebar-accent flex items-center justify-center text-[10px] font-bold text-sidebar-primary-foreground"
-              style={{ backgroundColor: `hsl(${195 + i * 30}, 60%, ${35 + i * 5}%)` }}
+              style={{ backgroundColor: `hsl(${120 + i * 30}, 45%, ${35 + i * 5}%)` }}
             >
               {String.fromCharCode(65 + i)}
             </div>

@@ -1,6 +1,6 @@
 import { useAppStore, TransportStatus } from '@/store/useAppStore';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, AlertTriangle, Plus, Check, Clock, X } from 'lucide-react';
+import { MapPin, AlertTriangle, Plus, Check, Clock, X, Phone, Mail } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -18,7 +18,7 @@ const statusConfig: Record<TransportStatus, { label: string; icon: typeof Check;
 export default function TransportsPage() {
   const { transports, team, vehicles, addTransport, updateTransport } = useAppStore();
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ guestName: '', from: '', to: '', dateTime: '', vehicleId: '', driverId: '', isVIP: false });
+  const [form, setForm] = useState({ guestName: '', guestPhone: '', guestEmail: '', from: '', to: '', dateTime: '', vehicleId: '', driverId: '', isVIP: false, notes: '' });
 
   const handleAdd = () => {
     if (!form.guestName || !form.from || !form.to || !form.dateTime) return;
@@ -28,8 +28,11 @@ export default function TransportsPage() {
       status: 'scheduled',
       vehicleId: form.vehicleId || undefined,
       driverId: form.driverId || undefined,
+      guestPhone: form.guestPhone || undefined,
+      guestEmail: form.guestEmail || undefined,
+      notes: form.notes || undefined,
     });
-    setForm({ guestName: '', from: '', to: '', dateTime: '', vehicleId: '', driverId: '', isVIP: false });
+    setForm({ guestName: '', guestPhone: '', guestEmail: '', from: '', to: '', dateTime: '', vehicleId: '', driverId: '', isVIP: false, notes: '' });
     setOpen(false);
   };
 
@@ -55,7 +58,11 @@ export default function TransportsPage() {
           <DialogContent>
             <DialogHeader><DialogTitle>Agendar Transporte</DialogTitle></DialogHeader>
             <div className="space-y-3">
-              <Input placeholder="Nome do convidado" value={form.guestName} onChange={(e) => setForm({ ...form, guestName: e.target.value })} />
+              <Input placeholder="Nome do passageiro" value={form.guestName} onChange={(e) => setForm({ ...form, guestName: e.target.value })} />
+              <div className="grid grid-cols-2 gap-3">
+                <Input placeholder="Celular / WhatsApp" value={form.guestPhone} onChange={(e) => setForm({ ...form, guestPhone: e.target.value })} />
+                <Input placeholder="E-mail" type="email" value={form.guestEmail} onChange={(e) => setForm({ ...form, guestEmail: e.target.value })} />
+              </div>
               <div className="grid grid-cols-2 gap-3">
                 <Input placeholder="Origem" value={form.from} onChange={(e) => setForm({ ...form, from: e.target.value })} />
                 <Input placeholder="Destino" value={form.to} onChange={(e) => setForm({ ...form, to: e.target.value })} />
@@ -79,6 +86,7 @@ export default function TransportsPage() {
                   </SelectContent>
                 </Select>
               </div>
+              <Input placeholder="Observações" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
               <label className="flex items-center gap-2 text-sm">
                 <input type="checkbox" checked={form.isVIP} onChange={(e) => setForm({ ...form, isVIP: e.target.checked })} className="rounded" />
                 Convidado VIP
@@ -111,6 +119,8 @@ export default function TransportsPage() {
                 <div className="flex items-center gap-3 mt-1 text-[10px] text-muted-foreground">
                   {vehicle && <span>🚗 {vehicle.name}</span>}
                   {driver && <span>👤 {driver.name.split(' ')[0]}</span>}
+                  {t.guestPhone && <span className="flex items-center gap-0.5"><Phone className="w-2.5 h-2.5" />{t.guestPhone}</span>}
+                  {t.guestEmail && <span className="flex items-center gap-0.5"><Mail className="w-2.5 h-2.5" />{t.guestEmail}</span>}
                 </div>
               </div>
               <div className="text-right shrink-0">
