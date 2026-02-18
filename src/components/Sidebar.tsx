@@ -1,15 +1,12 @@
-import { NavLink as RouterNavLink } from 'react-router-dom';
+import { NavLink as RouterNavLink, useLocation } from 'react-router-dom';
 import {
-  LayoutDashboard,
-  Car,
-  Zap,
-  MapPin,
-  CalendarDays,
-  CheckSquare,
-  Users,
-  Hotel,
+  LayoutDashboard, Car, Zap, MapPin, CalendarDays, CheckSquare, Users, Hotel,
+  PanelLeftClose, PanelLeftOpen, X, LogOut,
 } from 'lucide-react';
 import logo from '@/assets/logofeira26.webp';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { useAuth } from '@/hooks/useAuth';
+import { cn } from '@/lib/utils';
 
 const links = [
   { to: '/', icon: LayoutDashboard, label: 'Painel' },
@@ -22,52 +19,86 @@ const links = [
   { to: '/team', icon: Users, label: 'Equipe' },
 ];
 
-export default function Sidebar() {
+interface SidebarProps {
+  collapsed: boolean;
+  onToggle: () => void;
+  mobileOpen: boolean;
+  onMobileClose: () => void;
+}
+
+export default function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose }: SidebarProps) {
+  const isMobile = useIsMobile();
+  const { signOut } = useAuth();
+  const location = useLocation();
+
+  const isVisible = isMobile ? mobileOpen : true;
+  const width = isMobile ? 256 : collapsed ? 64 : 256;
+
+  if (!isVisible) return null;
+
   return (
-    <aside className="fixed left-0 top-0 bottom-0 w-64 bg-sidebar flex flex-col z-50">
-      <div className="p-5 flex items-center gap-3 border-b border-sidebar-border">
-        <img src={logo} alt="Fenasoja" className="w-10 h-10 rounded-lg object-contain bg-white/10 p-0.5" />
-        <div>
-          <h1 className="text-sm font-bold text-sidebar-primary-foreground tracking-tight">Fenasoja</h1>
-          <p className="text-[10px] text-sidebar-foreground/60 uppercase tracking-widest">Logística</p>
-        </div>
+    <aside
+      className={cn(
+        'fixed left-0 top-0 bottom-0 bg-sidebar flex flex-col z-50 transition-all duration-200 overflow-hidden'
+      )}
+      style={{ width }}
+    >
+      {/* Header */}
+      <div className="p-3 flex items-center gap-3 border-b border-sidebar-border min-h-[56px]">
+        <img src={logo} alt="Fenasoja" className="w-9 h-9 rounded-lg object-contain bg-white/10 p-0.5 shrink-0" />
+        {(!collapsed || isMobile) && (
+          <div className="flex-1 min-w-0">
+            <h1 className="text-sm font-bold text-sidebar-primary-foreground tracking-tight">Fenasoja</h1>
+            <p className="text-[10px] text-sidebar-foreground/60 uppercase tracking-widest">Logística</p>
+          </div>
+        )}
+        {isMobile ? (
+          <button onClick={onMobileClose} className="p-1.5 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground/70">
+            <X className="w-4 h-4" />
+          </button>
+        ) : (
+          <button onClick={onToggle} className="p-1.5 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground/70 shrink-0">
+            {collapsed ? <PanelLeftOpen className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
+          </button>
+        )}
       </div>
 
-      <nav className="flex-1 px-3 pt-4 space-y-1 overflow-y-auto">
+      {/* Nav */}
+      <nav className="flex-1 px-2 pt-3 space-y-0.5 overflow-y-auto">
         {links.map(({ to, icon: Icon, label }) => (
           <RouterNavLink
             key={to}
             to={to}
+            end={to === '/'}
+            onClick={isMobile ? onMobileClose : undefined}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+              cn(
+                'flex items-center gap-3 rounded-lg text-sm font-medium transition-colors',
+                collapsed && !isMobile ? 'justify-center px-2 py-2.5' : 'px-3 py-2.5',
                 isActive
                   ? 'bg-sidebar-accent text-sidebar-primary'
                   : 'text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50'
-              }`
+              )
             }
           >
-            <Icon className="w-4 h-4" />
-            {label}
+            <Icon className="w-4 h-4 shrink-0" />
+            {(!collapsed || isMobile) && <span className="truncate">{label}</span>}
           </RouterNavLink>
         ))}
       </nav>
 
-      <div className="p-4 mx-3 mb-4 rounded-lg bg-sidebar-accent/50">
-        <p className="text-[10px] text-sidebar-foreground/50 uppercase tracking-wider mb-1">Equipe online</p>
-        <div className="flex -space-x-2">
-          {Array.from({ length: 6 }).map((_, i) => (
-            <div
-              key={i}
-              className="w-7 h-7 rounded-full border-2 border-sidebar-accent flex items-center justify-center text-[10px] font-bold text-sidebar-primary-foreground"
-              style={{ backgroundColor: `hsl(${120 + i * 30}, 45%, ${35 + i * 5}%)` }}
-            >
-              {String.fromCharCode(65 + i)}
-            </div>
-          ))}
-          <div className="w-7 h-7 rounded-full border-2 border-sidebar-accent bg-sidebar-accent flex items-center justify-center text-[10px] font-medium text-sidebar-foreground/70">
-            +4
-          </div>
-        </div>
+      {/* Logout */}
+      <div className="p-2 border-t border-sidebar-border">
+        <button
+          onClick={signOut}
+          className={cn(
+            'flex items-center gap-3 w-full rounded-lg text-sm font-medium text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/50 transition-colors',
+            collapsed && !isMobile ? 'justify-center px-2 py-2.5' : 'px-3 py-2.5'
+          )}
+        >
+          <LogOut className="w-4 h-4 shrink-0" />
+          {(!collapsed || isMobile) && <span>Sair</span>}
+        </button>
       </div>
     </aside>
   );
