@@ -29,8 +29,11 @@ export interface VehicleLog {
   userId: string;
   pickupDate: string;
   pickupKm: number;
+  pickupTime?: string;
   returnDate?: string;
   returnKm?: number;
+  returnTime?: string;
+  note?: string;
 }
 
 export interface Vehicle {
@@ -179,7 +182,7 @@ interface AppState {
   updateVehicle: (id: string, data: Partial<Vehicle>) => void;
   addVehicle: (vehicle: Vehicle) => void;
   addVehicleLog: (vehicleId: string, log: VehicleLog) => void;
-  closeVehicleLog: (vehicleId: string, logId: string, returnDate: string, returnKm: number) => void;
+  closeVehicleLog: (vehicleId: string, logId: string, returnDate: string, returnKm: number, returnTime?: string, note?: string) => void;
   updateTransport: (id: string, data: Partial<Transport>) => void;
   addTransport: (transport: Transport) => void;
   updateTask: (id: string, data: Partial<Task>) => void;
@@ -212,13 +215,13 @@ export const useAppStore = create<AppState>((set) => ({
         v.id === vehicleId ? { ...v, logs: [...v.logs, log], status: 'in_use' as VehicleStatus, assignedTo: log.userId } : v
       ),
     })),
-  closeVehicleLog: (vehicleId, logId, returnDate, returnKm) =>
+  closeVehicleLog: (vehicleId, logId, returnDate, returnKm, returnTime, note) =>
     set((s) => ({
       vehicles: s.vehicles.map((v) =>
         v.id === vehicleId
           ? {
               ...v,
-              logs: v.logs.map((l) => (l.id === logId ? { ...l, returnDate, returnKm } : l)),
+              logs: v.logs.map((l) => (l.id === logId ? { ...l, returnDate, returnKm, returnTime, note: note || l.note } : l)),
               status: 'available' as VehicleStatus,
               assignedTo: undefined,
               currentKm: returnKm,
