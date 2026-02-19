@@ -9,7 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { cn } from '@/lib/utils';
 
 const links = [
-  { to: '/', icon: LayoutDashboard, label: 'Painel' },
+  { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/vehicles', icon: Car, label: 'Veículos Botolli' },
   { to: '/electric-carts', icon: Zap, label: 'Carrinhos Elétricos' },
   { to: '/transports', icon: MapPin, label: 'Transportes' },
