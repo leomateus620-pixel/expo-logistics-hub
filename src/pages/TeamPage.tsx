@@ -1,11 +1,13 @@
 import { useAppStore, TeamMember } from '@/store/useAppStore';
 import { Badge } from '@/components/ui/badge';
-import { Plus, CalendarDays, Pencil, Trash2, UserPlus } from 'lucide-react';
+import { Plus, CalendarDays, Pencil, Trash2, UserPlus, Loader2 } from 'lucide-react';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 const TEAM_COLORS = [
   'hsl(142, 50%, 35%)', 'hsl(38, 85%, 50%)', 'hsl(152, 55%, 40%)',
@@ -25,7 +27,8 @@ export default function TeamPage() {
   const [editForm, setEditForm] = useState({ name: '', role: '', phone: '' });
 
   const [addOpen, setAddOpen] = useState(false);
-  const [addForm, setAddForm] = useState({ name: '', role: '', phone: '' });
+  const [addForm, setAddForm] = useState({ name: '', role: '', phone: '', email: '', password: '' });
+  const [addLoading, setAddLoading] = useState(false);
 
   const [viewScheduleOpen, setViewScheduleOpen] = useState(false);
   const [viewMember, setViewMember] = useState<TeamMember | null>(null);
@@ -42,17 +45,37 @@ export default function TeamPage() {
     setEditOpen(false);
   };
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     if (!addForm.name || !addForm.role) return;
-    addTeamMember({
-      id: `tm${Date.now()}`,
-      name: addForm.name,
-      role: addForm.role,
-      phone: addForm.phone || undefined,
-      color: TEAM_COLORS[team.length % TEAM_COLORS.length],
-    });
-    setAddForm({ name: '', role: '', phone: '' });
-    setAddOpen(false);
+
+    setAddLoading(true);
+    try {
+      // If email and password provided, create auth user
+      if (addForm.email && addForm.password) {
+        const { data, error } = await supabase.functions.invoke('create-user', {
+          body: { email: addForm.email, password: addForm.password, full_name: addForm.name },
+        });
+        if (error || data?.error) {
+          toast.error(data?.error || error?.message || 'Erro ao criar acesso');
+          setAddLoading(false);
+          return;
+        }
+        toast.success('Acesso criado com sucesso');
+      }
+
+      addTeamMember({
+        id: `tm${Date.now()}`,
+        name: addForm.name,
+        role: addForm.role,
+        phone: addForm.phone || undefined,
+        color: TEAM_COLORS[team.length % TEAM_COLORS.length],
+      });
+      setAddForm({ name: '', role: '', phone: '', email: '', password: '' });
+      setAddOpen(false);
+    } catch (err) {
+      toast.error('Erro ao adicionar membro');
+    }
+    setAddLoading(false);
   };
 
   const handleAddSchedule = () => {
@@ -93,7 +116,15 @@ export default function TeamPage() {
             <Input placeholder="Nome completo" value={addForm.name} onChange={(e) => setAddForm({ ...addForm, name: e.target.value })} />
             <Input placeholder="Função" value={addForm.role} onChange={(e) => setAddForm({ ...addForm, role: e.target.value })} />
             <Input placeholder="Celular / WhatsApp" value={addForm.phone} onChange={(e) => setAddForm({ ...addForm, phone: e.target.value })} />
-            <Button onClick={handleAdd} className="w-full">Adicionar</Button>
+            <div className="border-t pt-3 mt-2">
+              <p className="text-xs text-muted-foreground mb-2">Acesso ao sistema (opcional)</p>
+              <Input type="email" placeholder="E-mail de acesso" value={addForm.email} onChange={(e) => setAddForm({ ...addForm, email: e.target.value })} />
+              <Input type="password" placeholder="Senha" value={addForm.password} onChange={(e) => setAddForm({ ...addForm, password: e.target.value })} className="mt-2" />
+            </div>
+            <Button onClick={handleAdd} className="w-full" disabled={addLoading}>
+              {addLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+              Adicionar
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
