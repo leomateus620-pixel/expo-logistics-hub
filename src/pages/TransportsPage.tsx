@@ -1,6 +1,9 @@
-import { useAppStore, TransportStatus, Transport } from '@/store/useAppStore';
+import { useTransports } from '@/hooks/useTransports';
+import { useOrgMembers } from '@/hooks/useOrgMembers';
+import { useVehicles } from '@/hooks/useVehicles';
+import { useGuests } from '@/hooks/useGuests';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, AlertTriangle, Plus, Check, Clock, X, Phone, Mail, Pencil, Briefcase, CalendarDays } from 'lucide-react';
+import { MapPin, Plus, Check, Clock, X, Phone, Pencil } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -8,106 +11,121 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { toast } from 'sonner';
 
-const statusConfig: Record<TransportStatus, { label: string; icon: typeof Check; class: string }> = {
-  scheduled: { label: 'Agendado', icon: Clock, class: 'bg-info/10 text-info' },
-  in_progress: { label: 'Em andamento', icon: MapPin, class: 'bg-accent/10 text-accent' },
-  completed: { label: 'Concluído', icon: Check, class: 'bg-success/10 text-success' },
-  cancelled: { label: 'Cancelado', icon: X, class: 'bg-destructive/10 text-destructive' },
+const statusConfig: Record<string, { label: string; icon: typeof Check; class: string }> = {
+  pendente: { label: 'Pendente', icon: Clock, class: 'bg-info/10 text-info' },
+  em_andamento: { label: 'Em andamento', icon: MapPin, class: 'bg-accent/10 text-accent' },
+  concluido: { label: 'Concluído', icon: Check, class: 'bg-success/10 text-success' },
+  cancelado: { label: 'Cancelado', icon: X, class: 'bg-destructive/10 text-destructive' },
 };
 
 export default function TransportsPage() {
-  const { transports, team, vehicles, addTransport, updateTransport } = useAppStore();
+  const { transports, create, update } = useTransports();
+  const { members } = useOrgMembers();
+  const { vehicles } = useVehicles();
+  const { guests } = useGuests();
+
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ guestName: '', guestPhone: '', guestEmail: '', guestRole: '', guestAgenda: '', from: '', to: '', dateTime: '', vehicleId: '', driverId: '', isVIP: false, notes: '' });
+  const [form, setForm] = useState({ titulo: '', guest_id: '', origem: '', destino: '', inicio_em: '', motorista_user_id: '', vehicle_id: '', prioridade: 'media', observacoes: '' });
 
   const [editOpen, setEditOpen] = useState(false);
   const [editId, setEditId] = useState('');
-  const [editForm, setEditForm] = useState({ guestName: '', guestPhone: '', guestEmail: '', guestRole: '', guestAgenda: '', from: '', to: '', dateTime: '', vehicleId: '', driverId: '', isVIP: false, notes: '', status: 'scheduled' as TransportStatus });
+  const [editForm, setEditForm] = useState({ ...form, status: 'pendente' });
 
-  const openEdit = (t: Transport) => {
+  const handleAdd = async () => {
+    if (!form.origem || !form.destino || !form.inicio_em) return;
+    try {
+      await create.mutateAsync({
+        titulo: form.titulo || null,
+        guest_id: form.guest_id || null,
+        origem: form.origem,
+        destino: form.destino,
+        inicio_em: form.inicio_em,
+        motorista_user_id: form.motorista_user_id || null,
+        vehicle_id: form.vehicle_id || null,
+        prioridade: form.prioridade,
+        observacoes: form.observacoes || null,
+      });
+      setForm({ titulo: '', guest_id: '', origem: '', destino: '', inicio_em: '', motorista_user_id: '', vehicle_id: '', prioridade: 'media', observacoes: '' });
+      setOpen(false);
+      toast.success('Transporte agendado');
+    } catch (err: any) { toast.error(err.message); }
+  };
+
+  const openEditDlg = (t: any) => {
     setEditId(t.id);
     setEditForm({
-      guestName: t.guestName, guestPhone: t.guestPhone || '', guestEmail: t.guestEmail || '',
-      guestRole: t.guestRole || '', guestAgenda: t.guestAgenda || '',
-      from: t.from, to: t.to, dateTime: t.dateTime,
-      vehicleId: t.vehicleId || '', driverId: t.driverId || '',
-      isVIP: t.isVIP || false, notes: t.notes || '', status: t.status,
+      titulo: t.titulo || '', guest_id: t.guest_id || '', origem: t.origem, destino: t.destino,
+      inicio_em: t.inicio_em?.slice(0, 16) || '', motorista_user_id: t.motorista_user_id || '',
+      vehicle_id: t.vehicle_id || '', prioridade: t.prioridade || 'media',
+      observacoes: t.observacoes || '', status: t.status,
     });
     setEditOpen(true);
   };
 
-  const handleEditSave = () => {
-    if (!editForm.guestName || !editForm.from || !editForm.to) return;
-    updateTransport(editId, {
-      guestName: editForm.guestName, guestPhone: editForm.guestPhone || undefined,
-      guestEmail: editForm.guestEmail || undefined, guestRole: editForm.guestRole || undefined,
-      guestAgenda: editForm.guestAgenda || undefined,
-      from: editForm.from, to: editForm.to, dateTime: editForm.dateTime,
-      vehicleId: editForm.vehicleId || undefined, driverId: editForm.driverId || undefined,
-      isVIP: editForm.isVIP, notes: editForm.notes || undefined, status: editForm.status,
-    });
-    setEditOpen(false);
+  const handleEditSave = async () => {
+    try {
+      await update.mutateAsync({
+        id: editId,
+        titulo: editForm.titulo || null,
+        guest_id: editForm.guest_id || null,
+        origem: editForm.origem,
+        destino: editForm.destino,
+        inicio_em: editForm.inicio_em,
+        motorista_user_id: editForm.motorista_user_id || null,
+        vehicle_id: editForm.vehicle_id || null,
+        prioridade: editForm.prioridade,
+        observacoes: editForm.observacoes || null,
+        status: editForm.status,
+      });
+      setEditOpen(false);
+      toast.success('Transporte atualizado');
+    } catch (err: any) { toast.error(err.message); }
   };
 
-  const handleAdd = () => {
-    if (!form.guestName || !form.from || !form.to || !form.dateTime) return;
-    addTransport({
-      id: `t${Date.now()}`, ...form, status: 'scheduled',
-      vehicleId: form.vehicleId || undefined, driverId: form.driverId || undefined,
-      guestPhone: form.guestPhone || undefined, guestEmail: form.guestEmail || undefined,
-      guestRole: form.guestRole || undefined, guestAgenda: form.guestAgenda || undefined,
-      notes: form.notes || undefined,
-    });
-    setForm({ guestName: '', guestPhone: '', guestEmail: '', guestRole: '', guestAgenda: '', from: '', to: '', dateTime: '', vehicleId: '', driverId: '', isVIP: false, notes: '' });
-    setOpen(false);
-  };
-
-  const cycleStatus = (id: string, current: TransportStatus) => {
-    const order: TransportStatus[] = ['scheduled', 'in_progress', 'completed'];
+  const cycleStatus = async (id: string, current: string) => {
+    const order = ['pendente', 'em_andamento', 'concluido'];
     const idx = order.indexOf(current);
-    if (idx < order.length - 1) updateTransport(id, { status: order[idx + 1] });
+    if (idx < order.length - 1) {
+      await update.mutateAsync({ id, status: order[idx + 1] });
+    }
   };
 
-  const sorted = [...transports].sort((a, b) => a.dateTime.localeCompare(b.dateTime));
+  const sorted = [...transports].sort((a: any, b: any) => (a.inicio_em || '').localeCompare(b.inicio_em || ''));
 
-  const TransportFormFields = ({ data, setData }: { data: typeof form; setData: (d: typeof form) => void }) => (
+  const FormFields = ({ data, setData }: { data: any; setData: (d: any) => void }) => (
     <div className="space-y-3">
-      <Input placeholder="Nome do passageiro" value={data.guestName} onChange={(e) => setData({ ...data, guestName: e.target.value })} />
+      <Input placeholder="Título (opcional)" value={data.titulo} onChange={(e) => setData({ ...data, titulo: e.target.value })} />
+      <Select value={data.guest_id} onValueChange={(v) => setData({ ...data, guest_id: v })}>
+        <SelectTrigger><SelectValue placeholder="Hóspede (opcional)" /></SelectTrigger>
+        <SelectContent>
+          <SelectItem value="">Nenhum</SelectItem>
+          {guests.map((g: any) => <SelectItem key={g.id} value={g.id}>{g.nome}</SelectItem>)}
+        </SelectContent>
+      </Select>
       <div className="grid grid-cols-2 gap-3">
-        <Input placeholder="Celular / WhatsApp" value={data.guestPhone} onChange={(e) => setData({ ...data, guestPhone: e.target.value })} />
-        <Input placeholder="E-mail" type="email" value={data.guestEmail} onChange={(e) => setData({ ...data, guestEmail: e.target.value })} />
+        <Input placeholder="Origem" value={data.origem} onChange={(e) => setData({ ...data, origem: e.target.value })} />
+        <Input placeholder="Destino" value={data.destino} onChange={(e) => setData({ ...data, destino: e.target.value })} />
       </div>
-      <Input placeholder="Cargo / Função profissional" value={data.guestRole} onChange={(e) => setData({ ...data, guestRole: e.target.value })} />
-      <Textarea placeholder="Agenda do passageiro no evento (compromissos, horários...)" value={data.guestAgenda} onChange={(e) => setData({ ...data, guestAgenda: e.target.value })} className="min-h-[60px]" />
+      <Input type="datetime-local" value={data.inicio_em} onChange={(e) => setData({ ...data, inicio_em: e.target.value })} />
       <div className="grid grid-cols-2 gap-3">
-        <Input placeholder="Origem" value={data.from} onChange={(e) => setData({ ...data, from: e.target.value })} />
-        <Input placeholder="Destino" value={data.to} onChange={(e) => setData({ ...data, to: e.target.value })} />
-      </div>
-      <Input type="datetime-local" value={data.dateTime} onChange={(e) => setData({ ...data, dateTime: e.target.value })} />
-      <div className="grid grid-cols-2 gap-3">
-        <Select value={data.vehicleId} onValueChange={(v) => setData({ ...data, vehicleId: v })}>
+        <Select value={data.vehicle_id} onValueChange={(v) => setData({ ...data, vehicle_id: v })}>
           <SelectTrigger><SelectValue placeholder="Veículo" /></SelectTrigger>
           <SelectContent>
-            {vehicles.map((v) => (
-              <SelectItem key={v.id} value={v.id}>{v.name}</SelectItem>
-            ))}
+            <SelectItem value="">Nenhum</SelectItem>
+            {vehicles.map((v: any) => <SelectItem key={v.id} value={v.id}>{v.placa} {v.modelo}</SelectItem>)}
           </SelectContent>
         </Select>
-        <Select value={data.driverId} onValueChange={(v) => setData({ ...data, driverId: v })}>
-          <SelectTrigger><SelectValue placeholder="Responsável" /></SelectTrigger>
+        <Select value={data.motorista_user_id} onValueChange={(v) => setData({ ...data, motorista_user_id: v })}>
+          <SelectTrigger><SelectValue placeholder="Motorista" /></SelectTrigger>
           <SelectContent>
-            {team.map((m) => (
-              <SelectItem key={m.id} value={m.id}>{m.name} - {m.role}</SelectItem>
-            ))}
+            <SelectItem value="">Nenhum</SelectItem>
+            {members.map((m: any) => <SelectItem key={m.user_id} value={m.user_id}>{m.nome_exibicao}</SelectItem>)}
           </SelectContent>
         </Select>
       </div>
-      <Input placeholder="Observações" value={data.notes} onChange={(e) => setData({ ...data, notes: e.target.value })} />
-      <label className="flex items-center gap-2 text-sm">
-        <input type="checkbox" checked={data.isVIP} onChange={(e) => setData({ ...data, isVIP: e.target.checked })} className="rounded" />
-        Convidado VIP
-      </label>
+      <Textarea placeholder="Observações" value={data.observacoes} onChange={(e) => setData({ ...data, observacoes: e.target.value })} rows={2} />
     </div>
   );
 
@@ -115,7 +133,7 @@ export default function TransportsPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Transportes</h1>
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Transportes</h1>
           <p className="text-sm text-muted-foreground mt-1">Buscar e levar convidados</p>
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
@@ -124,8 +142,8 @@ export default function TransportsPage() {
           </DialogTrigger>
           <DialogContent className="max-h-[90vh] overflow-y-auto">
             <DialogHeader><DialogTitle>Agendar Transporte</DialogTitle></DialogHeader>
-            <TransportFormFields data={form} setData={setForm} />
-            <Button onClick={handleAdd} className="w-full">Agendar</Button>
+            <FormFields data={form} setData={setForm} />
+            <Button onClick={handleAdd} className="w-full" disabled={create.isPending}>Agendar</Button>
           </DialogContent>
         </Dialog>
       </div>
@@ -133,27 +151,27 @@ export default function TransportsPage() {
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent className="max-h-[90vh] overflow-y-auto">
           <DialogHeader><DialogTitle>Editar Transporte</DialogTitle></DialogHeader>
-          <TransportFormFields data={editForm} setData={(d) => setEditForm({ ...d, status: editForm.status })} />
-          <Select value={editForm.status} onValueChange={(v) => setEditForm({ ...editForm, status: v as TransportStatus })}>
+          <FormFields data={editForm} setData={(d) => setEditForm({ ...d, status: editForm.status })} />
+          <Select value={editForm.status} onValueChange={(v) => setEditForm({ ...editForm, status: v })}>
             <SelectTrigger><SelectValue /></SelectTrigger>
             <SelectContent>
-              <SelectItem value="scheduled">Agendado</SelectItem>
-              <SelectItem value="in_progress">Em andamento</SelectItem>
-              <SelectItem value="completed">Concluído</SelectItem>
-              <SelectItem value="cancelled">Cancelado</SelectItem>
+              <SelectItem value="pendente">Pendente</SelectItem>
+              <SelectItem value="em_andamento">Em andamento</SelectItem>
+              <SelectItem value="concluido">Concluído</SelectItem>
+              <SelectItem value="cancelado">Cancelado</SelectItem>
             </SelectContent>
           </Select>
-          <Button onClick={handleEditSave} className="w-full">Salvar</Button>
+          <Button onClick={handleEditSave} className="w-full" disabled={update.isPending}>Salvar</Button>
         </DialogContent>
       </Dialog>
 
       <div className="space-y-3">
-        {sorted.map((t) => {
-          const sc = statusConfig[t.status];
+        {sorted.map((t: any) => {
+          const sc = statusConfig[t.status] || statusConfig.pendente;
           const Icon = sc.icon;
-          const driver = team.find((m) => m.id === t.driverId);
-          const vehicle = vehicles.find((v) => v.id === t.vehicleId);
-          const dt = new Date(t.dateTime);
+          const driver = members.find((m: any) => m.user_id === t.motorista_user_id);
+          const vehicle = vehicles.find((v: any) => v.id === t.vehicle_id);
+          const guest = guests.find((g: any) => g.id === t.guest_id);
 
           return (
             <div key={t.id} className="rounded-xl border bg-card p-4 hover:shadow-sm transition-shadow">
@@ -162,42 +180,37 @@ export default function TransportsPage() {
                   <Icon className="w-5 h-5" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    {t.isVIP && <AlertTriangle className="w-3.5 h-3.5 text-accent shrink-0" />}
-                    <p className="text-sm font-semibold truncate">{t.guestName}</p>
-                    {t.guestRole && <Badge variant="secondary" className="text-[10px] shrink-0">{t.guestRole}</Badge>}
-                  </div>
-                  <p className="text-xs text-muted-foreground mt-0.5">{t.from} → {t.to}</p>
+                  <p className="text-sm font-semibold truncate">{t.titulo || (guest?.nome) || `${t.origem} → ${t.destino}`}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{t.origem} → {t.destino}</p>
                   <div className="flex items-center gap-3 mt-1 text-[10px] text-muted-foreground flex-wrap">
-                    {vehicle && <span>🚗 {vehicle.name}</span>}
-                    {driver && <span>👤 {driver.name.split(' ')[0]}</span>}
-                    {t.guestPhone && <span className="flex items-center gap-0.5"><Phone className="w-2.5 h-2.5" />{t.guestPhone}</span>}
-                    {t.guestEmail && <span className="flex items-center gap-0.5"><Mail className="w-2.5 h-2.5" />{t.guestEmail}</span>}
+                    {vehicle && <span>🚗 {vehicle.placa}</span>}
+                    {driver && <span>👤 {(driver.nome_exibicao || '').split(' ')[0]}</span>}
+                    {guest && <span>🎫 {guest.nome}</span>}
                   </div>
                 </div>
                 <div className="text-right shrink-0">
-                  <p className="text-sm font-mono font-medium">{dt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</p>
-                  <p className="text-[10px] text-muted-foreground">{dt.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}</p>
+                  <p className="text-sm font-mono font-medium">{t.inicio_em ? new Date(t.inicio_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '-'}</p>
+                  <p className="text-[10px] text-muted-foreground">{t.inicio_em ? new Date(t.inicio_em).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) : ''}</p>
                 </div>
-                <button onClick={() => openEdit(t)} className="p-1.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground shrink-0">
+                <button onClick={() => openEditDlg(t)} className="p-1.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground shrink-0">
                   <Pencil className="w-3.5 h-3.5" />
                 </button>
-                {t.status !== 'completed' && t.status !== 'cancelled' && (
+                {t.status !== 'concluido' && t.status !== 'cancelado' && (
                   <button onClick={() => cycleStatus(t.id, t.status)} className="text-xs px-3 py-1.5 rounded-lg border border-border hover:bg-muted transition-colors shrink-0">
-                    {t.status === 'scheduled' ? 'Iniciar' : 'Concluir'}
+                    {t.status === 'pendente' ? 'Iniciar' : 'Concluir'}
                   </button>
                 )}
-                {t.status === 'completed' && <Badge variant="secondary" className="shrink-0">✓</Badge>}
+                {t.status === 'concluido' && <Badge variant="secondary" className="shrink-0">✓</Badge>}
               </div>
-              {t.guestAgenda && (
-                <div className="mt-2 ml-14 text-xs text-muted-foreground p-2 rounded-lg bg-muted/50 flex items-start gap-1.5">
-                  <CalendarDays className="w-3 h-3 mt-0.5 shrink-0" />
-                  <span>{t.guestAgenda}</span>
-                </div>
-              )}
             </div>
           );
         })}
+        {transports.length === 0 && (
+          <div className="text-center py-12 text-muted-foreground">
+            <MapPin className="w-8 h-8 mx-auto mb-2 opacity-50" />
+            <p className="text-sm">Nenhum transporte cadastrado</p>
+          </div>
+        )}
       </div>
     </div>
   );

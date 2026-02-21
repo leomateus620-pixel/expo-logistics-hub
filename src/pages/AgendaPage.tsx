@@ -1,139 +1,106 @@
-import { useAppStore } from '@/store/useAppStore';
+import { useEvents } from '@/hooks/useEvents';
 import { Badge } from '@/components/ui/badge';
-import { CalendarDays, Plus, Clock, MapPin, Download } from 'lucide-react';
+import { CalendarDays, Plus, Clock, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { toast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 export default function AgendaPage() {
-  const { events, addEvent } = useAppStore();
+  const { events, create } = useEvents();
   const [open, setOpen] = useState(false);
-  const [importOpen, setImportOpen] = useState(false);
-  const [calendarUrl, setCalendarUrl] = useState('');
-  const [form, setForm] = useState({ title: '', description: '', date: '', startTime: '', endTime: '', location: '', category: 'geral', isVIP: false });
+  const [form, setForm] = useState({ titulo: '', descricao: '', inicio_em: '', fim_em: '', local: '', tipo_tag: '' });
 
   const today = new Date().toISOString().split('T')[0];
   const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
 
-  const handleAdd = () => {
-    if (!form.title || !form.date || !form.startTime || !form.endTime) return;
-    addEvent({ id: `e${Date.now()}`, ...form, source: 'manual' });
-    setForm({ title: '', description: '', date: '', startTime: '', endTime: '', location: '', category: 'geral', isVIP: false });
-    setOpen(false);
+  const handleAdd = async () => {
+    if (!form.titulo || !form.inicio_em || !form.fim_em) return;
+    try {
+      await create.mutateAsync({
+        titulo: form.titulo,
+        descricao: form.descricao || null,
+        inicio_em: form.inicio_em,
+        fim_em: form.fim_em,
+        local: form.local || null,
+        tipo_tag: form.tipo_tag || null,
+      });
+      setForm({ titulo: '', descricao: '', inicio_em: '', fim_em: '', local: '', tipo_tag: '' });
+      setOpen(false);
+      toast.success('Evento criado');
+    } catch (err: any) { toast.error(err.message); }
   };
 
-  const handleImportGoogle = () => {
-    if (!calendarUrl.trim()) return;
-    toast({
-      title: 'Importação iniciada',
-      description: 'A integração com Google Agenda requer configuração de backend. Habilite o Lovable Cloud para ativar esta funcionalidade.',
-    });
-    setCalendarUrl('');
-    setImportOpen(false);
-  };
-
-  const dates = [...new Set(events.map((e) => e.date))].sort();
+  const dates: string[] = [...new Set(events.map((e: any) => String(e.inicio_em?.split('T')[0] || '')).filter((d: string) => d !== ''))].sort();
+  if (dates.length === 0) dates.push(today);
   const getLabel = (d: string) => d === today ? 'Hoje' : d === tomorrow ? 'Amanhã' : new Date(d + 'T12:00').toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' });
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Agenda da Feira</h1>
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Agenda da Feira</h1>
           <p className="text-sm text-muted-foreground mt-1">Programação e eventos</p>
         </div>
-        <div className="flex items-center gap-2">
-          <Dialog open={importOpen} onOpenChange={setImportOpen}>
-            <DialogTrigger asChild>
-              <Button variant="outline" size="sm"><Download className="w-4 h-4 mr-1" /> Importar Google Agenda</Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader><DialogTitle>Importar Agenda Google</DialogTitle></DialogHeader>
-              <div className="space-y-3">
-                <p className="text-sm text-muted-foreground">Cole o link público ou ID da sua agenda Google para importar os eventos.</p>
-                <Input placeholder="Link ou ID da Agenda Google" value={calendarUrl} onChange={(e) => setCalendarUrl(e.target.value)} />
-                <p className="text-xs text-muted-foreground">Ex: nome@gmail.com ou link público do Google Calendar</p>
-                <Button onClick={handleImportGoogle} className="w-full">Importar Eventos</Button>
-              </div>
-            </DialogContent>
-          </Dialog>
-          <Dialog open={open} onOpenChange={setOpen}>
-            <DialogTrigger asChild>
-              <Button size="sm"><Plus className="w-4 h-4 mr-1" /> Novo Evento</Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader><DialogTitle>Criar Evento</DialogTitle></DialogHeader>
-              <div className="space-y-3">
-                <Input placeholder="Título do evento" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />
-                <Input placeholder="Descrição (opcional)" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} />
-                <Input type="date" value={form.date} onChange={(e) => setForm({ ...form, date: e.target.value })} />
-                <div className="grid grid-cols-2 gap-3">
-                  <Input type="time" value={form.startTime} onChange={(e) => setForm({ ...form, startTime: e.target.value })} />
-                  <Input type="time" value={form.endTime} onChange={(e) => setForm({ ...form, endTime: e.target.value })} />
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button size="sm"><Plus className="w-4 h-4 mr-1" /> Novo Evento</Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader><DialogTitle>Criar Evento</DialogTitle></DialogHeader>
+            <div className="space-y-3">
+              <Input placeholder="Título do evento" value={form.titulo} onChange={(e) => setForm({ ...form, titulo: e.target.value })} />
+              <Input placeholder="Descrição (opcional)" value={form.descricao} onChange={(e) => setForm({ ...form, descricao: e.target.value })} />
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs text-muted-foreground mb-1 block">Início</label>
+                  <Input type="datetime-local" value={form.inicio_em} onChange={(e) => setForm({ ...form, inicio_em: e.target.value })} />
                 </div>
-                <Input placeholder="Local" value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} />
-                <Input placeholder="Categoria" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} />
-                <label className="flex items-center gap-2 text-sm">
-                  <input type="checkbox" checked={form.isVIP} onChange={(e) => setForm({ ...form, isVIP: e.target.checked })} className="rounded" />
-                  Evento VIP
-                </label>
-                <Button onClick={handleAdd} className="w-full">Criar Evento</Button>
+                <div>
+                  <label className="text-xs text-muted-foreground mb-1 block">Fim</label>
+                  <Input type="datetime-local" value={form.fim_em} onChange={(e) => setForm({ ...form, fim_em: e.target.value })} />
+                </div>
               </div>
-            </DialogContent>
-          </Dialog>
-        </div>
+              <Input placeholder="Local" value={form.local} onChange={(e) => setForm({ ...form, local: e.target.value })} />
+              <Input placeholder="Categoria / Tag" value={form.tipo_tag} onChange={(e) => setForm({ ...form, tipo_tag: e.target.value })} />
+              <Button onClick={handleAdd} className="w-full" disabled={create.isPending}>Criar Evento</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
-      <Tabs defaultValue={today} className="space-y-4">
-        <TabsList>
-          {dates.map((d: string) => (
+      <Tabs defaultValue={dates.includes(today) ? today : dates[0]} className="space-y-4">
+        <TabsList className="flex-wrap">
+          {dates.map((d) => (
             <TabsTrigger key={d} value={d}>{getLabel(d)}</TabsTrigger>
           ))}
         </TabsList>
-        {dates.map((d: string) => {
-          const dayEvents = events.filter((e) => e.date === d).sort((a, b) => a.startTime.localeCompare(b.startTime));
+        {dates.map((d) => {
+          const dayEvents = events.filter((e: any) => e.inicio_em?.startsWith(d)).sort((a: any, b: any) => a.inicio_em.localeCompare(b.inicio_em));
           return (
             <TabsContent key={d} value={d}>
               <div className="space-y-3">
-                {dayEvents.map((e) => {
-                  const now = new Date();
-                  const [h, m] = e.startTime.split(':').map(Number);
-                  const eventTime = new Date(now);
-                  eventTime.setHours(h, m, 0);
-                  const diffMin = e.date === today ? Math.round((eventTime.getTime() - now.getTime()) / 60000) : 999;
-                  const isSoon = diffMin > 0 && diffMin <= 60;
-
-                  return (
-                    <div key={e.id} className={cn('rounded-xl border bg-card p-4 flex items-center gap-4', isSoon && 'border-accent/50 bg-accent/5')}>
-                      <div className="text-center w-16 shrink-0">
-                        <p className="text-lg font-mono font-bold">{e.startTime}</p>
-                        <p className="text-[10px] text-muted-foreground">{e.endTime}</p>
-                      </div>
-                      <div className="w-px h-10 bg-border" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold flex items-center gap-1.5">
-                          {e.isVIP && <span className="text-accent">★</span>}
-                          {e.title}
-                          {e.source === 'google' && <Badge variant="outline" className="text-[9px] ml-1">Google</Badge>}
-                        </p>
-                        {e.description && <p className="text-xs text-muted-foreground mt-0.5">{e.description}</p>}
-                        <div className="flex items-center gap-3 mt-1">
-                          {e.location && <span className="text-[10px] text-muted-foreground flex items-center gap-1"><MapPin className="w-3 h-3" />{e.location}</span>}
-                          <Badge variant="outline" className="text-[10px]">{e.category}</Badge>
-                        </div>
-                      </div>
-                      {isSoon && (
-                        <Badge className="bg-accent text-accent-foreground animate-pulse-soft shrink-0">
-                          <Clock className="w-3 h-3 mr-1" /> Em {diffMin}min
-                        </Badge>
-                      )}
+                {dayEvents.length === 0 && <p className="text-sm text-muted-foreground py-8 text-center">Nenhum evento neste dia.</p>}
+                {dayEvents.map((e: any) => (
+                  <div key={e.id} className="rounded-xl border bg-card p-4 flex items-center gap-4">
+                    <div className="text-center w-16 shrink-0">
+                      <p className="text-lg font-mono font-bold">{new Date(e.inicio_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</p>
+                      <p className="text-[10px] text-muted-foreground">{new Date(e.fim_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</p>
                     </div>
-                  );
-                })}
+                    <div className="w-px h-10 bg-border" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold truncate">{e.titulo}</p>
+                      {e.descricao && <p className="text-xs text-muted-foreground mt-0.5">{e.descricao}</p>}
+                      <div className="flex items-center gap-3 mt-1">
+                        {e.local && <span className="text-[10px] text-muted-foreground flex items-center gap-1"><MapPin className="w-3 h-3" />{e.local}</span>}
+                        {e.tipo_tag && <Badge variant="outline" className="text-[10px]">{e.tipo_tag}</Badge>}
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
             </TabsContent>
           );

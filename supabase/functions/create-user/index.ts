@@ -19,7 +19,6 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-    // Verify caller is admin
     const userClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_PUBLISHABLE_KEY")!, {
       global: { headers: { Authorization: authHeader } },
     });
@@ -29,12 +28,16 @@ Deno.serve(async (req) => {
     }
 
     const adminClient = createClient(supabaseUrl, serviceRoleKey);
+
+    // Check if caller is admin in user_roles OR admin in any org
     const { data: roles } = await adminClient.from("user_roles").select("role").eq("user_id", caller.id).eq("role", "admin");
-    if (!roles || roles.length === 0) {
+    const { data: orgRoles } = await adminClient.from("org_members").select("role").eq("user_id", caller.id).in("role", ["admin", "gestor"]);
+
+    if ((!roles || roles.length === 0) && (!orgRoles || orgRoles.length === 0)) {
       return new Response(JSON.stringify({ error: "Sem permissão de administrador" }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    const { email, password, full_name } = await req.json();
+    const { email, password, full_name, org_id, role, cargo } = await req.json();
     if (!email || !password) {
       return new Response(JSON.stringify({ error: "Email e senha são obrigatórios" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
@@ -50,12 +53,23 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: error.message }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    // Assign 'user' role
+    // Assign 'user' role in user_roles
     await adminClient.from("user_roles").insert({ user_id: data.user.id, role: "user" });
 
     // Update profile name
     if (full_name) {
       await adminClient.from("profiles").update({ full_name }).eq("user_id", data.user.id);
+    }
+
+    // If org_id provided, add as org_member
+    if (org_id) {
+      await adminClient.from("org_members").insert({
+        org_id,
+        user_id: data.user.id,
+        role: role || "operador",
+        nome_exibicao: full_name || email,
+        cargo: cargo || null,
+      });
     }
 
     return new Response(JSON.stringify({ user: data.user }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });

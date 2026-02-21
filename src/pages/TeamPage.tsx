@@ -1,8 +1,12 @@
-import { useAppStore, TeamMember } from '@/store/useAppStore';
+import { useOrgMembers } from '@/hooks/useOrgMembers';
+import { useTasks } from '@/hooks/useTasks';
+import { useTransports } from '@/hooks/useTransports';
+import { useSchedules } from '@/hooks/useSchedules';
+import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import { Badge } from '@/components/ui/badge';
 import { Plus, CalendarDays, Pencil, Trash2, UserPlus, Loader2 } from 'lucide-react';
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -17,92 +21,104 @@ const TEAM_COLORS = [
 ];
 
 export default function TeamPage() {
-  const { team, tasks, transports, addSchedule, updateTeamMember, addTeamMember, removeTeamMember } = useAppStore();
-  const [scheduleOpen, setScheduleOpen] = useState(false);
-  const [selectedMember, setSelectedMember] = useState('');
-  const [scheduleForm, setScheduleForm] = useState({ date: '', startTime: '', endTime: '', note: '' });
+  const { orgId } = useCurrentOrg();
+  const { members, addMember, updateMember, removeMember } = useOrgMembers();
+  const { tasks } = useTasks();
+  const { transports } = useTransports();
+  const { schedules, shifts, assignments, createSchedule, createShift, createAssignment } = useSchedules();
+
+  const [addOpen, setAddOpen] = useState(false);
+  const [addForm, setAddForm] = useState({ nome: '', cargo: '', telefone: '', email: '', password: '', role: 'operador' });
+  const [addLoading, setAddLoading] = useState(false);
 
   const [editOpen, setEditOpen] = useState(false);
   const [editId, setEditId] = useState('');
-  const [editForm, setEditForm] = useState({ name: '', role: '', phone: '' });
+  const [editForm, setEditForm] = useState({ nome: '', cargo: '', telefone: '' });
 
-  const [addOpen, setAddOpen] = useState(false);
-  const [addForm, setAddForm] = useState({ name: '', role: '', phone: '', email: '', password: '' });
-  const [addLoading, setAddLoading] = useState(false);
+  const [scheduleOpen, setScheduleOpen] = useState(false);
+  const [scheduleForm, setScheduleForm] = useState({ nome: '', data_inicio: '', data_fim: '' });
+
+  const [shiftOpen, setShiftOpen] = useState(false);
+  const [shiftForm, setShiftForm] = useState({ schedule_id: '', titulo: '', inicio_em: '', fim_em: '', local: '' });
+
+  const [assignOpen, setAssignOpen] = useState(false);
+  const [assignForm, setAssignForm] = useState({ schedule_shift_id: '', member_user_id: '', funcao: '' });
 
   const [viewScheduleOpen, setViewScheduleOpen] = useState(false);
-  const [viewMember, setViewMember] = useState<TeamMember | null>(null);
-
-  const openEdit = (m: TeamMember) => {
-    setEditId(m.id);
-    setEditForm({ name: m.name, role: m.role, phone: m.phone || '' });
-    setEditOpen(true);
-  };
-
-  const handleEdit = () => {
-    if (!editForm.name || !editForm.role) return;
-    updateTeamMember(editId, { name: editForm.name, role: editForm.role, phone: editForm.phone || undefined });
-    setEditOpen(false);
-  };
+  const [viewMemberId, setViewMemberId] = useState('');
 
   const handleAdd = async () => {
-    if (!addForm.name || !addForm.role) return;
-
+    if (!addForm.nome || !addForm.cargo) return;
     setAddLoading(true);
     try {
-      // If email and password provided, create auth user
+      let userId: string | null = null;
       if (addForm.email && addForm.password) {
         const { data, error } = await supabase.functions.invoke('create-user', {
-          body: { email: addForm.email, password: addForm.password, full_name: addForm.name },
+          body: { email: addForm.email, password: addForm.password, full_name: addForm.nome, org_id: orgId, role: addForm.role, cargo: addForm.cargo },
         });
-        if (error || data?.error) {
-          toast.error(data?.error || error?.message || 'Erro ao criar acesso');
-          setAddLoading(false);
-          return;
-        }
+        if (error || data?.error) { toast.error(data?.error || error?.message); setAddLoading(false); return; }
+        userId = data?.user?.id;
         toast.success('Acesso criado com sucesso');
       }
-
-      addTeamMember({
-        id: `tm${Date.now()}`,
-        name: addForm.name,
-        role: addForm.role,
-        phone: addForm.phone || undefined,
-        color: TEAM_COLORS[team.length % TEAM_COLORS.length],
-      });
-      setAddForm({ name: '', role: '', phone: '', email: '', password: '' });
+      if (userId) {
+        await addMember.mutateAsync({
+          user_id: userId,
+          nome_exibicao: addForm.nome,
+          cargo: addForm.cargo,
+          telefone: addForm.telefone || undefined,
+          avatar_color: TEAM_COLORS[members.length % TEAM_COLORS.length],
+          role: addForm.role,
+        });
+      }
+      setAddForm({ nome: '', cargo: '', telefone: '', email: '', password: '', role: 'operador' });
       setAddOpen(false);
-    } catch (err) {
-      toast.error('Erro ao adicionar membro');
-    }
+    } catch (err: any) { toast.error(err.message); }
     setAddLoading(false);
   };
 
-  const handleAddSchedule = () => {
-    if (!selectedMember || !scheduleForm.date || !scheduleForm.startTime || !scheduleForm.endTime) return;
-    addSchedule(selectedMember, {
-      date: scheduleForm.date, startTime: scheduleForm.startTime,
-      endTime: scheduleForm.endTime, note: scheduleForm.note || undefined,
-    });
-    setScheduleForm({ date: '', startTime: '', endTime: '', note: '' });
-    setScheduleOpen(false);
+  const handleEdit = async () => {
+    if (!editForm.nome) return;
+    await updateMember.mutateAsync({ id: editId, nome_exibicao: editForm.nome, cargo: editForm.cargo || null, telefone: editForm.telefone || null });
+    setEditOpen(false);
+    toast.success('Membro atualizado');
   };
 
-  const today = new Date().toISOString().split('T')[0];
-  const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+  const handleCreateSchedule = async () => {
+    if (!scheduleForm.nome || !scheduleForm.data_inicio || !scheduleForm.data_fim) return;
+    await createSchedule.mutateAsync(scheduleForm);
+    setScheduleForm({ nome: '', data_inicio: '', data_fim: '' });
+    setScheduleOpen(false);
+    toast.success('Escala criada');
+  };
+
+  const handleCreateShift = async () => {
+    if (!shiftForm.schedule_id || !shiftForm.titulo || !shiftForm.inicio_em || !shiftForm.fim_em) return;
+    await createShift.mutateAsync(shiftForm);
+    setShiftForm({ schedule_id: '', titulo: '', inicio_em: '', fim_em: '', local: '' });
+    setShiftOpen(false);
+    toast.success('Turno criado');
+  };
+
+  const handleAssign = async () => {
+    if (!assignForm.schedule_shift_id || !assignForm.member_user_id) return;
+    await createAssignment.mutateAsync(assignForm);
+    setAssignForm({ schedule_shift_id: '', member_user_id: '', funcao: '' });
+    setAssignOpen(false);
+    toast.success('Alocação registrada');
+  };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">Equipe</h1>
-          <p className="text-sm text-muted-foreground mt-1">{team.length} membros da logística</p>
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Equipe</h1>
+          <p className="text-sm text-muted-foreground mt-1">{members.length} membros</p>
         </div>
-        <div className="flex gap-2">
-          <Button size="sm" variant="outline" onClick={() => setScheduleOpen(true)}>
-            <CalendarDays className="w-4 h-4 mr-1" /> Cadastrar Escala
+        <div className="flex gap-2 flex-wrap">
+          <Button size="sm" variant="outline" onClick={() => setScheduleOpen(true)} className="h-10 sm:h-9">
+            <CalendarDays className="w-4 h-4 mr-1" /> Criar Escala
           </Button>
-          <Button size="sm" onClick={() => setAddOpen(true)}>
+          <Button size="sm" onClick={() => setAddOpen(true)} className="h-10 sm:h-9">
             <UserPlus className="w-4 h-4 mr-1" /> Adicionar
           </Button>
         </div>
@@ -113,48 +129,26 @@ export default function TeamPage() {
         <DialogContent>
           <DialogHeader><DialogTitle>Adicionar Membro</DialogTitle></DialogHeader>
           <div className="space-y-3">
-            <Input placeholder="Nome completo" value={addForm.name} onChange={(e) => setAddForm({ ...addForm, name: e.target.value })} />
-            <Input placeholder="Função" value={addForm.role} onChange={(e) => setAddForm({ ...addForm, role: e.target.value })} />
-            <Input placeholder="Celular / WhatsApp" value={addForm.phone} onChange={(e) => setAddForm({ ...addForm, phone: e.target.value })} />
+            <Input placeholder="Nome completo" value={addForm.nome} onChange={(e) => setAddForm({ ...addForm, nome: e.target.value })} />
+            <Input placeholder="Cargo / Função" value={addForm.cargo} onChange={(e) => setAddForm({ ...addForm, cargo: e.target.value })} />
+            <Input placeholder="Celular / WhatsApp" value={addForm.telefone} onChange={(e) => setAddForm({ ...addForm, telefone: e.target.value })} />
+            <Select value={addForm.role} onValueChange={(v) => setAddForm({ ...addForm, role: v })}>
+              <SelectTrigger><SelectValue placeholder="Permissão" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="admin">Administrador</SelectItem>
+                <SelectItem value="gestor">Gestor</SelectItem>
+                <SelectItem value="operador">Operador</SelectItem>
+                <SelectItem value="leitura">Somente Leitura</SelectItem>
+              </SelectContent>
+            </Select>
             <div className="border-t pt-3 mt-2">
-              <p className="text-xs text-muted-foreground mb-2">Acesso ao sistema (opcional)</p>
+              <p className="text-xs text-muted-foreground mb-2">Acesso ao sistema (obrigatório)</p>
               <Input type="email" placeholder="E-mail de acesso" value={addForm.email} onChange={(e) => setAddForm({ ...addForm, email: e.target.value })} />
               <Input type="password" placeholder="Senha" value={addForm.password} onChange={(e) => setAddForm({ ...addForm, password: e.target.value })} className="mt-2" />
             </div>
             <Button onClick={handleAdd} className="w-full" disabled={addLoading}>
-              {addLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-              Adicionar
+              {addLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />} Adicionar
             </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Schedule */}
-      <Dialog open={scheduleOpen} onOpenChange={setScheduleOpen}>
-        <DialogContent>
-          <DialogHeader><DialogTitle>Cadastrar Escala de Trabalho</DialogTitle></DialogHeader>
-          <div className="space-y-3">
-            <Select value={selectedMember} onValueChange={setSelectedMember}>
-              <SelectTrigger><SelectValue placeholder="Selecionar membro" /></SelectTrigger>
-              <SelectContent>
-                {team.map((m) => (
-                  <SelectItem key={m.id} value={m.id}>{m.name} - {m.role}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Input type="date" value={scheduleForm.date} onChange={(e) => setScheduleForm({ ...scheduleForm, date: e.target.value })} />
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <label className="text-xs text-muted-foreground mb-1 block">Entrada</label>
-                <Input type="time" value={scheduleForm.startTime} onChange={(e) => setScheduleForm({ ...scheduleForm, startTime: e.target.value })} />
-              </div>
-              <div>
-                <label className="text-xs text-muted-foreground mb-1 block">Saída</label>
-                <Input type="time" value={scheduleForm.endTime} onChange={(e) => setScheduleForm({ ...scheduleForm, endTime: e.target.value })} />
-              </div>
-            </div>
-            <Input placeholder="Observação (opcional)" value={scheduleForm.note} onChange={(e) => setScheduleForm({ ...scheduleForm, note: e.target.value })} />
-            <Button onClick={handleAddSchedule} className="w-full">Salvar Escala</Button>
           </div>
         </DialogContent>
       </Dialog>
@@ -164,60 +158,155 @@ export default function TeamPage() {
         <DialogContent>
           <DialogHeader><DialogTitle>Editar Membro</DialogTitle></DialogHeader>
           <div className="space-y-3">
-            <Input placeholder="Nome" value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} />
-            <Input placeholder="Função" value={editForm.role} onChange={(e) => setEditForm({ ...editForm, role: e.target.value })} />
-            <Input placeholder="Celular / WhatsApp" value={editForm.phone} onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })} />
+            <Input placeholder="Nome" value={editForm.nome} onChange={(e) => setEditForm({ ...editForm, nome: e.target.value })} />
+            <Input placeholder="Cargo" value={editForm.cargo} onChange={(e) => setEditForm({ ...editForm, cargo: e.target.value })} />
+            <Input placeholder="Telefone" value={editForm.telefone} onChange={(e) => setEditForm({ ...editForm, telefone: e.target.value })} />
             <Button onClick={handleEdit} className="w-full">Salvar</Button>
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* View schedule */}
-      <Dialog open={viewScheduleOpen} onOpenChange={setViewScheduleOpen}>
+      {/* Create schedule */}
+      <Dialog open={scheduleOpen} onOpenChange={setScheduleOpen}>
         <DialogContent>
-          <DialogHeader><DialogTitle>Escala - {viewMember?.name}</DialogTitle></DialogHeader>
-          <div className="space-y-2 max-h-80 overflow-y-auto">
-            {(!viewMember?.schedule || viewMember.schedule.length === 0) && (
-              <p className="text-sm text-muted-foreground">Nenhuma escala cadastrada.</p>
-            )}
-            {viewMember?.schedule?.sort((a, b) => a.date.localeCompare(b.date)).map((s, i) => (
-              <div key={i} className="p-3 rounded-lg bg-muted/50 text-sm flex justify-between items-center">
-                <div>
-                  <p className="font-medium">{new Date(s.date + 'T00:00').toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' })}</p>
-                  {s.note && <p className="text-xs text-muted-foreground">{s.note}</p>}
-                </div>
-                <span className="text-xs text-muted-foreground">{s.startTime} - {s.endTime}</span>
+          <DialogHeader><DialogTitle>Criar Escala</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <Input placeholder="Nome da escala" value={scheduleForm.nome} onChange={(e) => setScheduleForm({ ...scheduleForm, nome: e.target.value })} />
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Início</label>
+                <Input type="date" value={scheduleForm.data_inicio} onChange={(e) => setScheduleForm({ ...scheduleForm, data_inicio: e.target.value })} />
               </div>
-            ))}
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Fim</label>
+                <Input type="date" value={scheduleForm.data_fim} onChange={(e) => setScheduleForm({ ...scheduleForm, data_fim: e.target.value })} />
+              </div>
+            </div>
+            <Button onClick={handleCreateSchedule} className="w-full" disabled={createSchedule.isPending}>Criar Escala</Button>
           </div>
         </DialogContent>
       </Dialog>
 
+      {/* Create shift */}
+      <Dialog open={shiftOpen} onOpenChange={setShiftOpen}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Criar Turno</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <Select value={shiftForm.schedule_id} onValueChange={(v) => setShiftForm({ ...shiftForm, schedule_id: v })}>
+              <SelectTrigger><SelectValue placeholder="Escala" /></SelectTrigger>
+              <SelectContent>
+                {schedules.map((s: any) => <SelectItem key={s.id} value={s.id}>{s.nome}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <Input placeholder="Título do turno (ex: Manhã)" value={shiftForm.titulo} onChange={(e) => setShiftForm({ ...shiftForm, titulo: e.target.value })} />
+            <div className="grid grid-cols-2 gap-3">
+              <Input type="datetime-local" value={shiftForm.inicio_em} onChange={(e) => setShiftForm({ ...shiftForm, inicio_em: e.target.value })} />
+              <Input type="datetime-local" value={shiftForm.fim_em} onChange={(e) => setShiftForm({ ...shiftForm, fim_em: e.target.value })} />
+            </div>
+            <Input placeholder="Local (opcional)" value={shiftForm.local} onChange={(e) => setShiftForm({ ...shiftForm, local: e.target.value })} />
+            <Button onClick={handleCreateShift} className="w-full" disabled={createShift.isPending}>Criar Turno</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Assign to shift */}
+      <Dialog open={assignOpen} onOpenChange={setAssignOpen}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Alocar Membro no Turno</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <Select value={assignForm.schedule_shift_id} onValueChange={(v) => setAssignForm({ ...assignForm, schedule_shift_id: v })}>
+              <SelectTrigger><SelectValue placeholder="Turno" /></SelectTrigger>
+              <SelectContent>
+                {shifts.map((s: any) => <SelectItem key={s.id} value={s.id}>{s.titulo} ({new Date(s.inicio_em).toLocaleDateString('pt-BR')})</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <Select value={assignForm.member_user_id} onValueChange={(v) => setAssignForm({ ...assignForm, member_user_id: v })}>
+              <SelectTrigger><SelectValue placeholder="Membro" /></SelectTrigger>
+              <SelectContent>
+                {members.map((m: any) => <SelectItem key={m.user_id} value={m.user_id}>{m.nome_exibicao}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <Input placeholder="Função no turno (opcional)" value={assignForm.funcao} onChange={(e) => setAssignForm({ ...assignForm, funcao: e.target.value })} />
+            <Button onClick={handleAssign} className="w-full" disabled={createAssignment.isPending}>Alocar</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* View schedule for member */}
+      <Dialog open={viewScheduleOpen} onOpenChange={setViewScheduleOpen}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Escala do Membro</DialogTitle></DialogHeader>
+          <div className="space-y-2 max-h-80 overflow-y-auto">
+            {(() => {
+              const memberAssignments = assignments.filter((a: any) => a.member_user_id === viewMemberId);
+              if (memberAssignments.length === 0) return <p className="text-sm text-muted-foreground">Nenhuma escala cadastrada.</p>;
+              return memberAssignments.map((a: any) => {
+                const shift = shifts.find((s: any) => s.id === a.schedule_shift_id);
+                if (!shift) return null;
+                return (
+                  <div key={a.id} className="p-3 rounded-lg bg-muted/50 text-sm flex justify-between items-center">
+                    <div>
+                      <p className="font-medium">{shift.titulo}</p>
+                      <p className="text-xs text-muted-foreground">{new Date(shift.inicio_em).toLocaleDateString('pt-BR')}</p>
+                      {a.funcao && <p className="text-xs text-muted-foreground">{a.funcao}</p>}
+                    </div>
+                    <span className="text-xs text-muted-foreground">
+                      {new Date(shift.inicio_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })} - {new Date(shift.fim_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                );
+              });
+            })()}
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Schedules section */}
+      {schedules.length > 0 && (
+        <div className="rounded-xl border bg-card p-4">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="font-semibold text-sm">Escalas</h2>
+            <div className="flex gap-2">
+              <Button size="sm" variant="outline" onClick={() => setShiftOpen(true)} className="h-8 text-xs">+ Turno</Button>
+              <Button size="sm" variant="outline" onClick={() => setAssignOpen(true)} className="h-8 text-xs">+ Alocação</Button>
+            </div>
+          </div>
+          <div className="space-y-2">
+            {schedules.map((s: any) => (
+              <div key={s.id} className="p-3 rounded-lg bg-muted/50 text-sm">
+                <p className="font-medium">{s.nome}</p>
+                <p className="text-xs text-muted-foreground">{new Date(s.data_inicio + 'T00:00').toLocaleDateString('pt-BR')} — {new Date(s.data_fim + 'T00:00').toLocaleDateString('pt-BR')}</p>
+                <Badge variant="outline" className="text-[10px] mt-1">{s.status}</Badge>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Team cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {team.map((m) => {
-          const memberTasks = tasks.filter((t) => t.assignedTo === m.id);
-          const pending = memberTasks.filter((t) => t.status !== 'done').length;
-          const done = memberTasks.filter((t) => t.status === 'done').length;
-          const activeTransport = transports.find((t) => t.driverId === m.id && t.status === 'in_progress');
-          const todaySchedule = m.schedule?.find((s) => s.date === today);
-          const tomorrowSchedule = m.schedule?.find((s) => s.date === tomorrow);
+        {members.map((m: any) => {
+          const memberTasks = tasks.filter((t: any) => t.assignee_user_id === m.user_id);
+          const pending = memberTasks.filter((t: any) => t.status === 'pendente').length;
+          const done = memberTasks.filter((t: any) => t.status === 'concluida').length;
+          const activeTransport = transports.find((t: any) => t.motorista_user_id === m.user_id && t.status === 'em_andamento');
 
           return (
             <div key={m.id} className="rounded-xl border bg-card p-5 hover:shadow-md transition-shadow">
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold text-primary-foreground" style={{ backgroundColor: m.color }}>
-                  {m.name.split(' ').map((n) => n[0]).join('').slice(0, 2)}
+                <div className="w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold text-primary-foreground" style={{ backgroundColor: m.avatar_color || TEAM_COLORS[0] }}>
+                  {(m.nome_exibicao || '?').split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold">{m.name}</p>
-                  <p className="text-xs text-muted-foreground">{m.role}</p>
-                  {m.phone && <p className="text-[10px] text-muted-foreground">{m.phone}</p>}
+                  <p className="font-semibold">{m.nome_exibicao}</p>
+                  <p className="text-xs text-muted-foreground">{m.cargo}</p>
+                  {m.telefone && <p className="text-[10px] text-muted-foreground">{m.telefone}</p>}
                 </div>
                 <div className="flex items-center gap-1">
-                  <button onClick={() => openEdit(m)} className="p-1.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground">
+                  <button onClick={() => { setEditId(m.id); setEditForm({ nome: m.nome_exibicao || '', cargo: m.cargo || '', telefone: m.telefone || '' }); setEditOpen(true); }} className="p-1.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground">
                     <Pencil className="w-3.5 h-3.5" />
                   </button>
-                  <button onClick={() => removeTeamMember(m.id)} className="p-1.5 rounded-lg hover:bg-destructive/10 transition-colors text-muted-foreground hover:text-destructive">
+                  <button onClick={() => { removeMember.mutateAsync(m.id); toast.success('Membro desativado'); }} className="p-1.5 rounded-lg hover:bg-destructive/10 transition-colors text-muted-foreground hover:text-destructive">
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </div>
@@ -228,36 +317,15 @@ export default function TeamPage() {
                 <Badge variant="secondary" className="text-[10px]">{done} concluída{done !== 1 ? 's' : ''}</Badge>
               </div>
 
-              {(todaySchedule || tomorrowSchedule) && (
-                <div className="space-y-1.5 mb-3">
-                  {todaySchedule && (
-                    <div className="text-xs p-2 rounded-lg bg-primary/5 border border-primary/10 flex items-center gap-2">
-                      <CalendarDays className="w-3 h-3 text-primary shrink-0" />
-                      <span className="font-medium text-primary">Hoje:</span>
-                      <span className="text-muted-foreground">{todaySchedule.startTime} - {todaySchedule.endTime}</span>
-                      {todaySchedule.note && <span className="text-muted-foreground/70 truncate">· {todaySchedule.note}</span>}
-                    </div>
-                  )}
-                  {tomorrowSchedule && (
-                    <div className="text-xs p-2 rounded-lg bg-muted/50 flex items-center gap-2">
-                      <CalendarDays className="w-3 h-3 text-muted-foreground shrink-0" />
-                      <span className="font-medium">Amanhã:</span>
-                      <span className="text-muted-foreground">{tomorrowSchedule.startTime} - {tomorrowSchedule.endTime}</span>
-                      {tomorrowSchedule.note && <span className="text-muted-foreground/70 truncate">· {tomorrowSchedule.note}</span>}
-                    </div>
-                  )}
-                </div>
-              )}
-
               {activeTransport && (
                 <div className="text-xs p-2.5 rounded-lg bg-accent/10 border border-accent/20 mb-3">
                   <p className="font-medium text-accent">🚗 Em transporte</p>
-                  <p className="text-muted-foreground mt-0.5">{activeTransport.guestName}: {activeTransport.from} → {activeTransport.to}</p>
+                  <p className="text-muted-foreground mt-0.5">{activeTransport.origem} → {activeTransport.destino}</p>
                 </div>
               )}
 
               <button
-                onClick={() => { setViewMember(m); setViewScheduleOpen(true); }}
+                onClick={() => { setViewMemberId(m.user_id); setViewScheduleOpen(true); }}
                 className="w-full text-xs font-medium py-2 rounded-lg border border-border hover:bg-muted transition-colors"
               >
                 Ver Escala Completa
@@ -265,6 +333,12 @@ export default function TeamPage() {
             </div>
           );
         })}
+        {members.length === 0 && (
+          <div className="col-span-full text-center py-12 text-muted-foreground">
+            <UserPlus className="w-8 h-8 mx-auto mb-2 opacity-50" />
+            <p className="text-sm">Nenhum membro cadastrado</p>
+          </div>
+        )}
       </div>
     </div>
   );

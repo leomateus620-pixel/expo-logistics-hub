@@ -1,5 +1,6 @@
-import { useAppStore, Vehicle, VehicleStatus } from '@/store/useAppStore';
-import { Zap, Wrench, Pencil, Plus, Phone, Clock } from 'lucide-react';
+import { useElectricCarts } from '@/hooks/useElectricCarts';
+import { useOrgMembers } from '@/hooks/useOrgMembers';
+import { Zap, Wrench, Pencil, Plus, Phone } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
@@ -7,74 +8,62 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { toast } from 'sonner';
 
-const statusConfig: Record<VehicleStatus, { label: string; class: string }> = {
-  available: { label: 'Disponível', class: 'bg-success/10 text-success border-success/20' },
-  in_use: { label: 'Em uso', class: 'bg-info/10 text-info border-info/20' },
-  maintenance: { label: 'Manutenção', class: 'bg-destructive/10 text-destructive border-destructive/20' },
+const statusConfig: Record<string, { label: string; class: string }> = {
+  disponivel: { label: 'Disponível', class: 'bg-success/10 text-success border-success/20' },
+  em_uso: { label: 'Em uso', class: 'bg-info/10 text-info border-info/20' },
+  manutencao: { label: 'Manutenção', class: 'bg-destructive/10 text-destructive border-destructive/20' },
+  inativo: { label: 'Inativo', class: 'bg-muted text-muted-foreground' },
 };
 
 export default function ElectricCartsPage() {
-  const { vehicles, team, updateVehicle, addVehicle, addVehicleLog, closeVehicleLog } = useAppStore();
-  const carts = vehicles.filter((v) => v.type === 'electric');
-
-  const [editOpen, setEditOpen] = useState(false);
-  const [editForm, setEditForm] = useState({ id: '', name: '', plate: '', status: 'available' as VehicleStatus });
+  const { carts, create, update, pickup, returnCart } = useElectricCarts();
+  const { members } = useOrgMembers();
 
   const [addOpen, setAddOpen] = useState(false);
-  const [addForm, setAddForm] = useState({ name: '', plate: '' });
+  const [addForm, setAddForm] = useState({ codigo: '', nome: '' });
+
+  const [editOpen, setEditOpen] = useState(false);
+  const [editId, setEditId] = useState('');
+  const [editForm, setEditForm] = useState({ codigo: '', nome: '', status: 'disponivel' });
 
   const [pickupOpen, setPickupOpen] = useState(false);
-  const [pickupForm, setPickupForm] = useState({ vehicleId: '', userId: '' });
+  const [pickupForm, setPickupForm] = useState({ cartId: '', userId: '' });
 
-  const [returnOpen, setReturnOpen] = useState(false);
-  const [returnForm, setReturnForm] = useState({ vehicleId: '', logId: '' });
-
-  const [logsOpen, setLogsOpen] = useState(false);
-  const [logsVehicle, setLogsVehicle] = useState<Vehicle | null>(null);
-
-  const openEdit = (v: Vehicle) => {
-    setEditForm({ id: v.id, name: v.name, plate: v.plate, status: v.status });
-    setEditOpen(true);
+  const handleAdd = async () => {
+    if (!addForm.codigo) return;
+    try {
+      await create.mutateAsync({ codigo: addForm.codigo, nome: addForm.nome || null });
+      setAddForm({ codigo: '', nome: '' });
+      setAddOpen(false);
+      toast.success('Carrinho adicionado');
+    } catch (err: any) { toast.error(err.message); }
   };
 
-  const handleEdit = () => {
-    if (!editForm.name || !editForm.plate) return;
-    updateVehicle(editForm.id, { name: editForm.name, plate: editForm.plate, status: editForm.status });
-    setEditOpen(false);
+  const handleEdit = async () => {
+    try {
+      await update.mutateAsync({ id: editId, codigo: editForm.codigo, nome: editForm.nome || null, status: editForm.status });
+      setEditOpen(false);
+      toast.success('Carrinho atualizado');
+    } catch (err: any) { toast.error(err.message); }
   };
 
-  const handleAdd = () => {
-    if (!addForm.name || !addForm.plate) return;
-    addVehicle({
-      id: `v${Date.now()}`,
-      name: addForm.name,
-      plate: addForm.plate,
-      type: 'electric',
-      status: 'available',
-      logs: [],
-    });
-    setAddForm({ name: '', plate: '' });
-    setAddOpen(false);
+  const handlePickup = async () => {
+    if (!pickupForm.cartId || !pickupForm.userId) return;
+    try {
+      await pickup.mutateAsync({ id: pickupForm.cartId, responsavel_user_id: pickupForm.userId });
+      setPickupForm({ cartId: '', userId: '' });
+      setPickupOpen(false);
+      toast.success('Retirada registrada');
+    } catch (err: any) { toast.error(err.message); }
   };
 
-  const handlePickup = () => {
-    if (!pickupForm.vehicleId || !pickupForm.userId) return;
-    addVehicleLog(pickupForm.vehicleId, {
-      id: `log${Date.now()}`,
-      userId: pickupForm.userId,
-      pickupDate: new Date().toISOString(),
-      pickupKm: 0,
-    });
-    setPickupForm({ vehicleId: '', userId: '' });
-    setPickupOpen(false);
-  };
-
-  const handleReturn = () => {
-    if (!returnForm.vehicleId || !returnForm.logId) return;
-    closeVehicleLog(returnForm.vehicleId, returnForm.logId, new Date().toISOString(), 0);
-    setReturnForm({ vehicleId: '', logId: '' });
-    setReturnOpen(false);
+  const handleReturn = async (id: string) => {
+    try {
+      await returnCart.mutateAsync(id);
+      toast.success('Devolução registrada');
+    } catch (err: any) { toast.error(err.message); }
   };
 
   return (
@@ -86,7 +75,7 @@ export default function ElectricCartsPage() {
         </div>
         <div className="flex gap-2">
           <Button size="sm" variant="outline" onClick={() => setPickupOpen(true)} className="h-10 sm:h-9">
-            <Clock className="w-4 h-4 mr-1" /> Retirada
+            <Zap className="w-4 h-4 mr-1" /> Retirada
           </Button>
           <Button size="sm" onClick={() => setAddOpen(true)} className="h-10 sm:h-9">
             <Plus className="w-4 h-4 mr-1" /> Adicionar
@@ -94,169 +83,118 @@ export default function ElectricCartsPage() {
         </div>
       </div>
 
-      {/* Add */}
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader><DialogTitle>Adicionar Carrinho Elétrico</DialogTitle></DialogHeader>
           <div className="space-y-3">
-            <Input placeholder="Nome / Identificação" value={addForm.name} onChange={(e) => setAddForm({ ...addForm, name: e.target.value })} />
-            <Input placeholder="Placa / Código" value={addForm.plate} onChange={(e) => setAddForm({ ...addForm, plate: e.target.value })} />
-            <Button onClick={handleAdd} className="w-full h-11">Adicionar</Button>
+            <Input placeholder="Código (ex: ELE-0001)" value={addForm.codigo} onChange={(e) => setAddForm({ ...addForm, codigo: e.target.value })} />
+            <Input placeholder="Nome / Descrição" value={addForm.nome} onChange={(e) => setAddForm({ ...addForm, nome: e.target.value })} />
+            <Button onClick={handleAdd} className="w-full h-11" disabled={create.isPending}>Adicionar</Button>
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* Edit */}
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader><DialogTitle>Editar Carrinho</DialogTitle></DialogHeader>
           <div className="space-y-3">
-            <Input placeholder="Nome" value={editForm.name} onChange={(e) => setEditForm({ ...editForm, name: e.target.value })} />
-            <Input placeholder="Placa / Código" value={editForm.plate} onChange={(e) => setEditForm({ ...editForm, plate: e.target.value })} />
-            <Select value={editForm.status} onValueChange={(v) => setEditForm({ ...editForm, status: v as VehicleStatus })}>
+            <Input placeholder="Código" value={editForm.codigo} onChange={(e) => setEditForm({ ...editForm, codigo: e.target.value })} />
+            <Input placeholder="Nome" value={editForm.nome} onChange={(e) => setEditForm({ ...editForm, nome: e.target.value })} />
+            <Select value={editForm.status} onValueChange={(v) => setEditForm({ ...editForm, status: v })}>
               <SelectTrigger><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="available">Disponível</SelectItem>
-                <SelectItem value="in_use">Em uso</SelectItem>
-                <SelectItem value="maintenance">Manutenção</SelectItem>
+                <SelectItem value="disponivel">Disponível</SelectItem>
+                <SelectItem value="em_uso">Em uso</SelectItem>
+                <SelectItem value="manutencao">Manutenção</SelectItem>
               </SelectContent>
             </Select>
-            <Button onClick={handleEdit} className="w-full h-11">Salvar</Button>
+            <Button onClick={handleEdit} className="w-full h-11" disabled={update.isPending}>Salvar</Button>
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* Pickup - no KM */}
       <Dialog open={pickupOpen} onOpenChange={setPickupOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader><DialogTitle>Registrar Retirada</DialogTitle></DialogHeader>
           <div className="space-y-3">
-            <Select value={pickupForm.vehicleId} onValueChange={(v) => setPickupForm({ ...pickupForm, vehicleId: v })}>
+            <Select value={pickupForm.cartId} onValueChange={(v) => setPickupForm({ ...pickupForm, cartId: v })}>
               <SelectTrigger><SelectValue placeholder="Carrinho" /></SelectTrigger>
               <SelectContent>
-                {carts.filter((v) => v.status === 'available').map((v) => (
-                  <SelectItem key={v.id} value={v.id}>{v.name} ({v.plate})</SelectItem>
+                {carts.filter((c: any) => c.status === 'disponivel').map((c: any) => (
+                  <SelectItem key={c.id} value={c.id}>{c.nome || c.codigo} ({c.codigo})</SelectItem>
                 ))}
               </SelectContent>
             </Select>
             <Select value={pickupForm.userId} onValueChange={(v) => setPickupForm({ ...pickupForm, userId: v })}>
               <SelectTrigger><SelectValue placeholder="Responsável" /></SelectTrigger>
               <SelectContent>
-                {team.map((m) => (
-                  <SelectItem key={m.id} value={m.id}>{m.name} - {m.role}</SelectItem>
+                {members.map((m: any) => (
+                  <SelectItem key={m.user_id} value={m.user_id}>{m.nome_exibicao} - {m.cargo}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            <Button onClick={handlePickup} className="w-full h-11">Registrar Retirada</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Return - no KM */}
-      <Dialog open={returnOpen} onOpenChange={setReturnOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader><DialogTitle>Registrar Devolução</DialogTitle></DialogHeader>
-          <div className="space-y-3">
-            <p className="text-sm text-muted-foreground">Confirmar devolução do carrinho?</p>
-            <Button onClick={handleReturn} className="w-full h-11">Registrar Devolução</Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Logs - no KM */}
-      <Dialog open={logsOpen} onOpenChange={setLogsOpen}>
-        <DialogContent className="sm:max-w-lg">
-          <DialogHeader><DialogTitle>Histórico - {logsVehicle?.name}</DialogTitle></DialogHeader>
-          <div className="space-y-2 max-h-80 overflow-y-auto">
-            {logsVehicle?.logs.length === 0 && <p className="text-sm text-muted-foreground">Nenhum registro.</p>}
-            {logsVehicle?.logs.map((log) => {
-              const user = team.find((m) => m.id === log.userId);
-              return (
-                <div key={log.id} className="p-3 rounded-lg bg-muted/50 text-sm space-y-1">
-                  <div className="flex justify-between">
-                    <span className="font-medium">{user?.name || 'Desconhecido'}</span>
-                  </div>
-                  <div className="flex flex-col sm:flex-row gap-1 sm:gap-4 text-xs text-muted-foreground">
-                    <span>Retirada: {new Date(log.pickupDate).toLocaleString('pt-BR')}</span>
-                    {log.returnDate && <span>Devolução: {new Date(log.returnDate).toLocaleString('pt-BR')}</span>}
-                  </div>
-                </div>
-              );
-            })}
+            <Button onClick={handlePickup} className="w-full h-11" disabled={pickup.isPending}>Registrar Retirada</Button>
           </div>
         </DialogContent>
       </Dialog>
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {carts.map((v) => {
-          const driver = team.find((m) => m.id === v.assignedTo);
-          const sc = statusConfig[v.status];
-          const activeLog = v.logs.find((l) => !l.returnDate);
+        {carts.map((c: any) => {
+          const resp = members.find((m: any) => m.user_id === c.responsavel_user_id);
+          const sc = statusConfig[c.status] || statusConfig.disponivel;
           return (
-            <div key={v.id} className="rounded-xl border bg-card p-4 sm:p-5 hover:shadow-md transition-shadow">
+            <div key={c.id} className="rounded-xl border bg-card p-4 sm:p-5 hover:shadow-md transition-shadow">
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-accent/10 text-accent">
                     <Zap className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="font-semibold text-sm">{v.name}</p>
-                    <p className="text-xs font-mono text-muted-foreground">{v.plate}</p>
+                    <p className="font-semibold text-sm">{c.nome || c.codigo}</p>
+                    <p className="text-xs font-mono text-muted-foreground">{c.codigo}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <button onClick={() => openEdit(v)} className="p-1.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground">
+                  <button onClick={() => { setEditId(c.id); setEditForm({ codigo: c.codigo, nome: c.nome || '', status: c.status }); setEditOpen(true); }} className="p-1.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground">
                     <Pencil className="w-3.5 h-3.5" />
                   </button>
                   <Badge variant="outline" className={cn('text-[10px]', sc.class)}>{sc.label}</Badge>
                 </div>
               </div>
-
-              {driver && (
+              {resp && (
                 <div className="flex items-center gap-2 mb-2 text-xs text-muted-foreground">
-                  <div className="w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold text-primary-foreground" style={{ backgroundColor: driver.color }}>
-                    {driver.name[0]}
+                  <div className="w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold text-primary-foreground" style={{ backgroundColor: resp.avatar_color || 'hsl(142,50%,35%)' }}>
+                    {(resp.nome_exibicao || '?')[0]}
                   </div>
-                  <span>{driver.name}</span>
-                  {driver.phone && v.status === 'in_use' && (
-                    <a href={`https://wa.me/55${driver.phone.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-0.5 text-success hover:underline">
-                      <Phone className="w-3 h-3" /> WhatsApp
-                    </a>
-                  )}
+                  <span>{resp.nome_exibicao}</span>
                 </div>
               )}
-
-              {activeLog && (
+              {c.retirada_em && c.status === 'em_uso' && (
                 <div className="text-xs text-muted-foreground p-2 rounded-lg bg-info/5 border border-info/10 mb-2">
-                  <p>Retirado: {new Date(activeLog.pickupDate).toLocaleString('pt-BR')}</p>
+                  <p>Retirado: {new Date(c.retirada_em).toLocaleString('pt-BR')}</p>
                 </div>
               )}
-
-              {v.status === 'maintenance' && (
+              {c.status === 'manutencao' && (
                 <div className="flex items-center gap-1.5 text-xs text-destructive mt-2">
                   <Wrench className="w-3 h-3" /> Em manutenção
                 </div>
               )}
-
               <div className="flex gap-2 mt-4">
-                {v.status === 'in_use' && activeLog && (
-                  <button
-                    onClick={() => { setReturnForm({ vehicleId: v.id, logId: activeLog.id }); setReturnOpen(true); }}
-                    className="flex-1 text-xs font-medium py-2.5 rounded-lg border border-border hover:bg-muted transition-colors"
-                  >
+                {c.status === 'em_uso' && (
+                  <button onClick={() => handleReturn(c.id)} className="flex-1 text-xs font-medium py-2.5 rounded-lg border border-border hover:bg-muted transition-colors">
                     Devolver
                   </button>
                 )}
-                <button
-                  onClick={() => { setLogsVehicle(v); setLogsOpen(true); }}
-                  className="flex-1 text-xs font-medium py-2.5 rounded-lg border border-border hover:bg-muted transition-colors"
-                >
-                  Histórico
-                </button>
               </div>
             </div>
           );
         })}
+        {carts.length === 0 && (
+          <div className="col-span-full text-center py-12 text-muted-foreground">
+            <Zap className="w-8 h-8 mx-auto mb-2 opacity-50" />
+            <p className="text-sm">Nenhum carrinho cadastrado</p>
+          </div>
+        )}
       </div>
     </div>
   );
