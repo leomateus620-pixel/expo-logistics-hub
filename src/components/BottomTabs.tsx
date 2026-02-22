@@ -14,7 +14,7 @@ const mainTabs = [
 ];
 
 const moreLinks = [
-  { to: '/ver-escala', icon: ClipboardList, label: 'Ver Escala' },
+  { to: '/ver-escala', icon: ClipboardList, label: 'Escala' },
   { to: '/transports', icon: MapPin, label: 'Transportes' },
   { to: '/guests', icon: Hotel, label: 'Hóspedes' },
   { to: '/electric-carts', icon: Zap, label: 'Carrinhos Elétricos' },

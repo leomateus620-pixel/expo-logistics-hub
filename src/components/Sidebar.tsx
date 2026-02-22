@@ -14,7 +14,7 @@ const links = [
   { to: '/transports', icon: MapPin, label: 'Transportes' },
   { to: '/guests', icon: Hotel, label: 'Hóspedes' },
   { to: '/agenda', icon: CalendarDays, label: 'Agenda' },
-  { to: '/ver-escala', icon: ClipboardList, label: 'Ver Escala' },
+  { to: '/ver-escala', icon: ClipboardList, label: 'Escala' },
   { to: '/checklist', icon: CheckSquare, label: 'Checklist' },
   { to: '/team', icon: Users, label: 'Equipe' },
   { to: '/settings', icon: Settings, label: 'Configurações' },

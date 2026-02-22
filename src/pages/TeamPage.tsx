@@ -1,4 +1,5 @@
 import { useOrgMembers } from '@/hooks/useOrgMembers';
+import { useQueryClient } from '@tanstack/react-query';
 import { useTasks } from '@/hooks/useTasks';
 import { useTransports } from '@/hooks/useTransports';
 import { useSchedules } from '@/hooks/useSchedules';
@@ -21,6 +22,7 @@ const TEAM_COLORS = [
 ];
 
 export default function TeamPage() {
+  const queryClient = useQueryClient();
   const { orgId } = useCurrentOrg();
   const { members, addMember, updateMember, removeMember } = useOrgMembers();
   const { tasks } = useTasks();
@@ -54,25 +56,25 @@ export default function TeamPage() {
     if (!addForm.password) { toast.error('Informe a senha'); return; }
     setAddLoading(true);
     try {
-      let userId: string | null = null;
-      if (addForm.email && addForm.password) {
-        const { data, error } = await supabase.functions.invoke('create-user', {
-          body: { email: addForm.email, password: addForm.password, full_name: addForm.nome, org_id: orgId, role: addForm.role, cargo: addForm.cargo },
-        });
-        if (error || data?.error) { toast.error(data?.error || error?.message); setAddLoading(false); return; }
-        userId = data?.user?.id;
-        toast.success('Acesso criado com sucesso');
-      }
+      const { data, error } = await supabase.functions.invoke('create-user', {
+        body: { email: addForm.email, password: addForm.password, full_name: addForm.nome, org_id: orgId, role: addForm.role, cargo: addForm.cargo },
+      });
+      if (error || data?.error) { toast.error(data?.error || error?.message); setAddLoading(false); return; }
+      // Edge function already creates user + org_member, just update avatar_color and telefone
+      const userId = data?.user?.id;
       if (userId) {
-        await addMember.mutateAsync({
-          user_id: userId,
-          nome_exibicao: addForm.nome,
-          cargo: addForm.cargo,
-          telefone: addForm.telefone || undefined,
-          avatar_color: TEAM_COLORS[members.length % TEAM_COLORS.length],
-          role: addForm.role,
-        });
+        // Find the org_member just created by the edge function and update extra fields
+        const { data: newMember } = await (supabase as any).from('org_members').select('id').eq('user_id', userId).eq('org_id', orgId).single();
+        if (newMember) {
+          await (supabase as any).from('org_members').update({
+            telefone: addForm.telefone || null,
+            avatar_color: TEAM_COLORS[members.length % TEAM_COLORS.length],
+          }).eq('id', newMember.id);
+        }
       }
+      // Refresh members list
+      queryClient.invalidateQueries({ queryKey: ['org-members'] });
+      toast.success('Membro adicionado com sucesso');
       setAddForm({ nome: '', cargo: '', telefone: '', email: '', password: '', role: 'operador' });
       setAddOpen(false);
     } catch (err: any) { toast.error(err.message); }
