@@ -94,6 +94,7 @@ export type Database = {
       electric_carts: {
         Row: {
           codigo: string
+          comissao: string | null
           created_at: string
           devolucao_em: string | null
           devolucao_prevista_em: string | null
@@ -108,6 +109,7 @@ export type Database = {
         }
         Insert: {
           codigo: string
+          comissao?: string | null
           created_at?: string
           devolucao_em?: string | null
           devolucao_prevista_em?: string | null
@@ -122,6 +124,7 @@ export type Database = {
         }
         Update: {
           codigo?: string
+          comissao?: string | null
           created_at?: string
           devolucao_em?: string | null
           devolucao_prevista_em?: string | null
@@ -717,6 +720,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_org_with_member: { Args: { org_nome: string }; Returns: string }
       get_user_org_ids: { Args: { _user_id: string }; Returns: string[] }
       get_user_org_role: {
         Args: { _org_id: string; _user_id: string }

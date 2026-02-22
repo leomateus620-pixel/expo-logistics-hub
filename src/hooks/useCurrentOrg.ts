@@ -31,25 +31,10 @@ export function useCurrentOrg() {
   const createOrgMutation = useMutation({
     mutationFn: async (nome: string) => {
       if (!user) throw new Error('Not authenticated');
-      // Create org
-      const { data: org, error: orgErr } = await (supabase as any)
-        .from('organizations')
-        .insert({ nome })
-        .select('id')
-        .single();
-      if (orgErr) throw orgErr;
-      // Add self as admin
-      const { error: memErr } = await (supabase as any)
-        .from('org_members')
-        .insert({
-          org_id: org.id,
-          user_id: user.id,
-          role: 'admin',
-          nome_exibicao: user.user_metadata?.full_name || user.email,
-        });
-      if (memErr) throw memErr;
-      localStorage.setItem(ORG_KEY, org.id);
-      return org;
+      const { data, error } = await (supabase as any).rpc('create_org_with_member', { org_nome: nome });
+      if (error) throw error;
+      localStorage.setItem(ORG_KEY, data);
+      return { id: data };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['my-org-membership'] });
