@@ -38,12 +38,12 @@ export default function TransportsPage() {
     try {
       await create.mutateAsync({
         titulo: form.titulo || null,
-        guest_id: form.guest_id || null,
+        guest_id: form.guest_id && form.guest_id !== 'none' ? form.guest_id : null,
         origem: form.origem,
         destino: form.destino,
         inicio_em: form.inicio_em,
-        motorista_user_id: form.motorista_user_id || null,
-        vehicle_id: form.vehicle_id || null,
+        motorista_user_id: form.motorista_user_id && form.motorista_user_id !== 'none' ? form.motorista_user_id : null,
+        vehicle_id: form.vehicle_id && form.vehicle_id !== 'none' ? form.vehicle_id : null,
         prioridade: form.prioridade,
         observacoes: form.observacoes || null,
       });
@@ -69,12 +69,12 @@ export default function TransportsPage() {
       await update.mutateAsync({
         id: editId,
         titulo: editForm.titulo || null,
-        guest_id: editForm.guest_id || null,
+        guest_id: editForm.guest_id && editForm.guest_id !== 'none' ? editForm.guest_id : null,
         origem: editForm.origem,
         destino: editForm.destino,
         inicio_em: editForm.inicio_em,
-        motorista_user_id: editForm.motorista_user_id || null,
-        vehicle_id: editForm.vehicle_id || null,
+        motorista_user_id: editForm.motorista_user_id && editForm.motorista_user_id !== 'none' ? editForm.motorista_user_id : null,
+        vehicle_id: editForm.vehicle_id && editForm.vehicle_id !== 'none' ? editForm.vehicle_id : null,
         prioridade: editForm.prioridade,
         observacoes: editForm.observacoes || null,
         status: editForm.status,
@@ -100,7 +100,7 @@ export default function TransportsPage() {
       <Select value={data.guest_id} onValueChange={(v) => setData({ ...data, guest_id: v })}>
         <SelectTrigger><SelectValue placeholder="Hóspede (opcional)" /></SelectTrigger>
         <SelectContent>
-          <SelectItem value="">Nenhum</SelectItem>
+          <SelectItem value="none">Nenhum</SelectItem>
           {guests.map((g: any) => <SelectItem key={g.id} value={g.id}>{g.nome}</SelectItem>)}
         </SelectContent>
       </Select>
@@ -113,14 +113,14 @@ export default function TransportsPage() {
         <Select value={data.vehicle_id} onValueChange={(v) => setData({ ...data, vehicle_id: v })}>
           <SelectTrigger><SelectValue placeholder="Veículo" /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Nenhum</SelectItem>
+            <SelectItem value="none">Nenhum</SelectItem>
             {vehicles.map((v: any) => <SelectItem key={v.id} value={v.id}>{v.placa} {v.modelo}</SelectItem>)}
           </SelectContent>
         </Select>
         <Select value={data.motorista_user_id} onValueChange={(v) => setData({ ...data, motorista_user_id: v })}>
           <SelectTrigger><SelectValue placeholder="Motorista" /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Nenhum</SelectItem>
+            <SelectItem value="none">Nenhum</SelectItem>
             {members.map((m: any) => <SelectItem key={m.user_id} value={m.user_id}>{m.nome_exibicao}</SelectItem>)}
           </SelectContent>
         </Select>

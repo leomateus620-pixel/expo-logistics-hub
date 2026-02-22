@@ -35,7 +35,7 @@ export default function ChecklistPage() {
         descricao: form.descricao || null,
         due_em: form.due_em || null,
         prioridade: form.prioridade,
-        assignee_user_id: form.assignee_user_id || null,
+        assignee_user_id: form.assignee_user_id && form.assignee_user_id !== 'none' ? form.assignee_user_id : null,
         recorrencia: form.recorrencia,
       });
       setForm({ titulo: '', descricao: '', due_em: '', prioridade: 'media', assignee_user_id: '', recorrencia: 'nenhuma' });
@@ -95,7 +95,7 @@ export default function ChecklistPage() {
               <Select value={form.assignee_user_id} onValueChange={(v) => setForm({ ...form, assignee_user_id: v })}>
                 <SelectTrigger><SelectValue placeholder="Responsável" /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">Ninguém</SelectItem>
+                  <SelectItem value="none">Ninguém</SelectItem>
                   {members.map((m: any) => (
                     <SelectItem key={m.user_id} value={m.user_id}>{m.nome_exibicao}</SelectItem>
                   ))}
