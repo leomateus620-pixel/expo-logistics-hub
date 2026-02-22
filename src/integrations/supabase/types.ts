@@ -159,6 +159,7 @@ export type Database = {
           local: string | null
           org_id: string
           origem: string | null
+          responsavel_user_id: string | null
           tipo_tag: string | null
           titulo: string
           updated_at: string
@@ -174,6 +175,7 @@ export type Database = {
           local?: string | null
           org_id: string
           origem?: string | null
+          responsavel_user_id?: string | null
           tipo_tag?: string | null
           titulo: string
           updated_at?: string
@@ -189,6 +191,7 @@ export type Database = {
           local?: string | null
           org_id?: string
           origem?: string | null
+          responsavel_user_id?: string | null
           tipo_tag?: string | null
           titulo?: string
           updated_at?: string

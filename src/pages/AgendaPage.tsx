@@ -1,18 +1,21 @@
 import { useEvents } from '@/hooks/useEvents';
+import { useOrgMembers } from '@/hooks/useOrgMembers';
 import { Badge } from '@/components/ui/badge';
-import { CalendarDays, Plus, Clock, MapPin } from 'lucide-react';
+import { CalendarDays, Plus, Clock, MapPin, User } from 'lucide-react';
 import { cn, rawTime } from '@/lib/utils';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 
 export default function AgendaPage() {
   const { events, create } = useEvents();
+  const { members } = useOrgMembers();
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ titulo: '', descricao: '', inicio_em: '', fim_em: '', local: '', tipo_tag: '' });
+  const [form, setForm] = useState({ titulo: '', descricao: '', inicio_em: '', fim_em: '', local: '', tipo_tag: '', responsavel_user_id: '' });
 
   const today = new Date().toISOString().split('T')[0];
   const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
@@ -27,8 +30,9 @@ export default function AgendaPage() {
         fim_em: form.fim_em,
         local: form.local || null,
         tipo_tag: form.tipo_tag || null,
+        responsavel_user_id: form.responsavel_user_id && form.responsavel_user_id !== 'none' ? form.responsavel_user_id : null,
       });
-      setForm({ titulo: '', descricao: '', inicio_em: '', fim_em: '', local: '', tipo_tag: '' });
+      setForm({ titulo: '', descricao: '', inicio_em: '', fim_em: '', local: '', tipo_tag: '', responsavel_user_id: '' });
       setOpen(false);
       toast.success('Evento criado');
     } catch (err: any) { toast.error(err.message); }
@@ -65,6 +69,13 @@ export default function AgendaPage() {
                 </div>
               </div>
               <Input placeholder="Local" value={form.local} onChange={(e) => setForm({ ...form, local: e.target.value })} />
+              <Select value={form.responsavel_user_id} onValueChange={(v) => setForm({ ...form, responsavel_user_id: v })}>
+                <SelectTrigger><SelectValue placeholder="Responsável (opcional)" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Nenhum</SelectItem>
+                  {members.map((m: any) => <SelectItem key={m.user_id} value={m.user_id}>{m.nome_exibicao}</SelectItem>)}
+                </SelectContent>
+              </Select>
               <Input placeholder="Categoria / Tag" value={form.tipo_tag} onChange={(e) => setForm({ ...form, tipo_tag: e.target.value })} />
               <Button onClick={handleAdd} className="w-full" disabled={create.isPending}>Criar Evento</Button>
             </div>
@@ -94,8 +105,9 @@ export default function AgendaPage() {
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-semibold truncate">{e.titulo}</p>
                       {e.descricao && <p className="text-xs text-muted-foreground mt-0.5">{e.descricao}</p>}
-                      <div className="flex items-center gap-3 mt-1">
+                      <div className="flex items-center gap-3 mt-1 flex-wrap">
                         {e.local && <span className="text-[10px] text-muted-foreground flex items-center gap-1"><MapPin className="w-3 h-3" />{e.local}</span>}
+                        {e.responsavel_user_id && (() => { const m = members.find((m: any) => m.user_id === e.responsavel_user_id); return m ? <span className="text-[10px] text-primary flex items-center gap-1"><User className="w-3 h-3" />{m.nome_exibicao}</span> : null; })()}
                         {e.tipo_tag && <Badge variant="outline" className="text-[10px]">{e.tipo_tag}</Badge>}
                       </div>
                     </div>

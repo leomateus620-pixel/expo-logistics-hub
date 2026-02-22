@@ -19,7 +19,7 @@ export default function VerEscalaPage() {
       list = list.filter((e: any) => e.inicio_em?.startsWith(filterDate));
     }
     if (filterMember !== 'all') {
-      list = list.filter((e: any) => e.created_by_user_id === filterMember);
+      list = list.filter((e: any) => e.responsavel_user_id === filterMember || e.created_by_user_id === filterMember);
     }
     return list.sort((a: any, b: any) => (a.inicio_em || '').localeCompare(b.inicio_em || ''));
   }, [events, filterDate, filterMember]);
@@ -32,8 +32,8 @@ export default function VerEscalaPage() {
   return (
     <div className="space-y-4">
       <div>
-        <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Ver Escala</h1>
-        <p className="text-sm text-muted-foreground mt-1">Visualize todos os eventos agendados</p>
+       <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Escala</h1>
+        <p className="text-sm text-muted-foreground mt-1">Visualize todos os eventos agendados por membro</p>
       </div>
 
       {/* Filtros */}
@@ -112,8 +112,13 @@ export default function VerEscalaPage() {
                         <MapPin className="w-3 h-3" />{e.local}
                       </span>
                     )}
+                    {e.responsavel_user_id && (
+                      <span className="flex items-center gap-1 text-primary font-medium">
+                        <User className="w-3 h-3" />{getMemberName(e.responsavel_user_id)}
+                      </span>
+                    )}
                     <span className="flex items-center gap-1">
-                      <User className="w-3 h-3" />{getMemberName(e.created_by_user_id)}
+                      <User className="w-3 h-3" />Criado por: {getMemberName(e.created_by_user_id)}
                     </span>
                   </div>
                   {e.tipo_tag && <Badge variant="outline" className="text-[10px]">{e.tipo_tag}</Badge>}
