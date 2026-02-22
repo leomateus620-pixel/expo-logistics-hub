@@ -63,7 +63,7 @@ export default function VehiclesPage() {
         modelo: editForm.modelo || null,
         status: editForm.status,
         km_atual: editForm.km_atual ? Number(editForm.km_atual) : 0,
-        responsavel_user_id: editForm.responsavel_user_id || null,
+        responsavel_user_id: editForm.responsavel_user_id && editForm.responsavel_user_id !== 'none' ? editForm.responsavel_user_id : null,
       });
       setEditOpen(false);
       toast.success('Veículo atualizado');
@@ -125,7 +125,7 @@ export default function VehiclesPage() {
             <Select value={editForm.responsavel_user_id} onValueChange={(v) => setEditForm({ ...editForm, responsavel_user_id: v })}>
               <SelectTrigger><SelectValue placeholder="Responsável" /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Nenhum</SelectItem>
+                <SelectItem value="none">Nenhum</SelectItem>
                 {members.map((m: any) => (
                   <SelectItem key={m.user_id} value={m.user_id}>{m.nome_exibicao} - {m.cargo}</SelectItem>
                 ))}
