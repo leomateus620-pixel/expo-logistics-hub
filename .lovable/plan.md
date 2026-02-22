@@ -1,79 +1,24 @@
 
 
-# Plano de Melhorias - Fenasoja Logistica
+# Fix: All Menu Items Failing with RLS Error
 
-Este plano abrange todas as solicitações em uma implementacao integrada.
+## Root Cause
 
----
+There are zero organizations and zero org_members in the database. Every table (vehicles, electric_carts, transports, guests, events, tasks, schedules) has RLS policies that check `is_org_member(auth.uid(), org_id)`. Without an org membership, nothing can be created anywhere.
 
-## 1. Corrigir criacao de organizacao (bloqueio atual)
+## Solution
 
-O sistema esta travado na tela "Criar Organizacao" porque o INSERT falha por causa do RLS.
+### Step 1: SQL Migration - Create atomic org+member function and add comissao field
 
-**Solucao:** Criar funcao RPC `create_org_with_member` (SECURITY DEFINER) que atomicamente cria a org e adiciona o usuario como admin. Atualizar `useCurrentOrg.ts` para usar essa RPC. Remover a tela de "Criar Organizacao" da exibicao (conforme solicitado - "desabilitar esse item").
+Create the `create_org_with_member` RPC function (SECURITY DEFINER) that:
+- Creates an organization
+- Adds the calling user as admin member
+- Returns the org_id
+- Bypasses the RLS chicken-and-egg problem
 
----
+Also add the `comissao` column to `electric_carts` for the plan's next steps.
 
-## 2. Carrinhos Eletricos - novos campos
-
-Adicionar campos a tabela `electric_carts`:
-- `comissao` (text) - para qual comissao o carrinho esta cedido
-- Ja existem campos de `responsavel_user_id`, `retirada_em` e `devolucao_em`
-
-Atualizar a pagina `ElectricCartsPage.tsx`:
-- Exibir campo "Comissao" no formulario de retirada e nos cards
-- Exibir data/horario de retirada e devolucao de forma mais visivel nos cards
-- Adicionar campo comissao no formulario de edicao
-
----
-
-## 3. Transportes - filtros e historico
-
-Atualizar `TransportsPage.tsx`:
-- Adicionar barra de filtros no topo: por motorista/responsavel, por status (pendente, em andamento, concluido, cancelado)
-- Por padrao, ocultar transportes concluidos/cancelados da listagem principal
-- Adicionar campo de pesquisa para buscar historico por dia e por veiculo
-- Botao "Mostrar Historico" que revela os concluidos com filtro de data
-
----
-
-## 4. Dashboard - renomear cards e adicionar navegacao
-
-Alterar `Dashboard.tsx`:
-- "Veiculos Disponiveis" -> "Veiculos Botolli Disponiveis"
-- "Carrinhos em Uso" -> "Carrinhos Eletricos Disponiveis" (mostrando disponiveis ao inves de em uso)
-- Cada StatCard ao ser clicado navega para a pagina correspondente:
-  - Veiculos Botolli -> `/vehicles`
-  - Carrinhos Eletricos -> `/electric-carts`
-  - Transportes Ativos -> `/transports`
-  - Tarefas Pendentes -> `/checklist`
-
-Atualizar `StatCard.tsx` para aceitar prop `onClick` ou `href`.
-
----
-
-## 5. Cadastro de membros - e-mail e senha integrado
-
-O cadastro na pagina de Equipe ja possui campos de e-mail e senha. Vou garantir que:
-- Os campos sejam obrigatorios (ja estao presentes)
-- A edge function `create-user` funcione corretamente com a permissao do admin
-
----
-
-## 6. Google Cloud (Google OAuth Login)
-
-Habilitar login com Google na aplicacao:
-- Configurar o provider Google OAuth via conector
-- Adicionar botao "Entrar com Google" na `LoginPage.tsx`
-- Atualizar o fluxo de autenticacao
-
----
-
-## Detalhes Tecnicos
-
-### Migracao SQL
 ```sql
--- 1. Funcao atomica para criar org
 CREATE OR REPLACE FUNCTION public.create_org_with_member(org_nome text)
 RETURNS uuid LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
 DECLARE
@@ -90,25 +35,31 @@ BEGIN
   RETURN new_org_id;
 END; $$;
 
--- 2. Novo campo comissao em electric_carts
 ALTER TABLE public.electric_carts ADD COLUMN IF NOT EXISTS comissao text;
 ```
 
-### Arquivos modificados
-- `src/hooks/useCurrentOrg.ts` - usar RPC `create_org_with_member`
-- `src/components/OrgGuard.tsx` - remover exibicao de CreateOrgPage (pular direto)
-- `src/pages/ElectricCartsPage.tsx` - campo comissao, exibir datas
-- `src/hooks/useElectricCarts.ts` - incluir comissao na retirada
-- `src/pages/TransportsPage.tsx` - filtros por responsavel/status, pesquisa historico
-- `src/pages/Dashboard.tsx` - renomear labels, adicionar onClick com navegacao
-- `src/components/StatCard.tsx` - aceitar prop onClick
-- `src/pages/LoginPage.tsx` - botao Google OAuth
+### Step 2: Update useCurrentOrg.ts
 
-### Ordem de execucao
-1. Migracao SQL (create_org_with_member + campo comissao)
-2. Corrigir useCurrentOrg + OrgGuard
-3. Atualizar ElectricCartsPage
-4. Atualizar TransportsPage com filtros
-5. Atualizar Dashboard + StatCard
-6. Configurar Google OAuth + LoginPage
+Change `createOrgMutation` to call the RPC instead of doing two separate inserts:
 
+```typescript
+const { data, error } = await (supabase as any).rpc('create_org_with_member', { org_nome: nome });
+if (error) throw error;
+localStorage.setItem(ORG_KEY, data);
+return { id: data };
+```
+
+### Step 3: Auto-create org on first load
+
+Since the "Create Organization" screen was removed, update `OrgGuard.tsx` to automatically create a default org when the user has none, so the app works immediately after login.
+
+### Step 4: Seed initial org for existing users
+
+Insert a default organization and add the main admin user (fenasojalog@gmail.com) as admin, so the current logged-in user can immediately use all features.
+
+## Expected Result
+
+After these changes:
+- The logged-in user will have an org membership
+- All RLS policies will pass
+- Vehicles, carts, transports, guests, events, tasks, and schedules will all work correctly
