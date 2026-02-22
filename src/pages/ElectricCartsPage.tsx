@@ -50,7 +50,8 @@ export default function ElectricCartsPage() {
   };
 
   const handlePickup = async () => {
-    if (!pickupForm.cartId || !pickupForm.userId) return;
+    if (!pickupForm.cartId) { toast.error('Selecione um carrinho'); return; }
+    if (!pickupForm.userId) { toast.error('Selecione um responsável'); return; }
     try {
       await pickup.mutateAsync({ id: pickupForm.cartId, responsavel_user_id: pickupForm.userId });
       setPickupForm({ cartId: '', userId: '' });
