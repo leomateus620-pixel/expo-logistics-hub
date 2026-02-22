@@ -15,6 +15,7 @@ import AgendaPage from "./pages/AgendaPage";
 import ChecklistPage from "./pages/ChecklistPage";
 import TeamPage from "./pages/TeamPage";
 import SettingsPage from "./pages/SettingsPage";
+import VerEscalaPage from "./pages/VerEscalaPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,6 +38,7 @@ const App = () => (
                 <Route path="/agenda" element={<AgendaPage />} />
                 <Route path="/checklist" element={<ChecklistPage />} />
                 <Route path="/team" element={<TeamPage />} />
+                <Route path="/ver-escala" element={<VerEscalaPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
