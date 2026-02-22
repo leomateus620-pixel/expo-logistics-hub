@@ -59,7 +59,14 @@ export default function TeamPage() {
       const { data, error } = await supabase.functions.invoke('create-user', {
         body: { email: addForm.email, password: addForm.password, full_name: addForm.nome, org_id: orgId, role: addForm.role, cargo: addForm.cargo },
       });
-      if (error || data?.error) { toast.error(data?.error || error?.message); setAddLoading(false); return; }
+      if (error) {
+        // Try to extract the actual error message from the response
+        const msg = data?.error || error?.message || 'Erro ao criar usuário';
+        toast.error(msg);
+        setAddLoading(false);
+        return;
+      }
+      if (data?.error) { toast.error(data.error); setAddLoading(false); return; }
       // Edge function already creates user + org_member, just update avatar_color and telefone
       const userId = data?.user?.id;
       if (userId) {
