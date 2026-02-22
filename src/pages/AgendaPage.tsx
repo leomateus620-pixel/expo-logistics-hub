@@ -1,7 +1,7 @@
 import { useEvents } from '@/hooks/useEvents';
 import { Badge } from '@/components/ui/badge';
 import { CalendarDays, Plus, Clock, MapPin } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, rawTime } from '@/lib/utils';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -87,8 +87,8 @@ export default function AgendaPage() {
                 {dayEvents.map((e: any) => (
                   <div key={e.id} className="rounded-xl border bg-card p-4 flex items-center gap-4">
                     <div className="text-center w-16 shrink-0">
-                      <p className="text-lg font-mono font-bold">{new Date(e.inicio_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</p>
-                      <p className="text-[10px] text-muted-foreground">{new Date(e.fim_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</p>
+                      <p className="text-lg font-mono font-bold">{rawTime(e.inicio_em)}</p>
+                      <p className="text-[10px] text-muted-foreground">{rawTime(e.fim_em)}</p>
                     </div>
                     <div className="w-px h-10 bg-border" />
                     <div className="flex-1 min-w-0">

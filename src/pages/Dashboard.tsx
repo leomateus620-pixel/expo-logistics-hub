@@ -7,7 +7,7 @@ import { useOrgMembers } from '@/hooks/useOrgMembers';
 import StatCard from '@/components/StatCard';
 import { Car, Zap, MapPin, CheckSquare, CalendarDays, Users, Clock, AlertTriangle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
+import { cn, rawTime } from '@/lib/utils';
 
 export default function Dashboard() {
   const { vehicles } = useVehicles();
@@ -66,7 +66,7 @@ export default function Dashboard() {
                     <p className="text-xs text-muted-foreground">{t.origem} → {t.destino}</p>
                   </div>
                   <div className="text-right shrink-0">
-                    <p className="text-xs font-mono font-medium">{t.inicio_em ? new Date(t.inicio_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '-'}</p>
+                    <p className="text-xs font-mono font-medium">{rawTime(t.inicio_em)}</p>
                     {driver && <p className="text-[10px] text-muted-foreground">{(driver.nome_exibicao || '').split(' ')[0]}</p>}
                   </div>
                 </div>
@@ -86,8 +86,8 @@ export default function Dashboard() {
             {todayEvents.map((e: any) => (
               <div key={e.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
                 <div className="text-center shrink-0 w-14">
-                  <p className="text-xs font-mono font-semibold">{new Date(e.inicio_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</p>
-                  <p className="text-[10px] text-muted-foreground">{new Date(e.fim_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</p>
+                  <p className="text-xs font-mono font-semibold">{rawTime(e.inicio_em)}</p>
+                  <p className="text-[10px] text-muted-foreground">{rawTime(e.fim_em)}</p>
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate">{e.titulo}</p>

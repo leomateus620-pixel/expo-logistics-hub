@@ -4,7 +4,7 @@ import { useVehicles } from '@/hooks/useVehicles';
 import { useGuests } from '@/hooks/useGuests';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Plus, Check, Clock, X, Phone, Pencil } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, rawTime, rawDateShort } from '@/lib/utils';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -189,8 +189,8 @@ export default function TransportsPage() {
                   </div>
                 </div>
                 <div className="text-right shrink-0">
-                  <p className="text-sm font-mono font-medium">{t.inicio_em ? new Date(t.inicio_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : '-'}</p>
-                  <p className="text-[10px] text-muted-foreground">{t.inicio_em ? new Date(t.inicio_em).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) : ''}</p>
+                  <p className="text-sm font-mono font-medium">{rawTime(t.inicio_em)}</p>
+                  <p className="text-[10px] text-muted-foreground">{rawDateShort(t.inicio_em)}</p>
                 </div>
                 <button onClick={() => openEditDlg(t)} className="p-1.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground shrink-0">
                   <Pencil className="w-3.5 h-3.5" />

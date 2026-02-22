@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CalendarDays, Clock, MapPin, User, Filter } from 'lucide-react';
+import { rawTime, rawWeekday, rawDay, rawMonthShort } from '@/lib/utils';
 import { useState, useMemo } from 'react';
 
 export default function VerEscalaPage() {
@@ -82,19 +83,17 @@ export default function VerEscalaPage() {
       ) : (
         <div className="space-y-3">
           {filtered.map((e: any) => {
-            const startDate = new Date(e.inicio_em);
-            const endDate = new Date(e.fim_em);
             return (
               <div key={e.id} className="rounded-xl border bg-card p-4 flex items-start gap-4">
                 <div className="text-center w-14 shrink-0 pt-0.5">
                   <p className="text-[10px] uppercase text-muted-foreground font-medium">
-                    {startDate.toLocaleDateString('pt-BR', { weekday: 'short' })}
+                    {rawWeekday(e.inicio_em)}
                   </p>
                   <p className="text-lg font-bold leading-tight">
-                    {startDate.toLocaleDateString('pt-BR', { day: '2-digit' })}
+                    {rawDay(e.inicio_em)}
                   </p>
                   <p className="text-[10px] text-muted-foreground">
-                    {startDate.toLocaleDateString('pt-BR', { month: 'short' })}
+                    {rawMonthShort(e.inicio_em)}
                   </p>
                 </div>
                 <div className="w-px h-12 bg-border self-center" />
@@ -104,9 +103,9 @@ export default function VerEscalaPage() {
                   <div className="flex flex-wrap items-center gap-3 text-[10px] text-muted-foreground">
                     <span className="flex items-center gap-1">
                       <Clock className="w-3 h-3" />
-                      {startDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                      {rawTime(e.inicio_em)}
                       {' – '}
-                      {endDate.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                      {rawTime(e.fim_em)}
                     </span>
                     {e.local && (
                       <span className="flex items-center gap-1">

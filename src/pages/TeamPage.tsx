@@ -1,4 +1,5 @@
 import { useOrgMembers } from '@/hooks/useOrgMembers';
+import { rawTime } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTasks } from '@/hooks/useTasks';
 import { useTransports } from '@/hooks/useTransports';
@@ -265,7 +266,7 @@ export default function TeamPage() {
                       {a.funcao && <p className="text-xs text-muted-foreground">{a.funcao}</p>}
                     </div>
                     <span className="text-xs text-muted-foreground">
-                      {new Date(shift.inicio_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })} - {new Date(shift.fim_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                      {rawTime(shift.inicio_em)} - {rawTime(shift.fim_em)}
                     </span>
                   </div>
                 );

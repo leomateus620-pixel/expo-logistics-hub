@@ -2,7 +2,7 @@ import { useTasks } from '@/hooks/useTasks';
 import { useOrgMembers } from '@/hooks/useOrgMembers';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Check, Clock, Repeat } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, rawTime } from '@/lib/utils';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -136,7 +136,7 @@ export default function ChecklistPage() {
                         {t.descricao && <p className="text-xs text-muted-foreground">{t.descricao}</p>}
                         <div className="flex items-center gap-2 mt-1 flex-wrap">
                           <Badge variant="outline" className={cn('text-[10px]', pc.class)}>{pc.label}</Badge>
-                          {t.due_em && <span className="text-[10px] text-muted-foreground flex items-center gap-0.5"><Clock className="w-2.5 h-2.5" />{new Date(t.due_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</span>}
+                          {t.due_em && <span className="text-[10px] text-muted-foreground flex items-center gap-0.5"><Clock className="w-2.5 h-2.5" />{rawTime(t.due_em)}</span>}
                           {t.recorrencia !== 'nenhuma' && <span className="text-[10px] text-primary flex items-center gap-0.5"><Repeat className="w-2.5 h-2.5" />{t.recorrencia}</span>}
                           {member && <span className="text-[10px] text-muted-foreground">→ {(member.nome_exibicao || '').split(' ')[0]}</span>}
                         </div>
@@ -153,7 +153,7 @@ export default function ChecklistPage() {
                           <Check className="w-3.5 h-3.5 text-success" />
                         </button>
                         <p className="text-sm line-through flex-1">{t.titulo}</p>
-                        {t.completed_at && <p className="text-[10px] text-muted-foreground">{new Date(t.completed_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</p>}
+                        {t.completed_at && <p className="text-[10px] text-muted-foreground">{rawTime(t.completed_at)}</p>}
                       </div>
                     ))}
                   </div>
