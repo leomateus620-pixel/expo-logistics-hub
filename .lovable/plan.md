@@ -1,65 +1,89 @@
 
+# Plano de Melhorias: Dashboard, Agenda, Escala e Checklist
 
-# Fix: All Menu Items Failing with RLS Error
+## 1. Dashboard com navegacao nos cards
 
-## Root Cause
+Tornar os 4 cards de estatisticas (Veiculos Disponiveis, Carrinhos em Uso, Transportes Ativos, Tarefas Pendentes) clicaveis, redirecionando para a pagina correspondente:
 
-There are zero organizations and zero org_members in the database. Every table (vehicles, electric_carts, transports, guests, events, tasks, schedules) has RLS policies that check `is_org_member(auth.uid(), org_id)`. Without an org membership, nothing can be created anywhere.
+- Veiculos Disponiveis --> `/vehicles`
+- Carrinhos em Uso --> `/electric-carts`
+- Transportes Ativos --> `/transports`
+- Tarefas Pendentes --> `/checklist`
 
-## Solution
+**Alteracoes:**
+- `src/components/StatCard.tsx`: Adicionar prop `to?: string` e envolver o card com `useNavigate` ou `Link` do react-router-dom, aplicando `cursor-pointer` quando houver link.
+- `src/pages/Dashboard.tsx`: Passar a prop `to` para cada `StatCard`.
 
-### Step 1: SQL Migration - Create atomic org+member function and add comissao field
+---
 
-Create the `create_org_with_member` RPC function (SECURITY DEFINER) that:
-- Creates an organization
-- Adds the calling user as admin member
-- Returns the org_id
-- Bypasses the RLS chicken-and-egg problem
+## 2. Agenda com edicao de eventos (responsavel)
 
-Also add the `comissao` column to `electric_carts` for the plan's next steps.
+Permitir clicar em um evento existente na Agenda para edita-lo, incluindo alterar o responsavel da equipe.
 
-```sql
-CREATE OR REPLACE FUNCTION public.create_org_with_member(org_nome text)
-RETURNS uuid LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
-DECLARE
-  new_org_id uuid;
-  caller_id uuid := auth.uid();
-  caller_name text;
-BEGIN
-  IF caller_id IS NULL THEN RAISE EXCEPTION 'Not authenticated'; END IF;
-  SELECT COALESCE(raw_user_meta_data->>'full_name', email)
-    INTO caller_name FROM auth.users WHERE id = caller_id;
-  INSERT INTO organizations (nome) VALUES (org_nome) RETURNING id INTO new_org_id;
-  INSERT INTO org_members (org_id, user_id, role, nome_exibicao)
-    VALUES (new_org_id, caller_id, 'admin', caller_name);
-  RETURN new_org_id;
-END; $$;
+**Alteracoes:**
+- `src/pages/AgendaPage.tsx`:
+  - Adicionar estado para evento selecionado (`editingEvent`).
+  - Reutilizar o Dialog de criacao para edicao, pre-preenchendo o formulario com os dados do evento.
+  - Ao salvar, chamar `update.mutateAsync` (ja disponivel no hook `useEvents`).
+  - Cada card de evento tera um botao ou sera clicavel para abrir a edicao.
 
-ALTER TABLE public.electric_carts ADD COLUMN IF NOT EXISTS comissao text;
+---
+
+## 3. Escala unificada (Eventos + Transportes)
+
+A pagina Escala (`VerEscalaPage`) passara a exibir tanto os eventos da Agenda quanto os transportes, todos juntos, ordenados por horario.
+
+**Alteracoes:**
+- `src/pages/VerEscalaPage.tsx`:
+  - Importar `useTransports` e `useOrgMembers`.
+  - Combinar os dados de `events` e `transports` em uma lista unificada, normalizando os campos (titulo, inicio_em, fim_em, responsavel).
+  - Transportes usarao `motorista_user_id` como responsavel e terao uma badge "Transporte" para diferenciar.
+  - Filtros por membro e data continuam funcionando sobre a lista unificada.
+
+---
+
+## 4. Checklist com itens da Escala
+
+O Checklist passara a exibir, alem das tarefas, os itens da escala (eventos + transportes) como itens de referencia/acompanhamento.
+
+**Alteracoes:**
+- `src/pages/ChecklistPage.tsx`:
+  - Importar `useEvents` e `useTransports`.
+  - Adicionar uma nova aba "Escala" (ou seção) que lista os eventos e transportes do dia, similar a uma lista de verificacao (somente leitura, sem checkbox).
+  - Manter as tarefas existentes nas abas "Hoje", "Amanha" e "Todas".
+
+---
+
+## Detalhes Tecnicos
+
+### StatCard.tsx
+```tsx
+// Adicionar props: onClick ou to (string)
+// Envolver com Link do react-router-dom quando 'to' estiver presente
+// Adicionar cursor-pointer e hover effect
 ```
 
-### Step 2: Update useCurrentOrg.ts
-
-Change `createOrgMutation` to call the RPC instead of doing two separate inserts:
-
-```typescript
-const { data, error } = await (supabase as any).rpc('create_org_with_member', { org_nome: nome });
-if (error) throw error;
-localStorage.setItem(ORG_KEY, data);
-return { id: data };
+### AgendaPage.tsx
+```tsx
+// Novo estado: editingEvent (null | event object)
+// Novo Dialog ou reutilizar o existente com modo create/edit
+// Preencher form com dados do evento ao clicar
+// Chamar update.mutateAsync no modo edicao
 ```
 
-### Step 3: Auto-create org on first load
+### VerEscalaPage.tsx
+```tsx
+// Importar useTransports
+// Criar lista unificada:
+// - events.map -> { tipo: 'evento', titulo, inicio_em, fim_em, responsavel_user_id }
+// - transports.map -> { tipo: 'transporte', titulo: t.titulo || `${t.origem} -> ${t.destino}`, 
+//     inicio_em, fim_em, responsavel_user_id: t.motorista_user_id }
+// Ordenar por inicio_em, aplicar filtros existentes
+```
 
-Since the "Create Organization" screen was removed, update `OrgGuard.tsx` to automatically create a default org when the user has none, so the app works immediately after login.
-
-### Step 4: Seed initial org for existing users
-
-Insert a default organization and add the main admin user (fenasojalog@gmail.com) as admin, so the current logged-in user can immediately use all features.
-
-## Expected Result
-
-After these changes:
-- The logged-in user will have an org membership
-- All RLS policies will pass
-- Vehicles, carts, transports, guests, events, tasks, and schedules will all work correctly
+### ChecklistPage.tsx
+```tsx
+// Importar useEvents e useTransports
+// Nova aba "Escala" com eventos e transportes do dia
+// Exibir como cards informativos (sem toggle de conclusao)
+```
