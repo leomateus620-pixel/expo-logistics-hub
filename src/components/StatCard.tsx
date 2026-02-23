@@ -1,5 +1,6 @@
 import { cn } from '@/lib/utils';
 import { ReactNode } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 interface StatCardProps {
   label: string;
@@ -7,6 +8,7 @@ interface StatCardProps {
   icon: ReactNode;
   trend?: string;
   variant?: 'default' | 'primary' | 'accent' | 'success' | 'warning';
+  to?: string;
 }
 
 const variantStyles = {
@@ -25,9 +27,13 @@ const iconStyles = {
   warning: 'bg-warning/10 text-warning',
 };
 
-export default function StatCard({ label, value, icon, trend, variant = 'default' }: StatCardProps) {
+export default function StatCard({ label, value, icon, trend, variant = 'default', to }: StatCardProps) {
+  const navigate = useNavigate();
   return (
-    <div className={cn('rounded-xl border p-5 transition-shadow hover:shadow-md', variantStyles[variant])}>
+    <div
+      className={cn('rounded-xl border p-5 transition-shadow hover:shadow-md', variantStyles[variant], to && 'cursor-pointer active:scale-[0.98]')}
+      onClick={to ? () => navigate(to) : undefined}
+    >
       <div className="flex items-start justify-between">
         <div>
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">{label}</p>

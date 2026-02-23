@@ -1,7 +1,7 @@
 import { useEvents } from '@/hooks/useEvents';
 import { useOrgMembers } from '@/hooks/useOrgMembers';
 import { Badge } from '@/components/ui/badge';
-import { CalendarDays, Plus, Clock, MapPin, User } from 'lucide-react';
+import { CalendarDays, Plus, Clock, MapPin, User, Pencil } from 'lucide-react';
 import { cn, rawTime } from '@/lib/utils';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -11,36 +11,68 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 
+const emptyForm = { titulo: '', descricao: '', inicio_em: '', fim_em: '', local: '', tipo_tag: '', responsavel_user_id: '' };
+
 export default function AgendaPage() {
-  const { events, create } = useEvents();
+  const { events, create, update } = useEvents();
   const { members } = useOrgMembers();
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ titulo: '', descricao: '', inicio_em: '', fim_em: '', local: '', tipo_tag: '', responsavel_user_id: '' });
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [form, setForm] = useState(emptyForm);
 
   const today = new Date().toISOString().split('T')[0];
   const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
 
-  const handleAdd = async () => {
+  const openCreate = () => {
+    setEditingId(null);
+    setForm(emptyForm);
+    setOpen(true);
+  };
+
+  const openEdit = (e: any) => {
+    setEditingId(e.id);
+    setForm({
+      titulo: e.titulo || '',
+      descricao: e.descricao || '',
+      inicio_em: e.inicio_em ? e.inicio_em.slice(0, 16) : '',
+      fim_em: e.fim_em ? e.fim_em.slice(0, 16) : '',
+      local: e.local || '',
+      tipo_tag: e.tipo_tag || '',
+      responsavel_user_id: e.responsavel_user_id || 'none',
+    });
+    setOpen(true);
+  };
+
+  const handleSave = async () => {
     if (!form.titulo || !form.inicio_em || !form.fim_em) return;
+    const payload = {
+      titulo: form.titulo,
+      descricao: form.descricao || null,
+      inicio_em: form.inicio_em,
+      fim_em: form.fim_em,
+      local: form.local || null,
+      tipo_tag: form.tipo_tag || null,
+      responsavel_user_id: form.responsavel_user_id && form.responsavel_user_id !== 'none' ? form.responsavel_user_id : null,
+    };
     try {
-      await create.mutateAsync({
-        titulo: form.titulo,
-        descricao: form.descricao || null,
-        inicio_em: form.inicio_em,
-        fim_em: form.fim_em,
-        local: form.local || null,
-        tipo_tag: form.tipo_tag || null,
-        responsavel_user_id: form.responsavel_user_id && form.responsavel_user_id !== 'none' ? form.responsavel_user_id : null,
-      });
-      setForm({ titulo: '', descricao: '', inicio_em: '', fim_em: '', local: '', tipo_tag: '', responsavel_user_id: '' });
+      if (editingId) {
+        await update.mutateAsync({ id: editingId, ...payload });
+        toast.success('Evento atualizado');
+      } else {
+        await create.mutateAsync(payload);
+        toast.success('Evento criado');
+      }
+      setForm(emptyForm);
+      setEditingId(null);
       setOpen(false);
-      toast.success('Evento criado');
     } catch (err: any) { toast.error(err.message); }
   };
 
   const dates: string[] = [...new Set(events.map((e: any) => String(e.inicio_em?.split('T')[0] || '')).filter((d: string) => d !== ''))].sort() as string[];
   if (dates.length === 0) dates.push(today);
   const getLabel = (d: string) => d === today ? 'Hoje' : d === tomorrow ? 'Amanhã' : new Date(d + 'T12:00').toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' });
+
+  const isSubmitting = create.isPending || update.isPending;
 
   return (
     <div className="space-y-6">
@@ -49,12 +81,12 @@ export default function AgendaPage() {
           <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Agenda da Feira</h1>
           <p className="text-sm text-muted-foreground mt-1">Programação e eventos</p>
         </div>
-        <Dialog open={open} onOpenChange={setOpen}>
+        <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setEditingId(null); setForm(emptyForm); } }}>
           <DialogTrigger asChild>
-            <Button size="sm"><Plus className="w-4 h-4 mr-1" /> Novo Evento</Button>
+            <Button size="sm" onClick={openCreate}><Plus className="w-4 h-4 mr-1" /> Novo Evento</Button>
           </DialogTrigger>
           <DialogContent>
-            <DialogHeader><DialogTitle>Criar Evento</DialogTitle></DialogHeader>
+            <DialogHeader><DialogTitle>{editingId ? 'Editar Evento' : 'Criar Evento'}</DialogTitle></DialogHeader>
             <div className="space-y-3">
               <Input placeholder="Título do evento" value={form.titulo} onChange={(e) => setForm({ ...form, titulo: e.target.value })} />
               <Input placeholder="Descrição (opcional)" value={form.descricao} onChange={(e) => setForm({ ...form, descricao: e.target.value })} />
@@ -77,7 +109,9 @@ export default function AgendaPage() {
                 </SelectContent>
               </Select>
               <Input placeholder="Categoria / Tag" value={form.tipo_tag} onChange={(e) => setForm({ ...form, tipo_tag: e.target.value })} />
-              <Button onClick={handleAdd} className="w-full" disabled={create.isPending}>Criar Evento</Button>
+              <Button onClick={handleSave} className="w-full" disabled={isSubmitting}>
+                {editingId ? 'Salvar Alterações' : 'Criar Evento'}
+              </Button>
             </div>
           </DialogContent>
         </Dialog>
@@ -96,7 +130,7 @@ export default function AgendaPage() {
               <div className="space-y-3">
                 {dayEvents.length === 0 && <p className="text-sm text-muted-foreground py-8 text-center">Nenhum evento neste dia.</p>}
                 {dayEvents.map((e: any) => (
-                  <div key={e.id} className="rounded-xl border bg-card p-4 flex items-center gap-4">
+                  <div key={e.id} className="rounded-xl border bg-card p-4 flex items-center gap-4 cursor-pointer hover:shadow-md transition-shadow" onClick={() => openEdit(e)}>
                     <div className="text-center w-16 shrink-0">
                       <p className="text-lg font-mono font-bold">{rawTime(e.inicio_em)}</p>
                       <p className="text-[10px] text-muted-foreground">{rawTime(e.fim_em)}</p>
@@ -111,6 +145,7 @@ export default function AgendaPage() {
                         {e.tipo_tag && <Badge variant="outline" className="text-[10px]">{e.tipo_tag}</Badge>}
                       </div>
                     </div>
+                    <Pencil className="w-4 h-4 text-muted-foreground shrink-0" />
                   </div>
                 ))}
               </div>

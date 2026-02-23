@@ -43,10 +43,10 @@ export default function Dashboard() {
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <StatCard label="Veículos Disponíveis" value={availableVehicles} icon={<Car className="w-5 h-5" />} variant="primary" trend={`${vehicles.length} no total`} />
-        <StatCard label="Carrinhos em Uso" value={cartsInUse} icon={<Zap className="w-5 h-5" />} variant="accent" trend={`${carts.length} elétricos`} />
-        <StatCard label="Transportes Ativos" value={activeTransports} icon={<MapPin className="w-5 h-5" />} variant="success" trend={`${upcomingTransports.length} pendentes`} />
-        <StatCard label="Tarefas Pendentes" value={pendingTasks} icon={<CheckSquare className="w-5 h-5" />} variant="warning" />
+        <StatCard label="Veículos Disponíveis" value={availableVehicles} icon={<Car className="w-5 h-5" />} variant="primary" trend={`${vehicles.length} no total`} to="/vehicles" />
+        <StatCard label="Carrinhos em Uso" value={cartsInUse} icon={<Zap className="w-5 h-5" />} variant="accent" trend={`${carts.length} elétricos`} to="/electric-carts" />
+        <StatCard label="Transportes Ativos" value={activeTransports} icon={<MapPin className="w-5 h-5" />} variant="success" trend={`${upcomingTransports.length} pendentes`} to="/transports" />
+        <StatCard label="Tarefas Pendentes" value={pendingTasks} icon={<CheckSquare className="w-5 h-5" />} variant="warning" to="/checklist" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
