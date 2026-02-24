@@ -94,7 +94,7 @@ export default function TransportsPage() {
 
   const sorted = [...transports].sort((a: any, b: any) => (a.inicio_em || '').localeCompare(b.inicio_em || ''));
 
-  const renderFormFields = (data: any, setData: (d: any) => void) => (
+  const renderFormFields = (data: any, setData: (d: any) => void, showObservacoes = true) => (
     <div className="space-y-3">
       <Input placeholder="Título (opcional)" value={data.titulo} onChange={(e) => setData({ ...data, titulo: e.target.value })} />
       <Select value={data.guest_id} onValueChange={(v) => setData({ ...data, guest_id: v })}>
@@ -125,7 +125,9 @@ export default function TransportsPage() {
           </SelectContent>
         </Select>
       </div>
-      <Textarea placeholder="Observações" value={data.observacoes} onChange={(e) => setData({ ...data, observacoes: e.target.value })} rows={2} />
+      {showObservacoes && (
+        <Textarea placeholder="Observações" value={data.observacoes} onChange={(e) => setData({ ...data, observacoes: e.target.value })} rows={2} />
+      )}
     </div>
   );
 
@@ -151,7 +153,7 @@ export default function TransportsPage() {
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent className="max-h-[90vh] overflow-y-auto">
           <DialogHeader><DialogTitle>Editar Transporte</DialogTitle></DialogHeader>
-          {renderFormFields(editForm, (d) => setEditForm({ ...d, status: editForm.status }))}
+          {renderFormFields(editForm, (d) => setEditForm({ ...d, status: editForm.status }), false)}
           <Select value={editForm.status} onValueChange={(v) => setEditForm({ ...editForm, status: v })}>
             <SelectTrigger><SelectValue /></SelectTrigger>
             <SelectContent>

@@ -1,12 +1,15 @@
 import { useEvents } from '@/hooks/useEvents';
 import { useTransports } from '@/hooks/useTransports';
 import { useOrgMembers } from '@/hooks/useOrgMembers';
+import { useAuth } from '@/hooks/useAuth';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { CalendarDays, Clock, MapPin, User, Filter, Car } from 'lucide-react';
 import { rawTime, rawWeekday, rawDay, rawMonthShort } from '@/lib/utils';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { toast } from 'sonner';
 
 interface UnifiedItem {
   id: string;
@@ -26,10 +29,29 @@ interface UnifiedItem {
 
 export default function VerEscalaPage() {
   const { events, isLoading: eventsLoading } = useEvents();
-  const { transports, isLoading: transportsLoading } = useTransports();
+  const { transports, update: updateTransport, isLoading: transportsLoading } = useTransports();
   const { members } = useOrgMembers();
-  const [filterMember, setFilterMember] = useState('all');
+  const { user } = useAuth();
+
+  // Pre-select logged-in user's member id
+  const myMemberId = useMemo(() => {
+    if (!user) return null;
+    const m = members.find((m: any) => m.user_id === user.id);
+    return m ? m.user_id : null;
+  }, [user, members]);
+
+  const [filterMember, setFilterMember] = useState<string>('');
   const [filterDate, setFilterDate] = useState('');
+
+  // Set default filter to logged-in user once members load
+  useEffect(() => {
+    if (myMemberId && filterMember === '') {
+      setFilterMember(myMemberId);
+    }
+  }, [myMemberId]);
+
+  // Use 'all' as effective when empty string and no myMemberId
+  const effectiveFilter = filterMember || 'all';
 
   const unified = useMemo(() => {
     const evList: UnifiedItem[] = events.map((e: any) => ({
@@ -62,17 +84,30 @@ export default function VerEscalaPage() {
     if (filterDate) {
       list = list.filter((i) => i.inicio_em?.startsWith(filterDate));
     }
-    if (filterMember !== 'all') {
-      list = list.filter((i) => i.responsavel_user_id === filterMember || i.created_by_user_id === filterMember);
+    if (effectiveFilter !== 'all') {
+      list = list.filter((i) => i.responsavel_user_id === effectiveFilter || i.created_by_user_id === effectiveFilter);
     }
     return list.sort((a, b) => (a.inicio_em || '').localeCompare(b.inicio_em || ''));
-  }, [events, transports, filterDate, filterMember]);
+  }, [events, transports, filterDate, effectiveFilter]);
 
   const isLoading = eventsLoading || transportsLoading;
 
   const getMemberName = (userId: string) => {
     const m = members.find((m: any) => m.user_id === userId);
     return m?.nome_exibicao || '—';
+  };
+
+  const handleCycleStatus = async (transportId: string, currentStatus: string) => {
+    const order = ['pendente', 'em_andamento', 'concluido'];
+    const idx = order.indexOf(currentStatus);
+    if (idx < order.length - 1) {
+      try {
+        await updateTransport.mutateAsync({ id: transportId, status: order[idx + 1] });
+        toast.success(idx === 0 ? 'Transporte iniciado' : 'Transporte concluído');
+      } catch (err: any) {
+        toast.error(err.message);
+      }
+    }
   };
 
   return (
@@ -88,7 +123,7 @@ export default function VerEscalaPage() {
           <span className="font-medium">Filtros</span>
         </div>
         <div className="flex-1">
-          <Select value={filterMember} onValueChange={setFilterMember}>
+          <Select value={effectiveFilter} onValueChange={setFilterMember}>
             <SelectTrigger className="w-full"><SelectValue placeholder="Filtrar por pessoa" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos da equipe</SelectItem>
@@ -99,7 +134,7 @@ export default function VerEscalaPage() {
         <div className="flex-1">
           <Input type="date" value={filterDate} onChange={(e) => setFilterDate(e.target.value)} className="w-full" />
         </div>
-        {(filterMember !== 'all' || filterDate) && (
+        {(effectiveFilter !== 'all' || filterDate) && (
           <button onClick={() => { setFilterMember('all'); setFilterDate(''); }} className="text-xs text-primary hover:underline shrink-0 self-center">Limpar filtros</button>
         )}
       </div>
@@ -134,6 +169,20 @@ export default function VerEscalaPage() {
                   {item.status && <Badge variant="secondary" className="text-[10px]">{item.status}</Badge>}
                 </div>
                 {item.tipo_tag && <Badge variant="outline" className="text-[10px]">{item.tipo_tag}</Badge>}
+
+                {/* Transport action buttons */}
+                {item.tipo === 'transporte' && item.status && item.status !== 'concluido' && item.status !== 'cancelado' && (
+                  <div className="pt-1">
+                    <Button
+                      size="sm"
+                      variant={item.status === 'pendente' ? 'default' : 'secondary'}
+                      className="h-7 text-xs"
+                      onClick={() => handleCycleStatus(item.id, item.status!)}
+                    >
+                      {item.status === 'pendente' ? '▶ Iniciar' : '✓ Concluir'}
+                    </Button>
+                  </div>
+                )}
               </div>
             </div>
           ))}

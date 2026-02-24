@@ -1,6 +1,8 @@
 import { useVehicles } from '@/hooks/useVehicles';
 import { useOrgMembers } from '@/hooks/useOrgMembers';
-import { Car, MapPin, Wrench, Pencil, Plus, Phone, Gauge } from 'lucide-react';
+import { useVehicleUsage } from '@/hooks/useVehicleUsage';
+import { useAuth } from '@/hooks/useAuth';
+import { Car, Pencil, Plus, Gauge, Fuel, ArrowRight, Palette } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
@@ -20,17 +22,22 @@ const statusConfig: Record<string, { label: string; class: string }> = {
 export default function VehiclesPage() {
   const { vehicles, create, update } = useVehicles();
   const { members } = useOrgMembers();
+  const { user } = useAuth();
+  const { totalKm } = useVehicleUsage();
 
   const [addOpen, setAddOpen] = useState(false);
   const [addForm, setAddForm] = useState({ placa: '', marca: '', modelo: '', ano: '', cor: '', categoria: 'outro', km_atual: '' });
 
   const [editOpen, setEditOpen] = useState(false);
   const [editId, setEditId] = useState('');
-  const [editForm, setEditForm] = useState({ placa: '', marca: '', modelo: '', status: 'disponivel', km_atual: '', responsavel_user_id: '' });
+  const [editForm, setEditForm] = useState({ placa: '', marca: '', modelo: '', cor: '', status: 'disponivel', km_atual: '', responsavel_user_id: '' });
+
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [detailVehicle, setDetailVehicle] = useState<any>(null);
 
   const openEdit = (v: any) => {
     setEditId(v.id);
-    setEditForm({ placa: v.placa, marca: v.marca || '', modelo: v.modelo || '', status: v.status, km_atual: String(v.km_atual || ''), responsavel_user_id: v.responsavel_user_id || '' });
+    setEditForm({ placa: v.placa, marca: v.marca || '', modelo: v.modelo || '', cor: v.cor || '', status: v.status, km_atual: String(v.km_atual || ''), responsavel_user_id: v.responsavel_user_id || '' });
     setEditOpen(true);
   };
 
@@ -61,6 +68,7 @@ export default function VehiclesPage() {
         placa: editForm.placa.toUpperCase(),
         marca: editForm.marca || null,
         modelo: editForm.modelo || null,
+        cor: editForm.cor || null,
         status: editForm.status,
         km_atual: editForm.km_atual ? Number(editForm.km_atual) : 0,
         responsavel_user_id: editForm.responsavel_user_id && editForm.responsavel_user_id !== 'none' ? editForm.responsavel_user_id : null,
@@ -71,6 +79,8 @@ export default function VehiclesPage() {
       toast.error(err.message || 'Erro ao atualizar');
     }
   };
+
+  const custoEstimado = totalKm * 0.65;
 
   return (
     <div className="space-y-6">
@@ -84,6 +94,32 @@ export default function VehiclesPage() {
         </Button>
       </div>
 
+      {/* Summary card */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="rounded-xl border bg-card p-4 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-primary/10 text-primary">
+            <Gauge className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">Total KM rodados</p>
+            <p className="text-lg font-bold">{totalKm.toLocaleString('pt-BR')} km</p>
+          </div>
+        </div>
+        <div className="rounded-xl border bg-card p-4 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-accent/10 text-accent">
+            <Fuel className="w-5 h-5" />
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">Custo estimado combustível</p>
+            <p className="text-lg font-bold">
+              {custoEstimado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+            </p>
+            <p className="text-[10px] text-muted-foreground">R$ 0,65/km</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Add dialog */}
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader><DialogTitle>Adicionar Veículo</DialogTitle></DialogHeader>
@@ -103,6 +139,7 @@ export default function VehiclesPage() {
         </DialogContent>
       </Dialog>
 
+      {/* Edit dialog */}
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader><DialogTitle>Editar Veículo</DialogTitle></DialogHeader>
@@ -112,6 +149,7 @@ export default function VehiclesPage() {
               <Input placeholder="Marca" value={editForm.marca} onChange={(e) => setEditForm({ ...editForm, marca: e.target.value })} />
               <Input placeholder="Modelo" value={editForm.modelo} onChange={(e) => setEditForm({ ...editForm, modelo: e.target.value })} />
             </div>
+            <Input placeholder="Cor" value={editForm.cor} onChange={(e) => setEditForm({ ...editForm, cor: e.target.value })} />
             <Input placeholder="KM atual" type="number" value={editForm.km_atual} onChange={(e) => setEditForm({ ...editForm, km_atual: e.target.value })} />
             <Select value={editForm.status} onValueChange={(v) => setEditForm({ ...editForm, status: v })}>
               <SelectTrigger><SelectValue /></SelectTrigger>
@@ -136,12 +174,25 @@ export default function VehiclesPage() {
         </DialogContent>
       </Dialog>
 
+      {/* Detail dialog with usage history */}
+      <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
+        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
+          <DialogHeader><DialogTitle>{detailVehicle?.marca} {detailVehicle?.modelo} — {detailVehicle?.placa}</DialogTitle></DialogHeader>
+          {detailVehicle && <VehicleDetailContent vehicle={detailVehicle} members={members} userId={user?.id} />}
+        </DialogContent>
+      </Dialog>
+
+      {/* Vehicle cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {vehicles.map((v: any) => {
           const driver = members.find((m: any) => m.user_id === v.responsavel_user_id);
           const sc = statusConfig[v.status] || statusConfig.disponivel;
           return (
-            <div key={v.id} className="rounded-xl border bg-card p-4 sm:p-5 hover:shadow-md transition-shadow">
+            <div
+              key={v.id}
+              className="rounded-xl border bg-card p-4 sm:p-5 hover:shadow-md transition-shadow cursor-pointer"
+              onClick={() => { setDetailVehicle(v); setDetailOpen(true); }}
+            >
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-primary/10 text-primary">
@@ -153,12 +204,17 @@ export default function VehiclesPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <button onClick={() => openEdit(v)} className="p-1.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground">
+                  <button onClick={(e) => { e.stopPropagation(); openEdit(v); }} className="p-1.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground">
                     <Pencil className="w-3.5 h-3.5" />
                   </button>
                   <Badge variant="outline" className={cn('text-[10px]', sc.class)}>{sc.label}</Badge>
                 </div>
               </div>
+              {v.cor && (
+                <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-2">
+                  <Palette className="w-3 h-3" /> {v.cor}
+                </div>
+              )}
               {v.km_atual != null && (
                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-2">
                   <Gauge className="w-3 h-3" /> {Number(v.km_atual).toLocaleString('pt-BR')} km
@@ -172,11 +228,6 @@ export default function VehiclesPage() {
                   <span>{driver.nome_exibicao}</span>
                 </div>
               )}
-              {v.status === 'manutencao' && (
-                <div className="flex items-center gap-1.5 text-xs text-destructive mt-2">
-                  <Wrench className="w-3 h-3" /> Em manutenção
-                </div>
-              )}
             </div>
           );
         })}
@@ -185,6 +236,125 @@ export default function VehiclesPage() {
             <Car className="w-8 h-8 mx-auto mb-2 opacity-50" />
             <p className="text-sm">Nenhum veículo cadastrado</p>
             <p className="text-xs">Clique em "Adicionar" para cadastrar o primeiro veículo</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// Sub-component for vehicle detail with usage history
+function VehicleDetailContent({ vehicle, members, userId }: { vehicle: any; members: any[]; userId?: string }) {
+  const { usages, createUsage, updateUsage } = useVehicleUsage(vehicle.id);
+  const { update: updateVehicle } = useVehicles();
+
+  const [kmSaida, setKmSaida] = useState('');
+  const [kmChegada, setKmChegada] = useState('');
+  const [responsavelId, setResponsavelId] = useState(userId || '');
+  const [obs, setObs] = useState('');
+
+  const openUsage = usages.find((u: any) => !u.km_chegada);
+
+  const handleRetirada = async () => {
+    if (!kmSaida) { toast.error('Informe o KM de saída'); return; }
+    try {
+      await createUsage.mutateAsync({
+        vehicle_id: vehicle.id,
+        responsavel_user_id: responsavelId && responsavelId !== 'none' ? responsavelId : null,
+        km_saida: Number(kmSaida),
+        observacoes: obs || null,
+      });
+      setKmSaida('');
+      setObs('');
+      toast.success('Retirada registrada');
+    } catch (err: any) { toast.error(err.message); }
+  };
+
+  const handleDevolucao = async (usageId: string) => {
+    if (!kmChegada) { toast.error('Informe o KM de chegada'); return; }
+    try {
+      await updateUsage.mutateAsync({
+        id: usageId,
+        km_chegada: Number(kmChegada),
+        devolucao_em: new Date().toISOString(),
+      });
+      // Update vehicle km_atual
+      await updateVehicle.mutateAsync({ id: vehicle.id, km_atual: Number(kmChegada) });
+      setKmChegada('');
+      toast.success('Devolução registrada');
+    } catch (err: any) { toast.error(err.message); }
+  };
+
+  const getMemberName = (uid: string) => members.find((m: any) => m.user_id === uid)?.nome_exibicao || '—';
+
+  return (
+    <div className="space-y-4">
+      {/* Open usage: show devolução */}
+      {openUsage ? (
+        <div className="rounded-lg border border-accent/30 bg-accent/5 p-3 space-y-2">
+          <p className="text-sm font-medium text-accent">⚠️ Veículo em uso — registrar devolução</p>
+          <p className="text-xs text-muted-foreground">
+            Responsável: {getMemberName(openUsage.responsavel_user_id)} | KM saída: {Number(openUsage.km_saida).toLocaleString('pt-BR')}
+          </p>
+          <Input placeholder="KM chegada (obrigatório)" type="number" value={kmChegada} onChange={(e) => setKmChegada(e.target.value)} />
+          <Button size="sm" onClick={() => handleDevolucao(openUsage.id)} disabled={updateUsage.isPending} className="w-full">
+            Registrar Devolução
+          </Button>
+        </div>
+      ) : (
+        <div className="rounded-lg border p-3 space-y-2">
+          <p className="text-sm font-medium">Registrar Retirada</p>
+          <Input placeholder="KM saída" type="number" value={kmSaida} onChange={(e) => setKmSaida(e.target.value)} />
+          <Select value={responsavelId} onValueChange={setResponsavelId}>
+            <SelectTrigger><SelectValue placeholder="Responsável" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">Nenhum</SelectItem>
+              {members.map((m: any) => (
+                <SelectItem key={m.user_id} value={m.user_id}>{m.nome_exibicao}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Input placeholder="Observações (opcional)" value={obs} onChange={(e) => setObs(e.target.value)} />
+          <Button size="sm" onClick={handleRetirada} disabled={createUsage.isPending} className="w-full">
+            Registrar Retirada
+          </Button>
+        </div>
+      )}
+
+      {/* Usage history */}
+      <div>
+        <p className="text-sm font-medium mb-2">Histórico de Usos</p>
+        {usages.length === 0 ? (
+          <p className="text-xs text-muted-foreground">Nenhum uso registrado</p>
+        ) : (
+          <div className="space-y-2">
+            {usages.map((u: any) => (
+              <div key={u.id} className="rounded-lg border p-3 text-xs space-y-1">
+                <div className="flex items-center justify-between">
+                  <span className="font-medium">{getMemberName(u.responsavel_user_id)}</span>
+                  <Badge variant={u.km_chegada ? 'secondary' : 'outline'} className="text-[10px]">
+                    {u.km_chegada ? 'Devolvido' : 'Em uso'}
+                  </Badge>
+                </div>
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <span>Saída: {Number(u.km_saida).toLocaleString('pt-BR')} km</span>
+                  {u.km_chegada && (
+                    <>
+                      <ArrowRight className="w-3 h-3" />
+                      <span>Chegada: {Number(u.km_chegada).toLocaleString('pt-BR')} km</span>
+                      <span className="font-semibold text-foreground ml-auto">
+                        {Number(u.km_rodados).toLocaleString('pt-BR')} km rodados
+                      </span>
+                    </>
+                  )}
+                </div>
+                <p className="text-muted-foreground">
+                  {new Date(u.retirada_em).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                  {u.devolucao_em && ` — ${new Date(u.devolucao_em).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}`}
+                </p>
+                {u.observacoes && <p className="text-muted-foreground italic">{u.observacoes}</p>}
+              </div>
+            ))}
           </div>
         )}
       </div>

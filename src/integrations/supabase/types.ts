@@ -659,6 +659,66 @@ export type Database = {
         }
         Relationships: []
       }
+      vehicle_usage: {
+        Row: {
+          created_at: string
+          devolucao_em: string | null
+          id: string
+          km_chegada: number | null
+          km_rodados: number | null
+          km_saida: number
+          observacoes: string | null
+          org_id: string
+          responsavel_user_id: string | null
+          retirada_em: string
+          updated_at: string
+          vehicle_id: string
+        }
+        Insert: {
+          created_at?: string
+          devolucao_em?: string | null
+          id?: string
+          km_chegada?: number | null
+          km_rodados?: number | null
+          km_saida: number
+          observacoes?: string | null
+          org_id: string
+          responsavel_user_id?: string | null
+          retirada_em?: string
+          updated_at?: string
+          vehicle_id: string
+        }
+        Update: {
+          created_at?: string
+          devolucao_em?: string | null
+          id?: string
+          km_chegada?: number | null
+          km_rodados?: number | null
+          km_saida?: number
+          observacoes?: string | null
+          org_id?: string
+          responsavel_user_id?: string | null
+          retirada_em?: string
+          updated_at?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_usage_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "vehicle_usage_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vehicles: {
         Row: {
           ano: number | null
