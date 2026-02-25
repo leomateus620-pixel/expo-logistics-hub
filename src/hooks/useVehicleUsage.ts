@@ -57,6 +57,13 @@ export function useVehicleUsage(vehicleId?: string) {
 
   const updateUsage = useMutation({
     mutationFn: async ({ id, ...updates }: { id: string; [key: string]: any }) => {
+      // Calculate km_rodados if km_chegada is provided
+      if (updates.km_chegada != null) {
+        const { data: current } = await (supabase as any).from('vehicle_usage').select('km_saida').eq('id', id).single();
+        if (current) {
+          updates.km_rodados = Number(updates.km_chegada) - Number(current.km_saida);
+        }
+      }
       const { data, error } = await (supabase as any)
         .from('vehicle_usage')
         .update(updates)

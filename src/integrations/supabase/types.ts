@@ -91,6 +91,27 @@ export type Database = {
           },
         ]
       }
+      commissions: {
+        Row: {
+          created_at: string
+          id: string
+          nome: string
+          org_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          nome: string
+          org_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          nome?: string
+          org_id?: string
+        }
+        Relationships: []
+      }
       electric_carts: {
         Row: {
           codigo: string
@@ -266,6 +287,7 @@ export type Database = {
         Row: {
           avatar_color: string | null
           cargo: string | null
+          commission_id: string | null
           created_at: string
           id: string
           is_active: boolean
@@ -279,6 +301,7 @@ export type Database = {
         Insert: {
           avatar_color?: string | null
           cargo?: string | null
+          commission_id?: string | null
           created_at?: string
           id?: string
           is_active?: boolean
@@ -292,6 +315,7 @@ export type Database = {
         Update: {
           avatar_color?: string | null
           cargo?: string | null
+          commission_id?: string | null
           created_at?: string
           id?: string
           is_active?: boolean
@@ -567,6 +591,8 @@ export type Database = {
           guest_id: string | null
           id: string
           inicio_em: string
+          km_devolucao: number | null
+          km_retirada: number | null
           motorista_user_id: string | null
           observacoes: string | null
           org_id: string
@@ -586,6 +612,8 @@ export type Database = {
           guest_id?: string | null
           id?: string
           inicio_em: string
+          km_devolucao?: number | null
+          km_retirada?: number | null
           motorista_user_id?: string | null
           observacoes?: string | null
           org_id: string
@@ -605,6 +633,8 @@ export type Database = {
           guest_id?: string | null
           id?: string
           inicio_em?: string
+          km_devolucao?: number | null
+          km_retirada?: number | null
           motorista_user_id?: string | null
           observacoes?: string | null
           org_id?: string

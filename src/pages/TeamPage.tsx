@@ -1,4 +1,5 @@
 import { useOrgMembers } from '@/hooks/useOrgMembers';
+import { useCommissions } from '@/hooks/useCommissions';
 import { rawTime } from '@/lib/utils';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTasks } from '@/hooks/useTasks';
@@ -6,7 +7,7 @@ import { useTransports } from '@/hooks/useTransports';
 import { useSchedules } from '@/hooks/useSchedules';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import { Badge } from '@/components/ui/badge';
-import { Plus, CalendarDays, Pencil, Trash2, UserPlus, Loader2 } from 'lucide-react';
+import { Plus, CalendarDays, Pencil, Trash2, UserPlus, Loader2, Users } from 'lucide-react';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -26,17 +27,18 @@ export default function TeamPage() {
   const queryClient = useQueryClient();
   const { orgId } = useCurrentOrg();
   const { members, addMember, updateMember, removeMember } = useOrgMembers();
+  const { commissions, create: createCommission, remove: removeCommission } = useCommissions();
   const { tasks } = useTasks();
   const { transports } = useTransports();
   const { schedules, shifts, assignments, createSchedule, createShift, createAssignment } = useSchedules();
 
   const [addOpen, setAddOpen] = useState(false);
-  const [addForm, setAddForm] = useState({ nome: '', cargo: '', telefone: '', email: '', password: '', role: 'operador' });
+  const [addForm, setAddForm] = useState({ nome: '', cargo: '', telefone: '', email: '', password: '', role: 'operador', commission_id: '' });
   const [addLoading, setAddLoading] = useState(false);
 
   const [editOpen, setEditOpen] = useState(false);
   const [editId, setEditId] = useState('');
-  const [editForm, setEditForm] = useState({ nome: '', cargo: '', telefone: '' });
+  const [editForm, setEditForm] = useState({ nome: '', cargo: '', telefone: '', commission_id: '' });
 
   const [scheduleOpen, setScheduleOpen] = useState(false);
   const [scheduleForm, setScheduleForm] = useState({ nome: '', data_inicio: '', data_fim: '' });
@@ -50,6 +52,20 @@ export default function TeamPage() {
   const [viewScheduleOpen, setViewScheduleOpen] = useState(false);
   const [viewMemberId, setViewMemberId] = useState('');
 
+  // Commission dialog
+  const [commissionOpen, setCommissionOpen] = useState(false);
+  const [commissionNome, setCommissionNome] = useState('');
+
+  const handleAddCommission = async () => {
+    if (!commissionNome.trim()) return;
+    try {
+      await createCommission.mutateAsync(commissionNome.trim());
+      setCommissionNome('');
+      setCommissionOpen(false);
+      toast.success('Comissão criada');
+    } catch (err: any) { toast.error(err.message); }
+  };
+
   const handleAdd = async () => {
     if (!addForm.nome) { toast.error('Informe o nome'); return; }
     if (!addForm.cargo) { toast.error('Informe o cargo'); return; }
@@ -61,29 +77,26 @@ export default function TeamPage() {
         body: { email: addForm.email, password: addForm.password, full_name: addForm.nome, org_id: orgId, role: addForm.role, cargo: addForm.cargo },
       });
       if (error) {
-        // Try to extract the actual error message from the response
         const msg = data?.error || error?.message || 'Erro ao criar usuário';
         toast.error(msg);
         setAddLoading(false);
         return;
       }
       if (data?.error) { toast.error(data.error); setAddLoading(false); return; }
-      // Edge function already creates user + org_member, just update avatar_color and telefone
       const userId = data?.user?.id;
       if (userId) {
-        // Find the org_member just created by the edge function and update extra fields
         const { data: newMember } = await (supabase as any).from('org_members').select('id').eq('user_id', userId).eq('org_id', orgId).single();
         if (newMember) {
           await (supabase as any).from('org_members').update({
             telefone: addForm.telefone || null,
             avatar_color: TEAM_COLORS[members.length % TEAM_COLORS.length],
+            commission_id: addForm.commission_id && addForm.commission_id !== 'none' ? addForm.commission_id : null,
           }).eq('id', newMember.id);
         }
       }
-      // Refresh members list
       queryClient.invalidateQueries({ queryKey: ['org-members'] });
       toast.success('Membro adicionado com sucesso');
-      setAddForm({ nome: '', cargo: '', telefone: '', email: '', password: '', role: 'operador' });
+      setAddForm({ nome: '', cargo: '', telefone: '', email: '', password: '', role: 'operador', commission_id: '' });
       setAddOpen(false);
     } catch (err: any) { toast.error(err.message); }
     setAddLoading(false);
@@ -92,7 +105,13 @@ export default function TeamPage() {
   const handleEdit = async () => {
     if (!editForm.nome) { toast.error('Informe o nome'); return; }
     try {
-      await updateMember.mutateAsync({ id: editId, nome_exibicao: editForm.nome, cargo: editForm.cargo || null, telefone: editForm.telefone || null });
+      await updateMember.mutateAsync({
+        id: editId,
+        nome_exibicao: editForm.nome,
+        cargo: editForm.cargo || null,
+        telefone: editForm.telefone || null,
+        commission_id: editForm.commission_id && editForm.commission_id !== 'none' ? editForm.commission_id : null,
+      });
       setEditOpen(false);
       toast.success('Membro atualizado');
     } catch (err: any) { toast.error(err.message || 'Erro ao salvar'); }
@@ -122,6 +141,8 @@ export default function TeamPage() {
     toast.success('Alocação registrada');
   };
 
+  const getCommissionName = (id: string) => commissions.find((c: any) => c.id === id)?.nome || '';
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -130,6 +151,9 @@ export default function TeamPage() {
           <p className="text-sm text-muted-foreground mt-1">{members.length} membros</p>
         </div>
         <div className="flex gap-2 flex-wrap">
+          <Button size="sm" variant="outline" onClick={() => setCommissionOpen(true)} className="h-10 sm:h-9">
+            <Users className="w-4 h-4 mr-1" /> Comissões
+          </Button>
           <Button size="sm" variant="outline" onClick={() => setScheduleOpen(true)} className="h-10 sm:h-9">
             <CalendarDays className="w-4 h-4 mr-1" /> Criar Escala
           </Button>
@@ -138,6 +162,35 @@ export default function TeamPage() {
           </Button>
         </div>
       </div>
+
+      {/* Commission dialog */}
+      <Dialog open={commissionOpen} onOpenChange={setCommissionOpen}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Comissões</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <div className="flex gap-2">
+              <Input placeholder="Nome da comissão" value={commissionNome} onChange={(e) => setCommissionNome(e.target.value)} />
+              <Button size="sm" onClick={handleAddCommission} disabled={createCommission.isPending}>
+                <Plus className="w-4 h-4" />
+              </Button>
+            </div>
+            {commissions.length === 0 ? (
+              <p className="text-xs text-muted-foreground">Nenhuma comissão cadastrada</p>
+            ) : (
+              <div className="space-y-2">
+                {commissions.map((c: any) => (
+                  <div key={c.id} className="flex items-center justify-between p-2 rounded-lg bg-muted/50">
+                    <span className="text-sm">{c.nome}</span>
+                    <button onClick={() => removeCommission.mutateAsync(c.id)} className="p-1 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive">
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Add member */}
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
@@ -154,6 +207,13 @@ export default function TeamPage() {
                 <SelectItem value="gestor">Gestor</SelectItem>
                 <SelectItem value="operador">Operador</SelectItem>
                 <SelectItem value="leitura">Somente Leitura</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={addForm.commission_id} onValueChange={(v) => setAddForm({ ...addForm, commission_id: v })}>
+              <SelectTrigger><SelectValue placeholder="Comissão (opcional)" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">Nenhuma</SelectItem>
+                {commissions.map((c: any) => <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>)}
               </SelectContent>
             </Select>
             <div className="border-t pt-3 mt-2">
@@ -176,6 +236,13 @@ export default function TeamPage() {
             <Input placeholder="Nome" value={editForm.nome} onChange={(e) => setEditForm({ ...editForm, nome: e.target.value })} />
             <Input placeholder="Cargo" value={editForm.cargo} onChange={(e) => setEditForm({ ...editForm, cargo: e.target.value })} />
             <Input placeholder="Telefone" value={editForm.telefone} onChange={(e) => setEditForm({ ...editForm, telefone: e.target.value })} />
+            <Select value={editForm.commission_id} onValueChange={(v) => setEditForm({ ...editForm, commission_id: v })}>
+              <SelectTrigger><SelectValue placeholder="Comissão" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">Nenhuma</SelectItem>
+                {commissions.map((c: any) => <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>)}
+              </SelectContent>
+            </Select>
             <Button onClick={handleEdit} className="w-full">Salvar</Button>
           </div>
         </DialogContent>
@@ -305,6 +372,7 @@ export default function TeamPage() {
           const pending = memberTasks.filter((t: any) => t.status === 'pendente').length;
           const done = memberTasks.filter((t: any) => t.status === 'concluida').length;
           const activeTransport = transports.find((t: any) => t.motorista_user_id === m.user_id && t.status === 'em_andamento');
+          const commissionName = m.commission_id ? getCommissionName(m.commission_id) : '';
 
           return (
             <div key={m.id} className="rounded-xl border bg-card p-5 hover:shadow-md transition-shadow">
@@ -318,7 +386,7 @@ export default function TeamPage() {
                   {m.telefone && <p className="text-[10px] text-muted-foreground">{m.telefone}</p>}
                 </div>
                 <div className="flex items-center gap-1">
-                  <button onClick={() => { setEditId(m.id); setEditForm({ nome: m.nome_exibicao || '', cargo: m.cargo || '', telefone: m.telefone || '' }); setEditOpen(true); }} className="p-1.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground">
+                  <button onClick={() => { setEditId(m.id); setEditForm({ nome: m.nome_exibicao || '', cargo: m.cargo || '', telefone: m.telefone || '', commission_id: m.commission_id || '' }); setEditOpen(true); }} className="p-1.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground">
                     <Pencil className="w-3.5 h-3.5" />
                   </button>
                   <button onClick={() => { removeMember.mutateAsync(m.id); toast.success('Membro desativado'); }} className="p-1.5 rounded-lg hover:bg-destructive/10 transition-colors text-muted-foreground hover:text-destructive">
@@ -326,6 +394,10 @@ export default function TeamPage() {
                   </button>
                 </div>
               </div>
+
+              {commissionName && (
+                <Badge variant="outline" className="text-[10px] mb-2">{commissionName}</Badge>
+              )}
 
               <div className="flex items-center gap-2 mb-3">
                 <Badge variant="outline" className="text-[10px]">{pending} pendente{pending !== 1 ? 's' : ''}</Badge>
