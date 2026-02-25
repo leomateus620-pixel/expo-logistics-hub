@@ -1,128 +1,129 @@
 
-# Plano de Melhorias: Veiculos, Transportes e Acesso por Membro
 
-## 1. Registro de KM rodados por uso de veiculo
+# Plano de Melhorias: Transportes, Veiculos, Equipe
 
-Criar uma tabela `vehicle_usage` para registrar cada retirada/devolucao de veiculo com controle de KM.
+## 1. Campos KM Retirada e KM Devolucao no Novo Transporte
 
-### Banco de dados (migracao SQL)
-- Nova tabela `vehicle_usage` com colunas:
-  - `id`, `org_id`, `vehicle_id`, `responsavel_user_id`
-  - `km_saida` (numeric, preenchido na retirada)
-  - `km_chegada` (numeric, NULL ate a devolucao -- obrigatorio na devolucao)
-  - `km_rodados` (numeric, calculado: km_chegada - km_saida)
-  - `retirada_em` (timestamp), `devolucao_em` (timestamp, NULL ate devolver)
-  - `observacoes` (text, opcional)
-  - `created_at`, `updated_at`
-- RLS: mesmas regras da tabela `vehicles` (select para membros, insert/update para admin/gestor/operador)
+A tabela `transports` nao possui campos de KM. Sera necessario adicionar `km_retirada` e `km_devolucao` na tabela `transports` via migracao SQL.
 
-### Hook `useVehicleUsage`
-- Novo hook para CRUD da tabela `vehicle_usage`
-- Queries filtradas por `org_id` e opcionalmente por `vehicle_id`
+### Banco de dados
+```sql
+ALTER TABLE public.transports
+  ADD COLUMN km_retirada numeric,
+  ADD COLUMN km_devolucao numeric;
+```
 
-### Pagina VehiclesPage
-- Ao clicar em um veiculo, abrir um painel/dialog com:
-  - Botao "Registrar Retirada" (preenche km_saida, responsavel, data/hora)
-  - Na listagem de usos, cada registro mostra: responsavel, km_saida, km_chegada, km_rodados
-  - Botao "Registrar Devolucao" no uso aberto (campo km_chegada obrigatorio)
-  - O campo `km_atual` do veiculo sera atualizado automaticamente com o ultimo `km_chegada`
-- Exibir historico de usos de cada veiculo com KM rodados por uso
+### TransportsPage.tsx
+- Adicionar campos `km_retirada` e `km_devolucao` no formulario de criacao (Novo Transporte).
+- No formulario de edicao, mostrar `km_devolucao` (preenchido ao concluir).
+- Ao salvar, gravar os valores na tabela `transports`.
+
+### Integracao com Veiculos
+- Quando um transporte for concluido e tiver `km_retirada` e `km_devolucao` preenchidos:
+  - Criar automaticamente um registro em `vehicle_usage` com os KM correspondentes.
+  - Atualizar o `km_atual` do veiculo com o valor de `km_devolucao`.
+- O `useVehicleUsage` ja soma todos os `km_rodados` da tabela `vehicle_usage`, entao o total e o custo estimado serao atualizados automaticamente.
 
 ---
 
-## 2. Custo total estimado com combustivel
+## 2. Corrigir calculo do Custo Estimado de Combustivel
 
-### Pagina VehiclesPage
-- Card de resumo no topo da pagina mostrando:
-  - Total de KM rodados (soma de `km_rodados` de todos os registros de `vehicle_usage`)
-  - Custo estimado = Total KM x R$ 0,65
-  - Formato monetario brasileiro (R$ X.XXX,XX)
+Na `VehiclesPage.tsx` linha 83, o calculo `totalKm * 0.65` esta correto no codigo. Porem o `totalKm` vindo do hook pode estar retornando valores incorretos se `km_rodados` for um campo GENERATED AS `(km_chegada - km_saida)` que esta retornando NULL para registros sem `km_chegada`.
 
----
+Verificarei se a coluna `km_rodados` e realmente `GENERATED ALWAYS AS (km_chegada - km_saida) STORED`. No schema atual ela aparece como coluna normal (nao generated). O hook `useVehicleUsage` filtra `NOT NULL` corretamente. O problema pode ser que na tabela o campo nao esta sendo calculado automaticamente. A correcao sera garantir que ao gravar `km_chegada`, tambem se grave `km_rodados = km_chegada - km_saida` via hook.
 
-## 3. Campo COR visivel no card do veiculo
-
-### Pagina VehiclesPage
-- O campo `cor` ja existe na tabela `vehicles` e no formulario de cadastro
-- Adicionar `cor` ao formulario de edicao (atualmente nao esta la)
-- Exibir a cor no card do veiculo (abaixo da placa ou como badge colorida)
+**Alteracao:** No `useVehicleUsage.ts`, ao fazer `updateUsage`, calcular e salvar `km_rodados` junto com `km_chegada`.
 
 ---
 
-## 4. Remover "Observacoes" do Editar Transporte
+## 3. Ocultar transportes concluidos apos 4 horas
 
-### Pagina TransportsPage
-- Remover o campo `Textarea` de observacoes do `renderFormFields` quando usado no dialog de edicao
-- Manter no dialog de criacao (ou remover de ambos -- o campo sera removido de ambos para simplicidade, ja que esta no edit)
-- Na verdade, remover APENAS do dialog de edicao. Separar o `renderFormFields` para aceitar um parametro `showObservacoes`
+### TransportsPage.tsx
+- Filtrar a lista `sorted` para excluir transportes com `status === 'concluido'` cuja `updated_at` (ou timestamp de conclusao) seja anterior a 4 horas atras.
+- Essa filtragem se aplica apenas a visualizacao padrao (sem pesquisa ativa).
 
 ---
 
-## 5. Acesso pessoal a escala/agenda para iniciar e concluir transportes
+## 4. Campo de pesquisa de transportes (por motorista e data)
 
-### Pagina VerEscalaPage
-- Quando o usuario logado visualizar a Escala, filtrar automaticamente por seu proprio `user_id` como padrao
-- Para itens do tipo "transporte", exibir botoes "Iniciar" e "Concluir" (mesma logica do `cycleStatus` da TransportsPage)
-- O operador podera alterar o status do transporte diretamente da Escala
-- Usar `useAuth` para obter o `user_id` do usuario logado e pre-selecionar no filtro de membro
+### TransportsPage.tsx
+- Adicionar barra de pesquisa no topo com:
+  - Select de motorista (filtrar por `motorista_user_id`).
+  - Input de data (filtrar por data de `inicio_em`).
+- Quando houver filtro ativo, mostrar TODOS os transportes (incluindo concluidos ocultos).
+- Botao "Limpar filtros" para voltar a visualizacao padrao.
+
+---
+
+## 5. Campo COMISSAO na Equipe
+
+### Banco de dados
+- Criar tabela `commissions` (id, org_id, nome, created_at) para cadastrar comissoes.
+- Adicionar coluna `commission_id` (uuid, nullable) na tabela `org_members`.
+
+```sql
+CREATE TABLE public.commissions (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  org_id uuid NOT NULL,
+  nome text NOT NULL,
+  created_at timestamptz NOT NULL DEFAULT now()
+);
+ALTER TABLE public.commissions ENABLE ROW LEVEL SECURITY;
+-- RLS: mesmas regras de org_members
+
+ALTER TABLE public.org_members ADD COLUMN commission_id uuid;
+```
+
+### TeamPage.tsx
+- Adicionar secao para cadastrar comissoes (botao "Nova Comissao" + dialog com campo nome).
+- No formulario de adicionar/editar membro, incluir Select de comissao.
+- Na listagem de membros, agrupar ou exibir badge com o nome da comissao.
+- Criar hook `useCommissions` para CRUD de comissoes.
 
 ---
 
 ## Detalhes Tecnicos
 
-### Migracao SQL
+### Migracao SQL completa
 ```sql
-CREATE TABLE public.vehicle_usage (
+-- Campos KM no transporte
+ALTER TABLE public.transports
+  ADD COLUMN km_retirada numeric,
+  ADD COLUMN km_devolucao numeric;
+
+-- Tabela de comissoes
+CREATE TABLE public.commissions (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   org_id uuid NOT NULL,
-  vehicle_id uuid NOT NULL,
-  responsavel_user_id uuid,
-  km_saida numeric NOT NULL,
-  km_chegada numeric,
-  km_rodados numeric GENERATED ALWAYS AS (
-    CASE WHEN km_chegada IS NOT NULL THEN km_chegada - km_saida ELSE NULL END
-  ) STORED,
-  retirada_em timestamptz NOT NULL DEFAULT now(),
-  devolucao_em timestamptz,
-  observacoes text,
-  created_at timestamptz NOT NULL DEFAULT now(),
-  updated_at timestamptz NOT NULL DEFAULT now()
+  nome text NOT NULL,
+  created_at timestamptz NOT NULL DEFAULT now()
 );
-
-ALTER TABLE public.vehicle_usage ENABLE ROW LEVEL SECURITY;
-
-CREATE POLICY "vehicle_usage_select" ON public.vehicle_usage
+ALTER TABLE public.commissions ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "commissions_select" ON public.commissions
   FOR SELECT USING (is_org_member(auth.uid(), org_id));
-CREATE POLICY "vehicle_usage_insert" ON public.vehicle_usage
+CREATE POLICY "commissions_insert" ON public.commissions
   FOR INSERT WITH CHECK (
-    get_user_org_role(auth.uid(), org_id) = ANY(ARRAY['admin','gestor','operador']::org_role[])
+    get_user_org_role(auth.uid(), org_id) = ANY(ARRAY['admin','gestor']::org_role[])
   );
-CREATE POLICY "vehicle_usage_update" ON public.vehicle_usage
+CREATE POLICY "commissions_update" ON public.commissions
   FOR UPDATE USING (
-    get_user_org_role(auth.uid(), org_id) = ANY(ARRAY['admin','gestor','operador']::org_role[])
+    get_user_org_role(auth.uid(), org_id) = ANY(ARRAY['admin','gestor']::org_role[])
   );
-CREATE POLICY "vehicle_usage_delete" ON public.vehicle_usage
+CREATE POLICY "commissions_delete" ON public.commissions
   FOR DELETE USING (
     get_user_org_role(auth.uid(), org_id) = ANY(ARRAY['admin','gestor']::org_role[])
   );
+
+-- Campo comissao no membro
+ALTER TABLE public.org_members ADD COLUMN commission_id uuid;
 ```
 
-### Arquivos a modificar/criar
+### Arquivos a criar/modificar
 
-1. **Novo: `src/hooks/useVehicleUsage.ts`**
-   - Hook com queries e mutations para `vehicle_usage`
+1. **Novo: `src/hooks/useCommissions.ts`** - CRUD de comissoes
+2. **`src/pages/TransportsPage.tsx`** - Campos KM, filtro de pesquisa, ocultar concluidos 4h
+3. **`src/hooks/useTransports.ts`** - Incluir km_retirada/km_devolucao no create/update
+4. **`src/hooks/useVehicleUsage.ts`** - Garantir calculo de km_rodados no updateUsage
+5. **`src/pages/VehiclesPage.tsx`** - Nenhuma alteracao necessaria (calculo ja correto)
+6. **`src/pages/TeamPage.tsx`** - Cadastro de comissoes + select no formulario de membro
 
-2. **`src/pages/VehiclesPage.tsx`**
-   - Adicionar campo `cor` no dialog de edicao
-   - Exibir cor no card do veiculo
-   - Adicionar dialog de detalhes do veiculo com historico de usos (retirada/devolucao com KM)
-   - Card de resumo com custo total estimado (soma KM x R$ 0,65)
-
-3. **`src/pages/TransportsPage.tsx`**
-   - Separar `renderFormFields` para nao mostrar observacoes no modo edicao
-
-4. **`src/pages/VerEscalaPage.tsx`**
-   - Pre-selecionar o usuario logado no filtro de membro
-   - Adicionar botoes "Iniciar" / "Concluir" nos itens de transporte
-   - Importar `useTransports` para ter acesso ao `update` mutation
-   - Importar `useAuth` para obter o `user_id` logado
