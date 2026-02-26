@@ -1,22 +1,40 @@
 
-Objetivo: corrigir o cálculo do campo “Custo estimado combustível” para usar exatamente **Total KM rodados × 0,65**.
 
-Passos de implementação:
-1. Revisar `src/pages/VehiclesPage.tsx` e centralizar a regra em constante:
-   - `const FUEL_COST_PER_KM = 0.65`
-   - `const custoEstimado = Number(totalKm || 0) * FUEL_COST_PER_KM`
-2. Garantir que `totalKm` venha limpo de `src/hooks/useVehicleUsage.ts`:
-   - somar apenas valores numéricos válidos de `km_rodados`
-   - ignorar `null`, `undefined` e `NaN` para evitar inflação no total
-3. Padronizar exibição no card:
-   - manter `toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })`
-   - manter legenda “R$ 0,65/km” coerente com a constante
-4. Validar com cenário real:
-   - conferir exemplo: 100 km → R$ 65,00
-   - conferir 0 km → R$ 0,00
-   - conferir atualização após concluir devolução/uso
+# Plano: Melhorias no Agendar Transporte
 
-Detalhes técnicos (direto ao ponto):
-- Arquivos: `src/pages/VehiclesPage.tsx`, `src/hooks/useVehicleUsage.ts`
-- Sem migração de banco para esta correção
-- Regra final obrigatória: `custoEstimado = totalKm * 0.65`
+## Alterações em `src/pages/TransportsPage.tsx`
+
+### 1. Remover campo "Observações" do formulário de criação
+- Remover `showObservacoes` e o `Textarea` de observações do `renderFormFields` (ambos os modos).
+
+### 2. Campo "Título" como Select com opções predefinidas
+- Substituir o `Input` de título por um `Select` com as opções: **Parque, Hotel, Aeroporto, Centro, Outros**.
+
+### 3. Campo "KM Devolução" habilitado somente ao concluir
+- No formulário de criação: mostrar apenas "KM Retirada", sem "KM Devolução".
+- No formulário de edição: mostrar "KM Devolução" somente quando `status === 'concluido'`.
+- Ao concluir via `cycleStatus`, abrir o dialog de edição para preencher KM Devolução + data/hora devolução antes de salvar.
+
+### 4. Data e horário automáticos (horário atual) com opção de editar
+- No formulário de criação, preencher `inicio_em` com `new Date().toISOString().slice(0, 16)` como valor padrão ao abrir o dialog.
+
+### 5. Inserir data e horário de devolução
+- Adicionar campo `fim_em` (datetime-local) no formulário de edição, visível quando `status === 'concluido'`. A coluna `fim_em` já existe na tabela `transports`.
+
+### 6. Campo "Comissão" (auto-preenchido a partir do motorista)
+- Ao selecionar o motorista, buscar automaticamente o `commission_id` do membro e exibir a comissão correspondente (read-only ou como badge).
+- Importar `useCommissions` para exibir o nome da comissão.
+
+### 7. Veículos: mostrar apenas com status "Disponível"
+- No Select de veículo, filtrar `vehicles` para exibir apenas os que têm `status === 'disponivel'`.
+
+### 8. Integração KM com veículo (já implementada)
+- Manter a lógica existente de criar `vehicle_usage` e atualizar `km_atual` ao concluir com KM preenchidos.
+
+## Refatoração do `renderFormFields`
+- Separar em lógica mais clara com parâmetros: `isEdit`, `status` para controlar visibilidade condicional dos campos.
+
+## Arquivos a modificar
+- `src/pages/TransportsPage.tsx` — todas as alterações acima
+- `src/hooks/useTransports.ts` — incluir `fim_em` no create/update
+
