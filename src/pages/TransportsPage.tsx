@@ -3,6 +3,7 @@ import { useOrgMembers } from '@/hooks/useOrgMembers';
 import { useVehicles } from '@/hooks/useVehicles';
 import { useGuests } from '@/hooks/useGuests';
 import { useVehicleUsage } from '@/hooks/useVehicleUsage';
+import { useCommissions } from '@/hooks/useCommissions';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Plus, Check, Clock, X, Pencil, Search, XCircle } from 'lucide-react';
 import { cn, rawTime, rawDateShort } from '@/lib/utils';
@@ -11,8 +12,8 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
+import { Label } from '@/components/ui/label';
 
 const statusConfig: Record<string, { label: string; icon: typeof Check; class: string }> = {
   pendente: { label: 'Pendente', icon: Clock, class: 'bg-info/10 text-info' },
@@ -21,6 +22,8 @@ const statusConfig: Record<string, { label: string; icon: typeof Check; class: s
   cancelado: { label: 'Cancelado', icon: X, class: 'bg-destructive/10 text-destructive' },
 };
 
+const tituloOptions = ['Parque', 'Hotel', 'Aeroporto', 'Centro', 'Outros'];
+
 export default function TransportsPage() {
   const { transports, create, update } = useTransports();
   const { members } = useOrgMembers();
@@ -28,18 +31,35 @@ export default function TransportsPage() {
   const { guests } = useGuests();
   const { createUsage } = useVehicleUsage();
   const { update: updateVehicle } = useVehicles();
+  const { commissions } = useCommissions();
 
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ titulo: '', guest_id: '', origem: '', destino: '', inicio_em: '', motorista_user_id: '', vehicle_id: '', prioridade: 'media', observacoes: '', km_retirada: '', km_devolucao: '' });
+  const [form, setForm] = useState({ titulo: '', guest_id: '', origem: '', destino: '', inicio_em: '', motorista_user_id: '', vehicle_id: '', prioridade: 'media', km_retirada: '' });
 
   const [editOpen, setEditOpen] = useState(false);
   const [editId, setEditId] = useState('');
-  const [editForm, setEditForm] = useState({ titulo: '', guest_id: '', origem: '', destino: '', inicio_em: '', motorista_user_id: '', vehicle_id: '', prioridade: 'media', observacoes: '', status: 'pendente', km_retirada: '', km_devolucao: '' });
+  const [editForm, setEditForm] = useState({ titulo: '', guest_id: '', origem: '', destino: '', inicio_em: '', motorista_user_id: '', vehicle_id: '', prioridade: 'media', status: 'pendente', km_retirada: '', km_devolucao: '', fim_em: '' });
 
   // Search filters
   const [filterMotorista, setFilterMotorista] = useState('');
   const [filterData, setFilterData] = useState('');
   const hasFilters = (!!filterMotorista && filterMotorista !== 'all') || !!filterData;
+
+  // Available vehicles only
+  const availableVehicles = vehicles.filter((v: any) => v.status === 'disponivel');
+
+  // Get commission name for a driver
+  const getDriverCommission = (driverUserId: string) => {
+    const member = members.find((m: any) => m.user_id === driverUserId);
+    if (!member?.commission_id) return null;
+    const commission = commissions.find((c: any) => c.id === member.commission_id);
+    return commission?.nome || null;
+  };
+
+  const openCreateDialog = () => {
+    setForm({ titulo: '', guest_id: '', origem: '', destino: '', inicio_em: new Date().toISOString().slice(0, 16), motorista_user_id: '', vehicle_id: '', prioridade: 'media', km_retirada: '' });
+    setOpen(true);
+  };
 
   const handleAdd = async () => {
     if (!form.origem || !form.destino || !form.inicio_em) return;
@@ -53,11 +73,9 @@ export default function TransportsPage() {
         motorista_user_id: form.motorista_user_id && form.motorista_user_id !== 'none' ? form.motorista_user_id : null,
         vehicle_id: form.vehicle_id && form.vehicle_id !== 'none' ? form.vehicle_id : null,
         prioridade: form.prioridade,
-        observacoes: form.observacoes || null,
         km_retirada: form.km_retirada ? Number(form.km_retirada) : null,
-        km_devolucao: form.km_devolucao ? Number(form.km_devolucao) : null,
       });
-      setForm({ titulo: '', guest_id: '', origem: '', destino: '', inicio_em: '', motorista_user_id: '', vehicle_id: '', prioridade: 'media', observacoes: '', km_retirada: '', km_devolucao: '' });
+      setForm({ titulo: '', guest_id: '', origem: '', destino: '', inicio_em: '', motorista_user_id: '', vehicle_id: '', prioridade: 'media', km_retirada: '' });
       setOpen(false);
       toast.success('Transporte agendado');
     } catch (err: any) { toast.error(err.message); }
@@ -69,19 +87,19 @@ export default function TransportsPage() {
       titulo: t.titulo || '', guest_id: t.guest_id || '', origem: t.origem, destino: t.destino,
       inicio_em: t.inicio_em?.slice(0, 16) || '', motorista_user_id: t.motorista_user_id || '',
       vehicle_id: t.vehicle_id || '', prioridade: t.prioridade || 'media',
-      observacoes: t.observacoes || '', status: t.status,
+      status: t.status,
       km_retirada: t.km_retirada != null ? String(t.km_retirada) : '',
       km_devolucao: t.km_devolucao != null ? String(t.km_devolucao) : '',
+      fim_em: t.fim_em?.slice(0, 16) || '',
     });
     setEditOpen(true);
   };
 
   const handleEditSave = async () => {
     try {
-      const wasNotConcluido = editForm.status === 'concluido';
       const currentTransport = transports.find((t: any) => t.id === editId);
       const statusChanged = currentTransport && currentTransport.status !== editForm.status;
-      
+
       await update.mutateAsync({
         id: editId,
         titulo: editForm.titulo || null,
@@ -92,10 +110,10 @@ export default function TransportsPage() {
         motorista_user_id: editForm.motorista_user_id && editForm.motorista_user_id !== 'none' ? editForm.motorista_user_id : null,
         vehicle_id: editForm.vehicle_id && editForm.vehicle_id !== 'none' ? editForm.vehicle_id : null,
         prioridade: editForm.prioridade,
-        observacoes: editForm.observacoes || null,
         status: editForm.status,
         km_retirada: editForm.km_retirada ? Number(editForm.km_retirada) : null,
-        km_devolucao: editForm.km_devolucao ? Number(editForm.km_devolucao) : null,
+        km_devolucao: editForm.status === 'concluido' && editForm.km_devolucao ? Number(editForm.km_devolucao) : null,
+        fim_em: editForm.status === 'concluido' && editForm.fim_em ? editForm.fim_em : null,
       });
 
       // If status changed to concluido and KM fields are filled, create vehicle_usage
@@ -109,7 +127,7 @@ export default function TransportsPage() {
             km_saida: kmSaida,
             km_chegada: kmChegada,
             km_rodados: kmChegada - kmSaida,
-            devolucao_em: new Date().toISOString(),
+            devolucao_em: editForm.fim_em || new Date().toISOString(),
           });
           await updateVehicle.mutateAsync({ id: editForm.vehicle_id, km_atual: kmChegada });
         } catch { /* silent - usage is secondary */ }
@@ -125,86 +143,107 @@ export default function TransportsPage() {
     const idx = order.indexOf(t.status);
     if (idx < order.length - 1) {
       const newStatus = order[idx + 1];
-      await update.mutateAsync({ id: t.id, status: newStatus });
-      
-      // If concluding and has KM + vehicle, create vehicle_usage
-      if (newStatus === 'concluido' && t.km_retirada && t.km_devolucao && t.vehicle_id) {
-        try {
-          const kmSaida = Number(t.km_retirada);
-          const kmChegada = Number(t.km_devolucao);
-          await createUsage.mutateAsync({
-            vehicle_id: t.vehicle_id,
-            responsavel_user_id: t.motorista_user_id || null,
-            km_saida: kmSaida,
-            km_chegada: kmChegada,
-            km_rodados: kmChegada - kmSaida,
-            devolucao_em: new Date().toISOString(),
-          });
-          await updateVehicle.mutateAsync({ id: t.vehicle_id, km_atual: kmChegada });
-        } catch { /* silent */ }
+      if (newStatus === 'concluido') {
+        // Open edit dialog to fill KM devolução + fim_em before concluding
+        setEditId(t.id);
+        setEditForm({
+          titulo: t.titulo || '', guest_id: t.guest_id || '', origem: t.origem, destino: t.destino,
+          inicio_em: t.inicio_em?.slice(0, 16) || '', motorista_user_id: t.motorista_user_id || '',
+          vehicle_id: t.vehicle_id || '', prioridade: t.prioridade || 'media',
+          status: 'concluido',
+          km_retirada: t.km_retirada != null ? String(t.km_retirada) : '',
+          km_devolucao: '',
+          fim_em: new Date().toISOString().slice(0, 16),
+        });
+        setEditOpen(true);
+        return;
       }
+      await update.mutateAsync({ id: t.id, status: newStatus });
     }
   };
 
   // Sort and filter
   const sorted = [...transports].sort((a: any, b: any) => (a.inicio_em || '').localeCompare(b.inicio_em || ''));
-
   const fourHoursAgo = new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString();
 
   const filtered = sorted.filter((t: any) => {
-    // Apply search filters
     if (hasFilters) {
       if (filterMotorista && filterMotorista !== 'all' && t.motorista_user_id !== filterMotorista) return false;
       if (filterData && t.inicio_em && !t.inicio_em.startsWith(filterData)) return false;
       return true;
     }
-    // Default: hide concluded > 4h ago
     if (t.status === 'concluido' && t.updated_at && t.updated_at < fourHoursAgo) return false;
     return true;
   });
 
-  const renderFormFields = (data: any, setData: (d: any) => void, showObservacoes = true, showKmFields = true) => (
-    <div className="space-y-3">
-      <Input placeholder="Título (opcional)" value={data.titulo} onChange={(e) => setData({ ...data, titulo: e.target.value })} />
-      <Select value={data.guest_id} onValueChange={(v) => setData({ ...data, guest_id: v })}>
-        <SelectTrigger><SelectValue placeholder="Hóspede (opcional)" /></SelectTrigger>
-        <SelectContent>
-          <SelectItem value="none">Nenhum</SelectItem>
-          {guests.map((g: any) => <SelectItem key={g.id} value={g.id}>{g.nome}</SelectItem>)}
-        </SelectContent>
-      </Select>
-      <div className="grid grid-cols-2 gap-3">
-        <Input placeholder="Origem" value={data.origem} onChange={(e) => setData({ ...data, origem: e.target.value })} />
-        <Input placeholder="Destino" value={data.destino} onChange={(e) => setData({ ...data, destino: e.target.value })} />
-      </div>
-      <Input type="datetime-local" value={data.inicio_em} onChange={(e) => setData({ ...data, inicio_em: e.target.value })} />
-      <div className="grid grid-cols-2 gap-3">
-        <Select value={data.vehicle_id} onValueChange={(v) => setData({ ...data, vehicle_id: v })}>
-          <SelectTrigger><SelectValue placeholder="Veículo" /></SelectTrigger>
+  // Shared form fields renderer
+  const renderFormFields = (data: any, setData: (d: any) => void, isEdit: boolean) => {
+    const driverCommission = data.motorista_user_id && data.motorista_user_id !== 'none'
+      ? getDriverCommission(data.motorista_user_id) : null;
+    const isConcluido = isEdit && data.status === 'concluido';
+    // For edit dialog, also show the current vehicle even if not available
+    const vehicleList = isEdit
+      ? vehicles.filter((v: any) => v.status === 'disponivel' || v.id === data.vehicle_id)
+      : availableVehicles;
+
+    return (
+      <div className="space-y-3">
+        <Select value={data.titulo} onValueChange={(v) => setData({ ...data, titulo: v })}>
+          <SelectTrigger><SelectValue placeholder="Título (destino)" /></SelectTrigger>
           <SelectContent>
-            <SelectItem value="none">Nenhum</SelectItem>
-            {vehicles.map((v: any) => <SelectItem key={v.id} value={v.id}>{v.placa} {v.modelo}</SelectItem>)}
+            {tituloOptions.map((opt) => <SelectItem key={opt} value={opt}>{opt}</SelectItem>)}
           </SelectContent>
         </Select>
-        <Select value={data.motorista_user_id} onValueChange={(v) => setData({ ...data, motorista_user_id: v })}>
-          <SelectTrigger><SelectValue placeholder="Motorista" /></SelectTrigger>
+        <Select value={data.guest_id} onValueChange={(v) => setData({ ...data, guest_id: v })}>
+          <SelectTrigger><SelectValue placeholder="Hóspede (opcional)" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="none">Nenhum</SelectItem>
-            {members.map((m: any) => <SelectItem key={m.user_id} value={m.user_id}>{m.nome_exibicao}</SelectItem>)}
+            {guests.map((g: any) => <SelectItem key={g.id} value={g.id}>{g.nome}</SelectItem>)}
           </SelectContent>
         </Select>
-      </div>
-      {showKmFields && (
         <div className="grid grid-cols-2 gap-3">
-          <Input placeholder="KM Retirada" type="number" value={data.km_retirada} onChange={(e) => setData({ ...data, km_retirada: e.target.value })} />
-          <Input placeholder="KM Devolução" type="number" value={data.km_devolucao} onChange={(e) => setData({ ...data, km_devolucao: e.target.value })} />
+          <Input placeholder="Origem" value={data.origem} onChange={(e) => setData({ ...data, origem: e.target.value })} />
+          <Input placeholder="Destino" value={data.destino} onChange={(e) => setData({ ...data, destino: e.target.value })} />
         </div>
-      )}
-      {showObservacoes && (
-        <Textarea placeholder="Observações" value={data.observacoes} onChange={(e) => setData({ ...data, observacoes: e.target.value })} rows={2} />
-      )}
-    </div>
-  );
+        <div>
+          <Label className="text-xs text-muted-foreground mb-1 block">Data/Hora saída</Label>
+          <Input type="datetime-local" value={data.inicio_em} onChange={(e) => setData({ ...data, inicio_em: e.target.value })} />
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <Select value={data.vehicle_id} onValueChange={(v) => setData({ ...data, vehicle_id: v })}>
+            <SelectTrigger><SelectValue placeholder="Veículo" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">Nenhum</SelectItem>
+              {vehicleList.map((v: any) => <SelectItem key={v.id} value={v.id}>{v.placa} {v.modelo}</SelectItem>)}
+            </SelectContent>
+          </Select>
+          <Select value={data.motorista_user_id} onValueChange={(v) => setData({ ...data, motorista_user_id: v })}>
+            <SelectTrigger><SelectValue placeholder="Motorista" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">Nenhum</SelectItem>
+              {members.map((m: any) => <SelectItem key={m.user_id} value={m.user_id}>{m.nome_exibicao}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
+        {driverCommission && (
+          <div className="flex items-center gap-2">
+            <Label className="text-xs text-muted-foreground">Comissão:</Label>
+            <Badge variant="secondary">{driverCommission}</Badge>
+          </div>
+        )}
+        <Input placeholder="KM Retirada" type="number" value={data.km_retirada} onChange={(e) => setData({ ...data, km_retirada: e.target.value })} />
+        {isConcluido && (
+          <>
+            <Input placeholder="KM Devolução" type="number" value={data.km_devolucao} onChange={(e) => setData({ ...data, km_devolucao: e.target.value })} />
+            <div>
+              <Label className="text-xs text-muted-foreground mb-1 block">Data/Hora devolução</Label>
+              <Input type="datetime-local" value={data.fim_em} onChange={(e) => setData({ ...data, fim_em: e.target.value })} />
+            </div>
+          </>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className="space-y-6">
@@ -215,11 +254,11 @@ export default function TransportsPage() {
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button size="sm"><Plus className="w-4 h-4 mr-1" /> Novo Transporte</Button>
+            <Button size="sm" onClick={openCreateDialog}><Plus className="w-4 h-4 mr-1" /> Novo Transporte</Button>
           </DialogTrigger>
           <DialogContent className="max-h-[90vh] overflow-y-auto">
             <DialogHeader><DialogTitle>Agendar Transporte</DialogTitle></DialogHeader>
-            {renderFormFields(form, setForm)}
+            {renderFormFields(form, setForm, false)}
             <Button onClick={handleAdd} className="w-full" disabled={create.isPending}>Agendar</Button>
           </DialogContent>
         </Dialog>
@@ -248,7 +287,7 @@ export default function TransportsPage() {
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent className="max-h-[90vh] overflow-y-auto">
           <DialogHeader><DialogTitle>Editar Transporte</DialogTitle></DialogHeader>
-          {renderFormFields(editForm, (d) => setEditForm({ ...d, status: editForm.status }), false, true)}
+          {renderFormFields(editForm, (d) => setEditForm({ ...d, status: editForm.status }), true)}
           <Select value={editForm.status} onValueChange={(v) => setEditForm({ ...editForm, status: v })}>
             <SelectTrigger><SelectValue /></SelectTrigger>
             <SelectContent>
