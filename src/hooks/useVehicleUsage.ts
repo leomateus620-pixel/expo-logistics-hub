@@ -38,7 +38,10 @@ export function useVehicleUsage(vehicleId?: string) {
     staleTime: 30000,
   });
 
-  const totalKm = allUsages.reduce((sum: number, u: any) => sum + Number(u.km_rodados || 0), 0);
+  const totalKm = allUsages.reduce((sum: number, u: any) => {
+    const val = Number(u.km_rodados);
+    return sum + (isNaN(val) ? 0 : val);
+  }, 0);
 
   const createUsage = useMutation({
     mutationFn: async (usage: Record<string, any>) => {

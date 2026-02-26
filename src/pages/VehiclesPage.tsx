@@ -80,7 +80,8 @@ export default function VehiclesPage() {
     }
   };
 
-  const custoEstimado = totalKm * 0.65;
+  const FUEL_COST_PER_KM = 0.65;
+  const custoEstimado = Number(totalKm || 0) * FUEL_COST_PER_KM;
 
   return (
     <div className="space-y-6">
