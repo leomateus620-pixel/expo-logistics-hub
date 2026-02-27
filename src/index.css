@@ -105,3 +105,11 @@
     @apply inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-xs font-medium;
   }
 }
+
+input, textarea, select, [role="combobox"] {
+  text-transform: uppercase;
+}
+
+input::placeholder, textarea::placeholder {
+  text-transform: none;
+}

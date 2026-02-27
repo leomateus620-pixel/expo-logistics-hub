@@ -178,7 +178,7 @@ export default function VehiclesPage() {
       {/* Detail dialog with usage history */}
       <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
         <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
-          <DialogHeader><DialogTitle>{detailVehicle?.marca} {detailVehicle?.modelo} — {detailVehicle?.placa}</DialogTitle></DialogHeader>
+          <DialogHeader><DialogTitle>{detailVehicle?.marca} {detailVehicle?.modelo} {detailVehicle?.cor ? detailVehicle.cor.toUpperCase() : ''} — {detailVehicle?.placa}</DialogTitle></DialogHeader>
           {detailVehicle && <VehicleDetailContent vehicle={detailVehicle} members={members} userId={user?.id} />}
         </DialogContent>
       </Dialog>
@@ -200,7 +200,7 @@ export default function VehiclesPage() {
                     <Car className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="font-semibold text-sm">{v.marca} {v.modelo}</p>
+                    <p className="font-semibold text-sm">{v.marca} {v.modelo} {v.cor ? v.cor.toUpperCase() : ''}</p>
                     <p className="text-xs font-mono text-muted-foreground">{v.placa}</p>
                   </div>
                 </div>
