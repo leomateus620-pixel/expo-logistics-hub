@@ -12,18 +12,18 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 
-const statusConfig: Record<string, { label: string; class: string }> = {
-  disponivel: { label: 'Disponível', class: 'bg-success/10 text-success border-success/20' },
-  em_uso: { label: 'Em uso', class: 'bg-info/10 text-info border-info/20' },
-  manutencao: { label: 'Manutenção', class: 'bg-destructive/10 text-destructive border-destructive/20' },
-  inativo: { label: 'Inativo', class: 'bg-muted text-muted-foreground' },
+const statusConfig: Record<string, { label: string; class: string; cardBg: string }> = {
+  disponivel: { label: 'Disponível', class: 'bg-success/10 text-success border-success/20', cardBg: 'border-l-4 border-l-green-500 bg-green-50/60 dark:bg-green-950/20' },
+  em_uso: { label: 'Em uso', class: 'bg-info/10 text-info border-info/20', cardBg: 'border-l-4 border-l-blue-500 bg-blue-50/60 dark:bg-blue-950/20' },
+  manutencao: { label: 'Manutenção', class: 'bg-destructive/10 text-destructive border-destructive/20', cardBg: 'border-l-4 border-l-orange-500 bg-orange-50/60 dark:bg-orange-950/20' },
+  inativo: { label: 'Inativo', class: 'bg-muted text-muted-foreground', cardBg: 'border-l-4 border-l-gray-400 bg-muted/40' },
 };
 
 export default function VehiclesPage() {
   const { vehicles, create, update } = useVehicles();
   const { members } = useOrgMembers();
   const { user } = useAuth();
-  const { totalKm } = useVehicleUsage();
+  const { totalKm, kmByVehicle } = useVehicleUsage();
 
   const [addOpen, setAddOpen] = useState(false);
   const [addForm, setAddForm] = useState({ placa: '', marca: '', modelo: '', ano: '', cor: '', categoria: 'outro', km_atual: '' });
@@ -188,15 +188,16 @@ export default function VehiclesPage() {
         {vehicles.map((v: any) => {
           const driver = members.find((m: any) => m.user_id === v.responsavel_user_id);
           const sc = statusConfig[v.status] || statusConfig.disponivel;
+          const vehicleKm = kmByVehicle[v.id] || 0;
           return (
             <div
               key={v.id}
-              className="rounded-xl border bg-card p-4 sm:p-5 hover:shadow-md transition-shadow cursor-pointer"
+              className={cn('rounded-xl border p-4 sm:p-5 hover:shadow-md transition-shadow cursor-pointer', sc.cardBg)}
               onClick={() => { setDetailVehicle(v); setDetailOpen(true); }}
             >
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-primary/10 text-primary">
+                  <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-background/80 text-foreground">
                     <Car className="w-5 h-5" />
                   </div>
                   <div>
@@ -205,20 +206,18 @@ export default function VehiclesPage() {
                   </div>
                 </div>
                 <div className="flex items-center gap-1.5">
-                  <button onClick={(e) => { e.stopPropagation(); openEdit(v); }} className="p-1.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground">
+                  <button onClick={(e) => { e.stopPropagation(); openEdit(v); }} className="p-1.5 rounded-lg hover:bg-background/60 transition-colors text-muted-foreground hover:text-foreground">
                     <Pencil className="w-3.5 h-3.5" />
                   </button>
                   <Badge variant="outline" className={cn('text-[10px]', sc.class)}>{sc.label}</Badge>
                 </div>
               </div>
-              {v.cor && (
-                <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-2">
-                  <Palette className="w-3 h-3" /> {v.cor}
-                </div>
-              )}
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-2">
+                <Gauge className="w-3 h-3" /> KM rodados: <span className="font-semibold text-foreground">{vehicleKm.toLocaleString('pt-BR')} km</span>
+              </div>
               {v.km_atual != null && (
                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-2">
-                  <Gauge className="w-3 h-3" /> {Number(v.km_atual).toLocaleString('pt-BR')} km
+                  <Gauge className="w-3 h-3" /> Odômetro: {Number(v.km_atual).toLocaleString('pt-BR')} km
                 </div>
               )}
               {driver && (

@@ -29,7 +29,7 @@ export function useVehicleUsage(vehicleId?: string) {
       if (!orgId) return [];
       const { data } = await (supabase as any)
         .from('transports')
-        .select('km_retirada, km_devolucao')
+        .select('vehicle_id, km_retirada, km_devolucao')
         .eq('org_id', orgId)
         .not('km_retirada', 'is', null)
         .not('km_devolucao', 'is', null);
@@ -43,6 +43,14 @@ export function useVehicleUsage(vehicleId?: string) {
     const diff = Number(t.km_devolucao) - Number(t.km_retirada);
     return sum + (isNaN(diff) || diff < 0 ? 0 : diff);
   }, 0);
+
+  const kmByVehicle = allTransports.reduce((map: Record<string, number>, t: any) => {
+    if (!t.vehicle_id) return map;
+    const diff = Number(t.km_devolucao) - Number(t.km_retirada);
+    const val = isNaN(diff) || diff < 0 ? 0 : diff;
+    map[t.vehicle_id] = (map[t.vehicle_id] || 0) + val;
+    return map;
+  }, {} as Record<string, number>);
 
   const createUsage = useMutation({
     mutationFn: async (usage: Record<string, any>) => {
@@ -83,5 +91,5 @@ export function useVehicleUsage(vehicleId?: string) {
     },
   });
 
-  return { usages, allTransports, totalKm, isLoading, createUsage, updateUsage };
+  return { usages, allTransports, totalKm, kmByVehicle, isLoading, createUsage, updateUsage };
 }
