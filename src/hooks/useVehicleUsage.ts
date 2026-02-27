@@ -23,24 +23,25 @@ export function useVehicleUsage(vehicleId?: string) {
     staleTime: 30000,
   });
 
-  const { data: allUsages = [] } = useQuery({
-    queryKey: ['vehicle_usage_all', orgId],
+  const { data: allTransports = [] } = useQuery({
+    queryKey: ['transports_km_all', orgId],
     queryFn: async () => {
       if (!orgId) return [];
       const { data } = await (supabase as any)
-        .from('vehicle_usage')
-        .select('km_rodados')
+        .from('transports')
+        .select('km_retirada, km_devolucao')
         .eq('org_id', orgId)
-        .not('km_rodados', 'is', null);
+        .not('km_retirada', 'is', null)
+        .not('km_devolucao', 'is', null);
       return data || [];
     },
     enabled: !!orgId,
     staleTime: 30000,
   });
 
-  const totalKm = allUsages.reduce((sum: number, u: any) => {
-    const val = Number(u.km_rodados);
-    return sum + (isNaN(val) ? 0 : val);
+  const totalKm = allTransports.reduce((sum: number, t: any) => {
+    const diff = Number(t.km_devolucao) - Number(t.km_retirada);
+    return sum + (isNaN(diff) || diff < 0 ? 0 : diff);
   }, 0);
 
   const createUsage = useMutation({
@@ -82,5 +83,5 @@ export function useVehicleUsage(vehicleId?: string) {
     },
   });
 
-  return { usages, allUsages, totalKm, isLoading, createUsage, updateUsage };
+  return { usages, allTransports, totalKm, isLoading, createUsage, updateUsage };
 }
