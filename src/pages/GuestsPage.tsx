@@ -10,16 +10,43 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
 
+type GuestFormData = { nome: string; telefone: string; email: string; tipo: string; hotel_nome: string; checkin_em: string; checkout_em: string; observacoes: string };
+
+function GuestFormFields({ data, setData }: { data: GuestFormData; setData: (d: GuestFormData) => void }) {
+  return (
+    <div className="space-y-3">
+      <Input placeholder="Nome completo" value={data.nome} onChange={(e) => setData({ ...data, nome: e.target.value })} />
+      <div className="grid grid-cols-2 gap-3">
+        <Input placeholder="Telefone" value={data.telefone} onChange={(e) => setData({ ...data, telefone: e.target.value })} />
+        <Input placeholder="E-mail" type="email" value={data.email} onChange={(e) => setData({ ...data, email: e.target.value })} />
+      </div>
+      <Input placeholder="Hotel" value={data.hotel_nome} onChange={(e) => setData({ ...data, hotel_nome: e.target.value })} />
+      <div className="grid grid-cols-2 gap-3">
+        <div>
+          <label className="text-xs text-muted-foreground mb-1 block">Check-in</label>
+          <Input type="datetime-local" value={data.checkin_em} onChange={(e) => setData({ ...data, checkin_em: e.target.value })} />
+        </div>
+        <div>
+          <label className="text-xs text-muted-foreground mb-1 block">Check-out</label>
+          <Input type="datetime-local" value={data.checkout_em} onChange={(e) => setData({ ...data, checkout_em: e.target.value })} />
+        </div>
+      </div>
+      <Textarea placeholder="Observações" value={data.observacoes} onChange={(e) => setData({ ...data, observacoes: e.target.value })} rows={2} />
+    </div>
+  );
+}
+
 export default function GuestsPage() {
   const { guests, create, update, remove } = useGuests();
   const { transports } = useTransports();
 
+  const emptyForm: GuestFormData = { nome: '', telefone: '', email: '', tipo: 'outro', hotel_nome: '', checkin_em: '', checkout_em: '', observacoes: '' };
   const [addOpen, setAddOpen] = useState(false);
-  const [form, setForm] = useState({ nome: '', telefone: '', email: '', tipo: 'outro', hotel_nome: '', checkin_em: '', checkout_em: '', observacoes: '' });
+  const [form, setForm] = useState(emptyForm);
 
   const [editOpen, setEditOpen] = useState(false);
   const [editId, setEditId] = useState('');
-  const [editForm, setEditForm] = useState({ ...form });
+  const [editForm, setEditForm] = useState(emptyForm);
 
   const handleAdd = async () => {
     if (!form.nome) return;
@@ -34,7 +61,7 @@ export default function GuestsPage() {
         checkout_em: form.checkout_em || null,
         observacoes: form.observacoes || null,
       });
-      setForm({ nome: '', telefone: '', email: '', tipo: 'outro', hotel_nome: '', checkin_em: '', checkout_em: '', observacoes: '' });
+      setForm(emptyForm);
       setAddOpen(false);
       toast.success('Hóspede cadastrado');
     } catch (err: any) { toast.error(err.message); }
@@ -62,28 +89,6 @@ export default function GuestsPage() {
       toast.success('Hóspede atualizado');
     } catch (err: any) { toast.error(err.message); }
   };
-
-  const GuestFormFields = ({ data, setData }: { data: typeof form; setData: (d: typeof form) => void }) => (
-    <div className="space-y-3">
-      <Input placeholder="Nome completo" value={data.nome} onChange={(e) => setData({ ...data, nome: e.target.value })} />
-      <div className="grid grid-cols-2 gap-3">
-        <Input placeholder="Telefone" value={data.telefone} onChange={(e) => setData({ ...data, telefone: e.target.value })} />
-        <Input placeholder="E-mail" type="email" value={data.email} onChange={(e) => setData({ ...data, email: e.target.value })} />
-      </div>
-      <Input placeholder="Hotel" value={data.hotel_nome} onChange={(e) => setData({ ...data, hotel_nome: e.target.value })} />
-      <div className="grid grid-cols-2 gap-3">
-        <div>
-          <label className="text-xs text-muted-foreground mb-1 block">Check-in</label>
-          <Input type="datetime-local" value={data.checkin_em} onChange={(e) => setData({ ...data, checkin_em: e.target.value })} />
-        </div>
-        <div>
-          <label className="text-xs text-muted-foreground mb-1 block">Check-out</label>
-          <Input type="datetime-local" value={data.checkout_em} onChange={(e) => setData({ ...data, checkout_em: e.target.value })} />
-        </div>
-      </div>
-      <Textarea placeholder="Observações" value={data.observacoes} onChange={(e) => setData({ ...data, observacoes: e.target.value })} rows={2} />
-    </div>
-  );
 
   return (
     <div className="space-y-6">

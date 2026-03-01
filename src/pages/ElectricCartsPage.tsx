@@ -1,5 +1,6 @@
 import { useElectricCarts } from '@/hooks/useElectricCarts';
 import { useOrgMembers } from '@/hooks/useOrgMembers';
+import { useCommissions } from '@/hooks/useCommissions';
 import { Zap, Wrench, Pencil, Plus, Phone } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -8,6 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 
 const statusConfig: Record<string, { label: string; class: string }> = {
@@ -20,6 +22,7 @@ const statusConfig: Record<string, { label: string; class: string }> = {
 export default function ElectricCartsPage() {
   const { carts, create, update, pickup, returnCart } = useElectricCarts();
   const { members } = useOrgMembers();
+  const { commissions } = useCommissions();
 
   const [addOpen, setAddOpen] = useState(false);
   const [addForm, setAddForm] = useState({ codigo: '', nome: '' });
@@ -29,7 +32,19 @@ export default function ElectricCartsPage() {
   const [editForm, setEditForm] = useState({ codigo: '', nome: '', status: 'disponivel' });
 
   const [pickupOpen, setPickupOpen] = useState(false);
-  const [pickupForm, setPickupForm] = useState({ cartId: '', userId: '' });
+  const [pickupForm, setPickupForm] = useState({ cartId: '', userId: '', comissao: '', retirada_em: '' });
+
+  const [returnOpen, setReturnOpen] = useState(false);
+  const [returnId, setReturnId] = useState('');
+  const [returnForm, setReturnForm] = useState({ devolucao_em: '' });
+
+  // Get commission name for a member
+  const getMemberCommission = (userId: string) => {
+    const member = members.find((m: any) => m.user_id === userId);
+    if (!member?.commission_id) return null;
+    const commission = commissions.find((c: any) => c.id === member.commission_id);
+    return commission?.nome || null;
+  };
 
   const handleAdd = async () => {
     if (!addForm.codigo) return;
@@ -49,20 +64,42 @@ export default function ElectricCartsPage() {
     } catch (err: any) { toast.error(err.message); }
   };
 
+  const openPickup = () => {
+    setPickupForm({
+      cartId: '',
+      userId: '',
+      comissao: '',
+      retirada_em: new Date().toISOString().slice(0, 16),
+    });
+    setPickupOpen(true);
+  };
+
   const handlePickup = async () => {
     if (!pickupForm.cartId) { toast.error('Selecione um carrinho'); return; }
     if (!pickupForm.userId) { toast.error('Selecione um responsável'); return; }
     try {
-      await pickup.mutateAsync({ id: pickupForm.cartId, responsavel_user_id: pickupForm.userId });
-      setPickupForm({ cartId: '', userId: '' });
+      await pickup.mutateAsync({
+        id: pickupForm.cartId,
+        responsavel_user_id: pickupForm.userId,
+        comissao: pickupForm.comissao || null,
+        retirada_em: pickupForm.retirada_em || new Date().toISOString(),
+      });
+      setPickupForm({ cartId: '', userId: '', comissao: '', retirada_em: '' });
       setPickupOpen(false);
       toast.success('Retirada registrada');
     } catch (err: any) { toast.error(err.message); }
   };
 
-  const handleReturn = async (id: string) => {
+  const openReturn = (id: string) => {
+    setReturnId(id);
+    setReturnForm({ devolucao_em: new Date().toISOString().slice(0, 16) });
+    setReturnOpen(true);
+  };
+
+  const handleReturn = async () => {
     try {
-      await returnCart.mutateAsync(id);
+      await returnCart.mutateAsync({ id: returnId, devolucao_em: returnForm.devolucao_em || new Date().toISOString() });
+      setReturnOpen(false);
       toast.success('Devolução registrada');
     } catch (err: any) { toast.error(err.message); }
   };
@@ -75,12 +112,16 @@ export default function ElectricCartsPage() {
           <p className="text-sm text-muted-foreground mt-1">Gerencie os carrinhos elétricos do evento</p>
         </div>
         <div className="flex gap-2">
+          <Button size="sm" variant="outline" onClick={openPickup} className="h-10 sm:h-9">
+            <Zap className="w-4 h-4 mr-1" /> Retirada
+          </Button>
           <Button size="sm" onClick={() => setAddOpen(true)} className="h-10 sm:h-9">
             <Plus className="w-4 h-4 mr-1" /> Adicionar
           </Button>
         </div>
       </div>
 
+      {/* Add dialog */}
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader><DialogTitle>Adicionar Carrinho Elétrico</DialogTitle></DialogHeader>
@@ -92,6 +133,7 @@ export default function ElectricCartsPage() {
         </DialogContent>
       </Dialog>
 
+      {/* Edit dialog */}
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader><DialogTitle>Editar Carrinho</DialogTitle></DialogHeader>
@@ -111,6 +153,7 @@ export default function ElectricCartsPage() {
         </DialogContent>
       </Dialog>
 
+      {/* Pickup dialog */}
       <Dialog open={pickupOpen} onOpenChange={setPickupOpen}>
         <DialogContent className="sm:max-w-md">
           <DialogHeader><DialogTitle>Registrar Retirada</DialogTitle></DialogHeader>
@@ -123,15 +166,42 @@ export default function ElectricCartsPage() {
                 ))}
               </SelectContent>
             </Select>
-            <Select value={pickupForm.userId} onValueChange={(v) => setPickupForm({ ...pickupForm, userId: v })}>
-              <SelectTrigger><SelectValue placeholder="Responsável" /></SelectTrigger>
+            <Select value={pickupForm.userId} onValueChange={(v) => {
+              const commission = getMemberCommission(v);
+              setPickupForm({ ...pickupForm, userId: v, comissao: commission || '' });
+            }}>
+              <SelectTrigger><SelectValue placeholder="Quem retira" /></SelectTrigger>
               <SelectContent>
                 {members.map((m: any) => (
                   <SelectItem key={m.user_id} value={m.user_id}>{m.nome_exibicao} - {m.cargo}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
+            {pickupForm.comissao && (
+              <div className="flex items-center gap-2">
+                <Label className="text-xs text-muted-foreground">Comissão:</Label>
+                <Badge variant="secondary">{pickupForm.comissao}</Badge>
+              </div>
+            )}
+            <div>
+              <Label className="text-xs text-muted-foreground mb-1 block">Horário de retirada</Label>
+              <Input type="datetime-local" value={pickupForm.retirada_em} onChange={(e) => setPickupForm({ ...pickupForm, retirada_em: e.target.value })} />
+            </div>
             <Button onClick={handlePickup} className="w-full h-11" disabled={pickup.isPending}>Registrar Retirada</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Return dialog */}
+      <Dialog open={returnOpen} onOpenChange={setReturnOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader><DialogTitle>Registrar Devolução</DialogTitle></DialogHeader>
+          <div className="space-y-3">
+            <div>
+              <Label className="text-xs text-muted-foreground mb-1 block">Horário de devolução</Label>
+              <Input type="datetime-local" value={returnForm.devolucao_em} onChange={(e) => setReturnForm({ ...returnForm, devolucao_em: e.target.value })} />
+            </div>
+            <Button onClick={handleReturn} className="w-full h-11" disabled={returnCart.isPending}>Registrar Devolução</Button>
           </div>
         </DialogContent>
       </Dialog>
@@ -167,6 +237,11 @@ export default function ElectricCartsPage() {
                   <span>{resp.nome_exibicao}</span>
                 </div>
               )}
+              {c.comissao && c.status === 'em_uso' && (
+                <div className="text-xs text-muted-foreground mb-2">
+                  Comissão: <Badge variant="secondary" className="text-[10px]">{c.comissao}</Badge>
+                </div>
+              )}
               {c.retirada_em && c.status === 'em_uso' && (
                 <div className="text-xs text-muted-foreground p-2 rounded-lg bg-info/5 border border-info/10 mb-2">
                   <p>Retirado: {new Date(c.retirada_em).toLocaleString('pt-BR')}</p>
@@ -179,7 +254,7 @@ export default function ElectricCartsPage() {
               )}
               <div className="flex gap-2 mt-4">
                 {c.status === 'em_uso' && (
-                  <button onClick={() => handleReturn(c.id)} className="flex-1 text-xs font-medium py-2.5 rounded-lg border border-border hover:bg-muted transition-colors">
+                  <button onClick={() => openReturn(c.id)} className="flex-1 text-xs font-medium py-2.5 rounded-lg border border-border hover:bg-muted transition-colors">
                     Devolver
                   </button>
                 )}
