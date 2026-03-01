@@ -1,20 +1,30 @@
 
 
-# Plano: Buscar Total KM dos Transportes
+# Plano: Ajustar horários para fuso de São Paulo (UTC-3)
 
-O `totalKm` atual vem da tabela `vehicle_usage`. O pedido é calcular a partir da tabela `transports`, usando `km_retirada` e `km_devolucao`.
+## Problema
+Todos os `new Date().toISOString()` geram horário UTC. Formulários e timestamps automáticos ficam 3 horas adiantados em relação a São Paulo.
 
-## Alteração em `src/hooks/useVehicleUsage.ts`
+## Solução
 
-Substituir a query `vehicle_usage_all` que busca `km_rodados` da tabela `vehicle_usage` por uma query na tabela `transports`:
-- Buscar todos os transportes da org que tenham `km_retirada` e `km_devolucao` preenchidos (ambos NOT NULL)
-- Calcular `totalKm` como soma de `(km_devolucao - km_retirada)` para cada transporte
-- Manter a invalidação ao concluir transportes
+### 1. Criar função utilitária `nowSP()` em `src/lib/utils.ts`
+Função que retorna a data/hora atual no fuso `America/Sao_Paulo`:
+- `nowSP()` → ISO string completa no fuso SP
+- `nowSPLocal()` → formato `YYYY-MM-DDTHH:MM` para inputs `datetime-local`
+- `todaySP()` → formato `YYYY-MM-DD` para inputs `date`
 
-## Alteração em `src/pages/VehiclesPage.tsx`
+### 2. Substituir todas as ocorrências de `new Date().toISOString()` e `new Date()`
 
-Nenhuma alteração necessária — já usa `totalKm * 0.65` corretamente.
+**Arquivos afetados (8 arquivos):**
+- `src/pages/TransportsPage.tsx` — 4 ocorrências (abertura formulário, devolução, fourHoursAgo)
+- `src/pages/ElectricCartsPage.tsx` — 4 ocorrências (retirada, devolução)
+- `src/pages/ChecklistPage.tsx` — 2 ocorrências (today, tomorrow)
+- `src/pages/Dashboard.tsx` — 2 ocorrências (now, todayStr)
+- `src/pages/AgendaPage.tsx` — 2 ocorrências (today, tomorrow)
+- `src/pages/VehiclesPage.tsx` — 1 ocorrência (devolução)
+- `src/hooks/useElectricCarts.ts` — 2 ocorrências (pickup, return)
+- `src/hooks/useTasks.ts` — 1 ocorrência (completed_at)
 
-## Arquivos a modificar
-- `src/hooks/useVehicleUsage.ts` — trocar fonte de dados de `vehicle_usage.km_rodados` para `transports.km_retirada / km_devolucao`
+### 3. Atualizar funções de exibição em `rawTime`, `rawWeekday` etc.
+Adicionar conversão para fuso SP ao exibir datas que vêm do banco em UTC.
 
