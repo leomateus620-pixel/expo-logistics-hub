@@ -4,7 +4,7 @@ import { useTransports } from '@/hooks/useTransports';
 import { useOrgMembers } from '@/hooks/useOrgMembers';
 import { Badge } from '@/components/ui/badge';
 import { Plus, Check, Clock, Repeat, CalendarDays, Car, MapPin, User } from 'lucide-react';
-import { cn, rawTime } from '@/lib/utils';
+import { cn, rawTime, todaySP } from '@/lib/utils';
 import { useState, useMemo } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -28,8 +28,10 @@ export default function ChecklistPage() {
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ titulo: '', descricao: '', due_em: '', prioridade: 'media', assignee_user_id: '', recorrencia: 'nenhuma' });
 
-  const today = new Date().toISOString().split('T')[0];
-  const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+  const today = todaySP();
+  const tomorrowDate = new Date(today + 'T12:00:00');
+  tomorrowDate.setDate(tomorrowDate.getDate() + 1);
+  const tomorrow = tomorrowDate.toISOString().split('T')[0];
 
   const handleAdd = async () => {
     if (!form.titulo) return;

@@ -7,7 +7,7 @@ import { useOrgMembers } from '@/hooks/useOrgMembers';
 import StatCard from '@/components/StatCard';
 import { Car, Zap, MapPin, CheckSquare, CalendarDays, Users, Clock, AlertTriangle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { cn, rawTime } from '@/lib/utils';
+import { cn, rawTime, todaySP } from '@/lib/utils';
 
 export default function Dashboard() {
   const { vehicles } = useVehicles();
@@ -17,8 +17,7 @@ export default function Dashboard() {
   const { events } = useEvents();
   const { members } = useOrgMembers();
 
-  const now = new Date();
-  const todayStr = now.toISOString().split('T')[0];
+  const todayStr = todaySP();
 
   const availableVehicles = vehicles.filter((v: any) => v.status === 'disponivel').length;
   const cartsInUse = carts.filter((c: any) => c.status === 'em_uso').length;

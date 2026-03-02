@@ -2,7 +2,7 @@ import { useEvents } from '@/hooks/useEvents';
 import { useOrgMembers } from '@/hooks/useOrgMembers';
 import { Badge } from '@/components/ui/badge';
 import { CalendarDays, Plus, Clock, MapPin, User, Pencil } from 'lucide-react';
-import { cn, rawTime } from '@/lib/utils';
+import { cn, rawTime, todaySP } from '@/lib/utils';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -20,8 +20,10 @@ export default function AgendaPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
 
-  const today = new Date().toISOString().split('T')[0];
-  const tomorrow = new Date(Date.now() + 86400000).toISOString().split('T')[0];
+  const today = todaySP();
+  const tomorrowDate = new Date(today + 'T12:00:00');
+  tomorrowDate.setDate(tomorrowDate.getDate() + 1);
+  const tomorrow = tomorrowDate.toISOString().split('T')[0];
 
   const openCreate = () => {
     setEditingId(null);

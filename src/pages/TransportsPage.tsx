@@ -6,7 +6,7 @@ import { useVehicleUsage } from '@/hooks/useVehicleUsage';
 import { useCommissions } from '@/hooks/useCommissions';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Plus, Check, Clock, X, Pencil, Search, XCircle } from 'lucide-react';
-import { cn, rawTime, rawDateShort } from '@/lib/utils';
+import { cn, rawTime, rawDateShort, nowSP, nowSPLocal } from '@/lib/utils';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -57,7 +57,7 @@ export default function TransportsPage() {
   };
 
   const openCreateDialog = () => {
-    setForm({ titulo: '', guest_id: '', origem: '', destino: '', inicio_em: new Date().toISOString().slice(0, 16), motorista_user_id: '', vehicle_id: '', prioridade: 'media', km_retirada: '' });
+    setForm({ titulo: '', guest_id: '', origem: '', destino: '', inicio_em: nowSPLocal(), motorista_user_id: '', vehicle_id: '', prioridade: 'media', km_retirada: '' });
     setOpen(true);
   };
 
@@ -127,7 +127,7 @@ export default function TransportsPage() {
             km_saida: kmSaida,
             km_chegada: kmChegada,
             km_rodados: kmChegada - kmSaida,
-            devolucao_em: editForm.fim_em || new Date().toISOString(),
+            devolucao_em: editForm.fim_em || nowSP(),
           });
           await updateVehicle.mutateAsync({ id: editForm.vehicle_id, km_atual: kmChegada });
         } catch { /* silent - usage is secondary */ }
@@ -153,7 +153,7 @@ export default function TransportsPage() {
           status: 'concluido',
           km_retirada: t.km_retirada != null ? String(t.km_retirada) : '',
           km_devolucao: '',
-          fim_em: new Date().toISOString().slice(0, 16),
+          fim_em: nowSPLocal(),
         });
         setEditOpen(true);
         return;
@@ -164,7 +164,7 @@ export default function TransportsPage() {
 
   // Sort and filter
   const sorted = [...transports].sort((a: any, b: any) => (a.inicio_em || '').localeCompare(b.inicio_em || ''));
-  const fourHoursAgo = new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString();
+  const fourHoursAgo = new Date(Date.now() - 4 * 60 * 60 * 1000).toLocaleString('sv-SE', { timeZone: 'America/Sao_Paulo' }).replace(' ', 'T');
 
   const filtered = sorted.filter((t: any) => {
     if (hasFilters) {

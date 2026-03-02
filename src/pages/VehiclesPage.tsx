@@ -4,7 +4,7 @@ import { useVehicleUsage } from '@/hooks/useVehicleUsage';
 import { useAuth } from '@/hooks/useAuth';
 import { Car, Pencil, Plus, Gauge, Fuel, ArrowRight, Palette } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
+import { cn, nowSP } from '@/lib/utils';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -276,7 +276,7 @@ function VehicleDetailContent({ vehicle, members, userId }: { vehicle: any; memb
       await updateUsage.mutateAsync({
         id: usageId,
         km_chegada: Number(kmChegada),
-        devolucao_em: new Date().toISOString(),
+        devolucao_em: nowSP(),
       });
       // Update vehicle km_atual
       await updateVehicle.mutateAsync({ id: vehicle.id, km_atual: Number(kmChegada) });
