@@ -3,7 +3,7 @@ import { useOrgMembers } from '@/hooks/useOrgMembers';
 import { useCommissions } from '@/hooks/useCommissions';
 import { Zap, Wrench, Pencil, Plus, Phone } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { cn } from '@/lib/utils';
+import { cn, nowSP, nowSPLocal } from '@/lib/utils';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -69,7 +69,7 @@ export default function ElectricCartsPage() {
       cartId: '',
       userId: '',
       comissao: '',
-      retirada_em: new Date().toISOString().slice(0, 16),
+      retirada_em: nowSPLocal(),
     });
     setPickupOpen(true);
   };
@@ -82,7 +82,7 @@ export default function ElectricCartsPage() {
         id: pickupForm.cartId,
         responsavel_user_id: pickupForm.userId,
         comissao: pickupForm.comissao || null,
-        retirada_em: pickupForm.retirada_em || new Date().toISOString(),
+        retirada_em: pickupForm.retirada_em || nowSP(),
       });
       setPickupForm({ cartId: '', userId: '', comissao: '', retirada_em: '' });
       setPickupOpen(false);
@@ -92,13 +92,13 @@ export default function ElectricCartsPage() {
 
   const openReturn = (id: string) => {
     setReturnId(id);
-    setReturnForm({ devolucao_em: new Date().toISOString().slice(0, 16) });
+    setReturnForm({ devolucao_em: nowSPLocal() });
     setReturnOpen(true);
   };
 
   const handleReturn = async () => {
     try {
-      await returnCart.mutateAsync({ id: returnId, devolucao_em: returnForm.devolucao_em || new Date().toISOString() });
+      await returnCart.mutateAsync({ id: returnId, devolucao_em: returnForm.devolucao_em || nowSP() });
       setReturnOpen(false);
       toast.success('Devolução registrada');
     } catch (err: any) { toast.error(err.message); }

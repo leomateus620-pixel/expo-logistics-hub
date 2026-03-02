@@ -2,6 +2,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCurrentOrg } from './useCurrentOrg';
 import { logAudit } from '@/services/auditService';
+import { nowSP } from '@/lib/utils';
 
 export function useElectricCarts() {
   const { orgId } = useCurrentOrg();
@@ -54,7 +55,7 @@ export function useElectricCarts() {
   const pickup = useMutation({
     mutationFn: async ({ id, responsavel_user_id, comissao, retirada_em }: { id: string; responsavel_user_id: string; comissao?: string | null; retirada_em?: string }) => {
       const { data: before } = await (supabase as any).from('electric_carts').select('*').eq('id', id).single();
-      const pickupTime = retirada_em || new Date().toISOString();
+      const pickupTime = retirada_em || nowSP();
       const { data, error } = await (supabase as any).from('electric_carts')
         .update({ status: 'em_uso', responsavel_user_id, comissao: comissao || null, retirada_em: pickupTime, devolucao_em: null })
         .eq('id', id).select().single();
@@ -72,7 +73,7 @@ export function useElectricCarts() {
   const returnCart = useMutation({
     mutationFn: async ({ id, devolucao_em }: { id: string; devolucao_em?: string }) => {
       const { data: before } = await (supabase as any).from('electric_carts').select('*').eq('id', id).single();
-      const returnTime = devolucao_em || new Date().toISOString();
+      const returnTime = devolucao_em || nowSP();
       const { data, error } = await (supabase as any).from('electric_carts')
         .update({ status: 'disponivel', responsavel_user_id: null, devolucao_em: returnTime })
         .eq('id', id).select().single();
