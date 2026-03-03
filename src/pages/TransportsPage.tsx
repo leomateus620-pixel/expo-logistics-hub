@@ -168,12 +168,12 @@ export default function TransportsPage() {
   const fourHoursAgo = new Date(Date.now() - 4 * 60 * 60 * 1000).toLocaleString('sv-SE', { timeZone: 'America/Sao_Paulo' }).replace(' ', 'T');
 
   const filtered = sorted.filter((t: any) => {
-    if (hasFilters) {
-      if (filterMotorista && filterMotorista !== 'all' && t.motorista_user_id !== filterMotorista) return false;
-      if (filterData && t.inicio_em && !t.inicio_em.startsWith(filterData)) return false;
-      return true;
+    if (filterMotorista && filterMotorista !== 'all' && t.motorista_user_id !== filterMotorista) return false;
+    if (filterData && t.inicio_em && !t.inicio_em.startsWith(filterData)) return false;
+    if (filterStatus && filterStatus !== 'all' && t.status !== filterStatus) return false;
+    if (!hasFilters) {
+      if (t.status === 'concluido' && t.updated_at && t.updated_at < fourHoursAgo) return false;
     }
-    if (t.status === 'concluido' && t.updated_at && t.updated_at < fourHoursAgo) return false;
     return true;
   });
 
@@ -278,8 +278,20 @@ export default function TransportsPage() {
           </SelectContent>
         </Select>
         <Input type="date" className="w-[160px] h-9 text-xs" value={filterData} onChange={(e) => setFilterData(e.target.value)} />
+        <Select value={filterStatus} onValueChange={setFilterStatus}>
+          <SelectTrigger className="w-[150px] h-9 text-xs">
+            <SelectValue placeholder="Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos</SelectItem>
+            <SelectItem value="pendente">Pendente</SelectItem>
+            <SelectItem value="em_andamento">Em andamento</SelectItem>
+            <SelectItem value="concluido">Concluído</SelectItem>
+            <SelectItem value="cancelado">Cancelado</SelectItem>
+          </SelectContent>
+        </Select>
         {hasFilters && (
-          <Button size="sm" variant="ghost" className="h-9 text-xs" onClick={() => { setFilterMotorista(''); setFilterData(''); }}>
+          <Button size="sm" variant="ghost" className="h-9 text-xs" onClick={() => { setFilterMotorista(''); setFilterData(''); setFilterStatus(''); }}>
             <XCircle className="w-3.5 h-3.5 mr-1" /> Limpar
           </Button>
         )}
