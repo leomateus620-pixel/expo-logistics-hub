@@ -5,7 +5,7 @@ import { useGuests } from '@/hooks/useGuests';
 import { useVehicleUsage } from '@/hooks/useVehicleUsage';
 import { useCommissions } from '@/hooks/useCommissions';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Plus, Check, Clock, X, Pencil, Search, XCircle } from 'lucide-react';
+import { MapPin, Plus, Check, Clock, X, Pencil, Search, XCircle, Trash2 } from 'lucide-react';
 import { cn, rawTime, rawDateShort, nowSP, nowSPLocal } from '@/lib/utils';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -25,7 +25,7 @@ const statusConfig: Record<string, { label: string; icon: typeof Check; class: s
 const tituloOptions = ['Parque', 'Hotel', 'Aeroporto', 'Centro', 'Outros'];
 
 export default function TransportsPage() {
-  const { transports, create, update } = useTransports();
+  const { transports, create, update, remove } = useTransports();
   const { members } = useOrgMembers();
   const { vehicles } = useVehicles();
   const { guests } = useGuests();
@@ -43,7 +43,8 @@ export default function TransportsPage() {
   // Search filters
   const [filterMotorista, setFilterMotorista] = useState('');
   const [filterData, setFilterData] = useState('');
-  const hasFilters = (!!filterMotorista && filterMotorista !== 'all') || !!filterData;
+  const [filterStatus, setFilterStatus] = useState('');
+  const hasFilters = (!!filterMotorista && filterMotorista !== 'all') || !!filterData || (!!filterStatus && filterStatus !== 'all');
 
   // Available vehicles only
   const availableVehicles = vehicles.filter((v: any) => v.status === 'disponivel');
@@ -167,12 +168,12 @@ export default function TransportsPage() {
   const fourHoursAgo = new Date(Date.now() - 4 * 60 * 60 * 1000).toLocaleString('sv-SE', { timeZone: 'America/Sao_Paulo' }).replace(' ', 'T');
 
   const filtered = sorted.filter((t: any) => {
-    if (hasFilters) {
-      if (filterMotorista && filterMotorista !== 'all' && t.motorista_user_id !== filterMotorista) return false;
-      if (filterData && t.inicio_em && !t.inicio_em.startsWith(filterData)) return false;
-      return true;
+    if (filterMotorista && filterMotorista !== 'all' && t.motorista_user_id !== filterMotorista) return false;
+    if (filterData && t.inicio_em && !t.inicio_em.startsWith(filterData)) return false;
+    if (filterStatus && filterStatus !== 'all' && t.status !== filterStatus) return false;
+    if (!hasFilters) {
+      if (t.status === 'concluido' && t.updated_at && t.updated_at < fourHoursAgo) return false;
     }
-    if (t.status === 'concluido' && t.updated_at && t.updated_at < fourHoursAgo) return false;
     return true;
   });
 
@@ -277,8 +278,20 @@ export default function TransportsPage() {
           </SelectContent>
         </Select>
         <Input type="date" className="w-[160px] h-9 text-xs" value={filterData} onChange={(e) => setFilterData(e.target.value)} />
+        <Select value={filterStatus} onValueChange={setFilterStatus}>
+          <SelectTrigger className="w-[150px] h-9 text-xs">
+            <SelectValue placeholder="Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos</SelectItem>
+            <SelectItem value="pendente">Pendente</SelectItem>
+            <SelectItem value="em_andamento">Em andamento</SelectItem>
+            <SelectItem value="concluido">Concluído</SelectItem>
+            <SelectItem value="cancelado">Cancelado</SelectItem>
+          </SelectContent>
+        </Select>
         {hasFilters && (
-          <Button size="sm" variant="ghost" className="h-9 text-xs" onClick={() => { setFilterMotorista(''); setFilterData(''); }}>
+          <Button size="sm" variant="ghost" className="h-9 text-xs" onClick={() => { setFilterMotorista(''); setFilterData(''); setFilterStatus(''); }}>
             <XCircle className="w-3.5 h-3.5 mr-1" /> Limpar
           </Button>
         )}
@@ -332,6 +345,9 @@ export default function TransportsPage() {
                 </div>
                 <button onClick={() => openEditDlg(t)} className="p-1.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground shrink-0">
                   <Pencil className="w-3.5 h-3.5" />
+                </button>
+                <button onClick={() => { if (confirm('Excluir este transporte?')) remove.mutate(t.id); }} className="p-1.5 rounded-lg hover:bg-destructive/10 transition-colors text-muted-foreground hover:text-destructive shrink-0">
+                  <Trash2 className="w-3.5 h-3.5" />
                 </button>
                 {t.status !== 'concluido' && t.status !== 'cancelado' && (
                   <button onClick={() => cycleStatus(t)} className="text-xs px-3 py-1.5 rounded-lg border border-border hover:bg-muted transition-colors shrink-0">
