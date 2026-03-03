@@ -25,7 +25,7 @@ const statusConfig: Record<string, { label: string; icon: typeof Check; class: s
 const tituloOptions = ['Parque', 'Hotel', 'Aeroporto', 'Centro', 'Outros'];
 
 export default function TransportsPage() {
-  const { transports, create, update } = useTransports();
+  const { transports, create, update, remove } = useTransports();
   const { members } = useOrgMembers();
   const { vehicles } = useVehicles();
   const { guests } = useGuests();
@@ -43,7 +43,8 @@ export default function TransportsPage() {
   // Search filters
   const [filterMotorista, setFilterMotorista] = useState('');
   const [filterData, setFilterData] = useState('');
-  const hasFilters = (!!filterMotorista && filterMotorista !== 'all') || !!filterData;
+  const [filterStatus, setFilterStatus] = useState('');
+  const hasFilters = (!!filterMotorista && filterMotorista !== 'all') || !!filterData || (!!filterStatus && filterStatus !== 'all');
 
   // Available vehicles only
   const availableVehicles = vehicles.filter((v: any) => v.status === 'disponivel');
