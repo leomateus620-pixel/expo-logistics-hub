@@ -104,5 +104,15 @@ export function useTransports() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['transports'] }),
   });
 
-  return { transports, isLoading, create, update };
+  const remove = useMutation({
+    mutationFn: async (id: string) => {
+      const { data: before } = await (supabase as any).from('transports').select('*').eq('id', id).single();
+      const { error } = await (supabase as any).from('transports').delete().eq('id', id);
+      if (error) throw error;
+      await logAudit({ orgId: orgId!, entity: 'transports', entityId: id, action: 'delete', before });
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['transports'] }),
+  });
+
+  return { transports, isLoading, create, update, remove };
 }

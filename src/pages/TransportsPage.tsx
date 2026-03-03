@@ -5,7 +5,7 @@ import { useGuests } from '@/hooks/useGuests';
 import { useVehicleUsage } from '@/hooks/useVehicleUsage';
 import { useCommissions } from '@/hooks/useCommissions';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Plus, Check, Clock, X, Pencil, Search, XCircle } from 'lucide-react';
+import { MapPin, Plus, Check, Clock, X, Pencil, Search, XCircle, Trash2 } from 'lucide-react';
 import { cn, rawTime, rawDateShort, nowSP, nowSPLocal } from '@/lib/utils';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
