@@ -2,6 +2,8 @@ import { useEvents } from '@/hooks/useEvents';
 import { useOrgMembers } from '@/hooks/useOrgMembers';
 import { Badge } from '@/components/ui/badge';
 import { CalendarDays, Plus, Clock, MapPin, User, Pencil } from 'lucide-react';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { cn, rawTime, todaySP } from '@/lib/utils';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -11,7 +13,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 
-const emptyForm = { titulo: '', descricao: '', inicio_em: '', fim_em: '', local: '', tipo_tag: '', responsavel_user_id: '' };
+const emptyForm = { titulo: '', descricao: '', inicio_em: '', fim_em: '', local: '', tipo_tag: '', responsavel_user_id: '', repetir_diariamente: false };
 
 export default function AgendaPage() {
   const { events, create, update } = useEvents();
@@ -41,6 +43,7 @@ export default function AgendaPage() {
       local: e.local || '',
       tipo_tag: e.tipo_tag || '',
       responsavel_user_id: e.responsavel_user_id || 'none',
+      repetir_diariamente: false,
     });
     setOpen(true);
   };
@@ -60,6 +63,20 @@ export default function AgendaPage() {
       if (editingId) {
         await update.mutateAsync({ id: editingId, ...payload });
         toast.success('Evento atualizado');
+      } else if (form.repetir_diariamente) {
+        const startDate = new Date(form.inicio_em);
+        const endDate = new Date(form.fim_em);
+        const diffMs = endDate.getTime() - startDate.getTime();
+        for (let i = 0; i < 7; i++) {
+          const newStart = new Date(startDate.getTime() + i * 86400000);
+          const newEnd = new Date(newStart.getTime() + diffMs);
+          await create.mutateAsync({
+            ...payload,
+            inicio_em: newStart.toISOString().slice(0, 16),
+            fim_em: newEnd.toISOString().slice(0, 16),
+          });
+        }
+        toast.success('7 eventos criados (diário)');
       } else {
         await create.mutateAsync(payload);
         toast.success('Evento criado');
@@ -111,6 +128,12 @@ export default function AgendaPage() {
                 </SelectContent>
               </Select>
               <Input placeholder="Categoria / Tag" value={form.tipo_tag} onChange={(e) => setForm({ ...form, tipo_tag: e.target.value })} />
+              {!editingId && (
+                <div className="flex items-center gap-2">
+                  <Switch id="repetir" checked={form.repetir_diariamente} onCheckedChange={(v) => setForm({ ...form, repetir_diariamente: v })} />
+                  <Label htmlFor="repetir" className="text-sm cursor-pointer">Repetir diariamente (7 dias)</Label>
+                </div>
+              )}
               <Button onClick={handleSave} className="w-full" disabled={isSubmitting}>
                 {editingId ? 'Salvar Alterações' : 'Criar Evento'}
               </Button>

@@ -1,6 +1,7 @@
 import { useOrgMembers } from '@/hooks/useOrgMembers';
 import { useCommissions } from '@/hooks/useCommissions';
 import { rawTime } from '@/lib/utils';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTasks } from '@/hooks/useTasks';
 import { useTransports } from '@/hooks/useTransports';
@@ -66,15 +67,24 @@ export default function TeamPage() {
     } catch (err: any) { toast.error(err.message); }
   };
 
+  const getCommissionName = (id: string) => commissions.find((c: any) => c.id === id)?.nome || '';
+
+  const selectedCommissionName = addForm.commission_id && addForm.commission_id !== 'none'
+    ? getCommissionName(addForm.commission_id)
+    : '';
+  const needsCredentials = selectedCommissionName.toUpperCase().includes('LOGÍSTICA') || selectedCommissionName.toUpperCase().includes('LOGISTICA');
+
   const handleAdd = async () => {
     if (!addForm.nome) { toast.error('Informe o nome'); return; }
     if (!addForm.cargo) { toast.error('Informe o cargo'); return; }
-    if (!addForm.email) { toast.error('Informe o e-mail de acesso'); return; }
-    if (!addForm.password) { toast.error('Informe a senha'); return; }
+    if (needsCredentials && !addForm.email) { toast.error('Informe o e-mail de acesso'); return; }
+    if (needsCredentials && !addForm.password) { toast.error('Informe a senha'); return; }
     setAddLoading(true);
     try {
+      const email = needsCredentials ? addForm.email : `placeholder-${Date.now()}@noaccess.local`;
+      const password = needsCredentials ? addForm.password : `P@ss${crypto.randomUUID().slice(0, 12)}`;
       const { data, error } = await supabase.functions.invoke('create-user', {
-        body: { email: addForm.email, password: addForm.password, full_name: addForm.nome, org_id: orgId, role: addForm.role, cargo: addForm.cargo },
+        body: { email, password, full_name: addForm.nome, org_id: orgId, role: addForm.role, cargo: addForm.cargo },
       });
       if (error) {
         const msg = data?.error || error?.message || 'Erro ao criar usuário';
@@ -141,7 +151,6 @@ export default function TeamPage() {
     toast.success('Alocação registrada');
   };
 
-  const getCommissionName = (id: string) => commissions.find((c: any) => c.id === id)?.nome || '';
 
   return (
     <div className="space-y-6">
@@ -216,11 +225,16 @@ export default function TeamPage() {
                 {commissions.map((c: any) => <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>)}
               </SelectContent>
             </Select>
-            <div className="border-t pt-3 mt-2">
-              <p className="text-xs text-muted-foreground mb-2">Acesso ao sistema (obrigatório)</p>
-              <Input type="email" placeholder="E-mail de acesso" value={addForm.email} onChange={(e) => setAddForm({ ...addForm, email: e.target.value })} />
-              <Input type="password" placeholder="Senha" value={addForm.password} onChange={(e) => setAddForm({ ...addForm, password: e.target.value })} className="mt-2" />
-            </div>
+            {needsCredentials && (
+              <div className="border-t pt-3 mt-2">
+                <p className="text-xs text-muted-foreground mb-2">Acesso ao sistema (obrigatório para esta comissão)</p>
+                <Input type="email" placeholder="E-mail de acesso" value={addForm.email} onChange={(e) => setAddForm({ ...addForm, email: e.target.value })} />
+                <Input type="password" placeholder="Senha" value={addForm.password} onChange={(e) => setAddForm({ ...addForm, password: e.target.value })} className="mt-2" />
+              </div>
+            )}
+            {!needsCredentials && addForm.commission_id && addForm.commission_id !== 'none' && (
+              <p className="text-[10px] text-muted-foreground">Este membro não terá acesso ao sistema.</p>
+            )}
             <Button onClick={handleAdd} className="w-full" disabled={addLoading}>
               {addLoading && <Loader2 className="w-4 h-4 mr-2 animate-spin" />} Adicionar
             </Button>
@@ -365,67 +379,83 @@ export default function TeamPage() {
         </div>
       )}
 
-      {/* Team cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {members.map((m: any) => {
-          const memberTasks = tasks.filter((t: any) => t.assignee_user_id === m.user_id);
-          const pending = memberTasks.filter((t: any) => t.status === 'pendente').length;
-          const done = memberTasks.filter((t: any) => t.status === 'concluida').length;
-          const activeTransport = transports.find((t: any) => t.motorista_user_id === m.user_id && t.status === 'em_andamento');
-          const commissionName = m.commission_id ? getCommissionName(m.commission_id) : '';
+      {/* Team table */}
+      <div className="rounded-xl border bg-card overflow-auto max-h-[70vh]">
+        <Table>
+          <TableHeader className="sticky top-0 bg-card z-10">
+            <TableRow>
+              <TableHead className="min-w-[200px]">Nome</TableHead>
+              <TableHead>Cargo</TableHead>
+              <TableHead>Telefone</TableHead>
+              <TableHead>Comissão</TableHead>
+              <TableHead className="text-center">Pendentes</TableHead>
+              <TableHead className="text-center">Concluídas</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Ações</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {members.map((m: any) => {
+              const memberTasks = tasks.filter((t: any) => t.assignee_user_id === m.user_id);
+              const pending = memberTasks.filter((t: any) => t.status === 'pendente').length;
+              const done = memberTasks.filter((t: any) => t.status === 'concluida').length;
+              const activeTransport = transports.find((t: any) => t.motorista_user_id === m.user_id && t.status === 'em_andamento');
+              const commissionName = m.commission_id ? getCommissionName(m.commission_id) : '';
 
-          return (
-            <div key={m.id} className="rounded-xl border bg-card p-5 hover:shadow-md transition-shadow">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold text-primary-foreground" style={{ backgroundColor: m.avatar_color || TEAM_COLORS[0] }}>
-                  {(m.nome_exibicao || '?').split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="font-semibold">{m.nome_exibicao}</p>
-                  <p className="text-xs text-muted-foreground">{m.cargo}</p>
-                  {m.telefone && <p className="text-[10px] text-muted-foreground">{m.telefone}</p>}
-                </div>
-                <div className="flex items-center gap-1">
-                  <button onClick={() => { setEditId(m.id); setEditForm({ nome: m.nome_exibicao || '', cargo: m.cargo || '', telefone: m.telefone || '', commission_id: m.commission_id || '' }); setEditOpen(true); }} className="p-1.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground">
-                    <Pencil className="w-3.5 h-3.5" />
-                  </button>
-                  <button onClick={() => { removeMember.mutateAsync(m.id); toast.success('Membro desativado'); }} className="p-1.5 rounded-lg hover:bg-destructive/10 transition-colors text-muted-foreground hover:text-destructive">
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              </div>
-
-              {commissionName && (
-                <Badge variant="outline" className="text-[10px] mb-2">{commissionName}</Badge>
-              )}
-
-              <div className="flex items-center gap-2 mb-3">
-                <Badge variant="outline" className="text-[10px]">{pending} pendente{pending !== 1 ? 's' : ''}</Badge>
-                <Badge variant="secondary" className="text-[10px]">{done} concluída{done !== 1 ? 's' : ''}</Badge>
-              </div>
-
-              {activeTransport && (
-                <div className="text-xs p-2.5 rounded-lg bg-accent/10 border border-accent/20 mb-3">
-                  <p className="font-medium text-accent">🚗 Em transporte</p>
-                  <p className="text-muted-foreground mt-0.5">{activeTransport.origem} → {activeTransport.destino}</p>
-                </div>
-              )}
-
-              <button
-                onClick={() => { setViewMemberId(m.user_id); setViewScheduleOpen(true); }}
-                className="w-full text-xs font-medium py-2 rounded-lg border border-border hover:bg-muted transition-colors"
-              >
-                Ver Escala Completa
-              </button>
-            </div>
-          );
-        })}
-        {members.length === 0 && (
-          <div className="col-span-full text-center py-12 text-muted-foreground">
-            <UserPlus className="w-8 h-8 mx-auto mb-2 opacity-50" />
-            <p className="text-sm">Nenhum membro cadastrado</p>
-          </div>
-        )}
+              return (
+                <TableRow key={m.id}>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-primary-foreground shrink-0" style={{ backgroundColor: m.avatar_color || TEAM_COLORS[0] }}>
+                        {(m.nome_exibicao || '?').split(' ').map((n: string) => n[0]).join('').slice(0, 2)}
+                      </div>
+                      <span className="font-medium text-sm truncate">{m.nome_exibicao}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-sm text-muted-foreground">{m.cargo || '—'}</TableCell>
+                  <TableCell className="text-sm text-muted-foreground">{m.telefone || '—'}</TableCell>
+                  <TableCell>
+                    {commissionName ? <Badge variant="outline" className="text-[10px]">{commissionName}</Badge> : <span className="text-muted-foreground">—</span>}
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <Badge variant="outline" className="text-[10px]">{pending}</Badge>
+                  </TableCell>
+                  <TableCell className="text-center">
+                    <Badge variant="secondary" className="text-[10px]">{done}</Badge>
+                  </TableCell>
+                  <TableCell>
+                    {activeTransport ? (
+                      <span className="text-xs text-accent font-medium">🚗 {activeTransport.origem} → {activeTransport.destino}</span>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">Disponível</span>
+                    )}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex items-center justify-end gap-1">
+                      <button onClick={() => { setViewMemberId(m.user_id); setViewScheduleOpen(true); }} className="p-1.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground" title="Ver Escala">
+                        <CalendarDays className="w-3.5 h-3.5" />
+                      </button>
+                      <button onClick={() => { setEditId(m.id); setEditForm({ nome: m.nome_exibicao || '', cargo: m.cargo || '', telefone: m.telefone || '', commission_id: m.commission_id || '' }); setEditOpen(true); }} className="p-1.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground" title="Editar">
+                        <Pencil className="w-3.5 h-3.5" />
+                      </button>
+                      <button onClick={() => { removeMember.mutateAsync(m.id); toast.success('Membro desativado'); }} className="p-1.5 rounded-lg hover:bg-destructive/10 transition-colors text-muted-foreground hover:text-destructive" title="Remover">
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+            {members.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={8} className="text-center py-12 text-muted-foreground">
+                  <UserPlus className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                  <p className="text-sm">Nenhum membro cadastrado</p>
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
       </div>
     </div>
   );
