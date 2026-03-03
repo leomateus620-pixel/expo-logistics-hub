@@ -43,6 +43,7 @@ export default function AgendaPage() {
       local: e.local || '',
       tipo_tag: e.tipo_tag || '',
       responsavel_user_id: e.responsavel_user_id || 'none',
+      repetir_diariamente: false,
     });
     setOpen(true);
   };
