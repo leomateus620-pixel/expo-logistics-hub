@@ -59,7 +59,7 @@ export default function TransportsPage() {
   };
 
   const openCreateDialog = () => {
-    setForm({ titulo: '', guest_id: '', origem: '', destino: '', inicio_em: nowSPLocal(), motorista_user_id: '', vehicle_id: '', prioridade: 'media', km_retirada: '' });
+    setForm({ titulo: '', guest_id: '', origem: '', destino: '', inicio_em: nowSPLocal(), motorista_user_id: '', vehicle_id: '', prioridade: 'media', km_retirada: '', voo_cidade: '', voo_numero: '', voo_checkin: '', voo_chegada: '', horario_saida: '' });
     setOpen(true);
   };
 
@@ -76,8 +76,13 @@ export default function TransportsPage() {
         vehicle_id: form.vehicle_id && form.vehicle_id !== 'none' ? form.vehicle_id : null,
         prioridade: form.prioridade,
         km_retirada: form.km_retirada ? Number(form.km_retirada) : null,
+        voo_cidade: form.titulo === 'Aeroporto' ? form.voo_cidade || null : null,
+        voo_numero: form.titulo === 'Aeroporto' ? form.voo_numero || null : null,
+        voo_checkin: form.titulo === 'Aeroporto' ? form.voo_checkin || null : null,
+        voo_chegada: form.titulo === 'Aeroporto' ? form.voo_chegada || null : null,
+        horario_saida: form.titulo === 'Aeroporto' ? form.horario_saida || null : null,
       });
-      setForm({ titulo: '', guest_id: '', origem: '', destino: '', inicio_em: '', motorista_user_id: '', vehicle_id: '', prioridade: 'media', km_retirada: '' });
+      setForm({ titulo: '', guest_id: '', origem: '', destino: '', inicio_em: '', motorista_user_id: '', vehicle_id: '', prioridade: 'media', km_retirada: '', voo_cidade: '', voo_numero: '', voo_checkin: '', voo_chegada: '', horario_saida: '' });
       setOpen(false);
       toast.success('Transporte agendado');
     } catch (err: any) { toast.error(err.message); }
@@ -93,6 +98,9 @@ export default function TransportsPage() {
       km_retirada: t.km_retirada != null ? String(t.km_retirada) : '',
       km_devolucao: t.km_devolucao != null ? String(t.km_devolucao) : '',
       fim_em: t.fim_em?.slice(0, 16) || '',
+      voo_cidade: t.voo_cidade || '', voo_numero: t.voo_numero || '',
+      voo_checkin: t.voo_checkin || '', voo_chegada: t.voo_chegada || '',
+      horario_saida: t.horario_saida || '',
     });
     setEditOpen(true);
   };
@@ -116,6 +124,11 @@ export default function TransportsPage() {
         km_retirada: editForm.km_retirada ? Number(editForm.km_retirada) : null,
         km_devolucao: editForm.status === 'concluido' && editForm.km_devolucao ? Number(editForm.km_devolucao) : null,
         fim_em: editForm.status === 'concluido' && editForm.fim_em ? editForm.fim_em : null,
+        voo_cidade: editForm.titulo === 'Aeroporto' ? editForm.voo_cidade || null : null,
+        voo_numero: editForm.titulo === 'Aeroporto' ? editForm.voo_numero || null : null,
+        voo_checkin: editForm.titulo === 'Aeroporto' ? editForm.voo_checkin || null : null,
+        voo_chegada: editForm.titulo === 'Aeroporto' ? editForm.voo_chegada || null : null,
+        horario_saida: editForm.titulo === 'Aeroporto' ? editForm.horario_saida || null : null,
       });
 
       // If status changed to concluido and KM fields are filled, create vehicle_usage
@@ -156,6 +169,9 @@ export default function TransportsPage() {
           km_retirada: t.km_retirada != null ? String(t.km_retirada) : '',
           km_devolucao: '',
           fim_em: nowSPLocal(),
+          voo_cidade: t.voo_cidade || '', voo_numero: t.voo_numero || '',
+          voo_checkin: t.voo_checkin || '', voo_chegada: t.voo_chegada || '',
+          horario_saida: t.horario_saida || '',
         });
         setEditOpen(true);
         return;
