@@ -473,6 +473,39 @@ export type Database = {
           },
         ]
       }
+      security_audit_reports: {
+        Row: {
+          created_at: string
+          findings: Json
+          id: string
+          metadata: Json
+          org_id: string
+          run_by_user_id: string
+          scope: string
+          summary: Json
+        }
+        Insert: {
+          created_at?: string
+          findings: Json
+          id?: string
+          metadata: Json
+          org_id: string
+          run_by_user_id: string
+          scope?: string
+          summary: Json
+        }
+        Update: {
+          created_at?: string
+          findings?: Json
+          id?: string
+          metadata?: Json
+          org_id?: string
+          run_by_user_id?: string
+          scope?: string
+          summary?: Json
+        }
+        Relationships: []
+      }
       shift_assignments: {
         Row: {
           created_at: string
@@ -828,6 +861,20 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      audit_check_rls_status: {
+        Args: never
+        Returns: {
+          rls_enabled: boolean
+          table_name: string
+        }[]
+      }
+      audit_count_policies: {
+        Args: never
+        Returns: {
+          policy_count: number
+          table_name: string
+        }[]
+      }
       create_org_with_member: { Args: { org_nome: string }; Returns: string }
       get_user_org_ids: { Args: { _user_id: string }; Returns: string[] }
       get_user_org_role: {
