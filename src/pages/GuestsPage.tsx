@@ -141,14 +141,14 @@ export default function GuestsPage() {
                 </div>
               </div>
               {g.hotel_nome && (
-                <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1.5">
-                  <Hotel className="w-3 h-3" /> {g.hotel_nome}
+                <div className="flex items-center gap-2 text-xs font-medium text-foreground/80 mb-2 px-3 py-2 rounded-xl bg-primary/5 backdrop-blur-sm border border-primary/10 shadow-sm">
+                  <Hotel className="w-3.5 h-3.5 text-primary" /> {g.hotel_nome}
                 </div>
               )}
               {(g.checkin_em || g.checkout_em) && (
-                <div className="text-xs text-muted-foreground mb-2 p-2 rounded-lg bg-muted/50">
-                  {g.checkin_em && <p>Check-in: {new Date(g.checkin_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</p>}
-                  {g.checkout_em && <p>Check-out: {new Date(g.checkout_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</p>}
+                <div className="text-xs mb-2 p-3 rounded-xl bg-success/5 backdrop-blur-sm border border-success/15 shadow-sm space-y-1">
+                  {g.checkin_em && <p className="flex items-center gap-1.5"><span className="inline-block w-1.5 h-1.5 rounded-full bg-success" /> <span className="font-medium text-foreground/80">Check-in:</span> <span className="text-muted-foreground">{new Date(g.checkin_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</span></p>}
+                  {g.checkout_em && <p className="flex items-center gap-1.5"><span className="inline-block w-1.5 h-1.5 rounded-full bg-warning" /> <span className="font-medium text-foreground/80">Check-out:</span> <span className="text-muted-foreground">{new Date(g.checkout_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</span></p>}
                 </div>
               )}
               <div className="flex items-center gap-3 text-[10px] text-muted-foreground mb-2">
@@ -156,14 +156,17 @@ export default function GuestsPage() {
                 {g.email && <span className="flex items-center gap-0.5"><Mail className="w-2.5 h-2.5" /> {g.email}</span>}
               </div>
               {linkedTransports.length > 0 && (
-                <div className="mt-3 pt-3 border-t border-border">
-                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-1.5">Transportes vinculados</p>
-                  {linkedTransports.map((t: any) => (
-                    <div key={t.id} className="text-xs text-muted-foreground flex items-center gap-1.5 py-0.5">
-                      <MapPin className="w-2.5 h-2.5" />
-                      {t.origem} → {t.destino} · {t.inicio_em ? new Date(t.inicio_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : ''}
-                    </div>
-                  ))}
+                <div className="mt-3 p-3 rounded-xl bg-info/5 backdrop-blur-sm border border-info/15 shadow-sm">
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider mb-2 font-semibold">Transportes vinculados</p>
+                  <div className="space-y-1.5">
+                    {[...linkedTransports].sort((a: any, b: any) => (a.inicio_em || '').localeCompare(b.inicio_em || '')).map((t: any) => (
+                      <div key={t.id} className="text-xs text-foreground/70 flex items-center gap-1.5 py-1 px-2 rounded-lg bg-card/60 border border-border/30">
+                        <MapPin className="w-3 h-3 text-info shrink-0" />
+                        <span>{t.origem} → {t.destino}</span>
+                        <span className="text-muted-foreground ml-auto text-[10px]">{t.inicio_em ? new Date(t.inicio_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) : ''}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>
