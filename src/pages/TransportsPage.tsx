@@ -48,6 +48,60 @@ export default function TransportsPage() {
   const [filterStatus, setFilterStatus] = useState('');
   const hasFilters = (!!filterMotorista && filterMotorista !== 'all') || !!filterData || (!!filterStatus && filterStatus !== 'all');
 
+  // Detail view
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [detailTransport, setDetailTransport] = useState<any>(null);
+
+  const openDetail = (t: any) => {
+    setDetailTransport(t);
+    setDetailOpen(true);
+  };
+
+  const generatePDF = (t: any) => {
+    const driver = members.find((m: any) => m.user_id === t.motorista_user_id);
+    const vehicle = vehicles.find((v: any) => v.id === t.vehicle_id);
+    const guest = guests.find((g: any) => g.id === t.guest_id);
+    const sc = statusConfig[t.status] || statusConfig.pendente;
+    const driverCommission = t.motorista_user_id ? getDriverCommission(t.motorista_user_id) : null;
+
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) { toast.error('Popup bloqueado pelo navegador'); return; }
+    printWindow.document.write(`<!DOCTYPE html><html><head><title>Transporte ${t.titulo || ''}</title><style>
+      body { font-family: 'Segoe UI', Arial, sans-serif; padding: 40px; max-width: 600px; margin: 0 auto; color: #1a1a1a; }
+      h1 { font-size: 18px; border-bottom: 2px solid #2d6a4f; padding-bottom: 8px; margin-bottom: 16px; color: #2d6a4f; }
+      .row { display: flex; gap: 8px; margin-bottom: 8px; }
+      .label { font-weight: 600; color: #555; font-size: 13px; min-width: 140px; }
+      .value { font-size: 14px; }
+      .flight { background: #f0f7f4; padding: 12px; border-radius: 8px; margin-top: 16px; }
+      .flight strong { color: #2d6a4f; }
+      .footer { margin-top: 24px; font-size: 11px; color: #888; border-top: 1px solid #ddd; padding-top: 8px; }
+    </style></head><body>
+      <h1>🚐 Transporte — ${t.titulo || 'Sem título'}</h1>
+      <div class="row"><span class="label">Status:</span><span class="value">${sc.label}</span></div>
+      <div class="row"><span class="label">Origem:</span><span class="value">${t.origem}</span></div>
+      <div class="row"><span class="label">Destino:</span><span class="value">${t.destino}</span></div>
+      <div class="row"><span class="label">Saída:</span><span class="value">${t.inicio_em ? new Date(t.inicio_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }) : '—'}</span></div>
+      ${t.fim_em ? `<div class="row"><span class="label">Devolução:</span><span class="value">${new Date(t.fim_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</span></div>` : ''}
+      <div class="row"><span class="label">Motorista:</span><span class="value">${driver?.nome_exibicao || '—'}</span></div>
+      ${driverCommission ? `<div class="row"><span class="label">Comissão:</span><span class="value">${driverCommission}</span></div>` : ''}
+      <div class="row"><span class="label">Veículo:</span><span class="value">${vehicle ? `${vehicle.placa} ${vehicle.modelo || ''}` : '—'}</span></div>
+      <div class="row"><span class="label">Hóspede:</span><span class="value">${guest?.nome || '—'}</span></div>
+      ${t.km_retirada != null ? `<div class="row"><span class="label">KM Retirada:</span><span class="value">${t.km_retirada}</span></div>` : ''}
+      ${t.km_devolucao != null ? `<div class="row"><span class="label">KM Devolução:</span><span class="value">${t.km_devolucao}</span></div>` : ''}
+      ${t.km_retirada != null && t.km_devolucao != null ? `<div class="row"><span class="label">KM Rodados:</span><span class="value">${Number(t.km_devolucao) - Number(t.km_retirada)}</span></div>` : ''}
+      ${t.titulo === 'Aeroporto' ? `<div class="flight"><strong>✈️ Informações do Voo</strong>
+        ${t.voo_cidade ? `<div class="row"><span class="label">Cidade:</span><span class="value">${t.voo_cidade}</span></div>` : ''}
+        ${t.voo_numero ? `<div class="row"><span class="label">Nº Voo:</span><span class="value">${t.voo_numero}</span></div>` : ''}
+        ${t.voo_checkin ? `<div class="row"><span class="label">Check-in:</span><span class="value">${t.voo_checkin}</span></div>` : ''}
+        ${t.voo_chegada ? `<div class="row"><span class="label">Chegada:</span><span class="value">${t.voo_chegada}</span></div>` : ''}
+        ${t.horario_saida ? `<div class="row"><span class="label">Saída p/ Aeroporto:</span><span class="value">${t.horario_saida}</span></div>` : ''}
+      </div>` : ''}
+      <div class="footer">Gerado em ${new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</div>
+    </body></html>`);
+    printWindow.document.close();
+    printWindow.print();
+  };
+
   // Available vehicles only
   const availableVehicles = vehicles.filter((v: any) => v.status === 'disponivel');
 
