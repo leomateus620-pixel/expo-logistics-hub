@@ -1,30 +1,21 @@
 
 
-# Plano: Ajustar horários para fuso de São Paulo (UTC-3)
+# Corrigir erro "km_rodados can only be updated to DEFAULT"
 
-## Problema
-Todos os `new Date().toISOString()` geram horário UTC. Formulários e timestamps automáticos ficam 3 horas adiantados em relação a São Paulo.
+## Diagnóstico
 
-## Solução
+A coluna `km_rodados` na tabela `vehicle_usage` é uma **coluna gerada automaticamente** (`GENERATED ALWAYS AS (CASE WHEN km_chegada IS NOT NULL THEN km_chegada - km_saida ELSE NULL END)`). O código em `useVehicleUsage.ts` tenta calcular e definir `km_rodados` manualmente no update, o que o banco rejeita.
 
-### 1. Criar função utilitária `nowSP()` em `src/lib/utils.ts`
-Função que retorna a data/hora atual no fuso `America/Sao_Paulo`:
-- `nowSP()` → ISO string completa no fuso SP
-- `nowSPLocal()` → formato `YYYY-MM-DDTHH:MM` para inputs `datetime-local`
-- `todaySP()` → formato `YYYY-MM-DD` para inputs `date`
+## Correção
 
-### 2. Substituir todas as ocorrências de `new Date().toISOString()` e `new Date()`
+### 1. `src/hooks/useVehicleUsage.ts` — Remover atribuição manual de `km_rodados`
 
-**Arquivos afetados (8 arquivos):**
-- `src/pages/TransportsPage.tsx` — 4 ocorrências (abertura formulário, devolução, fourHoursAgo)
-- `src/pages/ElectricCartsPage.tsx` — 4 ocorrências (retirada, devolução)
-- `src/pages/ChecklistPage.tsx` — 2 ocorrências (today, tomorrow)
-- `src/pages/Dashboard.tsx` — 2 ocorrências (now, todayStr)
-- `src/pages/AgendaPage.tsx` — 2 ocorrências (today, tomorrow)
-- `src/pages/VehiclesPage.tsx` — 1 ocorrência (devolução)
-- `src/hooks/useElectricCarts.ts` — 2 ocorrências (pickup, return)
-- `src/hooks/useTasks.ts` — 1 ocorrência (completed_at)
+Na mutation `updateUsage`, remover o bloco que calcula e atribui `updates.km_rodados`. O banco já calcula automaticamente quando `km_chegada` é preenchido. Basta enviar `km_chegada` e `devolucao_em` no update.
 
-### 3. Atualizar funções de exibição em `rawTime`, `rawWeekday` etc.
-Adicionar conversão para fuso SP ao exibir datas que vêm do banco em UTC.
+### 2. Garantir que o botão "Registrar Devolução" funcione
+
+O fluxo em `VehiclesPage.tsx` já está correto: envia `km_chegada` e `devolucao_em`. O problema é exclusivamente no hook que adiciona `km_rodados` ao payload do update.
+
+## Arquivo alterado
+- `src/hooks/useVehicleUsage.ts` — remover linhas 72-77 (cálculo manual de `km_rodados`)
 
