@@ -26,6 +26,9 @@ export default function Dashboard() {
   const pendingTasks = tasks.filter((t: any) => t.status === 'pendente').length;
 
   const todayEvents = events.filter((e: any) => e.inicio_em?.startsWith(todayStr));
+  const logisticsMembers = members.filter((m: any) =>
+    m.commission_nome && m.commission_nome.toUpperCase().includes('LOG')
+  );
   const upcomingTransports = transports
     .filter((t: any) => t.status === 'pendente')
     .sort((a: any, b: any) => (a.inicio_em || '').localeCompare(b.inicio_em || ''))
