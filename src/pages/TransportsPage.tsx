@@ -212,6 +212,32 @@ export default function TransportsPage() {
             {tituloOptions.map((opt) => <SelectItem key={opt} value={opt}>{opt}</SelectItem>)}
           </SelectContent>
         </Select>
+        {data.titulo === 'Aeroporto' && (
+          <div className="space-y-3 rounded-lg border border-border bg-muted/30 p-3">
+            <Label className="text-xs font-semibold text-foreground">Informações do Voo</Label>
+            <Select value={data.voo_cidade} onValueChange={(v) => setData({ ...data, voo_cidade: v })}>
+              <SelectTrigger><SelectValue placeholder="Cidade do Aeroporto" /></SelectTrigger>
+              <SelectContent>
+                {cidadeAeroportoOptions.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <Input placeholder="Nº do Voo" aria-label="Número do voo" value={data.voo_numero} onChange={(e) => setData({ ...data, voo_numero: e.target.value })} />
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label className="text-xs text-muted-foreground mb-1 block">Horário Check-in</Label>
+                <Input type="time" aria-label="Horário check-in" value={data.voo_checkin} onChange={(e) => setData({ ...data, voo_checkin: e.target.value })} />
+              </div>
+              <div>
+                <Label className="text-xs text-muted-foreground mb-1 block">Horário Chegada do Voo</Label>
+                <Input type="time" aria-label="Horário chegada do voo" value={data.voo_chegada} onChange={(e) => setData({ ...data, voo_chegada: e.target.value })} />
+              </div>
+            </div>
+            <div>
+              <Label className="text-xs text-muted-foreground mb-1 block">Horário de Saída (para o aeroporto)</Label>
+              <Input type="time" aria-label="Horário de saída para o aeroporto" value={data.horario_saida} onChange={(e) => setData({ ...data, horario_saida: e.target.value })} />
+            </div>
+          </div>
+        )}
         <Select value={data.guest_id} onValueChange={(v) => setData({ ...data, guest_id: v })}>
           <SelectTrigger><SelectValue placeholder="Hóspede (opcional)" /></SelectTrigger>
           <SelectContent>
