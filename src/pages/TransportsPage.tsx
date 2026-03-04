@@ -468,6 +468,156 @@ export default function TransportsPage() {
           </div>
         )}
       </div>
+
+      {/* Detail Dialog */}
+      <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
+        <DialogContent className="max-h-[90vh] overflow-y-auto">
+          {detailTransport && (() => {
+            const t = detailTransport;
+            const sc = statusConfig[t.status] || statusConfig.pendente;
+            const driver = members.find((m: any) => m.user_id === t.motorista_user_id);
+            const vehicle = vehicles.find((v: any) => v.id === t.vehicle_id);
+            const guest = guests.find((g: any) => g.id === t.guest_id);
+            const driverCommission = t.motorista_user_id ? getDriverCommission(t.motorista_user_id) : null;
+
+            return (
+              <>
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    <Eye className="w-5 h-5" />
+                    {t.titulo || `${t.origem} → ${t.destino}`}
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <Badge className={cn(sc.class, 'border-0')}>{sc.label}</Badge>
+                    {t.prioridade && <Badge variant="outline" className="capitalize">{t.prioridade}</Badge>}
+                  </div>
+
+                  <Separator />
+
+                  <div className="grid grid-cols-2 gap-y-3 gap-x-4 text-sm">
+                    <div>
+                      <p className="text-xs text-muted-foreground">Origem</p>
+                      <p className="font-medium">{t.origem}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Destino</p>
+                      <p className="font-medium">{t.destino}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Data/Hora Saída</p>
+                      <p className="font-medium">{t.inicio_em ? new Date(t.inicio_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }) : '—'}</p>
+                    </div>
+                    {t.fim_em && (
+                      <div>
+                        <p className="text-xs text-muted-foreground">Data/Hora Devolução</p>
+                        <p className="font-medium">{new Date(t.fim_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  <Separator />
+
+                  <div className="grid grid-cols-2 gap-y-3 gap-x-4 text-sm">
+                    <div>
+                      <p className="text-xs text-muted-foreground">Motorista</p>
+                      <p className="font-medium">{driver?.nome_exibicao || '—'}</p>
+                    </div>
+                    {driverCommission && (
+                      <div>
+                        <p className="text-xs text-muted-foreground">Comissão</p>
+                        <p className="font-medium">{driverCommission}</p>
+                      </div>
+                    )}
+                    <div>
+                      <p className="text-xs text-muted-foreground">Veículo</p>
+                      <p className="font-medium">{vehicle ? `${vehicle.placa} ${vehicle.modelo || ''}` : '—'}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Hóspede</p>
+                      <p className="font-medium">{guest?.nome || '—'}</p>
+                    </div>
+                  </div>
+
+                  {(t.km_retirada != null || t.km_devolucao != null) && (
+                    <>
+                      <Separator />
+                      <div className="grid grid-cols-3 gap-y-3 gap-x-4 text-sm">
+                        {t.km_retirada != null && (
+                          <div>
+                            <p className="text-xs text-muted-foreground">KM Retirada</p>
+                            <p className="font-medium">{t.km_retirada}</p>
+                          </div>
+                        )}
+                        {t.km_devolucao != null && (
+                          <div>
+                            <p className="text-xs text-muted-foreground">KM Devolução</p>
+                            <p className="font-medium">{t.km_devolucao}</p>
+                          </div>
+                        )}
+                        {t.km_retirada != null && t.km_devolucao != null && (
+                          <div>
+                            <p className="text-xs text-muted-foreground">KM Rodados</p>
+                            <p className="font-medium">{Number(t.km_devolucao) - Number(t.km_retirada)}</p>
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
+
+                  {t.titulo === 'Aeroporto' && (t.voo_cidade || t.voo_numero || t.voo_checkin || t.voo_chegada || t.horario_saida) && (
+                    <>
+                      <Separator />
+                      <div className="rounded-lg bg-muted/40 p-3 space-y-3">
+                        <p className="text-sm font-semibold flex items-center gap-1">✈️ Informações do Voo</p>
+                        <div className="grid grid-cols-2 gap-y-2 gap-x-4 text-sm">
+                          {t.voo_cidade && (
+                            <div>
+                              <p className="text-xs text-muted-foreground">Cidade</p>
+                              <p className="font-medium">{t.voo_cidade}</p>
+                            </div>
+                          )}
+                          {t.voo_numero && (
+                            <div>
+                              <p className="text-xs text-muted-foreground">Nº Voo</p>
+                              <p className="font-medium">{t.voo_numero}</p>
+                            </div>
+                          )}
+                          {t.voo_checkin && (
+                            <div>
+                              <p className="text-xs text-muted-foreground">Check-in</p>
+                              <p className="font-medium">{t.voo_checkin}</p>
+                            </div>
+                          )}
+                          {t.voo_chegada && (
+                            <div>
+                              <p className="text-xs text-muted-foreground">Chegada do Voo</p>
+                              <p className="font-medium">{t.voo_chegada}</p>
+                            </div>
+                          )}
+                          {t.horario_saida && (
+                            <div>
+                              <p className="text-xs text-muted-foreground">Saída p/ Aeroporto</p>
+                              <p className="font-medium">{t.horario_saida}</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  <Separator />
+
+                  <Button onClick={() => generatePDF(t)} variant="outline" className="w-full gap-2">
+                    <FileText className="w-4 h-4" /> Gerar PDF
+                  </Button>
+                </div>
+              </>
+            );
+          })()}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
