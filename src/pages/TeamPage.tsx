@@ -8,7 +8,7 @@ import { useTransports } from '@/hooks/useTransports';
 import { useSchedules } from '@/hooks/useSchedules';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import { Badge } from '@/components/ui/badge';
-import { Plus, CalendarDays, Pencil, Trash2, UserPlus, Loader2, Users } from 'lucide-react';
+import { Plus, CalendarDays, Pencil, Trash2, UserPlus, Loader2, Users, Search } from 'lucide-react';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -52,6 +52,8 @@ export default function TeamPage() {
 
   const [viewScheduleOpen, setViewScheduleOpen] = useState(false);
   const [viewMemberId, setViewMemberId] = useState('');
+
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Commission dialog
   const [commissionOpen, setCommissionOpen] = useState(false);
@@ -159,7 +161,17 @@ export default function TeamPage() {
           <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Equipe</h1>
           <p className="text-sm text-muted-foreground mt-1">{members.length} membros</p>
         </div>
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex gap-2 flex-wrap items-center">
+          <div className="relative">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="Pesquisar membro..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 h-10 sm:h-9 w-48 sm:w-56"
+              aria-label="Pesquisar membro por nome"
+            />
+          </div>
           <Button size="sm" variant="outline" onClick={() => setCommissionOpen(true)} className="h-10 sm:h-9">
             <Users className="w-4 h-4 mr-1" /> Comissões
           </Button>
@@ -395,7 +407,7 @@ export default function TeamPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {members.map((m: any) => {
+            {members.filter((m: any) => !searchQuery || (m.nome_exibicao || '').toLowerCase().includes(searchQuery.toLowerCase())).map((m: any) => {
               const memberTasks = tasks.filter((t: any) => t.assignee_user_id === m.user_id);
               const pending = memberTasks.filter((t: any) => t.status === 'pendente').length;
               const done = memberTasks.filter((t: any) => t.status === 'concluida').length;
