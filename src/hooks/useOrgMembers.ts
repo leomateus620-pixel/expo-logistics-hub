@@ -11,15 +11,22 @@ export function useOrgMembers() {
     queryKey: ['org-members', orgId],
     queryFn: async () => {
       if (!orgId) return [];
-      const { data } = await (supabase as any)
+      const { data: memberData } = await (supabase as any)
         .from('org_members')
-        .select('*, commissions(nome)')
+        .select('*')
         .eq('org_id', orgId)
         .eq('is_active', true)
         .order('nome_exibicao');
-      return (data || []).map((m: any) => ({
+      if (!memberData) return [];
+      // Fetch commissions separately to get names
+      const { data: commData } = await (supabase as any)
+        .from('commissions')
+        .select('id, nome')
+        .eq('org_id', orgId);
+      const commMap = new Map((commData || []).map((c: any) => [c.id, c.nome]));
+      return memberData.map((m: any) => ({
         ...m,
-        commission_nome: m.commissions?.nome || null,
+        commission_nome: m.commission_id ? commMap.get(m.commission_id) || null : null,
       }));
     },
     enabled: !!orgId,
