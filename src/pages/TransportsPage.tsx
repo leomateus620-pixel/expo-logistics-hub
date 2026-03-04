@@ -316,16 +316,68 @@ export default function TransportsPage() {
             </div>
           </div>
         )}
-        <Select value={data.guest_id} onValueChange={(v) => setData({ ...data, guest_id: v })}>
-          <SelectTrigger><SelectValue placeholder="Hóspede (opcional)" /></SelectTrigger>
-          <SelectContent>
-            <SelectItem value="none">Nenhum</SelectItem>
-            {guests.map((g: any) => <SelectItem key={g.id} value={g.id}>{g.nome}</SelectItem>)}
-          </SelectContent>
-        </Select>
+        {isEdit ? (
+          <Select value={data.guest_id} onValueChange={(v) => setData({ ...data, guest_id: v })}>
+            <SelectTrigger><SelectValue placeholder="Hóspede (opcional)" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">Nenhum</SelectItem>
+              {guests.map((g: any) => <SelectItem key={g.id} value={g.id}>{g.nome}{g.hotel_nome ? ` — ${g.hotel_nome}` : ''}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        ) : (
+          <div className="space-y-2">
+            <Label className="text-xs font-semibold text-foreground">Hóspedes (opcional)</Label>
+            <div className="max-h-40 overflow-y-auto rounded-lg border border-border p-2 space-y-1">
+              {guests.length === 0 && <p className="text-xs text-muted-foreground py-1">Nenhum hóspede cadastrado</p>}
+              {guests.map((g: any) => {
+                const checked = selectedGuests.includes(g.id);
+                return (
+                  <label key={g.id} className="flex items-center gap-2 py-1.5 px-2 rounded-md hover:bg-muted/50 cursor-pointer text-sm">
+                    <Checkbox
+                      checked={checked}
+                      onCheckedChange={(v) => {
+                        if (v) {
+                          setSelectedGuests(prev => [...prev, g.id]);
+                          setGuestDestinations(prev => ({ ...prev, [g.id]: g.hotel_nome || '' }));
+                        } else {
+                          setSelectedGuests(prev => prev.filter(id => id !== g.id));
+                          setGuestDestinations(prev => { const n = { ...prev }; delete n[g.id]; return n; });
+                        }
+                      }}
+                    />
+                    <span className="flex-1">{g.nome}</span>
+                    {g.hotel_nome && <span className="text-xs text-muted-foreground">{g.hotel_nome}</span>}
+                  </label>
+                );
+              })}
+            </div>
+            {selectedGuests.length > 0 && (
+              <div className="space-y-2 rounded-lg border border-border bg-muted/30 p-3">
+                <Label className="text-xs font-semibold text-foreground">Destino por hóspede</Label>
+                {selectedGuests.map((gId) => {
+                  const g = guests.find((x: any) => x.id === gId);
+                  return (
+                    <div key={gId} className="flex items-center gap-2">
+                      <span className="text-sm min-w-[100px] truncate">{g?.nome}</span>
+                      <Input
+                        placeholder="Destino (hotel)"
+                        value={guestDestinations[gId] || ''}
+                        onChange={(e) => setGuestDestinations(prev => ({ ...prev, [gId]: e.target.value }))}
+                        className="flex-1 h-8 text-sm"
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        )}
         <div className="grid grid-cols-2 gap-3">
           <Input placeholder="Origem" aria-label="Origem" value={data.origem} onChange={(e) => setData({ ...data, origem: e.target.value })} />
-          <Input placeholder="Destino" aria-label="Destino" value={data.destino} onChange={(e) => setData({ ...data, destino: e.target.value })} />
+          {/* Show single destino field only when no guests selected (create) or in edit */}
+          {(isEdit || selectedGuests.length === 0) && (
+            <Input placeholder="Destino" aria-label="Destino" value={data.destino} onChange={(e) => setData({ ...data, destino: e.target.value })} />
+          )}
         </div>
         <div>
           <Label className="text-xs text-muted-foreground mb-1 block">Data/Hora saída</Label>
