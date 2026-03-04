@@ -5,7 +5,7 @@ import { useGuests } from '@/hooks/useGuests';
 import { useVehicleUsage } from '@/hooks/useVehicleUsage';
 import { useCommissions } from '@/hooks/useCommissions';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Plus, Check, Clock, X, Pencil, Search, XCircle, Trash2 } from 'lucide-react';
+import { MapPin, Plus, Check, Clock, X, Pencil, Search, XCircle, Trash2, FileText, Eye } from 'lucide-react';
 import { cn, rawTime, rawDateShort, nowSP, nowSPLocal } from '@/lib/utils';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
 import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
 
 const statusConfig: Record<string, { label: string; icon: typeof Check; class: string }> = {
   pendente: { label: 'Pendente', icon: Clock, class: 'bg-info/10 text-info' },
@@ -46,6 +47,60 @@ export default function TransportsPage() {
   const [filterData, setFilterData] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
   const hasFilters = (!!filterMotorista && filterMotorista !== 'all') || !!filterData || (!!filterStatus && filterStatus !== 'all');
+
+  // Detail view
+  const [detailOpen, setDetailOpen] = useState(false);
+  const [detailTransport, setDetailTransport] = useState<any>(null);
+
+  const openDetail = (t: any) => {
+    setDetailTransport(t);
+    setDetailOpen(true);
+  };
+
+  const generatePDF = (t: any) => {
+    const driver = members.find((m: any) => m.user_id === t.motorista_user_id);
+    const vehicle = vehicles.find((v: any) => v.id === t.vehicle_id);
+    const guest = guests.find((g: any) => g.id === t.guest_id);
+    const sc = statusConfig[t.status] || statusConfig.pendente;
+    const driverCommission = t.motorista_user_id ? getDriverCommission(t.motorista_user_id) : null;
+
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) { toast.error('Popup bloqueado pelo navegador'); return; }
+    printWindow.document.write(`<!DOCTYPE html><html><head><title>Transporte ${t.titulo || ''}</title><style>
+      body { font-family: 'Segoe UI', Arial, sans-serif; padding: 40px; max-width: 600px; margin: 0 auto; color: #1a1a1a; }
+      h1 { font-size: 18px; border-bottom: 2px solid #2d6a4f; padding-bottom: 8px; margin-bottom: 16px; color: #2d6a4f; }
+      .row { display: flex; gap: 8px; margin-bottom: 8px; }
+      .label { font-weight: 600; color: #555; font-size: 13px; min-width: 140px; }
+      .value { font-size: 14px; }
+      .flight { background: #f0f7f4; padding: 12px; border-radius: 8px; margin-top: 16px; }
+      .flight strong { color: #2d6a4f; }
+      .footer { margin-top: 24px; font-size: 11px; color: #888; border-top: 1px solid #ddd; padding-top: 8px; }
+    </style></head><body>
+      <h1>🚐 Transporte — ${t.titulo || 'Sem título'}</h1>
+      <div class="row"><span class="label">Status:</span><span class="value">${sc.label}</span></div>
+      <div class="row"><span class="label">Origem:</span><span class="value">${t.origem}</span></div>
+      <div class="row"><span class="label">Destino:</span><span class="value">${t.destino}</span></div>
+      <div class="row"><span class="label">Saída:</span><span class="value">${t.inicio_em ? new Date(t.inicio_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }) : '—'}</span></div>
+      ${t.fim_em ? `<div class="row"><span class="label">Devolução:</span><span class="value">${new Date(t.fim_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</span></div>` : ''}
+      <div class="row"><span class="label">Motorista:</span><span class="value">${driver?.nome_exibicao || '—'}</span></div>
+      ${driverCommission ? `<div class="row"><span class="label">Comissão:</span><span class="value">${driverCommission}</span></div>` : ''}
+      <div class="row"><span class="label">Veículo:</span><span class="value">${vehicle ? `${vehicle.placa} ${vehicle.modelo || ''}` : '—'}</span></div>
+      <div class="row"><span class="label">Hóspede:</span><span class="value">${guest?.nome || '—'}</span></div>
+      ${t.km_retirada != null ? `<div class="row"><span class="label">KM Retirada:</span><span class="value">${t.km_retirada}</span></div>` : ''}
+      ${t.km_devolucao != null ? `<div class="row"><span class="label">KM Devolução:</span><span class="value">${t.km_devolucao}</span></div>` : ''}
+      ${t.km_retirada != null && t.km_devolucao != null ? `<div class="row"><span class="label">KM Rodados:</span><span class="value">${Number(t.km_devolucao) - Number(t.km_retirada)}</span></div>` : ''}
+      ${t.titulo === 'Aeroporto' ? `<div class="flight"><strong>✈️ Informações do Voo</strong>
+        ${t.voo_cidade ? `<div class="row"><span class="label">Cidade:</span><span class="value">${t.voo_cidade}</span></div>` : ''}
+        ${t.voo_numero ? `<div class="row"><span class="label">Nº Voo:</span><span class="value">${t.voo_numero}</span></div>` : ''}
+        ${t.voo_checkin ? `<div class="row"><span class="label">Check-in:</span><span class="value">${t.voo_checkin}</span></div>` : ''}
+        ${t.voo_chegada ? `<div class="row"><span class="label">Chegada:</span><span class="value">${t.voo_chegada}</span></div>` : ''}
+        ${t.horario_saida ? `<div class="row"><span class="label">Saída p/ Aeroporto:</span><span class="value">${t.horario_saida}</span></div>` : ''}
+      </div>` : ''}
+      <div class="footer">Gerado em ${new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</div>
+    </body></html>`);
+    printWindow.document.close();
+    printWindow.print();
+  };
 
   // Available vehicles only
   const availableVehicles = vehicles.filter((v: any) => v.status === 'disponivel');
@@ -368,22 +423,24 @@ export default function TransportsPage() {
           return (
             <div key={t.id} className="rounded-xl border bg-card p-4 hover:shadow-sm transition-shadow">
               <div className="flex items-center gap-4">
-                <div className={cn('w-10 h-10 rounded-lg flex items-center justify-center shrink-0', sc.class)}>
-                  <Icon className="w-5 h-5" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold truncate">{t.titulo || (guest?.nome) || `${t.origem} → ${t.destino}`}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{t.origem} → {t.destino}</p>
-                  <div className="flex items-center gap-3 mt-1 text-[10px] text-muted-foreground flex-wrap">
-                    {vehicle && <span>🚗 {vehicle.placa}</span>}
-                    {driver && <span>👤 {(driver.nome_exibicao || '').split(' ')[0]}</span>}
-                    {guest && <span>🎫 {guest.nome}</span>}
-                    {t.km_retirada != null && <span>📏 {t.km_retirada} km</span>}
-                    {t.km_devolucao != null && <span>→ {t.km_devolucao} km</span>}
-                    {t.voo_cidade && <span>✈️ {t.voo_cidade}</span>}
-                    {t.voo_numero && <span>Voo {t.voo_numero}</span>}
+                <button onClick={() => openDetail(t)} className="flex items-center gap-4 flex-1 min-w-0 text-left focus-ring rounded-lg p-1 -m-1" aria-label="Ver detalhes do transporte">
+                  <div className={cn('w-10 h-10 rounded-lg flex items-center justify-center shrink-0', sc.class)}>
+                    <Icon className="w-5 h-5" />
                   </div>
-                </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold truncate">{t.titulo || (guest?.nome) || `${t.origem} → ${t.destino}`}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{t.origem} → {t.destino}</p>
+                    <div className="flex items-center gap-3 mt-1 text-[10px] text-muted-foreground flex-wrap">
+                      {vehicle && <span>🚗 {vehicle.placa}</span>}
+                      {driver && <span>👤 {(driver.nome_exibicao || '').split(' ')[0]}</span>}
+                      {guest && <span>🎫 {guest.nome}</span>}
+                      {t.km_retirada != null && <span>📏 {t.km_retirada} km</span>}
+                      {t.km_devolucao != null && <span>→ {t.km_devolucao} km</span>}
+                      {t.voo_cidade && <span>✈️ {t.voo_cidade}</span>}
+                      {t.voo_numero && <span>Voo {t.voo_numero}</span>}
+                    </div>
+                  </div>
+                </button>
                 <div className="text-right shrink-0">
                   <p className="text-sm font-mono font-medium">{rawTime(t.inicio_em)}</p>
                   <p className="text-[10px] text-muted-foreground">{rawDateShort(t.inicio_em)}</p>
@@ -411,6 +468,156 @@ export default function TransportsPage() {
           </div>
         )}
       </div>
+
+      {/* Detail Dialog */}
+      <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
+        <DialogContent className="max-h-[90vh] overflow-y-auto">
+          {detailTransport && (() => {
+            const t = detailTransport;
+            const sc = statusConfig[t.status] || statusConfig.pendente;
+            const driver = members.find((m: any) => m.user_id === t.motorista_user_id);
+            const vehicle = vehicles.find((v: any) => v.id === t.vehicle_id);
+            const guest = guests.find((g: any) => g.id === t.guest_id);
+            const driverCommission = t.motorista_user_id ? getDriverCommission(t.motorista_user_id) : null;
+
+            return (
+              <>
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    <Eye className="w-5 h-5" />
+                    {t.titulo || `${t.origem} → ${t.destino}`}
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <Badge className={cn(sc.class, 'border-0')}>{sc.label}</Badge>
+                    {t.prioridade && <Badge variant="outline" className="capitalize">{t.prioridade}</Badge>}
+                  </div>
+
+                  <Separator />
+
+                  <div className="grid grid-cols-2 gap-y-3 gap-x-4 text-sm">
+                    <div>
+                      <p className="text-xs text-muted-foreground">Origem</p>
+                      <p className="font-medium">{t.origem}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Destino</p>
+                      <p className="font-medium">{t.destino}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Data/Hora Saída</p>
+                      <p className="font-medium">{t.inicio_em ? new Date(t.inicio_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }) : '—'}</p>
+                    </div>
+                    {t.fim_em && (
+                      <div>
+                        <p className="text-xs text-muted-foreground">Data/Hora Devolução</p>
+                        <p className="font-medium">{new Date(t.fim_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</p>
+                      </div>
+                    )}
+                  </div>
+
+                  <Separator />
+
+                  <div className="grid grid-cols-2 gap-y-3 gap-x-4 text-sm">
+                    <div>
+                      <p className="text-xs text-muted-foreground">Motorista</p>
+                      <p className="font-medium">{driver?.nome_exibicao || '—'}</p>
+                    </div>
+                    {driverCommission && (
+                      <div>
+                        <p className="text-xs text-muted-foreground">Comissão</p>
+                        <p className="font-medium">{driverCommission}</p>
+                      </div>
+                    )}
+                    <div>
+                      <p className="text-xs text-muted-foreground">Veículo</p>
+                      <p className="font-medium">{vehicle ? `${vehicle.placa} ${vehicle.modelo || ''}` : '—'}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Hóspede</p>
+                      <p className="font-medium">{guest?.nome || '—'}</p>
+                    </div>
+                  </div>
+
+                  {(t.km_retirada != null || t.km_devolucao != null) && (
+                    <>
+                      <Separator />
+                      <div className="grid grid-cols-3 gap-y-3 gap-x-4 text-sm">
+                        {t.km_retirada != null && (
+                          <div>
+                            <p className="text-xs text-muted-foreground">KM Retirada</p>
+                            <p className="font-medium">{t.km_retirada}</p>
+                          </div>
+                        )}
+                        {t.km_devolucao != null && (
+                          <div>
+                            <p className="text-xs text-muted-foreground">KM Devolução</p>
+                            <p className="font-medium">{t.km_devolucao}</p>
+                          </div>
+                        )}
+                        {t.km_retirada != null && t.km_devolucao != null && (
+                          <div>
+                            <p className="text-xs text-muted-foreground">KM Rodados</p>
+                            <p className="font-medium">{Number(t.km_devolucao) - Number(t.km_retirada)}</p>
+                          </div>
+                        )}
+                      </div>
+                    </>
+                  )}
+
+                  {t.titulo === 'Aeroporto' && (t.voo_cidade || t.voo_numero || t.voo_checkin || t.voo_chegada || t.horario_saida) && (
+                    <>
+                      <Separator />
+                      <div className="rounded-lg bg-muted/40 p-3 space-y-3">
+                        <p className="text-sm font-semibold flex items-center gap-1">✈️ Informações do Voo</p>
+                        <div className="grid grid-cols-2 gap-y-2 gap-x-4 text-sm">
+                          {t.voo_cidade && (
+                            <div>
+                              <p className="text-xs text-muted-foreground">Cidade</p>
+                              <p className="font-medium">{t.voo_cidade}</p>
+                            </div>
+                          )}
+                          {t.voo_numero && (
+                            <div>
+                              <p className="text-xs text-muted-foreground">Nº Voo</p>
+                              <p className="font-medium">{t.voo_numero}</p>
+                            </div>
+                          )}
+                          {t.voo_checkin && (
+                            <div>
+                              <p className="text-xs text-muted-foreground">Check-in</p>
+                              <p className="font-medium">{t.voo_checkin}</p>
+                            </div>
+                          )}
+                          {t.voo_chegada && (
+                            <div>
+                              <p className="text-xs text-muted-foreground">Chegada do Voo</p>
+                              <p className="font-medium">{t.voo_chegada}</p>
+                            </div>
+                          )}
+                          {t.horario_saida && (
+                            <div>
+                              <p className="text-xs text-muted-foreground">Saída p/ Aeroporto</p>
+                              <p className="font-medium">{t.horario_saida}</p>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  <Separator />
+
+                  <Button onClick={() => generatePDF(t)} variant="outline" className="w-full gap-2">
+                    <FileText className="w-4 h-4" /> Gerar PDF
+                  </Button>
+                </div>
+              </>
+            );
+          })()}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
