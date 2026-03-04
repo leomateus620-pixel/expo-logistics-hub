@@ -46,7 +46,8 @@ export default function TransportsPage() {
   const [filterMotorista, setFilterMotorista] = useState('');
   const [filterData, setFilterData] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
-  const hasFilters = (!!filterMotorista && filterMotorista !== 'all') || !!filterData || (!!filterStatus && filterStatus !== 'all');
+  const [filterSearch, setFilterSearch] = useState('');
+  const hasFilters = (!!filterMotorista && filterMotorista !== 'all') || !!filterData || (!!filterStatus && filterStatus !== 'all') || !!filterSearch;
 
   // Detail view
   const [detailOpen, setDetailOpen] = useState(false);
@@ -243,6 +244,13 @@ export default function TransportsPage() {
     if (filterMotorista && filterMotorista !== 'all' && t.motorista_user_id !== filterMotorista) return false;
     if (filterData && t.inicio_em && !t.inicio_em.startsWith(filterData)) return false;
     if (filterStatus && filterStatus !== 'all' && t.status !== filterStatus) return false;
+    if (filterSearch) {
+      const q = filterSearch.toLowerCase();
+      const driver = members.find((m: any) => m.user_id === t.motorista_user_id);
+      const guest = guests.find((g: any) => g.id === t.guest_id);
+      const haystack = [t.origem, t.destino, t.titulo, t.voo_numero, t.voo_cidade, driver?.nome_exibicao, guest?.nome].filter(Boolean).join(' ').toLowerCase();
+      if (!haystack.includes(q)) return false;
+    }
     if (!hasFilters) {
       if (t.status === 'concluido' && t.updated_at && t.updated_at < fourHoursAgo) return false;
     }
@@ -363,9 +371,17 @@ export default function TransportsPage() {
         </Dialog>
       </div>
 
-      {/* Search filters */}
       <div className="flex flex-wrap items-center gap-2">
-        <Search className="w-4 h-4 text-muted-foreground" />
+        <div className="relative">
+          <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Input
+            placeholder="Pesquisar..."
+            value={filterSearch}
+            onChange={(e) => setFilterSearch(e.target.value)}
+            className="pl-9 h-9 w-48 sm:w-56 text-xs"
+            aria-label="Pesquisar transporte"
+          />
+        </div>
         <Select value={filterMotorista} onValueChange={setFilterMotorista}>
           <SelectTrigger className="w-[180px] h-9 text-xs">
             <SelectValue placeholder="Motorista" />
@@ -389,7 +405,7 @@ export default function TransportsPage() {
           </SelectContent>
         </Select>
         {hasFilters && (
-          <Button size="sm" variant="ghost" className="h-9 text-xs" onClick={() => { setFilterMotorista(''); setFilterData(''); setFilterStatus(''); }}>
+          <Button size="sm" variant="ghost" className="h-9 text-xs" onClick={() => { setFilterMotorista(''); setFilterData(''); setFilterStatus(''); setFilterSearch(''); }}>
             <XCircle className="w-3.5 h-3.5 mr-1" /> Limpar
           </Button>
         )}
