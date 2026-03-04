@@ -1,30 +1,47 @@
 
 
-# Plano: Ajustar horários para fuso de São Paulo (UTC-3)
+# Fix Security Audit: Auth + RLS Issues
 
-## Problema
-Todos os `new Date().toISOString()` geram horário UTC. Formulários e timestamps automáticos ficam 3 horas adiantados em relação a São Paulo.
+## Problems Identified
 
-## Solução
+**Problem 1: Edge Function auth is broken.** Line 170 calls `callerClient.auth.getClaims(token)` which does not exist in the Supabase JS client. This causes the function to fail or return 401 for JWT-authenticated users.
 
-### 1. Criar função utilitária `nowSP()` em `src/lib/utils.ts`
-Função que retorna a data/hora atual no fuso `America/Sao_Paulo`:
-- `nowSP()` → ISO string completa no fuso SP
-- `nowSPLocal()` → formato `YYYY-MM-DDTHH:MM` para inputs `datetime-local`
-- `todaySP()` → formato `YYYY-MM-DD` para inputs `date`
+**Problem 2: "Ver relatório completo" fails due to RLS.** The `security_audit_reports` table SELECT policy only allows `admin` role. Since operadores can now run audits, they cannot read their own reports back, causing "Erro ao carregar relatório".
 
-### 2. Substituir todas as ocorrências de `new Date().toISOString()` e `new Date()`
+## Fixes
 
-**Arquivos afetados (8 arquivos):**
-- `src/pages/TransportsPage.tsx` — 4 ocorrências (abertura formulário, devolução, fourHoursAgo)
-- `src/pages/ElectricCartsPage.tsx` — 4 ocorrências (retirada, devolução)
-- `src/pages/ChecklistPage.tsx` — 2 ocorrências (today, tomorrow)
-- `src/pages/Dashboard.tsx` — 2 ocorrências (now, todayStr)
-- `src/pages/AgendaPage.tsx` — 2 ocorrências (today, tomorrow)
-- `src/pages/VehiclesPage.tsx` — 1 ocorrência (devolução)
-- `src/hooks/useElectricCarts.ts` — 2 ocorrências (pickup, return)
-- `src/hooks/useTasks.ts` — 1 ocorrência (completed_at)
+### 1. Edge Function (`supabase/functions/security-audit-selfcheck/index.ts`)
 
-### 3. Atualizar funções de exibição em `rawTime`, `rawWeekday` etc.
-Adicionar conversão para fuso SP ao exibir datas que vêm do banco em UTC.
+Replace the broken `getClaims` auth flow (lines 164-177) with `getUser()`:
+
+```typescript
+const callerClient = createClient(supabaseUrl, anonKey, {
+  global: { headers: { Authorization: authHeader } },
+});
+const { data: { user }, error: userError } = await callerClient.auth.getUser();
+if (userError || !user) {
+  return 401 error;
+}
+callerUserId = user.id;
+```
+
+### 2. Database Migration
+
+Update the SELECT and INSERT RLS policies on `security_audit_reports` to allow both `admin` and `operador`:
+
+```sql
+DROP POLICY "audit_reports_select" ON security_audit_reports;
+CREATE POLICY "audit_reports_select" ON security_audit_reports
+  FOR SELECT TO authenticated
+  USING (get_user_org_role(auth.uid(), org_id) IN ('admin', 'operador'));
+
+DROP POLICY "audit_reports_insert" ON security_audit_reports;
+CREATE POLICY "audit_reports_insert" ON security_audit_reports
+  FOR INSERT TO authenticated
+  WITH CHECK (get_user_org_role(auth.uid(), org_id) IN ('admin', 'operador'));
+```
+
+### Files Changed
+- `supabase/functions/security-audit-selfcheck/index.ts` — fix auth method
+- Migration — update RLS policies
 
