@@ -13,11 +13,14 @@ export function useOrgMembers() {
       if (!orgId) return [];
       const { data } = await (supabase as any)
         .from('org_members')
-        .select('*')
+        .select('*, commissions(nome)')
         .eq('org_id', orgId)
         .eq('is_active', true)
         .order('nome_exibicao');
-      return data || [];
+      return (data || []).map((m: any) => ({
+        ...m,
+        commission_nome: m.commissions?.nome || null,
+      }));
     },
     enabled: !!orgId,
     staleTime: 30000,

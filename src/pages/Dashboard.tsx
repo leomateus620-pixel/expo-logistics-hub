@@ -3,6 +3,7 @@ import { useElectricCarts } from '@/hooks/useElectricCarts';
 import { useTransports } from '@/hooks/useTransports';
 import { useTasks } from '@/hooks/useTasks';
 import { useEvents } from '@/hooks/useEvents';
+import { useCommissions } from '@/hooks/useCommissions';
 import { useOrgMembers } from '@/hooks/useOrgMembers';
 import StatCard from '@/components/StatCard';
 import { Car, Zap, MapPin, CheckSquare, CalendarDays, Users, Clock, AlertTriangle } from 'lucide-react';
@@ -25,6 +26,9 @@ export default function Dashboard() {
   const pendingTasks = tasks.filter((t: any) => t.status === 'pendente').length;
 
   const todayEvents = events.filter((e: any) => e.inicio_em?.startsWith(todayStr));
+  const logisticsMembers = members.filter((m: any) =>
+    m.commission_nome && m.commission_nome.toUpperCase().includes('LOG')
+  );
   const upcomingTransports = transports
     .filter((t: any) => t.status === 'pendente')
     .sort((a: any, b: any) => (a.inicio_em || '').localeCompare(b.inicio_em || ''))
@@ -97,15 +101,20 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Equipe */}
+        {/* Equipe Logística */}
         <div className="rounded-xl border bg-card p-4 sm:p-5">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-semibold flex items-center gap-2"><Users className="w-4 h-4 text-success" /> Equipe</h2>
-            <Badge variant="secondary">{members.length} membros</Badge>
+            <Badge variant="secondary">{logisticsMembers.length} membros</Badge>
           </div>
           <div className="space-y-2">
-            {members.slice(0, 6).map((m: any) => {
+            {logisticsMembers.length === 0 && <p className="text-sm text-muted-foreground">Nenhum membro na comissão de logística.</p>}
+            {logisticsMembers.map((m: any) => {
               const isInTransport = transports.some((t: any) => t.motorista_user_id === m.user_id && t.status === 'em_andamento');
+              const statusLabel = isInTransport || m.status === 'em_deslocamento' ? 'Em deslocamento' : 'Disponível';
+              const statusClass = isInTransport || m.status === 'em_deslocamento'
+                ? 'bg-accent/10 text-accent'
+                : 'bg-success/10 text-success';
               return (
                 <div key={m.id} className="flex items-center gap-2.5 p-2.5 rounded-lg bg-muted/50">
                   <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-primary-foreground shrink-0" style={{ backgroundColor: m.avatar_color || 'hsl(142, 50%, 35%)' }}>
@@ -113,9 +122,9 @@ export default function Dashboard() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-medium truncate">{m.nome_exibicao}</p>
-                    <p className="text-[10px] text-muted-foreground">{m.cargo}</p>
+                    <p className="text-[10px] text-muted-foreground uppercase">{m.cargo || '—'}</p>
                   </div>
-                  {isInTransport && <Badge className="bg-accent/10 text-accent text-[10px]">Em transporte</Badge>}
+                  <Badge className={cn('text-[10px]', statusClass)}>{statusLabel}</Badge>
                 </div>
               );
             })}

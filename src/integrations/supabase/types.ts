@@ -294,6 +294,7 @@ export type Database = {
           nome_exibicao: string | null
           org_id: string
           role: Database["public"]["Enums"]["org_role"]
+          status: Database["public"]["Enums"]["member_status"]
           telefone: string | null
           updated_at: string
           user_id: string
@@ -308,6 +309,7 @@ export type Database = {
           nome_exibicao?: string | null
           org_id: string
           role?: Database["public"]["Enums"]["org_role"]
+          status?: Database["public"]["Enums"]["member_status"]
           telefone?: string | null
           updated_at?: string
           user_id: string
@@ -322,6 +324,7 @@ export type Database = {
           nome_exibicao?: string | null
           org_id?: string
           role?: Database["public"]["Enums"]["org_role"]
+          status?: Database["public"]["Enums"]["member_status"]
           telefone?: string | null
           updated_at?: string
           user_id?: string
@@ -899,6 +902,7 @@ export type Database = {
       audit_action: "create" | "update" | "delete" | "status_change" | "import"
       cart_action: "retirada" | "devolucao" | "mudanca_status" | "nota"
       cart_status: "disponivel" | "em_uso" | "manutencao" | "inativo"
+      member_status: "disponivel" | "em_deslocamento"
       org_role: "admin" | "gestor" | "operador" | "leitura"
       priority_level: "baixa" | "media" | "alta" | "urgente"
       schedule_status: "rascunho" | "ativa" | "encerrada"
@@ -1038,6 +1042,7 @@ export const Constants = {
       audit_action: ["create", "update", "delete", "status_change", "import"],
       cart_action: ["retirada", "devolucao", "mudanca_status", "nota"],
       cart_status: ["disponivel", "em_uso", "manutencao", "inativo"],
+      member_status: ["disponivel", "em_deslocamento"],
       org_role: ["admin", "gestor", "operador", "leitura"],
       priority_level: ["baixa", "media", "alta", "urgente"],
       schedule_status: ["rascunho", "ativa", "encerrada"],
