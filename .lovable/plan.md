@@ -1,30 +1,19 @@
 
 
-# Plano: Ajustar horários para fuso de São Paulo (UTC-3)
+# Separar campo de pesquisa e botão "Pesquisar"
 
-## Problema
-Todos os `new Date().toISOString()` geram horário UTC. Formulários e timestamps automáticos ficam 3 horas adiantados em relação a São Paulo.
+## Mudança
 
-## Solução
+O campo de pesquisa atual filtra em tempo real enquanto o usuário digita. O usuário quer que o input apenas receba o texto, e a busca só seja disparada ao clicar um botão "Pesquisar".
 
-### 1. Criar função utilitária `nowSP()` em `src/lib/utils.ts`
-Função que retorna a data/hora atual no fuso `America/Sao_Paulo`:
-- `nowSP()` → ISO string completa no fuso SP
-- `nowSPLocal()` → formato `YYYY-MM-DDTHH:MM` para inputs `datetime-local`
-- `todaySP()` → formato `YYYY-MM-DD` para inputs `date`
+## Implementação em `src/pages/TransportsPage.tsx`
 
-### 2. Substituir todas as ocorrências de `new Date().toISOString()` e `new Date()`
+1. Adicionar um novo estado `searchInput` para o valor digitado (separado de `filterSearch` que é o valor efetivo do filtro)
+2. Substituir o `onChange` do Input para atualizar apenas `searchInput` (sem filtrar)
+3. Adicionar um `<Button>` "Pesquisar" ao lado do input que, ao ser clicado, copia `searchInput` para `filterSearch`
+4. Permitir também disparar a busca com Enter (onKeyDown)
+5. No "Limpar", resetar ambos `searchInput` e `filterSearch`
 
-**Arquivos afetados (8 arquivos):**
-- `src/pages/TransportsPage.tsx` — 4 ocorrências (abertura formulário, devolução, fourHoursAgo)
-- `src/pages/ElectricCartsPage.tsx` — 4 ocorrências (retirada, devolução)
-- `src/pages/ChecklistPage.tsx` — 2 ocorrências (today, tomorrow)
-- `src/pages/Dashboard.tsx` — 2 ocorrências (now, todayStr)
-- `src/pages/AgendaPage.tsx` — 2 ocorrências (today, tomorrow)
-- `src/pages/VehiclesPage.tsx` — 1 ocorrência (devolução)
-- `src/hooks/useElectricCarts.ts` — 2 ocorrências (pickup, return)
-- `src/hooks/useTasks.ts` — 1 ocorrência (completed_at)
-
-### 3. Atualizar funções de exibição em `rawTime`, `rawWeekday` etc.
-Adicionar conversão para fuso SP ao exibir datas que vêm do banco em UTC.
+## Arquivo alterado
+- `src/pages/TransportsPage.tsx`
 
