@@ -380,6 +380,8 @@ export default function TransportsPage() {
                     {guest && <span>🎫 {guest.nome}</span>}
                     {t.km_retirada != null && <span>📏 {t.km_retirada} km</span>}
                     {t.km_devolucao != null && <span>→ {t.km_devolucao} km</span>}
+                    {t.voo_cidade && <span>✈️ {t.voo_cidade}</span>}
+                    {t.voo_numero && <span>Voo {t.voo_numero}</span>}
                   </div>
                 </div>
                 <div className="text-right shrink-0">
