@@ -423,22 +423,24 @@ export default function TransportsPage() {
           return (
             <div key={t.id} className="rounded-xl border bg-card p-4 hover:shadow-sm transition-shadow">
               <div className="flex items-center gap-4">
-                <div className={cn('w-10 h-10 rounded-lg flex items-center justify-center shrink-0', sc.class)}>
-                  <Icon className="w-5 h-5" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold truncate">{t.titulo || (guest?.nome) || `${t.origem} → ${t.destino}`}</p>
-                  <p className="text-xs text-muted-foreground mt-0.5">{t.origem} → {t.destino}</p>
-                  <div className="flex items-center gap-3 mt-1 text-[10px] text-muted-foreground flex-wrap">
-                    {vehicle && <span>🚗 {vehicle.placa}</span>}
-                    {driver && <span>👤 {(driver.nome_exibicao || '').split(' ')[0]}</span>}
-                    {guest && <span>🎫 {guest.nome}</span>}
-                    {t.km_retirada != null && <span>📏 {t.km_retirada} km</span>}
-                    {t.km_devolucao != null && <span>→ {t.km_devolucao} km</span>}
-                    {t.voo_cidade && <span>✈️ {t.voo_cidade}</span>}
-                    {t.voo_numero && <span>Voo {t.voo_numero}</span>}
+                <button onClick={() => openDetail(t)} className="flex items-center gap-4 flex-1 min-w-0 text-left focus-ring rounded-lg p-1 -m-1" aria-label="Ver detalhes do transporte">
+                  <div className={cn('w-10 h-10 rounded-lg flex items-center justify-center shrink-0', sc.class)}>
+                    <Icon className="w-5 h-5" />
                   </div>
-                </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold truncate">{t.titulo || (guest?.nome) || `${t.origem} → ${t.destino}`}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{t.origem} → {t.destino}</p>
+                    <div className="flex items-center gap-3 mt-1 text-[10px] text-muted-foreground flex-wrap">
+                      {vehicle && <span>🚗 {vehicle.placa}</span>}
+                      {driver && <span>👤 {(driver.nome_exibicao || '').split(' ')[0]}</span>}
+                      {guest && <span>🎫 {guest.nome}</span>}
+                      {t.km_retirada != null && <span>📏 {t.km_retirada} km</span>}
+                      {t.km_devolucao != null && <span>→ {t.km_devolucao} km</span>}
+                      {t.voo_cidade && <span>✈️ {t.voo_cidade}</span>}
+                      {t.voo_numero && <span>Voo {t.voo_numero}</span>}
+                    </div>
+                  </div>
+                </button>
                 <div className="text-right shrink-0">
                   <p className="text-sm font-mono font-medium">{rawTime(t.inicio_em)}</p>
                   <p className="text-[10px] text-muted-foreground">{rawDateShort(t.inicio_em)}</p>
