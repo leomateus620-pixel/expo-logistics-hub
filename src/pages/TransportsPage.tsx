@@ -5,7 +5,7 @@ import { useGuests } from '@/hooks/useGuests';
 import { useVehicleUsage } from '@/hooks/useVehicleUsage';
 import { useCommissions } from '@/hooks/useCommissions';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Plus, Check, Clock, X, Pencil, Search, XCircle, Trash2, FileText, Eye } from 'lucide-react';
+import { MapPin, Plus, Check, Clock, X, Pencil, Search, XCircle, Trash2, FileText, Eye, ArrowRight, Plane } from 'lucide-react';
 import { cn, rawTime, rawDateShort, nowSP, nowSPLocal } from '@/lib/utils';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -17,11 +17,11 @@ import { toast } from 'sonner';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 
-const statusConfig: Record<string, { label: string; icon: typeof Check; class: string }> = {
-  pendente: { label: 'Pendente', icon: Clock, class: 'bg-info/10 text-info' },
-  em_andamento: { label: 'Em andamento', icon: MapPin, class: 'bg-accent/10 text-accent' },
-  concluido: { label: 'Concluído', icon: Check, class: 'bg-success/10 text-success' },
-  cancelado: { label: 'Cancelado', icon: X, class: 'bg-destructive/10 text-destructive' },
+const statusConfig: Record<string, { label: string; icon: typeof Check; class: string; dotClass: string }> = {
+  pendente: { label: 'Pendente', icon: Clock, class: 'bg-info/10 text-info', dotClass: 'bg-info' },
+  em_andamento: { label: 'Em andamento', icon: MapPin, class: 'bg-accent/10 text-accent', dotClass: 'bg-accent' },
+  concluido: { label: 'Concluído', icon: Check, class: 'bg-success/10 text-success', dotClass: 'bg-success' },
+  cancelado: { label: 'Cancelado', icon: X, class: 'bg-destructive/10 text-destructive', dotClass: 'bg-destructive' },
 };
 
 const tituloOptions = ['Parque', 'Hotel', 'Aeroporto', 'Centro', 'Outros'];
@@ -45,7 +45,6 @@ export default function TransportsPage() {
   const [editId, setEditId] = useState('');
   const [editForm, setEditForm] = useState({ titulo: '', guest_id: '', origem: '', destino: '', inicio_em: '', motorista_user_id: '', vehicle_id: '', prioridade: 'media', status: 'pendente', km_retirada: '', km_devolucao: '', fim_em: '', voo_cidade: '', voo_numero: '', voo_checkin: '', voo_chegada: '', horario_saida: '' });
 
-  // Search filters
   const [filterMotorista, setFilterMotorista] = useState('');
   const [filterData, setFilterData] = useState('');
   const [filterStatus, setFilterStatus] = useState('');
@@ -53,14 +52,10 @@ export default function TransportsPage() {
   const [searchInput, setSearchInput] = useState('');
   const hasFilters = (!!filterMotorista && filterMotorista !== 'all') || !!filterData || (!!filterStatus && filterStatus !== 'all') || !!filterSearch;
 
-  // Detail view
   const [detailOpen, setDetailOpen] = useState(false);
   const [detailTransport, setDetailTransport] = useState<any>(null);
 
-  const openDetail = (t: any) => {
-    setDetailTransport(t);
-    setDetailOpen(true);
-  };
+  const openDetail = (t: any) => { setDetailTransport(t); setDetailOpen(true); };
 
   const generatePDF = (t: any) => {
     const driver = members.find((m: any) => m.user_id === t.motorista_user_id);
@@ -107,10 +102,8 @@ export default function TransportsPage() {
     printWindow.print();
   };
 
-  // Available vehicles only
   const availableVehicles = vehicles.filter((v: any) => v.status === 'disponivel');
 
-  // Get commission name for a driver
   const getDriverCommission = (driverUserId: string) => {
     const member = members.find((m: any) => m.user_id === driverUserId);
     if (!member?.commission_id) return null;
@@ -127,7 +120,6 @@ export default function TransportsPage() {
 
   const handleAdd = async () => {
     if (!form.origem || !form.inicio_em) return;
-    // If guests selected, create one transport per guest
     const guestIds = selectedGuests.length > 0 ? selectedGuests : [null];
     if (selectedGuests.length === 0 && !form.destino) return;
     try {
@@ -202,7 +194,6 @@ export default function TransportsPage() {
         horario_saida: editForm.titulo === 'Aeroporto' ? editForm.horario_saida || null : null,
       });
 
-      // If status changed to concluido and KM fields are filled, create vehicle_usage
       if (statusChanged && editForm.status === 'concluido' && editForm.km_retirada && editForm.km_devolucao && editForm.vehicle_id && editForm.vehicle_id !== 'none') {
         try {
           const kmSaida = Number(editForm.km_retirada);
@@ -216,7 +207,7 @@ export default function TransportsPage() {
             devolucao_em: editForm.fim_em || nowSP(),
           });
           await updateVehicle.mutateAsync({ id: editForm.vehicle_id, km_atual: kmChegada });
-        } catch { /* silent - usage is secondary */ }
+        } catch { /* silent */ }
       }
 
       setEditOpen(false);
@@ -230,7 +221,6 @@ export default function TransportsPage() {
     if (idx < order.length - 1) {
       const newStatus = order[idx + 1];
       if (newStatus === 'concluido') {
-        // Open edit dialog to fill KM devolução + fim_em before concluding
         setEditId(t.id);
         setEditForm({
           titulo: t.titulo || '', guest_id: t.guest_id || '', origem: t.origem, destino: t.destino,
@@ -251,7 +241,6 @@ export default function TransportsPage() {
     }
   };
 
-  // Sort and filter
   const sorted = [...transports].sort((a: any, b: any) => (a.inicio_em || '').localeCompare(b.inicio_em || ''));
   const fourHoursAgo = new Date(Date.now() - 4 * 60 * 60 * 1000).toLocaleString('sv-SE', { timeZone: 'America/Sao_Paulo' }).replace(' ', 'T');
 
@@ -272,12 +261,10 @@ export default function TransportsPage() {
     return true;
   });
 
-  // Shared form fields renderer
   const renderFormFields = (data: any, setData: (d: any) => void, isEdit: boolean) => {
     const driverCommission = data.motorista_user_id && data.motorista_user_id !== 'none'
       ? getDriverCommission(data.motorista_user_id) : null;
     const isConcluido = isEdit && data.status === 'concluido';
-    // For edit dialog, also show the current vehicle even if not available
     const vehicleList = isEdit
       ? vehicles.filter((v: any) => v.status === 'disponivel' || v.id === data.vehicle_id)
       : availableVehicles;
@@ -374,7 +361,6 @@ export default function TransportsPage() {
         )}
         <div className="grid grid-cols-2 gap-3">
           <Input placeholder="Origem" aria-label="Origem" value={data.origem} onChange={(e) => setData({ ...data, origem: e.target.value })} />
-          {/* Show single destino field only when no guests selected (create) or in edit */}
           {(isEdit || selectedGuests.length === 0) && (
             <Input placeholder="Destino" aria-label="Destino" value={data.destino} onChange={(e) => setData({ ...data, destino: e.target.value })} />
           )}
@@ -420,7 +406,8 @@ export default function TransportsPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Transportes</h1>
@@ -428,7 +415,7 @@ export default function TransportsPage() {
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button size="sm" onClick={openCreateDialog}><Plus className="w-4 h-4 mr-1" /> Novo Transporte</Button>
+            <Button size="sm" onClick={openCreateDialog}><Plus className="w-4 h-4 mr-1" /> Novo</Button>
           </DialogTrigger>
           <DialogContent className="max-h-[90vh] overflow-y-auto">
             <DialogHeader><DialogTitle>Agendar Transporte</DialogTitle></DialogHeader>
@@ -438,52 +425,56 @@ export default function TransportsPage() {
         </Dialog>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2">
-        <div className="flex items-center gap-1">
-          <div className="relative">
+      {/* Filters — stacked on mobile */}
+      <div className="liquid-glass-card rounded-xl p-3 space-y-2">
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
               placeholder="Pesquisar..."
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter') setFilterSearch(searchInput); }}
-              className="pl-9 h-9 w-48 sm:w-56 text-xs"
+              className="pl-9 h-9 text-xs"
               aria-label="Pesquisar transporte"
             />
           </div>
-          <Button size="sm" className="h-9 text-xs" onClick={() => setFilterSearch(searchInput)}>
-            Pesquisar
+          <Button size="sm" className="h-9 text-xs shrink-0" onClick={() => setFilterSearch(searchInput)}>
+            Buscar
           </Button>
         </div>
-        <Select value={filterMotorista} onValueChange={setFilterMotorista}>
-          <SelectTrigger className="w-[180px] h-9 text-xs">
-            <SelectValue placeholder="Motorista" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos</SelectItem>
-            {members.map((m: any) => <SelectItem key={m.user_id} value={m.user_id}>{m.nome_exibicao}</SelectItem>)}
-          </SelectContent>
-        </Select>
-        <Input type="date" className="w-[160px] h-9 text-xs" value={filterData} onChange={(e) => setFilterData(e.target.value)} />
-        <Select value={filterStatus} onValueChange={setFilterStatus}>
-          <SelectTrigger className="w-[150px] h-9 text-xs">
-            <SelectValue placeholder="Status" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos</SelectItem>
-            <SelectItem value="pendente">Pendente</SelectItem>
-            <SelectItem value="em_andamento">Em andamento</SelectItem>
-            <SelectItem value="concluido">Concluído</SelectItem>
-            <SelectItem value="cancelado">Cancelado</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          <Select value={filterMotorista} onValueChange={setFilterMotorista}>
+            <SelectTrigger className="h-9 text-xs">
+              <SelectValue placeholder="Motorista" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos</SelectItem>
+              {members.map((m: any) => <SelectItem key={m.user_id} value={m.user_id}>{m.nome_exibicao}</SelectItem>)}
+            </SelectContent>
+          </Select>
+          <Input type="date" className="h-9 text-xs" value={filterData} onChange={(e) => setFilterData(e.target.value)} />
+          <Select value={filterStatus} onValueChange={setFilterStatus}>
+            <SelectTrigger className="h-9 text-xs">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos</SelectItem>
+              <SelectItem value="pendente">Pendente</SelectItem>
+              <SelectItem value="em_andamento">Em andamento</SelectItem>
+              <SelectItem value="concluido">Concluído</SelectItem>
+              <SelectItem value="cancelado">Cancelado</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
         {hasFilters && (
-          <Button size="sm" variant="ghost" className="h-9 text-xs" onClick={() => { setFilterMotorista(''); setFilterData(''); setFilterStatus(''); setFilterSearch(''); setSearchInput(''); }}>
-            <XCircle className="w-3.5 h-3.5 mr-1" /> Limpar
+          <Button size="sm" variant="ghost" className="h-8 text-xs w-full" onClick={() => { setFilterMotorista(''); setFilterData(''); setFilterStatus(''); setFilterSearch(''); setSearchInput(''); }}>
+            <XCircle className="w-3.5 h-3.5 mr-1" /> Limpar filtros
           </Button>
         )}
       </div>
 
+      {/* Edit Dialog */}
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent className="max-h-[90vh] overflow-y-auto">
           <DialogHeader><DialogTitle>Editar Transporte</DialogTitle></DialogHeader>
@@ -501,6 +492,7 @@ export default function TransportsPage() {
         </DialogContent>
       </Dialog>
 
+      {/* Transport Cards */}
       <div className="space-y-3">
         {filtered.map((t: any) => {
           const sc = statusConfig[t.status] || statusConfig.pendente;
@@ -508,44 +500,99 @@ export default function TransportsPage() {
           const driver = members.find((m: any) => m.user_id === t.motorista_user_id);
           const vehicle = vehicles.find((v: any) => v.id === t.vehicle_id);
           const guest = guests.find((g: any) => g.id === t.guest_id);
+          const hasFlightInfo = t.titulo === 'Aeroporto' && (t.voo_cidade || t.voo_numero);
 
           return (
-            <div key={t.id} className="rounded-xl border bg-card p-4 hover:shadow-sm transition-shadow">
-              <div className="flex items-center gap-4">
-                <button onClick={() => openDetail(t)} className="flex items-center gap-4 flex-1 min-w-0 text-left focus-ring rounded-lg p-1 -m-1" aria-label="Ver detalhes do transporte">
-                  <div className={cn('w-10 h-10 rounded-lg flex items-center justify-center shrink-0', sc.class)}>
-                    <Icon className="w-5 h-5" />
+            <div key={t.id} className="liquid-glass-card rounded-xl p-4 space-y-3 hover:shadow-md transition-shadow">
+              {/* Header: Status + Title + Time */}
+              <div className="flex items-start justify-between gap-2">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className={cn('w-9 h-9 rounded-lg flex items-center justify-center shrink-0', sc.class)}>
+                    <Icon className="w-4 h-4" />
                   </div>
-                  <div className="flex-1 min-w-0">
+                  <div className="min-w-0">
                     <p className="text-sm font-semibold truncate">{t.titulo || (guest?.nome) || `${t.origem} → ${t.destino}`}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">{t.origem} → {t.destino}</p>
-                    <div className="flex items-center gap-3 mt-1 text-[10px] text-muted-foreground flex-wrap">
-                      {vehicle && <span>🚗 {vehicle.placa}</span>}
-                      {driver && <span>👤 {(driver.nome_exibicao || '').split(' ')[0]}</span>}
-                      {guest && <span>🎫 {guest.nome}</span>}
-                      {t.km_retirada != null && <span>📏 {t.km_retirada} km</span>}
-                      {t.km_devolucao != null && <span>→ {t.km_devolucao} km</span>}
-                      {t.voo_cidade && <span>✈️ {t.voo_cidade}</span>}
-                      {t.voo_numero && <span>Voo {t.voo_numero}</span>}
-                    </div>
+                    <Badge className={cn(sc.class, 'border-0 text-[10px] px-1.5 py-0 mt-0.5')}>{sc.label}</Badge>
                   </div>
-                </button>
+                </div>
                 <div className="text-right shrink-0">
-                  <p className="text-sm font-mono font-medium">{rawTime(t.inicio_em)}</p>
+                  <p className="text-sm font-mono font-semibold">{rawTime(t.inicio_em)}</p>
                   <p className="text-[10px] text-muted-foreground">{rawDateShort(t.inicio_em)}</p>
                 </div>
-                <button onClick={() => openEditDlg(t)} aria-label="Editar transporte" className="p-1.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground shrink-0 focus-ring min-w-[44px] min-h-[44px] flex items-center justify-center">
-                  <Pencil className="w-3.5 h-3.5" />
-                </button>
-                <button onClick={() => { if (confirm('Excluir este transporte?')) remove.mutate(t.id); }} aria-label="Excluir transporte" className="p-1.5 rounded-lg hover:bg-destructive/10 transition-colors text-muted-foreground hover:text-destructive shrink-0 focus-ring min-w-[44px] min-h-[44px] flex items-center justify-center">
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
-                {t.status !== 'concluido' && t.status !== 'cancelado' && (
-                  <button onClick={() => cycleStatus(t)} className="text-xs px-3 py-1.5 rounded-lg border border-border hover:bg-muted transition-colors shrink-0 focus-ring min-h-[44px]">
-                    {t.status === 'pendente' ? 'Iniciar' : 'Concluir'}
-                  </button>
+              </div>
+
+              {/* Route */}
+              <button
+                onClick={() => openDetail(t)}
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/40 hover:bg-muted/60 transition-colors text-left focus-ring"
+                aria-label="Ver detalhes do transporte"
+              >
+                <MapPin className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                <span className="text-sm font-medium truncate">{t.origem}</span>
+                <ArrowRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                <span className="text-sm font-medium truncate">{t.destino}</span>
+              </button>
+
+              {/* Info chips */}
+              <div className="flex flex-wrap gap-1.5">
+                {vehicle && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-muted/50 text-[11px] text-muted-foreground">
+                    🚗 {vehicle.placa}
+                  </span>
                 )}
-                {t.status === 'concluido' && <Badge variant="secondary" className="shrink-0">✓</Badge>}
+                {driver && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-muted/50 text-[11px] text-muted-foreground">
+                    👤 {(driver.nome_exibicao || '').split(' ')[0]}
+                  </span>
+                )}
+                {guest && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-muted/50 text-[11px] text-muted-foreground">
+                    🎫 {guest.nome}
+                  </span>
+                )}
+                {t.km_retirada != null && (
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-muted/50 text-[11px] text-muted-foreground">
+                    📏 {t.km_retirada} km
+                  </span>
+                )}
+              </div>
+
+              {/* Flight info mini-card */}
+              {hasFlightInfo && (
+                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-info/5 border border-info/10 text-xs">
+                  <Plane className="w-3.5 h-3.5 text-info shrink-0" />
+                  <span className="text-muted-foreground">
+                    {t.voo_cidade && <span className="font-medium text-foreground">{t.voo_cidade}</span>}
+                    {t.voo_numero && <span className="ml-1.5">Voo {t.voo_numero}</span>}
+                    {t.voo_chegada && <span className="ml-1.5">• Chegada {t.voo_chegada}</span>}
+                    {t.horario_saida && <span className="ml-1.5">• Saída {t.horario_saida}</span>}
+                  </span>
+                </div>
+              )}
+
+              {/* Actions */}
+              <div className="flex items-center gap-2 pt-1">
+                {t.status !== 'concluido' && t.status !== 'cancelado' && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="flex-1 h-10 text-xs"
+                    onClick={() => cycleStatus(t)}
+                  >
+                    {t.status === 'pendente' ? 'Iniciar' : 'Concluir'}
+                  </Button>
+                )}
+                {t.status === 'concluido' && (
+                  <div className="flex-1 flex items-center justify-center h-10">
+                    <Badge variant="secondary" className="gap-1"><Check className="w-3 h-3" /> Concluído</Badge>
+                  </div>
+                )}
+                <Button size="icon" variant="ghost" className="h-10 w-10 shrink-0" onClick={() => openEditDlg(t)} aria-label="Editar">
+                  <Pencil className="w-4 h-4" />
+                </Button>
+                <Button size="icon" variant="ghost" className="h-10 w-10 shrink-0 text-destructive hover:text-destructive" onClick={() => { if (confirm('Excluir este transporte?')) remove.mutate(t.id); }} aria-label="Excluir">
+                  <Trash2 className="w-4 h-4" />
+                </Button>
               </div>
             </div>
           );
@@ -582,9 +629,7 @@ export default function TransportsPage() {
                     <Badge className={cn(sc.class, 'border-0')}>{sc.label}</Badge>
                     {t.prioridade && <Badge variant="outline" className="capitalize">{t.prioridade}</Badge>}
                   </div>
-
                   <Separator />
-
                   <div className="grid grid-cols-2 gap-y-3 gap-x-4 text-sm">
                     <div>
                       <p className="text-xs text-muted-foreground">Origem</p>
@@ -605,9 +650,7 @@ export default function TransportsPage() {
                       </div>
                     )}
                   </div>
-
                   <Separator />
-
                   <div className="grid grid-cols-2 gap-y-3 gap-x-4 text-sm">
                     <div>
                       <p className="text-xs text-muted-foreground">Motorista</p>
@@ -628,7 +671,6 @@ export default function TransportsPage() {
                       <p className="font-medium">{guest?.nome || '—'}</p>
                     </div>
                   </div>
-
                   {(t.km_retirada != null || t.km_devolucao != null) && (
                     <>
                       <Separator />
@@ -654,7 +696,6 @@ export default function TransportsPage() {
                       </div>
                     </>
                   )}
-
                   {t.titulo === 'Aeroporto' && (t.voo_cidade || t.voo_numero || t.voo_checkin || t.voo_chegada || t.horario_saida) && (
                     <>
                       <Separator />
@@ -695,9 +736,7 @@ export default function TransportsPage() {
                       </div>
                     </>
                   )}
-
                   <Separator />
-
                   <Button onClick={() => generatePDF(t)} variant="outline" className="w-full gap-2">
                     <FileText className="w-4 h-4" /> Gerar PDF
                   </Button>
