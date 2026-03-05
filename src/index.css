@@ -45,13 +45,13 @@
     --info: 210 70% 52%;
     --info-foreground: 0 0% 100%;
 
-    --sidebar-background: 148 40% 16%;
-    --sidebar-foreground: 140 15% 82%;
-    --sidebar-primary: 142 50% 55%;
+    --sidebar-background: 148 30% 24%;
+    --sidebar-foreground: 140 15% 88%;
+    --sidebar-primary: 142 55% 60%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 148 30% 22%;
-    --sidebar-accent-foreground: 140 15% 90%;
-    --sidebar-border: 148 25% 25%;
+    --sidebar-accent: 148 25% 30%;
+    --sidebar-accent-foreground: 140 15% 95%;
+    --sidebar-border: 148 20% 32%;
     --sidebar-ring: 142 50% 55%;
   }
 
@@ -75,14 +75,14 @@
     --border: 150 15% 18%;
     --input: 150 15% 18%;
     --ring: 142 50% 45%;
-    --sidebar-background: 150 25% 5%;
-    --sidebar-foreground: 140 12% 82%;
-    --sidebar-primary: 142 50% 50%;
+    --sidebar-background: 150 22% 10%;
+    --sidebar-foreground: 140 12% 85%;
+    --sidebar-primary: 142 50% 55%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 150 20% 12%;
-    --sidebar-accent-foreground: 140 12% 90%;
-    --sidebar-border: 150 15% 15%;
-    --sidebar-ring: 142 50% 50%;
+    --sidebar-accent: 150 18% 16%;
+    --sidebar-accent-foreground: 140 12% 92%;
+    --sidebar-border: 150 15% 18%;
+    --sidebar-ring: 142 50% 55%;
   }
 }
 
@@ -134,4 +134,33 @@ input, textarea, select, [role="combobox"] {
 
 input::placeholder, textarea::placeholder {
   text-transform: none;
+}
+
+/* Liquid Glass Effect */
+.liquid-glass {
+  background: rgba(255, 255, 255, 0.07);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.liquid-glass-card {
+  background: hsl(var(--card) / 0.6);
+  backdrop-filter: blur(16px) saturate(1.3);
+  -webkit-backdrop-filter: blur(16px) saturate(1.3);
+  border: 1px solid hsl(var(--border) / 0.5);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.dark .liquid-glass {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.dark .liquid-glass-card {
+  background: hsl(var(--card) / 0.5);
+  border-color: hsl(var(--border) / 0.4);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }

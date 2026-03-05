@@ -1,9 +1,7 @@
-import { ReactNode } from 'react';
+import { ReactNode, useState } from 'react';
 import Sidebar from './Sidebar';
-import BottomTabs from './BottomTabs';
 import OfflineBanner from './OfflineBanner';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useState } from 'react';
 import { Menu } from 'lucide-react';
 
 export default function Layout({ children }: { children: ReactNode }) {
@@ -20,18 +18,23 @@ export default function Layout({ children }: { children: ReactNode }) {
       </a>
       <OfflineBanner />
 
-      {/* Mobile overlay */}
-      {isMobile && mobileOpen && (
-        <div className="fixed inset-0 z-40 bg-black/50" onClick={() => setMobileOpen(false)} />
-      )}
+      <Sidebar
+        collapsed={collapsed}
+        onToggle={() => setCollapsed((c) => !c)}
+        isMobile={isMobile}
+        mobileOpen={mobileOpen}
+        onMobileClose={() => setMobileOpen(false)}
+      />
 
-      {!isMobile && (
-        <Sidebar
-          collapsed={collapsed}
-          onToggle={() => setCollapsed((c) => !c)}
-          mobileOpen={mobileOpen}
-          onMobileClose={() => setMobileOpen(false)}
-        />
+      {/* Mobile hamburger button */}
+      {isMobile && !mobileOpen && (
+        <button
+          onClick={() => setMobileOpen(true)}
+          aria-label="Abrir menu"
+          className="fixed top-3 left-3 z-30 p-2.5 rounded-xl liquid-glass-card text-foreground hover:bg-muted/80 transition-colors focus-ring"
+        >
+          <Menu className="w-5 h-5" />
+        </button>
       )}
 
       <main
@@ -39,13 +42,11 @@ export default function Layout({ children }: { children: ReactNode }) {
         className="min-h-screen p-4 md:p-6 transition-all duration-200"
         style={{
           marginLeft: sidebarWidth,
-          paddingBottom: isMobile ? 80 : 16,
+          paddingTop: isMobile ? 56 : 16,
         }}
       >
         {children}
       </main>
-
-      {isMobile && <BottomTabs />}
     </div>
   );
 }
