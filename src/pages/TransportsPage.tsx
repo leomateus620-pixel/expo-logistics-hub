@@ -412,7 +412,7 @@ export default function TransportsPage() {
       const updatePayload: any = {
         id: editId,
         titulo: editForm.titulo || null,
-        guest_id: editForm.guest_id && editForm.guest_id !== 'none' ? editForm.guest_id : null,
+        guest_id: editGuests.length === 1 ? editGuests[0] : (editGuests.length > 0 ? editGuests[0] : null),
         origem: editForm.origem,
         destino: editForm.destino,
         inicio_em: editForm.inicio_em,
