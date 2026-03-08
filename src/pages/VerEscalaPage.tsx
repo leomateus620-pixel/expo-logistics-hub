@@ -1,210 +1,399 @@
-import { useEvents } from '@/hooks/useEvents';
-import { useTransports } from '@/hooks/useTransports';
+import { useSchedules } from '@/hooks/useSchedules';
 import { useOrgMembers } from '@/hooks/useOrgMembers';
 import { useAuth } from '@/hooks/useAuth';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
+import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { CalendarDays, Clock, MapPin, User, Filter, Car, Trash2 } from 'lucide-react';
-import { rawTime, rawWeekday, rawDay, rawMonthShort } from '@/lib/utils';
-import { useState, useMemo, useEffect } from 'react';
+import { Badge } from '@/components/ui/badge';
+import { Calendar } from '@/components/ui/calendar';
+import { Plus, ChevronLeft, ChevronRight, Clock, User, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
-
-interface UnifiedItem {
-  id: string;
-  tipo: 'evento' | 'transporte';
-  titulo: string;
-  descricao?: string | null;
-  inicio_em: string;
-  fim_em?: string | null;
-  local?: string | null;
-  responsavel_user_id?: string | null;
-  created_by_user_id?: string | null;
-  tipo_tag?: string | null;
-  origem?: string;
-  destino?: string;
-  status?: string;
-}
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import { supabase } from '@/integrations/supabase/client';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 export default function VerEscalaPage() {
-  const { events, isLoading: eventsLoading, remove: removeEvent } = useEvents();
-  const { transports, update: updateTransport, remove: removeTransport, isLoading: transportsLoading } = useTransports();
+  const { schedules, isLoading, createSchedule, shifts, createShift, assignments, createAssignment } = useSchedules();
   const { members } = useOrgMembers();
   const { user } = useAuth();
-  const { myRole } = useCurrentOrg();
+  const { myRole, orgId } = useCurrentOrg();
+  const qc = useQueryClient();
 
-  // Pre-select logged-in user's member id
-  const myMemberId = useMemo(() => {
-    if (!user) return null;
-    const m = members.find((m: any) => m.user_id === user.id);
-    return m ? m.user_id : null;
-  }, [user, members]);
+  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [showCreateDialog, setShowCreateDialog] = useState(false);
+  const [showShiftDialog, setShowShiftDialog] = useState(false);
 
-  const [filterMember, setFilterMember] = useState<string>('');
-  const [filterDate, setFilterDate] = useState('');
+  // Create schedule form
+  const [schedName, setSchedName] = useState('');
+  const [schedStart, setSchedStart] = useState('');
+  const [schedEnd, setSchedEnd] = useState('');
 
-  // Set default filter to logged-in user once members load
-  useEffect(() => {
-    if (myMemberId && filterMember === '') {
-      setFilterMember(myMemberId);
-    }
-  }, [myMemberId]);
+  // Create shift form
+  const [shiftScheduleId, setShiftScheduleId] = useState('');
+  const [shiftMemberId, setShiftMemberId] = useState('');
+  const [shiftStart, setShiftStart] = useState('');
+  const [shiftEnd, setShiftEnd] = useState('');
+  const [shiftLocal, setShiftLocal] = useState('');
 
-  // Use 'all' as effective when empty string and no myMemberId
-  const effectiveFilter = filterMember || 'all';
+  const isAdmin = myRole === 'admin' || myRole === 'gestor';
 
-  const unified = useMemo(() => {
-    const evList: UnifiedItem[] = events.map((e: any) => ({
-      id: e.id,
-      tipo: 'evento' as const,
-      titulo: e.titulo,
-      descricao: e.descricao,
-      inicio_em: e.inicio_em,
-      fim_em: e.fim_em,
-      local: e.local,
-      responsavel_user_id: e.responsavel_user_id,
-      created_by_user_id: e.created_by_user_id,
-      tipo_tag: e.tipo_tag,
-    }));
-    const trList: UnifiedItem[] = transports.map((t: any) => ({
-      id: t.id,
-      tipo: 'transporte' as const,
-      titulo: t.titulo || `${t.origem} → ${t.destino}`,
-      descricao: t.observacoes,
-      inicio_em: t.inicio_em,
-      fim_em: t.fim_em,
-      local: null,
-      responsavel_user_id: t.motorista_user_id,
-      created_by_user_id: null,
-      origem: t.origem,
-      destino: t.destino,
-      status: t.status,
-    }));
-    let list = [...evList, ...trList];
-    if (filterDate) {
-      list = list.filter((i) => i.inicio_em?.startsWith(filterDate));
-    }
-    if (effectiveFilter !== 'all') {
-      list = list.filter((i) => i.responsavel_user_id === effectiveFilter || i.created_by_user_id === effectiveFilter);
-    }
-    return list.sort((a, b) => (a.inicio_em || '').localeCompare(b.inicio_em || ''));
-  }, [events, transports, filterDate, effectiveFilter]);
+  // Delete shift mutation
+  const deleteShift = useMutation({
+    mutationFn: async (shiftId: string) => {
+      const { error } = await (supabase as any).from('schedule_shifts').delete().eq('id', shiftId);
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['schedule-shifts'] });
+      toast.success('Turno removido');
+    },
+    onError: (err: any) => toast.error(err.message),
+  });
 
-  const isLoading = eventsLoading || transportsLoading;
+  // Calendar days for current month view
+  const calendarDays = useMemo(() => {
+    const monthStart = startOfMonth(currentMonth);
+    const monthEnd = endOfMonth(currentMonth);
+    const calStart = startOfWeek(monthStart, { locale: ptBR });
+    const calEnd = endOfWeek(monthEnd, { locale: ptBR });
+    return eachDayOfInterval({ start: calStart, end: calEnd });
+  }, [currentMonth]);
+
+  // Map shifts by date
+  const shiftsByDate = useMemo(() => {
+    const map: Record<string, typeof shifts> = {};
+    shifts.forEach((s: any) => {
+      const dateKey = s.inicio_em?.slice(0, 10);
+      if (!dateKey) return;
+      if (!map[dateKey]) map[dateKey] = [];
+      map[dateKey].push(s);
+    });
+    return map;
+  }, [shifts]);
+
+  // Assignments mapped by shift id
+  const assignmentsByShift = useMemo(() => {
+    const map: Record<string, any[]> = {};
+    assignments.forEach((a: any) => {
+      if (!map[a.schedule_shift_id]) map[a.schedule_shift_id] = [];
+      map[a.schedule_shift_id].push(a);
+    });
+    return map;
+  }, [assignments]);
 
   const getMemberName = (userId: string) => {
     const m = members.find((m: any) => m.user_id === userId);
     return m?.nome_exibicao || '—';
   };
 
-  const handleCycleStatus = async (transportId: string, currentStatus: string) => {
-    const order = ['pendente', 'em_andamento', 'concluido'];
-    const idx = order.indexOf(currentStatus);
-    if (idx < order.length - 1) {
-      try {
-        await updateTransport.mutateAsync({ id: transportId, status: order[idx + 1] });
-        toast.success(idx === 0 ? 'Transporte iniciado' : 'Transporte concluído');
-      } catch (err: any) {
-        toast.error(err.message);
-      }
+  const handleCreateSchedule = async () => {
+    if (!schedName || !schedStart || !schedEnd) {
+      toast.error('Preencha todos os campos');
+      return;
+    }
+    try {
+      await createSchedule.mutateAsync({ nome: schedName, data_inicio: schedStart, data_fim: schedEnd, status: 'ativa' });
+      toast.success('Escala criada!');
+      setShowCreateDialog(false);
+      setSchedName('');
+      setSchedStart('');
+      setSchedEnd('');
+    } catch (err: any) {
+      toast.error(err.message);
     }
   };
 
+  const handleCreateShift = async () => {
+    if (!shiftScheduleId || !shiftStart || !shiftEnd) {
+      toast.error('Preencha escala, início e fim');
+      return;
+    }
+    try {
+      const shift = await createShift.mutateAsync({
+        schedule_id: shiftScheduleId,
+        titulo: `Disponibilidade`,
+        inicio_em: shiftStart,
+        fim_em: shiftEnd,
+        local: shiftLocal || null,
+      });
+      // If a member is selected, create assignment
+      if (shiftMemberId) {
+        await createAssignment.mutateAsync({
+          schedule_shift_id: shift.id,
+          member_user_id: shiftMemberId,
+          funcao: 'disponível',
+        });
+      }
+      toast.success('Horário registrado!');
+      setShowShiftDialog(false);
+      setShiftScheduleId('');
+      setShiftMemberId('');
+      setShiftStart('');
+      setShiftEnd('');
+      setShiftLocal('');
+    } catch (err: any) {
+      toast.error(err.message);
+    }
+  };
+
+  const openShiftDialog = (date?: Date) => {
+    if (date) {
+      const dateStr = format(date, 'yyyy-MM-dd');
+      setShiftStart(`${dateStr}T08:00`);
+      setShiftEnd(`${dateStr}T17:00`);
+    }
+    // Pre-select current user
+    if (user) setShiftMemberId(user.id);
+    // Auto-select first active schedule
+    const activeSchedule = schedules.find((s: any) => s.status === 'ativa');
+    if (activeSchedule) setShiftScheduleId(activeSchedule.id);
+    setShowShiftDialog(true);
+  };
+
+  const selectedDateShifts = useMemo(() => {
+    if (!selectedDate) return [];
+    const key = format(selectedDate, 'yyyy-MM-dd');
+    return shiftsByDate[key] || [];
+  }, [selectedDate, shiftsByDate]);
+
+  const weekDays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+
   return (
     <div className="space-y-4">
-      <div>
-        <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Escala</h1>
-        <p className="text-sm text-muted-foreground mt-1">Eventos e transportes por membro</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Escala</h1>
+          <p className="text-sm text-muted-foreground mt-1">Disponibilidade da equipe</p>
+        </div>
+        <div className="flex gap-2">
+          {isAdmin && (
+            <Button size="sm" variant="outline" onClick={() => setShowCreateDialog(true)}>
+              <Plus className="w-4 h-4 mr-1" /> Criar Escala
+            </Button>
+          )}
+          <Button size="sm" onClick={() => openShiftDialog()}>
+            <Plus className="w-4 h-4 mr-1" /> Registrar Horário
+          </Button>
+        </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-3 p-3 rounded-xl border bg-card">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground shrink-0">
-          <Filter className="w-4 h-4" />
-          <span className="font-medium">Filtros</span>
-        </div>
-        <div className="flex-1">
-          <Select value={effectiveFilter} onValueChange={setFilterMember}>
-            <SelectTrigger className="w-full"><SelectValue placeholder="Filtrar por pessoa" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos da equipe</SelectItem>
-              {members.map((m: any) => <SelectItem key={m.user_id} value={m.user_id}>{m.nome_exibicao || 'Sem nome'}</SelectItem>)}
-            </SelectContent>
-          </Select>
-        </div>
-        <div className="flex-1">
-          <Input type="date" value={filterDate} onChange={(e) => setFilterDate(e.target.value)} className="w-full" />
-        </div>
-        {(effectiveFilter !== 'all' || filterDate) && (
-          <button onClick={() => { setFilterMember('all'); setFilterDate(''); }} className="text-xs text-primary hover:underline shrink-0 self-center">Limpar filtros</button>
-        )}
-      </div>
-
-      {isLoading ? (
-        <div className="text-sm text-muted-foreground text-center py-12">Carregando...</div>
-      ) : unified.length === 0 ? (
-        <div className="text-sm text-muted-foreground text-center py-12">Nenhum item encontrado.</div>
-      ) : (
-        <div className="space-y-3">
-          {unified.map((item) => (
-            <div key={`${item.tipo}-${item.id}`} className="rounded-xl border bg-card p-4 flex items-start gap-4">
-              <div className="text-center w-14 shrink-0 pt-0.5">
-                <p className="text-[10px] uppercase text-muted-foreground font-medium">{rawWeekday(item.inicio_em)}</p>
-                <p className="text-lg font-bold leading-tight">{rawDay(item.inicio_em)}</p>
-                <p className="text-[10px] text-muted-foreground">{rawMonthShort(item.inicio_em)}</p>
-              </div>
-              <div className="w-px h-12 bg-border self-center" />
-              <div className="flex-1 min-w-0 space-y-1">
-                <div className="flex items-center gap-2">
-                  <p className="text-sm font-semibold truncate">{item.titulo}</p>
-                  {item.tipo === 'transporte' && <Badge variant="outline" className="text-[10px] border-accent/30 text-accent shrink-0"><Car className="w-2.5 h-2.5 mr-0.5" />Transporte</Badge>}
-                </div>
-                {item.descricao && <p className="text-xs text-muted-foreground">{item.descricao}</p>}
-                {item.tipo === 'transporte' && item.origem && (
-                  <p className="text-xs text-muted-foreground"><MapPin className="w-3 h-3 inline mr-0.5" />{item.origem} → {item.destino}</p>
-                )}
-                <div className="flex flex-wrap items-center gap-3 text-[10px] text-muted-foreground">
-                  <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{rawTime(item.inicio_em)}{item.fim_em ? ` – ${rawTime(item.fim_em)}` : ''}</span>
-                  {item.local && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" />{item.local}</span>}
-                  {item.responsavel_user_id && <span className="flex items-center gap-1 text-primary font-medium"><User className="w-3 h-3" />{getMemberName(item.responsavel_user_id)}</span>}
-                  {item.status && <Badge variant="secondary" className="text-[10px]">{item.status}</Badge>}
-                </div>
-                {item.tipo_tag && <Badge variant="outline" className="text-[10px]">{item.tipo_tag}</Badge>}
-
-                {/* Action buttons */}
-                <div className="flex items-center gap-2 pt-1">
-                  {item.tipo === 'transporte' && item.status && item.status !== 'concluido' && item.status !== 'cancelado' && (
-                    <Button
-                      size="sm"
-                      variant={item.status === 'pendente' ? 'default' : 'secondary'}
-                      className="h-7 text-xs"
-                      onClick={() => handleCycleStatus(item.id, item.status!)}
-                    >
-                      {item.status === 'pendente' ? '▶ Iniciar' : '✓ Concluir'}
-                    </Button>
-                  )}
-                  {(myRole === 'admin' || myRole === 'gestor') && (
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="h-7 text-xs text-destructive hover:text-destructive hover:bg-destructive/10"
-                      onClick={() => {
-                        if (confirm('Excluir este item?')) {
-                          if (item.tipo === 'transporte') removeTransport.mutate(item.id);
-                          else removeEvent.mutate(item.id);
-                        }
-                      }}
-                    >
-                      <Trash2 className="w-3 h-3 mr-1" /> Excluir
-                    </Button>
-                  )}
-                </div>
-              </div>
-            </div>
+      {/* Active schedules */}
+      {schedules.filter((s: any) => s.status === 'ativa').length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {schedules.filter((s: any) => s.status === 'ativa').map((s: any) => (
+            <Badge key={s.id} variant="secondary" className="text-xs">
+              {s.nome} • {format(new Date(s.data_inicio), 'dd/MM')} – {format(new Date(s.data_fim), 'dd/MM')}
+            </Badge>
           ))}
         </div>
       )}
+
+      {/* Calendar header */}
+      <div className="rounded-xl border bg-card overflow-hidden">
+        <div className="flex items-center justify-between p-3 border-b">
+          <Button variant="ghost" size="icon" onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
+            <ChevronLeft className="w-4 h-4" />
+          </Button>
+          <h2 className="text-sm font-semibold capitalize">
+            {format(currentMonth, 'MMMM yyyy', { locale: ptBR })}
+          </h2>
+          <Button variant="ghost" size="icon" onClick={() => setCurrentMonth(addMonths(currentMonth, 1))}>
+            <ChevronRight className="w-4 h-4" />
+          </Button>
+        </div>
+
+        {/* Weekday headers */}
+        <div className="grid grid-cols-7 border-b">
+          {weekDays.map((d) => (
+            <div key={d} className="text-center text-[10px] font-medium text-muted-foreground py-2">{d}</div>
+          ))}
+        </div>
+
+        {/* Calendar grid */}
+        <div className="grid grid-cols-7">
+          {calendarDays.map((day, i) => {
+            const dateKey = format(day, 'yyyy-MM-dd');
+            const dayShifts = shiftsByDate[dateKey] || [];
+            const isCurrentMonth = day.getMonth() === currentMonth.getMonth();
+            const isToday = isSameDay(day, new Date());
+            const isSelected = selectedDate && isSameDay(day, selectedDate);
+
+            return (
+              <button
+                key={i}
+                onClick={() => setSelectedDate(day)}
+                className={`
+                  min-h-[72px] sm:min-h-[90px] p-1 border-b border-r text-left transition-colors
+                  ${!isCurrentMonth ? 'opacity-30' : ''}
+                  ${isSelected ? 'bg-primary/10 ring-1 ring-primary/30' : 'hover:bg-muted/50'}
+                `}
+              >
+                <span className={`
+                  text-xs font-medium inline-flex items-center justify-center w-6 h-6 rounded-full
+                  ${isToday ? 'bg-primary text-primary-foreground' : ''}
+                `}>
+                  {format(day, 'd')}
+                </span>
+                {dayShifts.length > 0 && (
+                  <div className="mt-0.5 space-y-0.5">
+                    {dayShifts.slice(0, 3).map((s: any) => {
+                      const shiftAssignments = assignmentsByShift[s.id] || [];
+                      return (
+                        <div key={s.id} className="text-[9px] bg-accent/20 text-accent-foreground rounded px-1 py-0.5 truncate">
+                          <Clock className="w-2.5 h-2.5 inline mr-0.5" />
+                          {s.inicio_em?.slice(11, 16)}–{s.fim_em?.slice(11, 16)}
+                          {shiftAssignments.length > 0 && (
+                            <span className="ml-0.5 font-medium">{getMemberName(shiftAssignments[0].member_user_id).split(' ')[0]}</span>
+                          )}
+                        </div>
+                      );
+                    })}
+                    {dayShifts.length > 3 && (
+                      <span className="text-[9px] text-muted-foreground">+{dayShifts.length - 3}</span>
+                    )}
+                  </div>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Selected date detail */}
+      {selectedDate && (
+        <div className="rounded-xl border bg-card p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <h3 className="text-sm font-semibold capitalize">
+              {format(selectedDate, "EEEE, dd 'de' MMMM", { locale: ptBR })}
+            </h3>
+            <Button size="sm" variant="outline" onClick={() => openShiftDialog(selectedDate)}>
+              <Plus className="w-3 h-3 mr-1" /> Adicionar
+            </Button>
+          </div>
+
+          {selectedDateShifts.length === 0 ? (
+            <p className="text-xs text-muted-foreground text-center py-6">Nenhum horário registrado neste dia.</p>
+          ) : (
+            <div className="space-y-2">
+              {selectedDateShifts.map((s: any) => {
+                const shiftAssignments = assignmentsByShift[s.id] || [];
+                return (
+                  <div key={s.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 border">
+                    <div className="flex items-center gap-2 text-sm font-medium">
+                      <Clock className="w-4 h-4 text-muted-foreground" />
+                      {s.inicio_em?.slice(11, 16)} – {s.fim_em?.slice(11, 16)}
+                    </div>
+                    <div className="flex-1 flex flex-wrap gap-1.5">
+                      {shiftAssignments.map((a: any) => (
+                        <Badge key={a.id} variant="secondary" className="text-[10px]">
+                          <User className="w-2.5 h-2.5 mr-0.5" />
+                          {getMemberName(a.member_user_id)}
+                        </Badge>
+                      ))}
+                      {shiftAssignments.length === 0 && (
+                        <span className="text-xs text-muted-foreground italic">Sem membros</span>
+                      )}
+                    </div>
+                    {s.local && <span className="text-[10px] text-muted-foreground">{s.local}</span>}
+                    {isAdmin && (
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="h-7 w-7 text-destructive hover:text-destructive hover:bg-destructive/10"
+                        onClick={() => {
+                          if (confirm('Excluir este turno?')) deleteShift.mutate(s.id);
+                        }}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Create Schedule Dialog */}
+      <Dialog open={showCreateDialog} onOpenChange={setShowCreateDialog}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Criar Escala</DialogTitle></DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Nome da escala</Label>
+              <Input value={schedName} onChange={(e) => setSchedName(e.target.value)} placeholder="Ex: Semana 1 - Fenasoja" />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>Data início</Label>
+                <Input type="date" value={schedStart} onChange={(e) => setSchedStart(e.target.value)} />
+              </div>
+              <div>
+                <Label>Data fim</Label>
+                <Input type="date" value={schedEnd} onChange={(e) => setSchedEnd(e.target.value)} />
+              </div>
+            </div>
+            <Button className="w-full" onClick={handleCreateSchedule} disabled={createSchedule.isPending}>
+              {createSchedule.isPending ? 'Criando...' : 'Criar Escala'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Register Shift Dialog */}
+      <Dialog open={showShiftDialog} onOpenChange={setShowShiftDialog}>
+        <DialogContent>
+          <DialogHeader><DialogTitle>Registrar Disponibilidade</DialogTitle></DialogHeader>
+          <div className="space-y-4">
+            <div>
+              <Label>Escala</Label>
+              <Select value={shiftScheduleId} onValueChange={setShiftScheduleId}>
+                <SelectTrigger><SelectValue placeholder="Selecione a escala" /></SelectTrigger>
+                <SelectContent>
+                  {schedules.filter((s: any) => s.status === 'ativa').map((s: any) => (
+                    <SelectItem key={s.id} value={s.id}>{s.nome}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label>Membro</Label>
+              <Select value={shiftMemberId} onValueChange={setShiftMemberId}>
+                <SelectTrigger><SelectValue placeholder="Quem estará disponível?" /></SelectTrigger>
+                <SelectContent>
+                  {members.map((m: any) => (
+                    <SelectItem key={m.user_id} value={m.user_id}>{m.nome_exibicao || 'Sem nome'}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label>Início</Label>
+                <Input type="datetime-local" value={shiftStart} onChange={(e) => setShiftStart(e.target.value)} />
+              </div>
+              <div>
+                <Label>Fim</Label>
+                <Input type="datetime-local" value={shiftEnd} onChange={(e) => setShiftEnd(e.target.value)} />
+              </div>
+            </div>
+            <div>
+              <Label>Local (opcional)</Label>
+              <Input value={shiftLocal} onChange={(e) => setShiftLocal(e.target.value)} placeholder="Ex: Pavilhão principal" />
+            </div>
+            <Button className="w-full" onClick={handleCreateShift} disabled={createShift.isPending}>
+              {createShift.isPending ? 'Salvando...' : 'Registrar Horário'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
