@@ -102,7 +102,7 @@ export default function ScootersPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 overflow-y-auto">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Patinetes</h1>
@@ -205,7 +205,7 @@ export default function ScootersPage() {
 
       {/* History dialog */}
       <Dialog open={historyOpen} onOpenChange={setHistoryOpen}>
-        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-lg max-h-[80vh] overflow-y-auto [&>div]:overflow-visible">
           <DialogHeader><DialogTitle>Histórico — {historyScooter?.nome || historyScooter?.codigo}</DialogTitle></DialogHeader>
           {historyScooter && <ScooterHistoryContent scooter={historyScooter} history={history} members={members} />}
         </DialogContent>

@@ -33,7 +33,7 @@ export function useScooters() {
       await logAudit({ orgId: orgId!, entity: 'scooters', entityId: data.id, action: 'create', after: data });
       return data;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['scooters'] }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['scooters'] }); qc.invalidateQueries({ queryKey: ['scooter-history'] }); },
   });
 
   const update = useMutation({
@@ -49,7 +49,7 @@ export function useScooters() {
       await logAudit({ orgId: orgId!, entity: 'scooters', entityId: id, action: 'update', before, after: data });
       return data;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['scooters'] }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['scooters'] }); qc.invalidateQueries({ queryKey: ['scooter-history'] }); },
   });
 
   const pickup = useMutation({
@@ -68,7 +68,7 @@ export function useScooters() {
       });
       return data;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['scooters'] }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['scooters'] }); qc.invalidateQueries({ queryKey: ['scooter-history'] }); },
   });
 
   const returnScooter = useMutation({
@@ -87,7 +87,7 @@ export function useScooters() {
       });
       return data;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['scooters'] }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: ['scooters'] }); qc.invalidateQueries({ queryKey: ['scooter-history'] }); },
   });
 
   const { data: history = [] } = useQuery({
