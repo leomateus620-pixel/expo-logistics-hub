@@ -1028,11 +1028,14 @@ function TransportCard({ t, members, vehicles, guests, highlightId, highlightRef
               🎫 {g.nome}
             </span>
           ))}
-          {guest?.hotel_nome && (
-            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-muted/40 text-[11px] text-muted-foreground">
-              🏨 {guest.hotel_nome}
-            </span>
-          )}
+          {(() => {
+            const hotels = [...new Set(transportGuests.map((g: any) => g.hotel_nome).filter(Boolean))];
+            return hotels.map((h: string) => (
+              <span key={h} className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-muted/40 text-[11px] text-muted-foreground">
+                🏨 {h}
+              </span>
+            ));
+          })()}
           {t.titulo === 'Aeroporto' && t.voo_cidade && (
             <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-muted/40 text-[11px] text-muted-foreground">
               ✈️ {t.voo_cidade}{t.voo_numero ? ` · ${t.voo_numero}` : ''}
