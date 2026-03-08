@@ -102,7 +102,7 @@ export default function VehiclesPage() {
   const { vehicles, isLoading: vehiclesLoading, create, update } = useVehicles();
   const { members } = useOrgMembers();
   const { user } = useAuth();
-  const { totalKm, kmByVehicle, isLoading: usageLoading } = useVehicleUsage();
+  const { usages, totalKm, kmByVehicle, isLoading: usageLoading } = useVehicleUsage();
   const { records: allFuelRecords, isLoading: fuelLoading } = useFuelRecords();
 
   const [addOpen, setAddOpen] = useState(false);
