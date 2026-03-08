@@ -29,8 +29,55 @@ const statusConfig: Record<string, { label: string; icon: typeof Check; class: s
   cancelado: { label: 'Cancelado', icon: X, class: 'bg-destructive/10 text-destructive', dotClass: 'bg-destructive' },
 };
 
-const tituloOptions = ['Parque', 'Hotel', 'Aeroporto', 'Centro', 'Outros'];
+const tituloOptions = ['Parque', 'Hotel', 'Aeroporto', 'Centro', 'Escolta Policial', 'Outros'];
 const cidadeAeroportoOptions = ['Chapecó', 'Santo Ângelo', 'Passo Fundo', 'Porto Alegre'];
+
+function buildEscoltaObs(data: any): string | null {
+  if (data.titulo !== 'Escolta Policial') return null;
+  const parts: string[] = [];
+  if (data.escolta_nome) parts.push(`ESCOLTADO: ${data.escolta_nome}`);
+  if (data.escolta_cargo) parts.push(`CARGO: ${data.escolta_cargo}`);
+  if (data.escolta_viaturas) parts.push(`VIATURAS: ${data.escolta_viaturas}`);
+  if (data.escolta_ponto_encontro) parts.push(`PONTO DE ENCONTRO: ${data.escolta_ponto_encontro}`);
+  if (data.escolta_contato_seguranca) parts.push(`CONTATO SEGURANÇA: ${data.escolta_contato_seguranca}`);
+  if (data.escolta_obs) parts.push(`OBS: ${data.escolta_obs}`);
+  return parts.length > 0 ? parts.join('\n') : null;
+}
+
+function parseEscoltaFromObs(obs: string | null) {
+  const result = { escolta_nome: '', escolta_cargo: '', escolta_viaturas: '', escolta_ponto_encontro: '', escolta_contato_seguranca: '', escolta_obs: '' };
+  if (!obs) return result;
+  for (const line of obs.split('\n')) {
+    if (line.startsWith('ESCOLTADO: ')) result.escolta_nome = line.slice(11);
+    else if (line.startsWith('CARGO: ')) result.escolta_cargo = line.slice(7);
+    else if (line.startsWith('VIATURAS: ')) result.escolta_viaturas = line.slice(10);
+    else if (line.startsWith('PONTO DE ENCONTRO: ')) result.escolta_ponto_encontro = line.slice(19);
+    else if (line.startsWith('CONTATO SEGURANÇA: ')) result.escolta_contato_seguranca = line.slice(19);
+    else if (line.startsWith('OBS: ')) result.escolta_obs = line.slice(5);
+  }
+  return result;
+}
+
+function generateWhatsAppText(data: any, driver: any, vehicle: any, guest: any) {
+  const lines = ['🚔 *ESCOLTA POLICIAL — FENASOJA*', ''];
+  if (data.escolta_nome) lines.push(`👤 *Escoltado:* ${data.escolta_nome}`);
+  if (data.escolta_cargo) lines.push(`🏷️ *Cargo/Função:* ${data.escolta_cargo}`);
+  lines.push(`📍 *Origem:* ${data.origem || '—'}`);
+  lines.push(`📍 *Destino:* ${data.destino || '—'}`);
+  if (data.inicio_em) {
+    const d = new Date(data.inicio_em);
+    lines.push(`📅 *Data/Hora:* ${d.toLocaleDateString('pt-BR')} às ${d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}`);
+  }
+  if (driver) lines.push(`🚗 *Motorista:* ${driver.nome_exibicao || ''}`);
+  if (vehicle) lines.push(`🚙 *Veículo:* ${vehicle.placa} ${vehicle.modelo || ''}`);
+  if (data.escolta_viaturas) lines.push(`🚓 *Nº Viaturas:* ${data.escolta_viaturas}`);
+  if (data.escolta_ponto_encontro) lines.push(`📌 *Ponto de Encontro:* ${data.escolta_ponto_encontro}`);
+  if (data.escolta_contato_seguranca) lines.push(`📞 *Contato Segurança:* ${data.escolta_contato_seguranca}`);
+  if (guest) lines.push(`🏨 *Hóspede:* ${guest.nome}`);
+  if (data.escolta_obs) lines.push(`📝 *Obs:* ${data.escolta_obs}`);
+  lines.push('', '_Mensagem gerada pelo sistema Fenasoja Logística_');
+  return lines.join('\n');
+}
 
 export default function TransportsPage() {
   const { transports, create, update, remove } = useTransports();
@@ -70,13 +117,16 @@ export default function TransportsPage() {
   }, [highlightId, transports]);
 
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ titulo: '', origem: '', destino: '', inicio_em: '', motorista_user_id: '', vehicle_id: '', prioridade: 'media', km_retirada: '', voo_cidade: '', voo_numero: '', voo_checkin: '', voo_chegada: '', horario_saida: '' });
+  const [form, setForm] = useState({ titulo: '', origem: '', destino: '', inicio_em: '', motorista_user_id: '', vehicle_id: '', prioridade: 'media', km_retirada: '', voo_cidade: '', voo_numero: '', voo_checkin: '', voo_chegada: '', horario_saida: '', escolta_nome: '', escolta_cargo: '', escolta_viaturas: '', escolta_ponto_encontro: '', escolta_contato_seguranca: '', escolta_obs: '' });
   const [selectedGuests, setSelectedGuests] = useState<string[]>([]);
   const [guestDestinations, setGuestDestinations] = useState<Record<string, string>>({});
 
+  const [whatsappOpen, setWhatsappOpen] = useState(false);
+  const [whatsappText, setWhatsappText] = useState('');
+
   const [editOpen, setEditOpen] = useState(false);
   const [editId, setEditId] = useState('');
-  const [editForm, setEditForm] = useState({ titulo: '', guest_id: '', origem: '', destino: '', inicio_em: '', motorista_user_id: '', vehicle_id: '', prioridade: 'media', status: 'pendente', km_retirada: '', km_devolucao: '', fim_em: '', voo_cidade: '', voo_numero: '', voo_checkin: '', voo_chegada: '', horario_saida: '' });
+  const [editForm, setEditForm] = useState({ titulo: '', guest_id: '', origem: '', destino: '', inicio_em: '', motorista_user_id: '', vehicle_id: '', prioridade: 'media', status: 'pendente', km_retirada: '', km_devolucao: '', fim_em: '', voo_cidade: '', voo_numero: '', voo_checkin: '', voo_chegada: '', horario_saida: '', escolta_nome: '', escolta_cargo: '', escolta_viaturas: '', escolta_ponto_encontro: '', escolta_contato_seguranca: '', escolta_obs: '' });
 
   const [filterMotorista, setFilterMotorista] = useState('');
   const [filterData, setFilterData] = useState('');
@@ -146,7 +196,7 @@ export default function TransportsPage() {
   };
 
   const openCreateDialog = () => {
-    setForm({ titulo: '', origem: '', destino: '', inicio_em: nowSPLocal(), motorista_user_id: '', vehicle_id: '', prioridade: 'media', km_retirada: '', voo_cidade: '', voo_numero: '', voo_checkin: '', voo_chegada: '', horario_saida: '' });
+    setForm({ titulo: '', origem: '', destino: '', inicio_em: nowSPLocal(), motorista_user_id: '', vehicle_id: '', prioridade: 'media', km_retirada: '', voo_cidade: '', voo_numero: '', voo_checkin: '', voo_chegada: '', horario_saida: '', escolta_nome: '', escolta_cargo: '', escolta_viaturas: '', escolta_ponto_encontro: '', escolta_contato_seguranca: '', escolta_obs: '' });
     setSelectedGuests([]);
     setGuestDestinations({});
     setOpen(true);
@@ -175,9 +225,21 @@ export default function TransportsPage() {
           voo_checkin: form.titulo === 'Aeroporto' ? form.voo_checkin || null : null,
           voo_chegada: form.titulo === 'Aeroporto' ? form.voo_chegada || null : null,
           horario_saida: form.titulo === 'Aeroporto' ? form.horario_saida || null : null,
+          observacoes: buildEscoltaObs(form),
         });
       }
-      setForm({ titulo: '', origem: '', destino: '', inicio_em: '', motorista_user_id: '', vehicle_id: '', prioridade: 'media', km_retirada: '', voo_cidade: '', voo_numero: '', voo_checkin: '', voo_chegada: '', horario_saida: '' });
+
+      // If escort, generate WhatsApp text
+      if (form.titulo === 'Escolta Policial') {
+        const driver = members.find((m: any) => m.user_id === form.motorista_user_id);
+        const vehicle = vehicles.find((v: any) => v.id === form.vehicle_id);
+        const guest = selectedGuests.length > 0 ? guests.find((g: any) => g.id === selectedGuests[0]) : null;
+        const text = generateWhatsAppText(form, driver, vehicle, guest);
+        setWhatsappText(text);
+        setWhatsappOpen(true);
+      }
+
+      setForm({ titulo: '', origem: '', destino: '', inicio_em: '', motorista_user_id: '', vehicle_id: '', prioridade: 'media', km_retirada: '', voo_cidade: '', voo_numero: '', voo_checkin: '', voo_chegada: '', horario_saida: '', escolta_nome: '', escolta_cargo: '', escolta_viaturas: '', escolta_ponto_encontro: '', escolta_contato_seguranca: '', escolta_obs: '' });
       setSelectedGuests([]);
       setGuestDestinations({});
       setOpen(false);
@@ -187,6 +249,7 @@ export default function TransportsPage() {
 
   const openEditDlg = (t: any) => {
     setEditId(t.id);
+    const escoltaData = parseEscoltaFromObs(t.observacoes);
     setEditForm({
       titulo: t.titulo || '', guest_id: t.guest_id || '', origem: t.origem, destino: t.destino,
       inicio_em: t.inicio_em?.slice(0, 16) || '', motorista_user_id: t.motorista_user_id || '',
@@ -198,6 +261,7 @@ export default function TransportsPage() {
       voo_cidade: t.voo_cidade || '', voo_numero: t.voo_numero || '',
       voo_checkin: t.voo_checkin || '', voo_chegada: t.voo_chegada || '',
       horario_saida: t.horario_saida || '',
+      ...escoltaData,
     });
     setEditOpen(true);
   };
@@ -226,6 +290,7 @@ export default function TransportsPage() {
         voo_checkin: editForm.titulo === 'Aeroporto' ? editForm.voo_checkin || null : null,
         voo_chegada: editForm.titulo === 'Aeroporto' ? editForm.voo_chegada || null : null,
         horario_saida: editForm.titulo === 'Aeroporto' ? editForm.horario_saida || null : null,
+        observacoes: buildEscoltaObs(editForm),
       });
 
       if (statusChanged && editForm.status === 'concluido' && editForm.km_retirada && editForm.km_devolucao && editForm.vehicle_id && editForm.vehicle_id !== 'none') {
@@ -261,6 +326,7 @@ export default function TransportsPage() {
           setTrackingTransportId(null);
         }
         setEditId(t.id);
+        const escoltaData = parseEscoltaFromObs(t.observacoes);
         setEditForm({
           titulo: t.titulo || '', guest_id: t.guest_id || '', origem: t.origem, destino: t.destino,
           inicio_em: t.inicio_em?.slice(0, 16) || '', motorista_user_id: t.motorista_user_id || '',
@@ -272,6 +338,7 @@ export default function TransportsPage() {
           voo_cidade: t.voo_cidade || '', voo_numero: t.voo_numero || '',
           voo_checkin: t.voo_checkin || '', voo_chegada: t.voo_chegada || '',
           horario_saida: t.horario_saida || '',
+          ...escoltaData,
         });
         setEditOpen(true);
         return;
@@ -345,6 +412,17 @@ export default function TransportsPage() {
               <Label className="text-xs text-muted-foreground mb-1 block">Horário de Saída (para o aeroporto)</Label>
               <Input type="time" aria-label="Horário de saída para o aeroporto" value={data.horario_saida} onChange={(e) => setData({ ...data, horario_saida: e.target.value })} />
             </div>
+          </div>
+        )}
+        {data.titulo === 'Escolta Policial' && (
+          <div className="space-y-3 rounded-lg border border-border bg-muted/30 p-3">
+            <Label className="text-xs font-semibold text-foreground">🚔 Informações da Escolta</Label>
+            <Input placeholder="Nome do escoltado" value={data.escolta_nome} onChange={(e) => setData({ ...data, escolta_nome: e.target.value })} />
+            <Input placeholder="Cargo / Função" value={data.escolta_cargo} onChange={(e) => setData({ ...data, escolta_cargo: e.target.value })} />
+            <Input placeholder="Nº de viaturas necessárias" type="number" value={data.escolta_viaturas} onChange={(e) => setData({ ...data, escolta_viaturas: e.target.value })} />
+            <Input placeholder="Ponto de encontro" value={data.escolta_ponto_encontro} onChange={(e) => setData({ ...data, escolta_ponto_encontro: e.target.value })} />
+            <Input placeholder="Contato da segurança (tel)" value={data.escolta_contato_seguranca} onChange={(e) => setData({ ...data, escolta_contato_seguranca: e.target.value })} />
+            <Input placeholder="Observações de segurança" value={data.escolta_obs} onChange={(e) => setData({ ...data, escolta_obs: e.target.value })} />
           </div>
         )}
         {isEdit ? (
@@ -533,6 +611,24 @@ export default function TransportsPage() {
             </SelectContent>
           </Select>
           <Button onClick={handleEditSave} className="w-full" disabled={update.isPending}>Salvar</Button>
+        </DialogContent>
+      </Dialog>
+
+      {/* WhatsApp Text Dialog */}
+      <Dialog open={whatsappOpen} onOpenChange={setWhatsappOpen}>
+        <DialogContent className="max-h-[90vh] overflow-y-auto">
+          <DialogHeader><DialogTitle>📋 Texto para WhatsApp</DialogTitle></DialogHeader>
+          <p className="text-xs text-muted-foreground">Copie o texto abaixo e envie ao responsável pela segurança:</p>
+          <div className="bg-muted rounded-lg p-4 text-sm whitespace-pre-wrap font-mono border">{whatsappText}</div>
+          <Button
+            onClick={() => {
+              navigator.clipboard.writeText(whatsappText);
+              toast.success('Texto copiado para a área de transferência!');
+            }}
+            className="w-full"
+          >
+            📋 Copiar Texto
+          </Button>
         </DialogContent>
       </Dialog>
 
