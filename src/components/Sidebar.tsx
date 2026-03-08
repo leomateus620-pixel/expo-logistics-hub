@@ -5,20 +5,39 @@ import {
 } from 'lucide-react';
 import logo from '@/assets/logofeira26.webp';
 import { useAuth } from '@/hooks/useAuth';
+import { useTransports } from '@/hooks/useTransports';
+import { useEvents } from '@/hooks/useEvents';
+import { useTasks } from '@/hooks/useTasks';
+import { useOrgMembers } from '@/hooks/useOrgMembers';
 import { cn } from '@/lib/utils';
+import { isToday, parseISO } from 'date-fns';
+import { useMemo } from 'react';
 
-const links = [
+/* ── Menu groups ── */
+const operacao = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/vehicles', icon: Car, label: 'Veículos Botolli' },
-  { to: '/electric-carts', icon: Zap, label: 'Carrinhos Elétricos' },
-  { to: '/scooters', icon: Bike, label: 'Patinetes' },
   { to: '/transports', icon: MapPin, label: 'Transportes' },
-  { to: '/guests', icon: Hotel, label: 'Hóspedes' },
   { to: '/agenda', icon: CalendarDays, label: 'Agenda' },
   { to: '/ver-escala', icon: ClipboardList, label: 'Escala' },
   { to: '/checklist', icon: CheckSquare, label: 'Checklist' },
+];
+
+const recursos = [
+  { to: '/vehicles', icon: Car, label: 'Veículos Botolli' },
+  { to: '/electric-carts', icon: Zap, label: 'Carrinhos Elétricos' },
+  { to: '/scooters', icon: Bike, label: 'Patinetes' },
+  { to: '/guests', icon: Hotel, label: 'Hóspedes' },
   { to: '/team', icon: Users, label: 'Equipe' },
+];
+
+const sistema = [
   { to: '/settings', icon: Settings, label: 'Configurações' },
+];
+
+const groups = [
+  { title: 'Operação', links: operacao },
+  { title: 'Recursos', links: recursos },
+  { title: 'Sistema', links: sistema },
 ];
 
 interface SidebarProps {
@@ -29,167 +48,201 @@ interface SidebarProps {
   onMobileClose: () => void;
 }
 
+/* ── Badge pill component ── */
+function SidebarBadge({ count }: { count: number }) {
+  if (count <= 0) return null;
+  return (
+    <span className="ml-auto min-w-[18px] h-[18px] text-[10px] font-bold rounded-full bg-sidebar-primary/25 text-sidebar-primary flex items-center justify-center leading-none">
+      {count > 99 ? '99+' : count}
+    </span>
+  );
+}
+
 export default function Sidebar({ collapsed, onToggle, isMobile, mobileOpen, onMobileClose }: SidebarProps) {
   const { signOut } = useAuth();
+  const { transports } = useTransports();
+  const { events } = useEvents();
+  const { tasks } = useTasks();
+  const { members } = useOrgMembers();
 
-  // On mobile: overlay sidebar with collapse support
-  if (isMobile) {
-    return (
-      <>
-        {/* Backdrop */}
-        {mobileOpen && (
-          <div
-            className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm transition-opacity"
-            onClick={onMobileClose}
-          />
-        )}
-        {/* Sidebar panel */}
-        <aside
-          className={cn(
-            'fixed left-0 top-0 bottom-0 z-50 flex flex-col transition-all duration-300 ease-out',
-            'backdrop-blur-2xl border-r border-white/10',
-            mobileOpen ? 'translate-x-0' : '-translate-x-full',
-            collapsed ? 'w-[68px]' : 'w-[280px]'
+  // Compute badge counts from real data
+  const badges = useMemo(() => {
+    const activeTransports = transports.filter((t: any) => t.status === 'em_andamento').length;
+    const todayEvents = events.filter((e: any) => {
+      try { return isToday(parseISO(e.inicio_em)); } catch { return false; }
+    }).length;
+    const pendingTasks = tasks.filter((t: any) => t.status === 'pendente').length;
+    const availableMembers = members.filter((m: any) => m.status === 'disponivel').length;
+
+    return new Map<string, number>([
+      ['/transports', activeTransports],
+      ['/agenda', todayEvents],
+      ['/checklist', pendingTasks],
+      ['/team', availableMembers],
+    ]);
+  }, [transports, events, tasks, members]);
+
+  // Micro-context summary line
+  const contextLine = useMemo(() => {
+    const parts: string[] = [];
+    const at = badges.get('/transports') || 0;
+    const ev = badges.get('/agenda') || 0;
+    const tk = badges.get('/checklist') || 0;
+    if (at > 0) parts.push(`${at} ativo${at > 1 ? 's' : ''}`);
+    if (ev > 0) parts.push(`${ev} evento${ev > 1 ? 's' : ''}`);
+    if (tk > 0) parts.push(`${tk} tarefa${tk > 1 ? 's' : ''}`);
+    return parts.length > 0 ? parts.join(' · ') : null;
+  }, [badges]);
+
+  const sidebarBg = 'linear-gradient(180deg, hsl(var(--sidebar-background) / 0.92), hsl(var(--sidebar-background) / 0.85))';
+
+  /* ── Shared nav renderer ── */
+  const renderNav = (mobile: boolean) => (
+    <nav className="flex-1 px-2 pt-1 overflow-y-auto" role="navigation" aria-label="Menu principal">
+      {groups.map((group) => (
+        <div key={group.title}>
+          {!collapsed && (
+            <p className="text-[9px] uppercase tracking-[0.15em] text-sidebar-foreground/40 font-semibold px-3 pt-4 pb-1 select-none">
+              {group.title}
+            </p>
           )}
-          style={{ background: 'hsl(var(--sidebar-background) / 0.88)' }}
-        >
-          <div className="p-3 flex items-center gap-3 border-b border-white/10 min-h-[56px]">
-            <img src={logo} alt="Fenasoja" className="w-9 h-9 rounded-lg object-contain bg-white/10 p-0.5 shrink-0" />
-            {!collapsed && (
-              <div className="flex-1 min-w-0">
-                <h1 className="text-sm font-bold text-sidebar-primary-foreground tracking-tight">Fenasoja</h1>
-                <p className="text-[10px] text-sidebar-foreground/60 uppercase tracking-widest">Logística</p>
-              </div>
-            )}
-            <div className="flex items-center gap-1 shrink-0">
-              <button
-                onClick={onToggle}
-                aria-label={collapsed ? 'Expandir menu' : 'Retrair menu'}
-                className="p-2 rounded-lg hover:bg-white/10 text-sidebar-foreground/70 focus-ring"
-              >
-                {collapsed ? <PanelLeftOpen className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
-              </button>
-              <button
-                onClick={onMobileClose}
-                aria-label="Fechar menu"
-                className="p-2 rounded-lg hover:bg-white/10 text-sidebar-foreground/70 focus-ring"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-          </div>
-
-          <nav className="flex-1 px-2 pt-3 space-y-0.5 overflow-y-auto" role="navigation" aria-label="Menu principal">
-            {links.map(({ to, icon: Icon, label }) => (
+          {collapsed && <div className="pt-2" />}
+          <div className="space-y-0.5">
+            {group.links.map(({ to, icon: Icon, label }) => (
               <RouterNavLink
                 key={to}
                 to={to}
                 end={to === '/'}
-                onClick={onMobileClose}
+                onClick={mobile ? onMobileClose : undefined}
                 className={({ isActive }) =>
                   cn(
-                    'flex items-center gap-3 rounded-lg text-sm font-medium transition-colors focus-ring',
-                    collapsed ? 'justify-center px-2 py-3.5' : 'px-3 py-3.5',
+                    'flex items-center gap-3 rounded-lg text-sm font-medium transition-all duration-200 focus-ring',
+                    collapsed ? 'justify-center px-2' : 'px-3',
+                    mobile ? 'py-3 gap-3.5 active:scale-[0.97] active:bg-white/10' : 'py-2.5',
                     isActive
-                      ? 'bg-white/15 text-sidebar-primary border-l-2 border-sidebar-primary'
-                      : 'text-sidebar-foreground/75 hover:text-sidebar-foreground hover:bg-white/8 border-l-2 border-transparent'
+                      ? 'bg-sidebar-primary/15 text-sidebar-primary font-semibold border-l-[3px] border-sidebar-primary'
+                      : 'text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-white/[0.07] border-l-[3px] border-transparent'
                   )
+                }
+                style={({ isActive }) =>
+                  isActive ? { boxShadow: 'inset 0 0 12px rgba(255,255,255,0.06)' } : undefined
                 }
               >
                 {({ isActive }) => (
                   <>
-                    <Icon className="w-5 h-5 shrink-0" aria-hidden="true" />
+                    <Icon className={cn(
+                      'shrink-0',
+                      mobile ? 'w-5 h-5' : 'w-4 h-4',
+                      isActive ? 'text-sidebar-primary' : ''
+                    )} aria-hidden="true" />
                     {!collapsed && <span className="truncate">{label}</span>}
+                    {!collapsed && <SidebarBadge count={badges.get(to) || 0} />}
                     {isActive && <span className="sr-only">(página atual)</span>}
                   </>
                 )}
               </RouterNavLink>
             ))}
-          </nav>
-
-          <div className="p-2 border-t border-white/10">
-            <button
-              onClick={() => { onMobileClose(); signOut(); }}
-              aria-label="Sair da conta"
-              className={cn(
-                'flex items-center gap-3 w-full rounded-lg text-sm font-medium text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-white/8 transition-colors focus-ring',
-                collapsed ? 'justify-center px-2 py-3' : 'px-3 py-3'
-              )}
-            >
-              <LogOut className="w-5 h-5 shrink-0" aria-hidden="true" />
-              {!collapsed && <span>Sair</span>}
-            </button>
           </div>
+        </div>
+      ))}
+    </nav>
+  );
+
+  /* ── Header renderer ── */
+  const renderHeader = (mobile: boolean) => (
+    <div className="p-3 flex items-center gap-3 border-b border-white/[0.08] min-h-[56px]">
+      <div className="bg-white/[0.08] rounded-xl p-1 shadow-sm shrink-0">
+        <img src={logo} alt="Fenasoja" className="w-8 h-8 rounded-lg object-contain" />
+      </div>
+      {!collapsed && (
+        <div className="flex-1 min-w-0">
+          <h1 className="text-[15px] font-bold text-sidebar-primary-foreground tracking-tight leading-tight">Fenasoja</h1>
+          <p className="text-[9px] tracking-[0.2em] text-sidebar-primary/70 font-medium uppercase">Logística</p>
+          {contextLine && (
+            <p className="text-[10px] text-sidebar-foreground/45 mt-0.5 truncate">{contextLine}</p>
+          )}
+        </div>
+      )}
+      <div className="flex items-center gap-1 shrink-0">
+        <button
+          onClick={onToggle}
+          aria-label={collapsed ? 'Expandir menu' : 'Retrair menu'}
+          className="p-2 rounded-lg hover:bg-white/[0.12] active:scale-95 transition-all duration-150 text-sidebar-foreground/70 focus-ring"
+        >
+          {collapsed ? <PanelLeftOpen className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
+        </button>
+        {mobile && (
+          <button
+            onClick={onMobileClose}
+            aria-label="Fechar menu"
+            className="p-2 rounded-lg hover:bg-white/[0.12] active:scale-95 transition-all duration-150 text-sidebar-foreground/70 focus-ring"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        )}
+      </div>
+    </div>
+  );
+
+  /* ── Footer renderer ── */
+  const renderFooter = (mobile: boolean) => (
+    <div className="p-3 mx-2 border-t border-white/[0.08]">
+      <button
+        onClick={() => { if (mobile) onMobileClose(); signOut(); }}
+        aria-label="Sair da conta"
+        className={cn(
+          'flex items-center gap-3 w-full rounded-lg text-sm font-medium transition-all duration-200 focus-ring',
+          'text-sidebar-foreground/50 hover:text-red-400 hover:bg-red-500/10',
+          collapsed ? 'justify-center px-2 py-2.5' : 'px-3 py-2.5'
+        )}
+      >
+        <LogOut className="w-4 h-4 shrink-0" aria-hidden="true" />
+        {!collapsed && <span>Sair</span>}
+      </button>
+    </div>
+  );
+
+  // ── Mobile sidebar ──
+  if (isMobile) {
+    return (
+      <>
+        {mobileOpen && (
+          <div
+            className="fixed inset-0 z-40 bg-black/50 backdrop-blur-md transition-opacity"
+            onClick={onMobileClose}
+          />
+        )}
+        <aside
+          className={cn(
+            'fixed left-0 top-0 bottom-0 z-50 flex flex-col',
+            'backdrop-blur-2xl border-r border-white/[0.12]',
+            mobileOpen ? 'translate-x-0' : '-translate-x-full',
+            collapsed ? 'w-[68px]' : 'w-[280px]'
+          )}
+          style={{
+            background: sidebarBg,
+            transition: 'transform 350ms cubic-bezier(0.32, 0.72, 0, 1)',
+          }}
+        >
+          {renderHeader(true)}
+          {renderNav(true)}
+          {renderFooter(true)}
         </aside>
       </>
     );
   }
 
-  // Desktop sidebar
+  // ── Desktop sidebar ──
   const width = collapsed ? 64 : 256;
 
   return (
     <aside
-      className="fixed left-0 top-0 bottom-0 flex flex-col z-50 transition-all duration-200 overflow-hidden backdrop-blur-2xl border-r border-white/10"
-      style={{ width, background: 'hsl(var(--sidebar-background) / 0.88)' }}
+      className="fixed left-0 top-0 bottom-0 flex flex-col z-50 transition-all duration-200 overflow-hidden backdrop-blur-2xl border-r border-white/[0.12]"
+      style={{ width, background: sidebarBg }}
     >
-      <div className="p-3 flex items-center gap-3 border-b border-white/10 min-h-[56px]">
-        <img src={logo} alt="Fenasoja" className="w-9 h-9 rounded-lg object-contain bg-white/10 p-0.5 shrink-0" />
-        {!collapsed && (
-          <div className="flex-1 min-w-0">
-            <h1 className="text-sm font-bold text-sidebar-primary-foreground tracking-tight">Fenasoja</h1>
-            <p className="text-[10px] text-sidebar-foreground/60 uppercase tracking-widest">Logística</p>
-          </div>
-        )}
-        <button
-          onClick={onToggle}
-          aria-label={collapsed ? 'Expandir menu lateral' : 'Recolher menu lateral'}
-          className="p-1.5 rounded-lg hover:bg-white/10 text-sidebar-foreground/70 shrink-0 focus-ring"
-        >
-          {collapsed ? <PanelLeftOpen className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
-        </button>
-      </div>
-
-      <nav className="flex-1 px-2 pt-3 space-y-0.5 overflow-y-auto" role="navigation" aria-label="Menu principal">
-        {links.map(({ to, icon: Icon, label }) => (
-          <RouterNavLink
-            key={to}
-            to={to}
-            end={to === '/'}
-            className={({ isActive }) =>
-              cn(
-                'flex items-center gap-3 rounded-lg text-sm font-medium transition-colors focus-ring',
-                collapsed ? 'justify-center px-2 py-3' : 'px-3 py-3',
-                isActive
-                  ? 'bg-white/15 text-sidebar-primary border-l-2 border-sidebar-primary'
-                  : 'text-sidebar-foreground/75 hover:text-sidebar-foreground hover:bg-white/8 border-l-2 border-transparent'
-              )
-            }
-          >
-            {({ isActive }) => (
-              <>
-                <Icon className="w-4 h-4 shrink-0" aria-hidden="true" />
-                {!collapsed && <span className="truncate">{label}</span>}
-                {isActive && <span className="sr-only">(página atual)</span>}
-              </>
-            )}
-          </RouterNavLink>
-        ))}
-      </nav>
-
-      <div className="p-2 border-t border-white/10">
-        <button
-          onClick={signOut}
-          aria-label="Sair da conta"
-          className={cn(
-            'flex items-center gap-3 w-full rounded-lg text-sm font-medium text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-white/8 transition-colors focus-ring',
-            collapsed ? 'justify-center px-2 py-2.5' : 'px-3 py-2.5'
-          )}
-        >
-          <LogOut className="w-4 h-4 shrink-0" aria-hidden="true" />
-          {!collapsed && <span>Sair</span>}
-        </button>
-      </div>
+      {renderHeader(false)}
+      {renderNav(false)}
+      {renderFooter(false)}
     </aside>
   );
 }
