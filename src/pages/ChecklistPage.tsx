@@ -252,7 +252,7 @@ export default function ChecklistPage() {
           placeholder="Data"
         />
         <Select value={filterResponsavel} onValueChange={setFilterResponsavel}>
-          <SelectTrigger className="w-48 h-8 text-xs"><SelectValue placeholder="Responsável" /></SelectTrigger>
+          <SelectTrigger className="w-48 h-8 text-xs"><SelectValue placeholder="RESPONSÁVEL" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Todos</SelectItem>
             {members.map((m: any) => (
@@ -260,8 +260,11 @@ export default function ChecklistPage() {
             ))}
           </SelectContent>
         </Select>
-        {(filterDate || (filterResponsavel && filterResponsavel !== 'all')) && (
-          <Button variant="ghost" size="sm" className="h-8 text-xs" onClick={() => { setFilterDate(''); setFilterResponsavel(''); }}>
+        <Button size="sm" className="h-8 text-xs" onClick={handleSearch}>
+          <Search className="w-3.5 h-3.5 mr-1" /> Pesquisar
+        </Button>
+        {(appliedDate || (appliedResponsavel && appliedResponsavel !== 'all')) && (
+          <Button variant="ghost" size="sm" className="h-8 text-xs" onClick={handleClearFilters}>
             Limpar
           </Button>
         )}
