@@ -507,6 +507,11 @@ function VehicleDetailContent({ vehicle, members, userId, kmTotal, fuelCostTotal
         km_saida: Number(kmSaida),
         observacoes: obs || null,
       });
+      await updateVehicle.mutateAsync({
+        id: vehicle.id,
+        status: 'em_uso',
+        responsavel_user_id: responsavelId && responsavelId !== 'none' ? responsavelId : null,
+      });
       setKmSaida('');
       setObs('');
       toast.success('Retirada registrada');
