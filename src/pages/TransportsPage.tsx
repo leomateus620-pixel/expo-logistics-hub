@@ -1084,14 +1084,50 @@ export default function TransportsPage() {
 }
 
 // Sub-component for transport location display
-function TransportLocationCard({ transportId, driverName, isMyTracking, onStopTracking, trackingError }: {
+function TransportLocationCard({ transportId, transport, driverName, isMyTracking, onStopTracking, trackingError }: {
   transportId: string;
+  transport?: any;
   driverName?: string;
   isMyTracking: boolean;
   onStopTracking: () => void;
   trackingError: string | null;
 }) {
   const location = useTransportLocation(transportId);
+  const [liveEta, setLiveEta] = useState<string | null>(null);
+  const lastFetchRef = useRef<number>(0);
+
+  // Fetch live ETA from Google Maps whenever location changes (throttled to every 2 min)
+  useEffect(() => {
+    if (!location || !transport) return;
+    const now = Date.now();
+    if (now - lastFetchRef.current < 120000) return; // throttle 2 min
+    lastFetchRef.current = now;
+
+    (async () => {
+      try {
+        const res = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/estimate-return`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
+            body: JSON.stringify({
+              origin_lat: location.latitude,
+              origin_lng: location.longitude,
+              destination: 'RETURN_TO_ORIGIN',
+            }),
+          }
+        );
+        const data = await res.json();
+        if (data.duration_minutes && !data.fallback) {
+          const eta = new Date(Date.now() + data.duration_minutes * 60000);
+          const formatted = eta.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
+          setLiveEta(`~${formatted} (${data.duration_minutes}min • ${data.distance_km}km)`);
+        }
+      } catch {
+        // silently fail, keep last ETA
+      }
+    })();
+  }, [location?.latitude, location?.longitude, transport]);
 
   if (!location && !isMyTracking) return null;
 
@@ -1125,6 +1161,12 @@ function TransportLocationCard({ transportId, driverName, isMyTracking, onStopTr
           Obtendo localização...
         </div>
       ) : null}
+      {liveEta && location && (
+        <div className="px-3 py-2 text-xs border-t bg-accent/5 flex items-center gap-2">
+          <Clock className="w-3.5 h-3.5 text-accent shrink-0" />
+          <span className="text-muted-foreground">Retorno estimado: <span className="font-medium text-foreground">{liveEta}</span></span>
+        </div>
+      )}
       {isMyTracking && (
         <button
           onClick={onStopTracking}
