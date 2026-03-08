@@ -908,6 +908,7 @@ export default function TransportsPage() {
             onDetail={() => openDetail(t)}
             onPDF={() => generatePDF(t)}
             getDriverCommission={getDriverCommission}
+            getGuestsForTransport={getGuestsForTransport}
           />
         ))}
         {filtered.length === 0 && (
