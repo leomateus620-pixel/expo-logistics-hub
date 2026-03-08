@@ -401,6 +401,17 @@ export default function TransportsPage() {
             </div>
           </div>
         )}
+        {data.titulo === 'Escolta Policial' && (
+          <div className="space-y-3 rounded-lg border border-border bg-muted/30 p-3">
+            <Label className="text-xs font-semibold text-foreground">🚔 Informações da Escolta</Label>
+            <Input placeholder="Nome do escoltado" value={data.escolta_nome} onChange={(e) => setData({ ...data, escolta_nome: e.target.value })} />
+            <Input placeholder="Cargo / Função" value={data.escolta_cargo} onChange={(e) => setData({ ...data, escolta_cargo: e.target.value })} />
+            <Input placeholder="Nº de viaturas necessárias" type="number" value={data.escolta_viaturas} onChange={(e) => setData({ ...data, escolta_viaturas: e.target.value })} />
+            <Input placeholder="Ponto de encontro" value={data.escolta_ponto_encontro} onChange={(e) => setData({ ...data, escolta_ponto_encontro: e.target.value })} />
+            <Input placeholder="Contato da segurança (tel)" value={data.escolta_contato_seguranca} onChange={(e) => setData({ ...data, escolta_contato_seguranca: e.target.value })} />
+            <Input placeholder="Observações de segurança" value={data.escolta_obs} onChange={(e) => setData({ ...data, escolta_obs: e.target.value })} />
+          </div>
+        )}
         {isEdit ? (
           <Select value={data.guest_id} onValueChange={(v) => setData({ ...data, guest_id: v })}>
             <SelectTrigger><SelectValue placeholder="Hóspede (opcional)" /></SelectTrigger>
