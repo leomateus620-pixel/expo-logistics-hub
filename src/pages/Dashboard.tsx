@@ -70,6 +70,12 @@ export default function Dashboard() {
             {upcomingTransports.length === 0 && <p className="text-sm text-muted-foreground">Nenhum transporte pendente.</p>}
             {upcomingTransports.map((t: any) => {
               const driver = members.find((m: any) => m.user_id === t.motorista_user_id);
+              const estDurationMin: Record<string, number> = { 'Aeroporto': 120, 'Hotel': 45, 'Parque': 30, 'Centro': 40, 'Escolta Policial': 90, 'Outros': 60 };
+              const retTime = t.fim_em
+                ? new Date(t.fim_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' })
+                : t.inicio_em
+                  ? new Date(new Date(t.inicio_em).getTime() + (estDurationMin[t.titulo] || 60) * 60000).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' })
+                  : null;
               return (
                 <div
                   key={t.id}
@@ -81,16 +87,21 @@ export default function Dashboard() {
                     <p className="text-xs text-muted-foreground">{t.origem} → {t.destino}</p>
                     {driver && <p className="text-[10px] text-muted-foreground">{driver.nome_exibicao || ''}</p>}
                   </div>
-                  <div className="text-center shrink-0 min-w-[60px]">
-                    <p className="text-[9px] uppercase text-muted-foreground font-medium">Saída</p>
-                    <p className="text-xs font-mono font-semibold">{t.horario_saida || rawTime(t.inicio_em)}</p>
-                  </div>
-                  {t.voo_chegada && (
-                    <div className="text-center shrink-0 min-w-[60px]">
-                      <p className="text-[9px] uppercase text-muted-foreground font-medium">Voo</p>
-                      <p className="text-xs font-mono font-semibold">{t.voo_chegada}</p>
+                  {/* Airport time highlighted */}
+                  {(t.voo_checkin || t.voo_chegada) && (
+                    <div className="text-center shrink-0 min-w-[50px]">
+                      <p className="text-[9px] uppercase text-muted-foreground font-medium">{t.voo_checkin ? 'Check' : 'Voo'}</p>
+                      <p className="text-sm font-mono font-bold text-primary">{t.voo_checkin || t.voo_chegada}</p>
                     </div>
                   )}
+                  <div className="text-center shrink-0 min-w-[44px]">
+                    <p className="text-[9px] uppercase text-muted-foreground font-medium">Saída</p>
+                    <p className="text-[11px] font-mono text-muted-foreground">{t.horario_saida || rawTime(t.inicio_em)}</p>
+                  </div>
+                  <div className="text-center shrink-0 min-w-[44px]">
+                    <p className="text-[9px] uppercase text-muted-foreground font-medium">Retorno</p>
+                    <p className="text-[11px] font-mono text-muted-foreground">{retTime || '—'}</p>
+                  </div>
                 </div>
               );
             })}
