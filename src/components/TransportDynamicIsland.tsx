@@ -254,7 +254,7 @@ export default function TransportDynamicIsland({
                       destLatLng={destCoords}
                       destLabel={t.destino}
                     />
-                    <div className="absolute top-2 right-2 flex items-center gap-1.5 bg-black/60 backdrop-blur-sm rounded-full px-2.5 py-1 text-[10px] font-medium text-white/90 border border-white/10">
+                    <div className="absolute top-2 right-2 flex items-center gap-1.5 bg-card/80 backdrop-blur-sm rounded-full px-2.5 py-1 text-[10px] font-medium text-foreground border border-border/40">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                       Ao vivo
                     </div>
