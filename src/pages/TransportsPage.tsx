@@ -762,7 +762,7 @@ export default function TransportsPage() {
               <div className="flex flex-wrap gap-1.5">
                 {vehicle && (
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-muted/50 text-[11px] text-muted-foreground">
-                    🚗 {vehicle.placa}
+                    🚗 {vehicle.placa}{vehicle.marca || vehicle.modelo ? ` • ${[vehicle.marca, vehicle.modelo].filter(Boolean).join(' ')}` : ''}{vehicle.cor ? ` ${vehicle.cor.toUpperCase()}` : ''}{vehicle.km_atual != null ? ` • ${Number(vehicle.km_atual).toLocaleString('pt-BR')} km` : ''}
                   </span>
                 )}
                 {driver && (
