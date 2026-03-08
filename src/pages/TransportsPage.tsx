@@ -86,6 +86,7 @@ export default function TransportsPage() {
       ${driverCommission ? `<div class="row"><span class="label">Comissão:</span><span class="value">${driverCommission}</span></div>` : ''}
       <div class="row"><span class="label">Veículo:</span><span class="value">${vehicle ? `${vehicle.placa} ${vehicle.modelo || ''}` : '—'}</span></div>
       <div class="row"><span class="label">Hóspede:</span><span class="value">${guest?.nome || '—'}</span></div>
+      ${guest?.hotel_nome ? `<div class="row"><span class="label">Hotel:</span><span class="value">${guest.hotel_nome}</span></div>` : ''}
       ${t.km_retirada != null ? `<div class="row"><span class="label">KM Retirada:</span><span class="value">${t.km_retirada}</span></div>` : ''}
       ${t.km_devolucao != null ? `<div class="row"><span class="label">KM Devolução:</span><span class="value">${t.km_devolucao}</span></div>` : ''}
       ${t.km_retirada != null && t.km_devolucao != null ? `<div class="row"><span class="label">KM Rodados:</span><span class="value">${Number(t.km_devolucao) - Number(t.km_retirada)}</span></div>` : ''}
@@ -547,7 +548,7 @@ export default function TransportsPage() {
                 )}
                 {guest && (
                   <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-muted/50 text-[11px] text-muted-foreground">
-                    🎫 {guest.nome}
+                    🎫 {guest.nome}{guest.hotel_nome ? ` • 🏨 ${guest.hotel_nome}` : ''}
                   </span>
                 )}
                 {t.km_retirada != null && (
@@ -669,6 +670,10 @@ export default function TransportsPage() {
                     <div>
                       <p className="text-xs text-muted-foreground">Hóspede</p>
                       <p className="font-medium">{guest?.nome || '—'}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Hotel</p>
+                      <p className="font-medium">{guest?.hotel_nome || '—'}</p>
                     </div>
                   </div>
                   {(t.km_retirada != null || t.km_devolucao != null) && (
