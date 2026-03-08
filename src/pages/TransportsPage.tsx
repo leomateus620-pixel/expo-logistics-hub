@@ -551,10 +551,11 @@ export default function TransportsPage() {
             <SelectContent>
               <SelectItem value="none">Nenhum</SelectItem>
               {vehicleList.map((v: any) => {
-                const isBusy = busyVehicleIds.has(v.id) && v.id !== data.vehicle_id;
+                const conflictInfo = data.inicio_em ? getVehicleConflictInfo(v.id, data.inicio_em, isEdit ? editForm?.id : undefined) : null;
+                const isBusy = !!conflictInfo && v.id !== data.vehicle_id;
                 return (
                   <SelectItem key={v.id} value={v.id} disabled={isBusy}>
-                    {v.placa} {v.modelo}{isBusy ? ' (em uso)' : ''}
+                    {v.placa} {v.modelo}{isBusy ? ` (${conflictInfo})` : ''}
                   </SelectItem>
                 );
               })}
