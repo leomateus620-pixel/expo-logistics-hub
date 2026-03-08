@@ -158,9 +158,8 @@ export default function TransportDynamicIsland({
         'relative overflow-hidden transition-all',
         'rounded-[22px]',
         // Liquid Glass dark capsule
-        'bg-foreground/90 text-background backdrop-blur-xl',
-        'border border-white/[0.08]',
-        'shadow-lg',
+        'bg-card/60 text-foreground backdrop-blur-xl',
+        'border border-border/40',
         expanded ? 'shadow-2xl' : 'shadow-md',
       )}
       style={{
