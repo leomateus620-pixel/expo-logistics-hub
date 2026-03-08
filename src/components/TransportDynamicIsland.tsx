@@ -358,7 +358,7 @@ export default function TransportDynamicIsland({
             )}
             <button
               onClick={(e) => { e.stopPropagation(); onDetail(); }}
-              className="flex items-center justify-center gap-1.5 h-9 px-4 rounded-xl bg-white/[0.08] hover:bg-white/[0.12] text-xs font-medium text-white/70 transition-all active:scale-[0.97]"
+              className="flex items-center justify-center gap-1.5 h-9 px-4 rounded-xl bg-muted/40 hover:bg-muted/60 text-xs font-medium text-foreground/70 transition-all active:scale-[0.97]"
             >
               <Eye className="w-3.5 h-3.5" /> Detalhes
             </button>
