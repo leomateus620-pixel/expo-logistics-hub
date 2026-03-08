@@ -42,5 +42,15 @@ export function useEvents() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['events'] }),
   });
 
-  return { events, isLoading, create, update };
+  const remove = useMutation({
+    mutationFn: async (id: string) => {
+      const { data: before } = await (supabase as any).from('events').select('*').eq('id', id).single();
+      const { error } = await (supabase as any).from('events').delete().eq('id', id);
+      if (error) throw error;
+      await logAudit({ orgId: orgId!, entity: 'events', entityId: id, action: 'delete', before });
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['events'] }),
+  });
+
+  return { events, isLoading, create, update, remove };
 }

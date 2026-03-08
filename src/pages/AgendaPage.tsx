@@ -1,7 +1,8 @@
 import { useEvents } from '@/hooks/useEvents';
 import { useOrgMembers } from '@/hooks/useOrgMembers';
+import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import { Badge } from '@/components/ui/badge';
-import { CalendarDays, Plus, Clock, MapPin, User, Pencil } from 'lucide-react';
+import { CalendarDays, Plus, Clock, MapPin, User, Pencil, Trash2 } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { cn, rawTime, todaySP } from '@/lib/utils';
@@ -16,8 +17,9 @@ import { toast } from 'sonner';
 const emptyForm = { titulo: '', descricao: '', inicio_em: '', fim_em: '', local: '', tipo_tag: '', responsavel_user_id: '', repetir_diariamente: false };
 
 export default function AgendaPage() {
-  const { events, create, update } = useEvents();
+  const { events, create, update, remove } = useEvents();
   const { members } = useOrgMembers();
+  const { myRole } = useCurrentOrg();
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
@@ -170,7 +172,18 @@ export default function AgendaPage() {
                         {e.tipo_tag && <Badge variant="outline" className="text-[10px]">{e.tipo_tag}</Badge>}
                       </div>
                     </div>
-                    <Pencil className="w-4 h-4 text-muted-foreground shrink-0" />
+                    <div className="flex items-center gap-1 shrink-0">
+                      <Pencil className="w-4 h-4 text-muted-foreground" />
+                      {(myRole === 'admin' || myRole === 'gestor') && (
+                        <button
+                          className="p-1 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                          onClick={(ev) => { ev.stopPropagation(); if (confirm('Excluir este evento?')) remove.mutate(e.id); }}
+                          aria-label="Excluir"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>

@@ -2,11 +2,12 @@ import { useEvents } from '@/hooks/useEvents';
 import { useTransports } from '@/hooks/useTransports';
 import { useOrgMembers } from '@/hooks/useOrgMembers';
 import { useAuth } from '@/hooks/useAuth';
+import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { CalendarDays, Clock, MapPin, User, Filter, Car } from 'lucide-react';
+import { CalendarDays, Clock, MapPin, User, Filter, Car, Trash2 } from 'lucide-react';
 import { rawTime, rawWeekday, rawDay, rawMonthShort } from '@/lib/utils';
 import { useState, useMemo, useEffect } from 'react';
 import { toast } from 'sonner';
@@ -28,10 +29,11 @@ interface UnifiedItem {
 }
 
 export default function VerEscalaPage() {
-  const { events, isLoading: eventsLoading } = useEvents();
-  const { transports, update: updateTransport, isLoading: transportsLoading } = useTransports();
+  const { events, isLoading: eventsLoading, remove: removeEvent } = useEvents();
+  const { transports, update: updateTransport, remove: removeTransport, isLoading: transportsLoading } = useTransports();
   const { members } = useOrgMembers();
   const { user } = useAuth();
+  const { myRole } = useCurrentOrg();
 
   // Pre-select logged-in user's member id
   const myMemberId = useMemo(() => {
@@ -170,9 +172,9 @@ export default function VerEscalaPage() {
                 </div>
                 {item.tipo_tag && <Badge variant="outline" className="text-[10px]">{item.tipo_tag}</Badge>}
 
-                {/* Transport action buttons */}
-                {item.tipo === 'transporte' && item.status && item.status !== 'concluido' && item.status !== 'cancelado' && (
-                  <div className="pt-1">
+                {/* Action buttons */}
+                <div className="flex items-center gap-2 pt-1">
+                  {item.tipo === 'transporte' && item.status && item.status !== 'concluido' && item.status !== 'cancelado' && (
                     <Button
                       size="sm"
                       variant={item.status === 'pendente' ? 'default' : 'secondary'}
@@ -181,8 +183,23 @@ export default function VerEscalaPage() {
                     >
                       {item.status === 'pendente' ? '▶ Iniciar' : '✓ Concluir'}
                     </Button>
-                  </div>
-                )}
+                  )}
+                  {(myRole === 'admin' || myRole === 'gestor') && (
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      className="h-7 text-xs text-destructive hover:text-destructive hover:bg-destructive/10"
+                      onClick={() => {
+                        if (confirm('Excluir este item?')) {
+                          if (item.tipo === 'transporte') removeTransport.mutate(item.id);
+                          else removeEvent.mutate(item.id);
+                        }
+                      }}
+                    >
+                      <Trash2 className="w-3 h-3 mr-1" /> Excluir
+                    </Button>
+                  )}
+                </div>
               </div>
             </div>
           ))}
