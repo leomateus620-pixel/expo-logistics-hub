@@ -7,11 +7,11 @@ import { useCommissions } from '@/hooks/useCommissions';
 import { useLocationTracking, useTransportLocation } from '@/hooks/useLocationTracking';
 import { useAuth } from '@/hooks/useAuth';
 import { Badge } from '@/components/ui/badge';
-import { MapPin, Plus, Check, Clock, X, Pencil, Search, XCircle, Trash2, FileText, Eye, ArrowRight, Plane, Navigation, MapPinOff } from 'lucide-react';
+import { MapPin, Plus, Check, Clock, X, Pencil, Search, XCircle, Trash2, FileText, Eye, ArrowRight, Plane, Navigation, MapPinOff, Route, Timer, Ruler, Play, Square, History, ChevronDown, ChevronUp } from 'lucide-react';
 import { cn, rawTime, rawDateShort, nowSP, nowSPLocal } from '@/lib/utils';
 import { useState, lazy, Suspense, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -19,22 +19,44 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import { Skeleton } from '@/components/ui/skeleton';
+import { supabase } from '@/integrations/supabase/client';
 
 const DriverLocationMap = lazy(() => import('@/components/DriverLocationMap'));
 
-const statusConfig: Record<string, { label: string; icon: typeof Check; class: string; dotClass: string }> = {
-  pendente: { label: 'Pendente', icon: Clock, class: 'bg-info/10 text-info', dotClass: 'bg-info' },
-  em_andamento: { label: 'Em andamento', icon: MapPin, class: 'bg-accent/10 text-accent', dotClass: 'bg-accent' },
-  concluido: { label: 'Concluído', icon: Check, class: 'bg-success/10 text-success', dotClass: 'bg-success' },
-  cancelado: { label: 'Cancelado', icon: X, class: 'bg-destructive/10 text-destructive', dotClass: 'bg-destructive' },
+/* ─── Status config ─── */
+const statusConfig: Record<string, { label: string; icon: typeof Check; class: string; dotClass: string; bgClass: string }> = {
+  pendente: { label: 'Pendente', icon: Clock, class: 'text-info', dotClass: 'bg-info', bgClass: 'bg-info/10 border-info/20' },
+  em_andamento: { label: 'Em trânsito', icon: Navigation, class: 'text-accent', dotClass: 'bg-accent', bgClass: 'bg-accent/10 border-accent/20' },
+  concluido: { label: 'Concluído', icon: Check, class: 'text-success', dotClass: 'bg-success', bgClass: 'bg-success/10 border-success/20' },
+  cancelado: { label: 'Cancelado', icon: X, class: 'text-destructive', dotClass: 'bg-destructive', bgClass: 'bg-destructive/10 border-destructive/20' },
 };
 
 const tituloOptions = ['Parque', 'Hotel', 'Aeroporto', 'Centro', 'Escolta Policial', 'Outros'];
 const cidadeAeroportoOptions = ['Chapecó', 'Santo Ângelo', 'Passo Fundo', 'Porto Alegre'];
 
-// Santa Rosa origin coords (Parque de Exposições)
 const SANTA_ROSA_LAT = -27.8708;
 const SANTA_ROSA_LNG = -54.4814;
+
+// Known destination coordinates for mini-map
+const knownDestCoords: Record<string, { lat: number; lng: number }> = {
+  'Parque': { lat: -27.8708, lng: -54.4814 },
+  'Hotel': { lat: -27.8711, lng: -54.4769 },
+  'Aeroporto_Chapecó': { lat: -27.1342, lng: -52.6566 },
+  'Aeroporto_Santo Ângelo': { lat: -28.2817, lng: -54.1691 },
+  'Aeroporto_Passo Fundo': { lat: -28.2437, lng: -52.3269 },
+  'Aeroporto_Porto Alegre': { lat: -29.9939, lng: -51.1711 },
+  'Centro': { lat: -27.8711, lng: -54.4769 },
+  'Escolta Policial': { lat: -27.8711, lng: -54.4769 },
+  'Outros': { lat: -27.8711, lng: -54.4769 },
+};
+
+function getDestCoords(t: any): { lat: number; lng: number } | null {
+  if (t.titulo === 'Aeroporto' && t.voo_cidade) {
+    return knownDestCoords[`Aeroporto_${t.voo_cidade}`] || null;
+  }
+  return knownDestCoords[t.titulo] || knownDestCoords['Outros'];
+}
 
 /** Fetch travel duration in minutes from Google Maps via edge function */
 async function fetchTravelMinutes(cidade: string): Promise<number | null> {
@@ -56,63 +78,68 @@ async function fetchTravelMinutes(cidade: string): Promise<number | null> {
   }
 }
 
-/** Subtract minutes from a HH:MM string, return new HH:MM or null */
+/** Fetch route preview (duration, distance, polyline) */
+async function fetchRoutePreview(destKey: string): Promise<{ duration_minutes: number; distance_km: number; polyline?: string } | null> {
+  try {
+    const dest = knownDestCoords[destKey] || knownDestCoords['Outros'];
+    const res = await fetch(
+      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/estimate-return`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
+        body: JSON.stringify({
+          mode: 'ROUTE_PREVIEW',
+          origin_lat: SANTA_ROSA_LAT,
+          origin_lng: SANTA_ROSA_LNG,
+          dest_lat: dest.lat,
+          dest_lng: dest.lng,
+          destination: destKey,
+        }),
+      }
+    );
+    const data = await res.json();
+    if (data.fallback) return null;
+    return { duration_minutes: data.duration_minutes, distance_km: data.distance_km, polyline: data.polyline };
+  } catch {
+    return null;
+  }
+}
+
 function subtractMinutes(time: string, mins: number): string | null {
   if (!time) return null;
   const [h, m] = time.split(':').map(Number);
   let totalMin = h * 60 + m - mins;
-  if (totalMin < 0) totalMin += 24 * 60; // wrap to previous day
+  if (totalMin < 0) totalMin += 24 * 60;
   const hh = String(Math.floor(totalMin / 60) % 24).padStart(2, '0');
   const mm = String(totalMin % 60).padStart(2, '0');
   return `${hh}:${mm}`;
 }
 
-/** Fixed departure buffers (in minutes before arrival/landing) per city */
 const DESEMBARQUE_BUFFER_MIN: Record<string, number> = {
-  'Chapecó': 270,       // 4h30
-  'Santo Ângelo': 90,   // 1h30
-  'Passo Fundo': 270,   // 4h30
-  'Porto Alegre': 480,  // 8h00
+  'Chapecó': 270, 'Santo Ângelo': 90, 'Passo Fundo': 270, 'Porto Alegre': 480,
 };
 const CHECKIN_BUFFER_MIN: Record<string, number> = {
-  'Chapecó': 330,       // 5h30
-  'Santo Ângelo': 150,  // 2h30
-  'Passo Fundo': 330,   // 5h30
-  'Porto Alegre': 510,  // 8h30
+  'Chapecó': 330, 'Santo Ângelo': 150, 'Passo Fundo': 330, 'Porto Alegre': 510,
 };
 
-/** Calculate suggested departure time based on travel + buffer */
 async function calcSuggestedDeparture(cidade: string, flightTime: string, isCheckin: boolean): Promise<string | null> {
   if (!cidade || !flightTime) return null;
-  if (isCheckin) {
-    const buffer = CHECKIN_BUFFER_MIN[cidade] || 330;
-    return subtractMinutes(flightTime, buffer);
-  }
-  // For arrivals, use fixed buffers
-  const buffer = DESEMBARQUE_BUFFER_MIN[cidade] || 270;
+  const buffer = isCheckin ? (CHECKIN_BUFFER_MIN[cidade] || 330) : (DESEMBARQUE_BUFFER_MIN[cidade] || 270);
   return subtractMinutes(flightTime, buffer);
 }
 
-// Estimated round-trip durations in minutes by transport type
 const estimatedDurationMin: Record<string, number> = {
-  'Aeroporto': 120,
-  'Hotel': 45,
-  'Parque': 30,
-  'Centro': 40,
-  'Escolta Policial': 90,
-  'Outros': 60,
+  'Aeroporto': 120, 'Hotel': 45, 'Parque': 30, 'Centro': 40, 'Escolta Policial': 90, 'Outros': 60,
 };
 
-/** Estimate the return time for a transport based on its type and start time */
 function estimateReturnTime(t: any): Date | null {
   if (!t.inicio_em) return null;
   if (t.fim_em) return new Date(t.fim_em);
   const start = new Date(t.inicio_em);
-  const durationMin = estimatedDurationMin[t.titulo] || 60;
+  const durationMin = t.duracao_estimada_min || estimatedDurationMin[t.titulo] || 60;
   return new Date(start.getTime() + durationMin * 60000);
 }
 
-/** Format estimated return time as HH:MM */
 function formatReturnTime(t: any): string | null {
   const ret = estimateReturnTime(t);
   if (!ret) return null;
@@ -166,6 +193,30 @@ function generateWhatsAppText(data: any, driver: any, vehicle: any, guest: any) 
   return lines.join('\n');
 }
 
+/** Decode Google polyline to array of [lat, lng] */
+function decodePolyline(encoded: string): [number, number][] {
+  const points: [number, number][] = [];
+  let index = 0, lat = 0, lng = 0;
+  while (index < encoded.length) {
+    let b, shift = 0, result = 0;
+    do { b = encoded.charCodeAt(index++) - 63; result |= (b & 0x1f) << shift; shift += 5; } while (b >= 0x20);
+    lat += (result & 1) ? ~(result >> 1) : (result >> 1);
+    shift = 0; result = 0;
+    do { b = encoded.charCodeAt(index++) - 63; result |= (b & 0x1f) << shift; shift += 5; } while (b >= 0x20);
+    lng += (result & 1) ? ~(result >> 1) : (result >> 1);
+    points.push([lat / 1e5, lng / 1e5]);
+  }
+  return points;
+}
+
+/* ─── Google Maps Static Mini Map URL ─── */
+function getMiniMapUrl(originLat: number, originLng: number, destLat: number, destLng: number, polyline?: string): string {
+  const key = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY; // We'll use a signed static map approach
+  // Use Google Maps Static API with the GOOGLE_MAPS_API_KEY via edge function proxy instead
+  // For now, use a simple Leaflet-rendered approach rather than static maps API
+  return '';
+}
+
 export default function TransportsPage() {
   const { transports, create, update, remove } = useTransports();
   const { members } = useOrgMembers();
@@ -176,11 +227,9 @@ export default function TransportsPage() {
   const { commissions } = useCommissions();
   const { user } = useAuth();
 
-  // Location tracking state
   const [trackingTransportId, setTrackingTransportId] = useState<string | null>(null);
   const locationTracker = useLocationTracking(trackingTransportId);
 
-  // Auto-start tracking when trackingTransportId is set
   useEffect(() => {
     if (trackingTransportId && !locationTracker.isTracking) {
       locationTracker.startTracking();
@@ -191,14 +240,10 @@ export default function TransportsPage() {
   const highlightId = searchParams.get('highlight');
   const highlightRef = useRef<HTMLDivElement>(null);
 
-  // Scroll to highlighted transport
   useEffect(() => {
     if (highlightId && highlightRef.current) {
       highlightRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      // Clear the param after scrolling
-      const timer = setTimeout(() => {
-        setSearchParams({}, { replace: true });
-      }, 3000);
+      const timer = setTimeout(() => setSearchParams({}, { replace: true }), 3000);
       return () => clearTimeout(timer);
     }
   }, [highlightId, transports]);
@@ -220,74 +265,36 @@ export default function TransportsPage() {
   const [filterStatus, setFilterStatus] = useState('');
   const [filterSearch, setFilterSearch] = useState('');
   const [searchInput, setSearchInput] = useState('');
+  const [showHistory, setShowHistory] = useState(false);
   const hasFilters = (!!filterMotorista && filterMotorista !== 'all') || !!filterData || (!!filterStatus && filterStatus !== 'all') || !!filterSearch;
 
   const [detailOpen, setDetailOpen] = useState(false);
   const [detailTransport, setDetailTransport] = useState<any>(null);
 
-  const openDetail = (t: any) => { setDetailTransport(t); setDetailOpen(true); };
-
-  const generatePDF = (t: any) => {
-    const driver = members.find((m: any) => m.user_id === t.motorista_user_id);
-    const vehicle = vehicles.find((v: any) => v.id === t.vehicle_id);
-    const guest = guests.find((g: any) => g.id === t.guest_id);
-    const sc = statusConfig[t.status] || statusConfig.pendente;
-    const driverCommission = t.motorista_user_id ? getDriverCommission(t.motorista_user_id) : null;
-
-    const printWindow = window.open('', '_blank');
-    if (!printWindow) { toast.error('Popup bloqueado pelo navegador'); return; }
-    printWindow.document.write(`<!DOCTYPE html><html><head><title>Transporte ${t.titulo || ''}</title><style>
-      body { font-family: 'Segoe UI', Arial, sans-serif; padding: 40px; max-width: 600px; margin: 0 auto; color: #1a1a1a; }
-      h1 { font-size: 18px; border-bottom: 2px solid #2d6a4f; padding-bottom: 8px; margin-bottom: 16px; color: #2d6a4f; }
-      .row { display: flex; gap: 8px; margin-bottom: 8px; }
-      .label { font-weight: 600; color: #555; font-size: 13px; min-width: 140px; }
-      .value { font-size: 14px; }
-      .flight { background: #f0f7f4; padding: 12px; border-radius: 8px; margin-top: 16px; }
-      .flight strong { color: #2d6a4f; }
-      .footer { margin-top: 24px; font-size: 11px; color: #888; border-top: 1px solid #ddd; padding-top: 8px; }
-    </style></head><body>
-      <h1>🚐 Transporte — ${t.titulo || 'Sem título'}</h1>
-      <div class="row"><span class="label">Status:</span><span class="value">${sc.label}</span></div>
-      <div class="row"><span class="label">Origem:</span><span class="value">${t.origem}</span></div>
-      <div class="row"><span class="label">Destino:</span><span class="value">${t.destino}</span></div>
-      <div class="row"><span class="label">Saída:</span><span class="value">${t.inicio_em ? new Date(t.inicio_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }) : '—'}</span></div>
-      ${t.fim_em ? `<div class="row"><span class="label">Devolução:</span><span class="value">${new Date(t.fim_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</span></div>` : ''}
-      <div class="row"><span class="label">Motorista:</span><span class="value">${driver?.nome_exibicao || '—'}</span></div>
-      ${driverCommission ? `<div class="row"><span class="label">Comissão:</span><span class="value">${driverCommission}</span></div>` : ''}
-      <div class="row"><span class="label">Veículo:</span><span class="value">${vehicle ? `${vehicle.placa} ${vehicle.modelo || ''}` : '—'}</span></div>
-      <div class="row"><span class="label">Hóspede:</span><span class="value">${guest?.nome || '—'}</span></div>
-      ${guest?.hotel_nome ? `<div class="row"><span class="label">Hotel:</span><span class="value">${guest.hotel_nome}</span></div>` : ''}
-      ${t.km_retirada != null ? `<div class="row"><span class="label">KM Retirada:</span><span class="value">${t.km_retirada}</span></div>` : ''}
-      ${t.km_devolucao != null ? `<div class="row"><span class="label">KM Devolução:</span><span class="value">${t.km_devolucao}</span></div>` : ''}
-      ${t.km_retirada != null && t.km_devolucao != null ? `<div class="row"><span class="label">KM Rodados:</span><span class="value">${Number(t.km_devolucao) - Number(t.km_retirada)}</span></div>` : ''}
-      ${t.titulo === 'Aeroporto' ? `<div class="flight"><strong>✈️ Informações do Voo</strong>
-        ${t.voo_cidade ? `<div class="row"><span class="label">Cidade:</span><span class="value">${t.voo_cidade}</span></div>` : ''}
-        ${t.voo_numero ? `<div class="row"><span class="label">Nº Voo:</span><span class="value">${t.voo_numero}</span></div>` : ''}
-        ${t.voo_checkin ? `<div class="row"><span class="label">Check-in:</span><span class="value">${t.voo_checkin}</span></div>` : ''}
-        ${t.voo_chegada ? `<div class="row"><span class="label">Chegada:</span><span class="value">${t.voo_chegada}</span></div>` : ''}
-        ${t.horario_saida ? `<div class="row"><span class="label">Saída p/ Aeroporto:</span><span class="value">${t.horario_saida}</span></div>` : ''}
-      </div>` : ''}
-      <div class="footer">Gerado em ${new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</div>
-    </body></html>`);
-    printWindow.document.close();
-    printWindow.print();
+  const [expandedCards, setExpandedCards] = useState<Set<string>>(new Set());
+  const toggleExpand = (id: string) => {
+    setExpandedCards(prev => {
+      const n = new Set(prev);
+      n.has(id) ? n.delete(id) : n.add(id);
+      return n;
+    });
   };
+
+  const openDetail = (t: any) => { setDetailTransport(t); setDetailOpen(true); };
 
   const availableVehicles = vehicles.filter((v: any) => v.status === 'disponivel');
 
-  // Check if a vehicle is busy at a given time (time-based conflict)
   const isVehicleBusyAt = (vehicleId: string, startTime: string, excludeTransportId?: string) => {
     return transports.some((t: any) => {
       if (t.vehicle_id !== vehicleId) return false;
       if (!['pendente', 'em_andamento'].includes(t.status)) return false;
       if (excludeTransportId && t.id === excludeTransportId) return false;
       const estReturn = estimateReturnTime(t);
-      if (!estReturn) return true; // can't estimate, assume busy
+      if (!estReturn) return true;
       return new Date(startTime) < estReturn;
     });
   };
 
-  // For backward compat in selector: check if vehicle has ANY active transport (used for label)
   const getVehicleConflictInfo = (vehicleId: string, startTime: string, excludeTransportId?: string) => {
     const conflicting = transports.find((t: any) => {
       if (t.vehicle_id !== vehicleId) return false;
@@ -324,6 +331,15 @@ export default function TransportsPage() {
       for (const gId of guestIds) {
         const destino = gId ? (guestDestinations[gId] || form.destino) : form.destino;
         if (!destino) continue;
+
+        // Fetch route estimate before creating
+        let routeData: { duration_minutes?: number; distance_km?: number; polyline?: string } = {};
+        const destKey = form.titulo === 'Aeroporto' && form.voo_cidade ? `Aeroporto_${form.voo_cidade}` : (form.titulo || 'Outros');
+        try {
+          const preview = await fetchRoutePreview(destKey);
+          if (preview) routeData = preview;
+        } catch { /* continue without route data */ }
+
         await create.mutateAsync({
           titulo: form.titulo || null,
           guest_id: gId || null,
@@ -340,10 +356,12 @@ export default function TransportsPage() {
           voo_chegada: form.titulo === 'Aeroporto' ? form.voo_chegada || null : null,
           horario_saida: form.titulo === 'Aeroporto' ? form.horario_saida || null : null,
           observacoes: buildEscoltaObs(form),
+          distancia_estimada_km: routeData.distance_km || null,
+          duracao_estimada_min: routeData.duration_minutes || null,
+          rota_polyline: routeData.polyline || null,
         });
       }
 
-      // If escort, generate WhatsApp text
       if (form.titulo === 'Escolta Policial') {
         const driver = members.find((m: any) => m.user_id === form.motorista_user_id);
         const vehicle = vehicles.find((v: any) => v.id === form.vehicle_id);
@@ -385,7 +403,7 @@ export default function TransportsPage() {
       const currentTransport = transports.find((t: any) => t.id === editId);
       const statusChanged = currentTransport && currentTransport.status !== editForm.status;
 
-      await update.mutateAsync({
+      const updatePayload: any = {
         id: editId,
         titulo: editForm.titulo || null,
         guest_id: editForm.guest_id && editForm.guest_id !== 'none' ? editForm.guest_id : null,
@@ -405,7 +423,14 @@ export default function TransportsPage() {
         voo_chegada: editForm.titulo === 'Aeroporto' ? editForm.voo_chegada || null : null,
         horario_saida: editForm.titulo === 'Aeroporto' ? editForm.horario_saida || null : null,
         observacoes: buildEscoltaObs(editForm),
-      });
+      };
+
+      // Save fim_real_em when completing
+      if (statusChanged && editForm.status === 'concluido') {
+        updatePayload.fim_real_em = new Date().toISOString();
+      }
+
+      await update.mutateAsync(updatePayload);
 
       if (statusChanged && editForm.status === 'concluido' && editForm.km_retirada && editForm.km_devolucao && editForm.vehicle_id && editForm.vehicle_id !== 'none') {
         try {
@@ -434,7 +459,6 @@ export default function TransportsPage() {
     if (idx < order.length - 1) {
       const newStatus = order[idx + 1];
       if (newStatus === 'concluido') {
-        // Stop tracking if this transport was being tracked
         if (trackingTransportId === t.id) {
           await locationTracker.stopTracking();
           setTrackingTransportId(null);
@@ -457,11 +481,11 @@ export default function TransportsPage() {
         setEditOpen(true);
         return;
       }
-      await update.mutateAsync({ id: t.id, status: newStatus });
-      // Start location tracking when initiating transport
+      // Starting trip — save inicio_real_em
+      await update.mutateAsync({ id: t.id, status: newStatus, inicio_real_em: new Date().toISOString() });
       if (newStatus === 'em_andamento') {
         setTrackingTransportId(t.id);
-        toast.success('Transporte iniciado — localização ativada');
+        toast.success('Viagem iniciada — localização ativada');
       }
     }
   };
@@ -480,11 +504,61 @@ export default function TransportsPage() {
       const haystack = [t.origem, t.destino, t.titulo, t.voo_numero, t.voo_cidade, driver?.nome_exibicao, guest?.nome].filter(Boolean).join(' ').toLowerCase();
       if (!haystack.includes(q)) return false;
     }
-    if (!hasFilters) {
+    if (!showHistory && !hasFilters) {
       if (t.status === 'concluido' && t.updated_at && t.updated_at < fourHoursAgo) return false;
     }
     return true;
   });
+
+  const activeCount = transports.filter((t: any) => t.status === 'em_andamento').length;
+  const pendingCount = transports.filter((t: any) => t.status === 'pendente').length;
+
+  const generatePDF = (t: any) => {
+    const driver = members.find((m: any) => m.user_id === t.motorista_user_id);
+    const vehicle = vehicles.find((v: any) => v.id === t.vehicle_id);
+    const guest = guests.find((g: any) => g.id === t.guest_id);
+    const sc = statusConfig[t.status] || statusConfig.pendente;
+    const driverCommission = t.motorista_user_id ? getDriverCommission(t.motorista_user_id) : null;
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) { toast.error('Popup bloqueado pelo navegador'); return; }
+    printWindow.document.write(`<!DOCTYPE html><html><head><title>Transporte ${t.titulo || ''}</title><style>
+      body { font-family: 'Segoe UI', Arial, sans-serif; padding: 40px; max-width: 600px; margin: 0 auto; color: #1a1a1a; }
+      h1 { font-size: 18px; border-bottom: 2px solid #2d6a4f; padding-bottom: 8px; margin-bottom: 16px; color: #2d6a4f; }
+      .row { display: flex; gap: 8px; margin-bottom: 8px; }
+      .label { font-weight: 600; color: #555; font-size: 13px; min-width: 140px; }
+      .value { font-size: 14px; }
+      .flight { background: #f0f7f4; padding: 12px; border-radius: 8px; margin-top: 16px; }
+      .flight strong { color: #2d6a4f; }
+      .footer { margin-top: 24px; font-size: 11px; color: #888; border-top: 1px solid #ddd; padding-top: 8px; }
+    </style></head><body>
+      <h1>🚐 Transporte — ${t.titulo || 'Sem título'}</h1>
+      <div class="row"><span class="label">Status:</span><span class="value">${sc.label}</span></div>
+      <div class="row"><span class="label">Origem:</span><span class="value">${t.origem}</span></div>
+      <div class="row"><span class="label">Destino:</span><span class="value">${t.destino}</span></div>
+      <div class="row"><span class="label">Saída:</span><span class="value">${t.inicio_em ? new Date(t.inicio_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }) : '—'}</span></div>
+      ${t.fim_em ? `<div class="row"><span class="label">Devolução:</span><span class="value">${new Date(t.fim_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</span></div>` : ''}
+      <div class="row"><span class="label">Motorista:</span><span class="value">${driver?.nome_exibicao || '—'}</span></div>
+      ${driverCommission ? `<div class="row"><span class="label">Comissão:</span><span class="value">${driverCommission}</span></div>` : ''}
+      <div class="row"><span class="label">Veículo:</span><span class="value">${vehicle ? `${vehicle.placa} ${vehicle.modelo || ''}` : '—'}</span></div>
+      <div class="row"><span class="label">Hóspede:</span><span class="value">${guest?.nome || '—'}</span></div>
+      ${guest?.hotel_nome ? `<div class="row"><span class="label">Hotel:</span><span class="value">${guest.hotel_nome}</span></div>` : ''}
+      ${t.distancia_estimada_km ? `<div class="row"><span class="label">Distância:</span><span class="value">${t.distancia_estimada_km} km</span></div>` : ''}
+      ${t.duracao_estimada_min ? `<div class="row"><span class="label">Tempo Estimado:</span><span class="value">${t.duracao_estimada_min} min</span></div>` : ''}
+      ${t.km_retirada != null ? `<div class="row"><span class="label">KM Retirada:</span><span class="value">${t.km_retirada}</span></div>` : ''}
+      ${t.km_devolucao != null ? `<div class="row"><span class="label">KM Devolução:</span><span class="value">${t.km_devolucao}</span></div>` : ''}
+      ${t.km_retirada != null && t.km_devolucao != null ? `<div class="row"><span class="label">KM Rodados:</span><span class="value">${Number(t.km_devolucao) - Number(t.km_retirada)}</span></div>` : ''}
+      ${t.titulo === 'Aeroporto' ? `<div class="flight"><strong>✈️ Informações do Voo</strong>
+        ${t.voo_cidade ? `<div class="row"><span class="label">Cidade:</span><span class="value">${t.voo_cidade}</span></div>` : ''}
+        ${t.voo_numero ? `<div class="row"><span class="label">Nº Voo:</span><span class="value">${t.voo_numero}</span></div>` : ''}
+        ${t.voo_checkin ? `<div class="row"><span class="label">Check-in:</span><span class="value">${t.voo_checkin}</span></div>` : ''}
+        ${t.voo_chegada ? `<div class="row"><span class="label">Chegada:</span><span class="value">${t.voo_chegada}</span></div>` : ''}
+        ${t.horario_saida ? `<div class="row"><span class="label">Saída p/ Aeroporto:</span><span class="value">${t.horario_saida}</span></div>` : ''}
+      </div>` : ''}
+      <div class="footer">Gerado em ${new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</div>
+    </body></html>`);
+    printWindow.document.close();
+    printWindow.print();
+  };
 
   const renderFormFields = (data: any, setData: (d: any) => void, isEdit: boolean) => {
     const driverCommission = data.motorista_user_id && data.motorista_user_id !== 'none'
@@ -508,7 +582,6 @@ export default function TransportsPage() {
             <Select value={data.voo_cidade} onValueChange={async (v) => {
               const updates: any = { ...data, voo_cidade: v };
               setData(updates);
-              // Recalculate departure with new city
               const flightTime = data.voo_checkin || data.voo_chegada;
               const isCheckin = !!data.voo_checkin;
               if (v && flightTime) {
@@ -521,11 +594,11 @@ export default function TransportsPage() {
                 {cidadeAeroportoOptions.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
               </SelectContent>
             </Select>
-            <Input placeholder="Nº do Voo" aria-label="Número do voo" value={data.voo_numero} onChange={(e) => setData({ ...data, voo_numero: e.target.value })} />
+            <Input placeholder="Nº do Voo" value={data.voo_numero} onChange={(e) => setData({ ...data, voo_numero: e.target.value })} />
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <Label className="text-xs text-muted-foreground mb-1 block">Horário Check-in</Label>
-                <Input type="time" aria-label="Horário check-in" value={data.voo_checkin} onChange={async (e) => {
+                <Label className="text-xs text-muted-foreground mb-1 block">Check-in</Label>
+                <Input type="time" value={data.voo_checkin} onChange={async (e) => {
                   const checkin = e.target.value;
                   setData({ ...data, voo_checkin: checkin });
                   if (checkin && data.voo_cidade) {
@@ -535,8 +608,8 @@ export default function TransportsPage() {
                 }} />
               </div>
               <div>
-                <Label className="text-xs text-muted-foreground mb-1 block">Horário Chegada do Voo</Label>
-                <Input type="time" aria-label="Horário chegada do voo" value={data.voo_chegada} onChange={async (e) => {
+                <Label className="text-xs text-muted-foreground mb-1 block">Chegada Voo</Label>
+                <Input type="time" value={data.voo_chegada} onChange={async (e) => {
                   const chegada = e.target.value;
                   setData({ ...data, voo_chegada: chegada });
                   if (chegada && data.voo_cidade && !data.voo_checkin) {
@@ -547,10 +620,10 @@ export default function TransportsPage() {
               </div>
             </div>
             <div>
-              <Label className="text-xs text-muted-foreground mb-1 block">Horário de Saída (sugerido pelo Google Maps)</Label>
-              <Input type="time" aria-label="Horário de saída para o aeroporto" value={data.horario_saida} onChange={(e) => setData({ ...data, horario_saida: e.target.value })} />
+              <Label className="text-xs text-muted-foreground mb-1 block">Saída (sugerido)</Label>
+              <Input type="time" value={data.horario_saida} onChange={(e) => setData({ ...data, horario_saida: e.target.value })} />
               <p className="text-[10px] text-muted-foreground mt-1">
-                {data.voo_checkin ? '⏱ Tempo de viagem + 1h de antecedência para check-in' : data.voo_chegada ? '⏱ Baseado no tempo de viagem Google Maps' : 'Preencha cidade e horário do voo para sugestão automática'}
+                {data.voo_checkin ? '⏱ Tempo de viagem + 1h para check-in' : data.voo_chegada ? '⏱ Baseado no Google Maps' : 'Preencha cidade e horário do voo'}
               </p>
             </div>
           </div>
@@ -560,10 +633,10 @@ export default function TransportsPage() {
             <Label className="text-xs font-semibold text-foreground">🚔 Informações da Escolta</Label>
             <Input placeholder="Nome do escoltado" value={data.escolta_nome} onChange={(e) => setData({ ...data, escolta_nome: e.target.value })} />
             <Input placeholder="Cargo / Função" value={data.escolta_cargo} onChange={(e) => setData({ ...data, escolta_cargo: e.target.value })} />
-            <Input placeholder="Nº de viaturas necessárias" type="number" value={data.escolta_viaturas} onChange={(e) => setData({ ...data, escolta_viaturas: e.target.value })} />
+            <Input placeholder="Nº de viaturas" type="number" value={data.escolta_viaturas} onChange={(e) => setData({ ...data, escolta_viaturas: e.target.value })} />
             <Input placeholder="Ponto de encontro" value={data.escolta_ponto_encontro} onChange={(e) => setData({ ...data, escolta_ponto_encontro: e.target.value })} />
-            <Input placeholder="Contato da segurança (tel)" value={data.escolta_contato_seguranca} onChange={(e) => setData({ ...data, escolta_contato_seguranca: e.target.value })} />
-            <Input placeholder="Observações de segurança" value={data.escolta_obs} onChange={(e) => setData({ ...data, escolta_obs: e.target.value })} />
+            <Input placeholder="Contato segurança" value={data.escolta_contato_seguranca} onChange={(e) => setData({ ...data, escolta_contato_seguranca: e.target.value })} />
+            <Input placeholder="Observações" value={data.escolta_obs} onChange={(e) => setData({ ...data, escolta_obs: e.target.value })} />
           </div>
         )}
         {isEdit ? (
@@ -623,9 +696,9 @@ export default function TransportsPage() {
           </div>
         )}
         <div className="grid grid-cols-2 gap-3">
-          <Input placeholder="Origem" aria-label="Origem" value={data.origem} onChange={(e) => setData({ ...data, origem: e.target.value })} />
+          <Input placeholder="Origem" value={data.origem} onChange={(e) => setData({ ...data, origem: e.target.value })} />
           {(isEdit || selectedGuests.length === 0) && (
-            <Input placeholder="Destino" aria-label="Destino" value={data.destino} onChange={(e) => setData({ ...data, destino: e.target.value })} />
+            <Input placeholder="Destino" value={data.destino} onChange={(e) => setData({ ...data, destino: e.target.value })} />
           )}
         </div>
         <div>
@@ -638,12 +711,12 @@ export default function TransportsPage() {
             <SelectContent>
               <SelectItem value="none">Nenhum</SelectItem>
               {vehicleList.map((v: any) => {
-                const editId = isEdit ? data.id : undefined;
-                const conflictInfo = data.inicio_em ? getVehicleConflictInfo(v.id, data.inicio_em, editId) : null;
+                const exId = isEdit ? data.id : undefined;
+                const conflictInfo = data.inicio_em ? getVehicleConflictInfo(v.id, data.inicio_em, exId) : null;
                 const isBusy = !!conflictInfo && v.id !== data.vehicle_id;
                 return (
                   <SelectItem key={v.id} value={v.id} disabled={isBusy}>
-                    {v.placa} {v.modelo}{isBusy ? ` (${conflictInfo})` : ''}
+                    {v.placa} {v.modelo || ''}{conflictInfo ? ` (${conflictInfo})` : ''}
                   </SelectItem>
                 );
               })}
@@ -658,15 +731,12 @@ export default function TransportsPage() {
           </Select>
         </div>
         {driverCommission && (
-          <div className="flex items-center gap-2">
-            <Label className="text-xs text-muted-foreground">Comissão:</Label>
-            <Badge variant="secondary">{driverCommission}</Badge>
-          </div>
+          <p className="text-xs text-muted-foreground">Comissão: <span className="font-medium text-foreground">{driverCommission}</span></p>
         )}
-        <Input placeholder="KM Retirada" aria-label="KM Retirada" type="number" value={data.km_retirada} onChange={(e) => setData({ ...data, km_retirada: e.target.value })} />
+        <Input placeholder="KM Retirada (odômetro)" type="number" value={data.km_retirada} onChange={(e) => setData({ ...data, km_retirada: e.target.value })} />
         {isConcluido && (
           <>
-            <Input placeholder="KM Devolução" aria-label="KM Devolução" type="number" value={data.km_devolucao} onChange={(e) => setData({ ...data, km_devolucao: e.target.value })} />
+            <Input placeholder="KM Devolução (odômetro)" type="number" value={data.km_devolucao} onChange={(e) => setData({ ...data, km_devolucao: e.target.value })} />
             <div>
               <Label className="text-xs text-muted-foreground mb-1 block">Data/Hora devolução</Label>
               <Input type="datetime-local" value={data.fim_em} onChange={(e) => setData({ ...data, fim_em: e.target.value })} />
@@ -678,26 +748,54 @@ export default function TransportsPage() {
   };
 
   return (
-    <div className="space-y-5">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Transportes</h1>
-          <p className="text-sm text-muted-foreground mt-1">Buscar e levar convidados</p>
+    <div className="space-y-4 pb-24">
+      {/* ─── Premium Header ─── */}
+      <div className="liquid-glass-card rounded-2xl p-4">
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            <h1 className="text-lg font-bold text-foreground tracking-tight">Transportes</h1>
+            <p className="text-xs text-muted-foreground mt-0.5">Gestão de viagens e logística</p>
+          </div>
+          <Button
+            onClick={openCreateDialog}
+            size="sm"
+            className="h-9 gap-1.5 rounded-xl shadow-sm active:scale-[0.97] transition-transform"
+          >
+            <Plus className="w-4 h-4" /> Novo
+          </Button>
         </div>
-        <Dialog open={open} onOpenChange={setOpen}>
-          <DialogTrigger asChild>
-            <Button size="sm" onClick={openCreateDialog}><Plus className="w-4 h-4 mr-1" /> Novo</Button>
-          </DialogTrigger>
-          <DialogContent className="max-h-[90vh] overflow-y-auto">
-            <DialogHeader><DialogTitle>Agendar Transporte</DialogTitle></DialogHeader>
-            {renderFormFields(form, setForm, false)}
-            <Button onClick={handleAdd} className="w-full" disabled={create.isPending}>Agendar</Button>
-          </DialogContent>
-        </Dialog>
+        {/* Status counters */}
+        <div className="flex gap-2">
+          {activeCount > 0 && (
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-accent/10 border border-accent/20">
+              <span className="w-1.5 h-1.5 rounded-full bg-accent animate-pulse" />
+              <span className="text-[11px] font-medium text-accent">{activeCount} em trânsito</span>
+            </div>
+          )}
+          {pendingCount > 0 && (
+            <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-info/10 border border-info/20">
+              <span className="w-1.5 h-1.5 rounded-full bg-info" />
+              <span className="text-[11px] font-medium text-info">{pendingCount} pendente{pendingCount > 1 ? 's' : ''}</span>
+            </div>
+          )}
+        </div>
       </div>
 
-      {/* Filters — stacked on mobile */}
+      {/* ─── Create Dialog ─── */}
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent className="max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Novo Transporte</DialogTitle>
+            <DialogDescription>Agende uma nova viagem</DialogDescription>
+          </DialogHeader>
+          {renderFormFields(form, setForm, false)}
+          <Button onClick={handleAdd} className="w-full" disabled={create.isPending}>
+            {create.isPending ? 'Salvando...' : 'Agendar Transporte'}
+          </Button>
+        </DialogContent>
+      </Dialog>
+
+      {/* ─── Filters ─── */}
       <div className="liquid-glass-card rounded-xl p-3 space-y-2">
         <div className="flex items-center gap-2">
           <div className="relative flex-1">
@@ -708,18 +806,13 @@ export default function TransportsPage() {
               onChange={(e) => setSearchInput(e.target.value)}
               onKeyDown={(e) => { if (e.key === 'Enter') setFilterSearch(searchInput); }}
               className="pl-9 h-9 text-xs"
-              aria-label="Pesquisar transporte"
             />
           </div>
-          <Button size="sm" className="h-9 text-xs shrink-0" onClick={() => setFilterSearch(searchInput)}>
-            Buscar
-          </Button>
+          <Button size="sm" className="h-9 text-xs shrink-0" onClick={() => setFilterSearch(searchInput)}>Buscar</Button>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
           <Select value={filterMotorista} onValueChange={setFilterMotorista}>
-            <SelectTrigger className="h-9 text-xs">
-              <SelectValue placeholder="Motorista" />
-            </SelectTrigger>
+            <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Motorista" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos</SelectItem>
               {members.map((m: any) => <SelectItem key={m.user_id} value={m.user_id}>{m.nome_exibicao}</SelectItem>)}
@@ -727,363 +820,299 @@ export default function TransportsPage() {
           </Select>
           <Input type="date" className="h-9 text-xs" value={filterData} onChange={(e) => setFilterData(e.target.value)} />
           <Select value={filterStatus} onValueChange={setFilterStatus}>
-            <SelectTrigger className="h-9 text-xs">
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
+            <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Status" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos</SelectItem>
               <SelectItem value="pendente">Pendente</SelectItem>
-              <SelectItem value="em_andamento">Em andamento</SelectItem>
+              <SelectItem value="em_andamento">Em trânsito</SelectItem>
               <SelectItem value="concluido">Concluído</SelectItem>
               <SelectItem value="cancelado">Cancelado</SelectItem>
             </SelectContent>
           </Select>
         </div>
-        {hasFilters && (
-          <Button size="sm" variant="ghost" className="h-8 text-xs w-full" onClick={() => { setFilterMotorista(''); setFilterData(''); setFilterStatus(''); setFilterSearch(''); setSearchInput(''); }}>
-            <XCircle className="w-3.5 h-3.5 mr-1" /> Limpar filtros
+        <div className="flex gap-2">
+          {hasFilters && (
+            <Button size="sm" variant="ghost" className="h-8 text-xs flex-1" onClick={() => { setFilterMotorista(''); setFilterData(''); setFilterStatus(''); setFilterSearch(''); setSearchInput(''); }}>
+              <XCircle className="w-3.5 h-3.5 mr-1" /> Limpar
+            </Button>
+          )}
+          <Button
+            size="sm"
+            variant={showHistory ? 'secondary' : 'ghost'}
+            className="h-8 text-xs"
+            onClick={() => setShowHistory(!showHistory)}
+          >
+            <History className="w-3.5 h-3.5 mr-1" /> {showHistory ? 'Ocultar histórico' : 'Ver histórico'}
           </Button>
-        )}
+        </div>
       </div>
 
-      {/* Edit Dialog */}
+      {/* ─── Edit Dialog ─── */}
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
         <DialogContent className="max-h-[90vh] overflow-y-auto">
-          <DialogHeader><DialogTitle>Editar Transporte</DialogTitle></DialogHeader>
+          <DialogHeader>
+            <DialogTitle>{editForm.status === 'concluido' ? 'Finalizar Viagem' : 'Editar Transporte'}</DialogTitle>
+            <DialogDescription>{editForm.status === 'concluido' ? 'Preencha os dados finais da viagem' : 'Atualize os dados do transporte'}</DialogDescription>
+          </DialogHeader>
           {renderFormFields(editForm, (d) => setEditForm({ ...d, status: editForm.status }), true)}
           <Select value={editForm.status} onValueChange={(v) => setEditForm({ ...editForm, status: v })}>
             <SelectTrigger><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="pendente">Pendente</SelectItem>
-              <SelectItem value="em_andamento">Em andamento</SelectItem>
+              <SelectItem value="em_andamento">Em trânsito</SelectItem>
               <SelectItem value="concluido">Concluído</SelectItem>
               <SelectItem value="cancelado">Cancelado</SelectItem>
             </SelectContent>
           </Select>
-          <Button onClick={handleEditSave} className="w-full" disabled={update.isPending}>Salvar</Button>
+          <Button onClick={handleEditSave} className="w-full active:scale-[0.97] transition-transform" disabled={update.isPending}>
+            {editForm.status === 'concluido' ? '✓ Finalizar Viagem' : 'Salvar'}
+          </Button>
         </DialogContent>
       </Dialog>
 
-      {/* WhatsApp Text Dialog */}
+      {/* ─── WhatsApp Dialog ─── */}
       <Dialog open={whatsappOpen} onOpenChange={setWhatsappOpen}>
         <DialogContent className="max-h-[90vh] overflow-y-auto">
-          <DialogHeader><DialogTitle>📋 Texto para WhatsApp</DialogTitle></DialogHeader>
-          <p className="text-xs text-muted-foreground">Copie o texto abaixo e envie ao responsável pela segurança:</p>
+          <DialogHeader>
+            <DialogTitle>📋 Texto para WhatsApp</DialogTitle>
+            <DialogDescription>Copie e envie ao responsável pela segurança</DialogDescription>
+          </DialogHeader>
           <div className="bg-muted rounded-lg p-4 text-sm whitespace-pre-wrap font-mono border">{whatsappText}</div>
-          <Button
-            onClick={() => {
-              navigator.clipboard.writeText(whatsappText);
-              toast.success('Texto copiado para a área de transferência!');
-            }}
-            className="w-full"
-          >
+          <Button onClick={() => { navigator.clipboard.writeText(whatsappText); toast.success('Copiado!'); }} className="w-full">
             📋 Copiar Texto
           </Button>
         </DialogContent>
       </Dialog>
 
-      {/* Transport Cards */}
+      {/* ─── Transport Cards ─── */}
       <div className="space-y-3">
-        {filtered.map((t: any) => {
-          const sc = statusConfig[t.status] || statusConfig.pendente;
-          const Icon = sc.icon;
-          const driver = members.find((m: any) => m.user_id === t.motorista_user_id);
-          const vehicle = vehicles.find((v: any) => v.id === t.vehicle_id);
-          const guest = guests.find((g: any) => g.id === t.guest_id);
-          const hasFlightInfo = t.titulo === 'Aeroporto' && (t.voo_cidade || t.voo_numero);
-
-          return (
-            <div
-              key={t.id}
-              ref={highlightId === t.id ? highlightRef : undefined}
-              className={cn(
-                'liquid-glass-card rounded-xl p-4 space-y-3 hover:shadow-md transition-all',
-                highlightId === t.id && 'ring-2 ring-primary ring-offset-2 ring-offset-background animate-pulse'
-              )}
-            >
-              {/* Header: Status + Title + Time */}
-              <div className="flex items-start justify-between gap-2">
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <div className={cn('w-9 h-9 rounded-lg flex items-center justify-center shrink-0', sc.class)}>
-                    <Icon className="w-4 h-4" />
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-sm font-semibold truncate">{t.titulo || (guest?.nome) || `${t.origem} → ${t.destino}`}</p>
-                    <Badge className={cn(sc.class, 'border-0 text-[10px] px-1.5 py-0 mt-0.5')}>{sc.label}</Badge>
-                  </div>
-                </div>
-                <div className="text-right shrink-0">
-                  {/* Airport time highlighted */}
-                  {(t.voo_checkin || t.voo_chegada) && (
-                    <div className="mb-1">
-                      <p className="text-[9px] uppercase text-muted-foreground font-medium">{t.voo_checkin ? 'Check-in' : 'Desembarque'}</p>
-                      <p className="text-base font-mono font-bold text-primary">{t.voo_checkin || t.voo_chegada}</p>
-                    </div>
-                  )}
-                  <div className="flex items-center gap-3 justify-end">
-                    <div>
-                      <p className="text-[9px] uppercase text-muted-foreground font-medium">Saída</p>
-                      <p className="text-xs font-mono text-muted-foreground">{t.horario_saida || rawTime(t.inicio_em)}</p>
-                    </div>
-                    <div>
-                      <p className="text-[9px] uppercase text-muted-foreground font-medium">Retorno</p>
-                      <p className="text-xs font-mono text-muted-foreground">{formatReturnTime(t) || '—'}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Route */}
-              <button
-                onClick={() => openDetail(t)}
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/40 hover:bg-muted/60 transition-colors text-left focus-ring"
-                aria-label="Ver detalhes do transporte"
-              >
-                <MapPin className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                <span className="text-sm font-medium truncate">{t.origem}</span>
-                <ArrowRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                <span className="text-sm font-medium truncate">{t.destino}</span>
-              </button>
-
-              {/* Info chips */}
-              <div className="flex flex-wrap gap-1.5">
-                {vehicle && (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-muted/50 text-[11px] text-muted-foreground">
-                    🚗 {vehicle.placa}{vehicle.marca || vehicle.modelo ? ` • ${[vehicle.marca, vehicle.modelo].filter(Boolean).join(' ')}` : ''}{vehicle.cor ? ` ${vehicle.cor.toUpperCase()}` : ''}{vehicle.km_atual != null ? ` • ${Number(vehicle.km_atual).toLocaleString('pt-BR')} km` : ''}
-                  </span>
-                )}
-                {driver && (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-muted/50 text-[11px] text-muted-foreground">
-                    👤 {(driver.nome_exibicao || '').split(' ')[0]}
-                  </span>
-                )}
-                {guest && (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-muted/50 text-[11px] text-muted-foreground">
-                    🎫 {guest.nome}{guest.hotel_nome ? ` • 🏨 ${guest.hotel_nome}` : ''}
-                  </span>
-                )}
-                {t.km_retirada != null && (
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-muted/50 text-[11px] text-muted-foreground">
-                    📏 {t.km_retirada} km
-                  </span>
-                )}
-              </div>
-
-              {/* Flight info mini-card */}
-              {hasFlightInfo && (
-                <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-info/5 border border-info/10 text-xs">
-                  <Plane className="w-3.5 h-3.5 text-info shrink-0" />
-                  <span className="text-muted-foreground">
-                    {t.voo_cidade && <span className="font-medium text-foreground">{t.voo_cidade}</span>}
-                    {t.voo_numero && <span className="ml-1.5">Voo {t.voo_numero}</span>}
-                    {t.voo_chegada && <span className="ml-1.5">• Chegada {t.voo_chegada}</span>}
-                    {t.horario_saida && <span className="ml-1.5">• Saída {t.horario_saida}</span>}
-                  </span>
-                </div>
-              )}
-
-              {/* Realtime location for em_andamento transports */}
-              {t.status === 'em_andamento' && (
-                <TransportLocationCard
-                  transportId={t.id}
-                  transport={t}
-                  driverName={driver?.nome_exibicao}
-                  isMyTracking={trackingTransportId === t.id}
-                  onStopTracking={async () => {
-                    await locationTracker.stopTracking();
-                    setTrackingTransportId(null);
-                  }}
-                  trackingError={trackingTransportId === t.id ? locationTracker.error : null}
-                />
-              )}
-
-              {/* Actions */}
-              <div className="flex items-center gap-2 pt-1">
-                {t.status !== 'concluido' && t.status !== 'cancelado' && (
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="flex-1 h-10 text-xs"
-                    onClick={() => cycleStatus(t)}
-                  >
-                    {t.status === 'pendente' ? (
-                      <><Navigation className="w-3.5 h-3.5 mr-1" /> Iniciar</>
-                    ) : 'Concluir'}
-                  </Button>
-                )}
-                {t.status === 'concluido' && (
-                  <div className="flex-1 flex items-center justify-center h-10">
-                    <Badge variant="secondary" className="gap-1"><Check className="w-3 h-3" /> Concluído</Badge>
-                  </div>
-                )}
-                <Button size="icon" variant="ghost" className="h-10 w-10 shrink-0" onClick={() => openEditDlg(t)} aria-label="Editar">
-                  <Pencil className="w-4 h-4" />
-                </Button>
-                <Button size="icon" variant="ghost" className="h-10 w-10 shrink-0 text-destructive hover:text-destructive" onClick={() => { if (confirm('Excluir este transporte?')) remove.mutate(t.id); }} aria-label="Excluir">
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
-          );
-        })}
+        {filtered.map((t: any) => (
+          <TransportCard
+            key={t.id}
+            t={t}
+            members={members}
+            vehicles={vehicles}
+            guests={guests}
+            highlightId={highlightId}
+            highlightRef={highlightId === t.id ? highlightRef : undefined}
+            trackingTransportId={trackingTransportId}
+            locationTracker={locationTracker}
+            setTrackingTransportId={setTrackingTransportId}
+            isExpanded={expandedCards.has(t.id)}
+            onToggleExpand={() => toggleExpand(t.id)}
+            onCycleStatus={() => cycleStatus(t)}
+            onEdit={() => openEditDlg(t)}
+            onDelete={() => { if (confirm('Excluir este transporte?')) remove.mutate(t.id); }}
+            onDetail={() => openDetail(t)}
+            onPDF={() => generatePDF(t)}
+            getDriverCommission={getDriverCommission}
+          />
+        ))}
         {filtered.length === 0 && (
-          <div className="text-center py-12 text-muted-foreground">
-            <MapPin className="w-8 h-8 mx-auto mb-2 opacity-50" />
-            <p className="text-sm">{hasFilters ? 'Nenhum transporte encontrado' : 'Nenhum transporte cadastrado'}</p>
+          <div className="liquid-glass-card rounded-2xl text-center py-16">
+            <div className="w-14 h-14 mx-auto mb-3 rounded-2xl bg-muted/60 flex items-center justify-center">
+              <MapPin className="w-6 h-6 text-muted-foreground/50" />
+            </div>
+            <p className="text-sm font-medium text-muted-foreground">{hasFilters ? 'Nenhum transporte encontrado' : 'Nenhum transporte cadastrado'}</p>
+            <p className="text-xs text-muted-foreground/60 mt-1">{hasFilters ? 'Ajuste os filtros para ver mais resultados' : 'Toque em "Novo" para agendar'}</p>
           </div>
         )}
       </div>
 
-      {/* Detail Dialog */}
+      {/* ─── Detail Dialog ─── */}
       <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
         <DialogContent className="max-h-[90vh] overflow-y-auto">
-          {detailTransport && (() => {
-            const t = detailTransport;
-            const sc = statusConfig[t.status] || statusConfig.pendente;
-            const driver = members.find((m: any) => m.user_id === t.motorista_user_id);
-            const vehicle = vehicles.find((v: any) => v.id === t.vehicle_id);
-            const guest = guests.find((g: any) => g.id === t.guest_id);
-            const driverCommission = t.motorista_user_id ? getDriverCommission(t.motorista_user_id) : null;
-
-            return (
-              <>
-                <DialogHeader>
-                  <DialogTitle className="flex items-center gap-2">
-                    <Eye className="w-5 h-5" />
-                    {t.titulo || `${t.origem} → ${t.destino}`}
-                  </DialogTitle>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <Badge className={cn(sc.class, 'border-0')}>{sc.label}</Badge>
-                    {t.prioridade && <Badge variant="outline" className="capitalize">{t.prioridade}</Badge>}
-                  </div>
-                  <Separator />
-                  <div className="grid grid-cols-2 gap-y-3 gap-x-4 text-sm">
-                    <div>
-                      <p className="text-xs text-muted-foreground">Origem</p>
-                      <p className="font-medium">{t.origem}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">Destino</p>
-                      <p className="font-medium">{t.destino}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">Data/Hora Saída</p>
-                      <p className="font-medium">{t.inicio_em ? new Date(t.inicio_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }) : '—'}</p>
-                    </div>
-                    {t.fim_em && (
-                      <div>
-                        <p className="text-xs text-muted-foreground">Data/Hora Devolução</p>
-                        <p className="font-medium">{new Date(t.fim_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</p>
-                      </div>
-                    )}
-                  </div>
-                  <Separator />
-                  <div className="grid grid-cols-2 gap-y-3 gap-x-4 text-sm">
-                    <div>
-                      <p className="text-xs text-muted-foreground">Motorista</p>
-                      <p className="font-medium">{driver?.nome_exibicao || '—'}</p>
-                    </div>
-                    {driverCommission && (
-                      <div>
-                        <p className="text-xs text-muted-foreground">Comissão</p>
-                        <p className="font-medium">{driverCommission}</p>
-                      </div>
-                    )}
-                    <div>
-                      <p className="text-xs text-muted-foreground">Veículo</p>
-                      <p className="font-medium">{vehicle ? `${vehicle.placa} ${vehicle.modelo || ''}` : '—'}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">Hóspede</p>
-                      <p className="font-medium">{guest?.nome || '—'}</p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted-foreground">Hotel</p>
-                      <p className="font-medium">{guest?.hotel_nome || '—'}</p>
-                    </div>
-                  </div>
-                  {(t.km_retirada != null || t.km_devolucao != null) && (
-                    <>
-                      <Separator />
-                      <div className="grid grid-cols-3 gap-y-3 gap-x-4 text-sm">
-                        {t.km_retirada != null && (
-                          <div>
-                            <p className="text-xs text-muted-foreground">KM Retirada</p>
-                            <p className="font-medium">{t.km_retirada}</p>
-                          </div>
-                        )}
-                        {t.km_devolucao != null && (
-                          <div>
-                            <p className="text-xs text-muted-foreground">KM Devolução</p>
-                            <p className="font-medium">{t.km_devolucao}</p>
-                          </div>
-                        )}
-                        {t.km_retirada != null && t.km_devolucao != null && (
-                          <div>
-                            <p className="text-xs text-muted-foreground">KM Rodados</p>
-                            <p className="font-medium">{Number(t.km_devolucao) - Number(t.km_retirada)}</p>
-                          </div>
-                        )}
-                      </div>
-                    </>
-                  )}
-                  {t.titulo === 'Aeroporto' && (t.voo_cidade || t.voo_numero || t.voo_checkin || t.voo_chegada || t.horario_saida) && (
-                    <>
-                      <Separator />
-                      <div className="rounded-lg bg-muted/40 p-3 space-y-3">
-                        <p className="text-sm font-semibold flex items-center gap-1">✈️ Informações do Voo</p>
-                        <div className="grid grid-cols-2 gap-y-2 gap-x-4 text-sm">
-                          {t.voo_cidade && (
-                            <div>
-                              <p className="text-xs text-muted-foreground">Cidade</p>
-                              <p className="font-medium">{t.voo_cidade}</p>
-                            </div>
-                          )}
-                          {t.voo_numero && (
-                            <div>
-                              <p className="text-xs text-muted-foreground">Nº Voo</p>
-                              <p className="font-medium">{t.voo_numero}</p>
-                            </div>
-                          )}
-                          {t.voo_checkin && (
-                            <div>
-                              <p className="text-xs text-muted-foreground">Check-in</p>
-                              <p className="font-medium">{t.voo_checkin}</p>
-                            </div>
-                          )}
-                          {t.voo_chegada && (
-                            <div>
-                              <p className="text-xs text-muted-foreground">Chegada do Voo</p>
-                              <p className="font-medium">{t.voo_chegada}</p>
-                            </div>
-                          )}
-                          {t.horario_saida && (
-                            <div>
-                              <p className="text-xs text-muted-foreground">Saída p/ Aeroporto</p>
-                              <p className="font-medium">{t.horario_saida}</p>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </>
-                  )}
-                  <Separator />
-                  <Button onClick={() => generatePDF(t)} variant="outline" className="w-full gap-2">
-                    <FileText className="w-4 h-4" /> Gerar PDF
-                  </Button>
-                </div>
-              </>
-            );
-          })()}
+          {detailTransport && <TransportDetailView t={detailTransport} members={members} vehicles={vehicles} guests={guests} getDriverCommission={getDriverCommission} onPDF={() => generatePDF(detailTransport)} />}
         </DialogContent>
       </Dialog>
     </div>
   );
 }
 
-// Sub-component for transport location display
+/* ═══════════════════════════════════════════════════════════════
+   Transport Card — Premium Liquid Glass
+   ═══════════════════════════════════════════════════════════════ */
+function TransportCard({ t, members, vehicles, guests, highlightId, highlightRef, trackingTransportId, locationTracker, setTrackingTransportId, isExpanded, onToggleExpand, onCycleStatus, onEdit, onDelete, onDetail, onPDF, getDriverCommission }: any) {
+  const sc = statusConfig[t.status] || statusConfig.pendente;
+  const Icon = sc.icon;
+  const driver = members.find((m: any) => m.user_id === t.motorista_user_id);
+  const vehicle = vehicles.find((v: any) => v.id === t.vehicle_id);
+  const guest = guests.find((g: any) => g.id === t.guest_id);
+  const hasFlightInfo = t.titulo === 'Aeroporto' && (t.voo_cidade || t.voo_numero);
+  const isActive = t.status === 'em_andamento';
+
+  return (
+    <div
+      ref={highlightRef}
+      className={cn(
+        'liquid-glass-card rounded-2xl overflow-hidden transition-all active:scale-[0.99]',
+        highlightId === t.id && 'ring-2 ring-primary ring-offset-2 ring-offset-background',
+        isActive && 'border-accent/30'
+      )}
+    >
+      {/* Active indicator bar */}
+      {isActive && <div className="h-0.5 bg-gradient-to-r from-accent/60 via-accent to-accent/60" />}
+
+      <div className="p-4 space-y-3">
+        {/* ─ Row 1: Status badge + title + times ─ */}
+        <div className="flex items-start justify-between gap-2">
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className={cn('w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border', sc.bgClass)}>
+              <Icon className={cn('w-4 h-4', sc.class)} />
+            </div>
+            <div className="min-w-0">
+              <p className="text-sm font-semibold truncate text-foreground">
+                {t.titulo || (guest?.nome) || `${t.origem} → ${t.destino}`}
+              </p>
+              <div className="flex items-center gap-1.5 mt-0.5">
+                <span className={cn('w-1.5 h-1.5 rounded-full', sc.dotClass, isActive && 'animate-pulse')} />
+                <span className={cn('text-[10px] font-medium', sc.class)}>{sc.label}</span>
+              </div>
+            </div>
+          </div>
+          <div className="text-right shrink-0 space-y-0.5">
+            {(t.voo_checkin || t.voo_chegada) && (
+              <div>
+                <p className="text-[9px] uppercase tracking-wider text-muted-foreground font-medium">{t.voo_checkin ? 'Check-in' : 'Desembarque'}</p>
+                <p className="text-base font-mono font-bold text-primary leading-tight">{t.voo_checkin || t.voo_chegada}</p>
+              </div>
+            )}
+            <div className="flex items-center gap-3 justify-end">
+              <div>
+                <p className="text-[9px] uppercase tracking-wider text-muted-foreground font-medium">Saída</p>
+                <p className="text-xs font-mono text-foreground/80">{t.horario_saida || rawTime(t.inicio_em)}</p>
+              </div>
+              <div>
+                <p className="text-[9px] uppercase tracking-wider text-muted-foreground font-medium">Retorno</p>
+                <p className="text-xs font-mono text-foreground/80">{formatReturnTime(t) || '—'}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* ─ Row 2: Route bar ─ */}
+        <button
+          onClick={onDetail}
+          className="w-full flex items-center gap-2 px-3 py-2.5 rounded-xl bg-muted/30 hover:bg-muted/50 active:scale-[0.98] transition-all text-left"
+        >
+          <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
+            <div className="w-2 h-2 rounded-full bg-primary" />
+          </div>
+          <span className="text-sm font-medium truncate text-foreground">{t.origem}</span>
+          <div className="flex-1 border-t border-dashed border-muted-foreground/30 mx-1" />
+          <ArrowRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+          <span className="text-sm font-medium truncate text-foreground">{t.destino}</span>
+          <div className="w-5 h-5 rounded-full bg-destructive/10 flex items-center justify-center shrink-0">
+            <div className="w-2 h-2 rounded-full bg-destructive" />
+          </div>
+        </button>
+
+        {/* ─ Row 3: ETA & Distance chips ─ */}
+        {(t.distancia_estimada_km || t.duracao_estimada_min) && (
+          <div className="flex gap-2">
+            {t.distancia_estimada_km && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-primary/5 border border-primary/10 text-[11px] font-medium text-primary">
+                <Ruler className="w-3 h-3" /> {t.distancia_estimada_km} km
+              </span>
+            )}
+            {t.duracao_estimada_min && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-primary/5 border border-primary/10 text-[11px] font-medium text-primary">
+                <Timer className="w-3 h-3" /> {t.duracao_estimada_min} min
+              </span>
+            )}
+          </div>
+        )}
+
+        {/* ─ Row 4: Info chips ─ */}
+        <div className="flex flex-wrap gap-1.5">
+          {vehicle && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-muted/40 text-[11px] text-muted-foreground">
+              🚗 {vehicle.placa}{vehicle.marca || vehicle.modelo ? ` • ${[vehicle.marca, vehicle.modelo].filter(Boolean).join(' ')}` : ''}{vehicle.cor ? ` ${vehicle.cor.toUpperCase()}` : ''}
+            </span>
+          )}
+          {driver && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-muted/40 text-[11px] text-muted-foreground">
+              👤 {(driver.nome_exibicao || '').split(' ')[0]}
+            </span>
+          )}
+          {guest && (
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-muted/40 text-[11px] text-muted-foreground">
+              🎫 {guest.nome}{guest.hotel_nome ? ` • 🏨 ${guest.hotel_nome}` : ''}
+            </span>
+          )}
+        </div>
+
+        {/* ─ Flight mini info ─ */}
+        {hasFlightInfo && (
+          <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-info/5 border border-info/10 text-xs">
+            <Plane className="w-3.5 h-3.5 text-info shrink-0" />
+            <span className="text-muted-foreground">
+              {t.voo_cidade && <span className="font-medium text-foreground">{t.voo_cidade}</span>}
+              {t.voo_numero && <span className="ml-1.5">Voo {t.voo_numero}</span>}
+              {t.voo_chegada && <span className="ml-1.5">• Chegada {t.voo_chegada}</span>}
+            </span>
+          </div>
+        )}
+
+        {/* ─ Live tracking map for active transports ─ */}
+        {isActive && (
+          <TransportLocationCard
+            transportId={t.id}
+            transport={t}
+            driverName={driver?.nome_exibicao}
+            isMyTracking={trackingTransportId === t.id}
+            onStopTracking={async () => {
+              await locationTracker.stopTracking();
+              setTrackingTransportId(null);
+            }}
+            trackingError={trackingTransportId === t.id ? locationTracker.error : null}
+          />
+        )}
+
+        {/* ─ Actions ─ */}
+        <div className="flex items-center gap-2 pt-1">
+          {t.status !== 'concluido' && t.status !== 'cancelado' && (
+            <Button
+              size="sm"
+              variant={t.status === 'pendente' ? 'default' : 'outline'}
+              className={cn(
+                'flex-1 h-10 text-xs rounded-xl font-medium active:scale-[0.97] transition-transform',
+                t.status === 'pendente' && 'shadow-sm'
+              )}
+              onClick={onCycleStatus}
+            >
+              {t.status === 'pendente' ? (
+                <><Play className="w-3.5 h-3.5 mr-1.5" /> Iniciar Viagem</>
+              ) : (
+                <><Square className="w-3.5 h-3.5 mr-1.5" /> Finalizar</>
+              )}
+            </Button>
+          )}
+          {t.status === 'concluido' && (
+            <div className="flex-1 flex items-center justify-center h-10">
+              <Badge className={cn(sc.bgClass, 'border gap-1 text-xs', sc.class)}>
+                <Check className="w-3 h-3" /> Concluído
+              </Badge>
+            </div>
+          )}
+          <Button size="icon" variant="ghost" className="h-10 w-10 shrink-0 rounded-xl" onClick={onEdit}>
+            <Pencil className="w-4 h-4" />
+          </Button>
+          <Button size="icon" variant="ghost" className="h-10 w-10 shrink-0 rounded-xl" onClick={onPDF}>
+            <FileText className="w-4 h-4" />
+          </Button>
+          <Button size="icon" variant="ghost" className="h-10 w-10 shrink-0 rounded-xl text-destructive hover:text-destructive" onClick={onDelete}>
+            <Trash2 className="w-4 h-4" />
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Transport Location Card (live map)
+   ═══════════════════════════════════════════════════════════════ */
 function TransportLocationCard({ transportId, transport, driverName, isMyTracking, onStopTracking, trackingError }: {
   transportId: string;
   transport?: any;
@@ -1096,11 +1125,24 @@ function TransportLocationCard({ transportId, transport, driverName, isMyTrackin
   const [liveEta, setLiveEta] = useState<string | null>(null);
   const lastFetchRef = useRef<number>(0);
 
-  // Fetch live ETA from Google Maps whenever location changes (throttled to every 2 min)
+  // Decode polyline from transport data
+  const routePolyline = useMemo(() => {
+    if (transport?.rota_polyline) {
+      try { return decodePolyline(transport.rota_polyline); } catch { return undefined; }
+    }
+    return undefined;
+  }, [transport?.rota_polyline]);
+
+  // Get destination coords
+  const destCoords = useMemo(() => {
+    const d = getDestCoords(transport);
+    return d ? [d.lat, d.lng] as [number, number] : undefined;
+  }, [transport?.titulo, transport?.voo_cidade]);
+
   useEffect(() => {
     if (!location || !transport) return;
     const now = Date.now();
-    if (now - lastFetchRef.current < 120000) return; // throttle 2 min
+    if (now - lastFetchRef.current < 120000) return;
     lastFetchRef.current = now;
 
     (async () => {
@@ -1123,18 +1165,22 @@ function TransportLocationCard({ transportId, transport, driverName, isMyTrackin
           const formatted = eta.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
           setLiveEta(`~${formatted} (${data.duration_minutes}min • ${data.distance_km}km)`);
         }
-      } catch {
-        // silently fail, keep last ETA
-      }
+      } catch { /* keep last ETA */ }
     })();
   }, [location?.latitude, location?.longitude, transport]);
 
   if (!location && !isMyTracking) return null;
 
   return (
-    <div className="rounded-lg border border-accent/20 overflow-hidden">
+    <div className="rounded-xl border border-accent/15 overflow-hidden">
       {location ? (
-        <Suspense fallback={<div className="h-[180px] bg-muted/50 flex items-center justify-center text-xs text-muted-foreground">Carregando mapa...</div>}>
+        <Suspense fallback={
+          <div className="h-[180px] bg-muted/30 flex items-center justify-center">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <Navigation className="w-4 h-4 animate-pulse" /> Carregando mapa...
+            </div>
+          </div>
+        }>
           <div className="relative">
             <DriverLocationMap
               latitude={location.latitude}
@@ -1143,8 +1189,11 @@ function TransportLocationCard({ transportId, transport, driverName, isMyTrackin
               speed={location.speed}
               driverName={driverName}
               className="h-[180px] relative"
+              routePolyline={routePolyline}
+              destLatLng={destCoords}
+              destLabel={transport?.destino}
             />
-            <div className="absolute top-2 right-2 flex items-center gap-1.5 bg-background/90 backdrop-blur-sm rounded-md px-2 py-1 text-[10px] font-medium border shadow-sm">
+            <div className="absolute top-2 right-2 flex items-center gap-1.5 bg-background/90 backdrop-blur-sm rounded-lg px-2 py-1 text-[10px] font-medium border shadow-sm">
               <span className="w-2 h-2 rounded-full bg-success animate-pulse" />
               Ao vivo
             </div>
@@ -1164,7 +1213,7 @@ function TransportLocationCard({ transportId, transport, driverName, isMyTrackin
       {liveEta && location && (
         <div className="px-3 py-2 text-xs border-t bg-accent/5 flex items-center gap-2">
           <Clock className="w-3.5 h-3.5 text-accent shrink-0" />
-          <span className="text-muted-foreground">Retorno estimado: <span className="font-medium text-foreground">{liveEta}</span></span>
+          <span className="text-muted-foreground">Retorno: <span className="font-medium text-foreground">{liveEta}</span></span>
         </div>
       )}
       {isMyTracking && (
@@ -1176,5 +1225,213 @@ function TransportLocationCard({ transportId, transport, driverName, isMyTrackin
         </button>
       )}
     </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   Transport Detail View (modal)
+   ═══════════════════════════════════════════════════════════════ */
+function TransportDetailView({ t, members, vehicles, guests, getDriverCommission, onPDF }: any) {
+  const sc = statusConfig[t.status] || statusConfig.pendente;
+  const driver = members.find((m: any) => m.user_id === t.motorista_user_id);
+  const vehicle = vehicles.find((v: any) => v.id === t.vehicle_id);
+  const guest = guests.find((g: any) => g.id === t.guest_id);
+  const driverCommission = t.motorista_user_id ? getDriverCommission(t.motorista_user_id) : null;
+
+  // Calculate real duration if available
+  const realDurationMin = t.inicio_real_em && t.fim_real_em
+    ? Math.round((new Date(t.fim_real_em).getTime() - new Date(t.inicio_real_em).getTime()) / 60000)
+    : null;
+  const kmRodados = t.km_retirada != null && t.km_devolucao != null
+    ? Number(t.km_devolucao) - Number(t.km_retirada)
+    : null;
+
+  return (
+    <>
+      <DialogHeader>
+        <DialogTitle className="flex items-center gap-2">
+          <Eye className="w-5 h-5" />
+          {t.titulo || `${t.origem} → ${t.destino}`}
+        </DialogTitle>
+        <DialogDescription>Detalhes do transporte</DialogDescription>
+      </DialogHeader>
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <Badge className={cn(sc.bgClass, 'border', sc.class)}>{sc.label}</Badge>
+          {t.prioridade && <Badge variant="outline" className="capitalize">{t.prioridade}</Badge>}
+        </div>
+
+        <Separator />
+
+        {/* Route info */}
+        <div className="grid grid-cols-2 gap-y-3 gap-x-4 text-sm">
+          <div>
+            <p className="text-xs text-muted-foreground">Origem</p>
+            <p className="font-medium">{t.origem}</p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">Destino</p>
+            <p className="font-medium">{t.destino}</p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">Data/Hora Saída</p>
+            <p className="font-medium">{t.inicio_em ? new Date(t.inicio_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }) : '—'}</p>
+          </div>
+          {t.fim_em && (
+            <div>
+              <p className="text-xs text-muted-foreground">Data/Hora Devolução</p>
+              <p className="font-medium">{new Date(t.fim_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</p>
+            </div>
+          )}
+        </div>
+
+        <Separator />
+
+        {/* People & vehicle */}
+        <div className="grid grid-cols-2 gap-y-3 gap-x-4 text-sm">
+          <div>
+            <p className="text-xs text-muted-foreground">Motorista</p>
+            <p className="font-medium">{driver?.nome_exibicao || '—'}</p>
+          </div>
+          {driverCommission && (
+            <div>
+              <p className="text-xs text-muted-foreground">Comissão</p>
+              <p className="font-medium">{driverCommission}</p>
+            </div>
+          )}
+          <div>
+            <p className="text-xs text-muted-foreground">Veículo</p>
+            <p className="font-medium">{vehicle ? `${vehicle.placa} ${vehicle.modelo || ''}` : '—'}</p>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">Hóspede</p>
+            <p className="font-medium">{guest?.nome || '—'}</p>
+          </div>
+          {guest?.hotel_nome && (
+            <div>
+              <p className="text-xs text-muted-foreground">Hotel</p>
+              <p className="font-medium">{guest.hotel_nome}</p>
+            </div>
+          )}
+        </div>
+
+        {/* Route metrics — predicted vs actual */}
+        {(t.distancia_estimada_km || t.duracao_estimada_min || kmRodados != null || realDurationMin != null) && (
+          <>
+            <Separator />
+            <div className="rounded-xl bg-muted/30 p-3 space-y-3">
+              <p className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                <Route className="w-3.5 h-3.5" /> Métricas da Viagem
+              </p>
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                {t.distancia_estimada_km && (
+                  <div>
+                    <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Distância estimada</p>
+                    <p className="font-mono font-medium">{t.distancia_estimada_km} km</p>
+                  </div>
+                )}
+                {kmRodados != null && (
+                  <div>
+                    <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Distância real</p>
+                    <p className="font-mono font-medium">{kmRodados} km</p>
+                  </div>
+                )}
+                {t.duracao_estimada_min && (
+                  <div>
+                    <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Tempo estimado</p>
+                    <p className="font-mono font-medium">{t.duracao_estimada_min} min</p>
+                  </div>
+                )}
+                {realDurationMin != null && (
+                  <div>
+                    <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Tempo real</p>
+                    <p className="font-mono font-medium">{realDurationMin} min</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* KM info */}
+        {(t.km_retirada != null || t.km_devolucao != null) && (
+          <>
+            <Separator />
+            <div className="grid grid-cols-3 gap-y-3 gap-x-4 text-sm">
+              {t.km_retirada != null && (
+                <div>
+                  <p className="text-xs text-muted-foreground">KM Retirada</p>
+                  <p className="font-medium">{t.km_retirada}</p>
+                </div>
+              )}
+              {t.km_devolucao != null && (
+                <div>
+                  <p className="text-xs text-muted-foreground">KM Devolução</p>
+                  <p className="font-medium">{t.km_devolucao}</p>
+                </div>
+              )}
+              {kmRodados != null && (
+                <div>
+                  <p className="text-xs text-muted-foreground">KM Rodados</p>
+                  <p className="font-medium">{kmRodados}</p>
+                </div>
+              )}
+            </div>
+          </>
+        )}
+
+        {/* Timeline history */}
+        {(t.inicio_real_em || t.fim_real_em) && (
+          <>
+            <Separator />
+            <div className="rounded-xl bg-muted/30 p-3 space-y-2">
+              <p className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                <History className="w-3.5 h-3.5" /> Histórico
+              </p>
+              <div className="space-y-2 text-xs">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-muted-foreground" />
+                  <span className="text-muted-foreground">Criado em {new Date(t.created_at).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</span>
+                </div>
+                {t.inicio_real_em && (
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-accent" />
+                    <span className="text-muted-foreground">Iniciado em {new Date(t.inicio_real_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</span>
+                  </div>
+                )}
+                {t.fim_real_em && (
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-success" />
+                    <span className="text-muted-foreground">Concluído em {new Date(t.fim_real_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </>
+        )}
+
+        {/* Flight info */}
+        {t.titulo === 'Aeroporto' && (t.voo_cidade || t.voo_numero || t.voo_checkin || t.voo_chegada || t.horario_saida) && (
+          <>
+            <Separator />
+            <div className="rounded-xl bg-muted/30 p-3 space-y-3">
+              <p className="text-sm font-semibold flex items-center gap-1">✈️ Informações do Voo</p>
+              <div className="grid grid-cols-2 gap-y-2 gap-x-4 text-sm">
+                {t.voo_cidade && <div><p className="text-xs text-muted-foreground">Cidade</p><p className="font-medium">{t.voo_cidade}</p></div>}
+                {t.voo_numero && <div><p className="text-xs text-muted-foreground">Nº Voo</p><p className="font-medium">{t.voo_numero}</p></div>}
+                {t.voo_checkin && <div><p className="text-xs text-muted-foreground">Check-in</p><p className="font-medium">{t.voo_checkin}</p></div>}
+                {t.voo_chegada && <div><p className="text-xs text-muted-foreground">Chegada</p><p className="font-medium">{t.voo_chegada}</p></div>}
+                {t.horario_saida && <div><p className="text-xs text-muted-foreground">Saída p/ Aeroporto</p><p className="font-medium">{t.horario_saida}</p></div>}
+              </div>
+            </div>
+          </>
+        )}
+
+        <Separator />
+        <Button onClick={onPDF} variant="outline" className="w-full gap-2 rounded-xl">
+          <FileText className="w-4 h-4" /> Gerar PDF
+        </Button>
+      </div>
+    </>
   );
 }
