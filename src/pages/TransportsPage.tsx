@@ -259,6 +259,8 @@ export default function TransportsPage() {
   const [newGuestForm, setNewGuestForm] = useState({ nome: '', telefone: '', email: '', hotel_nome: '', checkin_em: '', checkout_em: '', observacoes: '' });
   const [editShowNewGuestForm, setEditShowNewGuestForm] = useState(false);
   const [editNewGuestForm, setEditNewGuestForm] = useState({ nome: '', telefone: '', email: '', hotel_nome: '', checkin_em: '', checkout_em: '', observacoes: '' });
+  const [includeReturn, setIncludeReturn] = useState(false);
+  const [returnForm, setReturnForm] = useState({ inicio_em: '', voo_numero: '', voo_checkin: '', voo_chegada: '', horario_saida: '' });
 
   const [whatsappOpen, setWhatsappOpen] = useState(false);
   const [whatsappText, setWhatsappText] = useState('');
@@ -330,6 +332,8 @@ export default function TransportsPage() {
     setGuestDestinations({});
     setShowNewGuestForm(false);
     setNewGuestForm({ nome: '', telefone: '', email: '', hotel_nome: '', checkin_em: '', checkout_em: '', observacoes: '' });
+    setIncludeReturn(false);
+    setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', voo_chegada: '', horario_saida: '' });
     setOpen(true);
   };
 
@@ -385,11 +389,48 @@ export default function TransportsPage() {
         setWhatsappOpen(true);
       }
 
+      // Create return trip if enabled
+      if (includeReturn && form.titulo === 'Aeroporto' && returnForm.inicio_em) {
+        try {
+          const returnDestKey = form.voo_cidade ? `Aeroporto_${form.voo_cidade}` : 'Aeroporto';
+          let returnRouteData: { duration_minutes?: number; distance_km?: number; polyline?: string } = {};
+          try {
+            const preview = await fetchRoutePreview(returnDestKey);
+            if (preview) returnRouteData = preview;
+          } catch { /* silent */ }
+
+          const returnResult = await create.mutateAsync({
+            titulo: 'Aeroporto',
+            guest_id: selectedGuests.length > 0 ? selectedGuests[0] : null,
+            origem: destino || 'Santa Rosa',
+            destino: form.voo_cidade ? `Aeroporto ${form.voo_cidade}` : form.origem,
+            inicio_em: returnForm.inicio_em,
+            motorista_user_id: form.motorista_user_id && form.motorista_user_id !== 'none' ? form.motorista_user_id : null,
+            vehicle_id: form.vehicle_id && form.vehicle_id !== 'none' ? form.vehicle_id : null,
+            prioridade: form.prioridade,
+            voo_cidade: form.voo_cidade || null,
+            voo_numero: returnForm.voo_numero || null,
+            voo_checkin: returnForm.voo_checkin || null,
+            voo_chegada: null,
+            horario_saida: returnForm.horario_saida || null,
+            distancia_estimada_km: returnRouteData.distance_km || null,
+            duracao_estimada_min: returnRouteData.duration_minutes || null,
+            rota_polyline: returnRouteData.polyline || null,
+          });
+
+          if (selectedGuests.length > 0 && returnResult?.id) {
+            try { await setGuestsForTransport.mutateAsync({ transportId: returnResult.id, guestIds: selectedGuests }); } catch { /* silent */ }
+          }
+        } catch { /* silent - don't fail the main transport */ }
+      }
+
       setForm({ titulo: '', origem: '', destino: '', inicio_em: '', motorista_user_id: '', vehicle_id: '', prioridade: 'media', km_retirada: '', voo_cidade: '', voo_numero: '', voo_checkin: '', voo_chegada: '', horario_saida: '', escolta_nome: '', escolta_cargo: '', escolta_viaturas: '', escolta_ponto_encontro: '', escolta_contato_seguranca: '', escolta_obs: '' });
       setSelectedGuests([]);
       setGuestDestinations({});
+      setIncludeReturn(false);
+      setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', voo_chegada: '', horario_saida: '' });
       setOpen(false);
-      toast.success('Transporte agendado');
+      toast.success(includeReturn && form.titulo === 'Aeroporto' && returnForm.inicio_em ? 'Ida e volta agendados' : 'Transporte agendado');
     } catch (err: any) { toast.error(err.message); }
   };
 
@@ -604,6 +645,7 @@ export default function TransportsPage() {
           </SelectContent>
         </Select>
         {data.titulo === 'Aeroporto' && (
+          <>
           <div className="space-y-3 rounded-lg border border-border bg-muted/30 p-3">
             <Label className="text-xs font-semibold text-foreground">Informações do Voo</Label>
             <Select value={data.voo_cidade} onValueChange={async (v) => {
@@ -654,7 +696,45 @@ export default function TransportsPage() {
               </p>
             </div>
           </div>
+          {/* Return trip option - only in create mode */}
+          {!isEdit && (
+            <div className="space-y-3 rounded-lg border border-accent/30 bg-accent/5 p-3">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <Checkbox checked={includeReturn} onCheckedChange={(v) => setIncludeReturn(!!v)} />
+                <span className="text-xs font-semibold text-foreground">✈️ Agendar retorno ao aeroporto (volta)</span>
+              </label>
+              {includeReturn && (
+                <div className="space-y-3 pt-1">
+                  <p className="text-[10px] text-muted-foreground">Rota inversa: Hotel/Santa Rosa → Aeroporto {data.voo_cidade || ''}</p>
+                  <div>
+                    <Label className="text-xs text-muted-foreground mb-1 block">Data/Hora saída (volta)</Label>
+                    <DateTimePicker value={returnForm.inicio_em} onChange={(v) => setReturnForm(prev => ({ ...prev, inicio_em: v }))} placeholder="Data/Hora saída volta" />
+                  </div>
+                  <Input placeholder="Nº do Voo (volta)" value={returnForm.voo_numero} onChange={(e) => setReturnForm(prev => ({ ...prev, voo_numero: e.target.value }))} />
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label className="text-xs text-muted-foreground mb-1 block">Check-in Voo</Label>
+                      <Input type="time" value={returnForm.voo_checkin} onChange={async (e) => {
+                        const checkin = e.target.value;
+                        setReturnForm(prev => ({ ...prev, voo_checkin: checkin }));
+                        if (checkin && data.voo_cidade) {
+                          const suggested = await calcSuggestedDeparture(data.voo_cidade, checkin, true);
+                          if (suggested) setReturnForm(prev => ({ ...prev, voo_checkin: checkin, horario_saida: suggested }));
+                        }
+                      }} />
+                    </div>
+                    <div>
+                      <Label className="text-xs text-muted-foreground mb-1 block">Saída (sugerido)</Label>
+                      <Input type="time" value={returnForm.horario_saida} onChange={(e) => setReturnForm(prev => ({ ...prev, horario_saida: e.target.value }))} />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+          </>
         )}
+
         {data.titulo === 'Escolta Policial' && (
           <div className="space-y-3 rounded-lg border border-border bg-muted/30 p-3">
             <Label className="text-xs font-semibold text-foreground">🚔 Informações da Escolta</Label>
