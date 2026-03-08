@@ -212,7 +212,7 @@ export default function TransportDynamicIsland({
         {/* Right side: time or ETA */}
         {arrivalText && (
           <div className="shrink-0 text-right">
-            <span className="text-xs font-mono font-semibold text-white/70">{arrivalText}</span>
+            <span className="text-xs font-mono font-semibold text-foreground/70">{arrivalText}</span>
           </div>
         )}
       </button>
