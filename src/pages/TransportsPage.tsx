@@ -455,7 +455,21 @@ export default function TransportsPage() {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label className="text-xs text-muted-foreground mb-1 block">Horário Check-in</Label>
-                <Input type="time" aria-label="Horário check-in" value={data.voo_checkin} onChange={(e) => setData({ ...data, voo_checkin: e.target.value })} />
+                <Input type="time" aria-label="Horário check-in" value={data.voo_checkin} onChange={(e) => {
+                  const checkin = e.target.value;
+                  const updates: any = { ...data, voo_checkin: checkin };
+                  // Auto-set departure 1h before check-in
+                  if (checkin) {
+                    const [h, m] = checkin.split(':').map(Number);
+                    const totalMin = h * 60 + m - 60;
+                    if (totalMin >= 0) {
+                      const hh = String(Math.floor(totalMin / 60)).padStart(2, '0');
+                      const mm = String(totalMin % 60).padStart(2, '0');
+                      updates.horario_saida = `${hh}:${mm}`;
+                    }
+                  }
+                  setData(updates);
+                }} />
               </div>
               <div>
                 <Label className="text-xs text-muted-foreground mb-1 block">Horário Chegada do Voo</Label>
