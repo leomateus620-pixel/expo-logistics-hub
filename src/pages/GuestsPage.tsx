@@ -1,5 +1,6 @@
 import { useGuests } from '@/hooks/useGuests';
 import { useTransports } from '@/hooks/useTransports';
+import { useTransportGuests } from '@/hooks/useTransportGuests';
 import { Hotel, Plus, Pencil, Trash2, Phone, Mail, MapPin, AlertTriangle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -40,6 +41,7 @@ function GuestFormFields({ data, setData }: { data: GuestFormData; setData: (d: 
 export default function GuestsPage() {
   const { guests, create, update, remove } = useGuests();
   const { transports } = useTransports();
+  const { transportGuests } = useTransportGuests();
 
   const emptyForm: GuestFormData = { nome: '', telefone: '', email: '', tipo: 'outro', hotel_nome: '', checkin_em: '', checkout_em: '', observacoes: '' };
   const [addOpen, setAddOpen] = useState(false);
@@ -119,7 +121,8 @@ export default function GuestsPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {guests.map((g: any) => {
-          const linkedTransports = transports.filter((t: any) => t.guest_id === g.id);
+          const linkedTransportIds = transportGuests.filter((tg: any) => tg.guest_id === g.id).map((tg: any) => tg.transport_id);
+          const linkedTransports = transports.filter((t: any) => linkedTransportIds.includes(t.id) || t.guest_id === g.id);
           return (
             <div key={g.id} className="rounded-xl border bg-card p-5 hover:shadow-md transition-shadow">
               <div className="flex items-start justify-between mb-3">

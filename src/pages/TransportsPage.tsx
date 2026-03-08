@@ -6,6 +6,7 @@ import { useVehicleUsage } from '@/hooks/useVehicleUsage';
 import { useCommissions } from '@/hooks/useCommissions';
 import { useLocationTracking, useTransportLocation } from '@/hooks/useLocationTracking';
 import { useAuth } from '@/hooks/useAuth';
+import { useTransportGuests } from '@/hooks/useTransportGuests';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Plus, Check, Clock, X, Pencil, Search, XCircle, Trash2, FileText, Eye, ArrowRight, Plane, Navigation, MapPinOff, Route, Timer, Ruler, Play, Square, History, ChevronDown, ChevronUp } from 'lucide-react';
 import { cn, rawTime, rawDateShort, nowSP, nowSPLocal } from '@/lib/utils';
@@ -228,7 +229,7 @@ export default function TransportsPage() {
   const { update: updateVehicle } = useVehicles();
   const { commissions } = useCommissions();
   const { user } = useAuth();
-
+  const { getGuestsForTransport, setGuestsForTransport } = useTransportGuests();
   const [trackingTransportId, setTrackingTransportId] = useState<string | null>(null);
   const locationTracker = useLocationTracking(trackingTransportId);
 
@@ -260,7 +261,8 @@ export default function TransportsPage() {
 
   const [editOpen, setEditOpen] = useState(false);
   const [editId, setEditId] = useState('');
-  const [editForm, setEditForm] = useState({ titulo: '', guest_id: '', origem: '', destino: '', inicio_em: '', motorista_user_id: '', vehicle_id: '', prioridade: 'media', status: 'pendente', km_retirada: '', km_devolucao: '', fim_em: '', voo_cidade: '', voo_numero: '', voo_checkin: '', voo_chegada: '', horario_saida: '', escolta_nome: '', escolta_cargo: '', escolta_viaturas: '', escolta_ponto_encontro: '', escolta_contato_seguranca: '', escolta_obs: '' });
+  const [editGuests, setEditGuests] = useState<string[]>([]);
+  const [editForm, setEditForm] = useState({ titulo: '', origem: '', destino: '', inicio_em: '', motorista_user_id: '', vehicle_id: '', prioridade: 'media', status: 'pendente', km_retirada: '', km_devolucao: '', fim_em: '', voo_cidade: '', voo_numero: '', voo_checkin: '', voo_chegada: '', horario_saida: '', escolta_nome: '', escolta_cargo: '', escolta_viaturas: '', escolta_ponto_encontro: '', escolta_contato_seguranca: '', escolta_obs: '' });
 
   const [filterMotorista, setFilterMotorista] = useState('');
   const [filterData, setFilterData] = useState('');
@@ -327,41 +329,45 @@ export default function TransportsPage() {
 
   const handleAdd = async () => {
     if (!form.origem || !form.inicio_em) return;
-    const guestIds = selectedGuests.length > 0 ? selectedGuests : [null];
     if (selectedGuests.length === 0 && !form.destino) return;
     try {
-      for (const gId of guestIds) {
-        const destino = gId ? (guestDestinations[gId] || form.destino) : form.destino;
-        if (!destino) continue;
+      // Fetch route estimate
+      let routeData: { duration_minutes?: number; distance_km?: number; polyline?: string } = {};
+      const destKey = form.titulo === 'Aeroporto' && form.voo_cidade ? `Aeroporto_${form.voo_cidade}` : (form.titulo || 'Outros');
+      try {
+        const preview = await fetchRoutePreview(destKey);
+        if (preview) routeData = preview;
+      } catch { /* continue without route data */ }
 
-        // Fetch route estimate before creating
-        let routeData: { duration_minutes?: number; distance_km?: number; polyline?: string } = {};
-        const destKey = form.titulo === 'Aeroporto' && form.voo_cidade ? `Aeroporto_${form.voo_cidade}` : (form.titulo || 'Outros');
-        try {
-          const preview = await fetchRoutePreview(destKey);
-          if (preview) routeData = preview;
-        } catch { /* continue without route data */ }
+      // Determine destination: use first guest's hotel or form.destino
+      const destino = selectedGuests.length > 0
+        ? (guestDestinations[selectedGuests[0]] || form.destino || guests.find((g: any) => g.id === selectedGuests[0])?.hotel_nome || '')
+        : form.destino;
 
-        await create.mutateAsync({
-          titulo: form.titulo || null,
-          guest_id: gId || null,
-          origem: form.origem,
-          destino,
-          inicio_em: form.inicio_em,
-          motorista_user_id: form.motorista_user_id && form.motorista_user_id !== 'none' ? form.motorista_user_id : null,
-          vehicle_id: form.vehicle_id && form.vehicle_id !== 'none' ? form.vehicle_id : null,
-          prioridade: form.prioridade,
-          km_retirada: form.km_retirada ? Number(form.km_retirada) : null,
-          voo_cidade: form.titulo === 'Aeroporto' ? form.voo_cidade || null : null,
-          voo_numero: form.titulo === 'Aeroporto' ? form.voo_numero || null : null,
-          voo_checkin: form.titulo === 'Aeroporto' ? form.voo_checkin || null : null,
-          voo_chegada: form.titulo === 'Aeroporto' ? form.voo_chegada || null : null,
-          horario_saida: form.titulo === 'Aeroporto' ? form.horario_saida || null : null,
-          observacoes: buildEscoltaObs(form),
-          distancia_estimada_km: routeData.distance_km || null,
-          duracao_estimada_min: routeData.duration_minutes || null,
-          rota_polyline: routeData.polyline || null,
-        });
+      const result = await create.mutateAsync({
+        titulo: form.titulo || null,
+        guest_id: selectedGuests.length > 0 ? selectedGuests[0] : null,
+        origem: form.origem,
+        destino,
+        inicio_em: form.inicio_em,
+        motorista_user_id: form.motorista_user_id && form.motorista_user_id !== 'none' ? form.motorista_user_id : null,
+        vehicle_id: form.vehicle_id && form.vehicle_id !== 'none' ? form.vehicle_id : null,
+        prioridade: form.prioridade,
+        km_retirada: form.km_retirada ? Number(form.km_retirada) : null,
+        voo_cidade: form.titulo === 'Aeroporto' ? form.voo_cidade || null : null,
+        voo_numero: form.titulo === 'Aeroporto' ? form.voo_numero || null : null,
+        voo_checkin: form.titulo === 'Aeroporto' ? form.voo_checkin || null : null,
+        voo_chegada: form.titulo === 'Aeroporto' ? form.voo_chegada || null : null,
+        horario_saida: form.titulo === 'Aeroporto' ? form.horario_saida || null : null,
+        observacoes: buildEscoltaObs(form),
+        distancia_estimada_km: routeData.distance_km || null,
+        duracao_estimada_min: routeData.duration_minutes || null,
+        rota_polyline: routeData.polyline || null,
+      });
+
+      // Save all guests to junction table
+      if (selectedGuests.length > 0 && result?.id) {
+        try { await setGuestsForTransport.mutateAsync({ transportId: result.id, guestIds: selectedGuests }); } catch { /* silent */ }
       }
 
       if (form.titulo === 'Escolta Policial') {
@@ -377,15 +383,17 @@ export default function TransportsPage() {
       setSelectedGuests([]);
       setGuestDestinations({});
       setOpen(false);
-      toast.success(selectedGuests.length > 1 ? `${selectedGuests.length} transportes agendados` : 'Transporte agendado');
+      toast.success('Transporte agendado');
     } catch (err: any) { toast.error(err.message); }
   };
 
   const openEditDlg = (t: any) => {
     setEditId(t.id);
     const escoltaData = parseEscoltaFromObs(t.observacoes);
+    const linkedGuests = getGuestsForTransport(t.id);
+    setEditGuests(linkedGuests.length > 0 ? linkedGuests : (t.guest_id ? [t.guest_id] : []));
     setEditForm({
-      titulo: t.titulo || '', guest_id: t.guest_id || '', origem: t.origem, destino: t.destino,
+      titulo: t.titulo || '', origem: t.origem, destino: t.destino,
       inicio_em: t.inicio_em?.slice(0, 16) || '', motorista_user_id: t.motorista_user_id || '',
       vehicle_id: t.vehicle_id || '', prioridade: t.prioridade || 'media',
       status: t.status,
@@ -408,7 +416,7 @@ export default function TransportsPage() {
       const updatePayload: any = {
         id: editId,
         titulo: editForm.titulo || null,
-        guest_id: editForm.guest_id && editForm.guest_id !== 'none' ? editForm.guest_id : null,
+        guest_id: editGuests.length === 1 ? editGuests[0] : (editGuests.length > 0 ? editGuests[0] : null),
         origem: editForm.origem,
         destino: editForm.destino,
         inicio_em: editForm.inicio_em,
@@ -433,6 +441,9 @@ export default function TransportsPage() {
       }
 
       await update.mutateAsync(updatePayload);
+
+      // Sync junction table
+      try { await setGuestsForTransport.mutateAsync({ transportId: editId, guestIds: editGuests }); } catch { /* silent */ }
 
       if (statusChanged && editForm.status === 'concluido' && editForm.km_retirada && editForm.km_devolucao && editForm.vehicle_id && editForm.vehicle_id !== 'none') {
         try {
@@ -467,8 +478,10 @@ export default function TransportsPage() {
         }
         setEditId(t.id);
         const escoltaData = parseEscoltaFromObs(t.observacoes);
+        const linkedGuests2 = getGuestsForTransport(t.id);
+        setEditGuests(linkedGuests2.length > 0 ? linkedGuests2 : (t.guest_id ? [t.guest_id] : []));
         setEditForm({
-          titulo: t.titulo || '', guest_id: t.guest_id || '', origem: t.origem, destino: t.destino,
+          titulo: t.titulo || '', origem: t.origem, destino: t.destino,
           inicio_em: t.inicio_em?.slice(0, 16) || '', motorista_user_id: t.motorista_user_id || '',
           vehicle_id: t.vehicle_id || '', prioridade: t.prioridade || 'media',
           status: 'concluido',
@@ -502,8 +515,10 @@ export default function TransportsPage() {
     if (filterSearch) {
       const q = filterSearch.toLowerCase();
       const driver = members.find((m: any) => m.user_id === t.motorista_user_id);
-      const guest = guests.find((g: any) => g.id === t.guest_id);
-      const haystack = [t.origem, t.destino, t.titulo, t.voo_numero, t.voo_cidade, driver?.nome_exibicao, guest?.nome].filter(Boolean).join(' ').toLowerCase();
+      const linkedGIds = getGuestsForTransport(t.id);
+      const guestNames = linkedGIds.map((gid: string) => guests.find((g: any) => g.id === gid)?.nome).filter(Boolean);
+      if (guestNames.length === 0 && t.guest_id) { const g = guests.find((g: any) => g.id === t.guest_id); if (g) guestNames.push(g.nome); }
+      const haystack = [t.origem, t.destino, t.titulo, t.voo_numero, t.voo_cidade, driver?.nome_exibicao, ...guestNames].filter(Boolean).join(' ').toLowerCase();
       if (!haystack.includes(q)) return false;
     }
     if (!showHistory && !hasFilters) {
@@ -518,7 +533,11 @@ export default function TransportsPage() {
   const generatePDF = (t: any) => {
     const driver = members.find((m: any) => m.user_id === t.motorista_user_id);
     const vehicle = vehicles.find((v: any) => v.id === t.vehicle_id);
-    const guest = guests.find((g: any) => g.id === t.guest_id);
+    const linkedGIds = getGuestsForTransport(t.id);
+    const pdfGuests = linkedGIds.length > 0
+      ? linkedGIds.map((gid: string) => guests.find((g: any) => g.id === gid)).filter(Boolean)
+      : (t.guest_id ? [guests.find((g: any) => g.id === t.guest_id)].filter(Boolean) : []);
+    const guest = pdfGuests[0] || null;
     const sc = statusConfig[t.status] || statusConfig.pendente;
     const driverCommission = t.motorista_user_id ? getDriverCommission(t.motorista_user_id) : null;
     const printWindow = window.open('', '_blank');
@@ -542,8 +561,8 @@ export default function TransportsPage() {
       <div class="row"><span class="label">Motorista:</span><span class="value">${driver?.nome_exibicao || '—'}</span></div>
       ${driverCommission ? `<div class="row"><span class="label">Comissão:</span><span class="value">${driverCommission}</span></div>` : ''}
       <div class="row"><span class="label">Veículo:</span><span class="value">${vehicle ? `${vehicle.placa} ${vehicle.modelo || ''}` : '—'}</span></div>
-      <div class="row"><span class="label">Hóspede:</span><span class="value">${guest?.nome || '—'}</span></div>
-      ${guest?.hotel_nome ? `<div class="row"><span class="label">Hotel:</span><span class="value">${guest.hotel_nome}</span></div>` : ''}
+      <div class="row"><span class="label">Hóspede${pdfGuests.length > 1 ? 's' : ''}:</span><span class="value">${pdfGuests.length > 0 ? pdfGuests.map((g: any) => g.nome).join(', ') : '—'}</span></div>
+      ${pdfGuests.some((g: any) => g.hotel_nome) ? `<div class="row"><span class="label">Hotel:</span><span class="value">${[...new Set(pdfGuests.map((g: any) => g.hotel_nome).filter(Boolean))].join(', ')}</span></div>` : ''}
       ${t.distancia_estimada_km ? `<div class="row"><span class="label">Distância:</span><span class="value">${t.distancia_estimada_km} km</span></div>` : ''}
       ${t.duracao_estimada_min ? `<div class="row"><span class="label">Tempo Estimado:</span><span class="value">${t.duracao_estimada_min} min</span></div>` : ''}
       ${t.km_retirada != null ? `<div class="row"><span class="label">KM Retirada:</span><span class="value">${t.km_retirada}</span></div>` : ''}
@@ -641,26 +660,23 @@ export default function TransportsPage() {
             <Input placeholder="Observações" value={data.escolta_obs} onChange={(e) => setData({ ...data, escolta_obs: e.target.value })} />
           </div>
         )}
-        {isEdit ? (
-          <Select value={data.guest_id} onValueChange={(v) => setData({ ...data, guest_id: v })}>
-            <SelectTrigger><SelectValue placeholder="Hóspede (opcional)" /></SelectTrigger>
-            <SelectContent>
-              <SelectItem value="none">Nenhum</SelectItem>
-              {guests.map((g: any) => <SelectItem key={g.id} value={g.id}>{g.nome}{g.hotel_nome ? ` — ${g.hotel_nome}` : ''}</SelectItem>)}
-            </SelectContent>
-          </Select>
-        ) : (
-          <div className="space-y-2">
-            <Label className="text-xs font-semibold text-foreground">Hóspedes (opcional)</Label>
-            <div className="max-h-40 overflow-y-auto rounded-lg border border-border p-2 space-y-1">
-              {guests.length === 0 && <p className="text-xs text-muted-foreground py-1">Nenhum hóspede cadastrado</p>}
-              {guests.map((g: any) => {
-                const checked = selectedGuests.includes(g.id);
-                return (
-                  <label key={g.id} className="flex items-center gap-2 py-1.5 px-2 rounded-md hover:bg-muted/50 cursor-pointer text-sm">
-                    <Checkbox
-                      checked={checked}
-                      onCheckedChange={(v) => {
+        {/* Guest selection - always multi-select */}
+        <div className="space-y-2">
+          <Label className="text-xs font-semibold text-foreground">Hóspedes (opcional)</Label>
+          <div className="max-h-40 overflow-y-auto rounded-lg border border-border p-2 space-y-1">
+            {guests.length === 0 && <p className="text-xs text-muted-foreground py-1">Nenhum hóspede cadastrado</p>}
+            {guests.map((g: any) => {
+              const currentSelected = isEdit ? editGuests : selectedGuests;
+              const checked = currentSelected.includes(g.id);
+              return (
+                <label key={g.id} className="flex items-center gap-2 py-1.5 px-2 rounded-md hover:bg-muted/50 cursor-pointer text-sm">
+                  <Checkbox
+                    checked={checked}
+                    onCheckedChange={(v) => {
+                      if (isEdit) {
+                        if (v) setEditGuests(prev => [...prev, g.id]);
+                        else setEditGuests(prev => prev.filter(id => id !== g.id));
+                      } else {
                         if (v) {
                           setSelectedGuests(prev => [...prev, g.id]);
                           setGuestDestinations(prev => ({ ...prev, [g.id]: g.hotel_nome || '' }));
@@ -668,40 +684,29 @@ export default function TransportsPage() {
                           setSelectedGuests(prev => prev.filter(id => id !== g.id));
                           setGuestDestinations(prev => { const n = { ...prev }; delete n[g.id]; return n; });
                         }
-                      }}
-                    />
-                    <span className="flex-1">{g.nome}</span>
-                    {g.hotel_nome && <span className="text-xs text-muted-foreground">{g.hotel_nome}</span>}
-                  </label>
-                );
-              })}
-            </div>
-            {selectedGuests.length > 0 && (
-              <div className="space-y-2 rounded-lg border border-border bg-muted/30 p-3">
-                <Label className="text-xs font-semibold text-foreground">Destino por hóspede</Label>
-                {selectedGuests.map((gId) => {
-                  const g = guests.find((x: any) => x.id === gId);
-                  return (
-                    <div key={gId} className="flex items-center gap-2">
-                      <span className="text-sm min-w-[100px] truncate">{g?.nome}</span>
-                      <Input
-                        placeholder="Destino (hotel)"
-                        value={guestDestinations[gId] || ''}
-                        onChange={(e) => setGuestDestinations(prev => ({ ...prev, [gId]: e.target.value }))}
-                        className="flex-1 h-8 text-sm"
-                      />
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+                      }
+                    }}
+                  />
+                  <span className="flex-1">{g.nome}</span>
+                  {g.hotel_nome && <span className="text-xs text-muted-foreground">{g.hotel_nome}</span>}
+                </label>
+              );
+            })}
           </div>
-        )}
+          {!isEdit && selectedGuests.length > 1 && (
+            <p className="text-[10px] text-muted-foreground">
+              {selectedGuests.length} hóspedes selecionados — todos no mesmo transporte
+            </p>
+          )}
+          {isEdit && editGuests.length > 1 && (
+            <p className="text-[10px] text-muted-foreground">
+              {editGuests.length} hóspedes vinculados a este transporte
+            </p>
+          )}
+        </div>
         <div className="grid grid-cols-2 gap-3">
           <Input placeholder="Origem" value={data.origem} onChange={(e) => setData({ ...data, origem: e.target.value })} />
-          {(isEdit || selectedGuests.length === 0) && (
-            <Input placeholder="Destino" value={data.destino} onChange={(e) => setData({ ...data, destino: e.target.value })} />
-          )}
+          <Input placeholder="Destino" value={data.destino} onChange={(e) => setData({ ...data, destino: e.target.value })} />
         </div>
         <div>
           <Label className="text-xs text-muted-foreground mb-1 block">Data/Hora saída</Label>
@@ -909,6 +914,7 @@ export default function TransportsPage() {
             onDetail={() => openDetail(t)}
             onPDF={() => generatePDF(t)}
             getDriverCommission={getDriverCommission}
+            getGuestsForTransport={getGuestsForTransport}
           />
         ))}
         {filtered.length === 0 && (
@@ -925,7 +931,7 @@ export default function TransportsPage() {
       {/* ─── Detail Dialog ─── */}
       <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
         <DialogContent className="max-h-[90vh] overflow-y-auto">
-          {detailTransport && <TransportDetailView t={detailTransport} members={members} vehicles={vehicles} guests={guests} getDriverCommission={getDriverCommission} onPDF={() => generatePDF(detailTransport)} />}
+          {detailTransport && <TransportDetailView t={detailTransport} members={members} vehicles={vehicles} guests={guests} getDriverCommission={getDriverCommission} getGuestsForTransport={getGuestsForTransport} onPDF={() => generatePDF(detailTransport)} />}
         </DialogContent>
       </Dialog>
     </div>
@@ -935,12 +941,16 @@ export default function TransportsPage() {
 /* ═══════════════════════════════════════════════════════════════
    Transport Card — Premium Liquid Glass
    ═══════════════════════════════════════════════════════════════ */
-function TransportCard({ t, members, vehicles, guests, highlightId, highlightRef, trackingTransportId, locationTracker, setTrackingTransportId, isExpanded, onToggleExpand, onCycleStatus, onEdit, onDelete, onDetail, onPDF, getDriverCommission }: any) {
+function TransportCard({ t, members, vehicles, guests, highlightId, highlightRef, trackingTransportId, locationTracker, setTrackingTransportId, isExpanded, onToggleExpand, onCycleStatus, onEdit, onDelete, onDetail, onPDF, getDriverCommission, getGuestsForTransport }: any) {
   const sc = statusConfig[t.status] || statusConfig.pendente;
   const Icon = sc.icon;
   const driver = members.find((m: any) => m.user_id === t.motorista_user_id);
   const vehicle = vehicles.find((v: any) => v.id === t.vehicle_id);
-  const guest = guests.find((g: any) => g.id === t.guest_id);
+  const linkedGuestIds = getGuestsForTransport(t.id);
+  const transportGuests = linkedGuestIds.length > 0
+    ? linkedGuestIds.map((gid: string) => guests.find((g: any) => g.id === gid)).filter(Boolean)
+    : (t.guest_id ? [guests.find((g: any) => g.id === t.guest_id)].filter(Boolean) : []);
+  const guest = transportGuests[0] || null;
   const hasFlightInfo = t.titulo === 'Aeroporto' && (t.voo_cidade || t.voo_numero);
   const isActive = t.status === 'em_andamento';
 
@@ -1017,16 +1027,19 @@ function TransportCard({ t, members, vehicles, guests, highlightId, highlightRef
               🚙 {vehicle.placa}{vehicle.modelo ? ` · ${vehicle.modelo}` : ''}
             </span>
           )}
-          {guest && (
-            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-muted/40 text-[11px] text-muted-foreground">
-              🎫 {guest.nome}
+          {transportGuests.length > 0 && transportGuests.map((g: any) => (
+            <span key={g.id} className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-muted/40 text-[11px] text-muted-foreground">
+              🎫 {g.nome}
             </span>
-          )}
-          {guest?.hotel_nome && (
-            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-muted/40 text-[11px] text-muted-foreground">
-              🏨 {guest.hotel_nome}
-            </span>
-          )}
+          ))}
+          {(() => {
+            const hotels = [...new Set(transportGuests.map((g: any) => g.hotel_nome).filter(Boolean))];
+            return hotels.map((h: string) => (
+              <span key={h} className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-muted/40 text-[11px] text-muted-foreground">
+                🏨 {h}
+              </span>
+            ));
+          })()}
           {t.titulo === 'Aeroporto' && t.voo_cidade && (
             <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-muted/40 text-[11px] text-muted-foreground">
               ✈️ {t.voo_cidade}{t.voo_numero ? ` · ${t.voo_numero}` : ''}
@@ -1206,11 +1219,14 @@ function TransportLocationCard({ transportId, transport, driverName, isMyTrackin
 /* ═══════════════════════════════════════════════════════════════
    Transport Detail View (modal)
    ═══════════════════════════════════════════════════════════════ */
-function TransportDetailView({ t, members, vehicles, guests, getDriverCommission, onPDF }: any) {
+function TransportDetailView({ t, members, vehicles, guests, getDriverCommission, getGuestsForTransport, onPDF }: any) {
   const sc = statusConfig[t.status] || statusConfig.pendente;
   const driver = members.find((m: any) => m.user_id === t.motorista_user_id);
   const vehicle = vehicles.find((v: any) => v.id === t.vehicle_id);
-  const guest = guests.find((g: any) => g.id === t.guest_id);
+  const linkedGuestIds = getGuestsForTransport(t.id);
+  const transportGuests = linkedGuestIds.length > 0
+    ? linkedGuestIds.map((gid: string) => guests.find((g: any) => g.id === gid)).filter(Boolean)
+    : (t.guest_id ? [guests.find((g: any) => g.id === t.guest_id)].filter(Boolean) : []);
   const driverCommission = t.motorista_user_id ? getDriverCommission(t.motorista_user_id) : null;
 
   // Calculate real duration if available
@@ -1278,16 +1294,18 @@ function TransportDetailView({ t, members, vehicles, guests, getDriverCommission
             <p className="text-xs text-muted-foreground">Veículo</p>
             <p className="font-medium">{vehicle ? `${vehicle.placa} ${vehicle.modelo || ''}` : '—'}</p>
           </div>
-          <div>
-            <p className="text-xs text-muted-foreground">Hóspede</p>
-            <p className="font-medium">{guest?.nome || '—'}</p>
+          <div className={transportGuests.length > 1 ? 'col-span-2' : ''}>
+            <p className="text-xs text-muted-foreground">Hóspede{transportGuests.length > 1 ? 's' : ''}</p>
+            {transportGuests.length > 0 ? (
+              <div className="space-y-1">
+                {transportGuests.map((g: any) => (
+                  <p key={g.id} className="font-medium">{g.nome}{g.hotel_nome ? ` — ${g.hotel_nome}` : ''}</p>
+                ))}
+              </div>
+            ) : (
+              <p className="font-medium">—</p>
+            )}
           </div>
-          {guest?.hotel_nome && (
-            <div>
-              <p className="text-xs text-muted-foreground">Hotel</p>
-              <p className="font-medium">{guest.hotel_nome}</p>
-            </div>
-          )}
         </div>
 
         {/* Route metrics — predicted vs actual */}

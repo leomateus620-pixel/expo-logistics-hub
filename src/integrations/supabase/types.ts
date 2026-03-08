@@ -776,6 +776,59 @@ export type Database = {
           },
         ]
       }
+      transport_guests: {
+        Row: {
+          created_at: string
+          guest_id: string
+          id: string
+          org_id: string
+          transport_id: string
+        }
+        Insert: {
+          created_at?: string
+          guest_id: string
+          id?: string
+          org_id: string
+          transport_id: string
+        }
+        Update: {
+          created_at?: string
+          guest_id?: string
+          id?: string
+          org_id?: string
+          transport_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transport_guests_guest_id_fkey"
+            columns: ["guest_id"]
+            isOneToOne: false
+            referencedRelation: "guests"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transport_guests_guest_id_fkey"
+            columns: ["guest_id"]
+            isOneToOne: false
+            referencedRelation: "guests_safe"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transport_guests_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transport_guests_transport_id_fkey"
+            columns: ["transport_id"]
+            isOneToOne: false
+            referencedRelation: "transports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       transport_locations: {
         Row: {
           accuracy: number | null
