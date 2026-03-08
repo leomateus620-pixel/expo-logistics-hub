@@ -283,9 +283,9 @@ export default function TransportDynamicIsland({
 
           {/* Tracking status for my tracking */}
           {isMyTracking && !location && (
-            <div className="flex items-center gap-2 text-xs text-white/50">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
               {trackingError ? (
-                <><MapPinOff className="w-3.5 h-3.5 text-red-400" /><span className="text-red-300">{trackingError}</span></>
+                <><MapPinOff className="w-3.5 h-3.5 text-destructive" /><span className="text-destructive">{trackingError}</span></>
               ) : (
                 <><Navigation className="w-3.5 h-3.5 animate-pulse text-accent" /><span>Obtendo localização...</span></>
               )}
