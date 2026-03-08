@@ -116,9 +116,16 @@ export default function VerEscalaPage() {
   }, [assignments]);
 
   const getMemberName = (userId: string) => {
-    const m = members.find((m: any) => m.user_id === userId);
+    const m = logisticaMembers.find((m: any) => m.user_id === userId);
+    if (!m) {
+      const any = members.find((m: any) => m.user_id === userId);
+      return any?.nome_exibicao || '—';
+    }
     return m?.nome_exibicao || '—';
   };
+
+  // Filter shifts to only those assigned to logística members
+  const logisticaUserIds = new Set(logisticaMembers.map((m: any) => m.user_id));
 
   const handleCreateSchedule = async () => {
     if (!schedName || !schedStart || !schedEnd) {
