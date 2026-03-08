@@ -6,11 +6,13 @@ import { useEvents } from '@/hooks/useEvents';
 import { useCommissions } from '@/hooks/useCommissions';
 import { useOrgMembers } from '@/hooks/useOrgMembers';
 import StatCard from '@/components/StatCard';
-import { Car, Zap, MapPin, CheckSquare, CalendarDays, Users, Clock, AlertTriangle } from 'lucide-react';
+import { Car, Zap, MapPin, CheckSquare, CalendarDays, Users, Clock, AlertTriangle, User } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn, rawTime, todaySP } from '@/lib/utils';
+import { useNavigate } from 'react-router-dom';
 
 export default function Dashboard() {
+  const navigate = useNavigate();
   const { vehicles } = useVehicles();
   const { carts } = useElectricCarts();
   const { transports } = useTransports();
@@ -101,18 +103,30 @@ export default function Dashboard() {
               <p className="text-xs font-semibold text-primary uppercase tracking-wider mb-2">Hoje — {todayStr.split('-').reverse().join('/')}</p>
               <div className="space-y-2">
                 {todayEvents.length === 0 && <p className="text-sm text-muted-foreground">Nenhum evento hoje.</p>}
-                {todayEvents.map((e: any) => (
-                  <div key={e.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                    <div className="text-center shrink-0 w-14">
-                      <p className="text-xs font-mono font-semibold">{rawTime(e.inicio_em)}</p>
-                      <p className="text-[10px] text-muted-foreground">{rawTime(e.fim_em)}</p>
+                {todayEvents.map((e: any) => {
+                  const linkedTransport = transports.find((t: any) => e.descricao?.includes(t.id?.slice(0, 8)) || (e.tipo_tag === 'transporte' && t.inicio_em === e.inicio_em));
+                  const responsible = e.responsavel_user_id ? members.find((m: any) => m.user_id === e.responsavel_user_id) : null;
+                  return (
+                    <div key={e.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => navigate('/agenda')}>
+                      <div className="flex flex-col gap-1 shrink-0">
+                        <div className="text-center min-w-[56px]">
+                          <p className="text-[9px] uppercase text-muted-foreground font-medium">Check</p>
+                          <p className="text-xs font-mono font-semibold">{linkedTransport?.voo_checkin || '—'}</p>
+                        </div>
+                        <div className="text-center min-w-[56px]">
+                          <p className="text-[9px] uppercase text-muted-foreground font-medium">Evento</p>
+                          <p className="text-xs font-mono font-semibold">{rawTime(e.inicio_em)}</p>
+                        </div>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{e.titulo}</p>
+                        {e.local && <p className="text-xs text-muted-foreground">{e.local}</p>}
+                        {e.descricao && <p className="text-[10px] text-muted-foreground truncate">{e.descricao}</p>}
+                        {responsible && <p className="text-[10px] text-primary flex items-center gap-1 mt-0.5"><User className="w-3 h-3" />{responsible.nome_exibicao}</p>}
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{e.titulo}</p>
-                      {e.local && <p className="text-xs text-muted-foreground">{e.local}</p>}
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
             {/* Tomorrow */}
@@ -120,18 +134,30 @@ export default function Dashboard() {
               <p className="text-xs font-semibold text-accent uppercase tracking-wider mb-2">Amanhã — {tomorrowStr.split('-').reverse().join('/')}</p>
               <div className="space-y-2">
                 {tomorrowEvents.length === 0 && <p className="text-sm text-muted-foreground">Nenhum evento amanhã.</p>}
-                {tomorrowEvents.map((e: any) => (
-                  <div key={e.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
-                    <div className="text-center shrink-0 w-14">
-                      <p className="text-xs font-mono font-semibold">{rawTime(e.inicio_em)}</p>
-                      <p className="text-[10px] text-muted-foreground">{rawTime(e.fim_em)}</p>
+                {tomorrowEvents.map((e: any) => {
+                  const linkedTransport = transports.find((t: any) => e.descricao?.includes(t.id?.slice(0, 8)) || (e.tipo_tag === 'transporte' && t.inicio_em === e.inicio_em));
+                  const responsible = e.responsavel_user_id ? members.find((m: any) => m.user_id === e.responsavel_user_id) : null;
+                  return (
+                    <div key={e.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => navigate('/agenda')}>
+                      <div className="flex flex-col gap-1 shrink-0">
+                        <div className="text-center min-w-[56px]">
+                          <p className="text-[9px] uppercase text-muted-foreground font-medium">Check</p>
+                          <p className="text-xs font-mono font-semibold">{linkedTransport?.voo_checkin || '—'}</p>
+                        </div>
+                        <div className="text-center min-w-[56px]">
+                          <p className="text-[9px] uppercase text-muted-foreground font-medium">Evento</p>
+                          <p className="text-xs font-mono font-semibold">{rawTime(e.inicio_em)}</p>
+                        </div>
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{e.titulo}</p>
+                        {e.local && <p className="text-xs text-muted-foreground">{e.local}</p>}
+                        {e.descricao && <p className="text-[10px] text-muted-foreground truncate">{e.descricao}</p>}
+                        {responsible && <p className="text-[10px] text-primary flex items-center gap-1 mt-0.5"><User className="w-3 h-3" />{responsible.nome_exibicao}</p>}
+                      </div>
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">{e.titulo}</p>
-                      {e.local && <p className="text-xs text-muted-foreground">{e.local}</p>}
-                    </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>
