@@ -32,8 +32,26 @@ serve(async (req) => {
       throw new Error('GOOGLE_MAPS_API_KEY is not configured');
     }
 
-    const { origin_lat, origin_lng, destination } = await req.json();
+    const body = await req.json();
+    const { origin_lat, origin_lng, destination, mode, dest_lat, dest_lng } = body;
 
+    // MODE: ROUTE_PREVIEW — arbitrary origin/dest coords, returns polyline
+    if (mode === 'ROUTE_PREVIEW') {
+      const oLat = origin_lat || SANTA_ROSA.lat;
+      const oLng = origin_lng || SANTA_ROSA.lng;
+      const dLat = dest_lat;
+      const dLng = dest_lng;
+
+      if (!dLat || !dLng) {
+        // Try to resolve destination name to known coords
+        const destKey = destination || 'Outros';
+        const resolved = knownDestinations[destKey] || knownDestinations['Outros'];
+        return await computeRoute(GOOGLE_MAPS_API_KEY, oLat, oLng, resolved.lat, resolved.lng, resolved.label, true);
+      }
+      return await computeRoute(GOOGLE_MAPS_API_KEY, oLat, oLng, dLat, dLng, destination || 'Destino', true);
+    }
+
+    // Legacy mode
     if (!origin_lat || !origin_lng || !destination) {
       return new Response(
         JSON.stringify({ error: 'Missing required fields: origin_lat, origin_lng, destination' }),
@@ -41,68 +59,13 @@ serve(async (req) => {
       );
     }
 
-    // If destination is "RETURN_TO_ORIGIN", route from driver's current location back to Santa Rosa
     const isReturnTrip = destination === 'RETURN_TO_ORIGIN';
     const destCoords = isReturnTrip
       ? SANTA_ROSA
       : (knownDestinations[destination] || knownDestinations['Outros']);
 
-    const routesUrl = 'https://routes.googleapis.com/directions/v2:computeRoutes';
+    return await computeRoute(GOOGLE_MAPS_API_KEY, origin_lat, origin_lng, destCoords.lat, destCoords.lng, isReturnTrip ? 'Santa Rosa' : destCoords.label, false);
 
-    const body = {
-      origin: {
-        location: {
-          latLng: { latitude: origin_lat, longitude: origin_lng }
-        }
-      },
-      destination: {
-        location: {
-          latLng: { latitude: isReturnTrip ? destCoords.lat : destCoords.lat, longitude: isReturnTrip ? destCoords.lng : destCoords.lng }
-        }
-      },
-      travelMode: 'DRIVE',
-      routingPreference: 'TRAFFIC_AWARE',
-      computeAlternativeRoutes: false,
-    };
-
-    const response = await fetch(routesUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Goog-Api-Key': GOOGLE_MAPS_API_KEY,
-        'X-Goog-FieldMask': 'routes.duration,routes.distanceMeters,routes.staticDuration',
-      },
-      body: JSON.stringify(body),
-    });
-
-    const data = await response.json();
-
-    if (!response.ok || !data.routes?.length) {
-      console.error('Google Routes API error:', JSON.stringify(data));
-      return new Response(
-        JSON.stringify({ 
-          error: data.error?.message || 'Routes API error',
-          fallback: true,
-        }),
-        { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
-    }
-
-    const route = data.routes[0];
-    const durationStr = route.duration || '0s';
-    const durationSeconds = parseInt(durationStr.replace('s', ''), 10) || 0;
-    const durationMinutes = Math.ceil(durationSeconds / 60);
-    const distanceKm = Math.round((route.distanceMeters || 0) / 100) / 10;
-
-    return new Response(
-      JSON.stringify({
-        duration_minutes: durationMinutes,
-        distance_km: distanceKm,
-        destination_label: isReturnTrip ? 'Santa Rosa' : destCoords.label,
-        fallback: false,
-      }),
-      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
   } catch (error) {
     console.error('estimate-return error:', error);
     return new Response(
@@ -111,3 +74,68 @@ serve(async (req) => {
     );
   }
 });
+
+async function computeRoute(apiKey: string, oLat: number, oLng: number, dLat: number, dLng: number, destLabel: string, includePolyline: boolean) {
+  const routesUrl = 'https://routes.googleapis.com/directions/v2:computeRoutes';
+
+  const requestBody = {
+    origin: {
+      location: { latLng: { latitude: oLat, longitude: oLng } }
+    },
+    destination: {
+      location: { latLng: { latitude: dLat, longitude: dLng } }
+    },
+    travelMode: 'DRIVE',
+    routingPreference: 'TRAFFIC_AWARE',
+    computeAlternativeRoutes: false,
+  };
+
+  const fieldMask = includePolyline
+    ? 'routes.duration,routes.distanceMeters,routes.staticDuration,routes.polyline.encodedPolyline'
+    : 'routes.duration,routes.distanceMeters,routes.staticDuration';
+
+  const response = await fetch(routesUrl, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'X-Goog-Api-Key': apiKey,
+      'X-Goog-FieldMask': fieldMask,
+    },
+    body: JSON.stringify(requestBody),
+  });
+
+  const data = await response.json();
+
+  if (!response.ok || !data.routes?.length) {
+    console.error('Google Routes API error:', JSON.stringify(data));
+    return new Response(
+      JSON.stringify({ 
+        error: data.error?.message || 'Routes API error',
+        fallback: true,
+      }),
+      { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
+  }
+
+  const route = data.routes[0];
+  const durationStr = route.duration || '0s';
+  const durationSeconds = parseInt(durationStr.replace('s', ''), 10) || 0;
+  const durationMinutes = Math.ceil(durationSeconds / 60);
+  const distanceKm = Math.round((route.distanceMeters || 0) / 100) / 10;
+
+  const result: Record<string, any> = {
+    duration_minutes: durationMinutes,
+    distance_km: distanceKm,
+    destination_label: destLabel,
+    fallback: false,
+  };
+
+  if (includePolyline && route.polyline?.encodedPolyline) {
+    result.polyline = route.polyline.encodedPolyline;
+  }
+
+  return new Response(
+    JSON.stringify(result),
+    { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+  );
+}
