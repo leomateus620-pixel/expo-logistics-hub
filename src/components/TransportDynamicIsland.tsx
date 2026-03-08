@@ -372,7 +372,7 @@ export default function TransportDynamicIsland({
                 await locationTracker.stopTracking();
                 setTrackingTransportId(null);
               }}
-              className="w-full flex items-center justify-center gap-1.5 h-8 rounded-xl text-[11px] text-red-300/80 hover:bg-red-500/10 transition-colors"
+              className="w-full flex items-center justify-center gap-1.5 h-8 rounded-xl text-[11px] text-destructive hover:bg-destructive/10 transition-colors"
             >
               <MapPinOff className="w-3 h-3" /> Desativar localização
             </button>
