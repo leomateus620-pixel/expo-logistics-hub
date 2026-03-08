@@ -286,8 +286,10 @@ export default function ChecklistPage() {
         {/* Escala tab */}
         <TabsContent value="escala">
           <div className="space-y-2">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Eventos e Transportes de Hoje ({escalaItems.length})</p>
-            {escalaItems.length === 0 && <p className="text-sm text-muted-foreground py-8 text-center">Nenhum item na escala de hoje.</p>}
+            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">
+              Eventos e Transportes {appliedDate ? `de ${new Date(appliedDate + 'T12:00:00').toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })}` : 'de Hoje'} ({escalaItems.length})
+            </p>
+            {escalaItems.length === 0 && <p className="text-sm text-muted-foreground py-8 text-center">Nenhum item na escala{appliedDate ? ' para esta data' : ' de hoje'}.</p>}
             {escalaItems.map((item) => (
               <div key={`${item.tipo}-${item.id}`} className="rounded-xl border bg-card p-4 flex items-center gap-3">
                 <div className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 bg-muted">
