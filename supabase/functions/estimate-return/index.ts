@@ -18,6 +18,9 @@ const knownDestinations: Record<string, { lat: number; lng: number; label: strin
   'Outros': { lat: -27.8711, lng: -54.4769, label: 'Santa Rosa' },
 };
 
+// Santa Rosa origin (Parque de Exposições)
+const SANTA_ROSA = { lat: -27.8708, lng: -54.4814 };
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -38,9 +41,12 @@ serve(async (req) => {
       );
     }
 
-    const destCoords = knownDestinations[destination] || knownDestinations['Outros'];
+    // If destination is "RETURN_TO_ORIGIN", route from driver's current location back to Santa Rosa
+    const isReturnTrip = destination === 'RETURN_TO_ORIGIN';
+    const destCoords = isReturnTrip
+      ? SANTA_ROSA
+      : (knownDestinations[destination] || knownDestinations['Outros']);
 
-    // Use Google Routes API (new)
     const routesUrl = 'https://routes.googleapis.com/directions/v2:computeRoutes';
 
     const body = {
@@ -51,7 +57,7 @@ serve(async (req) => {
       },
       destination: {
         location: {
-          latLng: { latitude: destCoords.lat, longitude: destCoords.lng }
+          latLng: { latitude: isReturnTrip ? destCoords.lat : destCoords.lat, longitude: isReturnTrip ? destCoords.lng : destCoords.lng }
         }
       },
       travelMode: 'DRIVE',
@@ -83,7 +89,6 @@ serve(async (req) => {
     }
 
     const route = data.routes[0];
-    // duration comes as "XXXs" string
     const durationStr = route.duration || '0s';
     const durationSeconds = parseInt(durationStr.replace('s', ''), 10) || 0;
     const durationMinutes = Math.ceil(durationSeconds / 60);
@@ -93,7 +98,7 @@ serve(async (req) => {
       JSON.stringify({
         duration_minutes: durationMinutes,
         distance_km: distanceKm,
-        destination_label: destCoords.label,
+        destination_label: isReturnTrip ? 'Santa Rosa' : destCoords.label,
         fallback: false,
       }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
