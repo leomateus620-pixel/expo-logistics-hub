@@ -286,7 +286,7 @@ export default function AgendaPage() {
                     return (
                       <div
                         key={e.id}
-                        onClick={() => openEdit(e)}
+                        onClick={() => e._source !== 'transport' && openEdit(e)}
                         className={cn(
                           'group rounded-2xl border p-4 flex gap-4 cursor-pointer transition-all duration-200',
                           'bg-white/10 backdrop-blur-xl border-white/15',
