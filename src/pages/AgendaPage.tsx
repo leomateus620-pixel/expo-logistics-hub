@@ -1,8 +1,9 @@
 import { useEvents } from '@/hooks/useEvents';
 import { useOrgMembers } from '@/hooks/useOrgMembers';
+import { useCommissions } from '@/hooks/useCommissions';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import { Badge } from '@/components/ui/badge';
-import { CalendarDays, Plus, Clock, MapPin, User, Pencil, Trash2 } from 'lucide-react';
+import { CalendarDays, Plus, Clock, MapPin, User, Pencil, Trash2, Users } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { cn, rawTime, todaySP } from '@/lib/utils';
@@ -15,11 +16,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { toast } from 'sonner';
 
-const emptyForm = { titulo: '', descricao: '', inicio_em: '', fim_em: '', local: '', tipo_tag: '', responsavel_user_id: '', repetir_diariamente: false };
+const emptyForm = { titulo: '', descricao: '', inicio_em: '', fim_em: '', local: '', tipo_tag: '', responsavel_user_id: '', commission_id: '', repetir_diariamente: false };
 
 export default function AgendaPage() {
   const { events, create, update, remove } = useEvents();
   const { members } = useOrgMembers();
+  const { commissions } = useCommissions();
   const { myRole } = useCurrentOrg();
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -37,6 +39,8 @@ export default function AgendaPage() {
   };
 
   const openEdit = (e: any) => {
+    // Find commission_id from responsavel member
+    const responsavelMember = e.responsavel_user_id ? members.find((m: any) => m.user_id === e.responsavel_user_id) : null;
     setEditingId(e.id);
     setForm({
       titulo: e.titulo || '',
@@ -46,6 +50,7 @@ export default function AgendaPage() {
       local: e.local || '',
       tipo_tag: e.tipo_tag || '',
       responsavel_user_id: e.responsavel_user_id || 'none',
+      commission_id: responsavelMember?.commission_id || 'none',
       repetir_diariamente: false,
     });
     setOpen(true);
@@ -123,11 +128,20 @@ export default function AgendaPage() {
                 </div>
               </div>
               <Input placeholder="Local" value={form.local} onChange={(e) => setForm({ ...form, local: e.target.value })} />
+              <Select value={form.commission_id} onValueChange={(v) => setForm({ ...form, commission_id: v, responsavel_user_id: '' })}>
+                <SelectTrigger><SelectValue placeholder="Comissão (opcional)" /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">Todas as comissões</SelectItem>
+                  {commissions.map((c: any) => <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>)}
+                </SelectContent>
+              </Select>
               <Select value={form.responsavel_user_id} onValueChange={(v) => setForm({ ...form, responsavel_user_id: v })}>
                 <SelectTrigger><SelectValue placeholder="Responsável (opcional)" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">Nenhum</SelectItem>
-                  {members.map((m: any) => <SelectItem key={m.user_id} value={m.user_id}>{m.nome_exibicao}</SelectItem>)}
+                  {members
+                    .filter((m: any) => !form.commission_id || form.commission_id === 'none' || m.commission_id === form.commission_id)
+                    .map((m: any) => <SelectItem key={m.user_id} value={m.user_id}>{m.nome_exibicao}</SelectItem>)}
                 </SelectContent>
               </Select>
               <Input placeholder="Categoria / Tag" value={form.tipo_tag} onChange={(e) => setForm({ ...form, tipo_tag: e.target.value })} />
