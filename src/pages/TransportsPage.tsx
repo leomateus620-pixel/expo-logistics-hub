@@ -680,12 +680,12 @@ export default function TransportsPage() {
                 }} />
               </div>
               <div>
-                <Label className="text-xs text-muted-foreground mb-1 block">Data e Hora de Chegada</Label>
+                <Label className="text-xs text-muted-foreground mb-1 block">Data de Chegada</Label>
                 <DateTimePicker
                   value={data.voo_chegada_data}
                   onChange={(v) => setData({ ...data, voo_chegada_data: v })}
-                  mode="datetime"
-                  placeholder="Selecionar data e hora"
+                  mode="date"
+                  placeholder="Selecionar data"
                 />
               </div>
               <div>
@@ -736,12 +736,12 @@ export default function TransportsPage() {
                       }} />
                     </div>
                     <div>
-                      <Label className="text-xs text-muted-foreground mb-1 block">Data e Hora de Chegada (volta)</Label>
+                      <Label className="text-xs text-muted-foreground mb-1 block">Data de Chegada (volta)</Label>
                       <DateTimePicker
                         value={returnForm.voo_chegada_data}
                         onChange={(v) => setReturnForm(prev => ({ ...prev, voo_chegada_data: v }))}
-                        mode="datetime"
-                        placeholder="Selecionar data e hora"
+                        mode="date"
+                        placeholder="Selecionar data"
                       />
                     </div>
                     <div>
