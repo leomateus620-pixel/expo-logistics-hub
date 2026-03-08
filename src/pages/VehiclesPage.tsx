@@ -711,11 +711,11 @@ function VehicleDetailContent({ vehicle, members, userId, kmTotal, fuelCostTotal
                     )}
                     onClick={() => { if (matchedTransport) navigate('/transports'); }}
                   >
-                    <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between">
                       <span className="font-medium text-foreground">{getMemberName(u.responsavel_user_id)}</span>
                       <div className="flex items-center gap-1.5">
                         {matchedTransport && <ExternalLink className="w-3 h-3 text-primary" />}
-                        <Badge variant={u.km_chegada ? 'secondary' : 'outline'} className="text-[10px]">
+                        <Badge variant="outline" className={cn('text-[10px]', u.km_chegada ? 'bg-success/10 text-success border-success/20' : 'bg-info/10 text-info border-info/20')}>
                           {u.km_chegada ? 'Devolvido' : 'Em uso'}
                         </Badge>
                       </div>

@@ -7,7 +7,8 @@ export function cn(...inputs: ClassValue[]) {
 
 /** Get current date/time in São Paulo timezone as ISO string */
 export function nowSP(): string {
-  return new Date().toLocaleString('sv-SE', { timeZone: 'America/Sao_Paulo' }).replace(' ', 'T') + ':00';
+  const raw = new Date().toLocaleString('sv-SE', { timeZone: 'America/Sao_Paulo' });
+  return raw.replace(' ', 'T') + '-03:00';
 }
 
 /** Get current date/time in São Paulo timezone formatted for datetime-local inputs (YYYY-MM-DDTHH:MM) */
