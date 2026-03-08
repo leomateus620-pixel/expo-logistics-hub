@@ -231,12 +231,12 @@ export default function ChecklistPage() {
           <Filter className="w-4 h-4" />
           <span className="text-xs font-medium">Filtros:</span>
         </div>
-        <Input
-          type="date"
+        <DateTimePicker
+          mode="date"
           value={filterDate}
-          onChange={(e) => setFilterDate(e.target.value)}
-          className="w-40 h-8 text-xs"
+          onChange={setFilterDate}
           placeholder="Data"
+          className="w-40 h-8 text-xs"
         />
         <Select value={filterResponsavel} onValueChange={setFilterResponsavel}>
           <SelectTrigger className="w-48 h-8 text-xs"><SelectValue placeholder="Responsável" /></SelectTrigger>
