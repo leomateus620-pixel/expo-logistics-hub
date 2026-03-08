@@ -254,7 +254,6 @@ export default function VerEscalaPage() {
           <Search className="w-4 h-4 mr-1" /> Pesquisar
         </Button>
       </div>
-      </div>
 
       {/* Active schedules */}
       {schedules.filter((s: any) => s.status === 'ativa').length > 0 && (
