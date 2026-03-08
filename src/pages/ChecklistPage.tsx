@@ -3,7 +3,7 @@ import { useEvents } from '@/hooks/useEvents';
 import { useTransports } from '@/hooks/useTransports';
 import { useOrgMembers } from '@/hooks/useOrgMembers';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Check, Clock, Repeat, CalendarDays, Car, MapPin, User, Pencil, Filter } from 'lucide-react';
+import { Plus, Check, Clock, Repeat, CalendarDays, Car, MapPin, User, Pencil, Filter, Search } from 'lucide-react';
 import { cn, rawTime, todaySP } from '@/lib/utils';
 import { useState, useMemo } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
