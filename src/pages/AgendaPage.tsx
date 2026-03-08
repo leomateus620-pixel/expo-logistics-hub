@@ -96,14 +96,14 @@ export default function AgendaPage() {
   /* ── dates ── */
   const dates: string[] = useMemo(() => {
     const set = new Set<string>();
-    events.forEach((e: any) => {
+    allItems.forEach((e: any) => {
       const d = e.inicio_em?.split('T')[0];
       if (d) set.add(d);
     });
     const arr = [...set].sort();
     if (arr.length === 0) arr.push(today);
     return arr;
-  }, [events, today]);
+  }, [allItems, today]);
 
   const [selectedDate, setSelectedDate] = useState<string>(dates.includes(today) ? today : dates[0]);
   const scrollRef = useRef<HTMLDivElement>(null);
