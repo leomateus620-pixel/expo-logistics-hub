@@ -1004,6 +1004,46 @@ function TransportCard({ t, members, vehicles, guests, highlightId, highlightRef
           onCycleStatus={onCycleStatus}
           onDetail={onDetail}
         />
+
+        {/* ─ Info Chips: Hotel, Voo, Veículo, Hóspede, KM, Obs ─ */}
+        <div className="flex flex-wrap gap-1.5 px-1">
+          {driver && (
+            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-muted/40 text-[11px] text-muted-foreground">
+              👤 {driver.nome_exibicao?.split(' ')[0]}
+            </span>
+          )}
+          {vehicle && (
+            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-muted/40 text-[11px] text-muted-foreground">
+              🚙 {vehicle.placa}{vehicle.modelo ? ` · ${vehicle.modelo}` : ''}
+            </span>
+          )}
+          {guest && (
+            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-muted/40 text-[11px] text-muted-foreground">
+              🎫 {guest.nome}
+            </span>
+          )}
+          {guest?.hotel_nome && (
+            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-muted/40 text-[11px] text-muted-foreground">
+              🏨 {guest.hotel_nome}
+            </span>
+          )}
+          {t.titulo === 'Aeroporto' && t.voo_cidade && (
+            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-muted/40 text-[11px] text-muted-foreground">
+              ✈️ {t.voo_cidade}{t.voo_numero ? ` · ${t.voo_numero}` : ''}
+            </span>
+          )}
+          {t.km_retirada != null && (
+            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-muted/40 text-[11px] text-muted-foreground">
+              📍 KM {t.km_retirada}
+            </span>
+          )}
+          {t.observacoes && (
+            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-muted/40 text-[11px] text-muted-foreground truncate max-w-[200px]" title={t.observacoes}>
+              📝 {t.observacoes}
+            </span>
+          )}
+        </div>
+
         {/* ─ Actions ─ */}
         <div className="flex items-center gap-2 pt-1">
           {t.status !== 'concluido' && t.status !== 'cancelado' && (
