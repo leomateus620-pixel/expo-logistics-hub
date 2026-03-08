@@ -1,16 +1,16 @@
 import { useSchedules } from '@/hooks/useSchedules';
 import { useOrgMembers } from '@/hooks/useOrgMembers';
+import { useCommissions } from '@/hooks/useCommissions';
 import { useAuth } from '@/hooks/useAuth';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Calendar } from '@/components/ui/calendar';
-import { Plus, ChevronLeft, ChevronRight, Clock, User, Trash2 } from 'lucide-react';
+import { Plus, ChevronLeft, ChevronRight, Clock, User, Trash2, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -20,12 +20,13 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 export default function VerEscalaPage() {
   const { schedules, isLoading, createSchedule, shifts, createShift, assignments, createAssignment } = useSchedules();
   const { members } = useOrgMembers();
+  const { commissions } = useCommissions();
   const { user } = useAuth();
   const { myRole, orgId } = useCurrentOrg();
   const qc = useQueryClient();
 
   const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(new Date());
   const [showCreateDialog, setShowCreateDialog] = useState(false);
   const [showShiftDialog, setShowShiftDialog] = useState(false);
 
@@ -42,6 +43,33 @@ export default function VerEscalaPage() {
   const [shiftLocal, setShiftLocal] = useState('');
 
   const isAdmin = myRole === 'admin' || myRole === 'gestor';
+
+  // Filter state
+  const [filterName, setFilterName] = useState('');
+  const [filterDate, setFilterDate] = useState('');
+  const [appliedFilterName, setAppliedFilterName] = useState('');
+  const [appliedFilterDate, setAppliedFilterDate] = useState('');
+
+  // Find LOGÍSTICA commission
+  const logisticaCommission = commissions.find((c: any) =>
+    c.nome?.toUpperCase().includes('LOGÍSTICA') || c.nome?.toUpperCase().includes('LOGISTICA')
+  );
+
+  // Members filtered to LOGÍSTICA commission only
+  const logisticaMembers = useMemo(() => {
+    if (!logisticaCommission) return members;
+    return members.filter((m: any) => m.commission_id === logisticaCommission.id);
+  }, [members, logisticaCommission]);
+
+  const handleSearch = () => {
+    setAppliedFilterName(filterName);
+    setAppliedFilterDate(filterDate);
+    if (filterDate) {
+      const d = new Date(filterDate + 'T12:00:00');
+      setSelectedDate(d);
+      setCurrentMonth(d);
+    }
+  };
 
   // Delete shift mutation
   const deleteShift = useMutation({
@@ -65,17 +93,23 @@ export default function VerEscalaPage() {
     return eachDayOfInterval({ start: calStart, end: calEnd });
   }, [currentMonth]);
 
-  // Map shifts by date
+  // Logística member user IDs set
+  const logisticaUserIds = useMemo(() => new Set(logisticaMembers.map((m: any) => m.user_id)), [logisticaMembers]);
+
+  // Map shifts by date — only include shifts with logística member assignments
   const shiftsByDate = useMemo(() => {
-    const map: Record<string, typeof shifts> = {};
+    const map: Record<string, any[]> = {};
     shifts.forEach((s: any) => {
       const dateKey = s.inicio_em?.slice(0, 10);
       if (!dateKey) return;
+      const shiftAssigns = assignments.filter((a: any) => a.schedule_shift_id === s.id);
+      const hasLogistica = shiftAssigns.some((a: any) => logisticaUserIds.has(a.member_user_id));
+      if (!hasLogistica && shiftAssigns.length > 0) return;
       if (!map[dateKey]) map[dateKey] = [];
       map[dateKey].push(s);
     });
     return map;
-  }, [shifts]);
+  }, [shifts, assignments, logisticaUserIds]);
 
   // Assignments mapped by shift id
   const assignmentsByShift = useMemo(() => {
@@ -88,7 +122,11 @@ export default function VerEscalaPage() {
   }, [assignments]);
 
   const getMemberName = (userId: string) => {
-    const m = members.find((m: any) => m.user_id === userId);
+    const m = logisticaMembers.find((m: any) => m.user_id === userId);
+    if (!m) {
+      const anyM = members.find((m: any) => m.user_id === userId);
+      return anyM?.nome_exibicao || '—';
+    }
     return m?.nome_exibicao || '—';
   };
 
@@ -159,8 +197,17 @@ export default function VerEscalaPage() {
   const selectedDateShifts = useMemo(() => {
     if (!selectedDate) return [];
     const key = format(selectedDate, 'yyyy-MM-dd');
-    return shiftsByDate[key] || [];
-  }, [selectedDate, shiftsByDate]);
+    let dayShifts = shiftsByDate[key] || [];
+    // Apply name filter
+    if (appliedFilterName.trim()) {
+      const term = appliedFilterName.trim().toLowerCase();
+      dayShifts = dayShifts.filter((s: any) => {
+        const shiftAssigns = assignmentsByShift[s.id] || [];
+        return shiftAssigns.some((a: any) => getMemberName(a.member_user_id).toLowerCase().includes(term));
+      });
+    }
+    return dayShifts;
+  }, [selectedDate, shiftsByDate, appliedFilterName, assignmentsByShift]);
 
   const weekDays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
@@ -169,7 +216,7 @@ export default function VerEscalaPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Escala</h1>
-          <p className="text-sm text-muted-foreground mt-1">Disponibilidade da equipe</p>
+          <p className="text-sm text-muted-foreground mt-1">Logística, Hotelaria e Turismo</p>
         </div>
         <div className="flex gap-2">
           {isAdmin && (
@@ -181,6 +228,31 @@ export default function VerEscalaPage() {
             <Plus className="w-4 h-4 mr-1" /> Registrar Horário
           </Button>
         </div>
+      </div>
+
+      {/* Filters */}
+      <div className="flex flex-wrap items-end gap-2">
+        <div className="flex-1 min-w-[140px]">
+          <Label className="text-xs">Nome</Label>
+          <Input
+            placeholder="Filtrar por nome..."
+            value={filterName}
+            onChange={(e) => setFilterName(e.target.value)}
+            className="h-9"
+          />
+        </div>
+        <div className="min-w-[150px]">
+          <Label className="text-xs">Data</Label>
+          <Input
+            type="date"
+            value={filterDate}
+            onChange={(e) => setFilterDate(e.target.value)}
+            className="h-9"
+          />
+        </div>
+        <Button size="sm" className="h-9" onClick={handleSearch}>
+          <Search className="w-4 h-4 mr-1" /> Pesquisar
+        </Button>
       </div>
 
       {/* Active schedules */}
