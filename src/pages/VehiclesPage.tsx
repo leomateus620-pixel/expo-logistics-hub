@@ -4,39 +4,141 @@ import { useVehicleUsage } from '@/hooks/useVehicleUsage';
 import { useTransports } from '@/hooks/useTransports';
 import { useFuelRecords } from '@/hooks/useFuelRecords';
 import { useAuth } from '@/hooks/useAuth';
-import { Car, Pencil, Plus, Gauge, Fuel, ArrowRight, Palette, Clock, ExternalLink, Camera, Image } from 'lucide-react';
+import {
+  Car, Pencil, Plus, Gauge, Fuel, ArrowRight, Clock, ExternalLink,
+  Camera, Image, FileText, ChevronRight, Wrench, CircleDot, AlertTriangle,
+  TrendingUp, DollarSign, Activity
+} from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn, nowSP } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 
-const statusConfig: Record<string, { label: string; class: string; cardBg: string }> = {
-  disponivel: { label: 'Disponível', class: 'bg-success/10 text-success border-success/20', cardBg: 'border-l-4 border-l-green-500 bg-green-50/60 dark:bg-green-950/20' },
-  em_uso: { label: 'Em uso', class: 'bg-info/10 text-info border-info/20', cardBg: 'border-l-4 border-l-blue-500 bg-blue-50/60 dark:bg-blue-950/20' },
-  manutencao: { label: 'Manutenção', class: 'bg-destructive/10 text-destructive border-destructive/20', cardBg: 'border-l-4 border-l-orange-500 bg-orange-50/60 dark:bg-orange-950/20' },
-  inativo: { label: 'Inativo', class: 'bg-muted text-muted-foreground', cardBg: 'border-l-4 border-l-gray-400 bg-muted/40' },
+const FUEL_COST_PER_KM = 0.65;
+
+const statusConfig: Record<string, { label: string; icon: typeof Car; badgeCls: string }> = {
+  disponivel: { label: 'Disponível', icon: CircleDot, badgeCls: 'bg-success/15 text-success border-success/25' },
+  em_uso: { label: 'Em uso', icon: Activity, badgeCls: 'bg-info/15 text-info border-info/25' },
+  manutencao: { label: 'Manutenção', icon: Wrench, badgeCls: 'bg-warning/15 text-warning border-warning/25' },
+  inativo: { label: 'Inativo', icon: AlertTriangle, badgeCls: 'bg-muted text-muted-foreground border-border' },
 };
 
+function formatCurrency(val: number) {
+  return val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+}
+
+function formatKm(val: number) {
+  return val.toLocaleString('pt-BR');
+}
+
+// PDF generation via print window
+function generateVehiclePDF(vehicle: any, usages: any[], fuelRecords: any[], kmTotal: number, members: any[]) {
+  const getMemberName = (uid: string) => members.find((m: any) => m.user_id === uid)?.nome_exibicao || '—';
+  const custoEstimado = kmTotal * FUEL_COST_PER_KM;
+  const custoReal = fuelRecords.reduce((s: number, f: any) => s + (Number(f.valor) || 0), 0);
+
+  const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Relatório - ${vehicle.placa}</title>
+<style>
+  body{font-family:system-ui,sans-serif;padding:32px;color:#1a1a1a;max-width:800px;margin:0 auto}
+  h1{color:#2d6a4f;font-size:22px;margin-bottom:4px}
+  .sub{color:#666;font-size:13px;margin-bottom:24px}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px}
+  .metric{background:#f0f7f4;border:1px solid #d4e8dc;border-radius:8px;padding:12px}
+  .metric-label{font-size:11px;color:#666;text-transform:uppercase;letter-spacing:0.5px}
+  .metric-value{font-size:18px;font-weight:700;color:#2d6a4f;margin-top:2px}
+  table{width:100%;border-collapse:collapse;font-size:12px;margin-top:12px}
+  th{background:#2d6a4f;color:white;padding:8px 10px;text-align:left;font-weight:600}
+  td{padding:7px 10px;border-bottom:1px solid #e8e8e8}
+  tr:nth-child(even){background:#f8f8f8}
+  h2{color:#2d6a4f;font-size:16px;margin-top:28px;margin-bottom:8px;border-bottom:2px solid #d4e8dc;padding-bottom:4px}
+  .footer{margin-top:32px;text-align:center;font-size:10px;color:#999}
+  @media print{body{padding:16px}}
+</style></head><body>
+<h1>🚗 ${vehicle.marca || ''} ${vehicle.modelo || ''} ${vehicle.cor ? '— ' + vehicle.cor.toUpperCase() : ''}</h1>
+<p class="sub">Placa: <strong>${vehicle.placa}</strong> | Odômetro: ${formatKm(Number(vehicle.km_atual || 0))} km | Status: ${statusConfig[vehicle.status]?.label || vehicle.status}</p>
+<div class="grid">
+  <div class="metric"><div class="metric-label">KM Rodados</div><div class="metric-value">${formatKm(kmTotal)} km</div></div>
+  <div class="metric"><div class="metric-label">Custo Estimado</div><div class="metric-value">${formatCurrency(custoEstimado)}</div></div>
+  <div class="metric"><div class="metric-label">Custo Real (Abastecimentos)</div><div class="metric-value">${formatCurrency(custoReal)}</div></div>
+  <div class="metric"><div class="metric-label">Total Usos</div><div class="metric-value">${usages.length}</div></div>
+</div>
+<h2>Histórico de Utilização</h2>
+${usages.length === 0 ? '<p style="color:#999;font-size:12px">Nenhum uso registrado</p>' : `
+<table><thead><tr><th>Data</th><th>Responsável</th><th>KM Saída</th><th>KM Chegada</th><th>KM Rodados</th><th>Custo Est.</th></tr></thead><tbody>
+${usages.map((u: any) => `<tr>
+  <td>${new Date(u.retirada_em).toLocaleDateString('pt-BR')}</td>
+  <td>${getMemberName(u.responsavel_user_id)}</td>
+  <td>${formatKm(Number(u.km_saida))}</td>
+  <td>${u.km_chegada ? formatKm(Number(u.km_chegada)) : '—'}</td>
+  <td>${u.km_rodados ? formatKm(Number(u.km_rodados)) : '—'}</td>
+  <td>${u.km_rodados ? formatCurrency(Number(u.km_rodados) * FUEL_COST_PER_KM) : '—'}</td>
+</tr>`).join('')}
+</tbody></table>`}
+<h2>Abastecimentos</h2>
+${fuelRecords.length === 0 ? '<p style="color:#999;font-size:12px">Nenhum abastecimento registrado</p>' : `
+<table><thead><tr><th>Data</th><th>Litros</th><th>Valor</th><th>KM</th><th>Posto</th></tr></thead><tbody>
+${fuelRecords.map((f: any) => `<tr>
+  <td>${new Date(f.created_at).toLocaleDateString('pt-BR')}</td>
+  <td>${f.litros ? Number(f.litros).toLocaleString('pt-BR') + ' L' : '—'}</td>
+  <td>${f.valor ? formatCurrency(Number(f.valor)) : '—'}</td>
+  <td>${f.km_abastecimento ? formatKm(Number(f.km_abastecimento)) + ' km' : '—'}</td>
+  <td>${f.posto || '—'}</td>
+</tr>`).join('')}
+</tbody></table>`}
+<div class="footer">Fenasoja Logística — Relatório gerado em ${new Date().toLocaleString('pt-BR')}</div>
+</body></html>`;
+
+  const w = window.open('', '_blank');
+  if (w) { w.document.write(html); w.document.close(); w.print(); }
+}
+
 export default function VehiclesPage() {
-  const { vehicles, create, update } = useVehicles();
+  const { vehicles, isLoading: vehiclesLoading, create, update } = useVehicles();
   const { members } = useOrgMembers();
   const { user } = useAuth();
-  const { totalKm, kmByVehicle } = useVehicleUsage();
+  const { totalKm, kmByVehicle, isLoading: usageLoading } = useVehicleUsage();
+  const { records: allFuelRecords, isLoading: fuelLoading } = useFuelRecords();
 
   const [addOpen, setAddOpen] = useState(false);
   const [addForm, setAddForm] = useState({ placa: '', marca: '', modelo: '', ano: '', cor: '', categoria: 'outro', km_atual: '' });
-
   const [editOpen, setEditOpen] = useState(false);
   const [editId, setEditId] = useState('');
   const [editForm, setEditForm] = useState({ placa: '', marca: '', modelo: '', cor: '', status: 'disponivel', km_atual: '', responsavel_user_id: '' });
-
   const [detailOpen, setDetailOpen] = useState(false);
   const [detailVehicle, setDetailVehicle] = useState<any>(null);
+  const [statusFilter, setStatusFilter] = useState<string>('todos');
+
+  const isLoading = vehiclesLoading || usageLoading || fuelLoading;
+
+  // Aggregated metrics
+  const metrics = useMemo(() => {
+    const custoEstimado = totalKm * FUEL_COST_PER_KM;
+    const custoReal = allFuelRecords.reduce((s: number, f: any) => s + (Number(f.valor) || 0), 0);
+    const disponivel = vehicles.filter((v: any) => v.status === 'disponivel').length;
+    const emUso = vehicles.filter((v: any) => v.status === 'em_uso').length;
+    const manutencao = vehicles.filter((v: any) => v.status === 'manutencao').length;
+    return { custoEstimado, custoReal, disponivel, emUso, manutencao };
+  }, [vehicles, totalKm, allFuelRecords]);
+
+  // Fuel records by vehicle
+  const fuelByVehicle = useMemo(() => {
+    const map: Record<string, number> = {};
+    allFuelRecords.forEach((f: any) => {
+      map[f.vehicle_id] = (map[f.vehicle_id] || 0) + (Number(f.valor) || 0);
+    });
+    return map;
+  }, [allFuelRecords]);
+
+  const filteredVehicles = useMemo(() => {
+    if (statusFilter === 'todos') return vehicles;
+    return vehicles.filter((v: any) => v.status === statusFilter);
+  }, [vehicles, statusFilter]);
 
   const openEdit = (v: any) => {
     setEditId(v.id);
@@ -83,80 +185,195 @@ export default function VehiclesPage() {
     }
   };
 
-  const FUEL_COST_PER_KM = 0.65;
-  const custoEstimado = Number(totalKm || 0) * FUEL_COST_PER_KM;
-
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+    <div className="space-y-5 pb-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Veículos Botolli</h1>
-          <p className="text-sm text-muted-foreground mt-1">Gerencie a frota de veículos</p>
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-foreground">Veículos Botolli</h1>
+          <p className="text-xs text-muted-foreground mt-0.5">Gestão da frota • {vehicles.length} veículo{vehicles.length !== 1 ? 's' : ''}</p>
         </div>
-        <Button size="sm" onClick={() => setAddOpen(true)} className="h-10 sm:h-9">
+        <Button
+          size="sm"
+          onClick={() => setAddOpen(true)}
+          className="h-10 sm:h-9 liquid-glass-card bg-primary/90 hover:bg-primary text-primary-foreground border-primary/30 shadow-lg"
+        >
           <Plus className="w-4 h-4 mr-1" /> Adicionar
         </Button>
       </div>
 
-      {/* Summary card */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="rounded-xl border bg-card p-4 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-primary/10 text-primary">
-            <Gauge className="w-5 h-5" />
-          </div>
-          <div>
-            <p className="text-xs text-muted-foreground">Total KM rodados</p>
-            <p className="text-lg font-bold">{totalKm.toLocaleString('pt-BR')} km</p>
-          </div>
+      {/* KPI Summary Cards */}
+      {isLoading ? (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          {[...Array(5)].map((_, i) => (
+            <Skeleton key={i} className="h-[88px] rounded-2xl liquid-glass-card" />
+          ))}
         </div>
-        <div className="rounded-xl border bg-card p-4 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-accent/10 text-accent">
-            <Fuel className="w-5 h-5" />
-          </div>
-          <div>
-            <p className="text-xs text-muted-foreground">Custo estimado combustível</p>
-            <p className="text-lg font-bold">
-              {custoEstimado.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-            </p>
-            <p className="text-[10px] text-muted-foreground">R$ 0,65/km</p>
-          </div>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          <KpiCard icon={<Gauge className="w-4 h-4" />} label="KM Rodados" value={`${formatKm(totalKm)} km`} variant="primary" />
+          <KpiCard icon={<TrendingUp className="w-4 h-4" />} label="Custo Estimado" value={formatCurrency(metrics.custoEstimado)} sub="R$ 0,65/km" variant="accent" />
+          <KpiCard icon={<DollarSign className="w-4 h-4" />} label="Custo Real" value={formatCurrency(metrics.custoReal)} sub="Abastecimentos" variant="warning" />
+          <KpiCard icon={<Car className="w-4 h-4" />} label="Disponíveis" value={String(metrics.disponivel)} sub={`${metrics.emUso} em uso`} variant="success" />
+          <KpiCard icon={<Wrench className="w-4 h-4" />} label="Manutenção" value={String(metrics.manutencao)} variant="default" />
         </div>
+      )}
+
+      {/* Status filter */}
+      <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+        {[
+          { value: 'todos', label: 'Todos' },
+          { value: 'disponivel', label: 'Disponíveis' },
+          { value: 'em_uso', label: 'Em uso' },
+          { value: 'manutencao', label: 'Manutenção' },
+          { value: 'inativo', label: 'Inativos' },
+        ].map((f) => (
+          <button
+            key={f.value}
+            onClick={() => setStatusFilter(f.value)}
+            className={cn(
+              'px-3 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all',
+              statusFilter === f.value
+                ? 'bg-primary/15 text-primary border border-primary/30'
+                : 'liquid-glass-card text-muted-foreground hover:text-foreground'
+            )}
+          >
+            {f.label}
+          </button>
+        ))}
       </div>
+
+      {/* Vehicle Cards */}
+      {isLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          {[...Array(3)].map((_, i) => (
+            <Skeleton key={i} className="h-[180px] rounded-2xl liquid-glass-card" />
+          ))}
+        </div>
+      ) : filteredVehicles.length === 0 ? (
+        <div className="liquid-glass-card rounded-2xl p-12 text-center">
+          <Car className="w-10 h-10 mx-auto mb-3 text-muted-foreground/40" />
+          <p className="text-sm font-medium text-muted-foreground">
+            {statusFilter !== 'todos' ? 'Nenhum veículo com esse status' : 'Nenhum veículo cadastrado'}
+          </p>
+          <p className="text-xs text-muted-foreground/70 mt-1">
+            {statusFilter !== 'todos' ? 'Tente outro filtro' : 'Clique em "Adicionar" para começar'}
+          </p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          {filteredVehicles.map((v: any) => {
+            const driver = members.find((m: any) => m.user_id === v.responsavel_user_id);
+            const sc = statusConfig[v.status] || statusConfig.disponivel;
+            const vehicleKm = kmByVehicle[v.id] || 0;
+            const vehicleFuelCost = fuelByVehicle[v.id] || 0;
+            return (
+              <div
+                key={v.id}
+                className="liquid-glass-card rounded-2xl p-4 transition-all active:scale-[0.98] cursor-pointer hover:shadow-md"
+                onClick={() => { setDetailVehicle(v); setDetailOpen(true); }}
+              >
+                <div className="flex items-start justify-between mb-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-10 h-10 rounded-xl flex items-center justify-center bg-primary/10 text-primary shrink-0">
+                      <Car className="w-5 h-5" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="font-semibold text-sm text-foreground truncate">
+                        {v.marca} {v.modelo} {v.cor ? v.cor.toUpperCase() : ''}
+                      </p>
+                      <p className="text-xs font-mono text-muted-foreground">{v.placa}</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    <button
+                      onClick={(e) => { e.stopPropagation(); openEdit(v); }}
+                      aria-label={`Editar ${v.placa}`}
+                      className="p-2 rounded-xl hover:bg-foreground/5 transition-colors text-muted-foreground hover:text-foreground min-w-[40px] min-h-[40px] flex items-center justify-center"
+                    >
+                      <Pencil className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2 mb-3">
+                  <Badge variant="outline" className={cn('text-[10px] font-medium', sc.badgeCls)}>
+                    {sc.label}
+                  </Badge>
+                  {driver && (
+                    <span className="text-[10px] text-muted-foreground truncate flex items-center gap-1">
+                      <div className="w-4 h-4 rounded-full flex items-center justify-center text-[7px] font-bold text-primary-foreground shrink-0" style={{ backgroundColor: driver.avatar_color || 'hsl(142,50%,35%)' }}>
+                        {(driver.nome_exibicao || '?')[0]}
+                      </div>
+                      {driver.nome_exibicao}
+                    </span>
+                  )}
+                </div>
+
+                <div className="grid grid-cols-3 gap-2 text-center">
+                  <div className="rounded-xl bg-foreground/[0.03] p-2">
+                    <p className="text-[10px] text-muted-foreground">Odômetro</p>
+                    <p className="text-xs font-bold text-foreground">{formatKm(Number(v.km_atual || 0))}</p>
+                  </div>
+                  <div className="rounded-xl bg-foreground/[0.03] p-2">
+                    <p className="text-[10px] text-muted-foreground">KM Rodados</p>
+                    <p className="text-xs font-bold text-foreground">{formatKm(vehicleKm)}</p>
+                  </div>
+                  <div className="rounded-xl bg-foreground/[0.03] p-2">
+                    <p className="text-[10px] text-muted-foreground">Custo Real</p>
+                    <p className="text-xs font-bold text-foreground">{vehicleFuelCost > 0 ? formatCurrency(vehicleFuelCost) : '—'}</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-end mt-3 text-xs text-primary font-medium">
+                  <span className="flex items-center gap-1">Detalhes <ChevronRight className="w-3 h-3" /></span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* Add dialog */}
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader><DialogTitle>Adicionar Veículo</DialogTitle></DialogHeader>
-          <div className="space-y-3">
-            <Input placeholder="Placa (ex: ABC-1D23)" value={addForm.placa} onChange={(e) => setAddForm({ ...addForm, placa: e.target.value })} />
+        <DialogContent className="sm:max-w-md liquid-glass-card border-border/40">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold">Adicionar Veículo</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 pt-2">
+            <Input placeholder="Placa (ex: ABC-1D23)" value={addForm.placa} onChange={(e) => setAddForm({ ...addForm, placa: e.target.value })} className="h-11" />
             <div className="grid grid-cols-2 gap-3">
-              <Input placeholder="Marca" value={addForm.marca} onChange={(e) => setAddForm({ ...addForm, marca: e.target.value })} />
-              <Input placeholder="Modelo" value={addForm.modelo} onChange={(e) => setAddForm({ ...addForm, modelo: e.target.value })} />
+              <Input placeholder="Marca" value={addForm.marca} onChange={(e) => setAddForm({ ...addForm, marca: e.target.value })} className="h-11" />
+              <Input placeholder="Modelo" value={addForm.modelo} onChange={(e) => setAddForm({ ...addForm, modelo: e.target.value })} className="h-11" />
             </div>
             <div className="grid grid-cols-3 gap-3">
-              <Input placeholder="Ano" type="number" value={addForm.ano} onChange={(e) => setAddForm({ ...addForm, ano: e.target.value })} />
-              <Input placeholder="Cor" value={addForm.cor} onChange={(e) => setAddForm({ ...addForm, cor: e.target.value })} />
-              <Input placeholder="KM atual" type="number" value={addForm.km_atual} onChange={(e) => setAddForm({ ...addForm, km_atual: e.target.value })} />
+              <Input placeholder="Ano" type="number" value={addForm.ano} onChange={(e) => setAddForm({ ...addForm, ano: e.target.value })} className="h-11" />
+              <Input placeholder="Cor" value={addForm.cor} onChange={(e) => setAddForm({ ...addForm, cor: e.target.value })} className="h-11" />
+              <Input placeholder="KM atual" type="number" value={addForm.km_atual} onChange={(e) => setAddForm({ ...addForm, km_atual: e.target.value })} className="h-11" />
             </div>
-            <Button onClick={handleAdd} className="w-full h-11" disabled={create.isPending}>Adicionar</Button>
+            <Button onClick={handleAdd} className="w-full h-11 font-semibold" disabled={create.isPending}>
+              {create.isPending ? 'Adicionando...' : 'Adicionar Veículo'}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
 
       {/* Edit dialog */}
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader><DialogTitle>Editar Veículo</DialogTitle></DialogHeader>
-          <div className="space-y-3">
-            <Input placeholder="Placa" value={editForm.placa} onChange={(e) => setEditForm({ ...editForm, placa: e.target.value })} />
+        <DialogContent className="sm:max-w-md liquid-glass-card border-border/40">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold">Editar Veículo</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 pt-2">
+            <Input placeholder="Placa" value={editForm.placa} onChange={(e) => setEditForm({ ...editForm, placa: e.target.value })} className="h-11" />
             <div className="grid grid-cols-2 gap-3">
-              <Input placeholder="Marca" value={editForm.marca} onChange={(e) => setEditForm({ ...editForm, marca: e.target.value })} />
-              <Input placeholder="Modelo" value={editForm.modelo} onChange={(e) => setEditForm({ ...editForm, modelo: e.target.value })} />
+              <Input placeholder="Marca" value={editForm.marca} onChange={(e) => setEditForm({ ...editForm, marca: e.target.value })} className="h-11" />
+              <Input placeholder="Modelo" value={editForm.modelo} onChange={(e) => setEditForm({ ...editForm, modelo: e.target.value })} className="h-11" />
             </div>
-            <Input placeholder="Cor" value={editForm.cor} onChange={(e) => setEditForm({ ...editForm, cor: e.target.value })} />
-            <Input placeholder="KM atual" type="number" value={editForm.km_atual} onChange={(e) => setEditForm({ ...editForm, km_atual: e.target.value })} />
+            <Input placeholder="Cor" value={editForm.cor} onChange={(e) => setEditForm({ ...editForm, cor: e.target.value })} className="h-11" />
+            <Input placeholder="KM atual" type="number" value={editForm.km_atual} onChange={(e) => setEditForm({ ...editForm, km_atual: e.target.value })} className="h-11" />
             <Select value={editForm.status} onValueChange={(v) => setEditForm({ ...editForm, status: v })}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger className="h-11"><SelectValue /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="disponivel">Disponível</SelectItem>
                 <SelectItem value="em_uso">Em uso</SelectItem>
@@ -165,7 +382,7 @@ export default function VehiclesPage() {
               </SelectContent>
             </Select>
             <Select value={editForm.responsavel_user_id} onValueChange={(v) => setEditForm({ ...editForm, responsavel_user_id: v })}>
-              <SelectTrigger><SelectValue placeholder="Responsável" /></SelectTrigger>
+              <SelectTrigger className="h-11"><SelectValue placeholder="Responsável" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="none">Nenhum</SelectItem>
                 {members.map((m: any) => (
@@ -173,81 +390,63 @@ export default function VehiclesPage() {
                 ))}
               </SelectContent>
             </Select>
-            <Button onClick={handleEdit} className="w-full h-11" disabled={update.isPending}>Salvar</Button>
+            <Button onClick={handleEdit} className="w-full h-11 font-semibold" disabled={update.isPending}>
+              {update.isPending ? 'Salvando...' : 'Salvar Alterações'}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
 
-      {/* Detail dialog with usage history */}
+      {/* Detail dialog */}
       <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
-        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
-          <DialogHeader><DialogTitle>{detailVehicle?.marca} {detailVehicle?.modelo} {detailVehicle?.cor ? detailVehicle.cor.toUpperCase() : ''} — {detailVehicle?.placa}</DialogTitle></DialogHeader>
-          {detailVehicle && <VehicleDetailContent vehicle={detailVehicle} members={members} userId={user?.id} />}
+        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto liquid-glass-card border-border/40">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold">
+              {detailVehicle?.marca} {detailVehicle?.modelo} {detailVehicle?.cor ? detailVehicle.cor.toUpperCase() : ''} — {detailVehicle?.placa}
+            </DialogTitle>
+          </DialogHeader>
+          {detailVehicle && (
+            <VehicleDetailContent
+              vehicle={detailVehicle}
+              members={members}
+              userId={user?.id}
+              kmTotal={kmByVehicle[detailVehicle.id] || 0}
+              fuelCostTotal={fuelByVehicle[detailVehicle.id] || 0}
+            />
+          )}
         </DialogContent>
       </Dialog>
-
-      {/* Vehicle cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {vehicles.map((v: any) => {
-          const driver = members.find((m: any) => m.user_id === v.responsavel_user_id);
-          const sc = statusConfig[v.status] || statusConfig.disponivel;
-          const vehicleKm = kmByVehicle[v.id] || 0;
-          return (
-            <div
-              key={v.id}
-              className={cn('rounded-xl border p-4 sm:p-5 hover:shadow-md transition-shadow cursor-pointer', sc.cardBg)}
-              onClick={() => { setDetailVehicle(v); setDetailOpen(true); }}
-            >
-              <div className="flex items-start justify-between mb-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-background/80 text-foreground">
-                    <Car className="w-5 h-5" />
-                  </div>
-                  <div>
-                    <p className="font-semibold text-sm">{v.marca} {v.modelo} {v.cor ? v.cor.toUpperCase() : ''}</p>
-                    <p className="text-xs font-mono text-muted-foreground">{v.placa}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <button onClick={(e) => { e.stopPropagation(); openEdit(v); }} aria-label={`Editar ${v.placa}`} className="p-1.5 rounded-lg hover:bg-background/60 transition-colors text-muted-foreground hover:text-foreground focus-ring min-w-[44px] min-h-[44px] flex items-center justify-center">
-                    <Pencil className="w-3.5 h-3.5" />
-                  </button>
-                  <Badge variant="outline" className={cn('text-[10px]', sc.class)}>{sc.label}</Badge>
-                </div>
-              </div>
-              <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-2">
-                <Gauge className="w-3 h-3" /> KM rodados: <span className="font-semibold text-foreground">{vehicleKm.toLocaleString('pt-BR')} km</span>
-              </div>
-              {v.km_atual != null && (
-                <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-2">
-                  <Gauge className="w-3 h-3" /> Odômetro: {Number(v.km_atual).toLocaleString('pt-BR')} km
-                </div>
-              )}
-              {driver && (
-                <div className="flex items-center gap-2 mb-2 text-xs text-muted-foreground">
-                  <div className="w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold text-primary-foreground" style={{ backgroundColor: driver.avatar_color || 'hsl(142,50%,35%)' }}>
-                    {(driver.nome_exibicao || '?')[0]}
-                  </div>
-                  <span>{driver.nome_exibicao}</span>
-                </div>
-              )}
-            </div>
-          );
-        })}
-        {vehicles.length === 0 && (
-          <div className="col-span-full text-center py-12 text-muted-foreground">
-            <Car className="w-8 h-8 mx-auto mb-2 opacity-50" />
-            <p className="text-sm">Nenhum veículo cadastrado</p>
-            <p className="text-xs">Clique em "Adicionar" para cadastrar o primeiro veículo</p>
-          </div>
-        )}
-      </div>
     </div>
   );
 }
 
-// Sub-component for vehicle detail with usage history
-function VehicleDetailContent({ vehicle, members, userId }: { vehicle: any; members: any[]; userId?: string }) {
+// KPI Card component
+function KpiCard({ icon, label, value, sub, variant = 'default' }: { icon: React.ReactNode; label: string; value: string; sub?: string; variant?: string }) {
+  const iconBg: Record<string, string> = {
+    primary: 'bg-primary/12 text-primary',
+    accent: 'bg-accent/12 text-accent',
+    warning: 'bg-warning/12 text-warning',
+    success: 'bg-success/12 text-success',
+    default: 'bg-muted/60 text-muted-foreground',
+  };
+  return (
+    <div className="liquid-glass-card rounded-2xl p-3.5">
+      <div className="flex items-center gap-2 mb-1.5">
+        <div className={cn('w-7 h-7 rounded-lg flex items-center justify-center', iconBg[variant] || iconBg.default)}>
+          {icon}
+        </div>
+        <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider leading-tight">{label}</p>
+      </div>
+      <p className="text-lg font-bold tracking-tight text-foreground">{value}</p>
+      {sub && <p className="text-[10px] text-muted-foreground mt-0.5">{sub}</p>}
+    </div>
+  );
+}
+
+// Vehicle detail sub-component
+function VehicleDetailContent({ vehicle, members, userId, kmTotal, fuelCostTotal }: {
+  vehicle: any; members: any[]; userId?: string; kmTotal: number; fuelCostTotal: number;
+}) {
   const { usages, createUsage, updateUsage } = useVehicleUsage(vehicle.id);
   const { transports } = useTransports();
   const { update: updateVehicle } = useVehicles();
@@ -258,8 +457,8 @@ function VehicleDetailContent({ vehicle, members, userId }: { vehicle: any; memb
   const [kmChegada, setKmChegada] = useState('');
   const [responsavelId, setResponsavelId] = useState(userId || '');
   const [obs, setObs] = useState('');
+  const [activeTab, setActiveTab] = useState<'uso' | 'combustivel'>('uso');
 
-  // Fuel form state
   const [fuelOpen, setFuelOpen] = useState(false);
   const [fuelForm, setFuelForm] = useState({ litros: '', valor: '', km_abastecimento: '', posto: '', observacoes: '' });
   const [fuelPhoto, setFuelPhoto] = useState<File | null>(null);
@@ -316,6 +515,11 @@ function VehicleDetailContent({ vehicle, members, userId }: { vehicle: any; memb
 
   const handleDevolucao = async (usageId: string) => {
     if (!kmChegada) { toast.error('Informe o KM de chegada'); return; }
+    const usage = usages.find((u: any) => u.id === usageId);
+    if (usage && Number(kmChegada) < Number(usage.km_saida)) {
+      toast.error('KM de chegada não pode ser menor que KM de saída');
+      return;
+    }
     try {
       await updateUsage.mutateAsync({
         id: usageId,
@@ -343,7 +547,6 @@ function VehicleDetailContent({ vehicle, members, userId }: { vehicle: any; memb
     return hours > 0 ? `${hours}h${mins > 0 ? `${mins}min` : ''}` : `${mins}min`;
   };
 
-  // Find matching transport for a usage entry
   const findTransport = (usage: any) => {
     return transports.find((t: any) =>
       t.vehicle_id === vehicle.id &&
@@ -353,26 +556,53 @@ function VehicleDetailContent({ vehicle, members, userId }: { vehicle: any; memb
     );
   };
 
+  const handleGeneratePDF = () => {
+    generateVehiclePDF(vehicle, usages, fuelRecords, kmTotal, members);
+  };
+
   return (
     <div className="space-y-4">
-      {/* Open usage: show devolução */}
+      {/* Vehicle metrics summary */}
+      <div className="grid grid-cols-3 gap-2">
+        <div className="rounded-xl bg-foreground/[0.03] p-3 text-center">
+          <p className="text-[10px] text-muted-foreground">Odômetro</p>
+          <p className="text-sm font-bold">{formatKm(Number(vehicle.km_atual || 0))} km</p>
+        </div>
+        <div className="rounded-xl bg-foreground/[0.03] p-3 text-center">
+          <p className="text-[10px] text-muted-foreground">KM Rodados</p>
+          <p className="text-sm font-bold">{formatKm(kmTotal)} km</p>
+        </div>
+        <div className="rounded-xl bg-foreground/[0.03] p-3 text-center">
+          <p className="text-[10px] text-muted-foreground">Custo Real</p>
+          <p className="text-sm font-bold">{fuelCostTotal > 0 ? formatCurrency(fuelCostTotal) : '—'}</p>
+        </div>
+      </div>
+
+      {/* PDF button */}
+      <Button variant="outline" size="sm" onClick={handleGeneratePDF} className="w-full h-9 text-xs liquid-glass-card">
+        <FileText className="w-3.5 h-3.5 mr-1.5" /> Gerar Relatório PDF
+      </Button>
+
+      {/* Retirada / Devolução */}
       {openUsage ? (
-        <div className="rounded-lg border border-accent/30 bg-accent/5 p-3 space-y-2">
-          <p className="text-sm font-medium text-accent">⚠️ Veículo em uso — registrar devolução</p>
+        <div className="rounded-xl border border-warning/30 bg-warning/5 p-3.5 space-y-2.5">
+          <p className="text-sm font-semibold text-warning flex items-center gap-1.5">
+            <Activity className="w-4 h-4" /> Veículo em uso — registrar devolução
+          </p>
           <p className="text-xs text-muted-foreground">
             Responsável: {getMemberName(openUsage.responsavel_user_id)} | KM saída: {Number(openUsage.km_saida).toLocaleString('pt-BR')}
           </p>
-          <Input placeholder="KM chegada (obrigatório)" type="number" value={kmChegada} onChange={(e) => setKmChegada(e.target.value)} />
-          <Button size="sm" onClick={() => handleDevolucao(openUsage.id)} disabled={updateUsage.isPending} className="w-full">
-            Registrar Devolução
+          <Input placeholder="KM chegada (obrigatório)" type="number" value={kmChegada} onChange={(e) => setKmChegada(e.target.value)} className="h-11" />
+          <Button size="sm" onClick={() => handleDevolucao(openUsage.id)} disabled={updateUsage.isPending} className="w-full h-10">
+            {updateUsage.isPending ? 'Registrando...' : 'Registrar Devolução'}
           </Button>
         </div>
       ) : (
-        <div className="rounded-lg border p-3 space-y-2">
-          <p className="text-sm font-medium">Registrar Retirada</p>
-          <Input placeholder="KM saída" type="number" value={kmSaida} onChange={(e) => setKmSaida(e.target.value)} />
+        <div className="rounded-xl liquid-glass-card p-3.5 space-y-2.5">
+          <p className="text-sm font-semibold text-foreground">Registrar Retirada</p>
+          <Input placeholder="KM saída" type="number" value={kmSaida} onChange={(e) => setKmSaida(e.target.value)} className="h-11" />
           <Select value={responsavelId} onValueChange={setResponsavelId}>
-            <SelectTrigger><SelectValue placeholder="Responsável" /></SelectTrigger>
+            <SelectTrigger className="h-11"><SelectValue placeholder="Responsável" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="none">Nenhum</SelectItem>
               {members.map((m: any) => (
@@ -380,214 +610,221 @@ function VehicleDetailContent({ vehicle, members, userId }: { vehicle: any; memb
               ))}
             </SelectContent>
           </Select>
-          <Input placeholder="Observações (opcional)" value={obs} onChange={(e) => setObs(e.target.value)} />
-          <Button size="sm" onClick={handleRetirada} disabled={createUsage.isPending} className="w-full">
-            Registrar Retirada
+          <Input placeholder="Observações (opcional)" value={obs} onChange={(e) => setObs(e.target.value)} className="h-11" />
+          <Button size="sm" onClick={handleRetirada} disabled={createUsage.isPending} className="w-full h-10">
+            {createUsage.isPending ? 'Registrando...' : 'Registrar Retirada'}
           </Button>
         </div>
       )}
 
-      {/* Usage history */}
-      <div>
-        <p className="text-sm font-medium mb-3">Histórico de Utilização</p>
-        {usages.length === 0 ? (
-          <p className="text-xs text-muted-foreground">Nenhum uso registrado</p>
-        ) : (
-          <div className="space-y-2">
-            {usages.map((u: any) => {
-              const matchedTransport = u.km_chegada ? findTransport(u) : null;
-              return (
-                <div
-                  key={u.id}
-                  className={cn(
-                    'rounded-lg border p-3 text-xs space-y-1.5 transition-colors',
-                    matchedTransport ? 'cursor-pointer hover:bg-muted/60' : ''
-                  )}
-                  onClick={() => {
-                    if (matchedTransport) navigate('/transports');
-                  }}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium">{getMemberName(u.responsavel_user_id)}</span>
-                    <div className="flex items-center gap-1.5">
-                      {matchedTransport && <ExternalLink className="w-3 h-3 text-primary" />}
-                      <Badge variant={u.km_chegada ? 'secondary' : 'outline'} className="text-[10px]">
-                        {u.km_chegada ? 'Devolvido' : 'Em uso'}
-                      </Badge>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 text-muted-foreground flex-wrap">
-                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{formatDateTime(u.retirada_em)}</span>
-                    {u.devolucao_em && (
-                      <>
-                        <ArrowRight className="w-3 h-3" />
-                        <span>{formatDateTime(u.devolucao_em)}</span>
-                        <Badge variant="outline" className="text-[10px] ml-auto">{calcDuration(u.retirada_em, u.devolucao_em)}</Badge>
-                      </>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-3 text-muted-foreground">
-                    <span>Saída: {Number(u.km_saida).toLocaleString('pt-BR')} km</span>
-                    {u.km_chegada && (
-                      <>
-                        <ArrowRight className="w-3 h-3" />
-                        <span>Chegada: {Number(u.km_chegada).toLocaleString('pt-BR')} km</span>
-                        <span className="font-semibold text-foreground ml-auto">
-                          {Number(u.km_rodados).toLocaleString('pt-BR')} km
-                        </span>
-                      </>
-                    )}
-                  </div>
-                  {matchedTransport && (
-                    <div className="text-primary text-[10px] flex items-center gap-1">
-                      <Car className="w-3 h-3" />
-                      {matchedTransport.titulo || `${matchedTransport.origem} → ${matchedTransport.destino}`}
-                    </div>
-                  )}
-                  {u.observacoes && <p className="text-muted-foreground italic">{u.observacoes}</p>}
-                </div>
-              );
-            })}
-          </div>
-        )}
+      {/* Tabs */}
+      <div className="flex gap-1 p-1 rounded-xl bg-muted/40">
+        <button
+          className={cn('flex-1 py-2 px-3 rounded-lg text-xs font-medium transition-all', activeTab === 'uso' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground')}
+          onClick={() => setActiveTab('uso')}
+        >
+          Utilização ({usages.length})
+        </button>
+        <button
+          className={cn('flex-1 py-2 px-3 rounded-lg text-xs font-medium transition-all', activeTab === 'combustivel' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground')}
+          onClick={() => setActiveTab('combustivel')}
+        >
+          Combustível ({fuelRecords.length})
+        </button>
       </div>
 
-      {/* Fuel Records Section */}
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <p className="text-sm font-medium flex items-center gap-2"><Fuel className="w-4 h-4 text-accent" /> Abastecimentos</p>
-          <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => setFuelOpen(!fuelOpen)}>
-            {fuelOpen ? 'Cancelar' : '+ Registrar'}
-          </Button>
-        </div>
-
-        {fuelOpen && (
-          <div className="rounded-lg border p-3 space-y-2 mb-3">
-            <div className="grid grid-cols-2 gap-2">
-              <Input placeholder="Litros" type="number" step="0.01" value={fuelForm.litros} onChange={(e) => setFuelForm({ ...fuelForm, litros: e.target.value })} className="uppercase" />
-              <Input placeholder="Valor (R$)" type="number" step="0.01" value={fuelForm.valor} onChange={(e) => setFuelForm({ ...fuelForm, valor: e.target.value })} className="uppercase" />
+      {/* Usage history tab */}
+      {activeTab === 'uso' && (
+        <div>
+          {usages.length === 0 ? (
+            <div className="text-center py-8">
+              <Clock className="w-8 h-8 mx-auto mb-2 text-muted-foreground/30" />
+              <p className="text-xs text-muted-foreground">Nenhum uso registrado</p>
             </div>
-            <Input placeholder="KM no abastecimento" type="number" value={fuelForm.km_abastecimento} onChange={(e) => setFuelForm({ ...fuelForm, km_abastecimento: e.target.value })} className="uppercase" />
-            <Input placeholder="Posto / Local" value={fuelForm.posto} onChange={(e) => setFuelForm({ ...fuelForm, posto: e.target.value })} className="uppercase" />
-            <Input placeholder="Observações (opcional)" value={fuelForm.observacoes} onChange={(e) => setFuelForm({ ...fuelForm, observacoes: e.target.value })} className="uppercase" />
+          ) : (
+            <div className="space-y-2">
+              {usages.map((u: any) => {
+                const matchedTransport = u.km_chegada ? findTransport(u) : null;
+                return (
+                  <div
+                    key={u.id}
+                    className={cn(
+                      'rounded-xl liquid-glass-card p-3 text-xs space-y-1.5',
+                      matchedTransport ? 'cursor-pointer active:scale-[0.98]' : ''
+                    )}
+                    onClick={() => { if (matchedTransport) navigate('/transports'); }}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className="font-medium text-foreground">{getMemberName(u.responsavel_user_id)}</span>
+                      <div className="flex items-center gap-1.5">
+                        {matchedTransport && <ExternalLink className="w-3 h-3 text-primary" />}
+                        <Badge variant={u.km_chegada ? 'secondary' : 'outline'} className="text-[10px]">
+                          {u.km_chegada ? 'Devolvido' : 'Em uso'}
+                        </Badge>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 text-muted-foreground flex-wrap">
+                      <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{formatDateTime(u.retirada_em)}</span>
+                      {u.devolucao_em && (
+                        <>
+                          <ArrowRight className="w-3 h-3" />
+                          <span>{formatDateTime(u.devolucao_em)}</span>
+                          <Badge variant="outline" className="text-[10px] ml-auto">{calcDuration(u.retirada_em, u.devolucao_em)}</Badge>
+                        </>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-3 text-muted-foreground">
+                      <span>Saída: {Number(u.km_saida).toLocaleString('pt-BR')} km</span>
+                      {u.km_chegada && (
+                        <>
+                          <ArrowRight className="w-3 h-3" />
+                          <span>Chegada: {Number(u.km_chegada).toLocaleString('pt-BR')} km</span>
+                          <span className="font-semibold text-foreground ml-auto">
+                            {Number(u.km_rodados).toLocaleString('pt-BR')} km
+                          </span>
+                        </>
+                      )}
+                    </div>
+                    {matchedTransport && (
+                      <div className="text-primary text-[10px] flex items-center gap-1">
+                        <Car className="w-3 h-3" />
+                        {matchedTransport.titulo || `${matchedTransport.origem} → ${matchedTransport.destino}`}
+                      </div>
+                    )}
+                    {u.observacoes && <p className="text-muted-foreground italic">{u.observacoes}</p>}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
 
-            {/* Photo upload */}
-            <div>
-              <label className="flex items-center gap-2 p-3 rounded-lg border border-dashed border-primary/30 bg-primary/5 cursor-pointer hover:bg-primary/10 transition-colors">
+      {/* Fuel tab */}
+      {activeTab === 'combustivel' && (
+        <div>
+          <div className="flex items-center justify-end mb-3">
+            <Button size="sm" variant="outline" className="h-8 text-xs liquid-glass-card" onClick={() => setFuelOpen(!fuelOpen)}>
+              {fuelOpen ? 'Cancelar' : '+ Registrar'}
+            </Button>
+          </div>
+
+          {fuelOpen && (
+            <div className="rounded-xl liquid-glass-card p-3.5 space-y-2.5 mb-3">
+              <div className="grid grid-cols-2 gap-2">
+                <Input placeholder="Litros" type="number" step="0.01" value={fuelForm.litros} onChange={(e) => setFuelForm({ ...fuelForm, litros: e.target.value })} className="h-11" />
+                <Input placeholder="Valor (R$)" type="number" step="0.01" value={fuelForm.valor} onChange={(e) => setFuelForm({ ...fuelForm, valor: e.target.value })} className="h-11" />
+              </div>
+              <Input placeholder="KM no abastecimento" type="number" value={fuelForm.km_abastecimento} onChange={(e) => setFuelForm({ ...fuelForm, km_abastecimento: e.target.value })} className="h-11" />
+              <Input placeholder="Posto / Local" value={fuelForm.posto} onChange={(e) => setFuelForm({ ...fuelForm, posto: e.target.value })} className="h-11" />
+              <Input placeholder="Observações (opcional)" value={fuelForm.observacoes} onChange={(e) => setFuelForm({ ...fuelForm, observacoes: e.target.value })} className="h-11" />
+
+              <label className="flex items-center gap-2 p-3 rounded-xl border border-dashed border-primary/30 bg-primary/5 cursor-pointer hover:bg-primary/10 transition-colors">
                 <Camera className="w-5 h-5 text-primary" />
                 <span className="text-xs text-muted-foreground">{fuelPhoto ? fuelPhoto.name : 'Anexar cupom fiscal (foto)'}</span>
                 <input
-                  type="file"
-                  accept="image/*"
-                  capture="environment"
-                  className="hidden"
+                  type="file" accept="image/*" capture="environment" className="hidden"
                   onChange={(e) => {
                     const f = e.target.files?.[0];
-                    if (f) {
-                      setFuelPhoto(f);
-                      setFuelPhotoPreview(URL.createObjectURL(f));
-                    }
+                    if (f) { setFuelPhoto(f); setFuelPhotoPreview(URL.createObjectURL(f)); }
                   }}
                 />
               </label>
               {fuelPhotoPreview && (
-                <div className="mt-2 relative">
-                  <img src={fuelPhotoPreview} alt="Preview cupom" className="w-full max-h-40 object-contain rounded-lg border" />
+                <div className="relative">
+                  <img src={fuelPhotoPreview} alt="Preview cupom" className="w-full max-h-40 object-contain rounded-xl border" />
                   <button className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full w-5 h-5 flex items-center justify-center text-xs" onClick={() => { setFuelPhoto(null); setFuelPhotoPreview(null); }}>×</button>
                 </div>
               )}
+
+              <Button
+                size="sm" className="w-full h-10" disabled={fuelLoading}
+                onClick={async () => {
+                  if (!fuelForm.litros && !fuelForm.valor) { toast.error('Informe litros ou valor'); return; }
+                  setFuelLoading(true);
+                  try {
+                    let cupomUrl: string | null = null;
+                    if (fuelPhoto) cupomUrl = await uploadReceipt(fuelPhoto, vehicle.id);
+                    await createFuel.mutateAsync({
+                      vehicle_id: vehicle.id,
+                      litros: fuelForm.litros ? Number(fuelForm.litros) : null,
+                      valor: fuelForm.valor ? Number(fuelForm.valor) : null,
+                      km_abastecimento: fuelForm.km_abastecimento ? Number(fuelForm.km_abastecimento) : null,
+                      posto: fuelForm.posto || null,
+                      observacoes: fuelForm.observacoes || null,
+                      cupom_fiscal_url: cupomUrl,
+                      registrado_por_user_id: userId || null,
+                    });
+                    setFuelForm({ litros: '', valor: '', km_abastecimento: '', posto: '', observacoes: '' });
+                    setFuelPhoto(null); setFuelPhotoPreview(null); setFuelOpen(false);
+                    toast.success('Abastecimento registrado');
+                  } catch (err: any) { toast.error(err.message); }
+                  setFuelLoading(false);
+                }}
+              >
+                {fuelLoading ? 'Registrando...' : 'Registrar Abastecimento'}
+              </Button>
             </div>
+          )}
 
-            <Button
-              size="sm"
-              className="w-full"
-              disabled={fuelLoading}
-              onClick={async () => {
-                if (!fuelForm.litros && !fuelForm.valor) { toast.error('Informe litros ou valor'); return; }
-                setFuelLoading(true);
-                try {
-                  let cupomUrl: string | null = null;
-                  if (fuelPhoto) {
-                    cupomUrl = await uploadReceipt(fuelPhoto, vehicle.id);
-                  }
-                  await createFuel.mutateAsync({
-                    vehicle_id: vehicle.id,
-                    litros: fuelForm.litros ? Number(fuelForm.litros) : null,
-                    valor: fuelForm.valor ? Number(fuelForm.valor) : null,
-                    km_abastecimento: fuelForm.km_abastecimento ? Number(fuelForm.km_abastecimento) : null,
-                    posto: fuelForm.posto || null,
-                    observacoes: fuelForm.observacoes || null,
-                    cupom_fiscal_url: cupomUrl,
-                    registrado_por_user_id: userId || null,
-                  });
-                  setFuelForm({ litros: '', valor: '', km_abastecimento: '', posto: '', observacoes: '' });
-                  setFuelPhoto(null);
-                  setFuelPhotoPreview(null);
-                  setFuelOpen(false);
-                  toast.success('Abastecimento registrado');
-                } catch (err: any) { toast.error(err.message); }
-                setFuelLoading(false);
-              }}
-            >
-              Registrar Abastecimento
-            </Button>
-          </div>
-        )}
-
-        {fuelRecords.length === 0 && !fuelOpen ? (
-          <p className="text-xs text-muted-foreground">Nenhum abastecimento registrado</p>
-        ) : (
-          <div className="space-y-2">
-            {fuelRecords.map((f: any) => {
-              const who = members.find((m: any) => m.user_id === f.registrado_por_user_id);
-              const isEditing = editFuelId === f.id;
-              return (
-                <div key={f.id} className="rounded-lg border p-3 text-xs space-y-1">
-                  {isEditing ? (
-                    <div className="space-y-2">
-                      <div className="grid grid-cols-2 gap-2">
-                        <Input placeholder="Litros" type="number" step="0.01" value={editFuelForm.litros} onChange={(e) => setEditFuelForm({ ...editFuelForm, litros: e.target.value })} />
-                        <Input placeholder="Valor (R$)" type="number" step="0.01" value={editFuelForm.valor} onChange={(e) => setEditFuelForm({ ...editFuelForm, valor: e.target.value })} />
-                      </div>
-                      <Input placeholder="KM no abastecimento" type="number" value={editFuelForm.km_abastecimento} onChange={(e) => setEditFuelForm({ ...editFuelForm, km_abastecimento: e.target.value })} />
-                      <Input placeholder="Posto / Local" value={editFuelForm.posto} onChange={(e) => setEditFuelForm({ ...editFuelForm, posto: e.target.value })} />
-                      <Input placeholder="Observações" value={editFuelForm.observacoes} onChange={(e) => setEditFuelForm({ ...editFuelForm, observacoes: e.target.value })} />
-                      <div className="flex gap-2">
-                        <Button size="sm" className="flex-1" onClick={handleFuelEdit} disabled={fuelLoading}>Salvar</Button>
-                        <Button size="sm" variant="ghost" onClick={() => setEditFuelId(null)}>Cancelar</Button>
-                      </div>
-                    </div>
-                  ) : (
-                    <>
-                      <div className="flex items-center justify-between">
-                        <span className="font-medium">{who?.nome_exibicao || '—'}</span>
-                        <div className="flex items-center gap-2">
-                          <button onClick={() => openFuelEdit(f)} className="p-1 rounded hover:bg-muted transition-colors" aria-label="Editar abastecimento">
-                            <Pencil className="w-3 h-3 text-muted-foreground" />
-                          </button>
-                          <span className="text-muted-foreground">{new Date(f.created_at).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}</span>
+          {fuelRecords.length === 0 && !fuelOpen ? (
+            <div className="text-center py-8">
+              <Fuel className="w-8 h-8 mx-auto mb-2 text-muted-foreground/30" />
+              <p className="text-xs text-muted-foreground">Nenhum abastecimento registrado</p>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {fuelRecords.map((f: any) => {
+                const who = members.find((m: any) => m.user_id === f.registrado_por_user_id);
+                const isEditing = editFuelId === f.id;
+                return (
+                  <div key={f.id} className="rounded-xl liquid-glass-card p-3 text-xs space-y-1.5">
+                    {isEditing ? (
+                      <div className="space-y-2">
+                        <div className="grid grid-cols-2 gap-2">
+                          <Input placeholder="Litros" type="number" step="0.01" value={editFuelForm.litros} onChange={(e) => setEditFuelForm({ ...editFuelForm, litros: e.target.value })} />
+                          <Input placeholder="Valor (R$)" type="number" step="0.01" value={editFuelForm.valor} onChange={(e) => setEditFuelForm({ ...editFuelForm, valor: e.target.value })} />
+                        </div>
+                        <Input placeholder="KM" type="number" value={editFuelForm.km_abastecimento} onChange={(e) => setEditFuelForm({ ...editFuelForm, km_abastecimento: e.target.value })} />
+                        <Input placeholder="Posto" value={editFuelForm.posto} onChange={(e) => setEditFuelForm({ ...editFuelForm, posto: e.target.value })} />
+                        <Input placeholder="Observações" value={editFuelForm.observacoes} onChange={(e) => setEditFuelForm({ ...editFuelForm, observacoes: e.target.value })} />
+                        <div className="flex gap-2">
+                          <Button size="sm" className="flex-1" onClick={handleFuelEdit} disabled={fuelLoading}>Salvar</Button>
+                          <Button size="sm" variant="ghost" onClick={() => setEditFuelId(null)}>Cancelar</Button>
                         </div>
                       </div>
-                      <div className="flex items-center gap-3 text-muted-foreground flex-wrap">
-                        {f.litros && <span><Fuel className="w-3 h-3 inline mr-0.5" />{Number(f.litros).toLocaleString('pt-BR')} L</span>}
-                        {f.valor && <span>R$ {Number(f.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>}
-                        {f.km_abastecimento && <span><Gauge className="w-3 h-3 inline mr-0.5" />{Number(f.km_abastecimento).toLocaleString('pt-BR')} km</span>}
-                        {f.posto && <span>{f.posto}</span>}
-                      </div>
-                      {f.observacoes && <p className="text-muted-foreground italic">{f.observacoes}</p>}
-                      {f.cupom_fiscal_url && (
-                        <a href={f.cupom_fiscal_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline text-[10px]">
-                          <Image className="w-3 h-3" /> Ver cupom fiscal
-                        </a>
-                      )}
-                    </>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        )}
-      </div>
+                    ) : (
+                      <>
+                        <div className="flex items-center justify-between">
+                          <span className="font-medium text-foreground">{who?.nome_exibicao || '—'}</span>
+                          <div className="flex items-center gap-2">
+                            <button onClick={() => openFuelEdit(f)} className="p-1.5 rounded-lg hover:bg-foreground/5 transition-colors" aria-label="Editar">
+                              <Pencil className="w-3 h-3 text-muted-foreground" />
+                            </button>
+                            <span className="text-muted-foreground">{new Date(f.created_at).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}</span>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-3 text-muted-foreground flex-wrap">
+                          {f.litros && <span><Fuel className="w-3 h-3 inline mr-0.5" />{Number(f.litros).toLocaleString('pt-BR')} L</span>}
+                          {f.valor && <span className="font-semibold text-foreground">R$ {Number(f.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>}
+                          {f.km_abastecimento && <span><Gauge className="w-3 h-3 inline mr-0.5" />{Number(f.km_abastecimento).toLocaleString('pt-BR')} km</span>}
+                          {f.posto && <span>{f.posto}</span>}
+                        </div>
+                        {f.observacoes && <p className="text-muted-foreground italic">{f.observacoes}</p>}
+                        {f.cupom_fiscal_url && (
+                          <a href={f.cupom_fiscal_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline text-[10px]">
+                            <Image className="w-3 h-3" /> Ver cupom fiscal
+                          </a>
+                        )}
+                      </>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
