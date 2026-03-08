@@ -1285,16 +1285,18 @@ function TransportDetailView({ t, members, vehicles, guests, getDriverCommission
             <p className="text-xs text-muted-foreground">Veículo</p>
             <p className="font-medium">{vehicle ? `${vehicle.placa} ${vehicle.modelo || ''}` : '—'}</p>
           </div>
-          <div>
-            <p className="text-xs text-muted-foreground">Hóspede</p>
-            <p className="font-medium">{guest?.nome || '—'}</p>
+          <div className={transportGuests.length > 1 ? 'col-span-2' : ''}>
+            <p className="text-xs text-muted-foreground">Hóspede{transportGuests.length > 1 ? 's' : ''}</p>
+            {transportGuests.length > 0 ? (
+              <div className="space-y-1">
+                {transportGuests.map((g: any) => (
+                  <p key={g.id} className="font-medium">{g.nome}{g.hotel_nome ? ` — ${g.hotel_nome}` : ''}</p>
+                ))}
+              </div>
+            ) : (
+              <p className="font-medium">—</p>
+            )}
           </div>
-          {guest?.hotel_nome && (
-            <div>
-              <p className="text-xs text-muted-foreground">Hotel</p>
-              <p className="font-medium">{guest.hotel_nome}</p>
-            </div>
-          )}
         </div>
 
         {/* Route metrics — predicted vs actual */}
