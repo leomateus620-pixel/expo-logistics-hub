@@ -183,7 +183,7 @@ export default function ScootersPage() {
             )}
             <div>
               <Label className="text-xs text-muted-foreground mb-1 block">Horário de retirada</Label>
-              <Input type="datetime-local" value={pickupForm.retirada_em} onChange={(e) => setPickupForm({ ...pickupForm, retirada_em: e.target.value })} />
+              <DateTimePicker value={pickupForm.retirada_em} onChange={(v) => setPickupForm({ ...pickupForm, retirada_em: v })} placeholder="Retirada" />
             </div>
             <Button onClick={handlePickup} className="w-full h-11" disabled={pickup.isPending}>Registrar Retirada</Button>
           </div>
