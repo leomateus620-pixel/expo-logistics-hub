@@ -224,7 +224,7 @@ export default function TransportsPage() {
   const { transports, create, update, remove } = useTransports();
   const { members } = useOrgMembers();
   const { vehicles } = useVehicles();
-  const { guests } = useGuests();
+  const { guests, create: createGuest } = useGuests();
   const { createUsage } = useVehicleUsage();
   const { update: updateVehicle } = useVehicles();
   const { commissions } = useCommissions();
@@ -255,6 +255,10 @@ export default function TransportsPage() {
   const [form, setForm] = useState({ titulo: '', origem: '', destino: '', inicio_em: '', motorista_user_id: '', vehicle_id: '', prioridade: 'media', km_retirada: '', voo_cidade: '', voo_numero: '', voo_checkin: '', voo_chegada: '', horario_saida: '', escolta_nome: '', escolta_cargo: '', escolta_viaturas: '', escolta_ponto_encontro: '', escolta_contato_seguranca: '', escolta_obs: '' });
   const [selectedGuests, setSelectedGuests] = useState<string[]>([]);
   const [guestDestinations, setGuestDestinations] = useState<Record<string, string>>({});
+  const [showNewGuestForm, setShowNewGuestForm] = useState(false);
+  const [newGuestForm, setNewGuestForm] = useState({ nome: '', telefone: '', email: '', hotel_nome: '', checkin_em: '', checkout_em: '', observacoes: '' });
+  const [editShowNewGuestForm, setEditShowNewGuestForm] = useState(false);
+  const [editNewGuestForm, setEditNewGuestForm] = useState({ nome: '', telefone: '', email: '', hotel_nome: '', checkin_em: '', checkout_em: '', observacoes: '' });
 
   const [whatsappOpen, setWhatsappOpen] = useState(false);
   const [whatsappText, setWhatsappText] = useState('');
@@ -324,6 +328,8 @@ export default function TransportsPage() {
     setForm({ titulo: '', origem: '', destino: '', inicio_em: nowSPLocal(), motorista_user_id: '', vehicle_id: '', prioridade: 'media', km_retirada: '', voo_cidade: '', voo_numero: '', voo_checkin: '', voo_chegada: '', horario_saida: '', escolta_nome: '', escolta_cargo: '', escolta_viaturas: '', escolta_ponto_encontro: '', escolta_contato_seguranca: '', escolta_obs: '' });
     setSelectedGuests([]);
     setGuestDestinations({});
+    setShowNewGuestForm(false);
+    setNewGuestForm({ nome: '', telefone: '', email: '', hotel_nome: '', checkin_em: '', checkout_em: '', observacoes: '' });
     setOpen(true);
   };
 
@@ -662,7 +668,101 @@ export default function TransportsPage() {
         )}
         {/* Guest selection - always multi-select */}
         <div className="space-y-2">
-          <Label className="text-xs font-semibold text-foreground">Hóspedes (opcional)</Label>
+          <div className="flex items-center justify-between">
+            <Label className="text-xs font-semibold text-foreground">Hóspedes (opcional)</Label>
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="h-7 text-xs gap-1 text-primary"
+              onClick={() => {
+                if (isEdit) {
+                  setEditShowNewGuestForm(prev => !prev);
+                  setEditNewGuestForm({ nome: '', telefone: '', email: '', hotel_nome: '', checkin_em: '', checkout_em: '', observacoes: '' });
+                } else {
+                  setShowNewGuestForm(prev => !prev);
+                  setNewGuestForm({ nome: '', telefone: '', email: '', hotel_nome: '', checkin_em: '', checkout_em: '', observacoes: '' });
+                }
+              }}
+            >
+              <Plus className="w-3.5 h-3.5" /> Novo Hóspede
+            </Button>
+          </div>
+          {/* Inline new guest form */}
+          {(isEdit ? editShowNewGuestForm : showNewGuestForm) && (
+            <div className="rounded-lg border border-primary/30 bg-primary/5 p-3 space-y-2">
+              <p className="text-xs font-semibold text-primary">Cadastrar novo hóspede</p>
+              {(() => {
+                const gf = isEdit ? editNewGuestForm : newGuestForm;
+                const setGf = isEdit ? setEditNewGuestForm : setNewGuestForm;
+                return (
+                  <>
+                    <Input placeholder="Nome completo *" value={gf.nome} onChange={(e) => setGf({ ...gf, nome: e.target.value })} className="h-9 text-sm" />
+                    <div className="grid grid-cols-2 gap-2">
+                      <Input placeholder="Telefone" value={gf.telefone} onChange={(e) => setGf({ ...gf, telefone: e.target.value })} className="h-9 text-sm" />
+                      <Input placeholder="E-mail" type="email" value={gf.email} onChange={(e) => setGf({ ...gf, email: e.target.value })} className="h-9 text-sm" />
+                    </div>
+                    <Input placeholder="Hotel" value={gf.hotel_nome} onChange={(e) => setGf({ ...gf, hotel_nome: e.target.value })} className="h-9 text-sm" />
+                    <div className="grid grid-cols-2 gap-2">
+                      <div>
+                        <label className="text-[10px] text-muted-foreground mb-0.5 block">Check-in</label>
+                        <DateTimePicker value={gf.checkin_em} onChange={(v) => setGf({ ...gf, checkin_em: v })} placeholder="Check-in" />
+                      </div>
+                      <div>
+                        <label className="text-[10px] text-muted-foreground mb-0.5 block">Check-out</label>
+                        <DateTimePicker value={gf.checkout_em} onChange={(v) => setGf({ ...gf, checkout_em: v })} placeholder="Check-out" />
+                      </div>
+                    </div>
+                    <Input placeholder="Observações" value={gf.observacoes} onChange={(e) => setGf({ ...gf, observacoes: e.target.value })} className="h-9 text-sm" />
+                    <div className="flex gap-2">
+                      <Button
+                        type="button"
+                        size="sm"
+                        className="flex-1 h-8 text-xs"
+                        disabled={!gf.nome || create.isPending}
+                        onClick={async () => {
+                          try {
+                            const result = await createGuest.mutateAsync({
+                              nome: gf.nome,
+                              telefone: gf.telefone || null,
+                              email: gf.email || null,
+                              tipo: 'outro',
+                              hotel_nome: gf.hotel_nome || null,
+                              checkin_em: gf.checkin_em || null,
+                              checkout_em: gf.checkout_em || null,
+                              observacoes: gf.observacoes || null,
+                            });
+                            if (result?.id) {
+                              if (isEdit) {
+                                setEditGuests(prev => [...prev, result.id]);
+                                setEditShowNewGuestForm(false);
+                              } else {
+                                setSelectedGuests(prev => [...prev, result.id]);
+                                setGuestDestinations(prev => ({ ...prev, [result.id]: gf.hotel_nome || '' }));
+                                setShowNewGuestForm(false);
+                              }
+                            }
+                            toast.success('Hóspede cadastrado e selecionado');
+                          } catch (err: any) { toast.error(err.message); }
+                        }}
+                      >
+                        <Check className="w-3.5 h-3.5 mr-1" /> Salvar e Selecionar
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 text-xs"
+                        onClick={() => isEdit ? setEditShowNewGuestForm(false) : setShowNewGuestForm(false)}
+                      >
+                        Cancelar
+                      </Button>
+                    </div>
+                  </>
+                );
+              })()}
+            </div>
+          )}
           <div className="max-h-40 overflow-y-auto rounded-lg border border-border p-2 space-y-1">
             {guests.length === 0 && <p className="text-xs text-muted-foreground py-1">Nenhum hóspede cadastrado</p>}
             {guests.map((g: any) => {
