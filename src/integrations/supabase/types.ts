@@ -776,6 +776,63 @@ export type Database = {
           },
         ]
       }
+      transport_locations: {
+        Row: {
+          accuracy: number | null
+          created_at: string
+          driver_user_id: string
+          heading: number | null
+          id: string
+          latitude: number
+          longitude: number
+          org_id: string
+          speed: number | null
+          transport_id: string
+          updated_at: string
+        }
+        Insert: {
+          accuracy?: number | null
+          created_at?: string
+          driver_user_id: string
+          heading?: number | null
+          id?: string
+          latitude: number
+          longitude: number
+          org_id: string
+          speed?: number | null
+          transport_id: string
+          updated_at?: string
+        }
+        Update: {
+          accuracy?: number | null
+          created_at?: string
+          driver_user_id?: string
+          heading?: number | null
+          id?: string
+          latitude?: number
+          longitude?: number
+          org_id?: string
+          speed?: number | null
+          transport_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transport_locations_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transport_locations_transport_id_fkey"
+            columns: ["transport_id"]
+            isOneToOne: true
+            referencedRelation: "transports"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       transports: {
         Row: {
           created_at: string
