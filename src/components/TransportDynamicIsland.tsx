@@ -236,8 +236,8 @@ export default function TransportDynamicIsland({
             <div className="rounded-2xl overflow-hidden border border-border/30">
               {location && isActive ? (
                 <Suspense fallback={
-                  <div className="h-[160px] bg-white/5 flex items-center justify-center">
-                    <div className="flex items-center gap-2 text-xs text-white/40">
+                   <div className="h-[160px] bg-muted/30 flex items-center justify-center">
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <Navigation className="w-4 h-4 animate-pulse" /> Carregando mapa...
                     </div>
                   </div>
