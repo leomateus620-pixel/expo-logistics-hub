@@ -132,11 +132,11 @@ export default function ChecklistPage() {
   // Apply filters to tasks for a given tab
   const applyFilters = (taskList: any[]) => {
     let filtered = taskList;
-    if (filterDate) {
-      filtered = filtered.filter((t: any) => t.due_em?.startsWith(filterDate));
+    if (appliedDate) {
+      filtered = filtered.filter((t: any) => t.due_em?.startsWith(appliedDate));
     }
-    if (filterResponsavel && filterResponsavel !== 'all') {
-      filtered = filtered.filter((t: any) => t.assignee_user_id === filterResponsavel);
+    if (appliedResponsavel && appliedResponsavel !== 'all') {
+      filtered = filtered.filter((t: any) => t.assignee_user_id === appliedResponsavel);
     }
     return filtered;
   };
