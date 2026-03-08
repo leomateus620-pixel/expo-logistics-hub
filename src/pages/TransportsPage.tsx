@@ -229,7 +229,7 @@ export default function TransportsPage() {
   const { update: updateVehicle } = useVehicles();
   const { commissions } = useCommissions();
   const { user } = useAuth();
-
+  const { getGuestsForTransport, setGuestsForTransport } = useTransportGuests();
   const [trackingTransportId, setTrackingTransportId] = useState<string | null>(null);
   const locationTracker = useLocationTracking(trackingTransportId);
 
