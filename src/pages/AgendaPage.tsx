@@ -42,6 +42,89 @@ function isNowBetween(start: string, end: string): boolean {
   return now >= new Date(start) && now <= new Date(end);
 }
 
+/* ── PDF generator ── */
+function generateAgendaPDF(
+  selectedDate: string,
+  dayEvents: any[],
+  grouped: Record<string, any[]>,
+  members: any[],
+  commissions: any[],
+) {
+  const dateFormatted = (() => {
+    const [y, m, d] = selectedDate.split('-');
+    const dt = new Date(Number(y), Number(m) - 1, Number(d));
+    return dt.toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' });
+  })();
+
+  const shiftLabels: Record<string, string> = { manha: '☀ MANHÃ', tarde: '🌅 TARDE', noite: '🌙 NOITE' };
+
+  let html = `
+    <html><head><meta charset="utf-8"><title>Agenda Fenasoja - ${dateFormatted}</title>
+    <style>
+      @page { margin: 18mm 15mm; size: A4; }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font-family: 'Segoe UI', Arial, sans-serif; color: #1a1a1a; font-size: 11pt; line-height: 1.4; }
+      .header { text-align: center; border-bottom: 3px solid #16a34a; padding-bottom: 12px; margin-bottom: 18px; }
+      .header h1 { font-size: 20pt; color: #16a34a; margin-bottom: 2px; }
+      .header p { font-size: 10pt; color: #666; }
+      .date-title { font-size: 13pt; font-weight: 700; text-transform: capitalize; margin-bottom: 16px; color: #333; }
+      .shift-header { font-size: 11pt; font-weight: 700; color: #16a34a; border-bottom: 1.5px solid #e0e0e0; padding-bottom: 4px; margin: 16px 0 10px; text-transform: uppercase; letter-spacing: 1px; }
+      .event-card { border: 1px solid #e5e5e5; border-radius: 8px; padding: 10px 14px; margin-bottom: 10px; page-break-inside: avoid; background: #fafafa; }
+      .event-title { font-size: 12pt; font-weight: 700; margin-bottom: 3px; }
+      .event-time { font-size: 10pt; color: #16a34a; font-weight: 600; margin-bottom: 4px; }
+      .event-meta { font-size: 9pt; color: #555; margin-bottom: 2px; }
+      .event-meta strong { color: #333; }
+      .event-desc { font-size: 9pt; color: #444; margin-top: 5px; padding-top: 5px; border-top: 1px dashed #ddd; white-space: pre-wrap; }
+      .badge { display: inline-block; background: #e8f5e9; color: #2e7d32; padding: 1px 8px; border-radius: 10px; font-size: 8pt; font-weight: 600; margin-left: 6px; }
+      .badge-transport { background: #e3f2fd; color: #1565c0; }
+      .footer { margin-top: 24px; text-align: center; font-size: 8pt; color: #999; border-top: 1px solid #e0e0e0; padding-top: 8px; }
+      .summary { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; }
+      .summary p { font-size: 9pt; color: #333; }
+    </style></head><body>
+    <div class="header">
+      <h1>Programação da Feira</h1>
+      <p>Agenda Oficial de Eventos — Fenasoja 2026</p>
+    </div>
+    <div class="date-title">📅 ${dateFormatted}</div>
+    <div class="summary">
+      <p><strong>Total de compromissos:</strong> ${dayEvents.length} &nbsp;|&nbsp;
+      <strong>Manhã:</strong> ${grouped.manha.length} &nbsp;|&nbsp;
+      <strong>Tarde:</strong> ${grouped.tarde.length} &nbsp;|&nbsp;
+      <strong>Noite:</strong> ${grouped.noite.length}</p>
+    </div>`;
+
+  for (const shift of ['manha', 'tarde', 'noite'] as const) {
+    const items = grouped[shift];
+    if (items.length === 0) continue;
+    html += `<div class="shift-header">${shiftLabels[shift]} (${items.length})</div>`;
+    for (const e of items) {
+      const member = e.responsavel_user_id ? members.find((m: any) => m.user_id === e.responsavel_user_id) : null;
+      const comm = member?.commission_id ? commissions.find((c: any) => c.id === member.commission_id) : null;
+      const isTransport = e._source === 'transport' || e.tipo_tag === 'transporte';
+      const statusLabel = e._transportStatus === 'em_andamento' ? 'Em andamento' : e._transportStatus === 'pendente' ? 'Pendente' : '';
+
+      html += `<div class="event-card">`;
+      html += `<div class="event-title">${e.titulo || 'Sem título'}`;
+      if (e.tipo_tag) html += `<span class="badge ${isTransport ? 'badge-transport' : ''}">${e.tipo_tag}</span>`;
+      if (isTransport && statusLabel) html += `<span class="badge badge-transport">${statusLabel}</span>`;
+      html += `</div>`;
+      html += `<div class="event-time">⏰ ${rawTime(e.inicio_em)} — ${rawTime(e.fim_em)}</div>`;
+      if (e.local) html += `<div class="event-meta">📍 <strong>Local:</strong> ${e.local}</div>`;
+      if (member) html += `<div class="event-meta">👤 <strong>Responsável:</strong> ${member.nome_exibicao}${member.cargo ? ` (${member.cargo})` : ''}</div>`;
+      if (comm) html += `<div class="event-meta">👥 <strong>Comissão:</strong> ${comm.nome}</div>`;
+      if (e.descricao) html += `<div class="event-desc">${e.descricao}</div>`;
+      html += `</div>`;
+    }
+  }
+
+  const now = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+  html += `<div class="footer">Documento gerado em ${now} — Sistema de Logística Fenasoja</div>`;
+  html += `</body></html>`;
+
+  const w = window.open('', '_blank');
+  if (w) { w.document.write(html); w.document.close(); setTimeout(() => w.print(), 400); }
+}
+
 /* ── component ────────────────────────────────────────── */
 
 export default function AgendaPage() {
