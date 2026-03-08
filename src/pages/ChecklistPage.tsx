@@ -123,14 +123,26 @@ export default function ChecklistPage() {
   const dates = [today, tomorrow];
   const getLabel = (d: string) => d === today ? 'Hoje' : 'Amanhã';
 
+  const handleSearch = () => {
+    setAppliedDate(filterDate);
+    setAppliedResponsavel(filterResponsavel);
+  };
+
+  const handleClearFilters = () => {
+    setFilterDate('');
+    setFilterResponsavel('');
+    setAppliedDate('');
+    setAppliedResponsavel('');
+  };
+
   // Apply filters to tasks for a given tab
   const applyFilters = (taskList: any[]) => {
     let filtered = taskList;
-    if (filterDate) {
-      filtered = filtered.filter((t: any) => t.due_em?.startsWith(filterDate));
+    if (appliedDate) {
+      filtered = filtered.filter((t: any) => t.due_em?.startsWith(appliedDate));
     }
-    if (filterResponsavel && filterResponsavel !== 'all') {
-      filtered = filtered.filter((t: any) => t.assignee_user_id === filterResponsavel);
+    if (appliedResponsavel && appliedResponsavel !== 'all') {
+      filtered = filtered.filter((t: any) => t.assignee_user_id === appliedResponsavel);
     }
     return filtered;
   };
