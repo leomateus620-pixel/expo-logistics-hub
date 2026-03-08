@@ -531,7 +531,7 @@ function VehicleDetailContent({ vehicle, members, userId, kmTotal, fuelCostTotal
         km_chegada: Number(kmChegada),
         devolucao_em: nowSP(),
       });
-      await updateVehicle.mutateAsync({ id: vehicle.id, km_atual: Number(kmChegada) });
+      await updateVehicle.mutateAsync({ id: vehicle.id, km_atual: Number(kmChegada), status: 'disponivel', responsavel_user_id: null });
       setKmChegada('');
       toast.success('Devolução registrada');
     } catch (err: any) { toast.error(err.message); }
