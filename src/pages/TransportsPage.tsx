@@ -225,8 +225,20 @@ export default function TransportsPage() {
           voo_checkin: form.titulo === 'Aeroporto' ? form.voo_checkin || null : null,
           voo_chegada: form.titulo === 'Aeroporto' ? form.voo_chegada || null : null,
           horario_saida: form.titulo === 'Aeroporto' ? form.horario_saida || null : null,
+          observacoes: buildEscoltaObs(form),
         });
       }
+
+      // If escort, generate WhatsApp text
+      if (form.titulo === 'Escolta Policial') {
+        const driver = members.find((m: any) => m.user_id === form.motorista_user_id);
+        const vehicle = vehicles.find((v: any) => v.id === form.vehicle_id);
+        const guest = selectedGuests.length > 0 ? guests.find((g: any) => g.id === selectedGuests[0]) : null;
+        const text = generateWhatsAppText(form, driver, vehicle, guest);
+        setWhatsappText(text);
+        setWhatsappOpen(true);
+      }
+
       setForm({ titulo: '', origem: '', destino: '', inicio_em: '', motorista_user_id: '', vehicle_id: '', prioridade: 'media', km_retirada: '', voo_cidade: '', voo_numero: '', voo_checkin: '', voo_chegada: '', horario_saida: '', escolta_nome: '', escolta_cargo: '', escolta_viaturas: '', escolta_ponto_encontro: '', escolta_contato_seguranca: '', escolta_obs: '' });
       setSelectedGuests([]);
       setGuestDestinations({});
