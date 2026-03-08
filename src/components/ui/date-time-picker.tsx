@@ -142,10 +142,10 @@ export function DateTimePicker({
   const pickerContent = (
     <div className={cn(
       "flex flex-col",
-      isMobile ? "max-h-[65vh] overflow-y-auto" : ""
+      isMobile ? "max-h-[55vh] overflow-y-auto" : ""
     )}>
       {/* Quick shortcuts */}
-      <div className="flex items-center gap-1.5 px-3 pt-3 pb-1">
+      <div className="flex items-center gap-1.5 px-2 pt-2 pb-1">
         <Zap className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
         <button
           type="button"
@@ -179,21 +179,21 @@ export function DateTimePicker({
         onSelect={handleDaySelect}
         locale={ptBR}
         initialFocus
-        className={cn("p-2 pointer-events-auto", isMobile && "mx-auto")}
+        className={cn("p-1 pointer-events-auto", isMobile && "mx-auto")}
       />
 
       {/* Time selector */}
       {mode === "datetime" && (
-        <div className="border-t border-border/60 px-3 pb-3 pt-2 space-y-2">
-          {/* Hour chips grid */}
-          <div className="flex flex-wrap gap-1">
+        <div className="border-t border-border/60 px-2 pb-2 pt-1.5 space-y-1.5">
+          {/* Hour chips — single scrollable row */}
+          <div className="flex overflow-x-auto gap-1 pb-0.5 scrollbar-hide">
             {quickHours.map((h) => (
               <button
                 key={h}
                 type="button"
                 onClick={() => handleHourChip(h)}
                 className={cn(
-                  "px-2 py-1 rounded-md text-xs font-medium transition-all duration-150",
+                  "px-1.5 py-0.5 rounded-md text-[11px] font-medium whitespace-nowrap transition-all duration-150 shrink-0",
                   hour === h
                     ? "bg-primary text-primary-foreground shadow-sm"
                     : "bg-secondary/60 hover:bg-secondary text-secondary-foreground"
