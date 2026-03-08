@@ -3,7 +3,7 @@ import { useEvents } from '@/hooks/useEvents';
 import { useTransports } from '@/hooks/useTransports';
 import { useOrgMembers } from '@/hooks/useOrgMembers';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Check, Clock, Repeat, CalendarDays, Car, MapPin, User, Pencil, Filter } from 'lucide-react';
+import { Plus, Check, Clock, Repeat, CalendarDays, Car, MapPin, User, Pencil, Filter, Search } from 'lucide-react';
 import { cn, rawTime, todaySP } from '@/lib/utils';
 import { useState, useMemo } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -35,6 +35,20 @@ export default function ChecklistPage() {
   // Filters
   const [filterDate, setFilterDate] = useState('');
   const [filterResponsavel, setFilterResponsavel] = useState('');
+  const [appliedDate, setAppliedDate] = useState('');
+  const [appliedResponsavel, setAppliedResponsavel] = useState('');
+
+  const handleSearch = () => {
+    setAppliedDate(filterDate);
+    setAppliedResponsavel(filterResponsavel);
+  };
+
+  const handleClearFilters = () => {
+    setFilterDate('');
+    setFilterResponsavel('');
+    setAppliedDate('');
+    setAppliedResponsavel('');
+  };
 
   const today = todaySP();
   const tomorrowDate = new Date(today + 'T12:00:00');
@@ -118,11 +132,11 @@ export default function ChecklistPage() {
   // Apply filters to tasks for a given tab
   const applyFilters = (taskList: any[]) => {
     let filtered = taskList;
-    if (filterDate) {
-      filtered = filtered.filter((t: any) => t.due_em?.startsWith(filterDate));
+    if (appliedDate) {
+      filtered = filtered.filter((t: any) => t.due_em?.startsWith(appliedDate));
     }
-    if (filterResponsavel && filterResponsavel !== 'all') {
-      filtered = filtered.filter((t: any) => t.assignee_user_id === filterResponsavel);
+    if (appliedResponsavel && appliedResponsavel !== 'all') {
+      filtered = filtered.filter((t: any) => t.assignee_user_id === appliedResponsavel);
     }
     return filtered;
   };
@@ -238,7 +252,7 @@ export default function ChecklistPage() {
           placeholder="Data"
         />
         <Select value={filterResponsavel} onValueChange={setFilterResponsavel}>
-          <SelectTrigger className="w-48 h-8 text-xs"><SelectValue placeholder="Responsável" /></SelectTrigger>
+          <SelectTrigger className="w-48 h-8 text-xs"><SelectValue placeholder="RESPONSÁVEL" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Todos</SelectItem>
             {members.map((m: any) => (
@@ -246,8 +260,11 @@ export default function ChecklistPage() {
             ))}
           </SelectContent>
         </Select>
-        {(filterDate || (filterResponsavel && filterResponsavel !== 'all')) && (
-          <Button variant="ghost" size="sm" className="h-8 text-xs" onClick={() => { setFilterDate(''); setFilterResponsavel(''); }}>
+        <Button size="sm" className="h-8 text-xs" onClick={handleSearch}>
+          <Search className="w-3.5 h-3.5 mr-1" /> Pesquisar
+        </Button>
+        {(appliedDate || (appliedResponsavel && appliedResponsavel !== 'all')) && (
+          <Button variant="ghost" size="sm" className="h-8 text-xs" onClick={handleClearFilters}>
             Limpar
           </Button>
         )}
