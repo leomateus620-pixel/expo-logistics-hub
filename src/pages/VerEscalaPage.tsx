@@ -50,6 +50,7 @@ export default function VerEscalaPage() {
   const [filterDate, setFilterDate] = useState('');
   const [appliedFilterName, setAppliedFilterName] = useState('');
   const [appliedFilterDate, setAppliedFilterDate] = useState('');
+  const [showNameSuggestions, setShowNameSuggestions] = useState(false);
 
   // Find LOGÍSTICA commission
   const logisticaCommission = commissions.find((c: any) =>
@@ -61,6 +62,15 @@ export default function VerEscalaPage() {
     if (!logisticaCommission) return members;
     return members.filter((m: any) => m.commission_id === logisticaCommission.id);
   }, [members, logisticaCommission]);
+
+  // Name suggestions based on typed text
+  const nameSuggestions = useMemo(() => {
+    if (!filterName.trim()) return [];
+    const term = filterName.trim().toLowerCase();
+    return logisticaMembers.filter((m: any) =>
+      m.nome_exibicao?.toLowerCase().includes(term)
+    ).slice(0, 6);
+  }, [filterName, logisticaMembers]);
 
   const handleSearch = () => {
     setAppliedFilterName(filterName);
@@ -233,15 +243,42 @@ export default function VerEscalaPage() {
 
       {/* Filters */}
       <div className="flex flex-wrap items-end gap-2">
-        <div className="flex-1 min-w-[140px]">
+        <div className="flex-1 min-w-[140px] relative">
           <Label className="text-xs">Nome</Label>
           <Input
             placeholder="Filtrar por nome..."
             value={filterName}
-            onChange={(e) => setFilterName(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter') handleSearch(); }}
+            onChange={(e) => {
+              setFilterName(e.target.value);
+              setShowNameSuggestions(true);
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                handleSearch();
+                setShowNameSuggestions(false);
+              }
+            }}
+            onFocus={() => filterName.trim() && setShowNameSuggestions(true)}
+            onBlur={() => setTimeout(() => setShowNameSuggestions(false), 150)}
             className="h-9"
           />
+          {showNameSuggestions && nameSuggestions.length > 0 && (
+            <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-popover border rounded-md shadow-md overflow-hidden">
+              {nameSuggestions.map((m: any) => (
+                <button
+                  key={m.user_id}
+                  className="w-full text-left px-3 py-2 text-sm hover:bg-accent transition-colors truncate"
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    setFilterName(m.nome_exibicao);
+                    setShowNameSuggestions(false);
+                  }}
+                >
+                  {m.nome_exibicao}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
         <div className="min-w-[150px]">
           <Label className="text-xs">Data</Label>
