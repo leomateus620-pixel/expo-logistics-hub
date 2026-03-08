@@ -677,7 +677,16 @@ export default function TransportsPage() {
                 }} />
               </div>
               <div>
-                <Label className="text-xs text-muted-foreground mb-1 block">Chegada Voo</Label>
+                <Label className="text-xs text-muted-foreground mb-1 block">Data e Hora de Chegada</Label>
+                <DateTimePicker
+                  value={data.voo_chegada_data}
+                  onChange={(v) => setData({ ...data, voo_chegada_data: v })}
+                  mode="datetime"
+                  placeholder="Selecionar data e hora"
+                />
+              </div>
+              <div>
+                <Label className="text-xs text-muted-foreground mb-1 block">Chegada Voo (hora)</Label>
                 <Input type="time" value={data.voo_chegada} onChange={async (e) => {
                   const chegada = e.target.value;
                   setData({ ...data, voo_chegada: chegada });
