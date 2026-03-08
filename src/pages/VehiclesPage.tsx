@@ -412,8 +412,13 @@ export default function VehiclesPage() {
       <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
         <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto liquid-glass-card border-border/40">
           <DialogHeader>
-            <DialogTitle className="text-lg font-bold">
-              {detailVehicle?.marca} {detailVehicle?.modelo} {detailVehicle?.cor ? detailVehicle.cor.toUpperCase() : ''} — {detailVehicle?.placa}
+            <DialogTitle className="text-lg font-bold flex items-center gap-2 flex-wrap">
+              <span>{detailVehicle?.marca} {detailVehicle?.modelo} — {detailVehicle?.placa}</span>
+              {detailVehicle && (() => {
+                const vStatus = effectiveStatus[detailVehicle.id] || detailVehicle.status;
+                const sc = statusConfig[vStatus] || statusConfig.disponivel;
+                return <Badge variant="outline" className={cn('text-[10px] font-medium', sc.badgeCls)}>{sc.label}</Badge>;
+              })()}
             </DialogTitle>
           </DialogHeader>
           {detailVehicle && (
@@ -580,17 +585,26 @@ function VehicleDetailContent({ vehicle, members, userId, kmTotal, fuelCostTotal
     <div className="space-y-4">
       {/* Vehicle metrics summary */}
       <div className="grid grid-cols-3 gap-2">
-        <div className="rounded-xl bg-foreground/[0.03] p-3 text-center">
-          <p className="text-[10px] text-muted-foreground">Odômetro</p>
-          <p className="text-sm font-bold">{formatKm(Number(vehicle.km_atual || 0))} km</p>
+        <div className="rounded-xl bg-primary/5 border border-primary/10 p-3 text-center">
+          <div className="flex items-center justify-center gap-1 mb-1">
+            <Gauge className="w-3 h-3 text-primary" />
+            <p className="text-[10px] text-muted-foreground font-medium">Odômetro</p>
+          </div>
+          <p className="text-sm font-bold text-foreground">{formatKm(Number(vehicle.km_atual || 0))} km</p>
         </div>
-        <div className="rounded-xl bg-foreground/[0.03] p-3 text-center">
-          <p className="text-[10px] text-muted-foreground">KM Rodados</p>
-          <p className="text-sm font-bold">{formatKm(kmTotal)} km</p>
+        <div className="rounded-xl bg-accent/5 border border-accent/10 p-3 text-center">
+          <div className="flex items-center justify-center gap-1 mb-1">
+            <TrendingUp className="w-3 h-3 text-accent" />
+            <p className="text-[10px] text-muted-foreground font-medium">KM Rodados</p>
+          </div>
+          <p className="text-sm font-bold text-foreground">{formatKm(kmTotal)} km</p>
         </div>
-        <div className="rounded-xl bg-foreground/[0.03] p-3 text-center">
-          <p className="text-[10px] text-muted-foreground">Custo Real</p>
-          <p className="text-sm font-bold">{fuelCostTotal > 0 ? formatCurrency(fuelCostTotal) : '—'}</p>
+        <div className="rounded-xl bg-warning/5 border border-warning/10 p-3 text-center">
+          <div className="flex items-center justify-center gap-1 mb-1">
+            <DollarSign className="w-3 h-3 text-warning" />
+            <p className="text-[10px] text-muted-foreground font-medium">Custo Real</p>
+          </div>
+          <p className="text-sm font-bold text-foreground">{fuelCostTotal > 0 ? formatCurrency(fuelCostTotal) : '—'}</p>
         </div>
       </div>
 
@@ -601,22 +615,49 @@ function VehicleDetailContent({ vehicle, members, userId, kmTotal, fuelCostTotal
 
       {/* Retirada / Devolução */}
       {openUsage ? (
-        <div className="rounded-xl border border-warning/30 bg-warning/5 p-3.5 space-y-2.5">
-          <p className="text-sm font-semibold text-warning flex items-center gap-1.5">
-            <Activity className="w-4 h-4" /> Veículo em uso — registrar devolução
-          </p>
-          <p className="text-xs text-muted-foreground">
-            Responsável: {getMemberName(openUsage.responsavel_user_id)} | KM saída: {Number(openUsage.km_saida).toLocaleString('pt-BR')}
-          </p>
-          <Input placeholder="KM chegada (obrigatório)" type="number" value={kmChegada} onChange={(e) => setKmChegada(e.target.value)} className="h-11" />
-          <Button size="sm" onClick={() => handleDevolucao(openUsage.id)} disabled={updateUsage.isPending} className="w-full h-10">
-            {updateUsage.isPending ? 'Registrando...' : 'Registrar Devolução'}
+        <div className="rounded-xl border border-info/30 bg-info/5 p-4 space-y-3">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-info/15 flex items-center justify-center">
+              <Activity className="w-4 h-4 text-info" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-foreground">Veículo em uso</p>
+              <p className="text-[10px] text-muted-foreground">Registre a devolução abaixo</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-2 text-xs">
+            <div className="rounded-lg bg-background/60 p-2">
+              <p className="text-[10px] text-muted-foreground">Responsável</p>
+              <p className="font-medium text-foreground">{getMemberName(openUsage.responsavel_user_id)}</p>
+            </div>
+            <div className="rounded-lg bg-background/60 p-2">
+              <p className="text-[10px] text-muted-foreground">KM saída</p>
+              <p className="font-medium text-foreground">{Number(openUsage.km_saida).toLocaleString('pt-BR')}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Gauge className="w-4 h-4 text-muted-foreground shrink-0" />
+            <Input placeholder="KM chegada (obrigatório)" type="number" value={kmChegada} onChange={(e) => setKmChegada(e.target.value)} className="h-11" />
+          </div>
+          <Button size="sm" onClick={() => handleDevolucao(openUsage.id)} disabled={updateUsage.isPending} className="w-full h-10 bg-success hover:bg-success/90 text-success-foreground">
+            {updateUsage.isPending ? 'Registrando...' : '✓ Registrar Devolução'}
           </Button>
         </div>
       ) : (
-        <div className="rounded-xl liquid-glass-card p-3.5 space-y-2.5">
-          <p className="text-sm font-semibold text-foreground">Registrar Retirada</p>
-          <Input placeholder="KM saída" type="number" value={kmSaida} onChange={(e) => setKmSaida(e.target.value)} className="h-11" />
+        <div className="rounded-xl liquid-glass-card p-4 space-y-3">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+              <Car className="w-4 h-4 text-primary" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-foreground">Registrar Retirada</p>
+              <p className="text-[10px] text-muted-foreground">Preencha os dados para retirar o veículo</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <Gauge className="w-4 h-4 text-muted-foreground shrink-0" />
+            <Input placeholder="KM saída" type="number" value={kmSaida} onChange={(e) => setKmSaida(e.target.value)} className="h-11" />
+          </div>
           <Select value={responsavelId} onValueChange={setResponsavelId}>
             <SelectTrigger className="h-11"><SelectValue placeholder="Responsável" /></SelectTrigger>
             <SelectContent>
@@ -636,16 +677,16 @@ function VehicleDetailContent({ vehicle, members, userId, kmTotal, fuelCostTotal
       {/* Tabs */}
       <div className="flex gap-1 p-1 rounded-xl bg-muted/40">
         <button
-          className={cn('flex-1 py-2 px-3 rounded-lg text-xs font-medium transition-all', activeTab === 'uso' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground')}
+          className={cn('flex-1 py-2 px-3 rounded-lg text-xs font-medium transition-all flex items-center justify-center gap-1.5', activeTab === 'uso' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground')}
           onClick={() => setActiveTab('uso')}
         >
-          Utilização ({usages.length})
+          Utilização <Badge variant="secondary" className="text-[9px] px-1.5 py-0 h-4">{usages.length}</Badge>
         </button>
         <button
-          className={cn('flex-1 py-2 px-3 rounded-lg text-xs font-medium transition-all', activeTab === 'combustivel' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground')}
+          className={cn('flex-1 py-2 px-3 rounded-lg text-xs font-medium transition-all flex items-center justify-center gap-1.5', activeTab === 'combustivel' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground')}
           onClick={() => setActiveTab('combustivel')}
         >
-          Combustível ({fuelRecords.length})
+          Combustível <Badge variant="secondary" className="text-[9px] px-1.5 py-0 h-4">{fuelRecords.length}</Badge>
         </button>
       </div>
 
@@ -670,11 +711,11 @@ function VehicleDetailContent({ vehicle, members, userId, kmTotal, fuelCostTotal
                     )}
                     onClick={() => { if (matchedTransport) navigate('/transports'); }}
                   >
-                    <div className="flex items-center justify-between">
+                  <div className="flex items-center justify-between">
                       <span className="font-medium text-foreground">{getMemberName(u.responsavel_user_id)}</span>
                       <div className="flex items-center gap-1.5">
                         {matchedTransport && <ExternalLink className="w-3 h-3 text-primary" />}
-                        <Badge variant={u.km_chegada ? 'secondary' : 'outline'} className="text-[10px]">
+                        <Badge variant="outline" className={cn('text-[10px]', u.km_chegada ? 'bg-success/10 text-success border-success/20' : 'bg-info/10 text-info border-info/20')}>
                           {u.km_chegada ? 'Devolvido' : 'Em uso'}
                         </Badge>
                       </div>
