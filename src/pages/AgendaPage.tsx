@@ -183,7 +183,7 @@ export default function AgendaPage() {
                       {e.descricao && <p className="text-xs text-muted-foreground mt-0.5">{e.descricao}</p>}
                       <div className="flex items-center gap-3 mt-1 flex-wrap">
                         {e.local && <span className="text-[10px] text-muted-foreground flex items-center gap-1"><MapPin className="w-3 h-3" />{e.local}</span>}
-                        {e.responsavel_user_id && (() => { const m = members.find((m: any) => m.user_id === e.responsavel_user_id); return m ? <span className="text-[10px] text-primary flex items-center gap-1"><User className="w-3 h-3" />{m.nome_exibicao}</span> : null; })()}
+                        {e.responsavel_user_id && (() => { const m = members.find((m: any) => m.user_id === e.responsavel_user_id); if (!m) return null; const comm = m.commission_id ? commissions.find((c: any) => c.id === m.commission_id) : null; return (<><span className="text-[10px] text-primary flex items-center gap-1"><User className="w-3 h-3" />{m.nome_exibicao}</span>{comm && <span className="text-[10px] text-muted-foreground flex items-center gap-1"><Users className="w-3 h-3" />{comm.nome}</span>}</>); })()}
                         {e.tipo_tag && <Badge variant="outline" className="text-[10px]">{e.tipo_tag}</Badge>}
                       </div>
                     </div>
