@@ -125,10 +125,10 @@ export default function AgendaPage() {
 
   /* ── day events grouped by shift ── */
   const dayEvents = useMemo(() => {
-    return events
+    return allItems
       .filter((e: any) => e.inicio_em?.startsWith(selectedDate))
       .sort((a: any, b: any) => a.inicio_em.localeCompare(b.inicio_em));
-  }, [events, selectedDate]);
+  }, [allItems, selectedDate]);
 
   const grouped = useMemo(() => {
     const g: Record<string, any[]> = { manha: [], tarde: [], noite: [] };
