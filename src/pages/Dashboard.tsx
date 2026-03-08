@@ -5,6 +5,7 @@ import { useTasks } from '@/hooks/useTasks';
 import { useEvents } from '@/hooks/useEvents';
 import { useCommissions } from '@/hooks/useCommissions';
 import { useOrgMembers } from '@/hooks/useOrgMembers';
+import { useSchedules } from '@/hooks/useSchedules';
 import StatCard from '@/components/StatCard';
 import { Car, Zap, MapPin, CheckSquare, CalendarDays, Users, Clock, AlertTriangle, User } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
@@ -19,6 +20,7 @@ export default function Dashboard() {
   const { tasks } = useTasks();
   const { events } = useEvents();
   const { members } = useOrgMembers();
+  const { shifts, assignments } = useSchedules();
 
   const todayStr = todaySP();
   const tomorrowDate = new Date();
@@ -177,8 +179,16 @@ export default function Dashboard() {
             {logisticsMembers.length === 0 && <p className="text-sm text-muted-foreground">Nenhum membro na comissão de logística.</p>}
             {logisticsMembers.map((m: any) => {
               const isInTransport = transports.some((t: any) => t.motorista_user_id === m.user_id && t.status === 'em_andamento');
-              const statusLabel = isInTransport || m.status === 'em_deslocamento' ? 'Em deslocamento' : 'Disponível';
-              const statusClass = isInTransport || m.status === 'em_deslocamento'
+              const now = new Date();
+              const isInShift = assignments.some((a: any) => {
+                if (a.member_user_id !== m.user_id || a.status === 'cancelado') return false;
+                const shift = shifts.find((s: any) => s.id === a.schedule_shift_id);
+                if (!shift) return false;
+                return new Date(shift.inicio_em) <= now && new Date(shift.fim_em) >= now;
+              });
+              const isBusy = isInTransport || isInShift || m.status === 'em_deslocamento';
+              const statusLabel = isBusy ? (isInShift && !isInTransport ? 'Em escala' : 'Em deslocamento') : 'Disponível';
+              const statusClass = isBusy
                 ? 'bg-accent/10 text-accent'
                 : 'bg-success/10 text-success';
               return (
