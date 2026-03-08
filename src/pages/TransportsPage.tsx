@@ -428,7 +428,7 @@ export default function TransportsPage() {
       setSelectedGuests([]);
       setGuestDestinations({});
       setIncludeReturn(false);
-      setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', voo_chegada: '', horario_saida: '' });
+      setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', voo_chegada: '', voo_chegada_data: '', horario_saida: '' });
       setOpen(false);
       toast.success(includeReturn && form.titulo === 'Aeroporto' && returnForm.inicio_em ? 'Ida e volta agendados' : 'Transporte agendado');
     } catch (err: any) { toast.error(err.message); }
