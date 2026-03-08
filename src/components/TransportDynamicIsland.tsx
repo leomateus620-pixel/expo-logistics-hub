@@ -200,9 +200,9 @@ export default function TransportDynamicIsland({
           <div className="flex items-center gap-1.5 mt-0.5">
             <span className={cn(
               'w-1.5 h-1.5 rounded-full shrink-0',
-              isActive ? 'bg-accent animate-pulse' : isDone ? 'bg-emerald-400' : 'bg-white/30'
+              isActive ? 'bg-accent animate-pulse' : isDone ? 'bg-emerald-400' : 'bg-muted-foreground/30'
             )} />
-            <span className="text-[10px] font-medium text-white/50">
+            <span className="text-[10px] font-medium text-muted-foreground">
               {statusLabels[t.status] || t.status}
               {etaText && <> • {etaText}</>}
             </span>
