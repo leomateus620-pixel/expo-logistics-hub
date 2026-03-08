@@ -244,10 +244,11 @@ export default function VerEscalaPage() {
         </div>
         <div className="min-w-[150px]">
           <Label className="text-xs">Data</Label>
-          <Input
-            type="date"
+          <DateTimePicker
+            mode="date"
             value={filterDate}
-            onChange={(e) => setFilterDate(e.target.value)}
+            onChange={setFilterDate}
+            placeholder="Data"
             className="h-9"
           />
         </div>
