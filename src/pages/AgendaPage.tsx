@@ -325,11 +325,11 @@ export default function AgendaPage() {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-xs text-muted-foreground mb-1 block">Início</label>
-                <Input type="datetime-local" value={form.inicio_em} onChange={(e) => setForm({ ...form, inicio_em: e.target.value })} className="bg-background/80 border-border" />
+                <DateTimePicker value={form.inicio_em} onChange={(v) => setForm({ ...form, inicio_em: v })} placeholder="Início" />
               </div>
               <div>
                 <label className="text-xs text-muted-foreground mb-1 block">Fim</label>
-                <Input type="datetime-local" value={form.fim_em} onChange={(e) => setForm({ ...form, fim_em: e.target.value })} className="bg-background/80 border-border" />
+                <DateTimePicker value={form.fim_em} onChange={(v) => setForm({ ...form, fim_em: v })} placeholder="Fim" />
               </div>
             </div>
             <Input placeholder="Local" value={form.local} onChange={(e) => setForm({ ...form, local: e.target.value })} className="bg-background/80 border-border" />

@@ -203,7 +203,7 @@ export default function ElectricCartsPage() {
           <div className="space-y-3">
             <div>
               <Label className="text-xs text-muted-foreground mb-1 block">Horário de devolução</Label>
-              <Input type="datetime-local" value={returnForm.devolucao_em} onChange={(e) => setReturnForm({ ...returnForm, devolucao_em: e.target.value })} />
+              <DateTimePicker value={returnForm.devolucao_em} onChange={(v) => setReturnForm({ ...returnForm, devolucao_em: v })} placeholder="Devolução" />
             </div>
             <Button onClick={handleReturn} className="w-full h-11" disabled={returnCart.isPending}>Registrar Devolução</Button>
           </div>

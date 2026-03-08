@@ -25,11 +25,11 @@ function GuestFormFields({ data, setData }: { data: GuestFormData; setData: (d: 
       <div className="grid grid-cols-2 gap-3">
         <div>
           <label className="text-xs text-muted-foreground mb-1 block">Check-in</label>
-          <Input type="datetime-local" value={data.checkin_em} onChange={(e) => setData({ ...data, checkin_em: e.target.value })} />
+          <DateTimePicker value={data.checkin_em} onChange={(v) => setData({ ...data, checkin_em: v })} placeholder="Check-in" />
         </div>
         <div>
           <label className="text-xs text-muted-foreground mb-1 block">Check-out</label>
-          <Input type="datetime-local" value={data.checkout_em} onChange={(e) => setData({ ...data, checkout_em: e.target.value })} />
+          <DateTimePicker value={data.checkout_em} onChange={(v) => setData({ ...data, checkout_em: v })} placeholder="Check-out" />
         </div>
       </div>
       <Textarea placeholder="Observações" value={data.observacoes} onChange={(e) => setData({ ...data, observacoes: e.target.value })} rows={2} />
