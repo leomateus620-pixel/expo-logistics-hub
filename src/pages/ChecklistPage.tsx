@@ -106,14 +106,19 @@ export default function ChecklistPage() {
   };
 
   const escalaItems = useMemo(() => {
-    const evToday = events.filter((e: any) => e.inicio_em?.startsWith(today)).map((e: any) => ({
+    const filterDateStr = appliedDate || today;
+    const evForDate = events.filter((e: any) => e.inicio_em?.startsWith(filterDateStr)).map((e: any) => ({
       id: e.id, tipo: 'evento' as const, titulo: e.titulo, inicio_em: e.inicio_em, fim_em: e.fim_em, local: e.local, responsavel_user_id: e.responsavel_user_id,
     }));
-    const trToday = transports.filter((t: any) => t.inicio_em?.startsWith(today)).map((t: any) => ({
+    const trForDate = transports.filter((t: any) => t.inicio_em?.startsWith(filterDateStr)).map((t: any) => ({
       id: t.id, tipo: 'transporte' as const, titulo: t.titulo || `${t.origem} → ${t.destino}`, inicio_em: t.inicio_em, fim_em: t.fim_em, local: null, responsavel_user_id: t.motorista_user_id,
     }));
-    return [...evToday, ...trToday].sort((a, b) => (a.inicio_em || '').localeCompare(b.inicio_em || ''));
-  }, [events, transports, today]);
+    let items = [...evForDate, ...trForDate].sort((a, b) => (a.inicio_em || '').localeCompare(b.inicio_em || ''));
+    if (appliedResponsavel && appliedResponsavel !== 'all') {
+      items = items.filter(i => i.responsavel_user_id === appliedResponsavel);
+    }
+    return items;
+  }, [events, transports, today, appliedDate, appliedResponsavel]);
 
   const dates = [today, tomorrow];
   const getLabel = (d: string) => d === today ? 'Hoje' : 'Amanhã';
