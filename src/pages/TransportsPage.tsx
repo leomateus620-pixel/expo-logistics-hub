@@ -14,6 +14,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { DateTimePicker } from '@/components/ui/date-time-picker';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
@@ -703,7 +704,7 @@ export default function TransportsPage() {
         </div>
         <div>
           <Label className="text-xs text-muted-foreground mb-1 block">Data/Hora saída</Label>
-          <Input type="datetime-local" value={data.inicio_em} onChange={(e) => setData({ ...data, inicio_em: e.target.value })} />
+          <DateTimePicker value={data.inicio_em} onChange={(v) => setData({ ...data, inicio_em: v })} placeholder="Data/Hora saída" />
         </div>
         <div className="grid grid-cols-2 gap-3">
           <Select value={data.vehicle_id} onValueChange={(v) => setData({ ...data, vehicle_id: v })}>
@@ -739,7 +740,8 @@ export default function TransportsPage() {
             <Input placeholder="KM Devolução (odômetro)" type="number" value={data.km_devolucao} onChange={(e) => setData({ ...data, km_devolucao: e.target.value })} />
             <div>
               <Label className="text-xs text-muted-foreground mb-1 block">Data/Hora devolução</Label>
-              <Input type="datetime-local" value={data.fim_em} onChange={(e) => setData({ ...data, fim_em: e.target.value })} />
+
+              <DateTimePicker value={data.fim_em} onChange={(v) => setData({ ...data, fim_em: v })} placeholder="Devolução" />
             </div>
           </>
         )}
@@ -818,7 +820,7 @@ export default function TransportsPage() {
               {members.map((m: any) => <SelectItem key={m.user_id} value={m.user_id}>{m.nome_exibicao}</SelectItem>)}
             </SelectContent>
           </Select>
-          <Input type="date" className="h-9 text-xs" value={filterData} onChange={(e) => setFilterData(e.target.value)} />
+          <DateTimePicker mode="date" value={filterData} onChange={setFilterData} placeholder="Data" className="h-9 text-xs" />
           <Select value={filterStatus} onValueChange={setFilterStatus}>
             <SelectTrigger className="h-9 text-xs"><SelectValue placeholder="Status" /></SelectTrigger>
             <SelectContent>

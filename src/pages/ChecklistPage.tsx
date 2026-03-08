@@ -9,6 +9,7 @@ import { useState, useMemo } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { DateTimePicker } from '@/components/ui/date-time-picker';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -188,7 +189,7 @@ export default function ChecklistPage() {
             <div className="space-y-3">
               <Input placeholder="Título da tarefa" value={form.titulo} onChange={(e) => setForm({ ...form, titulo: e.target.value })} />
               <Textarea placeholder="Observações (opcional)" value={form.descricao} onChange={(e) => setForm({ ...form, descricao: e.target.value })} className="min-h-[60px]" />
-              <Input type="datetime-local" value={form.due_em} onChange={(e) => setForm({ ...form, due_em: e.target.value })} />
+              <DateTimePicker value={form.due_em} onChange={(v) => setForm({ ...form, due_em: v })} placeholder="Prazo" />
               <div className="grid grid-cols-2 gap-3">
                 <Select value={form.prioridade} onValueChange={(v) => setForm({ ...form, prioridade: v })}>
                   <SelectTrigger><SelectValue placeholder="Prioridade" /></SelectTrigger>
@@ -230,12 +231,12 @@ export default function ChecklistPage() {
           <Filter className="w-4 h-4" />
           <span className="text-xs font-medium">Filtros:</span>
         </div>
-        <Input
-          type="date"
+        <DateTimePicker
+          mode="date"
           value={filterDate}
-          onChange={(e) => setFilterDate(e.target.value)}
-          className="w-40 h-8 text-xs"
+          onChange={setFilterDate}
           placeholder="Data"
+          className="w-40 h-8 text-xs"
         />
         <Select value={filterResponsavel} onValueChange={setFilterResponsavel}>
           <SelectTrigger className="w-48 h-8 text-xs"><SelectValue placeholder="Responsável" /></SelectTrigger>
@@ -320,7 +321,7 @@ export default function ChecklistPage() {
             <Textarea placeholder="Observações" value={editForm.descricao} onChange={(e) => setEditForm({ ...editForm, descricao: e.target.value })} className="min-h-[80px]" />
             <div>
               <label className="text-xs text-muted-foreground mb-1 block">Data/Hora</label>
-              <Input type="datetime-local" value={editForm.due_em} onChange={(e) => setEditForm({ ...editForm, due_em: e.target.value })} />
+              <DateTimePicker value={editForm.due_em} onChange={(v) => setEditForm({ ...editForm, due_em: v })} placeholder="Prazo" />
             </div>
             <div className="grid grid-cols-2 gap-3">
               <Select value={editForm.prioridade} onValueChange={(v) => setEditForm({ ...editForm, prioridade: v })}>

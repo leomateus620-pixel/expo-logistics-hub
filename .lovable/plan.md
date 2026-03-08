@@ -1,53 +1,30 @@
 
 
-## Plano: Picker de Data/Hora moderno para todo o sistema
+# Plano: Ajustar horários para fuso de São Paulo (UTC-3)
 
-### Problema
-O `<input type="datetime-local">` nativo do browser tem UX ruim, especialmente no desktop — calendário feio, seletor de hora minúsculo, visual inconsistente entre browsers.
+## Problema
+Todos os `new Date().toISOString()` geram horário UTC. Formulários e timestamps automáticos ficam 3 horas adiantados em relação a São Paulo.
 
-### Solução
-Criar um componente reutilizável `DateTimePicker` que combine:
-- **Calendário** visual (shadcn `Calendar` / react-day-picker, já instalado)
-- **Seletores de hora/minuto** com scroll ou dropdowns estilizados
-- Tudo dentro de um `Popover` que abre ao clicar no campo
-- Visual Liquid Glass consistente com o resto do sistema
+## Solução
 
-### Componente: `src/components/ui/date-time-picker.tsx`
+### 1. Criar função utilitária `nowSP()` em `src/lib/utils.ts`
+Função que retorna a data/hora atual no fuso `America/Sao_Paulo`:
+- `nowSP()` → ISO string completa no fuso SP
+- `nowSPLocal()` → formato `YYYY-MM-DDTHH:MM` para inputs `datetime-local`
+- `todaySP()` → formato `YYYY-MM-DD` para inputs `date`
 
-**Props:**
-- `value: string` (ISO datetime string ou date string)
-- `onChange: (value: string) => void`
-- `mode: 'datetime' | 'date' | 'time'` (default: 'datetime')
-- `placeholder?: string`
-- `className?: string`
+### 2. Substituir todas as ocorrências de `new Date().toISOString()` e `new Date()`
 
-**Estrutura:**
-1. **Trigger**: Botão estilizado mostrando data/hora formatada, com ícone de calendário
-2. **Popover content**:
-   - `Calendar` do shadcn para selecionar o dia
-   - Abaixo do calendário: dois `Select` lado a lado para Hora (00-23) e Minuto (00-59)
-   - Botão "Confirmar" para fechar o popover
-3. **Modo `date`**: só mostra calendário, sem hora
-4. **Modo `time`**: só mostra seletores de hora/minuto
+**Arquivos afetados (8 arquivos):**
+- `src/pages/TransportsPage.tsx` — 4 ocorrências (abertura formulário, devolução, fourHoursAgo)
+- `src/pages/ElectricCartsPage.tsx` — 4 ocorrências (retirada, devolução)
+- `src/pages/ChecklistPage.tsx` — 2 ocorrências (today, tomorrow)
+- `src/pages/Dashboard.tsx` — 2 ocorrências (now, todayStr)
+- `src/pages/AgendaPage.tsx` — 2 ocorrências (today, tomorrow)
+- `src/pages/VehiclesPage.tsx` — 1 ocorrência (devolução)
+- `src/hooks/useElectricCarts.ts` — 2 ocorrências (pickup, return)
+- `src/hooks/useTasks.ts` — 1 ocorrência (completed_at)
 
-**Visual**: `bg-card/95 backdrop-blur-xl border-border` no popover, coerente com modais existentes.
-
-### Substituições em 8 arquivos
-
-Todos os `<Input type="datetime-local" ...>` e `<Input type="date" ...>` serão substituídos por `<DateTimePicker>`:
-
-| Arquivo | Ocorrências | Modo |
-|---|---|---|
-| `AgendaPage.tsx` | 2 (inicio_em, fim_em) | datetime |
-| `TransportsPage.tsx` | 3 (inicio_em, fim_em, filterData) | datetime + date |
-| `ChecklistPage.tsx` | 3 (due_em create, due_em edit, filterDate) | datetime + date |
-| `GuestsPage.tsx` | 2 (checkin_em, checkout_em) | datetime |
-| `ElectricCartsPage.tsx` | 2 (retirada_em, devolucao_em) | datetime |
-| `ScootersPage.tsx` | 2 (retirada_em, devolucao_em) | datetime |
-| `VerEscalaPage.tsx` | 4 (filterDate, schedStart, schedEnd, shiftStart/End) | date + datetime |
-| `TeamPage.tsx` | 2 (data_inicio, data_fim) | date |
-
-### Arquivos modificados
-1. **Criar** `src/components/ui/date-time-picker.tsx` — componente reutilizável
-2. **Editar** 8 páginas — substituir inputs nativos pelo novo componente
+### 3. Atualizar funções de exibição em `rawTime`, `rawWeekday` etc.
+Adicionar conversão para fuso SP ao exibir datas que vêm do banco em UTC.
 

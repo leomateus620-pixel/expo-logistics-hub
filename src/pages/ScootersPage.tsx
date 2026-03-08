@@ -8,6 +8,7 @@ import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { DateTimePicker } from '@/components/ui/date-time-picker';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
@@ -182,7 +183,7 @@ export default function ScootersPage() {
             )}
             <div>
               <Label className="text-xs text-muted-foreground mb-1 block">Horário de retirada</Label>
-              <Input type="datetime-local" value={pickupForm.retirada_em} onChange={(e) => setPickupForm({ ...pickupForm, retirada_em: e.target.value })} />
+              <DateTimePicker value={pickupForm.retirada_em} onChange={(v) => setPickupForm({ ...pickupForm, retirada_em: v })} placeholder="Retirada" />
             </div>
             <Button onClick={handlePickup} className="w-full h-11" disabled={pickup.isPending}>Registrar Retirada</Button>
           </div>
@@ -196,7 +197,7 @@ export default function ScootersPage() {
           <div className="space-y-3">
             <div>
               <Label className="text-xs text-muted-foreground mb-1 block">Horário de devolução</Label>
-              <Input type="datetime-local" value={returnForm.devolucao_em} onChange={(e) => setReturnForm({ ...returnForm, devolucao_em: e.target.value })} />
+              <DateTimePicker value={returnForm.devolucao_em} onChange={(v) => setReturnForm({ ...returnForm, devolucao_em: v })} placeholder="Devolução" />
             </div>
             <Button onClick={handleReturn} className="w-full h-11" disabled={returnScooter.isPending}>Registrar Devolução</Button>
           </div>

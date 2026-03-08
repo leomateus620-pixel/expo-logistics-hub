@@ -13,6 +13,7 @@ import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { DateTimePicker } from '@/components/ui/date-time-picker';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -283,11 +284,11 @@ export default function TeamPage() {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-xs text-muted-foreground mb-1 block">Início</label>
-                <Input type="date" value={scheduleForm.data_inicio} onChange={(e) => setScheduleForm({ ...scheduleForm, data_inicio: e.target.value })} />
+                <DateTimePicker mode="date" value={scheduleForm.data_inicio} onChange={(v) => setScheduleForm({ ...scheduleForm, data_inicio: v })} placeholder="Início" />
               </div>
               <div>
                 <label className="text-xs text-muted-foreground mb-1 block">Fim</label>
-                <Input type="date" value={scheduleForm.data_fim} onChange={(e) => setScheduleForm({ ...scheduleForm, data_fim: e.target.value })} />
+                <DateTimePicker mode="date" value={scheduleForm.data_fim} onChange={(v) => setScheduleForm({ ...scheduleForm, data_fim: v })} placeholder="Fim" />
               </div>
             </div>
             <Button onClick={handleCreateSchedule} className="w-full" disabled={createSchedule.isPending}>Criar Escala</Button>
@@ -308,8 +309,8 @@ export default function TeamPage() {
             </Select>
             <Input placeholder="Título do turno (ex: Manhã)" value={shiftForm.titulo} onChange={(e) => setShiftForm({ ...shiftForm, titulo: e.target.value })} />
             <div className="grid grid-cols-2 gap-3">
-              <Input type="datetime-local" value={shiftForm.inicio_em} onChange={(e) => setShiftForm({ ...shiftForm, inicio_em: e.target.value })} />
-              <Input type="datetime-local" value={shiftForm.fim_em} onChange={(e) => setShiftForm({ ...shiftForm, fim_em: e.target.value })} />
+              <DateTimePicker value={shiftForm.inicio_em} onChange={(v) => setShiftForm({ ...shiftForm, inicio_em: v })} placeholder="Início" />
+              <DateTimePicker value={shiftForm.fim_em} onChange={(v) => setShiftForm({ ...shiftForm, fim_em: v })} placeholder="Fim" />
             </div>
             <Input placeholder="Local (opcional)" value={shiftForm.local} onChange={(e) => setShiftForm({ ...shiftForm, local: e.target.value })} />
             <Button onClick={handleCreateShift} className="w-full" disabled={createShift.isPending}>Criar Turno</Button>

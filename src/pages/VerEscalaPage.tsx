@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { DateTimePicker } from '@/components/ui/date-time-picker';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { Plus, ChevronLeft, ChevronRight, Clock, User, Trash2, Search } from 'lucide-react';
@@ -243,10 +244,11 @@ export default function VerEscalaPage() {
         </div>
         <div className="min-w-[150px]">
           <Label className="text-xs">Data</Label>
-          <Input
-            type="date"
+          <DateTimePicker
+            mode="date"
             value={filterDate}
-            onChange={(e) => setFilterDate(e.target.value)}
+            onChange={setFilterDate}
+            placeholder="Data"
             className="h-9"
           />
         </div>
@@ -405,11 +407,11 @@ export default function VerEscalaPage() {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label>Data início</Label>
-                <Input type="date" value={schedStart} onChange={(e) => setSchedStart(e.target.value)} />
+                <DateTimePicker mode="date" value={schedStart} onChange={setSchedStart} placeholder="Início" />
               </div>
               <div>
                 <Label>Data fim</Label>
-                <Input type="date" value={schedEnd} onChange={(e) => setSchedEnd(e.target.value)} />
+                <DateTimePicker mode="date" value={schedEnd} onChange={setSchedEnd} placeholder="Fim" />
               </div>
             </div>
             <Button className="w-full" onClick={handleCreateSchedule} disabled={createSchedule.isPending}>
@@ -449,11 +451,11 @@ export default function VerEscalaPage() {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label>Início</Label>
-                <Input type="datetime-local" value={shiftStart} onChange={(e) => setShiftStart(e.target.value)} />
+                <DateTimePicker value={shiftStart} onChange={setShiftStart} placeholder="Início" />
               </div>
               <div>
                 <Label>Fim</Label>
-                <Input type="datetime-local" value={shiftEnd} onChange={(e) => setShiftEnd(e.target.value)} />
+                <DateTimePicker value={shiftEnd} onChange={setShiftEnd} placeholder="Fim" />
               </div>
             </div>
             <div>
