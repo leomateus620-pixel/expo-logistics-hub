@@ -32,6 +32,33 @@ const statusConfig: Record<string, { label: string; icon: typeof Check; class: s
 const tituloOptions = ['Parque', 'Hotel', 'Aeroporto', 'Centro', 'Escolta Policial', 'Outros'];
 const cidadeAeroportoOptions = ['Chapecó', 'Santo Ângelo', 'Passo Fundo', 'Porto Alegre'];
 
+// Estimated round-trip durations in minutes by transport type
+const estimatedDurationMin: Record<string, number> = {
+  'Aeroporto': 120,
+  'Hotel': 45,
+  'Parque': 30,
+  'Centro': 40,
+  'Escolta Policial': 90,
+  'Outros': 60,
+};
+
+/** Estimate the return time for a transport based on its type and start time */
+function estimateReturnTime(t: any): Date | null {
+  if (!t.inicio_em) return null;
+  // If already concluded, use fim_em
+  if (t.fim_em) return new Date(t.fim_em);
+  const start = new Date(t.inicio_em);
+  const durationMin = estimatedDurationMin[t.titulo] || 60;
+  return new Date(start.getTime() + durationMin * 60000);
+}
+
+/** Format estimated return time as HH:MM */
+function formatReturnTime(t: any): string | null {
+  const ret = estimateReturnTime(t);
+  if (!ret) return null;
+  return ret.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
+}
+
 function buildEscoltaObs(data: any): string | null {
   if (data.titulo !== 'Escolta Policial') return null;
   const parts: string[] = [];
