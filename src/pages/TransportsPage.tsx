@@ -389,11 +389,48 @@ export default function TransportsPage() {
         setWhatsappOpen(true);
       }
 
+      // Create return trip if enabled
+      if (includeReturn && form.titulo === 'Aeroporto' && returnForm.inicio_em) {
+        try {
+          const returnDestKey = form.voo_cidade ? `Aeroporto_${form.voo_cidade}` : 'Aeroporto';
+          let returnRouteData: { duration_minutes?: number; distance_km?: number; polyline?: string } = {};
+          try {
+            const preview = await fetchRoutePreview(returnDestKey);
+            if (preview) returnRouteData = preview;
+          } catch { /* silent */ }
+
+          const returnResult = await create.mutateAsync({
+            titulo: 'Aeroporto',
+            guest_id: selectedGuests.length > 0 ? selectedGuests[0] : null,
+            origem: destino || 'Santa Rosa',
+            destino: form.voo_cidade ? `Aeroporto ${form.voo_cidade}` : form.origem,
+            inicio_em: returnForm.inicio_em,
+            motorista_user_id: form.motorista_user_id && form.motorista_user_id !== 'none' ? form.motorista_user_id : null,
+            vehicle_id: form.vehicle_id && form.vehicle_id !== 'none' ? form.vehicle_id : null,
+            prioridade: form.prioridade,
+            voo_cidade: form.voo_cidade || null,
+            voo_numero: returnForm.voo_numero || null,
+            voo_checkin: returnForm.voo_checkin || null,
+            voo_chegada: null,
+            horario_saida: returnForm.horario_saida || null,
+            distancia_estimada_km: returnRouteData.distance_km || null,
+            duracao_estimada_min: returnRouteData.duration_minutes || null,
+            rota_polyline: returnRouteData.polyline || null,
+          });
+
+          if (selectedGuests.length > 0 && returnResult?.id) {
+            try { await setGuestsForTransport.mutateAsync({ transportId: returnResult.id, guestIds: selectedGuests }); } catch { /* silent */ }
+          }
+        } catch { /* silent - don't fail the main transport */ }
+      }
+
       setForm({ titulo: '', origem: '', destino: '', inicio_em: '', motorista_user_id: '', vehicle_id: '', prioridade: 'media', km_retirada: '', voo_cidade: '', voo_numero: '', voo_checkin: '', voo_chegada: '', horario_saida: '', escolta_nome: '', escolta_cargo: '', escolta_viaturas: '', escolta_ponto_encontro: '', escolta_contato_seguranca: '', escolta_obs: '' });
       setSelectedGuests([]);
       setGuestDestinations({});
+      setIncludeReturn(false);
+      setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', voo_chegada: '', horario_saida: '' });
       setOpen(false);
-      toast.success('Transporte agendado');
+      toast.success(includeReturn && form.titulo === 'Aeroporto' && returnForm.inicio_em ? 'Ida e volta agendados' : 'Transporte agendado');
     } catch (err: any) { toast.error(err.message); }
   };
 
