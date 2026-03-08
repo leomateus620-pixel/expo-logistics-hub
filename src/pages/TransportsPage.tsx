@@ -1210,11 +1210,14 @@ function TransportLocationCard({ transportId, transport, driverName, isMyTrackin
 /* ═══════════════════════════════════════════════════════════════
    Transport Detail View (modal)
    ═══════════════════════════════════════════════════════════════ */
-function TransportDetailView({ t, members, vehicles, guests, getDriverCommission, onPDF }: any) {
+function TransportDetailView({ t, members, vehicles, guests, getDriverCommission, getGuestsForTransport, onPDF }: any) {
   const sc = statusConfig[t.status] || statusConfig.pendente;
   const driver = members.find((m: any) => m.user_id === t.motorista_user_id);
   const vehicle = vehicles.find((v: any) => v.id === t.vehicle_id);
-  const guest = guests.find((g: any) => g.id === t.guest_id);
+  const linkedGuestIds = getGuestsForTransport(t.id);
+  const transportGuests = linkedGuestIds.length > 0
+    ? linkedGuestIds.map((gid: string) => guests.find((g: any) => g.id === gid)).filter(Boolean)
+    : (t.guest_id ? [guests.find((g: any) => g.id === t.guest_id)].filter(Boolean) : []);
   const driverCommission = t.motorista_user_id ? getDriverCommission(t.motorista_user_id) : null;
 
   // Calculate real duration if available
