@@ -1,7 +1,10 @@
 import { useEvents } from '@/hooks/useEvents';
+import { useTransports } from '@/hooks/useTransports';
 import { useOrgMembers } from '@/hooks/useOrgMembers';
 import { useCommissions } from '@/hooks/useCommissions';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
+import { useGuests } from '@/hooks/useGuests';
+import { useTransportGuests } from '@/hooks/useTransportGuests';
 import { Badge } from '@/components/ui/badge';
 import { CalendarDays, Plus, MapPin, User, Pencil, Trash2, Users, Sun, Sunset, Moon, CalendarOff } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
@@ -42,27 +45,65 @@ function isNowBetween(start: string, end: string): boolean {
 /* ── component ────────────────────────────────────────── */
 
 export default function AgendaPage() {
-  const { events, isLoading, create, update, remove } = useEvents();
+  const { events, isLoading: eventsLoading, create, update, remove } = useEvents();
+  const { transports, isLoading: transportsLoading } = useTransports();
   const { members } = useOrgMembers();
   const { commissions } = useCommissions();
   const { myRole } = useCurrentOrg();
+  const { guests } = useGuests();
+  const { getGuestsForTransport } = useTransportGuests();
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
 
+  const isLoading = eventsLoading || transportsLoading;
   const today = todaySP();
+
+  /* ── Merge events + active transports ── */
+  const allItems = useMemo(() => {
+    // Regular events (exclude auto-created transport events to avoid duplicates)
+    const regularEvents = events
+      .filter((e: any) => e.tipo_tag !== 'transporte')
+      .map((e: any) => ({ ...e, _source: 'event' as const }));
+
+    // Active transports (not completed/cancelled)
+    const activeTransports = transports
+      .filter((t: any) => t.status !== 'concluido' && t.status !== 'cancelado')
+      .map((t: any) => {
+        const driver = t.motorista_user_id ? members.find((m: any) => m.user_id === t.motorista_user_id) : null;
+        const guestIds = getGuestsForTransport(t.id);
+        const guestNames = guestIds.map((gid: string) => guests.find((g: any) => g.id === gid)?.nome).filter(Boolean);
+        const legacyGuest = !guestIds.length && t.guest_id ? guests.find((g: any) => g.id === t.guest_id) : null;
+        if (legacyGuest) guestNames.push(legacyGuest.nome);
+
+        return {
+          id: t.id,
+          titulo: `Transporte: ${t.titulo || ''} ${t.origem} → ${t.destino}`.trim(),
+          descricao: guestNames.length ? `Hóspedes: ${guestNames.join(', ')}` : null,
+          inicio_em: t.inicio_em,
+          fim_em: t.fim_em || t.inicio_em,
+          local: `${t.origem} → ${t.destino}`,
+          tipo_tag: 'transporte',
+          responsavel_user_id: t.motorista_user_id,
+          _source: 'transport' as const,
+          _transportStatus: t.status,
+        };
+      });
+
+    return [...regularEvents, ...activeTransports];
+  }, [events, transports, members, guests, getGuestsForTransport]);
 
   /* ── dates ── */
   const dates: string[] = useMemo(() => {
     const set = new Set<string>();
-    events.forEach((e: any) => {
+    allItems.forEach((e: any) => {
       const d = e.inicio_em?.split('T')[0];
       if (d) set.add(d);
     });
     const arr = [...set].sort();
     if (arr.length === 0) arr.push(today);
     return arr;
-  }, [events, today]);
+  }, [allItems, today]);
 
   const [selectedDate, setSelectedDate] = useState<string>(dates.includes(today) ? today : dates[0]);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -84,10 +125,10 @@ export default function AgendaPage() {
 
   /* ── day events grouped by shift ── */
   const dayEvents = useMemo(() => {
-    return events
+    return allItems
       .filter((e: any) => e.inicio_em?.startsWith(selectedDate))
       .sort((a: any, b: any) => a.inicio_em.localeCompare(b.inicio_em));
-  }, [events, selectedDate]);
+  }, [allItems, selectedDate]);
 
   const grouped = useMemo(() => {
     const g: Record<string, any[]> = { manha: [], tarde: [], noite: [] };
@@ -245,7 +286,7 @@ export default function AgendaPage() {
                     return (
                       <div
                         key={e.id}
-                        onClick={() => openEdit(e)}
+                        onClick={() => e._source !== 'transport' && openEdit(e)}
                         className={cn(
                           'group rounded-2xl border p-4 flex gap-4 cursor-pointer transition-all duration-200',
                           'bg-white/10 backdrop-blur-xl border-white/15',
@@ -291,18 +332,27 @@ export default function AgendaPage() {
                         </div>
 
                         {/* Actions */}
-                        <div className="flex flex-col items-center justify-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Pencil className="w-3.5 h-3.5 text-muted-foreground" />
-                          {(myRole === 'admin' || myRole === 'gestor') && (
-                            <button
-                              className="p-1 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
-                              onClick={(ev) => { ev.stopPropagation(); if (confirm('Excluir este evento?')) remove.mutate(e.id); }}
-                              aria-label="Excluir"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                          )}
-                        </div>
+                        {e._source !== 'transport' && (
+                          <div className="flex flex-col items-center justify-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Pencil className="w-3.5 h-3.5 text-muted-foreground" />
+                            {(myRole === 'admin' || myRole === 'gestor') && (
+                              <button
+                                className="p-1 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                                onClick={(ev) => { ev.stopPropagation(); if (confirm('Excluir este evento?')) remove.mutate(e.id); }}
+                                aria-label="Excluir"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            )}
+                          </div>
+                        )}
+                        {e._source === 'transport' && (
+                          <div className="flex items-center shrink-0">
+                            <Badge variant="outline" className="text-[10px] bg-primary/10 border-primary/30 text-primary">
+                              {e._transportStatus === 'em_andamento' ? 'Em andamento' : 'Pendente'}
+                            </Badge>
+                          </div>
+                        )}
                       </div>
                     );
                   })}
