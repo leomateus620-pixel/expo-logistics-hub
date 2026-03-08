@@ -227,6 +227,66 @@ export type Database = {
           },
         ]
       }
+      fuel_records: {
+        Row: {
+          created_at: string
+          cupom_fiscal_url: string | null
+          id: string
+          km_abastecimento: number | null
+          litros: number | null
+          observacoes: string | null
+          org_id: string
+          posto: string | null
+          registrado_por_user_id: string | null
+          updated_at: string
+          valor: number | null
+          vehicle_id: string
+        }
+        Insert: {
+          created_at?: string
+          cupom_fiscal_url?: string | null
+          id?: string
+          km_abastecimento?: number | null
+          litros?: number | null
+          observacoes?: string | null
+          org_id: string
+          posto?: string | null
+          registrado_por_user_id?: string | null
+          updated_at?: string
+          valor?: number | null
+          vehicle_id: string
+        }
+        Update: {
+          created_at?: string
+          cupom_fiscal_url?: string | null
+          id?: string
+          km_abastecimento?: number | null
+          litros?: number | null
+          observacoes?: string | null
+          org_id?: string
+          posto?: string | null
+          registrado_por_user_id?: string | null
+          updated_at?: string
+          valor?: number | null
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fuel_records_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fuel_records_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       guests: {
         Row: {
           checkin_em: string | null

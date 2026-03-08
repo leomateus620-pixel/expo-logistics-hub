@@ -2,8 +2,9 @@ import { useVehicles } from '@/hooks/useVehicles';
 import { useOrgMembers } from '@/hooks/useOrgMembers';
 import { useVehicleUsage } from '@/hooks/useVehicleUsage';
 import { useTransports } from '@/hooks/useTransports';
+import { useFuelRecords } from '@/hooks/useFuelRecords';
 import { useAuth } from '@/hooks/useAuth';
-import { Car, Pencil, Plus, Gauge, Fuel, ArrowRight, Palette, Clock, ExternalLink } from 'lucide-react';
+import { Car, Pencil, Plus, Gauge, Fuel, ArrowRight, Palette, Clock, ExternalLink, Camera, Image } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn, nowSP } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
@@ -250,12 +251,20 @@ function VehicleDetailContent({ vehicle, members, userId }: { vehicle: any; memb
   const { usages, createUsage, updateUsage } = useVehicleUsage(vehicle.id);
   const { transports } = useTransports();
   const { update: updateVehicle } = useVehicles();
+  const { records: fuelRecords, create: createFuel, uploadReceipt } = useFuelRecords(vehicle.id);
   const navigate = useNavigate();
 
   const [kmSaida, setKmSaida] = useState('');
   const [kmChegada, setKmChegada] = useState('');
   const [responsavelId, setResponsavelId] = useState(userId || '');
   const [obs, setObs] = useState('');
+
+  // Fuel form state
+  const [fuelOpen, setFuelOpen] = useState(false);
+  const [fuelForm, setFuelForm] = useState({ litros: '', valor: '', km_abastecimento: '', posto: '', observacoes: '' });
+  const [fuelPhoto, setFuelPhoto] = useState<File | null>(null);
+  const [fuelPhotoPreview, setFuelPhotoPreview] = useState<string | null>(null);
+  const [fuelLoading, setFuelLoading] = useState(false);
 
   const openUsage = usages.find((u: any) => !u.km_chegada);
 
@@ -405,6 +414,119 @@ function VehicleDetailContent({ vehicle, members, userId }: { vehicle: any; memb
                     </div>
                   )}
                   {u.observacoes && <p className="text-muted-foreground italic">{u.observacoes}</p>}
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Fuel Records Section */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <p className="text-sm font-medium flex items-center gap-2"><Fuel className="w-4 h-4 text-accent" /> Abastecimentos</p>
+          <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => setFuelOpen(!fuelOpen)}>
+            {fuelOpen ? 'Cancelar' : '+ Registrar'}
+          </Button>
+        </div>
+
+        {fuelOpen && (
+          <div className="rounded-lg border p-3 space-y-2 mb-3">
+            <div className="grid grid-cols-2 gap-2">
+              <Input placeholder="Litros" type="number" step="0.01" value={fuelForm.litros} onChange={(e) => setFuelForm({ ...fuelForm, litros: e.target.value })} className="uppercase" />
+              <Input placeholder="Valor (R$)" type="number" step="0.01" value={fuelForm.valor} onChange={(e) => setFuelForm({ ...fuelForm, valor: e.target.value })} className="uppercase" />
+            </div>
+            <Input placeholder="KM no abastecimento" type="number" value={fuelForm.km_abastecimento} onChange={(e) => setFuelForm({ ...fuelForm, km_abastecimento: e.target.value })} className="uppercase" />
+            <Input placeholder="Posto / Local" value={fuelForm.posto} onChange={(e) => setFuelForm({ ...fuelForm, posto: e.target.value })} className="uppercase" />
+            <Input placeholder="Observações (opcional)" value={fuelForm.observacoes} onChange={(e) => setFuelForm({ ...fuelForm, observacoes: e.target.value })} className="uppercase" />
+
+            {/* Photo upload */}
+            <div>
+              <label className="flex items-center gap-2 p-3 rounded-lg border border-dashed border-primary/30 bg-primary/5 cursor-pointer hover:bg-primary/10 transition-colors">
+                <Camera className="w-5 h-5 text-primary" />
+                <span className="text-xs text-muted-foreground">{fuelPhoto ? fuelPhoto.name : 'Anexar cupom fiscal (foto)'}</span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  capture="environment"
+                  className="hidden"
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) {
+                      setFuelPhoto(f);
+                      setFuelPhotoPreview(URL.createObjectURL(f));
+                    }
+                  }}
+                />
+              </label>
+              {fuelPhotoPreview && (
+                <div className="mt-2 relative">
+                  <img src={fuelPhotoPreview} alt="Preview cupom" className="w-full max-h-40 object-contain rounded-lg border" />
+                  <button className="absolute top-1 right-1 bg-destructive text-destructive-foreground rounded-full w-5 h-5 flex items-center justify-center text-xs" onClick={() => { setFuelPhoto(null); setFuelPhotoPreview(null); }}>×</button>
+                </div>
+              )}
+            </div>
+
+            <Button
+              size="sm"
+              className="w-full"
+              disabled={fuelLoading}
+              onClick={async () => {
+                if (!fuelForm.litros && !fuelForm.valor) { toast.error('Informe litros ou valor'); return; }
+                setFuelLoading(true);
+                try {
+                  let cupomUrl: string | null = null;
+                  if (fuelPhoto) {
+                    cupomUrl = await uploadReceipt(fuelPhoto, vehicle.id);
+                  }
+                  await createFuel.mutateAsync({
+                    vehicle_id: vehicle.id,
+                    litros: fuelForm.litros ? Number(fuelForm.litros) : null,
+                    valor: fuelForm.valor ? Number(fuelForm.valor) : null,
+                    km_abastecimento: fuelForm.km_abastecimento ? Number(fuelForm.km_abastecimento) : null,
+                    posto: fuelForm.posto || null,
+                    observacoes: fuelForm.observacoes || null,
+                    cupom_fiscal_url: cupomUrl,
+                    registrado_por_user_id: userId || null,
+                  });
+                  setFuelForm({ litros: '', valor: '', km_abastecimento: '', posto: '', observacoes: '' });
+                  setFuelPhoto(null);
+                  setFuelPhotoPreview(null);
+                  setFuelOpen(false);
+                  toast.success('Abastecimento registrado');
+                } catch (err: any) { toast.error(err.message); }
+                setFuelLoading(false);
+              }}
+            >
+              Registrar Abastecimento
+            </Button>
+          </div>
+        )}
+
+        {fuelRecords.length === 0 && !fuelOpen ? (
+          <p className="text-xs text-muted-foreground">Nenhum abastecimento registrado</p>
+        ) : (
+          <div className="space-y-2">
+            {fuelRecords.map((f: any) => {
+              const who = members.find((m: any) => m.user_id === f.registrado_por_user_id);
+              return (
+                <div key={f.id} className="rounded-lg border p-3 text-xs space-y-1">
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium">{who?.nome_exibicao || '—'}</span>
+                    <span className="text-muted-foreground">{new Date(f.created_at).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-muted-foreground flex-wrap">
+                    {f.litros && <span><Fuel className="w-3 h-3 inline mr-0.5" />{Number(f.litros).toLocaleString('pt-BR')} L</span>}
+                    {f.valor && <span>R$ {Number(f.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>}
+                    {f.km_abastecimento && <span><Gauge className="w-3 h-3 inline mr-0.5" />{Number(f.km_abastecimento).toLocaleString('pt-BR')} km</span>}
+                    {f.posto && <span>{f.posto}</span>}
+                  </div>
+                  {f.observacoes && <p className="text-muted-foreground italic">{f.observacoes}</p>}
+                  {f.cupom_fiscal_url && (
+                    <a href={f.cupom_fiscal_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline text-[10px]">
+                      <Image className="w-3 h-3" /> Ver cupom fiscal
+                    </a>
+                  )}
                 </div>
               );
             })}
