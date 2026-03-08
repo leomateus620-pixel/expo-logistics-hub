@@ -1,41 +1,30 @@
 
 
-## Plano: Corrigir status de veículos e erro na devolução
+# Plano: Ajustar horários para fuso de São Paulo (UTC-3)
 
-### Problemas identificados
+## Problema
+Todos os `new Date().toISOString()` geram horário UTC. Formulários e timestamps automáticos ficam 3 horas adiantados em relação a São Paulo.
 
-**1. Status inconsistente**: `handleRetirada` cria um registro em `vehicle_usage` mas **nunca atualiza** `vehicles.status` para `em_uso`. Na devolução, atualiza `km_atual` mas **não muda** o status de volta para `disponivel`. Resultado: card mostra "Disponível" mas ao abrir aparece "Veículo em uso".
+## Solução
 
-**2. Erro na devolução**: `handleDevolucao` chama `updateVehicle.mutateAsync()` que faz UPDATE na tabela `vehicles`. A RLS policy `vehicles_update` só permite `admin` e `gestor`. Usuários com role `operador` conseguem atualizar `vehicle_usage` (permitido pela policy) mas **falham** ao tentar atualizar `vehicles` (bloqueado pela policy). Isso causa o erro.
+### 1. Criar função utilitária `nowSP()` em `src/lib/utils.ts`
+Função que retorna a data/hora atual no fuso `America/Sao_Paulo`:
+- `nowSP()` → ISO string completa no fuso SP
+- `nowSPLocal()` → formato `YYYY-MM-DDTHH:MM` para inputs `datetime-local`
+- `todaySP()` → formato `YYYY-MM-DD` para inputs `date`
 
-### Correções
+### 2. Substituir todas as ocorrências de `new Date().toISOString()` e `new Date()`
 
-**A. Atualizar RLS de `vehicles_update`** (migração SQL):
-Adicionar `operador` à policy de UPDATE de `vehicles`, mesma lógica já usada em `vehicle_usage_update`. Operadores precisam atualizar `km_atual` e `status` durante retirada/devolução.
+**Arquivos afetados (8 arquivos):**
+- `src/pages/TransportsPage.tsx` — 4 ocorrências (abertura formulário, devolução, fourHoursAgo)
+- `src/pages/ElectricCartsPage.tsx` — 4 ocorrências (retirada, devolução)
+- `src/pages/ChecklistPage.tsx` — 2 ocorrências (today, tomorrow)
+- `src/pages/Dashboard.tsx` — 2 ocorrências (now, todayStr)
+- `src/pages/AgendaPage.tsx` — 2 ocorrências (today, tomorrow)
+- `src/pages/VehiclesPage.tsx` — 1 ocorrência (devolução)
+- `src/hooks/useElectricCarts.ts` — 2 ocorrências (pickup, return)
+- `src/hooks/useTasks.ts` — 1 ocorrência (completed_at)
 
-**B. `src/pages/VehiclesPage.tsx` — `handleRetirada`** (linha ~501-513):
-Após criar o usage, também chamar:
-```ts
-await updateVehicle.mutateAsync({ 
-  id: vehicle.id, 
-  status: 'em_uso',
-  responsavel_user_id: responsavelId || null 
-});
-```
-
-**C. `src/pages/VehiclesPage.tsx` — `handleDevolucao`** (linha ~516-533):
-Na chamada existente de `updateVehicle`, incluir mudança de status:
-```ts
-await updateVehicle.mutateAsync({ 
-  id: vehicle.id, 
-  km_atual: Number(kmChegada), 
-  status: 'disponivel',
-  responsavel_user_id: null 
-});
-```
-
-### Resultado
-- Status correto no card e no detalhe
-- Devolução funciona para todos os roles
-- Dados consistentes entre `vehicles` e `vehicle_usage`
+### 3. Atualizar funções de exibição em `rawTime`, `rawWeekday` etc.
+Adicionar conversão para fuso SP ao exibir datas que vêm do banco em UTC.
 

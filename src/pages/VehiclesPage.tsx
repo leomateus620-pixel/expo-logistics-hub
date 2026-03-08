@@ -507,6 +507,11 @@ function VehicleDetailContent({ vehicle, members, userId, kmTotal, fuelCostTotal
         km_saida: Number(kmSaida),
         observacoes: obs || null,
       });
+      await updateVehicle.mutateAsync({
+        id: vehicle.id,
+        status: 'em_uso',
+        responsavel_user_id: responsavelId && responsavelId !== 'none' ? responsavelId : null,
+      });
       setKmSaida('');
       setObs('');
       toast.success('Retirada registrada');
@@ -526,7 +531,7 @@ function VehicleDetailContent({ vehicle, members, userId, kmTotal, fuelCostTotal
         km_chegada: Number(kmChegada),
         devolucao_em: nowSP(),
       });
-      await updateVehicle.mutateAsync({ id: vehicle.id, km_atual: Number(kmChegada) });
+      await updateVehicle.mutateAsync({ id: vehicle.id, km_atual: Number(kmChegada), status: 'disponivel', responsavel_user_id: null });
       setKmChegada('');
       toast.success('Devolução registrada');
     } catch (err: any) { toast.error(err.message); }
