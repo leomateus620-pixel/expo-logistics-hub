@@ -471,8 +471,10 @@ export default function TransportsPage() {
         }
         setEditId(t.id);
         const escoltaData = parseEscoltaFromObs(t.observacoes);
+        const linkedGuests2 = getGuestsForTransport(t.id);
+        setEditGuests(linkedGuests2.length > 0 ? linkedGuests2 : (t.guest_id ? [t.guest_id] : []));
         setEditForm({
-          titulo: t.titulo || '', guest_id: t.guest_id || '', origem: t.origem, destino: t.destino,
+          titulo: t.titulo || '', origem: t.origem, destino: t.destino,
           inicio_em: t.inicio_em?.slice(0, 16) || '', motorista_user_id: t.motorista_user_id || '',
           vehicle_id: t.vehicle_id || '', prioridade: t.prioridade || 'media',
           status: 'concluido',
