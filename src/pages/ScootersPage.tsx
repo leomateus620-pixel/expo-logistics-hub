@@ -300,7 +300,7 @@ function ScooterHistoryContent({ scooter, history, members }: { scooter: any; hi
   const usageEntries = retiradas.map((ret: any) => {
     const retData = ret.after_data || {};
     const retiradaEm = retData.retirada_em || ret.created_at;
-    const responsavel = ret.actor_user_id;
+    const responsavel = retData.responsavel_user_id || ret.actor_user_id;
     const comissao = retData.comissao;
     const matchingDev = devolucoes.find((d: any) => new Date(d.created_at).getTime() > new Date(ret.created_at).getTime());
     const devData = matchingDev?.after_data || {};
