@@ -229,7 +229,7 @@ export default function TransportDynamicIsland({
       >
         <div className="px-4 pb-4 space-y-3">
           {/* Separator */}
-          <div className="h-px bg-white/[0.08]" />
+          <div className="h-px bg-border/40" />
 
           {/* Map area */}
           {(isActive || (t.rota_polyline && !isDone)) && (
