@@ -158,13 +158,13 @@ export default function TransportDynamicIsland({
         'relative overflow-hidden transition-all',
         'rounded-[22px]',
         // Liquid Glass dark capsule
-        'bg-foreground/90 text-background backdrop-blur-xl',
-        'border border-white/[0.08]',
-        'shadow-lg',
+        'bg-card/60 text-foreground backdrop-blur-xl',
+        'border border-border/40',
         expanded ? 'shadow-2xl' : 'shadow-md',
       )}
       style={{
         transition: 'all 500ms cubic-bezier(0.32, 0.72, 0, 1)',
+        boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.15), 0 4px 24px rgba(0,0,0,0.08)',
       }}
     >
       {/* ── Collapsed State (always visible) ── */}
@@ -179,30 +179,30 @@ export default function TransportDynamicIsland({
         {/* Navigation icon */}
         <div className={cn(
           'w-8 h-8 rounded-full flex items-center justify-center shrink-0',
-          isActive ? 'bg-accent/20' : isDone ? 'bg-white/10' : 'bg-white/10',
+          isActive ? 'bg-accent/20' : isDone ? 'bg-primary/10' : 'bg-primary/10',
         )}>
           {isActive ? (
             <Navigation className="w-4 h-4 text-accent animate-pulse" />
           ) : isDone ? (
             <div className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
           ) : (
-            <MapPin className="w-4 h-4 text-white/60" />
+            <MapPin className="w-4 h-4 text-muted-foreground" />
           )}
         </div>
 
         {/* Route text */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5">
-            <span className="text-sm font-semibold truncate text-white/95">{t.origem}</span>
-            <ArrowRight className="w-3 h-3 text-white/40 shrink-0" />
-            <span className="text-sm font-semibold truncate text-white/95">{t.destino}</span>
+            <span className="text-sm font-semibold truncate text-foreground">{t.origem}</span>
+            <ArrowRight className="w-3 h-3 text-muted-foreground/60 shrink-0" />
+            <span className="text-sm font-semibold truncate text-foreground">{t.destino}</span>
           </div>
           <div className="flex items-center gap-1.5 mt-0.5">
             <span className={cn(
               'w-1.5 h-1.5 rounded-full shrink-0',
-              isActive ? 'bg-accent animate-pulse' : isDone ? 'bg-emerald-400' : 'bg-white/30'
+              isActive ? 'bg-accent animate-pulse' : isDone ? 'bg-emerald-400' : 'bg-muted-foreground/30'
             )} />
-            <span className="text-[10px] font-medium text-white/50">
+            <span className="text-[10px] font-medium text-muted-foreground">
               {statusLabels[t.status] || t.status}
               {etaText && <> • {etaText}</>}
             </span>
@@ -212,7 +212,7 @@ export default function TransportDynamicIsland({
         {/* Right side: time or ETA */}
         {arrivalText && (
           <div className="shrink-0 text-right">
-            <span className="text-xs font-mono font-semibold text-white/70">{arrivalText}</span>
+            <span className="text-xs font-mono font-semibold text-foreground/70">{arrivalText}</span>
           </div>
         )}
       </button>
@@ -229,15 +229,15 @@ export default function TransportDynamicIsland({
       >
         <div className="px-4 pb-4 space-y-3">
           {/* Separator */}
-          <div className="h-px bg-white/[0.08]" />
+          <div className="h-px bg-border/40" />
 
           {/* Map area */}
           {(isActive || (t.rota_polyline && !isDone)) && (
-            <div className="rounded-2xl overflow-hidden border border-white/[0.06]">
+            <div className="rounded-2xl overflow-hidden border border-border/30">
               {location && isActive ? (
                 <Suspense fallback={
-                  <div className="h-[160px] bg-white/5 flex items-center justify-center">
-                    <div className="flex items-center gap-2 text-xs text-white/40">
+                   <div className="h-[160px] bg-muted/30 flex items-center justify-center">
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <Navigation className="w-4 h-4 animate-pulse" /> Carregando mapa...
                     </div>
                   </div>
@@ -254,7 +254,7 @@ export default function TransportDynamicIsland({
                       destLatLng={destCoords}
                       destLabel={t.destino}
                     />
-                    <div className="absolute top-2 right-2 flex items-center gap-1.5 bg-black/60 backdrop-blur-sm rounded-full px-2.5 py-1 text-[10px] font-medium text-white/90 border border-white/10">
+                    <div className="absolute top-2 right-2 flex items-center gap-1.5 bg-card/80 backdrop-blur-sm rounded-full px-2.5 py-1 text-[10px] font-medium text-foreground border border-border/40">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                       Ao vivo
                     </div>
@@ -263,7 +263,7 @@ export default function TransportDynamicIsland({
               ) : !isActive && destCoords ? (
                 <Suspense fallback={
                   <div className="h-[140px] bg-white/5 flex items-center justify-center">
-                    <div className="flex items-center gap-2 text-xs text-white/40">
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <MapPin className="w-4 h-4" /> Carregando rota...
                     </div>
                   </div>
@@ -283,9 +283,9 @@ export default function TransportDynamicIsland({
 
           {/* Tracking status for my tracking */}
           {isMyTracking && !location && (
-            <div className="flex items-center gap-2 text-xs text-white/50">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
               {trackingError ? (
-                <><MapPinOff className="w-3.5 h-3.5 text-red-400" /><span className="text-red-300">{trackingError}</span></>
+                <><MapPinOff className="w-3.5 h-3.5 text-destructive" /><span className="text-destructive">{trackingError}</span></>
               ) : (
                 <><Navigation className="w-3.5 h-3.5 animate-pulse text-accent" /><span>Obtendo localização...</span></>
               )}
@@ -295,12 +295,12 @@ export default function TransportDynamicIsland({
           {/* Metrics row */}
           <div className="flex flex-wrap gap-2">
             {(liveEta || t.distancia_estimada_km) && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/[0.08] text-[11px] font-medium text-white/70">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-muted/50 text-[11px] font-medium text-foreground/70">
                 <Ruler className="w-3 h-3" /> {liveEta ? `${liveEta.km} km` : `${t.distancia_estimada_km} km`}
               </span>
             )}
             {(liveEta || t.duracao_estimada_min) && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/[0.08] text-[11px] font-medium text-white/70">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-muted/50 text-[11px] font-medium text-foreground/70">
                 <Timer className="w-3 h-3" /> {liveEta ? `${liveEta.minutes} min` : `${t.duracao_estimada_min} min`}
               </span>
             )}
@@ -315,12 +315,12 @@ export default function TransportDynamicIsland({
           {(driverName || guestName) && (
             <div className="flex flex-wrap gap-2">
               {driverName && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/[0.06] text-[11px] text-white/60">
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-muted/40 text-[11px] text-muted-foreground">
                   👤 {driverName.split(' ')[0]}
                 </span>
               )}
               {guestName && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/[0.06] text-[11px] text-white/60">
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-muted/40 text-[11px] text-muted-foreground">
                   🎫 {guestName}
                 </span>
               )}
@@ -345,7 +345,7 @@ export default function TransportDynamicIsland({
                 className={cn(
                   'flex-1 flex items-center justify-center gap-1.5 h-9 rounded-xl text-xs font-semibold transition-all active:scale-[0.97]',
                   t.status === 'pendente'
-                    ? 'bg-white/15 hover:bg-white/20 text-white'
+                    ? 'bg-primary/15 hover:bg-primary/25 text-primary'
                     : 'bg-accent/20 hover:bg-accent/30 text-accent',
                 )}
               >
@@ -358,7 +358,7 @@ export default function TransportDynamicIsland({
             )}
             <button
               onClick={(e) => { e.stopPropagation(); onDetail(); }}
-              className="flex items-center justify-center gap-1.5 h-9 px-4 rounded-xl bg-white/[0.08] hover:bg-white/[0.12] text-xs font-medium text-white/70 transition-all active:scale-[0.97]"
+              className="flex items-center justify-center gap-1.5 h-9 px-4 rounded-xl bg-muted/40 hover:bg-muted/60 text-xs font-medium text-foreground/70 transition-all active:scale-[0.97]"
             >
               <Eye className="w-3.5 h-3.5" /> Detalhes
             </button>
@@ -372,7 +372,7 @@ export default function TransportDynamicIsland({
                 await locationTracker.stopTracking();
                 setTrackingTransportId(null);
               }}
-              className="w-full flex items-center justify-center gap-1.5 h-8 rounded-xl text-[11px] text-red-300/80 hover:bg-red-500/10 transition-colors"
+              className="w-full flex items-center justify-center gap-1.5 h-8 rounded-xl text-[11px] text-destructive hover:bg-destructive/10 transition-colors"
             >
               <MapPinOff className="w-3 h-3" /> Desativar localização
             </button>
