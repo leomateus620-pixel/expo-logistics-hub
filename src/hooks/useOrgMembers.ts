@@ -12,7 +12,7 @@ export function useOrgMembers() {
     queryFn: async () => {
       if (!orgId) return [];
       const { data: memberData } = await (supabase as any)
-        .from('org_members')
+        .from('org_members_safe')
         .select('*')
         .eq('org_id', orgId)
         .eq('is_active', true)

@@ -11,7 +11,7 @@ export function useGuests() {
     queryKey: ['guests', orgId],
     queryFn: async () => {
       if (!orgId) return [];
-      const { data } = await (supabase as any).from('guests').select('*').eq('org_id', orgId).order('nome');
+      const { data } = await (supabase as any).from('guests_safe').select('*').eq('org_id', orgId).order('nome');
       return data || [];
     },
     enabled: !!orgId,
