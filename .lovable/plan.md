@@ -1,76 +1,30 @@
 
 
-## Plano: Reformulação do DateTimePicker — Compacto, Mobile-First, Liquid Glass
+# Plano: Ajustar horários para fuso de São Paulo (UTC-3)
 
-### Problemas atuais
-- No mobile, o Popover com Calendar ocupa espaço excessivo e fica posicionado de forma desconfortável
-- Seletor de hora com dois Select separados é lento e pouco intuitivo
-- Sem atalhos rápidos (Agora, Hoje, Amanhã)
-- Sem sugestão automática de horário final
-- Sem validação de fim > início
-- Visual genérico, sem identidade Liquid Glass
+## Problema
+Todos os `new Date().toISOString()` geram horário UTC. Formulários e timestamps automáticos ficam 3 horas adiantados em relação a São Paulo.
 
-### Solução
+## Solução
 
-Reescrever `src/components/ui/date-time-picker.tsx` com duas experiências adaptativas:
+### 1. Criar função utilitária `nowSP()` em `src/lib/utils.ts`
+Função que retorna a data/hora atual no fuso `America/Sao_Paulo`:
+- `nowSP()` → ISO string completa no fuso SP
+- `nowSPLocal()` → formato `YYYY-MM-DDTHH:MM` para inputs `datetime-local`
+- `todaySP()` → formato `YYYY-MM-DD` para inputs `date`
 
-**Mobile**: abre como **Drawer** (bottom sheet via vaul, já instalado) — compacto, natural, premium
-**Desktop**: mantém **Popover** — posicionado, elegante, rápido
+### 2. Substituir todas as ocorrências de `new Date().toISOString()` e `new Date()`
 
-### Estrutura do novo componente
+**Arquivos afetados (8 arquivos):**
+- `src/pages/TransportsPage.tsx` — 4 ocorrências (abertura formulário, devolução, fourHoursAgo)
+- `src/pages/ElectricCartsPage.tsx` — 4 ocorrências (retirada, devolução)
+- `src/pages/ChecklistPage.tsx` — 2 ocorrências (today, tomorrow)
+- `src/pages/Dashboard.tsx` — 2 ocorrências (now, todayStr)
+- `src/pages/AgendaPage.tsx` — 2 ocorrências (today, tomorrow)
+- `src/pages/VehiclesPage.tsx` — 1 ocorrência (devolução)
+- `src/hooks/useElectricCarts.ts` — 2 ocorrências (pickup, return)
+- `src/hooks/useTasks.ts` — 1 ocorrência (completed_at)
 
-```text
-┌─────────────────────────────┐
-│ Trigger: Botão outline      │
-│ "10 mar 2026 • 08:00"       │
-└─────────────────────────────┘
-         ↓ (click)
-┌─────────────────────────────┐
-│ ── Atalhos rápidos ──       │
-│ [Hoje] [Amanhã] [Agora]    │
-├─────────────────────────────┤
-│ Calendar compacto (ptBR)    │
-│  < março 2026 >             │
-│  D S T Q Q S S              │
-│  ...                        │
-├─────────────────────────────┤
-│ 🕐 Hora: [08]h : [00]min   │
-│    grid de horários rápidos │
-│    [08:00][09:00][10:00]... │
-└─────────────────────────────┘
-```
-
-### Detalhes da implementação
-
-**1. Trigger** — Botão outline com ícone CalendarIcon, mostra data formatada em ptBR + hora. Visual Liquid Glass.
-
-**2. Atalhos rápidos** — Chips no topo: "Hoje", "Amanhã", "Agora" (datetime mode). Aplicação imediata.
-
-**3. Calendário** — `Calendar` shadcn compacto, `pointer-events-auto`, ptBR. Mesmo componente atual.
-
-**4. Seletor de hora** — Grid de chips com horários comuns (06:00 a 23:00, intervalos de 1h) + seletores Select de hora/minuto para precisão. Mais rápido que o modelo atual.
-
-**5. Mobile (Drawer)** — Usa `useIsMobile()` para renderizar `Drawer` (vaul) no mobile em vez de `Popover`. Bottom sheet com handle, altura controlada (`max-h-[70vh]`), scroll interno.
-
-**6. Desktop (Popover)** — Popover compacto com `w-auto`, alinhado ao campo.
-
-**7. Visual Liquid Glass** — `bg-card/95 backdrop-blur-xl border-border` no container. Chips de atalho com `bg-white/10 hover:bg-white/20`. Chip selecionado com `bg-primary`.
-
-### Props (sem breaking changes)
-```typescript
-interface DateTimePickerProps {
-  value: string;
-  onChange: (value: string) => void;
-  mode?: "datetime" | "date";
-  placeholder?: string;
-  className?: string;
-}
-```
-
-A interface permanece idêntica — todas as 9 páginas que já usam o componente funcionam sem alteração.
-
-### Arquivo modificado
-- `src/components/ui/date-time-picker.tsx` — Reescrita completa (mesma interface, nova UX)
-
-Nenhuma alteração nas páginas consumidoras — o componente é drop-in replacement.
+### 3. Atualizar funções de exibição em `rawTime`, `rawWeekday` etc.
+Adicionar conversão para fuso SP ao exibir datas que vêm do banco em UTC.
 
