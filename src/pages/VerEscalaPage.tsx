@@ -50,6 +50,16 @@ export default function VerEscalaPage() {
   const [filterDate, setFilterDate] = useState('');
   const [appliedFilterName, setAppliedFilterName] = useState('');
   const [appliedFilterDate, setAppliedFilterDate] = useState('');
+  const [showNameSuggestions, setShowNameSuggestions] = useState(false);
+
+  // Name suggestions based on typed text
+  const nameSuggestions = useMemo(() => {
+    if (!filterName.trim()) return [];
+    const term = filterName.trim().toLowerCase();
+    return logisticaMembers.filter((m: any) =>
+      m.nome_exibicao?.toLowerCase().includes(term)
+    ).slice(0, 6);
+  }, [filterName, logisticaMembers]);
 
   // Find LOGÍSTICA commission
   const logisticaCommission = commissions.find((c: any) =>
