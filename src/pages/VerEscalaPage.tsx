@@ -407,11 +407,11 @@ export default function VerEscalaPage() {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <Label>Data início</Label>
-                <Input type="date" value={schedStart} onChange={(e) => setSchedStart(e.target.value)} />
+                <DateTimePicker mode="date" value={schedStart} onChange={setSchedStart} placeholder="Início" />
               </div>
               <div>
                 <Label>Data fim</Label>
-                <Input type="date" value={schedEnd} onChange={(e) => setSchedEnd(e.target.value)} />
+                <DateTimePicker mode="date" value={schedEnd} onChange={setSchedEnd} placeholder="Fim" />
               </div>
             </div>
             <Button className="w-full" onClick={handleCreateSchedule} disabled={createSchedule.isPending}>
