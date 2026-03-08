@@ -179,7 +179,7 @@ export default function TransportDynamicIsland({
         {/* Navigation icon */}
         <div className={cn(
           'w-8 h-8 rounded-full flex items-center justify-center shrink-0',
-          isActive ? 'bg-accent/20' : isDone ? 'bg-white/10' : 'bg-white/10',
+          isActive ? 'bg-accent/20' : isDone ? 'bg-primary/10' : 'bg-primary/10',
         )}>
           {isActive ? (
             <Navigation className="w-4 h-4 text-accent animate-pulse" />
