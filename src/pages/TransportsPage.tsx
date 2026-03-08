@@ -188,6 +188,13 @@ export default function TransportsPage() {
 
   const availableVehicles = vehicles.filter((v: any) => v.status === 'disponivel');
 
+  // Vehicles with active (pendente/em_andamento) transports
+  const busyVehicleIds = new Set(
+    transports
+      .filter((t: any) => ['pendente', 'em_andamento'].includes(t.status) && t.vehicle_id)
+      .map((t: any) => t.vehicle_id)
+  );
+
   const getDriverCommission = (driverUserId: string) => {
     const member = members.find((m: any) => m.user_id === driverUserId);
     if (!member?.commission_id) return null;
@@ -496,7 +503,14 @@ export default function TransportsPage() {
             <SelectTrigger><SelectValue placeholder="Veículo" /></SelectTrigger>
             <SelectContent>
               <SelectItem value="none">Nenhum</SelectItem>
-              {vehicleList.map((v: any) => <SelectItem key={v.id} value={v.id}>{v.placa} {v.modelo}</SelectItem>)}
+              {vehicleList.map((v: any) => {
+                const isBusy = busyVehicleIds.has(v.id) && v.id !== data.vehicle_id;
+                return (
+                  <SelectItem key={v.id} value={v.id} disabled={isBusy}>
+                    {v.placa} {v.modelo}{isBusy ? ' (em uso)' : ''}
+                  </SelectItem>
+                );
+              })}
             </SelectContent>
           </Select>
           <Select value={data.motorista_user_id} onValueChange={(v) => setData({ ...data, motorista_user_id: v })}>
