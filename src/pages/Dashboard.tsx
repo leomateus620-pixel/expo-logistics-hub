@@ -69,7 +69,11 @@ export default function Dashboard() {
             {upcomingTransports.map((t: any) => {
               const driver = members.find((m: any) => m.user_id === t.motorista_user_id);
               return (
-                <div key={t.id} className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+                <div
+                  key={t.id}
+                  className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 cursor-pointer hover:bg-muted/80 transition-colors"
+                  onClick={() => navigate(`/transports?highlight=${t.id}`)}
+                >
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">{t.titulo || `${t.origem} → ${t.destino}`}</p>
                     <p className="text-xs text-muted-foreground">{t.origem} → {t.destino}</p>

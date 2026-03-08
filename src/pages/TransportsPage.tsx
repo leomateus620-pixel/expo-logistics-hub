@@ -9,7 +9,8 @@ import { useAuth } from '@/hooks/useAuth';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Plus, Check, Clock, X, Pencil, Search, XCircle, Trash2, FileText, Eye, ArrowRight, Plane, Navigation, MapPinOff } from 'lucide-react';
 import { cn, rawTime, rawDateShort, nowSP, nowSPLocal } from '@/lib/utils';
-import { useState, lazy, Suspense, useEffect } from 'react';
+import { useState, lazy, Suspense, useEffect, useRef, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -51,6 +52,22 @@ export default function TransportsPage() {
       locationTracker.startTracking();
     }
   }, [trackingTransportId]);
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const highlightId = searchParams.get('highlight');
+  const highlightRef = useRef<HTMLDivElement>(null);
+
+  // Scroll to highlighted transport
+  useEffect(() => {
+    if (highlightId && highlightRef.current) {
+      highlightRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // Clear the param after scrolling
+      const timer = setTimeout(() => {
+        setSearchParams({}, { replace: true });
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [highlightId, transports]);
 
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ titulo: '', origem: '', destino: '', inicio_em: '', motorista_user_id: '', vehicle_id: '', prioridade: 'media', km_retirada: '', voo_cidade: '', voo_numero: '', voo_checkin: '', voo_chegada: '', horario_saida: '' });
@@ -530,7 +547,14 @@ export default function TransportsPage() {
           const hasFlightInfo = t.titulo === 'Aeroporto' && (t.voo_cidade || t.voo_numero);
 
           return (
-            <div key={t.id} className="liquid-glass-card rounded-xl p-4 space-y-3 hover:shadow-md transition-shadow">
+            <div
+              key={t.id}
+              ref={highlightId === t.id ? highlightRef : undefined}
+              className={cn(
+                'liquid-glass-card rounded-xl p-4 space-y-3 hover:shadow-md transition-all',
+                highlightId === t.id && 'ring-2 ring-primary ring-offset-2 ring-offset-background animate-pulse'
+              )}
+            >
               {/* Header: Status + Title + Time */}
               <div className="flex items-start justify-between gap-2">
                 <div className="flex items-center gap-2.5 min-w-0">
