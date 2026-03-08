@@ -116,15 +116,25 @@ export default function VehiclesPage() {
 
   const isLoading = vehiclesLoading || usageLoading || fuelLoading;
 
+  // Derive effective status from open usages
+  const effectiveStatus = useMemo(() => {
+    const map: Record<string, string> = {};
+    vehicles.forEach((v: any) => {
+      const hasOpenUsage = usages.some((u: any) => u.vehicle_id === v.id && !u.km_chegada);
+      map[v.id] = hasOpenUsage ? 'em_uso' : v.status;
+    });
+    return map;
+  }, [vehicles, usages]);
+
   // Aggregated metrics
   const metrics = useMemo(() => {
     const custoEstimado = totalKm * FUEL_COST_PER_KM;
     const custoReal = allFuelRecords.reduce((s: number, f: any) => s + (Number(f.valor) || 0), 0);
-    const disponivel = vehicles.filter((v: any) => v.status === 'disponivel').length;
-    const emUso = vehicles.filter((v: any) => v.status === 'em_uso').length;
-    const manutencao = vehicles.filter((v: any) => v.status === 'manutencao').length;
+    const disponivel = vehicles.filter((v: any) => effectiveStatus[v.id] === 'disponivel').length;
+    const emUso = vehicles.filter((v: any) => effectiveStatus[v.id] === 'em_uso').length;
+    const manutencao = vehicles.filter((v: any) => effectiveStatus[v.id] === 'manutencao').length;
     return { custoEstimado, custoReal, disponivel, emUso, manutencao };
-  }, [vehicles, totalKm, allFuelRecords]);
+  }, [vehicles, totalKm, allFuelRecords, effectiveStatus]);
 
   // Fuel records by vehicle
   const fuelByVehicle = useMemo(() => {
@@ -137,8 +147,8 @@ export default function VehiclesPage() {
 
   const filteredVehicles = useMemo(() => {
     if (statusFilter === 'todos') return vehicles;
-    return vehicles.filter((v: any) => v.status === statusFilter);
-  }, [vehicles, statusFilter]);
+    return vehicles.filter((v: any) => effectiveStatus[v.id] === statusFilter);
+  }, [vehicles, statusFilter, effectiveStatus]);
 
   const openEdit = (v: any) => {
     setEditId(v.id);
