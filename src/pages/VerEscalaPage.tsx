@@ -93,17 +93,21 @@ export default function VerEscalaPage() {
     return eachDayOfInterval({ start: calStart, end: calEnd });
   }, [currentMonth]);
 
-  // Map shifts by date
+  // Map shifts by date — only include shifts with logística member assignments
   const shiftsByDate = useMemo(() => {
-    const map: Record<string, typeof shifts> = {};
+    const map: Record<string, any[]> = {};
     shifts.forEach((s: any) => {
       const dateKey = s.inicio_em?.slice(0, 10);
       if (!dateKey) return;
+      // Check if this shift has any logística member assigned
+      const shiftAssigns = assignments.filter((a: any) => a.schedule_shift_id === s.id);
+      const hasLogistica = shiftAssigns.some((a: any) => logisticaUserIds.has(a.member_user_id));
+      if (!hasLogistica && shiftAssigns.length > 0) return; // skip non-logística
       if (!map[dateKey]) map[dateKey] = [];
       map[dateKey].push(s);
     });
     return map;
-  }, [shifts]);
+  }, [shifts, assignments, logisticaUserIds]);
 
   // Assignments mapped by shift id
   const assignmentsByShift = useMemo(() => {
@@ -118,14 +122,14 @@ export default function VerEscalaPage() {
   const getMemberName = (userId: string) => {
     const m = logisticaMembers.find((m: any) => m.user_id === userId);
     if (!m) {
-      const any = members.find((m: any) => m.user_id === userId);
-      return any?.nome_exibicao || '—';
+      const anyM = members.find((m: any) => m.user_id === userId);
+      return anyM?.nome_exibicao || '—';
     }
     return m?.nome_exibicao || '—';
   };
 
   // Filter shifts to only those assigned to logística members
-  const logisticaUserIds = new Set(logisticaMembers.map((m: any) => m.user_id));
+  const logisticaUserIds2 = logisticaUserIds; // already defined above
 
   const handleCreateSchedule = async () => {
     if (!schedName || !schedStart || !schedEnd) {
@@ -194,8 +198,17 @@ export default function VerEscalaPage() {
   const selectedDateShifts = useMemo(() => {
     if (!selectedDate) return [];
     const key = format(selectedDate, 'yyyy-MM-dd');
-    return shiftsByDate[key] || [];
-  }, [selectedDate, shiftsByDate]);
+    let dayShifts = shiftsByDate[key] || [];
+    // Apply name filter
+    if (appliedFilterName.trim()) {
+      const term = appliedFilterName.trim().toLowerCase();
+      dayShifts = dayShifts.filter((s: any) => {
+        const shiftAssigns = assignmentsByShift[s.id] || [];
+        return shiftAssigns.some((a: any) => getMemberName(a.member_user_id).toLowerCase().includes(term));
+      });
+    }
+    return dayShifts;
+  }, [selectedDate, shiftsByDate, appliedFilterName, assignmentsByShift]);
 
   const weekDays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
