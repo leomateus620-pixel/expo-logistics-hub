@@ -24,6 +24,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { supabase } from '@/integrations/supabase/client';
 
 const DriverLocationMap = lazy(() => import('@/components/DriverLocationMap'));
+import TransportDynamicIsland from '@/components/TransportDynamicIsland';
 
 /* ─── Status config ─── */
 const statusConfig: Record<string, { label: string; icon: typeof Check; class: string; dotClass: string; bgClass: string }> = {
