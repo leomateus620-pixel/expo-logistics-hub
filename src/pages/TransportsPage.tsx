@@ -438,6 +438,9 @@ export default function TransportsPage() {
 
       await update.mutateAsync(updatePayload);
 
+      // Sync junction table
+      try { await setGuestsForTransport.mutateAsync({ transportId: editId, guestIds: editGuests }); } catch { /* silent */ }
+
       if (statusChanged && editForm.status === 'concluido' && editForm.km_retirada && editForm.km_devolucao && editForm.vehicle_id && editForm.vehicle_id !== 'none') {
         try {
           const kmSaida = Number(editForm.km_retirada);
