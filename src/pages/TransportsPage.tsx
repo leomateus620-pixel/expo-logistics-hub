@@ -658,7 +658,44 @@ export default function TransportsPage() {
               </p>
             </div>
           </div>
+          {/* Return trip option - only in create mode */}
+          {!isEdit && (
+            <div className="space-y-3 rounded-lg border border-accent/30 bg-accent/5 p-3">
+              <label className="flex items-center gap-2 cursor-pointer">
+                <Checkbox checked={includeReturn} onCheckedChange={(v) => setIncludeReturn(!!v)} />
+                <span className="text-xs font-semibold text-foreground">✈️ Agendar retorno ao aeroporto (volta)</span>
+              </label>
+              {includeReturn && (
+                <div className="space-y-3 pt-1">
+                  <p className="text-[10px] text-muted-foreground">Rota inversa: Hotel/Santa Rosa → Aeroporto {data.voo_cidade || ''}</p>
+                  <div>
+                    <Label className="text-xs text-muted-foreground mb-1 block">Data/Hora saída (volta)</Label>
+                    <DateTimePicker value={returnForm.inicio_em} onChange={(v) => setReturnForm(prev => ({ ...prev, inicio_em: v }))} placeholder="Data/Hora saída volta" />
+                  </div>
+                  <Input placeholder="Nº do Voo (volta)" value={returnForm.voo_numero} onChange={(e) => setReturnForm(prev => ({ ...prev, voo_numero: e.target.value }))} />
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label className="text-xs text-muted-foreground mb-1 block">Check-in Voo</Label>
+                      <Input type="time" value={returnForm.voo_checkin} onChange={async (e) => {
+                        const checkin = e.target.value;
+                        setReturnForm(prev => ({ ...prev, voo_checkin: checkin }));
+                        if (checkin && data.voo_cidade) {
+                          const suggested = await calcSuggestedDeparture(data.voo_cidade, checkin, true);
+                          if (suggested) setReturnForm(prev => ({ ...prev, voo_checkin: checkin, horario_saida: suggested }));
+                        }
+                      }} />
+                    </div>
+                    <div>
+                      <Label className="text-xs text-muted-foreground mb-1 block">Saída (sugerido)</Label>
+                      <Input type="time" value={returnForm.horario_saida} onChange={(e) => setReturnForm(prev => ({ ...prev, horario_saida: e.target.value }))} />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         )}
+
         {data.titulo === 'Escolta Policial' && (
           <div className="space-y-3 rounded-lg border border-border bg-muted/30 p-3">
             <Label className="text-xs font-semibold text-foreground">🚔 Informações da Escolta</Label>
