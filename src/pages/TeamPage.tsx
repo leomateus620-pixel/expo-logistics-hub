@@ -284,11 +284,11 @@ export default function TeamPage() {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label className="text-xs text-muted-foreground mb-1 block">Início</label>
-                <Input type="date" value={scheduleForm.data_inicio} onChange={(e) => setScheduleForm({ ...scheduleForm, data_inicio: e.target.value })} />
+                <DateTimePicker mode="date" value={scheduleForm.data_inicio} onChange={(v) => setScheduleForm({ ...scheduleForm, data_inicio: v })} placeholder="Início" />
               </div>
               <div>
                 <label className="text-xs text-muted-foreground mb-1 block">Fim</label>
-                <Input type="date" value={scheduleForm.data_fim} onChange={(e) => setScheduleForm({ ...scheduleForm, data_fim: e.target.value })} />
+                <DateTimePicker mode="date" value={scheduleForm.data_fim} onChange={(v) => setScheduleForm({ ...scheduleForm, data_fim: v })} placeholder="Fim" />
               </div>
             </div>
             <Button onClick={handleCreateSchedule} className="w-full" disabled={createSchedule.isPending}>Criar Escala</Button>
