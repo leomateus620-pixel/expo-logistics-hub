@@ -332,18 +332,27 @@ export default function AgendaPage() {
                         </div>
 
                         {/* Actions */}
-                        <div className="flex flex-col items-center justify-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Pencil className="w-3.5 h-3.5 text-muted-foreground" />
-                          {(myRole === 'admin' || myRole === 'gestor') && (
-                            <button
-                              className="p-1 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
-                              onClick={(ev) => { ev.stopPropagation(); if (confirm('Excluir este evento?')) remove.mutate(e.id); }}
-                              aria-label="Excluir"
-                            >
-                              <Trash2 className="w-3.5 h-3.5" />
-                            </button>
-                          )}
-                        </div>
+                        {e._source !== 'transport' && (
+                          <div className="flex flex-col items-center justify-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <Pencil className="w-3.5 h-3.5 text-muted-foreground" />
+                            {(myRole === 'admin' || myRole === 'gestor') && (
+                              <button
+                                className="p-1 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                                onClick={(ev) => { ev.stopPropagation(); if (confirm('Excluir este evento?')) remove.mutate(e.id); }}
+                                aria-label="Excluir"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            )}
+                          </div>
+                        )}
+                        {e._source === 'transport' && (
+                          <div className="flex items-center shrink-0">
+                            <Badge variant="outline" className="text-[10px] bg-primary/10 border-primary/30 text-primary">
+                              {e._transportStatus === 'em_andamento' ? 'Em andamento' : 'Pendente'}
+                            </Badge>
+                          </div>
+                        )}
                       </div>
                     );
                   })}
