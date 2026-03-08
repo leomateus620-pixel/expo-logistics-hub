@@ -547,7 +547,14 @@ export default function TransportsPage() {
           const hasFlightInfo = t.titulo === 'Aeroporto' && (t.voo_cidade || t.voo_numero);
 
           return (
-            <div key={t.id} className="liquid-glass-card rounded-xl p-4 space-y-3 hover:shadow-md transition-shadow">
+            <div
+              key={t.id}
+              ref={highlightId === t.id ? highlightRef : undefined}
+              className={cn(
+                'liquid-glass-card rounded-xl p-4 space-y-3 hover:shadow-md transition-all',
+                highlightId === t.id && 'ring-2 ring-primary ring-offset-2 ring-offset-background animate-pulse'
+              )}
+            >
               {/* Header: Status + Title + Time */}
               <div className="flex items-start justify-between gap-2">
                 <div className="flex items-center gap-2.5 min-w-0">
