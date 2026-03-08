@@ -28,6 +28,15 @@ export function useFuelRecords(vehicleId?: string) {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['fuel-records'] }),
   });
 
+  const updateFuel = useMutation({
+    mutationFn: async ({ id, ...fields }: Record<string, any>) => {
+      const { data, error } = await (supabase as any).from('fuel_records').update(fields).eq('id', id).select().single();
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['fuel-records'] }),
+  });
+
   const uploadReceipt = async (file: File, vehicleId: string): Promise<string> => {
     const ext = file.name.split('.').pop() || 'jpg';
     const path = `${orgId}/${vehicleId}/${Date.now()}.${ext}`;
@@ -37,5 +46,5 @@ export function useFuelRecords(vehicleId?: string) {
     return data.publicUrl;
   };
 
-  return { records, isLoading, create, uploadReceipt };
+  return { records, isLoading, create, updateFuel, uploadReceipt };
 }

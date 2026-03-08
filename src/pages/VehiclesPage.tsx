@@ -251,7 +251,7 @@ function VehicleDetailContent({ vehicle, members, userId }: { vehicle: any; memb
   const { usages, createUsage, updateUsage } = useVehicleUsage(vehicle.id);
   const { transports } = useTransports();
   const { update: updateVehicle } = useVehicles();
-  const { records: fuelRecords, create: createFuel, uploadReceipt } = useFuelRecords(vehicle.id);
+  const { records: fuelRecords, create: createFuel, updateFuel, uploadReceipt } = useFuelRecords(vehicle.id);
   const navigate = useNavigate();
 
   const [kmSaida, setKmSaida] = useState('');
@@ -265,6 +265,37 @@ function VehicleDetailContent({ vehicle, members, userId }: { vehicle: any; memb
   const [fuelPhoto, setFuelPhoto] = useState<File | null>(null);
   const [fuelPhotoPreview, setFuelPhotoPreview] = useState<string | null>(null);
   const [fuelLoading, setFuelLoading] = useState(false);
+  const [editFuelId, setEditFuelId] = useState<string | null>(null);
+  const [editFuelForm, setEditFuelForm] = useState({ litros: '', valor: '', km_abastecimento: '', posto: '', observacoes: '' });
+
+  const openFuelEdit = (f: any) => {
+    setEditFuelId(f.id);
+    setEditFuelForm({
+      litros: f.litros != null ? String(f.litros) : '',
+      valor: f.valor != null ? String(f.valor) : '',
+      km_abastecimento: f.km_abastecimento != null ? String(f.km_abastecimento) : '',
+      posto: f.posto || '',
+      observacoes: f.observacoes || '',
+    });
+  };
+
+  const handleFuelEdit = async () => {
+    if (!editFuelId) return;
+    setFuelLoading(true);
+    try {
+      await updateFuel.mutateAsync({
+        id: editFuelId,
+        litros: editFuelForm.litros ? Number(editFuelForm.litros) : null,
+        valor: editFuelForm.valor ? Number(editFuelForm.valor) : null,
+        km_abastecimento: editFuelForm.km_abastecimento ? Number(editFuelForm.km_abastecimento) : null,
+        posto: editFuelForm.posto || null,
+        observacoes: editFuelForm.observacoes || null,
+      });
+      setEditFuelId(null);
+      toast.success('Abastecimento atualizado');
+    } catch (err: any) { toast.error(err.message); }
+    setFuelLoading(false);
+  };
 
   const openUsage = usages.find((u: any) => !u.km_chegada);
 
@@ -509,23 +540,47 @@ function VehicleDetailContent({ vehicle, members, userId }: { vehicle: any; memb
           <div className="space-y-2">
             {fuelRecords.map((f: any) => {
               const who = members.find((m: any) => m.user_id === f.registrado_por_user_id);
+              const isEditing = editFuelId === f.id;
               return (
                 <div key={f.id} className="rounded-lg border p-3 text-xs space-y-1">
-                  <div className="flex items-center justify-between">
-                    <span className="font-medium">{who?.nome_exibicao || '—'}</span>
-                    <span className="text-muted-foreground">{new Date(f.created_at).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-muted-foreground flex-wrap">
-                    {f.litros && <span><Fuel className="w-3 h-3 inline mr-0.5" />{Number(f.litros).toLocaleString('pt-BR')} L</span>}
-                    {f.valor && <span>R$ {Number(f.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>}
-                    {f.km_abastecimento && <span><Gauge className="w-3 h-3 inline mr-0.5" />{Number(f.km_abastecimento).toLocaleString('pt-BR')} km</span>}
-                    {f.posto && <span>{f.posto}</span>}
-                  </div>
-                  {f.observacoes && <p className="text-muted-foreground italic">{f.observacoes}</p>}
-                  {f.cupom_fiscal_url && (
-                    <a href={f.cupom_fiscal_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline text-[10px]">
-                      <Image className="w-3 h-3" /> Ver cupom fiscal
-                    </a>
+                  {isEditing ? (
+                    <div className="space-y-2">
+                      <div className="grid grid-cols-2 gap-2">
+                        <Input placeholder="Litros" type="number" step="0.01" value={editFuelForm.litros} onChange={(e) => setEditFuelForm({ ...editFuelForm, litros: e.target.value })} />
+                        <Input placeholder="Valor (R$)" type="number" step="0.01" value={editFuelForm.valor} onChange={(e) => setEditFuelForm({ ...editFuelForm, valor: e.target.value })} />
+                      </div>
+                      <Input placeholder="KM no abastecimento" type="number" value={editFuelForm.km_abastecimento} onChange={(e) => setEditFuelForm({ ...editFuelForm, km_abastecimento: e.target.value })} />
+                      <Input placeholder="Posto / Local" value={editFuelForm.posto} onChange={(e) => setEditFuelForm({ ...editFuelForm, posto: e.target.value })} />
+                      <Input placeholder="Observações" value={editFuelForm.observacoes} onChange={(e) => setEditFuelForm({ ...editFuelForm, observacoes: e.target.value })} />
+                      <div className="flex gap-2">
+                        <Button size="sm" className="flex-1" onClick={handleFuelEdit} disabled={fuelLoading}>Salvar</Button>
+                        <Button size="sm" variant="ghost" onClick={() => setEditFuelId(null)}>Cancelar</Button>
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium">{who?.nome_exibicao || '—'}</span>
+                        <div className="flex items-center gap-2">
+                          <button onClick={() => openFuelEdit(f)} className="p-1 rounded hover:bg-muted transition-colors" aria-label="Editar abastecimento">
+                            <Pencil className="w-3 h-3 text-muted-foreground" />
+                          </button>
+                          <span className="text-muted-foreground">{new Date(f.created_at).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })}</span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 text-muted-foreground flex-wrap">
+                        {f.litros && <span><Fuel className="w-3 h-3 inline mr-0.5" />{Number(f.litros).toLocaleString('pt-BR')} L</span>}
+                        {f.valor && <span>R$ {Number(f.valor).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</span>}
+                        {f.km_abastecimento && <span><Gauge className="w-3 h-3 inline mr-0.5" />{Number(f.km_abastecimento).toLocaleString('pt-BR')} km</span>}
+                        {f.posto && <span>{f.posto}</span>}
+                      </div>
+                      {f.observacoes && <p className="text-muted-foreground italic">{f.observacoes}</p>}
+                      {f.cupom_fiscal_url && (
+                        <a href={f.cupom_fiscal_url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-primary hover:underline text-[10px]">
+                          <Image className="w-3 h-3" /> Ver cupom fiscal
+                        </a>
+                      )}
+                    </>
                   )}
                 </div>
               );
