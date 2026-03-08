@@ -536,6 +536,103 @@ export type Database = {
           },
         ]
       }
+      scooter_history: {
+        Row: {
+          action: Database["public"]["Enums"]["cart_action"]
+          actor_user_id: string
+          after_data: Json | null
+          before_data: Json | null
+          created_at: string
+          id: string
+          org_id: string
+          scooter_id: string
+        }
+        Insert: {
+          action: Database["public"]["Enums"]["cart_action"]
+          actor_user_id: string
+          after_data?: Json | null
+          before_data?: Json | null
+          created_at?: string
+          id?: string
+          org_id: string
+          scooter_id: string
+        }
+        Update: {
+          action?: Database["public"]["Enums"]["cart_action"]
+          actor_user_id?: string
+          after_data?: Json | null
+          before_data?: Json | null
+          created_at?: string
+          id?: string
+          org_id?: string
+          scooter_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scooter_history_scooter_id_fkey"
+            columns: ["scooter_id"]
+            isOneToOne: false
+            referencedRelation: "scooters"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      scooters: {
+        Row: {
+          codigo: string
+          comissao: string | null
+          created_at: string
+          devolucao_em: string | null
+          devolucao_prevista_em: string | null
+          id: string
+          nome: string | null
+          observacoes: string | null
+          org_id: string
+          responsavel_user_id: string | null
+          retirada_em: string | null
+          status: Database["public"]["Enums"]["cart_status"]
+          updated_at: string
+        }
+        Insert: {
+          codigo: string
+          comissao?: string | null
+          created_at?: string
+          devolucao_em?: string | null
+          devolucao_prevista_em?: string | null
+          id?: string
+          nome?: string | null
+          observacoes?: string | null
+          org_id: string
+          responsavel_user_id?: string | null
+          retirada_em?: string | null
+          status?: Database["public"]["Enums"]["cart_status"]
+          updated_at?: string
+        }
+        Update: {
+          codigo?: string
+          comissao?: string | null
+          created_at?: string
+          devolucao_em?: string | null
+          devolucao_prevista_em?: string | null
+          id?: string
+          nome?: string | null
+          observacoes?: string | null
+          org_id?: string
+          responsavel_user_id?: string | null
+          retirada_em?: string | null
+          status?: Database["public"]["Enums"]["cart_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scooters_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       security_audit_reports: {
         Row: {
           created_at: string
