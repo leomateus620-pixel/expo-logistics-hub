@@ -45,15 +45,53 @@ function isNowBetween(start: string, end: string): boolean {
 /* ── component ────────────────────────────────────────── */
 
 export default function AgendaPage() {
-  const { events, isLoading, create, update, remove } = useEvents();
+  const { events, isLoading: eventsLoading, create, update, remove } = useEvents();
+  const { transports, isLoading: transportsLoading } = useTransports();
   const { members } = useOrgMembers();
   const { commissions } = useCommissions();
   const { myRole } = useCurrentOrg();
+  const { guests } = useGuests();
+  const { getGuestsForTransport } = useTransportGuests();
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
 
+  const isLoading = eventsLoading || transportsLoading;
   const today = todaySP();
+
+  /* ── Merge events + active transports ── */
+  const allItems = useMemo(() => {
+    // Regular events (exclude auto-created transport events to avoid duplicates)
+    const regularEvents = events
+      .filter((e: any) => e.tipo_tag !== 'transporte')
+      .map((e: any) => ({ ...e, _source: 'event' as const }));
+
+    // Active transports (not completed/cancelled)
+    const activeTransports = transports
+      .filter((t: any) => t.status !== 'concluido' && t.status !== 'cancelado')
+      .map((t: any) => {
+        const driver = t.motorista_user_id ? members.find((m: any) => m.user_id === t.motorista_user_id) : null;
+        const guestIds = getGuestsForTransport(t.id);
+        const guestNames = guestIds.map((gid: string) => guests.find((g: any) => g.id === gid)?.nome).filter(Boolean);
+        const legacyGuest = !guestIds.length && t.guest_id ? guests.find((g: any) => g.id === t.guest_id) : null;
+        if (legacyGuest) guestNames.push(legacyGuest.nome);
+
+        return {
+          id: t.id,
+          titulo: `Transporte: ${t.titulo || ''} ${t.origem} → ${t.destino}`.trim(),
+          descricao: guestNames.length ? `Hóspedes: ${guestNames.join(', ')}` : null,
+          inicio_em: t.inicio_em,
+          fim_em: t.fim_em || t.inicio_em,
+          local: `${t.origem} → ${t.destino}`,
+          tipo_tag: 'transporte',
+          responsavel_user_id: t.motorista_user_id,
+          _source: 'transport' as const,
+          _transportStatus: t.status,
+        };
+      });
+
+    return [...regularEvents, ...activeTransports];
+  }, [events, transports, members, guests, getGuestsForTransport]);
 
   /* ── dates ── */
   const dates: string[] = useMemo(() => {
