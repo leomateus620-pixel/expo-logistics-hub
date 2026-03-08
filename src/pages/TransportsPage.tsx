@@ -9,7 +9,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Plus, Check, Clock, X, Pencil, Search, XCircle, Trash2, FileText, Eye, ArrowRight, Plane, Navigation, MapPinOff } from 'lucide-react';
 import { cn, rawTime, rawDateShort, nowSP, nowSPLocal } from '@/lib/utils';
-import { useState, lazy, Suspense, useEffect, useRef, useCallback } from 'react';
+import { useState, lazy, Suspense, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -32,6 +32,53 @@ const statusConfig: Record<string, { label: string; icon: typeof Check; class: s
 const tituloOptions = ['Parque', 'Hotel', 'Aeroporto', 'Centro', 'Escolta Policial', 'Outros'];
 const cidadeAeroportoOptions = ['Chapecó', 'Santo Ângelo', 'Passo Fundo', 'Porto Alegre'];
 
+// Santa Rosa origin coords (Parque de Exposições)
+const SANTA_ROSA_LAT = -27.8708;
+const SANTA_ROSA_LNG = -54.4814;
+
+/** Fetch travel duration in minutes from Google Maps via edge function */
+async function fetchTravelMinutes(cidade: string): Promise<number | null> {
+  try {
+    const destination = `Aeroporto_${cidade}`;
+    const res = await fetch(
+      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/estimate-return`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
+        body: JSON.stringify({ origin_lat: SANTA_ROSA_LAT, origin_lng: SANTA_ROSA_LNG, destination }),
+      }
+    );
+    const data = await res.json();
+    if (data.fallback || !data.duration_minutes) return null;
+    return data.duration_minutes;
+  } catch {
+    return null;
+  }
+}
+
+/** Subtract minutes from a HH:MM string, return new HH:MM or null */
+function subtractMinutes(time: string, mins: number): string | null {
+  if (!time) return null;
+  const [h, m] = time.split(':').map(Number);
+  let totalMin = h * 60 + m - mins;
+  if (totalMin < 0) totalMin += 24 * 60; // wrap to previous day
+  const hh = String(Math.floor(totalMin / 60) % 24).padStart(2, '0');
+  const mm = String(totalMin % 60).padStart(2, '0');
+  return `${hh}:${mm}`;
+}
+
+/** Calculate suggested departure time based on travel + buffer */
+async function calcSuggestedDeparture(cidade: string, flightTime: string, isCheckin: boolean): Promise<string | null> {
+  if (!cidade || !flightTime) return null;
+  const travelMin = await fetchTravelMinutes(cidade);
+  // Fallback durations if API fails
+  const fallback: Record<string, number> = { 'Chapecó': 150, 'Santo Ângelo': 50, 'Passo Fundo': 120, 'Porto Alegre': 300 };
+  const duration = travelMin || fallback[cidade] || 120;
+  // Add 1h buffer for check-in
+  const totalBuffer = isCheckin ? duration + 60 : duration;
+  return subtractMinutes(flightTime, totalBuffer);
+}
+
 // Estimated round-trip durations in minutes by transport type
 const estimatedDurationMin: Record<string, number> = {
   'Aeroporto': 120,
@@ -45,7 +92,6 @@ const estimatedDurationMin: Record<string, number> = {
 /** Estimate the return time for a transport based on its type and start time */
 function estimateReturnTime(t: any): Date | null {
   if (!t.inicio_em) return null;
-  // If already concluded, use fim_em
   if (t.fim_em) return new Date(t.fim_em);
   const start = new Date(t.inicio_em);
   const durationMin = estimatedDurationMin[t.titulo] || 60;
