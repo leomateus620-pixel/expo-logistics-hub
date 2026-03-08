@@ -218,13 +218,16 @@ export default function Dashboard() {
             {pendingTasksList.map((t: any) => {
               const member = members.find((m: any) => m.user_id === t.assignee_user_id);
               return (
-                <div key={t.id} className="flex items-center gap-3 p-2.5 rounded-lg bg-muted/50">
+                <div key={t.id} className="flex items-center gap-3 p-2.5 rounded-lg bg-muted/50 cursor-pointer hover:bg-muted/80 transition-colors" onClick={() => navigate('/checklist')}>
                   <div className={cn('w-2 h-2 rounded-full shrink-0',
                     t.prioridade === 'urgente' ? 'bg-destructive' :
                     t.prioridade === 'alta' ? 'bg-accent' : 'bg-muted-foreground/40'
                   )} />
-                  <p className="text-sm flex-1 truncate">{t.titulo}</p>
-                  {member && <span className="text-[10px] px-2 py-0.5 rounded-full bg-muted font-medium text-muted-foreground">{(member.nome_exibicao || '').split(' ')[0]}</span>}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{t.titulo}</p>
+                    {member && <p className="text-[10px] text-primary flex items-center gap-1"><User className="w-2.5 h-2.5" />{member.nome_exibicao}</p>}
+                  </div>
+                  {t.due_em && <span className="text-[10px] text-muted-foreground font-mono">{rawTime(t.due_em)}</span>}
                 </div>
               );
             })}

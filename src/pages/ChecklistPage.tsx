@@ -185,7 +185,7 @@ export default function ChecklistPage() {
                           <Badge variant="outline" className={cn('text-[10px]', pc.class)}>{pc.label}</Badge>
                           {t.due_em && <span className="text-[10px] text-muted-foreground flex items-center gap-0.5"><Clock className="w-2.5 h-2.5" />{rawTime(t.due_em)}</span>}
                           {t.recorrencia !== 'nenhuma' && <span className="text-[10px] text-primary flex items-center gap-0.5"><Repeat className="w-2.5 h-2.5" />{t.recorrencia}</span>}
-                          {member && <span className="text-[10px] text-muted-foreground">→ {(member.nome_exibicao || '').split(' ')[0]}</span>}
+                          {member && <span className="text-[10px] text-primary flex items-center gap-1"><User className="w-2.5 h-2.5" />{member.nome_exibicao}</span>}
                         </div>
                       </div>
                     </div>
