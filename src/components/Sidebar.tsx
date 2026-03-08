@@ -31,7 +31,7 @@ interface SidebarProps {
 export default function Sidebar({ collapsed, onToggle, isMobile, mobileOpen, onMobileClose }: SidebarProps) {
   const { signOut } = useAuth();
 
-  // On mobile: full-width overlay sidebar, always expanded
+  // On mobile: overlay sidebar with collapse support
   if (isMobile) {
     return (
       <>
@@ -45,24 +45,36 @@ export default function Sidebar({ collapsed, onToggle, isMobile, mobileOpen, onM
         {/* Sidebar panel */}
         <aside
           className={cn(
-            'fixed left-0 top-0 bottom-0 z-50 w-[280px] liquid-glass flex flex-col transition-transform duration-300 ease-out',
-            mobileOpen ? 'translate-x-0' : '-translate-x-full'
+            'fixed left-0 top-0 bottom-0 z-50 liquid-glass flex flex-col transition-all duration-300 ease-out',
+            mobileOpen ? 'translate-x-0' : '-translate-x-full',
+            collapsed ? 'w-[68px]' : 'w-[280px]'
           )}
           style={{ background: 'hsl(var(--sidebar-background) / 0.92)' }}
         >
           <div className="p-3 flex items-center gap-3 border-b border-white/10 min-h-[56px]">
             <img src={logo} alt="Fenasoja" className="w-9 h-9 rounded-lg object-contain bg-white/10 p-0.5 shrink-0" />
-            <div className="flex-1 min-w-0">
-              <h1 className="text-sm font-bold text-sidebar-primary-foreground tracking-tight">Fenasoja</h1>
-              <p className="text-[10px] text-sidebar-foreground/60 uppercase tracking-widest">Logística</p>
+            {!collapsed && (
+              <div className="flex-1 min-w-0">
+                <h1 className="text-sm font-bold text-sidebar-primary-foreground tracking-tight">Fenasoja</h1>
+                <p className="text-[10px] text-sidebar-foreground/60 uppercase tracking-widest">Logística</p>
+              </div>
+            )}
+            <div className="flex items-center gap-1 shrink-0">
+              <button
+                onClick={onToggle}
+                aria-label={collapsed ? 'Expandir menu' : 'Retrair menu'}
+                className="p-2 rounded-lg hover:bg-white/10 text-sidebar-foreground/70 focus-ring"
+              >
+                {collapsed ? <PanelLeftOpen className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
+              </button>
+              <button
+                onClick={onMobileClose}
+                aria-label="Fechar menu"
+                className="p-2 rounded-lg hover:bg-white/10 text-sidebar-foreground/70 focus-ring"
+              >
+                <X className="w-4 h-4" />
+              </button>
             </div>
-            <button
-              onClick={onMobileClose}
-              aria-label="Fechar menu"
-              className="p-2 rounded-lg hover:bg-white/10 text-sidebar-foreground/70 focus-ring"
-            >
-              <X className="w-5 h-5" />
-            </button>
           </div>
 
           <nav className="flex-1 px-2 pt-3 space-y-0.5 overflow-y-auto" role="navigation" aria-label="Menu principal">
@@ -74,7 +86,8 @@ export default function Sidebar({ collapsed, onToggle, isMobile, mobileOpen, onM
                 onClick={onMobileClose}
                 className={({ isActive }) =>
                   cn(
-                    'flex items-center gap-3 rounded-lg text-sm font-medium transition-colors focus-ring px-3 py-3',
+                    'flex items-center gap-3 rounded-lg text-sm font-medium transition-colors focus-ring',
+                    collapsed ? 'justify-center px-2 py-3' : 'px-3 py-3',
                     isActive
                       ? 'bg-white/12 text-sidebar-primary backdrop-blur-sm'
                       : 'text-sidebar-foreground/75 hover:text-sidebar-foreground hover:bg-white/8'
@@ -84,7 +97,7 @@ export default function Sidebar({ collapsed, onToggle, isMobile, mobileOpen, onM
                 {({ isActive }) => (
                   <>
                     <Icon className="w-5 h-5 shrink-0" aria-hidden="true" />
-                    <span className="truncate">{label}</span>
+                    {!collapsed && <span className="truncate">{label}</span>}
                     {isActive && <span className="sr-only">(página atual)</span>}
                   </>
                 )}
@@ -96,10 +109,13 @@ export default function Sidebar({ collapsed, onToggle, isMobile, mobileOpen, onM
             <button
               onClick={() => { onMobileClose(); signOut(); }}
               aria-label="Sair da conta"
-              className="flex items-center gap-3 w-full rounded-lg text-sm font-medium text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-white/8 transition-colors focus-ring px-3 py-3"
+              className={cn(
+                'flex items-center gap-3 w-full rounded-lg text-sm font-medium text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-white/8 transition-colors focus-ring',
+                collapsed ? 'justify-center px-2 py-3' : 'px-3 py-3'
+              )}
             >
               <LogOut className="w-5 h-5 shrink-0" aria-hidden="true" />
-              <span>Sair</span>
+              {!collapsed && <span>Sair</span>}
             </button>
           </div>
         </aside>
