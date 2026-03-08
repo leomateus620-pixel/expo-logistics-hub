@@ -3,23 +3,45 @@ import { useOrgMembers } from '@/hooks/useOrgMembers';
 import { useCommissions } from '@/hooks/useCommissions';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import { Badge } from '@/components/ui/badge';
-import { CalendarDays, Plus, Clock, MapPin, User, Pencil, Trash2, Users } from 'lucide-react';
+import { CalendarDays, Plus, MapPin, User, Pencil, Trash2, Users, Sun, Sunset, Moon, CalendarOff } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { cn, rawTime, todaySP } from '@/lib/utils';
-import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { cn, rawTime, todaySP, rawDay, rawWeekday, rawMonthShort } from '@/lib/utils';
+import { useState, useMemo, useRef, useEffect } from 'react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 
 const emptyForm = { titulo: '', descricao: '', inicio_em: '', fim_em: '', local: '', tipo_tag: '', responsavel_user_id: '', commission_id: '', repetir_diariamente: false };
 
+/* ── helpers ──────────────────────────────────────────── */
+
+function getShift(iso: string): 'manha' | 'tarde' | 'noite' {
+  const h = parseInt(iso.slice(11, 13) || '0', 10);
+  if (h < 12) return 'manha';
+  if (h < 18) return 'tarde';
+  return 'noite';
+}
+
+const shiftMeta = {
+  manha: { label: 'Manhã', icon: Sun },
+  tarde: { label: 'Tarde', icon: Sunset },
+  noite: { label: 'Noite', icon: Moon },
+} as const;
+
+function isNowBetween(start: string, end: string): boolean {
+  const now = new Date();
+  return now >= new Date(start) && now <= new Date(end);
+}
+
+/* ── component ────────────────────────────────────────── */
+
 export default function AgendaPage() {
-  const { events, create, update, remove } = useEvents();
+  const { events, isLoading, create, update, remove } = useEvents();
   const { members } = useOrgMembers();
   const { commissions } = useCommissions();
   const { myRole } = useCurrentOrg();
@@ -28,18 +50,56 @@ export default function AgendaPage() {
   const [form, setForm] = useState(emptyForm);
 
   const today = todaySP();
-  const tomorrowDate = new Date(today + 'T12:00:00');
-  tomorrowDate.setDate(tomorrowDate.getDate() + 1);
-  const tomorrow = tomorrowDate.toISOString().split('T')[0];
 
-  const openCreate = () => {
-    setEditingId(null);
-    setForm(emptyForm);
-    setOpen(true);
-  };
+  /* ── dates ── */
+  const dates: string[] = useMemo(() => {
+    const set = new Set<string>();
+    events.forEach((e: any) => {
+      const d = e.inicio_em?.split('T')[0];
+      if (d) set.add(d);
+    });
+    const arr = [...set].sort();
+    if (arr.length === 0) arr.push(today);
+    return arr;
+  }, [events, today]);
+
+  const [selectedDate, setSelectedDate] = useState<string>(dates.includes(today) ? today : dates[0]);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Keep selectedDate valid when dates change
+  useEffect(() => {
+    if (!dates.includes(selectedDate)) {
+      setSelectedDate(dates.includes(today) ? today : dates[0]);
+    }
+  }, [dates, selectedDate, today]);
+
+  // Scroll active chip into view
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container) return;
+    const active = container.querySelector('[data-active="true"]') as HTMLElement | null;
+    if (active) active.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+  }, [selectedDate]);
+
+  /* ── day events grouped by shift ── */
+  const dayEvents = useMemo(() => {
+    return events
+      .filter((e: any) => e.inicio_em?.startsWith(selectedDate))
+      .sort((a: any, b: any) => a.inicio_em.localeCompare(b.inicio_em));
+  }, [events, selectedDate]);
+
+  const grouped = useMemo(() => {
+    const g: Record<string, any[]> = { manha: [], tarde: [], noite: [] };
+    dayEvents.forEach((e: any) => {
+      g[getShift(e.inicio_em)].push(e);
+    });
+    return g;
+  }, [dayEvents]);
+
+  /* ── form handlers ── */
+  const openCreate = () => { setEditingId(null); setForm(emptyForm); setOpen(true); };
 
   const openEdit = (e: any) => {
-    // Find commission_id from responsavel member
     const responsavelMember = e.responsavel_user_id ? members.find((m: any) => m.user_id === e.responsavel_user_id) : null;
     setEditingId(e.id);
     setForm({
@@ -78,134 +138,229 @@ export default function AgendaPage() {
         for (let i = 0; i < 7; i++) {
           const newStart = new Date(startDate.getTime() + i * 86400000);
           const newEnd = new Date(newStart.getTime() + diffMs);
-          await create.mutateAsync({
-            ...payload,
-            inicio_em: newStart.toISOString().slice(0, 16),
-            fim_em: newEnd.toISOString().slice(0, 16),
-          });
+          await create.mutateAsync({ ...payload, inicio_em: newStart.toISOString().slice(0, 16), fim_em: newEnd.toISOString().slice(0, 16) });
         }
         toast.success('7 eventos criados (diário)');
       } else {
         await create.mutateAsync(payload);
         toast.success('Evento criado');
       }
-      setForm(emptyForm);
-      setEditingId(null);
-      setOpen(false);
+      setForm(emptyForm); setEditingId(null); setOpen(false);
     } catch (err: any) { toast.error(err.message); }
   };
 
-  const dates: string[] = [...new Set(events.map((e: any) => String(e.inicio_em?.split('T')[0] || '')).filter((d: string) => d !== ''))].sort() as string[];
-  if (dates.length === 0) dates.push(today);
-  const getLabel = (d: string) => d === today ? 'Hoje' : d === tomorrow ? 'Amanhã' : new Date(d + 'T12:00').toLocaleDateString('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' });
-
   const isSubmitting = create.isPending || update.isPending;
 
+  /* ── render ── */
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
+    <div className="space-y-5">
+      {/* ── Header ── */}
+      <div className="flex items-center justify-between gap-3">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Agenda da Feira</h1>
-          <p className="text-sm text-muted-foreground mt-1">Programação e eventos</p>
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Programação da Feira</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">Agenda oficial de eventos Fenasoja</p>
         </div>
-        <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setEditingId(null); setForm(emptyForm); } }}>
-          <DialogTrigger asChild>
-            <Button size="sm" onClick={openCreate}><Plus className="w-4 h-4 mr-1" /> Novo Evento</Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader><DialogTitle>{editingId ? 'Editar Evento' : 'Criar Evento'}</DialogTitle></DialogHeader>
-            <div className="space-y-3">
-              <Input placeholder="Título do evento" value={form.titulo} onChange={(e) => setForm({ ...form, titulo: e.target.value })} />
-              <Textarea placeholder="Observações (campo livre)" value={form.descricao} onChange={(e) => setForm({ ...form, descricao: e.target.value })} className="min-h-[80px] uppercase" />
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-xs text-muted-foreground mb-1 block">Início</label>
-                  <Input type="datetime-local" value={form.inicio_em} onChange={(e) => setForm({ ...form, inicio_em: e.target.value })} />
-                </div>
-                <div>
-                  <label className="text-xs text-muted-foreground mb-1 block">Fim</label>
-                  <Input type="datetime-local" value={form.fim_em} onChange={(e) => setForm({ ...form, fim_em: e.target.value })} />
-                </div>
-              </div>
-              <Input placeholder="Local" value={form.local} onChange={(e) => setForm({ ...form, local: e.target.value })} />
-              <Select value={form.commission_id} onValueChange={(v) => setForm({ ...form, commission_id: v, responsavel_user_id: '' })}>
-                <SelectTrigger><SelectValue placeholder="Comissão (opcional)" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">Todas as comissões</SelectItem>
-                  {commissions.map((c: any) => <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>)}
-                </SelectContent>
-              </Select>
-              <Select value={form.responsavel_user_id} onValueChange={(v) => setForm({ ...form, responsavel_user_id: v })}>
-                <SelectTrigger><SelectValue placeholder="Responsável (opcional)" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">Nenhum</SelectItem>
-                  {members
-                    .filter((m: any) => !form.commission_id || form.commission_id === 'none' || m.commission_id === form.commission_id)
-                    .map((m: any) => <SelectItem key={m.user_id} value={m.user_id}>{m.nome_exibicao}</SelectItem>)}
-                </SelectContent>
-              </Select>
-              <Input placeholder="Categoria / Tag" value={form.tipo_tag} onChange={(e) => setForm({ ...form, tipo_tag: e.target.value })} />
-              {!editingId && (
-                <div className="flex items-center gap-2">
-                  <Switch id="repetir" checked={form.repetir_diariamente} onCheckedChange={(v) => setForm({ ...form, repetir_diariamente: v })} />
-                  <Label htmlFor="repetir" className="text-sm cursor-pointer">Repetir diariamente (7 dias)</Label>
-                </div>
-              )}
-              <Button onClick={handleSave} className="w-full" disabled={isSubmitting}>
-                {editingId ? 'Salvar Alterações' : 'Criar Evento'}
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+        <Button size="sm" onClick={openCreate} className="bg-white/12 backdrop-blur-xl border border-white/20 text-foreground hover:bg-white/20 shadow-sm gap-1.5">
+          <Plus className="w-4 h-4" /> Novo Evento
+        </Button>
       </div>
 
-      <Tabs defaultValue={dates.includes(today) ? today : dates[0]} className="space-y-4">
-        <TabsList className="flex-wrap">
-          {dates.map((d) => (
-            <TabsTrigger key={d} value={d}>{getLabel(d)}</TabsTrigger>
-          ))}
-        </TabsList>
+      {/* ── Day chips ── */}
+      <div ref={scrollRef} className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide snap-x snap-mandatory -mx-1 px-1">
         {dates.map((d) => {
-          const dayEvents = events.filter((e: any) => e.inicio_em?.startsWith(d)).sort((a: any, b: any) => a.inicio_em.localeCompare(b.inicio_em));
+          const active = d === selectedDate;
+          const isToday = d === today;
           return (
-            <TabsContent key={d} value={d}>
-              <div className="space-y-3">
-                {dayEvents.length === 0 && <p className="text-sm text-muted-foreground py-8 text-center">Nenhum evento neste dia.</p>}
-                {dayEvents.map((e: any) => (
-                  <div key={e.id} className="rounded-xl border bg-card p-4 flex items-center gap-4 cursor-pointer hover:shadow-md transition-shadow" onClick={() => openEdit(e)}>
-                    <div className="text-center w-16 shrink-0">
-                      <p className="text-lg font-mono font-bold">{rawTime(e.inicio_em)}</p>
-                      <p className="text-[10px] text-muted-foreground">{rawTime(e.fim_em)}</p>
-                    </div>
-                    <div className="w-px h-10 bg-border" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-semibold truncate">{e.titulo}</p>
-                      {e.descricao && <p className="text-xs text-muted-foreground mt-0.5">{e.descricao}</p>}
-                      <div className="flex items-center gap-3 mt-1 flex-wrap">
-                        {e.local && <span className="text-[10px] text-muted-foreground flex items-center gap-1"><MapPin className="w-3 h-3" />{e.local}</span>}
-                        {e.responsavel_user_id && (() => { const m = members.find((m: any) => m.user_id === e.responsavel_user_id); if (!m) return null; const comm = m.commission_id ? commissions.find((c: any) => c.id === m.commission_id) : null; return (<><span className="text-[10px] text-primary flex items-center gap-1"><User className="w-3 h-3" />{m.nome_exibicao}</span>{comm && <span className="text-[10px] text-muted-foreground flex items-center gap-1"><Users className="w-3 h-3" />{comm.nome}</span>}</>); })()}
-                        {e.tipo_tag && <Badge variant="outline" className="text-[10px]">{e.tipo_tag}</Badge>}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-1 shrink-0">
-                      <Pencil className="w-4 h-4 text-muted-foreground" />
-                      {(myRole === 'admin' || myRole === 'gestor') && (
-                        <button
-                          className="p-1 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
-                          onClick={(ev) => { ev.stopPropagation(); if (confirm('Excluir este evento?')) remove.mutate(e.id); }}
-                          aria-label="Excluir"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </TabsContent>
+            <button
+              key={d}
+              data-active={active}
+              onClick={() => setSelectedDate(d)}
+              className={cn(
+                'snap-center shrink-0 flex flex-col items-center px-4 py-2 rounded-xl border transition-all duration-200 min-w-[72px]',
+                'active:scale-[0.96]',
+                active
+                  ? 'bg-primary text-primary-foreground border-primary shadow-md'
+                  : 'bg-white/10 backdrop-blur-lg border-white/15 text-foreground hover:bg-white/20'
+              )}
+            >
+              <span className="text-[10px] uppercase font-medium tracking-wide opacity-80">{rawWeekday(d)}</span>
+              <span className="text-lg font-bold leading-tight">{rawDay(d)}</span>
+              <span className="text-[10px] uppercase opacity-70">{rawMonthShort(d)}</span>
+              {isToday && <span className="mt-0.5 w-1.5 h-1.5 rounded-full bg-current opacity-60" />}
+            </button>
           );
         })}
-      </Tabs>
+      </div>
+
+      {/* ── Loading ── */}
+      {isLoading && (
+        <div className="space-y-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="rounded-2xl bg-white/10 backdrop-blur-xl border border-white/15 p-4 flex gap-4">
+              <Skeleton className="w-14 h-14 rounded-xl bg-white/10" />
+              <div className="flex-1 space-y-2">
+                <Skeleton className="h-4 w-3/4 bg-white/10" />
+                <Skeleton className="h-3 w-1/2 bg-white/10" />
+                <Skeleton className="h-3 w-1/3 bg-white/10" />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* ── Empty state ── */}
+      {!isLoading && dayEvents.length === 0 && (
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/15 flex items-center justify-center mb-4">
+            <CalendarOff className="w-7 h-7 text-muted-foreground" />
+          </div>
+          <p className="text-sm font-medium text-foreground">Nenhum evento neste dia</p>
+          <p className="text-xs text-muted-foreground mt-1 max-w-[240px]">Cadastre a programação oficial para que a equipe acompanhe a agenda da feira.</p>
+          <Button size="sm" variant="outline" onClick={openCreate} className="mt-4 bg-white/10 backdrop-blur border-white/15">
+            <Plus className="w-4 h-4 mr-1" /> Criar evento
+          </Button>
+        </div>
+      )}
+
+      {/* ── Events grouped by shift ── */}
+      {!isLoading && dayEvents.length > 0 && (
+        <div className="space-y-6">
+          {(['manha', 'tarde', 'noite'] as const).map((shift) => {
+            const items = grouped[shift];
+            if (items.length === 0) return null;
+            const { label, icon: Icon } = shiftMeta[shift];
+            return (
+              <section key={shift}>
+                <div className="flex items-center gap-2 mb-3 px-1">
+                  <Icon className="w-4 h-4 text-muted-foreground" />
+                  <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</span>
+                  <span className="text-[10px] text-muted-foreground/60">({items.length})</span>
+                </div>
+                <div className="space-y-2.5">
+                  {items.map((e: any) => {
+                    const isCurrent = isNowBetween(e.inicio_em, e.fim_em);
+                    const member = e.responsavel_user_id ? members.find((m: any) => m.user_id === e.responsavel_user_id) : null;
+                    const comm = member?.commission_id ? commissions.find((c: any) => c.id === member.commission_id) : null;
+                    return (
+                      <div
+                        key={e.id}
+                        onClick={() => openEdit(e)}
+                        className={cn(
+                          'group rounded-2xl border p-4 flex gap-4 cursor-pointer transition-all duration-200',
+                          'bg-white/10 backdrop-blur-xl border-white/15',
+                          'hover:bg-white/15 hover:shadow-lg',
+                          'active:scale-[0.98]',
+                          isCurrent && 'ring-2 ring-primary/40'
+                        )}
+                      >
+                        {/* Time column */}
+                        <div className="flex flex-col items-center justify-center w-14 shrink-0">
+                          <span className="text-base font-mono font-bold leading-tight">{rawTime(e.inicio_em)}</span>
+                          <span className="text-[10px] text-muted-foreground font-mono">{rawTime(e.fim_em)}</span>
+                          {isCurrent && <span className="mt-1 w-2 h-2 rounded-full bg-primary animate-pulse" />}
+                        </div>
+
+                        {/* Divider */}
+                        <div className="w-px self-stretch bg-white/15 shrink-0" />
+
+                        {/* Content */}
+                        <div className="flex-1 min-w-0 space-y-1.5">
+                          <p className="text-sm font-semibold truncate leading-tight">{e.titulo}</p>
+                          {e.descricao && <p className="text-xs text-muted-foreground line-clamp-2">{e.descricao}</p>}
+                          <div className="flex items-center gap-2.5 flex-wrap">
+                            {e.local && (
+                              <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                                <MapPin className="w-3 h-3" />{e.local}
+                              </span>
+                            )}
+                            {member && (
+                              <span className="text-[10px] text-primary flex items-center gap-1">
+                                <User className="w-3 h-3" />{member.nome_exibicao}
+                              </span>
+                            )}
+                            {comm && (
+                              <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                                <Users className="w-3 h-3" />{comm.nome}
+                              </span>
+                            )}
+                            {e.tipo_tag && (
+                              <Badge variant="outline" className="text-[10px] bg-white/10 border-white/20 backdrop-blur">{e.tipo_tag}</Badge>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="flex flex-col items-center justify-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Pencil className="w-3.5 h-3.5 text-muted-foreground" />
+                          {(myRole === 'admin' || myRole === 'gestor') && (
+                            <button
+                              className="p-1 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                              onClick={(ev) => { ev.stopPropagation(); if (confirm('Excluir este evento?')) remove.mutate(e.id); }}
+                              aria-label="Excluir"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </section>
+            );
+          })}
+        </div>
+      )}
+
+      {/* ── Modal ── */}
+      <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setEditingId(null); setForm(emptyForm); } }}>
+        <DialogContent className="bg-white/10 backdrop-blur-2xl border-white/15 sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-lg">{editingId ? 'Editar Evento' : 'Criar Evento'}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <Input placeholder="Título do evento" value={form.titulo} onChange={(e) => setForm({ ...form, titulo: e.target.value })} className="bg-white/10 border-white/15" />
+            <Textarea placeholder="Observações (campo livre)" value={form.descricao} onChange={(e) => setForm({ ...form, descricao: e.target.value })} className="min-h-[80px] bg-white/10 border-white/15" />
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Início</label>
+                <Input type="datetime-local" value={form.inicio_em} onChange={(e) => setForm({ ...form, inicio_em: e.target.value })} className="bg-white/10 border-white/15" />
+              </div>
+              <div>
+                <label className="text-xs text-muted-foreground mb-1 block">Fim</label>
+                <Input type="datetime-local" value={form.fim_em} onChange={(e) => setForm({ ...form, fim_em: e.target.value })} className="bg-white/10 border-white/15" />
+              </div>
+            </div>
+            <Input placeholder="Local" value={form.local} onChange={(e) => setForm({ ...form, local: e.target.value })} className="bg-white/10 border-white/15" />
+            <Select value={form.commission_id} onValueChange={(v) => setForm({ ...form, commission_id: v, responsavel_user_id: '' })}>
+              <SelectTrigger className="bg-white/10 border-white/15"><SelectValue placeholder="Comissão (opcional)" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">Todas as comissões</SelectItem>
+                {commissions.map((c: any) => <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <Select value={form.responsavel_user_id} onValueChange={(v) => setForm({ ...form, responsavel_user_id: v })}>
+              <SelectTrigger className="bg-white/10 border-white/15"><SelectValue placeholder="Responsável (opcional)" /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">Nenhum</SelectItem>
+                {members
+                  .filter((m: any) => !form.commission_id || form.commission_id === 'none' || m.commission_id === form.commission_id)
+                  .map((m: any) => <SelectItem key={m.user_id} value={m.user_id}>{m.nome_exibicao}</SelectItem>)}
+              </SelectContent>
+            </Select>
+            <Input placeholder="Categoria / Tag" value={form.tipo_tag} onChange={(e) => setForm({ ...form, tipo_tag: e.target.value })} className="bg-white/10 border-white/15" />
+            {!editingId && (
+              <div className="flex items-center gap-2">
+                <Switch id="repetir" checked={form.repetir_diariamente} onCheckedChange={(v) => setForm({ ...form, repetir_diariamente: v })} />
+                <Label htmlFor="repetir" className="text-sm cursor-pointer">Repetir diariamente (7 dias)</Label>
+              </div>
+            )}
+            <Button onClick={handleSave} className="w-full" disabled={isSubmitting}>
+              {editingId ? 'Salvar Alterações' : 'Criar Evento'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
