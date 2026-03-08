@@ -290,6 +290,7 @@ export default function TransportsPage() {
         voo_checkin: editForm.titulo === 'Aeroporto' ? editForm.voo_checkin || null : null,
         voo_chegada: editForm.titulo === 'Aeroporto' ? editForm.voo_chegada || null : null,
         horario_saida: editForm.titulo === 'Aeroporto' ? editForm.horario_saida || null : null,
+        observacoes: buildEscoltaObs(editForm),
       });
 
       if (statusChanged && editForm.status === 'concluido' && editForm.km_retirada && editForm.km_devolucao && editForm.vehicle_id && editForm.vehicle_id !== 'none') {
