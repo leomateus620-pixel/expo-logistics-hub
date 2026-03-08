@@ -231,6 +231,11 @@ export default function TransportsPage() {
     if (idx < order.length - 1) {
       const newStatus = order[idx + 1];
       if (newStatus === 'concluido') {
+        // Stop tracking if this transport was being tracked
+        if (trackingTransportId === t.id) {
+          await locationTracker.stopTracking();
+          setTrackingTransportId(null);
+        }
         setEditId(t.id);
         setEditForm({
           titulo: t.titulo || '', guest_id: t.guest_id || '', origem: t.origem, destino: t.destino,
@@ -248,6 +253,12 @@ export default function TransportsPage() {
         return;
       }
       await update.mutateAsync({ id: t.id, status: newStatus });
+      // Start location tracking when initiating transport
+      if (newStatus === 'em_andamento') {
+        setTrackingTransportId(t.id);
+        locationTracker.startTracking();
+        toast.success('Transporte iniciado — localização ativada');
+      }
     }
   };
 
