@@ -33,9 +33,11 @@ export default function ChecklistPage() {
   const [form, setForm] = useState({ titulo: '', descricao: '', due_em: '', prioridade: 'media', assignee_user_id: '', recorrencia: 'nenhuma' });
   const [editForm, setEditForm] = useState({ titulo: '', descricao: '', due_em: '', prioridade: 'media', assignee_user_id: '', recorrencia: 'nenhuma' });
 
-  // Filters
+  // Filters — applied on button click
   const [filterDate, setFilterDate] = useState('');
   const [filterResponsavel, setFilterResponsavel] = useState('');
+  const [appliedDate, setAppliedDate] = useState('');
+  const [appliedResponsavel, setAppliedResponsavel] = useState('');
 
   const today = todaySP();
   const tomorrowDate = new Date(today + 'T12:00:00');
