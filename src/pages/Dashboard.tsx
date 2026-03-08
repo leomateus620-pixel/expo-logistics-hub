@@ -71,11 +71,18 @@ export default function Dashboard() {
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium truncate">{t.titulo || `${t.origem} → ${t.destino}`}</p>
                     <p className="text-xs text-muted-foreground">{t.origem} → {t.destino}</p>
+                    {driver && <p className="text-[10px] text-muted-foreground">{driver.nome_exibicao || ''}</p>}
                   </div>
-                  <div className="text-right shrink-0">
-                    <p className="text-xs font-mono font-medium">{rawTime(t.inicio_em)}</p>
-                    {driver && <p className="text-[10px] text-muted-foreground">{(driver.nome_exibicao || '').split(' ')[0]}</p>}
+                  <div className="text-center shrink-0 min-w-[60px]">
+                    <p className="text-[9px] uppercase text-muted-foreground font-medium">Saída</p>
+                    <p className="text-xs font-mono font-semibold">{t.horario_saida || rawTime(t.inicio_em)}</p>
                   </div>
+                  {t.voo_chegada && (
+                    <div className="text-center shrink-0 min-w-[60px]">
+                      <p className="text-[9px] uppercase text-muted-foreground font-medium">Voo</p>
+                      <p className="text-xs font-mono font-semibold">{t.voo_chegada}</p>
+                    </div>
+                  )}
                 </div>
               );
             })}
