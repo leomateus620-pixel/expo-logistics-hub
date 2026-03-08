@@ -767,6 +767,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "transports_guest_id_fkey"
+            columns: ["guest_id"]
+            isOneToOne: false
+            referencedRelation: "guests_safe"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "transports_org_id_fkey"
             columns: ["org_id"]
             isOneToOne: false
@@ -921,7 +928,118 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      guests_safe: {
+        Row: {
+          checkin_em: string | null
+          checkout_em: string | null
+          created_at: string | null
+          email: string | null
+          hotel_nome: string | null
+          id: string | null
+          nome: string | null
+          observacoes: string | null
+          org_id: string | null
+          prioridade: Database["public"]["Enums"]["priority_level"] | null
+          telefone: string | null
+          tipo: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          checkin_em?: string | null
+          checkout_em?: string | null
+          created_at?: string | null
+          email?: never
+          hotel_nome?: string | null
+          id?: string | null
+          nome?: string | null
+          observacoes?: string | null
+          org_id?: string | null
+          prioridade?: Database["public"]["Enums"]["priority_level"] | null
+          telefone?: never
+          tipo?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          checkin_em?: string | null
+          checkout_em?: string | null
+          created_at?: string | null
+          email?: never
+          hotel_nome?: string | null
+          id?: string | null
+          nome?: string | null
+          observacoes?: string | null
+          org_id?: string | null
+          prioridade?: Database["public"]["Enums"]["priority_level"] | null
+          telefone?: never
+          tipo?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "guests_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      org_members_safe: {
+        Row: {
+          avatar_color: string | null
+          cargo: string | null
+          commission_id: string | null
+          created_at: string | null
+          id: string | null
+          is_active: boolean | null
+          nome_exibicao: string | null
+          org_id: string | null
+          role: Database["public"]["Enums"]["org_role"] | null
+          status: Database["public"]["Enums"]["member_status"] | null
+          telefone: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          avatar_color?: string | null
+          cargo?: string | null
+          commission_id?: string | null
+          created_at?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          nome_exibicao?: string | null
+          org_id?: string | null
+          role?: Database["public"]["Enums"]["org_role"] | null
+          status?: Database["public"]["Enums"]["member_status"] | null
+          telefone?: never
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          avatar_color?: string | null
+          cargo?: string | null
+          commission_id?: string | null
+          created_at?: string | null
+          id?: string | null
+          is_active?: boolean | null
+          nome_exibicao?: string | null
+          org_id?: string | null
+          role?: Database["public"]["Enums"]["org_role"] | null
+          status?: Database["public"]["Enums"]["member_status"] | null
+          telefone?: never
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "org_members_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       audit_check_rls_status: {
