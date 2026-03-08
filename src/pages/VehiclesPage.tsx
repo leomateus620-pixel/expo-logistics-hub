@@ -251,12 +251,20 @@ function VehicleDetailContent({ vehicle, members, userId }: { vehicle: any; memb
   const { usages, createUsage, updateUsage } = useVehicleUsage(vehicle.id);
   const { transports } = useTransports();
   const { update: updateVehicle } = useVehicles();
+  const { records: fuelRecords, create: createFuel, uploadReceipt } = useFuelRecords(vehicle.id);
   const navigate = useNavigate();
 
   const [kmSaida, setKmSaida] = useState('');
   const [kmChegada, setKmChegada] = useState('');
   const [responsavelId, setResponsavelId] = useState(userId || '');
   const [obs, setObs] = useState('');
+
+  // Fuel form state
+  const [fuelOpen, setFuelOpen] = useState(false);
+  const [fuelForm, setFuelForm] = useState({ litros: '', valor: '', km_abastecimento: '', posto: '', observacoes: '' });
+  const [fuelPhoto, setFuelPhoto] = useState<File | null>(null);
+  const [fuelPhotoPreview, setFuelPhotoPreview] = useState<string | null>(null);
+  const [fuelLoading, setFuelLoading] = useState(false);
 
   const openUsage = usages.find((u: any) => !u.km_chegada);
 
