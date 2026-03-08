@@ -252,7 +252,7 @@ export default function TransportsPage() {
   }, [highlightId, transports]);
 
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ titulo: '', origem: '', destino: '', inicio_em: '', motorista_user_id: '', vehicle_id: '', prioridade: 'media', km_retirada: '', voo_cidade: '', voo_numero: '', voo_checkin: '', voo_chegada: '', horario_saida: '', escolta_nome: '', escolta_cargo: '', escolta_viaturas: '', escolta_ponto_encontro: '', escolta_contato_seguranca: '', escolta_obs: '' });
+  const [form, setForm] = useState({ titulo: '', origem: '', destino: '', inicio_em: '', motorista_user_id: '', vehicle_id: '', prioridade: 'media', km_retirada: '', voo_cidade: '', voo_numero: '', voo_checkin: '', voo_chegada: '', voo_chegada_data: '', horario_saida: '', escolta_nome: '', escolta_cargo: '', escolta_viaturas: '', escolta_ponto_encontro: '', escolta_contato_seguranca: '', escolta_obs: '' });
   const [selectedGuests, setSelectedGuests] = useState<string[]>([]);
   const [guestDestinations, setGuestDestinations] = useState<Record<string, string>>({});
   const [showNewGuestForm, setShowNewGuestForm] = useState(false);
@@ -260,7 +260,7 @@ export default function TransportsPage() {
   const [editShowNewGuestForm, setEditShowNewGuestForm] = useState(false);
   const [editNewGuestForm, setEditNewGuestForm] = useState({ nome: '', telefone: '', email: '', hotel_nome: '', checkin_em: '', checkout_em: '', observacoes: '' });
   const [includeReturn, setIncludeReturn] = useState(false);
-  const [returnForm, setReturnForm] = useState({ inicio_em: '', voo_numero: '', voo_checkin: '', voo_chegada: '', horario_saida: '' });
+  const [returnForm, setReturnForm] = useState({ inicio_em: '', voo_numero: '', voo_checkin: '', voo_chegada: '', voo_chegada_data: '', horario_saida: '' });
 
   const [whatsappOpen, setWhatsappOpen] = useState(false);
   const [whatsappText, setWhatsappText] = useState('');
@@ -268,7 +268,7 @@ export default function TransportsPage() {
   const [editOpen, setEditOpen] = useState(false);
   const [editId, setEditId] = useState('');
   const [editGuests, setEditGuests] = useState<string[]>([]);
-  const [editForm, setEditForm] = useState({ titulo: '', origem: '', destino: '', inicio_em: '', motorista_user_id: '', vehicle_id: '', prioridade: 'media', status: 'pendente', km_retirada: '', km_devolucao: '', fim_em: '', voo_cidade: '', voo_numero: '', voo_checkin: '', voo_chegada: '', horario_saida: '', escolta_nome: '', escolta_cargo: '', escolta_viaturas: '', escolta_ponto_encontro: '', escolta_contato_seguranca: '', escolta_obs: '' });
+  const [editForm, setEditForm] = useState({ titulo: '', origem: '', destino: '', inicio_em: '', motorista_user_id: '', vehicle_id: '', prioridade: 'media', status: 'pendente', km_retirada: '', km_devolucao: '', fim_em: '', voo_cidade: '', voo_numero: '', voo_checkin: '', voo_chegada: '', voo_chegada_data: '', horario_saida: '', escolta_nome: '', escolta_cargo: '', escolta_viaturas: '', escolta_ponto_encontro: '', escolta_contato_seguranca: '', escolta_obs: '' });
 
   const [filterMotorista, setFilterMotorista] = useState('');
   const [filterData, setFilterData] = useState('');
@@ -327,13 +327,13 @@ export default function TransportsPage() {
   };
 
   const openCreateDialog = () => {
-    setForm({ titulo: '', origem: '', destino: '', inicio_em: nowSPLocal(), motorista_user_id: '', vehicle_id: '', prioridade: 'media', km_retirada: '', voo_cidade: '', voo_numero: '', voo_checkin: '', voo_chegada: '', horario_saida: '', escolta_nome: '', escolta_cargo: '', escolta_viaturas: '', escolta_ponto_encontro: '', escolta_contato_seguranca: '', escolta_obs: '' });
+    setForm({ titulo: '', origem: '', destino: '', inicio_em: nowSPLocal(), motorista_user_id: '', vehicle_id: '', prioridade: 'media', km_retirada: '', voo_cidade: '', voo_numero: '', voo_checkin: '', voo_chegada: '', voo_chegada_data: '', horario_saida: '', escolta_nome: '', escolta_cargo: '', escolta_viaturas: '', escolta_ponto_encontro: '', escolta_contato_seguranca: '', escolta_obs: '' });
     setSelectedGuests([]);
     setGuestDestinations({});
     setShowNewGuestForm(false);
     setNewGuestForm({ nome: '', telefone: '', email: '', hotel_nome: '', checkin_em: '', checkout_em: '', observacoes: '' });
     setIncludeReturn(false);
-    setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', voo_chegada: '', horario_saida: '' });
+    setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', voo_chegada: '', voo_chegada_data: '', horario_saida: '' });
     setOpen(true);
   };
 
@@ -368,6 +368,7 @@ export default function TransportsPage() {
         voo_numero: form.titulo === 'Aeroporto' ? form.voo_numero || null : null,
         voo_checkin: form.titulo === 'Aeroporto' ? form.voo_checkin || null : null,
         voo_chegada: form.titulo === 'Aeroporto' ? form.voo_chegada || null : null,
+        voo_chegada_data: form.titulo === 'Aeroporto' ? form.voo_chegada_data || null : null,
         horario_saida: form.titulo === 'Aeroporto' ? form.horario_saida || null : null,
         observacoes: buildEscoltaObs(form),
         distancia_estimada_km: routeData.distance_km || null,
@@ -412,6 +413,7 @@ export default function TransportsPage() {
             voo_numero: returnForm.voo_numero || null,
             voo_checkin: returnForm.voo_checkin || null,
             voo_chegada: null,
+            voo_chegada_data: returnForm.voo_chegada_data || null,
             horario_saida: returnForm.horario_saida || null,
             distancia_estimada_km: returnRouteData.distance_km || null,
             duracao_estimada_min: returnRouteData.duration_minutes || null,
@@ -424,11 +426,11 @@ export default function TransportsPage() {
         } catch { /* silent - don't fail the main transport */ }
       }
 
-      setForm({ titulo: '', origem: '', destino: '', inicio_em: '', motorista_user_id: '', vehicle_id: '', prioridade: 'media', km_retirada: '', voo_cidade: '', voo_numero: '', voo_checkin: '', voo_chegada: '', horario_saida: '', escolta_nome: '', escolta_cargo: '', escolta_viaturas: '', escolta_ponto_encontro: '', escolta_contato_seguranca: '', escolta_obs: '' });
+      setForm({ titulo: '', origem: '', destino: '', inicio_em: '', motorista_user_id: '', vehicle_id: '', prioridade: 'media', km_retirada: '', voo_cidade: '', voo_numero: '', voo_checkin: '', voo_chegada: '', voo_chegada_data: '', horario_saida: '', escolta_nome: '', escolta_cargo: '', escolta_viaturas: '', escolta_ponto_encontro: '', escolta_contato_seguranca: '', escolta_obs: '' });
       setSelectedGuests([]);
       setGuestDestinations({});
       setIncludeReturn(false);
-      setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', voo_chegada: '', horario_saida: '' });
+      setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', voo_chegada: '', voo_chegada_data: '', horario_saida: '' });
       setOpen(false);
       toast.success(includeReturn && form.titulo === 'Aeroporto' && returnForm.inicio_em ? 'Ida e volta agendados' : 'Transporte agendado');
     } catch (err: any) { toast.error(err.message); }
@@ -448,7 +450,7 @@ export default function TransportsPage() {
       km_devolucao: t.km_devolucao != null ? String(t.km_devolucao) : '',
       fim_em: t.fim_em?.slice(0, 16) || '',
       voo_cidade: t.voo_cidade || '', voo_numero: t.voo_numero || '',
-      voo_checkin: t.voo_checkin || '', voo_chegada: t.voo_chegada || '',
+      voo_checkin: t.voo_checkin || '', voo_chegada: t.voo_chegada || '', voo_chegada_data: t.voo_chegada_data || '',
       horario_saida: t.horario_saida || '',
       ...escoltaData,
     });
@@ -478,6 +480,7 @@ export default function TransportsPage() {
         voo_numero: editForm.titulo === 'Aeroporto' ? editForm.voo_numero || null : null,
         voo_checkin: editForm.titulo === 'Aeroporto' ? editForm.voo_checkin || null : null,
         voo_chegada: editForm.titulo === 'Aeroporto' ? editForm.voo_chegada || null : null,
+        voo_chegada_data: editForm.titulo === 'Aeroporto' ? editForm.voo_chegada_data || null : null,
         horario_saida: editForm.titulo === 'Aeroporto' ? editForm.horario_saida || null : null,
         observacoes: buildEscoltaObs(editForm),
       };
@@ -536,7 +539,7 @@ export default function TransportsPage() {
           km_devolucao: '',
           fim_em: nowSPLocal(),
           voo_cidade: t.voo_cidade || '', voo_numero: t.voo_numero || '',
-          voo_checkin: t.voo_checkin || '', voo_chegada: t.voo_chegada || '',
+          voo_checkin: t.voo_checkin || '', voo_chegada: t.voo_chegada || '', voo_chegada_data: t.voo_chegada_data || '',
           horario_saida: t.horario_saida || '',
           ...escoltaData,
         });
@@ -677,7 +680,16 @@ export default function TransportsPage() {
                 }} />
               </div>
               <div>
-                <Label className="text-xs text-muted-foreground mb-1 block">Chegada Voo</Label>
+                <Label className="text-xs text-muted-foreground mb-1 block">Data e Hora de Chegada</Label>
+                <DateTimePicker
+                  value={data.voo_chegada_data}
+                  onChange={(v) => setData({ ...data, voo_chegada_data: v })}
+                  mode="datetime"
+                  placeholder="Selecionar data e hora"
+                />
+              </div>
+              <div>
+                <Label className="text-xs text-muted-foreground mb-1 block">Chegada Voo (hora)</Label>
                 <Input type="time" value={data.voo_chegada} onChange={async (e) => {
                   const chegada = e.target.value;
                   setData({ ...data, voo_chegada: chegada });
@@ -722,6 +734,15 @@ export default function TransportsPage() {
                           if (suggested) setReturnForm(prev => ({ ...prev, voo_checkin: checkin, horario_saida: suggested }));
                         }
                       }} />
+                    </div>
+                    <div>
+                      <Label className="text-xs text-muted-foreground mb-1 block">Data e Hora de Chegada (volta)</Label>
+                      <DateTimePicker
+                        value={returnForm.voo_chegada_data}
+                        onChange={(v) => setReturnForm(prev => ({ ...prev, voo_chegada_data: v }))}
+                        mode="datetime"
+                        placeholder="Selecionar data e hora"
+                      />
                     </div>
                     <div>
                       <Label className="text-xs text-muted-foreground mb-1 block">Saída (sugerido)</Label>
