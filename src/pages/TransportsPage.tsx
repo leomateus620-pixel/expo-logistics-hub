@@ -396,7 +396,6 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
 
       const result = await create.mutateAsync({
         titulo: form.titulo || null,
-        guest_id: selectedGuests.length > 0 ? selectedGuests[0] : null,
         origem,
         destino,
         inicio_em,
