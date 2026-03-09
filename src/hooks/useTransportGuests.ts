@@ -29,24 +29,13 @@ export function useTransportGuests() {
   const setGuestsForTransport = useMutation({
     mutationFn: async ({ transportId, guestIds }: { transportId: string; guestIds: string[] }) => {
       if (!orgId) return;
-      // Delete existing
-      await (supabase as any)
-        .from('transport_guests')
-        .delete()
-        .eq('transport_id', transportId)
-        .eq('org_id', orgId);
-      // Insert new
-      if (guestIds.length > 0) {
-        const rows = guestIds.map(gid => ({
-          transport_id: transportId,
-          guest_id: gid,
-          org_id: orgId,
-        }));
-        const { error } = await (supabase as any)
-          .from('transport_guests')
-          .insert(rows);
-        if (error) throw error;
-      }
+      // Use atomic RPC to avoid race conditions
+      const { error } = await (supabase as any).rpc('set_transport_guests', {
+        _transport_id: transportId,
+        _org_id: orgId,
+        _guest_ids: guestIds,
+      });
+      if (error) throw error;
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['transport-guests'] });
