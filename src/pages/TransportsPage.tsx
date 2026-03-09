@@ -440,7 +440,6 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
 
           const returnResult = await create.mutateAsync({
             titulo: 'Aeroporto',
-            guest_id: selectedGuests.length > 0 ? selectedGuests[0] : null,
             origem: destino || 'Santa Rosa',
             destino: form.voo_cidade ? `Aeroporto ${form.voo_cidade}` : origem,
             inicio_em: ensureSPTimestamptz(returnForm.inicio_em),
