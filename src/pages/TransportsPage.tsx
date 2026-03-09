@@ -1327,9 +1327,23 @@ function TransportCard({ t, members, vehicles, guests, highlightId, highlightRef
           <Button size="icon" variant="ghost" className="h-10 w-10 shrink-0 rounded-xl" onClick={onPDF}>
             <FileText className="w-4 h-4" />
           </Button>
-          <Button size="icon" variant="ghost" className="h-10 w-10 shrink-0 rounded-xl text-destructive hover:text-destructive" onClick={onDelete}>
-            <Trash2 className="w-4 h-4" />
-          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button size="icon" variant="ghost" className="h-10 w-10 shrink-0 rounded-xl text-destructive hover:text-destructive">
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertContent>
+              <AlertDialogHeader>
+                <AlertTitle>Excluir transporte</AlertTitle>
+                <AlertDesc>Tem certeza que deseja excluir este transporte? Esta ação não pode ser desfeita.</AlertDesc>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogAction onClick={onDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Excluir</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertContent>
+          </AlertDialog>
         </div>
       </div>
     </div>
