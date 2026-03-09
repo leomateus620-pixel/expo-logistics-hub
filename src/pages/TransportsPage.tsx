@@ -1220,6 +1220,7 @@ function TransportCard({ t, members, vehicles, guests, highlightId, highlightRef
             </div>
           </div>
           <div className="text-right shrink-0 space-y-0.5">
+            <p className="text-[10px] font-medium text-muted-foreground">{rawDateShort(t.inicio_em)}</p>
             {(t.voo_checkin || t.voo_chegada) && (
               <div>
                 <p className="text-[9px] uppercase tracking-wider text-muted-foreground font-medium">{t.voo_checkin ? 'Check-in' : 'Desembarque'}</p>
