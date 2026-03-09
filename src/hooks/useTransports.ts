@@ -105,6 +105,22 @@ export function useTransports() {
     },
   });
 
+  const cleanupTransportEvents = async (id: string, mode: 'delete' | 'cancel') => {
+    if (!orgId) return;
+    const tag = `Transporte #${id.slice(0, 8)}`;
+    const { data: linkedEvents } = await (supabase as any)
+      .from('events').select('id').eq('org_id', orgId).like('descricao', `%${tag}%`);
+    if (linkedEvents?.length) {
+      for (const ev of linkedEvents) {
+        if (mode === 'delete') {
+          await (supabase as any).from('events').delete().eq('id', ev.id);
+        } else {
+          await (supabase as any).from('events').update({ titulo: '[CANCELADO] ' + (ev.titulo || '') }).eq('id', ev.id);
+        }
+      }
+    }
+  };
+
   const update = useMutation({
     mutationFn: async ({ id, ...updates }: { id: string; [key: string]: any }) => {
       const { data: before } = await (supabase as any).from('transports').select('*').eq('id', id).single();
@@ -112,19 +128,31 @@ export function useTransports() {
       if (error) throw error;
       const action = updates.status && updates.status !== before?.status ? 'status_change' : 'update';
       await logAudit({ orgId: orgId!, entity: 'transports', entityId: id, action, before, after: data });
+      // Sync with agenda on cancel
+      if (updates.status === 'cancelado' && before?.status !== 'cancelado') {
+        try { await cleanupTransportEvents(id, 'cancel'); } catch { /* silent */ }
+      }
       return data;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['transports'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['transports'] });
+      qc.invalidateQueries({ queryKey: ['events'] });
+    },
   });
 
   const remove = useMutation({
     mutationFn: async (id: string) => {
       const { data: before } = await (supabase as any).from('transports').select('*').eq('id', id).single();
+      // Clean up linked events before deleting
+      try { await cleanupTransportEvents(id, 'delete'); } catch { /* silent */ }
       const { error } = await (supabase as any).from('transports').delete().eq('id', id);
       if (error) throw error;
       await logAudit({ orgId: orgId!, entity: 'transports', entityId: id, action: 'delete', before });
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['transports'] }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['transports'] });
+      qc.invalidateQueries({ queryKey: ['events'] });
+    },
   });
 
   return { transports, isLoading, create, update, remove };

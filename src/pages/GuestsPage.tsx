@@ -123,7 +123,7 @@ export default function GuestsPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
         {guests.map((g: any) => {
           const linkedTransportIds = transportGuests.filter((tg: any) => tg.guest_id === g.id).map((tg: any) => tg.transport_id);
-          const linkedTransports = transports.filter((t: any) => linkedTransportIds.includes(t.id) || t.guest_id === g.id);
+          const linkedTransports = transports.filter((t: any) => linkedTransportIds.includes(t.id));
           return (
             <div key={g.id} className="rounded-xl border bg-card p-5 hover:shadow-md transition-shadow">
               <div className="flex items-start justify-between mb-3">

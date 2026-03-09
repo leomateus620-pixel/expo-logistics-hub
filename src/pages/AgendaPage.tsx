@@ -156,8 +156,6 @@ export default function AgendaPage() {
         const driver = t.motorista_user_id ? members.find((m: any) => m.user_id === t.motorista_user_id) : null;
         const guestIds = getGuestsForTransport(t.id);
         const guestNames = guestIds.map((gid: string) => guests.find((g: any) => g.id === gid)?.nome).filter(Boolean);
-        const legacyGuest = !guestIds.length && t.guest_id ? guests.find((g: any) => g.id === t.guest_id) : null;
-        if (legacyGuest) guestNames.push(legacyGuest.nome);
 
         return {
           id: t.id,

@@ -617,9 +617,7 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
     const driver = members.find((m: any) => m.user_id === t.motorista_user_id);
     const vehicle = vehicles.find((v: any) => v.id === t.vehicle_id);
     const linkedGIds = getGuestsForTransport(t.id);
-    const pdfGuests = linkedGIds.length > 0
-      ? linkedGIds.map((gid: string) => guests.find((g: any) => g.id === gid)).filter(Boolean)
-      : (t.guest_id ? [guests.find((g: any) => g.id === t.guest_id)].filter(Boolean) : []);
+    const pdfGuests = linkedGIds.map((gid: string) => guests.find((g: any) => g.id === gid)).filter(Boolean);
     const guest = pdfGuests[0] || null;
     const sc = statusConfig[t.status] || statusConfig.pendente;
     const driverCommission = t.motorista_user_id ? getDriverCommission(t.motorista_user_id) : null;
