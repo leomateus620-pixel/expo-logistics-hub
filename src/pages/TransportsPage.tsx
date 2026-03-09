@@ -500,7 +500,6 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
       const updatePayload: any = {
         id: editId,
         titulo: editForm.titulo || null,
-        guest_id: editGuests.length === 1 ? editGuests[0] : (editGuests.length > 0 ? editGuests[0] : null),
         origem: editForm.origem,
         destino: editForm.destino,
         inicio_em: editForm.inicio_em,
