@@ -562,7 +562,7 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
         setEditId(t.id);
         const escoltaData = parseEscoltaFromObs(t.observacoes);
         const linkedGuests2 = getGuestsForTransport(t.id);
-        setEditGuests(linkedGuests2.length > 0 ? linkedGuests2 : (t.guest_id ? [t.guest_id] : []));
+        setEditGuests(linkedGuests2);
         setEditForm({
           titulo: t.titulo || '', origem: t.origem, destino: t.destino,
           inicio_em: t.inicio_em?.slice(0, 16) || '', motorista_user_id: t.motorista_user_id || '',
