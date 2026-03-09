@@ -13,6 +13,7 @@ import { cn, rawTime, rawDateShort, nowSP, nowSPLocal } from '@/lib/utils';
 import { useState, lazy, Suspense, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent as AlertContent, AlertDialogDescription as AlertDesc, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle as AlertTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { DateTimePicker } from '@/components/ui/date-time-picker';
@@ -1146,7 +1147,7 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
             onToggleExpand={() => toggleExpand(t.id)}
             onCycleStatus={() => cycleStatus(t)}
             onEdit={() => openEditDlg(t)}
-            onDelete={() => { if (confirm('Excluir este transporte?')) remove.mutate(t.id); }}
+            onDelete={() => remove.mutate(t.id)}
             onDetail={() => openDetail(t)}
             onPDF={() => generatePDF(t)}
             getDriverCommission={getDriverCommission}
@@ -1326,9 +1327,23 @@ function TransportCard({ t, members, vehicles, guests, highlightId, highlightRef
           <Button size="icon" variant="ghost" className="h-10 w-10 shrink-0 rounded-xl" onClick={onPDF}>
             <FileText className="w-4 h-4" />
           </Button>
-          <Button size="icon" variant="ghost" className="h-10 w-10 shrink-0 rounded-xl text-destructive hover:text-destructive" onClick={onDelete}>
-            <Trash2 className="w-4 h-4" />
-          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button size="icon" variant="ghost" className="h-10 w-10 shrink-0 rounded-xl text-destructive hover:text-destructive">
+                <Trash2 className="w-4 h-4" />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertContent>
+              <AlertDialogHeader>
+                <AlertTitle>Excluir transporte</AlertTitle>
+                <AlertDesc>Tem certeza que deseja excluir este transporte? Esta ação não pode ser desfeita.</AlertDesc>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                <AlertDialogAction onClick={onDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Excluir</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertContent>
+          </AlertDialog>
         </div>
       </div>
     </div>

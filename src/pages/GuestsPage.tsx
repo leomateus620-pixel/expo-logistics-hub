@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -139,9 +140,23 @@ export default function GuestsPage() {
                   <button onClick={() => openEdit(g)} aria-label={`Editar ${g.nome}`} className="p-1.5 rounded-lg hover:bg-muted transition-colors text-muted-foreground hover:text-foreground focus-ring min-w-[44px] min-h-[44px] flex items-center justify-center">
                     <Pencil className="w-3.5 h-3.5" />
                   </button>
-                  <button onClick={() => { remove.mutateAsync(g.id); toast.success('Hóspede removido'); }} aria-label={`Remover ${g.nome}`} className="p-1.5 rounded-lg hover:bg-destructive/10 transition-colors text-muted-foreground hover:text-destructive focus-ring min-w-[44px] min-h-[44px] flex items-center justify-center">
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <button aria-label={`Remover ${g.nome}`} className="p-1.5 rounded-lg hover:bg-destructive/10 transition-colors text-muted-foreground hover:text-destructive focus-ring min-w-[44px] min-h-[44px] flex items-center justify-center">
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Remover hóspede</AlertDialogTitle>
+                        <AlertDialogDescription>Tem certeza que deseja remover <strong>{g.nome}</strong>? Esta ação não pode ser desfeita.</AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => { remove.mutateAsync(g.id); toast.success('Hóspede removido'); }} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Remover</AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
               </div>
               {g.hotel_nome && (

@@ -5,10 +5,29 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+/** Get the current UTC offset for São Paulo (handles DST automatically) */
+function getSPOffset(): string {
+  const now = new Date();
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/Sao_Paulo',
+    timeZoneName: 'shortOffset',
+  });
+  const parts = formatter.formatToParts(now);
+  const tzPart = parts.find(p => p.type === 'timeZoneName');
+  // tzPart.value is like "GMT-3" or "GMT-2"
+  const match = tzPart?.value?.match(/GMT([+-]?\d+)/);
+  if (match) {
+    const hours = parseInt(match[1], 10);
+    const sign = hours <= 0 ? '-' : '+';
+    return `${sign}${String(Math.abs(hours)).padStart(2, '0')}:00`;
+  }
+  return '-03:00'; // fallback
+}
+
 /** Get current date/time in São Paulo timezone as ISO string */
 export function nowSP(): string {
   const raw = new Date().toLocaleString('sv-SE', { timeZone: 'America/Sao_Paulo' });
-  return raw.replace(' ', 'T') + '-03:00';
+  return raw.replace(' ', 'T') + getSPOffset();
 }
 
 /** Get current date/time in São Paulo timezone formatted for datetime-local inputs (YYYY-MM-DDTHH:MM) */
@@ -20,6 +39,14 @@ export function nowSPLocal(): string {
 /** Get today's date in São Paulo timezone (YYYY-MM-DD) */
 export function todaySP(): string {
   return new Date().toLocaleDateString('sv-SE', { timeZone: 'America/Sao_Paulo' });
+}
+
+/** Ensure a datetime-local value has SP timezone offset */
+export function ensureSPOffset(datetimeLocal: string): string {
+  if (!datetimeLocal) return datetimeLocal;
+  // Already has offset
+  if (/[+-]\d{2}:\d{2}$/.test(datetimeLocal)) return datetimeLocal;
+  return datetimeLocal + getSPOffset();
 }
 
 /** Extract time HH:MM from ISO string without timezone conversion */

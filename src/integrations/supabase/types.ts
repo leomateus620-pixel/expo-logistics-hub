@@ -1295,6 +1295,10 @@ export type Database = {
         Args: { _org_id: string; _user_id: string }
         Returns: boolean
       }
+      set_transport_guests: {
+        Args: { _guest_ids: string[]; _org_id: string; _transport_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "user"
