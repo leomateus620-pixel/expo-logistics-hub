@@ -12,7 +12,7 @@ import {
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { cn, rawTime, todaySP } from '@/lib/utils';
+import { cn, rawTime, rawDateShort, todaySP } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useMemo } from 'react';
 
@@ -183,6 +183,10 @@ export default function Dashboard() {
                   <p className="text-sm font-medium truncate">{t.titulo || `${t.origem} → ${t.destino}`}</p>
                   <p className="text-[11px] text-muted-foreground">{t.origem} → {t.destino}</p>
                   {driver && <p className="text-[10px] text-muted-foreground mt-0.5">{driver.nome_exibicao}</p>}
+                </div>
+                <div className="text-center shrink-0">
+                  <p className="text-[9px] uppercase text-muted-foreground font-medium">Data</p>
+                  <p className="text-xs font-bold text-foreground">{rawDateShort(t.inicio_em)}</p>
                 </div>
                 {(t.voo_checkin || t.voo_chegada) && (
                   <div className="text-center shrink-0">
