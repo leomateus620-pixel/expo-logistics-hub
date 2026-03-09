@@ -1147,7 +1147,7 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
             onToggleExpand={() => toggleExpand(t.id)}
             onCycleStatus={() => cycleStatus(t)}
             onEdit={() => openEditDlg(t)}
-            onDelete={() => { if (confirm('Excluir este transporte?')) remove.mutate(t.id); }}
+            onDelete={() => remove.mutate(t.id)}
             onDetail={() => openDetail(t)}
             onPDF={() => generatePDF(t)}
             getDriverCommission={getDriverCommission}
