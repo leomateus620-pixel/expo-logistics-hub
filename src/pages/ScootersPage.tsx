@@ -273,9 +273,15 @@ export default function ScootersPage() {
           );
         })}
         {scooters.length === 0 && (
-          <div className="col-span-full text-center py-12 text-muted-foreground">
-            <Bike className="w-8 h-8 mx-auto mb-2 opacity-50" />
-            <p className="text-sm">Nenhum patinete cadastrado</p>
+          <div className="col-span-full text-center py-16 text-muted-foreground">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-accent/10 flex items-center justify-center">
+              <Bike className="w-8 h-8 text-accent/50" />
+            </div>
+            <p className="text-sm font-medium">Nenhum patinete cadastrado</p>
+            <p className="text-xs text-muted-foreground/70 mt-1">Adicione patinetes para gerenciar retiradas e devoluções</p>
+            <Button size="sm" className="mt-4" onClick={() => setAddOpen(true)}>
+              <Plus className="w-4 h-4 mr-1" /> Adicionar Patinete
+            </Button>
           </div>
         )}
       </div>

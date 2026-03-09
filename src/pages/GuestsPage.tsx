@@ -196,9 +196,15 @@ export default function GuestsPage() {
           );
         })}
         {guests.length === 0 && (
-          <div className="col-span-full text-center py-12 text-muted-foreground">
-            <Hotel className="w-8 h-8 mx-auto mb-2 opacity-50" />
-            <p className="text-sm">Nenhum hóspede cadastrado</p>
+          <div className="col-span-full text-center py-16 text-muted-foreground">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-primary/10 flex items-center justify-center">
+              <Hotel className="w-8 h-8 text-primary/50" />
+            </div>
+            <p className="text-sm font-medium">Nenhum hóspede cadastrado</p>
+            <p className="text-xs text-muted-foreground/70 mt-1">Cadastre o primeiro hóspede para gerenciar hospedagem e traslados</p>
+            <Button size="sm" className="mt-4" onClick={() => setAddOpen(true)}>
+              <Plus className="w-4 h-4 mr-1" /> Cadastrar Hóspede
+            </Button>
           </div>
         )}
       </div>
