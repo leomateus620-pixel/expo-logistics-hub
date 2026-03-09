@@ -937,7 +937,12 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
         </div>
         <div>
           <Label className="text-xs text-muted-foreground mb-1 block">Data/Hora saída</Label>
-          <DateTimePicker value={data.inicio_em} onChange={(v) => setData({ ...data, inicio_em: v })} placeholder="Data/Hora saída" />
+          <input
+            type="datetime-local"
+            value={data.inicio_em?.slice(0, 16) || ''}
+            onChange={(e) => setData({ ...data, inicio_em: e.target.value })}
+            className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          />
         </div>
         <div className="grid grid-cols-2 gap-3">
           <Select value={data.vehicle_id} onValueChange={(v) => setData({ ...data, vehicle_id: v })}>
