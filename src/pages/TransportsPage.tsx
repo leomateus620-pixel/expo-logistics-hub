@@ -823,11 +823,21 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
                     <div className="grid grid-cols-2 gap-2">
                       <div>
                         <label className="text-[10px] text-muted-foreground mb-0.5 block">Check-in</label>
-                        <DateTimePicker value={gf.checkin_em} onChange={(v) => setGf({ ...gf, checkin_em: v })} placeholder="Check-in" />
+                        <input
+                          type="datetime-local"
+                          value={gf.checkin_em?.slice(0, 16) || ''}
+                          onChange={(e) => setGf({ ...gf, checkin_em: e.target.value })}
+                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                        />
                       </div>
                       <div>
                         <label className="text-[10px] text-muted-foreground mb-0.5 block">Check-out</label>
-                        <DateTimePicker value={gf.checkout_em} onChange={(v) => setGf({ ...gf, checkout_em: v })} placeholder="Check-out" />
+                        <input
+                          type="datetime-local"
+                          value={gf.checkout_em?.slice(0, 16) || ''}
+                          onChange={(e) => setGf({ ...gf, checkout_em: e.target.value })}
+                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                        />
                       </div>
                     </div>
                     <Input placeholder="Observações" value={gf.observacoes} onChange={(e) => setGf({ ...gf, observacoes: e.target.value })} className="h-9 text-sm" />
