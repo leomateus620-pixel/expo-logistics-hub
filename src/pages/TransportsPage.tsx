@@ -510,7 +510,6 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
         voo_numero: editForm.titulo === 'Aeroporto' ? editForm.voo_numero || null : null,
         voo_checkin: editForm.titulo === 'Aeroporto' ? editForm.voo_checkin || null : null,
         voo_chegada: editForm.titulo === 'Aeroporto' ? editForm.voo_chegada || null : null,
-        voo_chegada_data: editForm.titulo === 'Aeroporto' ? editForm.voo_chegada_data || null : null,
         horario_saida: editForm.titulo === 'Aeroporto' ? editForm.horario_saida || null : null,
         observacoes: buildEscoltaObs(editForm),
       };
