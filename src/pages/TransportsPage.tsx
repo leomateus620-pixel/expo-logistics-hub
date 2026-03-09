@@ -978,8 +978,12 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
             <Input placeholder="KM Devolução (odômetro)" type="number" value={data.km_devolucao} onChange={(e) => setData({ ...data, km_devolucao: e.target.value })} />
             <div>
               <Label className="text-xs text-muted-foreground mb-1 block">Data/Hora devolução</Label>
-
-              <DateTimePicker value={data.fim_em} onChange={(v) => setData({ ...data, fim_em: v })} placeholder="Devolução" />
+              <input
+                type="datetime-local"
+                value={data.fim_em?.slice(0, 16) || ''}
+                onChange={(e) => setData({ ...data, fim_em: e.target.value })}
+                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              />
             </div>
           </>
         )}
