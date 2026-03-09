@@ -249,7 +249,13 @@ export default function TransportsPage() {
   const { commissions } = useCommissions();
   const { user } = useAuth();
   const { getGuestsForTransport, setGuestsForTransport } = useTransportGuests();
-  const [trackingTransportId, setTrackingTransportId] = useState<string | null>(null);
+  const [trackingTransportId, _setTrackingTransportId] = useState<string | null>(() => {
+    try { return localStorage.getItem('fenasoja_tracking_transport'); } catch { return null; }
+  });
+  const setTrackingTransportId = useCallback((id: string | null) => {
+    _setTrackingTransportId(id);
+    try { id ? localStorage.setItem('fenasoja_tracking_transport', id) : localStorage.removeItem('fenasoja_tracking_transport'); } catch { /* silent */ }
+  }, []);
   const locationTracker = useLocationTracking(trackingTransportId);
 
   useEffect(() => {
