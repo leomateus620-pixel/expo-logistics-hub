@@ -22,13 +22,26 @@ export function useTransports() {
     const user = (await supabase.auth.getUser()).data.user;
     if (!user || !orgId) return;
 
+    const inicioEm = transport.inicio_em;
+    const fimEm = transport.fim_em || (() => {
+      try {
+        if (!inicioEm) return inicioEm;
+        const start = new Date(inicioEm);
+        if (Number.isNaN(start.getTime())) return inicioEm;
+        const mins = Number(transport.duracao_estimada_min || 60);
+        return new Date(start.getTime() + mins * 60_000).toISOString();
+      } catch {
+        return inicioEm;
+      }
+    })();
+
     // Create agenda event
     const eventPayload: Record<string, any> = {
       org_id: orgId,
       created_by_user_id: user.id,
       titulo: `Transporte: ${transport.titulo || ''} ${transport.origem} → ${transport.destino}`.trim(),
-      inicio_em: transport.inicio_em,
-      fim_em: transport.fim_em || transport.inicio_em,
+      inicio_em: inicioEm,
+      fim_em: fimEm || inicioEm,
       tipo_tag: 'transporte',
       local: `${transport.origem} → ${transport.destino}`,
       descricao: `Transporte #${transportId.slice(0, 8)}`,
@@ -58,8 +71,8 @@ export function useTransports() {
       if (scheduleId) {
         const { data: shift } = await (supabase as any).from('schedule_shifts').insert({
           org_id: orgId, schedule_id: scheduleId,
-          titulo: eventPayload.titulo, inicio_em: transport.inicio_em,
-          fim_em: transport.fim_em || transport.inicio_em,
+          titulo: eventPayload.titulo, inicio_em: inicioEm,
+          fim_em: fimEm || inicioEm,
           local: eventPayload.local,
         }).select().single();
 
