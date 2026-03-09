@@ -891,8 +891,6 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
   );
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   Transport Card — Premium Liquid Glass
    ═══════════════════════════════════════════════════════════════ */
 function TransportCard({ t, members, vehicles, guests, highlightId, highlightRef, trackingTransportId, locationTracker, setTrackingTransportId, isExpanded, onToggleExpand, onCycleStatus, onEdit, onDelete, onDetail, onPDF, getDriverCommission, getGuestsForTransport }: any) {
   const sc = statusConfig[t.status] || statusConfig.pendente;
