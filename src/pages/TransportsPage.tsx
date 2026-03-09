@@ -520,7 +520,7 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
 
       // Save fim_real_em when completing
       if (statusChanged && editForm.status === 'concluido') {
-        updatePayload.fim_real_em = new Date().toISOString();
+        updatePayload.fim_real_em = nowSP();
       }
 
       await update.mutateAsync(updatePayload);
