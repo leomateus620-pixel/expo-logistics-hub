@@ -456,11 +456,11 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
         } catch { /* silent - don't fail the main transport */ }
       }
 
-      setForm({ titulo: '', origem: '', destino: '', inicio_em: '', motorista_user_id: '', vehicle_id: '', prioridade: 'media', km_retirada: '', voo_cidade: '', voo_numero: '', voo_checkin: '', voo_chegada: '', voo_chegada_data: '', horario_saida: '', escolta_nome: '', escolta_cargo: '', escolta_viaturas: '', escolta_ponto_encontro: '', escolta_contato_seguranca: '', escolta_obs: '' });
+      setForm({ titulo: '', origem: '', destino: '', inicio_em: '', motorista_user_id: '', vehicle_id: '', prioridade: 'media', km_retirada: '', voo_cidade: '', voo_numero: '', voo_checkin: '', voo_chegada: '', horario_saida: '', escolta_nome: '', escolta_cargo: '', escolta_viaturas: '', escolta_ponto_encontro: '', escolta_contato_seguranca: '', escolta_obs: '' });
       setSelectedGuests([]);
       setGuestDestinations({});
       setIncludeReturn(false);
-      setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', voo_chegada: '', voo_chegada_data: '', horario_saida: '' });
+      setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '' });
       setOpen(false);
       toast.success(includeReturn && form.titulo === 'Aeroporto' && returnForm.inicio_em ? 'Ida e volta agendados' : 'Transporte agendado');
     } catch (err: any) { toast.error(err.message); }
