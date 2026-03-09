@@ -8,7 +8,7 @@ import { useTransports } from '@/hooks/useTransports';
 import { useSchedules } from '@/hooks/useSchedules';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import { Badge } from '@/components/ui/badge';
-import { Plus, CalendarDays, Pencil, Trash2, UserPlus, Loader2, Users, Search } from 'lucide-react';
+import { Plus, CalendarDays, Pencil, Trash2, UserPlus, Loader2, Users, Search, UserCheck } from 'lucide-react';
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
