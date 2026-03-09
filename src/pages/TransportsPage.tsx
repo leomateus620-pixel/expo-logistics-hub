@@ -27,6 +27,9 @@ import { supabase } from '@/integrations/supabase/client';
 
 const DriverLocationMap = lazy(() => import('@/components/DriverLocationMap'));
 import TransportDynamicIsland from '@/components/TransportDynamicIsland';
+import TransportCard from '@/components/transport/TransportCard';
+import TransportDetailView from '@/components/transport/TransportDetailView';
+import TransportForm from '@/components/transport/TransportForm';
 
 /* ─── Status config ─── */
 const statusConfig: Record<string, { label: string; icon: typeof Check; class: string; dotClass: string; bgClass: string }> = {
