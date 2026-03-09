@@ -580,7 +580,7 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
         return;
       }
       // Starting trip — save inicio_real_em
-      await update.mutateAsync({ id: t.id, status: newStatus, inicio_real_em: new Date().toISOString() });
+      await update.mutateAsync({ id: t.id, status: newStatus, inicio_real_em: nowSP() });
       if (newStatus === 'em_andamento') {
         setTrackingTransportId(t.id);
         toast.success('Viagem iniciada — localização ativada');
