@@ -270,7 +270,7 @@ export default function TransportsPage() {
   }, [highlightId, transports]);
 
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ titulo: '', origem: '', destino: '', inicio_em: '', motorista_user_id: '', vehicle_id: '', prioridade: 'media', km_retirada: '', voo_cidade: '', voo_numero: '', voo_checkin: '', voo_chegada: '', voo_chegada_data: '', horario_saida: '', escolta_nome: '', escolta_cargo: '', escolta_viaturas: '', escolta_ponto_encontro: '', escolta_contato_seguranca: '', escolta_obs: '' });
+  const [form, setForm] = useState({ titulo: '', origem: '', destino: '', inicio_em: '', motorista_user_id: '', vehicle_id: '', prioridade: 'media', km_retirada: '', voo_cidade: '', voo_numero: '', voo_checkin: '', voo_chegada: '', horario_saida: '', escolta_nome: '', escolta_cargo: '', escolta_viaturas: '', escolta_ponto_encontro: '', escolta_contato_seguranca: '', escolta_obs: '' });
   const [selectedGuests, setSelectedGuests] = useState<string[]>([]);
   const [guestDestinations, setGuestDestinations] = useState<Record<string, string>>({});
   const [showNewGuestForm, setShowNewGuestForm] = useState(false);
