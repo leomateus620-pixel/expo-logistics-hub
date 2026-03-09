@@ -109,7 +109,9 @@ export default function GuestsPage() {
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
         <DialogContent><DialogHeader><DialogTitle>Cadastrar Hóspede</DialogTitle></DialogHeader>
           <GuestFormFields data={form} setData={setForm} />
-          <Button onClick={handleAdd} className="w-full" disabled={create.isPending}>Cadastrar</Button>
+          <Button onClick={handleAdd} className="w-full" disabled={create.isPending}>
+            {create.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Cadastrar
+          </Button>
         </DialogContent>
       </Dialog>
 
