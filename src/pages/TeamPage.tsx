@@ -273,7 +273,9 @@ export default function TeamPage() {
                 {commissions.map((c: any) => <SelectItem key={c.id} value={c.id}>{c.nome}</SelectItem>)}
               </SelectContent>
             </Select>
-            <Button onClick={handleEdit} className="w-full">Salvar</Button>
+            <Button onClick={handleEdit} className="w-full" disabled={updateMember.isPending}>
+              {updateMember.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Salvar
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
