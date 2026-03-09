@@ -278,7 +278,7 @@ export default function TransportsPage() {
   const [editShowNewGuestForm, setEditShowNewGuestForm] = useState(false);
   const [editNewGuestForm, setEditNewGuestForm] = useState({ nome: '', telefone: '', email: '', hotel_nome: '', checkin_em: '', checkout_em: '', observacoes: '' });
   const [includeReturn, setIncludeReturn] = useState(false);
-  const [returnForm, setReturnForm] = useState({ inicio_em: '', voo_numero: '', voo_checkin: '', voo_chegada: '', voo_chegada_data: '', horario_saida: '' });
+  const [returnForm, setReturnForm] = useState({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '' });
 
   const [whatsappOpen, setWhatsappOpen] = useState(false);
   const [whatsappText, setWhatsappText] = useState('');
