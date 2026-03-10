@@ -457,8 +457,7 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
             guestIds: selectedGuests,
           });
 
-          if (selectedGuests.length > 0 && returnResult?.id) {
-            try { await setGuestsForTransport.mutateAsync({ transportId: returnResult.id, guestIds: selectedGuests }); } catch { /* silent */ }
+          // guests already handled by edge function via guestIds in create
           }
         } catch { /* silent - don't fail the main transport */ }
       }
