@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import bgImage from '@/assets/fenasoja-bg-2026.png';
+import bgMobile from '@/assets/fenasoja-bg-mobile.png';
 import logoHorizontal from '@/assets/logofeira26.webp';
 import { LogIn } from 'lucide-react';
 
@@ -23,12 +24,19 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden">
-      {/* Background image */}
+      {/* Background image - desktop */}
       <img
         src={bgImage}
         alt=""
         aria-hidden="true"
-        className="absolute inset-0 w-full h-full object-contain md:object-cover bg-[#1a2e2a]"
+        className="absolute inset-0 w-full h-full object-cover hidden md:block"
+      />
+      {/* Background image - mobile */}
+      <img
+        src={bgMobile}
+        alt=""
+        aria-hidden="true"
+        className="absolute inset-0 w-full h-full object-cover md:hidden"
       />
       {/* Dark overlay */}
       <div className="absolute inset-0 bg-black/40" />
