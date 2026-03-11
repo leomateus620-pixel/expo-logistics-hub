@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import bgImage from '@/assets/fenasoja-bg-2026.png';
-import logoHorizontal from '@/assets/fenasoja-logo-horizontal.png';
+import logoHorizontal from '@/assets/logofeira26.webp';
 import { LogIn } from 'lucide-react';
 
 export default function LoginPage() {
