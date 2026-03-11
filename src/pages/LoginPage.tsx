@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { useAuth } from '@/hooks/useAuth';
-import logo from '@/assets/logofeira26.webp';
+import bgImage from '@/assets/fenasoja-bg-2026.png';
+import logoHorizontal from '@/assets/fenasoja-logo-horizontal.png';
 import { LogIn } from 'lucide-react';
 
 export default function LoginPage() {
@@ -22,39 +22,104 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <div className="w-full max-w-sm space-y-6">
-        <div className="flex flex-col items-center gap-3">
-          <img src={logo} alt="Fenasoja" className="w-16 h-16 rounded-xl object-contain bg-sidebar p-1.5" />
-          <div className="text-center">
-            <h1 className="text-xl font-bold tracking-tight">Fenasoja Logística</h1>
-            <p className="text-sm text-muted-foreground mt-1">Entre com suas credenciais</p>
+    <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden">
+      {/* Background image */}
+      <img
+        src={bgImage}
+        alt=""
+        aria-hidden="true"
+        className="absolute inset-0 w-full h-full object-cover"
+      />
+      {/* Dark overlay */}
+      <div className="absolute inset-0 bg-black/40" />
+
+      {/* Liquid Glass Card */}
+      <div
+        className="relative z-10 w-full max-w-sm rounded-2xl p-8 space-y-6"
+        style={{
+          background: 'rgba(255, 255, 255, 0.08)',
+          backdropFilter: 'blur(28px) saturate(1.5)',
+          WebkitBackdropFilter: 'blur(28px) saturate(1.5)',
+          border: '1px solid rgba(255, 255, 255, 0.15)',
+          boxShadow: '0 8px 40px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.12)',
+        }}
+      >
+        {/* Logo + Branding */}
+        <div className="flex flex-col items-center gap-4">
+          <img
+            src={logoHorizontal}
+            alt="Fenasoja 2026"
+            className="w-48 h-auto object-contain drop-shadow-lg"
+          />
+          <div className="text-center space-y-1">
+            <h1
+              className="text-2xl font-bold tracking-tight"
+              style={{
+                color: 'rgba(255, 255, 255, 0.95)',
+                textShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
+              }}
+            >
+              Fenasoja Logística
+            </h1>
+            <p
+              className="text-sm font-medium"
+              style={{
+                color: 'rgba(255, 255, 255, 0.65)',
+                textShadow: '0 1px 4px rgba(0, 0, 0, 0.2)',
+              }}
+            >
+              Comissão de Logística
+            </p>
           </div>
         </div>
+
+        {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
-          <Input
+          <input
             type="email"
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="h-11"
+            className="w-full h-12 rounded-xl px-4 text-sm text-white placeholder:text-white/50 outline-none transition-all focus:ring-2 focus:ring-white/30"
+            style={{
+              background: 'rgba(255, 255, 255, 0.1)',
+              border: '1px solid rgba(255, 255, 255, 0.15)',
+              backdropFilter: 'blur(10px)',
+            }}
           />
-          <Input
+          <input
             type="password"
             placeholder="Senha"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
-            className="h-11"
+            className="w-full h-12 rounded-xl px-4 text-sm text-white placeholder:text-white/50 outline-none transition-all focus:ring-2 focus:ring-white/30"
+            style={{
+              background: 'rgba(255, 255, 255, 0.1)',
+              border: '1px solid rgba(255, 255, 255, 0.15)',
+              backdropFilter: 'blur(10px)',
+            }}
           />
-          {error && <p className="text-sm text-destructive text-center">{error}</p>}
-          <Button type="submit" className="w-full h-11" disabled={loading}>
+          {error && (
+            <p className="text-sm text-center font-medium text-red-300 drop-shadow-sm">
+              {error}
+            </p>
+          )}
+          <Button
+            type="submit"
+            className="w-full h-12 rounded-xl text-sm font-semibold active:scale-[0.97] transition-transform"
+            disabled={loading}
+          >
             <LogIn className="w-4 h-4 mr-2" />
             {loading ? 'Entrando...' : 'Entrar'}
           </Button>
         </form>
-        <p className="text-xs text-center text-muted-foreground">
+
+        <p
+          className="text-xs text-center"
+          style={{ color: 'rgba(255, 255, 255, 0.45)' }}
+        >
           Acesso restrito. Solicite suas credenciais ao administrador.
         </p>
       </div>
