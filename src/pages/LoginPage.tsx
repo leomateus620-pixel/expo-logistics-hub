@@ -28,7 +28,7 @@ export default function LoginPage() {
         src={bgImage}
         alt=""
         aria-hidden="true"
-        className="absolute inset-0 w-full h-full object-cover"
+        className="absolute inset-0 w-full h-full object-contain md:object-cover bg-[#1a2e2a]"
       />
       {/* Dark overlay */}
       <div className="absolute inset-0 bg-black/40" />
