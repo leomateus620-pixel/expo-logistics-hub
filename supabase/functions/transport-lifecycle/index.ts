@@ -2,7 +2,14 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+};
+
+// Minimum role required for each action
+const ACTION_MIN_ROLES: Record<string, string[]> = {
+  create: ["admin", "gestor", "operador"],
+  update: ["admin", "gestor", "operador"],
+  delete: ["admin", "gestor"],
 };
 
 Deno.serve(async (req) => {
@@ -39,6 +46,23 @@ Deno.serve(async (req) => {
 
     const { action, payload } = await req.json();
 
+    // Validate role before executing action
+    const allowedRoles = ACTION_MIN_ROLES[action];
+    if (!allowedRoles) {
+      return err("Ação inválida", 400);
+    }
+
+    const orgId = action === "create" ? payload?.transport?.org_id : payload?.orgId;
+    if (orgId) {
+      const { data: roleData } = await admin.rpc("get_user_org_role", {
+        _user_id: user.id,
+        _org_id: orgId,
+      });
+      if (!roleData || !allowedRoles.includes(roleData)) {
+        return err("Sem permissão para esta operação", 403);
+      }
+    }
+
     if (action === "create") {
       return await handleCreate(admin, user.id, payload);
     } else if (action === "update") {
@@ -46,13 +70,10 @@ Deno.serve(async (req) => {
     } else if (action === "delete") {
       return await handleDelete(admin, user.id, payload);
     } else {
-      return new Response(JSON.stringify({ error: "Ação inválida" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return err("Ação inválida", 400);
     }
-  } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), {
+  } catch (err_) {
+    return new Response(JSON.stringify({ error: (err_ as Error).message }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
@@ -107,7 +128,9 @@ async function handleCreate(admin: any, userId: string, payload: any) {
   // Auto-create event + schedule + shift
   try {
     await createEventAndShift(admin, userId, transport, data.id);
-  } catch { /* silent */ }
+  } catch (e) {
+    console.error("[transport-lifecycle] Failed to create event/shift:", e);
+  }
 
   return ok({ data });
 }
@@ -157,14 +180,18 @@ async function handleUpdate(admin: any, userId: string, payload: any) {
         _org_id: orgId,
         _guest_ids: guestIds || [],
       });
-    } catch { /* silent */ }
+    } catch (e) {
+      console.error("[transport-lifecycle] Failed to set guests:", e);
+    }
   }
 
   // Handle cancel → cleanup events
   if (updates.status === "cancelado" && before?.status !== "cancelado") {
     try {
       await cleanupTransportEvents(admin, orgId, id, "cancel");
-    } catch { /* silent */ }
+    } catch (e) {
+      console.error("[transport-lifecycle] Failed to cleanup events on cancel:", e);
+    }
   }
 
   // Handle completion → create vehicle_usage + update vehicle km
@@ -183,7 +210,11 @@ async function handleUpdate(admin: any, userId: string, payload: any) {
         .from("vehicles")
         .update({ km_atual: vehicleUsage.km_chegada })
         .eq("id", vehicleUsage.vehicle_id);
-    } catch { /* silent */ }
+    } catch (e) {
+      console.error("[transport-lifecycle] Failed to create vehicle_usage:", e);
+      // This is critical — propagate the error
+      return err("Erro ao registrar uso do veículo: " + (e as Error).message);
+    }
   }
 
   return ok({ data });
@@ -202,7 +233,9 @@ async function handleDelete(admin: any, userId: string, payload: any) {
   // Cleanup linked events
   try {
     await cleanupTransportEvents(admin, orgId, id, "delete");
-  } catch { /* silent */ }
+  } catch (e) {
+    console.error("[transport-lifecycle] Failed to cleanup events on delete:", e);
+  }
 
   const { error } = await admin.from("transports").delete().eq("id", id);
   if (error) return err(error.message);

@@ -1,4 +1,4 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -21,12 +21,34 @@ const knownDestinations: Record<string, { lat: number; lng: number; label: strin
 // Santa Rosa origin (Parque de Exposições)
 const SANTA_ROSA = { lat: -27.8708, lng: -54.4814 };
 
-serve(async (req) => {
+Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    // Validate JWT — only authenticated users can call this
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseAnonKey = Deno.env.get('SUPABASE_ANON_KEY')!;
+    const userClient = createClient(supabaseUrl, supabaseAnonKey, {
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data, error: authError } = await userClient.auth.getUser();
+    if (authError || !data?.user) {
+      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
     const GOOGLE_MAPS_API_KEY = Deno.env.get('GOOGLE_MAPS_API_KEY');
     if (!GOOGLE_MAPS_API_KEY) {
       throw new Error('GOOGLE_MAPS_API_KEY is not configured');
@@ -104,20 +126,20 @@ async function computeRoute(apiKey: string, oLat: number, oLng: number, dLat: nu
     body: JSON.stringify(requestBody),
   });
 
-  const data = await response.json();
+  const responseData = await response.json();
 
-  if (!response.ok || !data.routes?.length) {
-    console.error('Google Routes API error:', JSON.stringify(data));
+  if (!response.ok || !responseData.routes?.length) {
+    console.error('Google Routes API error:', JSON.stringify(responseData));
     return new Response(
       JSON.stringify({ 
-        error: data.error?.message || 'Routes API error',
+        error: responseData.error?.message || 'Routes API error',
         fallback: true,
       }),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 
-  const route = data.routes[0];
+  const route = responseData.routes[0];
   const durationStr = route.duration || '0s';
   const durationSeconds = parseInt(durationStr.replace('s', ''), 10) || 0;
   const durationMinutes = Math.ceil(durationSeconds / 60);

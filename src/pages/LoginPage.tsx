@@ -15,9 +15,10 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading) return; // double-submit protection
     setError('');
     setLoading(true);
-    const { error } = await signIn(email, password);
+    const { error } = await signIn(email.trim(), password);
     if (error) setError('Email ou senha incorretos');
     setLoading(false);
   };

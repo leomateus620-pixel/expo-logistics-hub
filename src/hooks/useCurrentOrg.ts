@@ -42,7 +42,8 @@ export function useCurrentOrg() {
     },
   });
 
-  const orgId = membership?.org_id || localStorage.getItem(ORG_KEY) || null;
+  // Only use membership data as orgId source; don't fallback to stale localStorage
+  const orgId = membership?.org_id || null;
   const orgName = (membership?.organizations as any)?.nome || '';
   const myRole = membership?.role || null;
 

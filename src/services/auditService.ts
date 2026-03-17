@@ -7,13 +7,18 @@ export async function logAudit(params: {
   action: 'create' | 'update' | 'delete' | 'status_change' | 'import';
   before?: Record<string, unknown> | null;
   after?: Record<string, unknown> | null;
+  userId?: string;
 }) {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return;
+  let actorId = params.userId;
+  if (!actorId) {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+    actorId = user.id;
+  }
 
   await (supabase as any).from('audit_log').insert({
     org_id: params.orgId,
-    actor_user_id: user.id,
+    actor_user_id: actorId,
     entity: params.entity,
     entity_id: params.entityId,
     action: params.action,
