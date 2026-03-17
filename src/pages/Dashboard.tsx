@@ -14,7 +14,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn, rawTime, rawDateShort, todaySP } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
-import { useMemo } from 'react';
+import { useMemo, memo } from 'react';
 
 function getGreeting(): string {
   const h = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: 'numeric', hour12: false });
