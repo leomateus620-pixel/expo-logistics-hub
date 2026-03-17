@@ -446,7 +446,10 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
           });
 
           // guests handled by edge function via guestIds in create
-        } catch { /* silent - don't fail the main transport */ }
+        } catch (returnErr: any) {
+          console.error('Failed to create return trip:', returnErr);
+          toast.warning('Ida agendada, mas houve erro ao criar a volta. Tente criar manualmente.');
+        }
       }
 
       setForm({ titulo: '', origem: '', destino: '', inicio_em: '', motorista_user_id: '', vehicle_id: '', prioridade: 'media', km_retirada: '', voo_cidade: '', voo_numero: '', voo_checkin: '', voo_chegada: '', horario_saida: '', escolta_nome: '', escolta_cargo: '', escolta_viaturas: '', escolta_ponto_encontro: '', escolta_contato_seguranca: '', escolta_obs: '' });
