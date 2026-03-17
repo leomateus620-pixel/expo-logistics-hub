@@ -69,11 +69,16 @@ function getDestCoords(t: any): { lat: number; lng: number } | null {
 async function fetchTravelMinutes(cidade: string): Promise<number | null> {
   try {
     const destination = `Aeroporto_${cidade}`;
+    const { data: { session } } = await supabase.auth.getSession();
     const res = await fetch(
       `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/estimate-return`,
       {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          'Authorization': `Bearer ${session?.access_token || ''}`,
+        },
         body: JSON.stringify({ origin_lat: SANTA_ROSA_LAT, origin_lng: SANTA_ROSA_LNG, destination }),
       }
     );
