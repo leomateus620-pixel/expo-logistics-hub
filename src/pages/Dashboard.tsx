@@ -105,8 +105,14 @@ export default function Dashboard() {
   const activeTransports = transports.filter((t: any) => t.status === 'em_andamento').length;
   const pendingTasks = tasks.filter((t: any) => t.status === 'pendente').length;
 
-  const todayEvents = useMemo(() => events.filter((e: any) => e.inicio_em?.startsWith(todayStr)), [events, todayStr]);
-  const tomorrowEvents = useMemo(() => events.filter((e: any) => e.inicio_em?.startsWith(tomorrowStr)), [events, tomorrowStr]);
+  // Convert event timestamps to SP date for proper timezone comparison
+  const toSPDate = (iso: string): string => {
+    try {
+      return new Date(iso).toLocaleDateString('sv-SE', { timeZone: 'America/Sao_Paulo' });
+    } catch { return ''; }
+  };
+  const todayEvents = useMemo(() => events.filter((e: any) => e.inicio_em && toSPDate(e.inicio_em) === todayStr), [events, todayStr]);
+  const tomorrowEvents = useMemo(() => events.filter((e: any) => e.inicio_em && toSPDate(e.inicio_em) === tomorrowStr), [events, tomorrowStr]);
 
   const logisticsMembers = useMemo(() =>
     members.filter((m: any) => m.commission_nome && m.commission_nome.toUpperCase().includes('LOG')),
