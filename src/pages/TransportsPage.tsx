@@ -135,23 +135,8 @@ async function calcSuggestedDeparture(cidade: string, flightTime: string, isChec
   return subtractMinutes(flightTime, buffer);
 }
 
-function ensureSPTimestamptz(value: string): string {
-  if (!value) return value;
-
-  // Already has timezone info
-  if (/[zZ]$/.test(value) || /[+-]\d{2}:\d{2}$/.test(value)) return value;
-
-  // Date only
-  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return `${value}T00:00:00-03:00`;
-
-  // datetime-local (YYYY-MM-DDTHH:MM)
-  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value)) return `${value}:00-03:00`;
-
-  // datetime without tz but with seconds
-  if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/.test(value)) return `${value}-03:00`;
-
-  return value;
-}
+// Use unified ensureSPOffset from utils (DATA-01 fix)
+const ensureSPTimestamptz = ensureSPOffset;
 
 const estimatedDurationMin: Record<string, number> = {
   'Aeroporto': 120, 'Hotel': 45, 'Parque': 30, 'Centro': 40, 'Escolta Policial': 90, 'Outros': 60,
