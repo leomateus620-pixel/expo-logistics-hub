@@ -94,11 +94,16 @@ async function fetchTravelMinutes(cidade: string): Promise<number | null> {
 async function fetchRoutePreview(destKey: string): Promise<{ duration_minutes: number; distance_km: number; polyline?: string } | null> {
   try {
     const dest = knownDestCoords[destKey] || knownDestCoords['Outros'];
+    const { data: { session } } = await supabase.auth.getSession();
     const res = await fetch(
       `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/estimate-return`,
       {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY },
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          'Authorization': `Bearer ${session?.access_token || ''}`,
+        },
         body: JSON.stringify({
           mode: 'ROUTE_PREVIEW',
           origin_lat: SANTA_ROSA_LAT,
