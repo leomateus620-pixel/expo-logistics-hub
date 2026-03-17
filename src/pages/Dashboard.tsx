@@ -82,6 +82,67 @@ function Section({ title, icon: Icon, badge, children, onSeeAll, loading, empty,
   );
 }
 
+/* ─── MembersList extracted component ─── */
+const MembersList = memo(function MembersList({ logisticsMembers, assignments, shifts, transports }: {
+  logisticsMembers: any[]; assignments: any[]; shifts: any[]; transports: any[];
+}) {
+  const now = new Date();
+  const todayStrLocal = now.toLocaleDateString('sv-SE', { timeZone: 'America/Sao_Paulo' });
+
+  const memberShiftMap = useMemo(() => {
+    const map = new Map<string, { hasShiftToday: boolean; isInShiftNow: boolean }>();
+    for (const a of assignments) {
+      if (a.status === 'cancelado') continue;
+      const shift = shifts.find((s: any) => s.id === a.schedule_shift_id);
+      if (!shift) continue;
+      const uid = a.member_user_id;
+      const existing = map.get(uid) || { hasShiftToday: false, isInShiftNow: false };
+      try {
+        const shiftDate = new Date(shift.inicio_em).toLocaleDateString('sv-SE', { timeZone: 'America/Sao_Paulo' });
+        if (shiftDate === todayStrLocal) existing.hasShiftToday = true;
+      } catch { /* skip */ }
+      if (new Date(shift.inicio_em) <= now && new Date(shift.fim_em) >= now) existing.isInShiftNow = true;
+      map.set(uid, existing);
+    }
+    return map;
+  }, [assignments, shifts, todayStrLocal]);
+
+  return (
+    <div className="space-y-1.5">
+      {logisticsMembers.map((m: any) => {
+        const isInTransport = transports.some((t: any) => t.motorista_user_id === m.user_id && t.status === 'em_andamento');
+        const shiftData = memberShiftMap.get(m.user_id) || { hasShiftToday: false, isInShiftNow: false };
+
+        let statusLabel: string;
+        let statusClass: string;
+        if (isInTransport) {
+          statusLabel = 'Em deslocamento';
+          statusClass = 'bg-accent/15 text-accent';
+        } else if (shiftData.hasShiftToday) {
+          statusLabel = 'Disponível';
+          statusClass = 'bg-success/15 text-success';
+        } else {
+          statusLabel = 'OFF';
+          statusClass = 'bg-destructive/15 text-destructive';
+        }
+
+        return (
+          <div key={m.id} className="flex items-center gap-2.5 p-2.5 rounded-xl bg-muted/40">
+            <div className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold text-primary-foreground shrink-0" style={{ backgroundColor: m.avatar_color || 'hsl(var(--primary))' }}>
+              {(m.nome_exibicao || '?').split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()}
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs font-medium truncate">{m.nome_exibicao}</p>
+              <p className="text-[10px] text-muted-foreground">{m.cargo || '—'}</p>
+            </div>
+            <Badge className={cn('text-[9px] px-2 py-0.5 rounded-full', statusClass)}>{statusLabel}</Badge>
+          </div>
+        );
+      })}
+    </div>
+  );
+});
+
 export default function Dashboard() {
   const navigate = useNavigate();
   const { vehicles, isLoading: loadVehicles } = useVehicles();
