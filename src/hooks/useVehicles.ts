@@ -57,5 +57,14 @@ export function useVehicles() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['vehicles'] }),
   });
 
-  return { vehicles, isLoading, create, update, remove };
+  const uploadDocument = async (file: File, vehicleId: string): Promise<string> => {
+    const ext = file.name.split('.').pop() || 'pdf';
+    const path = `${orgId}/${vehicleId}/${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from('vehicle-documents').upload(path, file);
+    if (error) throw error;
+    const { data } = supabase.storage.from('vehicle-documents').getPublicUrl(path);
+    return data.publicUrl;
+  };
+
+  return { vehicles, isLoading, create, update, remove, uploadDocument };
 }
