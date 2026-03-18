@@ -465,7 +465,7 @@ function VehicleDetailContent({ vehicle, members, userId, kmTotal, fuelCostTotal
 }) {
   const { usages, createUsage, updateUsage } = useVehicleUsage(vehicle.id);
   const { transports } = useTransports();
-  const { update: updateVehicle } = useVehicles();
+  const { update: updateVehicle, uploadDocument } = useVehicles();
   const { records: fuelRecords, create: createFuel, updateFuel, uploadReceipt } = useFuelRecords(vehicle.id);
   const navigate = useNavigate();
 
@@ -482,6 +482,7 @@ function VehicleDetailContent({ vehicle, members, userId, kmTotal, fuelCostTotal
   const [fuelLoading, setFuelLoading] = useState(false);
   const [editFuelId, setEditFuelId] = useState<string | null>(null);
   const [editFuelForm, setEditFuelForm] = useState({ litros: '', valor: '', km_abastecimento: '', posto: '', observacoes: '' });
+  const [docUploading, setDocUploading] = useState(false);
 
   const openFuelEdit = (f: any) => {
     setEditFuelId(f.id);
