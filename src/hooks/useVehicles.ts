@@ -15,7 +15,7 @@ export function useVehicles() {
         .from('vehicles')
         .select('*')
         .eq('org_id', orgId)
-        .order('created_at', { ascending: false });
+        .order('modelo', { ascending: true });
       return data || [];
     },
     enabled: !!orgId,
