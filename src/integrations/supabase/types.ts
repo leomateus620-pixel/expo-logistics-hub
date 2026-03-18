@@ -1095,6 +1095,7 @@ export type Database = {
           categoria: string | null
           cor: string | null
           created_at: string
+          documento_url: string | null
           id: string
           km_atual: number | null
           marca: string | null
@@ -1111,6 +1112,7 @@ export type Database = {
           categoria?: string | null
           cor?: string | null
           created_at?: string
+          documento_url?: string | null
           id?: string
           km_atual?: number | null
           marca?: string | null
@@ -1127,6 +1129,7 @@ export type Database = {
           categoria?: string | null
           cor?: string | null
           created_at?: string
+          documento_url?: string | null
           id?: string
           km_atual?: number | null
           marca?: string | null
