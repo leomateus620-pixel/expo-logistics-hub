@@ -1,4 +1,5 @@
 import { useTransports } from '@/hooks/useTransports';
+import StartTripDialog from '@/components/transport/StartTripDialog';
 import { useOrgMembers } from '@/hooks/useOrgMembers';
 import { useVehicles } from '@/hooks/useVehicles';
 import { useGuests } from '@/hooks/useGuests';
@@ -238,7 +239,7 @@ function getMiniMapUrl(originLat: number, originLng: number, destLat: number, de
 }
 
 export default function TransportsPage() {
-  const { transports, create, update, remove } = useTransports();
+  const { transports, create, update, remove, start } = useTransports();
   const { members } = useOrgMembers();
   const { vehicles } = useVehicles();
   const { guests, create: createGuest } = useGuests();
@@ -288,6 +289,9 @@ export default function TransportsPage() {
 
   const [whatsappOpen, setWhatsappOpen] = useState(false);
   const [whatsappText, setWhatsappText] = useState('');
+
+  const [startTripDialogOpen, setStartTripDialogOpen] = useState(false);
+  const [startTripWhatsappData, setStartTripWhatsappData] = useState<any>(null);
 
   const [editOpen, setEditOpen] = useState(false);
   const [editId, setEditId] = useState('');
@@ -581,11 +585,22 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
         setEditOpen(true);
         return;
       }
-      // Starting trip — save inicio_real_em
-      await update.mutateAsync({ id: t.id, updates: { status: newStatus, inicio_real_em: nowSP() } });
+      // Starting trip — use start mutation with backend validation
       if (newStatus === 'em_andamento') {
-        setTrackingTransportId(t.id);
-        toast.success('Viagem iniciada — localização ativada');
+        try {
+          const result = await start.mutateAsync({ id: t.id });
+          // Set up tracking
+          setTrackingTransportId(t.id);
+          toast.success('Viagem iniciada — localização ativada');
+          // Show WhatsApp dialog
+          if (result?.whatsapp) {
+            setStartTripWhatsappData(result.whatsapp);
+            setStartTripDialogOpen(true);
+          }
+        } catch {
+          // Error already handled by onError in the mutation
+        }
+        return;
       }
     }
   };
@@ -886,6 +901,13 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
           {detailTransport && <TransportDetailView t={detailTransport} members={members} vehicles={vehicles} guests={guests} getDriverCommission={getDriverCommission} getGuestsForTransport={getGuestsForTransport} onPDF={() => generatePDF(detailTransport)} />}
         </DialogContent>
       </Dialog>
+
+      {/* ─── Start Trip WhatsApp Dialog ─── */}
+      <StartTripDialog
+        open={startTripDialogOpen}
+        onOpenChange={setStartTripDialogOpen}
+        whatsappData={startTripWhatsappData}
+      />
     </div>
   );
 }

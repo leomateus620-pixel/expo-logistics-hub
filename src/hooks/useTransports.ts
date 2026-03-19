@@ -92,5 +92,26 @@ export function useTransports() {
     onSuccess: invalidateAll,
   });
 
-  return { transports, isLoading, create, update, remove };
+  const start = useMutation({
+    mutationFn: async (params: { id: string }) => {
+      const result = await invokeLifecycle('start', { id: params.id, orgId });
+      return result;
+    },
+    onError: (error: any) => {
+      if (error?.message?.includes('modificado por outro usuário')) {
+        toast.error('Registro modificado por outro usuário', {
+          description: 'Recarregue os dados para ver a versão mais recente.',
+          action: {
+            label: 'Recarregar',
+            onClick: () => qc.invalidateQueries({ queryKey: ['transports'] }),
+          },
+        });
+      } else {
+        toast.error(error?.message || 'Erro ao iniciar viagem');
+      }
+    },
+    onSuccess: invalidateAll,
+  });
+
+  return { transports, isLoading, create, update, remove, start };
 }

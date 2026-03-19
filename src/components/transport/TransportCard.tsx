@@ -1,9 +1,10 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Check, Clock, X, Pencil, Trash2, FileText, Navigation, Play, Square, ChevronDown, ChevronUp } from 'lucide-react';
+import { Check, Clock, X, Pencil, Trash2, FileText, Navigation, Play, Square, ChevronDown, ChevronUp, MessageCircle } from 'lucide-react';
 import { cn, rawTime, rawDateShort } from '@/lib/utils';
 import TransportDynamicIsland from '@/components/TransportDynamicIsland';
+import { buildTripMessage, buildWhatsAppUrl, isValidPhone } from '@/lib/whatsapp';
 
 const statusConfig: Record<string, { label: string; icon: typeof Check; class: string; dotClass: string; bgClass: string }> = {
   pendente: { label: 'Pendente', icon: Clock, class: 'text-info', dotClass: 'bg-info', bgClass: 'bg-info/10 border-info/20' },
@@ -172,6 +173,25 @@ export default function TransportCard({ t, members, vehicles, guests, highlightI
                 <Check className="w-3 h-3" /> Concluído
               </Badge>
             </div>
+          )}
+          {isActive && guest?.telefone && isValidPhone(guest.telefone) && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="h-10 text-xs rounded-xl gap-1.5 text-[hsl(142,70%,40%)] border-[hsl(142,70%,40%)]/30 hover:bg-[hsl(142,70%,40%)]/10"
+              onClick={() => {
+                const msg = buildTripMessage({
+                  guestName: guest.nome,
+                  driverName: driver?.nome_exibicao || 'Motorista',
+                  destino: t.destino,
+                  titulo: t.titulo,
+                });
+                window.open(buildWhatsAppUrl(guest.telefone, msg), '_blank');
+              }}
+            >
+              <MessageCircle className="w-3.5 h-3.5" />
+              Hóspede
+            </Button>
           )}
           <Button size="icon" variant="ghost" className="h-10 w-10 shrink-0 rounded-xl" onClick={onEdit}>
             <Pencil className="w-4 h-4" />
