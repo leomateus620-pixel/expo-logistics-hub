@@ -97,6 +97,121 @@ function err(message: string, status = 400) {
   });
 }
 
+// ── START ───────────────────────────────────────────────────
+async function handleStart(admin: any, userId: string, payload: any) {
+  const { id, orgId } = payload;
+
+  // Fetch current transport
+  const { data: transport, error: fetchErr } = await admin
+    .from("transports")
+    .select("*")
+    .eq("id", id)
+    .single();
+  if (fetchErr || !transport) return err("Transporte não encontrado", 404);
+
+  // Validate status transition
+  if (transport.status !== "pendente") {
+    return err(`Não é possível iniciar uma viagem com status "${transport.status}"`, 400);
+  }
+
+  // Validate driver
+  if (!transport.motorista_user_id) {
+    return err("Motorista não vinculado ao transporte", 400);
+  }
+
+  // Fetch guests via transport_guests junction
+  const { data: tgLinks } = await admin
+    .from("transport_guests")
+    .select("guest_id")
+    .eq("transport_id", id);
+
+  let guestPhone: string | null = null;
+  let guestName: string | null = null;
+
+  if (tgLinks && tgLinks.length > 0) {
+    const guestIds = tgLinks.map((l: any) => l.guest_id);
+    const { data: guestsData } = await admin
+      .from("guests")
+      .select("id, nome, telefone")
+      .in("id", guestIds);
+
+    // Find first guest with valid phone
+    const guestWithPhone = guestsData?.find((g: any) => g.telefone && g.telefone.replace(/\D/g, "").length >= 10);
+    if (guestWithPhone) {
+      guestPhone = guestWithPhone.telefone;
+      guestName = guestWithPhone.nome;
+    } else if (guestsData && guestsData.length > 0) {
+      guestName = guestsData[0].nome;
+    }
+  }
+
+  // Update transport status
+  const now = new Date().toISOString();
+  const { data: updated, error: updateErr } = await admin
+    .from("transports")
+    .update({ status: "em_andamento", inicio_real_em: now })
+    .eq("id", id)
+    .select()
+    .single();
+  if (updateErr) return err(updateErr.message);
+
+  // Audit log
+  await admin.from("audit_log").insert({
+    org_id: orgId,
+    actor_user_id: userId,
+    entity: "transports",
+    entity_id: id,
+    action: "status_change",
+    before_data: { status: transport.status },
+    after_data: { status: "em_andamento", inicio_real_em: now },
+  });
+
+  // Get driver name
+  const { data: driverMember } = await admin
+    .from("org_members")
+    .select("nome_exibicao")
+    .eq("user_id", transport.motorista_user_id)
+    .eq("org_id", orgId)
+    .single();
+  const driverName = driverMember?.nome_exibicao || "Motorista";
+
+  // Build WhatsApp message
+  let destinoLabel = transport.destino || "";
+  if (transport.titulo === "Aeroporto") {
+    destinoLabel = `Aeroporto${transport.voo_cidade ? ` de ${transport.voo_cidade}` : ""}`;
+  }
+
+  const message = guestName
+    ? `Olá, ${guestName}. Aqui é ${driverName}, motorista responsável pelo seu transporte da Fenasoja Logística. Estou iniciando agora o deslocamento para o ${destinoLabel}. Qualquer necessidade, fico à disposição por aqui.`
+    : `Transporte iniciado para ${destinoLabel}. Motorista: ${driverName}.`;
+
+  // Normalize phone
+  let normalizedPhone = "";
+  let phoneValid = false;
+  if (guestPhone) {
+    const digits = guestPhone.replace(/\D/g, "");
+    normalizedPhone = digits.length >= 12 ? digits : `55${digits}`;
+    phoneValid = normalizedPhone.length >= 12 && normalizedPhone.length <= 15;
+  }
+
+  const whatsappUrl = phoneValid
+    ? `https://wa.me/${normalizedPhone}?text=${encodeURIComponent(message)}`
+    : "";
+
+  return ok({
+    data: updated,
+    whatsapp: {
+      phone: normalizedPhone,
+      message,
+      url: whatsappUrl,
+      guestName: guestName || "",
+      driverName,
+      startedAt: now,
+      phoneValid,
+    },
+  });
+}
+
 // ── CREATE ──────────────────────────────────────────────────
 async function handleCreate(admin: any, userId: string, payload: any) {
   const { transport, guestIds } = payload;
