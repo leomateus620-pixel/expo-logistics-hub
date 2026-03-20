@@ -347,9 +347,10 @@ export default function VehiclesPage() {
 
       {/* Add dialog */}
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
-        <DialogContent className="sm:max-w-md liquid-glass-card border-border/40">
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-lg font-bold">Adicionar Veículo</DialogTitle>
+            <DialogTitle>Adicionar Veículo</DialogTitle>
+            <DialogDescription>Cadastre um novo veículo na frota</DialogDescription>
           </DialogHeader>
           <div className="space-y-3 pt-2">
             <Input placeholder="Placa (ex: ABC-1D23)" value={addForm.placa} onChange={(e) => setAddForm({ ...addForm, placa: e.target.value })} className="h-11" />
@@ -362,7 +363,7 @@ export default function VehiclesPage() {
               <Input placeholder="Cor" value={addForm.cor} onChange={(e) => setAddForm({ ...addForm, cor: e.target.value })} className="h-11" />
               <Input placeholder="KM atual" type="number" value={addForm.km_atual} onChange={(e) => setAddForm({ ...addForm, km_atual: e.target.value })} className="h-11" />
             </div>
-            <Button onClick={handleAdd} className="w-full h-11 font-semibold" disabled={create.isPending}>
+            <Button onClick={handleAdd} className="w-full h-11 rounded-xl font-semibold active:scale-[0.97] transition-all" disabled={create.isPending}>
               {create.isPending ? 'Adicionando...' : 'Adicionar Veículo'}
             </Button>
           </div>
