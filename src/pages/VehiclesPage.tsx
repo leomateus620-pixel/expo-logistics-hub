@@ -13,7 +13,7 @@ import { Badge } from '@/components/ui/badge';
 import { cn, nowSP } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useState, useMemo, useCallback } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
