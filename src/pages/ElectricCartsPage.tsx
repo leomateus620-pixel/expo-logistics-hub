@@ -116,11 +116,11 @@ export default function ElectricCartsPage() {
           <p className="text-sm text-muted-foreground mt-1">Gerencie os carrinhos elétricos do evento</p>
         </div>
         <div className="flex gap-2">
-          <Button size="sm" variant="outline" onClick={openPickup} className="h-10 sm:h-9">
-            <Zap className="w-4 h-4 mr-1" /> Retirada
+          <Button size="sm" variant="outline" onClick={openPickup} className="h-10 sm:h-9 gap-1.5 rounded-xl shadow-sm active:scale-[0.97] transition-transform">
+            <Zap className="w-4 h-4" /> Retirada
           </Button>
-          <Button size="sm" onClick={() => setAddOpen(true)} className="h-10 sm:h-9">
-            <Plus className="w-4 h-4 mr-1" /> Adicionar
+          <Button size="sm" onClick={() => setAddOpen(true)} className="h-10 sm:h-9 gap-1.5 rounded-xl shadow-sm active:scale-[0.97] transition-transform">
+            <Plus className="w-4 h-4" /> Adicionar
           </Button>
         </div>
       </div>

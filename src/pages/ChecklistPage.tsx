@@ -201,7 +201,7 @@ export default function ChecklistPage() {
         </div>
         <Dialog open={open} onOpenChange={setOpen}>
           <DialogTrigger asChild>
-            <Button size="sm"><Plus className="w-4 h-4 mr-1" /> Nova Tarefa</Button>
+            <Button size="sm" className="h-10 sm:h-9 gap-1.5 rounded-xl shadow-sm active:scale-[0.97] transition-transform"><Plus className="w-4 h-4" /> Nova Tarefa</Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader><DialogTitle>Criar Tarefa</DialogTitle></DialogHeader>

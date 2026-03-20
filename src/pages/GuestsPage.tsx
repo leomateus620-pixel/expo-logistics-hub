@@ -101,8 +101,8 @@ export default function GuestsPage() {
           <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Hóspedes</h1>
           <p className="text-sm text-muted-foreground mt-1">Hospedagem e traslados dos convidados</p>
         </div>
-        <Button size="sm" onClick={() => setAddOpen(true)}>
-          <Plus className="w-4 h-4 mr-1" /> Novo Hóspede
+        <Button size="sm" onClick={() => setAddOpen(true)} className="h-10 sm:h-9 gap-1.5 rounded-xl shadow-sm active:scale-[0.97] transition-transform">
+          <Plus className="w-4 h-4" /> Novo Hóspede
         </Button>
       </div>
 

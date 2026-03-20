@@ -206,9 +206,9 @@ export default function VehiclesPage() {
         <Button
           size="sm"
           onClick={() => setAddOpen(true)}
-          className="h-10 sm:h-9 liquid-glass-card bg-primary/90 hover:bg-primary text-primary-foreground border-primary/30 shadow-lg"
+          className="h-10 sm:h-9 gap-1.5 rounded-xl shadow-sm active:scale-[0.97] transition-transform"
         >
-          <Plus className="w-4 h-4 mr-1" /> Adicionar
+          <Plus className="w-4 h-4" /> Adicionar
         </Button>
       </div>
 
