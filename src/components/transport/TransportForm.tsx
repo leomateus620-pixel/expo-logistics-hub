@@ -359,7 +359,13 @@ export default function TransportForm({
                 <SelectTrigger><SelectValue placeholder="Motorista" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">Nenhum</SelectItem>
-                  {members.map((m: any) => <SelectItem key={m.user_id} value={m.user_id}>{m.nome_exibicao}</SelectItem>)}
+                  {(() => {
+                    const isAeroporto = data.titulo?.toLowerCase().includes('aeroporto');
+                    const filtered = isAeroporto
+                      ? members.filter((m: any) => m.commission_nome?.toUpperCase().includes('LOGÍSTICA') || m.commission_nome?.toUpperCase().includes('LOGISTICA'))
+                      : members;
+                    return filtered.map((m: any) => <SelectItem key={m.user_id} value={m.user_id}>{m.nome_exibicao}</SelectItem>);
+                  })()}
                 </SelectContent>
               </Select>
             </div>
