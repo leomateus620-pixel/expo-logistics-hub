@@ -369,6 +369,12 @@ export default function TransportForm({
                 </SelectContent>
               </Select>
             </div>
+            {data.titulo?.toLowerCase().includes('aeroporto') && (
+              <p className="text-[11px] text-accent font-medium flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-accent inline-block" />
+                Apenas motoristas da comissão de Logística
+              </p>
+            )}
             {driverCommission && (
               <p className="text-xs text-muted-foreground">Comissão: <span className="font-medium text-foreground">{driverCommission}</span></p>
             )}

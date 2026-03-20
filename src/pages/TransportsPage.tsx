@@ -847,13 +847,13 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
 
       {/* ─── WhatsApp Dialog ─── */}
       <Dialog open={whatsappOpen} onOpenChange={setWhatsappOpen}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>📋 Texto para WhatsApp</DialogTitle>
-            <DialogDescription>Copie e envie ao responsável pela segurança</DialogDescription>
+            <DialogDescription>Copie o texto e envie ao responsável pela segurança</DialogDescription>
           </DialogHeader>
-          <div className="bg-muted rounded-lg p-4 text-sm whitespace-pre-wrap font-mono border">{whatsappText}</div>
-          <Button onClick={() => { navigator.clipboard.writeText(whatsappText); toast.success('Copiado!'); }} className="w-full">
+          <div className="bg-muted/50 rounded-xl p-4 text-sm whitespace-pre-wrap font-mono border border-border/40">{whatsappText}</div>
+          <Button onClick={() => { navigator.clipboard.writeText(whatsappText); toast.success('Copiado!'); }} className="w-full h-11 rounded-xl font-semibold active:scale-[0.97] transition-all">
             📋 Copiar Texto
           </Button>
         </DialogContent>

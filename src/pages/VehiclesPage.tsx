@@ -372,9 +372,10 @@ export default function VehiclesPage() {
 
       {/* Edit dialog */}
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
-        <DialogContent className="sm:max-w-md liquid-glass-card border-border/40">
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
-            <DialogTitle className="text-lg font-bold">Editar Veículo</DialogTitle>
+            <DialogTitle>Editar Veículo</DialogTitle>
+            <DialogDescription>Atualize as informações do veículo</DialogDescription>
           </DialogHeader>
           <div className="space-y-3 pt-2">
             <Input placeholder="Placa" value={editForm.placa} onChange={(e) => setEditForm({ ...editForm, placa: e.target.value })} className="h-11" />
@@ -402,7 +403,7 @@ export default function VehiclesPage() {
                 ))}
               </SelectContent>
             </Select>
-            <Button onClick={handleEdit} className="w-full h-11 font-semibold" disabled={update.isPending}>
+            <Button onClick={handleEdit} className="w-full h-11 rounded-xl font-semibold active:scale-[0.97] transition-all" disabled={update.isPending}>
               {update.isPending ? 'Salvando...' : 'Salvar Alterações'}
             </Button>
           </div>
