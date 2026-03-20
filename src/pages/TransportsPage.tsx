@@ -807,10 +807,10 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
 
       {/* ─── Edit Dialog ─── */}
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>{editForm.status === 'concluido' ? 'Finalizar Viagem' : 'Editar Transporte'}</DialogTitle>
-            <DialogDescription>{editForm.status === 'concluido' ? 'Preencha os dados finais da viagem' : 'Atualize os dados do transporte'}</DialogDescription>
+            <DialogDescription>{editForm.status === 'concluido' ? 'Registre os dados finais e conclua a viagem' : 'Atualize as informações do transporte'}</DialogDescription>
           </DialogHeader>
           <TransportForm
             data={editForm}
@@ -839,8 +839,8 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
               <SelectItem value="cancelado">Cancelado</SelectItem>
             </SelectContent>
           </Select>
-          <Button onClick={handleEditSave} className="w-full active:scale-[0.97] transition-transform" disabled={update.isPending}>
-            {editForm.status === 'concluido' ? '✓ Finalizar Viagem' : 'Salvar'}
+          <Button onClick={handleEditSave} className="w-full h-11 rounded-xl font-semibold active:scale-[0.97] transition-all" disabled={update.isPending}>
+            {editForm.status === 'concluido' ? '✓ Finalizar Viagem' : 'Salvar Alterações'}
           </Button>
         </DialogContent>
       </Dialog>
