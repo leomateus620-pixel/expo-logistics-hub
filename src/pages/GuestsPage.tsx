@@ -5,7 +5,7 @@ import { Hotel, Plus, Pencil, Trash2, Phone, Mail, MapPin, AlertTriangle, Loader
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -107,19 +107,27 @@ export default function GuestsPage() {
       </div>
 
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
-        <DialogContent><DialogHeader><DialogTitle>Cadastrar Hóspede</DialogTitle></DialogHeader>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Cadastrar Hóspede</DialogTitle>
+            <DialogDescription>Preencha os dados do convidado para registro</DialogDescription>
+          </DialogHeader>
           <GuestFormFields data={form} setData={setForm} />
-          <Button onClick={handleAdd} className="w-full" disabled={create.isPending}>
-            {create.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Cadastrar
+          <Button onClick={handleAdd} className="w-full h-11 rounded-xl font-semibold active:scale-[0.97] transition-all" disabled={create.isPending}>
+            {create.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Cadastrar Hóspede
           </Button>
         </DialogContent>
       </Dialog>
 
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
-        <DialogContent><DialogHeader><DialogTitle>Editar Hóspede</DialogTitle></DialogHeader>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Editar Hóspede</DialogTitle>
+            <DialogDescription>Atualize as informações do convidado</DialogDescription>
+          </DialogHeader>
           <GuestFormFields data={editForm} setData={setEditForm} />
-          <Button onClick={handleEdit} className="w-full" disabled={update.isPending}>
-            {update.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Salvar
+          <Button onClick={handleEdit} className="w-full h-11 rounded-xl font-semibold active:scale-[0.97] transition-all" disabled={update.isPending}>
+            {update.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Salvar Alterações
           </Button>
         </DialogContent>
       </Dialog>

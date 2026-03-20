@@ -717,10 +717,10 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
 
       {/* ─── Create Dialog ─── */}
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Novo Transporte</DialogTitle>
-            <DialogDescription>Agende uma nova viagem</DialogDescription>
+            <DialogDescription>Preencha os dados da viagem para agendar o transporte</DialogDescription>
           </DialogHeader>
           <TransportForm
             data={form}
@@ -747,7 +747,7 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
             getVehicleConflictInfo={getVehicleConflictInfo}
             availableVehicles={availableVehicles}
           />
-          <Button onClick={handleAdd} className="w-full" disabled={create.isPending}>
+          <Button onClick={handleAdd} className="w-full h-11 rounded-xl font-semibold active:scale-[0.97] transition-all" disabled={create.isPending}>
             {create.isPending ? 'Salvando...' : 'Agendar Transporte'}
           </Button>
         </DialogContent>
@@ -807,10 +807,10 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
 
       {/* ─── Edit Dialog ─── */}
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>{editForm.status === 'concluido' ? 'Finalizar Viagem' : 'Editar Transporte'}</DialogTitle>
-            <DialogDescription>{editForm.status === 'concluido' ? 'Preencha os dados finais da viagem' : 'Atualize os dados do transporte'}</DialogDescription>
+            <DialogDescription>{editForm.status === 'concluido' ? 'Registre os dados finais e conclua a viagem' : 'Atualize as informações do transporte'}</DialogDescription>
           </DialogHeader>
           <TransportForm
             data={editForm}
@@ -839,21 +839,21 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
               <SelectItem value="cancelado">Cancelado</SelectItem>
             </SelectContent>
           </Select>
-          <Button onClick={handleEditSave} className="w-full active:scale-[0.97] transition-transform" disabled={update.isPending}>
-            {editForm.status === 'concluido' ? '✓ Finalizar Viagem' : 'Salvar'}
+          <Button onClick={handleEditSave} className="w-full h-11 rounded-xl font-semibold active:scale-[0.97] transition-all" disabled={update.isPending}>
+            {editForm.status === 'concluido' ? '✓ Finalizar Viagem' : 'Salvar Alterações'}
           </Button>
         </DialogContent>
       </Dialog>
 
       {/* ─── WhatsApp Dialog ─── */}
       <Dialog open={whatsappOpen} onOpenChange={setWhatsappOpen}>
-        <DialogContent className="max-h-[90vh] overflow-y-auto">
+        <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>📋 Texto para WhatsApp</DialogTitle>
-            <DialogDescription>Copie e envie ao responsável pela segurança</DialogDescription>
+            <DialogDescription>Copie o texto e envie ao responsável pela segurança</DialogDescription>
           </DialogHeader>
-          <div className="bg-muted rounded-lg p-4 text-sm whitespace-pre-wrap font-mono border">{whatsappText}</div>
-          <Button onClick={() => { navigator.clipboard.writeText(whatsappText); toast.success('Copiado!'); }} className="w-full">
+          <div className="bg-muted/50 rounded-xl p-4 text-sm whitespace-pre-wrap font-mono border border-border/40">{whatsappText}</div>
+          <Button onClick={() => { navigator.clipboard.writeText(whatsappText); toast.success('Copiado!'); }} className="w-full h-11 rounded-xl font-semibold active:scale-[0.97] transition-all">
             📋 Copiar Texto
           </Button>
         </DialogContent>

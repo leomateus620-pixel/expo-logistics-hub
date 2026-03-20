@@ -359,10 +359,22 @@ export default function TransportForm({
                 <SelectTrigger><SelectValue placeholder="Motorista" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">Nenhum</SelectItem>
-                  {members.map((m: any) => <SelectItem key={m.user_id} value={m.user_id}>{m.nome_exibicao}</SelectItem>)}
+                  {(() => {
+                    const isAeroporto = data.titulo?.toLowerCase().includes('aeroporto');
+                    const filtered = isAeroporto
+                      ? members.filter((m: any) => m.commission_nome?.toUpperCase().includes('LOGÍSTICA') || m.commission_nome?.toUpperCase().includes('LOGISTICA'))
+                      : members;
+                    return filtered.map((m: any) => <SelectItem key={m.user_id} value={m.user_id}>{m.nome_exibicao}</SelectItem>);
+                  })()}
                 </SelectContent>
               </Select>
             </div>
+            {data.titulo?.toLowerCase().includes('aeroporto') && (
+              <p className="text-[11px] text-accent font-medium flex items-center gap-1">
+                <span className="w-1.5 h-1.5 rounded-full bg-accent inline-block" />
+                Apenas motoristas da comissão de Logística
+              </p>
+            )}
             {driverCommission && (
               <p className="text-xs text-muted-foreground">Comissão: <span className="font-medium text-foreground">{driverCommission}</span></p>
             )}
