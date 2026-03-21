@@ -830,7 +830,16 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
           </DialogHeader>
           <TransportForm
             data={editForm}
-            setData={(d) => setEditForm({ ...d, status: editForm.status })}
+            setData={(d: any) => {
+              if (typeof d === 'function') {
+                setEditForm((prev: any) => {
+                  const result = d(prev);
+                  return { ...result, status: prev.status };
+                });
+              } else {
+                setEditForm((prev: any) => ({ ...d, status: prev.status }));
+              }
+            }}
             isEdit={true}
             guests={guests}
             members={members}
