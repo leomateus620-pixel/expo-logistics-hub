@@ -194,7 +194,14 @@ export default function TransportDetailView({ t, members, vehicles, guests, getD
           <>
             <Separator />
             <div className="rounded-xl bg-muted/30 p-3 space-y-3">
-              <p className="text-sm font-semibold flex items-center gap-1">✈️ Informações do Voo</p>
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-semibold flex items-center gap-1">✈️ Informações do Voo</p>
+                {onEdit && (
+                  <Button variant="ghost" size="sm" className="h-7 px-2 text-xs gap-1 rounded-lg" onClick={onEdit}>
+                    <Pencil className="w-3 h-3" /> Editar
+                  </Button>
+                )}
+              </div>
               <div className="grid grid-cols-2 gap-y-2 gap-x-4 text-sm">
                 {t.voo_cidade && <div><p className="text-xs text-muted-foreground">Cidade</p><p className="font-medium">{t.voo_cidade}</p></div>}
                 {t.voo_numero && <div><p className="text-xs text-muted-foreground">Nº Voo</p><p className="font-medium">{t.voo_numero}</p></div>}
