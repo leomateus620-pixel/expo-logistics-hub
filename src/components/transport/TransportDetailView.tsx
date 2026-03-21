@@ -2,7 +2,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
-import { Check, Clock, X, Eye, Navigation, FileText, Route, History } from 'lucide-react';
+import { Check, Clock, X, Eye, Navigation, FileText, Route, History, Pencil } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const statusConfig: Record<string, { label: string; class: string; bgClass: string }> = {
@@ -12,7 +12,7 @@ const statusConfig: Record<string, { label: string; class: string; bgClass: stri
   cancelado: { label: 'Cancelado', class: 'text-destructive', bgClass: 'bg-destructive/10 border-destructive/20' },
 };
 
-export default function TransportDetailView({ t, members, vehicles, guests, getDriverCommission, getGuestsForTransport, onPDF }: any) {
+export default function TransportDetailView({ t, members, vehicles, guests, getDriverCommission, getGuestsForTransport, onPDF, onEdit }: any) {
   const sc = statusConfig[t.status] || statusConfig.pendente;
   const driver = members.find((m: any) => m.user_id === t.motorista_user_id);
   const vehicle = vehicles.find((v: any) => v.id === t.vehicle_id);
@@ -194,7 +194,14 @@ export default function TransportDetailView({ t, members, vehicles, guests, getD
           <>
             <Separator />
             <div className="rounded-xl bg-muted/30 p-3 space-y-3">
-              <p className="text-sm font-semibold flex items-center gap-1">✈️ Informações do Voo</p>
+              <div className="flex items-center justify-between">
+                <p className="text-sm font-semibold flex items-center gap-1">✈️ Informações do Voo</p>
+                {onEdit && (
+                  <Button variant="ghost" size="sm" className="h-7 px-2 text-xs gap-1 rounded-lg" onClick={onEdit}>
+                    <Pencil className="w-3 h-3" /> Editar
+                  </Button>
+                )}
+              </div>
               <div className="grid grid-cols-2 gap-y-2 gap-x-4 text-sm">
                 {t.voo_cidade && <div><p className="text-xs text-muted-foreground">Cidade</p><p className="font-medium">{t.voo_cidade}</p></div>}
                 {t.voo_numero && <div><p className="text-xs text-muted-foreground">Nº Voo</p><p className="font-medium">{t.voo_numero}</p></div>}

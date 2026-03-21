@@ -365,7 +365,12 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
     setOpen(true);
   };
 
+  const isSubmittingRef = useRef(false);
+
   const handleAdd = async () => {
+    if (isSubmittingRef.current) return;
+    isSubmittingRef.current = true;
+
     const origem = (form.origem || '').trim();
     const inicioEmRaw = form.inicio_em;
 
@@ -383,6 +388,7 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
 
     if (missing.length) {
       toast.error(`Preencha: ${missing.join(', ')}`);
+      isSubmittingRef.current = false;
       return;
     }
 
@@ -396,6 +402,12 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
       } catch { /* continue without route data */ }
 
       const inicio_em = ensureSPTimestamptz(inicioEmRaw);
+
+      // Capture return data before resetting
+      const shouldCreateReturn = includeReturn && form.titulo === 'Aeroporto' && returnForm.inicio_em;
+      const capturedForm = { ...form };
+      const capturedReturnForm = { ...returnForm };
+      const capturedGuests = [...selectedGuests];
 
       const result = await create.mutateAsync({
         transport: {
@@ -420,60 +432,64 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
         guestIds: selectedGuests,
       });
 
-      if (form.titulo === 'Escolta Policial') {
-        const driver = members.find((m: any) => m.user_id === form.motorista_user_id);
-        const vehicle = vehicles.find((v: any) => v.id === form.vehicle_id);
-        const guest = selectedGuests.length > 0 ? guests.find((g: any) => g.id === selectedGuests[0]) : null;
-        const text = generateWhatsAppText(form, driver, vehicle, guest);
+      // Close dialog and reset form immediately to prevent double-submit
+      setOpen(false);
+      setForm({ titulo: '', origem: '', destino: '', inicio_em: '', motorista_user_id: '', vehicle_id: '', prioridade: 'media', km_retirada: '', voo_cidade: '', voo_numero: '', voo_checkin: '', voo_chegada: '', horario_saida: '', escolta_nome: '', escolta_cargo: '', escolta_viaturas: '', escolta_ponto_encontro: '', escolta_contato_seguranca: '', escolta_obs: '' });
+      setSelectedGuests([]);
+      setGuestDestinations({});
+      setIncludeReturn(false);
+      setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '' });
+
+      if (capturedForm.titulo === 'Escolta Policial') {
+        const driver = members.find((m: any) => m.user_id === capturedForm.motorista_user_id);
+        const vehicle = vehicles.find((v: any) => v.id === capturedForm.vehicle_id);
+        const guest = capturedGuests.length > 0 ? guests.find((g: any) => g.id === capturedGuests[0]) : null;
+        const text = generateWhatsAppText(capturedForm, driver, vehicle, guest);
         setWhatsappText(text);
         setWhatsappOpen(true);
       }
 
       // Create return trip if enabled
-      if (includeReturn && form.titulo === 'Aeroporto' && returnForm.inicio_em) {
+      if (shouldCreateReturn) {
         try {
-          const returnDestKey = form.voo_cidade ? `Aeroporto_${form.voo_cidade}` : 'Aeroporto';
+          const returnDestKey = capturedForm.voo_cidade ? `Aeroporto_${capturedForm.voo_cidade}` : 'Aeroporto';
           let returnRouteData: { duration_minutes?: number; distance_km?: number; polyline?: string } = {};
           try {
             const preview = await fetchRoutePreview(returnDestKey);
             if (preview) returnRouteData = preview;
           } catch { /* silent */ }
 
-          const returnResult = await create.mutateAsync({
+          await create.mutateAsync({
             transport: {
               titulo: 'Aeroporto',
               origem: destino || 'Santa Rosa',
-              destino: form.voo_cidade ? `Aeroporto ${form.voo_cidade}` : origem,
-              inicio_em: ensureSPTimestamptz(returnForm.inicio_em),
-              motorista_user_id: form.motorista_user_id && form.motorista_user_id !== 'none' ? form.motorista_user_id : null,
-              vehicle_id: form.vehicle_id && form.vehicle_id !== 'none' ? form.vehicle_id : null,
-              prioridade: form.prioridade,
-              voo_cidade: form.voo_cidade || null,
-              voo_numero: returnForm.voo_numero || null,
-              voo_checkin: returnForm.voo_checkin || null,
-              horario_saida: returnForm.horario_saida || null,
+              destino: capturedForm.voo_cidade ? `Aeroporto ${capturedForm.voo_cidade}` : origem,
+              inicio_em: ensureSPTimestamptz(capturedReturnForm.inicio_em),
+              motorista_user_id: capturedForm.motorista_user_id && capturedForm.motorista_user_id !== 'none' ? capturedForm.motorista_user_id : null,
+              vehicle_id: capturedForm.vehicle_id && capturedForm.vehicle_id !== 'none' ? capturedForm.vehicle_id : null,
+              prioridade: capturedForm.prioridade,
+              voo_cidade: capturedForm.voo_cidade || null,
+              voo_numero: capturedReturnForm.voo_numero || null,
+              voo_checkin: capturedReturnForm.voo_checkin || null,
+              horario_saida: capturedReturnForm.horario_saida || null,
               distancia_estimada_km: returnRouteData.distance_km || null,
               duracao_estimada_min: returnRouteData.duration_minutes || null,
               rota_polyline: returnRouteData.polyline || null,
             },
-            guestIds: selectedGuests,
+            guestIds: capturedGuests,
           });
-
-          // guests handled by edge function via guestIds in create
         } catch (returnErr: any) {
           console.error('Failed to create return trip:', returnErr);
           toast.warning('Ida agendada, mas houve erro ao criar a volta. Tente criar manualmente.');
         }
       }
 
-      setForm({ titulo: '', origem: '', destino: '', inicio_em: '', motorista_user_id: '', vehicle_id: '', prioridade: 'media', km_retirada: '', voo_cidade: '', voo_numero: '', voo_checkin: '', voo_chegada: '', horario_saida: '', escolta_nome: '', escolta_cargo: '', escolta_viaturas: '', escolta_ponto_encontro: '', escolta_contato_seguranca: '', escolta_obs: '' });
-      setSelectedGuests([]);
-      setGuestDestinations({});
-      setIncludeReturn(false);
-      setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '' });
-      setOpen(false);
-      toast.success(includeReturn && form.titulo === 'Aeroporto' && returnForm.inicio_em ? 'Ida e volta agendados' : 'Transporte agendado');
-    } catch (err: any) { toast.error(err.message); }
+      toast.success(shouldCreateReturn ? 'Ida e volta agendados' : 'Transporte agendado');
+    } catch (err: any) {
+      toast.error(err.message);
+    } finally {
+      isSubmittingRef.current = false;
+    }
   };
 
   const openEditDlg = (t: any) => {
@@ -747,7 +763,7 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
             getVehicleConflictInfo={getVehicleConflictInfo}
             availableVehicles={availableVehicles}
           />
-          <Button onClick={handleAdd} className="w-full h-11 rounded-xl font-semibold active:scale-[0.97] transition-all" disabled={create.isPending}>
+          <Button onClick={handleAdd} className="w-full h-11 rounded-xl font-semibold active:scale-[0.97] transition-all" disabled={create.isPending || isSubmittingRef.current}>
             {create.isPending ? 'Salvando...' : 'Agendar Transporte'}
           </Button>
         </DialogContent>
@@ -898,7 +914,7 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
       {/* ─── Detail Dialog ─── */}
       <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
         <DialogContent className="max-h-[90vh] overflow-y-auto">
-          {detailTransport && <TransportDetailView t={detailTransport} members={members} vehicles={vehicles} guests={guests} getDriverCommission={getDriverCommission} getGuestsForTransport={getGuestsForTransport} onPDF={() => generatePDF(detailTransport)} />}
+          {detailTransport && <TransportDetailView t={detailTransport} members={members} vehicles={vehicles} guests={guests} getDriverCommission={getDriverCommission} getGuestsForTransport={getGuestsForTransport} onPDF={() => generatePDF(detailTransport)} onEdit={() => { setDetailOpen(false); openEditDlg(detailTransport); }} />}
         </DialogContent>
       </Dialog>
 
