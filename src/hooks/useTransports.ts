@@ -102,7 +102,10 @@ export function useTransports() {
     onError: (error: any) => {
       toast.error(error?.message || 'Erro ao excluir transporte');
     },
-    onSuccess: invalidateAll,
+    onSuccess: () => {
+      toast.success('Transporte excluído com sucesso');
+      invalidateAll();
+    },
   });
 
   const start = useMutation({
