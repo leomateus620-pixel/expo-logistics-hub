@@ -79,7 +79,6 @@ function Section({ title, icon: Icon, badge, children, onSeeAll, loading, empty,
         </div>
       ) : children}
     </div>
-    </div>
   );
 }
 
