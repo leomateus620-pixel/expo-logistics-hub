@@ -419,30 +419,17 @@ export default function VehiclesPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Detail dialog */}
-      <Dialog open={detailOpen} onOpenChange={setDetailOpen}>
-        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto liquid-glass-card border-border/40">
-          <DialogHeader>
-            <DialogTitle className="text-lg font-bold flex items-center gap-2 flex-wrap">
-              <span>{detailVehicle?.marca} {detailVehicle?.modelo} — {detailVehicle?.placa}</span>
-              {detailVehicle && (() => {
-                const vStatus = effectiveStatus[detailVehicle.id] || detailVehicle.status;
-                const sc = statusConfig[vStatus] || statusConfig.disponivel;
-                return <Badge variant="outline" className={cn('text-[10px] font-medium', sc.badgeCls)}>{sc.label}</Badge>;
-              })()}
-            </DialogTitle>
-          </DialogHeader>
-          {detailVehicle && (
-            <VehicleDetailContent
-              vehicle={detailVehicle}
-              members={members}
-              userId={user?.id}
-              kmTotal={kmByVehicle[detailVehicle.id] || 0}
-              fuelCostTotal={fuelByVehicle[detailVehicle.id] || 0}
-            />
-          )}
-        </DialogContent>
-      </Dialog>
+      {/* Detail — Drawer on mobile, Dialog on desktop */}
+      <VehicleDetailModal
+        open={detailOpen}
+        onOpenChange={setDetailOpen}
+        vehicle={detailVehicle}
+        effectiveStatus={effectiveStatus}
+        members={members}
+        userId={user?.id}
+        kmByVehicle={kmByVehicle}
+        fuelByVehicle={fuelByVehicle}
+      />
     </div>
   );
 }
