@@ -32,7 +32,17 @@ export function useTransports() {
     const { data, error } = await supabase.functions.invoke('transport-lifecycle', {
       body: { action, payload },
     });
-    if (error) throw error;
+    if (error) {
+      // Try to extract the real error message from the edge function response
+      let message = error.message;
+      try {
+        if ((error as any).context) {
+          const body = await (error as any).context.json();
+          if (body?.error) message = body.error;
+        }
+      } catch { /* ignore parse errors */ }
+      throw new Error(message);
+    }
     // Edge function returns JSON; check for error field
     if (data?.error) {
       const err = new Error(data.error);
@@ -92,7 +102,10 @@ export function useTransports() {
     onError: (error: any) => {
       toast.error(error?.message || 'Erro ao excluir transporte');
     },
-    onSuccess: invalidateAll,
+    onSuccess: () => {
+      toast.success('Transporte excluído com sucesso');
+      invalidateAll();
+    },
   });
 
   const start = useMutation({

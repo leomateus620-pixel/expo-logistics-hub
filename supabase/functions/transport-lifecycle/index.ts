@@ -10,7 +10,7 @@ const ACTION_MIN_ROLES: Record<string, string[]> = {
   create: ["admin", "gestor", "operador"],
   update: ["admin", "gestor", "operador"],
   start: ["admin", "gestor", "operador"],
-  delete: ["admin", "gestor"],
+  delete: ["admin", "gestor", "operador"],
 };
 
 Deno.serve(async (req) => {
