@@ -477,8 +477,12 @@ function VehicleDetailModal({ open, onOpenChange, vehicle, effectiveStatus, memb
   const fuelCostTotal = fuelByVehicle[vehicle.id] || 0;
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg max-h-[85dvh] p-0 flex flex-col">
+    <Dialog open={open} onOpenChange={(v) => { if (!v) { onOpenChange(false); } else { onOpenChange(true); } }}>
+      <DialogContent
+        className="p-0 w-[min(96vw,32rem)]"
+        onPointerDownOutside={(e) => e.preventDefault()}
+        onInteractOutside={(e) => e.preventDefault()}
+      >
         <DialogHeader className="p-5 pb-3 shrink-0 border-b border-border/20">
           <DialogTitle className="sr-only">{vehicle.marca} {vehicle.modelo} — {vehicle.placa}</DialogTitle>
           <DialogDescription className="sr-only">Detalhes do veículo</DialogDescription>
@@ -495,7 +499,7 @@ function VehicleDetailModal({ open, onOpenChange, vehicle, effectiveStatus, memb
             </div>
           </div>
         </DialogHeader>
-        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain scroll-smooth px-5 pb-5">
+        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain scroll-smooth px-5 pb-5" style={{ maxHeight: 'calc(88dvh - 80px)' }}>
           <VehicleDetailContent
             vehicle={vehicle}
             members={members}
