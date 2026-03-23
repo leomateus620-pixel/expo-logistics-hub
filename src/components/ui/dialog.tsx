@@ -27,6 +27,11 @@ const DialogOverlay = React.forwardRef<
 ));
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
+/**
+ * Safe viewport-centered dialog content.
+ * Uses `inset-0 m-auto` for resilient centering without translate hacks.
+ * max-h constrains to viewport; internal flex-col allows fixed header + scrollable body.
+ */
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
@@ -36,24 +41,17 @@ const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed inset-0 z-50 grid place-items-center p-3 sm:p-6 pointer-events-none",
+        "fixed z-50 inset-0 m-auto w-fit h-fit max-w-[min(96vw,32rem)] max-h-[88dvh] flex flex-col gap-4 border border-border/30 bg-card/95 backdrop-blur-2xl p-6 shadow-2xl duration-200 overflow-hidden rounded-2xl gold-accent",
+        "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
+        className,
       )}
-      style={{ overflow: 'auto' }}
       {...props}
     >
-      <div
-        className={cn(
-          "pointer-events-auto relative w-full max-w-lg max-h-[88dvh] flex flex-col gap-4 border border-border/30 bg-card/95 backdrop-blur-2xl p-6 shadow-2xl rounded-2xl gold-accent",
-          "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
-          className,
-        )}
-      >
-        {children}
-        <DialogPrimitive.Close className="absolute right-3 top-3 w-8 h-8 flex items-center justify-center rounded-full bg-muted/50 hover:bg-muted opacity-70 ring-offset-background transition-all hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground z-10">
-          <X className="h-4 w-4" />
-          <span className="sr-only">Close</span>
-        </DialogPrimitive.Close>
-      </div>
+      {children}
+      <DialogPrimitive.Close className="absolute right-3 top-3 w-8 h-8 flex items-center justify-center rounded-full bg-muted/50 hover:bg-muted opacity-70 ring-offset-background transition-all hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground z-10">
+        <X className="h-4 w-4" />
+        <span className="sr-only">Close</span>
+      </DialogPrimitive.Close>
     </DialogPrimitive.Content>
   </DialogPortal>
 ));
