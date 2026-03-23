@@ -14,7 +14,7 @@ import { cn, nowSP } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 import { useState, useMemo, useCallback } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription } from '@/components/ui/drawer';
+
 import { Input } from '@/components/ui/input';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Button } from '@/components/ui/button';
@@ -419,7 +419,7 @@ export default function VehiclesPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Detail — Drawer on mobile, Dialog on desktop */}
+      {/* Detail — centered Dialog */}
       <VehicleDetailModal
         open={detailOpen}
         onOpenChange={setDetailOpen}
@@ -464,13 +464,11 @@ function KpiCard({ icon, label, value, sub, variant = 'default' }: { icon: React
   );
 }
 
-// Responsive detail modal — Drawer on mobile, Dialog on desktop
+// Centered detail modal — Dialog for both mobile and desktop
 function VehicleDetailModal({ open, onOpenChange, vehicle, effectiveStatus, members, userId, kmByVehicle, fuelByVehicle }: {
   open: boolean; onOpenChange: (v: boolean) => void; vehicle: any; effectiveStatus: Record<string, string>;
   members: any[]; userId?: string; kmByVehicle: Record<string, number>; fuelByVehicle: Record<string, number>;
 }) {
-  const isMobile = useIsMobile();
-
   if (!vehicle) return null;
 
   const vStatus = effectiveStatus[vehicle.id] || vehicle.status;
@@ -478,60 +476,33 @@ function VehicleDetailModal({ open, onOpenChange, vehicle, effectiveStatus, memb
   const kmTotal = kmByVehicle[vehicle.id] || 0;
   const fuelCostTotal = fuelByVehicle[vehicle.id] || 0;
 
-  const headerContent = (
-    <div className="flex items-center gap-3">
-      <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-        <Car className="w-5 h-5 text-primary" />
-      </div>
-      <div className="min-w-0">
-        <div className="flex items-center gap-2 flex-wrap">
-          <span className="text-base font-bold text-foreground truncate">{vehicle.marca} {vehicle.modelo}</span>
-          <Badge variant="outline" className={cn('text-[10px] font-medium shrink-0', sc.badgeCls)}>{sc.label}</Badge>
-        </div>
-        <p className="text-xs font-mono text-muted-foreground">{vehicle.placa} {vehicle.cor ? `• ${vehicle.cor.toUpperCase()}` : ''}</p>
-      </div>
-    </div>
-  );
-
-  const bodyContent = (
-    <div className="overflow-y-auto overscroll-contain px-1" style={{ maxHeight: isMobile ? 'calc(85dvh - 100px)' : 'calc(80vh - 100px)' }}>
-      <VehicleDetailContent
-        vehicle={vehicle}
-        members={members}
-        userId={userId}
-        kmTotal={kmTotal}
-        fuelCostTotal={fuelCostTotal}
-      />
-    </div>
-  );
-
-  if (isMobile) {
-    return (
-      <Drawer open={open} onOpenChange={onOpenChange}>
-        <DrawerContent className="max-h-[85dvh] border-t border-border/40 bg-card/95 backdrop-blur-2xl">
-          <DrawerHeader className="pb-2">
-            <DrawerTitle className="sr-only">{vehicle.marca} {vehicle.modelo} — {vehicle.placa}</DrawerTitle>
-            <DrawerDescription className="sr-only">Detalhes do veículo</DrawerDescription>
-            {headerContent}
-          </DrawerHeader>
-          <div className="px-4 pb-6">
-            {bodyContent}
-          </div>
-        </DrawerContent>
-      </Drawer>
-    );
-  }
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg p-0 overflow-hidden">
-        <DialogHeader className="p-5 pb-3">
+      <DialogContent className="sm:max-w-lg max-h-[85dvh] p-0 flex flex-col">
+        <DialogHeader className="p-5 pb-3 shrink-0 border-b border-border/20">
           <DialogTitle className="sr-only">{vehicle.marca} {vehicle.modelo} — {vehicle.placa}</DialogTitle>
           <DialogDescription className="sr-only">Detalhes do veículo</DialogDescription>
-          {headerContent}
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+              <Car className="w-5 h-5 text-primary" />
+            </div>
+            <div className="min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-base font-bold text-foreground truncate">{vehicle.marca} {vehicle.modelo}</span>
+                <Badge variant="outline" className={cn('text-[10px] font-medium shrink-0', sc.badgeCls)}>{sc.label}</Badge>
+              </div>
+              <p className="text-xs font-mono text-muted-foreground">{vehicle.placa} {vehicle.cor ? `• ${vehicle.cor.toUpperCase()}` : ''}</p>
+            </div>
+          </div>
         </DialogHeader>
-        <div className="px-5 pb-5">
-          {bodyContent}
+        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain scroll-smooth px-5 pb-5">
+          <VehicleDetailContent
+            vehicle={vehicle}
+            members={members}
+            userId={userId}
+            kmTotal={kmTotal}
+            fuelCostTotal={fuelCostTotal}
+          />
         </div>
       </DialogContent>
     </Dialog>
