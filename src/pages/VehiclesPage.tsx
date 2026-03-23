@@ -272,7 +272,7 @@ export default function VehiclesPage() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-          {filteredVehicles.map((v: any) => {
+          {filteredVehicles.map((v: any, i: number) => {
             const driver = members.find((m: any) => m.user_id === v.responsavel_user_id);
             const vStatus = effectiveStatus[v.id] || v.status;
             const sc = statusConfig[vStatus] || statusConfig.disponivel;
@@ -281,7 +281,8 @@ export default function VehiclesPage() {
             return (
               <div
                 key={v.id}
-                className="liquid-glass-card rounded-2xl p-4 transition-all active:scale-[0.98] cursor-pointer hover:shadow-md"
+                className="liquid-glass-card rounded-2xl p-4 cursor-pointer active:scale-[0.98] hover:-translate-y-1 hover:shadow-lg transition-all duration-300 animate-fade-in"
+                style={{ animationDelay: `${i * 60}ms`, animationFillMode: 'backwards' }}
                 onClick={() => { setDetailVehicle(v); setDetailOpen(true); }}
               >
                 <div className="flex items-start justify-between mb-3">
