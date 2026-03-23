@@ -137,7 +137,7 @@ export default function GuestsPage() {
           const linkedTransportIds = transportGuests.filter((tg: any) => tg.guest_id === g.id).map((tg: any) => tg.transport_id);
           const linkedTransports = transports.filter((t: any) => linkedTransportIds.includes(t.id));
           return (
-            <div key={g.id} className="rounded-xl border bg-card p-5 hover:shadow-md transition-shadow">
+            <div key={g.id} className="liquid-glass-card rounded-2xl p-5 transition-all">
               <div className="flex items-start justify-between mb-3">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg flex items-center justify-center bg-primary/10 text-primary">

@@ -441,21 +441,28 @@ export default function VehiclesPage() {
 // KPI Card component
 function KpiCard({ icon, label, value, sub, variant = 'default' }: { icon: React.ReactNode; label: string; value: string; sub?: string; variant?: string }) {
   const iconBg: Record<string, string> = {
-    primary: 'bg-primary/12 text-primary',
-    accent: 'bg-accent/12 text-accent',
-    warning: 'bg-warning/12 text-warning',
-    success: 'bg-success/12 text-success',
+    primary: 'bg-primary/10 text-primary',
+    accent: 'bg-gold/10 text-gold',
+    warning: 'bg-warning/10 text-warning',
+    success: 'bg-success/10 text-success',
     default: 'bg-muted/60 text-muted-foreground',
   };
+  const borderAccent: Record<string, string> = {
+    primary: 'stat-accent-primary',
+    accent: 'stat-accent-accent',
+    warning: 'stat-accent-warning',
+    success: 'stat-accent-success',
+    default: '',
+  };
   return (
-    <div className="liquid-glass-card rounded-2xl p-3.5">
+    <div className={cn("liquid-glass-card rounded-2xl p-4", borderAccent[variant] || '')}>
       <div className="flex items-center gap-2 mb-1.5">
-        <div className={cn('w-7 h-7 rounded-lg flex items-center justify-center', iconBg[variant] || iconBg.default)}>
+        <div className={cn('w-8 h-8 rounded-xl flex items-center justify-center', iconBg[variant] || iconBg.default)}>
           {icon}
         </div>
         <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider leading-tight">{label}</p>
       </div>
-      <p className="text-lg font-bold tracking-tight text-foreground">{value}</p>
+      <p className="text-xl font-extrabold tracking-tight text-foreground">{value}</p>
       {sub && <p className="text-[10px] text-muted-foreground mt-0.5">{sub}</p>}
     </div>
   );
