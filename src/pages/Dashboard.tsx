@@ -207,8 +207,8 @@ export default function Dashboard() {
     <div className="space-y-5 pb-8">
       {/* ─── Header ─── */}
       <div className="px-1">
-        <h1 className="text-lg sm:text-xl font-bold tracking-tight text-foreground">{getGreeting()} 👋</h1>
-        <p className="text-xs text-muted-foreground mt-0.5 capitalize">{formatDateBR()}</p>
+        <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-foreground">{getGreeting()} 👋</h1>
+        <p className="text-xs text-muted-foreground mt-0.5 capitalize font-medium">{formatDateBR()}</p>
       </div>
 
       {/* ─── Stat Cards 2x2 ─── */}
