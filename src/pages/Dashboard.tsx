@@ -52,15 +52,15 @@ function Section({ title, icon: Icon, badge, children, onSeeAll, loading, empty,
   onSeeAll?: () => void; loading?: boolean; empty?: boolean; emptyMsg?: string;
 }) {
   return (
-    <div className="liquid-glass-card rounded-2xl p-4">
+    <div className="liquid-glass-card rounded-2xl p-5 gold-accent">
       <div className="flex items-center justify-between mb-3">
-        <h2 className="text-sm font-semibold flex items-center gap-2 text-foreground">
+        <h2 className="text-sm font-bold flex items-center gap-2 text-foreground tracking-tight">
           <Icon className="w-4 h-4 text-primary" aria-hidden /> {title}
         </h2>
         <div className="flex items-center gap-2">
-          {badge !== undefined && <Badge variant="secondary" className="text-[10px] font-medium">{badge}</Badge>}
+          {badge !== undefined && <Badge variant="secondary" className="text-[10px] font-semibold">{badge}</Badge>}
           {onSeeAll && (
-            <button onClick={onSeeAll} className="text-[10px] text-primary font-medium flex items-center gap-0.5 hover:underline">
+            <button onClick={onSeeAll} className="text-[10px] text-gold font-semibold flex items-center gap-0.5 hover:underline transition-colors">
               Ver tudo <ArrowRight className="w-3 h-3" />
             </button>
           )}
@@ -73,11 +73,12 @@ function Section({ title, icon: Icon, badge, children, onSeeAll, loading, empty,
           <Skeleton className="h-12 rounded-xl" />
         </div>
       ) : empty ? (
-        <div className="flex flex-col items-center justify-center py-6 text-muted-foreground">
-          <AlertCircle className="w-8 h-8 mb-2 opacity-30" />
-          <p className="text-xs">{emptyMsg || 'Nenhum item no momento.'}</p>
+        <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
+          <AlertCircle className="w-8 h-8 mb-2 opacity-25" />
+          <p className="text-xs font-medium">{emptyMsg || 'Nenhum item no momento.'}</p>
         </div>
       ) : children}
+    </div>
     </div>
   );
 }
