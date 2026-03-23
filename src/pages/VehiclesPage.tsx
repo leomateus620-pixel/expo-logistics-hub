@@ -221,11 +221,17 @@ export default function VehiclesPage() {
         </div>
       ) : (
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-          <KpiCard icon={<Gauge className="w-4 h-4" />} label="KM Rodados" value={`${formatKm(totalKm)} km`} variant="primary" />
-          <KpiCard icon={<TrendingUp className="w-4 h-4" />} label="Custo Estimado" value={formatCurrency(metrics.custoEstimado)} sub="R$ 0,65/km" variant="accent" />
-          <KpiCard icon={<DollarSign className="w-4 h-4" />} label="Custo Real" value={formatCurrency(metrics.custoReal)} sub="Abastecimentos" variant="warning" />
-          <KpiCard icon={<Car className="w-4 h-4" />} label="Disponíveis" value={String(metrics.disponivel)} sub={`${metrics.emUso} em uso`} variant="success" />
-          <KpiCard icon={<Wrench className="w-4 h-4" />} label="Manutenção" value={String(metrics.manutencao)} variant="default" />
+          {[
+            { icon: <Gauge className="w-4 h-4" />, label: "KM Rodados", value: `${formatKm(totalKm)} km`, variant: "primary" as const },
+            { icon: <TrendingUp className="w-4 h-4" />, label: "Custo Estimado", value: formatCurrency(metrics.custoEstimado), sub: "R$ 0,65/km", variant: "accent" as const },
+            { icon: <DollarSign className="w-4 h-4" />, label: "Custo Real", value: formatCurrency(metrics.custoReal), sub: "Abastecimentos", variant: "warning" as const },
+            { icon: <Car className="w-4 h-4" />, label: "Disponíveis", value: String(metrics.disponivel), sub: `${metrics.emUso} em uso`, variant: "success" as const },
+            { icon: <Wrench className="w-4 h-4" />, label: "Manutenção", value: String(metrics.manutencao), variant: "default" as const },
+          ].map((kpi, i) => (
+            <div key={kpi.label} className="animate-fade-in" style={{ animationDelay: `${i * 80}ms`, animationFillMode: 'backwards' }}>
+              <KpiCard {...kpi} />
+            </div>
+          ))}
         </div>
       )}
 

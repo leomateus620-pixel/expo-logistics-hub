@@ -39,18 +39,43 @@ export function useVehicleUsage(vehicleId?: string) {
     staleTime: 30000,
   });
 
-  const totalKm = allTransports.reduce((sum: number, t: any) => {
+  // KM from transports
+  const transportKm = allTransports.reduce((sum: number, t: any) => {
     const diff = Number(t.km_devolucao) - Number(t.km_retirada);
     return sum + (isNaN(diff) || diff < 0 ? 0 : diff);
   }, 0);
 
-  const kmByVehicle = allTransports.reduce((map: Record<string, number>, t: any) => {
+  const transportKmByVehicle = allTransports.reduce((map: Record<string, number>, t: any) => {
     if (!t.vehicle_id) return map;
     const diff = Number(t.km_devolucao) - Number(t.km_retirada);
     const val = isNaN(diff) || diff < 0 ? 0 : diff;
     map[t.vehicle_id] = (map[t.vehicle_id] || 0) + val;
     return map;
   }, {} as Record<string, number>);
+
+  // KM from direct vehicle_usage records (km_rodados is DB-generated)
+  const usageKm = usages.reduce((sum: number, u: any) => {
+    const val = Number(u.km_rodados);
+    return sum + (isNaN(val) || val <= 0 ? 0 : val);
+  }, 0);
+
+  const usageKmByVehicle = usages.reduce((map: Record<string, number>, u: any) => {
+    if (!u.vehicle_id) return map;
+    const val = Number(u.km_rodados);
+    if (!isNaN(val) && val > 0) {
+      map[u.vehicle_id] = (map[u.vehicle_id] || 0) + val;
+    }
+    return map;
+  }, {} as Record<string, number>);
+
+  // Merge both sources
+  const totalKm = transportKm + usageKm;
+
+  const allVehicleIds = new Set([...Object.keys(transportKmByVehicle), ...Object.keys(usageKmByVehicle)]);
+  const kmByVehicle: Record<string, number> = {};
+  allVehicleIds.forEach(id => {
+    kmByVehicle[id] = (transportKmByVehicle[id] || 0) + (usageKmByVehicle[id] || 0);
+  });
 
   const createUsage = useMutation({
     mutationFn: async (usage: Record<string, any>) => {
