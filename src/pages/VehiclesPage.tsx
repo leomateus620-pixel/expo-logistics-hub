@@ -419,7 +419,7 @@ export default function VehiclesPage() {
         </DialogContent>
       </Dialog>
 
-      {/* Detail — Drawer on mobile, Dialog on desktop */}
+      {/* Detail — centered Dialog */}
       <VehicleDetailModal
         open={detailOpen}
         onOpenChange={setDetailOpen}
