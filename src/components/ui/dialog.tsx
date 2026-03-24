@@ -28,9 +28,10 @@ const DialogOverlay = React.forwardRef<
 DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 
 /**
- * Safe viewport-centered dialog content.
- * Uses `inset-0 m-auto` for resilient centering without translate hacks.
- * max-h constrains to viewport; internal flex-col allows fixed header + scrollable body.
+ * SAFE DIALOG CONTRACT — do not change centering method.
+ * Uses standard left-50%/top-50% + translate centering (proven cross-browser).
+ * max-h-[85dvh] constrains to viewport; flex-col allows fixed header + scrollable body.
+ * Consumers needing scroll: add overflow-y-auto on a child div, NOT on DialogContent.
  */
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
@@ -41,7 +42,7 @@ const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        "fixed z-50 inset-0 m-auto w-fit h-fit max-w-[min(96vw,32rem)] max-h-[88dvh] flex flex-col gap-4 border border-border/30 bg-card/95 backdrop-blur-2xl p-6 shadow-2xl duration-200 overflow-hidden rounded-2xl gold-accent",
+        "fixed left-[50%] top-[50%] z-50 translate-x-[-50%] translate-y-[-50%] w-full max-w-lg max-h-[85dvh] flex flex-col gap-4 border border-border/30 bg-card/95 backdrop-blur-2xl p-6 shadow-2xl duration-200 rounded-2xl gold-accent",
         "data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
         className,
       )}
