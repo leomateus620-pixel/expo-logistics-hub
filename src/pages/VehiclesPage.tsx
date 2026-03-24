@@ -291,7 +291,7 @@ export default function VehiclesPage() {
                 key={v.id}
                 className="liquid-glass-card rounded-2xl p-4 cursor-pointer active:scale-[0.98] hover:-translate-y-1 hover:shadow-lg transition-all duration-300 animate-fade-in"
                 style={{ animationDelay: `${i * 60}ms`, animationFillMode: 'backwards' }}
-                onClick={() => { requestAnimationFrame(() => { setDetailVehicle(v); setDetailOpen(true); }); }}
+                onClick={() => { setDetailVehicle(v); setDetailOpen(true); }}
               >
                 <div className="flex items-start justify-between mb-3">
                   <div className="flex items-center gap-3 min-w-0">
