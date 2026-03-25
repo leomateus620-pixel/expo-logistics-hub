@@ -1,38 +1,78 @@
 
 
-# Correção Global Definitiva: Modais Invisíveis
+# Transições de Página + Otimização do Login
 
-## Causa raiz identificada
+## Escopo 1 — Transições entre páginas
 
-A classe `.grain-texture::before` em `src/index.css` (linha 232-242) cria um pseudo-elemento com:
-- `position: fixed`
-- `top: 0; left: 0; right: 0; bottom: 0`
-- **`z-index: 9999`**
-- `pointer-events: none`
+### Abordagem
+Criar um componente `PageTransition` que envolve o conteúdo de cada rota dentro do `Layout`, aplicando uma animação CSS sutil de fade + micro-slide vertical (opacity + translateY) na montagem. Sem biblioteca extra — apenas CSS + React key baseado na rota.
 
-Este pseudo-elemento cobre toda a viewport com z-index 9999. Os dialogs usam `z-50` (= 50 no Tailwind). Embora `pointer-events: none` deveria permitir cliques, o problema é que **o grain overlay visualmente cobre o conteúdo do modal**, e em certos contextos de stacking (backdrop-filter no dialog, etc.), o browser pode renderizar o grain POR CIMA do modal, tornando-o invisível ou quase invisível.
+### Implementação
 
-A combinação de `backdrop-blur-2xl` no DialogContent com o grain overlay em z-9999 cria conflitos de compositing que tornam o conteúdo do modal não-renderizado corretamente em alguns browsers/viewports.
+**1. `src/components/PageTransition.tsx`** (novo)
+- Componente wrapper que usa `useLocation().pathname` como `key` para forçar remount a cada navegação.
+- Aplica classe CSS de animação `animate-page-in` na montagem.
+- Respeita `prefers-reduced-motion` (sem animação quando ativado).
 
-## Correção
+**2. `src/index.css`** — adicionar keyframe
+```css
+@keyframes page-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-page-in {
+  animation: page-in 220ms cubic-bezier(0.25, 0.1, 0.25, 1) both;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-page-in { animation: none; }
+}
+```
 
-### 1. `src/index.css` — Corrigir z-index do grain texture
-- Alterar `.grain-texture::before` de `z-index: 9999` para `z-index: 0`
-- Isso mantém o efeito visual de textura no fundo sem interferir com overlays, modais, ou qualquer elemento de UI interativo
-- Adicionar escala de z-index documentada como comentário
+**3. `src/components/Layout.tsx`**
+- Envolver `{children}` com `<PageTransition>` dentro do `<main>`.
 
-### 2. `src/components/ui/dialog.tsx` — Elevar z-index dos modais
-- Overlay: manter `z-50` (suficiente com grain em z-0)
-- Content: manter `z-50` (Radix já garante stacking correto)
-- Nenhuma outra alteração necessária — o dialog.tsx atual está correto estruturalmente
+Resultado: transição leve de 220ms, GPU-friendly (opacity + transform), sem reflow.
 
-### 3. Validação
-- Todos os modais do sistema (Novo Hóspede, Nova Tarefa, Novo Transporte, Adicionar Veículo, detalhe de veículo) passam a renderizar corretamente
-- A textura grain permanece visível como efeito decorativo sutil no fundo
-- Zero regressão visual
+---
+
+## Escopo 2 — Otimização da tela de login
+
+### Problemas identificados
+1. Imagens PNG importadas via Vite como módulo JS — carregam com o bundle, bloqueiam render.
+2. Background usa `<img>` tag com `absolute inset-0` — funcional mas sem loading progressivo.
+3. `min-h-screen` no container pode causar saltos no mobile (100vh vs dvh).
+4. `backdrop-filter: blur(28px)` nos inputs é desnecessário (já tem no card pai) — custo extra de compositing.
+
+### Implementação
+
+**1. `src/pages/LoginPage.tsx`** — refatorar background
+- Trocar `<img>` tags por CSS `background-image` no container raiz com `bg-cover bg-center bg-fixed bg-no-repeat`.
+- Usar `min-h-[100dvh]` em vez de `min-h-screen`.
+- Adicionar estado `imageLoaded` com `<link rel="preload">` ou `new Image()` para fade-in progressivo do fundo.
+- Remover `backdrop-filter` dos inputs (herdam do card).
+- Manter card com `will-change: transform` para isolar compositing.
+
+**2. Estratégia de carregamento progressivo**
+- Container inicia com background color sólido escuro (cor dominante da imagem).
+- Ao carregar a imagem via JS `new Image()`, aplica fade-in do background com transição CSS `opacity 500ms`.
+- Resultado: formulário visível instantaneamente, imagem aparece suavemente.
+
+**3. Estabilidade visual mobile**
+- Container: `fixed inset-0` em vez de `min-h-[100dvh]` para o wrapper do background — imune a barras do navegador.
+- Conteúdo: `min-h-[100dvh]` com `overflow-y-auto` para o container do formulário.
+- Remover `overflow-hidden` do container pai (causa corte em teclado virtual).
+
+---
 
 ## Arquivos a editar
-1. `src/index.css` — linha 238: `z-index: 9999` → `z-index: 0`
+1. `src/components/PageTransition.tsx` — **criar** (wrapper de transição)
+2. `src/components/Layout.tsx` — envolver children com PageTransition
+3. `src/index.css` — adicionar keyframe `page-in`
+4. `src/pages/LoginPage.tsx` — refatorar background para CSS + loading progressivo + dvh
 
-Correção cirúrgica de 1 linha que resolve o problema global.
+## Riscos mitigados
+- Nenhuma lógica de negócio alterada
+- Nenhum componente de modal/dialog tocado
+- Animação usa apenas `opacity` + `transform` (GPU)
+- Fallback automático para `prefers-reduced-motion`
 
