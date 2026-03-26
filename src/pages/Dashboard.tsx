@@ -7,8 +7,8 @@ import { useOrgMembers } from '@/hooks/useOrgMembers';
 import { useSchedules } from '@/hooks/useSchedules';
 import StatCard from '@/components/StatCard';
 import {
-  Car, Zap, MapPin, CheckSquare, CalendarDays, Users, User, Bike,
-  Hotel, ClipboardList, Settings, ArrowRight, Clock, AlertCircle,
+  Car, Zap, MapPin, CheckSquare, CalendarDays, Users, User,
+  Hotel, ClipboardList, ArrowRight, Clock, AlertCircle, ExternalLink, FileText, Sheet,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -33,18 +33,6 @@ function formatDateBR(): string {
   });
 }
 
-const shortcuts = [
-  { to: '/vehicles', icon: Car, label: 'Veículos' },
-  { to: '/electric-carts', icon: Zap, label: 'Carrinhos' },
-  { to: '/scooters', icon: Bike, label: 'Patinetes' },
-  { to: '/transports', icon: MapPin, label: 'Transportes' },
-  { to: '/guests', icon: Hotel, label: 'Hóspedes' },
-  { to: '/agenda', icon: CalendarDays, label: 'Agenda' },
-  { to: '/ver-escala', icon: ClipboardList, label: 'Escala' },
-  { to: '/checklist', icon: CheckSquare, label: 'Checklist' },
-  { to: '/team', icon: Users, label: 'Equipe' },
-  { to: '/settings', icon: Settings, label: 'Config.' },
-];
 
 /* ─── Section wrapper ─── */
 function Section({ title, icon: Icon, badge, children, onSeeAll, loading, empty, emptyMsg }: {
@@ -402,23 +390,55 @@ export default function Dashboard() {
         </div>
       </Section>
 
-      {/* ─── Atalhos Rápidos ─── */}
-      <div className="liquid-glass-card rounded-2xl p-5 gold-accent">
-        <h2 className="text-sm font-bold text-foreground mb-3 tracking-tight">Atalhos Rápidos</h2>
-        <div className="grid grid-cols-5 gap-2">
-          {shortcuts.map(({ to, icon: Icon, label }) => (
-            <button
-              key={to}
-              onClick={() => navigate(to)}
-              className="flex flex-col items-center gap-1.5 p-3 rounded-xl hover:bg-primary/5 active:scale-[0.95] transition-all focus-ring"
-            >
-              <div className="w-10 h-10 rounded-xl bg-primary/8 flex items-center justify-center">
-                <Icon className="w-5 h-5 text-primary" />
+      {/* ─── Acessos Rápidos ─── */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {/* Card 1 — Rede Hoteleira */}
+        <button
+          type="button"
+          onClick={() => window.open('/docs/rede-hoteleira.pdf', '_blank')}
+          className="liquid-glass-card rounded-2xl p-5 gold-accent text-left cursor-pointer hover:bg-muted/60 active:scale-[0.98] transition-all group"
+        >
+          <div className="flex items-start gap-4">
+            <div className="w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
+              <Hotel className="w-5 h-5 text-primary" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1">
+                <h3 className="text-sm font-bold text-foreground">Rede Hoteleira</h3>
+                <Badge variant="secondary" className="text-[9px] px-1.5 py-0 flex items-center gap-0.5">
+                  <FileText className="w-2.5 h-2.5" /> PDF
+                </Badge>
               </div>
-              <span className="text-[10px] font-semibold text-muted-foreground leading-tight text-center">{label}</span>
-            </button>
-          ))}
-        </div>
+              <p className="text-[11px] font-medium text-muted-foreground">Hotéis da região da Grande Santa Rosa</p>
+              <p className="text-[10px] text-muted-foreground/70 mt-1 leading-relaxed">Consulte o PDF com a rede hoteleira disponível para apoio logístico e hospedagem.</p>
+            </div>
+            <ExternalLink className="w-4 h-4 text-muted-foreground/50 group-hover:text-primary transition-colors shrink-0 mt-1" />
+          </div>
+        </button>
+
+        {/* Card 2 — Autorizações de Retirada */}
+        <button
+          type="button"
+          onClick={() => window.open('https://docs.google.com/spreadsheets/d/1I0ESjrZWvpT5dQZrdTvYnIPtpY8SYJVP33fy4Yt0Cf0/edit?gid=0#gid=0', '_blank', 'noopener,noreferrer')}
+          className="liquid-glass-card rounded-2xl p-5 gold-accent text-left cursor-pointer hover:bg-muted/60 active:scale-[0.98] transition-all group"
+        >
+          <div className="flex items-start gap-4">
+            <div className="w-11 h-11 rounded-xl bg-accent/10 flex items-center justify-center shrink-0">
+              <ClipboardList className="w-5 h-5 text-accent" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1">
+                <h3 className="text-sm font-bold text-foreground">Autorizações de Retirada</h3>
+                <Badge variant="secondary" className="text-[9px] px-1.5 py-0 flex items-center gap-0.5">
+                  <Sheet className="w-2.5 h-2.5" /> Planilha
+                </Badge>
+              </div>
+              <p className="text-[11px] font-medium text-muted-foreground">Veículos e patinetes elétricos</p>
+              <p className="text-[10px] text-muted-foreground/70 mt-1 leading-relaxed">Acesse a planilha utilizada pelas comissões para definir os responsáveis autorizados por data e turno.</p>
+            </div>
+            <ExternalLink className="w-4 h-4 text-muted-foreground/50 group-hover:text-accent transition-colors shrink-0 mt-1" />
+          </div>
+        </button>
       </div>
     </div>
   );
