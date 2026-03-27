@@ -19,6 +19,7 @@ import ChecklistPage from "./pages/ChecklistPage";
 import TeamPage from "./pages/TeamPage";
 import SettingsPage from "./pages/SettingsPage";
 import VerEscalaPage from "./pages/VerEscalaPage";
+import KmEmissoesPage from "./pages/KmEmissoesPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -54,6 +55,7 @@ const App = () => (
                 <Route path="/checklist" element={<ChecklistPage />} />
                 <Route path="/team" element={<TeamPage />} />
                 <Route path="/ver-escala" element={<VerEscalaPage />} />
+                <Route path="/km-emissoes" element={<KmEmissoesPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
