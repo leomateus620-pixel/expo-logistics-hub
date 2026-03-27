@@ -1,7 +1,7 @@
 import { NavLink as RouterNavLink } from 'react-router-dom';
 import {
   LayoutDashboard, Car, Zap, MapPin, CalendarDays, CheckSquare, Users, Hotel, Bike,
-  PanelLeftClose, PanelLeftOpen, LogOut, Settings, ClipboardList, X, Gauge,
+  PanelLeftClose, PanelLeftOpen, LogOut, Settings, ClipboardList, X, Gauge, FileText,
 } from 'lucide-react';
 import logo from '@/assets/logofeira26.webp';
 import { useAuth } from '@/hooks/useAuth';
@@ -33,6 +33,7 @@ const recursos = [
 
 const sistema = [
   { to: '/settings', icon: Settings, label: 'Configurações' },
+  { to: '/system-report', icon: FileText, label: 'Relatório do Sistema' },
 ];
 
 const groups = [
