@@ -79,9 +79,9 @@ export default function DriverLocationMap({ latitude, longitude, accuracy, speed
 
     if (effectivePolyline && effectivePolyline.length > 1 && mapInstanceRef.current) {
       if (polylineRef.current) {
-        polylineRef.current.setLatLngs(routePolyline);
+        polylineRef.current.setLatLngs(effectivePolyline);
       } else {
-        polylineRef.current = L.polyline(routePolyline, {
+        polylineRef.current = L.polyline(effectivePolyline, {
           color: 'hsl(142,50%,35%)',
           weight: 3,
           opacity: 0.6,
