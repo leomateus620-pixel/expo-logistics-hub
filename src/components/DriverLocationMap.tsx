@@ -12,9 +12,10 @@ interface DriverLocationMapProps {
   routePolyline?: [number, number][];
   destLatLng?: [number, number];
   destLabel?: string;
+  zoomControl?: boolean;
 }
 
-export default function DriverLocationMap({ latitude, longitude, accuracy, speed, driverName, className, routePolyline, destLatLng, destLabel }: DriverLocationMapProps) {
+export default function DriverLocationMap({ latitude, longitude, accuracy, speed, driverName, className, routePolyline, destLatLng, destLabel, zoomControl = false }: DriverLocationMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const markerRef = useRef<L.Marker | null>(null);
@@ -27,7 +28,7 @@ export default function DriverLocationMap({ latitude, longitude, accuracy, speed
 
     if (!mapInstanceRef.current) {
       mapInstanceRef.current = L.map(mapRef.current, {
-        zoomControl: false,
+        zoomControl,
         attributionControl: false,
       }).setView([latitude, longitude], 13);
 

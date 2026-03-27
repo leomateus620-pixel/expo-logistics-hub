@@ -1,9 +1,10 @@
 import { useState, useMemo, useEffect, useRef, lazy, Suspense } from 'react';
 import { cn } from '@/lib/utils';
-import { Navigation, MapPinOff, Clock, ArrowRight, Ruler, Timer, Square, Play, Eye, MapPin } from 'lucide-react';
+import { Navigation, MapPinOff, Clock, ArrowRight, Ruler, Timer, Square, Play, Eye, MapPin, Expand } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTransportLocation } from '@/hooks/useLocationTracking';
 import { supabase } from '@/integrations/supabase/client';
+import FullscreenMapDialog from '@/components/transport/FullscreenMapDialog';
 
 const DriverLocationMap = lazy(() => import('@/components/DriverLocationMap'));
 
@@ -72,6 +73,7 @@ export default function TransportDynamicIsland({
 }: TransportDynamicIslandProps) {
   const isActive = t.status === 'em_andamento';
   const [expanded, setExpanded] = useState(isActive);
+  const [mapFullscreen, setMapFullscreen] = useState(false);
   const isCancelled = t.status === 'cancelado';
   const isDone = t.status === 'concluido';
 
@@ -253,7 +255,10 @@ export default function TransportDynamicIsland({
                     </div>
                   </div>
                 }>
-                  <div className="relative">
+                  <div
+                    className="relative cursor-pointer group"
+                    onClick={() => setMapFullscreen(true)}
+                  >
                     <DriverLocationMap
                       latitude={location.latitude}
                       longitude={location.longitude}
@@ -268,6 +273,9 @@ export default function TransportDynamicIsland({
                     <div className="absolute top-2 right-2 flex items-center gap-1.5 bg-card/80 backdrop-blur-sm rounded-full px-2.5 py-1 text-[10px] font-medium text-foreground border border-border/40">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                       Ao vivo
+                    </div>
+                    <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-card/80 backdrop-blur-sm rounded-lg p-1.5 border border-border/40">
+                      <Expand className="w-3.5 h-3.5 text-foreground/70" />
                     </div>
                   </div>
                 </Suspense>
@@ -399,6 +407,25 @@ export default function TransportDynamicIsland({
               <Eye className="w-3.5 h-3.5" /> Detalhes
             </button>
           </div>
+
+          {/* Fullscreen map dialog */}
+          {(location || destCoords) && (
+            <FullscreenMapDialog
+              open={mapFullscreen}
+              onOpenChange={setMapFullscreen}
+              latitude={location?.latitude ?? destCoords![0]}
+              longitude={location?.longitude ?? destCoords![1]}
+              accuracy={location?.accuracy}
+              speed={location?.speed}
+              driverName={driverName}
+              routePolyline={routePolyline}
+              destLatLng={destCoords}
+              destLabel={t.destino}
+              origemLabel={t.origem}
+              isLive={isActive && !!location}
+              etaText={liveEta ? `Chegada ~${liveEta.arrivalTime}` : etaText ? `~${etaText}` : null}
+            />
+          )}
 
           {/* Stop tracking */}
           {isMyTracking && (
