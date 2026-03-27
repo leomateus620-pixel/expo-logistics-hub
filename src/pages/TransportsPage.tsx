@@ -1,4 +1,5 @@
 import { useTransports } from '@/hooks/useTransports';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import StartTripDialog from '@/components/transport/StartTripDialog';
 import { useOrgMembers } from '@/hooks/useOrgMembers';
 import { useVehicles } from '@/hooks/useVehicles';
@@ -738,31 +739,33 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
             <DialogTitle>Novo Transporte</DialogTitle>
             <DialogDescription>Preencha os dados da viagem para agendar o transporte</DialogDescription>
           </DialogHeader>
-          <TransportForm
-            data={form}
-            setData={setForm}
-            isEdit={false}
-            guests={guests}
-            members={members}
-            vehicles={vehicles}
-            selectedGuests={selectedGuests}
-            setSelectedGuests={setSelectedGuests}
-            guestDestinations={guestDestinations}
-            setGuestDestinations={setGuestDestinations}
-            showNewGuestForm={showNewGuestForm}
-            setShowNewGuestForm={setShowNewGuestForm}
-            newGuestForm={newGuestForm}
-            setNewGuestForm={setNewGuestForm}
-            onCreateGuest={(d) => createGuest.mutateAsync(d)}
-            createGuestPending={createGuest.isPending}
-            includeReturn={includeReturn}
-            setIncludeReturn={setIncludeReturn}
-            returnForm={returnForm}
-            setReturnForm={setReturnForm}
-            getDriverCommission={getDriverCommission}
-            getVehicleConflictInfo={getVehicleConflictInfo}
-            availableVehicles={availableVehicles}
-          />
+          <ScrollArea className="max-h-[70vh] overflow-y-auto pr-1">
+            <TransportForm
+              data={form}
+              setData={setForm}
+              isEdit={false}
+              guests={guests}
+              members={members}
+              vehicles={vehicles}
+              selectedGuests={selectedGuests}
+              setSelectedGuests={setSelectedGuests}
+              guestDestinations={guestDestinations}
+              setGuestDestinations={setGuestDestinations}
+              showNewGuestForm={showNewGuestForm}
+              setShowNewGuestForm={setShowNewGuestForm}
+              newGuestForm={newGuestForm}
+              setNewGuestForm={setNewGuestForm}
+              onCreateGuest={(d) => createGuest.mutateAsync(d)}
+              createGuestPending={createGuest.isPending}
+              includeReturn={includeReturn}
+              setIncludeReturn={setIncludeReturn}
+              returnForm={returnForm}
+              setReturnForm={setReturnForm}
+              getDriverCommission={getDriverCommission}
+              getVehicleConflictInfo={getVehicleConflictInfo}
+              availableVehicles={availableVehicles}
+            />
+          </ScrollArea>
           <Button onClick={handleAdd} className="w-full h-11 rounded-xl font-semibold active:scale-[0.97] transition-all" disabled={create.isPending || isSubmittingRef.current}>
             {create.isPending ? 'Salvando...' : 'Agendar Transporte'}
           </Button>
@@ -828,33 +831,35 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
             <DialogTitle>{editForm.status === 'concluido' ? 'Finalizar Viagem' : 'Editar Transporte'}</DialogTitle>
             <DialogDescription>{editForm.status === 'concluido' ? 'Registre os dados finais e conclua a viagem' : 'Atualize as informações do transporte'}</DialogDescription>
           </DialogHeader>
-          <TransportForm
-            data={editForm}
-            setData={(d: any) => {
-              if (typeof d === 'function') {
-                setEditForm((prev: any) => {
-                  const result = d(prev);
-                  return { ...result, status: prev.status };
-                });
-              } else {
-                setEditForm((prev: any) => ({ ...d, status: prev.status }));
-              }
-            }}
-            isEdit={true}
-            guests={guests}
-            members={members}
-            vehicles={vehicles}
-            selectedGuests={editGuests}
-            setSelectedGuests={setEditGuests}
-            showNewGuestForm={editShowNewGuestForm}
-            setShowNewGuestForm={setEditShowNewGuestForm}
-            newGuestForm={editNewGuestForm}
-            setNewGuestForm={setEditNewGuestForm}
-            onCreateGuest={(d) => createGuest.mutateAsync(d)}
-            createGuestPending={createGuest.isPending}
-            getDriverCommission={getDriverCommission}
-            getVehicleConflictInfo={getVehicleConflictInfo}
-          />
+          <ScrollArea className="max-h-[70vh] overflow-y-auto pr-1">
+            <TransportForm
+              data={editForm}
+              setData={(d: any) => {
+                if (typeof d === 'function') {
+                  setEditForm((prev: any) => {
+                    const result = d(prev);
+                    return { ...result, status: prev.status };
+                  });
+                } else {
+                  setEditForm((prev: any) => ({ ...d, status: prev.status }));
+                }
+              }}
+              isEdit={true}
+              guests={guests}
+              members={members}
+              vehicles={vehicles}
+              selectedGuests={editGuests}
+              setSelectedGuests={setEditGuests}
+              showNewGuestForm={editShowNewGuestForm}
+              setShowNewGuestForm={setEditShowNewGuestForm}
+              newGuestForm={editNewGuestForm}
+              setNewGuestForm={setEditNewGuestForm}
+              onCreateGuest={(d) => createGuest.mutateAsync(d)}
+              createGuestPending={createGuest.isPending}
+              getDriverCommission={getDriverCommission}
+              getVehicleConflictInfo={getVehicleConflictInfo}
+            />
+          </ScrollArea>
           <Select value={editForm.status} onValueChange={(v) => setEditForm({ ...editForm, status: v })}>
             <SelectTrigger><SelectValue /></SelectTrigger>
             <SelectContent>
