@@ -62,6 +62,19 @@ interface TransportFormProps {
   availableVehicles?: any[];
 }
 
+const SANTA_ROSA = { lat: -27.8708, lng: -54.4814 };
+const knownDestCoords: Record<string, { lat: number; lng: number }> = {
+  'Parque': { lat: -27.8708, lng: -54.4814 },
+  'Hotel': { lat: -27.8711, lng: -54.4769 },
+  'Aeroporto_Chapecó': { lat: -27.1342, lng: -52.6566 },
+  'Aeroporto_Santo Ângelo': { lat: -28.2817, lng: -54.1691 },
+  'Aeroporto_Passo Fundo': { lat: -28.2437, lng: -52.3269 },
+  'Aeroporto_Porto Alegre': { lat: -29.9939, lng: -51.1711 },
+  'Centro': { lat: -27.8711, lng: -54.4769 },
+  'Escolta Policial': { lat: -27.8711, lng: -54.4769 },
+  'Outros': { lat: -27.8711, lng: -54.4769 },
+};
+
 export default function TransportForm({
   data, setData, isEdit, guests, members, vehicles, selectedGuests, setSelectedGuests,
   guestDestinations, setGuestDestinations, showNewGuestForm, setShowNewGuestForm,
@@ -69,6 +82,55 @@ export default function TransportForm({
   includeReturn, setIncludeReturn, returnForm, setReturnForm,
   getDriverCommission, getVehicleConflictInfo, availableVehicles,
 }: TransportFormProps) {
+  const [apiKm, setApiKm] = useState<number | null>(null);
+  const [loadingKm, setLoadingKm] = useState(false);
+
+  // Fetch real road distance when titulo/voo_cidade changes
+  useEffect(() => {
+    const destKey = data.titulo === 'Aeroporto' && data.voo_cidade
+      ? `Aeroporto_${data.voo_cidade}` : (data.titulo || '');
+    if (!destKey || destKey === 'Outros') { setApiKm(null); return; }
+
+    const dest = knownDestCoords[destKey] || knownDestCoords['Outros'];
+    let cancelled = false;
+    setLoadingKm(true);
+    (async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const res = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/estimate-return`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+              'Authorization': `Bearer ${session?.access_token || ''}`,
+            },
+            body: JSON.stringify({
+              mode: 'ROUTE_PREVIEW',
+              origin_lat: SANTA_ROSA.lat,
+              origin_lng: SANTA_ROSA.lng,
+              dest_lat: dest.lat,
+              dest_lng: dest.lng,
+              destination: destKey,
+            }),
+          }
+        );
+        const result = await res.json();
+        if (!cancelled && result.distance_km && !result.fallback) {
+          setApiKm(Math.round(result.distance_km * 2));
+        } else if (!cancelled) {
+          setApiKm(null);
+        }
+      } catch {
+        if (!cancelled) setApiKm(null);
+      } finally {
+        if (!cancelled) setLoadingKm(false);
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [data.titulo, data.voo_cidade]);
+
   const driverCommission = data.motorista_user_id && data.motorista_user_id !== 'none'
     ? getDriverCommission(data.motorista_user_id) : null;
   const isConcluido = isEdit && data.status === 'concluido';
