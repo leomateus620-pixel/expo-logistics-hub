@@ -85,23 +85,23 @@ export function rawMonthShort(iso: string | null | undefined): string {
   return date.toLocaleDateString('pt-BR', { month: 'short' });
 }
 
-/** Known one-way distances in km from Santa Rosa to common destinations */
-const KNOWN_DISTANCES_KM: Record<string, number> = {
-  'Aeroporto_Chapecó': 185,
-  'Aeroporto_Santo Ângelo': 55,
-  'Aeroporto_Passo Fundo': 210,
-  'Aeroporto_Porto Alegre': 490,
-  'Parque': 3,
-  'Hotel': 2,
-  'Centro': 2,
-  'Escolta Policial': 2,
+/** Known round-trip distances in km from Santa Rosa to common destinations */
+const KNOWN_ROUNDTRIP_KM: Record<string, number> = {
+  'Aeroporto_Chapecó': 630,
+  'Aeroporto_Santo Ângelo': 143,
+  'Aeroporto_Passo Fundo': 560,
+  'Aeroporto_Porto Alegre': 1024,
+  'Parque': 6,
+  'Hotel': 4,
+  'Centro': 4,
+  'Escolta Policial': 4,
 };
 
 /** Get estimated round-trip km for a transport based on title/city */
 export function getRoundTripKm(titulo: string | null | undefined, vooCidade?: string | null): number | null {
   if (!titulo) return null;
   const key = titulo === 'Aeroporto' && vooCidade ? `Aeroporto_${vooCidade}` : titulo;
-  const oneWay = KNOWN_DISTANCES_KM[key];
-  if (oneWay === undefined || oneWay === 0) return null;
-  return oneWay * 2;
+  const km = KNOWN_ROUNDTRIP_KM[key];
+  if (km === undefined || km === 0) return null;
+  return km;
 }
