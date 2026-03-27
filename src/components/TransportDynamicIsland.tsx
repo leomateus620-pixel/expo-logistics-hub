@@ -70,14 +70,19 @@ export default function TransportDynamicIsland({
   onCycleStatus,
   onDetail,
 }: TransportDynamicIslandProps) {
-  const [expanded, setExpanded] = useState(false);
   const isActive = t.status === 'em_andamento';
+  const [expanded, setExpanded] = useState(isActive);
   const isCancelled = t.status === 'cancelado';
   const isDone = t.status === 'concluido';
 
   const location = useTransportLocation(isActive ? t.id : null);
   const [liveEta, setLiveEta] = useState<{ minutes: number; km: number; arrivalTime: string } | null>(null);
   const lastFetchRef = useRef<number>(0);
+
+  // Auto-expand when transport becomes active
+  useEffect(() => {
+    if (isActive) setExpanded(true);
+  }, [isActive]);
 
   const routePolyline = useMemo(() => {
     if (t.rota_polyline) {
@@ -263,6 +268,31 @@ export default function TransportDynamicIsland({
                     <div className="absolute top-2 right-2 flex items-center gap-1.5 bg-card/80 backdrop-blur-sm rounded-full px-2.5 py-1 text-[10px] font-medium text-foreground border border-border/40">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                       Ao vivo
+                    </div>
+                  </div>
+                </Suspense>
+              ) : isActive && !location && destCoords ? (
+                <Suspense fallback={
+                  <div className="h-[160px] bg-muted/30 flex items-center justify-center">
+                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <Navigation className="w-4 h-4 animate-pulse" /> Carregando mapa...
+                    </div>
+                  </div>
+                }>
+                  <div className="relative">
+                    <DriverLocationMap
+                      latitude={destCoords[0]}
+                      longitude={destCoords[1]}
+                      className="h-[160px] relative"
+                      routePolyline={routePolyline}
+                      destLatLng={destCoords}
+                      destLabel={t.destino}
+                    />
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-[1px] rounded-2xl">
+                      <span className="flex items-center gap-2 bg-card/90 px-3 py-1.5 rounded-full text-xs font-medium text-foreground">
+                        <Navigation className="w-3.5 h-3.5 animate-pulse text-accent" />
+                        Obtendo localização do motorista...
+                      </span>
                     </div>
                   </div>
                 </Suspense>

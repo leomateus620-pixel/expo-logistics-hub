@@ -72,12 +72,16 @@ export default function DriverLocationMap({ latitude, longitude, accuracy, speed
       }
     }
 
-    // Route polyline
-    if (routePolyline && routePolyline.length > 1 && mapInstanceRef.current) {
+    // Route polyline or fallback straight line
+    const effectivePolyline = (routePolyline && routePolyline.length > 1)
+      ? routePolyline
+      : (destLatLng ? [[latitude, longitude] as [number, number], destLatLng] : undefined);
+
+    if (effectivePolyline && effectivePolyline.length > 1 && mapInstanceRef.current) {
       if (polylineRef.current) {
-        polylineRef.current.setLatLngs(routePolyline);
+        polylineRef.current.setLatLngs(effectivePolyline);
       } else {
-        polylineRef.current = L.polyline(routePolyline, {
+        polylineRef.current = L.polyline(effectivePolyline, {
           color: 'hsl(142,50%,35%)',
           weight: 3,
           opacity: 0.6,
