@@ -11,7 +11,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useTransportGuests } from '@/hooks/useTransportGuests';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Plus, Check, Clock, X, Pencil, Search, XCircle, Trash2, FileText, Eye, ArrowRight, Plane, Navigation, MapPinOff, Route, Timer, Ruler, Play, Square, History, ChevronDown, ChevronUp } from 'lucide-react';
-import { cn, rawTime, rawDateShort, nowSP, nowSPLocal, ensureSPOffset } from '@/lib/utils';
+import { cn, rawTime, rawDateShort, nowSP, nowSPLocal, ensureSPOffset, getRoundTripKm } from '@/lib/utils';
 import { useState, lazy, Suspense, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
@@ -426,7 +426,7 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
           voo_chegada: form.titulo === 'Aeroporto' ? form.voo_chegada || null : null,
           horario_saida: form.titulo === 'Aeroporto' ? form.horario_saida || null : null,
           observacoes: buildEscoltaObs(form),
-          distancia_estimada_km: routeData.distance_km || null,
+          distancia_estimada_km: routeData.distance_km || getRoundTripKm(form.titulo, form.voo_cidade) || null,
           duracao_estimada_min: routeData.duration_minutes || null,
           rota_polyline: routeData.polyline || null,
         },
@@ -473,7 +473,7 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
               voo_numero: capturedReturnForm.voo_numero || null,
               voo_checkin: capturedReturnForm.voo_checkin || null,
               horario_saida: capturedReturnForm.horario_saida || null,
-              distancia_estimada_km: returnRouteData.distance_km || null,
+              distancia_estimada_km: returnRouteData.distance_km || getRoundTripKm('Aeroporto', capturedForm.voo_cidade) || null,
               duracao_estimada_min: returnRouteData.duration_minutes || null,
               rota_polyline: returnRouteData.polyline || null,
             },

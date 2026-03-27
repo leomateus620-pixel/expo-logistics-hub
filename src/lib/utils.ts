@@ -84,3 +84,24 @@ export function rawMonthShort(iso: string | null | undefined): string {
   const date = new Date(Number(y), Number(m) - 1, 1);
   return date.toLocaleDateString('pt-BR', { month: 'short' });
 }
+
+/** Known one-way distances in km from Santa Rosa to common destinations */
+const KNOWN_DISTANCES_KM: Record<string, number> = {
+  'Aeroporto_Chapecó': 185,
+  'Aeroporto_Santo Ângelo': 55,
+  'Aeroporto_Passo Fundo': 210,
+  'Aeroporto_Porto Alegre': 490,
+  'Parque': 3,
+  'Hotel': 2,
+  'Centro': 2,
+  'Escolta Policial': 2,
+};
+
+/** Get estimated round-trip km for a transport based on title/city */
+export function getRoundTripKm(titulo: string | null | undefined, vooCidade?: string | null): number | null {
+  if (!titulo) return null;
+  const key = titulo === 'Aeroporto' && vooCidade ? `Aeroporto_${vooCidade}` : titulo;
+  const oneWay = KNOWN_DISTANCES_KM[key];
+  if (oneWay === undefined || oneWay === 0) return null;
+  return oneWay * 2;
+}

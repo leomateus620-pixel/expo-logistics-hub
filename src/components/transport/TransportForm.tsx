@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Check, Plus } from 'lucide-react';
 import { toast } from 'sonner';
+import { getRoundTripKm } from '@/lib/utils';
 
 const tituloOptions = ['Parque', 'Hotel', 'Aeroporto', 'Centro', 'Escolta Policial', 'Outros'];
 const cidadeAeroportoOptions = ['Chapecó', 'Santo Ângelo', 'Passo Fundo', 'Porto Alegre'];
@@ -103,6 +104,14 @@ export default function TransportForm({
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
               />
             </div>
+            {(() => {
+              const km = getRoundTripKm(data.titulo, data.voo_cidade);
+              return km ? (
+                <p className="text-xs text-muted-foreground bg-muted/30 rounded-lg px-3 py-2">
+                  🛣️ Distância estimada: <span className="font-semibold text-foreground">~{km} km</span> (ida e volta)
+                </p>
+              ) : null;
+            })()}
           </div>
         </AccordionContent>
       </AccordionItem>
