@@ -169,10 +169,15 @@ export default function TransportForm({
               />
             </div>
             {(() => {
-              const km = getRoundTripKm(data.titulo, data.voo_cidade);
+              const km = apiKm || getRoundTripKm(data.titulo, data.voo_cidade);
+              if (loadingKm) return (
+                <p className="text-xs text-muted-foreground bg-muted/30 rounded-lg px-3 py-2">
+                  🛣️ Calculando distância por rota...
+                </p>
+              );
               return km ? (
                 <p className="text-xs text-muted-foreground bg-muted/30 rounded-lg px-3 py-2">
-                  🛣️ Distância estimada: <span className="font-semibold text-foreground">~{km} km</span> (ida e volta)
+                  🛣️ Distância estimada: <span className="font-semibold text-foreground">~{km} km</span> (ida e volta){apiKm ? ' · via Google Maps' : ''}
                 </p>
               ) : null;
             })()}
