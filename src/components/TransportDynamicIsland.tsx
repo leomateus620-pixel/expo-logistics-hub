@@ -159,7 +159,7 @@ export default function TransportDynamicIsland({
     return (
       <div className="flex items-center gap-2 px-3 py-2 rounded-full bg-muted/40 text-muted-foreground/60">
         <MapPin className="w-3.5 h-3.5" />
-        <span className="text-xs truncate">{t.origem} → {t.destino}</span>
+        <span className="text-xs truncate">{t.origem} → {t.destino} → {t.origem}</span>
         <span className="text-[10px] ml-auto">Cancelado</span>
       </div>
     );
@@ -209,6 +209,8 @@ export default function TransportDynamicIsland({
             <span className="text-sm font-semibold truncate text-foreground">{t.origem}</span>
             <ArrowRight className="w-3 h-3 text-muted-foreground/60 shrink-0" />
             <span className="text-sm font-semibold truncate text-foreground">{t.destino}</span>
+            <ArrowRight className="w-3 h-3 text-muted-foreground/60 shrink-0" />
+            <span className="text-sm font-semibold truncate text-foreground">{t.origem}</span>
           </div>
           <div className="flex items-center gap-1.5 mt-0.5">
             <span className={cn(

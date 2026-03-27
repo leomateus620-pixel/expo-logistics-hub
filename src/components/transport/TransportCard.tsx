@@ -65,7 +65,7 @@ export default function TransportCard({ t, members, vehicles, guests, highlightI
             </div>
             <div className="min-w-0">
               <p className="text-sm font-semibold truncate text-foreground">
-                {t.titulo || (guest?.nome) || `${t.origem} → ${t.destino}`}
+                {t.titulo || (guest?.nome) || `${t.origem} → ${t.destino} → ${t.origem}`}
               </p>
               <div className="flex items-center gap-1.5 mt-0.5">
                 <span className={cn('w-1.5 h-1.5 rounded-full', sc.dotClass, isActive && 'animate-pulse')} />

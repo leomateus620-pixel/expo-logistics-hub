@@ -34,7 +34,7 @@ export default function TransportDetailView({ t, members, vehicles, guests, getD
       <DialogHeader>
         <DialogTitle className="flex items-center gap-2">
           <Eye className="w-5 h-5" />
-          {t.titulo || `${t.origem} → ${t.destino}`}
+          {t.titulo || `${t.origem} → ${t.destino} → ${t.origem}`}
         </DialogTitle>
         <DialogDescription>Detalhes do transporte</DialogDescription>
       </DialogHeader>
