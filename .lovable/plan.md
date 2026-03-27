@@ -1,18 +1,22 @@
 
-# Mover e Melhorar Cards de Acesso Rápido no Dashboard
+# Adicionar Scroll ao Dialog de Criar/Editar Transporte
 
-## O que muda
+## Problema
+O formulário "Novo Transporte" tem conteúdo extenso (accordions de dados, hóspedes, motorista, voo, retorno) que ultrapassa a viewport, ficando cortado sem scroll.
 
-1. **Reposicionar**: Mover o bloco "Acessos Rápidos" (linhas 393-442) para logo após os 4 StatCards (após linha 213), antes de "Próximos Transportes".
+## Solução
+Envolver o `TransportForm` dentro do `DialogContent` com um `ScrollArea` limitado a `max-h-[70vh]`, permitindo scroll suave dentro do modal.
 
-2. **Melhorar contraste e visual**: 
-   - Títulos: `text-foreground font-bold text-sm` → `text-foreground font-extrabold text-base`
-   - Subtítulos: de `text-muted-foreground` → `text-foreground/80 font-semibold`
-   - Descrição: de `text-muted-foreground/70 text-[10px]` → `text-muted-foreground text-[11px]`
-   - Ícones maiores: `w-12 h-12` no container, `w-6 h-6` no ícone
-   - Badge com melhor contraste: Card 1 badge verde (`bg-primary/15 text-primary`), Card 2 badge dourado (`bg-gold/15 text-gold`)
-   - Padding aumentado: `p-5` → `p-5 sm:p-6`
-   - Borda lateral colorida sutil: Card 1 com `border-l-2 border-primary/40`, Card 2 com `border-l-2 border-gold/40`
+## Implementação
 
-## Arquivo
-- `src/pages/Dashboard.tsx` — recortar bloco das linhas 393-442, colar após linha 213, aplicar melhorias visuais
+**`src/pages/TransportsPage.tsx`** — 2 alterações:
+
+1. Importar `ScrollArea` de `@/components/ui/scroll-area`
+2. No dialog de criação (linha ~741) e no dialog de edição (linha ~831), envolver `<TransportForm .../>` com:
+```tsx
+<ScrollArea className="max-h-[70vh] overflow-y-auto pr-1">
+  <TransportForm ... />
+</ScrollArea>
+```
+
+O `pr-1` evita que a scrollbar sobreponha o conteúdo. Nenhuma outra alteração necessária.
