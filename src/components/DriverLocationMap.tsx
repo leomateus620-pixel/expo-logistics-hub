@@ -35,6 +35,10 @@ export default function DriverLocationMap({ latitude, longitude, accuracy, speed
         maxZoom: 19,
       }).addTo(mapInstanceRef.current);
 
+      setTimeout(() => {
+        mapInstanceRef.current?.invalidateSize();
+      }, 600);
+
       // Driver icon
       const carIcon = L.divIcon({
         html: `<div style="background:hsl(142,50%,35%);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3);font-size:14px;">🚗</div>`,
@@ -109,9 +113,18 @@ export default function DriverLocationMap({ latitude, longitude, accuracy, speed
     }
   }, [latitude, longitude, accuracy, driverName, routePolyline, destLatLng, destLabel]);
 
-  // Cleanup
+  // Cleanup + ResizeObserver
   useEffect(() => {
+    const container = mapRef.current;
+    if (!container) return;
+
+    const observer = new ResizeObserver(() => {
+      mapInstanceRef.current?.invalidateSize();
+    });
+    observer.observe(container);
+
     return () => {
+      observer.disconnect();
       mapInstanceRef.current?.remove();
       mapInstanceRef.current = null;
       markerRef.current = null;
