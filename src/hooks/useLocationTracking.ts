@@ -19,6 +19,15 @@ export function useLocationTracking(transportId: string | null) {
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const lastPosRef = useRef<{ lat: number; lng: number } | null>(null);
 
+  // Keep refs in sync so updateLocation always reads fresh values
+  const transportIdRef = useRef(transportId);
+  const orgIdRef = useRef(orgId);
+  const userRef = useRef(user);
+
+  useEffect(() => { transportIdRef.current = transportId; }, [transportId]);
+  useEffect(() => { orgIdRef.current = orgId; }, [orgId]);
+  useEffect(() => { userRef.current = user; }, [user]);
+
   const [state, setState] = useState<LocationState>({
     isTracking: false,
     latitude: null,
@@ -29,7 +38,11 @@ export function useLocationTracking(transportId: string | null) {
   });
 
   const updateLocation = useCallback(async (pos: GeolocationPosition) => {
-    if (!transportId || !orgId || !user) return;
+    const tid = transportIdRef.current;
+    const oid = orgIdRef.current;
+    const u = userRef.current;
+    if (!tid || !oid || !u) return;
+
     const { latitude, longitude, accuracy, speed, heading } = pos.coords;
 
     setState(prev => ({
@@ -44,11 +57,10 @@ export function useLocationTracking(transportId: string | null) {
     lastPosRef.current = { lat: latitude, lng: longitude };
 
     try {
-      // Upsert location (unique per transport_id)
       await (supabase as any).from('transport_locations').upsert({
-        transport_id: transportId,
-        org_id: orgId,
-        driver_user_id: user.id,
+        transport_id: tid,
+        org_id: oid,
+        driver_user_id: u.id,
         latitude,
         longitude,
         accuracy,
@@ -59,22 +71,35 @@ export function useLocationTracking(transportId: string | null) {
     } catch (err) {
       console.error('Failed to update location:', err);
     }
-  }, [transportId, orgId, user]);
+  }, []); // No deps — reads from refs
 
-  const startTracking = useCallback(() => {
+  const startTracking = useCallback(async () => {
     if (!navigator.geolocation) {
       setState(prev => ({ ...prev, error: 'Geolocalização não suportada neste navegador' }));
       return;
     }
 
+    // Check permission state first
+    try {
+      const perm = await navigator.permissions.query({ name: 'geolocation' as PermissionName });
+      if (perm.state === 'denied') {
+        setState(prev => ({
+          ...prev,
+          error: 'Localização bloqueada. Acesse as configurações do navegador para permitir.',
+        }));
+        return;
+      }
+    } catch {
+      // Some browsers don't support permissions API — proceed anyway
+    }
+
     setState(prev => ({ ...prev, isTracking: true, error: null }));
 
-    // Watch position with high accuracy
     watchIdRef.current = navigator.geolocation.watchPosition(
       (pos) => updateLocation(pos),
       (err) => {
         let msg = 'Erro ao obter localização';
-        if (err.code === 1) msg = 'Permissão de localização negada';
+        if (err.code === 1) msg = 'Permissão de localização negada. Ative nas configurações do navegador.';
         if (err.code === 2) msg = 'Localização indisponível';
         if (err.code === 3) msg = 'Tempo esgotado ao obter localização';
         setState(prev => ({ ...prev, error: msg }));
@@ -97,9 +122,8 @@ export function useLocationTracking(transportId: string | null) {
       intervalRef.current = null;
     }
 
-    // Remove location record
-    if (transportId) {
-      await (supabase as any).from('transport_locations').delete().eq('transport_id', transportId);
+    if (transportIdRef.current) {
+      await (supabase as any).from('transport_locations').delete().eq('transport_id', transportIdRef.current);
     }
 
     setState({
@@ -111,7 +135,7 @@ export function useLocationTracking(transportId: string | null) {
       error: null,
     });
     lastPosRef.current = null;
-  }, [transportId]);
+  }, []);
 
   // Cleanup on unmount
   useEffect(() => {

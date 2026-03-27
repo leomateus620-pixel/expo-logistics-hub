@@ -327,13 +327,25 @@ export default function TransportDynamicIsland({
 
           {/* Tracking status for my tracking */}
           {isMyTracking && !location && (
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              {trackingError ? (
-                <><MapPinOff className="w-3.5 h-3.5 text-destructive" /><span className="text-destructive">{trackingError}</span></>
-              ) : (
-                <><Navigation className="w-3.5 h-3.5 animate-pulse text-accent" /><span>Obtendo localização...</span></>
-              )}
-            </div>
+            trackingError ? (
+              <div className="flex flex-col gap-1.5 p-2.5 rounded-xl bg-destructive/10 border border-destructive/20">
+                <div className="flex items-center gap-2 text-xs text-destructive">
+                  <MapPinOff className="w-3.5 h-3.5" />
+                  <span>{trackingError}</span>
+                </div>
+                <button
+                  onClick={() => locationTracker.startTracking()}
+                  className="text-[10px] text-accent underline text-left"
+                >
+                  Tentar novamente
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <Navigation className="w-3.5 h-3.5 animate-pulse text-accent" />
+                <span>Obtendo localização...</span>
+              </div>
+            )
           )}
 
           {/* Metrics row */}
