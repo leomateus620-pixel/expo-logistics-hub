@@ -73,8 +73,8 @@ export default function GuestsPage() {
         email: form.email || null,
         tipo: form.tipo,
         hotel_nome: form.hotel_nome || null,
-        checkin_em: form.checkin_em || null,
-        checkout_em: form.checkout_em || null,
+        checkin_em: form.checkin_em ? ensureSPOffset(form.checkin_em) : null,
+        checkout_em: form.checkout_em ? ensureSPOffset(form.checkout_em) : null,
         observacoes: form.observacoes || null,
       });
       setForm(emptyForm);
