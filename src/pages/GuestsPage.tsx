@@ -87,8 +87,8 @@ export default function GuestsPage() {
     setEditId(g.id);
     setEditForm({
       nome: g.nome, telefone: g.telefone || '', email: g.email || '', tipo: g.tipo || 'outro',
-      hotel_nome: g.hotel_nome || '', checkin_em: g.checkin_em?.slice(0, 16) || '',
-      checkout_em: g.checkout_em?.slice(0, 16) || '', observacoes: g.observacoes || '',
+      hotel_nome: g.hotel_nome || '', checkin_em: g.checkin_em ? utcToSPLocal(g.checkin_em) : '',
+      checkout_em: g.checkout_em ? utcToSPLocal(g.checkout_em) : '', observacoes: g.observacoes || '',
     });
     setEditOpen(true);
   };
