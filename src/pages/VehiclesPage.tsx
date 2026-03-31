@@ -340,8 +340,8 @@ export default function VehiclesPage() {
                     <p className="text-xs font-bold text-foreground">{formatKm(vehicleKm)}</p>
                   </div>
                   <div className="rounded-xl bg-foreground/[0.03] p-2">
-                    <p className="text-[10px] text-muted-foreground">Custo Real</p>
-                    <p className="text-xs font-bold text-foreground">{vehicleFuelCost > 0 ? formatCurrency(vehicleFuelCost) : '—'}</p>
+                    <p className="text-[10px] text-muted-foreground">Custo Est.</p>
+                    <p className="text-xs font-bold text-foreground">{vehicleKm > 0 ? formatCurrency(vehicleKm * FUEL_COST_PER_KM) : '—'}</p>
                   </div>
                 </div>
 
@@ -576,6 +576,7 @@ function VehicleDetailContent({ vehicle, members, userId, kmTotal, fuelCostTotal
       await updateVehicle.mutateAsync({
         id: vehicle.id,
         status: 'em_uso',
+        km_atual: Number(kmSaida),
         responsavel_user_id: responsavelId && responsavelId !== 'none' ? responsavelId : null,
       });
       setKmSaida('');

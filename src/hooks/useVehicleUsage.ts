@@ -89,6 +89,7 @@ export function useVehicleUsage(vehicleId?: string) {
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ['vehicle_usage'] });
+      qc.invalidateQueries({ queryKey: ['vehicles'] });
     },
   });
 
