@@ -576,6 +576,7 @@ function VehicleDetailContent({ vehicle, members, userId, kmTotal, fuelCostTotal
       await updateVehicle.mutateAsync({
         id: vehicle.id,
         status: 'em_uso',
+        km_atual: Number(kmSaida),
         responsavel_user_id: responsavelId && responsavelId !== 'none' ? responsavelId : null,
       });
       setKmSaida('');
