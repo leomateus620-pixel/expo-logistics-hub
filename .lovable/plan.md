@@ -1,54 +1,63 @@
 
 
-# Correção do Fuso Horário nos Hóspedes (Check-in / Check-out)
+# Reset + Teste Completo do Fluxo de Retirada/Devolução de Veículos
 
-## Problema
+## Problemas Identificados no Código
 
-O `DateTimePicker` emite valores sem offset (ex: `2026-05-10T12:00`). O `GuestsPage` envia esse valor diretamente ao banco. O Supabase interpreta como UTC, então `12:00 BRT` vira `12:00 UTC` = `09:00 BRT` — 3 horas a menos.
+1. **Odômetro não atualiza na retirada**: `handleRetirada` não atualiza `vehicle.km_atual` com o KM de saída. O odômetro só atualiza após devolução. Isso causa inconsistência visual durante o uso.
 
-O `TransportsPage` já resolve isso com `ensureSPOffset()`, mas o `GuestsPage` nunca foi atualizado.
+2. **Custo Estimado ausente nos cards individuais**: Os cards dos veículos mostram "Custo Real" (abastecimentos), mas não mostram o Custo Estimado (KM × R$ 0,65) por veículo.
 
-## Dados existentes afetados
+3. **Invalidação incompleta**: `createUsage` não invalida `['vehicles']`, então após retirada o card pode não refletir o status imediatamente.
 
-Todos os 12 hóspedes com datas estão com horários 3h atrasados no banco. Ex: CRISTIAN checkin salvo como `08:00 UTC` quando deveria ser `08:00-03:00` (= `11:00 UTC`).
+## Plano de Execução
 
-## Correções
+### 1. Migração SQL — Reset completo dos dados de uso
 
-### 1. Migração SQL — corrigir dados existentes
-Adicionar 3 horas a todos os `checkin_em` e `checkout_em` existentes:
 ```sql
-UPDATE guests SET checkin_em = checkin_em + interval '3 hours' WHERE checkin_em IS NOT NULL;
-UPDATE guests SET checkout_em = checkout_em + interval '3 hours' WHERE checkout_em IS NOT NULL;
+-- Deletar todos os registros de uso
+DELETE FROM vehicle_usage;
+
+-- Limpar KM dos transportes (zerar histórico de KM)
+UPDATE transports SET km_retirada = NULL, km_devolucao = NULL;
+
+-- Resetar odômetro de todos os veículos para 0
+UPDATE vehicles SET km_atual = 0;
 ```
 
-### 2. `src/pages/GuestsPage.tsx` — aplicar `ensureSPOffset` ao salvar
+### 2. Fix: Atualizar odômetro na retirada (`VehiclesPage.tsx`)
 
-No `handleAdd` e `handleEdit`, envolver `checkin_em` e `checkout_em` com `ensureSPOffset()` antes de enviar ao banco:
+No `handleRetirada`, adicionar `km_atual: Number(kmSaida)` no `updateVehicle`:
 ```typescript
-checkin_em: form.checkin_em ? ensureSPOffset(form.checkin_em) : null,
-checkout_em: form.checkout_em ? ensureSPOffset(form.checkout_em) : null,
+await updateVehicle.mutateAsync({
+  id: vehicle.id,
+  status: 'em_uso',
+  km_atual: Number(kmSaida),  // ← NOVO
+  responsavel_user_id: ...
+});
 ```
 
-### 3. `src/pages/GuestsPage.tsx` — corrigir `openEdit` para converter UTC→SP local
+### 3. Fix: Invalidar queries de veículos após criar usage (`useVehicleUsage.ts`)
 
-Ao abrir edição, o valor vem do banco em UTC. Precisa converter para horário SP antes de popular o formulário, para que o DateTimePicker mostre o horário correto:
-```typescript
-// Converter ISO UTC para datetime-local em SP
-function utcToSPLocal(iso: string): string {
-  const d = new Date(iso);
-  const parts = new Intl.DateTimeFormat('sv-SE', { 
-    timeZone: 'America/Sao_Paulo', 
-    year: 'numeric', month: '2-digit', day: '2-digit',
-    hour: '2-digit', minute: '2-digit', hour12: false 
-  }).formatToParts(d);
-  // reconstruct YYYY-MM-DDTHH:MM
-}
-```
+No `createUsage.onSuccess`, adicionar invalidação de `['vehicles']`.
 
-### Arquivos alterados
+### 4. Fix: Mostrar Custo Estimado por veículo nos cards (`VehiclesPage.tsx`)
+
+Substituir "Custo Real" no grid de 3 colunas do card por "Custo Est." calculado como `vehicleKm * 0.65`, mantendo Custo Real visível nos detalhes.
+
+### 5. Teste manual do fluxo completo
+
+Após implementação, testar no browser:
+- Confirmar dashboard zerado (0 km, R$ 0,00)
+- Retirar 3 veículos com KM diferentes
+- Devolver e verificar cálculos
+- Confirmar totais do dashboard
+
+## Arquivos Alterados
 
 | Arquivo | Ação |
 |---|---|
-| `src/pages/GuestsPage.tsx` | Editar — adicionar `ensureSPOffset` no save + converter UTC→local no edit |
-| SQL migration | Criar — corrigir dados existentes (+3h) |
+| SQL migration | Reset de vehicle_usage, transports KM, vehicles km_atual |
+| `src/pages/VehiclesPage.tsx` | Fix odômetro na retirada + Custo Estimado nos cards |
+| `src/hooks/useVehicleUsage.ts` | Fix invalidação de vehicles no createUsage |
 
