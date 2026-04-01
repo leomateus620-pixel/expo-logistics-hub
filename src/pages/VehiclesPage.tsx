@@ -678,15 +678,18 @@ function VehicleDetailContent({ vehicle, members, userId, kmTotal, fuelCostTotal
 
         {vehicle.documento_url ? (
           <div className="flex items-center gap-2">
-            <a
-              href={vehicle.documento_url}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              onClick={async () => {
+                try {
+                  const url = await getDocumentUrl(vehicle.documento_url!);
+                  window.open(url, '_blank');
+                } catch (err: any) { toast.error(err.message || 'Erro ao abrir documento'); }
+              }}
               className="flex-1 flex items-center gap-2 px-3 py-2.5 rounded-xl bg-primary/5 border border-primary/15 text-xs font-medium text-primary hover:bg-primary/10 transition-colors"
             >
               <Eye className="w-4 h-4" />
               Ver documento PDF
-            </a>
+            </button>
             <label className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-dashed border-muted-foreground/30 text-xs text-muted-foreground cursor-pointer hover:bg-foreground/5 transition-colors">
               <Upload className="w-3.5 h-3.5" />
               Substituir
