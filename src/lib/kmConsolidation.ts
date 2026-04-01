@@ -110,7 +110,7 @@ export const FAIR_PERIODS: Period[] = [
 ];
 
 function getDateStr(iso: string): string {
-  return iso.slice(0, 10);
+  return new Date(iso).toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
 }
 
 function findPeriod(date: string, periods: Period[]): string | null {
