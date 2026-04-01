@@ -514,7 +514,7 @@ function VehicleDetailContent({ vehicle, members, userId, kmTotal, fuelCostTotal
 }) {
   const { usages, createUsage, updateUsage } = useVehicleUsage(vehicle.id);
   const { transports } = useTransports();
-  const { update: updateVehicle, uploadDocument } = useVehicles();
+  const { update: updateVehicle, uploadDocument, getDocumentUrl } = useVehicles();
   const { records: fuelRecords, create: createFuel, updateFuel, uploadReceipt } = useFuelRecords(vehicle.id);
   const navigate = useNavigate();
 
