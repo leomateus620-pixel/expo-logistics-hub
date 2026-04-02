@@ -1,26 +1,54 @@
 
 
-# Update Agenda Header Text & Premium Liquid Glass Style
+# Fix: Agenda Timezone Inconsistencies with Transports
 
-## Changes
+## Problem
+
+The Agenda page has three timezone bugs that cause transports to appear on wrong days and wrong time shifts compared to the Transports page:
+
+1. **Date extraction** (line 181): `e.inicio_em?.split('T')[0]` extracts the UTC date portion from ISO timestamps. A transport at `23:00 BRT` = `02:00+1 UTC` appears on the next day in the Agenda.
+
+2. **Day filtering** (line 210): `e.inicio_em?.startsWith(selectedDate)` matches against the UTC date portion, same problem.
+
+3. **Shift detection** (line 28): `getShift()` uses `iso.slice(11, 13)` to get the hour — this is the UTC hour, not São Paulo hour. A transport at `14:00 BRT` (afternoon) could show as `17:00 UTC` (evening shift).
+
+The Transports page uses `rawTime()` which correctly converts to São Paulo timezone, so times display correctly there but not in the Agenda grouping logic.
+
+## Plan
 
 ### File: `src/pages/AgendaPage.tsx`
 
-**1. Update header text (lines 283-284):**
-- Title: "Programação da Feira" → "Agenda de Transportes"
-- Subtitle: "Agenda oficial de eventos Fenasoja" → "Gestão dos deslocamentos e recepção de convidados"
+**1. Fix `getShift()` helper (line 27-31)**
+Use `Date` + `toLocaleString` with `America/Sao_Paulo` timezone to extract the local hour:
 
-**2. Apply Liquid Glass styling to the header block (lines 281-285):**
-- Wrap the header area in a glass container with `backdrop-blur-xl`, translucent background (`bg-white/[0.04]`), subtle border (`border border-white/10`), rounded corners (`rounded-2xl`), and padding
-- Add a subtle gradient or glow accent consistent with the existing Liquid Glass design system
+```typescript
+function getShift(iso: string): 'manha' | 'tarde' | 'noite' {
+  const d = new Date(iso);
+  const h = parseInt(d.toLocaleTimeString('en-US', { hour: '2-digit', hour12: false, timeZone: 'America/Sao_Paulo' }), 10);
+  if (h < 12) return 'manha';
+  if (h < 18) return 'tarde';
+  return 'noite';
+}
+```
 
-**3. Update PDF header (lines 85-86):**
-- Match the same text changes in the PDF generator: title → "Agenda de Transportes", subtitle → "Gestão dos deslocamentos e recepção de convidados — Fenasoja 2026"
+**2. Add a `getDateSP()` helper**
+Extract the São Paulo date from an ISO timestamp:
 
-## Technical Details
+```typescript
+function getDateSP(iso: string): string {
+  return new Date(iso).toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
+}
+```
 
-| File | Lines | Action |
-|---|---|---|
-| `src/pages/AgendaPage.tsx` | 281-294 | Restyle header with glass container + new text |
-| `src/pages/AgendaPage.tsx` | 85-86 | Update PDF header text |
+**3. Fix date extraction for day chips (line 181)**
+Replace `e.inicio_em?.split('T')[0]` with `getDateSP(e.inicio_em)`.
+
+**4. Fix day filtering (line 210)**
+Replace `e.inicio_em?.startsWith(selectedDate)` with `getDateSP(e.inicio_em) === selectedDate`.
+
+## Files Changed
+
+| File | Action |
+|---|---|
+| `src/pages/AgendaPage.tsx` | Fix 4 timezone bugs in date/shift logic |
 
