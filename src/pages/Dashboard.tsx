@@ -166,7 +166,7 @@ export default function Dashboard() {
       .filter((e: any) => e.tipo_tag !== 'transporte' && e.inicio_em)
       .map((e: any) => ({ ...e, _source: 'event' as const }));
     const fromTransports = transports
-      .filter((t: any) => t.status === 'pendente' || t.status === 'em_andamento')
+      .filter((t: any) => t.status !== 'cancelado')
       .map((t: any) => ({
         id: t.id,
         titulo: t.titulo || `${t.origem} → ${t.destino}`,
