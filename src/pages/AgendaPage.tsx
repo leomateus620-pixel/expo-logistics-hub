@@ -24,8 +24,13 @@ const emptyForm = { titulo: '', descricao: '', inicio_em: '', fim_em: '', local:
 
 /* ── helpers ──────────────────────────────────────────── */
 
+function getDateSP(iso: string): string {
+  return new Date(iso).toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
+}
+
 function getShift(iso: string): 'manha' | 'tarde' | 'noite' {
-  const h = parseInt(iso.slice(11, 13) || '0', 10);
+  const d = new Date(iso);
+  const h = parseInt(d.toLocaleTimeString('en-US', { hour: '2-digit', hour12: false, timeZone: 'America/Sao_Paulo' }), 10);
   if (h < 12) return 'manha';
   if (h < 18) return 'tarde';
   return 'noite';
