@@ -160,8 +160,28 @@ export default function Dashboard() {
       return new Date(iso).toLocaleDateString('sv-SE', { timeZone: 'America/Sao_Paulo' });
     } catch { return ''; }
   };
-  const todayEvents = useMemo(() => events.filter((e: any) => e.inicio_em && toSPDate(e.inicio_em) === todayStr), [events, todayStr]);
-  const tomorrowEvents = useMemo(() => events.filter((e: any) => e.inicio_em && toSPDate(e.inicio_em) === tomorrowStr), [events, tomorrowStr]);
+  // Merge events (excluding transport duplicates) + active transports into unified agenda items
+  const agendaItems = useMemo(() => {
+    const fromEvents = events
+      .filter((e: any) => e.tipo_tag !== 'transporte' && e.inicio_em)
+      .map((e: any) => ({ ...e, _source: 'event' as const }));
+    const fromTransports = transports
+      .filter((t: any) => t.status === 'pendente' || t.status === 'em_andamento')
+      .map((t: any) => ({
+        id: t.id,
+        titulo: t.titulo || `${t.origem} → ${t.destino}`,
+        inicio_em: t.inicio_em,
+        local: `${t.origem} → ${t.destino}`,
+        responsavel_user_id: t.motorista_user_id,
+        voo_checkin: t.voo_checkin,
+        voo_chegada: t.voo_chegada,
+        _source: 'transport' as const,
+      }));
+    return [...fromEvents, ...fromTransports];
+  }, [events, transports]);
+
+  const todayEvents = useMemo(() => agendaItems.filter((e: any) => toSPDate(e.inicio_em) === todayStr), [agendaItems, todayStr]);
+  const tomorrowEvents = useMemo(() => agendaItems.filter((e: any) => toSPDate(e.inicio_em) === tomorrowStr), [agendaItems, tomorrowStr]);
 
   const logisticsMembers = useMemo(() =>
     members.filter((m: any) => m.commission_nome && m.commission_nome.toUpperCase().includes('LOG')),
