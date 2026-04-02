@@ -24,8 +24,13 @@ const emptyForm = { titulo: '', descricao: '', inicio_em: '', fim_em: '', local:
 
 /* ── helpers ──────────────────────────────────────────── */
 
+function getDateSP(iso: string): string {
+  return new Date(iso).toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
+}
+
 function getShift(iso: string): 'manha' | 'tarde' | 'noite' {
-  const h = parseInt(iso.slice(11, 13) || '0', 10);
+  const d = new Date(iso);
+  const h = parseInt(d.toLocaleTimeString('en-US', { hour: '2-digit', hour12: false, timeZone: 'America/Sao_Paulo' }), 10);
   if (h < 12) return 'manha';
   if (h < 18) return 'tarde';
   return 'noite';
@@ -178,7 +183,7 @@ export default function AgendaPage() {
   const dates: string[] = useMemo(() => {
     const set = new Set<string>();
     allItems.forEach((e: any) => {
-      const d = e.inicio_em?.split('T')[0];
+      const d = e.inicio_em ? getDateSP(e.inicio_em) : undefined;
       if (d) set.add(d);
     });
     const arr = [...set].sort();
@@ -207,7 +212,7 @@ export default function AgendaPage() {
   /* ── day events grouped by shift ── */
   const dayEvents = useMemo(() => {
     return allItems
-      .filter((e: any) => e.inicio_em?.startsWith(selectedDate))
+      .filter((e: any) => e.inicio_em && getDateSP(e.inicio_em) === selectedDate)
       .sort((a: any, b: any) => a.inicio_em.localeCompare(b.inicio_em));
   }, [allItems, selectedDate]);
 
