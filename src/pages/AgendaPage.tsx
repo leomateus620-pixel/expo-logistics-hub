@@ -24,9 +24,7 @@ const emptyForm = { titulo: '', descricao: '', inicio_em: '', fim_em: '', local:
 
 /* ── helpers ──────────────────────────────────────────── */
 
-function getDateSP(iso: string): string {
-  return new Date(iso).toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
-}
+// getDateSP is now imported from utils
 
 function getShift(iso: string): 'manha' | 'tarde' | 'noite' {
   const d = new Date(iso);
