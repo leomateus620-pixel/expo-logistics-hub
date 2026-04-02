@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCurrentOrg } from './useCurrentOrg';
+import { useCallback } from 'react';
 
 export function useTransportGuests() {
   const { orgId } = useCurrentOrg();
@@ -20,16 +21,15 @@ export function useTransportGuests() {
     staleTime: 30000,
   });
 
-  const getGuestsForTransport = (transportId: string): string[] => {
+  const getGuestsForTransport = useCallback((transportId: string): string[] => {
     return transportGuests
       .filter((tg: any) => tg.transport_id === transportId)
       .map((tg: any) => tg.guest_id);
-  };
+  }, [transportGuests]);
 
   const setGuestsForTransport = useMutation({
     mutationFn: async ({ transportId, guestIds }: { transportId: string; guestIds: string[] }) => {
       if (!orgId) return;
-      // Use atomic RPC to avoid race conditions
       const { error } = await (supabase as any).rpc('set_transport_guests', {
         _transport_id: transportId,
         _org_id: orgId,

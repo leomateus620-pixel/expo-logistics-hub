@@ -160,8 +160,28 @@ export default function Dashboard() {
       return new Date(iso).toLocaleDateString('sv-SE', { timeZone: 'America/Sao_Paulo' });
     } catch { return ''; }
   };
-  const todayEvents = useMemo(() => events.filter((e: any) => e.inicio_em && toSPDate(e.inicio_em) === todayStr), [events, todayStr]);
-  const tomorrowEvents = useMemo(() => events.filter((e: any) => e.inicio_em && toSPDate(e.inicio_em) === tomorrowStr), [events, tomorrowStr]);
+  // Merge events (excluding transport duplicates) + active transports into unified agenda items
+  const agendaItems = useMemo(() => {
+    const fromEvents = events
+      .filter((e: any) => e.tipo_tag !== 'transporte' && e.inicio_em)
+      .map((e: any) => ({ ...e, _source: 'event' as const }));
+    const fromTransports = transports
+      .filter((t: any) => t.status === 'pendente' || t.status === 'em_andamento')
+      .map((t: any) => ({
+        id: t.id,
+        titulo: t.titulo || `${t.origem} → ${t.destino}`,
+        inicio_em: t.inicio_em,
+        local: `${t.origem} → ${t.destino}`,
+        responsavel_user_id: t.motorista_user_id,
+        voo_checkin: t.voo_checkin,
+        voo_chegada: t.voo_chegada,
+        _source: 'transport' as const,
+      }));
+    return [...fromEvents, ...fromTransports];
+  }, [events, transports]);
+
+  const todayEvents = useMemo(() => agendaItems.filter((e: any) => toSPDate(e.inicio_em) === todayStr), [agendaItems, todayStr]);
+  const tomorrowEvents = useMemo(() => agendaItems.filter((e: any) => toSPDate(e.inicio_em) === tomorrowStr), [agendaItems, tomorrowStr]);
 
   const logisticsMembers = useMemo(() =>
     members.filter((m: any) => m.commission_nome && m.commission_nome.toUpperCase().includes('LOG')),
@@ -330,28 +350,29 @@ export default function Dashboard() {
               <p className="text-[10px] font-semibold text-primary uppercase tracking-wider mb-1.5">Hoje — {todayStr.split('-').reverse().join('/')}</p>
               <div className="space-y-1.5">
                 {todayEvents.map((e: any) => {
-                  const linkedTransport = transports.find((t: any) => e.descricao?.includes(t.id?.slice(0, 8)) || (e.tipo_tag === 'transporte' && t.inicio_em === e.inicio_em));
-                  const responsible = e.responsavel_user_id ? members.find((m: any) => m.user_id === e.responsavel_user_id) : null;
-                  return (
-                    <div key={e.id} className="flex items-center gap-3 p-2.5 rounded-xl bg-muted/40 cursor-pointer hover:bg-muted/60 active:scale-[0.98] transition-all" onClick={() => navigate('/agenda')}>
-                      <div className="flex flex-col gap-0.5 shrink-0 min-w-[48px]">
-                        <div className="text-center">
-                          <p className="text-[8px] uppercase text-muted-foreground">Check</p>
-                          <p className="text-[11px] font-mono font-semibold">{linkedTransport?.voo_checkin || '—'}</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-[8px] uppercase text-muted-foreground">Evento</p>
-                          <p className="text-[11px] font-mono font-semibold">{rawTime(e.inicio_em)}</p>
-                        </div>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">{e.titulo}</p>
-                        {e.local && <p className="text-[11px] text-muted-foreground truncate">{e.local}</p>}
-                        {responsible && <p className="text-[10px] text-primary flex items-center gap-1 mt-0.5"><User className="w-3 h-3" />{responsible.nome_exibicao}</p>}
-                      </div>
-                    </div>
-                  );
-                })}
+                   const responsible = e.responsavel_user_id ? members.find((m: any) => m.user_id === e.responsavel_user_id) : null;
+                   return (
+                     <div key={e.id} className="flex items-center gap-3 p-2.5 rounded-xl bg-muted/40 cursor-pointer hover:bg-muted/60 active:scale-[0.98] transition-all" onClick={() => navigate(e._source === 'transport' ? '/transports' : '/agenda')}>
+                       <div className="flex flex-col gap-0.5 shrink-0 min-w-[48px]">
+                         {(e.voo_checkin || e.voo_chegada) && (
+                           <div className="text-center">
+                             <p className="text-[8px] uppercase text-muted-foreground">Check</p>
+                             <p className="text-[11px] font-mono font-semibold">{e.voo_checkin || e.voo_chegada}</p>
+                           </div>
+                         )}
+                         <div className="text-center">
+                           <p className="text-[8px] uppercase text-muted-foreground">{e._source === 'transport' ? 'Saída' : 'Evento'}</p>
+                           <p className="text-[11px] font-mono font-semibold">{rawTime(e.inicio_em)}</p>
+                         </div>
+                       </div>
+                       <div className="flex-1 min-w-0">
+                         <p className="text-sm font-medium truncate">{e.titulo}</p>
+                         {e.local && <p className="text-[11px] text-muted-foreground truncate">{e.local}</p>}
+                         {responsible && <p className="text-[10px] text-primary flex items-center gap-1 mt-0.5"><User className="w-3 h-3" />{responsible.nome_exibicao}</p>}
+                       </div>
+                     </div>
+                   );
+                 })}
               </div>
             </div>
           )}
@@ -360,28 +381,29 @@ export default function Dashboard() {
               <p className="text-[10px] font-semibold text-accent uppercase tracking-wider mb-1.5">Amanhã — {tomorrowStr.split('-').reverse().join('/')}</p>
               <div className="space-y-1.5">
                 {tomorrowEvents.map((e: any) => {
-                  const linkedTransport = transports.find((t: any) => e.descricao?.includes(t.id?.slice(0, 8)) || (e.tipo_tag === 'transporte' && t.inicio_em === e.inicio_em));
-                  const responsible = e.responsavel_user_id ? members.find((m: any) => m.user_id === e.responsavel_user_id) : null;
-                  return (
-                    <div key={e.id} className="flex items-center gap-3 p-2.5 rounded-xl bg-muted/40 cursor-pointer hover:bg-muted/60 active:scale-[0.98] transition-all" onClick={() => navigate('/agenda')}>
-                      <div className="flex flex-col gap-0.5 shrink-0 min-w-[48px]">
-                        <div className="text-center">
-                          <p className="text-[8px] uppercase text-muted-foreground">Check</p>
-                          <p className="text-[11px] font-mono font-semibold">{linkedTransport?.voo_checkin || '—'}</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-[8px] uppercase text-muted-foreground">Evento</p>
-                          <p className="text-[11px] font-mono font-semibold">{rawTime(e.inicio_em)}</p>
-                        </div>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">{e.titulo}</p>
-                        {e.local && <p className="text-[11px] text-muted-foreground truncate">{e.local}</p>}
-                        {responsible && <p className="text-[10px] text-primary flex items-center gap-1 mt-0.5"><User className="w-3 h-3" />{responsible.nome_exibicao}</p>}
-                      </div>
-                    </div>
-                  );
-                })}
+                   const responsible = e.responsavel_user_id ? members.find((m: any) => m.user_id === e.responsavel_user_id) : null;
+                   return (
+                     <div key={e.id} className="flex items-center gap-3 p-2.5 rounded-xl bg-muted/40 cursor-pointer hover:bg-muted/60 active:scale-[0.98] transition-all" onClick={() => navigate(e._source === 'transport' ? '/transports' : '/agenda')}>
+                       <div className="flex flex-col gap-0.5 shrink-0 min-w-[48px]">
+                         {(e.voo_checkin || e.voo_chegada) && (
+                           <div className="text-center">
+                             <p className="text-[8px] uppercase text-muted-foreground">Check</p>
+                             <p className="text-[11px] font-mono font-semibold">{e.voo_checkin || e.voo_chegada}</p>
+                           </div>
+                         )}
+                         <div className="text-center">
+                           <p className="text-[8px] uppercase text-muted-foreground">{e._source === 'transport' ? 'Saída' : 'Evento'}</p>
+                           <p className="text-[11px] font-mono font-semibold">{rawTime(e.inicio_em)}</p>
+                         </div>
+                       </div>
+                       <div className="flex-1 min-w-0">
+                         <p className="text-sm font-medium truncate">{e.titulo}</p>
+                         {e.local && <p className="text-[11px] text-muted-foreground truncate">{e.local}</p>}
+                         {responsible && <p className="text-[10px] text-primary flex items-center gap-1 mt-0.5"><User className="w-3 h-3" />{responsible.nome_exibicao}</p>}
+                       </div>
+                     </div>
+                   );
+                 })}
               </div>
             </div>
           )}

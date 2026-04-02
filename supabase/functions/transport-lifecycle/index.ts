@@ -5,7 +5,6 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-// Minimum role required for each action
 const ACTION_MIN_ROLES: Record<string, string[]> = {
   create: ["admin", "gestor", "operador"],
   update: ["admin", "gestor", "operador"],
@@ -30,7 +29,6 @@ Deno.serve(async (req) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-    // User client for auth validation
     const userClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY")!, {
       global: { headers: { Authorization: authHeader } },
     });
@@ -42,12 +40,9 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Admin client for cross-table operations
     const admin = createClient(supabaseUrl, serviceRoleKey);
-
     const { action, payload } = await req.json();
 
-    // Validate role before executing action
     const allowedRoles = ACTION_MIN_ROLES[action];
     if (!allowedRoles) {
       return err("Ação inválida", 400);
@@ -97,11 +92,19 @@ function err(message: string, status = 400) {
   });
 }
 
+// ── Timezone helper ────────────────────────────────────────
+function toSPDate(iso: string): string {
+  try {
+    return new Date(iso).toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
+  } catch {
+    return iso?.slice(0, 10) || '';
+  }
+}
+
 // ── START ───────────────────────────────────────────────────
 async function handleStart(admin: any, userId: string, payload: any) {
   const { id, orgId } = payload;
 
-  // Fetch current transport
   const { data: transport, error: fetchErr } = await admin
     .from("transports")
     .select("*")
@@ -109,17 +112,14 @@ async function handleStart(admin: any, userId: string, payload: any) {
     .single();
   if (fetchErr || !transport) return err("Transporte não encontrado", 404);
 
-  // Validate status transition
   if (transport.status !== "pendente") {
     return err(`Não é possível iniciar uma viagem com status "${transport.status}"`, 400);
   }
 
-  // Validate driver
   if (!transport.motorista_user_id) {
     return err("Motorista não vinculado ao transporte", 400);
   }
 
-  // Fetch guests via transport_guests junction
   const { data: tgLinks } = await admin
     .from("transport_guests")
     .select("guest_id")
@@ -135,7 +135,6 @@ async function handleStart(admin: any, userId: string, payload: any) {
       .select("id, nome, telefone")
       .in("id", guestIds);
 
-    // Find first guest with valid phone
     const guestWithPhone = guestsData?.find((g: any) => g.telefone && g.telefone.replace(/\D/g, "").length >= 10);
     if (guestWithPhone) {
       guestPhone = guestWithPhone.telefone;
@@ -145,7 +144,6 @@ async function handleStart(admin: any, userId: string, payload: any) {
     }
   }
 
-  // Update transport status
   const now = new Date().toISOString();
   const { data: updated, error: updateErr } = await admin
     .from("transports")
@@ -155,7 +153,6 @@ async function handleStart(admin: any, userId: string, payload: any) {
     .single();
   if (updateErr) return err(updateErr.message);
 
-  // Audit log
   await admin.from("audit_log").insert({
     org_id: orgId,
     actor_user_id: userId,
@@ -166,7 +163,6 @@ async function handleStart(admin: any, userId: string, payload: any) {
     after_data: { status: "em_andamento", inicio_real_em: now },
   });
 
-  // Get driver name
   const { data: driverMember } = await admin
     .from("org_members")
     .select("nome_exibicao")
@@ -175,7 +171,6 @@ async function handleStart(admin: any, userId: string, payload: any) {
     .single();
   const driverName = driverMember?.nome_exibicao || "Motorista";
 
-  // Build WhatsApp message
   let destinoLabel = transport.destino || "";
   if (transport.titulo === "Aeroporto") {
     destinoLabel = `Aeroporto${transport.voo_cidade ? ` de ${transport.voo_cidade}` : ""}`;
@@ -185,7 +180,6 @@ async function handleStart(admin: any, userId: string, payload: any) {
     ? `Olá, ${guestName}. Aqui é ${driverName}, motorista responsável pelo seu transporte da Fenasoja Logística. Estou iniciando agora o deslocamento para o ${destinoLabel}. Qualquer necessidade, fico à disposição por aqui.`
     : `Transporte iniciado para ${destinoLabel}. Motorista: ${driverName}.`;
 
-  // Normalize phone
   let normalizedPhone = "";
   let phoneValid = false;
   if (guestPhone) {
@@ -216,7 +210,6 @@ async function handleStart(admin: any, userId: string, payload: any) {
 async function handleCreate(admin: any, userId: string, payload: any) {
   const { transport, guestIds } = payload;
 
-  // Insert transport
   const { data, error } = await admin
     .from("transports")
     .insert(transport)
@@ -224,7 +217,6 @@ async function handleCreate(admin: any, userId: string, payload: any) {
     .single();
   if (error) return err(error.message);
 
-  // Audit
   await admin.from("audit_log").insert({
     org_id: transport.org_id,
     actor_user_id: userId,
@@ -234,7 +226,6 @@ async function handleCreate(admin: any, userId: string, payload: any) {
     after_data: data,
   });
 
-  // Set guests via junction
   if (guestIds?.length) {
     await admin.rpc("set_transport_guests", {
       _transport_id: data.id,
@@ -243,11 +234,11 @@ async function handleCreate(admin: any, userId: string, payload: any) {
     });
   }
 
-  // Auto-create event + schedule + shift
+  // Auto-create shift for schedules (no event duplication)
   try {
-    await createEventAndShift(admin, userId, transport, data.id);
+    await createShiftForTransport(admin, userId, transport, data.id);
   } catch (e) {
-    console.error("[transport-lifecycle] Failed to create event/shift:", e);
+    console.error("[transport-lifecycle] Failed to create shift:", e);
   }
 
   return ok({ data });
@@ -257,19 +248,16 @@ async function handleCreate(admin: any, userId: string, payload: any) {
 async function handleUpdate(admin: any, userId: string, payload: any) {
   const { id, orgId, updates, expectedUpdatedAt, guestIds, vehicleUsage } = payload;
 
-  // Fetch current record
   const { data: before } = await admin
     .from("transports")
     .select("*")
     .eq("id", id)
     .single();
 
-  // Optimistic locking check
   if (expectedUpdatedAt && before?.updated_at !== expectedUpdatedAt) {
     return err("Registro modificado por outro usuário. Recarregue os dados.", 409);
   }
 
-  // Perform update
   const { data, error } = await admin
     .from("transports")
     .update(updates)
@@ -278,7 +266,6 @@ async function handleUpdate(admin: any, userId: string, payload: any) {
     .single();
   if (error) return err(error.message);
 
-  // Audit
   const action = updates.status && updates.status !== before?.status ? "status_change" : "update";
   await admin.from("audit_log").insert({
     org_id: orgId,
@@ -290,7 +277,6 @@ async function handleUpdate(admin: any, userId: string, payload: any) {
     after_data: data,
   });
 
-  // Set guests
   if (guestIds !== undefined) {
     try {
       await admin.rpc("set_transport_guests", {
@@ -303,16 +289,6 @@ async function handleUpdate(admin: any, userId: string, payload: any) {
     }
   }
 
-  // Handle cancel → cleanup events
-  if (updates.status === "cancelado" && before?.status !== "cancelado") {
-    try {
-      await cleanupTransportEvents(admin, orgId, id, "cancel");
-    } catch (e) {
-      console.error("[transport-lifecycle] Failed to cleanup events on cancel:", e);
-    }
-  }
-
-  // Handle completion → create vehicle_usage + update vehicle km
   if (updates.status === "concluido" && before?.status !== "concluido" && vehicleUsage) {
     try {
       await admin.from("vehicle_usage").insert({
@@ -330,7 +306,6 @@ async function handleUpdate(admin: any, userId: string, payload: any) {
         .eq("id", vehicleUsage.vehicle_id);
     } catch (e) {
       console.error("[transport-lifecycle] Failed to create vehicle_usage:", e);
-      // This is critical — propagate the error
       return err("Erro ao registrar uso do veículo: " + (e as Error).message);
     }
   }
@@ -348,13 +323,6 @@ async function handleDelete(admin: any, userId: string, payload: any) {
     .eq("id", id)
     .single();
 
-  // Cleanup linked events
-  try {
-    await cleanupTransportEvents(admin, orgId, id, "delete");
-  } catch (e) {
-    console.error("[transport-lifecycle] Failed to cleanup events on delete:", e);
-  }
-
   // Delete dependent records first to avoid FK violations
   await admin.from("transport_guests").delete().eq("transport_id", id);
   await admin.from("transport_locations").delete().eq("transport_id", id);
@@ -362,7 +330,6 @@ async function handleDelete(admin: any, userId: string, payload: any) {
   const { error } = await admin.from("transports").delete().eq("id", id);
   if (error) return err(error.message);
 
-  // Audit
   await admin.from("audit_log").insert({
     org_id: orgId,
     actor_user_id: userId,
@@ -376,12 +343,13 @@ async function handleDelete(admin: any, userId: string, payload: any) {
 }
 
 // ── HELPERS ─────────────────────────────────────────────────
-async function createEventAndShift(admin: any, userId: string, transport: any, transportId: string) {
+async function createShiftForTransport(admin: any, userId: string, transport: any, transportId: string) {
   const orgId = transport.org_id;
   const inicioEm = transport.inicio_em;
+  if (!inicioEm || !transport.motorista_user_id) return;
 
   let fimEm = transport.fim_em;
-  if (!fimEm && inicioEm) {
+  if (!fimEm) {
     try {
       const start = new Date(inicioEm);
       if (!isNaN(start.getTime())) {
@@ -392,95 +360,61 @@ async function createEventAndShift(admin: any, userId: string, transport: any, t
   }
   if (!fimEm) fimEm = inicioEm;
 
-  // Create event
-  const eventPayload = {
-    org_id: orgId,
-    created_by_user_id: userId,
-    titulo: `Transporte: ${transport.titulo || ""} ${transport.origem} → ${transport.destino}`.trim(),
-    inicio_em: inicioEm,
-    fim_em: fimEm,
-    tipo_tag: "transporte",
-    local: `${transport.origem} → ${transport.destino}`,
-    descricao: `Transporte #${transportId.slice(0, 8)}`,
-    responsavel_user_id: transport.motorista_user_id || null,
-  };
-  const { data: event } = await admin.from("events").insert(eventPayload).select().single();
+  // Use São Paulo timezone for correct date extraction
+  const transportDate = toSPDate(inicioEm);
 
-  // Create shift if driver assigned
-  if (transport.motorista_user_id && event) {
-    const transportDate = inicioEm?.slice(0, 10);
-    const { data: existingSchedules } = await admin
-      .from("schedules")
-      .select("id")
-      .eq("org_id", orgId)
-      .eq("status", "ativa")
-      .lte("data_inicio", transportDate)
-      .gte("data_fim", transportDate)
-      .limit(1);
+  const titulo = `Transporte: ${transport.titulo || ""} ${transport.origem} → ${transport.destino}`.trim();
+  const local = `${transport.origem} → ${transport.destino}`;
 
-    let scheduleId = existingSchedules?.[0]?.id;
-    if (!scheduleId) {
-      const { data: newSchedule } = await admin
-        .from("schedules")
-        .insert({
-          org_id: orgId,
-          created_by_user_id: userId,
-          nome: "Escala Automática",
-          data_inicio: transportDate,
-          data_fim: transportDate,
-          status: "ativa",
-        })
-        .select()
-        .single();
-      scheduleId = newSchedule?.id;
-    }
-
-    if (scheduleId) {
-      const { data: shift } = await admin
-        .from("schedule_shifts")
-        .insert({
-          org_id: orgId,
-          schedule_id: scheduleId,
-          titulo: eventPayload.titulo,
-          inicio_em: inicioEm,
-          fim_em: fimEm,
-          local: eventPayload.local,
-        })
-        .select()
-        .single();
-
-      if (shift) {
-        await admin.from("shift_assignments").insert({
-          org_id: orgId,
-          schedule_shift_id: shift.id,
-          member_user_id: transport.motorista_user_id,
-          created_by_user_id: userId,
-          funcao: "Motorista",
-          status: "confirmado",
-        });
-      }
-    }
-  }
-}
-
-async function cleanupTransportEvents(admin: any, orgId: string, transportId: string, mode: "delete" | "cancel") {
-  const tag = `Transporte #${transportId.slice(0, 8)}`;
-  const { data: linkedEvents } = await admin
-    .from("events")
-    .select("id, titulo")
+  const { data: existingSchedules } = await admin
+    .from("schedules")
+    .select("id")
     .eq("org_id", orgId)
-    .like("descricao", `%${tag}%`);
+    .eq("status", "ativa")
+    .lte("data_inicio", transportDate)
+    .gte("data_fim", transportDate)
+    .limit(1);
 
-  if (linkedEvents?.length) {
-    for (const ev of linkedEvents) {
-      if (mode === "delete") {
-        await admin.from("events").delete().eq("id", ev.id);
-      } else {
-        await admin
-          .from("events")
-          .update({ titulo: "[CANCELADO] " + (ev.titulo || "") })
-          .eq("id", ev.id);
-      }
+  let scheduleId = existingSchedules?.[0]?.id;
+  if (!scheduleId) {
+    const { data: newSchedule } = await admin
+      .from("schedules")
+      .insert({
+        org_id: orgId,
+        created_by_user_id: userId,
+        nome: "Escala Automática",
+        data_inicio: transportDate,
+        data_fim: transportDate,
+        status: "ativa",
+      })
+      .select()
+      .single();
+    scheduleId = newSchedule?.id;
+  }
+
+  if (scheduleId) {
+    const { data: shift } = await admin
+      .from("schedule_shifts")
+      .insert({
+        org_id: orgId,
+        schedule_id: scheduleId,
+        titulo,
+        inicio_em: inicioEm,
+        fim_em: fimEm,
+        local,
+      })
+      .select()
+      .single();
+
+    if (shift) {
+      await admin.from("shift_assignments").insert({
+        org_id: orgId,
+        schedule_shift_id: shift.id,
+        member_user_id: transport.motorista_user_id,
+        created_by_user_id: userId,
+        funcao: "Motorista",
+        status: "confirmado",
+      });
     }
   }
 }
