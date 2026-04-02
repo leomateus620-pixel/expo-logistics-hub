@@ -82,8 +82,8 @@ function generateAgendaPDF(
       .summary p { font-size: 9pt; color: #333; }
     </style></head><body>
     <div class="header">
-      <h1>Programação da Feira</h1>
-      <p>Agenda Oficial de Eventos — Fenasoja 2026</p>
+      <h1>Agenda de Transportes</h1>
+      <p>Gestão dos deslocamentos e recepção de convidados — Fenasoja 2026</p>
     </div>
     <div class="date-title">📅 ${dateFormatted}</div>
     <div class="summary">
