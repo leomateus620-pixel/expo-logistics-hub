@@ -89,6 +89,18 @@ export function rawMonthShort(iso: string | null | undefined): string {
   return d.toLocaleDateString('pt-BR', { month: 'short', timeZone: 'America/Sao_Paulo' });
 }
 
+/** Convert ISO timestamp to YYYY-MM-DD in São Paulo timezone */
+export function getDateSP(iso: string): string {
+  return new Date(iso).toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
+}
+
+/** Parse a YYYY-MM-DD date key into a Date without UTC midnight shift.
+ *  Uses noon local time to avoid DST edge cases. */
+export function parseDateKey(dateKey: string): Date {
+  const [y, m, d] = dateKey.split('-').map(Number);
+  return new Date(y, m - 1, d, 12, 0, 0);
+}
+
 /** Known round-trip distances in km from Santa Rosa to common destinations */
 const KNOWN_ROUNDTRIP_KM: Record<string, number> = {
   'Aeroporto_Chapecó': 630,
