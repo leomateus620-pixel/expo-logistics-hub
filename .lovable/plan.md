@@ -1,54 +1,69 @@
 
 
-# Fix: Agenda Timezone Inconsistencies with Transports
+# Fix: Inconsistências entre Transportes e Agenda
 
-## Problem
+## Problemas Identificados
 
-The Agenda page has three timezone bugs that cause transports to appear on wrong days and wrong time shifts compared to the Transports page:
+### 1. Dados duplicados entre `transports` e `events` (Causa raiz)
+Quando um transporte é criado, a edge function `transport-lifecycle` cria automaticamente um registro duplicado na tabela `events` com `tipo_tag = 'transporte'`. Esses eventos duplicados têm **horários diferentes** dos transportes originais (offset de ~3h), causando inconsistências:
 
-1. **Date extraction** (line 181): `e.inicio_em?.split('T')[0]` extracts the UTC date portion from ISO timestamps. A transport at `23:00 BRT` = `02:00+1 UTC` appears on the next day in the Agenda.
+| Transport ID | Hora real (UTC) | Hora no evento (UTC) | Diferença |
+|---|---|---|---|
+| 9da9dd3c | 04:45 | 07:45 | +3h |
+| b4fd11d3 | 03:15 | 09:45 | +6.5h |
+| f429362c | 03:55 | 10:25 | +6.5h |
 
-2. **Day filtering** (line 210): `e.inicio_em?.startsWith(selectedDate)` matches against the UTC date portion, same problem.
+A Agenda já filtra esses eventos duplicados corretamente (`tipo_tag !== 'transporte'`), mas o Dashboard os exibe com horários errados.
 
-3. **Shift detection** (line 28): `getShift()` uses `iso.slice(11, 13)` to get the hour — this is the UTC hour, not São Paulo hour. A transport at `14:00 BRT` (afternoon) could show as `17:00 UTC` (evening shift).
+### 2. Edge function: bug de timezone no schedule
+Linha 411: `inicioEm?.slice(0, 10)` extrai a data UTC, atribuindo turnos e escalas ao dia errado para transportes noturnos no horário de Brasília.
 
-The Transports page uses `rawTime()` which correctly converts to São Paulo timezone, so times display correctly there but not in the Agenda grouping logic.
+### 3. Dashboard lê eventos com horários errados
+O Dashboard mostra eventos da tabela `events` (incluindo os duplicados de transporte com horas erradas) em vez de ler diretamente da tabela `transports`.
 
-## Plan
+### 4. Hook `useTransportGuests` instável
+`getGuestsForTransport` cria uma nova referência a cada render, forçando recomputação desnecessária do `useMemo` de `allItems` na Agenda.
 
-### File: `src/pages/AgendaPage.tsx`
+## Plano de Correção
 
-**1. Fix `getShift()` helper (line 27-31)**
-Use `Date` + `toLocaleString` with `America/Sao_Paulo` timezone to extract the local hour:
-
-```typescript
-function getShift(iso: string): 'manha' | 'tarde' | 'noite' {
-  const d = new Date(iso);
-  const h = parseInt(d.toLocaleTimeString('en-US', { hour: '2-digit', hour12: false, timeZone: 'America/Sao_Paulo' }), 10);
-  if (h < 12) return 'manha';
-  if (h < 18) return 'tarde';
-  return 'noite';
-}
-```
-
-**2. Add a `getDateSP()` helper**
-Extract the São Paulo date from an ISO timestamp:
+### 1. Edge function: remover criação de eventos duplicados
+Remover a chamada `createEventAndShift` de dentro de `handleCreate`. Manter apenas a criação de **schedule shifts** (necessários para a página de escalas), extraída em função separada `createShiftForTransport`. Corrigir a extração de data com timezone:
 
 ```typescript
-function getDateSP(iso: string): string {
-  return new Date(iso).toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
-}
+// Antes (UTC - errado)
+const transportDate = inicioEm?.slice(0, 10);
+
+// Depois (BRT - correto)  
+const transportDate = new Date(inicioEm).toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
 ```
 
-**3. Fix date extraction for day chips (line 181)**
-Replace `e.inicio_em?.split('T')[0]` with `getDateSP(e.inicio_em)`.
+### 2. Migration: limpar eventos órfãos de transporte
+Deletar todos os 15 eventos com `tipo_tag = 'transporte'` da tabela `events`, pois são duplicatas com horários incorretos. A Agenda e o Dashboard passarão a ler diretamente da tabela `transports`.
 
-**4. Fix day filtering (line 210)**
-Replace `e.inicio_em?.startsWith(selectedDate)` with `getDateSP(e.inicio_em) === selectedDate`.
+```sql
+DELETE FROM events WHERE tipo_tag = 'transporte';
+```
 
-## Files Changed
+### 3. Dashboard: usar transports diretamente na seção Agenda
+Refatorar a seção "Agenda" do Dashboard para mesclar `events` (sem tipo_tag='transporte') + `transports` (pendentes/em andamento), exatamente como a Agenda page faz. Isso garante horários corretos e consistência entre as telas.
 
-| File | Action |
+### 4. Estabilizar `useTransportGuests`
+Envolver `getGuestsForTransport` com `useCallback` para evitar recomputação desnecessária do memo de `allItems` na Agenda:
+
+```typescript
+const getGuestsForTransport = useCallback((transportId: string): string[] => {
+  return transportGuests
+    .filter((tg: any) => tg.transport_id === transportId)
+    .map((tg: any) => tg.guest_id);
+}, [transportGuests]);
+```
+
+## Arquivos Alterados
+
+| Arquivo | Ação |
 |---|---|
-| `src/pages/AgendaPage.tsx` | Fix 4 timezone bugs in date/shift logic |
+| `supabase/functions/transport-lifecycle/index.ts` | Remover `createEventAndShift`, criar `createShiftForTransport` com timezone corrigido |
+| SQL migration | Deletar eventos órfãos com `tipo_tag = 'transporte'` |
+| `src/pages/Dashboard.tsx` | Mesclar transports + events na seção Agenda |
+| `src/hooks/useTransportGuests.ts` | Estabilizar `getGuestsForTransport` com `useCallback` |
 
