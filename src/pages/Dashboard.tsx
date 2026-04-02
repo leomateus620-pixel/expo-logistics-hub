@@ -350,28 +350,29 @@ export default function Dashboard() {
               <p className="text-[10px] font-semibold text-primary uppercase tracking-wider mb-1.5">Hoje — {todayStr.split('-').reverse().join('/')}</p>
               <div className="space-y-1.5">
                 {todayEvents.map((e: any) => {
-                  const linkedTransport = transports.find((t: any) => e.descricao?.includes(t.id?.slice(0, 8)) || (e.tipo_tag === 'transporte' && t.inicio_em === e.inicio_em));
-                  const responsible = e.responsavel_user_id ? members.find((m: any) => m.user_id === e.responsavel_user_id) : null;
-                  return (
-                    <div key={e.id} className="flex items-center gap-3 p-2.5 rounded-xl bg-muted/40 cursor-pointer hover:bg-muted/60 active:scale-[0.98] transition-all" onClick={() => navigate('/agenda')}>
-                      <div className="flex flex-col gap-0.5 shrink-0 min-w-[48px]">
-                        <div className="text-center">
-                          <p className="text-[8px] uppercase text-muted-foreground">Check</p>
-                          <p className="text-[11px] font-mono font-semibold">{linkedTransport?.voo_checkin || '—'}</p>
-                        </div>
-                        <div className="text-center">
-                          <p className="text-[8px] uppercase text-muted-foreground">Evento</p>
-                          <p className="text-[11px] font-mono font-semibold">{rawTime(e.inicio_em)}</p>
-                        </div>
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium truncate">{e.titulo}</p>
-                        {e.local && <p className="text-[11px] text-muted-foreground truncate">{e.local}</p>}
-                        {responsible && <p className="text-[10px] text-primary flex items-center gap-1 mt-0.5"><User className="w-3 h-3" />{responsible.nome_exibicao}</p>}
-                      </div>
-                    </div>
-                  );
-                })}
+                   const responsible = e.responsavel_user_id ? members.find((m: any) => m.user_id === e.responsavel_user_id) : null;
+                   return (
+                     <div key={e.id} className="flex items-center gap-3 p-2.5 rounded-xl bg-muted/40 cursor-pointer hover:bg-muted/60 active:scale-[0.98] transition-all" onClick={() => navigate(e._source === 'transport' ? '/transports' : '/agenda')}>
+                       <div className="flex flex-col gap-0.5 shrink-0 min-w-[48px]">
+                         {(e.voo_checkin || e.voo_chegada) && (
+                           <div className="text-center">
+                             <p className="text-[8px] uppercase text-muted-foreground">Check</p>
+                             <p className="text-[11px] font-mono font-semibold">{e.voo_checkin || e.voo_chegada}</p>
+                           </div>
+                         )}
+                         <div className="text-center">
+                           <p className="text-[8px] uppercase text-muted-foreground">{e._source === 'transport' ? 'Saída' : 'Evento'}</p>
+                           <p className="text-[11px] font-mono font-semibold">{rawTime(e.inicio_em)}</p>
+                         </div>
+                       </div>
+                       <div className="flex-1 min-w-0">
+                         <p className="text-sm font-medium truncate">{e.titulo}</p>
+                         {e.local && <p className="text-[11px] text-muted-foreground truncate">{e.local}</p>}
+                         {responsible && <p className="text-[10px] text-primary flex items-center gap-1 mt-0.5"><User className="w-3 h-3" />{responsible.nome_exibicao}</p>}
+                       </div>
+                     </div>
+                   );
+                 })}
               </div>
             </div>
           )}
