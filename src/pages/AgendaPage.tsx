@@ -212,7 +212,7 @@ export default function AgendaPage() {
   /* ── day events grouped by shift ── */
   const dayEvents = useMemo(() => {
     return allItems
-      .filter((e: any) => e.inicio_em?.startsWith(selectedDate))
+      .filter((e: any) => e.inicio_em && getDateSP(e.inicio_em) === selectedDate)
       .sort((a: any, b: any) => a.inicio_em.localeCompare(b.inicio_em));
   }, [allItems, selectedDate]);
 
