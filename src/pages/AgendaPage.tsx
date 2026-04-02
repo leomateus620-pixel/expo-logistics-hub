@@ -82,8 +82,8 @@ function generateAgendaPDF(
       .summary p { font-size: 9pt; color: #333; }
     </style></head><body>
     <div class="header">
-      <h1>Programação da Feira</h1>
-      <p>Agenda Oficial de Eventos — Fenasoja 2026</p>
+      <h1>Agenda de Transportes</h1>
+      <p>Gestão dos deslocamentos e recepção de convidados — Fenasoja 2026</p>
     </div>
     <div class="date-title">📅 ${dateFormatted}</div>
     <div class="summary">
@@ -278,10 +278,10 @@ export default function AgendaPage() {
   return (
     <div className="space-y-5">
       {/* ── Header ── */}
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center justify-between gap-3 backdrop-blur-xl bg-white/[0.04] border border-white/10 rounded-2xl p-4 shadow-[0_0_20px_-6px_hsl(var(--gold)/0.12)]">
         <div>
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Programação da Feira</h1>
-          <p className="text-xs sm:text-sm text-muted-foreground mt-0.5">Agenda oficial de eventos Fenasoja</p>
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight bg-gradient-to-r from-gold to-gold/70 bg-clip-text text-transparent">Agenda de Transportes</h1>
+          <p className="text-xs sm:text-sm text-muted-foreground/80 mt-0.5">Gestão dos deslocamentos e recepção de convidados</p>
         </div>
         <div className="flex items-center gap-2">
           <Button size="sm" variant="outline" onClick={() => generateAgendaPDF(selectedDate, dayEvents, grouped, members, commissions)} className="h-10 sm:h-9 gap-1.5 rounded-xl shadow-sm active:scale-[0.97] transition-transform" disabled={dayEvents.length === 0}>
