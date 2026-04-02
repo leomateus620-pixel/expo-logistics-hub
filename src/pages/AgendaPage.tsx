@@ -314,9 +314,9 @@ export default function AgendaPage() {
                   : 'bg-white/10 backdrop-blur-lg border-white/15 text-foreground hover:bg-white/20'
               )}
             >
-              <span className="text-[10px] uppercase font-medium tracking-wide opacity-80">{rawWeekday(d)}</span>
-              <span className="text-lg font-bold leading-tight">{rawDay(d)}</span>
-              <span className="text-[10px] uppercase opacity-70">{rawMonthShort(d)}</span>
+              <span className="text-[10px] uppercase font-medium tracking-wide opacity-80">{parseDateKey(d).toLocaleDateString('pt-BR', { weekday: 'short' })}</span>
+              <span className="text-lg font-bold leading-tight">{parseDateKey(d).toLocaleDateString('pt-BR', { day: '2-digit' })}</span>
+              <span className="text-[10px] uppercase opacity-70">{parseDateKey(d).toLocaleDateString('pt-BR', { month: 'short' })}</span>
               {isToday && <span className="mt-0.5 w-1.5 h-1.5 rounded-full bg-current opacity-60" />}
             </button>
           );
