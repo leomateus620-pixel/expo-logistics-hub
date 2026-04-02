@@ -183,7 +183,7 @@ export default function AgendaPage() {
   const dates: string[] = useMemo(() => {
     const set = new Set<string>();
     allItems.forEach((e: any) => {
-      const d = e.inicio_em?.split('T')[0];
+      const d = e.inicio_em ? getDateSP(e.inicio_em) : undefined;
       if (d) set.add(d);
     });
     const arr = [...set].sort();
