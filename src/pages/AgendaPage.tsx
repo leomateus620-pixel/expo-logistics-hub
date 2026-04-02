@@ -174,8 +174,8 @@ export default function AgendaPage() {
         };
       });
 
-    return [...regularEvents, ...activeTransports];
-  }, [events, transports, members, guests, getGuestsForTransport]);
+    return [...regularEvents, ...allTransports];
+  }, [events, transports, guests, getGuestsForTransport]);
 
   /* ── dates ── */
   const dates: string[] = useMemo(() => {
