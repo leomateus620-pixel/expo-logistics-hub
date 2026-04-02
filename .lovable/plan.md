@@ -1,38 +1,26 @@
 
 
-# Remove Two Guest Records
+# Update Agenda Header Text & Premium Liquid Glass Style
 
-## Problem
-Two duplicate guest records for "Leonardo" / "leonardo" (email: leomateus620@gmail.com) need to be deleted from the database.
+## Changes
 
-## Records to Delete
-| ID | Nome |
-|---|---|
-| `c158f8a0-1486-4276-8cd0-0a305e8edaf3` | leonardo |
-| `2b9ec6f2-692d-41b5-83b8-d9f411b4d090` | Leonardo |
+### File: `src/pages/AgendaPage.tsx`
 
-## Plan
+**1. Update header text (lines 283-284):**
+- Title: "Programação da Feira" → "Agenda de Transportes"
+- Subtitle: "Agenda oficial de eventos Fenasoja" → "Gestão dos deslocamentos e recepção de convidados"
 
-### 1. SQL Migration
-Delete the two guest records and their associated `transport_guests` links:
+**2. Apply Liquid Glass styling to the header block (lines 281-285):**
+- Wrap the header area in a glass container with `backdrop-blur-xl`, translucent background (`bg-white/[0.04]`), subtle border (`border border-white/10`), rounded corners (`rounded-2xl`), and padding
+- Add a subtle gradient or glow accent consistent with the existing Liquid Glass design system
 
-```sql
-DELETE FROM transport_guests WHERE guest_id IN (
-  'c158f8a0-1486-4276-8cd0-0a305e8edaf3',
-  '2b9ec6f2-692d-41b5-83b8-d9f411b4d090'
-);
+**3. Update PDF header (lines 85-86):**
+- Match the same text changes in the PDF generator: title → "Agenda de Transportes", subtitle → "Gestão dos deslocamentos e recepção de convidados — Fenasoja 2026"
 
-DELETE FROM guests WHERE id IN (
-  'c158f8a0-1486-4276-8cd0-0a305e8edaf3',
-  '2b9ec6f2-692d-41b5-83b8-d9f411b4d090'
-);
-```
+## Technical Details
 
-No frontend code changes needed — the guest list is fetched dynamically via React Query.
-
-## Files Changed
-
-| File | Action |
-|---|---|
-| SQL migration | Delete 2 guest records + transport_guests links |
+| File | Lines | Action |
+|---|---|---|
+| `src/pages/AgendaPage.tsx` | 281-294 | Restyle header with glass container + new text |
+| `src/pages/AgendaPage.tsx` | 85-86 | Update PDF header text |
 
