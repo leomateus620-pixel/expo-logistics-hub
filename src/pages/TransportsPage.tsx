@@ -627,7 +627,7 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
 
   const filtered = sorted.filter((t: any) => {
     if (filterMotorista && filterMotorista !== 'all' && t.motorista_user_id !== filterMotorista) return false;
-    if (filterData && t.inicio_em && !t.inicio_em.startsWith(filterData)) return false;
+    if (filterData && t.inicio_em && getDateSP(t.inicio_em) !== filterData) return false;
     if (filterStatus && filterStatus !== 'all' && t.status !== filterStatus) return false;
     if (filterSearch) {
       const q = filterSearch.toLowerCase();
