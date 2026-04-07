@@ -5,8 +5,18 @@ import bgImage from '@/assets/fenasoja-bg-2026.png';
 import bgMobile from '@/assets/fenasoja-bg-mobile.png';
 import logoHorizontal from '@/assets/logofeira26.webp';
 import { LogIn } from 'lucide-react';
+import splashImg from '@/assets/fenasoja-splash-2026.png';
 
 export default function LoginPage() {
+  // Preload splash image while user is on login screen
+  useEffect(() => {
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.as = 'image';
+    link.href = splashImg;
+    document.head.appendChild(link);
+    return () => { document.head.removeChild(link); };
+  }, []);
   const { signIn } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
