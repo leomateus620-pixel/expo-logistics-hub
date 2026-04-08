@@ -5,19 +5,21 @@ interface SplashScreenProps {
   onComplete: () => void;
 }
 
-const PARTICLES = Array.from({ length: 6 }, (_, i) => ({
+const GRAINS = Array.from({ length: 24 }, (_, i) => ({
   id: i,
-  size: 4 + Math.random() * 6,
-  left: 10 + Math.random() * 80,
+  size: 12 + Math.random() * 16,
+  left: Math.random() * 100,
   delay: Math.random() * 2,
-  duration: 3 + Math.random() * 2,
+  duration: 1.8 + Math.random() * 1.7,
+  rotateStart: Math.floor(Math.random() * 360),
+  rotateEnd: Math.floor(Math.random() * 360),
+  sway: -20 + Math.random() * 40,
 }));
 
 export default function SplashScreen({ onComplete }: SplashScreenProps) {
   const [phase, setPhase] = useState<'loading' | 'enter' | 'float' | 'exit'>('loading');
   const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
-  // Wait for image to load, then start animation
   useEffect(() => {
     const img = new Image();
     img.src = splashImg;
@@ -34,7 +36,6 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
       startAnimation();
     } else {
       img.onload = startAnimation;
-      // Fallback: if image fails, still run animation after 500ms
       img.onerror = () => setTimeout(startAnimation, 500);
     }
 
@@ -45,18 +46,21 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
 
   return (
     <div className="splash-backdrop fixed inset-0 z-[9999] flex items-center justify-center overflow-hidden">
-      {/* Particles */}
-      {PARTICLES.map((p) => (
-        <span
-          key={p.id}
-          className="splash-particle"
+      {/* Soybean grains */}
+      {GRAINS.map((g) => (
+        <div
+          key={g.id}
+          className="soybean-grain"
           style={{
-            width: p.size,
-            height: p.size,
-            left: `${p.left}%`,
-            bottom: '-10%',
-            animationDelay: `${p.delay}s`,
-            animationDuration: `${p.duration}s`,
+            width: g.size,
+            height: g.size * 0.72,
+            left: `${g.left}%`,
+            top: '-5%',
+            animationDelay: `${g.delay}s`,
+            animationDuration: `${g.duration}s`,
+            ['--rotate-start' as string]: `${g.rotateStart}deg`,
+            ['--rotate-end' as string]: `${g.rotateEnd}deg`,
+            ['--sway' as string]: `${g.sway}px`,
           }}
         />
       ))}
@@ -67,7 +71,6 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
           className={`splash-card ${phase !== 'loading' ? `splash-card--${phase}` : ''}`}
           style={{ opacity: phase === 'loading' ? 0 : undefined }}
         >
-          {/* Fixed-size container so card always has dimensions */}
           <div className="splash-image-wrap">
             <img
               src={splashImg}
@@ -76,7 +79,6 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
               draggable={false}
             />
           </div>
-          {/* Shine overlay */}
           <div className="splash-shine" />
         </div>
       </div>
