@@ -119,28 +119,40 @@ export default function GuestsPage() {
       </div>
 
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Cadastrar Hóspede</DialogTitle>
+        <DialogContent className="sm:max-w-md flex flex-col max-h-[80dvh]">
+          <DialogHeader className="shrink-0">
+            <DialogTitle className="flex items-center gap-2">
+              <Hotel className="w-5 h-5 text-primary" /> Cadastrar Hóspede
+            </DialogTitle>
             <DialogDescription>Preencha os dados do convidado para registro</DialogDescription>
           </DialogHeader>
-          <GuestFormFields data={form} setData={setForm} />
-          <Button onClick={handleAdd} className="w-full h-11 rounded-xl font-semibold active:scale-[0.97] transition-all" disabled={create.isPending}>
-            {create.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Cadastrar Hóspede
-          </Button>
+          <div className="flex-1 overflow-y-auto -mx-6 px-6 py-1 scrollbar-thin">
+            <GuestFormFields data={form} setData={setForm} />
+          </div>
+          <div className="shrink-0 pt-3 border-t border-border/30">
+            <Button onClick={handleAdd} className="w-full h-11 rounded-xl font-semibold active:scale-[0.97] transition-all" disabled={create.isPending}>
+              {create.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Cadastrar Hóspede
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
 
       <Dialog open={editOpen} onOpenChange={setEditOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>Editar Hóspede</DialogTitle>
+        <DialogContent className="sm:max-w-md flex flex-col max-h-[80dvh]">
+          <DialogHeader className="shrink-0">
+            <DialogTitle className="flex items-center gap-2">
+              <Hotel className="w-5 h-5 text-primary" /> Editar Hóspede
+            </DialogTitle>
             <DialogDescription>Atualize as informações do convidado</DialogDescription>
           </DialogHeader>
-          <GuestFormFields data={editForm} setData={setEditForm} />
-          <Button onClick={handleEdit} className="w-full h-11 rounded-xl font-semibold active:scale-[0.97] transition-all" disabled={update.isPending}>
-            {update.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Salvar Alterações
-          </Button>
+          <div className="flex-1 overflow-y-auto -mx-6 px-6 py-1 scrollbar-thin">
+            <GuestFormFields data={editForm} setData={setEditForm} />
+          </div>
+          <div className="shrink-0 pt-3 border-t border-border/30">
+            <Button onClick={handleEdit} className="w-full h-11 rounded-xl font-semibold active:scale-[0.97] transition-all" disabled={update.isPending}>
+              {update.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}Salvar Alterações
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
 
