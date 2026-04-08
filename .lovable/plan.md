@@ -1,80 +1,54 @@
 
-# Correção do splash pós-login para ficar realmente funcional
 
-## Diagnóstico mais provável
+# Adicionar grãos de soja caindo na Splash Screen 3D
 
-Pelo código atual, o problema não parece ser da autenticação em si, e sim do splash:
+## Visão geral
 
-1. O `SplashScreen` começa a contar os 3 segundos imediatamente, sem esperar a arte carregar.
-2. O card depende do `<img>` para ter dimensão visual. Se a imagem demorar ou falhar naquele instante, o usuário vê só o fundo/partículas.
-3. Isso explica o relato de “tela de animação travada e sem nada”: o backdrop aparece, mas o card principal não fica garantido.
+Substituir as partículas douradas genéricas por **grãos de soja realistas caindo de cima** durante os 3 segundos da animação. Os grãos terão formato oval característico da soja, cor dourada/amarelada com gradiente realista, sombra, e rotação 3D enquanto caem — criando o efeito de "chuva de soja" sobre o fundo verde escuro.
 
-## Correção proposta
+## Implementação
 
-### 1. Garantir pré-carregamento da arte antes da animação
-Ajustar o fluxo para o splash só iniciar quando a imagem estiver pronta:
-- pré-carregar a imagem ainda no `LoginPage`
-- reforçar no `SplashScreen` com estado `isReady`
-- iniciar o cronômetro de 3s apenas depois do asset estar carregado/decodificado
+### 1. `src/components/SplashScreen.tsx`
 
-Resultado: os 3 segundos passam a ser “3 segundos com o card visível”, não “3 segundos tentando carregar”.
+- Aumentar de 6 para **~20-25 grãos** de soja com propriedades randomizadas:
+  - `left`: posição horizontal (0-100%)
+  - `delay`: escalonado entre 0-2s
+  - `duration`: velocidade de queda (1.5-3.5s)
+  - `size`: tamanho variado (12-28px) para simular profundidade
+  - `rotateStart` / `rotateEnd`: ângulo de rotação 3D aleatório
+  - `swayAmount`: oscilação lateral durante a queda
+- Cada grão será um `<div>` com classe `.soybean-grain` em vez de `.splash-particle`
+- Os grãos caem de **cima para baixo** (top: -5% → bottom: 110%)
+- Manter o card 3D e o shine inalterados
 
-### 2. Dar tamanho fixo e presença visual ao card
-Refatorar o `SplashScreen` para o card não depender do `<img>` para existir:
-- usar um container com `width`, `max-width`, `aspect-ratio` e `min-height`
-- aplicar a arte como camada interna estável
-- manter fallback visual elegante mesmo se houver atraso de imagem
+### 2. `src/index.css`
 
-Resultado: mesmo em carga lenta, o usuário vê um card real, centralizado e responsivo.
+**Novo estilo `.soybean-grain`:**
+- Formato oval (border-radius elíptico ~50% 50% 45% 55%)
+- Gradiente radial realista simulando volume 3D do grão (amarelo dourado claro no centro, dourado mais escuro nas bordas, com highlight branco sutil no topo-esquerda)
+- Box-shadow suave para profundidade
+- Pseudo-element `::after` para o "hilum" (marca escura característica do grão de soja)
 
-### 3. Tornar a animação mais robusta e fluida
-Ajustar a sequência do splash para evitar sensação de travamento:
-- entrada curta e impactante
-- fase central com flutuação 3D suave
-- saída limpa e precisa
-- manter aceleração por GPU (`transform`, `opacity`)
-- reduzir efeitos que possam esconder o card no primeiro frame
+**Nova keyframe `@keyframes soybean-fall`:**
+- Queda vertical suave de cima para baixo
+- Rotação 3D contínua (rotateX + rotateZ) durante a queda
+- Oscilação lateral sutil (translateX senoidal via waypoints)
+- Fade-in no início, fade-out ao sair da tela
+- Variação de escala para simular aproximação/afastamento
 
-Também vou revisar o `z-index`, `opacity` inicial e a ordem das camadas para o brilho e partículas não competirem com a arte principal.
+**Remover** o antigo `splash-particle-drift` e `.splash-particle` (substituídos pelos grãos).
 
-### 4. Blindar o fluxo no `AuthGuard`
-Ajustar o gatilho do splash para ficar previsível:
-- mostrar splash apenas quando houver transição real para usuário autenticado
-- impedir reexecução indevida em refresh
-- só encerrar o splash quando a sequência completa terminar corretamente
+### Resultado visual
 
-## Arquivos a ajustar
+- Fundo verde escuro com dezenas de grãos de soja dourados caindo naturalmente
+- Cada grão rota em 3D enquanto cai, simulando gravidade realista
+- Card 3D da Fenasoja fica no centro com os grãos passando ao redor
+- Efeito remete diretamente à colheita de soja de Santa Rosa
 
-- `src/components/SplashScreen.tsx`
-  - adicionar preload/ready state
-  - iniciar a animação só após a arte estar pronta
-  - trocar a estrutura para card com dimensões fixas e fallback visual
+## Arquivos
 
-- `src/components/AuthGuard.tsx`
-  - reforçar a lógica de exibição pós-login
-  - evitar corrida entre autenticação e splash
+| Arquivo | Ação |
+|---|---|
+| `src/components/SplashScreen.tsx` | Trocar partículas por grãos de soja com propriedades realistas |
+| `src/index.css` | Adicionar `.soybean-grain` + `@keyframes soybean-fall`, remover partículas antigas |
 
-- `src/pages/LoginPage.tsx`
-  - pré-carregar a arte do splash enquanto o usuário está na tela de login
-
-- `src/index.css`
-  - refinar keyframes e estilos do card
-  - garantir responsividade e visibilidade imediata do conteúdo
-
-## Resultado esperado
-
-Depois da correção:
-- ao fazer login, o card aparecerá de fato
-- ele será exibido por 3 segundos visíveis e completos
-- não haverá mais tela “vazia” com animação no fundo
-- funcionará bem em desktop e mobile
-- a experiência ficará premium, mas estável e confiável
-
-## Validação que vou considerar na implementação
-
-- login em sessão nova
-- login em desktop
-- login em mobile
-- imagem carregando normalmente
-- cenário de carregamento lento
-- splash aparecendo uma vez por sessão sem travar a entrada no sistema
