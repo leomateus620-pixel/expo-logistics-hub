@@ -890,6 +890,8 @@ export type Database = {
         Row: {
           created_at: string
           destino: string
+          destino_lat: number | null
+          destino_lng: number | null
           distancia_estimada_km: number | null
           duracao_estimada_min: number | null
           fim_em: string | null
@@ -921,6 +923,8 @@ export type Database = {
         Insert: {
           created_at?: string
           destino: string
+          destino_lat?: number | null
+          destino_lng?: number | null
           distancia_estimada_km?: number | null
           duracao_estimada_min?: number | null
           fim_em?: string | null
@@ -952,6 +956,8 @@ export type Database = {
         Update: {
           created_at?: string
           destino?: string
+          destino_lat?: number | null
+          destino_lng?: number | null
           distancia_estimada_km?: number | null
           duracao_estimada_min?: number | null
           fim_em?: string | null

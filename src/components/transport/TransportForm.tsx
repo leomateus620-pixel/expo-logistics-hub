@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { getEffectiveEstimatedKm } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import PlacesAutocomplete from './PlacesAutocomplete';
 
 const tituloOptions = ['Parque', 'Hotel', 'Aeroporto', 'Centro', 'Escolta Policial', 'Outros'];
 const cidadeAeroportoOptions = ['Chapecó', 'Santo Ângelo', 'Passo Fundo', 'Porto Alegre'];
@@ -85,13 +86,19 @@ export default function TransportForm({
   const [apiKm, setApiKm] = useState<number | null>(null);
   const [loadingKm, setLoadingKm] = useState(false);
 
-  // Fetch real road distance when titulo/voo_cidade changes
+  // Fetch real road distance when titulo/voo_cidade changes or custom coords are set
   useEffect(() => {
     const destKey = data.titulo === 'Aeroporto' && data.voo_cidade
       ? `Aeroporto_${data.voo_cidade}` : (data.titulo || '');
-    if (!destKey || destKey === 'Outros') { setApiKm(null); return; }
 
-    const dest = knownDestCoords[destKey] || knownDestCoords['Outros'];
+    // For 'Outros' with custom coords, use those
+    const hasCustomCoords = data.titulo === 'Outros' && data.destino_lat && data.destino_lng;
+    if (!destKey && !hasCustomCoords) { setApiKm(null); return; }
+    if (destKey === 'Outros' && !hasCustomCoords) { setApiKm(null); return; }
+
+    const destLat = hasCustomCoords ? data.destino_lat : (knownDestCoords[destKey] || knownDestCoords['Outros']).lat;
+    const destLng = hasCustomCoords ? data.destino_lng : (knownDestCoords[destKey] || knownDestCoords['Outros']).lng;
+
     let cancelled = false;
     setLoadingKm(true);
     (async () => {
@@ -110,9 +117,9 @@ export default function TransportForm({
               mode: 'ROUTE_PREVIEW',
               origin_lat: SANTA_ROSA.lat,
               origin_lng: SANTA_ROSA.lng,
-              dest_lat: dest.lat,
-              dest_lng: dest.lng,
-              destination: destKey,
+              dest_lat: destLat,
+              dest_lng: destLng,
+              destination: destKey || 'Outros',
             }),
           }
         );
@@ -129,7 +136,7 @@ export default function TransportForm({
       }
     })();
     return () => { cancelled = true; };
-  }, [data.titulo, data.voo_cidade]);
+  }, [data.titulo, data.voo_cidade, data.destino_lat, data.destino_lng]);
 
   const driverCommission = data.motorista_user_id && data.motorista_user_id !== 'none'
     ? getDriverCommission(data.motorista_user_id) : null;
@@ -157,8 +164,29 @@ export default function TransportForm({
             </Select>
             <div className="grid grid-cols-2 gap-3">
               <Input placeholder="Origem" value={data.origem} onChange={(e) => setData({ ...data, origem: e.target.value })} />
-              <Input placeholder="Destino" value={data.destino} onChange={(e) => setData({ ...data, destino: e.target.value })} />
+              {data.titulo === 'Outros' ? (
+                <PlacesAutocomplete
+                  value={data.destino}
+                  placeholder="Buscar destino..."
+                  onSelect={(place) => {
+                    setData({
+                      ...data,
+                      destino: place.city || place.name,
+                      destino_lat: place.lat,
+                      destino_lng: place.lng,
+                      _selectedPlaceName: place.name,
+                    });
+                  }}
+                />
+              ) : (
+                <Input placeholder="Destino" value={data.destino} onChange={(e) => setData({ ...data, destino: e.target.value })} />
+              )}
             </div>
+            {data.titulo === 'Outros' && data._selectedPlaceName && (
+              <p className="text-xs text-muted-foreground bg-primary/5 rounded px-2 py-1">
+                📍 {data._selectedPlaceName}
+              </p>
+            )}
             <div>
               <Label className="text-xs text-muted-foreground mb-1 block">Data/Hora saída</Label>
               <input

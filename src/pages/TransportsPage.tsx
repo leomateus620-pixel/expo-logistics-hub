@@ -61,6 +61,10 @@ const knownDestCoords: Record<string, { lat: number; lng: number }> = {
 };
 
 function getDestCoords(t: any): { lat: number; lng: number } | null {
+  // Prioritize custom coords from database
+  if (t.destino_lat && t.destino_lng) {
+    return { lat: t.destino_lat, lng: t.destino_lng };
+  }
   if (t.titulo === 'Aeroporto' && t.voo_cidade) {
     return knownDestCoords[`Aeroporto_${t.voo_cidade}`] || null;
   }
@@ -93,9 +97,10 @@ async function fetchTravelMinutes(cidade: string): Promise<number | null> {
 }
 
 /** Fetch route preview (duration, distance, polyline) */
-async function fetchRoutePreview(destKey: string): Promise<{ duration_minutes: number; distance_km: number; polyline?: string } | null> {
+async function fetchRoutePreview(destKey: string, customLat?: number, customLng?: number): Promise<{ duration_minutes: number; distance_km: number; polyline?: string } | null> {
   try {
-    const dest = knownDestCoords[destKey] || knownDestCoords['Outros'];
+    const destLat = customLat || (knownDestCoords[destKey] || knownDestCoords['Outros']).lat;
+    const destLng = customLng || (knownDestCoords[destKey] || knownDestCoords['Outros']).lng;
     const { data: { session } } = await supabase.auth.getSession();
     const res = await fetch(
       `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/estimate-return`,
@@ -110,8 +115,8 @@ async function fetchRoutePreview(destKey: string): Promise<{ duration_minutes: n
           mode: 'ROUTE_PREVIEW',
           origin_lat: SANTA_ROSA_LAT,
           origin_lng: SANTA_ROSA_LNG,
-          dest_lat: dest.lat,
-          dest_lng: dest.lng,
+          dest_lat: destLat,
+          dest_lng: destLng,
           destination: destKey,
         }),
       }
@@ -406,8 +411,10 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
       // Fetch route estimate
       let routeData: { duration_minutes?: number; distance_km?: number; polyline?: string } = {};
       const destKey = form.titulo === 'Aeroporto' && form.voo_cidade ? `Aeroporto_${form.voo_cidade}` : (form.titulo || 'Outros');
+      const customLat = (form as any).destino_lat;
+      const customLng = (form as any).destino_lng;
       try {
-        const preview = await fetchRoutePreview(destKey);
+        const preview = await fetchRoutePreview(destKey, customLat, customLng);
         if (preview) routeData = preview;
       } catch { /* continue without route data */ }
 
@@ -435,6 +442,8 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
           voo_chegada: form.titulo === 'Aeroporto' ? form.voo_chegada || null : null,
           horario_saida: form.titulo === 'Aeroporto' ? form.horario_saida || null : null,
           observacoes: buildEscoltaObs(form),
+          destino_lat: customLat || null,
+          destino_lng: customLng || null,
           distancia_estimada_km: getEffectiveEstimatedKm(
             routeData.distance_km ? Math.round(routeData.distance_km * 2) : null,
             form.titulo,
