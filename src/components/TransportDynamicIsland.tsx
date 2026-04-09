@@ -78,13 +78,19 @@ export default function TransportDynamicIsland({
   const isDone = t.status === 'concluido';
 
   const location = useTransportLocation(isActive ? t.id : null);
-  const [liveEta, setLiveEta] = useState<{ minutes: number; km: number; arrivalTime: string } | null>(null);
+  const [liveDestRoute, setLiveDestRoute] = useState<{ minutes: number; km: number; arrivalTime: string } | null>(null);
+  const [liveReturnEta, setLiveReturnEta] = useState<{ minutes: number; arrivalTime: string } | null>(null);
   const [livePolyline, setLivePolyline] = useState<[number, number][] | undefined>(undefined);
   const lastFetchRef = useRef<number>(0);
+  const prevIsActiveRef = useRef<boolean>(false);
   const estimatedKm = getEffectiveEstimatedKm(t.distancia_estimada_km, t.titulo, t.voo_cidade, t.destino);
 
   // Auto-expand when transport becomes active
   useEffect(() => {
+    if (isActive && !prevIsActiveRef.current) {
+      lastFetchRef.current = 0; // force immediate fetch on trip start
+    }
+    prevIsActiveRef.current = isActive;
     if (isActive) setExpanded(true);
   }, [isActive]);
 
@@ -156,11 +162,18 @@ export default function TransportDynamicIsland({
           } catch { /* keep old */ }
         }
 
-        // Update ETA from return route
-        if (returnData.duration_minutes && !returnData.fallback) {
-          const eta = new Date(Date.now() + returnData.duration_minutes * 60000);
+        // Update destination route metrics from liveData
+        if (liveData.duration_minutes && !liveData.fallback) {
+          const eta = new Date(Date.now() + liveData.duration_minutes * 60000);
           const formatted = eta.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
-          setLiveEta({ minutes: returnData.duration_minutes, km: returnData.distance_km, arrivalTime: formatted });
+          setLiveDestRoute({ minutes: liveData.duration_minutes, km: liveData.distance_km, arrivalTime: formatted });
+        }
+
+        // Update return ETA from returnData
+        if (returnData.duration_minutes && !returnData.fallback) {
+          const retEta = new Date(Date.now() + returnData.duration_minutes * 60000);
+          const retFormatted = retEta.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
+          setLiveReturnEta({ minutes: returnData.duration_minutes, arrivalTime: retFormatted });
         }
       } catch { /* keep last */ }
     })();
@@ -168,20 +181,20 @@ export default function TransportDynamicIsland({
 
   // Build ETA display text for collapsed state
   const etaText = useMemo(() => {
-    if (liveEta && isActive) return `${liveEta.minutes} min`;
+    if (liveDestRoute && isActive) return `${liveDestRoute.minutes} min`;
     if (t.duracao_estimada_min) return `${t.duracao_estimada_min} min`;
     return null;
-  }, [liveEta, isActive, t.duracao_estimada_min]);
+  }, [liveDestRoute, isActive, t.duracao_estimada_min]);
 
   const arrivalText = useMemo(() => {
-    if (liveEta && isActive) return `Chegada ~${liveEta.arrivalTime}`;
+    if (liveDestRoute && isActive) return `Chegada ~${liveDestRoute.arrivalTime}`;
     if (t.horario_saida) return `Saída ${t.horario_saida}`;
     if (t.inicio_em) {
       const d = new Date(t.inicio_em);
       return `${d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' })}`;
     }
     return null;
-  }, [liveEta, isActive, t.horario_saida, t.inicio_em]);
+  }, [liveDestRoute, isActive, t.horario_saida, t.inicio_em]);
 
   const isMyTracking = trackingTransportId === t.id;
   const trackingError = isMyTracking ? locationTracker.error : null;
@@ -384,19 +397,24 @@ export default function TransportDynamicIsland({
 
           {/* Metrics row */}
           <div className="flex flex-wrap gap-2">
-            {(liveEta || estimatedKm) && (
+            {(liveDestRoute || estimatedKm) && (
               <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-muted/50 text-[11px] font-medium text-foreground/70">
-                <Ruler className="w-3 h-3" /> {liveEta ? `${liveEta.km} km` : `${estimatedKm} km`}
+                <Ruler className="w-3 h-3" /> {liveDestRoute ? `${liveDestRoute.km} km` : `${estimatedKm} km`}
               </span>
             )}
-            {(liveEta || t.duracao_estimada_min) && (
+            {(liveDestRoute || t.duracao_estimada_min) && (
               <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-muted/50 text-[11px] font-medium text-foreground/70">
-                <Timer className="w-3 h-3" /> {liveEta ? `${liveEta.minutes} min` : `${t.duracao_estimada_min} min`}
+                <Timer className="w-3 h-3" /> {liveDestRoute ? `${liveDestRoute.minutes} min` : `${t.duracao_estimada_min} min`}
               </span>
             )}
-            {liveEta && isActive && (
+            {liveDestRoute && isActive && (
               <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-accent/15 text-[11px] font-medium text-accent">
-                <Clock className="w-3 h-3" /> Chegada ~{liveEta.arrivalTime}
+                <Clock className="w-3 h-3" /> Chegada ~{liveDestRoute.arrivalTime}
+              </span>
+            )}
+            {liveReturnEta && isActive && (
+              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-muted/50 text-[11px] font-medium text-foreground/70">
+                🔄 Retorno ~{liveReturnEta.arrivalTime}
               </span>
             )}
           </div>
@@ -469,7 +487,7 @@ export default function TransportDynamicIsland({
               destLabel={t.destino}
               origemLabel={t.origem}
               isLive={isActive && !!location}
-              etaText={liveEta ? `Chegada ~${liveEta.arrivalTime}` : etaText ? `~${etaText}` : null}
+              etaText={liveDestRoute ? `Chegada ~${liveDestRoute.arrivalTime}` : etaText ? `~${etaText}` : null}
             />
           )}
 
