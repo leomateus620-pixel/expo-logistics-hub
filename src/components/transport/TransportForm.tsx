@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Check, Plus } from 'lucide-react';
 import { toast } from 'sonner';
-import { getRoundTripKm } from '@/lib/utils';
+import { getEffectiveEstimatedKm } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -169,7 +169,7 @@ export default function TransportForm({
               />
             </div>
             {(() => {
-              const km = apiKm || getRoundTripKm(data.titulo, data.voo_cidade, data.destino);
+              const km = getEffectiveEstimatedKm(apiKm, data.titulo, data.voo_cidade, data.destino);
               if (loadingKm) return (
                 <p className="text-xs text-muted-foreground bg-muted/30 rounded-lg px-3 py-2">
                   🛣️ Calculando distância por rota...
@@ -177,7 +177,7 @@ export default function TransportForm({
               );
               return km ? (
                 <p className="text-xs text-muted-foreground bg-muted/30 rounded-lg px-3 py-2">
-                  🛣️ Distância estimada: <span className="font-semibold text-foreground">~{km} km</span> (ida e volta){apiKm ? ' · via Google Maps' : ''}
+                  🛣️ Distância estimada: <span className="font-semibold text-foreground">~{km} km</span> (ida e volta){apiKm != null && km === apiKm ? ' · via Google Maps' : ''}
                 </p>
               ) : null;
             })()}

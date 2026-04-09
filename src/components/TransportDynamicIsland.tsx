@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect, useRef, lazy, Suspense } from 'react';
-import { cn } from '@/lib/utils';
+import { cn, getEffectiveEstimatedKm } from '@/lib/utils';
 import { Navigation, MapPinOff, Clock, ArrowRight, Ruler, Timer, Square, Play, Eye, MapPin, Expand } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useTransportLocation } from '@/hooks/useLocationTracking';
@@ -80,6 +80,7 @@ export default function TransportDynamicIsland({
   const location = useTransportLocation(isActive ? t.id : null);
   const [liveEta, setLiveEta] = useState<{ minutes: number; km: number; arrivalTime: string } | null>(null);
   const lastFetchRef = useRef<number>(0);
+  const estimatedKm = getEffectiveEstimatedKm(t.distancia_estimada_km, t.titulo, t.voo_cidade, t.destino);
 
   // Auto-expand when transport becomes active
   useEffect(() => {
@@ -352,9 +353,9 @@ export default function TransportDynamicIsland({
 
           {/* Metrics row */}
           <div className="flex flex-wrap gap-2">
-            {(liveEta || t.distancia_estimada_km) && (
+            {(liveEta || estimatedKm) && (
               <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-muted/50 text-[11px] font-medium text-foreground/70">
-                <Ruler className="w-3 h-3" /> {liveEta ? `${liveEta.km} km` : `${t.distancia_estimada_km} km`}
+                <Ruler className="w-3 h-3" /> {liveEta ? `${liveEta.km} km` : `${estimatedKm} km`}
               </span>
             )}
             {(liveEta || t.duracao_estimada_min) && (

@@ -11,7 +11,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useTransportGuests } from '@/hooks/useTransportGuests';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Plus, Check, Clock, X, Pencil, Search, XCircle, Trash2, FileText, Eye, ArrowRight, Plane, Navigation, MapPinOff, Route, Timer, Ruler, Play, Square, History, ChevronDown, ChevronUp } from 'lucide-react';
-import { cn, rawTime, rawDateShort, nowSP, nowSPLocal, ensureSPOffset, getRoundTripKm, getDateSP } from '@/lib/utils';
+import { cn, rawTime, rawDateShort, nowSP, nowSPLocal, ensureSPOffset, getRoundTripKm, getDateSP, getEffectiveEstimatedKm } from '@/lib/utils';
 import { useState, lazy, Suspense, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
@@ -432,7 +432,12 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
           voo_chegada: form.titulo === 'Aeroporto' ? form.voo_chegada || null : null,
           horario_saida: form.titulo === 'Aeroporto' ? form.horario_saida || null : null,
           observacoes: buildEscoltaObs(form),
-          distancia_estimada_km: routeData.distance_km ? Math.round(routeData.distance_km * 2) : getRoundTripKm(form.titulo, form.voo_cidade, form.destino) || null,
+          distancia_estimada_km: getEffectiveEstimatedKm(
+            routeData.distance_km ? Math.round(routeData.distance_km * 2) : null,
+            form.titulo,
+            form.voo_cidade,
+            destino,
+          ),
           duracao_estimada_min: routeData.duration_minutes || null,
           rota_polyline: routeData.polyline || null,
         },
@@ -479,7 +484,12 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
               voo_numero: capturedReturnForm.voo_numero || null,
               voo_checkin: capturedReturnForm.voo_checkin || null,
               horario_saida: capturedReturnForm.horario_saida || null,
-              distancia_estimada_km: returnRouteData.distance_km ? Math.round(returnRouteData.distance_km * 2) : getRoundTripKm('Aeroporto', capturedForm.voo_cidade, capturedForm.destino) || null,
+              distancia_estimada_km: getEffectiveEstimatedKm(
+                returnRouteData.distance_km ? Math.round(returnRouteData.distance_km * 2) : null,
+                'Aeroporto',
+                capturedForm.voo_cidade,
+                capturedForm.destino,
+              ),
               duracao_estimada_min: returnRouteData.duration_minutes || null,
               rota_polyline: returnRouteData.polyline || null,
             },
@@ -524,6 +534,11 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
     try {
       const currentTransport = transports.find((t: any) => t.id === editId);
       const statusChanged = currentTransport && currentTransport.status !== editForm.status;
+      const routeFieldsChanged = !!currentTransport && (
+        currentTransport.titulo !== (editForm.titulo || null) ||
+        currentTransport.destino !== editForm.destino ||
+        currentTransport.voo_cidade !== (editForm.titulo === 'Aeroporto' ? editForm.voo_cidade || null : null)
+      );
 
       const updates: any = {
         titulo: editForm.titulo || null,
@@ -542,6 +557,12 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
         voo_checkin: editForm.titulo === 'Aeroporto' ? editForm.voo_checkin || null : null,
         voo_chegada: editForm.titulo === 'Aeroporto' ? editForm.voo_chegada || null : null,
         horario_saida: editForm.titulo === 'Aeroporto' ? editForm.horario_saida || null : null,
+        distancia_estimada_km: getEffectiveEstimatedKm(
+          routeFieldsChanged ? null : currentTransport?.distancia_estimada_km,
+          editForm.titulo,
+          editForm.voo_cidade,
+          editForm.destino,
+        ),
         observacoes: buildEscoltaObs(editForm),
       };
 
@@ -684,7 +705,10 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
       <div class="row"><span class="label">Veículo:</span><span class="value">${vehicle ? `${vehicle.placa} ${vehicle.modelo || ''}` : '—'}</span></div>
       <div class="row"><span class="label">Hóspede${pdfGuests.length > 1 ? 's' : ''}:</span><span class="value">${pdfGuests.length > 0 ? pdfGuests.map((g: any) => g.nome).join(', ') : '—'}</span></div>
       ${pdfGuests.some((g: any) => g.hotel_nome) ? `<div class="row"><span class="label">Hotel:</span><span class="value">${[...new Set(pdfGuests.map((g: any) => g.hotel_nome).filter(Boolean))].join(', ')}</span></div>` : ''}
-      ${t.distancia_estimada_km ? `<div class="row"><span class="label">Distância:</span><span class="value">${t.distancia_estimada_km} km</span></div>` : ''}
+      ${(() => {
+        const km = getEffectiveEstimatedKm(t.distancia_estimada_km, t.titulo, t.voo_cidade, t.destino);
+        return km ? `<div class="row"><span class="label">Distância:</span><span class="value">${km} km</span></div>` : '';
+      })()}
       ${t.duracao_estimada_min ? `<div class="row"><span class="label">Tempo Estimado:</span><span class="value">${t.duracao_estimada_min} min</span></div>` : ''}
       ${t.km_retirada != null ? `<div class="row"><span class="label">KM Retirada:</span><span class="value">${t.km_retirada}</span></div>` : ''}
       ${t.km_devolucao != null ? `<div class="row"><span class="label">KM Devolução:</span><span class="value">${t.km_devolucao}</span></div>` : ''}

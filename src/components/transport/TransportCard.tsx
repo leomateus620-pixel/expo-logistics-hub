@@ -2,7 +2,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Check, Clock, X, Pencil, Trash2, FileText, Navigation, Play, Square, ChevronDown, ChevronUp, MessageCircle } from 'lucide-react';
-import { cn, rawTime, rawDateShort, getRoundTripKm } from '@/lib/utils';
+import { cn, rawTime, rawDateShort, getEffectiveEstimatedKm } from '@/lib/utils';
 import TransportDynamicIsland from '@/components/TransportDynamicIsland';
 import { buildTripMessage, buildWhatsAppUrl, isValidPhone } from '@/lib/whatsapp';
 
@@ -137,7 +137,7 @@ export default function TransportCard({ t, members, vehicles, guests, highlightI
             </span>
           )}
           {(() => {
-            const km = t.distancia_estimada_km || getRoundTripKm(t.titulo, t.voo_cidade, t.destino);
+            const km = getEffectiveEstimatedKm(t.distancia_estimada_km, t.titulo, t.voo_cidade, t.destino);
             return km ? (
               <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-muted/40 text-[11px] text-muted-foreground">
                 🛣️ ~{Math.round(km)} km (ida e volta)
