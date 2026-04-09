@@ -973,6 +973,9 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
         open={startTripDialogOpen}
         onOpenChange={setStartTripDialogOpen}
         whatsappData={startTripWhatsappData}
+        whatsappGuests={startTripWhatsappGuests}
+        driverName={startTripDriverName}
+        startedAt={startTripStartedAt}
       />
     </div>
   );
