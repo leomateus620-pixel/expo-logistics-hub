@@ -22,6 +22,10 @@ const knownDestCoords: Record<string, { lat: number; lng: number }> = {
 };
 
 function getDestCoords(t: any): { lat: number; lng: number } | null {
+  // Prioritize custom coords from database
+  if (t.destino_lat && t.destino_lng) {
+    return { lat: t.destino_lat, lng: t.destino_lng };
+  }
   if (t.titulo === 'Aeroporto' && t.voo_cidade) {
     return knownDestCoords[`Aeroporto_${t.voo_cidade}`] || null;
   }

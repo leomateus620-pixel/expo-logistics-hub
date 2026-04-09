@@ -442,6 +442,8 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
           voo_chegada: form.titulo === 'Aeroporto' ? form.voo_chegada || null : null,
           horario_saida: form.titulo === 'Aeroporto' ? form.horario_saida || null : null,
           observacoes: buildEscoltaObs(form),
+          destino_lat: customLat || null,
+          destino_lng: customLng || null,
           distancia_estimada_km: getEffectiveEstimatedKm(
             routeData.distance_km ? Math.round(routeData.distance_km * 2) : null,
             form.titulo,
