@@ -323,25 +323,31 @@ export default function TransportsPage() {
 
   const availableVehicles = vehicles.filter((v: any) => v.status === 'disponivel');
 
+  const checkOverlap = (t: any, startTime: string, excludeTransportId?: string) => {
+    if (t.vehicle_id === undefined) return false;
+    if (!['pendente', 'em_andamento'].includes(t.status)) return false;
+    if (excludeTransportId && t.id === excludeTransportId) return false;
+    const existingStart = new Date(t.inicio_em);
+    const existingEnd = estimateReturnTime(t);
+    if (!existingEnd) return true;
+    const newStart = new Date(startTime);
+    const newDurationMin = 120; // fallback: 2h para o novo transporte
+    const newEnd = new Date(newStart.getTime() + newDurationMin * 60000);
+    // Sobreposição real: startA < endB AND startB < endA
+    return newStart < existingEnd && existingStart < newEnd;
+  };
+
   const isVehicleBusyAt = (vehicleId: string, startTime: string, excludeTransportId?: string) => {
     return transports.some((t: any) => {
       if (t.vehicle_id !== vehicleId) return false;
-      if (!['pendente', 'em_andamento'].includes(t.status)) return false;
-      if (excludeTransportId && t.id === excludeTransportId) return false;
-      const estReturn = estimateReturnTime(t);
-      if (!estReturn) return true;
-      return new Date(startTime) < estReturn;
+      return checkOverlap(t, startTime, excludeTransportId);
     });
   };
 
   const getVehicleConflictInfo = (vehicleId: string, startTime: string, excludeTransportId?: string) => {
     const conflicting = transports.find((t: any) => {
       if (t.vehicle_id !== vehicleId) return false;
-      if (!['pendente', 'em_andamento'].includes(t.status)) return false;
-      if (excludeTransportId && t.id === excludeTransportId) return false;
-      const estReturn = estimateReturnTime(t);
-      if (!estReturn) return true;
-      return new Date(startTime) < estReturn;
+      return checkOverlap(t, startTime, excludeTransportId);
     });
     if (!conflicting) return null;
     const ret = formatReturnTime(conflicting);
