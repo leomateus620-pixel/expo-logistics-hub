@@ -57,6 +57,22 @@ Deno.serve(async (req) => {
     const body = await req.json();
     const { origin_lat, origin_lng, destination, mode, dest_lat, dest_lng } = body;
 
+    // MODE: LIVE_ROUTE — driver current position → destination, returns polyline + ETA
+    if (mode === 'LIVE_ROUTE') {
+      const oLat = origin_lat;
+      const oLng = origin_lng;
+      const dLat = dest_lat;
+      const dLng = dest_lng;
+
+      if (!oLat || !oLng || !dLat || !dLng) {
+        return new Response(
+          JSON.stringify({ error: 'LIVE_ROUTE requires origin_lat, origin_lng, dest_lat, dest_lng' }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        );
+      }
+      return await computeRoute(GOOGLE_MAPS_API_KEY, oLat, oLng, dLat, dLng, destination || 'Destino', true);
+    }
+
     // MODE: ROUTE_PREVIEW — arbitrary origin/dest coords, returns polyline
     if (mode === 'ROUTE_PREVIEW') {
       const oLat = origin_lat || SANTA_ROSA.lat;
@@ -65,7 +81,6 @@ Deno.serve(async (req) => {
       const dLng = dest_lng;
 
       if (!dLat || !dLng) {
-        // Try to resolve destination name to known coords
         const destKey = destination || 'Outros';
         const resolved = knownDestinations[destKey] || knownDestinations['Outros'];
         return await computeRoute(GOOGLE_MAPS_API_KEY, oLat, oLng, resolved.lat, resolved.lng, resolved.label, true);
@@ -73,7 +88,7 @@ Deno.serve(async (req) => {
       return await computeRoute(GOOGLE_MAPS_API_KEY, oLat, oLng, dLat, dLng, destination || 'Destino', true);
     }
 
-    // Legacy mode
+    // Legacy mode (RETURN_TO_ORIGIN or named destination) — now always includes polyline
     if (!origin_lat || !origin_lng || !destination) {
       return new Response(
         JSON.stringify({ error: 'Missing required fields: origin_lat, origin_lng, destination' }),
@@ -86,7 +101,8 @@ Deno.serve(async (req) => {
       ? SANTA_ROSA
       : (knownDestinations[destination] || knownDestinations['Outros']);
 
-    return await computeRoute(GOOGLE_MAPS_API_KEY, origin_lat, origin_lng, destCoords.lat, destCoords.lng, isReturnTrip ? 'Santa Rosa' : destCoords.label, false);
+    // Always include polyline now
+    return await computeRoute(GOOGLE_MAPS_API_KEY, origin_lat, origin_lng, destCoords.lat, destCoords.lng, isReturnTrip ? 'Santa Rosa' : destCoords.label, true);
 
   } catch (error) {
     console.error('estimate-return error:', error);
