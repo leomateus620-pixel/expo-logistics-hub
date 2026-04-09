@@ -1,63 +1,45 @@
 
 
-# Rota real no mapa em tempo real (usando Routes API + Roads API)
+# Corrigir métricas de distância/tempo/chegada no Dynamic Island
 
-## Problema atual
+## Problema
 
-1. **Rota estática**: O polyline é salvo no banco apenas na criação do transporte (origem fixa → destino). Durante a viagem, o mapa mostra uma **linha reta tracejada** entre o motorista e o destino porque a chamada de ETA ao vivo (`RETURN_TO_ORIGIN`) não retorna polyline.
-2. **Sem recálculo de rota**: Conforme o motorista se move, a rota não é recalculada — apenas o ETA é atualizado a cada 2 minutos.
+As métricas abaixo do mapa (km, minutos, chegada) estão usando os dados do **retorno à origem** (`returnData`) em vez da **rota ao vivo até o destino** (`liveData`). Resultado: mostra 0.3 km e 1 min quando o motorista está perto de Santa Rosa, não a distância real até o destino (ex: Santo Ângelo).
+
+Além disso, quando a viagem inicia e ainda não houve fetch ao vivo, os valores de fallback (`estimatedKm`, `duracao_estimada_min`) podem estar zerados ou incorretos.
+
+## Causa raiz
+
+Linha 160-163 do `TransportDynamicIsland.tsx`: o `liveEta` é populado com `returnData` (motorista → Santa Rosa), mas os badges de km/min/chegada usam esse mesmo objeto para mostrar distância até o **destino**.
 
 ## Solução
 
-Usar a Routes API (já habilitada) para buscar a rota real (polyline) junto com o ETA durante o acompanhamento ao vivo, e exibir essa rota no mapa.
+Separar em dois estados:
 
-## Alterações
+1. **`liveDestRoute`** — dados da rota motorista → destino (km, minutos, horário de chegada ao destino) — alimentado por `liveData`
+2. **`liveReturnEta`** — ETA de retorno à base — alimentado por `returnData` (para exibição separada se desejado)
 
-### 1. `supabase/functions/estimate-return/index.ts`
+### Alterações em `src/components/TransportDynamicIsland.tsx`
 
-- Modificar o modo `RETURN_TO_ORIGIN` para **sempre incluir o polyline** na resposta (adicionar `encodedPolyline` ao fieldMask)
-- Adicionar novo modo `LIVE_ROUTE` que aceita `origin_lat/lng` + `dest_lat/lng` e retorna duração + distância + polyline (rota do motorista até o destino, não de volta à origem)
-- Assim o frontend pode pedir a rota real motorista→destino E motorista→origem
+1. Substituir o state `liveEta` por dois states:
+   - `liveDestRoute: { minutes, km, arrivalTime }` — preenchido com `liveData` (rota ao destino)
+   - `liveReturnEta: { minutes, arrivalTime }` — preenchido com `returnData` (retorno à origem)
 
-### 2. `src/components/TransportDynamicIsland.tsx`
+2. No `useEffect` de fetch (linhas 148-164):
+   - Usar `liveData.duration_minutes` e `liveData.distance_km` para `liveDestRoute`
+   - Usar `returnData.duration_minutes` para `liveReturnEta`
 
-- No `useEffect` de ETA ao vivo, trocar o modo para `LIVE_ROUTE` passando as coordenadas do destino real do transporte
-- Extrair o `polyline` da resposta e decodificá-lo para atualizar o mapa com a rota rodoviária real
-- Adicionar state `livePolyline` que substitui o `routePolyline` estático quando disponível
-- Passar `livePolyline || routePolyline` para o componente `DriverLocationMap`
-- Fazer uma segunda chamada `RETURN_TO_ORIGIN` (com polyline) para calcular ETA de retorno
+3. Na seção de métricas (linhas 386-402):
+   - Badge de km: usar `liveDestRoute.km`
+   - Badge de minutos: usar `liveDestRoute.minutes`
+   - Badge de chegada: usar `liveDestRoute.arrivalTime` (chegada ao destino)
+   - Opcionalmente exibir retorno: `liveReturnEta.arrivalTime`
 
-### 3. `src/components/DriverLocationMap.tsx`
+4. Nos textos colapsados (`etaText`, `arrivalText`): usar `liveDestRoute` em vez de `liveEta`
 
-- Quando receber um `routePolyline` com pontos suficientes (>2), desenhar como linha **sólida** (não tracejada) para indicar rota real
-- Manter a linha tracejada apenas para fallback de linha reta (≤2 pontos)
-- Ajustar `fitBounds` para incluir toda a polyline, não apenas motorista + destino
-
-### 4. `src/components/transport/FullscreenMapDialog.tsx`
-
-- Passar `livePolyline` também para o mapa fullscreen, garantindo consistência
-
-## Fluxo durante viagem ativa
-
-```text
-A cada 2 min (quando GPS atualiza):
-  1. Frontend envia posição do motorista → edge function (modo LIVE_ROUTE)
-  2. Edge function chama Google Routes API com polyline no fieldMask
-  3. Retorna: duração, distância, polyline encodado
-  4. Frontend decodifica polyline → atualiza mapa com rota real
-  5. Atualiza ETA e distância restante
-```
-
-## Resultado esperado
-
-- Mapa mostra a rota rodoviária real (curvas, estradas) em vez de linha reta
-- ETA baseado em tráfego real atualizado a cada 2 minutos
-- Rota recalculada conforme motorista se move
+5. Fazer um fetch inicial imediato ao iniciar a viagem (quando `isActive` muda para true e `location` está disponível), sem esperar os 2 minutos do throttle — resetar `lastFetchRef.current = 0` quando `isActive` muda
 
 | Arquivo | Ação |
 |---|---|
-| `supabase/functions/estimate-return/index.ts` | Adicionar modo LIVE_ROUTE com polyline |
-| `src/components/TransportDynamicIsland.tsx` | Buscar e exibir rota ao vivo |
-| `src/components/DriverLocationMap.tsx` | Estilo sólido para rota real, fitBounds na polyline |
-| `src/components/transport/FullscreenMapDialog.tsx` | Passar polyline ao vivo |
+| `src/components/TransportDynamicIsland.tsx` | Separar liveEta em liveDestRoute + liveReturnEta; corrigir métricas |
 
