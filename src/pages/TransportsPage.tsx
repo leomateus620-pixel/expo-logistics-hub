@@ -11,7 +11,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useTransportGuests } from '@/hooks/useTransportGuests';
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Plus, Check, Clock, X, Pencil, Search, XCircle, Trash2, FileText, Eye, ArrowRight, Plane, Navigation, MapPinOff, Route, Timer, Ruler, Play, Square, History, ChevronDown, ChevronUp } from 'lucide-react';
-import { cn, rawTime, rawDateShort, nowSP, nowSPLocal, ensureSPOffset, getRoundTripKm, getDateSP, getEffectiveEstimatedKm } from '@/lib/utils';
+import { cn, rawTime, rawDateShort, nowSP, nowSPLocal, ensureSPOffset, getRoundTripKm, getDateSP, getEffectiveEstimatedKm, utcToSPLocal } from '@/lib/utils';
 import { useState, lazy, Suspense, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
