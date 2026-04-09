@@ -78,15 +78,24 @@ export default function DriverLocationMap({ latitude, longitude, accuracy, speed
       ? routePolyline
       : (destLatLng ? [[latitude, longitude] as [number, number], destLatLng] : undefined);
 
+    // Determine if this is a real road route (>2 points) or a fallback straight line
+    const isRealRoute = effectivePolyline && effectivePolyline.length > 2;
+
     if (effectivePolyline && effectivePolyline.length > 1 && mapInstanceRef.current) {
       if (polylineRef.current) {
         polylineRef.current.setLatLngs(effectivePolyline);
+        // Update style if route type changed
+        polylineRef.current.setStyle({
+          dashArray: isRealRoute ? undefined : '8 6',
+          weight: isRealRoute ? 4 : 3,
+          opacity: isRealRoute ? 0.8 : 0.6,
+        });
       } else {
         polylineRef.current = L.polyline(effectivePolyline, {
           color: 'hsl(142,50%,35%)',
-          weight: 3,
-          opacity: 0.6,
-          dashArray: '8 6',
+          weight: isRealRoute ? 4 : 3,
+          opacity: isRealRoute ? 0.8 : 0.6,
+          dashArray: isRealRoute ? undefined : '8 6',
         }).addTo(mapInstanceRef.current);
       }
     }
@@ -109,12 +118,19 @@ export default function DriverLocationMap({ latitude, longitude, accuracy, speed
         }
       }
 
-      // Fit bounds to include driver + destination
-      const bounds = L.latLngBounds([
-        [latitude, longitude],
-        destLatLng,
-      ]);
-      mapInstanceRef.current.fitBounds(bounds, { padding: [30, 30], maxZoom: 14 });
+      // Fit bounds to include driver + destination + polyline
+      if (effectivePolyline && effectivePolyline.length > 2) {
+        // Use full polyline for bounds
+        const bounds = L.latLngBounds(effectivePolyline.map(p => [p[0], p[1]] as [number, number]));
+        bounds.extend([latitude, longitude]);
+        mapInstanceRef.current.fitBounds(bounds, { padding: [30, 30], maxZoom: 14 });
+      } else {
+        const bounds = L.latLngBounds([
+          [latitude, longitude],
+          destLatLng,
+        ]);
+        mapInstanceRef.current.fitBounds(bounds, { padding: [30, 30], maxZoom: 14 });
+      }
     }
   }, [latitude, longitude, accuracy, driverName, routePolyline, destLatLng, destLabel]);
 

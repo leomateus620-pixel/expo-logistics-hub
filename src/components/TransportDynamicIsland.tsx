@@ -79,6 +79,7 @@ export default function TransportDynamicIsland({
 
   const location = useTransportLocation(isActive ? t.id : null);
   const [liveEta, setLiveEta] = useState<{ minutes: number; km: number; arrivalTime: string } | null>(null);
+  const [livePolyline, setLivePolyline] = useState<[number, number][] | undefined>(undefined);
   const lastFetchRef = useRef<number>(0);
   const estimatedKm = getEffectiveEstimatedKm(t.distancia_estimada_km, t.titulo, t.voo_cidade, t.destino);
 
@@ -99,37 +100,67 @@ export default function TransportDynamicIsland({
     return d ? [d.lat, d.lng] as [number, number] : undefined;
   }, [t.titulo, t.voo_cidade]);
 
-  // Fetch live ETA when location updates
+  // Fetch live route + ETA when location updates
   useEffect(() => {
     if (!location || !isActive) return;
     const now = Date.now();
     if (now - lastFetchRef.current < 120000) return;
     lastFetchRef.current = now;
 
+    const dest = getDestCoords(t);
+    if (!dest) return;
+
     (async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
-        const res = await fetch(
-          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/estimate-return`,
-          {
+        const headers = {
+          'Content-Type': 'application/json',
+          'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          'Authorization': `Bearer ${session?.access_token || ''}`,
+        };
+        const baseUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/estimate-return`;
+
+        // Fetch live route: driver → destination (with polyline)
+        const [liveRes, returnRes] = await Promise.all([
+          fetch(baseUrl, {
             method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-              'Authorization': `Bearer ${session?.access_token || ''}`,
-            },
+            headers,
+            body: JSON.stringify({
+              mode: 'LIVE_ROUTE',
+              origin_lat: location.latitude,
+              origin_lng: location.longitude,
+              dest_lat: dest.lat,
+              dest_lng: dest.lng,
+              destination: t.destino,
+            }),
+          }),
+          fetch(baseUrl, {
+            method: 'POST',
+            headers,
             body: JSON.stringify({
               origin_lat: location.latitude,
               origin_lng: location.longitude,
               destination: 'RETURN_TO_ORIGIN',
             }),
-          }
-        );
-        const data = await res.json();
-        if (data.duration_minutes && !data.fallback) {
-          const eta = new Date(Date.now() + data.duration_minutes * 60000);
+          }),
+        ]);
+
+        const liveData = await liveRes.json();
+        const returnData = await returnRes.json();
+
+        // Update polyline from live route
+        if (liveData.polyline && !liveData.fallback) {
+          try {
+            const decoded = decodePolyline(liveData.polyline);
+            if (decoded.length > 1) setLivePolyline(decoded);
+          } catch { /* keep old */ }
+        }
+
+        // Update ETA from return route
+        if (returnData.duration_minutes && !returnData.fallback) {
+          const eta = new Date(Date.now() + returnData.duration_minutes * 60000);
           const formatted = eta.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
-          setLiveEta({ minutes: data.duration_minutes, km: data.distance_km, arrivalTime: formatted });
+          setLiveEta({ minutes: returnData.duration_minutes, km: returnData.distance_km, arrivalTime: formatted });
         }
       } catch { /* keep last */ }
     })();
@@ -269,7 +300,7 @@ export default function TransportDynamicIsland({
                       speed={location.speed}
                       driverName={driverName}
                       className="h-[160px] relative"
-                      routePolyline={routePolyline}
+                      routePolyline={livePolyline || routePolyline}
                       destLatLng={destCoords}
                       destLabel={t.destino}
                     />
@@ -295,7 +326,7 @@ export default function TransportDynamicIsland({
                       latitude={destCoords[0]}
                       longitude={destCoords[1]}
                       className="h-[160px] relative"
-                      routePolyline={routePolyline}
+                      routePolyline={livePolyline || routePolyline}
                       destLatLng={destCoords}
                       destLabel={t.destino}
                     />
@@ -319,7 +350,7 @@ export default function TransportDynamicIsland({
                     latitude={destCoords[0]}
                     longitude={destCoords[1]}
                     className="h-[140px] relative"
-                    routePolyline={routePolyline}
+                    routePolyline={livePolyline || routePolyline}
                     destLatLng={destCoords}
                     destLabel={t.destino}
                   />
@@ -433,7 +464,7 @@ export default function TransportDynamicIsland({
               accuracy={location?.accuracy}
               speed={location?.speed}
               driverName={driverName}
-              routePolyline={routePolyline}
+              routePolyline={livePolyline || routePolyline}
               destLatLng={destCoords}
               destLabel={t.destino}
               origemLabel={t.origem}
