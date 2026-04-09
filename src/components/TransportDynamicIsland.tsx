@@ -108,7 +108,7 @@ export default function TransportDynamicIsland({
   const destCoords = useMemo(() => {
     const d = getDestCoords(t);
     return d ? [d.lat, d.lng] as [number, number] : undefined;
-  }, [t.titulo, t.voo_cidade]);
+  }, [t.titulo, t.voo_cidade, t.destino_lat, t.destino_lng]);
 
   // Fetch live route + ETA when location updates
   useEffect(() => {
