@@ -24,6 +24,15 @@ function getSPOffset(): string {
   return '-03:00'; // fallback
 }
 
+/** Convert an ISO/UTC timestamp to datetime-local format (YYYY-MM-DDTHH:MM) in São Paulo timezone */
+export function utcToSPLocal(iso: string): string {
+  const d = new Date(iso);
+  if (isNaN(d.getTime())) return '';
+  const raw = d.toLocaleString('sv-SE', { timeZone: 'America/Sao_Paulo' });
+  const [date, time] = raw.split(' ');
+  return `${date}T${time?.slice(0, 5) || '00:00'}`;
+}
+
 /** Get current date/time in São Paulo timezone as ISO string */
 export function nowSP(): string {
   const raw = new Date().toLocaleString('sv-SE', { timeZone: 'America/Sao_Paulo' });
