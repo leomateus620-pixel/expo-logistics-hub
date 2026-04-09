@@ -1,45 +1,86 @@
 
+# Busca de destino via Google Maps ao selecionar "Outros"
 
-# Corrigir métricas de distância/tempo/chegada no Dynamic Island
+## Resumo
 
-## Problema
+Quando o usuário selecionar "Outros" no título do transporte, em vez de só digitar texto livre no campo "Destino", aparecerá um campo de busca integrado com Google Places Autocomplete. Ao selecionar um local, o sistema preencherá automaticamente: nome do destino, cidade, coordenadas (lat/lng), distância estimada e tempo estimado via Routes API. Essas coordenadas serão salvas no banco para que o rastreamento ao vivo funcione corretamente.
 
-As métricas abaixo do mapa (km, minutos, chegada) estão usando os dados do **retorno à origem** (`returnData`) em vez da **rota ao vivo até o destino** (`liveData`). Resultado: mostra 0.3 km e 1 min quando o motorista está perto de Santa Rosa, não a distância real até o destino (ex: Santo Ângelo).
+## Alterações
 
-Além disso, quando a viagem inicia e ainda não houve fetch ao vivo, os valores de fallback (`estimatedKm`, `duracao_estimada_min`) podem estar zerados ou incorretos.
+### 1. Migração de banco — adicionar colunas de coordenadas
 
-## Causa raiz
+Adicionar `destino_lat` e `destino_lng` (float8, nullable) na tabela `transports` para armazenar as coordenadas do destino personalizado.
 
-Linha 160-163 do `TransportDynamicIsland.tsx`: o `liveEta` é populado com `returnData` (motorista → Santa Rosa), mas os badges de km/min/chegada usam esse mesmo objeto para mostrar distância até o **destino**.
+```sql
+ALTER TABLE public.transports ADD COLUMN destino_lat double precision;
+ALTER TABLE public.transports ADD COLUMN destino_lng double precision;
+```
 
-## Solução
+### 2. Edge function — `places-autocomplete` (nova)
 
-Separar em dois estados:
+Criar uma nova edge function que faz proxy para a Google Places API (New):
+- **Endpoint**: `POST /places-autocomplete`
+- **Body**: `{ query: string }`
+- **Resposta**: Lista de sugestões com `place_id`, `description`, `lat`, `lng`, `city`
+- Usa a Google Places API (New) — `searchText` endpoint
+- Protegida por JWT (mesmo padrão das outras funções)
 
-1. **`liveDestRoute`** — dados da rota motorista → destino (km, minutos, horário de chegada ao destino) — alimentado por `liveData`
-2. **`liveReturnEta`** — ETA de retorno à base — alimentado por `returnData` (para exibição separada se desejado)
+### 3. `src/components/transport/PlacesAutocomplete.tsx` (novo componente)
 
-### Alterações em `src/components/TransportDynamicIsland.tsx`
+Componente de busca de lugares:
+- Input com debounce (300ms) que chama a edge function
+- Dropdown com sugestões (nome + endereço)
+- Ao selecionar: retorna `{ name, city, lat, lng }` via callback
+- Responsivo: funciona em mobile e desktop
+- Mostra loading spinner enquanto busca
+- Mostra "Nenhum resultado" quando não encontra
 
-1. Substituir o state `liveEta` por dois states:
-   - `liveDestRoute: { minutes, km, arrivalTime }` — preenchido com `liveData` (rota ao destino)
-   - `liveReturnEta: { minutes, arrivalTime }` — preenchido com `returnData` (retorno à origem)
+### 4. `src/components/transport/TransportForm.tsx`
 
-2. No `useEffect` de fetch (linhas 148-164):
-   - Usar `liveData.duration_minutes` e `liveData.distance_km` para `liveDestRoute`
-   - Usar `returnData.duration_minutes` para `liveReturnEta`
+- Quando `titulo === 'Outros'`, substituir o campo de texto "Destino" pelo `PlacesAutocomplete`
+- Ao selecionar um local:
+  - Preencher `data.destino` com a cidade do local
+  - Salvar coordenadas em `data.destino_lat` e `data.destino_lng`
+  - Disparar fetch de `ROUTE_PREVIEW` usando as coordenadas reais → atualizar `apiKm`
+- Mostrar nome completo do local selecionado abaixo do campo
+- Atualizar o `useEffect` de km para usar `destino_lat/lng` quando disponível (em vez de `knownDestCoords['Outros']`)
 
-3. Na seção de métricas (linhas 386-402):
-   - Badge de km: usar `liveDestRoute.km`
-   - Badge de minutos: usar `liveDestRoute.minutes`
-   - Badge de chegada: usar `liveDestRoute.arrivalTime` (chegada ao destino)
-   - Opcionalmente exibir retorno: `liveReturnEta.arrivalTime`
+### 5. `src/pages/TransportsPage.tsx`
 
-4. Nos textos colapsados (`etaText`, `arrivalText`): usar `liveDestRoute` em vez de `liveEta`
+- Incluir `destino_lat` e `destino_lng` no payload de criação do transporte
+- Atualizar `getDestCoords()` para verificar se o transporte tem `destino_lat/lng` antes de usar os coords fixos
+- Atualizar `fetchRoutePreview()` para aceitar coordenadas customizadas
 
-5. Fazer um fetch inicial imediato ao iniciar a viagem (quando `isActive` muda para true e `location` está disponível), sem esperar os 2 minutos do throttle — resetar `lastFetchRef.current = 0` quando `isActive` muda
+### 6. `src/components/TransportDynamicIsland.tsx`
+
+- Atualizar `getDestCoords()` para usar `t.destino_lat` e `t.destino_lng` quando disponíveis (prioridade sobre o mapeamento fixo)
+- Isso garante que o rastreamento ao vivo e recálculo de rota funcionem para destinos personalizados
+
+### 7. `supabase/functions/estimate-return/index.ts`
+
+- Nenhuma alteração necessária — já suporta `dest_lat/dest_lng` arbitrários nos modos `ROUTE_PREVIEW` e `LIVE_ROUTE`
+
+## Fluxo do usuário
+
+```text
+1. Usuário abre "Novo Transporte"
+2. Seleciona "Outros" no título
+3. Campo "Destino" vira campo de busca com ícone de pesquisa
+4. Digita "Ijuí" → aparece lista: "Ijuí, RS, Brasil", etc.
+5. Seleciona "Ijuí, RS, Brasil"
+6. Sistema preenche: destino="Ijuí", lat/lng salvos
+7. Sistema calcula: "🛣️ Distância estimada: ~190 km (ida e volta) · via Google Maps"
+8. Ao salvar, coordenadas vão pro banco
+9. Durante viagem ao vivo, rota real é calculada usando as coordenadas corretas
+```
+
+## Arquivos
 
 | Arquivo | Ação |
 |---|---|
-| `src/components/TransportDynamicIsland.tsx` | Separar liveEta em liveDestRoute + liveReturnEta; corrigir métricas |
-
+| Migração SQL | Adicionar `destino_lat`, `destino_lng` |
+| `supabase/functions/places-autocomplete/index.ts` | Nova edge function (proxy Google Places) |
+| `src/components/transport/PlacesAutocomplete.tsx` | Novo componente de busca |
+| `src/components/transport/TransportForm.tsx` | Integrar autocomplete quando "Outros" |
+| `src/pages/TransportsPage.tsx` | Salvar coords, atualizar getDestCoords |
+| `src/components/TransportDynamicIsland.tsx` | Usar coords do banco para rastreamento |
