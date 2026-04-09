@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Separator } from '@/components/ui/separator';
 import { Check, Clock, X, Eye, Navigation, FileText, Route, History, Pencil } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { cn, getEffectiveEstimatedKm } from '@/lib/utils';
 
 const statusConfig: Record<string, { label: string; class: string; bgClass: string }> = {
   pendente: { label: 'Pendente', class: 'text-info', bgClass: 'bg-info/10 border-info/20' },
@@ -28,6 +28,7 @@ export default function TransportDetailView({ t, members, vehicles, guests, getD
   const kmRodados = t.km_retirada != null && t.km_devolucao != null
     ? Number(t.km_devolucao) - Number(t.km_retirada)
     : null;
+  const estimatedKm = getEffectiveEstimatedKm(t.distancia_estimada_km, t.titulo, t.voo_cidade, t.destino);
 
   return (
     <>
@@ -98,7 +99,7 @@ export default function TransportDetailView({ t, members, vehicles, guests, getD
           </div>
         </div>
 
-        {(t.distancia_estimada_km || t.duracao_estimada_min || kmRodados != null || realDurationMin != null) && (
+        {(estimatedKm || t.duracao_estimada_min || kmRodados != null || realDurationMin != null) && (
           <>
             <Separator />
             <div className="rounded-xl bg-muted/30 p-3 space-y-3">
@@ -106,10 +107,10 @@ export default function TransportDetailView({ t, members, vehicles, guests, getD
                 <Route className="w-3.5 h-3.5" /> Métricas da Viagem
               </p>
               <div className="grid grid-cols-2 gap-3 text-sm">
-                {t.distancia_estimada_km && (
+                {estimatedKm && (
                   <div>
                     <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Distância estimada</p>
-                    <p className="font-mono font-medium">{t.distancia_estimada_km} km</p>
+                    <p className="font-mono font-medium">{estimatedKm} km</p>
                   </div>
                 )}
                 {kmRodados != null && (

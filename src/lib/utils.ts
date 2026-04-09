@@ -137,3 +137,20 @@ export function getRoundTripKm(titulo: string | null | undefined, vooCidade?: st
   if (km !== undefined && km > 0) return km;
   return null;
 }
+
+/** Prefer known route values when a saved/API km is clearly a generic local placeholder */
+export function getEffectiveEstimatedKm(
+  savedKm: number | null | undefined,
+  titulo: string | null | undefined,
+  vooCidade?: string | null,
+  destino?: string | null
+): number | null {
+  const normalizedSavedKm = typeof savedKm === 'number' && savedKm > 0 ? savedKm : null;
+  const knownKm = getRoundTripKm(titulo, vooCidade, destino);
+
+  if (knownKm != null && (normalizedSavedKm == null || normalizedSavedKm <= 10)) {
+    return knownKm;
+  }
+
+  return normalizedSavedKm ?? knownKm;
+}

@@ -1,4 +1,4 @@
-import { getRoundTripKm } from './utils';
+import { getEffectiveEstimatedKm } from './utils';
 
 /* ── Types ── */
 export interface Period {
@@ -121,15 +121,18 @@ function findPeriod(date: string, periods: Period[]): string | null {
 }
 
 function resolveKm(t: any): { km: number | null; source: KmSource } {
-  // Source 1: explicit km saved
-  if (t.distancia_estimada_km != null && t.distancia_estimada_km > 0) {
-    return { km: t.distancia_estimada_km, source: 'saved' };
+  const savedKm = t.distancia_estimada_km != null && t.distancia_estimada_km > 0
+    ? t.distancia_estimada_km
+    : null;
+  const effectiveKm = getEffectiveEstimatedKm(savedKm, t.titulo, t.voo_cidade, t.destino);
+
+  if (effectiveKm != null) {
+    return {
+      km: effectiveKm,
+      source: savedKm != null && effectiveKm === savedKm ? 'saved' : 'known_route',
+    };
   }
-  // Source 2: known route
-  const known = getRoundTripKm(t.titulo, t.voo_cidade, t.destino);
-  if (known != null) {
-    return { km: known, source: 'known_route' };
-  }
+
   // Source 3: insufficient
   return { km: null, source: 'insufficient' };
 }
