@@ -642,6 +642,9 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
           // Show WhatsApp dialog
           if (result?.whatsapp) {
             setStartTripWhatsappData(result.whatsapp);
+            setStartTripWhatsappGuests(result.whatsappGuests || []);
+            setStartTripDriverName(result.driverName || '');
+            setStartTripStartedAt(result.startedAt || '');
             setStartTripDialogOpen(true);
           }
         } catch {
