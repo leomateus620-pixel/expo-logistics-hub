@@ -4,12 +4,13 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Check, Plus } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
+import { Check, Plus, MapPin, LocateFixed, Loader2, Search, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { getEffectiveEstimatedKm } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import PlacesAutocomplete from './PlacesAutocomplete';
+import PlacesSearchDialog from './PlacesSearchDialog';
 
 const tituloOptions = ['Parque', 'Hotel', 'Aeroporto', 'Centro', 'Escolta Policial', 'Outros'];
 const cidadeAeroportoOptions = ['Chapecó', 'Santo Ângelo', 'Passo Fundo', 'Porto Alegre'];
@@ -85,13 +86,52 @@ export default function TransportForm({
 }: TransportFormProps) {
   const [apiKm, setApiKm] = useState<number | null>(null);
   const [loadingKm, setLoadingKm] = useState(false);
+  const [detectingOrigin, setDetectingOrigin] = useState(false);
+  const [searchDialogOpen, setSearchDialogOpen] = useState(false);
+
+  // ── Auto-detect origin city on mount ──
+  useEffect(() => {
+    if (isEdit || data.origem) return;
+    detectOrigin();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const detectOrigin = async () => {
+    if (!navigator.geolocation) return;
+    setDetectingOrigin(true);
+    try {
+      const pos = await new Promise<GeolocationPosition>((resolve, reject) =>
+        navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 8000, enableHighAccuracy: false })
+      );
+      const { latitude, longitude } = pos.coords;
+      const { data: { session } } = await supabase.auth.getSession();
+      const res = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/places-autocomplete`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+            'Authorization': `Bearer ${session?.access_token || ''}`,
+          },
+          body: JSON.stringify({ mode: 'reverse', lat: latitude, lng: longitude }),
+        }
+      );
+      const result = await res.json();
+      if (result.city) {
+        setData((prev: any) => ({ ...prev, origem: result.city.toUpperCase() }));
+      }
+    } catch {
+      // silently fail - user can type manually
+    } finally {
+      setDetectingOrigin(false);
+    }
+  };
 
   // Fetch real road distance when titulo/voo_cidade changes or custom coords are set
   useEffect(() => {
     const destKey = data.titulo === 'Aeroporto' && data.voo_cidade
       ? `Aeroporto_${data.voo_cidade}` : (data.titulo || '');
 
-    // For 'Outros' with custom coords, use those
     const hasCustomCoords = data.titulo === 'Outros' && data.destino_lat && data.destino_lng;
     if (!destKey && !hasCustomCoords) { setApiKm(null); return; }
     if (destKey === 'Outros' && !hasCustomCoords) { setApiKm(null); return; }
@@ -150,358 +190,424 @@ export default function TransportForm({
   if (data.titulo === 'Escolta Policial') defaultOpen.push('escort');
 
   return (
-    <Accordion type="multiple" defaultValue={defaultOpen} className="w-full">
-      {/* Section 1: Basic Data */}
-      <AccordionItem value="basic">
-        <AccordionTrigger className="text-sm font-semibold">📋 Dados Básicos</AccordionTrigger>
-        <AccordionContent>
-          <div className="space-y-3">
-            <Select value={data.titulo} onValueChange={(v) => setData({ ...data, titulo: v })}>
-              <SelectTrigger><SelectValue placeholder="Título (destino)" /></SelectTrigger>
-              <SelectContent>
-                {tituloOptions.map((opt) => <SelectItem key={opt} value={opt}>{opt}</SelectItem>)}
-              </SelectContent>
-            </Select>
-            <div className="grid grid-cols-2 gap-3">
-              <Input placeholder="Origem" value={data.origem} onChange={(e) => setData({ ...data, origem: e.target.value })} />
+    <>
+      <Accordion type="multiple" defaultValue={defaultOpen} className="w-full">
+        {/* Section 1: Basic Data */}
+        <AccordionItem value="basic">
+          <AccordionTrigger className="text-sm font-semibold">📋 Dados Básicos</AccordionTrigger>
+          <AccordionContent>
+            <div className="space-y-3">
+              <Select value={data.titulo} onValueChange={(v) => setData({ ...data, titulo: v, destino_lat: null, destino_lng: null, _selectedPlaceName: '' })}>
+                <SelectTrigger><SelectValue placeholder="Título (destino)" /></SelectTrigger>
+                <SelectContent>
+                  {tituloOptions.map((opt) => <SelectItem key={opt} value={opt}>{opt}</SelectItem>)}
+                </SelectContent>
+              </Select>
+
+              {/* Origin field with auto-detect */}
+              <div className="space-y-1">
+                <Label className="text-xs text-muted-foreground">Origem</Label>
+                <div className="relative">
+                  <Input
+                    placeholder={detectingOrigin ? 'Detectando localização...' : 'Origem'}
+                    value={data.origem}
+                    onChange={(e) => setData({ ...data, origem: e.target.value })}
+                    className="pr-10"
+                    disabled={detectingOrigin}
+                  />
+                  <button
+                    type="button"
+                    onClick={detectOrigin}
+                    disabled={detectingOrigin}
+                    className="absolute right-1.5 top-1/2 -translate-y-1/2 w-8 h-8 flex items-center justify-center rounded-lg hover:bg-muted/80 transition-colors text-muted-foreground hover:text-primary disabled:opacity-50"
+                    title="Detectar localização atual"
+                  >
+                    {detectingOrigin ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      <LocateFixed className="w-4 h-4" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Destination field */}
               {data.titulo === 'Outros' ? (
-                <PlacesAutocomplete
-                  value={data.destino}
-                  placeholder="Buscar destino..."
-                  onSelect={(place) => {
-                    setData({
-                      ...data,
-                      destino: place.city || place.name,
-                      destino_lat: place.lat,
-                      destino_lng: place.lng,
-                      _selectedPlaceName: place.name,
-                    });
-                  }}
-                />
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground">Destino</Label>
+                  {data._selectedPlaceName ? (
+                    <div className="flex items-center gap-2 p-3 rounded-xl border border-primary/20 bg-primary/5">
+                      <div className="w-9 h-9 rounded-full bg-primary/15 flex items-center justify-center shrink-0">
+                        <MapPin className="w-4 h-4 text-primary" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-semibold text-foreground truncate">{data._selectedPlaceName}</p>
+                        {data.destino && (
+                          <Badge variant="secondary" className="mt-1 text-[10px] h-5 px-2">
+                            {data.destino}
+                          </Badge>
+                        )}
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setData({ ...data, destino: '', destino_lat: null, destino_lng: null, _selectedPlaceName: '' })}
+                        className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors shrink-0"
+                      >
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ) : (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full h-12 justify-start gap-3 rounded-xl border-dashed border-border/60 hover:border-primary/40 hover:bg-primary/5 text-muted-foreground hover:text-foreground transition-all"
+                      onClick={() => setSearchDialogOpen(true)}
+                    >
+                      <div className="w-8 h-8 rounded-full bg-muted/60 flex items-center justify-center">
+                        <Search className="w-4 h-4" />
+                      </div>
+                      <span className="text-sm">Buscar destino...</span>
+                    </Button>
+                  )}
+                </div>
               ) : (
-                <Input placeholder="Destino" value={data.destino} onChange={(e) => setData({ ...data, destino: e.target.value })} />
+                <div className="space-y-1">
+                  <Label className="text-xs text-muted-foreground">Destino</Label>
+                  <Input placeholder="Destino" value={data.destino} onChange={(e) => setData({ ...data, destino: e.target.value })} />
+                </div>
+              )}
+
+              <div>
+                <Label className="text-xs text-muted-foreground mb-1 block">Data/Hora saída</Label>
+                <input
+                  type="datetime-local"
+                  value={data.inicio_em?.slice(0, 16) || ''}
+                  onChange={(e) => setData({ ...data, inicio_em: e.target.value })}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                />
+              </div>
+              {(() => {
+                const km = getEffectiveEstimatedKm(apiKm, data.titulo, data.voo_cidade, data.destino);
+                if (loadingKm) return (
+                  <p className="text-xs text-muted-foreground bg-muted/30 rounded-lg px-3 py-2">
+                    🛣️ Calculando distância por rota...
+                  </p>
+                );
+                return km ? (
+                  <p className="text-xs text-muted-foreground bg-muted/30 rounded-lg px-3 py-2">
+                    🛣️ Distância estimada: <span className="font-semibold text-foreground">~{km} km</span> (ida e volta){apiKm != null && km === apiKm ? ' · via Google Maps' : ''}
+                  </p>
+                ) : null;
+              })()}
+            </div>
+          </AccordionContent>
+        </AccordionItem>
+
+        {/* Section 2: Flight Info (conditional) */}
+        {data.titulo === 'Aeroporto' && (
+          <AccordionItem value="flight">
+            <AccordionTrigger className="text-sm font-semibold">✈️ Informações do Voo</AccordionTrigger>
+            <AccordionContent>
+              <div className="space-y-3">
+                <Select value={data.voo_cidade} onValueChange={async (v) => {
+                  const updates: any = { ...data, voo_cidade: v };
+                  setData(updates);
+                  const flightTime = data.voo_checkin || data.voo_chegada;
+                  const isCheckin = !!data.voo_checkin;
+                  if (v && flightTime) {
+                    const suggested = await calcSuggestedDeparture(v, flightTime, isCheckin);
+                    if (suggested) setData((prev: any) => ({ ...prev, voo_cidade: v, horario_saida: suggested }));
+                  }
+                }}>
+                  <SelectTrigger><SelectValue placeholder="Cidade do Aeroporto" /></SelectTrigger>
+                  <SelectContent>
+                    {cidadeAeroportoOptions.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                  </SelectContent>
+                </Select>
+                <Input placeholder="Nº do Voo" value={data.voo_numero} onChange={(e) => setData({ ...data, voo_numero: e.target.value })} />
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label className="text-xs text-muted-foreground mb-1 block">Check-in</Label>
+                    <Input type="time" value={data.voo_checkin} onChange={async (e) => {
+                      const checkin = e.target.value;
+                      setData({ ...data, voo_checkin: checkin });
+                      if (checkin && data.voo_cidade) {
+                        const suggested = await calcSuggestedDeparture(data.voo_cidade, checkin, true);
+                        if (suggested) setData((prev: any) => ({ ...prev, voo_checkin: checkin, horario_saida: suggested }));
+                      }
+                    }} />
+                  </div>
+                  <div>
+                    <Label className="text-xs text-muted-foreground mb-1 block">Chegada Voo</Label>
+                    <Input type="time" value={data.voo_chegada} onChange={async (e) => {
+                      const chegada = e.target.value;
+                      setData({ ...data, voo_chegada: chegada });
+                      if (chegada && data.voo_cidade && !data.voo_checkin) {
+                        const suggested = await calcSuggestedDeparture(data.voo_cidade, chegada, false);
+                        if (suggested) setData((prev: any) => ({ ...prev, voo_chegada: chegada, horario_saida: suggested }));
+                      }
+                    }} />
+                  </div>
+                </div>
+                <div>
+                  <Label className="text-xs text-muted-foreground mb-1 block">Saída (sugerido)</Label>
+                  <Input type="time" value={data.horario_saida} onChange={(e) => setData({ ...data, horario_saida: e.target.value })} />
+                  <p className="text-[10px] text-muted-foreground mt-1">
+                    {data.voo_checkin ? '⏱ Tempo de viagem + 1h para check-in' : data.voo_chegada ? '⏱ Baseado no Google Maps' : 'Preencha cidade e horário do voo'}
+                  </p>
+                </div>
+              </div>
+
+              {/* Return trip option - only in create mode */}
+              {!isEdit && setIncludeReturn && setReturnForm && returnForm && (
+                <div className="space-y-3 rounded-lg border border-accent/30 bg-accent/5 p-3 mt-3">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <Checkbox checked={includeReturn} onCheckedChange={(v) => setIncludeReturn(!!v)} />
+                    <span className="text-xs font-semibold text-foreground">✈️ Agendar retorno ao aeroporto (volta)</span>
+                  </label>
+                  {includeReturn && (
+                    <div className="space-y-3 pt-1">
+                      <p className="text-[10px] text-muted-foreground">Rota inversa: Hotel/Santa Rosa → Aeroporto {data.voo_cidade || ''}</p>
+                      <div>
+                        <Label className="text-xs text-muted-foreground mb-1 block">Data/Hora saída (volta)</Label>
+                        <input
+                          type="datetime-local"
+                          value={returnForm.inicio_em?.slice(0, 16) || ''}
+                          onChange={(e) => setReturnForm((prev: any) => ({ ...prev, inicio_em: e.target.value }))}
+                          className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                        />
+                      </div>
+                      <Input placeholder="Nº do Voo (volta)" value={returnForm.voo_numero} onChange={(e) => setReturnForm((prev: any) => ({ ...prev, voo_numero: e.target.value }))} />
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <Label className="text-xs text-muted-foreground mb-1 block">Check-in Voo</Label>
+                          <Input type="time" value={returnForm.voo_checkin} onChange={async (e) => {
+                            const checkin = e.target.value;
+                            setReturnForm((prev: any) => ({ ...prev, voo_checkin: checkin }));
+                            if (checkin && data.voo_cidade) {
+                              const suggested = await calcSuggestedDeparture(data.voo_cidade, checkin, true);
+                              if (suggested) setReturnForm((prev: any) => ({ ...prev, voo_checkin: checkin, horario_saida: suggested }));
+                            }
+                          }} />
+                        </div>
+                        <div>
+                          <Label className="text-xs text-muted-foreground mb-1 block">Saída (sugerido)</Label>
+                          <Input type="time" value={returnForm.horario_saida} onChange={(e) => setReturnForm((prev: any) => ({ ...prev, horario_saida: e.target.value }))} />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </AccordionContent>
+          </AccordionItem>
+        )}
+
+        {/* Section 3: Escort (conditional) */}
+        {data.titulo === 'Escolta Policial' && (
+          <AccordionItem value="escort">
+            <AccordionTrigger className="text-sm font-semibold">🚔 Informações da Escolta</AccordionTrigger>
+            <AccordionContent>
+              <div className="space-y-3">
+                <Input placeholder="Nome do escoltado" value={data.escolta_nome} onChange={(e) => setData({ ...data, escolta_nome: e.target.value })} />
+                <Input placeholder="Cargo / Função" value={data.escolta_cargo} onChange={(e) => setData({ ...data, escolta_cargo: e.target.value })} />
+                <Input placeholder="Nº de viaturas" type="number" value={data.escolta_viaturas} onChange={(e) => setData({ ...data, escolta_viaturas: e.target.value })} />
+                <Input placeholder="Ponto de encontro" value={data.escolta_ponto_encontro} onChange={(e) => setData({ ...data, escolta_ponto_encontro: e.target.value })} />
+                <Input placeholder="Contato segurança" value={data.escolta_contato_seguranca} onChange={(e) => setData({ ...data, escolta_contato_seguranca: e.target.value })} />
+                <Input placeholder="Observações" value={data.escolta_obs} onChange={(e) => setData({ ...data, escolta_obs: e.target.value })} />
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        )}
+
+        {/* Section 4: Guests */}
+        <AccordionItem value="guests">
+          <AccordionTrigger className="text-sm font-semibold">🎫 Hóspedes {selectedGuests.length > 0 && `(${selectedGuests.length})`}</AccordionTrigger>
+          <AccordionContent>
+            <div className="space-y-2">
+              <div className="flex items-center justify-end">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 text-xs gap-1 text-primary"
+                  onClick={() => {
+                    setShowNewGuestForm(prev => !prev);
+                    setNewGuestForm({ nome: '', telefone: '', email: '', hotel_nome: '', checkin_em: '', checkout_em: '', observacoes: '' });
+                  }}
+                >
+                  <Plus className="w-3.5 h-3.5" /> Novo Hóspede
+                </Button>
+              </div>
+              {showNewGuestForm && (
+                <div className="rounded-lg border border-primary/30 bg-primary/5 p-3 space-y-2">
+                  <p className="text-xs font-semibold text-primary">Cadastrar novo hóspede</p>
+                  <Input placeholder="Nome completo *" value={newGuestForm.nome} onChange={(e) => setNewGuestForm({ ...newGuestForm, nome: e.target.value })} className="h-9 text-sm" />
+                  <div className="grid grid-cols-2 gap-2">
+                    <Input placeholder="Telefone" value={newGuestForm.telefone} onChange={(e) => setNewGuestForm({ ...newGuestForm, telefone: e.target.value })} className="h-9 text-sm" />
+                    <Input placeholder="E-mail" type="email" value={newGuestForm.email} onChange={(e) => setNewGuestForm({ ...newGuestForm, email: e.target.value })} className="h-9 text-sm" />
+                  </div>
+                  <Input placeholder="Hotel" value={newGuestForm.hotel_nome} onChange={(e) => setNewGuestForm({ ...newGuestForm, hotel_nome: e.target.value })} className="h-9 text-sm" />
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="text-[10px] text-muted-foreground mb-0.5 block">Check-in</label>
+                      <input type="datetime-local" value={newGuestForm.checkin_em?.slice(0, 16) || ''} onChange={(e) => setNewGuestForm({ ...newGuestForm, checkin_em: e.target.value })} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" />
+                    </div>
+                    <div>
+                      <label className="text-[10px] text-muted-foreground mb-0.5 block">Check-out</label>
+                      <input type="datetime-local" value={newGuestForm.checkout_em?.slice(0, 16) || ''} onChange={(e) => setNewGuestForm({ ...newGuestForm, checkout_em: e.target.value })} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" />
+                    </div>
+                  </div>
+                  <Input placeholder="Observações" value={newGuestForm.observacoes} onChange={(e) => setNewGuestForm({ ...newGuestForm, observacoes: e.target.value })} className="h-9 text-sm" />
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      size="sm"
+                      className="flex-1 h-8 text-xs"
+                      disabled={!newGuestForm.nome || createGuestPending}
+                      onClick={async () => {
+                        try {
+                          const result = await onCreateGuest({
+                            nome: newGuestForm.nome,
+                            telefone: newGuestForm.telefone || null,
+                            email: newGuestForm.email || null,
+                            tipo: 'outro',
+                            hotel_nome: newGuestForm.hotel_nome || null,
+                            checkin_em: newGuestForm.checkin_em || null,
+                            checkout_em: newGuestForm.checkout_em || null,
+                            observacoes: newGuestForm.observacoes || null,
+                          });
+                          if (result?.id) {
+                            setSelectedGuests(prev => [...prev, result.id]);
+                            if (setGuestDestinations) {
+                              setGuestDestinations(prev => ({ ...prev, [result.id]: newGuestForm.hotel_nome || '' }));
+                            }
+                            setShowNewGuestForm(() => false);
+                          }
+                          toast.success('Hóspede cadastrado e selecionado');
+                        } catch (err: any) { toast.error(err.message); }
+                      }}
+                    >
+                      <Check className="w-3.5 h-3.5 mr-1" /> Salvar e Selecionar
+                    </Button>
+                    <Button type="button" variant="ghost" size="sm" className="h-8 text-xs" onClick={() => setShowNewGuestForm(() => false)}>
+                      Cancelar
+                    </Button>
+                  </div>
+                </div>
+              )}
+              <div className="max-h-40 overflow-y-auto rounded-lg border border-border p-2 space-y-1">
+                {guests.length === 0 && <p className="text-xs text-muted-foreground py-1">Nenhum hóspede cadastrado</p>}
+                {guests.map((g: any) => {
+                  const checked = selectedGuests.includes(g.id);
+                  return (
+                    <label key={g.id} className="flex items-center gap-2 py-1.5 px-2 rounded-md hover:bg-muted/50 cursor-pointer text-sm">
+                      <Checkbox
+                        checked={checked}
+                        onCheckedChange={(v) => {
+                          if (v) {
+                            setSelectedGuests(prev => [...prev, g.id]);
+                            if (setGuestDestinations) setGuestDestinations(prev => ({ ...prev, [g.id]: g.hotel_nome || '' }));
+                          } else {
+                            setSelectedGuests(prev => prev.filter(id => id !== g.id));
+                            if (setGuestDestinations) setGuestDestinations(prev => { const n = { ...prev }; delete n[g.id]; return n; });
+                          }
+                        }}
+                      />
+                      <span className="flex-1">{g.nome}</span>
+                      {g.hotel_nome && <span className="text-xs text-muted-foreground">{g.hotel_nome}</span>}
+                    </label>
+                  );
+                })}
+              </div>
+              {selectedGuests.length > 1 && (
+                <p className="text-[10px] text-muted-foreground">
+                  {selectedGuests.length} hóspedes {isEdit ? 'vinculados' : 'selecionados'}
+                </p>
               )}
             </div>
-            {data.titulo === 'Outros' && data._selectedPlaceName && (
-              <p className="text-xs text-muted-foreground bg-primary/5 rounded px-2 py-1">
-                📍 {data._selectedPlaceName}
-              </p>
-            )}
-            <div>
-              <Label className="text-xs text-muted-foreground mb-1 block">Data/Hora saída</Label>
-              <input
-                type="datetime-local"
-                value={data.inicio_em?.slice(0, 16) || ''}
-                onChange={(e) => setData({ ...data, inicio_em: e.target.value })}
-                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-              />
-            </div>
-            {(() => {
-              const km = getEffectiveEstimatedKm(apiKm, data.titulo, data.voo_cidade, data.destino);
-              if (loadingKm) return (
-                <p className="text-xs text-muted-foreground bg-muted/30 rounded-lg px-3 py-2">
-                  🛣️ Calculando distância por rota...
-                </p>
-              );
-              return km ? (
-                <p className="text-xs text-muted-foreground bg-muted/30 rounded-lg px-3 py-2">
-                  🛣️ Distância estimada: <span className="font-semibold text-foreground">~{km} km</span> (ida e volta){apiKm != null && km === apiKm ? ' · via Google Maps' : ''}
-                </p>
-              ) : null;
-            })()}
-          </div>
-        </AccordionContent>
-      </AccordionItem>
+          </AccordionContent>
+        </AccordionItem>
 
-      {/* Section 2: Flight Info (conditional) */}
-      {data.titulo === 'Aeroporto' && (
-        <AccordionItem value="flight">
-          <AccordionTrigger className="text-sm font-semibold">✈️ Informações do Voo</AccordionTrigger>
+        {/* Section 5: Driver & Vehicle */}
+        <AccordionItem value="driver">
+          <AccordionTrigger className="text-sm font-semibold">🚗 Motorista e Veículo</AccordionTrigger>
           <AccordionContent>
             <div className="space-y-3">
-              <Select value={data.voo_cidade} onValueChange={async (v) => {
-                const updates: any = { ...data, voo_cidade: v };
-                setData(updates);
-                const flightTime = data.voo_checkin || data.voo_chegada;
-                const isCheckin = !!data.voo_checkin;
-                if (v && flightTime) {
-                  const suggested = await calcSuggestedDeparture(v, flightTime, isCheckin);
-                  if (suggested) setData((prev: any) => ({ ...prev, voo_cidade: v, horario_saida: suggested }));
-                }
-              }}>
-                <SelectTrigger><SelectValue placeholder="Cidade do Aeroporto" /></SelectTrigger>
-                <SelectContent>
-                  {cidadeAeroportoOptions.map((c) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
-                </SelectContent>
-              </Select>
-              <Input placeholder="Nº do Voo" value={data.voo_numero} onChange={(e) => setData({ ...data, voo_numero: e.target.value })} />
               <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <Label className="text-xs text-muted-foreground mb-1 block">Check-in</Label>
-                  <Input type="time" value={data.voo_checkin} onChange={async (e) => {
-                    const checkin = e.target.value;
-                    setData({ ...data, voo_checkin: checkin });
-                    if (checkin && data.voo_cidade) {
-                      const suggested = await calcSuggestedDeparture(data.voo_cidade, checkin, true);
-                      if (suggested) setData((prev: any) => ({ ...prev, voo_checkin: checkin, horario_saida: suggested }));
-                    }
-                  }} />
-                </div>
-                <div>
-                  <Label className="text-xs text-muted-foreground mb-1 block">Chegada Voo</Label>
-                  <Input type="time" value={data.voo_chegada} onChange={async (e) => {
-                    const chegada = e.target.value;
-                    setData({ ...data, voo_chegada: chegada });
-                    if (chegada && data.voo_cidade && !data.voo_checkin) {
-                      const suggested = await calcSuggestedDeparture(data.voo_cidade, chegada, false);
-                      if (suggested) setData((prev: any) => ({ ...prev, voo_chegada: chegada, horario_saida: suggested }));
-                    }
-                  }} />
-                </div>
+                <Select value={data.vehicle_id} onValueChange={(v) => setData({ ...data, vehicle_id: v })}>
+                  <SelectTrigger><SelectValue placeholder="Veículo" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Nenhum</SelectItem>
+                    {vehicleList.map((v: any) => {
+                      const exId = isEdit ? data.id : undefined;
+                      const conflictInfo = data.inicio_em ? getVehicleConflictInfo(v.id, data.inicio_em, exId) : null;
+                      const isBusy = !!conflictInfo && v.id !== data.vehicle_id;
+                      return (
+                        <SelectItem key={v.id} value={v.id} disabled={isBusy}>
+                          {v.placa} {v.modelo || ''}{conflictInfo ? ` (${conflictInfo})` : ''}
+                        </SelectItem>
+                      );
+                    })}
+                  </SelectContent>
+                </Select>
+                <Select value={data.motorista_user_id} onValueChange={(v) => setData({ ...data, motorista_user_id: v })}>
+                  <SelectTrigger><SelectValue placeholder="Motorista" /></SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Nenhum</SelectItem>
+                    {(() => {
+                      const isAeroporto = data.titulo?.toLowerCase().includes('aeroporto');
+                      const filtered = isAeroporto
+                        ? members.filter((m: any) => m.commission_nome?.toUpperCase().includes('LOGÍSTICA') || m.commission_nome?.toUpperCase().includes('LOGISTICA'))
+                        : members;
+                      return filtered.map((m: any) => <SelectItem key={m.user_id} value={m.user_id}>{m.nome_exibicao}</SelectItem>);
+                    })()}
+                  </SelectContent>
+                </Select>
               </div>
-              <div>
-                <Label className="text-xs text-muted-foreground mb-1 block">Saída (sugerido)</Label>
-                <Input type="time" value={data.horario_saida} onChange={(e) => setData({ ...data, horario_saida: e.target.value })} />
-                <p className="text-[10px] text-muted-foreground mt-1">
-                  {data.voo_checkin ? '⏱ Tempo de viagem + 1h para check-in' : data.voo_chegada ? '⏱ Baseado no Google Maps' : 'Preencha cidade e horário do voo'}
+              {data.titulo?.toLowerCase().includes('aeroporto') && (
+                <p className="text-[11px] text-accent font-medium flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-accent inline-block" />
+                  Apenas motoristas da comissão de Logística
                 </p>
-              </div>
-            </div>
-
-            {/* Return trip option - only in create mode */}
-            {!isEdit && setIncludeReturn && setReturnForm && returnForm && (
-              <div className="space-y-3 rounded-lg border border-accent/30 bg-accent/5 p-3 mt-3">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <Checkbox checked={includeReturn} onCheckedChange={(v) => setIncludeReturn(!!v)} />
-                  <span className="text-xs font-semibold text-foreground">✈️ Agendar retorno ao aeroporto (volta)</span>
-                </label>
-                {includeReturn && (
-                  <div className="space-y-3 pt-1">
-                    <p className="text-[10px] text-muted-foreground">Rota inversa: Hotel/Santa Rosa → Aeroporto {data.voo_cidade || ''}</p>
-                    <div>
-                      <Label className="text-xs text-muted-foreground mb-1 block">Data/Hora saída (volta)</Label>
-                      <input
-                        type="datetime-local"
-                        value={returnForm.inicio_em?.slice(0, 16) || ''}
-                        onChange={(e) => setReturnForm((prev: any) => ({ ...prev, inicio_em: e.target.value }))}
-                        className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                      />
-                    </div>
-                    <Input placeholder="Nº do Voo (volta)" value={returnForm.voo_numero} onChange={(e) => setReturnForm((prev: any) => ({ ...prev, voo_numero: e.target.value }))} />
-                    <div className="grid grid-cols-2 gap-3">
-                      <div>
-                        <Label className="text-xs text-muted-foreground mb-1 block">Check-in Voo</Label>
-                        <Input type="time" value={returnForm.voo_checkin} onChange={async (e) => {
-                          const checkin = e.target.value;
-                          setReturnForm((prev: any) => ({ ...prev, voo_checkin: checkin }));
-                          if (checkin && data.voo_cidade) {
-                            const suggested = await calcSuggestedDeparture(data.voo_cidade, checkin, true);
-                            if (suggested) setReturnForm((prev: any) => ({ ...prev, voo_checkin: checkin, horario_saida: suggested }));
-                          }
-                        }} />
-                      </div>
-                      <div>
-                        <Label className="text-xs text-muted-foreground mb-1 block">Saída (sugerido)</Label>
-                        <Input type="time" value={returnForm.horario_saida} onChange={(e) => setReturnForm((prev: any) => ({ ...prev, horario_saida: e.target.value }))} />
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
-          </AccordionContent>
-        </AccordionItem>
-      )}
-
-      {/* Section 3: Escort (conditional) */}
-      {data.titulo === 'Escolta Policial' && (
-        <AccordionItem value="escort">
-          <AccordionTrigger className="text-sm font-semibold">🚔 Informações da Escolta</AccordionTrigger>
-          <AccordionContent>
-            <div className="space-y-3">
-              <Input placeholder="Nome do escoltado" value={data.escolta_nome} onChange={(e) => setData({ ...data, escolta_nome: e.target.value })} />
-              <Input placeholder="Cargo / Função" value={data.escolta_cargo} onChange={(e) => setData({ ...data, escolta_cargo: e.target.value })} />
-              <Input placeholder="Nº de viaturas" type="number" value={data.escolta_viaturas} onChange={(e) => setData({ ...data, escolta_viaturas: e.target.value })} />
-              <Input placeholder="Ponto de encontro" value={data.escolta_ponto_encontro} onChange={(e) => setData({ ...data, escolta_ponto_encontro: e.target.value })} />
-              <Input placeholder="Contato segurança" value={data.escolta_contato_seguranca} onChange={(e) => setData({ ...data, escolta_contato_seguranca: e.target.value })} />
-              <Input placeholder="Observações" value={data.escolta_obs} onChange={(e) => setData({ ...data, escolta_obs: e.target.value })} />
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-      )}
-
-      {/* Section 4: Guests */}
-      <AccordionItem value="guests">
-        <AccordionTrigger className="text-sm font-semibold">🎫 Hóspedes {selectedGuests.length > 0 && `(${selectedGuests.length})`}</AccordionTrigger>
-        <AccordionContent>
-          <div className="space-y-2">
-            <div className="flex items-center justify-end">
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="h-7 text-xs gap-1 text-primary"
-                onClick={() => {
-                  setShowNewGuestForm(prev => !prev);
-                  setNewGuestForm({ nome: '', telefone: '', email: '', hotel_nome: '', checkin_em: '', checkout_em: '', observacoes: '' });
-                }}
-              >
-                <Plus className="w-3.5 h-3.5" /> Novo Hóspede
-              </Button>
-            </div>
-            {showNewGuestForm && (
-              <div className="rounded-lg border border-primary/30 bg-primary/5 p-3 space-y-2">
-                <p className="text-xs font-semibold text-primary">Cadastrar novo hóspede</p>
-                <Input placeholder="Nome completo *" value={newGuestForm.nome} onChange={(e) => setNewGuestForm({ ...newGuestForm, nome: e.target.value })} className="h-9 text-sm" />
-                <div className="grid grid-cols-2 gap-2">
-                  <Input placeholder="Telefone" value={newGuestForm.telefone} onChange={(e) => setNewGuestForm({ ...newGuestForm, telefone: e.target.value })} className="h-9 text-sm" />
-                  <Input placeholder="E-mail" type="email" value={newGuestForm.email} onChange={(e) => setNewGuestForm({ ...newGuestForm, email: e.target.value })} className="h-9 text-sm" />
-                </div>
-                <Input placeholder="Hotel" value={newGuestForm.hotel_nome} onChange={(e) => setNewGuestForm({ ...newGuestForm, hotel_nome: e.target.value })} className="h-9 text-sm" />
-                <div className="grid grid-cols-2 gap-2">
+              )}
+              {driverCommission && (
+                <p className="text-xs text-muted-foreground">Comissão: <span className="font-medium text-foreground">{driverCommission}</span></p>
+              )}
+              <Input placeholder="KM Retirada (odômetro)" type="number" value={data.km_retirada} onChange={(e) => setData({ ...data, km_retirada: e.target.value })} />
+              {isConcluido && (
+                <>
+                  <Input placeholder="KM Devolução (odômetro)" type="number" value={data.km_devolucao} onChange={(e) => setData({ ...data, km_devolucao: e.target.value })} />
                   <div>
-                    <label className="text-[10px] text-muted-foreground mb-0.5 block">Check-in</label>
-                    <input type="datetime-local" value={newGuestForm.checkin_em?.slice(0, 16) || ''} onChange={(e) => setNewGuestForm({ ...newGuestForm, checkin_em: e.target.value })} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" />
-                  </div>
-                  <div>
-                    <label className="text-[10px] text-muted-foreground mb-0.5 block">Check-out</label>
-                    <input type="datetime-local" value={newGuestForm.checkout_em?.slice(0, 16) || ''} onChange={(e) => setNewGuestForm({ ...newGuestForm, checkout_em: e.target.value })} className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2" />
-                  </div>
-                </div>
-                <Input placeholder="Observações" value={newGuestForm.observacoes} onChange={(e) => setNewGuestForm({ ...newGuestForm, observacoes: e.target.value })} className="h-9 text-sm" />
-                <div className="flex gap-2">
-                  <Button
-                    type="button"
-                    size="sm"
-                    className="flex-1 h-8 text-xs"
-                    disabled={!newGuestForm.nome || createGuestPending}
-                    onClick={async () => {
-                      try {
-                        const result = await onCreateGuest({
-                          nome: newGuestForm.nome,
-                          telefone: newGuestForm.telefone || null,
-                          email: newGuestForm.email || null,
-                          tipo: 'outro',
-                          hotel_nome: newGuestForm.hotel_nome || null,
-                          checkin_em: newGuestForm.checkin_em || null,
-                          checkout_em: newGuestForm.checkout_em || null,
-                          observacoes: newGuestForm.observacoes || null,
-                        });
-                        if (result?.id) {
-                          setSelectedGuests(prev => [...prev, result.id]);
-                          if (setGuestDestinations) {
-                            setGuestDestinations(prev => ({ ...prev, [result.id]: newGuestForm.hotel_nome || '' }));
-                          }
-                          setShowNewGuestForm(() => false);
-                        }
-                        toast.success('Hóspede cadastrado e selecionado');
-                      } catch (err: any) { toast.error(err.message); }
-                    }}
-                  >
-                    <Check className="w-3.5 h-3.5 mr-1" /> Salvar e Selecionar
-                  </Button>
-                  <Button type="button" variant="ghost" size="sm" className="h-8 text-xs" onClick={() => setShowNewGuestForm(() => false)}>
-                    Cancelar
-                  </Button>
-                </div>
-              </div>
-            )}
-            <div className="max-h-40 overflow-y-auto rounded-lg border border-border p-2 space-y-1">
-              {guests.length === 0 && <p className="text-xs text-muted-foreground py-1">Nenhum hóspede cadastrado</p>}
-              {guests.map((g: any) => {
-                const checked = selectedGuests.includes(g.id);
-                return (
-                  <label key={g.id} className="flex items-center gap-2 py-1.5 px-2 rounded-md hover:bg-muted/50 cursor-pointer text-sm">
-                    <Checkbox
-                      checked={checked}
-                      onCheckedChange={(v) => {
-                        if (v) {
-                          setSelectedGuests(prev => [...prev, g.id]);
-                          if (setGuestDestinations) setGuestDestinations(prev => ({ ...prev, [g.id]: g.hotel_nome || '' }));
-                        } else {
-                          setSelectedGuests(prev => prev.filter(id => id !== g.id));
-                          if (setGuestDestinations) setGuestDestinations(prev => { const n = { ...prev }; delete n[g.id]; return n; });
-                        }
-                      }}
+                    <Label className="text-xs text-muted-foreground mb-1 block">Data/Hora devolução</Label>
+                    <input
+                      type="datetime-local"
+                      value={data.fim_em?.slice(0, 16) || ''}
+                      onChange={(e) => setData({ ...data, fim_em: e.target.value })}
+                      className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                     />
-                    <span className="flex-1">{g.nome}</span>
-                    {g.hotel_nome && <span className="text-xs text-muted-foreground">{g.hotel_nome}</span>}
-                  </label>
-                );
-              })}
+                  </div>
+                </>
+              )}
             </div>
-            {selectedGuests.length > 1 && (
-              <p className="text-[10px] text-muted-foreground">
-                {selectedGuests.length} hóspedes {isEdit ? 'vinculados' : 'selecionados'}
-              </p>
-            )}
-          </div>
-        </AccordionContent>
-      </AccordionItem>
+          </AccordionContent>
+        </AccordionItem>
+      </Accordion>
 
-      {/* Section 5: Driver & Vehicle */}
-      <AccordionItem value="driver">
-        <AccordionTrigger className="text-sm font-semibold">🚗 Motorista e Veículo</AccordionTrigger>
-        <AccordionContent>
-          <div className="space-y-3">
-            <div className="grid grid-cols-2 gap-3">
-              <Select value={data.vehicle_id} onValueChange={(v) => setData({ ...data, vehicle_id: v })}>
-                <SelectTrigger><SelectValue placeholder="Veículo" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">Nenhum</SelectItem>
-                  {vehicleList.map((v: any) => {
-                    const exId = isEdit ? data.id : undefined;
-                    const conflictInfo = data.inicio_em ? getVehicleConflictInfo(v.id, data.inicio_em, exId) : null;
-                    const isBusy = !!conflictInfo && v.id !== data.vehicle_id;
-                    return (
-                      <SelectItem key={v.id} value={v.id} disabled={isBusy}>
-                        {v.placa} {v.modelo || ''}{conflictInfo ? ` (${conflictInfo})` : ''}
-                      </SelectItem>
-                    );
-                  })}
-                </SelectContent>
-              </Select>
-              <Select value={data.motorista_user_id} onValueChange={(v) => setData({ ...data, motorista_user_id: v })}>
-                <SelectTrigger><SelectValue placeholder="Motorista" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">Nenhum</SelectItem>
-                  {(() => {
-                    const isAeroporto = data.titulo?.toLowerCase().includes('aeroporto');
-                    const filtered = isAeroporto
-                      ? members.filter((m: any) => m.commission_nome?.toUpperCase().includes('LOGÍSTICA') || m.commission_nome?.toUpperCase().includes('LOGISTICA'))
-                      : members;
-                    return filtered.map((m: any) => <SelectItem key={m.user_id} value={m.user_id}>{m.nome_exibicao}</SelectItem>);
-                  })()}
-                </SelectContent>
-              </Select>
-            </div>
-            {data.titulo?.toLowerCase().includes('aeroporto') && (
-              <p className="text-[11px] text-accent font-medium flex items-center gap-1">
-                <span className="w-1.5 h-1.5 rounded-full bg-accent inline-block" />
-                Apenas motoristas da comissão de Logística
-              </p>
-            )}
-            {driverCommission && (
-              <p className="text-xs text-muted-foreground">Comissão: <span className="font-medium text-foreground">{driverCommission}</span></p>
-            )}
-            <Input placeholder="KM Retirada (odômetro)" type="number" value={data.km_retirada} onChange={(e) => setData({ ...data, km_retirada: e.target.value })} />
-            {isConcluido && (
-              <>
-                <Input placeholder="KM Devolução (odômetro)" type="number" value={data.km_devolucao} onChange={(e) => setData({ ...data, km_devolucao: e.target.value })} />
-                <div>
-                  <Label className="text-xs text-muted-foreground mb-1 block">Data/Hora devolução</Label>
-                  <input
-                    type="datetime-local"
-                    value={data.fim_em?.slice(0, 16) || ''}
-                    onChange={(e) => setData({ ...data, fim_em: e.target.value })}
-                    className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                  />
-                </div>
-              </>
-            )}
-          </div>
-        </AccordionContent>
-      </AccordionItem>
-    </Accordion>
+      {/* Places Search Dialog */}
+      <PlacesSearchDialog
+        open={searchDialogOpen}
+        onOpenChange={setSearchDialogOpen}
+        onSelect={(place) => {
+          setData({
+            ...data,
+            destino: place.city || place.name,
+            destino_lat: place.lat,
+            destino_lng: place.lng,
+            _selectedPlaceName: place.name,
+          });
+        }}
+      />
+    </>
   );
 }

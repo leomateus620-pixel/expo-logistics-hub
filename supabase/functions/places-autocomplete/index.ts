@@ -36,6 +36,43 @@ Deno.serve(async (req) => {
     }
 
     const body = await req.json();
+    const mode = body.mode || 'search';
+
+    // ── REVERSE GEOCODE MODE ──
+    if (mode === 'reverse') {
+      const lat = Number(body.lat);
+      const lng = Number(body.lng);
+      if (!lat || !lng) {
+        return new Response(JSON.stringify({ city: '', address: '' }), {
+          status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+
+      const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&language=pt-BR&result_type=administrative_area_level_2|locality&key=${GOOGLE_MAPS_API_KEY}`;
+      const geoRes = await fetch(geocodeUrl);
+      const geoData = await geoRes.json();
+
+      let city = '';
+      let address = '';
+
+      if (geoData.status === 'OK' && geoData.results?.length) {
+        for (const result of geoData.results) {
+          for (const comp of result.address_components || []) {
+            if ((comp.types?.includes('administrative_area_level_2') || comp.types?.includes('locality')) && !city) {
+              city = comp.long_name || '';
+            }
+          }
+          if (!address) address = result.formatted_address || '';
+          if (city) break;
+        }
+      }
+
+      return new Response(JSON.stringify({ city, address }), {
+        status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    // ── SEARCH MODE (existing) ──
     const query = (body.query || '').trim();
     if (!query || query.length < 2) {
       return new Response(JSON.stringify({ results: [] }), {
@@ -43,7 +80,6 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Step 1: Get autocomplete predictions using legacy Places API
     const autocompleteUrl = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(query)}&language=pt-BR&location=-27.87,-54.48&radius=500000&key=${GOOGLE_MAPS_API_KEY}`;
     const acRes = await fetch(autocompleteUrl);
     const acData = await acRes.json();
@@ -55,7 +91,6 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Step 2: Get details (lat/lng) for top 5 predictions
     const predictions = acData.predictions.slice(0, 5);
     const results = await Promise.all(predictions.map(async (p: any) => {
       try {
