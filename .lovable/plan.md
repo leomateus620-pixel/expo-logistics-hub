@@ -1,75 +1,102 @@
 
 
-# Auto-detecção de origem + Busca de destino premium
+# Split Navigation View — Vista aérea + Terceira pessoa
 
-## Resumo
+## Contexto atual
 
-Duas melhorias no formulário de criação de transporte:
-1. **Origem automática**: Detectar cidade do usuário via geolocalização + Google Reverse Geocoding
-2. **Destino "Outros"**: Substituir dropdown inline por um modal/drawer dedicado com busca de lugares — UX premium, responsivo
+- Mapas usam **Leaflet** (2D, raster tiles) via `DriverLocationMap.tsx`
+- Tela fullscreen atual: `FullscreenMapDialog.tsx` — um único mapa com overlays
+- Estado da viagem centralizado em `TransportDynamicIsland.tsx` (location, polyline, ETA, etc.)
+- Rota real vem da Google Routes API via edge function `estimate-return`
 
-## Alterações
+## Limitação técnica
 
-### 1. Edge function `places-autocomplete` — adicionar modo `reverse-geocode`
+Leaflet **não suporta** tilt (pitch) ou bearing (rotação de câmera). Para a vista em terceira pessoa com câmera inclinada e rotação dinâmica, é necessário um engine WebGL.
 
-Adicionar suporte a um segundo modo na mesma edge function:
-- `{ mode: "reverse", lat: number, lng: number }` → chama Google Geocoding API reversa → retorna `{ city: string, address: string }`
-- Mantém o modo existente de busca (`{ query: string }`) intacto
+**Solução**: Usar **MapLibre GL JS** (open-source, gratuito, suporta pitch/bearing/zoom nativamente) apenas para o mapa de navegação. O mapa aéreo continua com Leaflet existente.
 
-### 2. Novo componente `src/components/transport/PlacesSearchDialog.tsx`
-
-Modal dedicado para busca de destino com design premium:
-- **Mobile**: Drawer (vaul) que sobe do fundo, ocupando ~85% da tela
-- **Desktop**: Dialog centralizado (max-w-lg)
-- Header com título "Buscar Destino" e botão fechar
-- Campo de busca grande com ícone, auto-focus
-- Lista de resultados com ícones MapPin, nome em destaque, endereço secundário, cidade como badge
-- Estado vazio com ilustração/texto "Digite para buscar..."
-- Loading com skeleton/spinner
-- Ao selecionar → fecha e retorna o `PlaceResult`
-
-### 3. Atualizar `src/components/transport/TransportForm.tsx`
-
-**Origem automática:**
-- Adicionar `useEffect` no mount que pede `navigator.geolocation.getCurrentPosition`
-- Com as coordenadas, chamar `places-autocomplete` com `mode: "reverse"` 
-- Preencher `data.origem` com a cidade retornada (se o campo estiver vazio)
-- Mostrar ícone de localização 📍 e estado de loading no campo de origem
-- Botão de "redetectar" ao lado do input de origem
-
-**Destino "Outros":**
-- Substituir o `PlacesAutocomplete` inline por um botão que abre o `PlacesSearchDialog`
-- Quando um lugar é selecionado, preencher `destino`, `destino_lat`, `destino_lng`, `_selectedPlaceName`
-- Exibir o local selecionado como um chip/card elegante abaixo do botão (com ícone MapPin + nome + cidade)
-
-### 4. Atualizar `src/components/transport/PlacesAutocomplete.tsx`
-
-Manter o componente existente mas refatorar para ser usado internamente pelo `PlacesSearchDialog` (reutilizar a lógica de busca).
-
-## Fluxo do usuário
+## Arquitetura
 
 ```text
-ORIGEM:
-1. Abre "Novo Transporte"
-2. Campo "Origem" já aparece com spinner "Detectando..."
-3. Em ~1s preenche automaticamente: "SANTA ROSA" (baseado no GPS)
-4. Usuário pode editar manualmente se quiser
-
-DESTINO (Outros):
-1. Seleciona "Outros" no título
-2. Aparece botão "Buscar destino..." em vez de input inline
-3. Clica → abre modal/drawer com campo de busca grande
-4. Digita "Ijuí" → resultados aparecem com design limpo
-5. Seleciona → modal fecha, chip com "Ijuí, RS" aparece no form
-6. Distância é calculada automaticamente via Google Routes
+FullscreenMapDialog (refatorado)
+├── Top bar: origem → destino + status ao vivo
+├── Split container (50/50)
+│   ├── NavigationMap3D (MapLibre GL) — câmera 3ª pessoa
+│   │   └── pitch:60, bearing:heading, zoom:16, follow driver
+│   └── DriverLocationMap (Leaflet) — vista aérea existente
+│       └── fitBounds rota completa
+├── Metrics overlay: ETA, distância, velocidade, motorista
+└── Actions: Detalhes, Finalizar
 ```
+
+## Componentes
+
+### 1. `src/components/transport/NavigationMap3D.tsx` (novo)
+
+Mapa MapLibre GL com:
+- Tile source: OpenStreetMap vector tiles (free, via `demotiles.maplibre.org` ou similar raster fallback)
+- `pitch: 60` (câmera inclinada)
+- `bearing`: atualizado suavemente com heading do veículo (calculado entre posições consecutivas)
+- `center`: posição do driver, offset para baixo (mostra caminho à frente)
+- Marcador do veículo (ícone direcional)
+- Polyline da rota restante (trecho à frente)
+- Zoom dinâmico baseado em velocidade
+- `easeTo` para transições suaves (sem saltos)
+- Throttle de updates (200ms min)
+
+### 2. `src/components/transport/FullscreenMapDialog.tsx` (refatorado)
+
+- Layout split 50/50:
+  - **Desktop** (>768px): side-by-side horizontal
+  - **Mobile**: vertical stack (navegação em cima, aéreo embaixo)
+- Top bar glass com rota + status + badge "Ao vivo"
+- Bottom bar glass com métricas (velocidade, ETA, distância, motorista)
+- Separador visual elegante entre mapas (linha fina com label)
+- Manter botão fechar
+- Adicionar botões de ação (Detalhes, Finalizar) no overlay inferior
+
+### 3. `src/lib/heading.ts` (novo helper)
+
+- `calculateHeading(prev, current)`: calcula bearing entre dois pontos GPS
+- `smoothHeading(prev, next, factor)`: interpolação suave para evitar saltos
+
+### 4. Props adicionais
+
+`FullscreenMapDialog` recebe nova prop `heading` (calculada no `TransportDynamicIsland` a partir de posições consecutivas) e `onCycleStatus`/`onDetail` para ações.
+
+## Fluxo de dados
+
+```text
+TransportDynamicIsland
+  ├── location (GPS real-time) ──┐
+  ├── livePolyline ──────────────┤
+  ├── destCoords ────────────────┼──→ FullscreenMapDialog
+  ├── liveDestRoute (ETA/km) ────┤      ├── NavigationMap3D (MapLibre)
+  ├── heading (calculado) ───────┤      └── DriverLocationMap (Leaflet)
+  └── speed ─────────────────────┘
+```
+
+Ambos os mapas compartilham as mesmas props — sem duplicação de estado.
+
+## Responsividade
+
+| Breakpoint | Layout |
+|---|---|
+| Mobile (<768px) | Stack vertical: navegação 55%, aéreo 45%. Métricas compactas. |
+| Tablet/Desktop | Side-by-side 50/50. Cards de métricas mais espaçosos. |
+
+## Dependência
+
+- Instalar `maplibre-gl` (~300KB gzip) via npm
+- Sem custo de API — usa tiles OSM gratuitos
 
 ## Arquivos
 
 | Arquivo | Ação |
 |---|---|
-| `supabase/functions/places-autocomplete/index.ts` | Adicionar modo `reverse` geocoding |
-| `src/components/transport/PlacesSearchDialog.tsx` | Novo — modal/drawer premium de busca |
-| `src/components/transport/TransportForm.tsx` | Auto-detecção origem + botão para abrir dialog de destino |
-| `src/components/transport/PlacesAutocomplete.tsx` | Refatorar para reutilização interna |
+| `package.json` | Adicionar `maplibre-gl` |
+| `src/components/transport/NavigationMap3D.tsx` | Novo — mapa 3ª pessoa com MapLibre GL |
+| `src/lib/heading.ts` | Novo — cálculo de heading/bearing |
+| `src/components/transport/FullscreenMapDialog.tsx` | Refatorar — split view 50/50 + métricas + ações |
+| `src/components/TransportDynamicIsland.tsx` | Calcular heading entre posições e passar ao dialog |
 
