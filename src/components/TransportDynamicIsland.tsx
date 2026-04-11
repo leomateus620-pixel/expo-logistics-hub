@@ -1,9 +1,9 @@
 import { useState, useMemo, useEffect, useRef, lazy, Suspense } from 'react';
 import { cn, getEffectiveEstimatedKm } from '@/lib/utils';
 import { Navigation, MapPinOff, Clock, ArrowRight, Ruler, Timer, Square, Play, Eye, MapPin, Expand } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 import { useTransportLocation } from '@/hooks/useLocationTracking';
 import { supabase } from '@/integrations/supabase/client';
+import { calculateHeading, smoothHeading, haversineDistance } from '@/lib/heading';
 import FullscreenMapDialog from '@/components/transport/FullscreenMapDialog';
 
 const DriverLocationMap = lazy(() => import('@/components/DriverLocationMap'));
@@ -22,7 +22,6 @@ const knownDestCoords: Record<string, { lat: number; lng: number }> = {
 };
 
 function getDestCoords(t: any): { lat: number; lng: number } | null {
-  // Prioritize custom coords from database
   if (t.destino_lat && t.destino_lng) {
     return { lat: t.destino_lat, lng: t.destino_lng };
   }
@@ -89,10 +88,29 @@ export default function TransportDynamicIsland({
   const prevIsActiveRef = useRef<boolean>(false);
   const estimatedKm = getEffectiveEstimatedKm(t.distancia_estimada_km, t.titulo, t.voo_cidade, t.destino);
 
+  // ── Heading calculation from consecutive GPS positions ──
+  const [heading, setHeading] = useState(0);
+  const prevLocationRef = useRef<{ lat: number; lng: number } | null>(null);
+
+  useEffect(() => {
+    if (!location) return;
+    const prev = prevLocationRef.current;
+    if (prev) {
+      const dist = haversineDistance(prev.lat, prev.lng, location.latitude, location.longitude);
+      if (dist > 5) { // Only update heading if moved >5m
+        const rawHeading = calculateHeading(prev.lat, prev.lng, location.latitude, location.longitude);
+        setHeading(h => smoothHeading(h, rawHeading, 0.4));
+        prevLocationRef.current = { lat: location.latitude, lng: location.longitude };
+      }
+    } else {
+      prevLocationRef.current = { lat: location.latitude, lng: location.longitude };
+    }
+  }, [location?.latitude, location?.longitude]);
+
   // Auto-expand when transport becomes active
   useEffect(() => {
     if (isActive && !prevIsActiveRef.current) {
-      lastFetchRef.current = 0; // force immediate fetch on trip start
+      lastFetchRef.current = 0;
     }
     prevIsActiveRef.current = isActive;
     if (isActive) setExpanded(true);
@@ -130,7 +148,6 @@ export default function TransportDynamicIsland({
         };
         const baseUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/estimate-return`;
 
-        // Fetch live route: driver → destination (with polyline)
         const [liveRes, returnRes] = await Promise.all([
           fetch(baseUrl, {
             method: 'POST',
@@ -158,7 +175,6 @@ export default function TransportDynamicIsland({
         const liveData = await liveRes.json();
         const returnData = await returnRes.json();
 
-        // Update polyline from live route
         if (liveData.polyline && !liveData.fallback) {
           try {
             const decoded = decodePolyline(liveData.polyline);
@@ -166,14 +182,12 @@ export default function TransportDynamicIsland({
           } catch { /* keep old */ }
         }
 
-        // Update destination route metrics from liveData
         if (liveData.duration_minutes && !liveData.fallback) {
           const eta = new Date(Date.now() + liveData.duration_minutes * 60000);
           const formatted = eta.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
           setLiveDestRoute({ minutes: liveData.duration_minutes, km: liveData.distance_km, arrivalTime: formatted });
         }
 
-        // Update return ETA from returnData
         if (returnData.duration_minutes && !returnData.fallback) {
           const retEta = new Date(Date.now() + returnData.duration_minutes * 60000);
           const retFormatted = retEta.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
@@ -183,7 +197,6 @@ export default function TransportDynamicIsland({
     })();
   }, [location?.latitude, location?.longitude, isActive]);
 
-  // Build ETA display text for collapsed state
   const etaText = useMemo(() => {
     if (liveDestRoute && isActive) return `${liveDestRoute.minutes} min`;
     if (t.duracao_estimada_min) return `${t.duracao_estimada_min} min`;
@@ -203,7 +216,6 @@ export default function TransportDynamicIsland({
   const isMyTracking = trackingTransportId === t.id;
   const trackingError = isMyTracking ? locationTracker.error : null;
 
-  // Don't show island for cancelled transports
   if (isCancelled) {
     return (
       <div className="flex items-center gap-2 px-3 py-2 rounded-full bg-muted/40 text-muted-foreground/60">
@@ -219,7 +231,6 @@ export default function TransportDynamicIsland({
       className={cn(
         'relative overflow-hidden transition-all',
         'rounded-[22px]',
-        // Liquid Glass dark capsule
         'bg-card/60 text-foreground backdrop-blur-xl',
         'border border-border/40',
         expanded ? 'shadow-2xl' : 'shadow-md',
@@ -229,19 +240,18 @@ export default function TransportDynamicIsland({
         boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.15), 0 4px 24px rgba(0,0,0,0.08)',
       }}
     >
-      {/* ── Collapsed State (always visible) ── */}
+      {/* ── Collapsed State ── */}
       <button
         onClick={() => !isCancelled && setExpanded(!expanded)}
         className={cn(
           'w-full flex items-center gap-2.5 px-4 text-left',
           'active:scale-[0.98] transition-transform duration-150',
-          expanded ? 'py-3' : 'py-3',
+          'py-3',
         )}
       >
-        {/* Navigation icon */}
         <div className={cn(
           'w-8 h-8 rounded-full flex items-center justify-center shrink-0',
-          isActive ? 'bg-accent/20' : isDone ? 'bg-primary/10' : 'bg-primary/10',
+          isActive ? 'bg-accent/20' : 'bg-primary/10',
         )}>
           {isActive ? (
             <Navigation className="w-4 h-4 text-accent animate-pulse" />
@@ -252,7 +262,6 @@ export default function TransportDynamicIsland({
           )}
         </div>
 
-        {/* Route text */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5">
             <span className="text-sm font-semibold truncate text-foreground">{t.origem}</span>
@@ -273,7 +282,6 @@ export default function TransportDynamicIsland({
           </div>
         </div>
 
-        {/* Right side: time or ETA */}
         {arrivalText && (
           <div className="shrink-0 text-right">
             <span className="text-xs font-mono font-semibold text-foreground/70">{arrivalText}</span>
@@ -292,7 +300,6 @@ export default function TransportDynamicIsland({
         }}
       >
         <div className="px-4 pb-4 space-y-3">
-          {/* Separator */}
           <div className="h-px bg-border/40" />
 
           {/* Map area */}
@@ -300,16 +307,13 @@ export default function TransportDynamicIsland({
             <div className="rounded-2xl overflow-hidden border border-border/30">
               {location && isActive ? (
                 <Suspense fallback={
-                   <div className="h-[160px] bg-muted/30 flex items-center justify-center">
+                  <div className="h-[160px] bg-muted/30 flex items-center justify-center">
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
                       <Navigation className="w-4 h-4 animate-pulse" /> Carregando mapa...
                     </div>
                   </div>
                 }>
-                  <div
-                    className="relative cursor-pointer group"
-                    onClick={() => setMapFullscreen(true)}
-                  >
+                  <div className="relative cursor-pointer group" onClick={() => setMapFullscreen(true)}>
                     <DriverLocationMap
                       latitude={location.latitude}
                       longitude={location.longitude}
@@ -376,7 +380,7 @@ export default function TransportDynamicIsland({
             </div>
           )}
 
-          {/* Tracking status for my tracking */}
+          {/* Tracking status */}
           {isMyTracking && !location && (
             trackingError ? (
               <div className="flex flex-col gap-1.5 p-2.5 rounded-xl bg-destructive/10 border border-destructive/20">
@@ -384,10 +388,7 @@ export default function TransportDynamicIsland({
                   <MapPinOff className="w-3.5 h-3.5" />
                   <span>{trackingError}</span>
                 </div>
-                <button
-                  onClick={() => locationTracker.startTracking()}
-                  className="text-[10px] text-accent underline text-left"
-                >
+                <button onClick={() => locationTracker.startTracking()} className="text-[10px] text-accent underline text-left">
                   Tentar novamente
                 </button>
               </div>
@@ -476,7 +477,7 @@ export default function TransportDynamicIsland({
             </button>
           </div>
 
-          {/* Fullscreen map dialog */}
+          {/* Fullscreen map dialog with split view */}
           {(location || destCoords) && (
             <FullscreenMapDialog
               open={mapFullscreen}
@@ -492,6 +493,12 @@ export default function TransportDynamicIsland({
               origemLabel={t.origem}
               isLive={isActive && !!location}
               etaText={liveDestRoute ? `Chegada ~${liveDestRoute.arrivalTime}` : etaText ? `~${etaText}` : null}
+              heading={heading}
+              distanceKm={liveDestRoute?.km ?? (estimatedKm ? Number(estimatedKm) : null)}
+              durationMin={liveDestRoute?.minutes ?? t.duracao_estimada_min}
+              status={t.status}
+              onCycleStatus={onCycleStatus}
+              onDetail={onDetail}
             />
           )}
 
