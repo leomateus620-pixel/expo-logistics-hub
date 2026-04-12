@@ -1,10 +1,12 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense, useState, useCallback } from 'react';
 import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
-import { X, Navigation, ArrowRight, Clock, Ruler, Timer, Gauge, Eye, Square } from 'lucide-react';
+import { X, Navigation, ArrowRight, Clock, Ruler, Timer, Gauge, Eye, Square, Map, Split, Compass } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const DriverLocationMap = lazy(() => import('@/components/DriverLocationMap'));
 const NavigationMap3D = lazy(() => import('@/components/transport/NavigationMap3D'));
+
+type ViewMode = 'split' | 'nav' | 'aerial';
 
 interface FullscreenMapDialogProps {
   open: boolean;
@@ -41,6 +43,12 @@ const MapFallback = () => (
   </div>
 );
 
+function getInitialViewMode(): ViewMode {
+  try {
+    return (sessionStorage.getItem('map_view_mode') as ViewMode) || 'split';
+  } catch { return 'split'; }
+}
+
 export default function FullscreenMapDialog({
   open,
   onOpenChange,
@@ -64,21 +72,35 @@ export default function FullscreenMapDialog({
 }: FullscreenMapDialogProps) {
   const statusInfo = status ? statusConfig[status] : null;
   const showNavMap = isLive && heading !== undefined;
+  const [viewMode, setViewMode] = useState<ViewMode>(getInitialViewMode);
+
+  const handleViewMode = useCallback((mode: ViewMode) => {
+    setViewMode(mode);
+    try { sessionStorage.setItem('map_view_mode', mode); } catch { /* silent */ }
+  }, []);
+
+  // Determine what's visible based on mode
+  const showNav = showNavMap && (viewMode === 'split' || viewMode === 'nav');
+  const showAerial = viewMode === 'split' || viewMode === 'aerial' || !showNavMap;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-[100vw] w-screen h-[100dvh] max-h-[100dvh] p-0 rounded-none border-0 bg-background gap-0 overflow-hidden">
         <DialogTitle className="sr-only">Navegação do transporte</DialogTitle>
 
-        {/* ── Split map container ── */}
+        {/* ── Map container ── */}
         <div className={cn(
           'w-full h-full flex',
-          // Mobile: vertical stack; Desktop: side-by-side
           'flex-col md:flex-row',
         )}>
-          {/* ── 3D Navigation Map (top/left) ── */}
+          {/* ── 3D Navigation Map ── */}
           {showNavMap && (
-            <div className="relative w-full md:w-1/2 h-[55%] md:h-full">
+            <div className={cn(
+              'relative transition-all duration-300',
+              viewMode === 'nav' && 'w-full h-full',
+              viewMode === 'split' && 'w-full md:w-1/2 h-[55%] md:h-full',
+              viewMode === 'aerial' && 'hidden',
+            )}>
               <Suspense fallback={<MapFallback />}>
                 <NavigationMap3D
                   latitude={latitude}
@@ -93,15 +115,23 @@ export default function FullscreenMapDialog({
               {/* Label overlay */}
               <div className="absolute bottom-3 left-3 z-10">
                 <div className="flex items-center gap-1.5 bg-card/80 backdrop-blur-xl rounded-xl px-3 py-1.5 border border-border/30 shadow-lg">
-                  <Navigation className="w-3 h-3 text-accent" />
+                  <Compass className="w-3 h-3 text-accent" />
                   <span className="text-[10px] font-semibold text-foreground/80 uppercase tracking-wider">Navegação</span>
                 </div>
               </div>
+              {/* Driver label in full mode */}
+              {viewMode === 'nav' && driverName && (
+                <div className="absolute bottom-3 right-3 z-10">
+                  <div className="flex items-center gap-1.5 bg-card/80 backdrop-blur-xl rounded-xl px-3 py-1.5 border border-border/30 shadow-lg">
+                    <span className="text-[10px] font-medium text-foreground/80">👤 {driverName}</span>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
           {/* ── Separator ── */}
-          {showNavMap && (
+          {showNavMap && viewMode === 'split' && (
             <div className="hidden md:flex items-center justify-center w-px bg-border/40 relative z-10">
               <div className="w-6 h-6 rounded-full bg-card border border-border/40 shadow flex items-center justify-center absolute">
                 <div className="w-1.5 h-1.5 rounded-full bg-accent" />
@@ -109,10 +139,12 @@ export default function FullscreenMapDialog({
             </div>
           )}
 
-          {/* ── Aerial Map (bottom/right) ── */}
+          {/* ── Aerial Map ── */}
           <div className={cn(
-            'relative',
-            showNavMap ? 'w-full md:w-1/2 h-[45%] md:h-full' : 'w-full h-full',
+            'relative transition-all duration-300',
+            viewMode === 'aerial' || !showNavMap ? 'w-full h-full' : '',
+            viewMode === 'split' && showNavMap && 'w-full md:w-1/2 h-[45%] md:h-full',
+            viewMode === 'nav' && showNavMap && 'hidden',
           )}>
             <Suspense fallback={<MapFallback />}>
               <DriverLocationMap
@@ -129,11 +161,19 @@ export default function FullscreenMapDialog({
               />
             </Suspense>
             {/* Label overlay */}
-            {showNavMap && (
+            {showNavMap && viewMode !== 'nav' && (
               <div className="absolute bottom-3 left-3 z-10">
                 <div className="flex items-center gap-1.5 bg-card/80 backdrop-blur-xl rounded-xl px-3 py-1.5 border border-border/30 shadow-lg">
                   <Eye className="w-3 h-3 text-primary" />
                   <span className="text-[10px] font-semibold text-foreground/80 uppercase tracking-wider">Vista aérea</span>
+                </div>
+              </div>
+            )}
+            {/* Driver label in full aerial mode */}
+            {viewMode === 'aerial' && driverName && (
+              <div className="absolute bottom-3 right-3 z-10">
+                <div className="flex items-center gap-1.5 bg-card/80 backdrop-blur-xl rounded-xl px-3 py-1.5 border border-border/30 shadow-lg">
+                  <span className="text-[10px] font-medium text-foreground/80">👤 {driverName}</span>
                 </div>
               </div>
             )}
@@ -174,6 +214,41 @@ export default function FullscreenMapDialog({
             </button>
           </div>
         </div>
+
+        {/* ── View mode toggle (only when nav map is available) ── */}
+        {showNavMap && (
+          <div className="absolute top-14 md:top-16 left-1/2 -translate-x-1/2 z-[1000] pointer-events-auto">
+            <div className="flex items-center gap-0.5 bg-card/85 backdrop-blur-xl rounded-full p-1 border border-border/40 shadow-lg">
+              <button
+                onClick={() => handleViewMode('nav')}
+                className={cn(
+                  'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all',
+                  viewMode === 'nav' ? 'bg-accent/20 text-accent shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-muted/40',
+                )}
+              >
+                <Compass className="w-3 h-3" /> Navegação
+              </button>
+              <button
+                onClick={() => handleViewMode('split')}
+                className={cn(
+                  'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all',
+                  viewMode === 'split' ? 'bg-primary/20 text-primary shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-muted/40',
+                )}
+              >
+                <Split className="w-3 h-3" /> Dividido
+              </button>
+              <button
+                onClick={() => handleViewMode('aerial')}
+                className={cn(
+                  'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-semibold transition-all',
+                  viewMode === 'aerial' ? 'bg-primary/20 text-primary shadow-sm' : 'text-muted-foreground hover:text-foreground hover:bg-muted/40',
+                )}
+              >
+                <Map className="w-3 h-3" /> Aéreo
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* ── Bottom metrics + actions bar ── */}
         <div className="absolute bottom-0 left-0 right-0 z-[1000] pointer-events-none">
