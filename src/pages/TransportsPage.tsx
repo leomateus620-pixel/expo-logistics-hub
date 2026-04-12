@@ -272,6 +272,7 @@ export default function TransportsPage() {
 
   const [searchParams, setSearchParams] = useSearchParams();
   const highlightId = searchParams.get('highlight');
+  const actionParam = searchParams.get('action');
   const highlightRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -281,6 +282,14 @@ export default function TransportsPage() {
       return () => clearTimeout(timer);
     }
   }, [highlightId, transports]);
+
+  // Auto-open create dialog from ?action=create (e.g. from Dashboard)
+  useEffect(() => {
+    if (actionParam === 'create') {
+      openCreateDialog();
+      setSearchParams({}, { replace: true });
+    }
+  }, [actionParam]);
 
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ titulo: '', origem: '', destino: '', inicio_em: '', motorista_user_id: '', vehicle_id: '', prioridade: 'media', km_retirada: '', voo_cidade: '', voo_numero: '', voo_checkin: '', voo_chegada: '', horario_saida: '', escolta_nome: '', escolta_cargo: '', escolta_viaturas: '', escolta_ponto_encontro: '', escolta_contato_seguranca: '', escolta_obs: '' });
