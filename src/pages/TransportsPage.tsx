@@ -272,6 +272,7 @@ export default function TransportsPage() {
 
   const [searchParams, setSearchParams] = useSearchParams();
   const highlightId = searchParams.get('highlight');
+  const actionParam = searchParams.get('action');
   const highlightRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -281,6 +282,14 @@ export default function TransportsPage() {
       return () => clearTimeout(timer);
     }
   }, [highlightId, transports]);
+
+  // Auto-open create dialog from ?action=create (e.g. from Dashboard)
+  useEffect(() => {
+    if (actionParam === 'create') {
+      openCreateDialog();
+      setSearchParams({}, { replace: true });
+    }
+  }, [actionParam]);
 
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ titulo: '', origem: '', destino: '', inicio_em: '', motorista_user_id: '', vehicle_id: '', prioridade: 'media', km_retirada: '', voo_cidade: '', voo_numero: '', voo_checkin: '', voo_chegada: '', horario_saida: '', escolta_nome: '', escolta_cargo: '', escolta_viaturas: '', escolta_ponto_encontro: '', escolta_contato_seguranca: '', escolta_obs: '' });
@@ -382,7 +391,7 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
 
   const isSubmittingRef = useRef(false);
 
-  const handleAdd = async () => {
+  const handleCreate = async (mode: 'schedule' | 'start_now') => {
     if (isSubmittingRef.current) return;
     isSubmittingRef.current = true;
 
@@ -408,17 +417,9 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
     }
 
     try {
-      // Fetch route estimate
-      let routeData: { duration_minutes?: number; distance_km?: number; polyline?: string } = {};
-      const destKey = form.titulo === 'Aeroporto' && form.voo_cidade ? `Aeroporto_${form.voo_cidade}` : (form.titulo || 'Outros');
+      const inicio_em = ensureSPTimestamptz(inicioEmRaw);
       const customLat = (form as any).destino_lat;
       const customLng = (form as any).destino_lng;
-      try {
-        const preview = await fetchRoutePreview(destKey, customLat, customLng);
-        if (preview) routeData = preview;
-      } catch { /* continue without route data */ }
-
-      const inicio_em = ensureSPTimestamptz(inicioEmRaw);
 
       // Capture return data before resetting
       const shouldCreateReturn = includeReturn && form.titulo === 'Aeroporto' && returnForm.inicio_em;
@@ -426,6 +427,7 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
       const capturedReturnForm = { ...returnForm };
       const capturedGuests = [...selectedGuests];
 
+      // Create transport with minimal data — NO blocking route fetch
       const result = await create.mutateAsync({
         transport: {
           titulo: form.titulo || null,
@@ -444,19 +446,14 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
           observacoes: buildEscoltaObs(form),
           destino_lat: customLat || null,
           destino_lng: customLng || null,
-          distancia_estimada_km: getEffectiveEstimatedKm(
-            routeData.distance_km ? Math.round(routeData.distance_km * 2) : null,
-            form.titulo,
-            form.voo_cidade,
-            destino,
-          ),
-          duracao_estimada_min: routeData.duration_minutes || null,
-          rota_polyline: routeData.polyline || null,
+          distancia_estimada_km: null,
+          duracao_estimada_min: null,
+          rota_polyline: null,
         },
         guestIds: selectedGuests,
       });
 
-      // Close dialog and reset form immediately to prevent double-submit
+      // Close dialog immediately
       setOpen(false);
       setForm({ titulo: '', origem: '', destino: '', inicio_em: '', motorista_user_id: '', vehicle_id: '', prioridade: 'media', km_retirada: '', voo_cidade: '', voo_numero: '', voo_checkin: '', voo_chegada: '', horario_saida: '', escolta_nome: '', escolta_cargo: '', escolta_viaturas: '', escolta_ponto_encontro: '', escolta_contato_seguranca: '', escolta_obs: '' });
       setSelectedGuests([]);
@@ -464,6 +461,27 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
       setIncludeReturn(false);
       setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '' });
 
+      // Start trip immediately if mode is start_now
+      if (mode === 'start_now' && result?.id) {
+        try {
+          const startResult = await start.mutateAsync({ id: result.id });
+          setTrackingTransportId(result.id);
+          toast.success('Viagem iniciada — localização ativada');
+          if (startResult?.whatsapp) {
+            setStartTripWhatsappData(startResult.whatsapp);
+            setStartTripWhatsappGuests(startResult.whatsappGuests || []);
+            setStartTripDriverName(startResult.driverName || '');
+            setStartTripStartedAt(startResult.startedAt || '');
+            setStartTripDialogOpen(true);
+          }
+        } catch {
+          toast.warning('Transporte criado mas falha ao iniciar. Inicie manualmente.');
+        }
+      } else {
+        toast.success('Transporte agendado');
+      }
+
+      // Escolta Policial WhatsApp
       if (capturedForm.titulo === 'Escolta Policial') {
         const driver = members.find((m: any) => m.user_id === capturedForm.motorista_user_id);
         const vehicle = vehicles.find((v: any) => v.id === capturedForm.vehicle_id);
@@ -473,53 +491,84 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
         setWhatsappOpen(true);
       }
 
-      // Create return trip if enabled
-      if (shouldCreateReturn) {
-        try {
-          const returnDestKey = capturedForm.voo_cidade ? `Aeroporto_${capturedForm.voo_cidade}` : 'Aeroporto';
-          let returnRouteData: { duration_minutes?: number; distance_km?: number; polyline?: string } = {};
-          try {
-            const preview = await fetchRoutePreview(returnDestKey);
-            if (preview) returnRouteData = preview;
-          } catch { /* silent */ }
+      // Background: enrich route data + create return trip
+      const transportId = result?.id;
+      if (transportId) {
+        const destKey = capturedForm.titulo === 'Aeroporto' && capturedForm.voo_cidade
+          ? `Aeroporto_${capturedForm.voo_cidade}` : (capturedForm.titulo || 'Outros');
 
-          await create.mutateAsync({
-            transport: {
-              titulo: 'Aeroporto',
-              origem: destino || 'Santa Rosa',
-              destino: capturedForm.voo_cidade ? `Aeroporto ${capturedForm.voo_cidade}` : origem,
-              inicio_em: ensureSPTimestamptz(capturedReturnForm.inicio_em),
-              motorista_user_id: capturedForm.motorista_user_id && capturedForm.motorista_user_id !== 'none' ? capturedForm.motorista_user_id : null,
-              vehicle_id: capturedForm.vehicle_id && capturedForm.vehicle_id !== 'none' ? capturedForm.vehicle_id : null,
-              prioridade: capturedForm.prioridade,
-              voo_cidade: capturedForm.voo_cidade || null,
-              voo_numero: capturedReturnForm.voo_numero || null,
-              voo_checkin: capturedReturnForm.voo_checkin || null,
-              horario_saida: capturedReturnForm.horario_saida || null,
-              distancia_estimada_km: getEffectiveEstimatedKm(
-                returnRouteData.distance_km ? Math.round(returnRouteData.distance_km * 2) : null,
-                'Aeroporto',
-                capturedForm.voo_cidade,
-                capturedForm.destino,
-              ),
-              duracao_estimada_min: returnRouteData.duration_minutes || null,
-              rota_polyline: returnRouteData.polyline || null,
-            },
-            guestIds: capturedGuests,
-          });
-        } catch (returnErr: any) {
-          console.error('Failed to create return trip:', returnErr);
-          toast.warning('Ida agendada, mas houve erro ao criar a volta. Tente criar manualmente.');
-        }
+        // Fire and forget — enrich in background
+        (async () => {
+          try {
+            const preview = await fetchRoutePreview(destKey, customLat, customLng);
+            if (preview) {
+              await update.mutateAsync({
+                id: transportId,
+                updates: {
+                  distancia_estimada_km: getEffectiveEstimatedKm(
+                    preview.distance_km ? Math.round(preview.distance_km * 2) : null,
+                    capturedForm.titulo,
+                    capturedForm.voo_cidade,
+                    destino,
+                  ),
+                  duracao_estimada_min: preview.duration_minutes || null,
+                  rota_polyline: preview.polyline || null,
+                },
+              });
+            }
+          } catch { /* silent — transport still works without route data */ }
+        })();
       }
 
-      toast.success(shouldCreateReturn ? 'Ida e volta agendados' : 'Transporte agendado');
+      // Create return trip if enabled (also in background)
+      if (shouldCreateReturn) {
+        (async () => {
+          try {
+            const returnDestKey = capturedForm.voo_cidade ? `Aeroporto_${capturedForm.voo_cidade}` : 'Aeroporto';
+            let returnRouteData: { duration_minutes?: number; distance_km?: number; polyline?: string } = {};
+            try {
+              const preview = await fetchRoutePreview(returnDestKey);
+              if (preview) returnRouteData = preview;
+            } catch { /* silent */ }
+
+            await create.mutateAsync({
+              transport: {
+                titulo: 'Aeroporto',
+                origem: destino || 'Santa Rosa',
+                destino: capturedForm.voo_cidade ? `Aeroporto ${capturedForm.voo_cidade}` : origem,
+                inicio_em: ensureSPTimestamptz(capturedReturnForm.inicio_em),
+                motorista_user_id: capturedForm.motorista_user_id && capturedForm.motorista_user_id !== 'none' ? capturedForm.motorista_user_id : null,
+                vehicle_id: capturedForm.vehicle_id && capturedForm.vehicle_id !== 'none' ? capturedForm.vehicle_id : null,
+                prioridade: capturedForm.prioridade,
+                voo_cidade: capturedForm.voo_cidade || null,
+                voo_numero: capturedReturnForm.voo_numero || null,
+                voo_checkin: capturedReturnForm.voo_checkin || null,
+                horario_saida: capturedReturnForm.horario_saida || null,
+                distancia_estimada_km: getEffectiveEstimatedKm(
+                  returnRouteData.distance_km ? Math.round(returnRouteData.distance_km * 2) : null,
+                  'Aeroporto',
+                  capturedForm.voo_cidade,
+                  capturedForm.destino,
+                ),
+                duracao_estimada_min: returnRouteData.duration_minutes || null,
+                rota_polyline: returnRouteData.polyline || null,
+              },
+              guestIds: capturedGuests,
+            });
+          } catch (returnErr: any) {
+            console.error('Failed to create return trip:', returnErr);
+            toast.warning('Ida criada, mas houve erro ao criar a volta.');
+          }
+        })();
+      }
     } catch (err: any) {
       toast.error(err.message);
     } finally {
       isSubmittingRef.current = false;
     }
   };
+
+  const handleAdd = () => handleCreate('schedule');
 
   const openEditDlg = (t: any) => {
     setEditId(t.id);
@@ -811,9 +860,19 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
               availableVehicles={availableVehicles}
             />
           </ScrollArea>
-          <Button onClick={handleAdd} className="w-full h-11 rounded-xl font-semibold active:scale-[0.97] transition-all" disabled={create.isPending || isSubmittingRef.current}>
-            {create.isPending ? 'Salvando...' : 'Agendar Transporte'}
-          </Button>
+          <div className="space-y-2">
+            <Button onClick={handleAdd} className="w-full h-11 rounded-xl font-semibold active:scale-[0.97] transition-all" disabled={create.isPending || isSubmittingRef.current}>
+              {create.isPending && !isSubmittingRef.current ? 'Salvando...' : '📅 Agendar Transporte'}
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => handleCreate('start_now')}
+              className="w-full h-11 rounded-xl font-semibold active:scale-[0.97] transition-all border-accent/30 text-accent hover:bg-accent/10 hover:text-accent"
+              disabled={create.isPending || start.isPending || isSubmittingRef.current}
+            >
+              {start.isPending ? 'Iniciando...' : '🚀 Iniciar Transporte'}
+            </Button>
+          </div>
         </DialogContent>
       </Dialog>
 

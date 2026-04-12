@@ -132,7 +132,9 @@ export default function TransportDynamicIsland({
   useEffect(() => {
     if (!location || !isActive) return;
     const now = Date.now();
-    if (now - lastFetchRef.current < 120000) return;
+    // First call: 30s throttle, subsequent: 120s
+    const throttle = lastFetchRef.current === 0 ? 0 : (lastFetchRef.current < now - 30000 ? 0 : 120000);
+    if (throttle > 0 && now - lastFetchRef.current < throttle) return;
     lastFetchRef.current = now;
 
     const dest = getDestCoords(t);

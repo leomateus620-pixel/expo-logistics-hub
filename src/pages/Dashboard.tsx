@@ -233,8 +233,29 @@ export default function Dashboard() {
       )}
 
       {/* ─── Acessos Rápidos ─── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {/* Card 1 — Rede Hoteleira */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        {/* Card — Criar Transporte */}
+        <button
+          type="button"
+          onClick={() => navigate('/transports?action=create')}
+          className="liquid-glass-card rounded-2xl p-5 sm:p-6 border-l-2 border-accent/40 text-left cursor-pointer hover:bg-muted/60 active:scale-[0.98] transition-all group"
+        >
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center shrink-0">
+              <MapPin className="w-6 h-6 text-accent" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1">
+                <h3 className="text-base font-extrabold text-foreground">Criar Transporte</h3>
+              </div>
+              <p className="text-[11px] font-semibold text-foreground/80">Agendar ou iniciar viagem</p>
+              <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">Cadastre um novo transporte com origem, destino e dados do voo.</p>
+            </div>
+            <ArrowRight className="w-4 h-4 text-muted-foreground/50 group-hover:text-accent transition-colors shrink-0 mt-1" />
+          </div>
+        </button>
+
+        {/* Card — Rede Hoteleira */}
         <button
           type="button"
           onClick={() => window.open('/docs/rede-hoteleira.pdf', '_blank')}
@@ -258,7 +279,7 @@ export default function Dashboard() {
           </div>
         </button>
 
-        {/* Card 2 — Autorizações de Retirada */}
+        {/* Card — Autorizações de Retirada */}
         <button
           type="button"
           onClick={() => window.open('https://docs.google.com/spreadsheets/d/1I0ESjrZWvpT5dQZrdTvYnIPtpY8SYJVP33fy4Yt0Cf0/edit?gid=0#gid=0', '_blank', 'noopener,noreferrer')}

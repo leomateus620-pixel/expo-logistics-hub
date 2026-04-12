@@ -30,6 +30,7 @@ export default function PlacesSearchDialog({ open, onOpenChange, onSelect }: Pla
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   // Reset state when dialog opens
@@ -38,12 +39,21 @@ export default function PlacesSearchDialog({ open, onOpenChange, onSelect }: Pla
       setQuery('');
       setResults([]);
       setSearched(false);
-      setTimeout(() => inputRef.current?.focus(), 150);
+      setTimeout(() => inputRef.current?.focus(), 200);
+    } else {
+      // Cancel any in-flight request on close
+      abortRef.current?.abort();
     }
   }, [open]);
 
   const search = useCallback(async (q: string) => {
     if (q.length < 2) { setResults([]); setSearched(false); return; }
+
+    // Cancel previous request
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
     setLoading(true);
     setSearched(true);
     try {
@@ -58,14 +68,15 @@ export default function PlacesSearchDialog({ open, onOpenChange, onSelect }: Pla
             'Authorization': `Bearer ${session?.access_token || ''}`,
           },
           body: JSON.stringify({ query: q }),
+          signal: controller.signal,
         }
       );
       const data = await res.json();
       setResults(data.results || []);
-    } catch {
-      setResults([]);
+    } catch (e: any) {
+      if (e.name !== 'AbortError') setResults([]);
     } finally {
-      setLoading(false);
+      if (!controller.signal.aborted) setLoading(false);
     }
   }, []);
 
@@ -81,9 +92,9 @@ export default function PlacesSearchDialog({ open, onOpenChange, onSelect }: Pla
   };
 
   const content = (
-    <div className="flex flex-col gap-3 px-1">
+    <div className="flex flex-col gap-3 px-1 flex-1 min-h-0">
       {/* Search input */}
-      <div className="relative">
+      <div className="relative shrink-0">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
         <Input
           ref={inputRef}
@@ -91,12 +102,16 @@ export default function PlacesSearchDialog({ open, onOpenChange, onSelect }: Pla
           onChange={(e) => handleInputChange(e.target.value)}
           placeholder="Digite o nome do local ou cidade..."
           className="pl-10 pr-10 h-12 text-base rounded-xl bg-muted/30 border-border/50 focus-visible:ring-primary/40"
+          autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          spellCheck={false}
         />
         {loading && <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-primary animate-spin" />}
       </div>
 
-      {/* Results */}
-      <div className="flex-1 overflow-y-auto max-h-[50vh] min-h-[200px] space-y-1">
+      {/* Results - flex-1 to fill available space */}
+      <div className="flex-1 overflow-y-auto overscroll-contain min-h-0 space-y-1 -mx-1 px-1">
         {!searched && !loading && (
           <div className="flex flex-col items-center justify-center py-10 text-center gap-3">
             <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
@@ -137,7 +152,7 @@ export default function PlacesSearchDialog({ open, onOpenChange, onSelect }: Pla
           <button
             key={r.place_id}
             type="button"
-            className="w-full text-left px-3 py-3 rounded-xl hover:bg-primary/5 active:bg-primary/10 flex items-start gap-3 transition-colors group"
+            className="w-full text-left px-3 py-3.5 rounded-xl hover:bg-primary/5 active:bg-primary/10 flex items-start gap-3 transition-colors group min-h-[48px]"
             onClick={() => handleSelect(r)}
           >
             <div className="w-9 h-9 rounded-full bg-primary/10 group-hover:bg-primary/20 flex items-center justify-center shrink-0 mt-0.5 transition-colors">
@@ -161,14 +176,14 @@ export default function PlacesSearchDialog({ open, onOpenChange, onSelect }: Pla
   if (isMobile) {
     return (
       <Drawer open={open} onOpenChange={onOpenChange}>
-        <DrawerContent className="max-h-[85dvh]">
-          <DrawerHeader className="pb-2">
+        <DrawerContent className="max-h-[90dvh] flex flex-col">
+          <DrawerHeader className="pb-2 shrink-0">
             <DrawerTitle className="flex items-center gap-2 text-base">
               <MapPin className="w-5 h-5 text-primary" />
               Buscar Destino
             </DrawerTitle>
           </DrawerHeader>
-          <div className="px-4 pb-6">
+          <div className="px-4 pb-8 flex-1 min-h-0 flex flex-col">
             {content}
           </div>
         </DrawerContent>
@@ -178,7 +193,7 @@ export default function PlacesSearchDialog({ open, onOpenChange, onSelect }: Pla
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-lg max-h-[85vh] flex flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-base">
             <MapPin className="w-5 h-5 text-primary" />
