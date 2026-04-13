@@ -26,7 +26,7 @@ export default function ReimbursementList({
     return (
       <div className="space-y-2">
         {[1, 2, 3].map(i => (
-          <div key={i} className="h-16 rounded-xl bg-muted/40 animate-pulse" />
+          <div key={i} className="h-16 rounded-xl bg-muted/30 animate-pulse" />
         ))}
       </div>
     );
@@ -34,9 +34,11 @@ export default function ReimbursementList({
 
   if (reimbursements.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-12 text-muted-foreground">
-        <Banknote className="w-10 h-10 mb-3 opacity-25" />
-        <p className="text-sm font-medium">Nenhum ressarcimento</p>
+      <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
+        <div className="w-16 h-16 rounded-2xl bg-muted/30 flex items-center justify-center mb-4">
+          <Banknote className="w-8 h-8 opacity-25" />
+        </div>
+        <p className="text-sm font-semibold">Nenhum ressarcimento</p>
         <p className="text-xs mt-1">Ressarcimentos aparecerão aqui quando solicitados.</p>
       </div>
     );
@@ -50,7 +52,7 @@ export default function ReimbursementList({
         const amount = Number(r.requested_amount) || 0;
 
         return (
-          <div key={r.id} className="p-3.5 rounded-xl bg-muted/40">
+          <div key={r.id} className="p-3.5 rounded-xl bg-card/60 backdrop-blur-sm border border-border/30 shadow-sm">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-gold/10 flex items-center justify-center shrink-0">
                 <Banknote className="w-5 h-5 text-gold" />
@@ -73,16 +75,16 @@ export default function ReimbursementList({
 
             {canApprove && r.status === 'pendente' && (
               <div className="flex gap-2 mt-3">
-                <Button size="sm" variant="outline" className="flex-1 text-xs" onClick={() => onApprove?.(r.id)}>
+                <Button size="sm" variant="outline" className="flex-1 text-xs rounded-xl h-9" onClick={() => onApprove?.(r.id)}>
                   Aprovar
                 </Button>
-                <Button size="sm" variant="outline" className="flex-1 text-xs text-destructive" onClick={() => onReject?.(r.id)}>
+                <Button size="sm" variant="outline" className="flex-1 text-xs rounded-xl h-9 text-destructive" onClick={() => onReject?.(r.id)}>
                   Recusar
                 </Button>
               </div>
             )}
             {canApprove && r.status === 'aprovado' && (
-              <Button size="sm" className="w-full mt-3 text-xs" onClick={() => onMarkPaid?.(r.id)}>
+              <Button size="sm" className="w-full mt-3 text-xs rounded-xl h-9" onClick={() => onMarkPaid?.(r.id)}>
                 Marcar como Pago
               </Button>
             )}
