@@ -9,6 +9,8 @@ import { useExpenseCategories } from '@/hooks/useExpenseCategories';
 import { useVehicles } from '@/hooks/useVehicles';
 import { useTransports } from '@/hooks/useTransports';
 import { useOrgMembers } from '@/hooks/useOrgMembers';
+import { useCommissions } from '@/hooks/useCommissions';
+import { format } from 'date-fns';
 import { Upload, Loader2, Camera, QrCode, Truck, Car, User, CreditCard, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import QrScannerDialog from './QrScannerDialog';
@@ -40,7 +42,10 @@ export default function ExpenseForm({ onSubmit, isSubmitting, initialData }: Exp
   const { vehicles } = useVehicles();
   const { transports } = useTransports();
   const { members } = useOrgMembers();
+  const { commissions } = useCommissions();
 
+  const logisticaCommission = commissions.find((c: any) => c.nome?.toUpperCase().includes('LOGÍSTICA'));
+  const logisticaMembers = members.filter((m: any) => m.is_active && m.commission_id === logisticaCommission?.id);
   const [form, setForm] = useState({
     title: initialData?.title || '',
     description: initialData?.description || '',
@@ -158,8 +163,13 @@ export default function ExpenseForm({ onSubmit, isSubmitting, initialData }: Exp
 
   // Get transport display label
   const getTransportLabel = (t: any) => {
-    const route = `${(t.origem || '').slice(0, 15)} → ${(t.destino || '').slice(0, 15)}`;
-    return t.titulo || route;
+    const tipo = t.tipo ? `${t.tipo}` : '';
+    const rota = `${t.origem || '?'} → ${t.destino || '?'}`;
+    const data = t.inicio_em ? format(new Date(t.inicio_em), 'dd/MM HH:mm') : '';
+    const motorista = t.motorista_user_id
+      ? members.find((m: any) => m.user_id === t.motorista_user_id)?.nome_exibicao?.split(' ')[0] || ''
+      : '';
+    return [tipo, rota, data, motorista].filter(Boolean).join(' • ');
   };
 
   return (
@@ -232,8 +242,8 @@ export default function ExpenseForm({ onSubmit, isSubmitting, initialData }: Exp
           <Select value={form.transport_id} onValueChange={handleTransportSelect}>
             <SelectTrigger className="h-11 rounded-xl"><SelectValue placeholder="Opcional" /></SelectTrigger>
             <SelectContent>
-              {transports.filter((t: any) => t.status !== 'cancelado').slice(0, 30).map((t: any) => (
-                <SelectItem key={t.id} value={t.id}>{getTransportLabel(t)}</SelectItem>
+              {transports.filter((t: any) => t.status !== 'cancelado').map((t: any) => (
+                <SelectItem key={t.id} value={t.id} className="text-xs">{getTransportLabel(t)}</SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -259,11 +269,12 @@ export default function ExpenseForm({ onSubmit, isSubmitting, initialData }: Exp
         <Select value={form.paid_by_user_id} onValueChange={handleMemberSelect}>
           <SelectTrigger className="h-11 rounded-xl"><SelectValue placeholder="Selecione o membro" /></SelectTrigger>
           <SelectContent>
-            {members.filter((m: any) => m.is_active).map((m: any) => (
+            {logisticaMembers.map((m: any) => (
               <SelectItem key={m.user_id} value={m.user_id}>{m.nome_exibicao || 'Membro'}</SelectItem>
             ))}
           </SelectContent>
         </Select>
+        <p className="text-[10px] text-muted-foreground mt-0.5">Apenas membros da comissão de Logística</p>
       </div>
 
       {form.paid_by_user_id && (
