@@ -1,118 +1,112 @@
 
 
-# Módulo de Despesas & Ressarcimentos — Plano de Implementação
+# Fase 2 — Despesas: QR Scanner, Integrações e UI Premium
 
-## Escopo e Faseamento
+## Auditoria Resumida
 
-Este é um módulo completo que envolve ~10 tabelas novas, 1 edge function, 1 storage bucket, 5+ páginas/componentes e integrações com módulos existentes. Para manter qualidade e evitar regressões, a implementação será dividida em **3 fases incrementais**.
+**Estado atual:**
+- Módulo funcional com CRUD básico, 5 tabelas com RLS, formulário com selects de transporte/veículo/membro, upload de comprovantes, listagem com filtros por status, tabs Lançamentos/Ressarcimentos
+- Dashboard já tem card "Registrar Despesa" com contadores
 
----
-
-## FASE 1 — Fundação (esta entrega)
-
-Banco de dados, página principal, CRUD de despesas, dashboard cards, navegação.
-
-### 1.1 Banco de Dados (Migration)
-
-Criar as seguintes tabelas com RLS org-scoped:
-
-**`expense_categories`** — Categorias configuráveis
-- id, org_id, name, icon, requires_vehicle, requires_transport, requires_document, active, created_at
-
-**`expenses`** — Lançamentos de despesas
-- id, org_id, category_id, transport_id, event_id, vehicle_id, member_user_id
-- title, description, amount, expense_date, payment_method
-- paid_by_user_id, paid_by_name, pix_key, pix_key_type
-- status (rascunho/pendente_comprovante/pendente_validacao/aprovado/ressarcimento_solicitado/ressarcido/recusado/cancelado)
-- created_by_user_id, created_at, updated_at
-
-**`expense_documents`** — Comprovantes/notas anexadas
-- id, expense_id, org_id, file_url, file_type, document_type
-- qr_raw, qr_url, issuer_name, issuer_document, invoice_number, access_key
-- issue_datetime, extracted_total, extracted_payload_json
-- extraction_status, validation_status, created_at
-
-**`reimbursements`** — Controle de ressarcimentos
-- id, expense_id, org_id, beneficiary_user_id, beneficiary_name
-- pix_key, pix_key_type, requested_amount, approved_amount, paid_amount
-- status (pendente/aprovado/pago/recusado)
-- approved_by, paid_by, requested_at, approved_at, paid_at
-- payment_receipt_url, notes
-
-**`expense_approvals`** — Log de aprovações
-- id, expense_id, org_id, action, previous_status, new_status, reason, acted_by, acted_at
-
-Storage bucket: `expense-documents` (privado, RLS por org_id no path)
-
-Seed de categorias padrão (Combustível, Pedágio, Refeição, Hotel, Estacionamento, Manutenção, Compras operacionais, Outros).
-
-RLS: mesmas regras do projeto — operador+ pode inserir/atualizar, admin/gestor pode deletar, membros da org podem ler.
-
-### 1.2 Hook `useExpenses`
-
-CRUD completo com React Query, seguindo padrão de `useFuelRecords`/`useTransports`:
-- listagem com filtros (status, categoria, período, transporte, evento, membro)
-- create, update, delete mutations
-- upload de comprovante para storage
-- mutation de aprovação/mudança de status
-
-### 1.3 Página `ExpensesPage`
-
-Nova rota `/expenses` — "Despesas & Ressarcimentos"
-
-Estrutura:
-- **Tabs**: Lançamentos | Ressarcimentos | Relatórios
-- **Lançamentos**: Lista filtrada com chips (status, categoria, período), card por despesa com valor, categoria, status badge, comprovante indicator
-- **Dialog de criação**: Formulário completo com seleção de categoria, valor, data, contexto (transporte/evento/veículo), quem pagou, upload de comprovante
-- **Dialog de detalhes**: Visualização completa + ações (aprovar, recusar, solicitar ressarcimento)
-- **Ressarcimentos tab**: Lista de pendências de ressarcimento com ações (aprovar, marcar como pago)
-
-### 1.4 Navegação
-
-- Sidebar: adicionar "Despesas" no grupo "Operação" com ícone `Receipt`
-- BottomTabs: adicionar nos `moreLinks`
-- App.tsx: nova rota `/expenses`
-
-### 1.5 Dashboard
-
-Adicionar card "Despesas" na seção de ações rápidas:
-- Contador de despesas pendentes
-- Valor total do período
-- Alertas (sem comprovante, ressarcimento pendente)
-- Botão "Registrar Despesa" que navega para `/expenses?action=create`
+**Limitações encontradas:**
+1. **Sem scanner QR** — nenhuma lib de QR instalada
+2. **Categorias vazias** — seed não foi executado, tabela `expense_categories` depende de cadastro manual
+3. **Integração fraca** — selecionar transporte não sugere veículo/motorista automaticamente; sem auto-fill inteligente
+4. **UI funcional mas básica** — cards simples `bg-muted/40`, sem profundidade liquid glass, formulário denso sem separação visual clara, sem modo QR scan
+5. **ExpenseCard sem onClick útil** — recebe prop mas não abre detalhes
+6. **Sem `origem_lancamento`** — campo não existe na tabela para diferenciar manual vs QR
 
 ---
 
-## FASE 2 — QR Code e Integrações (entrega futura)
+## Plano de Implementação
 
-- **Scanner QR**: Componente com `html5-qrcode` para ler QR de NFC-e/NF-e
-- **Edge function `parse-fiscal-qr`**: Recebe URL/payload do QR, tenta extrair dados fiscais (CNPJ, valor, data, itens) via scraping do portal da SEFAZ ou parsing do payload
-- **Integração com Transportes**: Aba "Despesas" dentro do card de transporte
-- **Integração com Veículos**: Despesas de combustível/manutenção na ficha do veículo
-- **Integração com Equipe**: Despesas pagas pelo colaborador + ressarcimentos na ficha
+### 1. Migration: Seed de categorias + campo `origem_lancamento`
 
-## FASE 3 — Relatórios e Automações (entrega futura)
+- Adicionar coluna `origem_lancamento text default 'manual'` à tabela `expenses`
+- Seed idempotente de 14 categorias padrão usando uma function `seed_default_expense_categories(org_id)` chamada on-demand (ao abrir o módulo, se não houver categorias)
+- Alternativa mais simples: seed via migration com `INSERT ... ON CONFLICT DO NOTHING` usando org_id placeholder — mas como é multi-org, melhor usar hook no frontend que cria categorias default se `categories.length === 0`
 
-- Relatório consolidado por evento/período (PDF/CSV)
-- Detecção de duplicidade (mesmo QR, mesmo valor+data+emissor)
-- Automações: sugerir veículo ao selecionar combustível, criar pendência de ressarcimento automática
-- Offline: salvar rascunho local e sincronizar
+**Decisão**: Hook `useExpenseCategories` fará auto-seed via mutation se retornar vazio para a org. Categorias: Combustível, Pedágio, Alimentação, Hospedagem, Manutenção, Lavagem, Estacionamento, Frete de Apoio, Despesas Diversas, Reembolso, Diária, Nota de Compra, Material Operacional, Emergencial.
+
+### 2. QR Code Scanner
+
+**Dependência**: Instalar `html5-qrcode` (~200KB)
+
+**Novo componente**: `src/components/expenses/QrScannerDialog.tsx`
+- Drawer no mobile, Dialog no desktop
+- Usa `Html5QrcodeScanner` para acessar câmera
+- Estado: `idle | scanning | success | error`
+- Ao detectar QR:
+  - Parse do payload (URLs SEFAZ NFC-e contêm params como `chNFe`, `nVersao`, `tpAmb`, valor)
+  - Extrai campos disponíveis: chave de acesso, valor total, CNPJ emissor, data
+  - Bloqueia leitura duplicada por 3s
+  - Mostra preview dos dados extraídos
+  - Botão "Usar dados" que popula o formulário
+  - Botão "Tentar novamente" em caso de erro
+- Tratar permissão de câmera negada com mensagem clara
+- Cleanup do scanner ao fechar
+
+**Parser**: `src/lib/parseNfceQr.ts`
+- Parse de URL SEFAZ (formato: `http://www.sefaz.../qrcode?...`)
+- Extrai: chNFe, vNF (valor), CNPJ, dhEmi (data)
+- Fallback para payload genérico
+- Retorna objeto tipado com campos parciais
+
+### 3. Integração inteligente com Transportes/Veículos/Equipe
+
+**No `ExpenseForm.tsx`**:
+- Ao selecionar transporte → auto-preencher `vehicle_id` (do transporte) e `member_user_id` (motorista do transporte)
+- Ao selecionar veículo → sugerir categorias compatíveis (Combustível, Manutenção, Lavagem)
+- Ao selecionar membro → preencher `paid_by_name` automaticamente
+- Mostrar info contextual inline (ex: "Transporte: São Paulo → Campinas • Placa ABC-1234")
+- Transporte select mostra rota resumida + data
+
+### 4. UI/UX Premium — Reformulação visual
+
+**`ExpensesPage.tsx`** — Redesign completo:
+- Header com gradiente glass sutil e ícone Receipt
+- Summary cards com liquid glass (não `bg-muted/40` flat) — usar `liquid-glass-card` existente
+- Tabs com visual mais refinado
+- Chips de filtro com estilo premium (borda glass, hover suave)
+- FAB mobile com ícone de câmera (QR) como ação secundária
+- Empty states com ilustração vetorial sutil
+- Listagem com agrupamento por data (hoje, ontem, esta semana, anterior)
+
+**`ExpenseForm.tsx`** — Reorganização:
+- Dividir em seções visuais com separadores: "Informações", "Contexto Operacional", "Pagamento", "Comprovante"
+- Botão "Escanear Nota" destacado no topo do formulário
+- Campos com labels mais claros e ícones inline
+- Auto-fill visual feedback (campo preenchido por QR com badge "QR")
+- Dois botões de ação no form: "Salvar" + "Escanear e Salvar"
+
+**`ExpenseCard.tsx`** — Enriquecimento:
+- Mostrar vínculo com transporte/veículo quando existir (ícone + label condensado)
+- Mostrar data formatada
+- Hover/active com profundidade glass
+- Indicador visual de origem (manual vs QR scan)
+
+### 5. Detalhes da despesa
+
+**Novo componente**: `src/components/expenses/ExpenseDetailSheet.tsx`
+- Bottom sheet no mobile, side panel no desktop
+- Mostra todos os campos, vínculos, comprovante preview, histórico de status
+- Ações: aprovar, recusar, solicitar ressarcimento, editar
 
 ---
 
-## Arquivos da Fase 1
+## Arquivos
 
 | Arquivo | Ação |
 |---|---|
-| `supabase/migrations/` | Nova migration com 5 tabelas + RLS + seed categorias + bucket |
-| `src/hooks/useExpenses.ts` | Novo — hook CRUD completo |
-| `src/hooks/useExpenseCategories.ts` | Novo — categorias |
-| `src/pages/ExpensesPage.tsx` | Novo — página principal do módulo |
-| `src/components/expenses/ExpenseForm.tsx` | Novo — formulário de criação/edição |
-| `src/components/expenses/ExpenseCard.tsx` | Novo — card de despesa na listagem |
-| `src/components/expenses/ReimbursementList.tsx` | Novo — tab de ressarcimentos |
-| `src/pages/Dashboard.tsx` | Adicionar card de despesas |
-| `src/components/Sidebar.tsx` | Adicionar link "Despesas" |
-| `src/components/BottomTabs.tsx` | Adicionar nos moreLinks |
-| `src/App.tsx` | Adicionar rota `/expenses` |
+| `package.json` | Adicionar `html5-qrcode` |
+| `supabase/migrations/` | Coluna `origem_lancamento` |
+| `src/lib/parseNfceQr.ts` | Novo — parser de QR NFC-e |
+| `src/components/expenses/QrScannerDialog.tsx` | Novo — scanner QR |
+| `src/components/expenses/ExpenseDetailSheet.tsx` | Novo — detalhes da despesa |
+| `src/components/expenses/ExpenseForm.tsx` | Refatorar — seções, QR integration, auto-fill |
+| `src/components/expenses/ExpenseCard.tsx` | Enriquecer — vínculos, data, origem |
+| `src/components/expenses/ReimbursementList.tsx` | Refinamento visual |
+| `src/pages/ExpensesPage.tsx` | Redesign completo — UI premium, agrupamento, QR action |
+| `src/hooks/useExpenseCategories.ts` | Auto-seed de categorias padrão |
+| `src/hooks/useExpenses.ts` | Suporte a `origem_lancamento` |
 
