@@ -415,6 +415,7 @@ export type Database = {
           id: string
           member_user_id: string | null
           org_id: string
+          origem_lancamento: string
           paid_by_name: string | null
           paid_by_user_id: string | null
           payment_method: string | null
@@ -437,6 +438,7 @@ export type Database = {
           id?: string
           member_user_id?: string | null
           org_id: string
+          origem_lancamento?: string
           paid_by_name?: string | null
           paid_by_user_id?: string | null
           payment_method?: string | null
@@ -459,6 +461,7 @@ export type Database = {
           id?: string
           member_user_id?: string | null
           org_id?: string
+          origem_lancamento?: string
           paid_by_name?: string | null
           paid_by_user_id?: string | null
           payment_method?: string | null
