@@ -3,7 +3,7 @@ import { LayoutDashboard, Car, CalendarDays, CheckSquare, MoreHorizontal } from 
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { MapPin, Hotel, Zap, Users, Settings, LogOut, ClipboardList, Gauge, FileText } from 'lucide-react';
+import { MapPin, Hotel, Zap, Users, Settings, LogOut, ClipboardList, Gauge, FileText, Receipt } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
 const mainTabs = [
@@ -16,6 +16,7 @@ const mainTabs = [
 const moreLinks = [
   { to: '/ver-escala', icon: ClipboardList, label: 'Escala' },
   { to: '/transports', icon: MapPin, label: 'Transportes' },
+  { to: '/expenses', icon: Receipt, label: 'Despesas' },
   { to: '/guests', icon: Hotel, label: 'Hóspedes' },
   { to: '/electric-carts', icon: Zap, label: 'Carrinhos Elétricos' },
   { to: '/team', icon: Users, label: 'Equipe' },

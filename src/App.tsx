@@ -21,6 +21,7 @@ import SettingsPage from "./pages/SettingsPage";
 import VerEscalaPage from "./pages/VerEscalaPage";
 import KmEmissoesPage from "./pages/KmEmissoesPage";
 import SystemReportPage from "./pages/SystemReportPage";
+import ExpensesPage from "./pages/ExpensesPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -59,6 +60,7 @@ const App = () => (
                 <Route path="/km-emissoes" element={<KmEmissoesPage />} />
                 <Route path="/settings" element={<SettingsPage />} />
                 <Route path="/system-report" element={<SystemReportPage />} />
+                <Route path="/expenses" element={<ExpensesPage />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Layout>

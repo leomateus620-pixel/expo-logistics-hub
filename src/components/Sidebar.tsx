@@ -1,7 +1,7 @@
 import { NavLink as RouterNavLink } from 'react-router-dom';
 import {
   LayoutDashboard, Car, Zap, MapPin, CalendarDays, CheckSquare, Users, Hotel, Bike,
-  PanelLeftClose, PanelLeftOpen, LogOut, Settings, ClipboardList, X, Gauge, FileText,
+  PanelLeftClose, PanelLeftOpen, LogOut, Settings, ClipboardList, X, Gauge, FileText, Receipt,
 } from 'lucide-react';
 import logo from '@/assets/logofeira26.webp';
 import { useAuth } from '@/hooks/useAuth';
@@ -17,6 +17,7 @@ import { useMemo } from 'react';
 const operacao = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/transports', icon: MapPin, label: 'Transportes' },
+  { to: '/expenses', icon: Receipt, label: 'Despesas' },
   { to: '/agenda', icon: CalendarDays, label: 'Agenda' },
   { to: '/ver-escala', icon: ClipboardList, label: 'Escala' },
   { to: '/checklist', icon: CheckSquare, label: 'Checklist' },
