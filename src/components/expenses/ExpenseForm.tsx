@@ -242,8 +242,8 @@ export default function ExpenseForm({ onSubmit, isSubmitting, initialData }: Exp
           <Select value={form.transport_id} onValueChange={handleTransportSelect}>
             <SelectTrigger className="h-11 rounded-xl"><SelectValue placeholder="Opcional" /></SelectTrigger>
             <SelectContent>
-              {transports.filter((t: any) => t.status !== 'cancelado').slice(0, 30).map((t: any) => (
-                <SelectItem key={t.id} value={t.id}>{getTransportLabel(t)}</SelectItem>
+              {transports.filter((t: any) => t.status !== 'cancelado').map((t: any) => (
+                <SelectItem key={t.id} value={t.id} className="text-xs">{getTransportLabel(t)}</SelectItem>
               ))}
             </SelectContent>
           </Select>
@@ -269,11 +269,12 @@ export default function ExpenseForm({ onSubmit, isSubmitting, initialData }: Exp
         <Select value={form.paid_by_user_id} onValueChange={handleMemberSelect}>
           <SelectTrigger className="h-11 rounded-xl"><SelectValue placeholder="Selecione o membro" /></SelectTrigger>
           <SelectContent>
-            {members.filter((m: any) => m.is_active).map((m: any) => (
+            {logisticaMembers.map((m: any) => (
               <SelectItem key={m.user_id} value={m.user_id}>{m.nome_exibicao || 'Membro'}</SelectItem>
             ))}
           </SelectContent>
         </Select>
+        <p className="text-[10px] text-muted-foreground mt-0.5">Apenas membros da comissão de Logística</p>
       </div>
 
       {form.paid_by_user_id && (
