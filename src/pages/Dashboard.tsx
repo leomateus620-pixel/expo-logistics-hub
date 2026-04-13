@@ -5,10 +5,11 @@ import { useTasks } from '@/hooks/useTasks';
 import { useEvents } from '@/hooks/useEvents';
 import { useOrgMembers } from '@/hooks/useOrgMembers';
 import { useSchedules } from '@/hooks/useSchedules';
+import { useExpenses } from '@/hooks/useExpenses';
 import StatCard from '@/components/StatCard';
 import {
   Car, Zap, MapPin, CheckSquare, CalendarDays, Users, User,
-  Hotel, ClipboardList, ArrowRight, Clock, AlertCircle, ExternalLink, FileText, Sheet,
+  Hotel, ClipboardList, ArrowRight, Clock, AlertCircle, ExternalLink, FileText, Sheet, Receipt,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -140,6 +141,7 @@ export default function Dashboard() {
   const { events, isLoading: loadEvents } = useEvents();
   const { members, isLoading: loadMembers } = useOrgMembers();
   const { shifts, assignments, isLoading: loadSchedules } = useSchedules();
+  const { stats: expenseStats } = useExpenses();
 
   const todayStr = todaySP();
   const tomorrowStr = useMemo(() => {
