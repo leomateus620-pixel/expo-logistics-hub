@@ -235,7 +235,7 @@ export default function Dashboard() {
       )}
 
       {/* ─── Acessos Rápidos ─── */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
         {/* Card — Criar Transporte */}
         <button
           type="button"
@@ -302,6 +302,34 @@ export default function Dashboard() {
               <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">Acesse a planilha utilizada pelas comissões para definir os responsáveis autorizados por data e turno.</p>
             </div>
             <ExternalLink className="w-4 h-4 text-muted-foreground/50 group-hover:text-gold transition-colors shrink-0 mt-1" />
+          </div>
+        </button>
+
+        {/* Card — Despesas */}
+        <button
+          type="button"
+          onClick={() => navigate('/expenses?action=create')}
+          className="liquid-glass-card rounded-2xl p-5 sm:p-6 border-l-2 border-success/40 text-left cursor-pointer hover:bg-muted/60 active:scale-[0.98] transition-all group"
+        >
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 rounded-xl bg-success/10 flex items-center justify-center shrink-0">
+              <Receipt className="w-6 h-6 text-success" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 mb-1">
+                <h3 className="text-base font-extrabold text-foreground">Registrar Despesa</h3>
+                {(expenseStats.pendingReceipt + expenseStats.pendingReimbursement) > 0 && (
+                  <Badge variant="secondary" className="text-[9px] px-1.5 py-0 bg-accent/15 text-accent border-0">
+                    {expenseStats.pendingReceipt + expenseStats.pendingReimbursement} pendentes
+                  </Badge>
+                )}
+              </div>
+              <p className="text-[11px] font-semibold text-foreground/80">Lançar despesa operacional</p>
+              <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">
+                R$ {expenseStats.totalAmount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })} total
+              </p>
+            </div>
+            <ArrowRight className="w-4 h-4 text-muted-foreground/50 group-hover:text-success transition-colors shrink-0 mt-1" />
           </div>
         </button>
       </div>
