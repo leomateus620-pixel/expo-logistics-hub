@@ -20,10 +20,28 @@ const DEFAULT_CATEGORIES = [
   { name: 'Emergencial', icon: 'alert-triangle', requires_vehicle: false, requires_transport: false, requires_document: false },
 ];
 
+const normalizeCategoryName = (name: string) => name.trim().toLocaleLowerCase('pt-BR');
+
+const dedupeCategories = <T extends { name: string }>(items: T[]) => {
+  const unique = new Map<string, T>();
+
+  for (const item of items) {
+    const trimmedName = item.name?.trim();
+    if (!trimmedName) continue;
+
+    const key = normalizeCategoryName(trimmedName);
+    if (unique.has(key)) continue;
+
+    unique.set(key, { ...item, name: trimmedName });
+  }
+
+  return Array.from(unique.values()).sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
+};
+
 export function useExpenseCategories() {
   const { orgId } = useCurrentOrg();
   const qc = useQueryClient();
-  const seededRef = useRef(false);
+  const seededOrgsRef = useRef(new Set<string>());
 
   const { data: categories = [], isLoading } = useQuery({
     queryKey: ['expense-categories', orgId],
@@ -36,31 +54,41 @@ export function useExpenseCategories() {
         .eq('active', true)
         .order('name');
       if (error) throw error;
-      return data || [];
+      return dedupeCategories(data || []);
     },
     enabled: !!orgId,
     staleTime: 60000,
   });
 
   const seedMutation = useMutation({
-    mutationFn: async () => {
-      if (!orgId) return;
-      const rows = DEFAULT_CATEGORIES.map(c => ({ ...c, org_id: orgId }));
+    mutationFn: async (currentOrgId: string) => {
+      const rows = DEFAULT_CATEGORIES.map((category) => ({
+        ...category,
+        name: category.name.trim(),
+        org_id: currentOrgId,
+      }));
+
       const { error } = await (supabase as any)
         .from('expense_categories')
-        .insert(rows);
+        .upsert(rows, { onConflict: 'org_id,name', ignoreDuplicates: true });
+
       if (error) throw error;
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['expense-categories', orgId] }),
+    onSuccess: (_, currentOrgId) => qc.invalidateQueries({ queryKey: ['expense-categories', currentOrgId] }),
   });
 
   // Auto-seed once if categories are empty for this org
   useEffect(() => {
-    if (!isLoading && categories.length === 0 && orgId && !seededRef.current && !seedMutation.isPending) {
-      seededRef.current = true;
-      seedMutation.mutate();
-    }
-  }, [isLoading, categories.length, orgId, seedMutation]);
+    if (!orgId || isLoading || seedMutation.isPending || categories.length > 0) return;
+    if (seededOrgsRef.current.has(orgId)) return;
+
+    seededOrgsRef.current.add(orgId);
+    seedMutation.mutate(orgId, {
+      onError: () => {
+        seededOrgsRef.current.delete(orgId);
+      },
+    });
+  }, [categories.length, isLoading, orgId, seedMutation]);
 
   return { categories, isLoading: isLoading || seedMutation.isPending };
 }

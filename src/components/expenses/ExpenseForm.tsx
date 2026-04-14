@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -38,11 +38,24 @@ const pixKeyTypes = [
 ];
 
 export default function ExpenseForm({ onSubmit, isSubmitting, initialData }: ExpenseFormProps) {
-  const { categories } = useExpenseCategories();
+  const { categories, isLoading: categoriesLoading } = useExpenseCategories();
   const { vehicles } = useVehicles();
   const { transports } = useTransports();
   const { members } = useOrgMembers();
   const { commissions } = useCommissions();
+
+  const categoryOptions = useMemo(() => {
+    const seen = new Set<string>();
+
+    return categories
+      .filter((category: any) => {
+        const key = category.name?.trim().toLocaleLowerCase('pt-BR');
+        if (!key || seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      })
+      .sort((a: any, b: any) => a.name.localeCompare(b.name, 'pt-BR'));
+  }, [categories]);
 
   const logisticaCommission = commissions.find((c: any) => c.nome?.toUpperCase().includes('LOGÍSTICA'));
   const logisticaMembers = members.filter((m: any) => m.is_active && m.commission_id === logisticaCommission?.id);
@@ -68,8 +81,6 @@ export default function ExpenseForm({ onSubmit, isSubmitting, initialData }: Exp
   const [file, setFile] = useState<File | null>(null);
   const [qrOpen, setQrOpen] = useState(false);
   const [qrFields, setQrFields] = useState<Set<string>>(new Set());
-
-  const selectedCategory = categories.find((c: any) => c.id === form.category_id);
 
   const handleChange = (field: string, value: string) => {
     setForm(prev => ({ ...prev, [field]: value }));
@@ -196,11 +207,19 @@ export default function ExpenseForm({ onSubmit, isSubmitting, initialData }: Exp
         <div className="space-y-1.5">
           <Label className="text-xs font-semibold">Categoria *</Label>
           <Select value={form.category_id} onValueChange={v => handleChange('category_id', v)}>
-            <SelectTrigger className="h-11 rounded-xl"><SelectValue placeholder="Selecione" /></SelectTrigger>
+            <SelectTrigger className="h-11 rounded-xl" disabled={categoriesLoading || categoryOptions.length === 0}>
+              <SelectValue placeholder={categoriesLoading ? 'Carregando categorias...' : 'Selecione'} />
+            </SelectTrigger>
             <SelectContent>
-              {categories.map((c: any) => (
-                <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-              ))}
+              {categoryOptions.length > 0 ? (
+                categoryOptions.map((c: any) => (
+                  <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
+                ))
+              ) : (
+                <SelectItem value="__empty" disabled>
+                  {categoriesLoading ? 'Carregando categorias...' : 'Nenhuma categoria disponível'}
+                </SelectItem>
+              )}
             </SelectContent>
           </Select>
         </div>
