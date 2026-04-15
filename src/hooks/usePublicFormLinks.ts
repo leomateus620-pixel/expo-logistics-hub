@@ -31,7 +31,7 @@ export function usePublicFormLinks() {
     queryKey: ['public_form_links', orgId],
     enabled: !!orgId,
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from('public_form_links')
         .select('*')
         .eq('org_id', orgId!)
@@ -46,7 +46,7 @@ export function usePublicFormLinks() {
       if (!orgId) throw new Error('Sem organização');
       
       // Get existing links to skip
-      const { data: existing } = await supabase
+      const { data: existing } = await (supabase as any)
         .from('public_form_links')
         .select('committee_id')
         .eq('org_id', orgId);
@@ -80,7 +80,7 @@ export function usePublicFormLinks() {
         })
       );
 
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('public_form_links')
         .insert(rows.map((r) => r.row));
       if (error) throw error;
@@ -101,7 +101,7 @@ export function usePublicFormLinks() {
 
   const toggleActive = useMutation({
     mutationFn: async ({ id, is_active }: { id: string; is_active: boolean }) => {
-      const { error } = await supabase
+      const { error } = await (supabase as any)
         .from('public_form_links')
         .update({ is_active })
         .eq('id', id);
