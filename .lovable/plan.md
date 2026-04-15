@@ -1,35 +1,37 @@
 
 
-# Copiar Todas as Comissões + Links
+# Correção: Copiar Todos os Links (29 Comissões)
 
-## Problema
-Atualmente só é possível copiar links individualmente, e apenas na sessão em que foram gerados. O usuário quer poder copiar todas as comissões com seus links de uma vez, formatado para distribuição.
+## Diagnóstico
+Os dados mostram 29 comissões e 29 links no banco. As requisições PATCH retornam 204 (sucesso). O problema provável é que o loop sequencial de 29 requisições pode falhar parcialmente ou ter timeout, e qualquer falha aborta tudo sem feedback claro.
 
-## Solução
+## Correção
 
-### Abordagem: "Regenerar Todos + Copiar Tudo"
-Como os tokens brutos não ficam salvos no banco (apenas o hash), para copiar todos os links é necessário primeiro regenerar os tokens. A solução adiciona:
+### 1. Paralelizar regeneração de tokens (`usePublicFormLinks.ts`)
+- Substituir o loop `for` sequencial por `Promise.all` para executar as 29 atualizações em paralelo
+- Reduz o tempo total de ~10s para ~1s
+- Mantém tratamento de erro individual
 
-1. **Botão "Copiar Todos os Links"** no header do card, ao lado de "Gerar links para todas"
-2. Ao clicar, regenera tokens de todos os links ativos de uma vez
-3. Copia para a área de transferência um texto formatado com todas as comissões e links alinhados:
+### 2. Melhorar feedback no "Copiar Todos" (`MobilityLinksPanel.tsx`)
+- Mostrar progresso durante a geração ("Gerando links... 15/29")
+- Se algum link falhar, copiar os que funcionaram e avisar quantos falharam
+- Garantir que o texto copiado inclua todas as 29 comissões
 
-```text
+### 3. Formato do texto copiado (já correto, manter)
+```
 📋 Links de Mobilidade — Fenasoja 2026
 
-COMISSÃO AGROPECUÁRIA
-Presidente: João Silva
-Link: https://fenasojalog.lovable.app/f/mobilidade/abc123...
+📌 AGRICULTURA, SOJA E DERIVADOS
+Presidente: Vanessa Matraszek Gnoatto
+Link: https://fenasojalog.lovable.app/f/mobilidade/TOKEN
 
-COMISSÃO DE LOGÍSTICA
-Presidente: Maria Santos
-Link: https://fenasojalog.lovable.app/f/mobilidade/def456...
+... (todas as 29)
 
 ---
-Total: 12 comissões
+Total: 29 comissões
 ```
 
-## Arquivo a modificar
-- `src/components/mobility/MobilityLinksPanel.tsx` — adicionar botão "Copiar Todos" que regenera e copia formatado
-- `src/hooks/usePublicFormLinks.ts` — adicionar mutation `regenerateAll` que regenera tokens de todos os links ativos em batch
+## Arquivos a modificar
+- `src/hooks/usePublicFormLinks.ts` — paralelizar `regenerateAllTokens`
+- `src/components/mobility/MobilityLinksPanel.tsx` — feedback de progresso
 
