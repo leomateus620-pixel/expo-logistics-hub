@@ -1,7 +1,7 @@
 import { NavLink as RouterNavLink } from 'react-router-dom';
 import {
   LayoutDashboard, Car, Zap, MapPin, CalendarDays, CheckSquare, Users, Hotel, Bike,
-  PanelLeftClose, PanelLeftOpen, LogOut, Settings, ClipboardList, X, Gauge, FileText, Receipt,
+  PanelLeftClose, PanelLeftOpen, LogOut, Settings, ClipboardList, X, Gauge, FileText, Receipt, ShieldCheck,
 } from 'lucide-react';
 import logo from '@/assets/logofeira26.webp';
 import { useAuth } from '@/hooks/useAuth';
@@ -22,6 +22,7 @@ const operacao = [
   { to: '/ver-escala', icon: ClipboardList, label: 'Escala' },
   { to: '/checklist', icon: CheckSquare, label: 'Checklist' },
   { to: '/km-emissoes', icon: Gauge, label: 'KM & Emissões' },
+  { to: '/mobility-auth', icon: ShieldCheck, label: 'Mobilidade' },
 ];
 
 const recursos = [

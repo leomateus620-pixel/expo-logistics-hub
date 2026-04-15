@@ -3,7 +3,7 @@ import { LayoutDashboard, Car, CalendarDays, CheckSquare, MoreHorizontal } from 
 import { cn } from '@/lib/utils';
 import { useState } from 'react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { MapPin, Hotel, Zap, Users, Settings, LogOut, ClipboardList, Gauge, FileText, Receipt } from 'lucide-react';
+import { MapPin, Hotel, Zap, Users, Settings, LogOut, ClipboardList, Gauge, FileText, Receipt, ShieldCheck } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
 const mainTabs = [
@@ -21,6 +21,7 @@ const moreLinks = [
   { to: '/electric-carts', icon: Zap, label: 'Carrinhos Elétricos' },
   { to: '/team', icon: Users, label: 'Equipe' },
   { to: '/km-emissoes', icon: Gauge, label: 'KM & Emissões' },
+  { to: '/mobility-auth', icon: ShieldCheck, label: 'Mobilidade' },
   { to: '/settings', icon: Settings, label: 'Configurações' },
   { to: '/system-report', icon: FileText, label: 'Relatório do Sistema' },
 ];

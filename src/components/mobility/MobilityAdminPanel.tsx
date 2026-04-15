@@ -85,11 +85,11 @@ export default function MobilityAdminPanel() {
     <div className="space-y-6">
       {/* Stats */}
       <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
-        <StatCard title="Respondidas" value={stats.submitted} icon={<Shield className="w-4 h-4" />} />
-        <StatCard title="Integrantes" value={stats.total} icon={<Users className="w-4 h-4" />} />
-        <StatCard title="Carro Elétrico" value={stats.cars} icon={<Zap className="w-4 h-4" />} />
-        <StatCard title="Patinete" value={stats.scooters} icon={<Bike className="w-4 h-4" />} />
-        <StatCard title="QR Gratuito" value={stats.qr} icon={<QrCode className="w-4 h-4" />} />
+        <StatCard label="Respondidas" value={stats.submitted} icon={<Shield className="w-4 h-4" />} />
+        <StatCard label="Integrantes" value={stats.total} icon={<Users className="w-4 h-4" />} />
+        <StatCard label="Carro Elétrico" value={stats.cars} icon={<Zap className="w-4 h-4" />} />
+        <StatCard label="Patinete" value={stats.scooters} icon={<Bike className="w-4 h-4" />} />
+        <StatCard label="QR Gratuito" value={stats.qr} icon={<QrCode className="w-4 h-4" />} />
       </div>
 
       {/* Filters */}
@@ -186,12 +186,12 @@ export default function MobilityAdminPanel() {
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-1">
                           {m.access_status !== 'liberado' && (
-                            <Button variant="ghost" size="icon" className="h-7 w-7 text-green-600" onClick={() => handleStatusChange(m.id, 'liberado')} title="Liberar">
+                            <Button variant="ghost" size="icon" className="h-7 w-7 text-success" onClick={() => handleStatusChange(m.id, 'liberado')} title="Liberar">
                               <ShieldCheck className="w-3.5 h-3.5" />
                             </Button>
                           )}
                           {m.access_status !== 'bloqueado' && (
-                            <Button variant="ghost" size="icon" className="h-7 w-7 text-red-500" onClick={() => handleStatusChange(m.id, 'bloqueado')} title="Bloquear">
+                            <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => handleStatusChange(m.id, 'bloqueado')} title="Bloquear">
                               <ShieldX className="w-3.5 h-3.5" />
                             </Button>
                           )}

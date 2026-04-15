@@ -22,6 +22,7 @@ import VerEscalaPage from "./pages/VerEscalaPage";
 import KmEmissoesPage from "./pages/KmEmissoesPage";
 import SystemReportPage from "./pages/SystemReportPage";
 import ExpensesPage from "./pages/ExpensesPage";
+import MobilityAuthPage from "./pages/MobilityAuthPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -61,6 +62,7 @@ const App = () => (
                 <Route path="/settings" element={<SettingsPage />} />
                 <Route path="/system-report" element={<SystemReportPage />} />
                 <Route path="/expenses" element={<ExpensesPage />} />
+                <Route path="/mobility-auth" element={<MobilityAuthPage />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Layout>
