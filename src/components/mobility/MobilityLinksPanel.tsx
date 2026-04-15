@@ -10,11 +10,13 @@ import { Link2, Copy, Check, Loader2, LinkIcon, RefreshCw, ClipboardList } from 
 import { toast } from 'sonner';
 
 const getPublicOrigin = () => {
-  if (typeof window === 'undefined') return 'https://fenasojalog.lovable.app';
-
-  return window.location.hostname.startsWith('id-preview--')
-    ? 'https://fenasojalog.lovable.app'
-    : window.location.origin;
+  const PUBLIC_DOMAIN = 'https://fenasojalog.lovable.app';
+  if (typeof window === 'undefined') return PUBLIC_DOMAIN;
+  const host = window.location.hostname;
+  if (host === 'fenasojalog.lovable.app' || host === 'fenasojalog.com' || host === 'www.fenasojalog.com') {
+    return window.location.origin;
+  }
+  return PUBLIC_DOMAIN;
 };
 
 export default function MobilityLinksPanel() {
