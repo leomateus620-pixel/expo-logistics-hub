@@ -16,6 +16,7 @@ export interface PublicFormLink {
   committee_id: string;
   committee_name_snapshot: string;
   president_name_snapshot: string;
+  current_token?: string | null;
   token_hash: string;
   token_hint: string;
   is_active: boolean;
@@ -69,6 +70,7 @@ export function usePublicFormLinks() {
               committee_id: c.id,
               committee_name_snapshot: c.committee_name,
               president_name_snapshot: c.president_name,
+              current_token: token,
               token_hash: tokenHash,
               token_hint: tokenHint,
               is_active: true,
@@ -103,7 +105,7 @@ export function usePublicFormLinks() {
       const tokenHint = token.slice(-4);
       const { error } = await (supabase as any)
         .from('public_form_links')
-        .update({ token_hash: tokenHash, token_hint: tokenHint })
+        .update({ current_token: token, token_hash: tokenHash, token_hint: tokenHint })
         .eq('id', linkId);
       if (error) throw error;
       return { linkId, token };
@@ -129,7 +131,7 @@ export function usePublicFormLinks() {
         prepared.map(async ({ linkId, token, tokenHash, tokenHint }) => {
           const { error } = await (supabase as any)
             .from('public_form_links')
-            .update({ token_hash: tokenHash, token_hint: tokenHint })
+            .update({ current_token: token, token_hash: tokenHash, token_hint: tokenHint })
             .eq('id', linkId);
           if (error) throw error;
           return { linkId, token };
