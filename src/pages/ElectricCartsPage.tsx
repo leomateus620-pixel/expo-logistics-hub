@@ -12,6 +12,8 @@ import { DateTimePicker } from '@/components/ui/date-time-picker';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import AuthorizationsTab from '@/components/mobility/AuthorizationsTab';
 
 const statusConfig: Record<string, { label: string; class: string }> = {
   disponivel: { label: 'Disponível', class: 'bg-success/10 text-success border-success/20' },
@@ -124,6 +126,14 @@ export default function ElectricCartsPage() {
           </Button>
         </div>
       </div>
+
+      <Tabs defaultValue="frota" className="w-full">
+        <TabsList className="mb-4">
+          <TabsTrigger value="frota">Frota</TabsTrigger>
+          <TabsTrigger value="autorizados">Autorizados</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="frota">
 
       {/* Add dialog */}
       <Dialog open={addOpen} onOpenChange={setAddOpen}>
@@ -291,6 +301,12 @@ export default function ElectricCartsPage() {
           </div>
         )}
       </div>
+        </TabsContent>
+
+        <TabsContent value="autorizados">
+          <AuthorizationsTab type="carro_eletrico" />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
