@@ -56,17 +56,19 @@ export default function MobilityLinksPanel() {
       const results = await regenerateAllTokens.mutateAsync(activeLinks.map((l) => l.id));
       const tokenMap: Record<string, string> = {};
       results.forEach((r) => { tokenMap[r.linkId] = r.token; });
-      // Also store in availableTokens for individual copy
       setAvailableTokens((prev) => ({ ...prev, ...tokenMap }));
 
-      const lines = activeLinks.map((link) => {
-        const token = tokenMap[link.id];
-        return `📌 ${link.committee_name_snapshot.toUpperCase()}\nPresidente: ${link.president_name_snapshot}\nLink: https://fenasojalog.lovable.app/f/mobilidade/${token}`;
-      });
+      const lines = results
+        .map((r) => {
+          const link = activeLinks.find((l) => l.id === r.linkId);
+          if (!link) return null;
+          return `📌 ${link.committee_name_snapshot.toUpperCase()}\nPresidente: ${link.president_name_snapshot}\nLink: https://fenasojalog.lovable.app/f/mobilidade/${r.token}`;
+        })
+        .filter(Boolean);
 
-      const text = `📋 Links de Mobilidade — Fenasoja 2026\n\n${lines.join('\n\n')}\n\n---\nTotal: ${activeLinks.length} comissões`;
+      const text = `📋 Links de Mobilidade — Fenasoja 2026\n\n${lines.join('\n\n')}\n\n---\nTotal: ${lines.length} comissões`;
       await navigator.clipboard.writeText(text);
-      toast.success(`${activeLinks.length} links copiados para a área de transferência!`);
+      toast.success(`${lines.length} links copiados para a área de transferência!`);
     } catch {
       toast.error('Erro ao gerar links');
     } finally {

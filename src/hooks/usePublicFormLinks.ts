@@ -116,17 +116,36 @@ export function usePublicFormLinks() {
 
   const regenerateAllTokens = useMutation({
     mutationFn: async (linkIds: string[]) => {
+      const prepared = await Promise.all(
+        linkIds.map(async (linkId) => {
+          const token = crypto.randomUUID();
+          const tokenHash = await sha256(token);
+          const tokenHint = token.slice(-4);
+          return { linkId, token, tokenHash, tokenHint };
+        })
+      );
+
+      const settled = await Promise.allSettled(
+        prepared.map(async ({ linkId, token, tokenHash, tokenHint }) => {
+          const { error } = await (supabase as any)
+            .from('public_form_links')
+            .update({ token_hash: tokenHash, token_hint: tokenHint })
+            .eq('id', linkId);
+          if (error) throw error;
+          return { linkId, token };
+        })
+      );
+
       const results: { linkId: string; token: string }[] = [];
-      for (const linkId of linkIds) {
-        const token = crypto.randomUUID();
-        const tokenHash = await sha256(token);
-        const tokenHint = token.slice(-4);
-        const { error } = await (supabase as any)
-          .from('public_form_links')
-          .update({ token_hash: tokenHash, token_hint: tokenHint })
-          .eq('id', linkId);
-        if (error) throw error;
-        results.push({ linkId, token });
+      let failures = 0;
+      for (const r of settled) {
+        if (r.status === 'fulfilled') results.push(r.value);
+        else failures++;
+      }
+      if (failures > 0 && results.length > 0) {
+        toast.warning(`${failures} link(s) falharam. ${results.length} copiados.`);
+      } else if (failures > 0 && results.length === 0) {
+        throw new Error('Falha ao regenerar todos os tokens');
       }
       return results;
     },
