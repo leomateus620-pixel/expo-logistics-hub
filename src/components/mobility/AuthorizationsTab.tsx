@@ -83,7 +83,7 @@ export default function AuthorizationsTab({ type }: { type: 'carro_eletrico' | '
           <SelectTrigger className="w-full sm:w-[200px] h-10"><SelectValue placeholder="Comissão" /></SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Todas</SelectItem>
-            {committees.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+            {committees.map((c: string) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
           </SelectContent>
         </Select>
         <Button size="sm" variant="outline" onClick={exportCSV} className="h-10 gap-1.5">
