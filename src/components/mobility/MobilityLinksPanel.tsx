@@ -15,8 +15,9 @@ export default function MobilityLinksPanel() {
   // Map linkId -> raw token (available after generate or regenerate)
   const [availableTokens, setAvailableTokens] = useState<Record<string, string>>({});
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [copyingAll, setCopyingAll] = useState(false);
 
-  const baseUrl = window.location.origin;
+  const publishedUrl = 'https://fenasojalog.lovable.app';
 
   const handleGenerate = async () => {
     if (!committees?.length) return;
