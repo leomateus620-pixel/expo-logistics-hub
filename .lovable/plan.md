@@ -1,76 +1,37 @@
 
-## Diagnóstico
-Encontrei a causa real do problema: os links não estão mais caindo no login. A rota pública já abre corretamente no site publicado.
 
-O erro agora é outro:
-- o formulário público carrega em `/f/mobilidade/:token`
-- mas a chamada para `resolve-public-link` volta `404 Link não encontrado`
-- isso acontece porque o token copiado já foi invalidado
+# Fix: Links usando domínio errado (preview ao invés de público)
 
-### O que está acontecendo
-Hoje o fluxo de “Copiar” e principalmente “Copiar Todos” depende de regenerar tokens novos. Isso invalida os links anteriores de todas as comissões.
+## Problema
+A função `getPublicOrigin()` em `MobilityLinksPanel.tsx` só detecta previews com prefixo `id-preview--`. Quando você acessa pelo domínio `lovableproject.com`, ele usa `window.location.origin` diretamente — gerando links com o domínio de preview que exige login no workspace do Lovable.
 
-Em outras palavras:
-- cada vez que você usa “Copiar Todos”, os 29 links mudam
-- qualquer lista enviada antes para as comissões deixa de funcionar
-- por isso parece que “todos os links estão errados”
+A tela "Access denied" não é do seu app, é da plataforma Lovable bloqueando acesso ao preview para não-membros.
 
-Também vi um problema estrutural no código:
-- `MobilityLinksPanel.tsx` monta URLs fixas com `https://fenasojalog.lovable.app`
-- o site publicado responde em `https://fenasojalog.com`
-- isso pode confundir distribuição e validação, mesmo quando a rota existe
+## Correção
 
-## Correção proposta
+### 1. Fixar `getPublicOrigin()` para sempre usar o domínio público
+Alterar para retornar sempre `https://fenasojalog.lovable.app` (ou o domínio customizado) quando não estiver no domínio público real:
 
-### 1. Parar de invalidar links ao copiar
-Alterar a lógica para que:
-- “Copiar” copie o link atual salvo
-- “Copiar Todos” copie os 29 links atuais salvos
-- regeneração fique separada em uma ação explícita como “Gerar novo link”
+```typescript
+const getPublicOrigin = () => {
+  const PUBLIC_DOMAIN = 'https://fenasojalog.lovable.app';
+  if (typeof window === 'undefined') return PUBLIC_DOMAIN;
+  const host = window.location.hostname;
+  // Se está no domínio público real, usa ele
+  if (host === 'fenasojalog.lovable.app' || host === 'fenasojalog.com' || host === 'www.fenasojalog.com') {
+    return window.location.origin;
+  }
+  // Qualquer outro domínio (preview, lovableproject, localhost) → domínio público
+  return PUBLIC_DOMAIN;
+};
+```
 
-### 2. Persistir o token bruto atual no backend
-Hoje só o hash fica salvo, então depois não dá para reconstruir o link sem regenerar.
-Precisaremos:
-- adicionar um campo seguro para guardar o token atual
-- manter o `token_hash` para validação pública
-- usar o token salvo apenas no painel interno para cópia
+### 2. Atualizar tokens no banco para os 29 links
+Os tokens nos links que você colou já estão salvos no banco. Apenas o domínio precisa mudar. Após a correção no código, basta usar "Copiar Todos" novamente para obter os links corretos com o domínio público.
 
-Assim os links passam a ser estáveis até alguém clicar manualmente em regenerar.
+## Resultado
+Todos os 29 links passarão a usar `https://fenasojalog.lovable.app/f/mobilidade/TOKEN` — acessível por qualquer pessoa sem login.
 
-### 3. Corrigir a base de URL
-Trocar o domínio hardcoded por uma origem confiável, para os links serem gerados corretamente no domínio público atual.
+## Arquivo
+- `src/components/mobility/MobilityLinksPanel.tsx` — apenas a função `getPublicOrigin()`
 
-### 4. Ajustar a UI do painel
-No painel de links:
-- “Copiar” = copia o link atual
-- “Copiar Todos” = copia todas as comissões com os links atuais
-- “Gerar novo link” = rotaciona apenas aquela comissão
-- opcionalmente “Regenerar todos” como ação separada e com confirmação
-
-### 5. Recuperar os 29 links válidos
-Depois da correção:
-- gerar uma nova rodada única de links válidos
-- copiar a lista final das 29 comissões
-- usar essa lista como versão oficial para envio
-
-## Arquivos / camadas a alterar
-- `src/components/mobility/MobilityLinksPanel.tsx`
-- `src/hooks/usePublicFormLinks.ts`
-- migração no backend para persistir token atual
-- possivelmente `resolve-public-link` / `submit-public-form` apenas se precisarem de ajuste complementar
-
-## Resultado esperado
-Após a implementação:
-- os 29 links deixam de “quebrar” ao copiar
-- cada comissão mantém seu link funcional
-- o botão “Copiar Todos” passa a copiar a lista correta sem invalidar nada
-- somente ações explícitas de regeneração mudam o link de uma comissão
-
-## Detalhe técnico
-O comportamento atual é instável por design:
-- o banco guarda apenas `token_hash`
-- o frontend não consegue copiar links antigos após refresh
-- por isso ele foi implementado regenerando tokens no momento da cópia
-- essa estratégia torna qualquer link previamente distribuído inválido
-
-A correção correta é persistir o token atual de forma protegida no backend e separar “copiar” de “regenerar”.
