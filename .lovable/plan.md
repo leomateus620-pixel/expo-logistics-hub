@@ -1,37 +1,27 @@
 
 
-# Correção: Copiar Todos os Links (29 Comissões)
+# Diagnóstico: Links Redirecionando para Login
 
-## Diagnóstico
-Os dados mostram 29 comissões e 29 links no banco. As requisições PATCH retornam 204 (sucesso). O problema provável é que o loop sequencial de 29 requisições pode falhar parcialmente ou ter timeout, e qualquer falha aborta tudo sem feedback claro.
+## Causa Raiz
+O site publicado em `fenasojalog.lovable.app` / `fenasojalog.com` está com uma **versão antiga do código** — anterior à adição da rota pública `/f/mobilidade/:token`. Por isso, todos os 29 links caem no catch-all `/*` que exige autenticação e mostra a tela de login.
 
-## Correção
+**Prova:**
+- A edge function `resolve-public-link` funciona perfeitamente (testada com token `0943b0f2...` → retornou "Agricultura, Soja e Derivados")
+- O código-fonte em `App.tsx` linha 50 define a rota pública corretamente, ANTES do `AuthGuard`
+- Ao acessar `fenasojalog.com/f/mobilidade/TOKEN` no navegador, o site mostra a tela de login — confirmando que o deploy publicado não tem essa rota
 
-### 1. Paralelizar regeneração de tokens (`usePublicFormLinks.ts`)
-- Substituir o loop `for` sequencial por `Promise.all` para executar as 29 atualizações em paralelo
-- Reduz o tempo total de ~10s para ~1s
-- Mantém tratamento de erro individual
+## Solução
 
-### 2. Melhorar feedback no "Copiar Todos" (`MobilityLinksPanel.tsx`)
-- Mostrar progresso durante a geração ("Gerando links... 15/29")
-- Se algum link falhar, copiar os que funcionaram e avisar quantos falharam
-- Garantir que o texto copiado inclua todas as 29 comissões
+### Passo 1 — Republicar o site
+Você precisa clicar em **Publish → Update** no editor do Lovable para publicar a versão mais recente do frontend. Isso vai incluir a rota pública no deploy.
 
-### 3. Formato do texto copiado (já correto, manter)
-```
-📋 Links de Mobilidade — Fenasoja 2026
+### Passo 2 — Nenhuma alteração de código necessária
+O código está correto:
+- Rota `/f/mobilidade/:token` está isolada fora do `AuthGuard`
+- Edge functions `resolve-public-link` e `submit-public-form` funcionam
+- O formulário público (`PublicMobilityFormPage`) está completo
+- Os 29 links no banco estão ativos e com tokens válidos
 
-📌 AGRICULTURA, SOJA E DERIVADOS
-Presidente: Vanessa Matraszek Gnoatto
-Link: https://fenasojalog.lovable.app/f/mobilidade/TOKEN
-
-... (todas as 29)
-
----
-Total: 29 comissões
-```
-
-## Arquivos a modificar
-- `src/hooks/usePublicFormLinks.ts` — paralelizar `regenerateAllTokens`
-- `src/components/mobility/MobilityLinksPanel.tsx` — feedback de progresso
+## Ação necessária do usuário
+Clicar no botão **Publish** (canto superior direito) → **Update** para atualizar o site publicado. Após isso, todos os 29 links passarão a exibir o formulário público diretamente, sem exigir login.
 
