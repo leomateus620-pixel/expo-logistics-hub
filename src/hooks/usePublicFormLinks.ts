@@ -114,6 +114,28 @@ export function usePublicFormLinks() {
     onError: (e: any) => toast.error(e.message),
   });
 
+  const regenerateAllTokens = useMutation({
+    mutationFn: async (linkIds: string[]) => {
+      const results: { linkId: string; token: string }[] = [];
+      for (const linkId of linkIds) {
+        const token = crypto.randomUUID();
+        const tokenHash = await sha256(token);
+        const tokenHint = token.slice(-4);
+        const { error } = await (supabase as any)
+          .from('public_form_links')
+          .update({ token_hash: tokenHash, token_hint: tokenHint })
+          .eq('id', linkId);
+        if (error) throw error;
+        results.push({ linkId, token });
+      }
+      return results;
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['public_form_links', orgId] });
+    },
+    onError: (e: any) => toast.error(e.message),
+  });
+
   const toggleActive = useMutation({
     mutationFn: async ({ id, is_active }: { id: string; is_active: boolean }) => {
       const { error } = await (supabase as any)
@@ -128,5 +150,5 @@ export function usePublicFormLinks() {
     onError: (e: any) => toast.error(e.message),
   });
 
-  return { ...query, generateAll, regenerateToken, toggleActive };
+  return { ...query, generateAll, regenerateToken, regenerateAllTokens, toggleActive };
 }

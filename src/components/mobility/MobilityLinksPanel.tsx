@@ -6,17 +6,18 @@ import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Link2, Copy, Check, Loader2, LinkIcon, RefreshCw } from 'lucide-react';
+import { Link2, Copy, Check, Loader2, LinkIcon, RefreshCw, ClipboardList } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function MobilityLinksPanel() {
-  const { data: links, isLoading, generateAll, regenerateToken, toggleActive } = usePublicFormLinks();
+  const { data: links, isLoading, generateAll, regenerateToken, regenerateAllTokens, toggleActive } = usePublicFormLinks();
   const { committees } = useOfficialCommittees();
   // Map linkId -> raw token (available after generate or regenerate)
   const [availableTokens, setAvailableTokens] = useState<Record<string, string>>({});
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [copyingAll, setCopyingAll] = useState(false);
 
-  const baseUrl = window.location.origin;
+  const publishedUrl = 'https://fenasojalog.lovable.app';
 
   const handleGenerate = async () => {
     if (!committees?.length) return;
@@ -36,15 +37,45 @@ export default function MobilityLinksPanel() {
   };
 
   const copyLink = async (token: string, id: string) => {
-    const url = `${baseUrl}/f/mobilidade/${token}`;
+    const url = `https://fenasojalog.lovable.app/f/mobilidade/${token}`;
     await navigator.clipboard.writeText(url);
     setCopiedId(id);
     toast.success('Link copiado!');
     setTimeout(() => setCopiedId(null), 2000);
   };
 
+  const handleCopyAll = async () => {
+    if (!links?.length) return;
+    const activeLinks = links.filter((l) => l.is_active);
+    if (!activeLinks.length) {
+      toast.error('Nenhum link ativo para copiar');
+      return;
+    }
+    setCopyingAll(true);
+    try {
+      const results = await regenerateAllTokens.mutateAsync(activeLinks.map((l) => l.id));
+      const tokenMap: Record<string, string> = {};
+      results.forEach((r) => { tokenMap[r.linkId] = r.token; });
+      // Also store in availableTokens for individual copy
+      setAvailableTokens((prev) => ({ ...prev, ...tokenMap }));
+
+      const lines = activeLinks.map((link) => {
+        const token = tokenMap[link.id];
+        return `📌 ${link.committee_name_snapshot.toUpperCase()}\nPresidente: ${link.president_name_snapshot}\nLink: https://fenasojalog.lovable.app/f/mobilidade/${token}`;
+      });
+
+      const text = `📋 Links de Mobilidade — Fenasoja 2026\n\n${lines.join('\n\n')}\n\n---\nTotal: ${activeLinks.length} comissões`;
+      await navigator.clipboard.writeText(text);
+      toast.success(`${activeLinks.length} links copiados para a área de transferência!`);
+    } catch {
+      toast.error('Erro ao gerar links');
+    } finally {
+      setCopyingAll(false);
+    }
+  };
+
   const totalLinks = links?.length ?? 0;
-  const activeLinks = links?.filter((l) => l.is_active).length ?? 0;
+  const activeCount = links?.filter((l) => l.is_active).length ?? 0;
 
   return (
     <div className="space-y-4">
@@ -57,13 +88,21 @@ export default function MobilityLinksPanel() {
                 Links de Acesso Público
               </CardTitle>
               <CardDescription>
-                {totalLinks} links gerados · {activeLinks} ativos
+                {totalLinks} links gerados · {activeCount} ativos
               </CardDescription>
             </div>
-            <Button onClick={handleGenerate} disabled={generateAll.isPending || !committees?.length} size="sm">
-              {generateAll.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <LinkIcon className="w-4 h-4 mr-1" />}
-              Gerar links para todas
-            </Button>
+            <div className="flex items-center gap-2">
+              {!!links?.length && (
+                <Button onClick={handleCopyAll} disabled={copyingAll || regenerateAllTokens.isPending} size="sm" variant="outline">
+                  {copyingAll ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <ClipboardList className="w-4 h-4 mr-1" />}
+                  Copiar Todos
+                </Button>
+              )}
+              <Button onClick={handleGenerate} disabled={generateAll.isPending || !committees?.length} size="sm">
+                {generateAll.isPending ? <Loader2 className="w-4 h-4 animate-spin mr-1" /> : <LinkIcon className="w-4 h-4 mr-1" />}
+                Gerar links para todas
+              </Button>
+            </div>
           </div>
         </CardHeader>
         <CardContent>
