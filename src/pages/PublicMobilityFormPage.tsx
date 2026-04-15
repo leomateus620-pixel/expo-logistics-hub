@@ -69,7 +69,7 @@ export default function PublicMobilityFormPage() {
       <div className="w-full max-w-lg">
         {/* Header */}
         <div className="text-center mb-6">
-          <div className="inline-flex items-center gap-2 text-amber-700 mb-2">
+          <div className="inline-flex items-center gap-2 text-primary mb-2">
             <ShieldCheck className="w-6 h-6" />
             <span className="font-bold text-lg">Fenasoja 2026</span>
           </div>
@@ -80,7 +80,7 @@ export default function PublicMobilityFormPage() {
         {status === 'loading' && (
           <Card>
             <CardContent className="py-12 flex flex-col items-center gap-3">
-              <Loader2 className="w-8 h-8 animate-spin text-amber-600" />
+              <Loader2 className="w-8 h-8 animate-spin text-primary" />
               <p className="text-muted-foreground">Validando link...</p>
             </CardContent>
           </Card>
@@ -101,14 +101,14 @@ export default function PublicMobilityFormPage() {
 
         {/* Valid */}
         {status === 'valid' && data && (
-          <Card className="border-amber-200">
+          <Card className="border-primary/30">
             <CardHeader>
               <CardTitle className="text-lg">{data.committee_name}</CardTitle>
               <p className="text-sm text-muted-foreground">Presidente: {data.president_name}</p>
             </CardHeader>
             <CardContent className="flex flex-col items-center gap-3 py-8">
-              <CheckCircle2 className="w-10 h-10 text-green-600" />
-              <p className="font-medium text-green-700">Link válido!</p>
+              <CheckCircle2 className="w-10 h-10 text-primary" />
+              <p className="font-medium text-primary">Link válido!</p>
               <p className="text-sm text-muted-foreground text-center">
                 O formulário de autorização de mobilidade será disponibilizado em breve nesta página.
               </p>
