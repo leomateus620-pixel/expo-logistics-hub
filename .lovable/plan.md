@@ -1,73 +1,145 @@
 
-# Correção das categorias duplicadas no formulário de despesas
 
-## Diagnóstico
-Encontrei a causa principal da duplicação:
+# Módulo de Autorização de Mobilidade por Comissão
 
-- O hook `useExpenseCategories` faz **auto-seed no cliente** quando a lista vem vazia
-- A tabela `expense_categories` **não tem proteção de unicidade por organização + nome**
-- Como o app usa cache persistido e pode abrir múltiplas sessões/re-renderizações, o seed pode acontecer mais de uma vez em cenários de corrida
-- O formulário (`ExpenseForm.tsx`) renderiza a lista exatamente como vem do banco, então duplicatas existentes aparecem no select
+## Resumo
 
-Isso explica o comportamento do print: o problema não é só visual, é **estrutural de dados**.
+Criar um módulo completo para que cada comissão da Fenasoja registre quais integrantes estão autorizados a usar carro elétrico e/ou patinete. Inclui seed de 29 comissões oficiais, formulário de solicitação, cadastro de integrantes, e painel administrativo com filtros, contadores e exportação.
 
-## O que vou implementar
+## Estrutura de Dados (3 tabelas novas + seed)
 
-### 1. Correção definitiva no banco
-Criar uma migration para:
-- remover categorias duplicadas já existentes por organização/nome
-- manter apenas 1 registro ativo por categoria
-- criar uma proteção de unicidade para impedir novas duplicações
+### Tabela `official_committees`
+Armazena a base oficial de comissões/presidentes. Serve como referência imutável para histórico.
 
-Estratégia:
-- normalizar por `org_id + name`
-- apagar registros repetidos preservando o mais antigo ou mais consistente
-- criar `UNIQUE INDEX` em `(org_id, name)`
+```sql
+CREATE TABLE official_committees (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  org_id uuid NOT NULL,
+  committee_name text NOT NULL,
+  president_name text NOT NULL,
+  is_active boolean NOT NULL DEFAULT true,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now(),
+  UNIQUE(org_id, committee_name)
+);
+```
 
-Isso resolve a origem do bug.
+RLS: select para membros da org, insert/update/delete para admin/gestor.
 
-### 2. Seed robusto e idempotente
-Refatorar `src/hooks/useExpenseCategories.ts` para que o seed:
-- use inserção idempotente
-- não dependa apenas de `categories.length === 0`
-- trate conflito sem gerar erro ou duplicação
-- invalide o cache só quando necessário
+### Tabela `committee_mobility_forms`
+Registro de cada solicitação de mobilidade por comissão.
 
-Também vou adicionar proteção local para evitar nova tentativa redundante no mesmo ciclo de uso.
+```sql
+CREATE TABLE committee_mobility_forms (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  org_id uuid NOT NULL,
+  committee_id uuid NOT NULL REFERENCES official_committees(id),
+  committee_name_snapshot text NOT NULL,
+  president_name_snapshot text NOT NULL,
+  operational_responsible_name text,
+  operational_responsible_phone text,
+  operational_responsible_email text,
+  needs_electric_car boolean NOT NULL DEFAULT false,
+  needs_scooter boolean NOT NULL DEFAULT false,
+  submission_status text NOT NULL DEFAULT 'rascunho',
+  submitted_at timestamptz,
+  submitted_by_user_id uuid,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+```
 
-### 3. UX/performance no select de categorias
-Refinar `src/components/expenses/ExpenseForm.tsx` para:
-- deduplicar defensivamente as categorias recebidas antes de renderizar
-- ordenar de forma estável
-- evitar exibição repetida mesmo se houver resíduo temporário de cache
-- manter o comportamento atual do formulário sem quebrar integrações
+RLS: select para membros, insert/update para admin/gestor/operador, delete para admin/gestor.
 
-Assim, o usuário deixa de ver nomes repetidos imediatamente.
+### Tabela `committee_mobility_members`
+Integrantes autorizados por formulário.
 
-### 4. Compatibilidade e segurança
-Vou preservar:
-- arquitetura atual com React Query
-- integração com o módulo de despesas já existente
-- regras de RLS atuais
-- categorias padrão e vínculos operacionais já implantados
+```sql
+CREATE TABLE committee_mobility_members (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  org_id uuid NOT NULL,
+  form_id uuid NOT NULL REFERENCES committee_mobility_forms(id) ON DELETE CASCADE,
+  committee_id uuid NOT NULL REFERENCES official_committees(id),
+  member_name text NOT NULL,
+  member_role text,
+  member_identifier text,
+  access_electric_car boolean NOT NULL DEFAULT false,
+  access_scooter boolean NOT NULL DEFAULT false,
+  qr_access_free boolean NOT NULL DEFAULT false,
+  access_status text NOT NULL DEFAULT 'pendente',
+  notes text,
+  created_at timestamptz NOT NULL DEFAULT now(),
+  updated_at timestamptz NOT NULL DEFAULT now()
+);
+```
 
-Não vou alterar contratos do formulário nem o fluxo de criação de despesa além do necessário para robustez.
+RLS: mesma lógica das demais tabelas do sistema.
 
-## Arquivos que serão alterados
-- `supabase/migrations/...sql` — saneamento + trava de unicidade
-- `src/hooks/useExpenseCategories.ts` — seed idempotente e mais resiliente
-- `src/components/expenses/ExpenseForm.tsx` — renderização deduplicada e UX melhor no select
+### Seed das 29 comissões oficiais
+Inserir via migration as 29 comissões com seus presidentes para todas as orgs existentes. Usar `ON CONFLICT DO NOTHING` para segurança.
 
-## Resultado esperado
-Após a implementação:
-- o select de categorias deixará de mostrar itens duplicados
-- o banco ficará protegido contra novas duplicações
-- o primeiro carregamento continuará funcionando sem erro
-- a experiência ficará mais limpa, previsível e estável mesmo com cache/offline
+## Arquivos a criar
 
-## Detalhe técnico
-A correção precisa acontecer em **duas camadas**:
-1. **Banco**: remover duplicatas existentes e bloquear novas
-2. **Frontend**: deduplicar a lista renderizada e tornar o seed seguro
+| Arquivo | Descrição |
+|---|---|
+| `supabase/migrations/...sql` | Criação das 3 tabelas, RLS, seed |
+| `src/hooks/useOfficialCommittees.ts` | CRUD para comissões oficiais |
+| `src/hooks/useMobilityForms.ts` | CRUD para formulários de mobilidade |
+| `src/hooks/useMobilityMembers.ts` | CRUD para integrantes autorizados |
+| `src/pages/MobilityAuthPage.tsx` | Página principal com painel admin + formulário |
+| `src/components/mobility/MobilityForm.tsx` | Formulário de solicitação por comissão |
+| `src/components/mobility/MobilityMemberRow.tsx` | Linha de integrante no formulário |
+| `src/components/mobility/MobilityAdminPanel.tsx` | Painel com stats, filtros, tabela, exportação |
 
-Sem a trava no banco, o bug pode voltar. Sem a defesa no frontend, resíduos antigos ainda podem aparecer até o cache ser renovado.
+## Arquivos a modificar
+
+| Arquivo | Alteração |
+|---|---|
+| `src/App.tsx` | Adicionar rota `/mobility-auth` |
+| `src/components/Sidebar.tsx` | Adicionar link "Mobilidade" no grupo Operação |
+| `src/components/BottomTabs.tsx` | Adicionar link no menu "Mais" |
+
+## Funcionalidades do formulário
+
+- Select de comissão populado com as 29 oficiais
+- Auto-preenche presidente oficial (somente leitura para não-admin)
+- Campos de responsável operacional (nome, telefone, email)
+- Toggle "Precisa de carro elétrico?" / "Precisa de patinete?"
+- Área dinâmica para adicionar integrantes quando sim
+- Cada integrante: nome, cargo, identificador, checkbox carro/patinete/ambos, QR gratuito, observação
+- Botão de enviar que salva snapshot do presidente no formulário
+
+## Funcionalidades do painel administrativo
+
+- Cards de resumo: comissões respondidas, total integrantes, carro elétrico, patinete, QR gratuito
+- Busca por nome de integrante
+- Filtros: comissão, modal (carro/patinete), status de liberação
+- Tabela com todos os integrantes autorizados
+- Ações: liberar, revisar, bloquear acesso
+- Exportação CSV filtrada (todos, só carro, só patinete)
+- Expandir formulário de cada comissão para ver detalhes
+
+## Fluxo de dados
+
+```text
+Comissão oficial (seed)
+  └─> Formulário de mobilidade (1 por comissão)
+        └─> Integrantes autorizados (N por formulário)
+              └─> Status: pendente → liberado / bloqueado
+```
+
+## Segurança
+
+- RLS em todas as tabelas usando `is_org_member` e `get_user_org_role`
+- Snapshots de presidente/comissão no formulário para preservar histórico
+- Unicidade de integrante por comissão+modal via validação no frontend
+- Audit trail via tabela `audit_log` existente
+
+## UX/UI
+
+- Design consistente com o restante do sistema (cards, badges, tons gold)
+- Responsivo mobile/desktop
+- Estados de loading, empty state, sucesso e erro
+- Formulário limpo e guiado passo a passo
+- Painel operacional com leitura rápida
+
