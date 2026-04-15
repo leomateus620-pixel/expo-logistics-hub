@@ -1076,6 +1076,7 @@ export type Database = {
           committee_id: string
           committee_name_snapshot: string
           created_at: string
+          current_token: string | null
           id: string
           is_active: boolean
           org_id: string
@@ -1088,6 +1089,7 @@ export type Database = {
           committee_id: string
           committee_name_snapshot: string
           created_at?: string
+          current_token?: string | null
           id?: string
           is_active?: boolean
           org_id: string
@@ -1100,6 +1102,7 @@ export type Database = {
           committee_id?: string
           committee_name_snapshot?: string
           created_at?: string
+          current_token?: string | null
           id?: string
           is_active?: boolean
           org_id?: string
