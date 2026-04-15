@@ -98,7 +98,7 @@ export default function PublicMobilityFormPage() {
         setStatus('invalid');
       }
     })();
-  }, [token]);
+  }, [token, baseUrl]);
 
   const updateMember = useCallback((index: number, field: keyof MemberEntry, value: any) => {
     setMembers(prev => prev.map((m, i) => i === index ? { ...m, [field]: value } : m));
@@ -217,7 +217,7 @@ export default function PublicMobilityFormPage() {
             </Card>
 
             {data.has_existing_submission && (
-              <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 text-sm text-amber-700">
+              <div className="rounded-lg border border-warning/30 bg-warning/5 p-3 text-sm text-warning-foreground">
                 ⚠️ Já existe uma submissão para esta comissão. Enviar novamente irá atualizar os dados anteriores.
               </div>
             )}
