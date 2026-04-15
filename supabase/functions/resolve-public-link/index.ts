@@ -54,10 +54,30 @@ Deno.serve(async (req) => {
       );
     }
 
+    // Check for existing submission
+    const { data: existingForm } = await supabase
+      .from("public_mobility_forms")
+      .select("id, operational_responsible_name, operational_responsible_phone, operational_responsible_email, needs_electric_car, needs_scooter, submission_status, submitted_at")
+      .eq("link_id", data.id)
+      .maybeSingle();
+
+    let existing_members: any[] = [];
+    if (existingForm) {
+      const { data: members } = await supabase
+        .from("public_mobility_members")
+        .select("member_name, member_role, member_identifier, access_electric_car, access_scooter, qr_access_free, notes")
+        .eq("form_id", existingForm.id)
+        .order("member_name");
+      existing_members = members || [];
+    }
+
     return new Response(
       JSON.stringify({
         committee_name: data.committee_name_snapshot,
         president_name: data.president_name_snapshot,
+        has_existing_submission: !!existingForm,
+        existing_form: existingForm || null,
+        existing_members,
       }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
