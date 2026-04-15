@@ -23,6 +23,7 @@ import KmEmissoesPage from "./pages/KmEmissoesPage";
 import SystemReportPage from "./pages/SystemReportPage";
 import ExpensesPage from "./pages/ExpensesPage";
 import MobilityAuthPage from "./pages/MobilityAuthPage";
+import PublicMobilityFormPage from "./pages/PublicMobilityFormPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -44,30 +45,38 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <AuthGuard>
-          <OrgGuard>
-            <Layout>
-              <Routes>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="/vehicles" element={<VehiclesPage />} />
-                <Route path="/electric-carts" element={<ElectricCartsPage />} />
-                <Route path="/scooters" element={<ScootersPage />} />
-                <Route path="/transports" element={<TransportsPage />} />
-                <Route path="/guests" element={<GuestsPage />} />
-                <Route path="/agenda" element={<AgendaPage />} />
-                <Route path="/checklist" element={<ChecklistPage />} />
-                <Route path="/team" element={<TeamPage />} />
-                <Route path="/ver-escala" element={<VerEscalaPage />} />
-                <Route path="/km-emissoes" element={<KmEmissoesPage />} />
-                <Route path="/settings" element={<SettingsPage />} />
-                <Route path="/system-report" element={<SystemReportPage />} />
-                <Route path="/expenses" element={<ExpensesPage />} />
-                <Route path="/mobility-auth" element={<MobilityAuthPage />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </Layout>
-          </OrgGuard>
-        </AuthGuard>
+        <Routes>
+          {/* Public isolated route — no auth, no layout */}
+          <Route path="/f/mobilidade/:token" element={<PublicMobilityFormPage />} />
+
+          {/* Authenticated app */}
+          <Route path="/*" element={
+            <AuthGuard>
+              <OrgGuard>
+                <Layout>
+                  <Routes>
+                    <Route path="/" element={<Dashboard />} />
+                    <Route path="/vehicles" element={<VehiclesPage />} />
+                    <Route path="/electric-carts" element={<ElectricCartsPage />} />
+                    <Route path="/scooters" element={<ScootersPage />} />
+                    <Route path="/transports" element={<TransportsPage />} />
+                    <Route path="/guests" element={<GuestsPage />} />
+                    <Route path="/agenda" element={<AgendaPage />} />
+                    <Route path="/checklist" element={<ChecklistPage />} />
+                    <Route path="/team" element={<TeamPage />} />
+                    <Route path="/ver-escala" element={<VerEscalaPage />} />
+                    <Route path="/km-emissoes" element={<KmEmissoesPage />} />
+                    <Route path="/settings" element={<SettingsPage />} />
+                    <Route path="/system-report" element={<SystemReportPage />} />
+                    <Route path="/expenses" element={<ExpensesPage />} />
+                    <Route path="/mobility-auth" element={<MobilityAuthPage />} />
+                    <Route path="*" element={<NotFound />} />
+                  </Routes>
+                </Layout>
+              </OrgGuard>
+            </AuthGuard>
+          } />
+        </Routes>
       </BrowserRouter>
     </TooltipProvider>
   </PersistQueryClientProvider>

@@ -902,6 +902,60 @@ export type Database = {
         }
         Relationships: []
       }
+      public_form_links: {
+        Row: {
+          committee_id: string
+          committee_name_snapshot: string
+          created_at: string
+          id: string
+          is_active: boolean
+          org_id: string
+          president_name_snapshot: string
+          token_hash: string
+          token_hint: string
+          updated_at: string
+        }
+        Insert: {
+          committee_id: string
+          committee_name_snapshot: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          org_id: string
+          president_name_snapshot: string
+          token_hash: string
+          token_hint: string
+          updated_at?: string
+        }
+        Update: {
+          committee_id?: string
+          committee_name_snapshot?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          org_id?: string
+          president_name_snapshot?: string
+          token_hash?: string
+          token_hint?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "public_form_links_committee_id_fkey"
+            columns: ["committee_id"]
+            isOneToOne: false
+            referencedRelation: "official_committees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "public_form_links_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       reimbursements: {
         Row: {
           approved_amount: number | null

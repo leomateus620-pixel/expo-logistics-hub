@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ClipboardList, ShieldCheck } from 'lucide-react';
+import { ClipboardList, ShieldCheck, Link2 } from 'lucide-react';
 import MobilityForm from '@/components/mobility/MobilityForm';
 import MobilityAdminPanel from '@/components/mobility/MobilityAdminPanel';
+import MobilityLinksPanel from '@/components/mobility/MobilityLinksPanel';
 import PageTransition from '@/components/PageTransition';
 
 export default function MobilityAuthPage() {
@@ -26,12 +27,18 @@ export default function MobilityAuthPage() {
             <TabsTrigger value="form" className="gap-1.5">
               <ClipboardList className="w-4 h-4" /> Nova Solicitação
             </TabsTrigger>
+            <TabsTrigger value="links" className="gap-1.5">
+              <Link2 className="w-4 h-4" /> Links
+            </TabsTrigger>
           </TabsList>
           <TabsContent value="admin" className="mt-4">
             <MobilityAdminPanel />
           </TabsContent>
           <TabsContent value="form" className="mt-4">
             <MobilityForm onSuccess={() => setTab('admin')} />
+          </TabsContent>
+          <TabsContent value="links" className="mt-4">
+            <MobilityLinksPanel />
           </TabsContent>
         </Tabs>
       </div>
