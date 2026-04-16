@@ -1,11 +1,12 @@
 import { useMemo, useState } from 'react';
-import { Download, Search, Shield, ShieldCheck, ShieldX, Users, Zap, Bike, QrCode } from 'lucide-react';
+import { Download, Search, Shield, ShieldCheck, ShieldX, Users, Zap, Bike, QrCode, Trash2 } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { useMobilityForms } from '@/hooks/useMobilityForms';
 import { useMobilityMembers } from '@/hooks/useMobilityMembers';
 import { useOfficialCommittees } from '@/hooks/useOfficialCommittees';
@@ -24,7 +25,7 @@ const statusLabels: Record<string, string> = {
 
 export default function MobilityAdminPanel() {
   const { forms } = useMobilityForms();
-  const { allMembers, allMembersLoading, updateMember } = useMobilityMembers();
+  const { allMembers, allMembersLoading, updateMember, deleteMember } = useMobilityMembers();
   const { committees } = useOfficialCommittees();
 
   const [search, setSearch] = useState('');
@@ -57,6 +58,13 @@ export default function MobilityAdminPanel() {
       await updateMember.mutateAsync({ id, access_status: newStatus });
       toast.success(`Status atualizado para ${statusLabels[newStatus]}`);
     } catch { toast.error('Erro ao atualizar status'); }
+  };
+
+  const handleDelete = async (id: string, name: string) => {
+    try {
+      await deleteMember.mutateAsync(id);
+      toast.success(`${name} removido(a)`);
+    } catch { toast.error('Erro ao excluir integrante'); }
   };
 
   const exportCSV = () => {
@@ -195,6 +203,27 @@ export default function MobilityAdminPanel() {
                               <ShieldX className="w-3.5 h-3.5" />
                             </Button>
                           )}
+                          <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                              <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" title="Excluir">
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                              <AlertDialogHeader>
+                                <AlertDialogTitle>Excluir integrante?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                  Esta ação removerá <strong>{m.member_name}</strong> e todas as autorizações de mobilidade vinculadas. Não poderá ser desfeita.
+                                </AlertDialogDescription>
+                              </AlertDialogHeader>
+                              <AlertDialogFooter>
+                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => handleDelete(m.id, m.member_name)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                                  Excluir
+                                </AlertDialogAction>
+                              </AlertDialogFooter>
+                            </AlertDialogContent>
+                          </AlertDialog>
                         </div>
                       </TableCell>
                     </TableRow>
