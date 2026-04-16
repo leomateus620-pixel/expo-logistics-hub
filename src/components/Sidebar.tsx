@@ -66,22 +66,22 @@ function SidebarBadge({ count }: { count: number }) {
 
 export default function Sidebar({ collapsed, onToggle, isMobile, mobileOpen, onMobileClose }: SidebarProps) {
   const { signOut } = useAuth();
-  const { hasCapability, isLoading: capsLoading } = useCapabilities();
+  const { hasFullAccess, capSet, isLoading: capsLoading } = useCapabilities();
   const { transports } = useTransports();
   const { events } = useEvents();
   const { tasks } = useTasks();
   const { members } = useOrgMembers();
 
-  // Filter groups based on capabilities (only when caps are resolved)
+  // Filter groups based on capabilities. Use primitive deps so memo is stable.
   const groups = useMemo(() => {
     if (capsLoading) return [];
     return allGroups
       .map(group => ({
         ...group,
-        links: group.links.filter(link => hasCapability(link.cap)),
+        links: group.links.filter(link => hasFullAccess || capSet.has(link.cap)),
       }))
       .filter(group => group.links.length > 0);
-  }, [hasCapability, capsLoading]);
+  }, [hasFullAccess, capSet, capsLoading]);
 
   const badges = useMemo(() => {
     const activeTransports = transports.filter((t: any) => t.status === 'em_andamento').length;

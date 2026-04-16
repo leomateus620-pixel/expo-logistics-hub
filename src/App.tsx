@@ -5,6 +5,8 @@ import { QueryClient } from "@tanstack/react-query";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./contexts/AuthProvider";
+import { CapabilitiesProvider } from "./contexts/CapabilitiesProvider";
 import AuthGuard from "./components/AuthGuard";
 import OrgGuard from "./components/OrgGuard";
 import CapabilityGuard from "./components/CapabilityGuard";
@@ -43,19 +45,26 @@ const FullAccessRoute = ({ children }: { children: React.ReactNode }) => (
   <CapabilityGuard capability="full_access">{children}</CapabilityGuard>
 );
 
+const lastUserId = (typeof window !== 'undefined' && localStorage.getItem('fenasoja-last-user-id')) || 'anon';
+
 const App = () => (
-  <PersistQueryClientProvider client={queryClient} persistOptions={{ persister, maxAge: 1000 * 60 * 60 * 24 }}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          {/* Authenticated app */}
-          <Route path="/*" element={
-            <AuthGuard>
-              <OrgGuard>
-                <Layout>
-                  <Routes>
+  <PersistQueryClientProvider
+    client={queryClient}
+    persistOptions={{ persister, maxAge: 1000 * 60 * 60 * 24, buster: lastUserId }}
+  >
+    <AuthProvider>
+      <CapabilitiesProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              {/* Authenticated app */}
+              <Route path="/*" element={
+                <AuthGuard>
+                  <OrgGuard>
+                    <Layout>
+                      <Routes>
                     <Route path="/" element={<FullAccessRoute><Dashboard /></FullAccessRoute>} />
                     <Route path="/vehicles" element={<FullAccessRoute><VehiclesPage /></FullAccessRoute>} />
                     <Route path="/electric-carts" element={<FullAccessRoute><ElectricCartsPage /></FullAccessRoute>} />
@@ -79,9 +88,11 @@ const App = () => (
               </OrgGuard>
             </AuthGuard>
           } />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </CapabilitiesProvider>
+    </AuthProvider>
   </PersistQueryClientProvider>
 );
 

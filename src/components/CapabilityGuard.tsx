@@ -12,6 +12,7 @@ export default function CapabilityGuard({ capability, children, fallbackRoute }:
   const { hasCapability, hasFullAccess, isLoading } = useCapabilities();
   const location = useLocation();
 
+  // While loading, never decide — show spinner. Prevents wrongful redirects/leaks.
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -20,14 +21,14 @@ export default function CapabilityGuard({ capability, children, fallbackRoute }:
     );
   }
 
-  // Restricted user (mobility-only) landing on Dashboard or other full_access routes
   if (!hasCapability(capability)) {
     if (fallbackRoute) return <Navigate to={fallbackRoute} replace />;
+    // Restricted user (mobility-only) — always send to /mobility-auth
     if (!hasFullAccess && hasCapability('mobility_access')) {
-      // Avoid redirect loop
       if (location.pathname !== '/mobility-auth') {
         return <Navigate to="/mobility-auth" replace />;
       }
+      return <>{children}</>;
     }
     return <Navigate to="/" replace />;
   }
