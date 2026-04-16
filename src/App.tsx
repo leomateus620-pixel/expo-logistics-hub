@@ -4,13 +4,11 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient } from "@tanstack/react-query";
 import { PersistQueryClientProvider } from "@tanstack/react-query-persist-client";
 import { createSyncStoragePersister } from "@tanstack/query-sync-storage-persister";
-import { Loader2 } from "lucide-react";
-import { useEffect } from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import AuthGuard from "./components/AuthGuard";
 import OrgGuard from "./components/OrgGuard";
+import CapabilityGuard from "./components/CapabilityGuard";
 import Layout from "./components/Layout";
-import { getCanonicalPublicMobilityUrl, shouldForcePublicMobilityRedirect } from "./lib/publicMobility";
 import Dashboard from "./pages/Dashboard";
 import VehiclesPage from "./pages/VehiclesPage";
 import ElectricCartsPage from "./pages/ElectricCartsPage";
@@ -26,13 +24,12 @@ import KmEmissoesPage from "./pages/KmEmissoesPage";
 import SystemReportPage from "./pages/SystemReportPage";
 import ExpensesPage from "./pages/ExpensesPage";
 import MobilityAuthPage from "./pages/MobilityAuthPage";
-import PublicMobilityFormPage from "./pages/PublicMobilityFormPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      gcTime: 1000 * 60 * 60 * 24, // 24h — keep in cache for offline
+      gcTime: 1000 * 60 * 60 * 24,
     },
   },
 });
@@ -42,34 +39,9 @@ const persister = createSyncStoragePersister({
   key: 'fenasoja-query-cache',
 });
 
-const PublicMobilityRoute = () => {
-  const shouldRedirect = typeof window !== 'undefined' && shouldForcePublicMobilityRedirect(window.location);
-
-  useEffect(() => {
-    if (!shouldRedirect) return;
-
-    window.location.replace(
-      getCanonicalPublicMobilityUrl(
-        window.location.pathname,
-        window.location.search,
-        window.location.hash,
-      ),
-    );
-  }, [shouldRedirect]);
-
-  if (shouldRedirect) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background px-6">
-        <div className="flex items-center gap-3 text-muted-foreground">
-          <Loader2 className="h-5 w-5 animate-spin text-primary" />
-          <span>Redirecionando para o formulário público…</span>
-        </div>
-      </div>
-    );
-  }
-
-  return <PublicMobilityFormPage />;
-};
+const FullAccessRoute = ({ children }: { children: React.ReactNode }) => (
+  <CapabilityGuard capability="full_access">{children}</CapabilityGuard>
+);
 
 const App = () => (
   <PersistQueryClientProvider client={queryClient} persistOptions={{ persister, maxAge: 1000 * 60 * 60 * 24 }}>
@@ -78,30 +50,29 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          {/* Public isolated route — no auth, no layout */}
-          <Route path="/f/mobilidade/:token" element={<PublicMobilityRoute />} />
-
           {/* Authenticated app */}
           <Route path="/*" element={
             <AuthGuard>
               <OrgGuard>
                 <Layout>
                   <Routes>
-                    <Route path="/" element={<Dashboard />} />
-                    <Route path="/vehicles" element={<VehiclesPage />} />
-                    <Route path="/electric-carts" element={<ElectricCartsPage />} />
-                    <Route path="/scooters" element={<ScootersPage />} />
-                    <Route path="/transports" element={<TransportsPage />} />
-                    <Route path="/guests" element={<GuestsPage />} />
-                    <Route path="/agenda" element={<AgendaPage />} />
-                    <Route path="/checklist" element={<ChecklistPage />} />
-                    <Route path="/team" element={<TeamPage />} />
-                    <Route path="/ver-escala" element={<VerEscalaPage />} />
-                    <Route path="/km-emissoes" element={<KmEmissoesPage />} />
-                    <Route path="/settings" element={<SettingsPage />} />
-                    <Route path="/system-report" element={<SystemReportPage />} />
-                    <Route path="/expenses" element={<ExpensesPage />} />
-                    <Route path="/mobility-auth" element={<MobilityAuthPage />} />
+                    <Route path="/" element={<FullAccessRoute><Dashboard /></FullAccessRoute>} />
+                    <Route path="/vehicles" element={<FullAccessRoute><VehiclesPage /></FullAccessRoute>} />
+                    <Route path="/electric-carts" element={<FullAccessRoute><ElectricCartsPage /></FullAccessRoute>} />
+                    <Route path="/scooters" element={<FullAccessRoute><ScootersPage /></FullAccessRoute>} />
+                    <Route path="/transports" element={<FullAccessRoute><TransportsPage /></FullAccessRoute>} />
+                    <Route path="/guests" element={<FullAccessRoute><GuestsPage /></FullAccessRoute>} />
+                    <Route path="/agenda" element={<FullAccessRoute><AgendaPage /></FullAccessRoute>} />
+                    <Route path="/checklist" element={<FullAccessRoute><ChecklistPage /></FullAccessRoute>} />
+                    <Route path="/team" element={<FullAccessRoute><TeamPage /></FullAccessRoute>} />
+                    <Route path="/ver-escala" element={<FullAccessRoute><VerEscalaPage /></FullAccessRoute>} />
+                    <Route path="/km-emissoes" element={<FullAccessRoute><KmEmissoesPage /></FullAccessRoute>} />
+                    <Route path="/settings" element={<FullAccessRoute><SettingsPage /></FullAccessRoute>} />
+                    <Route path="/system-report" element={<FullAccessRoute><SystemReportPage /></FullAccessRoute>} />
+                    <Route path="/expenses" element={<FullAccessRoute><ExpensesPage /></FullAccessRoute>} />
+                    <Route path="/mobility-auth" element={
+                      <CapabilityGuard capability="mobility_access"><MobilityAuthPage /></CapabilityGuard>
+                    } />
                     <Route path="*" element={<NotFound />} />
                   </Routes>
                 </Layout>

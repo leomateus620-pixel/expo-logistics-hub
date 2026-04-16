@@ -777,6 +777,8 @@ export type Database = {
           committee_name_snapshot: string
           created_at: string
           id: string
+          internal_form_id: string | null
+          internal_member_id: string | null
           member_identifier: string | null
           member_name: string
           member_role: string | null
@@ -787,9 +789,9 @@ export type Database = {
           org_id: string
           president_name_snapshot: string
           qr_access_free: boolean
-          source_form_id: string
-          source_link_id: string
-          source_member_id: string
+          source_form_id: string | null
+          source_link_id: string | null
+          source_member_id: string | null
           source_origin: string
           submitted_at: string | null
           synced_at: string
@@ -802,6 +804,8 @@ export type Database = {
           committee_name_snapshot: string
           created_at?: string
           id?: string
+          internal_form_id?: string | null
+          internal_member_id?: string | null
           member_identifier?: string | null
           member_name: string
           member_role?: string | null
@@ -812,9 +816,9 @@ export type Database = {
           org_id: string
           president_name_snapshot: string
           qr_access_free?: boolean
-          source_form_id: string
-          source_link_id: string
-          source_member_id: string
+          source_form_id?: string | null
+          source_link_id?: string | null
+          source_member_id?: string | null
           source_origin?: string
           submitted_at?: string | null
           synced_at?: string
@@ -827,6 +831,8 @@ export type Database = {
           committee_name_snapshot?: string
           created_at?: string
           id?: string
+          internal_form_id?: string | null
+          internal_member_id?: string | null
           member_identifier?: string | null
           member_name?: string
           member_role?: string | null
@@ -837,9 +843,9 @@ export type Database = {
           org_id?: string
           president_name_snapshot?: string
           qr_access_free?: boolean
-          source_form_id?: string
-          source_link_id?: string
-          source_member_id?: string
+          source_form_id?: string | null
+          source_link_id?: string | null
+          source_member_id?: string | null
           source_origin?: string
           submitted_at?: string | null
           synced_at?: string
@@ -851,6 +857,20 @@ export type Database = {
             columns: ["committee_id"]
             isOneToOne: false
             referencedRelation: "official_committees"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mobility_authorizations_internal_form_id_fkey"
+            columns: ["internal_form_id"]
+            isOneToOne: false
+            referencedRelation: "committee_mobility_forms"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "mobility_authorizations_internal_member_id_fkey"
+            columns: ["internal_member_id"]
+            isOneToOne: false
+            referencedRelation: "committee_mobility_members"
             referencedColumns: ["id"]
           },
           {
@@ -1940,6 +1960,38 @@ export type Database = {
           },
         ]
       }
+      user_capabilities: {
+        Row: {
+          capability: string
+          created_at: string
+          id: string
+          org_id: string
+          user_id: string
+        }
+        Insert: {
+          capability: string
+          created_at?: string
+          id?: string
+          org_id: string
+          user_id: string
+        }
+        Update: {
+          capability?: string
+          created_at?: string
+          id?: string
+          org_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_capabilities_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_roles: {
         Row: {
           id: string
@@ -2216,6 +2268,10 @@ export type Database = {
         Args: { _org_id: string; _user_id: string }
         Returns: Database["public"]["Enums"]["org_role"]
       }
+      has_capability: {
+        Args: { _capability: string; _org_id: string; _user_id: string }
+        Returns: boolean
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -2242,6 +2298,10 @@ export type Database = {
           _token_hash: string
         }
         Returns: string
+      }
+      sync_internal_mobility_form: {
+        Args: { _form_id: string }
+        Returns: undefined
       }
       sync_public_mobility_form: {
         Args: { _form_id: string }

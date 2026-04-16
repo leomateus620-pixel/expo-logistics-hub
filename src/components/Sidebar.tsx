@@ -9,36 +9,37 @@ import { useTransports } from '@/hooks/useTransports';
 import { useEvents } from '@/hooks/useEvents';
 import { useTasks } from '@/hooks/useTasks';
 import { useOrgMembers } from '@/hooks/useOrgMembers';
+import { useCapabilities } from '@/hooks/useCapabilities';
 import { cn } from '@/lib/utils';
 import { isToday, parseISO } from 'date-fns';
 import { useMemo } from 'react';
 
-/* ── Menu groups ── */
+/* ── Menu groups with required capability ── */
 const operacao = [
-  { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/transports', icon: MapPin, label: 'Transportes' },
-  { to: '/expenses', icon: Receipt, label: 'Despesas' },
-  { to: '/agenda', icon: CalendarDays, label: 'Agenda' },
-  { to: '/ver-escala', icon: ClipboardList, label: 'Escala' },
-  { to: '/checklist', icon: CheckSquare, label: 'Checklist' },
-  { to: '/km-emissoes', icon: Gauge, label: 'KM & Emissões' },
-  { to: '/mobility-auth', icon: ShieldCheck, label: 'Mobilidade' },
+  { to: '/', icon: LayoutDashboard, label: 'Dashboard', cap: 'full_access' },
+  { to: '/transports', icon: MapPin, label: 'Transportes', cap: 'full_access' },
+  { to: '/expenses', icon: Receipt, label: 'Despesas', cap: 'full_access' },
+  { to: '/agenda', icon: CalendarDays, label: 'Agenda', cap: 'full_access' },
+  { to: '/ver-escala', icon: ClipboardList, label: 'Escala', cap: 'full_access' },
+  { to: '/checklist', icon: CheckSquare, label: 'Checklist', cap: 'full_access' },
+  { to: '/km-emissoes', icon: Gauge, label: 'KM & Emissões', cap: 'full_access' },
+  { to: '/mobility-auth', icon: ShieldCheck, label: 'Mobilidade', cap: 'mobility_access' },
 ];
 
 const recursos = [
-  { to: '/vehicles', icon: Car, label: 'Veículos Botolli' },
-  { to: '/electric-carts', icon: Zap, label: 'Carrinhos Elétricos' },
-  { to: '/scooters', icon: Bike, label: 'Patinetes' },
-  { to: '/guests', icon: Hotel, label: 'Hóspedes' },
-  { to: '/team', icon: Users, label: 'Equipe' },
+  { to: '/vehicles', icon: Car, label: 'Veículos Botolli', cap: 'full_access' },
+  { to: '/electric-carts', icon: Zap, label: 'Carrinhos Elétricos', cap: 'full_access' },
+  { to: '/scooters', icon: Bike, label: 'Patinetes', cap: 'full_access' },
+  { to: '/guests', icon: Hotel, label: 'Hóspedes', cap: 'full_access' },
+  { to: '/team', icon: Users, label: 'Equipe', cap: 'full_access' },
 ];
 
 const sistema = [
-  { to: '/settings', icon: Settings, label: 'Configurações' },
-  { to: '/system-report', icon: FileText, label: 'Relatório do Sistema' },
+  { to: '/settings', icon: Settings, label: 'Configurações', cap: 'full_access' },
+  { to: '/system-report', icon: FileText, label: 'Relatório do Sistema', cap: 'full_access' },
 ];
 
-const groups = [
+const allGroups = [
   { title: 'Operação', links: operacao },
   { title: 'Recursos', links: recursos },
   { title: 'Sistema', links: sistema },
@@ -64,10 +65,21 @@ function SidebarBadge({ count }: { count: number }) {
 
 export default function Sidebar({ collapsed, onToggle, isMobile, mobileOpen, onMobileClose }: SidebarProps) {
   const { signOut } = useAuth();
+  const { hasCapability } = useCapabilities();
   const { transports } = useTransports();
   const { events } = useEvents();
   const { tasks } = useTasks();
   const { members } = useOrgMembers();
+
+  // Filter groups based on capabilities
+  const groups = useMemo(() => {
+    return allGroups
+      .map(group => ({
+        ...group,
+        links: group.links.filter(link => hasCapability(link.cap)),
+      }))
+      .filter(group => group.links.length > 0);
+  }, [hasCapability]);
 
   const badges = useMemo(() => {
     const activeTransports = transports.filter((t: any) => t.status === 'em_andamento').length;

@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useOfficialCommittees } from '@/hooks/useOfficialCommittees';
 import { useMobilityForms } from '@/hooks/useMobilityForms';
 import { useMobilityMembers } from '@/hooks/useMobilityMembers';
+import { supabase } from '@/integrations/supabase/client';
 import MobilityMemberRow, { type MemberDraft } from './MobilityMemberRow';
 import { toast } from 'sonner';
 
@@ -75,6 +76,9 @@ export default function MobilityForm({ onSuccess }: Props) {
           notes: m.notes || undefined,
         });
       }
+
+      // Sync to mobility_authorizations
+      await (supabase as any).rpc('sync_internal_mobility_form', { _form_id: form.id });
 
       toast.success('Solicitação enviada com sucesso!');
       setCommitteeId(''); setOpName(''); setOpPhone(''); setOpEmail('');
