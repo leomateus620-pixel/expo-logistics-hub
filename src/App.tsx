@@ -88,9 +88,11 @@ const App = () => (
               </OrgGuard>
             </AuthGuard>
           } />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </CapabilitiesProvider>
+    </AuthProvider>
   </PersistQueryClientProvider>
 );
 
