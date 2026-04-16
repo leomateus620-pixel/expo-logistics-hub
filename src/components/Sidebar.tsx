@@ -13,6 +13,7 @@ import { useCapabilities } from '@/hooks/useCapabilities';
 import { cn } from '@/lib/utils';
 import { isToday, parseISO } from 'date-fns';
 import { useMemo } from 'react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 /* ── Menu groups with required capability ── */
 const operacao = [
@@ -65,21 +66,22 @@ function SidebarBadge({ count }: { count: number }) {
 
 export default function Sidebar({ collapsed, onToggle, isMobile, mobileOpen, onMobileClose }: SidebarProps) {
   const { signOut } = useAuth();
-  const { hasCapability } = useCapabilities();
+  const { hasCapability, isLoading: capsLoading } = useCapabilities();
   const { transports } = useTransports();
   const { events } = useEvents();
   const { tasks } = useTasks();
   const { members } = useOrgMembers();
 
-  // Filter groups based on capabilities
+  // Filter groups based on capabilities (only when caps are resolved)
   const groups = useMemo(() => {
+    if (capsLoading) return [];
     return allGroups
       .map(group => ({
         ...group,
         links: group.links.filter(link => hasCapability(link.cap)),
       }))
       .filter(group => group.links.length > 0);
-  }, [hasCapability]);
+  }, [hasCapability, capsLoading]);
 
   const badges = useMemo(() => {
     const activeTransports = transports.filter((t: any) => t.status === 'em_andamento').length;
@@ -113,7 +115,14 @@ export default function Sidebar({ collapsed, onToggle, isMobile, mobileOpen, onM
   /* ── Shared nav renderer ── */
   const renderNav = (mobile: boolean) => (
     <nav className="flex-1 px-2 pt-1 overflow-y-auto" role="navigation" aria-label="Menu principal">
-      {groups.map((group) => (
+      {capsLoading && (
+        <div className="space-y-2 p-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <Skeleton key={i} className="h-9 w-full bg-white/5" />
+          ))}
+        </div>
+      )}
+      {!capsLoading && groups.map((group) => (
         <div key={group.title}>
           {!collapsed && (
             <p className="text-[9px] uppercase tracking-[0.18em] text-gold/50 font-semibold px-3 pt-5 pb-1.5 select-none">

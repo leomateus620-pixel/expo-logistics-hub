@@ -17,8 +17,12 @@ export function useCurrentOrg() {
         .select('id, org_id, role, nome_exibicao, cargo, organizations(id, nome)')
         .eq('user_id', user.id)
         .eq('is_active', true);
-      if (error || !data || data.length === 0) return null;
-      // Prioritize org saved in localStorage
+      if (error || !data || data.length === 0) {
+        // Clean stale org from previous user
+        localStorage.removeItem(ORG_KEY);
+        return null;
+      }
+      // Prioritize org saved in localStorage ONLY if user actually belongs to it
       const savedOrgId = localStorage.getItem(ORG_KEY);
       const preferred = savedOrgId ? data.find((m: any) => m.org_id === savedOrgId) : null;
       const selected = preferred || data[0];

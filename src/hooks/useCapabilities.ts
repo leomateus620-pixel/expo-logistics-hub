@@ -5,13 +5,14 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 
 export function useCapabilities() {
-  const { user } = useAuth();
-  const { orgId, myRole } = useCurrentOrg();
+  const { user, loading: authLoading } = useAuth();
+  const { orgId, myRole, isLoading: orgLoading } = useCurrentOrg();
 
   // Admin/Gestor/Operador automatically have full_access
   const hasFullAccessByRole = myRole === 'admin' || myRole === 'gestor' || myRole === 'operador';
+  const roleResolved = !authLoading && !orgLoading && !!user && !!orgId && myRole !== null && myRole !== undefined;
 
-  const { data: capabilities = [], isLoading } = useQuery({
+  const { data: capabilities = [], isLoading: capLoading } = useQuery({
     queryKey: ['user-capabilities', user?.id, orgId],
     queryFn: async () => {
       if (!user || !orgId) return [];
@@ -23,7 +24,7 @@ export function useCapabilities() {
       if (error) throw error;
       return (data || []).map((r: any) => r.capability as string);
     },
-    enabled: !!user && !!orgId && !hasFullAccessByRole,
+    enabled: roleResolved && !hasFullAccessByRole,
     staleTime: 60000,
   });
 
@@ -36,5 +37,8 @@ export function useCapabilities() {
     return capSet.has(cap);
   };
 
-  return { hasFullAccess, hasCapability, isLoading: !hasFullAccessByRole && isLoading };
+  // We are loading until: auth done, org/role resolved, AND capability query done (when needed)
+  const isLoading = authLoading || orgLoading || (!!user && !!orgId && !roleResolved) || (roleResolved && !hasFullAccessByRole && capLoading);
+
+  return { hasFullAccess, hasCapability, isLoading };
 }

@@ -1,4 +1,4 @@
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useCapabilities } from '@/hooks/useCapabilities';
 import { Loader2 } from 'lucide-react';
 
@@ -9,7 +9,8 @@ interface Props {
 }
 
 export default function CapabilityGuard({ capability, children, fallbackRoute }: Props) {
-  const { hasCapability, isLoading } = useCapabilities();
+  const { hasCapability, hasFullAccess, isLoading } = useCapabilities();
+  const location = useLocation();
 
   if (isLoading) {
     return (
@@ -19,10 +20,16 @@ export default function CapabilityGuard({ capability, children, fallbackRoute }:
     );
   }
 
+  // Restricted user (mobility-only) landing on Dashboard or other full_access routes
   if (!hasCapability(capability)) {
-    // If user has mobility_access but not full_access, redirect to mobility
-    const redirect = fallbackRoute || (hasCapability('mobility_access') ? '/mobility-auth' : '/');
-    return <Navigate to={redirect} replace />;
+    if (fallbackRoute) return <Navigate to={fallbackRoute} replace />;
+    if (!hasFullAccess && hasCapability('mobility_access')) {
+      // Avoid redirect loop
+      if (location.pathname !== '/mobility-auth') {
+        return <Navigate to="/mobility-auth" replace />;
+      }
+    }
+    return <Navigate to="/" replace />;
   }
 
   return <>{children}</>;
