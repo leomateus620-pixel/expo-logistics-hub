@@ -36,7 +36,7 @@ export function CapabilitiesProvider({ children }: { children: ReactNode }) {
     staleTime: 60000,
   });
 
-  const capSet = useMemo(() => new Set(capabilities), [capabilities]);
+  const capSet = useMemo(() => new Set<string>(capabilities), [capabilities]);
   const hasFullAccess = hasFullAccessByRole || capSet.has('full_access');
 
   const isLoading =
