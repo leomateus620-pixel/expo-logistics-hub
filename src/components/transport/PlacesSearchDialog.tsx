@@ -39,7 +39,7 @@ export default function PlacesSearchDialog({ open, onOpenChange, onSelect }: Pla
       setQuery('');
       setResults([]);
       setSearched(false);
-      setTimeout(() => inputRef.current?.focus(), 200);
+      setTimeout(() => inputRef.current?.focus(), 350);
     } else {
       // Cancel any in-flight request on close
       abortRef.current?.abort();
@@ -92,9 +92,9 @@ export default function PlacesSearchDialog({ open, onOpenChange, onSelect }: Pla
   };
 
   const content = (
-    <div className="flex flex-col gap-3 px-1 flex-1 min-h-0">
-      {/* Search input */}
-      <div className="relative shrink-0">
+    <div className="flex flex-col gap-2 px-1 flex-1 min-h-0">
+      {/* Search input - sticky on mobile so it stays visible above keyboard */}
+      <div className="relative shrink-0 sticky top-0 z-10 bg-background pb-2">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
         <Input
           ref={inputRef}
@@ -110,16 +110,19 @@ export default function PlacesSearchDialog({ open, onOpenChange, onSelect }: Pla
         {loading && <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-primary animate-spin" />}
       </div>
 
-      {/* Results - flex-1 to fill available space */}
-      <div className="flex-1 overflow-y-auto overscroll-contain min-h-0 space-y-1 -mx-1 px-1">
+      {/* Results - flex-1 to fill available space, generous bottom padding for keyboard */}
+      <div
+        className="flex-1 overflow-y-auto overscroll-contain min-h-0 space-y-1 -mx-1 px-1"
+        style={{ paddingBottom: 'max(6rem, env(safe-area-inset-bottom))' }}
+      >
         {!searched && !loading && (
-          <div className="flex flex-col items-center justify-center py-10 text-center gap-3">
-            <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
-              <Navigation className="w-7 h-7 text-primary" />
+          <div className="flex flex-col items-center justify-center py-4 text-center gap-2">
+            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+              <Navigation className="w-5 h-5 text-primary" />
             </div>
             <div>
               <p className="text-sm font-medium text-foreground">Buscar destino</p>
-              <p className="text-xs text-muted-foreground mt-1">
+              <p className="text-xs text-muted-foreground mt-0.5">
                 Digite o nome do local, cidade ou endereço
               </p>
             </div>
@@ -141,7 +144,7 @@ export default function PlacesSearchDialog({ open, onOpenChange, onSelect }: Pla
         )}
 
         {searched && !loading && results.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-10 text-center gap-2">
+          <div className="flex flex-col items-center justify-center py-6 text-center gap-2">
             <MapPin className="w-8 h-8 text-muted-foreground/50" />
             <p className="text-sm text-muted-foreground">Nenhum resultado encontrado</p>
             <p className="text-xs text-muted-foreground/70">Tente outro nome ou endereço</p>
@@ -176,14 +179,14 @@ export default function PlacesSearchDialog({ open, onOpenChange, onSelect }: Pla
   if (isMobile) {
     return (
       <Drawer open={open} onOpenChange={onOpenChange}>
-        <DrawerContent className="max-h-[90dvh] flex flex-col">
-          <DrawerHeader className="pb-2 shrink-0">
+        <DrawerContent className="h-[85svh] max-h-[85svh] flex flex-col">
+          <DrawerHeader className="pb-1 pt-2 shrink-0">
             <DrawerTitle className="flex items-center gap-2 text-base">
               <MapPin className="w-5 h-5 text-primary" />
               Buscar Destino
             </DrawerTitle>
           </DrawerHeader>
-          <div className="px-4 pb-8 flex-1 min-h-0 flex flex-col">
+          <div className="px-4 pb-2 flex-1 min-h-0 flex flex-col">
             {content}
           </div>
         </DrawerContent>
