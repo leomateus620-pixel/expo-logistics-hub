@@ -179,14 +179,14 @@ export default function PlacesSearchDialog({ open, onOpenChange, onSelect }: Pla
   if (isMobile) {
     return (
       <Drawer open={open} onOpenChange={onOpenChange}>
-        <DrawerContent className="max-h-[90dvh] flex flex-col">
-          <DrawerHeader className="pb-2 shrink-0">
+        <DrawerContent className="h-[85svh] max-h-[85svh] flex flex-col">
+          <DrawerHeader className="pb-1 pt-2 shrink-0">
             <DrawerTitle className="flex items-center gap-2 text-base">
               <MapPin className="w-5 h-5 text-primary" />
               Buscar Destino
             </DrawerTitle>
           </DrawerHeader>
-          <div className="px-4 pb-8 flex-1 min-h-0 flex flex-col">
+          <div className="px-4 pb-2 flex-1 min-h-0 flex flex-col">
             {content}
           </div>
         </DrawerContent>
