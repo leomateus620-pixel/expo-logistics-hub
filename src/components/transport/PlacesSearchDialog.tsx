@@ -92,9 +92,9 @@ export default function PlacesSearchDialog({ open, onOpenChange, onSelect }: Pla
   };
 
   const content = (
-    <div className="flex flex-col gap-3 px-1 flex-1 min-h-0">
-      {/* Search input */}
-      <div className="relative shrink-0">
+    <div className="flex flex-col gap-2 px-1 flex-1 min-h-0">
+      {/* Search input - sticky on mobile so it stays visible above keyboard */}
+      <div className="relative shrink-0 sticky top-0 z-10 bg-background pb-2">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground pointer-events-none" />
         <Input
           ref={inputRef}
@@ -110,16 +110,19 @@ export default function PlacesSearchDialog({ open, onOpenChange, onSelect }: Pla
         {loading && <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-primary animate-spin" />}
       </div>
 
-      {/* Results - flex-1 to fill available space */}
-      <div className="flex-1 overflow-y-auto overscroll-contain min-h-0 space-y-1 -mx-1 px-1">
+      {/* Results - flex-1 to fill available space, generous bottom padding for keyboard */}
+      <div
+        className="flex-1 overflow-y-auto overscroll-contain min-h-0 space-y-1 -mx-1 px-1"
+        style={{ paddingBottom: 'max(6rem, env(safe-area-inset-bottom))' }}
+      >
         {!searched && !loading && (
-          <div className="flex flex-col items-center justify-center py-10 text-center gap-3">
-            <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
-              <Navigation className="w-7 h-7 text-primary" />
+          <div className="flex flex-col items-center justify-center py-4 text-center gap-2">
+            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+              <Navigation className="w-5 h-5 text-primary" />
             </div>
             <div>
               <p className="text-sm font-medium text-foreground">Buscar destino</p>
-              <p className="text-xs text-muted-foreground mt-1">
+              <p className="text-xs text-muted-foreground mt-0.5">
                 Digite o nome do local, cidade ou endereço
               </p>
             </div>
@@ -141,7 +144,7 @@ export default function PlacesSearchDialog({ open, onOpenChange, onSelect }: Pla
         )}
 
         {searched && !loading && results.length === 0 && (
-          <div className="flex flex-col items-center justify-center py-10 text-center gap-2">
+          <div className="flex flex-col items-center justify-center py-6 text-center gap-2">
             <MapPin className="w-8 h-8 text-muted-foreground/50" />
             <p className="text-sm text-muted-foreground">Nenhum resultado encontrado</p>
             <p className="text-xs text-muted-foreground/70">Tente outro nome ou endereço</p>
