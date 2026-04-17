@@ -1829,6 +1829,170 @@ export type Database = {
           },
         ]
       }
+      transport_weather_alerts: {
+        Row: {
+          alert_type: string | null
+          created_at: string
+          description: string | null
+          ends_at: string | null
+          id: string
+          org_id: string
+          severity: string | null
+          snapshot_id: string
+          source_uri: string | null
+          starts_at: string | null
+          title: string
+          transport_id: string
+        }
+        Insert: {
+          alert_type?: string | null
+          created_at?: string
+          description?: string | null
+          ends_at?: string | null
+          id?: string
+          org_id: string
+          severity?: string | null
+          snapshot_id: string
+          source_uri?: string | null
+          starts_at?: string | null
+          title: string
+          transport_id: string
+        }
+        Update: {
+          alert_type?: string | null
+          created_at?: string
+          description?: string | null
+          ends_at?: string | null
+          id?: string
+          org_id?: string
+          severity?: string | null
+          snapshot_id?: string
+          source_uri?: string | null
+          starts_at?: string | null
+          title?: string
+          transport_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transport_weather_alerts_snapshot_id_fkey"
+            columns: ["snapshot_id"]
+            isOneToOne: false
+            referencedRelation: "transport_weather_snapshots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      transport_weather_snapshots: {
+        Row: {
+          alert_count: number
+          alerts_summary_jsonb: Json
+          city_key: string
+          city_name: string | null
+          cloud_cover_pct: number | null
+          created_at: string
+          current_condition_code: string | null
+          current_condition_label: string | null
+          current_icon_uri: string | null
+          feels_like_c: number | null
+          fetched_at: string
+          forecast_period_label: string | null
+          humidity_pct: number | null
+          id: string
+          is_latest: boolean
+          latitude: number
+          longitude: number
+          operational_risk_level: Database["public"]["Enums"]["weather_risk_level"]
+          operational_risk_reason: string | null
+          org_id: string
+          place_id: string | null
+          precipitation_probability_pct: number | null
+          precipitation_type: string | null
+          raw_payload_jsonb: Json | null
+          temperature_c: number | null
+          thunderstorm_probability_pct: number | null
+          transport_id: string
+          updated_at: string
+          uv_index: number | null
+          valid_until: string
+          visibility_km: number | null
+          weather_source: Database["public"]["Enums"]["weather_source"]
+          wind_gust_kph: number | null
+          wind_speed_kph: number | null
+        }
+        Insert: {
+          alert_count?: number
+          alerts_summary_jsonb?: Json
+          city_key: string
+          city_name?: string | null
+          cloud_cover_pct?: number | null
+          created_at?: string
+          current_condition_code?: string | null
+          current_condition_label?: string | null
+          current_icon_uri?: string | null
+          feels_like_c?: number | null
+          fetched_at?: string
+          forecast_period_label?: string | null
+          humidity_pct?: number | null
+          id?: string
+          is_latest?: boolean
+          latitude: number
+          longitude: number
+          operational_risk_level?: Database["public"]["Enums"]["weather_risk_level"]
+          operational_risk_reason?: string | null
+          org_id: string
+          place_id?: string | null
+          precipitation_probability_pct?: number | null
+          precipitation_type?: string | null
+          raw_payload_jsonb?: Json | null
+          temperature_c?: number | null
+          thunderstorm_probability_pct?: number | null
+          transport_id: string
+          updated_at?: string
+          uv_index?: number | null
+          valid_until?: string
+          visibility_km?: number | null
+          weather_source?: Database["public"]["Enums"]["weather_source"]
+          wind_gust_kph?: number | null
+          wind_speed_kph?: number | null
+        }
+        Update: {
+          alert_count?: number
+          alerts_summary_jsonb?: Json
+          city_key?: string
+          city_name?: string | null
+          cloud_cover_pct?: number | null
+          created_at?: string
+          current_condition_code?: string | null
+          current_condition_label?: string | null
+          current_icon_uri?: string | null
+          feels_like_c?: number | null
+          fetched_at?: string
+          forecast_period_label?: string | null
+          humidity_pct?: number | null
+          id?: string
+          is_latest?: boolean
+          latitude?: number
+          longitude?: number
+          operational_risk_level?: Database["public"]["Enums"]["weather_risk_level"]
+          operational_risk_reason?: string | null
+          org_id?: string
+          place_id?: string | null
+          precipitation_probability_pct?: number | null
+          precipitation_type?: string | null
+          raw_payload_jsonb?: Json | null
+          temperature_c?: number | null
+          thunderstorm_probability_pct?: number | null
+          transport_id?: string
+          updated_at?: string
+          uv_index?: number | null
+          valid_until?: string
+          visibility_km?: number | null
+          weather_source?: Database["public"]["Enums"]["weather_source"]
+          wind_gust_kph?: number | null
+          wind_speed_kph?: number | null
+        }
+        Relationships: []
+      }
       transports: {
         Row: {
           created_at: string
@@ -2132,6 +2296,84 @@ export type Database = {
           },
         ]
       }
+      weather_city_cache: {
+        Row: {
+          city_key: string
+          city_name: string | null
+          expires_at: string
+          fetched_at: string
+          id: string
+          latitude: number
+          longitude: number
+          payload_jsonb: Json
+          time_bucket: string
+        }
+        Insert: {
+          city_key: string
+          city_name?: string | null
+          expires_at?: string
+          fetched_at?: string
+          id?: string
+          latitude: number
+          longitude: number
+          payload_jsonb: Json
+          time_bucket: string
+        }
+        Update: {
+          city_key?: string
+          city_name?: string | null
+          expires_at?: string
+          fetched_at?: string
+          id?: string
+          latitude?: number
+          longitude?: number
+          payload_jsonb?: Json
+          time_bucket?: string
+        }
+        Relationships: []
+      }
+      weather_sync_jobs: {
+        Row: {
+          created_at: string
+          error_message: string | null
+          finished_at: string | null
+          id: string
+          meta_jsonb: Json
+          org_id: string | null
+          requested_at: string
+          scope_reference: string | null
+          scope_type: string
+          started_at: string | null
+          status: Database["public"]["Enums"]["weather_sync_status"]
+        }
+        Insert: {
+          created_at?: string
+          error_message?: string | null
+          finished_at?: string | null
+          id?: string
+          meta_jsonb?: Json
+          org_id?: string | null
+          requested_at?: string
+          scope_reference?: string | null
+          scope_type: string
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["weather_sync_status"]
+        }
+        Update: {
+          created_at?: string
+          error_message?: string | null
+          finished_at?: string | null
+          id?: string
+          meta_jsonb?: Json
+          org_id?: string | null
+          requested_at?: string
+          scope_reference?: string | null
+          scope_type?: string
+          started_at?: string | null
+          status?: Database["public"]["Enums"]["weather_sync_status"]
+        }
+        Relationships: []
+      }
     }
     Views: {
       guests_safe: {
@@ -2335,6 +2577,14 @@ export type Database = {
       task_status_enum: "pendente" | "concluida"
       transport_status: "pendente" | "em_andamento" | "concluido" | "cancelado"
       vehicle_status: "disponivel" | "em_uso" | "manutencao" | "inativo"
+      weather_risk_level: "favoravel" | "atencao" | "alerta" | "critico"
+      weather_source: "google_weather_api"
+      weather_sync_status:
+        | "pendente"
+        | "em_andamento"
+        | "sucesso"
+        | "erro"
+        | "parcial"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -2489,6 +2739,15 @@ export const Constants = {
       task_status_enum: ["pendente", "concluida"],
       transport_status: ["pendente", "em_andamento", "concluido", "cancelado"],
       vehicle_status: ["disponivel", "em_uso", "manutencao", "inativo"],
+      weather_risk_level: ["favoravel", "atencao", "alerta", "critico"],
+      weather_source: ["google_weather_api"],
+      weather_sync_status: [
+        "pendente",
+        "em_andamento",
+        "sucesso",
+        "erro",
+        "parcial",
+      ],
     },
   },
 } as const
