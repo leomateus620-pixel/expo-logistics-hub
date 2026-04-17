@@ -11,6 +11,7 @@ import { getEffectiveEstimatedKm } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import PlacesSearchDialog from './PlacesSearchDialog';
+import { WeatherPreviewInTransportForm } from '@/components/weather/WeatherPreviewInTransportForm';
 
 const tituloOptions = ['Parque', 'Hotel', 'Aeroporto', 'Centro', 'Escolta Policial', 'Outros'];
 const cidadeAeroportoOptions = ['Chapecó', 'Santo Ângelo', 'Passo Fundo', 'Porto Alegre'];
@@ -299,6 +300,11 @@ export default function TransportForm({
                   </p>
                 ) : null;
               })()}
+              <WeatherPreviewInTransportForm
+                address={data.titulo === 'Aeroporto' ? data.voo_cidade : (data._selectedPlaceName || data.destino)}
+                lat={data.destino_lat}
+                lng={data.destino_lng}
+              />
             </div>
           </AccordionContent>
         </AccordionItem>

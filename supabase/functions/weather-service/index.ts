@@ -147,7 +147,8 @@ async function getOrFetchCityWeather(lat: number, lng: number, cityName?: string
     .gt('expires_at', new Date().toISOString())
     .maybeSingle();
   if (cached) {
-    return { normalized: cached.payload_jsonb, raw: cached.payload_jsonb, cityKey: ck, cityName: cached.city_name ?? cityName };
+    const { _raw, ...norm } = (cached.payload_jsonb ?? {}) as any;
+    return { normalized: norm, raw: _raw ?? null, cityKey: ck, cityName: cached.city_name ?? cityName };
   }
   const { cur, fc } = await fetchGoogleWeather(lat, lng);
   const normalized = normalizeGooglePayload(cur, fc);
@@ -195,7 +196,9 @@ async function resolveTransportLocation(transportId: string) {
 
 async function persistSnapshot(orgId: string, transportId: string, lat: number, lng: number, cityName: string, normalized: any, raw: any) {
   const ck = cityKey(lat, lng);
-  const { alerts_summary, ...normalizedClean } = normalized;
+  const { alerts_summary, ...rest } = normalized ?? {};
+  // Defensively strip any internal/underscore-prefixed keys (e.g. _raw) to avoid PGRST204 schema errors
+  const normalizedClean = Object.fromEntries(Object.entries(rest).filter(([k]) => !k.startsWith('_')));
   const { data: snap, error } = await admin
     .from('transport_weather_snapshots')
     .insert({
