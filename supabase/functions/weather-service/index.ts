@@ -147,7 +147,8 @@ async function getOrFetchCityWeather(lat: number, lng: number, cityName?: string
     .gt('expires_at', new Date().toISOString())
     .maybeSingle();
   if (cached) {
-    return { normalized: cached.payload_jsonb, raw: cached.payload_jsonb, cityKey: ck, cityName: cached.city_name ?? cityName };
+    const { _raw, ...norm } = (cached.payload_jsonb ?? {}) as any;
+    return { normalized: norm, raw: _raw ?? null, cityKey: ck, cityName: cached.city_name ?? cityName };
   }
   const { cur, fc } = await fetchGoogleWeather(lat, lng);
   const normalized = normalizeGooglePayload(cur, fc);
