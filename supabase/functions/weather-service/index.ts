@@ -195,6 +195,7 @@ async function resolveTransportLocation(transportId: string) {
 
 async function persistSnapshot(orgId: string, transportId: string, lat: number, lng: number, cityName: string, normalized: any, raw: any) {
   const ck = cityKey(lat, lng);
+  const { alerts_summary, ...normalizedClean } = normalized;
   const { data: snap, error } = await admin
     .from('transport_weather_snapshots')
     .insert({
@@ -204,8 +205,8 @@ async function persistSnapshot(orgId: string, transportId: string, lat: number, 
       city_name: cityName,
       latitude: lat,
       longitude: lng,
-      ...normalized,
-      alerts_summary_jsonb: normalized.alerts_summary ?? [],
+      ...normalizedClean,
+      alerts_summary_jsonb: alerts_summary ?? [],
       raw_payload_jsonb: raw,
       is_latest: true,
       fetched_at: new Date().toISOString(),
