@@ -58,6 +58,13 @@ export function useTransports() {
         transport: { ...params.transport, org_id: orgId },
         guestIds: params.guestIds || [],
       });
+      // Fire-and-forget: trigger weather sync for the new transport
+      const newId = result?.data?.id ?? result?.id;
+      if (newId) {
+        supabase.functions
+          .invoke('weather-service', { body: { action: 'sync_transport', transport_id: newId } })
+          .catch((err) => console.warn('[weather] initial sync failed', err));
+      }
       return result.data;
     },
     onSuccess: invalidateAll,

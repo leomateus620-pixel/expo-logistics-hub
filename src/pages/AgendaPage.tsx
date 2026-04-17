@@ -19,6 +19,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
+import { WeatherMiniSummary } from '@/components/weather/WeatherMiniSummary';
 
 const emptyForm = { titulo: '', descricao: '', inicio_em: '', fim_em: '', local: '', tipo_tag: '', responsavel_user_id: '', commission_id: '', repetir_diariamente: false };
 
@@ -416,6 +417,9 @@ export default function AgendaPage() {
                             )}
                             {e.tipo_tag && (
                               <Badge variant="outline" className="text-[10px] bg-white/10 border-white/20 backdrop-blur">{e.tipo_tag}</Badge>
+                            )}
+                            {e._source === 'transport' && (
+                              <WeatherMiniSummary transportId={e.id} />
                             )}
                           </div>
                         </div>
