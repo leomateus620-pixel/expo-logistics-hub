@@ -260,7 +260,7 @@ export default function Dashboard() {
         {/* Card — Rede Hoteleira */}
         <button
           type="button"
-          onClick={() => window.open('/docs/rede-hoteleira.pdf', '_blank')}
+          onClick={() => window.open('/docs/rede-hoteleira.pdf?v=2026-04-20', '_blank')}
           className="liquid-glass-card rounded-2xl p-5 sm:p-6 border-l-2 border-primary/40 text-left cursor-pointer hover:bg-muted/60 active:scale-[0.98] transition-all group"
         >
           <div className="flex items-start gap-4">
