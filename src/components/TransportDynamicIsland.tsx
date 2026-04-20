@@ -82,7 +82,7 @@ export default function TransportDynamicIsland({
 
   const location = useTransportLocation(isActive ? t.id : null);
   const [liveDestRoute, setLiveDestRoute] = useState<{ minutes: number; km: number; arrivalTime: string } | null>(null);
-  const [liveReturnEta, setLiveReturnEta] = useState<{ minutes: number; arrivalTime: string } | null>(null);
+  
   const [livePolyline, setLivePolyline] = useState<[number, number][] | undefined>(undefined);
   const lastFetchRef = useRef<number>(0);
   const prevIsActiveRef = useRef<boolean>(false);
@@ -150,32 +150,20 @@ export default function TransportDynamicIsland({
         };
         const baseUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/estimate-return`;
 
-        const [liveRes, returnRes] = await Promise.all([
-          fetch(baseUrl, {
-            method: 'POST',
-            headers,
-            body: JSON.stringify({
-              mode: 'LIVE_ROUTE',
-              origin_lat: location.latitude,
-              origin_lng: location.longitude,
-              dest_lat: dest.lat,
-              dest_lng: dest.lng,
-              destination: t.destino,
-            }),
+        const liveRes = await fetch(baseUrl, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            mode: 'LIVE_ROUTE',
+            origin_lat: location.latitude,
+            origin_lng: location.longitude,
+            dest_lat: dest.lat,
+            dest_lng: dest.lng,
+            destination: t.destino,
           }),
-          fetch(baseUrl, {
-            method: 'POST',
-            headers,
-            body: JSON.stringify({
-              origin_lat: location.latitude,
-              origin_lng: location.longitude,
-              destination: 'RETURN_TO_ORIGIN',
-            }),
-          }),
-        ]);
+        });
 
         const liveData = await liveRes.json();
-        const returnData = await returnRes.json();
 
         if (liveData.polyline && !liveData.fallback) {
           try {
@@ -188,12 +176,6 @@ export default function TransportDynamicIsland({
           const eta = new Date(Date.now() + liveData.duration_minutes * 60000);
           const formatted = eta.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
           setLiveDestRoute({ minutes: liveData.duration_minutes, km: liveData.distance_km, arrivalTime: formatted });
-        }
-
-        if (returnData.duration_minutes && !returnData.fallback) {
-          const retEta = new Date(Date.now() + returnData.duration_minutes * 60000);
-          const retFormatted = retEta.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
-          setLiveReturnEta({ minutes: returnData.duration_minutes, arrivalTime: retFormatted });
         }
       } catch { /* keep last */ }
     })();
@@ -417,11 +399,6 @@ export default function TransportDynamicIsland({
             {liveDestRoute && isActive && (
               <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-accent/15 text-[11px] font-medium text-accent">
                 <Clock className="w-3 h-3" /> Chegada ~{liveDestRoute.arrivalTime}
-              </span>
-            )}
-            {liveReturnEta && isActive && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-muted/50 text-[11px] font-medium text-foreground/70">
-                🔄 Retorno ~{liveReturnEta.arrivalTime}
               </span>
             )}
           </div>
