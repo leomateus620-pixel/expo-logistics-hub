@@ -676,7 +676,7 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
         setEditGuests(linkedGuests2);
         setEditForm({
           titulo: t.titulo || '', origem: t.origem, destino: t.destino,
-          inicio_em: t.inicio_em?.slice(0, 16) || '', motorista_user_id: t.motorista_user_id || '',
+          inicio_em: t.inicio_em ? utcToSPLocal(t.inicio_em) : '', motorista_user_id: t.motorista_user_id || '',
           vehicle_id: t.vehicle_id || '', prioridade: t.prioridade || 'media',
           status: 'concluido',
           km_retirada: t.km_retirada != null ? String(t.km_retirada) : '',
