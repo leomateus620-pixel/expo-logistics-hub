@@ -82,7 +82,7 @@ export default function TransportDynamicIsland({
 
   const location = useTransportLocation(isActive ? t.id : null);
   const [liveDestRoute, setLiveDestRoute] = useState<{ minutes: number; km: number; arrivalTime: string } | null>(null);
-  const [liveReturnEta, setLiveReturnEta] = useState<{ minutes: number; arrivalTime: string } | null>(null);
+  
   const [livePolyline, setLivePolyline] = useState<[number, number][] | undefined>(undefined);
   const lastFetchRef = useRef<number>(0);
   const prevIsActiveRef = useRef<boolean>(false);
