@@ -153,8 +153,10 @@ export default function TransportDynamicIsland({
     if (throttle > 0 && now - lastFetchRef.current < throttle) return;
     lastFetchRef.current = now;
 
-    const dest = getDestCoords(t);
-    if (!dest) return;
+    // Use destCoords (already swapped to origin during the return phase)
+    if (!destCoords) return;
+    const destLat = destCoords[0];
+    const destLng = destCoords[1];
 
     (async () => {
       try {
@@ -173,9 +175,9 @@ export default function TransportDynamicIsland({
             mode: 'LIVE_ROUTE',
             origin_lat: location.latitude,
             origin_lng: location.longitude,
-            dest_lat: dest.lat,
-            dest_lng: dest.lng,
-            destination: t.destino,
+            dest_lat: destLat,
+            dest_lng: destLng,
+            destination: isReturning ? t.origem : t.destino,
           }),
         });
 
@@ -195,7 +197,7 @@ export default function TransportDynamicIsland({
         }
       } catch { /* keep last */ }
     })();
-  }, [location?.latitude, location?.longitude, isActive]);
+  }, [location?.latitude, location?.longitude, isActive, isReturning, destCoords]);
 
   const etaText = useMemo(() => {
     if (liveDestRoute && isActive) return `${liveDestRoute.minutes} min`;
