@@ -1995,28 +1995,38 @@ export type Database = {
       }
       transports: {
         Row: {
+          chegada_destino_em: string | null
           created_at: string
           destino: string
           destino_lat: number | null
+          destino_lat_chegada: number | null
           destino_lng: number | null
+          destino_lng_chegada: number | null
           distancia_estimada_km: number | null
           duracao_estimada_min: number | null
+          fase_atual: string
           fim_em: string | null
           fim_real_em: string | null
+          fim_retorno_em: string | null
           guest_id: string | null
           horario_saida: string | null
           id: string
           inicio_em: string
           inicio_real_em: string | null
+          inicio_retorno_em: string | null
           km_devolucao: number | null
           km_retirada: number | null
           motorista_user_id: string | null
           observacoes: string | null
           org_id: string
           origem: string
+          origem_lat: number | null
+          origem_lng: number | null
           passageiros_qtd: number | null
           prioridade: Database["public"]["Enums"]["priority_level"] | null
           rota_polyline: string | null
+          rota_polyline_volta: string | null
+          somente_ida: boolean
           status: Database["public"]["Enums"]["transport_status"]
           tipo: string | null
           titulo: string | null
@@ -2028,28 +2038,38 @@ export type Database = {
           voo_numero: string | null
         }
         Insert: {
+          chegada_destino_em?: string | null
           created_at?: string
           destino: string
           destino_lat?: number | null
+          destino_lat_chegada?: number | null
           destino_lng?: number | null
+          destino_lng_chegada?: number | null
           distancia_estimada_km?: number | null
           duracao_estimada_min?: number | null
+          fase_atual?: string
           fim_em?: string | null
           fim_real_em?: string | null
+          fim_retorno_em?: string | null
           guest_id?: string | null
           horario_saida?: string | null
           id?: string
           inicio_em: string
           inicio_real_em?: string | null
+          inicio_retorno_em?: string | null
           km_devolucao?: number | null
           km_retirada?: number | null
           motorista_user_id?: string | null
           observacoes?: string | null
           org_id: string
           origem: string
+          origem_lat?: number | null
+          origem_lng?: number | null
           passageiros_qtd?: number | null
           prioridade?: Database["public"]["Enums"]["priority_level"] | null
           rota_polyline?: string | null
+          rota_polyline_volta?: string | null
+          somente_ida?: boolean
           status?: Database["public"]["Enums"]["transport_status"]
           tipo?: string | null
           titulo?: string | null
@@ -2061,28 +2081,38 @@ export type Database = {
           voo_numero?: string | null
         }
         Update: {
+          chegada_destino_em?: string | null
           created_at?: string
           destino?: string
           destino_lat?: number | null
+          destino_lat_chegada?: number | null
           destino_lng?: number | null
+          destino_lng_chegada?: number | null
           distancia_estimada_km?: number | null
           duracao_estimada_min?: number | null
+          fase_atual?: string
           fim_em?: string | null
           fim_real_em?: string | null
+          fim_retorno_em?: string | null
           guest_id?: string | null
           horario_saida?: string | null
           id?: string
           inicio_em?: string
           inicio_real_em?: string | null
+          inicio_retorno_em?: string | null
           km_devolucao?: number | null
           km_retirada?: number | null
           motorista_user_id?: string | null
           observacoes?: string | null
           org_id?: string
           origem?: string
+          origem_lat?: number | null
+          origem_lng?: number | null
           passageiros_qtd?: number | null
           prioridade?: Database["public"]["Enums"]["priority_level"] | null
           rota_polyline?: string | null
+          rota_polyline_volta?: string | null
+          somente_ida?: boolean
           status?: Database["public"]["Enums"]["transport_status"]
           tipo?: string | null
           titulo?: string | null
@@ -2553,7 +2583,15 @@ export type Database = {
     Enums: {
       app_role: "admin" | "user"
       assignment_status: "confirmado" | "pendente" | "cancelado"
-      audit_action: "create" | "update" | "delete" | "status_change" | "import"
+      audit_action:
+        | "create"
+        | "update"
+        | "delete"
+        | "status_change"
+        | "import"
+        | "arrive_destination"
+        | "start_return"
+        | "complete_return"
       cart_action: "retirada" | "devolucao" | "mudanca_status" | "nota"
       cart_status: "disponivel" | "em_uso" | "manutencao" | "inativo"
       expense_status:
@@ -2575,7 +2613,13 @@ export type Database = {
       schedule_status: "rascunho" | "ativa" | "encerrada"
       task_recurrence: "nenhuma" | "diaria" | "semanal" | "mensal"
       task_status_enum: "pendente" | "concluida"
-      transport_status: "pendente" | "em_andamento" | "concluido" | "cancelado"
+      transport_status:
+        | "pendente"
+        | "em_andamento"
+        | "concluido"
+        | "cancelado"
+        | "chegou_destino"
+        | "em_retorno"
       vehicle_status: "disponivel" | "em_uso" | "manutencao" | "inativo"
       weather_risk_level: "favoravel" | "atencao" | "alerta" | "critico"
       weather_source: "google_weather_api"
@@ -2714,7 +2758,16 @@ export const Constants = {
     Enums: {
       app_role: ["admin", "user"],
       assignment_status: ["confirmado", "pendente", "cancelado"],
-      audit_action: ["create", "update", "delete", "status_change", "import"],
+      audit_action: [
+        "create",
+        "update",
+        "delete",
+        "status_change",
+        "import",
+        "arrive_destination",
+        "start_return",
+        "complete_return",
+      ],
       cart_action: ["retirada", "devolucao", "mudanca_status", "nota"],
       cart_status: ["disponivel", "em_uso", "manutencao", "inativo"],
       expense_status: [
@@ -2737,7 +2790,14 @@ export const Constants = {
       schedule_status: ["rascunho", "ativa", "encerrada"],
       task_recurrence: ["nenhuma", "diaria", "semanal", "mensal"],
       task_status_enum: ["pendente", "concluida"],
-      transport_status: ["pendente", "em_andamento", "concluido", "cancelado"],
+      transport_status: [
+        "pendente",
+        "em_andamento",
+        "concluido",
+        "cancelado",
+        "chegou_destino",
+        "em_retorno",
+      ],
       vehicle_status: ["disponivel", "em_uso", "manutencao", "inativo"],
       weather_risk_level: ["favoravel", "atencao", "alerta", "critico"],
       weather_source: ["google_weather_api"],
