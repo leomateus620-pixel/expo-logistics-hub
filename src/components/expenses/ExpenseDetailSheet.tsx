@@ -7,9 +7,10 @@ import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import {
-  Receipt, Car, Truck, User, FileCheck, QrCode,
+  Receipt, Car, Truck, User, QrCode, FileText,
   CheckCircle, XCircle, Clock, Banknote, AlertCircle,
 } from 'lucide-react';
+import ExpenseDocumentPreview from './ExpenseDocumentPreview';
 
 const statusConfig: Record<string, { label: string; class: string; icon: React.ElementType }> = {
   rascunho: { label: 'Rascunho', class: 'bg-muted text-muted-foreground', icon: Clock },
@@ -82,7 +83,6 @@ export default function ExpenseDetailSheet({
       {/* Details */}
       <div className="rounded-xl bg-muted/30 p-3">
         <InfoRow label="Título" value={expense.title} icon={Receipt} />
-        {expense.description && <InfoRow label="Descrição" value={expense.description} />}
         <InfoRow
           label="Data"
           value={expense.expense_date ? format(new Date(expense.expense_date), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR }) : undefined}
@@ -103,15 +103,27 @@ export default function ExpenseDetailSheet({
         {expense.pix_key && (
           <InfoRow label="Chave Pix" value={`${expense.pix_key_type?.toUpperCase()}: ${expense.pix_key}`} icon={Banknote} />
         )}
-
-        {/* Document indicator */}
-        {hasDoc && (
-          <div className="flex items-center gap-2 py-2 text-success">
-            <FileCheck className="w-4 h-4" />
-            <span className="text-xs font-medium">{expense.expense_documents.length} comprovante(s) anexado(s)</span>
-          </div>
-        )}
       </div>
+
+      {/* Full description (multi-line) */}
+      {expense.description && (
+        <div className="rounded-xl bg-muted/30 p-3">
+          <div className="flex items-center gap-2 mb-1.5">
+            <FileText className="w-4 h-4 text-muted-foreground" />
+            <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Descrição</p>
+          </div>
+          <p className="text-sm text-foreground whitespace-pre-wrap break-words leading-relaxed">
+            {expense.description}
+          </p>
+        </div>
+      )}
+
+      {/* Documents */}
+      {hasDoc && (
+        <div className="rounded-xl bg-muted/30 p-3">
+          <ExpenseDocumentPreview documents={expense.expense_documents} />
+        </div>
+      )}
 
       {/* Actions */}
       <div className="flex flex-col gap-2">
