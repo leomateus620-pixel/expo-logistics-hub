@@ -3,6 +3,17 @@ import { supabase } from '@/integrations/supabase/client';
 import { useCurrentOrg } from './useCurrentOrg';
 import { toast } from 'sonner';
 
+// Fenasoja return-trip window (SP timezone): 29/04/2026 → 10/05/2026
+const RETURN_WINDOW_START = new Date('2026-04-29T03:00:00.000Z');
+const RETURN_WINDOW_END = new Date('2026-05-11T02:59:59.999Z');
+
+export function isInReturnTripWindow(inicioEm: string | null | undefined): boolean {
+  if (!inicioEm) return false;
+  const d = new Date(inicioEm);
+  if (isNaN(d.getTime())) return false;
+  return d >= RETURN_WINDOW_START && d <= RETURN_WINDOW_END;
+}
+
 export function useTransports() {
   const { orgId } = useCurrentOrg();
   const qc = useQueryClient();
@@ -33,21 +44,19 @@ export function useTransports() {
       body: { action, payload },
     });
     if (error) {
-      // Try to extract the real error message from the edge function response
       let message = error.message;
       try {
         if ((error as any).context) {
           const body = await (error as any).context.json();
           if (body?.error) message = body.error;
         }
-      } catch { /* ignore parse errors */ }
+      } catch { /* ignore */ }
       throw new Error(message);
     }
-    // Edge function returns JSON; check for error field
     if (data?.error) {
-      const err = new Error(data.error);
-      (err as any).status = data.status;
-      throw err;
+      const errObj = new Error(data.error);
+      (errObj as any).status = data.status;
+      throw errObj;
     }
     return data;
   };
@@ -58,7 +67,6 @@ export function useTransports() {
         transport: { ...params.transport, org_id: orgId },
         guestIds: params.guestIds || [],
       });
-      // Fire-and-forget: trigger weather sync for the new transport
       const newId = result?.data?.id ?? result?.id;
       if (newId) {
         supabase.functions
@@ -136,5 +144,55 @@ export function useTransports() {
     onSuccess: invalidateAll,
   });
 
-  return { transports, isLoading, create, update, remove, start };
+  const arriveDestination = useMutation({
+    mutationFn: async (params: { id: string }) => {
+      const result = await invokeLifecycle('arrive_destination', { id: params.id, orgId });
+      return result.data;
+    },
+    onError: (error: any) => toast.error(error?.message || 'Erro ao registrar chegada'),
+    onSuccess: () => {
+      toast.success('Chegada registrada — pronto para iniciar a volta');
+      invalidateAll();
+    },
+  });
+
+  const startReturn = useMutation({
+    mutationFn: async (params: { id: string }) => {
+      const result = await invokeLifecycle('start_return', { id: params.id, orgId });
+      return result.data;
+    },
+    onError: (error: any) => toast.error(error?.message || 'Erro ao iniciar volta'),
+    onSuccess: () => {
+      toast.success('Viagem de volta iniciada');
+      invalidateAll();
+    },
+  });
+
+  const completeReturn = useMutation({
+    mutationFn: async (params: { id: string; vehicleUsage?: Record<string, any> | null }) => {
+      const result = await invokeLifecycle('complete_return', {
+        id: params.id,
+        orgId,
+        vehicleUsage: params.vehicleUsage || null,
+      });
+      return result.data;
+    },
+    onError: (error: any) => toast.error(error?.message || 'Erro ao concluir retorno'),
+    onSuccess: () => {
+      toast.success('Retorno concluído');
+      invalidateAll();
+    },
+  });
+
+  return {
+    transports,
+    isLoading,
+    create,
+    update,
+    remove,
+    start,
+    arriveDestination,
+    startReturn,
+    completeReturn,
+  };
 }

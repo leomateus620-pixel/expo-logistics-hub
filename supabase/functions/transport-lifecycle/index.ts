@@ -10,7 +10,21 @@ const ACTION_MIN_ROLES: Record<string, string[]> = {
   update: ["admin", "gestor", "operador"],
   start: ["admin", "gestor", "operador"],
   delete: ["admin", "gestor", "operador"],
+  arrive_destination: ["admin", "gestor", "operador"],
+  start_return: ["admin", "gestor", "operador"],
+  complete_return: ["admin", "gestor", "operador"],
 };
+
+// ── Fenasoja return-trip window: 29/04/2026 → 10/05/2026 (SP) ──
+const RETURN_WINDOW_START = new Date("2026-04-29T03:00:00.000Z"); // 00:00 SP = 03:00 UTC
+const RETURN_WINDOW_END = new Date("2026-05-11T02:59:59.999Z");   // end of 10/05 SP
+
+function isInReturnWindow(inicioEm: string | null | undefined): boolean {
+  if (!inicioEm) return false;
+  const d = new Date(inicioEm);
+  if (isNaN(d.getTime())) return false;
+  return d >= RETURN_WINDOW_START && d <= RETURN_WINDOW_END;
+}
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -59,17 +73,14 @@ Deno.serve(async (req) => {
       }
     }
 
-    if (action === "create") {
-      return await handleCreate(admin, user.id, payload);
-    } else if (action === "update") {
-      return await handleUpdate(admin, user.id, payload);
-    } else if (action === "start") {
-      return await handleStart(admin, user.id, payload);
-    } else if (action === "delete") {
-      return await handleDelete(admin, user.id, payload);
-    } else {
-      return err("Ação inválida", 400);
-    }
+    if (action === "create") return await handleCreate(admin, user.id, payload);
+    if (action === "update") return await handleUpdate(admin, user.id, payload);
+    if (action === "start") return await handleStart(admin, user.id, payload);
+    if (action === "delete") return await handleDelete(admin, user.id, payload);
+    if (action === "arrive_destination") return await handleArriveDestination(admin, user.id, payload);
+    if (action === "start_return") return await handleStartReturn(admin, user.id, payload);
+    if (action === "complete_return") return await handleCompleteReturn(admin, user.id, payload);
+    return err("Ação inválida", 400);
   } catch (err_) {
     return new Response(JSON.stringify({ error: (err_ as Error).message }), {
       status: 500,
@@ -139,7 +150,7 @@ async function handleStart(admin: any, userId: string, payload: any) {
   const now = new Date().toISOString();
   const { data: updated, error: updateErr } = await admin
     .from("transports")
-    .update({ status: "em_andamento", inicio_real_em: now })
+    .update({ status: "em_andamento", inicio_real_em: now, fase_atual: "ida" })
     .eq("id", id)
     .select()
     .single();
@@ -168,7 +179,6 @@ async function handleStart(admin: any, userId: string, payload: any) {
     destinoLabel = `Aeroporto${transport.voo_cidade ? ` de ${transport.voo_cidade}` : ""}`;
   }
 
-  // Build per-guest WhatsApp data
   const whatsappGuests: any[] = [];
   for (const guest of allGuests) {
     const message = guest.nome
@@ -196,7 +206,6 @@ async function handleStart(admin: any, userId: string, payload: any) {
     });
   }
 
-  // If no guests linked, build a generic entry
   if (whatsappGuests.length === 0) {
     whatsappGuests.push({
       phone: "",
@@ -207,20 +216,195 @@ async function handleStart(admin: any, userId: string, payload: any) {
     });
   }
 
-  // Legacy compat: first guest as `whatsapp`
   const firstGuest = whatsappGuests[0];
 
   return ok({
     data: updated,
-    whatsapp: {
-      ...firstGuest,
-      driverName,
-      startedAt: now,
-    },
+    whatsapp: { ...firstGuest, driverName, startedAt: now },
     whatsappGuests,
     driverName,
     startedAt: now,
   });
+}
+
+// ── ARRIVE DESTINATION ──────────────────────────────────────
+async function handleArriveDestination(admin: any, userId: string, payload: any) {
+  const { id, orgId } = payload;
+
+  const { data: transport, error: fetchErr } = await admin
+    .from("transports")
+    .select("*")
+    .eq("id", id)
+    .single();
+  if (fetchErr || !transport) return err("Transporte não encontrado", 404);
+
+  if (!isInReturnWindow(transport.inicio_em)) {
+    return err("Fluxo de retorno disponível apenas para viagens entre 29/04 e 10/05/2026", 400);
+  }
+
+  if (transport.status !== "em_andamento") {
+    return err(`Status inválido: aguardando "em_andamento", está "${transport.status}"`, 400);
+  }
+
+  // Get last GPS position (snapshot before transport_locations row may be deleted later)
+  const { data: lastLoc } = await admin
+    .from("transport_locations")
+    .select("latitude, longitude")
+    .eq("transport_id", id)
+    .maybeSingle();
+
+  const now = new Date().toISOString();
+  const updates: Record<string, unknown> = {
+    status: "chegou_destino",
+    chegada_destino_em: now,
+    fase_atual: "ida",
+  };
+  if (lastLoc?.latitude && lastLoc?.longitude) {
+    updates.destino_lat_chegada = lastLoc.latitude;
+    updates.destino_lng_chegada = lastLoc.longitude;
+  }
+
+  const { data: updated, error: updateErr } = await admin
+    .from("transports")
+    .update(updates)
+    .eq("id", id)
+    .select()
+    .single();
+  if (updateErr) return err(updateErr.message);
+
+  await admin.from("audit_log").insert({
+    org_id: orgId,
+    actor_user_id: userId,
+    entity: "transports",
+    entity_id: id,
+    action: "arrive_destination",
+    before_data: { status: transport.status },
+    after_data: updates,
+  });
+
+  return ok({ data: updated });
+}
+
+// ── START RETURN ────────────────────────────────────────────
+async function handleStartReturn(admin: any, userId: string, payload: any) {
+  const { id, orgId } = payload;
+
+  const { data: transport, error: fetchErr } = await admin
+    .from("transports")
+    .select("*")
+    .eq("id", id)
+    .single();
+  if (fetchErr || !transport) return err("Transporte não encontrado", 404);
+
+  if (!isInReturnWindow(transport.inicio_em)) {
+    return err("Fluxo de retorno disponível apenas para viagens entre 29/04 e 10/05/2026", 400);
+  }
+
+  if (transport.somente_ida) {
+    return err("Este transporte foi marcado como Somente Ida", 400);
+  }
+
+  if (transport.status !== "chegou_destino") {
+    return err("Registre a chegada no destino primeiro", 400);
+  }
+
+  const now = new Date().toISOString();
+  const updates: Record<string, unknown> = {
+    status: "em_retorno",
+    inicio_retorno_em: now,
+    fase_atual: "volta",
+  };
+
+  const { data: updated, error: updateErr } = await admin
+    .from("transports")
+    .update(updates)
+    .eq("id", id)
+    .select()
+    .single();
+  if (updateErr) return err(updateErr.message);
+
+  await admin.from("audit_log").insert({
+    org_id: orgId,
+    actor_user_id: userId,
+    entity: "transports",
+    entity_id: id,
+    action: "start_return",
+    before_data: { status: transport.status },
+    after_data: updates,
+  });
+
+  return ok({ data: updated });
+}
+
+// ── COMPLETE RETURN ─────────────────────────────────────────
+async function handleCompleteReturn(admin: any, userId: string, payload: any) {
+  const { id, orgId, vehicleUsage } = payload;
+
+  const { data: before } = await admin
+    .from("transports")
+    .select("*")
+    .eq("id", id)
+    .single();
+  if (!before) return err("Transporte não encontrado", 404);
+
+  if (!isInReturnWindow(before.inicio_em)) {
+    return err("Fluxo de retorno disponível apenas para viagens entre 29/04 e 10/05/2026", 400);
+  }
+
+  if (before.status !== "em_retorno") {
+    return err(`Status inválido: aguardando "em_retorno", está "${before.status}"`, 400);
+  }
+
+  const now = new Date().toISOString();
+  const updates: Record<string, unknown> = {
+    status: "concluido",
+    fim_retorno_em: now,
+    fim_real_em: now,
+  };
+  if (vehicleUsage?.km_chegada != null) {
+    updates.km_devolucao = vehicleUsage.km_chegada;
+  }
+  if (vehicleUsage?.fim_em) updates.fim_em = vehicleUsage.fim_em;
+
+  const { data: updated, error: updateErr } = await admin
+    .from("transports")
+    .update(updates)
+    .eq("id", id)
+    .select()
+    .single();
+  if (updateErr) return err(updateErr.message);
+
+  await admin.from("audit_log").insert({
+    org_id: orgId,
+    actor_user_id: userId,
+    entity: "transports",
+    entity_id: id,
+    action: "complete_return",
+    before_data: { status: before.status },
+    after_data: updates,
+  });
+
+  // Register vehicle_usage if KM was provided
+  if (vehicleUsage && vehicleUsage.vehicle_id && vehicleUsage.km_saida != null && vehicleUsage.km_chegada != null) {
+    try {
+      await admin.from("vehicle_usage").insert({
+        org_id: orgId,
+        vehicle_id: vehicleUsage.vehicle_id,
+        responsavel_user_id: vehicleUsage.responsavel_user_id,
+        km_saida: vehicleUsage.km_saida,
+        km_chegada: vehicleUsage.km_chegada,
+        devolucao_em: vehicleUsage.devolucao_em || now,
+      });
+      await admin
+        .from("vehicles")
+        .update({ km_atual: vehicleUsage.km_chegada })
+        .eq("id", vehicleUsage.vehicle_id);
+    } catch (e) {
+      console.error("[transport-lifecycle] Failed to create vehicle_usage on complete_return:", e);
+    }
+  }
+
+  return ok({ data: updated });
 }
 
 // ── CREATE ──────────────────────────────────────────────────
@@ -251,7 +435,6 @@ async function handleCreate(admin: any, userId: string, payload: any) {
     });
   }
 
-  // Auto-create shift for schedules (no event duplication)
   try {
     await createShiftForTransport(admin, userId, transport, data.id);
   } catch (e) {
@@ -340,7 +523,6 @@ async function handleDelete(admin: any, userId: string, payload: any) {
     .eq("id", id)
     .single();
 
-  // Delete dependent records first to avoid FK violations
   await admin.from("transport_guests").delete().eq("transport_id", id);
   await admin.from("transport_locations").delete().eq("transport_id", id);
 
@@ -377,7 +559,6 @@ async function createShiftForTransport(admin: any, userId: string, transport: an
   }
   if (!fimEm) fimEm = inicioEm;
 
-  // Use São Paulo timezone for correct date extraction
   const transportDate = toSPDate(inicioEm);
 
   const titulo = `Transporte: ${transport.titulo || ""} ${transport.origem} → ${transport.destino}`.trim();
