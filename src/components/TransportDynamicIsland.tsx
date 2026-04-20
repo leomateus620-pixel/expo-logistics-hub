@@ -49,9 +49,13 @@ function decodePolyline(encoded: string): [number, number][] {
 const statusLabels: Record<string, string> = {
   pendente: 'Pendente',
   em_andamento: 'Em trânsito',
+  chegou_destino: 'Chegou no destino',
+  em_retorno: 'Em rota de retorno',
   concluido: 'Concluído',
   cancelado: 'Cancelado',
 };
+
+const SANTA_ROSA = { lat: -27.8708, lng: -54.4814 };
 
 interface TransportDynamicIslandProps {
   transport: any;
