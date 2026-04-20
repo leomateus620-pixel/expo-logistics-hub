@@ -598,6 +598,22 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
   const handleEditSave = async () => {
     try {
       const currentTransport = transports.find((t: any) => t.id === editId);
+      // If this Finalize dialog was opened for the return-trip flow, dispatch complete_return
+      if ((editForm as any).__completeReturn && currentTransport?.status === 'em_retorno') {
+        const kmSaida = editForm.km_retirada ? Number(editForm.km_retirada) : null;
+        const kmChegada = editForm.km_devolucao ? Number(editForm.km_devolucao) : null;
+        const vehicleUsage = (editForm.vehicle_id && editForm.vehicle_id !== 'none' && kmSaida != null && kmChegada != null) ? {
+          vehicle_id: editForm.vehicle_id,
+          responsavel_user_id: editForm.motorista_user_id && editForm.motorista_user_id !== 'none' ? editForm.motorista_user_id : null,
+          km_saida: kmSaida,
+          km_chegada: kmChegada,
+          devolucao_em: editForm.fim_em ? ensureSPOffset(editForm.fim_em) : nowSP(),
+          fim_em: editForm.fim_em ? ensureSPOffset(editForm.fim_em) : nowSP(),
+        } : null;
+        await completeReturn.mutateAsync({ id: editId, vehicleUsage });
+        setEditOpen(false);
+        return;
+      }
       const statusChanged = currentTransport && currentTransport.status !== editForm.status;
       const routeFieldsChanged = !!currentTransport && (
         currentTransport.titulo !== (editForm.titulo || null) ||
