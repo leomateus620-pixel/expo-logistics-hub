@@ -2,114 +2,59 @@
 
 ## Diagnóstico
 
-Hoje o ciclo de status é: `pendente → em_andamento → concluido`. Quando o motorista chega no destino, o operador clica em "Finalizar" e o transporte é fechado. Não há nenhuma fase intermediária para acompanhar o **trajeto de volta** (Destino → Origem) com mapa, ETA e tracking ao vivo — apesar de a contabilização interna (km, custo) já considerar ida + volta.
+No `ExpenseDetailSheet.tsx` (modal aberto ao clicar numa despesa), há duas limitações:
 
-A captura mostra justamente isso: o card mostra `Origem → Destino → Origem` no header, mas o mapa, polyline e ETA só funcionam para a perna de **ida**.
+1. **Descrição truncada**: o `InfoRow` usa `truncate` (linha 60), cortando o texto da descrição em uma linha. No print, "CNPJ: 9833807200…" aparece com reticências.
+2. **Comprovante invisível**: o componente apenas mostra `"1 comprovante(s) anexado(s)"` em texto, sem renderizar/abrir o arquivo. Os documentos estão no bucket privado `expense-documents` e a query em `useExpenses` já traz `expense_documents(id, file_url, extraction_status)`.
 
-## Solução: novo status `em_retorno`
+## Solução
 
-Adicionar uma fase intermediária na máquina de estados, mantendo **um único registro de transporte** (sem duplicação) e **o mesmo veículo vinculado**.
+### 1. Descrição completa (`ExpenseDetailSheet.tsx`)
 
-```text
-pendente → em_andamento → chegou_destino → em_retorno → concluido
-                              (botão)        (tracking    (finalizar
-                                              da volta)    com KM)
+- Renderizar a descrição em um bloco dedicado **fora** do componente `InfoRow` (que é forçado a uma linha), com `whitespace-pre-wrap break-words` e sem `truncate`.
+- Manter ícone + label, mas usar layout em coluna para o texto fluir em múltiplas linhas.
+
+### 2. Visualização de comprovantes
+
+Substituir a linha textual por uma seção interativa:
+
+- **Listar cada documento** com miniatura (se for imagem) ou ícone PDF.
+- **Botão "Visualizar"** que abre o arquivo numa Lightbox/Dialog (imagens) ou nova aba (PDFs).
+- Como o bucket é **privado**, gerar **Signed URL on-demand** via `supabase.storage.from('expense-documents').createSignedUrl(path, 3600)`.
+  - O campo `file_url` salvo no banco já é uma signed URL (com expiração de 1h). Pode estar expirada — então sempre **regerar** ao abrir o detalhe, extraindo o `path` original armazenado em `expense_documents.file_path` (verificar nome real da coluna nos types).
+- Detectar tipo de arquivo pela extensão (`.jpg/.png/.webp` → preview inline; `.pdf` → ícone + abrir em nova aba).
+
+### 3. Novo subcomponente `ExpenseDocumentPreview.tsx`
+
+- Recebe lista `expense.expense_documents`.
+- Para cada doc: gera signed URL fresca via Supabase Storage.
+- Renderiza grid 2-col (mobile 1-col) com thumb 80x80 + nome + botão olho/download.
+- Ao clicar: abre `Dialog` fullscreen (mobile: `Drawer`) com `<img>` zoomável ou `<iframe>` PDF.
+- Loading skeleton enquanto a signed URL é buscada.
+
+### 4. Ajustes no `useExpenses.ts`
+
+Adicionar à query de `expenses` o campo `file_path` (e `file_name`/`mime_type` se existirem):
+
+```ts
+.select('*, expense_categories(name, icon), expense_documents(id, file_url, file_path, file_name, mime_type, extraction_status)')
 ```
 
-### Novos campos no banco (`transports`)
-
-| Campo | Tipo | Uso |
-|---|---|---|
-| `chegada_destino_em` | `timestamptz` | timestamp da chegada no destino (auditoria) |
-| `inicio_retorno_em` | `timestamptz` | timestamp do clique "Iniciar Volta" |
-| `fim_retorno_em` | `timestamptz` | finalização do retorno (= `fim_real_em`) |
-| `destino_lat_chegada` / `destino_lng_chegada` | `double precision` | coordenadas exatas do check-in (ponto de partida da volta) |
-| `rota_polyline_volta` | `text` | polyline da rota Destino → Origem |
-| `origem_lat` / `origem_lng` | `double precision` | coordenadas da origem (chegada da volta) |
-| `somente_ida` | `boolean default false` | flag opcional para suprimir a volta |
-| `fase_atual` | `text` (`'ida' | 'volta'`) | indica perna ativa para a UI |
-
-Atualizar o enum `transport_status` adicionando `'chegou_destino'` e `'em_retorno'`.
-
-Trigger `validate_transport`: ajustar para aceitar as novas transições e marcar `fim_real_em = now()` apenas em `concluido`.
-
-### Edge function `transport-lifecycle`
-
-Adicionar 3 novas ações (com mesma RBAC `admin/gestor/operador`):
-
-1. **`arrive_destination`** — transição `em_andamento → chegou_destino`. Salva `chegada_destino_em`, `destino_lat_chegada/lng_chegada` (do último GPS em `transport_locations`), e mantém o tracking ativo (sem parar). Auditoria.
-2. **`start_return`** — transição `chegou_destino → em_retorno`. Bloqueia se `somente_ida=true`. Define `inicio_retorno_em`, `fase_atual='volta'`. Dispara WhatsApp opcional ("Motorista iniciou retorno"). Auditoria.
-3. **`complete_return`** — transição `em_retorno → concluido`. Define `fim_retorno_em`, `fim_real_em`, e segue o fluxo atual de `vehicle_usage` (KM saída/chegada — mantém comportamento atual).
-
-A ação `start` existente continua igual (perna de ida). A ação `update` (modal "Finalizar") **não muda o status para `concluido` direto** se a fase for ida — em vez disso, sugere `chegou_destino`.
-
-### Frontend
-
-#### `TransportDynamicIsland.tsx`
-- **Status `chegou_destino`**: mapa congelado no destino, badge âmbar "Chegou no destino", botão grande **"Iniciar Viagem de Volta"** (oculto se `somente_ida`).
-- **Status `em_retorno`**: mesmo motor de tracking ativo (`useTransportLocation`), mas com `destCoords` = `(origem_lat, origem_lng)`, polyline = `rota_polyline_volta`, badge "Em rota de retorno" (cor distinta — roxo/índigo). ETA calculada via `estimate-return` com `mode: 'LIVE_ROUTE'` apontando para a origem.
-- Header passa a destacar visualmente a perna ativa: `Origem → **Destino** → Origem` (ida) vs `Origem → Destino → **Origem**` (volta).
-
-#### `TransportsPage.tsx` — `cycleStatus`
-Reescrever a fila de transição:
-```text
-pendente → start (mutation existente)
-em_andamento → arrive_destination (novo botão "Cheguei")
-chegou_destino → start_return (botão "Iniciar Volta") OU pula direto para finalizar se somente_ida
-em_retorno → abre modal Finalizar (KM devolução) → complete_return
-```
-
-#### `TransportDetailView.tsx`
-Adicionar duas seções/abas claras:
-- **Ida** — `inicio_real_em` → `chegada_destino_em`, polyline ida, KM ida (estimado).
-- **Volta** — `inicio_retorno_em` → `fim_retorno_em`, polyline volta, KM volta (estimado).
-Métricas totais (km_rodados, custo) seguem unificadas no card "Métricas da Viagem".
-
-#### `TransportCard.tsx` / `TransportForm.tsx`
-- Card: badge de fase ativa (Ida/Volta) e botão contextual.
-- Form de criação: checkbox **"Transporte só ida"** (`somente_ida`), default `false`.
-
-### Bloqueios de erro
-
-- Tentar `start_return` sem `chegou_destino` → erro "Registre a chegada no destino primeiro".
-- Tentar `arrive_destination` sem GPS recente → permite, mas sem coordenadas (usa destino conhecido como fallback).
-- Trocar veículo durante `em_retorno` → backend rejeita.
-
-### Restrição ao período Fenasoja (29/04 a 10/05/2026)
-
-- Frontend: o botão "Iniciar Volta" e a UI da nova fase **só aparecem** se `inicio_em` cair entre `2026-04-29` e `2026-05-10` (SP). Fora desse intervalo, o fluxo permanece o atual (`em_andamento → concluido` direto).
-- Backend `transport-lifecycle`: as ações `arrive_destination`, `start_return`, `complete_return` validam o mesmo intervalo e retornam 400 se fora.
-- Para transportes `somente_ida=true` ou fora da janela, `cycleStatus` segue o caminho legado.
-
-### Realtime / offline
-- A tabela `transports` já está em `supabase_realtime`; mudanças de status propagam para todos os clientes sem ajuste.
-- `useTransportLocation` continua persistindo posições — apenas o consumidor (Dynamic Island) reaponta `destCoords` para a origem quando `fase_atual='volta'`.
-
-### Auditoria
-Todas as 3 novas ações gravam linhas em `audit_log` com `entity='transports'`, `action='arrive_destination' | 'start_return' | 'complete_return'`, e `before/after_data` com timestamps.
+Se a tabela não tiver `file_path`, derivar o path a partir da `file_url` (parse) ou usar `file_url` diretamente quando ainda válida, com fallback para regenerar.
 
 ## Arquivos a editar
 
 | Arquivo | Mudança |
 |---|---|
-| `supabase/migrations/<novo>.sql` | enum + colunas + trigger ajustado |
-| `supabase/functions/transport-lifecycle/index.ts` | 3 handlers novos + validação de janela 29/04–10/05 |
-| `src/hooks/useTransports.ts` | mutações `arriveDestination`, `startReturn`, `completeReturn` |
-| `src/components/TransportDynamicIsland.tsx` | UI fase volta, botão "Iniciar Volta", reaponto de `destCoords`/polyline |
-| `src/components/transport/TransportCard.tsx` | badge de fase + botão contextual |
-| `src/components/transport/TransportDetailView.tsx` | abas/seções Ida × Volta |
-| `src/components/transport/TransportForm.tsx` | checkbox "Somente ida" |
-| `src/pages/TransportsPage.tsx` | reescrever `cycleStatus` para a nova máquina de estados |
-| `src/integrations/supabase/types.ts` | regenerado automaticamente |
+| `src/components/expenses/ExpenseDetailSheet.tsx` | Descrição em bloco multilinha + integrar `ExpenseDocumentPreview` |
+| `src/components/expenses/ExpenseDocumentPreview.tsx` | **Novo** — lista, signed URL, lightbox imagem/PDF |
+| `src/hooks/useExpenses.ts` | Selecionar `file_path/file_name/mime_type` em `expense_documents` |
 
-## Critérios de aceite (validação)
+## Critérios de aceite
 
-1. Transporte criado para 02/05/2026 mostra botão "Cheguei" durante `em_andamento`.
-2. Após "Cheguei", surge "Iniciar Volta"; mapa para de avançar a ida.
-3. Ao iniciar a volta, polyline e ETA mostram **Destino → Origem** ao vivo.
-4. Veículo vinculado permanece o mesmo (impossível trocar).
-5. Ao chegar na origem, modal "Finalizar" abre com KM devolução; após salvar, status vira `concluido` e `vehicle_usage` é gravado uma única vez.
-6. Marcar "Somente ida" suprime toda a fase de retorno (fluxo legado).
-7. Transporte criado para 28/04 ou 11/05 segue o ciclo antigo (sem botão de volta).
-8. `audit_log` registra `arrive_destination`, `start_return`, `complete_return` com timestamps.
+1. Clicar numa despesa abre o detalhe com a descrição **completa**, quebrando linha sem `…`.
+2. Se houver comprovantes, aparece grid com thumb (imagem) ou ícone PDF + botão "Visualizar".
+3. Clicar em "Visualizar" abre o arquivo em modal (imagem) ou nova aba (PDF).
+4. Funciona para os 3 documentos do bucket privado, sempre com signed URL fresca de 1h.
+5. Mobile: lightbox abre como Drawer; desktop: como Dialog.
 
