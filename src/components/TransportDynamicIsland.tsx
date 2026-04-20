@@ -419,11 +419,6 @@ export default function TransportDynamicIsland({
                 <Clock className="w-3 h-3" /> Chegada ~{liveDestRoute.arrivalTime}
               </span>
             )}
-            {liveReturnEta && isActive && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-muted/50 text-[11px] font-medium text-foreground/70">
-                🔄 Retorno ~{liveReturnEta.arrivalTime}
-              </span>
-            )}
           </div>
 
           {/* People info */}
