@@ -245,7 +245,25 @@ export default function ExpensesPage() {
             ))}
           </div>
 
-          {/* List grouped by date */}
+          {/* Person filter */}
+          {distinctNames.length > 0 && (
+            <div className="mb-3">
+              <Select value={personFilter} onValueChange={(v) => setPersonFilter(v === '__all__' ? '' : v)}>
+                <SelectTrigger className="h-9 rounded-xl text-xs bg-card/50 border-border/30">
+                  <div className="flex items-center gap-1.5">
+                    <User className="w-3.5 h-3.5 text-muted-foreground" />
+                    <SelectValue placeholder="Filtrar por pessoa" />
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__all__">Todos</SelectItem>
+                  {distinctNames.map(name => (
+                    <SelectItem key={name} value={name}>{name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
           {isLoading ? (
             <div className="space-y-2">
               {[1, 2, 3].map(i => <div key={i} className="h-16 rounded-xl bg-muted/30 animate-pulse" />)}
