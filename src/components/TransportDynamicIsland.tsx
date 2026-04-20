@@ -150,32 +150,20 @@ export default function TransportDynamicIsland({
         };
         const baseUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/estimate-return`;
 
-        const [liveRes, returnRes] = await Promise.all([
-          fetch(baseUrl, {
-            method: 'POST',
-            headers,
-            body: JSON.stringify({
-              mode: 'LIVE_ROUTE',
-              origin_lat: location.latitude,
-              origin_lng: location.longitude,
-              dest_lat: dest.lat,
-              dest_lng: dest.lng,
-              destination: t.destino,
-            }),
+        const liveRes = await fetch(baseUrl, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify({
+            mode: 'LIVE_ROUTE',
+            origin_lat: location.latitude,
+            origin_lng: location.longitude,
+            dest_lat: dest.lat,
+            dest_lng: dest.lng,
+            destination: t.destino,
           }),
-          fetch(baseUrl, {
-            method: 'POST',
-            headers,
-            body: JSON.stringify({
-              origin_lat: location.latitude,
-              origin_lng: location.longitude,
-              destination: 'RETURN_TO_ORIGIN',
-            }),
-          }),
-        ]);
+        });
 
         const liveData = await liveRes.json();
-        const returnData = await returnRes.json();
 
         if (liveData.polyline && !liveData.fallback) {
           try {
@@ -188,12 +176,6 @@ export default function TransportDynamicIsland({
           const eta = new Date(Date.now() + liveData.duration_minutes * 60000);
           const formatted = eta.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
           setLiveDestRoute({ minutes: liveData.duration_minutes, km: liveData.distance_km, arrivalTime: formatted });
-        }
-
-        if (returnData.duration_minutes && !returnData.fallback) {
-          const retEta = new Date(Date.now() + returnData.duration_minutes * 60000);
-          const retFormatted = retEta.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
-          setLiveReturnEta({ minutes: returnData.duration_minutes, arrivalTime: retFormatted });
         }
       } catch { /* keep last */ }
     })();
