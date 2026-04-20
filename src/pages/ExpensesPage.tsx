@@ -56,6 +56,7 @@ export default function ExpensesPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [createOpen, setCreateOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState('');
+  const [personFilter, setPersonFilter] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState<any>(null);
   const { user } = useAuth();
@@ -73,7 +74,17 @@ export default function ExpensesPage() {
     }
   }, [searchParams, setSearchParams]);
 
-  const grouped = useMemo(() => groupByDate(expenses), [expenses]);
+  const distinctNames = useMemo(() =>
+    [...new Set(expenses?.map((e: any) => e.paid_by_name).filter(Boolean))].sort() as string[],
+    [expenses]
+  );
+
+  const filteredExpenses = useMemo(() =>
+    personFilter ? expenses.filter((e: any) => e.paid_by_name === personFilter) : expenses,
+    [expenses, personFilter]
+  );
+
+  const grouped = useMemo(() => groupByDate(filteredExpenses), [filteredExpenses]);
 
   const handleCreate = async (data: Record<string, any>, file?: File) => {
     setIsSubmitting(true);
