@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useExpenses } from '@/hooks/useExpenses';
 import { useAuth } from '@/hooks/useAuth';
@@ -12,7 +13,7 @@ import ExpenseForm from '@/components/expenses/ExpenseForm';
 import ExpenseCard from '@/components/expenses/ExpenseCard';
 import ExpenseDetailSheet from '@/components/expenses/ExpenseDetailSheet';
 import ReimbursementList from '@/components/expenses/ReimbursementList';
-import { Plus, Receipt, Banknote, Camera, ScanLine } from 'lucide-react';
+import { Plus, Receipt, Banknote, Camera, ScanLine, User } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { format, isToday, isYesterday, isThisWeek } from 'date-fns';
@@ -55,6 +56,7 @@ export default function ExpensesPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [createOpen, setCreateOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState('');
+  const [personFilter, setPersonFilter] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState<any>(null);
   const { user } = useAuth();
@@ -72,7 +74,17 @@ export default function ExpensesPage() {
     }
   }, [searchParams, setSearchParams]);
 
-  const grouped = useMemo(() => groupByDate(expenses), [expenses]);
+  const distinctNames = useMemo(() =>
+    [...new Set(expenses?.map((e: any) => e.paid_by_name).filter(Boolean))].sort() as string[],
+    [expenses]
+  );
+
+  const filteredExpenses = useMemo(() =>
+    personFilter ? expenses.filter((e: any) => e.paid_by_name === personFilter) : expenses,
+    [expenses, personFilter]
+  );
+
+  const grouped = useMemo(() => groupByDate(filteredExpenses), [filteredExpenses]);
 
   const handleCreate = async (data: Record<string, any>, file?: File) => {
     setIsSubmitting(true);
@@ -233,12 +245,30 @@ export default function ExpensesPage() {
             ))}
           </div>
 
-          {/* List grouped by date */}
+          {/* Person filter */}
+          {distinctNames.length > 0 && (
+            <div className="mb-3">
+              <Select value={personFilter} onValueChange={(v) => setPersonFilter(v === '__all__' ? '' : v)}>
+                <SelectTrigger className="h-9 rounded-xl text-xs bg-card/50 border-border/30">
+                  <div className="flex items-center gap-1.5">
+                    <User className="w-3.5 h-3.5 text-muted-foreground" />
+                    <SelectValue placeholder="Filtrar por pessoa" />
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__all__">Todos</SelectItem>
+                  {distinctNames.map(name => (
+                    <SelectItem key={name} value={name}>{name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
           {isLoading ? (
             <div className="space-y-2">
               {[1, 2, 3].map(i => <div key={i} className="h-16 rounded-xl bg-muted/30 animate-pulse" />)}
             </div>
-          ) : expenses.length === 0 ? (
+          ) : filteredExpenses.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-muted-foreground">
               <div className="w-16 h-16 rounded-2xl bg-muted/30 flex items-center justify-center mb-4">
                 <Receipt className="w-8 h-8 opacity-25" />
