@@ -305,6 +305,18 @@ export default function TransportForm({
                 lat={data.destino_lat}
                 lng={data.destino_lng}
               />
+              {/* Somente Ida — disables the return-trip phase */}
+              {!isEdit && (
+                <label className="flex items-center gap-2 cursor-pointer rounded-lg border border-border/40 bg-muted/20 px-3 py-2">
+                  <Checkbox
+                    checked={!!data.somente_ida}
+                    onCheckedChange={(v) => setData({ ...data, somente_ida: !!v })}
+                  />
+                  <span className="text-xs text-foreground/80">
+                    🛣️ Transporte só ida (não acompanhar volta)
+                  </span>
+                </label>
+              )}
             </div>
           </AccordionContent>
         </AccordionItem>

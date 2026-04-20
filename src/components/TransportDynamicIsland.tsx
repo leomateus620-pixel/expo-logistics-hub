@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect, useRef, lazy, Suspense } from 'react';
 import { cn, getEffectiveEstimatedKm } from '@/lib/utils';
 import { Navigation, MapPinOff, Clock, ArrowRight, Ruler, Timer, Square, Play, Eye, MapPin, Expand } from 'lucide-react';
 import { useTransportLocation } from '@/hooks/useLocationTracking';
+import { isInReturnTripWindow } from '@/hooks/useTransports';
 import { supabase } from '@/integrations/supabase/client';
 import { calculateHeading, smoothHeading, haversineDistance } from '@/lib/heading';
 import FullscreenMapDialog from '@/components/transport/FullscreenMapDialog';
