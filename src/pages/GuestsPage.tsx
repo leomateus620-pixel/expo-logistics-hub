@@ -28,6 +28,26 @@ import { toast } from 'sonner';
 
 type GuestFormData = { nome: string; telefone: string; email: string; tipo: string; hotel_nome: string; checkin_em: string; checkout_em: string; observacoes: string };
 
+/** Normaliza nome de hotel: trim, colapsa espaços, apóstrofo reto, Title Case */
+function normalizeHotelName(raw: string | null | undefined): string {
+  if (!raw) return '';
+  const cleaned = String(raw)
+    .trim()
+    .replace(/\s+/g, ' ')
+    .replace(/[\u2018\u2019\u02BC\u02B9]/g, "'");
+  if (!cleaned) return '';
+  return cleaned
+    .toLocaleLowerCase('pt-BR')
+    .split(' ')
+    .map(word =>
+      word
+        .split("'")
+        .map(seg => seg.length === 0 ? seg : seg.charAt(0).toLocaleUpperCase('pt-BR') + seg.slice(1))
+        .join("'")
+    )
+    .join(' ');
+}
+
 function GuestFormFields({ data, setData }: { data: GuestFormData; setData: (d: GuestFormData) => void }) {
   return (
     <div className="space-y-3">
@@ -78,9 +98,9 @@ export default function GuestsPage() {
     const counts = new Map<string, number>();
     let noneCount = 0;
     for (const g of guests as any[]) {
-      const name = (g.hotel_nome || '').trim();
-      if (!name) noneCount++;
-      else counts.set(name, (counts.get(name) || 0) + 1);
+      const normalized = normalizeHotelName(g.hotel_nome);
+      if (!normalized) noneCount++;
+      else counts.set(normalized, (counts.get(normalized) || 0) + 1);
     }
     const sorted = Array.from(counts.entries()).sort((a, b) => a[0].localeCompare(b[0], 'pt-BR'));
     return { sorted, noneCount };
@@ -88,8 +108,8 @@ export default function GuestsPage() {
 
   const filteredGuests = useMemo(() => {
     if (hotelFilter === 'all') return guests;
-    if (hotelFilter === '__none__') return (guests as any[]).filter(g => !(g.hotel_nome || '').trim());
-    return (guests as any[]).filter(g => g.hotel_nome === hotelFilter);
+    if (hotelFilter === '__none__') return (guests as any[]).filter(g => !normalizeHotelName(g.hotel_nome));
+    return (guests as any[]).filter(g => normalizeHotelName(g.hotel_nome) === hotelFilter);
   }, [guests, hotelFilter]);
 
   const isFilterActive = hotelFilter !== 'all';
@@ -102,7 +122,7 @@ export default function GuestsPage() {
         telefone: form.telefone || null,
         email: form.email || null,
         tipo: form.tipo,
-        hotel_nome: form.hotel_nome || null,
+        hotel_nome: normalizeHotelName(form.hotel_nome) || null,
         checkin_em: form.checkin_em ? ensureSPOffset(form.checkin_em) : null,
         checkout_em: form.checkout_em ? ensureSPOffset(form.checkout_em) : null,
         observacoes: form.observacoes || null,
@@ -127,7 +147,7 @@ export default function GuestsPage() {
     try {
       await update.mutateAsync({
         id: editId, nome: editForm.nome, telefone: editForm.telefone || null,
-        email: editForm.email || null, tipo: editForm.tipo, hotel_nome: editForm.hotel_nome || null,
+        email: editForm.email || null, tipo: editForm.tipo, hotel_nome: normalizeHotelName(editForm.hotel_nome) || null,
         checkin_em: editForm.checkin_em ? ensureSPOffset(editForm.checkin_em) : null, checkout_em: editForm.checkout_em ? ensureSPOffset(editForm.checkout_em) : null,
         observacoes: editForm.observacoes || null,
       });
