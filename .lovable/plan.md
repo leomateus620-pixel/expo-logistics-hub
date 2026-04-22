@@ -1,60 +1,104 @@
 
 
-## Remover "QR Gratuito" do módulo Mobilidade
+## Contagem regressiva 3D para Fenasoja no Dashboard
 
-### Diagnóstico
-A funcionalidade "QR Gratuito" aparece em 6 pontos da UI dos menus **Mobilidade**, **Patinetes** e **Carrinhos Elétricos**. Vamos retirar todas as menções visuais e exportadas, mantendo a coluna `qr_access_free` no banco intacta (sem migração destrutiva — preserva histórico e evita risco a registros existentes).
+### Objetivo
+Adicionar um **card de contagem regressiva** logo abaixo do cabeçalho do Dashboard ("Bom dia / data"), exibindo quanto tempo falta até a abertura oficial da **Fenasoja 2026 — 01/05/2026 00:00 (horário de Brasília, UTC-3)** com efeito 3D premium e responsividade total.
 
-### Mudanças
+### Layout do card
 
-**1. `src/components/mobility/MobilityAdminPanel.tsx`** (Painel principal)
-- Remover o `StatCard` "QR Gratuito" (o card destacado no print)
-- Reduzir grid de stats de 5 para 4 colunas (`grid-cols-2 md:grid-cols-4`)
-- Remover ícone `QrCode` ao lado do nome na tabela
-- Remover coluna "QR Gratuito" do CSV exportado
-- Limpar import `QrCode` do lucide-react e o cálculo `stats.qr`
+```text
+┌─────────────────────────────────────────────────────────┐
+│  🌾  FENASOJA 2026                       28/04 → 09/05  │
+│      Faltam 9 dias para a abertura oficial              │
+│                                                         │
+│   ┌────┐  ┌────┐  ┌────┐  ┌────┐                       │
+│   │ 09 │  │ 14 │  │ 32 │  │ 18 │                       │
+│   │DIAS│  │HORA│  │ MIN│  │ SEG│                       │
+│   └────┘  └────┘  └────┘  └────┘                       │
+│                                                         │
+│   ▓▓▓▓▓▓▓▓▓▓░░░░░░░░░░░  Contagem em tempo real        │
+└─────────────────────────────────────────────────────────┘
+```
 
-**2. `src/components/mobility/AuthorizationsTab.tsx`** (abas Autorizados em Patinetes e Carrinhos)
-- Remover coluna "QR" da tabela (header + célula com Badge)
-- Resultado: tabela vai de 7 para 6 colunas
+- **Mobile (<640px):** 4 mini-blocos em uma linha (`grid-cols-4`), dígitos `text-2xl`
+- **Desktop (≥640px):** mesmos 4 blocos maiores (`text-4xl`), card mais largo, glow dourado mais intenso
 
-**3. `src/components/mobility/EditMemberDialog.tsx`** (Dialog de edição)
-- Remover checkbox "QR Gratuito" do bloco de modais
-- Remover state `qrAccessFree` / `setQrAccessFree`
-- Remover do payload de `updateMember` (envia sempre `false` por compatibilidade ou omite)
+### Comportamento
 
-**4. `src/components/mobility/MobilityForm.tsx`** (formulário público de solicitação)
-- Remover `qr_access_free` do `emptyMember()` e do payload submetido
+- Alvo fixo: **2026-05-01T00:00:00-03:00** (Brasília)
+- Atualiza a cada **1 segundo** via `setInterval` com `clearInterval` no unmount
+- Calcula `diff = target - now` e quebra em `dias / horas / min / seg`
+- Quando `diff ≤ 0`: troca o título para "🎉 A Fenasoja começou!" e mostra "Evento em andamento" (sem regressivos negativos)
+- Texto dinâmico:
+  - `> 1 dia`: "Faltam **N** dias para a Fenasoja"
+  - `= 1 dia`: "Falta **1** dia para a Fenasoja"
+  - `< 1 dia`: "Faltam poucas horas para a Fenasoja"
+- Barra de progresso: percentual desde 01/01/2026 até 01/05/2026 (preenche dourado conforme aproxima)
 
-**5. `src/components/mobility/MobilityMemberRow.tsx`** (linha do form público)
-- Remover checkbox "QR Gratuito" e a prop relacionada
+### Estética 3D Premium (alinhada à identidade Liquid Glass)
 
-**6. `src/lib/generateMobilityAuthorizationsExport.ts`** (exportações)
-- **CSV:** remover coluna "QR Gratuito" do header e da linha
-- **PDF:** remover métrica "QR Gratuito" do bloco de stats da capa, remover coluna "QR Grátis" da tabela de resumo por comissão, remover coluna "QR" das tabelas detalhadas
-- Remover cálculo `totalQrFree` e o acumulador `qrFree` por comissão
+**Container externo:**
+- `perspective: 1200px` no wrapper
+- `transform-style: preserve-3d` + `rotateX(1deg)` sutil em repouso
+- Hover desktop: `translateY(-4px) rotateX(3deg) scale(1.01)` 400ms cubic-bezier
+- Background: gradiente diagonal verde Fenasoja `#194019` → `#0F2A0F` com overlay dourado translúcido
+- Borda: `border-image` gradiente dourado, ring duplo (interno gold 18% + externo 8%)
+- Sombra em camadas:
+  ```
+  0 1px 2px rgba(0,0,0,0.1),
+  0 12px 28px -8px hsl(var(--primary)/0.3),
+  0 28px 56px -20px hsl(var(--gold)/0.45),
+  inset 0 1px 0 hsl(var(--gold)/0.22)
+  ```
+- Camada de **shimmer diagonal** animada (reaproveita keyframe `shimmer-diagonal` já criado para EventCard)
+- Pequeno emblema "🌾" (ou ícone `Sprout`/`CalendarHeart` do lucide) flutuando à esquerda com animação `gold-pulse`
 
-**7. `src/hooks/useMobilityMembers.ts`** (tipagem)
-- Manter `qr_access_free` opcional na interface (compatibilidade com banco) mas não exigir no payload
+**Mini-blocos de dígitos:**
+- Cada bloco é um cubinho 3D: `rounded-xl`, fundo `bg-card/50 backdrop-blur-xl`, ring dourado interno
+- Dígitos em fonte mono (`font-mono font-extrabold`), cor `text-gold`
+- Efeito embossed: `text-shadow: 0 1px 0 rgba(0,0,0,0.4), 0 0 12px hsl(var(--gold)/0.35)`
+- Transição suave ao mudar valor: `transition-all 250ms` (fade entre dígitos)
+- Label abaixo (`DIAS / HORAS / MIN / SEG`) em `text-[10px] tracking-[0.2em] uppercase text-muted-foreground`
 
-### Banco de dados
-**Sem migração.** A coluna `qr_access_free` permanece em `committee_mobility_members` e `mobility_authorizations` com `DEFAULT false`, garantindo que novos registros não dependam mais desse dado. Se no futuro for necessário remover de vez, fazemos numa migração separada.
+**Barra de progresso:**
+- Trilho `bg-card/40 h-1.5 rounded-full` com fill em gradiente verde→dourado animado
 
-### Critério de aceite
-1. Card "QR GRATUITO" sumiu do Painel de Mobilidade (grid agora com 4 cards)
-2. Coluna/badge "QR" não aparece mais nas abas Autorizados de Patinetes nem de Carrinhos Elétricos
-3. Checkbox "QR Gratuito" sumiu do formulário público e do dialog de edição
-4. CSV e PDF exportados não contêm mais nenhuma menção a "QR Gratuito"
-5. Sem regressão em criar/editar/aprovar solicitações
-6. Ícone `QrCode` removido dos imports não utilizados
+### Acessibilidade & performance
+
+- `aria-live="polite"` no texto principal (anuncia a cada minuto, não a cada segundo, para evitar spam de leitores de tela)
+- Respeita `prefers-reduced-motion`: desativa shimmer/rotateX, mantém só a contagem
+- `useMemo` no cálculo do alvo, `useEffect` com cleanup do interval
+- Evita re-render do Dashboard inteiro: subcomponente isolado `<FenasojaCountdown />`
+
+### Posicionamento
+
+Inserir entre o header de saudação e o bloco "Acessos Rápidos" no `src/pages/Dashboard.tsx`:
+
+```text
+[Saudação + data]
+[🆕 Card Contagem Regressiva 3D]   ← novo
+[StatCards principais]
+[Acessos Rápidos]
+...
+```
 
 ### Arquivos
-| Arquivo | Mudança |
-|---|---|
-| `src/components/mobility/MobilityAdminPanel.tsx` | Remove StatCard, ícone na tabela, coluna do CSV |
-| `src/components/mobility/AuthorizationsTab.tsx` | Remove coluna QR da tabela |
-| `src/components/mobility/EditMemberDialog.tsx` | Remove checkbox e state |
-| `src/components/mobility/MobilityForm.tsx` | Remove campo do payload |
-| `src/components/mobility/MobilityMemberRow.tsx` | Remove checkbox |
-| `src/lib/generateMobilityAuthorizationsExport.ts` | Remove colunas/métricas QR de CSV e PDF |
+
+| Arquivo | Tipo | Mudança |
+|---|---|---|
+| `src/components/dashboard/FenasojaCountdown.tsx` | Novo | Componente isolado da contagem regressiva 3D, com hook interno de tick a 1s |
+| `src/pages/Dashboard.tsx` | Edit | Importa e renderiza `<FenasojaCountdown />` logo abaixo do bloco de saudação |
+| `tailwind.config.ts` | Edit (mínimo) | Reaproveita `shimmer-diagonal` e `gold-pulse` já existentes; adiciona `digit-flip` (fade 200ms) caso necessário |
+
+Sem migração de banco. Sem dependências novas. Sem impacto em outros módulos.
+
+### Critério de aceite
+
+1. Card aparece logo abaixo da saudação no Dashboard, em mobile e desktop
+2. Mostra "Faltam N dias para a Fenasoja" + 4 blocos (dias, horas, min, seg) atualizando em tempo real
+3. Alvo é **01/05/2026 00:00 (UTC-3)** — não muda com fuso do navegador
+4. Visual 3D com shimmer, sombras em camadas, pulse dourado e responsivo (mobile compacto / desktop amplo)
+5. Após 01/05/2026, exibe mensagem celebratória sem números negativos
+6. Respeita `prefers-reduced-motion`
 
