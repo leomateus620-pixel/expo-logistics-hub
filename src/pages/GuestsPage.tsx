@@ -28,6 +28,26 @@ import { toast } from 'sonner';
 
 type GuestFormData = { nome: string; telefone: string; email: string; tipo: string; hotel_nome: string; checkin_em: string; checkout_em: string; observacoes: string };
 
+/** Normaliza nome de hotel: trim, colapsa espaços, apóstrofo reto, Title Case */
+function normalizeHotelName(raw: string | null | undefined): string {
+  if (!raw) return '';
+  const cleaned = String(raw)
+    .trim()
+    .replace(/\s+/g, ' ')
+    .replace(/[\u2018\u2019\u02BC\u02B9]/g, "'");
+  if (!cleaned) return '';
+  return cleaned
+    .toLocaleLowerCase('pt-BR')
+    .split(' ')
+    .map(word =>
+      word
+        .split("'")
+        .map(seg => seg.length === 0 ? seg : seg.charAt(0).toLocaleUpperCase('pt-BR') + seg.slice(1))
+        .join("'")
+    )
+    .join(' ');
+}
+
 function GuestFormFields({ data, setData }: { data: GuestFormData; setData: (d: GuestFormData) => void }) {
   return (
     <div className="space-y-3">
