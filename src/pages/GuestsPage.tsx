@@ -1,7 +1,8 @@
 import { useGuests } from '@/hooks/useGuests';
 import { useTransports } from '@/hooks/useTransports';
 import { useTransportGuests } from '@/hooks/useTransportGuests';
-import { Hotel, Plus, Pencil, Trash2, Phone, Mail, MapPin, AlertTriangle, Loader2 } from 'lucide-react';
+import { Hotel, Plus, Pencil, Trash2, Phone, Mail, MapPin, AlertTriangle, Loader2, X } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { cn, ensureSPOffset } from '@/lib/utils';
 
