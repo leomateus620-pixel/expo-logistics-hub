@@ -116,7 +116,7 @@ export default function MobilityAdminPanel() {
               <SelectContent>
                 <SelectItem value="all">Todas comissões</SelectItem>
                 {committees.map((c: any) => (
-                  <SelectItem key={c.id} value={c.id}>{c.committee_name}</SelectItem>
+                  <SelectItem key={c.id} value={c.id}>{toTitleCase(c.committee_name)}</SelectItem>
                 ))}
               </SelectContent>
             </Select>

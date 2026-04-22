@@ -8,6 +8,7 @@ import { Search, FileSpreadsheet, FileDown, ShieldCheck, ShieldX } from 'lucide-
 // Badge import retained only for status badge below
 import { toast } from 'sonner';
 import { exportMobilityAuthorizationsCSV, exportMobilityAuthorizationsPDF } from '@/lib/generateMobilityAuthorizationsExport';
+import { toTitleCase, formatCpf } from '@/lib/textNormalize';
 
 const statusLabels: Record<string, { label: string; class: string }> = {
   pendente: { label: 'Pendente', class: 'bg-warning/10 text-warning border-warning/20' },
@@ -21,14 +22,23 @@ export default function AuthorizationsTab({ type }: { type: 'carro_eletrico' | '
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterCommittee, setFilterCommittee] = useState('all');
 
-  const committees = [...new Set(authorizations.map((a: any) => a.committee_name_snapshot))].sort();
+  // Comissões deduplicadas pela forma normalizada (evita "LOGÍSTICA" e "Logística" como duas opções)
+  const committees = Array.from(
+    new Set(
+      authorizations
+        .map((a: any) => toTitleCase(a.committee_name_snapshot))
+        .filter(Boolean),
+    ),
+  ).sort((a, b) => a.localeCompare(b, 'pt-BR'));
 
   const filtered = authorizations.filter((a: any) => {
     if (filterStatus !== 'all' && a.access_status !== filterStatus) return false;
-    if (filterCommittee !== 'all' && a.committee_name_snapshot !== filterCommittee) return false;
+    if (filterCommittee !== 'all' && toTitleCase(a.committee_name_snapshot) !== filterCommittee) return false;
     if (search) {
-      const s = search.toLowerCase();
-      return a.member_name.toLowerCase().includes(s) || a.committee_name_snapshot.toLowerCase().includes(s);
+      const s = toTitleCase(search).toLocaleLowerCase('pt-BR');
+      const name = toTitleCase(a.member_name).toLocaleLowerCase('pt-BR');
+      const com = toTitleCase(a.committee_name_snapshot).toLocaleLowerCase('pt-BR');
+      return name.includes(s) || com.includes(s);
     }
     return true;
   });
@@ -115,15 +125,19 @@ export default function AuthorizationsTab({ type }: { type: 'carro_eletrico' | '
               <tbody>
                 {filtered.map((a: any) => {
                   const st = statusLabels[a.access_status] || statusLabels.pendente;
+                  const displayName = toTitleCase(a.member_name);
+                  const displayCommittee = toTitleCase(a.committee_name_snapshot);
+                  const displayRole = toTitleCase(a.member_role || '');
+                  const displayResp = toTitleCase(a.operational_responsible_name || '');
                   return (
                     <tr key={a.id} className="border-b last:border-0 hover:bg-muted/30">
                       <td className="p-3">
-                        <p className="font-medium">{a.member_name}</p>
-                        <p className="text-xs text-muted-foreground sm:hidden">{a.committee_name_snapshot}</p>
+                        <p className="font-medium">{displayName}</p>
+                        <p className="text-xs text-muted-foreground sm:hidden">{displayCommittee}</p>
                       </td>
-                      <td className="p-3 hidden sm:table-cell text-muted-foreground">{a.committee_name_snapshot}</td>
-                      <td className="p-3 hidden md:table-cell text-muted-foreground">{a.member_role || '—'}</td>
-                      <td className="p-3 hidden lg:table-cell text-muted-foreground">{a.operational_responsible_name || '—'}</td>
+                      <td className="p-3 hidden sm:table-cell text-muted-foreground">{displayCommittee}</td>
+                      <td className="p-3 hidden md:table-cell text-muted-foreground">{displayRole || '—'}</td>
+                      <td className="p-3 hidden lg:table-cell text-muted-foreground">{displayResp || '—'}</td>
                       <td className="p-3 text-center">
                         <Badge variant="outline" className={`text-[10px] ${st.class}`}>{st.label}</Badge>
                       </td>
