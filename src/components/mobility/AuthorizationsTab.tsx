@@ -4,8 +4,9 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search, Download, ShieldCheck, ShieldX } from 'lucide-react';
+import { Search, FileSpreadsheet, FileDown, ShieldCheck, ShieldX } from 'lucide-react';
 import { toast } from 'sonner';
+import { exportMobilityAuthorizationsCSV, exportMobilityAuthorizationsPDF } from '@/lib/generateMobilityAuthorizationsExport';
 
 const statusLabels: Record<string, { label: string; class: string }> = {
   pendente: { label: 'Pendente', class: 'bg-warning/10 text-warning border-warning/20' },
@@ -39,26 +40,26 @@ export default function AuthorizationsTab({ type }: { type: 'carro_eletrico' | '
     } catch (err: any) { toast.error(err.message); }
   };
 
-  const exportCSV = () => {
-    const headers = ['Nome', 'Comissão', 'Presidente', 'Responsável Operacional', 'Cargo', 'Identificador', 'QR Gratuito', 'Status'];
-    const rows = filtered.map((a: any) => [
-      a.member_name,
-      a.committee_name_snapshot,
-      a.president_name_snapshot,
-      a.operational_responsible_name || '',
-      a.member_role || '',
-      a.member_identifier || '',
-      a.qr_access_free ? 'Sim' : 'Não',
-      a.access_status,
-    ]);
-    const csv = [headers, ...rows].map(r => r.map((c: string) => `"${c}"`).join(',')).join('\n');
-    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `autorizacoes_${type}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
+  const handleExportCSV = () => {
+    const count = exportMobilityAuthorizationsCSV(authorizations as any, type);
+    if (count === 0) {
+      toast.warning('Nenhuma solicitação aprovada para exportar.');
+    } else {
+      toast.success(`Exportadas ${count} autorizações aprovadas (CSV)`);
+    }
+  };
+
+  const handleExportPDF = () => {
+    try {
+      const count = exportMobilityAuthorizationsPDF(authorizations as any, type);
+      if (count === 0) {
+        toast.warning('Nenhuma solicitação aprovada para exportar.');
+      } else {
+        toast.success(`Exportadas ${count} autorizações aprovadas (PDF)`);
+      }
+    } catch (err: any) {
+      toast.error('Falha ao gerar PDF: ' + (err?.message || 'erro desconhecido'));
+    }
   };
 
   if (isLoading) return <p className="text-sm text-muted-foreground py-8 text-center">Carregando...</p>;
@@ -86,8 +87,11 @@ export default function AuthorizationsTab({ type }: { type: 'carro_eletrico' | '
             {committees.map((c: string) => <SelectItem key={c} value={c}>{c}</SelectItem>)}
           </SelectContent>
         </Select>
-        <Button size="sm" variant="outline" onClick={exportCSV} className="h-10 gap-1.5">
-          <Download className="w-4 h-4" /> CSV
+        <Button size="sm" variant="outline" onClick={handleExportCSV} className="h-10 gap-1.5 rounded-xl">
+          <FileSpreadsheet className="w-4 h-4 text-success" /> CSV
+        </Button>
+        <Button size="sm" variant="outline" onClick={handleExportPDF} className="h-10 gap-1.5 rounded-xl">
+          <FileDown className="w-4 h-4 text-gold" /> PDF
         </Button>
       </div>
 
