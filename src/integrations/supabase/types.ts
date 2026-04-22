@@ -653,6 +653,65 @@ export type Database = {
           },
         ]
       }
+      fenasoja_events: {
+        Row: {
+          commission_id: string | null
+          cover_color: string | null
+          created_at: string
+          created_by_user_id: string | null
+          descricao: string | null
+          fim_em: string
+          id: string
+          inicio_em: string
+          local: string | null
+          org_id: string
+          responsavel_user_id: string | null
+          tipo_tag: string | null
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          commission_id?: string | null
+          cover_color?: string | null
+          created_at?: string
+          created_by_user_id?: string | null
+          descricao?: string | null
+          fim_em: string
+          id?: string
+          inicio_em: string
+          local?: string | null
+          org_id: string
+          responsavel_user_id?: string | null
+          tipo_tag?: string | null
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          commission_id?: string | null
+          cover_color?: string | null
+          created_at?: string
+          created_by_user_id?: string | null
+          descricao?: string | null
+          fim_em?: string
+          id?: string
+          inicio_em?: string
+          local?: string | null
+          org_id?: string
+          responsavel_user_id?: string | null
+          tipo_tag?: string | null
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fenasoja_events_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       fuel_records: {
         Row: {
           created_at: string
