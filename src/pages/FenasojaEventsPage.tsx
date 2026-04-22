@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect, useRef } from 'react';
-import { Sparkles, Plus } from 'lucide-react';
+import { CalendarCheck2, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useFenasojaEvents, FENASOJA_RANGE } from '@/hooks/useFenasojaEvents';
@@ -98,8 +98,8 @@ export default function FenasojaEventsPage() {
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <div className="w-9 h-9 rounded-xl bg-gold/15 border border-gold/25 flex items-center justify-center backdrop-blur-xl">
-              <Sparkles className="w-5 h-5 text-gold" />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/40 via-primary/20 to-gold/30 border border-gold/30 ring-1 ring-inset ring-gold/20 flex items-center justify-center backdrop-blur-xl shadow-[inset_0_1px_0_hsl(var(--gold)/0.35),0_8px_24px_-12px_hsl(var(--gold)/0.45)]">
+              <CalendarCheck2 className="w-5 h-5 text-gold" />
             </div>
             <div>
               <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Eventos Fenasoja</h1>
@@ -131,10 +131,10 @@ export default function FenasojaEventsPage() {
               data-active={active}
               onClick={() => setSelectedDate(d)}
               className={cn(
-                'snap-center shrink-0 flex flex-col items-center px-4 py-2 rounded-xl border transition-all duration-200 min-w-[78px] relative',
-                'active:scale-[0.96]',
+                'snap-center shrink-0 flex flex-col items-center px-4 py-2 rounded-xl border transition-all duration-300 min-w-[78px] relative',
+                'active:scale-[0.96] hover:-translate-y-0.5',
                 active
-                  ? 'bg-primary text-primary-foreground border-primary shadow-md shadow-primary/20'
+                  ? 'bg-primary text-primary-foreground border-gold/40 scale-[1.06] animate-gold-pulse motion-reduce:animate-none'
                   : 'bg-card/50 backdrop-blur-lg border-gold/15 text-foreground hover:bg-card/80 hover:border-gold/30',
               )}
             >
@@ -175,8 +175,8 @@ export default function FenasojaEventsPage() {
       {/* Empty */}
       {!isLoading && dayEvents.length === 0 && (
         <div className="flex flex-col items-center justify-center py-16 text-center">
-          <div className="w-16 h-16 rounded-2xl bg-gold/10 border border-gold/20 backdrop-blur-xl flex items-center justify-center mb-4 shadow-[0_0_30px_-12px_hsl(var(--gold)/0.5)]">
-            <Sparkles className="w-7 h-7 text-gold" />
+          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/30 via-card/40 to-gold/20 border border-gold/25 backdrop-blur-xl flex items-center justify-center mb-4 shadow-[0_0_30px_-12px_hsl(var(--gold)/0.5),inset_0_1px_0_hsl(var(--gold)/0.3)]">
+            <CalendarCheck2 className="w-7 h-7 text-gold" />
           </div>
           <p className="text-sm font-semibold text-foreground">Nenhum evento programado para este dia</p>
           <p className="text-xs text-muted-foreground mt-1 max-w-[280px]">
@@ -192,7 +192,7 @@ export default function FenasojaEventsPage() {
 
       {/* List */}
       {!isLoading && dayEvents.length > 0 && (
-        <div className="space-y-3">
+        <div key={selectedDate} className="space-y-3" style={{ perspective: '1200px' }}>
           {dayEvents.map((ev: any, idx: number) => {
             const m = ev.responsavel_user_id ? memberById.get(ev.responsavel_user_id) : null;
             const c = ev.commission_id ? commissionById.get(ev.commission_id) : (m?.commission_id ? commissionById.get(m.commission_id) : null);
