@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect, useRef } from 'react';
-import { Sparkles, Plus, CalendarOff } from 'lucide-react';
+import { Sparkles, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useFenasojaEvents, FENASOJA_RANGE } from '@/hooks/useFenasojaEvents';
