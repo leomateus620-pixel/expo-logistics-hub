@@ -186,8 +186,38 @@ export default function GuestsPage() {
         </DialogContent>
       </Dialog>
 
+      <div className="liquid-glass-card rounded-xl px-3 py-2 flex flex-col sm:flex-row sm:items-center gap-3">
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          <Hotel className="w-4 h-4 text-primary shrink-0" />
+          <Select value={hotelFilter} onValueChange={setHotelFilter}>
+            <SelectTrigger className="h-10 rounded-xl flex-1">
+              <SelectValue placeholder="Filtrar por hotel" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos os hotéis ({guests.length})</SelectItem>
+              {hotelOptions.sorted.map(([name, count]) => (
+                <SelectItem key={name} value={name}>{name} ({count})</SelectItem>
+              ))}
+              {hotelOptions.noneCount > 0 && (
+                <SelectItem value="__none__">Sem hotel definido ({hotelOptions.noneCount})</SelectItem>
+              )}
+            </SelectContent>
+          </Select>
+        </div>
+        {isFilterActive && (
+          <div className="flex items-center gap-2 justify-between sm:justify-end">
+            <Badge variant="secondary" className="text-[11px]">
+              {filteredGuests.length} de {guests.length} hóspedes
+            </Badge>
+            <Button variant="ghost" size="sm" onClick={() => setHotelFilter('all')} className="h-9 gap-1 rounded-xl">
+              <X className="w-3.5 h-3.5" /> Limpar
+            </Button>
+          </div>
+        )}
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {guests.map((g: any) => {
+        {filteredGuests.map((g: any) => {
           const linkedTransportIds = transportGuests.filter((tg: any) => tg.guest_id === g.id).map((tg: any) => tg.transport_id);
           const linkedTransports = transports.filter((t: any) => linkedTransportIds.includes(t.id));
           return (
