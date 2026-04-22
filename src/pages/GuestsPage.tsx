@@ -1,7 +1,8 @@
 import { useGuests } from '@/hooks/useGuests';
 import { useTransports } from '@/hooks/useTransports';
 import { useTransportGuests } from '@/hooks/useTransportGuests';
-import { Hotel, Plus, Pencil, Trash2, Phone, Mail, MapPin, AlertTriangle, Loader2 } from 'lucide-react';
+import { Hotel, Plus, Pencil, Trash2, Phone, Mail, MapPin, AlertTriangle, Loader2, X } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
 import { cn, ensureSPOffset } from '@/lib/utils';
 
@@ -16,7 +17,7 @@ function utcToSPLocal(iso: string): string {
   const get = (t: string) => parts.find(p => p.type === t)?.value || '';
   return `${get('year')}-${get('month')}-${get('day')}T${get('hour')}:${get('minute')}`;
 }
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
@@ -63,6 +64,35 @@ export default function GuestsPage() {
   const [editOpen, setEditOpen] = useState(false);
   const [editId, setEditId] = useState('');
   const [editForm, setEditForm] = useState(emptyForm);
+
+  const [hotelFilter, setHotelFilter] = useState<string>(() => {
+    if (typeof window === 'undefined') return 'all';
+    return sessionStorage.getItem('guests:hotel-filter') || 'all';
+  });
+
+  useEffect(() => {
+    try { sessionStorage.setItem('guests:hotel-filter', hotelFilter); } catch {}
+  }, [hotelFilter]);
+
+  const hotelOptions = useMemo(() => {
+    const counts = new Map<string, number>();
+    let noneCount = 0;
+    for (const g of guests as any[]) {
+      const name = (g.hotel_nome || '').trim();
+      if (!name) noneCount++;
+      else counts.set(name, (counts.get(name) || 0) + 1);
+    }
+    const sorted = Array.from(counts.entries()).sort((a, b) => a[0].localeCompare(b[0], 'pt-BR'));
+    return { sorted, noneCount };
+  }, [guests]);
+
+  const filteredGuests = useMemo(() => {
+    if (hotelFilter === 'all') return guests;
+    if (hotelFilter === '__none__') return (guests as any[]).filter(g => !(g.hotel_nome || '').trim());
+    return (guests as any[]).filter(g => g.hotel_nome === hotelFilter);
+  }, [guests, hotelFilter]);
+
+  const isFilterActive = hotelFilter !== 'all';
 
   const handleAdd = async () => {
     if (!form.nome) return;
@@ -156,8 +186,38 @@ export default function GuestsPage() {
         </DialogContent>
       </Dialog>
 
+      <div className="liquid-glass-card rounded-xl px-3 py-2 flex flex-col sm:flex-row sm:items-center gap-3">
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          <Hotel className="w-4 h-4 text-primary shrink-0" />
+          <Select value={hotelFilter} onValueChange={setHotelFilter}>
+            <SelectTrigger className="h-10 rounded-xl flex-1">
+              <SelectValue placeholder="Filtrar por hotel" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos os hotéis ({guests.length})</SelectItem>
+              {hotelOptions.sorted.map(([name, count]) => (
+                <SelectItem key={name} value={name}>{name} ({count})</SelectItem>
+              ))}
+              {hotelOptions.noneCount > 0 && (
+                <SelectItem value="__none__">Sem hotel definido ({hotelOptions.noneCount})</SelectItem>
+              )}
+            </SelectContent>
+          </Select>
+        </div>
+        {isFilterActive && (
+          <div className="flex items-center gap-2 justify-between sm:justify-end">
+            <Badge variant="secondary" className="text-[11px]">
+              {filteredGuests.length} de {guests.length} hóspedes
+            </Badge>
+            <Button variant="ghost" size="sm" onClick={() => setHotelFilter('all')} className="h-9 gap-1 rounded-xl">
+              <X className="w-3.5 h-3.5" /> Limpar
+            </Button>
+          </div>
+        )}
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-        {guests.map((g: any) => {
+        {filteredGuests.map((g: any) => {
           const linkedTransportIds = transportGuests.filter((tg: any) => tg.guest_id === g.id).map((tg: any) => tg.transport_id);
           const linkedTransports = transports.filter((t: any) => linkedTransportIds.includes(t.id));
           return (
@@ -227,7 +287,7 @@ export default function GuestsPage() {
             </div>
           );
         })}
-        {guests.length === 0 && (
+        {filteredGuests.length === 0 && guests.length === 0 && (
           <div className="col-span-full text-center py-16 text-muted-foreground">
             <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-primary/10 flex items-center justify-center">
               <Hotel className="w-8 h-8 text-primary/50" />
@@ -236,6 +296,17 @@ export default function GuestsPage() {
             <p className="text-xs text-muted-foreground/70 mt-1">Cadastre o primeiro hóspede para gerenciar hospedagem e traslados</p>
             <Button size="sm" className="mt-4" onClick={() => setAddOpen(true)}>
               <Plus className="w-4 h-4 mr-1" /> Cadastrar Hóspede
+            </Button>
+          </div>
+        )}
+        {filteredGuests.length === 0 && guests.length > 0 && (
+          <div className="col-span-full text-center py-16 text-muted-foreground">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-primary/10 flex items-center justify-center">
+              <Hotel className="w-8 h-8 text-primary/50" />
+            </div>
+            <p className="text-sm font-medium">Nenhum hóspede no hotel selecionado</p>
+            <Button size="sm" variant="outline" className="mt-4 rounded-xl" onClick={() => setHotelFilter('all')}>
+              <X className="w-4 h-4 mr-1" /> Limpar filtro
             </Button>
           </div>
         )}
