@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Search, FileSpreadsheet, FileDown, ShieldCheck, ShieldX } from 'lucide-react';
+// Badge import retained only for status badge below
 import { toast } from 'sonner';
 import { exportMobilityAuthorizationsCSV, exportMobilityAuthorizationsPDF } from '@/lib/generateMobilityAuthorizationsExport';
 
@@ -107,7 +108,6 @@ export default function AuthorizationsTab({ type }: { type: 'carro_eletrico' | '
                   <th className="text-left p-3 font-medium hidden sm:table-cell">Comissão</th>
                   <th className="text-left p-3 font-medium hidden md:table-cell">Cargo</th>
                   <th className="text-left p-3 font-medium hidden lg:table-cell">Responsável Op.</th>
-                  <th className="text-center p-3 font-medium">QR</th>
                   <th className="text-center p-3 font-medium">Status</th>
                   <th className="text-center p-3 font-medium">Ação</th>
                 </tr>
@@ -124,9 +124,6 @@ export default function AuthorizationsTab({ type }: { type: 'carro_eletrico' | '
                       <td className="p-3 hidden sm:table-cell text-muted-foreground">{a.committee_name_snapshot}</td>
                       <td className="p-3 hidden md:table-cell text-muted-foreground">{a.member_role || '—'}</td>
                       <td className="p-3 hidden lg:table-cell text-muted-foreground">{a.operational_responsible_name || '—'}</td>
-                      <td className="p-3 text-center">
-                        {a.qr_access_free && <Badge variant="outline" className="text-[10px]">QR</Badge>}
-                      </td>
                       <td className="p-3 text-center">
                         <Badge variant="outline" className={`text-[10px] ${st.class}`}>{st.label}</Badge>
                       </td>

@@ -15,7 +15,7 @@ import { toast } from 'sonner';
 
 const emptyMember = (): MemberDraft => ({
   member_name: '', member_role: '', member_identifier: '',
-  access_electric_car: false, access_scooter: false, qr_access_free: false, notes: '',
+  access_electric_car: false, access_scooter: false, notes: '',
 });
 
 interface Props {
@@ -72,7 +72,6 @@ export default function MobilityForm({ onSuccess }: Props) {
           member_identifier: m.member_identifier || undefined,
           access_electric_car: m.access_electric_car,
           access_scooter: m.access_scooter,
-          qr_access_free: m.qr_access_free,
           notes: m.notes || undefined,
         });
       }

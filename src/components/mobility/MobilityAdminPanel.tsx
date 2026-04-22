@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Download, Search, Shield, ShieldCheck, ShieldX, Users, Zap, Bike, QrCode, Trash2, Pencil } from 'lucide-react';
+import { Download, Search, Shield, ShieldCheck, ShieldX, Users, Zap, Bike, Trash2, Pencil } from 'lucide-react';
 import EditMemberDialog from './EditMemberDialog';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -51,8 +51,7 @@ export default function MobilityAdminPanel() {
     const total = allMembers.length;
     const cars = allMembers.filter((m: any) => m.access_electric_car).length;
     const scooters = allMembers.filter((m: any) => m.access_scooter).length;
-    const qr = allMembers.filter((m: any) => m.qr_access_free).length;
-    return { submitted, total, cars, scooters, qr };
+    return { submitted, total, cars, scooters };
   }, [forms, allMembers]);
 
   const handleStatusChange = async (id: string, newStatus: string) => {
@@ -77,7 +76,6 @@ export default function MobilityAdminPanel() {
       Comissão: m.committee_mobility_forms?.committee_name_snapshot || '',
       'Carro Elétrico': m.access_electric_car ? 'Sim' : 'Não',
       Patinete: m.access_scooter ? 'Sim' : 'Não',
-      'QR Gratuito': m.qr_access_free ? 'Sim' : 'Não',
       Status: statusLabels[m.access_status] || m.access_status,
     }));
     if (rows.length === 0) { toast.error('Nenhum dado para exportar'); return; }
@@ -94,12 +92,11 @@ export default function MobilityAdminPanel() {
   return (
     <div className="space-y-6">
       {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <StatCard label="Respondidas" value={stats.submitted} icon={<Shield className="w-4 h-4" />} />
         <StatCard label="Integrantes" value={stats.total} icon={<Users className="w-4 h-4" />} />
         <StatCard label="Carro Elétrico" value={stats.cars} icon={<Zap className="w-4 h-4" />} />
         <StatCard label="Patinete" value={stats.scooters} icon={<Bike className="w-4 h-4" />} />
-        <StatCard label="QR Gratuito" value={stats.qr} icon={<QrCode className="w-4 h-4" />} />
       </div>
 
       {/* Filters */}
@@ -174,7 +171,6 @@ export default function MobilityAdminPanel() {
                     <TableRow key={m.id}>
                       <TableCell className="font-medium">
                         {m.member_name}
-                        {m.qr_access_free && <QrCode className="inline w-3.5 h-3.5 ml-1 text-primary" />}
                       </TableCell>
                       <TableCell className="hidden sm:table-cell text-muted-foreground text-xs">
                         {m.committee_mobility_forms?.committee_name_snapshot || '—'}

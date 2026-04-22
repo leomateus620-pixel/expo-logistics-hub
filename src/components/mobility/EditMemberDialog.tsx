@@ -27,7 +27,6 @@ export default function EditMemberDialog({ open, onOpenChange, member }: Props) 
   const [committeeId, setCommitteeId] = useState('');
   const [accessElectricCar, setAccessElectricCar] = useState(false);
   const [accessScooter, setAccessScooter] = useState(false);
-  const [qrAccessFree, setQrAccessFree] = useState(false);
   const [accessStatus, setAccessStatus] = useState('pendente');
   const [notes, setNotes] = useState('');
   const [saving, setSaving] = useState(false);
@@ -40,7 +39,6 @@ export default function EditMemberDialog({ open, onOpenChange, member }: Props) 
       setCommitteeId(member.committee_id || '');
       setAccessElectricCar(!!member.access_electric_car);
       setAccessScooter(!!member.access_scooter);
-      setQrAccessFree(!!member.qr_access_free);
       setAccessStatus(member.access_status || 'pendente');
       setNotes(member.notes || '');
     }
@@ -66,7 +64,6 @@ export default function EditMemberDialog({ open, onOpenChange, member }: Props) 
         committee_id: committeeId || member.committee_id,
         access_electric_car: accessElectricCar,
         access_scooter: accessScooter,
-        qr_access_free: qrAccessFree,
         access_status: accessStatus,
         notes: notes.trim() || null,
         form_id: member.form_id,
@@ -144,10 +141,6 @@ export default function EditMemberDialog({ open, onOpenChange, member }: Props) 
               <label className="flex items-center gap-2 text-sm cursor-pointer">
                 <Checkbox checked={accessScooter} onCheckedChange={v => setAccessScooter(!!v)} />
                 Patinete
-              </label>
-              <label className="flex items-center gap-2 text-sm cursor-pointer">
-                <Checkbox checked={qrAccessFree} onCheckedChange={v => setQrAccessFree(!!v)} />
-                QR Gratuito
               </label>
             </div>
           </div>

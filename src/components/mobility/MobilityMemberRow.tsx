@@ -9,7 +9,6 @@ export interface MemberDraft {
   member_identifier: string;
   access_electric_car: boolean;
   access_scooter: boolean;
-  qr_access_free: boolean;
   notes: string;
 }
 
@@ -67,13 +66,6 @@ export default function MobilityMemberRow({ member, index, onChange, onRemove, n
             Patinete
           </label>
         )}
-        <label className="flex items-center gap-2 text-sm">
-          <Checkbox
-            checked={member.qr_access_free}
-            onCheckedChange={v => onChange(index, 'qr_access_free', !!v)}
-          />
-          QR Gratuito
-        </label>
       </div>
       <Input
         placeholder="Observações (opcional)"
