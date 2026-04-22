@@ -12,6 +12,7 @@ import { useMobilityMembers } from '@/hooks/useMobilityMembers';
 import { supabase } from '@/integrations/supabase/client';
 import MobilityMemberRow, { type MemberDraft } from './MobilityMemberRow';
 import { toast } from 'sonner';
+import { toTitleCase, formatCpf } from '@/lib/textNormalize';
 
 const emptyMember = (): MemberDraft => ({
   member_name: '', member_role: '', member_identifier: '',
@@ -56,9 +57,9 @@ export default function MobilityForm({ onSuccess }: Props) {
         committee_id: committeeId,
         committee_name_snapshot: selected.committee_name,
         president_name_snapshot: selected.president_name,
-        operational_responsible_name: opName || undefined,
-        operational_responsible_phone: opPhone || undefined,
-        operational_responsible_email: opEmail || undefined,
+        operational_responsible_name: toTitleCase(opName) || undefined,
+        operational_responsible_phone: opPhone.trim() || undefined,
+        operational_responsible_email: opEmail.trim() || undefined,
         needs_electric_car: needsCar,
         needs_scooter: needsScooter,
       });
@@ -67,9 +68,9 @@ export default function MobilityForm({ onSuccess }: Props) {
         await addMember.mutateAsync({
           form_id: form.id,
           committee_id: committeeId,
-          member_name: m.member_name.trim(),
-          member_role: m.member_role || undefined,
-          member_identifier: m.member_identifier || undefined,
+          member_name: toTitleCase(m.member_name),
+          member_role: toTitleCase(m.member_role) || undefined,
+          member_identifier: formatCpf(m.member_identifier) || undefined,
           access_electric_car: m.access_electric_car,
           access_scooter: m.access_scooter,
           notes: m.notes || undefined,

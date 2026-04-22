@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { toast } from 'sonner';
 import { useMobilityMembers } from '@/hooks/useMobilityMembers';
 import { useOfficialCommittees } from '@/hooks/useOfficialCommittees';
+import { toTitleCase, formatCpf } from '@/lib/textNormalize';
 
 interface Props {
   open: boolean;
@@ -58,9 +59,9 @@ export default function EditMemberDialog({ open, onOpenChange, member }: Props) 
     try {
       await updateMember.mutateAsync({
         id: member.id,
-        member_name: memberName.trim(),
-        member_role: memberRole.trim() || null,
-        member_identifier: memberIdentifier.trim() || null,
+        member_name: toTitleCase(memberName),
+        member_role: toTitleCase(memberRole) || null,
+        member_identifier: formatCpf(memberIdentifier) || null,
         committee_id: committeeId || member.committee_id,
         access_electric_car: accessElectricCar,
         access_scooter: accessScooter,
