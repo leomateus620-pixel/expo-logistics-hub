@@ -104,6 +104,27 @@ export default {
           "0%, 100%": { transform: "translateY(0)" },
           "50%": { transform: "translateY(-2px)" },
         },
+        "card-enter-3d": {
+          "0%": { opacity: "0", transform: "translateY(24px) rotateX(-8deg) scale(0.96)" },
+          "100%": { opacity: "1", transform: "translateY(0) rotateX(0) scale(1)" },
+        },
+        "shimmer-diagonal": {
+          "0%": { transform: "translateX(-120%) skewX(-20deg)", opacity: "0" },
+          "30%": { opacity: "1" },
+          "100%": { transform: "translateX(220%) skewX(-20deg)", opacity: "0" },
+        },
+        "gold-pulse": {
+          "0%, 100%": { boxShadow: "0 0 0 0 hsl(var(--gold) / 0.45), 0 8px 22px -10px hsl(var(--gold) / 0.4)" },
+          "50%": { boxShadow: "0 0 0 6px hsl(var(--gold) / 0), 0 12px 30px -10px hsl(var(--gold) / 0.55)" },
+        },
+        "icon-spin-slow": {
+          "0%": { transform: "rotate(0deg)" },
+          "100%": { transform: "rotate(360deg)" },
+        },
+        "icon-glide": {
+          "0%, 100%": { transform: "translateX(0)" },
+          "50%": { transform: "translateX(2px)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -111,6 +132,11 @@ export default {
         "pulse-soft": "pulse-soft 2s ease-in-out infinite",
         "shimmer": "shimmer 2s ease-in-out infinite",
         "float": "float 3s ease-in-out infinite",
+        "card-enter-3d": "card-enter-3d 0.55s cubic-bezier(0.22, 1, 0.36, 1) both",
+        "shimmer-diagonal": "shimmer-diagonal 1.2s ease-out",
+        "gold-pulse": "gold-pulse 2.4s ease-in-out infinite",
+        "icon-spin-slow": "icon-spin-slow 14s linear infinite",
+        "icon-glide": "icon-glide 3s ease-in-out infinite",
       },
     },
   },
