@@ -287,7 +287,7 @@ export default function GuestsPage() {
             </div>
           );
         })}
-        {guests.length === 0 && (
+        {filteredGuests.length === 0 && guests.length === 0 && (
           <div className="col-span-full text-center py-16 text-muted-foreground">
             <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-primary/10 flex items-center justify-center">
               <Hotel className="w-8 h-8 text-primary/50" />
@@ -296,6 +296,17 @@ export default function GuestsPage() {
             <p className="text-xs text-muted-foreground/70 mt-1">Cadastre o primeiro hóspede para gerenciar hospedagem e traslados</p>
             <Button size="sm" className="mt-4" onClick={() => setAddOpen(true)}>
               <Plus className="w-4 h-4 mr-1" /> Cadastrar Hóspede
+            </Button>
+          </div>
+        )}
+        {filteredGuests.length === 0 && guests.length > 0 && (
+          <div className="col-span-full text-center py-16 text-muted-foreground">
+            <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-primary/10 flex items-center justify-center">
+              <Hotel className="w-8 h-8 text-primary/50" />
+            </div>
+            <p className="text-sm font-medium">Nenhum hóspede no hotel selecionado</p>
+            <Button size="sm" variant="outline" className="mt-4 rounded-xl" onClick={() => setHotelFilter('all')}>
+              <X className="w-4 h-4 mr-1" /> Limpar filtro
             </Button>
           </div>
         )}
