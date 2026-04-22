@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
-import { Download, Search, Shield, ShieldCheck, ShieldX, Users, Zap, Bike, QrCode, Trash2 } from 'lucide-react';
+import { Download, Search, Shield, ShieldCheck, ShieldX, Users, Zap, Bike, QrCode, Trash2, Pencil } from 'lucide-react';
+import EditMemberDialog from './EditMemberDialog';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -32,6 +33,7 @@ export default function MobilityAdminPanel() {
   const [filterCommittee, setFilterCommittee] = useState('all');
   const [filterModal, setFilterModal] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [editingMember, setEditingMember] = useState<any | null>(null);
 
   const filtered = useMemo(() => {
     return allMembers.filter((m: any) => {
@@ -193,6 +195,9 @@ export default function MobilityAdminPanel() {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex justify-end gap-1">
+                          <Button variant="ghost" size="icon" className="h-7 w-7 text-primary" onClick={() => setEditingMember(m)} title="Editar">
+                            <Pencil className="w-3.5 h-3.5" />
+                          </Button>
                           {m.access_status !== 'liberado' && (
                             <Button variant="ghost" size="icon" className="h-7 w-7 text-success" onClick={() => handleStatusChange(m.id, 'liberado')} title="Liberar">
                               <ShieldCheck className="w-3.5 h-3.5" />
@@ -234,6 +239,12 @@ export default function MobilityAdminPanel() {
           )}
         </CardContent>
       </Card>
+
+      <EditMemberDialog
+        open={!!editingMember}
+        onOpenChange={(o) => { if (!o) setEditingMember(null); }}
+        member={editingMember}
+      />
     </div>
   );
 }

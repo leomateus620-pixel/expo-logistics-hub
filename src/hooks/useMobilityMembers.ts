@@ -82,17 +82,27 @@ export function useMobilityMembers(formId?: string) {
   });
 
   const updateMember = useMutation({
-    mutationFn: async (params: { id: string; [key: string]: any }) => {
-      const { id, ...rest } = params;
+    mutationFn: async (params: { id: string; form_id?: string; [key: string]: any }) => {
+      const { id, form_id, ...rest } = params;
       const { error } = await (supabase as any)
         .from('committee_mobility_members')
         .update(rest)
         .eq('id', id);
       if (error) throw error;
+      // Re-sync authorizations so updates reflect immediately on Carro/Patinete tabs
+      if (form_id) {
+        try {
+          await (supabase as any).rpc('sync_internal_mobility_form', { _form_id: form_id });
+        } catch (e) {
+          // Non-blocking: sync failure shouldn't roll back the edit
+          console.warn('sync_internal_mobility_form failed:', e);
+        }
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['mobility-members'] });
       queryClient.invalidateQueries({ queryKey: ['mobility-members-all'] });
+      queryClient.invalidateQueries({ queryKey: ['mobility-authorizations'] });
     },
   });
 
