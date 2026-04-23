@@ -1,55 +1,48 @@
 
 
-## Corrigir data-alvo da contagem regressiva da Fenasoja
+## Corrigir tela branca em "Nova Solicitação" do menu Mobilidade
 
 ### Diagnóstico
-O card `FenasojaCountdown` usa como alvo `2026-05-01T00:00:00-03:00`, mas o texto diz "abertura oficial" — e a abertura oficial da Fenasoja 2026 é **28/04/2026** (conforme já registrado no badge do próprio card: "28/04 → 09/05" e na memória `logistica/periodo-operacional`).
+O fluxo `/mobility-auth` → aba **Nova Solicitação** abre tela branca para esse usuário, sem mensagem nem fallback. Três fragilidades concorrem:
 
-Hoje (23/04) faltam **5 dias** até 28/04, não 8 nem 9. O número "8 dias" aparece porque o alvo está em 01/05.
+1. **Sem ErrorBoundary** ao redor do `MobilityForm` — qualquer exceção durante o render (ex.: `committees` vir com formato inesperado do cache persistido em `localStorage`, falha de rede ao carregar comissões, RLS retornando erro) derruba a árvore inteira para branco em vez de mostrar mensagem amigável.
+2. **`MobilityForm` não trata o estado de erro** dos hooks (`useOfficialCommittees`, `useMobilityForms`, `useMobilityMembers`). Se o `useQuery` lança no `queryFn`, o React Query expõe `isError`/`error`, mas o componente só lê `committees` e `isLoading` — nunca o erro. Resultado: usuário sem permissão de leitura em `official_committees` ou com cache corrompido nunca vê feedback.
+3. **Cache persistido em `localStorage`** (`fenasoja-query-cache`, `gcTime` de 24h) pode estar restaurando uma resposta antiga inválida no notebook desse usuário específico, fazendo com que `committees.map(...)` ou `committees.find(...)` opere sobre algo não-array.
 
-### Pergunta interpretada
-Você quer que o card mostre **9 dias** — isso bate com a contagem até **02/05/2026 00:00 (UTC-3)** a partir de hoje. Mas isso entra em conflito com o rótulo "abertura oficial".
+### Solução em 3 camadas defensivas
 
-Duas leituras possíveis:
+**1. ErrorBoundary local em `MobilityAuthPage`**
 
-**A)** Você quer manter o alvo em 01/05 mas que o cálculo arredonde para cima (mostrando 9 em vez de 8). Solução: trocar `Math.floor` por `Math.ceil` apenas nos dias quando ainda há horas/minutos restantes — assim "faltam X dias" reflete o dia-calendário inteiro, não os blocos de 24h corridos.
+Envolver cada `<TabsContent>` com um `ErrorBoundary` simples que captura o throw e mostra um card de erro com botão "Tentar novamente" (recarrega a página). Garante que **nunca mais** apareça tela branca silenciosa nesse menu, mesmo se um bug futuro aparecer.
 
-**B)** Você quer corrigir o alvo para a abertura **real** (28/04), o que é mais consistente com o texto "abertura oficial" e o badge "28/04 → 09/05" do próprio card.
+**2. `MobilityForm` defensivo**
 
-### Solução proposta (recomendada: A — preserva sua intenção literal)
+- Garantir que `committees` é sempre array antes de `.map`/`.find`: `const safeCommittees = Array.isArray(committees) ? committees : []`.
+- Ler `isError`/`error` do hook `useOfficialCommittees` e mostrar uma mensagem clara: *"Não foi possível carregar a lista de comissões. Recarregue a página ou contate o administrador."*
+- Estender `useOfficialCommittees` para também devolver `isError` e `error` (hoje só devolve `committees`, `isLoading`, `updateCommittee`).
 
-Em `src/components/dashboard/FenasojaCountdown.tsx`:
+**3. Botão "Limpar cache local" no card de erro**
 
-- Manter `TARGET_ISO = '2026-05-01T00:00:00-03:00'`
-- Ajustar `computeParts` para que o número de **dias** exibido use `Math.ceil(diff / 86_400_000)` quando `diff > 0`, e os blocos de horas/min/seg continuem sendo o **resto da hora corrente** (não recalculados em cima do ceil), assim:
-  - O card mostra "Faltam **9** dias para a abertura oficial"
-  - Os blocos seguem mostrando `09 | HH | MM | SS` decrescendo em tempo real
-  - Quando faltar menos de 24h, mostra `01` dia (não `00`)
-  - Quando passar do alvo, `done = true` e exibe a mensagem celebratória
+No fallback do ErrorBoundary, oferecer ação secundária *"Limpar cache e recarregar"* que faz `localStorage.removeItem('fenasoja-query-cache')` antes do `location.reload()`. Resolve o cenário do cache persistido corrompido nesse notebook específico **sem afetar outros usuários** (cada navegador tem seu próprio cache).
 
-Cálculo:
-```ts
-const totalSeconds = Math.floor(diff / 1000);
-const days = Math.ceil(diff / 86_400_000);   // arredonda pra cima
-const hours = Math.floor((diff % 86_400_000) / 3_600_000);
-const minutes = Math.floor((diff % 3_600_000) / 60_000);
-const seconds = Math.floor((diff % 60_000) / 1000);
-```
+### Arquivos
 
-Headline também ajusta: `parts.days === 1 ? "Falta 1 dia..." : "Faltam N dias..."` (lógica atual já cobre).
+| Arquivo | Tipo | Mudança |
+|---|---|---|
+| `src/components/ErrorBoundary.tsx` | Novo | Componente reutilizável `<ErrorBoundary fallback={...}>` baseado em `componentDidCatch`, com card "Algo deu errado" + botões "Tentar novamente" e "Limpar cache local" |
+| `src/pages/MobilityAuthPage.tsx` | Edit | Envolver cada `<TabsContent>` com `<ErrorBoundary>` |
+| `src/components/mobility/MobilityForm.tsx` | Edit | `safeCommittees` guard, ler `isError`/`error` do hook, mostrar mensagem inline se falhar carregar comissões |
+| `src/hooks/useOfficialCommittees.ts` | Edit | Devolver `isError` e `error` no retorno do hook |
 
-### Arquivo
-
-| Arquivo | Mudança |
-|---|---|
-| `src/components/dashboard/FenasojaCountdown.tsx` | Trocar `Math.floor` por `Math.ceil` no cálculo de `days` dentro de `computeParts` |
+### Compatibilidade e risco
+- Zero migração de banco, zero mudança em RLS, zero impacto nos outros 99% dos usuários
+- Os outros menus (Equipe, Hóspedes, Transportes etc.) continuam exatamente como estão — alteração 100% isolada ao módulo Mobilidade
+- Build/preview do app continua idêntico para quem já usa normalmente
+- Para o usuário afetado: na próxima vez que abrir "Nova Solicitação", verá um card de erro acionável em vez de tela branca, e o botão "Limpar cache local" deve resolver definitivamente
 
 ### Critério de aceite
-1. Hoje (23/04/2026) o card mostra "Faltam **9** dias para a abertura oficial"
-2. Bloco "DIAS" mostra `09`
-3. Horas/min/seg seguem decrescendo normalmente
-4. Quando faltar menos de 24h, mostra `01` dia (não `00`)
-5. Após 01/05/2026 00:00, mensagem celebratória aparece sem números negativos
-
-> Se preferir a opção **B** (corrigir o alvo para 28/04 e ajustar o texto), me avise — basta mudar `TARGET_ISO` para `2026-04-28T00:00:00-03:00`.
+1. Clicar em **Nova Solicitação** nunca mais resulta em tela branca — pior caso é um card de erro com mensagem e ações
+2. Se a lista de comissões falhar ao carregar, o form mostra alerta inline em vez de quebrar
+3. Botão "Limpar cache local" remove `fenasoja-query-cache` do `localStorage` e recarrega
+4. Nenhum outro fluxo do sistema é afetado
 
