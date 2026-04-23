@@ -7,11 +7,11 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DateTimePicker } from '@/components/ui/date-time-picker';
-import { useFenasojaEvents, FENASOJA_RANGE } from '@/hooks/useFenasojaEvents';
+import { useFenasojaEvents } from '@/hooks/useFenasojaEvents';
 import { useOrgMembers } from '@/hooks/useOrgMembers';
 import { useCommissions } from '@/hooks/useCommissions';
 import { toast } from 'sonner';
-import { getDateSP, utcToSPLocal, ensureSPOffset } from '@/lib/utils';
+import { utcToSPLocal, ensureSPOffset } from '@/lib/utils';
 import { Sparkles } from 'lucide-react';
 
 interface EventFormProps {
@@ -31,12 +31,6 @@ const empty = {
   commission_id: 'none',
   repetir_diariamente: false,
 };
-
-function isInRange(dateStr: string): boolean {
-  if (!dateStr) return false;
-  const d = getDateSP(dateStr.length === 16 ? dateStr + ':00-03:00' : dateStr);
-  return d >= FENASOJA_RANGE.start && d <= FENASOJA_RANGE.end;
-}
 
 export default function EventForm({ open, onOpenChange, editing }: EventFormProps) {
   const { create, update } = useFenasojaEvents();
@@ -71,10 +65,6 @@ export default function EventForm({ open, onOpenChange, editing }: EventFormProp
       toast.error('Defina início e fim');
       return;
     }
-    if (!isInRange(form.inicio_em) || !isInRange(form.fim_em)) {
-      toast.error('Datas devem estar entre 01/05/2026 e 10/05/2026');
-      return;
-    }
 
     const payload = {
       titulo: form.titulo.toUpperCase(),
@@ -105,11 +95,10 @@ export default function EventForm({ open, onOpenChange, editing }: EventFormProp
         const start = new Date(startISO);
         const end = new Date(endISO);
         const diffMs = end.getTime() - start.getTime();
-        const lastDay = new Date(ensureSPOffset('2026-05-10T23:59'));
+        const MAX_DAYS = 30;
         let count = 0;
-        for (let i = 0; ; i++) {
+        for (let i = 0; i < MAX_DAYS; i++) {
           const newStart = new Date(start.getTime() + i * 86400000);
-          if (newStart > lastDay) break;
           const newEnd = new Date(newStart.getTime() + diffMs);
           await create.mutateAsync({
             ...payload,
@@ -234,7 +223,7 @@ export default function EventForm({ open, onOpenChange, editing }: EventFormProp
             <div className="flex items-center justify-between rounded-xl border border-gold/20 bg-gold/5 px-3 py-2.5">
               <div>
                 <Label htmlFor="repetir" className="text-sm font-medium">Repetir diariamente</Label>
-                <p className="text-[11px] text-muted-foreground">Cria cópias até 10/05/2026</p>
+                <p className="text-[11px] text-muted-foreground">Cria cópias diárias por até 30 dias</p>
               </div>
               <Switch
                 id="repetir"
