@@ -6,7 +6,7 @@ export function useOfficialCommittees() {
   const { orgId } = useCurrentOrg();
   const queryClient = useQueryClient();
 
-  const { data: committees = [], isLoading } = useQuery({
+  const query = useQuery({
     queryKey: ['official-committees', orgId],
     queryFn: async () => {
       if (!orgId) return [];
@@ -17,7 +17,7 @@ export function useOfficialCommittees() {
         .eq('is_active', true)
         .order('committee_name');
       if (error) throw error;
-      return data || [];
+      return Array.isArray(data) ? data : [];
     },
     enabled: !!orgId,
   });
@@ -33,5 +33,11 @@ export function useOfficialCommittees() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['official-committees'] }),
   });
 
-  return { committees, isLoading, updateCommittee };
+  return {
+    committees: Array.isArray(query.data) ? query.data : [],
+    isLoading: query.isLoading,
+    isError: query.isError,
+    error: query.error as Error | null,
+    updateCommittee,
+  };
 }

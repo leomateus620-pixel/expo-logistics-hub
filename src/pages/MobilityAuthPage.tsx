@@ -4,6 +4,7 @@ import { ClipboardList, ShieldCheck } from 'lucide-react';
 import MobilityForm from '@/components/mobility/MobilityForm';
 import MobilityAdminPanel from '@/components/mobility/MobilityAdminPanel';
 import PageTransition from '@/components/PageTransition';
+import ErrorBoundary from '@/components/ErrorBoundary';
 
 export default function MobilityAuthPage() {
   const [tab, setTab] = useState('admin');
@@ -28,10 +29,14 @@ export default function MobilityAuthPage() {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="admin" className="mt-4">
-            <MobilityAdminPanel />
+            <ErrorBoundary fallbackTitle="Não foi possível carregar o painel de mobilidade">
+              <MobilityAdminPanel />
+            </ErrorBoundary>
           </TabsContent>
           <TabsContent value="form" className="mt-4">
-            <MobilityForm onSuccess={() => setTab('admin')} />
+            <ErrorBoundary fallbackTitle="Não foi possível carregar o formulário de nova solicitação">
+              <MobilityForm onSuccess={() => setTab('admin')} />
+            </ErrorBoundary>
           </TabsContent>
         </Tabs>
       </div>

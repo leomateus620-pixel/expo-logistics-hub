@@ -1,11 +1,12 @@
 import { useState, useMemo } from 'react';
-import { Plus, Send, Loader2 } from 'lucide-react';
+import { Plus, Send, Loader2, AlertTriangle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useOfficialCommittees } from '@/hooks/useOfficialCommittees';
 import { useMobilityForms } from '@/hooks/useMobilityForms';
 import { useMobilityMembers } from '@/hooks/useMobilityMembers';
@@ -24,9 +25,11 @@ interface Props {
 }
 
 export default function MobilityForm({ onSuccess }: Props) {
-  const { committees, isLoading: loadingCommittees } = useOfficialCommittees();
+  const { committees, isLoading: loadingCommittees, isError: committeesError, error: committeesErrorObj } = useOfficialCommittees();
   const { createForm } = useMobilityForms();
   const { addMember } = useMobilityMembers();
+
+  const safeCommittees = useMemo(() => (Array.isArray(committees) ? committees : []), [committees]);
 
   const [committeeId, setCommitteeId] = useState('');
   const [opName, setOpName] = useState('');
@@ -37,7 +40,7 @@ export default function MobilityForm({ onSuccess }: Props) {
   const [members, setMembers] = useState<MemberDraft[]>([]);
   const [submitting, setSubmitting] = useState(false);
 
-  const selected = useMemo(() => committees.find((c: any) => c.id === committeeId), [committees, committeeId]);
+  const selected = useMemo(() => safeCommittees.find((c: any) => c?.id === committeeId), [safeCommittees, committeeId]);
 
   const handleMemberChange = (idx: number, field: keyof MemberDraft, value: any) => {
     setMembers(prev => prev.map((m, i) => i === idx ? { ...m, [field]: value } : m));
@@ -97,6 +100,17 @@ export default function MobilityForm({ onSuccess }: Props) {
         <CardTitle className="text-lg">Nova Solicitação de Mobilidade</CardTitle>
       </CardHeader>
       <CardContent className="space-y-5">
+        {committeesError && (
+          <Alert variant="destructive">
+            <AlertTriangle className="h-4 w-4" />
+            <AlertTitle>Não foi possível carregar a lista de comissões</AlertTitle>
+            <AlertDescription className="text-xs">
+              Recarregue a página ou contate o administrador.
+              {committeesErrorObj?.message ? ` (${committeesErrorObj.message})` : ''}
+            </AlertDescription>
+          </Alert>
+        )}
+
         {/* Committee select */}
         <div className="space-y-2">
           <Label>Comissão *</Label>
@@ -105,7 +119,7 @@ export default function MobilityForm({ onSuccess }: Props) {
               <SelectValue placeholder={loadingCommittees ? 'Carregando...' : 'Selecione a comissão'} />
             </SelectTrigger>
             <SelectContent>
-              {committees.map((c: any) => (
+              {safeCommittees.map((c: any) => (
                 <SelectItem key={c.id} value={c.id}>{c.committee_name}</SelectItem>
               ))}
             </SelectContent>
