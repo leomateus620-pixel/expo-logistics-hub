@@ -1,79 +1,55 @@
 
 
-## Padronizar escrita no menu Mobilidade
+## Corrigir data-alvo da contagem regressiva da Fenasoja
 
 ### Diagnóstico
-O módulo Mobilidade tem **escrita inconsistente** em vários campos texto-livre, dificultando leitura, ordenação, filtros e exportações. Exemplos reais hoje no banco:
+O card `FenasojaCountdown` usa como alvo `2026-05-01T00:00:00-03:00`, mas o texto diz "abertura oficial" — e a abertura oficial da Fenasoja 2026 é **28/04/2026** (conforme já registrado no badge do próprio card: "28/04 → 09/05" e na memória `logistica/periodo-operacional`).
 
-| Campo | Variações encontradas |
-|---|---|
-| `member_name` | `andressa kunzler`, `BRUNA G. pEREIRA`, `Carla freisleben servat`, `lUCAS ADIEL ESCHER`, `Nicoly felller silva da silveira` |
-| `member_role` | `serviços` / `Serviços`, `voluntaria` / `Voluntario`, `assessoria de imprensa`, `MEMBRO SUSTENTABILIDADE`, `Recepção ` (espaço extra) |
-| `member_identifier` (CPF) | `00879183071`, `009.590.360-75`, `968678920-00`, `024287740-00` (mistura formatado/cru, alguns inválidos) |
-| `operational_responsible_name` | `cARLA FREISLEBEN SERVAT` vs `Carla freisleben servat`, `elisandra simao reis` vs `Elisandra simao reis`, `Simone Casagrande ` (espaço extra) |
+Hoje (23/04) faltam **5 dias** até 28/04, não 8 nem 9. O número "8 dias" aparece porque o alvo está em 01/05.
 
-Resultado visual: o painel admin e a aba "Autorizados" mostram nomes em caixas/grafias misturadas, "Comissão" repete-se com sutis diferenças, e a contagem por filtro fica fragmentada.
+### Pergunta interpretada
+Você quer que o card mostre **9 dias** — isso bate com a contagem até **02/05/2026 00:00 (UTC-3)** a partir de hoje. Mas isso entra em conflito com o rótulo "abertura oficial".
 
-### Solução em duas camadas (idêntica ao padrão já usado em Hóspedes/hotéis)
+Duas leituras possíveis:
 
-**1. Helpers de normalização** (`src/lib/textNormalize.ts` — novo, reutilizável)
+**A)** Você quer manter o alvo em 01/05 mas que o cálculo arredonde para cima (mostrando 9 em vez de 8). Solução: trocar `Math.floor` por `Math.ceil` apenas nos dias quando ainda há horas/minutos restantes — assim "faltam X dias" reflete o dia-calendário inteiro, não os blocos de 24h corridos.
 
+**B)** Você quer corrigir o alvo para a abertura **real** (28/04), o que é mais consistente com o texto "abertura oficial" e o badge "28/04 → 09/05" do próprio card.
+
+### Solução proposta (recomendada: A — preserva sua intenção literal)
+
+Em `src/components/dashboard/FenasojaCountdown.tsx`:
+
+- Manter `TARGET_ISO = '2026-05-01T00:00:00-03:00'`
+- Ajustar `computeParts` para que o número de **dias** exibido use `Math.ceil(diff / 86_400_000)` quando `diff > 0`, e os blocos de horas/min/seg continuem sendo o **resto da hora corrente** (não recalculados em cima do ceil), assim:
+  - O card mostra "Faltam **9** dias para a abertura oficial"
+  - Os blocos seguem mostrando `09 | HH | MM | SS` decrescendo em tempo real
+  - Quando faltar menos de 24h, mostra `01` dia (não `00`)
+  - Quando passar do alvo, `done = true` e exibe a mensagem celebratória
+
+Cálculo:
 ```ts
-// Title Case respeitando pt-BR + apóstrofos retos + espaços colapsados
-toTitleCase(raw): "lUCAS ADIEL ESCHER" → "Lucas Adiel Escher"
-                  "BRUNA G. pEREIRA"   → "Bruna G. Pereira"
-                  "Simone Casagrande "  → "Simone Casagrande"
-
-// Mantém preposições em minúsculo (de, da, do, dos, das, e)
-"jose eduardo mucha" → "Jose Eduardo Mucha"
-"Alexandre Dall'Agnese" → "Alexandre Dall'Agnese"
-
-// CPF: aceita 11 dígitos puros OU já mascarado, devolve sempre "000.000.000-00"
-formatCpf("00879183071")    → "008.791.830-71"
-formatCpf("009.590.360-75") → "009.590.360-75"
-formatCpf("968678920-00")   → "" (inválido — devolve raw trim para não perder o dado)
+const totalSeconds = Math.floor(diff / 1000);
+const days = Math.ceil(diff / 86_400_000);   // arredonda pra cima
+const hours = Math.floor((diff % 86_400_000) / 3_600_000);
+const minutes = Math.floor((diff % 3_600_000) / 60_000);
+const seconds = Math.floor((diff % 60_000) / 1000);
 ```
 
-**2. Aplicar normalização em 3 momentos**
+Headline também ajusta: `parts.days === 1 ? "Falta 1 dia..." : "Faltam N dias..."` (lógica atual já cobre).
 
-| Onde | Campo | Função |
-|---|---|---|
-| `MobilityForm.tsx` (criar) | `member_name`, `operational_responsible_name`, `member_role` | `toTitleCase` antes de gravar |
-| `MobilityForm.tsx` (criar) | `member_identifier` | `formatCpf` antes de gravar |
-| `EditMemberDialog.tsx` (editar) | mesmos 4 campos | mesma normalização ao salvar |
-| `MobilityAdminPanel.tsx` + `AuthorizationsTab.tsx` (exibição) | mesmos 4 campos | aplica `toTitleCase`/`formatCpf` em runtime nos `<td>`/`<TableCell>` — **não muda dados antigos**, só corrige a apresentação |
+### Arquivo
 
-Assim:
-- **Dados novos:** já entram normalizados (gravação limpa)
-- **Dados antigos:** continuam intactos no banco, mas aparecem normalizados na UI
-- **Sem migração destrutiva:** zero risco de perder informação
-- **Filtros e busca** passam a comparar em forma normalizada (`includes` continua funcionando porque o helper é determinístico)
-
-**3. Sync downstream**
-
-O hook `updateMember` já chama `sync_internal_mobility_form` após editar, que regrava `member_name`/`member_role`/`member_identifier`/`operational_responsible_name` em `mobility_authorizations`. Como gravamos a versão normalizada no `committee_mobility_members`, a tabela de autorizações herda o nome formatado automaticamente — sem mexer na função SQL.
+| Arquivo | Mudança |
+|---|---|
+| `src/components/dashboard/FenasojaCountdown.tsx` | Trocar `Math.floor` por `Math.ceil` no cálculo de `days` dentro de `computeParts` |
 
 ### Critério de aceite
+1. Hoje (23/04/2026) o card mostra "Faltam **9** dias para a abertura oficial"
+2. Bloco "DIAS" mostra `09`
+3. Horas/min/seg seguem decrescendo normalmente
+4. Quando faltar menos de 24h, mostra `01` dia (não `00`)
+5. Após 01/05/2026 00:00, mensagem celebratória aparece sem números negativos
 
-1. Ao abrir o painel **Mobilidade → Painel**, todos os nomes aparecem em "Title Case" (ex: `Lucas Adiel Escher`, não `lUCAS ADIEL ESCHER`)
-2. Cargos como `serviços` / `Serviços` / `SERVIÇOS` aparecem todos como `Serviços`
-3. CPFs aparecem mascarados como `000.000.000-00` quando válidos
-4. Espaços extras no fim (`Simone Casagrande `) somem visualmente
-5. Aba **Autorizados** dentro de Patinetes e Carrinhos Elétricos mostra os mesmos nomes formatados
-6. Novos cadastros via **Nova Solicitação** já gravam normalizado no banco
-7. Editar um integrante e salvar regrava em forma normalizada e propaga para `mobility_authorizations`
-
-### Arquivos
-
-| Arquivo | Tipo | Mudança |
-|---|---|---|
-| `src/lib/textNormalize.ts` | Novo | `toTitleCase(str)` (com lista de preposições pt-BR) e `formatCpf(str)` |
-| `src/components/mobility/MobilityForm.tsx` | Edit | Aplica `toTitleCase`/`formatCpf` em `member_name`, `member_role`, `operational_responsible_name`, `member_identifier` antes de `createForm`/`addMember` |
-| `src/components/mobility/MobilityMemberRow.tsx` | (sem mudança) | Mantém input livre — normalização ocorre no submit |
-| `src/components/mobility/EditMemberDialog.tsx` | Edit | Mesma normalização no `handleSave` |
-| `src/components/mobility/MobilityAdminPanel.tsx` | Edit | Renderiza nomes/cargos/CPF passando pelos helpers; busca normaliza ambos os lados |
-| `src/components/mobility/AuthorizationsTab.tsx` | Edit | Renderiza `member_name`, `member_role`, `operational_responsible_name`, `member_identifier` via helpers; busca normalizada |
-| `src/lib/generateMobilityAuthorizationsExport.ts` | Edit | Aplica helpers ao montar linhas de CSV/PDF (assim a exportação também sai padronizada) |
-
-Sem migração no banco. Sem novos hooks. Sem dependências novas. Zero risco aos dados existentes.
+> Se preferir a opção **B** (corrigir o alvo para 28/04 e ajustar o texto), me avise — basta mudar `TARGET_ISO` para `2026-04-28T00:00:00-03:00`.
 
