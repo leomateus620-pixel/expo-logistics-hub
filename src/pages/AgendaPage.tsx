@@ -9,7 +9,7 @@ import { useTransportGuests } from '@/hooks/useTransportGuests';
 import { Plus, CalendarOff, FileDown } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { cn, rawTime, todaySP, getDateSP, parseDateKey } from '@/lib/utils';
+import { cn, rawTime, todaySP, getDateSP, parseDateKey, mergeDateAndTimeSP } from '@/lib/utils';
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -150,6 +150,11 @@ export default function AgendaPage() {
       .filter((e: any) => e.tipo_tag !== 'transporte')
       .map((e: any) => ({ ...e, _source: 'event' as const }));
 
+    // Same logic as TransportCard's formatReturnTime / saída display
+    const ESTIMATED_DUR: Record<string, number> = {
+      Aeroporto: 120, Hotel: 45, Parque: 30, Centro: 40, 'Escolta Policial': 90, Outros: 60,
+    };
+
     // All transports (exclude only cancelado; prefix cancelled label if needed later)
     const allTransports = transports
       .filter((t: any) => t.status !== 'cancelado')
@@ -158,17 +163,38 @@ export default function AgendaPage() {
         const guestNames = guestIds.map((gid: string) => guests.find((g: any) => g.id === gid)?.nome).filter(Boolean);
         const statusPrefix = t.status === 'concluido' ? '✅ ' : '';
 
+        // Saída displayed = horario_saida text overlaid on inicio_em date
+        const saidaIso = t.horario_saida
+          ? mergeDateAndTimeSP(t.inicio_em, t.horario_saida)
+          : t.inicio_em;
+
+        // Retorno = fim_em or estimated by duration preset
+        const fimIso = t.fim_em
+          ? t.fim_em
+          : new Date(
+              new Date(saidaIso).getTime() +
+                ((t.duracao_estimada_min || ESTIMATED_DUR[t.titulo] || 60) * 60000)
+            ).toISOString();
+
         return {
           id: t.id,
           titulo: `${statusPrefix}Transporte: ${t.titulo || ''} ${t.origem} → ${t.destino}`.trim(),
           descricao: guestNames.length ? `Hóspedes: ${guestNames.join(', ')}` : null,
-          inicio_em: t.inicio_em,
-          fim_em: t.fim_em || t.inicio_em,
+          inicio_em: saidaIso,
+          fim_em: fimIso,
           local: `${t.origem} → ${t.destino}`,
           tipo_tag: 'transporte',
           responsavel_user_id: t.motorista_user_id,
           _source: 'transport' as const,
           _transportStatus: t.status,
+          _transportTitulo: t.titulo,
+          _horarioSaidaText: t.horario_saida || null,
+          _voo: {
+            checkin: t.voo_checkin || null,
+            chegada: t.voo_chegada || null,
+            cidade: t.voo_cidade || null,
+            numero: t.voo_numero || null,
+          },
         };
       });
 
@@ -295,8 +321,8 @@ export default function AgendaPage() {
       </div>
 
       {/* ── Day chips ── */}
-      <div ref={scrollRef} className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide snap-x snap-mandatory -mx-1 px-1">
-        {dates.map((d) => {
+      <div ref={scrollRef} className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory -mx-1 px-1 [perspective:1000px]">
+        {dates.map((d, i) => {
           const active = d === selectedDate;
           const isToday = d === today;
           return (
@@ -304,18 +330,36 @@ export default function AgendaPage() {
               key={d}
               data-active={active}
               onClick={() => setSelectedDate(d)}
+              style={{ animation: 'card-enter-3d 0.45s cubic-bezier(0.22,1,0.36,1) both', animationDelay: `${i * 35}ms` }}
               className={cn(
-                'snap-center shrink-0 flex flex-col items-center px-4 py-2 rounded-xl border transition-all duration-200 min-w-[72px]',
-                'active:scale-[0.96]',
+                'group relative snap-center shrink-0 flex flex-col items-center px-4 py-2.5 rounded-xl border transition-all duration-300 min-w-[72px] overflow-hidden',
+                'active:scale-[0.96] hover:-translate-y-0.5',
                 active
-                  ? 'bg-primary text-primary-foreground border-primary shadow-md'
-                  : 'bg-white/10 backdrop-blur-lg border-white/15 text-foreground hover:bg-white/20'
+                  ? 'bg-gradient-to-b from-primary via-primary/95 to-primary/80 text-primary-foreground border-primary/60 shadow-[0_0_20px_hsl(var(--primary)/0.45),0_8px_18px_-8px_hsl(var(--primary)/0.6)]'
+                  : 'bg-card/55 backdrop-blur-xl border-white/12 text-foreground hover:bg-card/70 hover:border-gold/30'
               )}
             >
-              <span className="text-[10px] uppercase font-medium tracking-wide opacity-80">{parseDateKey(d).toLocaleDateString('pt-BR', { weekday: 'short' })}</span>
-              <span className="text-lg font-bold leading-tight">{parseDateKey(d).toLocaleDateString('pt-BR', { day: '2-digit' })}</span>
-              <span className="text-[10px] uppercase opacity-70">{parseDateKey(d).toLocaleDateString('pt-BR', { month: 'short' })}</span>
-              {isToday && <span className="mt-0.5 w-1.5 h-1.5 rounded-full bg-current opacity-60" />}
+              {/* Top reflection */}
+              <span
+                aria-hidden
+                className={cn(
+                  'pointer-events-none absolute inset-x-3 top-0 h-px',
+                  active
+                    ? 'bg-gradient-to-r from-transparent via-gold/60 to-transparent'
+                    : 'bg-gradient-to-r from-transparent via-gold/30 to-transparent'
+                )}
+              />
+              <span className="relative text-[10px] uppercase font-semibold tracking-wide opacity-85">{parseDateKey(d).toLocaleDateString('pt-BR', { weekday: 'short' })}</span>
+              <span className="relative text-lg font-bold leading-tight tabular-nums" style={active ? { textShadow: '0 0 10px hsl(var(--gold)/0.4)' } : undefined}>
+                {parseDateKey(d).toLocaleDateString('pt-BR', { day: '2-digit' })}
+              </span>
+              <span className="relative text-[10px] uppercase opacity-75">{parseDateKey(d).toLocaleDateString('pt-BR', { month: 'short' })}</span>
+              {isToday && (
+                <span className="relative mt-0.5 flex h-1.5 w-1.5">
+                  {!active && <span className="absolute inline-flex h-full w-full rounded-full bg-gold opacity-70 animate-ping motion-reduce:hidden" />}
+                  <span className={cn('relative inline-flex rounded-full h-1.5 w-1.5', active ? 'bg-gold' : 'bg-gold')} />
+                </span>
+              )}
             </button>
           );
         })}
