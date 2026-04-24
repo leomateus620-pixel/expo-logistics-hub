@@ -27,7 +27,7 @@ function buildOfficialDays(): string[] {
 }
 
 const OFFICIAL_DAYS = buildOfficialDays();
-const OFFICIAL_DAYS_SET = new Set(OFFICIAL_DAYS);
+
 
 export default function FenasojaEventsPage() {
   const { events, isLoading, canManage, remove } = useFenasojaEvents();
