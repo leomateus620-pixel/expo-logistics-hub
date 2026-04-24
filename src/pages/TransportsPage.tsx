@@ -159,9 +159,37 @@ const estimatedDurationMin: Record<string, number> = {
   'Aeroporto': 120, 'Hotel': 45, 'Parque': 30, 'Centro': 40, 'Escolta Policial': 90, 'Outros': 60,
 };
 
+const ARRIVAL_GROUND_BUFFER_MIN = 30;
+
+function airportOneWayMin(t: any): number {
+  const total = t.duracao_estimada_min || estimatedDurationMin.Aeroporto || 120;
+  return Math.max(30, Math.round(total / 2));
+}
+
+function buildSPDateTime(baseIso: string, hhmm: string): Date | null {
+  try {
+    const baseDate = String(baseIso).slice(0, 10);
+    const d = new Date(`${baseDate}T${hhmm}:00-03:00`);
+    return isNaN(d.getTime()) ? null : d;
+  } catch { return null; }
+}
+
 function estimateReturnTime(t: any): Date | null {
   if (!t.inicio_em) return null;
   if (t.fim_em) return new Date(t.fim_em);
+
+  if (t.titulo === 'Aeroporto') {
+    const oneWay = airportOneWayMin(t);
+    if (t.voo_chegada) {
+      const landing = buildSPDateTime(t.inicio_em, t.voo_chegada);
+      if (landing) return new Date(landing.getTime() + (ARRIVAL_GROUND_BUFFER_MIN + oneWay) * 60000);
+    }
+    if (t.voo_checkin) {
+      const checkin = buildSPDateTime(t.inicio_em, t.voo_checkin);
+      if (checkin) return new Date(checkin.getTime() + oneWay * 60000);
+    }
+  }
+
   const start = new Date(t.inicio_em);
   const durationMin = t.duracao_estimada_min || estimatedDurationMin[t.titulo] || 60;
   return new Date(start.getTime() + durationMin * 60000);
