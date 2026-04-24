@@ -2,7 +2,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Check, Clock, X, Pencil, Trash2, FileText, Navigation, Play, Square, ChevronDown, ChevronUp, MessageCircle } from 'lucide-react';
-import { cn, rawTime, rawDateShort, getEffectiveEstimatedKm } from '@/lib/utils';
+import { cn, rawTime, rawDateShort, getEffectiveEstimatedKm, getEffectiveOneWayMin, getEffectiveTotalMin } from '@/lib/utils';
 import TransportDynamicIsland from '@/components/TransportDynamicIsland';
 import { buildTripMessage, buildWhatsAppUrl, isValidPhone } from '@/lib/whatsapp';
 import { TransportWeatherCard } from '@/components/weather/TransportWeatherCard';
@@ -14,17 +14,11 @@ const statusConfig: Record<string, { label: string; icon: typeof Check; class: s
   cancelado: { label: 'Cancelado', icon: X, class: 'text-destructive', dotClass: 'bg-destructive', bgClass: 'bg-destructive/10 border-destructive/20' },
 };
 
-// Total round-trip duration (default for non-airport transports)
-const estimatedDurationMin: Record<string, number> = {
-  'Aeroporto': 120, 'Hotel': 45, 'Parque': 30, 'Centro': 40, 'Escolta Policial': 90, 'Outros': 60,
-};
-
 // Buffer applied after a flight lands (deplaning + baggage)
 const ARRIVAL_GROUND_BUFFER_MIN = 30;
 
 function airportOneWayMin(t: any): number {
-  const total = t.duracao_estimada_min || estimatedDurationMin.Aeroporto || 120;
-  return Math.max(30, Math.round(total / 2));
+  return getEffectiveOneWayMin(t.duracao_estimada_min, t.titulo, t.voo_cidade);
 }
 
 function buildSPDateTime(baseIso: string, hhmm: string): Date | null {
@@ -55,7 +49,7 @@ function estimateReturnTime(t: any): Date | null {
   }
 
   const start = new Date(t.inicio_em);
-  const durationMin = t.duracao_estimada_min || estimatedDurationMin[t.titulo] || 60;
+  const durationMin = getEffectiveTotalMin(t.duracao_estimada_min, t.titulo, t.voo_cidade);
   return new Date(start.getTime() + durationMin * 60000);
 }
 
