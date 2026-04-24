@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
-import { Download, Search, Shield, ShieldCheck, ShieldX, Users, Zap, Bike, Trash2, Pencil } from 'lucide-react';
+import { Download, Search, Shield, ShieldCheck, ShieldX, Users, Zap, Bike, Trash2, Pencil, AlertTriangle, RefreshCw } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import EditMemberDialog from './EditMemberDialog';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
