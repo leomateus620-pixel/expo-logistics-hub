@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
-import { Download, Search, Shield, ShieldCheck, ShieldX, Users, Zap, Bike, Trash2, Pencil } from 'lucide-react';
+import { Download, Search, Shield, ShieldCheck, ShieldX, Users, Zap, Bike, Trash2, Pencil, AlertTriangle, RefreshCw } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import EditMemberDialog from './EditMemberDialog';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -26,9 +27,10 @@ const statusLabels: Record<string, string> = {
 };
 
 export default function MobilityAdminPanel() {
-  const { forms } = useMobilityForms();
-  const { allMembers, allMembersLoading, updateMember, deleteMember } = useMobilityMembers();
+  const { forms, isError: formsError, refetch: refetchForms } = useMobilityForms();
+  const { allMembers, allMembersLoading, allMembersError, refetchAllMembers, updateMember, deleteMember } = useMobilityMembers();
   const { committees } = useOfficialCommittees();
+  const safeCommittees = Array.isArray(committees) ? committees : [];
 
   const [search, setSearch] = useState('');
   const [filterCommittee, setFilterCommittee] = useState('all');
@@ -93,6 +95,23 @@ export default function MobilityAdminPanel() {
 
   return (
     <div className="space-y-6">
+      {(formsError || allMembersError) && (
+        <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Não foi possível carregar todos os dados</AlertTitle>
+          <AlertDescription className="flex items-center justify-between gap-3 mt-1">
+            <span className="text-xs">Verifique sua conexão e tente novamente.</span>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => { refetchForms(); refetchAllMembers(); }}
+              className="gap-1.5"
+            >
+              <RefreshCw className="w-3.5 h-3.5" /> Tentar novamente
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <StatCard label="Respondidas" value={stats.submitted} icon={<Shield className="w-4 h-4" />} />
@@ -115,7 +134,7 @@ export default function MobilityAdminPanel() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todas comissões</SelectItem>
-                {committees.map((c: any) => (
+                {safeCommittees.map((c: any) => (
                   <SelectItem key={c.id} value={c.id}>{toTitleCase(c.committee_name)}</SelectItem>
                 ))}
               </SelectContent>

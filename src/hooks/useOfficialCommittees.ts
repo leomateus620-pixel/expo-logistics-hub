@@ -20,6 +20,8 @@ export function useOfficialCommittees() {
       return Array.isArray(data) ? data : [];
     },
     enabled: !!orgId,
+    staleTime: 60_000,
+    retry: 2,
   });
 
   const updateCommittee = useMutation({

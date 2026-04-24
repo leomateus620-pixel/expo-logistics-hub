@@ -25,18 +25,19 @@ export function useMobilityMembers(formId?: string) {
   const { data: members = [], isLoading } = useQuery({
     queryKey: ['mobility-members', orgId, formId],
     queryFn: async () => {
-      if (!orgId) return [];
-      let query = (supabase as any)
+      if (!orgId || !formId) return [];
+      const { data, error } = await (supabase as any)
         .from('committee_mobility_members')
         .select('*')
         .eq('org_id', orgId)
+        .eq('form_id', formId)
         .order('member_name');
-      if (formId) query = query.eq('form_id', formId);
-      const { data, error } = await query;
       if (error) throw error;
       return data || [];
     },
-    enabled: !!orgId,
+    enabled: !!orgId && !!formId,
+    staleTime: 30_000,
+    retry: 2,
   });
 
   const allMembers = useQuery({
@@ -52,6 +53,8 @@ export function useMobilityMembers(formId?: string) {
       return data || [];
     },
     enabled: !!orgId,
+    staleTime: 30_000,
+    retry: 2,
   });
 
   const addMember = useMutation({
@@ -124,6 +127,8 @@ export function useMobilityMembers(formId?: string) {
     members,
     allMembers: allMembers.data || [],
     allMembersLoading: allMembers.isLoading,
+    allMembersError: allMembers.isError,
+    refetchAllMembers: allMembers.refetch,
     isLoading,
     addMember,
     updateMember,

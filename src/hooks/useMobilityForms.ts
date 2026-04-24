@@ -8,7 +8,7 @@ export function useMobilityForms() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
 
-  const { data: forms = [], isLoading } = useQuery({
+  const { data: forms = [], isLoading, isError, refetch } = useQuery({
     queryKey: ['mobility-forms', orgId],
     queryFn: async () => {
       if (!orgId) return [];
@@ -21,6 +21,8 @@ export function useMobilityForms() {
       return data || [];
     },
     enabled: !!orgId,
+    staleTime: 30_000,
+    retry: 2,
   });
 
   const createForm = useMutation({
@@ -84,5 +86,5 @@ export function useMobilityForms() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['mobility-forms'] }),
   });
 
-  return { forms, isLoading, createForm, updateForm, submitForm, deleteForm };
+  return { forms, isLoading, isError, refetch, createForm, updateForm, submitForm, deleteForm };
 }

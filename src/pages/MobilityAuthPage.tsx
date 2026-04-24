@@ -1,13 +1,27 @@
 import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ClipboardList, ShieldCheck } from 'lucide-react';
+import { ClipboardList, ShieldCheck, Loader2 } from 'lucide-react';
 import MobilityForm from '@/components/mobility/MobilityForm';
 import MobilityAdminPanel from '@/components/mobility/MobilityAdminPanel';
 import PageTransition from '@/components/PageTransition';
 import ErrorBoundary from '@/components/ErrorBoundary';
+import { useAuth } from '@/hooks/useAuth';
+import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 
 export default function MobilityAuthPage() {
   const [tab, setTab] = useState('admin');
+  const { loading: authLoading, user } = useAuth();
+  const { isLoading: orgLoading, orgId } = useCurrentOrg();
+
+  // Wait for auth + org to fully resolve before mounting hooks that depend on auth.uid()
+  // Prevents the "white screen / infinite loading" race condition in restricted users.
+  if (authLoading || (user && orgLoading) || (user && !orgId && orgLoading)) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <Loader2 className="w-6 h-6 animate-spin text-primary" />
+      </div>
+    );
+  }
 
   return (
     <PageTransition>
