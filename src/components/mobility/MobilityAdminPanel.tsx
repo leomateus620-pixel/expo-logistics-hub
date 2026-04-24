@@ -95,6 +95,23 @@ export default function MobilityAdminPanel() {
 
   return (
     <div className="space-y-6">
+      {(formsError || allMembersError) && (
+        <Alert variant="destructive">
+          <AlertTriangle className="h-4 w-4" />
+          <AlertTitle>Não foi possível carregar todos os dados</AlertTitle>
+          <AlertDescription className="flex items-center justify-between gap-3 mt-1">
+            <span className="text-xs">Verifique sua conexão e tente novamente.</span>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => { refetchForms(); refetchAllMembers(); }}
+              className="gap-1.5"
+            >
+              <RefreshCw className="w-3.5 h-3.5" /> Tentar novamente
+            </Button>
+          </AlertDescription>
+        </Alert>
+      )}
       {/* Stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <StatCard label="Respondidas" value={stats.submitted} icon={<Shield className="w-4 h-4" />} />
