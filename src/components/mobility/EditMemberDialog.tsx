@@ -112,7 +112,7 @@ export default function EditMemberDialog({ open, onOpenChange, member }: Props) 
                 <SelectValue placeholder="Selecione a comissão" />
               </SelectTrigger>
               <SelectContent>
-                {committees.map((c: any) => (
+                {safeCommittees.map((c: any) => (
                   <SelectItem key={c.id} value={c.id}>{c.committee_name}</SelectItem>
                 ))}
               </SelectContent>
