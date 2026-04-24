@@ -6,7 +6,7 @@ import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import { useGuests } from '@/hooks/useGuests';
 import { useTransportGuests } from '@/hooks/useTransportGuests';
 import { Badge } from '@/components/ui/badge';
-import { CalendarDays, Plus, MapPin, User, Pencil, Trash2, Users, Sun, Sunset, Moon, CalendarOff, FileDown } from 'lucide-react';
+import { Plus, CalendarOff, FileDown } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { cn, rawTime, todaySP, getDateSP, parseDateKey } from '@/lib/utils';
@@ -143,6 +143,7 @@ export default function AgendaPage() {
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
+  const [detailItem, setDetailItem] = useState<any | null>(null);
 
   const isLoading = eventsLoading || transportsLoading;
   const today = todaySP();
@@ -361,93 +362,25 @@ export default function AgendaPage() {
           {(['manha', 'tarde', 'noite'] as const).map((shift) => {
             const items = grouped[shift];
             if (items.length === 0) return null;
-            const { label, icon: Icon } = shiftMeta[shift];
             return (
               <section key={shift}>
-                <div className="flex items-center gap-2 mb-3 px-1">
-                  <Icon className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">{label}</span>
-                  <span className="text-[10px] text-muted-foreground/60">({items.length})</span>
-                </div>
-                <div className="space-y-2.5">
-                  {items.map((e: any) => {
+                <ShiftSectionHeader shift={shift} count={items.length} />
+                <div className="space-y-3">
+                  {items.map((e: any, idx: number) => {
                     const isCurrent = isNowBetween(e.inicio_em, e.fim_em);
                     const member = e.responsavel_user_id ? members.find((m: any) => m.user_id === e.responsavel_user_id) : null;
                     const comm = member?.commission_id ? commissions.find((c: any) => c.id === member.commission_id) : null;
                     return (
-                      <div
+                      <AgendaItemCard3D
                         key={e.id}
-                        onClick={() => e._source !== 'transport' && openEdit(e)}
-                        className={cn(
-                          'group rounded-2xl border p-4 flex gap-4 cursor-pointer transition-all duration-200',
-                          'bg-white/10 backdrop-blur-xl border-white/15',
-                          'hover:bg-white/15 hover:shadow-lg',
-                          'active:scale-[0.98]',
-                          isCurrent && 'ring-2 ring-primary/40'
-                        )}
-                      >
-                        {/* Time column */}
-                        <div className="flex flex-col items-center justify-center w-14 shrink-0">
-                          <span className="text-base font-mono font-bold leading-tight">{rawTime(e.inicio_em)}</span>
-                          <span className="text-[10px] text-muted-foreground font-mono">{rawTime(e.fim_em)}</span>
-                          {isCurrent && <span className="mt-1 w-2 h-2 rounded-full bg-primary animate-pulse" />}
-                        </div>
-
-                        {/* Divider */}
-                        <div className="w-px self-stretch bg-white/15 shrink-0" />
-
-                        {/* Content */}
-                        <div className="flex-1 min-w-0 space-y-1.5">
-                          <p className="text-sm font-semibold truncate leading-tight">{e.titulo}</p>
-                          {e.descricao && <p className="text-xs text-muted-foreground line-clamp-2">{e.descricao}</p>}
-                          <div className="flex items-center gap-2.5 flex-wrap">
-                            {e.local && (
-                              <span className="text-[10px] text-muted-foreground flex items-center gap-1">
-                                <MapPin className="w-3 h-3" />{e.local}
-                              </span>
-                            )}
-                            {member && (
-                              <span className="text-[10px] text-primary flex items-center gap-1">
-                                <User className="w-3 h-3" />{member.nome_exibicao}
-                              </span>
-                            )}
-                            {comm && (
-                              <span className="text-[10px] text-muted-foreground flex items-center gap-1">
-                                <Users className="w-3 h-3" />{comm.nome}
-                              </span>
-                            )}
-                            {e.tipo_tag && (
-                              <Badge variant="outline" className="text-[10px] bg-white/10 border-white/20 backdrop-blur">{e.tipo_tag}</Badge>
-                            )}
-                            {e._source === 'transport' && (
-                              <WeatherMiniSummary transportId={e.id} />
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Actions */}
-                        {e._source !== 'transport' && (
-                          <div className="flex flex-col items-center justify-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                            <Pencil className="w-3.5 h-3.5 text-muted-foreground" />
-                            {(myRole === 'admin' || myRole === 'gestor') && (
-                              <button
-                                className="p-1 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
-                                onClick={(ev) => { ev.stopPropagation(); if (confirm('Excluir este evento?')) remove.mutate(e.id); }}
-                                aria-label="Excluir"
-                              >
-                                <Trash2 className="w-3.5 h-3.5" />
-                              </button>
-                            )}
-                          </div>
-                        )}
-                        {e._source === 'transport' && (
-                          <div className="flex items-center shrink-0">
-                            <Badge variant="outline" className="text-[10px] bg-primary/10 border-primary/30 text-primary">
-                              {e._transportStatus === 'em_andamento' ? 'Em andamento' : 'Pendente'}
-                            </Badge>
-                          </div>
-                        )}
-                      </div>
+                        item={e}
+                        shift={shift}
+                        index={idx}
+                        isCurrent={isCurrent}
+                        member={member}
+                        commission={comm}
+                        onOpen={setDetailItem}
+                      />
                     );
                   })}
                 </div>
@@ -456,6 +389,20 @@ export default function AgendaPage() {
           })}
         </div>
       )}
+
+      {/* ── Detail dialog (event OR transport) ── */}
+      <AgendaItemDetailDialog
+        item={detailItem}
+        open={!!detailItem}
+        onOpenChange={(v) => { if (!v) setDetailItem(null); }}
+        members={members}
+        commissions={commissions}
+        guests={guests}
+        getGuestsForTransport={getGuestsForTransport}
+        myRole={myRole}
+        onEdit={openEdit}
+        onDelete={(id) => remove.mutate(id)}
+      />
 
       {/* ── Modal ── */}
       <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setEditingId(null); setForm(emptyForm); } }}>
