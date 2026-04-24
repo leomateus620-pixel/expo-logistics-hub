@@ -9,7 +9,7 @@ import { useTransportGuests } from '@/hooks/useTransportGuests';
 import { Plus, CalendarOff, FileDown } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { cn, rawTime, todaySP, getDateSP, parseDateKey, mergeDateAndTimeSP } from '@/lib/utils';
+import { cn, rawTime, todaySP, getDateSP, parseDateKey, mergeDateAndTimeSP, getEffectiveOneWayMin, getEffectiveTotalMin } from '@/lib/utils';
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -180,8 +180,8 @@ export default function AgendaPage() {
         if (t.fim_em) {
           fimIso = t.fim_em;
         } else if (t.titulo === 'Aeroporto' && (t.voo_chegada || t.voo_checkin)) {
-          const totalDur = t.duracao_estimada_min || ESTIMATED_DUR.Aeroporto || 120;
-          const oneWay = Math.max(30, Math.round(totalDur / 2));
+          const oneWay = getEffectiveOneWayMin(t.duracao_estimada_min, t.titulo, t.voo_cidade);
+          const totalDur = getEffectiveTotalMin(t.duracao_estimada_min, t.titulo, t.voo_cidade);
           if (t.voo_chegada) {
             const landing = buildSPDT(t.inicio_em, t.voo_chegada);
             fimIso = landing
@@ -196,7 +196,7 @@ export default function AgendaPage() {
         } else {
           fimIso = new Date(
             new Date(saidaIso).getTime() +
-              ((t.duracao_estimada_min || ESTIMATED_DUR[t.titulo] || 60) * 60000)
+              (getEffectiveTotalMin(t.duracao_estimada_min, t.titulo, t.voo_cidade) * 60000)
           ).toISOString();
         }
 
