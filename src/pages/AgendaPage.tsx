@@ -154,6 +154,13 @@ export default function AgendaPage() {
     const ESTIMATED_DUR: Record<string, number> = {
       Aeroporto: 120, Hotel: 45, Parque: 30, Centro: 40, 'Escolta Policial': 90, Outros: 60,
     };
+    const ARRIVAL_GROUND_BUFFER_MIN = 30;
+    const buildSPDT = (baseIso: string, hhmm: string): Date | null => {
+      try {
+        const d = new Date(`${String(baseIso).slice(0, 10)}T${hhmm}:00-03:00`);
+        return isNaN(d.getTime()) ? null : d;
+      } catch { return null; }
+    };
 
     // All transports (exclude only cancelado; prefix cancelled label if needed later)
     const allTransports = transports
@@ -168,13 +175,30 @@ export default function AgendaPage() {
           ? mergeDateAndTimeSP(t.inicio_em, t.horario_saida)
           : t.inicio_em;
 
-        // Retorno = fim_em or estimated by duration preset
-        const fimIso = t.fim_em
-          ? t.fim_em
-          : new Date(
-              new Date(saidaIso).getTime() +
-                ((t.duracao_estimada_min || ESTIMATED_DUR[t.titulo] || 60) * 60000)
-            ).toISOString();
+        // Retorno: prefer fim_em; for airport anchor on flight event; otherwise saida + preset
+        let fimIso: string;
+        if (t.fim_em) {
+          fimIso = t.fim_em;
+        } else if (t.titulo === 'Aeroporto' && (t.voo_chegada || t.voo_checkin)) {
+          const totalDur = t.duracao_estimada_min || ESTIMATED_DUR.Aeroporto || 120;
+          const oneWay = Math.max(30, Math.round(totalDur / 2));
+          if (t.voo_chegada) {
+            const landing = buildSPDT(t.inicio_em, t.voo_chegada);
+            fimIso = landing
+              ? new Date(landing.getTime() + (ARRIVAL_GROUND_BUFFER_MIN + oneWay) * 60000).toISOString()
+              : new Date(new Date(saidaIso).getTime() + totalDur * 60000).toISOString();
+          } else {
+            const checkin = buildSPDT(t.inicio_em, t.voo_checkin);
+            fimIso = checkin
+              ? new Date(checkin.getTime() + oneWay * 60000).toISOString()
+              : new Date(new Date(saidaIso).getTime() + totalDur * 60000).toISOString();
+          }
+        } else {
+          fimIso = new Date(
+            new Date(saidaIso).getTime() +
+              ((t.duracao_estimada_min || ESTIMATED_DUR[t.titulo] || 60) * 60000)
+          ).toISOString();
+        }
 
         return {
           id: t.id,
