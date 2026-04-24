@@ -117,7 +117,7 @@ export default function MobilityAdminPanel() {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Todas comissões</SelectItem>
-                {committees.map((c: any) => (
+                {safeCommittees.map((c: any) => (
                   <SelectItem key={c.id} value={c.id}>{toTitleCase(c.committee_name)}</SelectItem>
                 ))}
               </SelectContent>
