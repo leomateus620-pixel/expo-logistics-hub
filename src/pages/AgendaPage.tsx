@@ -19,7 +19,8 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
-import { WeatherMiniSummary } from '@/components/weather/WeatherMiniSummary';
+import { AgendaItemCard3D, ShiftSectionHeader } from '@/components/agenda/AgendaItemCard3D';
+import { AgendaItemDetailDialog } from '@/components/agenda/AgendaItemDetailDialog';
 
 const emptyForm = { titulo: '', descricao: '', inicio_em: '', fim_em: '', local: '', tipo_tag: '', responsavel_user_id: '', commission_id: '', repetir_diariamente: false };
 
