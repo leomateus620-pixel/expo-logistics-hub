@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
   Clock, MapPin, User, Users, Pencil, Trash2, Truck, CalendarClock, ArrowRight, Sun, Sunset, Moon,
-  Hourglass, Navigation, ExternalLink,
+  Hourglass, Navigation, ExternalLink, Plane, PlaneLanding,
 } from 'lucide-react';
 import { cn, rawTime } from '@/lib/utils';
 import { TransportWeatherCard } from '@/components/weather/TransportWeatherCard';
@@ -129,18 +129,60 @@ export function AgendaItemDetailDialog({
 
         {/* Scrollable body */}
         <div className="overflow-y-auto max-h-[calc(min(90dvh,52rem)-15rem)] px-6 py-5 space-y-4">
+          {/* Flight info (transports of type Aeroporto) */}
+          {isTransport && item._voo && (item._voo.checkin || item._voo.chegada) && (
+            <div className="rounded-xl border border-gold/30 bg-gradient-to-br from-gold/15 via-card/40 to-primary/10 p-4 backdrop-blur-xl">
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-1.5 mb-2.5">
+                <Plane className="w-3 h-3 text-gold" /> Informações de Voo
+              </p>
+              <div className="grid grid-cols-2 gap-2.5">
+                {item._voo.checkin && (
+                  <div className="rounded-lg border border-gold/30 bg-gold/10 p-2.5">
+                    <p className="text-[9px] uppercase tracking-wider text-gold/90 font-bold flex items-center gap-1">
+                      <Plane className="w-2.5 h-2.5" /> Horário do Voo
+                    </p>
+                    <p className="text-lg font-mono font-bold text-foreground mt-0.5" style={{ textShadow: '0 0 10px hsl(var(--gold)/0.4)' }}>
+                      {item._voo.checkin}
+                    </p>
+                  </div>
+                )}
+                {item._voo.chegada && (
+                  <div className="rounded-lg border border-info/30 bg-info/10 p-2.5">
+                    <p className="text-[9px] uppercase tracking-wider text-info font-bold flex items-center gap-1">
+                      <PlaneLanding className="w-2.5 h-2.5" /> Desembarque
+                    </p>
+                    <p className="text-lg font-mono font-bold text-foreground mt-0.5">
+                      {item._voo.chegada}
+                    </p>
+                  </div>
+                )}
+              </div>
+              {(item._voo.cidade || item._voo.numero) && (
+                <p className="text-[10px] text-muted-foreground mt-2.5 flex items-center gap-1">
+                  {item._voo.cidade && <span className="font-medium">{item._voo.cidade}</span>}
+                  {item._voo.cidade && item._voo.numero && <span>•</span>}
+                  {item._voo.numero && <span className="font-mono">Voo {item._voo.numero}</span>}
+                </p>
+              )}
+            </div>
+          )}
+
           {/* Time block */}
           <div className="rounded-xl border border-white/15 bg-gradient-to-br from-card/80 to-card/40 p-4 backdrop-blur-xl">
             <div className="flex items-center justify-between gap-3">
               <div className="text-center flex-1">
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Início</p>
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
+                  {isTransport ? 'Saída' : 'Início'}
+                </p>
                 <p className="text-2xl font-mono font-bold mt-1" style={{ textShadow: '0 0 10px hsl(var(--gold)/0.25)' }}>
-                  {rawTime(item.inicio_em)}
+                  {isTransport && item._horarioSaidaText ? item._horarioSaidaText : rawTime(item.inicio_em)}
                 </p>
               </div>
               <ArrowRight className="w-5 h-5 text-gold/70 shrink-0" />
               <div className="text-center flex-1">
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Fim</p>
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
+                  {isTransport ? 'Retorno' : 'Fim'}
+                </p>
                 <p className="text-2xl font-mono font-bold mt-1" style={{ textShadow: '0 0 10px hsl(var(--gold)/0.25)' }}>
                   {rawTime(item.fim_em)}
                 </p>

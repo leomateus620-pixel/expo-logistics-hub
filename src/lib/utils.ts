@@ -103,6 +103,18 @@ export function getDateSP(iso: string): string {
   return new Date(iso).toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
 }
 
+/** Combine the date (in SP) of a base ISO timestamp with a "HH:MM" string,
+ *  returning an ISO with the SP offset preserved. */
+export function mergeDateAndTimeSP(baseIso: string, hhmm: string): string {
+  if (!baseIso || !hhmm) return baseIso;
+  const m = hhmm.match(/^(\d{1,2}):(\d{2})/);
+  if (!m) return baseIso;
+  const hh = m[1].padStart(2, '0');
+  const mm = m[2];
+  const dateKey = getDateSP(baseIso); // YYYY-MM-DD in SP
+  return `${dateKey}T${hh}:${mm}:00${getSPOffset()}`;
+}
+
 /** Parse a YYYY-MM-DD date key into a Date without UTC midnight shift.
  *  Uses noon local time to avoid DST edge cases. */
 export function parseDateKey(dateKey: string): Date {
