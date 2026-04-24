@@ -21,6 +21,7 @@ interface Props {
 export default function EditMemberDialog({ open, onOpenChange, member }: Props) {
   const { updateMember } = useMobilityMembers();
   const { committees } = useOfficialCommittees();
+  const safeCommittees = Array.isArray(committees) ? committees : [];
 
   const [memberName, setMemberName] = useState('');
   const [memberRole, setMemberRole] = useState('');
