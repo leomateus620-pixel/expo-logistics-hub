@@ -5,7 +5,7 @@ import { useCommissions } from '@/hooks/useCommissions';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import { useGuests } from '@/hooks/useGuests';
 import { useTransportGuests } from '@/hooks/useTransportGuests';
-import { Badge } from '@/components/ui/badge';
+
 import { Plus, CalendarOff, FileDown } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
@@ -36,11 +36,6 @@ function getShift(iso: string): 'manha' | 'tarde' | 'noite' {
   return 'noite';
 }
 
-const shiftMeta = {
-  manha: { label: 'Manhã', icon: Sun },
-  tarde: { label: 'Tarde', icon: Sunset },
-  noite: { label: 'Noite', icon: Moon },
-} as const;
 
 function isNowBetween(start: string, end: string): boolean {
   const now = new Date();
