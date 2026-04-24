@@ -27,9 +27,10 @@ const statusLabels: Record<string, string> = {
 };
 
 export default function MobilityAdminPanel() {
-  const { forms } = useMobilityForms();
-  const { allMembers, allMembersLoading, updateMember, deleteMember } = useMobilityMembers();
+  const { forms, isError: formsError, refetch: refetchForms } = useMobilityForms();
+  const { allMembers, allMembersLoading, allMembersError, refetchAllMembers, updateMember, deleteMember } = useMobilityMembers();
   const { committees } = useOfficialCommittees();
+  const safeCommittees = Array.isArray(committees) ? committees : [];
 
   const [search, setSearch] = useState('');
   const [filterCommittee, setFilterCommittee] = useState('all');
