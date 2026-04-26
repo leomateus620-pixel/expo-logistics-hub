@@ -186,19 +186,40 @@ export default function Dashboard() {
     return [...fromEvents, ...fromTransports];
   }, [events, transports]);
 
-  const todayEvents = useMemo(() => agendaItems.filter((e: any) => toSPDate(e.inicio_em) === todayStr), [agendaItems, todayStr]);
-  const tomorrowEvents = useMemo(() => agendaItems.filter((e: any) => toSPDate(e.inicio_em) === tomorrowStr), [agendaItems, tomorrowStr]);
+  // Janela de 7 dias (hoje → +6) em SP
+  const weekDays = useMemo(() => {
+    const base = new Date(`${todayStr}T12:00:00-03:00`);
+    return Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(base);
+      d.setDate(d.getDate() + i);
+      const key = d.toLocaleDateString('sv-SE', { timeZone: 'America/Sao_Paulo' });
+      const weekday = d.toLocaleDateString('pt-BR', { weekday: 'short', timeZone: 'America/Sao_Paulo' })
+        .replace('.', '');
+      return {
+        key,
+        label: i === 0 ? 'Hoje' : i === 1 ? 'Amanhã' : weekday.charAt(0).toUpperCase() + weekday.slice(1),
+        ddmm: key.split('-').slice(1).reverse().join('/'),
+      };
+    });
+  }, [todayStr]);
 
-  const fenasojaToday = useMemo(
-    () => fenasojaEvents.filter((e: any) => e.inicio_em && toSPDate(e.inicio_em) === todayStr)
-                        .sort((a: any, b: any) => (a.inicio_em || '').localeCompare(b.inicio_em || '')),
-    [fenasojaEvents, todayStr]
-  );
-  const fenasojaTomorrow = useMemo(
-    () => fenasojaEvents.filter((e: any) => e.inicio_em && toSPDate(e.inicio_em) === tomorrowStr)
-                        .sort((a: any, b: any) => (a.inicio_em || '').localeCompare(b.inicio_em || '')),
-    [fenasojaEvents, tomorrowStr]
-  );
+  const groupByDay = (items: any[]) => {
+    const keys = new Set(weekDays.map(d => d.key));
+    const map: Record<string, any[]> = {};
+    for (const it of items) {
+      if (!it?.inicio_em) continue;
+      const k = toSPDate(it.inicio_em);
+      if (!keys.has(k)) continue;
+      (map[k] ||= []).push(it);
+    }
+    for (const k of Object.keys(map)) {
+      map[k].sort((a, b) => (a.inicio_em || '').localeCompare(b.inicio_em || ''));
+    }
+    return map;
+  };
+
+  const transportsByDay = useMemo(() => groupByDay(agendaItems), [agendaItems, weekDays]);
+  const fenasojaByDay = useMemo(() => groupByDay(fenasojaEvents), [fenasojaEvents, weekDays]);
 
   const getFenasojaShift = (iso: string) => {
     try {

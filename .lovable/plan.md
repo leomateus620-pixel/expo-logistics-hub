@@ -1,79 +1,118 @@
-## 1) Bug de altura do card "Tarefas" (StatCard)
+## Objetivo
 
-**Causa raiz identificada** em `src/components/StatCard.tsx`:
+Transformar o card **Agenda** do Dashboard, hoje limitado a "Hoje + Amanhã", em uma visão de **7 dias corridos** (hoje + 6 dias seguintes), mantendo as duas colunas existentes (Transportes & Agenda · Eventos Fenasoja) e o design Liquid Glass / gold já aprovado.
+
+## Diagnóstico
+
+Em `src/pages/Dashboard.tsx`:
+
+- `todayEvents` / `tomorrowEvents` filtram `agendaItems` apenas por `todayStr` e `tomorrowStr`.
+- `fenasojaToday` / `fenasojaTomorrow` fazem o mesmo para `fenasojaEvents`.
+- O badge do header mostra `{totalToday} hoje · {totalTomorrow} amanhã` e a renderização tem dois blocos fixos ("Hoje" e "Amanhã") em cada coluna.
+
+Para semana, precisamos generalizar para um array de 7 dias (hoje → +6) e agrupar dinamicamente.
+
+## Plano
+
+### 1. Gerar a janela de 7 dias (uma única fonte de verdade)
+
+Criar, junto aos memos existentes, um helper:
+
+```ts
+const weekDays = useMemo(() => {
+  const base = new Date(`${todayStr}T12:00:00-03:00`); // meio-dia SP evita DST
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(base);
+    d.setDate(d.getDate() + i);
+    const key = d.toLocaleDateString('sv-SE', { timeZone: 'America/Sao_Paulo' }); // YYYY-MM-DD
+    return {
+      key,
+      label:
+        i === 0 ? 'Hoje'
+        : i === 1 ? 'Amanhã'
+        : d.toLocaleDateString('pt-BR', { weekday: 'short', timeZone: 'America/Sao_Paulo' })
+            .replace('.', '')
+            .replace(/^./, c => c.toUpperCase()),
+      ddmm: key.split('-').slice(1).reverse().join('/'), // DD/MM
+    };
+  });
+}, [todayStr]);
+```
+
+### 2. Agrupar dados por dia
+
+Substituir os 4 memos atuais (`todayEvents`, `tomorrowEvents`, `fenasojaToday`, `fenasojaTomorrow`) por dois mapas indexados por `YYYY-MM-DD`:
+
+```ts
+const transportsByDay = useMemo(() => {
+  const keys = new Set(weekDays.map(d => d.key));
+  const map: Record<string, any[]> = {};
+  for (const it of agendaItems) {
+    const k = toSPDate(it.inicio_em);
+    if (!keys.has(k)) continue;
+    (map[k] ||= []).push(it);
+  }
+  for (const k of Object.keys(map)) {
+    map[k].sort((a, b) => (a.inicio_em || '').localeCompare(b.inicio_em || ''));
+  }
+  return map;
+}, [agendaItems, weekDays]);
+
+const fenasojaByDay = useMemo(() => { /* idem para fenasojaEvents */ }, [fenasojaEvents, weekDays]);
+```
+
+### 3. Atualizar o header (badge + range)
 
 ```tsx
-{(showProgressBar || smartLabel || (urgentCount && urgentCount > 0)) && (
-  <div className="mt-2.5 ...">…</div>
-)}
+const totalWeekTransports = weekDays.reduce((s, d) => s + (transportsByDay[d.key]?.length || 0), 0);
+const totalWeekFenasoja  = weekDays.reduce((s, d) => s + (fenasojaByDay[d.key]?.length || 0), 0);
+const rangeLabel = `${weekDays[0].ddmm} – ${weekDays[6].ddmm}`;
 ```
 
-Quando `urgentCount = 0`, a expressão `(urgentCount && urgentCount > 0)` avalia para `0` (falsy mas **renderizável**), e o operador `||` retorna `0`. JSX então renderiza `{0 && <div>}` → imprime literalmente o caractere **"0"** abaixo do `trend "pendentes"` — exatamente o "0" extra visível na imagem do card Tarefas. Isso também desalinha visualmente os 4 cards (Veículos tem barra de progresso → smart-row; Tarefas mostra "0" → altura inconsistente).
+Header passa a exibir:
+- Título: `Agenda · Próximos 7 dias`
+- Subtítulo discreto (text-[10px] muted): `{rangeLabel}`
+- Badge: `{totalWeekTransports + totalWeekFenasoja} eventos · 7 dias`
 
-**Correções:**
+### 4. Renderização agrupada nas duas colunas
 
-- **a)** Reescrever a guarda usando booleanos estritos:
-  ```tsx
-  const hasSmartRow = showProgressBar || !!smartLabel || (typeof urgentCount === 'number' && urgentCount > 0);
-  {hasSmartRow && (<div ...>...)}
-  ```
-- **b)** Garantir altura uniforme dos 4 StatCards usando `min-h` no container de conteúdo (ex.: `min-h-[112px]` no `div.relative.p-4`) para que cards com/sem barra/chip fiquem visualmente alinhados na grade 2x2.
-- **c)** Aplicar a mesma proteção de booleanos no chip `urgentCount` (`!!urgentCount && urgentCount > 0` → `typeof urgentCount === 'number' && urgentCount > 0`).
+Substituir os blocos `Hoje` / `Amanhã` por um `weekDays.map(day => ...)` que só renderiza dias com itens. Cabeçalho de cada grupo segue o padrão atual (chip uppercase, cor primária na coluna esquerda, gold na direita, com destaque especial para "Hoje"):
 
----
-
-## 2) Card "Agenda" do Dashboard — dual-source (Transportes da Agenda + Eventos Fenasoja)
-
-Atualmente o card "Agenda" usa `events` (tabela `events`) + transportes ativos, mas **não inclui eventos da tabela `fenasoja_events`** (menu "Eventos Fenasoja"). O usuário quer um card dividido em duas colunas/seções inteligentes.
-
-### Estrutura proposta (em `src/pages/Dashboard.tsx`)
-
-Substituir a `<Section title="Agenda">` por um novo **card dual-pane** com duas sub-seções lado a lado (responsivo: 2 colunas no desktop ≥sm, empilhado no mobile):
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│ 📅 Agenda                                       Ver tudo →  │
-├──────────────────────────┬──────────────────────────────────┤
-│  🚗 TRANSPORTES & AGENDA │  🌾 EVENTOS FENASOJA             │
-│  (events + transports)   │  (fenasoja_events)               │
-│                          │                                   │
-│  • Hoje (3)              │  • Hoje (2)                      │
-│    08:30 ✈ Voo POA       │    09:00 ☀️ Abertura Oficial     │
-│    14:00 🚗 Hotel→Centro │    20:00 🌙 Show Sertanejo       │
-│  • Amanhã (1)            │  • Amanhã (1)                    │
-│    07:00 ✈ Chapecó       │    14:00 🌅 Palestra Soja        │
-└──────────────────────────┴──────────────────────────────────┘
+```tsx
+{weekDays.map(day => {
+  const items = transportsByDay[day.key] || [];
+  if (!items.length) return null;
+  const isToday = day.key === todayStr;
+  return (
+    <div key={day.key}>
+      <p className={`text-[10px] font-semibold uppercase tracking-wider mb-1.5 flex items-center gap-1.5
+                     ${isToday ? 'text-primary' : 'text-muted-foreground'}`}>
+        {day.label} <span className="opacity-60">— {day.ddmm}</span>
+        {isToday && <span className="ml-1 h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />}
+      </p>
+      <div className="space-y-1.5">{items.map(renderTransportItem)}</div>
+    </div>
+  );
+})}
 ```
 
-### Implementação
+Mesma estrutura na coluna Fenasoja, com `text-gold` e `renderFenasojaItem`.
 
-1. **Hook**: importar `useFenasojaEvents` em `Dashboard.tsx`.
-2. **Filtragem dual**:
-   - `agendaItems` (já existe) → coluna esquerda → "Transportes & Agenda".
-   - `fenasojaItems` (novo) → filtrar `fenasojaEvents` por `toSPDate === todayStr` e `=== tomorrowStr`.
-3. **Novo componente local `<DualAgendaCard>`** dentro de `Dashboard.tsx`, baseado em `<Section>` mas com layout `grid sm:grid-cols-2 gap-4` e divisor vertical sutil (`sm:divide-x divide-border/40`).
-4. **Coluna esquerda — "Transportes & Agenda"** (design já existente, refinado):
-   - Header: ícone `MapPin` + texto verde primário.
-   - Reusar a renderização atual de `todayEvents` / `tomorrowEvents` (linhas com hora, voo, responsável).
-   - `onClick` → navega para `/agenda` ou `/transports` conforme `_source`.
-5. **Coluna direita — "Eventos Fenasoja"** (inspirado em `EventCard.tsx`):
-   - Header: ícone soybean grain (reusar `<SoybeanGrain />` em mini) + texto gold.
-   - Cada item compacto: chip de turno (Manhã/Tarde/Noite com `Sun`/`Sunset`/`Moon` + `bg-gold/15`), hora em `font-mono` destacada em gold, título uppercase, local com `MapPin`.
-   - Borda lateral esquerda 3px gold (igual ao EventCard, mas miniaturizada).
-   - `onClick` → navega para `/fenasoja-events`.
-6. **Estado vazio inteligente**: cada coluna tem seu próprio empty state (não bloqueia a outra). Ex.: se só houver fenasoja sem transportes, mostra "Sem transportes hoje" do lado esquerdo e a lista de eventos do lado direito.
-7. **Badge no header**: contagem combinada `${transportesHoje + fenasojaHoje} hoje · ${transportesAmanha + fenasojaAmanha} amanhã`.
-8. **"Ver tudo"**: dropdown sutil com 2 opções (Agenda / Eventos Fenasoja) — ou simplificar como dois links no header, um por coluna.
+### 5. Estado vazio + scroll
 
-### Helper de turno (reutilizar lógica do EventCard)
+- Empty state da coluna passa a dizer: `"Sem registros nos próximos 7 dias."`
+- Empty state global (`isEmpty`) idem.
+- Cada coluna ganha `max-h-[420px] overflow-y-auto pr-1` (com `scrollbar-thin` se já houver utilitário) para evitar que 7 dias inflacionem o card no desktop, mantendo alinhamento com os outros blocos do Dashboard.
 
-Extrair `getShift(iso)` e `shiftMeta` para arquivo utilitário `src/lib/shiftHelpers.ts` (export shared) ou inline no Dashboard como função local pequena — a abordagem inline é suficiente já que é leve.
+### 6. Performance
 
----
+Tudo permanece em `useMemo`, `agendaItems`/`fenasojaEvents` já vêm cacheados via React Query (`staleTime: 30s`). Não há novas queries — apenas reorganização client-side. Sem impacto em FPS nem em payload.
 
-## Arquivos a modificar
+## Arquivos a alterar
 
-- **`src/components/StatCard.tsx`** — corrigir bug do "0" renderizado + adicionar `min-h` para alinhamento dos 4 cards.
-- **`src/pages/Dashboard.tsx`** — importar `useFenasojaEvents`, substituir `<Section title="Agenda">` pelo novo `<DualAgendaCard>` com duas colunas (Transportes & Agenda | Eventos Fenasoja), aproveitando design dos menus correspondentes.
+- `src/pages/Dashboard.tsx` — substituir memos e bloco JSX do card Agenda (linhas ~189–201 e ~467–624). Nenhum outro arquivo é afetado.
 
-Nenhuma mudança de banco de dados necessária. Sem novas dependências.
+## Fora de escopo
+
+- Página `/agenda` (continua com seu próprio range).
+- Filtros interativos (seletor de período) — pode ser proposto em iteração futura se desejado.
