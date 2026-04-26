@@ -3,6 +3,7 @@ import { useElectricCarts } from '@/hooks/useElectricCarts';
 import { useTransports } from '@/hooks/useTransports';
 import { useTasks } from '@/hooks/useTasks';
 import { useEvents } from '@/hooks/useEvents';
+import { useFenasojaEvents } from '@/hooks/useFenasojaEvents';
 import { useOrgMembers } from '@/hooks/useOrgMembers';
 import { useSchedules } from '@/hooks/useSchedules';
 import { useExpenses } from '@/hooks/useExpenses';
