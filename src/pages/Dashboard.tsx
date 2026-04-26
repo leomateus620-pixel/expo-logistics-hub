@@ -189,6 +189,26 @@ export default function Dashboard() {
   const todayEvents = useMemo(() => agendaItems.filter((e: any) => toSPDate(e.inicio_em) === todayStr), [agendaItems, todayStr]);
   const tomorrowEvents = useMemo(() => agendaItems.filter((e: any) => toSPDate(e.inicio_em) === tomorrowStr), [agendaItems, tomorrowStr]);
 
+  const fenasojaToday = useMemo(
+    () => fenasojaEvents.filter((e: any) => e.inicio_em && toSPDate(e.inicio_em) === todayStr)
+                        .sort((a: any, b: any) => (a.inicio_em || '').localeCompare(b.inicio_em || '')),
+    [fenasojaEvents, todayStr]
+  );
+  const fenasojaTomorrow = useMemo(
+    () => fenasojaEvents.filter((e: any) => e.inicio_em && toSPDate(e.inicio_em) === tomorrowStr)
+                        .sort((a: any, b: any) => (a.inicio_em || '').localeCompare(b.inicio_em || '')),
+    [fenasojaEvents, tomorrowStr]
+  );
+
+  const getFenasojaShift = (iso: string) => {
+    try {
+      const h = parseInt(new Date(iso).toLocaleTimeString('en-US', { hour: '2-digit', hour12: false, timeZone: 'America/Sao_Paulo' }), 10);
+      if (h < 12) return { label: 'Manhã', Icon: Sun };
+      if (h < 18) return { label: 'Tarde', Icon: Sunset };
+      return { label: 'Noite', Icon: Moon };
+    } catch { return { label: 'Evento', Icon: Sun }; }
+  };
+
   const logisticsMembers = useMemo(() =>
     members.filter((m: any) => m.commission_nome && m.commission_nome.toUpperCase().includes('LOG')),
     [members]
