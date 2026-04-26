@@ -464,81 +464,164 @@ export default function Dashboard() {
         </div>
       </Section>
 
-      {/* ─── Agenda ─── */}
-      <Section
-        title="Agenda"
-        icon={CalendarDays}
-        badge={`${todayEvents.length + tomorrowEvents.length} eventos`}
-        onSeeAll={() => navigate('/agenda')}
-        loading={loadEvents}
-        empty={todayEvents.length === 0 && tomorrowEvents.length === 0}
-        emptyMsg="Nenhum evento hoje ou amanhã."
-      >
-        <div className="space-y-3">
-          {todayEvents.length > 0 && (
-            <div>
-              <p className="text-[10px] font-semibold text-primary uppercase tracking-wider mb-1.5">Hoje — {todayStr.split('-').reverse().join('/')}</p>
-              <div className="space-y-1.5">
-                {todayEvents.map((e: any) => {
-                   const responsible = e.responsavel_user_id ? members.find((m: any) => m.user_id === e.responsavel_user_id) : null;
-                   return (
-                     <div key={e.id} className="flex items-center gap-3 p-2.5 rounded-xl bg-muted/40 cursor-pointer hover:bg-muted/60 active:scale-[0.98] transition-all" onClick={() => navigate(e._source === 'transport' ? '/transports' : '/agenda')}>
-                       <div className="flex flex-col gap-0.5 shrink-0 min-w-[48px]">
-                         {(e.voo_checkin || e.voo_chegada) && (
-                           <div className="text-center">
-                              <p className="text-[8px] uppercase text-muted-foreground">Voo</p>
-                             <p className="text-[11px] font-mono font-semibold">{e.voo_checkin || e.voo_chegada}</p>
-                           </div>
-                         )}
-                         <div className="text-center">
-                           <p className="text-[8px] uppercase text-muted-foreground">{e._source === 'transport' ? 'Saída' : 'Evento'}</p>
-                           <p className="text-[11px] font-mono font-semibold">{rawTime(e.inicio_em)}</p>
-                         </div>
-                       </div>
-                       <div className="flex-1 min-w-0">
-                         <p className="text-sm font-medium truncate">{e.titulo}</p>
-                         {e.local && <p className="text-[11px] text-muted-foreground truncate">{e.local}</p>}
-                         {responsible && <p className="text-[10px] text-primary flex items-center gap-1 mt-0.5"><User className="w-3 h-3" />{responsible.nome_exibicao}</p>}
-                       </div>
-                     </div>
-                   );
-                 })}
+      {/* ─── Agenda Dual-Pane ─── */}
+      {(() => {
+        const totalToday = todayEvents.length + fenasojaToday.length;
+        const totalTomorrow = tomorrowEvents.length + fenasojaTomorrow.length;
+        const isLoading = loadEvents || loadFenasoja || loadTransports;
+        const isEmpty = totalToday === 0 && totalTomorrow === 0;
+
+        const renderTransportItem = (e: any) => {
+          const responsible = e.responsavel_user_id ? members.find((m: any) => m.user_id === e.responsavel_user_id) : null;
+          return (
+            <div key={e.id} className="flex items-center gap-3 p-2.5 rounded-xl bg-muted/40 cursor-pointer hover:bg-muted/60 active:scale-[0.98] transition-all" onClick={() => navigate(e._source === 'transport' ? '/transports' : '/agenda')}>
+              <div className="flex flex-col gap-0.5 shrink-0 min-w-[48px]">
+                {(e.voo_checkin || e.voo_chegada) && (
+                  <div className="text-center">
+                    <p className="text-[8px] uppercase text-muted-foreground">Voo</p>
+                    <p className="text-[11px] font-mono font-semibold">{e.voo_checkin || e.voo_chegada}</p>
+                  </div>
+                )}
+                <div className="text-center">
+                  <p className="text-[8px] uppercase text-muted-foreground">{e._source === 'transport' ? 'Saída' : 'Evento'}</p>
+                  <p className="text-[11px] font-mono font-semibold">{rawTime(e.inicio_em)}</p>
+                </div>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium truncate">{e.titulo}</p>
+                {e.local && <p className="text-[11px] text-muted-foreground truncate">{e.local}</p>}
+                {responsible && <p className="text-[10px] text-primary flex items-center gap-1 mt-0.5"><User className="w-3 h-3" />{responsible.nome_exibicao}</p>}
               </div>
             </div>
-          )}
-          {tomorrowEvents.length > 0 && (
-            <div>
-              <p className="text-[10px] font-semibold text-accent uppercase tracking-wider mb-1.5">Amanhã — {tomorrowStr.split('-').reverse().join('/')}</p>
-              <div className="space-y-1.5">
-                {tomorrowEvents.map((e: any) => {
-                   const responsible = e.responsavel_user_id ? members.find((m: any) => m.user_id === e.responsavel_user_id) : null;
-                   return (
-                     <div key={e.id} className="flex items-center gap-3 p-2.5 rounded-xl bg-muted/40 cursor-pointer hover:bg-muted/60 active:scale-[0.98] transition-all" onClick={() => navigate(e._source === 'transport' ? '/transports' : '/agenda')}>
-                       <div className="flex flex-col gap-0.5 shrink-0 min-w-[48px]">
-                         {(e.voo_checkin || e.voo_chegada) && (
-                           <div className="text-center">
-                             <p className="text-[8px] uppercase text-muted-foreground">Voo</p>
-                             <p className="text-[11px] font-mono font-semibold">{e.voo_checkin || e.voo_chegada}</p>
-                           </div>
-                         )}
-                         <div className="text-center">
-                           <p className="text-[8px] uppercase text-muted-foreground">{e._source === 'transport' ? 'Saída' : 'Evento'}</p>
-                           <p className="text-[11px] font-mono font-semibold">{rawTime(e.inicio_em)}</p>
-                         </div>
-                       </div>
-                       <div className="flex-1 min-w-0">
-                         <p className="text-sm font-medium truncate">{e.titulo}</p>
-                         {e.local && <p className="text-[11px] text-muted-foreground truncate">{e.local}</p>}
-                         {responsible && <p className="text-[10px] text-primary flex items-center gap-1 mt-0.5"><User className="w-3 h-3" />{responsible.nome_exibicao}</p>}
-                       </div>
-                     </div>
-                   );
-                 })}
+          );
+        };
+
+        const renderFenasojaItem = (e: any) => {
+          const { label: shiftLabel, Icon: ShiftIcon } = getFenasojaShift(e.inicio_em);
+          return (
+            <div
+              key={e.id}
+              onClick={() => navigate('/fenasoja-events')}
+              className="group/fe relative overflow-hidden flex items-center gap-3 p-2.5 pl-3 rounded-xl cursor-pointer transition-all active:scale-[0.98]
+                         bg-[linear-gradient(135deg,hsl(var(--gold)/0.08)_0%,hsl(var(--card)/0.6)_60%,transparent_100%)]
+                         border border-gold/20 hover:border-gold/40 hover:shadow-[0_8px_20px_-10px_hsl(var(--gold)/0.4)]"
+            >
+              <div className="absolute left-0 top-1 bottom-1 w-[3px] rounded-r-full bg-gradient-to-b from-gold via-gold/80 to-gold/30 shadow-[0_0_8px_hsl(var(--gold)/0.5)]" aria-hidden />
+              <div className="flex flex-col items-center gap-0.5 shrink-0 min-w-[52px]">
+                <div className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-gradient-to-br from-gold/25 via-gold/10 to-transparent border border-gold/30 text-gold">
+                  <ShiftIcon className="w-2.5 h-2.5" aria-hidden />
+                  <span className="text-[8px] uppercase tracking-wider font-bold">{shiftLabel}</span>
+                </div>
+                <p className="text-[11px] font-mono font-bold tabular-nums text-foreground" style={{ textShadow: '0 0 10px hsl(var(--gold) / 0.2)' }}>
+                  {rawTime(e.inicio_em)}
+                </p>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-bold uppercase tracking-tight truncate text-foreground">{e.titulo}</p>
+                {e.local && (
+                  <p className="text-[11px] text-muted-foreground truncate flex items-center gap-1">
+                    <MapPin className="w-2.5 h-2.5 shrink-0" />{e.local}
+                  </p>
+                )}
+                {e.tipo_tag && (
+                  <span className="inline-block mt-0.5 text-[9px] font-bold px-1.5 py-0 rounded bg-gold/15 text-gold border border-gold/25">
+                    {e.tipo_tag}
+                  </span>
+                )}
               </div>
             </div>
-          )}
-        </div>
-      </Section>
+          );
+        };
+
+        return (
+          <div className="liquid-glass-card rounded-2xl p-5 gold-accent">
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-sm font-bold flex items-center gap-2 text-foreground tracking-tight">
+                <CalendarDays className="w-4 h-4 text-primary" aria-hidden /> Agenda
+              </h2>
+              <div className="flex items-center gap-2">
+                <Badge variant="secondary" className="text-[10px] font-semibold">
+                  {totalToday} hoje · {totalTomorrow} amanhã
+                </Badge>
+              </div>
+            </div>
+
+            {isLoading ? (
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div className="space-y-2"><Skeleton className="h-12 rounded-xl" /><Skeleton className="h-12 rounded-xl" /></div>
+                <div className="space-y-2"><Skeleton className="h-12 rounded-xl" /><Skeleton className="h-12 rounded-xl" /></div>
+              </div>
+            ) : isEmpty ? (
+              <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
+                <AlertCircle className="w-8 h-8 mb-2 opacity-25" />
+                <p className="text-xs font-medium">Nenhum evento ou transporte hoje ou amanhã.</p>
+              </div>
+            ) : (
+              <div className="grid sm:grid-cols-2 gap-4 sm:divide-x sm:divide-border/40">
+                {/* ── Coluna 1 — Transportes & Agenda ── */}
+                <div className="space-y-3 sm:pr-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-[11px] font-bold uppercase tracking-wider text-primary flex items-center gap-1.5">
+                      <MapPin className="w-3 h-3" /> Transportes & Agenda
+                    </h3>
+                    <button onClick={() => navigate('/agenda')} className="text-[10px] text-primary font-semibold flex items-center gap-0.5 hover:underline">
+                      Ver <ArrowRight className="w-3 h-3" />
+                    </button>
+                  </div>
+                  {todayEvents.length === 0 && tomorrowEvents.length === 0 ? (
+                    <p className="text-[11px] text-muted-foreground py-4 text-center">Sem transportes nos próximos 2 dias.</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {todayEvents.length > 0 && (
+                        <div>
+                          <p className="text-[10px] font-semibold text-primary uppercase tracking-wider mb-1.5">Hoje — {todayStr.split('-').reverse().join('/')}</p>
+                          <div className="space-y-1.5">{todayEvents.map(renderTransportItem)}</div>
+                        </div>
+                      )}
+                      {tomorrowEvents.length > 0 && (
+                        <div>
+                          <p className="text-[10px] font-semibold text-accent uppercase tracking-wider mb-1.5">Amanhã — {tomorrowStr.split('-').reverse().join('/')}</p>
+                          <div className="space-y-1.5">{tomorrowEvents.map(renderTransportItem)}</div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* ── Coluna 2 — Eventos Fenasoja ── */}
+                <div className="space-y-3 sm:pl-4">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-[11px] font-bold uppercase tracking-wider text-gold flex items-center gap-1.5">
+                      <Sparkles className="w-3 h-3" /> Eventos Fenasoja
+                    </h3>
+                    <button onClick={() => navigate('/fenasoja-events')} className="text-[10px] text-gold font-semibold flex items-center gap-0.5 hover:underline">
+                      Ver <ArrowRight className="w-3 h-3" />
+                    </button>
+                  </div>
+                  {fenasojaToday.length === 0 && fenasojaTomorrow.length === 0 ? (
+                    <p className="text-[11px] text-muted-foreground py-4 text-center">Sem eventos Fenasoja nos próximos 2 dias.</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {fenasojaToday.length > 0 && (
+                        <div>
+                          <p className="text-[10px] font-semibold text-gold uppercase tracking-wider mb-1.5">Hoje — {todayStr.split('-').reverse().join('/')}</p>
+                          <div className="space-y-1.5">{fenasojaToday.map(renderFenasojaItem)}</div>
+                        </div>
+                      )}
+                      {fenasojaTomorrow.length > 0 && (
+                        <div>
+                          <p className="text-[10px] font-semibold text-accent uppercase tracking-wider mb-1.5">Amanhã — {tomorrowStr.split('-').reverse().join('/')}</p>
+                          <div className="space-y-1.5">{fenasojaTomorrow.map(renderFenasojaItem)}</div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })()}
 
       {/* ─── Equipe Logística ─── */}
       <Section
