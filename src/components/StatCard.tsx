@@ -241,42 +241,44 @@ export default function StatCard({
             </div>
 
             {/* Smart status row */}
-            {(showProgressBar || smartLabel || (urgentCount && urgentCount > 0)) && (
-              <div className="mt-2.5 flex items-center gap-2" style={{ transform: 'translateZ(4px)' }}>
-                {showProgressBar && (
-                  <div className="flex-1 h-1 rounded-full bg-muted/50 overflow-hidden ring-1 ring-inset ring-border/30">
-                    <div
-                      className="h-full rounded-full transition-all duration-700 ease-out"
-                      style={{
-                        width: `${progressPct}%`,
-                        background: `linear-gradient(90deg, ${cfg.progressFrom}, ${cfg.progressTo})`,
-                        boxShadow: `0 0 6px ${cfg.glow}`,
-                      }}
-                    />
-                  </div>
-                )}
-                {smartLabel && (
-                  <span
-                    className="text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-md whitespace-nowrap"
-                    style={{
-                      background: `${cfg.accent}1f`,
-                      color: cfg.accent,
-                    }}
-                  >
-                    {smartLabel}
-                  </span>
-                )}
-                {!!urgentCount && urgentCount > 0 && (
-                  <span className="relative inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-md bg-destructive/15 text-destructive">
-                    <span className="relative inline-flex h-1.5 w-1.5">
-                      <span className="absolute inline-flex h-full w-full rounded-full bg-destructive opacity-75 animate-ping" />
-                      <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-destructive" />
+            {(() => {
+              const hasUrgent = typeof urgentCount === 'number' && urgentCount > 0;
+              const hasSmartRow = showProgressBar || !!smartLabel || hasUrgent;
+              if (!hasSmartRow) return null;
+              return (
+                <div className="mt-auto pt-2.5 flex items-center gap-2" style={{ transform: 'translateZ(4px)' }}>
+                  {showProgressBar && (
+                    <div className="flex-1 h-1 rounded-full bg-muted/50 overflow-hidden ring-1 ring-inset ring-border/30">
+                      <div
+                        className="h-full rounded-full transition-all duration-700 ease-out"
+                        style={{
+                          width: `${progressPct}%`,
+                          background: `linear-gradient(90deg, ${cfg.progressFrom}, ${cfg.progressTo})`,
+                          boxShadow: `0 0 6px ${cfg.glow}`,
+                        }}
+                      />
+                    </div>
+                  )}
+                  {smartLabel && (
+                    <span
+                      className="text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-md whitespace-nowrap"
+                      style={{ background: `${cfg.accent}1f`, color: cfg.accent }}
+                    >
+                      {smartLabel}
                     </span>
-                    {urgentCount} urgente{urgentCount > 1 ? 's' : ''}
-                  </span>
-                )}
-              </div>
-            )}
+                  )}
+                  {hasUrgent && (
+                    <span className="relative inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-md bg-destructive/15 text-destructive">
+                      <span className="relative inline-flex h-1.5 w-1.5">
+                        <span className="absolute inline-flex h-full w-full rounded-full bg-destructive opacity-75 animate-ping" />
+                        <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-destructive" />
+                      </span>
+                      {urgentCount} urgente{urgentCount! > 1 ? 's' : ''}
+                    </span>
+                  )}
+                </div>
+              );
+            })()}
 
             {/* Smart link arrow */}
             {to && (
