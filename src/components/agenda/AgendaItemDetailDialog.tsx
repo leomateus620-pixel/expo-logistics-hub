@@ -244,6 +244,25 @@ export function AgendaItemDetailDialog({
             </div>
           )}
 
+          {/* Transport-specific: vehicle */}
+          {isTransport && (
+            <div className="rounded-xl border border-white/10 bg-card/30 p-3 backdrop-blur-xl">
+              <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-1 mb-1">
+                <Car className="w-3 h-3 text-gold" /> Veículo
+              </p>
+              {item._vehicle ? (
+                <div className="flex items-baseline gap-2">
+                  <p className="text-sm font-mono font-bold text-foreground">{item._vehicle.placa}</p>
+                  {item._vehicle.modelo && (
+                    <p className="text-xs text-muted-foreground truncate">· {item._vehicle.modelo}</p>
+                  )}
+                </div>
+              ) : (
+                <p className="text-xs text-muted-foreground/80 italic">Nenhum veículo vinculado</p>
+              )}
+            </div>
+          )}
+
           {/* Transport-specific: weather + guests */}
           {isTransport && (
             <>
