@@ -1,5 +1,5 @@
 import { useRef, useState, useCallback } from 'react';
-import { MapPin, User, Users, Sun, Sunset, Moon, ChevronRight, Truck, CalendarClock, CheckCircle2 } from 'lucide-react';
+import { MapPin, User, Users, Sun, Sunset, Moon, ChevronRight, Truck, CalendarClock, CheckCircle2, Car } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn, rawTime } from '@/lib/utils';
 import { WeatherMiniSummary } from '@/components/weather/WeatherMiniSummary';
