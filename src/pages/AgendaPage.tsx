@@ -136,6 +136,7 @@ export default function AgendaPage() {
   const { myRole } = useCurrentOrg();
   const { guests } = useGuests();
   const { getGuestsForTransport } = useTransportGuests();
+  const { vehicles } = useVehicles();
   const [open, setOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState(emptyForm);
