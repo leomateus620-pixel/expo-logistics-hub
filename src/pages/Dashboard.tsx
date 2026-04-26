@@ -12,6 +12,7 @@ import FenasojaCountdown from '@/components/dashboard/FenasojaCountdown';
 import {
   Car, Zap, MapPin, CheckSquare, CalendarDays, Users, User,
   Hotel, ClipboardList, ArrowRight, Clock, AlertCircle, ExternalLink, FileText, Sheet, Receipt,
+  Sun, Sunset, Moon, Sparkles,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
