@@ -5,6 +5,7 @@ import { useCommissions } from '@/hooks/useCommissions';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import { useGuests } from '@/hooks/useGuests';
 import { useTransportGuests } from '@/hooks/useTransportGuests';
+import { useVehicles } from '@/hooks/useVehicles';
 
 import { Plus, CalendarOff, FileDown } from 'lucide-react';
 import { Switch } from '@/components/ui/switch';
