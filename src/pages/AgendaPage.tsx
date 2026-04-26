@@ -111,6 +111,7 @@ function generateAgendaPDF(
       html += `</div>`;
       html += `<div class="event-time">⏰ ${rawTime(e.inicio_em)} — ${rawTime(e.fim_em)}</div>`;
       if (e.local) html += `<div class="event-meta">📍 <strong>Local:</strong> ${e.local}</div>`;
+      if (e._vehicle) html += `<div class="event-meta">🚙 <strong>Veículo:</strong> ${e._vehicle.placa}${e._vehicle.modelo ? ` · ${e._vehicle.modelo}` : ''}</div>`;
       if (member) html += `<div class="event-meta">👤 <strong>Responsável:</strong> ${member.nome_exibicao}${member.cargo ? ` (${member.cargo})` : ''}</div>`;
       if (comm) html += `<div class="event-meta">👥 <strong>Comissão:</strong> ${comm.nome}</div>`;
       if (e.descricao) html += `<div class="event-desc">${e.descricao}</div>`;
