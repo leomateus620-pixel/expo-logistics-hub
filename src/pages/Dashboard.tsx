@@ -235,6 +235,11 @@ export default function Dashboard() {
     [members]
   );
 
+  const pendingTransportsCount = useMemo(
+    () => transports.filter((t: any) => t.status === 'pendente').length,
+    [transports]
+  );
+
   const upcomingTransports = useMemo(() =>
     transports
       .filter((t: any) => t.status === 'pendente')
