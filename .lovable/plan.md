@@ -1,78 +1,79 @@
-# Corrigir chuva de grãos — fluida em desktop e mobile
+## 1) Bug de altura do card "Tarefas" (StatCard)
 
-## Diagnóstico
+**Causa raiz identificada** em `src/components/StatCard.tsx`:
 
-Analisando `SoybeanRain.tsx` e a integração no `FenasojaCountdown.tsx`, identifiquei **5 causas** para a chuva travada e densidade baixa:
+```tsx
+{(showProgressBar || smartLabel || (urgentCount && urgentCount > 0)) && (
+  <div className="mt-2.5 ...">…</div>
+)}
+```
 
-### 1. Container 3D quebra o sizing do canvas
-O wrapper aplica `[transform-style:preserve-3d] [transform:rotateX(1deg)]`, criando um contexto 3D que interfere no `getBoundingClientRect()` do canvas — frequentemente o canvas inicia com `width=0/height=0` e nunca redesenha.
+Quando `urgentCount = 0`, a expressão `(urgentCount && urgentCount > 0)` avalia para `0` (falsy mas **renderizável**), e o operador `||` retorna `0`. JSX então renderiza `{0 && <div>}` → imprime literalmente o caractere **"0"** abaixo do `trend "pendentes"` — exatamente o "0" extra visível na imagem do card Tarefas. Isso também desalinha visualmente os 4 cards (Veículos tem barra de progresso → smart-row; Tarefas mostra "0" → altura inconsistente).
 
-### 2. `mix-blend-mode: screen` é caríssimo
-Força recomposição GPU pixel-a-pixel contra o gradiente complexo do card a cada frame. Causa drops massivos de FPS, especialmente em mobile.
+**Correções:**
 
-### 3. Spawn rate baixo + canvas inicia vazio
-- `SPAWN_INTERVAL_MS = 220ms` → ~4-5 grãos/s
-- Sem população inicial → leva ~8 segundos para o usuário ver chuva
-- `MAX_GRAINS = 38` nunca é atingido visualmente
-
-### 4. Gradientes radiais por grão por frame
-`ctx.createRadialGradient()` rodando 2x por grão por frame = ~4.560 gradientes/s. Gargalo principal de CPU.
-
-### 5. `dt` em frames, não em tempo real
-Em telas 120Hz/144Hz causa stutter. Gravidade deveria ser px/s² independente de refresh rate.
-
----
-
-## Plano
-
-### A. Reescrever `SoybeanRain.tsx`
-
-**1. Pré-renderizar sprites (offscreen canvas)** — 6 variações de grão renderizadas uma vez no mount, com gradiente + hilum + specular já compostos. Cada frame faz apenas `ctx.drawImage()` rotacionado — ~50x mais rápido.
-
-**2. Aumentar densidade**:
-- Desktop: `MAX_GRAINS = 55`, spawn a cada **90ms**
-- Mobile (`<640px` ou `hardwareConcurrency<4`): `MAX_GRAINS = 32`, spawn a cada **130ms**
-- **Pré-popular ~22 grãos** já em queda no mount → chuva começa "estabelecida"
-
-**3. Remover `mix-blend-mode: screen`** — substituir por alpha normal com cor já dourada brilhante. Ganho de 2-3x FPS em mobile.
-
-**4. Loop time-based**:
-- `dt` em segundos (cap 0.05s)
-- Gravidade: 380 px/s²
-- Skip frame se `dt > 0.1s` (volta de background)
-
-**5. Fix do sizing 3D**:
-- `requestAnimationFrame` após mount para sizing inicial real
-- `ResizeObserver` com debounce via rAF
-- Retry em 100ms se width=0
-
-### B. Ajustar `FenasojaCountdown.tsx`
-
-- Remover dependência de `mixBlendMode` (movido para o componente)
-- Garantir z-index correto do canvas (acima do bg, abaixo do conteúdo)
-- Manter intacto o efeito 3D premium do card
-
-### C. Capacidade inteligente
-
-- Mobile detection via `matchMedia('(max-width: 640px)')`
-- `hardwareConcurrency < 4` → modo econômico
-- `prefers-reduced-motion` → mantém poucos grãos estáticos (já existe)
-
-### D. Sway natural
-
-- Cada grão com `swayPhase` próprio (oscilação senoidal individual)
-- Wind global com lerp mais suave
+- **a)** Reescrever a guarda usando booleanos estritos:
+  ```tsx
+  const hasSmartRow = showProgressBar || !!smartLabel || (typeof urgentCount === 'number' && urgentCount > 0);
+  {hasSmartRow && (<div ...>...)}
+  ```
+- **b)** Garantir altura uniforme dos 4 StatCards usando `min-h` no container de conteúdo (ex.: `min-h-[112px]` no `div.relative.p-4`) para que cards com/sem barra/chip fiquem visualmente alinhados na grade 2x2.
+- **c)** Aplicar a mesma proteção de booleanos no chip `urgentCount` (`!!urgentCount && urgentCount > 0` → `typeof urgentCount === 'number' && urgentCount > 0`).
 
 ---
 
-## Resultado esperado
+## 2) Card "Agenda" do Dashboard — dual-source (Transportes da Agenda + Eventos Fenasoja)
 
-- **Desktop**: ~55 grãos visíveis, 60fps estável
-- **Mobile**: ~32 grãos fluidos, 60fps
-- **Início imediato**: chuva já estabelecida ao abrir o Dashboard
-- **Fix do bug**: canvas dimensiona corretamente dentro do card 3D
+Atualmente o card "Agenda" usa `events` (tabela `events`) + transportes ativos, mas **não inclui eventos da tabela `fenasoja_events`** (menu "Eventos Fenasoja"). O usuário quer um card dividido em duas colunas/seções inteligentes.
 
-## Arquivos modificados
+### Estrutura proposta (em `src/pages/Dashboard.tsx`)
 
-- `src/components/dashboard/SoybeanRain.tsx` — reescrita completa (sprites + loop time-based + mobile-aware)
-- `src/components/dashboard/FenasojaCountdown.tsx` — ajuste pontual de z-index do canvas
+Substituir a `<Section title="Agenda">` por um novo **card dual-pane** com duas sub-seções lado a lado (responsivo: 2 colunas no desktop ≥sm, empilhado no mobile):
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│ 📅 Agenda                                       Ver tudo →  │
+├──────────────────────────┬──────────────────────────────────┤
+│  🚗 TRANSPORTES & AGENDA │  🌾 EVENTOS FENASOJA             │
+│  (events + transports)   │  (fenasoja_events)               │
+│                          │                                   │
+│  • Hoje (3)              │  • Hoje (2)                      │
+│    08:30 ✈ Voo POA       │    09:00 ☀️ Abertura Oficial     │
+│    14:00 🚗 Hotel→Centro │    20:00 🌙 Show Sertanejo       │
+│  • Amanhã (1)            │  • Amanhã (1)                    │
+│    07:00 ✈ Chapecó       │    14:00 🌅 Palestra Soja        │
+└──────────────────────────┴──────────────────────────────────┘
+```
+
+### Implementação
+
+1. **Hook**: importar `useFenasojaEvents` em `Dashboard.tsx`.
+2. **Filtragem dual**:
+   - `agendaItems` (já existe) → coluna esquerda → "Transportes & Agenda".
+   - `fenasojaItems` (novo) → filtrar `fenasojaEvents` por `toSPDate === todayStr` e `=== tomorrowStr`.
+3. **Novo componente local `<DualAgendaCard>`** dentro de `Dashboard.tsx`, baseado em `<Section>` mas com layout `grid sm:grid-cols-2 gap-4` e divisor vertical sutil (`sm:divide-x divide-border/40`).
+4. **Coluna esquerda — "Transportes & Agenda"** (design já existente, refinado):
+   - Header: ícone `MapPin` + texto verde primário.
+   - Reusar a renderização atual de `todayEvents` / `tomorrowEvents` (linhas com hora, voo, responsável).
+   - `onClick` → navega para `/agenda` ou `/transports` conforme `_source`.
+5. **Coluna direita — "Eventos Fenasoja"** (inspirado em `EventCard.tsx`):
+   - Header: ícone soybean grain (reusar `<SoybeanGrain />` em mini) + texto gold.
+   - Cada item compacto: chip de turno (Manhã/Tarde/Noite com `Sun`/`Sunset`/`Moon` + `bg-gold/15`), hora em `font-mono` destacada em gold, título uppercase, local com `MapPin`.
+   - Borda lateral esquerda 3px gold (igual ao EventCard, mas miniaturizada).
+   - `onClick` → navega para `/fenasoja-events`.
+6. **Estado vazio inteligente**: cada coluna tem seu próprio empty state (não bloqueia a outra). Ex.: se só houver fenasoja sem transportes, mostra "Sem transportes hoje" do lado esquerdo e a lista de eventos do lado direito.
+7. **Badge no header**: contagem combinada `${transportesHoje + fenasojaHoje} hoje · ${transportesAmanha + fenasojaAmanha} amanhã`.
+8. **"Ver tudo"**: dropdown sutil com 2 opções (Agenda / Eventos Fenasoja) — ou simplificar como dois links no header, um por coluna.
+
+### Helper de turno (reutilizar lógica do EventCard)
+
+Extrair `getShift(iso)` e `shiftMeta` para arquivo utilitário `src/lib/shiftHelpers.ts` (export shared) ou inline no Dashboard como função local pequena — a abordagem inline é suficiente já que é leve.
+
+---
+
+## Arquivos a modificar
+
+- **`src/components/StatCard.tsx`** — corrigir bug do "0" renderizado + adicionar `min-h` para alinhamento dos 4 cards.
+- **`src/pages/Dashboard.tsx`** — importar `useFenasojaEvents`, substituir `<Section title="Agenda">` pelo novo `<DualAgendaCard>` com duas colunas (Transportes & Agenda | Eventos Fenasoja), aproveitando design dos menus correspondentes.
+
+Nenhuma mudança de banco de dados necessária. Sem novas dependências.
