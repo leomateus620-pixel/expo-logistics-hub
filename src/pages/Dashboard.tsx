@@ -142,6 +142,7 @@ export default function Dashboard() {
   const { transports, isLoading: loadTransports } = useTransports();
   const { tasks, isLoading: loadTasks } = useTasks();
   const { events, isLoading: loadEvents } = useEvents();
+  const { events: fenasojaEvents, isLoading: loadFenasoja } = useFenasojaEvents();
   const { members, isLoading: loadMembers } = useOrgMembers();
   const { shifts, assignments, isLoading: loadSchedules } = useSchedules();
   const { stats: expenseStats } = useExpenses();
