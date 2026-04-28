@@ -62,13 +62,30 @@ export default function ElectricCartCard({ cart, responsavel, onEdit, onReturn, 
         'transform-gpu transition-all duration-300',
         'hover:-translate-y-1 hover:shadow-[0_20px_48px_-12px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.12)]',
         'p-4 sm:p-5 flex flex-col',
+        isInUse && 'ring-1 ring-accent/45 shadow-[0_10px_36px_-10px_hsl(var(--accent)/0.45),inset_0_1px_0_rgba(255,255,255,0.12)]',
         isInUse ? 'min-h-[280px]' : 'min-h-[240px]'
       )}
     >
-      {/* Halo */}
-      <div className={cn('pointer-events-none absolute -top-12 -right-12 w-48 h-48 blur-3xl opacity-60', haloClass)} />
+      {/* Halo top-right */}
+      <div
+        className={cn(
+          'pointer-events-none absolute -top-12 -right-12 w-48 h-48 blur-3xl opacity-60',
+          haloClass,
+          isInUse && 'motion-safe:animate-halo-breath'
+        )}
+      />
+      {/* Halo bottom-left (extra depth on em_uso) */}
+      {isInUse && (
+        <div className="pointer-events-none absolute -bottom-16 -left-16 w-52 h-52 rounded-full blur-3xl opacity-40 bg-[radial-gradient(circle,hsl(var(--primary)/0.45),transparent_65%)]" />
+      )}
       {/* Glass sheen */}
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.08),transparent_50%)]" />
+      {/* Shimmer sweep — only when in use */}
+      {isInUse && (
+        <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl">
+          <div className="absolute top-0 -left-1/3 h-full w-1/3 bg-gradient-to-r from-transparent via-white/[0.09] to-transparent motion-safe:animate-cart-shimmer" />
+        </div>
+      )}
 
       {/* Header */}
       <div className="relative flex items-start justify-between mb-3">
@@ -85,7 +102,15 @@ export default function ElectricCartCard({ cart, responsavel, onEdit, onReturn, 
             <Zap className="w-5 h-5" />
           </div>
           <div className="min-w-0">
-            <p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">{cart.codigo}</p>
+            <div className="flex items-center gap-1.5">
+              {isInUse && (
+                <span className="relative flex h-1.5 w-1.5">
+                  <span className="absolute inline-flex h-full w-full rounded-full bg-accent opacity-75 motion-safe:animate-ping" />
+                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-accent" />
+                </span>
+              )}
+              <p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">{cart.codigo}</p>
+            </div>
             {isAvailable && cart.nome && (
               <p className="font-semibold text-base sm:text-lg leading-tight truncate">{cart.nome}</p>
             )}
@@ -174,14 +199,17 @@ export default function ElectricCartCard({ cart, responsavel, onEdit, onReturn, 
             onClick={(e) => { e.stopPropagation(); onReturn(); }}
             aria-label={`Devolver ${cart.nome || cart.codigo}`}
             className={cn(
-              'w-full h-12 rounded-xl font-bold uppercase tracking-wider text-sm',
+              'group/btn relative overflow-hidden w-full h-12 rounded-xl font-bold uppercase tracking-wider text-sm',
               'bg-gradient-to-r from-primary via-primary to-primary/85 text-primary-foreground',
               'shadow-[0_4px_16px_-4px_hsl(var(--primary)/0.5),inset_0_1px_0_rgba(255,255,255,0.2)]',
               'flex items-center justify-center gap-2',
-              'transition-all duration-200 hover:shadow-[0_8px_20px_-4px_hsl(var(--primary)/0.6)] active:scale-[0.97]'
+              'transition-all duration-300 hover:shadow-[0_10px_24px_-4px_hsl(var(--primary)/0.65)] hover:brightness-110 active:scale-[0.97]'
             )}
           >
-            <Undo2 className="w-4 h-4" /> Devolver
+            {/* hover shimmer */}
+            <span className="pointer-events-none absolute inset-0 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/25 to-transparent" />
+            <Undo2 className="w-4 h-4 relative" />
+            <span className="relative">Devolver</span>
           </button>
         </div>
       )}
