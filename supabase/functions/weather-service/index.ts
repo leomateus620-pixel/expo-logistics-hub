@@ -254,10 +254,19 @@ Deno.serve(async (req) => {
       let name = body.name as string | undefined;
       if ((lat == null || lng == null) && body.address) {
         const geo = await geocodeAddress(body.address);
-        if (!geo) throw new Error('endereço não localizado');
+        if (!geo) {
+          console.warn(`[weather] preview soft-fail geocode address="${body.address}"`);
+          return new Response(JSON.stringify({ ok: true, weather: null, city_key: null, city_name: null, latitude: null, longitude: null, reason: 'address_not_found' }), {
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          });
+        }
         lat = geo.lat; lng = geo.lng; name = geo.name;
       }
-      if (lat == null || lng == null) throw new Error('lat/lng ou address obrigatórios');
+      if (lat == null || lng == null) {
+        return new Response(JSON.stringify({ ok: true, weather: null, reason: 'missing_coords' }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
       const { normalized, cityKey: ck, cityName } = await getOrFetchCityWeather(Number(lat), Number(lng), name);
       console.log(`[weather] preview ok city=${ck} duration=${Date.now() - t0}ms risk=${normalized.operational_risk_level}`);
       return new Response(JSON.stringify({ ok: true, weather: normalized, city_key: ck, city_name: cityName, latitude: lat, longitude: lng }), {
