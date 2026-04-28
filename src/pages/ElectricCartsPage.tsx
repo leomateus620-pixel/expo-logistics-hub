@@ -397,6 +397,8 @@ function CartHistoryContent({ cart, history, members }: { cart: any; history: an
     const retiradaEm = retData.retirada_em || ret.created_at;
     const responsavel = ret.actor_user_id;
     const comissao = retData.comissao;
+    const tipo = retData.tipo_responsavel || 'interno';
+    const empresaSlug = retData.empresa_slug;
 
     // Find matching devolucao for same cart after this retirada
     const matchingDev = devolucoes.find((d: any) =>
@@ -409,6 +411,8 @@ function CartHistoryContent({ cart, history, members }: { cart: any; history: an
       id: ret.id,
       responsavel,
       comissao,
+      tipo,
+      empresaSlug,
       retirada_em: retiradaEm,
       devolucao_em: devolucaoEm,
     };
@@ -421,31 +425,46 @@ function CartHistoryContent({ cart, history, members }: { cart: any; history: an
         <p className="text-xs text-muted-foreground">Nenhum uso registrado</p>
       ) : (
         <div className="space-y-2">
-          {usageEntries.map((u: any) => (
-            <div key={u.id} className="rounded-lg border p-3 text-xs space-y-1.5">
-              <div className="flex items-center justify-between">
-                <span className="font-medium">{getMemberName(u.responsavel)}</span>
-                <Badge variant={u.devolucao_em ? 'secondary' : 'outline'} className="text-[10px]">
-                  {u.devolucao_em ? 'Devolvido' : 'Em uso'}
-                </Badge>
-              </div>
-              {u.comissao && (
-                <div className="text-muted-foreground">
-                  Comissão: <Badge variant="outline" className="text-[10px]">{u.comissao}</Badge>
+          {usageEntries.map((u: any) => {
+            const partner = u.tipo === 'empresa' ? getPartner(u.empresaSlug) : null;
+            return (
+              <div key={u.id} className="rounded-lg border p-3 text-xs space-y-1.5">
+                <div className="flex items-center justify-between gap-2">
+                  {partner ? (
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="w-6 h-6 rounded bg-white border flex items-center justify-center overflow-hidden shrink-0">
+                        <img src={partner.logo} alt={partner.nome} className="max-w-full max-h-full object-contain" />
+                      </div>
+                      <span className="font-medium truncate">{partner.nome}</span>
+                    </div>
+                  ) : (
+                    <span className="font-medium">{getMemberName(u.responsavel)}</span>
+                  )}
+                  <Badge variant={u.devolucao_em ? 'secondary' : 'outline'} className="text-[10px] shrink-0">
+                    {u.devolucao_em ? 'Devolvido' : 'Em uso'}
+                  </Badge>
                 </div>
-              )}
-              <div className="flex items-center gap-2 text-muted-foreground flex-wrap">
-                <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{formatDateTime(u.retirada_em)}</span>
-                {u.devolucao_em && (
-                  <>
-                    <ArrowRight className="w-3 h-3" />
-                    <span>{formatDateTime(u.devolucao_em)}</span>
-                    <Badge variant="outline" className="text-[10px] ml-auto">{calcDuration(u.retirada_em, u.devolucao_em)}</Badge>
-                  </>
+                {!partner && u.comissao && (
+                  <div className="text-muted-foreground">
+                    Comissão: <Badge variant="outline" className="text-[10px]">{u.comissao}</Badge>
+                  </div>
                 )}
+                {partner && (
+                  <div className="text-muted-foreground text-[10px]">Empresa parceira</div>
+                )}
+                <div className="flex items-center gap-2 text-muted-foreground flex-wrap">
+                  <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{formatDateTime(u.retirada_em)}</span>
+                  {u.devolucao_em && (
+                    <>
+                      <ArrowRight className="w-3 h-3" />
+                      <span>{formatDateTime(u.devolucao_em)}</span>
+                      <Badge variant="outline" className="text-[10px] ml-auto">{calcDuration(u.retirada_em, u.devolucao_em)}</Badge>
+                    </>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
