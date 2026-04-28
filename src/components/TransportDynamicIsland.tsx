@@ -122,6 +122,8 @@ export default function TransportDynamicIsland({
   useEffect(() => {
     if (isActive && !prevIsActiveRef.current) {
       lastFetchRef.current = 0;
+      lastFetchPosRef.current = null;
+      baselineEtaRef.current = null;
     }
     prevIsActiveRef.current = isActive;
     if (isActive) setExpanded(true);
