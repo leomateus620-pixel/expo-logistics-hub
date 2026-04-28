@@ -277,6 +277,7 @@ export default function ElectricCartsPage() {
         {carts.map((c: any) => {
           const resp = members.find((m: any) => m.user_id === c.responsavel_user_id);
           const sc = statusConfig[c.status] || statusConfig.disponivel;
+          const partner = c.tipo_responsavel === 'empresa' ? getPartner(c.empresa_slug) : null;
           return (
             <div
               key={c.id}
@@ -300,7 +301,18 @@ export default function ElectricCartsPage() {
                   <Badge variant="outline" className={cn('text-[10px]', sc.class)}>{sc.label}</Badge>
                 </div>
               </div>
-              {resp && (
+              {partner && c.status === 'em_uso' && (
+                <div className="flex items-center gap-3 mb-2 p-2 rounded-lg bg-muted/40 border border-border">
+                  <div className="w-10 h-10 rounded-md bg-white border flex items-center justify-center overflow-hidden shrink-0">
+                    <img src={partner.logo} alt={partner.nome} className="max-w-full max-h-full object-contain" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold truncate">{partner.nome}</p>
+                    <Badge variant="secondary" className="text-[10px] mt-0.5">Empresa parceira</Badge>
+                  </div>
+                </div>
+              )}
+              {!partner && resp && (
                 <div className="flex items-center gap-2 mb-2 text-xs text-muted-foreground">
                   <div className="w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold text-primary-foreground" style={{ backgroundColor: resp.avatar_color || 'hsl(142,50%,35%)' }}>
                     {(resp.nome_exibicao || '?')[0]}
@@ -308,7 +320,7 @@ export default function ElectricCartsPage() {
                   <span>{resp.nome_exibicao}</span>
                 </div>
               )}
-              {c.comissao && c.status === 'em_uso' && (
+              {!partner && c.comissao && c.status === 'em_uso' && (
                 <div className="text-xs text-muted-foreground mb-2">
                   Comissão: <Badge variant="secondary" className="text-[10px]">{c.comissao}</Badge>
                 </div>
