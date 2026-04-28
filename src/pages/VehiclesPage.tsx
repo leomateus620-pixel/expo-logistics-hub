@@ -790,6 +790,15 @@ function VehicleDetailContent({ vehicle, members, userId, kmTotal, fuelCostTotal
                 }}
               />
             </label>
+            {docPreviewUrl && (
+              <div className="w-full overflow-hidden rounded-xl border border-border bg-background">
+                <iframe
+                  src={docPreviewUrl}
+                  title={`Documento do veículo ${vehicle.placa || ''}`}
+                  className="h-[60dvh] min-h-[360px] w-full"
+                />
+              </div>
+            )}
           </div>
         ) : (
           <label className={cn(
