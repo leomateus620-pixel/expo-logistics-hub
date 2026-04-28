@@ -1,56 +1,39 @@
-# Aviso de Reserva no Card do Carrinho (Frota)
+## Diagnóstico do erro
 
-Quando um carrinho elétrico (ex.: G55) tiver uma reserva agendada, o card dele na aba **Frota** vai exibir um selo destacado com a data, o horário e o responsável pela próxima reserva — sem alterar o status real do carrinho.
+**Não é problema de permissão.** O usuário `fenasojalog@gmail.com` tem permissão para editar — basta ser membro ativo da organização (e ele é). O erro real é:
 
-## Comportamento
-
-Para cada card, calcular a "próxima reserva relevante" entre as reservas com `status = 'agendada'` ou `'em_andamento'`:
-
-1. **Em andamento agora** (`inicio_em <= agora <= fim_em`) → badge vermelho/âmbar pulsante "RESERVADO AGORA · até HH:mm".
-2. **Próxima nas próximas 24h** → badge âmbar "Reservado hoje/amanhã às HH:mm".
-3. **Futura (>24h)** → badge azul discreto "Reservado dd/MM HH:mm".
-4. **Sem reserva ativa/futura** → nada exibido.
-
-Se o carrinho já estiver `em_uso`, o aviso só aparece se a reserva ativa for de **outra pessoa** que não a atual (alerta de conflito) ou se houver uma reserva futura agendada nas próximas 24h.
-
-Tudo em horário **America/Sao_Paulo**.
-
-## Mudanças técnicas
-
-### 1. `src/pages/ElectricCartsPage.tsx`
-- Importar `useCartReservations` e obter `reservations`.
-- Construir um mapa `reservationsByCart: Record<cartId, CartReservation[]>` filtrando apenas `status in ('agendada','em_andamento')` e `fim_em >= agora`, ordenado por `inicio_em`.
-- Passar a próxima reserva (`nextReservation`) como nova prop ao `<ElectricCartCard>`.
-
-### 2. `src/components/electric-carts/ElectricCartCard.tsx`
-- Adicionar prop opcional `nextReservation?: CartReservation`.
-- Resolver o nome do responsável da reserva:
-  - `interno` → `members.find(user_id === responsavel_user_id)?.nome_exibicao` (passar `members` como prop ou já resolver no page e enviar `reservationLabel: string`).
-  - `empresa` → `getPartner(empresa_slug)?.nome`.
-  - `outros` → `nome_externo`.
-- Renderizar um **ReservationBadge** dentro do card (logo abaixo do header `codigo`/`nome`, antes do bloco de status):
-  - Layout: pill com ícone `CalendarClock`, texto curto + tooltip/linha secundária com responsável.
-  - Cores adaptativas por urgência (ver acima): `bg-destructive/15 text-destructive` (agora), `bg-amber-500/15 text-amber-700 dark:text-amber-300` (24h), `bg-info/15 text-info` (futura).
-  - Pulse sutil (`motion-safe:animate-pulse`) apenas no estado "agora".
-- Aparece em **todos os status** (disponivel, em_uso, manutencao) — é apenas um aviso informativo.
-
-### 3. Helper inline em `ElectricCartCard.tsx` (ou `src/lib/utils.ts`)
-```ts
-function formatReservationBadge(r: CartReservation, nowMs: number) {
-  const inicio = new Date(r.inicio_em).getTime();
-  const fim = new Date(r.fim_em).getTime();
-  const isNow = inicio <= nowMs && nowMs <= fim;
-  const within24h = inicio - nowMs <= 24*3600*1000;
-  // returns { variant: 'now'|'soon'|'future', label, sublabel }
-}
 ```
-Usa `toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', ... })`.
+duplicate key value violates unique constraint "vehicles_org_id_placa_key"
+```
 
-### 4. Tick por minuto
-Reaproveitar o `setInterval` existente no card (já roda quando `isInUse`); estender para também rodar quando há `nextReservation` para que o badge transicione automaticamente entre estados (futura → soon → now → some).
+A tabela `vehicles` tem uma constraint `UNIQUE(org_id, placa)`. No screenshot, o usuário estava editando a **AMAROK VW CINZA** (placa real `TQZ8B35`) e digitou no campo a placa `JDF6D47`. Como existe outro veículo na mesma organização com essa placa (ou a tentativa entrou em conflito por espaço/caracter invisível), o banco rejeitou.
+
+O problema secundário e mais grave de UX: a mensagem técnica do Postgres aparece **literalmente** na tela do usuário, sem orientação do que fazer.
+
+## O que será corrigido
+
+### 1. Mensagem de erro amigável (UX)
+Em `src/pages/VehiclesPage.tsx`, no `catch` de `handleEdit` e `handleAdd`, detectar o código de erro Postgres `23505` (unique violation) ou a substring `vehicles_org_id_placa_key` e exibir:
+
+> "Já existe outro veículo cadastrado com a placa **XXX** nesta organização. Verifique se você não está duplicando um registro."
+
+Aplicar o mesmo tratamento em `useVehicles.ts` para padronizar.
+
+### 2. Normalização de placa (raiz do problema)
+Antes de salvar (tanto no create quanto no update), normalizar a placa:
+- `trim()` para remover espaços
+- `toUpperCase()` (já existe parcialmente, garantir nos dois fluxos)
+- Remover caracteres invisíveis (`\u200B`, etc.) com regex `/[^\w]/g` exceto traço
+
+Isso evita "placas iguais" que parecem diferentes por espaço acidental.
+
+### 3. Permissões (verificação, não alteração)
+Confirmado via análise das RLS: a política de UPDATE em `vehicles` permite qualquer membro ativo da org. O usuário `fenasojalog@gmail.com` já é membro ativo da org Fenasoja — **não precisa "liberar" nada**. O bloqueio é puramente a constraint de unicidade.
 
 ## Arquivos modificados
-- `src/pages/ElectricCartsPage.tsx` — buscar reservas e mapear por cart.
-- `src/components/electric-carts/ElectricCartCard.tsx` — nova prop + badge de reserva + tick estendido.
+- `src/pages/VehiclesPage.tsx` — tratamento amigável dos erros nos handlers + normalização da placa
+- `src/hooks/useVehicles.ts` — normalização defensiva e tradução do erro 23505 no nível do hook
 
-Sem mudanças no banco, nas RLS ou em edge functions.
+## Fora de escopo
+- Não vou alterar a constraint UNIQUE — ela protege a integridade dos dados (duas Amarok com mesma placa não fazem sentido).
+- Não vou alterar permissões RLS (já estão corretas).

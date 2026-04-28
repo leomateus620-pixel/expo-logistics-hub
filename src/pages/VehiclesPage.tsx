@@ -158,11 +158,40 @@ export default function VehiclesPage() {
     setEditOpen(true);
   };
 
+  // Normaliza placa: trim, uppercase, remove caracteres invisíveis e espaços internos
+  const normalizePlaca = (raw: string) =>
+    (raw || '')
+      .replace(/[\u200B-\u200D\uFEFF]/g, '') // zero-width chars
+      .replace(/\s+/g, '')
+      .trim()
+      .toUpperCase();
+
+  // Traduz erros do Postgres em mensagens amigáveis ao usuário
+  const friendlyError = (err: any, placa: string): string => {
+    const msg = String(err?.message || err?.error_description || '');
+    const code = err?.code || err?.details?.code;
+    const isUniqueViolation =
+      code === '23505' ||
+      msg.includes('vehicles_org_id_placa_key') ||
+      msg.toLowerCase().includes('duplicate key');
+    if (isUniqueViolation) {
+      return `Já existe outro veículo cadastrado com a placa ${placa} nesta organização. Verifique se o registro não está duplicado.`;
+    }
+    if (msg.toLowerCase().includes('row-level security') || msg.toLowerCase().includes('permission')) {
+      return 'Você não tem permissão para realizar esta ação. Fale com o administrador.';
+    }
+    return msg || 'Erro inesperado. Tente novamente.';
+  };
+
   const handleAdd = async () => {
-    if (!addForm.placa) return;
+    const placa = normalizePlaca(addForm.placa);
+    if (!placa) {
+      toast.error('Informe a placa do veículo');
+      return;
+    }
     try {
       await create.mutateAsync({
-        placa: addForm.placa.toUpperCase(),
+        placa,
         marca: addForm.marca || null,
         modelo: addForm.modelo || null,
         ano: addForm.ano ? Number(addForm.ano) : null,
@@ -174,15 +203,20 @@ export default function VehiclesPage() {
       setAddOpen(false);
       toast.success('Veículo adicionado');
     } catch (err: any) {
-      toast.error(err.message || 'Erro ao adicionar');
+      toast.error(friendlyError(err, placa));
     }
   };
 
   const handleEdit = async () => {
+    const placa = normalizePlaca(editForm.placa);
+    if (!placa) {
+      toast.error('A placa não pode ficar em branco');
+      return;
+    }
     try {
       await update.mutateAsync({
         id: editId,
-        placa: editForm.placa.toUpperCase(),
+        placa,
         marca: editForm.marca || null,
         modelo: editForm.modelo || null,
         cor: editForm.cor || null,
@@ -193,7 +227,7 @@ export default function VehiclesPage() {
       setEditOpen(false);
       toast.success('Veículo atualizado');
     } catch (err: any) {
-      toast.error(err.message || 'Erro ao atualizar');
+      toast.error(friendlyError(err, placa));
     }
   };
 
