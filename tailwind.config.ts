@@ -125,6 +125,16 @@ export default {
           "0%, 100%": { transform: "translateX(0)" },
           "50%": { transform: "translateX(2px)" },
         },
+        "cart-shimmer": {
+          "0%": { transform: "translateX(-120%) skewX(-18deg)", opacity: "0" },
+          "20%": { opacity: "1" },
+          "60%": { opacity: "1" },
+          "100%": { transform: "translateX(220%) skewX(-18deg)", opacity: "0" },
+        },
+        "halo-breath": {
+          "0%, 100%": { opacity: "0.55", transform: "scale(1)" },
+          "50%": { opacity: "0.85", transform: "scale(1.08)" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
