@@ -147,6 +147,8 @@ export default {
         "gold-pulse": "gold-pulse 2.4s ease-in-out infinite",
         "icon-spin-slow": "icon-spin-slow 14s linear infinite",
         "icon-glide": "icon-glide 3s ease-in-out infinite",
+        "cart-shimmer": "cart-shimmer 5.5s ease-in-out infinite",
+        "halo-breath": "halo-breath 4s ease-in-out infinite",
       },
     },
   },
