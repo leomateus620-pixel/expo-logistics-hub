@@ -1,137 +1,62 @@
-## Objetivo
+# ETA Dinâmico em Tempo Real — Análise e Refinamento
 
-Criar uma terceira aba **Reservas** no menu Carrinhos Elétricos (ao lado de Frota e Autorizados), permitindo agendar antecipadamente a retirada de um carrinho com período definido (início → devolução prevista) e três tipos de retirada: **Membro Fenasoja**, **Empresa Parceira** ou **Outros** (nome livre). Adicionar também a opção "Outros" no fluxo de Retirada imediata existente, mantendo consistência. Usar fuso de SP (America/Sao_Paulo).
+## Resposta direta
 
----
+**Sim, a lógica já está implementada.** O sistema recalcula a chegada estimada em tempo real conforme o motorista se desloca:
 
-## 1. Banco de dados
+1. `useLocationTracking` faz `navigator.geolocation.watchPosition` (alta precisão), atualizando lat/lng continuamente.
+2. `TransportDynamicIsland` (linhas 148–201) detecta cada nova posição e chama a Edge Function `estimate-return` no modo `LIVE_ROUTE`.
+3. A Edge Function consulta o **Google Routes v2** com `routingPreference: 'TRAFFIC_AWARE'`, recebendo distância + duração reais a partir da posição **atual** do motorista até o destino, considerando:
+   - Distância restante (não a estimativa inicial).
+   - Trânsito vigente.
+   - Velocidade implícita pelo deslocamento real (o ponto de origem se move).
+4. O ETA é recalculado: `arrivalTime = Date.now() + duration_minutes`, exibido como "Chegada ~22:37".
 
-### Nova tabela `cart_reservations`
-Migration nova com:
-- `id uuid PK default gen_random_uuid()`
-- `org_id uuid NOT NULL`
-- `cart_id uuid NOT NULL` (referencia `electric_carts.id`)
-- `tipo_responsavel text NOT NULL` ('interno' | 'empresa' | 'outros')
-- `responsavel_user_id uuid` (quando interno)
-- `comissao text` (snapshot, quando interno)
-- `empresa_slug text` (quando empresa)
-- `nome_externo text` (quando outros — nome livre)
-- `telefone_externo text` (opcional, quando outros)
-- `inicio_em timestamptz NOT NULL` (retirada agendada)
-- `fim_em timestamptz NOT NULL` (devolução prevista)
-- `status text NOT NULL default 'agendada'` ('agendada' | 'em_andamento' | 'concluida' | 'cancelada')
-- `observacoes text`
-- `created_by_user_id uuid NOT NULL`
-- `created_at`, `updated_at` timestamptz
+Ou seja: se o motorista corre mais, a próxima medição parte mais perto do destino e o ETA se antecipa; se vai devagar ou pega trânsito, o Google retorna duração maior e o ETA se atrasa.
 
-**Trigger** `set_updated_at` em UPDATE.
+## O que pode melhorar
 
-**Trigger de validação** (antes INSERT/UPDATE):
-- garante `fim_em > inicio_em`
-- garante coerência: se `tipo='interno'` exige `responsavel_user_id`; se `'empresa'` exige `empresa_slug`; se `'outros'` exige `nome_externo` (trim não vazio).
-- detecta conflito: rejeita se existir outra reserva para o mesmo `cart_id` com status em ('agendada','em_andamento') cujo intervalo `[inicio_em, fim_em)` sobreponha.
+A lógica funciona, mas o **throttle atual é conservador (120 s entre chamadas)**, o que pode dar a sensação de que "nada muda". Também não há comparação visual entre a estimativa original e a atualizada.
 
-**RLS PERMISSIVE** (mesmo padrão de `electric_carts`):
-- SELECT: `is_org_member(auth.uid(), org_id)`
-- INSERT/UPDATE: `get_user_org_role IN (admin, gestor, operador)`
-- DELETE: `get_user_org_role IN (admin, gestor)`
+### Mudanças propostas
 
-### Atualizar `electric_carts`
-- Adicionar coluna `nome_externo text` (para suportar "Outros" no fluxo de retirada imediata).
-- `tipo_responsavel` já aceita texto livre — passar a aceitar `'outros'` (nenhuma alteração de constraint necessária; ajustar comentário/uso).
+1. **Throttle adaptativo em `TransportDynamicIsland.tsx`**
+   - Atual: 30 s na primeira chamada, depois 120 s fixos.
+   - Proposto:
+     - 60 s quando o trajeto é longo (> 60 min restantes) — economiza quota Google.
+     - 30 s quando faltam < 30 min para chegar — atualiza com mais frequência na reta final.
+     - Forçar recálculo se a posição mudou > 2 km desde a última chamada (movimento rápido).
 
----
+2. **Indicador visual de variação do ETA**
+   - Guardar a estimativa inicial (`t.duracao_estimada_min` ou primeira `LIVE_ROUTE`).
+   - Mostrar delta ao lado de "Chegada ~22:37":
+     - `↓ 8 min adiantado` (verde) se ETA atual < estimativa.
+     - `↑ 12 min atrasado` (âmbar) se ETA atual > estimativa.
+     - Sem indicador se diferença < 3 min.
 
-## 2. Hooks
+3. **Validação**
+   - Testar manualmente com uma rota ativa: verificar nos logs da Edge Function `estimate-return` se há chamadas `LIVE_ROUTE` periódicas e se `duration_minutes` varia conforme a posição muda.
+   - Confirmar que o ETA exibido na Dynamic Island reflete o valor retornado.
 
-### Novo `src/hooks/useCartReservations.ts`
-Padrão idêntico a `useElectricCarts`:
-- `list` (query por `org_id`, ordenado por `inicio_em` asc) com filtros opcionais.
-- `create` (insert + audit).
-- `update` (update + audit + history opcional).
-- `cancel` (set status `cancelada`).
-- `convertToPickup` (chama `useElectricCarts.pickup` com os dados da reserva e marca status `em_andamento`).
+## Detalhes técnicos
 
-### Atualizar `useElectricCarts.ts`
-- `pickup` aceita `tipo: 'interno' | 'empresa' | 'outros'` e `nome_externo?: string`.
-- Quando `tipo='outros'`: zera `responsavel_user_id`, `comissao`, `empresa_slug` e grava `nome_externo`.
-
----
-
-## 3. Tipos / Partners
-- `src/lib/partners.ts`: nenhuma alteração.
-- Em UI tratar `'outros'` como ramo separado (ícone `User`, label "Convidado / Externo").
-
----
-
-## 4. UI — Página `ElectricCartsPage.tsx`
-
-### Tabs
-`Frota | Autorizados | Reservas` (nova aba).
-
-### Aba Reservas (nova)
-Mesma linguagem visual Liquid Glass 3D dos cards atuais:
-- Header com título, contador (Agendadas / Em andamento / Concluídas) e botão `+ Nova Reserva`.
-- Filtros (segmented control reaproveitado do estilo `ElectricCartsFilters`): Período (Hoje / Próximos 7 dias / Todas) + busca por nome/código.
-- Lista de cards `ReservationCard` (novo componente em `src/components/electric-carts/ReservationCard.tsx`):
-  - Glassmorphism `backdrop-blur-2xl`, gradiente sutil, halo radial conforme status:
-    - `agendada` → halo `primary` (verde profundo)
-    - `em_andamento` → halo `accent` + shimmer leve (reaproveita `animate-cart-shimmer`)
-    - `concluida` → tons mutados
-    - `cancelada` → tons destrutivos com strike no título
-  - Conteúdo: código + nome do carrinho, bloco do responsável (avatar/foto/logo/iniciais conforme tipo), faixa horária `dd/MM HH:mm → dd/MM HH:mm` (SP), duração calculada e badge de status.
-  - Ações: `Iniciar Retirada` (quando hora atual >= inicio_em e cart disponível), `Editar`, `Cancelar`.
-- Vazio state com ícone `CalendarClock`.
-
-### Diálogo "Nova Reserva" / "Editar Reserva"
-- Select do carrinho (mostra todos, indicando próximas reservas conflitantes).
-- Tabs com 3 opções: **Membro Fenasoja | Empresa Parceira | Outros**.
-  - "Outros": Input `Nome` (uppercase, obrigatório) + Input `Telefone` (opcional, máscara BR).
-- Dois `DateTimePicker` (Início e Fim previsto), padrão SP, valor inicial = agora SP / agora+2h.
-- Campo `Observações` (textarea curta).
-- Validação client-side (zod) antes do submit; toast em erros do trigger (mensagem direta).
-
-### Aba Frota — diálogo "Registrar Retirada" existente
-- Adicionar terceira aba interna **Outros** (junto de Membro Fenasoja / Empresa Parceira) com input de nome (uppercase). Persiste em `electric_carts.nome_externo` + `tipo_responsavel='outros'`.
-- `ElectricCartCard.tsx` no estado "em uso" passa a renderizar bloco `Outros` com ícone `User` + nome externo (quando `tipo_responsavel='outros'`).
-
----
-
-## 5. Roteamento e navegação
-- Sem nova rota; tudo dentro de `/electric-carts` via tabs.
-- Reaproveita `ElectricCartsReportPage` (sem alteração nesta etapa).
-
----
-
-## 6. Detalhes técnicos / regras
+**Arquivo único alterado:** `src/components/TransportDynamicIsland.tsx`
 
 ```text
-Reservation lifecycle
-agendada ──(iniciar retirada)──▶ em_andamento ──(devolução)──▶ concluida
-   │                                  │
-   └──(cancelar)──▶ cancelada         └──(cancelar)──▶ cancelada
+useEffect (linhas 148–201)
+  ├── lastFetchRef (timestamp)
+  ├── lastPositionRef (lat,lng) ← NOVO: detecta deslocamento >2km
+  ├── initialEtaRef (minutes)   ← NOVO: baseline para o delta
+  └── throttle dinâmico baseado em liveDestRoute.minutes
+
+JSX badge ETA (linha 420)
+  └── + <span> com delta (verde/âmbar) quando |delta| ≥ 3 min
 ```
 
-- Conflito: trigger SQL bloqueia overlap entre reservas ativas no mesmo carrinho.
-- "Iniciar Retirada" a partir de uma reserva: chama `pickup` com snapshot da reserva (tipo, responsável, comissão, empresa_slug ou nome_externo) e seta `cart_reservations.status='em_andamento'`. Devolução pelo fluxo padrão do card finaliza a reserva via update no `useCartReservations` (chamada extra após `returnCart` quando houver reserva ativa daquele carrinho).
-- Todas as datas formatadas com `timeZone: 'America/Sao_Paulo'` via helpers já existentes (`nowSP`, `nowSPLocal`, `utcToSPLocal`).
-- Auditoria: cada operação chama `logAudit` (entity `cart_reservations`).
+Sem mudanças no backend, no banco ou em outras telas. Sem custo adicional perceptível de quota Google (throttle continua ≥ 30 s).
 
----
+## Fora de escopo
 
-## 7. Arquivos afetados
-
-**Novos**
-- `supabase/migrations/<timestamp>_cart_reservations.sql` (tabela, trigger validação + conflito, RLS, coluna `nome_externo` em `electric_carts`).
-- `src/hooks/useCartReservations.ts`
-- `src/components/electric-carts/ReservationCard.tsx`
-- `src/components/electric-carts/ReservationDialog.tsx` (criar/editar)
-- `src/components/electric-carts/ReservationsTab.tsx` (lista + filtros + dialog)
-
-**Editados**
-- `src/pages/ElectricCartsPage.tsx` — adicionar aba Reservas; adicionar tab "Outros" no diálogo Retirada; passar a finalizar reserva ao devolver.
-- `src/components/electric-carts/ElectricCartCard.tsx` — render do tipo `outros` no estado em uso.
-- `src/hooks/useElectricCarts.ts` — `pickup` suportando `tipo='outros'` e `nome_externo`.
-- `src/lib/utils.ts` — (apenas se necessário) helper de formatação curta de intervalo SP.
-
-Sem novas dependências. Mantém Liquid Glass, fuso SP, RLS isolado por `org_id`, sem efeitos AI.
+- Não vou alterar a lógica do `useLocationTracking` (já funciona bem com `watchPosition`).
+- Não vou alterar a Edge Function `estimate-return` (já usa `TRAFFIC_AWARE` corretamente).
+- Não vou persistir o histórico de ETA no banco — apenas estado local em memória.
