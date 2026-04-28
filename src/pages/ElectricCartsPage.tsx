@@ -169,6 +169,7 @@ export default function ElectricCartsPage() {
         <TabsList className="mb-4">
           <TabsTrigger value="frota">Frota</TabsTrigger>
           <TabsTrigger value="autorizados">Autorizados</TabsTrigger>
+          <TabsTrigger value="reservas">Reservas</TabsTrigger>
         </TabsList>
 
         <TabsContent value="frota">
