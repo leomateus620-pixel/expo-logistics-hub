@@ -145,7 +145,12 @@ export default function ElectricCartsPage() {
           <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Carrinhos Elétricos</h1>
           <p className="text-sm text-muted-foreground mt-1">Gerencie os carrinhos elétricos do evento</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
+          <Link to="/electric-carts/report">
+            <Button size="sm" variant="outline" className="h-10 sm:h-9 gap-1.5 rounded-xl shadow-sm active:scale-[0.97] transition-transform">
+              <FileText className="w-4 h-4" /> Relatório
+            </Button>
+          </Link>
           <Button size="sm" variant="outline" onClick={openPickup} className="h-10 sm:h-9 gap-1.5 rounded-xl shadow-sm active:scale-[0.97] transition-transform">
             <Zap className="w-4 h-4" /> Retirada
           </Button>
