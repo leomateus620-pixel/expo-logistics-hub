@@ -19,6 +19,7 @@ import { PARTNERS, getPartner, type PartnerSlug } from '@/lib/partners';
 import ElectricCartCard from '@/components/electric-carts/ElectricCartCard';
 import ElectricCartsFilters, { type CartStatusFilter } from '@/components/electric-carts/ElectricCartsFilters';
 import ReservationsTab from '@/components/electric-carts/ReservationsTab';
+import { useCartReservations, type CartReservation } from '@/hooks/useCartReservations';
 import { User } from 'lucide-react';
 
 const statusConfig: Record<string, { label: string; class: string }> = {
@@ -32,6 +33,31 @@ export default function ElectricCartsPage() {
   const { carts, create, update, pickup, returnCart, history } = useElectricCarts();
   const { members } = useOrgMembers();
   const { commissions } = useCommissions();
+  const { reservations } = useCartReservations();
+
+  // Map next active/upcoming reservation per cart with resolved label
+  const nextReservationByCart = useMemo(() => {
+    const nowMs = Date.now();
+    const map: Record<string, { reservation: CartReservation; label: string }> = {};
+    const sorted = [...reservations]
+      .filter((r) => (r.status === 'agendada' || r.status === 'em_andamento') && new Date(r.fim_em).getTime() >= nowMs)
+      .sort((a, b) => new Date(a.inicio_em).getTime() - new Date(b.inicio_em).getTime());
+    for (const r of sorted) {
+      if (map[r.cart_id]) continue;
+      let label = 'Reservado';
+      if (r.tipo_responsavel === 'interno' && r.responsavel_user_id) {
+        const m = members.find((mm: any) => mm.user_id === r.responsavel_user_id);
+        if (m?.nome_exibicao) label = m.nome_exibicao;
+      } else if (r.tipo_responsavel === 'empresa' && r.empresa_slug) {
+        const p = getPartner(r.empresa_slug as any);
+        if (p?.nome) label = p.nome;
+      } else if (r.tipo_responsavel === 'outros' && r.nome_externo) {
+        label = r.nome_externo;
+      }
+      map[r.cart_id] = { reservation: r, label };
+    }
+    return map;
+  }, [reservations, members]);
 
   const [addOpen, setAddOpen] = useState(false);
   const [addForm, setAddForm] = useState({ codigo: '', nome: '' });
@@ -333,11 +359,14 @@ export default function ElectricCartsPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {filteredCarts.map((c: any) => {
           const resp = members.find((m: any) => m.user_id === c.responsavel_user_id);
+          const nextRes = nextReservationByCart[c.id];
           return (
             <ElectricCartCard
               key={c.id}
               cart={c}
               responsavel={resp}
+              nextReservation={nextRes?.reservation}
+              nextReservationLabel={nextRes?.label}
               onEdit={() => { setEditId(c.id); setEditForm({ codigo: c.codigo, nome: c.nome || '', status: c.status }); setEditOpen(true); }}
               onReturn={() => openReturn(c.id)}
               onHistory={() => { setHistoryCart(c); setHistoryOpen(true); }}
