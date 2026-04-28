@@ -14,6 +14,7 @@ import Layout from "./components/Layout";
 import Dashboard from "./pages/Dashboard";
 import VehiclesPage from "./pages/VehiclesPage";
 import ElectricCartsPage from "./pages/ElectricCartsPage";
+import ElectricCartsReportPage from "./pages/ElectricCartsReportPage";
 import ScootersPage from "./pages/ScootersPage";
 import TransportsPage from "./pages/TransportsPage";
 import GuestsPage from "./pages/GuestsPage";
@@ -69,6 +70,7 @@ const App = () => (
                     <Route path="/" element={<FullAccessRoute><Dashboard /></FullAccessRoute>} />
                     <Route path="/vehicles" element={<FullAccessRoute><VehiclesPage /></FullAccessRoute>} />
                     <Route path="/electric-carts" element={<FullAccessRoute><ElectricCartsPage /></FullAccessRoute>} />
+                    <Route path="/electric-carts/report" element={<FullAccessRoute><ElectricCartsReportPage /></FullAccessRoute>} />
                     <Route path="/scooters" element={<FullAccessRoute><ScootersPage /></FullAccessRoute>} />
                     <Route path="/transports" element={<FullAccessRoute><TransportsPage /></FullAccessRoute>} />
                     <Route path="/guests" element={<FullAccessRoute><GuestsPage /></FullAccessRoute>} />
