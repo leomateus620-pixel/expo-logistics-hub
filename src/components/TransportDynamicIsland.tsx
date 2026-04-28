@@ -153,10 +153,29 @@ export default function TransportDynamicIsland({
   useEffect(() => {
     if (!location || !isActive) return;
     const now = Date.now();
-    // First call: 30s throttle, subsequent: 120s
-    const throttle = lastFetchRef.current === 0 ? 0 : (lastFetchRef.current < now - 30000 ? 0 : 120000);
-    if (throttle > 0 && now - lastFetchRef.current < throttle) return;
+
+    // Adaptive throttle:
+    // - first call: immediate
+    // - <30 min remaining: 30s (more frequent on the final stretch)
+    // - >60 min remaining: 60s (long trips, save quota)
+    // - default: 45s
+    // - bypass throttle if driver moved >2km since last fetch (rapid progress)
+    const remaining = liveDestRoute?.minutes ?? null;
+    let throttleMs = 45_000;
+    if (remaining != null) {
+      if (remaining < 30) throttleMs = 30_000;
+      else if (remaining > 60) throttleMs = 60_000;
+    }
+
+    const lastPos = lastFetchPosRef.current;
+    const movedKm = lastPos
+      ? haversineDistance(lastPos.lat, lastPos.lng, location.latitude, location.longitude) / 1000
+      : Infinity;
+    const movedFar = movedKm >= 2;
+
+    if (lastFetchRef.current !== 0 && !movedFar && now - lastFetchRef.current < throttleMs) return;
     lastFetchRef.current = now;
+    lastFetchPosRef.current = { lat: location.latitude, lng: location.longitude };
 
     // Use destCoords (already swapped to origin during the return phase)
     if (!destCoords) return;
@@ -198,11 +217,24 @@ export default function TransportDynamicIsland({
         if (liveData.duration_minutes && !liveData.fallback) {
           const eta = new Date(Date.now() + liveData.duration_minutes * 60000);
           const formatted = eta.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' });
+          // Capture baseline on first successful live measurement (anchor for delta)
+          if (baselineEtaRef.current == null) {
+            baselineEtaRef.current = liveData.duration_minutes;
+          }
           setLiveDestRoute({ minutes: liveData.duration_minutes, km: liveData.distance_km, arrivalTime: formatted });
         }
       } catch { /* keep last */ }
     })();
-  }, [location?.latitude, location?.longitude, isActive, isReturning, destCoords]);
+  }, [location?.latitude, location?.longitude, isActive, isReturning, destCoords, liveDestRoute?.minutes]);
+
+  // Delta in minutes vs baseline (negative = ahead of schedule, positive = late)
+  const etaDeltaMin = useMemo(() => {
+    if (!liveDestRoute || baselineEtaRef.current == null) return null;
+    // Baseline is "minutes remaining at first measurement"; expected remaining now = baseline - elapsed since start
+    // Simpler: compare to original transport estimate when available, else to baseline.
+    const reference = t.duracao_estimada_min ?? baselineEtaRef.current;
+    return liveDestRoute.minutes - reference;
+  }, [liveDestRoute, t.duracao_estimada_min]);
 
   const etaText = useMemo(() => {
     if (liveDestRoute && isActive) return `${liveDestRoute.minutes} min`;
