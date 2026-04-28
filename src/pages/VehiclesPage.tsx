@@ -711,7 +711,7 @@ function VehicleDetailContent({ vehicle, members, userId, kmTotal, fuelCostTotal
         </div>
 
         {vehicle.documento_url ? (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <button
               onClick={async () => {
                 try {
@@ -719,10 +719,30 @@ function VehicleDetailContent({ vehicle, members, userId, kmTotal, fuelCostTotal
                   window.open(url, '_blank');
                 } catch (err: any) { toast.error(err.message || 'Erro ao abrir documento'); }
               }}
-              className="flex-1 flex items-center gap-2 px-3 py-2.5 rounded-xl bg-primary/5 border border-primary/15 text-xs font-medium text-primary hover:bg-primary/10 transition-colors"
+              className="flex-1 min-w-[140px] flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-primary/5 border border-primary/15 text-xs font-medium text-primary hover:bg-primary/10 transition-colors"
             >
               <Eye className="w-4 h-4" />
               Ver documento PDF
+            </button>
+            <button
+              onClick={async () => {
+                try {
+                  const url = await getDocumentUrl(vehicle.documento_url!);
+                  const a = document.createElement('a');
+                  a.href = url;
+                  a.download = `documento-${vehicle.placa || 'veiculo'}.pdf`;
+                  a.target = '_blank';
+                  a.rel = 'noopener noreferrer';
+                  document.body.appendChild(a);
+                  a.click();
+                  a.remove();
+                } catch (err: any) { toast.error(err.message || 'Erro ao baixar documento'); }
+              }}
+              className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl bg-foreground/5 border border-border text-xs font-medium text-foreground hover:bg-foreground/10 transition-colors"
+              aria-label="Baixar documento"
+            >
+              <Upload className="w-3.5 h-3.5 rotate-180" />
+              Baixar
             </button>
             <label className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-dashed border-muted-foreground/30 text-xs text-muted-foreground cursor-pointer hover:bg-foreground/5 transition-colors">
               <Upload className="w-3.5 h-3.5" />
