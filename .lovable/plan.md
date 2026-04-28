@@ -1,101 +1,183 @@
+# Upgrade do Menu Carrinhos Elétricos
+
 ## Objetivo
 
-Permitir que carrinhos elétricos sejam retirados por **empresas parceiras** (Coopermil, Banrisul, Celena, Sicredi), além do fluxo atual de membros internos da Fenasoja. Quando o carrinho estiver em uso por uma empresa, a logo da empresa aparece no card.
+Três entregas em um pacote integrado:
 
-## Empresas Parceiras
+1. **Cards 3D Liquid Glass Premium** com hierarquia visual distinta para "Em uso" (destaque para Devolver, hora, quem retirou) e "Disponível" (destaque para nome/descrição e badge "Disponível").
+2. **Filtros** — busca por texto e segmented control (Todos / Disponíveis / Em uso).
+3. **Relatório "Uso de Carrinhos Elétricos"** — tela dedicada com histórico completo (retirada → devolução) já alimentado pela tabela `cart_history` existente.
 
-Lista fixa, configurada em código (não exige cadastro pelo usuário):
+---
 
-| Slug | Nome | Logo |
-|---|---|---|
-| `coopermil` | Coopermil | `src/assets/partners/coopermil.png` |
-| `banrisul` | Banrisul | `src/assets/partners/banrisul.png` |
-| `celena` | Celena Alimentos | `src/assets/partners/celena.jpg` |
-| `sicredi` | Sicredi | `src/assets/partners/sicredi.png` |
+## 1. Cards 3D Liquid Glass Premium
 
-As 4 imagens enviadas serão copiadas de `user-uploads://` para `src/assets/partners/`.
+### Design por estado
 
-## Mudanças no Banco
-
-Migration adicionando 2 colunas em `electric_carts`:
-
-- `tipo_responsavel` text — `'interno'` (padrão) ou `'empresa'`
-- `empresa_slug` text — slug da empresa quando `tipo_responsavel = 'empresa'` (nulo caso contrário)
-
-Ambos NULL-safe; nada quebra para registros existentes. O campo `responsavel_user_id` continua usado apenas no fluxo interno; o campo `comissao` permanece para o fluxo interno.
-
-Sem CHECK constraint para evitar problemas; validação será feita no frontend e no hook.
-
-## Mudanças no Backend (hook)
-
-`src/hooks/useElectricCarts.ts` — atualizar `pickup`:
-
-- Aceitar parâmetros opcionais `tipo: 'interno' | 'empresa'` e `empresa_slug`.
-- Quando `tipo = 'empresa'`: gravar `empresa_slug`, deixar `responsavel_user_id` e `comissao` como NULL.
-- Quando `tipo = 'interno'`: comportamento atual (grava `responsavel_user_id`/`comissao`, limpa `empresa_slug`).
-- Em `returnCart`: limpar também `empresa_slug` e `tipo_responsavel`.
-- Registrar `tipo` no `cart_history.action` e payload normalmente.
-
-## Mudanças na UI — `ElectricCartsPage.tsx`
-
-### 1. Catálogo de parceiros
-Novo módulo `src/lib/partners.ts` exportando `PARTNERS` (slug, nome, logo importada como ES module) e helper `getPartner(slug)`.
-
-### 2. Diálogo de Retirada
-Adicionar um seletor de **tipo de retirada** no topo do diálogo:
-
+**Disponível** (verde, calmo, convidativo):
 ```text
-[ Membro Fenasoja ] [ Empresa Parceira ]   ← Tabs/SegmentedControl
+┌──────────────────────────────────┐
+│  ⚡ ELE-0003          [✎] [✓]    │ ← halo verde sutil
+│                                  │
+│   Carrinho do Pavilhão Azul      │ ← título grande (text-lg)
+│   ELE-0003 · 4 lugares           │ ← descrição
+│                                  │
+│  ╔════════════════════════════╗  │
+│  ║   ✓  DISPONÍVEL            ║  │ ← faixa verde gradiente
+│  ╚════════════════════════════╝  │
+└──────────────────────────────────┘
 ```
 
-- **Membro Fenasoja**: mantém UI atual (Carrinho + Quem retira + Comissão derivada + Horário).
-- **Empresa Parceira**: mostra Carrinho + Select de empresa (cards com logo + nome) + Horário.
-
-Validação:
-- Interno: exige `cartId` + `userId`.
-- Empresa: exige `cartId` + `empresa_slug`.
-
-### 3. Card do Carrinho
-Quando `status = 'em_uso'`:
-- **Fluxo interno** (atual): avatar do responsável + comissão (sem alteração).
-- **Fluxo empresa**: substitui o bloco do responsável por uma linha com:
-  - Logo (32×32, `object-contain`, fundo branco com leve borda) + nome da empresa em destaque.
-  - Badge "Empresa parceira" pequena.
-
-Layout permanece idêntico em altura para não quebrar o grid.
-
-### 4. Histórico
-`CartHistoryContent` já lê `after_data`. Adicionar render: se entry tem `empresa_slug`, mostrar nome da empresa + logo mini em vez do nome do membro. Sem alteração estrutural.
-
-## Estrutura visual (card em uso por empresa)
-
+**Em uso** (azul/âmbar, foco em ação):
 ```text
-┌────────────────────────────────────────┐
-│ ⚡ ELE-0003           [✎] [Em uso]     │
-│                                        │
-│ ┌──────┐                               │
-│ │ LOGO │ Coopermil                     │
-│ │      │ Empresa parceira              │
-│ └──────┘                               │
-│                                        │
-│ Retirado: 28/04/2026 14:32             │
-│                                        │
-│ [           Devolver           ]       │
-└────────────────────────────────────────┘
+┌──────────────────────────────────┐
+│  ⚡ ELE-0001          [✎] [Em uso]│ ← halo âmbar
+│                                  │
+│  ┌────┐  Lucas Silva             │ ← avatar/logo grande
+│  │ LS │  LOGÍSTICA               │
+│  └────┘                          │
+│                                  │
+│  🕐  Retirado às 14:32           │ ← destaque hora
+│      há 1h 12min                 │
+│                                  │
+│  ╔════════════════════════════╗  │
+│  ║      ↩  DEVOLVER           ║  │ ← botão grande primário
+│  ╚════════════════════════════╝  │
+└──────────────────────────────────┘
 ```
 
-## Arquivos afetados
+### Técnica visual (Liquid Glass 3D)
 
-- **Migration nova** — adiciona `tipo_responsavel` e `empresa_slug` em `electric_carts`.
-- **Novos assets** — `src/assets/partners/{coopermil.png, banrisul.png, celena.jpg, sicredi.png}` copiados dos uploads.
-- **Novo arquivo** — `src/lib/partners.ts` (catálogo + helpers).
-- **Editado** — `src/hooks/useElectricCarts.ts` (pickup/returnCart com suporte a empresa).
-- **Editado** — `src/pages/ElectricCartsPage.tsx` (Tabs no diálogo de retirada, render do card e do histórico).
+- Container: `rounded-2xl border border-border/40 bg-gradient-to-br from-card/80 via-card/60 to-card/40 backdrop-blur-2xl shadow-[0_8px_32px_-12px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.1)]`
+- Halo de status: pseudo-elemento `::before` com gradiente radial colorido (verde para disponível, âmbar para em uso) com `blur-2xl opacity-40` posicionado no canto superior.
+- Profundidade 3D: `transform-gpu transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_16px_48px_-12px_rgba(0,0,0,0.4)] hover:scale-[1.02]`
+- Textura sutil: overlay `::after` com `bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.08),transparent_50%)] pointer-events-none`
+- Faixa "Disponível": botão visual com gradiente `from-success/20 via-success/15 to-success/10`, borda interna brilhante, ícone `CheckCircle2`, font-bold uppercase tracking-wide.
+- Botão "Devolver": `bg-gradient-to-r from-primary to-primary/80` h-12, ícone `Undo2`, sombra interna gold, ativa `active:scale-[0.97]`.
+- Badge de tempo decorrido: cálculo `(now - retirada_em)` formatado "há Xh Ymin".
+
+### Responsividade
+
+- Grid: `grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4`
+- Card: `min-h-[240px]` para "Disponível", `min-h-[280px]` para "Em uso" — alinhamento garantido.
+- Mobile (390px): cards full-width, fontes responsivas (`text-base sm:text-lg`), botão Devolver `h-12` para toque confortável.
+
+---
+
+## 2. Filtros
+
+Linha de filtros entre o header e o grid:
+
+```text
+┌─────────────────────────┐ ┌────────────────────────────┐
+│ 🔍 Buscar por código... │ │ [Todos] [Disponíveis] [Em uso]│
+└─────────────────────────┘ └────────────────────────────┘
+```
+
+- **Input de busca**: filtra por `codigo` ou `nome` (case-insensitive, debounce nativo via state).
+- **Segmented control**: 3 botões com contadores (ex: "Disponíveis (8)"), estilo Liquid Glass com tab ativa em primary.
+- Empty state aprimorado quando filtros não retornam nada.
+- Estado vazio mostra contador zerado e botão "Limpar filtros".
+
+---
+
+## 3. Relatório "Uso de Carrinhos Elétricos"
+
+### Origem dos dados
+
+A tabela `cart_history` **já existe** e já registra automaticamente toda retirada (`action='retirada'`) e devolução (`action='devolucao'`) via o hook `useElectricCarts`. Cada linha tem `before_data` e `after_data` (JSONB completos do carrinho) + `actor_user_id` + `created_at`. **Nenhuma migration é necessária.**
+
+### Nova rota: `/electric-carts/report`
+
+Acesso via botão "Relatório" no header da página de carrinhos (ícone `FileText`).
+
+### UI do relatório
+
+```text
+┌─────────────────────────────────────────────────────┐
+│ Uso de Carrinhos Elétricos                          │
+│ Histórico completo de retiradas e devoluções        │
+│                                                     │
+│ [Período: últimos 7 dias ▾]  [Carrinho: Todos ▾]   │
+│ [🔍 Buscar responsável...]   [📥 Exportar PDF]     │
+│                                                     │
+│ ┌──────────────────────────────────────────────┐   │
+│ │ ELE-0001 · Carrinho do Pavilhão Azul         │   │
+│ │ 👤 Lucas Silva (LOGÍSTICA)                   │   │
+│ │ 🕐 Retirado: 28/04 14:32                     │   │
+│ │ ↩  Devolvido: 28/04 16:45  ·  Duração: 2h13m │   │
+│ └──────────────────────────────────────────────┘   │
+│ ┌──────────────────────────────────────────────┐   │
+│ │ ELE-0002 · Em uso (sem devolução)            │   │
+│ │ 🏢 Coopermil (Empresa parceira)              │   │
+│ │ 🕐 Retirado: 28/04 13:10  ·  há 3h em uso   │   │
+│ └──────────────────────────────────────────────┘   │
+└─────────────────────────────────────────────────────┘
+```
+
+### Lógica de pareamento
+
+Para cada linha de `action='retirada'`, busca a `action='devolucao'` correspondente do mesmo `cart_id` cuja `created_at` seja a próxima posterior. Resulta em "sessões de uso" com:
+- Carrinho (`codigo`, `nome` do `after_data`)
+- Responsável: nome do membro (lookup em `org_members`) OU empresa parceira (via `empresa_slug` no `after_data` da retirada)
+- Hora de retirada (`retirada_em` do `after_data`)
+- Hora de devolução (`devolucao_em` do `after_data` da devolução) — null se ainda em uso
+- Duração calculada
+
+### Filtros do relatório
+
+- **Período**: hoje, 7 dias, 30 dias, todo período.
+- **Carrinho**: dropdown com todos os carrinhos.
+- **Busca por responsável**: filtra por nome de membro ou empresa.
+- **Status**: opcional — concluídas / em aberto.
+
+### Exportação PDF
+
+Botão "Exportar PDF" gera relatório usando `jsPDF` + `jspdf-autotable` (já no projeto, vide `src/lib/generateKmPdf.ts` como referência). Colunas: Carrinho, Responsável, Retirada, Devolução, Duração.
+
+---
+
+## Detalhes Técnicos
+
+### Arquivos a criar
+
+- **`src/components/electric-carts/ElectricCartCard.tsx`** — componente do card 3D Liquid Glass, recebe `cart`, `partner`, `responsavel`, callbacks `onEdit`, `onReturn`, `onHistory`.
+- **`src/components/electric-carts/ElectricCartsFilters.tsx`** — input de busca + segmented control com contadores.
+- **`src/pages/ElectricCartsReportPage.tsx`** — página do relatório com filtros, listagem de sessões e exportação.
+- **`src/hooks/useCartUsageReport.ts`** — hook que faz query em `cart_history` (com filtros de data via `created_at`), faz o pareamento retirada→devolução em memória e retorna sessões prontas.
+- **`src/lib/generateCartUsagePdf.ts`** — geração do PDF do relatório.
+
+### Arquivos a editar
+
+- **`src/pages/ElectricCartsPage.tsx`** — extrai card para componente, adiciona filtros (state local), botão "Relatório" no header, troca grid responsivo. Reduz tamanho do arquivo significativamente.
+- **`src/App.tsx`** — registra rota `/electric-carts/report` com `AuthGuard` + `OrgGuard` + `Layout`.
+- **`src/components/Sidebar.tsx`** — opcional: adicionar sub-item "Relatório de uso" sob Carrinhos Elétricos (ou apenas botão dentro da página — preferência por **botão dentro da página** para não poluir sidebar).
+
+### Sem mudanças necessárias
+
+- **Banco de dados**: `cart_history` já captura tudo (`action`, `before_data`, `after_data`, `actor_user_id`, `created_at`). RLS já permite SELECT por `is_org_member`. **Sem migration.**
+- **Hook `useElectricCarts`**: já insere histórico em `pickup` e `returnCart`. Sem mudanças.
+
+### Performance
+
+- Query do relatório usa `staleTime: 60s` no React Query.
+- Limite inicial de 500 registros (mais que o limite Supabase de 1000), com paginação futura se necessário.
+- Pareamento retirada↔devolução é O(n) com Map por `cart_id`.
+
+### Acessibilidade
+
+- Todos os botões mantêm `min-h-[44px]` para toque.
+- `aria-label` em ações ("Devolver carrinho ELE-0001", "Ver histórico de ELE-0001").
+- Contraste mantido conforme tokens do design system (success, primary, info).
+
+---
 
 ## Validação pós-implementação
 
-1. Retirar para membro interno → comportamento idêntico ao atual.
-2. Retirar para Coopermil → card mostra logo Coopermil + nome.
-3. Devolver carrinho de empresa → volta para "Disponível", sem dados residuais.
-4. Histórico do carrinho registra ambos os fluxos corretamente.
-5. Sem regressões nos contadores e na aba "Autorizados".
+1. Cards "Disponível" e "Em uso" renderizam com efeito 3D distinto e responsivo no mobile (390px) e desktop.
+2. Filtros (texto + status) funcionam combinados, com contadores corretos.
+3. Retirar um carrinho cria entrada visível no relatório imediatamente após.
+4. Devolver um carrinho fecha a sessão no relatório com duração calculada.
+5. Carrinho retirado por empresa parceira mostra logo no relatório.
+6. Exportação PDF gera arquivo formatado corretamente.
+7. Sem regressões nas abas "Frota" e "Autorizados" nem no histórico individual existente (botão de clique no card).
