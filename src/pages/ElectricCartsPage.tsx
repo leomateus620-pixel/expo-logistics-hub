@@ -14,6 +14,7 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AuthorizationsTab from '@/components/mobility/AuthorizationsTab';
+import { PARTNERS, getPartner, type PartnerSlug } from '@/lib/partners';
 
 const statusConfig: Record<string, { label: string; class: string }> = {
   disponivel: { label: 'Disponível', class: 'bg-success/10 text-success border-success/20' },
