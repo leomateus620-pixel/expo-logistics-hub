@@ -261,6 +261,7 @@ export type Database = {
           created_at: string
           devolucao_em: string | null
           devolucao_prevista_em: string | null
+          empresa_slug: string | null
           id: string
           nome: string | null
           observacoes: string | null
@@ -268,6 +269,7 @@ export type Database = {
           responsavel_user_id: string | null
           retirada_em: string | null
           status: Database["public"]["Enums"]["cart_status"]
+          tipo_responsavel: string
           updated_at: string
         }
         Insert: {
@@ -276,6 +278,7 @@ export type Database = {
           created_at?: string
           devolucao_em?: string | null
           devolucao_prevista_em?: string | null
+          empresa_slug?: string | null
           id?: string
           nome?: string | null
           observacoes?: string | null
@@ -283,6 +286,7 @@ export type Database = {
           responsavel_user_id?: string | null
           retirada_em?: string | null
           status?: Database["public"]["Enums"]["cart_status"]
+          tipo_responsavel?: string
           updated_at?: string
         }
         Update: {
@@ -291,6 +295,7 @@ export type Database = {
           created_at?: string
           devolucao_em?: string | null
           devolucao_prevista_em?: string | null
+          empresa_slug?: string | null
           id?: string
           nome?: string | null
           observacoes?: string | null
@@ -298,6 +303,7 @@ export type Database = {
           responsavel_user_id?: string | null
           retirada_em?: string | null
           status?: Database["public"]["Enums"]["cart_status"]
+          tipo_responsavel?: string
           updated_at?: string
         }
         Relationships: [

@@ -14,6 +14,7 @@ import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import AuthorizationsTab from '@/components/mobility/AuthorizationsTab';
+import { PARTNERS, getPartner, type PartnerSlug } from '@/lib/partners';
 
 const statusConfig: Record<string, { label: string; class: string }> = {
   disponivel: { label: 'Disponível', class: 'bg-success/10 text-success border-success/20' },
@@ -35,7 +36,7 @@ export default function ElectricCartsPage() {
   const [editForm, setEditForm] = useState({ codigo: '', nome: '', status: 'disponivel' });
 
   const [pickupOpen, setPickupOpen] = useState(false);
-  const [pickupForm, setPickupForm] = useState({ cartId: '', userId: '', comissao: '', retirada_em: '' });
+  const [pickupForm, setPickupForm] = useState<{ cartId: string; userId: string; comissao: string; retirada_em: string; tipo: 'interno' | 'empresa'; empresa_slug: PartnerSlug | '' }>({ cartId: '', userId: '', comissao: '', retirada_em: '', tipo: 'interno', empresa_slug: '' });
 
   const [returnOpen, setReturnOpen] = useState(false);
   const [returnId, setReturnId] = useState('');
@@ -76,21 +77,26 @@ export default function ElectricCartsPage() {
       userId: '',
       comissao: '',
       retirada_em: nowSPLocal(),
+      tipo: 'interno',
+      empresa_slug: '',
     });
     setPickupOpen(true);
   };
 
   const handlePickup = async () => {
     if (!pickupForm.cartId) { toast.error('Selecione um carrinho'); return; }
-    if (!pickupForm.userId) { toast.error('Selecione um responsável'); return; }
+    if (pickupForm.tipo === 'interno' && !pickupForm.userId) { toast.error('Selecione um responsável'); return; }
+    if (pickupForm.tipo === 'empresa' && !pickupForm.empresa_slug) { toast.error('Selecione a empresa parceira'); return; }
     try {
       await pickup.mutateAsync({
         id: pickupForm.cartId,
-        responsavel_user_id: pickupForm.userId,
-        comissao: pickupForm.comissao || null,
+        tipo: pickupForm.tipo,
+        responsavel_user_id: pickupForm.tipo === 'interno' ? pickupForm.userId : null,
+        comissao: pickupForm.tipo === 'interno' ? (pickupForm.comissao || null) : null,
+        empresa_slug: pickupForm.tipo === 'empresa' ? pickupForm.empresa_slug : null,
         retirada_em: pickupForm.retirada_em || nowSP(),
       });
-      setPickupForm({ cartId: '', userId: '', comissao: '', retirada_em: '' });
+      setPickupForm({ cartId: '', userId: '', comissao: '', retirada_em: '', tipo: 'interno', empresa_slug: '' });
       setPickupOpen(false);
       toast.success('Retirada registrada');
     } catch (err: any) { toast.error(err.message); }
@@ -169,7 +175,7 @@ export default function ElectricCartsPage() {
 
       {/* Pickup dialog */}
       <Dialog open={pickupOpen} onOpenChange={setPickupOpen}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="sm:max-w-md max-h-[90dvh] overflow-y-auto">
           <DialogHeader><DialogTitle>Registrar Retirada</DialogTitle></DialogHeader>
           <div className="space-y-3">
             <Select value={pickupForm.cartId} onValueChange={(v) => setPickupForm({ ...pickupForm, cartId: v })}>
@@ -180,23 +186,62 @@ export default function ElectricCartsPage() {
                 ))}
               </SelectContent>
             </Select>
-            <Select value={pickupForm.userId} onValueChange={(v) => {
-              const commission = getMemberCommission(v);
-              setPickupForm({ ...pickupForm, userId: v, comissao: commission || '' });
-            }}>
-              <SelectTrigger><SelectValue placeholder="Quem retira" /></SelectTrigger>
-              <SelectContent>
-                {members.map((m: any) => (
-                  <SelectItem key={m.user_id} value={m.user_id}>{m.nome_exibicao} - {m.cargo}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            {pickupForm.comissao && (
-              <div className="flex items-center gap-2">
-                <Label className="text-xs text-muted-foreground">Comissão:</Label>
-                <Badge variant="secondary">{pickupForm.comissao}</Badge>
-              </div>
-            )}
+
+            <Tabs
+              value={pickupForm.tipo}
+              onValueChange={(v) => setPickupForm({ ...pickupForm, tipo: v as 'interno' | 'empresa', userId: '', comissao: '', empresa_slug: '' })}
+            >
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="interno">Membro Fenasoja</TabsTrigger>
+                <TabsTrigger value="empresa">Empresa Parceira</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="interno" className="space-y-3 mt-3">
+                <Select value={pickupForm.userId} onValueChange={(v) => {
+                  const commission = getMemberCommission(v);
+                  setPickupForm({ ...pickupForm, userId: v, comissao: commission || '' });
+                }}>
+                  <SelectTrigger><SelectValue placeholder="Quem retira" /></SelectTrigger>
+                  <SelectContent>
+                    {members.map((m: any) => (
+                      <SelectItem key={m.user_id} value={m.user_id}>{m.nome_exibicao} - {m.cargo}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {pickupForm.comissao && (
+                  <div className="flex items-center gap-2">
+                    <Label className="text-xs text-muted-foreground">Comissão:</Label>
+                    <Badge variant="secondary">{pickupForm.comissao}</Badge>
+                  </div>
+                )}
+              </TabsContent>
+
+              <TabsContent value="empresa" className="space-y-3 mt-3">
+                <Label className="text-xs text-muted-foreground">Empresa parceira</Label>
+                <div className="grid grid-cols-2 gap-2">
+                  {PARTNERS.map((p) => {
+                    const selected = pickupForm.empresa_slug === p.slug;
+                    return (
+                      <button
+                        key={p.slug}
+                        type="button"
+                        onClick={() => setPickupForm({ ...pickupForm, empresa_slug: p.slug })}
+                        className={cn(
+                          'rounded-xl border p-3 flex flex-col items-center justify-center gap-2 bg-card hover:bg-muted transition-all min-h-[88px]',
+                          selected ? 'border-primary ring-2 ring-primary/30 shadow-sm' : 'border-border'
+                        )}
+                      >
+                        <div className="w-12 h-12 rounded-md bg-white border flex items-center justify-center overflow-hidden">
+                          <img src={p.logo} alt={p.nome} className="max-w-full max-h-full object-contain" />
+                        </div>
+                        <span className="text-[11px] font-medium text-center leading-tight">{p.nome}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </TabsContent>
+            </Tabs>
+
             <div>
               <Label className="text-xs text-muted-foreground mb-1 block">Horário de retirada</Label>
               <DateTimePicker value={pickupForm.retirada_em} onChange={(v) => setPickupForm({ ...pickupForm, retirada_em: v })} placeholder="Retirada" />
@@ -232,6 +277,7 @@ export default function ElectricCartsPage() {
         {carts.map((c: any) => {
           const resp = members.find((m: any) => m.user_id === c.responsavel_user_id);
           const sc = statusConfig[c.status] || statusConfig.disponivel;
+          const partner = c.tipo_responsavel === 'empresa' ? getPartner(c.empresa_slug) : null;
           return (
             <div
               key={c.id}
@@ -255,7 +301,18 @@ export default function ElectricCartsPage() {
                   <Badge variant="outline" className={cn('text-[10px]', sc.class)}>{sc.label}</Badge>
                 </div>
               </div>
-              {resp && (
+              {partner && c.status === 'em_uso' && (
+                <div className="flex items-center gap-3 mb-2 p-2 rounded-lg bg-muted/40 border border-border">
+                  <div className="w-10 h-10 rounded-md bg-white border flex items-center justify-center overflow-hidden shrink-0">
+                    <img src={partner.logo} alt={partner.nome} className="max-w-full max-h-full object-contain" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold truncate">{partner.nome}</p>
+                    <Badge variant="secondary" className="text-[10px] mt-0.5">Empresa parceira</Badge>
+                  </div>
+                </div>
+              )}
+              {!partner && resp && (
                 <div className="flex items-center gap-2 mb-2 text-xs text-muted-foreground">
                   <div className="w-5 h-5 rounded-full flex items-center justify-center text-[8px] font-bold text-primary-foreground" style={{ backgroundColor: resp.avatar_color || 'hsl(142,50%,35%)' }}>
                     {(resp.nome_exibicao || '?')[0]}
@@ -263,7 +320,7 @@ export default function ElectricCartsPage() {
                   <span>{resp.nome_exibicao}</span>
                 </div>
               )}
-              {c.comissao && c.status === 'em_uso' && (
+              {!partner && c.comissao && c.status === 'em_uso' && (
                 <div className="text-xs text-muted-foreground mb-2">
                   Comissão: <Badge variant="secondary" className="text-[10px]">{c.comissao}</Badge>
                 </div>
@@ -340,6 +397,8 @@ function CartHistoryContent({ cart, history, members }: { cart: any; history: an
     const retiradaEm = retData.retirada_em || ret.created_at;
     const responsavel = ret.actor_user_id;
     const comissao = retData.comissao;
+    const tipo = retData.tipo_responsavel || 'interno';
+    const empresaSlug = retData.empresa_slug;
 
     // Find matching devolucao for same cart after this retirada
     const matchingDev = devolucoes.find((d: any) =>
@@ -352,6 +411,8 @@ function CartHistoryContent({ cart, history, members }: { cart: any; history: an
       id: ret.id,
       responsavel,
       comissao,
+      tipo,
+      empresaSlug,
       retirada_em: retiradaEm,
       devolucao_em: devolucaoEm,
     };
@@ -364,31 +425,46 @@ function CartHistoryContent({ cart, history, members }: { cart: any; history: an
         <p className="text-xs text-muted-foreground">Nenhum uso registrado</p>
       ) : (
         <div className="space-y-2">
-          {usageEntries.map((u: any) => (
-            <div key={u.id} className="rounded-lg border p-3 text-xs space-y-1.5">
-              <div className="flex items-center justify-between">
-                <span className="font-medium">{getMemberName(u.responsavel)}</span>
-                <Badge variant={u.devolucao_em ? 'secondary' : 'outline'} className="text-[10px]">
-                  {u.devolucao_em ? 'Devolvido' : 'Em uso'}
-                </Badge>
-              </div>
-              {u.comissao && (
-                <div className="text-muted-foreground">
-                  Comissão: <Badge variant="outline" className="text-[10px]">{u.comissao}</Badge>
+          {usageEntries.map((u: any) => {
+            const partner = u.tipo === 'empresa' ? getPartner(u.empresaSlug) : null;
+            return (
+              <div key={u.id} className="rounded-lg border p-3 text-xs space-y-1.5">
+                <div className="flex items-center justify-between gap-2">
+                  {partner ? (
+                    <div className="flex items-center gap-2 min-w-0">
+                      <div className="w-6 h-6 rounded bg-white border flex items-center justify-center overflow-hidden shrink-0">
+                        <img src={partner.logo} alt={partner.nome} className="max-w-full max-h-full object-contain" />
+                      </div>
+                      <span className="font-medium truncate">{partner.nome}</span>
+                    </div>
+                  ) : (
+                    <span className="font-medium">{getMemberName(u.responsavel)}</span>
+                  )}
+                  <Badge variant={u.devolucao_em ? 'secondary' : 'outline'} className="text-[10px] shrink-0">
+                    {u.devolucao_em ? 'Devolvido' : 'Em uso'}
+                  </Badge>
                 </div>
-              )}
-              <div className="flex items-center gap-2 text-muted-foreground flex-wrap">
-                <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{formatDateTime(u.retirada_em)}</span>
-                {u.devolucao_em && (
-                  <>
-                    <ArrowRight className="w-3 h-3" />
-                    <span>{formatDateTime(u.devolucao_em)}</span>
-                    <Badge variant="outline" className="text-[10px] ml-auto">{calcDuration(u.retirada_em, u.devolucao_em)}</Badge>
-                  </>
+                {!partner && u.comissao && (
+                  <div className="text-muted-foreground">
+                    Comissão: <Badge variant="outline" className="text-[10px]">{u.comissao}</Badge>
+                  </div>
                 )}
+                {partner && (
+                  <div className="text-muted-foreground text-[10px]">Empresa parceira</div>
+                )}
+                <div className="flex items-center gap-2 text-muted-foreground flex-wrap">
+                  <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{formatDateTime(u.retirada_em)}</span>
+                  {u.devolucao_em && (
+                    <>
+                      <ArrowRight className="w-3 h-3" />
+                      <span>{formatDateTime(u.devolucao_em)}</span>
+                      <Badge variant="outline" className="text-[10px] ml-auto">{calcDuration(u.retirada_em, u.devolucao_em)}</Badge>
+                    </>
+                  )}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

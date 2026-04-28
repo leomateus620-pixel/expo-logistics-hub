@@ -53,11 +53,41 @@ export function useElectricCarts() {
   });
 
   const pickup = useMutation({
-    mutationFn: async ({ id, responsavel_user_id, comissao, retirada_em }: { id: string; responsavel_user_id: string; comissao?: string | null; retirada_em?: string }) => {
+    mutationFn: async ({
+      id,
+      responsavel_user_id,
+      comissao,
+      retirada_em,
+      tipo,
+      empresa_slug,
+    }: {
+      id: string;
+      responsavel_user_id?: string | null;
+      comissao?: string | null;
+      retirada_em?: string;
+      tipo?: 'interno' | 'empresa';
+      empresa_slug?: string | null;
+    }) => {
       const { data: before } = await (supabase as any).from('electric_carts').select('*').eq('id', id).single();
       const pickupTime = retirada_em || nowSP();
+      const tipoFinal = tipo || 'interno';
+      const updatePayload: Record<string, any> = {
+        status: 'em_uso',
+        retirada_em: pickupTime,
+        devolucao_em: null,
+        tipo_responsavel: tipoFinal,
+      };
+      if (tipoFinal === 'empresa') {
+        updatePayload.responsavel_user_id = null;
+        updatePayload.comissao = null;
+        updatePayload.empresa_slug = empresa_slug || null;
+      } else {
+        updatePayload.responsavel_user_id = responsavel_user_id || null;
+        updatePayload.comissao = comissao || null;
+        updatePayload.empresa_slug = null;
+      }
       const { data, error } = await (supabase as any).from('electric_carts')
-        .update({ status: 'em_uso', responsavel_user_id, comissao: comissao || null, retirada_em: pickupTime, devolucao_em: null })
+        .update(updatePayload)
         .eq('id', id).select().single();
       if (error) throw error;
       const user = (await supabase.auth.getUser()).data.user;
@@ -75,7 +105,14 @@ export function useElectricCarts() {
       const { data: before } = await (supabase as any).from('electric_carts').select('*').eq('id', id).single();
       const returnTime = devolucao_em || nowSP();
       const { data, error } = await (supabase as any).from('electric_carts')
-        .update({ status: 'disponivel', responsavel_user_id: null, devolucao_em: returnTime })
+        .update({
+          status: 'disponivel',
+          responsavel_user_id: null,
+          comissao: null,
+          empresa_slug: null,
+          tipo_responsavel: 'interno',
+          devolucao_em: returnTime,
+        })
         .eq('id', id).select().single();
       if (error) throw error;
       const user = (await supabase.auth.getUser()).data.user;
