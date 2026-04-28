@@ -1,12 +1,15 @@
-import { Zap, Pencil, Wrench, Clock, Undo2, CheckCircle2, Building2, User } from 'lucide-react';
+import { Zap, Pencil, Wrench, Clock, Undo2, CheckCircle2, Building2, User, CalendarClock } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { getPartner } from '@/lib/partners';
 import { useEffect, useState } from 'react';
+import type { CartReservation } from '@/hooks/useCartReservations';
 
 interface Props {
   cart: any;
   responsavel?: any;
+  nextReservation?: CartReservation;
+  nextReservationLabel?: string;
   onEdit: () => void;
   onReturn: () => void;
   onHistory: () => void;
