@@ -60,13 +60,15 @@ export function useElectricCarts() {
       retirada_em,
       tipo,
       empresa_slug,
+      nome_externo,
     }: {
       id: string;
       responsavel_user_id?: string | null;
       comissao?: string | null;
       retirada_em?: string;
-      tipo?: 'interno' | 'empresa';
+      tipo?: 'interno' | 'empresa' | 'outros';
       empresa_slug?: string | null;
+      nome_externo?: string | null;
     }) => {
       const { data: before } = await (supabase as any).from('electric_carts').select('*').eq('id', id).single();
       const pickupTime = retirada_em || nowSP();
@@ -81,10 +83,17 @@ export function useElectricCarts() {
         updatePayload.responsavel_user_id = null;
         updatePayload.comissao = null;
         updatePayload.empresa_slug = empresa_slug || null;
+        updatePayload.nome_externo = null;
+      } else if (tipoFinal === 'outros') {
+        updatePayload.responsavel_user_id = null;
+        updatePayload.comissao = null;
+        updatePayload.empresa_slug = null;
+        updatePayload.nome_externo = (nome_externo || '').trim().toUpperCase() || null;
       } else {
         updatePayload.responsavel_user_id = responsavel_user_id || null;
         updatePayload.comissao = comissao || null;
         updatePayload.empresa_slug = null;
+        updatePayload.nome_externo = null;
       }
       const { data, error } = await (supabase as any).from('electric_carts')
         .update(updatePayload)
@@ -110,6 +119,7 @@ export function useElectricCarts() {
           responsavel_user_id: null,
           comissao: null,
           empresa_slug: null,
+          nome_externo: null,
           tipo_responsavel: 'interno',
           devolucao_em: returnTime,
         })
