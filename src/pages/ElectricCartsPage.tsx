@@ -222,11 +222,12 @@ export default function ElectricCartsPage() {
 
             <Tabs
               value={pickupForm.tipo}
-              onValueChange={(v) => setPickupForm({ ...pickupForm, tipo: v as 'interno' | 'empresa', userId: '', comissao: '', empresa_slug: '' })}
+              onValueChange={(v) => setPickupForm({ ...pickupForm, tipo: v as 'interno' | 'empresa' | 'outros', userId: '', comissao: '', empresa_slug: '', nome_externo: '' })}
             >
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="interno">Membro Fenasoja</TabsTrigger>
-                <TabsTrigger value="empresa">Empresa Parceira</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="interno">Membro</TabsTrigger>
+                <TabsTrigger value="empresa">Empresa</TabsTrigger>
+                <TabsTrigger value="outros">Outros</TabsTrigger>
               </TabsList>
 
               <TabsContent value="interno" className="space-y-3 mt-3">
@@ -272,6 +273,21 @@ export default function ElectricCartsPage() {
                     );
                   })}
                 </div>
+              </TabsContent>
+
+              <TabsContent value="outros" className="space-y-3 mt-3">
+                <div className="flex items-center gap-2 p-2.5 rounded-xl bg-muted/30 border border-border/40">
+                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-accent/30 to-accent/10 text-accent flex items-center justify-center shrink-0">
+                    <User className="w-4 h-4" />
+                  </div>
+                  <span className="text-xs text-muted-foreground">Convidado / Externo — não cadastrado no sistema</span>
+                </div>
+                <Input
+                  placeholder="NOME COMPLETO"
+                  value={pickupForm.nome_externo}
+                  onChange={(e) => setPickupForm({ ...pickupForm, nome_externo: e.target.value.toUpperCase() })}
+                  className="uppercase"
+                />
               </TabsContent>
             </Tabs>
 
