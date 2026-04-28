@@ -199,14 +199,17 @@ export default function ElectricCartCard({ cart, responsavel, onEdit, onReturn, 
             onClick={(e) => { e.stopPropagation(); onReturn(); }}
             aria-label={`Devolver ${cart.nome || cart.codigo}`}
             className={cn(
-              'w-full h-12 rounded-xl font-bold uppercase tracking-wider text-sm',
+              'group/btn relative overflow-hidden w-full h-12 rounded-xl font-bold uppercase tracking-wider text-sm',
               'bg-gradient-to-r from-primary via-primary to-primary/85 text-primary-foreground',
               'shadow-[0_4px_16px_-4px_hsl(var(--primary)/0.5),inset_0_1px_0_rgba(255,255,255,0.2)]',
               'flex items-center justify-center gap-2',
-              'transition-all duration-200 hover:shadow-[0_8px_20px_-4px_hsl(var(--primary)/0.6)] active:scale-[0.97]'
+              'transition-all duration-300 hover:shadow-[0_10px_24px_-4px_hsl(var(--primary)/0.65)] hover:brightness-110 active:scale-[0.97]'
             )}
           >
-            <Undo2 className="w-4 h-4" /> Devolver
+            {/* hover shimmer */}
+            <span className="pointer-events-none absolute inset-0 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/25 to-transparent" />
+            <Undo2 className="w-4 h-4 relative" />
+            <span className="relative">Devolver</span>
           </button>
         </div>
       )}
