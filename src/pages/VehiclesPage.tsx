@@ -12,7 +12,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { cn, nowSP } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 
 import { Input } from '@/components/ui/input';
@@ -566,6 +566,48 @@ function VehicleDetailContent({ vehicle, members, userId, kmTotal, fuelCostTotal
   const [editFuelId, setEditFuelId] = useState<string | null>(null);
   const [editFuelForm, setEditFuelForm] = useState({ litros: '', valor: '', km_abastecimento: '', posto: '', observacoes: '' });
   const [docUploading, setDocUploading] = useState(false);
+  const [docPreviewUrl, setDocPreviewUrl] = useState<string | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (docPreviewUrl) URL.revokeObjectURL(docPreviewUrl);
+    };
+  }, [docPreviewUrl]);
+
+  const createDocumentBlobUrl = async () => {
+    const signedUrl = await getDocumentUrl(vehicle.documento_url!);
+    const response = await fetch(signedUrl);
+    if (!response.ok) throw new Error('Não foi possível carregar o documento.');
+    const blob = await response.blob();
+    return URL.createObjectURL(blob);
+  };
+
+  const handleViewDocument = async () => {
+    try {
+      const blobUrl = await createDocumentBlobUrl();
+      setDocPreviewUrl((previous) => {
+        if (previous) URL.revokeObjectURL(previous);
+        return blobUrl;
+      });
+    } catch (err: any) {
+      toast.error(err.message || 'Erro ao abrir documento');
+    }
+  };
+
+  const handleDownloadDocument = async () => {
+    try {
+      const blobUrl = await createDocumentBlobUrl();
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = `documento-${vehicle.placa || 'veiculo'}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(blobUrl);
+    } catch (err: any) {
+      toast.error(err.message || 'Erro ao baixar documento');
+    }
+  };
 
   const openFuelEdit = (f: any) => {
     setEditFuelId(f.id);
@@ -713,31 +755,14 @@ function VehicleDetailContent({ vehicle, members, userId, kmTotal, fuelCostTotal
         {vehicle.documento_url ? (
           <div className="flex items-center gap-2 flex-wrap">
             <button
-              onClick={async () => {
-                try {
-                  const url = await getDocumentUrl(vehicle.documento_url!);
-                  window.open(url, '_blank');
-                } catch (err: any) { toast.error(err.message || 'Erro ao abrir documento'); }
-              }}
+              onClick={handleViewDocument}
               className="flex-1 min-w-[140px] flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl bg-primary/5 border border-primary/15 text-xs font-medium text-primary hover:bg-primary/10 transition-colors"
             >
               <Eye className="w-4 h-4" />
               Ver documento PDF
             </button>
             <button
-              onClick={async () => {
-                try {
-                  const url = await getDocumentUrl(vehicle.documento_url!);
-                  const a = document.createElement('a');
-                  a.href = url;
-                  a.download = `documento-${vehicle.placa || 'veiculo'}.pdf`;
-                  a.target = '_blank';
-                  a.rel = 'noopener noreferrer';
-                  document.body.appendChild(a);
-                  a.click();
-                  a.remove();
-                } catch (err: any) { toast.error(err.message || 'Erro ao baixar documento'); }
-              }}
+              onClick={handleDownloadDocument}
               className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl bg-foreground/5 border border-border text-xs font-medium text-foreground hover:bg-foreground/10 transition-colors"
               aria-label="Baixar documento"
             >
@@ -765,6 +790,15 @@ function VehicleDetailContent({ vehicle, members, userId, kmTotal, fuelCostTotal
                 }}
               />
             </label>
+            {docPreviewUrl && (
+              <div className="w-full overflow-hidden rounded-xl border border-border bg-background">
+                <iframe
+                  src={docPreviewUrl}
+                  title={`Documento do veículo ${vehicle.placa || ''}`}
+                  className="h-[60dvh] min-h-[360px] w-full"
+                />
+              </div>
+            )}
           </div>
         ) : (
           <label className={cn(
