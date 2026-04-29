@@ -3,12 +3,16 @@ import Sidebar from './Sidebar';
 import OfflineBanner from './OfflineBanner';
 import PageTransition from './PageTransition';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useDriverAutoArm } from '@/hooks/useDriverAutoArm';
 import { Menu } from 'lucide-react';
 
 export default function Layout({ children }: { children: ReactNode }) {
   const isMobile = useIsMobile();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Auto-arm GPS for the assigned driver in any route (Dashboard, Escala, etc.).
+  useDriverAutoArm();
 
   const sidebarWidth = isMobile ? 0 : collapsed ? 64 : 256;
 
