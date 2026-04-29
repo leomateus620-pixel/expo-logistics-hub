@@ -333,13 +333,18 @@ export default function TransportsPage() {
     }
   }, [trackingTransportId]);
 
-  // Auto-resume on cold start ONLY for the user who actually owns GPS for an active trip.
-  // We do NOT auto-resume just because the user is the assigned motorista_user_id.
+  // Auto-arm GPS for the assigned driver. Strategy in order:
+  // 1) DB ownership (this user already owns GPS).
+  // 2) Local cache (this user, trip still active & unclaimed/ours).
+  // 3) Designated driver: this user is `motorista_user_id` of an active trip
+  //    and GPS isn't owned by anyone else → claim automatically so the live
+  //    map shows up the moment the driver opens the app, without any clicks.
+  // 4) Cleanup: drop tracking that's no longer valid for this user.
   useEffect(() => {
     if (!user?.id || !transports || transports.length === 0) return;
     const ACTIVE = ['em_andamento', 'em_retorno', 'chegou_destino'];
 
-    // 1) DB ownership: this user already owns GPS for some active trip
+    // 1) DB ownership
     const ownedActive = transports.find((t: any) =>
       ACTIVE.includes(t.status) && t.tracking_started_by_user_id === user.id
     );
@@ -351,7 +356,7 @@ export default function TransportsPage() {
       return;
     }
 
-    // 2) Local cache from this user, transport still active and unclaimed (or claimed by us)
+    // 2) Local cache
     const stored = readStoredTracking();
     if (stored && stored.userId === user.id) {
       const tracked = transports.find((t: any) => t.id === stored.transportId);
@@ -365,7 +370,34 @@ export default function TransportsPage() {
       clearStoredTracking();
     }
 
-    // 3) Anything currently tracked that is no longer valid for this user → clear
+    // 3) Auto-arm: this user is the designated driver of an active trip and
+    // GPS hasn't been claimed by anyone (or is already ours).
+    // Priority: em_retorno → em_andamento → chegou_destino, then most recent.
+    const PRIORITY: Record<string, number> = { em_retorno: 0, em_andamento: 1, chegou_destino: 2 };
+    const candidates = transports
+      .filter((t: any) =>
+        ACTIVE.includes(t.status)
+        && t.motorista_user_id === user.id
+        && (!t.tracking_started_by_user_id || t.tracking_started_by_user_id === user.id)
+      )
+      .sort((a: any, b: any) => {
+        const pa = PRIORITY[a.status] ?? 9;
+        const pb = PRIORITY[b.status] ?? 9;
+        if (pa !== pb) return pa - pb;
+        const da = new Date(a.inicio_em || 0).getTime();
+        const db = new Date(b.inicio_em || 0).getTime();
+        return db - da;
+      });
+    if (candidates.length > 0) {
+      const pick = candidates[0];
+      if (trackingTransportId !== pick.id) {
+        _setTrackingTransportId(pick.id);
+        writeStoredTracking(pick.id, pick.fase_atual || 'ida');
+      }
+      return;
+    }
+
+    // 4) Cleanup invalid tracking
     if (trackingTransportId) {
       const tracked = transports.find((t: any) => t.id === trackingTransportId);
       const invalid = !tracked

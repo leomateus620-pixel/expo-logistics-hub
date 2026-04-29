@@ -1,65 +1,67 @@
-## Objetivo
+## Diagnóstico
 
-Cada motorista da LOGÍSTICA passa a ter login próprio (Admin) com senha padrão única. O sistema já reconhece quem está logado para iniciar a viagem (graças ao isolamento por `motorista_user_id` + `tracking_device_id`), então basta cada um entrar com a própria conta para o GPS dele ser o usado.
+Confirmei no banco que **nenhuma viagem ativa** tem `tracking_device_id` ou `tracking_started_by_user_id` preenchidos:
 
-## O que vai acontecer
+| Viagem | Motorista | Status | Owner GPS |
+|---|---|---|---|
+| Vladimir → Passo Fundo | VLADIMIR | em_retorno | (vazio) |
+| Ricardo C. → Santo Ângelo | RICARDO C. | em_andamento | (vazio) |
+| Lucas → Chapecó | LUCAS | chegou_destino | (vazio) |
+| Marcelo → PREFEITO MANTEI | MARCELO | chegou_destino | (vazio) |
+| Micael → Santo Ângelo | MICAEL | chegou_destino | (vazio) |
 
-### 1. Promoção a Admin (8 pessoas)
+A tabela `transport_locations` está vazia para essas viagens.
 
-Promoção de `operador` → `admin` na organização:
+### Causa raiz
 
-| Nome | Email |
-|---|---|
-| LEONARDO MATEUS STROSCHEIN | leomateus620@gmail.com |
-| LUCAS FRANKEN | lucas.franken@gmail.com |
-| LUIS FERNANDO FURLANETTO | lffurla@gmail.com |
-| MARCELO DE BAIRROS | marcelo.bairros84@gmail.com |
-| MICAEL ARCANJO BÖCK | micael@fenasoja.com.br |
-| RICARDO CARPENEDO CAETANO | ricardoccaetano@hotmail.com |
-| RICARDO EMILIO ZIMMERMANN | ricardo@escritoriozimmermann.com.br |
-| VLADIMIR ANTÔNIO MADALOSSO DA ROSA | vladi@fenasoja.com.br |
+O hook `useLocationTracking` só chama `startTracking()` quando `trackingTransportId` está preenchido (linha 330-334 de `TransportsPage.tsx`). E `trackingTransportId` só é preenchido por **3 caminhos**:
 
-Eduardo Santos já é Admin — não muda.
+1. **Auto-resume**: o usuário **já era dono** (`tracking_started_by_user_id === user.id`) — circular, depende de já ter publicado antes.
+2. **Cache local**: o usuário precisou já ter clicado uma vez nesse navegador.
+3. **Clique manual** em algum botão (não óbvio para o motorista).
 
-### 2. Senha inicial padrão
+Como nenhum motorista nunca foi “marcado dono” no banco (depende do primeiro publish, e o publish depende do tracking estar rodando), o ciclo nunca começa. Resultado: motoristas abrem o app e o GPS **nunca arma** sozinho — por isso o mapa ao vivo nunca aparece, nem na ida nem na volta.
 
-**Senha: `Fenasoja@2026`** definida para todos os 8 acima.
+## Correção proposta
 
-Cada motorista entra com **email pessoal + Fenasoja@2026**, depois pode trocar em "Configurações → Minha Conta" se quiser. (Ela passa no HIBP Check porque mistura maiúscula/símbolo.)
+Fazer o tracking **armar automaticamente** assim que o motorista designado abre o app e existe uma viagem ativa atribuída a ele, sem depender do estado do banco.
 
-### 3. Como o sistema "sabe" quem é o motorista
+### 1. `src/pages/TransportsPage.tsx` — auto-claim por motorista designado
 
-Já está pronto pelos ajustes anteriores:
+Adicionar uma 4ª regra no `useEffect` de auto-resume, antes da regra do cache local:
 
-- Ao iniciar o transporte, o GPS só é reivindicado pelo **primeiro `publish` do motorista designado** (validado por `motorista_user_id` + `tracking_device_id` no banco).
-- Se Marcelo abrir o app dele e iniciar a viagem onde ele é o motorista, o GPS dele é registrado. Ninguém mais consegue sobrescrever.
-- Se outro coordenador clicar "Iniciar viagem" remotamente, o transporte muda de status, mas o GPS espera o motorista verdadeiro abrir o app.
+- Se existir uma viagem em status ativo (`em_andamento`, `em_retorno`, `chegou_destino`) **com `motorista_user_id === user.id`** **e** o GPS ainda não pertence a outro usuário (ou já é nosso, ou está vazio), seleciona ela como `trackingTransportId` automaticamente.
+- Critério de desempate quando há mais de uma: prioridade `em_retorno` → `em_andamento` → `chegou_destino`, depois `inicio_em` mais recente.
+- Se já existir owner em outro user (`tracking_started_by_user_id !== user.id` e `!= null`), **não** tenta — respeita o motorista atual.
 
-Não há mudança de UI necessária — só a separação de contas resolve a "bagunça".
+Isso garante que Vladimir abrindo o app vê o GPS dele iniciar sozinho na viagem em retorno; Ricardo C. abrindo vê iniciar na ida dele; etc.
 
-## Como executo
+### 2. `src/components/TransportDynamicIsland.tsx` — botão visível “Iniciar GPS”
 
-Crio um Edge Function **one-shot** chamado `setup-driver-admins` que:
+Hoje o aviso “Aguardando o motorista abrir o app…” aparece para os observadores, mas o motorista designado vendo o próprio card não tem um CTA óbvio caso o auto-arm falhe (permissão negada antes, etc.). Adicionar:
 
-1. Exige que quem chamar seja Admin da org (ou seja, você).
-2. Para cada motorista: faz `UPDATE org_members SET role='admin'` + `auth.admin.updateUserById(..., { password })`.
-3. Retorna o relatório de sucesso/erro por pessoa.
+- Se `t.motorista_user_id === user.id` **e** `!isMyTracking` **e** status ativo → mostrar botão “Iniciar meu GPS desta viagem” que chama `setTrackingTransportId(t.id, t.fase_atual)`.
+- Mantém o aviso atual para os outros usuários.
 
-Em seguida disparo a função uma única vez via `curl_edge_functions` com seu token de admin atual. A função fica no projeto (não deletada) caso precise resetar senhas no futuro — mas só Admin consegue chamar.
+### 3. Resetar tracking ao trocar de viagem ativa
 
-## Comunicado para os motoristas (sugestão)
+No mesmo `useEffect` de auto-resume, se o motorista já está com `trackingTransportId = A` mas A já não é mais ativa (concluída/cancelada) e existe outra viagem ativa B atribuída a ele, trocar de A → B (o singleton `locationTracker.start()` já trata o swap limpamente).
 
-> Olá! Seu acesso ao Fenasoja Logística foi liberado.
-> 
-> **Site:** www.fenasojalog.com
-> **Login:** seu email cadastrado
-> **Senha inicial:** Fenasoja@2026
-> 
-> Após entrar, vá em Configurações → Minha Conta para trocar a senha.
-> Para iniciar suas viagens, **sempre entre com sua própria conta** — assim o GPS do seu celular será o usado durante o transporte.
+### 4. Sem mudanças de banco/RLS
 
-## Arquivos
+O backend já está correto:
+- `publish_transport_location` valida motorista designado e device_id
+- `arrive_destination` e `start_return` já limpam `tracking_*` para a próxima fase reivindicar limpo
+- `reset_transport_tracking` está disponível como auxiliar
 
-- **Novo**: `supabase/functions/setup-driver-admins/index.ts`
-- **Sem migration de schema** (operação é só dado via Auth Admin API).
-- Nenhuma outra alteração de UI ou lógica.
+## Arquivos a alterar
+
+- `src/pages/TransportsPage.tsx` — nova regra de auto-arm para motorista designado + swap entre viagens
+- `src/components/TransportDynamicIsland.tsx` — CTA “Iniciar meu GPS” para o motorista quando o auto-arm não disparou
+
+## Resultado esperado
+
+Após a mudança:
+- **Vladimir** abrindo o app → GPS arma automaticamente na viagem Santa Rosa→Passo Fundo (em_retorno) → mapa ao vivo aparece para todo mundo.
+- **Ricardo C., Lucas, Marcelo, Micael** abrindo cada um o app → cada um arma na própria viagem, sem misturar.
+- Quem **não é o motorista** continua vendo apenas o mapa ao vivo (read-only) via `useTransportLocation`, sem nunca publicar.

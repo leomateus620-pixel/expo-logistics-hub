@@ -4,6 +4,7 @@ import { Navigation, MapPinOff, Clock, ArrowRight, Ruler, Timer, Square, Play, E
 import { useTransportLocation } from '@/hooks/useLocationTracking';
 import { isInReturnTripWindow } from '@/hooks/useTransports';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import { calculateHeading, smoothHeading, haversineDistance } from '@/lib/heading';
 import FullscreenMapDialog from '@/components/transport/FullscreenMapDialog';
 
@@ -80,6 +81,7 @@ export default function TransportDynamicIsland({
   onCycleStatus,
   onDetail,
 }: TransportDynamicIslandProps) {
+  const { user } = useAuth();
   const isReturning = t.status === 'em_retorno';
   const isAtDestination = t.status === 'chegou_destino';
   const isActive = t.status === 'em_andamento' || isReturning;
@@ -87,6 +89,8 @@ export default function TransportDynamicIsland({
   const [mapFullscreen, setMapFullscreen] = useState(false);
   const isCancelled = t.status === 'cancelado';
   const isDone = t.status === 'concluido';
+  const isAssignedDriver = !!user?.id && t.motorista_user_id === user.id;
+  const gpsClaimedByOther = !!t.tracking_started_by_user_id && t.tracking_started_by_user_id !== user?.id;
 
   // Stream live location during outbound and return phases (and pin while at destination)
   const location = useTransportLocation((isActive || isAtDestination) ? t.id : null);
@@ -482,6 +486,20 @@ export default function TransportDynamicIsland({
                 <span>Obtendo localização...</span>
               </div>
             )
+          )}
+
+
+          {/* Driver CTA: when this user is the assigned driver but GPS hasn't started here yet */}
+          {isAssignedDriver && !isMyTracking && !gpsClaimedByOther && (isActive || isAtDestination) && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                setTrackingTransportId(t.id);
+              }}
+              className="w-full flex items-center justify-center gap-2 h-10 rounded-xl bg-accent/15 hover:bg-accent/25 text-xs font-semibold text-accent transition-all active:scale-[0.97]"
+            >
+              <Navigation className="w-3.5 h-3.5" /> Iniciar meu GPS desta viagem
+            </button>
           )}
 
           {/* Metrics row */}
