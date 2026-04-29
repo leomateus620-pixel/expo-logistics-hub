@@ -589,26 +589,29 @@ export default function TransportDynamicIsland({
             </button>
           </div>
 
-          {/* Fullscreen map dialog with split view */}
+          {/* Fullscreen map dialog — só passa coord do motorista se for GPS REAL fresco */}
           {(location || destCoords || originCoords) && (
             <FullscreenMapDialog
               open={mapFullscreen}
               onOpenChange={setMapFullscreen}
-              latitude={location?.latitude ?? originCoords?.[0] ?? destCoords![0]}
-              longitude={location?.longitude ?? originCoords?.[1] ?? destCoords![1]}
-              accuracy={location?.accuracy}
-              speed={location?.speed}
+              hasRealDriverLocation={!!location && !location.isStale}
+              latitude={location && !location.isStale ? location.latitude : null}
+              longitude={location && !location.isStale ? location.longitude : null}
+              accuracy={location && !location.isStale ? location.accuracy : null}
+              speed={location && !location.isStale ? location.speed : null}
               driverName={driverName}
               routePolyline={livePolyline || routePolyline || previewPolyline}
+              originLatLng={originCoords}
               destLatLng={destCoords}
-              destLabel={t.destino}
-              origemLabel={t.origem}
-              isLive={isActive && !!location}
+              destLabel={isReturning ? t.origem : t.destino}
+              origemLabel={isReturning ? t.destino : t.origem}
+              isLive={isActive && !!location && !location.isStale}
               etaText={liveDestRoute ? `Chegada ~${liveDestRoute.arrivalTime}` : etaText ? `~${etaText}` : null}
               heading={heading}
               distanceKm={liveDestRoute?.km ?? (estimatedKm ? Number(estimatedKm) : null)}
               durationMin={liveDestRoute?.minutes ?? t.duracao_estimada_min}
               status={t.status}
+              isAssignedDriver={isAssignedDriver}
               onCycleStatus={onCycleStatus}
               onDetail={onDetail}
             />
