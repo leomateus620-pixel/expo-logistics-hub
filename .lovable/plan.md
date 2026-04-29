@@ -1,76 +1,56 @@
-## Diagnóstico do problema
+## Diagnóstico
 
-Investiguei o transporte do **MARCELO DE BAIRROS** (Santa Rosa → PREFEITO MANTEI → Santa Rosa) e descobri o problema raiz consultando a base.
+A correção anterior já garante que **só o motorista designado pode publicar GPS** (checagem no frontend + função `publish_transport_location`). Falta blindar contra mistura de localizações entre transportes/dispositivos quando:
 
-| Campo | Valor encontrado |
-|---|---|
-| `motorista_user_id` | MARCELO DE BAIRROS ✅ |
-| `tracking_started_by_user_id` | **EDUARDO SANTOS** ❌ |
-| `transport_locations.driver_user_id` | **EDUARDO SANTOS** ❌ |
+1. O mesmo usuário acidentalmente reativa o GPS num transporte que não é mais dele.
+2. O motorista abre o app em **dois dispositivos** (celular + desktop) e os dois começam a publicar.
+3. Outra aba/usuário entra no celular do motorista e confunde a `geolocation.watchPosition` ativa.
+4. Um transporte muda de fase (ida → retorno) e o `transport_id` antigo continua sendo publicado.
 
-E não foi só esse — os 3 transportes ativos hoje (Marcelo, Micael Böck e Ricardo Carpenedo) estão todos com **EDUARDO SANTOS** como dono do GPS. Ou seja, o Eduardo (operador/coordenador) clicou em "Iniciar viagem" pelo dispositivo dele para as 3 viagens, e o sistema "claimou" a localização do celular dele em vez da dos motoristas reais.
+## Correção (4 frentes)
 
-### Causa técnica
+### 1. Identificador de dispositivo (device fingerprint)
 
-Em `TransportsPage.tsx` linha 809, depois de iniciar a viagem o código faz:
-```ts
-setTrackingTransportId(t.id);
-toast.success('Viagem iniciada — localização ativada');
-```
-**Sem checar se o usuário logado é o motorista designado.** Qualquer pessoa que aperta o botão vira dono do GPS daquela viagem (a função `publish_transport_location` reivindica `tracking_started_by_user_id` na primeira publicação).
+Adicionar 2 colunas em `public.transports`:
+- `tracking_device_id text` — UUID gerado no primeiro start, persistido em `localStorage` (`fenasoja_device_id`).
+- `tracking_user_agent text` — diagnóstico (navegador/SO).
 
-A intenção original do produto é clara: a localização exibida no card precisa ser a do motorista que está dirigindo, não a de quem agendou/iniciou a viagem do escritório.
+Atualizar `publish_transport_location()` para receber `_device_id` e exigir que ele bata com o registrado. Se outro dispositivo tentar publicar (mesmo do mesmo user), recebe erro `"Outro dispositivo já está enviando a localização desta viagem"`.
 
-## Correção (3 frentes)
+### 2. Singleton global de tracking no frontend
 
-### 1. Limpar o GPS errado dos 3 transportes ativos (migration SQL)
+Hoje cada montagem do `useLocationTracking` cria um `watchPosition`. Vou centralizar num **singleton module** (`src/lib/locationTracker.ts`) que:
+- Mantém **apenas um `watchPosition` ativo por aba**, mesmo se o hook montar em vários lugares.
+- Guarda `currentTransportId` e `currentDeviceId` em memória.
+- Antes de cada `publish`, valida no DB que: `status` é ativo, `motorista_user_id === user.id`, `tracking_device_id IS NULL OR === currentDeviceId`.
+- Se mudar o `transportId`, **para o watch antigo** antes de criar o novo (evita coordenadas vazando entre transportes).
 
-Para cada um dos 3 transportes ativos com tracker errado:
-- `DELETE FROM transport_locations WHERE transport_id IN (...)` — remove as coordenadas do Eduardo.
-- `UPDATE transports SET tracking_started_by_user_id = NULL, tracking_started_at = NULL WHERE id IN (...)` — libera o slot de GPS para que o motorista correto possa começar a publicar do celular dele.
+`useLocationTracking` vira um wrapper fino que delega ao singleton e expõe estado reativo.
 
-Isso devolve o estado "aguardando GPS do motorista" — quando Marcelo (e os outros) abrir o app no celular dele, o auto-resume já existente em `TransportsPage.tsx` (linhas 338+) vai iniciar o tracking corretamente, porque ele é o `motorista_user_id`.
+### 3. Limpeza explícita ao mudar de fase
 
-### 2. Bloquear publicação de GPS por quem não é o motorista (frontend)
+No edge function `transport-lifecycle`, no `handleArriveDestination`, **deletar a linha de `transport_locations` da fase de ida** antes de mudar status para `chegou_destino`. E no `handleStartReturn`/equivalente, resetar `tracking_device_id` para permitir que o motorista reinicie do zero (mesmo dispositivo na maioria dos casos, mas garantia de fluxo limpo).
 
-Em `src/pages/TransportsPage.tsx`, no handler que inicia a viagem (próximo da linha 809) e no `useEffect` de auto-resume (linhas 330-334):
+### 4. Hardening visual
 
-```ts
-// Só ativa GPS local se o usuário logado for o motorista designado
-const isAssignedDriver = t.motorista_user_id === user?.id;
-if (isAssignedDriver) {
-  setTrackingTransportId(t.id);
-  toast.success('Viagem iniciada — localização ativada');
-} else {
-  toast.success('Viagem iniciada — aguardando GPS do motorista');
-}
-```
+No `TransportDynamicIsland.tsx`, exibir badge sutil: **"GPS via [nome do motorista] · [iniciais do dispositivo]"** quando o card é aberto por outros usuários acompanhando — só leitura, evita confusão "de quem é essa localização?".
 
-Mesma checagem no `useEffect` linha 330-334 antes de chamar `startTracking()`.
+## Comportamento esperado
 
-### 3. Defesa em profundidade no banco (migration)
-
-Atualizar `publish_transport_location()` para rejeitar publicações de quem não é o motorista quando há um motorista designado:
-
-```sql
--- dentro de publish_transport_location, antes do "claim ownership":
-IF v_transport.motorista_user_id IS NOT NULL 
-   AND v_transport.motorista_user_id <> v_user THEN
-  RAISE EXCEPTION 'Apenas o motorista designado pode publicar a localização desta viagem';
-END IF;
-```
-
-Assim, mesmo se o frontend falhar, o backend nunca grava a localização errada. Motoristas continuam podendo iniciar/publicar normalmente; coordenadores apenas agendam e iniciam administrativamente sem virar fonte de GPS.
-
-### Comportamento esperado depois
-
-- O Eduardo (ou qualquer coordenador) pode continuar clicando em "Iniciar viagem" do escritório — só não vira fonte de GPS.
-- O Marcelo abre o app no celular dele → auto-resume detecta que ele é o motorista da viagem ativa → reivindica `tracking_started_by_user_id` → coordenadas reais começam a aparecer no card.
-- O fluxo de WhatsApp, KM automático, retorno e demais lógicas seguem inalterados.
+| Cenário | Antes | Depois |
+|---|---|---|
+| Marcelo inicia GPS no celular | OK | OK + dispositivo registrado |
+| Marcelo abre o app no PC e clica em "Iniciar GPS" | PC sobrescreve | PC recebe erro educado, celular continua mandando |
+| Eduardo (admin) clica iniciar | Já bloqueado | Já bloqueado |
+| Marcelo finaliza ida e inicia retorno | Pode vazar coordenadas | Linha antiga deletada, dispositivo re-permitido |
+| Outros operadores acompanham viagem | OK | OK + badge "GPS via Marcelo" |
 
 ## Arquivos afetados
 
-- **Nova migration SQL**: limpeza dos 3 transports + atualização de `publish_transport_location`.
-- **`src/pages/TransportsPage.tsx`**: checagem `motorista_user_id === user?.id` antes de `setTrackingTransportId` no `startActive` e no `useEffect` de auto-start.
+- **Migration**: novas colunas `tracking_device_id`, `tracking_user_agent` em `transports`; nova assinatura de `publish_transport_location` com `_device_id` + `_user_agent`.
+- **Novo**: `src/lib/locationTracker.ts` (singleton de geolocation).
+- **Editar**: `src/hooks/useLocationTracking.ts` (delegar ao singleton, enviar device_id).
+- **Editar**: `supabase/functions/transport-lifecycle/index.ts` (limpar `transport_locations` em arrive/start_return + resetar device_id).
+- **Editar**: `src/components/TransportDynamicIsland.tsx` (badge "GPS via X").
 
-Nenhuma outra parte do fluxo (lifecycle, WhatsApp, KM, retorno) é tocada.
+Nenhuma outra parte do fluxo (KM, WhatsApp, retorno automático, ETA) é tocada.
