@@ -396,7 +396,7 @@ export default function TransportDynamicIsland({
           <div className="h-px bg-border/40" />
 
           {/* Map area */}
-          {(isActive || (t.rota_polyline && !isDone)) && (
+          {(isActive || ((t.rota_polyline || previewPolyline) && !isDone)) && (
             <div className="rounded-2xl overflow-hidden border border-border/30">
               {location && isActive ? (
                 <Suspense fallback={
