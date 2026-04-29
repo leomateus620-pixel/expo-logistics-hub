@@ -161,22 +161,45 @@ function NavigationMap3DInner({
     });
   }, [latitude, longitude, heading, speed]);
 
-  // Update route polyline
+  // Update / create route polyline whenever it changes (handles late arrival of polyline)
   useEffect(() => {
     const map = mapRef.current;
     if (!map || !routePolyline || routePolyline.length < 2) return;
 
-    const source = map.getSource('route') as maplibregl.GeoJSONSource | undefined;
-    if (source) {
-      source.setData({
-        type: 'Feature',
-        properties: {},
-        geometry: {
-          type: 'LineString',
-          coordinates: routePolyline.map(([lat, lng]) => [lng, lat]),
-        },
-      });
-    }
+    const apply = () => {
+      const coords = routePolyline.map(([lat, lng]) => [lng, lat]);
+      const source = map.getSource('route') as maplibregl.GeoJSONSource | undefined;
+      if (source) {
+        source.setData({
+          type: 'Feature',
+          properties: {},
+          geometry: { type: 'LineString', coordinates: coords },
+        });
+      } else {
+        map.addSource('route', {
+          type: 'geojson',
+          data: {
+            type: 'Feature',
+            properties: {},
+            geometry: { type: 'LineString', coordinates: coords },
+          },
+        });
+        map.addLayer({
+          id: 'route-line',
+          type: 'line',
+          source: 'route',
+          paint: {
+            'line-color': 'hsl(142, 50%, 35%)',
+            'line-width': 5,
+            'line-opacity': 0.8,
+          },
+          layout: { 'line-cap': 'round', 'line-join': 'round' },
+        });
+      }
+    };
+
+    if (map.isStyleLoaded()) apply();
+    else map.once('load', apply);
   }, [routePolyline]);
 
   // Update dest marker
