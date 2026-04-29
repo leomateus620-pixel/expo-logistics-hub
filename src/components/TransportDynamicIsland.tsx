@@ -206,9 +206,9 @@ export default function TransportDynamicIsland({
   }, [isActive, isAtDestination, location, routePolyline, originCoords, destCoords, isReturning, t.origem, t.destino]);
 
 
-  // Fetch live route + ETA when location updates
+  // Fetch live route + ETA when location updates (apenas com GPS real recente)
   useEffect(() => {
-    if (!location || !isActive) return;
+    if (!location || location.isStale || !isActive) return;
     const now = Date.now();
 
     // Adaptive throttle:
@@ -427,21 +427,24 @@ export default function TransportDynamicIsland({
                   </div>
                 }>
                   <div className="relative">
+                    {/* Mapa só com a rota planejada (SEM marker do motorista),
+                        para não confundir origem planejada com posição real. */}
                     <DriverLocationMap
                       latitude={originCoords[0]}
                       longitude={originCoords[1]}
-                      driverName={isReturning ? t.destino : t.origem}
+                      driverName={undefined}
                       className="h-[160px] relative"
-                      routePolyline={livePolyline || routePolyline || previewPolyline}
+                      routePolyline={routePolyline || previewPolyline}
                       destLatLng={destCoords}
                       destLabel={t.destino}
+                      hideDriverMarker
                     />
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/30 backdrop-blur-[1px] rounded-2xl px-3">
-                      <span className="flex items-center gap-2 bg-card/90 px-3 py-1.5 rounded-full text-xs font-medium text-foreground text-center">
+                    <div className="absolute inset-0 flex items-end justify-center pointer-events-none p-2">
+                      <span className="flex items-center gap-2 bg-card/95 px-3 py-1.5 rounded-full text-[11px] font-medium text-foreground border border-border/40 shadow-sm">
                         <Navigation className="w-3.5 h-3.5 animate-pulse text-accent shrink-0" />
                         {location?.isStale
-                          ? `Aguardando localização real… (última há ${Math.round((location.ageSeconds || 0) / 60)} min)`
-                          : 'Aguardando localização real do motorista…'}
+                          ? `GPS sem sinal há ${Math.round((location.ageSeconds || 0) / 60)} min`
+                          : 'Aguardando GPS real do motorista'}
                       </span>
                     </div>
                   </div>
@@ -471,16 +474,22 @@ export default function TransportDynamicIsland({
           )}
 
 
-          {/* Driver CTA: when this user is the assigned driver but GPS hasn't started here yet */}
-          {isAssignedDriver && !isMyTracking && !gpsClaimedByOther && (isActive || isAtDestination) && (
+          {/* Driver CTA: enquanto NÃO houver coordenada real recebida deste motorista,
+              mostre o botão para liberar/refazer a permissão de GPS via gesto direto. */}
+          {isAssignedDriver && !gpsClaimedByOther && (isActive || isAtDestination) && (!location || location.isStale) && (
             <button
-              onClick={(e) => {
+              onClick={async (e) => {
                 e.stopPropagation();
+                // Gesto direto do usuário → libera watchPosition no iOS/Safari
                 setTrackingTransportId(t.id);
+                try {
+                  await locationTracker.startTracking();
+                } catch { /* erros aparecem no painel acima */ }
               }}
-              className="w-full flex items-center justify-center gap-2 h-10 rounded-xl bg-accent/15 hover:bg-accent/25 text-xs font-semibold text-accent transition-all active:scale-[0.97]"
+              className="w-full flex items-center justify-center gap-2 h-11 rounded-xl bg-accent text-accent-foreground text-sm font-semibold transition-all active:scale-[0.97] shadow-md"
             >
-              <Navigation className="w-3.5 h-3.5" /> Iniciar meu GPS desta viagem
+              <Navigation className="w-4 h-4" />
+              {isMyTracking ? 'Reativar GPS desta viagem' : 'Ativar GPS desta viagem'}
             </button>
           )}
 

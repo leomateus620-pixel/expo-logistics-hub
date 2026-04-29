@@ -1,8 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Navigation, X } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useTransports } from '@/hooks/useTransports';
-import { locationTracker } from '@/lib/locationTracker';
+import { locationTracker, type TrackerSnapshot } from '@/lib/locationTracker';
 import { toast } from '@/hooks/use-toast';
 
 const ACTIVE = ['em_andamento', 'em_retorno', 'chegou_destino'];
@@ -19,15 +19,19 @@ export default function DriverGpsBanner() {
   const { transports } = useTransports();
   const [dismissed, setDismissed] = useState(false);
   const [starting, setStarting] = useState(false);
+  const [snap, setSnap] = useState<TrackerSnapshot>(locationTracker.getSnapshot());
+  useEffect(() => locationTracker.subscribe(setSnap), []);
 
   const target = useMemo(() => {
     if (!user?.id || !transports?.length) return null;
-    // Já estou trackeando algo? Não mostrar.
-    const snap = locationTracker.getSnapshot();
-    if (snap.isTracking && snap.transportId) return null;
+
+    // Se já estou trackeando E já tenho coordenada real publicada (lat/lng), nada a fazer.
+    if (snap.isTracking && snap.transportId && snap.latitude != null && snap.longitude != null) {
+      return null;
+    }
 
     // Sou motorista designado de alguma viagem ativa que ainda
-    // não tem outro dono de GPS?
+    // não tem outro dono de GPS? (independente de estar "isTracking" sem fix)
     return (
       transports.find(
         (t: any) =>
@@ -36,7 +40,7 @@ export default function DriverGpsBanner() {
           (!t.tracking_started_by_user_id || t.tracking_started_by_user_id === user.id),
       ) || null
     );
-  }, [user?.id, transports]);
+  }, [user?.id, transports, snap.isTracking, snap.transportId, snap.latitude, snap.longitude]);
 
   if (!target || dismissed) return null;
 
@@ -79,10 +83,12 @@ export default function DriverGpsBanner() {
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-xs font-semibold text-foreground leading-tight">
-            Você é o motorista desta viagem
+            {snap.error ? 'GPS precisa da sua permissão' : 'Você é o motorista desta viagem'}
           </p>
           <p className="text-[11px] text-muted-foreground leading-tight truncate">
-            {target.origem} → {target.destino} · toque para enviar sua localização
+            {snap.error
+              ? snap.error
+              : `${target.origem} → ${target.destino} · toque para enviar sua localização`}
           </p>
         </div>
         <button
@@ -90,7 +96,7 @@ export default function DriverGpsBanner() {
           disabled={starting}
           className="shrink-0 h-9 px-3 rounded-xl bg-accent text-accent-foreground text-xs font-semibold disabled:opacity-60 active:scale-95 transition-transform"
         >
-          {starting ? 'Ativando…' : 'Ativar GPS'}
+          {starting ? 'Ativando…' : snap.error ? 'Tentar novamente' : 'Ativar GPS'}
         </button>
         <button
           onClick={() => setDismissed(true)}

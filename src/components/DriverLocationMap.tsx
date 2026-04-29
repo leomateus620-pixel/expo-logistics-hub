@@ -13,9 +13,12 @@ interface DriverLocationMapProps {
   destLatLng?: [number, number];
   destLabel?: string;
   zoomControl?: boolean;
+  /** Quando true, NÃO renderiza o pin do motorista (usado para mostrar
+   * apenas a rota planejada enquanto não há GPS real do dispositivo). */
+  hideDriverMarker?: boolean;
 }
 
-export default function DriverLocationMap({ latitude, longitude, accuracy, speed, driverName, className, routePolyline, destLatLng, destLabel, zoomControl = false }: DriverLocationMapProps) {
+export default function DriverLocationMap({ latitude, longitude, accuracy, speed, driverName, className, routePolyline, destLatLng, destLabel, zoomControl = false, hideDriverMarker = false }: DriverLocationMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const markerRef = useRef<L.Marker | null>(null);
@@ -40,36 +43,40 @@ export default function DriverLocationMap({ latitude, longitude, accuracy, speed
         mapInstanceRef.current?.invalidateSize();
       }, 600);
 
-      // Driver icon
-      const carIcon = L.divIcon({
-        html: `<div style="background:hsl(142,50%,35%);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3);font-size:14px;">🚗</div>`,
-        iconSize: [28, 28],
-        iconAnchor: [14, 14],
-        className: '',
-      });
+      // Driver icon (oculto quando hideDriverMarker)
+      if (!hideDriverMarker) {
+        const carIcon = L.divIcon({
+          html: `<div style="background:hsl(142,50%,35%);width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3);font-size:14px;">🚗</div>`,
+          iconSize: [28, 28],
+          iconAnchor: [14, 14],
+          className: '',
+        });
 
-      markerRef.current = L.marker([latitude, longitude], { icon: carIcon })
-        .addTo(mapInstanceRef.current);
+        markerRef.current = L.marker([latitude, longitude], { icon: carIcon })
+          .addTo(mapInstanceRef.current);
 
-      if (driverName) {
-        markerRef.current.bindTooltip(driverName, { permanent: false, direction: 'top', offset: [0, -16] });
-      }
+        if (driverName) {
+          markerRef.current.bindTooltip(driverName, { permanent: false, direction: 'top', offset: [0, -16] });
+        }
 
-      if (accuracy && accuracy < 500) {
-        circleRef.current = L.circle([latitude, longitude], {
-          radius: accuracy,
-          color: 'hsl(142,50%,35%)',
-          fillColor: 'hsl(142,50%,35%)',
-          fillOpacity: 0.08,
-          weight: 1,
-        }).addTo(mapInstanceRef.current);
+        if (accuracy && accuracy < 500) {
+          circleRef.current = L.circle([latitude, longitude], {
+            radius: accuracy,
+            color: 'hsl(142,50%,35%)',
+            fillColor: 'hsl(142,50%,35%)',
+            fillOpacity: 0.08,
+            weight: 1,
+          }).addTo(mapInstanceRef.current);
+        }
       }
     } else {
       mapInstanceRef.current.setView([latitude, longitude], mapInstanceRef.current.getZoom());
-      markerRef.current?.setLatLng([latitude, longitude]);
-      if (circleRef.current && accuracy) {
-        circleRef.current.setLatLng([latitude, longitude]);
-        circleRef.current.setRadius(accuracy);
+      if (!hideDriverMarker) {
+        markerRef.current?.setLatLng([latitude, longitude]);
+        if (circleRef.current && accuracy) {
+          circleRef.current.setLatLng([latitude, longitude]);
+          circleRef.current.setRadius(accuracy);
+        }
       }
     }
 
