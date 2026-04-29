@@ -157,6 +157,8 @@ export default function SettingsPage() {
         </div>
       </div>
 
+      <NotificationRecipientsSection />
+
       {canSeeAudit && (
         <div className="rounded-xl border bg-card p-4 sm:p-5">
           <h2 className="font-semibold flex items-center gap-2 mb-3">
