@@ -163,7 +163,7 @@ export default function TransportDetailView({ t, members, vehicles, guests, getD
           </>
         )}
 
-        {(t.inicio_real_em || t.fim_real_em) && (
+        {(t.inicio_real_em || t.chegada_destino_em || t.inicio_retorno_em || t.fim_retorno_em || t.fim_real_em) && (
           <>
             <Separator />
             <div className="rounded-xl bg-muted/30 p-3 space-y-2">
@@ -181,10 +181,22 @@ export default function TransportDetailView({ t, members, vehicles, guests, getD
                     <span className="text-muted-foreground">Iniciado em {new Date(t.inicio_real_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</span>
                   </div>
                 )}
-                {t.fim_real_em && (
+                {t.chegada_destino_em && (
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-amber-500" />
+                    <span className="text-muted-foreground">Chegou no destino em {new Date(t.chegada_destino_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</span>
+                  </div>
+                )}
+                {t.inicio_retorno_em && (
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 rounded-full bg-indigo-500" />
+                    <span className="text-muted-foreground">Iniciou viagem de volta em {new Date(t.inicio_retorno_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</span>
+                  </div>
+                )}
+                {(t.fim_retorno_em || t.fim_real_em) && (
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-success" />
-                    <span className="text-muted-foreground">Concluído em {new Date(t.fim_real_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</span>
+                    <span className="text-muted-foreground">Finalizado em {new Date(t.fim_retorno_em || t.fim_real_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</span>
                   </div>
                 )}
               </div>

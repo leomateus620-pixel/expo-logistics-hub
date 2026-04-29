@@ -527,12 +527,34 @@ export default function TransportDynamicIsland({
             </div>
           )}
 
+          {/* Arrival state */}
+          {t.status === 'chegou_destino' && t.chegada_destino_em && (
+            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-amber-500/10 border border-amber-500/15 text-xs">
+              <span className="w-2 h-2 rounded-full bg-amber-400" />
+              <span className="text-amber-700 dark:text-amber-300/80">
+                Chegou ao destino às {new Date(t.chegada_destino_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' })}
+              </span>
+            </div>
+          )}
+
+          {/* Return started state */}
+          {t.status === 'em_retorno' && t.inicio_retorno_em && (
+            <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-indigo-500/10 border border-indigo-500/15 text-xs">
+              <span className="w-2 h-2 rounded-full bg-indigo-400" />
+              <span className="text-indigo-700 dark:text-indigo-300/80">
+                Retorno iniciado às {new Date(t.inicio_retorno_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' })}
+                {t.chegada_destino_em && ` · Chegou às ${new Date(t.chegada_destino_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' })}`}
+              </span>
+            </div>
+          )}
+
           {/* Done state */}
           {isDone && t.fim_real_em && (
             <div className="flex items-center gap-2 px-3 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/15 text-xs">
               <span className="w-2 h-2 rounded-full bg-emerald-400" />
-              <span className="text-emerald-300/80">
+              <span className="text-emerald-700 dark:text-emerald-300/80">
                 Concluído às {new Date(t.fim_real_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' })}
+                {t.chegada_destino_em && ` · Chegou às ${new Date(t.chegada_destino_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' })}`}
               </span>
             </div>
           )}

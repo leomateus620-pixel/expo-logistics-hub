@@ -929,6 +929,10 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
       <div class="row"><span class="label">Destino:</span><span class="value">${t.destino}</span></div>
       <div class="row"><span class="label">Saída:</span><span class="value">${t.inicio_em ? new Date(t.inicio_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' }) : '—'}</span></div>
       ${t.fim_em ? `<div class="row"><span class="label">Devolução:</span><span class="value">${new Date(t.fim_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</span></div>` : ''}
+      ${t.inicio_real_em ? `<div class="row"><span class="label">Início real (ida):</span><span class="value">${new Date(t.inicio_real_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</span></div>` : ''}
+      ${t.chegada_destino_em ? `<div class="row"><span class="label">Chegada no destino:</span><span class="value">${new Date(t.chegada_destino_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</span></div>` : ''}
+      ${t.inicio_retorno_em ? `<div class="row"><span class="label">Início do retorno:</span><span class="value">${new Date(t.inicio_retorno_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</span></div>` : ''}
+      ${(t.fim_retorno_em || t.fim_real_em) ? `<div class="row"><span class="label">Fim do retorno:</span><span class="value">${new Date(t.fim_retorno_em || t.fim_real_em).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</span></div>` : ''}
       <div class="row"><span class="label">Motorista:</span><span class="value">${driver?.nome_exibicao || '—'}</span></div>
       ${driverCommission ? `<div class="row"><span class="label">Comissão:</span><span class="value">${driverCommission}</span></div>` : ''}
       <div class="row"><span class="label">Veículo:</span><span class="value">${vehicle ? `${vehicle.placa} ${vehicle.modelo || ''}` : '—'}</span></div>
