@@ -22,12 +22,15 @@ export default function DriverGpsBanner() {
 
   const target = useMemo(() => {
     if (!user?.id || !transports?.length) return null;
-    // Já estou trackeando algo? Não mostrar.
     const snap = locationTracker.getSnapshot();
-    if (snap.isTracking && snap.transportId) return null;
+
+    // Se já estou trackeando E já tenho coordenada real publicada (lat/lng), nada a fazer.
+    if (snap.isTracking && snap.transportId && snap.latitude != null && snap.longitude != null) {
+      return null;
+    }
 
     // Sou motorista designado de alguma viagem ativa que ainda
-    // não tem outro dono de GPS?
+    // não tem outro dono de GPS? (independente de estar "isTracking" sem fix)
     return (
       transports.find(
         (t: any) =>
