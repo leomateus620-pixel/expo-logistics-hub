@@ -1,8 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Navigation, X } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useTransports } from '@/hooks/useTransports';
-import { locationTracker } from '@/lib/locationTracker';
+import { locationTracker, type TrackerSnapshot } from '@/lib/locationTracker';
 import { toast } from '@/hooks/use-toast';
 
 const ACTIVE = ['em_andamento', 'em_retorno', 'chegou_destino'];
@@ -19,6 +19,8 @@ export default function DriverGpsBanner() {
   const { transports } = useTransports();
   const [dismissed, setDismissed] = useState(false);
   const [starting, setStarting] = useState(false);
+  const [snap, setSnap] = useState<TrackerSnapshot>(locationTracker.getSnapshot());
+  useEffect(() => locationTracker.subscribe(setSnap), []);
 
   const target = useMemo(() => {
     if (!user?.id || !transports?.length) return null;
