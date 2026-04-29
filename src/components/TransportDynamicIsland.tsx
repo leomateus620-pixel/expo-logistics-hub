@@ -23,7 +23,7 @@ const knownDestCoords: Record<string, { lat: number; lng: number }> = {
 };
 
 function getDestCoords(t: any): { lat: number; lng: number } | null {
-  if (t.destino_lat && t.destino_lng) {
+  if (t.destino_lat != null && t.destino_lng != null) {
     return { lat: t.destino_lat, lng: t.destino_lng };
   }
   if (t.titulo === 'Aeroporto' && t.voo_cidade) {
