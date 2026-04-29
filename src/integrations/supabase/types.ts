@@ -2194,8 +2194,10 @@ export type Database = {
           status: Database["public"]["Enums"]["transport_status"]
           tipo: string | null
           titulo: string | null
+          tracking_device_id: string | null
           tracking_started_at: string | null
           tracking_started_by_user_id: string | null
+          tracking_user_agent: string | null
           updated_at: string
           vehicle_id: string | null
           voo_checkin: string | null
@@ -2239,8 +2241,10 @@ export type Database = {
           status?: Database["public"]["Enums"]["transport_status"]
           tipo?: string | null
           titulo?: string | null
+          tracking_device_id?: string | null
           tracking_started_at?: string | null
           tracking_started_by_user_id?: string | null
+          tracking_user_agent?: string | null
           updated_at?: string
           vehicle_id?: string | null
           voo_checkin?: string | null
@@ -2284,8 +2288,10 @@ export type Database = {
           status?: Database["public"]["Enums"]["transport_status"]
           tipo?: string | null
           titulo?: string | null
+          tracking_device_id?: string | null
           tracking_started_at?: string | null
           tracking_started_by_user_id?: string | null
+          tracking_user_agent?: string | null
           updated_at?: string
           vehicle_id?: string | null
           voo_checkin?: string | null
@@ -2725,15 +2731,33 @@ export type Database = {
         Args: { _org_id: string; _user_id: string }
         Returns: boolean
       }
-      publish_transport_location: {
-        Args: {
-          _accuracy?: number
-          _heading?: number
-          _latitude: number
-          _longitude: number
-          _speed?: number
-          _transport_id: string
-        }
+      publish_transport_location:
+        | {
+            Args: {
+              _accuracy?: number
+              _heading?: number
+              _latitude: number
+              _longitude: number
+              _speed?: number
+              _transport_id: string
+            }
+            Returns: undefined
+          }
+        | {
+            Args: {
+              _accuracy?: number
+              _device_id?: string
+              _heading?: number
+              _latitude: number
+              _longitude: number
+              _speed?: number
+              _transport_id: string
+              _user_agent?: string
+            }
+            Returns: undefined
+          }
+      reset_transport_tracking: {
+        Args: { _transport_id: string }
         Returns: undefined
       }
       set_transport_guests: {

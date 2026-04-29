@@ -270,8 +270,13 @@ async function handleStart(admin: any, userId: string, payload: any, authHeader?
       status: "em_andamento",
       inicio_real_em: now,
       fase_atual: "ida",
-      tracking_started_by_user_id: userId,
-      tracking_started_at: now,
+      // Ownership do GPS é reivindicado pelo PRIMEIRO publish do motorista
+      // designado (com seu device_id). Coordenadores que iniciam viagens
+      // remotamente não viram fonte de localização.
+      tracking_started_by_user_id: null,
+      tracking_started_at: null,
+      tracking_device_id: null,
+      tracking_user_agent: null,
     })
     .eq("id", id)
     .select()
@@ -444,11 +449,20 @@ async function handleArriveDestination(admin: any, userId: string, payload: any)
     status: "chegou_destino",
     chegada_destino_em: now,
     fase_atual: "ida",
+    // Libera ownership do GPS para a fase de retorno reiniciar limpa.
+    tracking_started_by_user_id: null,
+    tracking_started_at: null,
+    tracking_device_id: null,
+    tracking_user_agent: null,
   };
   if (lastLoc?.latitude && lastLoc?.longitude) {
     updates.destino_lat_chegada = lastLoc.latitude;
     updates.destino_lng_chegada = lastLoc.longitude;
   }
+
+  // Limpa marcador ao vivo da fase de ida — outros usuários acompanhando
+  // veem o pino congelar no destino até o motorista iniciar a volta.
+  await admin.from("transport_locations").delete().eq("transport_id", id);
 
   const { data: updated, error: updateErr } = await admin
     .from("transports")
@@ -543,9 +557,14 @@ async function handleStartReturn(admin: any, userId: string, payload: any, authH
     status: "em_retorno",
     inicio_retorno_em: now,
     fase_atual: "volta",
-    // The user who clicks "Iniciar volta" becomes the GPS owner for the return phase
-    tracking_started_by_user_id: userId,
-    tracking_started_at: now,
+    // Ownership do GPS é reivindicado pelo PRIMEIRO publish do motorista
+    // designado (com seu device_id). Não pré-marcamos quem clicou em
+    // "Iniciar volta" como dono — isso evita que coordenadores travem o GPS
+    // em seus próprios celulares.
+    tracking_started_by_user_id: null,
+    tracking_started_at: null,
+    tracking_device_id: null,
+    tracking_user_agent: null,
   };
 
   const { data: updated, error: updateErr } = await admin
