@@ -270,8 +270,13 @@ async function handleStart(admin: any, userId: string, payload: any, authHeader?
       status: "em_andamento",
       inicio_real_em: now,
       fase_atual: "ida",
-      tracking_started_by_user_id: userId,
-      tracking_started_at: now,
+      // Ownership do GPS é reivindicado pelo PRIMEIRO publish do motorista
+      // designado (com seu device_id). Coordenadores que iniciam viagens
+      // remotamente não viram fonte de localização.
+      tracking_started_by_user_id: null,
+      tracking_started_at: null,
+      tracking_device_id: null,
+      tracking_user_agent: null,
     })
     .eq("id", id)
     .select()
