@@ -578,8 +578,14 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
       if (mode === 'start_now' && result?.id) {
         try {
           const startResult = await start.mutateAsync({ id: result.id });
-          setTrackingTransportId(result.id);
-          toast.success('Viagem iniciada — localização ativada');
+          // Só ativa o GPS local se quem está criando for o motorista designado.
+          const isAssignedDriver = !!capturedForm.motorista_user_id && capturedForm.motorista_user_id === user?.id;
+          if (isAssignedDriver) {
+            setTrackingTransportId(result.id);
+            toast.success('Viagem iniciada — localização ativada');
+          } else {
+            toast.success('Viagem iniciada — aguardando GPS do motorista');
+          }
           if (startResult?.whatsapp) {
             setStartTripWhatsappData(startResult.whatsapp);
             setStartTripWhatsappGuests(startResult.whatsappGuests || []);
