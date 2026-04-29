@@ -224,6 +224,9 @@ export default function TransportCard({ t, members, vehicles, guests, highlightI
                   driverName: driver?.nome_exibicao || 'Motorista',
                   destino: t.destino,
                   titulo: t.titulo,
+                  vehicleModel: vehicle?.modelo,
+                  vehicleColor: vehicle?.cor,
+                  vehiclePlate: vehicle?.placa,
                 });
                 window.open(buildWhatsAppUrl(guest.telefone, msg), '_blank');
               }}

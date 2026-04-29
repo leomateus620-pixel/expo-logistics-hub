@@ -26,11 +26,29 @@ export function buildWhatsAppUrl(phone: string, message: string): string {
 }
 
 /** Build dynamic message based on transport context */
+export function buildVehicleInfoSentence(opts: {
+  vehicleModel?: string | null;
+  vehicleColor?: string | null;
+  vehiclePlate?: string | null;
+}): string {
+  const model = (opts.vehicleModel || '').trim();
+  const color = (opts.vehicleColor || '').trim();
+  const plate = (opts.vehiclePlate || '').trim();
+  const descriptor = [model, color].filter(Boolean).join(' ').trim();
+  if (descriptor && plate) return `O veículo é um ${descriptor}, placa ${plate}.`;
+  if (descriptor) return `O veículo é um ${descriptor}.`;
+  if (plate) return `Placa do veículo: ${plate}.`;
+  return '';
+}
+
 export function buildTripMessage(opts: {
   guestName: string;
   driverName: string;
   destino: string;
   titulo?: string;
+  vehicleModel?: string | null;
+  vehicleColor?: string | null;
+  vehiclePlate?: string | null;
 }): string {
   const { guestName, driverName, destino, titulo } = opts;
 
@@ -41,5 +59,8 @@ export function buildTripMessage(opts: {
     destinoLabel = destino || 'Hotel';
   }
 
-  return `Olá, ${guestName}. Aqui é ${driverName}, motorista responsável pelo seu transporte da Fenasoja Logística. Estou iniciando agora o deslocamento para o ${destinoLabel}. Qualquer necessidade, fico à disposição por aqui.`;
+  const vehicleSentence = buildVehicleInfoSentence(opts);
+  const vehiclePart = vehicleSentence ? ` ${vehicleSentence}` : '';
+
+  return `Olá, ${guestName}. Aqui é ${driverName}, motorista responsável pelo seu transporte da Fenasoja Logística. Estou iniciando agora o deslocamento para o ${destinoLabel}.${vehiclePart} Qualquer necessidade, fico à disposição por aqui.`;
 }

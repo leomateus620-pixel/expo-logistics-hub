@@ -179,11 +179,30 @@ async function handleStart(admin: any, userId: string, payload: any) {
     destinoLabel = `Aeroporto${transport.voo_cidade ? ` de ${transport.voo_cidade}` : ""}`;
   }
 
+  // Fetch vehicle info for inclusion in WhatsApp message
+  let vehicleInfo = "";
+  if (transport.vehicle_id) {
+    const { data: vehicleData } = await admin
+      .from("vehicles")
+      .select("modelo, cor, placa")
+      .eq("id", transport.vehicle_id)
+      .single();
+    if (vehicleData) {
+      const model = (vehicleData.modelo || "").trim();
+      const color = (vehicleData.cor || "").trim();
+      const plate = (vehicleData.placa || "").trim();
+      const descriptor = [model, color].filter(Boolean).join(" ").trim();
+      if (descriptor && plate) vehicleInfo = ` O veículo é um ${descriptor}, placa ${plate}.`;
+      else if (descriptor) vehicleInfo = ` O veículo é um ${descriptor}.`;
+      else if (plate) vehicleInfo = ` Placa do veículo: ${plate}.`;
+    }
+  }
+
   const whatsappGuests: any[] = [];
   for (const guest of allGuests) {
     const message = guest.nome
-      ? `Olá, ${guest.nome}. Aqui é ${driverName}, motorista responsável pelo seu transporte da Fenasoja Logística. Estou iniciando agora o deslocamento para o ${destinoLabel}. Qualquer necessidade, fico à disposição por aqui.`
-      : `Transporte iniciado para ${destinoLabel}. Motorista: ${driverName}.`;
+      ? `Olá, ${guest.nome}. Aqui é ${driverName}, motorista responsável pelo seu transporte da Fenasoja Logística. Estou iniciando agora o deslocamento para o ${destinoLabel}.${vehicleInfo} Qualquer necessidade, fico à disposição por aqui.`
+      : `Transporte iniciado para ${destinoLabel}. Motorista: ${driverName}.${vehicleInfo}`;
 
     let normalizedPhone = "";
     let phoneValid = false;
@@ -209,7 +228,7 @@ async function handleStart(admin: any, userId: string, payload: any) {
   if (whatsappGuests.length === 0) {
     whatsappGuests.push({
       phone: "",
-      message: `Transporte iniciado para ${destinoLabel}. Motorista: ${driverName}.`,
+      message: `Transporte iniciado para ${destinoLabel}. Motorista: ${driverName}.${vehicleInfo}`,
       url: "",
       guestName: "",
       phoneValid: false,
