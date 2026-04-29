@@ -1,6 +1,7 @@
 import { ReactNode, useState } from 'react';
 import Sidebar from './Sidebar';
 import OfflineBanner from './OfflineBanner';
+import DriverGpsBanner from './DriverGpsBanner';
 import PageTransition from './PageTransition';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useDriverAutoArm } from '@/hooks/useDriverAutoArm';
@@ -22,6 +23,7 @@ export default function Layout({ children }: { children: ReactNode }) {
         Pular para conteúdo
       </a>
       <OfflineBanner />
+      <DriverGpsBanner />
 
       <Sidebar
         collapsed={collapsed}
