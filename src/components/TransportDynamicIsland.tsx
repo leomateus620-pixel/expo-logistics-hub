@@ -390,10 +390,10 @@ export default function TransportDynamicIsland({
                       destLatLng={destCoords}
                       destLabel={t.destino}
                     />
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-[1px] rounded-2xl">
-                      <span className="flex items-center gap-2 bg-card/90 px-3 py-1.5 rounded-full text-xs font-medium text-foreground">
-                        <Navigation className="w-3.5 h-3.5 animate-pulse text-accent" />
-                        Obtendo localização do motorista...
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-[1px] rounded-2xl px-3">
+                      <span className="flex items-center gap-2 bg-card/90 px-3 py-1.5 rounded-full text-xs font-medium text-foreground text-center">
+                        <Navigation className="w-3.5 h-3.5 animate-pulse text-accent shrink-0" />
+                        Aguardando o motorista abrir o app…
                       </span>
                     </div>
                   </div>

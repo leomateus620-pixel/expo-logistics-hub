@@ -26,6 +26,84 @@ function isInReturnWindow(inicioEm: string | null | undefined): boolean {
   return d >= RETURN_WINDOW_START && d <= RETURN_WINDOW_END;
 }
 
+// ── Canonical destination coordinates (must mirror the client knownDestCoords) ──
+const SANTA_ROSA = { lat: -27.8708, lng: -54.4814 };
+const KNOWN_DEST_COORDS: Record<string, { lat: number; lng: number }> = {
+  "Aeroporto_Chapecó": { lat: -27.1342, lng: -52.6566 },
+  "Aeroporto_Passo Fundo": { lat: -28.2434, lng: -52.3261 },
+  "Aeroporto_Santo Ângelo": { lat: -28.2823, lng: -54.1693 },
+  "Aeroporto_Porto Alegre": { lat: -29.9939, lng: -51.1714 },
+  "Aeroporto": { lat: -27.1342, lng: -52.6566 },
+};
+
+function resolveDestCoords(t: any): { lat: number; lng: number } | null {
+  if (t.destino_lat != null && t.destino_lng != null) {
+    return { lat: Number(t.destino_lat), lng: Number(t.destino_lng) };
+  }
+  if (t.titulo === "Aeroporto") {
+    const key = t.voo_cidade ? `Aeroporto_${t.voo_cidade}` : "Aeroporto";
+    return KNOWN_DEST_COORDS[key] || KNOWN_DEST_COORDS["Aeroporto"];
+  }
+  return KNOWN_DEST_COORDS[t.titulo] || null;
+}
+
+/**
+ * Ensure a transport row has origem_lat/lng, destino_lat/lng and (best effort) a base
+ * route polyline before the trip becomes active. Safe to call multiple times — it only
+ * fills in NULL fields. Network failures are silently ignored: tracking still works
+ * with at least the coordinates filled.
+ */
+async function backfillTransportGeo(admin: any, t: any): Promise<Record<string, any>> {
+  const patch: Record<string, any> = {};
+
+  if (t.origem_lat == null || t.origem_lng == null) {
+    patch.origem_lat = SANTA_ROSA.lat;
+    patch.origem_lng = SANTA_ROSA.lng;
+  }
+
+  const dest = resolveDestCoords(t);
+  if (dest && (t.destino_lat == null || t.destino_lng == null)) {
+    patch.destino_lat = dest.lat;
+    patch.destino_lng = dest.lng;
+  }
+
+  // Best-effort: fetch a base route polyline if we still don't have one.
+  if (!t.rota_polyline && dest) {
+    const originLat = (patch.origem_lat ?? t.origem_lat) ?? SANTA_ROSA.lat;
+    const originLng = (patch.origem_lng ?? t.origem_lng) ?? SANTA_ROSA.lng;
+    try {
+      const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+      const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+      const res = await fetch(`${supabaseUrl}/functions/v1/estimate-return`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${serviceRoleKey}`,
+          "apikey": serviceRoleKey,
+        },
+        body: JSON.stringify({
+          mode: "LIVE_ROUTE",
+          origin_lat: originLat,
+          origin_lng: originLng,
+          dest_lat: dest.lat,
+          dest_lng: dest.lng,
+          destination: t.destino,
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data?.polyline && !data.fallback) patch.rota_polyline = data.polyline;
+        if (data?.duration_minutes && !t.duracao_estimada_min) patch.duracao_estimada_min = data.duration_minutes;
+        if (data?.distance_km && !t.distancia_estimada_km) patch.distancia_estimada_km = Math.round(data.distance_km);
+      }
+    } catch {
+      /* network blip — coords alone are enough for live tracking */
+    }
+  }
+
+  return patch;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -151,10 +229,14 @@ async function handleStart(admin: any, userId: string, payload: any) {
   // so the current driver's GPS upserts can succeed without RLS UPDATE conflicts.
   await admin.from("transport_locations").delete().eq("transport_id", id);
 
+  // Backfill missing geo data so the live map and the route polyline render
+  // correctly regardless of which flow created the transport.
+  const geoPatch = await backfillTransportGeo(admin, transport);
+
   const now = new Date().toISOString();
   const { data: updated, error: updateErr } = await admin
     .from("transports")
-    .update({ status: "em_andamento", inicio_real_em: now, fase_atual: "ida" })
+    .update({ ...geoPatch, status: "em_andamento", inicio_real_em: now, fase_atual: "ida" })
     .eq("id", id)
     .select()
     .single();
@@ -335,8 +417,12 @@ async function handleStartReturn(admin: any, userId: string, payload: any) {
   // so the current driver can write fresh GPS without RLS conflicts.
   await admin.from("transport_locations").delete().eq("transport_id", id);
 
+  // Ensure origem coordinates exist (return phase tracks toward the origin).
+  const geoPatch = await backfillTransportGeo(admin, transport);
+
   const now = new Date().toISOString();
   const updates: Record<string, unknown> = {
+    ...geoPatch,
     status: "em_retorno",
     inicio_retorno_em: now,
     fase_atual: "volta",

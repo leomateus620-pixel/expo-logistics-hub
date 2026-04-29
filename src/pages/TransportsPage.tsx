@@ -308,6 +308,20 @@ export default function TransportsPage() {
     }
   }, [trackingTransportId]);
 
+  // Auto-resume tracking: if I'm the assigned driver of an active transport and
+  // tracking isn't running yet (cold start, refresh, switched device), start it.
+  useEffect(() => {
+    if (!user?.id || !transports || transports.length === 0) return;
+    const mine = transports.find((t: any) =>
+      t.motorista_user_id === user.id &&
+      (t.status === 'em_andamento' || t.status === 'em_retorno')
+    );
+    if (mine && trackingTransportId !== mine.id) {
+      setTrackingTransportId(mine.id);
+    }
+  }, [user?.id, transports, trackingTransportId, setTrackingTransportId]);
+
+
   const [searchParams, setSearchParams] = useSearchParams();
   const highlightId = searchParams.get('highlight');
   const actionParam = searchParams.get('action');
