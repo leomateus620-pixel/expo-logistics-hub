@@ -271,20 +271,22 @@ class LocationTracker {
       });
       if (rpcErr) {
         const msg = String(rpcErr.message || rpcErr);
-        // Erros realmente terminais (outro dono confirmado pelo banco)
         if (/dispositivo|Outro usu/i.test(msg)) {
           this.setState({ error: msg });
+          this.pushLog(`[gps:publish-block] ${msg}`);
           this.stopInternal();
           return;
         }
-        // Demais erros (rede, ownership transitório durante reset de fase) →
-        // mantém a UI viva, segue tentando no próximo tick do watchPosition.
         console.warn('[gps] publish recoverable error:', msg);
         this.setState({ error: 'Tentando reconectar a localização…' });
+        this.pushLog(`[gps:publish-error] ${msg}`);
+      } else {
+        this.pushLog('[gps:publish-ok]');
       }
     } catch (err) {
       console.warn('[gps] publish exception (will retry):', err);
       this.setState({ error: 'Conexão instável — tentando novamente…' });
+      this.pushLog(`[gps:publish-exception] ${String(err)}`);
     }
   }
 }
