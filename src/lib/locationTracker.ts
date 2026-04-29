@@ -141,21 +141,25 @@ class LocationTracker {
     this.stopInternal();
   }
 
-  private stopInternal() {
+  private stopInternal(opts: { keepCoords?: boolean } = {}) {
     if (this.watchId !== null) {
       try { navigator.geolocation.clearWatch(this.watchId); } catch { /* silent */ }
       this.watchId = null;
     }
     this.currentTransportId = null;
     this.currentUserId = null;
-    this.setState({
-      isTracking: false,
-      transportId: null,
-      latitude: null,
-      longitude: null,
-      accuracy: null,
-      speed: null,
-    });
+    if (opts.keepCoords) {
+      this.setState({ isTracking: false, transportId: null });
+    } else {
+      this.setState({
+        isTracking: false,
+        transportId: null,
+        latitude: null,
+        longitude: null,
+        accuracy: null,
+        speed: null,
+      });
+    }
   }
 
   private async publish(pos: GeolocationPosition) {
@@ -215,15 +219,20 @@ class LocationTracker {
       });
       if (rpcErr) {
         const msg = String(rpcErr.message || rpcErr);
-        if (/dispositivo|motorista designado|Outro usu/i.test(msg)) {
+        // Erros realmente terminais (outro dono confirmado pelo banco)
+        if (/dispositivo|Outro usu/i.test(msg)) {
           this.setState({ error: msg });
           this.stopInternal();
           return;
         }
-        console.error('[gps] publish failed:', msg);
+        // Demais erros (rede, ownership transitório durante reset de fase) →
+        // mantém a UI viva, segue tentando no próximo tick do watchPosition.
+        console.warn('[gps] publish recoverable error:', msg);
+        this.setState({ error: 'Tentando reconectar a localização…' });
       }
     } catch (err) {
-      console.error('[gps] publish exception:', err);
+      console.warn('[gps] publish exception (will retry):', err);
+      this.setState({ error: 'Conexão instável — tentando novamente…' });
     }
   }
 }
