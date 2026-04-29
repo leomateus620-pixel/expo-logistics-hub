@@ -103,9 +103,7 @@ export default function FullscreenMapDialog({
           {showNav && latitude != null && longitude != null && (
             <div className={cn(
               'relative transition-all duration-300',
-              viewMode === 'nav' && 'w-full h-full',
-              viewMode === 'split' && 'w-full md:w-1/2 h-[55%] md:h-full',
-              viewMode === 'aerial' && 'hidden',
+              viewMode === 'nav' ? 'w-full h-full' : 'w-full md:w-1/2 h-[55%] md:h-full',
             )}>
               <Suspense fallback={<MapFallback />}>
                 <NavigationMap3D
