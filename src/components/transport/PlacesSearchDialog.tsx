@@ -57,22 +57,11 @@ export default function PlacesSearchDialog({ open, onOpenChange, onSelect }: Pla
     setLoading(true);
     setSearched(true);
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      const res = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/places-autocomplete`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-            'Authorization': `Bearer ${session?.access_token || ''}`,
-          },
-          body: JSON.stringify({ query: q }),
-          signal: controller.signal,
-        }
-      );
-      const data = await res.json();
-      setResults(data.results || []);
+      const { data, error } = await supabase.functions.invoke('places-autocomplete', {
+        body: { query: q },
+      });
+      if (error) throw error;
+      setResults(data?.results || []);
     } catch (e: any) {
       if (e.name !== 'AbortError') setResults([]);
     } finally {

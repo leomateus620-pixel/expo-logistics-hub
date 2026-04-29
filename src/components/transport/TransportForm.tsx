@@ -104,22 +104,12 @@ export default function TransportForm({
         navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 8000, enableHighAccuracy: false })
       );
       const { latitude, longitude } = pos.coords;
-      const { data: { session } } = await supabase.auth.getSession();
-      const res = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/places-autocomplete`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-            'Authorization': `Bearer ${session?.access_token || ''}`,
-          },
-          body: JSON.stringify({ mode: 'reverse', lat: latitude, lng: longitude }),
-        }
-      );
-      const result = await res.json();
-      if (result.city) {
-        setData((prev: any) => ({ ...prev, origem: result.city.toUpperCase() }));
+      const { data: result, error } = await supabase.functions.invoke('places-autocomplete', {
+        body: { mode: 'reverse', lat: latitude, lng: longitude },
+      });
+      if (error) throw error;
+      if (result?.city) {
+        setData((prev: any) => ({ ...prev, origem: String(result.city).toUpperCase() }));
       }
     } catch {
       // silently fail - user can type manually
