@@ -757,8 +757,13 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
     if (t.status === 'pendente') {
       try {
         const result = await start.mutateAsync({ id: t.id });
-        setTrackingTransportId(t.id);
-        toast.success('Viagem iniciada — localização ativada');
+        const isDriverMe = !!user?.id && t.motorista_user_id === user.id;
+        if (isDriverMe) {
+          setTrackingTransportId(t.id);
+          toast.success('Viagem iniciada — localização ativada');
+        } else {
+          toast.success('Viagem iniciada — aguardando motorista abrir o app');
+        }
         if (result?.whatsapp) {
           setStartTripWhatsappData(result.whatsapp);
           setStartTripWhatsappGuests(result.whatsappGuests || []);
