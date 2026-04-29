@@ -389,7 +389,7 @@ export default function TransportDynamicIsland({
           {/* Map area — only render for active phases (never for pendente/concluido/cancelado) */}
           {(isActive || isAtDestination) && (
             <div className="rounded-2xl overflow-hidden border border-border/30">
-              {location && isActive ? (
+              {location && !location.isStale && isActive ? (
                 <Suspense fallback={
                   <div className="h-[160px] bg-muted/30 flex items-center justify-center">
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -411,14 +411,14 @@ export default function TransportDynamicIsland({
                     />
                     <div className="absolute top-2 right-2 flex items-center gap-1.5 bg-card/80 backdrop-blur-sm rounded-full px-2.5 py-1 text-[10px] font-medium text-foreground border border-border/40">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                      Ao vivo
+                      {location.ageSeconds < 60 ? 'Ao vivo' : `Há ${Math.round(location.ageSeconds / 60)} min`}
                     </div>
                     <div className="absolute bottom-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity bg-card/80 backdrop-blur-sm rounded-lg p-1.5 border border-border/40">
                       <Expand className="w-3.5 h-3.5 text-foreground/70" />
                     </div>
                   </div>
                 </Suspense>
-              ) : isActive && !location && destCoords && originCoords ? (
+              ) : isActive && destCoords && originCoords ? (
                 <Suspense fallback={
                   <div className="h-[160px] bg-muted/30 flex items-center justify-center">
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -436,10 +436,12 @@ export default function TransportDynamicIsland({
                       destLatLng={destCoords}
                       destLabel={t.destino}
                     />
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/20 backdrop-blur-[1px] rounded-2xl px-3">
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/30 backdrop-blur-[1px] rounded-2xl px-3">
                       <span className="flex items-center gap-2 bg-card/90 px-3 py-1.5 rounded-full text-xs font-medium text-foreground text-center">
                         <Navigation className="w-3.5 h-3.5 animate-pulse text-accent shrink-0" />
-                        Aguardando o motorista abrir o app…
+                        {location?.isStale
+                          ? `Aguardando localização real… (última há ${Math.round((location.ageSeconds || 0) / 60)} min)`
+                          : 'Aguardando localização real do motorista…'}
                       </span>
                     </div>
                   </div>
