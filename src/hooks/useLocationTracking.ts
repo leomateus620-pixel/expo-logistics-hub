@@ -12,14 +12,14 @@ interface LocationState {
   error: string | null;
 }
 
+const ACTIVE_STATUSES = new Set(['em_andamento', 'em_retorno', 'chegou_destino']);
+
 export function useLocationTracking(transportId: string | null) {
   const { orgId } = useCurrentOrg();
   const { user } = useAuth();
   const watchIdRef = useRef<number | null>(null);
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const lastPosRef = useRef<{ lat: number; lng: number } | null>(null);
 
-  // Keep refs in sync so updateLocation always reads fresh values
   const transportIdRef = useRef(transportId);
   const orgIdRef = useRef(orgId);
   const userRef = useRef(user);
@@ -37,22 +37,19 @@ export function useLocationTracking(transportId: string | null) {
     error: null,
   });
 
-  const updateLocation = useCallback(async (pos: GeolocationPosition) => {
+  const publish = useCallback(async (pos: GeolocationPosition) => {
     const tid = transportIdRef.current;
-    const oid = orgIdRef.current;
     const u = userRef.current;
-    if (!tid || !oid || !u) return;
+    if (!tid || !u) return;
 
-    // Safety guard: only the driver currently assigned to the transport may publish location.
-    // Prevents a stale tracking session (e.g. driver was swapped) from polluting the live map.
+    // Light status check — don't block on network errors, just attempt RPC.
     try {
       const { data: t } = await (supabase as any)
         .from('transports')
-        .select('motorista_user_id, status')
+        .select('status')
         .eq('id', tid)
-        .single();
-      if (!t || t.motorista_user_id !== u.id || (t.status !== 'em_andamento' && t.status !== 'em_retorno' && t.status !== 'chegou_destino')) {
-        // No longer the assigned driver (or trip not active) — stop and clean up locally.
+        .maybeSingle();
+      if (t && !ACTIVE_STATUSES.has(t.status)) {
         if (watchIdRef.current !== null) {
           navigator.geolocation.clearWatch(watchIdRef.current);
           watchIdRef.current = null;
@@ -61,7 +58,7 @@ export function useLocationTracking(transportId: string | null) {
         setState(s => ({ ...s, isTracking: false }));
         return;
       }
-    } catch { /* network blip — keep trying */ }
+    } catch { /* keep going */ }
 
     const { latitude, longitude, accuracy, speed, heading } = pos.coords;
 
@@ -76,21 +73,7 @@ export function useLocationTracking(transportId: string | null) {
 
     lastPosRef.current = { lat: latitude, lng: longitude };
 
-    const payload = {
-      transport_id: tid,
-      org_id: oid,
-      driver_user_id: u.id,
-      latitude,
-      longitude,
-      accuracy,
-      speed: speed || null,
-      heading: heading || null,
-      updated_at: new Date().toISOString(),
-    };
-
     try {
-      // Atomic upsert via security-definer RPC. The RPC validates the caller is the
-      // assigned driver and the trip is active, then UPSERTs the row by transport_id.
       const { error: rpcErr } = await (supabase as any).rpc('publish_transport_location', {
         _transport_id: tid,
         _latitude: latitude,
@@ -99,11 +82,11 @@ export function useLocationTracking(transportId: string | null) {
         _speed: speed ?? null,
         _heading: heading ?? null,
       });
-      if (rpcErr) console.error('Failed to publish location:', rpcErr);
+      if (rpcErr) console.error('[gps] publish failed:', rpcErr.message || rpcErr);
     } catch (err) {
-      console.error('Failed to update location:', err);
+      console.error('[gps] publish exception:', err);
     }
-  }, []); // No deps — reads from refs
+  }, []);
 
   const startTracking = useCallback(async () => {
     if (!navigator.geolocation) {
@@ -111,7 +94,6 @@ export function useLocationTracking(transportId: string | null) {
       return;
     }
 
-    // Check permission state first
     try {
       const perm = await navigator.permissions.query({ name: 'geolocation' as PermissionName });
       if (perm.state === 'denied') {
@@ -122,13 +104,23 @@ export function useLocationTracking(transportId: string | null) {
         return;
       }
     } catch {
-      // Some browsers don't support permissions API — proceed anyway
+      // some browsers don't support permissions API
     }
 
     setState(prev => ({ ...prev, isTracking: true, error: null }));
 
+    // Fire an immediate single fix so the map updates quickly
+    navigator.geolocation.getCurrentPosition(
+      (pos) => publish(pos),
+      () => { /* errors handled by watch below */ },
+      { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 },
+    );
+
+    if (watchIdRef.current !== null) {
+      navigator.geolocation.clearWatch(watchIdRef.current);
+    }
     watchIdRef.current = navigator.geolocation.watchPosition(
-      (pos) => updateLocation(pos),
+      (pos) => publish(pos),
       (err) => {
         let msg = 'Erro ao obter localização';
         if (err.code === 1) msg = 'Permissão de localização negada. Ative nas configurações do navegador.';
@@ -136,27 +128,19 @@ export function useLocationTracking(transportId: string | null) {
         if (err.code === 3) msg = 'Tempo esgotado ao obter localização';
         setState(prev => ({ ...prev, error: msg }));
       },
-      {
-        enableHighAccuracy: true,
-        maximumAge: 10000,
-        timeout: 15000,
-      }
+      { enableHighAccuracy: true, maximumAge: 10000, timeout: 15000 }
     );
-  }, [updateLocation]);
+  }, [publish]);
 
   const stopTracking = useCallback(async () => {
     if (watchIdRef.current !== null) {
       navigator.geolocation.clearWatch(watchIdRef.current);
       watchIdRef.current = null;
     }
-    if (intervalRef.current) {
-      clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    }
 
-    if (transportIdRef.current) {
-      await (supabase as any).from('transport_locations').delete().eq('transport_id', transportIdRef.current);
-    }
+    // Do NOT delete the live location row here. The trip lifecycle handlers
+    // (arrive_destination / complete / cancel) clean it up. Deleting here would
+    // wipe the live marker for everyone else watching the trip.
 
     setState({
       isTracking: false,
@@ -169,14 +153,10 @@ export function useLocationTracking(transportId: string | null) {
     lastPosRef.current = null;
   }, []);
 
-  // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (watchIdRef.current !== null) {
         navigator.geolocation.clearWatch(watchIdRef.current);
-      }
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
       }
     };
   }, []);
@@ -200,19 +180,22 @@ export function useTransportLocation(transportId: string | null) {
   } | null>(null);
 
   useEffect(() => {
-    if (!transportId) return;
+    if (!transportId) {
+      setLocation(null);
+      return;
+    }
 
-    // Fetch initial
+    let cancelled = false;
+
     (async () => {
       const { data } = await (supabase as any)
         .from('transport_locations')
         .select('*')
         .eq('transport_id', transportId)
-        .single();
-      if (data) setLocation(data);
+        .maybeSingle();
+      if (!cancelled && data) setLocation(data);
     })();
 
-    // Subscribe to realtime changes
     const channel = supabase
       .channel(`location-${transportId}`)
       .on(
@@ -234,6 +217,7 @@ export function useTransportLocation(transportId: string | null) {
       .subscribe();
 
     return () => {
+      cancelled = true;
       supabase.removeChannel(channel);
     };
   }, [transportId]);
