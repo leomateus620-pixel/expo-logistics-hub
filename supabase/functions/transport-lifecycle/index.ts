@@ -444,6 +444,9 @@ async function handleStartReturn(admin: any, userId: string, payload: any, authH
     status: "em_retorno",
     inicio_retorno_em: now,
     fase_atual: "volta",
+    // The user who clicks "Iniciar volta" becomes the GPS owner for the return phase
+    tracking_started_by_user_id: userId,
+    tracking_started_at: now,
   };
 
   const { data: updated, error: updateErr } = await admin
