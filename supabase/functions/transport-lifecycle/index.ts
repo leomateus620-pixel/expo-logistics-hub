@@ -331,6 +331,10 @@ async function handleStartReturn(admin: any, userId: string, payload: any) {
     return err("Registre a chegada no destino primeiro", 400);
   }
 
+  // Clear any stale live-location row before the return phase begins,
+  // so the current driver can write fresh GPS without RLS conflicts.
+  await admin.from("transport_locations").delete().eq("transport_id", id);
+
   const now = new Date().toISOString();
   const updates: Record<string, unknown> = {
     status: "em_retorno",
