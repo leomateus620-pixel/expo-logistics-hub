@@ -1,56 +1,65 @@
-## Diagnóstico
+## Objetivo
 
-A correção anterior já garante que **só o motorista designado pode publicar GPS** (checagem no frontend + função `publish_transport_location`). Falta blindar contra mistura de localizações entre transportes/dispositivos quando:
+Cada motorista da LOGÍSTICA passa a ter login próprio (Admin) com senha padrão única. O sistema já reconhece quem está logado para iniciar a viagem (graças ao isolamento por `motorista_user_id` + `tracking_device_id`), então basta cada um entrar com a própria conta para o GPS dele ser o usado.
 
-1. O mesmo usuário acidentalmente reativa o GPS num transporte que não é mais dele.
-2. O motorista abre o app em **dois dispositivos** (celular + desktop) e os dois começam a publicar.
-3. Outra aba/usuário entra no celular do motorista e confunde a `geolocation.watchPosition` ativa.
-4. Um transporte muda de fase (ida → retorno) e o `transport_id` antigo continua sendo publicado.
+## O que vai acontecer
 
-## Correção (4 frentes)
+### 1. Promoção a Admin (8 pessoas)
 
-### 1. Identificador de dispositivo (device fingerprint)
+Promoção de `operador` → `admin` na organização:
 
-Adicionar 2 colunas em `public.transports`:
-- `tracking_device_id text` — UUID gerado no primeiro start, persistido em `localStorage` (`fenasoja_device_id`).
-- `tracking_user_agent text` — diagnóstico (navegador/SO).
+| Nome | Email |
+|---|---|
+| LEONARDO MATEUS STROSCHEIN | leomateus620@gmail.com |
+| LUCAS FRANKEN | lucas.franken@gmail.com |
+| LUIS FERNANDO FURLANETTO | lffurla@gmail.com |
+| MARCELO DE BAIRROS | marcelo.bairros84@gmail.com |
+| MICAEL ARCANJO BÖCK | micael@fenasoja.com.br |
+| RICARDO CARPENEDO CAETANO | ricardoccaetano@hotmail.com |
+| RICARDO EMILIO ZIMMERMANN | ricardo@escritoriozimmermann.com.br |
+| VLADIMIR ANTÔNIO MADALOSSO DA ROSA | vladi@fenasoja.com.br |
 
-Atualizar `publish_transport_location()` para receber `_device_id` e exigir que ele bata com o registrado. Se outro dispositivo tentar publicar (mesmo do mesmo user), recebe erro `"Outro dispositivo já está enviando a localização desta viagem"`.
+Eduardo Santos já é Admin — não muda.
 
-### 2. Singleton global de tracking no frontend
+### 2. Senha inicial padrão
 
-Hoje cada montagem do `useLocationTracking` cria um `watchPosition`. Vou centralizar num **singleton module** (`src/lib/locationTracker.ts`) que:
-- Mantém **apenas um `watchPosition` ativo por aba**, mesmo se o hook montar em vários lugares.
-- Guarda `currentTransportId` e `currentDeviceId` em memória.
-- Antes de cada `publish`, valida no DB que: `status` é ativo, `motorista_user_id === user.id`, `tracking_device_id IS NULL OR === currentDeviceId`.
-- Se mudar o `transportId`, **para o watch antigo** antes de criar o novo (evita coordenadas vazando entre transportes).
+**Senha: `Fenasoja@2026`** definida para todos os 8 acima.
 
-`useLocationTracking` vira um wrapper fino que delega ao singleton e expõe estado reativo.
+Cada motorista entra com **email pessoal + Fenasoja@2026**, depois pode trocar em "Configurações → Minha Conta" se quiser. (Ela passa no HIBP Check porque mistura maiúscula/símbolo.)
 
-### 3. Limpeza explícita ao mudar de fase
+### 3. Como o sistema "sabe" quem é o motorista
 
-No edge function `transport-lifecycle`, no `handleArriveDestination`, **deletar a linha de `transport_locations` da fase de ida** antes de mudar status para `chegou_destino`. E no `handleStartReturn`/equivalente, resetar `tracking_device_id` para permitir que o motorista reinicie do zero (mesmo dispositivo na maioria dos casos, mas garantia de fluxo limpo).
+Já está pronto pelos ajustes anteriores:
 
-### 4. Hardening visual
+- Ao iniciar o transporte, o GPS só é reivindicado pelo **primeiro `publish` do motorista designado** (validado por `motorista_user_id` + `tracking_device_id` no banco).
+- Se Marcelo abrir o app dele e iniciar a viagem onde ele é o motorista, o GPS dele é registrado. Ninguém mais consegue sobrescrever.
+- Se outro coordenador clicar "Iniciar viagem" remotamente, o transporte muda de status, mas o GPS espera o motorista verdadeiro abrir o app.
 
-No `TransportDynamicIsland.tsx`, exibir badge sutil: **"GPS via [nome do motorista] · [iniciais do dispositivo]"** quando o card é aberto por outros usuários acompanhando — só leitura, evita confusão "de quem é essa localização?".
+Não há mudança de UI necessária — só a separação de contas resolve a "bagunça".
 
-## Comportamento esperado
+## Como executo
 
-| Cenário | Antes | Depois |
-|---|---|---|
-| Marcelo inicia GPS no celular | OK | OK + dispositivo registrado |
-| Marcelo abre o app no PC e clica em "Iniciar GPS" | PC sobrescreve | PC recebe erro educado, celular continua mandando |
-| Eduardo (admin) clica iniciar | Já bloqueado | Já bloqueado |
-| Marcelo finaliza ida e inicia retorno | Pode vazar coordenadas | Linha antiga deletada, dispositivo re-permitido |
-| Outros operadores acompanham viagem | OK | OK + badge "GPS via Marcelo" |
+Crio um Edge Function **one-shot** chamado `setup-driver-admins` que:
 
-## Arquivos afetados
+1. Exige que quem chamar seja Admin da org (ou seja, você).
+2. Para cada motorista: faz `UPDATE org_members SET role='admin'` + `auth.admin.updateUserById(..., { password })`.
+3. Retorna o relatório de sucesso/erro por pessoa.
 
-- **Migration**: novas colunas `tracking_device_id`, `tracking_user_agent` em `transports`; nova assinatura de `publish_transport_location` com `_device_id` + `_user_agent`.
-- **Novo**: `src/lib/locationTracker.ts` (singleton de geolocation).
-- **Editar**: `src/hooks/useLocationTracking.ts` (delegar ao singleton, enviar device_id).
-- **Editar**: `supabase/functions/transport-lifecycle/index.ts` (limpar `transport_locations` em arrive/start_return + resetar device_id).
-- **Editar**: `src/components/TransportDynamicIsland.tsx` (badge "GPS via X").
+Em seguida disparo a função uma única vez via `curl_edge_functions` com seu token de admin atual. A função fica no projeto (não deletada) caso precise resetar senhas no futuro — mas só Admin consegue chamar.
 
-Nenhuma outra parte do fluxo (KM, WhatsApp, retorno automático, ETA) é tocada.
+## Comunicado para os motoristas (sugestão)
+
+> Olá! Seu acesso ao Fenasoja Logística foi liberado.
+> 
+> **Site:** www.fenasojalog.com
+> **Login:** seu email cadastrado
+> **Senha inicial:** Fenasoja@2026
+> 
+> Após entrar, vá em Configurações → Minha Conta para trocar a senha.
+> Para iniciar suas viagens, **sempre entre com sua própria conta** — assim o GPS do seu celular será o usado durante o transporte.
+
+## Arquivos
+
+- **Novo**: `supabase/functions/setup-driver-admins/index.ts`
+- **Sem migration de schema** (operação é só dado via Auth Admin API).
+- Nenhuma outra alteração de UI ou lógica.
