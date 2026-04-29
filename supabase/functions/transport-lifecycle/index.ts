@@ -194,7 +194,7 @@ function toSPDate(iso: string): string {
 }
 
 // ── START ───────────────────────────────────────────────────
-async function handleStart(admin: any, userId: string, payload: any) {
+async function handleStart(admin: any, userId: string, payload: any, authHeader?: string) {
   const { id, orgId } = payload;
 
   const { data: transport, error: fetchErr } = await admin
@@ -234,7 +234,7 @@ async function handleStart(admin: any, userId: string, payload: any) {
 
   // Backfill missing geo data so the live map and the route polyline render
   // correctly regardless of which flow created the transport.
-  const geoPatch = await backfillTransportGeo(admin, transport);
+  const geoPatch = await backfillTransportGeo(admin, transport, authHeader);
 
   const now = new Date().toISOString();
   const { data: updated, error: updateErr } = await admin
@@ -394,7 +394,7 @@ async function handleArriveDestination(admin: any, userId: string, payload: any)
 }
 
 // ── START RETURN ────────────────────────────────────────────
-async function handleStartReturn(admin: any, userId: string, payload: any) {
+async function handleStartReturn(admin: any, userId: string, payload: any, authHeader?: string) {
   const { id, orgId } = payload;
 
   const { data: transport, error: fetchErr } = await admin
@@ -421,7 +421,7 @@ async function handleStartReturn(admin: any, userId: string, payload: any) {
   await admin.from("transport_locations").delete().eq("transport_id", id);
 
   // Ensure origem coordinates exist (return phase tracks toward the origin).
-  const geoPatch = await backfillTransportGeo(admin, transport);
+  const geoPatch = await backfillTransportGeo(admin, transport, authHeader);
 
   const now = new Date().toISOString();
   const updates: Record<string, unknown> = {
