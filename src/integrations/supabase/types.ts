@@ -1028,6 +1028,45 @@ export type Database = {
           },
         ]
       }
+      notification_recipients: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          id: string
+          message_template: string
+          nome: string
+          notify_on_start: boolean
+          org_id: string
+          telefone: string
+          tipo: string
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          id?: string
+          message_template: string
+          nome: string
+          notify_on_start?: boolean
+          org_id: string
+          telefone: string
+          tipo?: string
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          id?: string
+          message_template?: string
+          nome?: string
+          notify_on_start?: boolean
+          org_id?: string
+          telefone?: string
+          tipo?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       official_committees: {
         Row: {
           committee_name: string

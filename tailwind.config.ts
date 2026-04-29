@@ -135,6 +135,16 @@ export default {
           "0%, 100%": { opacity: "0.55", transform: "scale(1)" },
           "50%": { opacity: "0.85", transform: "scale(1.08)" },
         },
+        "recipient-rise": {
+          "0%":   { opacity: "0", transform: "translateY(80px) rotateX(-15deg) scale(0.9)" },
+          "60%":  { opacity: "1", transform: "translateY(-6px) rotateX(2deg) scale(1.02)" },
+          "100%": { opacity: "1", transform: "translateY(0) rotateX(0) scale(1)" },
+        },
+        "gold-shimmer": {
+          "0%": { transform: "translateX(-150%) skewX(-20deg)", opacity: "0" },
+          "30%": { opacity: "0.9" },
+          "100%": { transform: "translateX(220%) skewX(-20deg)", opacity: "0" },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -149,6 +159,8 @@ export default {
         "icon-glide": "icon-glide 3s ease-in-out infinite",
         "cart-shimmer": "cart-shimmer 5.5s ease-in-out infinite",
         "halo-breath": "halo-breath 4s ease-in-out infinite",
+        "recipient-rise": "recipient-rise 700ms cubic-bezier(0.34, 1.56, 0.64, 1) both",
+        "gold-shimmer": "gold-shimmer 2.6s ease-in-out infinite",
       },
     },
   },

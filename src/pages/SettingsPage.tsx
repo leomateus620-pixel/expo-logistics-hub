@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Settings, Users, Shield, ShieldCheck, Loader2, ChevronDown, ChevronUp } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import NotificationRecipientsSection from '@/components/settings/NotificationRecipientsSection';
 
 const roleLabels: Record<string, string> = {
   admin: 'Administrador',
@@ -155,6 +156,8 @@ export default function SettingsPage() {
           ))}
         </div>
       </div>
+
+      <NotificationRecipientsSection />
 
       {canSeeAudit && (
         <div className="rounded-xl border bg-card p-4 sm:p-5">
