@@ -552,9 +552,14 @@ async function handleStartReturn(admin: any, userId: string, payload: any, authH
     status: "em_retorno",
     inicio_retorno_em: now,
     fase_atual: "volta",
-    // The user who clicks "Iniciar volta" becomes the GPS owner for the return phase
-    tracking_started_by_user_id: userId,
-    tracking_started_at: now,
+    // Ownership do GPS é reivindicado pelo PRIMEIRO publish do motorista
+    // designado (com seu device_id). Não pré-marcamos quem clicou em
+    // "Iniciar volta" como dono — isso evita que coordenadores travem o GPS
+    // em seus próprios celulares.
+    tracking_started_by_user_id: null,
+    tracking_started_at: null,
+    tracking_device_id: null,
+    tracking_user_agent: null,
   };
 
   const { data: updated, error: updateErr } = await admin
