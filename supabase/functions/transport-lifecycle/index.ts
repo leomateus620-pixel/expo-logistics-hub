@@ -53,7 +53,7 @@ function resolveDestCoords(t: any): { lat: number; lng: number } | null {
  * fills in NULL fields. Network failures are silently ignored: tracking still works
  * with at least the coordinates filled.
  */
-async function backfillTransportGeo(admin: any, t: any): Promise<Record<string, any>> {
+async function backfillTransportGeo(admin: any, t: any, userAuthHeader?: string): Promise<Record<string, any>> {
   const patch: Record<string, any> = {};
 
   if (t.origem_lat == null || t.origem_lng == null) {
@@ -68,21 +68,21 @@ async function backfillTransportGeo(admin: any, t: any): Promise<Record<string, 
   }
 
   // Best-effort: fetch a base route polyline if we still don't have one.
-  if (!t.rota_polyline && dest) {
+  if (!t.rota_polyline && dest && userAuthHeader) {
     const originLat = (patch.origem_lat ?? t.origem_lat) ?? SANTA_ROSA.lat;
     const originLng = (patch.origem_lng ?? t.origem_lng) ?? SANTA_ROSA.lng;
     try {
       const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-      const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+      const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
       const res = await fetch(`${supabaseUrl}/functions/v1/estimate-return`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${serviceRoleKey}`,
-          "apikey": serviceRoleKey,
+          "Authorization": userAuthHeader,
+          "apikey": anonKey,
         },
         body: JSON.stringify({
-          mode: "LIVE_ROUTE",
+          mode: "ROUTE_PREVIEW",
           origin_lat: originLat,
           origin_lng: originLng,
           dest_lat: dest.lat,
@@ -95,9 +95,12 @@ async function backfillTransportGeo(admin: any, t: any): Promise<Record<string, 
         if (data?.polyline && !data.fallback) patch.rota_polyline = data.polyline;
         if (data?.duration_minutes && !t.duracao_estimada_min) patch.duracao_estimada_min = data.duration_minutes;
         if (data?.distance_km && !t.distancia_estimada_km) patch.distancia_estimada_km = Math.round(data.distance_km);
+      } else {
+        const txt = await res.text().catch(() => "");
+        console.error("[transport-lifecycle] estimate-return failed", res.status, txt);
       }
-    } catch {
-      /* network blip — coords alone are enough for live tracking */
+    } catch (e) {
+      console.error("[transport-lifecycle] estimate-return error", (e as Error).message);
     }
   }
 
