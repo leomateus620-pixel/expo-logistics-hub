@@ -53,9 +53,23 @@ export function useLocationTracking(transportId: string | null) {
   return { ...state, startTracking, stopTracking };
 }
 
+/** Idade máxima (ms) para considerar a última localização como "ao vivo". */
+const STALE_AFTER_MS = 5 * 60 * 1000;
+
+export interface LiveLocation {
+  latitude: number;
+  longitude: number;
+  accuracy: number | null;
+  speed: number | null;
+  heading: number | null;
+  updated_at: string;
+  isStale: boolean;
+  ageSeconds: number;
+}
+
 /** Hook para acompanhar (read-only) a localização ao vivo de um transporte. */
-export function useTransportLocation(transportId: string | null) {
-  const [location, setLocation] = useState<{
+export function useTransportLocation(transportId: string | null): LiveLocation | null {
+  const [raw, setRaw] = useState<{
     latitude: number;
     longitude: number;
     accuracy: number | null;
@@ -63,6 +77,7 @@ export function useTransportLocation(transportId: string | null) {
     heading: number | null;
     updated_at: string;
   } | null>(null);
+  const [now, setNow] = useState<number>(() => Date.now());
 
   useEffect(() => {
     if (!transportId) {
