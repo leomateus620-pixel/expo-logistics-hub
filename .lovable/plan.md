@@ -1,74 +1,54 @@
+Vou corrigir o fluxo tratando o problema como falha funcional, não visual. A causa mais provável no código atual é dupla: o GPS ainda é iniciado por efeitos automáticos fora de um gesto direto do usuário, o que falha em navegadores móveis, e quando não há coordenada real o mapa ainda desenha uma rota/ícone usando origem/destino planejados, dando a impressão de rastreamento mesmo sem GPS real.
 
-## Resumo da auditoria
+Plano de correção:
 
-Fiz a varredura do fluxo: `useTransports` + `transport-lifecycle` (RBAC + admin client), `locationTracker` (singleton com `watchPosition`, ownership por usuário+device via RPC `publish_transport_location`), `useLocationTracking`/`useTransportLocation` (Realtime via `postgres_changes`), `TransportDynamicIsland` (auto-arm GPS, mapa Leaflet, ETA via `estimate-return`) e as Edge Functions `places-autocomplete` e `estimate-return`.
+1. Garantir ativação real do GPS por gesto direto do motorista
+- Remover a tentativa de iniciar `watchPosition` automaticamente por `useEffect` para viagens sem coordenada real.
+- Fazer os botões “Ativar GPS” e “Iniciar meu GPS desta viagem” chamarem a geolocalização diretamente dentro do clique/toque do motorista.
+- Reorganizar `locationTracker.start()` para abrir `getCurrentPosition`/`watchPosition` sem aguardar operações assíncronas antes, preservando o gesto exigido por iOS/Safari/Chrome mobile.
+- Manter validação segura no publish: somente o motorista designado pode publicar no transporte correto.
 
-**O fluxo está arquiteturalmente correto.** Os transportes ativos hoje no banco (`em_retorno`) estão com `tracking_started_by_user_id = NULL` e sem linhas em `transport_locations` — isso significa que os motoristas designados (`motorista_user_id`) não estão com a aba aberta no celular para reivindicar o GPS. A UI já mostra "Aguardando o motorista abrir o app…" nesse caso e existe o auto-arm + botão "Iniciar meu GPS desta viagem", então a parte mais crítica é estabilizar erros que estão impedindo a tela funcionar e melhorar a recuperação.
+2. Não mostrar marcador falso quando ainda não existe GPS real
+- No card do transporte, quando não houver linha em `transport_locations` recente, não renderizar carro/marcador na origem.
+- Substituir o mapa com carro falso por um estado explícito: “Aguardando GPS real do motorista”.
+- Se quiser manter prévia da rota planejada, ela será visualmente separada e sem marcador de motorista, para não confundir origem planejada com posição real.
 
-## Bugs reais encontrados (com causa)
+3. Corrigir rota ao vivo para partir da localização real do motorista
+- Quando houver coordenada real, chamar `estimate-return` no modo `LIVE_ROUTE` usando:
+  - origem = latitude/longitude reais do motorista;
+  - destino = destino da ida ou origem/base no retorno.
+- Enquanto a rota Google ao vivo ainda estiver calculando, desenhar no máximo uma linha temporária do GPS real até o destino, nunca a polyline antiga da origem planejada.
+- Impedir que `rota_polyline`/`previewPolyline` sobrescrevam a rota ao vivo quando já existe GPS real.
 
-1. **401 em `estimate-return`** — `TransportsPage.tsx` (linhas 78-90, 104-123) e `TransportDynamicIsland.tsx` (186-203, 250-271) chamam `fetch` direto com `Authorization: Bearer ${session?.access_token || ''}`. Se a sessão ainda não carregou, vai `Bearer ` vazio → 401 → mapa sem rota nem ETA. É exatamente o mesmo padrão que já corrigimos em `places-autocomplete`.
-2. **GPS não retoma sozinho ao perder ownership** — quando o `publish` no `locationTracker` falha porque outro usuário/device já dono, o tracker chama `stopInternal()` permanentemente. Se o "outro usuário" era um coordenador antigo e o lifecycle limpou ownership numa transição de fase, o motorista correto não rearma sozinho e o card fica preso.
-3. **Auto-arm não dispara em pages que não sejam `/transports`** — o `useEffect` de auto-arm vive em `TransportsPage`. Se o motorista abrir o app numa rota diferente (Dashboard, Escala), o GPS não inicia. Isso explica casos de "abriu o app e nada".
-4. **`stopInternal` zera coordenadas mesmo durante erro recuperável** — perde o último ponto bom da UI e cria um piscar de "Aguardando…".
-5. **`useTransportLocation` não revalida ao reconectar** — se a aba foi suspensa (mobile bloqueou tela), o canal Realtime pode reabrir vazio. Falta um refetch no `visibilitychange`/`online`.
-6. **Restrição da Google Maps API key** — a key precisa estar com restrição **None** (regra do projeto memorizada). Validar no Cloud antes de mexer em código.
+4. Sincronizar painel/admin em tempo real
+- Manter o listener realtime de `transport_locations`, mas melhorar o estado para diferenciar:
+  - sem GPS recebido;
+  - GPS tentando iniciar;
+  - GPS bloqueado/negado;
+  - GPS ao vivo;
+  - GPS obsoleto.
+- Invalidar/refazer dados quando a linha de localização muda, para o admin enxergar o motorista sem precisar recarregar.
 
-## O que NÃO está quebrado (não vamos mexer)
+5. Melhorar feedback e recuperação no celular do motorista
+- Mostrar erro claro se a permissão de localização estiver bloqueada.
+- Exibir botão “Tentar novamente” que reinicia o GPS diretamente no toque.
+- Evitar esconder o banner de GPS apenas porque houve uma tentativa de tracking sem primeira coordenada.
+- Exibir precisão/idade da última coordenada quando houver GPS real.
 
-- RBAC do `transport-lifecycle` (admin client + verificação de role via `get_user_org_role`).
-- RPC `publish_transport_location` (já garante motorista designado, ownership por user e device, status ativo).
-- Reset de ownership a cada transição de fase no lifecycle (`start`, `arrive_destination`, `start_return`).
-- Realtime em `transport_locations` filtrado por `transport_id`.
-- Fluxo de ida → chegou_destino → em_retorno → concluido (já implementado e em uso).
-- Janela 29/04–10/05 e flag `somente_ida`.
+6. Ajustar navegação 3D em tela cheia
+- A navegação 3D continuará abrindo ao tocar no mapa, mas só será considerada “Ao vivo” quando existir coordenada GPS real recente.
+- Em modo ao vivo, a câmera 3D seguirá a posição real do motorista e a rota recalculada até o destino.
+- Sem GPS real, a tela cheia mostrará aviso de GPS pendente em vez de simular navegação com origem planejada.
 
-## Plano de correção (cirúrgico, sem refactor)
+7. Revisão de backend/Cloud necessária
+- Verificar e, se necessário, ajustar a função `publish_transport_location` para continuar aceitando apenas o motorista designado, sem enfraquecer permissões.
+- Validar os dados atuais: há viagem ativa do LEONARDO sem linha de localização publicada, então a correção precisa fazer o celular dele conseguir publicar a primeira coordenada.
+- Confirmar que a tabela `transport_locations` segue com RLS segura e realtime ativo.
 
-### 1. Corrigir 401 em `estimate-return` (idem ao fix de `places-autocomplete`)
-Trocar os 4 `fetch` brutos por `supabase.functions.invoke('estimate-return', { body })`. Locais:
-- `src/pages/TransportsPage.tsx` — `fetchTravelMinutes` e `fetchRoutePreview`.
-- `src/components/TransportDynamicIsland.tsx` — preview polyline e LIVE_ROUTE.
-
-`functions.invoke` anexa o JWT da sessão automaticamente e aguarda a sessão estar pronta, eliminando o `Bearer ` vazio.
-
-### 2. `locationTracker`: retomar GPS quando a viagem ainda é minha
-- Quando o `publish` retornar erro de ownership, **não destruir o watch** se a checagem mostrar que `motorista_user_id === uid` e `tracking_started_by_user_id IS NULL` ou `=== uid`. Apenas re-tentar.
-- Manter `latitude/longitude` na UI durante erros transitórios (não zerar no `stopInternal` quando a parada foi por erro recuperável).
-- Garantir que ao mudar para um transporte novo o tracker faça `getCurrentPosition` imediato (já faz) e mantenha `watchPosition` mesmo se o primeiro `publish` falhar.
-
-### 3. Auto-arm GPS global (App-level), não só em `/transports`
-Extrair o `useEffect` de auto-arm para um hook `useDriverAutoArm()` montado uma vez no `App`/`Layout`, para que o motorista designado tenha seu GPS reivindicado assim que abre o app em qualquer rota. Mantém a mesma lógica de prioridade já validada (DB ownership → cache local → designated driver → cleanup).
-
-### 4. `useTransportLocation`: refetch em visibilidade/reconexão
-- Recarregar a última posição quando `document.visibilitychange === 'visible'` ou `window.online`.
-- Já temos o canal Realtime; só adicionar o refetch evita "card sem live" depois de tela bloqueada.
-
-### 5. UX/feedback claros (não invasivo)
-- Mensagem específica quando `motorista_user_id` é diferente do usuário logado e o card está aguardando: "Aguardando o motorista X abrir o app".
-- Indicador de "última atualização há Xs" no card ao vivo (usando `location.updated_at`).
-- Toast amigável quando Maps API falha (já há `try/catch`, só exibir uma vez por sessão para não spammar).
-
-### 6. Verificações operacionais (sem código)
-- Confirmar que `GOOGLE_MAPS_API_KEY` no Cloud está com restrição **None** (memória do projeto).
-- Avisar (toast/onboarding curto) que o motorista precisa abrir o app no celular dele uma vez para o GPS começar — esse é o único caminho seguro com a RPC atual.
-
-## Arquivos que vamos mexer
-
-- `src/pages/TransportsPage.tsx` — 2 funções fetch → `invoke`; mover auto-arm para hook global.
-- `src/components/TransportDynamicIsland.tsx` — 2 fetch → `invoke`; UX de última atualização.
-- `src/lib/locationTracker.ts` — não destruir state em erros recuperáveis; retry inteligente.
-- `src/hooks/useLocationTracking.ts` — `useTransportLocation` com refetch em `visibilitychange`/`online`.
-- `src/hooks/useDriverAutoArm.ts` — novo hook; montado em `src/App.tsx` (ou layout).
-- Sem alterações no banco, RPCs, RLS ou Edge Functions.
-
-## Critérios de aceite
-
-- Sem 401 em `estimate-return` mesmo logo após login.
-- Motorista designado vê o pino vivo dele ao abrir o app em qualquer rota, não só `/transports`.
-- Card mostra "atualizado há Xs" e não "pisca" quando ocorre erro temporário de GPS.
-- Mapa volta a aparecer automaticamente após reconexão/tela bloqueada.
-- Coordenadores que iniciam viagem remotamente continuam não travando o GPS para o motorista (fluxo atual preservado).
-- Nenhum usuário, RLS ou política altera-se; histórico e transportes existentes seguem funcionando.
-
-Posso seguir implementando esse plano?
+Critério de aceite após implementar:
+- O motorista LEONARDO toca em “Ativar GPS” no celular e uma linha `transport_locations` é criada/atualizada para o transporte ativo.
+- O card deixa de mostrar carro fixo na origem quando não há GPS real.
+- O mapa mostra o carro somente na coordenada real recebida do dispositivo.
+- A rota exibida parte da posição real do motorista até o destino/retorno.
+- O admin acompanha a posição em tempo real.
+- Ao tocar no mapa, a navegação 3D abre e segue a coordenada real, sem usar origem/destino como posição falsa.
