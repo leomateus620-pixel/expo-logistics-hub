@@ -357,7 +357,52 @@ async function handleStart(admin: any, userId: string, payload: any, authHeader?
     });
   }
 
-  const firstGuest = whatsappGuests[0];
+  // Fetch fixed notification recipients (e.g., travel agents) and append messages
+  try {
+    const { data: recipients } = await admin
+      .from("notification_recipients")
+      .select("nome, telefone, tipo, message_template")
+      .eq("org_id", orgId)
+      .eq("ativo", true)
+      .eq("notify_on_start", true);
+
+    if (recipients && recipients.length > 0) {
+      const firstGuestName = allGuests[0]?.nome || "o hóspede";
+      const vooNumero = transport.voo_numero || "—";
+      for (const rec of recipients) {
+        const message = String(rec.message_template || "")
+          .replace(/\{nome_destinatario\}/g, rec.nome || "")
+          .replace(/\{motorista\}/g, driverName)
+          .replace(/\{destino\}/g, destinoLabel)
+          .replace(/\{hospede\}/g, firstGuestName)
+          .replace(/\{voo\}/g, vooNumero);
+
+        let normalizedPhone = "";
+        let phoneValid = false;
+        if (rec.telefone) {
+          const digits = String(rec.telefone).replace(/\D/g, "");
+          normalizedPhone = digits.length >= 12 ? digits : `55${digits}`;
+          phoneValid = normalizedPhone.length >= 12 && normalizedPhone.length <= 15;
+        }
+
+        whatsappGuests.push({
+          phone: normalizedPhone,
+          message,
+          url: phoneValid
+            ? `https://wa.me/${normalizedPhone}?text=${encodeURIComponent(message)}`
+            : "",
+          guestName: rec.nome || "",
+          phoneValid,
+          kind: "recipient",
+          recipientType: rec.tipo || "agente_viagem",
+        });
+      }
+    }
+  } catch (e) {
+    console.warn("[transport-lifecycle] Could not load notification_recipients:", e);
+  }
+
+  const firstGuest = whatsappGuests.find((g: any) => g.kind !== "recipient") || whatsappGuests[0];
 
   return ok({
     data: updated,
