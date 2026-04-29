@@ -244,11 +244,29 @@ async function handleStart(admin: any, userId: string, payload: any, authHeader?
   // correctly regardless of which flow created the transport.
   const geoPatch = await backfillTransportGeo(admin, transport, authHeader);
 
+  // Auto-capture km_retirada from vehicle's current odometer (B.1)
+  const startPatch: Record<string, unknown> = {};
+  if (transport.km_retirada == null && transport.vehicle_id) {
+    try {
+      const { data: veh } = await admin
+        .from("vehicles")
+        .select("km_atual")
+        .eq("id", transport.vehicle_id)
+        .single();
+      if (veh && veh.km_atual != null) {
+        startPatch.km_retirada = Number(veh.km_atual);
+      }
+    } catch (e) {
+      console.warn("[transport-lifecycle] Could not auto-capture km_retirada:", e);
+    }
+  }
+
   const now = new Date().toISOString();
   const { data: updated, error: updateErr } = await admin
     .from("transports")
     .update({
       ...geoPatch,
+      ...startPatch,
       status: "em_andamento",
       inicio_real_em: now,
       fase_atual: "ida",
