@@ -244,11 +244,29 @@ async function handleStart(admin: any, userId: string, payload: any, authHeader?
   // correctly regardless of which flow created the transport.
   const geoPatch = await backfillTransportGeo(admin, transport, authHeader);
 
+  // Auto-capture km_retirada from vehicle's current odometer (B.1)
+  const startPatch: Record<string, unknown> = {};
+  if (transport.km_retirada == null && transport.vehicle_id) {
+    try {
+      const { data: veh } = await admin
+        .from("vehicles")
+        .select("km_atual")
+        .eq("id", transport.vehicle_id)
+        .single();
+      if (veh && veh.km_atual != null) {
+        startPatch.km_retirada = Number(veh.km_atual);
+      }
+    } catch (e) {
+      console.warn("[transport-lifecycle] Could not auto-capture km_retirada:", e);
+    }
+  }
+
   const now = new Date().toISOString();
   const { data: updated, error: updateErr } = await admin
     .from("transports")
     .update({
       ...geoPatch,
+      ...startPatch,
       status: "em_andamento",
       inicio_real_em: now,
       fase_atual: "ida",
@@ -405,6 +423,42 @@ async function handleArriveDestination(admin: any, userId: string, payload: any)
     after_data: updates,
   });
 
+  // Auto-register one-way (ida) leg in vehicle_usage (B.2)
+  if (transport.vehicle_id && transport.km_retirada != null && transport.distancia_estimada_km) {
+    try {
+      const kmIda = Math.round(Number(transport.distancia_estimada_km) / 2);
+      const kmRetirada = Number(transport.km_retirada);
+      const kmChegadaDestino = kmRetirada + kmIda;
+      const obs = `Ida automática — transporte ${id}`;
+
+      const { data: existing } = await admin
+        .from("vehicle_usage")
+        .select("id")
+        .eq("vehicle_id", transport.vehicle_id)
+        .eq("observacoes", obs)
+        .maybeSingle();
+
+      if (!existing) {
+        await admin.from("vehicle_usage").insert({
+          org_id: orgId,
+          vehicle_id: transport.vehicle_id,
+          responsavel_user_id: transport.motorista_user_id,
+          km_saida: kmRetirada,
+          km_chegada: kmChegadaDestino,
+          retirada_em: transport.inicio_real_em || now,
+          devolucao_em: now,
+          observacoes: obs,
+        });
+        await admin
+          .from("vehicles")
+          .update({ km_atual: kmChegadaDestino })
+          .eq("id", transport.vehicle_id);
+      }
+    } catch (e) {
+      console.error("[transport-lifecycle] Auto vehicle_usage (ida) failed:", e);
+    }
+  }
+
   return ok({ data: updated });
 }
 
@@ -490,6 +544,18 @@ async function handleCompleteReturn(admin: any, userId: string, payload: any) {
   }
 
   const now = new Date().toISOString();
+
+  // Auto-fill km_devolucao from estimated distance if not provided manually (B.3)
+  let autoKmDevolucao: number | null = null;
+  if (
+    (vehicleUsage?.km_chegada == null) &&
+    before.vehicle_id &&
+    before.km_retirada != null &&
+    before.distancia_estimada_km
+  ) {
+    autoKmDevolucao = Number(before.km_retirada) + Number(before.distancia_estimada_km);
+  }
+
   const updates: Record<string, unknown> = {
     status: "concluido",
     fim_retorno_em: now,
@@ -499,6 +565,8 @@ async function handleCompleteReturn(admin: any, userId: string, payload: any) {
   };
   if (vehicleUsage?.km_chegada != null) {
     updates.km_devolucao = vehicleUsage.km_chegada;
+  } else if (autoKmDevolucao != null) {
+    updates.km_devolucao = autoKmDevolucao;
   }
   if (vehicleUsage?.fim_em) updates.fim_em = vehicleUsage.fim_em;
 
@@ -520,7 +588,7 @@ async function handleCompleteReturn(admin: any, userId: string, payload: any) {
     after_data: updates,
   });
 
-  // Register vehicle_usage if KM was provided
+  // Register vehicle_usage if KM was provided manually
   if (vehicleUsage && vehicleUsage.vehicle_id && vehicleUsage.km_saida != null && vehicleUsage.km_chegada != null) {
     try {
       await admin.from("vehicle_usage").insert({
@@ -537,6 +605,39 @@ async function handleCompleteReturn(admin: any, userId: string, payload: any) {
         .eq("id", vehicleUsage.vehicle_id);
     } catch (e) {
       console.error("[transport-lifecycle] Failed to create vehicle_usage on complete_return:", e);
+    }
+  } else if (autoKmDevolucao != null && before.vehicle_id) {
+    // Auto-register return (volta) leg in vehicle_usage (B.3)
+    try {
+      const kmIda = Math.round(Number(before.distancia_estimada_km) / 2);
+      const kmSaidaVolta = Number(before.km_retirada) + kmIda;
+      const obs = `Volta automática — transporte ${id}`;
+
+      const { data: existing } = await admin
+        .from("vehicle_usage")
+        .select("id")
+        .eq("vehicle_id", before.vehicle_id)
+        .eq("observacoes", obs)
+        .maybeSingle();
+
+      if (!existing) {
+        await admin.from("vehicle_usage").insert({
+          org_id: orgId,
+          vehicle_id: before.vehicle_id,
+          responsavel_user_id: before.motorista_user_id,
+          km_saida: kmSaidaVolta,
+          km_chegada: autoKmDevolucao,
+          retirada_em: before.inicio_retorno_em || now,
+          devolucao_em: now,
+          observacoes: obs,
+        });
+        await admin
+          .from("vehicles")
+          .update({ km_atual: autoKmDevolucao })
+          .eq("id", before.vehicle_id);
+      }
+    } catch (e) {
+      console.error("[transport-lifecycle] Auto vehicle_usage (volta) failed:", e);
     }
   }
 
