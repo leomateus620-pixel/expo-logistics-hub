@@ -578,8 +578,14 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
       if (mode === 'start_now' && result?.id) {
         try {
           const startResult = await start.mutateAsync({ id: result.id });
-          setTrackingTransportId(result.id);
-          toast.success('Viagem iniciada — localização ativada');
+          // Só ativa o GPS local se quem está criando for o motorista designado.
+          const isAssignedDriver = !!capturedForm.motorista_user_id && capturedForm.motorista_user_id === user?.id;
+          if (isAssignedDriver) {
+            setTrackingTransportId(result.id);
+            toast.success('Viagem iniciada — localização ativada');
+          } else {
+            toast.success('Viagem iniciada — aguardando GPS do motorista');
+          }
           if (startResult?.whatsapp) {
             setStartTripWhatsappData(startResult.whatsapp);
             setStartTripWhatsappGuests(startResult.whatsappGuests || []);
@@ -804,10 +810,15 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
     if (t.status === 'pendente') {
       try {
         const result = await start.mutateAsync({ id: t.id });
-        // Always activate GPS on the device that started the trip.
-        // The DB now accepts publishes from any active org member.
-        setTrackingTransportId(t.id);
-        toast.success('Viagem iniciada — localização ativada');
+        // Só ativa o GPS local se o usuário logado for o motorista designado.
+        // Coordenadores podem iniciar a viagem administrativamente, mas não viram fonte de localização.
+        const isAssignedDriver = !!t.motorista_user_id && t.motorista_user_id === user?.id;
+        if (isAssignedDriver) {
+          setTrackingTransportId(t.id);
+          toast.success('Viagem iniciada — localização ativada');
+        } else {
+          toast.success('Viagem iniciada — aguardando GPS do motorista');
+        }
         if (result?.whatsapp) {
           setStartTripWhatsappData(result.whatsapp);
           setStartTripWhatsappGuests(result.whatsappGuests || []);
