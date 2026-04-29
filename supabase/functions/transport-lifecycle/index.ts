@@ -444,11 +444,20 @@ async function handleArriveDestination(admin: any, userId: string, payload: any)
     status: "chegou_destino",
     chegada_destino_em: now,
     fase_atual: "ida",
+    // Libera ownership do GPS para a fase de retorno reiniciar limpa.
+    tracking_started_by_user_id: null,
+    tracking_started_at: null,
+    tracking_device_id: null,
+    tracking_user_agent: null,
   };
   if (lastLoc?.latitude && lastLoc?.longitude) {
     updates.destino_lat_chegada = lastLoc.latitude;
     updates.destino_lng_chegada = lastLoc.longitude;
   }
+
+  // Limpa marcador ao vivo da fase de ida — outros usuários acompanhando
+  // veem o pino congelar no destino até o motorista iniciar a volta.
+  await admin.from("transport_locations").delete().eq("transport_id", id);
 
   const { data: updated, error: updateErr } = await admin
     .from("transports")
