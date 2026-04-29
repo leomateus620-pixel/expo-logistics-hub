@@ -247,7 +247,14 @@ async function handleStart(admin: any, userId: string, payload: any, authHeader?
   const now = new Date().toISOString();
   const { data: updated, error: updateErr } = await admin
     .from("transports")
-    .update({ ...geoPatch, status: "em_andamento", inicio_real_em: now, fase_atual: "ida" })
+    .update({
+      ...geoPatch,
+      status: "em_andamento",
+      inicio_real_em: now,
+      fase_atual: "ida",
+      tracking_started_by_user_id: userId,
+      tracking_started_at: now,
+    })
     .eq("id", id)
     .select()
     .single();
