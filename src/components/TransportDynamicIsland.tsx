@@ -4,6 +4,7 @@ import { Navigation, MapPinOff, Clock, ArrowRight, Ruler, Timer, Square, Play, E
 import { useTransportLocation } from '@/hooks/useLocationTracking';
 import { isInReturnTripWindow } from '@/hooks/useTransports';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
 import { calculateHeading, smoothHeading, haversineDistance } from '@/lib/heading';
 import FullscreenMapDialog from '@/components/transport/FullscreenMapDialog';
 
