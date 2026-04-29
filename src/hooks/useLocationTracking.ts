@@ -56,18 +56,35 @@ export function useLocationTracking(transportId: string | null) {
 
     lastPosRef.current = { lat: latitude, lng: longitude };
 
+    const payload = {
+      transport_id: tid,
+      org_id: oid,
+      driver_user_id: u.id,
+      latitude,
+      longitude,
+      accuracy,
+      speed: speed || null,
+      heading: heading || null,
+      updated_at: new Date().toISOString(),
+    };
+
     try {
-      await (supabase as any).from('transport_locations').upsert({
-        transport_id: tid,
-        org_id: oid,
-        driver_user_id: u.id,
-        latitude,
-        longitude,
-        accuracy,
-        speed: speed || null,
-        heading: heading || null,
-        updated_at: new Date().toISOString(),
-      }, { onConflict: 'transport_id' });
+      // 1) Try UPDATE first (most common case once tracking is established).
+      const { data: updated, error: updateErr } = await (supabase as any)
+        .from('transport_locations')
+        .update(payload)
+        .eq('transport_id', tid)
+        .select('transport_id');
+
+      // 2) If RLS blocked the update OR no row matched (first tick / stale row from another
+      //    driver), fall back to delete + insert so the current driver becomes the row owner.
+      if (updateErr || !updated || updated.length === 0) {
+        await (supabase as any).from('transport_locations').delete().eq('transport_id', tid);
+        const { error: insertErr } = await (supabase as any)
+          .from('transport_locations')
+          .insert(payload);
+        if (insertErr) console.error('Failed to insert location row:', insertErr);
+      }
     } catch (err) {
       console.error('Failed to update location:', err);
     }
