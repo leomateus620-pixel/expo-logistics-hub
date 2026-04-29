@@ -24,7 +24,6 @@ export default function DriverGpsBanner() {
 
   const target = useMemo(() => {
     if (!user?.id || !transports?.length) return null;
-    const snap = locationTracker.getSnapshot();
 
     // Se já estou trackeando E já tenho coordenada real publicada (lat/lng), nada a fazer.
     if (snap.isTracking && snap.transportId && snap.latitude != null && snap.longitude != null) {
@@ -41,7 +40,7 @@ export default function DriverGpsBanner() {
           (!t.tracking_started_by_user_id || t.tracking_started_by_user_id === user.id),
       ) || null
     );
-  }, [user?.id, transports]);
+  }, [user?.id, transports, snap.isTracking, snap.transportId, snap.latitude, snap.longitude]);
 
   if (!target || dismissed) return null;
 
