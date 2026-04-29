@@ -53,7 +53,7 @@ function resolveDestCoords(t: any): { lat: number; lng: number } | null {
  * fills in NULL fields. Network failures are silently ignored: tracking still works
  * with at least the coordinates filled.
  */
-async function backfillTransportGeo(admin: any, t: any, userAuthHeader?: string): Promise<Record<string, any>> {
+async function backfillTransportGeo(_admin: any, t: any, _userAuthHeader?: string): Promise<Record<string, any>> {
   const patch: Record<string, any> = {};
 
   if (t.origem_lat == null || t.origem_lng == null) {
@@ -67,40 +67,48 @@ async function backfillTransportGeo(admin: any, t: any, userAuthHeader?: string)
     patch.destino_lng = dest.lng;
   }
 
-  // Best-effort: fetch a base route polyline if we still don't have one.
-  if (!t.rota_polyline && dest && userAuthHeader) {
+  // Best-effort: fetch a base route polyline directly from Google Routes API.
+  // Calling the external API here (rather than another edge function) avoids
+  // any internal-JWT issues that previously caused rota_polyline to never persist.
+  if (!t.rota_polyline && dest) {
     const originLat = (patch.origem_lat ?? t.origem_lat) ?? SANTA_ROSA.lat;
     const originLng = (patch.origem_lng ?? t.origem_lng) ?? SANTA_ROSA.lng;
-    try {
-      const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-      const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
-      const res = await fetch(`${supabaseUrl}/functions/v1/estimate-return`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": userAuthHeader,
-          "apikey": anonKey,
-        },
-        body: JSON.stringify({
-          mode: "ROUTE_PREVIEW",
-          origin_lat: originLat,
-          origin_lng: originLng,
-          dest_lat: dest.lat,
-          dest_lng: dest.lng,
-          destination: t.destino,
-        }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        if (data?.polyline && !data.fallback) patch.rota_polyline = data.polyline;
-        if (data?.duration_minutes && !t.duracao_estimada_min) patch.duracao_estimada_min = data.duration_minutes;
-        if (data?.distance_km && !t.distancia_estimada_km) patch.distancia_estimada_km = Math.round(data.distance_km);
-      } else {
-        const txt = await res.text().catch(() => "");
-        console.error("[transport-lifecycle] estimate-return failed", res.status, txt);
+    const apiKey = Deno.env.get("GOOGLE_MAPS_API_KEY");
+    if (apiKey) {
+      try {
+        const res = await fetch("https://routes.googleapis.com/directions/v2:computeRoutes", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Goog-Api-Key": apiKey,
+            "X-Goog-FieldMask": "routes.duration,routes.distanceMeters,routes.polyline.encodedPolyline",
+          },
+          body: JSON.stringify({
+            origin: { location: { latLng: { latitude: originLat, longitude: originLng } } },
+            destination: { location: { latLng: { latitude: dest.lat, longitude: dest.lng } } },
+            travelMode: "DRIVE",
+            routingPreference: "TRAFFIC_AWARE",
+            computeAlternativeRoutes: false,
+          }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const route = data?.routes?.[0];
+          if (route?.polyline?.encodedPolyline) patch.rota_polyline = route.polyline.encodedPolyline;
+          if (route?.duration && !t.duracao_estimada_min) {
+            const seconds = parseInt(String(route.duration).replace("s", ""), 10) || 0;
+            if (seconds > 0) patch.duracao_estimada_min = Math.ceil(seconds / 60);
+          }
+          if (route?.distanceMeters && !t.distancia_estimada_km) {
+            patch.distancia_estimada_km = Math.round((route.distanceMeters || 0) / 1000);
+          }
+        } else {
+          const txt = await res.text().catch(() => "");
+          console.error("[transport-lifecycle] Google Routes failed", res.status, txt.slice(0, 300));
+        }
+      } catch (e) {
+        console.error("[transport-lifecycle] Google Routes error", (e as Error).message);
       }
-    } catch (e) {
-      console.error("[transport-lifecycle] estimate-return error", (e as Error).message);
     }
   }
 
