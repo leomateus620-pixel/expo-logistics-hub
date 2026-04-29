@@ -156,10 +156,10 @@ Deno.serve(async (req) => {
 
     if (action === "create") return await handleCreate(admin, user.id, payload);
     if (action === "update") return await handleUpdate(admin, user.id, payload);
-    if (action === "start") return await handleStart(admin, user.id, payload);
+    if (action === "start") return await handleStart(admin, user.id, payload, authHeader);
     if (action === "delete") return await handleDelete(admin, user.id, payload);
     if (action === "arrive_destination") return await handleArriveDestination(admin, user.id, payload);
-    if (action === "start_return") return await handleStartReturn(admin, user.id, payload);
+    if (action === "start_return") return await handleStartReturn(admin, user.id, payload, authHeader);
     if (action === "complete_return") return await handleCompleteReturn(admin, user.id, payload);
     return err("Ação inválida", 400);
   } catch (err_) {
