@@ -1,62 +1,61 @@
-## Problema
+# Corrigir origem da viagem de retorno
 
-O backend já registra três timestamps no ciclo de vida da viagem:
+## Problema diagnosticado
 
-- `chegada_destino_em` — quando o motorista clica "Cheguei no destino"
-- `inicio_retorno_em` — quando inicia a viagem de volta
-- `fim_retorno_em` — quando finaliza o retorno (igual a `fim_real_em`)
+Os dois transportes em curso têm `origem_lat = -27.8708` e `origem_lng = -54.4814` — coordenadas genéricas do **centro de Santa Rosa**, não do **Parque de Exposições Alfredo Leandro Carlson**, que é a origem real informada pelo usuário.
 
-Porém, **nenhum desses três campos é renderizado** no card de detalhes do transporte, na Dynamic Island ou no PDF gerado. O usuário só vê "Iniciado em" e "Concluído em" (a partir de `inicio_real_em` / `fim_real_em`), o que faz parecer que a chegada e o retorno não estão sendo capturados.
+Quando o motorista clica em "Iniciar Viagem de Volta", o `TransportDynamicIsland` usa `origem_lat/lng` como destino do retorno. Hoje, essa rota termina no centro da cidade — errado. O destino do retorno deve ser o **Parque de Exposições**.
 
-## Solução
+Para os demais transportes, o fluxo já está correto: usa `origem_lat/lng` armazenado no momento do cadastro, então ida (motorista → destino) e volta (motorista → origem) funcionam normalmente sem alteração.
 
-Mostrar os horários reais de chegada e início do retorno em todos os pontos de exibição da viagem, sem alterar o backend (já está correto).
+## Plano
 
-### 1. `src/components/transport/TransportDetailView.tsx` — Bloco "Histórico"
+### 1. Migração SQL — corrigir geodata dos dois transportes específicos
+Atualizar apenas os dois transportes citados (IDs `9da9dd3c-...` Passo Fundo e `f7833513-...` Chapecó) com as coordenadas reais do **Parque de Exposições Alfredo Leandro Carlson, Santa Rosa/RS**:
 
-Atualizar a timeline para incluir os novos marcos cronológicos, exibindo cada um somente quando existir:
+- `origem_lat = -27.83889`
+- `origem_lng = -54.46778`
+- `origem = 'Parque de Exposições Alfredo Leandro Carlson'`
+- `rota_polyline_volta = NULL` (força recálculo da rota de volta via Google Routes)
+- `rota_polyline = NULL` (força recálculo da rota de ida durante a fase atual também, garantindo coerência)
 
-```text
-• Criado em ...
-• Iniciado (ida) em {inicio_real_em}
-• Chegou no destino em {chegada_destino_em}     ← novo (cor âmbar)
-• Iniciou viagem de volta em {inicio_retorno_em} ← novo (cor índigo)
-• Finalizado em {fim_retorno_em || fim_real_em}
+Coordenadas obtidas do endereço público do parque em Santa Rosa/RS (Av. Inconfidência / saída para Tuparendi).
+
+### 2. Sem mudanças na lógica do app
+A lógica em `TransportDynamicIsland.tsx` já está correta:
+- Na fase `em_retorno`, o `destCoords` aponta para `origem_lat/lng` do transporte.
+- O `useTransportLocation` continua puxando a posição ao vivo do motorista que iniciou a viagem (ownership já implementado).
+- A Edge Function `estimate-return` recebe `destination: t.origem` e recalcula a rota até o parque assim que `rota_polyline_volta` está vazio.
+
+Isso garante que:
+- **Esses dois transportes**: ao iniciar volta, mapa traça rota da posição atual do motorista (ex.: Passo Fundo / Chapecó) até o Parque de Exposições em Santa Rosa.
+- **Demais transportes**: continuam usando a `origem_lat/lng` cadastrada normalmente, sem qualquer interferência.
+
+### 3. Remover fallback genérico `SANTA_ROSA` do componente
+Em `TransportDynamicIsland.tsx`, hoje há um fallback hardcoded para o centro de Santa Rosa quando `origem_lat/lng` está nulo. Vamos manter esse fallback (não atrapalha), mas adicionar um log silencioso quando ele for usado, para detectar futuros transportes mal cadastrados. Nenhuma mudança visual.
+
+## Detalhes técnicos
+
+### Arquivos
+- **`supabase/migrations/<timestamp>_fix_origem_parque_exposicoes.sql`** (novo) — UPDATE pontual nos dois IDs.
+- **`src/components/TransportDynamicIsland.tsx`** — apenas log de aviso quando cair no fallback.
+
+### SQL da migração
+```sql
+UPDATE public.transports
+   SET origem = 'Parque de Exposições Alfredo Leandro Carlson',
+       origem_lat = -27.83889,
+       origem_lng = -54.46778,
+       rota_polyline_volta = NULL,
+       rota_polyline = NULL,
+       updated_at = now()
+ WHERE id IN (
+   '9da9dd3c-1a40-4f1e-8a82-596505f34d3a',
+   'f7833513-6bcb-4df7-8123-dcb072eea04d'
+ );
 ```
 
-Também ajustar a condição que mostra/oculta o bloco para considerar `chegada_destino_em` e `inicio_retorno_em`.
-
-### 2. `src/components/TransportDynamicIsland.tsx` — Estado "Chegou no destino"
-
-Hoje só aparece "Concluído às HH:MM" quando `isDone`. Adicionar dois badges análogos:
-
-- Quando `t.status === 'chegou_destino'` e `t.chegada_destino_em` existir → badge âmbar:  
-  "Chegou ao destino às HH:MM"
-- Quando `t.status === 'em_retorno'` e `t.inicio_retorno_em` existir → badge índigo:  
-  "Retorno iniciado às HH:MM"
-
-Renderizados acima do bloco de "Actions", no mesmo padrão visual do badge "Concluído às".
-
-### 3. `src/pages/TransportsPage.tsx` — `generatePDF`
-
-Acrescentar linhas no PDF logo após "Saída" / "Devolução", condicionalmente:
-
-```text
-Chegada no destino: {chegada_destino_em formatado pt-BR}
-Início do retorno:   {inicio_retorno_em formatado pt-BR}
-Fim do retorno:      {fim_retorno_em formatado pt-BR}
-```
-
-Mantendo o mesmo formato `<div class="row">` já existente.
-
-### 4. Verificação rápida
-
-Após a alteração, validar via `supabase--read_query` que o transporte de teste citado pelo usuário (Santa Rosa → Passo Fundo → Santa Rosa, 29/04) tem `chegada_destino_em` preenchido, garantindo que o problema era apenas de renderização. Se algum registro antigo estiver `NULL` (porque chegou ao destino antes da feature ser introduzida), o bloco simplesmente não exibirá a linha — comportamento correto.
-
-## Arquivos modificados
-
-- `src/components/transport/TransportDetailView.tsx`
-- `src/components/TransportDynamicIsland.tsx`
-- `src/pages/TransportsPage.tsx`
-
-Sem migração de banco, sem alteração de RLS, sem alteração de Edge Functions.
+### Resultado esperado
+- Transporte Passo Fundo (`chegou_destino`): ao clicar em "Iniciar Viagem de Volta", o mapa abre com rota viva de Passo Fundo até o Parque de Exposições em Santa Rosa.
+- Transporte Chapecó (`em_andamento`): ao chegar no destino e iniciar o retorno, o mapa abre com rota viva de Chapecó até o Parque de Exposições.
+- Todos os outros transportes seguem inalterados.
