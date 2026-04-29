@@ -388,7 +388,7 @@ export default function TransportDynamicIsland({
                     </div>
                   </div>
                 </Suspense>
-              ) : isActive && !location && destCoords ? (
+              ) : isActive && !location && destCoords && originCoords ? (
                 <Suspense fallback={
                   <div className="h-[160px] bg-muted/30 flex items-center justify-center">
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -398,8 +398,9 @@ export default function TransportDynamicIsland({
                 }>
                   <div className="relative">
                     <DriverLocationMap
-                      latitude={destCoords[0]}
-                      longitude={destCoords[1]}
+                      latitude={originCoords[0]}
+                      longitude={originCoords[1]}
+                      driverName={isReturning ? t.destino : t.origem}
                       className="h-[160px] relative"
                       routePolyline={livePolyline || routePolyline}
                       destLatLng={destCoords}
@@ -413,7 +414,7 @@ export default function TransportDynamicIsland({
                     </div>
                   </div>
                 </Suspense>
-              ) : !isActive && destCoords ? (
+              ) : !isActive && destCoords && originCoords ? (
                 <Suspense fallback={
                   <div className="h-[140px] bg-white/5 flex items-center justify-center">
                     <div className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -422,8 +423,9 @@ export default function TransportDynamicIsland({
                   </div>
                 }>
                   <DriverLocationMap
-                    latitude={destCoords[0]}
-                    longitude={destCoords[1]}
+                    latitude={originCoords[0]}
+                    longitude={originCoords[1]}
+                    driverName={t.origem}
                     className="h-[140px] relative"
                     routePolyline={livePolyline || routePolyline}
                     destLatLng={destCoords}
