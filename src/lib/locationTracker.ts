@@ -104,21 +104,32 @@ class LocationTracker {
       return;
     }
 
+    // IMPORTANTE: NÃO usar `await` antes de chamar `getCurrentPosition`/`watchPosition`
+    // — em iOS/Safari isso quebra o "user gesture" e a permissão falha silenciosamente.
+    // A consulta de permissão acontece em paralelo apenas para feedback.
     try {
-      const perm = await navigator.permissions.query({ name: 'geolocation' as PermissionName });
-      if (perm.state === 'denied') {
-        this.setState({
-          error: 'Localização bloqueada. Acesse as configurações do navegador para permitir.',
-          isTracking: false,
-        });
-        return;
-      }
+      navigator.permissions
+        ?.query({ name: 'geolocation' as PermissionName })
+        .then((perm) => {
+          if (perm.state === 'denied') {
+            this.setState({
+              error: 'Localização bloqueada. Acesse as configurações do navegador para permitir.',
+            });
+          }
+        })
+        .catch(() => { /* ignora */ });
     } catch { /* permissions API ausente em alguns browsers */ }
 
-    // Fix imediato
+    // Fix imediato (dentro do gesto)
     navigator.geolocation.getCurrentPosition(
       (pos) => { void this.publish(pos); },
-      () => { /* erros tratados pelo watch abaixo */ },
+      (err) => {
+        let msg = 'Erro ao obter localização';
+        if (err.code === 1) msg = 'Permissão de localização negada. Ative nas configurações do navegador.';
+        if (err.code === 2) msg = 'Localização indisponível';
+        if (err.code === 3) msg = 'Tempo esgotado ao obter localização';
+        this.setState({ error: msg });
+      },
       { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 },
     );
 
