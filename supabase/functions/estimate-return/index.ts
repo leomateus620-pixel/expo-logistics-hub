@@ -6,20 +6,21 @@ const corsHeaders = {
 };
 
 // Known destination coordinates
+// Parque de Exposições Alfredo Leandro Carlson — origem padrão de todos os transportes
 const knownDestinations: Record<string, { lat: number; lng: number; label: string }> = {
-  'Parque': { lat: -27.8708, lng: -54.4814, label: 'Parque de Exposições' },
+  'Parque': { lat: -27.84502, lng: -54.47892, label: 'Parque de Exposições Alfredo Leandro Carlson' },
   'Hotel': { lat: -27.8711, lng: -54.4769, label: 'Centro Santa Rosa' },
   'Aeroporto_Chapecó': { lat: -27.1342, lng: -52.6566, label: 'Aeroporto Chapecó' },
   'Aeroporto_Santo Ângelo': { lat: -28.2817, lng: -54.1691, label: 'Aeroporto Santo Ângelo' },
   'Aeroporto_Passo Fundo': { lat: -28.2437, lng: -52.3269, label: 'Aeroporto Passo Fundo' },
   'Aeroporto_Porto Alegre': { lat: -29.9939, lng: -51.1711, label: 'Aeroporto Porto Alegre' },
   'Centro': { lat: -27.8711, lng: -54.4769, label: 'Centro Santa Rosa' },
-  'Escolta Policial': { lat: -27.8711, lng: -54.4769, label: 'Santa Rosa' },
-  'Outros': { lat: -27.8711, lng: -54.4769, label: 'Santa Rosa' },
+  'Escolta Policial': { lat: -27.84502, lng: -54.47892, label: 'Parque de Exposições — Santa Rosa' },
+  'Outros': { lat: -27.84502, lng: -54.47892, label: 'Parque de Exposições — Santa Rosa' },
 };
 
-// Santa Rosa origin (Parque de Exposições)
-const SANTA_ROSA = { lat: -27.8708, lng: -54.4814 };
+// Parque de Exposições Alfredo Leandro Carlson — origem oficial
+const SANTA_ROSA = { lat: -27.84502, lng: -54.47892 };
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
