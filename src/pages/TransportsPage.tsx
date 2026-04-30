@@ -44,12 +44,16 @@ const statusConfig: Record<string, { label: string; icon: typeof Check; class: s
 const tituloOptions = ['Parque', 'Hotel', 'Aeroporto', 'Centro', 'Escolta Policial', 'Outros'];
 const cidadeAeroportoOptions = ['Chapecó', 'Santo Ângelo', 'Passo Fundo', 'Porto Alegre'];
 
-const SANTA_ROSA_LAT = -27.8708;
-const SANTA_ROSA_LNG = -54.4814;
+// Origem padrão de TODOS os transportes:
+// Parque de Exposições Alfredo Leandro Carlson — R. Chile, Glória, Santa Rosa - RS
+// Coordenadas oficiais validadas via Google Maps.
+export const PARQUE_FENASOJA_LABEL = 'Parque de Exposições Alfredo Leandro Carlson — Santa Rosa, RS';
+const SANTA_ROSA_LAT = -27.84502;
+const SANTA_ROSA_LNG = -54.47892;
 
 // Known destination coordinates for mini-map
 const knownDestCoords: Record<string, { lat: number; lng: number }> = {
-  'Parque': { lat: -27.8708, lng: -54.4814 },
+  'Parque': { lat: -27.84502, lng: -54.47892 },
   'Hotel': { lat: -27.8711, lng: -54.4769 },
   'Aeroporto_Chapecó': { lat: -27.1342, lng: -52.6566 },
   'Aeroporto_Santo Ângelo': { lat: -28.2817, lng: -54.1691 },
@@ -501,7 +505,7 @@ export default function TransportsPage() {
   };
 
   const openCreateDialog = () => {
-    setForm({ titulo: '', origem: 'Santa Rosa', destino: '', inicio_em: nowSPLocal(), motorista_user_id: '', vehicle_id: '', prioridade: 'media', km_retirada: '', voo_cidade: '', voo_numero: '', voo_checkin: '', voo_chegada: '', horario_saida: '', escolta_nome: '', escolta_cargo: '', escolta_viaturas: '', escolta_ponto_encontro: '', escolta_contato_seguranca: '', escolta_obs: '' });
+    setForm({ titulo: '', origem: PARQUE_FENASOJA_LABEL, destino: '', inicio_em: nowSPLocal(), motorista_user_id: '', vehicle_id: '', prioridade: 'media', km_retirada: '', voo_cidade: '', voo_numero: '', voo_checkin: '', voo_chegada: '', horario_saida: '', escolta_nome: '', escolta_cargo: '', escolta_viaturas: '', escolta_ponto_encontro: '', escolta_contato_seguranca: '', escolta_obs: '' });
     setSelectedGuests([]);
     setGuestDestinations({});
     setShowNewGuestForm(false);
@@ -581,7 +585,7 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
 
       // Close dialog immediately
       setOpen(false);
-      setForm({ titulo: '', origem: '', destino: '', inicio_em: '', motorista_user_id: '', vehicle_id: '', prioridade: 'media', km_retirada: '', voo_cidade: '', voo_numero: '', voo_checkin: '', voo_chegada: '', horario_saida: '', escolta_nome: '', escolta_cargo: '', escolta_viaturas: '', escolta_ponto_encontro: '', escolta_contato_seguranca: '', escolta_obs: '' });
+      setForm({ titulo: '', origem: PARQUE_FENASOJA_LABEL, destino: '', inicio_em: '', motorista_user_id: '', vehicle_id: '', prioridade: 'media', km_retirada: '', voo_cidade: '', voo_numero: '', voo_checkin: '', voo_chegada: '', horario_saida: '', escolta_nome: '', escolta_cargo: '', escolta_viaturas: '', escolta_ponto_encontro: '', escolta_contato_seguranca: '', escolta_obs: '' });
       setSelectedGuests([]);
       setGuestDestinations({});
       setIncludeReturn(false);
@@ -667,8 +671,9 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
             await create.mutateAsync({
               transport: {
                 titulo: 'Aeroporto',
-                origem: destino || 'Santa Rosa',
-                destino: capturedForm.voo_cidade ? `Aeroporto ${capturedForm.voo_cidade}` : origem,
+                // Volta: origem é o destino anterior (aeroporto/hotel) e destino é o Parque
+                origem: destino || PARQUE_FENASOJA_LABEL,
+                destino: PARQUE_FENASOJA_LABEL,
                 inicio_em: ensureSPTimestamptz(capturedReturnForm.inicio_em),
                 motorista_user_id: capturedForm.motorista_user_id && capturedForm.motorista_user_id !== 'none' ? capturedForm.motorista_user_id : null,
                 vehicle_id: capturedForm.vehicle_id && capturedForm.vehicle_id !== 'none' ? capturedForm.vehicle_id : null,
