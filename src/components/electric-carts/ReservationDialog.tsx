@@ -154,20 +154,37 @@ export default function ReservationDialog({ open, onOpenChange, reservation }: P
     if (!cartId) { toast.error('Selecione o carrinho'); return; }
     if (!inicio || !fim) { toast.error('Defina o período'); return; }
     if (new Date(fim) <= new Date(inicio)) { toast.error('A devolução deve ser depois do início'); return; }
-    if (tipo === 'interno' && !userId) { toast.error('Selecione o membro'); return; }
+    if (tipo === 'interno' && !userId) { toast.error('Selecione quem retira'); return; }
     if (tipo === 'empresa' && !empresaSlug) { toast.error('Selecione a empresa parceira'); return; }
     if (tipo === 'outros' && !nomeExterno.trim()) { toast.error('Informe o nome'); return; }
 
+    // Aviso (sem bloqueio): 2 reservas para a mesma comissão no mesmo período
+    if (overlappingByCommission.length > 0) {
+      const lista = overlappingByCommission
+        .map((o) => `${o.cartCodigo}${o.quem ? ` (${o.quem})` : ''}`)
+        .join(', ');
+      toast.warning(
+        `Atenção: comissão "${comissao}" já tem reserva sobreposta — ${lista}. Recomendado: 1 carrinho por comissão.`,
+        { duration: 7000 }
+      );
+    }
+
+    const isFromAuth = tipo === 'interno' && userId.startsWith('auth:');
+    const tipoFinal: ReservationTipo = isFromAuth ? 'outros' : tipo;
+
     submittingRef.current = true;
     try {
-      const payload = {
+      const payload: any = {
         cart_id: cartId,
-        tipo_responsavel: tipo,
-        responsavel_user_id: tipo === 'interno' ? userId : null,
-        comissao: tipo === 'interno' ? comissao || null : null,
-        empresa_slug: tipo === 'empresa' ? empresaSlug : null,
-        nome_externo: tipo === 'outros' ? nomeExterno : null,
-        telefone_externo: tipo === 'outros' ? telefoneExterno || null : null,
+        tipo_responsavel: tipoFinal,
+        responsavel_user_id: tipoFinal === 'interno' ? userId : null,
+        comissao:
+          tipoFinal === 'interno' || tipoFinal === 'outros'
+            ? (comissao || null)
+            : null,
+        empresa_slug: tipoFinal === 'empresa' ? empresaSlug : null,
+        nome_externo: tipoFinal === 'outros' ? nomeExterno : null,
+        telefone_externo: tipoFinal === 'outros' ? telefoneExterno || null : null,
         inicio_em: new Date(inicio).toISOString(),
         fim_em: new Date(fim).toISOString(),
         observacoes: obs || null,
