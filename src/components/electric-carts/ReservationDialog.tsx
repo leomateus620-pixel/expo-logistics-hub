@@ -14,8 +14,9 @@ import { useCartReservations, type CartReservation, type ReservationTipo } from 
 import { useElectricCarts } from '@/hooks/useElectricCarts';
 import { useOrgMembers } from '@/hooks/useOrgMembers';
 import { useCommissions } from '@/hooks/useCommissions';
+import { useMobilityAuthorizations } from '@/hooks/useMobilityAuthorizations';
 import { toast } from 'sonner';
-import { User } from 'lucide-react';
+import { User, AlertTriangle } from 'lucide-react';
 
 interface Props {
   open: boolean;
