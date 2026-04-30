@@ -31,6 +31,8 @@ interface StartTripDialogProps {
   whatsappGuests?: WhatsAppGuestData[];
   driverName?: string;
   startedAt?: string;
+  /** Quando true, exibe a seção "Agentes & Parceiros". Apenas transportes do tipo Aeroporto devem habilitar. */
+  isAirport?: boolean;
 }
 
 function GuestSection({ guest, isOnly }: { guest: WhatsAppGuestData; isOnly: boolean }) {
@@ -183,7 +185,7 @@ function RecipientCard3D({ recipient, idx }: { recipient: WhatsAppGuestData; idx
   );
 }
 
-export default function StartTripDialog({ open, onOpenChange, whatsappData, whatsappGuests, driverName, startedAt }: StartTripDialogProps) {
+export default function StartTripDialog({ open, onOpenChange, whatsappData, whatsappGuests, driverName, startedAt, isAirport }: StartTripDialogProps) {
   // Determine the list of guests to render
   const allItems: WhatsAppGuestData[] = whatsappGuests && whatsappGuests.length > 0
     ? whatsappGuests
@@ -192,7 +194,8 @@ export default function StartTripDialog({ open, onOpenChange, whatsappData, what
       : [];
 
   const guests = allItems.filter((g) => g.kind !== 'recipient');
-  const recipients = allItems.filter((g) => g.kind === 'recipient');
+  // Agentes & Parceiros só aparecem em transportes para o Aeroporto
+  const recipients = isAirport ? allItems.filter((g) => g.kind === 'recipient') : [];
 
   const resolvedStartedAt = startedAt || whatsappData?.startedAt;
   if (!resolvedStartedAt || allItems.length === 0) return null;
