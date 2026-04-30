@@ -109,6 +109,46 @@ export default function ReservationDialog({ open, onOpenChange, reservation }: P
     return map;
   }, [members, commissions]);
 
+  const authNameToCommission = useMemo(() => {
+    const map = new Map<string, string>();
+    authorizations.forEach((a: any) => {
+      const key = (a.member_name || '').trim().toLocaleLowerCase('pt-BR');
+      if (key && !map.has(key)) map.set(key, a.committee_name_snapshot || '');
+    });
+    return map;
+  }, [authorizations]);
+
+  // Conflito por comissão: outras reservas ATIVAS sobrepostas no mesmo período
+  const overlappingByCommission = useMemo(() => {
+    if (!comissao || !inicio || !fim) return [] as Array<{ cartCodigo: string; quem: string }>;
+    const start = new Date(inicio).getTime();
+    const end = new Date(fim).getTime();
+    if (!(end > start)) return [];
+    const list: Array<{ cartCodigo: string; quem: string }> = [];
+    reservations.forEach((r: any) => {
+      if (reservation && r.id === reservation.id) return;
+      if (!(r.status === 'agendada' || r.status === 'em_andamento')) return;
+      const rs = new Date(r.inicio_em).getTime();
+      const re = new Date(r.fim_em).getTime();
+      if (!(rs < end && re > start)) return;
+      let rComissao: string | null = r.comissao || null;
+      let quem = r.nome_externo || '';
+      if (!rComissao && r.responsavel_user_id) {
+        rComissao = memberCommissionMap.get(r.responsavel_user_id) || null;
+        const m = members.find((mm: any) => mm.user_id === r.responsavel_user_id);
+        if (m?.nome_exibicao) quem = m.nome_exibicao;
+      }
+      if (!rComissao && r.nome_externo) {
+        rComissao = authNameToCommission.get(r.nome_externo.trim().toLocaleLowerCase('pt-BR')) || null;
+      }
+      if (rComissao && rComissao.trim() === comissao.trim()) {
+        const cart = carts.find((c: any) => c.id === r.cart_id);
+        list.push({ cartCodigo: cart?.nome || cart?.codigo || 'Carrinho', quem });
+      }
+    });
+    return list;
+  }, [comissao, inicio, fim, reservations, reservation, members, memberCommissionMap, authNameToCommission, carts]);
+
   const handleSubmit = async () => {
     if (submittingRef.current) return;
     if (!cartId) { toast.error('Selecione o carrinho'); return; }
