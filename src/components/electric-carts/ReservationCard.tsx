@@ -83,7 +83,7 @@ export default function ReservationCard({ reservation, cart, responsavel, onEdit
         'hover:-translate-y-1 hover:shadow-[0_20px_48px_-12px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.12)]',
         'p-4 sm:p-5 flex flex-col gap-3',
         meta.ring,
-        isInactive && 'opacity-80'
+        isInactive && 'opacity-90'
       )}
     >
       {/* Halo */}
@@ -117,44 +117,44 @@ export default function ReservationCard({ reservation, cart, responsavel, onEdit
       {/* Responsável */}
       <div className="relative">
         {partner ? (
-          <div className="flex items-center gap-3 p-2.5 rounded-xl bg-muted/40 border border-border/50">
-            <div className="w-11 h-11 rounded-lg bg-white border flex items-center justify-center overflow-hidden shrink-0">
+          <div className="flex items-center gap-3 p-3 rounded-xl bg-background/70 border border-border shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]">
+            <div className="w-12 h-12 rounded-lg bg-white border flex items-center justify-center overflow-hidden shrink-0">
               <img src={partner.logo} alt={partner.nome} className="max-w-full max-h-full object-contain" />
             </div>
-            <div className="min-w-0">
-              <p className="text-sm font-semibold truncate">{partner.nome}</p>
-              <Badge variant="secondary" className="text-[10px] mt-0.5 gap-1">
+            <div className="min-w-0 flex-1">
+              <p className="text-base font-bold text-foreground leading-tight break-words">{partner.nome}</p>
+              <Badge variant="outline" className="text-[11px] mt-1 gap-1 bg-primary/15 text-primary border-primary/30 font-bold uppercase">
                 <Building2 className="w-2.5 h-2.5" /> Empresa parceira
               </Badge>
             </div>
           </div>
         ) : reservation.tipo_responsavel === 'outros' ? (
-          <div className="flex items-center gap-3 p-2.5 rounded-xl bg-muted/40 border border-border/50">
-            <div className="w-11 h-11 rounded-full bg-gradient-to-br from-accent/30 to-accent/10 text-accent flex items-center justify-center shrink-0 shadow-inner">
+          <div className="flex items-center gap-3 p-3 rounded-xl bg-background/70 border border-border shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent/30 to-accent/10 text-accent flex items-center justify-center shrink-0 shadow-inner">
               <User className="w-5 h-5" />
             </div>
-            <div className="min-w-0">
-              <p className="text-sm font-semibold truncate">{reservation.nome_externo}</p>
-              <Badge variant="secondary" className="text-[10px] mt-0.5">
+            <div className="min-w-0 flex-1">
+              <p className="text-base font-bold text-foreground leading-tight break-words">{reservation.nome_externo}</p>
+              <Badge variant="outline" className="text-[11px] mt-1 bg-accent/15 text-accent-foreground border-accent/40 font-bold uppercase">
                 Convidado / Externo
               </Badge>
               {reservation.telefone_externo && (
-                <p className="text-[11px] text-muted-foreground mt-0.5 truncate">{reservation.telefone_externo}</p>
+                <p className="text-xs font-semibold text-foreground/80 mt-1 truncate">📞 {reservation.telefone_externo}</p>
               )}
             </div>
           </div>
         ) : responsavel ? (
-          <div className="flex items-center gap-3 p-2.5 rounded-xl bg-muted/40 border border-border/50">
+          <div className="flex items-center gap-3 p-3 rounded-xl bg-background/70 border border-border shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]">
             <div
-              className="w-11 h-11 rounded-full flex items-center justify-center text-sm font-bold text-primary-foreground shrink-0 shadow-inner"
+              className="w-12 h-12 rounded-full flex items-center justify-center text-base font-bold text-primary-foreground shrink-0 shadow-inner"
               style={{ backgroundColor: responsavel.avatar_color || 'hsl(142,50%,35%)' }}
             >
               {initials}
             </div>
-            <div className="min-w-0">
-              <p className="text-sm font-semibold truncate">{responsavel.nome_exibicao}</p>
+            <div className="min-w-0 flex-1">
+              <p className="text-base font-bold text-foreground leading-tight break-words">{responsavel.nome_exibicao}</p>
               {reservation.comissao && (
-                <Badge variant="secondary" className="text-[10px] mt-0.5">{reservation.comissao}</Badge>
+                <Badge variant="outline" className="text-[11px] mt-1 bg-primary/15 text-primary border-primary/30 font-bold uppercase">{reservation.comissao}</Badge>
               )}
             </div>
           </div>
@@ -163,22 +163,28 @@ export default function ReservationCard({ reservation, cart, responsavel, onEdit
 
       {/* Período */}
       <div className="relative grid grid-cols-2 gap-2">
-        <div className="px-3 py-2 rounded-lg bg-primary/10 border border-primary/20">
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground leading-tight">Retirada</p>
-          <p className="text-sm font-bold leading-tight">{fmtDate(reservation.inicio_em)} · {fmtTime(reservation.inicio_em)}</p>
+        <div className="px-3 py-2.5 rounded-lg bg-primary/15 border border-primary/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-foreground/80 leading-tight">Retirada</p>
+          <p className="text-[11px] text-muted-foreground leading-tight mt-0.5">{fmtDate(reservation.inicio_em)}</p>
+          <p className="text-lg font-bold text-foreground leading-tight">{fmtTime(reservation.inicio_em)}</p>
         </div>
-        <div className="px-3 py-2 rounded-lg bg-accent/10 border border-accent/20">
-          <p className="text-[10px] uppercase tracking-wider text-muted-foreground leading-tight">Devolução</p>
-          <p className="text-sm font-bold leading-tight">{fmtDate(reservation.fim_em)} · {fmtTime(reservation.fim_em)}</p>
+        <div className="px-3 py-2.5 rounded-lg bg-accent/15 border border-accent/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.12)]">
+          <p className="text-[11px] font-bold uppercase tracking-wider text-foreground/80 leading-tight">Devolução</p>
+          <p className="text-[11px] text-muted-foreground leading-tight mt-0.5">{fmtDate(reservation.fim_em)}</p>
+          <p className="text-lg font-bold text-foreground leading-tight">{fmtTime(reservation.fim_em)}</p>
         </div>
       </div>
-      <div className="relative flex items-center gap-1.5 text-[11px] text-muted-foreground -mt-1">
-        <Clock className="w-3 h-3" />
-        Duração: <span className="font-semibold text-foreground">{durationLabel(reservation.inicio_em, reservation.fim_em)}</span>
+      <div className="relative flex items-center gap-1.5 -mt-1">
+        <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-muted/60 border border-border text-[11px] font-semibold text-foreground">
+          <Clock className="w-3 h-3" />
+          Duração: <span className="font-bold">{durationLabel(reservation.inicio_em, reservation.fim_em)}</span>
+        </span>
       </div>
 
       {reservation.observacoes && (
-        <p className="relative text-xs text-muted-foreground italic line-clamp-2">{reservation.observacoes}</p>
+        <div className="relative rounded-lg bg-muted/40 border border-border/50 p-2">
+          <p className="text-sm text-foreground/85 line-clamp-2">{reservation.observacoes}</p>
+        </div>
       )}
 
       {/* Ações */}
