@@ -8,7 +8,7 @@ import { DateTimePicker } from '@/components/ui/date-time-picker';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
-import { cn, nowSPLocal } from '@/lib/utils';
+import { cn, nowSPLocal, ensureSPOffset } from '@/lib/utils';
 import { PARTNERS, type PartnerSlug } from '@/lib/partners';
 import { useCartReservations, type CartReservation, type ReservationTipo } from '@/hooks/useCartReservations';
 import { useElectricCarts } from '@/hooks/useElectricCarts';
@@ -25,15 +25,19 @@ interface Props {
 }
 
 function addHoursLocal(local: string, hours: number): string {
-  // local is YYYY-MM-DDTHH:MM
-  const d = new Date(local);
-  d.setHours(d.getHours() + hours);
-  const y = d.getFullYear();
-  const mo = String(d.getMonth() + 1).padStart(2, '0');
-  const da = String(d.getDate()).padStart(2, '0');
-  const h = String(d.getHours()).padStart(2, '0');
-  const mi = String(d.getMinutes()).padStart(2, '0');
-  return `${y}-${mo}-${da}T${h}:${mi}`;
+  // local is YYYY-MM-DDTHH:MM — interpret as São Paulo wall time, do arithmetic in UTC
+  // to avoid browser timezone shifting the result.
+  const [datePart, timePart] = local.split('T');
+  const [y, mo, da] = datePart.split('-').map(Number);
+  const [h, mi] = (timePart || '00:00').split(':').map(Number);
+  const utc = new Date(Date.UTC(y, (mo || 1) - 1, da || 1, h || 0, mi || 0));
+  utc.setUTCHours(utc.getUTCHours() + hours);
+  const yy = utc.getUTCFullYear();
+  const mm = String(utc.getUTCMonth() + 1).padStart(2, '0');
+  const dd = String(utc.getUTCDate()).padStart(2, '0');
+  const hh = String(utc.getUTCHours()).padStart(2, '0');
+  const mn = String(utc.getUTCMinutes()).padStart(2, '0');
+  return `${yy}-${mm}-${dd}T${hh}:${mn}`;
 }
 
 export default function ReservationDialog({ open, onOpenChange, reservation }: Props) {
@@ -185,8 +189,8 @@ export default function ReservationDialog({ open, onOpenChange, reservation }: P
         empresa_slug: tipoFinal === 'empresa' ? empresaSlug : null,
         nome_externo: tipoFinal === 'outros' ? nomeExterno : null,
         telefone_externo: tipoFinal === 'outros' ? telefoneExterno || null : null,
-        inicio_em: new Date(inicio).toISOString(),
-        fim_em: new Date(fim).toISOString(),
+        inicio_em: ensureSPOffset(inicio),
+        fim_em: ensureSPOffset(fim),
         observacoes: obs || null,
       };
       if (reservation) {
