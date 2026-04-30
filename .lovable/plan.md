@@ -1,81 +1,73 @@
-## Objetivo
+# Corrigir horários -3h dos Carrinhos Elétricos
 
-No menu **Carrinhos Elétricos**, ao registrar uma retirada:
-1. O campo **"Quem retira"** deve listar as pessoas **autorizadas** (do menu **Autorizados**, tipo `carro_eletrico`), e não mais a lista de membros da org.
-2. Exibir um **aviso (toast warning, sem bloqueio)** quando já houver outro carrinho **em uso** retirado por alguém da **mesma comissão** da pessoa selecionada — regra interna de "1 carrinho por comissão".
+## Diagnóstico
 
-Aplicado em dois lugares:
-- Dialog **Registrar Retirada** (`src/pages/ElectricCartsPage.tsx`)
-- Dialog **Reservas** (`src/components/electric-carts/ReservationDialog.tsx`) — mesma lógica para consistência
+O bug existia no envio: até a correção anterior, os campos `retirada_em`, `devolucao_em`, `inicio_em` e `fim_em` eram enviados **sem offset de timezone**. O Postgres interpretou os valores como **UTC**, então uma retirada digitada às **08:30 (SP)** ficou armazenada como **08:30 UTC** — que ao ser exibida em `America/Sao_Paulo` aparece como **05:30** (-3h).
 
----
+Verificação no banco confirma:
 
-## Mudanças
+| Tabela | Registros afetados |
+|---|---|
+| `electric_carts.retirada_em` / `devolucao_em` | 11 registros ativos |
+| `cart_reservations.inicio_em` / `fim_em` | 5 registros |
+| `cart_history.after_data` (snapshots JSONB) | 17 eventos de retirada/devolução |
 
-### 1. `src/pages/ElectricCartsPage.tsx` — Dialog "Registrar Retirada"
+Exemplo real (G24 - JEFERSON): cadastrado às 08:30 SP, salvo como `2026-04-30 08:30:00+00` (UTC) → exibido como **05:30**. Correto seria `2026-04-30 11:30:00+00`.
 
-**Aba "Membro" (renomeada para "Autorizado"):**
-- Substituir a Select que lista `members` por uma Select que lista `authorizations` filtradas por `authorization_type='carro_eletrico'` e, idealmente, `access_status='liberado'`.
-- Cada item exibe: `member_name — committee_name_snapshot` (ex.: "Jorge João Lunardi — Agricultura, Soja e Derivados").
-- Ordenação alfabética por nome; agrupamento opcional por comissão.
-- Ao selecionar:
-  - `pickupForm.nome_externo` recebe `member_name` (será gravado nesse campo, já que a pessoa não é necessariamente um `org_member` com `user_id`).
-  - `pickupForm.comissao` recebe `committee_name_snapshot` (mostrado no Badge "Comissão" abaixo da seleção).
-  - `pickupForm.userId` fica `null`.
-- Manter abas **Empresa** e **Outros** inalteradas.
+## O código já está corrigido
 
-**Persistência:**
-- A retirada será salva como `tipo_responsavel='outros'` (já existente), com `nome_externo = member_name` e adicionando `comissao` no payload do `pickup`.
-- Atualizar `useElectricCarts.pickup` para aceitar e gravar `comissao` também quando `tipo='outros'` (hoje só grava em `interno`). Pequeno ajuste: aceitar `comissao` em qualquer tipo se vier informado.
+A correção do envio (commit anterior) garante que **novos registros** sejam gravados com offset SP (`-03:00`). Esta migration corrige apenas o **legado**.
 
-**Aviso de duplicidade por comissão:**
-- Adicionar `useMemo` que mapeia, para cada comissão, os carrinhos atualmente `em_uso` (lendo `carts` + cruzando `nome_externo`/`responsavel_user_id` com `mobility_authorizations` para descobrir a comissão de cada retirador atual).
-- Ao escolher um autorizado, se a comissão dele já tem ≥1 carrinho em uso → exibir aviso visual abaixo do select:
-  - Banner amarelo: "⚠ Esta comissão já está com o carrinho **CARRINHO-XX** retirado por **NOME**. O recomendado é 1 carrinho por comissão."
-- Ao clicar em **Registrar Retirada**, se a duplicidade persistir, disparar `toast.warning(...)` mas **prosseguir normalmente** com a retirada.
+## Migration de correção
 
-### 2. `src/components/electric-carts/ReservationDialog.tsx`
+Soma `+3 horas` em todos os timestamps gravados antes do fix:
 
-- Aba **Membro** ganha a mesma troca: lista de autorizados em vez de `members`.
-- Mesma checagem de aviso para reservas que se sobrepõem no tempo com outra reserva ativa de pessoa da mesma comissão.
-- Salvar como `tipo_responsavel='outros'` com `nome_externo` + `comissao`.
+```sql
+-- 1) electric_carts: retirada_em e devolucao_em
+UPDATE electric_carts
+SET retirada_em = retirada_em + interval '3 hours'
+WHERE retirada_em IS NOT NULL;
 
-### 3. `src/hooks/useElectricCarts.ts`
+UPDATE electric_carts
+SET devolucao_em = devolucao_em + interval '3 hours'
+WHERE devolucao_em IS NOT NULL;
 
-- Em `pickup.mutationFn`, permitir gravar `comissao` também quando `tipo === 'outros'` (hoje força `comissao=null` exceto em `interno`).
+-- 2) cart_reservations: inicio_em e fim_em
+UPDATE cart_reservations
+SET inicio_em = inicio_em + interval '3 hours',
+    fim_em    = fim_em    + interval '3 hours';
 
-### 4. `src/hooks/useMobilityAuthorizations.ts`
+-- 3) cart_history: snapshots JSONB (retirada/devolucao)
+UPDATE cart_history
+SET after_data = jsonb_set(
+      after_data,
+      '{retirada_em}',
+      to_jsonb(((after_data->>'retirada_em')::timestamptz + interval '3 hours')::text)
+    )
+WHERE after_data ? 'retirada_em' AND after_data->>'retirada_em' IS NOT NULL;
 
-- Sem alterações estruturais. O hook já filtra por `type='carro_eletrico'`. Será consumido nos dois dialogs.
-
----
-
-## Detalhe técnico do "aviso por comissão"
-
-```text
-Para cada cart em status 'em_uso':
-  if cart.comissao -> usar diretamente
-  else if cart.responsavel_user_id -> resolver via members[].commission_id
-  else if cart.nome_externo -> procurar em authorizations onde
-        member_name == nome_externo && type=='carro_eletrico'
-        -> usar committee_name_snapshot
-=> map<comissao, { cartCodigo, retiradoPor }>
+UPDATE cart_history
+SET after_data = jsonb_set(
+      after_data,
+      '{devolucao_em}',
+      to_jsonb(((after_data->>'devolucao_em')::timestamptz + interval '3 hours')::text)
+    )
+WHERE after_data ? 'devolucao_em' AND after_data->>'devolucao_em' IS NOT NULL;
 ```
 
-Ao selecionar autorizado X:
-- `comissaoSelecionada = X.committee_name_snapshot`
-- Se `map[comissaoSelecionada]` existe → mostra aviso (apenas visual + toast warning no submit).
+## Risco e Mitigação
 
----
+- **Risco:** se algum registro já estiver correto, ficará +3h adiantado.
+- **Mitigação:** a auditoria mostra padrão 100% uniforme — nenhum registro foi gravado com offset antes do fix. Todos precisam do +3h.
+- Backup automático do Lovable Cloud permite reverter se necessário.
 
-## Resultado esperado
+## Resultado Esperado
 
-- "Quem retira" passa a refletir a lista oficial de autorizados (vinda do menu Autorizados).
-- A comissão é preenchida automaticamente e exibida.
-- Se já houver outra retirada ativa de alguém da mesma comissão, o operador vê um aviso claro mas pode prosseguir (regra é orientativa, não bloqueante).
-- Sem mudanças de schema; sem migrations.
+- G24 JEFERSON: `08:30+00` → `11:30+00` → exibido como **08:30 SP** ✅
+- Todos os cards passam a refletir o horário real digitado pelo usuário.
+- Novos cadastros já saem corretos pela correção do código aplicada anteriormente.
 
-Arquivos a editar:
-- `src/pages/ElectricCartsPage.tsx`
-- `src/components/electric-carts/ReservationDialog.tsx`
-- `src/hooks/useElectricCarts.ts`
+## Arquivos
+
+- Nova migration SQL (executada via tool `supabase--migration`).
+- Nenhuma mudança adicional de código — o frontend já está correto.
