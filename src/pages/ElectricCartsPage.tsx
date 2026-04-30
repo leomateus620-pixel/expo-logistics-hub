@@ -4,7 +4,7 @@ import { useCommissions } from '@/hooks/useCommissions';
 import { useMobilityAuthorizations } from '@/hooks/useMobilityAuthorizations';
 import { Zap, Plus, Clock, ArrowRight, FileText, AlertTriangle } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { cn, nowSP, nowSPLocal } from '@/lib/utils';
+import { cn, nowSP, nowSPLocal, ensureSPOffset } from '@/lib/utils';
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -227,7 +227,7 @@ export default function ElectricCartsPage() {
           tipoFinal === 'outros'
             ? (isFromAuth ? pickupForm.nome_externo : pickupForm.nome_externo)
             : null,
-        retirada_em: pickupForm.retirada_em || nowSP(),
+        retirada_em: pickupForm.retirada_em ? ensureSPOffset(pickupForm.retirada_em) : nowSP(),
       });
       setPickupForm({ cartId: '', userId: '', comissao: '', retirada_em: '', tipo: 'interno', empresa_slug: '', nome_externo: '' });
       setPickupOpen(false);
@@ -243,7 +243,7 @@ export default function ElectricCartsPage() {
 
   const handleReturn = async () => {
     try {
-      await returnCart.mutateAsync({ id: returnId, devolucao_em: returnForm.devolucao_em || nowSP() });
+      await returnCart.mutateAsync({ id: returnId, devolucao_em: returnForm.devolucao_em ? ensureSPOffset(returnForm.devolucao_em) : nowSP() });
       setReturnOpen(false);
       toast.success('Devolução registrada');
     } catch (err: any) { toast.error(err.message); }
