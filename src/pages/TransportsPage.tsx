@@ -838,6 +838,7 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
           setStartTripWhatsappGuests(result.whatsappGuests || []);
           setStartTripDriverName(result.driverName || '');
           setStartTripStartedAt(result.startedAt || '');
+          setStartTripTitulo(t.titulo || '');
           setStartTripDialogOpen(true);
         }
       } catch { /* handled by onError */ }
