@@ -483,7 +483,14 @@ async function handleArriveDestination(admin: any, userId: string, payload: any)
   });
 
   // Auto-register one-way (ida) leg in vehicle_usage (B.2)
-  if (transport.vehicle_id && transport.km_retirada != null && transport.distancia_estimada_km) {
+  // Skip if km_retirada is 0/null — avoids creating "phantom" usages disconnected
+  // from the real odometer (causes inflated cost estimates).
+  if (
+    transport.vehicle_id &&
+    transport.km_retirada != null &&
+    Number(transport.km_retirada) > 0 &&
+    transport.distancia_estimada_km
+  ) {
     try {
       const kmIda = Math.round(Number(transport.distancia_estimada_km) / 2);
       const kmRetirada = Number(transport.km_retirada);
