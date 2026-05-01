@@ -735,6 +735,9 @@ function VehicleDetailContent({ vehicle, members, userId, kmTotal, fuelCostTotal
         </div>
       </div>
 
+      {/* Conferência de Odômetro */}
+      <OdometerConsistencyCard vehicle={vehicle} usages={usages} kmTotal={kmTotal} />
+
       {/* PDF button */}
       <Button variant="outline" size="sm" onClick={handleGeneratePDF} className="w-full h-9 text-xs liquid-glass-card">
         <FileText className="w-3.5 h-3.5 mr-1.5" /> Gerar Relatório PDF
