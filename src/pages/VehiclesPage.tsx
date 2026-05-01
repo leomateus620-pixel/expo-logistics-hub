@@ -735,6 +735,9 @@ function VehicleDetailContent({ vehicle, members, userId, kmTotal, fuelCostTotal
         </div>
       </div>
 
+      {/* Conferência de Odômetro */}
+      <OdometerConsistencyCard vehicle={vehicle} usages={usages} kmTotal={kmTotal} />
+
       {/* PDF button */}
       <Button variant="outline" size="sm" onClick={handleGeneratePDF} className="w-full h-9 text-xs liquid-glass-card">
         <FileText className="w-3.5 h-3.5 mr-1.5" /> Gerar Relatório PDF
@@ -1103,3 +1106,75 @@ function VehicleDetailContent({ vehicle, members, userId, kmTotal, fuelCostTotal
     </div>
   );
 }
+
+/**
+ * Bloco "Conferência de Odômetro" — compara Σ km_rodados (vehicle_usage) com a
+ * variação real do odômetro (max_km_chegada − min_km_saida) e sinaliza divergências.
+ */
+function OdometerConsistencyCard({ vehicle, usages, kmTotal }: { vehicle: any; usages: any[]; kmTotal: number }) {
+  const valid = usages.filter((u: any) => u.km_saida != null && Number(u.km_saida) > 0);
+  const closed = valid.filter((u: any) => u.km_chegada != null);
+  const minSaida = valid.length ? Math.min(...valid.map((u: any) => Number(u.km_saida))) : null;
+  const maxChegada = closed.length ? Math.max(...closed.map((u: any) => Number(u.km_chegada))) : null;
+  const odometroAtual = Number(vehicle.km_atual || 0);
+  const variacaoReal = minSaida != null && maxChegada != null ? maxChegada - minSaida : null;
+  const diff = variacaoReal != null ? kmTotal - variacaoReal : null;
+  const gapAtual = maxChegada != null ? odometroAtual - maxChegada : null;
+
+  const hasIssue =
+    (diff != null && Math.abs(diff) > 5) ||
+    (gapAtual != null && Math.abs(gapAtual) > 5) ||
+    (odometroAtual === 0 && usages.length === 0);
+
+  return (
+    <div className={cn(
+      'rounded-xl liquid-glass-card p-4 space-y-2',
+      hasIssue ? 'border-warning/40' : 'border-success/30'
+    )}>
+      <div className="flex items-center gap-2 mb-1">
+        <div className={cn(
+          'w-8 h-8 rounded-lg flex items-center justify-center',
+          hasIssue ? 'bg-warning/15 text-warning' : 'bg-success/15 text-success'
+        )}>
+          {hasIssue ? <AlertTriangle className="w-4 h-4" /> : <CircleDot className="w-4 h-4" />}
+        </div>
+        <div>
+          <p className="text-sm font-semibold text-foreground">Conferência de Odômetro</p>
+          <p className="text-[10px] text-muted-foreground">
+            {hasIssue ? 'Há divergência entre o registrado e o odômetro' : 'Dados consistentes'}
+          </p>
+        </div>
+      </div>
+      <div className="grid grid-cols-2 gap-2 text-xs">
+        <div className="rounded-lg bg-foreground/[0.03] p-2">
+          <p className="text-[10px] text-muted-foreground">Odômetro inicial</p>
+          <p className="font-bold text-foreground">{minSaida != null ? formatKm(minSaida) + ' km' : '—'}</p>
+        </div>
+        <div className="rounded-lg bg-foreground/[0.03] p-2">
+          <p className="text-[10px] text-muted-foreground">Odômetro atual</p>
+          <p className="font-bold text-foreground">{formatKm(odometroAtual)} km</p>
+        </div>
+        <div className="rounded-lg bg-foreground/[0.03] p-2">
+          <p className="text-[10px] text-muted-foreground">Σ KM Rodados (sistema)</p>
+          <p className="font-bold text-foreground">{formatKm(kmTotal)} km</p>
+        </div>
+        <div className="rounded-lg bg-foreground/[0.03] p-2">
+          <p className="text-[10px] text-muted-foreground">Variação real do odômetro</p>
+          <p className="font-bold text-foreground">{variacaoReal != null ? formatKm(variacaoReal) + ' km' : '—'}</p>
+        </div>
+      </div>
+      {diff != null && Math.abs(diff) > 5 && (
+        <p className="text-[11px] text-warning font-medium">
+          ⚠ Σ KM diverge da variação real em {formatKm(Math.abs(diff))} km
+          {diff > 0 ? ' (registrado a mais — possíveis sobreposições)' : ' (registrado a menos — gaps no histórico)'}
+        </p>
+      )}
+      {gapAtual != null && Math.abs(gapAtual) > 5 && (
+        <p className="text-[11px] text-warning font-medium">
+          ⚠ Odômetro atual está {gapAtual > 0 ? 'à frente' : 'atrás'} do último km de chegada em {formatKm(Math.abs(gapAtual))} km
+        </p>
+      )}
+    </div>
+  );
+}
+
