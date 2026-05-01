@@ -53,12 +53,56 @@ export function useScooters() {
   });
 
   const pickup = useMutation({
-    mutationFn: async ({ id, responsavel_user_id, comissao, retirada_em }: { id: string; responsavel_user_id: string; comissao?: string | null; retirada_em?: string }) => {
+    mutationFn: async ({
+      id,
+      responsavel_user_id,
+      comissao,
+      retirada_em,
+      tipo,
+      empresa_slug,
+      nome_externo,
+      telefone_externo,
+    }: {
+      id: string;
+      responsavel_user_id?: string | null;
+      comissao?: string | null;
+      retirada_em?: string;
+      tipo?: 'interno' | 'empresa' | 'outros';
+      empresa_slug?: string | null;
+      nome_externo?: string | null;
+      telefone_externo?: string | null;
+    }) => {
       const { data: before } = await (supabase as any).from('scooters').select('*').eq('id', id).single();
       const raw = retirada_em || nowSP();
       const pickupTime = raw.length <= 19 ? raw + '-03:00' : raw;
+      const tipoFinal = tipo || 'interno';
+      const updatePayload: Record<string, any> = {
+        status: 'em_uso',
+        retirada_em: pickupTime,
+        devolucao_em: null,
+        tipo_responsavel: tipoFinal,
+      };
+      if (tipoFinal === 'empresa') {
+        updatePayload.responsavel_user_id = null;
+        updatePayload.comissao = null;
+        updatePayload.empresa_slug = empresa_slug || null;
+        updatePayload.nome_externo = null;
+        updatePayload.telefone_externo = null;
+      } else if (tipoFinal === 'outros') {
+        updatePayload.responsavel_user_id = null;
+        updatePayload.comissao = comissao || null;
+        updatePayload.empresa_slug = null;
+        updatePayload.nome_externo = (nome_externo || '').trim().toUpperCase() || null;
+        updatePayload.telefone_externo = telefone_externo || null;
+      } else {
+        updatePayload.responsavel_user_id = responsavel_user_id || null;
+        updatePayload.comissao = comissao || null;
+        updatePayload.empresa_slug = null;
+        updatePayload.nome_externo = null;
+        updatePayload.telefone_externo = null;
+      }
       const { data, error } = await (supabase as any).from('scooters')
-        .update({ status: 'em_uso', responsavel_user_id, comissao: comissao || null, retirada_em: pickupTime, devolucao_em: null })
+        .update(updatePayload)
         .eq('id', id).select().single();
       if (error) throw error;
       const user = (await supabase.auth.getUser()).data.user;
@@ -77,7 +121,16 @@ export function useScooters() {
       const raw = devolucao_em || nowSP();
       const returnTime = raw.length <= 19 ? raw + '-03:00' : raw;
       const { data, error } = await (supabase as any).from('scooters')
-        .update({ status: 'disponivel', responsavel_user_id: null, devolucao_em: returnTime })
+        .update({
+          status: 'disponivel',
+          responsavel_user_id: null,
+          comissao: null,
+          empresa_slug: null,
+          nome_externo: null,
+          telefone_externo: null,
+          tipo_responsavel: 'interno',
+          devolucao_em: returnTime,
+        })
         .eq('id', id).select().single();
       if (error) throw error;
       const user = (await supabase.auth.getUser()).data.user;
@@ -94,7 +147,7 @@ export function useScooters() {
     queryKey: ['scooter-history', orgId],
     queryFn: async () => {
       if (!orgId) return [];
-      const { data } = await (supabase as any).from('scooter_history').select('*').eq('org_id', orgId).order('created_at', { ascending: false }).limit(100);
+      const { data } = await (supabase as any).from('scooter_history').select('*').eq('org_id', orgId).order('created_at', { ascending: false }).limit(200);
       return data || [];
     },
     enabled: !!orgId,
