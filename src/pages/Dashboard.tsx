@@ -8,7 +8,6 @@ import { useOrgMembers } from '@/hooks/useOrgMembers';
 import { useSchedules } from '@/hooks/useSchedules';
 import { useExpenses } from '@/hooks/useExpenses';
 import StatCard from '@/components/StatCard';
-import FenasojaCountdown from '@/components/dashboard/FenasojaCountdown';
 import {
   Car, Zap, MapPin, CheckSquare, CalendarDays, Users, User,
   Hotel, ClipboardList, ArrowRight, Clock, AlertCircle, ExternalLink, FileText, Sheet, Receipt,
@@ -287,9 +286,6 @@ export default function Dashboard() {
         <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-foreground">{getGreeting()} 👋</h1>
         <p className="text-xs text-muted-foreground mt-0.5 capitalize font-medium">{formatDateBR()}</p>
       </div>
-
-      {/* ─── Fenasoja Countdown ─── */}
-      <FenasojaCountdown />
 
       {/* ─── Stat Cards 2x2 ─── */}
       {isLoadingAll ? (
