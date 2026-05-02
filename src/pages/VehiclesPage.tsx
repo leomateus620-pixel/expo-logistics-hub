@@ -605,13 +605,18 @@ function VehicleDetailContent({ vehicle, members, userId, kmTotal, fuelCostTotal
   const { transports } = useTransports();
   const { update: updateVehicle, uploadDocument, getDocumentUrl } = useVehicles();
   const { records: fuelRecords, create: createFuel, updateFuel, uploadReceipt } = useFuelRecords(vehicle.id);
+  const { expenses: vehicleExpenses, remove: removeExpense } = useExpenses({ vehicle_id: vehicle.id });
+  const { myRole } = useCurrentOrg();
+  const canDeleteExpense = myRole === 'admin' || myRole === 'gestor';
   const navigate = useNavigate();
 
   const [kmSaida, setKmSaida] = useState('');
   const [kmChegada, setKmChegada] = useState('');
   const [responsavelId, setResponsavelId] = useState(userId || '');
   const [obs, setObs] = useState('');
-  const [activeTab, setActiveTab] = useState<'uso' | 'combustivel'>('uso');
+  const [activeTab, setActiveTab] = useState<'uso' | 'combustivel' | 'despesas'>('uso');
+  const [expenseToDelete, setExpenseToDelete] = useState<any | null>(null);
+  const [deletingExpense, setDeletingExpense] = useState(false);
 
   const [fuelOpen, setFuelOpen] = useState(false);
   const [fuelForm, setFuelForm] = useState({ litros: '', valor: '', km_abastecimento: '', posto: '', observacoes: '' });
