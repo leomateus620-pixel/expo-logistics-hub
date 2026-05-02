@@ -3,11 +3,23 @@ import { useOrgMembers } from '@/hooks/useOrgMembers';
 import { useVehicleUsage } from '@/hooks/useVehicleUsage';
 import { useTransports } from '@/hooks/useTransports';
 import { useFuelRecords } from '@/hooks/useFuelRecords';
+import { useExpenses } from '@/hooks/useExpenses';
+import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import { useAuth } from '@/hooks/useAuth';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import {
   Car, Pencil, Plus, Gauge, Fuel, ArrowRight, Clock, ExternalLink,
   Camera, Image, FileText, ChevronRight, Wrench, CircleDot, AlertTriangle,
-  TrendingUp, DollarSign, Activity, Upload, Eye, Trash2
+  TrendingUp, DollarSign, Activity, Upload, Eye, Trash2, MapPin, Receipt
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn, nowSP } from '@/lib/utils';
@@ -100,12 +112,16 @@ ${fuelRecords.map((f: any) => `<tr>
   if (w) { w.document.write(html); w.document.close(); w.print(); }
 }
 
+const ACTIVE_TRANSPORT_STATUSES = ['em_andamento', 'em_retorno', 'chegou_destino'];
+
 export default function VehiclesPage() {
   const { vehicles, isLoading: vehiclesLoading, create, update } = useVehicles();
   const { members } = useOrgMembers();
   const { user } = useAuth();
   const { usages, totalKm, kmByVehicle, isLoading: usageLoading } = useVehicleUsage();
   const { records: allFuelRecords, isLoading: fuelLoading } = useFuelRecords();
+  const { transports } = useTransports();
+  const navigate = useNavigate();
 
   const [addOpen, setAddOpen] = useState(false);
   const [addForm, setAddForm] = useState({ placa: '', marca: '', modelo: '', ano: '', cor: '', categoria: 'outro', km_atual: '' });
@@ -118,15 +134,31 @@ export default function VehiclesPage() {
 
   const isLoading = vehiclesLoading || usageLoading || fuelLoading;
 
-  // Derive effective status from open usages
+  // Active transport per vehicle (em_andamento / em_retorno / chegou_destino)
+  const activeTransportByVehicle = useMemo(() => {
+    const map: Record<string, any> = {};
+    for (const t of transports as any[]) {
+      if (!t?.vehicle_id) continue;
+      if (!ACTIVE_TRANSPORT_STATUSES.includes(t.status)) continue;
+      // Keep the most recently started for that vehicle
+      const existing = map[t.vehicle_id];
+      if (!existing || (t.inicio_em || '') > (existing.inicio_em || '')) {
+        map[t.vehicle_id] = t;
+      }
+    }
+    return map;
+  }, [transports]);
+
+  // Derive effective status from open usages OR active transports
   const effectiveStatus = useMemo(() => {
     const map: Record<string, string> = {};
     vehicles.forEach((v: any) => {
       const hasOpenUsage = usages.some((u: any) => u.vehicle_id === v.id && !u.km_chegada);
-      map[v.id] = hasOpenUsage ? 'em_uso' : v.status;
+      const hasActiveTransport = !!activeTransportByVehicle[v.id];
+      map[v.id] = (hasOpenUsage || hasActiveTransport) ? 'em_uso' : v.status;
     });
     return map;
-  }, [vehicles, usages]);
+  }, [vehicles, usages, activeTransportByVehicle]);
 
   // Aggregated metrics
   const metrics = useMemo(() => {
@@ -320,6 +352,10 @@ export default function VehiclesPage() {
             const sc = statusConfig[vStatus] || statusConfig.disponivel;
             const vehicleKm = kmByVehicle[v.id] || 0;
             const vehicleFuelCost = fuelByVehicle[v.id] || 0;
+            const activeTransport = activeTransportByVehicle[v.id];
+            const transportDriver = activeTransport
+              ? members.find((m: any) => m.user_id === activeTransport.motorista_user_id)
+              : null;
             return (
               <div
                 key={v.id}
@@ -350,11 +386,11 @@ export default function VehiclesPage() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 mb-3">
+                <div className="flex items-center gap-2 mb-3 flex-wrap">
                   <Badge variant="outline" className={cn('text-[10px] font-medium', sc.badgeCls)}>
                     {sc.label}
                   </Badge>
-                  {driver && (
+                  {driver && !activeTransport && (
                     <span className="text-[10px] text-muted-foreground truncate flex items-center gap-1">
                       <div className="w-4 h-4 rounded-full flex items-center justify-center text-[7px] font-bold text-primary-foreground shrink-0" style={{ backgroundColor: driver.avatar_color || 'hsl(142,50%,35%)' }}>
                         {(driver.nome_exibicao || '?')[0]}
@@ -363,6 +399,37 @@ export default function VehiclesPage() {
                     </span>
                   )}
                 </div>
+
+                {activeTransport && (
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); navigate('/transports'); }}
+                    className="w-full mb-3 flex items-center gap-2 rounded-xl bg-info/10 border border-info/25 px-2.5 py-2 text-left hover:bg-info/15 transition-colors"
+                    aria-label="Abrir transportes"
+                  >
+                    <div className="w-7 h-7 rounded-lg bg-info/20 flex items-center justify-center shrink-0">
+                      <MapPin className="w-3.5 h-3.5 text-info" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[10px] font-semibold text-info uppercase tracking-wider leading-none">Em transporte</p>
+                      <p className="text-[11px] font-medium text-foreground truncate mt-0.5">
+                        {activeTransport.origem} → {activeTransport.destino}
+                      </p>
+                      {transportDriver && (
+                        <p className="text-[10px] text-muted-foreground truncate flex items-center gap-1 mt-0.5">
+                          <div
+                            className="w-3 h-3 rounded-full flex items-center justify-center text-[6px] font-bold text-primary-foreground shrink-0"
+                            style={{ backgroundColor: transportDriver.avatar_color || 'hsl(142,50%,35%)' }}
+                          >
+                            {(transportDriver.nome_exibicao || '?')[0]}
+                          </div>
+                          {transportDriver.nome_exibicao}
+                        </p>
+                      )}
+                    </div>
+                    <ChevronRight className="w-3.5 h-3.5 text-info shrink-0" />
+                  </button>
+                )}
 
                 <div className="grid grid-cols-3 gap-2 text-center">
                   <div className="rounded-xl bg-foreground/[0.03] p-2">
@@ -550,13 +617,18 @@ function VehicleDetailContent({ vehicle, members, userId, kmTotal, fuelCostTotal
   const { transports } = useTransports();
   const { update: updateVehicle, uploadDocument, getDocumentUrl } = useVehicles();
   const { records: fuelRecords, create: createFuel, updateFuel, uploadReceipt } = useFuelRecords(vehicle.id);
+  const { expenses: vehicleExpenses, remove: removeExpense } = useExpenses({ vehicle_id: vehicle.id });
+  const { myRole } = useCurrentOrg();
+  const canDeleteExpense = myRole === 'admin' || myRole === 'gestor';
   const navigate = useNavigate();
 
   const [kmSaida, setKmSaida] = useState('');
   const [kmChegada, setKmChegada] = useState('');
   const [responsavelId, setResponsavelId] = useState(userId || '');
   const [obs, setObs] = useState('');
-  const [activeTab, setActiveTab] = useState<'uso' | 'combustivel'>('uso');
+  const [activeTab, setActiveTab] = useState<'uso' | 'combustivel' | 'despesas'>('uso');
+  const [expenseToDelete, setExpenseToDelete] = useState<any | null>(null);
+  const [deletingExpense, setDeletingExpense] = useState(false);
 
   const [fuelOpen, setFuelOpen] = useState(false);
   const [fuelForm, setFuelForm] = useState({ litros: '', valor: '', km_abastecimento: '', posto: '', observacoes: '' });
@@ -708,8 +780,45 @@ function VehicleDetailContent({ vehicle, members, userId, kmTotal, fuelCostTotal
     generateVehiclePDF(vehicle, usages, fuelRecords, kmTotal, members);
   };
 
+  const activeTransport = useMemo(
+    () =>
+      (transports as any[]).find(
+        (t: any) =>
+          t?.vehicle_id === vehicle.id &&
+          ['em_andamento', 'em_retorno', 'chegou_destino'].includes(t.status),
+      ),
+    [transports, vehicle.id],
+  );
+  const activeTransportDriver = activeTransport
+    ? members.find((m: any) => m.user_id === activeTransport.motorista_user_id)
+    : null;
+
   return (
     <div className="space-y-4">
+      {activeTransport && (
+        <button
+          type="button"
+          onClick={() => navigate('/transports')}
+          className="w-full flex items-center gap-3 rounded-xl bg-info/10 border border-info/30 p-3 text-left hover:bg-info/15 transition-colors"
+        >
+          <div className="w-9 h-9 rounded-xl bg-info/20 flex items-center justify-center shrink-0">
+            <MapPin className="w-4 h-4 text-info" />
+          </div>
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] font-semibold text-info uppercase tracking-wider">Transporte ativo</p>
+            <p className="text-sm font-semibold text-foreground truncate">
+              {activeTransport.origem} → {activeTransport.destino}
+            </p>
+            {activeTransportDriver && (
+              <p className="text-[11px] text-muted-foreground truncate">
+                Motorista: {activeTransportDriver.nome_exibicao}
+              </p>
+            )}
+          </div>
+          <ChevronRight className="w-4 h-4 text-info shrink-0" />
+        </button>
+      )}
+
       {/* Vehicle metrics summary */}
       <div className="grid grid-cols-3 gap-2">
         <div className="rounded-xl bg-primary/5 border border-primary/10 p-3 text-center">
@@ -909,6 +1018,12 @@ function VehicleDetailContent({ vehicle, members, userId, kmTotal, fuelCostTotal
         >
           Combustível <Badge variant="secondary" className="text-[9px] px-1.5 py-0 h-4">{fuelRecords.length}</Badge>
         </button>
+        <button
+          className={cn('flex-1 py-2 px-3 rounded-lg text-xs font-medium transition-all flex items-center justify-center gap-1.5', activeTab === 'despesas' ? 'bg-background text-foreground shadow-sm' : 'text-muted-foreground')}
+          onClick={() => setActiveTab('despesas')}
+        >
+          Despesas <Badge variant="secondary" className="text-[9px] px-1.5 py-0 h-4">{vehicleExpenses.length}</Badge>
+        </button>
       </div>
 
       {/* Usage history tab */}
@@ -1103,6 +1218,125 @@ function VehicleDetailContent({ vehicle, members, userId, kmTotal, fuelCostTotal
           )}
         </div>
       )}
+
+      {/* Expenses tab */}
+      {activeTab === 'despesas' && (
+        <div>
+          {vehicleExpenses.length === 0 ? (
+            <div className="text-center py-8">
+              <Receipt className="w-8 h-8 mx-auto mb-2 text-muted-foreground/30" />
+              <p className="text-xs text-muted-foreground">Nenhuma despesa vinculada a este veículo</p>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => navigate('/expenses')}
+                className="mt-3 h-9 text-xs liquid-glass-card"
+              >
+                Lançar despesa
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {vehicleExpenses.map((e: any) => {
+                const linkedTransport = e.transports;
+                const statusBadge: Record<string, string> = {
+                  rascunho: 'bg-muted text-muted-foreground border-border',
+                  pendente_comprovante: 'bg-warning/15 text-warning border-warning/25',
+                  pendente_validacao: 'bg-info/15 text-info border-info/25',
+                  validada: 'bg-success/15 text-success border-success/25',
+                  reembolsada: 'bg-success/15 text-success border-success/25',
+                  recusada: 'bg-destructive/15 text-destructive border-destructive/25',
+                };
+                const statusCls = statusBadge[e.status] || statusBadge.rascunho;
+                const dateLabel = e.expense_date
+                  ? new Date(e.expense_date).toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo', day: '2-digit', month: '2-digit' })
+                  : '—';
+                return (
+                  <div key={e.id} className="rounded-xl liquid-glass-card p-3 text-xs space-y-1.5">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0 flex-1">
+                        <p className="font-semibold text-foreground truncate">{e.title || 'Despesa'}</p>
+                        {e.expense_categories?.name && (
+                          <p className="text-[10px] text-muted-foreground mt-0.5">{e.expense_categories.name}</p>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <span className="text-sm font-bold text-foreground tabular-nums">
+                          {formatCurrency(Number(e.amount) || 0)}
+                        </span>
+                        {canDeleteExpense && (
+                          <button
+                            onClick={() => setExpenseToDelete(e)}
+                            aria-label="Excluir despesa"
+                            className="p-1.5 rounded-lg hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <Badge variant="outline" className={cn('text-[9px] font-medium', statusCls)}>
+                        {(e.status || 'rascunho').replace(/_/g, ' ')}
+                      </Badge>
+                      <span className="text-[10px] text-muted-foreground flex items-center gap-1">
+                        <Clock className="w-3 h-3" /> {dateLabel}
+                      </span>
+                      {linkedTransport && (
+                        <button
+                          type="button"
+                          onClick={() => navigate('/transports')}
+                          className="text-[10px] text-info flex items-center gap-1 hover:underline"
+                        >
+                          <MapPin className="w-3 h-3" />
+                          {linkedTransport.titulo || linkedTransport.destino}
+                        </button>
+                      )}
+                    </div>
+                    {e.description && (
+                      <p className="text-muted-foreground italic line-clamp-2">{e.description}</p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
+      <AlertDialog open={!!expenseToDelete} onOpenChange={(o) => { if (!o) setExpenseToDelete(null); }}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir despesa?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {expenseToDelete?.title ? `"${expenseToDelete.title}"` : 'Esta despesa'} será removida permanentemente, junto com seus comprovantes e histórico de aprovações. Esta ação não pode ser desfeita.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deletingExpense}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              disabled={deletingExpense}
+              onClick={async (ev) => {
+                ev.preventDefault();
+                if (!expenseToDelete) return;
+                setDeletingExpense(true);
+                try {
+                  await removeExpense.mutateAsync(expenseToDelete.id);
+                  toast.success('Despesa excluída');
+                  setExpenseToDelete(null);
+                } catch (err: any) {
+                  toast.error(err?.message || 'Erro ao excluir despesa');
+                } finally {
+                  setDeletingExpense(false);
+                }
+              }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deletingExpense ? 'Excluindo...' : 'Excluir'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
