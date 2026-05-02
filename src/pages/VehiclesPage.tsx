@@ -3,7 +3,19 @@ import { useOrgMembers } from '@/hooks/useOrgMembers';
 import { useVehicleUsage } from '@/hooks/useVehicleUsage';
 import { useTransports } from '@/hooks/useTransports';
 import { useFuelRecords } from '@/hooks/useFuelRecords';
+import { useExpenses } from '@/hooks/useExpenses';
+import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import { useAuth } from '@/hooks/useAuth';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import {
   Car, Pencil, Plus, Gauge, Fuel, ArrowRight, Clock, ExternalLink,
   Camera, Image, FileText, ChevronRight, Wrench, CircleDot, AlertTriangle,
