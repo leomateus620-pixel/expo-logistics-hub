@@ -7,7 +7,7 @@ import { useAuth } from '@/hooks/useAuth';
 import {
   Car, Pencil, Plus, Gauge, Fuel, ArrowRight, Clock, ExternalLink,
   Camera, Image, FileText, ChevronRight, Wrench, CircleDot, AlertTriangle,
-  TrendingUp, DollarSign, Activity, Upload, Eye, Trash2
+  TrendingUp, DollarSign, Activity, Upload, Eye, Trash2, MapPin, Receipt
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn, nowSP } from '@/lib/utils';
