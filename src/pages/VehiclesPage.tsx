@@ -339,6 +339,10 @@ export default function VehiclesPage() {
             const sc = statusConfig[vStatus] || statusConfig.disponivel;
             const vehicleKm = kmByVehicle[v.id] || 0;
             const vehicleFuelCost = fuelByVehicle[v.id] || 0;
+            const activeTransport = activeTransportByVehicle[v.id];
+            const transportDriver = activeTransport
+              ? members.find((m: any) => m.user_id === activeTransport.motorista_user_id)
+              : null;
             return (
               <div
                 key={v.id}
@@ -369,11 +373,11 @@ export default function VehiclesPage() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 mb-3">
+                <div className="flex items-center gap-2 mb-3 flex-wrap">
                   <Badge variant="outline" className={cn('text-[10px] font-medium', sc.badgeCls)}>
                     {sc.label}
                   </Badge>
-                  {driver && (
+                  {driver && !activeTransport && (
                     <span className="text-[10px] text-muted-foreground truncate flex items-center gap-1">
                       <div className="w-4 h-4 rounded-full flex items-center justify-center text-[7px] font-bold text-primary-foreground shrink-0" style={{ backgroundColor: driver.avatar_color || 'hsl(142,50%,35%)' }}>
                         {(driver.nome_exibicao || '?')[0]}
@@ -382,6 +386,37 @@ export default function VehiclesPage() {
                     </span>
                   )}
                 </div>
+
+                {activeTransport && (
+                  <button
+                    type="button"
+                    onClick={(e) => { e.stopPropagation(); navigate('/transports'); }}
+                    className="w-full mb-3 flex items-center gap-2 rounded-xl bg-info/10 border border-info/25 px-2.5 py-2 text-left hover:bg-info/15 transition-colors"
+                    aria-label="Abrir transportes"
+                  >
+                    <div className="w-7 h-7 rounded-lg bg-info/20 flex items-center justify-center shrink-0">
+                      <MapPin className="w-3.5 h-3.5 text-info" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[10px] font-semibold text-info uppercase tracking-wider leading-none">Em transporte</p>
+                      <p className="text-[11px] font-medium text-foreground truncate mt-0.5">
+                        {activeTransport.origem} → {activeTransport.destino}
+                      </p>
+                      {transportDriver && (
+                        <p className="text-[10px] text-muted-foreground truncate flex items-center gap-1 mt-0.5">
+                          <div
+                            className="w-3 h-3 rounded-full flex items-center justify-center text-[6px] font-bold text-primary-foreground shrink-0"
+                            style={{ backgroundColor: transportDriver.avatar_color || 'hsl(142,50%,35%)' }}
+                          >
+                            {(transportDriver.nome_exibicao || '?')[0]}
+                          </div>
+                          {transportDriver.nome_exibicao}
+                        </p>
+                      )}
+                    </div>
+                    <ChevronRight className="w-3.5 h-3.5 text-info shrink-0" />
+                  </button>
+                )}
 
                 <div className="grid grid-cols-3 gap-2 text-center">
                   <div className="rounded-xl bg-foreground/[0.03] p-2">
