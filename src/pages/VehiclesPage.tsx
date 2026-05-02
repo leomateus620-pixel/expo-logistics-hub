@@ -109,6 +109,7 @@ export default function VehiclesPage() {
   const { usages, totalKm, kmByVehicle, isLoading: usageLoading } = useVehicleUsage();
   const { records: allFuelRecords, isLoading: fuelLoading } = useFuelRecords();
   const { transports } = useTransports();
+  const navigate = useNavigate();
 
   const [addOpen, setAddOpen] = useState(false);
   const [addForm, setAddForm] = useState({ placa: '', marca: '', modelo: '', ano: '', cor: '', categoria: 'outro', km_atual: '' });
