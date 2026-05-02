@@ -100,12 +100,15 @@ ${fuelRecords.map((f: any) => `<tr>
   if (w) { w.document.write(html); w.document.close(); w.print(); }
 }
 
+const ACTIVE_TRANSPORT_STATUSES = ['em_andamento', 'em_retorno', 'chegou_destino'];
+
 export default function VehiclesPage() {
   const { vehicles, isLoading: vehiclesLoading, create, update } = useVehicles();
   const { members } = useOrgMembers();
   const { user } = useAuth();
   const { usages, totalKm, kmByVehicle, isLoading: usageLoading } = useVehicleUsage();
   const { records: allFuelRecords, isLoading: fuelLoading } = useFuelRecords();
+  const { transports } = useTransports();
 
   const [addOpen, setAddOpen] = useState(false);
   const [addForm, setAddForm] = useState({ placa: '', marca: '', modelo: '', ano: '', cor: '', categoria: 'outro', km_atual: '' });
@@ -118,15 +121,31 @@ export default function VehiclesPage() {
 
   const isLoading = vehiclesLoading || usageLoading || fuelLoading;
 
-  // Derive effective status from open usages
+  // Active transport per vehicle (em_andamento / em_retorno / chegou_destino)
+  const activeTransportByVehicle = useMemo(() => {
+    const map: Record<string, any> = {};
+    for (const t of transports as any[]) {
+      if (!t?.vehicle_id) continue;
+      if (!ACTIVE_TRANSPORT_STATUSES.includes(t.status)) continue;
+      // Keep the most recently started for that vehicle
+      const existing = map[t.vehicle_id];
+      if (!existing || (t.inicio_em || '') > (existing.inicio_em || '')) {
+        map[t.vehicle_id] = t;
+      }
+    }
+    return map;
+  }, [transports]);
+
+  // Derive effective status from open usages OR active transports
   const effectiveStatus = useMemo(() => {
     const map: Record<string, string> = {};
     vehicles.forEach((v: any) => {
       const hasOpenUsage = usages.some((u: any) => u.vehicle_id === v.id && !u.km_chegada);
-      map[v.id] = hasOpenUsage ? 'em_uso' : v.status;
+      const hasActiveTransport = !!activeTransportByVehicle[v.id];
+      map[v.id] = (hasOpenUsage || hasActiveTransport) ? 'em_uso' : v.status;
     });
     return map;
-  }, [vehicles, usages]);
+  }, [vehicles, usages, activeTransportByVehicle]);
 
   // Aggregated metrics
   const metrics = useMemo(() => {
