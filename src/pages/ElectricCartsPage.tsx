@@ -253,8 +253,17 @@ export default function ElectricCartsPage() {
     } catch (err: any) { toast.error(err.message); }
   };
 
+  const { direction, scrollY } = useScrollDirection({ delta: 10, activateAfter: 160 });
+  const showFloating = direction === 'up' && scrollY > 160;
+
   return (
     <div className="space-y-6">
+      <FloatingPickupBar
+        visible={showFloating}
+        onClick={openPickup}
+        available={counts.disponivel}
+        inUse={counts.em_uso}
+      />
       <div>
         <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Carrinhos Elétricos</h1>
         <p className="text-sm text-muted-foreground mt-1">Gerencie os carrinhos elétricos do evento</p>
