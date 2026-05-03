@@ -1,43 +1,73 @@
 ## Objetivo
-Tornar o card "Registrar Retirada" mais compacto (principalmente no mobile 393px), mantendo a largura total e a identidade Liquid Glass 3D, além de melhorar o contraste das informações (disponíveis / em uso / título).
 
-## Mudanças em `src/components/electric-carts/PickupHeroCard.tsx`
+Adicionar comportamento sticky inteligente ao card "Registrar Retirada" no menu Carrinhos Elétricos: o card original continua no topo, e quando o usuário rola para baixo e depois sobe, uma versão flutuante aparece suavemente no topo. Reutiliza o mesmo handler `openPickup` — sem fluxo paralelo.
 
-### 1. Altura/padding mais enxutos
-- `min-h-[140px] sm:min-h-[160px]` → `min-h-[88px] sm:min-h-[112px]`.
-- Padding: `px-5 sm:px-7 py-5 sm:py-6` → `px-4 sm:px-6 py-3.5 sm:py-4`.
-- Gap interno: `gap-4 sm:gap-6` → `gap-3 sm:gap-4`.
-- `rounded-3xl` → `rounded-2xl` (mais condizente com altura menor).
+## Arquivos
 
-### 2. Ícone mais compacto
-- Pílula do `Zap`: `w-16 h-16 sm:w-20 sm:h-20` → `w-12 h-12 sm:w-14 sm:h-14`.
-- Ícone `Zap`: `w-8 h-8 sm:w-10 sm:h-10` → `w-6 h-6 sm:w-7 sm:h-7`.
-- Mantém glow e indicador `ping`, ajustando a posição do badge.
+### 1. Novo: `src/hooks/useScrollDirection.ts`
 
-### 3. Chevron mais discreto
-- `w-11 h-11 sm:w-12 sm:h-12` → `w-9 h-9 sm:w-10 sm:h-10`.
-- Ícone: `w-5 h-5 sm:w-6 sm:h-6` → `w-4 h-4 sm:w-5 sm:h-5`.
+Hook leve para detectar direção de scroll com throttling via `requestAnimationFrame`.
 
-### 4. Tipografia compacta + melhor contraste
-- Eyebrow "Toque para iniciar": remover no mobile (`hidden sm:block`) para ganhar altura; manter no desktop com `text-[11px]` e `text-primary` (mais sólido que `/80`).
-- Título: `text-xl sm:text-3xl` → `text-base sm:text-xl`, mantendo `font-extrabold tracking-tight`.
-- Subtítulo (contadores): trocar `text-muted-foreground` por `text-foreground/85` (alto contraste em ambos os temas) e usar **chips** ao invés de texto corrido para alta legibilidade:
-  - Chip verde: `bg-success/15 text-success border border-success/30 px-2 py-0.5 rounded-full text-[11px] font-bold` → `{available} disponíveis`.
-  - Chip âmbar: `bg-accent/20 text-accent-foreground dark:text-accent border border-accent/40 …` → `{inUse} em uso`.
-- Layout das chips em `flex flex-wrap items-center gap-1.5 mt-1`.
+- Escuta `window.scroll` (passive).
+- Mantém `lastY` em ref; só atualiza estado se `Math.abs(currentY - lastY) >= delta` (default 10px).
+- Retorna `{ direction: 'up' | 'down' | null, scrollY: number }`.
+- `direction` só vira `'up'` após o threshold mínimo de página (`activateAfter`, default 140px).
+- Desmonta listener ao unmount.
 
-### 5. Halos e shimmer
-- Reduzir halos para combinar com altura menor:
-  - `-top-16 -right-10 w-56 h-56` → `-top-10 -right-8 w-40 h-40`.
-  - `-bottom-20 -left-12 w-60 h-60` → `-bottom-12 -left-8 w-44 h-44`.
-- Manter shimmer e spotlight (ajustes só de tamanho).
+Assinatura:
+```ts
+useScrollDirection({ delta?: number; activateAfter?: number }): {
+  direction: 'up' | 'down' | null;
+  scrollY: number;
+}
+```
 
-### 6. Tilt 3D
-- Reduzir levemente para não exagerar em card menor: `±6°/±5°` → `±4°/±3°`.
-- Parallax dos elementos: `translateZ(40px / 24px / 32px)` → `translateZ(28px / 16px / 22px)`.
+### 2. Novo: `src/components/electric-carts/FloatingPickupBar.tsx`
+
+Versão **compacta** (não 3D, sem tilt) do CTA, otimizada para sticky.
+
+- Recebe `{ visible, onClick, available, inUse }`.
+- Wrapper `fixed top-0 left-0 right-0 z-40` com `pt-[env(safe-area-inset-top)]` e `px-4 sm:px-6 max-w-[var(--content-max,1200px)] mx-auto`.
+- Container interno: rounded-2xl, `bg-background/80 backdrop-blur-xl`, borda `border-primary/30`, sombra suave (`shadow-[0_8px_24px_-12px_hsl(var(--primary)/0.45)]`), altura `h-14`.
+- Conteúdo (linha única): pílula verde com `Zap` (w-9 h-9) + título "Registrar Retirada" (`text-sm font-bold`) + chips compactas `{available} disp` / `{inUse} em uso` (esconde chip "em uso" no mobile se não couber via `hidden xs:inline-flex` — usa breakpoint sm) + chevron à direita.
+- Animação:
+  - Quando `visible`: classes `translate-y-0 opacity-100`.
+  - Quando hidden: `-translate-y-[120%] opacity-0 pointer-events-none`.
+  - Transição: `transition-all duration-300 ease-[cubic-bezier(0.22,1,0.36,1)]`.
+  - `motion-reduce:transition-none`.
+- Acessibilidade: `role="button"`, `aria-label`, `tabIndex={0}`, Enter/Space.
+- Z-index: 40 (acima da lista, abaixo de Dialog `z-50` e Sidebar/Drawer).
+
+### 3. Editar: `src/pages/ElectricCartsPage.tsx`
+
+- Importar `useScrollDirection` e `FloatingPickupBar`.
+- Logo após declarar `openPickup`, calcular:
+  ```ts
+  const { direction, scrollY } = useScrollDirection({ delta: 10, activateAfter: 160 });
+  const showFloating = direction === 'up' && scrollY > 160;
+  ```
+- Renderizar `<FloatingPickupBar visible={showFloating} onClick={openPickup} available={counts.disponivel} inUse={counts.em_uso} />` no topo do JSX (antes do `<div className="space-y-6">`), de modo que fique sempre montado e apenas alterne classes (sem desmontar — evita flicker).
+- Nenhuma alteração no `PickupHeroCard` original nem em outros cards/botões.
+
+## Lógica de Scroll (detalhe)
+
+```text
+scrollY < 160               → showFloating = false (só card original)
+scrollY >= 160 && down      → showFloating = false (sai do caminho)
+scrollY >= 160 && up        → showFloating = true  (aparece flutuante)
+volta a scrollY < ~80       → showFloating = false (some, evita duplicidade)
+```
+
+Threshold de delta (10px) impede flicker em pequenos toques. `requestAnimationFrame` agrupa updates para 1 setState por frame.
 
 ## Garantias
-- Nenhuma alteração de props, fluxo, handlers ou layout externo (`ElectricCartsPage` permanece igual).
-- Mantém acessibilidade (`role`, `aria-label`, foco visível, `motion-reduce`).
-- Largura full mantida; apenas altura/peso visual diminuem.
-- Contraste das chips aprovado nos temas claro/escuro pelas tokens `--success` e `--accent`.
+
+- **Sem fluxo paralelo**: `FloatingPickupBar.onClick === openPickup` (mesmo handler do card original).
+- **Sem duplicidade visual**: o flutuante só monta visualmente quando `scrollY > 160`, então no topo só existe o original.
+- **Contadores sincronizados**: lê de `counts` derivado de `carts` (mesma fonte do hero).
+- **Safe-area iPhone**: `pt-[env(safe-area-inset-top)]`.
+- **Z-index controlado**: 40 (Dialogs continuam em 50; sidebar mobile permanece acima).
+- **Performance**: rAF + delta threshold; nenhum re-render da lista (estado fica isolado na page).
+- **Reduced motion**: respeitado via `motion-reduce`.
+- **Estados vazios/loading/permissão**: o bar só usa `counts` já existentes; se a página não renderiza (CapabilityGuard), o bar também não — porque está dentro do componente.
+- Nada do `PickupHeroCard` 3D, filtros, abas, botão Relatório, dialogs ou hooks é tocado.

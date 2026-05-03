@@ -21,6 +21,8 @@ import ElectricCartCard from '@/components/electric-carts/ElectricCartCard';
 import ElectricCartsFilters, { type CartStatusFilter } from '@/components/electric-carts/ElectricCartsFilters';
 import ReservationsTab from '@/components/electric-carts/ReservationsTab';
 import PickupHeroCard from '@/components/electric-carts/PickupHeroCard';
+import FloatingPickupBar from '@/components/electric-carts/FloatingPickupBar';
+import { useScrollDirection } from '@/hooks/useScrollDirection';
 import { useCartReservations, type CartReservation } from '@/hooks/useCartReservations';
 import { User } from 'lucide-react';
 
@@ -251,8 +253,17 @@ export default function ElectricCartsPage() {
     } catch (err: any) { toast.error(err.message); }
   };
 
+  const { direction, scrollY } = useScrollDirection({ delta: 10, activateAfter: 160 });
+  const showFloating = direction === 'up' && scrollY > 160;
+
   return (
     <div className="space-y-6">
+      <FloatingPickupBar
+        visible={showFloating}
+        onClick={openPickup}
+        available={counts.disponivel}
+        inUse={counts.em_uso}
+      />
       <div>
         <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Carrinhos Elétricos</h1>
         <p className="text-sm text-muted-foreground mt-1">Gerencie os carrinhos elétricos do evento</p>
