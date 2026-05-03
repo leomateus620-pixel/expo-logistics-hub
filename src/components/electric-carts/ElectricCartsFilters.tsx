@@ -19,7 +19,7 @@ const OPTIONS: { key: CartStatusFilter; label: string }[] = [
   { key: 'em_uso', label: 'Em uso' },
 ];
 
-export default function ElectricCartsFilters({ search, onSearch, status, onStatus, counts }: Props) {
+export default function ElectricCartsFilters({ search, onSearch, status, onStatus, counts, onAdd }: Props) {
   return (
     <div
       className={cn(
