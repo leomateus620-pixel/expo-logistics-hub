@@ -1,74 +1,43 @@
-
 ## Objetivo
-No menu **Carrinhos Elétricos**, redesenhar o cabeçalho de ações dando destaque máximo ao fluxo de **Retirada** com um card 3D Liquid Glass animado, adicionar busca por nome de autorizado dentro do diálogo de retirada e reorganizar os demais CTAs sem quebrar nenhum fluxo existente.
+Tornar o card "Registrar Retirada" mais compacto (principalmente no mobile 393px), mantendo a largura total e a identidade Liquid Glass 3D, além de melhorar o contraste das informações (disponíveis / em uso / título).
 
-## Mudanças
+## Mudanças em `src/components/electric-carts/PickupHeroCard.tsx`
 
-### 1. Busca de autorizado no diálogo de Retirada
-Arquivo: `src/pages/ElectricCartsPage.tsx` (aba "Autorizado" do diálogo de retirada).
+### 1. Altura/padding mais enxutos
+- `min-h-[140px] sm:min-h-[160px]` → `min-h-[88px] sm:min-h-[112px]`.
+- Padding: `px-5 sm:px-7 py-5 sm:py-6` → `px-4 sm:px-6 py-3.5 sm:py-4`.
+- Gap interno: `gap-4 sm:gap-6` → `gap-3 sm:gap-4`.
+- `rounded-3xl` → `rounded-2xl` (mais condizente com altura menor).
 
-- Substituir o `Select` simples por um **Combobox com busca** (padrão `Command` + `Popover`, já usado no projeto):
-  - Input de busca filtra `sortedAuthorizations` por `member_name` e `committee_name_snapshot` (normalização sem acento, lowercase).
-  - Mantém também os `members` internos abaixo, com seção e busca unificada.
-  - Mantém badges de status (`liberado` / `pendente`) e a comissão.
-- Comportamento de seleção e o resto do fluxo continuam idênticos (mesma lógica `auth:` / `userId`, `comissao`, `nome_externo`).
+### 2. Ícone mais compacto
+- Pílula do `Zap`: `w-16 h-16 sm:w-20 sm:h-20` → `w-12 h-12 sm:w-14 sm:h-14`.
+- Ícone `Zap`: `w-8 h-8 sm:w-10 sm:h-10` → `w-6 h-6 sm:w-7 sm:h-7`.
+- Mantém glow e indicador `ping`, ajustando a posição do badge.
 
-### 2. Hero "Retirada" — card 3D Liquid Glass com física
-Arquivo: `src/pages/ElectricCartsPage.tsx` (substitui a barra atual de 3 botões).
+### 3. Chevron mais discreto
+- `w-11 h-11 sm:w-12 sm:h-12` → `w-9 h-9 sm:w-10 sm:h-10`.
+- Ícone: `w-5 h-5 sm:w-6 sm:h-6` → `w-4 h-4 sm:w-5 sm:h-5`.
 
-Novo componente local `PickupHeroCard` (arquivo: `src/components/electric-carts/PickupHeroCard.tsx`):
+### 4. Tipografia compacta + melhor contraste
+- Eyebrow "Toque para iniciar": remover no mobile (`hidden sm:block`) para ganhar altura; manter no desktop com `text-[11px]` e `text-primary` (mais sólido que `/80`).
+- Título: `text-xl sm:text-3xl` → `text-base sm:text-xl`, mantendo `font-extrabold tracking-tight`.
+- Subtítulo (contadores): trocar `text-muted-foreground` por `text-foreground/85` (alto contraste em ambos os temas) e usar **chips** ao invés de texto corrido para alta legibilidade:
+  - Chip verde: `bg-success/15 text-success border border-success/30 px-2 py-0.5 rounded-full text-[11px] font-bold` → `{available} disponíveis`.
+  - Chip âmbar: `bg-accent/20 text-accent-foreground dark:text-accent border border-accent/40 …` → `{inUse} em uso`.
+- Layout das chips em `flex flex-wrap items-center gap-1.5 mt-1`.
 
-- **Layout vertical, largura total** (`w-full`), altura confortável (`min-h-[140px] sm:min-h-[160px]`), `rounded-3xl`, ocupando da borda esquerda à direita do menu (acima das tabs).
-- **Liquid Glass adaptativo ao projeto** (verde profundo + dourado, mesmas tokens `--primary`, `--accent`):
-  - Fundo: `bg-gradient-to-br from-primary/25 via-primary/12 to-accent/15` + `backdrop-blur-2xl`.
-  - Borda: `border border-primary/30` com `shadow-[0_20px_60px_-20px_hsl(var(--primary)/0.55),inset_0_1px_0_rgba(255,255,255,0.18)]`.
-  - 2 halos radiais animados (top-right primary, bottom-left accent) com `animate-halo-breath`.
-  - Sheen diagonal e shimmer sweep contínuo (reuso de `animate-cart-shimmer`).
-- **Efeito 3D com física (pointer tilt + spring)**:
-  - `onPointerMove` calcula `rotateX/rotateY` (range ±8°) e `translateZ` em função da posição do cursor (parallax dos elementos internos: ícone Zap flutua mais, badge de contador menos).
-  - Spring CSS: `transition: transform 320ms cubic-bezier(0.22, 1.4, 0.36, 1)` (overshoot leve = sensação elástica).
-  - `onPointerLeave` faz "snap-back" suave ao centro.
-  - `motion-reduce:transform-none` para acessibilidade.
-  - `active:scale-[0.985]` e `transform-style: preserve-3d` no wrapper; ícone com `translate-z-8` simulado.
-- **Conteúdo**:
-  - Esquerda: ícone `Zap` em "pílula" verde brilhante 14×14 com glow, com pequeno indicador animado (`ping`) quando há ≥1 carrinho disponível.
-  - Centro: título grande `Registrar Retirada` (uppercase tracking) + subtítulo dinâmico `{counts.disponivel} disponíveis · {counts.em_uso} em uso`.
-  - Direita: chevron animado com `translate-x` no hover indicando ação.
-- Card inteiro é o CTA (`role="button"`, `onClick={openPickup}`, foco visível, atalho `Enter/Space`).
+### 5. Halos e shimmer
+- Reduzir halos para combinar com altura menor:
+  - `-top-16 -right-10 w-56 h-56` → `-top-10 -right-8 w-40 h-40`.
+  - `-bottom-20 -left-12 w-60 h-60` → `-bottom-12 -left-8 w-44 h-44`.
+- Manter shimmer e spotlight (ajustes só de tamanho).
 
-### 3. Reordenação dos CTAs
-- **Remover** o botão "Adicionar" do header.
-- **Mover** o botão "Relatório" para **baixo** do hero, alinhado à direita, como botão `outline` discreto (`size="sm"`, ícone `FileText`).
-- O fluxo de adicionar carrinho continua disponível por:
-  - Botão "Adicionar Carrinho" já existente no **estado vazio** da grade.
-  - Novo botão-ícone discreto dentro do `ElectricCartsFilters` (ícone `Plus` à direita do filtro de status), preservando 100% o fluxo (`setAddOpen(true)`).
-- Nenhum estado, hook, mutation ou diálogo (`addOpen`, `pickupOpen`, `returnOpen`, `historyOpen`, `editOpen`) é alterado — apenas como são acionados.
+### 6. Tilt 3D
+- Reduzir levemente para não exagerar em card menor: `±6°/±5°` → `±4°/±3°`.
+- Parallax dos elementos: `translateZ(40px / 24px / 32px)` → `translateZ(28px / 16px / 22px)`.
 
-### 4. Layout final do topo da página
-
-```text
-┌─────────────────────────────────────────────────────────────┐
-│  Carrinhos Elétricos                                        │
-│  Gerencie os carrinhos elétricos do evento                  │
-├─────────────────────────────────────────────────────────────┤
-│ ╔═══════════════════════════════════════════════════════╗   │
-│ ║  ⚡   REGISTRAR RETIRADA                            ›  ║   │  ← Hero 3D
-│ ║      6 disponíveis · 2 em uso                         ║   │     Liquid Glass
-│ ╚═══════════════════════════════════════════════════════╝   │
-│                                          [📄 Relatório]     │
-├─────────────────────────────────────────────────────────────┤
-│ [Frota] [Autorizados] [Reservas]                            │
-└─────────────────────────────────────────────────────────────┘
-```
-
-## Garantias de não-quebra
-- Mesmas funções (`openPickup`, `handlePickup`, `handleAdd`, `setAddOpen`, etc.) e mesmos diálogos são reutilizados — apenas o gatilho visual muda.
-- Combobox de autorizados emite os mesmos valores (`auth:<id>` ou `<userId>`) processados no `onValueChange` atual.
-- Nenhuma alteração em hooks, RPCs, tabelas ou edge functions.
-- Tabs `Frota / Autorizados / Reservas` permanecem intactas.
-
-## Detalhes técnicos
-- Animações já disponíveis em `tailwind.config.ts` (`animate-halo-breath`, `animate-cart-shimmer`) — sem novas dependências.
-- A "física" usa apenas CSS transforms + cubic-bezier com overshoot; nada de framer-motion.
-- Acessibilidade: `aria-label`, foco visível com `ring-2 ring-primary/40`, suporte a `prefers-reduced-motion`.
-- Mobile (393px): tilt desabilitado em touch (detecta `pointerType !== 'mouse'`), card mantém o brilho/shimmer e o `active:scale` para sensação tátil.
+## Garantias
+- Nenhuma alteração de props, fluxo, handlers ou layout externo (`ElectricCartsPage` permanece igual).
+- Mantém acessibilidade (`role`, `aria-label`, foco visível, `motion-reduce`).
+- Largura full mantida; apenas altura/peso visual diminuem.
+- Contraste das chips aprovado nos temas claro/escuro pelas tokens `--success` e `--accent`.
