@@ -10,7 +10,7 @@ interface Props {
 
 /**
  * Hero CTA "Registrar Retirada" — Liquid Glass 3D card with pointer-driven tilt
- * and elastic spring snap-back. Adaptive to project palette (deep green + gold).
+ * and elastic spring snap-back. Compact, full-width, high-contrast info chips.
  */
 export default function PickupHeroCard({ onClick, available, inUse }: Props) {
   const ref = useRef<HTMLDivElement | null>(null);
@@ -23,8 +23,8 @@ export default function PickupHeroCard({ onClick, available, inUse }: Props) {
     const r = el.getBoundingClientRect();
     const x = (e.clientX - r.left) / r.width;
     const y = (e.clientY - r.top) / r.height;
-    const ry = (x - 0.5) * 12; // ±6°
-    const rx = -(y - 0.5) * 10; // ±5°
+    const ry = (x - 0.5) * 8; // ±4°
+    const rx = -(y - 0.5) * 6; // ±3°
     setTilt({ rx, ry, px: x * 100, py: y * 100, active: true });
   };
 
@@ -48,7 +48,7 @@ export default function PickupHeroCard({ onClick, available, inUse }: Props) {
       onPointerMove={handleMove}
       onPointerLeave={handleLeave}
       style={{ perspective: '1200px' }}
-      className="group relative w-full cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-primary/50 rounded-3xl"
+      className="group relative w-full cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-primary/50 rounded-2xl"
     >
       <div
         style={{
@@ -59,12 +59,12 @@ export default function PickupHeroCard({ onClick, available, inUse }: Props) {
             : 'transform 520ms cubic-bezier(0.22, 1.4, 0.36, 1)',
         }}
         className={cn(
-          'relative overflow-hidden rounded-3xl border border-primary/30',
+          'relative overflow-hidden rounded-2xl border border-primary/30',
           'bg-gradient-to-br from-primary/25 via-primary/10 to-accent/20',
           'backdrop-blur-2xl',
-          'shadow-[0_20px_60px_-20px_hsl(var(--primary)/0.55),inset_0_1px_0_rgba(255,255,255,0.18)]',
-          'min-h-[140px] sm:min-h-[160px]',
-          'px-5 sm:px-7 py-5 sm:py-6 flex items-center gap-4 sm:gap-6',
+          'shadow-[0_16px_44px_-18px_hsl(var(--primary)/0.55),inset_0_1px_0_rgba(255,255,255,0.18)]',
+          'min-h-[88px] sm:min-h-[112px]',
+          'px-4 sm:px-6 py-3.5 sm:py-4 flex items-center gap-3 sm:gap-4',
           'active:scale-[0.985] motion-reduce:transform-none motion-reduce:transition-none'
         )}
       >
@@ -77,22 +77,22 @@ export default function PickupHeroCard({ onClick, available, inUse }: Props) {
           }}
         />
         {/* Halos */}
-        <div className="pointer-events-none absolute -top-16 -right-10 w-56 h-56 blur-3xl opacity-70 bg-[radial-gradient(circle,hsl(var(--primary)/0.55),transparent_60%)] motion-safe:animate-halo-breath" />
-        <div className="pointer-events-none absolute -bottom-20 -left-12 w-60 h-60 blur-3xl opacity-60 bg-[radial-gradient(circle,hsl(var(--accent)/0.45),transparent_60%)]" />
+        <div className="pointer-events-none absolute -top-10 -right-8 w-40 h-40 blur-3xl opacity-70 bg-[radial-gradient(circle,hsl(var(--primary)/0.55),transparent_60%)] motion-safe:animate-halo-breath" />
+        <div className="pointer-events-none absolute -bottom-12 -left-8 w-44 h-44 blur-3xl opacity-60 bg-[radial-gradient(circle,hsl(var(--accent)/0.45),transparent_60%)]" />
         {/* Glass sheen */}
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.14),transparent_55%)]" />
         {/* Shimmer sweep */}
-        <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-3xl">
+        <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl">
           <div className="absolute top-0 -left-1/3 h-full w-1/3 bg-gradient-to-r from-transparent via-white/[0.10] to-transparent motion-safe:animate-cart-shimmer" />
         </div>
 
         {/* Icon pill — floats more (parallax) */}
         <div
-          style={{ transform: 'translateZ(40px)' }}
+          style={{ transform: 'translateZ(28px)' }}
           className="relative shrink-0 transition-transform"
         >
-          <div className="relative w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center bg-gradient-to-br from-primary via-primary to-primary/70 text-primary-foreground shadow-[0_12px_32px_-8px_hsl(var(--primary)/0.7),inset_0_1px_0_rgba(255,255,255,0.25)]">
-            <Zap className="w-8 h-8 sm:w-10 sm:h-10 drop-shadow-[0_2px_8px_rgba(0,0,0,0.25)]" />
+          <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center bg-gradient-to-br from-primary via-primary to-primary/70 text-primary-foreground shadow-[0_10px_24px_-8px_hsl(var(--primary)/0.7),inset_0_1px_0_rgba(255,255,255,0.25)]">
+            <Zap className="w-6 h-6 sm:w-7 sm:h-7 drop-shadow-[0_2px_8px_rgba(0,0,0,0.25)]" />
             {available > 0 && (
               <span className="absolute -top-1 -right-1 flex h-3 w-3">
                 <span className="absolute inline-flex h-full w-full rounded-full bg-accent opacity-80 motion-safe:animate-ping" />
@@ -104,29 +104,34 @@ export default function PickupHeroCard({ onClick, available, inUse }: Props) {
 
         {/* Text — middle parallax */}
         <div
-          style={{ transform: 'translateZ(24px)' }}
+          style={{ transform: 'translateZ(16px)' }}
           className="relative flex-1 min-w-0"
         >
-          <p className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.18em] text-primary/80">
+          <p className="hidden sm:block text-[11px] font-bold uppercase tracking-[0.18em] text-primary">
             Toque para iniciar
           </p>
-          <h2 className="text-xl sm:text-3xl font-extrabold tracking-tight leading-tight text-foreground">
+          <h2 className="text-base sm:text-xl font-extrabold tracking-tight leading-tight text-foreground">
             Registrar Retirada
           </h2>
-          <p className="text-xs sm:text-sm text-muted-foreground mt-1 truncate">
-            <span className="font-semibold text-success">{available}</span> disponíveis
-            <span className="opacity-50"> · </span>
-            <span className="font-semibold text-accent">{inUse}</span> em uso
-          </p>
+          <div className="flex flex-wrap items-center gap-1.5 mt-1.5">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-success/15 text-success border border-success/40">
+              <span className="w-1.5 h-1.5 rounded-full bg-success" />
+              {available} disponíveis
+            </span>
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-accent/20 text-accent-foreground dark:text-accent border border-accent/40">
+              <span className="w-1.5 h-1.5 rounded-full bg-accent" />
+              {inUse} em uso
+            </span>
+          </div>
         </div>
 
         {/* Chevron */}
         <div
-          style={{ transform: 'translateZ(32px)' }}
+          style={{ transform: 'translateZ(22px)' }}
           className="relative shrink-0 transition-transform"
         >
-          <div className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-primary/15 border border-primary/30 backdrop-blur-sm flex items-center justify-center text-primary shadow-[inset_0_1px_0_rgba(255,255,255,0.15)] group-hover:bg-primary/25 transition-all">
-            <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6 transition-transform duration-300 group-hover:translate-x-0.5" />
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-primary/15 border border-primary/30 backdrop-blur-sm flex items-center justify-center text-primary shadow-[inset_0_1px_0_rgba(255,255,255,0.15)] group-hover:bg-primary/25 transition-all">
+            <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:translate-x-0.5" />
           </div>
         </div>
       </div>
