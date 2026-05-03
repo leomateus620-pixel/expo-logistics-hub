@@ -1,4 +1,4 @@
-import { Search, X } from 'lucide-react';
+import { Search, X, Plus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 
@@ -10,6 +10,7 @@ interface Props {
   status: CartStatusFilter;
   onStatus: (s: CartStatusFilter) => void;
   counts: { all: number; disponivel: number; em_uso: number };
+  onAdd?: () => void;
 }
 
 const OPTIONS: { key: CartStatusFilter; label: string }[] = [
@@ -18,7 +19,7 @@ const OPTIONS: { key: CartStatusFilter; label: string }[] = [
   { key: 'em_uso', label: 'Em uso' },
 ];
 
-export default function ElectricCartsFilters({ search, onSearch, status, onStatus, counts }: Props) {
+export default function ElectricCartsFilters({ search, onSearch, status, onStatus, counts, onAdd }: Props) {
   return (
     <div
       className={cn(
@@ -89,6 +90,21 @@ export default function ElectricCartsFilters({ search, onSearch, status, onStatu
             );
           })}
         </div>
+
+        {onAdd && (
+          <button
+            onClick={onAdd}
+            aria-label="Adicionar carrinho elétrico"
+            className={cn(
+              'shrink-0 inline-flex items-center justify-center gap-1.5 h-11 sm:h-9 px-3 rounded-xl',
+              'border border-border/50 bg-background/40 backdrop-blur-sm text-sm font-medium',
+              'hover:bg-muted/60 hover:text-foreground text-muted-foreground transition-all active:scale-[0.97]'
+            )}
+          >
+            <Plus className="w-4 h-4" />
+            <span className="hidden sm:inline">Adicionar</span>
+          </button>
+        )}
       </div>
     </div>
   );

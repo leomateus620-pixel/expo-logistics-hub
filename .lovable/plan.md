@@ -1,41 +1,74 @@
-## Correção do transporte 03/05 (Parque → Santa Rosa → Parque)
 
-Aplicar via migration de dados (UPDATE direto requer permissão elevada — psql comum bloqueou).
+## Objetivo
+No menu **Carrinhos Elétricos**, redesenhar o cabeçalho de ações dando destaque máximo ao fluxo de **Retirada** com um card 3D Liquid Glass animado, adicionar busca por nome de autorizado dentro do diálogo de retirada e reorganizar os demais CTAs sem quebrar nenhum fluxo existente.
 
-### Operações SQL
+## Mudanças
 
-```sql
-BEGIN;
+### 1. Busca de autorizado no diálogo de Retirada
+Arquivo: `src/pages/ElectricCartsPage.tsx` (aba "Autorizado" do diálogo de retirada).
 
--- 1) Reescrever os 2 vehicle_usage do transporte para a AMAROK
-UPDATE vehicle_usage SET
-  vehicle_id = '2241a476-b89e-48b4-9caa-4b083bb14d46',
-  km_saida = 5953, km_chegada = 5975,
-  observacoes = 'Ida automática — transporte f94d0f44-20f1-403a-8494-57a3605f79e7 (corrigido: T-CROSS → AMAROK)'
-WHERE id = 'dc51a25e-1107-4c18-a760-3805b725c2bd';
+- Substituir o `Select` simples por um **Combobox com busca** (padrão `Command` + `Popover`, já usado no projeto):
+  - Input de busca filtra `sortedAuthorizations` por `member_name` e `committee_name_snapshot` (normalização sem acento, lowercase).
+  - Mantém também os `members` internos abaixo, com seção e busca unificada.
+  - Mantém badges de status (`liberado` / `pendente`) e a comissão.
+- Comportamento de seleção e o resto do fluxo continuam idênticos (mesma lógica `auth:` / `userId`, `comissao`, `nome_externo`).
 
-UPDATE vehicle_usage SET
-  vehicle_id = '2241a476-b89e-48b4-9caa-4b083bb14d46',
-  km_saida = 5975, km_chegada = 5997,
-  observacoes = 'Volta automática — transporte f94d0f44-20f1-403a-8494-57a3605f79e7 (corrigido: T-CROSS → AMAROK)'
-WHERE id = 'af8ac518-ba3b-4ed3-a0b8-e77a3df151c1';
+### 2. Hero "Retirada" — card 3D Liquid Glass com física
+Arquivo: `src/pages/ElectricCartsPage.tsx` (substitui a barra atual de 3 botões).
 
--- 2) Trocar veículo no transporte
-UPDATE transports SET vehicle_id = '2241a476-b89e-48b4-9caa-4b083bb14d46', updated_at = now()
-WHERE id = 'f94d0f44-20f1-403a-8494-57a3605f79e7';
+Novo componente local `PickupHeroCard` (arquivo: `src/components/electric-carts/PickupHeroCard.tsx`):
 
--- 3) Ajustar km_atual dos veículos
-UPDATE vehicles SET km_atual = 87704, updated_at = now()
-WHERE id = 'f8a51a52-1204-4f8e-ac10-97c572c79448'; -- T-CROSS volta ao km original
+- **Layout vertical, largura total** (`w-full`), altura confortável (`min-h-[140px] sm:min-h-[160px]`), `rounded-3xl`, ocupando da borda esquerda à direita do menu (acima das tabs).
+- **Liquid Glass adaptativo ao projeto** (verde profundo + dourado, mesmas tokens `--primary`, `--accent`):
+  - Fundo: `bg-gradient-to-br from-primary/25 via-primary/12 to-accent/15` + `backdrop-blur-2xl`.
+  - Borda: `border border-primary/30` com `shadow-[0_20px_60px_-20px_hsl(var(--primary)/0.55),inset_0_1px_0_rgba(255,255,255,0.18)]`.
+  - 2 halos radiais animados (top-right primary, bottom-left accent) com `animate-halo-breath`.
+  - Sheen diagonal e shimmer sweep contínuo (reuso de `animate-cart-shimmer`).
+- **Efeito 3D com física (pointer tilt + spring)**:
+  - `onPointerMove` calcula `rotateX/rotateY` (range ±8°) e `translateZ` em função da posição do cursor (parallax dos elementos internos: ícone Zap flutua mais, badge de contador menos).
+  - Spring CSS: `transition: transform 320ms cubic-bezier(0.22, 1.4, 0.36, 1)` (overshoot leve = sensação elástica).
+  - `onPointerLeave` faz "snap-back" suave ao centro.
+  - `motion-reduce:transform-none` para acessibilidade.
+  - `active:scale-[0.985]` e `transform-style: preserve-3d` no wrapper; ícone com `translate-z-8` simulado.
+- **Conteúdo**:
+  - Esquerda: ícone `Zap` em "pílula" verde brilhante 14×14 com glow, com pequeno indicador animado (`ping`) quando há ≥1 carrinho disponível.
+  - Centro: título grande `Registrar Retirada` (uppercase tracking) + subtítulo dinâmico `{counts.disponivel} disponíveis · {counts.em_uso} em uso`.
+  - Direita: chevron animado com `translate-x` no hover indicando ação.
+- Card inteiro é o CTA (`role="button"`, `onClick={openPickup}`, foco visível, atalho `Enter/Space`).
 
-UPDATE vehicles SET km_atual = 5997, updated_at = now()
-WHERE id = '2241a476-b89e-48b4-9caa-4b083bb14d46'; -- AMAROK +44 km
+### 3. Reordenação dos CTAs
+- **Remover** o botão "Adicionar" do header.
+- **Mover** o botão "Relatório" para **baixo** do hero, alinhado à direita, como botão `outline` discreto (`size="sm"`, ícone `FileText`).
+- O fluxo de adicionar carrinho continua disponível por:
+  - Botão "Adicionar Carrinho" já existente no **estado vazio** da grade.
+  - Novo botão-ícone discreto dentro do `ElectricCartsFilters` (ícone `Plus` à direita do filtro de status), preservando 100% o fluxo (`setAddOpen(true)`).
+- Nenhum estado, hook, mutation ou diálogo (`addOpen`, `pickupOpen`, `returnOpen`, `historyOpen`, `editOpen`) é alterado — apenas como são acionados.
 
-COMMIT;
+### 4. Layout final do topo da página
+
+```text
+┌─────────────────────────────────────────────────────────────┐
+│  Carrinhos Elétricos                                        │
+│  Gerencie os carrinhos elétricos do evento                  │
+├─────────────────────────────────────────────────────────────┤
+│ ╔═══════════════════════════════════════════════════════╗   │
+│ ║  ⚡   REGISTRAR RETIRADA                            ›  ║   │  ← Hero 3D
+│ ║      6 disponíveis · 2 em uso                         ║   │     Liquid Glass
+│ ╚═══════════════════════════════════════════════════════╝   │
+│                                          [📄 Relatório]     │
+├─────────────────────────────────────────────────────────────┤
+│ [Frota] [Autorizados] [Reservas]                            │
+└─────────────────────────────────────────────────────────────┘
 ```
 
-### Resultado esperado
-- Transporte `f94d0f44...` passa a ser executado com **AMAROK (JDF6D47)**
-- AMAROK: 5953 → **5997 km** (+44 km da viagem ida e volta)
-- T-CROSS: 87748 → **87704 km** (reverte os 44 km lançados indevidamente)
-- `km_rodados` recalculado automaticamente pela coluna GENERATED
+## Garantias de não-quebra
+- Mesmas funções (`openPickup`, `handlePickup`, `handleAdd`, `setAddOpen`, etc.) e mesmos diálogos são reutilizados — apenas o gatilho visual muda.
+- Combobox de autorizados emite os mesmos valores (`auth:<id>` ou `<userId>`) processados no `onValueChange` atual.
+- Nenhuma alteração em hooks, RPCs, tabelas ou edge functions.
+- Tabs `Frota / Autorizados / Reservas` permanecem intactas.
+
+## Detalhes técnicos
+- Animações já disponíveis em `tailwind.config.ts` (`animate-halo-breath`, `animate-cart-shimmer`) — sem novas dependências.
+- A "física" usa apenas CSS transforms + cubic-bezier com overshoot; nada de framer-motion.
+- Acessibilidade: `aria-label`, foco visível com `ring-2 ring-primary/40`, suporte a `prefers-reduced-motion`.
+- Mobile (393px): tilt desabilitado em touch (detecta `pointerType !== 'mouse'`), card mantém o brilho/shimmer e o `active:scale` para sensação tátil.

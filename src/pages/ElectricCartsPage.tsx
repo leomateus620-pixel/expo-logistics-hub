@@ -2,7 +2,7 @@ import { useElectricCarts } from '@/hooks/useElectricCarts';
 import { useOrgMembers } from '@/hooks/useOrgMembers';
 import { useCommissions } from '@/hooks/useCommissions';
 import { useMobilityAuthorizations } from '@/hooks/useMobilityAuthorizations';
-import { Zap, Plus, Clock, ArrowRight, FileText, AlertTriangle } from 'lucide-react';
+import { Zap, Plus, Clock, ArrowRight, FileText, AlertTriangle, Search } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn, nowSP, nowSPLocal, ensureSPOffset } from '@/lib/utils';
 import { useMemo, useState } from 'react';
@@ -20,6 +20,7 @@ import { PARTNERS, getPartner, type PartnerSlug } from '@/lib/partners';
 import ElectricCartCard from '@/components/electric-carts/ElectricCartCard';
 import ElectricCartsFilters, { type CartStatusFilter } from '@/components/electric-carts/ElectricCartsFilters';
 import ReservationsTab from '@/components/electric-carts/ReservationsTab';
+import PickupHeroCard from '@/components/electric-carts/PickupHeroCard';
 import { useCartReservations, type CartReservation } from '@/hooks/useCartReservations';
 import { User } from 'lucide-react';
 
@@ -125,6 +126,7 @@ export default function ElectricCartsPage() {
 
   const [pickupOpen, setPickupOpen] = useState(false);
   const [pickupForm, setPickupForm] = useState<{ cartId: string; userId: string; comissao: string; retirada_em: string; tipo: 'interno' | 'empresa' | 'outros'; empresa_slug: PartnerSlug | ''; nome_externo: string }>({ cartId: '', userId: '', comissao: '', retirada_em: '', tipo: 'interno', empresa_slug: '', nome_externo: '' });
+  const [authSearch, setAuthSearch] = useState('');
 
   const [returnOpen, setReturnOpen] = useState(false);
   const [returnId, setReturnId] = useState('');
@@ -251,24 +253,24 @@ export default function ElectricCartsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-        <div>
-          <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Carrinhos Elétricos</h1>
-          <p className="text-sm text-muted-foreground mt-1">Gerencie os carrinhos elétricos do evento</p>
-        </div>
-        <div className="flex gap-2 flex-wrap">
-          <Link to="/electric-carts/report">
-            <Button size="sm" variant="outline" className="h-10 sm:h-9 gap-1.5 rounded-xl shadow-sm active:scale-[0.97] transition-transform">
-              <FileText className="w-4 h-4" /> Relatório
-            </Button>
-          </Link>
-          <Button size="sm" variant="outline" onClick={openPickup} className="h-10 sm:h-9 gap-1.5 rounded-xl shadow-sm active:scale-[0.97] transition-transform">
-            <Zap className="w-4 h-4" /> Retirada
+      <div>
+        <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Carrinhos Elétricos</h1>
+        <p className="text-sm text-muted-foreground mt-1">Gerencie os carrinhos elétricos do evento</p>
+      </div>
+
+      {/* Hero CTA — Retirada em destaque */}
+      <PickupHeroCard
+        onClick={openPickup}
+        available={counts.disponivel}
+        inUse={counts.em_uso}
+      />
+
+      <div className="flex justify-end">
+        <Link to="/electric-carts/report">
+          <Button size="sm" variant="outline" className="h-10 sm:h-9 gap-1.5 rounded-xl shadow-sm active:scale-[0.97] transition-transform">
+            <FileText className="w-4 h-4" /> Relatório
           </Button>
-          <Button size="sm" onClick={() => setAddOpen(true)} className="h-10 sm:h-9 gap-1.5 rounded-xl shadow-sm active:scale-[0.97] transition-transform">
-            <Plus className="w-4 h-4" /> Adicionar
-          </Button>
-        </div>
+        </Link>
       </div>
 
       <Tabs defaultValue="frota" className="w-full">
@@ -313,7 +315,7 @@ export default function ElectricCartsPage() {
       </Dialog>
 
       {/* Pickup dialog */}
-      <Dialog open={pickupOpen} onOpenChange={setPickupOpen}>
+      <Dialog open={pickupOpen} onOpenChange={(v) => { setPickupOpen(v); if (!v) setAuthSearch(''); }}>
         <DialogContent className="sm:max-w-md max-h-[90dvh] overflow-y-auto">
           <DialogHeader><DialogTitle>Registrar Retirada</DialogTitle></DialogHeader>
           <div className="space-y-3">
@@ -358,30 +360,70 @@ export default function ElectricCartsPage() {
                 >
                   <SelectTrigger><SelectValue placeholder="Quem retira" /></SelectTrigger>
                   <SelectContent className="max-h-[60dvh]">
-                    {sortedAuthorizations.length > 0 && (
-                      <>
-                        <div className="px-2 py-1 text-[10px] uppercase tracking-wider text-muted-foreground">
-                          Autorizados (Carro Elétrico)
-                        </div>
-                        {sortedAuthorizations.map((a: any) => (
-                          <SelectItem key={`auth-${a.id}`} value={`auth:${a.id}`}>
-                            <span className="font-medium">{a.member_name}</span>
-                            <span className="text-muted-foreground"> — {a.committee_name_snapshot}</span>
-                            {a.access_status !== 'liberado' && (
-                              <span className="ml-2 text-[10px] text-amber-600">({a.access_status})</span>
-                            )}
-                          </SelectItem>
-                        ))}
-                        {members.length > 0 && (
-                          <div className="px-2 py-1 mt-1 text-[10px] uppercase tracking-wider text-muted-foreground border-t">
-                            Membros internos
-                          </div>
-                        )}
-                      </>
-                    )}
-                    {members.map((m: any) => (
-                      <SelectItem key={m.user_id} value={m.user_id}>{m.nome_exibicao} - {m.cargo}</SelectItem>
-                    ))}
+                    <div className="sticky top-0 z-10 bg-popover border-b p-2">
+                      <div className="relative">
+                        <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                        <Input
+                          autoFocus
+                          value={authSearch}
+                          onChange={(e) => setAuthSearch(e.target.value)}
+                          onKeyDown={(e) => e.stopPropagation()}
+                          placeholder="Buscar por nome ou comissão..."
+                          className="h-9 pl-8 text-sm rounded-lg"
+                        />
+                      </div>
+                    </div>
+                    {(() => {
+                      const norm = (s: string) => (s || '')
+                        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+                        .toLowerCase();
+                      const q = norm(authSearch.trim());
+                      const matchAuth = (a: any) =>
+                        !q || norm(a.member_name).includes(q) || norm(a.committee_name_snapshot).includes(q);
+                      const matchMember = (m: any) =>
+                        !q || norm(m.nome_exibicao).includes(q) || norm(m.cargo).includes(q);
+                      const filteredAuth = sortedAuthorizations.filter(matchAuth);
+                      const filteredMembers = members.filter(matchMember);
+                      const empty = filteredAuth.length === 0 && filteredMembers.length === 0;
+                      return (
+                        <>
+                          {filteredAuth.length > 0 && (
+                            <>
+                              <div className="px-2 py-1 text-[10px] uppercase tracking-wider text-muted-foreground">
+                                Autorizados (Carro Elétrico)
+                              </div>
+                              {filteredAuth.map((a: any) => (
+                                <SelectItem key={`auth-${a.id}`} value={`auth:${a.id}`}>
+                                  <span className="font-medium">{a.member_name}</span>
+                                  <span className="text-muted-foreground"> — {a.committee_name_snapshot}</span>
+                                  {a.access_status !== 'liberado' && (
+                                    <span className="ml-2 text-[10px] text-amber-600">({a.access_status})</span>
+                                  )}
+                                </SelectItem>
+                              ))}
+                            </>
+                          )}
+                          {filteredMembers.length > 0 && (
+                            <>
+                              <div className={cn(
+                                'px-2 py-1 text-[10px] uppercase tracking-wider text-muted-foreground',
+                                filteredAuth.length > 0 && 'mt-1 border-t'
+                              )}>
+                                Membros internos
+                              </div>
+                              {filteredMembers.map((m: any) => (
+                                <SelectItem key={m.user_id} value={m.user_id}>{m.nome_exibicao} - {m.cargo}</SelectItem>
+                              ))}
+                            </>
+                          )}
+                          {empty && (
+                            <div className="px-3 py-6 text-center text-xs text-muted-foreground">
+                              Nenhum resultado para “{authSearch}”
+                            </div>
+                          )}
+                        </>
+                      );
+                    })()}
                   </SelectContent>
                 </Select>
                 {pickupForm.comissao && (
@@ -484,6 +526,7 @@ export default function ElectricCartsPage() {
         status={statusFilter}
         onStatus={setStatusFilter}
         counts={counts}
+        onAdd={() => setAddOpen(true)}
       />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
