@@ -1,4 +1,4 @@
-import { Search, X } from 'lucide-react';
+import { Search, X, Plus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 
@@ -10,6 +10,7 @@ interface Props {
   status: CartStatusFilter;
   onStatus: (s: CartStatusFilter) => void;
   counts: { all: number; disponivel: number; em_uso: number };
+  onAdd?: () => void;
 }
 
 const OPTIONS: { key: CartStatusFilter; label: string }[] = [
