@@ -485,6 +485,7 @@ export default function ElectricCartsPage() {
         status={statusFilter}
         onStatus={setStatusFilter}
         counts={counts}
+        onAdd={() => setAddOpen(true)}
       />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
