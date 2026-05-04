@@ -60,28 +60,31 @@ export default function ExpenseDetailSheet({
 
   const content = (
     <div className="space-y-4 pb-4">
-      {/* Header with amount + status */}
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-2xl font-extrabold text-foreground">
-            R$ {amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-          </p>
-          <p className="text-xs text-muted-foreground mt-0.5">{categoryName}</p>
-        </div>
-        <div className="flex flex-col items-end gap-1.5">
-          <Badge className={cn('text-[10px] px-2.5 py-1 rounded-full flex items-center gap-1', status.class)}>
-            <StatusIcon className="w-3 h-3" /> {status.label}
-          </Badge>
-          {isQr && (
-            <Badge variant="outline" className="text-[9px] gap-1 px-2 py-0.5">
-              <QrCode className="w-3 h-3" /> Via QR
+      {/* Hero header */}
+      <div className="rounded-2xl p-4 bg-gradient-to-br from-primary/12 via-primary/6 to-transparent border border-white/10 shadow-[inset_0_1px_0_rgba(255,255,255,0.1)]">
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Valor</p>
+            <p className="text-3xl font-extrabold text-foreground tracking-tight leading-none">
+              R$ {amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+            </p>
+            <p className="text-xs text-muted-foreground mt-1.5">{categoryName}</p>
+          </div>
+          <div className="flex flex-col items-end gap-1.5 shrink-0">
+            <Badge className={cn('text-[10px] px-2.5 py-1 rounded-full flex items-center gap-1 border-0', status.class)}>
+              <StatusIcon className="w-3 h-3" /> {status.label}
             </Badge>
-          )}
+            {isQr && (
+              <Badge variant="outline" className="text-[9px] gap-1 px-2 py-0.5">
+                <QrCode className="w-3 h-3" /> Via QR
+              </Badge>
+            )}
+          </div>
         </div>
       </div>
 
       {/* Details */}
-      <div className="rounded-xl bg-muted/30 p-3">
+      <div className="rounded-2xl bg-card/50 backdrop-blur-xl border border-white/10 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
         <InfoRow label="Título" value={expense.title} icon={Receipt} />
         <InfoRow
           label="Data"
@@ -117,12 +120,12 @@ export default function ExpenseDetailSheet({
         )}
       </div>
 
-      {/* Full description (multi-line) */}
+      {/* Description */}
       {expense.description && (
-        <div className="rounded-xl bg-muted/30 p-3">
-          <div className="flex items-center gap-2 mb-1.5">
+        <div className="rounded-2xl bg-card/50 backdrop-blur-xl border border-white/10 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
+          <div className="flex items-center gap-2 mb-2">
             <FileText className="w-4 h-4 text-muted-foreground" />
-            <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Descrição</p>
+            <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wider">Descrição</p>
           </div>
           <p className="text-sm text-foreground whitespace-pre-wrap break-words leading-relaxed">
             {expense.description}
@@ -132,26 +135,26 @@ export default function ExpenseDetailSheet({
 
       {/* Documents */}
       {hasDoc && (
-        <div className="rounded-xl bg-muted/30 p-3">
+        <div className="rounded-2xl bg-card/50 backdrop-blur-xl border border-white/10 p-4 shadow-[inset_0_1px_0_rgba(255,255,255,0.06)]">
           <ExpenseDocumentPreview documents={expense.expense_documents} />
         </div>
       )}
 
       {/* Actions */}
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 pt-1">
         {expense.status === 'pendente_validacao' && onApprove && (
           <div className="flex gap-2">
-            <Button onClick={onApprove} className="flex-1" size="sm">
-              <CheckCircle className="w-4 h-4 mr-1.5" /> Aprovar
+            <Button onClick={onApprove} className="flex-1 h-11 rounded-xl">
+              <CheckCircle className="w-4 h-4 mr-1.5" /> Aprovar despesa
             </Button>
-            <Button onClick={onReject} variant="outline" className="flex-1 text-destructive" size="sm">
+            <Button onClick={onReject} variant="outline" className="flex-1 h-11 rounded-xl text-destructive">
               <XCircle className="w-4 h-4 mr-1.5" /> Recusar
             </Button>
           </div>
         )}
         {expense.status === 'aprovado' && expense.paid_by_user_id && onRequestReimbursement && (
-          <Button onClick={onRequestReimbursement} variant="outline" className="w-full gap-1.5" size="sm">
-            <Banknote className="w-4 h-4" /> Solicitar Ressarcimento
+          <Button onClick={onRequestReimbursement} className="w-full h-11 rounded-xl gap-1.5 bg-gradient-to-r from-gold to-gold/80 hover:opacity-90 text-foreground">
+            <Banknote className="w-4 h-4" /> Solicitar ressarcimento
           </Button>
         )}
       </div>
@@ -163,7 +166,7 @@ export default function ExpenseDetailSheet({
       <Drawer open={open} onOpenChange={onOpenChange}>
         <DrawerContent className="max-h-[90dvh]">
           <DrawerHeader>
-            <DrawerTitle>Detalhes da Despesa</DrawerTitle>
+            <DrawerTitle>Detalhes da despesa</DrawerTitle>
           </DrawerHeader>
           <div className="px-4 pb-6 overflow-y-auto">{content}</div>
         </DrawerContent>
@@ -173,9 +176,9 @@ export default function ExpenseDetailSheet({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md max-h-[90dvh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Detalhes da Despesa</DialogTitle>
+          <DialogTitle>Detalhes da despesa</DialogTitle>
         </DialogHeader>
         {content}
       </DialogContent>
