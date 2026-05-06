@@ -2,7 +2,7 @@ import { useElectricCarts } from '@/hooks/useElectricCarts';
 import { useOrgMembers } from '@/hooks/useOrgMembers';
 import { useCommissions } from '@/hooks/useCommissions';
 import { useMobilityAuthorizations } from '@/hooks/useMobilityAuthorizations';
-import { Zap, Plus, Clock, ArrowRight, FileText, AlertTriangle, Search } from 'lucide-react';
+import { Zap, Plus, Clock, ArrowRight, FileText, AlertTriangle, Search, X } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn, nowSP, nowSPLocal, ensureSPOffset } from '@/lib/utils';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -22,6 +22,7 @@ import ElectricCartsFilters, { type CartStatusFilter } from '@/components/electr
 import ReservationsTab from '@/components/electric-carts/ReservationsTab';
 import PickupHeroCard from '@/components/electric-carts/PickupHeroCard';
 import FloatingPickupBar from '@/components/electric-carts/FloatingPickupBar';
+import PersonPickerSheet from '@/components/electric-carts/PersonPickerSheet';
 import { useScrollDirection } from '@/hooks/useScrollDirection';
 import { useCartReservations, type CartReservation } from '@/hooks/useCartReservations';
 import { User } from 'lucide-react';
@@ -129,6 +130,7 @@ export default function ElectricCartsPage() {
   const [pickupOpen, setPickupOpen] = useState(false);
   const [pickupForm, setPickupForm] = useState<{ cartId: string; userId: string; comissao: string; retirada_em: string; tipo: 'interno' | 'empresa' | 'outros'; empresa_slug: PartnerSlug | ''; nome_externo: string }>({ cartId: '', userId: '', comissao: '', retirada_em: '', tipo: 'interno', empresa_slug: '', nome_externo: '' });
   const [authSearch, setAuthSearch] = useState('');
+  const [personPickerOpen, setPersonPickerOpen] = useState(false);
 
   const [returnOpen, setReturnOpen] = useState(false);
   const [returnId, setReturnId] = useState('');
@@ -376,99 +378,66 @@ export default function ElectricCartsPage() {
               </TabsList>
 
               <TabsContent value="interno" className="space-y-3 mt-3">
-                <Select
-                  value={pickupForm.userId}
-                  onValueChange={(v) => {
-                    // Autorizado vindo da lista oficial
-                    if (v.startsWith('auth:')) {
-                      const id = v.slice(5);
-                      const a: any = sortedAuthorizations.find((x: any) => x.id === id);
-                      setPickupForm({
-                        ...pickupForm,
-                        userId: v,
-                        nome_externo: (a?.member_name || '').toUpperCase(),
-                        comissao: a?.committee_name_snapshot || '',
-                      });
-                      return;
-                    }
-                    const commission = getMemberCommission(v);
-                    setPickupForm({ ...pickupForm, userId: v, comissao: commission || '', nome_externo: '' });
-                  }}
-                >
-                  <SelectTrigger><SelectValue placeholder="Quem retira" /></SelectTrigger>
-                  <SelectContent className="max-h-[60dvh]">
-                    <div className="sticky top-0 z-10 bg-popover border-b p-2">
-                      <div className="relative">
-                        <Search className="w-3.5 h-3.5 absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
-                        <Input
-                          autoFocus
-                          value={authSearch}
-                          onChange={(e) => setAuthSearch(e.target.value)}
-                          onKeyDown={(e) => e.stopPropagation()}
-                          placeholder="Buscar por nome ou comissão..."
-                          className="h-9 pl-8 text-sm rounded-lg"
-                        />
+                {(() => {
+                  const selectedLabel = pickupForm.nome_externo
+                    || (pickupForm.userId && !pickupForm.userId.startsWith('auth:')
+                      ? (members.find((m: any) => m.user_id === pickupForm.userId)?.nome_exibicao || '')
+                      : '');
+                  const hasSelection = !!selectedLabel;
+                  return (
+                    <button
+                      type="button"
+                      onClick={() => setPersonPickerOpen(true)}
+                      className={cn(
+                        'w-full flex items-center gap-3 rounded-xl border bg-background px-3 h-12 text-left transition-all',
+                        hasSelection ? 'border-primary/40 shadow-sm' : 'border-input hover:border-primary/30',
+                      )}
+                    >
+                      <div className={cn(
+                        'w-8 h-8 rounded-full flex items-center justify-center shrink-0',
+                        hasSelection
+                          ? 'bg-primary/15 text-primary border border-primary/30'
+                          : 'bg-muted text-muted-foreground',
+                      )}>
+                        {hasSelection ? selectedLabel.trim().charAt(0).toUpperCase() : <Search className="w-4 h-4" />}
                       </div>
-                    </div>
-                    {(() => {
-                      const norm = (s: string) => (s || '')
-                        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-                        .toLowerCase();
-                      const q = norm(authSearch.trim());
-                      const matchAuth = (a: any) =>
-                        !q || norm(a.member_name).includes(q) || norm(a.committee_name_snapshot).includes(q);
-                      const matchMember = (m: any) =>
-                        !q || norm(m.nome_exibicao).includes(q) || norm(m.cargo).includes(q);
-                      const filteredAuth = sortedAuthorizations.filter(matchAuth);
-                      const filteredMembers = members.filter(matchMember);
-                      const empty = filteredAuth.length === 0 && filteredMembers.length === 0;
-                      return (
-                        <>
-                          {filteredAuth.length > 0 && (
-                            <>
-                              <div className="px-2 py-1 text-[10px] uppercase tracking-wider text-muted-foreground">
-                                Autorizados (Carro Elétrico)
-                              </div>
-                              {filteredAuth.map((a: any) => (
-                                <SelectItem key={`auth-${a.id}`} value={`auth:${a.id}`}>
-                                  <span className="font-medium">{a.member_name}</span>
-                                  <span className="text-muted-foreground"> — {a.committee_name_snapshot}</span>
-                                  {a.access_status !== 'liberado' && (
-                                    <span className="ml-2 text-[10px] text-amber-600">({a.access_status})</span>
-                                  )}
-                                </SelectItem>
-                              ))}
-                            </>
-                          )}
-                          {filteredMembers.length > 0 && (
-                            <>
-                              <div className={cn(
-                                'px-2 py-1 text-[10px] uppercase tracking-wider text-muted-foreground',
-                                filteredAuth.length > 0 && 'mt-1 border-t'
-                              )}>
-                                Membros internos
-                              </div>
-                              {filteredMembers.map((m: any) => (
-                                <SelectItem key={m.user_id} value={m.user_id}>{m.nome_exibicao} - {m.cargo}</SelectItem>
-                              ))}
-                            </>
-                          )}
-                          {empty && (
-                            <div className="px-3 py-6 text-center text-xs text-muted-foreground">
-                              Nenhum resultado para “{authSearch}”
-                            </div>
-                          )}
-                        </>
-                      );
-                    })()}
-                  </SelectContent>
-                </Select>
-                {pickupForm.comissao && (
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <Label className="text-xs text-muted-foreground">Comissão:</Label>
-                    <Badge variant="secondary">{pickupForm.comissao}</Badge>
-                  </div>
-                )}
+                      <div className="flex-1 min-w-0">
+                        {hasSelection ? (
+                          <>
+                            <p className="text-sm font-semibold truncate">{selectedLabel}</p>
+                            {pickupForm.comissao && (
+                              <p className="text-[11px] text-muted-foreground truncate">{pickupForm.comissao}</p>
+                            )}
+                          </>
+                        ) : (
+                          <p className="text-sm text-muted-foreground">Selecionar quem retira</p>
+                        )}
+                      </div>
+                      {hasSelection ? (
+                        <span
+                          role="button"
+                          tabIndex={0}
+                          aria-label="Limpar seleção"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setPickupForm({ ...pickupForm, userId: '', comissao: '', nome_externo: '' });
+                          }}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.stopPropagation();
+                              setPickupForm({ ...pickupForm, userId: '', comissao: '', nome_externo: '' });
+                            }
+                          }}
+                          className="w-7 h-7 rounded-full hover:bg-muted flex items-center justify-center text-muted-foreground shrink-0"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </span>
+                      ) : (
+                        <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0" />
+                      )}
+                    </button>
+                  );
+                })()}
                 {pickupForm.comissao && (activeByCommission.get(pickupForm.comissao.trim())?.length ?? 0) > 0 && (
                   <div className="flex items-start gap-2 rounded-xl border border-amber-500/40 bg-amber-500/10 px-3 py-2 text-amber-700 dark:text-amber-300">
                     <AlertTriangle className="w-4 h-4 mt-0.5 shrink-0" />
@@ -534,6 +503,26 @@ export default function ElectricCartsPage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <PersonPickerSheet
+        open={personPickerOpen}
+        onOpenChange={setPersonPickerOpen}
+        authorizations={sortedAuthorizations}
+        members={members}
+        activeByCommission={activeByCommission}
+        onSelectAuth={(a) => {
+          setPickupForm({
+            ...pickupForm,
+            userId: `auth:${a.id}`,
+            nome_externo: (a?.member_name || '').toUpperCase(),
+            comissao: a?.committee_name_snapshot || '',
+          });
+        }}
+        onSelectMember={(m) => {
+          const commission = getMemberCommission(m.user_id);
+          setPickupForm({ ...pickupForm, userId: m.user_id, comissao: commission || '', nome_externo: '' });
+        }}
+      />
 
       {/* Return dialog */}
       <Dialog open={returnOpen} onOpenChange={setReturnOpen}>

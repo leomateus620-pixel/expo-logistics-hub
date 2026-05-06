@@ -14,7 +14,8 @@ import { useOrgMembers } from '@/hooks/useOrgMembers';
 import { useCommissions } from '@/hooks/useCommissions';
 import { useMobilityAuthorizations } from '@/hooks/useMobilityAuthorizations';
 import { toast } from 'sonner';
-import { AlertTriangle, Bike } from 'lucide-react';
+import { AlertTriangle, Bike, Search, X, ArrowRight } from 'lucide-react';
+import PersonPickerSheet from '@/components/electric-carts/PersonPickerSheet';
 
 interface Props {
   open: boolean;
@@ -37,6 +38,8 @@ export default function ScooterPickupDialog({ open, onOpenChange }: Props) {
   const [nomeExterno, setNomeExterno] = useState('');
   const [telefoneExterno, setTelefoneExterno] = useState('');
   const [retiradaEm, setRetiradaEm] = useState('');
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [pickerMode, setPickerMode] = useState<'autorizados' | 'internos'>('autorizados');
   const submittingRef = useRef(false);
 
   useEffect(() => {
@@ -145,32 +148,44 @@ export default function ScooterPickupDialog({ open, onOpenChange }: Props) {
                 <>
                   <div>
                     <Label className="text-xs text-muted-foreground mb-1 block">Selecionar autorizado</Label>
-                    <Select
-                      value={userId}
-                      onValueChange={(v) => {
-                        const a: any = sortedAuthorizations.find((x: any) => `auth:${x.id}` === v);
-                        setUserId(v);
-                        setNomeExterno((a?.member_name || '').toUpperCase());
-                        setComissao(a?.committee_name_snapshot || '');
-                        setTelefoneExterno(a?.operational_responsible_phone || '');
-                      }}
+                    <button
+                      type="button"
+                      onClick={() => { setPickerMode('autorizados'); setPickerOpen(true); }}
+                      className={cn(
+                        'w-full flex items-center gap-3 rounded-xl border bg-background px-3 h-12 text-left transition-all',
+                        nomeExterno ? 'border-primary/40 shadow-sm' : 'border-input hover:border-primary/30',
+                      )}
                     >
-                      <SelectTrigger><SelectValue placeholder="Quem retira o patinete" /></SelectTrigger>
-                      <SelectContent className="max-h-[60dvh]">
-                        <div className="px-2 py-1 text-[10px] uppercase tracking-wider text-muted-foreground">
-                          Autorizados (Patinete)
-                        </div>
-                        {sortedAuthorizations.map((a: any) => (
-                          <SelectItem key={`auth-${a.id}`} value={`auth:${a.id}`}>
-                            <span className="font-medium">{a.member_name}</span>
-                            <span className="text-muted-foreground"> — {a.committee_name_snapshot}</span>
-                            {a.access_status !== 'liberado' && (
-                              <span className="ml-2 text-[10px] text-amber-600">({a.access_status})</span>
-                            )}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      <div className={cn(
+                        'w-8 h-8 rounded-full flex items-center justify-center shrink-0',
+                        nomeExterno ? 'bg-primary/15 text-primary border border-primary/30' : 'bg-muted text-muted-foreground',
+                      )}>
+                        {nomeExterno ? nomeExterno.trim().charAt(0).toUpperCase() : <Search className="w-4 h-4" />}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        {nomeExterno ? (
+                          <>
+                            <p className="text-sm font-semibold truncate">{nomeExterno}</p>
+                            {comissao && <p className="text-[11px] text-muted-foreground truncate">{comissao}</p>}
+                          </>
+                        ) : (
+                          <p className="text-sm text-muted-foreground">Selecionar quem retira</p>
+                        )}
+                      </div>
+                      {nomeExterno ? (
+                        <span
+                          role="button"
+                          tabIndex={0}
+                          aria-label="Limpar"
+                          onClick={(e) => { e.stopPropagation(); setUserId(''); setNomeExterno(''); setComissao(''); setTelefoneExterno(''); }}
+                          className="w-7 h-7 rounded-full hover:bg-muted flex items-center justify-center text-muted-foreground shrink-0"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </span>
+                      ) : (
+                        <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0" />
+                      )}
+                    </button>
                   </div>
                   <div>
                     <Label className="text-xs text-muted-foreground mb-1 block">Telefone *</Label>
@@ -212,23 +227,53 @@ export default function ScooterPickupDialog({ open, onOpenChange }: Props) {
             </TabsContent>
 
             <TabsContent value="interno" className="space-y-3 mt-3">
-              <div>
-                <Label className="text-xs text-muted-foreground mb-1 block">Membro da equipe</Label>
-                <Select
-                  value={userId}
-                  onValueChange={(v) => {
-                    setUserId(v);
-                    setComissao(memberCommissionMap.get(v) || '');
-                  }}
-                >
-                  <SelectTrigger><SelectValue placeholder="Quem retira" /></SelectTrigger>
-                  <SelectContent className="max-h-[60dvh]">
-                    {members.map((m: any) => (
-                      <SelectItem key={m.user_id} value={m.user_id}>{m.nome_exibicao} - {m.cargo}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              {(() => {
+                const selected = members.find((m: any) => m.user_id === userId);
+                const label = selected?.nome_exibicao || '';
+                return (
+                  <div>
+                    <Label className="text-xs text-muted-foreground mb-1 block">Membro da equipe</Label>
+                    <button
+                      type="button"
+                      onClick={() => { setPickerMode('internos'); setPickerOpen(true); }}
+                      className={cn(
+                        'w-full flex items-center gap-3 rounded-xl border bg-background px-3 h-12 text-left transition-all',
+                        label ? 'border-primary/40 shadow-sm' : 'border-input hover:border-primary/30',
+                      )}
+                    >
+                      <div className={cn(
+                        'w-8 h-8 rounded-full flex items-center justify-center shrink-0',
+                        label ? 'bg-primary/15 text-primary border border-primary/30' : 'bg-muted text-muted-foreground',
+                      )}>
+                        {label ? label.trim().charAt(0).toUpperCase() : <Search className="w-4 h-4" />}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        {label ? (
+                          <>
+                            <p className="text-sm font-semibold truncate">{label}</p>
+                            <p className="text-[11px] text-muted-foreground truncate">{selected?.cargo || comissao}</p>
+                          </>
+                        ) : (
+                          <p className="text-sm text-muted-foreground">Selecionar quem retira</p>
+                        )}
+                      </div>
+                      {label ? (
+                        <span
+                          role="button"
+                          tabIndex={0}
+                          aria-label="Limpar"
+                          onClick={(e) => { e.stopPropagation(); setUserId(''); setComissao(''); }}
+                          className="w-7 h-7 rounded-full hover:bg-muted flex items-center justify-center text-muted-foreground shrink-0"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </span>
+                      ) : (
+                        <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0" />
+                      )}
+                    </button>
+                  </div>
+                );
+              })()}
               {comissao && (
                 <div className="flex items-center gap-2 flex-wrap">
                   <Label className="text-xs text-muted-foreground">Comissão:</Label>
@@ -248,6 +293,24 @@ export default function ScooterPickupDialog({ open, onOpenChange }: Props) {
           </Button>
         </div>
       </DialogContent>
+      <PersonPickerSheet
+        open={pickerOpen}
+        onOpenChange={setPickerOpen}
+        authorizations={sortedAuthorizations}
+        members={members}
+        tabs={tipo === 'interno' ? ['internos'] : ['autorizados']}
+        defaultTab={pickerMode}
+        onSelectAuth={(a: any) => {
+          setUserId(`auth:${a.id}`);
+          setNomeExterno((a?.member_name || '').toUpperCase());
+          setComissao(a?.committee_name_snapshot || '');
+          setTelefoneExterno(a?.operational_responsible_phone || '');
+        }}
+        onSelectMember={(m: any) => {
+          setUserId(m.user_id);
+          setComissao(memberCommissionMap.get(m.user_id) || '');
+        }}
+      />
     </Dialog>
   );
 }
