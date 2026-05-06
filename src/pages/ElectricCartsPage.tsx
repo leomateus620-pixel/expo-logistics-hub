@@ -504,6 +504,26 @@ export default function ElectricCartsPage() {
         </DialogContent>
       </Dialog>
 
+      <PersonPickerSheet
+        open={personPickerOpen}
+        onOpenChange={setPersonPickerOpen}
+        authorizations={sortedAuthorizations}
+        members={members}
+        activeByCommission={activeByCommission}
+        onSelectAuth={(a) => {
+          setPickupForm({
+            ...pickupForm,
+            userId: `auth:${a.id}`,
+            nome_externo: (a?.member_name || '').toUpperCase(),
+            comissao: a?.committee_name_snapshot || '',
+          });
+        }}
+        onSelectMember={(m) => {
+          const commission = getMemberCommission(m.user_id);
+          setPickupForm({ ...pickupForm, userId: m.user_id, comissao: commission || '', nome_externo: '' });
+        }}
+      />
+
       {/* Return dialog */}
       <Dialog open={returnOpen} onOpenChange={setReturnOpen}>
         <DialogContent className="sm:max-w-md">
