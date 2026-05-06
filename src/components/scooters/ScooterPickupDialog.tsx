@@ -227,23 +227,53 @@ export default function ScooterPickupDialog({ open, onOpenChange }: Props) {
             </TabsContent>
 
             <TabsContent value="interno" className="space-y-3 mt-3">
-              <div>
-                <Label className="text-xs text-muted-foreground mb-1 block">Membro da equipe</Label>
-                <Select
-                  value={userId}
-                  onValueChange={(v) => {
-                    setUserId(v);
-                    setComissao(memberCommissionMap.get(v) || '');
-                  }}
-                >
-                  <SelectTrigger><SelectValue placeholder="Quem retira" /></SelectTrigger>
-                  <SelectContent className="max-h-[60dvh]">
-                    {members.map((m: any) => (
-                      <SelectItem key={m.user_id} value={m.user_id}>{m.nome_exibicao} - {m.cargo}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              {(() => {
+                const selected = members.find((m: any) => m.user_id === userId);
+                const label = selected?.nome_exibicao || '';
+                return (
+                  <div>
+                    <Label className="text-xs text-muted-foreground mb-1 block">Membro da equipe</Label>
+                    <button
+                      type="button"
+                      onClick={() => { setPickerMode('internos'); setPickerOpen(true); }}
+                      className={cn(
+                        'w-full flex items-center gap-3 rounded-xl border bg-background px-3 h-12 text-left transition-all',
+                        label ? 'border-primary/40 shadow-sm' : 'border-input hover:border-primary/30',
+                      )}
+                    >
+                      <div className={cn(
+                        'w-8 h-8 rounded-full flex items-center justify-center shrink-0',
+                        label ? 'bg-primary/15 text-primary border border-primary/30' : 'bg-muted text-muted-foreground',
+                      )}>
+                        {label ? label.trim().charAt(0).toUpperCase() : <Search className="w-4 h-4" />}
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        {label ? (
+                          <>
+                            <p className="text-sm font-semibold truncate">{label}</p>
+                            <p className="text-[11px] text-muted-foreground truncate">{selected?.cargo || comissao}</p>
+                          </>
+                        ) : (
+                          <p className="text-sm text-muted-foreground">Selecionar quem retira</p>
+                        )}
+                      </div>
+                      {label ? (
+                        <span
+                          role="button"
+                          tabIndex={0}
+                          aria-label="Limpar"
+                          onClick={(e) => { e.stopPropagation(); setUserId(''); setComissao(''); }}
+                          className="w-7 h-7 rounded-full hover:bg-muted flex items-center justify-center text-muted-foreground shrink-0"
+                        >
+                          <X className="w-3.5 h-3.5" />
+                        </span>
+                      ) : (
+                        <ArrowRight className="w-4 h-4 text-muted-foreground shrink-0" />
+                      )}
+                    </button>
+                  </div>
+                );
+              })()}
               {comissao && (
                 <div className="flex items-center gap-2 flex-wrap">
                   <Label className="text-xs text-muted-foreground">Comissão:</Label>
