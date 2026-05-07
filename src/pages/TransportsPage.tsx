@@ -32,6 +32,7 @@ import TransportDynamicIsland from '@/components/TransportDynamicIsland';
 import TransportCard from '@/components/transport/TransportCard';
 import TransportDetailView from '@/components/transport/TransportDetailView';
 import TransportForm from '@/components/transport/TransportForm';
+import OdometerFinalizeSheet, { type OdometerConfirmPayload } from '@/components/transport/OdometerFinalizeSheet';
 
 /* ─── Status config ─── */
 const statusConfig: Record<string, { label: string; icon: typeof Check; class: string; dotClass: string; bgClass: string }> = {
