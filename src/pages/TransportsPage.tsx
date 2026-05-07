@@ -886,7 +886,7 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
         await locationTracker.stopTracking();
         setTrackingTransportId(null);
       }
-      openFinalizeDialog(t, true);
+      openOdometerSheet(t, true);
       return;
     }
   };
