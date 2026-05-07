@@ -32,6 +32,7 @@ import TransportDynamicIsland from '@/components/TransportDynamicIsland';
 import TransportCard from '@/components/transport/TransportCard';
 import TransportDetailView from '@/components/transport/TransportDetailView';
 import TransportForm from '@/components/transport/TransportForm';
+import OdometerFinalizeSheet, { type OdometerConfirmPayload } from '@/components/transport/OdometerFinalizeSheet';
 
 /* ─── Status config ─── */
 const statusConfig: Record<string, { label: string; icon: typeof Check; class: string; dotClass: string; bgClass: string }> = {
@@ -436,6 +437,10 @@ export default function TransportsPage() {
   const [startTripDriverName, setStartTripDriverName] = useState('');
   const [startTripStartedAt, setStartTripStartedAt] = useState('');
   const [startTripTitulo, setStartTripTitulo] = useState('');
+
+  // Odometer finalize sheet
+  const [odometerOpen, setOdometerOpen] = useState(false);
+  const [odometerCtx, setOdometerCtx] = useState<{ transportId: string; isReturnFlow: boolean } | null>(null);
 
   const [editOpen, setEditOpen] = useState(false);
   const [editId, setEditId] = useState('');
@@ -861,14 +866,14 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
         await locationTracker.stopTracking();
         setTrackingTransportId(null);
       }
-      openFinalizeDialog(t);
+      openOdometerSheet(t, false);
       return;
     }
 
     // chegou_destino → start_return (only valid in return flow)
     if (t.status === 'chegou_destino') {
       if (!useReturnFlow) {
-        openFinalizeDialog(t);
+        openOdometerSheet(t, false);
         return;
       }
       try { await startReturn.mutateAsync({ id: t.id }); } catch { /* handled */ }
@@ -881,7 +886,7 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
         await locationTracker.stopTracking();
         setTrackingTransportId(null);
       }
-      openFinalizeDialog(t, true);
+      openOdometerSheet(t, true);
       return;
     }
   };
@@ -908,6 +913,54 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
     } as any);
     setEditOpen(true);
   };
+
+  const openOdometerSheet = (t: any, isReturnFlow: boolean) => {
+    setOdometerCtx({ transportId: t.id, isReturnFlow });
+    setOdometerOpen(true);
+  };
+
+  const handleOdometerConfirm = async (payload: OdometerConfirmPayload) => {
+    if (!odometerCtx) return;
+    const t = transports.find((x: any) => x.id === odometerCtx.transportId);
+    if (!t) return;
+    try {
+      const kmSaida = payload.km_retirada;
+      const kmChegada = payload.km_devolucao;
+      const hasBoth = kmSaida != null && kmChegada != null && t.vehicle_id;
+      const vehicleUsage = hasBoth ? {
+        vehicle_id: t.vehicle_id,
+        responsavel_user_id: t.motorista_user_id || null,
+        km_saida: kmSaida,
+        km_chegada: kmChegada,
+        km_rodados: (kmChegada as number) - (kmSaida as number),
+        devolucao_em: payload.fim_em,
+        fim_em: payload.fim_em,
+      } : null;
+
+      if (odometerCtx.isReturnFlow) {
+        await completeReturn.mutateAsync({ id: t.id, vehicleUsage });
+      } else {
+        await update.mutateAsync({
+          id: t.id,
+          updates: {
+            status: 'concluido',
+            km_retirada: kmSaida,
+            km_devolucao: kmChegada,
+            fim_em: payload.fim_em,
+            fim_real_em: nowSP(),
+          },
+          expectedUpdatedAt: t.updated_at,
+          vehicleUsage,
+        });
+        toast.success('Viagem finalizada');
+      }
+      setOdometerOpen(false);
+      setOdometerCtx(null);
+    } catch (err: any) {
+      toast.error(err?.message || 'Erro ao finalizar');
+    }
+  };
+
 
   const sorted = [...transports].sort((a: any, b: any) => (a.inicio_em || '').localeCompare(b.inicio_em || ''));
   const fourHoursAgo = new Date(Date.now() - 4 * 60 * 60 * 1000).toLocaleString('sv-SE', { timeZone: 'America/Sao_Paulo' }).replace(' ', 'T');
@@ -1246,6 +1299,27 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
         startedAt={startTripStartedAt}
         isAirport={startTripTitulo === 'Aeroporto'}
       />
+
+      {/* ─── Odometer Finalize Sheet ─── */}
+      {(() => {
+        const t = odometerCtx ? transports.find((x: any) => x.id === odometerCtx.transportId) : null;
+        const v = t?.vehicle_id ? vehicles.find((vv: any) => vv.id === t.vehicle_id) : null;
+        const drv = t?.motorista_user_id ? members.find((m: any) => m.user_id === t.motorista_user_id) : null;
+        const estKm = t ? getEffectiveEstimatedKm(t.distancia_estimada_km, t.titulo, t.voo_cidade, t.destino) : null;
+        return (
+          <OdometerFinalizeSheet
+            open={odometerOpen}
+            onOpenChange={(v) => { setOdometerOpen(v); if (!v) setOdometerCtx(null); }}
+            transport={t}
+            vehicle={v}
+            driverName={drv?.nome_exibicao}
+            estimatedKm={estKm}
+            isReturnFlow={!!odometerCtx?.isReturnFlow}
+            isPending={update.isPending || completeReturn.isPending}
+            onConfirm={handleOdometerConfirm}
+          />
+        );
+      })()}
     </div>
   );
 }
