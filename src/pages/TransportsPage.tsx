@@ -873,7 +873,7 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
     // chegou_destino → start_return (only valid in return flow)
     if (t.status === 'chegou_destino') {
       if (!useReturnFlow) {
-        openFinalizeDialog(t);
+        openOdometerSheet(t, false);
         return;
       }
       try { await startReturn.mutateAsync({ id: t.id }); } catch { /* handled */ }
