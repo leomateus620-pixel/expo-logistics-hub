@@ -183,8 +183,8 @@ export default function AgendaPage() {
         if (t.fim_em) {
           fimIso = t.fim_em;
         } else if (t.titulo === 'Aeroporto' && (t.voo_chegada || t.voo_checkin)) {
-          const oneWay = getEffectiveOneWayMin(t.duracao_estimada_min, t.titulo, t.voo_cidade);
-          const totalDur = getEffectiveTotalMin(t.duracao_estimada_min, t.titulo, t.voo_cidade);
+          const oneWay = getEffectiveOneWayMin(t.duracao_estimada_min, t.titulo, t.voo_cidade, t.destino, t.distancia_estimada_km);
+          const totalDur = getEffectiveTotalMin(t.duracao_estimada_min, t.titulo, t.voo_cidade, t.destino, t.distancia_estimada_km);
           if (t.voo_chegada) {
             const landing = buildSPDT(t.inicio_em, t.voo_chegada);
             fimIso = landing
@@ -199,7 +199,7 @@ export default function AgendaPage() {
         } else {
           fimIso = new Date(
             new Date(saidaIso).getTime() +
-              (getEffectiveTotalMin(t.duracao_estimada_min, t.titulo, t.voo_cidade) * 60000)
+              (getEffectiveTotalMin(t.duracao_estimada_min, t.titulo, t.voo_cidade, t.destino, t.distancia_estimada_km) * 60000)
           ).toISOString();
         }
 

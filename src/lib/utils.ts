@@ -191,44 +191,110 @@ export const KNOWN_ONE_WAY_MIN: Record<string, number> = {
   'Outros': 30,
 };
 
+/** Canonical one-way times by destination CITY name (custom "Outros" trips). */
+const KNOWN_CITY_ONE_WAY_MIN: Record<string, number> = {
+  'Passo Fundo': 240,
+  'Chapecó': 240,
+  'Santo Ângelo': 80,
+  'Porto Alegre': 390,
+};
+
 /** Default round-trip duration (in minutes) per transport type, used as a last resort. */
 const DEFAULT_TOTAL_MIN: Record<string, number> = {
   'Aeroporto': 120, 'Hotel': 45, 'Parque': 30, 'Centro': 40, 'Escolta Policial': 90, 'Outros': 60,
 };
 
+/** Average safe driving speed (km/h) used to derive duration from a saved distance. */
+const SAFE_AVG_SPEED_KMH = 80;
+/** Maximum plausible average speed used to flag impossible return times. */
+const MAX_PLAUSIBLE_SPEED_KMH = 90;
+
+function cityOneWayFromDestino(destino?: string | null): number | null {
+  if (!destino) return null;
+  const lower = destino.toLowerCase();
+  for (const [city, mins] of Object.entries(KNOWN_CITY_ONE_WAY_MIN)) {
+    if (lower.includes(city.toLowerCase())) return mins;
+  }
+  return null;
+}
+
 /** Get the effective ONE-WAY driving time in minutes.
- *  Prefers the canonical value for known destinations over a saved value that is
- *  missing or implausibly short (≤ 10 min for an airport). */
+ *  Priority: airport canonical → city canonical → derived from saved distance →
+ *  saved/2 → type default. Always returns a plausible value for the trip length. */
 export function getEffectiveOneWayMin(
   savedTotalMin: number | null | undefined,
   titulo: string | null | undefined,
-  vooCidade?: string | null
+  vooCidade?: string | null,
+  destino?: string | null,
+  distanciaKmRoundTrip?: number | null,
 ): number {
   const key = titulo === 'Aeroporto' && vooCidade ? `Aeroporto_${vooCidade}` : (titulo || 'Outros');
   const known = KNOWN_ONE_WAY_MIN[key];
   const saved = typeof savedTotalMin === 'number' && savedTotalMin > 0 ? savedTotalMin : null;
-  // For airport trips, anything under 30 min one-way is implausible — prefer canonical
+
   if (titulo === 'Aeroporto') {
     if (known) return known;
     if (saved && saved >= 60) return Math.round(saved / 2);
-    return 120; // safe default for unknown airport
+    return 120;
   }
+
+  // Custom destination — try city table first
+  const cityMin = cityOneWayFromDestino(destino);
+  if (cityMin) return cityMin;
+
+  // Derive from saved round-trip distance (>30 km means it's not local)
+  if (typeof distanciaKmRoundTrip === 'number' && distanciaKmRoundTrip > 30) {
+    return Math.max(20, Math.round((distanciaKmRoundTrip / 2) / SAFE_AVG_SPEED_KMH * 60));
+  }
+
   if (saved && saved > 10) return Math.max(10, Math.round(saved / 2));
   return known ?? 30;
 }
 
-/** Get the effective ROUND-TRIP duration in minutes (for non-airport transports). */
+/** Get the effective ROUND-TRIP duration in minutes.
+ *  Rejects a saved value that is implausibly small for the saved distance. */
 export function getEffectiveTotalMin(
   savedTotalMin: number | null | undefined,
   titulo: string | null | undefined,
-  vooCidade?: string | null
+  vooCidade?: string | null,
+  destino?: string | null,
+  distanciaKmRoundTrip?: number | null,
 ): number {
   const saved = typeof savedTotalMin === 'number' && savedTotalMin > 0 ? savedTotalMin : null;
-  if (saved && saved > 10) return saved;
-  const oneWay = getEffectiveOneWayMin(savedTotalMin, titulo, vooCidade);
-  // Round-trip ≈ 2 × one-way for known long routes; otherwise use type default
+  const oneWay = getEffectiveOneWayMin(savedTotalMin, titulo, vooCidade, destino, distanciaKmRoundTrip);
+
+  // Saved must be plausible for the distance: >= distance / MAX_SPEED * 60
+  if (saved && saved > 10) {
+    if (typeof distanciaKmRoundTrip === 'number' && distanciaKmRoundTrip > 30) {
+      const minPlausible = (distanciaKmRoundTrip / MAX_PLAUSIBLE_SPEED_KMH) * 60;
+      if (saved >= minPlausible) return saved;
+      // Saved too short for distance → ignore, use derived
+      return oneWay * 2;
+    }
+    return saved;
+  }
+
   const key = titulo === 'Aeroporto' && vooCidade ? `Aeroporto_${vooCidade}` : (titulo || 'Outros');
-  if (KNOWN_ONE_WAY_MIN[key]) return oneWay * 2;
+  if (KNOWN_ONE_WAY_MIN[key] || cityOneWayFromDestino(destino) || (typeof distanciaKmRoundTrip === 'number' && distanciaKmRoundTrip > 30)) {
+    return oneWay * 2;
+  }
   return DEFAULT_TOTAL_MIN[titulo || 'Outros'] || 60;
+}
+
+/** Returns false if the return time is impossible given the round-trip distance. */
+export function isReturnTimePlausible(
+  departureIso: string | null | undefined,
+  returnIso: string | Date | null | undefined,
+  distanciaKmRoundTrip?: number | null,
+): boolean {
+  if (!departureIso || !returnIso) return true;
+  const dep = new Date(departureIso).getTime();
+  const ret = returnIso instanceof Date ? returnIso.getTime() : new Date(returnIso).getTime();
+  if (isNaN(dep) || isNaN(ret)) return true;
+  if (ret <= dep) return false;
+  if (typeof distanciaKmRoundTrip !== 'number' || distanciaKmRoundTrip <= 30) return true;
+  const elapsedMin = (ret - dep) / 60000;
+  const minPlausible = (distanciaKmRoundTrip / MAX_PLAUSIBLE_SPEED_KMH) * 60;
+  return elapsedMin >= minPlausible;
 }
 
