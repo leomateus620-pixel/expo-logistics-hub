@@ -143,7 +143,7 @@ const ensureSPTimestamptz = ensureSPOffset;
 const ARRIVAL_GROUND_BUFFER_MIN = 30;
 
 function airportOneWayMin(t: any): number {
-  return getEffectiveOneWayMin(t.duracao_estimada_min, t.titulo, t.voo_cidade);
+  return getEffectiveOneWayMin(t.duracao_estimada_min, t.titulo, t.voo_cidade, t.destino, t.distancia_estimada_km);
 }
 
 function buildSPDateTime(baseIso: string, hhmm: string): Date | null {
@@ -171,7 +171,7 @@ function estimateReturnTime(t: any): Date | null {
   }
 
   const start = new Date(t.inicio_em);
-  const durationMin = getEffectiveTotalMin(t.duracao_estimada_min, t.titulo, t.voo_cidade);
+  const durationMin = getEffectiveTotalMin(t.duracao_estimada_min, t.titulo, t.voo_cidade, t.destino, t.distancia_estimada_km);
   return new Date(start.getTime() + durationMin * 60000);
 }
 
