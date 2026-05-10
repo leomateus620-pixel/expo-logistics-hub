@@ -265,7 +265,7 @@ export function useDashboardMetrics() {
         }).length;
         const totalProg = considered.length;
         const percent = totalProg > 0 ? Math.round((realizados / totalProg) * 100) : 0;
-        return { total: trTotal, realizados: trRealizados, pendentes: trPendentes, emAndamento: trEmAndamento, agendadosHoje: trAgendadosHoje, kmTotal: Math.round(trKmTotal), aeroportos: Array.from(aeroportos), cidades: Array.from(cidades), topDestino, series: trSeries, progress: { realizados, pendentes: pendentesAll, criticas, percent, total: totalProg } };
+        return { total: trTotal, realizados: trRealizados, pendentes: trPendentes, emAndamento: trEmAndamento, agendadosHoje: trAgendadosHoje, kmTotal: Math.round(trKmTotal), combustivelTotalBRL: Math.max(fuelTotalBRL || 0, totalValorCombustivel || 0), aeroportos: Array.from(aeroportos), cidades: Array.from(cidades), topDestino, series: trSeries, progress: { realizados, pendentes: pendentesAll, criticas, percent, total: totalProg } };
       })(),
       tasks: { pendentes: tkPendentes, concluidas: tkConcluidas, criticas: tkCriticas, percent: tkPercent, porCategoria: tkByCat },
       team: { totalLogistica: totalLog, voluntarios, escaladosHoje, totalGeral: members.length },
