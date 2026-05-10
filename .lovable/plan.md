@@ -1,49 +1,73 @@
-## Correções no PDF (V8) — base V7
+## Atualização V9 — Seção de Hóspedes enriquecida (base V8)
 
-### Custos por veículo (valores reais do banco — `fuel_records`)
+Mantém **100% do design e demais conteúdos do V8**. Altera somente a Seção 5 — Hóspedes & Atendimentos — para tornar a informação rica, completa e auditável.
 
-| Placa | Modelo | Viagens (transp.) | KM odômetro | Litros | Combustível |
-|---|---|---|---|---|---|
-| JDF6D47 | AMAROK | 13 | 2.892 | 144,33 | **R$ 755,64** |
-| TQX7C18 | T-CROSS | 6 | 1.249 | 111,16 | **R$ 742,22** |
-| IZT7H43 | T-CROSS | 6 | 642 | 121,97 | **R$ 814,21** |
-| IZH9J56 | UP | 3 | 219 | 0,00 | **R$ 0,00** |
-| IXU8B21 | UP | 2 | 178 | 45,06 | **R$ 299,38** |
-| TQW2A80 | SAVEIRO | 0 | 0 | 0,00 | **R$ 0,00** |
-| — | DEFENDER 4x4 | — | — | 107,87 | **R$ 725,61** |
-| **TOTAL** | 7 veículos | **30** | **5.180** | **530,39** | **R$ 3.337,06** |
+### Dados oficiais do banco (validados em `guests` + `transport_guests`)
 
-Combustível total bate exatamente (R$ 3.337,06). Distribuição por veículo do V7 estava estimada/incorreta — será 100% substituída pelos valores reais acima.
+- **23 hóspedes cadastrados** no período da feira
+- **14 hóspedes transportados** (com ao menos 1 viagem vinculada)
+- **9 hóspedes sem transporte** (estadia própria / autossuficientes)
+- **32 vínculos hóspede ↔ transporte** — bate exatamente com os 32 transportes concluídos
 
-### Quilometragem — exibir os dois números
+### Distribuição por hotel (todos os 23)
 
-Adicionar nota explícita na seção da Frota e na auditoria de KM:
+| Hotel | Hóspedes |
+|---|---|
+| Imigrantes | 9 |
+| Benos Hotel | 7 |
+| Centro Santo Ângelo | 1 |
+| Prefeito Mantei | 1 |
+| Villas Hotel | 1 |
+| Imigrantes → Guia Lopes | 1 |
+| Em casa | 1 |
+| Sem hotel informado | 2 |
 
-> **KM total registrado:** **5.180 km** (cálculo do sistema, soma de `vehicle_usage`).
-> **KM total odômetro físico dos carros:** **5.811 km** (leitura direta dos painéis ao final do período).
-> Diferença de **631 km** corresponde a deslocamentos internos no parque e trechos sem registro de viagem no sistema.
+### Hóspedes transportados (14) — ordenados por viagens
 
-### Mudanças pontuais no PDF
+| Convidado | Hotel | Transportes |
+|---|---|---|
+| Walter Lehenbauer + 3 acompanhantes | — | **9** |
+| Luis Fernando Muñoz | Imigrantes | 4 |
+| Verônica Muccini Longhi | Imigrantes / Guia Lopes | 4 |
+| Alexandre Gadret e esposa | Prefeito Mantei | 2 |
+| Erasmo Battistella | — | 2 |
+| Luiz Carlos Molion | Benos Hotel | 2 |
+| Paulo Guedes | Imigrantes | 2 |
+| Daniel Carnio Costa | Benos Hotel | 1 |
+| Daniel Popov | Benos Hotel | 1 |
+| Família Walter | Imigrantes | 1 |
+| Paulo Hermann | Imigrantes | 1 |
+| Renato Buranello | Benos Hotel | 1 |
+| Rosane de Oliveira | Centro Santo Ângelo | 1 |
+| Tiago Maique | Benos Hotel | 1 |
+| **TOTAL** | — | **32** |
 
-1. **Tabela "3. Frota Operacional"**: substituir todas as linhas pelos valores reais acima. Total: 30 viagens / 5.180 km / 530,39 L / R$ 3.337,06.
-2. **Bloco de auditoria de KM e CO₂**: mostrar ambos os totais (5.180 sistema / 5.811 odômetro) e calcular CO₂ sobre 5.811 km (oficial físico) → ≈ **1.336 kg CO₂**.
-3. **Capa e KPIs**: manter "5.811 km" como número oficial destacado, com subtítulo "(5.180 km registrados pelo sistema)".
-4. **Texto da seção da frota**: nota técnica de transparência citando origem dos dados (`vehicles` + `vehicle_usage` + `fuel_records`, em 10/05/2026).
-5. **Manter intacto** todo o resto do V7: design, capa, equipe (9 nomes da LOGÍSTICA), Hotel Imigrantes como hospedagem, sem Sprinter/Kombi, 22 carrinhos elétricos / 2.157 h, hóspedes, eventos, mobilidade, conclusão. Sem checklist, sem comparativos de versão.
+### Hóspedes cadastrados sem transporte (9)
+
+Cristian de Leon Fedrizzi Petalas e Cláudio Zigiotto (Band), Daniel Fontana, Jerônimo Goergen, Júnior Gilliard e Thiago Facco, Mariângela da Cunha, Ricardo Emílio Zimmermann, Rodrigo Salton Schneider, Rodrigo Simch, Valmor (Presidente do PT).
+
+### Mudanças no PDF (somente Seção 5)
+
+1. **KPI grid** — manter (23 / 14 / 9), adicionar 4º card "VÍNCULOS DE VIAGEM = 32" para amarrar com a Seção 1.
+2. **Texto introdutório** — parágrafo curto explicando que a feira recebeu 23 convidados oficiais distribuídos em 8 hospedagens, e que as viagens cobriram 14 deles (9 deslocaram-se por meios próprios).
+3. **Tabela "Distribuição por hospedagem"** — 8 linhas + total (23).
+4. **Tabela "Hóspedes transportados — viagens vinculadas"** — substitui a tabela atual (que estava incompleta com 7 linhas e tudo "1"). Agora 14 linhas + total = 32. Colunas: Convidado · Hotel · Viagens.
+5. **Bloco "Cadastrados sem transporte (9)"** — parágrafo em fonte SMALL listando os 9 nomes.
+6. Layout: a Seção 5 passa a ocupar **2 páginas** (separadas por `PageBreak`) para evitar overflow. Tabelas com `KeepTogether` quando couber.
 
 ### Implementação
 
-- Duplicar `/tmp/genrep_v7.py` → `/tmp/genrep_v8.py`.
-- Atualizar header/metadata para "v8" e saída para `Relatorio_Geral_Operacao_Logistica_Fenasoja_2026_v8.pdf`.
-- Substituir array `fleet` pelos 7 veículos reais.
-- Atualizar bloco de KM/CO₂ para exibir ambos os totais.
-- Atualizar litros (530,39) e texto introdutório dos transportes (30 com veículo / 32 concluídos).
+- Duplicar `/tmp/genrep_v8.py` → `/tmp/genrep_v9.py`.
+- Atualizar `OUT` para `Relatorio_Geral_Operacao_Logistica_Fenasoja_2026_v9.pdf` e `CHART_DIR` para `/tmp/charts_v9`.
+- Substituir o bloco "p8: Hóspedes" (linhas ~367–387) pelo novo conteúdo descrito acima. Sem tocar em capa, KPIs gerais, frota, KM, carrinhos, eventos, equipe, mobilidade, auditoria ou conclusão.
 
 ### QA obrigatório
 
-- `pdftoppm` em todas as páginas.
-- Conferir: tabela da frota com valores reais; "5.180 km (sistema) / 5.811 km (odômetro físico)" presente em todos os pontos relevantes; total combustível R$ 3.337,06; CO₂ ≈ 1.336 kg; demais seções idênticas ao V7.
+- Rodar o script e validar exit code 0.
+- `pdftoppm -r 90` em todas as páginas.
+- Inspecionar visualmente as páginas da nova Seção 5: sem texto cortado, sem overflow de tabela, totais batendo (23 hospedagem, 32 viagens), 14 nomes presentes, 9 não-transportados listados.
+- Conferir que páginas anteriores e posteriores continuam idênticas ao V8.
 
 ### Entregável
 
-`Relatorio_Geral_Operacao_Logistica_Fenasoja_2026_v8.pdf`
+`Relatorio_Geral_Operacao_Logistica_Fenasoja_2026_v9.pdf`
