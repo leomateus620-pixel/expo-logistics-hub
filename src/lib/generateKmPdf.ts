@@ -1,6 +1,15 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { ConsolidationResult, FAIR_PERIODS } from './kmConsolidation';
+import type { VehicleOdometerEvent } from '@/hooks/useVehicleOdometerEvent';
+
+export interface OdometerEventReport {
+  items: VehicleOdometerEvent[];
+  totalKmEvento: number;
+  totalValorCombustivel: number;
+  totalLitros: number;
+  totalCustoEstimadoKm: number;
+}
 
 const KM_SOURCE_LABELS: Record<string, string> = {
   saved: 'KM salvo no transporte',
@@ -24,7 +33,9 @@ function fmtKm(km: number | null): string {
   return km != null ? `${km.toLocaleString('pt-BR')} km` : '—';
 }
 
-export function generateKmPdf(data: ConsolidationResult) {
+const fmtBRL = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+export function generateKmPdf(data: ConsolidationResult, odometer?: OdometerEventReport) {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
