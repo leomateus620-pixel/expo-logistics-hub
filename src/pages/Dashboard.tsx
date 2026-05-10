@@ -158,6 +158,8 @@ export default function Dashboard() {
   const { members, isLoading: loadMembers } = useOrgMembers();
   const { shifts, assignments, isLoading: loadSchedules } = useSchedules();
   const { stats: expenseStats } = useExpenses();
+  const metrics = useDashboardMetrics();
+  const [expanded, setExpanded] = useState<null | 'vehicles' | 'carts' | 'transports' | 'tasks'>(null);
 
   const todayStr = todaySP();
   const tomorrowStr = useMemo(() => {
