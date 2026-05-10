@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useCurrentOrg } from './useCurrentOrg';
 import { useVehicles } from './useVehicles';
-import { PERIOD_START, PERIOD_END } from './useDashboardMetrics';
+import { PERIOD_START, PERIOD_END } from '@/lib/dashboardPeriod';
 
 export interface VehicleOdometerEvent {
   vehicleId: string;

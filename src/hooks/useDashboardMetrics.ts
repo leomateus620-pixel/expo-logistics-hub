@@ -13,9 +13,9 @@ import { useVehicleOdometerEvent } from './useVehicleOdometerEvent';
 import { useFuelMetrics } from './useFuelMetrics';
 import { todaySP } from '@/lib/utils';
 import { isReturnTimePlausible } from '@/lib/utils';
+import { PERIOD_START, PERIOD_END } from '@/lib/dashboardPeriod';
 
-export const PERIOD_START = '2026-04-28';
-export const PERIOD_END = '2026-05-10';
+export { PERIOD_START, PERIOD_END };
 
 const inPeriod = (iso: string | null | undefined) => {
   if (!iso) return false;
