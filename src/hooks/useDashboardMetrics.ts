@@ -248,7 +248,21 @@ export function useDashboardMetrics() {
     return {
       vehicles: { total, disponiveis, emUso, manutencao, botolli, kmTotal: Math.round(kmTotal), kmMedio, topVeh: topVehData ? { ...topVehData, km: Math.round(topVeh![1]) } : null, kmSeries },
       carts: { total: cartTotal, emOperacao: cartsEmOp, disponiveis: cartsDisp, retiradas, horasUso: Math.round(totalHoras), topCart: topCartData ? { ...topCartData, horas: Math.round(topCart![1]) } : null, series: cartSeries },
-      transports: { total: trTotal, realizados: trRealizados, pendentes: trPendentes, emAndamento: trEmAndamento, agendadosHoje: trAgendadosHoje, kmTotal: Math.round(trKmTotal), aeroportos: Array.from(aeroportos), cidades: Array.from(cidades), topDestino, series: trSeries },
+      transports: (() => {
+        const considered = trPeriod.filter((t: any) => t.status !== 'cancelado');
+        const realizados = considered.filter((t: any) => t.status === 'concluido').length;
+        const pendentesAll = considered.length - realizados;
+        const nowMs = Date.now();
+        const criticas = considered.filter((t: any) => {
+          if (t.status === 'concluido') return false;
+          if (!t.motorista_user_id) return true;
+          if (t.inicio_em && new Date(t.inicio_em).getTime() < nowMs && t.status !== 'em_andamento') return true;
+          return false;
+        }).length;
+        const totalProg = considered.length;
+        const percent = totalProg > 0 ? Math.round((realizados / totalProg) * 100) : 0;
+        return { total: trTotal, realizados: trRealizados, pendentes: trPendentes, emAndamento: trEmAndamento, agendadosHoje: trAgendadosHoje, kmTotal: Math.round(trKmTotal), aeroportos: Array.from(aeroportos), cidades: Array.from(cidades), topDestino, series: trSeries, progress: { realizados, pendentes: pendentesAll, criticas, percent, total: totalProg } };
+      })(),
       tasks: { pendentes: tkPendentes, concluidas: tkConcluidas, criticas: tkCriticas, percent: tkPercent, porCategoria: tkByCat },
       team: { totalLogistica: totalLog, voluntarios, escaladosHoje, totalGeral: members.length },
       events: { cobertosPeriodo: eventosCobertos, proximosEventos, totalGeral: fenasojaEvents.length },
