@@ -40,8 +40,27 @@ const queryClient = new QueryClient({
   },
 });
 
+function safeStorage(): Storage {
+  try {
+    const t = '__fenasoja_test__';
+    window.localStorage.setItem(t, '1');
+    window.localStorage.removeItem(t);
+    return window.localStorage;
+  } catch {
+    const mem = new Map<string, string>();
+    return {
+      getItem: (k) => (mem.has(k) ? mem.get(k)! : null),
+      setItem: (k, v) => { mem.set(k, String(v)); },
+      removeItem: (k) => { mem.delete(k); },
+      clear: () => { mem.clear(); },
+      key: (i) => Array.from(mem.keys())[i] ?? null,
+      get length() { return mem.size; },
+    } as Storage;
+  }
+}
+
 const persister = createSyncStoragePersister({
-  storage: window.localStorage,
+  storage: safeStorage(),
   key: 'fenasoja-query-cache',
 });
 
@@ -49,7 +68,12 @@ const FullAccessRoute = ({ children }: { children: React.ReactNode }) => (
   <CapabilityGuard capability="full_access">{children}</CapabilityGuard>
 );
 
-const lastUserId = (typeof window !== 'undefined' && localStorage.getItem('fenasoja-last-user-id')) || 'anon';
+let lastUserId = 'anon';
+try {
+  if (typeof window !== 'undefined') {
+    lastUserId = window.localStorage.getItem('fenasoja-last-user-id') || 'anon';
+  }
+} catch {}
 
 const RouteFallback = () => (
   <div className="min-h-[40vh] flex items-center justify-center">
