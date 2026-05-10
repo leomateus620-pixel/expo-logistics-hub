@@ -254,6 +254,8 @@ export default function VehiclesPage() {
         cor: editForm.cor || null,
         status: editForm.status,
         km_atual: editForm.km_atual ? Number(editForm.km_atual) : 0,
+        km_inicial_evento: editForm.km_inicial_evento ? Number(editForm.km_inicial_evento) : null,
+        km_final_evento: editForm.km_final_evento ? Number(editForm.km_final_evento) : null,
         responsavel_user_id: editForm.responsavel_user_id && editForm.responsavel_user_id !== 'none' ? editForm.responsavel_user_id : null,
       });
       setEditOpen(false);
@@ -495,6 +497,10 @@ export default function VehiclesPage() {
             </div>
             <Input placeholder="Cor" value={editForm.cor} onChange={(e) => setEditForm({ ...editForm, cor: e.target.value })} className="h-11" />
             <Input placeholder="KM atual" type="number" value={editForm.km_atual} onChange={(e) => setEditForm({ ...editForm, km_atual: e.target.value })} className="h-11" />
+            <div className="grid grid-cols-2 gap-3">
+              <Input placeholder="KM inicial do evento" type="number" value={editForm.km_inicial_evento} onChange={(e) => setEditForm({ ...editForm, km_inicial_evento: e.target.value })} className="h-11" />
+              <Input placeholder="KM final do evento" type="number" value={editForm.km_final_evento} onChange={(e) => setEditForm({ ...editForm, km_final_evento: e.target.value })} className="h-11" />
+            </div>
             <Select value={editForm.status} onValueChange={(v) => setEditForm({ ...editForm, status: v })}>
               <SelectTrigger className="h-11"><SelectValue /></SelectTrigger>
               <SelectContent>
