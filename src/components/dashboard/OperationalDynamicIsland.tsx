@@ -63,10 +63,10 @@ export default function OperationalDynamicIsland({ metrics }: Props) {
         const fuelBRL = (metrics.transports as any).combustivelTotalBRL || 0;
         return (
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-            {renderMetric('Realizados', metrics.transports.realizados)}
-            {renderMetric('Pendentes', metrics.transports.pendentes)}
+            {renderMetric('Realizados', metrics.transports.realizados, `${metrics.transports.pendentes} pendentes`)}
             {renderMetric('KM período', `${Math.max(0, metrics.transports.kmTotal).toLocaleString('pt-BR')}`)}
             {renderMetric('Combustível', `R$ ${fuelBRL.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`)}
+            {renderMetric('Top destino', metrics.transports.topDestino?.split(',')[0] || '—')}
           </div>
         );
       }
