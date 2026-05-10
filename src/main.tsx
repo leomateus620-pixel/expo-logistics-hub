@@ -21,27 +21,43 @@ async function nukeCachesAndReload() {
   window.location.reload();
 }
 
-function isChunkError(msg?: string) {
-  if (!msg) return false;
-  const m = msg.toLowerCase();
-  return (
+function safeSession() {
+  try { return window.sessionStorage; } catch { return null as any; }
+}
+
+function isChunkError(msg?: string, filename?: string) {
+  if (!msg && !filename) return false;
+  const m = (msg || '').toLowerCase();
+  const f = (filename || '').toLowerCase();
+  if (
     m.includes('chunkloaderror') ||
     m.includes('failed to fetch dynamically imported module') ||
     m.includes('importing a module script failed') ||
-    m.includes("loading chunk") ||
-    m.includes("loading css chunk")
-  );
+    m.includes('loading chunk') ||
+    m.includes('loading css chunk')
+  ) return true;
+  // TDZ / init errors coming from a hashed asset bundle
+  if (
+    (m.includes('before initialization') || m.includes("can't access lexical declaration")) &&
+    /\/assets\/.*-[a-f0-9]{6,}\.(js|mjs)/.test(f)
+  ) return true;
+  return false;
 }
 
 window.addEventListener('error', (e) => {
-  if (isChunkError(e?.message) || isChunkError(String((e as any)?.error))) {
+  const fname = (e as any)?.filename || '';
+  if (
+    isChunkError(e?.message, fname) ||
+    isChunkError(String((e as any)?.error?.message || (e as any)?.error), fname)
+  ) {
     nukeCachesAndReload();
   }
 });
 window.addEventListener('unhandledrejection', (e) => {
   const reason: any = e?.reason;
   const msg = typeof reason === 'string' ? reason : reason?.message;
-  if (isChunkError(msg)) nukeCachesAndReload();
+  const stack: string = reason?.stack || '';
+  if (isChunkError(msg, stack)) nukeCachesAndReload();
 });
 
 if ('serviceWorker' in navigator) {

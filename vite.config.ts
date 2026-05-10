@@ -27,7 +27,11 @@ export default defineConfig(({ mode }) => ({
           if (id.includes("/leaflet/") || id.includes("\\leaflet\\")) return "maps-leaflet";
           if (id.includes("html5-qrcode")) return "qr";
           if (id.includes("jspdf")) return "pdf";
-          if (id.includes("recharts") || id.includes("d3-")) return "charts";
+          // Note: recharts/d3 are intentionally NOT in a manual chunk.
+          // Forcing them into a single chunk causes a TDZ ReferenceError
+          // ("Cannot access 'S' before initialization") on production builds
+          // because of cross-module circular initialization. Let Vite split
+          // them automatically alongside the lazy Dashboard chart components.
           if (id.includes("@radix-ui")) return "ui-radix";
           if (
             id.includes("/react/") ||
