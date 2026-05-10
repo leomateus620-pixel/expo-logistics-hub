@@ -108,7 +108,7 @@ export function useDashboardMetrics() {
         if (ev.action === 'retirada') lastPickup = ev.created_at;
         else if (ev.action === 'devolucao' && lastPickup) {
           const h = (new Date(ev.created_at).getTime() - new Date(lastPickup).getTime()) / 3600000;
-          if (h > 0 && h < 48) {
+          if (h > 0 && h < 336) {
             totalHoras += h;
             hoursByCart[c.id] = (hoursByCart[c.id] || 0) + h;
           }
