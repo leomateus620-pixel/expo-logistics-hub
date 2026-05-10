@@ -303,7 +303,7 @@ export function generateKmPdf(data: ConsolidationResult, odometer?: OdometerEven
 
   // ══════════════ INCONSISTÊNCIAS ══════════════
   checkNewPage(30);
-  sectionTitle('7. Inconsistências e Dados Pendentes');
+  sectionTitle('8. Inconsistências e Dados Pendentes');
 
   if (data.inconsistencies.length === 0) {
     doc.setFontSize(10);
@@ -331,7 +331,7 @@ export function generateKmPdf(data: ConsolidationResult, odometer?: OdometerEven
 
   // ══════════════ NOTA METODOLÓGICA ══════════════
   checkNewPage(50);
-  sectionTitle('8. Nota Metodológica');
+  sectionTitle('9. Nota Metodológica');
 
   doc.setFontSize(9);
   doc.setTextColor(60);
