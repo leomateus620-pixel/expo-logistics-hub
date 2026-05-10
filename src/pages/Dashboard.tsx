@@ -532,6 +532,9 @@ export default function Dashboard() {
           <FuelExpensesChartConnected />
         </Suspense>
         <Suspense fallback={<ChartFallback />}>
+          <OdometerEventChartConnected />
+        </Suspense>
+        <Suspense fallback={<ChartFallback />}>
           <OperationDistributionChart data={metrics.distribution} />
         </Suspense>
       </div>
