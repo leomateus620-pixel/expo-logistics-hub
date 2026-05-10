@@ -766,6 +766,101 @@ export default function Dashboard() {
         </div>
       </Section>
 
+      {/* ─── Resumo executivo do período ─── */}
+      <div className="animate-fade-in" style={{ animationDelay: '200ms' }}>
+        <PeriodReportCard metrics={metrics} />
+      </div>
+
+      {/* ─── Sheets expandidas dos cards 3D ─── */}
+      <ExpandedMetricSheet
+        open={expanded === 'vehicles'}
+        onOpenChange={(v) => !v && setExpanded(null)}
+        title="Veículos · Detalhamento"
+        description={`${metrics.vehicles.total} no total · ${metrics.vehicles.kmTotal.toLocaleString('pt-BR')} km no período`}
+        primaryCta={{ label: 'Abrir frota', onClick: () => navigate('/vehicles') }}
+      >
+        <div className="space-y-3 text-sm">
+          <div className="grid grid-cols-3 gap-2">
+            <div className="rounded-xl bg-muted/40 p-3"><p className="text-[10px] text-muted-foreground uppercase">Disponíveis</p><p className="text-xl font-extrabold tabular-nums">{metrics.vehicles.disponiveis}</p></div>
+            <div className="rounded-xl bg-muted/40 p-3"><p className="text-[10px] text-muted-foreground uppercase">Em uso</p><p className="text-xl font-extrabold tabular-nums">{metrics.vehicles.emUso}</p></div>
+            <div className="rounded-xl bg-muted/40 p-3"><p className="text-[10px] text-muted-foreground uppercase">Manutenção</p><p className="text-xl font-extrabold tabular-nums">{metrics.vehicles.manutencao}</p></div>
+          </div>
+          {metrics.vehicles.topVeh && (
+            <div className="rounded-xl bg-primary/10 p-3 border border-primary/20">
+              <p className="text-[10px] text-primary uppercase font-bold">Top veículo do período</p>
+              <p className="text-sm font-bold mt-0.5">{(metrics.vehicles.topVeh as any).placa || (metrics.vehicles.topVeh as any).modelo}</p>
+              <p className="text-xs text-muted-foreground">{(metrics.vehicles.topVeh as any).km} km rodados</p>
+            </div>
+          )}
+          <Suspense fallback={<ChartFallback />}>
+            <KmRodadosChart data={metrics.vehicles.kmSeries} />
+          </Suspense>
+        </div>
+      </ExpandedMetricSheet>
+
+      <ExpandedMetricSheet
+        open={expanded === 'carts'}
+        onOpenChange={(v) => !v && setExpanded(null)}
+        title="Carrinhos · Detalhamento"
+        description={`${metrics.carts.retiradas} retiradas · ${metrics.carts.horasUso}h de uso`}
+        primaryCta={{ label: 'Abrir carrinhos', onClick: () => navigate('/electric-carts') }}
+      >
+        <div className="space-y-3">
+          <div className="grid grid-cols-3 gap-2">
+            <div className="rounded-xl bg-muted/40 p-3"><p className="text-[10px] text-muted-foreground uppercase">Em operação</p><p className="text-xl font-extrabold tabular-nums">{metrics.carts.emOperacao}</p></div>
+            <div className="rounded-xl bg-muted/40 p-3"><p className="text-[10px] text-muted-foreground uppercase">Disponíveis</p><p className="text-xl font-extrabold tabular-nums">{metrics.carts.disponiveis}</p></div>
+            <div className="rounded-xl bg-muted/40 p-3"><p className="text-[10px] text-muted-foreground uppercase">Frota</p><p className="text-xl font-extrabold tabular-nums">{metrics.carts.total}</p></div>
+          </div>
+          <Suspense fallback={<ChartFallback />}>
+            <CartUsageChart data={metrics.carts.series} horasUso={metrics.carts.horasUso} />
+          </Suspense>
+        </div>
+      </ExpandedMetricSheet>
+
+      <ExpandedMetricSheet
+        open={expanded === 'transports'}
+        onOpenChange={(v) => !v && setExpanded(null)}
+        title="Transportes · Detalhamento"
+        description={`${metrics.transports.total} no período · ${metrics.transports.aeroportos.length} aeroportos`}
+        primaryCta={{ label: 'Abrir transportes', onClick: () => navigate('/transports') }}
+      >
+        <div className="space-y-3">
+          <div className="grid grid-cols-3 gap-2">
+            <div className="rounded-xl bg-muted/40 p-3"><p className="text-[10px] text-muted-foreground uppercase">Realizados</p><p className="text-xl font-extrabold tabular-nums">{metrics.transports.realizados}</p></div>
+            <div className="rounded-xl bg-muted/40 p-3"><p className="text-[10px] text-muted-foreground uppercase">Pendentes</p><p className="text-xl font-extrabold tabular-nums">{metrics.transports.pendentes}</p></div>
+            <div className="rounded-xl bg-muted/40 p-3"><p className="text-[10px] text-muted-foreground uppercase">Em curso</p><p className="text-xl font-extrabold tabular-nums">{metrics.transports.emAndamento}</p></div>
+          </div>
+          {metrics.transports.topDestino && (
+            <div className="rounded-xl bg-success/10 p-3 border border-success/20">
+              <p className="text-[10px] text-success uppercase font-bold">Destino mais frequente</p>
+              <p className="text-sm font-bold mt-0.5 truncate">{metrics.transports.topDestino}</p>
+            </div>
+          )}
+          <Suspense fallback={<ChartFallback />}>
+            <TransportsByDayChart data={metrics.transports.series} />
+          </Suspense>
+        </div>
+      </ExpandedMetricSheet>
+
+      <ExpandedMetricSheet
+        open={expanded === 'tasks'}
+        onOpenChange={(v) => !v && setExpanded(null)}
+        title="Tarefas · Detalhamento"
+        description={`${metrics.tasks.percent}% concluído · ${metrics.tasks.criticas} críticas`}
+        primaryCta={{ label: 'Abrir checklist', onClick: () => navigate('/checklist') }}
+      >
+        <div className="space-y-3">
+          <div className="grid grid-cols-3 gap-2">
+            <div className="rounded-xl bg-muted/40 p-3"><p className="text-[10px] text-muted-foreground uppercase">Pendentes</p><p className="text-xl font-extrabold tabular-nums">{metrics.tasks.pendentes}</p></div>
+            <div className="rounded-xl bg-muted/40 p-3"><p className="text-[10px] text-muted-foreground uppercase">Concluídas</p><p className="text-xl font-extrabold tabular-nums">{metrics.tasks.concluidas}</p></div>
+            <div className="rounded-xl bg-muted/40 p-3"><p className="text-[10px] text-muted-foreground uppercase">Críticas</p><p className="text-xl font-extrabold tabular-nums">{metrics.tasks.criticas}</p></div>
+          </div>
+          <Suspense fallback={<ChartFallback />}>
+            <TasksProgressChart pendentes={metrics.tasks.pendentes} concluidas={metrics.tasks.concluidas} criticas={metrics.tasks.criticas} percent={metrics.tasks.percent} />
+          </Suspense>
+        </div>
+      </ExpandedMetricSheet>
+
     </div>
   );
 }
