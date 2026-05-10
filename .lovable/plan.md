@@ -1,122 +1,66 @@
+## Contexto
 
-# Dashboard Premium — Fenasoja Logística
+O `Dashboard.tsx` ainda usa o `StatCard` antigo (já nem está importado — quebrado) e nenhum dos novos componentes premium criados na rodada anterior está orquestrado em tela. A tarefa é finalizar a integração e dar polimento de fluidez, sem mexer em lógica de negócio fora da Dashboard.
 
-Evolução visual e funcional da Dashboard mantendo identidade verde/dourada e Liquid Glass, sem quebrar módulos existentes.
+## O que falta fazer
 
-## 1. Camada de dados (nova)
+### 1. Reescrever `src/pages/Dashboard.tsx` (única alteração de página)
 
-**`src/hooks/useDashboardMetrics.ts`** — hook centralizador que agrega todas as métricas do período **2026-04-28 → 2026-05-10** a partir dos hooks já existentes (`useVehicles`, `useElectricCarts`, `useTransports`, `useTasks`, `useEvents`, `useFenasojaEvents`, `useOrgMembers`, `useSchedules`, `useVehicleUsage`, `useCartReservations`, `useMobilityAuthorizations`).
-
-Retorna objeto memoizado com:
-- `vehicles`: total, disponíveis, em uso, Botolli, kmTotal, kmMedio, topVeiculo, serieDiaria
-- `carts`: total, emOperacao, disponiveis, retiradasPeriodo, horasUso, topCarrinho, serieDiaria
-- `transports`: total, realizados, pendentes, emAndamento, agendadosHoje, kmTotal, aeroportos[], cidades[], topDestino, alertasRetorno[], serieDiaria
-- `tasks`: pendentes, concluidas, criticas, porCategoria, percentual
-- `team`: totalLogistica, voluntarios, escaladosHoje
-- `events`: cobertosPeriodo, proximosEventos
-- `mobility`: solicitacoes, carrinhosVinc, patinetesVinc, pendentes
-- `alerts[]`: lista normalizada `{ id, severity, message, ctaRoute, entity }`
-- `loading`, `error`, `isEmpty`
-
-Todas as agregações ficam aqui (single source of truth) — componentes só consomem.
-
-## 2. Componentes novos
-
-```
-src/components/dashboard/
-  OperationalDynamicIsland.tsx     # cápsula expansível, 9 categorias, swipe horizontal
-  DynamicIslandCategory.tsx        # renderiza 2-4 métricas de uma categoria
-  Metric3DCard.tsx                 # card principal com glass 3D, micro-tilt, expansão
-  MetricCardRotator.tsx            # rolagem interna automática (4-6s) + swipe + dots
-  ExpandedMetricSheet.tsx          # bottom-sheet (mobile) / Sheet lateral (desktop) com detalhes
-  charts/
-    TransportsByDayChart.tsx       # Recharts BarChart - realizados/pendentes/agendados
-    KmRodadosChart.tsx             # LineChart - KM por dia + por veículo
-    CartUsageChart.tsx             # AreaChart amarelo/dourado - horas e retiradas
-    TasksProgressChart.tsx         # RadialBar - % conclusão + críticas
-    OperationDistributionChart.tsx # Donut - distribuição transportes/mobilidade/eventos…
-  OperationAlertsPanel.tsx         # lista premium de alertas com severity e CTA
-  PeriodReportCard.tsx             # "Resumo 28/04 a 10/05" + CTA "Gerar relatório"
-  DashboardSkeleton.tsx
-  DashboardEmptyState.tsx
-  DashboardErrorState.tsx
-```
-
-Todos os charts são `lazy()` + `Suspense` para não pesar no first paint.
-
-## 3. Cards 3D rotativos (substituem os 4 cards atuais)
-
-Cada `Metric3DCard` tem:
-- número grande, ícone glass, badge status, micrográfico (sparkline inline)
-- `MetricCardRotator` interno cicla 3-5 telinhas a cada 5s (pausa em toque/hover); dots indicadores; swipe nativo
-- altura fixa para não pular layout
-- tilt sutil no desktop (mousemove → rotateX/Y ≤6°), scale 0.97 no toque mobile
-- toque/click → `ExpandedMetricSheet` (Drawer no mobile, Sheet no desktop) com gráficos e CTAs do módulo
-
-Conteúdo das telinhas conforme spec do usuário (Veículos / Carrinhos / Transportes / Tarefas).
-
-## 4. Dynamic Island operacional
-
-Componente cápsula **abaixo da saudação**:
-- Estado compacto: pílula glass com resumo (`Operação ativa · X tarefas · Y veículos · Z carrinhos`)
-- Click/tap → expande (Framer Motion `layout` + spring `{ stiffness: 260, damping: 28 }`) para painel com tabs horizontais scrolláveis: Hoje, Transportes, Carrinhos, Veículos, Equipe, Eventos, KM & Emissões, Mobilidade, Alertas
-- Swipe horizontal entre categorias com indicador
-- Cada categoria mostra 2-4 mini-métricas + CTA para módulo
-- Desktop ≥ md: já abre como barra horizontal lado-a-lado
-- Respeita `prefers-reduced-motion` (anima só fade)
-
-## 5. Layout final da Dashboard
+Manter todas as seções já existentes (Acessos Rápidos, Próximos Transportes, Agenda 7 dias, Equipe Logística, Tarefas Pendentes) intactas. Trocar apenas o bloco superior e injetar três novas seções:
 
 ```text
-[Saudação + data]
-[OperationalDynamicIsland]
-[CTA primário largo: Criar Transporte]   (mobile)
-[Grid 2x2 (mobile) / 4 col (desktop) — Metric3DCard x4]
-[Grid de gráficos: 1 col mobile / 2 col desktop]
-  - TransportsByDayChart
-  - KmRodadosChart
-  - CartUsageChart
-  - TasksProgressChart
-  - OperationDistributionChart
-[OperationAlertsPanel]
-[PeriodReportCard "Resumo 28/04 → 10/05"]
-[Acessos rápidos atuais (Hotéis PDF, Autorizações Sheet) — preservados]
+[ Header — saudação + data ]
+[ OperationalDynamicIsland ]                ← novo, abaixo do header
+[ Grid 2x2 de Metric3DCard ]                ← substitui StatCard
+[ Acessos Rápidos ]                         ← inalterado
+[ OperationAlertsPanel ]                    ← novo
+[ Charts grid (lazy) ]                      ← novo
+[ Próximos Transportes ]                    ← inalterado
+[ Agenda 7 dias ]                           ← inalterado
+[ Equipe + Tarefas ]                        ← inalterado
+[ PeriodReportCard ]                        ← novo, no rodapé
 ```
 
-Sidebar atual e `Layout.tsx` permanecem intactos. Sem alteração de rotas, permissões ou módulos internos.
+- Adicionar `useDashboardMetrics()` para alimentar Dynamic Island, charts, alertas e period card.
+- Os 4 `Metric3DCard` (Veículos, Carrinhos, Transportes, Tarefas) usam `screens` rotativas (3 telas cada) baseadas em `metrics.*`, com `spark` derivado das séries diárias e `cta` levando à página relevante.
+- Cada card abre um `ExpandedMetricSheet` (estado local `expanded: 'vehicles' | 'carts' | 'transports' | 'tasks' | null`) com detalhamento (top veículo, KM por dia, distribuição etc.).
+- Charts agrupados em grid `sm:grid-cols-2 lg:grid-cols-3`, todos `<Suspense fallback={<Skeleton h-[260px]>}` para carregamento progressivo.
+- Remover o bloco antigo `<StatCard …>` (4 ocorrências) e a lógica vinculada que ficou órfã (manter apenas o que ainda é usado: `nextTransportLabel`, `urgentTasksCount`, `pendingTransportsCount`).
 
-## 6. Estados
+### 2. Polimento de fluidez (sem nova arquitetura)
 
-- **Loading**: `DashboardSkeleton` com shapes de cada bloco (não spinners genéricos)
-- **Vazio**: `DashboardEmptyState` por bloco com CTA contextual ("Cadastrar primeiro transporte")
-- **Erro**: `DashboardErrorState` com mensagem + retry
-- Cada chart trata seu próprio empty individualmente
+- Adicionar `animate-fade-in` escalonado nas seções principais via classe utilitária já existente.
+- `Metric3DCard`: respeitar `motion-reduce` (já implementado) e garantir `will-change: transform` apenas no hover (otimizar re-renders).
+- Charts: lazy + Suspense + `loading="lazy"` em qualquer imagem; nenhum chart bloqueia o first paint.
+- Substituir spinners pesados por `Skeleton` consistente com o resto.
+- Alterar o container raiz para `space-y-5 pb-8 animate-fade-in` mantendo o staggering por seção via `style={{ animationDelay: 'Xms' }}` em wrappers internos.
+- Garantir `min-h` consistente nos cards 3D para evitar layout shift quando o rotator troca de tela.
 
-## 7. Acessibilidade & performance
+### 3. Sem mudanças fora do Dashboard
 
-- aria-labels em CTAs e gráficos, navegação por teclado, contraste AA
-- `prefers-reduced-motion`: desativa tilt, rotação automática, springs longos
-- `useMemo` em todas agregações pesadas; charts atrás de `lazy()`
-- `Recharts` já é dep usada; sem novas libs além de `framer-motion` (verificar se já presente — provavelmente sim)
+Nenhum arquivo de hooks, lib, edge function ou outras páginas será tocado. Os componentes em `src/components/dashboard/*` já existem e ficam como estão (apenas serão consumidos).
 
-## 8. Detalhes técnicos
+## Detalhes técnicos
 
-- Período fixo no hook: `PERIOD_START = '2026-04-28'`, `PERIOD_END = '2026-05-10'` (UTC-3, helpers de `lib/utils.ts`)
-- Alertas detectados:
-  - transporte sem motorista/veículo/retorno
-  - retorno implausível (já existe `isReturnTimePlausible`)
-  - carrinho retirado > 24h sem devolução
-  - tarefa crítica vencida
-  - evento sem cobertura logística
-- Identidade visual: tokens existentes (`--primary` verde, `--gold`, `liquid-glass-card`, `gold-accent`)
-- Sem mock — se módulo retorna vazio, renderiza empty state
+- **Estados locais novos no Dashboard:**
+  - `const [expanded, setExpanded] = useState<null | 'vehicles' | 'carts' | 'transports' | 'tasks'>(null)`
+  - `const metrics = useDashboardMetrics()`
+- **Spark data:**
+  - Veículos: `metrics.vehicles.kmSeries.map(s => s.km)`
+  - Carrinhos: `metrics.carts.series.map(s => s.retiradas)`
+  - Transportes: `metrics.transports.series.map(s => s.realizados + s.pendentes)`
+  - Tarefas: usar `[metrics.tasks.percent]` repetido ou um array sintético do progresso (sem série temporal real).
+- **Loading:** se `metrics.isLoading` (já exposto pelo hook) → manter `DashboardSkeleton` para os blocos 3D + charts.
+- **Empty states:** charts já tratam internamente; alertas usam `OperationAlertsPanel` que já tem estado vazio.
 
-## 9. Arquivos modificados
+## Critérios de aceite
 
-- `src/pages/Dashboard.tsx` — reescrito para orquestrar novos componentes (preserva acessos rápidos)
-- `src/hooks/useDashboardMetrics.ts` — novo
-- ~14 novos componentes em `src/components/dashboard/`
-
-## 10. Validação
-
-Após build: testar viewport mobile (393px), tablet, desktop; com sidebar aberta/fechada; expandir cards e Dynamic Island; estados loading/vazio; `prefers-reduced-motion`. Sem mudanças em DB, RLS ou edge functions.
+- Dashboard renderiza sem erros (StatCard removido).
+- 4 Metric3DCard funcionando com tilt, sparkline, rotator e expand sheet.
+- Dynamic Island visível abaixo do header, com 9 categorias navegáveis.
+- 5 charts carregam via Suspense sem bloquear o first paint.
+- Painel de alertas mostra alertas reais (motorista ausente, retorno implausível, carrinho > 24h, etc.).
+- PeriodReportCard renderiza no rodapé com link para `/reports`.
+- Animações suaves (fade-in escalonado), respeitando `prefers-reduced-motion`.
+- Mobile (393px) e desktop ambos refinados; nenhum overflow horizontal.
+- Nenhum módulo existente quebrado (Acessos Rápidos, Agenda, Equipe, Tarefas idênticos).
