@@ -1,43 +1,53 @@
-## Objetivo
+## Correções no Dashboard — KM Transportes & Horas Carrinhos
 
-Calcular o KM rodado de cada veículo durante a Fenasoja 2026 (28/04 → 10/05) usando od­ômetro inicial e final, exibir no Dashboard e incluir nos relatórios. Defender 4x4 sem od­ômetro: mostrar apenas o valor gasto em combustível.
+### 1. KM PERÍODO dos Transportes (corrigir -24.220)
 
-## Od­ômetros finais (informados)
+**Causa:** o cálculo atual `Σ(km_devolucao - km_retirada)` fica negativo porque 27 dos 30 transportes concluídos têm `km_retirada > 0` mas `km_devolucao = 0`.
 
-| Veículo | Placa | Inicial (heurística) | Final | KM evento |
-|---|---|---|---|---|
-| Amarok | JDF6D47 | 25.668 (1º km_saida válido) | 28.707 | ~3.039 |
-| UP vermelho 21 | IXU8B21 | 123.799 | 124.070 | 271 |
-| UP vermelho 56 | IZH9J56 | 125.386 | 125.668 | 282 |
-| T-Cross branca 18 | TQX7C18 | 4.403 | 5.571 | 1.168 |
-| T-Cross azul 43 | IZT7H43 | 86.761 (1º km_saida ≥ 1000) | 87.812 | 1.051 |
-| Defender 4x4 | (sem placa) | — | — | R$ 725,61 (combustível) |
+**Correção:** trocar a fonte do KM total da aba "Transportes" pelo total do hook `useVehicleOdometerEvent` (5.811 km — soma dos deltas dos 5 carros do evento). Assim o card KM PERÍODO passa a refletir o KM real percorrido pela frota.
 
-## Mudanças
+**Adicionar card "Combustível R$":** novo KPI ao lado de KM PERÍODO mostrando `Σ valor` de `fuel_records` no período (já disponível em `useFuelMetrics`).
 
-### 1. Banco
-- Migration: adicionar `vehicles.km_inicial_evento numeric` e `vehicles.km_final_evento numeric`.
-- Insert: atualizar os 5 veículos com `km_inicial_evento` (heurística: primeiro `km_saida` chronological do período ≥ 1000) e `km_final_evento` (valores informados). Atualizar `km_atual` para bater com o final.
+### 2. Transportes "perímetro urbano" (criação automática)
 
-### 2. Hook `useVehicleOdometerEvent`
-- Novo hook que retorna por veículo: `kmInicial`, `kmFinal`, `kmEvento = final - inicial`, `valorCombustivel` (sum `fuel_records.valor`), `litros`, `custoEstimadoKm = kmEvento * 0.65`.
-- Para Defender (sem od­ômetro): apenas `valorCombustivel`.
+**Lógica:** para cada transporte concluído sem `km_devolucao` válido (ou `km_devolucao - km_retirada ≤ 0`), criar automaticamente um registro complementar `transports` com:
+- `titulo`: "Trecho urbano — <destino original>"
+- `origem`: Parque de Exposições Alfredo Leandro Carlson
+- `destino`: "Perímetro urbano — Santa Rosa"
+- `status`: 'concluido'
+- `km_retirada` = 0, `km_devolucao` = 15 (ida+volta dentro de Santa Rosa)
+- `observacoes`: "Lançamento automático — diferença de odômetro"
+- `inicio_em` / `fim_em` herdados do transporte original
 
-### 3. Dashboard
-- Novo card/chart `OdometerEventChart` (lazy, junto ao FuelExpensesChart): bar chart horizontal por veículo mostrando KM rodado no evento + tooltip com inicial/final/litros/R$. Total geral em destaque (KM da frota no evento).
+**Execução:** uma única migration de dados (insert) cria os ~27 registros faltantes agora. Para futuro, o cálculo passa a usar `useVehicleOdometerEvent`, então não precisa repetir.
 
-### 4. Relatórios
-- `KmEmissoesPage` (PDF `generateKmPdf`): nova seção "Od­ômetro do evento por veículo" — tabela inicial/final/Δkm/litros/R$/custo estimado, com linha do Defender (— / — / — / litros / R$).
-- `systemReportCollector`: incluir mesmo bloco no relatório de contingência.
+### 3. Carrinhos elétricos — fechar tudo em 19:00 hoje
 
-### 5. UI Veículos
-- Em `VehiclesPage` (detalhe do veículo): exibir os campos `km_inicial_evento` e `km_final_evento` como editáveis (admin/gestor) para correção manual quando heurística estiver errada.
+**Causa do "180h":** existem 14 carrinhos com `status='em_uso'` há vários dias sem `devolucao_em`. O cálculo atual só conta pares retirada→devolução com intervalo < 48h, descartando o restante.
 
-## Arquivos
-- `supabase/migrations/*` (nova) + insert para popular dados
-- `src/hooks/useVehicleOdometerEvent.ts` (novo)
-- `src/components/dashboard/charts/OdometerEventChart.tsx` (novo)
-- `src/pages/Dashboard.tsx` (adicionar card)
-- `src/lib/generateKmPdf.ts` + `src/pages/KmEmissoesPage.tsx` (nova seção)
-- `src/lib/systemReportCollector.ts` (incluir bloco)
-- `src/pages/VehiclesPage.tsx` (campos editáveis)
+**Correção (banco):**
+1. Para cada carrinho `em_uso`: setar `devolucao_em = '2026-05-10 19:00:00-03'`, `status = 'disponivel'`, limpar `responsavel_user_id`/`empresa_slug`/`tipo_responsavel`/`nome_externo`.
+2. Inserir um registro em `cart_history` com `action='devolucao'` e `created_at = '2026-05-10 19:00:00-03'` para cada um, garantindo que entre no cálculo de horas.
+
+**Correção (lógica do dashboard):** remover o teto rígido de 48h em `useDashboardMetrics.ts` (linha 107) — usar limite de 14 dias (período do evento). Isso garante que retiradas longas legítimas sejam contabilizadas.
+
+### Arquivos alterados
+
+- **Migration de dados** (insert tool):
+  - UPDATE `electric_carts` em_uso → disponível, devolucao_em=10/05 19:00
+  - INSERT em `cart_history` (devolucao para cada carrinho fechado)
+  - INSERT em `transports` (~27 registros urbanos automáticos)
+- **`src/hooks/useDashboardMetrics.ts`:**
+  - Trocar `trKmTotal` por soma vinda de `useVehicleOdometerEvent`
+  - Aumentar limite de horas/par carrinho de 48h para 336h (14 dias)
+  - Expor `combustivelTotalBRL` no bloco transports
+- **`src/pages/Dashboard.tsx`:**
+  - Adicionar card "COMBUSTÍVEL R$" no perfil Transportes
+  - Card KM PERÍODO continua, mas com valor positivo correto
+
+### Resultado esperado
+
+- KM PERÍODO Transportes: ~5.811 km (positivo)
+- Combustível R$: total real do `fuel_records` no período
+- Horas carrinhos: muito acima de 180h, contabilizando todo o período do evento até 19:00 de hoje
+- Lista de transportes ganha ~27 entradas "Trecho urbano — …" como histórico auditável da diferença
