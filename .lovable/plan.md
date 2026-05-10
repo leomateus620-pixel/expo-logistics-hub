@@ -1,80 +1,103 @@
-# Correção do horário de retorno dos transportes
+## Diagnóstico
 
-## Diagnóstico (causa-raiz confirmada via banco)
+Investiguei o build atual e identifiquei 3 causas principais de lentidão no acesso pelo PC em `fenasojalog.com`:
 
-O transporte real para Passo Fundo está assim:
+### 1. Bundle JavaScript gigante (sem code splitting)
+O `src/App.tsx` importa **todas as 19 páginas estaticamente** no topo do arquivo. Isso significa que ao abrir o site, o navegador baixa de uma vez:
+- Todas as páginas (Dashboard, Vehicles, Transports, Agenda, Expenses, etc.)
+- **maplibre-gl** (~800KB gzipped)
+- **leaflet** (~150KB)
+- **html5-qrcode** (~200KB)
+- **jspdf + jspdf-autotable** (~300KB)
+- **recharts** (~400KB)
 
+Resultado: o usuário no PC baixa ~3–4MB de JS antes da primeira tela aparecer, mesmo se for só ver o Dashboard.
+
+### 2. Imagens de fundo enormes (~8,5MB total)
+- `fenasoja-bg-2026.png`: **2,8MB**
+- `fenasoja-bg-mobile.png`: **2,8MB**
+- `fenasoja-splash-2026.png`: **2,9MB**
+
+Em PNG, sem compressão WebP. O `LoginPage` carrega 2,8MB só para mostrar o fundo, e ainda faz preload da splash de 2,9MB.
+
+### 3. Falta de chunking dos vendors
+Sem `manualChunks` no `vite.config.ts`, o Vite agrupa tudo em poucos arquivos grandes. Sem cache eficiente entre deploys: qualquer mudança invalida o bundle inteiro.
+
+## Plano de otimizações
+
+### A. Code splitting por rota (impacto: alto)
+Converter todos os imports de páginas em `React.lazy()` + `<Suspense>` no `src/App.tsx`. Cada rota vira um chunk separado carregado sob demanda.
+
+```tsx
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const TransportsPage = lazy(() => import('./pages/TransportsPage'));
+// ...
+<Suspense fallback={<LoadingSpinner />}>
+  <Routes>...</Routes>
+</Suspense>
 ```
-titulo                = 'Outros'      ← chave usada pelos cálculos
-destino               = 'Passo Fundo'
-inicio_em             = 17:00 (SP)
-duracao_estimada_min  = NULL          ← campo vazio
-distancia_estimada_km = 560
+
+Ganho esperado: bundle inicial cai de ~3MB para ~600–800KB.
+
+### B. Vendor chunks no `vite.config.ts` (impacto: médio)
+Configurar `build.rollupOptions.output.manualChunks` para separar:
+- `react-vendor`: react, react-dom, react-router
+- `ui-vendor`: todos os @radix-ui
+- `maps`: maplibre-gl + leaflet (carregados só nas páginas de mapa)
+- `pdf`: jspdf + jspdf-autotable
+- `charts`: recharts
+- `qr`: html5-qrcode
+
+Vantagem: ao publicar uma atualização, só o chunk modificado é re-baixado; os vendors ficam em cache.
+
+### C. Lazy load de bibliotecas pesadas dentro das páginas (impacto: alto)
+- `NavigationMap3D.tsx` → dynamic import do `maplibre-gl` só quando o mapa renderiza
+- `QrScannerDialog.tsx` → dynamic import do `html5-qrcode` só ao abrir
+- Geradores de PDF (`generateCartUsagePdf`, `generateKmPdf`, `generateSystemReportPdf`) → já são chamados sob demanda, garantir que `jspdf` não vaza pro bundle inicial
+
+### D. Conversão de imagens PNG → WebP (impacto: alto no Login)
+Converter os 3 fundos PNG (2,8–2,9MB cada) para WebP otimizado. Estimativa: **~250–400KB cada** (redução de ~90%).
+- `fenasoja-bg-2026.png` → `.webp`
+- `fenasoja-bg-mobile.png` → `.webp`
+- `fenasoja-splash-2026.png` → `.webp`
+
+Atualizar imports em `LoginPage.tsx` e onde a splash é usada. **Nenhum impacto visual** — WebP mantém a qualidade.
+
+### E. Pré-conexão e prefetch (impacto: pequeno mas grátis)
+Adicionar no `index.html`:
+```html
+<link rel="preconnect" href="https://fidagsspejekripwkczr.supabase.co">
+<link rel="dns-prefetch" href="https://fidagsspejekripwkczr.supabase.co">
 ```
+Reduz handshake DNS/TLS na primeira chamada do Supabase.
 
-A função `getEffectiveTotalMin` em `src/lib/utils.ts` recebe `titulo='Outros'` e, como `duracao_estimada_min` é nulo, cai no `DEFAULT_TOTAL_MIN['Outros'] = 60`. Resultado: 17h + 60min → **18h**, exatamente o que o usuário viu.
+### F. Service Worker — pré-cachear chunks lazy (sem alteração)
+O `public/sw.js` atual já faz cache-first nos assets com hash do Vite, então as chunks lazy serão cacheadas automaticamente após o primeiro acesso. Sem mudança necessária.
 
-A tabela canônica `KNOWN_ONE_WAY_MIN` só tem chaves de aeroporto (`Aeroporto_Passo Fundo: 240`); destinos personalizados ("Outros" + cidade) não são reconhecidos e **a distância real (560 km) salva no banco é completamente ignorada** pelo cálculo de tempo. Esse é o bug central — vale para qualquer trajeto longo cadastrado com destino customizado.
+## Resumo dos arquivos que serão alterados
 
-Adicionalmente:
-- Quando o motorista está em rota, `TransportDynamicIsland` já chama `estimate-return` (Google Routes v2 com `TRAFFIC_AWARE`) — esse caminho está correto. O problema é o cálculo **estático** exibido em cards/agenda antes da viagem começar (e quando ela está pendente).
-- O form salva `duracao_estimada_min` quando o usuário escolhe destinos conhecidos / "Outros" via Places, mas existem transportes legados com o campo nulo (como o caso reportado).
-- Não há validação que rejeite uma duração impossível para a distância salva.
+| Arquivo | Mudança |
+|---|---|
+| `src/App.tsx` | Converter imports de páginas para `lazy()` + `Suspense` |
+| `vite.config.ts` | Adicionar `manualChunks` para vendors |
+| `src/components/transport/NavigationMap3D.tsx` | Dynamic import do maplibre-gl |
+| `src/components/expenses/QrScannerDialog.tsx` | Dynamic import do html5-qrcode |
+| `src/assets/fenasoja-bg-2026.webp` | **Novo** (gerado a partir do PNG) |
+| `src/assets/fenasoja-bg-mobile.webp` | **Novo** |
+| `src/assets/fenasoja-splash-2026.webp` | **Novo** |
+| `src/pages/LoginPage.tsx` | Trocar imports PNG → WebP |
+| Outros consumidores da splash | Trocar import PNG → WebP |
+| `index.html` | Adicionar `preconnect`/`dns-prefetch` Supabase |
 
-## O que será alterado
+## Garantias de integridade
 
-### 1. `src/lib/utils.ts` — cálculo derivado de distância + tabela por cidade
+- **Nenhuma mudança de regra de negócio, schema, RLS, ou edge function.**
+- **Nenhuma alteração visual** — WebP preserva qualidade idêntica ao PNG.
+- Os PNGs originais permanecem no repositório como fallback inicial e podem ser removidos depois de validar.
+- Code splitting é transparente: o `Suspense fallback` mostra um spinner idêntico ao `AuthGuard` por ~100–300ms na primeira navegação a cada rota.
 
-- Nova tabela `KNOWN_CITY_ONE_WAY_MIN` (Passo Fundo 240, Chapecó 240, Santo Ângelo 80, Porto Alegre 390) usada quando `titulo` não é "Aeroporto" mas o `destino` casa com uma cidade conhecida.
-- `getEffectiveOneWayMin(saved, titulo, vooCidade, destino?, distanciaKm?)`:
-  1. Se `titulo='Aeroporto'` → mantém lógica atual (canônico do aeroporto).
-  2. Senão, tenta `KNOWN_CITY_ONE_WAY_MIN` pelo `destino`.
-  3. Senão, se `distanciaKm > 30`, calcula `Math.round((distanciaKm/2) / 80 * 60)` (ida ≈ metade da distância salva, à 80 km/h média segura). Mínimo 20 min.
-  4. Senão, usa `saved/2` (se plausível) ou o default atual.
-- `getEffectiveTotalMin` ganha a mesma assinatura e segue:
-  - Se `saved` plausível **e compatível com a distância** (ver §3) → usa `saved`.
-  - Senão → `2 × oneWay`.
-- Validação: `isReturnTimePlausible(departureIso, returnIso, distanciaKm?)` retorna `false` se `(return-departure) < distanciaKm/90*60` (velocidade máxima média 90 km/h, sem parada). Exportada para uso na UI e no form.
+## Estimativa de ganho
 
-### 2. Propagar `destino` e `distancia_estimada_km` em todos os call-sites
-
-Atualizar para passar os dois novos parâmetros nos arquivos que já usam essas funções:
-- `src/components/transport/TransportCard.tsx`
-- `src/pages/TransportsPage.tsx`
-- `src/pages/AgendaPage.tsx`
-- `src/lib/kmConsolidation.ts`
-- `src/components/TransportDynamicIsland.tsx` (apenas leitura, não muda lógica de live)
-- `src/components/transport/TransportForm.tsx`
-
-### 3. Form: garantir `duracao_estimada_min` para destino "Outros"
-
-Em `TransportForm.tsx`, quando o usuário seleciona um destino via Places (modo "Outros") ou edita destino/distância, chamar `estimate-return` em modo `ROUTE_PREVIEW` com `dest_lat/dest_lng` reais para preencher `duracao_estimada_min` e `distancia_estimada_km` (ida — multiplica por 2 para round-trip ao salvar). Se o Maps falhar, deriva de `distancia_estimada_km` via fórmula segura (§1.3) e marca como estimado.
-
-### 4. Card / detalhe / agenda: rótulo de origem do cálculo
-
-Em `TransportCard` e `TransportDetailView`, quando exibir "Retorno previsto":
-- Se `status ∈ {em_andamento, em_retorno, chegou_destino}` e há ETA da live (já calculado pelo `DynamicIsland` via `transport_locations` + Routes v2) → "Atualizado pela localização em tempo real".
-- Se tem `duracao_estimada_min` plausível → "Calculado pelo Google Maps".
-- Se caiu na fórmula de distância → "Estimativa baseada na distância".
-- Se `isReturnTimePlausible === false` → não mostra hora; mostra "Calculando retorno com base na rota real" e dispara recálculo via `estimate-return` (ROUTE_PREVIEW).
-
-### 5. Logs de depuração
-
-Adicionar `console.log('[RETURN_TIME_CALCULATION]', {...})` em `estimateReturnTime` (quando `import.meta.env.DEV` ou flag) com transportId, origem, destino, distancia, duracao_saved, oneWay efetivo, source.
-
-### 6. Backfill leve (sem migração destrutiva)
-
-Para o transporte 4e0933b0 (Passo Fundo, 08/05) e quaisquer outros com `duracao_estimada_min IS NULL` e `distancia_estimada_km > 50`, o próprio cálculo dinâmico já vai corrigir a UI assim que o §1 entrar. Não vou alterar o banco — se o usuário quiser persistir, basta abrir/salvar no form (que agora chama Maps e grava).
-
-## Pontos que NÃO mudam
-
-- Edge function `estimate-return` (já usa Google Routes v2 corretamente, com polyline e tráfego).
-- `TransportDynamicIsland` live tracking (já é a fonte preferida quando em rota).
-- Estados/máquina do transporte e RLS.
-- Schema do banco.
-
-## Caso de teste manual após o fix
-
-Transporte `4e0933b0` (Passo Fundo, sai 17:00, 560 km):
-- Esperado: card mostra retorno **≈ 01:00** (17h + 2 × 240min = 01:00 do dia seguinte) com rótulo "Estimativa baseada na distância" até o motorista iniciar a viagem; depois passa a "Atualizado pela localização em tempo real".
-- 18:00 nunca mais aparece.
+- **Tempo até interativo (PC, conexão típica)**: de ~4–6s para ~1,5–2s na primeira visita.
+- **Re-visitas**: praticamente instantâneo (cache do SW + chunks vendor estáveis).
+- **Login screen**: de ~2,8MB de imagem para ~300KB.
