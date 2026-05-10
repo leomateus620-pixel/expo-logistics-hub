@@ -1,71 +1,65 @@
-## Análise das inconsistências encontradas
+## Objetivo
 
-### 1. Os 3 números de KM no sistema — explicação
+Gerar um único PDF consolidado (`Relatorio_Geral_Operacao_Logistica_Fenasoja_2026_v3.pdf`) que une:
 
-Após auditoria nas tabelas `vehicles`, `transports` e `fuel_records`:
+- **Parte A (executiva — do v2):** capa institucional, KPIs corrigidos (KM, combustível, equipe), gráficos, rankings, auditoria de KM e inconsistências.
+- **Parte B (operacional integral — do v1 ampliado):** todos os módulos do sistema com seus registros consolidados do período 28/04 → 10/05/2026.
 
-| Valor | Origem | Como é calculado | Status |
-|---|---|---|---|
-| **5.811 km** | Dashboard / Odômetro | Soma de `km_final_evento − km_inicial_evento` dos 5 veículos com odômetro registrado (Amarok 3.039 + T-Cross IZT7H43 1.051 + T-Cross TQX7C18 1.168 + UP IZH9J56 282 + UP IXU8B21 271) | ✅ **Oficial — KM real rodado** |
-| **5.180 km** | Relatório por veículo (Botolli) | Provável agrupamento por concessionária/marca incluindo estimativas | ⚠️ Intermediário, descartar |
-| **4.410 km** (PDF anterior mostrou 4.520) | Soma `distancia_estimada_km` dos 32 transportes | Estimativa Google Maps por viagem registrada, exclui rodagem urbana não cadastrada | ⚠️ Subestimado |
+Mesmo design liquid glass (verde Fenasoja #19401E + dourado #DCBE50), tipografia, cabeçalho/rodapé e paleta do v2.
 
-**Conclusão:** O número correto e oficial é **5.811 km** (odômetro físico). A diferença de **1.401 km** entre odômetro e transportes registrados corresponde a **deslocamentos urbanos / suporte operacional não cadastrados como viagem formal** — será apresentado como linha "Uso urbano e operacional" no relatório.
-
-### 2. Combustível — valor correto
-
-Soma real de **todos os 15 abastecimentos** da frota (incluindo Defender 4x4 desde 20/04):
+## Estrutura do PDF (≈ 25–30 páginas)
 
 ```
-R$ 3.337,06   (462,60 litros)
+1.  Capa institucional
+2.  Sumário executivo + índice
+3.  KPIs principais (18 cards)
+4.  Auditoria de KM (5.811 odômetro + 503 Defender = 6.314 oficial,
+    vs. 4.410 Google, vs. 5.180 Botolli — explicação)
+5.  Combustível detalhado (15 registros, R$ 3.337,06)
+6.  Equipe Logística (9 membros oficiais)
+7.  Gráficos: transportes/dia, KM/dia, ranking destinos,
+    ranking hóspedes, distribuição por equipe
+8.  Inconsistências e alertas
+─── Parte B: Dados integrais por módulo ───
+9.  Transportes (todos os registros do período)
+10. Veículos + Uso de veículos + Abastecimentos
+11. Hóspedes
+12. Agenda / Eventos Fenasoja
+13. Tarefas / Checklists
+14. Carrinhos elétricos (frota + reservas + histórico)
+15. Patinetes (frota + reservas + histórico)
+16. Escalas + turnos + atribuições
+17. Despesas + reembolsos + categorias
+18. Autorizações de mobilidade + comitês
+19. Equipe completa (org_members)
+20. Notificações configuradas
+21. Nota metodológica + assinatura
 ```
 
-O PDF anterior mostrou R$ 2.929,50 porque filtrava apenas 28/04→10/05, excluindo 3 abastecimentos do Defender de 20, 23 e 27/04 que somam R$ 407,56. Ajuste: incluir todos os abastecimentos da operação.
-(Valor mencionado pelo usuário R$ 3.377,06 = pequeno erro de digitação; valor real é R$ 3.337,06.)
+## Dados — fontes corretas (consolidadas do v2)
 
-### 3. Equipe — apenas Logística
+| Métrica | Valor oficial | Fonte |
+|---|---|---|
+| KM total operação | **6.314 km** | odômetros (5.811) + Defender estimado (503 via 71,87 L) |
+| KM Google estimado | 4.410 km | `transports.distancia_estimada_km` (subestima urbano) |
+| KM Botolli | 5.180 km | aggregate intermediário (informativo) |
+| Combustível | **R$ 3.337,06 / 462,60 L** | 15 registros incluindo Defender 4x4 |
+| Transportes | 32 | `transports` no período |
+| Carrinhos — retiradas | 221 | `cart_history` |
+| Equipe LOGÍSTICA | 9 membros | filtro `commission = 'LOGÍSTICA'` |
 
-Filtrar apenas os 9 integrantes da comissão **LOGÍSTICA, HOTELARIA E TURISMO** (role admin):
+Cada módulo da Parte B traz: total de registros, criados no período, alterados, tabela completa com colunas-chave (igual `systemReportCollector` já define), e bloco de inconsistências detectadas.
 
-1. EDUARDO SANTOS — Presidente Comissão
-2. LEONARDO MATEUS STROSCHEIN
-3. LUCAS FRANKEN
-4. LUIS FERNANDO FURLANETTO
-5. MARCELO DE BAIRROS
-6. MICAEL ARCANJO BÖCK
-7. RICARDO CARPENEDO CAETANO
-8. RICARDO EMILIO ZIMMERMANN
-9. VLADIMIR ANTÔNIO MADALOSSO DA ROSA
+## Implementação técnica
 
-### 4. Outras inconsistências detectadas (serão sinalizadas no PDF)
+- Script Python em `/tmp/genrep_v3.py` usando `reportlab` (mesma stack do v2).
+- Consultas via `psql` para extrair os dados de cada tabela do período.
+- Reuso integral do estilo visual do v2 (cores, fontes, header/footer, KPI cards, tabelas alternadas verde/creme, headers verde escuro com texto dourado).
+- Gráficos com `matplotlib` (já usados antes) embutidos como PNG.
+- QA obrigatório: `pdftoppm` em todas as páginas, inspeção visual de overflow/clipping antes de entregar.
+- Saída final: `/mnt/documents/Relatorio_Geral_Operacao_Logistica_Fenasoja_2026_v3.pdf` + `<lov-artifact>`.
 
-- 2 transportes urbanos (`Trecho urbano — Santa Rosa`) sem `distancia_estimada_km`
-- 2 transportes "Outros" sem KM (em 09/05)
-- 1 transporte sem veículo associado (30/04 20:42)
-- 1 abastecimento da Amarok com `valor=NULL` (01/05, 31,88 L)
-- Veículos sem odômetro: **Defender 4x4** e **Saveiro TQW2A80** (KM estimado por consumo de combustível: Defender ~480 km via 71,87L, Saveiro 0)
+## O que NÃO muda
 
-## Conteúdo do novo PDF (versão corrigida v2)
-
-1. **Capa institucional** — Fenasoja 2026, comissão Logística, período 28/04–10/05
-2. **Resumo Executivo** com números corretos:
-   - KM oficial: **5.811 km** (odômetro)
-   - Combustível: **R$ 3.337,06** / 462,60 L
-   - Custo médio: R$ 0,57/km
-   - Transportes: 32 concluídos
-   - Hóspedes, carrinhos elétricos, patinetes (mantidos)
-3. **Auditoria de KM** — tabela das 3 fontes explicando a divergência
-4. **KM por veículo** (Amarok líder com 3.039 km / R$ 755,64)
-5. **Combustível detalhado** — 15 abastecimentos, todos os veículos incluindo Defender
-6. **Transportes** — gráfico por dia + ranking destinos
-7. **Hóspedes** transportados
-8. **Carrinhos elétricos & Patinetes** (já corretos)
-9. **Equipe de Logística** — apenas os 9 membros
-10. **Inconsistências detectadas** (lista acima)
-11. **Nota metodológica** explicando hierarquia de fontes
-
-Arquivo: `/mnt/documents/Relatorio_Geral_Operacao_Logistica_Fenasoja_2026_v2.pdf`
-
----
-
-Posso prosseguir e gerar o PDF v2 com essas correções?
+- Nenhuma alteração no código do app (sem mexer em `SystemReportPage`, hooks ou tabelas).
+- Operação puramente de geração de artefato em `/mnt/documents/`.
