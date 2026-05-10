@@ -127,7 +127,7 @@ export default function VehiclesPage() {
   const [addForm, setAddForm] = useState({ placa: '', marca: '', modelo: '', ano: '', cor: '', categoria: 'outro', km_atual: '' });
   const [editOpen, setEditOpen] = useState(false);
   const [editId, setEditId] = useState('');
-  const [editForm, setEditForm] = useState({ placa: '', marca: '', modelo: '', cor: '', status: 'disponivel', km_atual: '', responsavel_user_id: '' });
+  const [editForm, setEditForm] = useState({ placa: '', marca: '', modelo: '', cor: '', status: 'disponivel', km_atual: '', responsavel_user_id: '', km_inicial_evento: '', km_final_evento: '' });
   const [detailOpen, setDetailOpen] = useState(false);
   const [detailVehicle, setDetailVehicle] = useState<any>(null);
   const [statusFilter, setStatusFilter] = useState<string>('todos');
@@ -186,7 +186,7 @@ export default function VehiclesPage() {
 
   const openEdit = (v: any) => {
     setEditId(v.id);
-    setEditForm({ placa: v.placa, marca: v.marca || '', modelo: v.modelo || '', cor: v.cor || '', status: v.status, km_atual: String(v.km_atual || ''), responsavel_user_id: v.responsavel_user_id || '' });
+    setEditForm({ placa: v.placa, marca: v.marca || '', modelo: v.modelo || '', cor: v.cor || '', status: v.status, km_atual: String(v.km_atual || ''), responsavel_user_id: v.responsavel_user_id || '', km_inicial_evento: v.km_inicial_evento != null ? String(v.km_inicial_evento) : '', km_final_evento: v.km_final_evento != null ? String(v.km_final_evento) : '' });
     setEditOpen(true);
   };
 
