@@ -61,6 +61,8 @@ export function useDashboardMetrics() {
   const { shifts, assignments, isLoading: ls } = useSchedules();
   const { usages, isLoading: lu } = useVehicleUsage();
   const { authorizations, isLoading: lma } = useMobilityAuthorizations();
+  const { totalKmEvento, totalValorCombustivel } = useVehicleOdometerEvent();
+  const { totalValor: fuelTotalBRL } = useFuelMetrics();
 
   const today = todaySP();
 
