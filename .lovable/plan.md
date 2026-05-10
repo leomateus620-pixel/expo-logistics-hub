@@ -1,67 +1,66 @@
 ## Objetivo
 
-Gerar `Relatorio_Geral_Operacao_Logistica_Fenasoja_2026_v6.pdf` em `/mnt/documents/`, mantendo **exatamente** o design institucional do V5 (capa verde profunda com círculo decorativo + faixas douradas, cabeçalho/rodapé fixos, KPIs em grid, tabelas verde/dourado, gráficos matplotlib) — porém com os ajustes pedidos.
+Gerar `Relatorio_Geral_Operacao_Logistica_Fenasoja_2026_v7.pdf` em `/mnt/documents/`, mantendo **exatamente** o design, capa, paleta, tipografia, gráficos e estrutura do V6 — corrigindo apenas as inconsistências apontadas. Esta é a versão final oficial.
 
-## Mudanças em relação ao V5
+## Correções em relação ao V6
 
-1. **KM oficial = 5.811 km** (apenas odômetro físico). Remover a soma "+503 Defender estimado". O Defender entra na frota mas com KM real registrado (ou marcado como "sem odômetro" se for o caso — sem inventar estimativa).
-2. **Sem estimativa de custo por km** (R$ 4.104,10 / R$ 0,65 × km). Remover a coluna/linha de "Custo estimado da frota" em todas as seções e KPIs.
-3. **Combustível = somente o real gasto no período** (R$ 3.337,06, incluindo abastecimento da Defender). Manter como o único indicador financeiro de combustível.
-4. **Carrinhos elétricos:** adicionar o **total de horas de uso** consolidado (somatório de `duration_min` das sessões fechadas → converter em horas) e horas médias por carrinho. Inserir em KPI + na seção própria.
-5. **Remover seção de Checklist & Tarefas** inteira (e retirar o KPI "13 / 1 / 12 tarefas"). Renumerar páginas.
-6. **Remover seção/parágrafos de "Inconsistências resolvidas / mudanças V4 → V5"** e qualquer texto comparando versões. O V6 não menciona versões anteriores nem reconciliações — é apresentado como o relatório oficial e final.
-7. **Polimento visual geral**: revisar espaçamentos, alinhamento dos cards, quebras de página, hierarquia tipográfica, evitar viúvas/órfãs em parágrafos, garantir respiro entre seções, gráficos com paleta consistente (verde → dourado), tabelas sem linhas cortadas no rodapé.
+### 1. Equipe Logística — lista oficial (9 membros vinculados à comissão "LOGÍSTICA, HOTELARIA E TURISMO" no banco)
 
-## Dados a usar (V6 oficial)
+| # | Nome | Cargo |
+|---|---|---|
+| 1 | EDUARDO SANTOS | PRESIDENTE COMISSÃO |
+| 2 | LEONARDO MATEUS STROSCHEIN | VOLUNTÁRIO |
+| 3 | LUCAS FRANKEN | VOLUNTÁRIO |
+| 4 | LUIS FERNANDO FURLANETTO | VOLUNTÁRIO |
+| 5 | MARCELO DE BAIRROS | VOLUNTÁRIO |
+| 6 | MICAEL ARCANJO BÖCK | VOLUNTÁRIO |
+| 7 | RICARDO CARPENEDO CAETANO | VOLUNTÁRIO |
+| 8 | RICARDO EMILIO ZIMMERMANN | VOLUNTÁRIO |
+| 9 | VLADIMIR ANTÔNIO MADALOSSO DA ROSA | VOLUNTÁRIO |
 
-| Indicador | Valor |
-|---|---|
-| Transportes concluídos | 32 |
-| KM oficial | **5.811 km** (odômetro físico) |
-| Combustível real | **R$ 3.337,06** (inclui Defender) |
-| Veículos utilizados | 7 |
-| Carrinhos elétricos (frota) | 22 |
-| Retiradas / Devoluções | 221 / 228 |
-| **Horas totais carrinhos** | calcular via `cart_history` (sessões fechadas) |
-| **Horas médias por carrinho** | total ÷ 22 |
-| Hóspedes cadastrados / transportados | 23 / 14 |
-| Eventos vinculados | 19 |
-| Equipe Logística (oficiais) | 9 |
-| Autorizações de mobilidade | 195 |
-| Ações auditadas | 476 |
+→ Substituir qualquer nome divergente do V6, manter o KPI "9 oficiais", garantir que a tabela/lista da seção "Equipe Logística" reflita exatamente esses nomes/cargos.
 
-Valores de horas serão obtidos consultando `cart_history` (ações `retirada`/`devolucao`) via `supabase--read_query` antes de gerar o PDF, pareando retirada → próxima devolução por `cart_id` e somando os minutos.
+### 2. Hotel Imigrantes não é aeroporto
 
-## Estrutura do PDF (10 páginas)
+- Revisar todas as seções (transportes, ranking de destinos, tabela diária, gráficos por destino) e reclassificar **Hotel Imigrantes** como destino tipo **Hotel/Hospedagem**, **nunca** como aeroporto.
+- Recalcular contagens e gráficos de "Aeroporto vs. Hotel" se necessário (mantendo o total de 32 transportes).
 
-1. Capa institucional (idêntica ao V5)
-2. Sumário Executivo + grid de KPIs (sem tarefas, sem custo estimado, com horas de carrinhos)
-3. Análise de Transportes (texto + gráficos transportes/dia e km/dia)
-4. Ranking de destinos + tabela diária
-5. KM e Emissões — número oficial **5.811 km**, CO₂ ≈ 1.336 kg, **sem custo estimado**
-6. Frota Botolli — tabela por veículo com KM e combustível real (sem coluna de custo estimado)
-7. Carrinhos Elétricos — KPIs (22 / 221 / 228 / **horas totais** / **horas médias**), gráfico de uso por dia, top responsáveis
-8. Hóspedes & Atendimentos
-9. Eventos Vinculados (19) + Equipe Logística (9)
-10. Mobilidade & Auditoria + Conclusão Institucional
+### 3. Frota Botolli — remover Sprinter e Kombi
+
+Frota oficial confirmada no banco (7 veículos), sem Sprinter nem Kombi:
+
+| Marca | Modelo | Placa |
+|---|---|---|
+| VW | AMAROK | JDF6D47 |
+| VW | SAVEIRO | TQW2A80 |
+| VW | T CROSS | IZT7H43 |
+| VW | T CROSS | TQX7C18 |
+| VW | UP | IZH9J56 |
+| VW | UP | IXU8B21 |
+| DEFENDER | 4X4 | (sem placa registrada) |
+
+→ Remover linhas Sprinter/Kombi da tabela "Frota Botolli", manter o KPI "7 veículos" e o KM oficial **5.811 km**.
+
+### 4. Manter tudo do V6
+
+- Mesmo design institucional (verde profundo `#0F3D1F` + dourado `#E2C24A`), capa com círculo decorativo, faixas, header/footer, KPIs em grid, gráficos matplotlib.
+- Mesmos dados oficiais: 32 transportes, 5.811 km, R$ 3.337,06 combustível real, 22 carrinhos elétricos, 2.157 h totais (~98 h/carrinho), 221/228 retiradas/devoluções, 23/14 hóspedes, 19 eventos, 195 autorizações, 476 ações auditadas.
+- Sem patinetes, sem checklist, sem comparação entre versões, sem custo estimado por km.
 
 ## Implementação técnica
 
-- Duplicar `/tmp/genrep_v5.py` → `/tmp/genrep_v6.py`.
-- Antes de gerar, rodar `supabase--read_query` em `cart_history` (período 28/04 a 11/05/2026) para calcular horas totais e horas médias.
-- Ajustar dicionário de KPIs: trocar KM, remover custo estimado, remover bloco de tarefas, adicionar horas.
-- Remover funções/seções: `build_checklist_section`, `build_inconsistencias_section` (ou equivalentes do V5).
-- Atualizar tabela da frota Botolli: remover coluna "Custo estimado (R$)".
-- Polimento: revisar `Spacer`, `KeepTogether`, larguras de coluna, padding de cards, alinhamento vertical de números grandes.
-- Atualizar header/footer e metadados para "v6".
+- Duplicar `/tmp/genrep_v6.py` → `/tmp/genrep_v7.py`.
+- Atualizar lista hard-coded da equipe Logística com os 9 nomes acima.
+- Remover entradas Sprinter/Kombi da estrutura da tabela Botolli.
+- Reclassificar "Hotel Imigrantes" no dicionário/lookup de destinos (de aeroporto → hotel) e revisar gráficos e ranking.
+- Atualizar header/footer/metadata para "v7" e rodapé "Versão Final Oficial".
 
 ## QA obrigatório
 
-- `pdftoppm -jpeg -r 130 v6.pdf qa/page` em todas as páginas.
-- Conferir página por página: capa idêntica, KM = 5.811 (nunca 6.314), nenhum "custo estimado" / "0,65", combustível = R$ 3.337,06, horas de carrinhos visíveis, **sem** seção de checklist, **sem** menção a V4/V5/inconsistências, sem patinetes.
-- Validar quebras de página, alinhamento de tabelas e cards, ausência de overflow/clipping.
+- `pdftoppm -jpeg -r 130 v7.pdf qa/page` em todas as páginas.
+- Conferir página por página: capa intacta, equipe = exatamente 9 nomes acima, sem Sprinter/Kombi, Hotel Imigrantes nunca aparece como aeroporto, KM = 5.811, combustível = R$ 3.337,06, horas carrinhos = 2.157 h, sem checklist, sem patinetes, sem menção a versões anteriores.
 - Iterar até zero defeitos visuais.
 
 ## Entregável
 
-`<lov-artifact path="Relatorio_Geral_Operacao_Logistica_Fenasoja_2026_v6.pdf" mime_type="application/pdf"></lov-artifact>`
+`Relatorio_Geral_Operacao_Logistica_Fenasoja_2026_v7.pdf` (versão final oficial).
