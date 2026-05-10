@@ -1,66 +1,49 @@
-## Objetivo
+## Correções no PDF (V8) — base V7
 
-Gerar `Relatorio_Geral_Operacao_Logistica_Fenasoja_2026_v7.pdf` em `/mnt/documents/`, mantendo **exatamente** o design, capa, paleta, tipografia, gráficos e estrutura do V6 — corrigindo apenas as inconsistências apontadas. Esta é a versão final oficial.
+### Custos por veículo (valores reais do banco — `fuel_records`)
 
-## Correções em relação ao V6
+| Placa | Modelo | Viagens (transp.) | KM odômetro | Litros | Combustível |
+|---|---|---|---|---|---|
+| JDF6D47 | AMAROK | 13 | 2.892 | 144,33 | **R$ 755,64** |
+| TQX7C18 | T-CROSS | 6 | 1.249 | 111,16 | **R$ 742,22** |
+| IZT7H43 | T-CROSS | 6 | 642 | 121,97 | **R$ 814,21** |
+| IZH9J56 | UP | 3 | 219 | 0,00 | **R$ 0,00** |
+| IXU8B21 | UP | 2 | 178 | 45,06 | **R$ 299,38** |
+| TQW2A80 | SAVEIRO | 0 | 0 | 0,00 | **R$ 0,00** |
+| — | DEFENDER 4x4 | — | — | 107,87 | **R$ 725,61** |
+| **TOTAL** | 7 veículos | **30** | **5.180** | **530,39** | **R$ 3.337,06** |
 
-### 1. Equipe Logística — lista oficial (9 membros vinculados à comissão "LOGÍSTICA, HOTELARIA E TURISMO" no banco)
+Combustível total bate exatamente (R$ 3.337,06). Distribuição por veículo do V7 estava estimada/incorreta — será 100% substituída pelos valores reais acima.
 
-| # | Nome | Cargo |
-|---|---|---|
-| 1 | EDUARDO SANTOS | PRESIDENTE COMISSÃO |
-| 2 | LEONARDO MATEUS STROSCHEIN | VOLUNTÁRIO |
-| 3 | LUCAS FRANKEN | VOLUNTÁRIO |
-| 4 | LUIS FERNANDO FURLANETTO | VOLUNTÁRIO |
-| 5 | MARCELO DE BAIRROS | VOLUNTÁRIO |
-| 6 | MICAEL ARCANJO BÖCK | VOLUNTÁRIO |
-| 7 | RICARDO CARPENEDO CAETANO | VOLUNTÁRIO |
-| 8 | RICARDO EMILIO ZIMMERMANN | VOLUNTÁRIO |
-| 9 | VLADIMIR ANTÔNIO MADALOSSO DA ROSA | VOLUNTÁRIO |
+### Quilometragem — exibir os dois números
 
-→ Substituir qualquer nome divergente do V6, manter o KPI "9 oficiais", garantir que a tabela/lista da seção "Equipe Logística" reflita exatamente esses nomes/cargos.
+Adicionar nota explícita na seção da Frota e na auditoria de KM:
 
-### 2. Hotel Imigrantes não é aeroporto
+> **KM total registrado:** **5.180 km** (cálculo do sistema, soma de `vehicle_usage`).
+> **KM total odômetro físico dos carros:** **5.811 km** (leitura direta dos painéis ao final do período).
+> Diferença de **631 km** corresponde a deslocamentos internos no parque e trechos sem registro de viagem no sistema.
 
-- Revisar todas as seções (transportes, ranking de destinos, tabela diária, gráficos por destino) e reclassificar **Hotel Imigrantes** como destino tipo **Hotel/Hospedagem**, **nunca** como aeroporto.
-- Recalcular contagens e gráficos de "Aeroporto vs. Hotel" se necessário (mantendo o total de 32 transportes).
+### Mudanças pontuais no PDF
 
-### 3. Frota Botolli — remover Sprinter e Kombi
+1. **Tabela "3. Frota Operacional"**: substituir todas as linhas pelos valores reais acima. Total: 30 viagens / 5.180 km / 530,39 L / R$ 3.337,06.
+2. **Bloco de auditoria de KM e CO₂**: mostrar ambos os totais (5.180 sistema / 5.811 odômetro) e calcular CO₂ sobre 5.811 km (oficial físico) → ≈ **1.336 kg CO₂**.
+3. **Capa e KPIs**: manter "5.811 km" como número oficial destacado, com subtítulo "(5.180 km registrados pelo sistema)".
+4. **Texto da seção da frota**: nota técnica de transparência citando origem dos dados (`vehicles` + `vehicle_usage` + `fuel_records`, em 10/05/2026).
+5. **Manter intacto** todo o resto do V7: design, capa, equipe (9 nomes da LOGÍSTICA), Hotel Imigrantes como hospedagem, sem Sprinter/Kombi, 22 carrinhos elétricos / 2.157 h, hóspedes, eventos, mobilidade, conclusão. Sem checklist, sem comparativos de versão.
 
-Frota oficial confirmada no banco (7 veículos), sem Sprinter nem Kombi:
+### Implementação
 
-| Marca | Modelo | Placa |
-|---|---|---|
-| VW | AMAROK | JDF6D47 |
-| VW | SAVEIRO | TQW2A80 |
-| VW | T CROSS | IZT7H43 |
-| VW | T CROSS | TQX7C18 |
-| VW | UP | IZH9J56 |
-| VW | UP | IXU8B21 |
-| DEFENDER | 4X4 | (sem placa registrada) |
+- Duplicar `/tmp/genrep_v7.py` → `/tmp/genrep_v8.py`.
+- Atualizar header/metadata para "v8" e saída para `Relatorio_Geral_Operacao_Logistica_Fenasoja_2026_v8.pdf`.
+- Substituir array `fleet` pelos 7 veículos reais.
+- Atualizar bloco de KM/CO₂ para exibir ambos os totais.
+- Atualizar litros (530,39) e texto introdutório dos transportes (30 com veículo / 32 concluídos).
 
-→ Remover linhas Sprinter/Kombi da tabela "Frota Botolli", manter o KPI "7 veículos" e o KM oficial **5.811 km**.
+### QA obrigatório
 
-### 4. Manter tudo do V6
+- `pdftoppm` em todas as páginas.
+- Conferir: tabela da frota com valores reais; "5.180 km (sistema) / 5.811 km (odômetro físico)" presente em todos os pontos relevantes; total combustível R$ 3.337,06; CO₂ ≈ 1.336 kg; demais seções idênticas ao V7.
 
-- Mesmo design institucional (verde profundo `#0F3D1F` + dourado `#E2C24A`), capa com círculo decorativo, faixas, header/footer, KPIs em grid, gráficos matplotlib.
-- Mesmos dados oficiais: 32 transportes, 5.811 km, R$ 3.337,06 combustível real, 22 carrinhos elétricos, 2.157 h totais (~98 h/carrinho), 221/228 retiradas/devoluções, 23/14 hóspedes, 19 eventos, 195 autorizações, 476 ações auditadas.
-- Sem patinetes, sem checklist, sem comparação entre versões, sem custo estimado por km.
+### Entregável
 
-## Implementação técnica
-
-- Duplicar `/tmp/genrep_v6.py` → `/tmp/genrep_v7.py`.
-- Atualizar lista hard-coded da equipe Logística com os 9 nomes acima.
-- Remover entradas Sprinter/Kombi da estrutura da tabela Botolli.
-- Reclassificar "Hotel Imigrantes" no dicionário/lookup de destinos (de aeroporto → hotel) e revisar gráficos e ranking.
-- Atualizar header/footer/metadata para "v7" e rodapé "Versão Final Oficial".
-
-## QA obrigatório
-
-- `pdftoppm -jpeg -r 130 v7.pdf qa/page` em todas as páginas.
-- Conferir página por página: capa intacta, equipe = exatamente 9 nomes acima, sem Sprinter/Kombi, Hotel Imigrantes nunca aparece como aeroporto, KM = 5.811, combustível = R$ 3.337,06, horas carrinhos = 2.157 h, sem checklist, sem patinetes, sem menção a versões anteriores.
-- Iterar até zero defeitos visuais.
-
-## Entregável
-
-`Relatorio_Geral_Operacao_Logistica_Fenasoja_2026_v7.pdf` (versão final oficial).
+`Relatorio_Geral_Operacao_Logistica_Fenasoja_2026_v8.pdf`
