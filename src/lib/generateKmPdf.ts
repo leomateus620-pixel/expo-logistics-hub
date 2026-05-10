@@ -1,6 +1,15 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { ConsolidationResult, FAIR_PERIODS } from './kmConsolidation';
+import type { VehicleOdometerEvent } from '@/hooks/useVehicleOdometerEvent';
+
+export interface OdometerEventReport {
+  items: VehicleOdometerEvent[];
+  totalKmEvento: number;
+  totalValorCombustivel: number;
+  totalLitros: number;
+  totalCustoEstimadoKm: number;
+}
 
 const KM_SOURCE_LABELS: Record<string, string> = {
   saved: 'KM salvo no transporte',
@@ -24,7 +33,9 @@ function fmtKm(km: number | null): string {
   return km != null ? `${km.toLocaleString('pt-BR')} km` : '—';
 }
 
-export function generateKmPdf(data: ConsolidationResult) {
+const fmtBRL = (v: number) => v.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+export function generateKmPdf(data: ConsolidationResult, odometer?: OdometerEventReport) {
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
   const pageW = doc.internal.pageSize.getWidth();
   const pageH = doc.internal.pageSize.getHeight();
@@ -224,9 +235,52 @@ export function generateKmPdf(data: ConsolidationResult) {
   });
   y = (doc as any).lastAutoTable.finalY + 10;
 
+  // ══════════════ ODÔMETRO DO EVENTO ══════════════
+  if (odometer && odometer.items.length > 0) {
+    checkNewPage(40);
+    sectionTitle('6. Od­ômetro do Evento por Veículo');
+
+    const oRows = odometer.items.map((i) => [
+      i.label,
+      i.hasOdometer ? (i.kmInicial ?? 0).toLocaleString('pt-BR') : '—',
+      i.hasOdometer ? (i.kmFinal ?? 0).toLocaleString('pt-BR') : '—',
+      i.hasOdometer ? fmtKm(i.kmEvento ?? 0) : '— (sem od­ômetro)',
+      i.litros ? `${i.litros.toLocaleString('pt-BR', { maximumFractionDigits: 2 })} L` : '—',
+      i.valorCombustivel ? fmtBRL(i.valorCombustivel) : '—',
+      i.custoEstimadoKm != null ? fmtBRL(i.custoEstimadoKm) : '—',
+    ]);
+
+    oRows.push([
+      'TOTAL',
+      '',
+      '',
+      fmtKm(odometer.totalKmEvento),
+      `${odometer.totalLitros.toLocaleString('pt-BR', { maximumFractionDigits: 2 })} L`,
+      fmtBRL(odometer.totalValorCombustivel),
+      fmtBRL(odometer.totalCustoEstimadoKm),
+    ]);
+
+    autoTable(doc, {
+      startY: y,
+      head: [['Veículo', 'KM Inicial', 'KM Final', 'KM Rodado', 'Litros', 'R$ Combustível', 'Custo Est. (R$ 0,65/km)']],
+      body: oRows,
+      margin: { left: margin, right: margin },
+      styles: { fontSize: 8, cellPadding: 3 },
+      headStyles: { fillColor: [25, 60, 25], textColor: [220, 190, 80] },
+      alternateRowStyles: { fillColor: [245, 245, 240] },
+      didParseCell: (hookData) => {
+        if (hookData.row.index === oRows.length - 1) {
+          hookData.cell.styles.fontStyle = 'bold';
+          hookData.cell.styles.fillColor = [230, 220, 180];
+        }
+      },
+    });
+    y = (doc as any).lastAutoTable.finalY + 10;
+  }
+
   // ══════════════ POR HÓSPEDE (ANALÍTICO) ══════════════
   checkNewPage(30);
-  sectionTitle('6. Consolidação Analítica por Hóspede');
+  sectionTitle('7. Consolidação Analítica por Hóspede');
 
   const gRows = data.guestSummaries.map(g => [
     g.guestName,
@@ -249,7 +303,7 @@ export function generateKmPdf(data: ConsolidationResult) {
 
   // ══════════════ INCONSISTÊNCIAS ══════════════
   checkNewPage(30);
-  sectionTitle('7. Inconsistências e Dados Pendentes');
+  sectionTitle('8. Inconsistências e Dados Pendentes');
 
   if (data.inconsistencies.length === 0) {
     doc.setFontSize(10);
@@ -277,7 +331,7 @@ export function generateKmPdf(data: ConsolidationResult) {
 
   // ══════════════ NOTA METODOLÓGICA ══════════════
   checkNewPage(50);
-  sectionTitle('8. Nota Metodológica');
+  sectionTitle('9. Nota Metodológica');
 
   doc.setFontSize(9);
   doc.setTextColor(60);

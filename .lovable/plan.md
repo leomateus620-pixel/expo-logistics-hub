@@ -1,64 +1,43 @@
-## Diagnóstico
+## Objetivo
 
-**1. Por que o gráfico de carrinhos não mostra dados antes de 05/05**
+Calcular o KM rodado de cada veículo durante a Fenasoja 2026 (28/04 → 10/05) usando od­ômetro inicial e final, exibir no Dashboard e incluir nos relatórios. Defender 4x4 sem od­ômetro: mostrar apenas o valor gasto em combustível.
 
-`src/hooks/useElectricCarts.ts` busca `cart_history` com `.limit(100)` ordenado por `created_at desc`. Como o histórico recente (05/05 → 10/05) já passa de 250 linhas, o limite corta tudo o que veio antes. No banco existem retiradas em todos os dias do período (28/04 em diante) — o problema é puramente de fetch no client.
+## Od­ômetros finais (informados)
 
-**2. "Tarefas" no dashboard**
+| Veículo | Placa | Inicial (heurística) | Final | KM evento |
+|---|---|---|---|---|
+| Amarok | JDF6D47 | 25.668 (1º km_saida válido) | 28.707 | ~3.039 |
+| UP vermelho 21 | IXU8B21 | 123.799 | 124.070 | 271 |
+| UP vermelho 56 | IZH9J56 | 125.386 | 125.668 | 282 |
+| T-Cross branca 18 | TQX7C18 | 4.403 | 5.571 | 1.168 |
+| T-Cross azul 43 | IZT7H43 | 86.761 (1º km_saida ≥ 1000) | 87.812 | 1.051 |
+| Defender 4x4 | (sem placa) | — | — | R$ 725,61 (combustível) |
 
-Hoje o card e o `TasksProgressChart` usam `useTasks()` (menu Checklist). O usuário quer medir progresso pela operação de **transportes**: cada transporte = 1 tarefa; concluído = realizado, demais = pendente; críticas = pendentes vencidos / sem motorista.
+## Mudanças
 
-**3. Despesas de combustível**
+### 1. Banco
+- Migration: adicionar `vehicles.km_inicial_evento numeric` e `vehicles.km_final_evento numeric`.
+- Insert: atualizar os 5 veículos com `km_inicial_evento` (heurística: primeiro `km_saida` chronological do período ≥ 1000) e `km_final_evento` (valores informados). Atualizar `km_atual` para bater com o final.
 
-`fuel_records` já existe (campos `litros`, `valor`, `km_abastecimento`, `vehicle_id`, `created_at`). Não há flag "Botolli" nos veículos — entendo que o pedido é mostrar os abastecimentos cadastrados no módulo Veículos. Vamos exibir gasto diário (R$) + barras por veículo dentro do período Fenasoja.
+### 2. Hook `useVehicleOdometerEvent`
+- Novo hook que retorna por veículo: `kmInicial`, `kmFinal`, `kmEvento = final - inicial`, `valorCombustivel` (sum `fuel_records.valor`), `litros`, `custoEstimadoKm = kmEvento * 0.65`.
+- Para Defender (sem od­ômetro): apenas `valorCombustivel`.
 
----
+### 3. Dashboard
+- Novo card/chart `OdometerEventChart` (lazy, junto ao FuelExpensesChart): bar chart horizontal por veículo mostrando KM rodado no evento + tooltip com inicial/final/litros/R$. Total geral em destaque (KM da frota no evento).
 
-## Plano de implementação
+### 4. Relatórios
+- `KmEmissoesPage` (PDF `generateKmPdf`): nova seção "Od­ômetro do evento por veículo" — tabela inicial/final/Δkm/litros/R$/custo estimado, com linha do Defender (— / — / — / litros / R$).
+- `systemReportCollector`: incluir mesmo bloco no relatório de contingência.
 
-### A. Corrigir histórico de carrinhos
-- `src/hooks/useElectricCarts.ts`: remover `.limit(100)` da query de `cart_history` e filtrar por `created_at >= PERIOD_START` (28/04) para trazer todo o período sem inflar payload.
-- Manter ordenação `desc` para a lista, mas garantir que `useDashboardMetrics` receba todas as linhas do período.
-- Resultado: barras passam a aparecer em 28/04, 29/04, 30/04, 01/05, 02/05, 03/05, 04/05 (atualmente zeradas).
+### 5. UI Veículos
+- Em `VehiclesPage` (detalhe do veículo): exibir os campos `km_inicial_evento` e `km_final_evento` como editáveis (admin/gestor) para correção manual quando heurística estiver errada.
 
-### B. Substituir "Progresso de tarefas" por "Progresso de transportes"
-- Criar `src/components/dashboard/charts/TransportsProgressChart.tsx` (mesma identidade visual radial do atual), com props:
-  - `realizados`, `pendentes`, `criticas`, `percent`
-- Cálculo em `useDashboardMetrics`:
-  - `total = transportes do período (todos status exceto cancelado)`
-  - `realizados = status concluido`
-  - `pendentes = status pendente + em_andamento + em_retorno + chegou_destino`
-  - `criticas = pendentes sem motorista OU com `inicio_em` < agora OU retorno implausível`
-  - `percent = round(realizados/total*100)`
-- Em `Dashboard.tsx`: trocar `<TasksProgressChart />` por `<TransportsProgressChart />`. O card "Tarefas" 3D continua existindo (vinculado ao Checklist) — só o gráfico muda.
-
-### C. Novo gráfico de combustível
-- Criar `src/hooks/useFuelMetrics.ts` consumindo `fuel_records` filtrado pelo período Fenasoja (28/04 → 10/05), agregando:
-  - série diária `{ dia, valor, litros }`
-  - total no período (R$, litros)
-  - top veículo por gasto
-- Criar `src/components/dashboard/charts/FuelExpensesChart.tsx`:
-  - Mesmo estilo Liquid Glass + gold-accent dos demais
-  - `ComposedChart`: barras = R$ por dia, linha = litros por dia
-  - Header com total R$ · litros e top veículo
-- Em `Dashboard.tsx`, posicionar logo após `KmRodadosChart`/`CartUsageChart`, dentro da grade de gráficos (`lazy import`).
-
-### D. Polimento
-- Manter animações `animate-fade-in` com delays escalonados.
-- Tooltip e cores via tokens (`hsl(var(--gold))`, `hsl(var(--primary))`).
-- Skeleton existente cobre o novo card via `<ChartFallback />`.
-
----
-
-## Arquivos afetados
-
-```text
-M src/hooks/useElectricCarts.ts            (remover limit, filtrar por período)
-M src/hooks/useDashboardMetrics.ts         (novas métricas: transports progress)
-A src/hooks/useFuelMetrics.ts              (agregação fuel_records)
-A src/components/dashboard/charts/TransportsProgressChart.tsx
-A src/components/dashboard/charts/FuelExpensesChart.tsx
-M src/pages/Dashboard.tsx                  (trocar chart de tarefas + inserir fuel chart)
-```
-
-Sem mudanças de schema / RLS — só leitura.
+## Arquivos
+- `supabase/migrations/*` (nova) + insert para popular dados
+- `src/hooks/useVehicleOdometerEvent.ts` (novo)
+- `src/components/dashboard/charts/OdometerEventChart.tsx` (novo)
+- `src/pages/Dashboard.tsx` (adicionar card)
+- `src/lib/generateKmPdf.ts` + `src/pages/KmEmissoesPage.tsx` (nova seção)
+- `src/lib/systemReportCollector.ts` (incluir bloco)
+- `src/pages/VehiclesPage.tsx` (campos editáveis)

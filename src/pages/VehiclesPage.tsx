@@ -127,7 +127,7 @@ export default function VehiclesPage() {
   const [addForm, setAddForm] = useState({ placa: '', marca: '', modelo: '', ano: '', cor: '', categoria: 'outro', km_atual: '' });
   const [editOpen, setEditOpen] = useState(false);
   const [editId, setEditId] = useState('');
-  const [editForm, setEditForm] = useState({ placa: '', marca: '', modelo: '', cor: '', status: 'disponivel', km_atual: '', responsavel_user_id: '' });
+  const [editForm, setEditForm] = useState({ placa: '', marca: '', modelo: '', cor: '', status: 'disponivel', km_atual: '', responsavel_user_id: '', km_inicial_evento: '', km_final_evento: '' });
   const [detailOpen, setDetailOpen] = useState(false);
   const [detailVehicle, setDetailVehicle] = useState<any>(null);
   const [statusFilter, setStatusFilter] = useState<string>('todos');
@@ -186,7 +186,7 @@ export default function VehiclesPage() {
 
   const openEdit = (v: any) => {
     setEditId(v.id);
-    setEditForm({ placa: v.placa, marca: v.marca || '', modelo: v.modelo || '', cor: v.cor || '', status: v.status, km_atual: String(v.km_atual || ''), responsavel_user_id: v.responsavel_user_id || '' });
+    setEditForm({ placa: v.placa, marca: v.marca || '', modelo: v.modelo || '', cor: v.cor || '', status: v.status, km_atual: String(v.km_atual || ''), responsavel_user_id: v.responsavel_user_id || '', km_inicial_evento: v.km_inicial_evento != null ? String(v.km_inicial_evento) : '', km_final_evento: v.km_final_evento != null ? String(v.km_final_evento) : '' });
     setEditOpen(true);
   };
 
@@ -254,6 +254,8 @@ export default function VehiclesPage() {
         cor: editForm.cor || null,
         status: editForm.status,
         km_atual: editForm.km_atual ? Number(editForm.km_atual) : 0,
+        km_inicial_evento: editForm.km_inicial_evento ? Number(editForm.km_inicial_evento) : null,
+        km_final_evento: editForm.km_final_evento ? Number(editForm.km_final_evento) : null,
         responsavel_user_id: editForm.responsavel_user_id && editForm.responsavel_user_id !== 'none' ? editForm.responsavel_user_id : null,
       });
       setEditOpen(false);
@@ -495,6 +497,10 @@ export default function VehiclesPage() {
             </div>
             <Input placeholder="Cor" value={editForm.cor} onChange={(e) => setEditForm({ ...editForm, cor: e.target.value })} className="h-11" />
             <Input placeholder="KM atual" type="number" value={editForm.km_atual} onChange={(e) => setEditForm({ ...editForm, km_atual: e.target.value })} className="h-11" />
+            <div className="grid grid-cols-2 gap-3">
+              <Input placeholder="KM inicial do evento" type="number" value={editForm.km_inicial_evento} onChange={(e) => setEditForm({ ...editForm, km_inicial_evento: e.target.value })} className="h-11" />
+              <Input placeholder="KM final do evento" type="number" value={editForm.km_final_evento} onChange={(e) => setEditForm({ ...editForm, km_final_evento: e.target.value })} className="h-11" />
+            </div>
             <Select value={editForm.status} onValueChange={(v) => setEditForm({ ...editForm, status: v })}>
               <SelectTrigger className="h-11"><SelectValue /></SelectTrigger>
               <SelectContent>

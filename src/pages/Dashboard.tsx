@@ -9,6 +9,7 @@ import { useSchedules } from '@/hooks/useSchedules';
 import { useExpenses } from '@/hooks/useExpenses';
 import { useDashboardMetrics } from '@/hooks/useDashboardMetrics';
 import { useFuelMetrics } from '@/hooks/useFuelMetrics';
+import { useVehicleOdometerEvent } from '@/hooks/useVehicleOdometerEvent';
 import {
   Car, Zap, MapPin, CheckSquare, CalendarDays, Users, User,
   Hotel, ClipboardList, ArrowRight, Clock, AlertCircle, ExternalLink, FileText, Sheet, Receipt,
@@ -31,6 +32,7 @@ const CartUsageChart = lazy(() => import('@/components/dashboard/charts/CartUsag
 const TasksProgressChart = lazy(() => import('@/components/dashboard/charts/TasksProgressChart'));
 const TransportsProgressChart = lazy(() => import('@/components/dashboard/charts/TransportsProgressChart'));
 const FuelExpensesChart = lazy(() => import('@/components/dashboard/charts/FuelExpensesChart'));
+const OdometerEventChart = lazy(() => import('@/components/dashboard/charts/OdometerEventChart'));
 const OperationDistributionChart = lazy(() => import('@/components/dashboard/charts/OperationDistributionChart'));
 
 const ChartFallback = () => <Skeleton className="h-[260px] rounded-2xl" />;
@@ -159,6 +161,18 @@ function FuelExpensesChartConnected() {
       totalLitros={fuel.totalLitros}
       totalAbastecimentos={fuel.totalAbastecimentos}
       topVeh={fuel.topVeh as any}
+    />
+  );
+}
+
+function OdometerEventChartConnected() {
+  const odo = useVehicleOdometerEvent();
+  return (
+    <OdometerEventChart
+      items={odo.items}
+      totalKmEvento={odo.totalKmEvento}
+      totalValorCombustivel={odo.totalValorCombustivel}
+      totalCustoEstimadoKm={odo.totalCustoEstimadoKm}
     />
   );
 }
@@ -516,6 +530,9 @@ export default function Dashboard() {
         </Suspense>
         <Suspense fallback={<ChartFallback />}>
           <FuelExpensesChartConnected />
+        </Suspense>
+        <Suspense fallback={<ChartFallback />}>
+          <OdometerEventChartConnected />
         </Suspense>
         <Suspense fallback={<ChartFallback />}>
           <OperationDistributionChart data={metrics.distribution} />

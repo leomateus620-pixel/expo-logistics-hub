@@ -2518,6 +2518,8 @@ export type Database = {
           documento_url: string | null
           id: string
           km_atual: number | null
+          km_final_evento: number | null
+          km_inicial_evento: number | null
           marca: string | null
           modelo: string | null
           org_id: string
@@ -2535,6 +2537,8 @@ export type Database = {
           documento_url?: string | null
           id?: string
           km_atual?: number | null
+          km_final_evento?: number | null
+          km_inicial_evento?: number | null
           marca?: string | null
           modelo?: string | null
           org_id: string
@@ -2552,6 +2556,8 @@ export type Database = {
           documento_url?: string | null
           id?: string
           km_atual?: number | null
+          km_final_evento?: number | null
+          km_inicial_evento?: number | null
           marca?: string | null
           modelo?: string | null
           org_id?: string

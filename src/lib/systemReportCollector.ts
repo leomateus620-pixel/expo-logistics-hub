@@ -67,6 +67,8 @@ export const ALL_MODULES: ModuleConfig[] = [
       { key: 'cor', label: 'Cor' },
       { key: 'categoria', label: 'Categoria' },
       { key: 'km_atual', label: 'KM Atual' },
+      { key: 'km_inicial_evento', label: 'KM Inicial Evento' },
+      { key: 'km_final_evento', label: 'KM Final Evento' },
       { key: 'status', label: 'Status' },
       { key: 'created_at', label: 'Criado em' },
       { key: 'updated_at', label: 'Atualizado em' },

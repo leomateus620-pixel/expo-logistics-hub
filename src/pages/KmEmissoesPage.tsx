@@ -11,6 +11,7 @@ import { useVehicles } from '@/hooks/useVehicles';
 import { useOrgMembers } from '@/hooks/useOrgMembers';
 import { consolidateTransports, FAIR_PERIODS, type ConsolidationResult, type KmSource } from '@/lib/kmConsolidation';
 import { generateKmPdf } from '@/lib/generateKmPdf';
+import { useVehicleOdometerEvent } from '@/hooks/useVehicleOdometerEvent';
 import {
   FileDown, ChevronDown, ChevronRight, AlertTriangle, CheckCircle2,
   Car, Users, MapPin, Calendar, Gauge, TrendingUp, Info,
@@ -40,6 +41,7 @@ export default function KmEmissoesPage() {
   const { guests, isLoading: gLoading } = useGuests();
   const { vehicles, isLoading: vLoading } = useVehicles();
   const { members, isLoading: mLoading } = useOrgMembers();
+  const odometer = useVehicleOdometerEvent();
 
   const isLoading = tLoading || tgLoading || gLoading || vLoading || mLoading;
 
@@ -90,7 +92,7 @@ export default function KmEmissoesPage() {
             <span className="text-xs text-muted-foreground">Apenas dados com base confiável entram no total consolidado.</span>
           </div>
         </div>
-        <Button onClick={() => generateKmPdf(data)} className="gap-2 shrink-0">
+        <Button onClick={() => generateKmPdf(data, { items: odometer.items, totalKmEvento: odometer.totalKmEvento, totalValorCombustivel: odometer.totalValorCombustivel, totalLitros: odometer.totalLitros, totalCustoEstimadoKm: odometer.totalCustoEstimadoKm })} className="gap-2 shrink-0">
           <FileDown className="w-4 h-4" />
           Gerar PDF
         </Button>
