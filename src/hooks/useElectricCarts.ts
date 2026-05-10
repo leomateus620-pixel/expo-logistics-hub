@@ -139,7 +139,14 @@ export function useElectricCarts() {
     queryKey: ['cart-history', orgId],
     queryFn: async () => {
       if (!orgId) return [];
-      const { data } = await (supabase as any).from('cart_history').select('*').eq('org_id', orgId).order('created_at', { ascending: false }).limit(100);
+      // Fetch full Fenasoja period (28/04/2026 → 11/05/2026) — no row limit so charts have all days
+      const { data } = await (supabase as any)
+        .from('cart_history')
+        .select('*')
+        .eq('org_id', orgId)
+        .gte('created_at', '2026-04-28T00:00:00-03:00')
+        .lte('created_at', '2026-05-11T03:00:00-03:00')
+        .order('created_at', { ascending: false });
       return data || [];
     },
     enabled: !!orgId,

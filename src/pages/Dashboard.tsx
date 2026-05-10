@@ -8,6 +8,7 @@ import { useOrgMembers } from '@/hooks/useOrgMembers';
 import { useSchedules } from '@/hooks/useSchedules';
 import { useExpenses } from '@/hooks/useExpenses';
 import { useDashboardMetrics } from '@/hooks/useDashboardMetrics';
+import { useFuelMetrics } from '@/hooks/useFuelMetrics';
 import {
   Car, Zap, MapPin, CheckSquare, CalendarDays, Users, User,
   Hotel, ClipboardList, ArrowRight, Clock, AlertCircle, ExternalLink, FileText, Sheet, Receipt,
@@ -28,6 +29,8 @@ const TransportsByDayChart = lazy(() => import('@/components/dashboard/charts/Tr
 const KmRodadosChart = lazy(() => import('@/components/dashboard/charts/KmRodadosChart'));
 const CartUsageChart = lazy(() => import('@/components/dashboard/charts/CartUsageChart'));
 const TasksProgressChart = lazy(() => import('@/components/dashboard/charts/TasksProgressChart'));
+const TransportsProgressChart = lazy(() => import('@/components/dashboard/charts/TransportsProgressChart'));
+const FuelExpensesChart = lazy(() => import('@/components/dashboard/charts/FuelExpensesChart'));
 const OperationDistributionChart = lazy(() => import('@/components/dashboard/charts/OperationDistributionChart'));
 
 const ChartFallback = () => <Skeleton className="h-[260px] rounded-2xl" />;
@@ -146,6 +149,19 @@ const MembersList = memo(function MembersList({ logisticsMembers, assignments, s
     </div>
   );
 });
+
+function FuelExpensesChartConnected() {
+  const fuel = useFuelMetrics();
+  return (
+    <FuelExpensesChart
+      data={fuel.series}
+      totalValor={fuel.totalValor}
+      totalLitros={fuel.totalLitros}
+      totalAbastecimentos={fuel.totalAbastecimentos}
+      topVeh={fuel.topVeh as any}
+    />
+  );
+}
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -491,12 +507,15 @@ export default function Dashboard() {
           <CartUsageChart data={metrics.carts.series} horasUso={metrics.carts.horasUso} />
         </Suspense>
         <Suspense fallback={<ChartFallback />}>
-          <TasksProgressChart
-            pendentes={metrics.tasks.pendentes}
-            concluidas={metrics.tasks.concluidas}
-            criticas={metrics.tasks.criticas}
-            percent={metrics.tasks.percent}
+          <TransportsProgressChart
+            realizados={metrics.transports.progress.realizados}
+            pendentes={metrics.transports.progress.pendentes}
+            criticas={metrics.transports.progress.criticas}
+            percent={metrics.transports.progress.percent}
           />
+        </Suspense>
+        <Suspense fallback={<ChartFallback />}>
+          <FuelExpensesChartConnected />
         </Suspense>
         <Suspense fallback={<ChartFallback />}>
           <OperationDistributionChart data={metrics.distribution} />
