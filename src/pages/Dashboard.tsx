@@ -7,7 +7,7 @@ import { useFenasojaEvents } from '@/hooks/useFenasojaEvents';
 import { useOrgMembers } from '@/hooks/useOrgMembers';
 import { useSchedules } from '@/hooks/useSchedules';
 import { useExpenses } from '@/hooks/useExpenses';
-import StatCard from '@/components/StatCard';
+import { useDashboardMetrics } from '@/hooks/useDashboardMetrics';
 import {
   Car, Zap, MapPin, CheckSquare, CalendarDays, Users, User,
   Hotel, ClipboardList, ArrowRight, Clock, AlertCircle, ExternalLink, FileText, Sheet, Receipt,
@@ -17,7 +17,20 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn, rawTime, rawDateShort, todaySP } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
-import { useMemo, memo } from 'react';
+import { useMemo, memo, lazy, Suspense, useState } from 'react';
+import Metric3DCard from '@/components/dashboard/Metric3DCard';
+import OperationalDynamicIsland from '@/components/dashboard/OperationalDynamicIsland';
+import ExpandedMetricSheet from '@/components/dashboard/ExpandedMetricSheet';
+import OperationAlertsPanel from '@/components/dashboard/OperationAlertsPanel';
+import PeriodReportCard from '@/components/dashboard/PeriodReportCard';
+
+const TransportsByDayChart = lazy(() => import('@/components/dashboard/charts/TransportsByDayChart'));
+const KmRodadosChart = lazy(() => import('@/components/dashboard/charts/KmRodadosChart'));
+const CartUsageChart = lazy(() => import('@/components/dashboard/charts/CartUsageChart'));
+const TasksProgressChart = lazy(() => import('@/components/dashboard/charts/TasksProgressChart'));
+const OperationDistributionChart = lazy(() => import('@/components/dashboard/charts/OperationDistributionChart'));
+
+const ChartFallback = () => <Skeleton className="h-[260px] rounded-2xl" />;
 
 function getGreeting(): string {
   const h = new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo', hour: 'numeric', hour12: false });

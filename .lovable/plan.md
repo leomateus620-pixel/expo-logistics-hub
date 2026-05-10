@@ -1,103 +1,122 @@
-## Diagnóstico
 
-Investiguei o build atual e identifiquei 3 causas principais de lentidão no acesso pelo PC em `fenasojalog.com`:
+# Dashboard Premium — Fenasoja Logística
 
-### 1. Bundle JavaScript gigante (sem code splitting)
-O `src/App.tsx` importa **todas as 19 páginas estaticamente** no topo do arquivo. Isso significa que ao abrir o site, o navegador baixa de uma vez:
-- Todas as páginas (Dashboard, Vehicles, Transports, Agenda, Expenses, etc.)
-- **maplibre-gl** (~800KB gzipped)
-- **leaflet** (~150KB)
-- **html5-qrcode** (~200KB)
-- **jspdf + jspdf-autotable** (~300KB)
-- **recharts** (~400KB)
+Evolução visual e funcional da Dashboard mantendo identidade verde/dourada e Liquid Glass, sem quebrar módulos existentes.
 
-Resultado: o usuário no PC baixa ~3–4MB de JS antes da primeira tela aparecer, mesmo se for só ver o Dashboard.
+## 1. Camada de dados (nova)
 
-### 2. Imagens de fundo enormes (~8,5MB total)
-- `fenasoja-bg-2026.png`: **2,8MB**
-- `fenasoja-bg-mobile.png`: **2,8MB**
-- `fenasoja-splash-2026.png`: **2,9MB**
+**`src/hooks/useDashboardMetrics.ts`** — hook centralizador que agrega todas as métricas do período **2026-04-28 → 2026-05-10** a partir dos hooks já existentes (`useVehicles`, `useElectricCarts`, `useTransports`, `useTasks`, `useEvents`, `useFenasojaEvents`, `useOrgMembers`, `useSchedules`, `useVehicleUsage`, `useCartReservations`, `useMobilityAuthorizations`).
 
-Em PNG, sem compressão WebP. O `LoginPage` carrega 2,8MB só para mostrar o fundo, e ainda faz preload da splash de 2,9MB.
+Retorna objeto memoizado com:
+- `vehicles`: total, disponíveis, em uso, Botolli, kmTotal, kmMedio, topVeiculo, serieDiaria
+- `carts`: total, emOperacao, disponiveis, retiradasPeriodo, horasUso, topCarrinho, serieDiaria
+- `transports`: total, realizados, pendentes, emAndamento, agendadosHoje, kmTotal, aeroportos[], cidades[], topDestino, alertasRetorno[], serieDiaria
+- `tasks`: pendentes, concluidas, criticas, porCategoria, percentual
+- `team`: totalLogistica, voluntarios, escaladosHoje
+- `events`: cobertosPeriodo, proximosEventos
+- `mobility`: solicitacoes, carrinhosVinc, patinetesVinc, pendentes
+- `alerts[]`: lista normalizada `{ id, severity, message, ctaRoute, entity }`
+- `loading`, `error`, `isEmpty`
 
-### 3. Falta de chunking dos vendors
-Sem `manualChunks` no `vite.config.ts`, o Vite agrupa tudo em poucos arquivos grandes. Sem cache eficiente entre deploys: qualquer mudança invalida o bundle inteiro.
+Todas as agregações ficam aqui (single source of truth) — componentes só consomem.
 
-## Plano de otimizações
+## 2. Componentes novos
 
-### A. Code splitting por rota (impacto: alto)
-Converter todos os imports de páginas em `React.lazy()` + `<Suspense>` no `src/App.tsx`. Cada rota vira um chunk separado carregado sob demanda.
-
-```tsx
-const Dashboard = lazy(() => import('./pages/Dashboard'));
-const TransportsPage = lazy(() => import('./pages/TransportsPage'));
-// ...
-<Suspense fallback={<LoadingSpinner />}>
-  <Routes>...</Routes>
-</Suspense>
+```
+src/components/dashboard/
+  OperationalDynamicIsland.tsx     # cápsula expansível, 9 categorias, swipe horizontal
+  DynamicIslandCategory.tsx        # renderiza 2-4 métricas de uma categoria
+  Metric3DCard.tsx                 # card principal com glass 3D, micro-tilt, expansão
+  MetricCardRotator.tsx            # rolagem interna automática (4-6s) + swipe + dots
+  ExpandedMetricSheet.tsx          # bottom-sheet (mobile) / Sheet lateral (desktop) com detalhes
+  charts/
+    TransportsByDayChart.tsx       # Recharts BarChart - realizados/pendentes/agendados
+    KmRodadosChart.tsx             # LineChart - KM por dia + por veículo
+    CartUsageChart.tsx             # AreaChart amarelo/dourado - horas e retiradas
+    TasksProgressChart.tsx         # RadialBar - % conclusão + críticas
+    OperationDistributionChart.tsx # Donut - distribuição transportes/mobilidade/eventos…
+  OperationAlertsPanel.tsx         # lista premium de alertas com severity e CTA
+  PeriodReportCard.tsx             # "Resumo 28/04 a 10/05" + CTA "Gerar relatório"
+  DashboardSkeleton.tsx
+  DashboardEmptyState.tsx
+  DashboardErrorState.tsx
 ```
 
-Ganho esperado: bundle inicial cai de ~3MB para ~600–800KB.
+Todos os charts são `lazy()` + `Suspense` para não pesar no first paint.
 
-### B. Vendor chunks no `vite.config.ts` (impacto: médio)
-Configurar `build.rollupOptions.output.manualChunks` para separar:
-- `react-vendor`: react, react-dom, react-router
-- `ui-vendor`: todos os @radix-ui
-- `maps`: maplibre-gl + leaflet (carregados só nas páginas de mapa)
-- `pdf`: jspdf + jspdf-autotable
-- `charts`: recharts
-- `qr`: html5-qrcode
+## 3. Cards 3D rotativos (substituem os 4 cards atuais)
 
-Vantagem: ao publicar uma atualização, só o chunk modificado é re-baixado; os vendors ficam em cache.
+Cada `Metric3DCard` tem:
+- número grande, ícone glass, badge status, micrográfico (sparkline inline)
+- `MetricCardRotator` interno cicla 3-5 telinhas a cada 5s (pausa em toque/hover); dots indicadores; swipe nativo
+- altura fixa para não pular layout
+- tilt sutil no desktop (mousemove → rotateX/Y ≤6°), scale 0.97 no toque mobile
+- toque/click → `ExpandedMetricSheet` (Drawer no mobile, Sheet no desktop) com gráficos e CTAs do módulo
 
-### C. Lazy load de bibliotecas pesadas dentro das páginas (impacto: alto)
-- `NavigationMap3D.tsx` → dynamic import do `maplibre-gl` só quando o mapa renderiza
-- `QrScannerDialog.tsx` → dynamic import do `html5-qrcode` só ao abrir
-- Geradores de PDF (`generateCartUsagePdf`, `generateKmPdf`, `generateSystemReportPdf`) → já são chamados sob demanda, garantir que `jspdf` não vaza pro bundle inicial
+Conteúdo das telinhas conforme spec do usuário (Veículos / Carrinhos / Transportes / Tarefas).
 
-### D. Conversão de imagens PNG → WebP (impacto: alto no Login)
-Converter os 3 fundos PNG (2,8–2,9MB cada) para WebP otimizado. Estimativa: **~250–400KB cada** (redução de ~90%).
-- `fenasoja-bg-2026.png` → `.webp`
-- `fenasoja-bg-mobile.png` → `.webp`
-- `fenasoja-splash-2026.png` → `.webp`
+## 4. Dynamic Island operacional
 
-Atualizar imports em `LoginPage.tsx` e onde a splash é usada. **Nenhum impacto visual** — WebP mantém a qualidade.
+Componente cápsula **abaixo da saudação**:
+- Estado compacto: pílula glass com resumo (`Operação ativa · X tarefas · Y veículos · Z carrinhos`)
+- Click/tap → expande (Framer Motion `layout` + spring `{ stiffness: 260, damping: 28 }`) para painel com tabs horizontais scrolláveis: Hoje, Transportes, Carrinhos, Veículos, Equipe, Eventos, KM & Emissões, Mobilidade, Alertas
+- Swipe horizontal entre categorias com indicador
+- Cada categoria mostra 2-4 mini-métricas + CTA para módulo
+- Desktop ≥ md: já abre como barra horizontal lado-a-lado
+- Respeita `prefers-reduced-motion` (anima só fade)
 
-### E. Pré-conexão e prefetch (impacto: pequeno mas grátis)
-Adicionar no `index.html`:
-```html
-<link rel="preconnect" href="https://fidagsspejekripwkczr.supabase.co">
-<link rel="dns-prefetch" href="https://fidagsspejekripwkczr.supabase.co">
+## 5. Layout final da Dashboard
+
+```text
+[Saudação + data]
+[OperationalDynamicIsland]
+[CTA primário largo: Criar Transporte]   (mobile)
+[Grid 2x2 (mobile) / 4 col (desktop) — Metric3DCard x4]
+[Grid de gráficos: 1 col mobile / 2 col desktop]
+  - TransportsByDayChart
+  - KmRodadosChart
+  - CartUsageChart
+  - TasksProgressChart
+  - OperationDistributionChart
+[OperationAlertsPanel]
+[PeriodReportCard "Resumo 28/04 → 10/05"]
+[Acessos rápidos atuais (Hotéis PDF, Autorizações Sheet) — preservados]
 ```
-Reduz handshake DNS/TLS na primeira chamada do Supabase.
 
-### F. Service Worker — pré-cachear chunks lazy (sem alteração)
-O `public/sw.js` atual já faz cache-first nos assets com hash do Vite, então as chunks lazy serão cacheadas automaticamente após o primeiro acesso. Sem mudança necessária.
+Sidebar atual e `Layout.tsx` permanecem intactos. Sem alteração de rotas, permissões ou módulos internos.
 
-## Resumo dos arquivos que serão alterados
+## 6. Estados
 
-| Arquivo | Mudança |
-|---|---|
-| `src/App.tsx` | Converter imports de páginas para `lazy()` + `Suspense` |
-| `vite.config.ts` | Adicionar `manualChunks` para vendors |
-| `src/components/transport/NavigationMap3D.tsx` | Dynamic import do maplibre-gl |
-| `src/components/expenses/QrScannerDialog.tsx` | Dynamic import do html5-qrcode |
-| `src/assets/fenasoja-bg-2026.webp` | **Novo** (gerado a partir do PNG) |
-| `src/assets/fenasoja-bg-mobile.webp` | **Novo** |
-| `src/assets/fenasoja-splash-2026.webp` | **Novo** |
-| `src/pages/LoginPage.tsx` | Trocar imports PNG → WebP |
-| Outros consumidores da splash | Trocar import PNG → WebP |
-| `index.html` | Adicionar `preconnect`/`dns-prefetch` Supabase |
+- **Loading**: `DashboardSkeleton` com shapes de cada bloco (não spinners genéricos)
+- **Vazio**: `DashboardEmptyState` por bloco com CTA contextual ("Cadastrar primeiro transporte")
+- **Erro**: `DashboardErrorState` com mensagem + retry
+- Cada chart trata seu próprio empty individualmente
 
-## Garantias de integridade
+## 7. Acessibilidade & performance
 
-- **Nenhuma mudança de regra de negócio, schema, RLS, ou edge function.**
-- **Nenhuma alteração visual** — WebP preserva qualidade idêntica ao PNG.
-- Os PNGs originais permanecem no repositório como fallback inicial e podem ser removidos depois de validar.
-- Code splitting é transparente: o `Suspense fallback` mostra um spinner idêntico ao `AuthGuard` por ~100–300ms na primeira navegação a cada rota.
+- aria-labels em CTAs e gráficos, navegação por teclado, contraste AA
+- `prefers-reduced-motion`: desativa tilt, rotação automática, springs longos
+- `useMemo` em todas agregações pesadas; charts atrás de `lazy()`
+- `Recharts` já é dep usada; sem novas libs além de `framer-motion` (verificar se já presente — provavelmente sim)
 
-## Estimativa de ganho
+## 8. Detalhes técnicos
 
-- **Tempo até interativo (PC, conexão típica)**: de ~4–6s para ~1,5–2s na primeira visita.
-- **Re-visitas**: praticamente instantâneo (cache do SW + chunks vendor estáveis).
-- **Login screen**: de ~2,8MB de imagem para ~300KB.
+- Período fixo no hook: `PERIOD_START = '2026-04-28'`, `PERIOD_END = '2026-05-10'` (UTC-3, helpers de `lib/utils.ts`)
+- Alertas detectados:
+  - transporte sem motorista/veículo/retorno
+  - retorno implausível (já existe `isReturnTimePlausible`)
+  - carrinho retirado > 24h sem devolução
+  - tarefa crítica vencida
+  - evento sem cobertura logística
+- Identidade visual: tokens existentes (`--primary` verde, `--gold`, `liquid-glass-card`, `gold-accent`)
+- Sem mock — se módulo retorna vazio, renderiza empty state
+
+## 9. Arquivos modificados
+
+- `src/pages/Dashboard.tsx` — reescrito para orquestrar novos componentes (preserva acessos rápidos)
+- `src/hooks/useDashboardMetrics.ts` — novo
+- ~14 novos componentes em `src/components/dashboard/`
+
+## 10. Validação
+
+Após build: testar viewport mobile (393px), tablet, desktop; com sidebar aberta/fechada; expandir cards e Dynamic Island; estados loading/vazio; `prefers-reduced-motion`. Sem mudanças em DB, RLS ou edge functions.
