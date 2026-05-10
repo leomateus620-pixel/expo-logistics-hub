@@ -9,6 +9,7 @@ import { useSchedules } from '@/hooks/useSchedules';
 import { useExpenses } from '@/hooks/useExpenses';
 import { useDashboardMetrics } from '@/hooks/useDashboardMetrics';
 import { useFuelMetrics } from '@/hooks/useFuelMetrics';
+import { useVehicleOdometerEvent } from '@/hooks/useVehicleOdometerEvent';
 import {
   Car, Zap, MapPin, CheckSquare, CalendarDays, Users, User,
   Hotel, ClipboardList, ArrowRight, Clock, AlertCircle, ExternalLink, FileText, Sheet, Receipt,
@@ -165,7 +166,7 @@ function FuelExpensesChartConnected() {
 }
 
 function OdometerEventChartConnected() {
-  const odo = require('@/hooks/useVehicleOdometerEvent').useVehicleOdometerEvent();
+  const odo = useVehicleOdometerEvent();
   return (
     <OdometerEventChart
       items={odo.items}
