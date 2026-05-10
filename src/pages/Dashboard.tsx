@@ -8,6 +8,7 @@ import { useOrgMembers } from '@/hooks/useOrgMembers';
 import { useSchedules } from '@/hooks/useSchedules';
 import { useExpenses } from '@/hooks/useExpenses';
 import { useDashboardMetrics } from '@/hooks/useDashboardMetrics';
+import { useFuelMetrics } from '@/hooks/useFuelMetrics';
 import {
   Car, Zap, MapPin, CheckSquare, CalendarDays, Users, User,
   Hotel, ClipboardList, ArrowRight, Clock, AlertCircle, ExternalLink, FileText, Sheet, Receipt,
@@ -148,6 +149,19 @@ const MembersList = memo(function MembersList({ logisticsMembers, assignments, s
     </div>
   );
 });
+
+function FuelExpensesChartConnected() {
+  const fuel = useFuelMetrics();
+  return (
+    <FuelExpensesChart
+      data={fuel.series}
+      totalValor={fuel.totalValor}
+      totalLitros={fuel.totalLitros}
+      totalAbastecimentos={fuel.totalAbastecimentos}
+      topVeh={fuel.topVeh as any}
+    />
+  );
+}
 
 export default function Dashboard() {
   const navigate = useNavigate();
