@@ -1,64 +1,67 @@
 ## Objetivo
 
-Gerar `Relatorio_Geral_Operacao_Logistica_Fenasoja_2026_v5.pdf` em `/mnt/documents/` reproduzindo o **design institucional** do PDF enviado (capa verde profunda com círculo decorativo, faixas douradas, cabeçalho/rodapé fixos em cada página, tipografia hierárquica, cards de KPI em grid 3×N) **populado com os dados corrigidos do V4**.
+Gerar `Relatorio_Geral_Operacao_Logistica_Fenasoja_2026_v6.pdf` em `/mnt/documents/`, mantendo **exatamente** o design institucional do V5 (capa verde profunda com círculo decorativo + faixas douradas, cabeçalho/rodapé fixos, KPIs em grid, tabelas verde/dourado, gráficos matplotlib) — porém com os ajustes pedidos.
 
-## Identidade visual (espelhar o upload)
+## Mudanças em relação ao V5
 
-- Capa: fundo verde escuro `#0F3D1F`, círculo decorativo verde `#1F6B3A` no canto superior direito, duas faixas douradas `#E2C24A` (topo e base do bloco central), título branco bold grande, subtítulo "Período · 28/04/2026 a 10/05/2026" em dourado, bloco "STATUS DA OPERAÇÃO / Operação concluída com excelência" no rodapé.
-- Páginas internas: faixa fina verde no topo com "FENASOJA 2026 · LOGÍSTICA" em branco + período/data em cinza claro à direita, conteúdo em fundo branco, títulos de seção em verde escuro com underline dourado, rodapé "Relatório Geral da Operação Logística · Fenasoja 2026  ·  Página N".
-- KPIs: cards em grid 3 colunas — label em uppercase dourado pequeno, número grande em verde escuro bold, descrição em cinza.
-- Tabelas: header verde escuro com texto dourado, linhas alternadas brancas/creme, bordas finas.
-- Gráficos (matplotlib): barras verdes com gradiente para dourado, eixos limpos, sem moldura.
+1. **KM oficial = 5.811 km** (apenas odômetro físico). Remover a soma "+503 Defender estimado". O Defender entra na frota mas com KM real registrado (ou marcado como "sem odômetro" se for o caso — sem inventar estimativa).
+2. **Sem estimativa de custo por km** (R$ 4.104,10 / R$ 0,65 × km). Remover a coluna/linha de "Custo estimado da frota" em todas as seções e KPIs.
+3. **Combustível = somente o real gasto no período** (R$ 3.337,06, incluindo abastecimento da Defender). Manter como o único indicador financeiro de combustível.
+4. **Carrinhos elétricos:** adicionar o **total de horas de uso** consolidado (somatório de `duration_min` das sessões fechadas → converter em horas) e horas médias por carrinho. Inserir em KPI + na seção própria.
+5. **Remover seção de Checklist & Tarefas** inteira (e retirar o KPI "13 / 1 / 12 tarefas"). Renumerar páginas.
+6. **Remover seção/parágrafos de "Inconsistências resolvidas / mudanças V4 → V5"** e qualquer texto comparando versões. O V6 não menciona versões anteriores nem reconciliações — é apresentado como o relatório oficial e final.
+7. **Polimento visual geral**: revisar espaçamentos, alinhamento dos cards, quebras de página, hierarquia tipográfica, evitar viúvas/órfãs em parágrafos, garantir respiro entre seções, gráficos com paleta consistente (verde → dourado), tabelas sem linhas cortadas no rodapé.
 
-## Dados a usar (do V4 / corrigidos)
+## Dados a usar (V6 oficial)
 
 | Indicador | Valor |
 |---|---|
 | Transportes concluídos | 32 |
-| KM consolidado oficial | **6.314 km** (5.811 odômetro + 503 Defender 4x4) |
-| Combustível | **R$ 3.337,06** (inclui Defender) |
-| Custo estimado da frota | R$ 4.104,10 (6.314 × 0,65) |
+| KM oficial | **5.811 km** (odômetro físico) |
+| Combustível real | **R$ 3.337,06** (inclui Defender) |
 | Veículos utilizados | 7 |
-| Carrinhos elétricos (frota) | **22** |
-| Retiradas / Devoluções carrinhos | 221 / 228 |
+| Carrinhos elétricos (frota) | 22 |
+| Retiradas / Devoluções | 221 / 228 |
+| **Horas totais carrinhos** | calcular via `cart_history` (sessões fechadas) |
+| **Horas médias por carrinho** | total ÷ 22 |
 | Hóspedes cadastrados / transportados | 23 / 14 |
 | Eventos vinculados | 19 |
-| Tarefas total / concluídas / pendentes | 13 / 1 / 12 |
-| Equipe Logística (oficiais) | **9 membros** |
+| Equipe Logística (oficiais) | 9 |
 | Autorizações de mobilidade | 195 |
 | Ações auditadas | 476 |
-| **Patinetes** | **REMOVIDO** |
 
-Auditoria de KM exibida em destaque (seção própria) explicando as 3 fontes que existiam no sistema (Dashboard 5.811 odômetro / Botolli 5.180 / Relatório antigo 4.520) e justificando o número oficial **6.314 km**.
+Valores de horas serão obtidos consultando `cart_history` (ações `retirada`/`devolucao`) via `supabase--read_query` antes de gerar o PDF, pareando retirada → próxima devolução por `cart_id` e somando os minutos.
 
-## Estrutura do PDF (10–12 páginas)
+## Estrutura do PDF (10 páginas)
 
-1. **Capa** institucional (idêntica ao upload, sem mudança visual)
-2. **Sumário Executivo** + grid 4×3 de KPIs (12 cards, sem Patinetes)
-3. **Análise de Transportes** — texto + gráfico "Transportes por dia" + "KM por dia"
-4. **Ranking de destinos** + tabela diária com totais (32 / 6.314)
-5. **KM, Odômetro e Emissões** — auditoria das 3 fontes + número oficial 6.314, custo R$ 4.104,10, CO₂ ≈ 1.452 kg
-6. **Frota Botolli** — tabela por veículo (incl. Defender 4x4) com KM e custo
-7. **Carrinhos Elétricos** — KPIs (22 / 221 / 228), gráfico de uso por dia, top responsáveis
-8. **Hóspedes & Atendimentos** — KPIs + top palestrantes transportados
-9. **Eventos Vinculados (19)** + **Equipe Logística (9 membros oficiais)** com tabela nome/cargo
-10. **Checklist & Tarefas** + **Mobilidade & Auditoria** (195 autorizações, 476 ações)
-11. **Inconsistências resolvidas** — conciliação KM, combustível, carrinhos
-12. **Conclusão Institucional** — parágrafo final + linha-resumo com os números corretos
+1. Capa institucional (idêntica ao V5)
+2. Sumário Executivo + grid de KPIs (sem tarefas, sem custo estimado, com horas de carrinhos)
+3. Análise de Transportes (texto + gráficos transportes/dia e km/dia)
+4. Ranking de destinos + tabela diária
+5. KM e Emissões — número oficial **5.811 km**, CO₂ ≈ 1.336 kg, **sem custo estimado**
+6. Frota Botolli — tabela por veículo com KM e combustível real (sem coluna de custo estimado)
+7. Carrinhos Elétricos — KPIs (22 / 221 / 228 / **horas totais** / **horas médias**), gráfico de uso por dia, top responsáveis
+8. Hóspedes & Atendimentos
+9. Eventos Vinculados (19) + Equipe Logística (9)
+10. Mobilidade & Auditoria + Conclusão Institucional
 
 ## Implementação técnica
 
-- Script Python `/tmp/genrep_v5.py` usando `reportlab` (Platypus + Canvas para capa/cabeçalhos) e `matplotlib` para 3 gráficos (transportes/dia, km/dia, uso carrinhos/dia).
-- Reaproveitar cores e estrutura de `genrep_v4.py` mas **redesenhar capa e cabeçalhos** para espelhar o upload (círculo decorativo via `canvas.circle`, faixas douradas via `canvas.rect`).
-- Fontes: Helvetica-Bold para títulos, Helvetica para corpo (built-in, sem risco de glifos faltando).
+- Duplicar `/tmp/genrep_v5.py` → `/tmp/genrep_v6.py`.
+- Antes de gerar, rodar `supabase--read_query` em `cart_history` (período 28/04 a 11/05/2026) para calcular horas totais e horas médias.
+- Ajustar dicionário de KPIs: trocar KM, remover custo estimado, remover bloco de tarefas, adicionar horas.
+- Remover funções/seções: `build_checklist_section`, `build_inconsistencias_section` (ou equivalentes do V5).
+- Atualizar tabela da frota Botolli: remover coluna "Custo estimado (R$)".
+- Polimento: revisar `Spacer`, `KeepTogether`, larguras de coluna, padding de cards, alinhamento vertical de números grandes.
+- Atualizar header/footer e metadados para "v6".
 
 ## QA obrigatório
 
-- `pdftoppm -jpeg -r 130 v5.pdf qa/page` em todas as páginas.
-- Inspeção visual de cada página: confirmar capa idêntica ao upload, ausência de "Patinetes", carrinhos = 22, KM = 6.314, combustível = R$ 3.337,06, equipe = 9.
-- Verificar overflow de tabelas, alinhamento de cards, rodapé/cabeçalho em todas as páginas.
+- `pdftoppm -jpeg -r 130 v6.pdf qa/page` em todas as páginas.
+- Conferir página por página: capa idêntica, KM = 5.811 (nunca 6.314), nenhum "custo estimado" / "0,65", combustível = R$ 3.337,06, horas de carrinhos visíveis, **sem** seção de checklist, **sem** menção a V4/V5/inconsistências, sem patinetes.
+- Validar quebras de página, alinhamento de tabelas e cards, ausência de overflow/clipping.
 - Iterar até zero defeitos visuais.
 
 ## Entregável
 
-`<lov-artifact path="Relatorio_Geral_Operacao_Logistica_Fenasoja_2026_v5.pdf" mime_type="application/pdf"></lov-artifact>`
+`<lov-artifact path="Relatorio_Geral_Operacao_Logistica_Fenasoja_2026_v6.pdf" mime_type="application/pdf"></lov-artifact>`
