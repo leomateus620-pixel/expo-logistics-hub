@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
-import bgImage from '@/assets/fenasoja-bg-2026.png';
-import bgMobile from '@/assets/fenasoja-bg-mobile.png';
+import bgImage from '@/assets/fenasoja-bg-2026.webp';
+import bgMobile from '@/assets/fenasoja-bg-mobile.webp';
 import logoHorizontal from '@/assets/logofeira26.webp';
 import { LogIn } from 'lucide-react';
-import splashImg from '@/assets/fenasoja-splash-2026.png';
+import splashImg from '@/assets/fenasoja-splash-2026.webp';
 
 export default function LoginPage() {
   // Preload splash image while user is on login screen
