@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { ShieldCheck } from 'lucide-react';
+import { ArrowRight, ShieldCheck, Sparkles } from 'lucide-react';
 import CommissionCard from '@/components/commissions/CommissionCard';
 import {
   SELECTED_COMMISSION_STORAGE_KEY,
@@ -33,32 +33,26 @@ export default function CommissionPortalPage() {
   };
 
   return (
-    <div className="min-h-screen overflow-hidden bg-[hsl(135_40%_14%)] text-white">
-      <div
-        className="fixed inset-0 hidden bg-cover bg-center bg-no-repeat opacity-80 md:block"
-        style={{ backgroundImage: `url(${bgImage})` }}
-        aria-hidden="true"
-      />
-      <div
-        className="fixed inset-0 bg-cover bg-center bg-no-repeat opacity-80 md:hidden"
-        style={{ backgroundImage: `url(${bgMobile})` }}
-        aria-hidden="true"
-      />
-      <div className="fixed inset-0 bg-[linear-gradient(180deg,rgba(9,42,22,0.86),rgba(9,42,22,0.94))]" aria-hidden="true" />
+    <div className="min-h-screen overflow-hidden bg-[hsl(135_48%_10%)] text-white">
+      <div className="fixed inset-0 hidden bg-cover bg-center bg-no-repeat opacity-75 md:block" style={{ backgroundImage: `url(${bgImage})` }} aria-hidden="true" />
+      <div className="fixed inset-0 bg-cover bg-center bg-no-repeat opacity-75 md:hidden" style={{ backgroundImage: `url(${bgMobile})` }} aria-hidden="true" />
+      <div className="fixed inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(212,164,50,0.20),transparent_28%),linear-gradient(135deg,rgba(4,31,17,0.92),rgba(7,44,24,0.82)_42%,rgba(3,21,12,0.96))]" aria-hidden="true" />
+      <div className="fixed inset-0 command-grid-bg opacity-60" aria-hidden="true" />
 
       <main className="relative z-10 mx-auto flex min-h-screen w-full max-w-7xl flex-col px-4 py-5 sm:px-6 lg:px-8">
-        <header className="flex flex-col gap-5 pb-6 pt-2 md:flex-row md:items-end md:justify-between md:pb-8">
-          <div className="flex max-w-3xl flex-col gap-5">
-            <img src={logo} alt="Fenasoja 2026" className="h-auto w-36 object-contain drop-shadow-xl sm:w-44" />
+        <header className="grid gap-6 pb-7 pt-2 lg:grid-cols-[1fr_360px] lg:items-end lg:pb-10">
+          <div className="animate-soft-rise flex max-w-4xl flex-col gap-6">
+            <img src={logo} alt="Fenasoja 2026" className="h-auto w-36 object-contain drop-shadow-2xl sm:w-48" />
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.22em] text-gold">
-                Sistema Integrado de Gestao Operacional
-              </p>
-              <h1 className="mt-3 max-w-3xl text-3xl font-black leading-tight tracking-tight text-white sm:text-4xl lg:text-5xl">
-                Fenasoja
+              <div className="inline-flex items-center gap-2 rounded-full border border-gold/25 bg-white/10 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.22em] text-gold backdrop-blur-xl">
+                <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
+                Sistema Integrado de Gestão Operacional
+              </div>
+              <h1 className="mt-5 max-w-4xl text-balance text-4xl font-black leading-[0.98] tracking-[-0.04em] text-white drop-shadow-2xl sm:text-5xl lg:text-7xl">
+                Portal das Comissões Fenasoja
               </h1>
-              <p className="mt-4 max-w-2xl text-sm leading-6 text-white/72 sm:text-base">
-                Selecione a comissao para acessar o ambiente operacional correspondente.
+              <p className="mt-5 max-w-2xl text-base leading-7 text-white/75 sm:text-lg">
+                Selecione a comissão para acessar um ambiente modular, seguro e alinhado à operação da feira.
               </p>
             </div>
           </div>
@@ -66,27 +60,38 @@ export default function CommissionPortalPage() {
           <button
             type="button"
             onClick={accessAdmin}
-            className="inline-flex h-12 items-center justify-center gap-2 rounded-xl border border-gold/30 bg-white/10 px-4 text-sm font-semibold text-gold shadow-lg backdrop-blur-xl transition hover:bg-gold/15 focus-ring md:min-w-44"
+            className="glass-panel interactive-lift group flex min-h-36 flex-col justify-between rounded-3xl p-5 text-left focus-ring lg:min-h-48"
           >
-            <ShieldCheck className="h-4 w-4" aria-hidden="true" />
-            Administrador
+            <div className="flex items-start justify-between gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gold/20 text-gold ring-1 ring-gold/30">
+                <ShieldCheck className="h-6 w-6" aria-hidden="true" />
+              </div>
+              <span className="rounded-full border border-gold/25 bg-gold/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-gold">
+                Acesso superior
+              </span>
+            </div>
+            <div>
+              <h2 className="text-2xl font-black tracking-tight text-white">Administrador</h2>
+              <p className="mt-2 text-sm leading-6 text-white/70">Central institucional para visão consolidada, comissões e governança do sistema.</p>
+              <span className="mt-4 inline-flex items-center text-sm font-bold text-gold">
+                Entrar como admin
+                <ArrowRight className="ml-2 h-4 w-4 transition group-hover:translate-x-1" aria-hidden="true" />
+              </span>
+            </div>
           </button>
         </header>
 
-        <section className="grid flex-1 grid-cols-1 gap-4 pb-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          {modules.map((module) => (
-            <CommissionCard
-              key={module.slug}
-              module={module}
-              onAccess={() => accessModule(module.slug)}
-            />
+        <section aria-label="Comissões disponíveis" className="grid flex-1 grid-cols-1 gap-4 pb-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {modules.map((module, index) => (
+            <CommissionCard key={module.slug} module={module} index={index} onAccess={() => accessModule(module.slug)} />
           ))}
           <CommissionCard
             module={{
               ...adminPortalCard,
-              accentClass: 'from-gold/25 via-emerald-500/10 to-transparent',
+              accentClass: 'from-gold/30 via-emerald-500/10 to-transparent',
               sensitive: true,
             }}
+            index={modules.length}
             actionLabel="Entrar como admin"
             onAccess={accessAdmin}
           />
