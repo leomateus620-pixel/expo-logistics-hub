@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
-import { LogIn } from 'lucide-react';
+import { ArrowLeft, LockKeyhole, LogIn, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import bgImage from '@/assets/fenasoja-bg-2026.webp';
@@ -46,8 +46,8 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
   const contextName = isAdminLogin
     ? 'Administrador'
     : selectedModule
-      ? `Comissao de ${selectedModule.name}`
-      : 'Comissao de Logistica';
+      ? `Comissão de ${selectedModule.name}`
+      : 'Comissão de Logística';
 
   const resolveTarget = () => {
     if (returnTo && returnTo !== '/' && !returnTo.startsWith('/login')) return returnTo;
@@ -93,7 +93,7 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
     setLoading(true);
     const { error } = await signIn(email.trim(), password);
     if (error) {
-      setError('Email ou senha incorretos');
+      setError('E-mail ou senha incorretos. Confira suas credenciais e tente novamente.');
     } else {
       navigate(resolveTarget(), { replace: true });
     }
@@ -101,115 +101,99 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
   };
 
   return (
-    <div className="fixed inset-0" style={{ backgroundColor: '#1a2e1a' }}>
+    <div className="fixed inset-0 bg-[hsl(135_48%_10%)]">
       <div
         className="absolute inset-0 hidden bg-cover bg-center bg-no-repeat transition-opacity duration-500 md:block"
-        style={{
-          backgroundImage: `url(${bgImage})`,
-          opacity: bgReady ? 1 : 0,
-        }}
+        style={{ backgroundImage: `url(${bgImage})`, opacity: bgReady ? 0.78 : 0 }}
         aria-hidden="true"
       />
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-500 md:hidden"
-        style={{
-          backgroundImage: `url(${bgMobile})`,
-          opacity: bgReady ? 1 : 0,
-        }}
+        style={{ backgroundImage: `url(${bgMobile})`, opacity: bgReady ? 0.78 : 0 }}
         aria-hidden="true"
       />
-      <div className="absolute inset-0 bg-black/40" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(212,164,50,0.20),transparent_30%),linear-gradient(135deg,rgba(4,31,17,0.92),rgba(7,44,24,0.84)_48%,rgba(3,21,12,0.96))]" aria-hidden="true" />
+      <div className="absolute inset-0 command-grid-bg opacity-50" aria-hidden="true" />
 
-      <div className="relative z-10 flex min-h-[100dvh] items-center justify-center overflow-y-auto p-4">
-        <div
-          className="w-full max-w-sm space-y-6 rounded-2xl p-8 will-change-transform"
-          style={{
-            background: 'rgba(255, 255, 255, 0.08)',
-            backdropFilter: 'blur(28px) saturate(1.5)',
-            WebkitBackdropFilter: 'blur(28px) saturate(1.5)',
-            border: '1px solid rgba(255, 255, 255, 0.15)',
-            boxShadow: '0 8px 40px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.12)',
-          }}
-        >
-          <div className="flex flex-col items-center gap-4">
-            <img
-              src={logoHorizontal}
-              alt="Fenasoja 2026"
-              className="h-auto w-48 object-contain drop-shadow-lg"
-            />
-            <div className="space-y-1 text-center">
-              <h1
-                className="text-2xl font-bold tracking-tight"
-                style={{
-                  color: 'rgba(255, 255, 255, 0.95)',
-                  textShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
-                }}
-              >
-                Acesso
-              </h1>
-              <p
-                className="text-sm font-medium"
-                style={{
-                  color: 'rgba(255, 255, 255, 0.65)',
-                  textShadow: '0 1px 4px rgba(0, 0, 0, 0.2)',
-                }}
-              >
-                {contextName}
-              </p>
+      <div className="relative z-10 flex min-h-[100dvh] items-center justify-center overflow-y-auto p-4 sm:p-6">
+        <div className="grid w-full max-w-5xl gap-5 lg:grid-cols-[1fr_430px] lg:items-center">
+          <section className="hidden animate-soft-rise text-white lg:block">
+            <img src={logoHorizontal} alt="Fenasoja 2026" className="h-auto w-52 object-contain drop-shadow-2xl" />
+            <div className="mt-8 inline-flex items-center gap-2 rounded-full border border-gold/25 bg-white/10 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.22em] text-gold backdrop-blur-xl">
+              <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
+              Acesso restrito
             </div>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="h-12 w-full rounded-xl px-4 text-sm text-white placeholder:text-white/50 outline-none transition-all focus:ring-2 focus:ring-white/30"
-              style={{
-                background: 'rgba(255, 255, 255, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.15)',
-              }}
-            />
-            <input
-              type="password"
-              placeholder="Senha"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              className="h-12 w-full rounded-xl px-4 text-sm text-white placeholder:text-white/50 outline-none transition-all focus:ring-2 focus:ring-white/30"
-              style={{
-                background: 'rgba(255, 255, 255, 0.1)',
-                border: '1px solid rgba(255, 255, 255, 0.15)',
-              }}
-            />
-            {error && (
-              <p className="text-center text-sm font-medium text-red-300 drop-shadow-sm">
-                {error}
-              </p>
-            )}
-            <Button
-              type="submit"
-              className="h-12 w-full rounded-xl text-sm font-semibold transition-transform active:scale-[0.97]"
-              disabled={loading}
-            >
-              <LogIn className="mr-2 h-4 w-4" />
-              {loading ? 'Entrando...' : 'Entrar'}
-            </Button>
-          </form>
-
-          <div className="space-y-3 text-center">
-            <p className="text-xs" style={{ color: 'rgba(255, 255, 255, 0.45)' }}>
-              Acesso restrito. Solicite suas credenciais ao administrador.
+            <h1 className="mt-5 max-w-xl text-5xl font-black leading-none tracking-[-0.04em] drop-shadow-2xl">
+              Ambiente seguro das comissões
+            </h1>
+            <p className="mt-5 max-w-lg text-base leading-7 text-white/70">
+              Entre com suas credenciais para continuar no módulo selecionado, preservando permissões e contexto operacional.
             </p>
-            <Link
-              to="/portal"
-              className="block rounded-lg text-xs font-semibold text-gold/85 transition hover:text-gold focus-ring"
-            >
-              Trocar comissao
-            </Link>
-          </div>
+          </section>
+
+          <section className="glass-panel animate-soft-rise w-full rounded-[2rem] p-5 text-white shadow-2xl sm:p-8" aria-labelledby="login-title">
+            <div className="flex flex-col items-center gap-5 text-center">
+              <img src={logoHorizontal} alt="Fenasoja 2026" className="h-auto w-44 object-contain drop-shadow-lg sm:w-52" />
+              <div className="space-y-3">
+                <span className="inline-flex items-center gap-2 rounded-full border border-gold/25 bg-gold/10 px-3 py-1 text-xs font-bold text-gold">
+                  {isAdminLogin ? <LockKeyhole className="h-3.5 w-3.5" aria-hidden="true" /> : null}
+                  {contextName}
+                </span>
+                <div>
+                  <h1 id="login-title" className="text-3xl font-black tracking-tight text-white">
+                    Acessar sistema
+                  </h1>
+                  <p className="mt-2 text-sm leading-6 text-white/60">
+                    Informe seu e-mail e senha para continuar.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+              <label className="block text-left">
+                <span className="mb-2 block text-xs font-bold uppercase tracking-[0.16em] text-white/70">E-mail</span>
+                <input
+                  type="email"
+                  placeholder="seu.email@fenasoja.com.br"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  autoComplete="email"
+                  className="h-12 w-full rounded-2xl border border-white/15 bg-white/10 px-4 text-sm text-white normal-case placeholder:text-white/40 outline-none transition focus:border-gold/40 focus:ring-2 focus:ring-gold/25"
+                />
+              </label>
+              <label className="block text-left">
+                <span className="mb-2 block text-xs font-bold uppercase tracking-[0.16em] text-white/70">Senha</span>
+                <input
+                  type="password"
+                  placeholder="Digite sua senha"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  autoComplete="current-password"
+                  className="h-12 w-full rounded-2xl border border-white/15 bg-white/10 px-4 text-sm text-white normal-case placeholder:text-white/40 outline-none transition focus:border-gold/40 focus:ring-2 focus:ring-gold/25"
+                />
+              </label>
+              {error && (
+                <div className="rounded-2xl border border-red-300/25 bg-red-500/15 px-4 py-3 text-sm font-semibold text-red-100" role="alert">
+                  {error}
+                </div>
+              )}
+              <Button type="submit" className="h-12 w-full rounded-2xl text-sm font-bold shadow-lg shadow-black/20 transition-transform active:scale-[0.98]" disabled={loading}>
+                <LogIn className="mr-2 h-4 w-4" aria-hidden="true" />
+                {loading ? 'Entrando...' : 'Entrar'}
+              </Button>
+            </form>
+
+            <div className="mt-6 space-y-3 text-center">
+              <p className="text-xs leading-5 text-white/50">Acesso restrito. Solicite suas credenciais ao administrador.</p>
+              <Link to="/portal" className="inline-flex items-center rounded-xl px-3 py-2 text-xs font-bold text-gold transition hover:bg-gold/10 hover:text-gold focus-ring">
+                <ArrowLeft className="mr-2 h-3.5 w-3.5" aria-hidden="true" />
+                Trocar comissão
+              </Link>
+            </div>
+          </section>
         </div>
       </div>
     </div>

@@ -18,7 +18,7 @@ export default function Layout({ children }: { children: ReactNode }) {
   const sidebarWidth = isMobile ? 0 : collapsed ? 64 : 256;
 
   return (
-    <div className="min-h-screen bg-background grain-texture">
+    <div className="min-h-screen bg-background grain-texture command-grid-bg">
       <a href="#main-content" className="skip-to-content">
         Pular para conteúdo
       </a>

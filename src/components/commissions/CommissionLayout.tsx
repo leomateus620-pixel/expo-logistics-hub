@@ -13,9 +13,9 @@ export default function CommissionLayout({ module, children }: CommissionLayoutP
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-background grain-texture">
+    <div className="min-h-screen bg-background grain-texture command-grid-bg">
       <a href="#main-content" className="skip-to-content">
-        Pular para conteudo
+        Pular para conteúdo
       </a>
       <OfflineBanner />
       <CommissionSidebar
@@ -24,7 +24,7 @@ export default function CommissionLayout({ module, children }: CommissionLayoutP
         onMobileOpen={() => setMobileOpen(true)}
         onMobileClose={() => setMobileOpen(false)}
       />
-      <main id="main-content" className="min-h-screen px-4 pb-8 pt-16 md:ml-[286px] md:p-6">
+      <main id="main-content" className="min-h-screen px-4 pb-8 pt-20 md:ml-[306px] md:p-8">
         <PageTransition>{children}</PageTransition>
       </main>
     </div>
