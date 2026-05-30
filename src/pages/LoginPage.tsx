@@ -1,30 +1,72 @@
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
+import { LogIn } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import bgImage from '@/assets/fenasoja-bg-2026.webp';
 import bgMobile from '@/assets/fenasoja-bg-mobile.webp';
 import logoHorizontal from '@/assets/logofeira26.webp';
-import { LogIn } from 'lucide-react';
 import splashImg from '@/assets/fenasoja-splash-2026.webp';
+import {
+  SELECTED_COMMISSION_STORAGE_KEY,
+  getCommissionModule,
+  getModuleRoute,
+} from '@/modules/commissions/commissionRegistry';
 
-export default function LoginPage() {
-  // Preload splash image while user is on login screen
-  useEffect(() => {
-    const link = document.createElement('link');
-    link.rel = 'preload';
-    link.as = 'image';
-    link.href = splashImg;
-    document.head.appendChild(link);
-    return () => { document.head.removeChild(link); };
-  }, []);
-  const { signIn } = useAuth();
+interface LoginPageProps {
+  returnTo?: string;
+}
+
+function getStoredModuleSlug() {
+  try {
+    return localStorage.getItem(SELECTED_COMMISSION_STORAGE_KEY);
+  } catch {
+    return null;
+  }
+}
+
+function getModuleSlugFromPath(path?: string) {
+  return path?.match(/^\/comissoes\/([^/?#]+)/)?.[1] ?? null;
+}
+
+export default function LoginPage({ returnTo }: LoginPageProps) {
+  const { signIn, user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { moduleSlug } = useParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [bgReady, setBgReady] = useState(false);
 
-  // Progressive image loading
+  const isAdminLogin = location.pathname === '/login/admin' || moduleSlug === 'admin' || returnTo?.startsWith('/admin');
+  const selectedSlug = isAdminLogin ? 'admin' : moduleSlug || getModuleSlugFromPath(returnTo) || getStoredModuleSlug() || 'logistica';
+  const selectedModule = getCommissionModule(selectedSlug);
+  const contextName = isAdminLogin
+    ? 'Administrador'
+    : selectedModule
+      ? `Comissao de ${selectedModule.name}`
+      : 'Comissao de Logistica';
+
+  const resolveTarget = () => {
+    if (returnTo && returnTo !== '/' && !returnTo.startsWith('/login')) return returnTo;
+    if (isAdminLogin) return '/admin';
+    if (selectedModule) return getModuleRoute(selectedModule);
+    return '/comissoes/logistica/dashboard';
+  };
+
+  useEffect(() => {
+    const link = document.createElement('link');
+    link.rel = 'preload';
+    link.as = 'image';
+    link.href = splashImg;
+    document.head.appendChild(link);
+    return () => {
+      document.head.removeChild(link);
+    };
+  }, []);
+
   useEffect(() => {
     const isMobile = window.innerWidth < 768;
     const src = isMobile ? bgMobile : bgImage;
@@ -37,28 +79,37 @@ export default function LoginPage() {
     }
   }, []);
 
+  useEffect(() => {
+    if (!authLoading && user && location.pathname.startsWith('/login')) {
+      navigate(resolveTarget(), { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [authLoading, user, location.pathname]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (loading) return;
     setError('');
     setLoading(true);
     const { error } = await signIn(email.trim(), password);
-    if (error) setError('Email ou senha incorretos');
+    if (error) {
+      setError('Email ou senha incorretos');
+    } else {
+      navigate(resolveTarget(), { replace: true });
+    }
     setLoading(false);
   };
 
   return (
     <div className="fixed inset-0" style={{ backgroundColor: '#1a2e1a' }}>
-      {/* Background layer — CSS background, fixed, stable */}
       <div
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-500"
+        className="absolute inset-0 hidden bg-cover bg-center bg-no-repeat transition-opacity duration-500 md:block"
         style={{
           backgroundImage: `url(${bgImage})`,
           opacity: bgReady ? 1 : 0,
         }}
         aria-hidden="true"
       />
-      {/* Mobile background variant */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat transition-opacity duration-500 md:hidden"
         style={{
@@ -67,17 +118,11 @@ export default function LoginPage() {
         }}
         aria-hidden="true"
       />
-      {/* Hide desktop bg on mobile */}
-      <style>{`@media (max-width: 767px) { .login-bg-desktop { display: none; } }`}</style>
-
-      {/* Dark overlay */}
       <div className="absolute inset-0 bg-black/40" />
 
-      {/* Content layer — scrollable, stable on keyboard open */}
-      <div className="relative z-10 min-h-[100dvh] flex items-center justify-center p-4 overflow-y-auto">
-        {/* Liquid Glass Card */}
+      <div className="relative z-10 flex min-h-[100dvh] items-center justify-center overflow-y-auto p-4">
         <div
-          className="w-full max-w-sm rounded-2xl p-8 space-y-6 will-change-transform"
+          className="w-full max-w-sm space-y-6 rounded-2xl p-8 will-change-transform"
           style={{
             background: 'rgba(255, 255, 255, 0.08)',
             backdropFilter: 'blur(28px) saturate(1.5)',
@@ -86,14 +131,13 @@ export default function LoginPage() {
             boxShadow: '0 8px 40px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.12)',
           }}
         >
-          {/* Logo + Branding */}
           <div className="flex flex-col items-center gap-4">
             <img
               src={logoHorizontal}
               alt="Fenasoja 2026"
-              className="w-48 h-auto object-contain drop-shadow-lg"
+              className="h-auto w-48 object-contain drop-shadow-lg"
             />
-            <div className="text-center space-y-1">
+            <div className="space-y-1 text-center">
               <h1
                 className="text-2xl font-bold tracking-tight"
                 style={{
@@ -101,7 +145,7 @@ export default function LoginPage() {
                   textShadow: '0 2px 8px rgba(0, 0, 0, 0.3)',
                 }}
               >
-                Fenasoja Logística
+                Acesso
               </h1>
               <p
                 className="text-sm font-medium"
@@ -110,12 +154,11 @@ export default function LoginPage() {
                   textShadow: '0 1px 4px rgba(0, 0, 0, 0.2)',
                 }}
               >
-                Comissão de Logística
+                {contextName}
               </p>
             </div>
           </div>
 
-          {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
             <input
               type="email"
@@ -123,7 +166,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full h-12 rounded-xl px-4 text-sm text-white placeholder:text-white/50 outline-none transition-all focus:ring-2 focus:ring-white/30"
+              className="h-12 w-full rounded-xl px-4 text-sm text-white placeholder:text-white/50 outline-none transition-all focus:ring-2 focus:ring-white/30"
               style={{
                 background: 'rgba(255, 255, 255, 0.1)',
                 border: '1px solid rgba(255, 255, 255, 0.15)',
@@ -135,33 +178,38 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full h-12 rounded-xl px-4 text-sm text-white placeholder:text-white/50 outline-none transition-all focus:ring-2 focus:ring-white/30"
+              className="h-12 w-full rounded-xl px-4 text-sm text-white placeholder:text-white/50 outline-none transition-all focus:ring-2 focus:ring-white/30"
               style={{
                 background: 'rgba(255, 255, 255, 0.1)',
                 border: '1px solid rgba(255, 255, 255, 0.15)',
               }}
             />
             {error && (
-              <p className="text-sm text-center font-medium text-red-300 drop-shadow-sm">
+              <p className="text-center text-sm font-medium text-red-300 drop-shadow-sm">
                 {error}
               </p>
             )}
             <Button
               type="submit"
-              className="w-full h-12 rounded-xl text-sm font-semibold active:scale-[0.97] transition-transform"
+              className="h-12 w-full rounded-xl text-sm font-semibold transition-transform active:scale-[0.97]"
               disabled={loading}
             >
-              <LogIn className="w-4 h-4 mr-2" />
+              <LogIn className="mr-2 h-4 w-4" />
               {loading ? 'Entrando...' : 'Entrar'}
             </Button>
           </form>
 
-          <p
-            className="text-xs text-center"
-            style={{ color: 'rgba(255, 255, 255, 0.45)' }}
-          >
-            Acesso restrito. Solicite suas credenciais ao administrador.
-          </p>
+          <div className="space-y-3 text-center">
+            <p className="text-xs" style={{ color: 'rgba(255, 255, 255, 0.45)' }}>
+              Acesso restrito. Solicite suas credenciais ao administrador.
+            </p>
+            <Link
+              to="/portal"
+              className="block rounded-lg text-xs font-semibold text-gold/85 transition hover:text-gold focus-ring"
+            >
+              Trocar comissao
+            </Link>
+          </div>
         </div>
       </div>
     </div>

@@ -1,9 +1,11 @@
 import { ReactNode } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import LoginPage from '@/pages/LoginPage';
 
 export default function AuthGuard({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
+  const location = useLocation();
 
   if (loading) {
     return (
@@ -13,7 +15,7 @@ export default function AuthGuard({ children }: { children: ReactNode }) {
     );
   }
 
-  if (!user) return <LoginPage />;
+  if (!user) return <LoginPage returnTo={`${location.pathname}${location.search}`} />;
 
   return <>{children}</>;
 }
