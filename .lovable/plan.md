@@ -1,73 +1,78 @@
-## Atualização V9 — Seção de Hóspedes enriquecida (base V8)
+## Diagnóstico das últimas 2 merges
 
-Mantém **100% do design e demais conteúdos do V8**. Altera somente a Seção 5 — Hóspedes & Atendimentos — para tornar a informação rica, completa e auditável.
+**PR #3 — `Enriquece escopo operacional das comissões`** (2b3f1a9)
+Mexeu em conteúdo/registry/menus. Sem impacto visual no card.
 
-### Dados oficiais do banco (validados em `guests` + `transport_guests`)
+**PR #4 — `Melhora visual 3D nos cards do Portal das Comissões`** (6dae369)
+Onde está o problema. Tudo que foi adicionado é **CSS estático**:
+- `.commission-card-3d` aplica um `rotateX(5deg) rotateY(-4deg)` fixo só no `:hover` — o card "pula" para uma pose única e volta. Não há resposta ao cursor, não há paralaxe real, não há sensação de massa.
+- O "brilho" é um `::before` com gradiente fixo — não acompanha o mouse.
+- O `commission-card-orbit` é só duas linhas estáticas no topo/direita.
+- O `commission-integration-link` (fio dourado entre cards) é decoração 2D — não é 3D.
+- `translateZ(22px)` em todos os filhos é uma única camada — sem hierarquia de profundidade entre ícone, título, CTA.
 
-- **23 hóspedes cadastrados** no período da feira
-- **14 hóspedes transportados** (com ao menos 1 viagem vinculada)
-- **9 hóspedes sem transporte** (estadia própria / autossuficientes)
-- **32 vínculos hóspede ↔ transporte** — bate exatamente com os 32 transportes concluídos
+Resultado: parece "card com hover bonitinho", não premium 3D com física. Genérico — qualquer template Tailwind faz isso.
 
-### Distribuição por hotel (todos os 23)
+## Referência interna a seguir
 
-| Hotel | Hóspedes |
-|---|---|
-| Imigrantes | 9 |
-| Benos Hotel | 7 |
-| Centro Santo Ângelo | 1 |
-| Prefeito Mantei | 1 |
-| Villas Hotel | 1 |
-| Imigrantes → Guia Lopes | 1 |
-| Em casa | 1 |
-| Sem hotel informado | 2 |
+`src/components/dashboard/Metric3DCard.tsx` é exatamente o efeito premium que o usuário quer replicar. Ele usa:
 
-### Hóspedes transportados (14) — ordenados por viagens
+1. Wrapper com `perspective: 1400px`.
+2. `onMouseMove` calcula posição relativa (`px`, `py`) e aplica `rotateX/rotateY` proporcional ao cursor (não estático).
+3. Radial-gradient de glow que segue o cursor: `radial-gradient(60% 60% at ${mx}% ${my}%, ...)`.
+4. Camadas com `translateZ` diferentes (header 15px, ícone 20px, conteúdo 8px) → paralaxe real.
+5. `box-shadow` muda de intensidade entre repouso e hover.
+6. Easing `cubic-bezier(0.22,1,0.36,1)` curto (280ms) — sensação de mola.
+7. `motion-reduce` desliga tudo.
+8. Pose de repouso leve (`rotateX(2deg) rotateY(-1deg)`) — o card já "vive" parado.
 
-| Convidado | Hotel | Transportes |
-|---|---|---|
-| Walter Lehenbauer + 3 acompanhantes | — | **9** |
-| Luis Fernando Muñoz | Imigrantes | 4 |
-| Verônica Muccini Longhi | Imigrantes / Guia Lopes | 4 |
-| Alexandre Gadret e esposa | Prefeito Mantei | 2 |
-| Erasmo Battistella | — | 2 |
-| Luiz Carlos Molion | Benos Hotel | 2 |
-| Paulo Guedes | Imigrantes | 2 |
-| Daniel Carnio Costa | Benos Hotel | 1 |
-| Daniel Popov | Benos Hotel | 1 |
-| Família Walter | Imigrantes | 1 |
-| Paulo Hermann | Imigrantes | 1 |
-| Renato Buranello | Benos Hotel | 1 |
-| Rosane de Oliveira | Centro Santo Ângelo | 1 |
-| Tiago Maique | Benos Hotel | 1 |
-| **TOTAL** | — | **32** |
+## O que vou construir
 
-### Hóspedes cadastrados sem transporte (9)
+Refatorar `src/components/commissions/CommissionCard.tsx` para um card interativo 3D com física, mantendo a identidade verde+dourado e a estrutura visual atual (badge de status, ícone, título, descrição, badge "sensível", CTA, conector dourado entre cards).
 
-Cristian de Leon Fedrizzi Petalas e Cláudio Zigiotto (Band), Daniel Fontana, Jerônimo Goergen, Júnior Gilliard e Thiago Facco, Mariângela da Cunha, Ricardo Emílio Zimmermann, Rodrigo Salton Schneider, Rodrigo Simch, Valmor (Presidente do PT).
+### Comportamento
 
-### Mudanças no PDF (somente Seção 5)
+- Wrapper `[perspective:1400px]`.
+- Estado `tilt` com `{ x, y, mx, my, hover }` via `useState` + `onMouseMove` (mesmo padrão do Metric3DCard, faixa de tilt um pouco maior — ~12° — porque o card é maior).
+- Em repouso: micro-pose `rotateX(2deg) rotateY(-2deg)` + flutuação sutil opcional via `@keyframes` (1 vez a cada 6s, leve).
+- Em hover: tilt segue cursor; glow dourado/verde radial segue cursor; sombra "decola" (eleva no eixo Z) e fica mais profunda.
+- Em `mousedown`/`active`: leve compressão (`scale(0.985) translateZ(-4px)`) para feedback físico de toque.
+- Em `mouseleave`: transição de retorno mais lenta (~520ms cubic-bezier suave) para parecer mola assentando.
 
-1. **KPI grid** — manter (23 / 14 / 9), adicionar 4º card "VÍNCULOS DE VIAGEM = 32" para amarrar com a Seção 1.
-2. **Texto introdutório** — parágrafo curto explicando que a feira recebeu 23 convidados oficiais distribuídos em 8 hospedagens, e que as viagens cobriram 14 deles (9 deslocaram-se por meios próprios).
-3. **Tabela "Distribuição por hospedagem"** — 8 linhas + total (23).
-4. **Tabela "Hóspedes transportados — viagens vinculadas"** — substitui a tabela atual (que estava incompleta com 7 linhas e tudo "1"). Agora 14 linhas + total = 32. Colunas: Convidado · Hotel · Viagens.
-5. **Bloco "Cadastrados sem transporte (9)"** — parágrafo em fonte SMALL listando os 9 nomes.
-6. Layout: a Seção 5 passa a ocupar **2 páginas** (separadas por `PageBreak`) para evitar overflow. Tabelas com `KeepTogether` quando couber.
+### Camadas de paralaxe (translateZ)
 
-### Implementação
+- Sombra base do gradiente: `0px`
+- Halo radial seguindo cursor: `12px`
+- Badge de status + conteúdo de texto: `26px`
+- Título: `34px`
+- Ícone do módulo: `48px` (mais pra frente, com sombra própria projetada)
+- Botão CTA: `30px` com brilho que varre no hover
 
-- Duplicar `/tmp/genrep_v8.py` → `/tmp/genrep_v9.py`.
-- Atualizar `OUT` para `Relatorio_Geral_Operacao_Logistica_Fenasoja_2026_v9.pdf` e `CHART_DIR` para `/tmp/charts_v9`.
-- Substituir o bloco "p8: Hóspedes" (linhas ~367–387) pelo novo conteúdo descrito acima. Sem tocar em capa, KPIs gerais, frota, KM, carrinhos, eventos, equipe, mobilidade, auditoria ou conclusão.
+### Visual
 
-### QA obrigatório
+- Mantém superfície liquid-glass verde existente (gradiente do registry no header), borda fina dourada que ganha intensidade com o cursor.
+- Reflexo especular fino que orbita no sentido do cursor (linear-gradient diagonal cuja posição depende de `mx/my`).
+- Sombra de chão sob o card aumenta quando o card "decola" (translateY/translateZ negativos da sombra).
+- Conector dourado (`commission-integration-link`) preservado mas com pulso sincronizado.
 
-- Rodar o script e validar exit code 0.
-- `pdftoppm -r 90` em todas as páginas.
-- Inspecionar visualmente as páginas da nova Seção 5: sem texto cortado, sem overflow de tabela, totais batendo (23 hospedagem, 32 viagens), 14 nomes presentes, 9 não-transportados listados.
-- Conferir que páginas anteriores e posteriores continuam idênticas ao V8.
+### Acessibilidade / performance
 
-### Entregável
+- Tudo dentro de `prefers-reduced-motion: reduce` desliga rotação e fica só com hover sutil de elevação.
+- Em touch (`@media (hover: none)`) desliga `onMouseMove` (não há cursor), mantém a pose de repouso + tap feedback.
+- `will-change: transform` apenas durante hover (evita custo em idle).
 
-`Relatorio_Geral_Operacao_Logistica_Fenasoja_2026_v9.pdf`
+### Limpeza do CSS
+
+Em `src/index.css`, remover o tilt estático de `.commission-card-3d:hover` (linhas 464–478) e a regra `translateZ(22px)` chapada em todos os filhos. O tilt passa a ser controlado por inline style no componente. Mantém: superfície base, borda, sombra de repouso, `.commission-icon-3d` (servirá como base do ícone com sombra), `.commission-action-button`, `.commission-card-orbit` (reaproveitado como linha especular dinâmica), `.commission-integration-link` (intacto), dark mode, `prefers-reduced-motion`.
+
+## Arquivos afetados
+
+- `src/components/commissions/CommissionCard.tsx` — reescrita do componente (tilt via state, mousemove, camadas translateZ, glow dinâmico).
+- `src/index.css` — remover o hover-tilt estático e o translateZ-em-todos-os-filhos; ajustar transições de retorno; adicionar keyframe sutil de "respiração" para o card em repouso.
+- Nenhuma mudança em `CommissionPortalPage.tsx`, registry ou rotas.
+
+## Fora de escopo
+
+- Sem mudanças no admin card, no header do portal, no login ou nos placeholders internos das comissões.
+- Sem novas libs (sem framer-motion / three) — JS puro + CSS, mesmo padrão do Metric3DCard.
+- Sem alterar a paleta verde/dourado ou a tipografia.
