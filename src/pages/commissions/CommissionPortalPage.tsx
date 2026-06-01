@@ -1,9 +1,9 @@
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, ShieldCheck, Sparkles } from 'lucide-react';
 import CommissionCard from '@/components/commissions/CommissionCard';
 import {
   SELECTED_COMMISSION_STORAGE_KEY,
-  adminPortalCard,
   getPublicCommissionModules,
 } from '@/modules/commissions/commissionRegistry';
 import bgImage from '@/assets/fenasoja-bg-2026.webp';
@@ -21,6 +21,8 @@ function saveSelectedModule(slug: string) {
 export default function CommissionPortalPage() {
   const navigate = useNavigate();
   const modules = getPublicCommissionModules();
+  const [expandedSlug, setExpandedSlug] = useState<string | null>(null);
+  const gridRef = useRef<HTMLElement>(null);
 
   const accessModule = (slug: string) => {
     saveSelectedModule(slug);
@@ -31,6 +33,27 @@ export default function CommissionPortalPage() {
     saveSelectedModule('admin');
     navigate('/login/admin');
   };
+
+  const toggleSlug = (slug: string) => {
+    setExpandedSlug((prev) => (prev === slug ? null : slug));
+  };
+
+  useEffect(() => {
+    if (!expandedSlug) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setExpandedSlug(null);
+    };
+    const onClick = (e: MouseEvent) => {
+      if (!gridRef.current) return;
+      if (!gridRef.current.contains(e.target as Node)) setExpandedSlug(null);
+    };
+    window.addEventListener('keydown', onKey);
+    window.addEventListener('mousedown', onClick);
+    return () => {
+      window.removeEventListener('keydown', onKey);
+      window.removeEventListener('mousedown', onClick);
+    };
+  }, [expandedSlug]);
 
   return (
     <div className="min-h-screen overflow-hidden bg-[hsl(135_48%_10%)] text-white">
@@ -52,7 +75,7 @@ export default function CommissionPortalPage() {
                 Portal das Comissões Fenasoja
               </h1>
               <p className="mt-5 max-w-2xl text-base leading-7 text-white/75 sm:text-lg">
-                Selecione a comissão para acessar um ambiente modular, seguro e alinhado à operação da feira.
+                Toque em uma comissão para expandir e acessar seu ambiente modular, seguro e alinhado à operação da feira.
               </p>
             </div>
           </div>
@@ -81,20 +104,21 @@ export default function CommissionPortalPage() {
           </button>
         </header>
 
-        <section aria-label="Comissões disponíveis" className="commission-grid grid flex-1 grid-cols-1 gap-x-5 gap-y-7 pb-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        <section
+          ref={gridRef}
+          aria-label="Comissões disponíveis"
+          className="grid flex-1 grid-cols-1 items-start gap-3 pb-8 md:grid-cols-2 xl:grid-cols-3"
+        >
           {modules.map((module, index) => (
-            <CommissionCard key={module.slug} module={module} index={index} onAccess={() => accessModule(module.slug)} />
+            <CommissionCard
+              key={module.slug}
+              module={module}
+              index={index}
+              expanded={expandedSlug === module.slug}
+              onToggle={() => toggleSlug(module.slug)}
+              onAccess={() => accessModule(module.slug)}
+            />
           ))}
-          <CommissionCard
-            module={{
-              ...adminPortalCard,
-              accentClass: 'from-gold/30 via-emerald-500/10 to-transparent',
-              sensitive: true,
-            }}
-            index={modules.length}
-            actionLabel="Entrar como admin"
-            onAccess={accessAdmin}
-          />
         </section>
       </main>
     </div>

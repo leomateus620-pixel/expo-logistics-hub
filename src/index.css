@@ -440,56 +440,62 @@ input::placeholder, textarea::placeholder {
   transform-style: preserve-3d;
 }
 
-.commission-card-perspective {
-  perspective: 1500px;
-  perspective-origin: 50% 30%;
-  transform-style: preserve-3d;
-}
-
-@media (hover: none) {
-  .commission-card-perspective {
-    perspective: none;
-  }
-}
-
-.commission-card-3d {
+.commission-island {
   isolation: isolate;
+  position: relative;
+  border-radius: 999px;
   background:
     linear-gradient(145deg, hsl(0 0% 100% / 0.78), hsl(132 18% 92% / 0.58) 46%, hsl(142 24% 84% / 0.42)),
     hsl(var(--card) / 0.68);
-  border: 1px solid hsl(0 0% 100% / 0.52);
-  outline: 1px solid hsl(var(--gold) / 0.08);
+  border: 1px solid hsl(0 0% 100% / 0.55);
+  outline: 1px solid hsl(var(--gold) / 0.10);
+  backdrop-filter: blur(22px) saturate(1.08);
+  -webkit-backdrop-filter: blur(22px) saturate(1.08);
   transform: translateZ(0);
-  transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 260ms ease, border-color 260ms ease;
+  transition:
+    border-radius 320ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 240ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 260ms ease,
+    border-color 240ms ease,
+    background 240ms ease;
   box-shadow:
-    0 30px 70px rgb(2 19 10 / 0.24),
-    0 14px 28px rgb(2 19 10 / 0.16),
-    0 1px 0 rgb(255 255 255 / 0.72) inset,
-    0 -18px 32px rgb(8 66 32 / 0.08) inset;
+    0 1px 0 hsl(var(--gold) / 0.22) inset,
+    0 1px 0 rgb(255 255 255 / 0.55) inset,
+    0 10px 24px -12px hsl(var(--primary) / 0.45),
+    0 22px 48px -22px hsl(var(--gold) / 0.28);
+  cursor: pointer;
 }
 
-.commission-card-3d:hover {
-  transform: translateY(-3px);
-  border-color: hsl(var(--gold) / 0.42);
-  box-shadow:
-    0 44px 90px rgb(1 12 7 / 0.34),
-    0 18px 36px rgb(3 40 19 / 0.22),
-    0 0 48px hsl(var(--gold) / 0.14),
-    0 1px 0 rgb(255 255 255 / 0.78) inset,
-    0 -22px 36px rgb(8 66 32 / 0.10) inset;
-}
-
-.commission-card-3d::before {
+.commission-island::before {
   content: '';
   position: absolute;
   inset: 0;
   border-radius: inherit;
   pointer-events: none;
   z-index: 1;
-  background: linear-gradient(135deg, rgb(255 255 255 / 0.42), rgb(255 255 255 / 0.06) 36%, transparent 68%);
+  background: linear-gradient(135deg, rgb(255 255 255 / 0.42), rgb(255 255 255 / 0.04) 38%, transparent 70%);
+}
+
+.commission-island:hover {
+  transform: translateY(-2px);
+  border-color: hsl(var(--gold) / 0.45);
   box-shadow:
-    0 1px 0 rgb(255 255 255 / 0.5) inset,
-    0 0 0 1px rgb(255 255 255 / 0.08) inset;
+    0 1px 0 hsl(var(--gold) / 0.28) inset,
+    0 1px 0 rgb(255 255 255 / 0.6) inset,
+    0 18px 36px -14px hsl(var(--primary) / 0.55),
+    0 32px 64px -26px hsl(var(--gold) / 0.42),
+    0 0 0 1px hsl(var(--gold) / 0.18);
+}
+
+.commission-island[data-expanded='true'] {
+  border-radius: 1.5rem;
+  border-color: hsl(var(--gold) / 0.55);
+  box-shadow:
+    0 1px 0 hsl(var(--gold) / 0.32) inset,
+    0 1px 0 rgb(255 255 255 / 0.6) inset,
+    0 24px 50px -18px hsl(var(--primary) / 0.6),
+    0 40px 80px -28px hsl(var(--gold) / 0.5),
+    0 0 0 1px hsl(var(--gold) / 0.22);
 }
 
 .commission-card-glow {
@@ -503,23 +509,14 @@ input::placeholder, textarea::placeholder {
   background: radial-gradient(180px circle at var(--mx, 50%) var(--my, 30%), hsl(var(--gold) / 0.22), transparent 65%);
 }
 
-.commission-card-3d:hover .commission-card-glow {
+.commission-island:hover .commission-card-glow,
+.commission-island[data-expanded='true'] .commission-card-glow {
   opacity: 1;
-}
-
-
-.commission-icon-3d {
-  background-image: linear-gradient(145deg, rgb(255 255 255 / 0.54), rgb(255 255 255 / 0.08));
-  box-shadow:
-    0 16px 26px rgb(0 0 0 / 0.12),
-    0 2px 5px rgb(0 0 0 / 0.10),
-    0 1px 0 rgb(255 255 255 / 0.65) inset;
-  transform: translateZ(34px);
 }
 
 .commission-status-pill {
   box-shadow:
-    0 10px 20px rgb(0 0 0 / 0.08),
+    0 6px 14px rgb(0 0 0 / 0.08),
     0 1px 0 rgb(255 255 255 / 0.5) inset;
 }
 
@@ -541,151 +538,46 @@ input::placeholder, textarea::placeholder {
   transition: transform 520ms ease, opacity 320ms ease;
 }
 
-.commission-card-3d:hover .commission-action-button::after {
+.commission-island:hover .commission-action-button::after {
   opacity: 1;
   transform: translateX(70%);
 }
 
-.commission-card-orbit {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  border-radius: inherit;
-  pointer-events: none;
-  background:
-    linear-gradient(90deg, transparent, hsl(var(--gold) / 0.28), transparent) top / 72% 1px no-repeat,
-    linear-gradient(180deg, transparent, rgb(255 255 255 / 0.24), transparent) right / 1px 70% no-repeat;
-  opacity: 0.58;
-  transform: translateZ(30px);
-}
-
-.commission-integration-link {
-  position: absolute;
-  left: 50%;
-  bottom: -1.75rem;
-  z-index: -1;
-  display: block;
-  width: 1px;
-  height: 1.75rem;
-  background: linear-gradient(180deg, hsl(var(--gold) / 0.68), hsl(var(--gold) / 0.12));
-  box-shadow: 0 0 14px hsl(var(--gold) / 0.34);
-  pointer-events: none;
-}
-
-.commission-integration-link::before,
-.commission-integration-link::after {
-  content: '';
-  position: absolute;
-  border-radius: 999px;
-  background: hsl(var(--gold));
-  box-shadow: 0 0 12px hsl(var(--gold) / 0.8);
-}
-
-.commission-integration-link::before {
-  left: -2px;
-  top: -1px;
-  width: 5px;
-  height: 5px;
-}
-
-.commission-integration-link::after {
-  left: -1px;
-  bottom: 2px;
-  width: 3px;
-  height: 3px;
-  animation: integration-pulse 1800ms ease-in-out infinite;
-}
-
-.commission-grid > article:last-child .commission-integration-link {
-  display: none;
-}
-
-@media (min-width: 640px) {
-  .commission-integration-link {
-    left: auto;
-    right: -1.25rem;
-    bottom: auto;
-    top: 50%;
-    width: 1.25rem;
-    height: 1px;
-    background: linear-gradient(90deg, hsl(var(--gold) / 0.66), hsl(var(--gold) / 0.12));
-    transform: translateY(-50%);
-  }
-
-  .commission-integration-link::before {
-    left: -1px;
-    top: -2px;
-  }
-
-  .commission-integration-link::after {
-    left: auto;
-    right: 2px;
-    bottom: -1px;
-  }
-
-  .commission-grid > article:nth-child(2n) .commission-integration-link {
-    display: none;
-  }
-}
-
-@media (min-width: 1024px) {
-  .commission-grid > article:nth-child(2n) .commission-integration-link {
-    display: block;
-  }
-
-  .commission-grid > article:nth-child(3n) .commission-integration-link {
-    display: none;
-  }
-}
-
-@media (min-width: 1280px) {
-  .commission-grid > article:nth-child(3n) .commission-integration-link {
-    display: block;
-  }
-
-  .commission-grid > article:nth-child(4n) .commission-integration-link {
-    display: none;
-  }
-}
-
-.dark .commission-card-3d {
+.dark .commission-island {
   background:
     linear-gradient(145deg, hsl(142 22% 13% / 0.88), hsl(137 30% 9% / 0.82) 48%, hsl(128 28% 7% / 0.78)),
     hsl(var(--card) / 0.72);
   border-color: hsl(0 0% 100% / 0.13);
   box-shadow:
-    0 34px 78px rgb(0 0 0 / 0.46),
-    0 12px 26px rgb(0 0 0 / 0.30),
-    0 1px 0 rgb(255 255 255 / 0.10) inset,
-    0 -18px 34px rgb(0 0 0 / 0.22) inset;
+    0 1px 0 hsl(var(--gold) / 0.18) inset,
+    0 1px 0 rgb(255 255 255 / 0.08) inset,
+    0 14px 30px -14px rgb(0 0 0 / 0.55),
+    0 28px 60px -28px hsl(var(--gold) / 0.20);
 }
 
-.dark .commission-card-3d:hover {
-  border-color: hsl(var(--gold) / 0.40);
+.dark .commission-island:hover {
+  border-color: hsl(var(--gold) / 0.42);
   box-shadow:
-    0 48px 100px rgb(0 0 0 / 0.58),
-    0 20px 42px rgb(0 0 0 / 0.38),
-    0 0 42px hsl(var(--gold) / 0.12),
-    0 1px 0 rgb(255 255 255 / 0.14) inset;
+    0 1px 0 hsl(var(--gold) / 0.24) inset,
+    0 1px 0 rgb(255 255 255 / 0.12) inset,
+    0 22px 44px -16px rgb(0 0 0 / 0.65),
+    0 36px 72px -28px hsl(var(--gold) / 0.32),
+    0 0 0 1px hsl(var(--gold) / 0.20);
 }
 
-@keyframes integration-pulse {
-  0%, 100% { opacity: 0.45; transform: scale(0.9); }
-  50% { opacity: 1; transform: scale(1.35); }
+.dark .commission-island[data-expanded='true'] {
+  border-color: hsl(var(--gold) / 0.50);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .commission-card-3d,
+  .commission-island,
   .commission-action-button::after {
     transition: none;
   }
 
-  .commission-card-3d:hover,
-  .commission-card-3d:active {
+  .commission-island:hover,
+  .commission-island:active {
     transform: none;
   }
-
-  .commission-integration-link::after {
-    animation: none;
-  }
 }
+
