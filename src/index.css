@@ -109,6 +109,12 @@
     @apply border-border;
   }
 
+  html {
+    /* Reserva o espaço da barra de rolagem para evitar shift horizontal
+       quando o conteúdo cresce (ex.: expandir uma ilha de comissão). */
+    scrollbar-gutter: stable;
+  }
+
   body {
     @apply bg-background text-foreground font-sans antialiased;
     background-image: 
@@ -116,6 +122,7 @@
       radial-gradient(ellipse at 80% 100%, hsl(45 87% 55% / 0.02) 0%, transparent 50%);
     background-attachment: fixed;
   }
+
 
   .dark body {
     background-image: 
