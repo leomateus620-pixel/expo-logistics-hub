@@ -440,6 +440,18 @@ input::placeholder, textarea::placeholder {
   transform-style: preserve-3d;
 }
 
+.commission-card-perspective {
+  perspective: 1500px;
+  perspective-origin: 50% 30%;
+  transform-style: preserve-3d;
+}
+
+@media (hover: none) {
+  .commission-card-perspective {
+    perspective: none;
+  }
+}
+
 .commission-card-3d {
   isolation: isolate;
   background:
@@ -447,49 +459,36 @@ input::placeholder, textarea::placeholder {
     hsl(var(--card) / 0.68);
   border: 1px solid hsl(0 0% 100% / 0.52);
   outline: 1px solid hsl(var(--gold) / 0.08);
-  transform: translate3d(0, 0, 0) rotateX(0deg) rotateY(0deg);
   transform-style: preserve-3d;
   box-shadow:
     0 30px 70px rgb(2 19 10 / 0.24),
     0 14px 28px rgb(2 19 10 / 0.16),
     0 1px 0 rgb(255 255 255 / 0.72) inset,
     0 -18px 32px rgb(8 66 32 / 0.08) inset;
-  transition:
-    transform 520ms cubic-bezier(0.18, 0.89, 0.32, 1.18),
-    box-shadow 520ms cubic-bezier(0.18, 0.89, 0.32, 1.18),
-    border-color 320ms ease,
-    filter 320ms ease;
 }
 
 .commission-card-3d:hover {
   border-color: hsl(var(--gold) / 0.42);
-  filter: saturate(1.08) contrast(1.04);
-  transform: translate3d(0, -10px, 34px) rotateX(5deg) rotateY(-4deg);
+  filter: saturate(1.06) contrast(1.03);
   box-shadow:
-    0 44px 94px rgb(1 12 7 / 0.34),
-    0 18px 36px rgb(3 40 19 / 0.22),
-    0 0 42px hsl(var(--gold) / 0.12),
+    0 54px 110px rgb(1 12 7 / 0.40),
+    0 22px 44px rgb(3 40 19 / 0.28),
+    0 0 56px hsl(var(--gold) / 0.18),
     0 1px 0 rgb(255 255 255 / 0.78) inset,
-    0 -22px 34px rgb(8 66 32 / 0.10) inset;
-}
-
-.commission-card-3d:active {
-  transform: translate3d(0, -3px, 10px) rotateX(2deg) rotateY(-1deg) scale(0.992);
+    0 -24px 38px rgb(8 66 32 / 0.12) inset;
 }
 
 .commission-card-3d::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
   z-index: 1;
-  background:
-    linear-gradient(135deg, rgb(255 255 255 / 0.62), rgb(255 255 255 / 0.10) 36%, transparent 68%),
-    radial-gradient(circle at 18% 12%, hsl(var(--gold) / 0.14), transparent 30%),
-    radial-gradient(circle at 86% 24%, hsl(var(--primary) / 0.12), transparent 34%);
+  background: linear-gradient(135deg, rgb(255 255 255 / 0.42), rgb(255 255 255 / 0.06) 36%, transparent 68%);
   box-shadow:
     0 1px 0 rgb(255 255 255 / 0.5) inset,
     0 0 0 1px rgb(255 255 255 / 0.08) inset;
-}
-
-.commission-card-3d > *:not(.commission-integration-link) {
-  transform: translateZ(22px);
 }
 
 .commission-icon-3d {
