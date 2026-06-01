@@ -1,78 +1,48 @@
-## Diagnóstico das últimas 2 merges
+## Problema
 
-**PR #3 — `Enriquece escopo operacional das comissões`** (2b3f1a9)
-Mexeu em conteúdo/registry/menus. Sem impacto visual no card.
+O efeito atual do `CommissionCard` está pesado: tilt de até 12°, lift de 16px + translateZ, paralaxe forte (ícone a 48px, título a 34px+12px), reflexo especular varrendo e sombra de chão expandindo. Resultado: o card deforma demais, o ícone "salta" para fora do header, a descrição parece flutuar separada do corpo e o cartão perde a forma estável de superfície institucional.
 
-**PR #4 — `Melhora visual 3D nos cards do Portal das Comissões`** (6dae369)
-Onde está o problema. Tudo que foi adicionado é **CSS estático**:
-- `.commission-card-3d` aplica um `rotateX(5deg) rotateY(-4deg)` fixo só no `:hover` — o card "pula" para uma pose única e volta. Não há resposta ao cursor, não há paralaxe real, não há sensação de massa.
-- O "brilho" é um `::before` com gradiente fixo — não acompanha o mouse.
-- O `commission-card-orbit` é só duas linhas estáticas no topo/direita.
-- O `commission-integration-link` (fio dourado entre cards) é decoração 2D — não é 3D.
-- `translateZ(22px)` em todos os filhos é uma única camada — sem hierarquia de profundidade entre ícone, título, CTA.
+## Objetivo
 
-Resultado: parece "card com hover bonitinho", não premium 3D com física. Genérico — qualquer template Tailwind faz isso.
+Manter a sensação 3D premium com física real (cursor-aware), mas suave — o card deve permanecer com a mesma silhueta e proporções em repouso e em hover, sem deslocamentos perceptíveis de camadas. Descrições, título e CTA precisam ficar nítidos, alinhados e sem "voar".
 
-## Referência interna a seguir
+## Ajustes em `src/components/commissions/CommissionCard.tsx`
 
-`src/components/dashboard/Metric3DCard.tsx` é exatamente o efeito premium que o usuário quer replicar. Ele usa:
+Tilt e movimento (mais discreto):
+- `MAX_TILT`: 12 → **4°** (rotação muito sutil que acompanha o cursor).
+- Pose de repouso: `rx 2, ry -2` → **`rx 1, ry -1`**.
+- `lift` no hover: 16px → **4px** (quase imperceptível, só dá sensação de elevação).
+- `pressZ` no active: -6 → **-2**.
+- Remover o `scale(0.987)` no pressed (mantém forma).
 
-1. Wrapper com `perspective: 1400px`.
-2. `onMouseMove` calcula posição relativa (`px`, `py`) e aplica `rotateX/rotateY` proporcional ao cursor (não estático).
-3. Radial-gradient de glow que segue o cursor: `radial-gradient(60% 60% at ${mx}% ${my}%, ...)`.
-4. Camadas com `translateZ` diferentes (header 15px, ícone 20px, conteúdo 8px) → paralaxe real.
-5. `box-shadow` muda de intensidade entre repouso e hover.
-6. Easing `cubic-bezier(0.22,1,0.36,1)` curto (280ms) — sensação de mola.
-7. `motion-reduce` desliga tudo.
-8. Pose de repouso leve (`rotateX(2deg) rotateY(-1deg)`) — o card já "vive" parado.
+Paralaxe (achatar para preservar a forma):
+- Header (ícone + status): `translateZ(26)` → **`6`**.
+- Ícone: `translateZ(48) + rotateX/Y(-tilt*0.25)` → **`translateZ(10)`** sem contra-rotação (fica colado no header, sem saltar).
+- Corpo (título/descrição/CTA wrapper): `translateZ(26)` → **`4`**.
+- Título: remover o `translateZ(12)` extra.
+- CTA: `translateZ(14)` → **`2`**.
+- Halo radial: `translateZ(12)` → **`1`** e reduzir opacidade (gold 0.32 → **0.14**, primary 0.22 → **0.10**).
+- Reflexo especular: **remover** o layer (`translateZ(18)` + linear-gradient varrendo). Era o efeito mais agressivo; sai por completo.
+- Sombra de chão: largura 74→88% e opacidade 0.28→0.55 viram **78→84%** e **0.22→0.32** (variação mínima).
+- Base de cor (`accentClass`): mantém `translateZ(2)`.
+- Linha dourada inferior: remover `translateZ(20)` (fica em 0, colada na borda).
 
-## O que vou construir
+Transições:
+- Hover: 140ms → **180ms** mais suave.
+- Retorno (mouseleave): 560ms → **420ms** com mesmo easing.
 
-Refatorar `src/components/commissions/CommissionCard.tsx` para um card interativo 3D com física, mantendo a identidade verde+dourado e a estrutura visual atual (badge de status, ícone, título, descrição, badge "sensível", CTA, conector dourado entre cards).
+Acessibilidade/performance: mantém `prefers-reduced-motion` (sem rotação), `@media (hover: none)` (sem mousemove), `will-change` apenas em hover. Sem novas libs.
 
-### Comportamento
+## `src/index.css`
 
-- Wrapper `[perspective:1400px]`.
-- Estado `tilt` com `{ x, y, mx, my, hover }` via `useState` + `onMouseMove` (mesmo padrão do Metric3DCard, faixa de tilt um pouco maior — ~12° — porque o card é maior).
-- Em repouso: micro-pose `rotateX(2deg) rotateY(-2deg)` + flutuação sutil opcional via `@keyframes` (1 vez a cada 6s, leve).
-- Em hover: tilt segue cursor; glow dourado/verde radial segue cursor; sombra "decola" (eleva no eixo Z) e fica mais profunda.
-- Em `mousedown`/`active`: leve compressão (`scale(0.985) translateZ(-4px)`) para feedback físico de toque.
-- Em `mouseleave`: transição de retorno mais lenta (~520ms cubic-bezier suave) para parecer mola assentando.
-
-### Camadas de paralaxe (translateZ)
-
-- Sombra base do gradiente: `0px`
-- Halo radial seguindo cursor: `12px`
-- Badge de status + conteúdo de texto: `26px`
-- Título: `34px`
-- Ícone do módulo: `48px` (mais pra frente, com sombra própria projetada)
-- Botão CTA: `30px` com brilho que varre no hover
-
-### Visual
-
-- Mantém superfície liquid-glass verde existente (gradiente do registry no header), borda fina dourada que ganha intensidade com o cursor.
-- Reflexo especular fino que orbita no sentido do cursor (linear-gradient diagonal cuja posição depende de `mx/my`).
-- Sombra de chão sob o card aumenta quando o card "decola" (translateY/translateZ negativos da sombra).
-- Conector dourado (`commission-integration-link`) preservado mas com pulso sincronizado.
-
-### Acessibilidade / performance
-
-- Tudo dentro de `prefers-reduced-motion: reduce` desliga rotação e fica só com hover sutil de elevação.
-- Em touch (`@media (hover: none)`) desliga `onMouseMove` (não há cursor), mantém a pose de repouso + tap feedback.
-- `will-change: transform` apenas durante hover (evita custo em idle).
-
-### Limpeza do CSS
-
-Em `src/index.css`, remover o tilt estático de `.commission-card-3d:hover` (linhas 464–478) e a regra `translateZ(22px)` chapada em todos os filhos. O tilt passa a ser controlado por inline style no componente. Mantém: superfície base, borda, sombra de repouso, `.commission-icon-3d` (servirá como base do ícone com sombra), `.commission-action-button`, `.commission-card-orbit` (reaproveitado como linha especular dinâmica), `.commission-integration-link` (intacto), dark mode, `prefers-reduced-motion`.
-
-## Arquivos afetados
-
-- `src/components/commissions/CommissionCard.tsx` — reescrita do componente (tilt via state, mousemove, camadas translateZ, glow dinâmico).
-- `src/index.css` — remover o hover-tilt estático e o translateZ-em-todos-os-filhos; ajustar transições de retorno; adicionar keyframe sutil de "respiração" para o card em repouso.
-- Nenhuma mudança em `CommissionPortalPage.tsx`, registry ou rotas.
+Sem mudanças estruturais. Confirmar que `.commission-card-3d` continua sem `transform`/`transition` próprios (controlados inline), e que o `:hover` apenas reforça borda dourada e box-shadow — sem rotação CSS competindo com o JS.
 
 ## Fora de escopo
 
-- Sem mudanças no admin card, no header do portal, no login ou nos placeholders internos das comissões.
-- Sem novas libs (sem framer-motion / three) — JS puro + CSS, mesmo padrão do Metric3DCard.
-- Sem alterar a paleta verde/dourado ou a tipografia.
+- Nada de novo no registry, portal, admin, login, placeholders.
+- Sem mudar paleta, tipografia, badge de status, conector dourado entre cards, ou estrutura do JSX.
+- Apenas atenuar valores numéricos e remover o layer de reflexo especular.
+
+## Resultado esperado
+
+Card mantém forma, proporção e legibilidade da descrição em qualquer posição do cursor. O 3D vira um "respiro" de profundidade + glow dourado suave seguindo o mouse + leve elevação, sem deformação visível das camadas.
