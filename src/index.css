@@ -588,3 +588,71 @@ input::placeholder, textarea::placeholder {
   }
 }
 
+/* Cronograma e Eventos - institutional planning workspace */
+.cronograma-page {
+  position: relative;
+  isolation: isolate;
+}
+
+.cronograma-page::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    linear-gradient(hsl(var(--primary) / 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, hsl(var(--primary) / 0.028) 1px, transparent 1px),
+    radial-gradient(circle at 12% 4%, hsl(var(--primary) / 0.08), transparent 30%),
+    radial-gradient(circle at 88% 18%, hsl(var(--gold) / 0.075), transparent 26%);
+  background-size: 48px 48px, 48px 48px, auto, auto;
+}
+
+.cronograma-hero::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: linear-gradient(110deg, transparent 0%, rgb(255 255 255 / 0.28) 42%, transparent 58%);
+  transform: translateX(-120%);
+  opacity: 0;
+}
+
+.cronograma-hero:hover::after {
+  animation: cronograma-shine 980ms ease-out;
+}
+
+@keyframes cronograma-view-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes cronograma-shine {
+  0% {
+    opacity: 0;
+    transform: translateX(-120%);
+  }
+  35% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(120%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cronograma-hero:hover::after {
+    animation: none;
+  }
+}
+
