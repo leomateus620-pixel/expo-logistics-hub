@@ -37,6 +37,7 @@ const SystemReportPage = lazy(() => import('./pages/SystemReportPage'));
 const ExpensesPage = lazy(() => import('./pages/ExpensesPage'));
 const MobilityAuthPage = lazy(() => import('./pages/MobilityAuthPage'));
 const FenasojaEventsPage = lazy(() => import('./pages/FenasojaEventsPage'));
+const CronogramaEventosPage = lazy(() => import('./pages/CronogramaEventosPage'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const CommissionPortalPage = lazy(() => import('./pages/commissions/CommissionPortalPage'));
 const CommissionDashboardPlaceholder = lazy(() => import('./pages/commissions/CommissionDashboardPlaceholder'));
@@ -241,6 +242,7 @@ function LegacyLogisticsRoutes() {
         <Route path="/guests" element={<FullAccessRoute><GuestsPage /></FullAccessRoute>} />
         <Route path="/agenda" element={<FullAccessRoute><AgendaPage /></FullAccessRoute>} />
         <Route path="/fenasoja-events" element={<FullAccessRoute><FenasojaEventsPage /></FullAccessRoute>} />
+        <Route path="/cronograma-eventos" element={<FullAccessRoute><CronogramaEventosPage /></FullAccessRoute>} />
         <Route path="/checklist" element={<FullAccessRoute><ChecklistPage /></FullAccessRoute>} />
         <Route path="/team" element={<FullAccessRoute><TeamPage /></FullAccessRoute>} />
         <Route path="/ver-escala" element={<FullAccessRoute><VerEscalaPage /></FullAccessRoute>} />
