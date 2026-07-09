@@ -1,367 +1,242 @@
-import { useMemo, useState, type ReactNode } from 'react';
+import { useMemo, useState } from 'react';
 import {
-  AlertTriangle,
-  ArrowRight,
-  BarChart3,
-  CalendarDays,
+  AlertCircle,
+  CalendarCheck2,
   ChevronDown,
-  Columns3,
+  ChevronRight,
   Flag,
-  ListTodo,
-  UsersRound,
+  Layers3,
+  Route,
+  Sparkles,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import {
-  formatEventRange,
-  getMonthLabel,
-  groupByMonth,
-  groupByYear,
-  isCentralMeeting,
-  isMainFenasojaEvent,
-  type CronogramaEvent,
-} from '@/lib/cronograma-eventos';
-import type { CronogramaView } from './CronogramaViewTabs';
-import { CategoryBadge } from './CronogramaBadges';
+  CronogramaCategoryMarker,
+  CronogramaMetaBadge,
+  CronogramaPriorityIndicator,
+  CronogramaStatusIndicator,
+  EventMetaLine,
+} from './CronogramaBadges';
 import {
-  EventCompactCard,
-  EventFeaturedCard,
-  EventListRow,
-  EventMiniCard,
-  MeetingMiniCard,
+  CategoryInsightCard,
+  CronogramaEventCard,
+  MeetingAgendaCard,
   UndatedDecisionCard,
+  YearColumnHeader,
 } from './EventCards';
+import { CRONOGRAMA_YEARS, categoryLabels } from './cronogramaData';
+import { compareEventDates, formatLongDateRange, formatShortDateRange, getDateParts, getMonthLabel } from './dateUtils';
+import type { CronogramaCategory, CronogramaEvent, CronogramaView } from './types';
 
-const years = [2026, 2027, 2028] as const;
-
-const yearNarratives: Record<2026 | 2027 | 2028, { title: string; text: string }> = {
-  2026: {
-    title: 'Estruturação inicial',
-    text: 'Comissões, mídia, fornecedores e primeiras agendas externas.',
-  },
-  2027: {
-    title: 'Consolidação',
-    text: 'Contratações, parcerias, projetos e preparação operacional.',
-  },
-  2028: {
-    title: 'Reta final e realização',
-    text: 'Lançamentos, reuniões intensivas, feira e encerramento oficial.',
-  },
-};
-
-interface BoardProps {
-  events: CronogramaEvent[];
-  onSelect: (event: CronogramaEvent) => void;
-}
-
-interface OverviewExecutivePanelProps extends BoardProps {
-  onView: (view: CronogramaView) => void;
-}
-
-interface UndatedDecisionBoardProps extends BoardProps {
-  onEdit: (event: CronogramaEvent) => void;
-}
-
-export function ViewTransition({ view, children }: { view: CronogramaView; children: ReactNode }) {
-  return (
-    <div key={view} className="animate-page-in">
-      {children}
-    </div>
-  );
-}
-
-export function EmptyCronogramaState({ title, text }: { title: string; text: string }) {
-  return (
-    <div className="rounded-2xl border border-dashed border-border/70 bg-white/60 p-8 text-center backdrop-blur-xl">
-      <p className="text-sm font-black text-foreground">{title}</p>
-      <p className="mt-1 text-sm text-muted-foreground">{text}</p>
-    </div>
-  );
-}
-
-function Panel({
-  icon: Icon,
-  title,
-  count,
-  action,
-  children,
-  className,
-}: {
-  icon: typeof CalendarDays;
-  title: string;
-  count?: number;
-  action?: ReactNode;
-  children: ReactNode;
-  className?: string;
-}) {
-  return (
-    <section className={cn('liquid-glass-card rounded-2xl p-3.5', className)}>
-      <div className="mb-3 flex items-center justify-between gap-3">
-        <div className="flex min-w-0 items-center gap-2">
-          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-primary/15 bg-primary/10 text-primary">
-            <Icon className="h-4 w-4" />
-          </span>
-          <h2 className="truncate text-base font-black tracking-tight text-foreground">{title}</h2>
-        </div>
-        <div className="flex shrink-0 items-center gap-2">
-          {typeof count === 'number' && (
-            <span className="rounded-full bg-white/70 px-2 py-1 text-[11px] font-black text-muted-foreground shadow-sm">{count}</span>
-          )}
-          {action}
-        </div>
-      </div>
-      {children}
-    </section>
-  );
-}
-
-function getTodayKey() {
-  return new Date().toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' });
-}
-
-function getUpcomingEvents(events: CronogramaEvent[], limit: number) {
-  const today = getTodayKey();
-  const upcoming = events.filter((event) => event.startDate && event.startDate >= today && !isMainFenasojaEvent(event));
-  const fallback = events.filter((event) => event.startDate && !isMainFenasojaEvent(event));
-  return (upcoming.length ? upcoming : fallback).slice(0, limit);
-}
-
-function groupByCategory(events: CronogramaEvent[]) {
-  const map = new Map<string, CronogramaEvent[]>();
-  for (const event of events) {
-    map.set(event.category, [...(map.get(event.category) ?? []), event]);
-  }
-  return Array.from(map.entries()).sort((a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0], 'pt-BR'));
-}
-
-function MonthAccordion({
-  monthKey,
+export function OverviewBoard({
   events,
-  onSelect,
-  defaultOpen,
-  compactLimit = 6,
+  onOpen,
+  onEdit,
+  onSwitchView,
 }: {
-  monthKey: string;
   events: CronogramaEvent[];
-  onSelect: (event: CronogramaEvent) => void;
-  defaultOpen?: boolean;
-  compactLimit?: number;
+  onOpen: (event: CronogramaEvent) => void;
+  onEdit: (event: CronogramaEvent) => void;
+  onSwitchView: (view: CronogramaView) => void;
 }) {
-  const [expanded, setExpanded] = useState(false);
-  const firstDate = events.find((event) => event.startDate)?.startDate;
-  const monthLabel = monthKey.endsWith('sem-data') ? 'Sem data definida' : getMonthLabel(firstDate) ?? monthKey;
-  const visible = expanded ? events : events.slice(0, compactLimit);
-  const hidden = events.length - visible.length;
+  const datedEvents = [...events].filter((event) => event.date).sort(compareEventDates);
+  const main2028 = events.find((event) => event.id === 'fenasoja-2028-abertura') || datedEvents.find((event) => event.year === 2028 && event.isMain);
+  const nextEvents = datedEvents.slice(0, 5);
+  const undated = events.filter((event) => !event.date).slice(0, 3);
 
   return (
-    <details
-      className="group rounded-2xl border border-border/50 bg-white/60 p-2.5 shadow-sm backdrop-blur-xl open:bg-white/80"
-      open={defaultOpen}
-    >
-      <summary className="flex cursor-pointer list-none items-center justify-between gap-3 rounded-xl px-1 py-0.5 focus-ring [&::-webkit-details-marker]:hidden">
-        <div className="min-w-0">
-          <p className="truncate text-sm font-black text-foreground">{monthLabel}</p>
-          <p className="text-[11px] font-bold text-muted-foreground">{events.length} registros</p>
-        </div>
-        <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition group-open:rotate-180" />
-      </summary>
-      <div className="mt-2 space-y-2">
-        {visible.map((event) => (
-          <EventMiniCard key={event.id} event={event} onSelect={onSelect} />
-        ))}
-        {hidden > 0 && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={(event) => {
-              event.preventDefault();
-              setExpanded(true);
-            }}
-            className="h-8 w-full rounded-xl text-xs font-bold"
-          >
-            Ver mais {hidden} eventos do mês
-          </Button>
+    <div className="grid gap-4 xl:grid-cols-[minmax(0,1.15fr)_420px]">
+      <section className="space-y-4">
+        {main2028 && (
+          <article className="relative overflow-hidden rounded-[1.75rem] border border-gold/32 bg-[linear-gradient(135deg,hsl(var(--primary)/0.10),rgb(255_255_255/0.84)_44%,hsl(var(--gold)/0.16))] p-5 shadow-[0_24px_80px_-48px_hsl(var(--primary)/0.72),inset_0_1px_0_rgb(255_255_255/0.72)] sm:p-6">
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_8%_0%,hsl(var(--primary)/0.16),transparent_32%),radial-gradient(circle_at_94%_20%,hsl(var(--gold)/0.18),transparent_28%)]" />
+            <div className="relative grid gap-5 lg:grid-cols-[minmax(0,1fr)_240px] lg:items-end">
+              <div className="min-w-0">
+                <div className="mb-4 flex flex-wrap items-center gap-2">
+                  <CronogramaMetaBadge icon={Sparkles} tone="gold">Marco principal</CronogramaMetaBadge>
+                  <CronogramaMetaBadge icon={Flag} tone="green">Fenasoja 2028</CronogramaMetaBadge>
+                </div>
+                <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-primary/75">Destaque executivo</p>
+                <h2 className="mt-2 text-3xl font-black tracking-tight text-foreground sm:text-4xl">{main2028.title}</h2>
+                <p className="mt-3 max-w-3xl text-sm leading-relaxed text-muted-foreground">{main2028.summary}</p>
+                <div className="mt-5 flex flex-wrap items-center gap-3">
+                  <EventMetaLine event={main2028} />
+                  <CronogramaPriorityIndicator priority={main2028.priority} />
+                </div>
+              </div>
+              <div className="rounded-[1.35rem] border border-white/60 bg-white/58 p-4 shadow-[inset_0_1px_0_rgb(255_255_255/0.65)]">
+                <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">Data oficial</p>
+                <p className="mt-2 text-2xl font-black leading-tight text-primary">{formatLongDateRange(main2028.date, main2028.endDate)}</p>
+                <Button type="button" onClick={() => onOpen(main2028)} className="mt-4 w-full rounded-full">
+                  Abrir detalhes
+                </Button>
+              </div>
+            </div>
+          </article>
         )}
-      </div>
-    </details>
+
+        <section className="rounded-[1.75rem] border border-white/60 bg-white/66 p-4 shadow-[0_18px_60px_-42px_rgb(21_62_39/0.48),inset_0_1px_0_rgb(255_255_255/0.66)]">
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Leitura rápida</p>
+              <h2 className="text-xl font-black tracking-tight">Próximos eventos oficiais</h2>
+            </div>
+            <Button type="button" variant="ghost" size="sm" onClick={() => onSwitchView('timeline')} className="rounded-full text-xs">
+              Ver linha do tempo
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+          <div className="grid gap-3 lg:grid-cols-2">
+            {nextEvents.map((event, index) => (
+              <CronogramaEventCard key={event.id} event={event} index={index} compact onOpen={onOpen} onEdit={onEdit} />
+            ))}
+          </div>
+        </section>
+      </section>
+
+      <aside className="space-y-4">
+        <section className="rounded-[1.75rem] border border-white/60 bg-white/66 p-4 shadow-[0_18px_60px_-42px_rgb(21_62_39/0.48),inset_0_1px_0_rgb(255_255_255/0.66)]">
+          <div className="mb-4 flex items-center justify-between gap-3">
+            <div>
+              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Central de decisão</p>
+              <h2 className="text-xl font-black tracking-tight">Pendências sem data</h2>
+            </div>
+            <AlertCircle className="h-5 w-5 text-amber-800" />
+          </div>
+          <div className="space-y-3">
+            {undated.map((event) => (
+              <UndatedDecisionCard key={event.id} event={event} onOpen={onOpen} onEdit={onEdit} />
+            ))}
+          </div>
+          <Button type="button" variant="outline" onClick={() => onSwitchView('undated')} className="mt-4 w-full rounded-full border-gold/25 bg-white/55 text-xs">
+            Ver todas as pendências
+          </Button>
+        </section>
+      </aside>
+    </div>
   );
 }
 
-function CategoryEventLine({ event, onSelect }: { event: CronogramaEvent; onSelect: (event: CronogramaEvent) => void }) {
+export function TimelineBoard({
+  events,
+  onOpen,
+}: {
+  events: CronogramaEvent[];
+  onOpen: (event: CronogramaEvent) => void;
+}) {
+  const [openMonths, setOpenMonths] = useState<Record<string, boolean>>({});
+  const dated = useMemo(() => events.filter((event) => event.date).sort(compareEventDates), [events]);
+
+  const grouped = useMemo(() => {
+    const map = new Map<number, Map<number, CronogramaEvent[]>>();
+    dated.forEach((event) => {
+      const parts = getDateParts(event.date);
+      if (!parts) return;
+      if (!map.has(parts.year)) map.set(parts.year, new Map());
+      const yearMap = map.get(parts.year)!;
+      if (!yearMap.has(parts.month)) yearMap.set(parts.month, []);
+      yearMap.get(parts.month)!.push(event);
+    });
+    return map;
+  }, [dated]);
+
   return (
-    <button
-      type="button"
-      onClick={() => onSelect(event)}
-      className="group flex w-full items-center gap-2 rounded-xl border border-border/50 bg-white/75 px-2.5 py-2 text-left shadow-sm transition hover:border-primary/30 hover:bg-white/90 focus-ring"
-    >
-      <span className="h-2 w-2 shrink-0 rounded-full bg-primary/75" />
-      <span className="min-w-0 flex-1">
-        <span className="block truncate text-xs font-black text-foreground">{event.title}</span>
-        <span className="block truncate text-[10px] font-semibold text-muted-foreground">{formatEventRange(event)}</span>
-      </span>
+    <div className="grid gap-4 xl:grid-cols-3">
+      {CRONOGRAMA_YEARS.map((year) => {
+        const months = grouped.get(year) || new Map();
+        const yearEvents = Array.from(months.values()).flat();
+        return (
+          <section key={year} className="rounded-[1.75rem] border border-white/60 bg-white/60 p-3 shadow-[0_18px_58px_-44px_rgb(21_62_39/0.42),inset_0_1px_0_rgb(255_255_255/0.62)]">
+            <YearColumnHeader year={year} events={yearEvents} />
+            <div className="space-y-3">
+              {Array.from(months.entries()).map(([month, monthEvents]) => {
+                const key = `${year}-${month}`;
+                const open = openMonths[key] ?? true;
+                return (
+                  <div key={key} className="relative rounded-2xl border border-border/35 bg-white/58 p-3">
+                    <div className="absolute bottom-4 left-[1.08rem] top-12 w-px bg-gradient-to-b from-gold/55 via-primary/20 to-transparent" />
+                    <button
+                      type="button"
+                      onClick={() => setOpenMonths((value) => ({ ...value, [key]: !open }))}
+                      className="mb-3 flex w-full items-center justify-between gap-3 rounded-xl text-left focus-ring"
+                    >
+                      <span>
+                        <span className="block text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">Mês</span>
+                        <span className="text-lg font-black tracking-tight text-foreground">{getMonthLabel(month)}</span>
+                      </span>
+                      <span className="flex items-center gap-2 text-xs font-bold text-primary">
+                        {monthEvents.length} eventos
+                        {open ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+                      </span>
+                    </button>
+                    <div className={cn('grid gap-2 overflow-hidden transition-all duration-300', open ? 'max-h-[900px] opacity-100' : 'max-h-0 opacity-0')}>
+                      {monthEvents.map((event) => (
+                        <TimelineItem key={event.id} event={event} onOpen={onOpen} />
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+              {yearEvents.length === 0 && <EmptyBoardState title={`Sem eventos em ${year}`} text="Ajuste os filtros para ampliar a visão." />}
+            </div>
+          </section>
+        );
+      })}
+    </div>
+  );
+}
+
+function TimelineItem({ event, onOpen }: { event: CronogramaEvent; onOpen: (event: CronogramaEvent) => void }) {
+  return (
+    <button type="button" onClick={() => onOpen(event)} className="group relative ml-5 block rounded-xl border border-border/32 bg-white/62 p-3 text-left transition hover:border-gold/35 hover:bg-white focus-ring">
+      <span className="absolute -left-[1.68rem] top-4 h-3 w-3 rounded-full border-2 border-white bg-primary shadow-[0_0_0_4px_hsl(var(--primary)/0.10)]" />
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <p className="text-[11px] font-bold text-gold">{formatShortDateRange(event.date, event.endDate)} · {event.startTime || 'horário a definir'}</p>
+          <h4 className="mt-1 line-clamp-2 text-sm font-bold leading-tight text-foreground group-hover:text-primary">{event.title}</h4>
+        </div>
+        <CronogramaStatusIndicator status={event.status} compact />
+      </div>
     </button>
   );
 }
 
-export function OverviewExecutivePanel({ events, onSelect, onView }: OverviewExecutivePanelProps) {
-  const mainEvent = events.find(isMainFenasojaEvent);
-  const upcoming = getUpcomingEvents(events, 6);
-  const undated = events.filter((event) => !event.hasExactDate).slice(0, 4);
-  const central = events.filter(isCentralMeeting).slice(0, 4);
-  const byYear = groupByYear(events);
-  const categoryGroups = groupByCategory(events).slice(0, 6);
-
+export function YearBoard({
+  events,
+  onOpen,
+  onEdit,
+}: {
+  events: CronogramaEvent[];
+  onOpen: (event: CronogramaEvent) => void;
+  onEdit: (event: CronogramaEvent) => void;
+}) {
   return (
-    <div className="space-y-3">
-      <div className="grid gap-3 xl:grid-cols-[minmax(0,1.25fr)_390px]">
-        <div className="space-y-3">
-          {mainEvent && <EventFeaturedCard event={mainEvent} onSelect={onSelect} />}
-
-          <Panel
-            icon={CalendarDays}
-            title="Próximos eventos oficiais"
-            count={upcoming.length}
-            action={
-              <Button variant="ghost" size="sm" className="h-8 rounded-xl text-xs font-bold" onClick={() => onView('timeline')}>
-                Timeline
-                <ArrowRight className="h-3.5 w-3.5" />
-              </Button>
-            }
-          >
-            <div className="grid gap-2 lg:grid-cols-2">
-              {upcoming.map((event) => (
-                <EventCompactCard key={event.id} event={event} onSelect={onSelect} />
-              ))}
-            </div>
-          </Panel>
-
-          <div className="grid gap-3 xl:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
-            <Panel icon={Columns3} title="Distribuição por ano">
-              <div className="grid gap-2 sm:grid-cols-3">
-                {years.map((year) => (
-                  <button
-                    key={year}
-                    type="button"
-                    onClick={() => onView('year')}
-                    className="rounded-2xl border border-border/50 bg-white/70 p-3 text-left shadow-sm transition hover:border-primary/30 hover:bg-white/90 focus-ring"
-                  >
-                    <p className="text-[10px] font-black uppercase tracking-[0.14em] text-amber-800 dark:text-gold">{yearNarratives[year].title}</p>
-                    <div className="mt-2 flex items-end justify-between gap-2">
-                      <span className="text-2xl font-black text-foreground">{year}</span>
-                      <span className="text-sm font-black text-primary">{byYear[year]?.length ?? 0}</span>
-                    </div>
-                    <p className="mt-1 line-clamp-2 text-xs font-semibold text-muted-foreground">{yearNarratives[year].text}</p>
-                  </button>
-                ))}
-              </div>
-            </Panel>
-
-            <Panel icon={BarChart3} title="Categorias principais">
-              <div className="grid gap-2 sm:grid-cols-2">
-                {categoryGroups.slice(0, 4).map(([category, categoryEvents]) => (
-                  <button
-                    key={category}
-                    type="button"
-                    onClick={() => onView('category')}
-                    className="rounded-2xl border border-border/50 bg-white/70 p-3 text-left shadow-sm transition hover:border-primary/30 hover:bg-white/90 focus-ring"
-                  >
-                    <div className="flex items-center justify-between gap-2">
-                      <CategoryBadge category={category} />
-                      <span className="text-sm font-black text-primary">{categoryEvents.length}</span>
-                    </div>
-                    <p className="mt-2 line-clamp-2 text-xs font-black leading-snug text-foreground">{category}</p>
-                  </button>
-                ))}
-              </div>
-            </Panel>
-          </div>
-        </div>
-
-        <aside className="space-y-3">
-          <Panel
-            icon={ListTodo}
-            title="Pendências sem data"
-            count={undated.length}
-            action={
-              <Button variant="ghost" size="sm" className="h-8 rounded-xl text-xs font-bold" onClick={() => onView('undated')}>
-                Ver
-                <ArrowRight className="h-3.5 w-3.5" />
-              </Button>
-            }
-          >
-            <div className="space-y-2">
-              {undated.map((event) => (
-                <EventListRow key={event.id} event={event} onSelect={onSelect} />
-              ))}
-            </div>
-          </Panel>
-
-          <Panel
-            icon={UsersRound}
-            title="Reuniões da Central"
-            count={central.length}
-            action={
-              <Button variant="ghost" size="sm" className="h-8 rounded-xl text-xs font-bold" onClick={() => onView('central')}>
-                Agenda
-                <ArrowRight className="h-3.5 w-3.5" />
-              </Button>
-            }
-          >
-            <div className="space-y-2">
-              {central.map((event) => (
-                <MeetingMiniCard key={event.id} event={event} onSelect={onSelect} />
-              ))}
-            </div>
-          </Panel>
-        </aside>
-      </div>
-
-    </div>
-  );
-}
-
-export function CompactTimeline({ events, onSelect }: BoardProps) {
-  const byYear = groupByYear(events);
-
-  return (
-    <div className="grid gap-3 xl:grid-cols-3">
-      {years.map((year) => {
-        const yearEvents = byYear[year] ?? [];
-        const dated = yearEvents.filter((event) => event.hasExactDate);
-        const undated = yearEvents.filter((event) => !event.hasExactDate);
-        const monthGroups = Object.entries(groupByMonth(dated)).sort(([a], [b]) => a.localeCompare(b));
-
+    <div className="grid gap-4 xl:grid-cols-3">
+      {CRONOGRAMA_YEARS.map((year) => {
+        const yearEvents = events.filter((event) => event.year === year).sort(compareEventDates);
+        const months = groupByMonth(yearEvents.filter((event) => event.date));
         return (
-          <section key={year} className="liquid-glass-card rounded-2xl p-3">
-            <div className="mb-3 flex items-center justify-between gap-3">
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.16em] text-amber-800 dark:text-gold">Linha do tempo</p>
-                <h2 className="text-2xl font-black text-foreground">{year}</h2>
-              </div>
-              <span className="rounded-full bg-white/70 px-2 py-1 text-[11px] font-black text-muted-foreground">{yearEvents.length}</span>
-            </div>
-
-            <div className="space-y-2">
-              {monthGroups.map(([monthKey, monthEvents], index) => (
-                <MonthAccordion
-                  key={monthKey}
-                  monthKey={monthKey}
-                  events={monthEvents}
-                  onSelect={onSelect}
-                  defaultOpen={index === 0 || monthKey === '2028-05'}
-                  compactLimit={5}
-                />
+          <section key={year} className="max-h-[calc(100vh-180px)] overflow-auto rounded-[1.75rem] border border-white/60 bg-white/58 p-3 shadow-[0_18px_58px_-44px_rgb(21_62_39/0.42),inset_0_1px_0_rgb(255_255_255/0.62)]">
+            <YearColumnHeader year={year} events={yearEvents} />
+            <div className="space-y-3">
+              {Array.from(months.entries()).map(([month, monthEvents]) => (
+                <div key={`${year}-${month}`} className="rounded-2xl border border-border/35 bg-white/55 p-3">
+                  <div className="mb-2 flex items-center justify-between gap-2">
+                    <h4 className="font-black tracking-tight text-foreground">{getMonthLabel(month)}</h4>
+                    <span className="rounded-full bg-primary/[0.07] px-2 py-1 text-[10px] font-bold text-primary">{monthEvents.length}</span>
+                  </div>
+                  <div className="space-y-2">
+                    {monthEvents.map((event, index) => (
+                      <CronogramaEventCard key={event.id} event={event} index={index} compact onOpen={onOpen} onEdit={onEdit} />
+                    ))}
+                  </div>
+                </div>
               ))}
-              {undated.length > 0 && (
-                <MonthAccordion
-                  monthKey={`${year}-sem-data`}
-                  events={undated}
-                  onSelect={onSelect}
-                  defaultOpen={false}
-                  compactLimit={5}
-                />
-              )}
+              {yearEvents.filter((event) => !event.date).map((event) => (
+                <UndatedDecisionCard key={event.id} event={event} onOpen={onOpen} onEdit={onEdit} />
+              ))}
+              {yearEvents.length === 0 && <EmptyBoardState title={`Sem itens em ${year}`} text="Nenhum evento atende aos filtros atuais." />}
             </div>
           </section>
         );
@@ -370,134 +245,110 @@ export function CompactTimeline({ events, onSelect }: BoardProps) {
   );
 }
 
-export function YearCompactBoard({ events, onSelect }: BoardProps) {
-  const byYear = groupByYear(events);
-
+export function CategoryBoard({
+  events,
+  onOpen,
+}: {
+  events: CronogramaEvent[];
+  onOpen: (event: CronogramaEvent) => void;
+}) {
+  const categories = Object.keys(categoryLabels) as CronogramaCategory[];
   return (
-    <div className="grid gap-3 xl:grid-cols-3">
-      {years.map((year) => {
-        const yearEvents = byYear[year] ?? [];
-        const central = yearEvents.filter(isCentralMeeting).length;
-        const undated = yearEvents.filter((event) => !event.hasExactDate).length;
-        const monthGroups = Object.entries(groupByMonth(yearEvents)).sort(([a], [b]) => a.localeCompare(b));
-
-        return (
-          <section key={year} className="liquid-glass-card rounded-2xl p-3">
-            <div className={cn('mb-3 rounded-2xl border p-3', year === 2028 ? 'border-gold/45 bg-gold/10' : 'border-border/50 bg-white/60')}>
-              <p className="text-[10px] font-black uppercase tracking-[0.16em] text-amber-800 dark:text-gold">{yearNarratives[year].title}</p>
-              <div className="mt-1 flex items-end justify-between gap-3">
-                <h2 className="text-3xl font-black text-foreground">{year}</h2>
-                <span className="rounded-full bg-white/75 px-2 py-1 text-xs font-black text-primary">{yearEvents.length} registros</span>
-              </div>
-              <p className="mt-2 text-xs font-semibold leading-relaxed text-muted-foreground">{yearNarratives[year].text}</p>
-              <div className="mt-3 flex flex-wrap gap-1.5 text-[10px] font-black text-muted-foreground">
-                <span className="rounded-full bg-white/75 px-2 py-1">{central} reuniões</span>
-                <span className="rounded-full bg-white/75 px-2 py-1">{undated} sem data</span>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              {monthGroups.map(([monthKey, monthEvents], index) => (
-                <MonthAccordion
-                  key={monthKey}
-                  monthKey={monthKey}
-                  events={monthEvents}
-                  onSelect={onSelect}
-                  defaultOpen={index === 0 || monthKey === '2028-05'}
-                  compactLimit={4}
-                />
-              ))}
-            </div>
-          </section>
-        );
+    <div className="grid gap-4 lg:grid-cols-2 2xl:grid-cols-3">
+      {categories.map((category) => {
+        const categoryEvents = events.filter((event) => event.category === category).sort(compareEventDates);
+        if (categoryEvents.length === 0) return null;
+        return <CategoryInsightCard key={category} category={category} events={categoryEvents} onOpen={onOpen} />;
       })}
     </div>
   );
 }
 
-export function CategoryCompactBoard({ events, onSelect }: BoardProps) {
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
-  const groups = useMemo(() => groupByCategory(events), [events]);
+export function MeetingsBoard({
+  events,
+  onOpen,
+}: {
+  events: CronogramaEvent[];
+  onOpen: (event: CronogramaEvent) => void;
+}) {
+  const meetings = events.filter((event) => event.isCentralMeeting).sort(compareEventDates);
+  const byYear = CRONOGRAMA_YEARS.map((year) => ({
+    year,
+    events: meetings.filter((event) => event.year === year),
+  }));
 
   return (
-    <div className="grid gap-3 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
-      {groups.map(([category, categoryEvents]) => {
-        const open = expanded[category];
-        const visible = open ? categoryEvents : categoryEvents.slice(0, 3);
-        const undated = categoryEvents.filter((event) => !event.hasExactDate).length;
-
-        return (
-          <section key={category} className="liquid-glass-card rounded-2xl p-3">
-            <div className="mb-3 flex items-start justify-between gap-3">
-              <div className="min-w-0 space-y-1.5">
-                <CategoryBadge category={category} />
-                <h2 className="line-clamp-2 text-base font-black leading-tight text-foreground">{category}</h2>
-              </div>
-              <div className="shrink-0 text-right">
-                <p className="text-2xl font-black text-primary">{categoryEvents.length}</p>
-                {undated > 0 && <p className="text-[10px] font-black text-amber-800">{undated} sem data</p>}
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              {visible.map((event) => (
-                <CategoryEventLine key={event.id} event={event} onSelect={onSelect} />
-              ))}
-            </div>
-
-            {categoryEvents.length > 3 && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                className="mt-2 h-8 w-full rounded-xl text-xs font-bold"
-                onClick={() => setExpanded((current) => ({ ...current, [category]: !open }))}
-              >
-                {open ? 'Compactar categoria' : `Ver todos (${categoryEvents.length})`}
-              </Button>
-            )}
-          </section>
-        );
-      })}
-    </div>
-  );
-}
-
-export function CentralMeetingsBoard({ events, onSelect }: BoardProps) {
-  const central = events.filter(isCentralMeeting);
-  const byYear = groupByYear(central);
-
-  return (
-    <div className="space-y-3">
-      <section className="liquid-glass-card rounded-2xl p-3.5">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+    <div className="space-y-4">
+      <section className="rounded-[1.75rem] border border-white/60 bg-white/66 p-4 shadow-[0_18px_58px_-44px_rgb(21_62_39/0.42),inset_0_1px_0_rgb(255_255_255/0.62)]">
+        <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.16em] text-amber-800 dark:text-gold">Agenda institucional</p>
-            <h2 className="mt-1 text-xl font-black text-foreground">Reuniões da Comissão Central</h2>
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Agenda institucional</p>
+            <h2 className="text-2xl font-black tracking-tight">Reuniões centrais por ano</h2>
           </div>
-          <div className="grid gap-2 text-xs font-bold text-muted-foreground sm:grid-cols-3 lg:min-w-[560px]">
-            <span className="rounded-xl border border-border/50 bg-white/70 px-3 py-2">Local: Sala dos Voluntários</span>
-            <span className="rounded-xl border border-border/50 bg-white/70 px-3 py-2">Horário: 18h30</span>
-            <span className="rounded-xl border border-border/50 bg-white/70 px-3 py-2">{central.length} reuniões oficiais</span>
-          </div>
+          <CronogramaMetaBadge icon={CalendarCheck2} tone="green">{meetings.length} reuniões</CronogramaMetaBadge>
         </div>
       </section>
 
-      <div className="grid gap-3 xl:grid-cols-3">
-        {years.map((year) => (
-          <section key={year} className={cn('liquid-glass-card rounded-2xl p-3', year === 2028 && 'border-gold/45')}>
-            <div className="mb-3 flex items-center justify-between gap-3">
-              <div>
-                <p className="text-[10px] font-black uppercase tracking-[0.16em] text-muted-foreground">Ano</p>
-                <h2 className="text-2xl font-black text-foreground">{year}</h2>
-              </div>
-              <span className="rounded-full bg-white/70 px-2 py-1 text-[11px] font-black text-muted-foreground">
-                {(byYear[year] ?? []).length} reuniões
-              </span>
+      <div className="grid gap-4 xl:grid-cols-3">
+        {byYear.map(({ year, events: yearMeetings }) => (
+          <section key={year} className="rounded-[1.75rem] border border-white/60 bg-white/58 p-3 shadow-[0_18px_58px_-44px_rgb(21_62_39/0.42),inset_0_1px_0_rgb(255_255_255/0.62)]">
+            <YearColumnHeader year={year} events={yearMeetings} />
+            <div className="space-y-3">
+              {yearMeetings.map((event, index) => (
+                <MeetingAgendaCard key={event.id} event={event} index={index} onOpen={onOpen} />
+              ))}
+              {yearMeetings.length === 0 && <EmptyBoardState title="Sem reunião central" text="Nenhuma reunião atende aos filtros atuais." />}
             </div>
-            <div className="space-y-2">
-              {(byYear[year] ?? []).map((event) => (
-                <MeetingMiniCard key={event.id} event={event} onSelect={onSelect} />
+          </section>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export function UndatedBoard({
+  events,
+  onOpen,
+  onEdit,
+}: {
+  events: CronogramaEvent[];
+  onOpen: (event: CronogramaEvent) => void;
+  onEdit: (event: CronogramaEvent) => void;
+}) {
+  const undated = events.filter((event) => !event.date);
+  const byCategory = Object.keys(categoryLabels).map((category) => ({
+    category: category as CronogramaCategory,
+    events: undated.filter((event) => event.category === category),
+  })).filter((group) => group.events.length > 0);
+
+  return (
+    <div className="space-y-4">
+      <section className="rounded-[1.75rem] border border-amber-900/10 bg-[linear-gradient(135deg,rgb(255_255_255/0.80),hsl(var(--gold)/0.09))] p-5 shadow-[0_20px_64px_-46px_rgb(102_64_12/0.5),inset_0_1px_0_rgb(255_255_255/0.66)]">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-950/65">Central de decisões pendentes</p>
+            <h2 className="text-2xl font-black tracking-tight">Pendências sem data</h2>
+            <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+              Itens sem data oficial continuam preservados, mas aparecem como decisões de planejamento em vez de alertas genéricos.
+            </p>
+          </div>
+          <CronogramaMetaBadge icon={Route} tone="gold">{undated.length} decisões</CronogramaMetaBadge>
+        </div>
+      </section>
+
+      <div className="grid gap-4 xl:grid-cols-2">
+        {byCategory.map(({ category, events: categoryEvents }) => (
+          <section key={category} className="rounded-[1.75rem] border border-white/60 bg-white/58 p-4 shadow-[0_18px_58px_-44px_rgb(21_62_39/0.42),inset_0_1px_0_rgb(255_255_255/0.62)]">
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <div>
+                <CronogramaCategoryMarker category={category} className="mb-2" />
+                <h3 className="text-xl font-black tracking-tight">{categoryLabels[category]}</h3>
+              </div>
+              <span className="rounded-full bg-gold/[0.10] px-2.5 py-1 text-xs font-bold text-amber-950">{categoryEvents.length}</span>
+            </div>
+            <div className="space-y-3">
+              {categoryEvents.map((event) => (
+                <UndatedDecisionCard key={event.id} event={event} onOpen={onOpen} onEdit={onEdit} />
               ))}
             </div>
           </section>
@@ -507,74 +358,24 @@ export function CentralMeetingsBoard({ events, onSelect }: BoardProps) {
   );
 }
 
-export function UndatedDecisionBoard({ events, onSelect, onEdit }: UndatedDecisionBoardProps) {
-  const undated = events.filter((event) => !event.hasExactDate);
-  const groups = useMemo(() => groupByCategory(undated), [undated]);
-
-  if (undated.length === 0) {
-    return <EmptyCronogramaState title="Nenhuma pendência sem data" text="Os filtros atuais não retornaram eventos aguardando definição de data." />;
-  }
-
-  return (
-    <div className="space-y-3">
-      <section className="liquid-glass-card rounded-2xl border-amber-300/45 bg-amber-50/60 p-3.5">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex items-start gap-3">
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl border border-amber-300/65 bg-amber-100 text-amber-900">
-              <AlertTriangle className="h-5 w-5" />
-            </span>
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.16em] text-amber-800">Central de decisão</p>
-              <h2 className="mt-1 text-xl font-black text-foreground">Pendências sem data</h2>
-              <p className="mt-1 text-sm font-semibold text-muted-foreground">
-                Atividades oficiais preservadas das planilhas e aguardando data, responsável ou comissão final.
-              </p>
-            </div>
-          </div>
-          <span className="rounded-full bg-white/80 px-3 py-1 text-sm font-black text-amber-900">{undated.length} pendências</span>
-        </div>
-      </section>
-
-      <section className="liquid-glass-card rounded-2xl p-3">
-        <div className="mb-3 flex flex-wrap gap-2">
-          {groups.slice(0, 8).map(([category, categoryEvents]) => (
-            <span key={category} className="inline-flex items-center gap-1.5 rounded-full border border-border/60 bg-white/75 px-2.5 py-1 text-[11px] font-black text-muted-foreground">
-              <span className="text-amber-900">{categoryEvents.length}</span>
-              {category}
-            </span>
-          ))}
-        </div>
-        <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-4">
-          {undated.map((event) => (
-            <UndatedDecisionCard key={event.id} event={event} onSelect={onSelect} onEdit={onEdit} />
-          ))}
-        </div>
-      </section>
-    </div>
-  );
+function groupByMonth(events: CronogramaEvent[]) {
+  const map = new Map<number, CronogramaEvent[]>();
+  events.forEach((event) => {
+    const parts = getDateParts(event.date);
+    if (!parts) return;
+    if (!map.has(parts.month)) map.set(parts.month, []);
+    map.get(parts.month)!.push(event);
+  });
+  map.forEach((value) => value.sort(compareEventDates));
+  return map;
 }
 
-export function SearchAwareEmpty({ events }: { events: CronogramaEvent[] }) {
-  const undated = events.filter((event) => !event.hasExactDate).length;
-  const central = events.filter(isCentralMeeting).length;
-
+function EmptyBoardState({ title, text }: { title: string; text: string }) {
   return (
-    <div className="grid gap-3 md:grid-cols-3">
-      <div className="rounded-2xl border border-border/50 bg-white/70 p-3">
-        <Flag className="h-5 w-5 text-gold" />
-        <p className="mt-2 text-sm font-black">Fenasoja 2028</p>
-        <p className="text-xs font-semibold text-muted-foreground">Evento principal preservado no seed oficial.</p>
-      </div>
-      <div className="rounded-2xl border border-border/50 bg-white/70 p-3">
-        <UsersRound className="h-5 w-5 text-primary" />
-        <p className="mt-2 text-sm font-black">{central} reuniões</p>
-        <p className="text-xs font-semibold text-muted-foreground">Reuniões centrais continuam estruturadas.</p>
-      </div>
-      <div className="rounded-2xl border border-amber-300/55 bg-amber-50 p-3">
-        <ListTodo className="h-5 w-5 text-amber-800" />
-        <p className="mt-2 text-sm font-black">{undated} sem data</p>
-        <p className="text-xs font-semibold text-muted-foreground">Pendências oficiais continuam disponíveis.</p>
-      </div>
+    <div className="rounded-2xl border border-dashed border-border/55 bg-white/38 p-5 text-center">
+      <Layers3 className="mx-auto h-5 w-5 text-muted-foreground" />
+      <p className="mt-2 text-sm font-bold text-foreground">{title}</p>
+      <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{text}</p>
     </div>
   );
 }

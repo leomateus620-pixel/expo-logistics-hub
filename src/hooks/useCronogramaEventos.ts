@@ -29,7 +29,7 @@ interface SupabaseResult<T> {
   error: { message?: string } | null;
 }
 
-interface SupabaseQueryBuilder {
+interface SupabaseQueryBuilder extends PromiseLike<SupabaseResult<unknown[]>> {
   select(columns?: string): SupabaseQueryBuilder;
   eq(column: string, value: unknown): SupabaseQueryBuilder;
   order(column: string, options?: Record<string, unknown>): SupabaseQueryBuilder;
@@ -44,6 +44,29 @@ const cronogramaDb = supabase as unknown as {
   from(table: string): SupabaseQueryBuilder;
   auth: typeof supabase.auth;
 };
+
+export function mergeOfficialSeedWithDb(seedEvents: CronogramaEvent[], dbEvents: CronogramaEvent[]): CronogramaEvent[] {
+  const byKey = new Map<string, CronogramaEvent>();
+
+  seedEvents.forEach((seedEvent) => {
+    const key = seedEvent.sourceKey || seedEvent.id;
+    byKey.set(key, seedEvent);
+  });
+
+  dbEvents.forEach((dbEvent) => {
+    const key = dbEvent.sourceKey || dbEvent.id;
+    const seedEvent = byKey.get(key);
+    byKey.set(key, {
+      ...(seedEvent ?? {}),
+      ...dbEvent,
+      id: dbEvent.id || seedEvent?.id || key,
+      sourceKey: dbEvent.sourceKey || seedEvent?.sourceKey || key,
+      isOfficialSeed: seedEvent?.isOfficialSeed ?? dbEvent.isOfficialSeed,
+    });
+  });
+
+  return sortCronogramaEvents(Array.from(byKey.values()));
+}
 
 function parseJsonArray<T>(value: unknown): T[] {
   if (Array.isArray(value)) return value as T[];
@@ -209,10 +232,11 @@ export function useCronogramaEventos() {
   });
 
   const seedOfficialData = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (eventsToSeed: CronogramaEvent[] = officialSeedEvents) => {
       if (!orgId || !isWritableRole(myRole)) return [];
       const user = (await cronogramaDb.auth.getUser()).data.user;
-      const payload = officialSeedEvents.map((event) => toDbPayload(event, orgId, user?.id));
+      if (eventsToSeed.length === 0) return [];
+      const payload = eventsToSeed.map((event) => toDbPayload(event, orgId, user?.id));
       const { data, error } = await cronogramaDb
         .from('cronograma_eventos')
         .upsert(payload, { onConflict: 'org_id,source_key', ignoreDuplicates: true })
@@ -227,32 +251,31 @@ export function useCronogramaEventos() {
       setDbUnavailable(true);
     },
   });
+  const { isPending: isSeedingOfficialData, mutate: seedMissingOfficialData } = seedOfficialData;
 
   useEffect(() => {
-    if (query.data && query.data.length > 0) {
-      setSessionEvents(sortCronogramaEvents(query.data));
-      return;
-    }
+    const dbEvents = query.data ?? [];
+    setSessionEvents(mergeOfficialSeedWithDb(officialSeedEvents, dbEvents));
 
-    setSessionEvents(officialSeedEvents);
+    if (!orgId || !query.data || !isWritableRole(myRole) || isSeedingOfficialData) return;
+
+    const dbSourceKeys = new Set(dbEvents.map((event) => event.sourceKey).filter(Boolean));
+    const missingOfficialEvents = officialSeedEvents.filter((event) => event.sourceKey && !dbSourceKeys.has(event.sourceKey));
 
     if (
-      orgId &&
-      query.data &&
-      query.data.length === 0 &&
-      isWritableRole(myRole) &&
+      missingOfficialEvents.length > 0 &&
       !seedAttemptedForOrg.current.has(orgId) &&
-      !seedOfficialData.isPending
+      !isSeedingOfficialData
     ) {
       seedAttemptedForOrg.current.add(orgId);
-      seedOfficialData.mutate();
+      seedMissingOfficialData(missingOfficialEvents);
     }
-  }, [myRole, orgId, query.data, seedOfficialData]);
+  }, [isSeedingOfficialData, myRole, orgId, query.data, seedMissingOfficialData]);
 
   const create = useMutation({
     mutationFn: async (draft: CronogramaEventDraft) => {
       const event = draftToEvent(draft);
-      const canUseDb = Boolean(orgId && !dbUnavailable && query.data && query.data.length > 0);
+      const canUseDb = Boolean(orgId && !dbUnavailable);
 
       if (!canUseDb) return event;
 
@@ -266,7 +289,11 @@ export function useCronogramaEventos() {
       return fromDbRow(data);
     },
     onSuccess: (event) => {
-      setSessionEvents((current) => sortCronogramaEvents([...current, event]));
+      setSessionEvents((current) => {
+        const existingIndex = current.findIndex((item) => item.id === event.id || item.sourceKey === event.sourceKey);
+        if (existingIndex === -1) return sortCronogramaEvents([...current, event]);
+        return sortCronogramaEvents(current.map((item, index) => (index === existingIndex ? event : item)));
+      });
       queryClient.invalidateQueries({ queryKey: ['cronograma-eventos'] });
     },
   });
@@ -276,53 +303,35 @@ export function useCronogramaEventos() {
       const current = sessionEvents.find((event) => event.id === id);
       if (!current) throw new Error('Evento não encontrado');
       const next = { ...current, ...updates, updatedAt: new Date().toISOString() };
-      const canUseDb = Boolean(orgId && !dbUnavailable && query.data && query.data.some((event) => event.id === id));
+      const canUseDb = Boolean(orgId && !dbUnavailable && next.sourceKey);
 
       if (!canUseDb) return next;
 
+      const user = (await cronogramaDb.auth.getUser()).data.user;
       const { data, error } = await cronogramaDb
         .from('cronograma_eventos')
-        .update({
-          title: next.title,
-          description: next.description ?? null,
-          category: next.category,
-          event_type: next.eventType,
-          source_year: next.sourceYear,
-          start_date: next.startDate ?? null,
-          end_date: next.endDate ?? null,
-          month_label: next.monthLabel ?? null,
-          week_label: next.weekLabel ?? null,
-          status: next.status as CronogramaStatus,
-          priority: next.priority as CronogramaPriority,
-          location: next.location ?? null,
-          event_time: next.time ?? null,
-          days_remaining: next.daysRemaining ?? null,
-          commission_slug: next.commissionSlug ?? null,
-          commission_name: next.commissionName ?? null,
-          responsible_name: next.responsibleName ?? null,
-          source_note: next.sourceNote ?? null,
-          has_exact_date: next.hasExactDate,
-          linked_commissions: next.linkedCommissions ?? [],
-          subevents: next.subevents ?? [],
-        })
-        .eq('id', id)
+        .upsert(toDbPayload(next, orgId!, user?.id), { onConflict: 'org_id,source_key' })
         .select('*')
         .single();
       if (error) throw error;
       return fromDbRow(data);
     },
     onSuccess: (event) => {
-      setSessionEvents((current) => sortCronogramaEvents(current.map((item) => (item.id === event.id ? event : item))));
+      setSessionEvents((current) => {
+        const existingIndex = current.findIndex((item) => item.id === event.id || item.sourceKey === event.sourceKey);
+        if (existingIndex === -1) return sortCronogramaEvents([...current, event]);
+        return sortCronogramaEvents(current.map((item, index) => (index === existingIndex ? event : item)));
+      });
       queryClient.invalidateQueries({ queryKey: ['cronograma-eventos'] });
     },
   });
 
   const events = useMemo(() => sortCronogramaEvents(sessionEvents), [sessionEvents]);
-  const isSeedFallback = dbUnavailable || !orgId || !query.data || query.data.length === 0;
+  const isSeedFallback = dbUnavailable || !orgId || !query.data;
 
   return {
     events,
-    isLoading: query.isLoading || seedOfficialData.isPending,
+    isLoading: query.isLoading || isSeedingOfficialData,
     isSeedFallback,
     canManage: isWritableRole(myRole),
     create,

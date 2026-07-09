@@ -252,4 +252,3 @@ CREATE TRIGGER trg_cronograma_eventos_updated
 CREATE TRIGGER trg_cronograma_subeventos_updated
   BEFORE UPDATE ON public.cronograma_subeventos
   FOR EACH ROW EXECUTE FUNCTION public.set_updated_at();
-

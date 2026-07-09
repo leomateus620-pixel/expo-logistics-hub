@@ -1215,4 +1215,3 @@ export const fenasoja2028CronogramaSeed: CronogramaEventSeed[] = [
     sourceRow: 'R29',
   }),
 ];
-

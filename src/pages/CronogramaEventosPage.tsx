@@ -1,178 +1,223 @@
-import { useMemo, useState } from 'react';
-import { toast } from 'sonner';
-import { Skeleton } from '@/components/ui/skeleton';
-import CalendarMonthView from '@/components/cronograma-eventos/CalendarMonthView';
+import { useEffect, useMemo, useState } from 'react';
+import { CalendarDays } from 'lucide-react';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { CronogramaCommandHeader } from '@/components/cronograma-eventos/CronogramaCommandHeader';
+import { CronogramaFiltersBar } from '@/components/cronograma-eventos/CronogramaFiltersBar';
+import { CronogramaViewTabs, ViewContentTransition } from '@/components/cronograma-eventos/CronogramaViewTabs';
 import {
-  CompactTimeline,
-  CategoryCompactBoard,
-  CentralMeetingsBoard,
-  EmptyCronogramaState,
-  OverviewExecutivePanel,
-  SearchAwareEmpty,
-  UndatedDecisionBoard,
-  ViewTransition,
-  YearCompactBoard,
+  CategoryBoard,
+  MeetingsBoard,
+  OverviewBoard,
+  TimelineBoard,
+  UndatedBoard,
+  YearBoard,
 } from '@/components/cronograma-eventos/CronogramaBoards';
-import CronogramaCommandHeader from '@/components/cronograma-eventos/CronogramaCommandHeader';
-import CronogramaFiltersBar from '@/components/cronograma-eventos/CronogramaFiltersBar';
-import CronogramaViewTabs, { type CronogramaView } from '@/components/cronograma-eventos/CronogramaViewTabs';
-import EventDrawer from '@/components/cronograma-eventos/EventDrawer';
-import EventForm from '@/components/cronograma-eventos/EventForm';
-import { useCronogramaEventos, type CronogramaEventDraft } from '@/hooks/useCronogramaEventos';
+import { CalendarMonthView } from '@/components/cronograma-eventos/CalendarMonthView';
+import { EventDrawer } from '@/components/cronograma-eventos/EventDrawer';
+import { EventForm } from '@/components/cronograma-eventos/EventForm';
+import { compareEventDates } from '@/components/cronograma-eventos/dateUtils';
 import {
-  buildCronogramaKpis,
-  defaultCronogramaFilters,
-  filterCronogramaEvents,
-  type CronogramaEvent,
-  type CronogramaFilters,
-} from '@/lib/cronograma-eventos';
+  adaptCronogramaEvent,
+  visualEventToDraft,
+  visualEventToSourceUpdates,
+} from '@/components/cronograma-eventos/modelAdapter';
+import type { CronogramaEvent, CronogramaFilters, CronogramaView } from '@/components/cronograma-eventos/types';
+import { useCronogramaEventos } from '@/hooks/useCronogramaEventos';
+import type { CronogramaEvent as SourceCronogramaEvent } from '@/lib/cronograma-eventos';
 
-function LoadingWorkspace() {
-  return (
-    <div className="grid gap-3 lg:grid-cols-2 xl:grid-cols-3">
-      {Array.from({ length: 6 }).map((_, index) => (
-        <Skeleton key={index} className="h-28 rounded-2xl bg-white/60" />
-      ))}
-    </div>
-  );
-}
+const emptyFilters: CronogramaFilters = {
+  query: '',
+  year: 'all',
+  category: 'all',
+  status: 'all',
+  priority: 'all',
+};
 
 export default function CronogramaEventosPage() {
-  const { events, isLoading, isSeedFallback, canManage, create, update } = useCronogramaEventos();
-  const [filters, setFilters] = useState<CronogramaFilters>(defaultCronogramaFilters);
-  const [view, setView] = useState<CronogramaView>('overview');
+  const cronograma = useCronogramaEventos();
+  const [activeView, setActiveView] = useState<CronogramaView>('overview');
+  const [filters, setFilters] = useState<CronogramaFilters>(emptyFilters);
   const [selectedEvent, setSelectedEvent] = useState<CronogramaEvent | null>(null);
-  const [formEvent, setFormEvent] = useState<CronogramaEvent | null>(null);
-  const [formOpen, setFormOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerStartsEditing, setDrawerStartsEditing] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
 
-  const kpis = useMemo(() => buildCronogramaKpis(events), [events]);
-  const filteredEvents = useMemo(() => filterCronogramaEvents(events, filters), [events, filters]);
+  const events = useMemo(() => cronograma.events.map(adaptCronogramaEvent), [cronograma.events]);
+  const sourceById = useMemo(() => {
+    const map = new Map<string, SourceCronogramaEvent>();
+    cronograma.events.forEach((event) => {
+      map.set(event.id, event);
+      if (event.sourceKey) map.set(event.sourceKey, event);
+    });
+    return map;
+  }, [cronograma.events]);
 
-  const openNew = () => {
-    setFormEvent(null);
-    setFormOpen(true);
+  useEffect(() => {
+    if (!selectedEvent) return;
+    const freshEvent = events.find((event) => event.id === selectedEvent.id || event.sourceKey === selectedEvent.sourceKey);
+    if (freshEvent && freshEvent !== selectedEvent) setSelectedEvent(freshEvent);
+  }, [events, selectedEvent]);
+
+  const filteredEvents = useMemo(() => {
+    const query = filters.query.trim().toLowerCase();
+    return events
+      .filter((event) => {
+        if (filters.year !== 'all' && event.year !== filters.year) return false;
+        if (filters.category !== 'all' && event.category !== filters.category) return false;
+        if (filters.status !== 'all' && event.status !== filters.status) return false;
+        if (filters.priority !== 'all' && event.priority !== filters.priority) return false;
+        if (!query) return true;
+        const haystack = [
+          event.title,
+          event.summary,
+          event.location,
+          event.owner,
+          event.commission,
+          event.pendingReason,
+          event.decisionNeeded,
+        ].filter(Boolean).join(' ').toLowerCase();
+        return haystack.includes(query);
+      })
+      .sort(compareEventDates);
+  }, [events, filters]);
+
+  const openEvent = (event: CronogramaEvent, edit = false) => {
+    setSelectedEvent(event);
+    setDrawerStartsEditing(edit);
+    setDrawerOpen(true);
   };
 
-  const openEdit = (event: CronogramaEvent) => {
-    setFormEvent(event);
-    setFormOpen(true);
-  };
-
-  const handleSubmit = async (payload: Partial<CronogramaEvent> & Pick<CronogramaEvent, 'title' | 'category' | 'eventType'>) => {
-    try {
-      if (formEvent) {
-        await update.mutateAsync({ id: formEvent.id, updates: payload });
-        toast.success('Evento atualizado');
-      } else {
-        await create.mutateAsync(payload as CronogramaEventDraft);
-        toast.success('Evento criado');
-      }
-      setFormOpen(false);
-      setFormEvent(null);
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : 'Não foi possível salvar o evento';
-      toast.error(message);
+  const handleDrawerOpenChange = (open: boolean) => {
+    setDrawerOpen(open);
+    if (!open) {
+      setDrawerStartsEditing(false);
     }
   };
 
-  const showUndated = () => {
-    setFilters((current) => ({ ...current, dateMode: 'undated', month: 'sem-data' }));
-    setView('undated');
+  const handleSave = (nextEvent: CronogramaEvent) => {
+    const sourceEvent = sourceById.get(nextEvent.id) || (nextEvent.sourceKey ? sourceById.get(nextEvent.sourceKey) : undefined);
+    if (sourceEvent) {
+      cronograma.update.mutate({
+        id: sourceEvent.id,
+        updates: visualEventToSourceUpdates(nextEvent, sourceEvent),
+      });
+    } else {
+      cronograma.create.mutate(visualEventToDraft(nextEvent));
+    }
+    setSelectedEvent(nextEvent);
   };
 
-  const handleAddSubevent = (event: CronogramaEvent) => {
-    setSelectedEvent(null);
-    toast.info('Subeventos preparados para cadastro vinculado');
-    openEdit(event);
+  const handleCreate = (event: CronogramaEvent) => {
+    const id = `custom-${Date.now()}`;
+    const nextEvent = {
+      ...event,
+      id,
+      sourceKey: `manual-${id}`,
+      isOfficial: false,
+      isMain: false,
+    };
+    cronograma.create.mutate(visualEventToDraft(nextEvent), {
+      onSuccess: (sourceEvent) => {
+        const createdEvent = adaptCronogramaEvent(sourceEvent);
+        setCreateOpen(false);
+        openEvent(createdEvent);
+      },
+    });
   };
 
-  const renderContent = () => {
-    if (isLoading) return <LoadingWorkspace />;
-
-    if (filteredEvents.length === 0) {
-      return (
-        <div className="space-y-3">
-          <EmptyCronogramaState title="Nenhum evento encontrado" text="Ajuste os filtros para visualizar mais registros oficiais." />
-          <SearchAwareEmpty events={events} />
-        </div>
-      );
-    }
-
-    if (view === 'overview') {
-      return <OverviewExecutivePanel events={filteredEvents} onSelect={setSelectedEvent} onView={setView} />;
-    }
-
-    if (view === 'timeline') {
-      return <CompactTimeline events={filteredEvents} onSelect={setSelectedEvent} />;
-    }
-
-    if (view === 'calendar') {
-      return <CalendarMonthView events={filteredEvents} onSelect={setSelectedEvent} />;
-    }
-
-    if (view === 'year') {
-      return <YearCompactBoard events={filteredEvents} onSelect={setSelectedEvent} />;
-    }
-
-    if (view === 'category') {
-      return <CategoryCompactBoard events={filteredEvents} onSelect={setSelectedEvent} />;
-    }
-
-    if (view === 'central') {
-      return <CentralMeetingsBoard events={filteredEvents} onSelect={setSelectedEvent} />;
-    }
-
-    return <UndatedDecisionBoard events={filteredEvents} onSelect={setSelectedEvent} onEdit={openEdit} />;
-  };
+  const preferredCalendarYear = filters.year === 'all' ? undefined : filters.year;
 
   return (
-    <div className="min-h-screen space-y-3 pb-8">
-      <CronogramaCommandHeader
-        total={kpis.total}
-        byYear={kpis.byYear}
-        centralMeetings={kpis.centralMeetings}
-        undated={kpis.undated}
-        isSeedFallback={isSeedFallback}
-        onNew={openNew}
-        onUndated={showUndated}
-      />
+    <main className="cronograma-page min-h-screen pb-10">
+      <div className="mx-auto flex w-full max-w-[1680px] flex-col gap-4 px-3 sm:px-5 2xl:px-8">
+        <CronogramaCommandHeader
+          events={events}
+          onNewEvent={() => setCreateOpen(true)}
+          onOpenUndated={() => setActiveView('undated')}
+        />
 
-      <div className="sticky top-2 z-20 space-y-2 rounded-[1.35rem] bg-background/75 pb-2 backdrop-blur-2xl">
-        <CronogramaViewTabs value={view} onChange={setView} resultsCount={filteredEvents.length} />
-        <CronogramaFiltersBar filters={filters} onChange={setFilters} events={events} resultsCount={filteredEvents.length} />
+        <div className="sticky top-2 z-20 space-y-3 rounded-[1.6rem] bg-background/55 pb-2 backdrop-blur-xl">
+          <CronogramaViewTabs activeView={activeView} onChange={setActiveView} />
+          <CronogramaFiltersBar filters={filters} onChange={setFilters} onClear={() => setFilters(emptyFilters)} />
+        </div>
+
+        <ViewContentTransition view={activeView}>
+          {activeView === 'overview' && (
+            <OverviewBoard
+              events={filteredEvents}
+              onOpen={(event) => openEvent(event)}
+              onEdit={(event) => openEvent(event, true)}
+              onSwitchView={setActiveView}
+            />
+          )}
+
+          {activeView === 'timeline' && (
+            <TimelineBoard events={filteredEvents} onOpen={(event) => openEvent(event)} />
+          )}
+
+          {activeView === 'calendar' && (
+            <CalendarMonthView
+              events={filteredEvents}
+              preferredYear={preferredCalendarYear}
+              onOpen={(event) => openEvent(event)}
+              onEdit={(event) => openEvent(event, true)}
+            />
+          )}
+
+          {activeView === 'year' && (
+            <YearBoard
+              events={filteredEvents}
+              onOpen={(event) => openEvent(event)}
+              onEdit={(event) => openEvent(event, true)}
+            />
+          )}
+
+          {activeView === 'category' && (
+            <CategoryBoard events={filteredEvents} onOpen={(event) => openEvent(event)} />
+          )}
+
+          {activeView === 'meetings' && (
+            <MeetingsBoard events={filteredEvents} onOpen={(event) => openEvent(event)} />
+          )}
+
+          {activeView === 'undated' && (
+            <UndatedBoard
+              events={filteredEvents}
+              onOpen={(event) => openEvent(event)}
+              onEdit={(event) => openEvent(event, true)}
+            />
+          )}
+        </ViewContentTransition>
       </div>
-
-      <main className="min-h-[520px]">
-        <ViewTransition view={view}>{renderContent()}</ViewTransition>
-      </main>
 
       <EventDrawer
         event={selectedEvent}
-        open={!!selectedEvent}
-        onOpenChange={(open) => !open && setSelectedEvent(null)}
-        onEdit={(event) => {
-          setSelectedEvent(null);
-          openEdit(event);
-        }}
-        onAddSubevent={handleAddSubevent}
+        open={drawerOpen}
+        onOpenChange={handleDrawerOpenChange}
+        onSave={handleSave}
+        startInEdit={drawerStartsEditing}
       />
 
-      <EventForm
-        open={formOpen}
-        onOpenChange={(open) => {
-          setFormOpen(open);
-          if (!open) setFormEvent(null);
-        }}
-        event={formEvent}
-        onSubmit={handleSubmit}
-        isSubmitting={create.isPending || update.isPending}
-      />
-
-      {!canManage && (
-        <div className="fixed bottom-4 right-4 z-30 rounded-2xl border border-border/60 bg-card/95 px-4 py-3 text-xs font-semibold text-muted-foreground shadow-xl backdrop-blur-xl">
-          Acesso em modo leitura
-        </div>
-      )}
-    </div>
+      <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+        <DialogContent className="max-w-3xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <CalendarDays className="h-5 w-5 text-gold" />
+              Novo evento do cronograma
+            </DialogTitle>
+            <DialogDescription>
+              Criação local para planejamento e apresentação do cronograma. Não altera dados operacionais existentes.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="overflow-y-auto pr-1">
+            <EventForm
+              onSubmit={handleCreate}
+              onCancel={() => setCreateOpen(false)}
+              submitLabel="Criar evento"
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
+    </main>
   );
 }

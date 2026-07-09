@@ -1,66 +1,74 @@
-import { AlertTriangle, Calendar, Columns3, LayoutDashboard, ListTree, Tags, UsersRound } from 'lucide-react';
+import {
+  CalendarRange,
+  Columns3,
+  Layers3,
+  ListChecks,
+  Map,
+  Network,
+  UsersRound,
+} from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import type { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
+import type { CronogramaView } from './types';
 
-export type CronogramaView =
-  | 'overview'
-  | 'timeline'
-  | 'calendar'
-  | 'year'
-  | 'category'
-  | 'central'
-  | 'undated';
-
-const cronogramaViews: Array<{ value: CronogramaView; label: string; shortLabel: string; icon: typeof LayoutDashboard }> = [
-  { value: 'overview', label: 'Visão geral', shortLabel: 'Geral', icon: LayoutDashboard },
-  { value: 'timeline', label: 'Linha do tempo', shortLabel: 'Timeline', icon: ListTree },
-  { value: 'calendar', label: 'Calendário', shortLabel: 'Calendário', icon: Calendar },
-  { value: 'year', label: 'Por ano', shortLabel: 'Anos', icon: Columns3 },
-  { value: 'category', label: 'Por categoria', shortLabel: 'Categorias', icon: Tags },
-  { value: 'central', label: 'Reuniões Central', shortLabel: 'Central', icon: UsersRound },
-  { value: 'undated', label: 'Pendências sem data', shortLabel: 'Pendências', icon: AlertTriangle },
+const tabs: Array<{ value: CronogramaView; label: string; icon: LucideIcon }> = [
+  { value: 'overview', label: 'Visão geral', icon: Map },
+  { value: 'timeline', label: 'Linha do tempo', icon: Network },
+  { value: 'calendar', label: 'Calendário', icon: CalendarRange },
+  { value: 'year', label: 'Por ano', icon: Columns3 },
+  { value: 'category', label: 'Por categoria', icon: Layers3 },
+  { value: 'meetings', label: 'Reuniões Central', icon: UsersRound },
+  { value: 'undated', label: 'Pendências sem data', icon: ListChecks },
 ];
 
-interface CronogramaViewTabsProps {
-  value: CronogramaView;
+export function CronogramaViewTabs({
+  activeView,
+  onChange,
+}: {
+  activeView: CronogramaView;
   onChange: (view: CronogramaView) => void;
-  resultsCount: number;
-}
-
-export default function CronogramaViewTabs({ value, onChange, resultsCount }: CronogramaViewTabsProps) {
+}) {
   return (
-    <section className="liquid-glass-card rounded-2xl p-1.5">
-      <div
-        className="flex gap-1.5 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-        role="tablist"
-        aria-label="Visualizações do cronograma"
-      >
-        {cronogramaViews.map(({ value: itemValue, label, shortLabel, icon: Icon }) => {
-          const active = itemValue === value;
+    <div className="rounded-[1.35rem] border border-white/55 bg-white/58 p-1.5 shadow-[0_16px_48px_-36px_rgb(21_62_39/0.42),inset_0_1px_0_rgb(255_255_255/0.62)] backdrop-blur-2xl">
+      <div className="grid gap-1 md:grid-cols-4 xl:grid-cols-7">
+        {tabs.map((tab) => {
+          const active = activeView === tab.value;
+          const Icon = tab.icon;
           return (
             <button
-              key={itemValue}
+              key={tab.value}
               type="button"
-              role="tab"
-              aria-selected={active}
-              onClick={() => onChange(itemValue)}
+              onClick={() => onChange(tab.value)}
               className={cn(
-                'inline-flex h-10 shrink-0 items-center gap-2 rounded-xl border px-3 text-xs font-black transition duration-200 active:scale-[0.98] focus-ring sm:h-11 sm:px-3.5 sm:text-sm',
+                'group relative flex min-h-10 items-center justify-center gap-2 rounded-2xl px-3 py-2 text-xs font-bold transition-all duration-200 focus-ring',
                 active
-                  ? 'border-gold/45 bg-[linear-gradient(135deg,hsl(var(--gold)/0.26),hsl(var(--primary)/0.11))] text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.42),0_14px_28px_-22px_hsl(var(--gold))]'
-                  : 'border-transparent text-muted-foreground hover:border-border/70 hover:bg-white/70 hover:text-foreground',
+                  ? 'bg-primary text-primary-foreground shadow-[0_14px_30px_-22px_hsl(var(--primary)/0.78)]'
+                  : 'text-foreground/62 hover:bg-white/68 hover:text-primary',
               )}
+              aria-pressed={active}
             >
-              <Icon className={cn('h-4 w-4', active ? 'text-amber-800 dark:text-gold' : 'text-muted-foreground')} />
-              <span className="hidden sm:inline">{label}</span>
-              <span className="sm:hidden">{shortLabel}</span>
+              <Icon className={cn('h-4 w-4 transition-transform duration-200', active ? 'text-gold' : 'group-hover:-translate-y-0.5')} />
+              <span className="truncate">{tab.label}</span>
+              {active && <span className="absolute inset-x-5 -bottom-1 h-0.5 rounded-full bg-gold" />}
             </button>
           );
         })}
-        <div className="ml-auto hidden min-w-fit items-center rounded-xl border border-border/50 bg-white/70 px-3 text-[11px] font-black text-muted-foreground xl:flex">
-          <span className="mr-1.5 h-2 w-2 rounded-full bg-primary" />
-          {resultsCount} visíveis
-        </div>
       </div>
-    </section>
+    </div>
+  );
+}
+
+export function ViewContentTransition({
+  view,
+  children,
+}: {
+  view: CronogramaView;
+  children: ReactNode;
+}) {
+  return (
+    <div key={view} className="min-h-[430px] animate-[cronograma-view-in_240ms_cubic-bezier(0.22,1,0.36,1)_both]">
+      {children}
+    </div>
   );
 }
