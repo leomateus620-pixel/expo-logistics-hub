@@ -58,8 +58,8 @@ export function EventDrawer({
 
   return (
     <Sheet open={open} onOpenChange={onOpenChange}>
-      <SheetContent className="flex w-full flex-col gap-0 overflow-hidden border-l border-gold/18 bg-[linear-gradient(150deg,rgb(255_255_255/0.96),rgb(245_249_242/0.92)_55%,hsl(var(--gold)/0.11))] p-0 backdrop-blur-2xl sm:max-w-2xl">
-        <div className="relative border-b border-white/60 p-5 sm:p-6">
+      <SheetContent className="cronograma-drawer flex w-full flex-col gap-0 overflow-hidden p-0 sm:max-w-2xl">
+        <div className="cronograma-drawer-header relative p-5 sm:p-6">
           <EventIdentityStrip event={event} className="left-0 inset-y-6" />
           <SheetHeader className="pr-8 text-left">
             <div className="mb-3 flex flex-wrap items-center gap-2">
@@ -80,7 +80,7 @@ export function EventDrawer({
           </div>
         </div>
 
-        <div className="flex-1 overflow-y-auto p-5 sm:p-6">
+        <div className="cronograma-drawer-body flex-1 overflow-y-auto p-5 sm:p-6">
           {editMode ? (
             <EventForm
               event={event}
@@ -89,7 +89,7 @@ export function EventDrawer({
             />
           ) : (
             <div className="space-y-4">
-              <section className="grid gap-3 sm:grid-cols-2">
+              <section className="cronograma-drawer-section grid gap-x-5 sm:grid-cols-2">
                 <InfoBlock icon={CalendarClock} label="Data e horário" value={`${formatLongDateRange(event.date, event.endDate)}${event.startTime ? ` · ${event.startTime}` : ''}${event.endTime ? ` às ${event.endTime}` : ''}`} />
                 <InfoBlock icon={MapPin} label="Local" value={event.location || 'Local a definir'} />
                 <InfoBlock icon={UserRound} label="Responsável" value={event.owner || 'Responsável a definir'} />
@@ -97,7 +97,7 @@ export function EventDrawer({
               </section>
 
               {(event.pendingReason || event.decisionNeeded || !event.date) && (
-                <section className="rounded-2xl border border-amber-900/10 bg-gold/[0.075] p-4">
+                <section className="cronograma-drawer-section rounded-xl border border-amber-900/10 bg-gold/[0.075] p-4">
                   <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-amber-950/65">Decisão pendente</p>
                   <p className="mt-2 text-sm leading-relaxed text-foreground/78">{event.pendingReason || 'Ainda sem data oficial definida.'}</p>
                   {event.decisionNeeded && (
@@ -107,7 +107,7 @@ export function EventDrawer({
               )}
 
               {event.subevents && event.subevents.length > 0 && (
-                <section className="rounded-2xl border border-white/60 bg-white/58 p-4 shadow-[inset_0_1px_0_rgb(255_255_255/0.62)]">
+                <section className="cronograma-drawer-section border-t border-border/45 pt-4">
                   <div className="mb-3 flex items-center justify-between gap-3">
                     <div>
                       <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">Subeventos</p>
@@ -135,7 +135,7 @@ export function EventDrawer({
                 </section>
               )}
 
-              <section className="rounded-2xl border border-white/60 bg-white/58 p-4 shadow-[inset_0_1px_0_rgb(255_255_255/0.62)]">
+              <section className="cronograma-drawer-section border-t border-border/45 pt-4">
                 <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">Leitura executiva</p>
                 <p className="mt-2 text-sm leading-relaxed text-foreground/76">{event.summary}</p>
               </section>
@@ -144,7 +144,7 @@ export function EventDrawer({
         </div>
 
         {!editMode && (
-          <div className="border-t border-white/60 bg-white/75 p-4 backdrop-blur-xl">
+          <div className="cronograma-drawer-footer p-4">
             <div className="flex flex-wrap justify-end gap-2">
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="rounded-full">
                 Fechar
@@ -171,7 +171,7 @@ function InfoBlock({
   value: string;
 }) {
   return (
-    <div className={cn('rounded-2xl border border-white/60 bg-white/58 p-4 shadow-[inset_0_1px_0_rgb(255_255_255/0.62)]')}>
+    <div className={cn('cronograma-info-row py-3')}>
       <div className="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
         <Icon className="h-3.5 w-3.5 text-gold" />
         {label}

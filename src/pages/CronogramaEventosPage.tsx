@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { CalendarDays } from 'lucide-react';
+import { useSearchParams } from 'react-router-dom';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { CronogramaCommandHeader } from '@/components/cronograma-eventos/CronogramaCommandHeader';
 import { CronogramaFiltersBar } from '@/components/cronograma-eventos/CronogramaFiltersBar';
@@ -8,10 +9,10 @@ import {
   CategoryBoard,
   MeetingsBoard,
   OverviewBoard,
-  TimelineBoard,
   UndatedBoard,
   YearBoard,
 } from '@/components/cronograma-eventos/CronogramaBoards';
+import { CronogramaTimelineBoard } from '@/components/cronograma-eventos/CronogramaTimelineBoard';
 import { CalendarMonthView } from '@/components/cronograma-eventos/CalendarMonthView';
 import { EventDrawer } from '@/components/cronograma-eventos/EventDrawer';
 import { EventForm } from '@/components/cronograma-eventos/EventForm';
@@ -33,14 +34,30 @@ const emptyFilters: CronogramaFilters = {
   priority: 'all',
 };
 
+const cronogramaViews: CronogramaView[] = ['overview', 'timeline', 'calendar', 'year', 'category', 'meetings', 'undated'];
+
+function isCronogramaView(value: string | null): value is CronogramaView {
+  return Boolean(value && cronogramaViews.includes(value as CronogramaView));
+}
+
 export default function CronogramaEventosPage() {
   const cronograma = useCronogramaEventos();
-  const [activeView, setActiveView] = useState<CronogramaView>('overview');
+  const [searchParams, setSearchParams] = useSearchParams();
   const [filters, setFilters] = useState<CronogramaFilters>(emptyFilters);
   const [selectedEvent, setSelectedEvent] = useState<CronogramaEvent | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerStartsEditing, setDrawerStartsEditing] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
+  const activeView = isCronogramaView(searchParams.get('view')) ? searchParams.get('view') as CronogramaView : 'overview';
+
+  const setActiveView = (view: CronogramaView) => {
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current);
+      if (view === 'overview') next.delete('view');
+      else next.set('view', view);
+      return next;
+    }, { replace: true });
+  };
 
   const events = useMemo(() => cronograma.events.map(adaptCronogramaEvent), [cronograma.events]);
   const sourceById = useMemo(() => {
@@ -134,12 +151,23 @@ export default function CronogramaEventosPage() {
           events={events}
           onNewEvent={() => setCreateOpen(true)}
           onOpenUndated={() => setActiveView('undated')}
+          canManage={cronograma.canManage}
         />
 
-        <div className="sticky top-2 z-20 space-y-3 rounded-[1.6rem] bg-background/55 pb-2 backdrop-blur-xl">
+        <div className="cronograma-command-dock sticky top-[72px] z-20 space-y-2 py-2">
           <CronogramaViewTabs activeView={activeView} onChange={setActiveView} />
-          <CronogramaFiltersBar filters={filters} onChange={setFilters} onClear={() => setFilters(emptyFilters)} />
+          <CronogramaFiltersBar
+            filters={filters}
+            onChange={setFilters}
+            onClear={() => setFilters(emptyFilters)}
+            resultCount={filteredEvents.length}
+            totalCount={events.length}
+          />
         </div>
+
+        <p className="sr-only" aria-live="polite">
+          {filteredEvents.length} de {events.length} eventos exibidos na visão atual.
+        </p>
 
         <ViewContentTransition view={activeView}>
           {activeView === 'overview' && (
@@ -152,7 +180,7 @@ export default function CronogramaEventosPage() {
           )}
 
           {activeView === 'timeline' && (
-            <TimelineBoard events={filteredEvents} onOpen={(event) => openEvent(event)} />
+            <CronogramaTimelineBoard events={filteredEvents} onOpen={(event) => openEvent(event)} />
           )}
 
           {activeView === 'calendar' && (

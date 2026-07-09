@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowRight, ShieldCheck, Sparkles } from 'lucide-react';
 import CommissionCard from '@/components/commissions/CommissionCard';
+import { CronogramaPortalCard } from '@/components/cronograma-eventos/CronogramaPortalCard';
 import {
   SELECTED_COMMISSION_STORAGE_KEY,
   getPublicCommissionModules,
@@ -27,6 +28,11 @@ export default function CommissionPortalPage() {
   const accessModule = (slug: string) => {
     saveSelectedModule(slug);
     navigate(`/login/${slug}`);
+  };
+
+  const accessCronograma = () => {
+    saveSelectedModule('cronograma-eventos');
+    navigate('/login/cronograma-eventos');
   };
 
   const accessAdmin = () => {
@@ -75,7 +81,7 @@ export default function CommissionPortalPage() {
                 Portal das Comissões Fenasoja
               </h1>
               <p className="mt-5 max-w-2xl text-base leading-7 text-white/75 sm:text-lg">
-                Toque em uma comissão para expandir e acessar seu ambiente modular, seguro e alinhado à operação da feira.
+                Acesse a central temporal da Fenasoja ou escolha uma comissão para entrar em seu ambiente operacional.
               </p>
             </div>
           </div>
@@ -103,6 +109,10 @@ export default function CommissionPortalPage() {
             </div>
           </button>
         </header>
+
+        <section aria-label="Acesso direto aos módulos institucionais" className="mb-6">
+          <CronogramaPortalCard onAccess={accessCronograma} />
+        </section>
 
         <section
           ref={gridRef}

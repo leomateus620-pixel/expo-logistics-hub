@@ -49,7 +49,7 @@ export function OverviewBoard({
     <div className="grid gap-4 xl:grid-cols-[minmax(0,1.15fr)_420px]">
       <section className="space-y-4">
         {main2028 && (
-          <article className="relative overflow-hidden rounded-[1.75rem] border border-gold/32 bg-[linear-gradient(135deg,hsl(var(--primary)/0.10),rgb(255_255_255/0.84)_44%,hsl(var(--gold)/0.16))] p-5 shadow-[0_24px_80px_-48px_hsl(var(--primary)/0.72),inset_0_1px_0_rgb(255_255_255/0.72)] sm:p-6">
+          <article className="cronograma-main-event relative overflow-hidden p-5 sm:p-6">
             <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_8%_0%,hsl(var(--primary)/0.16),transparent_32%),radial-gradient(circle_at_94%_20%,hsl(var(--gold)/0.18),transparent_28%)]" />
             <div className="relative grid gap-5 lg:grid-cols-[minmax(0,1fr)_240px] lg:items-end">
               <div className="min-w-0">
@@ -65,7 +65,7 @@ export function OverviewBoard({
                   <CronogramaPriorityIndicator priority={main2028.priority} />
                 </div>
               </div>
-              <div className="rounded-[1.35rem] border border-white/60 bg-white/58 p-4 shadow-[inset_0_1px_0_rgb(255_255_255/0.65)]">
+              <div className="cronograma-main-date-panel p-4">
                 <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">Data oficial</p>
                 <p className="mt-2 text-2xl font-black leading-tight text-primary">{formatLongDateRange(main2028.date, main2028.endDate)}</p>
                 <Button type="button" onClick={() => onOpen(main2028)} className="mt-4 w-full rounded-full">
@@ -76,7 +76,7 @@ export function OverviewBoard({
           </article>
         )}
 
-        <section className="rounded-[1.75rem] border border-white/60 bg-white/66 p-4 shadow-[0_18px_60px_-42px_rgb(21_62_39/0.48),inset_0_1px_0_rgb(255_255_255/0.66)]">
+        <section className="cronograma-ledger p-4">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Leitura rápida</p>
@@ -87,7 +87,7 @@ export function OverviewBoard({
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
-          <div className="grid gap-3 lg:grid-cols-2">
+          <div className="divide-y divide-border/40">
             {nextEvents.map((event, index) => (
               <CronogramaEventCard key={event.id} event={event} index={index} compact onOpen={onOpen} onEdit={onEdit} />
             ))}
@@ -96,7 +96,7 @@ export function OverviewBoard({
       </section>
 
       <aside className="space-y-4">
-        <section className="rounded-[1.75rem] border border-white/60 bg-white/66 p-4 shadow-[0_18px_60px_-42px_rgb(21_62_39/0.48),inset_0_1px_0_rgb(255_255_255/0.66)]">
+        <section className="cronograma-ledger is-undated p-4">
           <div className="mb-4 flex items-center justify-between gap-3">
             <div>
               <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Central de decisão</p>
@@ -170,7 +170,7 @@ export function TimelineBoard({
                         {open ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
                       </span>
                     </button>
-                    <div className={cn('grid gap-2 overflow-hidden transition-all duration-300', open ? 'max-h-[900px] opacity-100' : 'max-h-0 opacity-0')}>
+                    <div className={cn('grid gap-2 overflow-hidden transition-opacity duration-200', open ? 'max-h-[900px] opacity-100' : 'max-h-0 opacity-0')}>
                       {monthEvents.map((event) => (
                         <TimelineItem key={event.id} event={event} onOpen={onOpen} />
                       ))}
@@ -279,7 +279,7 @@ export function MeetingsBoard({
 
   return (
     <div className="space-y-4">
-      <section className="rounded-[1.75rem] border border-white/60 bg-white/66 p-4 shadow-[0_18px_58px_-44px_rgb(21_62_39/0.42),inset_0_1px_0_rgb(255_255_255/0.62)]">
+      <section className="cronograma-board-heading p-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Agenda institucional</p>
@@ -323,7 +323,7 @@ export function UndatedBoard({
 
   return (
     <div className="space-y-4">
-      <section className="rounded-[1.75rem] border border-amber-900/10 bg-[linear-gradient(135deg,rgb(255_255_255/0.80),hsl(var(--gold)/0.09))] p-5 shadow-[0_20px_64px_-46px_rgb(102_64_12/0.5),inset_0_1px_0_rgb(255_255_255/0.66)]">
+      <section className="cronograma-board-heading is-undated p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-950/65">Central de decisões pendentes</p>

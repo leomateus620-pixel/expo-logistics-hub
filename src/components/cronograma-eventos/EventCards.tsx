@@ -15,8 +15,6 @@ import {
   CronogramaCategoryMarker,
   CronogramaPriorityIndicator,
   CronogramaStatusIndicator,
-  EventBadgesRow,
-  EventIdentityStrip,
   EventMetaLine,
 } from './CronogramaBadges';
 import { categoryLabels } from './cronogramaData';
@@ -36,68 +34,70 @@ export function CronogramaEventCard({
   onOpen: (event: CronogramaEvent) => void;
   onEdit?: (event: CronogramaEvent) => void;
 }) {
+  const dateLabel = event.date ? formatShortDate(event.date) : 'Sem data';
   return (
     <article
       className={cn(
-        'group relative overflow-hidden rounded-2xl border border-white/65 bg-white/72 backdrop-blur-2xl shadow-[0_18px_52px_-32px_rgb(21_62_39/0.45),inset_0_1px_0_rgb(255_255_255/0.65)] transition-all duration-300',
-        'hover:-translate-y-0.5 hover:border-gold/35 hover:shadow-[0_22px_62px_-30px_rgb(21_62_39/0.58),0_10px_28px_-24px_hsl(var(--gold)/0.65),inset_0_1px_0_rgb(255_255_255/0.72)]',
-        'active:translate-y-0 active:scale-[0.995]',
-        compact ? 'p-3 pl-4' : 'p-4 pl-5',
+        'cronograma-event-row group',
+        compact && 'is-compact',
+        event.isMain && 'is-main',
+        event.priority === 'critical' && 'is-critical',
       )}
       style={{ animationDelay: `${index * 35}ms` }}
     >
-      <EventIdentityStrip event={event} />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_0%,hsl(var(--gold)/0.12),transparent_34%),linear-gradient(135deg,rgb(255_255_255/0.38),transparent_46%)] opacity-75" />
-      <div className="relative space-y-3">
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0 space-y-2">
-            <div className="flex flex-wrap items-center gap-2">
-              <CronogramaCategoryMarker category={event.category} />
-              {event.isOfficial && <span className="text-[10px] font-bold uppercase tracking-[0.18em] text-gold">Oficial</span>}
-            </div>
-            <h3 className={cn('text-balance font-bold leading-tight tracking-tight text-foreground', compact ? 'text-sm' : 'text-base')}>
-              {event.title}
-            </h3>
-          </div>
-          <button
-            type="button"
-            onClick={() => onOpen(event)}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border/45 bg-white/60 text-foreground/62 transition-all duration-200 hover:border-gold/35 hover:text-primary focus-ring"
-            aria-label={`Abrir detalhes de ${event.title}`}
-          >
-            <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
-          </button>
+      <div className="cronograma-event-date" aria-label={dateLabel}>
+        <span className="font-mono text-[10px] font-bold uppercase tracking-[0.12em] text-muted-foreground">
+          {event.date ? event.year : 'Pendente'}
+        </span>
+        <span className="mt-1 text-sm font-black leading-tight text-foreground">{dateLabel}</span>
+        {event.startTime && <span className="mt-1 font-mono text-[10px] font-semibold text-primary">{event.startTime}</span>}
+      </div>
+
+      <div className="min-w-0">
+        <div className="flex flex-wrap items-center gap-2">
+          <CronogramaCategoryMarker category={event.category} />
+          {event.isOfficial && <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-gold">Oficial</span>}
+          {event.isMain && <span className="text-[9px] font-bold uppercase tracking-[0.16em] text-primary">Marco 2028</span>}
         </div>
+        <button type="button" onClick={() => onOpen(event)} className="mt-1.5 block w-full text-left focus-ring">
+          <h3 className={cn('text-balance font-bold leading-tight tracking-tight text-foreground group-hover:text-primary', compact ? 'text-sm' : 'text-base')}>
+            {event.title}
+          </h3>
+        </button>
+        {!compact && <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted-foreground">{event.summary}</p>}
+        <EventMetaLine event={event} dense className="mt-2" />
+      </div>
 
-        {!compact && <p className="text-sm leading-relaxed text-muted-foreground">{event.summary}</p>}
-        <EventMetaLine event={event} dense={compact} />
-
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <EventBadgesRow event={event} compact={compact} />
-          <div className="flex items-center gap-1.5">
-            {onEdit && (
-              <Button
-                type="button"
-                size="sm"
-                variant="ghost"
-                onClick={() => onEdit(event)}
-                className="h-8 rounded-full px-2.5 text-xs text-foreground/68 hover:text-primary"
-              >
-                <Edit3 className="h-3.5 w-3.5" />
-                Editar
-              </Button>
-            )}
+      <div className="cronograma-event-actions">
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          <CronogramaStatusIndicator status={event.status} compact />
+          {(event.priority === 'critical' || event.priority === 'high') && (
+            <CronogramaPriorityIndicator priority={event.priority} compact />
+          )}
+        </div>
+        <div className="mt-2 flex items-center justify-end gap-1">
+          {onEdit && (
             <Button
               type="button"
               size="sm"
               variant="ghost"
-              onClick={() => onOpen(event)}
-              className="h-8 rounded-full px-2.5 text-xs text-primary hover:bg-primary/[0.08]"
+              onClick={() => onEdit(event)}
+              className="h-8 rounded-lg px-2 text-xs text-foreground/62 hover:text-primary"
             >
-              Detalhes
-              <ChevronRight className="h-3.5 w-3.5" />
+              <Edit3 className="h-3.5 w-3.5" aria-hidden="true" />
+              <span className="hidden 2xl:inline">Editar</span>
             </Button>
-          </div>
+          )}
+          <Button
+            type="button"
+            size="icon"
+            variant="ghost"
+            onClick={() => onOpen(event)}
+            className="h-8 w-8 rounded-lg text-primary hover:bg-primary/[0.08]"
+            aria-label={`Abrir detalhes de ${event.title}`}
+          >
+            <ArrowUpRight className="h-4 w-4" aria-hidden="true" />
+          </Button>
         </div>
       </div>
     </article>
@@ -115,7 +115,7 @@ export function CompactEventRow({
     <button
       type="button"
       onClick={() => onOpen(event)}
-      className="group flex w-full items-start gap-3 rounded-xl border border-border/35 bg-white/55 px-3 py-2.5 text-left transition-all duration-200 hover:border-gold/30 hover:bg-white/80 hover:shadow-[0_10px_24px_-20px_hsl(var(--primary)/0.45)] focus-ring"
+      className="cronograma-compact-row group focus-ring"
     >
       <span className="mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/[0.07] text-[11px] font-bold text-primary">
         {event.startTime || formatShortDate(event.date).slice(0, 2)}
@@ -145,7 +145,7 @@ export function MeetingAgendaCard({
   const remaining = daysUntil(event.date);
   return (
     <article
-      className="group relative overflow-hidden rounded-2xl border border-primary/12 bg-white/72 p-4 shadow-[0_18px_48px_-34px_hsl(var(--primary)/0.58),inset_0_1px_0_rgb(255_255_255/0.65)] transition-all duration-300 hover:-translate-y-0.5 hover:border-gold/30 hover:bg-white/86"
+      className="cronograma-meeting-row group"
       style={{ animationDelay: `${index * 45}ms` }}
     >
       <div className="absolute inset-y-5 left-0 w-1 rounded-r-full bg-gradient-to-b from-primary via-primary/65 to-gold" />
@@ -195,7 +195,7 @@ export function UndatedDecisionCard({
   onEdit?: (event: CronogramaEvent) => void;
 }) {
   return (
-    <article className="group relative overflow-hidden rounded-2xl border border-amber-900/10 bg-[linear-gradient(135deg,rgb(255_255_255/0.82),hsl(var(--gold)/0.075))] p-4 shadow-[0_18px_54px_-36px_rgb(102_64_12/0.42),inset_0_1px_0_rgb(255_255_255/0.65)] transition-all duration-300 hover:-translate-y-0.5 hover:border-gold/32">
+    <article className="cronograma-undated-row group">
       <div className="absolute inset-y-4 left-0 w-1.5 rounded-r-full bg-amber-700/75" />
       <div className="space-y-3 pl-1">
         <div className="flex items-start justify-between gap-3">
@@ -209,7 +209,7 @@ export function UndatedDecisionCard({
           <CronogramaPriorityIndicator priority={event.priority} compact />
         </div>
         <p className="text-sm leading-relaxed text-muted-foreground">{event.summary}</p>
-        <div className="rounded-xl border border-amber-900/10 bg-white/58 p-3">
+        <div className="cronograma-decision-context">
           <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-amber-950/65">Motivo</p>
           <p className="mt-1 text-sm text-foreground/76">{event.pendingReason || 'Aguardando definição executiva.'}</p>
           {event.decisionNeeded && <p className="mt-2 text-xs font-medium text-primary">{event.decisionNeeded}</p>}
@@ -249,7 +249,7 @@ export function CategoryInsightCard({
   const next = [...events].filter((event) => event.date).sort((a, b) => `${a.date}-${a.startTime}`.localeCompare(`${b.date}-${b.startTime}`))[0];
 
   return (
-    <section className="rounded-2xl border border-white/60 bg-white/70 p-4 shadow-[0_18px_54px_-38px_rgb(21_62_39/0.45),inset_0_1px_0_rgb(255_255_255/0.62)]">
+    <section className="cronograma-category-ledger">
       <div className="mb-4 flex items-start justify-between gap-3">
         <div>
           <CronogramaCategoryMarker category={category} className="mb-2" />

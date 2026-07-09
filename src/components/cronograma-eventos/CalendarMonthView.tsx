@@ -88,13 +88,19 @@ export function CalendarMonthView({
   onOpen: (event: CronogramaEvent) => void;
   onEdit?: (event: CronogramaEvent) => void;
 }) {
-  const firstDated = useMemo(() => events.find((event) => event.date), [events]);
-  const firstParts = firstDated ? getDateParts(firstDated.date) : null;
-  const [year, setYear] = useState(preferredYear || firstParts?.year || 2028);
-  const [month, setMonth] = useState(firstParts?.month ?? 4);
+  const initialYear = preferredYear || 2028;
+  const initialEvent = useMemo(
+    () => events.find((event) => event.year === initialYear && event.isMain && event.date)
+      || events.find((event) => event.year === initialYear && event.date)
+      || events.find((event) => event.date),
+    [events, initialYear],
+  );
+  const initialParts = initialEvent ? getDateParts(initialEvent.date) : null;
+  const [year, setYear] = useState(initialYear);
+  const [month, setMonth] = useState(initialParts?.month ?? 4);
   const [selectedDate, setSelectedDate] = useState<string>(() => {
-    if (firstDated?.date) return firstDated.date;
-    return dateKey(preferredYear || 2028, 4, 1);
+    if (initialEvent?.date) return initialEvent.date;
+    return dateKey(initialYear, 4, 1);
   });
   const [expanded, setExpanded] = useState(false);
   const [sideCollapsed, setSideCollapsed] = useState(false);
@@ -301,7 +307,7 @@ function CalendarWorkspace({
 
         <div
           className={cn(
-            'grid gap-4 transition-all duration-300',
+            'grid gap-4',
             expanded
               ? sideCollapsed
                 ? 'xl:grid-cols-1'
@@ -317,7 +323,7 @@ function CalendarWorkspace({
                 </div>
               ))}
             </div>
-            <div className="grid grid-cols-7 gap-1.5">
+            <div key={`${year}-${month}`} className="cronograma-calendar-month-enter grid grid-cols-7 gap-1.5">
               {cells.map((cell) => {
                 if (cell.type === 'empty') {
                   return <div key={cell.key} className={cn('rounded-2xl', expanded ? 'min-h-[96px]' : 'min-h-[74px]')} />;
@@ -328,12 +334,10 @@ function CalendarWorkspace({
                 const hasMain = events.some((event) => event.isMain);
                 const hasMeeting = events.some((event) => event.isCentralMeeting);
                 return (
-                  <button
+                  <div
                     key={cell.key}
-                    type="button"
-                    onClick={() => onSelectDate(key)}
                     className={cn(
-                      'group relative flex flex-col overflow-hidden rounded-2xl border p-2 text-left transition-all duration-200 focus-ring',
+                      'group relative flex flex-col overflow-hidden rounded-xl border text-left transition-[border-color,background-color,box-shadow] duration-200',
                       expanded ? 'min-h-[108px]' : 'min-h-[82px]',
                       selected
                         ? 'border-primary/38 bg-primary/[0.075] shadow-[0_14px_30px_-24px_hsl(var(--primary)/0.75),inset_0_1px_0_rgb(255_255_255/0.72)]'
@@ -341,18 +345,24 @@ function CalendarWorkspace({
                           ? 'border-gold/24 bg-white/75 hover:border-gold/45 hover:bg-white'
                           : 'border-border/22 bg-white/36 hover:bg-white/62',
                     )}
+                    role="group"
                     aria-label={`${cell.day} de ${getMonthLabel(month)} de ${year}, ${events.length} eventos`}
                   >
-                    <span className="flex items-center justify-between gap-1">
+                    <button
+                      type="button"
+                      onClick={() => onSelectDate(key)}
+                      className="flex w-full items-center justify-between gap-1 rounded-lg p-2 text-left focus-ring"
+                      aria-label={`Selecionar ${cell.day} de ${getMonthLabel(month)} de ${year}`}
+                    >
                       <span className={cn('font-mono text-sm font-black', selected ? 'text-primary' : 'text-foreground/78')}>{cell.day}</span>
                       <span className="flex items-center gap-1">
                         {hasMeeting && <span className="h-1.5 w-1.5 rounded-full bg-primary" title="Reunião central" />}
                         {hasMain && <span className="h-1.5 w-1.5 rounded-full bg-gold" title="Marco principal" />}
                         {events.length > 0 && <span className="text-[10px] font-bold text-muted-foreground">{events.length}</span>}
                       </span>
-                    </span>
-                    <CalendarEventLayer events={events} expanded={expanded} />
-                  </button>
+                    </button>
+                    <CalendarEventLayer events={events} expanded={expanded} onOpen={onOpen} />
+                  </div>
                 );
               })}
             </div>
@@ -486,7 +496,7 @@ function CalendarYearWheel({
         type="button"
         onWheel={onWheel}
         className={cn(
-          'h-7 min-w-[76px] rounded-full px-3 font-mono text-sm font-black text-primary transition-all duration-200 hover:bg-gold/[0.12] hover:text-amber-950 focus-ring',
+          'h-7 min-w-[76px] rounded-full px-3 font-mono text-sm font-black text-primary transition-[transform,background-color,color,box-shadow] duration-200 hover:bg-gold/[0.12] hover:text-amber-950 focus-ring',
           pulse && 'scale-105 bg-gold/[0.15] text-amber-950 shadow-[0_0_0_5px_hsl(var(--gold)/0.08)]',
         )}
         aria-label={`Ano selecionado ${year}. Role para trocar o ano.`}
@@ -506,7 +516,15 @@ function CalendarYearWheel({
   );
 }
 
-function CalendarEventLayer({ events, expanded }: { events: CronogramaEvent[]; expanded: boolean }) {
+function CalendarEventLayer({
+  events,
+  expanded,
+  onOpen,
+}: {
+  events: CronogramaEvent[];
+  expanded: boolean;
+  onOpen: (event: CronogramaEvent) => void;
+}) {
   if (events.length === 0) {
     return <span className="mt-auto h-1 rounded-full bg-transparent" />;
   }
@@ -514,10 +532,12 @@ function CalendarEventLayer({ events, expanded }: { events: CronogramaEvent[]; e
   return (
     <span className="mt-2 flex flex-1 flex-col gap-1">
       {events.slice(0, expanded ? 3 : 2).map((event) => (
-        <span
+        <button
+          type="button"
           key={event.id}
+          onClick={() => onOpen(event)}
           className={cn(
-            'block truncate rounded-lg border px-1.5 py-1 text-[10px] font-semibold leading-none shadow-[inset_0_1px_0_rgb(255_255_255/0.55)]',
+            'block w-full truncate rounded-md border px-1.5 py-1 text-left text-[10px] font-semibold leading-none shadow-[inset_0_1px_0_rgb(255_255_255/0.55)] focus-ring',
             event.priority === 'critical'
               ? 'border-red-900/12 bg-red-50/85 text-red-950'
               : event.isCentralMeeting
@@ -529,7 +549,7 @@ function CalendarEventLayer({ events, expanded }: { events: CronogramaEvent[]; e
         >
           {event.startTime && <span className="mr-1 font-mono">{event.startTime}</span>}
           {event.title}
-        </span>
+        </button>
       ))}
       {events.length > (expanded ? 3 : 2) && (
         <span className="text-[10px] font-bold text-muted-foreground">+{events.length - (expanded ? 3 : 2)} eventos</span>
@@ -645,7 +665,7 @@ function CalendarFullscreenMode({
   }, [onClose]);
 
   return (
-    <div className="fixed inset-0 z-50 bg-emerald-950/35 p-2 backdrop-blur-xl sm:p-4">
+    <div className="cronograma-calendar-expanded fixed inset-0 z-50 bg-emerald-950/35 p-2 backdrop-blur-xl sm:p-4" role="dialog" aria-modal="true" aria-label="Calendário expandido">
       <div className="h-full overflow-auto rounded-[2rem]">
         {children}
       </div>

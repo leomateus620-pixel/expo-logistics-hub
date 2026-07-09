@@ -15,6 +15,7 @@ import CapabilityGuard from './components/CapabilityGuard';
 import Layout from './components/Layout';
 import CommissionLayout from './components/commissions/CommissionLayout';
 import ModuleAccessGuard from './components/commissions/ModuleAccessGuard';
+import { CronogramaModuleShell } from './components/cronograma-eventos/CronogramaModuleShell';
 import LoginPage from './pages/LoginPage';
 import {
   getCommissionModule,
@@ -229,6 +230,22 @@ function AdminRoutes() {
   );
 }
 
+function CronogramaModuleRoute() {
+  return (
+    <AuthGuard>
+      <OrgGuard>
+        <CapabilityGuard capability="cronograma_eventos_access">
+          <CronogramaModuleShell>
+            <Suspended>
+              <CronogramaEventosPage />
+            </Suspended>
+          </CronogramaModuleShell>
+        </CapabilityGuard>
+      </OrgGuard>
+    </AuthGuard>
+  );
+}
+
 function LegacyLogisticsRoutes() {
   return (
     <AuthenticatedLogisticsLayout>
@@ -241,9 +258,7 @@ function LegacyLogisticsRoutes() {
         <Route path="/transports" element={<FullAccessRoute><TransportsPage /></FullAccessRoute>} />
         <Route path="/guests" element={<FullAccessRoute><GuestsPage /></FullAccessRoute>} />
         <Route path="/agenda" element={<FullAccessRoute><AgendaPage /></FullAccessRoute>} />
-        <Route path="/cronograma-eventos" element={<FullAccessRoute><CronogramaEventosPage /></FullAccessRoute>} />
         <Route path="/fenasoja-events" element={<FullAccessRoute><FenasojaEventsPage /></FullAccessRoute>} />
-        <Route path="/cronograma-eventos" element={<FullAccessRoute><CronogramaEventosPage /></FullAccessRoute>} />
         <Route path="/checklist" element={<FullAccessRoute><ChecklistPage /></FullAccessRoute>} />
         <Route path="/team" element={<FullAccessRoute><TeamPage /></FullAccessRoute>} />
         <Route path="/ver-escala" element={<FullAccessRoute><VerEscalaPage /></FullAccessRoute>} />
@@ -277,6 +292,7 @@ const App = () => (
               <Route path="/login/admin" element={<LoginPage />} />
               <Route path="/login/:moduleSlug" element={<LoginPage />} />
               <Route path="/admin/*" element={<AdminRoutes />} />
+              <Route path="/cronograma-eventos" element={<CronogramaModuleRoute />} />
               <Route path="/comissoes/logistica/*" element={<LogisticaModuleRoutes />} />
               <Route path="/comissoes/:moduleSlug/*" element={<CommissionModuleRoutes />} />
               <Route path="/*" element={<LegacyLogisticsRoutes />} />

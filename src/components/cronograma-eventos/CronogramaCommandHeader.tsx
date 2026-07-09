@@ -1,24 +1,30 @@
 import {
-  CalendarDays,
   Clock3,
+  Database,
   Flag,
   Plus,
-  Sparkles,
   UsersRound,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { CronogramaMetaBadge } from './CronogramaBadges';
 import type { CronogramaEvent } from './types';
+
+const cycleLabels: Record<number, string> = {
+  2026: 'Estruturação',
+  2027: 'Consolidação',
+  2028: 'Realização',
+};
 
 export function CronogramaCommandHeader({
   events,
   onNewEvent,
   onOpenUndated,
+  canManage,
 }: {
   events: CronogramaEvent[];
   onNewEvent: () => void;
   onOpenUndated: () => void;
+  canManage: boolean;
 }) {
   const official = events.filter((event) => event.isOfficial).length;
   const byYear = {
@@ -30,56 +36,66 @@ export function CronogramaCommandHeader({
   const meetings = events.filter((event) => event.isCentralMeeting).length;
 
   return (
-    <header className="cronograma-hero relative overflow-hidden rounded-[1.75rem] border border-white/60 bg-[linear-gradient(135deg,rgb(255_255_255/0.82),rgb(245_249_241/0.72)_48%,hsl(var(--gold)/0.12))] p-5 shadow-[0_24px_80px_-48px_rgb(21_62_39/0.62),inset_0_1px_0_rgb(255_255_255/0.72)] sm:p-6">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_0%,hsl(var(--primary)/0.14),transparent_30%),radial-gradient(circle_at_88%_18%,hsl(var(--gold)/0.16),transparent_24%)]" />
-      <div className="relative grid gap-5 xl:grid-cols-[minmax(0,1fr)_auto] xl:items-center">
+    <header className="cronograma-command-header">
+      <div className="cronograma-command-grid">
         <div className="min-w-0">
-          <div className="mb-3 flex flex-wrap items-center gap-2">
-            <CronogramaMetaBadge icon={Sparkles} tone="gold">Fenasoja 2028</CronogramaMetaBadge>
-            <CronogramaMetaBadge icon={Flag} tone="green">Central temporal oficial</CronogramaMetaBadge>
+          <div className="cronograma-eyebrow">
+            <span className="cronograma-live-dot" aria-hidden="true" />
+            Planejamento institucional · base oficial ativa
           </div>
-          <div className="flex items-start gap-4">
-            <div className="hidden h-14 w-14 shrink-0 items-center justify-center rounded-2xl border border-gold/25 bg-white/55 text-primary shadow-[inset_0_1px_0_rgb(255_255_255/0.65),0_14px_34px_-26px_hsl(var(--primary)/0.75)] sm:flex">
-              <CalendarDays className="h-7 w-7" aria-hidden="true" />
-            </div>
-            <div className="min-w-0">
-              <p className="text-[11px] font-bold uppercase tracking-[0.24em] text-primary/75">Planejamento institucional</p>
-              <h1 className="mt-1 text-2xl font-black tracking-tight text-foreground sm:text-3xl">
-                Cronograma e Eventos
-              </h1>
-              <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
-                Visão executiva do ciclo 2026-2028 com marcos oficiais, reuniões centrais, decisões pendentes e calendário de planejamento da Fenasoja.
-              </p>
-            </div>
-          </div>
+          <h1 className="mt-3 text-balance text-3xl font-black tracking-[-0.035em] text-white sm:text-4xl">
+            Cronograma e Eventos
+          </h1>
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-white/64 sm:text-[15px]">
+            Central temporal do ciclo 2026—2028. Marcos, reuniões, períodos e decisões permanecem conectados em uma única leitura operacional.
+          </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 xl:min-w-[620px]">
-          <HeaderMetric icon={CalendarDays} label="Oficiais" value={official} accent />
-          <HeaderMetric icon={Flag} label="2026" value={byYear[2026]} />
-          <HeaderMetric icon={Flag} label="2027" value={byYear[2027]} />
-          <HeaderMetric icon={Sparkles} label="2028" value={byYear[2028]} accent />
-          <HeaderMetric icon={Clock3} label="Sem data" value={undated} />
-          <HeaderMetric icon={UsersRound} label="Reuniões" value={meetings} />
-        </div>
-      </div>
-
-      <div className="relative mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-white/55 pt-4">
-        <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
-          <span className="h-2 w-2 rounded-full bg-primary shadow-[0_0_0_4px_hsl(var(--primary)/0.09)]" />
-          Seed oficial ativo com eventos datados e decisões sem data preservadas.
-        </div>
-        <div className="flex flex-wrap items-center gap-2">
-          <Button type="button" variant="outline" size="sm" onClick={onOpenUndated} className="rounded-full border-gold/25 bg-white/55 px-3 text-xs text-amber-950 hover:bg-gold/10">
+        <div className="cronograma-command-actions">
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={onOpenUndated}
+            className="cronograma-secondary-action h-10 rounded-lg px-3 text-xs"
+          >
+            <Clock3 className="h-4 w-4" aria-hidden="true" />
             Pendências
-            <span className="rounded-full bg-gold/[0.15] px-1.5 py-0.5 text-[10px] font-bold">{undated}</span>
+            <span className="cronograma-action-count">{undated}</span>
           </Button>
-          <Button type="button" size="sm" onClick={onNewEvent} className="rounded-full px-4 text-xs shadow-[0_14px_28px_-18px_hsl(var(--primary)/0.75)]">
-            <Plus className="h-4 w-4" />
-            Novo evento
-          </Button>
+          {canManage && (
+            <Button
+              type="button"
+              size="sm"
+              onClick={onNewEvent}
+              className="cronograma-primary-action h-10 rounded-lg px-4 text-xs"
+            >
+              <Plus className="h-4 w-4" aria-hidden="true" />
+              Novo evento
+            </Button>
+          )}
         </div>
       </div>
+
+      <div className="cronograma-cycle-rail" aria-label="Evolução do ciclo Fenasoja 2028">
+        {[2026, 2027, 2028].map((year) => (
+          <div key={year} className="cronograma-cycle-stage" data-final={year === 2028}>
+            <span className="cronograma-cycle-node" aria-hidden="true" />
+            <span className="font-mono text-sm font-black text-white">{year}</span>
+            <span className="text-[11px] font-semibold text-white/46">{cycleLabels[year]}</span>
+            <span className="ml-auto font-mono text-xs font-bold text-gold">{byYear[year as 2026 | 2027 | 2028]}</span>
+          </div>
+        ))}
+      </div>
+
+      <dl className="cronograma-metric-strip">
+        <HeaderMetric icon={Database} label="Base oficial" value={official} />
+        <HeaderMetric icon={Flag} label="2026" value={byYear[2026]} />
+        <HeaderMetric icon={Flag} label="2027" value={byYear[2027]} />
+        <HeaderMetric icon={Flag} label="2028" value={byYear[2028]} accent />
+        <HeaderMetric icon={Clock3} label="Sem data" value={undated} />
+        <HeaderMetric icon={UsersRound} label="Reuniões centrais" value={meetings} />
+      </dl>
     </header>
   );
 }
@@ -89,21 +105,19 @@ function HeaderMetric({
   label,
   value,
   accent,
-  danger,
 }: {
   icon: LucideIcon;
   label: string;
   value: number;
   accent?: boolean;
-  danger?: boolean;
 }) {
   return (
-    <div className="rounded-2xl border border-white/55 bg-white/52 px-3 py-3 shadow-[inset_0_1px_0_rgb(255_255_255/0.62)]">
-      <div className="flex items-center justify-between gap-2">
-        <Icon className={accent ? 'h-4 w-4 text-gold' : danger ? 'h-4 w-4 text-red-700' : 'h-4 w-4 text-primary'} />
-        <span className="font-mono text-xl font-black leading-none text-foreground">{value}</span>
-      </div>
-      <p className="mt-2 truncate text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground">{label}</p>
+    <div className="cronograma-metric-item">
+      <dt className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-white/42">
+        <Icon className={accent ? 'h-3.5 w-3.5 text-gold' : 'h-3.5 w-3.5 text-emerald-200/62'} aria-hidden="true" />
+        {label}
+      </dt>
+      <dd className={accent ? 'font-mono text-xl font-black text-gold' : 'font-mono text-xl font-black text-white'}>{value}</dd>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, LockKeyhole, LogIn, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, CalendarRange, LockKeyhole, LogIn, ShieldCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import bgImage from '@/assets/fenasoja-bg-2026.webp';
@@ -42,16 +42,24 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
 
   const isAdminLogin = location.pathname === '/login/admin' || moduleSlug === 'admin' || returnTo?.startsWith('/admin');
   const selectedSlug = isAdminLogin ? 'admin' : moduleSlug || getModuleSlugFromPath(returnTo) || getStoredModuleSlug() || 'logistica';
+  const isCronogramaLogin = selectedSlug === 'cronograma-eventos' || returnTo === '/cronograma-eventos';
   const selectedModule = getCommissionModule(selectedSlug);
   const contextName = isAdminLogin
     ? 'Administrador'
-    : selectedModule
+    : isCronogramaLogin
+      ? 'Cronograma e Eventos'
+      : selectedModule
       ? `Comissão de ${selectedModule.name}`
       : 'Comissão de Logística';
+  const heroTitle = isCronogramaLogin ? 'Planejamento temporal da Fenasoja 2028' : 'Ambiente seguro das comissões';
+  const heroDescription = isCronogramaLogin
+    ? 'Acesse diretamente o calendário oficial, a linha do tempo, as reuniões centrais e as decisões pendentes do ciclo 2026—2028.'
+    : 'Entre com suas credenciais para continuar no módulo selecionado, preservando permissões e contexto operacional.';
 
   const resolveTarget = () => {
     if (returnTo && returnTo !== '/' && !returnTo.startsWith('/login')) return returnTo;
     if (isAdminLogin) return '/admin';
+    if (isCronogramaLogin) return '/cronograma-eventos';
     if (selectedModule) return getModuleRoute(selectedModule);
     return '/comissoes/logistica/dashboard';
   };
@@ -124,10 +132,10 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
               Acesso restrito
             </div>
             <h1 className="mt-5 max-w-xl text-5xl font-black leading-none tracking-[-0.04em] drop-shadow-2xl">
-              Ambiente seguro das comissões
+              {heroTitle}
             </h1>
             <p className="mt-5 max-w-lg text-base leading-7 text-white/70">
-              Entre com suas credenciais para continuar no módulo selecionado, preservando permissões e contexto operacional.
+              {heroDescription}
             </p>
           </section>
 
@@ -137,6 +145,7 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
               <div className="space-y-3">
                 <span className="inline-flex items-center gap-2 rounded-full border border-gold/25 bg-gold/10 px-3 py-1 text-xs font-bold text-gold">
                   {isAdminLogin ? <LockKeyhole className="h-3.5 w-3.5" aria-hidden="true" /> : null}
+                  {isCronogramaLogin ? <CalendarRange className="h-3.5 w-3.5" aria-hidden="true" /> : null}
                   {contextName}
                 </span>
                 <div>
@@ -190,7 +199,7 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
               <p className="text-xs leading-5 text-white/50">Acesso restrito. Solicite suas credenciais ao administrador.</p>
               <Link to="/portal" className="inline-flex items-center rounded-xl px-3 py-2 text-xs font-bold text-gold transition hover:bg-gold/10 hover:text-gold focus-ring">
                 <ArrowLeft className="mr-2 h-3.5 w-3.5" aria-hidden="true" />
-                Trocar comissão
+                Voltar ao portal
               </Link>
             </div>
           </section>
