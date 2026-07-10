@@ -27,22 +27,22 @@ import { formatShortDateRange, formatWeekday } from './dateUtils';
 const statusMeta: Record<CronogramaStatus, { icon: LucideIcon; className: string; dot: string }> = {
   confirmed: {
     icon: CheckCircle2,
-    className: 'text-emerald-800 bg-emerald-50/80 border-emerald-900/10',
+    className: 'text-emerald-800',
     dot: 'bg-emerald-600',
   },
   planned: {
     icon: Clock3,
-    className: 'text-primary bg-primary/5 border-primary/15',
+    className: 'text-primary',
     dot: 'bg-primary',
   },
   in_definition: {
     icon: CircleDashed,
-    className: 'text-amber-900 bg-amber-50/80 border-amber-900/10',
+    className: 'text-amber-900',
     dot: 'bg-amber-600',
   },
   blocked: {
     icon: ShieldAlert,
-    className: 'text-red-900 bg-red-50/80 border-red-900/10',
+    className: 'text-red-900',
     dot: 'bg-red-700',
   },
 };
@@ -87,7 +87,7 @@ export function CronogramaMetaBadge({
   return (
     <span
       className={cn(
-        'inline-flex h-7 items-center gap-1.5 rounded-full border px-2.5 text-[11px] font-semibold leading-none tracking-[0.01em] shadow-[inset_0_1px_0_rgb(255_255_255/0.42)]',
+        'inline-flex h-7 items-center gap-1.5 rounded-md border px-2.5 text-[11px] font-semibold leading-none tracking-[0.01em]',
         toneClass,
         className,
       )}
@@ -106,17 +106,15 @@ export function CronogramaStatusIndicator({
   compact?: boolean;
 }) {
   const meta = statusMeta[status];
-  const Icon = meta.icon;
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 rounded-full border font-semibold leading-none shadow-[inset_0_1px_0_rgb(255_255_255/0.48)]',
-        compact ? 'h-6 px-2 text-[10px]' : 'h-7 px-2.5 text-[11px]',
+        'inline-flex items-center gap-1.5 font-semibold leading-none',
+        compact ? 'text-[10px]' : 'text-[11px]',
         meta.className,
       )}
     >
-      <span className={cn('h-1.5 w-1.5 rounded-full', meta.dot)} />
-      {!compact && <Icon className="h-3.5 w-3.5" aria-hidden="true" />}
+      <span className={cn('h-1.5 w-1.5 rounded-full shadow-[0_0_0_3px_rgb(255_255_255/0.72)]', meta.dot)} />
       {statusLabels[status]}
     </span>
   );
@@ -133,7 +131,7 @@ export function CronogramaPriorityIndicator({
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1.5 overflow-hidden rounded-full border font-semibold leading-none',
+        'inline-flex items-center gap-1.5 overflow-hidden rounded-md border font-semibold leading-none',
         compact ? 'h-6 pr-2 text-[10px]' : 'h-7 pr-2.5 text-[11px]',
         meta.className,
       )}
@@ -156,7 +154,7 @@ export function CronogramaCategoryMarker({
 }) {
   return (
     <span className={cn('inline-flex items-center gap-2 text-[11px] font-semibold text-foreground/72', className)}>
-      <span className={cn('h-2.5 w-2.5 rounded-full shadow-[0_0_0_4px_rgb(255_255_255/0.7)]', categoryTone[category])} />
+      <span className={cn('h-3.5 w-0.5 rounded-full', categoryTone[category])} />
       {label && categoryLabels[category]}
     </span>
   );

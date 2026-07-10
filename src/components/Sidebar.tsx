@@ -1,7 +1,7 @@
 import { NavLink as RouterNavLink } from 'react-router-dom';
 import {
   LayoutDashboard, Car, Zap, MapPin, CalendarDays, CheckSquare, Users, Hotel, Bike,
-  PanelLeftClose, PanelLeftOpen, LogOut, Settings, ClipboardList, X, Gauge, FileText, Receipt, ShieldCheck, CalendarCheck2, CalendarRange,
+  PanelLeftClose, PanelLeftOpen, LogOut, Settings, ClipboardList, X, Gauge, FileText, Receipt, ShieldCheck, CalendarCheck2,
 } from 'lucide-react';
 import { useFenasojaEvents } from '@/hooks/useFenasojaEvents';
 import logo from '@/assets/logofeira26.webp';
@@ -22,7 +22,6 @@ const operacao = [
   { to: '/transports', icon: MapPin, label: 'Transportes', cap: 'full_access' },
   { to: '/expenses', icon: Receipt, label: 'Despesas', cap: 'full_access' },
   { to: '/agenda', icon: CalendarDays, label: 'Agenda', cap: 'full_access' },
-  { to: '/cronograma-eventos', icon: CalendarCheck2, label: 'Cronograma e Eventos', cap: 'full_access' },
   { to: '/fenasoja-events', icon: CalendarCheck2, label: 'Eventos Fenasoja', cap: 'full_access' },
   { to: '/ver-escala', icon: ClipboardList, label: 'Escala', cap: 'full_access' },
   { to: '/checklist', icon: CheckSquare, label: 'Checklist', cap: 'full_access' },
