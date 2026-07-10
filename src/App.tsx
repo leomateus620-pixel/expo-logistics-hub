@@ -9,6 +9,7 @@ import { BrowserRouter, Navigate, Route, Routes, useParams } from 'react-router-
 import { AuthProvider } from './contexts/AuthProvider';
 import { CapabilitiesProvider } from './contexts/CapabilitiesProvider';
 import { useAuth } from './hooks/useAuth';
+import { useCapabilities } from './hooks/useCapabilities';
 import AuthGuard from './components/AuthGuard';
 import OrgGuard from './components/OrgGuard';
 import CapabilityGuard from './components/CapabilityGuard';
@@ -39,6 +40,7 @@ const ExpensesPage = lazy(() => import('./pages/ExpensesPage'));
 const MobilityAuthPage = lazy(() => import('./pages/MobilityAuthPage'));
 const FenasojaEventsPage = lazy(() => import('./pages/FenasojaEventsPage'));
 const CronogramaEventosPage = lazy(() => import('./pages/CronogramaEventosPage'));
+const CommercialMapPage = lazy(() => import('./pages/CommercialMapPage'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const CommissionPortalPage = lazy(() => import('./pages/commissions/CommissionPortalPage'));
 const CommissionDashboardPlaceholder = lazy(() => import('./pages/commissions/CommissionDashboardPlaceholder'));
@@ -123,8 +125,9 @@ function AuthenticatedLogisticsLayout({ children }: { children: ReactNode }) {
 
 function RootRoute() {
   const { user, loading } = useAuth();
+  const { hasFullAccess, hasCapability, isLoading: capabilitiesLoading } = useCapabilities();
 
-  if (loading) {
+  if (loading || (!!user && capabilitiesLoading)) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
@@ -140,12 +143,32 @@ function RootRoute() {
     );
   }
 
+  if (!hasFullAccess && hasCapability('map.view')) {
+    return <Navigate to="/mapa-comercial" replace />;
+  }
+
   return (
     <AuthenticatedLogisticsLayout>
       <FullAccessRoute>
         <Dashboard />
       </FullAccessRoute>
     </AuthenticatedLogisticsLayout>
+  );
+}
+
+function CommercialMapRoute() {
+  return (
+    <AuthGuard>
+      <OrgGuard>
+        <CapabilityGuard capability="map.view">
+          <Layout>
+            <Suspended>
+              <CommercialMapPage />
+            </Suspended>
+          </Layout>
+        </CapabilityGuard>
+      </OrgGuard>
+    </AuthGuard>
   );
 }
 
@@ -293,6 +316,7 @@ const App = () => (
               <Route path="/login/:moduleSlug" element={<LoginPage />} />
               <Route path="/admin/*" element={<AdminRoutes />} />
               <Route path="/cronograma-eventos" element={<CronogramaModuleRoute />} />
+              <Route path="/mapa-comercial" element={<CommercialMapRoute />} />
               <Route path="/comissoes/logistica/*" element={<LogisticaModuleRoutes />} />
               <Route path="/comissoes/:moduleSlug/*" element={<CommissionModuleRoutes />} />
               <Route path="/*" element={<LegacyLogisticsRoutes />} />

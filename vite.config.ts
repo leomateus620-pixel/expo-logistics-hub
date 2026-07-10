@@ -25,6 +25,12 @@ export default defineConfig(({ mode }) => ({
           if (!id.includes("node_modules")) return;
           if (id.includes("maplibre-gl")) return "maps-maplibre";
           if (id.includes("/leaflet/") || id.includes("\\leaflet\\")) return "maps-leaflet";
+          if (
+            id.includes("/three/") ||
+            id.includes("\\three\\") ||
+            id.includes("three-stdlib") ||
+            id.includes("@react-three")
+          ) return "maps-three";
           if (id.includes("html5-qrcode")) return "qr";
           if (id.includes("jspdf")) return "pdf";
           // Note: recharts/d3 are intentionally NOT in a manual chunk.

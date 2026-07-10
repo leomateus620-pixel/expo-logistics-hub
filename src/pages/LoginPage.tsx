@@ -43,23 +43,29 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
   const isAdminLogin = location.pathname === '/login/admin' || moduleSlug === 'admin' || returnTo?.startsWith('/admin');
   const selectedSlug = isAdminLogin ? 'admin' : moduleSlug || getModuleSlugFromPath(returnTo) || getStoredModuleSlug() || 'logistica';
   const isCronogramaLogin = selectedSlug === 'cronograma-eventos' || returnTo === '/cronograma-eventos';
+  const isCommercialMapLogin = selectedSlug === 'mapa-comercial' || returnTo?.startsWith('/mapa-comercial');
   const selectedModule = getCommissionModule(selectedSlug);
   const contextName = isAdminLogin
     ? 'Administrador'
     : isCronogramaLogin
       ? 'Cronograma e Eventos'
+      : isCommercialMapLogin
+        ? 'Mapa Comercial'
       : selectedModule
       ? `Comissão de ${selectedModule.name}`
       : 'Comissão de Logística';
-  const heroTitle = isCronogramaLogin ? 'Planejamento temporal da Fenasoja 2028' : 'Ambiente seguro das comissões';
+  const heroTitle = isCommercialMapLogin ? 'Gestão territorial e comercial do parque' : isCronogramaLogin ? 'Planejamento temporal da Fenasoja 2028' : 'Ambiente seguro das comissões';
   const heroDescription = isCronogramaLogin
     ? 'Acesse diretamente o calendário oficial, a linha do tempo, as reuniões centrais e as decisões pendentes do ciclo 2026—2028.'
+    : isCommercialMapLogin
+      ? 'Visualize estruturas, disponibilidade, reservas, vendas e contratos em uma base cartográfica controlada.'
     : 'Entre com suas credenciais para continuar no módulo selecionado, preservando permissões e contexto operacional.';
 
   const resolveTarget = () => {
     if (returnTo && returnTo !== '/' && !returnTo.startsWith('/login')) return returnTo;
     if (isAdminLogin) return '/admin';
     if (isCronogramaLogin) return '/cronograma-eventos';
+    if (isCommercialMapLogin) return '/mapa-comercial';
     if (selectedModule) return getModuleRoute(selectedModule);
     return '/comissoes/logistica/dashboard';
   };

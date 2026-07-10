@@ -1,7 +1,7 @@
 import { NavLink as RouterNavLink } from 'react-router-dom';
 import {
   LayoutDashboard, Car, Zap, MapPin, CalendarDays, CheckSquare, Users, Hotel, Bike,
-  PanelLeftClose, PanelLeftOpen, LogOut, Settings, ClipboardList, X, Gauge, FileText, Receipt, ShieldCheck, CalendarCheck2,
+  PanelLeftClose, PanelLeftOpen, LogOut, Settings, ClipboardList, X, Gauge, FileText, Receipt, ShieldCheck, CalendarCheck2, MapPinned,
 } from 'lucide-react';
 import { useFenasojaEvents } from '@/hooks/useFenasojaEvents';
 import logo from '@/assets/logofeira26.webp';
@@ -19,6 +19,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 /* ── Menu groups with required capability ── */
 const operacao = [
   { to: '/', icon: LayoutDashboard, label: 'Dashboard', cap: 'full_access' },
+  { to: '/mapa-comercial', icon: MapPinned, label: 'Mapa Comercial', cap: 'map.view' },
   { to: '/transports', icon: MapPin, label: 'Transportes', cap: 'full_access' },
   { to: '/expenses', icon: Receipt, label: 'Despesas', cap: 'full_access' },
   { to: '/agenda', icon: CalendarDays, label: 'Agenda', cap: 'full_access' },
