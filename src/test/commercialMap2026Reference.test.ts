@@ -5,6 +5,7 @@ import {
   OFFICIAL_REFERENCE_REVISION,
 } from '@/features/commercial-map/data/officialReference2026';
 import type { MapEntity } from '@/features/commercial-map/types';
+import { normalizeMapEntityMetadata } from '@/features/commercial-map/utils/mapMetadata';
 
 const expectedLots: Record<string, number[]> = {
   S: Array.from({ length: 36 }, (_, index) => index + 1),
@@ -119,6 +120,34 @@ describe('referência cartográfica oficial Fenasoja 2026', () => {
     expect(OFFICIAL_REFERENCE_DATA.entities.filter((entity) => entity.metadata.legendCode === 'E')).toHaveLength(24);
     expect(OFFICIAL_REFERENCE_DATA.entities.filter((entity) => entity.metadata.legendCode === 'D6')).toHaveLength(3);
     expect(OFFICIAL_REFERENCE_DATA.entities.filter((entity) => entity.metadata.legendCode === 'B42')).toHaveLength(2);
+  });
+
+  it('mantém os portões sem completar descrições ausentes na legenda oficial', () => {
+    const gates = new Map(OFFICIAL_REFERENCE_DATA.entities
+      .filter((entity) => entity.classification === 'GATE')
+      .map((entity) => [entity.publicIdentifier, entity.name]));
+    expect(gates.get('A10')).toBe('Portão 10');
+    expect(gates.get('A11')).toBe('Portão 11');
+  });
+
+  it('normaliza uma fonte única de metadados para rótulo, busca e geometria', () => {
+    const lotByEntity = new Map(OFFICIAL_REFERENCE_DATA.lots.map((lot) => [lot.entityId, lot]));
+    const normalized = OFFICIAL_REFERENCE_DATA.entities.map((entity) => normalizeMapEntityMetadata(entity, lotByEntity.get(entity.id)));
+    expect(normalized.every((metadata) => metadata.stableId && metadata.officialDisplayName && metadata.geometryReference)).toBe(true);
+    expect(normalized.every((metadata) => metadata.labelAnchor.every(Number.isFinite))).toBe(true);
+    expect(normalized.every((metadata) => metadata.searchKeywords.length > 0)).toBe(true);
+
+    const restaurant = normalized.find((metadata) => metadata.structureCode === 'C2');
+    expect(restaurant).toMatchObject({
+      officialDisplayName: 'Restaurante Central',
+      entityType: 'RESTAURANT',
+      preferredLabelVisibility: 'medium',
+    });
+    expect(restaurant?.searchKeywords).toEqual(expect.arrayContaining(['Restaurante Central', 'C2']));
+
+    const lotS36 = normalized.find((metadata) => metadata.block === 'S' && metadata.lotNumber === '36');
+    expect(lotS36).toMatchObject({ preferredLabelVisibility: 'near', commercialStatus: 'BLOCKED' });
+    expect(lotS36?.searchKeywords).toEqual(expect.arrayContaining(['Quadra S', 'Lote 36']));
   });
 
   it('usa identificadores compostos únicos e não associa ocupantes aos lotes', () => {

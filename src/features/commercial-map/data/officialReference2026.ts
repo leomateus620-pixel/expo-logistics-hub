@@ -348,8 +348,8 @@ function addStructure(
   ['A7', 'Portão 7 — entrada de visitantes e expositores', [3267, 1703]],
   ['A8', 'Portão 8 — entrada de visitantes e expositores', [5206, 1302]],
   ['A9', 'Portão 9 — saída de visitantes e expositores', [3964, 1302]],
-  ['A10', 'Portão 10 — entrada e saída de visitantes', [1214, 3137]],
-  ['A11', 'Portão 11 — entrada e saída de visitantes e expositores', [5954, 1293]],
+  ['A10', 'Portão 10', [1214, 3137]],
+  ['A11', 'Portão 11', [5954, 1293]],
 ] as Array<[string, string, PdfPoint]>).forEach(([code, name, center]) => addEntity({
   publicIdentifier: code,
   name,

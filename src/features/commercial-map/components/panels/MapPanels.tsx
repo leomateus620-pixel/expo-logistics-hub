@@ -36,6 +36,7 @@ import { CLASSIFICATION_LABELS, STATUS_CONFIG, VERIFICATION_LABELS } from '../..
 import { useLotActivity, useLotContractVersions, useMapMutations } from '../../hooks/useCommercialMap';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import { polygonAreaMapUnits } from '../../utils/geometry';
+import { normalizeMapEntityMetadata } from '../../utils/mapMetadata';
 import type { CommercialLot, MapEntity, MapLayer, MapPermissions } from '../../types';
 import { LotWorkflowDialog, type LotWorkflow } from '../commercial/LotWorkflowDialog';
 import { LotStructureDialog, type LotStructureOperation } from '../commercial/LotStructureDialog';
@@ -224,10 +225,11 @@ export function ResultsPanel({ entities, lots }: { entities: MapEntity[]; lots: 
           )}
           {entities.map((entity) => {
             const lot = lotByEntity.get(entity.id);
+            const metadata = normalizeMapEntityMetadata(entity, lot);
             return (
               <button key={entity.id} type="button" onClick={() => setSelectedEntityId(entity.id)}>
                 <i style={{ background: lot ? STATUS_CONFIG[lot.status].color : '#6e7f71' }}>{lot ? STATUS_CONFIG[lot.status].symbol : entity.publicIdentifier.slice(0, 2)}</i>
-                <span><strong>{entity.publicIdentifier} · {entity.name}</strong><small>{CLASSIFICATION_LABELS[entity.classification]}{lot ? ` · ${STATUS_CONFIG[lot.status].label}` : ''}</small></span>
+                <span><strong>{entity.publicIdentifier} · {metadata.officialDisplayName}</strong><small>{CLASSIFICATION_LABELS[entity.classification]}{lot ? ` · ${STATUS_CONFIG[lot.status].label}` : ''}</small></span>
                 <ChevronRight className="h-4 w-4" />
               </button>
             );
@@ -259,12 +261,13 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions }:
   const contracts = useLotContractVersions(lot?.id ?? null, permissions.canManageContracts);
   const areaMapUnits = polygonAreaMapUnits(entity.geometry);
   const status = lot ? STATUS_CONFIG[lot.status] : null;
+  const metadata = normalizeMapEntityMetadata(entity, lot);
   const structuralReady = lot ? ['AVAILABLE', 'BLOCKED', 'UNAVAILABLE'].includes(lot.status) : false;
 
   return (
     <>
       <aside className="commercial-map-panel commercial-map-details-panel">
-        <PanelHeader eyebrow={CLASSIFICATION_LABELS[entity.classification]} title={entity.name} onClose={() => setSelectedEntityId(null)} />
+        <PanelHeader eyebrow={CLASSIFICATION_LABELS[entity.classification]} title={metadata.officialDisplayName} onClose={() => setSelectedEntityId(null)} />
         <ScrollArea className="commercial-map-panel-scroll">
           <div className="commercial-map-detail-hero">
             <div className="commercial-map-detail-code">{entity.publicIdentifier}</div>
@@ -391,9 +394,10 @@ export function MapListView({ entities, lots }: { entities: MapEntity[]; lots: C
           <tbody>
             {entities.map((entity) => {
               const lot = lotByEntity.get(entity.id);
+              const metadata = normalizeMapEntityMetadata(entity, lot);
               return (
                 <tr key={entity.id}>
-                  <td><strong>{entity.publicIdentifier}</strong><span>{entity.name}</span></td>
+                  <td><strong>{entity.publicIdentifier}</strong><span>{metadata.officialDisplayName}</span></td>
                   <td>{CLASSIFICATION_LABELS[entity.classification]}</td>
                   <td>{lot ? <span className="commercial-map-table-status"><i style={{ background: STATUS_CONFIG[lot.status].color }} />{STATUS_CONFIG[lot.status].label}</span> : 'Não comercial'}</td>
                   <td>{lot?.officialAreaSqm ? `${number.format(lot.officialAreaSqm)} m²` : 'Área não validada'}</td>

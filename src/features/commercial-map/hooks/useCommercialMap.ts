@@ -25,6 +25,7 @@ import {
 } from '../services/commercialMapService';
 import { useCommercialMapStore } from '../state/useCommercialMapStore';
 import type { CommercialLot, MapEntity, MapPermissions } from '../types';
+import { mapSearchText } from '../utils/mapMetadata';
 import { resolveMapPermissions } from '../utils/permissions';
 
 const MAP_ERROR_MESSAGES: Record<string, string> = {
@@ -114,17 +115,7 @@ export function useMapEntityFilter(entities: MapEntity[], lots: CommercialLot[])
       const lot = lotByEntity.get(entity.id);
       if (statusFilters.length > 0 && (!lot || !statusFilters.includes(lot.status))) return false;
       if (!normalizedSearch) return true;
-      const haystack = [
-        entity.publicIdentifier,
-        entity.name,
-        entity.description,
-        lot?.publicIdentifier,
-        lot?.block,
-        lot?.lotNumber,
-        lot?.displayName,
-        lot?.currentBuyer,
-        lot?.activeContractNumber,
-      ].filter(Boolean).join(' ').toLocaleLowerCase('pt-BR');
+      const haystack = `${mapSearchText(entity, lot)} ${entity.description ?? ''}`.toLocaleLowerCase('pt-BR');
       return haystack.includes(normalizedSearch);
     });
 

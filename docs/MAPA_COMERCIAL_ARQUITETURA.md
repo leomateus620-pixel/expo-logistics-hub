@@ -168,3 +168,40 @@ Antes da publicação operacional:
 6. validar visualmente as vistas, seleção e responsividade em desktop,
    notebook, tablet e celular;
 7. executar TypeScript, testes, lint focado, build e `git diff --check`.
+
+## Refinamento técnico de navegação e identificação
+
+O perfil autenticado da cena original mostrou dois custos independentes:
+
+- o `Canvas` permanecia em renderização contínua mesmo com a câmera ociosa;
+- 262 lotes mantinham malhas, materiais e arestas individuais, enquanto até
+  58 rótulos HTML com `backdrop-filter` eram recalculados durante a navegação.
+
+A cena passou a usar renderização sob demanda, sombras estáticas invalidadas
+somente quando necessário e um `THREE.BatchedMesh` para os lotes, com uma única
+geometria de linhas para suas bordas. Durante pan/órbita, o raycast comercial é
+suspenso e retomado ao final da interação. Os rótulos agora são escolhidos pela
+distância real da câmera, prioridade semântica, limite por viewport e colisão em
+espaço de tela. A visão geral autenticada caiu de 58 para 14 rótulos e de 578
+para 415 nós DOM no perfil de referência.
+
+Em uma janela ociosa de três segundos, `TaskDuration` caiu de 1777,968 ms para
+0,684 ms e `ScriptDuration` de 1670,992 ms para 0 ms. No mesmo gesto de
+navegação e estabilização, `TaskDuration` caiu de 805,515 ms para 563,000 ms e
+`ScriptDuration` de 576,473 ms para 451,658 ms.
+
+A seleção deixou de usar uma distância fixa. O enquadramento calcula a extensão
+real, usa margens diferentes para lote, restaurante, pavilhão, arena e
+estacionamento, limita distância e inclinação e desloca o alvo para preservar a
+área útil ao lado do painel. Em telas estreitas, o deslocamento considera a
+altura da folha de detalhes e sua margem de segurança. Fechar o painel preserva
+a câmera atual; trocar de entidade interrompe a animação anterior e inicia o
+novo foco a partir da posição corrente.
+
+Uma fonte normalizada de metadados concentra identificador estável, nome
+oficial, tipo, quadra, lote, código de estrutura, via, situação comercial,
+referência geométrica, âncora, nível de rótulo, prioridade, palavras-chave e
+aliases. A conferência da legenda oficial corrigiu A10 e A11 para os nomes
+exatos `Portão 10` e `Portão 11`; a migration de dados
+`20260712010000_correct_official_gate_names_2026.sql` aplica a correção apenas a
+entidades oficiais gerenciadas, sem lote comercial associado.

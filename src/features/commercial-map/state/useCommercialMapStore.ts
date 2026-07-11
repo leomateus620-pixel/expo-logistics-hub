@@ -16,6 +16,7 @@ interface CommercialMapState {
   referenceOpacity: number;
   labelsVisible: boolean;
   reducedGraphics: boolean;
+  cameraInteracting: boolean;
   setSelectedEntityId: (id: string | null) => void;
   setHoveredEntityId: (id: string | null) => void;
   setSearch: (search: string) => void;
@@ -32,6 +33,7 @@ interface CommercialMapState {
   setReferenceOpacity: (opacity: number) => void;
   setLabelsVisible: (visible: boolean) => void;
   setReducedGraphics: (reduced: boolean) => void;
+  setCameraInteracting: (interacting: boolean) => void;
 }
 
 export const useCommercialMapStore = create<CommercialMapState>((set) => ({
@@ -49,6 +51,7 @@ export const useCommercialMapStore = create<CommercialMapState>((set) => ({
   referenceOpacity: 0.28,
   labelsVisible: true,
   reducedGraphics: false,
+  cameraInteracting: false,
   setSelectedEntityId: (selectedEntityId) => set({ selectedEntityId, activePanel: selectedEntityId ? 'details' : null }),
   setHoveredEntityId: (hoveredEntityId) => set({ hoveredEntityId }),
   setSearch: (search) => set({ search }),
@@ -77,4 +80,5 @@ export const useCommercialMapStore = create<CommercialMapState>((set) => ({
   setReferenceOpacity: (referenceOpacity) => set({ referenceOpacity }),
   setLabelsVisible: (labelsVisible) => set({ labelsVisible }),
   setReducedGraphics: (reducedGraphics) => set({ reducedGraphics }),
+  setCameraInteracting: (cameraInteracting) => set({ cameraInteracting }),
 }));
