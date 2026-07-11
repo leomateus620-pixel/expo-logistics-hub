@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCapabilities } from '@/hooks/useCapabilities';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
@@ -69,6 +69,8 @@ export function useMapPermissions(): MapPermissions {
 export function useCommercialMap() {
   const { orgId } = useCurrentOrg();
   const initializeLayers = useCommercialMapStore((state) => state.initializeLayers);
+  const setReferenceOpacity = useCommercialMapStore((state) => state.setReferenceOpacity);
+  const syncedCalibration = useRef<string | null>(null);
   const query = useQuery({
     queryKey: ['commercial-map', orgId],
     queryFn: () => fetchCommercialMap(orgId!),
@@ -81,34 +83,61 @@ export function useCommercialMap() {
     if (query.data?.layers) initializeLayers(query.data.layers);
   }, [initializeLayers, query.data?.layers]);
 
+  useEffect(() => {
+    const calibration = query.data?.calibration;
+    if (!calibration) return;
+    const calibrationKey = `${calibration.id}:${calibration.version}`;
+    if (syncedCalibration.current === calibrationKey) return;
+    syncedCalibration.current = calibrationKey;
+    setReferenceOpacity(calibration.opacity);
+  }, [query.data?.calibration, setReferenceOpacity]);
+
   return query;
 }
 
-export function useFilteredMapEntities(entities: MapEntity[], lots: CommercialLot[]) {
+export interface MapEntityFilterResult {
+  entities: MapEntity[];
+  matchingEntityIds: ReadonlySet<string>;
+  hasActiveCriteria: boolean;
+}
+
+export function useMapEntityFilter(entities: MapEntity[], lots: CommercialLot[]): MapEntityFilterResult {
   const search = useCommercialMapStore((state) => state.search);
   const statusFilters = useCommercialMapStore((state) => state.statusFilters);
   const layerVisibility = useCommercialMapStore((state) => state.layerVisibility);
   const normalizedSearch = search.trim().toLocaleLowerCase('pt-BR');
   const lotByEntity = useMemo(() => new Map(lots.map((lot) => [lot.entityId, lot])), [lots]);
 
-  return useMemo(() => entities.filter((entity) => {
-    if (layerVisibility[entity.layerId] === false) return false;
-    const lot = lotByEntity.get(entity.id);
-    if (statusFilters.length > 0 && (!lot || !statusFilters.includes(lot.status))) return false;
-    if (!normalizedSearch) return true;
-    const haystack = [
-      entity.publicIdentifier,
-      entity.name,
-      entity.description,
-      lot?.publicIdentifier,
-      lot?.block,
-      lot?.lotNumber,
-      lot?.displayName,
-      lot?.currentBuyer,
-      lot?.activeContractNumber,
-    ].filter(Boolean).join(' ').toLocaleLowerCase('pt-BR');
-    return haystack.includes(normalizedSearch);
-  }), [entities, layerVisibility, lotByEntity, normalizedSearch, statusFilters]);
+  return useMemo(() => {
+    const filteredEntities = entities.filter((entity) => {
+      if (layerVisibility[entity.layerId] === false) return false;
+      const lot = lotByEntity.get(entity.id);
+      if (statusFilters.length > 0 && (!lot || !statusFilters.includes(lot.status))) return false;
+      if (!normalizedSearch) return true;
+      const haystack = [
+        entity.publicIdentifier,
+        entity.name,
+        entity.description,
+        lot?.publicIdentifier,
+        lot?.block,
+        lot?.lotNumber,
+        lot?.displayName,
+        lot?.currentBuyer,
+        lot?.activeContractNumber,
+      ].filter(Boolean).join(' ').toLocaleLowerCase('pt-BR');
+      return haystack.includes(normalizedSearch);
+    });
+
+    return {
+      entities: filteredEntities,
+      matchingEntityIds: new Set(filteredEntities.map((entity) => entity.id)),
+      hasActiveCriteria: Boolean(normalizedSearch || statusFilters.length > 0),
+    };
+  }, [entities, layerVisibility, lotByEntity, normalizedSearch, statusFilters]);
+}
+
+export function useFilteredMapEntities(entities: MapEntity[], lots: CommercialLot[]) {
+  return useMapEntityFilter(entities, lots).entities;
 }
 
 export function useMapMutations() {
@@ -121,7 +150,7 @@ export function useMapMutations() {
     mutationFn: () => bootstrapOfficialReference(orgId!),
     onSuccess: async () => {
       await invalidate();
-      toast.success('Base oficial importada como rascunho para validação.');
+      toast.success('Cartografia oficial 2026 sincronizada como rascunho auditável.');
     },
     onError: (error) => toast.error('Falha ao iniciar a base cartográfica', { description: errorMessage(error) }),
   });

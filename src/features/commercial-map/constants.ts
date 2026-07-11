@@ -1,12 +1,14 @@
 import type { CommercialStatus, MapClassification, MapLayer, VerificationStatus } from './types';
 
 export const MAP_REFERENCE_WIDTH = 120;
-export const MAP_REFERENCE_HEIGHT = 67.5;
-export const OFFICIAL_REFERENCE_IMAGE = '/maps/fenasoja-oficial-2024-optimized.webp';
+/** Park-only crop of the official 2026 PDF: 5,500 x 4,150 PDF points. */
+export const MAP_REFERENCE_HEIGHT = 90.545455;
+export const OFFICIAL_REFERENCE_IMAGE = '/maps/fenasoja-oficial-2026-park.webp';
 
 export const CLASSIFICATION_LABELS: Record<MapClassification, string> = {
   SELLABLE_LOT: 'Lote comercial',
   INTERNAL_STAND: 'Estande interno',
+  QUADRA: 'Quadra',
   PAVILION: 'Pavilhão',
   BUILDING: 'Edificação permanente',
   RESTAURANT: 'Restaurante',
@@ -25,6 +27,7 @@ export const CLASSIFICATION_LABELS: Record<MapClassification, string> = {
   EMERGENCY: 'Emergência / primeiros socorros',
   SERVICE: 'Estrutura de serviço',
   ATTRACTION: 'Atração / área de visitantes',
+  EVENT_VENUE: 'Arena / espaço de eventos',
   LIVESTOCK_AREA: 'Área pecuária',
   RURAL_EXHIBITION: 'Exporural',
   RESTRICTED_AREA: 'Área restrita',
@@ -77,6 +80,7 @@ export const STATUS_CONFIG: Record<CommercialStatus, {
 export const CLASSIFICATION_COLORS: Record<MapClassification, string> = {
   SELLABLE_LOT: '#3cab57',
   INTERNAL_STAND: '#62bd72',
+  QUADRA: '#24543a',
   PAVILION: '#56616e',
   BUILDING: '#7b746b',
   RESTAURANT: '#ee7b22',
@@ -95,6 +99,7 @@ export const CLASSIFICATION_COLORS: Record<MapClassification, string> = {
   EMERGENCY: '#e63946',
   SERVICE: '#497c77',
   ATTRACTION: '#72a8b5',
+  EVENT_VENUE: '#f28c1b',
   LIVESTOCK_AREA: '#d9c06a',
   RURAL_EXHIBITION: '#6fba43',
   RESTRICTED_AREA: '#c05b52',
@@ -103,6 +108,7 @@ export const CLASSIFICATION_COLORS: Record<MapClassification, string> = {
 };
 
 export const DEFAULT_REFERENCE_LAYERS: MapLayer[] = [
+  ['quadras', 'Quadras', '#24543a', 5],
   ['commercial', 'Lotes comerciais', '#38a553', 10],
   ['pavilions', 'Pavilhões', '#5d6874', 20],
   ['structures', 'Estruturas permanentes', '#827b72', 30],
@@ -113,12 +119,11 @@ export const DEFAULT_REFERENCE_LAYERS: MapLayer[] = [
   ['parking', 'Estacionamentos', '#c9ad79', 80],
   ['circulation', 'Ruas e circulação', '#b8bab6', 90],
   ['green', 'Áreas verdes', '#6fb846', 100],
-  ['water', 'Água', '#6fb6cf', 110],
-  ['exporural', 'Exporural', '#69ae42', 120],
-  ['reference', 'Referência original', '#94a3b8', 130],
+  ['exporural', 'Exporural e pecuária', '#69ae42', 120],
+  ['reference', 'Referência oficial 2026', '#94a3b8', 130],
 ].map(([key, name, color, sortOrder]) => ({
   id: `reference:${key}`,
-  projectId: 'reference:fenasoja-2024',
+  projectId: 'reference:fenasoja-2026',
   key: String(key),
   name: String(name),
   description: null,
@@ -130,13 +135,13 @@ export const DEFAULT_REFERENCE_LAYERS: MapLayer[] = [
 }));
 
 export const CAMERA_PRESETS = {
-  overview: { label: 'Visão geral', position: [0, 68, 72] as const, target: [0, 0, 0] as const },
-  top: { label: 'Vista superior', position: [0, 98, 0.1] as const, target: [0, 0, 0] as const },
-  isometric: { label: 'Isométrica', position: [63, 58, 63] as const, target: [0, 0, 0] as const },
-  commercial: { label: 'Área comercial', position: [-3, 42, 39] as const, target: [-1, 0, 6] as const },
-  pavilions: { label: 'Pavilhões', position: [-14, 34, 54] as const, target: [-8, 0, 21] as const },
-  parking: { label: 'Estacionamentos', position: [-40, 48, -20] as const, target: [-33, 0, -20] as const },
-  gates: { label: 'Portões', position: [2, 72, 72] as const, target: [0, 0, 10] as const },
+  overview: { label: 'Visão geral', position: [0, 96, 108] as const, target: [0, 0, 1] as const },
+  top: { label: 'Vista superior', position: [0, 142, 0.1] as const, target: [0, 0, 0] as const },
+  isometric: { label: 'Isométrica', position: [82, 76, 88] as const, target: [2, 0, 2] as const },
+  commercial: { label: 'Área comercial', position: [-1, 49, 47] as const, target: [-4, 0, 2] as const },
+  pavilions: { label: 'Pavilhões', position: [-22, 42, 58] as const, target: [-14, 0, 24] as const },
+  parking: { label: 'Estacionamentos', position: [47, 58, 35] as const, target: [37, 0, 24] as const },
+  gates: { label: 'Portões', position: [3, 100, 105] as const, target: [0, 0, 3] as const },
 };
 
 export const MAP_CAPABILITIES = [

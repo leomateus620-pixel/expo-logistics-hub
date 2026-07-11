@@ -1,5 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
-import { OFFICIAL_REFERENCE_DATA } from '../data/officialReference2024';
+import { OFFICIAL_REFERENCE_DATA, OFFICIAL_REFERENCE_REVISION } from '../data/officialReference2026';
 import type {
   CommercialLot,
   CommercialMapData,
@@ -15,7 +15,8 @@ import { validateContractFile } from '../utils/contracts';
 
 interface ProjectRow {
   id: string; org_id: string; name: string; description: string | null; coordinate_system: MapProject['coordinateSystem'];
-  reference_width: number | string; reference_height: number | string; active_version: number; is_published: boolean;
+  reference_width: number | string; reference_height: number | string; reference_revision?: string | null;
+  active_version: number; is_published: boolean;
 }
 interface LayerRow {
   id: string; project_id: string; layer_key: string; name: string; description: string | null; color: string;
@@ -70,6 +71,36 @@ function isMissingReservationMaintenance(error: { code?: string; message?: strin
     || Boolean(error.message?.includes('expire_commercial_reservations') && error.message.includes('schema cache'));
 }
 
+function isMissingReferenceSync(error: { code?: string; message?: string }): boolean {
+  return error.code === '42883'
+    || error.code === 'PGRST202'
+    || Boolean(error.message?.includes('sync_commercial_map_reference_2026') && error.message.includes('schema cache'));
+}
+
+function isClearlyLegacy2024Seed(
+  project: ProjectRow,
+  entities: EntityRow[],
+  hasAnyCommercialLots: boolean,
+): boolean {
+  if (hasAnyCommercialLots) return false;
+
+  const revision = project.reference_revision?.trim();
+  if (revision?.startsWith('2024')) return true;
+
+  const projectDescription = `${project.name} ${project.description ?? ''}`.toLocaleLowerCase('pt-BR');
+  if (projectDescription.includes('2024') && projectDescription.includes('fenasoja') && projectDescription.includes('referência')) {
+    return true;
+  }
+
+  if (entities.length === 0) return false;
+  return entities.every((entity) => {
+    const metadata = entity.metadata ?? {};
+    const sourceRevision = typeof metadata.sourceRevision === 'string' ? metadata.sourceRevision : '';
+    const source = typeof metadata.source === 'string' ? metadata.source.toLocaleLowerCase('pt-BR') : '';
+    return sourceRevision.startsWith('2024') || (source.includes('fenasoja') && source.includes('2024'));
+  });
+}
+
 function mapProject(row: ProjectRow): MapProject {
   return {
     id: row.id,
@@ -79,6 +110,7 @@ function mapProject(row: ProjectRow): MapProject {
     coordinateSystem: row.coordinate_system,
     referenceWidth: Number(row.reference_width),
     referenceHeight: Number(row.reference_height),
+    referenceRevision: row.reference_revision ?? null,
     activeVersion: row.active_version,
     isPublished: row.is_published,
   };
@@ -219,7 +251,7 @@ export async function fetchCommercialMap(orgId: string): Promise<CommercialMapDa
     if (isMissingMapInfrastructure(projectError)) {
       return {
         ...OFFICIAL_REFERENCE_DATA,
-        sourceMessage: 'A infraestrutura cartográfica aguarda a aplicação da migration. A referência oficial permanece disponível em modo seguro de leitura.',
+        sourceMessage: 'A infraestrutura cartográfica aguarda a aplicação da migration. A referência oficial 2026 permanece disponível em modo seguro de leitura.',
       };
     }
     throw projectError;
@@ -228,20 +260,31 @@ export async function fetchCommercialMap(orgId: string): Promise<CommercialMapDa
   if (!projectRow) return OFFICIAL_REFERENCE_DATA;
   const project = mapProject(projectRow);
 
-  const [layersResult, entitiesResult, geometriesResult, calibrationResult, lotsResult] = await Promise.all([
+  const [layersResult, entitiesResult, geometriesResult, calibrationResult, lotsResult, lotPresenceResult] = await Promise.all([
     db.from('map_layers').select('*').eq('project_id', project.id).order('sort_order'),
     db.from('map_entities').select('*').eq('project_id', project.id).eq('is_archived', false),
     db.from('map_entity_geometries').select('*').eq('project_id', project.id).eq('is_current', true),
     db.from('map_calibrations').select('*').eq('project_id', project.id).order('version', { ascending: false }).limit(1).maybeSingle(),
     db.from('commercial_lots').select('*, lot_prices(*), lot_reservations(*), lot_sales(*)').eq('project_id', project.id).is('archived_at', null),
+    db.from('commercial_lots').select('id').eq('project_id', project.id).limit(1),
   ]);
 
-  const firstError = [layersResult, entitiesResult, geometriesResult, calibrationResult, lotsResult].find((result) => result.error)?.error;
+  const firstError = [layersResult, entitiesResult, geometriesResult, calibrationResult, lotsResult, lotPresenceResult]
+    .find((result) => result.error)?.error;
   if (firstError) throw firstError;
   const geometryByEntity = new Map<string, GeometryRow>((geometriesResult.data ?? []).map((row: GeometryRow) => [row.entity_id, row]));
   const entities = (entitiesResult.data ?? [])
     .filter((row: EntityRow) => geometryByEntity.has(row.id))
     .map((row: EntityRow) => mapEntity(row, geometryByEntity.get(row.id)!));
+  const entityRows = (entitiesResult.data ?? []) as EntityRow[];
+  const lotRows = (lotsResult.data ?? []) as LotRow[];
+
+  if (isClearlyLegacy2024Seed(projectRow as ProjectRow, entityRows, (lotPresenceResult.data ?? []).length > 0)) {
+    return {
+      ...OFFICIAL_REFERENCE_DATA,
+      sourceMessage: 'A base persistida ainda contém somente a referência oficial 2024 e não possui lotes comerciais. A referência 2026 está sendo exibida em modo seguro de leitura; a atualização persistida exige uma ação explícita de um administrador e nenhum dado foi alterado automaticamente.',
+    };
+  }
 
   return {
     source: 'database',
@@ -250,15 +293,19 @@ export async function fetchCommercialMap(orgId: string): Promise<CommercialMapDa
     calibration: await signedReferenceUrl(calibrationResult.data ? mapCalibration(calibrationResult.data) : null),
     layers: (layersResult.data ?? []).map(mapLayer),
     entities,
-    lots: (lotsResult.data ?? []).map(mapLot),
+    lots: lotRows.map(mapLot),
   };
 }
 
 export async function bootstrapOfficialReference(orgId: string): Promise<string> {
   const source = OFFICIAL_REFERENCE_DATA;
-  const { data, error } = await db.rpc('bootstrap_commercial_map', {
+  const entityIdentifierById = new Map(source.entities.map((entity) => [entity.id, entity.publicIdentifier]));
+  const { data, error } = await db.rpc('sync_commercial_map_reference_2026', {
     p_org_id: orgId,
-    p_project: source.project,
+    p_project: {
+      ...source.project,
+      referenceRevision: OFFICIAL_REFERENCE_REVISION,
+    },
     p_layers: source.layers.map((layer) => ({
       key: layer.key,
       name: layer.name,
@@ -275,12 +322,57 @@ export async function bootstrapOfficialReference(orgId: string): Promise<string>
       description: entity.description,
       classification: entity.classification,
       layerKey: entity.layerId.replace('reference:', ''),
+      parentPublicIdentifier: typeof entity.metadata.parentPublicIdentifier === 'string'
+        ? entity.metadata.parentPublicIdentifier
+        : null,
+      verificationStatus: entity.verificationStatus,
+      isSellable: entity.isSellable,
       geometry: entity.geometry,
-      metadata: entity.metadata,
+      metadata: {
+        ...entity.metadata,
+        seedManaged: true,
+        sourceRevision: OFFICIAL_REFERENCE_REVISION,
+      },
     })),
-    p_calibration: { opacity: source.calibration?.opacity ?? 0.28 },
+    p_lots: source.lots.map((lot) => ({
+      publicIdentifier: lot.publicIdentifier,
+      entityPublicIdentifier: entityIdentifierById.get(lot.entityId) ?? lot.publicIdentifier,
+      block: lot.block,
+      lotNumber: lot.lotNumber,
+      levelLabel: lot.levelLabel,
+      displayName: lot.displayName,
+      description: lot.description,
+      infrastructure: lot.infrastructure,
+      hasElectricity: lot.hasElectricity,
+      hasWater: lot.hasWater,
+      hasInternet: lot.hasInternet,
+      isCorner: lot.isCorner,
+      isCovered: lot.isCovered,
+      accessibilityNotes: lot.accessibilityNotes,
+    })),
+    p_calibration: source.calibration ? {
+      referenceImagePath: source.calibration.referenceImagePath,
+      opacity: source.calibration.opacity,
+      isLocked: source.calibration.isLocked,
+      imageOffsetX: source.calibration.imageOffsetX,
+      imageOffsetY: source.calibration.imageOffsetY,
+      imageScaleX: source.calibration.imageScaleX,
+      imageScaleY: source.calibration.imageScaleY,
+      imageRotationDegrees: source.calibration.imageRotationDegrees,
+      pointA: source.calibration.pointA,
+      pointB: source.calibration.pointB,
+      knownDistanceMeters: source.calibration.knownDistanceMeters,
+      mapUnitsPerMeter: source.calibration.mapUnitsPerMeter,
+    } : {},
   });
-  if (error) throw error;
+  if (error) {
+    if (isMissingReferenceSync(error)) {
+      const migrationError = new Error('A sincronização segura do mapa 2026 ainda não está disponível no banco. Aplique a migration 20260711010000_upgrade_commercial_map_2026 antes de tentar novamente.');
+      (migrationError as Error & { cause?: unknown }).cause = error;
+      throw migrationError;
+    }
+    throw error;
+  }
   return String(data);
 }
 

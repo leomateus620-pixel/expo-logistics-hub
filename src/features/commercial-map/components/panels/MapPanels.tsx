@@ -79,7 +79,7 @@ export function CommercialSummary({ lots }: { lots: CommercialLot[] }) {
         <strong>{lots.length}</strong>
         <span>lotes cadastrados</span>
       </div>
-      {(['AVAILABLE', 'RESERVED', 'IN_NEGOTIATION', 'SOLD'] as const).map((status) => (
+      {(['BLOCKED', 'AVAILABLE', 'RESERVED', 'IN_NEGOTIATION', 'SOLD'] as const).map((status) => (
         <button
           type="button"
           key={status}
@@ -148,7 +148,7 @@ export function LayersPanel({ layers, entities, permissions }: { layers: MapLaye
       <PanelHeader eyebrow="Composição visual" title="Camadas do parque" onClose={() => setActivePanel(null)} />
       <ScrollArea className="commercial-map-panel-scroll">
         <div className="commercial-map-panel-section">
-          {layers.filter((layer) => layer.key !== 'reference').map((layer) => (
+          {layers.filter((layer) => layer.key !== 'reference' && (counts[layer.id] ?? 0) > 0).map((layer) => (
             <div className="commercial-map-layer-row" key={layer.id}>
               <Switch
                 checked={layerVisibility[layer.id] !== false}
@@ -359,7 +359,7 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions }:
                 {activity.data?.map((item) => (
                   <div key={item.id}>
                     <i><CheckCircle2 /></i>
-                    <span><strong>{item.action.replaceAll('_', ' ')}</strong><small>{dateTime.format(new Date(item.createdAt))}{item.reason ? ` · ${item.reason}` : ''}</small></span>
+                    <span><strong>{item.action.replace(/_/g, ' ')}</strong><small>{dateTime.format(new Date(item.createdAt))}{item.reason ? ` · ${item.reason}` : ''}</small></span>
                   </div>
                 ))}
               </div>

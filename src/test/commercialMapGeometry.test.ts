@@ -12,7 +12,7 @@ import {
   validateGeometry,
 } from '@/features/commercial-map/utils/geometry';
 import { resolveMapPermissions } from '@/features/commercial-map/utils/permissions';
-import { OFFICIAL_REFERENCE_DATA } from '@/features/commercial-map/data/officialReference2024';
+import { OFFICIAL_REFERENCE_DATA } from '@/features/commercial-map/data/officialReference2026';
 import { validateContractFile } from '@/features/commercial-map/utils/contracts';
 import type { PolygonGeometry } from '@/features/commercial-map/types';
 
@@ -96,9 +96,11 @@ describe('regras comerciais e segurança', () => {
     expect(validateContractFile(new File(['x'], 'contrato.exe', { type: 'application/octet-stream' }))).toContain('PDF ou DOCX');
   });
 
-  it('não transforma a digitalização oficial em lote comercial fictício', () => {
-    expect(OFFICIAL_REFERENCE_DATA.lots).toHaveLength(0);
-    expect(OFFICIAL_REFERENCE_DATA.entities.every((entity) => !entity.isSellable)).toBe(true);
+  it('importa somente os lotes numerados pela planta e os mantém comercialmente bloqueados', () => {
+    expect(OFFICIAL_REFERENCE_DATA.lots).toHaveLength(262);
+    expect(OFFICIAL_REFERENCE_DATA.lots.every((lot) => lot.status === 'BLOCKED')).toBe(true);
+    expect(OFFICIAL_REFERENCE_DATA.lots.every((lot) => lot.pricingMode === 'NOT_FOR_SALE')).toBe(true);
+    expect(OFFICIAL_REFERENCE_DATA.lots.every((lot) => lot.currentBuyer === null)).toBe(true);
     expect(OFFICIAL_REFERENCE_DATA.entities.every((entity) => entity.verificationStatus === 'NEEDS_REVIEW')).toBe(true);
     expect(OFFICIAL_REFERENCE_DATA.entities.filter((entity) => !validateGeometry(entity.geometry).valid)).toEqual([]);
   });

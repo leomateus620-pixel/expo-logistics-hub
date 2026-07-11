@@ -1,6 +1,7 @@
 export type MapClassification =
   | 'SELLABLE_LOT'
   | 'INTERNAL_STAND'
+  | 'QUADRA'
   | 'PAVILION'
   | 'BUILDING'
   | 'RESTAURANT'
@@ -19,6 +20,7 @@ export type MapClassification =
   | 'EMERGENCY'
   | 'SERVICE'
   | 'ATTRACTION'
+  | 'EVENT_VENUE'
   | 'LIVESTOCK_AREA'
   | 'RURAL_EXHIBITION'
   | 'RESTRICTED_AREA'
@@ -65,6 +67,8 @@ export interface MapProject {
   referenceHeight: number;
   activeVersion: number;
   isPublished: boolean;
+  /** Version of the official cartographic reference synchronized into the project. */
+  referenceRevision: string | null;
 }
 
 export interface MapCalibration {

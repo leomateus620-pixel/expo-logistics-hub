@@ -1,179 +1,170 @@
-# Mapa Comercial Fenasoja — arquitetura e implantação
+# Mapa Comercial Fenasoja 2026 — arquitetura e implantação
 
-## Objetivo e princípio de segurança
+## Objetivo e fontes de verdade
 
-O módulo transforma a planta oficial de 2024 em uma base cartográfica editável e em um fluxo comercial auditável. A imagem anexada é tratada como referência visual, nunca como levantamento métrico. Por isso:
+O módulo mantém a navegação, os fluxos comerciais, a edição geométrica e a
+arquitetura do mapa 3D existente, substituindo a digitalização preliminar de
+2024 pela planta oficial Fenasoja 2026.
 
-- nenhuma unidade da imagem foi promovida automaticamente a lote vendável;
-- somente `SELLABLE_LOT` e `INTERNAL_STAND` podem entrar no fluxo comercial;
-- todas as 62 estruturas iniciais estão em `NEEDS_REVIEW`, sem área oficial e sem preço;
-- área cartográfica, área calculada após calibração e área oficial validada permanecem campos distintos;
-- toda mudança sensível ocorre em RPC transacional, com permissão repetida no banco.
+As fontes primárias desta revisão são:
 
-## Auditoria do sistema existente
+- `Mapa do Parque 300x200.pdf`, criado em 29/04/2026;
+- a renderização oficial JPEG de `14902 × 11949` pixels;
+- a legenda de infraestrutura localizada abaixo da planta.
 
-A implementação reutiliza a arquitetura já presente:
+A lista lateral de expositores/compradores não faz parte do domínio
+cartográfico. Nenhum nome, ocupação, contrato ou disponibilidade foi importado
+dessa lista.
 
-- React 18, Vite e React Router;
-- `AuthProvider`, `AuthGuard`, `OrgGuard` e `CapabilityGuard`;
-- organização atual e papéis existentes (`admin`, `gestor`, `operador`, `leitura`);
-- cliente Supabase único em `src/integrations/supabase/client`;
-- TanStack Query para estado persistido e invalidação após mutações;
-- Zustand somente para câmera, seleção, filtros, camadas e rascunhos locais;
-- componentes shadcn/Radix e o `Layout` autenticado atual;
-- Vitest e ESLint existentes.
+## Manifesto cartográfico reproduzível
 
-Não foi criado um segundo cliente Supabase, fluxo de autenticação, layout ou sistema de permissões.
+`src/features/commercial-map/data/officialReference2026.ts` registra o tamanho
+da página, o hash SHA-256 do JPEG analisado, o recorte em coordenadas PDF e a
+versão `2026.1` da referência.
 
-## Rota e autorização
-
-A rota autenticada é `/mapa-comercial`, fora de Comissões. O menu “Mapa Comercial” aparece no grupo Operação. O login direto preserva a URL de retorno, e uma conta apenas com `map.view` é encaminhada para o mapa.
-
-| Capacidade | Uso |
-| --- | --- |
-| `map.view` | projeto, camadas, entidades e situação pública dos lotes |
-| `map.edit` | auditoria e manutenção de entidades |
-| `map.edit_geometry` | editor vetorial e calibração |
-| `map.manage_lots` | cadastro, dados comerciais, divisão e mesclagem |
-| `map.manage_sales` | reserva, negociação e venda |
-| `map.manage_contracts` | upload, versões e URLs temporárias de contratos |
-| `map.manage_layers` | manutenção de camadas |
-| `map.admin` | implantação e administração cartográfica |
-
-`admin` e `gestor` recebem as capacidades cartográficas elevadas pelo modelo de papel atual. `operador` visualiza o mapa, mas não recebe edição ou vendas automaticamente. A RLS e as RPCs usam as mesmas regras; esconder um botão não é considerado controle de acesso.
-
-## Modelo cartográfico
-
-O projeto usa coordenadas locais normalizadas de `120 × 67,5` unidades. Cada entidade mantém um GeoJSON `Polygon` independente de Three.js:
+O raster de runtime é `public/maps/fenasoja-oficial-2026-park.webp` (`3000 ×
+2264`). Ele contém somente a área do parque, incluindo o acesso sul, e exclui a
+lista lateral de compradores e as tabelas externas à planta. A conversão de
+PDF para coordenadas locais é determinística:
 
 ```text
-map_project
-  ├── map_calibrations (versões da escala e imagem)
-  ├── map_layers
-  └── map_entities (classificação e hierarquia)
-       └── map_entity_geometries (geometria atual)
-            └── map_geometry_versions (revisões substituídas)
+x_local = ((x_pdf - 600) / 5500) × 120 - 60
+y_local = ((y_pdf - 900) / 4150) × 90,545455 - 45,2727275
 ```
 
-O PostGIS materializa cada GeoJSON como geometria nativa gerada. Isso fornece validação topológica e índice GiST sem acoplar o domínio ao objeto renderizado. O banco rejeita polígonos vazios, sem área, inválidos ou sobrepostos a outro lote vendável. Limites compartilhados continuam permitidos.
+Essas coordenadas são uma digitalização visual oficial, não um levantamento
+topográfico. Área cartográfica, área calculada por calibração e área oficial
+validada permanecem conceitos separados.
 
-As classificações cobrem lotes, estandes, pavilhões, construções, alimentação, banheiros, portões, estacionamentos, ruas, circulação, áreas verdes, árvores, água, administração, segurança, emergência, serviços, atrações, pecuária, Exporural, áreas restritas e marcos.
+## Inventário 2026
 
-## Base oficial inicial
+A base contém:
 
-`officialReference2024.ts` contém somente estruturas de alto nível identificáveis com segurança na planta e na legenda:
+- 21 quadras oficiais: A, B, C, D, E, F, G, I, J, L, M, N, O, P, Q, R, S, T,
+  U, V e X;
+- 262 lotes com numeração impressa na planta;
+- a rede de ruas internas, alamedas, avenidas e acessos externos;
+- portões A1 a A11;
+- pavilhões e infraestrutura B1 a B42;
+- estruturas C1 a C8, D1 a D6, sanitários E, Arena F, Árvore Lunar G e Parque
+  de Diversões J;
+- estacionamentos, Pista Campeira, Pavilhão 09, área de motorhome, test drive,
+  etnias e Pórtico das Nações.
 
-- portões A1 a A6 visíveis e áreas de estacionamento;
-- pavilhões e construções principais B1 a B14 visíveis;
-- blocos comerciais visíveis, ainda não vendáveis;
-- pista campeira, pista de remates, áreas pecuárias e Exporural;
-- ruas/circulação principais;
-- lago, áreas verdes e parque de diversões;
-- alimentação, etnias, banheiros, segurança, emergência e apoio claramente identificáveis.
+Lotes usam identificadores únicos compostos (`Q-S-36`, por exemplo), enquanto
+a interface mostra somente o número correto e o contexto da quadra. Todos os
+lotes derivados da planta entram em `BLOCKED`, sem preço, comprador, contrato,
+área oficial ou disponibilidade inferida.
 
-A implantação usa uma única RPC atômica. Projeto, camadas, entidades, geometrias, calibração inicial e log são confirmados juntos ou revertidos juntos.
+## Correções críticas de 2024 para 2026
 
-## Calibração e áreas
+- o antigo `LAGO / Lago central` foi removido;
+- a área é oficialmente a **Arena Sicredi - Icatu**, classificada como
+  `EVENT_VENUE`;
+- não existe entidade `WATER` na referência 2026;
+- `Restaurante do lago`, `Banheiros químicos — lago`, `Área PRCT` e `Pista de
+  remates` foram removidos por não existirem na planta 2026;
+- S e R deixaram de ser blocos genéricos e passaram a conter suas subdivisões
+  oficiais;
+- quadras V, U, T e X e os novos portões/apoios foram incorporados;
+- nomes e códigos de pavilhões, segurança, emergência, etnias e alimentação
+  foram reconciliados com a legenda inferior.
 
-O administrador seleciona dois pontos, informa uma distância conhecida e salva uma nova versão de calibração. A conversão é:
+## Ambiguidades mantidas como pendência
 
-```text
-unidades_por_metro = distância_no_mapa / distância_real
-área_calculada_m² = área_cartográfica / unidades_por_metro²
-```
+O sistema não completa lacunas por inferência:
 
-Uma área calculada nunca se torna área oficial automaticamente. Preço por metro quadrado exige `area_validation_status = VALIDATED` e `official_area_sqm > 0` no navegador e novamente na RPC.
+- a coluna regular onde B40 está localizado corresponderia geometricamente a
+  G03/G04, mas esses números não estão impressos; portanto, não foram criados;
+- B23 Ambulatório e o marcador J Parque de Diversões aparecem na planta, mas
+  não na legenda inferior; ambos permanecem `NEEDS_REVIEW` com a divergência
+  registrada em metadados;
+- as faixas ocres ao norte não possuem código ou nome oficial e não viraram
+  lotes nem estacionamentos;
+- medidas, testadas, profundidades e áreas oficiais continuam pendentes de
+  documentação/calibração.
 
-A referência também possui deslocamento X/Y, escala X/Y, rotação e bloqueio. Validar uma nova calibração recalcula as áreas cartográficas de todos os lotes ativos; invalidá-la remove essas áreas calculadas, sem tocar nas medidas oficiais.
+## Modelo e renderização
 
-## Cadastro e edição de lote
+O modelo existente continua baseado em `MapProject`, calibrações versionadas,
+camadas, `MapEntity`, GeoJSON Polygon e `CommercialLot`. Foram adicionadas as
+classificações `QUADRA` e `EVENT_VENUE`.
 
-O editor de implantação permite traçar uma unidade sobre a referência, definir identificador, nome, classificação, bloco, estrutura superior, medidas documentadas e preço inicial. Uma RPC cria entidade, geometria, lote, preço, histórico de status e auditoria na mesma transação.
+Quadras são pais hierárquicos e renderizadas somente como contorno, sem cobrir
+ou capturar o clique dos lotes. Ruas permanecem visíveis durante busca e
+filtros; lotes não correspondentes são atenuados, preservando a orientação.
 
-O diálogo “Editar lote” mantém controle otimista por `updated_at`. Ele versiona o preço, preserva a versão anterior no histórico, diferencia notas comerciais/internas e atualiza características de infraestrutura sem alterar silenciosamente o status.
+No desktop, os números dos lotes, nomes de quadras, vias e estruturas
+prioritárias têm rótulos de nível de detalhe. No celular ou em modo gráfico
+reduzido, rótulos persistentes são reduzidos e seleção/hover continuam
+disponíveis. A câmera calcula o enquadramento pela extensão real da geometria,
+limita o alvo ao parque e preserva transições suaves entre vista geral,
+superior, isométrica e foco de seleção.
 
-Antes de publicar, um administrador deve aprovar individualmente cada entidade. A aprovação exige a calibração mais recente válida e, no caso de lotes, área oficial validada. A RPC de publicação repete todos os gates e incrementa a versão do projeto.
+## Sincronização segura com o banco
 
-## Geometria, divisão e mesclagem
+A migration `20260711010000_upgrade_commercial_map_2026.sql` é aditiva. Ela:
 
-O editor geométrico mantém rascunho, desfazer/refazer e validação no cliente. O salvamento exige motivo e versão esperada; conflito simultâneo retorna `GEOMETRY_VERSION_CONFLICT`.
+- adiciona `map_projects.reference_revision`;
+- permite `QUADRA` e `EVENT_VENUE` no domínio SQL;
+- expõe `sync_commercial_map_reference_2026` somente para usuários
+  autenticados com `map.admin`;
+- cria ou atualiza apenas entidades marcadas como seed oficial;
+- rejeita conflitos com identificadores mantidos manualmente;
+- preserva lotes com área, preço, reserva, negociação, venda, contrato ou
+  histórico comercial;
+- valida sobreposição entre lotes vendáveis;
+- versiona geometrias substituídas e mantém a calibração validada em uma
+  repetição sem alterações;
+- arquiva entidades oficiais obsoletas sem vínculo comercial;
+- mantém novos lotes bloqueados e sem dados de comprador;
+- registra a sincronização somente quando houve mudança real.
 
-### Divisão
+A rota não executa essa sincronização automaticamente. Se detectar uma base
+2024 sem lotes comerciais, exibe a referência 2026 em modo seguro de leitura e
+oferece a ação explícita de administrador. Projetos com dados comerciais reais
+nunca são substituídos silenciosamente.
 
-1. O usuário escolhe eixo e posição da linha divisória.
-2. O cliente produz dois polígonos e confirma preservação de área.
-3. O PostGIS confirma que a união dos filhos é exatamente a origem, que os interiores não se sobrepõem e que não há invasão de outros lotes.
-4. A origem é arquivada e os dois resultados são criados em `BLOCKED`/`NEEDS_REVIEW`.
-5. Área oficial, preço e contrato não são copiados.
-6. `map_lot_lineage` e `map_activity_logs` preservam a origem.
+## Rota, autorização e fluxos preservados
 
-### Mesclagem
+A rota permanece `/mapa-comercial`, protegida por `AuthGuard`, `OrgGuard` e
+`CapabilityGuard(map.view)` dentro do layout autenticado. O cliente Supabase,
+TanStack Query, Zustand, painéis, editor GeoJSON, calibração, divisão/mesclagem,
+reservas, negociações, vendas e contratos privados foram mantidos.
 
-1. Somente lotes compatíveis com limite compartilhado aparecem como candidatos.
-2. O cliente constrói a união do contorno.
-3. O PostGIS confirma adjacência e equivalência exata entre a união das origens e o resultado.
-4. Lotes com reserva, negociação, venda ou contrato ativo são bloqueados.
-5. As origens são arquivadas e o resultado nasce em `BLOCKED`/`NEEDS_REVIEW`, sem preço ou área oficial herdados.
+## Validação local executada
 
-Essas regras evitam duplicar valor comercial ou vínculo jurídico durante uma alteração física.
+A rota real foi aberta em sessão autenticada temporária e revisada nas seguintes
+áreas de visualização:
 
-## Fluxo comercial
+- desktop Full HD: `1920 × 1080`;
+- notebook: `1366 × 768`;
+- tablet em retrato: `768 × 1024`;
+- celular: viewport mobile de `480 × 844`, com `460 × 844` de área útil capturada.
 
-`commercial_lots` possui estados `AVAILABLE`, `RESERVED`, `IN_NEGOTIATION`, `SOLD`, `BLOCKED` e `UNAVAILABLE`. Preços, reservas, negociações, vendas e contratos vivem em tabelas próprias.
+Foram exercitados enquadramento geral, vista superior, vista isométrica, zoom,
+movimento da câmera, busca, lista acessível, seleção e foco da Arena Sicredi -
+Icatu, painel de detalhes, painel de camadas, filtros e composição responsiva. A
+Arena foi confirmada como espaço de eventos não comercial e a camada de água não
+é oferecida pela referência 2026.
 
-- reserva, negociação e venda bloqueiam a linha do lote (`FOR UPDATE`);
-- índices parciais impedem duas reservas, negociações ou vendas confirmadas simultâneas;
-- reservas vencidas são expiradas de forma idempotente na sincronização do mapa, retornando o lote reservado a disponível e registrando histórico;
-- preço por m² depende exclusivamente da área oficial validada;
-- alterações de preço criam uma nova vigência em vez de sobrescrever o histórico.
+As evidências visuais finais estão em `docs/screenshots/`:
 
-## Contratos privados
+- `mapa-comercial-2026-desktop-1920x1080.jpg`;
+- `mapa-comercial-2026-notebook-1366x768.jpg`;
+- `mapa-comercial-2026-tablet-768x1024.jpg`;
+- `mapa-comercial-2026-mobile-460x844.jpg`;
+- `mapa-comercial-2026-mobile-arena-details-460x844.jpg`.
 
-Os arquivos ficam no bucket privado `map-contracts`, com limite de 15 MB e tipos PDF/DOCX. O caminho obrigatório é `org_id/lot_id/uuid.ext`, validado pela RPC contra o objeto efetivamente enviado. A tabela guarda metadados e versões; a interface usa URLs assinadas por cinco minutos. Substituir um contrato marca a versão anterior como superada, sem apagar o documento histórico.
+## Validação obrigatória
 
-O bucket `map-references` também é privado, aceita JPEG/PNG/WebP e limita arquivos a 25 MB.
+Antes da publicação operacional:
 
-## Renderização e experiência
-
-A rota é carregada sob demanda. React Three Fiber e drei renderizam extrusões a partir das entidades estruturadas, com câmera superior/isométrica, foco, pan, zoom, rotação, filtros, busca, camadas, opacidade, rótulos adaptativos e modo gráfico reduzido.
-
-A textura de trabalho usa WebP em 2.750 px (aprox. 250 KB), enquanto o JPEG oficial integral permanece preservado para conferência. O runtime 3D é um chunk lazy separado do código comercial, reduzindo o JavaScript específico da rota para aproximadamente 133 KB minificados.
-
-Há uma tabela sincronizada para acessibilidade e fallback WebGL. No celular, detalhes usam painel inferior e controles compatíveis com toque/safe area. Estados comerciais combinam texto, símbolo, borda e cor.
-
-## Implantação
-
-1. Aplicar `20260710010000_create_commercial_map.sql` primeiro em homologação.
-2. Confirmar que a extensão PostGIS está instalada no schema `extensions`.
-3. Executar testes de RLS com contas de cada papel/capacidade.
-4. Regenerar os tipos Supabase; o serviço usa um cast local documentado enquanto a migration ainda não existe no snapshot versionado.
-5. Atribuir capacidades específicas às contas comerciais que não sejam `admin`/`gestor`.
-6. Abrir `/mapa-comercial` e executar “Iniciar implantação”.
-7. Carregar a referência oficial de melhor resolução, calibrar e validar.
-8. Revisar as 62 entidades iniciais antes de publicar o projeto.
-9. Traçar cada lote/estande a partir de cadastro e medição oficiais.
-
-Não há nova variável de ambiente. As credenciais Supabase existentes continuam sendo usadas.
-
-## Validação manual ainda obrigatória
-
-- limites e identificadores de todos os lotes individuais dos blocos A–S;
-- estandes internos de cada pavilhão;
-- medidas, testadas, profundidades e áreas oficiais;
-- portão A7, estruturas pequenas e itens parcialmente ilegíveis na imagem;
-- hierarquia exata de blocos/pavilhões;
-- posição fina de ruas, passeios, vegetação e apoio;
-- nomes empresariais presentes na edição de 2024, que não devem virar cadastro permanente sem confirmação;
-- levantamento de uma distância real para a primeira calibração válida;
-- eventual georreferenciamento futuro.
-
-## Verificações executadas nesta entrega
-
-- TypeScript sem emissão;
-- ESLint focado em todo o módulo e integrações alteradas;
-- 32 testes Vitest;
-- parser PostgreSQL 17 aceitando as 163 instruções da migration;
-- build Vite de produção;
-- inspeção visual desktop e mobile, incluindo seleção, tabela sincronizada e fallback de autenticação.
-
-O lint integral do repositório ainda contém dívida anterior fora do módulo. A migration não foi aplicada a uma instância local porque o ambiente não oferece PostgreSQL/Docker; por isso, a homologação com RLS e Storage reais permanece um gate obrigatório de publicação operacional.
+1. aplicar as migrations em homologação;
+2. executar a sincronização 2026 com uma conta `map.admin`;
+3. confirmar RLS e Storage com os papéis reais;
+4. calibrar uma distância conhecida e validar as áreas oficiais;
+5. revisar as ambiguidades G03/G04, B23 e J contra documentação complementar;
+6. validar visualmente as vistas, seleção e responsividade em desktop,
+   notebook, tablet e celular;
+7. executar TypeScript, testes, lint focado, build e `git diff --check`.

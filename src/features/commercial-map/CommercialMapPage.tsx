@@ -17,7 +17,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { useCommercialMap, useFilteredMapEntities, useMapMutations, useMapPermissions } from './hooks/useCommercialMap';
+import { useCommercialMap, useMapEntityFilter, useMapMutations, useMapPermissions } from './hooks/useCommercialMap';
 import { useCommercialMapStore } from './state/useCommercialMapStore';
 import { CommercialMapCanvas } from './components/canvas/CommercialMapCanvas';
 import { MapToolbar } from './components/controls/MapToolbar';
@@ -64,7 +64,8 @@ export default function CommercialMapPage() {
   const [publishReason, setPublishReason] = useState('Publicação após revisão cartográfica e comercial');
 
   const data = mapQuery.data;
-  const filteredEntities = useFilteredMapEntities(data?.entities ?? [], data?.lots ?? []);
+  const mapFilter = useMapEntityFilter(data?.entities ?? [], data?.lots ?? []);
+  const filteredEntities = mapFilter.entities;
   const selectedEntity = data?.entities.find((entity) => entity.id === selectedEntityId) ?? null;
   const selectedLot = data?.lots.find((lot) => lot.entityId === selectedEntityId);
 
@@ -113,7 +114,7 @@ export default function CommercialMapPage() {
           <div className="commercial-map-title-icon"><MapPinned /></div>
           <div>
             <span>Inteligência territorial e comercial</span>
-            <h1>Mapa Comercial</h1>
+            <h1>Mapa Comercial 2026</h1>
             <p>{data.project.name}</p>
           </div>
         </div>
@@ -155,19 +156,19 @@ export default function CommercialMapPage() {
           {data.source === 'official-reference' && permissions.isMapAdmin && (
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button size="sm"><DatabaseZap />Iniciar implantação</Button>
+                <Button size="sm"><DatabaseZap />Implantar base 2026</Button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
                   <div className="commercial-map-dialog-icon"><DatabaseZap /></div>
-                  <AlertDialogTitle>Importar a base oficial como rascunho?</AlertDialogTitle>
+                  <AlertDialogTitle>Sincronizar a cartografia oficial 2026?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    Serão criados o projeto, as camadas e somente as estruturas de alto nível identificadas na planta. Nada será publicado como lote comercial, nenhuma área será considerada oficial e todas as geometrias exigirão revisão.
+                    A sincronização importa 21 quadras, 262 lotes numerados, vias e infraestrutura sem copiar a lista lateral de compradores. Lotes novos entram bloqueados e sem preço ou área oficial; registros comerciais existentes e geometrias já validadas são preservados.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
                   <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                  <AlertDialogAction onClick={() => bootstrap.mutate()}>Criar base auditável</AlertDialogAction>
+                  <AlertDialogAction onClick={() => bootstrap.mutate()}>Sincronizar como rascunho</AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
@@ -179,7 +180,11 @@ export default function CommercialMapPage() {
         <div className="commercial-map-source-banner" role="status">
           <AlertTriangle />
           <span><strong>{data.source === 'official-reference' ? 'Base oficial em preparação' : 'Projeto ainda não publicado'}</strong>{data.sourceMessage}</span>
-          <Badge variant="outline">sem dados inventados</Badge>
+          <Badge variant="outline">
+            {data.source === 'official-reference'
+              ? `${data.lots.length} lotes · sem compradores importados`
+              : `${data.lots.length} lotes persistidos`}
+          </Badge>
         </div>
       )}
 
@@ -192,7 +197,13 @@ export default function CommercialMapPage() {
           <MapListView entities={filteredEntities} lots={data.lots} />
         ) : (
           <>
-            <CommercialMapCanvas entities={filteredEntities} lots={data.lots} calibration={data.calibration} />
+            <CommercialMapCanvas
+              entities={data.entities}
+              lots={data.lots}
+              calibration={data.calibration}
+              matchingEntityIds={mapFilter.matchingEntityIds}
+              filtersActive={mapFilter.hasActiveCriteria}
+            />
             <CommercialSummary lots={data.lots} />
             <MapToolbar permissions={permissions} hasSelection={Boolean(selectedEntity)} />
             <StatusLegend />
