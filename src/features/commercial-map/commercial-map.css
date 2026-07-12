@@ -422,6 +422,12 @@
 .commercial-map-label.is-restroom > span { color: #155c88; letter-spacing: .08em; }
 .commercial-map-label.is-selected { z-index: 2; max-width: 190px; transform: translateY(-6px); border-color: rgba(23,91,43,.45); background: rgba(244,250,239,.98); box-shadow: 0 8px 20px rgba(17,75,32,.22); }
 .commercial-map-label.is-selected.is-structure > span { max-width: 172px; font-size: 7.5px; }
+.commercial-map-label.is-architectural-landmark { border-color: rgba(18,91,52,.3); background: rgba(248,250,243,.96); box-shadow: 0 5px 16px rgba(15,66,36,.17); }
+.commercial-map-label.is-architectural-landmark .commercial-map-label-code { background: #175d38; color: #fff7cf; }
+.commercial-map-label.is-architectural-landmark.is-selected { max-width: 205px; padding: 5px 9px; transform: translateY(-8px); border-color: rgba(213,172,55,.7); background: rgba(20,75,45,.98); color: #fffdf3; box-shadow: 0 10px 24px rgba(11,58,31,.3), 0 0 0 2px rgba(244,207,92,.14); }
+.commercial-map-label.is-architectural-landmark.is-selected::after { border-color: rgba(213,172,55,.58); background: rgba(20,75,45,.98); }
+.commercial-map-label.is-architectural-landmark.is-selected > span { max-width: 185px; color: #fffdf3; font-size: 8px; letter-spacing: .045em; }
+.commercial-map-label.is-architectural-landmark.is-selected .commercial-map-label-code { background: #e2bd4e; color: #173b28; }
 .commercial-map-label.is-access.is-selected { border-color: rgba(224,185,55,.72); background: rgba(20,69,43,.98); box-shadow: 0 8px 22px rgba(13,55,33,.3); }
 .commercial-map-label.is-restroom.is-selected { border-color: rgba(29,116,170,.58); background: rgba(244,251,255,.99); box-shadow: 0 8px 20px rgba(23,86,125,.24); }
 .commercial-map-loading { display: flex; width: 190px; flex-direction: column; align-items: center; gap: 4px; padding: 14px; border-radius: 13px; background: rgba(253,254,251,.92); color: #294334; box-shadow: 0 12px 30px rgba(25,54,33,.14); text-align: center; }

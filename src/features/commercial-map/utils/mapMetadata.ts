@@ -1,6 +1,7 @@
 import { CLASSIFICATION_LABELS, STATUS_CONFIG, VERIFICATION_LABELS } from '../constants';
 import type { CommercialLot, Coordinate, MapClassification, MapEntity } from '../types';
 import { geometryCentroid } from './geometry';
+import { strategicLandmarkSearchAliases } from './landmarks';
 
 export type MapLabelVisibility = 'far' | 'medium' | 'near';
 
@@ -108,6 +109,7 @@ export function normalizeMapEntityMetadata(entity: MapEntity, lot?: CommercialLo
     ? officialDisplayName
     : stringMetadata(entity, 'street');
   const aliases = unique([
+    ...strategicLandmarkSearchAliases(entity),
     ...stringArrayMetadata(entity, 'aliases'),
     ...stringArrayMetadata(entity, 'searchKeywords'),
     ...stringArrayMetadata(entity, 'keywords'),

@@ -20,6 +20,11 @@ import {
 } from '../../utils/interaction';
 import { normalizeMapEntityMetadata, type MapLabelVisibility } from '../../utils/mapMetadata';
 import {
+  resolveStrategicLandmarkKind,
+  strategicLandmarkFocusDirection,
+  strategicLandmarkVisualHeight,
+} from '../../utils/landmarks';
+import {
   labelBelongsToActiveMode,
   requiresSolidRendering,
   RESTROOM_PRESENTATION_LIFT,
@@ -29,6 +34,7 @@ import {
 } from '../../utils/mapPresentation';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import type { CameraPreset, CommercialLot, MapCalibration, MapEntity } from '../../types';
+import { StrategicLandmarkMesh } from './StrategicLandmarks';
 
 interface CommercialMapCanvasProps {
   entities: MapEntity[];
@@ -115,7 +121,9 @@ function entityLabelHeight(entity: MapEntity) {
   if (classification === 'ROAD' || classification === 'PEDESTRIAN_PATH' || classification === 'QUADRA') return 0.16;
   return Math.max(
     0.22,
-    entity.geometry.extrusionHeight + resolveMarkerPresentationLift(classification) + 0.32,
+    (strategicLandmarkVisualHeight(entity) ?? entity.geometry.extrusionHeight)
+      + resolveMarkerPresentationLift(classification)
+      + 0.32,
   );
 }
 
@@ -139,7 +147,7 @@ function getSceneExtent(entities: MapEntity[]): SceneExtent {
     maxHeight = Math.max(
       maxHeight,
       entity.geometry.elevation
-        + entity.geometry.extrusionHeight
+        + (strategicLandmarkVisualHeight(entity) ?? entity.geometry.extrusionHeight)
         + resolveMarkerPresentationLift(entity.classification),
     );
   });
@@ -173,7 +181,8 @@ function getEntityExtent(entity: MapEntity): SceneExtent {
   const depth = Math.max(1.6, maxZ - minZ);
   const maxHeight = Math.max(
     0.5,
-    entity.geometry.extrusionHeight + resolveMarkerPresentationLift(entity.classification),
+    (strategicLandmarkVisualHeight(entity) ?? entity.geometry.extrusionHeight)
+      + resolveMarkerPresentationLift(entity.classification),
   );
   return {
     minX,
@@ -187,6 +196,21 @@ function getEntityExtent(entity: MapEntity): SceneExtent {
     maxHeight,
     diagonal: Math.hypot(width, depth),
   };
+}
+
+function focusProfileForEntity(entity: MapEntity) {
+  const profile = selectionFocusProfile(entity.classification);
+  const landmark = resolveStrategicLandmarkKind(entity);
+  if (landmark === 'german-pavilion') {
+    return { ...profile, contextRatio: 0.055, fitPadding: 1.2, minDistanceRatio: 0.05, maxDistanceRatio: 0.34, minimumDirectionY: 0.44 };
+  }
+  if (landmark === 'fenasoja-restaurant') {
+    return { ...profile, contextRatio: 0.075, fitPadding: 1.22, minDistanceRatio: 0.06, maxDistanceRatio: 0.42, minimumDirectionY: 0.46 };
+  }
+  if (landmark === 'sicredi-arena') {
+    return { ...profile, contextRatio: 0.16, fitPadding: 1.18, minDistanceRatio: 0.11, maxDistanceRatio: 0.6, minimumDirectionY: 0.48 };
+  }
+  return profile;
 }
 
 function fitDistanceForDirection(
@@ -346,7 +370,7 @@ interface EntityMeshProps {
   onCursor: (cursor: 'grab' | 'grabbing' | 'pointer') => void;
 }
 
-const EntityMesh = memo(function EntityMesh({
+const GenericEntityMesh = memo(function GenericEntityMesh({
   entity,
   selected,
   hovered,
@@ -573,6 +597,27 @@ const EntityMesh = memo(function EntityMesh({
 
     </group>
   );
+});
+
+const EntityMesh = memo(function EntityMesh(props: EntityMeshProps) {
+  if (resolveStrategicLandmarkKind(props.entity)) {
+    return (
+      <StrategicLandmarkMesh
+        entity={props.entity}
+        selected={props.selected}
+        hovered={props.hovered}
+        filtersActive={props.filtersActive}
+        isMatch={props.isMatch}
+        layerOpacity={props.layerOpacity}
+        cameraNavigating={props.cameraNavigating}
+        onSelect={props.onSelect}
+        onHover={props.onHover}
+        onFocus={props.onFocus}
+        onCursor={props.onCursor}
+      />
+    );
+  }
+  return <GenericEntityMesh {...props} />;
 });
 
 interface LotEntry {
@@ -830,6 +875,7 @@ const EntityLabel = memo(function EntityLabel({
   const isQuadra = classification === 'QUADRA';
   const isGate = classification === 'GATE';
   const isRestroom = classification === 'RESTROOM' || classification === 'CHEMICAL_RESTROOM';
+  const isArchitecturalLandmark = Boolean(resolveStrategicLandmarkKind(entity));
   const dimmed = Boolean(lot && filtersActive && !isMatch && !selected);
   const status = lot ? STATUS_CONFIG[lot.status] : null;
   const labelHeight = entityLabelHeight(entity);
@@ -838,7 +884,7 @@ const EntityLabel = memo(function EntityLabel({
     <Html
       position={[metadata.labelAnchor[0], entity.geometry.elevation + labelHeight, metadata.labelAnchor[1]]}
       center
-      distanceFactor={selected ? 18 : lot ? 28 : level === 'far' ? 42 : 36}
+      distanceFactor={selected ? isArchitecturalLandmark ? 15 : 18 : lot ? 28 : level === 'far' ? 42 : 36}
       zIndexRange={[22, 2]}
       style={{ pointerEvents: 'none' }}
     >
@@ -858,7 +904,7 @@ const EntityLabel = memo(function EntityLabel({
         <div
           data-map-entity-id={entity.id}
           data-map-label-mode={selected ? 'focus' : 'navigation'}
-          className={`commercial-map-label is-structure ${isGate ? 'is-access' : ''} ${isRestroom ? 'is-restroom' : ''} ${selected ? 'is-selected' : ''}`}
+          className={`commercial-map-label is-structure ${isGate ? 'is-access' : ''} ${isRestroom ? 'is-restroom' : ''} ${isArchitecturalLandmark ? 'is-architectural-landmark' : ''} ${selected ? 'is-selected' : ''}`}
         >
           {metadata.structureCode && <strong className="commercial-map-label-code">{isRestroom ? 'E' : metadata.structureCode}</strong>}
           <span>{isRestroom && !selected ? 'WC' : metadata.officialDisplayName}</span>
@@ -1036,7 +1082,7 @@ function CameraRig({ selectedEntity, extent }: { selectedEntity: MapEntity | nul
   const queueSelection = useCallback((entity: MapEntity) => {
     const perspective = camera as THREE.PerspectiveCamera;
     const entityExtent = getEntityExtent(entity);
-    const focusProfile = selectionFocusProfile(entity.classification);
+    const focusProfile = focusProfileForEntity(entity);
     const hasDetailsPanel = activePanel === 'details';
     const panelWidth = hasDetailsPanel && size.width > 900 ? Math.min(380, size.width * 0.42) : 0;
     const panelHeight = hasDetailsPanel && size.width <= 900 ? Math.min(size.height * (size.width <= 640 ? 0.74 : 0.68), 610) : 0;
@@ -1052,6 +1098,10 @@ function CameraRig({ selectedEntity, extent }: { selectedEntity: MapEntity | nul
     const direction = camera.position.clone().sub(currentTarget);
     if (direction.lengthSq() < 0.01) direction.set(0.7, 0.75, 0.8);
     direction.normalize();
+    const landmarkFocusDirection = strategicLandmarkFocusDirection(entity);
+    if (landmarkFocusDirection) {
+      direction.lerp(new THREE.Vector3(...landmarkFocusDirection).normalize(), 0.72).normalize();
+    }
     direction.y = Math.max(direction.y, focusProfile.minimumDirectionY);
     direction.normalize();
     const fittedDistance = fitDistanceForDirection(entityExtent, perspective.fov || 38, aspect, direction, focusProfile.fitPadding);
@@ -1102,8 +1152,9 @@ function CameraRig({ selectedEntity, extent }: { selectedEntity: MapEntity | nul
       initialized.current = true;
     } else if (presetChanged) {
       queuePreset(preset);
-    } else if (sequenceChanged && selectedEntity) {
-      queueSelection(selectedEntity);
+    } else if (sequenceChanged) {
+      if (selectedEntity) queueSelection(selectedEntity);
+      else queuePreset(preset);
     } else if (selectionChanged && selectedEntity) {
       queueSelection(selectedEntity);
     } else if (selectionChanged && !selectedEntity) {
