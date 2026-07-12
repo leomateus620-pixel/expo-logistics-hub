@@ -42,6 +42,8 @@ export type MapSource = 'database' | 'official-reference';
 export type MapPanel = 'layers' | 'results' | 'details' | 'calibration' | null;
 export type MapWorkspaceMode = '3d' | 'list' | 'edit' | 'create';
 export type CameraPreset = 'overview' | 'top' | 'isometric' | 'commercial' | 'pavilions' | 'parking' | 'gates';
+export type EntitySortOrder = 'relevance' | 'name' | 'location' | 'status';
+export type EntityTableDensity = 'compact' | 'comfortable';
 
 export type Coordinate = [number, number];
 

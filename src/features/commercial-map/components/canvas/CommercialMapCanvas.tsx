@@ -1120,7 +1120,7 @@ function CanvasLoader() {
   );
 }
 
-export function CommercialMapCanvas(props: CommercialMapCanvasProps) {
+export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: CommercialMapCanvasProps) {
   const { entities, lots, calibration, matchingEntityIds, filtersActive } = props;
   const setSelectedEntityId = useCommercialMapStore((state) => state.setSelectedEntityId);
   const reducedGraphics = useCommercialMapStore((state) => state.reducedGraphics);
@@ -1171,4 +1171,4 @@ export function CommercialMapCanvas(props: CommercialMapCanvasProps) {
       </Suspense>
     </Canvas>
   );
-}
+});

@@ -14,6 +14,12 @@ describe('pipeline de seleção do mapa comercial', () => {
     useCommercialMapStore.setState({
       selectedEntityId: null,
       hoveredEntityId: null,
+      search: '',
+      statusFilters: [],
+      classificationFilters: [],
+      locationFilter: null,
+      verificationFilters: [],
+      sortOrder: 'relevance',
       activePanel: null,
       workspaceMode: '3d',
       cameraNavigating: false,
@@ -61,6 +67,48 @@ describe('pipeline de seleção do mapa comercial', () => {
       cameraNavigating: true,
       selectedEntityId: 'entity:quadra-n',
       activePanel: 'details',
+    });
+  });
+
+  it('leva seleções do explorador ao mapa, abre detalhes e solicita novo foco', () => {
+    const initialSequence = useCommercialMapStore.getState().cameraSequence;
+    useCommercialMapStore.setState({ workspaceMode: 'list', search: 'Quadra S', statusFilters: ['BLOCKED'] });
+
+    useCommercialMapStore.getState().selectEntityFromExplorer('entity:lot-s-36');
+
+    expect(useCommercialMapStore.getState()).toMatchObject({
+      selectedEntityId: 'entity:lot-s-36',
+      activePanel: 'details',
+      workspaceMode: '3d',
+      cameraSequence: initialSequence + 1,
+      search: 'Quadra S',
+      statusFilters: ['BLOCKED'],
+    });
+  });
+
+  it('limpa todos os filtros sem perder seleção ou preferência de densidade', () => {
+    useCommercialMapStore.setState({
+      selectedEntityId: 'entity:lot-1',
+      search: 'empresa',
+      statusFilters: ['AVAILABLE'],
+      classificationFilters: ['SELLABLE_LOT'],
+      locationFilter: 'block:S',
+      verificationFilters: ['VERIFIED'],
+      sortOrder: 'status',
+      tableDensity: 'compact',
+    });
+
+    useCommercialMapStore.getState().clearExplorerFilters();
+
+    expect(useCommercialMapStore.getState()).toMatchObject({
+      selectedEntityId: 'entity:lot-1',
+      search: '',
+      statusFilters: [],
+      classificationFilters: [],
+      locationFilter: null,
+      verificationFilters: [],
+      sortOrder: 'relevance',
+      tableDensity: 'compact',
     });
   });
 });

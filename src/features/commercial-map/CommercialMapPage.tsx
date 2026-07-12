@@ -25,10 +25,9 @@ import {
   CommercialSummary,
   EntityDetailsPanel,
   LayersPanel,
-  MapListView,
-  ResultsPanel,
   StatusLegend,
 } from './components/panels/MapPanels';
+import { MapListView, ResultsPanel } from './components/panels/EntityExplorer';
 import { CalibrationPanel } from './components/panels/CalibrationPanel';
 import './commercial-map.css';
 
@@ -63,7 +62,6 @@ export default function CommercialMapPage() {
 
   const data = mapQuery.data;
   const mapFilter = useMapEntityFilter(data?.entities ?? [], data?.lots ?? []);
-  const filteredEntities = mapFilter.entities;
   const selectedEntity = data?.entities.find((entity) => entity.id === selectedEntityId) ?? null;
   const selectedLot = data?.lots.find((lot) => lot.entityId === selectedEntityId);
 
@@ -71,15 +69,20 @@ export default function CommercialMapPage() {
     const shortcut = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
         event.preventDefault();
-        (document.querySelector('[aria-label="Buscar no mapa comercial"]') as HTMLInputElement | null)?.focus();
+        const searchTarget = workspaceMode === 'list'
+          ? document.querySelector('.commercial-map-list-view [data-commercial-map-search]')
+          : activePanel === 'results'
+            ? document.querySelector('.commercial-map-results-panel [data-commercial-map-search]')
+            : document.querySelector('.commercial-map-search [data-commercial-map-search]');
+        (searchTarget as HTMLInputElement | null)?.focus();
       }
-      if (event.key === 'Escape') {
+      if (event.key === 'Escape' && !event.defaultPrevented) {
         setActivePanel(null);
       }
     };
     window.addEventListener('keydown', shortcut);
     return () => window.removeEventListener('keydown', shortcut);
-  }, [setActivePanel]);
+  }, [activePanel, setActivePanel, workspaceMode]);
 
   useEffect(() => {
     if (workspaceMode === 'edit' && !selectedEntity) setWorkspaceMode('3d');
@@ -175,7 +178,7 @@ export default function CommercialMapPage() {
         ) : workspaceMode === 'edit' && selectedEntity ? (
           <GeometryEditor entity={selectedEntity} calibration={data.calibration} />
         ) : workspaceMode === 'list' || !webglAvailable ? (
-          <MapListView entities={filteredEntities} lots={data.lots} />
+          <MapListView explorer={mapFilter} permissions={permissions} />
         ) : (
           <>
             <CommercialMapCanvas
@@ -197,7 +200,7 @@ export default function CommercialMapPage() {
             )}
 
             {activePanel === 'layers' && <LayersPanel layers={data.layers} entities={data.entities} permissions={permissions} />}
-            {activePanel === 'results' && <ResultsPanel entities={filteredEntities} lots={data.lots} />}
+            {activePanel === 'results' && <ResultsPanel explorer={mapFilter} />}
             {activePanel === 'details' && selectedEntity && <EntityDetailsPanel entity={selectedEntity} lot={selectedLot} entities={data.entities} lots={data.lots} permissions={permissions} />}
             {activePanel === 'calibration' && <CalibrationPanel project={data.project} calibration={data.calibration} />}
           </>

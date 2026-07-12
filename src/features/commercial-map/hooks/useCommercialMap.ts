@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCapabilities } from '@/hooks/useCapabilities';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
@@ -25,7 +25,14 @@ import {
 } from '../services/commercialMapService';
 import { useCommercialMapStore } from '../state/useCommercialMapStore';
 import type { CommercialLot, MapEntity, MapPermissions } from '../types';
-import { mapSearchText } from '../utils/mapMetadata';
+import {
+  buildEntityExplorerFacets,
+  buildEntityExplorerIndex,
+  filterAndSortEntityExplorerItems,
+  normalizeExplorerText,
+  type EntityExplorerFacets,
+  type EntityExplorerItem,
+} from '../utils/entityExplorer';
 import { resolveMapPermissions } from '../utils/permissions';
 
 const MAP_ERROR_MESSAGES: Record<string, string> = {
@@ -98,33 +105,70 @@ export function useCommercialMap() {
 
 export interface MapEntityFilterResult {
   entities: MapEntity[];
+  items: EntityExplorerItem[];
   matchingEntityIds: ReadonlySet<string>;
   hasActiveCriteria: boolean;
+  totalCount: number;
+  filteredCount: number;
+  facets: EntityExplorerFacets;
+}
+
+function useDebouncedValue<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  useEffect(() => {
+    const timeout = window.setTimeout(() => setDebouncedValue(value), delay);
+    return () => window.clearTimeout(timeout);
+  }, [delay, value]);
+
+  return debouncedValue;
 }
 
 export function useMapEntityFilter(entities: MapEntity[], lots: CommercialLot[]): MapEntityFilterResult {
   const search = useCommercialMapStore((state) => state.search);
   const statusFilters = useCommercialMapStore((state) => state.statusFilters);
+  const classificationFilters = useCommercialMapStore((state) => state.classificationFilters);
+  const locationFilter = useCommercialMapStore((state) => state.locationFilter);
+  const verificationFilters = useCommercialMapStore((state) => state.verificationFilters);
+  const sortOrder = useCommercialMapStore((state) => state.sortOrder);
   const layerVisibility = useCommercialMapStore((state) => state.layerVisibility);
-  const normalizedSearch = search.trim().toLocaleLowerCase('pt-BR');
-  const lotByEntity = useMemo(() => new Map(lots.map((lot) => [lot.entityId, lot])), [lots]);
+  const debouncedSearch = useDebouncedValue(search, 140);
+  const indexedItems = useMemo(() => buildEntityExplorerIndex(entities, lots), [entities, lots]);
+  const visibleItems = useMemo(
+    () => indexedItems.filter((item) => layerVisibility[item.entity.layerId] !== false),
+    [indexedItems, layerVisibility],
+  );
+  const facets = useMemo(() => buildEntityExplorerFacets(visibleItems), [visibleItems]);
 
-  return useMemo(() => {
-    const filteredEntities = entities.filter((entity) => {
-      if (layerVisibility[entity.layerId] === false) return false;
-      const lot = lotByEntity.get(entity.id);
-      if (statusFilters.length > 0 && (!lot || !statusFilters.includes(lot.status))) return false;
-      if (!normalizedSearch) return true;
-      const haystack = `${mapSearchText(entity, lot)} ${entity.description ?? ''}`.toLocaleLowerCase('pt-BR');
-      return haystack.includes(normalizedSearch);
+  const stableResult = useMemo(() => {
+    const filteredItems = filterAndSortEntityExplorerItems(visibleItems, {
+      query: debouncedSearch,
+      statusFilters,
+      classificationFilters,
+      locationFilter,
+      verificationFilters,
+      sortOrder,
     });
+    const filteredEntities = filteredItems.map((item) => item.entity);
 
     return {
       entities: filteredEntities,
+      items: filteredItems,
       matchingEntityIds: new Set(filteredEntities.map((entity) => entity.id)),
-      hasActiveCriteria: Boolean(normalizedSearch || statusFilters.length > 0),
+      hasActiveCriteria: Boolean(
+        normalizeExplorerText(debouncedSearch)
+        || statusFilters.length
+        || classificationFilters.length
+        || locationFilter
+        || verificationFilters.length
+      ),
+      totalCount: visibleItems.length,
+      filteredCount: filteredItems.length,
+      facets,
     };
-  }, [entities, layerVisibility, lotByEntity, normalizedSearch, statusFilters]);
+  }, [classificationFilters, debouncedSearch, facets, locationFilter, sortOrder, statusFilters, verificationFilters, visibleItems]);
+
+  return stableResult;
 }
 
 export function useFilteredMapEntities(entities: MapEntity[], lots: CommercialLot[]) {

@@ -1,4 +1,4 @@
-import { CLASSIFICATION_LABELS } from '../constants';
+import { CLASSIFICATION_LABELS, STATUS_CONFIG, VERIFICATION_LABELS } from '../constants';
 import type { CommercialLot, Coordinate, MapClassification, MapEntity } from '../types';
 import { geometryCentroid } from './geometry';
 
@@ -107,18 +107,30 @@ export function normalizeMapEntityMetadata(entity: MapEntity, lot?: CommercialLo
   const street = entity.classification === 'ROAD' || entity.classification === 'PEDESTRIAN_PATH'
     ? officialDisplayName
     : stringMetadata(entity, 'street');
-  const aliases = stringArrayMetadata(entity, 'aliases');
+  const aliases = unique([
+    ...stringArrayMetadata(entity, 'aliases'),
+    ...stringArrayMetadata(entity, 'searchKeywords'),
+    ...stringArrayMetadata(entity, 'keywords'),
+  ]);
   const labelAnchor = geometryCentroid(entity.geometry);
   const preferredLabelVisibility = preferredVisibility(entity);
   const searchKeywords = unique([
     officialDisplayName,
+    entity.name,
+    entity.id,
     entity.publicIdentifier,
+    lot?.publicIdentifier,
     code,
     block ? `Quadra ${block}` : null,
     lotNumber ? `Lote ${lotNumber}` : null,
     street,
+    lot?.levelLabel,
     CLASSIFICATION_LABELS[entity.classification],
+    VERIFICATION_LABELS[entity.verificationStatus],
+    lot ? STATUS_CONFIG[lot.status].label : 'Não comercial',
     lot?.displayName,
+    entity.description,
+    lot?.description,
     lot?.currentBuyer,
     lot?.activeContractNumber,
     ...aliases,
@@ -143,5 +155,9 @@ export function normalizeMapEntityMetadata(entity: MapEntity, lot?: CommercialLo
 }
 
 export function mapSearchText(entity: MapEntity, lot?: CommercialLot): string {
-  return normalizeMapEntityMetadata(entity, lot).searchKeywords.join(' ').toLocaleLowerCase('pt-BR');
+  return normalizeMapEntityMetadata(entity, lot).searchKeywords
+    .join(' ')
+    .toLocaleLowerCase('pt-BR')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
 }
