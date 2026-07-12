@@ -33,9 +33,16 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
  * from tailwindcss-animate never break vertical/horizontal positioning.
  * max-h + flex-col keeps header/actions visible and body scroll predictable.
  */
-const DialogViewport = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (
-  <div className={cn("fixed inset-0 z-50 grid place-items-center p-3 sm:p-6 pointer-events-none", className)} {...props} />
+const DialogViewport = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivElement>>(
+  ({ className, ...props }, ref) => (
+    <div
+      ref={ref}
+      className={cn("fixed inset-0 z-50 grid place-items-center p-3 sm:p-6 pointer-events-none", className)}
+      {...props}
+    />
+  ),
 );
+DialogViewport.displayName = "DialogViewport";
 
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,

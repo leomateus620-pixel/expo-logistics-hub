@@ -12,6 +12,7 @@ import {
   SlidersHorizontal,
   SquareStack,
   Warehouse,
+  X,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -45,12 +46,26 @@ export function MapToolbar({ permissions, hasSelection }: { permissions: MapPerm
       <div className="commercial-map-search">
         <Search className="h-4 w-4" aria-hidden="true" />
         <Input
+          data-commercial-map-search
+          type="search"
           value={search}
           onChange={(event) => setSearch(event.target.value)}
-          placeholder="Buscar lote, bloco, empresa ou contrato"
+          onKeyDown={(event) => {
+            if (event.key === 'Escape' && search) {
+              event.preventDefault();
+              event.stopPropagation();
+              setSearch('');
+            } else if (event.key === 'Enter') {
+              setActivePanel('results');
+            }
+          }}
+          placeholder="ID, nome, quadra, lote, rua ou empresa"
           aria-label="Buscar no mapa comercial"
+          aria-keyshortcuts="Control+K Meta+K"
+          autoComplete="off"
         />
-        <kbd>⌘ K</kbd>
+        {search && <button type="button" className="commercial-map-search-clear" onClick={() => setSearch('')} aria-label="Limpar busca"><X /></button>}
+        <kbd aria-hidden="true">Ctrl K</kbd>
       </div>
 
       <div className="commercial-map-toolbar" aria-label="Controles do mapa">

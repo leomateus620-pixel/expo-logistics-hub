@@ -17,7 +17,6 @@ import {
   MapPinned,
   PencilLine,
   Ruler,
-  SearchX,
   Scissors,
   ShieldAlert,
   ShoppingBag,
@@ -31,7 +30,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Slider } from '@/components/ui/slider';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { CLASSIFICATION_LABELS, STATUS_CONFIG, VERIFICATION_LABELS } from '../../constants';
+import { CLASSIFICATION_LABELS, STATUS_CONFIG } from '../../constants';
 import { useLotActivity, useLotContractVersions, useMapMutations } from '../../hooks/useCommercialMap';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import { polygonAreaMapUnits } from '../../utils/geometry';
@@ -57,7 +56,6 @@ function PanelHeader({ title, eyebrow, onClose }: { title: string; eyebrow: stri
     </div>
   );
 }
-
 export function CommercialSummary({ lots }: { lots: CommercialLot[] }) {
   const toggleStatus = useCommercialMapStore((state) => state.toggleStatus);
   const statusFilters = useCommercialMapStore((state) => state.statusFilters);
@@ -201,44 +199,6 @@ export function LayersPanel({ layers, entities, permissions }: { layers: MapLaye
   );
 }
 
-export function ResultsPanel({ entities, lots }: { entities: MapEntity[]; lots: CommercialLot[] }) {
-  const setActivePanel = useCommercialMapStore((state) => state.setActivePanel);
-  const setSelectedEntityId = useCommercialMapStore((state) => state.setSelectedEntityId);
-  const statusFilters = useCommercialMapStore((state) => state.statusFilters);
-  const toggleStatus = useCommercialMapStore((state) => state.toggleStatus);
-  const lotByEntity = useMemo(() => new Map(lots.map((lot) => [lot.entityId, lot])), [lots]);
-  return (
-    <aside className="commercial-map-panel commercial-map-results-panel">
-      <PanelHeader eyebrow="Busca e seleção" title={`${entities.length} resultados no mapa`} onClose={() => setActivePanel(null)} />
-      <div className="commercial-map-filter-chips">
-        {(Object.keys(STATUS_CONFIG) as Array<keyof typeof STATUS_CONFIG>).map((status) => (
-          <button key={status} type="button" className={statusFilters.includes(status) ? 'is-active' : ''} onClick={() => toggleStatus(status)}>
-            <i style={{ background: STATUS_CONFIG[status].color }} />{STATUS_CONFIG[status].shortLabel}
-          </button>
-        ))}
-      </div>
-      <ScrollArea className="commercial-map-panel-scroll">
-        <div className="commercial-map-result-list">
-          {entities.length === 0 && (
-            <div className="commercial-map-empty"><SearchX /><strong>Nenhum resultado</strong><span>Ajuste a busca ou remova alguns filtros.</span></div>
-          )}
-          {entities.map((entity) => {
-            const lot = lotByEntity.get(entity.id);
-            const metadata = normalizeMapEntityMetadata(entity, lot);
-            return (
-              <button key={entity.id} type="button" onClick={() => setSelectedEntityId(entity.id)}>
-                <i style={{ background: lot ? STATUS_CONFIG[lot.status].color : '#6e7f71' }}>{lot ? STATUS_CONFIG[lot.status].symbol : entity.publicIdentifier.slice(0, 2)}</i>
-                <span><strong>{entity.publicIdentifier} · {metadata.officialDisplayName}</strong><small>{CLASSIFICATION_LABELS[entity.classification]}{lot ? ` · ${STATUS_CONFIG[lot.status].label}` : ''}</small></span>
-                <ChevronRight className="h-4 w-4" />
-              </button>
-            );
-          })}
-        </div>
-      </ScrollArea>
-    </aside>
-  );
-}
-
 function DetailMetric({ icon: Icon, label, value, warning }: { icon: typeof Tag; label: string; value: string; warning?: boolean }) {
   return (
     <div className={`commercial-map-detail-metric ${warning ? 'is-warning' : ''}`}>
@@ -370,40 +330,5 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions }:
       {lot && <LotEditDialog lot={lot} open={editingLot} onClose={() => setEditingLot(false)} />}
       <EntityVerificationDialog entity={entity} open={verificationOpen} onClose={() => setVerificationOpen(false)} />
     </>
-  );
-}
-
-export function MapListView({ entities, lots }: { entities: MapEntity[]; lots: CommercialLot[] }) {
-  const setSelectedEntityId = useCommercialMapStore((state) => state.setSelectedEntityId);
-  const setWorkspaceMode = useCommercialMapStore((state) => state.setWorkspaceMode);
-  const lotByEntity = useMemo(() => new Map(lots.map((lot) => [lot.entityId, lot])), [lots]);
-  return (
-    <div className="commercial-map-list-view">
-      <div className="commercial-map-list-heading">
-        <div><span>Alternativa acessível ao mapa 3D</span><h2>Entidades do parque</h2><p>A seleção nesta tabela permanece sincronizada com a cena.</p></div>
-        <Button variant="outline" onClick={() => setWorkspaceMode('3d')}><Layers3 className="h-4 w-4" />Voltar ao mapa</Button>
-      </div>
-      <div className="commercial-map-table-wrap">
-        <table>
-          <thead><tr><th>Identificação</th><th>Classificação</th><th>Situação</th><th>Área oficial</th><th>Verificação</th><th><span className="sr-only">Ações</span></th></tr></thead>
-          <tbody>
-            {entities.map((entity) => {
-              const lot = lotByEntity.get(entity.id);
-              const metadata = normalizeMapEntityMetadata(entity, lot);
-              return (
-                <tr key={entity.id}>
-                  <td><strong>{entity.publicIdentifier}</strong><span>{metadata.officialDisplayName}</span></td>
-                  <td>{CLASSIFICATION_LABELS[entity.classification]}</td>
-                  <td>{lot ? <span className="commercial-map-table-status"><i style={{ background: STATUS_CONFIG[lot.status].color }} />{STATUS_CONFIG[lot.status].label}</span> : 'Não comercial'}</td>
-                  <td>{lot?.officialAreaSqm ? `${number.format(lot.officialAreaSqm)} m²` : 'Área não validada'}</td>
-                  <td>{VERIFICATION_LABELS[entity.verificationStatus]}</td>
-                  <td><Button size="sm" variant="ghost" onClick={() => { setSelectedEntityId(entity.id); setWorkspaceMode('3d'); }}>Ver no mapa<ChevronRight className="h-4 w-4" /></Button></td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-    </div>
   );
 }

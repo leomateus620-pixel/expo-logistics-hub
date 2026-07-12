@@ -1,11 +1,25 @@
 import { create } from 'zustand';
-import type { CameraPreset, CommercialStatus, MapPanel, MapWorkspaceMode } from '../types';
+import type {
+  CameraPreset,
+  CommercialStatus,
+  EntitySortOrder,
+  EntityTableDensity,
+  MapClassification,
+  MapPanel,
+  MapWorkspaceMode,
+  VerificationStatus,
+} from '../types';
 
 interface CommercialMapState {
   selectedEntityId: string | null;
   hoveredEntityId: string | null;
   search: string;
   statusFilters: CommercialStatus[];
+  classificationFilters: MapClassification[];
+  locationFilter: string | null;
+  verificationFilters: VerificationStatus[];
+  sortOrder: EntitySortOrder;
+  tableDensity: EntityTableDensity;
   layerVisibility: Record<string, boolean>;
   layerOpacity: Record<string, number>;
   activePanel: MapPanel;
@@ -22,6 +36,13 @@ interface CommercialMapState {
   setSearch: (search: string) => void;
   toggleStatus: (status: CommercialStatus) => void;
   clearStatuses: () => void;
+  toggleClassification: (classification: MapClassification) => void;
+  setLocationFilter: (location: string | null) => void;
+  toggleVerification: (status: VerificationStatus) => void;
+  setSortOrder: (sortOrder: EntitySortOrder) => void;
+  setTableDensity: (density: EntityTableDensity) => void;
+  clearExplorerFilters: () => void;
+  selectEntityFromExplorer: (id: string) => void;
   setLayerVisibility: (layerId: string, visible: boolean) => void;
   setLayerOpacity: (layerId: string, opacity: number) => void;
   initializeLayers: (layers: Array<{ id: string; isVisible: boolean; opacity: number }>) => void;
@@ -41,6 +62,11 @@ export const useCommercialMapStore = create<CommercialMapState>((set) => ({
   hoveredEntityId: null,
   search: '',
   statusFilters: [],
+  classificationFilters: [],
+  locationFilter: null,
+  verificationFilters: [],
+  sortOrder: 'relevance',
+  tableDensity: 'comfortable',
   layerVisibility: {},
   layerOpacity: {},
   activePanel: null,
@@ -61,6 +87,34 @@ export const useCommercialMapStore = create<CommercialMapState>((set) => ({
       : [...state.statusFilters, status],
   })),
   clearStatuses: () => set({ statusFilters: [] }),
+  toggleClassification: (classification) => set((state) => ({
+    classificationFilters: state.classificationFilters.includes(classification)
+      ? state.classificationFilters.filter((candidate) => candidate !== classification)
+      : [...state.classificationFilters, classification],
+  })),
+  setLocationFilter: (locationFilter) => set({ locationFilter }),
+  toggleVerification: (status) => set((state) => ({
+    verificationFilters: state.verificationFilters.includes(status)
+      ? state.verificationFilters.filter((candidate) => candidate !== status)
+      : [...state.verificationFilters, status],
+  })),
+  setSortOrder: (sortOrder) => set({ sortOrder }),
+  setTableDensity: (tableDensity) => set({ tableDensity }),
+  clearExplorerFilters: () => set({
+    search: '',
+    statusFilters: [],
+    classificationFilters: [],
+    locationFilter: null,
+    verificationFilters: [],
+    sortOrder: 'relevance',
+  }),
+  selectEntityFromExplorer: (selectedEntityId) => set((state) => ({
+    selectedEntityId,
+    hoveredEntityId: null,
+    activePanel: 'details',
+    workspaceMode: '3d',
+    cameraSequence: state.cameraSequence + 1,
+  })),
   setLayerVisibility: (layerId, visible) => set((state) => ({ layerVisibility: { ...state.layerVisibility, [layerId]: visible } })),
   setLayerOpacity: (layerId, opacity) => set((state) => ({ layerOpacity: { ...state.layerOpacity, [layerId]: opacity } })),
   initializeLayers: (layers) => set((state) => {
