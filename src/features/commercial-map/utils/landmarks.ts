@@ -2,6 +2,9 @@ import type { MapEntity } from '../types';
 
 export type StrategicLandmarkKind =
   | 'fenasoja-headquarters'
+  | 'polish-pavilion'
+  | 'italian-pavilion'
+  | 'nations-portico'
   | 'german-pavilion'
   | 'fenasoja-restaurant'
   | 'sicredi-arena';
@@ -38,6 +41,30 @@ const STRATEGIC_LANDMARKS: Readonly<Record<string, StrategicLandmarkDefinition>>
     facingRadians: 0,
     focusDirection: [0.56, 0.36, 0.96],
     visualHeight: ({ width, depth }) => Math.min(2.6, Math.max(width, depth) * 0.84),
+  },
+  C5: {
+    kind: 'polish-pavilion',
+    aliases: ['Etnia Polonesa', 'Casa Polonesa', 'Pavilhão Polonês', 'Polish House'],
+    // O alpendre abre para o miolo da Praça das Nações, a leste do footprint C5.
+    facingRadians: Math.PI / 2,
+    focusDirection: [0.96, 0.4, 0.3],
+    visualHeight: ({ width, depth }) => Math.min(2.35, Math.max(width, depth) * 0.86),
+  },
+  C6: {
+    kind: 'italian-pavilion',
+    aliases: ['Etnia Italiana', 'Casa Italiana', 'Pavilhão Italiano', 'Italian House'],
+    // A varanda e a escada abrem para o miolo da Praça das Nações, a oeste de C6.
+    facingRadians: -Math.PI / 2,
+    focusDirection: [-0.96, 0.42, 0.28],
+    visualHeight: ({ width, depth }) => Math.min(2.3, Math.max(width, depth) * 0.84),
+  },
+  'PORTICO-NACOES': {
+    kind: 'nations-portico',
+    aliases: ['Pórtico das Nações', 'Portal das Nações', 'Praça das Nações', 'Nations Gateway'],
+    // O portal marca a chegada pelo lado sul do conjunto das etnias.
+    facingRadians: 0,
+    focusDirection: [0.48, 0.4, 0.94],
+    visualHeight: ({ width }) => Math.min(2.75, width * 0.94),
   },
   C8: {
     kind: 'german-pavilion',

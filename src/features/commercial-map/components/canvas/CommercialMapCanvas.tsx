@@ -204,6 +204,12 @@ function focusProfileForEntity(entity: MapEntity) {
   if (landmark === 'fenasoja-headquarters') {
     return { ...profile, contextRatio: 0.055, fitPadding: 1.16, minDistanceRatio: 0.05, maxDistanceRatio: 0.3, minimumDirectionY: 0.32 };
   }
+  if (landmark === 'polish-pavilion' || landmark === 'italian-pavilion') {
+    return { ...profile, contextRatio: 0.058, fitPadding: 1.18, minDistanceRatio: 0.05, maxDistanceRatio: 0.32, minimumDirectionY: 0.34 };
+  }
+  if (landmark === 'nations-portico') {
+    return { ...profile, contextRatio: 0.052, fitPadding: 1.12, minDistanceRatio: 0.045, maxDistanceRatio: 0.3, minimumDirectionY: 0.32 };
+  }
   if (landmark === 'german-pavilion') {
     return { ...profile, contextRatio: 0.06, fitPadding: 1.24, minDistanceRatio: 0.05, maxDistanceRatio: 0.34, minimumDirectionY: 0.34 };
   }
