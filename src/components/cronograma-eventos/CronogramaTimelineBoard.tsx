@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useMemo } from 'react';
 import {
   CalendarClock,
   CalendarDays,
@@ -14,6 +14,15 @@ import {
   UserRound,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useTimelineCycleNavigation, type TimelinePositionChange } from '@/hooks/useTimelineCycleNavigation';
+import {
+  buildCronogramaYearSummaries,
+  CRONOGRAMA_CYCLE,
+  getCronogramaCycleStage,
+  getCurrentCycleYear,
+  getFirstRelevantMonthForYear,
+  type CronogramaCycleYear,
+} from '@/lib/cronograma-cycle';
 import { cn } from '@/lib/utils';
 import {
   getInitialTimelineMonth,
@@ -29,7 +38,8 @@ import {
   CronogramaStatusIndicator,
 } from './CronogramaBadges';
 import { statusLabels } from './cronogramaData';
-import { formatLongDate, formatShortDateRange } from './dateUtils';
+import { formatLongDate } from './dateUtils';
+import { TimelineCycleNavigator } from './TimelineCycleNavigator';
 import type { CronogramaEvent } from './types';
 
 const monthYearFormatter = new Intl.DateTimeFormat('pt-BR', {
@@ -37,6 +47,7 @@ const monthYearFormatter = new Intl.DateTimeFormat('pt-BR', {
   year: 'numeric',
   timeZone: 'UTC',
 });
+const NOOP = () => undefined;
 
 const monthShortFormatter = new Intl.DateTimeFormat('pt-BR', {
   month: 'short',
@@ -49,209 +60,332 @@ function monthLabel(monthKey: string) {
   return label.charAt(0).toUpperCase() + label.slice(1);
 }
 
-function monthPhase(year: number) {
-  if (year === 2026) return 'Estruturação';
-  if (year === 2027) return 'Consolidação';
-  return 'Realização';
-}
-
 export function CronogramaTimelineBoard({
   events,
+  allEvents,
   onOpen,
   onClearFilters,
+  onReturnToFullCycle,
+  onOpenUndated,
+  requestedYear = null,
+  requestedMonth = null,
+  temporalFocusKey = 'all',
+  preferredTemporalYear = null,
+  onPositionChange,
+  todayKey: todayKeyOverride,
 }: {
   events: CronogramaEvent[];
+  allEvents?: CronogramaEvent[];
   onOpen: (event: CronogramaEvent) => void;
   onClearFilters: () => void;
+  onReturnToFullCycle?: () => void;
+  onOpenUndated?: () => void;
+  requestedYear?: CronogramaCycleYear | null;
+  requestedMonth?: string | null;
+  temporalFocusKey?: string;
+  preferredTemporalYear?: CronogramaCycleYear | null;
+  onPositionChange?: (change: TimelinePositionChange) => void;
+  todayKey?: string;
 }) {
-  const todayKey = getTodayKey();
+  const completeEvents = allEvents ?? events;
+  const returnToFullCycle = onReturnToFullCycle ?? onClearFilters;
+  const openUndated = onOpenUndated ?? NOOP;
+  const todayKey = todayKeyOverride ?? getTodayKey();
   const grouped = useMemo(() => groupTimelineByMonth(events), [events]);
   const monthKeys = useMemo(() => Array.from(grouped.keys()), [grouped]);
-  const initialMonth = useMemo(() => getInitialTimelineMonth(events, todayKey), [events, todayKey]);
-  const [openMonths, setOpenMonths] = useState<Record<string, boolean>>(() => ({ [initialMonth]: true }));
-  const [activeMonth, setActiveMonth] = useState(initialMonth);
-  const monthRefs = useRef<Record<string, HTMLElement | null>>({});
-  const positionedInitially = useRef(false);
+  const monthKeysByYear = useMemo(() => Object.fromEntries(
+    CRONOGRAMA_CYCLE.map(({ year }) => [
+      year,
+      monthKeys.filter((key) => key.startsWith(`${year}-`)),
+    ]),
+  ) as Record<CronogramaCycleYear, string[]>, [monthKeys]);
+  const summaries = useMemo(
+    () => buildCronogramaYearSummaries(completeEvents, events),
+    [completeEvents, events],
+  );
+  const firstMonthByYear = useMemo(() => Object.fromEntries(
+    CRONOGRAMA_CYCLE.map(({ year }) => [year, getFirstRelevantMonthForYear(events, year, todayKey)]),
+  ) as Record<CronogramaCycleYear, string | null>, [events, todayKey]);
+  const availableYears = useMemo(
+    () => summaries.filter((summary) => summary.available).map((summary) => summary.year),
+    [summaries],
+  );
+  const initialMonth = useMemo(
+    () => monthKeys.length ? getInitialTimelineMonth(events, todayKey) : null,
+    [events, monthKeys.length, todayKey],
+  );
   const snapshot = useMemo(() => getTimelineSnapshot(events, todayKey), [events, todayKey]);
   const undated = useMemo(() => events.filter((event) => !event.date), [events]);
+  const navigation = useTimelineCycleNavigation({
+    monthKeys,
+    firstMonthByYear,
+    availableYears,
+    initialMonth,
+    requestedYear,
+    requestedMonth,
+    todayKey,
+    temporalFocusKey,
+    preferredTemporalYear,
+    onPositionChange,
+  });
+  const currentYear = getCurrentCycleYear(todayKey);
+  const selectedSummary = summaries.find((summary) => summary.year === navigation.selectedYear)!;
+  const focusedLabel = navigation.focusedMonth
+    ? monthLabel(navigation.focusedMonth)
+    : `${navigation.selectedYear} · ${selectedSummary.stage}`;
+  const reflectEventMonth = navigation.reflectEventMonth;
 
-  useEffect(() => {
-    if (!monthKeys.length) return;
-    if (!monthKeys.includes(activeMonth)) setActiveMonth(initialMonth);
-    setOpenMonths((current) => current[initialMonth] ? current : { ...current, [initialMonth]: true });
-  }, [activeMonth, initialMonth, monthKeys]);
+  const openTimelineEvent = useCallback((event: CronogramaEvent) => {
+    if (event.date) reflectEventMonth(event.date.slice(0, 7));
+    onOpen(event);
+  }, [onOpen, reflectEventMonth]);
 
-  useEffect(() => {
-    if (positionedInitially.current || !monthRefs.current[initialMonth]) return;
-    const timer = window.setTimeout(() => {
-      positionedInitially.current = true;
-      monthRefs.current[initialMonth]?.scrollIntoView({ block: 'start', behavior: 'auto' });
-    }, 0);
-    return () => window.clearTimeout(timer);
-  }, [initialMonth, monthKeys.length]);
+  return (
+    <section className="cronograma-timeline-shell" aria-label="Linha do tempo operacional">
+      <TimelineCycleNavigator
+        summaries={summaries}
+        selectedYear={navigation.selectedYear}
+        currentYear={currentYear}
+        onSelectYear={navigation.selectYear}
+      />
 
-  useEffect(() => {
-    if (typeof IntersectionObserver === 'undefined') return;
-    const observer = new IntersectionObserver((entries) => {
-      const visible = entries
-        .filter((entry) => entry.isIntersecting)
-        .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-      if (visible) setActiveMonth((visible.target as HTMLElement).dataset.month ?? initialMonth);
-    }, { rootMargin: '-38% 0px -50% 0px', threshold: [0.1, 0.35, 0.6] });
-    monthKeys.forEach((key) => {
-      const section = monthRefs.current[key];
-      if (section) observer.observe(section);
-    });
-    return () => observer.disconnect();
-  }, [initialMonth, monthKeys]);
+      <div className="cronograma-timeline-workspace">
+        <nav className="cronograma-temporal-nav" aria-label="Navegação entre períodos">
+          <div className="min-w-0">
+            <p className="text-[9px] font-bold uppercase tracking-[0.17em] text-muted-foreground">Período em foco</p>
+            <p className="truncate text-lg font-black tracking-tight text-foreground">{focusedLabel}</p>
+          </div>
+          <div className="ml-auto flex items-center gap-1.5">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={navigation.goToToday}
+              className="h-9 rounded-lg px-3 text-xs"
+              aria-label="Ir para o período de hoje"
+            >
+              <CalendarDays className="h-4 w-4" aria-hidden="true" />
+              <span className="hidden sm:inline">Ir para hoje</span>
+              <span className="sm:hidden">Hoje</span>
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              disabled={!navigation.previousMonth}
+              onClick={() => navigation.previousMonth && navigation.goToMonth(navigation.previousMonth)}
+              className="h-9 w-9 rounded-lg"
+              aria-label="Período anterior"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              disabled={!navigation.nextMonth}
+              onClick={() => navigation.nextMonth && navigation.goToMonth(navigation.nextMonth)}
+              className="h-9 w-9 rounded-lg"
+              aria-label="Próximo período"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+        </nav>
 
-  const scrollToMonth = useCallback((monthKey: string) => {
-    setOpenMonths((current) => ({ ...current, [monthKey]: true }));
-    setActiveMonth(monthKey);
-    window.setTimeout(() => {
-      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      monthRefs.current[monthKey]?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth', block: 'start' });
-    }, 0);
-  }, []);
+        <p className="sr-only" aria-live="polite" aria-atomic="true">
+          Ano em foco {navigation.selectedYear}, etapa {selectedSummary.stage}.
+        </p>
 
-  const activeIndex = Math.max(0, monthKeys.indexOf(activeMonth));
+        <div className="cronograma-month-stream">
+          {CRONOGRAMA_CYCLE.map(({ year }) => {
+            const yearMonthKeys = monthKeysByYear[year];
+            const focusedMonthMissing = navigation.selectedYear === year
+              && (!navigation.focusedMonth || !grouped.has(navigation.focusedMonth));
+            const placeholderKey = focusedMonthMissing
+              ? navigation.focusedMonth ?? `${year}-00`
+              : null;
+            const streamKeys = placeholderKey
+              ? [...yearMonthKeys, placeholderKey].sort()
+              : yearMonthKeys;
 
-  if (!events.length) {
-    return <TimelineEmptyState onClear={onClearFilters} />;
+            return (
+              <section
+                key={year}
+                className="cronograma-year-stream"
+                data-year={year}
+                aria-label={`${year}, etapa ${getCronogramaCycleStage(year).stage}`}
+              >
+                {streamKeys.map((key) => {
+                  if (key === placeholderKey) {
+                    const keyForObserver = navigation.focusedMonth ? `month:${navigation.focusedMonth}` : `year:${year}`;
+                    return (
+                      <TimelineYearEmptyState
+                        key={`empty-${key}`}
+                        focusKey={keyForObserver}
+                        registerFocusNode={navigation.registerFocusNode}
+                        summary={selectedSummary}
+                        focusedMonth={navigation.focusedMonth}
+                        onClearFilters={onClearFilters}
+                        onReturnToFullCycle={returnToFullCycle}
+                        onOpenUndated={openUndated}
+                      />
+                    );
+                  }
+
+                  const monthEvents = grouped.get(key) ?? [];
+                  const summary = getMonthOperationalSummary(monthEvents);
+                  const open = navigation.expandedMonths[key] ?? false;
+                  const [monthYear] = key.split('-').map(Number);
+                  const isCurrent = key === todayKey.slice(0, 7);
+                  return (
+                    <section
+                      key={key}
+                      ref={(node) => navigation.registerFocusNode(`month:${key}`, node)}
+                      data-focus-key={`month:${key}`}
+                      data-month={key}
+                      data-current={isCurrent || undefined}
+                      data-active={navigation.focusedMonth === key || undefined}
+                      className="cronograma-month-section"
+                      aria-labelledby={`cronograma-month-${key}`}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => navigation.toggleMonth(key)}
+                        className="cronograma-month-summary focus-ring"
+                        aria-expanded={open}
+                        aria-controls={`cronograma-month-events-${key}`}
+                      >
+                        <span className="cronograma-month-marker" aria-hidden="true">
+                          <span>{key.slice(5)}</span>
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="flex flex-wrap items-center gap-2">
+                            <strong id={`cronograma-month-${key}`} className="text-base font-black tracking-tight text-foreground sm:text-lg">{monthLabel(key)}</strong>
+                            <span className="rounded-full bg-primary/[0.06] px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.12em] text-primary">{getCronogramaCycleStage(monthYear).stage}</span>
+                            {isCurrent && <span className="rounded-full bg-gold/15 px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-[0.12em] text-amber-950">Mês atual</span>}
+                          </span>
+                          <span className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-muted-foreground">
+                            <span>{summary.total} eventos</span>
+                            <span>{summary.completed} concluídos</span>
+                            {summary.overdue > 0 && <span className="font-bold text-red-800">{summary.overdue} atrasados</span>}
+                            {summary.pending > 0 && <span>{summary.pending} pendentes</span>}
+                          </span>
+                        </span>
+                        <span className="flex items-center gap-2 text-xs font-bold text-primary">
+                          {open ? 'Recolher' : 'Ver mês'}
+                          <ChevronDown className={cn('h-4 w-4 transition-transform', open && 'rotate-180')} aria-hidden="true" />
+                        </span>
+                      </button>
+
+                      {open && (
+                        <div id={`cronograma-month-events-${key}`} className="cronograma-month-events">
+                          {monthEvents.map((event) => (
+                            <TimelineEventRow
+                              key={event.id}
+                              event={event}
+                              todayKey={todayKey}
+                              isNextOfficial={snapshot.nextOfficialAction?.id === event.id}
+                              onOpen={openTimelineEvent}
+                            />
+                          ))}
+                        </div>
+                      )}
+                    </section>
+                  );
+                })}
+              </section>
+            );
+          })}
+        </div>
+
+        {undated.length > 0 && (
+          <section className="cronograma-undated-section" aria-labelledby="cronograma-undated-title">
+            <header className="flex flex-wrap items-start justify-between gap-3 border-b border-amber-900/10 px-4 py-3 sm:px-5">
+              <div>
+                <p className="text-[9px] font-bold uppercase tracking-[0.17em] text-amber-900/70">Backlog institucional</p>
+                <h3 id="cronograma-undated-title" className="mt-1 text-lg font-black tracking-tight text-foreground">Ações aguardando definição de data</h3>
+              </div>
+              <span className="rounded-full bg-amber-100 px-3 py-1 font-mono text-xs font-bold text-amber-950">{undated.length}</span>
+            </header>
+            <div className="divide-y divide-amber-900/10">
+              {undated.slice(0, 8).map((event) => (
+                <button key={event.id} type="button" onClick={() => openTimelineEvent(event)} className="cronograma-undated-action focus-ring">
+                  <CalendarClock className="mt-0.5 h-4 w-4 shrink-0 text-amber-800" aria-hidden="true" />
+                  <span className="min-w-0 flex-1 text-left">
+                    <span className="block text-sm font-bold text-foreground">{event.title}</span>
+                    <span className="mt-1 block truncate text-xs text-muted-foreground">{event.pendingReason || 'Aguardando agendamento institucional.'}</span>
+                  </span>
+                  <CronogramaPriorityIndicator priority={event.priority} compact />
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
+    </section>
+  );
+}
+
+function TimelineYearEmptyState({
+  focusKey,
+  registerFocusNode,
+  summary,
+  focusedMonth,
+  onClearFilters,
+  onReturnToFullCycle,
+  onOpenUndated,
+}: {
+  focusKey: string;
+  registerFocusNode: (key: string, node: HTMLElement | null) => void;
+  summary: ReturnType<typeof buildCronogramaYearSummaries>[number];
+  focusedMonth: string | null;
+  onClearFilters: () => void;
+  onReturnToFullCycle: () => void;
+  onOpenUndated: () => void;
+}) {
+  const focusedMonthLabel = focusedMonth ? monthLabel(focusedMonth) : null;
+  let title = `Nenhum evento encontrado em ${summary.year} com os filtros atuais.`;
+  let description = 'Os filtros foram preservados. Ajuste o recorte ou escolha outro ano no ciclo.';
+
+  if (!summary.available) {
+    title = `Ainda não há eventos cadastrados em ${summary.year}.`;
+    description = 'A etapa continua visível no ciclo e será habilitada quando receber eventos.';
+  } else if (summary.undatedFiltered > 0 && summary.datedFiltered === 0) {
+    title = `${summary.undatedFiltered} ${summary.undatedFiltered === 1 ? 'evento atende' : 'eventos atendem'} aos filtros, mas ${summary.undatedFiltered === 1 ? 'ainda não possui' : 'ainda não possuem'} data.`;
+    description = `Consulte as pendências sem data de ${summary.year} ou mantenha os filtros para escolher outra etapa.`;
+  } else if (focusedMonthLabel && summary.datedFiltered > 0) {
+    title = `Nenhum evento encontrado em ${focusedMonthLabel} com os filtros atuais.`;
+    description = `Há outros meses disponíveis em ${summary.year}; use os controles de período para continuar a navegação.`;
   }
 
   return (
-    <section className="cronograma-timeline-workspace" aria-label="Linha do tempo operacional">
-      <nav className="cronograma-temporal-nav" aria-label="Navegação entre meses">
-        <div className="min-w-0">
-          <p className="text-[9px] font-bold uppercase tracking-[0.17em] text-muted-foreground">Período em foco</p>
-          <p className="truncate text-lg font-black tracking-tight text-foreground">{monthLabel(activeMonth)}</p>
-        </div>
-        <div className="ml-auto flex items-center gap-1.5">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={() => scrollToMonth(initialMonth)}
-            className="h-9 rounded-lg px-3 text-xs"
-            aria-label="Ir para o mês atual"
-          >
-            <CalendarDays className="h-4 w-4" aria-hidden="true" />
-            <span className="hidden sm:inline">Ir para hoje</span>
-            <span className="sm:hidden">Hoje</span>
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            disabled={activeIndex <= 0}
-            onClick={() => scrollToMonth(monthKeys[activeIndex - 1])}
-            className="h-9 w-9 rounded-lg"
-            aria-label="Período anterior"
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            disabled={activeIndex >= monthKeys.length - 1}
-            onClick={() => scrollToMonth(monthKeys[activeIndex + 1])}
-            className="h-9 w-9 rounded-lg"
-            aria-label="Próximo período"
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
-      </nav>
-
-      <div className="cronograma-month-stream">
-        {monthKeys.map((key) => {
-          const monthEvents = grouped.get(key) ?? [];
-          const summary = getMonthOperationalSummary(monthEvents);
-          const open = openMonths[key] ?? false;
-          const [year] = key.split('-').map(Number);
-          const isCurrent = key === todayKey.slice(0, 7);
-          return (
-            <section
-              key={key}
-              ref={(node) => { monthRefs.current[key] = node; }}
-              data-month={key}
-              data-current={isCurrent || undefined}
-              data-active={activeMonth === key || undefined}
-              className="cronograma-month-section"
-              aria-labelledby={`cronograma-month-${key}`}
-            >
-              <button
-                type="button"
-                onClick={() => setOpenMonths((current) => ({ ...current, [key]: !open }))}
-                className="cronograma-month-summary focus-ring"
-                aria-expanded={open}
-                aria-controls={`cronograma-month-events-${key}`}
-              >
-                <span className="cronograma-month-marker" aria-hidden="true">
-                  <span>{key.slice(5)}</span>
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="flex flex-wrap items-center gap-2">
-                    <strong id={`cronograma-month-${key}`} className="text-base font-black tracking-tight text-foreground sm:text-lg">{monthLabel(key)}</strong>
-                    <span className="rounded-full bg-primary/[0.06] px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.12em] text-primary">{monthPhase(year)}</span>
-                    {isCurrent && <span className="rounded-full bg-gold/15 px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-[0.12em] text-amber-950">Mês atual</span>}
-                  </span>
-                  <span className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-muted-foreground">
-                    <span>{summary.total} eventos</span>
-                    <span>{summary.completed} concluídos</span>
-                    {summary.overdue > 0 && <span className="font-bold text-red-800">{summary.overdue} atrasados</span>}
-                    {summary.pending > 0 && <span>{summary.pending} pendentes</span>}
-                  </span>
-                </span>
-                <span className="flex items-center gap-2 text-xs font-bold text-primary">
-                  {open ? 'Recolher' : 'Ver mês'}
-                  <ChevronDown className={cn('h-4 w-4 transition-transform', open && 'rotate-180')} aria-hidden="true" />
-                </span>
-              </button>
-
-              {open && (
-                <div id={`cronograma-month-events-${key}`} className="cronograma-month-events">
-                  {monthEvents.map((event) => (
-                    <TimelineEventRow
-                      key={event.id}
-                      event={event}
-                      todayKey={todayKey}
-                      isNextOfficial={snapshot.nextOfficialAction?.id === event.id}
-                      onOpen={onOpen}
-                    />
-                  ))}
-                </div>
-              )}
-            </section>
-          );
-        })}
+    <section
+      ref={(node) => registerFocusNode(focusKey, node)}
+      data-focus-key={focusKey}
+      className="cronograma-empty-state cronograma-year-empty-state"
+      role="status"
+    >
+      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/[0.07] text-primary">
+        <SearchX className="h-5 w-5" aria-hidden="true" />
+      </span>
+      <div className="min-w-0 flex-1">
+        <h2 className="text-base font-black tracking-tight text-foreground">{title}</h2>
+        <p className="mt-1 max-w-2xl text-sm leading-5 text-muted-foreground">{description}</p>
       </div>
-
-      {undated.length > 0 && (
-        <section className="cronograma-undated-section" aria-labelledby="cronograma-undated-title">
-          <header className="flex flex-wrap items-start justify-between gap-3 border-b border-amber-900/10 px-4 py-3 sm:px-5">
-            <div>
-              <p className="text-[9px] font-bold uppercase tracking-[0.17em] text-amber-900/70">Backlog institucional</p>
-              <h3 id="cronograma-undated-title" className="mt-1 text-lg font-black tracking-tight text-foreground">Ações aguardando definição de data</h3>
-            </div>
-            <span className="rounded-full bg-amber-100 px-3 py-1 font-mono text-xs font-bold text-amber-950">{undated.length}</span>
-          </header>
-          <div className="divide-y divide-amber-900/10">
-            {undated.slice(0, 8).map((event) => (
-              <button key={event.id} type="button" onClick={() => onOpen(event)} className="cronograma-undated-action focus-ring">
-                <CalendarClock className="mt-0.5 h-4 w-4 shrink-0 text-amber-800" aria-hidden="true" />
-                <span className="min-w-0 flex-1 text-left">
-                  <span className="block text-sm font-bold text-foreground">{event.title}</span>
-                  <span className="mt-1 block truncate text-xs text-muted-foreground">{event.pendingReason || 'Aguardando agendamento institucional.'}</span>
-                </span>
-                <CronogramaPriorityIndicator priority={event.priority} compact />
-              </button>
-            ))}
-          </div>
-        </section>
-      )}
+      <div className="cronograma-year-empty-actions">
+        {summary.undatedFiltered > 0 && (
+          <Button type="button" variant="outline" size="sm" onClick={onOpenUndated} className="rounded-lg">
+            <CalendarClock className="h-4 w-4" />Ver sem data
+          </Button>
+        )}
+        <Button type="button" variant="outline" size="sm" onClick={onReturnToFullCycle} className="rounded-lg">
+          Ver todo o ciclo
+        </Button>
+        <Button type="button" variant="ghost" size="sm" onClick={onClearFilters} className="rounded-lg text-primary">
+          <CircleAlert className="h-4 w-4" />Limpar filtros
+        </Button>
+      </div>
     </section>
   );
 }
@@ -318,19 +452,6 @@ function TimelineEventRow({
         <CronogramaPriorityIndicator priority={event.priority} compact />
       </span>
     </button>
-  );
-}
-
-function TimelineEmptyState({ onClear }: { onClear: () => void }) {
-  return (
-    <section className="cronograma-empty-state" role="status">
-      <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/[0.07] text-primary"><SearchX className="h-6 w-6" /></span>
-      <div>
-        <h2 className="text-lg font-black tracking-tight text-foreground">Nenhum evento corresponde aos filtros</h2>
-        <p className="mt-1 max-w-xl text-sm leading-6 text-muted-foreground">A base continua disponível. Remova um ou mais filtros para voltar à sequência cronológica.</p>
-      </div>
-      <Button type="button" variant="outline" onClick={onClear} className="rounded-lg"><CircleAlert className="h-4 w-4" />Limpar filtros</Button>
-    </section>
   );
 }
 

@@ -17,7 +17,12 @@
   top: 14.75rem;
 }
 
-.cronograma-month-section {
+.cronograma-cycle-navigator {
+  top: 14.75rem;
+}
+
+.cronograma-month-section,
+.cronograma-year-empty-state {
   scroll-margin-top: 18.75rem;
 }
 
@@ -96,7 +101,8 @@ body[data-scroll-locked] .cronograma-drawer {
     top: 17.25rem;
   }
 
-  .cronograma-month-section {
+  .cronograma-month-section,
+  .cronograma-year-empty-state {
     scroll-margin-top: 21.5rem;
   }
 }
@@ -124,7 +130,8 @@ body[data-scroll-locked] .cronograma-drawer {
     top: 16.75rem;
   }
 
-  .cronograma-month-section {
+  .cronograma-month-section,
+  .cronograma-year-empty-state {
     scroll-margin-top: 20.75rem;
   }
 

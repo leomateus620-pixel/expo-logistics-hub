@@ -346,9 +346,204 @@ body[data-scroll-locked] {
   color: hsl(32 70% 22%);
 }
 
+.cronograma-timeline-shell,
 .cronograma-timeline-workspace {
   display: grid;
+  min-width: 0;
   gap: 0.75rem;
+}
+
+.cronograma-timeline-shell {
+  align-items: start;
+}
+
+.cronograma-cycle-navigator {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid hsl(var(--cronograma-line) / 0.88);
+  border-radius: 0.85rem;
+  background: rgb(255 255 255 / 0.82);
+  box-shadow: 0 16px 40px -36px rgb(10 54 28 / 0.5);
+  backdrop-filter: blur(14px) saturate(1.05);
+}
+
+.cronograma-cycle-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.72rem 0.8rem 0.35rem;
+}
+
+.cronograma-cycle-step {
+  display: inline-flex;
+  min-width: 2.1rem;
+  height: 1.45rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid hsl(var(--primary) / 0.14);
+  border-radius: 999px;
+  background: hsl(var(--primary) / 0.05);
+  color: hsl(var(--primary));
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.58rem;
+  font-weight: 800;
+}
+
+.cronograma-cycle-years {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(10rem, 1fr));
+  gap: 0.35rem;
+  overflow-x: auto;
+  padding: 0.35rem 0.65rem 0.72rem;
+  scroll-padding-inline: 0.65rem;
+  scrollbar-width: none;
+  overscroll-behavior-inline: contain;
+}
+
+.cronograma-cycle-years::-webkit-scrollbar {
+  display: none;
+}
+
+.cronograma-cycle-years::before,
+.cronograma-cycle-years::after {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  left: calc(16.666% + 0.65rem);
+  right: calc(16.666% + 0.65rem);
+  top: 1.28rem;
+  height: 1px;
+  background: hsl(var(--primary) / 0.16);
+  pointer-events: none;
+}
+
+.cronograma-cycle-years::after {
+  background: hsl(var(--primary) / 0.62);
+  transform: scaleX(var(--cycle-progress));
+  transform-origin: left center;
+  transition: transform 260ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.cronograma-cycle-year-item {
+  min-width: 0;
+  scroll-snap-align: center;
+}
+
+.cronograma-cycle-year {
+  position: relative;
+  display: grid;
+  width: 100%;
+  min-height: 4.8rem;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 0.55rem;
+  border: 1px solid transparent;
+  border-radius: 0.68rem;
+  padding: 1.65rem 0.62rem 0.58rem;
+  background: transparent;
+  color: hsl(var(--foreground) / 0.72);
+  text-align: left;
+  transition: color 170ms ease, background-color 170ms ease, border-color 170ms ease, transform 170ms ease;
+}
+
+.cronograma-cycle-year.is-selected {
+  border-color: hsl(var(--primary) / 0.16);
+  background: hsl(var(--primary) / 0.065);
+  color: hsl(var(--primary));
+}
+
+.cronograma-cycle-year[data-no-match='true']:not(.is-selected) {
+  color: hsl(var(--foreground) / 0.52);
+}
+
+.cronograma-cycle-year:disabled {
+  cursor: not-allowed;
+  color: hsl(var(--muted-foreground) / 0.62);
+}
+
+.cronograma-cycle-node {
+  position: absolute;
+  z-index: 2;
+  left: 50%;
+  top: 0.64rem;
+  display: flex;
+  width: 0.95rem;
+  height: 0.95rem;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid hsl(var(--primary) / 0.42);
+  border-radius: 999px;
+  background: white;
+  color: white;
+  box-shadow: 0 0 0 3px rgb(255 255 255 / 0.82);
+  transform: translateX(-50%);
+  transition: background-color 170ms ease, border-color 170ms ease, transform 200ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.cronograma-cycle-year.is-selected .cronograma-cycle-node {
+  border-color: hsl(var(--primary));
+  background: hsl(var(--primary));
+  transform: translateX(-50%) scale(1.08);
+}
+
+.cronograma-cycle-year[data-current='true'] .cronograma-cycle-node {
+  box-shadow: 0 0 0 3px hsl(var(--gold) / 0.16);
+}
+
+.cronograma-cycle-year-copy,
+.cronograma-cycle-count {
+  display: grid;
+  min-width: 0;
+}
+
+.cronograma-cycle-stage {
+  margin-top: 0.28rem;
+  overflow: hidden;
+  color: hsl(var(--muted-foreground));
+  font-size: 0.63rem;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cronograma-cycle-current-label {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.16rem 0.36rem;
+  background: hsl(var(--gold) / 0.16);
+  color: hsl(35 78% 25%);
+  font-size: 0.48rem;
+  font-weight: 850;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.cronograma-cycle-count {
+  justify-items: end;
+  color: hsl(var(--muted-foreground));
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.52rem;
+  line-height: 1.2;
+  text-align: right;
+}
+
+.cronograma-cycle-count strong {
+  color: currentColor;
+  font-size: 0.66rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.cronograma-cycle-support {
+  display: none;
+  border-top: 1px solid hsl(var(--border) / 0.42);
+  padding: 0.65rem 0.8rem 0.75rem;
+  color: hsl(var(--muted-foreground));
+  font-size: 0.64rem;
+  line-height: 1.05rem;
 }
 
 .cronograma-temporal-nav {
@@ -369,6 +564,12 @@ body[data-scroll-locked] {
 
 .cronograma-month-stream {
   display: grid;
+  gap: 0.75rem;
+}
+
+.cronograma-year-stream {
+  display: grid;
+  min-width: 0;
   gap: 0.55rem;
 }
 
@@ -544,6 +745,23 @@ body[data-scroll-locked] {
   padding: 2rem;
   background: rgb(255 255 255 / 0.66);
   text-align: left;
+}
+
+.cronograma-empty-state.cronograma-year-empty-state {
+  min-height: 9rem;
+  justify-content: flex-start;
+  scroll-margin-top: 17.25rem;
+  padding: 1rem;
+  animation: cronograma-list-in 170ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+.cronograma-year-empty-actions {
+  display: flex;
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.4rem;
 }
 
 .cronograma-drawer-overlay {
@@ -842,6 +1060,81 @@ body[data-scroll-locked] {
   }
 }
 
+@media (min-width: 1180px) {
+  .cronograma-timeline-shell {
+    grid-template-columns: clamp(11.5rem, 14vw, 13.25rem) minmax(0, 1fr);
+  }
+
+  .cronograma-cycle-navigator {
+    position: sticky;
+    z-index: 13;
+  }
+
+  .cronograma-cycle-heading {
+    padding: 0.8rem 0.78rem 0.45rem;
+  }
+
+  .cronograma-cycle-years {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.18rem;
+    overflow: visible;
+    padding: 0.35rem 0.55rem 0.65rem;
+  }
+
+  .cronograma-cycle-years::before,
+  .cronograma-cycle-years::after {
+    left: 1.25rem;
+    right: auto;
+    top: 1.2rem;
+    bottom: 1.2rem;
+    width: 1px;
+    height: auto;
+  }
+
+  .cronograma-cycle-years::after {
+    transform: scaleY(var(--cycle-progress));
+    transform-origin: center top;
+  }
+
+  .cronograma-cycle-year {
+    min-height: 3.95rem;
+    grid-template-columns: 1.05rem minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.48rem;
+    padding: 0.55rem 0.48rem;
+  }
+
+  .cronograma-cycle-node {
+    position: relative;
+    left: auto;
+    top: auto;
+    width: 0.72rem;
+    height: 0.72rem;
+    box-shadow: 0 0 0 3px rgb(255 255 255 / 0.82);
+    transform: none;
+  }
+
+  .cronograma-cycle-year.is-selected .cronograma-cycle-node {
+    transform: scale(1.12);
+  }
+
+  .cronograma-cycle-current-label {
+    padding-inline: 0.28rem;
+    font-size: 0.44rem;
+  }
+
+  .cronograma-cycle-support {
+    display: block;
+  }
+}
+
+@media (min-width: 1536px) {
+  .cronograma-timeline-shell {
+    grid-template-columns: 13.5rem minmax(0, 1fr);
+    gap: 0.9rem;
+  }
+}
+
 @media (hover: hover) and (pointer: fine) {
   .cronograma-operational-event:hover {
     z-index: 1;
@@ -857,6 +1150,13 @@ body[data-scroll-locked] {
 
   .cronograma-undated-action:hover {
     background: hsl(42 76% 90% / 0.52);
+  }
+
+  .cronograma-cycle-year:not(:disabled):not(.is-selected):hover {
+    border-color: hsl(var(--primary) / 0.10);
+    background: hsl(var(--primary) / 0.035);
+    color: hsl(var(--primary));
+    transform: translateY(-1px);
   }
 }
 
@@ -940,6 +1240,15 @@ body[data-scroll-locked] {
     align-items: flex-start;
   }
 
+  .cronograma-cycle-heading {
+    padding-inline: max(0.7rem, env(safe-area-inset-left)) max(0.7rem, env(safe-area-inset-right));
+  }
+
+  .cronograma-cycle-years {
+    grid-template-columns: repeat(3, minmax(9.6rem, 1fr));
+    padding-inline: max(0.55rem, env(safe-area-inset-left)) max(0.55rem, env(safe-area-inset-right));
+  }
+
   .cronograma-temporal-nav {
     top: 14.4rem;
     min-height: 3.4rem;
@@ -1003,6 +1312,16 @@ body[data-scroll-locked] {
     padding: 1.25rem;
   }
 
+  .cronograma-empty-state.cronograma-year-empty-state {
+    min-height: 10rem;
+    padding: 0.9rem;
+  }
+
+  .cronograma-year-empty-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
   .cronograma-sync-alert {
     align-items: flex-start;
     flex-wrap: wrap;
@@ -1053,6 +1372,10 @@ body[data-scroll-locked] {
 @media (prefers-reduced-motion: reduce) {
   .cronograma-drawer,
   .cronograma-drawer-overlay,
+  .cronograma-cycle-years::after,
+  .cronograma-cycle-year,
+  .cronograma-cycle-node,
+  .cronograma-year-empty-state,
   .cronograma-month-events,
   .cronograma-operational-event,
   .cronograma-progress-track > span,
@@ -1067,6 +1390,7 @@ body[data-scroll-locked] {
 @media (prefers-contrast: more) {
   .cronograma-month-section,
   .cronograma-temporal-nav,
+  .cronograma-cycle-navigator,
   .cronograma-filter-surface,
   .cronograma-view-nav,
   .cronograma-form-section,

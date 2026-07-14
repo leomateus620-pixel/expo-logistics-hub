@@ -4,8 +4,9 @@ import type {
   CronogramaPriority,
   CronogramaStatus,
 } from './types';
+import { CRONOGRAMA_CYCLE_YEARS } from '@/lib/cronograma-cycle';
 
-export const CRONOGRAMA_YEARS = [2026, 2027, 2028] as const;
+export const CRONOGRAMA_YEARS = CRONOGRAMA_CYCLE_YEARS;
 
 export const categoryLabels: Record<CronogramaCategory, string> = {
   governanca: 'Governança',

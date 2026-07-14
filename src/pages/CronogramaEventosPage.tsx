@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AlertTriangle, CalendarDays, Loader2, RefreshCw } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { CalendarMonthView } from '@/components/cronograma-eventos/CalendarMonthView';
@@ -28,6 +28,11 @@ import type { CronogramaEvent, CronogramaFilters, CronogramaView } from '@/compo
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useCronogramaEventHistory, useCronogramaEventos } from '@/hooks/useCronogramaEventos';
+import {
+  isCycleMonthKey,
+  isCronogramaCycleYear,
+  type CronogramaCycleYear,
+} from '@/lib/cronograma-cycle';
 import type { CronogramaEvent as SourceCronogramaEvent } from '@/lib/cronograma-eventos';
 import { filterTimelineEvents } from '@/lib/cronograma-timeline';
 
@@ -63,9 +68,16 @@ export default function CronogramaEventosPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const drawerReturnFocusRef = useRef<HTMLElement>(null);
   const timelinePositionRef = useRef({ x: 0, y: 0 });
+  const selectedPresenceRef = useRef({ id: '', seenInData: false });
   const activeView = isCronogramaView(searchParams.get('view'))
     ? searchParams.get('view') as CronogramaView
     : 'timeline';
+  const requestedTimelineYear = isCronogramaCycleYear(searchParams.get('timelineYear'))
+    ? Number(searchParams.get('timelineYear')) as CronogramaCycleYear
+    : null;
+  const requestedTimelineMonth = isCycleMonthKey(searchParams.get('timelineMonth'))
+    ? searchParams.get('timelineMonth')
+    : null;
 
   const setActiveView = (view: CronogramaView) => {
     setSearchParams((current) => {
@@ -94,15 +106,70 @@ export default function CronogramaEventosPage() {
   const eventHistory = useCronogramaEventHistory(selectedSourceId);
 
   useEffect(() => {
-    if (!selectedEvent) return;
+    if (!selectedEvent) {
+      selectedPresenceRef.current = { id: '', seenInData: false };
+      return;
+    }
+    if (selectedPresenceRef.current.id !== selectedEvent.id) {
+      selectedPresenceRef.current = { id: selectedEvent.id, seenInData: false };
+    }
     const freshEvent = events.find((event) => event.id === selectedEvent.id || event.sourceKey === selectedEvent.sourceKey);
-    if (freshEvent && freshEvent !== selectedEvent) setSelectedEvent(freshEvent);
-  }, [events, selectedEvent]);
+    if (freshEvent) {
+      selectedPresenceRef.current.seenInData = true;
+      if (freshEvent !== selectedEvent) setSelectedEvent(freshEvent);
+      return;
+    }
+    if (cronograma.isLoading || !selectedPresenceRef.current.seenInData) return;
+    setDrawerOpen(false);
+    setDrawerStartsEditing(false);
+    setSelectedEvent(null);
+  }, [cronograma.isLoading, events, selectedEvent]);
 
   const filteredEvents = useMemo(
     () => filterTimelineEvents(events, filters).sort(compareEventDates),
     [events, filters],
   );
+  const temporalFocusKey = useMemo(() => [
+    filters.year,
+    filters.month,
+    filters.period,
+    filters.fromDate,
+    filters.toDate,
+  ].join('|'), [filters.fromDate, filters.month, filters.period, filters.toDate, filters.year]);
+  const preferredTemporalYear = isCronogramaCycleYear(filters.year) ? filters.year : null;
+
+  const clearFilters = useCallback(() => setFilters(emptyFilters), []);
+  const returnToFullCycle = useCallback(() => {
+    setFilters((current) => ({
+      ...current,
+      year: 'all',
+      month: 'all',
+      period: 'all',
+      fromDate: '',
+      toDate: '',
+    }));
+  }, []);
+  const handleTimelinePositionChange = useCallback(({
+    year,
+    month,
+    replace,
+  }: {
+    year: CronogramaCycleYear;
+    month: string | null;
+    replace: boolean;
+  }) => {
+    setSearchParams((current) => {
+      const currentYear = current.get('timelineYear');
+      const currentMonth = current.get('timelineMonth');
+      if (currentYear === String(year) && currentMonth === month) return current;
+
+      const next = new URLSearchParams(current);
+      next.set('timelineYear', String(year));
+      if (month) next.set('timelineMonth', month);
+      else next.delete('timelineMonth');
+      return next;
+    }, { replace });
+  }, [setSearchParams]);
 
   const openEvent = (event: CronogramaEvent, edit = false) => {
     timelinePositionRef.current = { x: window.scrollX, y: window.scrollY };
@@ -174,7 +241,7 @@ export default function CronogramaEventosPage() {
             filters={filters}
             events={events}
             onChange={setFilters}
-            onClear={() => setFilters(emptyFilters)}
+            onClear={clearFilters}
             resultCount={filteredEvents.length}
             totalCount={events.length}
             syncing={cronograma.isRefreshing}
@@ -224,8 +291,16 @@ export default function CronogramaEventosPage() {
             {activeView === 'timeline' && (
               <CronogramaTimelineBoard
                 events={filteredEvents}
+                allEvents={events}
                 onOpen={(event) => openEvent(event)}
-                onClearFilters={() => setFilters(emptyFilters)}
+                onClearFilters={clearFilters}
+                onReturnToFullCycle={returnToFullCycle}
+                onOpenUndated={() => setActiveView('undated')}
+                requestedYear={requestedTimelineYear}
+                requestedMonth={requestedTimelineMonth}
+                temporalFocusKey={temporalFocusKey}
+                preferredTemporalYear={preferredTemporalYear}
+                onPositionChange={handleTimelinePositionChange}
               />
             )}
 
