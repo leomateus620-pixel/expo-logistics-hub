@@ -4,6 +4,7 @@ import {
   isMainFenasojaEvent,
   type CronogramaEvent as SourceCronogramaEvent,
 } from '@/lib/cronograma-eventos';
+import { deriveOperationalStatus } from '@/lib/cronograma-timeline';
 import { categoryLabels } from './cronogramaData';
 import type {
   CronogramaCategory,
@@ -25,18 +26,24 @@ const categoryKeywords: Array<[CronogramaCategory, RegExp]> = [
 
 const sourceToVisualStatus: Record<SourceCronogramaEvent['status'], CronogramaStatus> = {
   planejado: 'planned',
-  em_andamento: 'confirmed',
+  em_andamento: 'in_progress',
   aguardando_definicao: 'in_definition',
-  aguardando_responsavel: 'in_definition',
-  concluido: 'confirmed',
-  cancelado: 'blocked',
+  aguardando_responsavel: 'blocked',
+  concluido: 'completed',
+  cancelado: 'cancelled',
 };
 
 const visualToSourceStatus: Record<CronogramaStatus, SourceCronogramaEvent['status']> = {
-  confirmed: 'concluido',
+  confirmed: 'planejado',
   planned: 'planejado',
+  in_progress: 'em_andamento',
+  completed: 'concluido',
+  overdue: 'planejado',
+  rescheduled: 'planejado',
+  cancelled: 'cancelado',
+  undated: 'aguardando_definicao',
   in_definition: 'aguardando_definicao',
-  blocked: 'cancelado',
+  blocked: 'aguardando_responsavel',
 };
 
 const sourceToVisualPriority: Record<SourceCronogramaEvent['priority'], CronogramaPriority> = {
@@ -106,11 +113,13 @@ function fallbackSummary(event: SourceCronogramaEvent): string {
 export function adaptCronogramaEvent(event: SourceCronogramaEvent): CronogramaEvent {
   const category = getVisualCategory(event);
   const centralMeeting = isCentralMeeting(event);
+  const sourceStatus = sourceToVisualStatus[event.status] ?? 'planned';
 
-  return {
+  const adapted: CronogramaEvent = {
     id: event.id,
     sourceKey: event.sourceKey,
     sourceCategory: event.category,
+    sourceSheet: event.sourceSheet,
     title: event.title,
     summary: fallbackSummary(event),
     date: event.hasExactDate ? event.startDate : null,
@@ -118,7 +127,7 @@ export function adaptCronogramaEvent(event: SourceCronogramaEvent): CronogramaEv
     startTime: event.time ?? undefined,
     year: event.sourceYear,
     category,
-    status: sourceToVisualStatus[event.status] ?? 'planned',
+    status: sourceStatus,
     priority: sourceToVisualPriority[event.priority] ?? 'medium',
     kind: centralMeeting ? 'meeting' : sourceToVisualKind[event.eventType] ?? 'event',
     location: event.location ?? undefined,
@@ -133,6 +142,8 @@ export function adaptCronogramaEvent(event: SourceCronogramaEvent): CronogramaEv
     isCentralMeeting: centralMeeting,
     pendingReason: event.hasExactDate ? undefined : event.sourceNote ?? 'Aguardando definição de data oficial.',
     decisionNeeded: event.hasExactDate ? undefined : 'Definir data oficial e confirmar responsáveis vinculados.',
+    createdAt: event.createdAt,
+    updatedAt: event.updatedAt,
     subevents: event.subevents?.map((subevent) => ({
       title: subevent.title,
       date: subevent.startDate ?? null,
@@ -140,6 +151,15 @@ export function adaptCronogramaEvent(event: SourceCronogramaEvent): CronogramaEv
       status: subevent.status ? sourceToVisualStatus[subevent.status] : 'planned',
     })),
   };
+  adapted.status = deriveOperationalStatus(adapted);
+  adapted.subevents = adapted.subevents?.map((subevent) => ({
+    ...subevent,
+    status: deriveOperationalStatus({
+      date: subevent.date ?? null,
+      status: subevent.status ?? 'planned',
+    }),
+  }));
+  return adapted;
 }
 
 export function visualEventToSourceUpdates(

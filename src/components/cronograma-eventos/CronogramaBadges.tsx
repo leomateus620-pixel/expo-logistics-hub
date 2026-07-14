@@ -1,10 +1,14 @@
 import {
   AlertTriangle,
+  Ban,
+  CalendarOff,
   CheckCircle2,
   CircleDashed,
   Clock3,
   Flag,
   Layers3,
+  PlayCircle,
+  RefreshCw,
   ShieldAlert,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
@@ -34,6 +38,36 @@ const statusMeta: Record<CronogramaStatus, { icon: LucideIcon; className: string
     icon: Clock3,
     className: 'text-primary',
     dot: 'bg-primary',
+  },
+  in_progress: {
+    icon: PlayCircle,
+    className: 'text-sky-900',
+    dot: 'bg-sky-700',
+  },
+  completed: {
+    icon: CheckCircle2,
+    className: 'text-emerald-900',
+    dot: 'bg-emerald-700',
+  },
+  overdue: {
+    icon: AlertTriangle,
+    className: 'text-red-900',
+    dot: 'bg-red-700',
+  },
+  rescheduled: {
+    icon: RefreshCw,
+    className: 'text-violet-900',
+    dot: 'bg-violet-700',
+  },
+  cancelled: {
+    icon: Ban,
+    className: 'text-slate-700',
+    dot: 'bg-slate-600',
+  },
+  undated: {
+    icon: CalendarOff,
+    className: 'text-amber-950',
+    dot: 'bg-amber-700',
   },
   in_definition: {
     icon: CircleDashed,
@@ -106,6 +140,7 @@ export function CronogramaStatusIndicator({
   compact?: boolean;
 }) {
   const meta = statusMeta[status];
+  const Icon = meta.icon;
   return (
     <span
       className={cn(
@@ -114,7 +149,8 @@ export function CronogramaStatusIndicator({
         meta.className,
       )}
     >
-      <span className={cn('h-1.5 w-1.5 rounded-full shadow-[0_0_0_3px_rgb(255_255_255/0.72)]', meta.dot)} />
+      <Icon className="h-3.5 w-3.5" aria-hidden="true" />
+      <span className={cn('h-1.5 w-1.5 rounded-full shadow-[0_0_0_3px_rgb(255_255_255/0.72)]', meta.dot)} aria-hidden="true" />
       {statusLabels[status]}
     </span>
   );
