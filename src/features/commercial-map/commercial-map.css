@@ -90,6 +90,33 @@
 .commercial-map-canvas { display: block; width: 100%; height: 100%; outline: none; cursor: grab; touch-action: none; }
 .commercial-map-canvas > canvas { cursor: grab; }
 
+.commercial-map-interior-navigation {
+  position: absolute;
+  z-index: 16;
+  top: 14px;
+  left: 50%;
+  display: grid;
+  width: min(660px, calc(100% - 32px));
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 13px;
+  padding: 8px;
+  transform: translateX(-50%);
+  border: 1px solid rgba(70, 55, 36, .18);
+  border-radius: 15px;
+  background: rgba(250, 247, 239, .93);
+  box-shadow: 0 16px 42px rgba(47, 35, 22, .18), inset 0 1px rgba(255, 255, 255, .72);
+  backdrop-filter: blur(18px) saturate(1.15);
+}
+.commercial-map-interior-navigation button { height: 38px; border-color: rgba(28, 74, 43, .18); background: rgba(255,255,255,.72); color: var(--map-forest-dark); font-size: 10px; font-weight: 800; }
+.commercial-map-interior-navigation button svg { width: 15px; height: 15px; }
+.commercial-map-interior-navigation > div { display: flex; min-width: 0; flex-direction: column; gap: 1px; }
+.commercial-map-interior-navigation span { color: #8c6d36; font-size: 7px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+.commercial-map-interior-navigation strong { overflow: hidden; color: #263a2d; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
+.commercial-map-interior-navigation small { color: #756f64; font-size: 8px; }
+.commercial-map-interior-navigation kbd { border: 1px solid rgba(57, 48, 36, .13); border-radius: 7px; background: #eee8dc; padding: 4px 7px; color: #746b5f; font-size: 8px; box-shadow: inset 0 -1px rgba(62, 48, 34, .08); }
+.commercial-map-shell.is-interior .commercial-map-viewport { background: #ddd8ca; }
+
 .commercial-map-structure-preview { display: flex; min-height: 330px; flex-direction: column; overflow: hidden; border: 1px solid rgba(25,61,36,.12); border-radius: 16px; background: #edf2eb; }
 .commercial-map-structure-preview svg { width: 100%; min-height: 0; flex: 1; background: radial-gradient(circle at 50% 50%, #f7faf5, #e6ece3); }
 .commercial-map-structure-preview .source-polygon { fill: rgba(25,61,36,.08); stroke: #486653; stroke-width: .22; stroke-dasharray: .5 .35; }
@@ -620,6 +647,9 @@
   .commercial-map-header-actions button svg { width: 15px; height: 15px; }
   .commercial-map-search { top: 10px; left: 10px; width: calc(100% - 20px); height: 40px; }
   .commercial-map-search kbd { display: none; }
+  .commercial-map-interior-navigation { top: 9px; width: calc(100% - 18px); grid-template-columns: auto minmax(0, 1fr); gap: 8px; padding: 6px; }
+  .commercial-map-interior-navigation button { width: 38px; padding: 0; font-size: 0; }
+  .commercial-map-interior-navigation small, .commercial-map-interior-navigation kbd { display: none; }
   .commercial-map-toolbar { top: 58px; left: 10px; height: 39px; }
   .commercial-map-toolbar button { width: 29px; height: 29px; }
   .commercial-map-actions { top: 58px; right: 10px; }
@@ -684,6 +714,9 @@
   .commercial-map-header-actions button svg { width: 15px; height: 15px; }
   .commercial-map-search { top: 10px; left: 10px; width: calc(100% - 20px); height: 40px; }
   .commercial-map-search kbd { display: none; }
+  .commercial-map-interior-navigation { top: 9px; width: calc(100% - 18px); grid-template-columns: auto minmax(0, 1fr); gap: 8px; padding: 6px; }
+  .commercial-map-interior-navigation button { width: 38px; padding: 0; font-size: 0; }
+  .commercial-map-interior-navigation small, .commercial-map-interior-navigation kbd { display: none; }
   .commercial-map-toolbar { top: 58px; left: 10px; height: 39px; transform: none; }
   .commercial-map-toolbar button { width: 29px; height: 29px; }
   .commercial-map-actions { top: 58px; right: 10px; }
@@ -712,5 +745,5 @@
 }
 
 @media (prefers-contrast: high) {
-  .commercial-map-search, .commercial-map-toolbar, .commercial-map-summary, .commercial-map-panel { border-width: 2px; border-color: #173322; }
+  .commercial-map-search, .commercial-map-toolbar, .commercial-map-summary, .commercial-map-panel, .commercial-map-interior-navigation { border-width: 2px; border-color: #173322; }
 }

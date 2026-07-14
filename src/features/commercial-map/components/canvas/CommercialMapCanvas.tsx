@@ -34,6 +34,7 @@ import {
 } from '../../utils/mapPresentation';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import type { CameraPreset, CommercialLot, MapCalibration, MapEntity } from '../../types';
+import { HeadquartersInteriorScene } from './HeadquartersInteriorScene';
 import { StrategicLandmarkMesh } from './StrategicLandmarks';
 
 interface CommercialMapCanvasProps {
@@ -202,7 +203,7 @@ function focusProfileForEntity(entity: MapEntity) {
   const profile = selectionFocusProfile(entity.classification);
   const landmark = resolveStrategicLandmarkKind(entity);
   if (landmark === 'administrative-center') {
-    return { ...profile, contextRatio: 0.085, fitPadding: 1.2, minDistanceRatio: 0.065, maxDistanceRatio: 0.4, minimumDirectionY: 0.36 };
+    return { ...profile, contextRatio: 0.055, fitPadding: 1.08, minDistanceRatio: 0.052, maxDistanceRatio: 0.32, minimumDirectionY: 0.32 };
   }
   if (landmark === 'fenasoja-headquarters') {
     return { ...profile, contextRatio: 0.055, fitPadding: 1.16, minDistanceRatio: 0.05, maxDistanceRatio: 0.3, minimumDirectionY: 0.32 };
@@ -379,6 +380,7 @@ interface EntityMeshProps {
   onSelect: (id: string) => void;
   onHover: (id: string | null) => void;
   onFocus: () => void;
+  onEnterInterior: (id: string) => void;
   onCursor: (cursor: 'grab' | 'grabbing' | 'pointer') => void;
 }
 
@@ -625,6 +627,7 @@ const EntityMesh = memo(function EntityMesh(props: EntityMeshProps) {
         onSelect={props.onSelect}
         onHover={props.onHover}
         onFocus={props.onFocus}
+        onEnterInterior={props.onEnterInterior}
         onCursor={props.onCursor}
       />
     );
@@ -1277,10 +1280,12 @@ function CameraRig({ selectedEntity, extent }: { selectedEntity: MapEntity | nul
 
 function Scene({ entities, lots, calibration, matchingEntityIds, filtersActive }: CommercialMapCanvasProps) {
   const selectedEntityId = useCommercialMapStore((state) => state.selectedEntityId);
+  const interiorEntityId = useCommercialMapStore((state) => state.interiorEntityId);
   const hoveredEntityId = useCommercialMapStore((state) => state.hoveredEntityId);
   const setSelectedEntityId = useCommercialMapStore((state) => state.setSelectedEntityId);
   const setHoveredEntityId = useCommercialMapStore((state) => state.setHoveredEntityId);
   const focusSelection = useCommercialMapStore((state) => state.focusSelection);
+  const enterInterior = useCommercialMapStore((state) => state.enterInterior);
   const labelsVisible = useCommercialMapStore((state) => state.labelsVisible);
   const layerVisibility = useCommercialMapStore((state) => state.layerVisibility);
   const layerOpacity = useCommercialMapStore((state) => state.layerOpacity);
@@ -1294,6 +1299,9 @@ function Scene({ entities, lots, calibration, matchingEntityIds, filtersActive }
   const sceneCenter = useMemo(() => [extent.centerX, extent.centerZ] as const, [extent.centerX, extent.centerZ]);
   const lotByEntity = useMemo(() => new Map(lots.map((lot) => [lot.entityId, lot])), [lots]);
   const selectedEntity = entities.find((entity) => entity.id === selectedEntityId) ?? null;
+  const interiorEntity = entities.find((entity) => (
+    entity.id === interiorEntityId && resolveStrategicLandmarkKind(entity) === 'fenasoja-headquarters'
+  )) ?? null;
   const visibleLayerEntities = useMemo(() => entities.filter((entity) => (
     layerVisibility[entity.layerId] !== false
   )), [entities, layerVisibility]);
@@ -1324,12 +1332,16 @@ function Scene({ entities, lots, calibration, matchingEntityIds, filtersActive }
     gl.shadowMap.needsUpdate = true;
     invalidate();
     return () => { gl.shadowMap.autoUpdate = true; };
-  }, [entities, gl, invalidate, reducedGraphics]);
+  }, [entities, gl, interiorEntityId, invalidate, reducedGraphics]);
 
   useEffect(() => {
     if (!cameraNavigating) return;
     setHoveredEntityId(null);
   }, [cameraNavigating, setHoveredEntityId]);
+
+  if (interiorEntity) {
+    return <HeadquartersInteriorScene entity={interiorEntity} reducedGraphics={reducedGraphics} />;
+  }
 
   return (
     <>
@@ -1395,6 +1407,7 @@ function Scene({ entities, lots, calibration, matchingEntityIds, filtersActive }
           onSelect={setSelectedEntityId}
           onHover={setHoveredEntityId}
           onFocus={focusSelection}
+          onEnterInterior={enterInterior}
           onCursor={setCanvasCursor}
         />
       ))}
@@ -1432,6 +1445,7 @@ function CanvasLoader() {
 export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: CommercialMapCanvasProps) {
   const { entities, lots, calibration, matchingEntityIds, filtersActive } = props;
   const setSelectedEntityId = useCommercialMapStore((state) => state.setSelectedEntityId);
+  const interiorEntityId = useCommercialMapStore((state) => state.interiorEntityId);
   const reducedGraphics = useCommercialMapStore((state) => state.reducedGraphics);
   const extent = useMemo(() => getSceneExtent(entities), [entities]);
   const viewportWidth = typeof window === 'undefined' ? 1366 : window.innerWidth;
@@ -1467,7 +1481,9 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
           gl.shadowMap.type = THREE.PCFSoftShadowMap;
           gl.domElement.style.cursor = 'grab';
         }}
-      onPointerMissed={() => setSelectedEntityId(null)}
+      onPointerMissed={() => {
+        if (!interiorEntityId) setSelectedEntityId(null);
+      }}
     >
       <Suspense fallback={<CanvasLoader />}>
         <Scene

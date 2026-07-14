@@ -56,7 +56,7 @@ describe('marcos arquitetônicos estratégicos', () => {
     expect(resolveStrategicLandmarkKind({ publicIdentifier: 'B1' })).toBeNull();
 
     expect(strategicLandmarkFacingRadians(persistedAdministrativeCenter)).toBeCloseTo(Math.PI / 2);
-    expect(strategicLandmarkFacingRadians(persistedHeadquarters)).toBeCloseTo(-Math.PI / 9);
+    expect(strategicLandmarkFacingRadians(persistedHeadquarters)).toBeCloseTo(-Math.PI / 18);
     expect(strategicLandmarkFacingRadians(persistedPolish)).toBeCloseTo(Math.PI / 2);
     expect(strategicLandmarkFacingRadians(persistedItalian)).toBeCloseTo(-Math.PI / 2);
     expect(strategicLandmarkFacingRadians(persistedPortico)).toBe(0);

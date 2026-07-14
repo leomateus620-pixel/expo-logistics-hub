@@ -678,7 +678,12 @@ function SignagePanel({
         context.fillStyle = foreground;
         context.textAlign = 'center';
         context.textBaseline = 'middle';
-        context.font = '700 58px Arial, sans-serif';
+        let titleSize = 58;
+        context.font = `700 ${titleSize}px Arial, sans-serif`;
+        while (titleSize > 28 && context.measureText(title).width > canvas.width - 56) {
+          titleSize -= 2;
+          context.font = `700 ${titleSize}px Arial, sans-serif`;
+        }
         context.fillText(title, canvas.width / 2, subtitle ? 68 : 82);
         if (subtitle) {
           context.globalAlpha = 0.86;
@@ -730,7 +735,7 @@ function ReferenceMuralPanel({
 }) {
   const { texture, muralMaterial } = useMemo(() => {
     let canvasTexture: THREE.CanvasTexture | null = null;
-    const fallback = variant === 'administrative' ? '#b7b5a9' : '#d68b2f';
+    const fallback = variant === 'administrative' ? '#b7b5a9' : '#294a43';
     if (typeof document !== 'undefined') {
       const canvas = document.createElement('canvas');
       canvas.width = variant === 'administrative' ? 512 : 768;
@@ -793,48 +798,37 @@ function ReferenceMuralPanel({
           }
         } else {
           const background = context.createLinearGradient(0, 0, canvas.width, 0);
-          background.addColorStop(0, '#d99825');
-          background.addColorStop(0.58, '#d78122');
-          background.addColorStop(1, '#c85e32');
+          background.addColorStop(0, '#263f3e');
+          background.addColorStop(0.58, '#355a50');
+          background.addColorStop(1, '#203937');
           context.fillStyle = background;
           context.fillRect(0, 0, canvas.width, canvas.height);
-          context.fillStyle = '#b84132';
-          context.beginPath();
-          context.moveTo(0, 300);
-          context.lineTo(306, 186);
-          context.lineTo(768, 242);
-          context.lineTo(768, 384);
-          context.lineTo(0, 384);
-          context.closePath();
-          context.fill();
-          context.fillStyle = '#e2b03b';
-          context.beginPath();
-          context.arc(116, 102, 72, 0, Math.PI * 2);
-          context.fill();
-          context.fillStyle = '#793c31';
-          [68, 104, 143, 182].forEach((x, index) => {
-            context.fillRect(x, 224 - index * 11, 18, 88 + index * 10);
+          context.strokeStyle = 'rgba(240, 243, 232, .7)';
+          context.lineWidth = 5;
+          [192, 384, 576].forEach((x) => {
             context.beginPath();
-            context.arc(x + 9, 207 - index * 11, 13, 0, Math.PI * 2);
+            context.moveTo(x, 0);
+            context.lineTo(x, 384);
+            context.stroke();
+          });
+          const soybeans = [
+            [95, 92, 62, '#a8b865'], [270, 266, 78, '#d0bd62'],
+            [485, 102, 70, '#91aa62'], [666, 270, 88, '#c6b45f'],
+          ] as const;
+          soybeans.forEach(([x, y, radius, color], index) => {
+            context.fillStyle = color;
+            context.beginPath();
+            context.ellipse(x, y, radius * 1.28, radius * 0.72, index % 2 ? -0.48 : 0.42, 0, Math.PI * 2);
             context.fill();
           });
-          const people = [358, 405, 452, 502, 555, 611];
-          people.forEach((x, index) => {
-            const personY = 184 - (index % 3) * 10;
-            context.fillStyle = index % 2 === 0 ? '#3d4a49' : '#f0dfc4';
-            context.beginPath();
-            context.arc(x, personY, 12, 0, Math.PI * 2);
-            context.fill();
-            context.fillRect(x - 10, personY + 14, 20, 76 + (index % 2) * 9);
-          });
-          context.fillStyle = '#f4e7ce';
-          context.font = '700 22px Arial, sans-serif';
+          context.fillStyle = '#f5f1df';
+          context.font = '800 26px Arial, sans-serif';
           context.textAlign = 'left';
-          context.fillText('NOSSO OURO', 46, 73);
-          context.fillText('VEM DO CAMPO', 46, 101);
+          context.fillText('NOSSO OURO', 30, 320);
+          context.fillText('VEM DO CAMPO', 30, 352);
           context.textAlign = 'right';
-          context.font = '800 25px Arial, sans-serif';
-          context.fillText('FENASOJA', 730, 340);
+          context.font = '900 35px Arial, sans-serif';
+          context.fillText('FENASOJA', 738, 64);
         }
         canvasTexture = new THREE.CanvasTexture(canvas);
         canvasTexture.colorSpace = THREE.SRGBColorSpace;
@@ -1184,6 +1178,11 @@ function AdministrativeCenter({
     position: [unit.position[0], unit.position[1], unit.position[2] + depth * 0.039] as Vector3Tuple,
     scale: [unit.scale[0] * 0.72, unit.scale[1] * 0.08, 0.01] as Vector3Tuple,
   })), [airConditioners, depth]);
+  const acFans = useMemo<InstanceTransform[]>(() => airConditioners.map((unit) => ({
+    position: [unit.position[0], unit.position[1], unit.position[2] + depth * 0.041] as Vector3Tuple,
+    scale: [unit.scale[1] * 0.29, 0.012, unit.scale[1] * 0.29] as Vector3Tuple,
+    rotation: [Math.PI / 2, 0, 0] as Vector3Tuple,
+  })), [airConditioners, depth]);
   const accessSteps = useMemo<InstanceTransform[]>(() => [0, 1, 2].map((index) => ({
     position: [entranceX, 0.035 + index * 0.035, frontZ + depth * (0.165 - index * 0.03)] as Vector3Tuple,
     scale: [bodyWidth * (0.13 + index * 0.012), 0.04, depth * 0.09] as Vector3Tuple,
@@ -1202,8 +1201,8 @@ function AdministrativeCenter({
       <mesh geometry={UNIT_BOX} material={materials.accent} position={[0, baseY + wallHeight * 0.055, bodyZ]} scale={[bodyWidth, wallHeight * 0.11, bodyDepth]} castShadow receiveShadow raycast={NO_RAYCAST} dispose={null} />
       <mesh geometry={UNIT_BOX} material={materials.wall} position={[0, baseY + wallHeight / 2, bodyZ]} scale={[bodyWidth, wallHeight, bodyDepth]} castShadow receiveShadow raycast={NO_RAYCAST} dispose={null} />
       <ScaledInstances material={materials.roof} castShadow receiveShadow items={[
-        { position: [0, baseY + wallHeight + roofRise * 0.5, bodyZ + bodyDepth * 0.25], scale: [bodyWidth + width * 0.04, 0.085, roofHalfDepth], rotation: [roofPitch, 0, 0] },
-        { position: [0, baseY + wallHeight + roofRise * 0.5, bodyZ - bodyDepth * 0.25], scale: [bodyWidth + width * 0.04, 0.085, roofHalfDepth], rotation: [-roofPitch, 0, 0] },
+        { position: [0, baseY + wallHeight + roofRise * 0.5, bodyZ + bodyDepth * 0.25], scale: [bodyWidth + width * 0.04, 0.065, roofHalfDepth], rotation: [roofPitch, 0, 0] },
+        { position: [0, baseY + wallHeight + roofRise * 0.5, bodyZ - bodyDepth * 0.25], scale: [bodyWidth + width * 0.04, 0.065, roofHalfDepth], rotation: [-roofPitch, 0, 0] },
       ]} />
       <ScaledInstances geometry={endGableGeometry} material={materials.wall} items={[
         { position: [-bodyWidth / 2 - 0.002, baseY + wallHeight, bodyZ], scale: [1, 1, 1], rotation: [0, -Math.PI / 2, 0] },
@@ -1225,12 +1224,34 @@ function AdministrativeCenter({
         <>
           <ScaledInstances material={materials.metal} items={airConditioners} />
           <ScaledInstances material={materials.dark} items={acVents} />
+          <ScaledInstances geometry={UNIT_CYLINDER} material={materials.dark} items={acFans} />
           <ReferenceMuralPanel
             variant="administrative"
-            position={[-bodyWidth / 2 - 0.026, baseY + wallHeight * 0.52, bodyZ]}
+            position={[-bodyWidth / 2 - 0.027, baseY + wallHeight * 0.64, bodyZ - bodyDepth * 0.03]}
             rotation={[0, -Math.PI / 2, 0]}
-            size={[bodyDepth * 0.86, wallHeight * 0.82]}
+            size={[bodyDepth * 0.86, wallHeight * 0.62]}
           />
+          <mesh
+            geometry={UNIT_BOX}
+            material={materials.glass}
+            position={[-bodyWidth / 2 - 0.028, baseY + wallHeight * 0.22, bodyZ + bodyDepth * 0.29]}
+            scale={[0.028, wallHeight * 0.36, bodyDepth * 0.2]}
+            raycast={NO_RAYCAST}
+            dispose={null}
+          />
+          <mesh
+            geometry={UNIT_BOX}
+            material={materials.trim}
+            position={[-bodyWidth / 2 - width * 0.055, baseY + wallHeight * 0.45, bodyZ + bodyDepth * 0.29]}
+            scale={[width * 0.11, 0.05, bodyDepth * 0.3]}
+            castShadow
+            raycast={NO_RAYCAST}
+            dispose={null}
+          />
+          <ScaledInstances material={materials.platform} items={[0, 1].map((index) => ({
+            position: [-bodyWidth / 2 - width * (0.035 + index * 0.035), 0.035 + index * 0.028, bodyZ + bodyDepth * 0.29] as Vector3Tuple,
+            scale: [width * 0.07, 0.04, bodyDepth * (0.27 - index * 0.025)] as Vector3Tuple,
+          }))} />
           <ScaledInstances geometry={UNIT_SHRUB} material={materials.green} items={[-0.33, -0.18, 0.16, 0.32].map((x, index) => ({
             position: [x * width, 0.18 + (index % 2) * 0.03, frontZ + depth * 0.25] as Vector3Tuple,
             scale: [depth * 0.16, depth * (0.18 + (index % 2) * 0.04), depth * 0.14] as Vector3Tuple,
@@ -1243,8 +1264,8 @@ function AdministrativeCenter({
           <SignagePanel
             title="CENTRO ADMINISTRATIVO"
             subtitle="AUDITÓRIO FENASOJA"
-            position={[bodyWidth * 0.24, baseY + wallHeight * 0.46, frontZ + 0.072]}
-            size={[bodyWidth * 0.31, wallHeight * 0.14]}
+            position={[bodyWidth * 0.06, baseY + wallHeight * 0.46, frontZ + 0.072]}
+            size={[bodyWidth * 0.44, wallHeight * 0.14]}
             background="#e9ece4"
             foreground="#314640"
           />
@@ -1265,16 +1286,16 @@ function FenasojaHeadquarters({
   showDetail,
   showFocusDetail,
 }: LandmarkModelProps) {
-  // A envoltória é reduzida antes da rotação visual de 20° para que plataforma,
-  // sede e anexo continuem integralmente dentro do footprint cartográfico B12.
-  const width = bounds.width * 0.84;
-  const depth = bounds.depth * 0.64;
-  const mainX = -width * 0.17;
-  const bodyWidth = width * 0.62;
-  const bodyDepth = depth * 0.82;
-  const bodyZ = -depth * 0.04;
-  const wallHeight = height * 0.38;
-  const roofRise = height * 0.46;
+  // A empena principal responde à Rua Argentina; a leve rotação revela a
+  // esquina com a Rua Brasília sem ultrapassar o footprint cartográfico B12.
+  const width = bounds.width * 0.9;
+  const depth = bounds.depth * 0.76;
+  const mainX = -width * 0.16;
+  const bodyWidth = width * 0.65;
+  const bodyDepth = depth * 0.84;
+  const bodyZ = -depth * 0.035;
+  const wallHeight = height * 0.4;
+  const roofRise = height * 0.47;
   const frontZ = bodyZ + bodyDepth / 2;
   const roofPitch = Math.atan2(roofRise, bodyWidth / 2);
   const roofLength = Math.hypot(bodyWidth / 2 + width * 0.035, roofRise);
@@ -1286,11 +1307,11 @@ function FenasojaHeadquarters({
   const doorHeight = wallHeight * 0.59;
   const doorY = 0.11 + doorHeight / 2;
   const doorZ = frontZ + 0.078;
-  const annexWidth = width * 0.37;
-  const annexDepth = depth * 0.66;
-  const annexX = width * 0.315;
-  const annexZ = -depth * 0.08;
-  const annexHeight = wallHeight * 0.84;
+  const annexWidth = width * 0.33;
+  const annexDepth = depth * 0.7;
+  const annexX = width * 0.34;
+  const annexZ = -depth * 0.075;
+  const annexHeight = wallHeight * 0.8;
   const annexFrontZ = annexZ + annexDepth / 2;
   const annexRoofRise = annexHeight * 0.17;
   const annexRoofPitch = Math.atan2(annexRoofRise, annexDepth / 2 + depth * 0.025);
@@ -1376,6 +1397,7 @@ function FenasojaHeadquarters({
   const paving: InstanceTransform[] = [
     { position: [0, 0.09, frontZ + depth * 0.13], scale: [width * 0.78, 0.045, depth * 0.16] },
     { position: [0, 0.075, depth * 0.44], scale: [width * 0.48, 0.035, depth * 0.2] },
+    { position: [-width * 0.3, 0.07, -depth * 0.01], scale: [width * 0.12, 0.035, depth * 0.78] },
   ];
   const annexWindows = useMemo<InstanceTransform[]>(() => Array.from({ length: 4 }, (_, index) => ({
     position: [annexX + (-0.34 + index * 0.225) * annexWidth, annexHeight * 0.79, annexFrontZ + 0.037] as Vector3Tuple,
@@ -1445,20 +1467,20 @@ function FenasojaHeadquarters({
         <mesh geometry={marqueeGeometry} material={materials.white} position={[0, marqueeY, frontZ + 0.035]} castShadow receiveShadow raycast={NO_RAYCAST} />
         <ScaledInstances geometry={UNIT_PLANE} material={entranceGlass} items={doorPanels} />
         <ScaledInstances material={materials.platform} items={paving} receiveShadow />
-        {showFocusDetail && (
-          <group position={[-width * 0.27, 0, depth * 0.12]} scale={[0.5, 0.5, 0.5]} dispose={null}>
-            <SoybeanMonument
-              width={width * 0.58}
-              depth={depth * 0.58}
-              materials={materials}
-              showDetail
-              showFocusDetail
-            />
-          </group>
-        )}
-
       {showDetail && (
         <>
+          <ScaledInstances material={materials.white} castShadow items={[-0.4, -0.2, 0, 0.2, 0.4].flatMap((ratio) => ([
+            {
+              position: [-bodyWidth * 0.25, wallHeight + roofRise * 0.535 + 0.09, bodyZ + ratio * bodyDepth] as Vector3Tuple,
+              scale: [roofLength * 0.98, 0.014, 0.018] as Vector3Tuple,
+              rotation: [0, 0, roofPitch] as Vector3Tuple,
+            },
+            {
+              position: [bodyWidth * 0.25, wallHeight + roofRise * 0.535 + 0.09, bodyZ + ratio * bodyDepth] as Vector3Tuple,
+              scale: [roofLength * 0.98, 0.014, 0.018] as Vector3Tuple,
+              rotation: [0, 0, -roofPitch] as Vector3Tuple,
+            },
+          ]))} />
           <ScaledInstances material={materials.trim} items={gablePosts} />
           <HeadquartersIdentityPanel
             position={[0, marqueeY, frontZ + 0.035]}
@@ -1524,7 +1546,7 @@ function FenasojaHeadquarters({
 
       <mesh
         geometry={UNIT_BOX}
-        material={materials.wall}
+        material={materials.white}
         position={[annexX, 0.09 + annexHeight / 2, annexZ]}
         scale={[annexWidth, annexHeight, annexDepth]}
         castShadow
@@ -1534,9 +1556,9 @@ function FenasojaHeadquarters({
       />
       <mesh
         geometry={UNIT_BOX}
-        material={materials.accent}
-        position={[annexX - annexWidth * 0.08, 0.09 + annexHeight * 0.39, annexFrontZ + 0.026]}
-        scale={[annexWidth * 0.74, annexHeight * 0.56, 0.026]}
+        material={materials.glass}
+        position={[annexX - annexWidth * 0.06, 0.09 + annexHeight * 0.4, annexFrontZ + 0.026]}
+        scale={[annexWidth * 0.78, annexHeight * 0.54, 0.026]}
         raycast={NO_RAYCAST}
         dispose={null}
       />
@@ -1559,7 +1581,7 @@ function FenasojaHeadquarters({
       />
       <ScaledInstances
         geometry={annexGableGeometry}
-        material={materials.wall}
+        material={materials.white}
         items={[
           {
             position: [annexX + annexWidth / 2 + 0.002, 0.09 + annexHeight, annexZ],
@@ -1570,6 +1592,16 @@ function FenasojaHeadquarters({
       />
       <ScaledInstances material={materials.glass} items={annexWindows} />
       <ScaledInstances material={materials.white} items={annexFrames} />
+      <ScaledInstances material={materials.white} items={[
+        ...[-0.45, -0.15, 0.15, 0.45].map((ratio) => ({
+          position: [annexX - annexWidth * 0.06 + ratio * annexWidth * 0.78, 0.09 + annexHeight * 0.4, annexFrontZ + 0.046] as Vector3Tuple,
+          scale: [0.018, annexHeight * 0.56, 0.018] as Vector3Tuple,
+        })),
+        {
+          position: [annexX - annexWidth * 0.06, 0.09 + annexHeight * 0.58, annexFrontZ + 0.047] as Vector3Tuple,
+          scale: [annexWidth * 0.8, 0.018, 0.018] as Vector3Tuple,
+        },
+      ]} />
       <ScaledInstances
         material={materials.glass}
         items={[-0.22, 0.04, 0.28].map((ratio) => ({
@@ -1614,8 +1646,8 @@ function FenasojaHeadquarters({
         <>
           <ReferenceMuralPanel
             variant="meeting-room"
-            position={[annexX - annexWidth * 0.08, 0.09 + annexHeight * 0.39, annexFrontZ + 0.042]}
-            size={[annexWidth * 0.72, annexHeight * 0.54]}
+            position={[annexX - annexWidth * 0.06, 0.09 + annexHeight * 0.4, annexFrontZ + 0.043]}
+            size={[annexWidth * 0.76, annexHeight * 0.5]}
           />
           <ScaledInstances geometry={UNIT_CYLINDER} material={materials.accent} castShadow items={palmTrunks} />
           <ScaledInstances geometry={UNIT_CONE} material={materials.green} items={palmFronds} />
@@ -1632,7 +1664,7 @@ function FenasojaHeadquarters({
 
       {showFocusDetail && (
         <SignagePanel
-          title="SALA DE REUNIÕES"
+          title="FENASOJA"
           position={[annexX + annexWidth * 0.35, 0.09 + annexHeight * 0.66, annexFrontZ + 0.061]}
           size={[annexWidth * 0.26, annexHeight * 0.085]}
           background="#f2f0e8"
@@ -2323,6 +2355,7 @@ export interface StrategicLandmarkMeshProps {
   onSelect: (id: string) => void;
   onHover: (id: string | null) => void;
   onFocus: () => void;
+  onEnterInterior: (id: string) => void;
   onCursor: (cursor: 'grab' | 'grabbing' | 'pointer') => void;
 }
 
@@ -2337,6 +2370,7 @@ export function StrategicLandmarkMesh({
   onSelect,
   onHover,
   onFocus,
+  onEnterInterior,
   onCursor,
 }: StrategicLandmarkMeshProps) {
   const kind = resolveStrategicLandmarkKind(entity);
@@ -2391,7 +2425,8 @@ export function StrategicLandmarkMesh({
     event.stopPropagation();
     if (!isMapSelectionClick(event.delta)) return;
     onSelect(entity.id);
-    onFocus();
+    if (kind === 'fenasoja-headquarters') onEnterInterior(entity.id);
+    else onFocus();
   };
 
   const modelProps: LandmarkModelProps = {

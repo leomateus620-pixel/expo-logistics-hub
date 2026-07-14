@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   AlertTriangle,
+  ArrowLeft,
   BadgeCheck,
   Box,
   DatabaseZap,
@@ -53,6 +54,8 @@ export default function CommercialMapPage() {
   const permissions = useMapPermissions();
   const { bootstrap, publish } = useMapMutations();
   const selectedEntityId = useCommercialMapStore((state) => state.selectedEntityId);
+  const interiorEntityId = useCommercialMapStore((state) => state.interiorEntityId);
+  const exitInterior = useCommercialMapStore((state) => state.exitInterior);
   const activePanel = useCommercialMapStore((state) => state.activePanel);
   const setActivePanel = useCommercialMapStore((state) => state.setActivePanel);
   const workspaceMode = useCommercialMapStore((state) => state.workspaceMode);
@@ -77,12 +80,13 @@ export default function CommercialMapPage() {
         (searchTarget as HTMLInputElement | null)?.focus();
       }
       if (event.key === 'Escape' && !event.defaultPrevented) {
-        setActivePanel(null);
+        if (interiorEntityId) exitInterior();
+        else setActivePanel(null);
       }
     };
     window.addEventListener('keydown', shortcut);
     return () => window.removeEventListener('keydown', shortcut);
-  }, [activePanel, setActivePanel, workspaceMode]);
+  }, [activePanel, exitInterior, interiorEntityId, setActivePanel, workspaceMode]);
 
   useEffect(() => {
     if (workspaceMode === 'edit' && !selectedEntity) setWorkspaceMode('3d');
@@ -109,7 +113,7 @@ export default function CommercialMapPage() {
   }
 
   return (
-    <section className="commercial-map-shell" aria-label="Plataforma de gestão do mapa comercial">
+    <section className={`commercial-map-shell ${interiorEntityId ? 'is-interior' : ''}`} aria-label="Plataforma de gestão do mapa comercial">
       <header className="commercial-map-command-header">
         <div className="commercial-map-title-lockup">
           <div className="commercial-map-title-icon"><MapPinned /></div>
@@ -188,21 +192,35 @@ export default function CommercialMapPage() {
               matchingEntityIds={mapFilter.matchingEntityIds}
               filtersActive={mapFilter.hasActiveCriteria}
             />
-            <CommercialSummary lots={data.lots} />
-            <MapToolbar permissions={permissions} hasSelection={Boolean(selectedEntity)} />
-            <StatusLegend />
+            {interiorEntityId ? (
+              <div className="commercial-map-interior-navigation" aria-label="Navegação do interior da Sede Fenasoja">
+                <Button variant="outline" onClick={exitInterior}><ArrowLeft />Voltar ao mapa</Button>
+                <div>
+                  <span>Visita interna · B12</span>
+                  <strong>Sede Fenasoja / Comissão Central</strong>
+                  <small>Arraste para observar os ambientes · role para aproximar</small>
+                </div>
+                <kbd>Esc</kbd>
+              </div>
+            ) : (
+              <>
+                <CommercialSummary lots={data.lots} />
+                <MapToolbar permissions={permissions} hasSelection={Boolean(selectedEntity)} />
+                <StatusLegend />
+              </>
+            )}
 
-            {data.lots.length === 0 && (
+            {!interiorEntityId && data.lots.length === 0 && (
               <div className="commercial-map-onboarding-note">
                 <Sparkles />
                 <span><strong>Parque digitalizado, cadastro comercial protegido</strong>A base não contém lotes fictícios. Trace e valide cada unidade antes de ativar preços e vendas.</span>
               </div>
             )}
 
-            {activePanel === 'layers' && <LayersPanel layers={data.layers} entities={data.entities} permissions={permissions} />}
-            {activePanel === 'results' && <ResultsPanel explorer={mapFilter} />}
-            {activePanel === 'details' && selectedEntity && <EntityDetailsPanel entity={selectedEntity} lot={selectedLot} entities={data.entities} lots={data.lots} permissions={permissions} />}
-            {activePanel === 'calibration' && <CalibrationPanel project={data.project} calibration={data.calibration} />}
+            {!interiorEntityId && activePanel === 'layers' && <LayersPanel layers={data.layers} entities={data.entities} permissions={permissions} />}
+            {!interiorEntityId && activePanel === 'results' && <ResultsPanel explorer={mapFilter} />}
+            {!interiorEntityId && activePanel === 'details' && selectedEntity && <EntityDetailsPanel entity={selectedEntity} lot={selectedLot} entities={data.entities} lots={data.lots} permissions={permissions} />}
+            {!interiorEntityId && activePanel === 'calibration' && <CalibrationPanel project={data.project} calibration={data.calibration} />}
           </>
         )}
 

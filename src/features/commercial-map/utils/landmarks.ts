@@ -41,7 +41,7 @@ const STRATEGIC_LANDMARKS: Readonly<Record<string, StrategicLandmarkDefinition>>
     // O bloco longitudinal fica a oeste da Rua Brasília. A fachada repetitiva
     // abre para leste e a empena com mural encerra o conjunto ao sul.
     facingRadians: Math.PI / 2,
-    focusDirection: [0.94, 0.42, 0.34],
+    focusDirection: [0.78, 0.4, 0.68],
     visualHeight: ({ width, depth }) => Math.min(3.15, Math.max(width, depth) * 0.42),
   },
   B12: {
@@ -54,8 +54,8 @@ const STRATEGIC_LANDMARKS: Readonly<Record<string, StrategicLandmarkDefinition>>
     ],
     // A sede ocupa o canto sudoeste da Quadra B: a empena responde à Rua
     // Argentina, mas também se apresenta para a curva da Rua Brasília.
-    facingRadians: -Math.PI / 9,
-    focusDirection: [-0.56, 0.38, 0.94],
+    facingRadians: -Math.PI / 18,
+    focusDirection: [-0.42, 0.36, 0.94],
     visualHeight: ({ width, depth }) => Math.min(2.6, Math.max(width, depth) * 0.84),
   },
   C5: {

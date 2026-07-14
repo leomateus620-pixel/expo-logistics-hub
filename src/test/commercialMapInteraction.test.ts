@@ -13,6 +13,7 @@ describe('pipeline de seleção do mapa comercial', () => {
   beforeEach(() => {
     useCommercialMapStore.setState({
       selectedEntityId: null,
+      interiorEntityId: null,
       hoveredEntityId: null,
       search: '',
       statusFilters: [],
@@ -83,6 +84,37 @@ describe('pipeline de seleção do mapa comercial', () => {
       cameraSequence: initialSequence + 1,
       search: 'Quadra S',
       statusFilters: ['BLOCKED'],
+    });
+  });
+
+  it('entra e sai do interior preservando seleção, painel e retorno de câmera', () => {
+    const initialSequence = useCommercialMapStore.getState().cameraSequence;
+
+    useCommercialMapStore.getState().enterInterior('reference:2026:b12');
+    expect(useCommercialMapStore.getState()).toMatchObject({
+      selectedEntityId: 'reference:2026:b12',
+      interiorEntityId: 'reference:2026:b12',
+      hoveredEntityId: null,
+      activePanel: null,
+      workspaceMode: '3d',
+      cameraSequence: initialSequence + 1,
+    });
+
+    useCommercialMapStore.getState().exitInterior();
+    expect(useCommercialMapStore.getState()).toMatchObject({
+      selectedEntityId: 'reference:2026:b12',
+      interiorEntityId: null,
+      activePanel: 'details',
+      workspaceMode: '3d',
+      cameraSequence: initialSequence + 2,
+    });
+
+    useCommercialMapStore.getState().enterInterior('reference:2026:b12');
+    useCommercialMapStore.getState().setSelectedEntityId('reference:2026:b11');
+    expect(useCommercialMapStore.getState()).toMatchObject({
+      selectedEntityId: 'reference:2026:b11',
+      interiorEntityId: null,
+      activePanel: 'details',
     });
   });
 
