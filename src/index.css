@@ -163,6 +163,918 @@
   }
 }
 
+/* Cronograma e Eventos — operational timeline refinement */
+.cronograma-module-shell {
+  min-height: 100vh;
+  min-height: 100dvh;
+  color: hsl(145 30% 14%);
+  background-color: hsl(var(--cronograma-paper));
+}
+
+body[data-scroll-locked] {
+  background: hsl(72 24% 97%) !important;
+}
+
+.cronograma-command-header {
+  padding: 1.05rem 1.15rem;
+  border-radius: 1.15rem;
+}
+
+.cronograma-command-grid {
+  gap: 0.8rem;
+}
+
+.cronograma-executive-context {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 0;
+  margin-top: 0.9rem;
+  overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 0.09);
+  border-radius: 0.85rem;
+  background: rgb(255 255 255 / 0.035);
+}
+
+.cronograma-next-action {
+  min-width: 0;
+  padding: 0.9rem 1rem;
+}
+
+.cronograma-operational-signals {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 1px solid rgb(255 255 255 / 0.08);
+}
+
+.cronograma-signal {
+  min-width: 0;
+  padding: 0.7rem 0.8rem;
+}
+
+.cronograma-signal:nth-child(2n) {
+  border-left: 1px solid rgb(255 255 255 / 0.08);
+}
+
+.cronograma-signal:nth-child(n + 3) {
+  border-top: 1px solid rgb(255 255 255 / 0.08);
+}
+
+.cronograma-command-dock {
+  border-radius: 0.9rem;
+  background: hsl(var(--cronograma-paper) / 0.94);
+  box-shadow: 0 12px 30px -26px rgb(11 55 29 / 0.48);
+}
+
+.cronograma-filter-surface {
+  display: block;
+  padding: 0.45rem 0.55rem;
+}
+
+.cronograma-filter-main-row {
+  display: grid;
+  grid-template-columns: minmax(13rem, 1fr) auto auto;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.cronograma-search-input {
+  border-radius: 0.6rem;
+  border-color: hsl(var(--cronograma-line));
+  background: white;
+}
+
+.cronograma-period-pills {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.15rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.cronograma-period-pills::-webkit-scrollbar {
+  display: none;
+}
+
+.cronograma-period-pill {
+  min-height: 2rem;
+  flex: 0 0 auto;
+  border-radius: 0.5rem;
+  padding: 0.35rem 0.58rem;
+  color: hsl(var(--foreground) / 0.62);
+  font-size: 0.66rem;
+  font-weight: 750;
+  white-space: nowrap;
+  transition: color 150ms ease, background-color 150ms ease;
+}
+
+.cronograma-period-pill:hover,
+.cronograma-period-pill.is-active {
+  background: hsl(var(--primary) / 0.075);
+  color: hsl(var(--primary));
+}
+
+.cronograma-period-pill.is-active {
+  box-shadow: inset 0 0 0 1px hsl(var(--primary) / 0.13);
+}
+
+.cronograma-filter-status-row {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.4rem;
+  border-top: 1px solid hsl(var(--border) / 0.42);
+  padding: 0.4rem 0.15rem 0;
+}
+
+.cronograma-active-filters {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  align-items: center;
+  gap: 0.3rem;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.cronograma-active-filters::-webkit-scrollbar {
+  display: none;
+}
+
+.cronograma-filter-chip {
+  display: inline-flex;
+  min-height: 1.6rem;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.3rem;
+  border: 1px solid hsl(var(--primary) / 0.14);
+  border-radius: 999px;
+  padding: 0.25rem 0.5rem;
+  background: hsl(var(--primary) / 0.055);
+  color: hsl(var(--primary));
+  font-size: 0.62rem;
+  font-weight: 700;
+}
+
+.cronograma-filter-count {
+  min-width: 1.15rem;
+  height: 1.15rem;
+  background: hsl(var(--primary) / 0.10);
+  color: hsl(var(--primary));
+}
+
+.cronograma-syncing-label {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.3rem;
+  color: hsl(var(--primary));
+  font-size: 0.62rem;
+  font-weight: 750;
+}
+
+.cronograma-sync-alert {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border: 1px solid hsl(38 70% 42% / 0.25);
+  border-radius: 0.8rem;
+  padding: 0.7rem 0.85rem;
+  background: hsl(43 80% 95%);
+  color: hsl(32 70% 22%);
+}
+
+.cronograma-timeline-workspace {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.cronograma-temporal-nav {
+  position: sticky;
+  top: 13rem;
+  z-index: 14;
+  display: flex;
+  min-height: 3.75rem;
+  align-items: center;
+  gap: 1rem;
+  border: 1px solid hsl(var(--cronograma-line) / 0.92);
+  border-radius: 0.8rem;
+  padding: 0.55rem 0.7rem 0.55rem 0.9rem;
+  background: rgb(255 255 255 / 0.94);
+  box-shadow: 0 14px 34px -28px rgb(11 55 29 / 0.54);
+  backdrop-filter: blur(16px) saturate(1.08);
+}
+
+.cronograma-month-stream {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.cronograma-month-section {
+  overflow: clip;
+  scroll-margin-top: 17.25rem;
+  border: 1px solid hsl(var(--cronograma-line) / 0.82);
+  border-radius: 0.85rem;
+  background: rgb(255 255 255 / 0.78);
+  box-shadow: 0 16px 42px -38px rgb(10 54 28 / 0.55);
+  transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+}
+
+.cronograma-month-section[data-active='true'] {
+  border-color: hsl(var(--primary) / 0.28);
+  box-shadow: 0 18px 46px -38px hsl(var(--primary) / 0.55);
+}
+
+.cronograma-month-section[data-current='true'] {
+  border-color: hsl(var(--gold) / 0.48);
+  background: linear-gradient(90deg, hsl(var(--gold) / 0.055), rgb(255 255 255 / 0.82) 22%);
+}
+
+.cronograma-month-summary {
+  display: grid;
+  width: 100%;
+  grid-template-columns: 2.65rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.85rem;
+  padding: 0.72rem 0.9rem;
+  text-align: left;
+}
+
+.cronograma-month-marker {
+  display: grid;
+  width: 2.4rem;
+  height: 2.4rem;
+  place-items: center;
+  border: 1px solid hsl(var(--primary) / 0.16);
+  border-radius: 0.68rem;
+  background: hsl(var(--primary) / 0.06);
+  color: hsl(var(--primary));
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.cronograma-month-section[data-current='true'] .cronograma-month-marker {
+  border-color: hsl(var(--gold) / 0.4);
+  background: hsl(var(--gold) / 0.13);
+  color: hsl(35 80% 24%);
+}
+
+.cronograma-month-events {
+  border-top: 1px solid hsl(var(--border) / 0.52);
+  padding: 0 0.65rem 0.25rem;
+  animation: cronograma-list-in 170ms cubic-bezier(0.23, 1, 0.32, 1) both;
+}
+
+.cronograma-operational-event {
+  position: relative;
+  display: grid;
+  width: 100%;
+  grid-template-columns: 3.7rem 0.8rem minmax(0, 1fr) auto;
+  align-items: stretch;
+  gap: 0.65rem;
+  border-bottom: 1px solid hsl(var(--border) / 0.42);
+  padding: 0.7rem 0.45rem;
+  text-align: left;
+  transition: background-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+
+.cronograma-operational-event:last-child {
+  border-bottom: 0;
+}
+
+.cronograma-operational-event[data-today='true'] {
+  border-radius: 0.7rem;
+  background: hsl(var(--primary) / 0.055);
+  box-shadow: inset 3px 0 0 hsl(var(--primary));
+}
+
+.cronograma-operational-event[data-next='true']:not([data-today='true']) {
+  border-radius: 0.7rem;
+  background: hsl(var(--gold) / 0.055);
+  box-shadow: inset 3px 0 0 hsl(var(--gold));
+}
+
+.cronograma-event-date-block {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid hsl(var(--border) / 0.48);
+  padding-right: 0.55rem;
+}
+
+.cronograma-event-rail {
+  position: relative;
+  display: block;
+}
+
+.cronograma-event-rail::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: -0.7rem;
+  bottom: -0.7rem;
+  width: 1px;
+  background: hsl(var(--primary) / 0.17);
+  transform: translateX(-50%);
+}
+
+.cronograma-event-rail > span {
+  position: absolute;
+  left: 50%;
+  top: 1.2rem;
+  z-index: 1;
+  width: 0.52rem;
+  height: 0.52rem;
+  border: 2px solid white;
+  border-radius: 999px;
+  background: hsl(var(--primary));
+  box-shadow: 0 0 0 3px hsl(var(--primary) / 0.11);
+  transform: translateX(-50%);
+}
+
+.cronograma-operational-event[data-status='overdue'] .cronograma-event-rail > span,
+.cronograma-operational-event[data-status='blocked'] .cronograma-event-rail > span {
+  background: hsl(0 70% 42%);
+  box-shadow: 0 0 0 3px hsl(0 70% 42% / 0.11);
+}
+
+.cronograma-operational-event[data-status='completed'] .cronograma-event-rail > span {
+  background: hsl(145 54% 34%);
+}
+
+.cronograma-event-state {
+  display: flex;
+  min-width: 8.5rem;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 0.45rem;
+}
+
+.cronograma-undated-section {
+  overflow: hidden;
+  border: 1px solid hsl(38 65% 44% / 0.24);
+  border-radius: 0.85rem;
+  background: hsl(45 72% 96% / 0.92);
+}
+
+.cronograma-undated-action {
+  display: flex;
+  width: 100%;
+  align-items: flex-start;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  text-align: left;
+}
+
+.cronograma-empty-state {
+  display: flex;
+  min-height: 16rem;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  border: 1px dashed hsl(var(--cronograma-line));
+  border-radius: 1rem;
+  padding: 2rem;
+  background: rgb(255 255 255 / 0.66);
+  text-align: left;
+}
+
+.cronograma-drawer-overlay {
+  inset: 0 !important;
+  width: 100vw !important;
+  height: 100vh;
+  height: 100dvh;
+  background: rgb(4 25 13 / 0.46) !important;
+  backdrop-filter: blur(1.5px);
+  animation-duration: 180ms !important;
+}
+
+.cronograma-drawer {
+  --background: 72 24% 97%;
+  --foreground: 145 30% 14%;
+  --card: 0 0% 100%;
+  --card-foreground: 145 30% 14%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 145 30% 14%;
+  --muted: 76 18% 92%;
+  --muted-foreground: 145 10% 39%;
+  --border: 142 18% 82%;
+  --input: 142 18% 82%;
+  --ring: 143 50% 28%;
+  inset-block: 0 !important;
+  right: 0 !important;
+  display: grid !important;
+  width: min(100vw, 46rem) !important;
+  max-width: 46rem !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 0 !important;
+  overflow: hidden;
+  border-left: 1px solid hsl(var(--gold) / 0.25);
+  padding: 0 !important;
+  background: hsl(var(--background)) !important;
+  color: hsl(var(--foreground)) !important;
+  box-shadow: -28px 0 72px -38px rgb(3 31 16 / 0.7);
+  backdrop-filter: none;
+  animation-duration: 220ms !important;
+}
+
+.cronograma-drawer-header,
+.cronograma-drawer-footer {
+  position: relative;
+  z-index: 2;
+  border-color: hsl(var(--border));
+  background: rgb(255 255 255 / 0.97);
+  backdrop-filter: none;
+}
+
+.cronograma-drawer-header {
+  border-bottom-width: 1px;
+  padding: 1.15rem 1.35rem 1rem;
+}
+
+.cronograma-drawer-footer {
+  border-top-width: 1px;
+  padding: 0.75rem 1.1rem max(0.75rem, env(safe-area-inset-bottom));
+  box-shadow: 0 -10px 26px -24px rgb(10 42 24 / 0.48);
+}
+
+.cronograma-drawer-title {
+  color: hsl(var(--foreground)) !important;
+  font-size: clamp(1.25rem, 2vw, 1.65rem) !important;
+  font-weight: 900 !important;
+  line-height: 1.18 !important;
+  letter-spacing: -0.025em !important;
+}
+
+.cronograma-drawer-description {
+  display: -webkit-box;
+  overflow: hidden;
+  color: hsl(var(--muted-foreground)) !important;
+  font-size: 0.8rem !important;
+  line-height: 1.45 !important;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.cronograma-drawer-body {
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 1rem 1.35rem 1.5rem;
+  background: hsl(var(--background));
+  scrollbar-gutter: stable;
+}
+
+.cronograma-drawer-body:focus-visible {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: -2px;
+}
+
+.cronograma-editing-badge {
+  display: inline-flex;
+  height: 1.75rem;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid hsl(var(--primary) / 0.16);
+  border-radius: 0.4rem;
+  padding-inline: 0.55rem;
+  background: hsl(var(--primary) / 0.06);
+  color: hsl(var(--primary));
+  font-size: 0.68rem;
+  font-weight: 750;
+}
+
+.cronograma-section-eyebrow {
+  color: hsl(var(--muted-foreground));
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.cronograma-info-row {
+  border-bottom-color: hsl(var(--border));
+}
+
+.cronograma-pending-panel {
+  border: 1px solid hsl(38 60% 43% / 0.22);
+  border-radius: 0.85rem;
+  padding: 0.9rem;
+  background: hsl(45 75% 95%);
+}
+
+.cronograma-pending-icon {
+  display: flex;
+  width: 2rem;
+  height: 2rem;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.55rem;
+  background: hsl(38 72% 45% / 0.13);
+  color: hsl(35 72% 29%);
+}
+
+.cronograma-decision-needed {
+  margin-top: 0.75rem;
+  border-left: 3px solid hsl(38 72% 45%);
+  border-radius: 0.45rem;
+  padding: 0.65rem 0.75rem;
+  background: white;
+  color: hsl(var(--foreground));
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.cronograma-progress-label {
+  border-radius: 999px;
+  padding: 0.3rem 0.55rem;
+  background: hsl(var(--primary) / 0.07);
+  color: hsl(var(--primary));
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.67rem;
+  font-weight: 800;
+}
+
+.cronograma-progress-track {
+  height: 0.35rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: hsl(var(--muted));
+}
+
+.cronograma-progress-track > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: hsl(var(--primary));
+  transition: width 220ms ease;
+}
+
+.cronograma-subevent-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.7rem;
+  padding: 0.7rem;
+  background: white;
+}
+
+.cronograma-subevent-check {
+  display: flex;
+  width: 1.75rem;
+  height: 1.75rem;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid hsl(var(--border));
+  border-radius: 999px;
+  color: hsl(var(--muted-foreground));
+}
+
+.cronograma-subevent-check.is-completed {
+  border-color: hsl(145 48% 34% / 0.24);
+  background: hsl(145 45% 94%);
+  color: hsl(145 55% 28%);
+}
+
+.cronograma-history-panel {
+  display: flex;
+  gap: 0.65rem;
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+  background: hsl(var(--muted) / 0.55);
+}
+
+.cronograma-audit-section {
+  border-top: 1px solid hsl(var(--border));
+  padding-top: 1rem;
+}
+
+.cronograma-audit-entry {
+  position: relative;
+  display: flex;
+  gap: 0.65rem;
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.65rem;
+  padding: 0.65rem 0.7rem;
+  background: white;
+}
+
+.cronograma-audit-dot {
+  width: 0.48rem;
+  height: 0.48rem;
+  flex: 0 0 auto;
+  margin-top: 0.28rem;
+  border: 2px solid white;
+  border-radius: 999px;
+  background: hsl(var(--primary));
+  box-shadow: 0 0 0 3px hsl(var(--primary) / 0.1);
+}
+
+.cronograma-form-section {
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.85rem;
+  padding: 0.9rem;
+  background: rgb(255 255 255 / 0.82);
+}
+
+.cronograma-form-section.is-pending {
+  border-color: hsl(38 60% 43% / 0.24);
+  background: hsl(45 75% 96%);
+}
+
+.cronograma-create-dialog,
+.cronograma-discard-dialog {
+  --background: 72 24% 97%;
+  --foreground: 145 30% 14%;
+  --muted: 76 18% 92%;
+  --muted-foreground: 145 10% 39%;
+  --border: 142 18% 82%;
+  border-color: hsl(var(--border));
+  background: hsl(var(--background)) !important;
+  color: hsl(var(--foreground)) !important;
+}
+
+.cronograma-create-dialog {
+  display: grid;
+  max-height: min(90vh, 54rem);
+  max-height: min(90dvh, 54rem);
+  grid-template-rows: auto minmax(0, 1fr);
+  overflow: hidden;
+}
+
+@media (min-width: 768px) {
+  .cronograma-executive-context {
+    grid-template-columns: minmax(0, 1.25fr) minmax(25rem, 0.75fr);
+  }
+
+  .cronograma-operational-signals {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    border-top: 0;
+    border-left: 1px solid rgb(255 255 255 / 0.08);
+  }
+
+  .cronograma-signal:nth-child(n) {
+    border-top: 0;
+  }
+
+  .cronograma-signal:nth-child(n + 2) {
+    border-left: 1px solid rgb(255 255 255 / 0.08);
+  }
+}
+
+@media (min-width: 1024px) {
+  .cronograma-command-header {
+    padding: 1.15rem 1.35rem;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cronograma-operational-event:hover {
+    z-index: 1;
+    border-radius: 0.7rem;
+    background: hsl(var(--primary) / 0.045);
+    box-shadow: 0 10px 26px -22px hsl(var(--primary) / 0.55);
+    transform: translateX(2px);
+  }
+
+  .cronograma-month-summary:hover {
+    background: hsl(var(--primary) / 0.026);
+  }
+
+  .cronograma-undated-action:hover {
+    background: hsl(42 76% 90% / 0.52);
+  }
+}
+
+@media (max-width: 1023px) {
+  .cronograma-filter-main-row {
+    grid-template-columns: minmax(12rem, 1fr) auto;
+  }
+
+  .cronograma-period-pills {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  .cronograma-temporal-nav {
+    top: 15.4rem;
+  }
+
+  .cronograma-month-section {
+    scroll-margin-top: 19.5rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .cronograma-page {
+    padding-top: 0.65rem;
+  }
+
+  .cronograma-command-header {
+    border-radius: 0.95rem;
+    padding: 0.9rem;
+  }
+
+  .cronograma-command-header h1 {
+    font-size: 1.45rem;
+  }
+
+  .cronograma-command-header p {
+    line-height: 1.35rem;
+  }
+
+  .cronograma-command-actions {
+    width: 100%;
+  }
+
+  .cronograma-command-actions > button {
+    flex: 1;
+  }
+
+  .cronograma-executive-context {
+    margin-top: 0.75rem;
+  }
+
+  .cronograma-next-action {
+    padding: 0.8rem;
+  }
+
+  .cronograma-command-dock {
+    top: 64px;
+    margin-inline: -0.2rem;
+  }
+
+  .cronograma-view-tab {
+    min-height: 2.25rem;
+    padding: 0.5rem 0.65rem;
+  }
+
+  .cronograma-filter-main-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .cronograma-filter-main-row > label {
+    grid-column: 1;
+  }
+
+  .cronograma-period-pills {
+    margin-inline: -0.15rem;
+    padding-inline: 0.15rem;
+  }
+
+  .cronograma-filter-status-row {
+    align-items: flex-start;
+  }
+
+  .cronograma-temporal-nav {
+    top: 14.4rem;
+    min-height: 3.4rem;
+    padding: 0.45rem 0.55rem 0.45rem 0.75rem;
+  }
+
+  .cronograma-temporal-nav > div:first-child {
+    max-width: 8.5rem;
+  }
+
+  .cronograma-month-section {
+    scroll-margin-top: 18.5rem;
+  }
+
+  .cronograma-month-summary {
+    grid-template-columns: 2.25rem minmax(0, 1fr) auto;
+    gap: 0.55rem;
+    padding: 0.65rem;
+  }
+
+  .cronograma-month-marker {
+    width: 2.1rem;
+    height: 2.1rem;
+  }
+
+  .cronograma-month-summary > span:last-child {
+    font-size: 0;
+  }
+
+  .cronograma-month-summary > span:last-child svg {
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+
+  .cronograma-month-events {
+    padding-inline: 0.35rem;
+  }
+
+  .cronograma-operational-event {
+    grid-template-columns: 3rem 0.55rem minmax(0, 1fr);
+    gap: 0.45rem;
+    padding: 0.7rem 0.25rem;
+  }
+
+  .cronograma-event-date-block {
+    padding-right: 0.35rem;
+  }
+
+  .cronograma-event-state {
+    grid-column: 3;
+    min-width: 0;
+    flex-flow: row wrap;
+    align-items: center;
+    justify-content: flex-start;
+    padding-top: 0.2rem;
+  }
+
+  .cronograma-empty-state {
+    min-height: 13rem;
+    justify-content: flex-start;
+    padding: 1.25rem;
+  }
+
+  .cronograma-sync-alert {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .cronograma-sync-alert button {
+    margin-left: 1.75rem;
+  }
+
+  .cronograma-drawer {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    border-left: 0;
+  }
+
+  .cronograma-drawer-header {
+    padding: 0.95rem 1rem 0.85rem;
+  }
+
+  .cronograma-drawer-body {
+    padding: 0.85rem 1rem 1.25rem;
+    scrollbar-gutter: auto;
+  }
+
+  .cronograma-drawer-footer {
+    padding-inline: 0.85rem;
+  }
+
+  .cronograma-drawer-footer button {
+    min-height: 2.65rem;
+  }
+
+  .cronograma-drawer-footer > div,
+  .cronograma-drawer-footer > div > div {
+    width: 100%;
+  }
+
+  .cronograma-drawer-footer > div > div > button {
+    flex: 1;
+  }
+
+  .cronograma-discard-dialog {
+    width: calc(100vw - 1.5rem);
+    border-radius: 0.9rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cronograma-drawer,
+  .cronograma-drawer-overlay,
+  .cronograma-month-events,
+  .cronograma-operational-event,
+  .cronograma-progress-track > span,
+  .cronograma-period-pill,
+  .cronograma-month-section {
+    animation: none !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .cronograma-month-section,
+  .cronograma-temporal-nav,
+  .cronograma-filter-surface,
+  .cronograma-view-nav,
+  .cronograma-form-section,
+  .cronograma-subevent-row {
+    border-color: hsl(var(--foreground) / 0.48);
+  }
+}
+
 input, textarea, select, [role="combobox"] {
   text-transform: uppercase;
 }

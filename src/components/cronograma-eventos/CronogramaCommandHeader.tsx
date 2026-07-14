@@ -1,19 +1,23 @@
 import {
+  AlertTriangle,
+  CalendarDays,
   Clock3,
-  Database,
   Flag,
   Plus,
-  UsersRound,
+  UserRoundX,
 } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { formatLongDateRange } from '@/components/cronograma-eventos/dateUtils';
+import { getCountdownLabel, getTimelineSnapshot, getTodayKey } from '@/lib/cronograma-timeline';
 import type { CronogramaEvent } from './types';
 
-const cycleLabels: Record<number, string> = {
-  2026: 'Estruturação',
-  2027: 'Consolidação',
-  2028: 'Realização',
-};
+const currentDateFormatter = new Intl.DateTimeFormat('pt-BR', {
+  weekday: 'long',
+  day: '2-digit',
+  month: 'long',
+  year: 'numeric',
+  timeZone: 'America/Sao_Paulo',
+});
 
 export function CronogramaCommandHeader({
   events,
@@ -26,14 +30,9 @@ export function CronogramaCommandHeader({
   onOpenUndated: () => void;
   canManage: boolean;
 }) {
-  const official = events.filter((event) => event.isOfficial).length;
-  const byYear = {
-    2026: events.filter((event) => event.year === 2026).length,
-    2027: events.filter((event) => event.year === 2027).length,
-    2028: events.filter((event) => event.year === 2028).length,
-  };
-  const undated = events.filter((event) => !event.date).length;
-  const meetings = events.filter((event) => event.isCentralMeeting).length;
+  const todayKey = getTodayKey();
+  const snapshot = getTimelineSnapshot(events, todayKey);
+  const next = snapshot.nextOfficialAction;
 
   return (
     <header className="cronograma-command-header">
@@ -41,13 +40,13 @@ export function CronogramaCommandHeader({
         <div className="min-w-0">
           <div className="cronograma-eyebrow">
             <span className="cronograma-live-dot" aria-hidden="true" />
-            Planejamento institucional · base oficial ativa
+            Linha do tempo operacional · {currentDateFormatter.format(new Date())}
           </div>
-          <h1 className="mt-3 text-balance text-3xl font-black tracking-[-0.035em] text-white sm:text-4xl">
+          <h1 className="mt-2 text-balance text-2xl font-black tracking-[-0.035em] text-white sm:text-3xl">
             Cronograma e Eventos
           </h1>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-white/64 sm:text-[15px]">
-            Central temporal do ciclo 2026—2028. Marcos, reuniões, períodos e decisões permanecem conectados em uma única leitura operacional.
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-white/68">
+            Decisões, responsáveis e prazos do ciclo Fenasoja reunidos em uma sequência institucional única.
           </p>
         </div>
 
@@ -60,8 +59,8 @@ export function CronogramaCommandHeader({
             className="cronograma-secondary-action h-10 rounded-lg px-3 text-xs"
           >
             <Clock3 className="h-4 w-4" aria-hidden="true" />
-            Pendências
-            <span className="cronograma-action-count">{undated}</span>
+            Sem data
+            <span className="cronograma-action-count">{snapshot.undated}</span>
           </Button>
           {canManage && (
             <Button
@@ -77,47 +76,72 @@ export function CronogramaCommandHeader({
         </div>
       </div>
 
-      <div className="cronograma-cycle-rail" aria-label="Evolução do ciclo Fenasoja 2028">
-        {[2026, 2027, 2028].map((year) => (
-          <div key={year} className="cronograma-cycle-stage" data-final={year === 2028}>
-            <span className="cronograma-cycle-node" aria-hidden="true" />
-            <span className="font-mono text-sm font-black text-white">{year}</span>
-            <span className="text-[11px] font-semibold text-white/46">{cycleLabels[year]}</span>
-            <span className="ml-auto font-mono text-xs font-bold text-gold">{byYear[year as 2026 | 2027 | 2028]}</span>
+      <section className="cronograma-executive-context" aria-label="Situação operacional do ciclo">
+        <div className="cronograma-next-action">
+          <div className="flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-[0.17em] text-gold">
+            <Flag className="h-3.5 w-3.5" aria-hidden="true" />
+            Próxima ação oficial
           </div>
-        ))}
-      </div>
+          {next ? (
+            <>
+              <div className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                <h2 className="max-w-3xl text-lg font-black leading-tight text-white sm:text-xl">{next.title}</h2>
+                <span className="font-mono text-xs font-bold text-gold">{getCountdownLabel(next.date, todayKey)}</span>
+              </div>
+              <p className="mt-1.5 text-xs leading-5 text-white/62">
+                {formatLongDateRange(next.date, next.endDate)}
+                {next.startTime ? ` · ${next.startTime}` : ''}
+                {next.owner ? ` · ${next.owner}` : ' · responsável a definir'}
+              </p>
+            </>
+          ) : (
+            <p className="mt-2 text-sm font-semibold text-white/70">Nenhuma ação futura encontrada no recorte atual.</p>
+          )}
+          <div className="mt-3 flex items-center gap-3">
+            <div className="h-1.5 min-w-0 flex-1 overflow-hidden rounded-full bg-white/10" aria-hidden="true">
+              <span className="block h-full rounded-full bg-gold" style={{ width: `${snapshot.progress}%` }} />
+            </div>
+            <span className="font-mono text-[11px] font-bold text-white/72">{snapshot.progress}% do ciclo</span>
+          </div>
+        </div>
 
-      <dl className="cronograma-metric-strip">
-        <HeaderMetric icon={Database} label="Base oficial" value={official} />
-        <HeaderMetric icon={Flag} label="2026" value={byYear[2026]} />
-        <HeaderMetric icon={Flag} label="2027" value={byYear[2027]} />
-        <HeaderMetric icon={Flag} label="2028" value={byYear[2028]} accent />
-        <HeaderMetric icon={Clock3} label="Sem data" value={undated} />
-        <HeaderMetric icon={UsersRound} label="Reuniões centrais" value={meetings} />
-      </dl>
+        <dl className="cronograma-operational-signals">
+          <Signal
+            icon={CalendarDays}
+            label="Próxima Fenasoja"
+            value={snapshot.edition ? getCountdownLabel(snapshot.edition.date, todayKey) : 'A definir'}
+            detail={snapshot.edition ? formatLongDateRange(snapshot.edition.date, snapshot.edition.endDate) : undefined}
+          />
+          <Signal icon={AlertTriangle} label="Ações atrasadas" value={snapshot.overdue} danger={snapshot.overdue > 0} />
+          <Signal icon={Clock3} label="Sem data" value={snapshot.undated} />
+          <Signal icon={UserRoundX} label="Sem responsável" value={snapshot.missingOwner} />
+        </dl>
+      </section>
     </header>
   );
 }
 
-function HeaderMetric({
+function Signal({
   icon: Icon,
   label,
   value,
-  accent,
+  detail,
+  danger = false,
 }: {
-  icon: LucideIcon;
+  icon: typeof Clock3;
   label: string;
-  value: number;
-  accent?: boolean;
+  value: string | number;
+  detail?: string;
+  danger?: boolean;
 }) {
   return (
-    <div className="cronograma-metric-item">
-      <dt className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-[0.14em] text-white/42">
-        <Icon className={accent ? 'h-3.5 w-3.5 text-gold' : 'h-3.5 w-3.5 text-emerald-200/62'} aria-hidden="true" />
+    <div className="cronograma-signal">
+      <dt className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-[0.13em] text-white/46">
+        <Icon className={danger ? 'h-3.5 w-3.5 text-red-300' : 'h-3.5 w-3.5 text-emerald-200/70'} aria-hidden="true" />
         {label}
       </dt>
-      <dd className={accent ? 'font-mono text-xl font-black text-gold' : 'font-mono text-xl font-black text-white'}>{value}</dd>
+      <dd className={danger ? 'mt-1 font-mono text-lg font-black text-red-200' : 'mt-1 font-mono text-lg font-black text-white'}>{value}</dd>
+      {detail && <p className="mt-0.5 truncate text-[9px] text-white/40">{detail}</p>}
     </div>
   );
 }

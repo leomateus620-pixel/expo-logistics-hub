@@ -1,0 +1,134 @@
+/* Loaded after index.css so the operational timeline remains stable across legacy breakpoints. */
+.cronograma-command-header {
+  padding: 1.05rem 1.15rem;
+  border-radius: 1.15rem;
+}
+
+.cronograma-command-grid {
+  gap: 0.8rem;
+}
+
+.cronograma-filter-surface {
+  display: block;
+  padding: 0.45rem 0.55rem;
+}
+
+.cronograma-temporal-nav {
+  top: 14.75rem;
+}
+
+.cronograma-month-section {
+  scroll-margin-top: 18.75rem;
+}
+
+.cronograma-drawer {
+  --background: 72 24% 97%;
+  --foreground: 145 30% 14%;
+  --card: 0 0% 100%;
+  --card-foreground: 145 30% 14%;
+  --muted: 76 18% 92%;
+  --muted-foreground: 145 10% 39%;
+  --border: 142 18% 82%;
+  --input: 142 18% 82%;
+  --ring: 143 50% 28%;
+  inset-block: 0 !important;
+  right: 0 !important;
+  display: grid !important;
+  width: min(100vw, 46rem) !important;
+  max-width: 46rem !important;
+  height: 100vh !important;
+  height: 100dvh !important;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: 0 !important;
+  overflow: hidden;
+  padding: 0 !important;
+  background: hsl(var(--background)) !important;
+  color: hsl(var(--foreground)) !important;
+  box-shadow: -28px 0 72px -38px rgb(3 31 16 / 0.7);
+  backdrop-filter: none;
+}
+
+body[data-scroll-locked] .cronograma-drawer-overlay {
+  right: calc(-1 * var(--removed-body-scroll-bar-size, 0px)) !important;
+  width: calc(100vw + var(--removed-body-scroll-bar-size, 0px)) !important;
+}
+
+body[data-scroll-locked] .cronograma-drawer-overlay::after {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  left: 100%;
+  width: var(--removed-body-scroll-bar-size, 0px);
+  background: rgb(4 25 13 / 0.46);
+  backdrop-filter: blur(1.5px);
+}
+
+body[data-scroll-locked] .cronograma-drawer {
+  right: calc(-1 * var(--removed-body-scroll-bar-size, 0px)) !important;
+}
+
+.cronograma-drawer[data-state='closed'],
+.cronograma-drawer-overlay[data-state='closed'] {
+  animation: none !important;
+  transition: none !important;
+}
+
+.cronograma-drawer-header,
+.cronograma-drawer-footer {
+  background: rgb(255 255 255 / 0.97);
+  backdrop-filter: none;
+}
+
+@media (min-width: 768px) {
+  .cronograma-filter-surface {
+    display: block;
+  }
+}
+
+@media (min-width: 1024px) {
+  .cronograma-command-header {
+    padding: 1.15rem 1.35rem;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .cronograma-temporal-nav {
+    top: 17.25rem;
+  }
+
+  .cronograma-month-section {
+    scroll-margin-top: 21.5rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .cronograma-command-header {
+    padding: 0.9rem;
+    border-radius: 0.95rem;
+  }
+
+  .cronograma-drawer {
+    left: 0 !important;
+    right: auto !important;
+    width: calc(100vw + var(--removed-body-scroll-bar-size, 0px)) !important;
+    max-width: none !important;
+    border-left: 0;
+  }
+
+  body[data-scroll-locked] .cronograma-drawer {
+    left: 0 !important;
+    right: auto !important;
+  }
+
+  .cronograma-temporal-nav {
+    top: 16.75rem;
+  }
+
+  .cronograma-month-section {
+    scroll-margin-top: 20.75rem;
+  }
+
+  .cronograma-complete-action {
+    display: none;
+  }
+}

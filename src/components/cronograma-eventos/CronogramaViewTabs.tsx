@@ -13,8 +13,8 @@ import { cn } from '@/lib/utils';
 import type { CronogramaView } from './types';
 
 const tabs: Array<{ value: CronogramaView; label: string; shortLabel: string; icon: LucideIcon }> = [
+  { value: 'timeline', label: 'Linha do tempo', shortLabel: 'Linha', icon: Network },
   { value: 'overview', label: 'Visão geral', shortLabel: 'Visão', icon: Map },
-  { value: 'timeline', label: 'Linha do tempo', shortLabel: 'Timeline', icon: Network },
   { value: 'calendar', label: 'Calendário', shortLabel: 'Calendário', icon: CalendarRange },
   { value: 'year', label: 'Por ano', shortLabel: 'Anos', icon: Columns3 },
   { value: 'category', label: 'Por categoria', shortLabel: 'Categorias', icon: Layers3 },

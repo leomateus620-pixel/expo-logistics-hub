@@ -20,6 +20,12 @@ export const categoryLabels: Record<CronogramaCategory, string> = {
 export const statusLabels: Record<CronogramaStatus, string> = {
   confirmed: 'Confirmado',
   planned: 'Planejado',
+  in_progress: 'Em andamento',
+  completed: 'Concluído',
+  overdue: 'Atrasado',
+  rescheduled: 'Reprogramado',
+  cancelled: 'Cancelado',
+  undated: 'Sem data',
   in_definition: 'Em definição',
   blocked: 'Dependência',
 };

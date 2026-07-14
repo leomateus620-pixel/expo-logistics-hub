@@ -15,6 +15,7 @@ import {
   sortCronogramaEvents,
   type CronogramaEvent,
 } from '@/lib/cronograma-eventos';
+import type { CronogramaHistoryEntry } from '@/components/cronograma-eventos/types';
 
 const officialSeedEvents = normalizeCronogramaSeed(fenasoja2028CronogramaSeed);
 
@@ -26,12 +27,13 @@ export type CronogramaEventDraft = Partial<CronogramaEventSeed> & {
 
 interface SupabaseResult<T> {
   data: T | null;
-  error: { message?: string } | null;
+  error: { message?: string; code?: string } | null;
 }
 
 interface SupabaseQueryBuilder extends PromiseLike<SupabaseResult<unknown[]>> {
   select(columns?: string): SupabaseQueryBuilder;
   eq(column: string, value: unknown): SupabaseQueryBuilder;
+  in(column: string, values: unknown[]): SupabaseQueryBuilder;
   order(column: string, options?: Record<string, unknown>): SupabaseQueryBuilder;
   limit(count: number): Promise<SupabaseResult<unknown[]>>;
   upsert(values: unknown, options?: Record<string, unknown>): SupabaseQueryBuilder;
@@ -89,6 +91,44 @@ function readString(row: Record<string, unknown>, key: string): string | null {
 function readNumber(row: Record<string, unknown>, key: string): number | null {
   const value = row[key];
   return typeof value === 'number' ? value : null;
+}
+
+function readObject(row: Record<string, unknown>, key: string): Record<string, unknown> {
+  const value = row[key];
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : {};
+}
+
+const historyFieldLabels: Array<[string[], string]> = [
+  [['title'], 'título'],
+  [['description', 'summary'], 'resumo'],
+  [['start_date', 'startDate'], 'data'],
+  [['end_date', 'endDate'], 'data final'],
+  [['event_time', 'time'], 'horário'],
+  [['status'], 'status'],
+  [['priority'], 'prioridade'],
+  [['location'], 'local'],
+  [['responsible_name', 'responsibleName'], 'responsável'],
+  [['commission_name', 'commissionName'], 'comissão'],
+  [['subevents'], 'checklist'],
+];
+
+function firstValue(record: Record<string, unknown>, keys: string[]) {
+  for (const key of keys) {
+    if (key in record) return record[key];
+  }
+  return undefined;
+}
+
+function summarizeHistoryChange(previous: Record<string, unknown>, next: Record<string, unknown>) {
+  return historyFieldLabels
+    .filter(([keys]) => JSON.stringify(firstValue(previous, keys)) !== JSON.stringify(firstValue(next, keys)))
+    .map(([, label]) => label);
+}
+
+function isUuid(value: string | null | undefined) {
+  return Boolean(value && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value));
 }
 
 function fromDbRow(row: unknown): CronogramaEvent {
@@ -275,14 +315,15 @@ export function useCronogramaEventos() {
   const create = useMutation({
     mutationFn: async (draft: CronogramaEventDraft) => {
       const event = draftToEvent(draft);
-      const canUseDb = Boolean(orgId && !dbUnavailable);
-
-      if (!canUseDb) return event;
+      if (!orgId) throw new Error('Não foi possível identificar a organização atual. Entre novamente e tente salvar.');
+      if (dbUnavailable) {
+        throw new Error('A sincronização está indisponível. O evento não foi salvo para evitar perda de dados. Tente novamente quando a conexão for restabelecida.');
+      }
 
       const user = (await cronogramaDb.auth.getUser()).data.user;
       const { data, error } = await cronogramaDb
         .from('cronograma_eventos')
-        .insert(toDbPayload(event, orgId!, user?.id))
+        .insert(toDbPayload(event, orgId, user?.id))
         .select('*')
         .single();
       if (error) throw error;
@@ -301,20 +342,52 @@ export function useCronogramaEventos() {
   const update = useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<CronogramaEvent> }) => {
       const current = sessionEvents.find((event) => event.id === id);
-      if (!current) throw new Error('Evento não encontrado');
+      if (!current) throw new Error('Evento não encontrado. Atualize a página e tente novamente.');
       const next = { ...current, ...updates, updatedAt: new Date().toISOString() };
-      const canUseDb = Boolean(orgId && !dbUnavailable && next.sourceKey);
-
-      if (!canUseDb) return next;
+      if (!orgId || !next.sourceKey) throw new Error('O evento não possui vínculo persistente com a organização atual.');
+      if (dbUnavailable) {
+        throw new Error('A sincronização está indisponível. As alterações não foram salvas para evitar perda de dados. Tente novamente mais tarde.');
+      }
 
       const user = (await cronogramaDb.auth.getUser()).data.user;
-      const { data, error } = await cronogramaDb
-        .from('cronograma_eventos')
-        .upsert(toDbPayload(next, orgId!, user?.id), { onConflict: 'org_id,source_key' })
-        .select('*')
-        .single();
-      if (error) throw error;
-      return fromDbRow(data);
+      const fullPayload = toDbPayload(next, orgId, user?.id);
+      const { created_by_user_id: _createdByUserId, ...updatePayload } = fullPayload;
+      let result: SupabaseResult<unknown>;
+
+      if (current.updatedAt) {
+        result = await cronogramaDb
+          .from('cronograma_eventos')
+          .update(updatePayload)
+          .eq('org_id', orgId)
+          .eq('source_key', next.sourceKey)
+          .eq('updated_at', current.updatedAt)
+          .select('*')
+          .single();
+        if (result.error?.code === 'PGRST116' || (!result.error && !result.data)) {
+          queryClient.invalidateQueries({ queryKey: ['cronograma-eventos'] });
+          throw new Error('Este evento foi alterado por outra pessoa. Atualize a página, revise a versão mais recente e tente novamente.');
+        }
+      } else {
+        result = await cronogramaDb
+          .from('cronograma_eventos')
+          .upsert(fullPayload, { onConflict: 'org_id,source_key' })
+          .select('*')
+          .single();
+      }
+
+      if (result.error) throw new Error(result.error.message || 'Não foi possível salvar as alterações.');
+      const saved = fromDbRow(result.data);
+
+      const previousValue = toDbPayload(current, orgId, user?.id);
+      await cronogramaDb.from('cronograma_evento_logs').insert({
+        event_id: saved.id,
+        action: 'updated',
+        previous_value: previousValue,
+        new_value: updatePayload,
+        user_id: user?.id ?? null,
+      });
+
+      return saved;
     },
     onSuccess: (event) => {
       setSessionEvents((current) => {
@@ -323,6 +396,7 @@ export function useCronogramaEventos() {
         return sortCronogramaEvents(current.map((item, index) => (index === existingIndex ? event : item)));
       });
       queryClient.invalidateQueries({ queryKey: ['cronograma-eventos'] });
+      queryClient.invalidateQueries({ queryKey: ['cronograma-event-history', event.id] });
     },
   });
 
@@ -332,10 +406,70 @@ export function useCronogramaEventos() {
   return {
     events,
     isLoading: query.isLoading || isSeedingOfficialData,
+    isRefreshing: query.isFetching,
     isSeedFallback,
+    error: query.error,
+    refetch: query.refetch,
     canManage: isWritableRole(myRole),
     create,
     update,
     seedOfficialData,
+  };
+}
+
+export function useCronogramaEventHistory(eventId: string | null | undefined) {
+  const { myRole } = useCurrentOrg();
+  const canViewHistory = myRole === 'admin' || myRole === 'gestor';
+  const query = useQuery({
+    queryKey: ['cronograma-event-history', eventId],
+    enabled: canViewHistory && isUuid(eventId),
+    staleTime: 15000,
+    retry: false,
+    queryFn: async () => {
+      const { data, error } = await cronogramaDb
+        .from('cronograma_evento_logs')
+        .select('*')
+        .eq('event_id', eventId!)
+        .order('created_at', { ascending: false })
+        .limit(20);
+      if (error) throw new Error(error.message || 'Histórico indisponível.');
+
+      const rows = (data ?? []) as Array<Record<string, unknown>>;
+      const userIds = Array.from(new Set(rows.map((row) => readString(row, 'user_id')).filter(Boolean) as string[]));
+      const profileByUserId = new Map<string, string>();
+      if (userIds.length > 0) {
+        const profiles = await cronogramaDb
+          .from('profiles')
+          .select('user_id,full_name')
+          .in('user_id', userIds)
+          .limit(50);
+        (profiles.data ?? []).forEach((profile) => {
+          const record = profile as Record<string, unknown>;
+          const userId = readString(record, 'user_id');
+          const fullName = readString(record, 'full_name');
+          if (userId && fullName) profileByUserId.set(userId, fullName);
+        });
+      }
+
+      return rows.map<CronogramaHistoryEntry>((row) => {
+        const userId = readString(row, 'user_id');
+        const previous = readObject(row, 'previous_value');
+        const next = readObject(row, 'new_value');
+        return {
+          id: readString(row, 'id') ?? `${readString(row, 'created_at')}-${userId}`,
+          action: readString(row, 'action') ?? 'updated',
+          createdAt: readString(row, 'created_at') ?? new Date().toISOString(),
+          userLabel: (userId && profileByUserId.get(userId)) || 'Usuário autenticado',
+          changedFields: summarizeHistoryChange(previous, next),
+        };
+      });
+    },
+  });
+
+  return {
+    entries: query.data ?? [],
+    isLoading: query.isLoading,
+    error: query.error,
+    canViewHistory,
   };
 }

@@ -16,7 +16,17 @@ export type CronogramaCategory =
   | 'comercial'
   | 'cerimonial';
 
-export type CronogramaStatus = 'confirmed' | 'planned' | 'in_definition' | 'blocked';
+export type CronogramaStatus =
+  | 'confirmed'
+  | 'planned'
+  | 'in_progress'
+  | 'completed'
+  | 'overdue'
+  | 'rescheduled'
+  | 'cancelled'
+  | 'undated'
+  | 'in_definition'
+  | 'blocked';
 
 export type CronogramaPriority = 'critical' | 'high' | 'medium' | 'low';
 
@@ -26,6 +36,7 @@ export interface CronogramaEvent {
   id: string;
   sourceKey?: string;
   sourceCategory?: string;
+  sourceSheet?: string;
   title: string;
   summary: string;
   date: string | null;
@@ -46,6 +57,8 @@ export interface CronogramaEvent {
   isCentralMeeting?: boolean;
   pendingReason?: string;
   decisionNeeded?: string;
+  createdAt?: string | null;
+  updatedAt?: string | null;
   subevents?: Array<{
     title: string;
     date?: string | null;
@@ -57,12 +70,28 @@ export interface CronogramaEvent {
 export interface CronogramaFilters {
   query: string;
   year: 'all' | number;
+  month: 'all' | number;
   category: 'all' | CronogramaCategory;
   status: 'all' | CronogramaStatus;
   priority: 'all' | CronogramaPriority;
+  period: 'all' | 'today' | 'week' | '30days' | 'upcoming' | 'overdue' | 'undated';
+  commission: 'all' | string;
+  owner: 'all' | string;
+  officialOnly: boolean;
+  missingOwner: boolean;
+  fromDate: string;
+  toDate: string;
 }
 
 export interface CronogramaOption<T extends string | number> {
   value: T;
   label: string;
+}
+
+export interface CronogramaHistoryEntry {
+  id: string;
+  action: string;
+  createdAt: string;
+  userLabel: string;
+  changedFields: string[];
 }

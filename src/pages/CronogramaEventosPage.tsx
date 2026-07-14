@@ -1,10 +1,7 @@
-import { useEffect, useMemo, useState } from 'react';
-import { CalendarDays } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { AlertTriangle, CalendarDays, Loader2, RefreshCw } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { CronogramaCommandHeader } from '@/components/cronograma-eventos/CronogramaCommandHeader';
-import { CronogramaFiltersBar } from '@/components/cronograma-eventos/CronogramaFiltersBar';
-import { CronogramaViewTabs, ViewContentTransition } from '@/components/cronograma-eventos/CronogramaViewTabs';
+import { CalendarMonthView } from '@/components/cronograma-eventos/CalendarMonthView';
 import {
   CategoryBoard,
   MeetingsBoard,
@@ -12,8 +9,13 @@ import {
   UndatedBoard,
   YearBoard,
 } from '@/components/cronograma-eventos/CronogramaBoards';
-import { CronogramaTimelineBoard } from '@/components/cronograma-eventos/CronogramaTimelineBoard';
-import { CalendarMonthView } from '@/components/cronograma-eventos/CalendarMonthView';
+import { CronogramaCommandHeader } from '@/components/cronograma-eventos/CronogramaCommandHeader';
+import { CronogramaFiltersBar } from '@/components/cronograma-eventos/CronogramaFiltersBar';
+import {
+  CronogramaTimelineBoard,
+  CronogramaTimelineSkeleton,
+} from '@/components/cronograma-eventos/CronogramaTimelineBoard';
+import { CronogramaViewTabs, ViewContentTransition } from '@/components/cronograma-eventos/CronogramaViewTabs';
 import { EventDrawer } from '@/components/cronograma-eventos/EventDrawer';
 import { EventForm } from '@/components/cronograma-eventos/EventForm';
 import { compareEventDates } from '@/components/cronograma-eventos/dateUtils';
@@ -23,15 +25,26 @@ import {
   visualEventToSourceUpdates,
 } from '@/components/cronograma-eventos/modelAdapter';
 import type { CronogramaEvent, CronogramaFilters, CronogramaView } from '@/components/cronograma-eventos/types';
-import { useCronogramaEventos } from '@/hooks/useCronogramaEventos';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { useCronogramaEventHistory, useCronogramaEventos } from '@/hooks/useCronogramaEventos';
 import type { CronogramaEvent as SourceCronogramaEvent } from '@/lib/cronograma-eventos';
+import { filterTimelineEvents } from '@/lib/cronograma-timeline';
 
 const emptyFilters: CronogramaFilters = {
   query: '',
   year: 'all',
+  month: 'all',
   category: 'all',
   status: 'all',
   priority: 'all',
+  period: 'all',
+  commission: 'all',
+  owner: 'all',
+  officialOnly: false,
+  missingOwner: false,
+  fromDate: '',
+  toDate: '',
 };
 
 const cronogramaViews: CronogramaView[] = ['overview', 'timeline', 'calendar', 'year', 'category', 'meetings', 'undated'];
@@ -48,12 +61,16 @@ export default function CronogramaEventosPage() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerStartsEditing, setDrawerStartsEditing] = useState(false);
   const [createOpen, setCreateOpen] = useState(false);
-  const activeView = isCronogramaView(searchParams.get('view')) ? searchParams.get('view') as CronogramaView : 'overview';
+  const drawerReturnFocusRef = useRef<HTMLElement>(null);
+  const timelinePositionRef = useRef({ x: 0, y: 0 });
+  const activeView = isCronogramaView(searchParams.get('view'))
+    ? searchParams.get('view') as CronogramaView
+    : 'timeline';
 
   const setActiveView = (view: CronogramaView) => {
     setSearchParams((current) => {
       const next = new URLSearchParams(current);
-      if (view === 'overview') next.delete('view');
+      if (view === 'timeline') next.delete('view');
       else next.set('view', view);
       return next;
     }, { replace: true });
@@ -68,6 +85,13 @@ export default function CronogramaEventosPage() {
     });
     return map;
   }, [cronograma.events]);
+  const selectedSourceId = useMemo(() => {
+    if (!selectedEvent) return null;
+    return sourceById.get(selectedEvent.id)?.id
+      ?? (selectedEvent.sourceKey ? sourceById.get(selectedEvent.sourceKey)?.id : null)
+      ?? null;
+  }, [selectedEvent, sourceById]);
+  const eventHistory = useCronogramaEventHistory(selectedSourceId);
 
   useEffect(() => {
     if (!selectedEvent) return;
@@ -75,30 +99,16 @@ export default function CronogramaEventosPage() {
     if (freshEvent && freshEvent !== selectedEvent) setSelectedEvent(freshEvent);
   }, [events, selectedEvent]);
 
-  const filteredEvents = useMemo(() => {
-    const query = filters.query.trim().toLowerCase();
-    return events
-      .filter((event) => {
-        if (filters.year !== 'all' && event.year !== filters.year) return false;
-        if (filters.category !== 'all' && event.category !== filters.category) return false;
-        if (filters.status !== 'all' && event.status !== filters.status) return false;
-        if (filters.priority !== 'all' && event.priority !== filters.priority) return false;
-        if (!query) return true;
-        const haystack = [
-          event.title,
-          event.summary,
-          event.location,
-          event.owner,
-          event.commission,
-          event.pendingReason,
-          event.decisionNeeded,
-        ].filter(Boolean).join(' ').toLowerCase();
-        return haystack.includes(query);
-      })
-      .sort(compareEventDates);
-  }, [events, filters]);
+  const filteredEvents = useMemo(
+    () => filterTimelineEvents(events, filters).sort(compareEventDates),
+    [events, filters],
+  );
 
   const openEvent = (event: CronogramaEvent, edit = false) => {
+    timelinePositionRef.current = { x: window.scrollX, y: window.scrollY };
+    if (document.activeElement instanceof HTMLElement) {
+      drawerReturnFocusRef.current = document.activeElement;
+    }
     setSelectedEvent(event);
     setDrawerStartsEditing(edit);
     setDrawerOpen(true);
@@ -108,20 +118,24 @@ export default function CronogramaEventosPage() {
     setDrawerOpen(open);
     if (!open) {
       setDrawerStartsEditing(false);
+      const { x, y } = timelinePositionRef.current;
+      window.setTimeout(() => window.scrollTo({ left: x, top: y, behavior: 'auto' }), 0);
     }
   };
 
-  const handleSave = (nextEvent: CronogramaEvent) => {
-    const sourceEvent = sourceById.get(nextEvent.id) || (nextEvent.sourceKey ? sourceById.get(nextEvent.sourceKey) : undefined);
+  const handleSave = async (nextEvent: CronogramaEvent) => {
+    const sourceEvent = sourceById.get(nextEvent.id)
+      || (nextEvent.sourceKey ? sourceById.get(nextEvent.sourceKey) : undefined);
     if (sourceEvent) {
-      cronograma.update.mutate({
+      const updated = await cronograma.update.mutateAsync({
         id: sourceEvent.id,
         updates: visualEventToSourceUpdates(nextEvent, sourceEvent),
       });
-    } else {
-      cronograma.create.mutate(visualEventToDraft(nextEvent));
+      setSelectedEvent(adaptCronogramaEvent(updated));
+      return;
     }
-    setSelectedEvent(nextEvent);
+    const created = await cronograma.create.mutateAsync(visualEventToDraft(nextEvent));
+    setSelectedEvent(adaptCronogramaEvent(created));
   };
 
   const handleCreate = (event: CronogramaEvent) => {
@@ -158,10 +172,12 @@ export default function CronogramaEventosPage() {
           <CronogramaViewTabs activeView={activeView} onChange={setActiveView} />
           <CronogramaFiltersBar
             filters={filters}
+            events={events}
             onChange={setFilters}
             onClear={() => setFilters(emptyFilters)}
             resultCount={filteredEvents.length}
             totalCount={events.length}
+            syncing={cronograma.isRefreshing}
           />
         </div>
 
@@ -169,53 +185,84 @@ export default function CronogramaEventosPage() {
           {filteredEvents.length} de {events.length} eventos exibidos na visão atual.
         </p>
 
-        <ViewContentTransition view={activeView}>
-          {activeView === 'overview' && (
-            <OverviewBoard
-              events={filteredEvents}
-              onOpen={(event) => openEvent(event)}
-              onEdit={(event) => openEvent(event, true)}
-              onSwitchView={setActiveView}
-            />
-          )}
+        {cronograma.isSeedFallback && !cronograma.isLoading && (
+          <div className="cronograma-sync-alert" role="alert">
+            <AlertTriangle className="h-4 w-4 shrink-0" aria-hidden="true" />
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-bold">Exibindo a base oficial consolidada</p>
+              <p className="mt-0.5 text-xs opacity-80">A sincronização online não respondeu. Nenhum dado foi descartado.</p>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => cronograma.refetch()}
+              disabled={cronograma.isRefreshing}
+              className="h-8 rounded-lg bg-white/70 text-xs"
+            >
+              {cronograma.isRefreshing
+                ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                : <RefreshCw className="h-3.5 w-3.5" />}
+              Tentar novamente
+            </Button>
+          </div>
+        )}
 
-          {activeView === 'timeline' && (
-            <CronogramaTimelineBoard events={filteredEvents} onOpen={(event) => openEvent(event)} />
-          )}
+        {cronograma.isLoading && events.length === 0 ? (
+          <CronogramaTimelineSkeleton />
+        ) : (
+          <ViewContentTransition view={activeView}>
+            {activeView === 'overview' && (
+              <OverviewBoard
+                events={filteredEvents}
+                onOpen={(event) => openEvent(event)}
+                onEdit={(event) => openEvent(event, true)}
+                onSwitchView={setActiveView}
+              />
+            )}
 
-          {activeView === 'calendar' && (
-            <CalendarMonthView
-              events={filteredEvents}
-              preferredYear={preferredCalendarYear}
-              onOpen={(event) => openEvent(event)}
-              onEdit={(event) => openEvent(event, true)}
-            />
-          )}
+            {activeView === 'timeline' && (
+              <CronogramaTimelineBoard
+                events={filteredEvents}
+                onOpen={(event) => openEvent(event)}
+                onClearFilters={() => setFilters(emptyFilters)}
+              />
+            )}
 
-          {activeView === 'year' && (
-            <YearBoard
-              events={filteredEvents}
-              onOpen={(event) => openEvent(event)}
-              onEdit={(event) => openEvent(event, true)}
-            />
-          )}
+            {activeView === 'calendar' && (
+              <CalendarMonthView
+                events={filteredEvents}
+                preferredYear={preferredCalendarYear}
+                onOpen={(event) => openEvent(event)}
+                onEdit={(event) => openEvent(event, true)}
+              />
+            )}
 
-          {activeView === 'category' && (
-            <CategoryBoard events={filteredEvents} onOpen={(event) => openEvent(event)} />
-          )}
+            {activeView === 'year' && (
+              <YearBoard
+                events={filteredEvents}
+                onOpen={(event) => openEvent(event)}
+                onEdit={(event) => openEvent(event, true)}
+              />
+            )}
 
-          {activeView === 'meetings' && (
-            <MeetingsBoard events={filteredEvents} onOpen={(event) => openEvent(event)} />
-          )}
+            {activeView === 'category' && (
+              <CategoryBoard events={filteredEvents} onOpen={(event) => openEvent(event)} />
+            )}
 
-          {activeView === 'undated' && (
-            <UndatedBoard
-              events={filteredEvents}
-              onOpen={(event) => openEvent(event)}
-              onEdit={(event) => openEvent(event, true)}
-            />
-          )}
-        </ViewContentTransition>
+            {activeView === 'meetings' && (
+              <MeetingsBoard events={filteredEvents} onOpen={(event) => openEvent(event)} />
+            )}
+
+            {activeView === 'undated' && (
+              <UndatedBoard
+                events={filteredEvents}
+                onOpen={(event) => openEvent(event)}
+                onEdit={(event) => openEvent(event, true)}
+              />
+            )}
+          </ViewContentTransition>
+        )}
       </div>
 
       <EventDrawer
@@ -224,17 +271,23 @@ export default function CronogramaEventosPage() {
         onOpenChange={handleDrawerOpenChange}
         onSave={handleSave}
         startInEdit={drawerStartsEditing}
+        canManage={cronograma.canManage}
+        returnFocusRef={drawerReturnFocusRef}
+        history={eventHistory.entries}
+        historyLoading={eventHistory.isLoading}
+        historyError={eventHistory.error}
+        canViewHistory={eventHistory.canViewHistory}
       />
 
       <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-        <DialogContent className="max-w-3xl">
+        <DialogContent className="cronograma-create-dialog max-w-3xl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <CalendarDays className="h-5 w-5 text-gold" />
               Novo evento do cronograma
             </DialogTitle>
             <DialogDescription>
-              Criação local para planejamento e apresentação do cronograma. Não altera dados operacionais existentes.
+              Cadastre uma ação complementar no cronograma da organização. Os dados oficiais existentes permanecem preservados.
             </DialogDescription>
           </DialogHeader>
           <div className="overflow-y-auto pr-1">
@@ -242,6 +295,8 @@ export default function CronogramaEventosPage() {
               onSubmit={handleCreate}
               onCancel={() => setCreateOpen(false)}
               submitLabel="Criar evento"
+              isSaving={cronograma.create.isPending}
+              submitError={cronograma.create.error instanceof Error ? cronograma.create.error.message : null}
             />
           </div>
         </DialogContent>

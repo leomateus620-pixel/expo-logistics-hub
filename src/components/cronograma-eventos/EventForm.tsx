@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import { CalendarClock, Layers3, Plus, Save, Trash2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -28,6 +28,21 @@ const kindLabels: Record<CronogramaKind, string> = {
   decision: 'Decisão',
 };
 
+const editableStatusLabels: Partial<Record<CronogramaStatus, string>> = {
+  planned: statusLabels.planned,
+  in_progress: statusLabels.in_progress,
+  in_definition: statusLabels.in_definition,
+  blocked: statusLabels.blocked,
+  completed: statusLabels.completed,
+  cancelled: statusLabels.cancelled,
+};
+
+function normalizeEditableStatus(status: CronogramaStatus): CronogramaStatus {
+  if (status === 'overdue' || status === 'confirmed' || status === 'rescheduled') return 'planned';
+  if (status === 'undated') return 'in_definition';
+  return status;
+}
+
 const defaultForm: CronogramaEvent = {
   id: '',
   title: '',
@@ -55,17 +70,43 @@ export function EventForm({
   onSubmit,
   onCancel,
   submitLabel = 'Salvar alterações',
+  formId = 'cronograma-event-form',
+  showActions = true,
+  isSaving = false,
+  submitError,
+  onDirtyChange,
 }: {
   event?: CronogramaEvent | null;
   onSubmit: (event: CronogramaEvent) => void;
   onCancel: () => void;
   submitLabel?: string;
+  formId?: string;
+  showActions?: boolean;
+  isSaving?: boolean;
+  submitError?: string | null;
+  onDirtyChange?: (dirty: boolean) => void;
 }) {
-  const [form, setForm] = useState<CronogramaEvent>(() => ({ ...defaultForm, ...(event || {}) }));
+  const initialForm = useMemo<CronogramaEvent>(() => {
+    const next = { ...defaultForm, ...(event || {}) };
+    return {
+      ...next,
+      status: normalizeEditableStatus(next.status),
+      subevents: next.subevents?.map((subevent) => ({
+        ...subevent,
+        status: normalizeEditableStatus(subevent.status ?? 'planned'),
+      })),
+    };
+  }, [event]);
+  const initialSignature = useMemo(() => JSON.stringify(initialForm), [initialForm]);
+  const [form, setForm] = useState<CronogramaEvent>(initialForm);
 
   useEffect(() => {
-    setForm({ ...defaultForm, ...(event || {}) });
-  }, [event]);
+    setForm(initialForm);
+  }, [initialForm]);
+
+  useEffect(() => {
+    onDirtyChange?.(JSON.stringify(form) !== initialSignature);
+  }, [form, initialSignature, onDirtyChange]);
 
   const update = <K extends keyof CronogramaEvent>(key: K, value: CronogramaEvent[K]) => {
     setForm((current) => ({ ...current, [key]: value }));
@@ -97,7 +138,8 @@ export function EventForm({
     }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (submitEvent: FormEvent<HTMLFormElement>) => {
+    submitEvent.preventDefault();
     const normalizedDate = form.date?.trim() ? form.date : null;
     const nextYear = normalizedDate ? Number(normalizedDate.slice(0, 4)) : Number(form.year || 2028);
     const normalizedSubevents = (form.subevents ?? [])
@@ -127,8 +169,8 @@ export function EventForm({
   };
 
   return (
-    <div className="space-y-4">
-      <div className="rounded-2xl border border-white/60 bg-white/58 p-4 shadow-[inset_0_1px_0_rgb(255_255_255/0.62)]">
+    <form id={formId} onSubmit={handleSubmit} className="space-y-4" noValidate>
+      <div className="cronograma-form-section">
         <div className="mb-3 flex items-center gap-2">
           <CalendarClock className="h-4 w-4 text-gold" />
           <h3 className="text-sm font-black uppercase tracking-[0.14em] text-foreground/72">Identidade do evento</h3>
@@ -158,7 +200,7 @@ export function EventForm({
         </div>
       </div>
 
-      <div className="rounded-2xl border border-white/60 bg-white/58 p-4 shadow-[inset_0_1px_0_rgb(255_255_255/0.62)]">
+      <div className="cronograma-form-section">
         <div className="mb-3 flex items-center gap-2">
           <Layers3 className="h-4 w-4 text-primary" />
           <h3 className="text-sm font-black uppercase tracking-[0.14em] text-foreground/72">Classificação</h3>
@@ -174,7 +216,7 @@ export function EventForm({
             label="Status"
             value={form.status}
             onChange={(value) => update('status', value as CronogramaStatus)}
-            items={statusLabels}
+            items={editableStatusLabels}
           />
           <SelectField
             label="Prioridade"
@@ -191,7 +233,7 @@ export function EventForm({
         </div>
       </div>
 
-      <div className="rounded-2xl border border-white/60 bg-white/58 p-4 shadow-[inset_0_1px_0_rgb(255_255_255/0.62)]">
+      <div className="cronograma-form-section">
         <h3 className="mb-3 text-sm font-black uppercase tracking-[0.14em] text-foreground/72">Data, local e responsáveis</h3>
         <div className="grid gap-3 sm:grid-cols-3">
           <div className="space-y-1.5">
@@ -250,7 +292,7 @@ export function EventForm({
         </div>
       </div>
 
-      <div className="rounded-2xl border border-amber-900/10 bg-gold/[0.07] p-4">
+      <div className="cronograma-form-section is-pending">
         <h3 className="mb-3 text-sm font-black uppercase tracking-[0.14em] text-amber-950/72">Quando ainda não há data</h3>
         <div className="grid gap-3">
           <div className="space-y-1.5">
@@ -277,7 +319,7 @@ export function EventForm({
         </div>
       </div>
 
-      <div className="rounded-2xl border border-white/60 bg-white/58 p-4 shadow-[inset_0_1px_0_rgb(255_255_255/0.62)]">
+      <div className="cronograma-form-section">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <div>
             <h3 className="text-sm font-black uppercase tracking-[0.14em] text-foreground/72">Subeventos vinculados</h3>
@@ -334,7 +376,7 @@ export function EventForm({
                     label="Status"
                     value={subevent.status || 'planned'}
                     onChange={(value) => updateSubevent(index, 'status', value as CronogramaStatus)}
-                    items={statusLabels}
+                    items={editableStatusLabels}
                   />
                   <div className="flex items-end">
                     <Button
@@ -355,17 +397,21 @@ export function EventForm({
         )}
       </div>
 
-      <div className="sticky bottom-0 -mx-1 flex justify-end gap-2 border-t border-white/60 bg-white/80 px-1 py-3 backdrop-blur-xl">
-        <Button type="button" variant="outline" onClick={onCancel} className="rounded-full">
-          <X className="h-4 w-4" />
-          Cancelar
-        </Button>
-        <Button type="button" onClick={handleSubmit} className="rounded-full">
-          <Save className="h-4 w-4" />
-          {submitLabel}
-        </Button>
-      </div>
-    </div>
+      {submitError && <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-semibold text-red-900" role="alert">{submitError}</p>}
+
+      {showActions && (
+        <div className="flex flex-wrap justify-end gap-2 border-t border-border/50 pt-4">
+          <Button type="button" variant="outline" onClick={onCancel} disabled={isSaving} className="rounded-lg">
+            <X className="h-4 w-4" />
+            Cancelar
+          </Button>
+          <Button type="submit" disabled={isSaving} className="rounded-lg">
+            <Save className="h-4 w-4" />
+            {isSaving ? 'Salvando…' : submitLabel}
+          </Button>
+        </div>
+      )}
+    </form>
   );
 }
 
@@ -384,7 +430,7 @@ function SelectField<T extends string>({
     <div className="space-y-1.5">
       <Label>{label}</Label>
       <Select value={value} onValueChange={onChange}>
-        <SelectTrigger className="rounded-2xl border-white/60 bg-white/72">
+        <SelectTrigger aria-label={label} className="rounded-2xl border-white/60 bg-white/72">
           <SelectValue />
         </SelectTrigger>
         <SelectContent className="rounded-2xl bg-white/95">
