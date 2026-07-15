@@ -242,6 +242,16 @@ async function persistSnapshot(orgId: string, transportId: string, lat: number, 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: corsHeaders });
 
+  // KILL-SWITCH: feature de clima pausada. Não grava snapshots nem consome API.
+  // Para reativar, remova este bloco.
+  return new Response(
+    JSON.stringify({ ok: true, disabled: true, weather: null, snapshot: null, reason: 'weather_feature_disabled' }),
+    { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
+  );
+
+  // eslint-disable-next-line no-unreachable
+
+
   const t0 = Date.now();
   try {
     const body = await req.json();
