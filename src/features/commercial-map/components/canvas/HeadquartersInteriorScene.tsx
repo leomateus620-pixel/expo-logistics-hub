@@ -372,7 +372,7 @@ function InteriorCameraRig({ entity }: { entity: MapEntity }) {
       maxPolarAngle={Math.PI / 2.02}
       target={toWorld(0, 1.35, -0.35).toArray()}
       onStart={() => { animating.current = false; }}
-      onChange={invalidate}
+      onChange={() => invalidate()}
     />
   );
 }
