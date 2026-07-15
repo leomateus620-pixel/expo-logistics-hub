@@ -2,6 +2,8 @@ import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
 import "./index.css";
 import "./styles/cronograma-operational-overrides.css";
+import "./styles/cronograma-mobile.css";
+import "./styles/cronograma-mobile-overlays.css";
 
 const RECOVERY_KEY = 'fenasoja-recovery-attempted';
 const RELOAD_KEY = 'fenasoja-sw-reloaded';

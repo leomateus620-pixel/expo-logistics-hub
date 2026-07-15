@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useEffect, useId, useMemo, useRef, useState, type FormEvent } from 'react';
 import { CalendarClock, Layers3, Plus, Save, Trash2, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -75,9 +75,11 @@ export function EventForm({
   isSaving = false,
   submitError,
   onDirtyChange,
+  presentation = 'desktop',
+  defaultYear,
 }: {
   event?: CronogramaEvent | null;
-  onSubmit: (event: CronogramaEvent) => void;
+  onSubmit: (event: CronogramaEvent) => Promise<void> | void;
   onCancel: () => void;
   submitLabel?: string;
   formId?: string;
@@ -85,9 +87,17 @@ export function EventForm({
   isSaving?: boolean;
   submitError?: string | null;
   onDirtyChange?: (dirty: boolean) => void;
+  presentation?: 'desktop' | 'mobile';
+  defaultYear?: CronogramaEvent['year'];
 }) {
+  const formInstanceId = useId().replace(/:/g, '');
+  const fieldId = (name: string) => `${formInstanceId}-${name}`;
   const initialForm = useMemo<CronogramaEvent>(() => {
-    const next = { ...defaultForm, ...(event || {}) };
+    const next = {
+      ...defaultForm,
+      ...(!event && defaultYear ? { year: defaultYear } : {}),
+      ...(event || {}),
+    };
     return {
       ...next,
       status: normalizeEditableStatus(next.status),
@@ -96,17 +106,30 @@ export function EventForm({
         status: normalizeEditableStatus(subevent.status ?? 'planned'),
       })),
     };
-  }, [event]);
+  }, [defaultYear, event]);
   const initialSignature = useMemo(() => JSON.stringify(initialForm), [initialForm]);
   const [form, setForm] = useState<CronogramaEvent>(initialForm);
+  const [baselineSignature, setBaselineSignature] = useState(initialSignature);
+  const [fieldErrors, setFieldErrors] = useState<{ title?: string; time?: string }>({});
+  const formIdentity = event?.sourceKey ?? event?.id ?? '__new-cronograma-event__';
+  const formIdentityRef = useRef(formIdentity);
+  const dirtyRef = useRef(false);
 
   useEffect(() => {
+    const identityChanged = formIdentityRef.current !== formIdentity;
+    if (!identityChanged && dirtyRef.current) return;
+    formIdentityRef.current = formIdentity;
+    dirtyRef.current = false;
     setForm(initialForm);
-  }, [initialForm]);
+    setBaselineSignature(initialSignature);
+    setFieldErrors({});
+  }, [formIdentity, initialForm, initialSignature]);
 
   useEffect(() => {
-    onDirtyChange?.(JSON.stringify(form) !== initialSignature);
-  }, [form, initialSignature, onDirtyChange]);
+    const dirty = JSON.stringify(form) !== baselineSignature;
+    dirtyRef.current = dirty;
+    onDirtyChange?.(dirty);
+  }, [baselineSignature, form, onDirtyChange]);
 
   const update = <K extends keyof CronogramaEvent>(key: K, value: CronogramaEvent[K]) => {
     setForm((current) => ({ ...current, [key]: value }));
@@ -140,6 +163,23 @@ export function EventForm({
 
   const handleSubmit = (submitEvent: FormEvent<HTMLFormElement>) => {
     submitEvent.preventDefault();
+    if (isSaving) return;
+
+    if (presentation === 'mobile') {
+      const nextErrors: { title?: string; time?: string } = {};
+      if (!form.title.trim()) nextErrors.title = 'Informe um título para identificar o evento.';
+      if (form.startTime && form.endTime && form.endTime <= form.startTime) {
+        nextErrors.time = 'O horário final deve ser posterior ao horário inicial.';
+      }
+      setFieldErrors(nextErrors);
+      if (Object.keys(nextErrors).length > 0) {
+        window.requestAnimationFrame(() => {
+          document.getElementById(nextErrors.title ? fieldId('title') : fieldId('end'))?.focus();
+        });
+        return;
+      }
+    }
+
     const normalizedDate = form.date?.trim() ? form.date : null;
     const nextYear = normalizedDate ? Number(normalizedDate.slice(0, 4)) : Number(form.year || 2028);
     const normalizedSubevents = (form.subevents ?? [])
@@ -153,8 +193,8 @@ export function EventForm({
 
     onSubmit({
       ...form,
-      title: form.title.trim() || 'Novo evento do cronograma',
-      summary: form.summary.trim() || 'Descrição executiva a complementar.',
+      title: form.title.trim() || (presentation === 'desktop' ? 'Novo evento do cronograma' : ''),
+      summary: form.summary.trim() || (presentation === 'desktop' ? 'Descrição executiva a complementar.' : ''),
       date: normalizedDate,
       year: nextYear,
       startTime: form.startTime?.trim() || undefined,
@@ -169,7 +209,13 @@ export function EventForm({
   };
 
   return (
-    <form id={formId} onSubmit={handleSubmit} className="space-y-4" noValidate>
+    <form
+      id={formId}
+      onSubmit={handleSubmit}
+      className="cronograma-event-form space-y-4"
+      data-presentation={presentation}
+      noValidate
+    >
       <div className="cronograma-form-section">
         <div className="mb-3 flex items-center gap-2">
           <CalendarClock className="h-4 w-4 text-gold" />
@@ -177,19 +223,34 @@ export function EventForm({
         </div>
         <div className="grid gap-3">
           <div className="space-y-1.5">
-            <Label htmlFor="cronograma-title">Título</Label>
+            <Label htmlFor={fieldId('title')}>
+              Título {presentation === 'mobile' && <span aria-hidden="true" className="text-red-700">*</span>}
+            </Label>
             <Input
-              id="cronograma-title"
+              id={fieldId('title')}
               value={form.title}
-              onChange={(event) => update('title', event.target.value)}
+              onChange={(event) => {
+                update('title', event.target.value);
+                if (fieldErrors.title) setFieldErrors((current) => ({ ...current, title: undefined }));
+              }}
               placeholder="Ex: Abertura oficial Fenasoja 2028"
               className="bg-white/72"
+              required={presentation === 'mobile'}
+              aria-invalid={Boolean(fieldErrors.title) || undefined}
+              aria-describedby={fieldErrors.title ? fieldId('title-error') : undefined}
             />
+            {fieldErrors.title && (
+              <p id={fieldId('title-error')} className="cronograma-mobile-field-error" role="alert">
+                {fieldErrors.title}
+              </p>
+            )}
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="cronograma-summary">Resumo executivo</Label>
+            <Label htmlFor={fieldId('summary')}>
+              Resumo executivo {presentation === 'mobile' && <span className="font-normal text-muted-foreground">(opcional)</span>}
+            </Label>
             <Textarea
-              id="cronograma-summary"
+              id={fieldId('summary')}
               rows={3}
               value={form.summary}
               onChange={(event) => update('summary', event.target.value)}
@@ -208,24 +269,28 @@ export function EventForm({
         <div className="grid gap-3 sm:grid-cols-2">
           <SelectField
             label="Categoria"
+            mobile={presentation === 'mobile'}
             value={form.category}
             onChange={(value) => update('category', value as CronogramaCategory)}
             items={categoryLabels}
           />
           <SelectField
             label="Status"
+            mobile={presentation === 'mobile'}
             value={form.status}
             onChange={(value) => update('status', value as CronogramaStatus)}
             items={editableStatusLabels}
           />
           <SelectField
             label="Prioridade"
+            mobile={presentation === 'mobile'}
             value={form.priority}
             onChange={(value) => update('priority', value as CronogramaPriority)}
             items={priorityLabels}
           />
           <SelectField
             label="Tipo"
+            mobile={presentation === 'mobile'}
             value={form.kind}
             onChange={(value) => update('kind', value as CronogramaKind)}
             items={kindLabels}
@@ -237,9 +302,11 @@ export function EventForm({
         <h3 className="mb-3 text-sm font-black uppercase tracking-[0.14em] text-foreground/72">Data, local e responsáveis</h3>
         <div className="grid gap-3 sm:grid-cols-3">
           <div className="space-y-1.5">
-            <Label htmlFor="cronograma-date">Data</Label>
+            <Label htmlFor={fieldId('date')}>
+              Data {presentation === 'mobile' && <span className="font-normal text-muted-foreground">(opcional)</span>}
+            </Label>
             <Input
-              id="cronograma-date"
+              id={fieldId('date')}
               type="date"
               value={form.date || ''}
               onChange={(event) => update('date', event.target.value || null)}
@@ -247,32 +314,45 @@ export function EventForm({
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="cronograma-start">Início</Label>
+            <Label htmlFor={fieldId('start')}>Início</Label>
             <Input
-              id="cronograma-start"
+              id={fieldId('start')}
               type="time"
               value={form.startTime || ''}
-              onChange={(event) => update('startTime', event.target.value)}
+              onChange={(event) => {
+                update('startTime', event.target.value);
+                if (fieldErrors.time) setFieldErrors((current) => ({ ...current, time: undefined }));
+              }}
               className="bg-white/72"
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="cronograma-end">Fim</Label>
+            <Label htmlFor={fieldId('end')}>Fim</Label>
             <Input
-              id="cronograma-end"
+              id={fieldId('end')}
               type="time"
               value={form.endTime || ''}
-              onChange={(event) => update('endTime', event.target.value)}
+              onChange={(event) => {
+                update('endTime', event.target.value);
+                if (fieldErrors.time) setFieldErrors((current) => ({ ...current, time: undefined }));
+              }}
               className="bg-white/72"
+              aria-invalid={Boolean(fieldErrors.time) || undefined}
+              aria-describedby={fieldErrors.time ? fieldId('time-error') : undefined}
             />
+            {fieldErrors.time && (
+              <p id={fieldId('time-error')} className="cronograma-mobile-field-error" role="alert">
+                {fieldErrors.time}
+              </p>
+            )}
           </div>
         </div>
 
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           <div className="space-y-1.5">
-            <Label htmlFor="cronograma-location">Local</Label>
+            <Label htmlFor={fieldId('location')}>Local</Label>
             <Input
-              id="cronograma-location"
+              id={fieldId('location')}
               value={form.location || ''}
               onChange={(event) => update('location', event.target.value)}
               placeholder="Local ou área do parque"
@@ -280,9 +360,9 @@ export function EventForm({
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="cronograma-owner">Responsável</Label>
+            <Label htmlFor={fieldId('owner')}>Responsável</Label>
             <Input
-              id="cronograma-owner"
+              id={fieldId('owner')}
               value={form.owner || ''}
               onChange={(event) => update('owner', event.target.value)}
               placeholder="Comissão, pessoa ou coordenação"
@@ -296,9 +376,9 @@ export function EventForm({
         <h3 className="mb-3 text-sm font-black uppercase tracking-[0.14em] text-amber-950/72">Quando ainda não há data</h3>
         <div className="grid gap-3">
           <div className="space-y-1.5">
-            <Label htmlFor="cronograma-pending">Motivo da pendência</Label>
+            <Label htmlFor={fieldId('pending')}>Motivo da pendência</Label>
             <Input
-              id="cronograma-pending"
+              id={fieldId('pending')}
               value={form.pendingReason || ''}
               onChange={(event) => update('pendingReason', event.target.value)}
               placeholder="Ex: aguardando contrato, fornecedor ou validação externa"
@@ -306,9 +386,9 @@ export function EventForm({
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor="cronograma-decision">Decisão necessária</Label>
+            <Label htmlFor={fieldId('decision')}>Decisão necessária</Label>
             <Textarea
-              id="cronograma-decision"
+              id={fieldId('decision')}
               rows={2}
               value={form.decisionNeeded || ''}
               onChange={(event) => update('decisionNeeded', event.target.value)}
@@ -338,12 +418,12 @@ export function EventForm({
         ) : (
           <div className="space-y-3">
             {(form.subevents ?? []).map((subevent, index) => (
-              <div key={`${subevent.title}-${index}`} className="rounded-2xl border border-border/35 bg-white/64 p-3">
+              <div key={index} className="rounded-2xl border border-border/35 bg-white/64 p-3">
                 <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_150px]">
                   <div className="space-y-1.5">
-                    <Label htmlFor={`cronograma-subevent-title-${index}`}>Título do subevento</Label>
+                    <Label htmlFor={fieldId(`subevent-title-${index}`)}>Título do subevento</Label>
                     <Input
-                      id={`cronograma-subevent-title-${index}`}
+                      id={fieldId(`subevent-title-${index}`)}
                       value={subevent.title}
                       onChange={(event) => updateSubevent(index, 'title', event.target.value)}
                       placeholder="Ex: validação de fornecedores"
@@ -351,9 +431,9 @@ export function EventForm({
                     />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor={`cronograma-subevent-date-${index}`}>Data</Label>
+                    <Label htmlFor={fieldId(`subevent-date-${index}`)}>Data</Label>
                     <Input
-                      id={`cronograma-subevent-date-${index}`}
+                      id={fieldId(`subevent-date-${index}`)}
                       type="date"
                       value={subevent.date || ''}
                       onChange={(event) => updateSubevent(index, 'date', event.target.value || null)}
@@ -363,9 +443,9 @@ export function EventForm({
                 </div>
                 <div className="mt-3 grid gap-3 sm:grid-cols-[minmax(0,1fr)_170px_auto]">
                   <div className="space-y-1.5">
-                    <Label htmlFor={`cronograma-subevent-owner-${index}`}>Responsável</Label>
+                    <Label htmlFor={fieldId(`subevent-owner-${index}`)}>Responsável</Label>
                     <Input
-                      id={`cronograma-subevent-owner-${index}`}
+                      id={fieldId(`subevent-owner-${index}`)}
                       value={subevent.owner || ''}
                       onChange={(event) => updateSubevent(index, 'owner', event.target.value)}
                       placeholder="Comissão ou responsável"
@@ -374,6 +454,7 @@ export function EventForm({
                   </div>
                   <SelectField
                     label="Status"
+                    mobile={presentation === 'mobile'}
                     value={subevent.status || 'planned'}
                     onChange={(value) => updateSubevent(index, 'status', value as CronogramaStatus)}
                     items={editableStatusLabels}
@@ -420,11 +501,13 @@ function SelectField<T extends string>({
   value,
   onChange,
   items,
+  mobile = false,
 }: {
   label: string;
   value: T;
   onChange: (value: string) => void;
   items: Record<string, string>;
+  mobile?: boolean;
 }) {
   return (
     <div className="space-y-1.5">
@@ -433,7 +516,11 @@ function SelectField<T extends string>({
         <SelectTrigger aria-label={label} className="rounded-2xl border-white/60 bg-white/72">
           <SelectValue />
         </SelectTrigger>
-        <SelectContent className="rounded-2xl bg-white/95">
+        <SelectContent
+          className={mobile
+            ? 'cronograma-event-select-content z-[95] max-h-[min(22rem,70dvh)] rounded-2xl bg-white/95'
+            : 'rounded-2xl bg-white/95'}
+        >
           {Object.entries(items).map(([itemValue, itemLabel]) => (
             <SelectItem key={itemValue} value={itemValue} className="rounded-xl">
               {itemLabel}

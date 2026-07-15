@@ -60,16 +60,19 @@ export function CronogramaViewTabs({
 export function ViewContentTransition({
   view,
   children,
+  ariaLabel,
 }: {
   view: CronogramaView;
   children: ReactNode;
+  ariaLabel?: string;
 }) {
   return (
     <section
       key={view}
       id="cronograma-view-panel"
       role="tabpanel"
-      aria-labelledby={`cronograma-tab-${view}`}
+      aria-label={ariaLabel}
+      aria-labelledby={ariaLabel ? undefined : `cronograma-tab-${view}`}
       tabIndex={0}
       className="cronograma-view-transition min-h-[430px] focus-visible:outline-none"
     >
