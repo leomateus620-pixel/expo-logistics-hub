@@ -230,7 +230,7 @@ export function MobileCronogramaTimeline({
     temporalFocusRef.current = temporalFocusKey;
     const preferredYear = preferredTemporalYear ?? yearFromMonth(initialMonth) ?? firstMatchingYear;
     if (!preferredYear) return;
-    commitPosition(preferredYear, firstFilteredMonthByYear[preferredYear] ?? initialMonth, 'temporal-filter', true);
+    commitPosition(preferredYear as 2026 | 2027 | 2028, firstFilteredMonthByYear[preferredYear] ?? initialMonth, 'temporal-filter', true);
   }, [commitPosition, firstFilteredMonthByYear, firstMatchingYear, initialMonth, preferredTemporalYear, temporalFocusKey]);
 
   useEffect(() => {
