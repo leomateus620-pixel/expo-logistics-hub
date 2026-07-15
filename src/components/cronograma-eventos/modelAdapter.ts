@@ -1,4 +1,8 @@
-import type { CronogramaEventDraft } from '@/hooks/useCronogramaEventos';
+import {
+  cronogramaCommissionOptions,
+  type CronogramaSubeventSeed,
+} from '@/data/fenasoja2028CronogramaSeed';
+import type { CronogramaEventDraft, CronogramaSubeventDraft } from '@/hooks/useCronogramaEventos';
 import {
   isCentralMeeting,
   isMainFenasojaEvent,
@@ -12,7 +16,10 @@ import type {
   CronogramaKind,
   CronogramaPriority,
   CronogramaStatus,
+  CronogramaSubevent,
 } from './types';
+
+const commissionBySlug = new Map(cronogramaCommissionOptions.map((commission) => [commission.slug, commission.name]));
 
 const categoryKeywords: Array<[CronogramaCategory, RegExp]> = [
   ['logistica', /log[ií]stica|estacionamento|ve[ií]culos|acesso|mobilidade/i],
@@ -144,12 +151,7 @@ export function adaptCronogramaEvent(event: SourceCronogramaEvent): CronogramaEv
     decisionNeeded: event.hasExactDate ? undefined : 'Definir data oficial e confirmar responsáveis vinculados.',
     createdAt: event.createdAt,
     updatedAt: event.updatedAt,
-    subevents: event.subevents?.map((subevent) => ({
-      title: subevent.title,
-      date: subevent.startDate ?? null,
-      owner: subevent.responsibleName ?? subevent.commissionSlug ?? undefined,
-      status: subevent.status ? sourceToVisualStatus[subevent.status] : 'planned',
-    })),
+    subevents: event.subevents?.map(adaptCronogramaSubevent),
   };
   adapted.status = deriveOperationalStatus(adapted);
   adapted.subevents = adapted.subevents?.map((subevent) => ({
@@ -160,6 +162,63 @@ export function adaptCronogramaEvent(event: SourceCronogramaEvent): CronogramaEv
     }),
   }));
   return adapted;
+}
+
+export function adaptCronogramaSubevent(subevent: CronogramaSubeventSeed): CronogramaSubevent {
+  const status = subevent.status ? sourceToVisualStatus[subevent.status] : 'planned';
+  return {
+    id: subevent.id,
+    title: subevent.title,
+    description: subevent.description ?? null,
+    date: subevent.startDate ?? null,
+    endDate: subevent.endDate ?? null,
+    owner: subevent.responsibleName ?? undefined,
+    status,
+    priority: subevent.priority ? sourceToVisualPriority[subevent.priority] : 'medium',
+    commissionSlug: subevent.commissionSlug ?? undefined,
+    commission: subevent.commissionName
+      ?? (subevent.commissionSlug ? commissionBySlug.get(subevent.commissionSlug) : undefined),
+    sortOrder: subevent.sortOrder,
+    storage: subevent.storage,
+    createdAt: subevent.createdAt,
+    updatedAt: subevent.updatedAt,
+  };
+}
+
+export function visualSubeventToSourceDraft(
+  subevent: CronogramaSubevent,
+  sortOrder = 0,
+): CronogramaSubeventDraft {
+  return {
+    title: subevent.title.trim(),
+    description: subevent.description?.trim() || null,
+    startDate: subevent.date ?? null,
+    endDate: subevent.endDate ?? subevent.date ?? null,
+    responsibleName: subevent.owner?.trim() || null,
+    commissionSlug: subevent.commissionSlug ?? null,
+    status: subevent.status ? visualToSourceStatus[subevent.status] : 'planejado',
+    priority: subevent.priority ? visualToSourcePriority[subevent.priority] : 'media',
+    sortOrder,
+  };
+}
+
+function embeddedSubevents(event: CronogramaEvent, current: SourceCronogramaEvent) {
+  const embedded = event.subevents?.filter((subevent) => subevent.storage !== 'relational');
+  if (!embedded) return current.subevents;
+  return embedded.map((subevent, index) => ({
+    id: subevent.id,
+    title: subevent.title,
+    description: subevent.description ?? null,
+    startDate: subevent.date ?? null,
+    endDate: subevent.endDate ?? subevent.date ?? null,
+    responsibleName: subevent.owner ?? null,
+    commissionSlug: subevent.commissionSlug ?? null,
+    commissionName: subevent.commission ?? null,
+    status: subevent.status ? visualToSourceStatus[subevent.status] : 'planejado',
+    priority: subevent.priority ? visualToSourcePriority[subevent.priority] : 'media',
+    sortOrder: subevent.sortOrder ?? index,
+    storage: 'embedded' as const,
+  }));
 }
 
 export function visualEventToSourceUpdates(
@@ -186,15 +245,7 @@ export function visualEventToSourceUpdates(
     sourceNote: event.pendingReason ?? event.decisionNeeded ?? current.sourceNote,
     hasExactDate,
     linkedCommissions: current.linkedCommissions,
-    subevents: event.subevents?.map((subevent, index) => ({
-      title: subevent.title,
-      startDate: subevent.date ?? null,
-      endDate: subevent.date ?? null,
-      responsibleName: subevent.owner ?? null,
-      status: subevent.status ? visualToSourceStatus[subevent.status] : 'planejado',
-      priority: 'media',
-      sortOrder: index,
-    })) ?? current.subevents,
+    subevents: embeddedSubevents(event, current),
   };
 }
 
@@ -221,14 +272,21 @@ export function visualEventToDraft(event: CronogramaEvent): CronogramaEventDraft
     isOfficialSeed: false,
     hasExactDate,
     linkedCommissions: [],
-    subevents: event.subevents?.map((subevent, index) => ({
-      title: subevent.title,
-      startDate: subevent.date ?? null,
-      endDate: subevent.date ?? null,
-      responsibleName: subevent.owner ?? null,
-      status: subevent.status ? visualToSourceStatus[subevent.status] : 'planejado',
-      priority: 'media',
-      sortOrder: index,
-    })) ?? [],
+    subevents: (event.subevents ?? [])
+      .filter((subevent) => subevent.storage !== 'relational')
+      .map((subevent, index) => ({
+        id: subevent.id,
+        title: subevent.title,
+        description: subevent.description ?? null,
+        startDate: subevent.date ?? null,
+        endDate: subevent.endDate ?? subevent.date ?? null,
+        responsibleName: subevent.owner ?? null,
+        commissionSlug: subevent.commissionSlug ?? null,
+        commissionName: subevent.commission ?? null,
+        status: subevent.status ? visualToSourceStatus[subevent.status] : 'planejado',
+        priority: subevent.priority ? visualToSourcePriority[subevent.priority] : 'media',
+        sortOrder: subevent.sortOrder ?? index,
+        storage: 'embedded',
+      })),
   };
 }
