@@ -77,6 +77,7 @@ export function EventForm({
   onDirtyChange,
   presentation = 'desktop',
   defaultYear,
+  showSubevents = true,
 }: {
   event?: CronogramaEvent | null;
   onSubmit: (event: CronogramaEvent) => Promise<void> | void;
@@ -89,6 +90,7 @@ export function EventForm({
   onDirtyChange?: (dirty: boolean) => void;
   presentation?: 'desktop' | 'mobile';
   defaultYear?: CronogramaEvent['year'];
+  showSubevents?: boolean;
 }) {
   const formInstanceId = useId().replace(/:/g, '');
   const fieldId = (name: string) => `${formInstanceId}-${name}`;
@@ -399,6 +401,7 @@ export function EventForm({
         </div>
       </div>
 
+      {showSubevents && (
       <div className="cronograma-form-section">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
           <div>
@@ -477,6 +480,7 @@ export function EventForm({
           </div>
         )}
       </div>
+      )}
 
       {submitError && <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-semibold text-red-900" role="alert">{submitError}</p>}
 
