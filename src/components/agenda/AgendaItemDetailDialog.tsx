@@ -6,7 +6,7 @@ import {
   Hourglass, Navigation, ExternalLink, Plane, PlaneLanding, Car,
 } from 'lucide-react';
 import { cn, rawTime } from '@/lib/utils';
-import { TransportWeatherCard } from '@/components/weather/TransportWeatherCard';
+// import { TransportWeatherCard } from '@/components/weather/TransportWeatherCard'; // desativado
 import { useNavigate } from 'react-router-dom';
 
 function getShift(iso?: string): 'manha' | 'tarde' | 'noite' {
@@ -266,7 +266,7 @@ export function AgendaItemDetailDialog({
           {/* Transport-specific: weather + guests */}
           {isTransport && (
             <>
-              <TransportWeatherCard transportId={item.id} />
+              {/* TransportWeatherCard desativado */}
               {transportGuests.length > 0 && (
                 <div className="rounded-xl border border-white/10 bg-card/30 p-3 backdrop-blur-xl">
                   <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-1 mb-2">

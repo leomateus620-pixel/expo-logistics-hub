@@ -2,7 +2,7 @@ import { useRef, useState, useCallback } from 'react';
 import { MapPin, User, Users, Sun, Sunset, Moon, ChevronRight, Truck, CalendarClock, CheckCircle2, Car } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn, rawTime } from '@/lib/utils';
-import { WeatherMiniSummary } from '@/components/weather/WeatherMiniSummary';
+// import { WeatherMiniSummary } from '@/components/weather/WeatherMiniSummary'; // desativado
 
 type Shift = 'manha' | 'tarde' | 'noite';
 
@@ -218,7 +218,7 @@ export function AgendaItemCard3D({ item, shift, index, isCurrent, member, commis
                   {item.tipo_tag}
                 </Badge>
               )}
-              {isTransport && <WeatherMiniSummary transportId={item.id} />}
+              {/* WeatherMiniSummary desativado */}
             </div>
 
             {/* Status row */}
