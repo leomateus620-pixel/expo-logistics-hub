@@ -14,6 +14,27 @@ export type Database = {
   }
   public: {
     Tables: {
+      _sync_fk_backup: {
+        Row: {
+          constraint_def: string | null
+          constraint_name: unknown
+          schema_name: unknown
+          table_name: unknown
+        }
+        Insert: {
+          constraint_def?: string | null
+          constraint_name?: unknown
+          schema_name?: unknown
+          table_name?: unknown
+        }
+        Update: {
+          constraint_def?: string | null
+          constraint_name?: unknown
+          schema_name?: unknown
+          table_name?: unknown
+        }
+        Relationships: []
+      }
       audit_log: {
         Row: {
           action: Database["public"]["Enums"]["audit_action"]
@@ -81,15 +102,7 @@ export type Database = {
           id?: string
           org_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "cart_history_cart_id_fkey"
-            columns: ["cart_id"]
-            isOneToOne: false
-            referencedRelation: "electric_carts"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       cart_reservations: {
         Row: {
@@ -221,22 +234,7 @@ export type Database = {
           submitted_by_user_id?: string | null
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "committee_mobility_forms_committee_id_fkey"
-            columns: ["committee_id"]
-            isOneToOne: false
-            referencedRelation: "official_committees"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "committee_mobility_forms_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       committee_mobility_members: {
         Row: {
@@ -287,29 +285,7 @@ export type Database = {
           qr_access_free?: boolean
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "committee_mobility_members_committee_id_fkey"
-            columns: ["committee_id"]
-            isOneToOne: false
-            referencedRelation: "official_committees"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "committee_mobility_members_form_id_fkey"
-            columns: ["form_id"]
-            isOneToOne: false
-            referencedRelation: "committee_mobility_forms"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "committee_mobility_members_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       electric_carts: {
         Row: {
@@ -366,15 +342,7 @@ export type Database = {
           tipo_responsavel?: string
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "electric_carts_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       events: {
         Row: {
@@ -425,15 +393,7 @@ export type Database = {
           titulo?: string
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "events_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       expense_approvals: {
         Row: {
@@ -469,22 +429,7 @@ export type Database = {
           previous_status?: Database["public"]["Enums"]["expense_status"] | null
           reason?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "expense_approvals_expense_id_fkey"
-            columns: ["expense_id"]
-            isOneToOne: false
-            referencedRelation: "expenses"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "expense_approvals_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       expense_categories: {
         Row: {
@@ -520,15 +465,7 @@ export type Database = {
           requires_transport?: boolean
           requires_vehicle?: boolean
         }
-        Relationships: [
-          {
-            foreignKeyName: "expense_categories_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       expense_documents: {
         Row: {
@@ -594,22 +531,7 @@ export type Database = {
           qr_url?: string | null
           validation_status?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "expense_documents_expense_id_fkey"
-            columns: ["expense_id"]
-            isOneToOne: false
-            referencedRelation: "expenses"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "expense_documents_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       expenses: {
         Row: {
@@ -681,43 +603,7 @@ export type Database = {
           updated_at?: string
           vehicle_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "expenses_category_id_fkey"
-            columns: ["category_id"]
-            isOneToOne: false
-            referencedRelation: "expense_categories"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "expenses_event_id_fkey"
-            columns: ["event_id"]
-            isOneToOne: false
-            referencedRelation: "events"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "expenses_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "expenses_transport_id_fkey"
-            columns: ["transport_id"]
-            isOneToOne: false
-            referencedRelation: "transports"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "expenses_vehicle_id_fkey"
-            columns: ["vehicle_id"]
-            isOneToOne: false
-            referencedRelation: "vehicles"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       fenasoja_events: {
         Row: {
@@ -768,15 +654,7 @@ export type Database = {
           titulo?: string
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "fenasoja_events_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       fuel_records: {
         Row: {
@@ -821,22 +699,7 @@ export type Database = {
           valor?: number | null
           vehicle_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "fuel_records_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "fuel_records_vehicle_id_fkey"
-            columns: ["vehicle_id"]
-            isOneToOne: false
-            referencedRelation: "vehicles"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       guests: {
         Row: {
@@ -884,15 +747,7 @@ export type Database = {
           tipo?: string | null
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "guests_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       mobility_authorizations: {
         Row: {
@@ -976,57 +831,7 @@ export type Database = {
           synced_at?: string
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "mobility_authorizations_committee_id_fkey"
-            columns: ["committee_id"]
-            isOneToOne: false
-            referencedRelation: "official_committees"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "mobility_authorizations_internal_form_id_fkey"
-            columns: ["internal_form_id"]
-            isOneToOne: false
-            referencedRelation: "committee_mobility_forms"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "mobility_authorizations_internal_member_id_fkey"
-            columns: ["internal_member_id"]
-            isOneToOne: false
-            referencedRelation: "committee_mobility_members"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "mobility_authorizations_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "mobility_authorizations_source_form_id_fkey"
-            columns: ["source_form_id"]
-            isOneToOne: false
-            referencedRelation: "public_mobility_forms"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "mobility_authorizations_source_link_id_fkey"
-            columns: ["source_link_id"]
-            isOneToOne: false
-            referencedRelation: "public_form_links"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "mobility_authorizations_source_member_id_fkey"
-            columns: ["source_member_id"]
-            isOneToOne: false
-            referencedRelation: "public_mobility_members"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       notification_recipients: {
         Row: {
@@ -1095,15 +900,7 @@ export type Database = {
           president_name?: string
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "official_committees_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       org_members: {
         Row: {
@@ -1151,15 +948,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "org_members_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       organizations: {
         Row: {
@@ -1231,29 +1020,7 @@ export type Database = {
           org_id?: string
           payload?: Json
         }
-        Relationships: [
-          {
-            foreignKeyName: "public_form_audit_form_id_fkey"
-            columns: ["form_id"]
-            isOneToOne: false
-            referencedRelation: "public_mobility_forms"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "public_form_audit_link_id_fkey"
-            columns: ["link_id"]
-            isOneToOne: false
-            referencedRelation: "public_form_links"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "public_form_audit_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       public_form_links: {
         Row: {
@@ -1295,22 +1062,7 @@ export type Database = {
           token_hint?: string
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "public_form_links_committee_id_fkey"
-            columns: ["committee_id"]
-            isOneToOne: false
-            referencedRelation: "official_committees"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "public_form_links_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       public_mobility_forms: {
         Row: {
@@ -1370,29 +1122,7 @@ export type Database = {
           submitted_at?: string | null
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "public_mobility_forms_committee_id_fkey"
-            columns: ["committee_id"]
-            isOneToOne: false
-            referencedRelation: "official_committees"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "public_mobility_forms_link_id_fkey"
-            columns: ["link_id"]
-            isOneToOne: true
-            referencedRelation: "public_form_links"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "public_mobility_forms_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       public_mobility_members: {
         Row: {
@@ -1440,29 +1170,7 @@ export type Database = {
           qr_access_free?: boolean
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "public_mobility_members_committee_id_fkey"
-            columns: ["committee_id"]
-            isOneToOne: false
-            referencedRelation: "official_committees"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "public_mobility_members_form_id_fkey"
-            columns: ["form_id"]
-            isOneToOne: false
-            referencedRelation: "public_mobility_forms"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "public_mobility_members_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       reimbursements: {
         Row: {
@@ -1528,22 +1236,7 @@ export type Database = {
           requested_at?: string
           status?: Database["public"]["Enums"]["reimbursement_status"]
         }
-        Relationships: [
-          {
-            foreignKeyName: "reimbursements_expense_id_fkey"
-            columns: ["expense_id"]
-            isOneToOne: false
-            referencedRelation: "expenses"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "reimbursements_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       schedule_shifts: {
         Row: {
@@ -1582,22 +1275,7 @@ export type Database = {
           titulo?: string
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "schedule_shifts_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "schedule_shifts_schedule_id_fkey"
-            columns: ["schedule_id"]
-            isOneToOne: false
-            referencedRelation: "schedules"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       schedules: {
         Row: {
@@ -1633,15 +1311,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["schedule_status"]
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "schedules_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       scooter_history: {
         Row: {
@@ -1674,15 +1344,7 @@ export type Database = {
           org_id?: string
           scooter_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "scooter_history_scooter_id_fkey"
-            columns: ["scooter_id"]
-            isOneToOne: false
-            referencedRelation: "scooters"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       scooter_reservations: {
         Row: {
@@ -1799,15 +1461,7 @@ export type Database = {
           tipo_responsavel?: string
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "scooters_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       security_audit_reports: {
         Row: {
@@ -1876,22 +1530,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["assignment_status"]
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "shift_assignments_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "shift_assignments_schedule_shift_id_fkey"
-            columns: ["schedule_shift_id"]
-            isOneToOne: false
-            referencedRelation: "schedule_shifts"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       tasks: {
         Row: {
@@ -1942,15 +1581,7 @@ export type Database = {
           titulo?: string
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "tasks_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       transport_guests: {
         Row: {
@@ -1974,36 +1605,7 @@ export type Database = {
           org_id?: string
           transport_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "transport_guests_guest_id_fkey"
-            columns: ["guest_id"]
-            isOneToOne: false
-            referencedRelation: "guests"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "transport_guests_guest_id_fkey"
-            columns: ["guest_id"]
-            isOneToOne: false
-            referencedRelation: "guests_safe"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "transport_guests_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "transport_guests_transport_id_fkey"
-            columns: ["transport_id"]
-            isOneToOne: false
-            referencedRelation: "transports"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       transport_locations: {
         Row: {
@@ -2045,22 +1647,7 @@ export type Database = {
           transport_id?: string
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "transport_locations_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "transport_locations_transport_id_fkey"
-            columns: ["transport_id"]
-            isOneToOne: true
-            referencedRelation: "transports"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       transport_weather_alerts: {
         Row: {
@@ -2105,15 +1692,7 @@ export type Database = {
           title?: string
           transport_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "transport_weather_alerts_snapshot_id_fkey"
-            columns: ["snapshot_id"]
-            isOneToOne: false
-            referencedRelation: "transport_weather_snapshots"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       transport_weather_snapshots: {
         Row: {
@@ -2368,36 +1947,7 @@ export type Database = {
           voo_cidade?: string | null
           voo_numero?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "transports_guest_id_fkey"
-            columns: ["guest_id"]
-            isOneToOne: false
-            referencedRelation: "guests"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "transports_guest_id_fkey"
-            columns: ["guest_id"]
-            isOneToOne: false
-            referencedRelation: "guests_safe"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "transports_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "transports_vehicle_id_fkey"
-            columns: ["vehicle_id"]
-            isOneToOne: false
-            referencedRelation: "vehicles"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       user_capabilities: {
         Row: {
@@ -2421,15 +1971,7 @@ export type Database = {
           org_id?: string
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "user_capabilities_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       user_roles: {
         Row: {
@@ -2492,22 +2034,7 @@ export type Database = {
           updated_at?: string
           vehicle_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "vehicle_usage_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "vehicle_usage_vehicle_id_fkey"
-            columns: ["vehicle_id"]
-            isOneToOne: false
-            referencedRelation: "vehicles"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       vehicles: {
         Row: {
@@ -2567,15 +2094,7 @@ export type Database = {
           status?: Database["public"]["Enums"]["vehicle_status"]
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "vehicles_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       weather_city_cache: {
         Row: {
@@ -2703,15 +2222,7 @@ export type Database = {
           tipo?: string | null
           updated_at?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "guests_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       org_members_safe: {
         Row: {
@@ -2759,15 +2270,7 @@ export type Database = {
           updated_at?: string | null
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "org_members_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
     }
     Functions: {
