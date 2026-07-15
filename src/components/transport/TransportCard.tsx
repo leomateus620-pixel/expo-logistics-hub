@@ -5,7 +5,7 @@ import { Check, Clock, X, Pencil, Trash2, FileText, Navigation, Play, Square, Ch
 import { cn, rawTime, rawDateShort, getEffectiveEstimatedKm, getEffectiveOneWayMin, getEffectiveTotalMin } from '@/lib/utils';
 import TransportDynamicIsland from '@/components/TransportDynamicIsland';
 import { buildTripMessage, buildWhatsAppUrl, isValidPhone } from '@/lib/whatsapp';
-import { TransportWeatherCard } from '@/components/weather/TransportWeatherCard';
+// import { TransportWeatherCard } from '@/components/weather/TransportWeatherCard'; // desativado
 
 const statusConfig: Record<string, { label: string; icon: typeof Check; class: string; dotClass: string; bgClass: string }> = {
   pendente: { label: 'Pendente', icon: Clock, class: 'text-info', dotClass: 'bg-info', bgClass: 'bg-info/10 border-info/20' },
@@ -181,8 +181,8 @@ export default function TransportCard({ t, members, vehicles, guests, highlightI
           )}
         </div>
 
-        {/* Weather */}
-        <TransportWeatherCard transportId={t.id} />
+        {/* Weather desativado */}
+
 
         {/* Actions */}
         <div className="flex items-center gap-2 pt-1">

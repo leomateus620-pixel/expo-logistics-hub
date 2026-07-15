@@ -11,7 +11,7 @@ import { getEffectiveEstimatedKm } from '@/lib/utils';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import PlacesSearchDialog from './PlacesSearchDialog';
-import { WeatherPreviewInTransportForm } from '@/components/weather/WeatherPreviewInTransportForm';
+// import { WeatherPreviewInTransportForm } from '@/components/weather/WeatherPreviewInTransportForm'; // desativado
 
 const tituloOptions = ['Parque', 'Hotel', 'Aeroporto', 'Centro', 'Escolta Policial', 'Outros'];
 const cidadeAeroportoOptions = ['Chapecó', 'Santo Ângelo', 'Passo Fundo', 'Porto Alegre'];
@@ -266,11 +266,8 @@ export default function TransportForm({
                   </p>
                 ) : null;
               })()}
-              <WeatherPreviewInTransportForm
-                address={data.titulo === 'Aeroporto' ? data.voo_cidade : (data._selectedPlaceName || data.destino)}
-                lat={data.destino_lat}
-                lng={data.destino_lng}
-              />
+              {/* Weather preview desativado */}
+
               {/* Somente Ida — disables the return-trip phase */}
               {!isEdit && (
                 <label className="flex items-center gap-2 cursor-pointer rounded-lg border border-border/40 bg-muted/20 px-3 py-2">

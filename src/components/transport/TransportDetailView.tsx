@@ -4,7 +4,7 @@ import { DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/di
 import { Separator } from '@/components/ui/separator';
 import { Check, Clock, X, Eye, Navigation, FileText, Route, History, Pencil } from 'lucide-react';
 import { cn, getEffectiveEstimatedKm } from '@/lib/utils';
-import { TransportWeatherCard } from '@/components/weather/TransportWeatherCard';
+// import { TransportWeatherCard } from '@/components/weather/TransportWeatherCard'; // desativado
 
 const statusConfig: Record<string, { label: string; class: string; bgClass: string }> = {
   pendente: { label: 'Pendente', class: 'text-info', bgClass: 'bg-info/10 border-info/20' },
@@ -227,13 +227,8 @@ export default function TransportDetailView({ t, members, vehicles, guests, getD
           </>
         )}
 
-        <Separator />
-        <div className="space-y-2">
-          <p className="text-xs font-semibold text-foreground flex items-center gap-1.5">
-            🌤️ Clima Operacional
-          </p>
-          <TransportWeatherCard transportId={t.id} />
-        </div>
+        {/* Clima operacional desativado */}
+
 
         <Separator />
         <Button onClick={onPDF} variant="outline" className="w-full gap-2 rounded-xl">

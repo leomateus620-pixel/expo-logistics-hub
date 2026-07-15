@@ -68,11 +68,9 @@ export function useTransports() {
         guestIds: params.guestIds || [],
       });
       const newId = result?.data?.id ?? result?.id;
-      if (newId) {
-        supabase.functions
-          .invoke('weather-service', { body: { action: 'sync_transport', transport_id: newId } })
-          .catch((err) => console.warn('[weather] initial sync failed', err));
-      }
+      // weather sync desativado
+      void newId;
+
       return result.data;
     },
     onSuccess: invalidateAll,
