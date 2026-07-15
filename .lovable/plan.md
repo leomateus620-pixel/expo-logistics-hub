@@ -1,67 +1,45 @@
+## Sincronização via pg_dump completo (`fenasojalog_260715.backup`)
 
-# Sincronização completa do banco (schema + dados) via CSVs
+O arquivo enviado é um `pg_dump` custom (v18.4) contendo `auth.users` + todas as 45 tabelas `public.*`. Isso permite sobrescrever tudo neste projeto preservando UUIDs de usuários, IDs, timestamps e relações.
 
-O projeto de origem `A2tcfX2gomzgq8eaSuEw` não está acessível neste workspace, então não consigo ler suas migrations nem seus dados diretamente. Vamos operar em duas frentes: (1) schema já está em grande parte alinhado (é o mesmo codebase remixado) e ajusto o que faltar via migration; (2) você exporta cada tabela como CSV do projeto de origem e eu importo aqui, sobrescrevendo tudo.
+### Fase 1 — Preparação
+- Extrair do backup, em `/tmp/`:
+  - `auth_users.sql` — só `auth.users` (id, email, encrypted_password, raw_user_meta_data, created_at)
+  - `public_data.sql` — dados de todas as 45 tabelas `public.*` (data-only, sem DDL)
+- Conferir headers vs. schema atual deste projeto. O codebase é o mesmo (remix), então espera-se compatibilidade total; se algo divergir, gero **uma migration única** (ADD COLUMN / ALTER TYPE / policies + GRANTs faltantes) antes da Fase 3.
 
-## Fase 1 — Você exporta os CSVs no projeto de origem
+### Fase 2 — Restaurar `auth.users` com UUIDs originais
+Não podemos escrever direto em `auth.users` via migration. Vou criar uma **edge function temporária `restore-auth-users`** (verify_jwt=false, chamada uma única vez com um token pré-compartilhado que você define):
+- Lê a lista de usuários exportada (embutida no deploy).
+- Para cada usuário chama `supabase.auth.admin.createUser({ id: <uuid_original>, email, password: <senha_temporária>, email_confirm: true, user_metadata })`, preservando o UUID.
+- Retorna relatório: criados / já existentes / erros.
+- Depois de rodar com sucesso, a função é deletada.
 
-No projeto de origem, abra **Cloud → Advanced settings → Export data** e exporte **todas as tabelas do schema public** como CSV. As tabelas atualmente existentes nesta conta destino (que precisam receber dados) são:
+Você me confirma se prefere:
+- **(a)** Uma senha temporária única para todos (ex.: `Fenasoja@2026`) — usuários trocam depois.
+- **(b)** Manter os hashes originais do backup — nesse caso preciso inserir direto em `auth.users` via migration (mais invasivo, mas funciona; hoje é a única forma de preservar senhas).
 
-```text
-organizations, org_members, profiles, user_roles, user_capabilities,
-commissions, official_committees,
-guests, transports, transport_guests, transport_locations,
-transport_weather_snapshots, transport_weather_alerts, weather_city_cache, weather_sync_jobs,
-vehicles, vehicle_usage, fuel_records,
-electric_carts, cart_reservations, cart_history,
-scooters, scooter_reservations, scooter_history,
-events, fenasoja_events, schedules, schedule_shifts, shift_assignments, tasks,
-expenses, expense_documents, expense_approvals, expense_categories, reimbursements,
-mobility_authorizations, committee_mobility_forms, committee_mobility_members,
-public_form_links, public_mobility_forms, public_mobility_members, public_form_audit,
-notification_recipients, audit_log, security_audit_reports
-```
+### Fase 3 — Sobrescrever dados de `public.*`
+Em uma única transação:
+1. `SET session_replication_role = replica;` — desativa **todos** os triggers de validação (`validate_transport`, `validate_vehicle_usage`, `cascade_delete_*`, `invalidate_old_weather_snapshots`, etc.) e FKs durante a carga.
+2. `TRUNCATE` em cascade de todas as 45 tabelas `public.*`.
+3. Executar `public_data.sql` via `psql` (o pg_restore gera `COPY ... FROM stdin`, ordem correta de dependências já resolvida pelo `pg_dump`).
+4. `SET session_replication_role = origin;` — reativa triggers.
+5. `SELECT setval(...)` em todas as sequences se necessário (o dump já traz).
+6. Relatório: `SELECT count(*)` por tabela × totais esperados do backup.
 
-Anexe os arquivos no chat (pode ser em um ZIP). Confirme também se o projeto de origem tem alguma tabela `public.*` que **não** está na lista acima — se sim, me avise para incluir.
+Como o tool `supabase--insert` aceita insert/update/delete e o psql do sandbox aceita insert, e a Fase 3 mistura TRUNCATE + COPY + SET, vou empacotar tudo em **uma migration única** (migrations aceitam qualquer DML/DDL e rodam com privilégio total).
 
-## Fase 2 — Alinhamento de schema (se necessário)
+### Fase 4 — Storage buckets (opcional)
+Arquivos em `fuel-receipts`, `vehicle-documents`, `expense-documents` **não** estão no `pg_dump` (Storage é separado). Se quiser trazer, você exporta os arquivos do projeto origem (zip) e eu re-upo mantendo os `storage_path` gravados nas tabelas.
 
-Assim que receber os CSVs, comparo o cabeçalho de cada um com as colunas atuais da tabela destino. Se houver colunas faltando/renomeadas/tipos diferentes, gero **uma migration única** que ajusta o schema (ADD COLUMN, ALTER TYPE, novas tabelas, novas policies + GRANTs) antes de qualquer INSERT. Se estiverem idênticos, pulo esta fase.
+### Fase 5 — Limpeza
+- Deletar a edge function `restore-auth-users`.
+- Deletar arquivos temporários em `/tmp/`.
 
-## Fase 3 — Sobrescrita total dos dados (TRUNCATE + INSERT)
+---
 
-Ordem executada em uma única transação para preservar FKs e triggers:
-
-1. **Desabilitar temporariamente triggers de validação** (`validate_transport`, `validate_vehicle_usage`, `validate_cart_reservation`, `validate_scooter_reservation`, `validate_guest`, `cascade_delete_*`, `cleanup_transport_location_on_status_change`, `invalidate_old_weather_snapshots`) — os dados vindos da origem já são consistentes e re-validar pode rejeitar linhas legítimas.
-2. **`TRUNCATE ... RESTART IDENTITY CASCADE`** em todas as tabelas listadas, respeitando a ordem inversa de dependências.
-3. **COPY FROM STDIN** de cada CSV (via `psql`), na ordem de dependências:
-   - Nível 0: `organizations`, `profiles` (já povoada por trigger `handle_new_user`; UPSERT), `user_roles`, `user_capabilities`, `org_members`, `commissions`, `official_committees`, `expense_categories`, `weather_city_cache`, `notification_recipients`
-   - Nível 1: `guests`, `vehicles`, `electric_carts`, `scooters`, `events`, `fenasoja_events`, `schedules`, `public_form_links`, `committee_mobility_forms`
-   - Nível 2: `transports`, `vehicle_usage`, `fuel_records`, `cart_reservations`, `scooter_reservations`, `schedule_shifts`, `tasks`, `expenses`, `public_mobility_forms`, `committee_mobility_members`, `mobility_authorizations`
-   - Nível 3: `transport_guests`, `transport_locations`, `transport_weather_snapshots`, `transport_weather_alerts`, `cart_history`, `scooter_history`, `shift_assignments`, `expense_documents`, `expense_approvals`, `reimbursements`, `public_mobility_members`, `public_form_audit`, `audit_log`, `security_audit_reports`, `weather_sync_jobs`
-4. **Reabilitar triggers** e rodar um `SELECT count(*)` por tabela para conferir totais com os CSVs (log em resposta).
-
-## Fase 4 — Vinculação de usuários e itens fora do banco
-
-Alguns pontos que **não** vêm no export do `public.*` e que você precisa saber:
-
-- **`auth.users`** (contas de login) é gerenciado pelo Supabase e não é exportado. Os `user_id` que aparecerão em `org_members`, `user_roles`, `profiles`, `transports.motorista_user_id`, etc. **só funcionarão se os mesmos UUIDs existirem em `auth.users` deste projeto**. Se as contas ainda não existem aqui, ou os UUIDs são diferentes, o login vai falhar e RLS bloqueará tudo. Duas opções que decidiremos depois de ver os CSVs:
-  1. Recriar cada usuário via Admin API neste projeto reaproveitando o UUID original (precisa que você me confirme a lista de e-mails) — mantém dados 100% ligados.
-  2. Aceitar que só o Admin `fenasojalog@gmail.com` fará login e me passar o UUID novo dele; eu remapeio todos os `user_id` dos CSVs para esse único UUID.
-- **Storage buckets** (`fuel-receipts`, `vehicle-documents`, `expense-documents`): os arquivos em si (comprovantes/PDFs) precisariam ser copiados à parte. Se você quiser trazê-los, exporte-os do painel de Storage do projeto origem e eu subo no destino mapeando pelos `storage_path` gravados nas tabelas.
-- **Secrets de Edge Functions** já estão configurados neste projeto (`GOOGLE_MAPS_API_KEY`, etc.) — nada a fazer.
-
-## Detalhes técnicos
-
-- Toda a Fase 3 roda via `supabase--insert` (permite INSERT/UPDATE/DELETE) e/ou `psql` com `COPY FROM /tmp/<tabela>.csv WITH CSV HEADER` para performance em tabelas grandes (`audit_log` 1169 linhas, `cart_history` 522, `transport_weather_snapshots` provavelmente muitas).
-- CSVs enviados por você ficam disponíveis em `/mnt/user-uploads/`, copio para `/tmp/` antes do `COPY`.
-- Colunas geradas (`transports.km_rodados` GENERATED ALWAYS) são ignoradas no INSERT — projeto os valores automaticamente pelas colunas de origem/destino.
-- Colunas com defaults (`created_at`, `updated_at`, `id`) são preservadas do CSV para manter o histórico exato.
-- Ao final, um relatório mostra: total esperado (do CSV) × total inserido × diferenças por tabela.
-
-## O que preciso de você para começar
-
-1. Confirme este plano.
-2. Envie o ZIP (ou os CSVs soltos) com os exports.
-3. Diga se quer manter os `user_id` originais (opção 1) ou remapear tudo para um único admin (opção 2) — se preferir, decidimos depois de eu inspecionar os CSVs.
-4. Diga se quer trazer os arquivos de Storage também.
+### O que preciso decidir antes de executar
+1. **Senhas** (Fase 2): opção (a) senha única temporária, ou (b) preservar hashes originais via migration direta em `auth.users`?
+2. **Storage** (Fase 4): trazer os arquivos ou pular?
+3. **Confirmação**: aprovar para eu sair de plan mode e executar.
