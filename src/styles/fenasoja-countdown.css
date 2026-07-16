@@ -600,6 +600,26 @@ button.fenasoja-countdown-undated:focus-visible {
   button.fenasoja-countdown-undated:hover {
     background: rgb(255 255 255 / 0.065);
   }
+
+  .fenasoja-countdown-ops-card:hover {
+    border-color: hsl(var(--fenasoja-hero-gold) / 0.48);
+    box-shadow:
+      0 30px 58px -36px rgb(2 13 31 / 0.86),
+      0 16px 28px -24px hsl(var(--fenasoja-hero-gold) / 0.42),
+      inset 0 1px 0 rgb(255 255 255 / 0.18),
+      inset 0 -1px 0 rgb(0 0 0 / 0.45);
+    transform: translateY(-1px) rotateX(0.65deg) translateZ(0);
+  }
+
+  .fenasoja-countdown-ops-card .fenasoja-countdown-operation-metric:hover,
+  .fenasoja-countdown-ops-card .fenasoja-countdown-next-action:hover,
+  .fenasoja-countdown-ops-card .fenasoja-countdown-progress:hover {
+    border-color: rgb(255 255 255 / 0.22);
+    background:
+      radial-gradient(circle at 20% 0%, hsl(var(--fenasoja-hero-gold) / 0.14), transparent 38%),
+      linear-gradient(150deg, rgb(255 255 255 / 0.155), rgb(255 255 255 / 0.07));
+    transform: translateY(-1px) translateZ(0);
+  }
 }
 
 .fenasoja-countdown-hero[data-presentation='mobile'] {
@@ -784,6 +804,7 @@ button.fenasoja-countdown-undated:focus-visible {
 
 @media (prefers-reduced-motion: reduce) {
   .fenasoja-countdown-hero,
+  .fenasoja-countdown-ops-card,
   .fenasoja-countdown-clock,
   .fenasoja-countdown-value > span,
   .fenasoja-countdown-live > i {
@@ -793,12 +814,20 @@ button.fenasoja-countdown-undated:focus-visible {
   .fenasoja-countdown-new-event,
   .fenasoja-countdown-unit,
   .fenasoja-countdown-progress-track > span,
+  .fenasoja-countdown-ops-card .fenasoja-countdown-progress,
+  .fenasoja-countdown-ops-card .fenasoja-countdown-next-action,
+  .fenasoja-countdown-ops-card .fenasoja-countdown-operation-metric,
   button.fenasoja-countdown-undated {
     transition-duration: 0.01ms !important;
   }
 
   .fenasoja-countdown-unit,
   .fenasoja-countdown-unit:hover,
+  .fenasoja-countdown-ops-card,
+  .fenasoja-countdown-ops-card:hover,
+  .fenasoja-countdown-ops-card .fenasoja-countdown-progress,
+  .fenasoja-countdown-ops-card .fenasoja-countdown-next-action,
+  .fenasoja-countdown-ops-card .fenasoja-countdown-operation-metric,
   .fenasoja-countdown-clock {
     transform: none !important;
   }
@@ -861,28 +890,36 @@ button.fenasoja-countdown-undated:focus-visible {
 
 /* ============ Wrapper + separated ops card ============ */
 .fenasoja-countdown-wrapper {
+  --fenasoja-hero-deep: 213 89% 11%;
+  --fenasoja-hero-mid: 233 76% 30%;
+  --fenasoja-hero-bright: 211 77% 45%;
+  --fenasoja-hero-gold: 44 94% 55%;
   display: grid;
   gap: clamp(0.75rem, 1.4vw, 1.15rem);
+  perspective: 1200px;
 }
 
 .fenasoja-countdown-ops-card {
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  border: 1px solid hsl(var(--fenasoja-hero-gold) / 0.32);
-  border-radius: 1.25rem;
-  padding: clamp(0.9rem, 1.4vw, 1.15rem) clamp(1rem, 1.6vw, 1.35rem);
+  border: 1px solid hsl(var(--fenasoja-hero-gold) / 0.42);
+  border-radius: 1.2rem;
+  padding: clamp(0.78rem, 1.25vw, 1rem);
   color: white;
   background:
-    radial-gradient(circle at 88% -30%, hsl(var(--fenasoja-hero-gold) / 0.18), transparent 42%),
-    radial-gradient(circle at 8% 130%, oklch(var(--brand-green) / 0.14), transparent 44%),
-    linear-gradient(128deg, hsl(var(--fenasoja-hero-deep)) 0%, hsl(var(--fenasoja-hero-mid)) 58%, oklch(var(--brand-navy-800)) 100%);
+    radial-gradient(circle at 88% -36%, hsl(var(--fenasoja-hero-gold) / 0.26), transparent 38%),
+    radial-gradient(circle at 2% 118%, oklch(var(--brand-green) / 0.36), transparent 44%),
+    linear-gradient(128deg, hsl(var(--fenasoja-hero-deep)) 0%, hsl(219 78% 16%) 46%, oklch(var(--brand-navy-900)) 100%);
   box-shadow:
-    var(--elevation-4),
-    0 2px 0 hsl(var(--fenasoja-hero-gold) / 0.16),
-    inset 0 1px 0 rgb(255 255 255 / 0.14),
-    inset 0 -1px 0 rgb(0 0 0 / 0.35);
+    0 28px 54px -34px rgb(2 13 31 / 0.88),
+    0 10px 22px -18px hsl(var(--fenasoja-hero-gold) / 0.46),
+    inset 0 1px 0 rgb(255 255 255 / 0.18),
+    inset 0 -1px 0 rgb(0 0 0 / 0.48);
+  transform: rotateX(0.85deg) translateZ(0);
+  transform-origin: center top;
   animation: fenasoja-countdown-reveal var(--motion-structural) var(--ease-decelerate) both;
+  transition: border-color var(--motion-base) var(--ease-standard), box-shadow var(--motion-base) var(--ease-standard), transform var(--motion-base) var(--ease-standard);
 }
 
 .fenasoja-countdown-ops-card::before {
@@ -891,12 +928,13 @@ button.fenasoja-countdown-undated:focus-visible {
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  opacity: 0.18;
-  background-image:
-    linear-gradient(rgb(255 255 255 / 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(255 255 255 / 0.04) 1px, transparent 1px);
-  background-size: 48px 48px;
-  mask-image: linear-gradient(100deg, transparent 4%, black 48%, black 92%, transparent);
+  opacity: 0.9;
+  background:
+    linear-gradient(90deg, rgb(255 255 255 / 0.09) 1px, transparent 1px),
+    linear-gradient(rgb(255 255 255 / 0.07) 1px, transparent 1px),
+    linear-gradient(115deg, rgb(255 255 255 / 0.16), transparent 22%, transparent 76%, hsl(var(--fenasoja-hero-gold) / 0.1));
+  background-size: 56px 56px, 56px 56px, 100% 100%;
+  mask-image: linear-gradient(100deg, transparent 2%, black 28%, black 86%, transparent);
 }
 
 .fenasoja-countdown-ops-card::after {
@@ -914,6 +952,127 @@ button.fenasoja-countdown-undated:focus-visible {
   z-index: 1;
 }
 
+.fenasoja-countdown-ops-card .fenasoja-countdown-footer {
+  grid-template-columns: minmax(19rem, 0.82fr) minmax(34rem, 1.18fr);
+  align-items: stretch;
+  gap: clamp(0.7rem, 1.2vw, 0.95rem);
+}
+
+.fenasoja-countdown-ops-card .fenasoja-countdown-progress,
+.fenasoja-countdown-ops-card .fenasoja-countdown-next-action,
+.fenasoja-countdown-ops-card .fenasoja-countdown-operation-metric {
+  border: 1px solid rgb(255 255 255 / 0.16);
+  border-radius: 0.88rem;
+  background:
+    radial-gradient(circle at 18% 0%, hsl(var(--fenasoja-hero-gold) / 0.11), transparent 42%),
+    linear-gradient(150deg, rgb(255 255 255 / 0.12), rgb(255 255 255 / 0.052));
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.15),
+    0 12px 22px -20px rgb(0 0 0 / 0.82);
+  transition: border-color var(--motion-fast) var(--ease-standard), background var(--motion-fast) var(--ease-standard), transform var(--motion-fast) var(--ease-standard);
+}
+
+.fenasoja-countdown-ops-card .fenasoja-countdown-progress {
+  display: grid;
+  align-content: center;
+  padding: 0.78rem 0.86rem;
+}
+
+.fenasoja-countdown-ops-card .fenasoja-countdown-progress-heading {
+  color: rgb(255 255 255 / 0.96);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+}
+
+.fenasoja-countdown-ops-card .fenasoja-countdown-progress-heading strong {
+  color: hsl(var(--fenasoja-hero-gold));
+  font-size: 0.7rem;
+  text-shadow: 0 0 16px hsl(var(--fenasoja-hero-gold) / 0.38);
+}
+
+.fenasoja-countdown-ops-card .fenasoja-countdown-progress-track {
+  height: 0.48rem;
+  margin-top: 0.62rem;
+  background: rgb(255 255 255 / 0.2);
+  box-shadow:
+    inset 0 1px 2px rgb(0 0 0 / 0.52),
+    0 0 0 1px rgb(255 255 255 / 0.06);
+}
+
+.fenasoja-countdown-ops-card .fenasoja-countdown-progress > p {
+  margin-top: 0.58rem;
+  color: rgb(255 255 255 / 0.82);
+  font-size: 0.66rem;
+  font-weight: 650;
+}
+
+.fenasoja-countdown-ops-card .fenasoja-countdown-operations {
+  grid-template-columns: minmax(15rem, 1fr) minmax(5.6rem, 0.36fr) minmax(5.6rem, 0.36fr);
+  align-items: stretch;
+  gap: 0.55rem;
+  border-left: 0;
+}
+
+.fenasoja-countdown-ops-card .fenasoja-countdown-next-action {
+  min-height: 4.65rem;
+  padding: 0.72rem 0.82rem;
+}
+
+.fenasoja-countdown-ops-card .fenasoja-countdown-next-action > svg,
+.fenasoja-countdown-ops-card .fenasoja-countdown-operation-metric > svg {
+  filter: drop-shadow(0 0 10px currentColor);
+}
+
+.fenasoja-countdown-ops-card .fenasoja-countdown-next-action small,
+.fenasoja-countdown-ops-card .fenasoja-countdown-operation-metric small {
+  color: rgb(255 255 255 / 0.72);
+  font-size: 0.58rem;
+  font-weight: 850;
+  letter-spacing: 0.07em;
+}
+
+.fenasoja-countdown-ops-card .fenasoja-countdown-next-action strong {
+  display: -webkit-box;
+  margin-top: 0.22rem;
+  color: rgb(255 255 255 / 0.98);
+  font-size: 0.76rem;
+  font-weight: 900;
+  line-height: 1.26;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: normal;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+.fenasoja-countdown-ops-card .fenasoja-countdown-next-action em {
+  color: rgb(255 255 255 / 0.78);
+  font-size: 0.58rem;
+  font-weight: 650;
+}
+
+.fenasoja-countdown-ops-card .fenasoja-countdown-operation-metric {
+  align-content: center;
+  min-height: 4.65rem;
+  border-left: 1px solid rgb(255 255 255 / 0.16);
+  padding: 0.68rem 0.68rem;
+}
+
+.fenasoja-countdown-ops-card .fenasoja-countdown-operation-metric strong {
+  color: rgb(255 255 255 / 0.96);
+  font-size: 1.05rem;
+  font-weight: 850;
+  text-shadow: 0 8px 16px rgb(0 0 0 / 0.26);
+}
+
+.fenasoja-countdown-ops-card .fenasoja-countdown-operation-metric[data-alert='true'] {
+  border-color: color-mix(in oklch, oklch(var(--destructive)) 42%, white);
+  background:
+    radial-gradient(circle at 18% 0%, color-mix(in oklch, oklch(var(--destructive)) 42%, white) 0%, transparent 38%),
+    linear-gradient(150deg, rgb(255 255 255 / 0.13), rgb(255 255 255 / 0.06));
+}
+
 .fenasoja-countdown-ops-card[data-presentation='mobile'] {
   border-radius: 1rem;
   padding: 0.85rem;
@@ -928,29 +1087,42 @@ button.fenasoja-countdown-undated:focus-visible {
 
 .fenasoja-countdown-ops-card[data-presentation='mobile'] .fenasoja-countdown-operations {
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  border-top: 1px solid rgb(255 255 255 / 0.09);
+  border-top: 0;
   border-left: 0;
-  padding-top: 0.62rem;
+  padding-top: 0;
 }
 
 .fenasoja-countdown-ops-card[data-presentation='mobile'] .fenasoja-countdown-next-action {
   grid-column: 1 / -1;
-  padding: 0 0 0.55rem;
+  padding: 0.68rem 0.72rem;
 }
 
 .fenasoja-countdown-ops-card[data-presentation='mobile'] .fenasoja-countdown-operation-metric {
   min-height: 2.75rem;
-  border-top: 1px solid rgb(255 255 255 / 0.08);
-  border-left: 0;
+  border-left: 1px solid rgb(255 255 255 / 0.16);
   padding: 0.5rem 0.6rem 0.15rem;
 }
 
 .fenasoja-countdown-ops-card[data-presentation='mobile'] .fenasoja-countdown-operation-metric + .fenasoja-countdown-operation-metric {
-  border-left: 1px solid rgb(255 255 255 / 0.1);
+  border-left: 1px solid rgb(255 255 255 / 0.16);
 }
 
 @media (max-width: 900px) {
   .fenasoja-countdown-ops-card .fenasoja-countdown-footer {
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .fenasoja-countdown-ops-card .fenasoja-countdown-operations {
+    grid-template-columns: minmax(0, 1fr) minmax(5.25rem, 0.42fr) minmax(5.25rem, 0.42fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .fenasoja-countdown-ops-card .fenasoja-countdown-operations {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .fenasoja-countdown-ops-card .fenasoja-countdown-next-action {
+    grid-column: 1 / -1;
   }
 }
