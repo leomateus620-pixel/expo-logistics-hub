@@ -1,55 +1,32 @@
-## Escopo
-Refinar o card **Contagem Oficial** (`FenasojaCountdownHero.tsx` + `src/styles/fenasoja-countdown.css`) — hoje o bloco é visualmente denso, os quadrados do relógio parecem "cartões brancos genéricos" e o rodapé (Próximo Marco / Atrasadas / Sem Data) está grudado no mesmo card, competindo com a contagem.
+# Correção do card operacional (abaixo da contagem oficial)
 
 ## Diagnóstico
-- Quadros do relógio em branco puro criam um contraste chapado sobre o azul e "quebram" a linguagem premium (parece template de contagem regressiva genérico).
-- Texto de apoio "Cada decisão do cronograma converge para este marco institucional. Acompanhe a preparação em tempo real" é ruído — a proposta já se comunica pelo próprio relógio + eyebrow.
-- Barra "Preparação 2026—2028 · 6% · Próximo Marco · Atrasadas · Sem Data" está costurada no mesmo `<header>`. Isso amontoa dois níveis de informação (institucional × operacional) num único card.
 
-## Mudanças
+O card `.fenasoja-countdown-ops-card` foi criado com fundo semi-transparente (`oklch(... / 0.92-0.96)`) somado a `backdrop-filter: blur()`. Como o card está dentro de um container claro da workspace do Cronograma, o blur amostra os pixels brancos do fundo e o gradiente translúcido navy vira um cinza-azulado quase branco — sumindo o texto branco e o efeito 3D.
 
-**1. `src/components/cronograma-eventos/FenasojaCountdownHero.tsx`**
-- Remover o parágrafo `fenasoja-countdown-description` (a frase pedida).
-- Dividir a árvore em **dois containers irmãos**:
-  - `<header class="fenasoja-countdown-hero">` — mantém topline, story ("Nossa próxima grande história começa em / FENASOJA 2028 / Faltam X dias…") e o relógio.
-  - `<section class="fenasoja-countdown-ops">` — novo card, físico e independente, contendo o `fenasoja-countdown-progress` + `fenasoja-countdown-operations` (Próximo marco / Atrasadas / Sem data).
-- Ambos ficam empilhados com `gap` real entre eles (visualmente destacados), preservando a mesma largura e alinhamento.
+## Correção (somente CSS, arquivo `src/styles/fenasoja-countdown.css`)
 
-**2. `src/styles/fenasoja-countdown.css`**
-- `.fenasoja-countdown-hero`:
-  - Fundo em degradê profundo `oklch(var(--brand-navy-950)) → oklch(var(--brand-indigo-900))` + camada radial ouro/laranja sutil no canto do relógio.
-  - `border: 1px solid oklch(var(--brand-gold-500)/0.18)`, `inset 0 1px 0 oklch(1 0 0 / 0.06)` (luz superior), sombra ambient + contato.
-  - `backdrop-filter: blur(24px) saturate(1.35)`.
-- `.fenasoja-countdown-clock`:
-  - Container ganha "moldura de vidro" (glass escuro com borda dourada 0.12) para destacar o relógio como peça central.
-- `.fenasoja-countdown-unit` (os quadrados):
-  - Trocar o branco chapado por **placa 3D**: fundo `linear-gradient(180deg, oklch(var(--brand-cream)/0.98), oklch(var(--brand-cream)/0.88))`, `border: 1px solid oklch(var(--brand-gold-500)/0.35)`, `inset 0 1px 0 rgb(255 255 255 / 0.9)` (highlight superior) + `inset 0 -1px 0 oklch(var(--brand-navy-950)/0.12)` (sombra inferior interna), sombra externa de contato `0 8px 18px -10px oklch(var(--brand-navy-950)/0.55)`.
-  - Números com `text-shadow: 0 1px 0 rgb(255 255 255 / 0.7), 0 -1px 0 oklch(var(--brand-navy-950)/0.15)` para simular relevo tipográfico.
-  - Cor do valor: `oklch(var(--brand-navy-900))`; label unidade em `oklch(var(--brand-navy-900)/0.65)` com tracking wide.
-  - Separador ":" opcional entre unidades usando pseudo-elemento (`::after`) só em `sm+`.
-- `.fenasoja-countdown-value`:
-  - Fonte tabular (`font-variant-numeric: tabular-nums`), `font-weight: 800`, tamanho responsivo (`clamp(2rem, 4.2vw, 3rem)`).
-  - Contador de segundos ganha `transition: transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1)` sutil no tick (spring físico), respeitando `prefers-reduced-motion`.
-- **Novo `.fenasoja-countdown-ops`** (segundo card, separado):
-  - Mesma família visual (glass navy + borda dourada 0.14), porém mais baixo/horizontal.
-  - `border-radius` idêntico ao hero, `margin-top: clamp(0.75rem, 1.5vw, 1.25rem)` para separação clara.
-  - Divisórias verticais internas entre "Preparação", "Próximo marco", "Atrasadas", "Sem data" (`border-left: 1px solid oklch(1 0 0 / 0.08)` a partir do 2º item em md+).
-  - Mantém as classes internas atuais (`.fenasoja-countdown-progress`, `.fenasoja-countdown-operations`, `.fenasoja-countdown-next-action`, `.fenasoja-countdown-operation-metric`) — só reposiciona e refina padding/gap.
-- Remover regras órfãs da `.fenasoja-countdown-description`.
+Reescrever a regra `.fenasoja-countdown-ops-card` (linhas ~862–890) para:
 
-**3. Tipografia e ritmo**
-- Eyebrow "Nossa próxima grande história começa em" com `letter-spacing: 0.22em`, cor `oklch(var(--brand-gold-500)/0.85)`.
-- `FENASOJA 2028` mantém tamanho, mas ganha `text-shadow: 0 2px 0 rgb(0 0 0 / 0.35)` para volume; "2028" continua em ouro.
-- "Faltam X dias" com número em `oklch(var(--brand-gold-500))` + peso 700.
-
-**4. Responsivo / a11y**
-- Em `mobile` (`data-presentation="mobile"`): relógio em 4 colunas compactas mantidas, ops card colapsa em 2 colunas (Próximo marco linha inteira + Atrasadas/Sem data lado a lado).
-- `prefers-reduced-motion`: desliga a animação spring do tick de segundos e mantém apenas o valor atualizado.
+1. **Fundo totalmente opaco** na mesma família do hero (evita transparência sobre o container branco):
+   - `background:` com radial gold sutil no canto superior direito + gradiente linear em `hsl(var(--fenasoja-hero-deep))` → `hsl(var(--fenasoja-hero-mid))` → `oklch(var(--brand-navy-800))`. Todos os stops **sem alfa**.
+2. **Remover `backdrop-filter`** (não faz sentido com fundo opaco e é o causador da lavagem).
+3. **Reforçar borda e sombra 3D**: borda dourada 0.32, `box-shadow` com `var(--elevation-4)` + linha dourada inferior + inset highlight/depth (mesma linguagem do hero, porém em altura menor).
+4. **Grid sutil de profundidade** via `::after` já existente + novo `::before` com grid pattern leve mascarado (opcional para dar volume, sem chapar).
+5. Ajustar `.fenasoja-countdown-progress-heading`, `.fenasoja-countdown-progress > p`, `.fenasoja-countdown-next-action small/em` e `.fenasoja-countdown-operation-metric small` para **cores com contraste ≥ 4.5:1** sobre o navy (subir opacidades de `0.62–0.68` → `0.82–0.9`; título eyebrow em `hsl(var(--fenasoja-hero-gold))`).
+6. Ajustar `.fenasoja-countdown-progress-track` para track em `rgb(255 255 255 / 0.18)` (mais visível) mantendo o fill dourado.
+7. Divisores verticais entre a coluna de progresso e a de operações: subir para `rgb(255 255 255 / 0.18)`.
 
 ## Fora de escopo
-- Nenhum ajuste em rotas, hooks (`useLiveFenasojaCountdown`), summary de comandos, ou lógica de contagem.
-- Nenhuma alteração em `CronogramaModuleShell` (barra superior já refinada).
-- Sem novas dependências.
 
-## Resultado esperado
-Contagem oficial com sensação premium e material físico (placas cremosas com relevo, moldura de vidro, luz dourada), sem o parágrafo descritivo, e com o bloco operacional (Preparação + Próximo marco + Atrasadas + Sem data) claramente separado em um segundo card irmão — hierarquia institucional × operacional legível de imediato.
+- Nenhuma alteração em `FenasojaCountdownHero.tsx` (marcação permanece).
+- Sem mudança de dados, hooks ou rotas.
+- Hero card (que já está correto) permanece intocado.
+
+## Validação
+
+Após a mudança, abrir `/cronograma-eventos` em desktop e mobile via Playwright, capturar screenshot do bloco abaixo do relógio e conferir:
+- Fundo navy escuro sólido, sem lavagem branca.
+- Textos "Preparação 2026—2028", "Próximo marco operacional", "Atrasadas", "Sem data" legíveis.
+- Barra de progresso dourada visível sobre track escuro.
+- Continuidade visual com o hero acima (mesma família de cor, mesma borda dourada).
