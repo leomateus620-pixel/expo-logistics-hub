@@ -81,75 +81,79 @@ export function FenasojaCountdownHero({
   const isOpen = countdown.phase === 'open';
 
   return (
-    <header
-      className="fenasoja-countdown-hero"
-      data-presentation={presentation}
-      data-phase={countdown.phase}
-      aria-labelledby={`fenasoja-countdown-title-${presentation}`}
-    >
-      <span className="fenasoja-countdown-ambient" aria-hidden="true" />
+    <div className="fenasoja-countdown-wrapper" data-presentation={presentation}>
+      <header
+        className="fenasoja-countdown-hero"
+        data-presentation={presentation}
+        data-phase={countdown.phase}
+        aria-labelledby={`fenasoja-countdown-title-${presentation}`}
+      >
+        <span className="fenasoja-countdown-ambient" aria-hidden="true" />
 
-      <div className="fenasoja-countdown-content">
-        <div className="fenasoja-countdown-topline">
-          <div className="fenasoja-countdown-mark">
-            <Sprout aria-hidden="true" />
-            <span>Contagem oficial</span>
-            <span className="fenasoja-countdown-mark-divider" aria-hidden="true" />
-            <span>Cronograma e Eventos</span>
-          </div>
-
-          {canManage && (
-            <Button
-              type="button"
-              size="sm"
-              onClick={onNewEvent}
-              className="fenasoja-countdown-new-event"
-            >
-              <Plus aria-hidden="true" />
-              Novo evento
-            </Button>
-          )}
-        </div>
-
-        <div className="fenasoja-countdown-main">
-          <div className="fenasoja-countdown-story">
-            <p className="fenasoja-countdown-overline">Nossa próxima grande história começa em</p>
-            <h1 id={`fenasoja-countdown-title-${presentation}`}>
-              FENASOJA <span>2028</span>
-            </h1>
-            <p className="fenasoja-countdown-lead">
-              {isOpen ? (
-                'A feira está oficialmente aberta.'
-              ) : (
-                <>Faltam <strong>{countdown.days} dias</strong> para a abertura oficial.</>
-              )}
-            </p>
-            <p className="fenasoja-countdown-description">
-              Cada decisão do cronograma converge para este marco institucional.
-              Acompanhe a preparação em tempo real.
-            </p>
-          </div>
-
-          <section className="fenasoja-countdown-clock" aria-label="Contagem regressiva para a Fenasoja 2028">
-            <div className="fenasoja-countdown-clock-heading">
-              <span><Clock3 aria-hidden="true" /> Tempo até a abertura</span>
-              <span className="fenasoja-countdown-live"><i aria-hidden="true" /> Em tempo real</span>
+        <div className="fenasoja-countdown-content">
+          <div className="fenasoja-countdown-topline">
+            <div className="fenasoja-countdown-mark">
+              <Sprout aria-hidden="true" />
+              <span>Contagem oficial</span>
+              <span className="fenasoja-countdown-mark-divider" aria-hidden="true" />
+              <span>Cronograma e Eventos</span>
             </div>
 
-            <div
-              className="fenasoja-countdown-grid"
-              role="timer"
-              aria-live="off"
-              aria-label={accessibleCountdown}
-            >
-              <CountdownUnit value={countdown.days} label="dias" unit="days" />
-              <CountdownUnit value={countdown.hours} label="horas" unit="hours" />
-              <CountdownUnit value={countdown.minutes} label="min" unit="minutes" />
-              <CountdownUnit value={countdown.seconds} label="seg" unit="seconds" />
-            </div>
-          </section>
-        </div>
+            {canManage && (
+              <Button
+                type="button"
+                size="sm"
+                onClick={onNewEvent}
+                className="fenasoja-countdown-new-event"
+              >
+                <Plus aria-hidden="true" />
+                Novo evento
+              </Button>
+            )}
+          </div>
 
+          <div className="fenasoja-countdown-main">
+            <div className="fenasoja-countdown-story">
+              <p className="fenasoja-countdown-overline">Nossa próxima grande história começa em</p>
+              <h1 id={`fenasoja-countdown-title-${presentation}`}>
+                FENASOJA <span>2028</span>
+              </h1>
+              <p className="fenasoja-countdown-lead">
+                {isOpen ? (
+                  'A feira está oficialmente aberta.'
+                ) : (
+                  <>Faltam <strong>{countdown.days} dias</strong> para a abertura oficial.</>
+                )}
+              </p>
+            </div>
+
+            <section className="fenasoja-countdown-clock" aria-label="Contagem regressiva para a Fenasoja 2028">
+              <div className="fenasoja-countdown-clock-heading">
+                <span><Clock3 aria-hidden="true" /> Tempo até a abertura</span>
+                <span className="fenasoja-countdown-live"><i aria-hidden="true" /> Em tempo real</span>
+              </div>
+
+              <div
+                className="fenasoja-countdown-grid"
+                role="timer"
+                aria-live="off"
+                aria-label={accessibleCountdown}
+              >
+                <CountdownUnit value={countdown.days} label="dias" unit="days" />
+                <CountdownUnit value={countdown.hours} label="horas" unit="hours" />
+                <CountdownUnit value={countdown.minutes} label="min" unit="minutes" />
+                <CountdownUnit value={countdown.seconds} label="seg" unit="seconds" />
+              </div>
+            </section>
+          </div>
+        </div>
+      </header>
+
+      <section
+        className="fenasoja-countdown-ops-card"
+        data-presentation={presentation}
+        aria-label="Painel operacional do cronograma"
+      >
         <div className="fenasoja-countdown-footer">
           <div className="fenasoja-countdown-progress">
             <div className="fenasoja-countdown-progress-heading">
@@ -195,7 +199,8 @@ export function FenasojaCountdownHero({
             </button>
           </div>
         </div>
-      </div>
-    </header>
+      </section>
+    </div>
   );
 }
+

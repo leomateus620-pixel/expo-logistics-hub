@@ -1,43 +1,55 @@
 ## Escopo
-Refinar a barra superior do módulo **Cronograma e Eventos** (`src/components/cronograma-eventos/CronogramaModuleShell.tsx`) — hoje ela aparece opaca, com hierarquia visual fraca e o rótulo "Central temporal independente" poluindo a leitura.
+Refinar o card **Contagem Oficial** (`FenasojaCountdownHero.tsx` + `src/styles/fenasoja-countdown.css`) — hoje o bloco é visualmente denso, os quadrados do relógio parecem "cartões brancos genéricos" e o rodapé (Próximo Marco / Atrasadas / Sem Data) está grudado no mesmo card, competindo com a contagem.
 
-## Diagnóstico do bug visual
-- Fundo `.cronograma-module-bar` usa uma cor plana translúcida sobre o hero azul, sem contraste — os textos ficam apagados.
-- O selo do calendário e o botão "Portal" competem visualmente com o título.
-- Sobrescrita "Central temporal independente" é ruído; a informação relevante é apenas **Cronograma e Eventos** + ciclo.
+## Diagnóstico
+- Quadros do relógio em branco puro criam um contraste chapado sobre o azul e "quebram" a linguagem premium (parece template de contagem regressiva genérico).
+- Texto de apoio "Cada decisão do cronograma converge para este marco institucional. Acompanhe a preparação em tempo real" é ruído — a proposta já se comunica pelo próprio relógio + eyebrow.
+- Barra "Preparação 2026—2028 · 6% · Próximo Marco · Atrasadas · Sem Data" está costurada no mesmo `<header>`. Isso amontoa dois níveis de informação (institucional × operacional) num único card.
 
 ## Mudanças
 
-**1. `CronogramaModuleShell.tsx`**
-- Remover completamente o parágrafo "Central temporal independente".
-- Trocar o container `cronograma-module-mark` (ícone calendário) por uma tile 3D com física de luz (gradient + inset highlight + shadow ambient/contact).
-- Reorganizar hierarquia: marca Fenasoja → divisor → tile 3D + título grande "Cronograma e Eventos" em uma única linha limpa.
-- Bloco direito (ciclo oficial) ganha um chip 3D compacto com o mesmo tratamento (glass premium), visível também em breakpoints menores (sm+).
-- Botão "Sair" recebe tratamento 3D consistente (borda superior clara, sombra de contato, hover press).
+**1. `src/components/cronograma-eventos/FenasojaCountdownHero.tsx`**
+- Remover o parágrafo `fenasoja-countdown-description` (a frase pedida).
+- Dividir a árvore em **dois containers irmãos**:
+  - `<header class="fenasoja-countdown-hero">` — mantém topline, story ("Nossa próxima grande história começa em / FENASOJA 2028 / Faltam X dias…") e o relógio.
+  - `<section class="fenasoja-countdown-ops">` — novo card, físico e independente, contendo o `fenasoja-countdown-progress` + `fenasoja-countdown-operations` (Próximo marco / Atrasadas / Sem data).
+- Ambos ficam empilhados com `gap` real entre eles (visualmente destacados), preservando a mesma largura e alinhamento.
 
-**2. `src/styles/cronograma-workspace.css`** (arquivo já dedicado ao módulo)
-- Reescrever `.cronograma-module-bar`:
-  - Fundo em degradê linear vertical (`oklch(var(--brand-navy-900)) → oklch(var(--brand-navy-950))`) + camada `radial-gradient` sutil laranja no canto ativo.
-  - `backdrop-filter: blur(20px) saturate(1.4)`.
-  - Sombra inferior de profundidade `0 12px 32px -18px rgb(0 0 0 / 0.6)` + linha inferior 1px `oklch(var(--brand-orange-500)/0.35)` para "acabamento" físico.
-  - Highlight interno superior `inset 0 1px 0 oklch(1 0 0 / 0.08)` — luz simulada.
-- Nova classe `.cronograma-module-tile-3d` (para o ícone calendário):
-  - Fundo em degradê ouro→laranja com `inset 0 1px 0 rgb(255 255 255 / 0.35)`, sombra de contato `0 6px 12px -4px oklch(var(--brand-orange-500) / 0.5)` e sombra ambiente.
-  - `transform: perspective(400px) rotateX(6deg)` em repouso, `hover: rotateX(0deg) translateY(-1px)` — física de "levantar".
-  - `transition: transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1)` (spring).
-- Nova classe `.cronograma-module-chip-3d` (para o chip "Ciclo oficial"):
-  - Glass escuro com borda `oklch(var(--brand-gold-500)/0.25)`, inset highlight, sombra de profundidade.
-- `.cronograma-module-back` e `.cronograma-module-signout`:
-  - Ganham `box-shadow` de contato + inset highlight superior + hover com `translateY(-1px)` e press `translateY(0)` (afundamento físico ao clicar via `:active`).
+**2. `src/styles/fenasoja-countdown.css`**
+- `.fenasoja-countdown-hero`:
+  - Fundo em degradê profundo `oklch(var(--brand-navy-950)) → oklch(var(--brand-indigo-900))` + camada radial ouro/laranja sutil no canto do relógio.
+  - `border: 1px solid oklch(var(--brand-gold-500)/0.18)`, `inset 0 1px 0 oklch(1 0 0 / 0.06)` (luz superior), sombra ambient + contato.
+  - `backdrop-filter: blur(24px) saturate(1.35)`.
+- `.fenasoja-countdown-clock`:
+  - Container ganha "moldura de vidro" (glass escuro com borda dourada 0.12) para destacar o relógio como peça central.
+- `.fenasoja-countdown-unit` (os quadrados):
+  - Trocar o branco chapado por **placa 3D**: fundo `linear-gradient(180deg, oklch(var(--brand-cream)/0.98), oklch(var(--brand-cream)/0.88))`, `border: 1px solid oklch(var(--brand-gold-500)/0.35)`, `inset 0 1px 0 rgb(255 255 255 / 0.9)` (highlight superior) + `inset 0 -1px 0 oklch(var(--brand-navy-950)/0.12)` (sombra inferior interna), sombra externa de contato `0 8px 18px -10px oklch(var(--brand-navy-950)/0.55)`.
+  - Números com `text-shadow: 0 1px 0 rgb(255 255 255 / 0.7), 0 -1px 0 oklch(var(--brand-navy-950)/0.15)` para simular relevo tipográfico.
+  - Cor do valor: `oklch(var(--brand-navy-900))`; label unidade em `oklch(var(--brand-navy-900)/0.65)` com tracking wide.
+  - Separador ":" opcional entre unidades usando pseudo-elemento (`::after`) só em `sm+`.
+- `.fenasoja-countdown-value`:
+  - Fonte tabular (`font-variant-numeric: tabular-nums`), `font-weight: 800`, tamanho responsivo (`clamp(2rem, 4.2vw, 3rem)`).
+  - Contador de segundos ganha `transition: transform 220ms cubic-bezier(0.34, 1.56, 0.64, 1)` sutil no tick (spring físico), respeitando `prefers-reduced-motion`.
+- **Novo `.fenasoja-countdown-ops`** (segundo card, separado):
+  - Mesma família visual (glass navy + borda dourada 0.14), porém mais baixo/horizontal.
+  - `border-radius` idêntico ao hero, `margin-top: clamp(0.75rem, 1.5vw, 1.25rem)` para separação clara.
+  - Divisórias verticais internas entre "Preparação", "Próximo marco", "Atrasadas", "Sem data" (`border-left: 1px solid oklch(1 0 0 / 0.08)` a partir do 2º item em md+).
+  - Mantém as classes internas atuais (`.fenasoja-countdown-progress`, `.fenasoja-countdown-operations`, `.fenasoja-countdown-next-action`, `.fenasoja-countdown-operation-metric`) — só reposiciona e refina padding/gap.
+- Remover regras órfãs da `.fenasoja-countdown-description`.
 
-**3. Tipografia**
-- Título "Cronograma e Eventos" para `text-base sm:text-lg font-bold tracking-tight text-white` com pequena `text-shadow: 0 1px 0 rgb(0 0 0 / 0.4)` para dar volume.
-- Eyebrow "Ciclo oficial" mantém tracking wide, mas cor `oklch(var(--brand-gold-500) / 0.85)` para amarrar com o chip 3D.
+**3. Tipografia e ritmo**
+- Eyebrow "Nossa próxima grande história começa em" com `letter-spacing: 0.22em`, cor `oklch(var(--brand-gold-500)/0.85)`.
+- `FENASOJA 2028` mantém tamanho, mas ganha `text-shadow: 0 2px 0 rgb(0 0 0 / 0.35)` para volume; "2028" continua em ouro.
+- "Faltam X dias" com número em `oklch(var(--brand-gold-500))` + peso 700.
+
+**4. Responsivo / a11y**
+- Em `mobile` (`data-presentation="mobile"`): relógio em 4 colunas compactas mantidas, ops card colapsa em 2 colunas (Próximo marco linha inteira + Atrasadas/Sem data lado a lado).
+- `prefers-reduced-motion`: desliga a animação spring do tick de segundos e mantém apenas o valor atualizado.
 
 ## Fora de escopo
-- Nenhuma alteração em rotas, dados do cronograma, timeline ou lógica.
-- Sem tocar em tokens globais (`tokens.css`) — só CSS dedicado do módulo.
-- Sem novas dependências (efeito 3D 100% CSS puro, sem libs de física).
+- Nenhum ajuste em rotas, hooks (`useLiveFenasojaCountdown`), summary de comandos, ou lógica de contagem.
+- Nenhuma alteração em `CronogramaModuleShell` (barra superior já refinada).
+- Sem novas dependências.
 
 ## Resultado esperado
-Barra superior com sensação tátil de material físico: relevo, luz superior, sombra de contato, chip do ciclo elevado, ícone calendário com leve inclinação que se nivela no hover. Sem o texto "Central temporal independente". Leitura limpa em mobile e desktop.
+Contagem oficial com sensação premium e material físico (placas cremosas com relevo, moldura de vidro, luz dourada), sem o parágrafo descritivo, e com o bloco operacional (Preparação + Próximo marco + Atrasadas + Sem data) claramente separado em um segundo card irmão — hierarquia institucional × operacional legível de imediato.
