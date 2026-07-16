@@ -7,6 +7,7 @@ const globalStyles = readFileSync(resolve('src/index.css'), 'utf8');
 const workspaceStyles = readFileSync(resolve('src/styles/cronograma-workspace.css'), 'utf8');
 const mobileStyles = readFileSync(resolve('src/styles/cronograma-mobile.css'), 'utf8');
 const mobileOverlayStyles = readFileSync(resolve('src/styles/cronograma-mobile-overlays.css'), 'utf8');
+const countdownStyles = readFileSync(resolve('src/styles/fenasoja-countdown.css'), 'utf8');
 
 describe('arquitetura visual premium Fenasoja 2028', () => {
   it('mantém a hierarquia semântica de elevação zero a quatro', () => {
@@ -42,5 +43,13 @@ describe('arquitetura visual premium Fenasoja 2028', () => {
     expect(mobileOverlayStyles).toContain('var(--elevation-4)');
     expect(mobileOverlayStyles).toContain('var(--motion-base)');
     expect(mobileOverlayStyles).toContain('var(--destructive)');
+  });
+
+  it('adapta o countdown ao navy 2028 sem animacao decorativa continua', () => {
+    expect(countdownStyles).toContain('--fenasoja-hero-deep: 213 89% 11%');
+    expect(countdownStyles).toContain('var(--elevation-4)');
+    expect(countdownStyles).toContain('var(--motion-structural)');
+    expect(countdownStyles).not.toMatch(/hsl\(14[0-9]/i);
+    expect(countdownStyles).not.toMatch(/animation:[^;]*infinite/i);
   });
 });

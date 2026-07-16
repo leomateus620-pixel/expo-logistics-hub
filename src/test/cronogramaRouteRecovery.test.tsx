@@ -23,8 +23,8 @@ describe('Cronograma route recovery contract', () => {
       />,
     );
 
-    expect(screen.getByRole('heading', { name: 'Cronograma e Eventos' })).toBeInTheDocument();
-    expect(screen.getByText('Nenhuma ação futura encontrada no recorte atual.')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'FENASOJA 2028' })).toBeInTheDocument();
+    expect(screen.getByText('Nenhuma ação futura no recorte atual')).toBeInTheDocument();
   });
 
   it('replaces a render crash with a visible recovery state and sanitized diagnostics', () => {

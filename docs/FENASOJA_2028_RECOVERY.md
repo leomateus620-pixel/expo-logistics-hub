@@ -9,11 +9,13 @@ getTodayKey is not defined` durante a montagem da rota. Como a rota lazy não
 possuía um boundary próprio, a raiz React era desmontada e o fundo navy do
 documento permanecia sozinho.
 
-A correção concentra os três helpers em `createCronogramaCommandSummary()`,
-uma fronteira de módulo tipada e importada pelo cabeçalho. A rota agora também
-possui loading, acesso negado e recuperação de erro visíveis, com diagnóstico
-sanitizado que não registra dados do evento ou do usuário. Assim, uma futura
-falha de chunk ou renderização deixa de produzir uma tela silenciosa.
+O histórico confirmou a origem: a resolução de merge do countdown importou
+`FenasojaCountdownHero`, mas preservou o corpo antigo do cabeçalho sem os seus
+imports. A correção restaura a delegação correta ao hero e concentra os helpers
+em `buildCronogramaCommandSummary()`, uma fronteira de módulo tipada. A rota
+agora também possui loading, acesso negado e recuperação de erro visíveis, com
+diagnóstico sanitizado que não registra dados do evento ou do usuário. Assim,
+uma futura falha de chunk ou renderização deixa de produzir uma tela silenciosa.
 
 ## Mapa de regressões
 
@@ -26,6 +28,7 @@ falha de chunk ou renderização deixa de produzir uma tela silenciosa.
 | Agenda | Timeline e cartões com hierarquia | Datas, horários e eventos pouco separados | Chips, blocos de hora, cartões e diálogo com elevação coerente |
 | Escala | Calendário operacional | Filtros e chips extensos, varredura repetida de assignments | Superfícies agrupadas, chips roláveis e índice O(n) por turno |
 | Cronograma | Timeline e workspace relacionado | Tela em branco; mobile ainda herdava verde estrutural | Boundary, estados resilientes, navy/indigo estrutural e workspace conectado lazy |
+| Countdown | Contagem oficial 2028 | Merge incompleto, verde estrutural e partículas contínuas | Hero recomposto em navy/indigo, segundos funcionais e atmosfera estática |
 
 ## Arquitetura visual
 
@@ -46,13 +49,16 @@ falha de chunk ou renderização deixa de produzir uma tela silenciosa.
 - Workspace relacional carregado por import dinâmico, com CSS e JavaScript em
   chunks próprios (`30,39 kB` CSS / `5,54 kB` gzip e `21,36 kB` JS / `6,41 kB`
   gzip no build de validação).
-- Cronograma principal: `215,09 kB` / `54,97 kB` gzip, sem carregar o workspace
-  antes de sua abertura.
+- Cronograma principal: `214,85 kB` / `55,39 kB` gzip, com o CSS do countdown
+  separado (`18,77 kB` / `3,88 kB` gzip) e sem carregar o workspace antes de
+  sua abertura.
 - Escala indexa assignments uma vez por turno e memoiza nomes e escalas ativas,
   removendo filtros repetidos por célula do calendário.
 - Blur fica restrito a navegação, painéis flutuantes, diálogos e superfícies de
   comando; em mobile os raios caem para 10/14 px.
 - Animações usam `transform` e `opacity`, sem loops decorativos permanentes.
+- O countdown mantém atualização funcional de segundos, mas remove a chuva de
+  partículas, o pulse infinito e a remontagem animada de números.
 
 ## Segurança de dados
 
@@ -63,9 +69,9 @@ subevento; nenhum dado real foi substituído por mocks durante a recuperação.
 
 ## Validação
 
-- Vitest: 16 arquivos, 138 testes aprovados.
+- Vitest: 17 arquivos, 144 testes aprovados.
 - TypeScript: `tsc --noEmit` aprovado.
-- Build de produção: 4.644 módulos transformados e build aprovado.
+- Build de produção: 4.647 módulos transformados e build aprovado.
 - Viewports inspecionados: 390×844, 430×932, 768×1024, 1366×768 e 1920×1080.
 - Fluxos inspecionados: Login, Portal, Agenda, detalhe de transporte, Escala,
   criação de escala sem envio, sidebar expandida/recolhida, timeline, calendário,
