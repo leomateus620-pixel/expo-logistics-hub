@@ -1,23 +1,5 @@
-import {
-  AlertTriangle,
-  CalendarDays,
-  Clock3,
-  Flag,
-  Plus,
-  UserRoundX,
-} from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { formatLongDateRange } from '@/components/cronograma-eventos/dateUtils';
-import { getCountdownLabel, getTimelineSnapshot, getTodayKey } from '@/lib/cronograma-timeline';
+import { FenasojaCountdownHero } from './FenasojaCountdownHero';
 import type { CronogramaEvent } from './types';
-
-const currentDateFormatter = new Intl.DateTimeFormat('pt-BR', {
-  weekday: 'long',
-  day: '2-digit',
-  month: 'long',
-  year: 'numeric',
-  timeZone: 'America/Sao_Paulo',
-});
 
 export function CronogramaCommandHeader({
   events,

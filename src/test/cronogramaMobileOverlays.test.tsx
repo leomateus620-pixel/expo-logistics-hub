@@ -71,11 +71,13 @@ function installHistoryBackBehavior() {
 function EventScreenHarness({
   initialEvent = baseEvent,
   onSave = vi.fn().mockResolvedValue(undefined),
+  onEditWorkspace,
   startInEdit = false,
   sourceUnavailable = false,
 }: {
   initialEvent?: CronogramaEvent;
   onSave?: (event: CronogramaEvent) => Promise<void> | void;
+  onEditWorkspace?: (event: CronogramaEvent) => void;
   startInEdit?: boolean;
   sourceUnavailable?: boolean;
 }) {
@@ -100,6 +102,7 @@ function EventScreenHarness({
         open={open}
         onOpenChange={setOpen}
         onSave={handleSave}
+        onEditWorkspace={onEditWorkspace}
         startInEdit={startInEdit}
         sourceUnavailable={sourceUnavailable}
         canManage
@@ -210,6 +213,20 @@ describe('overlays móveis do cronograma', () => {
     await expectMobileOverlayRemoved();
     expect(historyBack).toHaveBeenCalledOnce();
     expect(screen.getByTestId('timeline-mobile')).toHaveTextContent('Linha do tempo preservada');
+  });
+
+  it('fecha a camada móvel pelo histórico antes de abrir o workspace conectado', async () => {
+    const onEditWorkspace = vi.fn();
+    const historyBack = vi.mocked(window.history.back);
+    render(<EventScreenHarness onEditWorkspace={onEditWorkspace} />);
+    const dialog = await screen.findByTestId('cronograma-mobile-event-dialog');
+
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Editar' }));
+
+    await expectMobileOverlayRemoved();
+    await waitFor(() => expect(onEditWorkspace).toHaveBeenCalledWith(baseEvent));
+    expect(historyBack).toHaveBeenCalledOnce();
+    expect(window.history.state).not.toHaveProperty(HISTORY_KEY);
   });
 
   it('suporta ciclos repetidos de abrir e fechar sem overlays residuais', async () => {
