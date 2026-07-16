@@ -134,9 +134,12 @@ export default function Sidebar({ collapsed, onToggle, isMobile, mobileOpen, onM
         </div>
       )}
       {!capsLoading && groups.map((group) => (
-        <div key={group.title}>
+        <div key={group.title} className="mt-3 first:mt-0">
           {!collapsed && (
-            <p className="select-none px-3 pb-1.5 pt-5 text-[9px] font-bold uppercase tracking-[0.16em] text-sidebar-foreground/45">
+            <p
+              className="select-none px-3 pb-1.5 pt-4 text-[10px] font-bold uppercase tracking-[0.18em]"
+              style={{ color: 'oklch(var(--sidebar-foreground) / 0.55)' }}
+            >
               {group.title}
             </p>
           )}
@@ -150,22 +153,20 @@ export default function Sidebar({ collapsed, onToggle, isMobile, mobileOpen, onM
                 onClick={mobile ? onMobileClose : undefined}
                 className={({ isActive }) =>
                   cn(
-                    'premium-nav-link relative flex items-center gap-3 rounded-lg text-sm font-medium transition-[background-color,color,transform,box-shadow] duration-200 focus-ring',
+                    'sidebar-nav-item premium-nav-link relative flex items-center gap-3 rounded-lg text-sm font-medium transition-all duration-200 focus-ring',
                     collapsed ? 'justify-center px-2' : 'px-3',
-                    mobile ? 'gap-3.5 py-3 active:bg-white/10' : 'py-2.5',
-                    isActive
-                      ? 'bg-sidebar-accent text-sidebar-accent-foreground font-semibold'
-                      : 'text-sidebar-foreground/68 hover:bg-white/[0.06] hover:text-sidebar-foreground'
+                    mobile ? 'gap-3.5 py-3' : 'py-2.5',
+                    isActive ? 'sidebar-nav-item--active font-semibold' : 'sidebar-nav-item--idle'
                   )
                 }
               >
                 {({ isActive }) => (
                   <>
-                    <Icon className={cn(
-                      'shrink-0',
-                      mobile ? 'w-5 h-5' : 'w-4 h-4',
-                      isActive ? 'text-action' : ''
-                    )} aria-hidden="true" />
+                    <Icon
+                      className={cn('shrink-0', mobile ? 'w-5 h-5' : 'w-4 h-4')}
+                      style={{ color: isActive ? 'oklch(var(--action))' : 'inherit' }}
+                      aria-hidden="true"
+                    />
                     {!collapsed && <span className="truncate">{label}</span>}
                     {!collapsed && <SidebarBadge count={badges.get(to) || 0} />}
                     {isActive && <span className="sr-only">(página atual)</span>}
@@ -188,7 +189,7 @@ export default function Sidebar({ collapsed, onToggle, isMobile, mobileOpen, onM
         <button
           onClick={onToggle}
           aria-label={collapsed ? 'Expandir menu' : 'Retrair menu'}
-          className="rounded-lg p-2 text-sidebar-foreground/60 transition-colors duration-150 hover:bg-white/[0.08] hover:text-sidebar-foreground focus-ring"
+          className="sidebar-icon-btn rounded-lg p-2 transition-colors duration-150 focus-ring"
         >
           {collapsed ? <PanelLeftOpen className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
         </button>
@@ -196,7 +197,7 @@ export default function Sidebar({ collapsed, onToggle, isMobile, mobileOpen, onM
           <button
             onClick={onMobileClose}
             aria-label="Fechar menu"
-            className="rounded-lg p-2 text-sidebar-foreground/60 transition-colors duration-150 hover:bg-white/[0.08] hover:text-sidebar-foreground focus-ring"
+            className="sidebar-icon-btn rounded-lg p-2 transition-colors duration-150 focus-ring"
           >
             <X className="w-4 h-4" />
           </button>
@@ -212,8 +213,7 @@ export default function Sidebar({ collapsed, onToggle, isMobile, mobileOpen, onM
         onClick={() => { if (mobile) onMobileClose(); signOut(); }}
         aria-label="Sair da conta"
         className={cn(
-          'flex w-full items-center gap-3 rounded-lg text-sm font-medium transition-colors duration-150 focus-ring',
-          'text-sidebar-foreground/40 hover:text-red-400 hover:bg-red-500/10',
+          'sidebar-signout flex w-full items-center gap-3 rounded-lg text-sm font-medium transition-colors duration-150 focus-ring',
           collapsed ? 'justify-center px-2 py-2.5' : 'px-3 py-2.5'
         )}
       >
