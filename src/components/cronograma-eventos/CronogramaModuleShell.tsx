@@ -61,7 +61,7 @@ export function CronogramaModuleShell({ children }: { children: ReactNode }) {
               variant="ghost"
               size="sm"
               onClick={handleSignOut}
-              className="cronograma-module-signout h-9 rounded-lg px-2.5 text-xs"
+              className="cronograma-module-signout h-11 min-w-11 rounded-lg px-2.5 text-xs sm:h-9 sm:min-w-0"
             >
               <LogOut className="h-4 w-4" aria-hidden="true" />
               <span className="hidden sm:inline">Sair</span>

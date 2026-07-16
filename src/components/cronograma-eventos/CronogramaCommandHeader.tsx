@@ -8,7 +8,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { formatLongDateRange } from '@/components/cronograma-eventos/dateUtils';
-import { getCountdownLabel, getTimelineSnapshot, getTodayKey } from '@/lib/cronograma-timeline';
+import { buildCronogramaCommandSummary } from '@/lib/cronograma-command-summary';
 import type { CronogramaEvent } from './types';
 
 const currentDateFormatter = new Intl.DateTimeFormat('pt-BR', {
@@ -30,8 +30,7 @@ export function CronogramaCommandHeader({
   onOpenUndated: () => void;
   canManage: boolean;
 }) {
-  const todayKey = getTodayKey();
-  const snapshot = getTimelineSnapshot(events, todayKey);
+  const { snapshot, nextCountdown, editionCountdown } = buildCronogramaCommandSummary(events);
   const next = snapshot.nextOfficialAction;
 
   return (
@@ -86,7 +85,7 @@ export function CronogramaCommandHeader({
             <>
               <div className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
                 <h2 className="max-w-3xl text-lg font-black leading-tight text-white sm:text-xl">{next.title}</h2>
-                <span className="font-mono text-xs font-bold text-[oklch(var(--brand-gold-400))]">{getCountdownLabel(next.date, todayKey)}</span>
+                <span className="font-mono text-xs font-bold text-[oklch(var(--brand-gold-400))]">{nextCountdown}</span>
               </div>
               <p className="mt-1.5 text-xs leading-5 text-white/62">
                 {formatLongDateRange(next.date, next.endDate)}
@@ -109,7 +108,7 @@ export function CronogramaCommandHeader({
           <Signal
             icon={CalendarDays}
             label="Próxima Fenasoja"
-            value={snapshot.edition ? getCountdownLabel(snapshot.edition.date, todayKey) : 'A definir'}
+            value={editionCountdown ?? 'A definir'}
             detail={snapshot.edition ? formatLongDateRange(snapshot.edition.date, snapshot.edition.endDate) : undefined}
           />
           <Signal icon={AlertTriangle} label="Ações atrasadas" value={snapshot.overdue} danger={snapshot.overdue > 0} />

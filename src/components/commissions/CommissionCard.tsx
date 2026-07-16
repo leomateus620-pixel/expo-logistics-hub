@@ -23,6 +23,7 @@ interface CommissionCardProps {
 export default function CommissionCard({
   module,
   actionLabel = 'Acessar módulo',
+  index = 0,
   expanded = false,
   onToggle,
   onAccess,
@@ -33,10 +34,10 @@ export default function CommissionCard({
   return (
     <article
       className={cn(
-        'overflow-hidden rounded-xl border bg-card text-card-foreground shadow-[var(--shadow-xs)]',
-        'transition-[border-color,box-shadow] duration-200',
-        expanded ? 'border-primary/35 shadow-[var(--shadow-sm)]' : 'border-border',
+        'portal-card-enter liquid-glass-card overflow-hidden rounded-xl text-card-foreground',
+        expanded ? 'border-primary/35 shadow-[var(--elevation-3)]' : 'border-border',
       )}
+      style={{ animationDelay: `${Math.min(index, 8) * 35}ms` }}
     >
       <button
         type="button"
@@ -46,7 +47,7 @@ export default function CommissionCard({
       >
         <span
           className={cn(
-            'flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border bg-secondary text-primary',
+            'flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-border bg-secondary text-primary shadow-[inset_0_1px_0_rgb(255_255_255/0.78),var(--elevation-1)] transition-transform duration-200 group-hover:-translate-y-0.5',
             module.visual?.iconBackground,
           )}
         >
@@ -81,7 +82,7 @@ export default function CommissionCard({
       </button>
 
       {expanded && (
-        <div>
+        <div className="animate-soft-rise">
           <div className="border-t border-border px-4 pb-4 pt-3 sm:px-5">
             <p className="text-sm leading-6 text-muted-foreground">{module.description}</p>
 

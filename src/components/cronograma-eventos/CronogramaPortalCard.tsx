@@ -5,11 +5,11 @@ export function CronogramaPortalCard({ onAccess }: { onAccess: () => void }) {
     <button
       type="button"
       onClick={onAccess}
-      className="group w-full overflow-hidden rounded-xl border border-white/14 bg-white/[0.055] text-left shadow-[var(--shadow-xs)] outline-none transition-[border-color,background-color] duration-200 hover:border-[oklch(var(--brand-orange-500)/0.56)] hover:bg-white/[0.075] focus-visible:ring-2 focus-visible:ring-[oklch(var(--brand-orange-500))]"
+      className="cronograma-portal-card group w-full text-left outline-none focus-visible:ring-2 focus-visible:ring-[oklch(var(--brand-orange-500))] focus-visible:ring-offset-2 focus-visible:ring-offset-[oklch(var(--brand-navy-900))]"
       aria-label="Acessar Cronograma e Eventos"
     >
       <span className="grid gap-4 p-4 sm:p-5 lg:grid-cols-[auto_minmax(0,1fr)_auto] lg:items-center">
-        <span className="flex h-12 w-12 items-center justify-center rounded-lg bg-[oklch(var(--brand-indigo-500))] text-white" aria-hidden="true">
+        <span className="cronograma-portal-icon flex h-12 w-12 items-center justify-center rounded-xl text-white" aria-hidden="true">
           <CalendarRange className="h-7 w-7" />
         </span>
 
@@ -39,7 +39,7 @@ export function CronogramaPortalCard({ onAccess }: { onAccess: () => void }) {
 
         <span className="inline-flex items-center gap-2 text-sm font-bold text-[oklch(var(--brand-gold-400))]">
           Acessar central
-          <ArrowRight className="h-4 w-4" aria-hidden="true" />
+          <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" aria-hidden="true" />
         </span>
       </span>
     </button>

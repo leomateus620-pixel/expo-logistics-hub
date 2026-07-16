@@ -36,8 +36,12 @@
 
 @layer utilities {
   .glass {
-    @apply border border-border bg-card;
-    box-shadow: var(--shadow-xs);
+    position: relative;
+    border: 1px solid oklch(var(--glass-border));
+    background: oklch(var(--glass-surface));
+    box-shadow: var(--elevation-2);
+    backdrop-filter: blur(var(--glass-blur-nav)) saturate(var(--glass-saturation));
+    -webkit-backdrop-filter: blur(var(--glass-blur-nav)) saturate(var(--glass-saturation));
   }
   
   .status-badge {
@@ -1387,7 +1391,7 @@ input::placeholder, textarea::placeholder {
   to { opacity: 1; transform: translateY(0); }
 }
 .animate-page-in {
-  animation: page-in 220ms cubic-bezier(0.25, 0.1, 0.25, 1) both;
+  animation: page-in var(--motion-base) var(--ease-decelerate) both;
 }
 @media (prefers-reduced-motion: reduce) {
   .animate-page-in { animation: none; }
@@ -1715,8 +1719,10 @@ input::placeholder, textarea::placeholder {
   top: 0;
   z-index: 40;
   border-bottom: 1px solid rgb(255 255 255 / 0.10);
-  background: oklch(var(--cronograma-forest));
-  box-shadow: var(--shadow-sm);
+  background: oklch(var(--glass-surface-inverse));
+  box-shadow: var(--elevation-2);
+  backdrop-filter: blur(var(--glass-blur-nav)) saturate(var(--glass-saturation));
+  -webkit-backdrop-filter: blur(var(--glass-blur-nav)) saturate(var(--glass-saturation));
 }
 
 .cronograma-module-back,
@@ -1725,12 +1731,13 @@ input::placeholder, textarea::placeholder {
   align-items: center;
   justify-content: center;
   gap: 0.25rem;
-  min-height: 2.25rem;
   border-radius: 0.55rem;
   color: rgb(255 255 255 / 0.68);
 }
 
 .cronograma-module-back {
+  min-width: 2.75rem;
+  min-height: 2.75rem;
   padding-inline: 0.5rem;
   font-size: 0.75rem;
   font-weight: 700;
@@ -1739,6 +1746,7 @@ input::placeholder, textarea::placeholder {
 
 .cronograma-module-mark {
   width: 2rem;
+  min-height: 2.25rem;
   border: 1px solid oklch(var(--gold) / 0.25);
   background: oklch(var(--gold) / 0.10);
   color: oklch(var(--gold));
@@ -1770,11 +1778,19 @@ input::placeholder, textarea::placeholder {
     radial-gradient(circle at 82% 0%, oklch(var(--brand-indigo-500) / 0.72), transparent 36%),
     radial-gradient(circle at 100% 100%, oklch(var(--action) / 0.12), transparent 30%),
     oklch(var(--cronograma-forest));
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--elevation-3);
 }
 
 .cronograma-command-header::after {
-  display: none;
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(rgb(255 255 255 / 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.02) 1px, transparent 1px),
+    radial-gradient(circle at 18% -20%, rgb(255 255 255 / 0.10), transparent 28%);
+  background-size: 42px 42px, 42px 42px, auto;
+  content: '';
+  pointer-events: none;
 }
 
 .cronograma-command-grid,
@@ -1804,8 +1820,8 @@ input::placeholder, textarea::placeholder {
   width: 0.4rem;
   height: 0.4rem;
   border-radius: 999px;
-  background: hsl(145 62% 58%);
-  box-shadow: 0 0 0 4px hsl(145 62% 58% / 0.10);
+  background: oklch(var(--brand-green));
+  box-shadow: 0 0 0 4px oklch(var(--brand-green) / 0.12);
 }
 
 .cronograma-command-actions {
@@ -1829,7 +1845,11 @@ input::placeholder, textarea::placeholder {
 .cronograma-primary-action {
   background: oklch(var(--action));
   color: oklch(var(--action-foreground));
-  box-shadow: none;
+  box-shadow:
+    0 2px 4px rgb(3 24 52 / 0.18),
+    0 14px 26px -16px oklch(var(--action) / 0.72),
+    inset 0 1px 0 rgb(255 255 255 / 0.32),
+    inset 0 -2px 0 rgb(3 24 52 / 0.15);
 }
 
 .cronograma-primary-action:hover {
@@ -1911,16 +1931,19 @@ input::placeholder, textarea::placeholder {
 
 .cronograma-command-dock {
   border-radius: 0 0 1.1rem 1.1rem;
-  background: oklch(var(--cronograma-paper) / 0.88);
-  backdrop-filter: blur(18px) saturate(1.15);
+  background: oklch(var(--glass-surface-strong));
+  box-shadow: 0 16px 34px -30px rgb(3 24 52 / 0.55);
+  backdrop-filter: blur(var(--glass-blur-nav)) saturate(var(--glass-saturation));
+  -webkit-backdrop-filter: blur(var(--glass-blur-nav)) saturate(var(--glass-saturation));
 }
 
 .cronograma-view-nav,
 .cronograma-filter-surface {
-  border: 1px solid oklch(var(--cronograma-line) / 0.76);
-  background: rgb(255 255 255 / 0.82);
-  box-shadow: 0 14px 38px -34px rgb(15 70 35 / 0.55), inset 0 1px 0 rgb(255 255 255 / 0.70);
-  backdrop-filter: blur(18px) saturate(1.1);
+  border: 1px solid oklch(var(--glass-border));
+  background: oklch(var(--glass-surface-strong));
+  box-shadow: var(--elevation-2);
+  backdrop-filter: blur(var(--glass-blur-nav)) saturate(var(--glass-saturation));
+  -webkit-backdrop-filter: blur(var(--glass-blur-nav)) saturate(var(--glass-saturation));
 }
 
 .cronograma-view-nav {
@@ -1960,7 +1983,8 @@ input::placeholder, textarea::placeholder {
 .cronograma-view-tab.is-active {
   background: oklch(var(--primary));
   color: white;
-  box-shadow: 0 12px 24px -18px oklch(var(--primary) / 0.85);
+  box-shadow: var(--elevation-1), inset 0 1px 0 rgb(255 255 255 / 0.18);
+  transform: translateY(-1px);
 }
 
 .cronograma-view-tab.is-active svg {
@@ -2007,10 +2031,11 @@ input::placeholder, textarea::placeholder {
 .cronograma-ledger,
 .cronograma-board-heading,
 .cronograma-category-ledger {
-  border: 1px solid oklch(var(--cronograma-line) / 0.78);
-  background: rgb(255 255 255 / 0.74);
-  box-shadow: 0 20px 54px -42px rgb(17 72 38 / 0.52), inset 0 1px 0 rgb(255 255 255 / 0.78);
-  backdrop-filter: blur(16px);
+  border: 1px solid oklch(var(--glass-border));
+  background: oklch(var(--glass-surface-strong));
+  box-shadow: var(--elevation-2);
+  backdrop-filter: blur(var(--glass-blur-nav)) saturate(var(--glass-saturation));
+  -webkit-backdrop-filter: blur(var(--glass-blur-nav)) saturate(var(--glass-saturation));
 }
 
 .cronograma-main-event {
@@ -2018,7 +2043,7 @@ input::placeholder, textarea::placeholder {
   border-color: oklch(var(--gold) / 0.32);
   background:
     linear-gradient(110deg, oklch(var(--primary) / 0.08), transparent 42%),
-    rgb(255 255 255 / 0.78);
+    oklch(var(--glass-surface-strong));
 }
 
 .cronograma-main-date-panel {
@@ -2035,7 +2060,7 @@ input::placeholder, textarea::placeholder {
 .cronograma-ledger.is-undated,
 .cronograma-board-heading.is-undated {
   border-color: oklch(var(--gold) / 0.28);
-  background: hsl(46 72% 97% / 0.82);
+  background: oklch(var(--warning) / 0.08);
 }
 
 .cronograma-event-row {
@@ -2191,8 +2216,8 @@ input::placeholder, textarea::placeholder {
   overflow: hidden;
   border: 1px solid oklch(var(--cronograma-line) / 0.76);
   border-radius: 1.1rem;
-  background: rgb(255 255 255 / 0.68);
-  box-shadow: 0 22px 58px -48px rgb(16 70 36 / 0.55);
+  background: oklch(var(--glass-surface-strong));
+  box-shadow: var(--elevation-1);
   opacity: 0.86;
   transform: translateY(4px);
   transition: opacity 220ms ease, transform 220ms cubic-bezier(0.23, 1, 0.32, 1), border-color 220ms ease;
@@ -2200,6 +2225,7 @@ input::placeholder, textarea::placeholder {
 
 .cronograma-story-section[data-active='true'] {
   border-color: oklch(var(--primary) / 0.28);
+  box-shadow: var(--elevation-2);
   opacity: 1;
   transform: translateY(0);
 }
@@ -2283,17 +2309,19 @@ input::placeholder, textarea::placeholder {
 }
 
 .cronograma-drawer {
-  border-left: 1px solid oklch(var(--gold) / 0.22);
-  background: oklch(var(--cronograma-paper) / 0.96);
-  box-shadow: -26px 0 70px -42px rgb(5 45 22 / 0.68);
-  backdrop-filter: blur(24px) saturate(1.08);
+  border-left: 1px solid oklch(var(--gold) / 0.24);
+  background: oklch(var(--glass-surface-strong));
+  box-shadow: var(--elevation-4);
+  backdrop-filter: blur(var(--glass-blur-panel)) saturate(var(--glass-saturation));
+  -webkit-backdrop-filter: blur(var(--glass-blur-panel)) saturate(var(--glass-saturation));
 }
 
 .cronograma-drawer-header,
 .cronograma-drawer-footer {
   border-color: oklch(var(--border) / 0.58);
-  background: rgb(255 255 255 / 0.64);
-  backdrop-filter: blur(18px);
+  background: oklch(var(--glass-surface-strong));
+  backdrop-filter: blur(var(--glass-blur-nav));
+  -webkit-backdrop-filter: blur(var(--glass-blur-nav));
 }
 
 .cronograma-drawer-header {
@@ -2318,15 +2346,18 @@ input::placeholder, textarea::placeholder {
 
 .cronograma-portal-card {
   position: relative;
+  isolation: isolate;
   overflow: hidden;
-  border: 1px solid oklch(var(--gold) / 0.24);
+  border: 1px solid oklch(var(--brand-orange-500) / 0.34);
   border-radius: 1.1rem;
   background:
-    radial-gradient(circle at 90% 0%, oklch(var(--gold) / 0.13), transparent 30%),
-    hsl(143 55% 12% / 0.88);
-  box-shadow: 0 24px 70px -38px rgb(0 0 0 / 0.68), inset 0 1px 0 rgb(255 255 255 / 0.08);
-  backdrop-filter: blur(20px);
-  transition: border-color 200ms ease, transform 180ms ease, box-shadow 200ms ease;
+    radial-gradient(circle at 88% 0%, oklch(var(--brand-indigo-500) / 0.34), transparent 34%),
+    radial-gradient(circle at 0% 120%, oklch(var(--brand-orange-500) / 0.14), transparent 34%),
+    oklch(var(--brand-navy-800) / 0.72);
+  box-shadow: var(--elevation-3);
+  backdrop-filter: blur(var(--glass-blur-panel)) saturate(var(--glass-saturation));
+  -webkit-backdrop-filter: blur(var(--glass-blur-panel)) saturate(var(--glass-saturation));
+  transition: border-color var(--motion-base) var(--ease-standard), transform var(--motion-base) var(--ease-decelerate), box-shadow var(--motion-base) var(--ease-standard);
 }
 
 .cronograma-portal-rail {
@@ -2362,7 +2393,7 @@ input::placeholder, textarea::placeholder {
   height: 0.7rem;
   border: 2px solid oklch(var(--gold));
   border-radius: 999px;
-  background: hsl(143 55% 12%);
+  background: oklch(var(--brand-navy-900));
 }
 
 .cronograma-portal-node[data-final='true'] {
@@ -2521,8 +2552,8 @@ input::placeholder, textarea::placeholder {
   }
 
   .cronograma-portal-card:hover {
-    border-color: oklch(var(--gold) / 0.45);
-    box-shadow: 0 28px 76px -38px rgb(0 0 0 / 0.78), 0 0 0 1px oklch(var(--gold) / 0.08);
+    border-color: oklch(var(--brand-orange-500) / 0.62);
+    box-shadow: var(--elevation-4), 0 0 0 1px oklch(var(--brand-gold-400) / 0.08);
     transform: translateY(-2px);
   }
 
@@ -2648,20 +2679,29 @@ input::placeholder, textarea::placeholder {
 .liquid-glass,
 .liquid-glass-card,
 .premium-surface,
-.glass-panel,
-.surface-primary,
-.surface-secondary {
-  background: oklch(var(--card));
-  border: 1px solid oklch(var(--border));
-  box-shadow: var(--shadow-xs);
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
+.glass-panel {
+  position: relative;
+  isolation: isolate;
+  border: 1px solid oklch(var(--glass-border));
+  background:
+    linear-gradient(145deg, rgb(255 255 255 / 0.16), transparent 42%),
+    oklch(var(--glass-surface));
+  box-shadow: var(--elevation-2);
+  backdrop-filter: blur(var(--glass-blur-panel)) saturate(var(--glass-saturation));
+  -webkit-backdrop-filter: blur(var(--glass-blur-panel)) saturate(var(--glass-saturation));
 }
 
-/* Legacy blur utilities degrade to opaque surfaces without compositor blur. */
-[class*="backdrop-blur"] {
-  backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
+.glass-panel,
+.premium-surface {
+  box-shadow: var(--elevation-3);
+}
+
+.surface-primary,
+.surface-secondary {
+  position: relative;
+  border: 1px solid oklch(var(--border) / 0.82);
+  background: oklch(var(--card));
+  box-shadow: var(--elevation-1);
 }
 
 /* Legacy text utilities use contrast-safe foreground tones on light surfaces. */
@@ -2682,19 +2722,40 @@ input::placeholder, textarea::placeholder {
 }
 
 .liquid-glass-card:hover,
-.interactive-lift:hover,
-.interactive-lift:active {
-  transform: none;
-  box-shadow: var(--shadow-sm);
+.interactive-lift:hover {
+  border-color: oklch(var(--primary) / 0.28);
+  box-shadow: var(--elevation-2);
+  transform: translateY(var(--interaction-lift));
+}
+
+.liquid-glass-card,
+.interactive-lift {
+  transform: translateZ(0);
+  transition:
+    transform var(--motion-base) var(--ease-decelerate),
+    border-color var(--motion-fast) var(--ease-standard),
+    box-shadow var(--motion-base) var(--ease-standard),
+    background-color var(--motion-fast) var(--ease-standard);
+}
+
+.liquid-glass-card:active,
+.interactive-lift:active,
+.interaction-press:active {
+  box-shadow: var(--elevation-1);
+  transform: translateY(0) scale(var(--interaction-press-scale));
+  transition-duration: var(--motion-instant);
 }
 
 .liquid-glass-card::before,
 .premium-surface::before,
-.glass-panel::before,
-.grain-texture::before,
-.sidebar-gold-bar::before,
-.commission-card-glow {
-  display: none;
+.glass-panel::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 1px 0 rgb(var(--glass-highlight));
+  content: '';
+  pointer-events: none;
 }
 
 .gold-accent::after {
@@ -2715,14 +2776,36 @@ input::placeholder, textarea::placeholder {
 
 .command-grid-bg {
   background-image:
-    radial-gradient(circle at 88% 0%, oklch(var(--primary) / 0.07), transparent 34%),
-    radial-gradient(circle at 0% 100%, oklch(var(--action) / 0.055), transparent 28%);
-  background-size: auto;
+    linear-gradient(oklch(var(--primary) / 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, oklch(var(--primary) / 0.02) 1px, transparent 1px),
+    radial-gradient(circle at 88% 0%, oklch(var(--primary) / 0.085), transparent 34%),
+    radial-gradient(circle at 0% 100%, oklch(var(--action) / 0.06), transparent 28%);
+  background-size: 44px 44px, 44px 44px, auto, auto;
 }
 
 .portal-card-enter,
 .animate-soft-rise {
-  animation: none;
+  animation: premium-soft-rise var(--motion-slow) var(--ease-decelerate) backwards;
+}
+
+.route-soft-enter {
+  animation: premium-route-in var(--motion-structural) var(--ease-decelerate) both;
+}
+
+.grain-texture::before,
+.sidebar-gold-bar::before,
+.commission-card-glow {
+  display: none;
+}
+
+@keyframes premium-soft-rise {
+  from { opacity: 0; transform: translateY(10px) scale(0.992); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes premium-route-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .premium-sidebar-scrollbar {
@@ -2731,6 +2814,222 @@ input::placeholder, textarea::placeholder {
 
 .premium-sidebar-scrollbar::-webkit-scrollbar-thumb {
   background: oklch(var(--navigation-active) / 0.38);
+}
+
+/* Screen-level variants use the shared primitives rather than local shadows. */
+.elevation-0 { box-shadow: var(--elevation-0); }
+.elevation-1 { box-shadow: var(--elevation-1); }
+.elevation-2 { box-shadow: var(--elevation-2); }
+.elevation-3 { box-shadow: var(--elevation-3); }
+.elevation-4 { box-shadow: var(--elevation-4); }
+
+.premium-structural-motion {
+  transition-timing-function: var(--ease-decelerate);
+}
+
+.auth-glass-panel {
+  border-color: oklch(var(--glass-border));
+  background:
+    radial-gradient(circle at 100% 0%, oklch(var(--brand-gold-400) / 0.10), transparent 30%),
+    oklch(var(--glass-surface-strong));
+  box-shadow: var(--elevation-4);
+  backdrop-filter: blur(var(--glass-blur-panel)) saturate(var(--glass-saturation));
+  -webkit-backdrop-filter: blur(var(--glass-blur-panel)) saturate(var(--glass-saturation));
+}
+
+.auth-primary-action {
+  box-shadow:
+    0 2px 4px rgb(3 24 52 / 0.16),
+    0 14px 26px -16px oklch(var(--action) / 0.74),
+    inset 0 1px 0 rgb(255 255 255 / 0.34),
+    inset 0 -2px 0 rgb(3 24 52 / 0.14);
+  transition: transform var(--motion-fast) var(--ease-standard), box-shadow var(--motion-fast) var(--ease-standard), filter var(--motion-fast) var(--ease-standard);
+}
+
+.auth-primary-action:hover {
+  box-shadow:
+    0 3px 6px rgb(3 24 52 / 0.18),
+    0 18px 32px -16px oklch(var(--action) / 0.82),
+    inset 0 1px 0 rgb(255 255 255 / 0.38),
+    inset 0 -2px 0 rgb(3 24 52 / 0.14);
+  filter: saturate(1.04) brightness(1.02);
+  transform: translateY(-1px);
+}
+
+.auth-primary-action:active {
+  box-shadow: var(--elevation-1), inset 0 2px 4px rgb(3 24 52 / 0.18);
+  transform: translateY(1px) scale(var(--interaction-press-scale));
+}
+
+.portal-glass-stat,
+.premium-app-header {
+  border: 1px solid oklch(var(--glass-border-inverse));
+  background: oklch(var(--glass-surface-inverse));
+  box-shadow: var(--elevation-2);
+  backdrop-filter: blur(var(--glass-blur-nav)) saturate(var(--glass-saturation));
+  -webkit-backdrop-filter: blur(var(--glass-blur-nav)) saturate(var(--glass-saturation));
+}
+
+.premium-app-sidebar {
+  box-shadow: 12px 0 34px -28px rgb(3 24 52 / 0.92), inset -1px 0 rgb(255 255 255 / 0.025);
+}
+
+.premium-app-header {
+  background: oklch(var(--glass-surface-strong));
+  border-color: oklch(var(--border) / 0.72);
+  box-shadow: var(--elevation-1);
+}
+
+.premium-nav-link::before {
+  position: absolute;
+  inset-block: 0.55rem;
+  left: 0;
+  width: 3px;
+  border-radius: 0 999px 999px 0;
+  background: oklch(var(--action));
+  box-shadow: 0 0 14px oklch(var(--action) / 0.42);
+  content: '';
+  opacity: 0;
+  transform: scaleY(0.45);
+  transition: opacity var(--motion-fast) var(--ease-standard), transform var(--motion-base) var(--ease-spring);
+}
+
+.premium-nav-link[aria-current='page'] {
+  box-shadow: inset 0 1px rgb(255 255 255 / 0.06), 0 8px 22px -18px rgb(0 0 0 / 0.7);
+  transform: translateX(2px);
+}
+
+.premium-nav-link[aria-current='page']::before {
+  opacity: 1;
+  transform: scaleY(1);
+}
+
+.agenda-card-depth,
+.escala-surface {
+  box-shadow: var(--elevation-1);
+  transition: transform var(--motion-base) var(--ease-decelerate), border-color var(--motion-fast) var(--ease-standard), box-shadow var(--motion-base) var(--ease-standard), background-color var(--motion-fast) var(--ease-standard);
+}
+
+.agenda-time-block {
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.78), 0 8px 18px -16px oklch(var(--primary) / 0.58);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .agenda-day-chip:hover {
+    box-shadow: var(--elevation-2);
+    transform: translateY(-2px);
+  }
+
+  .agenda-card-depth:hover {
+    box-shadow: var(--elevation-2);
+    transform: translateY(-2px);
+  }
+
+  .escala-calendar-day:hover {
+    background: oklch(var(--secondary));
+    transform: translateY(-1px);
+  }
+}
+
+.agenda-day-chip:active {
+  box-shadow: var(--elevation-1);
+  transform: translateY(0) scale(var(--interaction-press-scale));
+}
+
+.escala-surface {
+  border-color: oklch(var(--border) / 0.82);
+  background:
+    radial-gradient(circle at 100% 0%, oklch(var(--primary) / 0.045), transparent 30%),
+    oklch(var(--card));
+}
+
+.escala-calendar-day {
+  transition: transform var(--motion-fast) var(--ease-standard), background-color var(--motion-fast) var(--ease-standard), box-shadow var(--motion-fast) var(--ease-standard);
+}
+
+.escala-calendar-day[data-selected='true'] {
+  z-index: 1;
+  background: oklch(var(--selected-surface));
+  box-shadow: inset 0 0 0 1px oklch(var(--primary) / 0.32), var(--elevation-1);
+  transform: translateY(-1px);
+}
+
+.cronograma-route-state {
+  border: 1px solid oklch(var(--glass-border));
+  background: oklch(var(--glass-surface-strong));
+  box-shadow: var(--elevation-4);
+  backdrop-filter: blur(var(--glass-blur-panel)) saturate(var(--glass-saturation));
+  -webkit-backdrop-filter: blur(var(--glass-blur-panel)) saturate(var(--glass-saturation));
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .glass,
+  .liquid-glass,
+  .liquid-glass-card,
+  .premium-surface,
+  .glass-panel,
+  .auth-glass-panel,
+  .portal-glass-stat,
+  .premium-app-header,
+  .cronograma-route-state {
+    background: oklch(var(--card));
+  }
+
+  .portal-glass-stat {
+    background: oklch(var(--brand-navy-800));
+  }
+}
+
+@media (max-width: 767px), (pointer: coarse) {
+  :root {
+    --glass-blur-nav: 10px;
+    --glass-blur-panel: 14px;
+  }
+
+  .interactive-lift:hover,
+  .liquid-glass-card:hover,
+  .agenda-card-depth:hover {
+    transform: none;
+  }
+
+  .escala-surface :is(button, input, [role='combobox']),
+  .agenda-page-shell :is(button, input, [role='combobox']) {
+    min-height: 2.75rem;
+  }
+
+  .escala-surface button,
+  .agenda-page-shell button {
+    min-width: 2.75rem;
+  }
+}
+
+@media (min-width: 640px) {
+  .cronograma-module-back {
+    min-width: auto;
+    min-height: 2.25rem;
+  }
+}
+
+@media (prefers-contrast: more), (prefers-reduced-transparency: reduce) {
+  .glass,
+  .liquid-glass,
+  .liquid-glass-card,
+  .premium-surface,
+  .glass-panel,
+  .auth-glass-panel,
+  .portal-glass-stat,
+  .premium-app-header,
+  .cronograma-route-state {
+    border-color: oklch(var(--foreground) / 0.38);
+    background: oklch(var(--card));
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .portal-glass-stat {
+    border-color: rgb(255 255 255 / 0.30);
+    background: oklch(var(--brand-navy-800));
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

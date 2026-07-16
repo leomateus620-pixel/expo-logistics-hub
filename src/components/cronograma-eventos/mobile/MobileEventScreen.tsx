@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type RefObject } from 'react';
+import { useEffect, useMemo, useRef, useState, type RefObject } from 'react';
 import {
   AlertTriangle,
   CalendarClock,
@@ -40,6 +40,7 @@ export function MobileEventScreen({
   open,
   onOpenChange,
   onSave,
+  onEditWorkspace,
   startInEdit = false,
   canManage = false,
   returnFocusRef,
@@ -53,6 +54,7 @@ export function MobileEventScreen({
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSave: (event: CronogramaEvent) => Promise<void> | void;
+  onEditWorkspace?: (event: CronogramaEvent) => void;
   startInEdit?: boolean;
   canManage?: boolean;
   returnFocusRef?: RefObject<HTMLElement>;
@@ -67,6 +69,7 @@ export function MobileEventScreen({
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [discardTarget, setDiscardTarget] = useState<DiscardTarget>(null);
+  const workspaceTargetRef = useRef<CronogramaEvent | null>(null);
   const eventIdentity = event?.sourceKey ?? event?.id;
 
   useEffect(() => {
@@ -82,7 +85,14 @@ export function MobileEventScreen({
   const overlayHistory = useMobileOverlayHistory({
     open: open && Boolean(event),
     dirty: (editMode && dirty) || saving,
-    onClose: () => onOpenChange(false),
+    onClose: () => {
+      onOpenChange(false);
+      const workspaceTarget = workspaceTargetRef.current;
+      workspaceTargetRef.current = null;
+      if (workspaceTarget && onEditWorkspace) {
+        window.setTimeout(() => onEditWorkspace(workspaceTarget), 0);
+      }
+    },
     onDirtyClose: () => {
       if (!saving) setDiscardTarget('close');
     },
@@ -126,6 +136,15 @@ export function MobileEventScreen({
       return;
     }
     setEditMode(false);
+  };
+
+  const handleEdit = () => {
+    if (!onEditWorkspace) {
+      setEditMode(true);
+      return;
+    }
+    workspaceTargetRef.current = event;
+    overlayHistory.requestClose();
   };
 
   const handleConfirmDiscard = () => {
@@ -214,7 +233,12 @@ export function MobileEventScreen({
                 <Button type="button" variant="outline" onClick={overlayHistory.requestClose} disabled={saving} className="rounded-xl">
                   Fechar
                 </Button>
-                <Button type="button" onClick={() => setEditMode(true)} disabled={saving} className="rounded-xl">
+                <Button
+                  type="button"
+                  onClick={handleEdit}
+                  disabled={saving}
+                  className="rounded-xl"
+                >
                   <Edit3 className="h-4 w-4" />Editar
                 </Button>
               </>

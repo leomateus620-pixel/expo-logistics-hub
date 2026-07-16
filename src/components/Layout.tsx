@@ -42,7 +42,7 @@ export default function Layout({ children }: { children: ReactNode }) {
   }, [location.pathname]);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="command-grid-bg min-h-screen bg-background">
       <a href="#main-content" className="skip-to-content">Pular para conteúdo</a>
       <OfflineBanner />
       <DriverGpsBanner />
@@ -57,16 +57,16 @@ export default function Layout({ children }: { children: ReactNode }) {
 
       <main
         id="main-content"
-        className="min-h-screen p-4 transition-[margin] duration-200 md:p-6"
+        className="premium-structural-motion min-h-screen p-4 transition-[margin] duration-300 md:p-6"
         style={{ marginLeft: sidebarWidth }}
       >
-        <header className="sticky top-0 z-30 -mx-4 -mt-4 mb-4 flex min-h-14 items-center gap-3 border-b border-border bg-background px-4 py-2.5 md:-mx-6 md:-mt-6 md:mb-6 md:px-6">
+        <header className="premium-app-header sticky top-0 z-30 -mx-4 -mt-4 mb-4 flex min-h-14 items-center gap-3 border-x-0 border-t-0 px-4 py-2.5 md:-mx-6 md:-mt-6 md:mb-6 md:px-6">
           {isMobile && (
             <button
               type="button"
               onClick={() => setMobileOpen(true)}
               aria-label="Abrir menu"
-              className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-border bg-card text-foreground shadow-[var(--shadow-xs)] transition-colors duration-150 hover:bg-accent focus-ring"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-border bg-card text-foreground shadow-[var(--shadow-xs)] transition-colors duration-150 hover:bg-accent focus-ring"
             >
               <Menu className="h-5 w-5" aria-hidden="true" />
             </button>
@@ -75,7 +75,7 @@ export default function Layout({ children }: { children: ReactNode }) {
             <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground">Comissão de Logística</p>
             <h1 className="truncate text-sm font-bold text-foreground sm:text-base">{routeLabel}</h1>
           </div>
-          <span className="rounded-md bg-accent px-2 py-1 text-[10px] font-black tracking-[0.08em] text-accent-foreground">FENASOJA 2028</span>
+          <span className="rounded-md border border-primary/10 bg-accent px-2 py-1 text-[10px] font-black tracking-[0.08em] text-accent-foreground shadow-[var(--elevation-1)]">FENASOJA 2028</span>
         </header>
 
         <PageTransition>{children}</PageTransition>

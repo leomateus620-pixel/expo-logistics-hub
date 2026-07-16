@@ -57,7 +57,7 @@ export default function CommissionPortalPage() {
   }, [expandedSlug]);
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[oklch(var(--brand-navy-900))] text-[oklch(var(--brand-soft-white))]">
+    <div className="command-grid-bg relative min-h-screen overflow-hidden bg-[oklch(var(--brand-navy-900))] text-[oklch(var(--brand-soft-white))]">
       <div
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_82%_4%,oklch(var(--brand-indigo-500)/0.72),transparent_38%),radial-gradient(circle_at_12%_105%,oklch(var(--brand-orange-500)/0.22),transparent_34%)]"
         aria-hidden="true"
@@ -67,13 +67,13 @@ export default function CommissionPortalPage() {
         aria-hidden="true"
       />
 
-      <main className="relative mx-auto flex min-h-screen w-full max-w-7xl flex-col px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
-        <header className="flex items-center justify-between gap-4 border-b border-white/10 pb-4">
+      <main className="route-soft-enter relative mx-auto flex min-h-screen w-full max-w-7xl flex-col px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
+        <header className="portal-glass-stat flex items-center justify-between gap-4 rounded-xl px-3 py-2.5 sm:px-4">
           <FenasojaBrand subtitle="Sistema integrado de gestão" tone="dark" />
           <button
             type="button"
             onClick={accessAdmin}
-            className="inline-flex h-10 items-center gap-2 rounded-lg border border-white/16 px-3 text-sm font-semibold text-white transition-colors duration-150 hover:border-[oklch(var(--brand-orange-500)/0.65)] hover:bg-white/8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[oklch(var(--brand-orange-500))]"
+            className="interaction-press inline-flex h-11 min-w-11 items-center gap-2 rounded-lg border border-white/16 bg-white/[0.035] px-3 text-sm font-semibold text-white transition-[background-color,border-color,transform] duration-150 hover:border-[oklch(var(--brand-orange-500)/0.65)] hover:bg-white/8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[oklch(var(--brand-orange-500))] sm:h-10 sm:min-w-0"
           >
             <ShieldCheck className="h-4 w-4 text-[oklch(var(--brand-gold-400))]" aria-hidden="true" />
             <span className="hidden sm:inline">Administrador</span>
@@ -94,12 +94,12 @@ export default function CommissionPortalPage() {
             </p>
           </div>
 
-          <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-white/12 bg-white/12">
-            <div className="bg-[oklch(var(--brand-navy-900))] p-4">
+          <dl className="portal-glass-stat grid grid-cols-2 gap-px overflow-hidden rounded-xl">
+            <div className="bg-white/[0.035] p-4">
               <dt className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/50">Comissões</dt>
               <dd className="mt-1 text-3xl font-black text-[oklch(var(--brand-gold-400))]">{modules.length}</dd>
             </div>
-            <div className="bg-[oklch(var(--brand-navy-900))] p-4">
+            <div className="bg-white/[0.035] p-4">
               <dt className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/50">Ciclo</dt>
               <dd className="mt-1 text-3xl font-black text-white">2028</dd>
             </div>
@@ -120,10 +120,11 @@ export default function CommissionPortalPage() {
           </div>
 
           <div className="grid grid-cols-1 items-start gap-2.5 lg:grid-cols-2">
-            {modules.map((module) => (
+            {modules.map((module, index) => (
               <CommissionCard
                 key={module.slug}
                 module={module}
+                index={index}
                 expanded={expandedSlug === module.slug}
                 onToggle={() => setExpandedSlug((current) => (current === module.slug ? null : module.slug))}
                 onAccess={() => accessModule(module.slug)}

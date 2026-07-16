@@ -336,18 +336,18 @@ export default function AgendaPage() {
 
   /* ── render ── */
   return (
-    <div className="space-y-5">
+    <div className="agenda-page-shell space-y-5">
       {/* ── Header ── */}
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center justify-between gap-3 rounded-2xl border border-border/75 bg-card/78 p-4 shadow-[var(--elevation-1)] backdrop-blur-sm">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Agenda de Transportes</h1>
           <p className="text-sm text-muted-foreground mt-1">Gestão dos deslocamentos e recepção de convidados</p>
         </div>
         <div className="flex items-center gap-2">
-          <Button size="sm" variant="outline" onClick={() => generateAgendaPDF(selectedDate, dayEvents, grouped, members, commissions)} className="h-10 sm:h-9 gap-1.5 rounded-xl shadow-sm active:scale-[0.97] transition-transform" disabled={dayEvents.length === 0}>
+          <Button size="sm" variant="outline" onClick={() => generateAgendaPDF(selectedDate, dayEvents, grouped, members, commissions)} className="h-11 sm:h-9 gap-1.5 rounded-xl shadow-sm active:scale-[0.97] transition-transform" disabled={dayEvents.length === 0}>
             <FileDown className="w-4 h-4" /> PDF
           </Button>
-          <Button size="sm" onClick={openCreate} className="h-10 sm:h-9 gap-1.5 rounded-xl shadow-sm active:scale-[0.97] transition-transform">
+          <Button size="sm" onClick={openCreate} className="h-11 sm:h-9 gap-1.5 rounded-xl shadow-sm active:scale-[0.97] transition-transform">
             <Plus className="w-4 h-4" /> Novo Evento
           </Button>
         </div>
@@ -364,10 +364,10 @@ export default function AgendaPage() {
               data-active={active}
               onClick={() => setSelectedDate(d)}
               className={cn(
-                'relative flex min-w-[72px] shrink-0 snap-center flex-col items-center overflow-hidden rounded-lg border px-4 py-2.5 transition-colors duration-150',
+                'agenda-day-chip relative flex min-w-[72px] shrink-0 snap-center flex-col items-center overflow-hidden rounded-xl border px-4 py-2.5 transition-[background-color,border-color,color,box-shadow,transform] duration-200',
                 active
-                  ? 'border-primary bg-primary text-primary-foreground shadow-xs'
-                  : 'border-border bg-card text-foreground hover:border-primary/30 hover:bg-secondary/50'
+                  ? 'border-primary bg-primary text-primary-foreground shadow-[var(--elevation-2)]'
+                  : 'border-border bg-card text-foreground shadow-[var(--elevation-1)] hover:border-primary/30 hover:bg-secondary/50'
               )}
             >
               <span className="relative text-[10px] uppercase font-semibold tracking-wide opacity-85">{parseDateKey(d).toLocaleDateString('pt-BR', { weekday: 'short' })}</span>
@@ -401,7 +401,7 @@ export default function AgendaPage() {
 
       {/* ── Empty state ── */}
       {!isLoading && dayEvents.length === 0 && (
-        <div className="flex flex-col items-center justify-center py-16 text-center">
+        <div className="glass-panel flex flex-col items-center justify-center rounded-2xl py-16 text-center">
           <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-xl border border-border bg-secondary">
             <CalendarOff className="w-7 h-7 text-muted-foreground" />
           </div>

@@ -29,6 +29,7 @@ export interface CronogramaCommissionLink {
 }
 
 export interface CronogramaSubeventSeed {
+  id?: string;
   title: string;
   description?: string | null;
   startDate?: string | null;
@@ -36,8 +37,12 @@ export interface CronogramaSubeventSeed {
   status?: CronogramaStatus;
   priority?: CronogramaPriority;
   commissionSlug?: string | null;
+  commissionName?: string | null;
   responsibleName?: string | null;
   sortOrder?: number;
+  storage?: 'embedded' | 'relational';
+  createdAt?: string | null;
+  updatedAt?: string | null;
 }
 
 export interface CronogramaEventSeed {

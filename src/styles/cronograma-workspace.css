@@ -1,0 +1,1620 @@
+.cronograma-relationship-workspace {
+  --workspace-ink: oklch(var(--foreground));
+  --workspace-green: oklch(var(--primary)); /* Internal compatibility alias. */
+  --workspace-green-deep: oklch(var(--brand-navy-900));
+  --workspace-gold: oklch(var(--brand-gold-700));
+  --workspace-line: oklch(var(--primary) / 0.24);
+  --workspace-muted: oklch(var(--muted-foreground));
+  --workspace-surface: oklch(var(--card));
+  --workspace-surface-soft: oklch(var(--surface-2));
+  --workspace-border: oklch(var(--border));
+  --workspace-danger: oklch(var(--destructive));
+  min-height: calc(100vh - 68px);
+  color: var(--workspace-ink);
+  background:
+    radial-gradient(circle at 12% 8%, oklch(var(--brand-indigo-100) / 0.62), transparent 26rem),
+    radial-gradient(circle at 88% 18%, oklch(var(--brand-gold-400) / 0.20), transparent 28rem),
+    linear-gradient(180deg, oklch(var(--background)) 0%, oklch(var(--surface-2)) 48%, oklch(var(--background)) 100%);
+}
+
+.cronograma-workspace-toolbar {
+  position: sticky;
+  top: 68px;
+  z-index: 34;
+  border-bottom: 1px solid oklch(var(--border) / 0.72);
+  background: oklch(var(--glass-surface-strong));
+  box-shadow: var(--elevation-2);
+  backdrop-filter: blur(var(--glass-blur-nav)) saturate(var(--glass-saturation));
+  -webkit-backdrop-filter: blur(var(--glass-blur-nav)) saturate(var(--glass-saturation));
+}
+
+.cronograma-workspace-toolbar-inner {
+  width: min(100%, 1680px);
+  min-height: 70px;
+  margin: 0 auto;
+  padding: 0.65rem clamp(0.85rem, 2vw, 2rem);
+  display: grid;
+  grid-template-columns: minmax(12rem, 1fr) auto minmax(12rem, 1fr);
+  align-items: center;
+  gap: 1rem;
+}
+
+.cronograma-workspace-back {
+  width: max-content;
+  min-height: 42px;
+  padding: 0 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  border: 1px solid oklch(var(--border) / 0.78);
+  border-radius: 13px;
+  color: oklch(var(--foreground) / 0.78);
+  background: oklch(var(--glass-surface));
+  font-size: 0.78rem;
+  font-weight: 800;
+  transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+}
+
+.cronograma-workspace-back:hover {
+  transform: translateX(-2px);
+  border-color: oklch(var(--primary) / 0.34);
+  background: oklch(var(--card));
+}
+
+.cronograma-workspace-back svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.cronograma-workspace-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  text-align: left;
+}
+
+.cronograma-workspace-heading-icon {
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 15px;
+  color: white;
+  background: linear-gradient(145deg, var(--workspace-green), var(--workspace-green-deep));
+  box-shadow: var(--elevation-2);
+}
+
+.cronograma-workspace-heading-icon svg {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.cronograma-workspace-heading p {
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--workspace-muted);
+}
+
+.cronograma-workspace-heading h1 {
+  margin-top: 0.1rem;
+  font-size: 1rem;
+  line-height: 1.1;
+  font-weight: 900;
+  letter-spacing: -0.025em;
+}
+
+.cronograma-workspace-summary {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.55rem;
+  font-size: 0.7rem;
+  color: var(--workspace-muted);
+}
+
+.cronograma-workspace-summary span,
+.cronograma-workspace-summary strong {
+  min-height: 30px;
+  padding: 0 0.65rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 999px;
+  background: oklch(var(--glass-surface));
+  border: 1px solid oklch(var(--border) / 0.72);
+  font-weight: 800;
+}
+
+.cronograma-workspace-summary strong {
+  color: white;
+  background: var(--workspace-green-deep);
+}
+
+.cronograma-workspace-summary svg {
+  width: 0.8rem;
+  height: 0.8rem;
+}
+
+.cronograma-workspace-canvas {
+  position: relative;
+  isolation: isolate;
+  width: min(100%, 1680px);
+  min-height: calc(100vh - 138px);
+  margin: 0 auto;
+  padding: clamp(1.25rem, 2.6vw, 2.6rem) clamp(0.85rem, 3vw, 3rem) 7rem;
+  overflow: clip;
+}
+
+.cronograma-workspace-grid {
+  position: absolute;
+  inset: 0;
+  z-index: -3;
+  opacity: 0.42;
+  background-image:
+    linear-gradient(oklch(var(--primary) / 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, oklch(var(--primary) / 0.035) 1px, transparent 1px);
+  background-size: 38px 38px;
+  mask-image: linear-gradient(to bottom, black, transparent 86%);
+}
+
+.cronograma-workspace-ambient {
+  position: absolute;
+  z-index: -2;
+  border-radius: 999px;
+  filter: blur(2px);
+  pointer-events: none;
+}
+
+.cronograma-workspace-ambient.ambient-one {
+  top: 10rem;
+  left: -7rem;
+  width: 23rem;
+  height: 23rem;
+  border: 1px solid oklch(var(--primary) / 0.10);
+  box-shadow: inset 0 0 8rem oklch(var(--brand-indigo-200) / 0.18);
+}
+
+.cronograma-workspace-ambient.ambient-two {
+  top: 22rem;
+  right: -9rem;
+  width: 27rem;
+  height: 27rem;
+  border: 1px solid oklch(var(--gold) / 0.14);
+  box-shadow: inset 0 0 9rem oklch(var(--brand-gold-400) / 0.15);
+}
+
+.cronograma-workspace-intro {
+  max-width: 1240px;
+  margin: 0 auto 1.35rem;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.5rem;
+  animation: workspace-rise var(--motion-structural) var(--ease-decelerate) both;
+}
+
+.cronograma-workspace-intro > div:first-child {
+  max-width: 690px;
+}
+
+.cronograma-workspace-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  color: var(--workspace-green);
+  font-size: 0.65rem;
+  font-weight: 900;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+}
+
+.cronograma-workspace-eyebrow svg {
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
+.cronograma-workspace-intro h2 {
+  margin-top: 0.45rem;
+  max-width: 640px;
+  font-size: clamp(1.45rem, 2.6vw, 2.25rem);
+  line-height: 1.05;
+  font-weight: 950;
+  letter-spacing: -0.045em;
+  color: var(--workspace-ink);
+}
+
+.cronograma-workspace-intro > div:first-child > p:last-child {
+  margin-top: 0.65rem;
+  max-width: 620px;
+  color: var(--workspace-muted);
+  font-size: 0.86rem;
+  line-height: 1.65;
+}
+
+.cronograma-workspace-filter {
+  padding: 0.28rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  border: 1px solid oklch(var(--border) / 0.78);
+  border-radius: 14px;
+  background: oklch(var(--glass-surface));
+  box-shadow: var(--elevation-1);
+}
+
+.cronograma-workspace-filter button {
+  min-height: 34px;
+  padding: 0 0.68rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 10px;
+  color: var(--workspace-muted);
+  font-size: 0.69rem;
+  font-weight: 800;
+  transition: color 160ms ease, background 160ms ease, box-shadow 160ms ease;
+}
+
+.cronograma-workspace-filter button span {
+  min-width: 1.25rem;
+  height: 1.25rem;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  color: inherit;
+  background: oklch(var(--primary) / 0.07);
+  font-size: 0.58rem;
+}
+
+.cronograma-workspace-filter button[aria-pressed='true'] {
+  color: white;
+  background: var(--workspace-green-deep);
+  box-shadow: var(--elevation-1);
+}
+
+.cronograma-workspace-filter button[aria-pressed='true'] span {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.cronograma-workspace-sync-warning {
+  max-width: 920px;
+  margin: 0 auto 1rem;
+  padding: 0.9rem 1rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  border: 1px solid oklch(var(--warning) / 0.28);
+  border-radius: 17px;
+  color: oklch(var(--warning-foreground));
+  background: oklch(var(--warning) / 0.12);
+}
+
+.cronograma-workspace-sync-warning > svg {
+  width: 1rem;
+  height: 1rem;
+  margin-top: 0.1rem;
+  flex: 0 0 auto;
+}
+
+.cronograma-workspace-sync-warning strong {
+  font-size: 0.78rem;
+}
+
+.cronograma-workspace-sync-warning p {
+  margin-top: 0.15rem;
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
+.cronograma-main-anchor {
+  position: relative;
+  width: min(100%, 920px);
+  margin: 0 auto;
+  padding: clamp(1rem, 2vw, 1.45rem);
+  border: 1px solid oklch(var(--primary) / 0.23);
+  border-radius: 28px;
+  background:
+    radial-gradient(circle at 92% 0%, oklch(var(--brand-gold-400) / 0.10), transparent 32%),
+    oklch(var(--glass-surface-strong));
+  box-shadow: var(--elevation-3);
+  backdrop-filter: blur(var(--glass-blur-panel)) saturate(var(--glass-saturation));
+  -webkit-backdrop-filter: blur(var(--glass-blur-panel)) saturate(var(--glass-saturation));
+  animation: anchor-bloom var(--motion-structural) var(--ease-decelerate) 60ms both;
+}
+
+.cronograma-main-anchor::before {
+  content: '';
+  position: absolute;
+  inset: 7px;
+  border: 1px solid oklch(var(--primary) / 0.08);
+  border-radius: 21px;
+  pointer-events: none;
+}
+
+.cronograma-main-anchor-orbit {
+  position: absolute;
+  border: 1px solid oklch(var(--primary) / 0.13);
+  border-radius: 999px;
+  pointer-events: none;
+}
+
+.cronograma-main-anchor-orbit.orbit-one {
+  width: 1.05rem;
+  height: 1.05rem;
+  top: -0.35rem;
+  right: 3.2rem;
+  background: var(--workspace-surface);
+}
+
+.cronograma-main-anchor-orbit.orbit-two {
+  width: 0.55rem;
+  height: 0.55rem;
+  top: -1rem;
+  right: 2.4rem;
+  background: var(--workspace-gold);
+  border: 0;
+  box-shadow: 0 0 0 5px oklch(var(--gold) / 0.09);
+}
+
+.cronograma-main-anchor-topline {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.cronograma-main-anchor-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+  color: var(--workspace-green);
+  font-size: 0.64rem;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.cronograma-main-anchor-label svg {
+  width: 0.85rem;
+  height: 0.85rem;
+  color: var(--workspace-gold);
+}
+
+.cronograma-main-anchor-body {
+  position: relative;
+  margin-top: 1rem;
+  display: grid;
+  grid-template-columns: 54px minmax(0, 1fr);
+  align-items: start;
+  gap: 1rem;
+}
+
+.cronograma-main-anchor-symbol {
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  border-radius: 19px;
+  color: white;
+  background: linear-gradient(145deg, var(--workspace-green), var(--workspace-green-deep));
+  box-shadow: var(--elevation-2);
+}
+
+.cronograma-main-anchor-symbol svg {
+  width: 1.35rem;
+  height: 1.35rem;
+}
+
+.cronograma-main-anchor-body h2 {
+  margin-top: 0.45rem;
+  font-size: clamp(1.28rem, 2.1vw, 1.8rem);
+  line-height: 1.12;
+  font-weight: 950;
+  letter-spacing: -0.036em;
+  color: var(--workspace-ink);
+}
+
+.cronograma-main-anchor-body p {
+  margin-top: 0.48rem;
+  max-width: 720px;
+  color: var(--workspace-muted);
+  font-size: 0.8rem;
+  line-height: 1.58;
+}
+
+.cronograma-main-anchor-meta {
+  position: relative;
+  margin-top: 1.1rem;
+  padding-top: 1rem;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.65rem;
+  border-top: 1px solid oklch(var(--border) / 0.72);
+}
+
+.cronograma-main-anchor-meta div {
+  min-width: 0;
+  padding: 0.65rem 0.72rem;
+  border-radius: 14px;
+  background: oklch(var(--surface-2) / 0.78);
+}
+
+.cronograma-main-anchor-meta dt {
+  display: flex;
+  align-items: center;
+  gap: 0.34rem;
+  color: var(--workspace-muted);
+  font-size: 0.57rem;
+  font-weight: 900;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.cronograma-main-anchor-meta dt svg {
+  width: 0.72rem;
+  height: 0.72rem;
+  color: var(--workspace-green);
+}
+
+.cronograma-main-anchor-meta dd {
+  margin-top: 0.33rem;
+  overflow: hidden;
+  color: oklch(var(--foreground) / 0.86);
+  font-size: 0.68rem;
+  line-height: 1.35;
+  font-weight: 800;
+  text-overflow: ellipsis;
+}
+
+.cronograma-main-anchor-actions {
+  position: relative;
+  margin-top: 0.85rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.cronograma-main-anchor-actions button {
+  min-height: 38px;
+  color: oklch(var(--foreground) / 0.82);
+  background: oklch(var(--glass-surface));
+}
+
+.cronograma-main-anchor-port {
+  position: absolute;
+  left: 50%;
+  bottom: -18px;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  transform: translateX(-50%);
+  border: 6px solid oklch(var(--background));
+  border-radius: 999px;
+  color: white;
+  background: var(--workspace-green);
+  box-shadow: var(--elevation-2);
+}
+
+.cronograma-main-anchor-port svg {
+  width: 0.8rem;
+  height: 0.8rem;
+}
+
+.cronograma-main-editor {
+  position: relative;
+  width: min(100%, 1040px);
+  margin: 2.2rem auto 0;
+  padding: 1.1rem;
+  border: 1px solid oklch(var(--primary) / 0.18);
+  border-radius: 24px;
+  background: oklch(var(--glass-surface-strong));
+  box-shadow: var(--elevation-3);
+  animation: thought-bloom var(--motion-slow) var(--ease-decelerate) both;
+}
+
+.cronograma-main-editor::before {
+  content: '';
+  position: absolute;
+  top: -2.2rem;
+  left: 50%;
+  width: 1px;
+  height: 2.2rem;
+  background: var(--workspace-line);
+}
+
+.cronograma-main-editor-heading {
+  margin-bottom: 0.8rem;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.cronograma-main-editor-heading p {
+  color: var(--workspace-green);
+  font-size: 0.61rem;
+  font-weight: 900;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.cronograma-main-editor-heading h3 {
+  margin-top: 0.15rem;
+  font-size: 1rem;
+  font-weight: 900;
+}
+
+.cronograma-main-editor-heading > span {
+  color: var(--workspace-muted);
+  font-size: 0.67rem;
+  font-weight: 700;
+}
+
+.cronograma-relationship-tree {
+  position: relative;
+  width: min(100%, 1240px);
+  min-height: 11rem;
+  margin: 0 auto;
+  padding-top: 4.2rem;
+}
+
+.cronograma-relationship-spine {
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  bottom: 3rem;
+  left: 50%;
+  width: 2px;
+  transform: translateX(-50%) scaleY(0);
+  transform-origin: top;
+  background: linear-gradient(to bottom, oklch(var(--primary) / 0.46), oklch(var(--primary) / 0.12) 80%, transparent);
+  animation: connector-grow 640ms var(--ease-decelerate) 320ms forwards;
+}
+
+.cronograma-relationship-branches {
+  display: flex;
+  flex-direction: column;
+  gap: 1.55rem;
+}
+
+.cronograma-relationship-branch {
+  --branch-gap: 66px;
+  position: relative;
+  min-height: 8rem;
+  display: flex;
+  align-items: flex-start;
+}
+
+.cronograma-relationship-branch::before {
+  content: '';
+  position: absolute;
+  top: 3.2rem;
+  width: var(--branch-gap);
+  height: 2px;
+  transform: scaleX(0);
+  background: linear-gradient(90deg, oklch(var(--primary) / 0.34), oklch(var(--primary) / 0.14));
+  animation: branch-line-grow 360ms var(--ease-standard) calc(360ms + var(--branch-index) * 70ms) forwards;
+}
+
+.cronograma-relationship-branch[data-side='left']::before {
+  right: 50%;
+  transform-origin: right;
+}
+
+.cronograma-relationship-branch[data-side='right']::before {
+  left: 50%;
+  transform-origin: left;
+}
+
+.cronograma-branch-joint,
+.cronograma-add-branch-joint {
+  position: absolute;
+  z-index: 2;
+  top: 2.73rem;
+  left: 50%;
+  width: 17px;
+  height: 17px;
+  display: grid;
+  place-items: center;
+  transform: translateX(-50%);
+  border: 4px solid oklch(var(--background));
+  border-radius: 999px;
+  background: var(--workspace-green);
+  box-shadow: 0 0 0 1px oklch(var(--primary) / 0.17);
+}
+
+.cronograma-branch-joint span,
+.cronograma-add-branch-joint span {
+  width: 3px;
+  height: 3px;
+  border-radius: 999px;
+  background: white;
+}
+
+.cronograma-branch-content {
+  width: calc(50% - var(--branch-gap));
+}
+
+.cronograma-relationship-branch[data-side='right'] .cronograma-branch-content {
+  margin-left: auto;
+}
+
+.cronograma-subevent-node {
+  position: relative;
+  padding: 1rem;
+  border: 1px solid oklch(var(--border) / 0.82);
+  border-radius: 24px 24px 24px 10px;
+  background: oklch(var(--glass-surface-strong));
+  box-shadow: var(--elevation-1);
+  opacity: 0;
+  transform: translateY(12px) scale(0.97);
+  animation: node-arrive var(--motion-structural) var(--ease-decelerate) calc(400ms + var(--branch-index) * 70ms) forwards;
+  transition: transform var(--motion-base) var(--ease-decelerate), border-color var(--motion-fast) var(--ease-standard), box-shadow var(--motion-base) var(--ease-standard);
+}
+
+.cronograma-relationship-branch[data-side='right'] .cronograma-subevent-node {
+  border-radius: 24px 24px 10px 24px;
+}
+
+.cronograma-subevent-node::before {
+  content: '';
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 4px;
+  border-radius: 24px 0 0 10px;
+  background: var(--workspace-green);
+}
+
+.cronograma-relationship-branch[data-side='right'] .cronograma-subevent-node::before {
+  right: 0;
+  left: auto;
+  border-radius: 0 24px 10px 0;
+}
+
+.cronograma-subevent-node[data-status='blocked']::before,
+.cronograma-subevent-node[data-status='in_definition']::before {
+  background: oklch(var(--warning));
+}
+
+.cronograma-subevent-node[data-status='cancelled']::before {
+  background: oklch(var(--destructive));
+}
+
+.cronograma-subevent-node[data-completed='true'] {
+  border-color: oklch(var(--success) / 0.20);
+  background: oklch(var(--success) / 0.055);
+}
+
+.cronograma-subevent-node:hover {
+  transform: translateY(-2px);
+  border-color: oklch(var(--primary) / 0.28);
+  box-shadow: var(--elevation-2);
+}
+
+.cronograma-subevent-node-kicker {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+}
+
+.cronograma-subevent-node-kicker > span:first-child {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.38rem;
+  color: var(--workspace-muted);
+  font-size: 0.58rem;
+  font-weight: 900;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+}
+
+.cronograma-subevent-node-kicker > span:first-child svg {
+  width: 0.72rem;
+  height: 0.72rem;
+  color: var(--workspace-green);
+}
+
+.cronograma-subevent-node h3 {
+  margin-top: 0.7rem;
+  color: var(--workspace-ink);
+  font-size: 1rem;
+  line-height: 1.2;
+  font-weight: 900;
+  letter-spacing: -0.022em;
+}
+
+.cronograma-subevent-node[data-completed='true'] h3 {
+  color: var(--workspace-muted);
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+}
+
+.cronograma-subevent-preview {
+  margin-top: 0.45rem;
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--workspace-muted);
+  font-size: 0.73rem;
+  line-height: 1.5;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.cronograma-subevent-node-meta {
+  margin-top: 0.8rem;
+  display: grid;
+  gap: 0.38rem;
+}
+
+.cronograma-subevent-node-meta span {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.42rem;
+  overflow: hidden;
+  color: var(--workspace-muted);
+  font-size: 0.66rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cronograma-subevent-node-meta svg {
+  width: 0.76rem;
+  height: 0.76rem;
+  flex: 0 0 auto;
+  color: var(--workspace-green);
+}
+
+.cronograma-subevent-expanded {
+  margin-top: 0.8rem;
+  padding: 0.75rem;
+  border: 1px solid oklch(var(--border) / 0.72);
+  border-radius: 14px;
+  background: oklch(var(--surface-2) / 0.72);
+  animation: workspace-rise var(--motion-base) var(--ease-standard) both;
+}
+
+.cronograma-subevent-expanded p {
+  color: var(--workspace-muted);
+  font-size: 0.7rem;
+  line-height: 1.55;
+}
+
+.cronograma-subevent-expanded div {
+  margin-top: 0.55rem;
+  padding-top: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+  border-top: 1px solid oklch(var(--border) / 0.68);
+  font-size: 0.62rem;
+}
+
+.cronograma-subevent-expanded span {
+  color: var(--workspace-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 900;
+}
+
+.cronograma-subevent-expanded strong {
+  color: oklch(var(--foreground) / 0.82);
+}
+
+.cronograma-subevent-node-actions {
+  margin-top: 0.85rem;
+  padding-top: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  border-top: 1px solid oklch(var(--border) / 0.68);
+}
+
+.cronograma-subevent-node-actions button {
+  min-height: 34px;
+  padding: 0 0.52rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32rem;
+  border-radius: 9px;
+  color: var(--workspace-muted);
+  font-size: 0.63rem;
+  font-weight: 800;
+  transition: color 150ms ease, background 150ms ease;
+}
+
+.cronograma-subevent-node-actions button:hover {
+  color: oklch(var(--primary));
+  background: oklch(var(--primary) / 0.07);
+}
+
+.cronograma-subevent-node-actions button:disabled {
+  opacity: 0.52;
+  cursor: wait;
+}
+
+.cronograma-subevent-node-actions button.is-complete {
+  color: oklch(var(--success));
+}
+
+.cronograma-subevent-node-actions button.is-remove {
+  margin-left: auto;
+  color: oklch(var(--destructive));
+}
+
+.cronograma-subevent-node-actions button.is-remove:hover {
+  color: oklch(var(--semantic-red-700));
+  background: oklch(var(--destructive) / 0.08);
+}
+
+.cronograma-subevent-node-actions svg {
+  width: 0.82rem;
+  height: 0.82rem;
+}
+
+.cronograma-subevent-node-actions .chevron {
+  width: 0.7rem;
+  height: 0.7rem;
+  opacity: 0.62;
+}
+
+.cronograma-relationship-empty {
+  position: relative;
+  width: min(100% - 4rem, 420px);
+  margin: 0 auto 1.4rem;
+  padding: 1.15rem;
+  text-align: center;
+  border: 1px dashed oklch(var(--primary) / 0.24);
+  border-radius: 23px;
+  color: var(--workspace-muted);
+  background: oklch(var(--glass-surface));
+}
+
+.cronograma-relationship-empty-icon {
+  width: 44px;
+  height: 44px;
+  margin: 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  color: var(--workspace-green);
+  background: oklch(var(--primary) / 0.09);
+}
+
+.cronograma-relationship-empty-icon svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.cronograma-relationship-empty p {
+  margin-top: 0.65rem;
+  font-size: 0.72rem;
+}
+
+.cronograma-relationship-empty strong {
+  margin-top: 0.18rem;
+  display: block;
+  color: oklch(var(--foreground) / 0.84);
+  font-size: 0.78rem;
+}
+
+.empty-thought {
+  position: absolute;
+  border-radius: 999px;
+  background: oklch(var(--primary) / 0.09);
+}
+
+.empty-thought.thought-a {
+  width: 0.75rem;
+  height: 0.75rem;
+  top: -1.1rem;
+  left: 32%;
+}
+
+.empty-thought.thought-b {
+  width: 0.38rem;
+  height: 0.38rem;
+  top: -1.7rem;
+  left: 28%;
+  background: oklch(var(--gold) / 0.42);
+}
+
+.cronograma-relationship-filter-empty {
+  width: min(100% - 4rem, 420px);
+  margin: 0 auto 1.4rem;
+  padding: 0.75rem;
+  border: 1px dashed oklch(var(--border));
+  border-radius: 14px;
+  text-align: center;
+  color: var(--workspace-muted);
+  background: oklch(var(--glass-surface));
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.cronograma-add-branch {
+  position: relative;
+  width: min(100%, 660px);
+  margin: 1.8rem auto 0;
+  padding-top: 2rem;
+}
+
+.cronograma-add-branch::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 2px;
+  height: 2rem;
+  transform: translateX(-50%);
+  background: var(--workspace-line);
+}
+
+.cronograma-add-branch-joint {
+  top: 1.47rem;
+}
+
+.cronograma-add-thought {
+  position: relative;
+  width: min(100%, 370px);
+  min-height: 82px;
+  margin: 0 auto;
+  padding: 0.85rem 2.65rem 0.85rem 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 0.78rem;
+  border: 1px solid oklch(var(--primary) / 0.28);
+  border-radius: 999px 999px 999px 25px;
+  text-align: left;
+  color: oklch(var(--primary));
+  background:
+    radial-gradient(circle at 92% 18%, oklch(var(--brand-gold-400) / 0.20), transparent 28%),
+    oklch(var(--glass-surface-strong));
+  box-shadow: var(--elevation-2);
+  transition: transform var(--motion-base) var(--ease-decelerate), border-color var(--motion-base) var(--ease-standard), box-shadow var(--motion-base) var(--ease-standard);
+  animation: add-pulse-in var(--motion-structural) var(--ease-decelerate) 520ms both;
+}
+
+.cronograma-add-thought:not(:disabled):hover {
+  transform: translateY(-3px) scale(1.012);
+  border-color: oklch(var(--primary) / 0.50);
+  box-shadow: var(--elevation-3);
+}
+
+.cronograma-add-thought:disabled {
+  cursor: not-allowed;
+  filter: saturate(0.5);
+  opacity: 0.72;
+}
+
+.cronograma-add-thought-icon {
+  width: 48px;
+  height: 48px;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 999px;
+  color: white;
+  background: linear-gradient(145deg, var(--workspace-green), var(--workspace-green-deep));
+  box-shadow: var(--elevation-2);
+}
+
+.cronograma-add-thought-icon svg {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+.cronograma-add-thought strong,
+.cronograma-add-thought small {
+  display: block;
+}
+
+.cronograma-add-thought strong {
+  font-size: 0.9rem;
+  font-weight: 950;
+  letter-spacing: -0.018em;
+}
+
+.cronograma-add-thought small {
+  margin-top: 0.18rem;
+  color: var(--workspace-muted);
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.cronograma-add-thought-spark {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 0.9rem;
+  height: 0.9rem;
+  color: var(--workspace-gold);
+}
+
+.cronograma-add-composer-wrap {
+  margin-top: 1.2rem;
+  animation: thought-bloom var(--motion-slow) var(--ease-decelerate) both;
+}
+
+.cronograma-thought-composer {
+  position: relative;
+  padding: 1rem;
+  border: 1px solid oklch(var(--primary) / 0.22);
+  border-radius: 27px 27px 27px 12px;
+  background: oklch(var(--glass-surface-strong));
+  box-shadow: var(--elevation-3);
+}
+
+.cronograma-branch-content > .cronograma-thought-composer {
+  margin-top: 0.8rem;
+}
+
+.cronograma-thought-tail {
+  position: absolute;
+  top: -0.72rem;
+  left: 2rem;
+  width: 1.35rem;
+  height: 1.35rem;
+  transform: rotate(45deg);
+  border-top: 1px solid oklch(var(--primary) / 0.22);
+  border-left: 1px solid oklch(var(--primary) / 0.22);
+  background: var(--workspace-surface);
+}
+
+.cronograma-thought-composer-heading {
+  position: relative;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) 36px;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.cronograma-thought-composer-icon {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 15px;
+  color: white;
+  background: linear-gradient(145deg, var(--workspace-green), var(--workspace-green-deep));
+}
+
+.cronograma-thought-composer-icon svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.cronograma-thought-composer-heading p {
+  color: var(--workspace-green);
+  font-size: 0.58rem;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.cronograma-thought-composer-heading h3 {
+  margin-top: 0.08rem;
+  font-size: 0.96rem;
+  font-weight: 950;
+}
+
+.cronograma-thought-composer-heading span:not(.cronograma-thought-composer-icon) {
+  margin-top: 0.12rem;
+  display: block;
+  overflow: hidden;
+  color: var(--workspace-muted);
+  font-size: 0.62rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cronograma-thought-close {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  color: var(--workspace-muted);
+  background: oklch(var(--primary) / 0.05);
+}
+
+.cronograma-thought-close svg {
+  width: 0.9rem;
+  height: 0.9rem;
+}
+
+.cronograma-thought-fields {
+  margin-top: 0.9rem;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.cronograma-thought-field {
+  min-width: 0;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.cronograma-thought-field.is-wide {
+  grid-column: 1 / -1;
+}
+
+.cronograma-thought-field label {
+  color: oklch(var(--foreground) / 0.78);
+  font-size: 0.65rem;
+  font-weight: 850;
+}
+
+.cronograma-thought-field input,
+.cronograma-thought-field textarea,
+.cronograma-thought-select {
+  width: 100%;
+  border: 1px solid oklch(var(--border));
+  border-radius: 13px;
+  color: var(--workspace-ink);
+  background: oklch(var(--surface-1));
+  font-size: 0.75rem;
+}
+
+.cronograma-thought-field input,
+.cronograma-thought-select {
+  min-height: 42px;
+}
+
+.cronograma-thought-field textarea {
+  min-height: 76px;
+  resize: vertical;
+}
+
+.cronograma-thought-select {
+  padding: 0 0.75rem;
+  appearance: auto;
+}
+
+.cronograma-thought-error,
+.cronograma-thought-submit-error,
+.cronograma-workspace-action-error {
+  color: oklch(var(--destructive));
+  font-size: 0.68rem;
+  font-weight: 750;
+}
+
+.cronograma-thought-submit-error,
+.cronograma-workspace-action-error {
+  margin-top: 0.75rem;
+  padding: 0.7rem;
+  border: 1px solid oklch(var(--destructive) / 0.20);
+  border-radius: 12px;
+  background: oklch(var(--destructive) / 0.075);
+}
+
+.cronograma-workspace-action-error {
+  width: min(100%, 660px);
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.cronograma-thought-actions {
+  margin-top: 0.9rem;
+  padding-top: 0.8rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.45rem;
+  border-top: 1px solid oklch(var(--border) / 0.70);
+}
+
+.cronograma-workspace-remove-dialog {
+  border-radius: 22px;
+}
+
+@keyframes workspace-rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes anchor-bloom {
+  from { opacity: 0; transform: translateY(12px) scale(0.975); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes connector-grow {
+  to { transform: translateX(-50%) scaleY(1); }
+}
+
+@keyframes branch-line-grow {
+  to { transform: scaleX(1); }
+}
+
+@keyframes node-arrive {
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes thought-bloom {
+  from { opacity: 0; transform: translateY(-6px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes add-pulse-in {
+  0% { opacity: 0; transform: translateY(10px) scale(0.96); }
+  70% { opacity: 1; transform: translateY(-2px) scale(1.015); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (min-width: 900px) and (max-width: 1199px) {
+  .cronograma-workspace-toolbar-inner {
+    grid-template-columns: 1fr auto 1fr;
+  }
+
+  .cronograma-workspace-summary span {
+    display: none;
+  }
+
+  .cronograma-main-anchor-meta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cronograma-relationship-branch {
+    --branch-gap: 46px;
+  }
+
+  .cronograma-subevent-node-actions button span {
+    display: none;
+  }
+
+  .cronograma-subevent-node-actions button {
+    width: 36px;
+    padding: 0;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 899px) {
+  .cronograma-relationship-workspace {
+    min-height: calc(100dvh - 68px);
+  }
+
+  .cronograma-workspace-toolbar {
+    top: 68px;
+  }
+
+  .cronograma-workspace-toolbar-inner {
+    min-height: 64px;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 0.55rem;
+    padding: 0.5rem 0.7rem;
+  }
+
+  .cronograma-workspace-back {
+    width: 44px;
+    min-height: 44px;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .cronograma-workspace-back span,
+  .cronograma-workspace-heading p,
+  .cronograma-workspace-summary span {
+    display: none;
+  }
+
+  .cronograma-workspace-heading {
+    justify-self: start;
+    gap: 0.55rem;
+  }
+
+  .cronograma-workspace-heading-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 13px;
+  }
+
+  .cronograma-workspace-heading h1 {
+    font-size: 0.92rem;
+  }
+
+  .cronograma-workspace-summary strong {
+    min-width: 42px;
+    min-height: 34px;
+    padding: 0 0.55rem;
+    justify-content: center;
+  }
+
+  .cronograma-workspace-canvas {
+    min-height: calc(100dvh - 132px);
+    padding: 1rem 0.75rem calc(6rem + env(safe-area-inset-bottom));
+  }
+
+  .cronograma-workspace-intro {
+    margin-bottom: 1rem;
+    align-items: stretch;
+    flex-direction: column;
+    gap: 0.9rem;
+  }
+
+  .cronograma-workspace-intro h2 {
+    font-size: 1.45rem;
+  }
+
+  .cronograma-workspace-intro > div:first-child > p:last-child {
+    font-size: 0.78rem;
+    line-height: 1.55;
+  }
+
+  .cronograma-workspace-filter {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .cronograma-workspace-filter button {
+    min-height: 44px;
+    padding: 0 0.35rem;
+    justify-content: center;
+    font-size: 0.64rem;
+  }
+
+  .cronograma-main-anchor {
+    border-radius: 23px;
+    padding: 0.9rem;
+  }
+
+  .cronograma-main-anchor-topline {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+
+  .cronograma-main-anchor-body {
+    grid-template-columns: 44px minmax(0, 1fr);
+    gap: 0.72rem;
+  }
+
+  .cronograma-main-anchor-symbol {
+    width: 44px;
+    height: 44px;
+    border-radius: 15px;
+  }
+
+  .cronograma-main-anchor-body h2 {
+    font-size: 1.18rem;
+  }
+
+  .cronograma-main-anchor-body p {
+    font-size: 0.72rem;
+  }
+
+  .cronograma-main-anchor-meta {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.45rem;
+  }
+
+  .cronograma-main-anchor-meta div {
+    padding: 0.58rem;
+  }
+
+  .cronograma-main-anchor-actions button {
+    width: 100%;
+  }
+
+  .cronograma-main-editor {
+    margin-top: 2rem;
+    padding: 0.75rem;
+    border-radius: 20px;
+  }
+
+  .cronograma-main-editor-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .cronograma-relationship-tree {
+    padding-top: 3.8rem;
+  }
+
+  .cronograma-relationship-spine {
+    left: 22px;
+    transform: scaleY(0);
+  }
+
+  .cronograma-relationship-spine {
+    animation-name: connector-grow-mobile;
+  }
+
+  .cronograma-relationship-branches {
+    gap: 1rem;
+  }
+
+  .cronograma-relationship-branch {
+    --branch-gap: 30px;
+    min-height: auto;
+    padding-left: 52px;
+  }
+
+  .cronograma-relationship-branch::before,
+  .cronograma-relationship-branch[data-side='left']::before,
+  .cronograma-relationship-branch[data-side='right']::before {
+    top: 2.7rem;
+    right: auto;
+    left: 22px;
+    width: 30px;
+    transform-origin: left;
+  }
+
+  .cronograma-branch-joint {
+    top: 2.22rem;
+    left: 22px;
+  }
+
+  .cronograma-branch-content {
+    width: 100%;
+  }
+
+  .cronograma-relationship-branch[data-side='right'] .cronograma-branch-content {
+    margin-left: 0;
+  }
+
+  .cronograma-subevent-node,
+  .cronograma-relationship-branch[data-side='right'] .cronograma-subevent-node {
+    border-radius: 21px 21px 21px 9px;
+  }
+
+  .cronograma-relationship-branch[data-side='right'] .cronograma-subevent-node::before {
+    right: auto;
+    left: 0;
+    border-radius: 21px 0 0 9px;
+  }
+
+  .cronograma-subevent-node-actions {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .cronograma-subevent-node-actions button,
+  .cronograma-subevent-node-actions button.is-remove {
+    min-width: 0;
+    min-height: 44px;
+    margin-left: 0;
+    padding: 0 0.25rem;
+    justify-content: center;
+  }
+
+  .cronograma-subevent-node-actions button span {
+    display: none;
+  }
+
+  .cronograma-subevent-node-actions .chevron {
+    display: none;
+  }
+
+  .cronograma-relationship-empty,
+  .cronograma-relationship-filter-empty {
+    width: calc(100% - 52px);
+    margin-left: 52px;
+  }
+
+  .cronograma-add-branch {
+    margin-top: 1.2rem;
+    padding-top: 0;
+    padding-left: 52px;
+  }
+
+  .cronograma-add-branch::before {
+    top: 2.65rem;
+    left: 22px;
+    width: 30px;
+    height: 2px;
+    transform: none;
+  }
+
+  .cronograma-add-branch-joint {
+    top: 2.17rem;
+    left: 22px;
+  }
+
+  .cronograma-add-thought {
+    width: 100%;
+    min-height: 76px;
+    border-radius: 24px 24px 24px 10px;
+  }
+
+  .cronograma-add-thought-icon {
+    width: 44px;
+    height: 44px;
+  }
+
+  .cronograma-add-composer-wrap {
+    margin-top: 0.9rem;
+  }
+
+  .cronograma-thought-composer {
+    padding: 0.8rem;
+    border-radius: 21px 21px 21px 9px;
+  }
+
+  .cronograma-thought-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cronograma-thought-field.is-wide {
+    grid-column: auto;
+  }
+
+  .cronograma-thought-field input,
+  .cronograma-thought-select {
+    min-height: 46px;
+    font-size: 16px;
+  }
+
+  .cronograma-thought-field textarea {
+    font-size: 16px;
+  }
+
+  .cronograma-thought-actions {
+    position: sticky;
+    bottom: 0;
+    margin-right: -0.25rem;
+    margin-bottom: -0.25rem;
+    margin-left: -0.25rem;
+    padding: 0.75rem 0.25rem 0.25rem;
+    background: linear-gradient(to bottom, transparent, rgba(255, 255, 255, 0.98) 24%);
+  }
+
+  .cronograma-thought-actions button:last-child {
+    flex: 1;
+  }
+}
+
+@media (max-width: 420px) {
+  .cronograma-workspace-filter button span {
+    display: none;
+  }
+
+  .cronograma-main-anchor-meta {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cronograma-thought-composer-heading {
+    grid-template-columns: 38px minmax(0, 1fr) 36px;
+  }
+
+  .cronograma-thought-composer-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 13px;
+  }
+}
+
+@keyframes connector-grow-mobile {
+  to { transform: scaleY(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cronograma-workspace-intro,
+  .cronograma-main-anchor,
+  .cronograma-relationship-spine,
+  .cronograma-relationship-branch::before,
+  .cronograma-subevent-node,
+  .cronograma-add-thought,
+  .cronograma-add-composer-wrap,
+  .cronograma-main-editor,
+  .cronograma-subevent-expanded {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+  }
+
+  .cronograma-workspace-back,
+  .cronograma-subevent-node,
+  .cronograma-add-thought {
+    transition: none;
+  }
+}

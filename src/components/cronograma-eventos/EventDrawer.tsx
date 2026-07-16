@@ -54,6 +54,7 @@ interface EventDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSave: (event: CronogramaEvent) => Promise<void> | void;
+  onEditWorkspace?: (event: CronogramaEvent) => void;
   startInEdit?: boolean;
   canManage?: boolean;
   returnFocusRef?: RefObject<HTMLElement>;
@@ -68,6 +69,7 @@ export function EventDrawer({
   open,
   onOpenChange,
   onSave,
+  onEditWorkspace,
   startInEdit = false,
   canManage = false,
   returnFocusRef,
@@ -378,7 +380,11 @@ export function EventDrawer({
                   )}
                   <Button type="button" variant="outline" onClick={requestClose} className="rounded-lg">Fechar</Button>
                   {canManage && (
-                    <Button type="button" onClick={() => setEditMode(true)} className="rounded-lg">
+                    <Button
+                      type="button"
+                      onClick={() => onEditWorkspace ? onEditWorkspace(event) : setEditMode(true)}
+                      className="rounded-lg"
+                    >
                       <Edit3 className="h-4 w-4" /> Editar evento
                     </Button>
                   )}

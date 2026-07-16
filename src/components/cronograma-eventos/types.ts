@@ -59,12 +59,34 @@ export interface CronogramaEvent {
   decisionNeeded?: string;
   createdAt?: string | null;
   updatedAt?: string | null;
-  subevents?: Array<{
-    title: string;
-    date?: string | null;
-    owner?: string;
-    status?: CronogramaStatus;
-  }>;
+  subevents?: CronogramaSubevent[];
+}
+
+export interface CronogramaSubevent {
+  id?: string;
+  title: string;
+  description?: string | null;
+  date?: string | null;
+  endDate?: string | null;
+  owner?: string;
+  status?: CronogramaStatus;
+  priority?: CronogramaPriority;
+  commissionSlug?: string;
+  commission?: string;
+  sortOrder?: number;
+  storage?: 'embedded' | 'relational';
+  createdAt?: string | null;
+  updatedAt?: string | null;
+}
+
+export interface CronogramaSubeventInput {
+  requestId?: string;
+  title: string;
+  description: string;
+  date: string | null;
+  status: CronogramaStatus;
+  responsible: string;
+  commissionSlug: string;
 }
 
 export interface CronogramaFilters {

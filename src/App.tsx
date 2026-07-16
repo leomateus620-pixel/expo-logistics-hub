@@ -17,6 +17,11 @@ import Layout from './components/Layout';
 import CommissionLayout from './components/commissions/CommissionLayout';
 import ModuleAccessGuard from './components/commissions/ModuleAccessGuard';
 import { CronogramaModuleShell } from './components/cronograma-eventos/CronogramaModuleShell';
+import {
+  CronogramaPermissionDenied,
+  CronogramaRouteBoundary,
+  CronogramaRouteLoading,
+} from './components/cronograma-eventos/CronogramaRouteState';
 import LoginPage from './pages/LoginPage';
 import {
   getCommissionModule,
@@ -255,17 +260,19 @@ function AdminRoutes() {
 
 function CronogramaModuleRoute() {
   return (
-    <AuthGuard>
-      <OrgGuard>
-        <CapabilityGuard capability="cronograma_eventos_access">
-          <CronogramaModuleShell>
-            <Suspended>
-              <CronogramaEventosPage />
-            </Suspended>
-          </CronogramaModuleShell>
-        </CapabilityGuard>
-      </OrgGuard>
-    </AuthGuard>
+    <CronogramaRouteBoundary>
+      <AuthGuard>
+        <OrgGuard>
+          <CapabilityGuard capability="cronograma_eventos_access" fallback={<CronogramaPermissionDenied />}>
+            <CronogramaModuleShell>
+              <Suspense fallback={<CronogramaRouteLoading />}>
+                <CronogramaEventosPage />
+              </Suspense>
+            </CronogramaModuleShell>
+          </CapabilityGuard>
+        </OrgGuard>
+      </AuthGuard>
+    </CronogramaRouteBoundary>
   );
 }
 

@@ -285,7 +285,7 @@ function CalendarWorkspace({
   return (
     <section
       className={cn(
-        'relative overflow-hidden rounded-2xl border border-border bg-card shadow-sm',
+        'glass-panel command-grid-bg relative overflow-hidden rounded-2xl',
         expanded ? 'min-h-[calc(100vh-3.5rem)] p-4 sm:p-5' : 'p-4 sm:p-5',
       )}
     >
@@ -315,7 +315,7 @@ function CalendarWorkspace({
               : 'xl:grid-cols-[minmax(0,1.45fr)_360px]',
           )}
         >
-          <div className="rounded-xl border border-border bg-background p-3">
+          <div className="surface-primary rounded-xl p-3">
             <div className="grid grid-cols-7 gap-1.5 pb-2">
               {weekDays.map((day) => (
                 <div key={day} className="px-2 py-1 text-center text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
@@ -337,10 +337,10 @@ function CalendarWorkspace({
                   <div
                     key={cell.key}
                     className={cn(
-                      'group relative flex flex-col overflow-hidden rounded-xl border text-left transition-[border-color,background-color,box-shadow] duration-200',
+                      'group relative flex flex-col overflow-hidden rounded-xl border text-left transition-[border-color,background-color,box-shadow,transform] duration-200',
                       expanded ? 'min-h-[108px]' : 'min-h-[82px]',
                       selected
-                        ? 'border-primary/40 bg-primary/10'
+                        ? 'z-[1] -translate-y-0.5 border-primary/40 bg-primary/10 shadow-[var(--elevation-1)]'
                         : events.length
                           ? 'border-gold/30 bg-card hover:border-gold/50 hover:bg-warning/5'
                           : 'border-border bg-card hover:bg-secondary',
@@ -575,7 +575,7 @@ function CalendarSidePanel({
 }) {
   return (
     <aside className="space-y-3">
-      <section className="rounded-xl border border-border bg-background p-4">
+      <section className="surface-primary rounded-xl p-4">
         <div className="mb-3 flex items-center justify-between gap-3">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">Mês selecionado</p>
@@ -587,7 +587,7 @@ function CalendarSidePanel({
           <button
             type="button"
             onClick={() => onOpen(nextMonthEvent)}
-            className="w-full rounded-xl border border-border bg-card p-3 text-left transition-colors hover:border-gold/40 hover:bg-secondary focus-ring"
+            className="interactive-lift w-full rounded-xl border border-border bg-card p-3 text-left transition-colors hover:border-gold/40 hover:bg-secondary focus-ring"
           >
             <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-primary">Próximo do mês</p>
             <p className="mt-1 text-sm font-bold leading-tight text-foreground">{nextMonthEvent.title}</p>
@@ -598,7 +598,7 @@ function CalendarSidePanel({
         )}
       </section>
 
-      <section className="rounded-xl border border-border bg-background p-4">
+      <section className="surface-primary rounded-xl p-4">
         <div className="mb-3">
           <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">Dia selecionado</p>
           <h3 className="text-lg font-black tracking-tight text-foreground">{formatLongDate(selectedDate)}</h3>
@@ -609,7 +609,7 @@ function CalendarSidePanel({
         ) : (
           <div className="space-y-2">
             {dayEvents.map((event) => (
-              <div key={event.id} className="rounded-xl border border-border bg-card p-3">
+              <div key={event.id} className="interactive-lift rounded-xl border border-border bg-card p-3 shadow-[var(--elevation-1)]">
                 <div className="mb-2 flex flex-wrap items-center gap-1.5">
                   <CronogramaCategoryMarker category={event.category} />
                   <CronogramaStatusIndicator status={event.status} compact />
@@ -665,7 +665,7 @@ function CalendarFullscreenMode({
         <DialogDescription className="sr-only">
           Visualização ampliada do calendário do cronograma, com navegação por mês, ano e eventos.
         </DialogDescription>
-        <div className="min-h-0 flex-1 overflow-auto rounded-xl">
+        <div className="min-h-0 flex-1 overflow-auto rounded-2xl shadow-[var(--elevation-4)]">
           {children}
         </div>
       </DialogContent>

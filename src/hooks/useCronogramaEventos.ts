@@ -17,12 +17,17 @@ import {
 } from '@/lib/cronograma-eventos';
 import type { CronogramaHistoryEntry } from '@/components/cronograma-eventos/types';
 
-const officialSeedEvents = normalizeCronogramaSeed(fenasoja2028CronogramaSeed);
-
 export type CronogramaEventDraft = Partial<CronogramaEventSeed> & {
   title: string;
   category: string;
   eventType: CronogramaEvent['eventType'];
+};
+
+export type CronogramaSubeventDraft = Omit<
+  CronogramaSubeventSeed,
+  'id' | 'storage' | 'createdAt' | 'updatedAt'
+> & {
+  title: string;
 };
 
 interface SupabaseResult<T> {
@@ -39,6 +44,7 @@ interface SupabaseQueryBuilder extends PromiseLike<SupabaseResult<unknown[]>> {
   upsert(values: unknown, options?: Record<string, unknown>): SupabaseQueryBuilder;
   insert(values: unknown): SupabaseQueryBuilder;
   update(values: unknown): SupabaseQueryBuilder;
+  delete(): SupabaseQueryBuilder;
   single(): Promise<SupabaseResult<unknown>>;
 }
 
@@ -46,6 +52,20 @@ const cronogramaDb = supabase as unknown as {
   from(table: string): SupabaseQueryBuilder;
   auth: typeof supabase.auth;
 };
+
+function decorateEmbeddedSubevents(event: CronogramaEvent): CronogramaEvent {
+  return {
+    ...event,
+    subevents: (event.subevents ?? []).map((subevent, index) => ({
+      ...subevent,
+      id: subevent.id ?? `embedded:${event.sourceKey || event.id}:${index}`,
+      sortOrder: subevent.sortOrder ?? index,
+      storage: subevent.storage ?? 'embedded',
+    })),
+  };
+}
+
+const officialSeedEvents = normalizeCronogramaSeed(fenasoja2028CronogramaSeed).map(decorateEmbeddedSubevents);
 
 export function mergeOfficialSeedWithDb(seedEvents: CronogramaEvent[], dbEvents: CronogramaEvent[]): CronogramaEvent[] {
   const byKey = new Map<string, CronogramaEvent>();
@@ -133,7 +153,7 @@ function isUuid(value: string | null | undefined) {
 
 function fromDbRow(row: unknown): CronogramaEvent {
   const record = row as Record<string, unknown>;
-  return {
+  return decorateEmbeddedSubevents({
     id: readString(record, 'id') ?? readString(record, 'source_key') ?? '',
     sourceKey: readString(record, 'source_key') ?? '',
     title: readString(record, 'title') ?? '',
@@ -163,10 +183,58 @@ function fromDbRow(row: unknown): CronogramaEvent {
     subevents: parseJsonArray<CronogramaSubeventSeed>(record.subevents),
     createdAt: readString(record, 'created_at'),
     updatedAt: readString(record, 'updated_at'),
+  });
+}
+
+function fromDbSubeventRow(row: unknown): CronogramaSubeventSeed & { parentEventId: string } {
+  const record = row as Record<string, unknown>;
+  return {
+    id: readString(record, 'id') ?? '',
+    parentEventId: readString(record, 'parent_event_id') ?? '',
+    title: readString(record, 'title') ?? '',
+    description: readString(record, 'description'),
+    startDate: readString(record, 'start_date'),
+    endDate: readString(record, 'end_date'),
+    status: (readString(record, 'status') ?? 'planejado') as CronogramaStatus,
+    priority: (readString(record, 'priority') ?? 'media') as CronogramaPriority,
+    commissionSlug: readString(record, 'commission_slug'),
+    responsibleName: readString(record, 'responsible_name'),
+    sortOrder: readNumber(record, 'sort_order') ?? 0,
+    storage: 'relational',
+    createdAt: readString(record, 'created_at'),
+    updatedAt: readString(record, 'updated_at'),
+  };
+}
+
+function mergeRelationalSubevents(
+  event: CronogramaEvent,
+  relational: CronogramaSubeventSeed[],
+): CronogramaEvent {
+  const embedded = (event.subevents ?? []).filter((subevent) => subevent.storage !== 'relational');
+  return {
+    ...event,
+    subevents: [...embedded, ...relational].sort(
+      (left, right) => (left.sortOrder ?? 0) - (right.sortOrder ?? 0),
+    ),
   };
 }
 
 function toDbPayload(event: CronogramaEventSeed | CronogramaEvent, orgId: string, createdByUserId?: string | null) {
+  const embeddedSubevents = (event.subevents ?? [])
+    .filter((subevent) => subevent.storage !== 'relational')
+    .map((subevent) => ({
+      id: subevent.id,
+      title: subevent.title,
+      description: subevent.description ?? null,
+      startDate: subevent.startDate ?? null,
+      endDate: subevent.endDate ?? null,
+      status: subevent.status ?? 'planejado',
+      priority: subevent.priority ?? 'media',
+      commissionSlug: subevent.commissionSlug ?? null,
+      commissionName: subevent.commissionName ?? null,
+      responsibleName: subevent.responsibleName ?? null,
+      sortOrder: subevent.sortOrder ?? 0,
+    }));
   return {
     org_id: orgId,
     source_key: event.sourceKey,
@@ -194,8 +262,23 @@ function toDbPayload(event: CronogramaEventSeed | CronogramaEvent, orgId: string
     is_official_seed: event.isOfficialSeed,
     has_exact_date: event.hasExactDate,
     linked_commissions: event.linkedCommissions ?? [],
-    subevents: event.subevents ?? [],
+    subevents: embeddedSubevents,
     created_by_user_id: createdByUserId ?? null,
+  };
+}
+
+function toDbSubeventPayload(parentEventId: string, draft: CronogramaSubeventDraft) {
+  return {
+    parent_event_id: parentEventId,
+    title: draft.title.trim(),
+    description: draft.description?.trim() || null,
+    start_date: draft.startDate ?? null,
+    end_date: draft.endDate ?? draft.startDate ?? null,
+    status: draft.status ?? 'planejado',
+    priority: draft.priority ?? 'media',
+    commission_slug: draft.commissionSlug ?? null,
+    responsible_name: draft.responsibleName?.trim() || null,
+    sort_order: draft.sortOrder ?? 0,
   };
 }
 
@@ -244,6 +327,7 @@ export function useCronogramaEventos() {
   const queryClient = useQueryClient();
   const [sessionEvents, setSessionEvents] = useState<CronogramaEvent[]>(officialSeedEvents);
   const [dbUnavailable, setDbUnavailable] = useState(false);
+  const [relationshipsUnavailable, setRelationshipsUnavailable] = useState(false);
   const seedAttemptedForOrg = useRef(new Set<string>());
 
   const query = useQuery({
@@ -266,7 +350,36 @@ export function useCronogramaEventos() {
       }
 
       setDbUnavailable(false);
-      return (data ?? []).map(fromDbRow) as CronogramaEvent[];
+      const dbEvents = (data ?? []).map(fromDbRow) as CronogramaEvent[];
+      const parentIds = dbEvents.map((event) => event.id).filter(isUuid);
+      if (parentIds.length === 0) {
+        setRelationshipsUnavailable(false);
+        return dbEvents;
+      }
+
+      const relationalResult = await cronogramaDb
+        .from('cronograma_subeventos')
+        .select('*')
+        .in('parent_event_id', parentIds)
+        .order('sort_order', { ascending: true })
+        .order('created_at', { ascending: true })
+        .order('id', { ascending: true })
+        .limit(5000);
+
+      if (relationalResult.error) {
+        setRelationshipsUnavailable(true);
+        return dbEvents;
+      }
+
+      setRelationshipsUnavailable(false);
+      const byParent = new Map<string, CronogramaSubeventSeed[]>();
+      (relationalResult.data ?? []).map(fromDbSubeventRow).forEach((subevent) => {
+        const current = byParent.get(subevent.parentEventId) ?? [];
+        current.push(subevent);
+        byParent.set(subevent.parentEventId, current);
+      });
+
+      return dbEvents.map((event) => mergeRelationalSubevents(event, byParent.get(event.id) ?? []));
     },
     retry: false,
   });
@@ -339,62 +452,266 @@ export function useCronogramaEventos() {
     },
   });
 
+  const replaceSessionEvent = (event: CronogramaEvent) => {
+    setSessionEvents((current) => {
+      const existingIndex = current.findIndex((item) => item.id === event.id || item.sourceKey === event.sourceKey);
+      if (existingIndex === -1) return sortCronogramaEvents([...current, event]);
+      return sortCronogramaEvents(current.map((item, index) => (index === existingIndex ? event : item)));
+    });
+  };
+
+  const findSessionEvent = (identity: string) => sessionEvents.find(
+    (event) => event.id === identity || event.sourceKey === identity,
+  );
+
+  const writeEventLog = async ({
+    eventId,
+    action,
+    previousValue,
+    newValue,
+    userId,
+  }: {
+    eventId: string;
+    action: string;
+    previousValue: unknown;
+    newValue: unknown;
+    userId: string | null;
+  }) => {
+    await cronogramaDb.from('cronograma_evento_logs').insert({
+      event_id: eventId,
+      action,
+      previous_value: previousValue,
+      new_value: newValue,
+      user_id: userId,
+    });
+  };
+
+  const saveEventRecord = async (
+    current: CronogramaEvent,
+    next: CronogramaEvent,
+    action = 'updated',
+  ) => {
+    if (!orgId || !next.sourceKey) throw new Error('O evento não possui vínculo persistente com a organização atual.');
+    if (dbUnavailable) {
+      throw new Error('A sincronização está indisponível. As alterações não foram salvas para evitar perda de dados. Tente novamente mais tarde.');
+    }
+
+    const user = (await cronogramaDb.auth.getUser()).data.user;
+    const fullPayload = toDbPayload(next, orgId, user?.id);
+    const { created_by_user_id: _createdByUserId, ...updatePayload } = fullPayload;
+    let result: SupabaseResult<unknown>;
+
+    if (current.updatedAt) {
+      result = await cronogramaDb
+        .from('cronograma_eventos')
+        .update(updatePayload)
+        .eq('org_id', orgId)
+        .eq('source_key', next.sourceKey)
+        .eq('updated_at', current.updatedAt)
+        .select('*')
+        .single();
+      if (result.error?.code === 'PGRST116' || (!result.error && !result.data)) {
+        queryClient.invalidateQueries({ queryKey: ['cronograma-eventos'] });
+        throw new Error('Este evento foi alterado por outra pessoa. Atualize a página, revise a versão mais recente e tente novamente.');
+      }
+    } else {
+      result = await cronogramaDb
+        .from('cronograma_eventos')
+        .upsert(fullPayload, { onConflict: 'org_id,source_key' })
+        .select('*')
+        .single();
+    }
+
+    if (result.error) throw new Error(result.error.message || 'Não foi possível salvar as alterações.');
+    const savedFromDb = fromDbRow(result.data);
+    const relational = (current.subevents ?? []).filter((subevent) => subevent.storage === 'relational');
+    const saved = mergeRelationalSubevents(savedFromDb, relational);
+
+    await writeEventLog({
+      eventId: saved.id,
+      action,
+      previousValue: toDbPayload(current, orgId, user?.id),
+      newValue: updatePayload,
+      userId: user?.id ?? null,
+    });
+    return saved;
+  };
+
+  const ensurePersistedParent = async (current: CronogramaEvent) => {
+    if (isUuid(current.id)) return current;
+    if (!orgId || !current.sourceKey) throw new Error('O evento principal não possui vínculo persistente.');
+
+    const existing = await cronogramaDb
+      .from('cronograma_eventos')
+      .select('*')
+      .eq('org_id', orgId)
+      .eq('source_key', current.sourceKey)
+      .limit(1);
+    if (existing.error) throw new Error(existing.error.message || 'Não foi possível localizar o evento principal.');
+    if (existing.data?.[0]) {
+      const persisted = fromDbRow(existing.data[0]);
+      const relational = (current.subevents ?? []).filter((subevent) => subevent.storage === 'relational');
+      return mergeRelationalSubevents(persisted, relational);
+    }
+
+    return saveEventRecord(current, current, 'relationship_parent_created');
+  };
+
   const update = useMutation({
     mutationFn: async ({ id, updates }: { id: string; updates: Partial<CronogramaEvent> }) => {
-      const current = sessionEvents.find((event) => event.id === id);
+      const current = findSessionEvent(id);
       if (!current) throw new Error('Evento não encontrado. Atualize a página e tente novamente.');
       const next = { ...current, ...updates, updatedAt: new Date().toISOString() };
-      if (!orgId || !next.sourceKey) throw new Error('O evento não possui vínculo persistente com a organização atual.');
-      if (dbUnavailable) {
-        throw new Error('A sincronização está indisponível. As alterações não foram salvas para evitar perda de dados. Tente novamente mais tarde.');
-      }
-
-      const user = (await cronogramaDb.auth.getUser()).data.user;
-      const fullPayload = toDbPayload(next, orgId, user?.id);
-      const { created_by_user_id: _createdByUserId, ...updatePayload } = fullPayload;
-      let result: SupabaseResult<unknown>;
-
-      if (current.updatedAt) {
-        result = await cronogramaDb
-          .from('cronograma_eventos')
-          .update(updatePayload)
-          .eq('org_id', orgId)
-          .eq('source_key', next.sourceKey)
-          .eq('updated_at', current.updatedAt)
-          .select('*')
-          .single();
-        if (result.error?.code === 'PGRST116' || (!result.error && !result.data)) {
-          queryClient.invalidateQueries({ queryKey: ['cronograma-eventos'] });
-          throw new Error('Este evento foi alterado por outra pessoa. Atualize a página, revise a versão mais recente e tente novamente.');
-        }
-      } else {
-        result = await cronogramaDb
-          .from('cronograma_eventos')
-          .upsert(fullPayload, { onConflict: 'org_id,source_key' })
-          .select('*')
-          .single();
-      }
-
-      if (result.error) throw new Error(result.error.message || 'Não foi possível salvar as alterações.');
-      const saved = fromDbRow(result.data);
-
-      const previousValue = toDbPayload(current, orgId, user?.id);
-      await cronogramaDb.from('cronograma_evento_logs').insert({
-        event_id: saved.id,
-        action: 'updated',
-        previous_value: previousValue,
-        new_value: updatePayload,
-        user_id: user?.id ?? null,
-      });
-
-      return saved;
+      return saveEventRecord(current, next);
     },
     onSuccess: (event) => {
-      setSessionEvents((current) => {
-        const existingIndex = current.findIndex((item) => item.id === event.id || item.sourceKey === event.sourceKey);
-        if (existingIndex === -1) return sortCronogramaEvents([...current, event]);
-        return sortCronogramaEvents(current.map((item, index) => (index === existingIndex ? event : item)));
-      });
+      replaceSessionEvent(event);
+      queryClient.invalidateQueries({ queryKey: ['cronograma-eventos'] });
+      queryClient.invalidateQueries({ queryKey: ['cronograma-event-history', event.id] });
+    },
+  });
+
+  const createSubevent = useMutation({
+    mutationFn: async ({
+      eventId,
+      draft,
+      requestId,
+    }: {
+      eventId: string;
+      draft: CronogramaSubeventDraft;
+      requestId?: string;
+    }) => {
+      if (!isWritableRole(myRole)) throw new Error('Seu perfil possui acesso somente para consulta.');
+      if (dbUnavailable || relationshipsUnavailable) {
+        throw new Error('Os relacionamentos online estão indisponíveis. O subevento não foi criado para evitar uma associação incompleta.');
+      }
+      const current = findSessionEvent(eventId);
+      if (!current) throw new Error('Evento principal não encontrado. Atualize a página e tente novamente.');
+      const parent = await ensurePersistedParent(current);
+      const relational = (parent.subevents ?? []).filter((subevent) => subevent.storage === 'relational');
+      const normalizedDraft = { ...draft, sortOrder: draft.sortOrder ?? relational.length };
+      const id = requestId
+        ?? (typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : undefined);
+      if (!id) throw new Error('Não foi possível gerar uma identidade segura para o subevento. Tente novamente.');
+      const { data, error } = await cronogramaDb
+        .from('cronograma_subeventos')
+        .insert({ id, ...toDbSubeventPayload(parent.id, normalizedDraft) })
+        .select('*')
+        .single();
+      if (error) throw new Error(error.message || 'Não foi possível criar o subevento.');
+
+      const created = fromDbSubeventRow(data);
+      return mergeRelationalSubevents(parent, [...relational, created]);
+    },
+    onSuccess: (event) => {
+      replaceSessionEvent(event);
+      queryClient.invalidateQueries({ queryKey: ['cronograma-eventos'] });
+      queryClient.invalidateQueries({ queryKey: ['cronograma-event-history', event.id] });
+    },
+  });
+
+  const updateSubevent = useMutation({
+    mutationFn: async ({
+      eventId,
+      subeventId,
+      draft,
+    }: {
+      eventId: string;
+      subeventId: string;
+      draft: CronogramaSubeventDraft;
+    }) => {
+      if (!isWritableRole(myRole)) throw new Error('Seu perfil possui acesso somente para consulta.');
+      const current = findSessionEvent(eventId);
+      if (!current) throw new Error('Evento principal não encontrado. Atualize a página e tente novamente.');
+      const existingSubevent = (current.subevents ?? []).find((subevent) => subevent.id === subeventId);
+      if (!existingSubevent) throw new Error('Subevento não encontrado. Atualize a página e tente novamente.');
+
+      if (existingSubevent.storage !== 'relational' || !isUuid(subeventId)) {
+        const next = {
+          ...current,
+          subevents: (current.subevents ?? []).map((subevent) => (
+            subevent.id === subeventId
+              ? { ...subevent, ...draft, id: subevent.id, storage: 'embedded' as const }
+              : subevent
+          )),
+        };
+        return saveEventRecord(current, next, 'subevent_updated');
+      }
+
+      if (dbUnavailable || relationshipsUnavailable) {
+        throw new Error('Os relacionamentos online estão indisponíveis. Tente novamente em instantes.');
+      }
+      const parent = await ensurePersistedParent(current);
+      let request = cronogramaDb
+        .from('cronograma_subeventos')
+        .update(toDbSubeventPayload(parent.id, draft))
+        .eq('id', subeventId)
+        .eq('parent_event_id', parent.id);
+      if (existingSubevent.updatedAt) request = request.eq('updated_at', existingSubevent.updatedAt);
+      const result = await request.select('*').single();
+      if (result.error?.code === 'PGRST116' || (!result.error && !result.data)) {
+        queryClient.invalidateQueries({ queryKey: ['cronograma-eventos'] });
+        throw new Error('Este subevento foi alterado por outra pessoa. Atualize a página e revise a versão mais recente.');
+      }
+      if (result.error) throw new Error(result.error.message || 'Não foi possível atualizar o subevento.');
+
+      const saved = fromDbSubeventRow(result.data);
+      const next = {
+        ...parent,
+        subevents: (parent.subevents ?? []).map((subevent) => (subevent.id === subeventId ? saved : subevent)),
+      };
+      return next;
+    },
+    onSuccess: (event) => {
+      replaceSessionEvent(event);
+      queryClient.invalidateQueries({ queryKey: ['cronograma-eventos'] });
+      queryClient.invalidateQueries({ queryKey: ['cronograma-event-history', event.id] });
+    },
+  });
+
+  const deleteSubevent = useMutation({
+    mutationFn: async ({ eventId, subeventId }: { eventId: string; subeventId: string }) => {
+      if (myRole !== 'admin' && myRole !== 'gestor') {
+        throw new Error('Somente administradores e gestores podem remover subeventos.');
+      }
+      const current = findSessionEvent(eventId);
+      if (!current) throw new Error('Evento principal não encontrado. Atualize a página e tente novamente.');
+      const existingSubevent = (current.subevents ?? []).find((subevent) => subevent.id === subeventId);
+      if (!existingSubevent) throw new Error('Subevento não encontrado. Atualize a página e tente novamente.');
+
+      if (existingSubevent.storage !== 'relational' || !isUuid(subeventId)) {
+        const next = {
+          ...current,
+          subevents: (current.subevents ?? []).filter((subevent) => subevent.id !== subeventId),
+        };
+        return saveEventRecord(current, next, 'subevent_removed');
+      }
+
+      if (dbUnavailable || relationshipsUnavailable) {
+        throw new Error('Os relacionamentos online estão indisponíveis. Tente novamente em instantes.');
+      }
+      const parent = await ensurePersistedParent(current);
+      let request = cronogramaDb
+        .from('cronograma_subeventos')
+        .delete()
+        .eq('id', subeventId)
+        .eq('parent_event_id', parent.id);
+      if (existingSubevent.updatedAt) request = request.eq('updated_at', existingSubevent.updatedAt);
+      const result = await request.select('*').single();
+      if (result.error?.code === 'PGRST116' || (!result.error && !result.data)) {
+        queryClient.invalidateQueries({ queryKey: ['cronograma-eventos'] });
+        throw new Error('Este subevento mudou desde a última leitura. Atualize a página antes de remover.');
+      }
+      if (result.error) throw new Error(result.error.message || 'Não foi possível remover o subevento.');
+
+      const next = {
+        ...parent,
+        subevents: (parent.subevents ?? []).filter((subevent) => subevent.id !== subeventId),
+      };
+      return next;
+    },
+    onSuccess: (event) => {
+      replaceSessionEvent(event);
       queryClient.invalidateQueries({ queryKey: ['cronograma-eventos'] });
       queryClient.invalidateQueries({ queryKey: ['cronograma-event-history', event.id] });
     },
@@ -411,8 +728,13 @@ export function useCronogramaEventos() {
     error: query.error,
     refetch: query.refetch,
     canManage: isWritableRole(myRole),
+    canDeleteSubevents: myRole === 'admin' || myRole === 'gestor',
+    relationshipsUnavailable,
     create,
     update,
+    createSubevent,
+    updateSubevent,
+    deleteSubevent,
     seedOfficialData,
   };
 }

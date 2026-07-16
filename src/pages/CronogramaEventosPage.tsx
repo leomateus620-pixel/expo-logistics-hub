@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AlertTriangle, CalendarDays, Loader2, RefreshCw } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { CalendarMonthView } from '@/components/cronograma-eventos/CalendarMonthView';
@@ -28,10 +28,17 @@ import { MobileEventScreen } from '@/components/cronograma-eventos/mobile/Mobile
 import { compareEventDates } from '@/components/cronograma-eventos/dateUtils';
 import {
   adaptCronogramaEvent,
+  visualSubeventToSourceDraft,
   visualEventToDraft,
   visualEventToSourceUpdates,
 } from '@/components/cronograma-eventos/modelAdapter';
-import type { CronogramaEvent, CronogramaFilters, CronogramaView } from '@/components/cronograma-eventos/types';
+import type {
+  CronogramaEvent,
+  CronogramaFilters,
+  CronogramaSubevent,
+  CronogramaSubeventInput,
+  CronogramaView,
+} from '@/components/cronograma-eventos/types';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useCronogramaEventHistory, useCronogramaEventos } from '@/hooks/useCronogramaEventos';
@@ -47,6 +54,11 @@ import {
 } from '@/lib/cronograma-cycle';
 import type { CronogramaEvent as SourceCronogramaEvent } from '@/lib/cronograma-eventos';
 import { filterTimelineEvents } from '@/lib/cronograma-timeline';
+
+const EventRelationshipWorkspace = lazy(async () => {
+  const module = await import('@/components/cronograma-eventos/workspace/EventRelationshipWorkspace');
+  return { default: module.EventRelationshipWorkspace };
+});
 
 const emptyFilters: CronogramaFilters = {
   query: '',
@@ -98,6 +110,8 @@ export default function CronogramaEventosPage() {
   const contentIsMobilePresentation = overlayIsMobilePresentation;
   const drawerReturnFocusRef = useRef<HTMLElement>(null);
   const timelinePositionRef = useRef({ x: 0, y: 0 });
+  const workspacePositionRef = useRef({ x: 0, y: 0 });
+  const workspaceTransitionRef = useRef(false);
   const selectedPresenceRef = useRef({ id: '', seenInData: false });
   const overlayOpenRef = useRef({ drawer: false, create: false, filters: false });
   const activeView = isCronogramaView(searchParams.get('view'))
@@ -120,6 +134,12 @@ export default function CronogramaEventosPage() {
   };
 
   const events = useMemo(() => cronograma.events.map(adaptCronogramaEvent), [cronograma.events]);
+  const workspaceIdentity = searchParams.get('workspace');
+  const workspaceEvent = useMemo(() => (
+    workspaceIdentity
+      ? events.find((event) => event.id === workspaceIdentity || event.sourceKey === workspaceIdentity) ?? null
+      : null
+  ), [events, workspaceIdentity]);
   const sourceById = useMemo(() => {
     const map = new Map<string, SourceCronogramaEvent>();
     cronograma.events.forEach((event) => {
@@ -251,6 +271,33 @@ export default function CronogramaEventosPage() {
     setDrawerOpen(true);
   }, [viewportIsMobilePresentation]);
 
+  const openWorkspace = useCallback((event: CronogramaEvent) => {
+    workspaceTransitionRef.current = overlayIsMobilePresentation;
+    workspacePositionRef.current = { x: window.scrollX, y: window.scrollY };
+    overlayOpenRef.current.drawer = false;
+    setDrawerOpen(false);
+    setDrawerStartsEditing(false);
+    setSelectedEvent(null);
+    setSelectedSourceUnavailable(false);
+    setPresentationLock(null);
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current);
+      next.set('workspace', event.sourceKey ?? event.id);
+      return next;
+    });
+    window.setTimeout(() => window.scrollTo({ left: 0, top: 0, behavior: 'auto' }), 0);
+  }, [overlayIsMobilePresentation, setSearchParams]);
+
+  const closeWorkspace = useCallback(() => {
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current);
+      next.delete('workspace');
+      return next;
+    }, { replace: true });
+    const { x, y } = workspacePositionRef.current;
+    window.setTimeout(() => window.scrollTo({ left: x, top: y, behavior: 'auto' }), 0);
+  }, [setSearchParams]);
+
   const handleDrawerOpenChange = (open: boolean) => {
     overlayOpenRef.current.drawer = open;
     setDrawerOpen(open);
@@ -259,6 +306,10 @@ export default function CronogramaEventosPage() {
       const { x, y } = timelinePositionRef.current;
       const closingEventIdentity = selectedEvent?.sourceKey ?? selectedEvent?.id;
       window.setTimeout(() => {
+        if (workspaceTransitionRef.current) {
+          workspaceTransitionRef.current = false;
+          return;
+        }
         window.scrollTo({ left: x, top: y, behavior: 'auto' });
         if (overlayIsMobilePresentation) {
           setSelectedEvent((current) => (
@@ -323,6 +374,53 @@ export default function CronogramaEventosPage() {
     }
     const created = await cronograma.create.mutateAsync(visualEventToDraft(nextEvent));
     setSelectedEvent(adaptCronogramaEvent(created));
+  };
+
+  const handleCreateSubevent = async (input: CronogramaSubeventInput) => {
+    if (!workspaceEvent) throw new Error('Evento principal não encontrado. Atualize a página e tente novamente.');
+    const draft = visualSubeventToSourceDraft({
+      title: input.title,
+      description: input.description,
+      date: input.date,
+      endDate: input.date,
+      owner: input.responsible,
+      status: input.status,
+      priority: 'medium',
+      commissionSlug: input.commissionSlug || undefined,
+      storage: 'relational',
+    }, workspaceEvent.subevents?.length ?? 0);
+    await cronograma.createSubevent.mutateAsync({
+      eventId: workspaceEvent.sourceKey ?? workspaceEvent.id,
+      draft,
+      requestId: input.requestId,
+    });
+  };
+
+  const handleUpdateSubevent = async (subevent: CronogramaSubevent, input: CronogramaSubeventInput) => {
+    if (!workspaceEvent || !subevent.id) throw new Error('A conexão selecionada não possui identidade persistente.');
+    const draft = visualSubeventToSourceDraft({
+      ...subevent,
+      title: input.title,
+      description: input.description,
+      date: input.date,
+      endDate: input.date,
+      owner: input.responsible,
+      status: input.status,
+      commissionSlug: input.commissionSlug || undefined,
+    }, subevent.sortOrder ?? 0);
+    await cronograma.updateSubevent.mutateAsync({
+      eventId: workspaceEvent.sourceKey ?? workspaceEvent.id,
+      subeventId: subevent.id,
+      draft,
+    });
+  };
+
+  const handleRemoveSubevent = async (subevent: CronogramaSubevent) => {
+    if (!workspaceEvent || !subevent.id) throw new Error('A conexão selecionada não possui identidade persistente.');
+    await cronograma.deleteSubevent.mutateAsync({
+      eventId: workspaceEvent.sourceKey ?? workspaceEvent.id,
+      subeventId: subevent.id,
+    });
   };
 
   const prepareNewEvent = (event: CronogramaEvent) => {
@@ -420,7 +518,7 @@ export default function CronogramaEventosPage() {
             <OverviewBoard
               events={filteredEvents}
               onOpen={(event) => openEvent(event)}
-              onEdit={(event) => openEvent(event, true)}
+              onEdit={openWorkspace}
               onSwitchView={setActiveView}
             />
           )}
@@ -462,7 +560,7 @@ export default function CronogramaEventosPage() {
               events={filteredEvents}
               preferredYear={preferredCalendarYear}
               onOpen={(event) => openEvent(event)}
-              onEdit={(event) => openEvent(event, true)}
+              onEdit={openWorkspace}
             />
           )}
 
@@ -470,7 +568,7 @@ export default function CronogramaEventosPage() {
             <YearBoard
               events={filteredEvents}
               onOpen={(event) => openEvent(event)}
-              onEdit={(event) => openEvent(event, true)}
+              onEdit={openWorkspace}
             />
           )}
 
@@ -486,7 +584,7 @@ export default function CronogramaEventosPage() {
             <UndatedBoard
               events={filteredEvents}
               onOpen={(event) => openEvent(event)}
-              onEdit={(event) => openEvent(event, true)}
+              onEdit={openWorkspace}
             />
           )}
         </ViewContentTransition>
@@ -497,9 +595,41 @@ export default function CronogramaEventosPage() {
   return (
     <main
       id="cronograma-main"
-      className="cronograma-page min-h-screen pb-10"
+      className={`cronograma-page min-h-screen ${workspaceIdentity ? '' : 'pb-10'}`}
       data-presentation={contentIsMobilePresentation ? 'mobile' : 'desktop'}
     >
+      {workspaceIdentity ? (
+        workspaceEvent ? (
+          <Suspense fallback={<WorkspaceLoadingState />}>
+            <EventRelationshipWorkspace
+              event={workspaceEvent}
+              onBack={closeWorkspace}
+              onSaveEvent={handleSave}
+              onCreateSubevent={handleCreateSubevent}
+              onUpdateSubevent={handleUpdateSubevent}
+              onRemoveSubevent={handleRemoveSubevent}
+              canManage={cronograma.canManage}
+              canDeleteSubevents={cronograma.canDeleteSubevents}
+              relationshipsUnavailable={cronograma.relationshipsUnavailable || cronograma.isSeedFallback}
+            />
+          </Suspense>
+        ) : (
+          <div className="flex min-h-[60vh] items-center justify-center" role="status">
+            {cronograma.isLoading ? (
+              <span className="inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> Preparando workspace…
+              </span>
+            ) : (
+              <div className="max-w-md rounded-2xl border border-border/50 bg-white p-6 text-center shadow-sm">
+                <h1 className="text-lg font-black">Evento não encontrado</h1>
+                <p className="mt-2 text-sm text-muted-foreground">O registro pode ter sido atualizado ou removido por outra pessoa.</p>
+                <Button type="button" variant="outline" onClick={closeWorkspace} className="mt-4 rounded-xl">Voltar ao cronograma</Button>
+              </div>
+            )}
+          </div>
+        )
+      ) : (
+      <>
       {contentIsMobilePresentation ? (
         <MobileCronogramaErrorBoundary
           resetKey={`${activeView}:${events.length}:${cronograma.isLoading ? 'loading' : 'ready'}`}
@@ -562,6 +692,7 @@ export default function CronogramaEventosPage() {
             open={drawerOpen}
             onOpenChange={handleDrawerOpenChange}
             onSave={handleSave}
+            onEditWorkspace={openWorkspace}
             startInEdit={drawerStartsEditing}
             canManage={cronograma.canManage}
             returnFocusRef={drawerReturnFocusRef}
@@ -578,6 +709,7 @@ export default function CronogramaEventosPage() {
           open={drawerOpen}
           onOpenChange={handleDrawerOpenChange}
           onSave={handleSave}
+          onEditWorkspace={openWorkspace}
           startInEdit={drawerStartsEditing}
           canManage={cronograma.canManage}
           returnFocusRef={drawerReturnFocusRef}
@@ -621,6 +753,19 @@ export default function CronogramaEventosPage() {
           </DialogContent>
         </Dialog>
       )}
+      </>
+      )}
     </main>
+  );
+}
+
+function WorkspaceLoadingState() {
+  return (
+    <div className="flex min-h-[60vh] items-center justify-center px-4" role="status">
+      <div className="glass-panel flex items-center gap-3 rounded-2xl px-5 py-4 text-sm font-semibold text-muted-foreground">
+        <Loader2 className="h-4 w-4 animate-spin text-primary" aria-hidden="true" />
+        Preparando conexões do evento…
+      </div>
+    </div>
   );
 }
