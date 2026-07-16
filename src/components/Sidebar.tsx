@@ -189,7 +189,7 @@ export default function Sidebar({ collapsed, onToggle, isMobile, mobileOpen, onM
         <button
           onClick={onToggle}
           aria-label={collapsed ? 'Expandir menu' : 'Retrair menu'}
-          className="rounded-lg p-2 text-sidebar-foreground/60 transition-colors duration-150 hover:bg-white/[0.08] hover:text-sidebar-foreground focus-ring"
+          className="sidebar-icon-btn rounded-lg p-2 transition-colors duration-150 focus-ring"
         >
           {collapsed ? <PanelLeftOpen className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
         </button>
@@ -197,7 +197,7 @@ export default function Sidebar({ collapsed, onToggle, isMobile, mobileOpen, onM
           <button
             onClick={onMobileClose}
             aria-label="Fechar menu"
-            className="rounded-lg p-2 text-sidebar-foreground/60 transition-colors duration-150 hover:bg-white/[0.08] hover:text-sidebar-foreground focus-ring"
+            className="sidebar-icon-btn rounded-lg p-2 transition-colors duration-150 focus-ring"
           >
             <X className="w-4 h-4" />
           </button>
@@ -213,8 +213,7 @@ export default function Sidebar({ collapsed, onToggle, isMobile, mobileOpen, onM
         onClick={() => { if (mobile) onMobileClose(); signOut(); }}
         aria-label="Sair da conta"
         className={cn(
-          'flex w-full items-center gap-3 rounded-lg text-sm font-medium transition-colors duration-150 focus-ring',
-          'text-sidebar-foreground/40 hover:text-red-400 hover:bg-red-500/10',
+          'sidebar-signout flex w-full items-center gap-3 rounded-lg text-sm font-medium transition-colors duration-150 focus-ring',
           collapsed ? 'justify-center px-2 py-2.5' : 'px-3 py-2.5'
         )}
       >
