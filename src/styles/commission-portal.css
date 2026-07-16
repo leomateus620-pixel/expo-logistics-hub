@@ -1,0 +1,1153 @@
+.fenasoja-portal {
+  --portal-navy-950: #031630;
+  --portal-navy-900: #061d3d;
+  --portal-navy-800: #0c2b50;
+  --portal-cream: #fffaf0;
+  --portal-text: #f8fafc;
+  --portal-muted: #c6d2e0;
+  --portal-subtle: #aebdd0;
+  --portal-gold: #f8d55b;
+  --portal-orange: #ff8a24;
+  position: relative;
+  isolation: isolate;
+  min-height: 100dvh;
+  overflow-x: clip;
+  background: var(--portal-navy-950);
+  color: var(--portal-text);
+}
+
+.fenasoja-portal__atmosphere {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--portal-navy-950);
+}
+
+.fenasoja-portal__atmosphere picture,
+.fenasoja-portal__atmosphere img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.fenasoja-portal__atmosphere img {
+  object-fit: cover;
+  object-position: center bottom;
+  animation: portal-atmosphere-drift 22s ease-in-out infinite alternate;
+}
+
+.fenasoja-portal__atmosphere::after {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 50% 20%, rgb(3 22 48 / 0.20), rgb(3 22 48 / 0.76) 76%),
+    linear-gradient(90deg, rgb(2 18 40 / 0.48), transparent 24%, transparent 76%, rgb(2 18 40 / 0.42)),
+    linear-gradient(180deg, rgb(2 16 36 / 0.18), rgb(2 16 36 / 0.62));
+  content: '';
+}
+
+.fenasoja-portal__shell {
+  --portal-shell-gutter: clamp(1rem, 2.2vw, 2rem);
+  position: relative;
+  width: min(100%, 90rem);
+  min-height: 100dvh;
+  margin-inline: auto;
+  padding-top: max(var(--portal-shell-gutter), env(safe-area-inset-top));
+  padding-right: max(var(--portal-shell-gutter), env(safe-area-inset-right));
+  padding-bottom: max(clamp(3rem, 7vw, 6rem), calc(env(safe-area-inset-bottom) + 1.5rem));
+  padding-left: max(var(--portal-shell-gutter), env(safe-area-inset-left));
+}
+
+.fenasoja-portal__header {
+  display: flex;
+  min-height: 4rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid rgb(211 225 242 / 0.30);
+  border-radius: 1rem;
+  background:
+    linear-gradient(135deg, rgb(255 255 255 / 0.055), transparent 48%),
+    rgb(7 31 61 / 0.84);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.10) inset,
+    0 18px 42px -30px rgb(0 0 0 / 0.82);
+  backdrop-filter: blur(16px) saturate(1.18);
+  -webkit-backdrop-filter: blur(16px) saturate(1.18);
+}
+
+.fenasoja-portal__admin {
+  display: inline-flex;
+  min-width: 2.75rem;
+  height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding-inline: 0.9rem;
+  border: 1px solid rgb(248 213 91 / 0.42);
+  border-radius: 0.75rem;
+  background: rgb(255 255 255 / 0.055);
+  color: var(--portal-text);
+  font-size: 0.875rem;
+  font-weight: 760;
+  box-shadow: 0 1px 0 rgb(255 255 255 / 0.10) inset;
+  transition:
+    transform 180ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 180ms ease,
+    background-color 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.fenasoja-portal__brand-compact {
+  display: none;
+}
+
+.fenasoja-portal__admin svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.fenasoja-portal__admin svg:first-child {
+  color: var(--portal-gold);
+}
+
+.fenasoja-portal__admin svg:last-child {
+  transition: transform 180ms ease;
+}
+
+.fenasoja-portal__admin:focus-visible,
+.fenasoja-portal .cronograma-portal-card:focus-visible,
+.commission-access-card__action:focus-visible {
+  outline: 3px solid #ffd35c;
+  outline-offset: 3px;
+}
+
+.commission-access-card__toggle:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 3px #ffd35c;
+}
+
+.commission-access-card[data-status='active'] .commission-access-card__toggle:focus-visible {
+  box-shadow:
+    inset 0 0 0 3px #082541,
+    inset 0 0 0 5px #ffd35c;
+}
+
+.commission-access-card[data-status='active'] .commission-access-card__action:focus-visible {
+  outline-color: #082541;
+}
+
+.fenasoja-portal__hero {
+  padding: clamp(2.4rem, 4vw, 3.75rem) 0 clamp(1.75rem, 3vw, 2.5rem);
+}
+
+.fenasoja-portal__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: var(--portal-gold);
+  font-size: 0.7rem;
+  font-weight: 850;
+  letter-spacing: 0.18em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.fenasoja-portal__eyebrow > span {
+  width: 2.25rem;
+  height: 1px;
+  flex: 0 0 auto;
+  background: linear-gradient(90deg, var(--portal-orange), var(--portal-gold));
+  box-shadow: 0 0 12px rgb(248 213 91 / 0.40);
+}
+
+.fenasoja-portal__headline {
+  max-width: 100%;
+  margin-top: 0.8rem;
+  color: var(--portal-text);
+  font-size: clamp(2.15rem, 3.25vw, 3.25rem);
+  font-weight: 950;
+  letter-spacing: -0.052em;
+  line-height: 0.98;
+  text-wrap: pretty;
+  text-shadow: 0 12px 38px rgb(0 0 0 / 0.34);
+}
+
+.fenasoja-portal__headline-accent {
+  color: #fff1c4;
+  background: linear-gradient(105deg, #fffaf0 10%, #f8d55b 94%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.fenasoja-portal__primary {
+  margin-bottom: clamp(2.5rem, 4vw, 3.75rem);
+}
+
+.fenasoja-portal .cronograma-portal-card {
+  position: relative;
+  isolation: isolate;
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid rgb(255 166 64 / 0.72);
+  border-radius: 1.35rem;
+  outline: none;
+  background:
+    radial-gradient(circle at 84% -35%, rgb(76 99 255 / 0.46), transparent 45%),
+    radial-gradient(circle at 0% 120%, rgb(255 138 36 / 0.18), transparent 38%),
+    linear-gradient(120deg, rgb(12 40 73 / 0.96), rgb(7 30 65 / 0.95));
+  color: var(--portal-text);
+  text-align: left;
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.12) inset,
+    0 28px 62px -34px rgb(0 0 0 / 0.94),
+    0 18px 48px -34px rgb(255 138 36 / 0.56);
+  cursor: pointer;
+  backdrop-filter: blur(14px) saturate(1.15);
+  -webkit-backdrop-filter: blur(14px) saturate(1.15);
+  transition:
+    transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 180ms ease,
+    box-shadow 220ms ease;
+}
+
+.fenasoja-portal .cronograma-portal-card::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0.28rem;
+  background: linear-gradient(180deg, var(--portal-gold), var(--portal-orange));
+  content: '';
+}
+
+.fenasoja-portal .cronograma-portal-card::after {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(120deg, rgb(255 255 255 / 0.055), transparent 38%);
+  content: '';
+  pointer-events: none;
+}
+
+.cronograma-portal-card__content {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: clamp(1rem, 2vw, 1.5rem);
+  padding: clamp(1.25rem, 2.4vw, 1.8rem);
+}
+
+.fenasoja-portal .cronograma-portal-icon {
+  display: grid;
+  width: 4rem;
+  height: 4rem;
+  place-items: center;
+  border: 1px solid rgb(248 213 91 / 0.42);
+  border-radius: 1rem;
+  background:
+    radial-gradient(circle at 30% 15%, rgb(255 255 255 / 0.13), transparent 42%),
+    rgb(248 213 91 / 0.12);
+  color: var(--portal-gold);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.13) inset,
+    0 14px 28px -20px rgb(248 213 91 / 0.75);
+}
+
+.fenasoja-portal .cronograma-portal-icon svg {
+  width: 1.85rem;
+  height: 1.85rem;
+}
+
+.cronograma-portal-card__body {
+  display: block;
+  min-width: 0;
+}
+
+.cronograma-portal-card__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: var(--portal-gold);
+  font-size: 0.68rem;
+  font-weight: 850;
+  letter-spacing: 0.15em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.cronograma-portal-card__availability {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.45rem;
+  border: 1px solid rgb(93 220 177 / 0.34);
+  border-radius: 999px;
+  background: rgb(26 90 70 / 0.50);
+  color: #c9f8e8;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.cronograma-portal-card__availability svg {
+  width: 0.8rem;
+  height: 0.8rem;
+}
+
+.cronograma-portal-card__title {
+  display: block;
+  margin-top: 0.55rem;
+  color: var(--portal-text);
+  font-size: clamp(1.45rem, 2.3vw, 1.9rem);
+  font-weight: 920;
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+}
+
+.cronograma-portal-card__description {
+  display: block;
+  max-width: 48rem;
+  margin-top: 0.4rem;
+  color: var(--portal-muted);
+  font-size: 0.9rem;
+  line-height: 1.55;
+}
+
+.cronograma-portal-card__cycle {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 0.8rem;
+  color: var(--portal-subtle);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.cronograma-portal-card__cycle strong {
+  color: #fff4cf;
+  font-weight: 850;
+  letter-spacing: 0.04em;
+}
+
+.cronograma-portal-card__cta {
+  display: inline-flex;
+  min-height: 3rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 0.78rem 1.15rem;
+  border: 1px solid rgb(255 220 122 / 0.72);
+  border-radius: 0.85rem;
+  background: linear-gradient(135deg, #ffad3d, var(--portal-orange));
+  color: #071a34;
+  font-size: 0.875rem;
+  font-weight: 900;
+  line-height: 1.1;
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.42) inset,
+    0 16px 28px -18px rgb(255 138 36 / 0.90),
+    0 6px 12px -8px rgb(0 0 0 / 0.68);
+  transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
+}
+
+.cronograma-portal-card__cta svg {
+  width: 1rem;
+  height: 1rem;
+  transition: transform 180ms ease;
+}
+
+.fenasoja-portal__commissions {
+  padding-bottom: 1rem;
+}
+
+.fenasoja-portal__section-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.25rem;
+  margin-bottom: 1.15rem;
+}
+
+.fenasoja-portal__section-kicker {
+  color: var(--portal-gold);
+  font-size: 0.68rem;
+  font-weight: 850;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.fenasoja-portal__section-header h2 {
+  margin-top: 0.25rem;
+  color: var(--portal-text);
+  font-size: clamp(1.45rem, 2.2vw, 1.8rem);
+  font-weight: 900;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+}
+
+.fenasoja-portal__profile-note {
+  display: inline-flex;
+  min-height: 2.25rem;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid rgb(211 225 242 / 0.22);
+  border-radius: 999px;
+  background: rgb(6 29 59 / 0.72);
+  color: #d8e2ee;
+  font-size: 0.75rem;
+  font-weight: 720;
+  white-space: nowrap;
+}
+
+.fenasoja-portal__profile-note svg {
+  width: 0.9rem;
+  height: 0.9rem;
+  color: var(--portal-gold);
+}
+
+.fenasoja-portal__groups {
+  display: grid;
+  gap: 1rem;
+}
+
+.commission-access-group {
+  --group-accent: #f8d55b;
+  position: relative;
+  overflow: hidden;
+  padding: 0.9rem;
+  border: 1px solid rgb(211 225 242 / 0.18);
+  border-radius: 1.15rem;
+  background:
+    linear-gradient(135deg, rgb(255 255 255 / 0.035), transparent 40%),
+    rgb(4 24 50 / 0.82);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.06) inset,
+    0 22px 44px -34px rgb(0 0 0 / 0.82);
+  backdrop-filter: blur(12px) saturate(1.08);
+  -webkit-backdrop-filter: blur(12px) saturate(1.08);
+}
+
+.commission-access-group::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 2px;
+  background: linear-gradient(180deg, var(--group-accent), transparent 85%);
+  content: '';
+}
+
+.commission-access-group[data-status='active'] {
+  --group-accent: #54dcb0;
+}
+
+.commission-access-group[data-status='structuring'] {
+  --group-accent: #f8d55b;
+}
+
+.commission-access-group[data-status='restricted'] {
+  --group-accent: #ff7d84;
+}
+
+.commission-access-group__header {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.7rem;
+  margin-bottom: 0.75rem;
+  padding: 0.1rem 0.15rem;
+}
+
+.commission-access-group__icon {
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--group-accent) 42%, transparent);
+  border-radius: 0.7rem;
+  background: color-mix(in srgb, var(--group-accent) 12%, transparent);
+  color: var(--group-accent);
+}
+
+.commission-access-group__icon svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.commission-access-group__header h3 {
+  color: var(--portal-text);
+  font-size: 0.98rem;
+  font-weight: 850;
+  letter-spacing: -0.015em;
+  line-height: 1.2;
+}
+
+.commission-access-group__header p {
+  margin-top: 0.15rem;
+  color: var(--portal-subtle);
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+
+.commission-access-group__count {
+  display: grid;
+  min-width: 2rem;
+  height: 2rem;
+  place-items: center;
+  border: 1px solid rgb(211 225 242 / 0.18);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.055);
+  color: var(--portal-text);
+  font-size: 0.75rem;
+  font-weight: 850;
+}
+
+.commission-access-group__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: 0.65rem;
+}
+
+.commission-access-group[data-status='active'] .commission-access-group__grid,
+.commission-access-group[data-status='restricted'] .commission-access-group__grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.commission-access-card {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgb(211 225 242 / 0.18);
+  border-radius: 0.9rem;
+  background:
+    linear-gradient(135deg, rgb(255 255 255 / 0.04), transparent 46%),
+    rgb(8 34 65 / 0.94);
+  color: var(--portal-text);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.055) inset,
+    0 12px 24px -22px rgb(0 0 0 / 0.88);
+  transition: transform 190ms ease, border-color 180ms ease, box-shadow 190ms ease;
+}
+
+.commission-access-card[data-status='active'] {
+  border-color: rgb(223 232 231 / 0.86);
+  background:
+    radial-gradient(circle at 0% 0%, rgb(84 220 176 / 0.11), transparent 32%),
+    linear-gradient(140deg, #fffdf7, #f2f5f1);
+  color: #082541;
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.94) inset,
+    0 18px 34px -26px rgb(0 0 0 / 0.66),
+    0 12px 28px -26px rgb(84 220 176 / 0.68);
+}
+
+.commission-access-card[data-expanded='true'] {
+  border-color: color-mix(in srgb, var(--group-accent, #f8d55b) 56%, transparent);
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.08) inset,
+    0 20px 36px -26px rgb(0 0 0 / 0.92),
+    0 0 0 1px rgb(248 213 91 / 0.08);
+}
+
+.commission-access-card__toggle {
+  display: grid;
+  width: 100%;
+  min-height: 4.25rem;
+  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.7rem 0.85rem;
+  border-radius: inherit;
+  color: inherit;
+  text-align: left;
+  transition: background-color 160ms ease;
+}
+
+.commission-access-card__icon {
+  display: grid;
+  width: 2.55rem;
+  height: 2.55rem;
+  place-items: center;
+  border: 1px solid rgb(211 225 242 / 0.26);
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 0 rgb(255 255 255 / 0.16) inset;
+}
+
+.commission-access-card__icon svg {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.commission-access-card:not([data-status='active'])[data-tone='amber'] .commission-access-card__icon {
+  color: #fcd34d;
+}
+
+.commission-access-card:not([data-status='active'])[data-tone='lime'] .commission-access-card__icon {
+  color: #bef264;
+}
+
+.commission-access-card:not([data-status='active'])[data-tone='cyan'] .commission-access-card__icon {
+  color: #67e8f9;
+}
+
+.commission-access-card:not([data-status='active'])[data-tone='rose'] .commission-access-card__icon {
+  color: #fda4af;
+}
+
+.commission-access-card:not([data-status='active'])[data-tone='sky'] .commission-access-card__icon {
+  color: #7dd3fc;
+}
+
+.commission-access-card:not([data-status='active'])[data-tone='red'] .commission-access-card__icon {
+  color: #fca5a5;
+}
+
+.commission-access-card:not([data-status='active'])[data-tone='teal'] .commission-access-card__icon {
+  color: #5eead4;
+}
+
+.commission-access-card:not([data-status='active'])[data-tone='gold'] .commission-access-card__icon {
+  color: #fde047;
+}
+
+.commission-access-card__identity {
+  min-width: 0;
+}
+
+.commission-access-card__name {
+  display: block;
+  overflow: hidden;
+  color: var(--portal-text);
+  font-size: 0.9rem;
+  font-weight: 850;
+  letter-spacing: -0.018em;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.commission-access-card[data-status='active'] .commission-access-card__name {
+  color: #082541;
+}
+
+.commission-access-card__type {
+  display: block;
+  margin-top: 0.18rem;
+  color: var(--portal-subtle);
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  line-height: 1.3;
+  text-transform: uppercase;
+}
+
+.commission-access-card[data-status='active'] .commission-access-card__type {
+  color: #53697f;
+}
+
+.commission-access-card__status {
+  display: inline-flex;
+  min-height: 1.65rem;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0.5rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 850;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
+.commission-access-card[data-status='active'] .commission-access-card__status {
+  border-color: #75cbb0;
+  background: #d9f8ec;
+  color: #07533e;
+}
+
+.commission-access-card[data-status='structuring'] .commission-access-card__status {
+  border-color: #d9b347;
+  background: #fff0bd;
+  color: #684000;
+}
+
+.commission-access-card[data-status='restricted'] .commission-access-card__status {
+  border-color: #dc9297;
+  background: #ffe4e6;
+  color: #861d25;
+}
+
+.commission-access-card__chevron {
+  width: 1rem;
+  height: 1rem;
+  color: var(--portal-muted);
+  transition: transform 180ms ease, color 180ms ease;
+}
+
+.commission-access-card[data-status='active'] .commission-access-card__chevron {
+  color: #3f5870;
+}
+
+.commission-access-card__details {
+  padding: 0.9rem;
+  border-top: 1px solid rgb(211 225 242 / 0.16);
+  background: rgb(1 15 34 / 0.28);
+}
+
+.commission-access-card__details > p {
+  max-width: 58rem;
+  color: var(--portal-muted);
+  font-size: 0.84rem;
+  line-height: 1.65;
+}
+
+.commission-access-card[data-status='active'] .commission-access-card__details {
+  border-top-color: rgb(8 37 65 / 0.12);
+  background: rgb(8 37 65 / 0.025);
+}
+
+.commission-access-card[data-status='active'] .commission-access-card__details > p {
+  color: #3f5870;
+}
+
+.commission-access-card__sensitive {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-top: 0.75rem;
+  padding: 0.6rem 0.7rem;
+  border: 1px solid #e3a1a6;
+  border-radius: 0.65rem;
+  background: #ffe8e9;
+  color: #7d2028;
+  font-size: 0.75rem;
+  font-weight: 800;
+}
+
+.commission-access-card__sensitive svg {
+  width: 0.9rem;
+  height: 0.9rem;
+  flex: 0 0 auto;
+}
+
+.commission-access-card__action {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.9rem;
+  padding: 0.65rem 0.9rem;
+  border: 1px solid rgb(211 225 242 / 0.28);
+  border-radius: 0.7rem;
+  background: rgb(255 255 255 / 0.075);
+  color: var(--portal-text);
+  font-size: 0.8rem;
+  font-weight: 850;
+  box-shadow: 0 1px 0 rgb(255 255 255 / 0.08) inset;
+  transition: transform 170ms ease, background-color 170ms ease, border-color 170ms ease, box-shadow 170ms ease;
+}
+
+.commission-access-card__action[data-variant='primary'] {
+  border-color: #f2b04a;
+  background: linear-gradient(135deg, #ffad3d, var(--portal-orange));
+  color: #071a34;
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.40) inset,
+    0 12px 22px -16px rgb(255 138 36 / 0.84);
+}
+
+.commission-access-card__action svg {
+  width: 0.95rem;
+  height: 0.95rem;
+  transition: transform 170ms ease;
+}
+
+.portal-reveal {
+  animation: portal-reveal 560ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.fenasoja-portal__hero.portal-reveal {
+  animation-delay: 70ms;
+}
+
+.fenasoja-portal__primary.portal-reveal {
+  animation-delay: 130ms;
+}
+
+.fenasoja-portal__commissions.portal-reveal {
+  animation-delay: 190ms;
+}
+
+.fenasoja-portal .portal-card-enter {
+  animation: commission-card-enter 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes portal-atmosphere-drift {
+  from { transform: scale(1.015) translate3d(0, -2px, 0); }
+  to { transform: scale(1.03) translate3d(0, 2px, 0); }
+}
+
+@keyframes portal-reveal {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes commission-card-enter {
+  from { opacity: 0; transform: translateY(7px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (min-width: 64rem) {
+  .fenasoja-portal__headline {
+    white-space: nowrap;
+  }
+
+  .fenasoja-portal__headline > span {
+    display: inline;
+  }
+}
+
+@media (max-width: 63.999rem) {
+  .fenasoja-portal__headline > span {
+    display: block;
+  }
+
+  .fenasoja-portal__headline-accent {
+    margin-top: 0.12em;
+  }
+}
+
+@media (max-width: 56.25rem) and (orientation: portrait), (max-width: 47.999rem) {
+  .cronograma-portal-card__content {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .cronograma-portal-card__cta {
+    grid-column: 1 / -1;
+    width: 100%;
+  }
+}
+
+@media (max-width: 56.25rem) {
+  .fenasoja-portal__atmosphere img {
+    animation: none;
+  }
+
+  .fenasoja-portal__header,
+  .fenasoja-portal .cronograma-portal-card,
+  .commission-access-group {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+}
+
+@media (max-width: 47.999rem) {
+  .fenasoja-portal__atmosphere img {
+    object-position: center bottom;
+  }
+
+  .fenasoja-portal__atmosphere::after {
+    background:
+      radial-gradient(ellipse at 48% 20%, rgb(3 22 48 / 0.28), rgb(3 22 48 / 0.78) 72%),
+      linear-gradient(180deg, rgb(2 16 36 / 0.18), rgb(2 16 36 / 0.68));
+  }
+
+  .fenasoja-portal__shell {
+    padding-top: max(1rem, env(safe-area-inset-top));
+    padding-right: max(1rem, env(safe-area-inset-right));
+    padding-bottom: max(3.5rem, calc(env(safe-area-inset-bottom) + 1.5rem));
+    padding-left: max(1rem, env(safe-area-inset-left));
+  }
+
+  .fenasoja-portal__hero {
+    padding: 2.25rem 0 1.7rem;
+  }
+
+  .fenasoja-portal__eyebrow {
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+  }
+
+  .fenasoja-portal__headline {
+    font-size: clamp(2rem, 8.5vw, 2.3rem);
+    line-height: 0.99;
+  }
+
+  .fenasoja-portal__primary {
+    margin-bottom: 2.5rem;
+  }
+
+  .cronograma-portal-card__content {
+    gap: 0.9rem;
+    padding: 1.1rem;
+  }
+
+  .fenasoja-portal .cronograma-portal-icon {
+    width: 3.25rem;
+    height: 3.25rem;
+  }
+
+  .fenasoja-portal .cronograma-portal-icon svg {
+    width: 1.55rem;
+    height: 1.55rem;
+  }
+
+  .cronograma-portal-card__meta {
+    gap: 0.45rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.11em;
+  }
+
+  .cronograma-portal-card__title {
+    font-size: 1.38rem;
+  }
+
+  .fenasoja-portal__section-header {
+    align-items: center;
+  }
+
+  .fenasoja-portal__profile-note {
+    font-size: 0.72rem;
+  }
+
+  .commission-access-group {
+    padding: 0.75rem;
+  }
+
+  .commission-access-group__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .commission-access-group__header p {
+    max-width: 26rem;
+  }
+}
+
+@media (max-width: 35rem) {
+  .fenasoja-portal__header {
+    min-height: 3.75rem;
+    padding: 0.6rem;
+  }
+
+  .fenasoja-portal__admin {
+    padding-inline: 0.7rem;
+  }
+
+  .fenasoja-portal__eyebrow > span {
+    width: 1.35rem;
+  }
+
+  .fenasoja-portal__section-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+
+  .commission-access-group__header {
+    align-items: start;
+  }
+
+  .commission-access-group__header p {
+    font-size: 0.74rem;
+  }
+
+  .commission-access-card__toggle {
+    gap: 0.55rem;
+    padding-inline: 0.7rem;
+  }
+
+  .commission-access-card__status {
+    font-size: 0.7rem;
+  }
+}
+
+@media (max-width: 22.5rem) {
+  .commission-access-card__toggle {
+    grid-template-columns: auto minmax(0, 1fr) auto;
+  }
+
+  .commission-access-card__status {
+    grid-column: 2;
+    justify-self: start;
+  }
+
+  .commission-access-card__chevron {
+    grid-column: 3;
+    grid-row: 1;
+  }
+}
+
+@media (max-width: 21rem) {
+  .fenasoja-portal__header {
+    gap: 0.5rem;
+  }
+
+  .fenasoja-portal__brand-standard {
+    display: none;
+  }
+
+  .fenasoja-portal__brand-compact {
+    display: inline-flex;
+    gap: 0.5rem;
+  }
+
+  .fenasoja-portal__admin {
+    gap: 0.4rem;
+    padding-inline: 0.6rem;
+  }
+
+  .fenasoja-portal__admin svg:last-child {
+    display: none;
+  }
+
+  .fenasoja-portal__headline {
+    font-size: 1.75rem;
+    letter-spacing: -0.045em;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .fenasoja-portal__admin:hover {
+    border-color: rgb(255 170 67 / 0.78);
+    background: rgb(255 255 255 / 0.095);
+    box-shadow:
+      0 1px 0 rgb(255 255 255 / 0.14) inset,
+      0 12px 22px -16px rgb(255 138 36 / 0.54);
+    transform: translateY(-1px);
+  }
+
+  .fenasoja-portal__admin:hover svg:last-child,
+  .fenasoja-portal .cronograma-portal-card:hover .cronograma-portal-card__cta svg,
+  .commission-access-card__action:hover svg {
+    transform: translateX(3px);
+  }
+
+  .fenasoja-portal .cronograma-portal-card:hover {
+    border-color: rgb(255 190 93 / 0.94);
+    box-shadow:
+      0 1px 0 rgb(255 255 255 / 0.15) inset,
+      0 34px 70px -36px rgb(0 0 0 / 0.96),
+      0 20px 50px -30px rgb(255 138 36 / 0.62);
+    transform: translateY(-2px);
+  }
+
+  .fenasoja-portal .cronograma-portal-card:hover .cronograma-portal-card__cta {
+    box-shadow:
+      0 1px 0 rgb(255 255 255 / 0.46) inset,
+      0 18px 30px -16px rgb(255 138 36 / 0.96),
+      0 7px 14px -8px rgb(0 0 0 / 0.72);
+    filter: brightness(1.035);
+    transform: translateY(-1px);
+  }
+
+  .commission-access-card__toggle:hover {
+    background: rgb(255 255 255 / 0.045);
+  }
+
+  .commission-access-card[data-status='active']:hover {
+    border-color: #8dd4bd;
+    box-shadow:
+      0 1px 0 rgb(255 255 255 / 0.94) inset,
+      0 22px 38px -26px rgb(0 0 0 / 0.70),
+      0 16px 30px -24px rgb(84 220 176 / 0.72);
+    transform: translateY(-2px);
+  }
+
+  .commission-access-card:not([data-status='active']):hover {
+    border-color: rgb(248 213 91 / 0.38);
+  }
+
+  .commission-access-card__action:hover {
+    border-color: rgb(248 213 91 / 0.56);
+    background: rgb(255 255 255 / 0.12);
+    transform: translateY(-1px);
+  }
+
+  .commission-access-card__action[data-variant='primary']:hover {
+    background: linear-gradient(135deg, #ffb54d, #ff922f);
+  }
+}
+
+.fenasoja-portal__admin:active,
+.fenasoja-portal .cronograma-portal-card:active,
+.commission-access-card__action:active {
+  transform: translateY(0) scale(0.985);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fenasoja-portal__atmosphere img,
+  .portal-reveal,
+  .fenasoja-portal .portal-card-enter {
+    animation: none;
+  }
+
+  .fenasoja-portal__admin,
+  .fenasoja-portal .cronograma-portal-card,
+  .cronograma-portal-card__cta,
+  .cronograma-portal-card__cta svg,
+  .commission-access-card,
+  .commission-access-card__toggle,
+  .commission-access-card__action,
+  .commission-access-card__action svg,
+  .commission-access-card__chevron {
+    transition: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .fenasoja-portal__header,
+  .fenasoja-portal .cronograma-portal-card,
+  .commission-access-group,
+  .commission-access-card {
+    border-color: rgb(255 255 255 / 0.58);
+  }
+
+  .fenasoja-portal__atmosphere::after {
+    background: rgb(3 22 48 / 0.86);
+  }
+}
+
+@media (prefers-reduced-transparency: reduce) {
+  .fenasoja-portal__header,
+  .fenasoja-portal .cronograma-portal-card,
+  .commission-access-group {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .fenasoja-portal__header,
+  .commission-access-group {
+    background: var(--portal-navy-900);
+  }
+}
+
+@media (forced-colors: active) {
+  .fenasoja-portal__atmosphere {
+    display: none;
+  }
+
+  .fenasoja-portal__headline-accent {
+    background: none;
+    color: CanvasText;
+    -webkit-text-fill-color: currentColor;
+  }
+
+  .fenasoja-portal__admin,
+  .fenasoja-portal .cronograma-portal-card,
+  .commission-access-group,
+  .commission-access-card,
+  .commission-access-card__action {
+    border: 1px solid ButtonText;
+    forced-color-adjust: auto;
+  }
+
+  .commission-access-card__toggle:focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: -3px;
+  }
+}
