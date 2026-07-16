@@ -2904,6 +2904,38 @@ input::placeholder, textarea::placeholder {
   transform: scaleY(1);
 }
 
+/* Sidebar nav item — legibility-first color system */
+.sidebar-nav-item--idle {
+  color: oklch(var(--sidebar-foreground) / 0.82);
+}
+.sidebar-nav-item--idle:hover {
+  color: oklch(var(--sidebar-foreground));
+  background: oklch(var(--sidebar-foreground) / 0.06);
+  transform: translateX(1px);
+}
+.sidebar-nav-item--active {
+  color: oklch(var(--sidebar-accent-foreground));
+  background: linear-gradient(
+    90deg,
+    oklch(var(--sidebar-accent) / 0.92) 0%,
+    oklch(var(--sidebar-accent) / 0.55) 100%
+  );
+}
+.sidebar-icon-btn {
+  color: oklch(var(--sidebar-foreground) / 0.7);
+}
+.sidebar-icon-btn:hover {
+  color: oklch(var(--sidebar-foreground));
+  background: oklch(var(--sidebar-foreground) / 0.08);
+}
+.sidebar-signout {
+  color: oklch(var(--sidebar-foreground) / 0.55);
+}
+.sidebar-signout:hover {
+  color: oklch(0.72 0.18 25);
+  background: oklch(0.55 0.2 25 / 0.12);
+}
+
 .agenda-card-depth,
 .escala-surface {
   box-shadow: var(--elevation-1);
