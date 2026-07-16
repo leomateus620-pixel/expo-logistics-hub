@@ -1,22 +1,22 @@
 .commercial-map-shell {
-  --map-ink: #173322;
-  --map-muted: #657369;
-  --map-forest: #175b2b;
-  --map-forest-dark: #0e3d1d;
-  --map-gold: #d7a928;
-  --map-panel: rgba(250, 251, 248, 0.94);
+  --map-ink: oklch(var(--brand-navy-900));
+  --map-muted: #626d7d;
+  --map-forest: oklch(var(--brand-indigo-500));
+  --map-forest-dark: oklch(var(--brand-navy-900));
+  --map-gold: oklch(var(--brand-orange-600));
+  --map-panel: oklch(var(--brand-soft-white) / 0.97);
   display: flex;
   min-height: min(560px, calc(100dvh - 40px));
   height: calc(100dvh - 40px);
   flex-direction: column;
   overflow: hidden;
-  border: 1px solid rgba(24, 67, 36, 0.14);
-  border-radius: 22px;
+  border: 1px solid oklch(var(--brand-indigo-500) / 0.16);
+  border-radius: 16px;
   background: #dfe7de;
   color: var(--map-ink);
   container-name: commercial-map;
   container-type: inline-size;
-  box-shadow: 0 22px 65px rgba(20, 50, 28, 0.12), 0 2px 8px rgba(20, 50, 28, 0.05);
+  box-shadow: 0 8px 22px -16px oklch(var(--brand-navy-900) / 0.38);
   isolation: isolate;
 }
 
@@ -65,17 +65,16 @@
   align-items: center;
   gap: 16px;
   padding: 8px 16px;
-  border-bottom: 1px solid rgba(30, 64, 40, 0.1);
-  background: rgba(251, 252, 249, 0.93);
-  backdrop-filter: blur(22px) saturate(1.2);
+  border-bottom: 1px solid oklch(var(--brand-indigo-500) / 0.14);
+  background: oklch(var(--brand-soft-white));
 }
 
 .commercial-map-title-lockup { display: flex; min-width: 0; align-items: center; gap: 12px; }
 .commercial-map-title-icon,
-.commercial-map-dialog-icon { display: grid; width: 42px; height: 42px; flex: 0 0 auto; place-items: center; border-radius: 13px; background: linear-gradient(145deg, #1b672f, #0d4620); color: #f5d46a; box-shadow: 0 8px 20px rgba(18, 76, 34, 0.2), inset 0 1px rgba(255,255,255,.16); }
+.commercial-map-dialog-icon { display: grid; width: 42px; height: 42px; flex: 0 0 auto; place-items: center; border-radius: 10px; background: oklch(var(--brand-indigo-500)); color: oklch(var(--brand-gold-500)); }
 .commercial-map-title-icon svg { width: 21px; height: 21px; }
 .commercial-map-title-lockup > div:last-child { min-width: 0; }
-.commercial-map-title-lockup span { display: block; color: #718077; font-size: 8px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+.commercial-map-title-lockup span { display: block; color: oklch(var(--brand-muted-indigo)); font-size: 8px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
 .commercial-map-title-lockup h1 { margin: 1px 0 0; color: var(--map-ink); font-size: 22px; font-weight: 800; letter-spacing: -.035em; line-height: 1.05; }
 .commercial-map-title-lockup p { overflow: hidden; margin: 3px 0 0; color: var(--map-muted); font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
 
@@ -190,7 +189,7 @@
 
 .commercial-map-actions { position: absolute; z-index: 12; top: 14px; right: 16px; display: flex; gap: 7px; }
 .commercial-map-actions .button, .commercial-map-actions button { box-shadow: 0 10px 30px rgba(25, 54, 33, .08); }
-.commercial-map-edit-button { background: linear-gradient(135deg, #1a672f, #0f4e24); }
+.commercial-map-edit-button { background: oklch(var(--action)); color: oklch(var(--action-foreground)); }
 
 .commercial-map-summary {
   position: absolute;
@@ -573,10 +572,10 @@
 .commercial-map-form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .commercial-map-form-grid h3, .commercial-map-form-grid .is-full { grid-column: 1 / -1; }
 .commercial-map-form-grid > label:not(.commercial-map-setting-row) { display: flex; min-width: 0; flex-direction: column; gap: 4px; color: #596a60; font-size: 8px; font-weight: 700; }
-.commercial-map-form-grid input, .commercial-map-form-grid textarea, .commercial-map-form-grid select { width: 100%; border: 1px solid hsl(var(--input)); border-radius: 7px; background: hsl(var(--background)); padding: 0 8px; color: hsl(var(--foreground)); font-size: 9px; }
+.commercial-map-form-grid input, .commercial-map-form-grid textarea, .commercial-map-form-grid select { width: 100%; border: 1px solid oklch(var(--input)); border-radius: 7px; background: oklch(var(--background)); padding: 0 8px; color: oklch(var(--foreground)); font-size: 9px; }
 .commercial-map-form-grid input, .commercial-map-form-grid select { height: 34px; }
 .commercial-map-form-grid textarea { padding-block: 7px; resize: vertical; }
-.commercial-map-form-grid select:focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: 1px; }
+.commercial-map-form-grid select:focus-visible { outline: 2px solid oklch(var(--ring)); outline-offset: 1px; }
 .commercial-map-form-warning { display: flex; align-items: flex-start; gap: 5px; margin: 0; padding: 7px; border-radius: 7px; background: #fff7df; color: #785919; font-size: 8px; line-height: 1.4; }
 .commercial-map-form-warning svg { width: 12px; height: 12px; flex: 0 0 auto; }
 
@@ -745,5 +744,48 @@
 }
 
 @media (prefers-contrast: high) {
-  .commercial-map-search, .commercial-map-toolbar, .commercial-map-summary, .commercial-map-panel, .commercial-map-interior-navigation { border-width: 2px; border-color: #173322; }
+  .commercial-map-search, .commercial-map-toolbar, .commercial-map-summary, .commercial-map-panel, .commercial-map-interior-navigation { border-width: 2px; border-color: oklch(var(--brand-navy-900)); }
+}
+
+/* Fenasoja 2028 product chrome. Terrain and status colors remain semantic. */
+.commercial-map-search,
+.commercial-map-toolbar,
+.commercial-map-actions button,
+.commercial-map-summary,
+.commercial-map-legend,
+.commercial-map-panel,
+.commercial-map-interior-navigation,
+.commercial-map-table-wrap,
+.commercial-map-explorer-controls,
+.commercial-map-list-heading,
+.commercial-map-editor-header,
+.commercial-map-editor-inspector {
+  border-color: oklch(var(--brand-indigo-500) / 0.15);
+  background-color: rgba(249, 250, 251, 0.97);
+  box-shadow: 0 8px 20px -16px oklch(var(--brand-navy-900) / 0.42);
+  backdrop-filter: none;
+}
+
+.commercial-map-toolbar button:hover:not(:disabled),
+.commercial-map-toolbar button.is-active,
+.commercial-map-summary > button:hover,
+.commercial-map-summary > button.is-active,
+.commercial-map-search-clear:hover {
+  background: #eef0ff;
+  color: oklch(var(--brand-indigo-500));
+}
+
+.commercial-map-summary > button.is-active::after {
+  border-color: oklch(var(--brand-indigo-500) / 0.34);
+}
+
+.commercial-map-interior-navigation span,
+.commercial-map-list-heading > span {
+  color: oklch(var(--brand-muted-indigo));
+}
+
+.commercial-map-entity-table tbody tr.is-selected {
+  border-color: oklch(var(--brand-indigo-500) / 0.42);
+  background: #eef0ff;
+  box-shadow: none;
 }

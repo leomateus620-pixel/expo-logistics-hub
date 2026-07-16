@@ -126,9 +126,9 @@ export function DateTimePicker({
     <Button
       variant="outline"
       className={cn(
-        "w-full justify-start text-left font-normal h-10 bg-background/80 backdrop-blur-sm border-border/60 hover:bg-accent/50 transition-all duration-200",
+        "h-10 w-full justify-start border-border bg-background text-left font-normal shadow-[var(--shadow-xs)] transition-[border-color,box-shadow,background-color] duration-150 hover:bg-muted/60 motion-reduce:transition-none",
         !value && "text-muted-foreground",
-        open && "ring-2 ring-primary/30 border-primary/50",
+        open && "border-ring ring-2 ring-ring/25",
         className
       )}
     >
@@ -177,14 +177,14 @@ export function DateTimePicker({
         <button
           type="button"
           onClick={() => handleShortcut("hoje")}
-          className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-secondary/80 hover:bg-secondary text-secondary-foreground transition-colors"
+          className="min-h-8 rounded-lg bg-secondary px-2.5 py-1 text-[11px] font-medium text-secondary-foreground transition-colors duration-150 hover:bg-secondary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none"
         >
           Hoje
         </button>
         <button
           type="button"
           onClick={() => handleShortcut("amanha")}
-          className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-secondary/80 hover:bg-secondary text-secondary-foreground transition-colors"
+          className="min-h-8 rounded-lg bg-secondary px-2.5 py-1 text-[11px] font-medium text-secondary-foreground transition-colors duration-150 hover:bg-secondary/80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none"
         >
           Amanhã
         </button>
@@ -192,7 +192,7 @@ export function DateTimePicker({
           <button
             type="button"
             onClick={() => handleShortcut("agora")}
-            className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-primary/15 hover:bg-primary/25 text-primary transition-colors"
+            className="min-h-8 rounded-lg bg-primary/10 px-2.5 py-1 text-[11px] font-medium text-foreground transition-colors duration-150 hover:bg-primary/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none"
           >
             Agora
           </button>
@@ -221,7 +221,7 @@ export function DateTimePicker({
                 type="button"
                 onClick={() => handleHourChip(h)}
                 className={cn(
-                  "px-1 py-0.5 rounded-md text-[10px] font-medium whitespace-nowrap transition-all duration-150 shrink-0",
+                  "min-h-8 shrink-0 rounded-md px-1.5 py-1 text-[10px] font-medium whitespace-nowrap transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring motion-reduce:transition-none",
                   hour === h
                     ? "bg-primary text-primary-foreground shadow-sm"
                     : "bg-secondary/60 hover:bg-secondary text-secondary-foreground"
@@ -268,7 +268,7 @@ export function DateTimePicker({
         <DrawerTrigger asChild>
           {triggerButton}
         </DrawerTrigger>
-        <DrawerContent className="bg-card/95 backdrop-blur-xl border-border/60">
+        <DrawerContent className="border-border bg-card shadow-lg">
           {pickerContent}
           <div className="px-3 pb-4 pt-1">
             <Button
@@ -290,7 +290,7 @@ export function DateTimePicker({
         {triggerButton}
       </PopoverTrigger>
       <PopoverContent
-        className="w-[260px] p-0 bg-card/95 backdrop-blur-xl border-border/60 shadow-xl"
+        className="w-[260px] border-border bg-card p-0 shadow-md"
         align="start"
         sideOffset={4}
       >

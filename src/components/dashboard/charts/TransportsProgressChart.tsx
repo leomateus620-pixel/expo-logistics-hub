@@ -9,7 +9,7 @@ interface Props {
 }
 
 export default function TransportsProgressChart({ realizados, pendentes, criticas, percent }: Props) {
-  const data = [{ name: 'Conclusão', value: percent, fill: 'hsl(var(--primary))' }];
+  const data = [{ name: 'Conclusão', value: percent, fill: 'oklch(var(--primary))' }];
   const total = realizados + pendentes;
 
   return (
@@ -28,7 +28,7 @@ export default function TransportsProgressChart({ realizados, pendentes, critica
           <ResponsiveContainer width="100%" height={200}>
             <RadialBarChart cx="50%" cy="50%" innerRadius="68%" outerRadius="100%" barSize={14} data={data} startAngle={90} endAngle={-270}>
               <PolarAngleAxis type="number" domain={[0, 100]} angleAxisId={0} tick={false} />
-              <RadialBar background={{ fill: 'hsl(var(--muted))' }} dataKey="value" cornerRadius={10} angleAxisId={0} />
+              <RadialBar background={{ fill: 'oklch(var(--muted))' }} dataKey="value" cornerRadius={10} angleAxisId={0} />
             </RadialBarChart>
           </ResponsiveContainer>
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">

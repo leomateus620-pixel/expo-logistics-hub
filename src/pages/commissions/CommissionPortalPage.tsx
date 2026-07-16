@@ -1,15 +1,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, ShieldCheck, Sparkles } from 'lucide-react';
+import { ArrowRight, ShieldCheck } from 'lucide-react';
 import CommissionCard from '@/components/commissions/CommissionCard';
+import { FenasojaBrand } from '@/components/brand/FenasojaBrand';
 import { CronogramaPortalCard } from '@/components/cronograma-eventos/CronogramaPortalCard';
 import {
   SELECTED_COMMISSION_STORAGE_KEY,
   getPublicCommissionModules,
 } from '@/modules/commissions/commissionRegistry';
-import bgImage from '@/assets/fenasoja-bg-2026.webp';
-import bgMobile from '@/assets/fenasoja-bg-mobile.webp';
-import logo from '@/assets/logofeira26.webp';
 
 function saveSelectedModule(slug: string) {
   try {
@@ -40,95 +38,98 @@ export default function CommissionPortalPage() {
     navigate('/login/admin');
   };
 
-  const toggleSlug = (slug: string) => {
-    setExpandedSlug((prev) => (prev === slug ? null : slug));
-  };
-
   useEffect(() => {
     if (!expandedSlug) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setExpandedSlug(null);
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setExpandedSlug(null);
     };
-    const onClick = (e: MouseEvent) => {
-      if (!gridRef.current) return;
-      if (!gridRef.current.contains(e.target as Node)) setExpandedSlug(null);
+    const closeOutside = (event: MouseEvent) => {
+      if (gridRef.current && !gridRef.current.contains(event.target as Node)) {
+        setExpandedSlug(null);
+      }
     };
-    window.addEventListener('keydown', onKey);
-    window.addEventListener('mousedown', onClick);
+    window.addEventListener('keydown', closeOnEscape);
+    window.addEventListener('mousedown', closeOutside);
     return () => {
-      window.removeEventListener('keydown', onKey);
-      window.removeEventListener('mousedown', onClick);
+      window.removeEventListener('keydown', closeOnEscape);
+      window.removeEventListener('mousedown', closeOutside);
     };
   }, [expandedSlug]);
 
   return (
-    <div className="min-h-screen overflow-hidden bg-[hsl(135_48%_10%)] text-white">
-      <div className="fixed inset-0 hidden bg-cover bg-center bg-no-repeat opacity-75 md:block" style={{ backgroundImage: `url(${bgImage})` }} aria-hidden="true" />
-      <div className="fixed inset-0 bg-cover bg-center bg-no-repeat opacity-75 md:hidden" style={{ backgroundImage: `url(${bgMobile})` }} aria-hidden="true" />
-      <div className="fixed inset-0 bg-[radial-gradient(circle_at_20%_10%,rgba(212,164,50,0.20),transparent_28%),linear-gradient(135deg,rgba(4,31,17,0.92),rgba(7,44,24,0.82)_42%,rgba(3,21,12,0.96))]" aria-hidden="true" />
-      <div className="fixed inset-0 command-grid-bg opacity-60" aria-hidden="true" />
+    <div className="relative min-h-screen overflow-hidden bg-[oklch(var(--brand-navy-900))] text-[oklch(var(--brand-soft-white))]">
+      <div
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_82%_4%,oklch(var(--brand-indigo-500)/0.72),transparent_38%),radial-gradient(circle_at_12%_105%,oklch(var(--brand-orange-500)/0.22),transparent_34%)]"
+        aria-hidden="true"
+      />
+      <div
+        className="pointer-events-none absolute -right-24 top-28 h-80 w-80 rotate-12 rounded-[28%] border border-[oklch(var(--brand-orange-500)/0.14)]"
+        aria-hidden="true"
+      />
 
-      <main className="relative z-10 mx-auto flex min-h-screen w-full max-w-7xl flex-col px-4 py-5 sm:px-6 lg:px-8">
-        <header className="grid gap-6 pb-7 pt-2 lg:grid-cols-[1fr_360px] lg:items-end lg:pb-10">
-          <div className="animate-soft-rise flex max-w-4xl flex-col gap-6">
-            <img src={logo} alt="Fenasoja 2026" className="h-auto w-36 object-contain drop-shadow-2xl sm:w-48" />
-            <div>
-              <div className="inline-flex items-center gap-2 rounded-full border border-gold/25 bg-white/10 px-3 py-1.5 text-[11px] font-bold uppercase tracking-[0.22em] text-gold backdrop-blur-xl">
-                <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-                Sistema Integrado de Gestão Operacional
-              </div>
-              <h1 className="mt-5 max-w-4xl text-balance text-4xl font-black leading-[0.98] tracking-[-0.04em] text-white drop-shadow-2xl sm:text-5xl lg:text-7xl">
-                Portal das Comissões Fenasoja
-              </h1>
-              <p className="mt-5 max-w-2xl text-base leading-7 text-white/75 sm:text-lg">
-                Acesse a central temporal da Fenasoja ou escolha uma comissão para entrar em seu ambiente operacional.
-              </p>
-            </div>
-          </div>
-
+      <main className="relative mx-auto flex min-h-screen w-full max-w-7xl flex-col px-4 py-4 sm:px-6 sm:py-6 lg:px-8">
+        <header className="flex items-center justify-between gap-4 border-b border-white/10 pb-4">
+          <FenasojaBrand subtitle="Sistema integrado de gestão" tone="dark" />
           <button
             type="button"
             onClick={accessAdmin}
-            className="glass-panel interactive-lift group flex min-h-36 flex-col justify-between rounded-3xl p-5 text-left focus-ring lg:min-h-48"
+            className="inline-flex h-10 items-center gap-2 rounded-lg border border-white/16 px-3 text-sm font-semibold text-white transition-colors duration-150 hover:border-[oklch(var(--brand-orange-500)/0.65)] hover:bg-white/8 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[oklch(var(--brand-orange-500))]"
           >
-            <div className="flex items-start justify-between gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gold/20 text-gold ring-1 ring-gold/30">
-                <ShieldCheck className="h-6 w-6" aria-hidden="true" />
-              </div>
-              <span className="rounded-full border border-gold/25 bg-gold/10 px-3 py-1 text-[11px] font-bold uppercase tracking-wide text-gold">
-                Acesso superior
-              </span>
-            </div>
-            <div>
-              <h2 className="text-2xl font-black tracking-tight text-white">Administrador</h2>
-              <p className="mt-2 text-sm leading-6 text-white/70">Central institucional para visão consolidada, comissões e governança do sistema.</p>
-              <span className="mt-4 inline-flex items-center text-sm font-bold text-gold">
-                Entrar como admin
-                <ArrowRight className="ml-2 h-4 w-4 transition group-hover:translate-x-1" aria-hidden="true" />
-              </span>
-            </div>
+            <ShieldCheck className="h-4 w-4 text-[oklch(var(--brand-gold-400))]" aria-hidden="true" />
+            <span className="hidden sm:inline">Administrador</span>
+            <ArrowRight className="h-4 w-4" aria-hidden="true" />
           </button>
         </header>
 
-        <section aria-label="Acesso direto aos módulos institucionais" className="mb-6">
+        <section className="grid gap-6 py-8 lg:grid-cols-[minmax(0,1fr)_280px] lg:items-end lg:py-12">
+          <div className="max-w-3xl">
+            <p className="text-xs font-bold uppercase tracking-[0.16em] text-[oklch(var(--brand-gold-400))]">
+              Portal das comissões · edição 2028
+            </p>
+            <h1 className="mt-3 text-balance text-4xl font-black leading-[1.02] tracking-[-0.04em] sm:text-5xl lg:text-6xl">
+              Operação conectada para construir a próxima Fenasoja.
+            </h1>
+            <p className="mt-4 max-w-2xl text-sm leading-6 text-white/68 sm:text-base sm:leading-7">
+              Escolha uma frente de trabalho ou acesse o cronograma central. Cada módulo mantém seu contexto, seus dados e suas permissões.
+            </p>
+          </div>
+
+          <dl className="grid grid-cols-2 gap-px overflow-hidden rounded-xl border border-white/12 bg-white/12">
+            <div className="bg-[oklch(var(--brand-navy-900))] p-4">
+              <dt className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/50">Comissões</dt>
+              <dd className="mt-1 text-3xl font-black text-[oklch(var(--brand-gold-400))]">{modules.length}</dd>
+            </div>
+            <div className="bg-[oklch(var(--brand-navy-900))] p-4">
+              <dt className="text-[10px] font-bold uppercase tracking-[0.14em] text-white/50">Ciclo</dt>
+              <dd className="mt-1 text-3xl font-black text-white">2028</dd>
+            </div>
+          </dl>
+        </section>
+
+        <section aria-label="Acesso direto ao cronograma" className="mb-8">
           <CronogramaPortalCard onAccess={accessCronograma} />
         </section>
 
-        <section
-          ref={gridRef}
-          aria-label="Comissões disponíveis"
-          className="grid flex-1 grid-cols-1 items-start gap-3 pb-8 md:grid-cols-2 xl:grid-cols-3"
-        >
-          {modules.map((module, index) => (
-            <CommissionCard
-              key={module.slug}
-              module={module}
-              index={index}
-              expanded={expandedSlug === module.slug}
-              onToggle={() => toggleSlug(module.slug)}
-              onAccess={() => accessModule(module.slug)}
-            />
-          ))}
+        <section ref={gridRef} aria-labelledby="commission-list-title" className="pb-10">
+          <div className="mb-4 flex flex-wrap items-end justify-between gap-2">
+            <div>
+              <h2 id="commission-list-title" className="text-lg font-bold text-white">Frentes de trabalho</h2>
+              <p className="mt-1 text-sm text-white/56">Expanda uma comissão para consultar o escopo e acessar o ambiente.</p>
+            </div>
+            <span className="text-xs font-semibold text-white/45">Acesso conforme perfil</span>
+          </div>
+
+          <div className="grid grid-cols-1 items-start gap-2.5 lg:grid-cols-2">
+            {modules.map((module) => (
+              <CommissionCard
+                key={module.slug}
+                module={module}
+                expanded={expandedSlug === module.slug}
+                onToggle={() => setExpandedSlug((current) => (current === module.slug ? null : module.slug))}
+                onAccess={() => accessModule(module.slug)}
+              />
+            ))}
+          </div>
         </section>
       </main>
     </div>

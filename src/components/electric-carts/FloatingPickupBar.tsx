@@ -47,12 +47,12 @@ export default function FloatingPickupBar({ onClick, available, inUse, visible }
           className={cn(
             'group relative flex items-center gap-3 h-14 px-3 sm:px-4 rounded-2xl cursor-pointer',
             'bg-background/85 backdrop-blur-xl border border-primary/30',
-            'shadow-[0_10px_28px_-12px_hsl(var(--primary)/0.55),inset_0_1px_0_rgba(255,255,255,0.14)]',
+            'shadow-[0_10px_28px_-12px_oklch(var(--primary)/0.55),inset_0_1px_0_rgba(255,255,255,0.14)]',
             'outline-none focus-visible:ring-2 focus-visible:ring-primary/50',
             'active:scale-[0.985] transition-transform'
           )}
         >
-          <div className="relative shrink-0 w-9 h-9 rounded-xl flex items-center justify-center bg-gradient-to-br from-primary via-primary to-primary/70 text-primary-foreground shadow-[0_6px_16px_-6px_hsl(var(--primary)/0.7),inset_0_1px_0_rgba(255,255,255,0.25)]">
+          <div className="relative shrink-0 w-9 h-9 rounded-xl flex items-center justify-center bg-gradient-to-br from-primary via-primary to-primary/70 text-primary-foreground shadow-[0_6px_16px_-6px_oklch(var(--primary)/0.7),inset_0_1px_0_rgba(255,255,255,0.25)]">
             <Zap className="w-4 h-4" strokeWidth={2.5} />
             {available > 0 && (
               <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-accent border border-background" />

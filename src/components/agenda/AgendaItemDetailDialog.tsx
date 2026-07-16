@@ -90,22 +90,20 @@ export function AgendaItemDetailDialog({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-lg p-0 overflow-hidden">
-        {/* Header with gradient */}
-        <div className="relative px-6 pt-6 pb-5 bg-gradient-to-br from-primary/30 via-primary/10 to-gold/15 border-b border-white/10">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,hsl(var(--gold)/0.18),transparent_60%)]" aria-hidden />
-          <DialogHeader className="relative space-y-2 text-left p-0">
+        <div className="border-b border-border bg-primary/5 px-6 pb-5 pt-6">
+          <DialogHeader className="space-y-2 p-0 text-left">
             <div className="flex items-center gap-2 flex-wrap">
               {isTransport && (
-                <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-primary to-gold/60 flex items-center justify-center shadow-md">
+                <div className="flex h-7 w-7 items-center justify-center rounded-md bg-primary text-primary-foreground">
                   <Truck className="w-3.5 h-3.5 text-primary-foreground" />
                 </div>
               )}
-              <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-primary/15 border border-primary/25">
+              <div className="inline-flex items-center gap-1.5 rounded-md border border-primary/25 bg-primary/10 px-2 py-0.5">
                 <ShiftIcon className="w-3 h-3 text-gold" />
                 <span className="text-[9px] font-bold uppercase tracking-wider text-foreground/85">{shiftMeta[shift].label}</span>
               </div>
               {statusMeta && (
-                <span className={cn('inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-[9px] font-bold uppercase tracking-wider', statusMeta.cls)}>
+                <span className={cn('inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider', statusMeta.cls)}>
                   {statusMeta.label}
                 </span>
               )}
@@ -113,8 +111,8 @@ export function AgendaItemDetailDialog({
                 <Badge variant="outline" className="text-[9px] h-4 bg-card/40 border-white/20">{item.tipo_tag}</Badge>
               )}
               {isNow && (
-                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-success/15 border border-success/30 text-[9px] font-bold uppercase tracking-wider text-success">
-                  <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
+                <span className="inline-flex items-center gap-1.5 rounded-md border border-success/30 bg-success/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-success">
+                  <span className="h-1.5 w-1.5 rounded-full bg-success" />
                   Acontecendo agora
                 </span>
               )}
@@ -131,7 +129,7 @@ export function AgendaItemDetailDialog({
         <div className="overflow-y-auto max-h-[calc(min(90dvh,52rem)-15rem)] px-6 py-5 space-y-4">
           {/* Flight info (transports of type Aeroporto) */}
           {isTransport && item._voo && (item._voo.checkin || item._voo.chegada) && (
-            <div className="rounded-xl border border-gold/30 bg-gradient-to-br from-gold/15 via-card/40 to-primary/10 p-4 backdrop-blur-xl">
+            <div className="rounded-xl border border-gold/35 bg-gold/10 p-4">
               <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-1.5 mb-2.5">
                 <Plane className="w-3 h-3 text-gold" /> Informações de Voo
               </p>
@@ -141,7 +139,7 @@ export function AgendaItemDetailDialog({
                     <p className="text-[9px] uppercase tracking-wider text-gold/90 font-bold flex items-center gap-1">
                       <Plane className="w-2.5 h-2.5" /> Horário do Voo
                     </p>
-                    <p className="text-lg font-mono font-bold text-foreground mt-0.5" style={{ textShadow: '0 0 10px hsl(var(--gold)/0.4)' }}>
+                    <p className="mt-0.5 font-mono text-lg font-bold text-foreground">
                       {item._voo.checkin}
                     </p>
                   </div>
@@ -168,13 +166,13 @@ export function AgendaItemDetailDialog({
           )}
 
           {/* Time block */}
-          <div className="rounded-xl border border-white/15 bg-gradient-to-br from-card/80 to-card/40 p-4 backdrop-blur-xl">
+          <div className="rounded-xl border border-border bg-secondary/45 p-4">
             <div className="flex items-center justify-between gap-3">
               <div className="text-center flex-1">
                 <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
                   {isTransport ? 'Saída' : 'Início'}
                 </p>
-                <p className="text-2xl font-mono font-bold mt-1" style={{ textShadow: '0 0 10px hsl(var(--gold)/0.25)' }}>
+                <p className="mt-1 font-mono text-2xl font-bold">
                   {isTransport && item._horarioSaidaText ? item._horarioSaidaText : rawTime(item.inicio_em)}
                 </p>
               </div>
@@ -183,12 +181,12 @@ export function AgendaItemDetailDialog({
                 <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">
                   {isTransport ? 'Retorno' : 'Fim'}
                 </p>
-                <p className="text-2xl font-mono font-bold mt-1" style={{ textShadow: '0 0 10px hsl(var(--gold)/0.25)' }}>
+                <p className="mt-1 font-mono text-2xl font-bold">
                   {rawTime(item.fim_em)}
                 </p>
               </div>
             </div>
-            <div className="flex items-center justify-center gap-1.5 mt-3 pt-3 border-t border-white/10">
+            <div className="mt-3 flex items-center justify-center gap-1.5 border-t border-border pt-3">
               <Hourglass className="w-3 h-3 text-muted-foreground" />
               <span className="text-xs text-muted-foreground">Duração: <span className="font-semibold text-foreground">{durationLabel(item.inicio_em, item.fim_em)}</span></span>
             </div>
@@ -196,7 +194,7 @@ export function AgendaItemDetailDialog({
 
           {/* Transport-specific: route */}
           {isTransport && (origem || destino) && (
-            <div className="rounded-xl border border-white/15 bg-card/30 p-4 backdrop-blur-xl space-y-2">
+            <div className="space-y-2 rounded-xl border border-border bg-card p-4">
               <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-1.5">
                 <Navigation className="w-3 h-3" /> Trajeto
               </p>
@@ -216,7 +214,7 @@ export function AgendaItemDetailDialog({
 
           {/* Generic: local for events */}
           {!isTransport && item.local && (
-            <div className="flex items-start gap-2.5 rounded-xl border border-white/10 bg-card/30 p-3 backdrop-blur-xl">
+            <div className="flex items-start gap-2.5 rounded-xl border border-border bg-card p-3">
               <MapPin className="w-4 h-4 text-gold mt-0.5 shrink-0" />
               <div className="min-w-0">
                 <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">Local</p>
@@ -229,14 +227,14 @@ export function AgendaItemDetailDialog({
           {(member || commission) && (
             <div className="grid grid-cols-2 gap-2">
               {member && (
-                <div className="rounded-xl border border-white/10 bg-card/30 p-3 backdrop-blur-xl">
+                <div className="rounded-xl border border-border bg-card p-3">
                   <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-1"><User className="w-3 h-3" /> Responsável</p>
                   <p className="text-sm font-semibold mt-0.5 truncate">{member.nome_exibicao}</p>
                   {member.cargo && <p className="text-[10px] text-muted-foreground truncate">{member.cargo}</p>}
                 </div>
               )}
               {commission && (
-                <div className="rounded-xl border border-white/10 bg-card/30 p-3 backdrop-blur-xl">
+                <div className="rounded-xl border border-border bg-card p-3">
                   <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-1"><Users className="w-3 h-3" /> Comissão</p>
                   <p className="text-sm font-semibold mt-0.5 truncate">{commission.nome}</p>
                 </div>
@@ -246,7 +244,7 @@ export function AgendaItemDetailDialog({
 
           {/* Transport-specific: vehicle */}
           {isTransport && (
-            <div className="rounded-xl border border-white/10 bg-card/30 p-3 backdrop-blur-xl">
+            <div className="rounded-xl border border-border bg-card p-3">
               <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-1 mb-1">
                 <Car className="w-3 h-3 text-gold" /> Veículo
               </p>
@@ -268,7 +266,7 @@ export function AgendaItemDetailDialog({
             <>
               {/* TransportWeatherCard desativado */}
               {transportGuests.length > 0 && (
-                <div className="rounded-xl border border-white/10 bg-card/30 p-3 backdrop-blur-xl">
+                <div className="rounded-xl border border-border bg-card p-3">
                   <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold flex items-center gap-1 mb-2">
                     <Users className="w-3 h-3" /> Hóspedes ({transportGuests.length})
                   </p>
@@ -286,7 +284,7 @@ export function AgendaItemDetailDialog({
 
           {/* Description / observations */}
           {item.descricao && (
-            <div className="rounded-xl border border-white/10 bg-card/30 p-3 backdrop-blur-xl">
+            <div className="rounded-xl border border-border bg-card p-3">
               <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold mb-1">Observações</p>
               <p className="text-sm text-foreground/90 whitespace-pre-wrap leading-relaxed">{item.descricao}</p>
             </div>
@@ -294,7 +292,7 @@ export function AgendaItemDetailDialog({
         </div>
 
         {/* Footer actions */}
-        <div className="flex items-center gap-2 px-6 py-4 border-t border-white/10 bg-card/40 backdrop-blur-xl">
+        <div className="flex items-center gap-2 border-t border-border bg-secondary/45 px-6 py-4">
           {isTransport ? (
             <Button
               size="sm"

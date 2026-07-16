@@ -27,15 +27,15 @@
 }
 
 .cronograma-drawer {
-  --background: 72 24% 97%;
-  --foreground: 145 30% 14%;
-  --card: 0 0% 100%;
-  --card-foreground: 145 30% 14%;
-  --muted: 76 18% 92%;
-  --muted-foreground: 145 10% 39%;
-  --border: 142 18% 82%;
-  --input: 142 18% 82%;
-  --ring: 143 50% 28%;
+  --background: var(--brand-soft-white);
+  --foreground: var(--brand-navy-900);
+  --card: var(--neutral-0);
+  --card-foreground: var(--brand-navy-900);
+  --muted: var(--neutral-200);
+  --muted-foreground: var(--neutral-600);
+  --border: 87% 0.018 266;
+  --input: 82% 0.023 266;
+  --ring: var(--brand-orange-700);
   inset-block: 0 !important;
   right: 0 !important;
   display: grid !important;
@@ -47,8 +47,8 @@
   gap: 0 !important;
   overflow: hidden;
   padding: 0 !important;
-  background: hsl(var(--background)) !important;
-  color: hsl(var(--foreground)) !important;
+  background: oklch(var(--background)) !important;
+  color: oklch(var(--foreground)) !important;
   box-shadow: -28px 0 72px -38px rgb(3 31 16 / 0.7);
   backdrop-filter: none;
 }

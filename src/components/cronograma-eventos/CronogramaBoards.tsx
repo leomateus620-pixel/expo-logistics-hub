@@ -50,7 +50,7 @@ export function OverviewBoard({
       <section className="space-y-4">
         {main2028 && (
           <article className="cronograma-main-event relative overflow-hidden p-5 sm:p-6">
-            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_8%_0%,hsl(var(--primary)/0.16),transparent_32%),radial-gradient(circle_at_94%_20%,hsl(var(--gold)/0.18),transparent_28%)]" />
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_8%_0%,oklch(var(--primary)/0.16),transparent_32%),radial-gradient(circle_at_94%_20%,oklch(var(--gold)/0.18),transparent_28%)]" />
             <div className="relative grid gap-5 lg:grid-cols-[minmax(0,1fr)_240px] lg:items-end">
               <div className="min-w-0">
                 <div className="mb-4 flex flex-wrap items-center gap-2">
@@ -190,7 +190,7 @@ export function TimelineBoard({
 function TimelineItem({ event, onOpen }: { event: CronogramaEvent; onOpen: (event: CronogramaEvent) => void }) {
   return (
     <button type="button" onClick={() => onOpen(event)} className="group relative ml-5 block rounded-xl border border-border/32 bg-white/62 p-3 text-left transition hover:border-gold/35 hover:bg-white focus-ring">
-      <span className="absolute -left-[1.68rem] top-4 h-3 w-3 rounded-full border-2 border-white bg-primary shadow-[0_0_0_4px_hsl(var(--primary)/0.10)]" />
+      <span className="absolute -left-[1.68rem] top-4 h-3 w-3 rounded-full border-2 border-white bg-primary shadow-[0_0_0_4px_oklch(var(--primary)/0.10)]" />
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0">
           <p className="text-[11px] font-bold text-gold">{formatShortDateRange(event.date, event.endDate)} · {event.startTime || 'horário a definir'}</p>

@@ -22,6 +22,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
 import { AgendaItemCard3D, ShiftSectionHeader } from '@/components/agenda/AgendaItemCard3D';
 import { AgendaItemDetailDialog } from '@/components/agenda/AgendaItemDetailDialog';
+import { FENASOJA_2028_COLORS } from '@/lib/fenasoja-brand';
 
 const emptyForm = { titulo: '', descricao: '', inicio_em: '', fim_em: '', local: '', tipo_tag: '', responsavel_user_id: '', commission_id: '', repetir_diariamente: false };
 
@@ -51,6 +52,7 @@ function generateAgendaPDF(
   members: any[],
   commissions: any[],
 ) {
+  const brand = FENASOJA_2028_COLORS;
   const dateFormatted = (() => {
     const [y, m, d] = selectedDate.split('-');
     const dt = new Date(Number(y), Number(m) - 1, Number(d));
@@ -65,26 +67,26 @@ function generateAgendaPDF(
       @page { margin: 18mm 15mm; size: A4; }
       * { margin: 0; padding: 0; box-sizing: border-box; }
       body { font-family: 'Segoe UI', Arial, sans-serif; color: #1a1a1a; font-size: 11pt; line-height: 1.4; }
-      .header { text-align: center; border-bottom: 3px solid #16a34a; padding-bottom: 12px; margin-bottom: 18px; }
-      .header h1 { font-size: 20pt; color: #16a34a; margin-bottom: 2px; }
+      .header { text-align: center; border-bottom: 3px solid ${brand.orange}; padding-bottom: 12px; margin-bottom: 18px; }
+      .header h1 { font-size: 20pt; color: ${brand.indigo}; margin-bottom: 2px; }
       .header p { font-size: 10pt; color: #666; }
       .date-title { font-size: 13pt; font-weight: 700; text-transform: capitalize; margin-bottom: 16px; color: #333; }
-      .shift-header { font-size: 11pt; font-weight: 700; color: #16a34a; border-bottom: 1.5px solid #e0e0e0; padding-bottom: 4px; margin: 16px 0 10px; text-transform: uppercase; letter-spacing: 1px; }
+      .shift-header { font-size: 11pt; font-weight: 700; color: ${brand.indigo}; border-bottom: 1.5px solid #e0e0e0; padding-bottom: 4px; margin: 16px 0 10px; text-transform: uppercase; letter-spacing: 1px; }
       .event-card { border: 1px solid #e5e5e5; border-radius: 8px; padding: 10px 14px; margin-bottom: 10px; page-break-inside: avoid; background: #fafafa; }
       .event-title { font-size: 12pt; font-weight: 700; margin-bottom: 3px; }
-      .event-time { font-size: 10pt; color: #16a34a; font-weight: 600; margin-bottom: 4px; }
+      .event-time { font-size: 10pt; color: ${brand.blue}; font-weight: 600; margin-bottom: 4px; }
       .event-meta { font-size: 9pt; color: #555; margin-bottom: 2px; }
       .event-meta strong { color: #333; }
       .event-desc { font-size: 9pt; color: #444; margin-top: 5px; padding-top: 5px; border-top: 1px dashed #ddd; white-space: pre-wrap; }
-      .badge { display: inline-block; background: #e8f5e9; color: #2e7d32; padding: 1px 8px; border-radius: 10px; font-size: 8pt; font-weight: 600; margin-left: 6px; }
+      .badge { display: inline-block; background: #eef0ff; color: ${brand.indigo}; padding: 1px 8px; border-radius: 6px; font-size: 8pt; font-weight: 600; margin-left: 6px; }
       .badge-transport { background: #e3f2fd; color: #1565c0; }
       .footer { margin-top: 24px; text-align: center; font-size: 8pt; color: #999; border-top: 1px solid #e0e0e0; padding-top: 8px; }
-      .summary { background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; }
+      .summary { background: ${brand.softWhite}; border: 1px solid #d7daf6; border-radius: 8px; padding: 10px 14px; margin-bottom: 16px; }
       .summary p { font-size: 9pt; color: #333; }
     </style></head><body>
     <div class="header">
       <h1>Agenda de Transportes</h1>
-      <p>Gestão dos deslocamentos e recepção de convidados — Fenasoja 2026</p>
+      <p>Gestão dos deslocamentos e recepção de convidados — Fenasoja 2028</p>
     </div>
     <div class="date-title">📅 ${dateFormatted}</div>
     <div class="summary">
@@ -352,8 +354,8 @@ export default function AgendaPage() {
       </div>
 
       {/* ── Day chips ── */}
-      <div ref={scrollRef} className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory -mx-1 px-1 [perspective:1000px]">
-        {dates.map((d, i) => {
+      <div ref={scrollRef} className="-mx-1 flex snap-x snap-mandatory gap-2 overflow-x-auto px-1 pb-2 scrollbar-hide">
+        {dates.map((d) => {
           const active = d === selectedDate;
           const isToday = d === today;
           return (
@@ -361,35 +363,20 @@ export default function AgendaPage() {
               key={d}
               data-active={active}
               onClick={() => setSelectedDate(d)}
-              style={{ animation: 'card-enter-3d 0.45s cubic-bezier(0.22,1,0.36,1) both', animationDelay: `${i * 35}ms` }}
               className={cn(
-                'group relative snap-center shrink-0 flex flex-col items-center px-4 py-2.5 rounded-xl border transition-all duration-300 min-w-[72px] overflow-hidden',
-                'active:scale-[0.96] hover:-translate-y-0.5',
+                'relative flex min-w-[72px] shrink-0 snap-center flex-col items-center overflow-hidden rounded-lg border px-4 py-2.5 transition-colors duration-150',
                 active
-                  ? 'bg-gradient-to-b from-primary via-primary/95 to-primary/80 text-primary-foreground border-primary/60 shadow-[0_0_20px_hsl(var(--primary)/0.45),0_8px_18px_-8px_hsl(var(--primary)/0.6)]'
-                  : 'bg-card/55 backdrop-blur-xl border-white/12 text-foreground hover:bg-card/70 hover:border-gold/30'
+                  ? 'border-primary bg-primary text-primary-foreground shadow-xs'
+                  : 'border-border bg-card text-foreground hover:border-primary/30 hover:bg-secondary/50'
               )}
             >
-              {/* Top reflection */}
-              <span
-                aria-hidden
-                className={cn(
-                  'pointer-events-none absolute inset-x-3 top-0 h-px',
-                  active
-                    ? 'bg-gradient-to-r from-transparent via-gold/60 to-transparent'
-                    : 'bg-gradient-to-r from-transparent via-gold/30 to-transparent'
-                )}
-              />
               <span className="relative text-[10px] uppercase font-semibold tracking-wide opacity-85">{parseDateKey(d).toLocaleDateString('pt-BR', { weekday: 'short' })}</span>
-              <span className="relative text-lg font-bold leading-tight tabular-nums" style={active ? { textShadow: '0 0 10px hsl(var(--gold)/0.4)' } : undefined}>
+              <span className="relative text-lg font-bold leading-tight tabular-nums">
                 {parseDateKey(d).toLocaleDateString('pt-BR', { day: '2-digit' })}
               </span>
               <span className="relative text-[10px] uppercase opacity-75">{parseDateKey(d).toLocaleDateString('pt-BR', { month: 'short' })}</span>
               {isToday && (
-                <span className="relative mt-0.5 flex h-1.5 w-1.5">
-                  {!active && <span className="absolute inline-flex h-full w-full rounded-full bg-gold opacity-70 animate-ping motion-reduce:hidden" />}
-                  <span className={cn('relative inline-flex rounded-full h-1.5 w-1.5', active ? 'bg-gold' : 'bg-gold')} />
-                </span>
+                <span className="relative mt-0.5 h-1.5 w-1.5 rounded-full bg-gold" aria-label="Hoje" />
               )}
             </button>
           );
@@ -400,8 +387,8 @@ export default function AgendaPage() {
       {isLoading && (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="rounded-2xl bg-white/10 backdrop-blur-xl border border-white/15 p-4 flex gap-4">
-              <Skeleton className="w-14 h-14 rounded-xl bg-white/10" />
+            <div key={i} className="flex gap-4 rounded-xl border border-border bg-card p-4">
+              <Skeleton className="h-14 w-14 rounded-lg" />
               <div className="flex-1 space-y-2">
                 <Skeleton className="h-4 w-3/4 bg-white/10" />
                 <Skeleton className="h-3 w-1/2 bg-white/10" />
@@ -415,7 +402,7 @@ export default function AgendaPage() {
       {/* ── Empty state ── */}
       {!isLoading && dayEvents.length === 0 && (
         <div className="flex flex-col items-center justify-center py-16 text-center">
-          <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/15 flex items-center justify-center mb-4">
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-xl border border-border bg-secondary">
             <CalendarOff className="w-7 h-7 text-muted-foreground" />
           </div>
           <p className="text-sm font-medium text-foreground">Nenhum evento neste dia</p>

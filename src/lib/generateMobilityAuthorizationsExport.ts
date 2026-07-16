@@ -1,6 +1,7 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { toTitleCase, formatCpf } from './textNormalize';
+import { FENASOJA_2028_RGB } from './fenasoja-brand';
 
 export type MobilityExportType = 'carro_eletrico' | 'patinete';
 
@@ -27,8 +28,11 @@ const TYPE_LABEL: Record<MobilityExportType, { singular: string; plural: string;
   patinete: { singular: 'Patinete', plural: 'Patinetes', fileSlug: 'patinetes' },
 };
 
-const FENASOJA_GREEN: [number, number, number] = [25, 64, 25];
-const FENASOJA_GOLD: [number, number, number] = [220, 190, 80];
+const FENASOJA_NAVY = FENASOJA_2028_RGB.navy;
+const FENASOJA_INDIGO = FENASOJA_2028_RGB.indigo;
+const FENASOJA_ORANGE = FENASOJA_2028_RGB.orange;
+const FENASOJA_GOLD = FENASOJA_2028_RGB.gold;
+const FENASOJA_SOFT_WHITE = FENASOJA_2028_RGB.softWhite;
 const TEXT_DARK: [number, number, number] = [30, 30, 30];
 const TEXT_MUTED: [number, number, number] = [110, 110, 110];
 
@@ -129,18 +133,18 @@ export function exportMobilityAuthorizationsPDF(
   const pageH = doc.internal.pageSize.getHeight();
 
   // ===== COVER =====
-  doc.setFillColor(...FENASOJA_GREEN);
+  doc.setFillColor(...FENASOJA_NAVY);
   doc.rect(0, 0, pageW, pageH, 'F');
 
   // Gold accent bar
-  doc.setFillColor(...FENASOJA_GOLD);
+  doc.setFillColor(...FENASOJA_ORANGE);
   doc.rect(0, 60, pageW, 3, 'F');
   doc.rect(0, 200, pageW, 3, 'F');
 
   doc.setTextColor(...FENASOJA_GOLD);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(14);
-  doc.text('FENASOJA 2026 — LOGÍSTICA', pageW / 2, 80, { align: 'center' });
+  doc.text('FENASOJA 2028 — LOGÍSTICA', pageW / 2, 80, { align: 'center' });
 
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(26);
@@ -200,9 +204,9 @@ export function exportMobilityAuthorizationsPDF(
   ];
   stats.forEach((s, i) => {
     const x = 14 + i * (cardW + 6);
-    doc.setFillColor(245, 245, 240);
+    doc.setFillColor(245, 246, 252);
     doc.roundedRect(x, cardY, cardW, cardH, 2, 2, 'F');
-    doc.setFillColor(...FENASOJA_GOLD);
+    doc.setFillColor(...FENASOJA_ORANGE);
     doc.rect(x, cardY, 2, cardH, 'F');
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(9);
@@ -210,7 +214,7 @@ export function exportMobilityAuthorizationsPDF(
     doc.text(s[0].toUpperCase(), x + 6, cardY + 9);
     doc.setFont('helvetica', 'bold');
     doc.setFontSize(20);
-    doc.setTextColor(...FENASOJA_GREEN);
+    doc.setTextColor(...FENASOJA_INDIGO);
     doc.text(s[1], x + 6, cardY + 21);
   });
 
@@ -225,7 +229,7 @@ export function exportMobilityAuthorizationsPDF(
     body: summaryRows,
     theme: 'striped',
     styles: { font: 'helvetica', fontSize: 9, cellPadding: 2.5, textColor: TEXT_DARK },
-    headStyles: { fillColor: FENASOJA_GREEN, textColor: FENASOJA_GOLD, fontStyle: 'bold' },
+    headStyles: { fillColor: FENASOJA_INDIGO, textColor: FENASOJA_SOFT_WHITE, fontStyle: 'bold' },
     alternateRowStyles: { fillColor: [248, 248, 244] },
     columnStyles: {
       2: { halign: 'center', cellWidth: 28 },
@@ -247,7 +251,7 @@ export function exportMobilityAuthorizationsPDF(
 
     // Committee section header
     let y = 38;
-    doc.setFillColor(...FENASOJA_GREEN);
+    doc.setFillColor(...FENASOJA_INDIGO);
     doc.roundedRect(14, y, pageW - 28, 22, 2, 2, 'F');
     doc.setTextColor(...FENASOJA_GOLD);
     doc.setFont('helvetica', 'bold');
@@ -278,7 +282,7 @@ export function exportMobilityAuthorizationsPDF(
       ]),
       theme: 'striped',
       styles: { font: 'helvetica', fontSize: 9, cellPadding: 2.5, textColor: TEXT_DARK },
-      headStyles: { fillColor: FENASOJA_GREEN, textColor: FENASOJA_GOLD, fontStyle: 'bold' },
+      headStyles: { fillColor: FENASOJA_INDIGO, textColor: FENASOJA_SOFT_WHITE, fontStyle: 'bold' },
       alternateRowStyles: { fillColor: [248, 248, 244] },
       columnStyles: {
         0: { halign: 'center', cellWidth: 10 },
@@ -298,7 +302,7 @@ export function exportMobilityAuthorizationsPDF(
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(8);
     doc.setTextColor(...TEXT_MUTED);
-    doc.text('Fenasoja Logística — Documento oficial de autorização', 14, pageH - 7);
+    doc.text('Fenasoja 2028 · Logística — Documento oficial de autorização', 14, pageH - 7);
     doc.text(`Página ${i} de ${pageCount}`, pageW - 14, pageH - 7, { align: 'right' });
   }
 
@@ -307,15 +311,15 @@ export function exportMobilityAuthorizationsPDF(
 }
 
 function drawHeader(doc: jsPDF, title: string, pageW: number) {
-  doc.setFillColor(...FENASOJA_GREEN);
+  doc.setFillColor(...FENASOJA_INDIGO);
   doc.rect(0, 0, pageW, 22, 'F');
-  doc.setFillColor(...FENASOJA_GOLD);
+  doc.setFillColor(...FENASOJA_ORANGE);
   doc.rect(0, 22, pageW, 1.5, 'F');
 
   doc.setTextColor(...FENASOJA_GOLD);
   doc.setFont('helvetica', 'bold');
   doc.setFontSize(11);
-  doc.text('FENASOJA 2026 · LOGÍSTICA', 14, 14);
+  doc.text('FENASOJA 2028 · LOGÍSTICA', 14, 14);
 
   doc.setTextColor(255, 255, 255);
   doc.setFont('helvetica', 'normal');

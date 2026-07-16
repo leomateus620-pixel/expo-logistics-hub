@@ -1,10 +1,11 @@
 import type { ReactNode } from 'react';
 import { CalendarRange, ChevronLeft, LogOut } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import logo from '@/assets/logofeira26.webp';
+import { FenasojaBrand } from '@/components/brand/FenasojaBrand';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
+import { presentFenasojaProductName } from '@/lib/fenasoja-brand';
 
 export function CronogramaModuleShell({ children }: { children: ReactNode }) {
   const { signOut } = useAuth();
@@ -37,7 +38,7 @@ export function CronogramaModuleShell({ children }: { children: ReactNode }) {
             <span className="h-8 w-px bg-white/14" aria-hidden="true" />
 
             <div className="flex min-w-0 items-center gap-3">
-              <img src={logo} alt="Fenasoja" className="hidden h-8 w-auto object-contain sm:block" />
+              <FenasojaBrand compact markOnly tone="dark" className="hidden sm:inline-flex" />
               <span className="cronograma-module-mark" aria-hidden="true">
                 <CalendarRange className="h-4 w-4" />
               </span>
@@ -53,7 +54,7 @@ export function CronogramaModuleShell({ children }: { children: ReactNode }) {
           <div className="flex items-center gap-2">
             <div className="hidden text-right lg:block">
               <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/42">Ciclo oficial</p>
-              <p className="text-xs font-semibold text-white/76">{orgName || 'Fenasoja'} · 2026—2028</p>
+              <p className="text-xs font-semibold text-white/76">{presentFenasojaProductName(orgName)} · 2026—2028</p>
             </div>
             <Button
               type="button"

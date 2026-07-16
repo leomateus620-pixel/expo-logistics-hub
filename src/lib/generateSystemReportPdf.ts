@@ -1,6 +1,14 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { SystemReportPayload } from './systemReportCollector';
+import { FENASOJA_2028_RGB } from './fenasoja-brand';
+
+const PDF_NAVY = FENASOJA_2028_RGB.navy;
+const PDF_INDIGO = FENASOJA_2028_RGB.indigo;
+const PDF_ORANGE = FENASOJA_2028_RGB.orange;
+const PDF_GOLD = FENASOJA_2028_RGB.gold;
+const PDF_SOFT_WHITE = FENASOJA_2028_RGB.softWhite;
+const PDF_ALT_ROW: [number, number, number] = [245, 246, 252];
 
 function fmtDate(d: string): string {
   if (!d) return '—';
@@ -46,7 +54,7 @@ export function generateSystemReportPdf(payload: SystemReportPayload) {
       doc.setFontSize(8);
       doc.setTextColor(120);
       doc.text(`Página ${i} de ${pages}`, pageW / 2, pageH - 8, { align: 'center' });
-      doc.text('Fenasoja Logística — Relatório do Sistema', margin, pageH - 8);
+      doc.text('Fenasoja 2028 · Logística — Relatório do Sistema', margin, pageH - 8);
     }
   };
 
@@ -61,10 +69,10 @@ export function generateSystemReportPdf(payload: SystemReportPayload) {
     checkNewPage(20);
     y += 6;
     doc.setFontSize(14);
-    doc.setTextColor(30, 80, 30);
+    doc.setTextColor(...PDF_INDIGO);
     doc.text(title, margin, y);
     y += 2;
-    doc.setDrawColor(200, 180, 80);
+    doc.setDrawColor(...PDF_ORANGE);
     doc.setLineWidth(0.5);
     doc.line(margin, y, margin + contentW, y);
     y += 8;
@@ -72,18 +80,18 @@ export function generateSystemReportPdf(payload: SystemReportPayload) {
   };
 
   // ══════════════ CAPA ══════════════
-  doc.setFillColor(25, 60, 25);
+  doc.setFillColor(...PDF_NAVY);
   doc.rect(0, 0, pageW, pageH, 'F');
 
-  doc.setTextColor(220, 190, 80);
+  doc.setTextColor(...PDF_GOLD);
   doc.setFontSize(28);
   doc.text('Relatório de Continuidade', pageW / 2, 65, { align: 'center' });
   doc.setFontSize(22);
   doc.text('Operacional', pageW / 2, 78, { align: 'center' });
 
-  doc.setTextColor(200);
+  doc.setTextColor(...PDF_SOFT_WHITE);
   doc.setFontSize(12);
-  doc.text('Fenasoja 2026 — Logística', pageW / 2, 98, { align: 'center' });
+  doc.text('Fenasoja 2028 — Logística', pageW / 2, 98, { align: 'center' });
 
   doc.setFontSize(10);
   doc.text(`Período: ${fmtDate(payload.period.start)} a ${fmtDate(payload.period.end)}`, pageW / 2, 112, { align: 'center' });
@@ -116,8 +124,8 @@ export function generateSystemReportPdf(payload: SystemReportPayload) {
     body: summaryRows,
     margin: { left: margin, right: margin },
     styles: { fontSize: 9, cellPadding: 3 },
-    headStyles: { fillColor: [25, 60, 25], textColor: [220, 190, 80] },
-    alternateRowStyles: { fillColor: [245, 245, 240] },
+    headStyles: { fillColor: PDF_INDIGO, textColor: PDF_SOFT_WHITE },
+    alternateRowStyles: { fillColor: PDF_ALT_ROW },
   });
   y = (doc as any).lastAutoTable.finalY + 10;
 
@@ -170,8 +178,8 @@ export function generateSystemReportPdf(payload: SystemReportPayload) {
         body,
         margin: { left: margin, right: margin },
         styles: { fontSize: 7, cellPadding: 2, overflow: 'linebreak' },
-        headStyles: { fillColor: [25, 60, 25], textColor: [220, 190, 80], fontSize: 7 },
-        alternateRowStyles: { fillColor: [245, 245, 240] },
+        headStyles: { fillColor: PDF_INDIGO, textColor: PDF_SOFT_WHITE, fontSize: 7 },
+        alternateRowStyles: { fillColor: PDF_ALT_ROW },
       });
       y = (doc as any).lastAutoTable.finalY + 10;
     }

@@ -37,11 +37,11 @@ export default function OperationalDynamicIsland({ metrics }: Props) {
 
   useEffect(() => {
     const el = tabsRef.current?.querySelector(`[data-cat="${active}"]`) as HTMLElement | null;
-    el?.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+    el?.scrollIntoView({ behavior: 'auto', inline: 'center', block: 'nearest' });
   }, [active]);
 
   const renderMetric = (label: string, value: string | number, hint?: string) => (
-    <div className="rounded-xl bg-card/60 border border-border/40 p-2.5 backdrop-blur-md">
+    <div className="rounded-lg border border-border bg-card p-2.5">
       <p className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">{label}</p>
       <p className="text-base font-extrabold tabular-nums text-foreground mt-0.5">{value}</p>
       {hint && <p className="text-[9px] text-muted-foreground mt-0.5 truncate">{hint}</p>}
@@ -135,7 +135,7 @@ export default function OperationalDynamicIsland({ metrics }: Props) {
                 type="button"
                 onClick={() => a.ctaRoute && navigate(a.ctaRoute)}
                 className={cn(
-                  'w-full text-left rounded-xl p-2.5 border backdrop-blur-md transition-all hover:scale-[1.01] active:scale-[0.99] flex items-start gap-2',
+                  'flex w-full items-start gap-2 rounded-lg border p-2.5 text-left transition-colors duration-150',
                   a.severity === 'high' ? 'bg-destructive/10 border-destructive/30 text-destructive' :
                   a.severity === 'medium' ? 'bg-warning/10 border-warning/30 text-warning' :
                   'bg-muted/40 border-border/40 text-foreground',
@@ -151,38 +151,23 @@ export default function OperationalDynamicIsland({ metrics }: Props) {
   };
 
   return (
-    <div className="relative">
+    <section className="overflow-hidden rounded-xl border border-border bg-card shadow-[var(--shadow-xs)]" aria-label="Resumo da operação">
       <button
         type="button"
         onClick={() => setExpanded(e => !e)}
         aria-expanded={expanded}
         aria-controls="dynamic-island-panel"
-        className={cn(
-          'w-full flex items-center justify-between gap-3 px-4 py-2.5 rounded-full',
-          'bg-card/70 backdrop-blur-2xl backdrop-saturate-150 border border-border/40',
-          'shadow-[0_8px_28px_-12px_rgba(0,0,0,0.25),inset_0_1px_0_rgba(255,255,255,0.08)]',
-          'hover:bg-card/85 active:scale-[0.99] transition-all duration-300',
-        )}
+        className="flex w-full items-center justify-between gap-3 px-4 py-2.5 text-left transition-colors duration-150 hover:bg-secondary focus-ring"
       >
         <div className="flex items-center gap-2 min-w-0">
-          <span className="relative inline-flex h-2 w-2 shrink-0">
-            <span className="absolute inline-flex h-full w-full rounded-full bg-success opacity-70 animate-ping" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-success" />
-          </span>
+          <span className="h-2 w-2 shrink-0 rounded-full bg-success" aria-hidden="true" />
           <span className="text-[11px] sm:text-xs font-semibold text-foreground truncate">{summary}</span>
         </div>
-        <ChevronDown className={cn('w-4 h-4 text-muted-foreground transition-transform duration-300 shrink-0', expanded && 'rotate-180')} />
+        <ChevronDown className={cn('h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200', expanded && 'rotate-180')} />
       </button>
 
-      <div
-        id="dynamic-island-panel"
-        className={cn(
-          'overflow-hidden transition-[max-height,opacity,margin] duration-500 ease-out',
-          expanded ? 'max-h-[600px] opacity-100 mt-2' : 'max-h-0 opacity-0 mt-0',
-        )}
-        aria-hidden={!expanded}
-      >
-        <div className="rounded-2xl bg-card/70 backdrop-blur-2xl backdrop-saturate-150 border border-border/40 p-3 shadow-[0_12px_32px_-14px_rgba(0,0,0,0.3),inset_0_1px_0_rgba(255,255,255,0.08)]">
+      {expanded && (
+        <div id="dynamic-island-panel" className="border-t border-border bg-secondary/55 p-3">
           {/* Tabs */}
           <div ref={tabsRef} className="flex gap-1.5 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-none" style={{ scrollbarWidth: 'none' }}>
             {CATEGORIES.map(cat => {
@@ -196,7 +181,7 @@ export default function OperationalDynamicIsland({ metrics }: Props) {
                   type="button"
                   onClick={() => setActive(cat.id)}
                   className={cn(
-                    'shrink-0 inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[11px] font-semibold transition-all',
+                    'inline-flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-1.5 text-[11px] font-semibold transition-colors duration-150',
                     isActive
                       ? 'bg-primary text-primary-foreground shadow-sm'
                       : 'bg-muted/50 text-muted-foreground hover:bg-muted/80 hover:text-foreground',
@@ -215,11 +200,11 @@ export default function OperationalDynamicIsland({ metrics }: Props) {
             })}
           </div>
 
-          <div className="pt-2 animate-page-in" key={active}>
+          <div className="pt-2" key={active}>
             {renderCategory()}
           </div>
         </div>
-      </div>
-    </div>
+      )}
+    </section>
   );
 }

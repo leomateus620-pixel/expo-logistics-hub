@@ -107,7 +107,7 @@ export default function FenasojaEventsPage() {
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/40 via-primary/20 to-gold/30 border border-gold/30 ring-1 ring-inset ring-gold/20 flex items-center justify-center backdrop-blur-xl shadow-[inset_0_1px_0_hsl(var(--gold)/0.35),0_8px_24px_-12px_hsl(var(--gold)/0.45)]">
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary/40 via-primary/20 to-gold/30 border border-gold/30 ring-1 ring-inset ring-gold/20 flex items-center justify-center backdrop-blur-xl shadow-[inset_0_1px_0_oklch(var(--gold)/0.35),0_8px_24px_-12px_oklch(var(--gold)/0.45)]">
               <CalendarCheck2 className="w-5 h-5 text-gold" />
             </div>
             <div>
@@ -177,7 +177,7 @@ export default function FenasojaEventsPage() {
                 </span>
               )}
               {isToday && !active && (
-                <span className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-gold animate-pulse" />
+                <span className="absolute right-1 top-1 h-1.5 w-1.5 rounded-full bg-gold" aria-label="Hoje" />
               )}
             </button>
           );
@@ -196,12 +196,12 @@ export default function FenasojaEventsPage() {
       {/* Empty */}
       {!isLoading && dayEvents.length === 0 && (
         <div className="flex flex-col items-center justify-center py-16 text-center">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/30 via-card/40 to-gold/20 border border-gold/25 backdrop-blur-xl flex items-center justify-center mb-4 shadow-[0_0_30px_-12px_hsl(var(--gold)/0.5),inset_0_1px_0_hsl(var(--gold)/0.3)]">
-            <CalendarCheck2 className="w-7 h-7 text-gold" />
+          <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-xl border border-border bg-accent text-primary shadow-[var(--shadow-xs)]">
+            <CalendarCheck2 className="h-6 w-6" />
           </div>
           <p className="text-sm font-semibold text-foreground">Nenhum evento programado para este dia</p>
           <p className="text-xs text-muted-foreground mt-1 max-w-[280px]">
-            Cadastre os eventos institucionais da Fenasoja 2026 para que toda a equipe acompanhe.
+            Cadastre os eventos institucionais da Fenasoja 2028 para que toda a equipe acompanhe.
           </p>
           {canManage && (
             <Button size="sm" onClick={handleNew} className="mt-4 gap-1.5 rounded-xl">

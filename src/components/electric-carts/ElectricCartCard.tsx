@@ -82,71 +82,33 @@ export default function ElectricCartCard({ cart, responsavel, nextReservation, n
     ? formatReservationBadge(nextReservation, Date.now() + tick * 0)
     : null;
 
-  const haloClass = isAvailable
-    ? 'bg-[radial-gradient(circle_at_top_right,hsl(var(--success)/0.35),transparent_60%)]'
-    : isInUse
-      ? 'bg-[radial-gradient(circle_at_top_right,hsl(var(--accent)/0.35),transparent_60%)]'
-      : 'bg-[radial-gradient(circle_at_top_right,hsl(var(--destructive)/0.25),transparent_60%)]';
-
   const initials = (responsavel?.nome_exibicao || '?').slice(0, 2).toUpperCase();
 
   return (
-    <div
-      onClick={onHistory}
+    <article
       className={cn(
-        'group relative cursor-pointer overflow-hidden rounded-2xl border border-border/40',
-        'bg-gradient-to-br from-card/85 via-card/65 to-card/45 backdrop-blur-2xl',
-        'shadow-[0_8px_32px_-12px_rgba(0,0,0,0.25),inset_0_1px_0_rgba(255,255,255,0.08)]',
-        'transform-gpu transition-all duration-300',
-        'hover:-translate-y-1 hover:shadow-[0_20px_48px_-12px_rgba(0,0,0,0.35),inset_0_1px_0_rgba(255,255,255,0.12)]',
-        'p-4 sm:p-5 flex flex-col',
-        isInUse && 'ring-1 ring-accent/45 shadow-[0_10px_36px_-10px_hsl(var(--accent)/0.45),inset_0_1px_0_rgba(255,255,255,0.12)]',
+        'relative flex flex-col rounded-xl border border-border bg-card p-4 shadow-xs transition-[border-color,box-shadow] duration-150 sm:p-5',
+        'hover:border-primary/25 hover:shadow-sm',
+        isInUse && 'border-primary/30',
         isInUse ? 'min-h-[280px]' : 'min-h-[240px]'
       )}
     >
-      {/* Halo top-right */}
-      <div
-        className={cn(
-          'pointer-events-none absolute -top-12 -right-12 w-48 h-48 blur-3xl opacity-60',
-          haloClass,
-          isInUse && 'motion-safe:animate-halo-breath'
-        )}
-      />
-      {/* Halo bottom-left (extra depth on em_uso) */}
-      {isInUse && (
-        <div className="pointer-events-none absolute -bottom-16 -left-16 w-52 h-52 rounded-full blur-3xl opacity-40 bg-[radial-gradient(circle,hsl(var(--primary)/0.45),transparent_65%)]" />
-      )}
-      {/* Glass sheen */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.08),transparent_50%)]" />
-      {/* Shimmer sweep — only when in use */}
-      {isInUse && (
-        <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-2xl">
-          <div className="absolute top-0 -left-1/3 h-full w-1/3 bg-gradient-to-r from-transparent via-white/[0.09] to-transparent motion-safe:animate-cart-shimmer" />
-        </div>
-      )}
-
       {/* Header */}
-      <div className="relative flex items-start justify-between mb-3">
+      <div className="mb-3 flex items-start justify-between">
         <div className="flex items-center gap-3">
           <div
             className={cn(
-              'w-11 h-11 rounded-xl flex items-center justify-center shrink-0',
-              'bg-gradient-to-br shadow-inner',
-              isAvailable && 'from-success/25 to-success/10 text-success',
-              isInUse && 'from-accent/30 to-accent/10 text-accent',
-              isMaintenance && 'from-destructive/25 to-destructive/10 text-destructive'
+              'flex h-11 w-11 shrink-0 items-center justify-center rounded-lg',
+              isAvailable && 'bg-success/10 text-success',
+              isInUse && 'bg-primary/10 text-primary',
+              isMaintenance && 'bg-destructive/10 text-destructive'
             )}
           >
             <Zap className="w-5 h-5" />
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-1.5">
-              {isInUse && (
-                <span className="relative flex h-1.5 w-1.5">
-                  <span className="absolute inline-flex h-full w-full rounded-full bg-accent opacity-75 motion-safe:animate-ping" />
-                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-accent" />
-                </span>
-              )}
+              {isInUse && <span className="h-1.5 w-1.5 rounded-full bg-primary" aria-label="Em uso" />}
               <p className="font-mono text-[11px] uppercase tracking-wider text-muted-foreground">{cart.codigo}</p>
             </div>
             {isAvailable && cart.nome && (
@@ -154,13 +116,22 @@ export default function ElectricCartCard({ cart, responsavel, nextReservation, n
             )}
           </div>
         </div>
-        <button
-          onClick={(e) => { e.stopPropagation(); onEdit(); }}
-          aria-label={`Editar ${cart.nome || cart.codigo}`}
-          className="relative p-2 rounded-lg hover:bg-muted/60 transition-colors text-muted-foreground hover:text-foreground min-w-[40px] min-h-[40px] flex items-center justify-center"
-        >
-          <Pencil className="w-3.5 h-3.5" />
-        </button>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={onHistory}
+            aria-label={`Ver histórico de ${cart.nome || cart.codigo}`}
+            className="flex min-h-10 min-w-10 items-center justify-center rounded-lg text-muted-foreground transition-colors duration-150 hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <Clock className="h-4 w-4" />
+          </button>
+          <button
+            onClick={onEdit}
+            aria-label={`Editar ${cart.nome || cart.codigo}`}
+            className="flex min-h-10 min-w-10 items-center justify-center rounded-lg text-muted-foreground transition-colors duration-150 hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+          >
+            <Pencil className="h-4 w-4" />
+          </button>
+        </div>
       </div>
 
       {/* Reservation badge */}
@@ -168,8 +139,7 @@ export default function ElectricCartCard({ cart, responsavel, nextReservation, n
         <div
           className={cn(
             'relative mb-3 rounded-xl border px-3 py-2 flex items-center gap-2',
-            'shadow-[inset_0_1px_0_rgba(255,255,255,0.1)] backdrop-blur-sm',
-            reservationBadge.variant === 'now' && 'bg-destructive/15 border-destructive/40 text-destructive motion-safe:animate-pulse',
+            reservationBadge.variant === 'now' && 'bg-destructive/10 border-destructive/40 text-destructive',
             reservationBadge.variant === 'soon' && 'bg-amber-500/15 border-amber-500/40 text-amber-700 dark:text-amber-300',
             reservationBadge.variant === 'future' && 'bg-info/15 border-info/40 text-info'
           )}
@@ -194,8 +164,7 @@ export default function ElectricCartCard({ cart, responsavel, nextReservation, n
           <div
             className={cn(
               'mt-4 rounded-xl px-4 py-3 flex items-center justify-center gap-2',
-              'bg-gradient-to-r from-success/25 via-success/15 to-success/10',
-              'border border-success/30 shadow-[inset_0_1px_0_rgba(255,255,255,0.15)]'
+              'border border-success/30 bg-success/10'
             )}
           >
             <CheckCircle2 className="w-4 h-4 text-success" />
@@ -273,17 +242,12 @@ export default function ElectricCartCard({ cart, responsavel, nextReservation, n
             onClick={(e) => { e.stopPropagation(); onReturn(); }}
             aria-label={`Devolver ${cart.nome || cart.codigo}`}
             className={cn(
-              'group/btn relative overflow-hidden w-full h-12 rounded-xl font-bold uppercase tracking-wider text-sm',
-              'bg-gradient-to-r from-primary via-primary to-primary/85 text-primary-foreground',
-              'shadow-[0_4px_16px_-4px_hsl(var(--primary)/0.5),inset_0_1px_0_rgba(255,255,255,0.2)]',
-              'flex items-center justify-center gap-2',
-              'transition-all duration-300 hover:shadow-[0_10px_24px_-4px_hsl(var(--primary)/0.65)] hover:brightness-110 active:scale-[0.97]'
+              'flex h-12 w-full items-center justify-center gap-2 rounded-lg bg-action text-sm font-bold uppercase tracking-wider text-action-foreground',
+              'transition-colors duration-150 hover:bg-action/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
             )}
           >
-            {/* hover shimmer */}
-            <span className="pointer-events-none absolute inset-0 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700 bg-gradient-to-r from-transparent via-white/25 to-transparent" />
-            <Undo2 className="w-4 h-4 relative" />
-            <span className="relative">Devolver</span>
+            <Undo2 className="h-4 w-4" />
+            <span>Devolver</span>
           </button>
         </div>
       )}
@@ -298,6 +262,6 @@ export default function ElectricCartCard({ cart, responsavel, nextReservation, n
           {cart.observacoes && <p className="text-xs text-muted-foreground">{cart.observacoes}</p>}
         </div>
       )}
-    </div>
+    </article>
   );
 }

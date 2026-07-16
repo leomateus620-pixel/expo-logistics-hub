@@ -8,6 +8,7 @@ import { Settings, Users, Shield, ShieldCheck, Loader2, ChevronDown, ChevronUp }
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import NotificationRecipientsSection from '@/components/settings/NotificationRecipientsSection';
+import { presentFenasojaProductName } from '@/lib/fenasoja-brand';
 
 const roleLabels: Record<string, string> = {
   admin: 'Administrador',
@@ -19,8 +20,8 @@ const roleLabels: Record<string, string> = {
 const severityColors: Record<string, string> = {
   critical: 'bg-destructive text-destructive-foreground',
   high: 'bg-destructive/80 text-destructive-foreground',
-  medium: 'bg-yellow-500 text-white',
-  low: 'bg-blue-500 text-white',
+  medium: 'bg-warning text-warning-foreground',
+  low: 'bg-info text-info-foreground',
   info: 'bg-muted text-muted-foreground',
 };
 
@@ -127,7 +128,7 @@ export default function SettingsPage() {
         <div className="space-y-2 text-sm">
           <div className="flex justify-between">
             <span className="text-muted-foreground">Nome</span>
-            <span className="font-medium">{orgName}</span>
+            <span className="font-medium">{presentFenasojaProductName(orgName)}</span>
           </div>
           <div className="flex justify-between">
             <span className="text-muted-foreground">Seu papel</span>

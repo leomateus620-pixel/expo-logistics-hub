@@ -137,7 +137,7 @@ const MembersList = memo(function MembersList({ logisticsMembers, assignments, s
 
         return (
           <div key={m.id} className="flex items-center gap-2.5 p-2.5 rounded-xl bg-muted/40">
-            <div className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold text-primary-foreground shrink-0" style={{ backgroundColor: m.avatar_color || 'hsl(var(--primary))' }}>
+            <div className="w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-bold text-primary-foreground shrink-0" style={{ backgroundColor: m.avatar_color || 'oklch(var(--primary))' }}>
               {(m.nome_exibicao || '?').split(' ').map((n: string) => n[0]).join('').slice(0, 2).toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
@@ -325,7 +325,7 @@ export default function Dashboard() {
   const isLoadingAll = loadVehicles || loadCarts || loadTransports || loadTasks;
 
   return (
-    <div className="space-y-5 pb-8 animate-fade-in">
+    <div className="space-y-4 pb-8">
       {/* ─── Header ─── */}
       <div className="px-1">
         <h1 className="text-xl sm:text-2xl font-extrabold tracking-tight text-foreground">{getGreeting()} 👋</h1>
@@ -333,17 +333,17 @@ export default function Dashboard() {
       </div>
 
       {/* ─── Dynamic Island operacional ─── */}
-      <div style={{ animationDelay: '40ms' }} className="animate-fade-in">
+      <div>
         <OperationalDynamicIsland metrics={metrics} />
       </div>
 
       {/* ─── Métricas 3D 2x2 ─── */}
       {isLoadingAll ? (
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
           {[1,2,3,4].map(i => <Skeleton key={i} className="h-[180px] rounded-2xl" />)}
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-3 animate-fade-in" style={{ animationDelay: '80ms' }}>
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
           <Metric3DCard
             title="Veículos"
             icon={<Car className="w-5 h-5" strokeWidth={2.25} />}
@@ -407,11 +407,11 @@ export default function Dashboard() {
         <button
           type="button"
           onClick={() => navigate('/transports?action=create')}
-          className="liquid-glass-card rounded-2xl p-5 sm:p-6 border-l-2 border-accent/40 text-left cursor-pointer hover:bg-muted/60 active:scale-[0.98] transition-all group"
+          className="group rounded-xl border border-border border-t-2 border-t-action bg-card p-4 text-left shadow-[var(--shadow-xs)] transition-colors duration-150 hover:bg-secondary focus-ring"
         >
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-xl bg-accent/10 flex items-center justify-center shrink-0">
-              <MapPin className="w-6 h-6 text-accent" />
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-action/12">
+              <MapPin className="h-5 w-5 text-[oklch(var(--brand-orange-700))]" />
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
@@ -428,11 +428,11 @@ export default function Dashboard() {
         <button
           type="button"
           onClick={() => window.open('/docs/rede-hoteleira.pdf?v=2026-04-20', '_blank')}
-          className="liquid-glass-card rounded-2xl p-5 sm:p-6 border-l-2 border-primary/40 text-left cursor-pointer hover:bg-muted/60 active:scale-[0.98] transition-all group"
+          className="group rounded-xl border border-border border-t-2 border-t-primary bg-card p-4 text-left shadow-[var(--shadow-xs)] transition-colors duration-150 hover:bg-secondary focus-ring"
         >
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-              <Hotel className="w-6 h-6 text-primary" />
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-accent">
+              <Hotel className="h-5 w-5 text-primary" />
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
@@ -452,11 +452,11 @@ export default function Dashboard() {
         <button
           type="button"
           onClick={() => window.open('https://docs.google.com/spreadsheets/d/1I0ESjrZWvpT5dQZrdTvYnIPtpY8SYJVP33fy4Yt0Cf0/edit?gid=0#gid=0', '_blank', 'noopener,noreferrer')}
-          className="liquid-glass-card rounded-2xl p-5 sm:p-6 border-l-2 border-gold/40 text-left cursor-pointer hover:bg-muted/60 active:scale-[0.98] transition-all group"
+          className="group rounded-xl border border-border border-t-2 border-t-warning bg-card p-4 text-left shadow-[var(--shadow-xs)] transition-colors duration-150 hover:bg-secondary focus-ring"
         >
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-xl bg-gold/10 flex items-center justify-center shrink-0">
-              <ClipboardList className="w-6 h-6 text-gold" />
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-warning/15">
+              <ClipboardList className="h-5 w-5 text-warning-foreground" />
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
@@ -468,7 +468,7 @@ export default function Dashboard() {
               <p className="text-[11px] font-semibold text-foreground/80">Veículos e patinetes elétricos</p>
               <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">Acesse a planilha utilizada pelas comissões para definir os responsáveis autorizados por data e turno.</p>
             </div>
-            <ExternalLink className="w-4 h-4 text-muted-foreground/50 group-hover:text-gold transition-colors shrink-0 mt-1" />
+            <ExternalLink className="w-4 h-4 text-muted-foreground/50 group-hover:text-[oklch(var(--brand-gold-700))] transition-colors shrink-0 mt-1" />
           </div>
         </button>
 
@@ -476,11 +476,11 @@ export default function Dashboard() {
         <button
           type="button"
           onClick={() => navigate('/expenses?action=create')}
-          className="liquid-glass-card rounded-2xl p-5 sm:p-6 border-l-2 border-success/40 text-left cursor-pointer hover:bg-muted/60 active:scale-[0.98] transition-all group"
+          className="group rounded-xl border border-border border-t-2 border-t-success bg-card p-4 text-left shadow-[var(--shadow-xs)] transition-colors duration-150 hover:bg-secondary focus-ring"
         >
           <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-xl bg-success/10 flex items-center justify-center shrink-0">
-              <Receipt className="w-6 h-6 text-success" />
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-success/10">
+              <Receipt className="h-5 w-5 text-success" />
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
@@ -502,12 +502,12 @@ export default function Dashboard() {
       </div>
 
       {/* ─── Alertas da Operação ─── */}
-      <div className="animate-fade-in" style={{ animationDelay: '120ms' }}>
+      <div>
         <OperationAlertsPanel alerts={metrics.alerts} />
       </div>
 
       {/* ─── Gráficos do período ─── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 animate-fade-in" style={{ animationDelay: '160ms' }}>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         <Suspense fallback={<ChartFallback />}>
           <TransportsByDayChart data={metrics.transports.series} />
         </Suspense>
@@ -556,9 +556,10 @@ export default function Dashboard() {
               ? new Date(t.fim_em).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', timeZone: 'America/Sao_Paulo' })
               : '—';
             return (
-              <div
+              <button
+                type="button"
                 key={t.id}
-                className="flex items-center gap-3 p-3 rounded-xl bg-muted/40 cursor-pointer hover:bg-muted/60 active:scale-[0.98] transition-all"
+                className="flex w-full items-center gap-3 rounded-xl bg-muted/40 p-3 text-left transition-colors duration-150 hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
                 onClick={() => navigate(`/transports?highlight=${t.id}`)}
               >
                 <div className="flex-1 min-w-0">
@@ -584,7 +585,7 @@ export default function Dashboard() {
                   <p className="text-[9px] uppercase text-muted-foreground font-medium">Retorno</p>
                   <p className="text-[11px] font-mono text-muted-foreground">{retTime}</p>
                 </div>
-              </div>
+              </button>
             );
           })}
         </div>
@@ -601,7 +602,12 @@ export default function Dashboard() {
         const renderTransportItem = (e: any) => {
           const responsible = e.responsavel_user_id ? members.find((m: any) => m.user_id === e.responsavel_user_id) : null;
           return (
-            <div key={e.id} className="flex items-center gap-3 p-2.5 rounded-xl bg-muted/40 cursor-pointer hover:bg-muted/60 active:scale-[0.98] transition-all" onClick={() => navigate(e._source === 'transport' ? '/transports' : '/agenda')}>
+            <button
+              type="button"
+              key={e.id}
+              className="flex w-full items-center gap-3 rounded-lg bg-secondary p-2.5 text-left transition-colors duration-150 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              onClick={() => navigate(e._source === 'transport' ? '/transports' : '/agenda')}
+            >
               <div className="flex flex-col gap-0.5 shrink-0 min-w-[48px]">
                 {(e.voo_checkin || e.voo_chegada) && (
                   <div className="text-center">
@@ -619,27 +625,25 @@ export default function Dashboard() {
                 {e.local && <p className="text-[11px] text-muted-foreground truncate">{e.local}</p>}
                 {responsible && <p className="text-[10px] text-primary flex items-center gap-1 mt-0.5"><User className="w-3 h-3" />{responsible.nome_exibicao}</p>}
               </div>
-            </div>
+            </button>
           );
         };
 
         const renderFenasojaItem = (e: any) => {
           const { label: shiftLabel, Icon: ShiftIcon } = getFenasojaShift(e.inicio_em);
           return (
-            <div
+            <button
+              type="button"
               key={e.id}
               onClick={() => navigate('/fenasoja-events')}
-              className="group/fe relative overflow-hidden flex items-center gap-3 p-2.5 pl-3 rounded-xl cursor-pointer transition-all active:scale-[0.98]
-                         bg-[linear-gradient(135deg,hsl(var(--gold)/0.08)_0%,hsl(var(--card)/0.6)_60%,transparent_100%)]
-                         border border-gold/20 hover:border-gold/40 hover:shadow-[0_8px_20px_-10px_hsl(var(--gold)/0.4)]"
+              className="flex w-full items-center gap-3 rounded-lg border border-warning/25 bg-warning/[0.07] p-2.5 text-left transition-colors duration-150 hover:bg-warning/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
             >
-              <div className="absolute left-0 top-1 bottom-1 w-[3px] rounded-r-full bg-gradient-to-b from-gold via-gold/80 to-gold/30 shadow-[0_0_8px_hsl(var(--gold)/0.5)]" aria-hidden />
               <div className="flex flex-col items-center gap-0.5 shrink-0 min-w-[52px]">
-                <div className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md bg-gradient-to-br from-gold/25 via-gold/10 to-transparent border border-gold/30 text-gold">
+                <div className="inline-flex items-center gap-1 rounded-md border border-warning/30 bg-warning/15 px-1.5 py-0.5 text-warning-foreground">
                   <ShiftIcon className="w-2.5 h-2.5" aria-hidden />
                   <span className="text-[8px] uppercase tracking-wider font-bold">{shiftLabel}</span>
                 </div>
-                <p className="text-[11px] font-mono font-bold tabular-nums text-foreground" style={{ textShadow: '0 0 10px hsl(var(--gold) / 0.2)' }}>
+                <p className="text-[11px] font-mono font-bold tabular-nums text-foreground">
                   {rawTime(e.inicio_em)}
                 </p>
               </div>
@@ -656,7 +660,7 @@ export default function Dashboard() {
                   </span>
                 )}
               </div>
-            </div>
+            </button>
           );
         };
 
@@ -675,7 +679,7 @@ export default function Dashboard() {
                   <p className={`text-[10px] font-semibold uppercase tracking-wider mb-1.5 flex items-center gap-1.5 ${isToday ? accentClass : 'text-muted-foreground'}`}>
                     <span>{day.label}</span>
                     <span className="opacity-60">— {day.ddmm}</span>
-                    {isToday && <span className={`ml-1 h-1.5 w-1.5 rounded-full animate-pulse ${accentClass.includes('gold') ? 'bg-gold' : 'bg-primary'}`} />}
+                    {isToday && <span className={`ml-1 h-1.5 w-1.5 rounded-full ${accentClass.includes('gold') ? 'bg-gold' : 'bg-primary'}`} />}
                   </p>
                   <div className="space-y-1.5">{items.map(renderer)}</div>
                 </div>
@@ -712,7 +716,7 @@ export default function Dashboard() {
               <div className="grid sm:grid-cols-2 gap-4 sm:divide-x sm:divide-border/40">
                 {/* ── Coluna 1 — Transportes & Agenda ── */}
                 <div className="space-y-3 sm:pr-4 max-h-[460px] overflow-y-auto pr-1">
-                  <div className="flex items-center justify-between sticky top-0 bg-card/80 backdrop-blur-sm py-1 z-10">
+                  <div className="sticky top-0 z-10 flex items-center justify-between bg-card py-1">
                     <h3 className="text-[11px] font-bold uppercase tracking-wider text-primary flex items-center gap-1.5">
                       <MapPin className="w-3 h-3" /> Transportes & Agenda
                     </h3>
@@ -729,7 +733,7 @@ export default function Dashboard() {
 
                 {/* ── Coluna 2 — Eventos Fenasoja ── */}
                 <div className="space-y-3 sm:pl-4 max-h-[460px] overflow-y-auto pr-1">
-                  <div className="flex items-center justify-between sticky top-0 bg-card/80 backdrop-blur-sm py-1 z-10">
+                  <div className="sticky top-0 z-10 flex items-center justify-between bg-card py-1">
                     <h3 className="text-[11px] font-bold uppercase tracking-wider text-gold flex items-center gap-1.5">
                       <Sparkles className="w-3 h-3" /> Eventos Fenasoja
                     </h3>
@@ -781,7 +785,12 @@ export default function Dashboard() {
           {pendingTasksList.map((t: any) => {
             const member = members.find((m: any) => m.user_id === t.assignee_user_id);
             return (
-              <div key={t.id} className="flex items-center gap-3 p-2.5 rounded-xl bg-muted/40 cursor-pointer hover:bg-muted/60 active:scale-[0.98] transition-all" onClick={() => navigate('/checklist')}>
+              <button
+                type="button"
+                key={t.id}
+                className="flex w-full items-center gap-3 rounded-xl bg-muted/40 p-2.5 text-left transition-colors duration-150 hover:bg-muted/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                onClick={() => navigate('/checklist')}
+              >
                 <div className={cn('w-2 h-2 rounded-full shrink-0',
                   t.prioridade === 'urgente' ? 'bg-destructive' :
                   t.prioridade === 'alta' ? 'bg-accent' :
@@ -796,14 +805,14 @@ export default function Dashboard() {
                     <Clock className="w-3 h-3" />{rawTime(t.due_em)}
                   </span>
                 )}
-              </div>
+              </button>
             );
           })}
         </div>
       </Section>
 
       {/* ─── Resumo executivo do período ─── */}
-      <div className="animate-fade-in" style={{ animationDelay: '200ms' }}>
+      <div>
         <PeriodReportCard metrics={metrics} />
       </div>
 

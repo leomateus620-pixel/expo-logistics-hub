@@ -21,36 +21,21 @@ const OPTIONS: { key: CartStatusFilter; label: string }[] = [
 
 export default function ElectricCartsFilters({ search, onSearch, status, onStatus, counts, onAdd }: Props) {
   return (
-    <div
-      className={cn(
-        'relative overflow-hidden rounded-2xl border border-border/40',
-        'bg-gradient-to-br from-card/85 via-card/65 to-card/45 backdrop-blur-2xl',
-        'shadow-[0_8px_32px_-12px_rgba(0,0,0,0.25),inset_0_1px_0_rgba(255,255,255,0.08)]',
-        'p-3 sm:p-4'
-      )}
-    >
-      {/* Decorative halo — same language as cards */}
-      <div className="pointer-events-none absolute -top-12 -right-12 w-40 h-40 blur-3xl opacity-50 bg-[radial-gradient(circle,hsl(var(--primary)/0.35),transparent_60%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.06),transparent_50%)]" />
-
-      <div className="relative flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+    <div className="rounded-xl border border-border bg-card p-3 shadow-xs sm:p-4">
+      <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
         <div className="relative flex-1 max-w-md">
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none transition-colors" />
           <Input
             value={search}
             onChange={(e) => onSearch(e.target.value)}
             placeholder="Buscar por código ou nome..."
-            className={cn(
-              'pl-9 pr-9 h-11 rounded-xl',
-              'bg-background/40 backdrop-blur-sm border-border/50',
-              'focus-visible:ring-2 focus-visible:ring-primary/40 focus-visible:border-primary/40 transition-all'
-            )}
+            className="h-11 rounded-lg bg-background pl-9 pr-10"
           />
           {search && (
             <button
               onClick={() => onSearch('')}
               aria-label="Limpar busca"
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 rounded-md hover:bg-muted text-muted-foreground transition-colors"
+              className="absolute right-1 top-1/2 flex min-h-10 min-w-10 -translate-y-1/2 items-center justify-center rounded-md text-muted-foreground transition-colors duration-150 hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <X className="w-3.5 h-3.5" />
             </button>
@@ -59,8 +44,7 @@ export default function ElectricCartsFilters({ search, onSearch, status, onStatu
 
         <div
           className={cn(
-            'inline-flex items-center p-1 rounded-xl border border-border/40',
-            'bg-background/30 backdrop-blur-sm shadow-[inset_0_1px_0_rgba(255,255,255,0.05)] gap-1'
+            'inline-flex items-center gap-1 rounded-lg border border-border bg-secondary/50 p-1'
           )}
         >
           {OPTIONS.map((o) => {
@@ -70,11 +54,12 @@ export default function ElectricCartsFilters({ search, onSearch, status, onStatu
               <button
                 key={o.key}
                 onClick={() => onStatus(o.key)}
+                aria-pressed={active}
                 className={cn(
-                  'transform-gpu px-3 sm:px-4 h-9 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 flex items-center gap-1.5',
+                  'flex h-10 items-center gap-1.5 rounded-md px-3 text-xs font-medium transition-colors duration-150 sm:px-4 sm:text-sm',
                   active
-                    ? 'bg-gradient-to-r from-primary to-primary/85 text-primary-foreground shadow-[0_4px_16px_-4px_hsl(var(--primary)/0.45),inset_0_1px_0_rgba(255,255,255,0.15)]'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/40'
+                    ? 'bg-primary text-primary-foreground shadow-xs'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
                 )}
               >
                 {o.label}
@@ -96,9 +81,8 @@ export default function ElectricCartsFilters({ search, onSearch, status, onStatu
             onClick={onAdd}
             aria-label="Adicionar carrinho elétrico"
             className={cn(
-              'shrink-0 inline-flex items-center justify-center gap-1.5 h-11 sm:h-9 px-3 rounded-xl',
-              'border border-border/50 bg-background/40 backdrop-blur-sm text-sm font-medium',
-              'hover:bg-muted/60 hover:text-foreground text-muted-foreground transition-all active:scale-[0.97]'
+              'inline-flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-lg border border-border bg-background px-3 text-sm font-medium text-muted-foreground',
+              'transition-colors duration-150 hover:bg-muted hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
             )}
           >
             <Plus className="w-4 h-4" />

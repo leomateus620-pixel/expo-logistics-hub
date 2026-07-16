@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
-import { AlertTriangle, ArrowRight, BarChart3, ClipboardList, Database, FileText, Info, Layers3, ListChecks, ShieldCheck, Sparkles, UsersRound, Workflow, type LucideIcon } from 'lucide-react';
+import { AlertTriangle, ArrowRight, ClipboardList, FileText, Layers3, ShieldCheck, Workflow } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import {
@@ -14,61 +14,26 @@ interface CommissionDashboardPlaceholderProps {
   module: CommissionModule;
 }
 
-interface ScopeListCardProps {
-  title: string;
-  items?: string[];
-  icon: LucideIcon;
-  tone?: 'default' | 'gold' | 'red';
-}
-
 function getActiveMenu(module: CommissionModule, pathname: string) {
   const relative = pathname.replace(module.basePath, '').replace(/^\/+/, '');
   const currentPath = relative || 'dashboard';
   return module.menus.find((item) => item.path === currentPath) ?? module.menus[0];
 }
 
-function ScopeListCard({ title, items, icon: Icon, tone = 'default' }: ScopeListCardProps) {
-  if (!items?.length) return null;
-
-  return (
-    <div className="liquid-glass-card rounded-xl p-4 md:p-5">
-      <div className="mb-3 flex items-center gap-3">
-        <div
-          className={cn(
-            'flex h-9 w-9 shrink-0 items-center justify-center rounded-xl',
-            tone === 'red' ? 'bg-red-500/10 text-red-600 dark:text-red-300' : 'bg-gold/15 text-gold'
-          )}
-        >
-          <Icon className="h-4 w-4" aria-hidden="true" />
-        </div>
-        <h3 className="text-sm font-bold text-foreground">{title}</h3>
-      </div>
-      <ul className="space-y-2 text-sm leading-6 text-muted-foreground">
-        {items.map((item) => (
-          <li key={item} className="flex gap-2">
-            <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-gold" aria-hidden="true" />
-            <span>{item}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
 function getScopeSections(activeMenu: CommissionMenuItem) {
   return [
-    { title: 'Atividades principais', items: activeMenu.activities, icon: ListChecks },
-    { title: 'Tarefas previstas', items: activeMenu.tasks, icon: ClipboardList },
-    { title: 'Dados que serão registrados', items: activeMenu.dataInputs, icon: Database },
-    { title: 'Saídas esperadas', items: activeMenu.outputs, icon: Workflow },
-    { title: 'Indicadores futuros', items: activeMenu.indicators, icon: BarChart3 },
-    { title: 'Relatórios esperados', items: activeMenu.reports, icon: FileText },
-    { title: 'Responsáveis prováveis', items: activeMenu.responsibleProfiles, icon: UsersRound },
-    { title: 'Fluxo de status', items: activeMenu.statusFlow, icon: Workflow },
-    { title: 'Regras de prioridade', items: activeMenu.priorityRules, icon: AlertTriangle },
-    { title: 'Observações', items: activeMenu.notes, icon: Info },
-    { title: 'Melhorias futuras', items: activeMenu.futureEnhancements, icon: Sparkles },
-  ];
+    { title: 'Atividades principais', items: activeMenu.activities },
+    { title: 'Tarefas previstas', items: activeMenu.tasks },
+    { title: 'Dados registrados', items: activeMenu.dataInputs },
+    { title: 'Saídas esperadas', items: activeMenu.outputs },
+    { title: 'Indicadores', items: activeMenu.indicators },
+    { title: 'Relatórios', items: activeMenu.reports },
+    { title: 'Perfis responsáveis', items: activeMenu.responsibleProfiles },
+    { title: 'Fluxo de status', items: activeMenu.statusFlow },
+    { title: 'Regras de prioridade', items: activeMenu.priorityRules },
+    { title: 'Observações', items: activeMenu.notes },
+    { title: 'Evoluções previstas', items: activeMenu.futureEnhancements },
+  ].filter((section) => section.items?.length);
 }
 
 export default function CommissionDashboardPlaceholder({ module }: CommissionDashboardPlaceholderProps) {
@@ -77,153 +42,158 @@ export default function CommissionDashboardPlaceholder({ module }: CommissionDas
   const ModuleIcon = module.icon;
   const ActiveIcon = activeMenu.icon;
   const scopeSections = getScopeSections(activeMenu);
-  const filledSections = scopeSections.filter((section) => section.items?.length);
 
-  const expectedMetrics = [
-    { label: 'Áreas previstas', value: module.menus.length, icon: Sparkles },
-    { label: 'Fluxos estruturados', value: module.menus.filter((menu) => menu.path !== 'dashboard').length, icon: ClipboardList },
-    { label: 'Relatórios planejados', value: module.menus.some((menu) => menu.path.includes('relatorio')) ? 1 : 0, icon: FileText },
-  ];
+  const metrics = [
+    ['Áreas previstas', module.menus.length],
+    ['Fluxos estruturados', module.menus.filter((menu) => menu.path !== 'dashboard').length],
+    ['Relatórios planejados', module.menus.some((menu) => menu.path.includes('relatorio')) ? 1 : 0],
+  ] as const;
 
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-col gap-5">
-      <section className="premium-surface gold-accent relative overflow-hidden rounded-[2rem] p-5 md:p-7">
-        <div className={cn('absolute inset-x-0 top-0 h-40 bg-gradient-to-br opacity-80', module.accentClass)} aria-hidden="true" />
-        <div className="relative grid gap-6 lg:grid-cols-[1fr_340px] lg:items-start">
-          <div className="max-w-3xl">
+    <div className="mx-auto flex w-full max-w-7xl flex-col gap-4">
+      <section className="rounded-xl border border-border bg-card p-5 shadow-[var(--shadow-xs)] md:p-6">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
+          <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-2">
-              <span className={cn('inline-flex rounded-full border px-3 py-1.5 text-xs font-bold shadow-sm backdrop-blur-xl', statusClasses[module.status])}>
+              <span className={cn('inline-flex rounded-md border px-2 py-1 text-xs font-bold', statusClasses[module.status])}>
                 {statusLabels[module.status]}
               </span>
               {module.sensitive && (
-                <span className="inline-flex items-center gap-1.5 rounded-full border border-red-500/25 bg-red-500/10 px-3 py-1.5 text-xs font-bold text-red-700 dark:text-red-300">
+                <span className="inline-flex items-center gap-1.5 rounded-md border border-destructive/25 bg-destructive/[0.08] px-2 py-1 text-xs font-bold text-destructive">
                   <ShieldCheck className="h-3.5 w-3.5" aria-hidden="true" />
-                  Sensível
+                  Acesso sensível
                 </span>
               )}
             </div>
+
             <div className="mt-5 flex items-center gap-4">
-              <div className={cn('flex h-16 w-16 items-center justify-center rounded-3xl shadow-lg ring-1 ring-white/40', module.visual.iconBackground)}>
-                <ModuleIcon className="h-8 w-8" aria-hidden="true" />
+              <div className={cn('flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-border bg-secondary text-primary', module.visual.iconBackground)}>
+                <ModuleIcon className="h-6 w-6" aria-hidden="true" />
               </div>
-              <div>
-                <p className="text-xs font-bold uppercase tracking-[0.22em] text-gold">Módulo</p>
-                <h1 className="text-3xl font-black tracking-tight text-foreground md:text-4xl">{module.name}</h1>
+              <div className="min-w-0">
+                <p className="text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">Comissão</p>
+                <h1 className="truncate text-3xl font-black tracking-tight text-foreground">{module.name}</h1>
               </div>
             </div>
-            <p className="mt-5 max-w-2xl text-sm leading-7 text-muted-foreground md:text-base">
-              Este módulo está preparado para receber os fluxos específicos da comissão. A estrutura de navegação,
-              permissões e rotas já está pronta para evoluir sem misturar dados entre comissões.
-            </p>
-            <div className="mt-5 flex flex-wrap gap-2 text-xs font-semibold text-muted-foreground">
-              <span className="rounded-full border border-border/50 bg-card/50 px-3 py-1.5">Tema: {module.visual.motionHint}</span>
-              <span className="rounded-full border border-border/50 bg-card/50 px-3 py-1.5">Registry centralizado</span>
-            </div>
+            <p className="mt-4 max-w-3xl text-sm leading-6 text-muted-foreground">{module.description}</p>
           </div>
 
-          <div className="liquid-glass-card rounded-3xl p-5">
+          <aside className="rounded-lg border border-border bg-secondary p-4" aria-label="Área atual">
             <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gold/15 text-gold ring-1 ring-gold/20">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                 <ActiveIcon className="h-5 w-5" aria-hidden="true" />
-              </div>
-              <div>
+              </span>
+              <div className="min-w-0">
                 <p className="text-xs font-semibold text-muted-foreground">Área atual</p>
-                <h2 className="font-black text-foreground">{activeMenu.label}</h2>
+                <h2 className="truncate font-black text-foreground">{activeMenu.label}</h2>
               </div>
             </div>
-            <p className="mt-4 text-sm leading-6 text-muted-foreground">{activeMenu.description}</p>
-          </div>
+            <p className="mt-3 text-sm leading-6 text-muted-foreground">{activeMenu.description}</p>
+          </aside>
         </div>
 
         {module.sensitive && (
-          <div className="relative mt-5 flex gap-3 rounded-2xl border border-red-500/25 bg-red-500/10 p-4 text-sm leading-6 text-red-800 dark:text-red-200">
+          <div className="mt-5 flex gap-3 rounded-lg border border-destructive/25 bg-destructive/[0.07] p-3 text-sm leading-6 text-destructive">
             <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0" aria-hidden="true" />
-            <p>Módulo sensível: requer validação e permissões específicas. Nenhum dado financeiro real foi implementado nesta etapa.</p>
+            <p>Este módulo exige validação e permissões específicas. Nenhum dado financeiro foi inventado para preencher a interface.</p>
           </div>
         )}
       </section>
 
-      <section className="grid gap-4 md:grid-cols-3">
-        {expectedMetrics.map(({ label, value, icon: Icon }) => (
-          <div key={label} className="liquid-glass-card interactive-lift rounded-3xl p-5">
-            <div className="flex items-center justify-between gap-3">
-              <p className="text-sm font-semibold text-muted-foreground">{label}</p>
-              <Icon className="h-5 w-5 text-gold" aria-hidden="true" />
+      <section className="overflow-hidden rounded-xl border border-border bg-card shadow-[var(--shadow-xs)]" aria-label="Resumo do módulo">
+        <dl className="grid sm:grid-cols-3">
+          {metrics.map(([label, value], index) => (
+            <div key={label} className={cn('px-5 py-4', index > 0 && 'border-t border-border sm:border-l sm:border-t-0')}>
+              <dt className="text-xs font-semibold text-muted-foreground">{label}</dt>
+              <dd className="mt-1 text-2xl font-black text-foreground">{value}</dd>
             </div>
-            <p className="mt-4 text-4xl font-black text-foreground">{value}</p>
-          </div>
-        ))}
+          ))}
+        </dl>
       </section>
 
-      <section className="grid gap-4 lg:grid-cols-[1.25fr_0.75fr]">
-        <div className="liquid-glass-card rounded-3xl p-4 md:p-6">
-          <div className="mb-5 flex items-center justify-between gap-3">
-            <div>
-              <p className="text-xs font-bold uppercase tracking-[0.2em] text-gold">Menus previstos</p>
-              <h2 className="text-2xl font-black tracking-tight text-foreground">Estrutura do módulo</h2>
-            </div>
-          </div>
-          <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-start">
+        <section className="overflow-hidden rounded-xl border border-border bg-card shadow-[var(--shadow-xs)]" aria-labelledby="module-navigation-title">
+          <header className="border-b border-border px-4 py-3">
+            <h2 id="module-navigation-title" className="text-base font-bold text-foreground">Estrutura do módulo</h2>
+            <p className="mt-1 text-xs text-muted-foreground">Áreas disponíveis nesta comissão.</p>
+          </header>
+          <nav className="divide-y divide-border" aria-label={`Áreas de ${module.name}`}>
             {module.menus.map((item) => {
               const Icon = item.icon;
+              const isActive = activeMenu.path === item.path;
               return (
                 <Link
                   key={item.path}
                   to={getModuleRoute(module, item.path)}
+                  aria-current={isActive ? 'page' : undefined}
                   className={cn(
-                    'group rounded-2xl border p-4 transition focus-ring active:scale-[0.99]',
-                    activeMenu.path === item.path
-                      ? 'border-gold/30 bg-gold/10 shadow-lg shadow-gold/5'
-                      : 'border-border/50 bg-card/40 hover:border-gold/30 hover:bg-card/80'
+                    'group flex items-start gap-3 px-4 py-3 transition-colors duration-150 focus-ring',
+                    isActive ? 'bg-accent' : 'hover:bg-secondary',
                   )}
                 >
-                  <div className="flex items-start gap-3">
-                    <div className={cn('flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl transition group-hover:scale-105', module.visual.iconBackground)}>
-                      <Icon className="h-4 w-4" aria-hidden="true" />
-                    </div>
-                    <div className="min-w-0">
-                      <p className="font-bold text-foreground">{item.label}</p>
-                      <p className="mt-1 line-clamp-2 text-xs leading-5 text-muted-foreground">{item.description}</p>
-                    </div>
-                  </div>
+                  <span className={cn('mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg', isActive ? 'bg-primary text-primary-foreground' : 'bg-secondary text-primary')}>
+                    <Icon className="h-4 w-4" aria-hidden="true" />
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-sm font-bold text-foreground">{item.label}</span>
+                    <span className="mt-0.5 block text-xs leading-5 text-muted-foreground">{item.description}</span>
+                  </span>
+                  <ArrowRight className="mt-2 h-4 w-4 shrink-0 text-muted-foreground" aria-hidden="true" />
                 </Link>
               );
             })}
-          </div>
-        </div>
+          </nav>
+        </section>
 
-        <div className="space-y-4">
-          <div className="liquid-glass-card rounded-3xl p-5 md:p-6">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-gold">Próximos passos</p>
-            <ul className="mt-4 space-y-3 text-sm leading-6 text-muted-foreground">
-              {[
-                'Definir dados reais e responsáveis da comissão.',
-                'Criar tabelas ou consultas específicas quando o fluxo estiver validado.',
-                'Conectar indicadores reais ao dashboard do administrador.',
-              ].map((item) => (
-                <li key={item} className="flex gap-2">
-                  <ArrowRight className="mt-1 h-4 w-4 shrink-0 text-gold" aria-hidden="true" />
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="liquid-glass-card rounded-3xl p-5 md:p-6">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gold/15 text-gold">
-              <Layers3 className="h-6 w-6" aria-hidden="true" />
+        <section className="overflow-hidden rounded-xl border border-border bg-card shadow-[var(--shadow-xs)]" aria-labelledby="current-scope-title">
+          <header className="flex items-start gap-3 border-b border-border px-4 py-3">
+            <Workflow className="mt-0.5 h-5 w-5 text-primary" aria-hidden="true" />
+            <div>
+              <h2 id="current-scope-title" className="text-base font-bold text-foreground">Escopo de {activeMenu.label}</h2>
+              <p className="mt-1 text-xs text-muted-foreground">Definições registradas sem dados operacionais fictícios.</p>
             </div>
-            <p className="mt-4 text-xs font-bold uppercase tracking-[0.2em] text-gold">Módulo em estruturação</p>
-            <p className="mt-3 text-sm leading-6 text-muted-foreground">
-              Espaço reservado para demandas, anexos e relatórios do módulo. Os dados desta etapa são derivados do registry,
-              sem inventar registros operacionais.
-            </p>
-            <Button asChild className="mt-4 w-full rounded-2xl">
-              <Link to="/admin/geral">Acompanhar no admin</Link>
+          </header>
+
+          {scopeSections.length > 0 ? (
+            <div className="divide-y divide-border">
+              {scopeSections.map((section) => (
+                <div key={section.title} className="grid gap-2 px-4 py-3 sm:grid-cols-[160px_minmax(0,1fr)]">
+                  <h3 className="text-xs font-bold text-foreground">{section.title}</h3>
+                  <ul className="space-y-1.5 text-sm leading-5 text-muted-foreground">
+                    {section.items?.map((item) => (
+                      <li key={item} className="flex gap-2">
+                        <span className="mt-2 h-1 w-1 shrink-0 rounded-full bg-action" aria-hidden="true" />
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="px-4 py-8 text-center">
+              <Layers3 className="mx-auto h-7 w-7 text-primary" aria-hidden="true" />
+              <p className="mt-3 text-sm font-bold text-foreground">Estrutura preparada para evolução</p>
+              <p className="mx-auto mt-1 max-w-md text-xs leading-5 text-muted-foreground">
+                Rotas e permissões estão preservadas. Dados e indicadores serão conectados quando o fluxo real desta comissão for validado.
+              </p>
+            </div>
+          )}
+
+          <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-border bg-secondary px-4 py-3">
+            <span className="inline-flex items-center gap-2 text-xs font-semibold text-muted-foreground">
+              <ClipboardList className="h-4 w-4" aria-hidden="true" />
+              Registry centralizado
+            </span>
+            <Button asChild size="sm" variant="outline">
+              <Link to="/admin/geral">
+                <FileText className="mr-2 h-4 w-4" aria-hidden="true" />
+                Acompanhar no admin
+              </Link>
             </Button>
-          </div>
-        </div>
-      </section>
+          </footer>
+        </section>
+      </div>
     </div>
   );
 }

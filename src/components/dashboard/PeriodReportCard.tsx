@@ -1,11 +1,12 @@
 import { useNavigate } from 'react-router-dom';
-import { FileText, ArrowRight } from 'lucide-react';
+import { ArrowRight, FileText } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import type { useDashboardMetrics } from '@/hooks/useDashboardMetrics';
-import { PERIOD_START, PERIOD_END } from '@/hooks/useDashboardMetrics';
+import { PERIOD_END, PERIOD_START } from '@/hooks/useDashboardMetrics';
 
 type Metrics = ReturnType<typeof useDashboardMetrics>;
 
-const fmt = (k: string) => k.split('-').slice(1).reverse().join('/');
+const fmt = (key: string) => key.split('-').slice(1).reverse().join('/');
 
 export default function PeriodReportCard({ metrics }: { metrics: Metrics }) {
   const navigate = useNavigate();
@@ -21,40 +22,37 @@ export default function PeriodReportCard({ metrics }: { metrics: Metrics }) {
   ];
 
   return (
-    <div className="relative rounded-2xl overflow-hidden bg-gradient-to-br from-card/80 via-card/60 to-card/80 backdrop-blur-2xl border border-gold/30 shadow-[0_12px_36px_-14px_hsl(var(--gold)/0.25),inset_0_1px_0_rgba(255,255,255,0.08)]">
-      <div aria-hidden className="absolute inset-x-0 top-0 h-px" style={{ background: 'linear-gradient(90deg, transparent, hsl(var(--gold)), transparent)' }} />
-      <div aria-hidden className="absolute -top-12 -right-12 w-44 h-44 rounded-full bg-gold/10 blur-3xl pointer-events-none" />
-
-      <div className="relative p-5">
-        <div className="flex items-start justify-between gap-3 mb-4">
-          <div>
-            <p className="text-[10px] font-bold uppercase tracking-wider text-gold">Resumo do período</p>
-            <h2 className="text-base sm:text-lg font-extrabold tracking-tight text-foreground mt-0.5">
-              {fmt(PERIOD_START)} → {fmt(PERIOD_END)}
-            </h2>
-          </div>
-          <div className="rounded-xl p-2 bg-gold/15 ring-1 ring-gold/30">
-            <FileText className="w-4 h-4 text-gold" />
-          </div>
+    <section className="overflow-hidden rounded-xl border border-border bg-card shadow-[var(--shadow-xs)]" aria-labelledby="period-summary-title">
+      <header className="flex flex-wrap items-start justify-between gap-3 border-b border-border px-4 py-4">
+        <div>
+          <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground">Resumo do período operacional</p>
+          <h2 id="period-summary-title" className="mt-1 text-lg font-black tracking-tight text-foreground">
+            {fmt(PERIOD_START)} → {fmt(PERIOD_END)}
+          </h2>
         </div>
+        <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent text-primary">
+          <FileText className="h-4 w-4" aria-hidden="true" />
+        </span>
+      </header>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-          {items.map(it => (
-            <div key={it.label} className="rounded-xl bg-card/60 border border-border/40 p-2.5">
-              <p className="text-[9px] font-semibold uppercase tracking-wider text-muted-foreground">{it.label}</p>
-              <p className="text-base font-extrabold tabular-nums text-foreground mt-0.5">{it.value}</p>
-            </div>
-          ))}
-        </div>
+      <dl className="grid grid-cols-2 sm:grid-cols-4">
+        {items.map((item, index) => (
+          <div
+            key={item.label}
+            className={`px-4 py-3 ${index >= 2 ? 'border-t border-border' : ''} ${index % 2 ? 'border-l border-border' : ''} sm:border-t-0 sm:[&:nth-child(n+5)]:border-t sm:[&:not(:nth-child(4n+1))]:border-l`}
+          >
+            <dt className="text-[10px] font-semibold text-muted-foreground">{item.label}</dt>
+            <dd className="mt-0.5 text-lg font-black text-foreground tabular-nums">{item.value}</dd>
+          </div>
+        ))}
+      </dl>
 
-        <button
-          type="button"
-          onClick={() => navigate('/system-report')}
-          className="mt-4 w-full inline-flex items-center justify-center gap-2 h-11 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 active:scale-[0.98] transition-all"
-        >
-          Gerar relatório completo <ArrowRight className="w-4 h-4" />
-        </button>
-      </div>
-    </div>
+      <footer className="border-t border-border bg-secondary px-4 py-3">
+        <Button type="button" onClick={() => navigate('/system-report')} className="w-full sm:w-auto">
+          Gerar relatório completo
+          <ArrowRight className="ml-2 h-4 w-4" aria-hidden="true" />
+        </Button>
+      </footer>
+    </section>
   );
 }

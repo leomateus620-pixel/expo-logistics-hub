@@ -31,22 +31,22 @@ export default function FuelExpensesChart({ data, totalValor, totalLitros, total
             <ComposedChart data={data} margin={{ top: 6, right: 6, left: -22, bottom: 0 }}>
               <defs>
                 <linearGradient id="fuelGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.95} />
-                  <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity={0.5} />
+                  <stop offset="0%" stopColor="oklch(var(--primary))" stopOpacity={0.95} />
+                  <stop offset="100%" stopColor="oklch(var(--primary))" stopOpacity={0.5} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border) / 0.4)" vertical={false} />
-              <XAxis dataKey="dia" tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
-              <YAxis yAxisId="left" tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
-              <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
+              <CartesianGrid strokeDasharray="3 3" stroke="oklch(var(--border) / 0.4)" vertical={false} />
+              <XAxis dataKey="dia" tick={{ fontSize: 10, fill: 'oklch(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
+              <YAxis yAxisId="left" tick={{ fontSize: 10, fill: 'oklch(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
+              <YAxis yAxisId="right" orientation="right" tick={{ fontSize: 10, fill: 'oklch(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
               <Tooltip
-                contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 12, fontSize: 11, padding: 8 }}
+                contentStyle={{ background: 'oklch(var(--card))', border: '1px solid oklch(var(--border))', borderRadius: 12, fontSize: 11, padding: 8 }}
                 formatter={(v: number, name: string) => name === 'Valor (R$)' ? [fmtBRL(v), name] : [`${v} L`, name]}
-                cursor={{ fill: 'hsl(var(--primary) / 0.1)' }}
+                cursor={{ fill: 'oklch(var(--primary) / 0.1)' }}
               />
               <Legend wrapperStyle={{ fontSize: 10 }} iconType="circle" iconSize={8} />
               <Bar yAxisId="left" dataKey="valor" name="Valor (R$)" fill="url(#fuelGrad)" radius={[6, 6, 0, 0]} />
-              <Line yAxisId="right" type="monotone" dataKey="litros" name="Litros" stroke="hsl(var(--gold))" strokeWidth={2} dot={{ r: 2.5, fill: 'hsl(var(--gold))' }} />
+              <Line yAxisId="right" type="monotone" dataKey="litros" name="Litros" stroke="oklch(var(--gold))" strokeWidth={2} dot={{ r: 2.5, fill: 'oklch(var(--gold))' }} />
             </ComposedChart>
           </ResponsiveContainer>
           {topVeh && (

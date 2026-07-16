@@ -1,73 +1,49 @@
-# Welcome to your Lovable project
+# Expo Logistics Hub — Fenasoja 2028
 
-## Project info
+Sistema web operacional da Comissão de Logística da Fenasoja 2028. A aplicação reúne dashboard, transportes, frota, carrinhos, patinetes, hóspedes, agenda, mapa comercial, cronograma e relatórios, preservando as rotas, permissões, integrações e regras de negócio existentes.
 
-**URL**: https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID
+## Requisitos
 
-## How can I edit this code?
+- Node.js 20 ou superior;
+- npm;
+- acesso às variáveis públicas do projeto Supabase.
 
-There are several ways of editing your application.
+Crie o arquivo de ambiente local sem versionar credenciais:
 
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```env
+VITE_SUPABASE_URL=...
+VITE_SUPABASE_PUBLISHABLE_KEY=...
 ```
 
-**Edit a file directly in GitHub**
+## Desenvolvimento local
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```powershell
+npm.cmd install
+npm.cmd run dev
+```
 
-**Use GitHub Codespaces**
+O servidor Vite informa a URL local no terminal. A autenticação e os dados continuam usando a integração Supabase configurada pelo projeto; não há dados mockados para substituir uma sessão indisponível.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## Validação
 
-## What technologies are used for this project?
+```powershell
+npx.cmd tsc -p tsconfig.app.json --noEmit
+npm.cmd test
+npm.cmd run build
+npm.cmd run lint
+```
 
-This project is built with:
+O lint global contém dívida histórica conhecida. Em mudanças focadas, compare a contagem global com a linha de base e valide separadamente os arquivos alterados.
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## Arquitetura visual 2028
 
-## How can I deploy this project?
+- Tokens canônicos: `src/styles/tokens.css`;
+- constantes de marca para TypeScript, PDF e canvas: `src/lib/fenasoja-brand.ts`;
+- lockup vetorial: `src/components/brand/FenasojaBrand.tsx`;
+- regras e matriz de aceite: [`docs/FENASOJA_2028_DESIGN_SYSTEM.md`](docs/FENASOJA_2028_DESIGN_SYSTEM.md).
 
-Simply open [Lovable](https://lovable.dev/projects/REPLACE_WITH_PROJECT_ID) and click on Share -> Publish.
+Referências históricas de 2026 continuam válidas quando representam dados, datas, migrations, o ciclo 2026–2028 ou a proveniência oficial do mapa. A apresentação corrente do produto usa Fenasoja 2028.
 
-## Can I connect a custom domain to my Lovable project?
+## Produção
 
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+Gere o artefato com `npm.cmd run build` e publique o diretório `dist` pelo pipeline já adotado pelo repositório. Variáveis de ambiente e políticas Supabase devem ser configuradas no ambiente de destino; nunca inclua chaves ou credenciais no código ou na documentação.

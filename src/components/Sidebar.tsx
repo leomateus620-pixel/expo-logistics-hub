@@ -4,7 +4,7 @@ import {
   PanelLeftClose, PanelLeftOpen, LogOut, Settings, ClipboardList, X, Gauge, FileText, Receipt, ShieldCheck, CalendarCheck2, MapPinned,
 } from 'lucide-react';
 import { useFenasojaEvents } from '@/hooks/useFenasojaEvents';
-import logo from '@/assets/logofeira26.webp';
+import { FenasojaBrand } from '@/components/brand/FenasojaBrand';
 import { useAuth } from '@/hooks/useAuth';
 import { useTransports } from '@/hooks/useTransports';
 import { useEvents } from '@/hooks/useEvents';
@@ -64,7 +64,7 @@ interface SidebarProps {
 function SidebarBadge({ count }: { count: number }) {
   if (count <= 0) return null;
   return (
-    <span className="ml-auto min-w-[20px] h-[20px] text-[10px] font-bold rounded-full bg-gold/20 text-gold flex items-center justify-center leading-none">
+    <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-md bg-action px-1 text-[10px] font-black leading-none text-action-foreground">
       {count > 99 ? '99+' : count}
     </span>
   );
@@ -121,7 +121,7 @@ export default function Sidebar({ collapsed, onToggle, isMobile, mobileOpen, onM
     return parts.length > 0 ? parts.join(' · ') : null;
   }, [badges]);
 
-  const sidebarBg = 'linear-gradient(180deg, hsl(var(--sidebar-background)), hsl(var(--sidebar-background) / 0.95))';
+  const sidebarBg = 'oklch(var(--sidebar-background))';
 
   /* ── Shared nav renderer ── */
   const renderNav = (mobile: boolean) => (
@@ -136,7 +136,7 @@ export default function Sidebar({ collapsed, onToggle, isMobile, mobileOpen, onM
       {!capsLoading && groups.map((group) => (
         <div key={group.title}>
           {!collapsed && (
-            <p className="text-[9px] uppercase tracking-[0.18em] text-gold/50 font-semibold px-3 pt-5 pb-1.5 select-none">
+            <p className="select-none px-3 pb-1.5 pt-5 text-[9px] font-bold uppercase tracking-[0.16em] text-sidebar-foreground/45">
               {group.title}
             </p>
           )}
@@ -150,12 +150,12 @@ export default function Sidebar({ collapsed, onToggle, isMobile, mobileOpen, onM
                 onClick={mobile ? onMobileClose : undefined}
                 className={({ isActive }) =>
                   cn(
-                    'flex items-center gap-3 rounded-xl text-sm font-medium transition-all duration-200 focus-ring relative',
+                    'relative flex items-center gap-3 rounded-lg text-sm font-medium transition-[background-color,color] duration-150 focus-ring',
                     collapsed ? 'justify-center px-2' : 'px-3',
-                    mobile ? 'py-3 gap-3.5 active:scale-[0.97] active:bg-white/10' : 'py-2.5',
+                    mobile ? 'gap-3.5 py-3 active:bg-white/10' : 'py-2.5',
                     isActive
-                      ? 'bg-gold/10 text-gold font-semibold sidebar-gold-bar'
-                      : 'text-sidebar-foreground/65 hover:text-sidebar-foreground hover:bg-white/[0.06] '
+                      ? 'bg-sidebar-accent text-sidebar-accent-foreground font-semibold'
+                      : 'text-sidebar-foreground/68 hover:bg-white/[0.06] hover:text-sidebar-foreground'
                   )
                 }
               >
@@ -164,7 +164,7 @@ export default function Sidebar({ collapsed, onToggle, isMobile, mobileOpen, onM
                     <Icon className={cn(
                       'shrink-0',
                       mobile ? 'w-5 h-5' : 'w-4 h-4',
-                      isActive ? 'text-gold' : ''
+                      isActive ? 'text-action' : ''
                     )} aria-hidden="true" />
                     {!collapsed && <span className="truncate">{label}</span>}
                     {!collapsed && <SidebarBadge count={badges.get(to) || 0} />}
@@ -181,24 +181,14 @@ export default function Sidebar({ collapsed, onToggle, isMobile, mobileOpen, onM
 
   /* ── Header renderer ── */
   const renderHeader = (mobile: boolean) => (
-    <div className="p-3 flex items-center gap-3 border-b border-gold/10 min-h-[56px]">
-      <div className="bg-white/[0.08] rounded-xl p-1.5 shadow-sm shrink-0 ring-1 ring-gold/10">
-        <img src={logo} alt="Fenasoja" className="w-8 h-8 rounded-lg object-contain" />
-      </div>
-      {!collapsed && (
-        <div className="flex-1 min-w-0">
-          <h1 className="text-[15px] font-bold text-gold tracking-tight leading-tight">Fenasoja</h1>
-          <p className="text-[9px] tracking-[0.2em] text-sidebar-foreground/50 font-medium uppercase">Logística</p>
-          {contextLine && (
-            <p className="text-[10px] text-sidebar-foreground/35 mt-0.5 truncate">{contextLine}</p>
-          )}
-        </div>
-      )}
+    <div className={cn('flex min-h-[64px] items-center border-b border-sidebar-border p-3', collapsed ? 'flex-col gap-2' : 'gap-3')}>
+      <FenasojaBrand compact markOnly={collapsed} subtitle="Logística" tone="dark" className={cn('min-w-0', !collapsed && 'flex-1')} />
+      {!collapsed && contextLine && <span className="sr-only">{contextLine}</span>}
       <div className="flex items-center gap-1 shrink-0">
         <button
           onClick={onToggle}
           aria-label={collapsed ? 'Expandir menu' : 'Retrair menu'}
-          className="p-2 rounded-xl hover:bg-white/[0.08] active:scale-95 transition-all duration-150 text-sidebar-foreground/60 focus-ring"
+          className="rounded-lg p-2 text-sidebar-foreground/60 transition-colors duration-150 hover:bg-white/[0.08] hover:text-sidebar-foreground focus-ring"
         >
           {collapsed ? <PanelLeftOpen className="w-4 h-4" /> : <PanelLeftClose className="w-4 h-4" />}
         </button>
@@ -206,7 +196,7 @@ export default function Sidebar({ collapsed, onToggle, isMobile, mobileOpen, onM
           <button
             onClick={onMobileClose}
             aria-label="Fechar menu"
-            className="p-2 rounded-xl hover:bg-white/[0.08] active:scale-95 transition-all duration-150 text-sidebar-foreground/60 focus-ring"
+            className="rounded-lg p-2 text-sidebar-foreground/60 transition-colors duration-150 hover:bg-white/[0.08] hover:text-sidebar-foreground focus-ring"
           >
             <X className="w-4 h-4" />
           </button>
@@ -217,12 +207,12 @@ export default function Sidebar({ collapsed, onToggle, isMobile, mobileOpen, onM
 
   /* ── Footer renderer ── */
   const renderFooter = (mobile: boolean) => (
-    <div className="p-3 mx-2 border-t border-white/[0.06]">
+    <div className="mx-2 border-t border-sidebar-border p-3">
       <button
         onClick={() => { if (mobile) onMobileClose(); signOut(); }}
         aria-label="Sair da conta"
         className={cn(
-          'flex items-center gap-3 w-full rounded-xl text-sm font-medium transition-all duration-200 focus-ring',
+          'flex w-full items-center gap-3 rounded-lg text-sm font-medium transition-colors duration-150 focus-ring',
           'text-sidebar-foreground/40 hover:text-red-400 hover:bg-red-500/10',
           collapsed ? 'justify-center px-2 py-2.5' : 'px-3 py-2.5'
         )}
@@ -239,20 +229,20 @@ export default function Sidebar({ collapsed, onToggle, isMobile, mobileOpen, onM
       <>
         {mobileOpen && (
           <div
-            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-md transition-opacity"
+            className="fixed inset-0 z-40 bg-[oklch(var(--overlay)/0.70)] transition-opacity"
             onClick={onMobileClose}
           />
         )}
         <aside
           className={cn(
             'fixed left-0 top-0 bottom-0 z-50 flex flex-col',
-            'backdrop-blur-2xl border-r border-gold/10',
+            'border-r border-sidebar-border',
             mobileOpen ? 'translate-x-0' : '-translate-x-full',
-            collapsed ? 'w-[68px]' : 'w-[280px]'
+            collapsed ? 'w-[72px]' : 'w-[288px]'
           )}
           style={{
             background: sidebarBg,
-            transition: 'transform 350ms cubic-bezier(0.32, 0.72, 0, 1)',
+            transition: 'transform 200ms var(--ease-out-expo)',
           }}
         >
           {renderHeader(true)}
@@ -264,11 +254,11 @@ export default function Sidebar({ collapsed, onToggle, isMobile, mobileOpen, onM
   }
 
   // ── Desktop sidebar ──
-  const width = collapsed ? 64 : 256;
+  const width = collapsed ? 72 : 272;
 
   return (
     <aside
-      className="fixed left-0 top-0 bottom-0 flex flex-col z-50 transition-all duration-200 overflow-hidden backdrop-blur-2xl border-r border-gold/10"
+      className="fixed bottom-0 left-0 top-0 z-50 flex flex-col overflow-hidden border-r border-sidebar-border transition-[width] duration-200"
       style={{ width, background: sidebarBg }}
     >
       {renderHeader(false)}

@@ -21,17 +21,17 @@ export default function TransportsByDayChart({ data }: Props) {
       ) : (
         <ResponsiveContainer width="100%" height={220}>
           <BarChart data={data} margin={{ top: 6, right: 6, left: -22, bottom: 0 }}>
-            <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border) / 0.4)" vertical={false} />
-            <XAxis dataKey="dia" tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
-            <YAxis tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} allowDecimals={false} />
+            <CartesianGrid strokeDasharray="3 3" stroke="oklch(var(--border) / 0.4)" vertical={false} />
+            <XAxis dataKey="dia" tick={{ fontSize: 10, fill: 'oklch(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
+            <YAxis tick={{ fontSize: 10, fill: 'oklch(var(--muted-foreground))' }} axisLine={false} tickLine={false} allowDecimals={false} />
             <Tooltip
-              contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 12, fontSize: 11, padding: 8 }}
-              cursor={{ fill: 'hsl(var(--muted) / 0.4)' }}
+              contentStyle={{ background: 'oklch(var(--card))', border: '1px solid oklch(var(--border))', borderRadius: 12, fontSize: 11, padding: 8 }}
+              cursor={{ fill: 'oklch(var(--muted) / 0.4)' }}
             />
             <Legend wrapperStyle={{ fontSize: 10 }} iconType="circle" iconSize={8} />
-            <Bar dataKey="realizados" stackId="a" fill="hsl(var(--success))" radius={[0, 0, 0, 0]} name="Realizados" />
-            <Bar dataKey="agendados" stackId="a" fill="hsl(var(--primary))" name="Em curso" />
-            <Bar dataKey="pendentes" stackId="a" fill="hsl(var(--gold))" radius={[6, 6, 0, 0]} name="Pendentes" />
+            <Bar dataKey="realizados" stackId="a" fill="oklch(var(--success))" radius={[0, 0, 0, 0]} name="Realizados" />
+            <Bar dataKey="agendados" stackId="a" fill="oklch(var(--primary))" name="Em curso" />
+            <Bar dataKey="pendentes" stackId="a" fill="oklch(var(--gold))" radius={[6, 6, 0, 0]} name="Pendentes" />
           </BarChart>
         </ResponsiveContainer>
       )}

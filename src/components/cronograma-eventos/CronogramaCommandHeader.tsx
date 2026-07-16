@@ -78,7 +78,7 @@ export function CronogramaCommandHeader({
 
       <section className="cronograma-executive-context" aria-label="Situação operacional do ciclo">
         <div className="cronograma-next-action">
-          <div className="flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-[0.17em] text-gold">
+          <div className="flex items-center gap-2 text-[10px] font-extrabold uppercase tracking-[0.17em] text-[oklch(var(--brand-gold-400))]">
             <Flag className="h-3.5 w-3.5" aria-hidden="true" />
             Próxima ação oficial
           </div>
@@ -86,7 +86,7 @@ export function CronogramaCommandHeader({
             <>
               <div className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
                 <h2 className="max-w-3xl text-lg font-black leading-tight text-white sm:text-xl">{next.title}</h2>
-                <span className="font-mono text-xs font-bold text-gold">{getCountdownLabel(next.date, todayKey)}</span>
+                <span className="font-mono text-xs font-bold text-[oklch(var(--brand-gold-400))]">{getCountdownLabel(next.date, todayKey)}</span>
               </div>
               <p className="mt-1.5 text-xs leading-5 text-white/62">
                 {formatLongDateRange(next.date, next.endDate)}
@@ -137,7 +137,7 @@ function Signal({
   return (
     <div className="cronograma-signal">
       <dt className="flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-[0.13em] text-white/46">
-        <Icon className={danger ? 'h-3.5 w-3.5 text-red-300' : 'h-3.5 w-3.5 text-emerald-200/70'} aria-hidden="true" />
+        <Icon className={danger ? 'h-3.5 w-3.5 text-red-300' : 'h-3.5 w-3.5 text-cream/80'} aria-hidden="true" />
         {label}
       </dt>
       <dd className={danger ? 'mt-1 font-mono text-lg font-black text-red-200' : 'mt-1 font-mono text-lg font-black text-white'}>{value}</dd>

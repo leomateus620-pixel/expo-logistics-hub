@@ -118,9 +118,9 @@ export default function CommercialMapPage() {
         <div className="commercial-map-title-lockup">
           <div className="commercial-map-title-icon"><MapPinned /></div>
           <div>
-            <span>Inteligência territorial e comercial</span>
-            <h1>Mapa Comercial 2026</h1>
-            <p>{data.project.name}</p>
+            <span>Gestão territorial e comercial · Fenasoja 2028</span>
+            <h1>Mapa Comercial</h1>
+            <p>Referência cartográfica: {data.project.name}</p>
           </div>
         </div>
         <div className="commercial-map-header-actions">

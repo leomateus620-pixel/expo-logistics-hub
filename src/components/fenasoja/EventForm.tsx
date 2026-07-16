@@ -128,7 +128,7 @@ export default function EventForm({ open, onOpenChange, editing }: EventFormProp
             {editing ? 'Editar Evento Fenasoja' : 'Novo Evento Fenasoja'}
           </DialogTitle>
           <DialogDescription>
-            Programação institucional · 01/05 a 10/05/2026
+            Base operacional histórica · 01/05 a 10/05/2026
           </DialogDescription>
         </DialogHeader>
 
