@@ -39,22 +39,19 @@ export function CronogramaModuleShell({ children }: { children: ReactNode }) {
 
             <div className="flex min-w-0 items-center gap-3">
               <FenasojaBrand compact markOnly tone="dark" className="hidden sm:inline-flex" />
-              <span className="cronograma-module-mark" aria-hidden="true">
+              <span className="cronograma-module-tile-3d" aria-hidden="true">
                 <CalendarRange className="h-4 w-4" />
               </span>
-              <div className="min-w-0">
-                <p className="truncate text-[10px] font-bold uppercase tracking-[0.18em] text-white/48">
-                  Central temporal independente
-                </p>
-                <p className="truncate text-sm font-bold text-white">Cronograma e Eventos</p>
-              </div>
+              <p className="cronograma-module-title truncate text-base font-bold sm:text-lg">
+                Cronograma e Eventos
+              </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="hidden text-right lg:block">
-              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/42">Ciclo oficial</p>
-              <p className="text-xs font-semibold text-white/76">{presentFenasojaProductName(orgName)} · 2026—2028</p>
+            <div className="cronograma-module-chip-3d hidden text-right lg:inline-flex">
+              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/60">Ciclo oficial</p>
+              <p className="text-xs font-semibold text-white/90">{presentFenasojaProductName(orgName)} · 2026—2028</p>
             </div>
             <Button
               type="button"
