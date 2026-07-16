@@ -4,105 +4,7 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  :root {
-    /* Fenasoja Premium — Light Mode */
-    --background: 90 8% 96%;
-    --foreground: 150 25% 12%;
-
-    --card: 60 10% 99%;
-    --card-foreground: 150 25% 12%;
-
-    --popover: 60 10% 99%;
-    --popover-foreground: 150 25% 12%;
-
-    --primary: 120 100% 20%;
-    --primary-foreground: 60 20% 98%;
-
-    --secondary: 90 10% 91%;
-    --secondary-foreground: 150 20% 15%;
-
-    --muted: 90 8% 93%;
-    --muted-foreground: 150 10% 42%;
-
-    --accent: 45 87% 55%;
-    --accent-foreground: 40 60% 12%;
-
-    --destructive: 0 72% 48%;
-    --destructive-foreground: 0 0% 100%;
-
-    --border: 90 12% 85%;
-    --input: 90 12% 85%;
-    --ring: 120 80% 28%;
-
-    --radius: 0.75rem;
-
-    --success: 152 55% 38%;
-    --success-foreground: 0 0% 100%;
-
-    --warning: 38 85% 52%;
-    --warning-foreground: 40 60% 12%;
-
-    --info: 210 70% 50%;
-    --info-foreground: 0 0% 100%;
-
-    --gold: 45 87% 55%;
-    --gold-foreground: 40 60% 12%;
-
-    /* Sidebar — Deep Forest Green */
-    --sidebar-background: 135 40% 14%;
-    --sidebar-foreground: 80 15% 85%;
-    --sidebar-primary: 45 87% 55%;
-    --sidebar-primary-foreground: 135 40% 10%;
-    --sidebar-accent: 135 30% 20%;
-    --sidebar-accent-foreground: 80 15% 95%;
-    --sidebar-border: 135 25% 22%;
-    --sidebar-ring: 45 87% 55%;
-  }
-
-  .dark {
-    /* Fenasoja Premium — Dark Mode: "Campo Noturno" */
-    --background: 140 18% 6%;
-    --foreground: 80 10% 90%;
-
-    --card: 140 15% 9%;
-    --card-foreground: 80 10% 90%;
-
-    --popover: 140 15% 9%;
-    --popover-foreground: 80 10% 90%;
-
-    --primary: 120 70% 38%;
-    --primary-foreground: 0 0% 100%;
-
-    --secondary: 140 12% 16%;
-    --secondary-foreground: 80 10% 90%;
-
-    --muted: 140 12% 14%;
-    --muted-foreground: 80 8% 58%;
-
-    --accent: 45 85% 52%;
-    --accent-foreground: 0 0% 100%;
-
-    --destructive: 0 62% 35%;
-    --destructive-foreground: 80 10% 98%;
-
-    --border: 140 12% 18%;
-    --input: 140 12% 18%;
-    --ring: 120 70% 38%;
-
-    --gold: 45 85% 52%;
-    --gold-foreground: 0 0% 100%;
-
-    --sidebar-background: 140 25% 8%;
-    --sidebar-foreground: 80 12% 82%;
-    --sidebar-primary: 45 85% 52%;
-    --sidebar-primary-foreground: 140 25% 8%;
-    --sidebar-accent: 140 18% 14%;
-    --sidebar-accent-foreground: 80 12% 92%;
-    --sidebar-border: 140 15% 16%;
-    --sidebar-ring: 45 85% 52%;
-  }
-}
+/* Primitive and semantic theme values live in styles/tokens.css. */
 
 @layer base {
   * {
@@ -117,23 +19,25 @@
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
-    background-image: 
-      radial-gradient(ellipse at 20% 0%, hsl(120 100% 20% / 0.03) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 100%, hsl(45 87% 55% / 0.02) 0%, transparent 50%);
+    min-width: 320px;
+    background-image:
+      radial-gradient(ellipse at 16% 0%, oklch(var(--brand-indigo-500) / 0.045) 0%, transparent 42%),
+      radial-gradient(ellipse at 92% 100%, oklch(var(--brand-orange-500) / 0.035) 0%, transparent 40%);
     background-attachment: fixed;
   }
 
 
   .dark body {
-    background-image: 
-      radial-gradient(ellipse at 20% 0%, hsl(120 70% 38% / 0.06) 0%, transparent 50%),
-      radial-gradient(ellipse at 80% 100%, hsl(45 85% 52% / 0.03) 0%, transparent 50%);
+    background-image:
+      radial-gradient(ellipse at 16% 0%, oklch(var(--brand-indigo-500) / 0.15) 0%, transparent 42%),
+      radial-gradient(ellipse at 92% 100%, oklch(var(--brand-orange-500) / 0.08) 0%, transparent 40%);
   }
 }
 
 @layer utilities {
   .glass {
-    @apply bg-card/80 backdrop-blur-md border border-border/50;
+    @apply border border-border bg-card;
+    box-shadow: var(--shadow-xs);
   }
   
   .status-badge {
@@ -147,32 +51,20 @@
 
 /* Skip to content link */
 .skip-to-content {
-  @apply absolute left-4 top-4 z-[100] px-4 py-2 rounded-lg bg-primary text-primary-foreground text-sm font-medium;
+  @apply absolute left-4 top-4 z-[100] px-4 py-2 rounded-lg bg-action text-action-foreground text-sm font-bold;
   @apply -translate-y-16 focus:translate-y-0 transition-transform;
-}
-
-/* High contrast mode */
-@media (prefers-contrast: high) {
-  :root {
-    --muted-foreground: 150 10% 30%;
-    --border: 90 15% 65%;
-  }
-  .dark {
-    --muted-foreground: 80 8% 75%;
-    --border: 140 15% 35%;
-  }
 }
 
 /* Cronograma e Eventos — operational timeline refinement */
 .cronograma-module-shell {
   min-height: 100vh;
   min-height: 100dvh;
-  color: hsl(145 30% 14%);
-  background-color: hsl(var(--cronograma-paper));
+  color: oklch(var(--foreground));
+  background-color: oklch(var(--cronograma-paper));
 }
 
 body[data-scroll-locked] {
-  background: hsl(72 24% 97%) !important;
+  background: oklch(var(--background)) !important;
 }
 
 .cronograma-command-header {
@@ -222,7 +114,7 @@ body[data-scroll-locked] {
 
 .cronograma-command-dock {
   border-radius: 0.9rem;
-  background: hsl(var(--cronograma-paper) / 0.94);
+  background: oklch(var(--cronograma-paper) / 0.94);
   box-shadow: 0 12px 30px -26px rgb(11 55 29 / 0.48);
 }
 
@@ -240,7 +132,7 @@ body[data-scroll-locked] {
 
 .cronograma-search-input {
   border-radius: 0.6rem;
-  border-color: hsl(var(--cronograma-line));
+  border-color: oklch(var(--cronograma-line));
   background: white;
 }
 
@@ -262,7 +154,7 @@ body[data-scroll-locked] {
   flex: 0 0 auto;
   border-radius: 0.5rem;
   padding: 0.35rem 0.58rem;
-  color: hsl(var(--foreground) / 0.62);
+  color: oklch(var(--foreground) / 0.62);
   font-size: 0.66rem;
   font-weight: 750;
   white-space: nowrap;
@@ -271,12 +163,12 @@ body[data-scroll-locked] {
 
 .cronograma-period-pill:hover,
 .cronograma-period-pill.is-active {
-  background: hsl(var(--primary) / 0.075);
-  color: hsl(var(--primary));
+  background: oklch(var(--primary) / 0.075);
+  color: oklch(var(--primary));
 }
 
 .cronograma-period-pill.is-active {
-  box-shadow: inset 0 0 0 1px hsl(var(--primary) / 0.13);
+  box-shadow: inset 0 0 0 1px oklch(var(--primary) / 0.13);
 }
 
 .cronograma-filter-status-row {
@@ -285,7 +177,7 @@ body[data-scroll-locked] {
   align-items: center;
   gap: 0.5rem;
   margin-top: 0.4rem;
-  border-top: 1px solid hsl(var(--border) / 0.42);
+  border-top: 1px solid oklch(var(--border) / 0.42);
   padding: 0.4rem 0.15rem 0;
 }
 
@@ -309,11 +201,11 @@ body[data-scroll-locked] {
   flex: 0 0 auto;
   align-items: center;
   gap: 0.3rem;
-  border: 1px solid hsl(var(--primary) / 0.14);
+  border: 1px solid oklch(var(--primary) / 0.14);
   border-radius: 999px;
   padding: 0.25rem 0.5rem;
-  background: hsl(var(--primary) / 0.055);
-  color: hsl(var(--primary));
+  background: oklch(var(--primary) / 0.055);
+  color: oklch(var(--primary));
   font-size: 0.62rem;
   font-weight: 700;
 }
@@ -321,8 +213,8 @@ body[data-scroll-locked] {
 .cronograma-filter-count {
   min-width: 1.15rem;
   height: 1.15rem;
-  background: hsl(var(--primary) / 0.10);
-  color: hsl(var(--primary));
+  background: oklch(var(--primary) / 0.10);
+  color: oklch(var(--primary));
 }
 
 .cronograma-syncing-label {
@@ -330,7 +222,7 @@ body[data-scroll-locked] {
   flex: 0 0 auto;
   align-items: center;
   gap: 0.3rem;
-  color: hsl(var(--primary));
+  color: oklch(var(--primary));
   font-size: 0.62rem;
   font-weight: 750;
 }
@@ -360,7 +252,7 @@ body[data-scroll-locked] {
 .cronograma-cycle-navigator {
   min-width: 0;
   overflow: hidden;
-  border: 1px solid hsl(var(--cronograma-line) / 0.88);
+  border: 1px solid oklch(var(--cronograma-line) / 0.88);
   border-radius: 0.85rem;
   background: rgb(255 255 255 / 0.82);
   box-shadow: 0 16px 40px -36px rgb(10 54 28 / 0.5);
@@ -381,10 +273,10 @@ body[data-scroll-locked] {
   height: 1.45rem;
   align-items: center;
   justify-content: center;
-  border: 1px solid hsl(var(--primary) / 0.14);
+  border: 1px solid oklch(var(--primary) / 0.14);
   border-radius: 999px;
-  background: hsl(var(--primary) / 0.05);
-  color: hsl(var(--primary));
+  background: oklch(var(--primary) / 0.05);
+  color: oklch(var(--primary));
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.58rem;
   font-weight: 800;
@@ -415,12 +307,12 @@ body[data-scroll-locked] {
   right: calc(16.666% + 0.65rem);
   top: 1.28rem;
   height: 1px;
-  background: hsl(var(--primary) / 0.16);
+  background: oklch(var(--primary) / 0.16);
   pointer-events: none;
 }
 
 .cronograma-cycle-years::after {
-  background: hsl(var(--primary) / 0.62);
+  background: oklch(var(--primary) / 0.62);
   transform: scaleX(var(--cycle-progress));
   transform-origin: left center;
   transition: transform 260ms cubic-bezier(0.23, 1, 0.32, 1);
@@ -443,24 +335,24 @@ body[data-scroll-locked] {
   border-radius: 0.68rem;
   padding: 1.65rem 0.62rem 0.58rem;
   background: transparent;
-  color: hsl(var(--foreground) / 0.72);
+  color: oklch(var(--foreground) / 0.72);
   text-align: left;
   transition: color 170ms ease, background-color 170ms ease, border-color 170ms ease, transform 170ms ease;
 }
 
 .cronograma-cycle-year.is-selected {
-  border-color: hsl(var(--primary) / 0.16);
-  background: hsl(var(--primary) / 0.065);
-  color: hsl(var(--primary));
+  border-color: oklch(var(--primary) / 0.16);
+  background: oklch(var(--primary) / 0.065);
+  color: oklch(var(--primary));
 }
 
 .cronograma-cycle-year[data-no-match='true']:not(.is-selected) {
-  color: hsl(var(--foreground) / 0.52);
+  color: oklch(var(--foreground) / 0.52);
 }
 
 .cronograma-cycle-year:disabled {
   cursor: not-allowed;
-  color: hsl(var(--muted-foreground) / 0.62);
+  color: oklch(var(--muted-foreground) / 0.62);
 }
 
 .cronograma-cycle-node {
@@ -473,7 +365,7 @@ body[data-scroll-locked] {
   height: 0.95rem;
   align-items: center;
   justify-content: center;
-  border: 2px solid hsl(var(--primary) / 0.42);
+  border: 2px solid oklch(var(--primary) / 0.42);
   border-radius: 999px;
   background: white;
   color: white;
@@ -483,13 +375,13 @@ body[data-scroll-locked] {
 }
 
 .cronograma-cycle-year.is-selected .cronograma-cycle-node {
-  border-color: hsl(var(--primary));
-  background: hsl(var(--primary));
+  border-color: oklch(var(--primary));
+  background: oklch(var(--primary));
   transform: translateX(-50%) scale(1.08);
 }
 
 .cronograma-cycle-year[data-current='true'] .cronograma-cycle-node {
-  box-shadow: 0 0 0 3px hsl(var(--gold) / 0.16);
+  box-shadow: 0 0 0 3px oklch(var(--gold) / 0.16);
 }
 
 .cronograma-cycle-year-copy,
@@ -501,7 +393,7 @@ body[data-scroll-locked] {
 .cronograma-cycle-stage {
   margin-top: 0.28rem;
   overflow: hidden;
-  color: hsl(var(--muted-foreground));
+  color: oklch(var(--muted-foreground));
   font-size: 0.63rem;
   font-weight: 650;
   text-overflow: ellipsis;
@@ -514,7 +406,7 @@ body[data-scroll-locked] {
   align-items: center;
   border-radius: 999px;
   padding: 0.16rem 0.36rem;
-  background: hsl(var(--gold) / 0.16);
+  background: oklch(var(--gold) / 0.16);
   color: hsl(35 78% 25%);
   font-size: 0.48rem;
   font-weight: 850;
@@ -524,7 +416,7 @@ body[data-scroll-locked] {
 
 .cronograma-cycle-count {
   justify-items: end;
-  color: hsl(var(--muted-foreground));
+  color: oklch(var(--muted-foreground));
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.52rem;
   line-height: 1.2;
@@ -539,9 +431,9 @@ body[data-scroll-locked] {
 
 .cronograma-cycle-support {
   display: none;
-  border-top: 1px solid hsl(var(--border) / 0.42);
+  border-top: 1px solid oklch(var(--border) / 0.42);
   padding: 0.65rem 0.8rem 0.75rem;
-  color: hsl(var(--muted-foreground));
+  color: oklch(var(--muted-foreground));
   font-size: 0.64rem;
   line-height: 1.05rem;
 }
@@ -554,7 +446,7 @@ body[data-scroll-locked] {
   min-height: 3.75rem;
   align-items: center;
   gap: 1rem;
-  border: 1px solid hsl(var(--cronograma-line) / 0.92);
+  border: 1px solid oklch(var(--cronograma-line) / 0.92);
   border-radius: 0.8rem;
   padding: 0.55rem 0.7rem 0.55rem 0.9rem;
   background: rgb(255 255 255 / 0.94);
@@ -576,7 +468,7 @@ body[data-scroll-locked] {
 .cronograma-month-section {
   overflow: clip;
   scroll-margin-top: 17.25rem;
-  border: 1px solid hsl(var(--cronograma-line) / 0.82);
+  border: 1px solid oklch(var(--cronograma-line) / 0.82);
   border-radius: 0.85rem;
   background: rgb(255 255 255 / 0.78);
   box-shadow: 0 16px 42px -38px rgb(10 54 28 / 0.55);
@@ -584,13 +476,13 @@ body[data-scroll-locked] {
 }
 
 .cronograma-month-section[data-active='true'] {
-  border-color: hsl(var(--primary) / 0.28);
-  box-shadow: 0 18px 46px -38px hsl(var(--primary) / 0.55);
+  border-color: oklch(var(--primary) / 0.28);
+  box-shadow: 0 18px 46px -38px oklch(var(--primary) / 0.55);
 }
 
 .cronograma-month-section[data-current='true'] {
-  border-color: hsl(var(--gold) / 0.48);
-  background: linear-gradient(90deg, hsl(var(--gold) / 0.055), rgb(255 255 255 / 0.82) 22%);
+  border-color: oklch(var(--gold) / 0.48);
+  background: linear-gradient(90deg, oklch(var(--gold) / 0.055), rgb(255 255 255 / 0.82) 22%);
 }
 
 .cronograma-month-summary {
@@ -608,23 +500,23 @@ body[data-scroll-locked] {
   width: 2.4rem;
   height: 2.4rem;
   place-items: center;
-  border: 1px solid hsl(var(--primary) / 0.16);
+  border: 1px solid oklch(var(--primary) / 0.16);
   border-radius: 0.68rem;
-  background: hsl(var(--primary) / 0.06);
-  color: hsl(var(--primary));
+  background: oklch(var(--primary) / 0.06);
+  color: oklch(var(--primary));
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.68rem;
   font-weight: 800;
 }
 
 .cronograma-month-section[data-current='true'] .cronograma-month-marker {
-  border-color: hsl(var(--gold) / 0.4);
-  background: hsl(var(--gold) / 0.13);
+  border-color: oklch(var(--gold) / 0.4);
+  background: oklch(var(--gold) / 0.13);
   color: hsl(35 80% 24%);
 }
 
 .cronograma-month-events {
-  border-top: 1px solid hsl(var(--border) / 0.52);
+  border-top: 1px solid oklch(var(--border) / 0.52);
   padding: 0 0.65rem 0.25rem;
   animation: cronograma-list-in 170ms cubic-bezier(0.23, 1, 0.32, 1) both;
 }
@@ -636,7 +528,7 @@ body[data-scroll-locked] {
   grid-template-columns: 3.7rem 0.8rem minmax(0, 1fr) auto;
   align-items: stretch;
   gap: 0.65rem;
-  border-bottom: 1px solid hsl(var(--border) / 0.42);
+  border-bottom: 1px solid oklch(var(--border) / 0.42);
   padding: 0.7rem 0.45rem;
   text-align: left;
   transition: background-color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
@@ -648,14 +540,14 @@ body[data-scroll-locked] {
 
 .cronograma-operational-event[data-today='true'] {
   border-radius: 0.7rem;
-  background: hsl(var(--primary) / 0.055);
-  box-shadow: inset 3px 0 0 hsl(var(--primary));
+  background: oklch(var(--primary) / 0.055);
+  box-shadow: inset 3px 0 0 oklch(var(--primary));
 }
 
 .cronograma-operational-event[data-next='true']:not([data-today='true']) {
   border-radius: 0.7rem;
-  background: hsl(var(--gold) / 0.055);
-  box-shadow: inset 3px 0 0 hsl(var(--gold));
+  background: oklch(var(--gold) / 0.055);
+  box-shadow: inset 3px 0 0 oklch(var(--gold));
 }
 
 .cronograma-event-date-block {
@@ -664,7 +556,7 @@ body[data-scroll-locked] {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  border-right: 1px solid hsl(var(--border) / 0.48);
+  border-right: 1px solid oklch(var(--border) / 0.48);
   padding-right: 0.55rem;
 }
 
@@ -680,7 +572,7 @@ body[data-scroll-locked] {
   top: -0.7rem;
   bottom: -0.7rem;
   width: 1px;
-  background: hsl(var(--primary) / 0.17);
+  background: oklch(var(--primary) / 0.17);
   transform: translateX(-50%);
 }
 
@@ -693,8 +585,8 @@ body[data-scroll-locked] {
   height: 0.52rem;
   border: 2px solid white;
   border-radius: 999px;
-  background: hsl(var(--primary));
-  box-shadow: 0 0 0 3px hsl(var(--primary) / 0.11);
+  background: oklch(var(--primary));
+  box-shadow: 0 0 0 3px oklch(var(--primary) / 0.11);
   transform: translateX(-50%);
 }
 
@@ -740,7 +632,7 @@ body[data-scroll-locked] {
   align-items: center;
   justify-content: center;
   gap: 1rem;
-  border: 1px dashed hsl(var(--cronograma-line));
+  border: 1px dashed oklch(var(--cronograma-line));
   border-radius: 1rem;
   padding: 2rem;
   background: rgb(255 255 255 / 0.66);
@@ -775,17 +667,17 @@ body[data-scroll-locked] {
 }
 
 .cronograma-drawer {
-  --background: 72 24% 97%;
-  --foreground: 145 30% 14%;
-  --card: 0 0% 100%;
-  --card-foreground: 145 30% 14%;
-  --popover: 0 0% 100%;
-  --popover-foreground: 145 30% 14%;
-  --muted: 76 18% 92%;
-  --muted-foreground: 145 10% 39%;
-  --border: 142 18% 82%;
-  --input: 142 18% 82%;
-  --ring: 143 50% 28%;
+  --background: var(--brand-soft-white);
+  --foreground: var(--brand-navy-900);
+  --card: var(--neutral-0);
+  --card-foreground: var(--brand-navy-900);
+  --popover: var(--neutral-0);
+  --popover-foreground: var(--brand-navy-900);
+  --muted: var(--neutral-200);
+  --muted-foreground: var(--neutral-600);
+  --border: 87% 0.018 266;
+  --input: 82% 0.023 266;
+  --ring: var(--brand-orange-700);
   inset-block: 0 !important;
   right: 0 !important;
   display: grid !important;
@@ -796,10 +688,10 @@ body[data-scroll-locked] {
   grid-template-rows: auto minmax(0, 1fr) auto;
   gap: 0 !important;
   overflow: hidden;
-  border-left: 1px solid hsl(var(--gold) / 0.25);
+  border-left: 1px solid oklch(var(--gold) / 0.25);
   padding: 0 !important;
-  background: hsl(var(--background)) !important;
-  color: hsl(var(--foreground)) !important;
+  background: oklch(var(--background)) !important;
+  color: oklch(var(--foreground)) !important;
   box-shadow: -28px 0 72px -38px rgb(3 31 16 / 0.7);
   backdrop-filter: none;
   animation-duration: 220ms !important;
@@ -809,7 +701,7 @@ body[data-scroll-locked] {
 .cronograma-drawer-footer {
   position: relative;
   z-index: 2;
-  border-color: hsl(var(--border));
+  border-color: oklch(var(--border));
   background: rgb(255 255 255 / 0.97);
   backdrop-filter: none;
 }
@@ -826,7 +718,7 @@ body[data-scroll-locked] {
 }
 
 .cronograma-drawer-title {
-  color: hsl(var(--foreground)) !important;
+  color: oklch(var(--foreground)) !important;
   font-size: clamp(1.25rem, 2vw, 1.65rem) !important;
   font-weight: 900 !important;
   line-height: 1.18 !important;
@@ -836,7 +728,7 @@ body[data-scroll-locked] {
 .cronograma-drawer-description {
   display: -webkit-box;
   overflow: hidden;
-  color: hsl(var(--muted-foreground)) !important;
+  color: oklch(var(--muted-foreground)) !important;
   font-size: 0.8rem !important;
   line-height: 1.45 !important;
   -webkit-box-orient: vertical;
@@ -849,12 +741,12 @@ body[data-scroll-locked] {
   overflow-y: auto;
   overscroll-behavior: contain;
   padding: 1rem 1.35rem 1.5rem;
-  background: hsl(var(--background));
+  background: oklch(var(--background));
   scrollbar-gutter: stable;
 }
 
 .cronograma-drawer-body:focus-visible {
-  outline: 2px solid hsl(var(--ring));
+  outline: 2px solid oklch(var(--ring));
   outline-offset: -2px;
 }
 
@@ -863,17 +755,17 @@ body[data-scroll-locked] {
   height: 1.75rem;
   align-items: center;
   gap: 0.35rem;
-  border: 1px solid hsl(var(--primary) / 0.16);
+  border: 1px solid oklch(var(--primary) / 0.16);
   border-radius: 0.4rem;
   padding-inline: 0.55rem;
-  background: hsl(var(--primary) / 0.06);
-  color: hsl(var(--primary));
+  background: oklch(var(--primary) / 0.06);
+  color: oklch(var(--primary));
   font-size: 0.68rem;
   font-weight: 750;
 }
 
 .cronograma-section-eyebrow {
-  color: hsl(var(--muted-foreground));
+  color: oklch(var(--muted-foreground));
   font-size: 0.62rem;
   font-weight: 800;
   letter-spacing: 0.15em;
@@ -881,7 +773,7 @@ body[data-scroll-locked] {
 }
 
 .cronograma-info-row {
-  border-bottom-color: hsl(var(--border));
+  border-bottom-color: oklch(var(--border));
 }
 
 .cronograma-pending-panel {
@@ -909,7 +801,7 @@ body[data-scroll-locked] {
   border-radius: 0.45rem;
   padding: 0.65rem 0.75rem;
   background: white;
-  color: hsl(var(--foreground));
+  color: oklch(var(--foreground));
   font-size: 0.78rem;
   line-height: 1.5;
 }
@@ -917,8 +809,8 @@ body[data-scroll-locked] {
 .cronograma-progress-label {
   border-radius: 999px;
   padding: 0.3rem 0.55rem;
-  background: hsl(var(--primary) / 0.07);
-  color: hsl(var(--primary));
+  background: oklch(var(--primary) / 0.07);
+  color: oklch(var(--primary));
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.67rem;
   font-weight: 800;
@@ -928,14 +820,14 @@ body[data-scroll-locked] {
   height: 0.35rem;
   overflow: hidden;
   border-radius: 999px;
-  background: hsl(var(--muted));
+  background: oklch(var(--muted));
 }
 
 .cronograma-progress-track > span {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: hsl(var(--primary));
+  background: oklch(var(--primary));
   transition: width 220ms ease;
 }
 
@@ -943,7 +835,7 @@ body[data-scroll-locked] {
   display: flex;
   align-items: flex-start;
   gap: 0.75rem;
-  border: 1px solid hsl(var(--border));
+  border: 1px solid oklch(var(--border));
   border-radius: 0.7rem;
   padding: 0.7rem;
   background: white;
@@ -956,9 +848,9 @@ body[data-scroll-locked] {
   flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  border: 1px solid hsl(var(--border));
+  border: 1px solid oklch(var(--border));
   border-radius: 999px;
-  color: hsl(var(--muted-foreground));
+  color: oklch(var(--muted-foreground));
 }
 
 .cronograma-subevent-check.is-completed {
@@ -970,14 +862,14 @@ body[data-scroll-locked] {
 .cronograma-history-panel {
   display: flex;
   gap: 0.65rem;
-  border: 1px solid hsl(var(--border));
+  border: 1px solid oklch(var(--border));
   border-radius: 0.75rem;
   padding: 0.75rem;
-  background: hsl(var(--muted) / 0.55);
+  background: oklch(var(--muted) / 0.55);
 }
 
 .cronograma-audit-section {
-  border-top: 1px solid hsl(var(--border));
+  border-top: 1px solid oklch(var(--border));
   padding-top: 1rem;
 }
 
@@ -985,7 +877,7 @@ body[data-scroll-locked] {
   position: relative;
   display: flex;
   gap: 0.65rem;
-  border: 1px solid hsl(var(--border));
+  border: 1px solid oklch(var(--border));
   border-radius: 0.65rem;
   padding: 0.65rem 0.7rem;
   background: white;
@@ -998,12 +890,12 @@ body[data-scroll-locked] {
   margin-top: 0.28rem;
   border: 2px solid white;
   border-radius: 999px;
-  background: hsl(var(--primary));
-  box-shadow: 0 0 0 3px hsl(var(--primary) / 0.1);
+  background: oklch(var(--primary));
+  box-shadow: 0 0 0 3px oklch(var(--primary) / 0.1);
 }
 
 .cronograma-form-section {
-  border: 1px solid hsl(var(--border));
+  border: 1px solid oklch(var(--border));
   border-radius: 0.85rem;
   padding: 0.9rem;
   background: rgb(255 255 255 / 0.82);
@@ -1016,14 +908,14 @@ body[data-scroll-locked] {
 
 .cronograma-create-dialog,
 .cronograma-discard-dialog {
-  --background: 72 24% 97%;
-  --foreground: 145 30% 14%;
-  --muted: 76 18% 92%;
-  --muted-foreground: 145 10% 39%;
-  --border: 142 18% 82%;
-  border-color: hsl(var(--border));
-  background: hsl(var(--background)) !important;
-  color: hsl(var(--foreground)) !important;
+  --background: var(--brand-soft-white);
+  --foreground: var(--brand-navy-900);
+  --muted: var(--neutral-200);
+  --muted-foreground: var(--neutral-600);
+  --border: 87% 0.018 266;
+  border-color: oklch(var(--border));
+  background: oklch(var(--background)) !important;
+  color: oklch(var(--foreground)) !important;
 }
 
 .cronograma-create-dialog {
@@ -1139,13 +1031,13 @@ body[data-scroll-locked] {
   .cronograma-operational-event:hover {
     z-index: 1;
     border-radius: 0.7rem;
-    background: hsl(var(--primary) / 0.045);
-    box-shadow: 0 10px 26px -22px hsl(var(--primary) / 0.55);
+    background: oklch(var(--primary) / 0.045);
+    box-shadow: 0 10px 26px -22px oklch(var(--primary) / 0.55);
     transform: translateX(2px);
   }
 
   .cronograma-month-summary:hover {
-    background: hsl(var(--primary) / 0.026);
+    background: oklch(var(--primary) / 0.026);
   }
 
   .cronograma-undated-action:hover {
@@ -1153,9 +1045,9 @@ body[data-scroll-locked] {
   }
 
   .cronograma-cycle-year:not(:disabled):not(.is-selected):hover {
-    border-color: hsl(var(--primary) / 0.10);
-    background: hsl(var(--primary) / 0.035);
-    color: hsl(var(--primary));
+    border-color: oklch(var(--primary) / 0.10);
+    background: oklch(var(--primary) / 0.035);
+    color: oklch(var(--primary));
     transform: translateY(-1px);
   }
 }
@@ -1395,7 +1287,7 @@ body[data-scroll-locked] {
   .cronograma-view-nav,
   .cronograma-form-section,
   .cronograma-subevent-row {
-    border-color: hsl(var(--foreground) / 0.48);
+    border-color: oklch(var(--foreground) / 0.48);
   }
 }
 
@@ -1413,47 +1305,28 @@ input::placeholder, textarea::placeholder {
 
 /* Base liquid glass */
 .liquid-glass {
-  background: rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(24px) saturate(1.5);
-  -webkit-backdrop-filter: blur(24px) saturate(1.5);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 
-    0 4px 32px rgba(0, 0, 0, 0.06),
-    0 1px 0 rgba(255, 255, 255, 0.08) inset;
+  background: oklch(var(--card));
+  border: 1px solid oklch(var(--border));
+  box-shadow: var(--shadow-xs);
 }
 
 /* Card liquid glass — premium depth */
 .liquid-glass-card {
-  background: hsl(var(--card) / 0.6);
-  backdrop-filter: blur(24px) saturate(1.4);
-  -webkit-backdrop-filter: blur(24px) saturate(1.4);
-  border: 1px solid hsl(var(--border) / 0.35);
-  box-shadow: 
-    0 1px 3px rgba(0, 0, 0, 0.04),
-    0 4px 24px rgba(0, 0, 0, 0.03),
-    0 1px 0 rgba(255, 255, 255, 0.06) inset;
-  transition: all 250ms cubic-bezier(0.4, 0, 0.2, 1);
+  background: oklch(var(--card));
+  border: 1px solid oklch(var(--border));
+  box-shadow: var(--shadow-xs);
+  transition: background-color 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
 }
 
 .liquid-glass-card:hover {
-  box-shadow: 
-    0 2px 8px rgba(0, 0, 0, 0.06),
-    0 8px 32px rgba(0, 0, 0, 0.05),
-    0 1px 0 rgba(255, 255, 255, 0.08) inset;
-  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
 }
 
 /* Premium surface — for elevated sections */
 .premium-surface {
-  background: hsl(var(--card) / 0.7);
-  backdrop-filter: blur(32px) saturate(1.5);
-  -webkit-backdrop-filter: blur(32px) saturate(1.5);
-  border: 1px solid hsl(var(--border) / 0.3);
-  box-shadow: 
-    0 2px 16px rgba(0, 0, 0, 0.04),
-    0 8px 40px rgba(0, 0, 0, 0.03),
-    0 1px 0 rgba(255, 255, 255, 0.08) inset,
-    0 0 0 0.5px hsl(var(--gold) / 0.06) inset;
+  background: oklch(var(--card));
+  border: 1px solid oklch(var(--border));
+  box-shadow: var(--shadow-sm);
 }
 
 /* Gold accent shimmer — very subtle */
@@ -1467,7 +1340,7 @@ input::placeholder, textarea::placeholder {
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, transparent, hsl(var(--gold) / 0.25), transparent);
+  background: linear-gradient(90deg, transparent, oklch(var(--gold) / 0.25), transparent);
   border-radius: inherit;
 }
 
@@ -1486,35 +1359,27 @@ input::placeholder, textarea::placeholder {
 
 /* Dark mode glass adjustments */
 .dark .liquid-glass {
-  background: rgba(255, 255, 255, 0.03);
-  border-color: rgba(255, 255, 255, 0.06);
-  box-shadow: 
-    0 4px 32px rgba(0, 0, 0, 0.2),
-    0 1px 0 rgba(255, 255, 255, 0.04) inset;
+  background: oklch(var(--card));
+  border-color: oklch(var(--border));
+  box-shadow: var(--shadow-xs);
 }
 
 .dark .liquid-glass-card {
-  background: hsl(var(--card) / 0.55);
-  border-color: hsl(var(--border) / 0.35);
-  box-shadow: 
-    0 2px 8px rgba(0, 0, 0, 0.15),
-    0 8px 32px rgba(0, 0, 0, 0.1),
-    0 1px 0 rgba(255, 255, 255, 0.03) inset;
+  background: oklch(var(--card));
+  border-color: oklch(var(--border));
+  box-shadow: var(--shadow-xs);
 }
 
 .dark .premium-surface {
-  background: hsl(var(--card) / 0.6);
-  box-shadow: 
-    0 4px 24px rgba(0, 0, 0, 0.2),
-    0 1px 0 rgba(255, 255, 255, 0.04) inset,
-    0 0 0 0.5px hsl(var(--gold) / 0.08) inset;
+  background: oklch(var(--card));
+  box-shadow: var(--shadow-sm);
 }
 
 /* Premium stat card left border accent */
-.stat-accent-primary { border-left: 3px solid hsl(var(--primary)); }
-.stat-accent-accent { border-left: 3px solid hsl(var(--gold)); }
-.stat-accent-success { border-left: 3px solid hsl(var(--success)); }
-.stat-accent-warning { border-left: 3px solid hsl(var(--warning)); }
+.stat-accent-primary { border-left: 3px solid oklch(var(--primary)); }
+.stat-accent-accent { border-left: 3px solid oklch(var(--gold)); }
+.stat-accent-success { border-left: 3px solid oklch(var(--success)); }
+.stat-accent-warning { border-left: 3px solid oklch(var(--warning)); }
 
 /* Page transition — GPU-friendly fade + micro-slide */
 @keyframes page-in {
@@ -1540,8 +1405,8 @@ input::placeholder, textarea::placeholder {
   bottom: 15%;
   width: 3px;
   border-radius: 0 3px 3px 0;
-  background: linear-gradient(180deg, hsl(var(--gold)), hsl(var(--gold) / 0.7));
-  box-shadow: 0 0 8px hsl(var(--gold) / 0.3);
+  background: linear-gradient(180deg, oklch(var(--gold)), oklch(var(--gold) / 0.7));
+  box-shadow: 0 0 8px oklch(var(--gold) / 0.3);
 }
 
 
@@ -1550,17 +1415,16 @@ input::placeholder, textarea::placeholder {
    ═══════════════════════════════════════════════ */
 @layer utilities {
   .surface-primary {
-    @apply bg-card/80 text-card-foreground backdrop-blur-2xl border border-border/40;
-    box-shadow: var(--shadow-premium);
+    @apply border border-border bg-card text-card-foreground shadow-sm;
   }
 
   .surface-secondary {
-    @apply bg-muted/50 text-foreground backdrop-blur-xl border border-border/30;
+    @apply border border-border bg-muted text-foreground;
+    box-shadow: var(--shadow-xs);
   }
 
   .glass-panel {
-    @apply border border-white/15 bg-white/[0.09] backdrop-blur-2xl;
-    box-shadow: 0 24px 80px rgb(0 0 0 / 0.20), inset 0 1px 0 rgb(255 255 255 / 0.16);
+    @apply border border-border bg-card text-card-foreground shadow-sm;
   }
 
   .premium-shadow {
@@ -1597,10 +1461,10 @@ input::placeholder, textarea::placeholder {
 
   .command-grid-bg {
     background-image:
-      linear-gradient(hsl(var(--gold) / 0.05) 1px, transparent 1px),
-      linear-gradient(90deg, hsl(var(--gold) / 0.05) 1px, transparent 1px),
-      radial-gradient(circle at 20% 0%, hsl(var(--primary) / 0.10), transparent 34%),
-      radial-gradient(circle at 82% 12%, hsl(var(--gold) / 0.08), transparent 28%);
+      linear-gradient(oklch(var(--gold) / 0.05) 1px, transparent 1px),
+      linear-gradient(90deg, oklch(var(--gold) / 0.05) 1px, transparent 1px),
+      radial-gradient(circle at 20% 0%, oklch(var(--primary) / 0.10), transparent 34%),
+      radial-gradient(circle at 82% 12%, oklch(var(--gold) / 0.08), transparent 28%);
     background-size: 42px 42px, 42px 42px, auto, auto;
   }
 
@@ -1610,9 +1474,9 @@ input::placeholder, textarea::placeholder {
 }
 
 :root {
-  --shadow-premium: 0 18px 60px rgb(25 50 28 / 0.12), 0 2px 8px rgb(25 50 28 / 0.06), inset 0 1px 0 rgb(255 255 255 / 0.20);
-  --shadow-pressed: 0 8px 24px rgb(25 50 28 / 0.10), inset 0 1px 0 rgb(255 255 255 / 0.18);
-  --glass-highlight: linear-gradient(135deg, rgb(255 255 255 / 0.22), rgb(255 255 255 / 0.04) 38%, transparent 70%);
+  --shadow-premium: var(--shadow-sm);
+  --shadow-pressed: var(--shadow-xs);
+  --glass-highlight: none;
 }
 
 .liquid-glass-card,
@@ -1643,7 +1507,7 @@ input::placeholder, textarea::placeholder {
 
 .premium-sidebar-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: hsl(var(--gold) / 0.35) transparent;
+  scrollbar-color: oklch(var(--gold) / 0.35) transparent;
 }
 
 .premium-sidebar-scrollbar::-webkit-scrollbar {
@@ -1651,7 +1515,7 @@ input::placeholder, textarea::placeholder {
 }
 
 .premium-sidebar-scrollbar::-webkit-scrollbar-thumb {
-  background: hsl(var(--gold) / 0.28);
+  background: oklch(var(--gold) / 0.28);
   border-radius: 999px;
 }
 
@@ -1689,9 +1553,9 @@ input::placeholder, textarea::placeholder {
   border-radius: 999px;
   background:
     linear-gradient(145deg, hsl(0 0% 100% / 0.78), hsl(132 18% 92% / 0.58) 46%, hsl(142 24% 84% / 0.42)),
-    hsl(var(--card) / 0.68);
+    oklch(var(--card) / 0.68);
   border: 1px solid hsl(0 0% 100% / 0.55);
-  outline: 1px solid hsl(var(--gold) / 0.10);
+  outline: 1px solid oklch(var(--gold) / 0.10);
   backdrop-filter: blur(22px) saturate(1.08);
   -webkit-backdrop-filter: blur(22px) saturate(1.08);
   transform: translateZ(0);
@@ -1702,10 +1566,10 @@ input::placeholder, textarea::placeholder {
     border-color 240ms ease,
     background 240ms ease;
   box-shadow:
-    0 1px 0 hsl(var(--gold) / 0.22) inset,
+    0 1px 0 oklch(var(--gold) / 0.22) inset,
     0 1px 0 rgb(255 255 255 / 0.55) inset,
-    0 10px 24px -12px hsl(var(--primary) / 0.45),
-    0 22px 48px -22px hsl(var(--gold) / 0.28);
+    0 10px 24px -12px oklch(var(--primary) / 0.45),
+    0 22px 48px -22px oklch(var(--gold) / 0.28);
   cursor: pointer;
 }
 
@@ -1721,24 +1585,24 @@ input::placeholder, textarea::placeholder {
 
 .commission-island:hover {
   transform: translateY(-2px);
-  border-color: hsl(var(--gold) / 0.45);
+  border-color: oklch(var(--gold) / 0.45);
   box-shadow:
-    0 1px 0 hsl(var(--gold) / 0.28) inset,
+    0 1px 0 oklch(var(--gold) / 0.28) inset,
     0 1px 0 rgb(255 255 255 / 0.6) inset,
-    0 18px 36px -14px hsl(var(--primary) / 0.55),
-    0 32px 64px -26px hsl(var(--gold) / 0.42),
-    0 0 0 1px hsl(var(--gold) / 0.18);
+    0 18px 36px -14px oklch(var(--primary) / 0.55),
+    0 32px 64px -26px oklch(var(--gold) / 0.42),
+    0 0 0 1px oklch(var(--gold) / 0.18);
 }
 
 .commission-island[data-expanded='true'] {
   border-radius: 1.5rem;
-  border-color: hsl(var(--gold) / 0.55);
+  border-color: oklch(var(--gold) / 0.55);
   box-shadow:
-    0 1px 0 hsl(var(--gold) / 0.32) inset,
+    0 1px 0 oklch(var(--gold) / 0.32) inset,
     0 1px 0 rgb(255 255 255 / 0.6) inset,
-    0 24px 50px -18px hsl(var(--primary) / 0.6),
-    0 40px 80px -28px hsl(var(--gold) / 0.5),
-    0 0 0 1px hsl(var(--gold) / 0.22);
+    0 24px 50px -18px oklch(var(--primary) / 0.6),
+    0 40px 80px -28px oklch(var(--gold) / 0.5),
+    0 0 0 1px oklch(var(--gold) / 0.22);
 }
 
 .commission-card-glow {
@@ -1749,7 +1613,7 @@ input::placeholder, textarea::placeholder {
   z-index: 2;
   opacity: 0;
   transition: opacity 240ms ease;
-  background: radial-gradient(180px circle at var(--mx, 50%) var(--my, 30%), hsl(var(--gold) / 0.22), transparent 65%);
+  background: radial-gradient(180px circle at var(--mx, 50%) var(--my, 30%), oklch(var(--gold) / 0.22), transparent 65%);
 }
 
 .commission-island:hover .commission-card-glow,
@@ -1767,7 +1631,7 @@ input::placeholder, textarea::placeholder {
   position: relative;
   overflow: hidden;
   box-shadow:
-    0 14px 24px hsl(var(--primary) / 0.20),
+    0 14px 24px oklch(var(--primary) / 0.20),
     0 1px 0 rgb(255 255 255 / 0.18) inset;
 }
 
@@ -1789,27 +1653,27 @@ input::placeholder, textarea::placeholder {
 .dark .commission-island {
   background:
     linear-gradient(145deg, hsl(142 22% 13% / 0.88), hsl(137 30% 9% / 0.82) 48%, hsl(128 28% 7% / 0.78)),
-    hsl(var(--card) / 0.72);
+    oklch(var(--card) / 0.72);
   border-color: hsl(0 0% 100% / 0.13);
   box-shadow:
-    0 1px 0 hsl(var(--gold) / 0.18) inset,
+    0 1px 0 oklch(var(--gold) / 0.18) inset,
     0 1px 0 rgb(255 255 255 / 0.08) inset,
     0 14px 30px -14px rgb(0 0 0 / 0.55),
-    0 28px 60px -28px hsl(var(--gold) / 0.20);
+    0 28px 60px -28px oklch(var(--gold) / 0.20);
 }
 
 .dark .commission-island:hover {
-  border-color: hsl(var(--gold) / 0.42);
+  border-color: oklch(var(--gold) / 0.42);
   box-shadow:
-    0 1px 0 hsl(var(--gold) / 0.24) inset,
+    0 1px 0 oklch(var(--gold) / 0.24) inset,
     0 1px 0 rgb(255 255 255 / 0.12) inset,
     0 22px 44px -16px rgb(0 0 0 / 0.65),
-    0 36px 72px -28px hsl(var(--gold) / 0.32),
-    0 0 0 1px hsl(var(--gold) / 0.20);
+    0 36px 72px -28px oklch(var(--gold) / 0.32),
+    0 0 0 1px oklch(var(--gold) / 0.20);
 }
 
 .dark .commission-island[data-expanded='true'] {
-  border-color: hsl(var(--gold) / 0.50);
+  border-color: oklch(var(--gold) / 0.50);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1826,13 +1690,13 @@ input::placeholder, textarea::placeholder {
 
 /* Cronograma e Eventos — independent temporal workspace */
 .cronograma-module-shell {
-  --cronograma-forest: 143 57% 12%;
-  --cronograma-forest-soft: 143 42% 18%;
-  --cronograma-paper: 72 24% 97%;
-  --cronograma-line: 142 24% 82%;
+  --cronograma-forest: var(--brand-navy-900);
+  --cronograma-forest-soft: var(--brand-indigo-500);
+  --cronograma-paper: var(--background);
+  --cronograma-line: var(--border);
   position: relative;
   isolation: isolate;
-  background: hsl(var(--cronograma-paper));
+  background: oklch(var(--cronograma-paper));
 }
 
 .cronograma-module-shell::before {
@@ -1842,11 +1706,8 @@ input::placeholder, textarea::placeholder {
   z-index: -2;
   pointer-events: none;
   background:
-    radial-gradient(circle at 8% 4%, hsl(var(--primary) / 0.09), transparent 28%),
-    radial-gradient(circle at 92% 16%, hsl(var(--gold) / 0.10), transparent 24%),
-    linear-gradient(hsl(var(--primary) / 0.026) 1px, transparent 1px),
-    linear-gradient(90deg, hsl(var(--primary) / 0.022) 1px, transparent 1px);
-  background-size: auto, auto, 56px 56px, 56px 56px;
+    radial-gradient(circle at 8% 4%, oklch(var(--primary) / 0.09), transparent 28%),
+    radial-gradient(circle at 92% 16%, oklch(var(--action) / 0.07), transparent 24%);
 }
 
 .cronograma-module-bar {
@@ -1854,9 +1715,8 @@ input::placeholder, textarea::placeholder {
   top: 0;
   z-index: 40;
   border-bottom: 1px solid rgb(255 255 255 / 0.10);
-  background: hsl(var(--cronograma-forest) / 0.96);
-  box-shadow: 0 16px 40px -28px rgb(3 30 15 / 0.70);
-  backdrop-filter: blur(18px) saturate(1.2);
+  background: oklch(var(--cronograma-forest));
+  box-shadow: var(--shadow-sm);
 }
 
 .cronograma-module-back,
@@ -1879,9 +1739,9 @@ input::placeholder, textarea::placeholder {
 
 .cronograma-module-mark {
   width: 2rem;
-  border: 1px solid hsl(var(--gold) / 0.25);
-  background: hsl(var(--gold) / 0.10);
-  color: hsl(var(--gold));
+  border: 1px solid oklch(var(--gold) / 0.25);
+  background: oklch(var(--gold) / 0.10);
+  color: oklch(var(--gold));
 }
 
 .cronograma-module-signout {
@@ -1902,27 +1762,19 @@ input::placeholder, textarea::placeholder {
 .cronograma-command-header {
   position: relative;
   overflow: hidden;
-  border: 1px solid hsl(var(--gold) / 0.18);
-  border-radius: 1.4rem;
+  border: 1px solid oklch(var(--brand-indigo-300) / 0.22);
+  border-radius: 1rem;
   padding: 1.25rem;
   color: white;
   background:
-    radial-gradient(circle at 82% 0%, hsl(var(--gold) / 0.14), transparent 26%),
-    hsl(var(--cronograma-forest));
-  box-shadow: 0 26px 70px -46px rgb(3 42 19 / 0.90), inset 0 1px 0 rgb(255 255 255 / 0.08);
+    radial-gradient(circle at 82% 0%, oklch(var(--brand-indigo-500) / 0.72), transparent 36%),
+    radial-gradient(circle at 100% 100%, oklch(var(--action) / 0.12), transparent 30%),
+    oklch(var(--cronograma-forest));
+  box-shadow: var(--shadow-sm);
 }
 
 .cronograma-command-header::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0.22;
-  background-image:
-    linear-gradient(rgb(255 255 255 / 0.045) 1px, transparent 1px),
-    linear-gradient(90deg, rgb(255 255 255 / 0.04) 1px, transparent 1px);
-  background-size: 44px 44px;
-  mask-image: linear-gradient(90deg, transparent, black 48%, black);
+  display: none;
 }
 
 .cronograma-command-grid,
@@ -1945,7 +1797,7 @@ input::placeholder, textarea::placeholder {
   font-weight: 800;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: hsl(var(--gold) / 0.90);
+  color: oklch(var(--gold) / 0.90);
 }
 
 .cronograma-live-dot {
@@ -1975,13 +1827,13 @@ input::placeholder, textarea::placeholder {
 }
 
 .cronograma-primary-action {
-  background: hsl(var(--gold));
-  color: hsl(143 58% 11%);
-  box-shadow: 0 12px 28px -18px hsl(var(--gold) / 0.80);
+  background: oklch(var(--action));
+  color: oklch(var(--action-foreground));
+  box-shadow: none;
 }
 
 .cronograma-primary-action:hover {
-  background: hsl(var(--gold) / 0.92);
+  background: oklch(var(--brand-orange-600));
 }
 
 .cronograma-action-count,
@@ -1996,8 +1848,8 @@ input::placeholder, textarea::placeholder {
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.625rem;
   font-weight: 800;
-  background: hsl(var(--gold) / 0.14);
-  color: hsl(var(--gold));
+  background: oklch(var(--gold) / 0.14);
+  color: oklch(var(--gold));
 }
 
 .cronograma-cycle-rail {
@@ -2023,21 +1875,21 @@ input::placeholder, textarea::placeholder {
   top: calc(50% + 0.35rem);
   width: 1px;
   height: calc(100% - 0.7rem);
-  background: linear-gradient(hsl(var(--gold) / 0.45), rgb(255 255 255 / 0.08));
+  background: linear-gradient(oklch(var(--gold) / 0.45), rgb(255 255 255 / 0.08));
 }
 
 .cronograma-cycle-node {
   width: 0.8rem;
   height: 0.8rem;
   flex: 0 0 auto;
-  border: 2px solid hsl(var(--gold) / 0.70);
+  border: 2px solid oklch(var(--gold) / 0.70);
   border-radius: 999px;
-  background: hsl(var(--cronograma-forest));
-  box-shadow: 0 0 0 4px hsl(var(--gold) / 0.07);
+  background: oklch(var(--cronograma-forest));
+  box-shadow: 0 0 0 4px oklch(var(--gold) / 0.07);
 }
 
 .cronograma-cycle-stage[data-final='true'] .cronograma-cycle-node {
-  background: hsl(var(--gold));
+  background: oklch(var(--gold));
 }
 
 .cronograma-metric-strip {
@@ -2059,13 +1911,13 @@ input::placeholder, textarea::placeholder {
 
 .cronograma-command-dock {
   border-radius: 0 0 1.1rem 1.1rem;
-  background: hsl(var(--cronograma-paper) / 0.88);
+  background: oklch(var(--cronograma-paper) / 0.88);
   backdrop-filter: blur(18px) saturate(1.15);
 }
 
 .cronograma-view-nav,
 .cronograma-filter-surface {
-  border: 1px solid hsl(var(--cronograma-line) / 0.76);
+  border: 1px solid oklch(var(--cronograma-line) / 0.76);
   background: rgb(255 255 255 / 0.82);
   box-shadow: 0 14px 38px -34px rgb(15 70 35 / 0.55), inset 0 1px 0 rgb(255 255 255 / 0.70);
   backdrop-filter: blur(18px) saturate(1.1);
@@ -2099,20 +1951,20 @@ input::placeholder, textarea::placeholder {
   border-radius: 0.62rem;
   padding: 0.55rem 0.75rem;
   scroll-snap-align: start;
-  color: hsl(var(--foreground) / 0.58);
+  color: oklch(var(--foreground) / 0.58);
   font-size: 0.7rem;
   font-weight: 750;
   transition: color 180ms ease, background-color 180ms ease, transform 140ms ease;
 }
 
 .cronograma-view-tab.is-active {
-  background: hsl(var(--primary));
+  background: oklch(var(--primary));
   color: white;
-  box-shadow: 0 12px 24px -18px hsl(var(--primary) / 0.85);
+  box-shadow: 0 12px 24px -18px oklch(var(--primary) / 0.85);
 }
 
 .cronograma-view-tab.is-active svg {
-  color: hsl(var(--gold));
+  color: oklch(var(--gold));
 }
 
 .cronograma-filter-surface {
@@ -2138,13 +1990,13 @@ input::placeholder, textarea::placeholder {
 .cronograma-search-input,
 .cronograma-filter-trigger {
   border-radius: 0.58rem;
-  border-color: hsl(var(--border) / 0.70);
+  border-color: oklch(var(--border) / 0.70);
   background: rgb(255 255 255 / 0.82);
   box-shadow: none;
 }
 
 .cronograma-clear-filter {
-  color: hsl(var(--foreground) / 0.60);
+  color: oklch(var(--foreground) / 0.60);
 }
 
 .cronograma-view-transition {
@@ -2155,7 +2007,7 @@ input::placeholder, textarea::placeholder {
 .cronograma-ledger,
 .cronograma-board-heading,
 .cronograma-category-ledger {
-  border: 1px solid hsl(var(--cronograma-line) / 0.78);
+  border: 1px solid oklch(var(--cronograma-line) / 0.78);
   background: rgb(255 255 255 / 0.74);
   box-shadow: 0 20px 54px -42px rgb(17 72 38 / 0.52), inset 0 1px 0 rgb(255 255 255 / 0.78);
   backdrop-filter: blur(16px);
@@ -2163,14 +2015,14 @@ input::placeholder, textarea::placeholder {
 
 .cronograma-main-event {
   border-radius: 1.25rem;
-  border-color: hsl(var(--gold) / 0.32);
+  border-color: oklch(var(--gold) / 0.32);
   background:
-    linear-gradient(110deg, hsl(var(--primary) / 0.08), transparent 42%),
+    linear-gradient(110deg, oklch(var(--primary) / 0.08), transparent 42%),
     rgb(255 255 255 / 0.78);
 }
 
 .cronograma-main-date-panel {
-  border-left: 2px solid hsl(var(--gold) / 0.70);
+  border-left: 2px solid oklch(var(--gold) / 0.70);
   background: rgb(255 255 255 / 0.50);
 }
 
@@ -2182,7 +2034,7 @@ input::placeholder, textarea::placeholder {
 
 .cronograma-ledger.is-undated,
 .cronograma-board-heading.is-undated {
-  border-color: hsl(var(--gold) / 0.28);
+  border-color: oklch(var(--gold) / 0.28);
   background: hsl(46 72% 97% / 0.82);
 }
 
@@ -2192,7 +2044,7 @@ input::placeholder, textarea::placeholder {
   grid-template-columns: 6.5rem minmax(0, 1fr);
   gap: 0.9rem;
   align-items: start;
-  border-bottom: 1px solid hsl(var(--border) / 0.48);
+  border-bottom: 1px solid oklch(var(--border) / 0.48);
   padding: 0.9rem 0.4rem;
   background: transparent;
   transition: background-color 180ms ease, transform 160ms ease, border-color 180ms ease;
@@ -2205,16 +2057,16 @@ input::placeholder, textarea::placeholder {
   left: -0.4rem;
   width: 2px;
   border-radius: 999px;
-  background: hsl(var(--primary) / 0.35);
+  background: oklch(var(--primary) / 0.35);
 }
 
 .cronograma-event-row.is-critical::before {
-  background: hsl(var(--destructive));
+  background: oklch(var(--destructive));
 }
 
 .cronograma-event-row.is-main::before {
   width: 3px;
-  background: hsl(var(--gold));
+  background: oklch(var(--gold));
 }
 
 .cronograma-event-date {
@@ -2222,7 +2074,7 @@ input::placeholder, textarea::placeholder {
   min-height: 3.7rem;
   flex-direction: column;
   justify-content: center;
-  border-right: 1px solid hsl(var(--border) / 0.48);
+  border-right: 1px solid oklch(var(--border) / 0.48);
   padding-right: 0.75rem;
 }
 
@@ -2240,7 +2092,7 @@ input::placeholder, textarea::placeholder {
   width: 100%;
   align-items: flex-start;
   gap: 0.75rem;
-  border-bottom: 1px solid hsl(var(--border) / 0.38);
+  border-bottom: 1px solid oklch(var(--border) / 0.38);
   padding: 0.7rem 0.35rem;
   text-align: left;
   transition: background-color 180ms ease, color 180ms ease, transform 160ms ease;
@@ -2250,7 +2102,7 @@ input::placeholder, textarea::placeholder {
 .cronograma-undated-row {
   position: relative;
   overflow: hidden;
-  border-bottom: 1px solid hsl(var(--border) / 0.48);
+  border-bottom: 1px solid oklch(var(--border) / 0.48);
   padding: 1rem;
   background: rgb(255 255 255 / 0.48);
   transition: background-color 180ms ease, transform 160ms ease;
@@ -2276,7 +2128,7 @@ input::placeholder, textarea::placeholder {
 
 .cronograma-story-index {
   align-self: start;
-  border: 1px solid hsl(var(--cronograma-line) / 0.78);
+  border: 1px solid oklch(var(--cronograma-line) / 0.78);
   border-radius: 1rem;
   padding: 1rem;
   background: rgb(255 255 255 / 0.78);
@@ -2298,7 +2150,7 @@ input::placeholder, textarea::placeholder {
   top: 1rem;
   bottom: 1rem;
   width: 1px;
-  background: hsl(var(--primary) / 0.18);
+  background: oklch(var(--primary) / 0.18);
 }
 
 .cronograma-story-year {
@@ -2309,13 +2161,13 @@ input::placeholder, textarea::placeholder {
   border-radius: 0.65rem;
   padding: 0.65rem 0.55rem;
   text-align: left;
-  color: hsl(var(--foreground) / 0.52);
+  color: oklch(var(--foreground) / 0.52);
   transition: color 180ms ease, background-color 180ms ease, transform 180ms ease;
 }
 
 .cronograma-story-year[data-active='true'] {
-  background: hsl(var(--primary) / 0.065);
-  color: hsl(var(--primary));
+  background: oklch(var(--primary) / 0.065);
+  color: oklch(var(--primary));
 }
 
 .cronograma-story-year-node {
@@ -2323,21 +2175,21 @@ input::placeholder, textarea::placeholder {
   width: 0.65rem;
   height: 0.65rem;
   flex: 0 0 auto;
-  border: 2px solid hsl(var(--primary) / 0.45);
+  border: 2px solid oklch(var(--primary) / 0.45);
   border-radius: 999px;
   background: white;
   transition: background-color 180ms ease, border-color 180ms ease, transform 180ms ease;
 }
 
 .cronograma-story-year[data-active='true'] .cronograma-story-year-node {
-  border-color: hsl(var(--gold));
-  background: hsl(var(--gold));
+  border-color: oklch(var(--gold));
+  background: oklch(var(--gold));
   transform: scale(1.15);
 }
 
 .cronograma-story-section {
   overflow: hidden;
-  border: 1px solid hsl(var(--cronograma-line) / 0.76);
+  border: 1px solid oklch(var(--cronograma-line) / 0.76);
   border-radius: 1.1rem;
   background: rgb(255 255 255 / 0.68);
   box-shadow: 0 22px 58px -48px rgb(16 70 36 / 0.55);
@@ -2347,13 +2199,13 @@ input::placeholder, textarea::placeholder {
 }
 
 .cronograma-story-section[data-active='true'] {
-  border-color: hsl(var(--primary) / 0.28);
+  border-color: oklch(var(--primary) / 0.28);
   opacity: 1;
   transform: translateY(0);
 }
 
 .cronograma-story-section[data-year='2028'] {
-  border-color: hsl(var(--gold) / 0.32);
+  border-color: oklch(var(--gold) / 0.32);
 }
 
 .cronograma-story-section-header {
@@ -2361,9 +2213,9 @@ input::placeholder, textarea::placeholder {
   align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
-  border-bottom: 1px solid hsl(var(--border) / 0.52);
+  border-bottom: 1px solid oklch(var(--border) / 0.52);
   padding: 1.15rem;
-  background: hsl(var(--primary) / 0.025);
+  background: oklch(var(--primary) / 0.025);
 }
 
 .cronograma-story-months {
@@ -2372,7 +2224,7 @@ input::placeholder, textarea::placeholder {
 
 .cronograma-story-month {
   position: relative;
-  border-bottom: 1px solid hsl(var(--border) / 0.46);
+  border-bottom: 1px solid oklch(var(--border) / 0.46);
 }
 
 .cronograma-story-month-trigger {
@@ -2389,7 +2241,7 @@ input::placeholder, textarea::placeholder {
 .cronograma-story-event-list {
   position: relative;
   margin-left: 0.4rem;
-  border-left: 1px solid hsl(var(--primary) / 0.16);
+  border-left: 1px solid oklch(var(--primary) / 0.16);
   padding: 0 0 0.55rem 1rem;
   animation: cronograma-list-in 180ms cubic-bezier(0.23, 1, 0.32, 1) both;
 }
@@ -2406,18 +2258,18 @@ input::placeholder, textarea::placeholder {
   height: 0.48rem;
   border: 2px solid white;
   border-radius: 999px;
-  background: hsl(var(--primary));
-  box-shadow: 0 0 0 3px hsl(var(--primary) / 0.10);
+  background: oklch(var(--primary));
+  box-shadow: 0 0 0 3px oklch(var(--primary) / 0.10);
 }
 
 .cronograma-timeline-node[data-main='true'] {
-  background: hsl(var(--gold));
-  box-shadow: 0 0 0 4px hsl(var(--gold) / 0.12);
+  background: oklch(var(--gold));
+  box-shadow: 0 0 0 4px oklch(var(--gold) / 0.12);
 }
 
 .cronograma-empty-row {
   padding: 1rem 0;
-  color: hsl(var(--muted-foreground));
+  color: oklch(var(--muted-foreground));
   font-size: 0.75rem;
   text-align: center;
 }
@@ -2431,15 +2283,15 @@ input::placeholder, textarea::placeholder {
 }
 
 .cronograma-drawer {
-  border-left: 1px solid hsl(var(--gold) / 0.22);
-  background: hsl(var(--cronograma-paper) / 0.96);
+  border-left: 1px solid oklch(var(--gold) / 0.22);
+  background: oklch(var(--cronograma-paper) / 0.96);
   box-shadow: -26px 0 70px -42px rgb(5 45 22 / 0.68);
   backdrop-filter: blur(24px) saturate(1.08);
 }
 
 .cronograma-drawer-header,
 .cronograma-drawer-footer {
-  border-color: hsl(var(--border) / 0.58);
+  border-color: oklch(var(--border) / 0.58);
   background: rgb(255 255 255 / 0.64);
   backdrop-filter: blur(18px);
 }
@@ -2461,16 +2313,16 @@ input::placeholder, textarea::placeholder {
 .cronograma-drawer-section:nth-child(4) { animation-delay: 105ms; }
 
 .cronograma-info-row {
-  border-bottom: 1px solid hsl(var(--border) / 0.48);
+  border-bottom: 1px solid oklch(var(--border) / 0.48);
 }
 
 .cronograma-portal-card {
   position: relative;
   overflow: hidden;
-  border: 1px solid hsl(var(--gold) / 0.24);
+  border: 1px solid oklch(var(--gold) / 0.24);
   border-radius: 1.1rem;
   background:
-    radial-gradient(circle at 90% 0%, hsl(var(--gold) / 0.13), transparent 30%),
+    radial-gradient(circle at 90% 0%, oklch(var(--gold) / 0.13), transparent 30%),
     hsl(143 55% 12% / 0.88);
   box-shadow: 0 24px 70px -38px rgb(0 0 0 / 0.68), inset 0 1px 0 rgb(255 255 255 / 0.08);
   backdrop-filter: blur(20px);
@@ -2493,7 +2345,7 @@ input::placeholder, textarea::placeholder {
   right: 0.5rem;
   top: 0.35rem;
   height: 1px;
-  background: hsl(var(--gold));
+  background: oklch(var(--gold));
 }
 
 .cronograma-portal-year {
@@ -2508,13 +2360,13 @@ input::placeholder, textarea::placeholder {
 .cronograma-portal-node {
   width: 0.7rem;
   height: 0.7rem;
-  border: 2px solid hsl(var(--gold));
+  border: 2px solid oklch(var(--gold));
   border-radius: 999px;
   background: hsl(143 55% 12%);
 }
 
 .cronograma-portal-node[data-final='true'] {
-  background: hsl(var(--gold));
+  background: oklch(var(--gold));
 }
 
 .cronograma-portal-icon {
@@ -2523,10 +2375,10 @@ input::placeholder, textarea::placeholder {
   height: 3.25rem;
   align-items: center;
   justify-content: center;
-  border: 1px solid hsl(var(--gold) / 0.28);
+  border: 1px solid oklch(var(--gold) / 0.28);
   border-radius: 0.85rem;
-  background: hsl(var(--gold) / 0.09);
-  color: hsl(var(--gold));
+  background: oklch(var(--gold) / 0.09);
+  color: oklch(var(--gold));
 }
 
 @keyframes cronograma-view-in {
@@ -2582,7 +2434,7 @@ input::placeholder, textarea::placeholder {
     display: grid;
     min-width: 7.5rem;
     justify-content: start;
-    border-right: 1px solid hsl(var(--border) / 0.55);
+    border-right: 1px solid oklch(var(--border) / 0.55);
     padding-inline: 0.35rem 0.8rem;
   }
 
@@ -2639,8 +2491,8 @@ input::placeholder, textarea::placeholder {
 @media (hover: hover) and (pointer: fine) {
   .cronograma-module-back:hover,
   .cronograma-view-tab:not(.is-active):hover {
-    background: hsl(var(--primary) / 0.06);
-    color: hsl(var(--primary));
+    background: oklch(var(--primary) / 0.06);
+    color: oklch(var(--primary));
   }
 
   .cronograma-module-back:hover {
@@ -2659,18 +2511,18 @@ input::placeholder, textarea::placeholder {
   .cronograma-timeline-item:hover,
   .cronograma-meeting-row:hover,
   .cronograma-undated-row:hover {
-    background: hsl(var(--primary) / 0.035);
+    background: oklch(var(--primary) / 0.035);
     transform: translateX(2px);
   }
 
   .cronograma-story-year:hover {
-    background: hsl(var(--primary) / 0.045);
-    color: hsl(var(--primary));
+    background: oklch(var(--primary) / 0.045);
+    color: oklch(var(--primary));
   }
 
   .cronograma-portal-card:hover {
-    border-color: hsl(var(--gold) / 0.45);
-    box-shadow: 0 28px 76px -38px rgb(0 0 0 / 0.78), 0 0 0 1px hsl(var(--gold) / 0.08);
+    border-color: oklch(var(--gold) / 0.45);
+    box-shadow: 0 28px 76px -38px rgb(0 0 0 / 0.78), 0 0 0 1px oklch(var(--gold) / 0.08);
     transform: translateY(-2px);
   }
 
@@ -2702,7 +2554,7 @@ input::placeholder, textarea::placeholder {
 
   .cronograma-event-actions {
     grid-column: 1 / -1;
-    border-top: 1px solid hsl(var(--border) / 0.38);
+    border-top: 1px solid oklch(var(--border) / 0.38);
     padding-top: 0.55rem;
   }
 
@@ -2788,7 +2640,107 @@ input::placeholder, textarea::placeholder {
   .cronograma-ledger,
   .cronograma-story-section,
   .cronograma-story-index {
-    border-color: hsl(var(--foreground) / 0.48);
+    border-color: oklch(var(--foreground) / 0.48);
+  }
+}
+
+/* Fenasoja 2028 — compatibility layer for legacy surface class names. */
+.liquid-glass,
+.liquid-glass-card,
+.premium-surface,
+.glass-panel,
+.surface-primary,
+.surface-secondary {
+  background: oklch(var(--card));
+  border: 1px solid oklch(var(--border));
+  box-shadow: var(--shadow-xs);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+/* Legacy blur utilities degrade to opaque surfaces without compositor blur. */
+[class*="backdrop-blur"] {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Legacy text utilities use contrast-safe foreground tones on light surfaces. */
+:root:not(.dark) .text-accent {
+  color: oklch(var(--accent-foreground)) !important;
+}
+
+:root:not(.dark) .text-gold {
+  color: oklch(var(--brand-gold-700));
+}
+
+:root:not(.dark) .text-gold\/90 {
+  color: oklch(var(--brand-gold-700) / 0.9);
+}
+
+:root:not(.dark) .text-gold\/70 {
+  color: oklch(var(--brand-gold-700) / 0.7);
+}
+
+.liquid-glass-card:hover,
+.interactive-lift:hover,
+.interactive-lift:active {
+  transform: none;
+  box-shadow: var(--shadow-sm);
+}
+
+.liquid-glass-card::before,
+.premium-surface::before,
+.glass-panel::before,
+.grain-texture::before,
+.sidebar-gold-bar::before,
+.commission-card-glow {
+  display: none;
+}
+
+.gold-accent::after {
+  background: oklch(var(--primary));
+}
+
+.stat-accent-primary,
+.stat-accent-accent,
+.stat-accent-success,
+.stat-accent-warning {
+  border-left: 1px solid oklch(var(--border));
+  border-top: 2px solid oklch(var(--primary));
+}
+
+.stat-accent-accent { border-top-color: oklch(var(--action)); }
+.stat-accent-success { border-top-color: oklch(var(--success)); }
+.stat-accent-warning { border-top-color: oklch(var(--warning)); }
+
+.command-grid-bg {
+  background-image:
+    radial-gradient(circle at 88% 0%, oklch(var(--primary) / 0.07), transparent 34%),
+    radial-gradient(circle at 0% 100%, oklch(var(--action) / 0.055), transparent 28%);
+  background-size: auto;
+}
+
+.portal-card-enter,
+.animate-soft-rise {
+  animation: none;
+}
+
+.premium-sidebar-scrollbar {
+  scrollbar-color: oklch(var(--navigation-active) / 0.45) transparent;
+}
+
+.premium-sidebar-scrollbar::-webkit-scrollbar-thumb {
+  background: oklch(var(--navigation-active) / 0.38);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 

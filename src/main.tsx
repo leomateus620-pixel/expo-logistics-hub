@@ -1,5 +1,6 @@
 import { createRoot } from "react-dom/client";
 import App from "./App.tsx";
+import "./styles/tokens.css";
 import "./index.css";
 import "./styles/cronograma-operational-overrides.css";
 import "./styles/cronograma-mobile.css";

@@ -75,7 +75,7 @@ export default function OdometerFinalizeSheet({
   const Body = (
     <div className="flex flex-col gap-4">
       {/* Hero header */}
-      <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-primary/15 via-primary/5 to-accent/10 p-4 shadow-[0_10px_30px_-12px_hsl(var(--primary)/0.4)]">
+      <div className="relative overflow-hidden rounded-2xl border border-white/10 bg-gradient-to-br from-primary/15 via-primary/5 to-accent/10 p-4 shadow-[0_10px_30px_-12px_oklch(var(--primary)/0.4)]">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-gradient-to-br from-primary to-primary/60 text-primary-foreground shadow-lg shadow-primary/30">
             <Gauge className="w-6 h-6" />
@@ -90,19 +90,19 @@ export default function OdometerFinalizeSheet({
         {(vehicle || driverName) && (
           <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
             {vehicle && (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-background/60 backdrop-blur px-2.5 py-1 border border-border/40">
+              <span className="inline-flex items-center gap-1.5 rounded-lg bg-secondary px-2.5 py-1 border border-border">
                 <Car className="w-3.5 h-3.5 text-primary" />
                 <span className="font-semibold">{vehicle.placa}</span>
                 {vehicle.modelo && <span className="text-muted-foreground">· {vehicle.modelo}</span>}
               </span>
             )}
             {driverName && (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-background/60 backdrop-blur px-2.5 py-1 border border-border/40">
+              <span className="inline-flex items-center gap-1.5 rounded-lg bg-secondary px-2.5 py-1 border border-border">
                 👤 {driverName}
               </span>
             )}
             {lastKnownKm != null && (
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-background/60 backdrop-blur px-2.5 py-1 border border-border/40">
+              <span className="inline-flex items-center gap-1.5 rounded-lg bg-secondary px-2.5 py-1 border border-border">
                 Odômetro atual: <span className="font-mono font-semibold">{fmt(lastKnownKm)}</span> km
               </span>
             )}
@@ -160,7 +160,7 @@ export default function OdometerFinalizeSheet({
               ? 'border-border/40 bg-muted/30'
               : invalido
                 ? 'border-destructive/30 bg-destructive/10'
-                : 'border-primary/20 bg-gradient-to-br from-primary/10 to-accent/10 shadow-[inset_0_1px_0_0_hsl(var(--primary)/0.1)]'
+                : 'border-primary/20 bg-gradient-to-br from-primary/10 to-accent/10 shadow-[inset_0_1px_0_0_oklch(var(--primary)/0.1)]'
           )}>
             <div className="flex items-baseline justify-between gap-3">
               <span className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">KM rodados</span>
@@ -198,7 +198,7 @@ export default function OdometerFinalizeSheet({
         <Button
           onClick={() => handleConfirm(false)}
           disabled={isPending || invalido}
-          className="h-12 rounded-xl font-semibold text-base bg-gradient-to-r from-primary to-primary/85 active:scale-[0.98] transition-transform shadow-lg shadow-primary/20"
+          className="h-12 rounded-xl bg-primary text-base font-semibold text-primary-foreground shadow-sm"
         >
           <Check className="w-5 h-5 mr-2" />
           {isReturnFlow ? 'Finalizar volta' : 'Finalizar viagem'}
@@ -219,7 +219,7 @@ export default function OdometerFinalizeSheet({
   if (isMobile) {
     return (
       <Sheet open={open} onOpenChange={onOpenChange}>
-        <SheetContent side="bottom" className="liquid-glass-card rounded-t-3xl border-t border-white/10 backdrop-blur-xl max-h-[92dvh] overflow-y-auto p-4 pb-[max(env(safe-area-inset-bottom),16px)]">
+        <SheetContent side="bottom" className="max-h-[92dvh] overflow-y-auto rounded-t-2xl border-t border-border bg-card p-4 pb-[max(env(safe-area-inset-bottom),16px)] shadow-lg">
           <SheetHeader className="sr-only">
             <SheetTitle>Registrar odômetro</SheetTitle>
             <SheetDescription>Informe o KM final do veículo</SheetDescription>
@@ -232,7 +232,7 @@ export default function OdometerFinalizeSheet({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg liquid-glass-card backdrop-blur-xl border-white/10 rounded-3xl">
+      <DialogContent className="rounded-2xl border-border bg-card sm:max-w-lg">
         <DialogHeader className="sr-only">
           <DialogTitle>Registrar odômetro</DialogTitle>
           <DialogDescription>Informe o KM final do veículo</DialogDescription>

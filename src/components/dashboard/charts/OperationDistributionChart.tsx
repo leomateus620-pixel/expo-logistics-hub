@@ -23,11 +23,11 @@ export default function OperationDistributionChart({ data }: Props) {
           <PieChart>
             <Pie data={data} cx="50%" cy="50%" innerRadius={50} outerRadius={80} dataKey="value" paddingAngle={2}>
               {data.map((entry, i) => (
-                <Cell key={i} fill={entry.color} stroke="hsl(var(--card))" strokeWidth={2} />
+                <Cell key={i} fill={entry.color} stroke="oklch(var(--card))" strokeWidth={2} />
               ))}
             </Pie>
             <Tooltip
-              contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 12, fontSize: 11, padding: 8 }}
+              contentStyle={{ background: 'oklch(var(--card))', border: '1px solid oklch(var(--border))', borderRadius: 12, fontSize: 11, padding: 8 }}
               formatter={(v: number, name: string) => [`${v} (${total ? Math.round((v / total) * 100) : 0}%)`, name]}
             />
             <Legend wrapperStyle={{ fontSize: 10 }} iconType="circle" iconSize={8} />

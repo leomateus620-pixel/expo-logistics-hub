@@ -62,7 +62,7 @@ export default function PickupHeroCard({ onClick, available, inUse }: Props) {
           'relative overflow-hidden rounded-2xl border border-primary/30',
           'bg-gradient-to-br from-primary/25 via-primary/10 to-accent/20',
           'backdrop-blur-2xl',
-          'shadow-[0_16px_44px_-18px_hsl(var(--primary)/0.55),inset_0_1px_0_rgba(255,255,255,0.18)]',
+          'shadow-[0_16px_44px_-18px_oklch(var(--primary)/0.55),inset_0_1px_0_rgba(255,255,255,0.18)]',
           'min-h-[88px] sm:min-h-[112px]',
           'px-4 sm:px-6 py-3.5 sm:py-4 flex items-center gap-3 sm:gap-4',
           'active:scale-[0.985] motion-reduce:transform-none motion-reduce:transition-none'
@@ -73,12 +73,12 @@ export default function PickupHeroCard({ onClick, available, inUse }: Props) {
           aria-hidden
           className="pointer-events-none absolute inset-0 opacity-70 transition-opacity duration-300"
           style={{
-            background: `radial-gradient(circle at ${tilt.px}% ${tilt.py}%, hsl(var(--primary) / 0.28), transparent 55%)`,
+            background: `radial-gradient(circle at ${tilt.px}% ${tilt.py}%, oklch(var(--primary) / 0.28), transparent 55%)`,
           }}
         />
         {/* Halos */}
-        <div className="pointer-events-none absolute -top-10 -right-8 w-40 h-40 blur-3xl opacity-70 bg-[radial-gradient(circle,hsl(var(--primary)/0.55),transparent_60%)] motion-safe:animate-halo-breath" />
-        <div className="pointer-events-none absolute -bottom-12 -left-8 w-44 h-44 blur-3xl opacity-60 bg-[radial-gradient(circle,hsl(var(--accent)/0.45),transparent_60%)]" />
+        <div className="pointer-events-none absolute -top-10 -right-8 w-40 h-40 blur-3xl opacity-70 bg-[radial-gradient(circle,oklch(var(--primary)/0.55),transparent_60%)] motion-safe:animate-halo-breath" />
+        <div className="pointer-events-none absolute -bottom-12 -left-8 w-44 h-44 blur-3xl opacity-60 bg-[radial-gradient(circle,oklch(var(--accent)/0.45),transparent_60%)]" />
         {/* Glass sheen */}
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.14),transparent_55%)]" />
         {/* Shimmer sweep */}
@@ -91,7 +91,7 @@ export default function PickupHeroCard({ onClick, available, inUse }: Props) {
           style={{ transform: 'translateZ(28px)' }}
           className="relative shrink-0 transition-transform"
         >
-          <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center bg-gradient-to-br from-primary via-primary to-primary/70 text-primary-foreground shadow-[0_10px_24px_-8px_hsl(var(--primary)/0.7),inset_0_1px_0_rgba(255,255,255,0.25)]">
+          <div className="relative w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center bg-gradient-to-br from-primary via-primary to-primary/70 text-primary-foreground shadow-[0_10px_24px_-8px_oklch(var(--primary)/0.7),inset_0_1px_0_rgba(255,255,255,0.25)]">
             <Zap className="w-6 h-6 sm:w-7 sm:h-7 drop-shadow-[0_2px_8px_rgba(0,0,0,0.25)]" />
             {available > 0 && (
               <span className="absolute -top-1 -right-1 flex h-3 w-3">

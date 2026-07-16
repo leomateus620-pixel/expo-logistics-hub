@@ -33,6 +33,7 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
+import { FENASOJA_2028_COLORS, FENASOJA_PRODUCT_NAME } from '@/lib/fenasoja-brand';
 
 const FUEL_COST_PER_KM = 0.65;
 
@@ -59,18 +60,18 @@ function generateVehiclePDF(vehicle: any, usages: any[], fuelRecords: any[], kmT
 
   const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>Relatório - ${vehicle.placa}</title>
 <style>
-  body{font-family:system-ui,sans-serif;padding:32px;color:#1a1a1a;max-width:800px;margin:0 auto}
-  h1{color:#2d6a4f;font-size:22px;margin-bottom:4px}
+  body{font-family:system-ui,sans-serif;padding:32px;color:${FENASOJA_2028_COLORS.navy};max-width:800px;margin:0 auto}
+  h1{color:${FENASOJA_2028_COLORS.indigo};font-size:22px;margin-bottom:4px}
   .sub{color:#666;font-size:13px;margin-bottom:24px}
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:24px}
-  .metric{background:#f0f7f4;border:1px solid #d4e8dc;border-radius:8px;padding:12px}
+  .metric{background:${FENASOJA_2028_COLORS.softWhite};border:1px solid ${FENASOJA_2028_COLORS.cream};border-radius:8px;padding:12px}
   .metric-label{font-size:11px;color:#666;text-transform:uppercase;letter-spacing:0.5px}
-  .metric-value{font-size:18px;font-weight:700;color:#2d6a4f;margin-top:2px}
+  .metric-value{font-size:18px;font-weight:700;color:${FENASOJA_2028_COLORS.indigo};margin-top:2px}
   table{width:100%;border-collapse:collapse;font-size:12px;margin-top:12px}
-  th{background:#2d6a4f;color:white;padding:8px 10px;text-align:left;font-weight:600}
+  th{background:${FENASOJA_2028_COLORS.navy};color:${FENASOJA_2028_COLORS.softWhite};padding:8px 10px;text-align:left;font-weight:600}
   td{padding:7px 10px;border-bottom:1px solid #e8e8e8}
   tr:nth-child(even){background:#f8f8f8}
-  h2{color:#2d6a4f;font-size:16px;margin-top:28px;margin-bottom:8px;border-bottom:2px solid #d4e8dc;padding-bottom:4px}
+  h2{color:${FENASOJA_2028_COLORS.indigo};font-size:16px;margin-top:28px;margin-bottom:8px;border-bottom:2px solid ${FENASOJA_2028_COLORS.gold};padding-bottom:4px}
   .footer{margin-top:32px;text-align:center;font-size:10px;color:#999}
   @media print{body{padding:16px}}
 </style></head><body>
@@ -105,7 +106,7 @@ ${fuelRecords.map((f: any) => `<tr>
   <td>${f.posto || '—'}</td>
 </tr>`).join('')}
 </tbody></table>`}
-<div class="footer">Fenasoja Logística — Relatório gerado em ${new Date().toLocaleString('pt-BR')}</div>
+<div class="footer">${FENASOJA_PRODUCT_NAME} · Logística — Relatório gerado em ${new Date().toLocaleString('pt-BR')}</div>
 </body></html>`;
 
   const w = window.open('', '_blank');

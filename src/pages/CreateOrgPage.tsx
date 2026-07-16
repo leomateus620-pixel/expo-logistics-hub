@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import logo from '@/assets/logofeira26.webp';
+import { FenasojaBrand } from '@/components/brand/FenasojaBrand';
 
 export default function CreateOrgPage() {
   const { createOrg, isCreating } = useCurrentOrg();
@@ -22,16 +22,16 @@ export default function CreateOrgPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background p-4">
-      <div className="w-full max-w-sm space-y-6">
+    <div className="flex min-h-screen items-center justify-center bg-background p-4">
+      <div className="w-full max-w-sm rounded-xl border border-border bg-card p-6 shadow-[var(--shadow-sm)]">
         <div className="text-center">
-          <img src={logo} alt="Fenasoja" className="w-16 h-16 mx-auto rounded-xl object-contain bg-primary/10 p-1" />
-          <h1 className="text-xl font-bold mt-4">Bem-vindo ao Fenasoja Logística</h1>
+          <FenasojaBrand subtitle="Logística" tone="light" className="justify-center" />
+          <h1 className="mt-6 text-xl font-bold">Bem-vindo à Fenasoja 2028</h1>
           <p className="text-sm text-muted-foreground mt-2">
             Crie sua organização para começar a gerenciar a logística do evento.
           </p>
         </div>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <Input
             placeholder="Nome da organização"
             value={nome}

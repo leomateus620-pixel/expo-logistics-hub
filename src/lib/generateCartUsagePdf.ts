@@ -1,6 +1,7 @@
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import type { CartUsageSession } from '@/hooks/useCartUsageReport';
+import { FENASOJA_2028_RGB } from './fenasoja-brand';
 
 function fmt(iso: string | null): string {
   if (!iso) return '—';
@@ -25,7 +26,7 @@ export function generateCartUsagePdf(sessions: CartUsageSession[], periodLabel: 
   const pageH = doc.internal.pageSize.getHeight();
 
   doc.setFontSize(16);
-  doc.setTextColor(30, 80, 30);
+  doc.setTextColor(...FENASOJA_2028_RGB.indigo);
   doc.text('Uso de Carrinhos Elétricos', 14, 16);
   doc.setFontSize(10);
   doc.setTextColor(100);
@@ -45,8 +46,8 @@ export function generateCartUsagePdf(sessions: CartUsageSession[], periodLabel: 
       fmtDuration(s.duration_min),
     ]),
     styles: { fontSize: 9, cellPadding: 2.5 },
-    headStyles: { fillColor: [30, 80, 30], textColor: 255, fontStyle: 'bold' },
-    alternateRowStyles: { fillColor: [248, 248, 240] },
+    headStyles: { fillColor: FENASOJA_2028_RGB.indigo, textColor: FENASOJA_2028_RGB.softWhite, fontStyle: 'bold' },
+    alternateRowStyles: { fillColor: [245, 246, 252] },
     columnStyles: {
       0: { cellWidth: 50 },
       1: { cellWidth: 55 },
@@ -64,7 +65,7 @@ export function generateCartUsagePdf(sessions: CartUsageSession[], periodLabel: 
     doc.setFontSize(8);
     doc.setTextColor(120);
     doc.text(`Página ${i} de ${pages}`, pageW / 2, pageH - 8, { align: 'center' });
-    doc.text('Fenasoja Logística — Relatório de Carrinhos Elétricos', 14, pageH - 8);
+    doc.text('Fenasoja 2028 · Logística — Relatório de Carrinhos Elétricos', 14, pageH - 8);
   }
 
   doc.save(`uso-carrinhos-eletricos-${new Date().toISOString().slice(0, 10)}.pdf`);

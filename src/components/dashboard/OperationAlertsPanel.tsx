@@ -13,12 +13,12 @@ export default function OperationAlertsPanel({ alerts }: { alerts: DashboardAler
   const navigate = useNavigate();
 
   return (
-    <div className="liquid-glass-card rounded-2xl p-5 gold-accent">
+    <section className="rounded-xl border border-border bg-card p-4 shadow-[var(--shadow-xs)]">
       <div className="flex items-center justify-between mb-3">
         <h2 className="text-sm font-bold flex items-center gap-2 text-foreground tracking-tight">
           <AlertCircle className="w-4 h-4 text-destructive" /> Alertas da Operação
         </h2>
-        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-muted/50 text-muted-foreground">
+        <span className="rounded-md bg-secondary px-2 py-0.5 text-[10px] font-semibold text-muted-foreground">
           {alerts.length}
         </span>
       </div>
@@ -39,7 +39,7 @@ export default function OperationAlertsPanel({ alerts }: { alerts: DashboardAler
                 type="button"
                 onClick={() => a.ctaRoute && navigate(a.ctaRoute)}
                 className={cn(
-                  'w-full text-left rounded-xl p-3 border backdrop-blur-md transition-all hover:scale-[1.005] active:scale-[0.99] flex items-center gap-3',
+                  'flex w-full items-center gap-3 rounded-lg border p-3 text-left transition-colors duration-150',
                   cfg.cls,
                 )}
               >
@@ -54,6 +54,6 @@ export default function OperationAlertsPanel({ alerts }: { alerts: DashboardAler
           })}
         </div>
       )}
-    </div>
+    </section>
   );
 }

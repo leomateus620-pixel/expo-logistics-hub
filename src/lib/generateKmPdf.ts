@@ -2,6 +2,14 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { ConsolidationResult, FAIR_PERIODS } from './kmConsolidation';
 import type { VehicleOdometerEvent } from '@/hooks/useVehicleOdometerEvent';
+import { FENASOJA_2028_RGB } from './fenasoja-brand';
+
+const PDF_NAVY = FENASOJA_2028_RGB.navy;
+const PDF_INDIGO = FENASOJA_2028_RGB.indigo;
+const PDF_ORANGE = FENASOJA_2028_RGB.orange;
+const PDF_GOLD = FENASOJA_2028_RGB.gold;
+const PDF_SOFT_WHITE = FENASOJA_2028_RGB.softWhite;
+const PDF_ALT_ROW: [number, number, number] = [245, 246, 252];
 
 export interface OdometerEventReport {
   items: VehicleOdometerEvent[];
@@ -50,7 +58,7 @@ export function generateKmPdf(data: ConsolidationResult, odometer?: OdometerEven
       doc.setFontSize(8);
       doc.setTextColor(120);
       doc.text(`Página ${i} de ${pages}`, pageW / 2, pageH - 8, { align: 'center' });
-      doc.text('Fenasoja Logística — Relatório gerado automaticamente', margin, pageH - 8);
+      doc.text('Fenasoja 2028 · Logística — Relatório gerado automaticamente', margin, pageH - 8);
     }
   };
 
@@ -65,10 +73,10 @@ export function generateKmPdf(data: ConsolidationResult, odometer?: OdometerEven
     checkNewPage(20);
     y += 6;
     doc.setFontSize(14);
-    doc.setTextColor(30, 80, 30);
+    doc.setTextColor(...PDF_INDIGO);
     doc.text(title, margin, y);
     y += 2;
-    doc.setDrawColor(200, 180, 80);
+    doc.setDrawColor(...PDF_ORANGE);
     doc.setLineWidth(0.5);
     doc.line(margin, y, margin + contentW, y);
     y += 8;
@@ -76,18 +84,18 @@ export function generateKmPdf(data: ConsolidationResult, odometer?: OdometerEven
   };
 
   // ══════════════ CAPA ══════════════
-  doc.setFillColor(25, 60, 25);
+  doc.setFillColor(...PDF_NAVY);
   doc.rect(0, 0, pageW, pageH, 'F');
 
-  doc.setTextColor(220, 190, 80);
+  doc.setTextColor(...PDF_GOLD);
   doc.setFontSize(28);
   doc.text('Relatório de Quilometragem', pageW / 2, 70, { align: 'center' });
   doc.setFontSize(20);
   doc.text('e Base de Emissão de Carbono', pageW / 2, 82, { align: 'center' });
 
-  doc.setTextColor(200);
+  doc.setTextColor(...PDF_SOFT_WHITE);
   doc.setFontSize(12);
-  doc.text('Fenasoja 2026 — Logística', pageW / 2, 100, { align: 'center' });
+  doc.text('Fenasoja 2028 — Logística', pageW / 2, 100, { align: 'center' });
 
   doc.setFontSize(10);
   const periodsText = FAIR_PERIODS.map(p => `${p.label}: ${fmtDate(p.start)} a ${fmtDate(p.end)}`).join('   |   ');
@@ -120,8 +128,8 @@ export function generateKmPdf(data: ConsolidationResult, odometer?: OdometerEven
     body: summaryRows,
     margin: { left: margin, right: margin },
     styles: { fontSize: 10, cellPadding: 4 },
-    headStyles: { fillColor: [25, 60, 25], textColor: [220, 190, 80] },
-    alternateRowStyles: { fillColor: [245, 245, 240] },
+    headStyles: { fillColor: PDF_INDIGO, textColor: PDF_SOFT_WHITE },
+    alternateRowStyles: { fillColor: PDF_ALT_ROW },
   });
   y = (doc as any).lastAutoTable.finalY + 10;
 
@@ -145,8 +153,8 @@ export function generateKmPdf(data: ConsolidationResult, odometer?: OdometerEven
     body: periodRows,
     margin: { left: margin, right: margin },
     styles: { fontSize: 8, cellPadding: 3 },
-    headStyles: { fillColor: [25, 60, 25], textColor: [220, 190, 80] },
-    alternateRowStyles: { fillColor: [245, 245, 240] },
+    headStyles: { fillColor: PDF_INDIGO, textColor: PDF_SOFT_WHITE },
+    alternateRowStyles: { fillColor: PDF_ALT_ROW },
   });
   y = (doc as any).lastAutoTable.finalY + 10;
 
@@ -176,8 +184,8 @@ export function generateKmPdf(data: ConsolidationResult, odometer?: OdometerEven
     body: dayRows,
     margin: { left: margin, right: margin },
     styles: { fontSize: 8, cellPadding: 3 },
-    headStyles: { fillColor: [25, 60, 25], textColor: [220, 190, 80] },
-    alternateRowStyles: { fillColor: [245, 245, 240] },
+    headStyles: { fillColor: PDF_INDIGO, textColor: PDF_SOFT_WHITE },
+    alternateRowStyles: { fillColor: PDF_ALT_ROW },
   });
   y = (doc as any).lastAutoTable.finalY + 10;
 
@@ -202,8 +210,8 @@ export function generateKmPdf(data: ConsolidationResult, odometer?: OdometerEven
     body: tRows,
     margin: { left: margin, right: margin },
     styles: { fontSize: 7, cellPadding: 2 },
-    headStyles: { fillColor: [25, 60, 25], textColor: [220, 190, 80] },
-    alternateRowStyles: { fillColor: [245, 245, 240] },
+    headStyles: { fillColor: PDF_INDIGO, textColor: PDF_SOFT_WHITE },
+    alternateRowStyles: { fillColor: PDF_ALT_ROW },
     columnStyles: {
       1: { cellWidth: 35 },
       4: { cellWidth: 30 },
@@ -230,8 +238,8 @@ export function generateKmPdf(data: ConsolidationResult, odometer?: OdometerEven
     body: vRows,
     margin: { left: margin, right: margin },
     styles: { fontSize: 9, cellPadding: 3 },
-    headStyles: { fillColor: [25, 60, 25], textColor: [220, 190, 80] },
-    alternateRowStyles: { fillColor: [245, 245, 240] },
+    headStyles: { fillColor: PDF_INDIGO, textColor: PDF_SOFT_WHITE },
+    alternateRowStyles: { fillColor: PDF_ALT_ROW },
   });
   y = (doc as any).lastAutoTable.finalY + 10;
 
@@ -266,8 +274,8 @@ export function generateKmPdf(data: ConsolidationResult, odometer?: OdometerEven
       body: oRows,
       margin: { left: margin, right: margin },
       styles: { fontSize: 8, cellPadding: 3 },
-      headStyles: { fillColor: [25, 60, 25], textColor: [220, 190, 80] },
-      alternateRowStyles: { fillColor: [245, 245, 240] },
+      headStyles: { fillColor: PDF_INDIGO, textColor: PDF_SOFT_WHITE },
+      alternateRowStyles: { fillColor: PDF_ALT_ROW },
       didParseCell: (hookData) => {
         if (hookData.row.index === oRows.length - 1) {
           hookData.cell.styles.fontStyle = 'bold';
@@ -295,8 +303,8 @@ export function generateKmPdf(data: ConsolidationResult, odometer?: OdometerEven
     body: gRows,
     margin: { left: margin, right: margin },
     styles: { fontSize: 8, cellPadding: 3 },
-    headStyles: { fillColor: [25, 60, 25], textColor: [220, 190, 80] },
-    alternateRowStyles: { fillColor: [245, 245, 240] },
+    headStyles: { fillColor: PDF_INDIGO, textColor: PDF_SOFT_WHITE },
+    alternateRowStyles: { fillColor: PDF_ALT_ROW },
     columnStyles: { 3: { cellWidth: 70 } },
   });
   y = (doc as any).lastAutoTable.finalY + 10;

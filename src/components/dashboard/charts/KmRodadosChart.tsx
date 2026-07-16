@@ -29,15 +29,15 @@ export default function KmRodadosChart({ data, topVehicleLabel }: Props) {
             <AreaChart data={data} margin={{ top: 6, right: 6, left: -22, bottom: 0 }}>
               <defs>
                 <linearGradient id="kmGrad" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="hsl(var(--success))" stopOpacity={0.4} />
-                  <stop offset="100%" stopColor="hsl(var(--success))" stopOpacity={0} />
+                  <stop offset="0%" stopColor="oklch(var(--success))" stopOpacity={0.4} />
+                  <stop offset="100%" stopColor="oklch(var(--success))" stopOpacity={0} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border) / 0.4)" vertical={false} />
-              <XAxis dataKey="dia" tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
-              <Tooltip contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border))', borderRadius: 12, fontSize: 11, padding: 8 }} />
-              <Area type="monotone" dataKey="km" stroke="hsl(var(--success))" strokeWidth={2} fill="url(#kmGrad)" />
+              <CartesianGrid strokeDasharray="3 3" stroke="oklch(var(--border) / 0.4)" vertical={false} />
+              <XAxis dataKey="dia" tick={{ fontSize: 10, fill: 'oklch(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 10, fill: 'oklch(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
+              <Tooltip contentStyle={{ background: 'oklch(var(--card))', border: '1px solid oklch(var(--border))', borderRadius: 12, fontSize: 11, padding: 8 }} />
+              <Area type="monotone" dataKey="km" stroke="oklch(var(--success))" strokeWidth={2} fill="url(#kmGrad)" />
             </AreaChart>
           </ResponsiveContainer>
           {topVehicleLabel && (

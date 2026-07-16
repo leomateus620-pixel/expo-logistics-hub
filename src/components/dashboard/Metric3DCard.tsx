@@ -1,7 +1,6 @@
-import { ReactNode, useRef, useState, useCallback } from 'react';
-import { cn } from '@/lib/utils';
-import MetricCardRotator from './MetricCardRotator';
+import type { ReactNode } from 'react';
 import { Maximize2 } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 type Variant = 'primary' | 'accent' | 'success' | 'warning';
 
@@ -20,135 +19,94 @@ interface Props {
   cta?: { label: string; onClick: () => void };
   onExpand?: () => void;
   liveActive?: boolean;
-  /** sparkline data */
   spark?: number[];
 }
 
-const cfgMap: Record<Variant, { glow: string; iconBg: string; iconColor: string; ring: string; accent: string }> = {
-  primary: { glow: 'hsl(var(--primary) / 0.32)', iconBg: 'from-primary/30 to-primary/5', iconColor: 'text-primary', ring: 'ring-primary/30', accent: 'hsl(var(--primary))' },
-  accent: { glow: 'hsl(var(--gold) / 0.34)', iconBg: 'from-[hsl(var(--gold)/0.35)] to-[hsl(var(--gold)/0.05)]', iconColor: 'text-gold', ring: 'ring-[hsl(var(--gold)/0.35)]', accent: 'hsl(var(--gold))' },
-  success: { glow: 'hsl(var(--success) / 0.32)', iconBg: 'from-[hsl(var(--success)/0.32)] to-[hsl(var(--success)/0.05)]', iconColor: 'text-success', ring: 'ring-[hsl(var(--success)/0.30)]', accent: 'hsl(var(--success))' },
-  warning: { glow: 'hsl(var(--warning) / 0.32)', iconBg: 'from-[hsl(var(--warning)/0.32)] to-[hsl(var(--warning)/0.05)]', iconColor: 'text-warning', ring: 'ring-[hsl(var(--warning)/0.30)]', accent: 'hsl(var(--warning))' },
+const cfgMap: Record<Variant, { border: string; icon: string; spark: string; label: string }> = {
+  primary: { border: 'border-t-primary', icon: 'bg-accent text-primary', spark: 'oklch(var(--primary))', label: 'text-primary' },
+  accent: { border: 'border-t-action', icon: 'bg-action/12 text-[oklch(var(--brand-orange-700))]', spark: 'oklch(var(--action))', label: 'text-[oklch(var(--brand-orange-700))]' },
+  success: { border: 'border-t-success', icon: 'bg-success/10 text-success', spark: 'oklch(var(--success))', label: 'text-success' },
+  warning: { border: 'border-t-warning', icon: 'bg-warning/15 text-warning-foreground', spark: 'oklch(var(--warning))', label: 'text-warning-foreground' },
 };
 
 function Sparkline({ data, color }: { data: number[]; color: string }) {
   if (!data.length) return null;
   const max = Math.max(...data, 1);
-  const w = 60, h = 16;
-  const step = w / Math.max(data.length - 1, 1);
-  const pts = data.map((v, i) => `${i * step},${h - (v / max) * h}`).join(' ');
+  const width = 72;
+  const height = 20;
+  const step = width / Math.max(data.length - 1, 1);
+  const points = data.map((value, index) => `${index * step},${height - (value / max) * height}`).join(' ');
   return (
-    <svg width={w} height={h} className="opacity-70" aria-hidden>
-      <polyline fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" points={pts} />
+    <svg width={width} height={height} className="opacity-75" aria-hidden="true">
+      <polyline fill="none" stroke={color} strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" points={points} />
     </svg>
   );
 }
 
 export default function Metric3DCard({ title, icon, variant, screens, cta, onExpand, liveActive, spark }: Props) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [tilt, setTilt] = useState({ x: 0, y: 0, mx: 50, my: 50, hover: false });
   const cfg = cfgMap[variant];
-
-  const handleMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    const el = ref.current;
-    if (!el) return;
-    const r = el.getBoundingClientRect();
-    const px = (e.clientX - r.left) / r.width;
-    const py = (e.clientY - r.top) / r.height;
-    setTilt({ x: (0.5 - py) * 10, y: (px - 0.5) * 10, mx: px * 100, my: py * 100, hover: true });
-  }, []);
-  const handleMouseLeave = useCallback(() => setTilt({ x: 0, y: 0, mx: 50, my: 50, hover: false }), []);
+  const primaryMetric = screens[0];
+  const secondaryMetrics = screens.slice(1);
 
   return (
-    <div className="[perspective:1400px] motion-reduce:[perspective:none]">
-      <div
-        ref={ref}
-        className="relative rounded-2xl will-change-transform transition-[transform,box-shadow] duration-[280ms] ease-[cubic-bezier(0.22,1,0.36,1)] active:scale-[0.98] motion-reduce:!transform-none"
-        style={{
-          transformStyle: 'preserve-3d',
-          transform: tilt.hover ? `rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) translateZ(8px)` : 'rotateX(2deg) rotateY(-1deg)',
-        }}
-        onMouseMove={handleMouseMove}
-        onMouseLeave={handleMouseLeave}
-      >
-        {/* Glow */}
-        <div aria-hidden className="absolute -inset-1 rounded-3xl opacity-40 blur-xl pointer-events-none transition-opacity duration-300" style={{ background: `radial-gradient(60% 60% at ${tilt.mx}% ${tilt.my}%, ${cfg.glow}, transparent 70%)`, opacity: tilt.hover ? 0.9 : 0.4 }} />
-        {/* Surface */}
-        <div className={cn('relative rounded-2xl overflow-hidden bg-card/55 backdrop-blur-2xl backdrop-saturate-150 border border-border/40 ring-1 ring-inset', cfg.ring)}
-          style={{ boxShadow: tilt.hover ? `0 14px 38px -10px ${cfg.glow}, inset 0 1px 0 rgba(255,255,255,0.10), inset 0 0 0 0.5px hsl(var(--gold) / 0.10)` : `0 4px 14px -6px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.06), inset 0 0 0 0.5px hsl(var(--gold) / 0.07)` }}>
-          {/* Top edge */}
-          <div aria-hidden className="absolute inset-x-0 top-0 h-px pointer-events-none" style={{ background: `linear-gradient(90deg, transparent, ${cfg.accent}, transparent)`, opacity: 0.5 }} />
-          {/* Left accent */}
-          <div aria-hidden className="absolute left-0 top-2 bottom-2 w-[3px] rounded-r-full pointer-events-none" style={{ background: `linear-gradient(180deg, ${cfg.accent}, ${cfg.accent}80)`, boxShadow: `0 0 10px ${cfg.glow}` }} />
-
-          {/* Header */}
-          <div className="relative p-4 pb-2 flex items-start justify-between gap-2" style={{ transform: 'translateZ(15px)' }}>
-            <div className="flex items-center gap-1.5 min-w-0">
-              <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider truncate">{title}</p>
-              {liveActive && (
-                <span className="relative inline-flex h-1.5 w-1.5 shrink-0">
-                  <span className="absolute inline-flex h-full w-full rounded-full opacity-75 animate-ping" style={{ background: cfg.accent }} />
-                  <span className="relative inline-flex h-1.5 w-1.5 rounded-full" style={{ background: cfg.accent }} />
-                </span>
-              )}
-            </div>
-            <div className="flex items-center gap-1.5 shrink-0">
-              {spark && <Sparkline data={spark} color={cfg.accent} />}
-              <div className={cn('rounded-xl p-1.5 bg-gradient-to-br ring-1', cfg.iconBg, cfg.ring)}
-                style={{ transform: tilt.hover ? 'translateZ(20px) scale(1.05)' : 'translateZ(8px)', boxShadow: `inset 0 1px 0 rgba(255,255,255,0.18), 0 4px 10px -3px ${cfg.glow}` }}>
-                <div className={cn(cfg.iconColor)}>{icon}</div>
-              </div>
-            </div>
-          </div>
-
-          {/* Rotating content */}
-          <div className="px-4 pb-3 min-h-[88px]" style={{ transform: 'translateZ(8px)' }}>
-            <MetricCardRotator
-              ariaLabel={`Métricas de ${title}`}
-              screens={screens.map((s, i) => (
-                <div key={i}>
-                  <p className="text-2xl sm:text-3xl font-extrabold tracking-tight tabular-nums text-foreground" style={{ textShadow: tilt.hover ? `0 2px 12px ${cfg.glow}` : 'none' }}>
-                    {s.value}
-                  </p>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <p className="text-[10px] font-semibold text-muted-foreground truncate">{s.label}</p>
-                    {s.smartTag && (
-                      <span className="text-[9px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-md whitespace-nowrap" style={{ background: `${cfg.accent}1f`, color: cfg.accent }}>
-                        {s.smartTag}
-                      </span>
-                    )}
-                  </div>
-                  {s.hint && <p className="text-[10px] text-muted-foreground/80 mt-0.5 truncate">{s.hint}</p>}
-                </div>
-              ))}
-            />
-          </div>
-
-          {/* Footer CTAs */}
-          <div className="flex items-center justify-between px-3 py-2 border-t border-border/30 bg-muted/20">
-            {cta ? (
-              <button
-                type="button"
-                onClick={(e) => { e.stopPropagation(); cta.onClick(); }}
-                className="text-[10px] font-bold uppercase tracking-wide px-2 py-1 rounded-md hover:bg-foreground/5 transition-colors"
-                style={{ color: cfg.accent }}
-              >
-                {cta.label}
-              </button>
-            ) : <span />}
-            {onExpand && (
-              <button
-                type="button"
-                onClick={(e) => { e.stopPropagation(); onExpand(); }}
-                aria-label={`Expandir detalhes de ${title}`}
-                className="p-1 rounded-md hover:bg-foreground/5 transition-colors text-muted-foreground hover:text-foreground"
-              >
-                <Maximize2 className="w-3 h-3" />
-              </button>
+    <article className={cn('overflow-hidden rounded-xl border border-border border-t-2 bg-card shadow-[var(--shadow-xs)]', cfg.border)}>
+      <div className="flex items-start justify-between gap-3 px-4 pb-3 pt-4">
+        <div className="flex min-w-0 items-center gap-3">
+          <span className={cn('flex h-9 w-9 shrink-0 items-center justify-center rounded-lg', cfg.icon)}>{icon}</span>
+          <div className="min-w-0">
+            <p className="truncate text-xs font-bold uppercase tracking-[0.12em] text-muted-foreground">{title}</p>
+            {liveActive && (
+              <span className="mt-1 inline-flex items-center gap-1.5 text-[10px] font-bold text-success">
+                <span className="h-1.5 w-1.5 rounded-full bg-success" aria-hidden="true" />
+                Em operação agora
+              </span>
             )}
           </div>
         </div>
+        {spark && <Sparkline data={spark} color={cfg.spark} />}
       </div>
-    </div>
+
+      {primaryMetric && (
+        <div className="px-4 pb-4">
+          <div className="flex flex-wrap items-end gap-x-3 gap-y-1">
+            <p className="text-3xl font-black tracking-tight text-foreground tabular-nums">{primaryMetric.value}</p>
+            <p className="pb-1 text-xs font-semibold text-muted-foreground">{primaryMetric.label}</p>
+            {primaryMetric.smartTag && (
+              <span className={cn('mb-1 rounded-md bg-secondary px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide', cfg.label)}>
+                {primaryMetric.smartTag}
+              </span>
+            )}
+          </div>
+          {primaryMetric.hint && <p className="mt-1 text-[10px] text-muted-foreground">{primaryMetric.hint}</p>}
+        </div>
+      )}
+
+      {secondaryMetrics.length > 0 && (
+        <dl className="grid grid-cols-2 border-t border-border bg-secondary/55">
+          {secondaryMetrics.map((metric, index) => (
+            <div key={`${metric.label}-${index}`} className={cn('min-w-0 px-4 py-3', index > 0 && 'border-l border-border')}>
+              <dt className="truncate text-[10px] font-semibold text-muted-foreground">{metric.label}</dt>
+              <dd className="mt-0.5 truncate text-lg font-black text-foreground tabular-nums">{metric.value}</dd>
+              {metric.hint && <p className="truncate text-[9px] text-muted-foreground">{metric.hint}</p>}
+            </div>
+          ))}
+        </dl>
+      )}
+
+      {(cta || onExpand) && (
+        <footer className="flex items-center justify-between border-t border-border px-3 py-2">
+          {cta ? (
+            <button type="button" onClick={cta.onClick} className={cn('rounded-md px-2 py-1 text-[10px] font-bold uppercase tracking-wide transition-colors hover:bg-secondary focus-ring', cfg.label)}>
+              {cta.label}
+            </button>
+          ) : <span />}
+          {onExpand && (
+            <button type="button" onClick={onExpand} aria-label={`Expandir detalhes de ${title}`} className="rounded-md p-1.5 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground focus-ring">
+              <Maximize2 className="h-3.5 w-3.5" aria-hidden="true" />
+            </button>
+          )}
+        </footer>
+      )}
+    </article>
   );
 }

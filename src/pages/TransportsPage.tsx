@@ -22,6 +22,7 @@ import { DateTimePicker } from '@/components/ui/date-time-picker';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { toast } from 'sonner';
+import { FENASOJA_2028_COLORS, FENASOJA_PRODUCT_NAME } from '@/lib/fenasoja-brand';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -224,7 +225,7 @@ function generateWhatsAppText(data: any, driver: any, vehicle: any, guest: any) 
   if (data.escolta_contato_seguranca) lines.push(`📞 *Contato Segurança:* ${data.escolta_contato_seguranca}`);
   if (guest) lines.push(`🏨 *Hóspede:* ${guest.nome}`);
   if (data.escolta_obs) lines.push(`📝 *Obs:* ${data.escolta_obs}`);
-  lines.push('', '_Mensagem gerada pelo sistema Fenasoja Logística_');
+  lines.push('', '_Mensagem gerada pelo sistema Fenasoja 2028 · Logística_');
   return lines.join('\n');
 }
 
@@ -998,13 +999,13 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
     const printWindow = window.open('', '_blank');
     if (!printWindow) { toast.error('Popup bloqueado pelo navegador'); return; }
     printWindow.document.write(`<!DOCTYPE html><html><head><title>Transporte ${t.titulo || ''}</title><style>
-      body { font-family: 'Segoe UI', Arial, sans-serif; padding: 40px; max-width: 600px; margin: 0 auto; color: #1a1a1a; }
-      h1 { font-size: 18px; border-bottom: 2px solid #2d6a4f; padding-bottom: 8px; margin-bottom: 16px; color: #2d6a4f; }
+      body { font-family: 'Segoe UI', Arial, sans-serif; padding: 40px; max-width: 600px; margin: 0 auto; color: ${FENASOJA_2028_COLORS.navy}; }
+      h1 { font-size: 18px; border-bottom: 2px solid ${FENASOJA_2028_COLORS.gold}; padding-bottom: 8px; margin-bottom: 16px; color: ${FENASOJA_2028_COLORS.indigo}; }
       .row { display: flex; gap: 8px; margin-bottom: 8px; }
       .label { font-weight: 600; color: #555; font-size: 13px; min-width: 140px; }
       .value { font-size: 14px; }
-      .flight { background: #f0f7f4; padding: 12px; border-radius: 8px; margin-top: 16px; }
-      .flight strong { color: #2d6a4f; }
+      .flight { background: ${FENASOJA_2028_COLORS.softWhite}; border: 1px solid ${FENASOJA_2028_COLORS.cream}; padding: 12px; border-radius: 8px; margin-top: 16px; }
+      .flight strong { color: ${FENASOJA_2028_COLORS.indigo}; }
       .footer { margin-top: 24px; font-size: 11px; color: #888; border-top: 1px solid #ddd; padding-top: 8px; }
     </style></head><body>
       <h1>🚐 Transporte — ${t.titulo || 'Sem título'}</h1>
@@ -1037,7 +1038,7 @@ setReturnForm({ inicio_em: '', voo_numero: '', voo_checkin: '', horario_saida: '
         ${t.voo_chegada ? `<div class="row"><span class="label">Chegada:</span><span class="value">${t.voo_chegada}</span></div>` : ''}
         ${t.horario_saida ? `<div class="row"><span class="label">Saída p/ Aeroporto:</span><span class="value">${t.horario_saida}</span></div>` : ''}
       </div>` : ''}
-      <div class="footer">Gerado em ${new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</div>
+      <div class="footer">${FENASOJA_PRODUCT_NAME} · Gerado em ${new Date().toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</div>
     </body></html>`);
     printWindow.document.close();
     printWindow.print();

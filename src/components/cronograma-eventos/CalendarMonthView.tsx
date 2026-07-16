@@ -12,6 +12,7 @@ import {
   PanelRightOpen,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import {
   CronogramaCategoryMarker,
@@ -106,6 +107,7 @@ export function CalendarMonthView({
   const [sideCollapsed, setSideCollapsed] = useState(false);
   const [yearPulse, setYearPulse] = useState(false);
   const wheelLock = useRef(false);
+  const expandedTriggerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     if (!preferredYear || preferredYear === year) return;
@@ -115,15 +117,6 @@ export function CalendarMonthView({
     setYearPulse(true);
     window.setTimeout(() => setYearPulse(false), 260);
   }, [preferredYear, year, month, selectedDate]);
-
-  useEffect(() => {
-    if (!expanded) return;
-    const original = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = original;
-    };
-  }, [expanded]);
 
   const eventsByDate = useMemo(() => {
     const map = new Map<string, CronogramaEvent[]>();
@@ -196,6 +189,16 @@ export function CalendarMonthView({
     setSelectedDate(dateKey(year, nextMonth, 1));
   };
 
+  const openExpanded = () => {
+    expandedTriggerRef.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    setExpanded(true);
+  };
+
+  const closeExpanded = () => {
+    setExpanded(false);
+    window.requestAnimationFrame(() => expandedTriggerRef.current?.focus());
+  };
+
   const renderWorkspace = (isExpanded: boolean) => (
     <CalendarWorkspace
       eventsByDate={eventsByDate}
@@ -213,8 +216,8 @@ export function CalendarMonthView({
       onYearWheel={handleYearWheel}
       onOpen={onOpen}
       onEdit={onEdit}
-      onExpand={() => setExpanded(true)}
-      onExitExpand={() => setExpanded(false)}
+      onExpand={openExpanded}
+      onExitExpand={closeExpanded}
       onToggleSide={() => setSideCollapsed((value) => !value)}
       nextMonthEvent={nextMonthEvent}
     />
@@ -223,11 +226,9 @@ export function CalendarMonthView({
   return (
     <>
       {renderWorkspace(false)}
-      {expanded && (
-        <CalendarFullscreenMode onClose={() => setExpanded(false)}>
-          {renderWorkspace(true)}
-        </CalendarFullscreenMode>
-      )}
+      <CalendarFullscreenMode open={expanded} onOpenChange={(open) => (open ? setExpanded(true) : closeExpanded())}>
+        {renderWorkspace(true)}
+      </CalendarFullscreenMode>
     </>
   );
 }
@@ -284,11 +285,10 @@ function CalendarWorkspace({
   return (
     <section
       className={cn(
-        'relative overflow-hidden rounded-[1.75rem] border border-white/60 bg-[linear-gradient(145deg,rgb(255_255_255/0.84),rgb(244_249_241/0.78)_58%,hsl(var(--gold)/0.10))] shadow-[0_24px_80px_-50px_rgb(21_62_39/0.62),inset_0_1px_0_rgb(255_255_255/0.72)]',
+        'relative overflow-hidden rounded-2xl border border-border bg-card shadow-sm',
         expanded ? 'min-h-[calc(100vh-3.5rem)] p-4 sm:p-5' : 'p-4 sm:p-5',
       )}
     >
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(hsl(var(--primary)/0.045)_1px,transparent_1px),linear-gradient(90deg,hsl(var(--primary)/0.035)_1px,transparent_1px)] bg-[size:42px_42px]" />
       <div className="relative space-y-4">
         <CalendarToolbar
           year={year}
@@ -315,7 +315,7 @@ function CalendarWorkspace({
               : 'xl:grid-cols-[minmax(0,1.45fr)_360px]',
           )}
         >
-          <div className="rounded-[1.35rem] border border-white/55 bg-white/58 p-3 shadow-[inset_0_1px_0_rgb(255_255_255/0.64)] backdrop-blur-xl">
+          <div className="rounded-xl border border-border bg-background p-3">
             <div className="grid grid-cols-7 gap-1.5 pb-2">
               {weekDays.map((day) => (
                 <div key={day} className="px-2 py-1 text-center text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground">
@@ -340,10 +340,10 @@ function CalendarWorkspace({
                       'group relative flex flex-col overflow-hidden rounded-xl border text-left transition-[border-color,background-color,box-shadow] duration-200',
                       expanded ? 'min-h-[108px]' : 'min-h-[82px]',
                       selected
-                        ? 'border-primary/38 bg-primary/[0.075] shadow-[0_14px_30px_-24px_hsl(var(--primary)/0.75),inset_0_1px_0_rgb(255_255_255/0.72)]'
+                        ? 'border-primary/40 bg-primary/10'
                         : events.length
-                          ? 'border-gold/24 bg-white/75 hover:border-gold/45 hover:bg-white'
-                          : 'border-border/22 bg-white/36 hover:bg-white/62',
+                          ? 'border-gold/30 bg-card hover:border-gold/50 hover:bg-warning/5'
+                          : 'border-border bg-card hover:bg-secondary',
                     )}
                     role="group"
                     aria-label={`${cell.day} de ${getMonthLabel(month)} de ${year}, ${events.length} eventos`}
@@ -414,7 +414,7 @@ function CalendarToolbar({
   return (
     <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
       <div className="flex min-w-0 items-center gap-2">
-        <Button type="button" variant="outline" size="icon" onClick={() => onChangeMonth(-1)} className="h-10 w-10 rounded-full border-white/60 bg-white/58">
+        <Button type="button" variant="outline" size="icon" onClick={() => onChangeMonth(-1)} className="h-10 w-10 rounded-full border-border bg-card">
           <ChevronLeft className="h-4 w-4" />
           <span className="sr-only">Mês anterior</span>
         </Button>
@@ -433,7 +433,7 @@ function CalendarToolbar({
           </div>
           <p className="mt-1 text-xs text-muted-foreground">Passe o mouse no ano e role para alternar 2026, 2027 e 2028.</p>
         </div>
-        <Button type="button" variant="outline" size="icon" onClick={() => onChangeMonth(1)} className="h-10 w-10 rounded-full border-white/60 bg-white/58">
+        <Button type="button" variant="outline" size="icon" onClick={() => onChangeMonth(1)} className="h-10 w-10 rounded-full border-border bg-card">
           <ChevronRight className="h-4 w-4" />
           <span className="sr-only">Próximo mês</span>
         </Button>
@@ -444,7 +444,7 @@ function CalendarToolbar({
           Modo planejamento
         </CronogramaMetaBadge>
         {expanded && (
-          <Button type="button" variant="outline" size="sm" onClick={onToggleSide} className="h-9 rounded-full border-white/60 bg-white/60 px-3 text-xs">
+          <Button type="button" variant="outline" size="sm" onClick={onToggleSide} className="h-9 rounded-lg border-border bg-card px-3 text-xs">
             {sideCollapsed ? <PanelRightOpen className="h-4 w-4" /> : <PanelRightClose className="h-4 w-4" />}
             {sideCollapsed ? 'Mostrar painel' : 'Recolher painel'}
           </Button>
@@ -454,7 +454,7 @@ function CalendarToolbar({
           variant={expanded ? 'default' : 'outline'}
           size="sm"
           onClick={expanded ? onExitExpand : onExpand}
-          className={cn('h-9 rounded-full px-3 text-xs', !expanded && 'border-gold/28 bg-white/60 text-amber-950 hover:bg-gold/10')}
+          className={cn('h-9 rounded-lg px-3 text-xs', !expanded && 'border-gold/30 bg-card text-foreground hover:bg-gold/10')}
         >
           {expanded ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
           {expanded ? 'Sair do expandido' : 'Expandir calendário'}
@@ -482,7 +482,7 @@ function CalendarYearWheel({
   onNext: () => void;
 }) {
   return (
-    <span className="inline-flex items-center gap-1 rounded-full border border-gold/25 bg-white/62 p-1 shadow-[inset_0_1px_0_rgb(255_255_255/0.64)]">
+    <span className="inline-flex items-center gap-1 rounded-full border border-gold/25 bg-card p-1">
       <button
         type="button"
         onClick={onPrev}
@@ -497,7 +497,7 @@ function CalendarYearWheel({
         onWheel={onWheel}
         className={cn(
           'h-7 min-w-[76px] rounded-full px-3 font-mono text-sm font-black text-primary transition-[transform,background-color,color,box-shadow] duration-200 hover:bg-gold/[0.12] hover:text-amber-950 focus-ring',
-          pulse && 'scale-105 bg-gold/[0.15] text-amber-950 shadow-[0_0_0_5px_hsl(var(--gold)/0.08)]',
+          pulse && 'scale-105 bg-gold/[0.15] text-foreground',
         )}
         aria-label={`Ano selecionado ${year}. Role para trocar o ano.`}
       >
@@ -537,14 +537,14 @@ function CalendarEventLayer({
           key={event.id}
           onClick={() => onOpen(event)}
           className={cn(
-            'block w-full truncate rounded-md border px-1.5 py-1 text-left text-[10px] font-semibold leading-none shadow-[inset_0_1px_0_rgb(255_255_255/0.55)] focus-ring',
+            'block w-full truncate rounded-md border px-1.5 py-1 text-left text-[10px] font-semibold leading-none focus-ring',
             event.priority === 'critical'
               ? 'border-red-900/12 bg-red-50/85 text-red-950'
               : event.isCentralMeeting
                 ? 'border-primary/12 bg-primary/[0.07] text-primary'
                 : event.isMain
                   ? 'border-gold/24 bg-gold/[0.12] text-amber-950'
-                  : 'border-border/28 bg-white/72 text-foreground/75',
+                  : 'border-border bg-card text-foreground/75',
           )}
         >
           {event.startTime && <span className="mr-1 font-mono">{event.startTime}</span>}
@@ -575,7 +575,7 @@ function CalendarSidePanel({
 }) {
   return (
     <aside className="space-y-3">
-      <section className="rounded-[1.35rem] border border-white/55 bg-white/66 p-4 shadow-[inset_0_1px_0_rgb(255_255_255/0.64)] backdrop-blur-xl">
+      <section className="rounded-xl border border-border bg-background p-4">
         <div className="mb-3 flex items-center justify-between gap-3">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">Mês selecionado</p>
@@ -587,7 +587,7 @@ function CalendarSidePanel({
           <button
             type="button"
             onClick={() => onOpen(nextMonthEvent)}
-            className="w-full rounded-2xl border border-border/35 bg-white/58 p-3 text-left transition hover:border-gold/32 hover:bg-white focus-ring"
+            className="w-full rounded-xl border border-border bg-card p-3 text-left transition-colors hover:border-gold/40 hover:bg-secondary focus-ring"
           >
             <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-primary">Próximo do mês</p>
             <p className="mt-1 text-sm font-bold leading-tight text-foreground">{nextMonthEvent.title}</p>
@@ -598,7 +598,7 @@ function CalendarSidePanel({
         )}
       </section>
 
-      <section className="rounded-[1.35rem] border border-white/55 bg-white/66 p-4 shadow-[inset_0_1px_0_rgb(255_255_255/0.64)] backdrop-blur-xl">
+      <section className="rounded-xl border border-border bg-background p-4">
         <div className="mb-3">
           <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">Dia selecionado</p>
           <h3 className="text-lg font-black tracking-tight text-foreground">{formatLongDate(selectedDate)}</h3>
@@ -609,7 +609,7 @@ function CalendarSidePanel({
         ) : (
           <div className="space-y-2">
             {dayEvents.map((event) => (
-              <div key={event.id} className="rounded-2xl border border-border/35 bg-white/58 p-3">
+              <div key={event.id} className="rounded-xl border border-border bg-card p-3">
                 <div className="mb-2 flex flex-wrap items-center gap-1.5">
                   <CronogramaCategoryMarker category={event.category} />
                   <CronogramaStatusIndicator status={event.status} compact />
@@ -642,7 +642,7 @@ function CalendarSidePanel({
 
 function EmptyCalendarState({ title, text }: { title: string; text: string }) {
   return (
-    <div className="rounded-2xl border border-dashed border-border/55 bg-white/38 p-4 text-center">
+    <div className="rounded-xl border border-dashed border-border bg-secondary/50 p-4 text-center">
       <p className="text-sm font-bold text-foreground">{title}</p>
       <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{text}</p>
     </div>
@@ -651,24 +651,24 @@ function EmptyCalendarState({ title, text }: { title: string; text: string }) {
 
 function CalendarFullscreenMode({
   children,
-  onClose,
+  open,
+  onOpenChange,
 }: {
   children: ReactNode;
-  onClose: () => void;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }) {
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose();
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [onClose]);
-
   return (
-    <div className="cronograma-calendar-expanded fixed inset-0 z-50 bg-emerald-950/35 p-2 backdrop-blur-xl sm:p-4" role="dialog" aria-modal="true" aria-label="Calendário expandido">
-      <div className="h-full overflow-auto rounded-[2rem]">
-        {children}
-      </div>
-    </div>
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="h-[calc(100dvh-1rem)] max-h-none max-w-none gap-0 border-0 bg-transparent p-0 shadow-none sm:h-[calc(100dvh-2rem)] sm:max-w-none sm:p-0">
+        <DialogTitle className="sr-only">Calendário expandido</DialogTitle>
+        <DialogDescription className="sr-only">
+          Visualização ampliada do calendário do cronograma, com navegação por mês, ano e eventos.
+        </DialogDescription>
+        <div className="min-h-0 flex-1 overflow-auto rounded-xl">
+          {children}
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }

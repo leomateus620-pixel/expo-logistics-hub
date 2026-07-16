@@ -220,10 +220,10 @@ export default function ExpensesPage() {
   ] as const;
 
   const toneStyles: Record<string, { text: string; chip: string; ring: string }> = {
-    accent:  { text: 'text-accent',  chip: 'bg-accent/15 text-accent',   ring: 'shadow-[0_8px_24px_-12px_hsl(var(--accent)/0.4)]' },
-    primary: { text: 'text-primary', chip: 'bg-primary/15 text-primary', ring: 'shadow-[0_8px_24px_-12px_hsl(var(--primary)/0.4)]' },
-    gold:    { text: 'text-gold',    chip: 'bg-gold/15 text-gold',       ring: 'shadow-[0_8px_24px_-12px_hsl(var(--gold)/0.4)]' },
-    success: { text: 'text-success', chip: 'bg-success/15 text-success', ring: 'shadow-[0_8px_24px_-12px_hsl(var(--success)/0.4)]' },
+    accent:  { text: 'text-accent',  chip: 'bg-accent/15 text-accent',   ring: 'shadow-[0_8px_24px_-12px_oklch(var(--accent)/0.4)]' },
+    primary: { text: 'text-primary', chip: 'bg-primary/15 text-primary', ring: 'shadow-[0_8px_24px_-12px_oklch(var(--primary)/0.4)]' },
+    gold:    { text: 'text-gold',    chip: 'bg-gold/15 text-gold',       ring: 'shadow-[0_8px_24px_-12px_oklch(var(--gold)/0.4)]' },
+    success: { text: 'text-success', chip: 'bg-success/15 text-success', ring: 'shadow-[0_8px_24px_-12px_oklch(var(--success)/0.4)]' },
   };
 
   return (
@@ -236,7 +236,7 @@ export default function ExpensesPage() {
               'relative w-12 h-12 rounded-2xl flex items-center justify-center shrink-0',
               'bg-gradient-to-br from-primary/25 via-primary/10 to-gold/15',
               'border border-white/10',
-              'shadow-[inset_0_1px_0_rgba(255,255,255,0.18),inset_0_-2px_4px_rgba(0,0,0,0.1),0_4px_12px_-4px_hsl(var(--primary)/0.3)]',
+              'shadow-[inset_0_1px_0_rgba(255,255,255,0.18),inset_0_-2px_4px_rgba(0,0,0,0.1),0_4px_12px_-4px_oklch(var(--primary)/0.3)]',
             )}
           >
             <Receipt className="w-6 h-6 text-primary drop-shadow-sm" />
@@ -253,7 +253,7 @@ export default function ExpensesPage() {
           className={cn(
             'gap-1.5 rounded-xl h-11 px-4 shrink-0 font-semibold',
             'bg-gradient-to-b from-primary to-primary/85 hover:from-primary/95 hover:to-primary/80',
-            'shadow-[0_8px_20px_-8px_hsl(var(--primary)/0.5),inset_0_1px_0_rgba(255,255,255,0.18)]',
+            'shadow-[0_8px_20px_-8px_oklch(var(--primary)/0.5),inset_0_1px_0_rgba(255,255,255,0.18)]',
           )}
         >
           <Plus className="w-4 h-4" /> Nova despesa
@@ -325,7 +325,7 @@ export default function ExpensesPage() {
                   className={cn(
                     'whitespace-nowrap px-3.5 py-2 rounded-full text-xs font-semibold transition-all shrink-0 border',
                     active
-                      ? 'bg-gradient-to-b from-primary to-primary/85 text-primary-foreground border-primary/40 shadow-[0_4px_12px_-4px_hsl(var(--primary)/0.5),inset_0_1px_0_rgba(255,255,255,0.2)]'
+                      ? 'bg-gradient-to-b from-primary to-primary/85 text-primary-foreground border-primary/40 shadow-[0_4px_12px_-4px_oklch(var(--primary)/0.5),inset_0_1px_0_rgba(255,255,255,0.2)]'
                       : 'bg-card/50 text-muted-foreground border-white/10 hover:bg-card/80 backdrop-blur-md',
                   )}
                 >
@@ -389,7 +389,7 @@ export default function ExpensesPage() {
                 'relative rounded-2xl p-4',
                 'bg-gradient-to-br from-primary/15 via-primary/5 to-gold/10 backdrop-blur-xl',
                 'border border-white/10',
-                'shadow-[0_8px_24px_-12px_hsl(var(--primary)/0.35),inset_0_1px_0_rgba(255,255,255,0.1)]',
+                'shadow-[0_8px_24px_-12px_oklch(var(--primary)/0.35),inset_0_1px_0_rgba(255,255,255,0.1)]',
               )}
             >
               <button
@@ -490,7 +490,7 @@ export default function ExpensesPage() {
             className={cn(
               'h-14 px-5 rounded-full flex items-center gap-2 transition-transform active:scale-95',
               'bg-gradient-to-b from-primary to-primary/85 text-primary-foreground font-semibold',
-              'shadow-[0_12px_28px_-8px_hsl(var(--primary)/0.55),inset_0_1px_0_rgba(255,255,255,0.2)]',
+              'shadow-[0_12px_28px_-8px_oklch(var(--primary)/0.55),inset_0_1px_0_rgba(255,255,255,0.2)]',
             )}
           >
             <Plus className="w-5 h-5" />

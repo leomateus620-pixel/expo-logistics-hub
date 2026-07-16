@@ -126,7 +126,7 @@ export default function ScooterReservationsTab() {
         'shadow-[0_8px_32px_-12px_rgba(0,0,0,0.25),inset_0_1px_0_rgba(255,255,255,0.08)]',
         'p-3 sm:p-4'
       )}>
-        <div className="pointer-events-none absolute -top-12 -right-12 w-40 h-40 blur-3xl opacity-50 bg-[radial-gradient(circle,hsl(var(--primary)/0.35),transparent_60%)]" />
+        <div className="pointer-events-none absolute -top-12 -right-12 w-40 h-40 blur-3xl opacity-50 bg-[radial-gradient(circle,oklch(var(--primary)/0.35),transparent_60%)]" />
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.06),transparent_50%)]" />
 
         <div className="relative flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
@@ -159,7 +159,7 @@ export default function ScooterReservationsTab() {
                   className={cn(
                     'transform-gpu px-3 sm:px-4 h-9 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 whitespace-nowrap',
                     active
-                      ? 'bg-gradient-to-r from-primary to-primary/85 text-primary-foreground shadow-[0_4px_16px_-4px_hsl(var(--primary)/0.45),inset_0_1px_0_rgba(255,255,255,0.15)]'
+                      ? 'bg-gradient-to-r from-primary to-primary/85 text-primary-foreground shadow-[0_4px_16px_-4px_oklch(var(--primary)/0.45),inset_0_1px_0_rgba(255,255,255,0.15)]'
                       : 'text-muted-foreground hover:text-foreground hover:bg-muted/40'
                   )}
                 >

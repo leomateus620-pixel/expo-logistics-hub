@@ -16,7 +16,7 @@ export default function EventPeriodBar({ event, className }: { event: Cronograma
         <span>{days} dias</span>
       </div>
       <div className="mt-2 h-2 overflow-hidden rounded-full bg-black/20">
-        <div className="h-full w-full rounded-full bg-gradient-to-r from-gold/40 via-gold to-primary/70 shadow-[0_0_18px_hsl(var(--gold)/0.35)]" />
+        <div className="h-full w-full rounded-full bg-gradient-to-r from-gold/40 via-gold to-primary/70 shadow-[0_0_18px_oklch(var(--gold)/0.35)]" />
       </div>
     </div>
   );

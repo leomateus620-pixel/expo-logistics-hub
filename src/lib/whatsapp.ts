@@ -62,5 +62,5 @@ export function buildTripMessage(opts: {
   const vehicleSentence = buildVehicleInfoSentence(opts);
   const vehiclePart = vehicleSentence ? ` ${vehicleSentence}` : '';
 
-  return `Olá, ${guestName}. Aqui é ${driverName}, motorista responsável pelo seu transporte da Fenasoja Logística. Estou iniciando agora o deslocamento para o ${destinoLabel}.${vehiclePart} Qualquer necessidade, fico à disposição por aqui.`;
+  return `Olá, ${guestName}. Aqui é ${driverName}, motorista responsável pelo seu transporte da Fenasoja 2028. Estou iniciando agora o deslocamento para o ${destinoLabel}.${vehiclePart} Qualquer necessidade, fico à disposição por aqui.`;
 }

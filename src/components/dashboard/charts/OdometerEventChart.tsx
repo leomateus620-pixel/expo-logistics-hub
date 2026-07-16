@@ -60,17 +60,17 @@ export default function OdometerEventChart({ items, totalKmEvento, totalValorCom
             <BarChart data={data} layout="vertical" margin={{ top: 4, right: 12, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="odoGrad" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.9} />
-                  <stop offset="100%" stopColor="hsl(var(--gold))" stopOpacity={0.9} />
+                  <stop offset="0%" stopColor="oklch(var(--primary))" stopOpacity={0.9} />
+                  <stop offset="100%" stopColor="oklch(var(--gold))" stopOpacity={0.9} />
                 </linearGradient>
               </defs>
-              <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border) / 0.4)" horizontal={false} />
-              <XAxis type="number" tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
-              <YAxis type="category" dataKey="short" tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} width={70} />
-              <Tooltip content={<CustomTooltip />} cursor={{ fill: 'hsl(var(--primary) / 0.08)' }} />
+              <CartesianGrid strokeDasharray="3 3" stroke="oklch(var(--border) / 0.4)" horizontal={false} />
+              <XAxis type="number" tick={{ fontSize: 10, fill: 'oklch(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
+              <YAxis type="category" dataKey="short" tick={{ fontSize: 10, fill: 'oklch(var(--muted-foreground))' }} axisLine={false} tickLine={false} width={70} />
+              <Tooltip content={<CustomTooltip />} cursor={{ fill: 'oklch(var(--primary) / 0.08)' }} />
               <Bar dataKey="km" radius={[0, 8, 8, 0]}>
                 {data.map((d, i) => (
-                  <Cell key={i} fill={d.hasOdometer ? 'url(#odoGrad)' : 'hsl(var(--muted) / 0.6)'} />
+                  <Cell key={i} fill={d.hasOdometer ? 'url(#odoGrad)' : 'oklch(var(--muted) / 0.6)'} />
                 ))}
               </Bar>
             </BarChart>

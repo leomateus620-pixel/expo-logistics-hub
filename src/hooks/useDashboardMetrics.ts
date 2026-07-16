@@ -207,11 +207,11 @@ export function useDashboardMetrics() {
 
     /* ─── Distribution (donut) ─── */
     const distribution = [
-      { name: 'Transportes', value: trTotal, color: 'hsl(var(--primary))' },
-      { name: 'Eventos', value: eventosCobertos, color: 'hsl(var(--gold))' },
-      { name: 'Carrinhos', value: retiradas, color: 'hsl(var(--accent))' },
-      { name: 'Mobilidade', value: mobSolicitacoes, color: 'hsl(var(--success))' },
-      { name: 'Veículos ativos', value: emUso, color: 'hsl(var(--warning))' },
+      { name: 'Transportes', value: trTotal, color: 'oklch(var(--primary))' },
+      { name: 'Eventos', value: eventosCobertos, color: 'oklch(var(--gold))' },
+      { name: 'Carrinhos', value: retiradas, color: 'oklch(var(--accent))' },
+      { name: 'Mobilidade', value: mobSolicitacoes, color: 'oklch(var(--success))' },
+      { name: 'Veículos ativos', value: emUso, color: 'oklch(var(--warning))' },
     ].filter(d => d.value > 0);
 
     /* ─── Alerts ─── */

@@ -29,10 +29,10 @@ function durationLabel(startIso: string, endIso: string): string {
 }
 
 const STATUS_META: Record<ScooterReservation['status'], { label: string; icon: any; chip: string; halo: string; ring?: string }> = {
-  agendada: { label: 'Agendada', icon: CalendarClock, chip: 'bg-primary/15 text-primary border-primary/30', halo: 'bg-[radial-gradient(circle_at_top_right,hsl(var(--primary)/0.35),transparent_60%)]' },
-  em_andamento: { label: 'Em andamento', icon: Play, chip: 'bg-accent/20 text-accent-foreground border-accent/40', halo: 'bg-[radial-gradient(circle_at_top_right,hsl(var(--accent)/0.4),transparent_60%)]', ring: 'ring-1 ring-accent/45 shadow-[0_10px_36px_-10px_hsl(var(--accent)/0.45),inset_0_1px_0_rgba(255,255,255,0.12)]' },
-  concluida: { label: 'Concluída', icon: CheckCircle2, chip: 'bg-success/15 text-success border-success/30', halo: 'bg-[radial-gradient(circle_at_top_right,hsl(var(--success)/0.25),transparent_60%)]' },
-  cancelada: { label: 'Cancelada', icon: Ban, chip: 'bg-destructive/15 text-destructive border-destructive/30', halo: 'bg-[radial-gradient(circle_at_top_right,hsl(var(--destructive)/0.2),transparent_60%)]' },
+  agendada: { label: 'Agendada', icon: CalendarClock, chip: 'bg-primary/15 text-primary border-primary/30', halo: 'bg-[radial-gradient(circle_at_top_right,oklch(var(--primary)/0.35),transparent_60%)]' },
+  em_andamento: { label: 'Em andamento', icon: Play, chip: 'bg-accent/20 text-accent-foreground border-accent/40', halo: 'bg-[radial-gradient(circle_at_top_right,oklch(var(--accent)/0.4),transparent_60%)]', ring: 'ring-1 ring-accent/45 shadow-[0_10px_36px_-10px_oklch(var(--accent)/0.45),inset_0_1px_0_rgba(255,255,255,0.12)]' },
+  concluida: { label: 'Concluída', icon: CheckCircle2, chip: 'bg-success/15 text-success border-success/30', halo: 'bg-[radial-gradient(circle_at_top_right,oklch(var(--success)/0.25),transparent_60%)]' },
+  cancelada: { label: 'Cancelada', icon: Ban, chip: 'bg-destructive/15 text-destructive border-destructive/30', halo: 'bg-[radial-gradient(circle_at_top_right,oklch(var(--destructive)/0.2),transparent_60%)]' },
 };
 
 export default function ScooterReservationCard({ reservation, scooter, responsavel, onEdit, onCancel, onStart }: Props) {
@@ -162,7 +162,7 @@ export default function ScooterReservationCard({ reservation, scooter, responsav
               className={cn(
                 'flex-1 h-10 rounded-xl font-bold uppercase tracking-wider text-xs',
                 'bg-gradient-to-r from-primary via-primary to-primary/85 text-primary-foreground',
-                'shadow-[0_4px_16px_-4px_hsl(var(--primary)/0.5),inset_0_1px_0_rgba(255,255,255,0.2)]',
+                'shadow-[0_4px_16px_-4px_oklch(var(--primary)/0.5),inset_0_1px_0_rgba(255,255,255,0.2)]',
                 'flex items-center justify-center gap-1.5 transition-all hover:brightness-110 active:scale-[0.97]'
               )}
             >

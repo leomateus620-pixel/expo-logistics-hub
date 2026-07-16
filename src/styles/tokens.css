@@ -1,0 +1,189 @@
+:root {
+  color-scheme: light;
+
+  /* Fenasoja 2028 primitives — exact reference anchors in OKLCH. */
+  --brand-indigo-50: 97% 0.014 268.03;
+  --brand-indigo-100: 93% 0.030 268.03;
+  --brand-indigo-200: 85% 0.058 268.03;
+  --brand-indigo-300: 72% 0.095 268.03;
+  --brand-indigo-400: 55% 0.140 268.03;
+  --brand-indigo-500: 31.52% 0.1686 268.03; /* #121D85 */
+  --brand-indigo-600: 27% 0.150 268.03;
+  --brand-indigo-700: 23% 0.120 268.03;
+  --brand-indigo-800: 19% 0.086 268.03;
+  --brand-indigo-900: 16% 0.060 268.03;
+
+  --brand-navy-800: 27% 0.066 255.67;
+  --brand-navy-900: 21.07% 0.062 255.67; /* #031834 */
+  --brand-navy-950: 9.24% 0.0096 345.04; /* #040203 */
+
+  --brand-orange-400: 77% 0.150 54;
+  --brand-orange-500: 69.79% 0.1781 49.36; /* #F2751A */
+  --brand-orange-600: 69.49% 0.1645 57.95; /* #E67E09 */
+  --brand-orange-700: 57% 0.150 49.36;
+
+  --brand-gold-400: 88.95% 0.1521 95.08; /* #FAD954 */
+  --brand-gold-500: 83.85% 0.1654 86.44; /* #F9C121 */
+  --brand-gold-700: 57% 0.125 76;
+
+  --brand-cream: 93.04% 0.0369 80.62; /* #F5E6CD */
+  --brand-soft-white: 98.46% 0.0017 247.84; /* #F9FAFB */
+  --brand-blue: 53.77% 0.1655 255.72; /* #1A6CCB */
+  --brand-green: 62.06% 0.1191 171.97; /* #089D7E */
+  --brand-muted-indigo: 45.87% 0.1066 285.46; /* #534D90 */
+
+  /* Neutral and semantic primitives. */
+  --neutral-0: 100% 0 0;
+  --neutral-50: 98.2% 0.004 266;
+  --neutral-100: 96% 0.007 266;
+  --neutral-200: 92% 0.010 266;
+  --neutral-300: 85% 0.014 266;
+  --neutral-500: 58% 0.025 260;
+  --neutral-600: 46% 0.030 258;
+  --neutral-700: 35% 0.036 257;
+  --neutral-900: 19% 0.040 256;
+
+  --semantic-red-500: 55% 0.205 27;
+  --semantic-red-700: 43% 0.170 27;
+  --semantic-green-600: 45% 0.105 171.97;
+  --semantic-blue-600: 48% 0.158 255.72;
+
+  /* Semantic layer. */
+  --background: 97.4% 0.006 266;
+  --foreground: var(--brand-navy-900);
+
+  --surface-1: var(--brand-soft-white);
+  --surface-2: 95.5% 0.012 268;
+  --surface-3: 91.5% 0.022 268;
+  --surface-inverse: var(--brand-navy-900);
+  --overlay: 10% 0.025 260;
+
+  --card: var(--surface-1);
+  --card-foreground: var(--foreground);
+  --popover: var(--surface-1);
+  --popover-foreground: var(--foreground);
+
+  --primary: var(--brand-indigo-500);
+  --primary-foreground: var(--brand-soft-white);
+  --action: var(--brand-orange-500);
+  --action-foreground: var(--brand-navy-900);
+
+  --secondary: var(--surface-2);
+  --secondary-foreground: var(--brand-navy-900);
+  --muted: var(--neutral-200);
+  --muted-foreground: var(--neutral-600);
+  --accent: var(--brand-indigo-100);
+  --accent-foreground: var(--brand-indigo-500);
+
+  --destructive: var(--semantic-red-500);
+  --destructive-foreground: var(--neutral-0);
+  --success: var(--semantic-green-600);
+  --success-foreground: var(--neutral-0);
+  --warning: var(--brand-gold-500);
+  --warning-foreground: var(--brand-navy-900);
+  --info: var(--semantic-blue-600);
+  --info-foreground: var(--neutral-0);
+  --gold: var(--brand-gold-500);
+  --gold-foreground: var(--brand-navy-900);
+  --cream: var(--brand-cream);
+  --cream-foreground: var(--brand-navy-900);
+
+  --border: 87% 0.018 266;
+  --input: 82% 0.023 266;
+  --ring: var(--brand-orange-700);
+  --focus-ring: var(--brand-orange-700);
+  --selected-surface: var(--brand-indigo-100);
+  --navigation-active: var(--brand-orange-500);
+  --navigation-inactive: 78% 0.025 255;
+
+  --sidebar-background: var(--brand-navy-900);
+  --sidebar-foreground: var(--brand-cream);
+  --sidebar-primary: var(--brand-orange-500);
+  --sidebar-primary-foreground: var(--brand-navy-900);
+  --sidebar-accent: 27% 0.073 260;
+  --sidebar-accent-foreground: var(--brand-soft-white);
+  --sidebar-border: 35% 0.062 260;
+  --sidebar-ring: var(--brand-orange-500);
+
+  --chart-1: var(--brand-indigo-500);
+  --chart-2: var(--brand-orange-500);
+  --chart-3: var(--brand-green);
+  --chart-4: var(--brand-gold-500);
+  --chart-5: var(--brand-blue);
+  --chart-6: var(--brand-muted-indigo);
+
+  --radius: 0.75rem;
+  --radius-sm: 0.5rem;
+  --radius-lg: 1rem;
+  --shadow-xs: 0 1px 2px rgb(3 24 52 / 0.06);
+  --shadow-sm: 0 4px 8px -6px rgb(3 24 52 / 0.22);
+  --shadow-md: 0 8px 16px -12px rgb(3 24 52 / 0.34);
+
+  --motion-fast: 150ms;
+  --motion-base: 200ms;
+  --motion-slow: 250ms;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+
+  --z-dropdown: 40;
+  --z-sticky: 50;
+  --z-modal-backdrop: 60;
+  --z-modal: 70;
+  --z-toast: 80;
+  --z-tooltip: 90;
+}
+
+.dark {
+  color-scheme: dark;
+
+  --background: var(--brand-navy-950);
+  --foreground: var(--brand-soft-white);
+  --surface-1: 16.5% 0.038 258;
+  --surface-2: 20.5% 0.050 258;
+  --surface-3: 25% 0.064 260;
+  --surface-inverse: var(--brand-soft-white);
+
+  --card: var(--surface-1);
+  --card-foreground: var(--foreground);
+  --popover: var(--surface-2);
+  --popover-foreground: var(--foreground);
+  --primary: 68% 0.155 262;
+  --primary-foreground: var(--brand-navy-950);
+  --action: var(--brand-orange-500);
+  --action-foreground: var(--brand-navy-950);
+  --secondary: var(--surface-2);
+  --secondary-foreground: var(--brand-soft-white);
+  --muted: 25% 0.030 260;
+  --muted-foreground: 76% 0.022 255;
+  --accent: 28% 0.078 263;
+  --accent-foreground: var(--brand-soft-white);
+  --destructive: 62% 0.195 27;
+  --destructive-foreground: var(--brand-soft-white);
+  --success: var(--brand-green);
+  --success-foreground: var(--brand-navy-950);
+  --warning: var(--brand-gold-500);
+  --warning-foreground: var(--brand-navy-950);
+  --info: 66% 0.145 255.72;
+  --info-foreground: var(--brand-navy-950);
+  --gold: var(--brand-gold-400);
+  --gold-foreground: var(--brand-navy-950);
+  --border: 31% 0.045 260;
+  --input: 38% 0.052 260;
+  --ring: var(--brand-orange-400);
+  --focus-ring: var(--brand-orange-400);
+  --selected-surface: 27% 0.092 266;
+  --navigation-inactive: 73% 0.026 255;
+}
+
+@media (prefers-contrast: more) {
+  :root {
+    --muted-foreground: 38% 0.034 258;
+    --border: 68% 0.040 260;
+    --input: 58% 0.050 260;
+  }
+
+  .dark {
+    --muted-foreground: 86% 0.018 255;
+    --border: 58% 0.055 260;
+    --input: 68% 0.060 260;
+  }
+}
