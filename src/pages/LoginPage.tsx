@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, CalendarRange, LockKeyhole, LogIn, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, CalendarRange, Loader2, LockKeyhole, LogIn, ShieldCheck } from 'lucide-react';
 import { FenasojaBrand } from '@/components/brand/FenasojaBrand';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
@@ -92,7 +92,7 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
   };
 
   return (
-    <main className="relative min-h-[100dvh] overflow-hidden bg-[oklch(var(--brand-navy-900))] text-white">
+    <main className="command-grid-bg relative min-h-[100dvh] overflow-hidden bg-[oklch(var(--brand-navy-900))] text-white">
       <div
         className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_16%_12%,oklch(var(--brand-indigo-500)/0.74),transparent_38%),radial-gradient(circle_at_95%_90%,oklch(var(--brand-orange-500)/0.22),transparent_35%)]"
         aria-hidden="true"
@@ -114,16 +114,16 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
           </h1>
           <p className="mt-5 text-base leading-7 text-white/68">{heroDescription}</p>
 
-          <div className="mt-10 grid grid-cols-3 gap-px overflow-hidden rounded-xl border border-white/12 bg-white/12">
+          <div className="portal-glass-stat mt-10 grid grid-cols-3 gap-px overflow-hidden rounded-xl">
             {['Contexto preservado', 'Acesso por perfil', 'Dados protegidos'].map((item) => (
-              <span key={item} className="bg-[oklch(var(--brand-navy-900))] px-3 py-4 text-center text-xs font-semibold text-white/68">
+              <span key={item} className="bg-white/[0.035] px-3 py-4 text-center text-xs font-semibold text-white/72">
                 {item}
               </span>
             ))}
           </div>
         </section>
 
-        <section className="w-full rounded-2xl border border-border bg-card p-5 text-card-foreground shadow-[var(--shadow-md)] sm:p-7" aria-labelledby="login-title">
+        <section className="auth-glass-panel animate-soft-rise w-full rounded-2xl border p-5 text-card-foreground sm:p-7" aria-labelledby="login-title" aria-busy={loading}>
           <div className="flex items-start justify-between gap-4">
             <FenasojaBrand compact subtitle="Acesso ao sistema" tone="light" />
             <span className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-accent px-2 py-1 text-[10px] font-bold text-accent-foreground">
@@ -148,7 +148,7 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
                 onChange={(event) => setEmail(event.target.value)}
                 required
                 autoComplete="email"
-                className="h-11 w-full rounded-lg border border-input bg-background px-3 text-sm text-foreground outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/20"
+                className="h-11 w-full rounded-lg border border-input bg-white/70 px-3 text-sm text-foreground shadow-inner outline-none transition-[border-color,background-color,box-shadow] duration-150 placeholder:text-muted-foreground focus:border-ring focus:bg-white/90 focus:ring-4 focus:ring-ring/15"
               />
             </label>
             <label className="block text-left">
@@ -160,7 +160,7 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
                 onChange={(event) => setPassword(event.target.value)}
                 required
                 autoComplete="current-password"
-                className="h-11 w-full rounded-lg border border-input bg-background px-3 text-sm text-foreground outline-none transition-[border-color,box-shadow] duration-150 placeholder:text-muted-foreground focus:border-ring focus:ring-2 focus:ring-ring/20"
+                className="h-11 w-full rounded-lg border border-input bg-white/70 px-3 text-sm text-foreground shadow-inner outline-none transition-[border-color,background-color,box-shadow] duration-150 placeholder:text-muted-foreground focus:border-ring focus:bg-white/90 focus:ring-4 focus:ring-ring/15"
               />
             </label>
 
@@ -170,8 +170,10 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
               </div>
             )}
 
-            <Button type="submit" className="h-11 w-full" disabled={loading}>
-              <LogIn className="mr-2 h-4 w-4" aria-hidden="true" />
+            <Button type="submit" className="auth-primary-action h-11 w-full" disabled={loading}>
+              {loading
+                ? <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
+                : <LogIn className="mr-2 h-4 w-4" aria-hidden="true" />}
               {loading ? 'Entrando...' : 'Entrar no sistema'}
             </Button>
           </form>
@@ -180,7 +182,7 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
             <p className="text-xs leading-5 text-muted-foreground">Acesso restrito. Solicite suas credenciais ao administrador.</p>
             <Link
               to="/portal"
-              className="mt-2 inline-flex items-center rounded-lg px-3 py-2 text-xs font-bold text-primary transition-colors duration-150 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              className="mt-2 inline-flex min-h-11 items-center rounded-lg px-3 py-2 text-xs font-bold text-primary transition-colors duration-150 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
             >
               <ArrowLeft className="mr-2 h-3.5 w-3.5" aria-hidden="true" />
               Voltar ao portal

@@ -89,8 +89,8 @@ export function AgendaItemDetailDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-lg p-0 overflow-hidden">
-        <div className="border-b border-border bg-primary/5 px-6 pb-5 pt-6">
+      <DialogContent className="glass-panel sm:max-w-lg p-0 overflow-hidden">
+        <div className="border-b border-border/70 bg-[linear-gradient(135deg,oklch(var(--primary)/0.11),oklch(var(--brand-gold-400)/0.055),transparent)] px-6 pb-5 pt-6 shadow-[inset_0_1px_0_rgb(255_255_255/0.7)]">
           <DialogHeader className="space-y-2 p-0 text-left">
             <div className="flex items-center gap-2 flex-wrap">
               {isTransport && (
@@ -166,7 +166,7 @@ export function AgendaItemDetailDialog({
           )}
 
           {/* Time block */}
-          <div className="rounded-xl border border-border bg-secondary/45 p-4">
+          <div className="surface-secondary rounded-xl border border-border bg-secondary/45 p-4">
             <div className="flex items-center justify-between gap-3">
               <div className="text-center flex-1">
                 <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold">

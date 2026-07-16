@@ -10,7 +10,7 @@ A nova seção mantém os comandos e sinais que ajudam a operar o cronograma, ma
 
 - A abertura está centralizada em `2028-05-01T10:00:00-03:00`, no fuso `America/Sao_Paulo`, conforme a data e o horário já representados no módulo.
 - O relógio usa um único temporizador alinhado ao próximo segundo, com limpeza completa no desmonte e valores limitados a zero após a abertura.
-- As partículas de soja usam um `canvas` isolado, sprite reutilizável, densidade limitada, `devicePixelRatio` controlado e pausa por visibilidade/interseção.
+- A atmosfera agrícola usa luz e textura estáticas; a chuva contínua de partículas foi removida para reduzir trabalho de GPU e preservar causalidade visual.
 - `prefers-reduced-motion` mantém uma composição estática e remove transições não essenciais.
 - O conteúdo móvel respeita `safe-area-inset-left/right`, sem aproximar comandos ou números de recortes físicos da tela.
-- O projeto não recebeu GSAP ou outra dependência de motion: CSS e `requestAnimationFrame` atendem ao efeito com custo menor e integração direta ao stack existente.
+- O projeto não recebeu GSAP ou outra dependência de motion: CSS tokenizado atende às entradas curtas, enquanto a atualização de segundos permanece apenas funcional.

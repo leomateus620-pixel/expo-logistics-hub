@@ -47,6 +47,7 @@ export interface AgendaItemCard3DProps {
 export function AgendaItemCard3D({
   item,
   shift,
+  index,
   isCurrent,
   member,
   commission,
@@ -62,15 +63,16 @@ export function AgendaItemCard3D({
       type="button"
       onClick={() => onOpen(item)}
       className={cn(
-        'group w-full rounded-xl border bg-card p-4 text-left shadow-xs outline-none',
-        'transition-[border-color,background-color,box-shadow] duration-150 hover:border-primary/30 hover:bg-card hover:shadow-sm',
+        'agenda-card-depth animate-soft-rise group w-full rounded-xl border bg-card p-4 text-left outline-none',
+        'hover:border-primary/30 hover:bg-card',
         'focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-background',
-        isCurrent && 'border-success/35 bg-success/[0.035]',
+        isCurrent && 'border-success/35 bg-success/[0.035] shadow-[var(--elevation-2)]',
       )}
+      style={{ animationDelay: `${Math.min(index, 8) * 28}ms` }}
       aria-label={`Abrir item ${item.titulo}, das ${rawTime(item.inicio_em)} às ${rawTime(item.fim_em)}`}
     >
       <span className="flex gap-3">
-        <span className="flex w-[4.75rem] shrink-0 flex-col justify-center rounded-lg border border-border bg-secondary px-2.5 py-2">
+        <span className="agenda-time-block flex w-[4.75rem] shrink-0 flex-col justify-center rounded-lg border border-border bg-secondary px-2.5 py-2">
           <span className="font-mono text-base font-extrabold tabular-nums text-foreground">
             {rawTime(item.inicio_em)}
           </span>
@@ -166,7 +168,7 @@ export function ShiftSectionHeader({ shift, count }: { shift: Shift; count: numb
 
   return (
     <div className="mb-3 flex items-center gap-2.5 px-1">
-      <span className={cn('flex h-7 w-7 items-center justify-center rounded-md border', shiftTone[shift])}>
+      <span className={cn('flex h-7 w-7 items-center justify-center rounded-md border shadow-[var(--elevation-1)]', shiftTone[shift])}>
         <Icon className="h-3.5 w-3.5" aria-hidden="true" />
       </span>
       <span className="text-xs font-bold uppercase tracking-[0.16em] text-foreground">

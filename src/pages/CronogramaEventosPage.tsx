@@ -1,7 +1,6 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AlertTriangle, CalendarDays, Loader2, RefreshCw } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
-import '@/styles/cronograma-workspace.css';
 import { CalendarMonthView } from '@/components/cronograma-eventos/CalendarMonthView';
 import {
   CategoryBoard,
@@ -26,7 +25,6 @@ import { MobileCronogramaHeader } from '@/components/cronograma-eventos/mobile/M
 import { MobileCronogramaNavigation } from '@/components/cronograma-eventos/mobile/MobileCronogramaNavigation';
 import { MobileCronogramaTimeline } from '@/components/cronograma-eventos/mobile/MobileCronogramaTimeline';
 import { MobileEventScreen } from '@/components/cronograma-eventos/mobile/MobileEventScreen';
-import { EventRelationshipWorkspace } from '@/components/cronograma-eventos/workspace/EventRelationshipWorkspace';
 import { compareEventDates } from '@/components/cronograma-eventos/dateUtils';
 import {
   adaptCronogramaEvent,
@@ -56,6 +54,11 @@ import {
 } from '@/lib/cronograma-cycle';
 import type { CronogramaEvent as SourceCronogramaEvent } from '@/lib/cronograma-eventos';
 import { filterTimelineEvents } from '@/lib/cronograma-timeline';
+
+const EventRelationshipWorkspace = lazy(async () => {
+  const module = await import('@/components/cronograma-eventos/workspace/EventRelationshipWorkspace');
+  return { default: module.EventRelationshipWorkspace };
+});
 
 const emptyFilters: CronogramaFilters = {
   query: '',
@@ -597,17 +600,19 @@ export default function CronogramaEventosPage() {
     >
       {workspaceIdentity ? (
         workspaceEvent ? (
-          <EventRelationshipWorkspace
-            event={workspaceEvent}
-            onBack={closeWorkspace}
-            onSaveEvent={handleSave}
-            onCreateSubevent={handleCreateSubevent}
-            onUpdateSubevent={handleUpdateSubevent}
-            onRemoveSubevent={handleRemoveSubevent}
-            canManage={cronograma.canManage}
-            canDeleteSubevents={cronograma.canDeleteSubevents}
-            relationshipsUnavailable={cronograma.relationshipsUnavailable || cronograma.isSeedFallback}
-          />
+          <Suspense fallback={<WorkspaceLoadingState />}>
+            <EventRelationshipWorkspace
+              event={workspaceEvent}
+              onBack={closeWorkspace}
+              onSaveEvent={handleSave}
+              onCreateSubevent={handleCreateSubevent}
+              onUpdateSubevent={handleUpdateSubevent}
+              onRemoveSubevent={handleRemoveSubevent}
+              canManage={cronograma.canManage}
+              canDeleteSubevents={cronograma.canDeleteSubevents}
+              relationshipsUnavailable={cronograma.relationshipsUnavailable || cronograma.isSeedFallback}
+            />
+          </Suspense>
         ) : (
           <div className="flex min-h-[60vh] items-center justify-center" role="status">
             {cronograma.isLoading ? (
@@ -751,5 +756,16 @@ export default function CronogramaEventosPage() {
       </>
       )}
     </main>
+  );
+}
+
+function WorkspaceLoadingState() {
+  return (
+    <div className="flex min-h-[60vh] items-center justify-center px-4" role="status">
+      <div className="glass-panel flex items-center gap-3 rounded-2xl px-5 py-4 text-sm font-semibold text-muted-foreground">
+        <Loader2 className="h-4 w-4 animate-spin text-primary" aria-hidden="true" />
+        Preparando conexões do evento…
+      </div>
+    </div>
   );
 }

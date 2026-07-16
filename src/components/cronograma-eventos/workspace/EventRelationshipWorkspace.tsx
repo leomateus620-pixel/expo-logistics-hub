@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState, type CSSProperties } from 'react';
+import '@/styles/cronograma-workspace.css';
 import {
   ArrowLeft,
   BrainCircuit,

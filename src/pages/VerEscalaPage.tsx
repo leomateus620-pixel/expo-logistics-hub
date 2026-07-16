@@ -3,7 +3,7 @@ import { useOrgMembers } from '@/hooks/useOrgMembers';
 import { useCommissions } from '@/hooks/useCommissions';
 import { useAuth } from '@/hooks/useAuth';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { DateTimePicker } from '@/components/ui/date-time-picker';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Badge } from '@/components/ui/badge';
-import { Plus, ChevronLeft, ChevronRight, Clock, User, Trash2, Search } from 'lucide-react';
+import { Plus, ChevronLeft, ChevronRight, Clock, Loader2, User, Trash2, Search } from 'lucide-react';
 import { toast } from 'sonner';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, addMonths, subMonths, startOfWeek, endOfWeek } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -107,39 +107,47 @@ export default function VerEscalaPage() {
   // Logística member user IDs set
   const logisticaUserIds = useMemo(() => new Set(logisticaMembers.map((m: any) => m.user_id)), [logisticaMembers]);
 
+  // Index once instead of scanning every assignment for every calendar cell.
+  const assignmentsByShift = useMemo(() => {
+    const map: Record<string, typeof assignments> = {};
+    assignments.forEach((assignment) => {
+      if (!map[assignment.schedule_shift_id]) map[assignment.schedule_shift_id] = [];
+      map[assignment.schedule_shift_id].push(assignment);
+    });
+    return map;
+  }, [assignments]);
+
   // Map shifts by date — only include shifts with logística member assignments
   const shiftsByDate = useMemo(() => {
     const map: Record<string, any[]> = {};
     shifts.forEach((s: any) => {
       const dateKey = s.inicio_em?.slice(0, 10);
       if (!dateKey) return;
-      const shiftAssigns = assignments.filter((a: any) => a.schedule_shift_id === s.id);
+      const shiftAssigns = assignmentsByShift[s.id] || [];
       const hasLogistica = shiftAssigns.some((a: any) => logisticaUserIds.has(a.member_user_id));
       if (!hasLogistica && shiftAssigns.length > 0) return;
       if (!map[dateKey]) map[dateKey] = [];
       map[dateKey].push(s);
     });
     return map;
-  }, [shifts, assignments, logisticaUserIds]);
+  }, [assignmentsByShift, logisticaUserIds, shifts]);
 
-  // Assignments mapped by shift id
-  const assignmentsByShift = useMemo(() => {
-    const map: Record<string, any[]> = {};
-    assignments.forEach((a: any) => {
-      if (!map[a.schedule_shift_id]) map[a.schedule_shift_id] = [];
-      map[a.schedule_shift_id].push(a);
-    });
+  const memberNameByUserId = useMemo(() => {
+    const map = new Map<string, string>();
+    members.forEach((member) => map.set(member.user_id, member.nome_exibicao || '—'));
+    logisticaMembers.forEach((member) => map.set(member.user_id, member.nome_exibicao || '—'));
     return map;
-  }, [assignments]);
+  }, [logisticaMembers, members]);
 
-  const getMemberName = (userId: string) => {
-    const m = logisticaMembers.find((m: any) => m.user_id === userId);
-    if (!m) {
-      const anyM = members.find((m: any) => m.user_id === userId);
-      return anyM?.nome_exibicao || '—';
-    }
-    return m?.nome_exibicao || '—';
-  };
+  const getMemberName = useCallback(
+    (userId: string) => memberNameByUserId.get(userId) || '—',
+    [memberNameByUserId],
+  );
+
+  const activeSchedules = useMemo(
+    () => schedules.filter((schedule) => schedule.status === 'ativa'),
+    [schedules],
+  );
 
   const handleCreateSchedule = async () => {
     if (!schedName || !schedStart || !schedEnd) {
@@ -218,31 +226,31 @@ export default function VerEscalaPage() {
       });
     }
     return dayShifts;
-  }, [selectedDate, shiftsByDate, appliedFilterName, assignmentsByShift]);
+  }, [appliedFilterName, assignmentsByShift, getMemberName, selectedDate, shiftsByDate]);
 
   const weekDays = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between">
+      <div className="escala-surface flex flex-col gap-4 rounded-2xl border p-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Escala</h1>
           <p className="text-sm text-muted-foreground mt-1">Logística, Hotelaria e Turismo</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex w-full flex-wrap gap-2 sm:w-auto">
           {isAdmin && (
-            <Button size="sm" variant="outline" onClick={() => setShowCreateDialog(true)}>
+            <Button size="sm" variant="outline" onClick={() => setShowCreateDialog(true)} className="min-w-0 flex-1 sm:flex-none">
               <Plus className="w-4 h-4 mr-1" /> Criar Escala
             </Button>
           )}
-          <Button size="sm" onClick={() => openShiftDialog()}>
+          <Button size="sm" onClick={() => openShiftDialog()} className="min-w-0 flex-1 sm:flex-none">
             <Plus className="w-4 h-4 mr-1" /> Registrar Horário
           </Button>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="flex flex-wrap items-end gap-2">
+      <div className="escala-surface grid items-end gap-3 rounded-2xl border p-3 sm:grid-cols-[minmax(0,1fr)_minmax(10rem,0.35fr)_auto_auto] sm:p-4">
         <div className="flex-1 min-w-[140px] relative">
           <Label className="text-xs">Nome</Label>
           <Input
@@ -304,19 +312,39 @@ export default function VerEscalaPage() {
       </div>
 
       {/* Active schedules */}
-      {schedules.filter((s: any) => s.status === 'ativa').length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {schedules.filter((s: any) => s.status === 'ativa').map((s: any) => (
-            <Badge key={s.id} variant="secondary" className="text-xs">
-              {s.nome} • {format(new Date(s.data_inicio), 'dd/MM')} – {format(new Date(s.data_fim), 'dd/MM')}
-            </Badge>
-          ))}
+      {isLoading && (
+        <div className="escala-surface flex min-h-24 items-center justify-center gap-2 rounded-2xl border text-sm font-semibold text-muted-foreground" role="status">
+          <Loader2 className="h-4 w-4 animate-spin text-primary" aria-hidden="true" />
+          Carregando escalas e horários…
+        </div>
+      )}
+
+      {!isLoading && activeSchedules.length === 0 && (
+        <div className="escala-surface rounded-2xl border border-dashed p-5 text-center" role="status">
+          <p className="text-sm font-bold text-foreground">Nenhuma escala ativa</p>
+          <p className="mt-1 text-xs text-muted-foreground">Crie uma escala para organizar os horários da equipe de logística.</p>
+        </div>
+      )}
+
+      {activeSchedules.length > 0 && (
+        <div className="escala-surface rounded-2xl border p-3">
+          <div className="mb-2 flex items-center justify-between gap-3">
+            <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground">Escalas ativas</p>
+            <span className="font-mono text-[10px] font-bold text-primary">{activeSchedules.length}</span>
+          </div>
+          <div className="flex snap-x gap-2 overflow-x-auto pb-1 scrollbar-hide">
+            {activeSchedules.map((s) => (
+              <Badge key={s.id} variant="secondary" className="shrink-0 snap-start border border-primary/10 bg-primary/5 px-3 py-1.5 text-xs shadow-[var(--elevation-1)]">
+                {s.nome} • {format(new Date(s.data_inicio), 'dd/MM')} – {format(new Date(s.data_fim), 'dd/MM')}
+              </Badge>
+            ))}
+          </div>
         </div>
       )}
 
       {/* Calendar header */}
-      <div className="rounded-xl border bg-card overflow-hidden">
-        <div className="flex items-center justify-between p-3 border-b">
+      <div className="escala-surface overflow-hidden rounded-2xl border shadow-[var(--elevation-2)]">
+        <div className="flex items-center justify-between border-b border-border/70 bg-card/72 p-3 backdrop-blur-sm">
           <Button variant="ghost" size="icon" onClick={() => setCurrentMonth(subMonths(currentMonth, 1))}>
             <ChevronLeft className="w-4 h-4" />
           </Button>
@@ -356,10 +384,10 @@ export default function VerEscalaPage() {
               <button
                 key={i}
                 onClick={() => setSelectedDate(day)}
-                className={`
-                  min-h-[72px] sm:min-h-[90px] p-1 border-b border-r text-left transition-colors
-                  ${!isCurrentMonth ? 'opacity-30' : ''}
-                  ${isSelected ? 'bg-primary/10 ring-1 ring-primary/30' : 'hover:bg-muted/50'}
+                data-selected={Boolean(isSelected)}
+                className={`escala-calendar-day relative min-h-[64px] border-b border-r p-1 text-left sm:min-h-[90px]
+                  ${!isCurrentMonth ? 'opacity-35' : ''}
+                  ${isSelected ? '' : 'hover:bg-muted/50'}
                 `}
               >
                 <span className={`
@@ -395,7 +423,7 @@ export default function VerEscalaPage() {
 
       {/* Selected date detail */}
       {selectedDate && (
-        <div className="rounded-xl border bg-card p-4 space-y-3">
+        <div className="escala-surface space-y-3 rounded-2xl border p-4 shadow-[var(--elevation-2)]">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-semibold capitalize">
               {format(selectedDate, "EEEE, dd 'de' MMMM", { locale: ptBR })}

@@ -7,9 +7,11 @@ import {
   formatFenasojaCountdownLabel,
   getFenasojaCountdown,
 } from '@/lib/fenasoja-countdown';
-import { getCountdownLabel, getTimelineSnapshot, getTodayKey } from '@/lib/cronograma-timeline';
+import {
+  buildCronogramaCommandSummary,
+  getCronogramaCommandReference,
+} from '@/lib/cronograma-command-summary';
 import '@/styles/fenasoja-countdown.css';
-import { SoybeanParticleCanvas } from './SoybeanParticleCanvas';
 import type { CronogramaEvent } from './types';
 
 export interface FenasojaCountdownHeroProps {
@@ -54,7 +56,7 @@ const CountdownUnit = memo(function CountdownUnit({
   return (
     <span className="fenasoja-countdown-unit" data-unit={unit}>
       <span className="fenasoja-countdown-value" aria-hidden="true">
-        <span key={formatted}>{formatted}</span>
+        <span>{formatted}</span>
       </span>
       <span className="fenasoja-countdown-unit-label">{label}</span>
     </span>
@@ -69,10 +71,10 @@ export function FenasojaCountdownHero({
   presentation,
 }: FenasojaCountdownHeroProps) {
   const countdown = useLiveFenasojaCountdown();
-  const todayKey = getTodayKey();
-  const timelineSnapshot = useMemo(
-    () => getTimelineSnapshot(events, todayKey),
-    [events, todayKey],
+  const referenceKey = getCronogramaCommandReference();
+  const { snapshot: timelineSnapshot, nextCountdown } = useMemo(
+    () => buildCronogramaCommandSummary(events, referenceKey),
+    [events, referenceKey],
   );
   const nextAction = timelineSnapshot.nextOfficialAction;
   const accessibleCountdown = formatFenasojaCountdownLabel(countdown);
@@ -85,7 +87,6 @@ export function FenasojaCountdownHero({
       data-phase={countdown.phase}
       aria-labelledby={`fenasoja-countdown-title-${presentation}`}
     >
-      <SoybeanParticleCanvas />
       <span className="fenasoja-countdown-ambient" aria-hidden="true" />
 
       <div className="fenasoja-countdown-content">
@@ -169,7 +170,7 @@ export function FenasojaCountdownHero({
                 <strong>{nextAction?.title ?? 'Nenhuma ação futura no recorte atual'}</strong>
                 {nextAction && (
                   <em>
-                    {formatLongDateRange(nextAction.date, nextAction.endDate)} · {getCountdownLabel(nextAction.date, todayKey)}
+                    {formatLongDateRange(nextAction.date, nextAction.endDate)} · {nextCountdown}
                   </em>
                 )}
               </span>

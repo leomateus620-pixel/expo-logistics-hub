@@ -115,14 +115,55 @@
   --radius: 0.75rem;
   --radius-sm: 0.5rem;
   --radius-lg: 1rem;
-  --shadow-xs: 0 1px 2px rgb(3 24 52 / 0.06);
-  --shadow-sm: 0 4px 8px -6px rgb(3 24 52 / 0.22);
-  --shadow-md: 0 8px 16px -12px rgb(3 24 52 / 0.34);
+  /* Physical elevation: contact shadow + ambient shadow + edge highlight. */
+  --elevation-0: none;
+  --elevation-1:
+    0 1px 2px rgb(3 24 52 / 0.08),
+    0 8px 22px -18px rgb(18 29 133 / 0.34),
+    inset 0 1px 0 rgb(255 255 255 / 0.72);
+  --elevation-2:
+    0 2px 4px -1px rgb(3 24 52 / 0.12),
+    0 16px 36px -22px rgb(18 29 133 / 0.42),
+    inset 0 1px 0 rgb(255 255 255 / 0.78);
+  --elevation-3:
+    0 4px 10px -4px rgb(3 24 52 / 0.18),
+    0 24px 56px -26px rgb(3 24 52 / 0.38),
+    inset 0 1px 0 rgb(255 255 255 / 0.70);
+  --elevation-4:
+    0 8px 18px -8px rgb(3 24 52 / 0.22),
+    0 36px 84px -32px rgb(3 24 52 / 0.46),
+    inset 0 1px 0 rgb(255 255 255 / 0.66);
 
+  /* Compatibility aliases now point to the semantic elevation scale. */
+  --shadow-xs: var(--elevation-1);
+  --shadow-sm: var(--elevation-2);
+  --shadow-md: var(--elevation-3);
+  --shadow-lg: var(--elevation-4);
+
+  /* Selective glass. The tint remains explicit even without blur support. */
+  --glass-surface: 98.46% 0.0017 247.84 / 0.76;
+  --glass-surface-strong: 98.46% 0.0017 247.84 / 0.88;
+  --glass-surface-inverse: 21.07% 0.062 255.67 / 0.78;
+  --glass-border: 100% 0 0 / 0.62;
+  --glass-border-inverse: 100% 0 0 / 0.14;
+  --glass-highlight: 255 255 255 / 0.72;
+  --glass-blur-nav: 14px;
+  --glass-blur-panel: 20px;
+  --glass-saturation: 1.12;
+
+  /* Motion communicates weight; routine actions stay short. */
+  --motion-instant: 90ms;
   --motion-fast: 150ms;
-  --motion-base: 200ms;
-  --motion-slow: 250ms;
-  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --motion-base: 210ms;
+  --motion-slow: 320ms;
+  --motion-structural: 420ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --ease-decelerate: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-accelerate: cubic-bezier(0.4, 0, 1, 1);
+  --ease-spring: cubic-bezier(0.2, 0.9, 0.25, 1.08);
+  --ease-out-expo: var(--ease-decelerate);
+  --interaction-lift: -2px;
+  --interaction-press-scale: 0.98;
 
   --z-dropdown: 40;
   --z-sticky: 50;
@@ -172,6 +213,27 @@
   --focus-ring: var(--brand-orange-400);
   --selected-surface: 27% 0.092 266;
   --navigation-inactive: 73% 0.026 255;
+
+  --elevation-1:
+    0 1px 2px rgb(0 0 0 / 0.28),
+    0 10px 24px -18px rgb(0 0 0 / 0.72),
+    inset 0 1px 0 rgb(255 255 255 / 0.08);
+  --elevation-2:
+    0 2px 6px -2px rgb(0 0 0 / 0.36),
+    0 18px 42px -22px rgb(0 0 0 / 0.78),
+    inset 0 1px 0 rgb(255 255 255 / 0.10);
+  --elevation-3:
+    0 5px 12px -5px rgb(0 0 0 / 0.44),
+    0 28px 64px -28px rgb(0 0 0 / 0.86),
+    inset 0 1px 0 rgb(255 255 255 / 0.11);
+  --elevation-4:
+    0 9px 20px -8px rgb(0 0 0 / 0.52),
+    0 40px 92px -32px rgb(0 0 0 / 0.92),
+    inset 0 1px 0 rgb(255 255 255 / 0.12);
+  --glass-surface: 20.5% 0.050 258 / 0.72;
+  --glass-surface-strong: 20.5% 0.050 258 / 0.86;
+  --glass-border: 100% 0 0 / 0.12;
+  --glass-highlight: 255 255 255 / 0.10;
 }
 
 @media (prefers-contrast: more) {

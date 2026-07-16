@@ -54,7 +54,10 @@ Verde ou azul não devem ser combinados com foreground arbitrário: use o par se
 | Token | Uso |
 | --- | --- |
 | `--background` / `--foreground` | Plano global e texto principal |
-| `--surface-1..3` | Elevação por contraste, sem simular vidro |
+| `--surface-1..3` | Hierarquia de superfícies sólidas |
+| `--elevation-0..4` | Profundidade física de base, grupos, seleção, controles flutuantes e overlays |
+| `--glass-*` | Vidro semântico para navegação, toolbars, painéis e diálogos |
+| `--motion-*`, `--ease-*` | Duração e física compartilhadas de feedback e transições estruturais |
 | `--primary` | Ênfase institucional e seleção |
 | `--action` / `--action-foreground` | CTA primário e respectivo texto |
 | `--secondary`, `--muted`, `--accent` | Ações e conteúdo de menor hierarquia |
@@ -66,8 +69,8 @@ Verde ou azul não devem ser combinados com foreground arbitrário: use o par se
 Escalas compartilhadas:
 
 - raios: 8 px, 10 px, 12 px e 16 px como escala padrão; 24 px fica reservado a sheets e superfícies de tela cheia; evitar cantos de 32 px ou maiores;
-- sombras: `xs`, `sm` e `md`, estreitas e de baixa opacidade;
-- movimento: 150 ms para feedback imediato, 200 ms como padrão e 250 ms para transições estruturais;
+- sombras: elevação `0` a `4`, combinando contato, ambiente e highlight interno sem glow artificial;
+- movimento: 90–150 ms para pressão e feedback, 210 ms como padrão, 320–420 ms para drawers e transições estruturais;
 - z-index: dropdown, sticky, backdrop, modal, toast e tooltip em uma escala única.
 
 ## Decisões de migração
@@ -75,7 +78,7 @@ Escalas compartilhadas:
 | Antes | Fenasoja 2028 |
 | --- | --- |
 | Identidade 2026 baseada em imagens raster nas superfícies principais | Lockup 2028 em SVG/código, nítido em qualquer densidade e sem download de imagem de marca |
-| Gradientes, brilho, blur e glassmorphism recorrentes | Superfícies sólidas, bordas discretas e contraste estrutural |
+| Gradientes, brilho, blur e glassmorphism recorrentes | Vidro seletivo e tokenizado, com superfícies sólidas no conteúdo repetitivo |
 | Cards grandes e repetitivos em grids de vitrine | Faixas de métricas, linhas densas e grupos operacionais |
 | Cores locais por componente | Primitives e papéis semânticos centralizados |
 | Animações decorativas contínuas e entrada encenada | Movimento curto, funcional e removível por preferência do usuário |
@@ -101,9 +104,10 @@ Escalas compartilhadas:
 
 ### Componentes e superfícies
 
-- Cards padrão têm superfície sólida, borda de 1 px e sombra curta opcional.
+- Cards padrão têm superfície sólida e elevação 1; seleção e hover significativo podem alcançar elevação 2.
 - Evite cards aninhados quando separadores, linhas ou agrupamentos semânticos resolvem a hierarquia.
-- Não use tilt 3D, cursor glow, grain, grid decorativo ou blur de fundo em componentes operacionais.
+- Use vidro apenas em navegação, toolbars, painéis contextuais, diálogos e cards operacionais importantes. Listas longas permanecem sólidas.
+- Não use tilt exagerado, cursor glow, grain, partículas ou movimento contínuo. Profundidade vem de elevação, edge highlight e lift de 1–2 px.
 - Use badges para estados curtos; use alertas ou texto auxiliar quando houver consequência ou ação necessária.
 - Skeletons devem respeitar a geometria do conteúdo e não simular dados.
 
@@ -166,7 +170,7 @@ Esses casos devem ser contextualizados na interface quando necessário, não reb
 - Estados expandido, selecionado, atual e inválido usam os atributos ARIA correspondentes.
 - Layouts devem ser verificados sem overflow em 320 px ou mais, com zoom de 200% e sem depender de hover; cenários não exercitados precisam ser registrados no handoff.
 - `prefers-reduced-motion: reduce` elimina movimento não essencial e reduz transições ao mínimo.
-- Não há animação contínua decorativa. Transições de 150–250 ms comunicam mudança de estado ou contexto.
+- Não há animação contínua decorativa. Transições de 90–420 ms comunicam pressão, mudança de estado ou contexto.
 
 ## Responsividade
 
@@ -180,7 +184,8 @@ Esses casos devem ser contextualizados na interface quando necessário, não reb
 
 - Marca principal é SVG/código; assets raster legados de branding não devem entrar no bundle inicial.
 - Os rasters de branding em `src/assets/` permanecem versionados apenas como legado histórico. Não são importados pela aplicação nem emitidos pelo build e não devem voltar a ser usados como identidade corrente.
-- Blur, filtros e sombras largas são evitados para reduzir custo de composição.
+- Blur é limitado a poucas superfícies elevadas e reduzido no mobile; cards de lista e células de calendário não criam camadas de blur individuais.
+- Sombras largas usam a escala semântica compartilhada, evitando combinações locais e glows.
 - Lazy loading de rotas e cache/persistência existentes são preservados.
 - Movimento usa propriedades baratas (`transform` e `opacity`) apenas quando necessário.
 - O build deve ser revisado quanto a chunks, imagens legadas e regressões de tamanho; mudanças de negócio não são uma solução aceitável para regressão visual ou de bundle.
@@ -192,6 +197,8 @@ Esses casos devem ser contextualizados na interface quando necessário, não reb
 | Tokens e contraste | Paleta TS, RGB, charts e pares AA | `npm.cmd test -- src/test/fenasojaBrandTokens.test.ts` |
 | Build de produção | Aplicação completa | `npm.cmd run build`; sem erro e sem assets raster legados de marca no output |
 | Regressão automatizada | Suíte Vitest completa | `npm.cmd test`; toda a cobertura automatizada permanece verde |
+| Rota crítica | Cabeçalho, loading, permissão e boundary | `src/test/cronogramaRouteRecovery.test.tsx` |
+| Integridade premium | Elevação, vidro, motion e fallback de composição | `src/test/premiumDesignSystem.test.ts` |
 | Qualidade estática | Arquivos alterados | ESLint focado e `git diff --check`; dívida global preexistente é reportada separadamente |
 | Portal e login | 1366 × 768, 390 × 844 | Marca, foco, formulário, erro e acesso por teclado |
 | Dashboard e módulos | 1920 × 1080, 1366 × 768, 768 × 1024, 390 × 844 | Hierarquia, menu, densidade, loading/empty/error e ausência de overflow |

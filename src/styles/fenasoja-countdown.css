@@ -1,8 +1,8 @@
 .fenasoja-countdown-hero {
-  --fenasoja-hero-deep: 149 72% 9%;
-  --fenasoja-hero-mid: 147 66% 14%;
-  --fenasoja-hero-bright: 143 58% 22%;
-  --fenasoja-hero-gold: 45 92% 59%;
+  --fenasoja-hero-deep: 213 89% 11%;
+  --fenasoja-hero-mid: 233 76% 30%;
+  --fenasoja-hero-bright: 211 77% 45%;
+  --fenasoja-hero-gold: 44 94% 55%;
   position: relative;
   isolation: isolate;
   overflow: hidden;
@@ -11,14 +11,14 @@
   color: white;
   background:
     radial-gradient(circle at 72% -20%, hsl(var(--fenasoja-hero-gold) / 0.17), transparent 34%),
-    radial-gradient(circle at 15% 116%, hsl(141 65% 34% / 0.34), transparent 38%),
-    linear-gradient(124deg, hsl(var(--fenasoja-hero-deep)) 0%, hsl(var(--fenasoja-hero-mid)) 52%, hsl(146 67% 11%) 100%);
+    radial-gradient(circle at 15% 116%, oklch(var(--brand-green) / 0.16), transparent 38%),
+    linear-gradient(124deg, hsl(var(--fenasoja-hero-deep)) 0%, hsl(var(--fenasoja-hero-mid)) 52%, oklch(var(--brand-navy-800)) 100%);
   box-shadow:
-    0 32px 76px -44px hsl(148 75% 8% / 0.92),
+    var(--elevation-4),
     0 2px 0 hsl(var(--fenasoja-hero-gold) / 0.16),
     inset 0 1px 0 rgb(255 255 255 / 0.14);
   perspective: 1200px;
-  animation: fenasoja-countdown-reveal 620ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: fenasoja-countdown-reveal var(--motion-structural) var(--ease-decelerate) both;
 }
 
 .fenasoja-countdown-hero::before {
@@ -44,16 +44,6 @@
   pointer-events: none;
   background: linear-gradient(90deg, transparent, hsl(var(--fenasoja-hero-gold) / 0.78), transparent);
   box-shadow: 0 -10px 28px hsl(var(--fenasoja-hero-gold) / 0.16);
-}
-
-.fenasoja-soy-canvas {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  opacity: 0.58;
 }
 
 .fenasoja-countdown-ambient {
@@ -128,11 +118,11 @@
   box-shadow:
     0 12px 28px -18px hsl(var(--fenasoja-hero-gold) / 0.88),
     inset 0 1px 0 rgb(255 255 255 / 0.45);
-  transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1), background-color 180ms ease, box-shadow 180ms ease;
+  transition: transform var(--motion-fast) var(--ease-standard), background-color var(--motion-fast) var(--ease-standard), box-shadow var(--motion-fast) var(--ease-standard);
 }
 
 .fenasoja-countdown-new-event:hover {
-  background: hsl(45 96% 64%);
+  background: oklch(var(--brand-gold-400));
 }
 
 .fenasoja-countdown-new-event > svg {
@@ -203,14 +193,16 @@
   padding: 0.8rem 0.85rem 0.9rem;
   background:
     linear-gradient(145deg, rgb(255 255 255 / 0.105), rgb(255 255 255 / 0.028)),
-    hsl(148 67% 9% / 0.42);
+    oklch(var(--brand-navy-900) / 0.54);
   box-shadow:
-    0 24px 48px -34px rgb(0 0 0 / 0.72),
+    var(--elevation-3),
     inset 0 1px 0 rgb(255 255 255 / 0.11),
     inset 0 -1px 0 rgb(0 0 0 / 0.25);
+  backdrop-filter: blur(var(--glass-blur-nav)) saturate(var(--glass-saturation));
+  -webkit-backdrop-filter: blur(var(--glass-blur-nav)) saturate(var(--glass-saturation));
   transform: rotateX(0.8deg) translateZ(0);
   transform-origin: center bottom;
-  animation: fenasoja-clock-arrive 680ms 90ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: fenasoja-clock-arrive var(--motion-structural) var(--ease-decelerate) var(--motion-instant) both;
 }
 
 .fenasoja-countdown-clock-heading {
@@ -246,9 +238,8 @@
   width: 0.38rem;
   height: 0.38rem;
   border-radius: 999px;
-  background: hsl(145 68% 58%);
-  box-shadow: 0 0 0 4px hsl(145 68% 58% / 0.1), 0 0 12px hsl(145 68% 58% / 0.42);
-  animation: fenasoja-live-pulse 2.4s ease-in-out infinite;
+  background: oklch(var(--success));
+  box-shadow: 0 0 0 4px oklch(var(--success) / 0.12);
 }
 
 .fenasoja-countdown-grid {
@@ -271,13 +262,13 @@
   border-radius: 0.95rem;
   background:
     radial-gradient(circle at 30% 12%, rgb(255 255 255 / 0.2), transparent 34%),
-    linear-gradient(160deg, hsl(132 15% 91% / 0.97), hsl(103 17% 78% / 0.91));
+    linear-gradient(160deg, oklch(var(--brand-soft-white) / 0.98), oklch(var(--brand-cream) / 0.92));
   box-shadow:
-    0 14px 24px -18px rgb(0 0 0 / 0.88),
+    var(--elevation-2),
     inset 0 1px 0 rgb(255 255 255 / 0.88),
-    inset 0 -8px 16px rgb(31 72 42 / 0.12);
+    inset 0 -8px 16px oklch(var(--brand-indigo-500) / 0.08);
   transform: rotateX(2.2deg) translateZ(0);
-  transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1), border-color 180ms ease, box-shadow 180ms ease;
+  transition: transform var(--motion-base) var(--ease-decelerate), border-color var(--motion-fast) var(--ease-standard), box-shadow var(--motion-base) var(--ease-standard);
 }
 
 .fenasoja-countdown-unit::before {
@@ -295,7 +286,7 @@
   inset: auto 18% 0.35rem;
   height: 0.25rem;
   border-radius: 999px;
-  background: rgb(10 51 29 / 0.12);
+  background: oklch(var(--brand-navy-900) / 0.12);
   filter: blur(4px);
 }
 
@@ -304,7 +295,7 @@
   box-shadow:
     0 16px 28px -20px hsl(var(--fenasoja-hero-gold) / 0.72),
     inset 0 1px 0 rgb(255 255 255 / 0.88),
-    inset 0 -8px 16px rgb(31 72 42 / 0.12);
+    inset 0 -8px 16px oklch(var(--brand-indigo-500) / 0.08);
 }
 
 .fenasoja-countdown-value {
@@ -313,7 +304,7 @@
   display: grid;
   min-width: 0;
   place-items: center;
-  color: hsl(43 92% 29%);
+  color: oklch(var(--brand-gold-700));
   font-family: 'JetBrains Mono', monospace;
   font-size: clamp(2.3rem, 4.1vw, 4.2rem);
   font-variant-numeric: tabular-nums;
@@ -327,14 +318,14 @@
 }
 
 .fenasoja-countdown-value > span {
-  animation: fenasoja-number-change 300ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: fenasoja-number-change var(--motion-base) var(--ease-decelerate) both;
 }
 
 .fenasoja-countdown-unit-label {
   position: relative;
   z-index: 1;
   margin-top: 0.55rem;
-  color: hsl(149 42% 17% / 0.9);
+  color: oklch(var(--brand-navy-900) / 0.9);
   font-size: clamp(0.58rem, 0.72vw, 0.7rem);
   font-weight: 850;
   letter-spacing: 0.11em;
@@ -388,9 +379,9 @@
   height: 100%;
   min-width: 0.38rem;
   border-radius: inherit;
-  background: linear-gradient(90deg, hsl(44 87% 47%), hsl(49 98% 67%));
+  background: linear-gradient(90deg, oklch(var(--brand-gold-700)), oklch(var(--brand-gold-400)));
   box-shadow: 0 0 14px hsl(var(--fenasoja-hero-gold) / 0.36);
-  transition: width 600ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: width var(--motion-structural) var(--ease-decelerate);
 }
 
 .fenasoja-countdown-progress-track > span::after {
@@ -492,7 +483,7 @@
 .fenasoja-countdown-operation-metric > svg {
   width: 0.85rem;
   height: 0.85rem;
-  color: rgb(181 236 200 / 0.7);
+  color: oklch(var(--brand-blue) / 0.88);
 }
 
 .fenasoja-countdown-operation-metric > span {
@@ -510,12 +501,12 @@
 
 .fenasoja-countdown-operation-metric[data-alert='true'] > svg,
 .fenasoja-countdown-operation-metric[data-alert='true'] strong {
-  color: hsl(4 88% 77%);
+  color: color-mix(in oklch, oklch(var(--destructive)) 64%, white);
 }
 
 button.fenasoja-countdown-undated {
   cursor: pointer;
-  transition: background-color 180ms ease, color 180ms ease;
+  transition: background-color var(--motion-fast) var(--ease-standard), color var(--motion-fast) var(--ease-standard), transform var(--motion-fast) var(--ease-standard);
 }
 
 .fenasoja-countdown-new-event:focus-visible,
@@ -597,7 +588,7 @@ button.fenasoja-countdown-undated:focus-visible {
     box-shadow:
       0 20px 34px -22px rgb(0 0 0 / 0.88),
       inset 0 1px 0 rgb(255 255 255 / 0.92),
-      inset 0 -8px 16px rgb(31 72 42 / 0.12);
+      inset 0 -8px 16px oklch(var(--brand-indigo-500) / 0.08);
     transform: translateY(-2px) rotateX(1deg) translateZ(0);
   }
 
@@ -768,6 +759,24 @@ button.fenasoja-countdown-undated:focus-visible {
   }
 }
 
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .fenasoja-countdown-clock {
+    background: oklch(var(--brand-navy-900));
+  }
+}
+
+@media (prefers-contrast: more), (prefers-reduced-transparency: reduce) {
+  .fenasoja-countdown-clock {
+    background: oklch(var(--brand-navy-900));
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .fenasoja-countdown-unit {
+    background: oklch(var(--brand-soft-white));
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .fenasoja-countdown-hero,
   .fenasoja-countdown-clock,
@@ -789,9 +798,6 @@ button.fenasoja-countdown-undated:focus-visible {
     transform: none !important;
   }
 
-  .fenasoja-soy-canvas {
-    opacity: 0.34;
-  }
 }
 
 @media (prefers-contrast: more) {

@@ -64,7 +64,7 @@ interface SidebarProps {
 function SidebarBadge({ count }: { count: number }) {
   if (count <= 0) return null;
   return (
-    <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-md bg-action px-1 text-[10px] font-black leading-none text-action-foreground">
+    <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-md bg-action px-1 text-[10px] font-black leading-none text-action-foreground shadow-[0_5px_12px_-7px_oklch(var(--action)/0.8),inset_0_1px_0_rgb(255_255_255/0.34)]">
       {count > 99 ? '99+' : count}
     </span>
   );
@@ -150,7 +150,7 @@ export default function Sidebar({ collapsed, onToggle, isMobile, mobileOpen, onM
                 onClick={mobile ? onMobileClose : undefined}
                 className={({ isActive }) =>
                   cn(
-                    'relative flex items-center gap-3 rounded-lg text-sm font-medium transition-[background-color,color] duration-150 focus-ring',
+                    'premium-nav-link relative flex items-center gap-3 rounded-lg text-sm font-medium transition-[background-color,color,transform,box-shadow] duration-200 focus-ring',
                     collapsed ? 'justify-center px-2' : 'px-3',
                     mobile ? 'gap-3.5 py-3 active:bg-white/10' : 'py-2.5',
                     isActive
@@ -229,20 +229,20 @@ export default function Sidebar({ collapsed, onToggle, isMobile, mobileOpen, onM
       <>
         {mobileOpen && (
           <div
-            className="fixed inset-0 z-40 bg-[oklch(var(--overlay)/0.70)] transition-opacity"
+            className="fixed inset-0 z-40 bg-[oklch(var(--overlay)/0.66)] backdrop-blur-sm transition-opacity"
             onClick={onMobileClose}
           />
         )}
         <aside
           className={cn(
-            'fixed left-0 top-0 bottom-0 z-50 flex flex-col',
+            'premium-app-sidebar fixed left-0 top-0 bottom-0 z-50 flex flex-col',
             'border-r border-sidebar-border',
             mobileOpen ? 'translate-x-0' : '-translate-x-full',
             collapsed ? 'w-[72px]' : 'w-[288px]'
           )}
           style={{
             background: sidebarBg,
-            transition: 'transform 200ms var(--ease-out-expo)',
+            transition: 'transform var(--motion-slow) var(--ease-spring)',
           }}
         >
           {renderHeader(true)}
@@ -258,7 +258,7 @@ export default function Sidebar({ collapsed, onToggle, isMobile, mobileOpen, onM
 
   return (
     <aside
-      className="fixed bottom-0 left-0 top-0 z-50 flex flex-col overflow-hidden border-r border-sidebar-border transition-[width] duration-200"
+      className="premium-app-sidebar premium-structural-motion fixed bottom-0 left-0 top-0 z-50 flex flex-col overflow-hidden border-r border-sidebar-border transition-[width] duration-300"
       style={{ width, background: sidebarBg }}
     >
       {renderHeader(false)}
