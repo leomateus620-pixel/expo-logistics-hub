@@ -22,6 +22,7 @@ import type {
 const commissionBySlug = new Map(cronogramaCommissionOptions.map((commission) => [commission.slug, commission.name]));
 
 const categoryKeywords: Array<[CronogramaCategory, RegExp]> = [
+  ['representacoes', /representa[çc][ãa]o|representa[çc][õo]es|agenda institucional|compromisso externo/i],
   ['logistica', /log[ií]stica|estacionamento|ve[ií]culos|acesso|mobilidade/i],
   ['infraestrutura', /infra|seguran[çc]a|limpeza|ppci|internet|pavilh|exporural|banheiro|gerador|c[âa]mera|libras|acessibilidade/i],
   ['comunicacao', /comunica|m[ií]dia|imprensa|propaganda|revista|lan[çc]amento|v[ií]deo|fot[oó]grafo/i],
