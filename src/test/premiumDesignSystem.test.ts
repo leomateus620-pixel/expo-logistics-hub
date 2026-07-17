@@ -8,6 +8,7 @@ const workspaceStyles = readFileSync(resolve('src/styles/cronograma-workspace.cs
 const mobileStyles = readFileSync(resolve('src/styles/cronograma-mobile.css'), 'utf8');
 const mobileOverlayStyles = readFileSync(resolve('src/styles/cronograma-mobile-overlays.css'), 'utf8');
 const countdownStyles = readFileSync(resolve('src/styles/fenasoja-countdown.css'), 'utf8');
+const loginStyles = readFileSync(resolve('src/styles/login-experience.css'), 'utf8');
 
 describe('arquitetura visual premium Fenasoja 2028', () => {
   it('mantém a hierarquia semântica de elevação zero a quatro', () => {
@@ -51,5 +52,21 @@ describe('arquitetura visual premium Fenasoja 2028', () => {
     expect(countdownStyles).toContain('var(--motion-structural)');
     expect(countdownStyles).not.toMatch(/hsl\(14[0-9]/i);
     expect(countdownStyles).not.toMatch(/animation:[^;]*infinite/i);
+  });
+
+  it('mantém o login no sistema visual compartilhado com estados e fallbacks completos', () => {
+    expect(loginStyles).toContain('oklch(var(--brand-navy-900))');
+    expect(loginStyles).toContain('oklch(var(--brand-orange-500))');
+    expect(loginStyles).toContain('var(--motion-structural)');
+    expect(loginStyles).toContain('.auth-input-frame[data-invalid=\'true\']');
+    expect(loginStyles).toContain('.auth-input-control:-webkit-autofill');
+    expect(loginStyles).toContain('0 0 0 3px oklch(var(--focus-ring))');
+    expect(loginStyles).toContain('0 0 0 3px oklch(var(--semantic-red-700))');
+    expect(loginStyles).toContain('@supports not ((backdrop-filter: blur(1px))');
+    expect(loginStyles).toContain('@media (prefers-reduced-motion: reduce)');
+    expect(loginStyles).not.toMatch(/#[0-9a-f]{3,8}/i);
+    expect(loginStyles).not.toMatch(/animation:[^;]*infinite/i);
+    expect(globalStyles).not.toContain('.auth-glass-panel');
+    expect(globalStyles).not.toContain('.auth-primary-action');
   });
 });

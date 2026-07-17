@@ -1,18 +1,128 @@
-import { useEffect, useState } from 'react';
+import { type CSSProperties, useEffect, useRef, useState } from 'react';
 import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
-import { ArrowLeft, CalendarRange, Loader2, LockKeyhole, LogIn, ShieldCheck } from 'lucide-react';
+import {
+  AlertCircle,
+  ArrowLeft,
+  ArrowRight,
+  BadgeCheck,
+  CalendarDays,
+  CalendarRange,
+  Check,
+  Eye,
+  EyeOff,
+  FileCheck2,
+  KeyRound,
+  Landmark,
+  Layers3,
+  Loader2,
+  LockKeyhole,
+  Mail,
+  Map,
+  Milestone,
+  Route,
+  ShieldCheck,
+  UsersRound,
+  type LucideIcon,
+} from 'lucide-react';
 import { FenasojaBrand } from '@/components/brand/FenasojaBrand';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { useAuth } from '@/hooks/useAuth';
 import {
   SELECTED_COMMISSION_STORAGE_KEY,
   getCommissionModule,
   getModuleRoute,
 } from '@/modules/commissions/commissionRegistry';
+import '@/styles/login-experience.css';
 
 interface LoginPageProps {
   returnTo?: string;
 }
+
+interface CapabilityItem {
+  description: string;
+  icon: LucideIcon;
+  label: string;
+}
+
+interface FieldErrors {
+  email?: string;
+  password?: string;
+}
+
+type FormPhase = 'idle' | 'submitting' | 'success';
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const SUCCESS_REDIRECT_DELAY_MS = 800;
+
+const cronogramaCapabilities: CapabilityItem[] = [
+  {
+    icon: CalendarDays,
+    label: 'Calendário estratégico',
+    description: 'Marcos e períodos',
+  },
+  {
+    icon: Milestone,
+    label: 'Linha do tempo',
+    description: 'Ciclo 2026—2028',
+  },
+  {
+    icon: UsersRound,
+    label: 'Reuniões centrais',
+    description: 'Agenda compartilhada',
+  },
+  {
+    icon: BadgeCheck,
+    label: 'Decisões do ciclo',
+    description: 'Registro institucional',
+  },
+];
+
+const commercialMapCapabilities: CapabilityItem[] = [
+  {
+    icon: Map,
+    label: 'Parque mapeado',
+    description: 'Estruturas oficiais',
+  },
+  {
+    icon: Landmark,
+    label: 'Disponibilidade',
+    description: 'Situação comercial',
+  },
+  {
+    icon: FileCheck2,
+    label: 'Contratos',
+    description: 'Histórico conectado',
+  },
+  {
+    icon: ShieldCheck,
+    label: 'Acesso controlado',
+    description: 'Perfis e permissões',
+  },
+];
+
+const adminCapabilities: CapabilityItem[] = [
+  {
+    icon: Landmark,
+    label: 'Governança central',
+    description: 'Visão institucional',
+  },
+  {
+    icon: UsersRound,
+    label: 'Perfis e acessos',
+    description: 'Controle por função',
+  },
+  {
+    icon: Layers3,
+    label: 'Comissões',
+    description: 'Gestão integrada',
+  },
+  {
+    icon: FileCheck2,
+    label: 'Decisões auditáveis',
+    description: 'Registro conectado',
+  },
+];
 
 function getStoredModuleSlug() {
   try {
@@ -26,19 +136,40 @@ function getModuleSlugFromPath(path?: string) {
   return path?.match(/^\/comissoes\/([^/?#]+)/)?.[1] ?? null;
 }
 
+function validateEmail(value: string) {
+  const normalized = value.trim();
+  if (!normalized) return 'Informe seu e-mail.';
+  if (!EMAIL_PATTERN.test(normalized)) return 'Digite um e-mail válido.';
+  return undefined;
+}
+
+function validatePassword(value: string) {
+  if (!value) return 'Informe sua senha.';
+  return undefined;
+}
+
 export default function LoginPage({ returnTo }: LoginPageProps) {
   const { signIn, user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const { moduleSlug } = useParams();
+  const redirectTimerRef = useRef<number | null>(null);
+  const submissionRedirectRef = useRef(false);
+  const emailInputRef = useRef<HTMLInputElement>(null);
+  const passwordInputRef = useRef<HTMLInputElement>(null);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
+  const [authError, setAuthError] = useState('');
+  const [phase, setPhase] = useState<FormPhase>('idle');
+  const [showPassword, setShowPassword] = useState(false);
+  const [touched, setTouched] = useState({ email: false, password: false });
 
   const isAdminLogin = location.pathname === '/login/admin' || moduleSlug === 'admin' || returnTo?.startsWith('/admin');
-  const selectedSlug = isAdminLogin ? 'admin' : moduleSlug || getModuleSlugFromPath(returnTo) || getStoredModuleSlug() || 'logistica';
-  const isCronogramaLogin = selectedSlug === 'cronograma-eventos' || returnTo === '/cronograma-eventos';
+  const selectedSlug = isAdminLogin
+    ? 'admin'
+    : moduleSlug || getModuleSlugFromPath(returnTo) || getStoredModuleSlug() || 'logistica';
+  const isCronogramaLogin = selectedSlug === 'cronograma-eventos' || returnTo?.startsWith('/cronograma-eventos');
   const isCommercialMapLogin = selectedSlug === 'mapa-comercial' || returnTo?.startsWith('/mapa-comercial');
   const selectedModule = getCommissionModule(selectedSlug);
   const contextName = isAdminLogin
@@ -50,16 +181,66 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
         : selectedModule
           ? `Comissão de ${selectedModule.name}`
           : 'Comissão de Logística';
-  const heroTitle = isCommercialMapLogin
-    ? 'Gestão territorial e comercial do parque'
+  const heroTitleLead = isAdminLogin
+    ? 'Governança institucional'
     : isCronogramaLogin
-      ? 'Planejamento temporal da Fenasoja 2028'
-      : 'Ambiente seguro das comissões';
-  const heroDescription = isCronogramaLogin
-    ? 'Consulte calendário, linha do tempo, reuniões centrais e decisões do ciclo oficial 2026—2028.'
+      ? 'Planejamento temporal'
+      : isCommercialMapLogin
+        ? 'Gestão territorial'
+        : 'Ambiente seguro';
+  const heroTitleAccent = isAdminLogin
+    ? 'Fenasoja 2028'
+    : isCronogramaLogin
+      ? 'da Fenasoja 2028'
+      : isCommercialMapLogin
+        ? 'e comercial do parque'
+        : 'das comissões';
+  const capabilities = isCronogramaLogin
+    ? cronogramaCapabilities
     : isCommercialMapLogin
-      ? 'Visualize estruturas, disponibilidade, reservas, vendas e contratos na base cartográfica controlada.'
-      : 'Continue no módulo selecionado com as mesmas permissões e o mesmo contexto operacional.';
+      ? commercialMapCapabilities
+      : isAdminLogin
+        ? adminCapabilities
+        : [
+            {
+              icon: Layers3,
+              label: 'Módulo selecionado',
+              description: selectedModule?.name ?? 'Logística',
+            },
+            {
+              icon: CalendarDays,
+              label: 'Agenda operacional',
+              description: 'Prioridades do ciclo',
+            },
+            {
+              icon: UsersRound,
+              label: 'Equipe conectada',
+              description: 'Papéis definidos',
+            },
+            {
+              icon: ShieldCheck,
+              label: 'Dados do módulo',
+              description: 'Acesso controlado',
+            },
+          ];
+  const ContextIcon = isAdminLogin
+    ? LockKeyhole
+    : isCronogramaLogin
+      ? CalendarRange
+      : isCommercialMapLogin
+        ? Map
+        : Layers3;
+  const isBusy = phase !== 'idle';
+  const emailInvalid = Boolean(fieldErrors.email || authError);
+  const passwordInvalid = Boolean(fieldErrors.password || authError);
+  const emailDescribedBy = [
+    fieldErrors.email ? 'login-email-error' : null,
+    authError ? 'login-auth-error' : null,
+  ].filter(Boolean).join(' ') || undefined;
+  const passwordDescribedBy = [
+    fieldErrors.password ? 'login-password-error' : null,
+    authError ? 'login-auth-error' : null,
+  ].filter(Boolean).join(' ') || undefined;
 
   const resolveTarget = () => {
     if (returnTo && returnTo !== '/' && !returnTo.startsWith('/login')) return returnTo;
@@ -71,120 +252,336 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
   };
 
   useEffect(() => {
-    if (!authLoading && user && location.pathname.startsWith('/login')) {
+    if (
+      !authLoading
+      && user
+      && location.pathname.startsWith('/login')
+      && !submissionRedirectRef.current
+    ) {
       navigate(resolveTarget(), { replace: true });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [authLoading, user, location.pathname]);
 
+  useEffect(() => {
+    return () => {
+      if (redirectTimerRef.current !== null) {
+        window.clearTimeout(redirectTimerRef.current);
+      }
+      submissionRedirectRef.current = false;
+    };
+  }, []);
+
+  const updateEmail = (value: string) => {
+    setEmail(value);
+    setAuthError('');
+    if (touched.email) {
+      setFieldErrors((current) => ({ ...current, email: validateEmail(value) }));
+    }
+  };
+
+  const updatePassword = (value: string) => {
+    setPassword(value);
+    setAuthError('');
+    if (touched.password) {
+      setFieldErrors((current) => ({ ...current, password: validatePassword(value) }));
+    }
+  };
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (loading) return;
-    setError('');
-    setLoading(true);
-    const result = await signIn(email.trim(), password);
-    if (result.error) {
-      setError('E-mail ou senha incorretos. Confira suas credenciais e tente novamente.');
-    } else {
-      navigate(resolveTarget(), { replace: true });
+    if (isBusy) return;
+
+    const nextErrors: FieldErrors = {
+      email: validateEmail(email),
+      password: validatePassword(password),
+    };
+
+    setTouched({ email: true, password: true });
+    setFieldErrors(nextErrors);
+    setAuthError('');
+
+    if (nextErrors.email || nextErrors.password) {
+      const firstInvalidField = nextErrors.email
+        ? emailInputRef.current
+        : passwordInputRef.current;
+      firstInvalidField?.focus();
+      return;
     }
-    setLoading(false);
+
+    submissionRedirectRef.current = true;
+    setPhase('submitting');
+
+    try {
+      const result = await signIn(email.trim(), password);
+      if (result.error) {
+        submissionRedirectRef.current = false;
+        setAuthError('E-mail ou senha incorretos. Confira suas credenciais e tente novamente.');
+        setPhase('idle');
+        return;
+      }
+
+      setPhase('success');
+      redirectTimerRef.current = window.setTimeout(
+        () => {
+          submissionRedirectRef.current = false;
+          navigate(resolveTarget(), { replace: true });
+        },
+        SUCCESS_REDIRECT_DELAY_MS,
+      );
+    } catch {
+      submissionRedirectRef.current = false;
+      setAuthError('Não foi possível acessar o sistema agora. Verifique sua conexão e tente novamente.');
+      setPhase('idle');
+    }
   };
 
   return (
-    <main className="command-grid-bg relative min-h-[100dvh] overflow-hidden bg-[oklch(var(--brand-navy-900))] text-white">
-      <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_16%_12%,oklch(var(--brand-indigo-500)/0.74),transparent_38%),radial-gradient(circle_at_95%_90%,oklch(var(--brand-orange-500)/0.22),transparent_35%)]"
-        aria-hidden="true"
-      />
-      <div
-        className="pointer-events-none absolute -left-24 bottom-10 h-72 w-72 rotate-[-14deg] rounded-[30%] border border-[oklch(var(--brand-gold-400)/0.14)]"
-        aria-hidden="true"
-      />
+    <main className="auth-screen" data-auth-phase={phase}>
+      <div className="auth-screen__cycle" aria-hidden="true">
+        <span>2026</span>
+        <i />
+        <span>2027</span>
+        <i />
+        <span data-current="true">2028</span>
+      </div>
 
-      <div className="relative mx-auto grid min-h-[100dvh] w-full max-w-6xl items-center gap-8 px-4 py-6 sm:px-6 lg:grid-cols-[minmax(0,1fr)_420px] lg:px-8">
-        <section className="hidden max-w-xl lg:block" aria-labelledby="login-hero-title">
-          <FenasojaBrand subtitle="Gestão operacional" tone="dark" />
-          <p className="mt-14 inline-flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-[oklch(var(--brand-gold-400))]">
-            <ShieldCheck className="h-4 w-4" aria-hidden="true" />
-            Acesso protegido
-          </p>
-          <h1 id="login-hero-title" className="mt-4 text-balance text-5xl font-black leading-[1.02] tracking-[-0.04em]">
-            {heroTitle}
-          </h1>
-          <p className="mt-5 text-base leading-7 text-white/68">{heroDescription}</p>
+      <div className="auth-layout">
+        <section className="auth-hero" aria-labelledby="login-hero-title">
+          <FenasojaBrand
+            className="auth-hero__brand"
+            scale="display"
+            subtitle="Planejamento institucional"
+            tone="dark"
+          />
 
-          <div className="portal-glass-stat mt-10 grid grid-cols-3 gap-px overflow-hidden rounded-xl">
-            {['Contexto preservado', 'Acesso por perfil', 'Dados protegidos'].map((item) => (
-              <span key={item} className="bg-white/[0.035] px-3 py-4 text-center text-xs font-semibold text-white/72">
-                {item}
-              </span>
-            ))}
+          <div className="auth-hero__context">
+            <span className="auth-hero__context-icon" aria-hidden="true">
+              <ShieldCheck />
+            </span>
+            <span className="auth-hero__context-label">Acesso protegido</span>
+            <span className="auth-hero__context-divider" aria-hidden="true" />
+            <span className="auth-hero__context-name">{contextName}</span>
           </div>
+
+          <h1 id="login-hero-title" className="auth-hero__title">
+            {heroTitleLead}
+            <span>{heroTitleAccent}</span>
+          </h1>
+
+          <p className="auth-hero__capability-label">Capacidades do ambiente</p>
+          <ul className="auth-capabilities" aria-label="Capacidades do ambiente selecionado">
+            {capabilities.map(({ description, icon: Icon, label }, index) => (
+              <li
+                key={label}
+                className="auth-capability"
+                style={{ '--capability-index': index } as CSSProperties}
+              >
+                <span className="auth-capability__icon" aria-hidden="true">
+                  <Icon />
+                </span>
+                <span className="auth-capability__copy">
+                  <strong>{label}</strong>
+                  <span>{description}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
         </section>
 
-        <section className="auth-glass-panel animate-soft-rise w-full rounded-2xl border p-5 text-card-foreground sm:p-7" aria-labelledby="login-title" aria-busy={loading}>
-          <div className="flex items-start justify-between gap-4">
+        <section
+          className="auth-panel"
+          aria-labelledby="login-title"
+          aria-busy={phase === 'submitting'}
+        >
+          <div className="auth-panel__brand-row">
             <FenasojaBrand compact subtitle="Acesso ao sistema" tone="light" />
-            <span className="inline-flex shrink-0 items-center gap-1.5 rounded-md bg-accent px-2 py-1 text-[10px] font-bold text-accent-foreground">
-              {isAdminLogin && <LockKeyhole className="h-3.5 w-3.5" aria-hidden="true" />}
-              {isCronogramaLogin && <CalendarRange className="h-3.5 w-3.5" aria-hidden="true" />}
-              {contextName}
-            </span>
+            <div className="auth-module-badge">
+              <span className="auth-module-badge__icon" aria-hidden="true">
+                <ContextIcon />
+              </span>
+              <span className="auth-module-badge__copy">
+                <span>Módulo selecionado</span>
+                <strong>{contextName}</strong>
+              </span>
+            </div>
           </div>
 
-          <div className="mt-8">
-            <h2 id="login-title" className="text-2xl font-black tracking-tight text-foreground">Entrar</h2>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">Use suas credenciais para continuar no ambiente selecionado.</p>
+          <div className="auth-panel__heading">
+            <p className="auth-panel__eyebrow">
+              <ShieldCheck aria-hidden="true" />
+              Identificação segura
+            </p>
+            <h2 id="login-title">Entrar</h2>
+            <p>
+              Use suas credenciais institucionais para continuar em <strong>{contextName}</strong>.
+            </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-            <label className="block text-left">
-              <span className="mb-2 block text-sm font-semibold text-foreground">E-mail</span>
-              <input
-                type="email"
-                placeholder="seu.email@fenasoja.com.br"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                required
-                autoComplete="email"
-                className="h-11 w-full rounded-lg border border-input bg-white/70 px-3 text-sm text-foreground shadow-inner outline-none transition-[border-color,background-color,box-shadow] duration-150 placeholder:text-muted-foreground focus:border-ring focus:bg-white/90 focus:ring-4 focus:ring-ring/15"
-              />
-            </label>
-            <label className="block text-left">
-              <span className="mb-2 block text-sm font-semibold text-foreground">Senha</span>
-              <input
-                type="password"
-                placeholder="Digite sua senha"
-                value={password}
-                onChange={(event) => setPassword(event.target.value)}
-                required
-                autoComplete="current-password"
-                className="h-11 w-full rounded-lg border border-input bg-white/70 px-3 text-sm text-foreground shadow-inner outline-none transition-[border-color,background-color,box-shadow] duration-150 placeholder:text-muted-foreground focus:border-ring focus:bg-white/90 focus:ring-4 focus:ring-ring/15"
-              />
-            </label>
+          <form className="auth-form" onSubmit={handleSubmit} noValidate>
+            <div className="auth-field">
+              <label className="auth-field__label" htmlFor="login-email">
+                E-mail
+              </label>
+              <div
+                className="auth-input-frame"
+                data-filled={email.trim().length > 0}
+                data-invalid={emailInvalid}
+                data-disabled={isBusy}
+              >
+                <span className="auth-input-frame__icon" aria-hidden="true">
+                  <Mail />
+                </span>
+                <Input
+                  ref={emailInputRef}
+                  id="login-email"
+                  className="auth-input-control"
+                  type="email"
+                  placeholder="seu.email@fenasoja.com.br"
+                  value={email}
+                  onChange={(event) => updateEmail(event.target.value)}
+                  onBlur={() => {
+                    setTouched((current) => ({ ...current, email: true }));
+                    setFieldErrors((current) => ({ ...current, email: validateEmail(email) }));
+                  }}
+                  required
+                  disabled={isBusy}
+                  autoComplete="email"
+                  autoCapitalize="none"
+                  enterKeyHint="next"
+                  inputMode="email"
+                  spellCheck={false}
+                  aria-invalid={emailInvalid}
+                  aria-describedby={emailDescribedBy}
+                />
+              </div>
+              {fieldErrors.email && (
+                <p
+                  className="auth-field__error"
+                  id="login-email-error"
+                  role="alert"
+                  aria-live="assertive"
+                >
+                  <AlertCircle aria-hidden="true" />
+                  {fieldErrors.email}
+                </p>
+              )}
+            </div>
 
-            {error && (
-              <div className="rounded-lg border border-destructive/25 bg-destructive/[0.08] px-3 py-2.5 text-sm font-semibold text-destructive" role="alert">
-                {error}
+            <div className="auth-field">
+              <label className="auth-field__label" htmlFor="login-password">
+                Senha
+              </label>
+              <div
+                className="auth-input-frame"
+                data-filled={password.length > 0}
+                data-invalid={passwordInvalid}
+                data-disabled={isBusy}
+                data-has-action="true"
+              >
+                <span className="auth-input-frame__icon" aria-hidden="true">
+                  <KeyRound />
+                </span>
+                <Input
+                  ref={passwordInputRef}
+                  id="login-password"
+                  className="auth-input-control"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="Digite sua senha"
+                  value={password}
+                  onChange={(event) => updatePassword(event.target.value)}
+                  onBlur={() => {
+                    setTouched((current) => ({ ...current, password: true }));
+                    setFieldErrors((current) => ({ ...current, password: validatePassword(password) }));
+                  }}
+                  required
+                  disabled={isBusy}
+                  autoComplete="current-password"
+                  enterKeyHint="go"
+                  aria-invalid={passwordInvalid}
+                  aria-describedby={passwordDescribedBy}
+                />
+                <button
+                  type="button"
+                  className="auth-password-toggle"
+                  onClick={() => setShowPassword((visible) => !visible)}
+                  disabled={isBusy}
+                  aria-label={showPassword ? 'Ocultar senha' : 'Mostrar senha'}
+                  aria-pressed={showPassword}
+                >
+                  {showPassword
+                    ? <EyeOff aria-hidden="true" />
+                    : <Eye aria-hidden="true" />}
+                </button>
+              </div>
+              {fieldErrors.password && (
+                <p
+                  className="auth-field__error"
+                  id="login-password-error"
+                  role="alert"
+                  aria-live="assertive"
+                >
+                  <AlertCircle aria-hidden="true" />
+                  {fieldErrors.password}
+                </p>
+              )}
+            </div>
+
+            {authError && (
+              <div
+                className="auth-form__alert"
+                id="login-auth-error"
+                role="alert"
+                aria-live="assertive"
+              >
+                <span className="auth-form__alert-icon" aria-hidden="true">
+                  <AlertCircle />
+                </span>
+                <span>{authError}</span>
               </div>
             )}
 
-            <Button type="submit" className="auth-primary-action h-11 w-full" disabled={loading}>
-              {loading
-                ? <Loader2 className="mr-2 h-4 w-4 animate-spin" aria-hidden="true" />
-                : <LogIn className="mr-2 h-4 w-4" aria-hidden="true" />}
-              {loading ? 'Entrando...' : 'Entrar no sistema'}
+            <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+              {phase === 'submitting' && 'Validando suas credenciais.'}
+              {phase === 'success' && 'Acesso confirmado. Redirecionando para o ambiente selecionado.'}
+            </p>
+
+            <Button
+              type="submit"
+              className="auth-submit w-full"
+              disabled={isBusy}
+              data-phase={phase}
+            >
+              <span className="auth-submit__leading" aria-hidden="true">
+                {phase === 'submitting'
+                  ? <Loader2 className="animate-spin" />
+                  : phase === 'success'
+                    ? <Check />
+                    : <LockKeyhole />}
+              </span>
+              <span>
+                {phase === 'submitting'
+                  ? 'Validando acesso…'
+                  : phase === 'success'
+                    ? 'Acesso confirmado'
+                    : 'Entrar no sistema'}
+              </span>
+              {phase === 'idle' && <ArrowRight className="auth-submit__arrow" aria-hidden="true" />}
             </Button>
           </form>
 
-          <div className="mt-6 border-t border-border pt-4 text-center">
-            <p className="text-xs leading-5 text-muted-foreground">Acesso restrito. Solicite suas credenciais ao administrador.</p>
-            <Link
-              to="/portal"
-              className="mt-2 inline-flex min-h-11 items-center rounded-lg px-3 py-2 text-xs font-bold text-primary transition-colors duration-150 hover:bg-accent focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            >
-              <ArrowLeft className="mr-2 h-3.5 w-3.5" aria-hidden="true" />
+          <div className="auth-panel__footer">
+            <div className="auth-restricted-note">
+              <span className="auth-restricted-note__icon" aria-hidden="true">
+                <ShieldCheck />
+              </span>
+              <span>
+                <strong>Acesso restrito</strong>
+                Solicite suas credenciais ao administrador.
+              </span>
+            </div>
+            <Link to="/portal" className="auth-back-link">
+              <ArrowLeft aria-hidden="true" />
               Voltar ao portal
             </Link>
           </div>
