@@ -1,5 +1,5 @@
 import { useEffect, useId, useMemo, useRef, useState, type FormEvent } from 'react';
-import { CalendarClock, Layers3, Plus, Save, Trash2, X } from 'lucide-react';
+import { CalendarClock, Layers3, Save, UserRound, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,13 +11,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useOrgCommissions } from '@/hooks/useOrgCommissions';
 import { categoryLabels, priorityLabels, statusLabels } from './cronogramaData';
+import { CronogramaSubeventForm } from './CronogramaSubeventForm';
+import { RelationalMultiSelect, type RelationalSelection } from './RelationalMultiSelect';
 import type {
   CronogramaCategory,
   CronogramaEvent,
+  CronogramaEventCommissionLink,
+  CronogramaEventResponsibleLink,
   CronogramaKind,
   CronogramaPriority,
   CronogramaStatus,
+  CronogramaSubevent,
 } from './types';
 
 const kindLabels: Record<CronogramaKind, string> = {
@@ -27,6 +33,7 @@ const kindLabels: Record<CronogramaKind, string> = {
   deadline: 'Prazo',
   decision: 'Decisão',
 };
+
 
 const editableStatusLabels: Partial<Record<CronogramaStatus, string>> = {
   planned: statusLabels.planned,
