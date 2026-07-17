@@ -334,7 +334,7 @@ export function useTimelineCycleNavigation(options: TimelineNavigationOptions) {
     const requestedMonthYear = yearFromMonth(options.requestedMonth);
     const requestedYear = options.requestedYear ?? requestedMonthYear;
     if (!requestedYear) return;
-    const year = resolveAvailableYear(requestedYear, options.availableYears);
+    const year = resolveFocusYear(requestedYear, options.availableYears);
     const month = requestedMonthYear === year
       ? options.requestedMonth
       : options.firstMonthByYear[year];
