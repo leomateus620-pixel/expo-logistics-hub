@@ -42,7 +42,9 @@ export interface CronogramaSubeventSeed {
   commissionName?: string | null;
   responsibleName?: string | null;
   sortOrder?: number;
-  storage?: 'embedded' | 'relational';
+  storage?: 'embedded' | 'relational' | 'queued';
+  syncState?: 'pending' | 'failed';
+  syncError?: string | null;
   createdAt?: string | null;
   updatedAt?: string | null;
 }

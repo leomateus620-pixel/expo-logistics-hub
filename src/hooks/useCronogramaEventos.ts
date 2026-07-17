@@ -1,7 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
+import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import {
   fenasoja2028CronogramaSeed,
   type CronogramaCommissionLink,
@@ -16,6 +17,16 @@ import {
   type CronogramaEvent,
 } from '@/lib/cronograma-eventos';
 import type { CronogramaHistoryEntry } from '@/components/cronograma-eventos/types';
+import {
+  attachQueuedCronogramaRelationships,
+  enqueueCronogramaRelationship,
+  isQueueableCronogramaRelationshipError,
+  readCronogramaRelationshipQueue,
+  recordQueuedCronogramaAttempt,
+  removeQueuedCronogramaRelationship,
+  updateQueuedCronogramaRelationship,
+  type QueuedCronogramaRelationship,
+} from '@/lib/cronograma-relationship-queue';
 
 export type CronogramaEventDraft = Partial<CronogramaEventSeed> & {
   title: string;
@@ -210,7 +221,9 @@ function mergeRelationalSubevents(
   event: CronogramaEvent,
   relational: CronogramaSubeventSeed[],
 ): CronogramaEvent {
-  const embedded = (event.subevents ?? []).filter((subevent) => subevent.storage !== 'relational');
+  const embedded = (event.subevents ?? []).filter((subevent) => (
+    !subevent.storage || subevent.storage === 'embedded'
+  ));
   return {
     ...event,
     subevents: [...embedded, ...relational].sort(
@@ -221,7 +234,7 @@ function mergeRelationalSubevents(
 
 function toDbPayload(event: CronogramaEventSeed | CronogramaEvent, orgId: string, createdByUserId?: string | null) {
   const embeddedSubevents = (event.subevents ?? [])
-    .filter((subevent) => subevent.storage !== 'relational')
+    .filter((subevent) => !subevent.storage || subevent.storage === 'embedded')
     .map((subevent) => ({
       id: subevent.id,
       title: subevent.title,
@@ -322,13 +335,79 @@ function isWritableRole(role: string | null) {
   return role === 'admin' || role === 'gestor' || role === 'operador';
 }
 
+function errorMessage(error: unknown, fallback: string) {
+  if (error instanceof Error && error.message) return error.message;
+  if (error && typeof error === 'object' && 'message' in error && typeof error.message === 'string') {
+    return error.message;
+  }
+  return fallback;
+}
+
+function nextSubeventSortOrder(event: CronogramaEvent) {
+  return Math.max(-1, ...(event.subevents ?? []).map((subevent) => subevent.sortOrder ?? -1)) + 1;
+}
+
+function replaceEventInList(events: CronogramaEvent[], event: CronogramaEvent) {
+  const existingIndex = events.findIndex((item) => (
+    item.id === event.id || item.sourceKey === event.sourceKey
+  ));
+  if (existingIndex === -1) return sortCronogramaEvents([...events, event]);
+  return sortCronogramaEvents(events.map((item, index) => (index === existingIndex ? event : item)));
+}
+
+async function insertRelationalSubevent(
+  parentEventId: string,
+  draft: CronogramaSubeventDraft,
+  requestId: string,
+) {
+  const result = await cronogramaDb
+    .from('cronograma_subeventos')
+    .insert({ id: requestId, ...toDbSubeventPayload(parentEventId, draft) })
+    .select('*')
+    .single();
+
+  if (!result.error) return fromDbSubeventRow(result.data);
+  if (result.error.code !== '23505') throw result.error;
+
+  const existing = await cronogramaDb
+    .from('cronograma_subeventos')
+    .select('*')
+    .eq('id', requestId)
+    .eq('parent_event_id', parentEventId)
+    .limit(1);
+  if (existing.error) throw existing.error;
+  if (!existing.data?.[0]) throw result.error;
+  return fromDbSubeventRow(existing.data[0]);
+}
+
 export function useCronogramaEventos() {
   const { orgId, myRole } = useCurrentOrg();
   const queryClient = useQueryClient();
+  const isOnline = useOnlineStatus();
   const [sessionEvents, setSessionEvents] = useState<CronogramaEvent[]>(officialSeedEvents);
   const [dbUnavailable, setDbUnavailable] = useState(false);
   const [relationshipsUnavailable, setRelationshipsUnavailable] = useState(false);
+  const [queuedRelationships, setQueuedRelationships] = useState<QueuedCronogramaRelationship[]>(
+    () => readCronogramaRelationshipQueue(),
+  );
   const seedAttemptedForOrg = useRef(new Set<string>());
+  const lastAutoSyncSignature = useRef('');
+
+  const refreshQueuedRelationships = useCallback(() => {
+    setQueuedRelationships(readCronogramaRelationshipQueue());
+  }, []);
+
+  const queuedRelationshipsForOrg = useMemo(
+    () => queuedRelationships.filter((item) => item.orgId === orgId),
+    [orgId, queuedRelationships],
+  );
+
+  useEffect(() => {
+    refreshQueuedRelationships();
+    const handleStorage = () => refreshQueuedRelationships();
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
+  }, [orgId, refreshQueuedRelationships]);
 
   const query = useQuery({
     queryKey: ['cronograma-eventos', orgId],
@@ -453,16 +532,13 @@ export function useCronogramaEventos() {
   });
 
   const replaceSessionEvent = (event: CronogramaEvent) => {
-    setSessionEvents((current) => {
-      const existingIndex = current.findIndex((item) => item.id === event.id || item.sourceKey === event.sourceKey);
-      if (existingIndex === -1) return sortCronogramaEvents([...current, event]);
-      return sortCronogramaEvents(current.map((item, index) => (index === existingIndex ? event : item)));
-    });
+    setSessionEvents((current) => replaceEventInList(current, event));
   };
 
-  const findSessionEvent = (identity: string) => sessionEvents.find(
-    (event) => event.id === identity || event.sourceKey === identity,
-  );
+  const findSessionEvent = (identity: string) => attachQueuedCronogramaRelationships(
+    sessionEvents,
+    queuedRelationshipsForOrg,
+  ).find((event) => event.id === identity || event.sourceKey === identity);
 
   const writeEventLog = async ({
     eventId,
@@ -490,9 +566,10 @@ export function useCronogramaEventos() {
     current: CronogramaEvent,
     next: CronogramaEvent,
     action = 'updated',
+    allowUnavailable = false,
   ) => {
     if (!orgId || !next.sourceKey) throw new Error('O evento não possui vínculo persistente com a organização atual.');
-    if (dbUnavailable) {
+    if (dbUnavailable && !allowUnavailable) {
       throw new Error('A sincronização está indisponível. As alterações não foram salvas para evitar perda de dados. Tente novamente mais tarde.');
     }
 
@@ -537,7 +614,7 @@ export function useCronogramaEventos() {
     return saved;
   };
 
-  const ensurePersistedParent = async (current: CronogramaEvent) => {
+  const ensurePersistedParent = async (current: CronogramaEvent, allowUnavailable = false) => {
     if (isUuid(current.id)) return current;
     if (!orgId || !current.sourceKey) throw new Error('O evento principal não possui vínculo persistente.');
 
@@ -547,14 +624,14 @@ export function useCronogramaEventos() {
       .eq('org_id', orgId)
       .eq('source_key', current.sourceKey)
       .limit(1);
-    if (existing.error) throw new Error(existing.error.message || 'Não foi possível localizar o evento principal.');
+    if (existing.error) throw existing.error;
     if (existing.data?.[0]) {
       const persisted = fromDbRow(existing.data[0]);
       const relational = (current.subevents ?? []).filter((subevent) => subevent.storage === 'relational');
       return mergeRelationalSubevents(persisted, relational);
     }
 
-    return saveEventRecord(current, current, 'relationship_parent_created');
+    return saveEventRecord(current, current, 'relationship_parent_created', allowUnavailable);
   };
 
   const update = useMutation({
@@ -571,6 +648,34 @@ export function useCronogramaEventos() {
     },
   });
 
+  const queueSubevent = (
+    current: CronogramaEvent,
+    draft: CronogramaSubeventDraft,
+    requestId: string,
+    attemptError?: unknown,
+  ) => {
+    if (!orgId) throw new Error('Não foi possível identificar a organização atual. Entre novamente e tente salvar.');
+    enqueueCronogramaRelationship({
+      requestId,
+      orgId,
+      parentEventId: current.id,
+      parentSourceKey: current.sourceKey || current.id,
+      parentTitle: current.title,
+      draft,
+    });
+    if (attemptError) recordQueuedCronogramaAttempt(orgId, requestId, attemptError);
+    refreshQueuedRelationships();
+  };
+
+  const markRelationshipBackendUnavailable = (error: unknown) => {
+    const message = errorMessage(error, '').toLocaleLowerCase('pt-BR');
+    if (message.includes('cronograma_eventos') && !message.includes('cronograma_subeventos')) {
+      setDbUnavailable(true);
+      return;
+    }
+    setRelationshipsUnavailable(true);
+  };
+
   const createSubevent = useMutation({
     mutationFn: async ({
       eventId,
@@ -582,33 +687,140 @@ export function useCronogramaEventos() {
       requestId?: string;
     }) => {
       if (!isWritableRole(myRole)) throw new Error('Seu perfil possui acesso somente para consulta.');
-      if (dbUnavailable || relationshipsUnavailable) {
-        throw new Error('Os relacionamentos online estão indisponíveis. O subevento não foi criado para evitar uma associação incompleta.');
-      }
       const current = findSessionEvent(eventId);
       if (!current) throw new Error('Evento principal não encontrado. Atualize a página e tente novamente.');
-      const parent = await ensurePersistedParent(current);
-      const relational = (parent.subevents ?? []).filter((subevent) => subevent.storage === 'relational');
-      const normalizedDraft = { ...draft, sortOrder: draft.sortOrder ?? relational.length };
       const id = requestId
         ?? (typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : undefined);
       if (!id) throw new Error('Não foi possível gerar uma identidade segura para o subevento. Tente novamente.');
-      const { data, error } = await cronogramaDb
-        .from('cronograma_subeventos')
-        .insert({ id, ...toDbSubeventPayload(parent.id, normalizedDraft) })
-        .select('*')
-        .single();
-      if (error) throw new Error(error.message || 'Não foi possível criar o subevento.');
+      const normalizedDraft = {
+        ...draft,
+        sortOrder: draft.sortOrder ?? nextSubeventSortOrder(current),
+      };
 
-      const created = fromDbSubeventRow(data);
-      return mergeRelationalSubevents(parent, [...relational, created]);
+      if (!isOnline || dbUnavailable || relationshipsUnavailable) {
+        queueSubevent(current, normalizedDraft, id);
+        return { mode: 'queued' as const, event: null };
+      }
+
+      try {
+        const parent = await ensurePersistedParent(current);
+        const relational = (parent.subevents ?? []).filter((subevent) => subevent.storage === 'relational');
+        const created = await insertRelationalSubevent(parent.id, normalizedDraft, id);
+        removeQueuedCronogramaRelationship(orgId!, id);
+        refreshQueuedRelationships();
+        return {
+          mode: 'synced' as const,
+          event: mergeRelationalSubevents(parent, [...relational, created]),
+        };
+      } catch (error) {
+        if (!isQueueableCronogramaRelationshipError(error, isOnline)) {
+          throw new Error(errorMessage(error, 'Não foi possível criar o subevento.'));
+        }
+        markRelationshipBackendUnavailable(error);
+        queueSubevent(current, normalizedDraft, id, error);
+        return { mode: 'queued' as const, event: null };
+      }
     },
-    onSuccess: (event) => {
-      replaceSessionEvent(event);
+    onSuccess: (result) => {
+      if (!result.event) return;
+      replaceSessionEvent(result.event);
       queryClient.invalidateQueries({ queryKey: ['cronograma-eventos'] });
-      queryClient.invalidateQueries({ queryKey: ['cronograma-event-history', event.id] });
+      queryClient.invalidateQueries({ queryKey: ['cronograma-event-history', result.event.id] });
     },
   });
+
+  const syncQueuedRelationships = useMutation({
+    mutationFn: async () => {
+      if (!orgId || !isWritableRole(myRole)) return { synced: 0, failed: 0 };
+      const queued = readCronogramaRelationshipQueue(orgId);
+      let remaining = [...queued];
+      let workingEvents = sessionEvents;
+      const persistedEvents: CronogramaEvent[] = [];
+      let synced = 0;
+      let failed = 0;
+
+      for (const item of queued) {
+        const visibleEvents = attachQueuedCronogramaRelationships(workingEvents, remaining);
+        const current = visibleEvents.find((event) => (
+          event.id === item.parentEventId || event.sourceKey === item.parentSourceKey
+        ));
+        if (!current) {
+          recordQueuedCronogramaAttempt(
+            orgId,
+            item.requestId,
+            new Error('O evento principal desta conexão não está disponível no recorte atual.'),
+          );
+          failed += 1;
+          continue;
+        }
+
+        const alreadyPersisted = (current.subevents ?? []).find((subevent) => (
+          subevent.id === item.requestId && subevent.storage === 'relational'
+        ));
+        if (alreadyPersisted) {
+          removeQueuedCronogramaRelationship(orgId, item.requestId);
+          remaining = remaining.filter((queuedItem) => queuedItem.requestId !== item.requestId);
+          synced += 1;
+          continue;
+        }
+
+        try {
+          const parent = await ensurePersistedParent(current, true);
+          const relational = (parent.subevents ?? []).filter((subevent) => subevent.storage === 'relational');
+          const created = await insertRelationalSubevent(parent.id, item.draft, item.requestId);
+          const persistedEvent = mergeRelationalSubevents(parent, [...relational, created]);
+          workingEvents = replaceEventInList(workingEvents, persistedEvent);
+          persistedEvents.push(persistedEvent);
+          removeQueuedCronogramaRelationship(orgId, item.requestId);
+          remaining = remaining.filter((queuedItem) => queuedItem.requestId !== item.requestId);
+          synced += 1;
+        } catch (error) {
+          recordQueuedCronogramaAttempt(orgId, item.requestId, error);
+          if (isQueueableCronogramaRelationshipError(error, isOnline)) {
+            markRelationshipBackendUnavailable(error);
+          }
+          failed += 1;
+        }
+      }
+
+      if (synced > 0) {
+        setSessionEvents((current) => persistedEvents.reduce(
+          (events, event) => replaceEventInList(events, event),
+          current,
+        ));
+        setDbUnavailable(false);
+        setRelationshipsUnavailable(false);
+      }
+      refreshQueuedRelationships();
+      return { synced, failed };
+    },
+    onSuccess: ({ synced }) => {
+      if (synced === 0) return;
+      queryClient.invalidateQueries({ queryKey: ['cronograma-eventos'] });
+    },
+  });
+
+  const queuedRelationshipSignature = useMemo(
+    () => queuedRelationshipsForOrg.map((item) => item.requestId).sort().join(','),
+    [queuedRelationshipsForOrg],
+  );
+  const canAutoSyncRelationships = Boolean(isOnline && orgId && query.data);
+  const syncQueuedRelationshipsNow = syncQueuedRelationships.mutate;
+
+  useEffect(() => {
+    if (!canAutoSyncRelationships || !queuedRelationshipSignature || syncQueuedRelationships.isPending) return;
+    const signature = `${orgId}:${query.dataUpdatedAt}:${queuedRelationshipSignature}`;
+    if (lastAutoSyncSignature.current === signature) return;
+    lastAutoSyncSignature.current = signature;
+    syncQueuedRelationshipsNow();
+  }, [
+    canAutoSyncRelationships,
+    orgId,
+    query.dataUpdatedAt,
+    queuedRelationshipSignature,
+    syncQueuedRelationships.isPending,
+    syncQueuedRelationshipsNow,
+  ]);
 
   const updateSubevent = useMutation({
     mutationFn: async ({
@@ -625,6 +837,16 @@ export function useCronogramaEventos() {
       if (!current) throw new Error('Evento principal não encontrado. Atualize a página e tente novamente.');
       const existingSubevent = (current.subevents ?? []).find((subevent) => subevent.id === subeventId);
       if (!existingSubevent) throw new Error('Subevento não encontrado. Atualize a página e tente novamente.');
+
+      if (existingSubevent.storage === 'queued') {
+        if (!orgId) throw new Error('Não foi possível identificar a organização atual.');
+        updateQueuedCronogramaRelationship(orgId, subeventId, {
+          ...draft,
+          sortOrder: draft.sortOrder ?? existingSubevent.sortOrder,
+        });
+        refreshQueuedRelationships();
+        return null;
+      }
 
       if (existingSubevent.storage !== 'relational' || !isUuid(subeventId)) {
         const next = {
@@ -663,6 +885,7 @@ export function useCronogramaEventos() {
       return next;
     },
     onSuccess: (event) => {
+      if (!event) return;
       replaceSessionEvent(event);
       queryClient.invalidateQueries({ queryKey: ['cronograma-eventos'] });
       queryClient.invalidateQueries({ queryKey: ['cronograma-event-history', event.id] });
@@ -671,13 +894,22 @@ export function useCronogramaEventos() {
 
   const deleteSubevent = useMutation({
     mutationFn: async ({ eventId, subeventId }: { eventId: string; subeventId: string }) => {
-      if (myRole !== 'admin' && myRole !== 'gestor') {
-        throw new Error('Somente administradores e gestores podem remover subeventos.');
-      }
       const current = findSessionEvent(eventId);
       if (!current) throw new Error('Evento principal não encontrado. Atualize a página e tente novamente.');
       const existingSubevent = (current.subevents ?? []).find((subevent) => subevent.id === subeventId);
       if (!existingSubevent) throw new Error('Subevento não encontrado. Atualize a página e tente novamente.');
+
+      if (existingSubevent.storage === 'queued') {
+        if (!isWritableRole(myRole)) throw new Error('Seu perfil possui acesso somente para consulta.');
+        if (!orgId) throw new Error('Não foi possível identificar a organização atual.');
+        removeQueuedCronogramaRelationship(orgId, subeventId);
+        refreshQueuedRelationships();
+        return null;
+      }
+
+      if (myRole !== 'admin' && myRole !== 'gestor') {
+        throw new Error('Somente administradores e gestores podem remover subeventos persistidos.');
+      }
 
       if (existingSubevent.storage !== 'relational' || !isUuid(subeventId)) {
         const next = {
@@ -711,14 +943,39 @@ export function useCronogramaEventos() {
       return next;
     },
     onSuccess: (event) => {
+      if (!event) return;
       replaceSessionEvent(event);
       queryClient.invalidateQueries({ queryKey: ['cronograma-eventos'] });
       queryClient.invalidateQueries({ queryKey: ['cronograma-event-history', event.id] });
     },
   });
 
-  const events = useMemo(() => sortCronogramaEvents(sessionEvents), [sessionEvents]);
+  const retryRelationships = async () => {
+    if (!isOnline) {
+      throw new Error('Este dispositivo está offline. Os rascunhos permanecem preservados e serão enviados quando a conexão voltar.');
+    }
+    const refreshed = await query.refetch();
+    if (refreshed.error) {
+      throw new Error('O serviço do cronograma ainda não está disponível. Nenhum rascunho foi perdido; tente novamente mais tarde.');
+    }
+    lastAutoSyncSignature.current = '';
+    const result = await syncQueuedRelationships.mutateAsync();
+    if (result.failed > 0) {
+      throw new Error(
+        result.synced > 0
+          ? `${result.synced} conexões foram sincronizadas, mas ${result.failed} ainda precisam de revisão.`
+          : 'As conexões continuam preservadas localmente, mas o serviço ainda não aceitou a sincronização.',
+      );
+    }
+    return result;
+  };
+
+  const events = useMemo(
+    () => sortCronogramaEvents(attachQueuedCronogramaRelationships(sessionEvents, queuedRelationshipsForOrg)),
+    [queuedRelationshipsForOrg, sessionEvents],
+  );
   const isSeedFallback = dbUnavailable || !orgId || !query.data;
+  const relationshipSyncUnavailable = dbUnavailable || relationshipsUnavailable || !isOnline || !query.data;
 
   return {
     events,
@@ -730,6 +987,11 @@ export function useCronogramaEventos() {
     canManage: isWritableRole(myRole),
     canDeleteSubevents: myRole === 'admin' || myRole === 'gestor',
     relationshipsUnavailable,
+    relationshipSyncUnavailable,
+    pendingRelationshipCount: queuedRelationshipsForOrg.length,
+    failedRelationshipCount: queuedRelationshipsForOrg.filter((item) => item.lastError).length,
+    isSyncingRelationships: syncQueuedRelationships.isPending,
+    retryRelationships,
     create,
     update,
     createSubevent,

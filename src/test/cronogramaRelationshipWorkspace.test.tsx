@@ -181,24 +181,46 @@ describe('EventRelationshipWorkspace', () => {
     expect(addBubble).toHaveFocus();
   });
 
-  it('protege mutações quando a sincronização relacional está indisponível', () => {
+  it('preserva novas conexões na fila quando a sincronização relacional está indisponível', async () => {
+    const onRetry = vi.fn();
     render(
       <EventRelationshipWorkspace
-        event={baseEvent}
+        event={{
+          ...baseEvent,
+          subevents: [
+            ...(baseEvent.subevents ?? []),
+            {
+              id: '33333333-3333-4333-8333-333333333333',
+              title: 'Validar acesso de montagem',
+              status: 'planned',
+              storage: 'queued',
+              syncState: 'pending',
+              sortOrder: 2,
+            },
+          ],
+        }}
         onBack={vi.fn()}
         onSaveEvent={vi.fn()}
-        onCreateSubevent={vi.fn()}
+        onCreateSubevent={vi.fn().mockResolvedValue('queued')}
         onUpdateSubevent={vi.fn()}
         onRemoveSubevent={vi.fn()}
         canManage
         canDeleteSubevents={false}
         relationshipsUnavailable
+        pendingRelationshipCount={1}
+        onRetryRelationships={onRetry}
       />,
     );
 
-    expect(screen.getByRole('alert')).toHaveTextContent('Relacionamentos em modo protegido');
-    expect(screen.getByRole('button', { name: 'Adicionar subevento' })).toBeDisabled();
-    expect(screen.queryByRole('button', { name: /Remover subevento/ })).not.toBeInTheDocument();
+    expect(screen.getByRole('status')).toHaveTextContent('1 conexão aguarda sincronização');
+    expect(screen.getByRole('button', { name: 'Adicionar subevento' })).toBeEnabled();
+    expect(screen.getByRole('button', { name: 'Remover subevento Validar acesso de montagem' })).toBeVisible();
+    expect(screen.queryByRole('button', { name: 'Remover subevento Publicar pauta final' })).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Adicionar subevento' }));
+    expect(screen.getByTestId('subevent-composer')).toBeVisible();
+    fireEvent.click(screen.getByRole('button', { name: 'Tentar agora' }));
+    await waitFor(() => expect(onRetry).toHaveBeenCalledTimes(1));
   });
 });
 
@@ -229,8 +251,20 @@ describe('compatibilidade do modelo de relacionamentos', () => {
   };
 
   it('preserva o legado incorporado e nunca serializa relações da tabela filha no JSON do evento', () => {
-    const updates = visualEventToSourceUpdates(baseEvent, sourceEvent);
-    const draft = visualEventToDraft(baseEvent);
+    const eventWithPendingQueue: CronogramaEvent = {
+      ...baseEvent,
+      subevents: [
+        ...(baseEvent.subevents ?? []),
+        {
+          id: '33333333-3333-4333-8333-333333333333',
+          title: 'Rascunho pendente',
+          storage: 'queued',
+          syncState: 'pending',
+        },
+      ],
+    };
+    const updates = visualEventToSourceUpdates(eventWithPendingQueue, sourceEvent);
+    const draft = visualEventToDraft(eventWithPendingQueue);
 
     expect(updates.subevents).toEqual([
       expect.objectContaining({
@@ -244,6 +278,9 @@ describe('compatibilidade do modelo de relacionamentos', () => {
     ]);
     expect(updates.subevents).not.toEqual(expect.arrayContaining([
       expect.objectContaining({ id: '11111111-1111-4111-8111-111111111111' }),
+    ]));
+    expect(updates.subevents).not.toEqual(expect.arrayContaining([
+      expect.objectContaining({ id: '33333333-3333-4333-8333-333333333333' }),
     ]));
     expect(draft.subevents).toHaveLength(1);
     expect(draft.subevents?.[0].id).toBe('embedded:main-event:0');

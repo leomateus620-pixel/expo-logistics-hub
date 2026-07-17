@@ -63,6 +63,7 @@ function monthLabel(monthKey: string) {
 export function CronogramaTimelineBoard({
   events,
   allEvents,
+  selectedEventId = null,
   onOpen,
   onClearFilters,
   onReturnToFullCycle,
@@ -76,6 +77,7 @@ export function CronogramaTimelineBoard({
 }: {
   events: CronogramaEvent[];
   allEvents?: CronogramaEvent[];
+  selectedEventId?: string | null;
   onOpen: (event: CronogramaEvent) => void;
   onClearFilters: () => void;
   onReturnToFullCycle?: () => void;
@@ -244,8 +246,9 @@ export function CronogramaTimelineBoard({
                       ref={(node) => navigation.registerFocusNode(`month:${key}`, node)}
                       data-focus-key={`month:${key}`}
                       data-month={key}
-                      data-current={isCurrent || undefined}
-                      data-active={navigation.focusedMonth === key || undefined}
+                       data-current={isCurrent || undefined}
+                       data-active={navigation.focusedMonth === key || undefined}
+                       data-open={open || undefined}
                       className="cronograma-month-section"
                       aria-labelledby={`cronograma-month-${key}`}
                     >
@@ -284,6 +287,7 @@ export function CronogramaTimelineBoard({
                             <TimelineEventRow
                               key={event.id}
                               event={event}
+                              selected={selectedEventId === event.id}
                               todayKey={todayKey}
                               isNextOfficial={snapshot.nextOfficialAction?.id === event.id}
                               onOpen={openTimelineEvent}
@@ -392,11 +396,13 @@ function TimelineYearEmptyState({
 
 function TimelineEventRow({
   event,
+  selected,
   todayKey,
   isNextOfficial,
   onOpen,
 }: {
   event: CronogramaEvent;
+  selected: boolean;
   todayKey: string;
   isNextOfficial: boolean;
   onOpen: (event: CronogramaEvent) => void;
@@ -414,7 +420,9 @@ function TimelineEventRow({
       data-status={event.status}
       data-today={isToday || undefined}
       data-next={isNextOfficial || undefined}
+      data-selected={selected || undefined}
       data-event-id={event.id}
+      aria-pressed={selected}
       aria-label={`${event.title}. ${formatLongDate(event.date)}. Status ${statusLabels[event.status]}.`}
     >
       <span className="cronograma-event-date-block">

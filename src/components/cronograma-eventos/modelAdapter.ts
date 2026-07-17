@@ -180,6 +180,8 @@ export function adaptCronogramaSubevent(subevent: CronogramaSubeventSeed): Crono
       ?? (subevent.commissionSlug ? commissionBySlug.get(subevent.commissionSlug) : undefined),
     sortOrder: subevent.sortOrder,
     storage: subevent.storage,
+    syncState: subevent.syncState,
+    syncError: subevent.syncError,
     createdAt: subevent.createdAt,
     updatedAt: subevent.updatedAt,
   };
@@ -203,7 +205,7 @@ export function visualSubeventToSourceDraft(
 }
 
 function embeddedSubevents(event: CronogramaEvent, current: SourceCronogramaEvent) {
-  const embedded = event.subevents?.filter((subevent) => subevent.storage !== 'relational');
+  const embedded = event.subevents?.filter((subevent) => !subevent.storage || subevent.storage === 'embedded');
   if (!embedded) return current.subevents;
   return embedded.map((subevent, index) => ({
     id: subevent.id,
@@ -273,7 +275,7 @@ export function visualEventToDraft(event: CronogramaEvent): CronogramaEventDraft
     hasExactDate,
     linkedCommissions: [],
     subevents: (event.subevents ?? [])
-      .filter((subevent) => subevent.storage !== 'relational')
+      .filter((subevent) => !subevent.storage || subevent.storage === 'embedded')
       .map((subevent, index) => ({
         id: subevent.id,
         title: subevent.title,
