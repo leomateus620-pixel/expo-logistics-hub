@@ -96,6 +96,20 @@ function resolveAvailableYear(
     .sort((a, b) => Math.abs(a - preferred) - Math.abs(b - preferred))[0];
 }
 
+/**
+ * Foco temporal: qualquer ano do ciclo (2026/2027/2028) é válido para foco,
+ * mesmo sem eventos — o stream renderiza um placeholder próprio para anos vazios.
+ * Só cai no vizinho mais próximo se o ano pedido sair da janela do ciclo
+ * (proteção contra URL corrompida).
+ */
+function resolveFocusYear(
+  preferred: CronogramaCycleYear,
+  availableYears: CronogramaCycleYear[],
+) {
+  if (isCronogramaCycleYear(preferred)) return preferred;
+  return resolveAvailableYear(preferred, availableYears);
+}
+
 function resolveInitialState(options: TimelineNavigationOptions): TimelineNavigationState {
   const requestedMonthYear = yearFromMonth(options.requestedMonth);
   let selectedYear = options.requestedYear
@@ -103,7 +117,8 @@ function resolveInitialState(options: TimelineNavigationOptions): TimelineNaviga
     ?? yearFromMonth(options.initialMonth)
     ?? getClosestCycleYear(options.todayKey);
 
-  selectedYear = resolveAvailableYear(selectedYear, options.availableYears);
+  selectedYear = resolveFocusYear(selectedYear, options.availableYears);
+
 
   const requestedMonth = requestedMonthYear === selectedYear ? options.requestedMonth : null;
   const initialMonth = yearFromMonth(options.initialMonth) === selectedYear ? options.initialMonth : null;
