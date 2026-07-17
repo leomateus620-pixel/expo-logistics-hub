@@ -1,37 +1,43 @@
-## Bug identificado — Linha do tempo trava em dez/2026 e "salta" para jun/2026
+## Objetivo
+Persistir os 8 compromissos institucionais listados na mensagem no módulo Cronograma e Eventos, categorizados como **"Representações"**, ano de ciclo **2026**, visíveis na Linha do Tempo e demais visões (Calendário, Categoria, etc.).
 
-### Causa raiz (verificada nos arquivos)
-- `src/lib/cronograma-cycle.ts` calcula `availableYears` a partir de `summary.available = total.total > 0`. Como só há eventos cadastrados em 2026, `availableYears = [2026]`.
-- `src/hooks/useTimelineCycleNavigation.ts`:
-  - Effect de deep-link (linhas ~314-345): sempre que a URL muda para `timelineYear=2027` (via clique no `TimelineCycleNavigator` ou via `onPositionChange` emitido pelo `IntersectionObserver`), chama `resolveAvailableYear(2027, [2026])` que retorna 2026. Como `2026 !== state.selectedYear (2027)`, dispara `commitFocus(2026, firstMonthByYear[2026], 'reconcile', { immediate: true })` → `scrollIntoView({ behavior: 'auto' })` no mês retornado por `getFirstRelevantMonthForYear` (jun/2026), causando o snap-back instantâneo.
-  - Effect de reconciliação por contexto (linhas ~371-374): tem o mesmo `resolveAvailableYear` como fallback e reforça o snap quando `availableSignature` muda.
-  - `resolveInitialState` (linhas ~99-117): também filtra o estado inicial pelos anos disponíveis, escondendo 2027/2028 mesmo quando explicitamente pedidos na URL.
-- Consequência: rolagem/click para 2027 e 2028 é rejeitada porque o cronograma trata "ano sem eventos" como "ano indisponível para foco", embora o próprio stream (`CronogramaTimelineBoard.tsx`) já renderize um placeholder (`TimelineYearEmptyState`) preparado para anos vazios.
+## Eventos a cadastrar (todos categoria "Representações", 2026)
 
-### Correção proposta (mínima, sem quebrar contratos)
-Manter `availableYears` para o navegador visual (mostrar contagens, ícones de "ano indisponível"), mas **não** usá-lo como filtro para foco. Anos 2026/2027/2028 são todos foco-legítimos porque o stream já lida com vazios via placeholder.
+| # | Data | Horário | Título | Local |
+|---|------|---------|--------|-------|
+| 1 | 20/07/2026 | 09:00 | Reunião com Jacson | Casa Fenasoja |
+| 2 | 20/07/2026 | 14:00 | Reunião com Rodrigo | Casa Fenasoja |
+| 3 | 20/07/2026 | 19:00 | Lançamento do Festival Gastronômico | Auditório do IFFar |
+| 4 | 21/07/2026 | 07:15 | Café do Sindilojas | Botolli |
+| 5 | 24/07/2026 | 08:00–11:00 | Encontro Regional de Inovação e Empreendedorismo | Auditório do Parque |
+| 6 | 24/07/2026 | 12:00 | Almoço 10 anos Eficiência Buffet | Restaurante B. Industrial |
+| 7 | 01/08/2026 | 10:00 | Ato de inauguração da Praça Pedro Carpenedo (obs: programação inicia 08:30) | Praça em frente Centro Cultural |
+| 8 | 12–13/08/2026 | 07:15 (saída) | Eli Summit Ijuí (saída: SEMEAR AGRO HUB, RS 344 Km 39, 1100 — Timbaúva, Santa Rosa) | Ijuí |
 
-Arquivos alterados:
+## Como será feito
 
-1. **`src/hooks/useTimelineCycleNavigation.ts`**
-   - Criar helper local `resolveFocusYear(preferred, availableYears)` que:
-     - Se `preferred` é um `CronogramaCycleYear` válido → retorna `preferred` (independente de estar em `availableYears`).
-     - Só cai no vizinho mais próximo se `preferred` estiver fora de 2026-2028 (proteção contra URL corrompida).
-   - Substituir os três usos de `resolveAvailableYear` por `resolveFocusYear`:
-     - `resolveInitialState` (~linha 106).
-     - Effect de deep-link (~linha 322).
-     - Effect de reconciliação por contexto (~linha 372) — remover totalmente o ramo "reconcile por availableChanged" quando o ano atual continua sendo um cycle year válido (o placeholder cobre o caso).
-   - Manter `resolveAvailableYear` disponível para uso futuro (não remover a função) — apenas parar de aplicá-la na trajetória de foco.
+Uso da ferramenta de inserção do banco (Cloud) gravando diretamente em `public.cronograma_eventos` com os campos exigidos pelo esquema atual:
 
-2. **`src/hooks/useTimelineCycleNavigation.ts` — proteção anti-loop do observer**
-   - No effect do `IntersectionObserver` (~linhas 275-306), evitar redespachar quando o `visible` top é o mesmo do estado atual (comparar `key` contra `focusKey(state.selectedYear, state.focusedMonth)`). Isso reduz emissões redundantes de `onPositionChange('observer')` que hoje refazem toda a cadeia URL → effect 314 → commitFocus a cada frame de rolagem.
+- `org_id` = organização única existente
+- `category = 'Representações'`, `event_type = 'representacao'`
+- `source_year = 2026`, `source_key = 'representacao-<slug>-<data>'` (garante idempotência caso rode 2x)
+- `start_date`, `end_date`, `start_time`, `end_time`, `event_time` (texto amigável)
+- `status = 'planejado'`, `priority = 'media'`, `has_exact_date = true`
+- `is_official_seed = false`, `source_sheet = 'Cadastro manual — Representações'`
+- `title` em MAIÚSCULAS (padrão do projeto), `location`, `description` (com observações — ex.: "Programação inicia 08:30" no item 7 e endereço de saída no item 8)
+- `linked_commissions = '[]'`, `subevents = '[]'`, `lock_version = 1`
 
-### Verificação
-- `bunx tsgo --noEmit` para garantir que o refactor não quebra tipos.
-- Playwright headless: abrir `/cronograma-eventos`, clicar no ano 2027 no `TimelineCycleNavigator`, capturar screenshot e confirmar que o placeholder de 2027 permanece em foco (sem snap para junho/2026); repetir clicando em 2028. Rolar até o final e confirmar que o topo do stream continua acessível sem retornos automáticos.
-- Rodar `bunx vitest run src/lib/__tests__/cronogramaRpc.test.ts` para garantir que a suíte existente segue verde.
+Grava tudo em uma única transação (`INSERT ... VALUES (...), (...), ...`) para atomicidade.
 
-### Fora de escopo (não alterar nesta passagem)
-- Regras do `IntersectionObserver` (`rootMargin`, thresholds) — só ajustar se o Playwright detectar oscilação residual.
-- Cálculo de `getFirstRelevantMonthForYear` (comportamento correto por si só).
-- Layout/CSS do stream — nenhuma mudança visual necessária além de destravar a navegação.
+## Persistência e integração
+
+- A `cronograma_eventos_full` (view usada pelo hook `useCronogramaEventos`) reflete automaticamente os novos registros — a Linha do Tempo passa a exibir julho e agosto/2026 com os cards.
+- `_cronograma_log` não é chamado neste caminho porque estamos inserindo em nome do sistema, sem `auth.uid()`; para manter trilha, gravaremos uma linha em `audit_log` com resumo "8 eventos de Representações cadastrados".
+- Não são criadas comissões/responsáveis relacionais (não foram informados). Podem ser adicionados depois pela UI via RPC já existente.
+
+## Fora de escopo
+- Criação de subeventos (nenhum foi descrito).
+- Vínculo com comissões ou responsáveis (sem dados).
+- Alterações de UI/tema.
+
+Se aprovado, executo a migração de dados e confirmo com uma leitura mostrando os 8 registros criados.
