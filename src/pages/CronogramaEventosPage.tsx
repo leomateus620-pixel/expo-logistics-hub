@@ -318,6 +318,17 @@ export default function CronogramaEventosPage() {
     }, { replace: true });
   }, [setSearchParams, viewportIsMobilePresentation]);
 
+  // Deep-link sync: ?event=<id|sourceKey>&mode=view|edit&subevent=<id>
+  useEffect(() => {
+    if (!deepLinkEvent) return;
+    if (cronograma.isLoading) return;
+    const current = selectedEvent?.sourceKey ?? selectedEvent?.id;
+    if (drawerOpen && current === deepLinkEvent) return;
+    const match = events.find((event) => event.id === deepLinkEvent || event.sourceKey === deepLinkEvent);
+    if (!match) return;
+    openEvent(match, deepLinkMode === 'edit');
+  }, [cronograma.isLoading, deepLinkEvent, deepLinkMode, drawerOpen, events, openEvent, selectedEvent]);
+
 
   const openWorkspace = useCallback((event: CronogramaEvent) => {
     workspaceTransitionRef.current = overlayIsMobilePresentation;
