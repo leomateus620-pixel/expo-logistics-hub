@@ -16,6 +16,7 @@ export const categoryLabels: Record<CronogramaCategory, string> = {
   comunicacao: 'Comunicação',
   comercial: 'Comercial',
   cerimonial: 'Cerimonial',
+  representacoes: 'Representações',
 };
 
 export const statusLabels: Record<CronogramaStatus, string> = {
@@ -46,6 +47,7 @@ export const categoryTone: Record<CronogramaCategory, string> = {
   comunicacao: 'bg-sky-700',
   comercial: 'bg-amber-700',
   cerimonial: 'bg-rose-700',
+  representacoes: 'bg-indigo-700',
 };
 
 export const officialCronogramaEvents: CronogramaEvent[] = [
