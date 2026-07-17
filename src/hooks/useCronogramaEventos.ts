@@ -1,6 +1,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
+import {
+  cronogramaSaveEvent,
+  cronogramaSaveSubevent,
+  cronogramaDeleteSubevent,
+  cronogramaReorderSubevents,
+  type CronogramaSaveEventPayload,
+  type CronogramaSaveSubeventPayload,
+} from '@/lib/cronograma-rpc';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import {
