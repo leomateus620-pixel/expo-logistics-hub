@@ -1006,6 +1006,29 @@ export function useCronogramaEventos() {
     updateSubevent,
     deleteSubevent,
     seedOfficialData,
+    saveEventRpc,
+    saveSubeventRpc,
+    deleteSubeventRpc,
+    reorderSubeventsRpc,
+  };
+}
+
+export function useCronogramaEventHistory(eventId: string | null | undefined) {
+  const { myRole } = useCurrentOrg();
+  const canViewHistory = myRole === 'admin' || myRole === 'gestor';
+
+    relationshipsUnavailable,
+    relationshipSyncUnavailable,
+    pendingRelationshipCount: queuedRelationshipsForOrg.length,
+    failedRelationshipCount: queuedRelationshipsForOrg.filter((item) => item.lastError).length,
+    isSyncingRelationships: syncQueuedRelationships.isPending,
+    retryRelationships,
+    create,
+    update,
+    createSubevent,
+    updateSubevent,
+    deleteSubevent,
+    seedOfficialData,
   };
 }
 
