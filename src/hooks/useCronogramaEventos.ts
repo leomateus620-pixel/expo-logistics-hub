@@ -985,6 +985,27 @@ export function useCronogramaEventos() {
   const isSeedFallback = dbUnavailable || !orgId || !query.data;
   const relationshipSyncUnavailable = dbUnavailable || relationshipsUnavailable || !isOnline || !query.data;
 
+  const saveEventRpc = useMutation({
+    mutationFn: async (input: { payload: CronogramaSaveEventPayload; expectedLockVersion?: number | null }) =>
+      cronogramaSaveEvent(input.payload, input.expectedLockVersion),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['cronograma-eventos', orgId] }); },
+  });
+  const saveSubeventRpc = useMutation({
+    mutationFn: async (input: { payload: CronogramaSaveSubeventPayload; expectedLockVersion?: number | null }) =>
+      cronogramaSaveSubevent(input.payload, input.expectedLockVersion),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['cronograma-eventos', orgId] }); },
+  });
+  const deleteSubeventRpc = useMutation({
+    mutationFn: async (input: { subeventId: string; expectedLockVersion?: number | null }) =>
+      cronogramaDeleteSubevent(input.subeventId, input.expectedLockVersion),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['cronograma-eventos', orgId] }); },
+  });
+  const reorderSubeventsRpc = useMutation({
+    mutationFn: async (input: { eventId: string; orderedIds: string[] }) =>
+      cronogramaReorderSubevents(input.eventId, input.orderedIds),
+    onSuccess: () => { queryClient.invalidateQueries({ queryKey: ['cronograma-eventos', orgId] }); },
+  });
+
   return {
     events,
     isLoading: query.isLoading || isSeedingOfficialData,
