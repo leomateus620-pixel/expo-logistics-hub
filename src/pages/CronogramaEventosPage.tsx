@@ -308,7 +308,16 @@ export default function CronogramaEventosPage() {
     setSelectedEvent(event);
     setDrawerStartsEditing(edit);
     setDrawerOpen(true);
-  }, [viewportIsMobilePresentation]);
+    const identity = event.sourceKey ?? event.id;
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current);
+      if (identity) next.set('event', identity);
+      if (edit) next.set('mode', 'edit'); else next.delete('mode');
+      next.delete('subevent');
+      return next;
+    }, { replace: true });
+  }, [setSearchParams, viewportIsMobilePresentation]);
+
 
   const openWorkspace = useCallback((event: CronogramaEvent) => {
     workspaceTransitionRef.current = overlayIsMobilePresentation;
