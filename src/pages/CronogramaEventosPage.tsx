@@ -351,6 +351,13 @@ export default function CronogramaEventosPage() {
     setDrawerOpen(open);
     if (!open) {
       setDrawerStartsEditing(false);
+      setSearchParams((current) => {
+        const next = new URLSearchParams(current);
+        next.delete('event');
+        next.delete('subevent');
+        next.delete('mode');
+        return next;
+      }, { replace: true });
       const { x, y } = timelinePositionRef.current;
       const closingEventIdentity = selectedEvent?.sourceKey ?? selectedEvent?.id;
       window.setTimeout(() => {
