@@ -306,6 +306,9 @@ export function useTimelineCycleNavigation(options: TimelineNavigationOptions) {
       const month = kind === 'month' ? value : null;
       const year = kind === 'month' ? yearFromMonth(value) : Number(value);
       if (!isCronogramaCycleYear(year)) return;
+      // Anti-loop: se o foco visível já corresponde ao estado atual, não redespachar
+      // (evita cadeia observer → URL → effect de deep-link → commitFocus a cada frame).
+      if (year === state.selectedYear && month === state.focusedMonth) return;
       dispatch({ type: 'observe', year, month });
       onPositionChangeRef.current?.({ year, month, reason: 'observer', replace: true });
     }, {
