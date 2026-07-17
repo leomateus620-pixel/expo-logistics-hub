@@ -130,6 +130,9 @@ export default function CronogramaEventosPage() {
   const requestedTimelineMonth = isCycleMonthKey(searchParams.get('timelineMonth'))
     ? searchParams.get('timelineMonth')
     : null;
+  const deepLinkEvent = searchParams.get('event');
+  const deepLinkSubevent = searchParams.get('subevent');
+  const deepLinkMode = searchParams.get('mode') === 'edit' ? 'edit' : 'view';
   const openCountdownExperience = useCallback(() => {
     navigate(FENASOJA_COUNTDOWN_ROUTE, {
       state: { fromCronograma: true },
