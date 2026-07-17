@@ -2898,41 +2898,6 @@ input::placeholder, textarea::placeholder {
   transition-timing-function: var(--ease-decelerate);
 }
 
-.auth-glass-panel {
-  border-color: oklch(var(--glass-border));
-  background:
-    radial-gradient(circle at 100% 0%, oklch(var(--brand-gold-400) / 0.10), transparent 30%),
-    oklch(var(--glass-surface-strong));
-  box-shadow: var(--elevation-4);
-  backdrop-filter: blur(var(--glass-blur-panel)) saturate(var(--glass-saturation));
-  -webkit-backdrop-filter: blur(var(--glass-blur-panel)) saturate(var(--glass-saturation));
-}
-
-.auth-primary-action {
-  box-shadow:
-    0 2px 4px rgb(3 24 52 / 0.16),
-    0 14px 26px -16px oklch(var(--action) / 0.74),
-    inset 0 1px 0 rgb(255 255 255 / 0.34),
-    inset 0 -2px 0 rgb(3 24 52 / 0.14);
-  transition: transform var(--motion-fast) var(--ease-standard), box-shadow var(--motion-fast) var(--ease-standard), filter var(--motion-fast) var(--ease-standard);
-}
-
-.auth-primary-action:hover {
-  box-shadow:
-    0 3px 6px rgb(3 24 52 / 0.18),
-    0 18px 32px -16px oklch(var(--action) / 0.82),
-    inset 0 1px 0 rgb(255 255 255 / 0.38),
-    inset 0 -2px 0 rgb(3 24 52 / 0.14);
-  filter: saturate(1.04) brightness(1.02);
-  transform: translateY(-1px);
-}
-
-.auth-primary-action:active {
-  box-shadow: var(--elevation-1), inset 0 2px 4px rgb(3 24 52 / 0.18);
-  transform: translateY(1px) scale(var(--interaction-press-scale));
-}
-
-.portal-glass-stat,
 .premium-app-header {
   border: 1px solid oklch(var(--glass-border-inverse));
   background: oklch(var(--glass-surface-inverse));
@@ -3071,15 +3036,9 @@ input::placeholder, textarea::placeholder {
   .liquid-glass-card,
   .premium-surface,
   .glass-panel,
-  .auth-glass-panel,
-  .portal-glass-stat,
   .premium-app-header,
   .cronograma-route-state {
     background: oklch(var(--card));
-  }
-
-  .portal-glass-stat {
-    background: oklch(var(--brand-navy-800));
   }
 }
 
@@ -3119,8 +3078,6 @@ input::placeholder, textarea::placeholder {
   .liquid-glass-card,
   .premium-surface,
   .glass-panel,
-  .auth-glass-panel,
-  .portal-glass-stat,
   .premium-app-header,
   .cronograma-route-state {
     border-color: oklch(var(--foreground) / 0.38);
@@ -3129,10 +3086,6 @@ input::placeholder, textarea::placeholder {
     -webkit-backdrop-filter: none;
   }
 
-  .portal-glass-stat {
-    border-color: rgb(255 255 255 / 0.30);
-    background: oklch(var(--brand-navy-800));
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
