@@ -311,6 +311,311 @@ export type Database = {
           },
         ]
       }
+      cronograma_evento_comissoes: {
+        Row: {
+          commission_id: string | null
+          commission_name_snapshot: string | null
+          commission_slug: string | null
+          created_at: string
+          event_id: string
+          id: string
+          relation_role: string
+          updated_at: string
+        }
+        Insert: {
+          commission_id?: string | null
+          commission_name_snapshot?: string | null
+          commission_slug?: string | null
+          created_at?: string
+          event_id: string
+          id?: string
+          relation_role?: string
+          updated_at?: string
+        }
+        Update: {
+          commission_id?: string | null
+          commission_name_snapshot?: string | null
+          commission_slug?: string | null
+          created_at?: string
+          event_id?: string
+          id?: string
+          relation_role?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cronograma_evento_comissoes_commission_id_fkey"
+            columns: ["commission_id"]
+            isOneToOne: false
+            referencedRelation: "commissions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cronograma_evento_comissoes_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "cronograma_eventos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cronograma_evento_logs: {
+        Row: {
+          action: string
+          created_at: string
+          entity_id: string | null
+          entity_type: string
+          event_id: string
+          id: string
+          new_value: Json | null
+          previous_value: Json | null
+          request_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string
+          event_id: string
+          id?: string
+          new_value?: Json | null
+          previous_value?: Json | null
+          request_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string
+          event_id?: string
+          id?: string
+          new_value?: Json | null
+          previous_value?: Json | null
+          request_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cronograma_evento_logs_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "cronograma_eventos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cronograma_evento_responsaveis: {
+        Row: {
+          created_at: string
+          event_id: string
+          id: string
+          is_primary: boolean
+          name_snapshot: string | null
+          org_member_user_id: string | null
+          responsible_type: string
+          role: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          id?: string
+          is_primary?: boolean
+          name_snapshot?: string | null
+          org_member_user_id?: string | null
+          responsible_type?: string
+          role?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          id?: string
+          is_primary?: boolean
+          name_snapshot?: string | null
+          org_member_user_id?: string | null
+          responsible_type?: string
+          role?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cronograma_evento_responsaveis_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "cronograma_eventos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cronograma_eventos: {
+        Row: {
+          category: string
+          commission_name: string | null
+          commission_slug: string | null
+          created_at: string
+          created_by_user_id: string | null
+          days_remaining: number | null
+          description: string | null
+          end_date: string | null
+          event_time: string | null
+          event_type: string
+          has_exact_date: boolean
+          id: string
+          is_official_seed: boolean
+          linked_commissions: Json
+          location: string | null
+          month_label: string | null
+          org_id: string
+          priority: string
+          responsible_name: string | null
+          source_cell: string | null
+          source_key: string
+          source_note: string | null
+          source_row: string | null
+          source_sheet: string
+          source_year: number
+          start_date: string | null
+          status: string
+          subevents: Json
+          title: string
+          updated_at: string
+          week_label: string | null
+        }
+        Insert: {
+          category?: string
+          commission_name?: string | null
+          commission_slug?: string | null
+          created_at?: string
+          created_by_user_id?: string | null
+          days_remaining?: number | null
+          description?: string | null
+          end_date?: string | null
+          event_time?: string | null
+          event_type?: string
+          has_exact_date?: boolean
+          id?: string
+          is_official_seed?: boolean
+          linked_commissions?: Json
+          location?: string | null
+          month_label?: string | null
+          org_id: string
+          priority?: string
+          responsible_name?: string | null
+          source_cell?: string | null
+          source_key: string
+          source_note?: string | null
+          source_row?: string | null
+          source_sheet?: string
+          source_year?: number
+          start_date?: string | null
+          status?: string
+          subevents?: Json
+          title: string
+          updated_at?: string
+          week_label?: string | null
+        }
+        Update: {
+          category?: string
+          commission_name?: string | null
+          commission_slug?: string | null
+          created_at?: string
+          created_by_user_id?: string | null
+          days_remaining?: number | null
+          description?: string | null
+          end_date?: string | null
+          event_time?: string | null
+          event_type?: string
+          has_exact_date?: boolean
+          id?: string
+          is_official_seed?: boolean
+          linked_commissions?: Json
+          location?: string | null
+          month_label?: string | null
+          org_id?: string
+          priority?: string
+          responsible_name?: string | null
+          source_cell?: string | null
+          source_key?: string
+          source_note?: string | null
+          source_row?: string | null
+          source_sheet?: string
+          source_year?: number
+          start_date?: string | null
+          status?: string
+          subevents?: Json
+          title?: string
+          updated_at?: string
+          week_label?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cronograma_eventos_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cronograma_subeventos: {
+        Row: {
+          commission_slug: string | null
+          created_at: string
+          description: string | null
+          end_date: string | null
+          id: string
+          parent_event_id: string
+          priority: string
+          responsible_name: string | null
+          sort_order: number
+          start_date: string | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          commission_slug?: string | null
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          parent_event_id: string
+          priority?: string
+          responsible_name?: string | null
+          sort_order?: number
+          start_date?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          commission_slug?: string | null
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          parent_event_id?: string
+          priority?: string
+          responsible_name?: string | null
+          sort_order?: number
+          start_date?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cronograma_subeventos_parent_event_id_fkey"
+            columns: ["parent_event_id"]
+            isOneToOne: false
+            referencedRelation: "cronograma_eventos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       electric_carts: {
         Row: {
           codigo: string
