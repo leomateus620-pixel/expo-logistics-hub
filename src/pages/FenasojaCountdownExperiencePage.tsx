@@ -1,6 +1,7 @@
 import {
   Component,
   lazy,
+  memo,
   Suspense,
   useCallback,
   useEffect,
@@ -115,11 +116,72 @@ class AtmosphereBoundary extends Component<
   }
 }
 
+const FenasojaCountdownExperienceClock = memo(function FenasojaCountdownExperienceClock() {
+  const { snapshot, accessibleLabel, announcement } = useFenasojaCountdown();
+
+  return (
+    <>
+      <div className="fenasoja-countdown-experience__clock" data-phase={snapshot.phase}>
+        <div className="fenasoja-countdown-experience__clock-topline">
+          <span><Clock3 aria-hidden="true" /> Tempo até a abertura</span>
+          <span>{snapshot.phase === 'open' ? 'Fenasoja aberta' : 'Atualização contínua'}</span>
+        </div>
+
+        <FenasojaCountdownDigits
+          snapshot={snapshot}
+          accessibleLabel={accessibleLabel}
+          variant="immersive"
+        />
+
+        <div className="fenasoja-countdown-experience__clock-footer">
+          <span aria-hidden="true" />
+          <p>
+            {snapshot.phase === 'open'
+              ? 'A Fenasoja 2028 está oficialmente aberta.'
+              : `Horário oficial · ${FENASOJA_2028_TIME_ZONE_LABEL}`}
+          </p>
+          <span aria-hidden="true" />
+        </div>
+      </div>
+
+      <p className="sr-only" aria-live="polite" aria-atomic="true">
+        {announcement}
+      </p>
+    </>
+  );
+});
+
+const FenasojaCountdownExperienceContent = memo(function FenasojaCountdownExperienceContent() {
+  return (
+    <section
+      className="fenasoja-countdown-experience__content"
+      aria-labelledby="fenasoja-countdown-experience-title"
+    >
+      <div className="fenasoja-countdown-experience__identity">
+        <p className="fenasoja-countdown-experience__eyebrow">
+          <ShieldCheck aria-hidden="true" />
+          Marco oficial da edição
+        </p>
+        <h1 id="fenasoja-countdown-experience-title">
+          <span className="fenasoja-countdown-experience__wordmark">FENASOJA</span>
+          <span className="fenasoja-countdown-experience__edition">2028</span>
+        </h1>
+        <p className="fenasoja-countdown-experience__subtitle">Contagem oficial</p>
+        <p className="fenasoja-countdown-experience__opening">
+          <CalendarClock aria-hidden="true" />
+          Abertura em {FENASOJA_2028_OPENING_LABEL}
+        </p>
+      </div>
+
+      <FenasojaCountdownExperienceClock />
+    </section>
+  );
+});
+
 export default function FenasojaCountdownExperiencePage() {
   const navigate = useNavigate();
   const location = useLocation();
   const returnButtonRef = useRef<HTMLButtonElement>(null);
-  const { snapshot, accessibleLabel, announcement } = useFenasojaCountdown();
   const capabilities = useExperienceCapabilities();
   const [enhancedReady, setEnhancedReady] = useState(false);
   const openedFromCronograma = Boolean(
@@ -207,7 +269,6 @@ export default function FenasojaCountdownExperiencePage() {
       id="fenasoja-countdown-experience"
       className="fenasoja-countdown-experience"
       data-motion={motionEnabled ? 'active' : 'still'}
-      data-phase={snapshot.phase}
       data-renderer={enhancedReady ? 'enhanced' : 'photographic'}
     >
       <div className="fenasoja-countdown-experience__photographic" aria-hidden="true">
@@ -257,58 +318,18 @@ export default function FenasojaCountdownExperiencePage() {
           type="button"
           className="fenasoja-countdown-experience__return"
           onClick={returnToCronograma}
+          aria-label="Voltar ao Cronograma e Eventos"
         >
           <ArrowLeft aria-hidden="true" />
-          <span>Voltar ao cronograma</span>
+          <span className="fenasoja-countdown-experience__return-label">
+            <span className="fenasoja-countdown-experience__return-label-long">Voltar ao cronograma</span>
+            <span className="fenasoja-countdown-experience__return-label-short">Voltar</span>
+          </span>
           <kbd>Esc</kbd>
         </button>
       </header>
 
-      <section
-        className="fenasoja-countdown-experience__content"
-        aria-labelledby="fenasoja-countdown-experience-title"
-      >
-        <div className="fenasoja-countdown-experience__identity">
-          <p className="fenasoja-countdown-experience__eyebrow">
-            <ShieldCheck aria-hidden="true" />
-            Fenasoja 2028 · marco oficial
-          </p>
-          <h1 id="fenasoja-countdown-experience-title">
-            Contagem <span>Oficial</span>
-          </h1>
-          <p className="fenasoja-countdown-experience__opening">
-            <CalendarClock aria-hidden="true" />
-            Abertura em {FENASOJA_2028_OPENING_LABEL}
-          </p>
-        </div>
-
-        <div className="fenasoja-countdown-experience__clock" data-phase={snapshot.phase}>
-          <div className="fenasoja-countdown-experience__clock-topline">
-            <span><Clock3 aria-hidden="true" /> Tempo até a abertura</span>
-            <span>{snapshot.phase === 'open' ? 'Fenasoja aberta' : 'Atualização contínua'}</span>
-          </div>
-
-          <FenasojaCountdownDigits
-            snapshot={snapshot}
-            accessibleLabel={accessibleLabel}
-            variant="immersive"
-          />
-
-          <div className="fenasoja-countdown-experience__clock-footer">
-            <span aria-hidden="true" />
-            <p>
-              {snapshot.phase === 'open'
-                ? 'A Fenasoja 2028 está oficialmente aberta.'
-                : `Horário oficial · ${FENASOJA_2028_TIME_ZONE_LABEL}`}
-            </p>
-            <span aria-hidden="true" />
-          </div>
-        </div>
-
-        <p className="sr-only" aria-live="polite" aria-atomic="true">
-          {announcement}
-        </p>
-      </section>
+      <FenasojaCountdownExperienceContent />
 
       <footer className="fenasoja-countdown-experience__footer">
         <span className="fenasoja-countdown-experience__live-dot" aria-hidden="true" />

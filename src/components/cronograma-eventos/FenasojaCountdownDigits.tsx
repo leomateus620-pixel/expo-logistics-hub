@@ -27,9 +27,11 @@ const CountdownUnit = memo(function CountdownUnit({
   const formatted = String(value).padStart(unit === 'days' ? 3 : 2, '0');
 
   return (
-    <span className="fenasoja-countdown-unit" data-unit={unit}>
+    <span className="fenasoja-countdown-unit" data-unit={unit} data-value={formatted}>
       <span className="fenasoja-countdown-value" aria-hidden="true">
-        <span key={formatted}>{formatted}</span>
+        <span className="fenasoja-countdown-value-motion" key={formatted}>
+          <span className="fenasoja-countdown-value-glyph">{formatted}</span>
+        </span>
       </span>
       <span className="fenasoja-countdown-unit-label">{label}</span>
     </span>
