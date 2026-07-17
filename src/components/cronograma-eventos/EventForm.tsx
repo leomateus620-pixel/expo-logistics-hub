@@ -34,7 +34,6 @@ const kindLabels: Record<CronogramaKind, string> = {
   decision: 'Decisão',
 };
 
-
 const editableStatusLabels: Partial<Record<CronogramaStatus, string>> = {
   planned: statusLabels.planned,
   in_progress: statusLabels.in_progress,
@@ -68,9 +67,55 @@ const defaultForm: CronogramaEvent = {
   pendingReason: '',
   decisionNeeded: '',
   subevents: [],
+  commissionsRel: [],
+  responsiblesRel: [],
 };
 
-type SubeventFormItem = NonNullable<CronogramaEvent['subevents']>[number];
+function commissionLinksToSelections(links: CronogramaEventCommissionLink[] | undefined): RelationalSelection[] {
+  return (links ?? []).map((link) => ({
+    id: link.commissionId ?? `slug:${link.commissionSlug ?? link.commissionName ?? 'sem-vinculo'}`,
+    label: link.commissionName ?? link.commissionSlug ?? 'Comissão',
+    hint: link.commissionSlug ?? undefined,
+    isPrimary: link.isPrimary ?? false,
+  }));
+}
+
+function responsibleLinksToSelections(links: CronogramaEventResponsibleLink[] | undefined): RelationalSelection[] {
+  return (links ?? []).map((link) => ({
+    id: link.userId ?? `external:${(link.name ?? '').toLocaleLowerCase('pt-BR')}`,
+    label: link.name ?? 'Responsável',
+    hint: link.role ?? (link.responsibleType === 'external' ? 'Externo' : 'Membro'),
+    isPrimary: link.isPrimary ?? false,
+  }));
+}
+
+function selectionsToCommissionLinks(
+  selections: RelationalSelection[],
+  options: Array<{ id: string; nome: string; slug: string }>,
+): CronogramaEventCommissionLink[] {
+  return selections.map((selection) => {
+    const option = options.find((item) => item.id === selection.id);
+    return {
+      commissionId: option?.id ?? (selection.id.startsWith('slug:') ? null : selection.id),
+      commissionSlug: option?.slug ?? selection.hint ?? null,
+      commissionName: option?.nome ?? selection.label,
+      isPrimary: selection.isPrimary ?? false,
+    };
+  });
+}
+
+function selectionsToResponsibleLinks(selections: RelationalSelection[]): CronogramaEventResponsibleLink[] {
+  return selections.map((selection) => {
+    const isExternal = selection.id.startsWith('external:') || selection.id.startsWith('custom:');
+    return {
+      userId: isExternal ? null : selection.id,
+      name: selection.label,
+      role: selection.hint ?? null,
+      isPrimary: selection.isPrimary ?? false,
+      responsibleType: isExternal ? 'external' : 'member',
+    };
+  });
+}
 
 export function EventForm({
   event,
@@ -85,6 +130,7 @@ export function EventForm({
   presentation = 'desktop',
   defaultYear,
   showSubevents = true,
+  showRelational = true,
 }: {
   event?: CronogramaEvent | null;
   onSubmit: (event: CronogramaEvent) => Promise<void> | void;
@@ -98,9 +144,11 @@ export function EventForm({
   presentation?: 'desktop' | 'mobile';
   defaultYear?: CronogramaEvent['year'];
   showSubevents?: boolean;
+  showRelational?: boolean;
 }) {
   const formInstanceId = useId().replace(/:/g, '');
   const fieldId = (name: string) => `${formInstanceId}-${name}`;
+  const { commissions, isLoading: commissionsLoading } = useOrgCommissions();
   const initialForm = useMemo<CronogramaEvent>(() => {
     const next = {
       ...defaultForm,
@@ -114,6 +162,8 @@ export function EventForm({
         ...subevent,
         status: normalizeEditableStatus(subevent.status ?? 'planned'),
       })),
+      commissionsRel: next.commissionsRel ?? [],
+      responsiblesRel: next.responsiblesRel ?? [],
     };
   }, [defaultYear, event]);
   const initialSignature = useMemo(() => JSON.stringify(initialForm), [initialForm]);
@@ -144,31 +194,22 @@ export function EventForm({
     setForm((current) => ({ ...current, [key]: value }));
   };
 
-  const updateSubevent = <K extends keyof SubeventFormItem>(index: number, key: K, value: SubeventFormItem[K]) => {
-    setForm((current) => ({
-      ...current,
-      subevents: (current.subevents ?? []).map((subevent, itemIndex) => (
-        itemIndex === index ? { ...subevent, [key]: value } : subevent
-      )),
-    }));
-  };
-
-  const addSubevent = () => {
-    setForm((current) => ({
-      ...current,
-      subevents: [
-        ...(current.subevents ?? []),
-        { title: '', date: null, owner: '', status: 'planned' },
-      ],
-    }));
-  };
-
-  const removeSubevent = (index: number) => {
-    setForm((current) => ({
-      ...current,
-      subevents: (current.subevents ?? []).filter((_, itemIndex) => itemIndex !== index),
-    }));
-  };
+  const commissionSelections = useMemo(
+    () => commissionLinksToSelections(form.commissionsRel),
+    [form.commissionsRel],
+  );
+  const responsibleSelections = useMemo(
+    () => responsibleLinksToSelections(form.responsiblesRel),
+    [form.responsiblesRel],
+  );
+  const commissionOptions = useMemo(
+    () => commissions.map((commission) => ({
+      id: commission.id,
+      label: commission.nome,
+      hint: commission.slug,
+    })),
+    [commissions],
+  );
 
   const handleSubmit = (submitEvent: FormEvent<HTMLFormElement>) => {
     submitEvent.preventDefault();
@@ -189,12 +230,13 @@ export function EventForm({
 
     const normalizedDate = form.date?.trim() ? form.date : null;
     const nextYear = normalizedDate ? Number(normalizedDate.slice(0, 4)) : Number(form.year || 2028);
-    const normalizedSubevents = (form.subevents ?? [])
-      .map((subevent) => ({
+    const normalizedSubevents: CronogramaSubevent[] = (form.subevents ?? [])
+      .map((subevent, index) => ({
         ...subevent,
         title: subevent.title.trim(),
         date: subevent.date?.trim() || null,
         owner: subevent.owner?.trim() || undefined,
+        sortOrder: subevent.sortOrder ?? index,
       }))
       .filter((subevent) => subevent.title.length > 0);
 
@@ -212,6 +254,8 @@ export function EventForm({
       pendingReason: form.pendingReason?.trim() || undefined,
       decisionNeeded: form.decisionNeeded?.trim() || undefined,
       subevents: normalizedSubevents,
+      commissionsRel: selectionsToCommissionLinks(commissionSelections, commissions),
+      responsiblesRel: selectionsToResponsibleLinks(responsibleSelections),
     });
   };
 
@@ -368,17 +412,50 @@ export function EventForm({
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor={fieldId('owner')}>Responsável</Label>
+            <Label htmlFor={fieldId('owner')}>Responsável (fallback)</Label>
             <Input
               id={fieldId('owner')}
               value={form.owner || ''}
               onChange={(event) => update('owner', event.target.value)}
-              placeholder="Comissão, pessoa ou coordenação"
+              placeholder="Legado: comissão ou pessoa (use os vínculos abaixo quando possível)"
               className="bg-white/72"
             />
           </div>
         </div>
       </div>
+
+      {showRelational && (
+        <div className="cronograma-form-section space-y-4">
+          <div className="flex items-center gap-2">
+            <UserRound className="h-4 w-4 text-primary" />
+            <h3 className="text-sm font-black uppercase tracking-[0.14em] text-foreground/72">Vínculos relacionais</h3>
+          </div>
+          <RelationalMultiSelect
+            label="Comissões vinculadas"
+            placeholder="Buscar comissão…"
+            emptyLabel="Nenhuma comissão vinculada. Adicione uma ou mais e marque a principal."
+            options={commissionOptions}
+            value={commissionSelections}
+            onChange={(next) => update('commissionsRel', selectionsToCommissionLinks(next, commissions))}
+            isLoading={commissionsLoading}
+            primaryLabel="Principal"
+          />
+          <RelationalMultiSelect
+            label="Responsáveis"
+            placeholder="Nome, comissão ou papel…"
+            emptyLabel="Nenhum responsável relacional. Adicione um nome ou selecione um membro."
+            options={[]}
+            value={responsibleSelections}
+            onChange={(next) => update('responsiblesRel', selectionsToResponsibleLinks(next))}
+            allowCustom
+            primaryLabel="Principal"
+          />
+          <p className="text-[11px] leading-relaxed text-muted-foreground">
+            Os vínculos relacionais são persistidos pelas RPCs oficiais (<code>cronograma_save_event</code>) e substituem
+            o campo &quot;Responsável (fallback)&quot; para eventos já salvos.
+          </p>
+        </div>
+      )}
 
       <div className="cronograma-form-section is-pending">
         <h3 className="mb-3 text-sm font-black uppercase tracking-[0.14em] text-amber-950/72">Quando ainda não há data</h3>
@@ -408,84 +485,14 @@ export function EventForm({
       </div>
 
       {showSubevents && (
-      <div className="cronograma-form-section">
-        <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-          <div>
-            <h3 className="text-sm font-black uppercase tracking-[0.14em] text-foreground/72">Subeventos vinculados</h3>
-            <p className="mt-1 text-xs text-muted-foreground">Entregas menores, reuniões de apoio ou ações dependentes do evento principal.</p>
-          </div>
-          <Button type="button" variant="outline" size="sm" onClick={addSubevent} className="rounded-full bg-white/70 text-xs">
-            <Plus className="h-4 w-4" />
-            Adicionar subevento
-          </Button>
+        <div className="cronograma-form-section">
+          <CronogramaSubeventForm
+            value={form.subevents ?? []}
+            onChange={(next) => update('subevents', next)}
+            presentation={presentation}
+            disabled={isSaving}
+          />
         </div>
-
-        {(form.subevents ?? []).length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-border/50 bg-white/45 p-4 text-center text-sm text-muted-foreground">
-            Nenhum subevento vinculado.
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {(form.subevents ?? []).map((subevent, index) => (
-              <div key={index} className="rounded-2xl border border-border/35 bg-white/64 p-3">
-                <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_150px]">
-                  <div className="space-y-1.5">
-                    <Label htmlFor={fieldId(`subevent-title-${index}`)}>Título do subevento</Label>
-                    <Input
-                      id={fieldId(`subevent-title-${index}`)}
-                      value={subevent.title}
-                      onChange={(event) => updateSubevent(index, 'title', event.target.value)}
-                      placeholder="Ex: validação de fornecedores"
-                      className="bg-white/72"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label htmlFor={fieldId(`subevent-date-${index}`)}>Data</Label>
-                    <Input
-                      id={fieldId(`subevent-date-${index}`)}
-                      type="date"
-                      value={subevent.date || ''}
-                      onChange={(event) => updateSubevent(index, 'date', event.target.value || null)}
-                      className="bg-white/72"
-                    />
-                  </div>
-                </div>
-                <div className="mt-3 grid gap-3 sm:grid-cols-[minmax(0,1fr)_170px_auto]">
-                  <div className="space-y-1.5">
-                    <Label htmlFor={fieldId(`subevent-owner-${index}`)}>Responsável</Label>
-                    <Input
-                      id={fieldId(`subevent-owner-${index}`)}
-                      value={subevent.owner || ''}
-                      onChange={(event) => updateSubevent(index, 'owner', event.target.value)}
-                      placeholder="Comissão ou responsável"
-                      className="bg-white/72"
-                    />
-                  </div>
-                  <SelectField
-                    label="Status"
-                    mobile={presentation === 'mobile'}
-                    value={subevent.status || 'planned'}
-                    onChange={(value) => updateSubevent(index, 'status', value as CronogramaStatus)}
-                    items={editableStatusLabels}
-                  />
-                  <div className="flex items-end">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => removeSubevent(index)}
-                      className="h-10 w-10 rounded-full text-muted-foreground hover:bg-red-50 hover:text-red-800"
-                      aria-label="Remover subevento"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
       )}
 
       {submitError && <p className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm font-semibold text-red-900" role="alert">{submitError}</p>}
@@ -516,7 +523,7 @@ function SelectField<T extends string>({
   label: string;
   value: T;
   onChange: (value: string) => void;
-  items: Record<string, string>;
+  items: Record<string, string | undefined>;
   mobile?: boolean;
 }) {
   return (
@@ -531,11 +538,13 @@ function SelectField<T extends string>({
             ? 'cronograma-event-select-content z-[95] max-h-[min(22rem,70dvh)] rounded-2xl bg-white/95'
             : 'rounded-2xl bg-white/95'}
         >
-          {Object.entries(items).map(([itemValue, itemLabel]) => (
-            <SelectItem key={itemValue} value={itemValue} className="rounded-xl">
-              {itemLabel}
-            </SelectItem>
-          ))}
+          {Object.entries(items)
+            .filter(([, itemLabel]) => Boolean(itemLabel))
+            .map(([itemValue, itemLabel]) => (
+              <SelectItem key={itemValue} value={itemValue} className="rounded-xl">
+                {itemLabel}
+              </SelectItem>
+            ))}
         </SelectContent>
       </Select>
     </div>
