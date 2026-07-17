@@ -173,7 +173,7 @@ export function FenasojaCountdownHero({
                   <Maximize2 />
                 </span>
                 <span>
-                  <strong>{isExpanding ? 'Abrindo experiência…' : 'Ver contagem completa'}</strong>
+                  <strong>{isExpanding ? 'Abrindo experiência…' : 'Abrir contagem'}</strong>
                   <small>Experiência imersiva</small>
                 </span>
                 <ArrowUpRight className="fenasoja-countdown-expand-arrow" aria-hidden="true" />

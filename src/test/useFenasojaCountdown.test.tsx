@@ -70,6 +70,20 @@ describe('useFenasojaCountdown', () => {
     expect(vi.getTimerCount()).toBe(0);
   });
 
+  it('recalcula o rollover de minuto a partir do timestamp absoluto', () => {
+    const initialTime = FENASOJA_2028_OPENING_TIMESTAMP - 60_000;
+    vi.setSystemTime(initialTime);
+
+    const { result } = renderHook(() => useFenasojaCountdown());
+    expect(result.current.snapshot).toMatchObject({ minutes: 1, seconds: 0 });
+
+    act(() => {
+      vi.advanceTimersByTime(1_012);
+    });
+
+    expect(result.current.snapshot).toMatchObject({ minutes: 0, seconds: 59 });
+  });
+
   it('suspende fora do viewport e reconcilia ao reaparecer', () => {
     const initialTime = FENASOJA_2028_OPENING_TIMESTAMP - 180_000;
     vi.setSystemTime(initialTime);

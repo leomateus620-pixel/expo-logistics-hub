@@ -59,6 +59,41 @@ describe('contagem regressiva da Fenasoja 2028', () => {
     });
   });
 
+  it('mantém rollovers exatos de dia, hora e minuto', () => {
+    const openingTimestamp = Date.parse(FENASOJA_2028_OPENING_ISO);
+
+    expect(getFenasojaCountdown(openingTimestamp - 86_400_000)).toMatchObject({
+      days: 1,
+      hours: 0,
+      minutes: 0,
+      seconds: 0,
+    });
+    expect(getFenasojaCountdown(openingTimestamp - 86_399_000)).toMatchObject({
+      days: 0,
+      hours: 23,
+      minutes: 59,
+      seconds: 59,
+    });
+    expect(getFenasojaCountdown(openingTimestamp - 3_600_000)).toMatchObject({
+      hours: 1,
+      minutes: 0,
+      seconds: 0,
+    });
+    expect(getFenasojaCountdown(openingTimestamp - 3_599_000)).toMatchObject({
+      hours: 0,
+      minutes: 59,
+      seconds: 59,
+    });
+    expect(getFenasojaCountdown(openingTimestamp - 60_000)).toMatchObject({
+      minutes: 1,
+      seconds: 0,
+    });
+    expect(getFenasojaCountdown(openingTimestamp - 59_000)).toMatchObject({
+      minutes: 0,
+      seconds: 59,
+    });
+  });
+
   it('nunca exibe valores negativos depois da abertura', () => {
     const snapshot = getFenasojaCountdown(Date.parse(FENASOJA_2028_OPENING_ISO) + 60_000);
 

@@ -50,6 +50,10 @@ describe('arquitetura visual premium Fenasoja 2028', () => {
     expect(countdownStyles).toContain('--fenasoja-hero-deep: 213 89% 11%');
     expect(countdownStyles).toContain('var(--elevation-4)');
     expect(countdownStyles).toContain('var(--motion-structural)');
+    expect(countdownStyles).toContain('-webkit-text-fill-color: currentColor');
+    expect(countdownStyles).not.toContain('-webkit-text-fill-color: transparent');
+    expect(countdownStyles).not.toContain('will-change: opacity, transform');
+    expect(countdownStyles).not.toMatch(/@keyframes fenasoja-number-change[\s\S]*?filter:/);
     expect(countdownStyles).not.toMatch(/hsl\(14[0-9]/i);
     expect(countdownStyles).not.toMatch(/animation:[^;]*infinite/i);
   });
