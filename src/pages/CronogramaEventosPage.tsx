@@ -59,6 +59,7 @@ import {
   findFenasojaCountdownReturnFocus,
 } from '@/lib/fenasoja-countdown-navigation';
 import { filterTimelineEvents } from '@/lib/cronograma-timeline';
+import '@/styles/cronograma-timeline-recovery.css';
 
 const EventRelationshipWorkspace = lazy(async () => {
   const module = await import('@/components/cronograma-eventos/workspace/EventRelationshipWorkspace');
@@ -424,11 +425,12 @@ export default function CronogramaEventosPage() {
       commissionSlug: input.commissionSlug || undefined,
       storage: 'relational',
     }, workspaceEvent.subevents?.length ?? 0);
-    await cronograma.createSubevent.mutateAsync({
+    const result = await cronograma.createSubevent.mutateAsync({
       eventId: workspaceEvent.sourceKey ?? workspaceEvent.id,
       draft,
       requestId: input.requestId,
     });
+    return result.mode;
   };
 
   const handleUpdateSubevent = async (subevent: CronogramaSubevent, input: CronogramaSubeventInput) => {
@@ -519,25 +521,39 @@ export default function CronogramaEventosPage() {
         {filteredEvents.length} de {events.length} eventos exibidos na visão atual.
       </p>
 
-      {cronograma.isSeedFallback && !cronograma.isLoading && (
-        <div className="cronograma-sync-alert" role="alert">
+      {(cronograma.isSeedFallback || cronograma.pendingRelationshipCount > 0) && !cronograma.isLoading && (
+        <div className="cronograma-sync-alert" role={cronograma.isSeedFallback ? 'alert' : 'status'}>
           <AlertTriangle className="h-4 w-4 shrink-0" aria-hidden="true" />
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-bold">Exibindo a base oficial consolidada</p>
-            <p className="mt-0.5 text-xs opacity-80">A sincronização online não respondeu. Nenhum dado foi descartado.</p>
+            <p className="text-sm font-bold">
+              {cronograma.pendingRelationshipCount > 0
+                ? `${cronograma.pendingRelationshipCount} ${cronograma.pendingRelationshipCount === 1 ? 'conexão aguarda' : 'conexões aguardam'} sincronização`
+                : 'Exibindo a base oficial consolidada'}
+            </p>
+            <p className="mt-0.5 text-xs opacity-80">
+              {cronograma.pendingRelationshipCount > 0
+                ? 'Os rascunhos estão preservados neste dispositivo e sairão da fila somente após confirmação do servidor.'
+                : 'A sincronização online não respondeu. Nenhum dado foi descartado.'}
+            </p>
           </div>
           <Button
             type="button"
             variant="outline"
             size="sm"
-            onClick={() => cronograma.refetch()}
-            disabled={cronograma.isRefreshing}
+            onClick={() => {
+              if (cronograma.pendingRelationshipCount > 0) {
+                void cronograma.retryRelationships().catch(() => undefined);
+                return;
+              }
+              void cronograma.refetch();
+            }}
+            disabled={cronograma.isRefreshing || cronograma.isSyncingRelationships}
             className="h-8 rounded-lg bg-white/70 text-xs"
           >
-            {cronograma.isRefreshing
+            {cronograma.isRefreshing || cronograma.isSyncingRelationships
               ? <Loader2 className="h-3.5 w-3.5 animate-spin" />
               : <RefreshCw className="h-3.5 w-3.5" />}
-            Tentar novamente
+            {cronograma.pendingRelationshipCount > 0 ? 'Sincronizar agora' : 'Tentar novamente'}
           </Button>
         </div>
       )}
@@ -577,6 +593,7 @@ export default function CronogramaEventosPage() {
               <CronogramaTimelineBoard
                 events={filteredEvents}
                 allEvents={events}
+                selectedEventId={selectedEvent?.id ?? null}
                 onOpen={(event) => openEvent(event)}
                 onClearFilters={clearFilters}
                 onReturnToFullCycle={returnToFullCycle}
@@ -645,7 +662,11 @@ export default function CronogramaEventosPage() {
               onRemoveSubevent={handleRemoveSubevent}
               canManage={cronograma.canManage}
               canDeleteSubevents={cronograma.canDeleteSubevents}
-              relationshipsUnavailable={cronograma.relationshipsUnavailable || cronograma.isSeedFallback}
+              relationshipsUnavailable={cronograma.relationshipSyncUnavailable}
+              pendingRelationshipCount={cronograma.pendingRelationshipCount}
+              failedRelationshipCount={cronograma.failedRelationshipCount}
+              isSyncingRelationships={cronograma.isSyncingRelationships}
+              onRetryRelationships={cronograma.retryRelationships}
             />
           </Suspense>
         ) : (

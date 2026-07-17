@@ -1,0 +1,422 @@
+/* Recovery layer for the operational timeline. Loaded after the legacy module styles. */
+.cronograma-page {
+  background:
+    radial-gradient(circle at 8% 3%, oklch(var(--brand-indigo-200) / 0.32), transparent 25rem),
+    radial-gradient(circle at 92% 16%, oklch(var(--brand-gold-400) / 0.14), transparent 28rem),
+    linear-gradient(180deg, oklch(var(--surface-2)) 0%, oklch(var(--background)) 22rem, oklch(var(--neutral-50)) 100%);
+}
+
+.cronograma-page::before {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background-image:
+    linear-gradient(oklch(var(--brand-indigo-500) / 0.024) 1px, transparent 1px),
+    linear-gradient(90deg, oklch(var(--brand-indigo-500) / 0.024) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: linear-gradient(to bottom, black, transparent 70%);
+  content: '';
+  pointer-events: none;
+}
+
+.cronograma-page .cronograma-command-header {
+  border-color: oklch(var(--brand-indigo-300) / 0.32);
+  box-shadow: var(--elevation-4);
+}
+
+.cronograma-page .cronograma-command-dock {
+  border: 1px solid oklch(var(--brand-indigo-200) / 0.42);
+  border-top: 0;
+  background:
+    linear-gradient(180deg, oklch(var(--brand-indigo-50) / 0.72), oklch(var(--glass-surface-strong))),
+    oklch(var(--surface-1));
+  box-shadow: var(--elevation-3);
+}
+
+.cronograma-page .cronograma-view-nav,
+.cronograma-page .cronograma-filter-surface {
+  border-color: oklch(var(--brand-indigo-200) / 0.48);
+  background: oklch(var(--surface-1) / 0.96);
+  box-shadow: var(--elevation-1);
+}
+
+.cronograma-page .cronograma-view-nav {
+  box-shadow:
+    var(--elevation-1),
+    inset 0 -1px 0 oklch(var(--brand-indigo-200) / 0.22);
+}
+
+.cronograma-page .cronograma-view-tab:not(.is-active):hover {
+  background: oklch(var(--brand-indigo-50));
+  color: oklch(var(--brand-indigo-600));
+}
+
+.cronograma-page .cronograma-filter-grid {
+  border-radius: 0.72rem;
+  background: oklch(var(--surface-2) / 0.72);
+}
+
+.cronograma-page .cronograma-search-input,
+.cronograma-page .cronograma-filter-trigger {
+  min-height: 2.65rem;
+  border-color: oklch(var(--brand-indigo-200) / 0.58);
+  background: oklch(var(--neutral-0) / 0.96);
+}
+
+.cronograma-page .cronograma-search-input:focus,
+.cronograma-page .cronograma-filter-trigger:focus-visible {
+  border-color: oklch(var(--brand-orange-600) / 0.72);
+  box-shadow: 0 0 0 3px oklch(var(--brand-orange-500) / 0.15);
+}
+
+.cronograma-page .cronograma-timeline-shell {
+  gap: 1rem;
+}
+
+.cronograma-page .cronograma-cycle-navigator {
+  border-color: oklch(var(--brand-indigo-300) / 0.24);
+  color: oklch(var(--brand-soft-white));
+  background:
+    radial-gradient(circle at 100% 0%, oklch(var(--brand-indigo-500) / 0.62), transparent 62%),
+    linear-gradient(160deg, oklch(var(--brand-navy-800)), oklch(var(--brand-navy-900)));
+  box-shadow: var(--elevation-3);
+  backdrop-filter: none;
+}
+
+.cronograma-page .cronograma-cycle-navigator .text-foreground {
+  color: oklch(var(--brand-soft-white));
+}
+
+.cronograma-page .cronograma-cycle-navigator .text-muted-foreground,
+.cronograma-page .cronograma-cycle-stage,
+.cronograma-page .cronograma-cycle-count,
+.cronograma-page .cronograma-cycle-support {
+  color: oklch(var(--brand-soft-white) / 0.64);
+}
+
+.cronograma-page .cronograma-cycle-step {
+  border-color: oklch(var(--brand-gold-400) / 0.32);
+  background: oklch(var(--brand-gold-400) / 0.12);
+  color: oklch(var(--brand-gold-400));
+}
+
+.cronograma-page .cronograma-cycle-years::before {
+  background: oklch(var(--brand-soft-white) / 0.16);
+}
+
+.cronograma-page .cronograma-cycle-years::after {
+  background: linear-gradient(90deg, oklch(var(--brand-orange-500)), oklch(var(--brand-gold-400)));
+}
+
+.cronograma-page .cronograma-cycle-year {
+  color: oklch(var(--brand-soft-white) / 0.78);
+}
+
+.cronograma-page .cronograma-cycle-year[data-no-match='true']:not(.is-selected) {
+  color: oklch(var(--brand-soft-white) / 0.48);
+}
+
+.cronograma-page .cronograma-cycle-year:disabled {
+  color: oklch(var(--brand-soft-white) / 0.34);
+}
+
+.cronograma-page .cronograma-cycle-year:not(:disabled):hover {
+  border-color: oklch(var(--brand-soft-white) / 0.12);
+  background: oklch(var(--brand-soft-white) / 0.07);
+}
+
+.cronograma-page .cronograma-cycle-year.is-selected {
+  border-color: oklch(var(--brand-gold-400) / 0.36);
+  color: oklch(var(--brand-soft-white));
+  background:
+    linear-gradient(135deg, oklch(var(--brand-indigo-400) / 0.26), oklch(var(--brand-soft-white) / 0.08));
+  box-shadow: inset 0 1px 0 oklch(var(--brand-soft-white) / 0.10);
+}
+
+.cronograma-page .cronograma-cycle-node {
+  border-color: oklch(var(--brand-soft-white) / 0.52);
+  background: oklch(var(--brand-navy-800));
+  box-shadow: 0 0 0 3px oklch(var(--brand-navy-900) / 0.88);
+}
+
+.cronograma-page .cronograma-cycle-year.is-selected .cronograma-cycle-node {
+  border-color: oklch(var(--brand-gold-400));
+  color: oklch(var(--brand-navy-900));
+  background: oklch(var(--brand-gold-400));
+}
+
+.cronograma-page .cronograma-cycle-current-label {
+  background: oklch(var(--brand-gold-400) / 0.18);
+  color: oklch(var(--brand-gold-400));
+}
+
+.cronograma-page .cronograma-temporal-nav {
+  position: sticky;
+  overflow: hidden;
+  border-color: oklch(var(--brand-indigo-200) / 0.58);
+  background:
+    linear-gradient(100deg, oklch(var(--brand-indigo-50) / 0.94), oklch(var(--neutral-0) / 0.96) 38%);
+  box-shadow: var(--elevation-2);
+}
+
+.cronograma-page .cronograma-temporal-nav::before {
+  position: absolute;
+  inset-block: 0.6rem;
+  left: 0;
+  width: 3px;
+  border-radius: 999px;
+  background: linear-gradient(oklch(var(--brand-orange-500)), oklch(var(--brand-gold-400)));
+  content: '';
+}
+
+.cronograma-page .cronograma-month-stream {
+  gap: 0.9rem;
+}
+
+.cronograma-page .cronograma-year-stream {
+  gap: 0.68rem;
+}
+
+.cronograma-page .cronograma-month-section {
+  border-color: oklch(var(--brand-indigo-200) / 0.48);
+  border-radius: 1rem;
+  background: oklch(var(--surface-1) / 0.95);
+  box-shadow: var(--elevation-1);
+  transition:
+    border-color var(--motion-base) var(--ease-standard),
+    box-shadow var(--motion-base) var(--ease-standard),
+    background-color var(--motion-base) var(--ease-standard),
+    transform var(--motion-fast) var(--ease-standard);
+}
+
+.cronograma-page .cronograma-month-section[data-active='true'] {
+  border-color: oklch(var(--brand-indigo-400) / 0.52);
+  box-shadow: var(--elevation-2);
+}
+
+.cronograma-page .cronograma-month-section[data-current='true'] {
+  border-color: oklch(var(--brand-gold-500) / 0.62);
+  background:
+    linear-gradient(100deg, oklch(var(--brand-gold-400) / 0.14), oklch(var(--surface-1)) 30%);
+}
+
+.cronograma-page .cronograma-month-section[data-open='true'] {
+  border-color: oklch(var(--brand-indigo-400) / 0.46);
+  box-shadow: var(--elevation-2);
+}
+
+.cronograma-page .cronograma-month-section[data-open='true'] .cronograma-month-summary {
+  background: linear-gradient(90deg, oklch(var(--brand-indigo-50) / 0.92), transparent 62%);
+}
+
+.cronograma-page .cronograma-month-summary {
+  min-height: 4.5rem;
+  padding: 0.8rem 0.95rem;
+}
+
+.cronograma-page .cronograma-month-marker {
+  border-color: oklch(var(--brand-indigo-300) / 0.42);
+  background: oklch(var(--brand-indigo-100) / 0.78);
+  color: oklch(var(--brand-indigo-600));
+  box-shadow: inset 0 1px 0 oklch(var(--neutral-0) / 0.72);
+}
+
+.cronograma-page .cronograma-month-section[data-current='true'] .cronograma-month-marker {
+  border-color: oklch(var(--brand-gold-500) / 0.58);
+  background: oklch(var(--brand-gold-400) / 0.24);
+  color: oklch(var(--brand-navy-900));
+}
+
+.cronograma-page .cronograma-month-events {
+  border-color: oklch(var(--brand-indigo-200) / 0.46);
+  padding: 0.35rem 0.7rem 0.45rem;
+  background:
+    linear-gradient(180deg, oklch(var(--brand-indigo-50) / 0.50), transparent 5rem),
+    oklch(var(--neutral-0) / 0.66);
+}
+
+.cronograma-page .cronograma-operational-event {
+  min-height: 5.65rem;
+  border-color: oklch(var(--brand-indigo-200) / 0.40);
+  border-radius: 0.82rem;
+  padding: 0.72rem 0.55rem;
+  transition:
+    background-color var(--motion-fast) var(--ease-standard),
+    transform var(--motion-fast) var(--ease-standard),
+    box-shadow var(--motion-fast) var(--ease-standard),
+    border-color var(--motion-fast) var(--ease-standard);
+}
+
+.cronograma-page .cronograma-operational-event + .cronograma-operational-event {
+  margin-top: 0.18rem;
+}
+
+.cronograma-page .cronograma-operational-event[data-selected='true'] {
+  border-color: oklch(var(--brand-indigo-400) / 0.48);
+  background:
+    linear-gradient(90deg, oklch(var(--brand-indigo-100) / 0.72), oklch(var(--neutral-0) / 0.90) 58%);
+  box-shadow:
+    inset 4px 0 0 oklch(var(--brand-orange-500)),
+    var(--elevation-2);
+}
+
+.cronograma-page .cronograma-operational-event[data-selected='true'] .cronograma-event-rail > span {
+  background: oklch(var(--brand-orange-500));
+  box-shadow: 0 0 0 4px oklch(var(--brand-orange-500) / 0.16);
+}
+
+.cronograma-page .cronograma-operational-event[data-status='overdue'],
+.cronograma-page .cronograma-operational-event[data-status='blocked'] {
+  background: linear-gradient(90deg, oklch(var(--destructive) / 0.065), transparent 52%);
+}
+
+.cronograma-page .cronograma-operational-event[data-status='completed'] {
+  background: linear-gradient(90deg, oklch(var(--success) / 0.055), transparent 48%);
+}
+
+.cronograma-page .cronograma-event-date-block {
+  border-color: oklch(var(--brand-indigo-200) / 0.48);
+}
+
+.cronograma-page .cronograma-event-rail::before {
+  width: 2px;
+  background: linear-gradient(oklch(var(--brand-indigo-300) / 0.18), oklch(var(--brand-indigo-500) / 0.36));
+}
+
+.cronograma-page .cronograma-event-rail > span {
+  border-color: oklch(var(--neutral-0));
+  background: oklch(var(--brand-indigo-500));
+}
+
+.cronograma-page .cronograma-operational-event [class*='bg-slate-200'] {
+  background: oklch(var(--brand-indigo-100));
+}
+
+.cronograma-page .cronograma-undated-section {
+  border-color: oklch(var(--brand-gold-500) / 0.42);
+  background:
+    linear-gradient(110deg, oklch(var(--brand-gold-400) / 0.14), oklch(var(--cream) / 0.72));
+  box-shadow: var(--elevation-1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cronograma-page .cronograma-operational-event:hover {
+    border-color: oklch(var(--brand-indigo-300) / 0.48);
+    background: oklch(var(--brand-indigo-50) / 0.78);
+    box-shadow: var(--elevation-1);
+    transform: translateX(3px);
+  }
+
+  .cronograma-page .cronograma-month-section:not([data-open='true']):hover {
+    border-color: oklch(var(--brand-indigo-300) / 0.46);
+    transform: translateY(-1px);
+  }
+}
+
+@media (min-width: 900px) {
+  .cronograma-drawer {
+    border-left-color: oklch(var(--brand-indigo-300) / 0.38) !important;
+    background:
+      radial-gradient(circle at 90% 0%, oklch(var(--brand-indigo-200) / 0.34), transparent 24rem),
+      linear-gradient(180deg, oklch(var(--surface-2)), oklch(var(--background))) !important;
+    box-shadow: var(--elevation-4) !important;
+  }
+
+  .cronograma-drawer-header,
+  .cronograma-drawer-footer {
+    border-color: oklch(var(--brand-indigo-200) / 0.52);
+    background: oklch(var(--surface-1) / 0.96);
+  }
+
+  .cronograma-drawer-header {
+    box-shadow: inset 0 -1px 0 oklch(var(--neutral-0) / 0.62);
+  }
+
+  .cronograma-drawer-body {
+    background: linear-gradient(180deg, oklch(var(--brand-indigo-50) / 0.38), transparent 18rem);
+  }
+
+  .cronograma-drawer-section,
+  .cronograma-form-section {
+    border: 1px solid oklch(var(--brand-indigo-200) / 0.48);
+    border-radius: 1rem;
+    background: oklch(var(--surface-1) / 0.94);
+    box-shadow: var(--elevation-1);
+  }
+
+  .cronograma-form-section {
+    padding: 1rem;
+  }
+
+  .cronograma-drawer input,
+  .cronograma-drawer textarea,
+  .cronograma-drawer [role='combobox'] {
+    border-color: oklch(var(--brand-indigo-200) / 0.58);
+    background: oklch(var(--neutral-0) / 0.96);
+  }
+}
+
+.cronograma-page[data-presentation='mobile'] .cronograma-mobile-experience {
+  background:
+    radial-gradient(circle at 92% 4%, oklch(var(--brand-indigo-200) / 0.30), transparent 18rem),
+    linear-gradient(180deg, oklch(var(--surface-2)), oklch(var(--background)) 18rem);
+}
+
+.cronograma-page[data-presentation='mobile'] .cronograma-mobile-event-card {
+  border-color: oklch(var(--brand-indigo-200) / 0.48);
+  background: oklch(var(--surface-1) / 0.96);
+  box-shadow: var(--elevation-1);
+}
+
+.cronograma-page[data-presentation='mobile'] .cronograma-mobile-event-card:active {
+  border-color: oklch(var(--brand-orange-500) / 0.62);
+  transform: scale(var(--interaction-press-scale));
+}
+
+.cronograma-page[data-presentation='mobile'] .cronograma-mobile-month-summary,
+.cronograma-page[data-presentation='mobile'] .cronograma-mobile-filter-summary {
+  border-color: oklch(var(--brand-indigo-200) / 0.46);
+  background: oklch(var(--brand-indigo-50) / 0.72);
+}
+
+@media (max-width: 1179px) {
+  .cronograma-page .cronograma-cycle-navigator {
+    border-radius: 1rem;
+  }
+
+  .cronograma-page .cronograma-cycle-year {
+    min-height: 5rem;
+  }
+}
+
+@media (max-width: 767px) {
+  .cronograma-page::before {
+    background-size: 34px 34px;
+  }
+
+  .cronograma-page .cronograma-month-summary {
+    min-height: 4.2rem;
+  }
+
+  .cronograma-page .cronograma-operational-event {
+    min-height: 5.2rem;
+    padding-inline: 0.35rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cronograma-page .cronograma-month-section,
+  .cronograma-page .cronograma-operational-event,
+  .cronograma-page .cronograma-cycle-year {
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .cronograma-page .cronograma-month-section,
+  .cronograma-page .cronograma-operational-event,
+  .cronograma-page .cronograma-temporal-nav,
+  .cronograma-page .cronograma-filter-surface {
+    border-color: oklch(var(--foreground) / 0.52);
+  }
+}

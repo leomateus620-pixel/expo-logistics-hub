@@ -74,7 +74,9 @@ export interface CronogramaSubevent {
   commissionSlug?: string;
   commission?: string;
   sortOrder?: number;
-  storage?: 'embedded' | 'relational';
+  storage?: 'embedded' | 'relational' | 'queued';
+  syncState?: 'pending' | 'failed';
+  syncError?: string | null;
   createdAt?: string | null;
   updatedAt?: string | null;
 }

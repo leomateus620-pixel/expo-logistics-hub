@@ -167,19 +167,17 @@ export function EventForm({
     submitEvent.preventDefault();
     if (isSaving) return;
 
-    if (presentation === 'mobile') {
-      const nextErrors: { title?: string; time?: string } = {};
-      if (!form.title.trim()) nextErrors.title = 'Informe um título para identificar o evento.';
-      if (form.startTime && form.endTime && form.endTime <= form.startTime) {
-        nextErrors.time = 'O horário final deve ser posterior ao horário inicial.';
-      }
-      setFieldErrors(nextErrors);
-      if (Object.keys(nextErrors).length > 0) {
-        window.requestAnimationFrame(() => {
-          document.getElementById(nextErrors.title ? fieldId('title') : fieldId('end'))?.focus();
-        });
-        return;
-      }
+    const nextErrors: { title?: string; time?: string } = {};
+    if (!form.title.trim()) nextErrors.title = 'Informe um título para identificar o evento.';
+    if (form.startTime && form.endTime && form.endTime <= form.startTime) {
+      nextErrors.time = 'O horário final deve ser posterior ao horário inicial.';
+    }
+    setFieldErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) {
+      window.requestAnimationFrame(() => {
+        document.getElementById(nextErrors.title ? fieldId('title') : fieldId('end'))?.focus();
+      });
+      return;
     }
 
     const normalizedDate = form.date?.trim() ? form.date : null;
@@ -195,8 +193,8 @@ export function EventForm({
 
     onSubmit({
       ...form,
-      title: form.title.trim() || (presentation === 'desktop' ? 'Novo evento do cronograma' : ''),
-      summary: form.summary.trim() || (presentation === 'desktop' ? 'Descrição executiva a complementar.' : ''),
+      title: form.title.trim(),
+      summary: form.summary.trim(),
       date: normalizedDate,
       year: nextYear,
       startTime: form.startTime?.trim() || undefined,
@@ -226,10 +224,11 @@ export function EventForm({
         <div className="grid gap-3">
           <div className="space-y-1.5">
             <Label htmlFor={fieldId('title')}>
-              Título {presentation === 'mobile' && <span aria-hidden="true" className="text-red-700">*</span>}
+              Título <span aria-hidden="true" className="text-red-700">*</span>
             </Label>
             <Input
               id={fieldId('title')}
+              aria-label="Título"
               value={form.title}
               onChange={(event) => {
                 update('title', event.target.value);
@@ -237,7 +236,7 @@ export function EventForm({
               }}
               placeholder="Ex: Abertura oficial Fenasoja 2028"
               className="bg-white/72"
-              required={presentation === 'mobile'}
+              required
               aria-invalid={Boolean(fieldErrors.title) || undefined}
               aria-describedby={fieldErrors.title ? fieldId('title-error') : undefined}
             />
@@ -249,7 +248,7 @@ export function EventForm({
           </div>
           <div className="space-y-1.5">
             <Label htmlFor={fieldId('summary')}>
-              Resumo executivo {presentation === 'mobile' && <span className="font-normal text-muted-foreground">(opcional)</span>}
+              Resumo executivo <span className="font-normal text-muted-foreground">(opcional)</span>
             </Label>
             <Textarea
               id={fieldId('summary')}

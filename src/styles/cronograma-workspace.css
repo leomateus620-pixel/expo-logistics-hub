@@ -280,16 +280,29 @@
 }
 
 .cronograma-workspace-sync-warning {
-  max-width: 920px;
+  max-width: 1040px;
   margin: 0 auto 1rem;
   padding: 0.9rem 1rem;
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   gap: 0.7rem;
   border: 1px solid oklch(var(--warning) / 0.28);
   border-radius: 17px;
   color: oklch(var(--warning-foreground));
   background: oklch(var(--warning) / 0.12);
+  box-shadow: var(--elevation-1);
+}
+
+.cronograma-workspace-sync-warning[data-state='syncing'] {
+  border-color: oklch(var(--info) / 0.30);
+  color: oklch(var(--brand-navy-900));
+  background: oklch(var(--info) / 0.09);
+}
+
+.cronograma-workspace-sync-warning[data-state='failed'] {
+  border-color: oklch(var(--destructive) / 0.30);
+  color: oklch(var(--brand-navy-900));
+  background: oklch(var(--destructive) / 0.07);
 }
 
 .cronograma-workspace-sync-warning > svg {
@@ -307,6 +320,24 @@
   margin-top: 0.15rem;
   font-size: 0.72rem;
   line-height: 1.45;
+}
+
+.cronograma-workspace-sync-warning > div {
+  min-width: 0;
+  flex: 1;
+}
+
+.cronograma-workspace-sync-action {
+  min-height: 38px;
+  flex: 0 0 auto;
+  border-color: oklch(var(--brand-indigo-300) / 0.54);
+  background: oklch(var(--neutral-0) / 0.76);
+  color: oklch(var(--brand-indigo-600));
+}
+
+.cronograma-workspace-sync-action svg {
+  width: 0.9rem;
+  height: 0.9rem;
 }
 
 .cronograma-main-anchor {
@@ -689,6 +720,16 @@
   background: oklch(var(--success) / 0.055);
 }
 
+.cronograma-subevent-node[data-storage='queued'] {
+  border-color: oklch(var(--brand-orange-500) / 0.42);
+  background:
+    linear-gradient(120deg, oklch(var(--brand-gold-400) / 0.10), oklch(var(--glass-surface-strong)) 46%);
+}
+
+.cronograma-subevent-node[data-storage='queued']::before {
+  background: linear-gradient(oklch(var(--brand-orange-500)), oklch(var(--brand-gold-500)));
+}
+
 .cronograma-subevent-node:hover {
   transform: translateY(-2px);
   border-color: oklch(var(--primary) / 0.28);
@@ -717,6 +758,41 @@
   width: 0.72rem;
   height: 0.72rem;
   color: var(--workspace-green);
+}
+
+.cronograma-subevent-node-state {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.35rem;
+}
+
+.cronograma-subevent-sync-badge {
+  min-height: 24px;
+  padding: 0 0.48rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  border: 1px solid oklch(var(--brand-orange-500) / 0.30);
+  border-radius: 999px;
+  color: oklch(var(--brand-navy-900));
+  background: oklch(var(--brand-gold-400) / 0.18);
+  font-size: 0.55rem;
+  font-weight: 900;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
+.cronograma-subevent-sync-badge[data-state='failed'] {
+  border-color: oklch(var(--destructive) / 0.28);
+  color: oklch(var(--semantic-red-700));
+  background: oklch(var(--destructive) / 0.08);
+}
+
+.cronograma-subevent-sync-badge svg {
+  width: 0.68rem;
+  height: 0.68rem;
 }
 
 .cronograma-subevent-node h3 {
@@ -805,6 +881,15 @@
 
 .cronograma-subevent-expanded strong {
   color: oklch(var(--foreground) / 0.82);
+}
+
+.cronograma-subevent-sync-error {
+  margin-top: 0.55rem;
+  padding-top: 0.55rem;
+  border-top: 1px solid oklch(var(--destructive) / 0.18);
+  color: oklch(var(--semantic-red-700)) !important;
+  font-size: 0.64rem !important;
+  font-weight: 750;
 }
 
 .cronograma-subevent-node-actions {
@@ -1616,5 +1701,21 @@
   .cronograma-subevent-node,
   .cronograma-add-thought {
     transition: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .cronograma-workspace-sync-warning {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .cronograma-workspace-sync-action {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .cronograma-subevent-node-state {
+    justify-content: flex-start;
   }
 }
