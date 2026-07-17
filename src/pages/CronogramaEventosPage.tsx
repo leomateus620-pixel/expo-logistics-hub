@@ -1,6 +1,6 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AlertTriangle, CalendarDays, Loader2, RefreshCw } from 'lucide-react';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CalendarMonthView } from '@/components/cronograma-eventos/CalendarMonthView';
 import {
   CategoryBoard,
@@ -53,6 +53,11 @@ import {
   type CronogramaCycleYear,
 } from '@/lib/cronograma-cycle';
 import type { CronogramaEvent as SourceCronogramaEvent } from '@/lib/cronograma-eventos';
+import {
+  FENASOJA_COUNTDOWN_ROUTE,
+  consumeFenasojaCountdownLaunch,
+  findFenasojaCountdownReturnFocus,
+} from '@/lib/fenasoja-countdown-navigation';
 import { filterTimelineEvents } from '@/lib/cronograma-timeline';
 
 const EventRelationshipWorkspace = lazy(async () => {
@@ -95,6 +100,7 @@ function isCronogramaView(value: string | null): value is CronogramaView {
 export default function CronogramaEventosPage() {
   const cronograma = useCronogramaEventos();
   const viewportIsMobilePresentation = useCronogramaMobilePresentation();
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [filters, setFilters] = useState<CronogramaFilters>(emptyFilters);
   const [selectedEvent, setSelectedEvent] = useState<CronogramaEvent | null>(null);
@@ -123,6 +129,35 @@ export default function CronogramaEventosPage() {
   const requestedTimelineMonth = isCycleMonthKey(searchParams.get('timelineMonth'))
     ? searchParams.get('timelineMonth')
     : null;
+  const openCountdownExperience = useCallback(() => {
+    navigate(FENASOJA_COUNTDOWN_ROUTE, {
+      state: { fromCronograma: true },
+    });
+  }, [navigate]);
+
+  useEffect(() => {
+    const launchContext = consumeFenasojaCountdownLaunch();
+    if (!launchContext) return;
+
+    let focusFrame = 0;
+    const scrollFrame = window.requestAnimationFrame(() => {
+      focusFrame = window.requestAnimationFrame(() => {
+        window.scrollTo({
+          left: launchContext.scrollX,
+          top: launchContext.scrollY,
+          behavior: 'auto',
+        });
+        findFenasojaCountdownReturnFocus(launchContext.focusId)?.focus({
+          preventScroll: true,
+        });
+      });
+    });
+
+    return () => {
+      window.cancelAnimationFrame(scrollFrame);
+      if (focusFrame) window.cancelAnimationFrame(focusFrame);
+    };
+  }, []);
 
   const setActiveView = (view: CronogramaView) => {
     setSearchParams((current) => {
@@ -640,6 +675,7 @@ export default function CronogramaEventosPage() {
               events={events}
               onNewEvent={openCreate}
               onOpenUndated={() => setActiveView('undated')}
+              onExpandCountdown={openCountdownExperience}
               canManage={cronograma.canManage}
             />
             <MobileCronogramaNavigation activeView={activeView} onChange={setActiveView} />
@@ -662,6 +698,7 @@ export default function CronogramaEventosPage() {
             events={events}
             onNewEvent={openCreate}
             onOpenUndated={() => setActiveView('undated')}
+            onExpandCountdown={openCountdownExperience}
             canManage={cronograma.canManage}
           />
 

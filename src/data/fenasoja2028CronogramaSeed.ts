@@ -1,3 +1,5 @@
+import { FENASOJA_2028_SCHEDULE } from '@/config/fenasoja-2028';
+
 export type CronogramaStatus =
   | 'planejado'
   | 'em_andamento'
@@ -82,10 +84,10 @@ export const cronogramaOfficialSheets = {
 } as const;
 
 export const cronogramaOfficialRange = {
-  startDate: '2026-06-04',
-  endDate: '2028-06-20',
-  mainEventStart: '2028-05-01',
-  mainEventEnd: '2028-05-07',
+  startDate: FENASOJA_2028_SCHEDULE.cycleStartDate,
+  endDate: FENASOJA_2028_SCHEDULE.cycleEndDate,
+  mainEventStart: FENASOJA_2028_SCHEDULE.openingDate,
+  mainEventEnd: FENASOJA_2028_SCHEDULE.mainEventEndDate,
 } as const;
 
 export const cronogramaCommissionOptions: CronogramaCommissionLink[] = [
@@ -1081,26 +1083,31 @@ export const fenasoja2028CronogramaSeed: CronogramaEventSeed[] = [
     sourceNote: 'Legenda oficial da planilha de reuniões: SS = Soy Summit.',
     hasExactDate: true,
   }),
-  period('2028-realizacao-fenasoja-2028', '2028-05-01', '2028-05-07', {
-    title: 'Realização da Fenasoja 2028',
-    description: 'Evento principal da feira, com destaque máximo na central temporal oficial.',
-    category: 'Evento principal',
-    eventType: 'evento_principal',
-    sourceYear: 2028,
-    priority: 'critica',
-    commissionSlug: 'comissao-central',
-    linkedCommissions: [
-      commissionBySlug.get('comissao-central')!,
-      commissionBySlug.get('logistica')!,
-      commissionBySlug.get('infraestrutura')!,
-      commissionBySlug.get('gastronomia')!,
-      commissionBySlug.get('seguranca')!,
-      commissionBySlug.get('limpeza')!,
-    ],
-    sourceSheet: cronogramaOfficialSheets[2028],
-    sourceRow: 'R19',
-    sourceNote: 'Destaque visual máximo solicitado para o período de 01/05/2028 a 07/05/2028.',
-  }),
+  period(
+    '2028-realizacao-fenasoja-2028',
+    FENASOJA_2028_SCHEDULE.openingDate,
+    FENASOJA_2028_SCHEDULE.mainEventEndDate,
+    {
+      title: 'Realização da Fenasoja 2028',
+      description: 'Evento principal da feira, com destaque máximo na central temporal oficial.',
+      category: 'Evento principal',
+      eventType: 'evento_principal',
+      sourceYear: 2028,
+      priority: 'critica',
+      commissionSlug: 'comissao-central',
+      linkedCommissions: [
+        commissionBySlug.get('comissao-central')!,
+        commissionBySlug.get('logistica')!,
+        commissionBySlug.get('infraestrutura')!,
+        commissionBySlug.get('gastronomia')!,
+        commissionBySlug.get('seguranca')!,
+        commissionBySlug.get('limpeza')!,
+      ],
+      sourceSheet: cronogramaOfficialSheets[2028],
+      sourceRow: 'R19',
+      sourceNote: 'Destaque visual máximo solicitado para o período de 01/05/2028 a 07/05/2028.',
+    },
+  ),
   undated('2028-reuniao-conselho-fiscal-sem-data', {
     title: 'Reunião do Conselho Fiscal',
     category: 'Reuniões institucionais',

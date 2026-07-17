@@ -1,12 +1,25 @@
-import { memo, useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, Clock3, Flag, Plus, Sprout } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  AlertTriangle,
+  ArrowUpRight,
+  Clock3,
+  Flag,
+  Maximize2,
+  Plus,
+  Sprout,
+} from 'lucide-react';
+import { FenasojaCountdownDigits } from '@/components/cronograma-eventos/FenasojaCountdownDigits';
 import { formatLongDateRange } from '@/components/cronograma-eventos/dateUtils';
+import { useFenasojaCountdown } from '@/hooks/useFenasojaCountdown';
 import {
   FENASOJA_2028_OPENING_LABEL,
-  formatFenasojaCountdownLabel,
   getFenasojaCountdown,
 } from '@/lib/fenasoja-countdown';
+import {
+  FENASOJA_COUNTDOWN_ROUTE,
+  rememberFenasojaCountdownLaunch,
+  runFenasojaCountdownViewTransition,
+} from '@/lib/fenasoja-countdown-navigation';
 import {
   buildCronogramaCommandSummary,
   getCronogramaCommandReference,
@@ -18,48 +31,70 @@ export interface FenasojaCountdownHeroProps {
   events: CronogramaEvent[];
   onNewEvent: () => void;
   onOpenUndated: () => void;
+  onExpandCountdown?: () => void;
   canManage: boolean;
   presentation: 'desktop' | 'mobile';
 }
 
-function useLiveFenasojaCountdown() {
-  const [referenceTime, setReferenceTime] = useState(() => Date.now());
+const LiveCountdownCore = memo(function LiveCountdownCore({
+  presentation,
+}: {
+  presentation: 'desktop' | 'mobile';
+}) {
+  const coreRef = useRef<HTMLDivElement>(null);
+  const [nearViewport, setNearViewport] = useState(true);
+  const { snapshot, accessibleLabel, announcement } = useFenasojaCountdown(nearViewport);
+  const isOpen = snapshot.phase === 'open';
 
   useEffect(() => {
-    let intervalId: number | undefined;
-    const delayToNextSecond = 1_000 - (Date.now() % 1_000);
-    const timeoutId = window.setTimeout(() => {
-      setReferenceTime(Date.now());
-      intervalId = window.setInterval(() => setReferenceTime(Date.now()), 1_000);
-    }, delayToNextSecond);
+    const node = coreRef.current;
+    if (!node || typeof IntersectionObserver === 'undefined') return;
 
-    return () => {
-      window.clearTimeout(timeoutId);
-      if (intervalId !== undefined) window.clearInterval(intervalId);
-    };
+    const observer = new IntersectionObserver(
+      ([entry]) => setNearViewport(entry.isIntersecting),
+      { rootMargin: '160px 0px' },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
   }, []);
 
-  return useMemo(() => getFenasojaCountdown(referenceTime), [referenceTime]);
-}
-
-const CountdownUnit = memo(function CountdownUnit({
-  value,
-  label,
-  unit,
-}: {
-  value: number;
-  label: string;
-  unit: 'days' | 'hours' | 'minutes' | 'seconds';
-}) {
-  const formatted = String(value).padStart(unit === 'days' ? 3 : 2, '0');
-
   return (
-    <span className="fenasoja-countdown-unit" data-unit={unit}>
-      <span className="fenasoja-countdown-value" aria-hidden="true">
-        <span>{formatted}</span>
-      </span>
-      <span className="fenasoja-countdown-unit-label">{label}</span>
-    </span>
+    <div ref={coreRef} className="fenasoja-countdown-main">
+      <div className="fenasoja-countdown-story">
+        <p className="fenasoja-countdown-overline">
+          <span aria-hidden="true" />
+          A próxima grande história começa em
+        </p>
+        <h1 id={`fenasoja-countdown-title-${presentation}`}>
+          <span className="fenasoja-countdown-wordmark">FENASOJA</span>
+          <span className="fenasoja-countdown-edition">2028</span>
+        </h1>
+        <p className="fenasoja-countdown-lead">
+          {isOpen ? (
+            'A feira está oficialmente aberta.'
+          ) : (
+            <>
+              Faltam <strong>{snapshot.days} dias</strong> para a abertura oficial.
+            </>
+          )}
+        </p>
+      </div>
+
+      <section className="fenasoja-countdown-clock" aria-label="Contagem regressiva para a Fenasoja 2028">
+        <div className="fenasoja-countdown-clock-heading">
+          <span><Clock3 aria-hidden="true" /> Tempo até a abertura</span>
+          <span className="fenasoja-countdown-live"><i aria-hidden="true" /> Atualização em tempo real</span>
+        </div>
+
+        <FenasojaCountdownDigits
+          snapshot={snapshot}
+          accessibleLabel={accessibleLabel}
+        />
+        <p className="sr-only" aria-live="polite" aria-atomic="true">
+          {announcement}
+        </p>
+      </section>
+    </div>
   );
 });
 
@@ -67,84 +102,104 @@ export function FenasojaCountdownHero({
   events,
   onNewEvent,
   onOpenUndated,
+  onExpandCountdown,
   canManage,
   presentation,
 }: FenasojaCountdownHeroProps) {
-  const countdown = useLiveFenasojaCountdown();
+  const [isExpanding, setIsExpanding] = useState(false);
   const referenceKey = getCronogramaCommandReference();
   const { snapshot: timelineSnapshot, nextCountdown } = useMemo(
     () => buildCronogramaCommandSummary(events, referenceKey),
     [events, referenceKey],
   );
+  const cycleProgress = getFenasojaCountdown().cycleProgress;
   const nextAction = timelineSnapshot.nextOfficialAction;
-  const accessibleCountdown = formatFenasojaCountdownLabel(countdown);
-  const isOpen = countdown.phase === 'open';
+  const expandControlId = `fenasoja-countdown-expand-${presentation}`;
+
+  const openExpandedCountdown = useCallback(() => {
+    if (isExpanding) return;
+
+    rememberFenasojaCountdownLaunch(expandControlId);
+    setIsExpanding(true);
+    runFenasojaCountdownViewTransition(() => {
+      if (onExpandCountdown) {
+        onExpandCountdown();
+        return;
+      }
+
+      window.location.assign(FENASOJA_COUNTDOWN_ROUTE);
+    });
+  }, [expandControlId, isExpanding, onExpandCountdown]);
 
   return (
     <div className="fenasoja-countdown-wrapper" data-presentation={presentation}>
       <header
         className="fenasoja-countdown-hero"
         data-presentation={presentation}
-        data-phase={countdown.phase}
         aria-labelledby={`fenasoja-countdown-title-${presentation}`}
       >
         <span className="fenasoja-countdown-ambient" aria-hidden="true" />
+        <span className="fenasoja-countdown-soy-cluster" aria-hidden="true">
+          <i />
+          <i />
+          <i />
+        </span>
 
         <div className="fenasoja-countdown-content">
           <div className="fenasoja-countdown-topline">
             <div className="fenasoja-countdown-mark">
-              <Sprout aria-hidden="true" />
-              <span>Contagem oficial</span>
-              <span className="fenasoja-countdown-mark-divider" aria-hidden="true" />
-              <span>Cronograma e Eventos</span>
+              <span className="fenasoja-countdown-mark-icon" aria-hidden="true">
+                <Sprout />
+              </span>
+              <span>
+                <strong>Contagem oficial</strong>
+                <small>Cronograma e Eventos</small>
+              </span>
             </div>
 
-            {canManage && (
-              <Button
+            <div className="fenasoja-countdown-actions">
+              <button
+                id={expandControlId}
                 type="button"
-                size="sm"
-                onClick={onNewEvent}
-                className="fenasoja-countdown-new-event"
+                className="fenasoja-countdown-expand"
+                data-fenasoja-countdown-expand
+                onClick={openExpandedCountdown}
+                disabled={isExpanding}
+                data-loading={isExpanding || undefined}
+                aria-busy={isExpanding}
+                aria-label="Ver contagem completa da Fenasoja 2028"
               >
-                <Plus aria-hidden="true" />
-                Novo evento
-              </Button>
-            )}
+                <span className="fenasoja-countdown-expand-icon" aria-hidden="true">
+                  <Maximize2 />
+                </span>
+                <span>
+                  <strong>{isExpanding ? 'Abrindo experiência…' : 'Ver contagem completa'}</strong>
+                  <small>Experiência imersiva</small>
+                </span>
+                <ArrowUpRight className="fenasoja-countdown-expand-arrow" aria-hidden="true" />
+              </button>
+
+              {canManage && (
+                <button
+                  type="button"
+                  onClick={onNewEvent}
+                  className="fenasoja-countdown-new-event"
+                >
+                  <Plus aria-hidden="true" />
+                  <span>Novo evento</span>
+                </button>
+              )}
+            </div>
           </div>
 
-          <div className="fenasoja-countdown-main">
-            <div className="fenasoja-countdown-story">
-              <p className="fenasoja-countdown-overline">Nossa próxima grande história começa em</p>
-              <h1 id={`fenasoja-countdown-title-${presentation}`}>
-                FENASOJA <span>2028</span>
-              </h1>
-              <p className="fenasoja-countdown-lead">
-                {isOpen ? (
-                  'A feira está oficialmente aberta.'
-                ) : (
-                  <>Faltam <strong>{countdown.days} dias</strong> para a abertura oficial.</>
-                )}
-              </p>
-            </div>
+          <LiveCountdownCore presentation={presentation} />
 
-            <section className="fenasoja-countdown-clock" aria-label="Contagem regressiva para a Fenasoja 2028">
-              <div className="fenasoja-countdown-clock-heading">
-                <span><Clock3 aria-hidden="true" /> Tempo até a abertura</span>
-                <span className="fenasoja-countdown-live"><i aria-hidden="true" /> Em tempo real</span>
-              </div>
-
-              <div
-                className="fenasoja-countdown-grid"
-                role="timer"
-                aria-live="off"
-                aria-label={accessibleCountdown}
-              >
-                <CountdownUnit value={countdown.days} label="dias" unit="days" />
-                <CountdownUnit value={countdown.hours} label="horas" unit="hours" />
-                <CountdownUnit value={countdown.minutes} label="min" unit="minutes" />
-                <CountdownUnit value={countdown.seconds} label="seg" unit="seconds" />
-              </div>
-            </section>
+          <div className="fenasoja-countdown-card-meta">
+            <span>Marco oficial</span>
+            <i aria-hidden="true" />
+            <span>{FENASOJA_2028_OPENING_LABEL}</span>
+            <i aria-hidden="true" />
+            <span>Horário de Brasília</span>
           </div>
         </div>
       </header>
@@ -158,12 +213,12 @@ export function FenasojaCountdownHero({
           <div className="fenasoja-countdown-progress">
             <div className="fenasoja-countdown-progress-heading">
               <span>Preparação 2026—2028</span>
-              <strong>{countdown.cycleProgress}% do ciclo temporal</strong>
+              <strong>{cycleProgress}% do ciclo temporal</strong>
             </div>
             <span className="fenasoja-countdown-progress-track" aria-hidden="true">
-              <span style={{ width: `${countdown.cycleProgress}%` }} />
+              <span style={{ width: `${cycleProgress}%` }} />
             </span>
-            <p>Marco oficial · {FENASOJA_2028_OPENING_LABEL} · horário de Brasília</p>
+            <p>Planejamento conectado ao marco oficial da edição 2028.</p>
           </div>
 
           <div className="fenasoja-countdown-operations" aria-label="Resumo operacional do cronograma">
@@ -203,4 +258,3 @@ export function FenasojaCountdownHero({
     </div>
   );
 }
-

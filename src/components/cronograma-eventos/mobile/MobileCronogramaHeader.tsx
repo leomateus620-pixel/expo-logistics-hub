@@ -6,6 +6,7 @@ interface MobileCronogramaHeaderProps {
   events: CronogramaEvent[];
   onNewEvent: () => void;
   onOpenUndated: () => void;
+  onExpandCountdown?: () => void;
   canManage: boolean;
 }
 
@@ -13,6 +14,7 @@ export function MobileCronogramaHeader({
   events,
   onNewEvent,
   onOpenUndated,
+  onExpandCountdown,
   canManage,
 }: MobileCronogramaHeaderProps) {
   return (
@@ -20,6 +22,7 @@ export function MobileCronogramaHeader({
       events={events}
       onNewEvent={onNewEvent}
       onOpenUndated={onOpenUndated}
+      onExpandCountdown={onExpandCountdown}
       canManage={canManage}
       presentation="mobile"
     />
