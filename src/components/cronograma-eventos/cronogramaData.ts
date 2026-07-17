@@ -47,6 +47,7 @@ export const categoryTone: Record<CronogramaCategory, string> = {
   comunicacao: 'bg-sky-700',
   comercial: 'bg-amber-700',
   cerimonial: 'bg-rose-700',
+  representacoes: 'bg-indigo-700',
 };
 
 export const officialCronogramaEvents: CronogramaEvent[] = [
