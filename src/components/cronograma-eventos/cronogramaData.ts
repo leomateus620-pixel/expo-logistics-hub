@@ -16,6 +16,7 @@ export const categoryLabels: Record<CronogramaCategory, string> = {
   comunicacao: 'Comunicação',
   comercial: 'Comercial',
   cerimonial: 'Cerimonial',
+  representacoes: 'Representações',
 };
 
 export const statusLabels: Record<CronogramaStatus, string> = {
