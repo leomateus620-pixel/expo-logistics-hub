@@ -5,11 +5,13 @@ export function CronogramaCommandHeader({
   events,
   onNewEvent,
   onOpenUndated,
+  onExpandCountdown,
   canManage,
 }: {
   events: CronogramaEvent[];
   onNewEvent: () => void;
   onOpenUndated: () => void;
+  onExpandCountdown?: () => void;
   canManage: boolean;
 }) {
   return (
@@ -17,6 +19,7 @@ export function CronogramaCommandHeader({
       events={events}
       onNewEvent={onNewEvent}
       onOpenUndated={onOpenUndated}
+      onExpandCountdown={onExpandCountdown}
       canManage={canManage}
       presentation="desktop"
     />

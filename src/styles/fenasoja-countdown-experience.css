@@ -1,0 +1,761 @@
+body[data-countdown-experience='open'] {
+  background: oklch(var(--brand-navy-950));
+}
+
+.fenasoja-countdown-experience {
+  position: fixed;
+  isolation: isolate;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 42%, oklch(var(--brand-indigo-500) / 0.2), transparent 44%),
+    oklch(var(--brand-navy-950));
+  color: white;
+  overscroll-behavior: none;
+}
+
+.fenasoja-countdown-experience__photographic,
+.fenasoja-countdown-experience__photographic picture,
+.fenasoja-countdown-experience__photographic img,
+.fenasoja-countdown-experience__canvas,
+.fenasoja-countdown-experience__vignette,
+.fenasoja-countdown-experience__grain {
+  position: absolute !important;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.fenasoja-countdown-experience__photographic {
+  z-index: 0;
+  overflow: hidden;
+  background: oklch(var(--brand-navy-950));
+}
+
+.fenasoja-countdown-experience__photographic img {
+  object-fit: cover;
+  object-position: center;
+  opacity: 0.82;
+  filter: saturate(0.92) contrast(1.08) brightness(0.76);
+  transform: scale(1.012);
+  animation: fenasoja-experience-photo-in 720ms var(--ease-decelerate) both;
+}
+
+.fenasoja-countdown-experience__canvas {
+  z-index: 1 !important;
+  pointer-events: none !important;
+}
+
+.fenasoja-countdown-experience__vignette {
+  z-index: 2;
+  background:
+    radial-gradient(ellipse at center, transparent 28%, rgb(1 7 18 / 0.28) 72%, rgb(1 5 14 / 0.76) 118%),
+    linear-gradient(180deg, rgb(2 12 31 / 0.74) 0%, transparent 22%, transparent 70%, rgb(2 10 26 / 0.72) 100%),
+    linear-gradient(90deg, rgb(2 10 24 / 0.36), transparent 25%, transparent 75%, rgb(2 10 24 / 0.36));
+  pointer-events: none;
+}
+
+.fenasoja-countdown-experience__grain {
+  z-index: 3;
+  opacity: 0.12;
+  background-image:
+    radial-gradient(circle, rgb(255 255 255 / 0.36) 0 0.45px, transparent 0.65px),
+    radial-gradient(circle, rgb(255 212 110 / 0.22) 0 0.35px, transparent 0.55px);
+  background-position: 0 0, 7px 11px;
+  background-size: 13px 13px, 17px 17px;
+  mix-blend-mode: soft-light;
+  pointer-events: none;
+}
+
+.fenasoja-countdown-experience__header,
+.fenasoja-countdown-experience__content,
+.fenasoja-countdown-experience__footer {
+  position: relative;
+  z-index: 5;
+}
+
+.fenasoja-countdown-experience__header {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  align-items: center;
+  gap: 1rem;
+  padding:
+    max(1rem, env(safe-area-inset-top))
+    max(1.25rem, env(safe-area-inset-right))
+    0.65rem
+    max(1.25rem, env(safe-area-inset-left));
+  animation: fenasoja-experience-header-in var(--motion-structural) var(--ease-decelerate) 80ms both;
+}
+
+.fenasoja-countdown-experience__brand {
+  justify-self: start;
+}
+
+.fenasoja-countdown-experience__brand .fenasoja-brand__mark {
+  border: 1px solid rgb(255 255 255 / 0.16);
+  background: rgb(255 255 255 / 0.94);
+  box-shadow:
+    0 16px 28px -18px rgb(0 0 0 / 0.9),
+    inset 0 1px 0 rgb(255 255 255 / 0.88);
+}
+
+.fenasoja-countdown-experience__status {
+  display: inline-flex;
+  min-height: 2rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.42rem;
+  border: 1px solid rgb(255 255 255 / 0.12);
+  border-radius: 999px;
+  padding: 0.4rem 0.7rem;
+  background: rgb(3 24 52 / 0.44);
+  color: rgb(255 255 255 / 0.72);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08);
+  font-size: 0.62rem;
+  font-weight: 780;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.fenasoja-countdown-experience__status svg {
+  width: 0.75rem;
+  height: 0.75rem;
+  color: oklch(var(--brand-green));
+  filter: drop-shadow(0 0 8px oklch(var(--brand-green) / 0.44));
+}
+
+.fenasoja-countdown-experience__return {
+  display: inline-flex;
+  min-height: 2.75rem;
+  justify-self: end;
+  align-items: center;
+  gap: 0.55rem;
+  border: 1px solid rgb(255 255 255 / 0.18);
+  border-radius: 0.85rem;
+  padding: 0.5rem 0.55rem 0.5rem 0.72rem;
+  background:
+    linear-gradient(145deg, rgb(255 255 255 / 0.1), rgb(255 255 255 / 0.035)),
+    rgb(3 24 52 / 0.54);
+  color: white;
+  box-shadow:
+    0 16px 32px -22px rgb(0 0 0 / 0.88),
+    inset 0 1px 0 rgb(255 255 255 / 0.12);
+  font-family: inherit;
+  font-size: 0.68rem;
+  font-weight: 820;
+  outline: none;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition:
+    border-color var(--motion-fast) var(--ease-standard),
+    background-color var(--motion-fast) var(--ease-standard),
+    box-shadow var(--motion-base) var(--ease-standard),
+    transform var(--motion-fast) var(--ease-decelerate);
+}
+
+.fenasoja-countdown-experience__return > svg {
+  width: 0.95rem;
+  height: 0.95rem;
+  color: oklch(var(--brand-gold-400));
+}
+
+.fenasoja-countdown-experience__return kbd {
+  display: inline-grid;
+  min-width: 1.7rem;
+  height: 1.35rem;
+  place-items: center;
+  border: 1px solid rgb(255 255 255 / 0.14);
+  border-radius: 0.38rem;
+  background: rgb(255 255 255 / 0.07);
+  color: rgb(255 255 255 / 0.5);
+  font-family: inherit;
+  font-size: 0.5rem;
+  font-weight: 750;
+}
+
+.fenasoja-countdown-experience__return:focus-visible {
+  outline: 3px solid oklch(var(--focus-ring));
+  outline-offset: 3px;
+}
+
+.fenasoja-countdown-experience__content {
+  display: grid;
+  width: min(100%, 78rem);
+  min-width: 0;
+  min-height: 0;
+  align-self: center;
+  justify-self: center;
+  align-content: center;
+  gap: clamp(1.1rem, 2.7vh, 2rem);
+  padding:
+    clamp(0.75rem, 2vh, 1.5rem)
+    max(1.25rem, env(safe-area-inset-right))
+    clamp(0.75rem, 2vh, 1.5rem)
+    max(1.25rem, env(safe-area-inset-left));
+}
+
+.fenasoja-countdown-experience__identity {
+  min-width: 0;
+  text-align: center;
+  animation: fenasoja-experience-identity-in 520ms var(--ease-decelerate) 120ms both;
+}
+
+.fenasoja-countdown-experience__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.48rem;
+  margin: 0;
+  color: oklch(var(--brand-gold-400));
+  font-size: clamp(0.62rem, 0.75vw, 0.72rem);
+  font-weight: 880;
+  letter-spacing: 0.16em;
+  text-shadow: 0 0 18px oklch(var(--brand-gold-500) / 0.18);
+  text-transform: uppercase;
+}
+
+.fenasoja-countdown-experience__eyebrow svg {
+  width: 0.88rem;
+  height: 0.88rem;
+}
+
+.fenasoja-countdown-experience__identity h1 {
+  margin: 0.48rem 0 0;
+  color: white;
+  font-size: clamp(3.4rem, 7vw, 7.1rem);
+  font-weight: 950;
+  letter-spacing: -0.082em;
+  line-height: 0.82;
+  text-shadow:
+    0 2px 0 rgb(255 255 255 / 0.08),
+    0 24px 50px rgb(0 0 0 / 0.46);
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+
+.fenasoja-countdown-experience__identity h1 > span {
+  color: oklch(var(--brand-gold-400));
+  text-shadow:
+    0 1px 0 rgb(255 247 192 / 0.28),
+    0 0 38px oklch(var(--brand-gold-500) / 0.2);
+}
+
+.fenasoja-countdown-experience__opening {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  margin: 0.85rem 0 0;
+  color: rgb(255 255 255 / 0.7);
+  font-size: clamp(0.72rem, 0.9vw, 0.86rem);
+  font-weight: 650;
+}
+
+.fenasoja-countdown-experience__opening svg {
+  width: 0.9rem;
+  height: 0.9rem;
+  color: oklch(var(--brand-gold-400));
+}
+
+.fenasoja-countdown-experience__clock {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid oklch(var(--brand-gold-400) / 0.3);
+  border-radius: clamp(1rem, 1.6vw, 1.35rem);
+  padding: clamp(0.75rem, 1.3vw, 1rem);
+  background:
+    radial-gradient(circle at 50% -18%, oklch(var(--brand-gold-500) / 0.13), transparent 35%),
+    linear-gradient(145deg, rgb(255 255 255 / 0.095), rgb(255 255 255 / 0.025)),
+    rgb(3 24 52 / 0.72);
+  box-shadow:
+    0 42px 88px -42px rgb(0 0 0 / 0.88),
+    0 18px 42px -32px oklch(var(--brand-gold-500) / 0.52),
+    inset 0 1px 0 rgb(255 255 255 / 0.14),
+    inset 0 -1px 0 rgb(0 0 0 / 0.48);
+  backdrop-filter: blur(14px) saturate(1.08);
+  -webkit-backdrop-filter: blur(14px) saturate(1.08);
+  view-transition-name: fenasoja-countdown-landmark;
+  animation: fenasoja-experience-clock-in 560ms var(--ease-decelerate) 160ms both;
+}
+
+.fenasoja-countdown-experience__clock::before {
+  position: absolute;
+  inset: 0 8% auto;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, oklch(var(--brand-gold-400) / 0.78), transparent);
+  box-shadow: 0 9px 30px oklch(var(--brand-gold-500) / 0.22);
+  content: '';
+}
+
+.fenasoja-countdown-experience__clock-topline {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+  margin: 0 0.15rem 0.7rem;
+  color: rgb(255 255 255 / 0.56);
+  font-size: 0.58rem;
+  font-weight: 760;
+  letter-spacing: 0.055em;
+  text-transform: uppercase;
+}
+
+.fenasoja-countdown-experience__clock-topline > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.fenasoja-countdown-experience__clock-topline svg {
+  width: 0.8rem;
+  height: 0.8rem;
+  color: oklch(var(--brand-gold-400));
+}
+
+.fenasoja-countdown-experience .fenasoja-countdown-grid[data-variant='immersive'] {
+  border-color: rgb(255 255 255 / 0.12);
+  border-radius: 0.92rem;
+  background:
+    radial-gradient(circle at 50% -30%, rgb(255 255 255 / 0.08), transparent 44%),
+    rgb(1 10 25 / 0.48);
+}
+
+.fenasoja-countdown-experience .fenasoja-countdown-grid[data-variant='immersive'] .fenasoja-countdown-unit {
+  min-height: clamp(7rem, 15vh, 10.5rem);
+  background:
+    linear-gradient(180deg, rgb(255 255 255 / 0.02), transparent),
+    radial-gradient(circle at 50% -20%, oklch(var(--brand-gold-500) / 0.07), transparent 52%);
+}
+
+.fenasoja-countdown-experience .fenasoja-countdown-grid[data-variant='immersive'] .fenasoja-countdown-value {
+  font-size: clamp(3rem, 7vw, 6.8rem);
+  font-weight: 690;
+  letter-spacing: -0.09em;
+  text-indent: -0.09em;
+  text-shadow: 0 18px 34px rgb(0 0 0 / 0.34);
+}
+
+.fenasoja-countdown-experience .fenasoja-countdown-grid[data-variant='immersive'] .fenasoja-countdown-unit-label {
+  margin-top: 0.72rem;
+  color: rgb(255 255 255 / 0.64);
+  font-size: clamp(0.52rem, 0.72vw, 0.68rem);
+  letter-spacing: 0.18em;
+}
+
+.fenasoja-countdown-experience__clock-footer {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(1.5rem, 1fr) auto minmax(1.5rem, 1fr);
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.72rem;
+}
+
+.fenasoja-countdown-experience__clock-footer > span {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.16));
+}
+
+.fenasoja-countdown-experience__clock-footer > span:last-child {
+  background: linear-gradient(90deg, rgb(255 255 255 / 0.16), transparent);
+}
+
+.fenasoja-countdown-experience__clock-footer p {
+  margin: 0;
+  color: rgb(255 255 255 / 0.5);
+  font-size: 0.55rem;
+  font-weight: 680;
+  letter-spacing: 0.05em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.fenasoja-countdown-experience__footer {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding:
+    0.55rem
+    max(1.25rem, env(safe-area-inset-right))
+    max(0.8rem, env(safe-area-inset-bottom))
+    max(1.25rem, env(safe-area-inset-left));
+  color: rgb(255 255 255 / 0.46);
+  font-size: 0.56rem;
+  font-weight: 660;
+  letter-spacing: 0.04em;
+  text-align: center;
+  text-transform: uppercase;
+  animation: fenasoja-experience-header-in var(--motion-structural) var(--ease-decelerate) 220ms both;
+}
+
+.fenasoja-countdown-experience__live-dot {
+  width: 0.38rem;
+  height: 0.38rem;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: oklch(var(--brand-green));
+  box-shadow:
+    0 0 0 3px oklch(var(--brand-green) / 0.12),
+    0 0 12px oklch(var(--brand-green) / 0.44);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .fenasoja-countdown-experience__return:hover {
+    border-color: oklch(var(--brand-gold-400) / 0.54);
+    background:
+      linear-gradient(145deg, oklch(var(--brand-gold-500) / 0.13), rgb(255 255 255 / 0.055)),
+      rgb(3 24 52 / 0.62);
+    box-shadow:
+      0 20px 36px -24px rgb(0 0 0 / 0.9),
+      0 14px 28px -24px oklch(var(--brand-gold-500) / 0.52),
+      inset 0 1px 0 rgb(255 255 255 / 0.16);
+    transform: translateY(-1px);
+  }
+}
+
+.fenasoja-countdown-experience__return:active {
+  transform: translateY(0) scale(0.98);
+  transition-duration: var(--motion-instant);
+}
+
+@media (max-width: 760px) {
+  .fenasoja-countdown-experience__photographic img {
+    object-position: center 54%;
+    opacity: 0.76;
+    filter: saturate(0.9) contrast(1.1) brightness(0.68);
+  }
+
+  .fenasoja-countdown-experience__vignette {
+    background:
+      radial-gradient(ellipse at 50% 40%, transparent 14%, rgb(1 7 18 / 0.32) 66%, rgb(1 5 14 / 0.74) 112%),
+      linear-gradient(180deg, rgb(2 12 31 / 0.76) 0%, transparent 24%, transparent 62%, rgb(2 10 26 / 0.78) 100%);
+  }
+
+  .fenasoja-countdown-experience__header {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.6rem;
+    padding:
+      max(0.7rem, env(safe-area-inset-top))
+      max(0.8rem, env(safe-area-inset-right))
+      0.35rem
+      max(0.8rem, env(safe-area-inset-left));
+  }
+
+  .fenasoja-countdown-experience__status {
+    display: none;
+  }
+
+  .fenasoja-countdown-experience__return {
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    padding-inline: 0.7rem;
+  }
+
+  .fenasoja-countdown-experience__return kbd {
+    display: none;
+  }
+
+  .fenasoja-countdown-experience__content {
+    gap: clamp(0.8rem, 2.2vh, 1.25rem);
+    padding:
+      0.55rem
+      max(0.75rem, env(safe-area-inset-right))
+      0.55rem
+      max(0.75rem, env(safe-area-inset-left));
+  }
+
+  .fenasoja-countdown-experience__eyebrow {
+    font-size: 0.55rem;
+    letter-spacing: 0.13em;
+  }
+
+  .fenasoja-countdown-experience__identity h1 {
+    margin-top: 0.4rem;
+    font-size: clamp(2.85rem, 14.8vw, 4.35rem);
+    line-height: 0.84;
+  }
+
+  .fenasoja-countdown-experience__opening {
+    margin-top: 0.68rem;
+    font-size: 0.68rem;
+  }
+
+  .fenasoja-countdown-experience__clock {
+    border-radius: 1rem;
+    padding: 0.62rem;
+    backdrop-filter: blur(10px) saturate(1.04);
+    -webkit-backdrop-filter: blur(10px) saturate(1.04);
+  }
+
+  .fenasoja-countdown-experience__clock-topline {
+    margin-bottom: 0.52rem;
+    font-size: 0.5rem;
+  }
+
+  .fenasoja-countdown-experience .fenasoja-countdown-grid[data-variant='immersive'] {
+    border-radius: 0.74rem;
+  }
+
+  .fenasoja-countdown-experience .fenasoja-countdown-grid[data-variant='immersive'] .fenasoja-countdown-unit {
+    min-height: clamp(5.2rem, 14vh, 7.4rem);
+    padding-inline: 0.15rem;
+  }
+
+  .fenasoja-countdown-experience .fenasoja-countdown-grid[data-variant='immersive'] .fenasoja-countdown-value {
+    font-size: clamp(2rem, 11.5vw, 3.25rem);
+  }
+
+  .fenasoja-countdown-experience .fenasoja-countdown-grid[data-variant='immersive'] .fenasoja-countdown-unit-label {
+    margin-top: 0.45rem;
+    font-size: clamp(0.42rem, 2vw, 0.52rem);
+    letter-spacing: 0.1em;
+  }
+
+  .fenasoja-countdown-experience__clock-footer {
+    margin-top: 0.56rem;
+  }
+
+  .fenasoja-countdown-experience__clock-footer p {
+    font-size: 0.46rem;
+  }
+
+  .fenasoja-countdown-experience__footer {
+    padding-top: 0.35rem;
+    padding-bottom: max(0.55rem, env(safe-area-inset-bottom));
+    font-size: 0.48rem;
+  }
+}
+
+@media (max-width: 420px) {
+  .fenasoja-countdown-experience__return > span {
+    max-width: 4.4rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .fenasoja-countdown-experience__opening {
+    max-width: 19rem;
+    margin-inline: auto;
+    line-height: 1.35;
+  }
+}
+
+@media (max-width: 350px) {
+  .fenasoja-countdown-experience__brand .fenasoja-brand__subtitle {
+    display: none;
+  }
+
+  .fenasoja-countdown-experience__return > span {
+    display: none;
+  }
+
+  .fenasoja-countdown-experience__identity h1 {
+    font-size: 2.65rem;
+  }
+
+  .fenasoja-countdown-experience .fenasoja-countdown-grid[data-variant='immersive'] .fenasoja-countdown-value {
+    font-size: 1.9rem;
+  }
+}
+
+@media (max-height: 700px) {
+  .fenasoja-countdown-experience__content {
+    gap: 0.7rem;
+    padding-block: 0.45rem;
+  }
+
+  .fenasoja-countdown-experience__identity h1 {
+    font-size: clamp(2.65rem, 8.5vh, 4.7rem);
+  }
+
+  .fenasoja-countdown-experience__opening {
+    margin-top: 0.5rem;
+  }
+
+  .fenasoja-countdown-experience .fenasoja-countdown-grid[data-variant='immersive'] .fenasoja-countdown-unit {
+    min-height: clamp(4.75rem, 19vh, 7rem);
+  }
+
+  .fenasoja-countdown-experience__footer {
+    padding-top: 0.25rem;
+    padding-bottom: max(0.4rem, env(safe-area-inset-bottom));
+  }
+}
+
+@media (orientation: landscape) and (max-height: 620px) {
+  .fenasoja-countdown-experience__header {
+    padding-top: max(0.45rem, env(safe-area-inset-top));
+  }
+
+  .fenasoja-countdown-experience__content {
+    width: min(100%, 82rem);
+    grid-template-columns: minmax(0, 0.62fr) minmax(0, 1.38fr);
+    align-items: center;
+    gap: 1rem;
+  }
+
+  .fenasoja-countdown-experience__identity {
+    text-align: left;
+  }
+
+  .fenasoja-countdown-experience__eyebrow,
+  .fenasoja-countdown-experience__opening {
+    justify-content: flex-start;
+  }
+
+  .fenasoja-countdown-experience__identity h1 {
+    font-size: clamp(2.65rem, 8vw, 4.8rem);
+  }
+
+  .fenasoja-countdown-experience__clock {
+    min-width: 0;
+  }
+
+  .fenasoja-countdown-experience .fenasoja-countdown-grid[data-variant='immersive'] .fenasoja-countdown-unit {
+    min-height: clamp(4.7rem, 27vh, 7.1rem);
+  }
+
+  .fenasoja-countdown-experience .fenasoja-countdown-grid[data-variant='immersive'] .fenasoja-countdown-value {
+    font-size: clamp(2.1rem, 6.5vw, 3.8rem);
+  }
+
+  .fenasoja-countdown-experience__footer {
+    display: none;
+  }
+}
+
+@media (max-width: 700px) and (max-height: 620px) {
+  .fenasoja-countdown-experience {
+    grid-template-rows: auto auto auto;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .fenasoja-countdown-experience__content {
+    width: 100%;
+    grid-template-columns: minmax(0, 1fr);
+    align-self: start;
+  }
+
+  .fenasoja-countdown-experience__identity {
+    text-align: center;
+  }
+
+  .fenasoja-countdown-experience__eyebrow,
+  .fenasoja-countdown-experience__opening {
+    justify-content: center;
+  }
+
+  .fenasoja-countdown-experience__identity h1 {
+    font-size: clamp(2.2rem, 11vw, 3.1rem);
+  }
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  .fenasoja-countdown-experience__status,
+  .fenasoja-countdown-experience__return,
+  .fenasoja-countdown-experience__clock {
+    background: oklch(var(--brand-navy-900));
+  }
+}
+
+@media (prefers-contrast: more), (prefers-reduced-transparency: reduce) {
+  .fenasoja-countdown-experience__vignette {
+    background:
+      radial-gradient(ellipse at center, transparent 18%, rgb(1 5 14 / 0.58) 72%, rgb(1 5 14 / 0.9) 112%),
+      linear-gradient(180deg, rgb(2 12 31 / 0.88), transparent 26%, transparent 68%, rgb(2 10 26 / 0.88));
+  }
+
+  .fenasoja-countdown-experience__status,
+  .fenasoja-countdown-experience__return,
+  .fenasoja-countdown-experience__clock {
+    border-color: rgb(255 255 255 / 0.54);
+    background: oklch(var(--brand-navy-900));
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .fenasoja-countdown-experience__opening,
+  .fenasoja-countdown-experience__clock-topline,
+  .fenasoja-countdown-experience__clock-footer p,
+  .fenasoja-countdown-experience__footer {
+    color: rgb(255 255 255 / 0.82);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fenasoja-countdown-experience__photographic img,
+  .fenasoja-countdown-experience__header,
+  .fenasoja-countdown-experience__identity,
+  .fenasoja-countdown-experience__clock,
+  .fenasoja-countdown-experience__footer {
+    animation: none !important;
+  }
+
+  .fenasoja-countdown-experience__return {
+    transition-duration: 0.01ms !important;
+  }
+
+  ::view-transition-old(fenasoja-countdown-landmark),
+  ::view-transition-new(fenasoja-countdown-landmark) {
+    animation: none !important;
+  }
+}
+
+@keyframes fenasoja-experience-photo-in {
+  from {
+    opacity: 0.48;
+    transform: scale(1.035);
+  }
+  to {
+    opacity: 0.82;
+    transform: scale(1.012);
+  }
+}
+
+@keyframes fenasoja-experience-header-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fenasoja-experience-identity-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fenasoja-experience-clock-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.982);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}

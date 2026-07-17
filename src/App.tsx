@@ -45,6 +45,9 @@ const ExpensesPage = lazy(() => import('./pages/ExpensesPage'));
 const MobilityAuthPage = lazy(() => import('./pages/MobilityAuthPage'));
 const FenasojaEventsPage = lazy(() => import('./pages/FenasojaEventsPage'));
 const CronogramaEventosPage = lazy(() => import('./pages/CronogramaEventosPage'));
+const FenasojaCountdownExperiencePage = lazy(
+  () => import('./pages/FenasojaCountdownExperiencePage'),
+);
 const CommercialMapPage = lazy(() => import('./pages/CommercialMapPage'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const CommissionPortalPage = lazy(() => import('./pages/commissions/CommissionPortalPage'));
@@ -276,6 +279,22 @@ function CronogramaModuleRoute() {
   );
 }
 
+function CronogramaCountdownExperienceRoute() {
+  return (
+    <CronogramaRouteBoundary>
+      <AuthGuard>
+        <OrgGuard>
+          <CapabilityGuard capability="cronograma_eventos_access" fallback={<CronogramaPermissionDenied />}>
+            <Suspense fallback={<CronogramaRouteLoading label="Preparando a Contagem Oficial…" />}>
+              <FenasojaCountdownExperiencePage />
+            </Suspense>
+          </CapabilityGuard>
+        </OrgGuard>
+      </AuthGuard>
+    </CronogramaRouteBoundary>
+  );
+}
+
 function LegacyLogisticsRoutes() {
   return (
     <AuthenticatedLogisticsLayout>
@@ -322,6 +341,10 @@ const App = () => (
               <Route path="/login/admin" element={<LoginPage />} />
               <Route path="/login/:moduleSlug" element={<LoginPage />} />
               <Route path="/admin/*" element={<AdminRoutes />} />
+              <Route
+                path="/cronograma-eventos/contagem-oficial"
+                element={<CronogramaCountdownExperienceRoute />}
+              />
               <Route path="/cronograma-eventos" element={<CronogramaModuleRoute />} />
               <Route path="/mapa-comercial" element={<CommercialMapRoute />} />
               <Route path="/comissoes/logistica/*" element={<LogisticaModuleRoutes />} />

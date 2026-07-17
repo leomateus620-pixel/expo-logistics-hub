@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { CronogramaCommandHeader } from '@/components/cronograma-eventos/CronogramaCommandHeader';
 import {
@@ -25,6 +25,29 @@ describe('Cronograma route recovery contract', () => {
 
     expect(screen.getByRole('heading', { name: 'FENASOJA 2028' })).toBeInTheDocument();
     expect(screen.getByText('Nenhuma ação futura no recorte atual')).toBeInTheDocument();
+  });
+
+  it('delegates the immersive route action and exposes its loading state', () => {
+    const onExpandCountdown = vi.fn();
+    render(
+      <CronogramaCommandHeader
+        events={[]}
+        onNewEvent={vi.fn()}
+        onOpenUndated={vi.fn()}
+        onExpandCountdown={onExpandCountdown}
+        canManage={false}
+      />,
+    );
+
+    const expandButton = screen.getByRole('button', {
+      name: 'Ver contagem completa da Fenasoja 2028',
+    });
+    fireEvent.click(expandButton);
+
+    expect(onExpandCountdown).toHaveBeenCalledTimes(1);
+    expect(expandButton).toBeDisabled();
+    expect(expandButton).toHaveAttribute('aria-busy', 'true');
+    expect(screen.getByText('Abrindo experiência…')).toBeInTheDocument();
   });
 
   it('replaces a render crash with a visible recovery state and sanitized diagnostics', () => {
