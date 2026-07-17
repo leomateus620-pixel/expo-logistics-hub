@@ -383,8 +383,10 @@ export function useTimelineCycleNavigation(options: TimelineNavigationOptions) {
       return;
     }
 
-    if (availableChanged && options.availableYears.length && !options.availableYears.includes(state.selectedYear)) {
-      const year = resolveAvailableYear(state.selectedYear, options.availableYears);
+    // Só reconciliar se o ano atual saiu completamente da janela do ciclo (2026-2028).
+    // Anos vazios continuam válidos para foco — o stream renderiza placeholder próprio.
+    if (availableChanged && !isCronogramaCycleYear(state.selectedYear)) {
+      const year = resolveFocusYear(state.selectedYear, options.availableYears);
       commitFocus(year, options.firstMonthByYear[year], 'reconcile', { immediate: true });
       return;
     }
