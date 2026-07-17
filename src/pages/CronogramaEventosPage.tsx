@@ -130,6 +130,9 @@ export default function CronogramaEventosPage() {
   const requestedTimelineMonth = isCycleMonthKey(searchParams.get('timelineMonth'))
     ? searchParams.get('timelineMonth')
     : null;
+  const deepLinkEvent = searchParams.get('event');
+  const deepLinkSubevent = searchParams.get('subevent');
+  const deepLinkMode = searchParams.get('mode') === 'edit' ? 'edit' : 'view';
   const openCountdownExperience = useCallback(() => {
     navigate(FENASOJA_COUNTDOWN_ROUTE, {
       state: { fromCronograma: true },
@@ -305,7 +308,27 @@ export default function CronogramaEventosPage() {
     setSelectedEvent(event);
     setDrawerStartsEditing(edit);
     setDrawerOpen(true);
-  }, [viewportIsMobilePresentation]);
+    const identity = event.sourceKey ?? event.id;
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current);
+      if (identity) next.set('event', identity);
+      if (edit) next.set('mode', 'edit'); else next.delete('mode');
+      next.delete('subevent');
+      return next;
+    }, { replace: true });
+  }, [setSearchParams, viewportIsMobilePresentation]);
+
+  // Deep-link sync: ?event=<id|sourceKey>&mode=view|edit&subevent=<id>
+  useEffect(() => {
+    if (!deepLinkEvent) return;
+    if (cronograma.isLoading) return;
+    const current = selectedEvent?.sourceKey ?? selectedEvent?.id;
+    if (drawerOpen && current === deepLinkEvent) return;
+    const match = events.find((event) => event.id === deepLinkEvent || event.sourceKey === deepLinkEvent);
+    if (!match) return;
+    openEvent(match, deepLinkMode === 'edit');
+  }, [cronograma.isLoading, deepLinkEvent, deepLinkMode, drawerOpen, events, openEvent, selectedEvent]);
+
 
   const openWorkspace = useCallback((event: CronogramaEvent) => {
     workspaceTransitionRef.current = overlayIsMobilePresentation;
@@ -339,6 +362,13 @@ export default function CronogramaEventosPage() {
     setDrawerOpen(open);
     if (!open) {
       setDrawerStartsEditing(false);
+      setSearchParams((current) => {
+        const next = new URLSearchParams(current);
+        next.delete('event');
+        next.delete('subevent');
+        next.delete('mode');
+        return next;
+      }, { replace: true });
       const { x, y } = timelinePositionRef.current;
       const closingEventIdentity = selectedEvent?.sourceKey ?? selectedEvent?.id;
       window.setTimeout(() => {

@@ -60,6 +60,27 @@ export interface CronogramaEvent {
   createdAt?: string | null;
   updatedAt?: string | null;
   subevents?: CronogramaSubevent[];
+  /** Optimistic-lock version from `cronograma_eventos.lock_version` when persisted. */
+  lockVersion?: number | null;
+  /** Relational commissions (multi-select) — mirrors `cronograma_evento_comissoes`. */
+  commissionsRel?: CronogramaEventCommissionLink[];
+  /** Relational responsibles (multi-select) — mirrors `cronograma_evento_responsaveis`. */
+  responsiblesRel?: CronogramaEventResponsibleLink[];
+}
+
+export interface CronogramaEventCommissionLink {
+  commissionId?: string | null;
+  commissionSlug?: string | null;
+  commissionName?: string | null;
+  isPrimary?: boolean;
+}
+
+export interface CronogramaEventResponsibleLink {
+  userId?: string | null;
+  name?: string | null;
+  role?: string | null;
+  isPrimary?: boolean;
+  responsibleType?: 'member' | 'external';
 }
 
 export interface CronogramaSubevent {
