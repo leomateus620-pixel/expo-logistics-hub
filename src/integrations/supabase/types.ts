@@ -152,20 +152,29 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          is_active: boolean
           nome: string
           org_id: string
+          slug: string
+          updated_at: string
         }
         Insert: {
           created_at?: string
           id?: string
+          is_active?: boolean
           nome: string
           org_id: string
+          slug: string
+          updated_at?: string
         }
         Update: {
           created_at?: string
           id?: string
+          is_active?: boolean
           nome?: string
           org_id?: string
+          slug?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -319,6 +328,7 @@ export type Database = {
           created_at: string
           event_id: string
           id: string
+          org_id: string
           relation_role: string
           updated_at: string
         }
@@ -329,6 +339,7 @@ export type Database = {
           created_at?: string
           event_id: string
           id?: string
+          org_id: string
           relation_role?: string
           updated_at?: string
         }
@@ -339,23 +350,31 @@ export type Database = {
           created_at?: string
           event_id?: string
           id?: string
+          org_id?: string
           relation_role?: string
           updated_at?: string
         }
         Relationships: [
           {
-            foreignKeyName: "cronograma_evento_comissoes_commission_id_fkey"
-            columns: ["commission_id"]
+            foreignKeyName: "cronograma_evento_comissoes_commission_org_fkey"
+            columns: ["commission_id", "org_id"]
             isOneToOne: false
             referencedRelation: "commissions"
-            referencedColumns: ["id"]
+            referencedColumns: ["id", "org_id"]
           },
           {
-            foreignKeyName: "cronograma_evento_comissoes_event_id_fkey"
-            columns: ["event_id"]
+            foreignKeyName: "cronograma_evento_comissoes_event_org_fkey"
+            columns: ["event_id", "org_id"]
             isOneToOne: false
             referencedRelation: "cronograma_eventos"
-            referencedColumns: ["id"]
+            referencedColumns: ["id", "org_id"]
+          },
+          {
+            foreignKeyName: "cronograma_evento_comissoes_event_org_fkey"
+            columns: ["event_id", "org_id"]
+            isOneToOne: false
+            referencedRelation: "cronograma_eventos_full"
+            referencedColumns: ["id", "org_id"]
           },
         ]
       }
@@ -404,6 +423,13 @@ export type Database = {
             referencedRelation: "cronograma_eventos"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "cronograma_evento_logs_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "cronograma_eventos_full"
+            referencedColumns: ["id"]
+          },
         ]
       }
       cronograma_evento_responsaveis: {
@@ -413,6 +439,7 @@ export type Database = {
           id: string
           is_primary: boolean
           name_snapshot: string | null
+          org_id: string
           org_member_user_id: string | null
           responsible_type: string
           role: string | null
@@ -424,6 +451,7 @@ export type Database = {
           id?: string
           is_primary?: boolean
           name_snapshot?: string | null
+          org_id: string
           org_member_user_id?: string | null
           responsible_type?: string
           role?: string | null
@@ -435,6 +463,7 @@ export type Database = {
           id?: string
           is_primary?: boolean
           name_snapshot?: string | null
+          org_id?: string
           org_member_user_id?: string | null
           responsible_type?: string
           role?: string | null
@@ -442,24 +471,34 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "cronograma_evento_responsaveis_event_id_fkey"
-            columns: ["event_id"]
+            foreignKeyName: "cronograma_evento_responsaveis_event_org_fkey"
+            columns: ["event_id", "org_id"]
             isOneToOne: false
             referencedRelation: "cronograma_eventos"
-            referencedColumns: ["id"]
+            referencedColumns: ["id", "org_id"]
+          },
+          {
+            foreignKeyName: "cronograma_evento_responsaveis_event_org_fkey"
+            columns: ["event_id", "org_id"]
+            isOneToOne: false
+            referencedRelation: "cronograma_eventos_full"
+            referencedColumns: ["id", "org_id"]
           },
         ]
       }
       cronograma_eventos: {
         Row: {
           category: string
+          category_key: string | null
           commission_name: string | null
           commission_slug: string | null
           created_at: string
           created_by_user_id: string | null
           days_remaining: number | null
+          decision_needed: string | null
           description: string | null
           end_date: string | null
+          end_time: string | null
           event_time: string | null
           event_type: string
           has_exact_date: boolean
@@ -467,8 +506,10 @@ export type Database = {
           is_official_seed: boolean
           linked_commissions: Json
           location: string | null
+          lock_version: number
           month_label: string | null
           org_id: string
+          pending_reason: string | null
           priority: string
           responsible_name: string | null
           source_cell: string | null
@@ -478,6 +519,7 @@ export type Database = {
           source_sheet: string
           source_year: number
           start_date: string | null
+          start_time: string | null
           status: string
           subevents: Json
           title: string
@@ -486,13 +528,16 @@ export type Database = {
         }
         Insert: {
           category?: string
+          category_key?: string | null
           commission_name?: string | null
           commission_slug?: string | null
           created_at?: string
           created_by_user_id?: string | null
           days_remaining?: number | null
+          decision_needed?: string | null
           description?: string | null
           end_date?: string | null
+          end_time?: string | null
           event_time?: string | null
           event_type?: string
           has_exact_date?: boolean
@@ -500,8 +545,10 @@ export type Database = {
           is_official_seed?: boolean
           linked_commissions?: Json
           location?: string | null
+          lock_version?: number
           month_label?: string | null
           org_id: string
+          pending_reason?: string | null
           priority?: string
           responsible_name?: string | null
           source_cell?: string | null
@@ -511,6 +558,7 @@ export type Database = {
           source_sheet?: string
           source_year?: number
           start_date?: string | null
+          start_time?: string | null
           status?: string
           subevents?: Json
           title: string
@@ -519,13 +567,16 @@ export type Database = {
         }
         Update: {
           category?: string
+          category_key?: string | null
           commission_name?: string | null
           commission_slug?: string | null
           created_at?: string
           created_by_user_id?: string | null
           days_remaining?: number | null
+          decision_needed?: string | null
           description?: string | null
           end_date?: string | null
+          end_time?: string | null
           event_time?: string | null
           event_type?: string
           has_exact_date?: boolean
@@ -533,8 +584,10 @@ export type Database = {
           is_official_seed?: boolean
           linked_commissions?: Json
           location?: string | null
+          lock_version?: number
           month_label?: string | null
           org_id?: string
+          pending_reason?: string | null
           priority?: string
           responsible_name?: string | null
           source_cell?: string | null
@@ -544,6 +597,7 @@ export type Database = {
           source_sheet?: string
           source_year?: number
           start_date?: string | null
+          start_time?: string | null
           status?: string
           subevents?: Json
           title?: string
@@ -560,16 +614,112 @@ export type Database = {
           },
         ]
       }
+      cronograma_subevento_comissoes: {
+        Row: {
+          commission_id: string | null
+          commission_name_snapshot: string | null
+          commission_slug: string | null
+          created_at: string
+          id: string
+          org_id: string
+          relation_role: string
+          subevent_id: string
+          updated_at: string
+        }
+        Insert: {
+          commission_id?: string | null
+          commission_name_snapshot?: string | null
+          commission_slug?: string | null
+          created_at?: string
+          id?: string
+          org_id: string
+          relation_role?: string
+          subevent_id: string
+          updated_at?: string
+        }
+        Update: {
+          commission_id?: string | null
+          commission_name_snapshot?: string | null
+          commission_slug?: string | null
+          created_at?: string
+          id?: string
+          org_id?: string
+          relation_role?: string
+          subevent_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cronograma_subevento_comissoes_subevent_id_fkey"
+            columns: ["subevent_id"]
+            isOneToOne: false
+            referencedRelation: "cronograma_subeventos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cronograma_subevento_responsaveis: {
+        Row: {
+          created_at: string
+          id: string
+          is_primary: boolean
+          name_snapshot: string | null
+          org_id: string
+          org_member_user_id: string | null
+          responsible_type: string
+          role: string | null
+          subevent_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_primary?: boolean
+          name_snapshot?: string | null
+          org_id: string
+          org_member_user_id?: string | null
+          responsible_type?: string
+          role?: string | null
+          subevent_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_primary?: boolean
+          name_snapshot?: string | null
+          org_id?: string
+          org_member_user_id?: string | null
+          responsible_type?: string
+          role?: string | null
+          subevent_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cronograma_subevento_responsaveis_subevent_id_fkey"
+            columns: ["subevent_id"]
+            isOneToOne: false
+            referencedRelation: "cronograma_subeventos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cronograma_subeventos: {
         Row: {
+          commission_name_snapshot: string | null
           commission_slug: string | null
           created_at: string
           description: string | null
           end_date: string | null
           id: string
+          legacy_key: string | null
+          lock_version: number
+          org_id: string
           parent_event_id: string
           priority: string
           responsible_name: string | null
+          responsible_name_snapshot: string | null
           sort_order: number
           start_date: string | null
           status: string
@@ -577,14 +727,19 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          commission_name_snapshot?: string | null
           commission_slug?: string | null
           created_at?: string
           description?: string | null
           end_date?: string | null
           id?: string
+          legacy_key?: string | null
+          lock_version?: number
+          org_id: string
           parent_event_id: string
           priority?: string
           responsible_name?: string | null
+          responsible_name_snapshot?: string | null
           sort_order?: number
           start_date?: string | null
           status?: string
@@ -592,14 +747,19 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          commission_name_snapshot?: string | null
           commission_slug?: string | null
           created_at?: string
           description?: string | null
           end_date?: string | null
           id?: string
+          legacy_key?: string | null
+          lock_version?: number
+          org_id?: string
           parent_event_id?: string
           priority?: string
           responsible_name?: string | null
+          responsible_name_snapshot?: string | null
           sort_order?: number
           start_date?: string | null
           status?: string
@@ -608,11 +768,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "cronograma_subeventos_parent_event_id_fkey"
-            columns: ["parent_event_id"]
+            foreignKeyName: "cronograma_subeventos_parent_org_fkey"
+            columns: ["parent_event_id", "org_id"]
             isOneToOne: false
             referencedRelation: "cronograma_eventos"
-            referencedColumns: ["id"]
+            referencedColumns: ["id", "org_id"]
+          },
+          {
+            foreignKeyName: "cronograma_subeventos_parent_org_fkey"
+            columns: ["parent_event_id", "org_id"]
+            isOneToOne: false
+            referencedRelation: "cronograma_eventos_full"
+            referencedColumns: ["id", "org_id"]
           },
         ]
       }
@@ -2962,6 +3129,143 @@ export type Database = {
       }
     }
     Views: {
+      cronograma_eventos_full: {
+        Row: {
+          category: string | null
+          category_key: string | null
+          commission_name: string | null
+          commission_slug: string | null
+          commissions_rel: Json | null
+          created_at: string | null
+          created_by_user_id: string | null
+          days_remaining: number | null
+          decision_needed: string | null
+          description: string | null
+          end_date: string | null
+          end_time: string | null
+          event_time: string | null
+          event_type: string | null
+          has_exact_date: boolean | null
+          id: string | null
+          is_official_seed: boolean | null
+          linked_commissions: Json | null
+          location: string | null
+          lock_version: number | null
+          month_label: string | null
+          org_id: string | null
+          pending_reason: string | null
+          priority: string | null
+          responsible_name: string | null
+          responsibles_rel: Json | null
+          source_cell: string | null
+          source_key: string | null
+          source_note: string | null
+          source_row: string | null
+          source_sheet: string | null
+          source_year: number | null
+          start_date: string | null
+          start_time: string | null
+          status: string | null
+          subevents: Json | null
+          subevents_rel: Json | null
+          title: string | null
+          updated_at: string | null
+          week_label: string | null
+        }
+        Insert: {
+          category?: string | null
+          category_key?: string | null
+          commission_name?: string | null
+          commission_slug?: string | null
+          commissions_rel?: never
+          created_at?: string | null
+          created_by_user_id?: string | null
+          days_remaining?: number | null
+          decision_needed?: string | null
+          description?: string | null
+          end_date?: string | null
+          end_time?: string | null
+          event_time?: string | null
+          event_type?: string | null
+          has_exact_date?: boolean | null
+          id?: string | null
+          is_official_seed?: boolean | null
+          linked_commissions?: Json | null
+          location?: string | null
+          lock_version?: number | null
+          month_label?: string | null
+          org_id?: string | null
+          pending_reason?: string | null
+          priority?: string | null
+          responsible_name?: string | null
+          responsibles_rel?: never
+          source_cell?: string | null
+          source_key?: string | null
+          source_note?: string | null
+          source_row?: string | null
+          source_sheet?: string | null
+          source_year?: number | null
+          start_date?: string | null
+          start_time?: string | null
+          status?: string | null
+          subevents?: Json | null
+          subevents_rel?: never
+          title?: string | null
+          updated_at?: string | null
+          week_label?: string | null
+        }
+        Update: {
+          category?: string | null
+          category_key?: string | null
+          commission_name?: string | null
+          commission_slug?: string | null
+          commissions_rel?: never
+          created_at?: string | null
+          created_by_user_id?: string | null
+          days_remaining?: number | null
+          decision_needed?: string | null
+          description?: string | null
+          end_date?: string | null
+          end_time?: string | null
+          event_time?: string | null
+          event_type?: string | null
+          has_exact_date?: boolean | null
+          id?: string | null
+          is_official_seed?: boolean | null
+          linked_commissions?: Json | null
+          location?: string | null
+          lock_version?: number | null
+          month_label?: string | null
+          org_id?: string | null
+          pending_reason?: string | null
+          priority?: string | null
+          responsible_name?: string | null
+          responsibles_rel?: never
+          source_cell?: string | null
+          source_key?: string | null
+          source_note?: string | null
+          source_row?: string | null
+          source_sheet?: string | null
+          source_year?: number | null
+          start_date?: string | null
+          start_time?: string | null
+          status?: string | null
+          subevents?: Json | null
+          subevents_rel?: never
+          title?: string | null
+          updated_at?: string | null
+          week_label?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cronograma_eventos_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       guests_safe: {
         Row: {
           checkin_em: string | null
@@ -3076,6 +3380,38 @@ export type Database = {
       }
     }
     Functions: {
+      _cronograma_apply_event_commissions: {
+        Args: { _event_id: string; _items: Json; _org_id: string }
+        Returns: undefined
+      }
+      _cronograma_apply_event_responsibles: {
+        Args: { _event_id: string; _items: Json; _org_id: string }
+        Returns: undefined
+      }
+      _cronograma_apply_subevent_commissions: {
+        Args: { _items: Json; _org_id: string; _subevent_id: string }
+        Returns: undefined
+      }
+      _cronograma_apply_subevent_responsibles: {
+        Args: { _items: Json; _org_id: string; _subevent_id: string }
+        Returns: undefined
+      }
+      _cronograma_log: {
+        Args: {
+          _action: string
+          _entity_id: string
+          _entity_type: string
+          _event_id: string
+          _next: Json
+          _prev: Json
+          _request_id: string
+        }
+        Returns: undefined
+      }
+      _cronograma_require_writer: {
+        Args: { _org_id: string }
+        Returns: undefined
+      }
       audit_check_rls_status: {
         Args: never
         Returns: {
@@ -3091,6 +3427,22 @@ export type Database = {
         }[]
       }
       create_org_with_member: { Args: { org_nome: string }; Returns: string }
+      cronograma_delete_subevent: {
+        Args: { expected_lock_version?: number; subevent_id: string }
+        Returns: Json
+      }
+      cronograma_reorder_subevents: {
+        Args: { event_id: string; ordered_ids: string[] }
+        Returns: Json
+      }
+      cronograma_save_event: {
+        Args: { expected_lock_version?: number; payload: Json }
+        Returns: Json
+      }
+      cronograma_save_subevent: {
+        Args: { expected_lock_version?: number; payload: Json }
+        Returns: Json
+      }
       get_user_org_ids: { Args: { _user_id: string }; Returns: string[] }
       get_user_org_role: {
         Args: { _org_id: string; _user_id: string }
