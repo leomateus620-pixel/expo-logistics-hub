@@ -96,6 +96,20 @@ function resolveAvailableYear(
     .sort((a, b) => Math.abs(a - preferred) - Math.abs(b - preferred))[0];
 }
 
+/**
+ * Foco temporal: qualquer ano do ciclo (2026/2027/2028) é válido para foco,
+ * mesmo sem eventos — o stream renderiza um placeholder próprio para anos vazios.
+ * Só cai no vizinho mais próximo se o ano pedido sair da janela do ciclo
+ * (proteção contra URL corrompida).
+ */
+function resolveFocusYear(
+  preferred: CronogramaCycleYear,
+  availableYears: CronogramaCycleYear[],
+) {
+  if (isCronogramaCycleYear(preferred)) return preferred;
+  return resolveAvailableYear(preferred, availableYears);
+}
+
 function resolveInitialState(options: TimelineNavigationOptions): TimelineNavigationState {
   const requestedMonthYear = yearFromMonth(options.requestedMonth);
   let selectedYear = options.requestedYear
@@ -103,7 +117,8 @@ function resolveInitialState(options: TimelineNavigationOptions): TimelineNaviga
     ?? yearFromMonth(options.initialMonth)
     ?? getClosestCycleYear(options.todayKey);
 
-  selectedYear = resolveAvailableYear(selectedYear, options.availableYears);
+  selectedYear = resolveFocusYear(selectedYear, options.availableYears);
+
 
   const requestedMonth = requestedMonthYear === selectedYear ? options.requestedMonth : null;
   const initialMonth = yearFromMonth(options.initialMonth) === selectedYear ? options.initialMonth : null;
@@ -291,6 +306,9 @@ export function useTimelineCycleNavigation(options: TimelineNavigationOptions) {
       const month = kind === 'month' ? value : null;
       const year = kind === 'month' ? yearFromMonth(value) : Number(value);
       if (!isCronogramaCycleYear(year)) return;
+      // Anti-loop: se o foco visível já corresponde ao estado atual, não redespachar
+      // (evita cadeia observer → URL → effect de deep-link → commitFocus a cada frame).
+      if (year === state.selectedYear && month === state.focusedMonth) return;
       dispatch({ type: 'observe', year, month });
       onPositionChangeRef.current?.({ year, month, reason: 'observer', replace: true });
     }, {
@@ -319,7 +337,7 @@ export function useTimelineCycleNavigation(options: TimelineNavigationOptions) {
     const requestedMonthYear = yearFromMonth(options.requestedMonth);
     const requestedYear = options.requestedYear ?? requestedMonthYear;
     if (!requestedYear) return;
-    const year = resolveAvailableYear(requestedYear, options.availableYears);
+    const year = resolveFocusYear(requestedYear, options.availableYears);
     const month = requestedMonthYear === year
       ? options.requestedMonth
       : options.firstMonthByYear[year];
@@ -368,8 +386,10 @@ export function useTimelineCycleNavigation(options: TimelineNavigationOptions) {
       return;
     }
 
-    if (availableChanged && options.availableYears.length && !options.availableYears.includes(state.selectedYear)) {
-      const year = resolveAvailableYear(state.selectedYear, options.availableYears);
+    // Só reconciliar se o ano atual saiu completamente da janela do ciclo (2026-2028).
+    // Anos vazios continuam válidos para foco — o stream renderiza placeholder próprio.
+    if (availableChanged && !isCronogramaCycleYear(state.selectedYear)) {
+      const year = resolveFocusYear(state.selectedYear, options.availableYears);
       commitFocus(year, options.firstMonthByYear[year], 'reconcile', { immediate: true });
       return;
     }
