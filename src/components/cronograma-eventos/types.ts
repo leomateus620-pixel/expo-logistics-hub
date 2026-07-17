@@ -14,7 +14,8 @@ export type CronogramaCategory =
   | 'logistica'
   | 'comunicacao'
   | 'comercial'
-  | 'cerimonial';
+  | 'cerimonial'
+  | 'representacoes';
 
 export type CronogramaStatus =
   | 'confirmed'

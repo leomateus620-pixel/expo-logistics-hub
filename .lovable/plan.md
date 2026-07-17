@@ -1,43 +1,33 @@
 ## Objetivo
-Persistir os 8 compromissos institucionais listados na mensagem no módulo Cronograma e Eventos, categorizados como **"Representações"**, ano de ciclo **2026**, visíveis na Linha do Tempo e demais visões (Calendário, Categoria, etc.).
+Adicionar a categoria **Representações** aos filtros do módulo Cronograma e Eventos e garantir que os 8 eventos já cadastrados (jul-ago/2026) apareçam quando o usuário selecionar esse filtro.
 
-## Eventos a cadastrar (todos categoria "Representações", 2026)
+## Diagnóstico
+- Os filtros são alimentados pelo enum `CronogramaCategory` em `src/components/cronograma-eventos/types.ts` (7 valores atuais: governanca, programacao, infraestrutura, logistica, comunicacao, comercial, cerimonial). Sem entrada nova, a categoria "Representações" não aparece no dropdown.
+- O mapeamento visual acontece em `modelAdapter.ts › getVisualCategory`, que decide via regex sobre `event.category`/título. Hoje, um registro com `category='Representações'` cai no fallback `'governanca'` — por isso os 8 eventos aparecem, mas classificados errado, e não respondem ao filtro certo.
+- Labels/tons ficam em `cronogramaData.ts` (`categoryLabels`, `categoryTone`).
 
-| # | Data | Horário | Título | Local |
-|---|------|---------|--------|-------|
-| 1 | 20/07/2026 | 09:00 | Reunião com Jacson | Casa Fenasoja |
-| 2 | 20/07/2026 | 14:00 | Reunião com Rodrigo | Casa Fenasoja |
-| 3 | 20/07/2026 | 19:00 | Lançamento do Festival Gastronômico | Auditório do IFFar |
-| 4 | 21/07/2026 | 07:15 | Café do Sindilojas | Botolli |
-| 5 | 24/07/2026 | 08:00–11:00 | Encontro Regional de Inovação e Empreendedorismo | Auditório do Parque |
-| 6 | 24/07/2026 | 12:00 | Almoço 10 anos Eficiência Buffet | Restaurante B. Industrial |
-| 7 | 01/08/2026 | 10:00 | Ato de inauguração da Praça Pedro Carpenedo (obs: programação inicia 08:30) | Praça em frente Centro Cultural |
-| 8 | 12–13/08/2026 | 07:15 (saída) | Eli Summit Ijuí (saída: SEMEAR AGRO HUB, RS 344 Km 39, 1100 — Timbaúva, Santa Rosa) | Ijuí |
+## Alterações (somente front-end)
 
-## Como será feito
+1. **`src/components/cronograma-eventos/types.ts`**  
+   Acrescentar `'representacoes'` ao union `CronogramaCategory`.
 
-Uso da ferramenta de inserção do banco (Cloud) gravando diretamente em `public.cronograma_eventos` com os campos exigidos pelo esquema atual:
+2. **`src/components/cronograma-eventos/cronogramaData.ts`**  
+   - `categoryLabels.representacoes = 'Representações'`.  
+   - `categoryTone.representacoes = 'bg-indigo-700'` (tom distinto dos demais, harmônico com o design system).
 
-- `org_id` = organização única existente
-- `category = 'Representações'`, `event_type = 'representacao'`
-- `source_year = 2026`, `source_key = 'representacao-<slug>-<data>'` (garante idempotência caso rode 2x)
-- `start_date`, `end_date`, `start_time`, `end_time`, `event_time` (texto amigável)
-- `status = 'planejado'`, `priority = 'media'`, `has_exact_date = true`
-- `is_official_seed = false`, `source_sheet = 'Cadastro manual — Representações'`
-- `title` em MAIÚSCULAS (padrão do projeto), `location`, `description` (com observações — ex.: "Programação inicia 08:30" no item 7 e endereço de saída no item 8)
-- `linked_commissions = '[]'`, `subevents = '[]'`, `lock_version = 1`
+3. **`src/components/cronograma-eventos/modelAdapter.ts`**  
+   Inserir, no topo de `categoryKeywords`, a regra:  
+   `['representacoes', /representa[çc][ãa]o|representa[çc][õo]es|agenda institucional|compromisso externo/i]`  
+   Assim, todos os 8 eventos (que têm `category='Representações'` e `event_type='representacao'` no banco) serão mapeados para o novo bucket. Nenhum evento existente é afetado — a regex é específica.
 
-Grava tudo em uma única transação (`INSERT ... VALUES (...), (...), ...`) para atomicidade.
+## Persistência / dados
+Não é preciso alterar o banco: os registros já foram gravados com `category='Representações'` no turno anterior, e o adapter passa a reconhecê-los. Filtro passa a listar 8 eventos ao selecionar "Representações".
 
-## Persistência e integração
-
-- A `cronograma_eventos_full` (view usada pelo hook `useCronogramaEventos`) reflete automaticamente os novos registros — a Linha do Tempo passa a exibir julho e agosto/2026 com os cards.
-- `_cronograma_log` não é chamado neste caminho porque estamos inserindo em nome do sistema, sem `auth.uid()`; para manter trilha, gravaremos uma linha em `audit_log` com resumo "8 eventos de Representações cadastrados".
-- Não são criadas comissões/responsáveis relacionais (não foram informados). Podem ser adicionados depois pela UI via RPC já existente.
+## Validação
+- Rodar `tsgo` para garantir que o novo membro do union não quebra maps `Record<CronogramaCategory, …>`.
+- Rodar `bunx vitest run src/test/cronogramaTimeline.test.tsx` (usa o enum de categorias).
+- Verificação visual: abrir `/cronograma-eventos`, expandir filtros, selecionar "Representações" e confirmar os 8 cards de julho/agosto.
 
 ## Fora de escopo
-- Criação de subeventos (nenhum foi descrito).
-- Vínculo com comissões ou responsáveis (sem dados).
-- Alterações de UI/tema.
-
-Se aprovado, executo a migração de dados e confirmo com uma leitura mostrando os 8 registros criados.
+- Backend/RPC (nada muda).
+- Ícones específicos ou novas cores no design system além do tom Tailwind indicado.
