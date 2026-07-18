@@ -14,6 +14,7 @@ describe('pipeline de seleção do mapa comercial', () => {
     useCommercialMapStore.setState({
       selectedEntityId: null,
       interiorEntityId: null,
+      interiorReturnView: null,
       hoveredEntityId: null,
       search: '',
       statusFilters: [],
@@ -100,6 +101,11 @@ describe('pipeline de seleção do mapa comercial', () => {
       cameraSequence: initialSequence + 1,
     });
 
+    const returnView = {
+      position: [12, 8, 19] as [number, number, number],
+      target: [-4, 1, -9] as [number, number, number],
+    };
+    useCommercialMapStore.getState().setInteriorReturnView(returnView);
     useCommercialMapStore.getState().exitInterior();
     expect(useCommercialMapStore.getState()).toMatchObject({
       selectedEntityId: 'reference:2026:b12',
@@ -107,6 +113,7 @@ describe('pipeline de seleção do mapa comercial', () => {
       activePanel: 'details',
       workspaceMode: '3d',
       cameraSequence: initialSequence + 2,
+      interiorReturnView: returnView,
     });
 
     useCommercialMapStore.getState().enterInterior('reference:2026:b12');
@@ -115,6 +122,17 @@ describe('pipeline de seleção do mapa comercial', () => {
       selectedEntityId: 'reference:2026:b11',
       interiorEntityId: null,
       activePanel: 'details',
+    });
+  });
+
+  it('aceita a inspeção de B9 sem alterar o contrato genérico de seleção', () => {
+    useCommercialMapStore.getState().enterInterior('reference:2026:b9');
+
+    expect(useCommercialMapStore.getState()).toMatchObject({
+      selectedEntityId: 'reference:2026:b9',
+      interiorEntityId: 'reference:2026:b9',
+      activePanel: null,
+      workspaceMode: '3d',
     });
   });
 

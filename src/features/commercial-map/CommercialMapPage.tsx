@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   AlertTriangle,
   ArrowLeft,
@@ -30,6 +30,7 @@ import {
 } from './components/panels/MapPanels';
 import { MapListView, ResultsPanel } from './components/panels/EntityExplorer';
 import { CalibrationPanel } from './components/panels/CalibrationPanel';
+import { resolveStrategicLandmarkKind } from './utils/landmarks';
 import './commercial-map.css';
 
 function supportsWebGL() {
@@ -60,6 +61,8 @@ export default function CommercialMapPage() {
   const setActivePanel = useCommercialMapStore((state) => state.setActivePanel);
   const workspaceMode = useCommercialMapStore((state) => state.workspaceMode);
   const setWorkspaceMode = useCommercialMapStore((state) => state.setWorkspaceMode);
+  const interiorBackButtonRef = useRef<HTMLButtonElement>(null);
+  const lastInteriorEntityId = useRef<string | null>(null);
   const [webglAvailable] = useState(() => supportsWebGL());
   const [publishReason, setPublishReason] = useState('Publicação após revisão cartográfica e comercial');
 
@@ -67,6 +70,9 @@ export default function CommercialMapPage() {
   const mapFilter = useMapEntityFilter(data?.entities ?? [], data?.lots ?? []);
   const selectedEntity = data?.entities.find((entity) => entity.id === selectedEntityId) ?? null;
   const selectedLot = data?.lots.find((lot) => lot.entityId === selectedEntityId);
+  const selectedKind = selectedEntity ? resolveStrategicLandmarkKind(selectedEntity) : null;
+  const interiorEntity = data?.entities.find((entity) => entity.id === interiorEntityId) ?? null;
+  const interiorKind = interiorEntity ? resolveStrategicLandmarkKind(interiorEntity) : null;
 
   useEffect(() => {
     const shortcut = (event: KeyboardEvent) => {
@@ -87,6 +93,23 @@ export default function CommercialMapPage() {
     window.addEventListener('keydown', shortcut);
     return () => window.removeEventListener('keydown', shortcut);
   }, [activePanel, exitInterior, interiorEntityId, setActivePanel, workspaceMode]);
+
+  useEffect(() => {
+    if (interiorEntityId) {
+      lastInteriorEntityId.current = interiorEntityId;
+      const frame = window.requestAnimationFrame(() => interiorBackButtonRef.current?.focus());
+      return () => window.cancelAnimationFrame(frame);
+    }
+    if (!lastInteriorEntityId.current) return undefined;
+    const frame = window.requestAnimationFrame(() => {
+      const trigger = Array.from(
+        document.querySelectorAll<HTMLElement>('[data-commercial-map-interior-trigger]'),
+      ).find((candidate) => candidate.offsetParent !== null);
+      trigger?.focus();
+      lastInteriorEntityId.current = null;
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [interiorEntityId]);
 
   useEffect(() => {
     if (workspaceMode === 'edit' && !selectedEntity) setWorkspaceMode('3d');
@@ -113,7 +136,10 @@ export default function CommercialMapPage() {
   }
 
   return (
-    <section className={`commercial-map-shell ${interiorEntityId ? 'is-interior' : ''}`} aria-label="Plataforma de gestão do mapa comercial">
+    <section
+      className={`commercial-map-shell ${interiorEntityId ? 'is-interior' : ''} ${interiorKind === 'livestock-pavilion' ? 'is-livestock-interior' : ''} ${selectedKind === 'livestock-pavilion' ? 'has-livestock-selection' : ''}`}
+      aria-label="Plataforma de gestão do mapa comercial"
+    >
       <header className="commercial-map-command-header">
         <div className="commercial-map-title-lockup">
           <div className="commercial-map-title-icon"><MapPinned /></div>
@@ -192,13 +218,28 @@ export default function CommercialMapPage() {
               matchingEntityIds={mapFilter.matchingEntityIds}
               filtersActive={mapFilter.hasActiveCriteria}
             />
-            {interiorEntityId ? (
-              <div className="commercial-map-interior-navigation" aria-label="Navegação do interior da Sede Fenasoja">
-                <Button variant="outline" onClick={exitInterior}><ArrowLeft />Voltar ao mapa</Button>
+            {interiorEntity ? (
+              <div
+                className="commercial-map-interior-navigation"
+                aria-label={`Navegação do interior de ${interiorEntity.name}`}
+              >
+                <Button
+                  ref={interiorBackButtonRef}
+                  variant="outline"
+                  onClick={exitInterior}
+                  aria-label={`Voltar ao mapa a partir de ${interiorEntity.name}`}
+                  aria-keyshortcuts="Escape"
+                >
+                  <ArrowLeft />Voltar ao mapa
+                </Button>
                 <div>
-                  <span>Visita interna · B12</span>
-                  <strong>Sede Fenasoja / Comissão Central</strong>
-                  <small>Arraste para observar os ambientes · role para aproximar</small>
+                  <span>Inspeção interna · {interiorEntity.publicIdentifier}</span>
+                  <strong>{interiorEntity.name}</strong>
+                  <small>
+                    {interiorKind === 'livestock-pavilion'
+                      ? 'Arraste para percorrer o corredor e as baias · role para aproximar'
+                      : 'Arraste para observar os ambientes · role para aproximar'}
+                  </small>
                 </div>
                 <kbd>Esc</kbd>
               </div>

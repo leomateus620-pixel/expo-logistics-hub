@@ -6,6 +6,7 @@ import {
   strategicLandmarkFacingRadians,
   strategicLandmarkFocusDirection,
   strategicLandmarkSearchAliases,
+  strategicLandmarkSupportsInterior,
   strategicLandmarkVisualHeight,
 } from '@/features/commercial-map/utils/landmarks';
 import {
@@ -16,6 +17,7 @@ import {
 const targetIdentifiers = [
   'B11',
   'B12',
+  'B9',
   'B41',
   'C5',
   'C6',
@@ -37,6 +39,7 @@ describe('marcos arquitetônicos estratégicos', () => {
   it('resolve os assets pelo identificador público sem depender do id persistido', () => {
     const persistedAdministrativeCenter = { ...targets.B11, id: 'db:uuid:centro-administrativo' };
     const persistedHeadquarters = { ...targets.B12, id: 'db:uuid:sede' };
+    const persistedLivestockPavilion = { ...targets.B9, id: 'db:uuid:pecuaria' };
     const persistedPolish = { ...targets.C5, id: 'db:uuid:polonesa' };
     const persistedItalian = { ...targets.C6, id: 'db:uuid:italiana' };
     const persistedPortico = { ...targets['PORTICO-NACOES'], id: 'db:uuid:portico' };
@@ -46,6 +49,7 @@ describe('marcos arquitetônicos estratégicos', () => {
 
     expect(resolveStrategicLandmarkKind(persistedAdministrativeCenter)).toBe('administrative-center');
     expect(resolveStrategicLandmarkKind(persistedHeadquarters)).toBe('fenasoja-headquarters');
+    expect(resolveStrategicLandmarkKind(persistedLivestockPavilion)).toBe('livestock-pavilion');
     expect(resolveStrategicLandmarkKind(persistedPolish)).toBe('polish-pavilion');
     expect(resolveStrategicLandmarkKind(persistedItalian)).toBe('italian-pavilion');
     expect(resolveStrategicLandmarkKind(persistedPortico)).toBe('nations-portico');
@@ -57,6 +61,7 @@ describe('marcos arquitetônicos estratégicos', () => {
 
     expect(strategicLandmarkFacingRadians(persistedAdministrativeCenter)).toBeCloseTo(Math.PI / 2);
     expect(strategicLandmarkFacingRadians(persistedHeadquarters)).toBeCloseTo(-Math.PI / 18);
+    expect(strategicLandmarkFacingRadians(persistedLivestockPavilion)).toBe(0);
     expect(strategicLandmarkFacingRadians(persistedPolish)).toBeCloseTo(Math.PI / 2);
     expect(strategicLandmarkFacingRadians(persistedItalian)).toBeCloseTo(-Math.PI / 2);
     expect(strategicLandmarkFacingRadians(persistedPortico)).toBe(0);
@@ -67,6 +72,7 @@ describe('marcos arquitetônicos estratégicos', () => {
     expect(strategicLandmarkFocusDirection(persistedAdministrativeCenter)?.[0]).toBeGreaterThan(0);
     expect(strategicLandmarkFocusDirection(persistedHeadquarters)?.[0]).toBeLessThan(0);
     expect(strategicLandmarkFocusDirection(persistedHeadquarters)?.[2]).toBeGreaterThan(0);
+    expect(strategicLandmarkFocusDirection(persistedLivestockPavilion)?.[2]).toBeGreaterThan(0);
     expect(strategicLandmarkFocusDirection(persistedPolish)?.[0]).toBeGreaterThan(0);
     expect(strategicLandmarkFocusDirection(persistedItalian)?.[0]).toBeLessThan(0);
     expect(strategicLandmarkFocusDirection(persistedPortico)?.[2]).toBeGreaterThan(0);
@@ -78,6 +84,7 @@ describe('marcos arquitetônicos estratégicos', () => {
   it('preserva os footprints oficiais enquanto calcula silhuetas mais altas', () => {
     const administrativeBounds = strategicLandmarkBounds(targets.B11);
     const headquartersBounds = strategicLandmarkBounds(targets.B12);
+    const livestockBounds = strategicLandmarkBounds(targets.B9);
     const meetingRoomBounds = strategicLandmarkBounds(targets.B41);
     const polishBounds = strategicLandmarkBounds(targets.C5);
     const italianBounds = strategicLandmarkBounds(targets.C6);
@@ -90,6 +97,8 @@ describe('marcos arquitetônicos estratégicos', () => {
     expect(administrativeBounds.depth).toBeCloseTo(6.5455, 4);
     expect(headquartersBounds.width).toBeCloseTo(2.9455, 4);
     expect(headquartersBounds.depth).toBeCloseTo(2.2691, 4);
+    expect(livestockBounds.width).toBeCloseTo(18.7636, 4);
+    expect(livestockBounds.depth).toBeCloseTo(2.9018, 4);
     expect(meetingRoomBounds.width).toBeCloseTo(1.6145, 4);
     expect(meetingRoomBounds.depth).toBeCloseTo(1.44, 4);
     expect(polishBounds.width).toBeCloseTo(2.5745, 4);
@@ -105,7 +114,7 @@ describe('marcos arquitetônicos estratégicos', () => {
     expect(arenaBounds.width).toBeCloseTo(10.5818, 4);
     expect(arenaBounds.depth).toBeCloseTo(9.6, 4);
 
-    [targets.B11, targets.B12, targets.C5, targets.C6, targets.C8, targets.C2, targets.F, targets['PORTICO-NACOES']]
+    [targets.B11, targets.B12, targets.B9, targets.C5, targets.C6, targets.C8, targets.C2, targets.F, targets['PORTICO-NACOES']]
       .forEach((entity) => {
         const before = JSON.stringify(entity);
         expect(strategicLandmarkVisualHeight(entity)).toBeGreaterThan(entity.geometry.extrusionHeight);
@@ -136,6 +145,7 @@ describe('marcos arquitetônicos estratégicos', () => {
   it('mantém os nomes oficiais e acrescenta aliases arquitetônicos à busca', () => {
     expect(strategicLandmarkSearchAliases(targets.B11)).toContain('Centro Administrativo Fenasoja');
     expect(strategicLandmarkSearchAliases(targets.B12)).toContain('Fenasoja Headquarters');
+    expect(strategicLandmarkSearchAliases(targets.B9)).toContain('Pavilhões de Pecuária');
     expect(strategicLandmarkSearchAliases(targets.C5)).toContain('Casa Polonesa');
     expect(strategicLandmarkSearchAliases(targets.C6)).toContain('Etnia Italiana');
     expect(strategicLandmarkSearchAliases(targets['PORTICO-NACOES'])).toContain('Portal das Nações');
@@ -144,7 +154,7 @@ describe('marcos arquitetônicos estratégicos', () => {
     expect(strategicLandmarkSearchAliases(targets.F)).toContain('Arena Sicredi Icatu');
 
     const items = buildEntityExplorerIndex(
-      [targets.B11, targets.B12, targets.B41, targets.C5, targets.C6, targets.C8, targets.C2, targets.F, targets['PORTICO-NACOES']],
+      [targets.B11, targets.B12, targets.B9, targets.B41, targets.C5, targets.C6, targets.C8, targets.C2, targets.F, targets['PORTICO-NACOES']],
       [],
     );
 
@@ -168,6 +178,16 @@ describe('marcos arquitetônicos estratégicos', () => {
     });
     expect(headquartersResult.map((item) => item.entity.publicIdentifier)).toEqual(['B12']);
 
+    const livestockResult = filterAndSortEntityExplorerItems(items, {
+      query: 'Pavilhões de Pecuária',
+      statusFilters: [],
+      classificationFilters: [],
+      locationFilter: null,
+      verificationFilters: [],
+      sortOrder: 'relevance',
+    });
+    expect(livestockResult.map((item) => item.entity.publicIdentifier)).toEqual(['B9']);
+
     const meetingRoomResult = filterAndSortEntityExplorerItems(items, {
       query: 'Sala de Reuniões Fenasoja',
       statusFilters: [],
@@ -178,5 +198,12 @@ describe('marcos arquitetônicos estratégicos', () => {
     });
     expect(meetingRoomResult.map((item) => item.entity.publicIdentifier)).toEqual(['B41']);
     expect(targets.C2.name).toBe('Restaurante Central');
+  });
+
+  it('limita a inspeção interna aos marcos que possuem uma cena vinculada', () => {
+    expect(strategicLandmarkSupportsInterior(targets.B9)).toBe(true);
+    expect(strategicLandmarkSupportsInterior(targets.B12)).toBe(true);
+    expect(strategicLandmarkSupportsInterior(targets.B11)).toBe(false);
+    expect(strategicLandmarkSupportsInterior(targets.C5)).toBe(false);
   });
 });
