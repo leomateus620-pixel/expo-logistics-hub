@@ -10,9 +10,15 @@ import type {
   VerificationStatus,
 } from '../types';
 
+export interface CommercialMapCameraView {
+  position: [number, number, number];
+  target: [number, number, number];
+}
+
 interface CommercialMapState {
   selectedEntityId: string | null;
   interiorEntityId: string | null;
+  interiorReturnView: CommercialMapCameraView | null;
   hoveredEntityId: string | null;
   search: string;
   statusFilters: CommercialStatus[];
@@ -35,6 +41,7 @@ interface CommercialMapState {
   setSelectedEntityId: (id: string | null) => void;
   enterInterior: (id: string) => void;
   exitInterior: () => void;
+  setInteriorReturnView: (view: CommercialMapCameraView | null) => void;
   setHoveredEntityId: (id: string | null) => void;
   setSearch: (search: string) => void;
   toggleStatus: (status: CommercialStatus) => void;
@@ -63,6 +70,7 @@ interface CommercialMapState {
 export const useCommercialMapStore = create<CommercialMapState>((set) => ({
   selectedEntityId: null,
   interiorEntityId: null,
+  interiorReturnView: null,
   hoveredEntityId: null,
   search: '',
   statusFilters: [],
@@ -85,12 +93,14 @@ export const useCommercialMapStore = create<CommercialMapState>((set) => ({
   setSelectedEntityId: (selectedEntityId) => set((state) => ({
     selectedEntityId,
     interiorEntityId: state.interiorEntityId === selectedEntityId ? state.interiorEntityId : null,
+    interiorReturnView: state.interiorEntityId === selectedEntityId ? state.interiorReturnView : null,
     activePanel: selectedEntityId ? 'details' : null,
   })),
   enterInterior: (selectedEntityId) => set((state) => ({
     selectedEntityId,
     hoveredEntityId: null,
     interiorEntityId: selectedEntityId,
+    interiorReturnView: null,
     activePanel: null,
     workspaceMode: '3d',
     cameraNavigating: false,
@@ -103,6 +113,7 @@ export const useCommercialMapStore = create<CommercialMapState>((set) => ({
     cameraNavigating: false,
     cameraSequence: state.cameraSequence + 1,
   })),
+  setInteriorReturnView: (interiorReturnView) => set({ interiorReturnView }),
   setHoveredEntityId: (hoveredEntityId) => set({ hoveredEntityId }),
   setSearch: (search) => set({ search }),
   toggleStatus: (status) => set((state) => ({
@@ -136,6 +147,7 @@ export const useCommercialMapStore = create<CommercialMapState>((set) => ({
     selectedEntityId,
     hoveredEntityId: null,
     interiorEntityId: null,
+    interiorReturnView: null,
     activePanel: 'details',
     workspaceMode: '3d',
     cameraSequence: state.cameraSequence + 1,
@@ -155,12 +167,14 @@ export const useCommercialMapStore = create<CommercialMapState>((set) => ({
   setWorkspaceMode: (workspaceMode) => set((state) => ({
     workspaceMode,
     interiorEntityId: workspaceMode === '3d' ? state.interiorEntityId : null,
+    interiorReturnView: workspaceMode === '3d' ? state.interiorReturnView : null,
   })),
   requestCameraPreset: (cameraPreset) => set((state) => ({
     cameraPreset,
     cameraSequence: state.cameraSequence + 1,
     workspaceMode: '3d',
     interiorEntityId: null,
+    interiorReturnView: null,
   })),
   focusSelection: () => set((state) => ({ cameraSequence: state.cameraSequence + 1, workspaceMode: '3d' })),
   setReferenceVisible: (referenceVisible) => set({ referenceVisible }),

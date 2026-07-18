@@ -1,8 +1,10 @@
 import type { MapEntity } from '../types';
+import { livestockPavilionVisualHeight } from './livestockPavilion';
 
 export type StrategicLandmarkKind =
   | 'administrative-center'
   | 'fenasoja-headquarters'
+  | 'livestock-pavilion'
   | 'polish-pavilion'
   | 'italian-pavilion'
   | 'nations-portico'
@@ -30,6 +32,20 @@ interface StrategicLandmarkDefinition {
 }
 
 const STRATEGIC_LANDMARKS: Readonly<Record<string, StrategicLandmarkDefinition>> = {
+  B9: {
+    kind: 'livestock-pavilion',
+    aliases: [
+      'Pavilhões de Pecuária',
+      'Pavilhões 6 10 11',
+      'Pecuária',
+      'Livestock Pavilion',
+    ],
+    // O footprint oficial é um conjunto longitudinal único. A leitura
+    // preferencial mostra o lado ventilado e preserva o contexto das vias.
+    facingRadians: 0,
+    focusDirection: [0.36, 0.44, 0.9],
+    visualHeight: livestockPavilionVisualHeight,
+  },
   B11: {
     kind: 'administrative-center',
     aliases: [
@@ -115,6 +131,13 @@ export function resolveStrategicLandmarkKind(
   entity: Pick<MapEntity, 'publicIdentifier'>,
 ): StrategicLandmarkKind | null {
   return STRATEGIC_LANDMARKS[normalizedIdentifier(entity)]?.kind ?? null;
+}
+
+export function strategicLandmarkSupportsInterior(
+  entity: Pick<MapEntity, 'publicIdentifier'>,
+): boolean {
+  const kind = resolveStrategicLandmarkKind(entity);
+  return kind === 'fenasoja-headquarters' || kind === 'livestock-pavilion';
 }
 
 export function strategicLandmarkSearchAliases(

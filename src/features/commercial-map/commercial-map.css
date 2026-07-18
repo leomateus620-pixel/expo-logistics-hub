@@ -108,6 +108,7 @@
   backdrop-filter: blur(18px) saturate(1.15);
 }
 .commercial-map-interior-navigation button { height: 38px; border-color: rgba(28, 74, 43, .18); background: rgba(255,255,255,.72); color: var(--map-forest-dark); font-size: 10px; font-weight: 800; }
+.commercial-map-interior-navigation button:focus-visible { outline: 3px solid rgba(41, 93, 104, .34); outline-offset: 2px; }
 .commercial-map-interior-navigation button svg { width: 15px; height: 15px; }
 .commercial-map-interior-navigation > div { display: flex; min-width: 0; flex-direction: column; gap: 1px; }
 .commercial-map-interior-navigation span { color: #8c6d36; font-size: 7px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
@@ -115,6 +116,7 @@
 .commercial-map-interior-navigation small { color: #756f64; font-size: 8px; }
 .commercial-map-interior-navigation kbd { border: 1px solid rgba(57, 48, 36, .13); border-radius: 7px; background: #eee8dc; padding: 4px 7px; color: #746b5f; font-size: 8px; box-shadow: inset 0 -1px rgba(62, 48, 34, .08); }
 .commercial-map-shell.is-interior .commercial-map-viewport { background: #ddd8ca; }
+.commercial-map-shell.is-livestock-interior .commercial-map-viewport { background: #d9ddd5; }
 
 .commercial-map-structure-preview { display: flex; min-height: 330px; flex-direction: column; overflow: hidden; border: 1px solid rgba(25,61,36,.12); border-radius: 16px; background: #edf2eb; }
 .commercial-map-structure-preview svg { width: 100%; min-height: 0; flex: 1; background: radial-gradient(circle at 50% 50%, #f7faf5, #e6ece3); }
@@ -253,6 +255,7 @@
 .commercial-map-panel-header h2 { margin: 3px 0 0; color: var(--map-ink); font-size: 17px; font-weight: 800; letter-spacing: -.025em; line-height: 1.1; }
 .commercial-map-panel-header > button { display: grid; width: 32px; height: 32px; flex: 0 0 auto; place-items: center; border-radius: 9px; color: #617067; }
 .commercial-map-panel-header > button:hover { background: #e9eee7; color: var(--map-forest); }
+.commercial-map-short-interior-action { display: none; }
 .commercial-map-panel-scroll { min-height: 0; flex: 1; }
 .commercial-map-panel-scroll [data-radix-scroll-area-viewport] > div { display: block !important; width: 100%; min-width: 0 !important; }
 .commercial-map-panel-section { padding: 10px; }
@@ -646,8 +649,8 @@
   .commercial-map-header-actions button svg { width: 15px; height: 15px; }
   .commercial-map-search { top: 10px; left: 10px; width: calc(100% - 20px); height: 40px; }
   .commercial-map-search kbd { display: none; }
-  .commercial-map-interior-navigation { top: 9px; width: calc(100% - 18px); grid-template-columns: auto minmax(0, 1fr); gap: 8px; padding: 6px; }
-  .commercial-map-interior-navigation button { width: 38px; padding: 0; font-size: 0; }
+  .commercial-map-interior-navigation { top: max(9px, env(safe-area-inset-top)); width: calc(100% - 18px); grid-template-columns: auto minmax(0, 1fr); gap: 8px; padding: 6px; }
+  .commercial-map-interior-navigation button { width: 44px; height: 44px; padding: 0; font-size: 0; }
   .commercial-map-interior-navigation small, .commercial-map-interior-navigation kbd { display: none; }
   .commercial-map-toolbar { top: 58px; left: 10px; height: 39px; }
   .commercial-map-toolbar button { width: 29px; height: 29px; }
@@ -662,6 +665,7 @@
   .commercial-map-summary > button:nth-of-type(n+4) { display: none; }
   .commercial-map-onboarding-note { right: 9px; bottom: calc(67px + env(safe-area-inset-bottom)); left: 9px; max-width: none; }
   .commercial-map-panel { height: min(74%, 610px); padding-bottom: env(safe-area-inset-bottom); }
+  .commercial-map-shell.has-livestock-selection .commercial-map-details-panel { height: min(68%, 570px); }
   .commercial-map-results-panel { height: min(82%, 690px); }
   .commercial-map-explorer-controls.is-panel .commercial-map-explorer-filter-row,
   .commercial-map-explorer-controls.is-table .commercial-map-explorer-filter-row { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -713,8 +717,8 @@
   .commercial-map-header-actions button svg { width: 15px; height: 15px; }
   .commercial-map-search { top: 10px; left: 10px; width: calc(100% - 20px); height: 40px; }
   .commercial-map-search kbd { display: none; }
-  .commercial-map-interior-navigation { top: 9px; width: calc(100% - 18px); grid-template-columns: auto minmax(0, 1fr); gap: 8px; padding: 6px; }
-  .commercial-map-interior-navigation button { width: 38px; padding: 0; font-size: 0; }
+  .commercial-map-interior-navigation { top: max(9px, env(safe-area-inset-top)); width: calc(100% - 18px); grid-template-columns: auto minmax(0, 1fr); gap: 8px; padding: 6px; }
+  .commercial-map-interior-navigation button { width: 44px; height: 44px; padding: 0; font-size: 0; }
   .commercial-map-interior-navigation small, .commercial-map-interior-navigation kbd { display: none; }
   .commercial-map-toolbar { top: 58px; left: 10px; height: 39px; transform: none; }
   .commercial-map-toolbar button { width: 29px; height: 29px; }
@@ -739,8 +743,31 @@
   .commercial-map-summary, .commercial-map-legend { bottom: 12px; }
 }
 
+@media (max-width: 900px) and (max-height: 520px) {
+  .commercial-map-shell.has-livestock-selection .commercial-map-short-interior-action {
+    position: absolute;
+    z-index: 5;
+    top: 16px;
+    right: 56px;
+    display: inline-flex;
+    height: 38px;
+    padding-inline: 12px;
+    font-size: 10px;
+  }
+  .commercial-map-shell.has-livestock-selection .commercial-map-standard-interior-action { display: none; }
+  .commercial-map-shell.has-livestock-selection .commercial-map-details-panel .commercial-map-panel-header > div {
+    min-width: 0;
+    padding-right: 116px;
+  }
+  .commercial-map-shell.has-livestock-selection .commercial-map-details-panel .commercial-map-panel-header h2 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .commercial-map-panel, .commercial-map-label, .commercial-map-toolbar button, .commercial-map-result-list > button { animation: none !important; transition: none !important; }
+  .commercial-map-panel, .commercial-map-label, .commercial-map-toolbar button, .commercial-map-result-list > button, .commercial-map-interior-navigation { animation: none !important; transition: none !important; }
 }
 
 @media (prefers-contrast: high) {

@@ -22,6 +22,7 @@ import { normalizeMapEntityMetadata, type MapLabelVisibility } from '../../utils
 import {
   resolveStrategicLandmarkKind,
   strategicLandmarkFocusDirection,
+  strategicLandmarkSupportsInterior,
   strategicLandmarkVisualHeight,
 } from '../../utils/landmarks';
 import {
@@ -35,6 +36,7 @@ import {
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import type { CameraPreset, CommercialLot, MapCalibration, MapEntity } from '../../types';
 import { HeadquartersInteriorScene } from './HeadquartersInteriorScene';
+import { LivestockPavilionInteriorScene } from './LivestockPavilionInteriorScene';
 import { StrategicLandmarkMesh } from './StrategicLandmarks';
 
 interface CommercialMapCanvasProps {
@@ -207,6 +209,9 @@ function focusProfileForEntity(entity: MapEntity) {
   }
   if (landmark === 'fenasoja-headquarters') {
     return { ...profile, contextRatio: 0.055, fitPadding: 1.16, minDistanceRatio: 0.05, maxDistanceRatio: 0.3, minimumDirectionY: 0.32 };
+  }
+  if (landmark === 'livestock-pavilion') {
+    return { ...profile, contextRatio: 0.075, fitPadding: 1.15, minDistanceRatio: 0.06, maxDistanceRatio: 0.42, minimumDirectionY: 0.36 };
   }
   if (landmark === 'polish-pavilion' || landmark === 'italian-pavilion') {
     return { ...profile, contextRatio: 0.058, fitPadding: 1.18, minDistanceRatio: 0.05, maxDistanceRatio: 0.32, minimumDirectionY: 0.34 };
@@ -1065,6 +1070,7 @@ function CameraRig({ selectedEntity, extent }: { selectedEntity: MapEntity | nul
   const previousPreset = useRef<CameraPreset>(preset);
   const previousSequence = useRef(cameraSequence);
   const previousSelection = useRef<string | null>(selectedEntity?.id ?? null);
+  const returnView = useRef(useCommercialMapStore.getState().interiorReturnView);
 
   const queuePreset = useCallback((nextPreset: CameraPreset) => {
     const perspective = camera as THREE.PerspectiveCamera;
@@ -1104,8 +1110,12 @@ function CameraRig({ selectedEntity, extent }: { selectedEntity: MapEntity | nul
     const entityExtent = getEntityExtent(entity);
     const focusProfile = focusProfileForEntity(entity);
     const hasDetailsPanel = activePanel === 'details';
-    const panelWidth = hasDetailsPanel && size.width > 900 ? Math.min(380, size.width * 0.42) : 0;
-    const panelHeight = hasDetailsPanel && size.width <= 900 ? Math.min(size.height * (size.width <= 640 ? 0.74 : 0.68), 610) : 0;
+    const sidePanelLayout = hasDetailsPanel
+      && (typeof window === 'undefined' ? size.width > 900 : window.innerWidth > 900);
+    const panelWidth = sidePanelLayout ? Math.min(380, size.width * 0.54) : 0;
+    const panelHeight = hasDetailsPanel && !sidePanelLayout
+      ? Math.min(size.height * (size.width <= 640 ? 0.74 : 0.68), 610)
+      : 0;
     const usableWidth = Math.max(size.width - panelWidth, size.width * 0.48);
     const usableHeight = Math.max(size.height - panelHeight, size.height * 0.26);
     const aspect = usableWidth / Math.max(usableHeight, 1);
@@ -1150,7 +1160,10 @@ function CameraRig({ selectedEntity, extent }: { selectedEntity: MapEntity | nul
         // Keep the anchor and its label clear of the mobile details sheet. The
         // sheet's rounded top edge and safe-area spacing need a little more
         // clearance than its raw height alone suggests.
-        lookAt.addScaledVector(viewUp, -verticalShift * 0.96);
+        const mobilePanelClearance = resolveStrategicLandmarkKind(entity) === 'livestock-pavilion'
+          ? 1.72
+          : 0.96;
+        lookAt.addScaledVector(viewUp, -verticalShift * mobilePanelClearance);
       }
     }
     targetLookAt.current.copy(lookAt);
@@ -1169,7 +1182,21 @@ function CameraRig({ selectedEntity, extent }: { selectedEntity: MapEntity | nul
     const sequenceChanged = cameraSequence !== previousSequence.current;
 
     if (!initialized.current) {
-      if (selectedEntity) queueSelection(selectedEntity);
+      if (returnView.current) {
+        const perspective = camera as THREE.PerspectiveCamera;
+        targetPosition.current.set(...returnView.current.position);
+        targetLookAt.current.set(...returnView.current.target);
+        camera.position.copy(targetPosition.current);
+        controlsRef.current?.target.copy(targetLookAt.current);
+        controlsRef.current?.update();
+        perspective.near = Math.max(0.035, camera.position.distanceTo(targetLookAt.current) / 1600);
+        perspective.far = Math.max(720, extent.diagonal * 9);
+        perspective.updateProjectionMatrix();
+        animating.current = false;
+        returnView.current = null;
+        useCommercialMapStore.getState().setInteriorReturnView(null);
+        invalidate();
+      } else if (selectedEntity) queueSelection(selectedEntity);
       else queuePreset(preset);
       initialized.current = true;
     } else if (presetChanged) {
@@ -1188,7 +1215,7 @@ function CameraRig({ selectedEntity, extent }: { selectedEntity: MapEntity | nul
     previousSelection.current = selectedId;
     previousPreset.current = preset;
     previousSequence.current = cameraSequence;
-  }, [cameraSequence, preset, queuePreset, queueSelection, selectedEntity]);
+  }, [camera, cameraSequence, extent.diagonal, invalidate, preset, queuePreset, queueSelection, selectedEntity]);
 
   const clampTarget = useCallback(() => {
     const controls = controlsRef.current;
@@ -1235,9 +1262,17 @@ function CameraRig({ selectedEntity, extent }: { selectedEntity: MapEntity | nul
   }, [gl, invalidate, setCameraNavigating]);
 
   useEffect(() => () => {
+    const controls = controlsRef.current;
+    const store = useCommercialMapStore.getState();
+    if (store.interiorEntityId && controls) {
+      store.setInteriorReturnView({
+        position: camera.position.toArray() as [number, number, number],
+        target: controls.target.toArray() as [number, number, number],
+      });
+    }
     setCameraNavigating(false);
     gl.domElement.style.cursor = '';
-  }, [gl, setCameraNavigating]);
+  }, [camera, gl, setCameraNavigating]);
 
   useFrame((_state, delta) => {
     if (!animating.current) return;
@@ -1300,7 +1335,7 @@ function Scene({ entities, lots, calibration, matchingEntityIds, filtersActive }
   const lotByEntity = useMemo(() => new Map(lots.map((lot) => [lot.entityId, lot])), [lots]);
   const selectedEntity = entities.find((entity) => entity.id === selectedEntityId) ?? null;
   const interiorEntity = entities.find((entity) => (
-    entity.id === interiorEntityId && resolveStrategicLandmarkKind(entity) === 'fenasoja-headquarters'
+    entity.id === interiorEntityId && strategicLandmarkSupportsInterior(entity)
   )) ?? null;
   const visibleLayerEntities = useMemo(() => entities.filter((entity) => (
     layerVisibility[entity.layerId] !== false
@@ -1340,7 +1375,9 @@ function Scene({ entities, lots, calibration, matchingEntityIds, filtersActive }
   }, [cameraNavigating, setHoveredEntityId]);
 
   if (interiorEntity) {
-    return <HeadquartersInteriorScene entity={interiorEntity} reducedGraphics={reducedGraphics} />;
+    return resolveStrategicLandmarkKind(interiorEntity) === 'livestock-pavilion'
+      ? <LivestockPavilionInteriorScene entity={interiorEntity} reducedGraphics={reducedGraphics} />
+      : <HeadquartersInteriorScene entity={interiorEntity} reducedGraphics={reducedGraphics} />;
   }
 
   return (

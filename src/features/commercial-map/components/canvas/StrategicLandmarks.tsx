@@ -5,6 +5,7 @@ import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import type { MapEntity } from '../../types';
 import { withoutClosingPoint } from '../../utils/geometry';
 import { isMapSelectionClick } from '../../utils/interaction';
+import { LIVESTOCK_PAVILION_RENDER_BUDGET } from '../../utils/livestockPavilion';
 import {
   resolveStrategicLandmarkKind,
   strategicLandmarkBounds,
@@ -13,6 +14,7 @@ import {
   type StrategicLandmarkBounds,
   type StrategicLandmarkKind,
 } from '../../utils/landmarks';
+import { LivestockPavilion } from './LivestockPavilion';
 
 const NO_RAYCAST = () => undefined;
 const MAP_BACKGROUND_COLOR = new THREE.Color('#dfe8de');
@@ -117,6 +119,18 @@ const LANDMARK_PALETTES: Record<StrategicLandmarkKind, LandmarkPalette> = {
     white: '#f3f3ee',
     platform: '#77716a',
     metal: '#626969',
+  },
+  'livestock-pavilion': {
+    wall: '#6e9eae',
+    accent: '#a75f3f',
+    roof: '#d8d8d0',
+    trim: '#c8c0ad',
+    dark: '#29383a',
+    glass: '#526d73',
+    green: '#3c694c',
+    white: '#f1f0e8',
+    platform: '#898a82',
+    metal: '#596669',
   },
   'polish-pavilion': {
     wall: '#97633f',
@@ -999,6 +1013,8 @@ function useArchitecturalDetail(
     if (selected) return;
     const threshold = kind === 'sicredi-arena'
       ? Math.max(30, bounds.width * 3.1)
+      : kind === 'livestock-pavilion'
+        ? Math.max(28, bounds.width * LIVESTOCK_PAVILION_RENDER_BUDGET.detailDistanceMultiplier)
       : kind === 'fenasoja-restaurant'
         ? Math.max(20, bounds.width * 5)
         : kind === 'administrative-center'
@@ -2425,7 +2441,7 @@ export function StrategicLandmarkMesh({
     event.stopPropagation();
     if (!isMapSelectionClick(event.delta)) return;
     onSelect(entity.id);
-    if (kind === 'fenasoja-headquarters') onEnterInterior(entity.id);
+    if (kind === 'fenasoja-headquarters' || kind === 'livestock-pavilion') onEnterInterior(entity.id);
     else onFocus();
   };
 
@@ -2463,6 +2479,7 @@ export function StrategicLandmarkMesh({
       <group rotation={[0, facingRadians, 0]} dispose={null}>
         {kind === 'administrative-center' && <AdministrativeCenter {...modelProps} />}
         {kind === 'fenasoja-headquarters' && <FenasojaHeadquarters {...modelProps} />}
+        {kind === 'livestock-pavilion' && <LivestockPavilion {...modelProps} />}
         {kind === 'polish-pavilion' && <PolishPavilion {...modelProps} />}
         {kind === 'italian-pavilion' && <ItalianPavilion {...modelProps} />}
         {kind === 'nations-portico' && <NationsPortico {...modelProps} />}

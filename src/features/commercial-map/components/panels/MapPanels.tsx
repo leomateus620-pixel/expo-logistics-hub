@@ -35,7 +35,10 @@ import { CLASSIFICATION_LABELS, STATUS_CONFIG } from '../../constants';
 import { useLotActivity, useLotContractVersions, useMapMutations } from '../../hooks/useCommercialMap';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import { polygonAreaMapUnits } from '../../utils/geometry';
-import { resolveStrategicLandmarkKind } from '../../utils/landmarks';
+import {
+  resolveStrategicLandmarkKind,
+  strategicLandmarkSupportsInterior,
+} from '../../utils/landmarks';
 import { normalizeMapEntityMetadata } from '../../utils/mapMetadata';
 import type { CommercialLot, MapEntity, MapLayer, MapPermissions } from '../../types';
 import { LotWorkflowDialog, type LotWorkflow } from '../commercial/LotWorkflowDialog';
@@ -225,11 +228,23 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions }:
   const status = lot ? STATUS_CONFIG[lot.status] : null;
   const metadata = normalizeMapEntityMetadata(entity, lot);
   const structuralReady = lot ? ['AVAILABLE', 'BLOCKED', 'UNAVAILABLE'].includes(lot.status) : false;
+  const landmarkKind = resolveStrategicLandmarkKind(entity);
 
   return (
     <>
       <aside className="commercial-map-panel commercial-map-details-panel">
         <PanelHeader eyebrow={CLASSIFICATION_LABELS[entity.classification]} title={metadata.officialDisplayName} onClose={() => setSelectedEntityId(null)} />
+        {landmarkKind === 'livestock-pavilion' && (
+          <Button
+            className="commercial-map-short-interior-action"
+            onClick={() => enterInterior(entity.id)}
+            data-commercial-map-interior-trigger={entity.id}
+            aria-label={`Ver interior de ${metadata.officialDisplayName}`}
+          >
+            <DoorOpen className="h-4 w-4" />
+            Ver interior
+          </Button>
+        )}
         <ScrollArea className="commercial-map-panel-scroll">
           <div className="commercial-map-detail-hero">
             <div className="commercial-map-detail-code">{entity.publicIdentifier}</div>
@@ -293,8 +308,16 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions }:
 
               <div className="commercial-map-detail-actions">
                 <Button variant="outline" onClick={focusSelection}><Focus className="h-4 w-4" />Centralizar</Button>
-                {resolveStrategicLandmarkKind(entity) === 'fenasoja-headquarters' && (
-                  <Button onClick={() => enterInterior(entity.id)}><DoorOpen className="h-4 w-4" />Visitar interior</Button>
+                {strategicLandmarkSupportsInterior(entity) && (
+                  <Button
+                    className="commercial-map-standard-interior-action"
+                    onClick={() => enterInterior(entity.id)}
+                    data-commercial-map-interior-trigger={entity.id}
+                    aria-label={`${landmarkKind === 'livestock-pavilion' ? 'Ver' : 'Visitar'} interior de ${metadata.officialDisplayName}`}
+                  >
+                    <DoorOpen className="h-4 w-4" />
+                    {landmarkKind === 'livestock-pavilion' ? 'Ver interior' : 'Visitar interior'}
+                  </Button>
                 )}
                 {permissions.isMapAdmin && <Button variant="outline" onClick={() => setVerificationOpen(true)}><BadgeCheck className="h-4 w-4" />{entity.verificationStatus === 'VERIFIED' ? 'Reabrir revisão' : 'Verificar entidade'}</Button>}
                 {lot && permissions.canManageLots && <Button variant="outline" onClick={() => setEditingLot(true)}><PencilLine className="h-4 w-4" />Editar lote</Button>}
