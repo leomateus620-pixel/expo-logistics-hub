@@ -211,7 +211,7 @@ function focusProfileForEntity(entity: MapEntity) {
     return { ...profile, contextRatio: 0.055, fitPadding: 1.16, minDistanceRatio: 0.05, maxDistanceRatio: 0.3, minimumDirectionY: 0.32 };
   }
   if (landmark === 'livestock-pavilion') {
-    return { ...profile, contextRatio: 0.075, fitPadding: 1.15, minDistanceRatio: 0.06, maxDistanceRatio: 0.42, minimumDirectionY: 0.36 };
+    return { ...profile, contextRatio: 0.068, fitPadding: 1.08, minDistanceRatio: 0.055, maxDistanceRatio: 0.38, minimumDirectionY: 0.28 };
   }
   if (landmark === 'polish-pavilion' || landmark === 'italian-pavilion') {
     return { ...profile, contextRatio: 0.058, fitPadding: 1.18, minDistanceRatio: 0.05, maxDistanceRatio: 0.32, minimumDirectionY: 0.34 };

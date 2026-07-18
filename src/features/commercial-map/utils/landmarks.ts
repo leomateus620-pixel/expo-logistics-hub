@@ -43,7 +43,7 @@ const STRATEGIC_LANDMARKS: Readonly<Record<string, StrategicLandmarkDefinition>>
     // O footprint oficial é um conjunto longitudinal único. A leitura
     // preferencial mostra o lado ventilado e preserva o contexto das vias.
     facingRadians: 0,
-    focusDirection: [0.36, 0.44, 0.9],
+    focusDirection: [0.26, 0.31, 0.96],
     visualHeight: livestockPavilionVisualHeight,
   },
   B11: {

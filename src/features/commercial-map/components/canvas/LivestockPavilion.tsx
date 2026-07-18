@@ -1,20 +1,19 @@
 import { memo, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import {
+  createLivestockCattlePlan,
   createLivestockPavilionLayout,
   LIVESTOCK_PAVILION_RENDER_BUDGET,
   livestockPavilionBayPositions,
-  type LivestockPavilionLayout,
 } from '../../utils/livestockPavilion';
 import type { StrategicLandmarkBounds } from '../../utils/landmarks';
+import { LivestockCattle } from './LivestockCattle';
+import { createLivestockSurfaceTexture } from './livestockPavilionTextures';
 
 const NO_RAYCAST = () => undefined;
 const UNIT_BOX = new THREE.BoxGeometry(1, 1, 1);
 const UNIT_PLANE = new THREE.PlaneGeometry(1, 1);
-const CATTLE_BODY = new THREE.SphereGeometry(0.5, 8, 6);
-const CATTLE_HEAD = new THREE.SphereGeometry(0.5, 7, 5);
-const CATTLE_LEG = new THREE.CylinderGeometry(0.5, 0.42, 1, 6);
-const CATTLE_EAR = new THREE.ConeGeometry(0.5, 1, 5);
+const BEDDING_CLUMP = new THREE.DodecahedronGeometry(0.5, 0);
 
 type Vector3Tuple = [number, number, number];
 
@@ -35,13 +34,6 @@ export interface LivestockPavilionMaterials {
   white: THREE.MeshStandardMaterial;
   platform: THREE.MeshStandardMaterial;
   metal: THREE.MeshStandardMaterial;
-}
-
-export interface CattlePose {
-  position: Vector3Tuple;
-  rotationY: number;
-  scale?: number;
-  coat: string;
 }
 
 function ScaledInstances({
@@ -87,168 +79,39 @@ function ScaledInstances({
   );
 }
 
-function ColoredInstances({
-  geometry,
-  material,
-  items,
-  castShadow = false,
-}: {
-  geometry: THREE.BufferGeometry;
-  material: THREE.MeshStandardMaterial;
-  items: Array<InstanceTransform & { color: string }>;
-  castShadow?: boolean;
-}) {
-  const ref = useRef<THREE.InstancedMesh>(null);
-
-  useLayoutEffect(() => {
-    const mesh = ref.current;
-    if (!mesh) return;
-    const object = new THREE.Object3D();
-    const color = new THREE.Color();
-    items.forEach((item, index) => {
-      object.position.set(...item.position);
-      object.rotation.set(...(item.rotation ?? [0, 0, 0]));
-      object.scale.set(...item.scale);
-      object.updateMatrix();
-      mesh.setMatrixAt(index, object.matrix);
-      mesh.setColorAt(index, color.set(item.color));
-    });
-    mesh.instanceMatrix.needsUpdate = true;
-    if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
-    mesh.computeBoundingBox();
-    mesh.computeBoundingSphere();
-  }, [items]);
-
-  if (!items.length) return null;
-  return (
-    <instancedMesh
-      ref={ref}
-      args={[geometry, material, items.length]}
-      castShadow={castShadow}
-      receiveShadow
-      raycast={NO_RAYCAST}
-    />
-  );
-}
-
-function rotatedOffset(rotationY: number, forward: number, lateral = 0) {
+function beamAlongXy(
+  startX: number,
+  startY: number,
+  endX: number,
+  endY: number,
+  z: number,
+  thickness: number,
+): InstanceTransform {
+  const dx = endX - startX;
+  const dy = endY - startY;
   return {
-    x: Math.cos(rotationY) * forward + Math.sin(rotationY) * lateral,
-    z: -Math.sin(rotationY) * forward + Math.cos(rotationY) * lateral,
+    position: [(startX + endX) / 2, (startY + endY) / 2, z],
+    scale: [Math.hypot(dx, dy), thickness, thickness],
+    rotation: [0, 0, Math.atan2(dy, dx)],
   };
 }
 
-export const LivestockCattle = memo(function LivestockCattle({
-  poses,
-  castShadow = false,
-}: {
-  poses: CattlePose[];
-  castShadow?: boolean;
-}) {
-  const materials = useMemo(() => ({
-    coat: new THREE.MeshStandardMaterial({
-      color: '#ffffff',
-      roughness: 0.92,
-      metalness: 0,
-      vertexColors: true,
-      emissive: '#51473e',
-      emissiveIntensity: 0.055,
-    }),
-    muzzle: new THREE.MeshStandardMaterial({
-      color: '#39332d',
-      roughness: 0.94,
-      metalness: 0,
-      vertexColors: true,
-      emissive: '#241f1b',
-      emissiveIntensity: 0.035,
-    }),
-  }), []);
-
-  useEffect(() => () => {
-    materials.coat.dispose();
-    materials.muzzle.dispose();
-  }, [materials]);
-
-  const transforms = useMemo(() => {
-    const bodies: Array<InstanceTransform & { color: string }> = [];
-    const heads: Array<InstanceTransform & { color: string }> = [];
-    const legs: Array<InstanceTransform & { color: string }> = [];
-    const ears: Array<InstanceTransform & { color: string }> = [];
-    const horns: Array<InstanceTransform & { color: string }> = [];
-    const muzzles: Array<InstanceTransform & { color: string }> = [];
-
-    poses.forEach((pose) => {
-      const scale = pose.scale ?? 1;
-      const [x, baseY, z] = pose.position;
-      const bodyY = baseY + 0.31 * scale;
-      const headOffset = rotatedOffset(pose.rotationY, 0.32 * scale);
-      const muzzleOffset = rotatedOffset(pose.rotationY, 0.415 * scale);
-
-      bodies.push({
-        position: [x, bodyY, z],
-        scale: [0.58 * scale, 0.32 * scale, 0.27 * scale],
-        rotation: [0, pose.rotationY, 0],
-        color: pose.coat,
-      });
-      heads.push({
-        position: [x + headOffset.x, baseY + 0.29 * scale, z + headOffset.z],
-        scale: [0.25 * scale, 0.25 * scale, 0.22 * scale],
-        rotation: [0, pose.rotationY, -0.12],
-        color: pose.coat,
-      });
-      muzzles.push({
-        position: [x + muzzleOffset.x, baseY + 0.245 * scale, z + muzzleOffset.z],
-        scale: [0.13 * scale, 0.14 * scale, 0.17 * scale],
-        rotation: [0, pose.rotationY, 0],
-        color: pose.coat === '#e9dfc9' ? '#7e6552' : '#2d2925',
-      });
-
-      const legForward = [-0.17, 0.17];
-      const legSides = [-0.085, 0.085];
-      legForward.forEach((forward) => {
-        legSides.forEach((lateral) => {
-          const legOffset = rotatedOffset(pose.rotationY, forward * scale, lateral * scale);
-          legs.push({
-            position: [x + legOffset.x, baseY + 0.12 * scale, z + legOffset.z],
-            scale: [0.07 * scale, 0.24 * scale, 0.07 * scale],
-            rotation: [0, pose.rotationY, 0],
-            color: pose.coat,
-          });
-        });
-      });
-
-      [-1, 1].forEach((side) => {
-        const earOffset = rotatedOffset(pose.rotationY, 0.32 * scale, side * 0.13 * scale);
-        ears.push({
-          position: [x + earOffset.x, baseY + 0.405 * scale, z + earOffset.z],
-          scale: [0.09 * scale, 0.12 * scale, 0.065 * scale],
-          rotation: [Math.PI / 2, pose.rotationY, side * 0.5],
-          color: pose.coat,
-        });
-        const hornOffset = rotatedOffset(pose.rotationY, 0.345 * scale, side * 0.062 * scale);
-        horns.push({
-          position: [x + hornOffset.x, baseY + 0.455 * scale, z + hornOffset.z],
-          scale: [0.036 * scale, 0.12 * scale, 0.036 * scale],
-          rotation: [0, pose.rotationY, side * 0.28],
-          color: '#e1cf9f',
-        });
-      });
-    });
-
-    return { bodies, heads, legs, ears, horns, muzzles };
-  }, [poses]);
-
-  return (
-    <group raycast={NO_RAYCAST}>
-      <ColoredInstances geometry={CATTLE_BODY} material={materials.coat} items={transforms.bodies} castShadow={castShadow} />
-      <ColoredInstances geometry={CATTLE_HEAD} material={materials.coat} items={transforms.heads} castShadow={castShadow} />
-      <ColoredInstances geometry={CATTLE_LEG} material={materials.coat} items={transforms.legs} />
-      <ColoredInstances geometry={CATTLE_EAR} material={materials.coat} items={transforms.ears} />
-      <ColoredInstances geometry={CATTLE_EAR} material={materials.coat} items={transforms.horns} />
-      <ColoredInstances geometry={CATTLE_HEAD} material={materials.muzzle} items={transforms.muzzles} />
-    </group>
-  );
-});
+function beamAlongYz(
+  x: number,
+  startY: number,
+  startZ: number,
+  endY: number,
+  endZ: number,
+  thickness: number,
+): InstanceTransform {
+  const dy = endY - startY;
+  const dz = endZ - startZ;
+  return {
+    position: [x, (startY + endY) / 2, (startZ + endZ) / 2],
+    scale: [thickness, thickness, Math.hypot(dy, dz)],
+    rotation: [-Math.atan2(dy, dz), 0, 0],
+  };
+}
 
 function createIdentityTexture() {
   if (typeof document === 'undefined') return null;
@@ -330,43 +193,6 @@ function LivestockIdentitySign({
   );
 }
 
-function createExternalCattlePoses(
-  layout: LivestockPavilionLayout,
-  includeFocusedHerd: boolean,
-): CattlePose[] {
-  const coats = ['#e9dfc9', '#8c5d3f', '#403832', '#c9ad83', '#f0eadb'];
-  const poses: CattlePose[] = [];
-
-  layout.sections.forEach((section, sectionIndex) => {
-    const bays = livestockPavilionBayPositions(section);
-    const visibleCount = includeFocusedHerd
-      ? Math.min(LIVESTOCK_PAVILION_RENDER_BUDGET.focusedCattlePerSection, section.bayCount)
-      : Math.min(LIVESTOCK_PAVILION_RENDER_BUDGET.mediumCattlePerSection, section.bayCount);
-    for (let index = 0; index < visibleCount; index += 1) {
-      const bayIndex = includeFocusedHerd
-        ? index
-        : Math.round(index * (section.bayCount - 1) / Math.max(1, visibleCount - 1));
-      const minX = bays[bayIndex] ?? section.minX;
-      const maxX = bays[bayIndex + 1] ?? section.maxX;
-      const side = (index + sectionIndex) % 2 === 0 ? 1 : -1;
-      poses.push({
-        position: [
-          (minX + maxX) / 2 + ((index % 3) - 1) * 0.045,
-          layout.platformHeight + 0.055,
-          side * (layout.corridorWidth / 2 + layout.stallDepth * (0.52 + (index % 2) * 0.08)),
-        ],
-        rotationY: side > 0
-          ? (index % 2 ? Math.PI - 0.16 : 0.12)
-          : (index % 2 ? 0.18 : Math.PI + 0.1),
-        scale: 0.88 + ((index + sectionIndex) % 3) * 0.055,
-        coat: coats[(index * 2 + sectionIndex) % coats.length],
-      });
-    }
-  });
-
-  return poses;
-}
-
 export const LivestockPavilion = memo(function LivestockPavilion({
   bounds,
   height,
@@ -384,45 +210,168 @@ export const LivestockPavilion = memo(function LivestockPavilion({
     () => createLivestockPavilionLayout(bounds, height),
     [bounds, height],
   );
+  const surfaceTextures = useMemo(() => ({
+    concrete: createLivestockSurfaceTexture('concrete'),
+    roof: createLivestockSurfaceTexture('roof'),
+    sawdust: createLivestockSurfaceTexture('sawdust'),
+  }), []);
+  const detailMaterials = useMemo(() => ({
+    skylight: new THREE.MeshStandardMaterial({
+      color: '#b7d4d3',
+      roughness: 0.3,
+      metalness: 0.05,
+      transparent: true,
+      opacity: 0.46,
+      depthWrite: false,
+      side: THREE.DoubleSide,
+    }),
+    light: new THREE.MeshStandardMaterial({
+      color: '#fff1c4',
+      emissive: '#ffbf69',
+      emissiveIntensity: 1.25,
+      roughness: 0.44,
+      metalness: 0,
+      toneMapped: false,
+    }),
+  }), []);
+
+  useEffect(() => {
+    const targets = [
+      {
+        material: materials.platform,
+        texture: surfaceTextures.concrete,
+        bumpScale: 0.014,
+        roughness: 0.96,
+        metalness: 0,
+      },
+      {
+        material: materials.accent,
+        texture: surfaceTextures.sawdust,
+        bumpScale: 0.022,
+        roughness: 1,
+        metalness: 0,
+      },
+      {
+        material: materials.roof,
+        texture: surfaceTextures.roof,
+        bumpScale: 0.008,
+        roughness: 0.6,
+        metalness: 0.16,
+      },
+    ];
+    const previous = targets.map(({ material }) => ({
+      material,
+      map: material.map,
+      bumpMap: material.bumpMap,
+      bumpScale: material.bumpScale,
+      roughness: material.roughness,
+      metalness: material.metalness,
+    }));
+
+    targets.forEach(({ material, texture, bumpScale, roughness, metalness }) => {
+      material.map = texture;
+      material.bumpMap = texture;
+      material.bumpScale = bumpScale;
+      material.roughness = roughness;
+      material.metalness = metalness;
+      material.needsUpdate = true;
+    });
+
+    return () => {
+      previous.forEach((item) => {
+        item.material.map = item.map;
+        item.material.bumpMap = item.bumpMap;
+        item.material.bumpScale = item.bumpScale;
+        item.material.roughness = item.roughness;
+        item.material.metalness = item.metalness;
+        item.material.needsUpdate = true;
+      });
+    };
+  }, [materials, surfaceTextures]);
+
+  useEffect(() => () => {
+    Object.values(surfaceTextures).forEach((texture) => texture?.dispose());
+  }, [surfaceTextures]);
+
+  useEffect(() => () => {
+    detailMaterials.skylight.dispose();
+    detailMaterials.light.dispose();
+  }, [detailMaterials]);
 
   const architecture = useMemo(() => {
     const roofFaces: InstanceTransform[] = [];
     const ridgeCaps: InstanceTransform[] = [];
+    const ridgeVents: InstanceTransform[] = [];
+    const ridgeSupports: InstanceTransform[] = [];
     const gutters: InstanceTransform[] = [];
+    const downspouts: InstanceTransform[] = [];
     const platforms: InstanceTransform[] = [];
     const stallFloors: InstanceTransform[] = [];
     const corridors: InstanceTransform[] = [];
+    const aisleEdges: InstanceTransform[] = [];
+    const aisleJoints: InstanceTransform[] = [];
     const sideWalls: InstanceTransform[] = [];
     const columns: InstanceTransform[] = [];
     const trussTies: InstanceTransform[] = [];
     const trussChords: InstanceTransform[] = [];
-    const partitions: InstanceTransform[] = [];
+    const trussWebs: InstanceTransform[] = [];
+    const partitionKickboards: InstanceTransform[] = [];
+    const partitionRails: InstanceTransform[] = [];
     const sideRails: InstanceTransform[] = [];
+    const corridorRails: InstanceTransform[] = [];
+    const gatePosts: InstanceTransform[] = [];
+    const sideBraces: InstanceTransform[] = [];
     const roofSeams: InstanceTransform[] = [];
-    const sectionFrames: InstanceTransform[] = [];
+    const purlins: InstanceTransform[] = [];
+    const skylights: InstanceTransform[] = [];
+    const feedTroughs: InstanceTransform[] = [];
+    const waterers: InstanceTransform[] = [];
+    const lightHousings: InstanceTransform[] = [];
+    const lightTubes: InstanceTransform[] = [];
+    const beddingClumps: InstanceTransform[] = [];
 
-    layout.sections.forEach((section) => {
+    layout.sections.forEach((section, sectionIndex) => {
       platforms.push({
         position: [section.centerX, layout.platformHeight / 2, 0],
         scale: [section.width, layout.platformHeight, layout.depth - 0.04],
       });
       corridors.push({
-        position: [section.centerX, layout.platformHeight + 0.018, 0],
-        scale: [section.width - 0.08, 0.035, layout.corridorWidth - 0.04],
+        position: [section.centerX, layout.platformHeight + 0.03, 0],
+        scale: [section.width - 0.08, 0.06, layout.corridorWidth - 0.04],
+      });
+      aisleJoints.push({
+        position: [section.minX + 0.035, layout.platformHeight + 0.064, 0],
+        scale: [0.035, 0.012, layout.corridorWidth - 0.08],
       });
       [-1, 1].forEach((side) => {
         const sideZ = side * (layout.corridorWidth / 2 + layout.stallDepth / 2);
         stallFloors.push({
-          position: [section.centerX, layout.platformHeight + 0.023, sideZ],
-          scale: [section.width - 0.1, 0.045, layout.stallDepth - 0.06],
+          position: [section.centerX, layout.platformHeight + 0.034, sideZ],
+          scale: [section.width - 0.1, 0.068, layout.stallDepth - 0.06],
+        });
+        aisleEdges.push({
+          position: [
+            section.centerX,
+            layout.platformHeight + 0.08,
+            side * (layout.corridorWidth / 2 + 0.02),
+          ],
+          scale: [section.width - 0.1, 0.1, 0.07],
+        });
+        feedTroughs.push({
+          position: [
+            section.centerX,
+            layout.platformHeight + 0.13,
+            side * (layout.corridorWidth / 2 + 0.135),
+          ],
+          scale: [section.width - 0.28, 0.16, 0.18],
         });
         sideWalls.push({
           position: [
             section.centerX,
-            layout.platformHeight + layout.sideWallHeight / 2,
+            layout.platformHeight + layout.sideWallHeight * 0.38,
             side * (layout.depth / 2 - 0.075),
           ],
-          scale: [section.width - 0.18, layout.sideWallHeight, 0.12],
+          scale: [section.width - 0.18, layout.sideWallHeight * 0.76, 0.12],
         });
         roofFaces.push({
           position: [
@@ -437,19 +386,51 @@ export const LivestockPavilion = memo(function LivestockPavilion({
           position: [section.centerX, layout.eaveHeight - 0.018, side * (layout.depth / 2 - 0.035)],
           scale: [section.width + 0.055, 0.07, 0.075],
         });
-        [0.74, 1.04].forEach((heightRatio) => {
+        [0.76, 1.12].forEach((heightRatio) => {
           sideRails.push({
             position: [
               section.centerX,
-              Math.min(layout.eaveHeight - 0.18, layout.sideWallHeight * heightRatio + 0.33),
+              Math.min(layout.eaveHeight - 0.17, layout.sideWallHeight * heightRatio + 0.32),
               side * (layout.depth / 2 - 0.115),
             ],
             scale: [section.width - 0.22, 0.035, 0.035],
           });
         });
+        [0.42, 0.67, 0.91].forEach((railHeight) => {
+          corridorRails.push({
+            position: [
+              section.centerX,
+              layout.platformHeight + railHeight,
+              side * (layout.corridorWidth / 2 + 0.19),
+            ],
+            scale: [section.width - 0.24, 0.04, 0.04],
+          });
+        });
+        [0.28, 0.58, 0.86].forEach((slopeRatio) => {
+          purlins.push({
+            position: [
+              section.centerX,
+              layout.height - layout.roofRise * slopeRatio - 0.055,
+              side * layout.roofHalfSpan * slopeRatio,
+            ],
+            scale: [section.width - 0.08, 0.04, 0.045],
+          });
+        });
+        [-0.25, 0.25].forEach((xRatio) => {
+          const slopeRatio = 0.43;
+          skylights.push({
+            position: [
+              section.centerX + section.width * xRatio,
+              layout.height - layout.roofRise * slopeRatio + 0.047,
+              side * layout.roofHalfSpan * slopeRatio,
+            ],
+            scale: [section.width * 0.18, 0.018, layout.roofSlopeLength * 0.32],
+            rotation: [side * layout.roofAngle, 0, 0],
+          });
+        });
 
         if (showFocusDetail) {
-          const seamCount = Math.max(5, Math.round(section.width / 0.46));
+          const seamCount = Math.max(8, Math.round(section.width / 0.36));
           for (let seamIndex = 1; seamIndex < seamCount; seamIndex += 1) {
             roofSeams.push({
               position: [
@@ -462,11 +443,46 @@ export const LivestockPavilion = memo(function LivestockPavilion({
             });
           }
         }
+
+        [section.minX + 0.09, section.maxX - 0.09].forEach((x) => {
+          downspouts.push({
+            position: [
+              x,
+              layout.platformHeight + layout.eaveHeight * 0.46,
+              side * (layout.depth / 2 - 0.035),
+            ],
+            scale: [0.055, layout.eaveHeight * 0.92, 0.055],
+          });
+        });
+
+        const clumpCount = showFocusDetail ? 18 : 7;
+        for (let clumpIndex = 0; clumpIndex < clumpCount; clumpIndex += 1) {
+          const xRatio = ((clumpIndex * 37 + sectionIndex * 13 + (side > 0 ? 5 : 19)) % 97) / 97;
+          const zRatio = ((clumpIndex * 29 + sectionIndex * 7) % 43) / 43;
+          const clumpScale = 0.045 + ((clumpIndex * 11 + sectionIndex) % 5) * 0.009;
+          beddingClumps.push({
+            position: [
+              section.minX + 0.14 + xRatio * (section.width - 0.28),
+              layout.platformHeight + 0.078,
+              side * (
+                layout.corridorWidth / 2
+                + 0.28
+                + zRatio * Math.max(0.1, layout.stallDepth - 0.4)
+              ),
+            ],
+            scale: [clumpScale * 1.45, clumpScale * 0.42, clumpScale],
+            rotation: [0, (clumpIndex * 0.91) % Math.PI, 0],
+          });
+        }
       });
 
       ridgeCaps.push({
         position: [section.centerX, layout.height + 0.025, 0],
         scale: [section.width + 0.09, 0.085, 0.14],
+      });
+      ridgeVents.push({
+        position: [section.centerX, layout.height + 0.135, 0],
+        scale: [section.width - 0.12, 0.055, 0.24],
       });
 
       const bayPositions = livestockPavilionBayPositions(section);
@@ -485,53 +501,149 @@ export const LivestockPavilion = memo(function LivestockPavilion({
             scale: [0.055, 0.055, layout.roofSlopeLength - 0.06],
             rotation: [side * layout.roofAngle, 0, 0],
           });
+          gatePosts.push({
+            position: [
+              x,
+              layout.platformHeight + 0.54,
+              side * (layout.corridorWidth / 2 + 0.19),
+            ],
+            scale: [0.055, 0.92, 0.055],
+          });
+          trussWebs.push(
+            beamAlongYz(
+              x,
+              layout.eaveHeight - 0.12,
+              side * layout.roofHalfSpan * 0.82,
+              layout.height - 0.1,
+              0,
+              0.04,
+            ),
+            beamAlongYz(
+              x,
+              layout.eaveHeight - 0.12,
+              0,
+              layout.height - layout.roofRise * 0.48,
+              side * layout.roofHalfSpan * 0.48,
+              0.035,
+            ),
+          );
         });
         trussTies.push({
           position: [x, layout.eaveHeight - 0.095, 0],
           scale: [0.055, 0.055, layout.depth - 0.24],
         });
+        ridgeSupports.push({
+          position: [x, layout.height + 0.075, 0],
+          scale: [0.035, 0.13, 0.035],
+        });
         if (index > 0 && index < bayPositions.length - 1) {
           [-1, 1].forEach((side) => {
-            partitions.push({
+            partitionKickboards.push({
               position: [
                 x,
-                layout.platformHeight + layout.sideWallHeight * 0.42,
+                layout.platformHeight + 0.14,
                 side * (layout.corridorWidth / 2 + layout.stallDepth / 2),
               ],
-              scale: [0.055, layout.sideWallHeight * 0.78, layout.stallDepth - 0.12],
+              scale: [0.055, 0.22, layout.stallDepth - 0.12],
             });
+            [0.39, 0.63, 0.86].forEach((railHeight) => {
+              partitionRails.push({
+                position: [
+                  x,
+                  layout.platformHeight + railHeight,
+                  side * (layout.corridorWidth / 2 + layout.stallDepth / 2),
+                ],
+                scale: [0.045, 0.045, layout.stallDepth - 0.12],
+              });
+            });
+            if ((index + sectionIndex) % 3 === 1) {
+              waterers.push({
+                position: [
+                  x + 0.13,
+                  layout.platformHeight + 0.24,
+                  side * (layout.corridorWidth / 2 + layout.stallDepth * 0.8),
+                ],
+                scale: [0.22, 0.24, 0.2],
+              });
+            }
           });
         }
-      });
-
-      [section.minX + 0.035, section.maxX - 0.035].forEach((x) => {
-        sectionFrames.push({
-          position: [x, layout.platformHeight + layout.eaveHeight / 2, 0],
-          scale: [0.095, layout.eaveHeight, layout.depth - 0.16],
-        });
+        if (index < bayPositions.length - 1) {
+          const nextX = bayPositions[index + 1];
+          const bayWidth = nextX - x;
+          lightHousings.push({
+            position: [
+              x + bayWidth / 2,
+              layout.eaveHeight - 0.19,
+              0,
+            ],
+            scale: [bayWidth * 0.48, 0.065, 0.085],
+          });
+          lightTubes.push({
+            position: [
+              x + bayWidth / 2,
+              layout.eaveHeight - 0.225,
+              0,
+            ],
+            scale: [bayWidth * 0.39, 0.025, 0.048],
+          });
+          if (index % 2 === 0) {
+            [-1, 1].forEach((side) => {
+              sideBraces.push(
+                beamAlongXy(
+                  x + 0.04,
+                  layout.platformHeight + 0.34,
+                  nextX - 0.04,
+                  layout.eaveHeight - 0.22,
+                  side * (layout.depth / 2 - 0.145),
+                  0.035,
+                ),
+              );
+            });
+          }
+        }
       });
     });
 
     return {
+      beddingClumps,
       columns,
       corridors,
       gutters,
-      partitions,
+      lightTubes,
+      metalDetails: [
+        ...sideRails,
+        ...corridorRails,
+        ...gatePosts,
+        ...partitionRails,
+        ...downspouts,
+        ...ridgeSupports,
+      ],
+      darkDetails: [
+        ...aisleJoints,
+        ...trussTies,
+        ...trussChords,
+        ...trussWebs,
+        ...sideBraces,
+        ...purlins,
+        ...lightHousings,
+      ],
+      partitionKickboards,
       platforms,
       ridgeCaps,
+      ridgeVents,
       roofFaces,
       roofSeams,
-      sectionFrames,
-      sideRails,
       sideWalls,
+      skylights,
       stallFloors,
-      trussChords,
-      trussTies,
+      trimDetails: [...aisleEdges, ...feedTroughs],
+      waterers,
     };
   }, [layout, showFocusDetail]);
 
   const cattle = useMemo(
-    () => createExternalCattlePoses(layout, showFocusDetail),
+    () => createLivestockCattlePlan(layout, showFocusDetail ? 'focused' : 'medium'),
     [layout, showFocusDetail],
   );
 
@@ -543,7 +655,7 @@ export const LivestockPavilion = memo(function LivestockPavilion({
         receiveShadow
       />
       <ScaledInstances
-        material={materials.trim}
+        material={materials.platform}
         items={architecture.corridors}
         receiveShadow
       />
@@ -564,18 +676,31 @@ export const LivestockPavilion = memo(function LivestockPavilion({
         castShadow
         receiveShadow
       />
-      <ScaledInstances material={materials.metal} items={architecture.ridgeCaps} castShadow />
+      <ScaledInstances material={materials.roof} items={architecture.ridgeCaps} castShadow />
       <ScaledInstances material={materials.metal} items={architecture.gutters} />
       <ScaledInstances material={materials.dark} items={architecture.columns} castShadow={showDetail} />
-      <ScaledInstances material={materials.dark} items={architecture.sectionFrames} />
 
       {showDetail && (
         <>
-          <ScaledInstances material={materials.metal} items={architecture.sideRails} />
-          <ScaledInstances material={materials.wall} items={architecture.partitions} />
-          <ScaledInstances material={materials.dark} items={architecture.trussTies} />
-          <ScaledInstances material={materials.dark} items={architecture.trussChords} />
-          <LivestockCattle poses={cattle} castShadow={showFocusDetail} />
+          <ScaledInstances
+            material={materials.trim}
+            items={architecture.trimDetails}
+            castShadow
+            receiveShadow
+          />
+          <ScaledInstances material={materials.dark} items={architecture.darkDetails} />
+          <ScaledInstances material={materials.metal} items={architecture.metalDetails} />
+          <ScaledInstances material={materials.wall} items={architecture.partitionKickboards} />
+          <ScaledInstances material={materials.roof} items={architecture.ridgeVents} castShadow />
+          <ScaledInstances material={detailMaterials.skylight} items={architecture.skylights} />
+          <ScaledInstances material={detailMaterials.light} items={architecture.lightTubes} />
+          <ScaledInstances material={materials.glass} items={architecture.waterers} />
+          <ScaledInstances geometry={BEDDING_CLUMP} material={materials.accent} items={architecture.beddingClumps} />
+          <LivestockCattle
+            poses={cattle}
+            castShadow={showFocusDetail}
+            animate={showFocusDetail}
+          />
           <LivestockIdentitySign
             width={layout.width}
             depth={layout.depth}
@@ -586,7 +711,16 @@ export const LivestockPavilion = memo(function LivestockPavilion({
       )}
 
       {showFocusDetail && (
-        <ScaledInstances material={materials.white} items={architecture.roofSeams} />
+        <>
+          <ScaledInstances material={materials.white} items={architecture.roofSeams} />
+          <pointLight
+            position={[0, layout.eaveHeight * 0.72, 0]}
+            intensity={0.82}
+            distance={layout.width * 0.55}
+            decay={2}
+            color="#ffd59a"
+          />
+        </>
       )}
     </group>
   );
