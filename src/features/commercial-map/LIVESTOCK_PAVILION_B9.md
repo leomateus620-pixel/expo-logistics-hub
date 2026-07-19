@@ -44,7 +44,8 @@ legíveis, sem atribuir um número a qualquer trecho.
 - Seleção: um volume invisível derivado do footprint oficial
 - Raycast: somente o volume pai recebe hover, clique e duplo clique
 - Label: nome oficial ancorado no centroide e na altura visual derivada
-- Foco: direção `[0.36, 0.44, 0.9]`, com compensação para painel lateral ou sheet
+- Foco: direção `[0.26, 0.31, 0.96]`, com enquadramento mais baixo da fachada e
+  compensação para painel lateral ou sheet
 - Painel: metadados normalizados e área cartográfica existentes
 - Inspeção: ação explícita `Ver interior`, `Escape` e retorno pelo botão
 - Retorno: posição e alvo da câmera externa são capturados antes da troca de cena
@@ -68,35 +69,61 @@ footprint oficial para não fechar os pequenos afastamentos cartográficos.
 
 - Exterior: conjunto baixo, muito longitudinal, cobertura metálica clara,
   continuidade horizontal, entorno verde e ligação direta com vias do parque
-- Interior: estrutura metálica exposta, laterais ventiladas, piso
-  terroso/avermelhado, contenções azul-acinzentadas, baias repetidas e circulação
-  longitudinal
+- Interior: estrutura metálica exposta, laterais ventiladas, piso de concreto e
+  serragem, contenções azul-acinzentadas, baias repetidas e circulação longitudinal
 - Limite de inferência: não foram adicionados anexos, portas, numeração por
   trecho ou equipamentos sem apoio visual ou cartográfico
 
 ## Reconstrução paramétrica
 
 - Três trechos espaciais com duas juntas de cobertura
-- Seis planos inclinados de telhado, cumeeiras, espessura e calhas
-- Plataforma, corredor longitudinal e pisos de baias
-- Paredes baixas, trilhos, pilares, tirantes e tesouras repetidas
+- Telhado metálico com painéis, costuras, terças, cumeeiras ventiladas,
+  claraboias, calhas e condutores
+- Tesouras completas, cordas, diagonais, tirantes laterais e pilares repetidos
+- Plataforma, corredor central de concreto, juntas, drenagem e bordas de aisle
+- Baias com cama de serragem, acúmulos irregulares, muretas, trilhos, portões,
+  divisórias, cochos lineares e bebedouros
+- Iluminação linear interna com preenchimento quente e frio
 - Placa única com a identificação oficial combinada
 - Corte interno pela remoção apenas da água de cobertura próxima à câmera
-- Gado low-poly instanciado, com variação determinística de pelagem, escala e
-  orientação, sempre dentro das baias
+- Câmera interna responsiva para desktop, paisagem compacta e retrato, com
+  órbita, zoom e pan limitados ao volume do pavilhão
+
+## Rebanho paramétrico
+
+- 18 animais no interior e 15 no exterior selecionado
+- Perfis determinísticos brancos, pretos, marrons, vermelho-acastanhados,
+  malhados e de face branca
+- Construções pesada, padrão e compacta, incluindo um boi claro de grande porte
+  com cupim e chifres
+- Poses em pé, alimentando-se e deitadas, com variação de orientação e cabeça
+- Respiração, cabeça e cauda animadas apenas em animais elegíveis
+- Limite de quatro animais animados por cena, atualização a `14 fps` e respeito
+  a `prefers-reduced-motion`
+- Geometrias e materiais compartilhados; todas as partes do rebanho ignoram
+  raycast
+
+## Materiais e superfícies
+
+- Concreto, serragem e telha usam texturas procedurais determinísticas de
+  `256 × 256`, geradas localmente e repetidas conforme a superfície
+- A placa usa canvas `512 × 128`, criado somente quando o detalhe está ativo
+- Não há download de modelos, bibliotecas visuais ou texturas fotográficas
+- Rugosidade, metalness, bump e preenchimento de luz foram calibrados para
+  diferenciar aço, cobertura, concreto, serragem, água e animais sem brilho
+  plástico
 
 ## Orçamento de renderização
 
-- Visão geral: 9 batches arquitetônicos instanciados; nenhum animal
-- Distância média: 9 animais, 21 draw calls do modelo
-- Selecionado: 15 animais, 22 draw calls do modelo e menos de 8 mil triângulos
-- Interior: 18 animais (9 em gráficos reduzidos), cerca de 20 draw calls e menos
-  de 8 mil triângulos
-- Textura de placa: `512 × 128`, criada somente quando o detalhe está ativo
-- Materiais compartilhados; nenhuma biblioteca, modelo externo ou textura
-  fotográfica adicionada
-- Sombras: cobertura, paredes e elementos estruturais principais; animais
-  somente em foco ou interior; divisórias pequenas não projetam sombra
-- LOD: detalhe externo ativado por distância; costuras de cobertura, rebanho
-  completo e sombras dos animais somente no foco selecionado
-- Animação: apenas durante transições de câmera e interação com controles
+- Visão geral: somente a arquitetura compatível com o LOD, sem rebanho
+- Distância média: 9 animais e arquitetura simplificada
+- Selecionado: 15 animais, superfícies e detalhes completos
+- Interior: 18 animais; 9 em gráficos reduzidos
+- Rebanho completo: 11 batches instanciados, incluindo sombra de contato
+- Batches arquitetônicos consolidados por material para reduzir trocas de estado
+- Sombras: cobertura, paredes e estrutura principal; animais apenas em foco ou
+  interior; elementos pequenos não projetam sombra
+- LOD: detalhes externos e rebanho crescem por distância; costuras, textura,
+  gado completo e sombras ficam restritos ao foco
+- Animação: invalidação sob demanda; fora das transições e dos quatro animais
+  elegíveis, a cena permanece estática

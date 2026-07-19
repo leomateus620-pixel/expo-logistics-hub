@@ -4,6 +4,7 @@ import {
   LIVESTOCK_PAVILION_OFFICIAL_NAME,
   LIVESTOCK_PAVILION_PUBLIC_IDENTIFIER,
   LIVESTOCK_PAVILION_RENDER_BUDGET,
+  createLivestockCattlePlan,
   createLivestockPavilionLayout,
   livestockPavilionBayPositions,
 } from '@/features/commercial-map/utils/livestockPavilion';
@@ -62,7 +63,37 @@ describe('fonte de verdade arquitetônica do pavilhão de pecuária', () => {
     expect(LIVESTOCK_PAVILION_RENDER_BUDGET.focusedCattlePerSection * 3).toBe(15);
     expect(LIVESTOCK_PAVILION_RENDER_BUDGET.interiorCattlePerSection * 3).toBe(18);
     expect(LIVESTOCK_PAVILION_RENDER_BUDGET.reducedInteriorCattlePerSection * 3).toBe(9);
+    expect(LIVESTOCK_PAVILION_RENDER_BUDGET.animatedCattleLimit).toBeLessThanOrEqual(4);
+    expect(LIVESTOCK_PAVILION_RENDER_BUDGET.animationFps).toBeLessThanOrEqual(15);
+    expect(LIVESTOCK_PAVILION_RENDER_BUDGET.surfaceTextureSize).toBeLessThanOrEqual(256);
     expect(LIVESTOCK_PAVILION_RENDER_BUDGET.identityTextureWidth).toBeLessThanOrEqual(512);
     expect(LIVESTOCK_PAVILION_RENDER_BUDGET.identityTextureHeight).toBeLessThanOrEqual(128);
+  });
+
+  it('planeja um rebanho interno variado, contido nas baias e com animação limitada', () => {
+    const bounds = strategicLandmarkBounds(entity);
+    const layout = createLivestockPavilionLayout(bounds, strategicLandmarkVisualHeight(entity)!);
+    const herd = createLivestockCattlePlan(layout, 'interior');
+
+    expect(herd).toHaveLength(LIVESTOCK_PAVILION_RENDER_BUDGET.interiorCattlePerSection * 3);
+    expect(new Set(herd.map((pose) => pose.coat)).size).toBeGreaterThanOrEqual(5);
+    expect(new Set(herd.map((pose) => pose.stance))).toEqual(
+      new Set(['standing', 'feeding', 'resting']),
+    );
+    expect(herd.some((pose) => pose.build === 'heavy' && pose.coat === '#eee9dc' && pose.scale > 1.1)).toBe(true);
+    expect(herd.some((pose) => pose.coat === '#201f1d')).toBe(true);
+    expect(herd.some((pose) => pose.coat === '#7b4b2f' || pose.coat === '#864a2e')).toBe(true);
+    expect(herd.filter((pose) => pose.animated).length).toBeGreaterThanOrEqual(2);
+    expect(herd.filter((pose) => pose.animated).length).toBeLessThanOrEqual(
+      LIVESTOCK_PAVILION_RENDER_BUDGET.animatedCattleLimit,
+    );
+
+    herd.forEach((pose) => {
+      const section = layout.sections.find((candidate) => candidate.key === pose.sectionKey)!;
+      expect(pose.position[0]).toBeGreaterThan(section.minX);
+      expect(pose.position[0]).toBeLessThan(section.maxX);
+      expect(Math.abs(pose.position[2])).toBeGreaterThan(layout.corridorWidth / 2);
+      expect(Math.abs(pose.position[2])).toBeLessThan(layout.depth / 2);
+    });
   });
 });

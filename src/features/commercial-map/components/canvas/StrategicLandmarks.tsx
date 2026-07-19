@@ -121,16 +121,16 @@ const LANDMARK_PALETTES: Record<StrategicLandmarkKind, LandmarkPalette> = {
     metal: '#626969',
   },
   'livestock-pavilion': {
-    wall: '#6e9eae',
-    accent: '#a75f3f',
-    roof: '#d8d8d0',
-    trim: '#c8c0ad',
-    dark: '#29383a',
-    glass: '#526d73',
+    wall: '#557d88',
+    accent: '#c3925b',
+    roof: '#c8cbc7',
+    trim: '#b6b1a5',
+    dark: '#263234',
+    glass: '#315d68',
     green: '#3c694c',
-    white: '#f1f0e8',
-    platform: '#898a82',
-    metal: '#596669',
+    white: '#ecece6',
+    platform: '#85847d',
+    metal: '#4d5c5f',
   },
   'polish-pavilion': {
     wall: '#97633f',
@@ -238,6 +238,16 @@ function useLandmarkMaterials(
       metal: material(palette.metal, 0.62, 0.16),
     };
     result.white.side = THREE.DoubleSide;
+    if (kind === 'livestock-pavilion') {
+      result.roof.roughness = 0.6;
+      result.roof.metalness = 0.16;
+      result.metal.roughness = 0.5;
+      result.metal.metalness = 0.34;
+      result.dark.roughness = 0.58;
+      result.dark.metalness = 0.28;
+      result.wall.roughness = 0.82;
+      result.platform.roughness = 0.96;
+    }
     return result;
   }, [kind]);
 
