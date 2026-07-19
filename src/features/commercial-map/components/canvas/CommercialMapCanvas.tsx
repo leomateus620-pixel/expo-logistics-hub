@@ -1,4 +1,4 @@
-import { memo, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { lazy, memo, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, type ThreeEvent, useFrame, useThree } from '@react-three/fiber';
 import { AdaptiveDpr, Html, OrbitControls, Preload, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
@@ -38,6 +38,11 @@ import type { CameraPreset, CommercialLot, MapCalibration, MapEntity } from '../
 import { HeadquartersInteriorScene } from './HeadquartersInteriorScene';
 import { LivestockPavilionInteriorScene } from './LivestockPavilionInteriorScene';
 import { StrategicLandmarkMesh } from './StrategicLandmarks';
+
+const MiranteInteriorScene = lazy(async () => {
+  const module = await import('./MiranteInteriorScene');
+  return { default: module.MiranteInteriorScene };
+});
 
 interface CommercialMapCanvasProps {
   entities: MapEntity[];
@@ -212,6 +217,9 @@ function focusProfileForEntity(entity: MapEntity) {
   }
   if (landmark === 'livestock-pavilion') {
     return { ...profile, contextRatio: 0.068, fitPadding: 1.08, minDistanceRatio: 0.055, maxDistanceRatio: 0.38, minimumDirectionY: 0.28 };
+  }
+  if (landmark === 'mirante-pavilion') {
+    return { ...profile, contextRatio: 0.075, fitPadding: 1.16, minDistanceRatio: 0.06, maxDistanceRatio: 0.4, minimumDirectionY: 0.3 };
   }
   if (landmark === 'polish-pavilion' || landmark === 'italian-pavilion') {
     return { ...profile, contextRatio: 0.058, fitPadding: 1.18, minDistanceRatio: 0.05, maxDistanceRatio: 0.32, minimumDirectionY: 0.34 };
@@ -1071,6 +1079,31 @@ function CameraRig({ selectedEntity, extent }: { selectedEntity: MapEntity | nul
   const previousSequence = useRef(cameraSequence);
   const previousSelection = useRef<string | null>(selectedEntity?.id ?? null);
   const returnView = useRef(useCommercialMapStore.getState().interiorReturnView);
+  const [reducedMotion, setReducedMotion] = useState(() => (
+    typeof window !== 'undefined'
+    && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+  ));
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return undefined;
+    const query = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const update = () => setReducedMotion(query.matches);
+    update();
+    query.addEventListener?.('change', update);
+    return () => query.removeEventListener?.('change', update);
+  }, []);
+
+  const startCameraMove = useCallback(() => {
+    if (reducedMotion) {
+      camera.position.copy(targetPosition.current);
+      controlsRef.current?.target.copy(targetLookAt.current);
+      controlsRef.current?.update();
+      animating.current = false;
+    } else {
+      animating.current = true;
+    }
+    invalidate();
+  }, [camera, invalidate, reducedMotion]);
 
   const queuePreset = useCallback((nextPreset: CameraPreset) => {
     const perspective = camera as THREE.PerspectiveCamera;
@@ -1098,30 +1131,38 @@ function CameraRig({ selectedEntity, extent }: { selectedEntity: MapEntity | nul
     );
     targetLookAt.current.copy(lookAt);
     targetPosition.current.copy(lookAt).add(direction.multiplyScalar(distance));
+    perspective.fov = 38;
     perspective.near = Math.max(0.05, distance / 1600);
     perspective.far = Math.max(720, extent.diagonal * 9, distance * 4);
     perspective.updateProjectionMatrix();
-    animating.current = true;
-    invalidate();
-  }, [camera, extent, invalidate, size.height, size.width]);
+    startCameraMove();
+  }, [camera, extent, size.height, size.width, startCameraMove]);
 
   const queueSelection = useCallback((entity: MapEntity) => {
     const perspective = camera as THREE.PerspectiveCamera;
     const entityExtent = getEntityExtent(entity);
     const focusProfile = focusProfileForEntity(entity);
+    const landmarkKind = resolveStrategicLandmarkKind(entity);
     const hasDetailsPanel = activePanel === 'details';
     const sidePanelLayout = hasDetailsPanel
       && (typeof window === 'undefined' ? size.width > 900 : window.innerWidth > 900);
     const panelWidth = sidePanelLayout ? Math.min(380, size.width * 0.54) : 0;
+    const compactPanelRatio = landmarkKind === 'mirante-pavilion'
+      ? 0.68
+      : size.width <= 640 ? 0.74 : 0.68;
     const panelHeight = hasDetailsPanel && !sidePanelLayout
-      ? Math.min(size.height * (size.width <= 640 ? 0.74 : 0.68), 610)
+      ? Math.min(size.height * compactPanelRatio, 610)
       : 0;
     const usableWidth = Math.max(size.width - panelWidth, size.width * 0.48);
     const usableHeight = Math.max(size.height - panelHeight, size.height * 0.26);
     const aspect = usableWidth / Math.max(usableHeight, 1);
+    const mobileMiranteSelection = landmarkKind === 'mirante-pavilion' && panelHeight > 0;
+    const compactSidePanelMirante = landmarkKind === 'mirante-pavilion'
+      && panelWidth > 0
+      && usableWidth < 420;
     const entityCenter = new THREE.Vector3(
       entityExtent.centerX,
-      entity.geometry.elevation + entityExtent.maxHeight * 0.28,
+      entity.geometry.elevation + entityExtent.maxHeight * (mobileMiranteSelection ? -0.32 : 0.28),
       entityExtent.centerZ,
     );
     const currentTarget = controlsRef.current?.target ?? targetLookAt.current;
@@ -1132,16 +1173,23 @@ function CameraRig({ selectedEntity, extent }: { selectedEntity: MapEntity | nul
     if (landmarkFocusDirection) {
       // Preserve a small amount of spatial continuity while making the public
       // facade deterministic after rapid switches or a lateral manual view.
-      direction.lerp(new THREE.Vector3(...landmarkFocusDirection).normalize(), 0.92).normalize();
+      const deterministicDirection = new THREE.Vector3(...landmarkFocusDirection).normalize();
+      if (landmarkKind === 'mirante-pavilion') direction.copy(deterministicDirection);
+      else direction.lerp(deterministicDirection, 0.92).normalize();
     }
     direction.y = Math.max(direction.y, focusProfile.minimumDirectionY);
     direction.normalize();
     const fittedDistance = fitDistanceForDirection(entityExtent, perspective.fov || 38, aspect, direction, focusProfile.fitPadding);
-    const distance = THREE.MathUtils.clamp(
+    const fittedSelectionDistance = THREE.MathUtils.clamp(
       Math.max(fittedDistance, extent.diagonal * focusProfile.contextRatio),
       Math.max(10, extent.diagonal * focusProfile.minDistanceRatio),
       Math.max(36, extent.diagonal * focusProfile.maxDistanceRatio),
     );
+    const distance = mobileMiranteSelection
+      ? fittedSelectionDistance * 1.26
+      : compactSidePanelMirante
+        ? fittedSelectionDistance * 1.36
+      : fittedSelectionDistance;
     const viewDirection = direction.clone().negate();
     const right = new THREE.Vector3().crossVectors(viewDirection, new THREE.Vector3(0, 1, 0));
     if (right.lengthSq() < 0.0001) right.set(1, 0, 0);
@@ -1150,7 +1198,7 @@ function CameraRig({ selectedEntity, extent }: { selectedEntity: MapEntity | nul
     const lookAt = entityCenter.clone();
     if (panelWidth > 0) {
       const horizontalShift = distance * Math.tan(horizontalFov / 2) * (panelWidth / Math.max(size.width, 1));
-      lookAt.addScaledVector(right, horizontalShift * 0.72);
+      lookAt.addScaledVector(right, horizontalShift * (compactSidePanelMirante ? 1.04 : 0.72));
     } else if (panelHeight > 0) {
       const viewUp = new THREE.Vector3().crossVectors(right, viewDirection);
       viewUp.y = 0;
@@ -1160,20 +1208,22 @@ function CameraRig({ selectedEntity, extent }: { selectedEntity: MapEntity | nul
         // Keep the anchor and its label clear of the mobile details sheet. The
         // sheet's rounded top edge and safe-area spacing need a little more
         // clearance than its raw height alone suggests.
-        const mobilePanelClearance = resolveStrategicLandmarkKind(entity) === 'livestock-pavilion'
+        const mobilePanelClearance = landmarkKind === 'livestock-pavilion'
           ? 1.72
-          : 0.96;
+          : landmarkKind === 'mirante-pavilion'
+            ? 1.56
+            : 0.96;
         lookAt.addScaledVector(viewUp, -verticalShift * mobilePanelClearance);
       }
     }
     targetLookAt.current.copy(lookAt);
     targetPosition.current.copy(lookAt).add(direction.multiplyScalar(distance));
+    perspective.fov = 38;
     perspective.near = Math.max(0.035, distance / 1600);
     perspective.far = Math.max(720, extent.diagonal * 9);
     perspective.updateProjectionMatrix();
-    animating.current = true;
-    invalidate();
-  }, [activePanel, camera, extent, invalidate, size.height, size.width]);
+    startCameraMove();
+  }, [activePanel, camera, extent, size.height, size.width, startCameraMove]);
 
   useEffect(() => {
     const selectedId = selectedEntity?.id ?? null;
@@ -1189,6 +1239,7 @@ function CameraRig({ selectedEntity, extent }: { selectedEntity: MapEntity | nul
         camera.position.copy(targetPosition.current);
         controlsRef.current?.target.copy(targetLookAt.current);
         controlsRef.current?.update();
+        perspective.fov = 38;
         perspective.near = Math.max(0.035, camera.position.distanceTo(targetLookAt.current) / 1600);
         perspective.far = Math.max(720, extent.diagonal * 9);
         perspective.updateProjectionMatrix();
@@ -1221,10 +1272,18 @@ function CameraRig({ selectedEntity, extent }: { selectedEntity: MapEntity | nul
     const controls = controlsRef.current;
     if (!controls) return;
     const margin = Math.max(3, extent.diagonal * 0.08);
+    const targetMinimumY = selectedEntity
+      && resolveStrategicLandmarkKind(selectedEntity) === 'mirante-pavilion'
+      ? -extent.maxHeight * 1.2
+      : 0;
     controls.target.x = THREE.MathUtils.clamp(controls.target.x, extent.minX - margin, extent.maxX + margin);
-    controls.target.y = THREE.MathUtils.clamp(controls.target.y, 0, extent.maxHeight * 2 + 4);
+    controls.target.y = THREE.MathUtils.clamp(
+      controls.target.y,
+      targetMinimumY,
+      extent.maxHeight * 2 + 4,
+    );
     controls.target.z = THREE.MathUtils.clamp(controls.target.z, extent.minZ - margin, extent.maxZ + margin);
-  }, [extent]);
+  }, [extent, selectedEntity]);
 
   const handleControlsStart = useCallback(() => {
     const controls = controlsRef.current;
@@ -1294,18 +1353,32 @@ function CameraRig({ selectedEntity, extent }: { selectedEntity: MapEntity | nul
     }
   });
 
+  const selectedKind = selectedEntity ? resolveStrategicLandmarkKind(selectedEntity) : null;
+  const miranteSelected = selectedKind === 'mirante-pavilion';
+  const miranteExtent = miranteSelected && selectedEntity ? getEntityExtent(selectedEntity) : null;
+  const miranteMinimumDistance = miranteExtent
+    ? Math.max(7.5, miranteExtent.diagonal * 0.8)
+    : Math.max(8, extent.diagonal * 0.055);
+  const miranteMaximumDistance = miranteExtent
+    ? Math.max(30, miranteExtent.diagonal * 4)
+    : Math.max(260, extent.diagonal * 4.5);
+
   return (
     <OrbitControls
       ref={controlsRef}
       makeDefault
-      enableDamping
+      regress
+      enableDamping={!reducedMotion}
       dampingFactor={0.072}
-      minDistance={Math.max(8, extent.diagonal * 0.055)}
-      maxDistance={Math.max(260, extent.diagonal * 4.5)}
+      enablePan={!miranteSelected}
+      minDistance={miranteMinimumDistance}
+      maxDistance={miranteMaximumDistance}
       minPolarAngle={0.025}
       maxPolarAngle={Math.PI / 2.08}
       screenSpacePanning
-      zoomToCursor
+      zoomToCursor={!miranteSelected}
+      minAzimuthAngle={miranteSelected ? -2.65 : -Infinity}
+      maxAzimuthAngle={miranteSelected ? -0.9 : Infinity}
       onStart={handleControlsStart}
       onEnd={handleControlsEnd}
       onChange={handleControlsChange}
@@ -1375,9 +1448,14 @@ function Scene({ entities, lots, calibration, matchingEntityIds, filtersActive }
   }, [cameraNavigating, setHoveredEntityId]);
 
   if (interiorEntity) {
-    return resolveStrategicLandmarkKind(interiorEntity) === 'livestock-pavilion'
-      ? <LivestockPavilionInteriorScene entity={interiorEntity} reducedGraphics={reducedGraphics} />
-      : <HeadquartersInteriorScene entity={interiorEntity} reducedGraphics={reducedGraphics} />;
+    const interiorKind = resolveStrategicLandmarkKind(interiorEntity);
+    if (interiorKind === 'livestock-pavilion') {
+      return <LivestockPavilionInteriorScene entity={interiorEntity} reducedGraphics={reducedGraphics} />;
+    }
+    if (interiorKind === 'mirante-pavilion') {
+      return <MiranteInteriorScene entity={interiorEntity} reducedGraphics={reducedGraphics} />;
+    }
+    return <HeadquartersInteriorScene entity={interiorEntity} reducedGraphics={reducedGraphics} />;
   }
 
   return (
