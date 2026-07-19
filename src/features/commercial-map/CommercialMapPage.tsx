@@ -102,9 +102,13 @@ export default function CommercialMapPage() {
     }
     if (!lastInteriorEntityId.current) return undefined;
     const frame = window.requestAnimationFrame(() => {
+      const interiorTriggerId = lastInteriorEntityId.current;
       const trigger = Array.from(
         document.querySelectorAll<HTMLElement>('[data-commercial-map-interior-trigger]'),
-      ).find((candidate) => candidate.offsetParent !== null);
+      ).find((candidate) => (
+        candidate.offsetParent !== null
+        && candidate.dataset.commercialMapInteriorTrigger === interiorTriggerId
+      ));
       trigger?.focus();
       lastInteriorEntityId.current = null;
     });
@@ -137,7 +141,7 @@ export default function CommercialMapPage() {
 
   return (
     <section
-      className={`commercial-map-shell ${interiorEntityId ? 'is-interior' : ''} ${interiorKind === 'livestock-pavilion' ? 'is-livestock-interior' : ''} ${selectedKind === 'livestock-pavilion' ? 'has-livestock-selection' : ''}`}
+      className={`commercial-map-shell ${interiorEntityId ? 'is-interior' : ''} ${interiorKind === 'livestock-pavilion' ? 'is-livestock-interior' : ''} ${interiorKind === 'mirante-pavilion' ? 'is-mirante-interior' : ''} ${selectedKind === 'livestock-pavilion' || selectedKind === 'mirante-pavilion' ? 'has-architectural-selection' : ''}`}
       aria-label="Plataforma de gestão do mapa comercial"
     >
       <header className="commercial-map-command-header">
@@ -221,6 +225,7 @@ export default function CommercialMapPage() {
             {interiorEntity ? (
               <div
                 className="commercial-map-interior-navigation"
+                role="navigation"
                 aria-label={`Navegação do interior de ${interiorEntity.name}`}
               >
                 <Button
@@ -238,7 +243,9 @@ export default function CommercialMapPage() {
                   <small>
                     {interiorKind === 'livestock-pavilion'
                       ? 'Arraste para percorrer o corredor e as baias · role para aproximar'
-                      : 'Arraste para observar os ambientes · role para aproximar'}
+                      : interiorKind === 'mirante-pavilion'
+                        ? 'Arraste para observar o salão e a vista da Arena · role para aproximar'
+                        : 'Arraste para observar os ambientes · role para aproximar'}
                   </small>
                 </div>
                 <kbd>Esc</kbd>

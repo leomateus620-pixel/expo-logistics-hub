@@ -1,10 +1,12 @@
 import type { MapEntity } from '../types';
 import { livestockPavilionVisualHeight } from './livestockPavilion';
+import { miranteVisualHeight } from './mirante';
 
 export type StrategicLandmarkKind =
   | 'administrative-center'
   | 'fenasoja-headquarters'
   | 'livestock-pavilion'
+  | 'mirante-pavilion'
   | 'polish-pavilion'
   | 'italian-pavilion'
   | 'nations-portico'
@@ -45,6 +47,20 @@ const STRATEGIC_LANDMARKS: Readonly<Record<string, StrategicLandmarkDefinition>>
     facingRadians: 0,
     focusDirection: [0.26, 0.31, 0.96],
     visualHeight: livestockPavilionVisualHeight,
+  },
+  D3: {
+    kind: 'mirante-pavilion',
+    aliases: [
+      'Mirante Fenasoja',
+      'Pavilhão Mirante',
+      'Espaço de observação',
+      'Hospitalidade Mirante',
+    ],
+    // O eixo longo oficial corre em Z. A lateral aberta observa a Arena
+    // Sicredi a leste; a câmera fica a oeste para manter essa relação legível.
+    facingRadians: 0,
+    focusDirection: [-0.94, 0.38, -0.22],
+    visualHeight: miranteVisualHeight,
   },
   B11: {
     kind: 'administrative-center',
@@ -137,7 +153,9 @@ export function strategicLandmarkSupportsInterior(
   entity: Pick<MapEntity, 'publicIdentifier'>,
 ): boolean {
   const kind = resolveStrategicLandmarkKind(entity);
-  return kind === 'fenasoja-headquarters' || kind === 'livestock-pavilion';
+  return kind === 'fenasoja-headquarters'
+    || kind === 'livestock-pavilion'
+    || kind === 'mirante-pavilion';
 }
 
 export function strategicLandmarkSearchAliases(

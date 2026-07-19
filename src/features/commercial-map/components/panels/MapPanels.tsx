@@ -229,12 +229,14 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions }:
   const metadata = normalizeMapEntityMetadata(entity, lot);
   const structuralReady = lot ? ['AVAILABLE', 'BLOCKED', 'UNAVAILABLE'].includes(lot.status) : false;
   const landmarkKind = resolveStrategicLandmarkKind(entity);
+  const usesInspectionCopy = landmarkKind === 'livestock-pavilion'
+    || landmarkKind === 'mirante-pavilion';
 
   return (
     <>
       <aside className="commercial-map-panel commercial-map-details-panel">
         <PanelHeader eyebrow={CLASSIFICATION_LABELS[entity.classification]} title={metadata.officialDisplayName} onClose={() => setSelectedEntityId(null)} />
-        {landmarkKind === 'livestock-pavilion' && (
+        {usesInspectionCopy && (
           <Button
             className="commercial-map-short-interior-action"
             onClick={() => enterInterior(entity.id)}
@@ -313,10 +315,10 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions }:
                     className="commercial-map-standard-interior-action"
                     onClick={() => enterInterior(entity.id)}
                     data-commercial-map-interior-trigger={entity.id}
-                    aria-label={`${landmarkKind === 'livestock-pavilion' ? 'Ver' : 'Visitar'} interior de ${metadata.officialDisplayName}`}
+                    aria-label={`${usesInspectionCopy ? 'Ver' : 'Visitar'} interior de ${metadata.officialDisplayName}`}
                   >
                     <DoorOpen className="h-4 w-4" />
-                    {landmarkKind === 'livestock-pavilion' ? 'Ver interior' : 'Visitar interior'}
+                    {usesInspectionCopy ? 'Ver interior' : 'Visitar interior'}
                   </Button>
                 )}
                 {permissions.isMapAdmin && <Button variant="outline" onClick={() => setVerificationOpen(true)}><BadgeCheck className="h-4 w-4" />{entity.verificationStatus === 'VERIFIED' ? 'Reabrir revisão' : 'Verificar entidade'}</Button>}

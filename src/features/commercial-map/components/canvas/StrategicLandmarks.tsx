@@ -6,6 +6,7 @@ import type { MapEntity } from '../../types';
 import { withoutClosingPoint } from '../../utils/geometry';
 import { isMapSelectionClick } from '../../utils/interaction';
 import { LIVESTOCK_PAVILION_RENDER_BUDGET } from '../../utils/livestockPavilion';
+import { MIRANTE_RENDER_BUDGET } from '../../utils/mirante';
 import {
   resolveStrategicLandmarkKind,
   strategicLandmarkBounds,
@@ -15,6 +16,7 @@ import {
   type StrategicLandmarkKind,
 } from '../../utils/landmarks';
 import { LivestockPavilion } from './LivestockPavilion';
+import { MirantePavilion } from './MirantePavilion';
 
 const NO_RAYCAST = () => undefined;
 const MAP_BACKGROUND_COLOR = new THREE.Color('#dfe8de');
@@ -132,6 +134,18 @@ const LANDMARK_PALETTES: Record<StrategicLandmarkKind, LandmarkPalette> = {
     platform: '#85847d',
     metal: '#4d5c5f',
   },
+  'mirante-pavilion': {
+    wall: '#d6d2c7',
+    accent: '#8b765d',
+    roof: '#c9ced0',
+    trim: '#e5e1d8',
+    dark: '#273033',
+    glass: '#51666a',
+    green: '#45684b',
+    white: '#f2f0e9',
+    platform: '#9a978f',
+    metal: '#5f696b',
+  },
   'polish-pavilion': {
     wall: '#97633f',
     accent: '#766c61',
@@ -238,7 +252,7 @@ function useLandmarkMaterials(
       metal: material(palette.metal, 0.62, 0.16),
     };
     result.white.side = THREE.DoubleSide;
-    if (kind === 'livestock-pavilion') {
+    if (kind === 'livestock-pavilion' || kind === 'mirante-pavilion') {
       result.roof.roughness = 0.6;
       result.roof.metalness = 0.16;
       result.metal.roughness = 0.5;
@@ -247,6 +261,13 @@ function useLandmarkMaterials(
       result.dark.metalness = 0.28;
       result.wall.roughness = 0.82;
       result.platform.roughness = 0.96;
+    }
+    if (kind === 'mirante-pavilion') {
+      result.roof.roughness = 0.68;
+      result.roof.metalness = 0.2;
+      result.wall.roughness = 0.94;
+      result.accent.roughness = 0.8;
+      result.accent.metalness = 0.02;
     }
     return result;
   }, [kind]);
@@ -1025,6 +1046,11 @@ function useArchitecturalDetail(
       ? Math.max(30, bounds.width * 3.1)
       : kind === 'livestock-pavilion'
         ? Math.max(28, bounds.width * LIVESTOCK_PAVILION_RENDER_BUDGET.detailDistanceMultiplier)
+      : kind === 'mirante-pavilion'
+        ? Math.max(
+          MIRANTE_RENDER_BUDGET.detailDistanceMinimum,
+          Math.max(bounds.width, bounds.depth) * MIRANTE_RENDER_BUDGET.detailDistanceMultiplier,
+        )
       : kind === 'fenasoja-restaurant'
         ? Math.max(20, bounds.width * 5)
         : kind === 'administrative-center'
@@ -2451,7 +2477,10 @@ export function StrategicLandmarkMesh({
     event.stopPropagation();
     if (!isMapSelectionClick(event.delta)) return;
     onSelect(entity.id);
-    if (kind === 'fenasoja-headquarters' || kind === 'livestock-pavilion') onEnterInterior(entity.id);
+    if (
+      kind === 'fenasoja-headquarters'
+      || kind === 'livestock-pavilion'
+    ) onEnterInterior(entity.id);
     else onFocus();
   };
 
@@ -2490,6 +2519,7 @@ export function StrategicLandmarkMesh({
         {kind === 'administrative-center' && <AdministrativeCenter {...modelProps} />}
         {kind === 'fenasoja-headquarters' && <FenasojaHeadquarters {...modelProps} />}
         {kind === 'livestock-pavilion' && <LivestockPavilion {...modelProps} />}
+        {kind === 'mirante-pavilion' && <MirantePavilion {...modelProps} />}
         {kind === 'polish-pavilion' && <PolishPavilion {...modelProps} />}
         {kind === 'italian-pavilion' && <ItalianPavilion {...modelProps} />}
         {kind === 'nations-portico' && <NationsPortico {...modelProps} />}

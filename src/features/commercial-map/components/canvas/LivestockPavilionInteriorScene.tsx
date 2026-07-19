@@ -295,6 +295,7 @@ function LivestockInteriorCameraRig({
     <OrbitControls
       ref={controls}
       makeDefault
+      regress
       enableDamping
       dampingFactor={0.075}
       enablePan
