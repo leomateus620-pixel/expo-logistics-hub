@@ -434,10 +434,10 @@
 .commercial-map-label.is-lot > span { color: #183f27; font-size: 8px; letter-spacing: -.035em; }
 .commercial-map-label.is-lot strong { color: #315c3d; font-size: 6.5px; letter-spacing: .025em; text-transform: uppercase; }
 .commercial-map-label.is-lot.is-dimmed { opacity: .18; }
-.commercial-map-label.is-road { min-width: auto; max-width: 130px; padding: 2px 6px; transform: translateY(-2px); border-color: rgba(87,70,60,.22); border-radius: 999px; background: rgba(248,245,237,.94); color: #443a35; box-shadow: 0 2px 7px rgba(40,31,27,.13); font-size: 6px; letter-spacing: .055em; text-transform: uppercase; }
+.commercial-map-label.is-road { min-width: auto; max-width: 130px; padding: 2px 6px; transform: translateY(-2px); border-color: rgba(69,78,84,.24); border-radius: 999px; background: rgba(246,247,245,.95); color: #384044; box-shadow: 0 2px 7px rgba(34,39,42,.14); font-size: 6px; letter-spacing: .055em; text-transform: uppercase; }
 .commercial-map-label.is-road::after { display: none; }
 .commercial-map-label.is-road > span { overflow: hidden; max-width: 120px; font-family: inherit; font-weight: 750; text-overflow: ellipsis; }
-.commercial-map-label.is-road.is-selected { border-color: rgba(221,176,67,.82); background: rgba(255,249,220,.98); color: #322823; box-shadow: 0 4px 14px rgba(79,55,30,.22); }
+.commercial-map-label.is-road.is-selected { border-color: rgba(221,176,67,.82); background: rgba(255,250,225,.98); color: #30373a; box-shadow: 0 4px 14px rgba(42,47,50,.2); }
 .commercial-map-label.is-quadra { min-width: auto; padding: 3px 7px; border-color: rgba(40,112,58,.24); border-radius: 999px; background: rgba(237,247,235,.82); color: #226338; box-shadow: 0 3px 10px rgba(24,78,36,.1); font-size: 6.5px; letter-spacing: .06em; text-transform: uppercase; }
 .commercial-map-label.is-quadra::after { border-color: rgba(40,112,58,.24); background: rgba(237,247,235,.82); }
 .commercial-map-label.is-structure { max-width: 160px; padding: 4px 7px; border-color: rgba(39,64,47,.16); background: rgba(250,252,248,.9); }

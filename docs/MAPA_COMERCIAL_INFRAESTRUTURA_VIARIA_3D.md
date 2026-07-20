@@ -2,7 +2,9 @@
 
 ## Fontes de verdade
 
-O sistema mantém a cartografia oficial 2026 como fonte geométrica. As quatro fotografias de campo recebidas em 20/07/2026 orientam apenas a materialidade: asfalto carvão com subtom terroso, desgaste discreto, meios-fios claros e ausência de sinalização horizontal inventada. Nenhuma árvore, poste ou rua foi posicionada sem coordenada oficial.
+O sistema mantém a cartografia oficial 2026 como fonte geométrica. As fotografias de campo recebidas em 20/07/2026 orientam apenas a materialidade: asfalto cinza-escuro neutro, desgaste discreto, meios-fios claros e ausência de sinalização horizontal inventada. Nenhuma árvore, poste ou rua foi posicionada sem coordenada oficial.
+
+Na recalibração cromática, a pista visível na parte superior da referência apresentou amostras próximas de RGB `70/73/80` a `75/83/86`, enquanto a versão anterior do mapa chegava a RGB `53/42/35`. A diferença confirmou excesso de vermelho e falta de azul no material anterior; o trecho marrom visto através do para-brisa não foi usado como referência de pavimento.
 
 A malha validada contém 21 entidades `ROAD` e uma `PEDESTRIAN_PATH`. Todas permanecem no layer `circulation`, na elevação `0`, com as extrusões oficiais de `0,032` e `0,026`, respectivamente. Ruas, avenidas, alameda e rodovia continuam sendo as mesmas entidades pesquisáveis, selecionáveis e editáveis do sistema anterior.
 
@@ -20,13 +22,13 @@ Os meios-fios não fecham as pontas dos polígonos e são interrompidos onde out
 
 ## Materiais e profundidade
 
-- Asfalto base `#453a35`, com variação procedural determinística de baixa frequência, alta rugosidade e relevo sutil.
-- Sarjeta `#302b29`, suficiente para marcar a borda sem desenhar uma faixa artificial.
-- Meio-fio `#ddd8cb`, coerente com a pintura branca vista em campo e sem brilho plástico.
-- Caminho `#b9ad98`, com paginação mineral discreta para não competir com as ruas.
+- Asfalto base `#4b5054`, cinza-escuro de baixo croma, com variação procedural determinística em escalas fina e ampla.
+- Sarjeta `#34393d`, mais escura que a pista sem introduzir preto absoluto ou subtom marrom.
+- Meio-fio `#dfe2e0`, coerente com a pintura branca vista em campo e sem brilho plástico.
+- Caminho `#b8ad99`, com paginação mineral discreta para não competir com as ruas.
 - Materiais não lançam sombra; recebem a sombra ambiental já existente. A profundidade vem da extrusão, sarjeta, meio-fio e oclusão, não de luzes extras.
 
-As texturas são geradas localmente em `96 × 96`, sem download, imagem pesada ou aleatoriedade entre renderizações. O modo gráfico reduzido amplia o passo de amostragem dos meios-fios e omite a malha de sarjeta na cena.
+As texturas são geradas localmente em `96 × 96`, sem download, imagem pesada ou aleatoriedade entre renderizações. O asfalto usa roughness `0,98`, relevo `0,005` e variação tonal limitada para permanecer legível sem ruído. O modo gráfico reduzido amplia o passo de amostragem dos meios-fios e omite a malha de sarjeta na cena.
 
 ## Interação preservada
 
