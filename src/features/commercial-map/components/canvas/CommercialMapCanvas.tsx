@@ -37,6 +37,7 @@ import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import type { CameraPreset, CommercialLot, MapCalibration, MapEntity } from '../../types';
 import { HeadquartersInteriorScene } from './HeadquartersInteriorScene';
 import { LivestockPavilionInteriorScene } from './LivestockPavilionInteriorScene';
+import { RoadInfrastructure } from './RoadInfrastructure';
 import { StrategicLandmarkMesh } from './StrategicLandmarks';
 
 const MiranteInteriorScene = lazy(async () => {
@@ -923,7 +924,7 @@ const EntityLabel = memo(function EntityLabel({
           {(selected || hovered) && status && <small><b aria-hidden="true">{status.symbol}</b> {status.label}</small>}
         </div>
       ) : isRoad ? (
-        <div data-map-entity-id={entity.id} data-map-label-mode="navigation" className="commercial-map-label is-road"><span>{metadata.officialDisplayName}</span></div>
+        <div data-map-entity-id={entity.id} data-map-label-mode={selected ? 'focus' : 'navigation'} className={`commercial-map-label is-road ${selected ? 'is-selected' : ''}`}><span>{metadata.officialDisplayName}</span></div>
       ) : isQuadra ? (
         <div data-map-entity-id={entity.id} data-map-label-mode={selected ? 'focus' : 'navigation'} className={`commercial-map-label is-quadra ${selected ? 'is-selected' : ''}`}>
           <span>{quadraLabel(metadata.officialDisplayName || entity.publicIdentifier)}</span>
@@ -1421,6 +1422,12 @@ function Scene({ entities, lots, calibration, matchingEntityIds, filtersActive }
     .map((entity) => ({ entity, lot: lotByEntity.get(entity.id) }))
     .filter((entry): entry is LotEntry => Boolean(entry.lot)), [lotByEntity, renderedEntities]);
   const nonLotEntities = useMemo(() => renderedEntities.filter((entity) => !lotByEntity.has(entity.id)), [lotByEntity, renderedEntities]);
+  const circulationEntities = useMemo(() => nonLotEntities.filter((entity) => (
+    entity.classification === 'ROAD' || entity.classification === 'PEDESTRIAN_PATH'
+  )), [nonLotEntities]);
+  const structuralEntities = useMemo(() => nonLotEntities.filter((entity) => (
+    entity.classification !== 'ROAD' && entity.classification !== 'PEDESTRIAN_PATH'
+  )), [nonLotEntities]);
   const labelVisibility = useSemanticLabelVisibility({
     entities: renderedEntities,
     lotByEntity,
@@ -1495,6 +1502,14 @@ function Scene({ entities, lots, calibration, matchingEntityIds, filtersActive }
         <meshStandardMaterial color="#cfdccc" roughness={1} metalness={0} />
       </mesh>
       <ReferenceUnderlay calibration={calibration} />
+      <RoadInfrastructure
+        entities={circulationEntities}
+        selectedEntityId={selectedEntityId}
+        matchingEntityIds={matchingEntityIds}
+        filtersActive={filtersActive}
+        layerOpacity={layerOpacity}
+        reducedGraphics={reducedGraphics}
+      />
       <BatchedLots
         entries={lotEntries}
         selectedEntityId={selectedEntityId}
@@ -1508,7 +1523,7 @@ function Scene({ entities, lots, calibration, matchingEntityIds, filtersActive }
         cameraNavigating={cameraNavigating}
         onCursor={setCanvasCursor}
       />
-      {nonLotEntities.map((entity) => (
+      {structuralEntities.map((entity) => (
         <EntityMesh
           key={entity.id}
           entity={entity}
