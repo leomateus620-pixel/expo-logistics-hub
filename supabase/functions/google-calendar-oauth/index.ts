@@ -31,17 +31,18 @@ Deno.serve(async (req) => {
 
   try {
     const url = new URL(req.url);
-    const action = url.searchParams.get("action") ?? (await req.json().catch(() => ({}))).action;
+    const body = await req.json().catch(() => ({} as Record<string, unknown>));
+    const action = (url.searchParams.get("action") ?? (body as { action?: string }).action) as string | undefined;
     const user = await requireUser(req);
     const db = admin();
 
     if (action === "start") {
-      const body = await req.json().catch(() => ({}));
-      const returnUrl = body.returnUrl || `${url.origin}/settings?google=connected`;
+      const returnUrl = (body as { returnUrl?: string }).returnUrl || `${url.origin}/settings?google=connected`;
+      const orgId = (body as { orgId?: string }).orgId;
       const oauth = await startOAuth(returnUrl, user.id);
       await db.from("google_calendar_connections").upsert({
         user_id: user.id,
-        org_id: body.orgId,
+        org_id: orgId,
         status: "connecting",
       }, { onConflict: "user_id" });
       return new Response(JSON.stringify(oauth), {
@@ -50,8 +51,8 @@ Deno.serve(async (req) => {
     }
 
     if (action === "complete") {
-      const body = await req.json().catch(() => ({}));
-      const orgId = body.orgId;
+      const orgId = (body as { orgId?: string }).orgId;
+
       const connectionKey = await fetchConnectionKey(user.id);
       if (!connectionKey) {
         return new Response(JSON.stringify({ error: "no_connection" }), {
