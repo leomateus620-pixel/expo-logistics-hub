@@ -8,7 +8,7 @@ import { Settings, Users, Shield, ShieldCheck, Loader2, ChevronDown, ChevronUp }
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import NotificationRecipientsSection from '@/components/settings/NotificationRecipientsSection';
-import { GoogleCalendarSection } from '@/components/settings/GoogleCalendarSection';
+
 import { presentFenasojaProductName } from '@/lib/fenasoja-brand';
 
 const roleLabels: Record<string, string> = {
@@ -141,8 +141,6 @@ export default function SettingsPage() {
           </div>
         </div>
       </div>
-
-      <GoogleCalendarSection />
 
       <div className="rounded-xl border bg-card p-4 sm:p-5">
         <h2 className="font-semibold flex items-center gap-2 mb-3">

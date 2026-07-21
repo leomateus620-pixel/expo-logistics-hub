@@ -1,6 +1,5 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
-  AlertTriangle,
   ArrowUpRight,
   Clock3,
   Flag,
@@ -9,6 +8,7 @@ import {
   Sprout,
 } from 'lucide-react';
 import { FenasojaCountdownDigits } from '@/components/cronograma-eventos/FenasojaCountdownDigits';
+import { GoogleCalendarHeroWidget } from '@/components/cronograma-eventos/GoogleCalendarHeroWidget';
 import { formatLongDateRange } from '@/components/cronograma-eventos/dateUtils';
 import { useFenasojaCountdown } from '@/hooks/useFenasojaCountdown';
 import {
@@ -235,23 +235,7 @@ export function FenasojaCountdownHero({
               </span>
             </div>
 
-            <div
-              className="fenasoja-countdown-operation-metric"
-              data-alert={timelineSnapshot.overdue > 0 || undefined}
-            >
-              <AlertTriangle aria-hidden="true" />
-              <span><small>Atrasadas</small><strong>{timelineSnapshot.overdue}</strong></span>
-            </div>
-
-            <button
-              type="button"
-              onClick={onOpenUndated}
-              className="fenasoja-countdown-operation-metric fenasoja-countdown-undated"
-              aria-label={`Abrir ${timelineSnapshot.undated} ${timelineSnapshot.undated === 1 ? 'evento sem data' : 'eventos sem data'}`}
-            >
-              <Clock3 aria-hidden="true" />
-              <span><small>Sem data</small><strong>{timelineSnapshot.undated}</strong></span>
-            </button>
+            <GoogleCalendarHeroWidget />
           </div>
         </div>
       </section>
