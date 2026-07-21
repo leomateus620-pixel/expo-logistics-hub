@@ -1,0 +1,1 @@
+DELETE FROM public.google_calendar_connections WHERE user_id='b664fc22-69d3-40f1-8370-16b8a07ec402' AND status <> 'connected';

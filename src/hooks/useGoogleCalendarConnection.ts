@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -48,12 +49,38 @@ export function useGoogleCalendarConnection() {
     },
   });
 
+  const completeConnection = async (useOrg: string) => {
+    const tryCall = async () =>
+      invoke<{ ok: boolean; calendarId?: string; backfill?: number; pending?: boolean }>(
+        'complete',
+        { orgId: useOrg },
+      );
+    let last: unknown;
+    for (let attempt = 0; attempt < 6; attempt++) {
+      try {
+        const res = await tryCall();
+        if ((res as any).pending) {
+          await new Promise((r) => setTimeout(r, 2000));
+          continue;
+        }
+        return res;
+      } catch (e: any) {
+        last = e;
+        const msg = String(e?.message ?? e);
+        const isRetryable = msg.includes('no_connection') || msg.includes('non-2xx') || msg.includes('pending');
+        if (!isRetryable || attempt === 5) throw e;
+        await new Promise((r) => setTimeout(r, 2000));
+      }
+    }
+    throw last ?? new Error('no_connection');
+  };
+
   const connect = useMutation({
     mutationFn: async () => {
       if (!orgId) throw new Error('sem_organizacao');
       // Limpa qualquer estado travado (connecting/error) antes de reiniciar.
       try { await invoke('reset'); } catch { /* ignore */ }
-      const returnUrl = `${window.location.origin}/settings?google=connected`;
+      const returnUrl = `${window.location.origin}${window.location.pathname}?google=connected`;
       const oauth = await invoke<{ authorization_url?: string; authorize_url?: string; url?: string; session_id?: string }>(
         'start',
         { orgId, returnUrl },
@@ -74,24 +101,11 @@ export function useGoogleCalendarConnection() {
         }, 800);
       });
 
-      // Completa: valida conexão + cria calendário + backfill.
-      // O gateway pode levar ~1-2s para persistir a autorização; tentamos até 3x.
-      const tryComplete = async () =>
-        invoke<{ ok: boolean; calendarId: string; backfill: number }>('complete', { orgId });
-      for (let attempt = 0; attempt < 3; attempt++) {
-        try {
-          return await tryComplete();
-        } catch (e: any) {
-          const msg = String(e?.message ?? e);
-          const isNoConn = msg.includes('no_connection') || msg.includes('non-2xx');
-          if (!isNoConn || attempt === 2) throw e;
-          await new Promise((r) => setTimeout(r, 2000));
-        }
-      }
-      throw new Error('no_connection');
+      return await completeConnection(orgId);
     },
     onSuccess: (data) => {
-      toast({ title: 'Google Agenda conectada', description: `${data.backfill} eventos serão sincronizados em segundo plano.` });
+      const n = (data as any)?.backfill ?? 0;
+      toast({ title: 'Google Agenda conectada', description: `${n} eventos serão sincronizados em segundo plano.` });
       qc.invalidateQueries({ queryKey: ['google-calendar-status'] });
     },
     onError: (e: Error) => {
@@ -105,6 +119,29 @@ export function useGoogleCalendarConnection() {
       toast({ title: 'Erro', description, variant: 'destructive' });
     },
   });
+
+  // Recuperação: quando o usuário volta ao app com ?google=connected na URL,
+  // dispara complete() automaticamente para fechar o fluxo mesmo que o popup
+  // tenha sido fechado antes do await terminar.
+  const recoveryTriedRef = useRef(false);
+  useEffect(() => {
+    if (recoveryTriedRef.current) return;
+    if (typeof window === 'undefined') return;
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('google') !== 'connected') return;
+    if (!orgId) return;
+    recoveryTriedRef.current = true;
+    completeConnection(orgId)
+      .then(() => qc.invalidateQueries({ queryKey: ['google-calendar-status'] }))
+      .catch((e) => console.warn('[google-oauth] recovery complete falhou:', e))
+      .finally(() => {
+        params.delete('google');
+        const qs = params.toString();
+        const newUrl = window.location.pathname + (qs ? `?${qs}` : '') + window.location.hash;
+        window.history.replaceState({}, '', newUrl);
+      });
+  }, [orgId, qc]);
+
 
 
   const disconnect = useMutation({

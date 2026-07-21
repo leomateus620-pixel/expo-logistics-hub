@@ -66,6 +66,17 @@ Deno.serve(async (req) => {
 
       const ok = await probeConnection(user.id);
       if (!ok) {
+        // Se há registro recente em 'connecting', mantém e retorna pending
+        // para o frontend continuar tentando sem travar em 'error'.
+        const { data: existing } = await db.from("google_calendar_connections")
+          .select("status, connected_at").eq("user_id", user.id).maybeSingle();
+        const recent = existing?.connected_at
+          && (Date.now() - new Date(existing.connected_at as string).getTime()) < 10 * 60 * 1000;
+        if (existing?.status === "connecting" && recent) {
+          return new Response(JSON.stringify({ ok: false, pending: true }), {
+            status: 202, headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
         await db.from("google_calendar_connections")
           .update({ status: "error", last_error: "no_connection" })
           .eq("user_id", user.id);
@@ -73,6 +84,7 @@ Deno.serve(async (req) => {
           status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
+
 
       // Cria calendário secundário
       const calId = await ensureSecondaryCalendar(user.id);
