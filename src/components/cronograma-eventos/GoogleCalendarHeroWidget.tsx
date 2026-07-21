@@ -77,6 +77,12 @@ export const GoogleCalendarHeroWidget = memo(function GoogleCalendarHeroWidget()
             <strong>Conectando…</strong>
             <em>Aprovando permissão na conta Google.</em>
           </>
+        ) : isStalePending || isErrored ? (
+          <>
+            <small>Google Agenda</small>
+            <strong>Conexão não finalizada</strong>
+            <em>Clique em "Tentar novamente" para reiniciar o fluxo.</em>
+          </>
         ) : (
           <>
             <small>Google Agenda</small>
