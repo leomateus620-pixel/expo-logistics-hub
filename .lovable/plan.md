@@ -1,26 +1,25 @@
-## Problema
-1. **Redirecionamento indevido após OAuth:** o `returnUrl` está hardcoded como `${window.location.origin}/settings?google=connected`. Quando o Google devolve o popup, se o navegador reaproveita a aba principal (ou o usuário fecha o popup e volta ao app), acaba caindo em `/settings`, que dentro do contexto de comissão vira "Configurações da Comissão LOGÍSTICA".
-2. **Widget em "Conexão não finalizada":** o registro em `google_calendar_connections` está com `status='connecting'` (nunca avançou para `connected`). O consent no Google foi concluído, mas o `complete` (probe + criação de calendário + upsert) não rodou com sucesso — provavelmente porque o popup foi fechado antes do `await` resolver, ou a propagação do gateway demorou além das 3 tentativas.
+## Plano de correção
 
-## Correções
+1. **Corrigir a chamada autenticada para a função do Google Agenda**
+   - Ajustar o hook `useGoogleCalendarConnection` para buscar a sessão atual antes de invocar `google-calendar-oauth`.
+   - Enviar explicitamente o `Authorization: Bearer <access_token>` nas chamadas da função.
+   - Se não houver sessão válida, não chamar a função em loop; exibir estado neutro pedindo login/recarregamento.
 
-### 1. `useGoogleCalendarConnection.ts`
-- Trocar `returnUrl` para a **rota atual do usuário** em vez de `/settings`:
-  ```ts
-  const returnUrl = `${window.location.origin}${window.location.pathname}?google=connected`;
-  ```
-  Assim o popup (ou fallback de aba) volta para `/cronograma-eventos` (ou qualquer página onde o widget viva), nunca para `/settings`.
-- Aumentar a robustez do `complete`: subir tentativas de 3 → 6 com backoff 2s, e chamar `complete` **também** quando a página recarrega com `?google=connected` no query string (efeito colateral: recupera fluxos onde o popup foi fechado cedo).
+2. **Evitar loop visual e toast genérico no widget**
+   - Impedir que o `status` fique refazendo chamadas 401 indefinidamente.
+   - Melhorar a mensagem de erro para diferenciar: sessão expirada, conexão Google não concluída e falha real do gateway.
+   - Manter o botão clicável em estados `error`/`connecting` antigos, com “Tentar novamente”.
 
-### 2. `google-calendar-oauth` (edge function)
-- Adicionar tolerância no `complete`: se o probe falhar mas já existir registro `connecting` recente (<10min), retornar `202 pending` em vez de marcar `error`, para o frontend continuar tentando sem travar a UI.
-- Nada muda no `start`/`reset`/`disconnect`.
+3. **Corrigir preservação da tela atual no retorno do OAuth**
+   - Preservar `pathname + search` atual, incluindo filtros do Cronograma, ao montar o `returnUrl`.
+   - Ao voltar com `?google=connected`, chamar `complete` e limpar apenas o parâmetro `google`, sem apagar `timelineYear`, `timelineMonth` ou filtros.
 
-### 3. Destravamento imediato do registro atual
-- Rodar server-side: probar a conexão do usuário `b664fc22-…` via gateway; se OK, criar calendário secundário, popular `google_email`, marcar `status='connected'` e enfileirar backfill. Se probe falhar, apagar o registro travado para permitir reconexão limpa.
+4. **Fortalecer a função `google-calendar-oauth`**
+   - Ajustar `requireUser` para retornar erro claro quando o token não vier ou estiver inválido.
+   - Corrigir o fallback antigo que ainda aponta para `/settings?google=connected`.
+   - Tornar o cálculo de `pending` confiável, usando `count` corretamente em vez de depender de `pending?.length` em consulta `head`.
 
-### 4. Consumir `?google=connected` no dashboard/cronograma
-- Adicionar um `useEffect` no componente que monta o `GoogleCalendarHeroWidget` (ou no próprio widget) que, ao detectar `?google=connected` na URL, dispara `complete` uma vez e limpa o query param via `history.replaceState`. Assim o fluxo se fecha mesmo quando o usuário fecha o popup antes do await.
-
-## Fora de escopo
-- Não mexer no fluxo de login/AuthGuard — o redirecionamento reportado é 100% consequência do `returnUrl` errado do OAuth do Google, não do login geral do app.
+5. **Validação final**
+   - Verificar no preview que o widget não dispara mais 401 em loop.
+   - Confirmar que o botão inicia o OAuth na tela de Cronograma e retorna para a mesma rota.
+   - Conferir que o widget muda para conectado/sucesso quando a função confirma a conexão.

@@ -15,14 +15,41 @@ function admin() {
   return createClient(supabaseUrl, service, { auth: { persistSession: false } });
 }
 
+function json(data: Record<string, unknown>, init: ResponseInit = {}) {
+  return new Response(JSON.stringify(data), {
+    ...init,
+    headers: { ...corsHeaders, "Content-Type": "application/json", ...(init.headers ?? {}) },
+  });
+}
+
+function resolveReturnUrl(req: Request, raw?: string) {
+  const origin = req.headers.get("Origin");
+  const fallbackOrigin = origin ?? new URL(req.url).origin;
+  const fallback = `${fallbackOrigin}/cronograma-eventos?google=connected`;
+  if (!raw) return fallback;
+
+  try {
+    const parsed = new URL(raw, fallbackOrigin);
+    if (origin && parsed.origin !== origin) return fallback;
+    parsed.searchParams.set("google", "connected");
+    return parsed.toString();
+  } catch {
+    return fallback;
+  }
+}
+
 async function requireUser(req: Request) {
   const authHeader = req.headers.get("Authorization") ?? "";
+  if (!authHeader.startsWith("Bearer ") || authHeader.length < 16) {
+    throw json({ error: "auth_session_required" }, { status: 401 });
+  }
+
   const supa = createClient(supabaseUrl, anon, {
     auth: { persistSession: false },
     global: { headers: { Authorization: authHeader } },
   });
-  const { data: { user } } = await supa.auth.getUser();
-  if (!user) throw new Response(JSON.stringify({ error: "unauthorized" }), { status: 401, headers: corsHeaders });
+  const { data: { user }, error } = await supa.auth.getUser();
+  if (error || !user) throw json({ error: "auth_session_invalid" }, { status: 401 });
   return user;
 }
 
@@ -37,7 +64,7 @@ Deno.serve(async (req) => {
     const db = admin();
 
     if (action === "start") {
-      const returnUrl = (body as { returnUrl?: string }).returnUrl || `${url.origin}/settings?google=connected`;
+      const returnUrl = resolveReturnUrl(req, (body as { returnUrl?: string }).returnUrl);
       const orgId = (body as { orgId?: string }).orgId;
       const oauth = await startOAuth(returnUrl, user.id);
       await db.from("google_calendar_connections").upsert({
@@ -45,9 +72,7 @@ Deno.serve(async (req) => {
         org_id: orgId,
         status: "connecting",
       }, { onConflict: "user_id" });
-      return new Response(JSON.stringify(oauth), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return json(oauth);
     }
 
     if (action === "reset") {
@@ -56,9 +81,7 @@ Deno.serve(async (req) => {
         .delete()
         .eq("user_id", user.id)
         .neq("status", "connected");
-      return new Response(JSON.stringify({ ok: true }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return json({ ok: true });
     }
 
     if (action === "complete") {
@@ -73,16 +96,12 @@ Deno.serve(async (req) => {
         const recent = existing?.connected_at
           && (Date.now() - new Date(existing.connected_at as string).getTime()) < 10 * 60 * 1000;
         if (existing?.status === "connecting" && recent) {
-          return new Response(JSON.stringify({ ok: false, pending: true }), {
-            status: 202, headers: { ...corsHeaders, "Content-Type": "application/json" },
-          });
+          return json({ ok: false, pending: true }, { status: 202 });
         }
         await db.from("google_calendar_connections")
           .update({ status: "error", last_error: "no_connection" })
           .eq("user_id", user.id);
-        return new Response(JSON.stringify({ error: "no_connection" }), {
-          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
+        return json({ error: "no_connection" }, { status: 400 });
       }
 
 
@@ -128,9 +147,7 @@ Deno.serve(async (req) => {
           .eq("user_id", user.id);
       }
 
-      return new Response(JSON.stringify({ ok: true, calendarId: calId, backfill: rows.length }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return json({ ok: true, calendarId: calId, backfill: rows.length });
     }
 
     if (action === "disconnect") {
@@ -138,30 +155,22 @@ Deno.serve(async (req) => {
       await db.from("google_sync_outbox").update({ status: "cancelled" })
         .eq("user_id", user.id).in("status", ["queued", "failed"]);
       await db.from("google_calendar_connections").delete().eq("user_id", user.id);
-      return new Response(JSON.stringify({ ok: true }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return json({ ok: true });
     }
 
     if (action === "status") {
       const { data: conn } = await db.from("google_calendar_connections")
         .select("*").eq("user_id", user.id).maybeSingle();
-      const { data: pending } = await db.from("google_sync_outbox")
+      const { count: pendingCount } = await db.from("google_sync_outbox")
         .select("id", { count: "exact", head: true })
         .eq("user_id", user.id).in("status", ["queued", "failed", "in_flight"]);
-      return new Response(JSON.stringify({ connection: conn, pending: pending?.length ?? 0 }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return json({ connection: conn, pending: pendingCount ?? 0 });
     }
 
-    return new Response(JSON.stringify({ error: "unknown_action" }), {
-      status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return json({ error: "unknown_action" }, { status: 400 });
   } catch (e) {
     if (e instanceof Response) return e;
     console.error("google-calendar-oauth error", e);
-    return new Response(JSON.stringify({ error: String((e as Error).message ?? e) }), {
-      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return json({ error: String((e as Error).message ?? e) }, { status: 500 });
   }
 });

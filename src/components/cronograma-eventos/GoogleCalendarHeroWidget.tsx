@@ -5,7 +5,7 @@ import { ptBR } from 'date-fns/locale';
 import { useGoogleCalendarConnection } from '@/hooks/useGoogleCalendarConnection';
 
 export const GoogleCalendarHeroWidget = memo(function GoogleCalendarHeroWidget() {
-  const { connection, pending, isLoading, connect, disconnect } = useGoogleCalendarConnection();
+  const { connection, pending, isLoading, authError, connect, disconnect } = useGoogleCalendarConnection();
 
   const status = connection?.status ?? 'disconnected';
   const backfillPct =
@@ -29,6 +29,12 @@ export const GoogleCalendarHeroWidget = memo(function GoogleCalendarHeroWidget()
       <div className="fenasoja-google-widget-icon" aria-hidden="true">
         {isConnecting ? (
           <Loader2 className="animate-spin" />
+        ) : authError === 'sessao_expirada' ? (
+          <>
+            <small>Google Agenda</small>
+            <strong>Sessão expirada</strong>
+            <em>Recarregue o sistema e entre novamente para conectar.</em>
+          </>
         ) : isConnected ? (
           <CheckCircle2 />
         ) : isReconnect ? (

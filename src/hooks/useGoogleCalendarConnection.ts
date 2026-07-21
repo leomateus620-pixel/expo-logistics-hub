@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
@@ -23,9 +23,31 @@ export interface GoogleStatusResponse {
   pending: number;
 }
 
+class GoogleCalendarAuthError extends Error {
+  constructor(message = 'sessao_expirada') {
+    super(message);
+    this.name = 'GoogleCalendarAuthError';
+  }
+}
+
+async function getValidatedAccessToken() {
+  const { data: sessionData } = await supabase.auth.getSession();
+  const token = sessionData.session?.access_token;
+  if (!token) throw new GoogleCalendarAuthError();
+
+  const { data: userData, error } = await supabase.auth.getUser();
+  if (error || !userData.user) throw new GoogleCalendarAuthError();
+
+  return token;
+}
+
 async function invoke<T>(action: string, body: Record<string, unknown> = {}): Promise<T> {
+  const accessToken = await getValidatedAccessToken();
   const { data, error } = await supabase.functions.invoke('google-calendar-oauth', {
     body: { action, ...body },
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+    },
   });
   if (error) throw error;
   return data as T;
@@ -36,12 +58,20 @@ export function useGoogleCalendarConnection() {
   const { orgId } = useCurrentOrg();
   const { toast } = useToast();
   const qc = useQueryClient();
+  const userId = user?.id ?? null;
 
   const status = useQuery({
-    queryKey: ['google-calendar-status', user?.id],
+    queryKey: ['google-calendar-status', userId],
     queryFn: () => invoke<GoogleStatusResponse>('status'),
-    enabled: !!user,
+    enabled: !!userId,
+    retry: (failureCount, error) => {
+      if (error instanceof GoogleCalendarAuthError || String((error as Error)?.message ?? error).includes('unauthorized')) {
+        return false;
+      }
+      return failureCount < 1;
+    },
     refetchInterval: (q) => {
+      if (q.state.error) return false;
       const data = q.state.data as GoogleStatusResponse | undefined;
       if (data?.connection?.status === 'connecting') return 4000;
       if ((data?.pending ?? 0) > 0) return 10000;
@@ -80,7 +110,9 @@ export function useGoogleCalendarConnection() {
       if (!orgId) throw new Error('sem_organizacao');
       // Limpa qualquer estado travado (connecting/error) antes de reiniciar.
       try { await invoke('reset'); } catch { /* ignore */ }
-      const returnUrl = `${window.location.origin}${window.location.pathname}?google=connected`;
+      const currentUrl = new URL(window.location.href);
+      currentUrl.searchParams.set('google', 'connected');
+      const returnUrl = currentUrl.toString();
       const oauth = await invoke<{ authorization_url?: string; authorize_url?: string; url?: string; session_id?: string }>(
         'start',
         { orgId, returnUrl },
@@ -114,8 +146,13 @@ export function useGoogleCalendarConnection() {
         popup_bloqueado: 'Ative pop-ups no navegador para conectar sua conta Google.',
         sem_organizacao: 'Nenhuma organização ativa. Selecione uma organização antes de conectar.',
         sem_url_oauth: 'O servidor não devolveu a URL de autorização do Google. Tente novamente.',
+        sessao_expirada: 'Sua sessão expirou. Recarregue o sistema e entre novamente antes de conectar.',
       };
-      const description = known[e.message] ?? `Falha ao conectar Google Agenda: ${e.message}`;
+      const rawMessage = String(e.message ?? e);
+      const description = known[rawMessage]
+        ?? (rawMessage.includes('no_connection') || rawMessage.includes('non-2xx')
+          ? 'A autorização do Google ainda não foi confirmada. Clique em “Tentar novamente” para reiniciar o fluxo.'
+          : `Falha ao conectar Google Agenda: ${rawMessage}`);
       toast({ title: 'Erro', description, variant: 'destructive' });
     },
   });
@@ -152,10 +189,19 @@ export function useGoogleCalendarConnection() {
     },
   });
 
+  const authError = useMemo(() => {
+    const error = status.error;
+    if (!error) return null;
+    const message = String((error as Error)?.message ?? error);
+    if (error instanceof GoogleCalendarAuthError || message.includes('unauthorized')) return 'sessao_expirada';
+    return message;
+  }, [status.error]);
+
   return {
     connection: status.data?.connection ?? null,
     pending: status.data?.pending ?? 0,
     isLoading: status.isLoading,
+    authError,
     connect,
     disconnect,
   };
