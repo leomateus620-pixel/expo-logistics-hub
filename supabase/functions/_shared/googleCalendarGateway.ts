@@ -63,11 +63,19 @@ export async function fetchConnectionKey(appUserId: string): Promise<string | nu
       },
     },
   );
-  if (!res.ok) return null;
+  if (!res.ok) {
+    console.error(`fetchConnectionKey http ${res.status}: ${await res.text()}`);
+    return null;
+  }
   const body = await res.json();
-  const conn = body?.connections?.[0] ?? body?.[0] ?? body;
-  return conn?.connection_key ?? conn?.api_key ?? null;
+  const conn = body?.connections?.[0] ?? body?.data?.[0] ?? body?.[0] ?? body;
+  const key = conn?.connection_key ?? conn?.api_key ?? conn?.connection_api_key ?? null;
+  if (!key) {
+    console.error("fetchConnectionKey: shape inesperado", JSON.stringify(body).slice(0, 500));
+  }
+  return key;
 }
+
 
 /**
  * Chama a API do Google Calendar via gateway usando a connection_key do usuário.
