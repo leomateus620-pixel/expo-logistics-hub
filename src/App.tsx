@@ -50,6 +50,7 @@ const FenasojaCountdownExperiencePage = lazy(
 );
 const CommercialMapPage = lazy(() => import('./pages/CommercialMapPage'));
 const NotFound = lazy(() => import('./pages/NotFound'));
+const UnsubscribePage = lazy(() => import('./pages/UnsubscribePage'));
 const CommissionPortalPage = lazy(() => import('./pages/commissions/CommissionPortalPage'));
 const CommissionDashboardPlaceholder = lazy(() => import('./pages/commissions/CommissionDashboardPlaceholder'));
 const AdminPortalPage = lazy(() => import('./pages/admin/AdminPortalPage'));
@@ -338,6 +339,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<RootRoute />} />
               <Route path="/portal" element={<Suspended><CommissionPortalPage /></Suspended>} />
+              <Route path="/unsubscribe" element={<Suspended><UnsubscribePage /></Suspended>} />
               <Route path="/login/admin" element={<LoginPage />} />
               <Route path="/login/:moduleSlug" element={<LoginPage />} />
               <Route path="/admin/*" element={<AdminRoutes />} />
