@@ -5,6 +5,7 @@ import Sidebar from './Sidebar';
 import OfflineBanner from './OfflineBanner';
 import DriverGpsBanner from './DriverGpsBanner';
 import PageTransition from './PageTransition';
+import { UpcomingEventsBell } from './UpcomingEventsBell';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useDriverAutoArm } from '@/hooks/useDriverAutoArm';
 
@@ -75,6 +76,7 @@ export default function Layout({ children }: { children: ReactNode }) {
             <p className="text-[10px] font-bold uppercase tracking-[0.14em] text-muted-foreground">Comissão de Logística</p>
             <h1 className="truncate text-sm font-bold text-foreground sm:text-base">{routeLabel}</h1>
           </div>
+          <UpcomingEventsBell />
           <span className="rounded-md border border-primary/10 bg-accent px-2 py-1 text-[10px] font-black tracking-[0.08em] text-accent-foreground shadow-[var(--elevation-1)]">FENASOJA 2028</span>
         </header>
 

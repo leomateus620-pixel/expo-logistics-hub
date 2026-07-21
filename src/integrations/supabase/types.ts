@@ -1394,6 +1394,7 @@ export type Database = {
           backfill_done: number
           backfill_total: number
           connected_at: string
+          connection_key: string | null
           created_at: string
           google_email: string | null
           last_error: string | null
@@ -1409,6 +1410,7 @@ export type Database = {
           backfill_done?: number
           backfill_total?: number
           connected_at?: string
+          connection_key?: string | null
           created_at?: string
           google_email?: string | null
           last_error?: string | null
@@ -1424,6 +1426,7 @@ export type Database = {
           backfill_done?: number
           backfill_total?: number
           connected_at?: string
+          connection_key?: string | null
           created_at?: string
           google_email?: string | null
           last_error?: string | null
