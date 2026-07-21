@@ -72,8 +72,21 @@ export function useGoogleCalendarConnection() {
         }, 800);
       });
 
-      // Completa: busca connection_key + cria calendário + backfill
-      return invoke<{ ok: boolean; calendarId: string; backfill: number }>('complete', { orgId });
+      // Completa: valida conexão + cria calendário + backfill.
+      // O gateway pode levar ~1-2s para persistir a autorização; tentamos até 3x.
+      const tryComplete = async () =>
+        invoke<{ ok: boolean; calendarId: string; backfill: number }>('complete', { orgId });
+      for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+          return await tryComplete();
+        } catch (e: any) {
+          const msg = String(e?.message ?? e);
+          const isNoConn = msg.includes('no_connection') || msg.includes('non-2xx');
+          if (!isNoConn || attempt === 2) throw e;
+          await new Promise((r) => setTimeout(r, 2000));
+        }
+      }
+      throw new Error('no_connection');
     },
     onSuccess: (data) => {
       toast({ title: 'Google Agenda conectada', description: `${data.backfill} eventos serão sincronizados em segundo plano.` });
