@@ -539,7 +539,7 @@ export function useCronogramaEventos() {
     queryFn: async () => {
       if (!orgId) return [];
       const { data, error } = await cronogramaDb
-        .from('cronograma_eventos')
+        .from('cronograma_eventos_full')
         .select('*')
         .eq('org_id', orgId)
         .order('start_date', { ascending: true, nullsFirst: false })
@@ -552,36 +552,8 @@ export function useCronogramaEventos() {
       }
 
       setDbUnavailable(false);
-      const dbEvents = (data ?? []).map(fromDbRow) as CronogramaEvent[];
-      const parentIds = dbEvents.map((event) => event.id).filter(isUuid);
-      if (parentIds.length === 0) {
-        setRelationshipsUnavailable(false);
-        return dbEvents;
-      }
-
-      const relationalResult = await cronogramaDb
-        .from('cronograma_subeventos')
-        .select('*')
-        .in('parent_event_id', parentIds)
-        .order('sort_order', { ascending: true })
-        .order('created_at', { ascending: true })
-        .order('id', { ascending: true })
-        .limit(5000);
-
-      if (relationalResult.error) {
-        setRelationshipsUnavailable(true);
-        return dbEvents;
-      }
-
       setRelationshipsUnavailable(false);
-      const byParent = new Map<string, CronogramaSubeventSeed[]>();
-      (relationalResult.data ?? []).map(fromDbSubeventRow).forEach((subevent) => {
-        const current = byParent.get(subevent.parentEventId) ?? [];
-        current.push(subevent);
-        byParent.set(subevent.parentEventId, current);
-      });
-
-      return dbEvents.map((event) => mergeRelationalSubevents(event, byParent.get(event.id) ?? []));
+      return (data ?? []).map(fromDbRow) as CronogramaEvent[];
     },
     retry: false,
   });
@@ -635,13 +607,7 @@ export function useCronogramaEventos() {
         throw new Error('A sincronização está indisponível. O evento não foi salvo para evitar perda de dados. Tente novamente quando a conexão for restabelecida.');
       }
 
-      const user = (await cronogramaDb.auth.getUser()).data.user;
-      const { data, error } = await cronogramaDb
-        .from('cronograma_eventos')
-        .insert(toDbPayload(event, orgId, user?.id))
-        .select('*')
-        .single();
-      if (error) throw error;
+      const data = await cronogramaSaveEvent(toRpcEventPayload(event, orgId), null);
       return fromDbRow(data);
     },
     onSuccess: (event) => {
@@ -696,53 +662,17 @@ export function useCronogramaEventos() {
       throw new Error('A sincronização está indisponível. As alterações não foram salvas para evitar perda de dados. Tente novamente mais tarde.');
     }
 
-    const user = (await cronogramaDb.auth.getUser()).data.user;
-    const fullPayload = toDbPayload(next, orgId, user?.id);
-    const { created_by_user_id: _createdByUserId, ...updatePayload } = fullPayload;
-    let result: SupabaseResult<unknown>;
-
-    if (current.updatedAt) {
-      result = await cronogramaDb
-        .from('cronograma_eventos')
-        .update(updatePayload)
-        .eq('org_id', orgId)
-        .eq('source_key', next.sourceKey)
-        .eq('updated_at', current.updatedAt)
-        .select('*')
-        .single();
-      if (result.error?.code === 'PGRST116' || (!result.error && !result.data)) {
-        queryClient.invalidateQueries({ queryKey: ['cronograma-eventos'] });
-        throw new Error('Este evento foi alterado por outra pessoa. Atualize a página, revise a versão mais recente e tente novamente.');
-      }
-    } else {
-      result = await cronogramaDb
-        .from('cronograma_eventos')
-        .upsert(fullPayload, { onConflict: 'org_id,source_key' })
-        .select('*')
-        .single();
-    }
-
-    if (result.error) throw new Error(result.error.message || 'Não foi possível salvar as alterações.');
-    const savedFromDb = fromDbRow(result.data);
-    const relational = (current.subevents ?? []).filter((subevent) => subevent.storage === 'relational');
-    const saved = mergeRelationalSubevents(savedFromDb, relational);
-
-    await writeEventLog({
-      eventId: saved.id,
-      action,
-      previousValue: toDbPayload(current, orgId, user?.id),
-      newValue: updatePayload,
-      userId: user?.id ?? null,
-    });
-    return saved;
+    const payload = toRpcEventPayload(next, orgId);
+    const data = await cronogramaSaveEvent(payload, current.lockVersion ?? null);
+    return fromDbRow(data);
   };
 
   const ensurePersistedParent = async (current: CronogramaEvent, allowUnavailable = false) => {
     if (isUuid(current.id)) return current;
     if (!orgId || !current.sourceKey) throw new Error('O evento principal não possui vínculo persistente.');
 
-    const existing = await cronogramaDb
-      .from('cronograma_eventos')
+      const existing = await cronogramaDb
+        .from('cronograma_eventos_full')
       .select('*')
       .eq('org_id', orgId)
       .eq('source_key', current.sourceKey)
