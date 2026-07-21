@@ -93,6 +93,8 @@ export interface CronogramaSaveSubeventPayload {
   description?: string | null;
   start_date?: string | null;
   end_date?: string | null;
+  start_time?: string | null;
+  end_time?: string | null;
   status?: string;
   priority?: string;
   commission_slug?: string | null;

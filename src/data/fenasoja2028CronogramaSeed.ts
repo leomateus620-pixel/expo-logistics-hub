@@ -36,12 +36,15 @@ export interface CronogramaSubeventSeed {
   description?: string | null;
   startDate?: string | null;
   endDate?: string | null;
+  startTime?: string | null;
+  endTime?: string | null;
   status?: CronogramaStatus;
   priority?: CronogramaPriority;
   commissionSlug?: string | null;
   commissionName?: string | null;
   responsibleName?: string | null;
   sortOrder?: number;
+  lockVersion?: number | null;
   storage?: 'embedded' | 'relational' | 'queued';
   syncState?: 'pending' | 'failed';
   syncError?: string | null;
@@ -64,6 +67,8 @@ export interface CronogramaEventSeed {
   priority: CronogramaPriority;
   location?: string | null;
   time?: string | null;
+  startTime?: string | null;
+  endTime?: string | null;
   daysRemaining?: number | null;
   commissionSlug?: string | null;
   commissionName?: string | null;
@@ -76,6 +81,20 @@ export interface CronogramaEventSeed {
   hasExactDate: boolean;
   linkedCommissions?: CronogramaCommissionLink[];
   subevents?: CronogramaSubeventSeed[];
+  lockVersion?: number | null;
+  commissionsRel?: Array<{
+    commissionId?: string | null;
+    commissionSlug?: string | null;
+    commissionName?: string | null;
+    isPrimary?: boolean;
+  }>;
+  responsiblesRel?: Array<{
+    userId?: string | null;
+    name?: string | null;
+    role?: string | null;
+    isPrimary?: boolean;
+    responsibleType?: 'member' | 'external';
+  }>;
 }
 
 export const cronogramaOfficialSheets = {

@@ -90,6 +90,8 @@ export interface CronogramaSubevent {
   description?: string | null;
   date?: string | null;
   endDate?: string | null;
+  startTime?: string;
+  endTime?: string;
   owner?: string;
   status?: CronogramaStatus;
   priority?: CronogramaPriority;
@@ -101,6 +103,7 @@ export interface CronogramaSubevent {
   syncError?: string | null;
   createdAt?: string | null;
   updatedAt?: string | null;
+  lockVersion?: number | null;
 }
 
 export interface CronogramaSubeventInput {
@@ -108,6 +111,8 @@ export interface CronogramaSubeventInput {
   title: string;
   description: string;
   date: string | null;
+  startTime?: string;
+  endTime?: string;
   status: CronogramaStatus;
   responsible: string;
   commissionSlug: string;
