@@ -2,7 +2,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import {
   startOAuth,
-  fetchConnectionKey,
+  probeConnection,
   ensureSecondaryCalendar,
   callGoogleJson,
 } from "../_shared/googleCalendarGateway.ts";
