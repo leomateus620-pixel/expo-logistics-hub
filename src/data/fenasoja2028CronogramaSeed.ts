@@ -23,6 +23,7 @@ export type CronogramaEventType =
   | 'operacao'
   | 'lancamento'
   | 'evento_principal'
+  | 'representacao'
   | 'sem_data';
 
 export interface CronogramaCommissionLink {
