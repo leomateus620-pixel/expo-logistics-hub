@@ -65,10 +65,11 @@ export interface CronogramaSubeventFormProps {
   presentation?: 'desktop' | 'mobile';
   disabled?: boolean;
   emptyLabel?: string;
+  defaultDate?: string | null;
 }
 
 const stableId = (subevent: CronogramaSubevent, index: number) => (
-  subevent.id ?? `draft:${index}:${subevent.title || 'novo'}`
+  subevent.id ?? `draft:${index}`
 );
 
 /**
@@ -83,6 +84,7 @@ export function CronogramaSubeventForm({
   presentation = 'desktop',
   disabled = false,
   emptyLabel = 'Nenhum subevento vinculado.',
+  defaultDate = null,
 }: CronogramaSubeventFormProps) {
   const [pendingDeleteIndex, setPendingDeleteIndex] = useState<number | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -142,14 +144,17 @@ export function CronogramaSubeventForm({
       ...value,
       {
         title: '',
-        date: null,
+        date: defaultDate,
+        endDate: defaultDate,
+        startTime: '',
+        endTime: '',
         owner: '',
         status: 'planned',
         priority: 'medium',
         sortOrder: value.length,
       },
     ]);
-  }, [onChange, value]);
+  }, [defaultDate, onChange, value]);
 
   const requestDelete = (index: number) => {
     setDeleteError(null);
@@ -311,7 +316,7 @@ function SortableSubeventRow({
           <GripVertical className="h-4 w-4" />
         </button>
         <div className="min-w-0 flex-1 space-y-3">
-          <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_150px]">
+          <div className="grid gap-3 sm:grid-cols-[minmax(0,1fr)_150px_120px_120px]">
             <div className="space-y-1.5">
               <Label htmlFor={`${rowId}-title`}>Título do subevento</Label>
               <Input
@@ -330,6 +335,28 @@ function SortableSubeventRow({
                 type="date"
                 value={subevent.date || ''}
                 onChange={(event) => onUpdate(index, 'date', event.target.value || null)}
+                className="bg-white/72"
+                disabled={disabled}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor={`${rowId}-start-time`}>Início</Label>
+              <Input
+                id={`${rowId}-start-time`}
+                type="time"
+                value={subevent.startTime || ''}
+                onChange={(event) => onUpdate(index, 'startTime', event.target.value)}
+                className="bg-white/72"
+                disabled={disabled}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor={`${rowId}-end-time`}>Fim</Label>
+              <Input
+                id={`${rowId}-end-time`}
+                type="time"
+                value={subevent.endTime || ''}
+                onChange={(event) => onUpdate(index, 'endTime', event.target.value)}
                 className="bg-white/72"
                 disabled={disabled}
               />

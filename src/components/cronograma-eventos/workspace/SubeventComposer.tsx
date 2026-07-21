@@ -25,6 +25,8 @@ const emptyInput: CronogramaSubeventInput = {
   title: '',
   description: '',
   date: null,
+  startTime: '',
+  endTime: '',
   status: 'planned',
   responsible: '',
   commissionSlug: '',
@@ -39,12 +41,14 @@ function createRelationshipRequestId() {
   });
 }
 
-function inputFromSubevent(subevent?: CronogramaSubevent | null): CronogramaSubeventInput {
-  if (!subevent) return emptyInput;
+function inputFromSubevent(subevent?: CronogramaSubevent | null, defaultDate?: string | null): CronogramaSubeventInput {
+  if (!subevent) return { ...emptyInput, date: defaultDate ?? null };
   return {
     title: subevent.title,
     description: subevent.description ?? '',
-    date: subevent.date ?? null,
+    date: subevent.date ?? defaultDate ?? null,
+    startTime: subevent.startTime ?? '',
+    endTime: subevent.endTime ?? '',
     status: subevent.status ?? 'planned',
     responsible: subevent.owner ?? '',
     commissionSlug: subevent.commissionSlug ?? '',
@@ -55,18 +59,20 @@ export function SubeventComposer({
   initialSubevent,
   connectedTo,
   mode = 'create',
+  defaultDate = null,
   onSubmit,
   onCancel,
 }: {
   initialSubevent?: CronogramaSubevent | null;
   connectedTo: string;
   mode?: 'create' | 'edit';
+  defaultDate?: string | null;
   onSubmit: (input: CronogramaSubeventInput) => Promise<void> | void;
   onCancel: () => void;
 }) {
   const instanceId = useId().replace(/:/g, '');
   const requestIdRef = useRef(mode === 'create' ? createRelationshipRequestId() : undefined);
-  const initialInput = useMemo(() => inputFromSubevent(initialSubevent), [initialSubevent]);
+  const initialInput = useMemo(() => inputFromSubevent(initialSubevent, defaultDate), [defaultDate, initialSubevent]);
   const [form, setForm] = useState(initialInput);
   const [titleError, setTitleError] = useState<string | null>(null);
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -100,6 +106,8 @@ export function SubeventComposer({
         requestId: requestIdRef.current,
         title: form.title.trim(),
         description: form.description.trim(),
+        startTime: form.startTime?.trim() || undefined,
+        endTime: form.endTime?.trim() || undefined,
         responsible: form.responsible.trim(),
       });
     } catch (error) {
@@ -176,6 +184,26 @@ export function SubeventComposer({
             type="date"
             value={form.date ?? ''}
             onChange={(event) => update('date', event.target.value || null)}
+          />
+        </div>
+
+        <div className="cronograma-thought-field">
+          <Label htmlFor={fieldId('start-time')}>Início</Label>
+          <Input
+            id={fieldId('start-time')}
+            type="time"
+            value={form.startTime ?? ''}
+            onChange={(event) => update('startTime', event.target.value)}
+          />
+        </div>
+
+        <div className="cronograma-thought-field">
+          <Label htmlFor={fieldId('end-time')}>Fim</Label>
+          <Input
+            id={fieldId('end-time')}
+            type="time"
+            value={form.endTime ?? ''}
+            onChange={(event) => update('endTime', event.target.value)}
           />
         </div>
 

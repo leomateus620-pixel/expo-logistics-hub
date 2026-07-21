@@ -58,7 +58,7 @@ function isCompleted(subevent: CronogramaSubevent) {
 }
 
 function subeventIdentity(subevent: CronogramaSubevent, index: number) {
-  return subevent.id ?? `subevent-${index}-${subevent.title}`;
+  return subevent.id ?? `subevent-${index}`;
 }
 
 export function EventRelationshipWorkspace({
@@ -411,6 +411,7 @@ export function EventRelationshipWorkspace({
                         initialSubevent={subevent}
                         connectedTo={event.title}
                         mode="edit"
+                        defaultDate={event.date}
                         onSubmit={(input) => handleUpdate(subevent, input)}
                         onCancel={() => setEditingNodeId(null)}
                       />
@@ -457,6 +458,7 @@ export function EventRelationshipWorkspace({
               <div id="cronograma-new-subevent-composer" className="cronograma-add-composer-wrap">
                 <SubeventComposer
                   connectedTo={event.title}
+                  defaultDate={event.date}
                   onSubmit={handleCreate}
                   onCancel={() => setComposerOpen(false)}
                 />
@@ -540,7 +542,7 @@ function SubeventNode({
       <h3>{subevent.title}</h3>
       {subevent.description && <p className="cronograma-subevent-preview">{subevent.description}</p>}
       <div className="cronograma-subevent-node-meta">
-        <span><CalendarDays aria-hidden="true" /> {subevent.date ? formatLongDate(subevent.date) : 'Prazo a definir'}</span>
+        <span><CalendarDays aria-hidden="true" /> {subevent.date ? `${formatLongDate(subevent.date)}${subevent.startTime ? ` · ${subevent.startTime}` : ''}` : 'Prazo a definir'}</span>
         <span><UserRound aria-hidden="true" /> {subevent.owner || 'Responsável a definir'}</span>
         <span><Layers3 aria-hidden="true" /> {subevent.commission || 'Comissão a definir'}</span>
       </div>
