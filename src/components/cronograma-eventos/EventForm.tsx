@@ -234,7 +234,10 @@ export function EventForm({
       .map((subevent, index) => ({
         ...subevent,
         title: subevent.title.trim(),
-        date: subevent.date?.trim() || null,
+        date: subevent.date?.trim() || normalizedDate,
+        endDate: subevent.endDate?.trim() || subevent.date?.trim() || normalizedDate,
+        startTime: subevent.startTime?.trim() || undefined,
+        endTime: subevent.endTime?.trim() || undefined,
         owner: subevent.owner?.trim() || undefined,
         sortOrder: subevent.sortOrder ?? index,
       }))
@@ -491,6 +494,7 @@ export function EventForm({
             onChange={(next) => update('subevents', next)}
             presentation={presentation}
             disabled={isSaving}
+            defaultDate={form.date}
           />
         </div>
       )}

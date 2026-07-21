@@ -14,6 +14,8 @@ export interface QueuedCronogramaSubeventDraft {
   description?: string | null;
   startDate?: string | null;
   endDate?: string | null;
+  startTime?: string | null;
+  endTime?: string | null;
   status?: CronogramaStatus;
   priority?: CronogramaPriority;
   commissionSlug?: string | null;

@@ -64,6 +64,7 @@ export const typeLabels: Record<CronogramaEventType, string> = {
   operacao: 'Operação',
   lancamento: 'Lançamento',
   evento_principal: 'Evento principal',
+  representacao: 'Representação',
   sem_data: 'Sem data',
 };
 

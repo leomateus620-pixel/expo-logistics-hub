@@ -81,6 +81,7 @@ const sourceToVisualKind: Record<SourceCronogramaEvent['eventType'], CronogramaK
   operacao: 'event',
   lancamento: 'milestone',
   evento_principal: 'event',
+  representacao: 'event',
   sem_data: 'decision',
 };
 
@@ -122,6 +123,8 @@ export function adaptCronogramaEvent(event: SourceCronogramaEvent): CronogramaEv
   const category = getVisualCategory(event);
   const centralMeeting = isCentralMeeting(event);
   const sourceStatus = sourceToVisualStatus[event.status] ?? 'planned';
+  const primaryCommission = event.commissionsRel?.find((link) => link.isPrimary) ?? event.commissionsRel?.[0];
+  const primaryResponsible = event.responsiblesRel?.find((link) => link.isPrimary) ?? event.responsiblesRel?.[0];
 
   const adapted: CronogramaEvent = {
     id: event.id,
@@ -132,17 +135,19 @@ export function adaptCronogramaEvent(event: SourceCronogramaEvent): CronogramaEv
     summary: fallbackSummary(event),
     date: event.hasExactDate ? event.startDate : null,
     endDate: event.hasExactDate ? event.endDate : null,
-    startTime: event.time ?? undefined,
+    startTime: event.startTime ?? event.time ?? undefined,
+    endTime: event.endTime ?? undefined,
     year: event.sourceYear,
     category,
     status: sourceStatus,
     priority: sourceToVisualPriority[event.priority] ?? 'medium',
     kind: centralMeeting ? 'meeting' : sourceToVisualKind[event.eventType] ?? 'event',
     location: event.location ?? undefined,
-    owner: event.responsibleName ?? event.commissionName ?? undefined,
-    commission: event.commissionName ?? event.linkedCommissions?.[0]?.name,
+    owner: primaryResponsible?.name ?? event.responsibleName ?? event.commissionName ?? undefined,
+    commission: primaryCommission?.commissionName ?? event.commissionName ?? event.linkedCommissions?.[0]?.name,
     relatedCommissionIds: [
       event.commissionSlug,
+      ...(event.commissionsRel ?? []).flatMap((commission) => [commission.commissionId, commission.commissionSlug]),
       ...(event.linkedCommissions ?? []).map((commission) => commission.slug),
     ].filter(Boolean) as string[],
     isMain: isMainFenasojaEvent(event),
@@ -153,6 +158,9 @@ export function adaptCronogramaEvent(event: SourceCronogramaEvent): CronogramaEv
     createdAt: event.createdAt,
     updatedAt: event.updatedAt,
     subevents: event.subevents?.map(adaptCronogramaSubevent),
+    lockVersion: event.lockVersion,
+    commissionsRel: event.commissionsRel ?? [],
+    responsiblesRel: event.responsiblesRel ?? [],
   };
   adapted.status = deriveOperationalStatus(adapted);
   adapted.subevents = adapted.subevents?.map((subevent) => ({
@@ -173,6 +181,8 @@ export function adaptCronogramaSubevent(subevent: CronogramaSubeventSeed): Crono
     description: subevent.description ?? null,
     date: subevent.startDate ?? null,
     endDate: subevent.endDate ?? null,
+    startTime: subevent.startTime ?? undefined,
+    endTime: subevent.endTime ?? undefined,
     owner: subevent.responsibleName ?? undefined,
     status,
     priority: subevent.priority ? sourceToVisualPriority[subevent.priority] : 'medium',
@@ -185,6 +195,7 @@ export function adaptCronogramaSubevent(subevent: CronogramaSubeventSeed): Crono
     syncError: subevent.syncError,
     createdAt: subevent.createdAt,
     updatedAt: subevent.updatedAt,
+    lockVersion: subevent.lockVersion,
   };
 }
 
@@ -197,6 +208,8 @@ export function visualSubeventToSourceDraft(
     description: subevent.description?.trim() || null,
     startDate: subevent.date ?? null,
     endDate: subevent.endDate ?? subevent.date ?? null,
+    startTime: subevent.startTime ?? null,
+    endTime: subevent.endTime ?? null,
     responsibleName: subevent.owner?.trim() || null,
     commissionSlug: subevent.commissionSlug ?? null,
     status: subevent.status ? visualToSourceStatus[subevent.status] : 'planejado',
@@ -238,6 +251,8 @@ export function visualEventToSourceUpdates(
     sourceYear: normalizeYear(event.date ? Number(event.date.slice(0, 4)) : event.year),
     startDate: event.date,
     endDate: event.endDate ?? null,
+    startTime: event.startTime ?? null,
+    endTime: event.endTime ?? null,
     status: visualToSourceStatus[event.status],
     priority: visualToSourcePriority[event.priority],
     location: event.location ?? null,
@@ -248,6 +263,8 @@ export function visualEventToSourceUpdates(
     sourceNote: event.pendingReason ?? event.decisionNeeded ?? current.sourceNote,
     hasExactDate,
     linkedCommissions: current.linkedCommissions,
+    commissionsRel: event.commissionsRel ?? current.commissionsRel ?? [],
+    responsiblesRel: event.responsiblesRel ?? current.responsiblesRel ?? [],
     subevents: embeddedSubevents(event, current),
   };
 }
@@ -264,6 +281,8 @@ export function visualEventToDraft(event: CronogramaEvent): CronogramaEventDraft
     sourceYear: normalizeYear(event.date ? Number(event.date.slice(0, 4)) : event.year),
     startDate: event.date,
     endDate: event.endDate ?? null,
+    startTime: event.startTime ?? null,
+    endTime: event.endTime ?? null,
     status: visualToSourceStatus[event.status],
     priority: visualToSourcePriority[event.priority],
     location: event.location ?? null,
@@ -275,6 +294,8 @@ export function visualEventToDraft(event: CronogramaEvent): CronogramaEventDraft
     isOfficialSeed: false,
     hasExactDate,
     linkedCommissions: [],
+    commissionsRel: event.commissionsRel ?? [],
+    responsiblesRel: event.responsiblesRel ?? [],
     subevents: (event.subevents ?? [])
       .filter((subevent) => !subevent.storage || subevent.storage === 'embedded')
       .map((subevent, index) => ({
@@ -283,6 +304,8 @@ export function visualEventToDraft(event: CronogramaEvent): CronogramaEventDraft
         description: subevent.description ?? null,
         startDate: subevent.date ?? null,
         endDate: subevent.endDate ?? subevent.date ?? null,
+        startTime: subevent.startTime ?? null,
+        endTime: subevent.endTime ?? null,
         responsibleName: subevent.owner ?? null,
         commissionSlug: subevent.commissionSlug ?? null,
         commissionName: subevent.commission ?? null,
