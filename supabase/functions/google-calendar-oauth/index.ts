@@ -53,27 +53,26 @@ Deno.serve(async (req) => {
     if (action === "complete") {
       const orgId = (body as { orgId?: string }).orgId;
 
-      const connectionKey = await fetchConnectionKey(user.id);
-      if (!connectionKey) {
+      const ok = await probeConnection(user.id);
+      if (!ok) {
         return new Response(JSON.stringify({ error: "no_connection" }), {
           status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
 
       // Cria calendário secundário
-      const calId = await ensureSecondaryCalendar(connectionKey);
+      const calId = await ensureSecondaryCalendar(user.id);
 
       // Busca email do usuário no Google
       let email: string | null = null;
       try {
-        const profile = await callGoogleJson<{ email?: string }>(connectionKey, "/oauth2/v2/userinfo");
+        const profile = await callGoogleJson<{ email?: string }>(user.id, "/oauth2/v2/userinfo");
         email = profile.email ?? null;
       } catch { /* ignore */ }
 
       await db.from("google_calendar_connections").upsert({
         user_id: user.id,
         org_id: orgId,
-        connection_key: connectionKey,
         google_email: email,
         secondary_calendar_id: calId,
         status: "connected",
