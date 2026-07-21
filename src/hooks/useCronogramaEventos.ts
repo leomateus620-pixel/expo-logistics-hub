@@ -410,7 +410,6 @@ function toRpcEventPayload(event: CronogramaEventSeed | CronogramaEvent, orgId: 
 
 function toDbSubeventPayload(parentEventId: string, draft: CronogramaSubeventDraft) {
   return {
-    id: isUuid(draft.id) ? draft.id : undefined,
     parent_event_id: parentEventId,
     title: draft.title.trim(),
     description: draft.description?.trim() || null,
@@ -828,13 +827,12 @@ export function useCronogramaEventos() {
 
       try {
         const parent = await ensurePersistedParent(current);
-        const relational = (parent.subevents ?? []).filter((subevent) => subevent.storage === 'relational');
-        const created = await insertRelationalSubevent(parent.id, normalizedDraft, id);
+        const { parent: savedParent } = await saveRelationalSubevent(parent.id, normalizedDraft, id);
         removeQueuedCronogramaRelationship(orgId!, id);
         refreshQueuedRelationships();
         return {
           mode: 'synced' as const,
-          event: mergeRelationalSubevents(parent, [...relational, created]),
+          event: savedParent,
         };
       } catch (error) {
         if (!isQueueableCronogramaRelationshipError(error, isOnline)) {
@@ -890,9 +888,7 @@ export function useCronogramaEventos() {
 
         try {
           const parent = await ensurePersistedParent(current, true);
-          const relational = (parent.subevents ?? []).filter((subevent) => subevent.storage === 'relational');
-          const created = await insertRelationalSubevent(parent.id, item.draft, item.requestId);
-          const persistedEvent = mergeRelationalSubevents(parent, [...relational, created]);
+          const { parent: persistedEvent } = await saveRelationalSubevent(parent.id, item.draft, item.requestId);
           workingEvents = replaceEventInList(workingEvents, persistedEvent);
           persistedEvents.push(persistedEvent);
           removeQueuedCronogramaRelationship(orgId, item.requestId);
