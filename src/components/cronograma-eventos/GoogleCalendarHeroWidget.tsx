@@ -1,133 +1,294 @@
-import { memo } from 'react';
-import { Calendar, CheckCircle2, Loader2, AlertTriangle, Unlink, LinkIcon } from 'lucide-react';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  AlertTriangle,
+  CheckCircle2,
+  ExternalLink,
+  Link2,
+  Loader2,
+  RefreshCw,
+  Unlink,
+  XCircle,
+} from 'lucide-react';
+import googleCalendarIcon from '@/assets/google-calendar.svg';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { useGoogleCalendarConnection } from '@/hooks/useGoogleCalendarConnection';
+import {
+  deriveGoogleCalendarState,
+  type GoogleCalendarAction,
+  type GoogleCalendarStateView,
+} from '@/lib/google-calendar-state';
+
+const GOOGLE_CALENDAR_URL = 'https://calendar.google.com/calendar/u/0/r';
+
+function formatLastSync(value: string | null | undefined) {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return new Intl.DateTimeFormat('pt-BR', {
+    day: '2-digit',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'America/Sao_Paulo',
+  }).format(date).replace(',', ' ·');
+}
+
+function statusLabel(state: GoogleCalendarStateView) {
+  if (state.tone === 'success') return 'Conectado';
+  if (state.tone === 'progress') return 'Em andamento';
+  if (state.tone === 'danger') return 'Ação necessária';
+  if (state.tone === 'warning') return 'Atenção';
+  return state.id === 'disconnected' ? 'Não conectado' : 'Disponível';
+}
+
+function StatusGlyph({ state }: { state: GoogleCalendarStateView }) {
+  if (state.busy) return <Loader2 className="fenasoja-google-widget-spinner" aria-hidden="true" />;
+  if (state.tone === 'success') return <CheckCircle2 aria-hidden="true" />;
+  if (state.tone === 'danger') return <XCircle aria-hidden="true" />;
+  if (state.tone === 'warning') return <AlertTriangle aria-hidden="true" />;
+  return <Link2 aria-hidden="true" />;
+}
 
 export const GoogleCalendarHeroWidget = memo(function GoogleCalendarHeroWidget() {
-  const { connection, pending, isLoading, authError, connect, disconnect } = useGoogleCalendarConnection();
+  const {
+    connection,
+    pending,
+    outbox,
+    isLoading,
+    isRefreshing,
+    statusErrorCode,
+    flowErrorCode,
+    flowPhase,
+    connect,
+    retry,
+    disconnect,
+    cancelOAuth,
+    refresh,
+  } = useGoogleCalendarConnection();
+  const [confirmingDisconnect, setConfirmingDisconnect] = useState(false);
+  const [isVisible, setIsVisible] = useState(() => typeof IntersectionObserver === 'undefined');
+  const widgetRef = useRef<HTMLElement>(null);
 
-  const status = connection?.status ?? 'disconnected';
-  const backfillPct =
-    connection && connection.backfill_total > 0
-      ? Math.min(100, Math.round((connection.backfill_done / connection.backfill_total) * 100))
-      : null;
+  useEffect(() => {
+    const node = widgetRef.current;
+    if (!node || typeof IntersectionObserver === 'undefined') {
+      setIsVisible(true);
+      return;
+    }
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) setIsVisible(true);
+    }, { rootMargin: '80px 0px' });
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
 
-  const isConnected = status === 'connected';
-  const isReconnect = status === 'reconnect_required';
-  const isErrored = status === 'error';
-  const isStalePending = status === 'connecting' && !connect.isPending;
-  const isConnecting = connect.isPending;
-  const isSyncing = backfillPct !== null && backfillPct < 100;
+  const state = useMemo(() => deriveGoogleCalendarState({
+    connection,
+    pending,
+    outbox,
+    isLoading,
+    statusErrorCode,
+    flowErrorCode,
+    flowPhase,
+    retrying: retry.isPending || isRefreshing,
+    disconnecting: disconnect.isPending,
+    confirmingDisconnect,
+  }), [
+    confirmingDisconnect,
+    connection,
+    disconnect.isPending,
+    flowErrorCode,
+    flowPhase,
+    isLoading,
+    isRefreshing,
+    outbox,
+    pending,
+    retry.isPending,
+    statusErrorCode,
+  ]);
+
+  const backfillPct = connection && connection.backfill_total > 0
+    ? Math.min(100, Math.round((connection.backfill_done / connection.backfill_total) * 100))
+    : null;
+  const lastSync = formatLastSync(connection?.last_sync_at);
+  const controlsLocked = connect.isPending || retry.isPending || disconnect.isPending || isRefreshing;
+
+  const runAction = (action: GoogleCalendarAction) => {
+    if (controlsLocked && action !== 'cancel_oauth') return;
+    if (action === 'connect' || action === 'retry_connection' || action === 'reconnect') {
+      connect.mutate();
+    } else if (action === 'retry_sync') {
+      retry.mutate();
+    } else if (action === 'refresh') {
+      void refresh();
+    } else if (action === 'disconnect') {
+      setConfirmingDisconnect(true);
+    } else if (action === 'cancel_oauth') {
+      cancelOAuth();
+    }
+  };
+
+  const renderPrimaryAction = () => {
+    if (!state.primaryLabel) return null;
+    if (state.primaryAction === 'open_calendar') {
+      return (
+        <a
+          className="fenasoja-google-widget-cta"
+          href={GOOGLE_CALENDAR_URL}
+          target="_blank"
+          rel="noreferrer"
+        >
+          <ExternalLink aria-hidden="true" />
+          <span>{state.primaryLabel}</span>
+        </a>
+      );
+    }
+
+    const disabled = state.primaryAction === 'none' || controlsLocked || state.busy;
+    return (
+      <button
+        type="button"
+        className="fenasoja-google-widget-cta"
+        onClick={() => runAction(state.primaryAction)}
+        disabled={disabled}
+        aria-busy={disabled && state.busy ? true : undefined}
+      >
+        {state.busy ? <Loader2 className="fenasoja-google-widget-spinner" aria-hidden="true" /> : <RefreshCw aria-hidden="true" />}
+        <span>{state.primaryLabel}</span>
+      </button>
+    );
+  };
 
   return (
-    <div
-      className="fenasoja-google-widget"
-      data-state={status}
-      aria-label="Sincronização com Google Agenda"
-    >
-      <div className="fenasoja-google-widget-icon" aria-hidden="true">
-        {isConnecting ? (
-          <Loader2 className="animate-spin" />
-        ) : authError === 'sessao_expirada' ? (
-          <>
-            <small>Google Agenda</small>
-            <strong>Sessão expirada</strong>
-            <em>Recarregue o sistema e entre novamente para conectar.</em>
-          </>
-        ) : isConnected ? (
-          <CheckCircle2 />
-        ) : isReconnect ? (
-          <AlertTriangle />
-        ) : (
-          <Calendar />
-        )}
-      </div>
+    <>
+      <article
+        ref={widgetRef}
+        className="fenasoja-google-widget"
+        data-state={state.id}
+        data-tone={state.tone}
+        data-busy={state.busy || undefined}
+        data-visible={isVisible || undefined}
+        aria-labelledby="google-calendar-widget-title"
+        aria-describedby="google-calendar-widget-description"
+        aria-busy={state.busy}
+      >
+        <div
+          className="fenasoja-google-widget-icon"
+          role="img"
+          aria-label="Google Agenda"
+        >
+          <img src={googleCalendarIcon} alt="" width="48" height="48" />
+          <span className="fenasoja-google-widget-icon-status">
+            <StatusGlyph state={state} />
+          </span>
+        </div>
 
-      <div className="fenasoja-google-widget-body">
-        {isLoading ? (
-          <>
-            <small>Google Agenda</small>
-            <strong>Verificando conexão…</strong>
-          </>
-        ) : isConnected ? (
-          <>
-            <small>Google Agenda · Conectado</small>
-            <strong>{connection?.google_email ?? 'Conta vinculada'}</strong>
-            {isSyncing ? (
-              <em>
-                Sincronizando {connection?.backfill_done}/{connection?.backfill_total} eventos
-                <span className="fenasoja-google-widget-track" aria-hidden="true">
-                  <span style={{ width: `${backfillPct}%` }} />
-                </span>
-              </em>
-            ) : connection?.last_sync_at ? (
-              <em>
-                Última sync{' '}
-                {format(new Date(connection.last_sync_at), "dd/MM 'às' HH:mm", { locale: ptBR })}
-                {pending > 0 ? ` · ${pending} pendente${pending > 1 ? 's' : ''}` : ''}
-              </em>
-            ) : (
-              <em>Calendário &quot;FENASOJA — Cronograma&quot;</em>
-            )}
-          </>
-        ) : isReconnect ? (
-          <>
-            <small>Google Agenda · Reconectar</small>
-            <strong>Permissão expirada</strong>
-            <em>A conexão precisa ser reautorizada.</em>
-          </>
-        ) : isConnecting ? (
-          <>
-            <small>Google Agenda</small>
-            <strong>Conectando…</strong>
-            <em>Aprovando permissão na conta Google.</em>
-          </>
-        ) : isStalePending || isErrored ? (
-          <>
-            <small>Google Agenda</small>
-            <strong>Conexão não finalizada</strong>
-            <em>Clique em "Tentar novamente" para reiniciar o fluxo.</em>
-          </>
-        ) : (
-          <>
-            <small>Google Agenda</small>
-            <strong>Sincronize seu cronograma</strong>
-            <em>Eventos das suas comissões no seu calendário Google.</em>
-          </>
-        )}
-      </div>
-
-      <div className="fenasoja-google-widget-actions">
-        {isConnected ? (
-          <button
-            type="button"
-            className="fenasoja-google-widget-ghost"
-            onClick={() => disconnect.mutate()}
-            disabled={disconnect.isPending}
-            aria-label="Desconectar Google Agenda"
-          >
-            {disconnect.isPending ? <Loader2 className="animate-spin" /> : <Unlink />}
-            <span>Desconectar</span>
-          </button>
-        ) : (
-          <button
-            type="button"
-            className="fenasoja-google-widget-cta"
-            onClick={() => connect.mutate()}
-            disabled={isConnecting}
-          >
-            {isConnecting ? <Loader2 className="animate-spin" /> : <LinkIcon />}
-            <span>
-              {isReconnect
-                ? 'Reconectar'
-                : isStalePending || isErrored
-                ? 'Tentar novamente'
-                : 'Conectar'}
+        <div className="fenasoja-google-widget-body">
+          <div className="fenasoja-google-widget-heading">
+            <div>
+              <span className="fenasoja-google-widget-eyebrow">{state.eyebrow}</span>
+              <span className="fenasoja-google-widget-name">Google Agenda</span>
+            </div>
+            <span className="fenasoja-google-widget-status" data-tone={state.tone}>
+              <StatusGlyph state={state} />
+              {statusLabel(state)}
             </span>
-          </button>
-        )}
-      </div>
-    </div>
+          </div>
+
+          <h3 id="google-calendar-widget-title">{state.title}</h3>
+          <p id="google-calendar-widget-description">{state.description}</p>
+
+          {(connection?.google_email || lastSync || pending > 0) && (
+            <dl className="fenasoja-google-widget-meta">
+              {connection?.google_email && (
+                <div>
+                  <dt>Conta</dt>
+                  <dd title={connection.google_email}>{connection.google_email}</dd>
+                </div>
+              )}
+              {lastSync && (
+                <div>
+                  <dt>Última sincronização</dt>
+                  <dd>{lastSync}</dd>
+                </div>
+              )}
+              {pending > 0 && (
+                <div>
+                  <dt>Fila</dt>
+                  <dd>{pending} {pending === 1 ? 'atualização' : 'atualizações'}</dd>
+                </div>
+              )}
+            </dl>
+          )}
+
+          {backfillPct !== null && backfillPct < 100 && connection && (
+            <div
+              className="fenasoja-google-widget-progress"
+              role="progressbar"
+              aria-label="Progresso da sincronização inicial"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={backfillPct}
+            >
+              <span>
+                <strong>{backfillPct}%</strong>
+                <span>{connection.backfill_done} de {connection.backfill_total} eventos</span>
+              </span>
+              <span className="fenasoja-google-widget-track" aria-hidden="true">
+                <span style={{ transform: `scaleX(${backfillPct / 100})` }} />
+              </span>
+            </div>
+          )}
+        </div>
+
+        <div className="fenasoja-google-widget-actions">
+          {renderPrimaryAction()}
+          {state.secondaryAction && state.secondaryLabel && (
+            <button
+              type="button"
+              className="fenasoja-google-widget-ghost"
+              onClick={() => runAction(state.secondaryAction!)}
+              disabled={controlsLocked && state.secondaryAction !== 'cancel_oauth'}
+            >
+              {state.secondaryAction === 'disconnect' ? <Unlink aria-hidden="true" /> : null}
+              <span>{state.secondaryLabel}</span>
+            </button>
+          )}
+        </div>
+
+        <p className="sr-only" aria-live="polite" aria-atomic="true">
+          {state.announce}
+        </p>
+      </article>
+
+      <AlertDialog open={confirmingDisconnect} onOpenChange={setConfirmingDisconnect}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Desconectar o Google Agenda?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Novas alterações deixarão de ser sincronizadas. Os eventos que já estão no Google Agenda serão preservados.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Manter conexão</AlertDialogCancel>
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              onClick={() => disconnect.mutate()}
+            >
+              Sim, desconectar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
   );
 });

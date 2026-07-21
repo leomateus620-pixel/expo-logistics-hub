@@ -46,7 +46,8 @@ export async function startOAuth(returnUrl: string, appUserId: string) {
     }),
   });
   if (!res.ok) {
-    throw new Error(`oauth_start_failed:${res.status}:${await res.text()}`);
+    await res.text();
+    throw new Error(`oauth_start_failed:${res.status}`);
   }
   return await res.json();
 }
@@ -77,7 +78,7 @@ export async function callGoogleJson<T = unknown>(
 ): Promise<T> {
   const res = await callGoogle(appUserId, path, init);
   const text = await res.text();
-  if (!res.ok) throw new Error(`google_api:${res.status}:${text}`);
+  if (!res.ok) throw new Error(`google_api:${res.status}:provider_rejected`);
   return text ? JSON.parse(text) : ({} as T);
 }
 
@@ -92,11 +93,11 @@ export async function probeConnection(appUserId: string): Promise<boolean> {
       await res.text();
       return true;
     }
-    const body = await res.text();
-    console.warn(`probeConnection http ${res.status}: ${body.slice(0, 300)}`);
+    await res.text();
+    console.warn("probeConnection rejected", { status: res.status });
     return false;
-  } catch (e) {
-    console.warn("probeConnection error:", (e as Error).message);
+  } catch {
+    console.warn("probeConnection failed", { reason: "gateway_unavailable" });
     return false;
   }
 }
@@ -104,7 +105,7 @@ export async function probeConnection(appUserId: string): Promise<boolean> {
 /** Cria calendário secundário "FENASOJA — Cronograma". */
 export async function ensureSecondaryCalendar(appUserId: string, existingId?: string | null) {
   if (existingId) {
-    const check = await callGoogle(appUserId, `/calendar/v3/calendars/${existingId}`);
+    const check = await callGoogle(appUserId, `/calendar/v3/calendars/${encodeURIComponent(existingId)}`);
     await check.text();
     if (check.ok) return existingId;
   }
@@ -116,7 +117,7 @@ export async function ensureSecondaryCalendar(appUserId: string, existingId?: st
       timeZone: "America/Sao_Paulo",
     }),
   });
-  await callGoogle(appUserId, `/calendar/v3/users/me/calendarList/${created.id}`, {
+  await callGoogle(appUserId, `/calendar/v3/users/me/calendarList/${encodeURIComponent(created.id)}`, {
     method: "PATCH",
     body: JSON.stringify({ colorId: "10", summaryOverride: "FENASOJA — Cronograma" }),
   }).then((r) => r.text()).catch(() => {});

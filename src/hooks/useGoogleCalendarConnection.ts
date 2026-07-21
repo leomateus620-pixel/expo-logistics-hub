@@ -1,18 +1,28 @@
-import { useEffect, useMemo, useRef } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import { useToast } from '@/hooks/use-toast';
+import {
+  buildGoogleCalendarReturnUrl,
+  cleanGoogleCalendarCallbackUrl,
+  parseGoogleCalendarCallbackFeedback,
+} from '@/lib/google-calendar-callback';
+import type {
+  GoogleCalendarBackendStatus,
+  GoogleCalendarFlowPhase,
+  GoogleCalendarOutboxSummary,
+} from '@/lib/google-calendar-state';
 
 export interface GoogleCalendarConnection {
   user_id: string;
   org_id: string;
   google_email: string | null;
   secondary_calendar_id: string | null;
-  status: 'connected' | 'reconnect_required' | 'disconnected' | 'error' | 'connecting';
+  status: GoogleCalendarBackendStatus;
   last_sync_at: string | null;
-  last_error: string | null;
+  error_code: string | null;
   backfill_total: number;
   backfill_done: number;
   connected_at: string;
@@ -21,188 +31,378 @@ export interface GoogleCalendarConnection {
 export interface GoogleStatusResponse {
   connection: GoogleCalendarConnection | null;
   pending: number;
+  outbox: GoogleCalendarOutboxSummary;
 }
 
-class GoogleCalendarAuthError extends Error {
-  constructor(message = 'sessao_expirada') {
-    super(message);
-    this.name = 'GoogleCalendarAuthError';
+type GoogleCalendarErrorCode =
+  | 'authorization_cancelled'
+  | 'authorization_failed'
+  | 'authorization_not_confirmed'
+  | 'invalid_callback'
+  | 'no_active_organization'
+  | 'oauth_popup_blocked'
+  | 'oauth_url_missing'
+  | 'request_failed'
+  | 'session_expired';
+
+class GoogleCalendarFlowError extends Error {
+  readonly code: GoogleCalendarErrorCode;
+
+  constructor(code: GoogleCalendarErrorCode) {
+    super(code);
+    this.name = 'GoogleCalendarFlowError';
+    this.code = code;
   }
 }
+
+const SAFE_ERROR_COPY: Record<GoogleCalendarErrorCode, string> = {
+  authorization_cancelled: 'A autorização foi cancelada. Nenhuma alteração foi feita.',
+  authorization_failed: 'Não foi possível confirmar a autorização do Google. Tente novamente.',
+  authorization_not_confirmed: 'A autorização ainda não foi confirmada. Tente novamente quando estiver pronto.',
+  invalid_callback: 'O retorno da autorização não pôde ser validado. Inicie a conexão novamente.',
+  no_active_organization: 'Selecione uma organização antes de conectar sua conta Google.',
+  oauth_popup_blocked: 'Permita pop-ups neste site para abrir a autorização do Google.',
+  oauth_url_missing: 'O serviço de autorização não respondeu como esperado. Tente novamente.',
+  request_failed: 'O serviço está temporariamente indisponível. Tente novamente em instantes.',
+  session_expired: 'Sua sessão expirou. Entre novamente antes de conectar sua conta.',
+};
+
+const isKnownErrorCode = (value: unknown): value is GoogleCalendarErrorCode =>
+  typeof value === 'string' && value in SAFE_ERROR_COPY;
 
 async function getValidatedAccessToken() {
   const { data: sessionData } = await supabase.auth.getSession();
   const token = sessionData.session?.access_token;
-  if (!token) throw new GoogleCalendarAuthError();
+  if (!token) throw new GoogleCalendarFlowError('session_expired');
 
   const { data: userData, error } = await supabase.auth.getUser();
-  if (error || !userData.user) throw new GoogleCalendarAuthError();
-
+  if (error || !userData.user) throw new GoogleCalendarFlowError('session_expired');
   return token;
+}
+
+async function readFunctionErrorCode(error: unknown): Promise<GoogleCalendarErrorCode> {
+  const context = (error as { context?: unknown })?.context;
+  if (context instanceof Response) {
+    try {
+      const payload = await context.clone().json() as { error?: unknown };
+      if (isKnownErrorCode(payload.error)) return payload.error;
+    } catch {
+      // A resposta pode não ter corpo JSON. O usuário recebe uma mensagem segura.
+    }
+  }
+  const message = String((error as Error)?.message ?? '');
+  if (message.toLowerCase().includes('unauthorized')) return 'session_expired';
+  return 'request_failed';
 }
 
 async function invoke<T>(action: string, body: Record<string, unknown> = {}): Promise<T> {
   const accessToken = await getValidatedAccessToken();
   const { data, error } = await supabase.functions.invoke('google-calendar-oauth', {
     body: { action, ...body },
-    headers: {
-      Authorization: `Bearer ${accessToken}`,
-    },
+    headers: { Authorization: `Bearer ${accessToken}` },
   });
-  if (error) throw error;
+  if (error) throw new GoogleCalendarFlowError(await readFunctionErrorCode(error));
+  if (data && typeof data === 'object' && isKnownErrorCode((data as { error?: unknown }).error)) {
+    throw new GoogleCalendarFlowError((data as { error: GoogleCalendarErrorCode }).error);
+  }
   return data as T;
+}
+
+interface CompleteResponse {
+  ok: boolean;
+  calendarId?: string;
+  backfill?: number;
+  pending?: boolean;
+}
+
+interface PopupMessage {
+  type: 'fenasoja:google-calendar-oauth';
+  status: 'success' | 'cancelled' | 'failed';
+  code?: GoogleCalendarErrorCode;
+}
+
+function waitForPopupResult(popup: Window): Promise<PopupMessage | { status: 'closed' }> {
+  return new Promise((resolve) => {
+    let settled = false;
+    const finish = (result: PopupMessage | { status: 'closed' }) => {
+      if (settled) return;
+      settled = true;
+      window.clearInterval(interval);
+      window.removeEventListener('message', onMessage);
+      resolve(result);
+    };
+    const onMessage = (event: MessageEvent<PopupMessage>) => {
+      if (event.origin !== window.location.origin || event.source !== popup) return;
+      if (event.data?.type !== 'fenasoja:google-calendar-oauth') return;
+      finish(event.data);
+    };
+    const interval = window.setInterval(() => {
+      if (popup.closed) finish({ status: 'closed' });
+    }, 400);
+    window.addEventListener('message', onMessage);
+  });
 }
 
 export function useGoogleCalendarConnection() {
   const { user } = useAuth();
   const { orgId } = useCurrentOrg();
   const { toast } = useToast();
-  const qc = useQueryClient();
+  const queryClient = useQueryClient();
   const userId = user?.id ?? null;
+  const [flowPhase, setFlowPhase] = useState<GoogleCalendarFlowPhase>('idle');
+  const [flowErrorCode, setFlowErrorCode] = useState<GoogleCalendarErrorCode | null>(null);
+  const connectPromiseRef = useRef<Promise<CompleteResponse> | null>(null);
+  const popupRef = useRef<Window | null>(null);
+  const oauthCancelledRef = useRef(false);
+  const callbackHandledRef = useRef(false);
+  const phaseTimerRef = useRef<number | null>(null);
+  const refreshPromiseRef = useRef<Promise<unknown> | null>(null);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const invalidateStatus = useCallback(
+    () => queryClient.invalidateQueries({ queryKey: ['google-calendar-status', userId] }),
+    [queryClient, userId],
+  );
 
   const status = useQuery({
     queryKey: ['google-calendar-status', userId],
     queryFn: () => invoke<GoogleStatusResponse>('status'),
-    enabled: !!userId,
-    retry: (failureCount, error) => {
-      if (error instanceof GoogleCalendarAuthError || String((error as Error)?.message ?? error).includes('unauthorized')) {
-        return false;
-      }
-      return failureCount < 1;
-    },
-    refetchInterval: (q) => {
-      if (q.state.error) return false;
-      const data = q.state.data as GoogleStatusResponse | undefined;
-      if (data?.connection?.status === 'connecting') return 4000;
-      if ((data?.pending ?? 0) > 0) return 10000;
+    enabled: Boolean(userId),
+    retry: (failureCount, error) =>
+      !(error instanceof GoogleCalendarFlowError && error.code === 'session_expired') && failureCount < 1,
+    refetchInterval: (query) => {
+      if (query.state.error) return false;
+      const data = query.state.data as GoogleStatusResponse | undefined;
+      if (data?.connection?.status === 'connecting' || data?.connection?.status === 'completing') return 3000;
+      if ((data?.pending ?? 0) > 0) return 8000;
       return 60000;
     },
   });
 
-  const completeConnection = async (useOrg: string) => {
-    const tryCall = async () =>
-      invoke<{ ok: boolean; calendarId?: string; backfill?: number; pending?: boolean }>(
-        'complete',
-        { orgId: useOrg },
-      );
-    let last: unknown;
-    for (let attempt = 0; attempt < 6; attempt++) {
-      try {
-        const res = await tryCall();
-        if ((res as any).pending) {
-          await new Promise((r) => setTimeout(r, 2000));
-          continue;
-        }
-        return res;
-      } catch (e: any) {
-        last = e;
-        const msg = String(e?.message ?? e);
-        const isRetryable = msg.includes('no_connection') || msg.includes('non-2xx') || msg.includes('pending');
-        if (!isRetryable || attempt === 5) throw e;
-        await new Promise((r) => setTimeout(r, 2000));
-      }
+  const completeConnection = useCallback(async (activeOrgId: string) => {
+    for (let attempt = 0; attempt < 6; attempt += 1) {
+      const response = await invoke<CompleteResponse>('complete', { orgId: activeOrgId });
+      if (!response.pending) return response;
+      await new Promise((resolve) => window.setTimeout(resolve, 1600));
     }
-    throw last ?? new Error('no_connection');
-  };
+    throw new GoogleCalendarFlowError('authorization_not_confirmed');
+  }, []);
 
   const connect = useMutation({
     mutationFn: async () => {
-      if (!orgId) throw new Error('sem_organizacao');
-      // Limpa qualquer estado travado (connecting/error) antes de reiniciar.
-      try { await invoke('reset'); } catch { /* ignore */ }
-      const currentUrl = new URL(window.location.href);
-      currentUrl.searchParams.set('google', 'connected');
-      const returnUrl = currentUrl.toString();
-      const oauth = await invoke<{ authorization_url?: string; authorize_url?: string; url?: string; session_id?: string }>(
-        'start',
-        { orgId, returnUrl },
-      );
-      const authorizeUrl = oauth.authorization_url ?? oauth.authorize_url ?? oauth.url;
-      if (!authorizeUrl) {
-        console.error('[google-oauth] resposta sem authorization_url:', oauth);
-        throw new Error('sem_url_oauth');
+      if (connectPromiseRef.current) return connectPromiseRef.current;
+
+      const operation = (async () => {
+        if (!orgId) throw new GoogleCalendarFlowError('no_active_organization');
+        oauthCancelledRef.current = false;
+        setFlowErrorCode(null);
+        setFlowPhase('starting');
+        await invoke('reset');
+
+        const oauth = await invoke<{
+          authorization_url?: string;
+          authorize_url?: string;
+          url?: string;
+        }>('start', {
+          orgId,
+          returnUrl: buildGoogleCalendarReturnUrl(window.location.href),
+        });
+        const authorizeUrl = oauth.authorization_url ?? oauth.authorize_url ?? oauth.url;
+        if (!authorizeUrl) throw new GoogleCalendarFlowError('oauth_url_missing');
+
+        const popup = window.open(authorizeUrl, 'fenasoja-google-oauth', 'width=540,height=720,resizable=yes,scrollbars=yes');
+        if (!popup) throw new GoogleCalendarFlowError('oauth_popup_blocked');
+        popupRef.current = popup;
+        popup.focus();
+        setFlowPhase('waiting_oauth');
+
+        const popupResult = await waitForPopupResult(popup);
+        popupRef.current = null;
+        if (oauthCancelledRef.current || popupResult.status === 'cancelled') {
+          throw new GoogleCalendarFlowError('authorization_cancelled');
+        }
+        if (popupResult.status === 'failed') {
+          throw new GoogleCalendarFlowError(popupResult.code ?? 'authorization_failed');
+        }
+
+        setFlowPhase('returning');
+        return completeConnection(orgId);
+      })();
+
+      connectPromiseRef.current = operation;
+      try {
+        return await operation;
+      } finally {
+        connectPromiseRef.current = null;
       }
-
-      const popup = window.open(authorizeUrl, 'google-oauth', 'width=520,height=680');
-      if (!popup) throw new Error('popup_bloqueado');
-
-      // Aguarda o popup fechar (usuário concluiu ou cancelou)
-      await new Promise<void>((resolve) => {
-        const interval = window.setInterval(() => {
-          if (popup.closed) { window.clearInterval(interval); resolve(); }
-        }, 800);
-      });
-
-      return await completeConnection(orgId);
     },
     onSuccess: (data) => {
-      const n = (data as any)?.backfill ?? 0;
-      toast({ title: 'Google Agenda conectada', description: `${n} eventos serão sincronizados em segundo plano.` });
-      qc.invalidateQueries({ queryKey: ['google-calendar-status'] });
+      const total = data.backfill ?? 0;
+      setFlowPhase('success');
+      setFlowErrorCode(null);
+      toast({
+        title: 'Google Agenda conectado',
+        description: total > 0
+          ? `${total} evento${total === 1 ? '' : 's'} será${total === 1 ? '' : 'ão'} sincronizado${total === 1 ? '' : 's'} em segundo plano.`
+          : 'A conexão foi confirmada com segurança.',
+      });
+      void invalidateStatus();
+      if (phaseTimerRef.current) window.clearTimeout(phaseTimerRef.current);
+      phaseTimerRef.current = window.setTimeout(() => setFlowPhase('idle'), 1400);
     },
-    onError: (e: Error) => {
-      console.error('[google-oauth] connect error:', e);
-      const known: Record<string, string> = {
-        popup_bloqueado: 'Ative pop-ups no navegador para conectar sua conta Google.',
-        sem_organizacao: 'Nenhuma organização ativa. Selecione uma organização antes de conectar.',
-        sem_url_oauth: 'O servidor não devolveu a URL de autorização do Google. Tente novamente.',
-        sessao_expirada: 'Sua sessão expirou. Recarregue o sistema e entre novamente antes de conectar.',
-      };
-      const rawMessage = String(e.message ?? e);
-      const description = known[rawMessage]
-        ?? (rawMessage.includes('no_connection') || rawMessage.includes('non-2xx')
-          ? 'A autorização do Google ainda não foi confirmada. Clique em “Tentar novamente” para reiniciar o fluxo.'
-          : `Falha ao conectar Google Agenda: ${rawMessage}`);
-      toast({ title: 'Erro', description, variant: 'destructive' });
+    onError: (error: Error) => {
+      const code = error instanceof GoogleCalendarFlowError ? error.code : 'request_failed';
+      setFlowErrorCode(code);
+      setFlowPhase(code === 'authorization_cancelled' ? 'cancelled' : 'idle');
+      toast({
+        title: code === 'authorization_cancelled' ? 'Conexão cancelada' : 'Não foi possível conectar',
+        description: SAFE_ERROR_COPY[code],
+        variant: code === 'authorization_cancelled' ? 'default' : 'destructive',
+      });
     },
   });
 
-  // Recuperação: quando o usuário volta ao app com ?google=connected na URL,
-  // dispara complete() automaticamente para fechar o fluxo mesmo que o popup
-  // tenha sido fechado antes do await terminar.
-  const recoveryTriedRef = useRef(false);
+  const cancelOAuth = useCallback(() => {
+    oauthCancelledRef.current = true;
+    popupRef.current?.close();
+    popupRef.current = null;
+    setFlowPhase('cancelled');
+    setFlowErrorCode('authorization_cancelled');
+    void invoke('reset').catch(() => undefined);
+  }, []);
+
+  // O gateway retorna para a rota pública já consolidada. A própria página
+  // conclui o handshake, avisa a janela de origem e remove parâmetros sensíveis.
   useEffect(() => {
-    if (recoveryTriedRef.current) return;
-    if (typeof window === 'undefined') return;
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('google') !== 'connected') return;
-    if (!orgId) return;
-    recoveryTriedRef.current = true;
+    if (callbackHandledRef.current || !orgId || typeof window === 'undefined') return;
+    const feedback = parseGoogleCalendarCallbackFeedback(window.location.search);
+    if (feedback.kind === 'none') return;
+    callbackHandledRef.current = true;
+    window.history.replaceState({}, '', cleanGoogleCalendarCallbackUrl(window.location));
+
+    const notifyOpener = (message: PopupMessage) => {
+      if (!window.opener || window.opener.closed) return false;
+      window.opener.postMessage(message, window.location.origin);
+      window.close();
+      return true;
+    };
+
+    if (feedback.kind === 'cancelled') {
+      setFlowPhase('cancelled');
+      setFlowErrorCode(feedback.code);
+      notifyOpener({ type: 'fenasoja:google-calendar-oauth', status: 'cancelled', code: feedback.code });
+      return;
+    }
+    if (feedback.kind === 'failed') {
+      setFlowPhase('idle');
+      setFlowErrorCode(feedback.code);
+      notifyOpener({ type: 'fenasoja:google-calendar-oauth', status: 'failed', code: feedback.code });
+      return;
+    }
+
+    setFlowPhase('returning');
     completeConnection(orgId)
-      .then(() => qc.invalidateQueries({ queryKey: ['google-calendar-status'] }))
-      .catch((e) => console.warn('[google-oauth] recovery complete falhou:', e))
-      .finally(() => {
-        params.delete('google');
-        const qs = params.toString();
-        const newUrl = window.location.pathname + (qs ? `?${qs}` : '') + window.location.hash;
-        window.history.replaceState({}, '', newUrl);
+      .then((result) => {
+        setFlowPhase('success');
+        setFlowErrorCode(null);
+        void invalidateStatus();
+        const openerNotified = notifyOpener({
+          type: 'fenasoja:google-calendar-oauth',
+          status: 'success',
+        });
+        if (!openerNotified) {
+          toast({
+            title: 'Google Agenda conectado',
+            description: (result.backfill ?? 0) > 0
+              ? 'A sincronização inicial foi programada e continuará em segundo plano.'
+              : 'A conexão foi confirmada com segurança.',
+          });
+        }
+        if (phaseTimerRef.current) window.clearTimeout(phaseTimerRef.current);
+        phaseTimerRef.current = window.setTimeout(() => setFlowPhase('idle'), 1400);
+        return result;
+      })
+      .catch((error: Error) => {
+        const code = error instanceof GoogleCalendarFlowError ? error.code : 'authorization_failed';
+        setFlowPhase('idle');
+        setFlowErrorCode(code);
+        notifyOpener({ type: 'fenasoja:google-calendar-oauth', status: 'failed', code });
       });
-  }, [orgId, qc]);
+  }, [completeConnection, invalidateStatus, orgId, toast]);
 
+  const refreshStatus = useCallback(() => {
+    if (refreshPromiseRef.current) return refreshPromiseRef.current;
+    setIsRefreshing(true);
+    const operation = status.refetch().finally(() => {
+      if (refreshPromiseRef.current === operation) refreshPromiseRef.current = null;
+      setIsRefreshing(false);
+    });
+    refreshPromiseRef.current = operation;
+    return operation;
+  }, [status]);
 
+  const retry = useMutation({
+    mutationFn: () => invoke<{ ok: boolean; retried: number }>('retry'),
+    onSuccess: (result) => {
+      toast({
+        title: 'Nova tentativa programada',
+        description: result.retried > 0
+          ? `${result.retried} evento${result.retried === 1 ? '' : 's'} será${result.retried === 1 ? '' : 'ão'} reprocessado${result.retried === 1 ? '' : 's'}.`
+          : 'Não há eventos com falha para reprocessar.',
+      });
+      void invalidateStatus();
+    },
+    onError: () => {
+      toast({
+        title: 'Não foi possível tentar novamente',
+        description: SAFE_ERROR_COPY.request_failed,
+        variant: 'destructive',
+      });
+    },
+  });
 
   const disconnect = useMutation({
     mutationFn: () => invoke<{ ok: boolean }>('disconnect'),
     onSuccess: () => {
-      toast({ title: 'Google Agenda desconectada' });
-      qc.invalidateQueries({ queryKey: ['google-calendar-status'] });
+      setFlowPhase('disconnected_success');
+      setFlowErrorCode(null);
+      toast({ title: 'Google Agenda desconectado' });
+      void invalidateStatus();
+      if (phaseTimerRef.current) window.clearTimeout(phaseTimerRef.current);
+      phaseTimerRef.current = window.setTimeout(() => setFlowPhase('idle'), 2200);
+    },
+    onError: () => {
+      toast({
+        title: 'Não foi possível desconectar',
+        description: SAFE_ERROR_COPY.request_failed,
+        variant: 'destructive',
+      });
     },
   });
 
-  const authError = useMemo(() => {
-    const error = status.error;
-    if (!error) return null;
-    const message = String((error as Error)?.message ?? error);
-    if (error instanceof GoogleCalendarAuthError || message.includes('unauthorized')) return 'sessao_expirada';
-    return message;
+  useEffect(() => () => {
+    if (phaseTimerRef.current) window.clearTimeout(phaseTimerRef.current);
+    popupRef.current?.close();
+  }, []);
+
+  const statusErrorCode = useMemo(() => {
+    if (!status.error) return null;
+    return status.error instanceof GoogleCalendarFlowError ? status.error.code : 'request_failed';
   }, [status.error]);
 
   return {
     connection: status.data?.connection ?? null,
     pending: status.data?.pending ?? 0,
+    outbox: status.data?.outbox ?? null,
     isLoading: status.isLoading,
-    authError,
+    isRefreshing,
+    statusErrorCode,
+    flowErrorCode,
+    flowPhase,
     connect,
+    retry,
     disconnect,
+    cancelOAuth,
+    refresh: refreshStatus,
   };
 }
