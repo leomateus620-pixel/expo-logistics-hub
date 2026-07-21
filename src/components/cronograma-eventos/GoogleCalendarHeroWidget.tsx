@@ -112,7 +112,13 @@ export const GoogleCalendarHeroWidget = memo(function GoogleCalendarHeroWidget()
             disabled={isConnecting}
           >
             {isConnecting ? <Loader2 className="animate-spin" /> : <LinkIcon />}
-            <span>{isReconnect ? 'Reconectar' : 'Conectar'}</span>
+            <span>
+              {isReconnect
+                ? 'Reconectar'
+                : isStalePending || isErrored
+                ? 'Tentar novamente'
+                : 'Conectar'}
+            </span>
           </button>
         )}
       </div>
