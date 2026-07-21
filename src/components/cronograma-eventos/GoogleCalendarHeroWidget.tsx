@@ -15,7 +15,9 @@ export const GoogleCalendarHeroWidget = memo(function GoogleCalendarHeroWidget()
 
   const isConnected = status === 'connected';
   const isReconnect = status === 'reconnect_required';
-  const isConnecting = status === 'connecting' || connect.isPending;
+  const isErrored = status === 'error';
+  const isStalePending = status === 'connecting' && !connect.isPending;
+  const isConnecting = connect.isPending;
   const isSyncing = backfillPct !== null && backfillPct < 100;
 
   return (
