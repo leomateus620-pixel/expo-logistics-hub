@@ -1,5 +1,6 @@
 // Helpers para chamar o gateway do Lovable App User Connector (Google Calendar).
-// A connection_key é uma referência opaca do gateway (NÃO é o token do Google).
+// A autenticação usa app_user_id + client key; a connection é resolvida internamente
+// pelo gateway (não expomos connection_key ao app).
 
 export const GATEWAY_BASE = "https://connector-gateway.lovable.dev";
 export const CONNECTOR_ID = "google_calendar";
@@ -27,7 +28,7 @@ export function clientApiKey(): string {
 
 /**
  * Inicia o fluxo OAuth do App User Connector.
- * Retorna { authorize_url, session_id } que o frontend abre em popup.
+ * Retorna { authorization_url, session_id } que o frontend abre em popup.
  */
 export async function startOAuth(returnUrl: string, appUserId: string) {
   const res = await fetch(`${GATEWAY_BASE}/api/v1/app-users/oauth2/authorize`, {
@@ -51,44 +52,18 @@ export async function startOAuth(returnUrl: string, appUserId: string) {
 }
 
 /**
- * Recupera a connection_key após o usuário aprovar consent.
- */
-export async function fetchConnectionKey(appUserId: string): Promise<string | null> {
-  const res = await fetch(
-    `${GATEWAY_BASE}/api/v1/app-users/connections?connector_id=${CONNECTOR_ID}&app_user_id=${encodeURIComponent(appUserId)}`,
-    {
-      headers: {
-        Authorization: `Bearer ${lovableApiKey()}`,
-        "X-Client-Api-Key": clientApiKey(),
-      },
-    },
-  );
-  if (!res.ok) {
-    console.error(`fetchConnectionKey http ${res.status}: ${await res.text()}`);
-    return null;
-  }
-  const body = await res.json();
-  const conn = body?.connections?.[0] ?? body?.data?.[0] ?? body?.[0] ?? body;
-  const key = conn?.connection_key ?? conn?.api_key ?? conn?.connection_api_key ?? null;
-  if (!key) {
-    console.error("fetchConnectionKey: shape inesperado", JSON.stringify(body).slice(0, 500));
-  }
-  return key;
-}
-
-
-/**
- * Chama a API do Google Calendar via gateway usando a connection_key do usuário.
+ * Chama a API do Google via gateway, autenticando como app_user.
  */
 export async function callGoogle(
-  connectionKey: string,
+  appUserId: string,
   path: string,
   init: RequestInit = {},
 ): Promise<Response> {
   const url = `${GATEWAY_BASE}/${CONNECTOR_ID}${path}`;
   const headers = new Headers(init.headers ?? {});
   headers.set("Authorization", `Bearer ${lovableApiKey()}`);
-  headers.set("X-Connection-Api-Key", connectionKey);
+  headers.set("X-Client-Api-Key", clientApiKey());
+  headers.set("X-App-User-Id", appUserId);
   if (init.body && !headers.has("Content-Type")) {
     headers.set("Content-Type", "application/json");
   }
@@ -96,24 +71,44 @@ export async function callGoogle(
 }
 
 export async function callGoogleJson<T = unknown>(
-  connectionKey: string,
+  appUserId: string,
   path: string,
   init: RequestInit = {},
 ): Promise<T> {
-  const res = await callGoogle(connectionKey, path, init);
+  const res = await callGoogle(appUserId, path, init);
   const text = await res.text();
   if (!res.ok) throw new Error(`google_api:${res.status}:${text}`);
   return text ? JSON.parse(text) : ({} as T);
 }
 
+/**
+ * Valida que a autorização OAuth foi concluída (endpoint barato).
+ * Retorna true se o gateway aceita chamadas como esse app_user.
+ */
+export async function probeConnection(appUserId: string): Promise<boolean> {
+  try {
+    const res = await callGoogle(appUserId, "/calendar/v3/users/me/settings/timezone");
+    if (res.ok) {
+      await res.text();
+      return true;
+    }
+    const body = await res.text();
+    console.warn(`probeConnection http ${res.status}: ${body.slice(0, 300)}`);
+    return false;
+  } catch (e) {
+    console.warn("probeConnection error:", (e as Error).message);
+    return false;
+  }
+}
+
 /** Cria calendário secundário "FENASOJA — Cronograma". */
-export async function ensureSecondaryCalendar(connectionKey: string, existingId?: string | null) {
+export async function ensureSecondaryCalendar(appUserId: string, existingId?: string | null) {
   if (existingId) {
-    // verificar se ainda existe
-    const check = await callGoogle(connectionKey, `/calendar/v3/calendars/${existingId}`);
+    const check = await callGoogle(appUserId, `/calendar/v3/calendars/${existingId}`);
+    await check.text();
     if (check.ok) return existingId;
   }
-  const created = await callGoogleJson<{ id: string }>(connectionKey, "/calendar/v3/calendars", {
+  const created = await callGoogleJson<{ id: string }>(appUserId, "/calendar/v3/calendars", {
     method: "POST",
     body: JSON.stringify({
       summary: "FENASOJA — Cronograma",
@@ -121,10 +116,9 @@ export async function ensureSecondaryCalendar(connectionKey: string, existingId?
       timeZone: "America/Sao_Paulo",
     }),
   });
-  // aplicar cor/nome via calendarList
-  await callGoogle(connectionKey, `/calendar/v3/users/me/calendarList/${created.id}`, {
+  await callGoogle(appUserId, `/calendar/v3/users/me/calendarList/${created.id}`, {
     method: "PATCH",
     body: JSON.stringify({ colorId: "10", summaryOverride: "FENASOJA — Cronograma" }),
-  }).catch(() => {});
+  }).then((r) => r.text()).catch(() => {});
   return created.id;
 }
