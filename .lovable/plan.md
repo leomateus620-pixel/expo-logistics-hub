@@ -1,44 +1,28 @@
+## Problema
 
-## Objetivo
-Validar o fluxo completo criando um evento real e disparando: (1) e-mail para leomateus620@gmail.com, (2) sino de notificação no app, (3) sincronização no Google Agenda do usuário Leonardo.
+Sua linha em `google_calendar_connections` ficou travada com `status='connecting'` (desde 06:04 UTC, sem `google_email` e sem `last_error`). O widget desabilita o botão sempre que `status === 'connecting'`, então não há como reiniciar o fluxo pela UI — mesmo que o popup do Google já tenha sido fechado.
 
-## Passos
+Causa: quando o `complete` falha (ex.: `no_connection` após as 3 tentativas), o registro permanece em `connecting` para sempre, e o front bloqueia novo clique.
 
-### 1. Descoberta de IDs (via `supabase--read_query`)
-- Localizar `user_id` do Leonardo pelo e-mail `leomateus620@gmail.com` em `auth.users`.
-- Confirmar `org_id` ativo e `commission_id` da comissão CENTRAL vinculada ao Leonardo em `org_members`.
-- Verificar em `google_calendar_connections` se Leonardo tem `status=connected` (pré-requisito da sincronização automática no Google Agenda). Se não estiver conectado, avisar e prosseguir apenas com e-mail + sino.
+## Correção
 
-### 2. Criação do evento de teste (via `supabase--insert`)
-Inserir em `cronograma_eventos`:
-- `title`: "REUNIÃO COM OS SOLTIS — PRESIDENTE FENASOJA 2028"
-- `start_date`: amanhã (quarta-feira, data calculada em UTC-3)
-- `start_time`: `13:30`
-- `has_exact_date`: true
-- `category`: representações
-- `location`: (deixar null ou preencher se o usuário indicar)
-- `org_id` e `created_by_user_id` do Leonardo.
+1. **UI (`GoogleCalendarHeroWidget.tsx`)**
+   - Só desabilitar o botão enquanto `connect.isPending` (mutação em execução), não quando o `status` do banco for `connecting`.
+   - Quando `status='connecting'` mas nenhuma mutação está rodando, mudar o rótulo para **"Tentar novamente"** e mostrar um sublinha discreta ("Conexão anterior não finalizada").
 
-Inserir vínculos:
-- `cronograma_evento_responsaveis` → user_id do Leonardo.
-- `cronograma_evento_comissoes` → commission_id CENTRAL (para que o `next-events-feed` traga esse evento no sino).
+2. **Hook (`useGoogleCalendarConnection.ts`)**
+   - Antes de abrir o popup no `connect.mutate`, chamar uma nova ação `reset` no edge function para limpar registros travados desse usuário (`status in ('connecting','error')` sem `google_email`).
+   - Manter o retry loop atual do `complete`.
 
-### 3. Disparo do agendamento
-- Chamar `event-reminders?mode=schedule` via `supabase--curl_edge_functions` para materializar as entregas em `event_reminder_deliveries` (offsets 1440min e 120min).
-- Como o evento é amanhã 13:30 e agora estamos ~22h de hoje, o lembrete de 24h já está no passado → forçar envio imediato do lembrete de 24h ajustando temporariamente `scheduled_for` para "agora" via `supabase--insert`/update SQL, de modo que o worker `send` colete e envie.
-- Chamar `event-reminders?mode=send` para processar as entregas pendentes → envia o e-mail via `send-transactional-email` (template `event-reminder`).
+3. **Edge function (`google-calendar-oauth/index.ts`)**
+   - Adicionar branch `action === 'reset'`: deleta (ou marca como `disconnected`) a linha do usuário atual quando `status <> 'connected'`. Retorna `{ ok: true }`.
+   - Garantir que, ao falhar `complete` após retries, a linha vá para `status='error'` com `last_error` preenchido (em vez de continuar `connecting`), para o próximo refetch já refletir estado recuperável.
 
-### 4. Sincronização Google Agenda
-- Se Leonardo estiver conectado: inserir uma linha em `google_sync_outbox` (op=`upsert_event`, event_id do novo evento, user_id do Leonardo) e invocar `google-sync-worker` via `supabase--curl_edge_functions`. Isso cria o evento no calendário secundário "FENASOJA — Cronograma" do Leonardo.
-- Se não estiver conectado: reportar ao usuário que o passo do Google Agenda foi ignorado e pedir para conectar via o widget no dashboard.
+4. **Limpeza pontual do seu registro atual**
+   - Executar `delete from google_calendar_connections where user_id='b664fc22-…' and status='connecting';` para destravar imediatamente sua sessão.
 
-### 5. Validação
-- Consultar `email_send_log` para confirmar `status='sent'` do lembrete.
-- Consultar `event_reminder_deliveries` para confirmar `status='sent'` e `sent_at`.
-- Consultar `google_calendar_event_map` para confirmar o `google_event_id` criado (se conectado).
-- Chamar `next-events-feed` como o Leonardo para confirmar que o sino/`UpcomingEventsBell` retorna o evento.
-- Reportar o resultado consolidado ao usuário: e-mail enviado ✔, sino ativo ✔, Google Agenda ✔/pendente.
+5. **Verificação**
+   - Recarregar o dashboard → widget deve voltar para "Conectar".
+   - Clicar em conectar → popup OAuth → após aprovar, toast de sucesso e `status='connected'` no banco.
 
-## Observações
-- Tudo pode ser executado sem alterações de código — apenas dados + invocação de edge functions já implantadas.
-- Nenhum arquivo será modificado neste turno.
+Sem mudanças de escopo/negócio; só destrava o fluxo e adiciona recuperação automática de estado inconsistente.
