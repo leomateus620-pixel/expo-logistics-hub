@@ -66,6 +66,9 @@ Deno.serve(async (req) => {
 
       const ok = await probeConnection(user.id);
       if (!ok) {
+        await db.from("google_calendar_connections")
+          .update({ status: "error", last_error: "no_connection" })
+          .eq("user_id", user.id);
         return new Response(JSON.stringify({ error: "no_connection" }), {
           status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
