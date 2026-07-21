@@ -51,6 +51,8 @@ export function useGoogleCalendarConnection() {
   const connect = useMutation({
     mutationFn: async () => {
       if (!orgId) throw new Error('sem_organizacao');
+      // Limpa qualquer estado travado (connecting/error) antes de reiniciar.
+      try { await invoke('reset'); } catch { /* ignore */ }
       const returnUrl = `${window.location.origin}/settings?google=connected`;
       const oauth = await invoke<{ authorization_url?: string; authorize_url?: string; url?: string; session_id?: string }>(
         'start',

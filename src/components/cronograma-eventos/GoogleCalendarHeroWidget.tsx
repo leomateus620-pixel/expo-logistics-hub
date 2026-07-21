@@ -15,7 +15,9 @@ export const GoogleCalendarHeroWidget = memo(function GoogleCalendarHeroWidget()
 
   const isConnected = status === 'connected';
   const isReconnect = status === 'reconnect_required';
-  const isConnecting = status === 'connecting' || connect.isPending;
+  const isErrored = status === 'error';
+  const isStalePending = status === 'connecting' && !connect.isPending;
+  const isConnecting = connect.isPending;
   const isSyncing = backfillPct !== null && backfillPct < 100;
 
   return (
@@ -75,6 +77,12 @@ export const GoogleCalendarHeroWidget = memo(function GoogleCalendarHeroWidget()
             <strong>Conectando…</strong>
             <em>Aprovando permissão na conta Google.</em>
           </>
+        ) : isStalePending || isErrored ? (
+          <>
+            <small>Google Agenda</small>
+            <strong>Conexão não finalizada</strong>
+            <em>Clique em "Tentar novamente" para reiniciar o fluxo.</em>
+          </>
         ) : (
           <>
             <small>Google Agenda</small>
@@ -104,7 +112,13 @@ export const GoogleCalendarHeroWidget = memo(function GoogleCalendarHeroWidget()
             disabled={isConnecting}
           >
             {isConnecting ? <Loader2 className="animate-spin" /> : <LinkIcon />}
-            <span>{isReconnect ? 'Reconectar' : 'Conectar'}</span>
+            <span>
+              {isReconnect
+                ? 'Reconectar'
+                : isStalePending || isErrored
+                ? 'Tentar novamente'
+                : 'Conectar'}
+            </span>
           </button>
         )}
       </div>
