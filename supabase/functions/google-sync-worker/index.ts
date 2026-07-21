@@ -56,7 +56,7 @@ function buildGoogleEvent(ev: CronEvent, subs: any[]) {
 async function processTask(supa: any, task: any) {
   const { data: conn } = await supa.from("google_calendar_connections")
     .select("*").eq("user_id", task.user_id).maybeSingle();
-  if (!conn || conn.status !== "connected" || !conn.connection_key || !conn.secondary_calendar_id) {
+  if (!conn || conn.status !== "connected" || !conn.secondary_calendar_id) {
     await supa.from("google_sync_outbox").update({
       status: "reconnect_required",
       last_error: "connection_missing_or_disconnected",
@@ -65,7 +65,7 @@ async function processTask(supa: any, task: any) {
   }
 
   const calId = conn.secondary_calendar_id;
-  const key = conn.connection_key;
+  const key = task.user_id;
 
   const { data: existing } = await supa.from("google_calendar_event_map")
     .select("*").eq("user_id", task.user_id).eq("event_id", task.event_id).is("subevent_id", null).maybeSingle();
