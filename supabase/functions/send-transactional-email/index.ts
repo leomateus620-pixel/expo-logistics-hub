@@ -25,9 +25,9 @@ function generateToken(): string {
     .join('')
 }
 
-// Auth note: this function uses verify_jwt = true in config.toml, so Supabase's
-// gateway validates the caller's JWT (anon or service_role) before the request
-// reaches this code. No in-function auth check is needed.
+// Defense in depth: verify_jwt validates JWT shape at the gateway and this
+// function additionally accepts only the service-role caller used by the
+// existing server-side reminder workflow.
 
 Deno.serve(async (req) => {
   // Handle CORS preflight
@@ -49,12 +49,23 @@ Deno.serve(async (req) => {
     )
   }
 
+  const authToken = (req.headers.get('Authorization') ?? '').replace(/^Bearer\s+/i, '')
+  if (!authToken || authToken !== supabaseServiceKey) {
+    return new Response(
+      JSON.stringify({ error: 'Unauthorized' }),
+      {
+        status: 401,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    )
+  }
+
   // Parse request body
   let templateName: string
   let recipientEmail: string
   let idempotencyKey: string
   let messageId: string
-  let templateData: Record<string, any> = {}
+  let templateData: Record<string, unknown> = {}
   try {
     const body = await req.json()
     templateName = body.templateName || body.template_name
@@ -277,14 +288,35 @@ Deno.serve(async (req) => {
     )
   }
 
-  // 4. Render React Email template to HTML and plain text
-  const html = await renderAsync(
-    React.createElement(template.component, templateData)
-  )
-  const plainText = await renderAsync(
-    React.createElement(template.component, templateData),
-    { plainText: true }
-  )
+  // 4. Render React Email template to HTML and plain text. A malformed visual
+  // payload fails only this delivery and never reaches the dispatch queue.
+  let html: string
+  let plainText: string
+  try {
+    html = await renderAsync(
+      React.createElement(template.component, templateData)
+    )
+    plainText = await renderAsync(
+      React.createElement(template.component, templateData),
+      { plainText: true }
+    )
+  } catch (error) {
+    console.error('Transactional template render blocked', {
+      templateName,
+      reason: error instanceof Error ? error.message.slice(0, 120) : 'render_failed',
+    })
+    await supabase.from('email_send_log').insert({
+      message_id: messageId,
+      template_name: templateName,
+      recipient_email: effectiveRecipient,
+      status: 'failed',
+      error_message: 'Template validation or render failed',
+    })
+    return new Response(JSON.stringify({ error: 'Template render failed' }), {
+      status: 422,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    })
+  }
 
   // Resolve subject — supports static string or dynamic function
   const resolvedSubject =
