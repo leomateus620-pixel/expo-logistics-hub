@@ -444,6 +444,8 @@ function draftToEvent(draft: CronogramaEventDraft): CronogramaEvent {
     priority: draft.priority ?? 'media',
     location: draft.location ?? null,
     time: draft.time ?? null,
+    startTime: draft.startTime ?? draft.time ?? null,
+    endTime: draft.endTime ?? null,
     daysRemaining: draft.daysRemaining ?? null,
     commissionSlug: draft.commissionSlug ?? null,
     commissionName: draft.commissionName ?? null,
@@ -455,6 +457,8 @@ function draftToEvent(draft: CronogramaEventDraft): CronogramaEvent {
     isOfficialSeed: draft.isOfficialSeed ?? false,
     hasExactDate,
     linkedCommissions: draft.linkedCommissions ?? [],
+    commissionsRel: draft.commissionsRel ?? [],
+    responsiblesRel: draft.responsiblesRel ?? [],
     subevents: draft.subevents ?? [],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
@@ -914,25 +918,11 @@ export function useCronogramaEventos() {
         throw new Error('Os relacionamentos online estão indisponíveis. Tente novamente em instantes.');
       }
       const parent = await ensurePersistedParent(current);
-      let request = cronogramaDb
-        .from('cronograma_subeventos')
-        .update(toDbSubeventPayload(parent.id, draft))
-        .eq('id', subeventId)
-        .eq('parent_event_id', parent.id);
-      if (existingSubevent.updatedAt) request = request.eq('updated_at', existingSubevent.updatedAt);
-      const result = await request.select('*').single();
-      if (result.error?.code === 'PGRST116' || (!result.error && !result.data)) {
-        queryClient.invalidateQueries({ queryKey: ['cronograma-eventos'] });
-        throw new Error('Este subevento foi alterado por outra pessoa. Atualize a página e revise a versão mais recente.');
-      }
-      if (result.error) throw new Error(result.error.message || 'Não foi possível atualizar o subevento.');
-
-      const saved = fromDbSubeventRow(result.data);
-      const next = {
-        ...parent,
-        subevents: (parent.subevents ?? []).map((subevent) => (subevent.id === subeventId ? saved : subevent)),
-      };
-      return next;
+      const data = await cronogramaSaveSubevent(
+        { ...toDbSubeventPayload(parent.id, draft), id: subeventId },
+        existingSubevent.lockVersion ?? null,
+      );
+      return fromDbRow(data);
     },
     onSuccess: (event) => {
       if (!event) return;
@@ -973,24 +963,8 @@ export function useCronogramaEventos() {
         throw new Error('Os relacionamentos online estão indisponíveis. Tente novamente em instantes.');
       }
       const parent = await ensurePersistedParent(current);
-      let request = cronogramaDb
-        .from('cronograma_subeventos')
-        .delete()
-        .eq('id', subeventId)
-        .eq('parent_event_id', parent.id);
-      if (existingSubevent.updatedAt) request = request.eq('updated_at', existingSubevent.updatedAt);
-      const result = await request.select('*').single();
-      if (result.error?.code === 'PGRST116' || (!result.error && !result.data)) {
-        queryClient.invalidateQueries({ queryKey: ['cronograma-eventos'] });
-        throw new Error('Este subevento mudou desde a última leitura. Atualize a página antes de remover.');
-      }
-      if (result.error) throw new Error(result.error.message || 'Não foi possível remover o subevento.');
-
-      const next = {
-        ...parent,
-        subevents: (parent.subevents ?? []).filter((subevent) => subevent.id !== subeventId),
-      };
-      return next;
+      const data = await cronogramaDeleteSubevent(subeventId, existingSubevent.lockVersion ?? null);
+      return fromDbRow(data);
     },
     onSuccess: (event) => {
       if (!event) return;
