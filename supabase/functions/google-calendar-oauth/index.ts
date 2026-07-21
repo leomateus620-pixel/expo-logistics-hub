@@ -50,6 +50,17 @@ Deno.serve(async (req) => {
       });
     }
 
+    if (action === "reset") {
+      // Remove qualquer registro não conectado do usuário para permitir recomeçar o fluxo.
+      await db.from("google_calendar_connections")
+        .delete()
+        .eq("user_id", user.id)
+        .neq("status", "connected");
+      return new Response(JSON.stringify({ ok: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     if (action === "complete") {
       const orgId = (body as { orgId?: string }).orgId;
 
