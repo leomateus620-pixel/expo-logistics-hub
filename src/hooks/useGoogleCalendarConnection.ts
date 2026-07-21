@@ -52,9 +52,15 @@ export function useGoogleCalendarConnection() {
     mutationFn: async () => {
       if (!orgId) throw new Error('sem_organizacao');
       const returnUrl = `${window.location.origin}/settings?google=connected`;
-      const oauth = await invoke<{ authorize_url?: string; url?: string }>('start', { orgId, returnUrl });
-      const authorizeUrl = oauth.authorize_url ?? oauth.url;
-      if (!authorizeUrl) throw new Error('sem_url_oauth');
+      const oauth = await invoke<{ authorization_url?: string; authorize_url?: string; url?: string; session_id?: string }>(
+        'start',
+        { orgId, returnUrl },
+      );
+      const authorizeUrl = oauth.authorization_url ?? oauth.authorize_url ?? oauth.url;
+      if (!authorizeUrl) {
+        console.error('[google-oauth] resposta sem authorization_url:', oauth);
+        throw new Error('sem_url_oauth');
+      }
 
       const popup = window.open(authorizeUrl, 'google-oauth', 'width=520,height=680');
       if (!popup) throw new Error('popup_bloqueado');
@@ -74,12 +80,17 @@ export function useGoogleCalendarConnection() {
       qc.invalidateQueries({ queryKey: ['google-calendar-status'] });
     },
     onError: (e: Error) => {
-      const msg = e.message === 'popup_bloqueado'
-        ? 'Ative pop-ups para conectar sua conta Google.'
-        : 'Falha ao conectar Google Agenda.';
-      toast({ title: 'Erro', description: msg, variant: 'destructive' });
+      console.error('[google-oauth] connect error:', e);
+      const known: Record<string, string> = {
+        popup_bloqueado: 'Ative pop-ups no navegador para conectar sua conta Google.',
+        sem_organizacao: 'Nenhuma organização ativa. Selecione uma organização antes de conectar.',
+        sem_url_oauth: 'O servidor não devolveu a URL de autorização do Google. Tente novamente.',
+      };
+      const description = known[e.message] ?? `Falha ao conectar Google Agenda: ${e.message}`;
+      toast({ title: 'Erro', description, variant: 'destructive' });
     },
   });
+
 
   const disconnect = useMutation({
     mutationFn: () => invoke<{ ok: boolean }>('disconnect'),
