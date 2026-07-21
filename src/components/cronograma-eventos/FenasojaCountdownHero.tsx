@@ -1,6 +1,7 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowUpRight,
+  Clock3,
   Flag,
   Maximize2,
   Plus,
