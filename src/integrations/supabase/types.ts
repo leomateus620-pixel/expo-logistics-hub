@@ -854,6 +854,79 @@ export type Database = {
           },
         ]
       }
+      event_reminder_deliveries: {
+        Row: {
+          channel: string
+          created_at: string
+          event_id: string
+          event_version: number
+          id: string
+          idempotency_key: string
+          last_error: string | null
+          offset_minutes: number
+          org_id: string
+          scheduled_for: string
+          sent_at: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          channel?: string
+          created_at?: string
+          event_id: string
+          event_version: number
+          id?: string
+          idempotency_key: string
+          last_error?: string | null
+          offset_minutes: number
+          org_id: string
+          scheduled_for: string
+          sent_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          channel?: string
+          created_at?: string
+          event_id?: string
+          event_version?: number
+          id?: string
+          idempotency_key?: string
+          last_error?: string | null
+          offset_minutes?: number
+          org_id?: string
+          scheduled_for?: string
+          sent_at?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "event_reminder_deliveries_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "cronograma_eventos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_reminder_deliveries_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "cronograma_eventos_full"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "event_reminder_deliveries_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           created_at: string
@@ -1316,6 +1389,209 @@ export type Database = {
           },
         ]
       }
+      google_calendar_connections: {
+        Row: {
+          backfill_done: number
+          backfill_total: number
+          connected_at: string
+          created_at: string
+          google_email: string | null
+          last_error: string | null
+          last_sync_at: string | null
+          org_id: string
+          scopes_granted: string[]
+          secondary_calendar_id: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          backfill_done?: number
+          backfill_total?: number
+          connected_at?: string
+          created_at?: string
+          google_email?: string | null
+          last_error?: string | null
+          last_sync_at?: string | null
+          org_id: string
+          scopes_granted?: string[]
+          secondary_calendar_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          backfill_done?: number
+          backfill_total?: number
+          connected_at?: string
+          created_at?: string
+          google_email?: string | null
+          last_error?: string | null
+          last_sync_at?: string | null
+          org_id?: string
+          scopes_granted?: string[]
+          secondary_calendar_id?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "google_calendar_connections_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      google_calendar_event_map: {
+        Row: {
+          content_hash: string | null
+          created_at: string
+          deleted_at: string | null
+          event_id: string
+          google_calendar_id: string | null
+          google_event_id: string | null
+          id: string
+          last_synced_at: string | null
+          subevent_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content_hash?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          event_id: string
+          google_calendar_id?: string | null
+          google_event_id?: string | null
+          id?: string
+          last_synced_at?: string | null
+          subevent_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content_hash?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          event_id?: string
+          google_calendar_id?: string | null
+          google_event_id?: string | null
+          id?: string
+          last_synced_at?: string | null
+          subevent_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "google_calendar_event_map_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "cronograma_eventos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "google_calendar_event_map_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "cronograma_eventos_full"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "google_calendar_event_map_subevent_id_fkey"
+            columns: ["subevent_id"]
+            isOneToOne: false
+            referencedRelation: "cronograma_subeventos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      google_sync_outbox: {
+        Row: {
+          attempts: number
+          created_at: string
+          dedupe_key: string
+          event_id: string | null
+          id: string
+          is_initial_backfill: boolean
+          last_error: string | null
+          next_attempt_at: string
+          operation: string
+          org_id: string
+          payload_hash: string | null
+          status: string
+          subevent_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          dedupe_key: string
+          event_id?: string | null
+          id?: string
+          is_initial_backfill?: boolean
+          last_error?: string | null
+          next_attempt_at?: string
+          operation: string
+          org_id: string
+          payload_hash?: string | null
+          status?: string
+          subevent_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          dedupe_key?: string
+          event_id?: string | null
+          id?: string
+          is_initial_backfill?: boolean
+          last_error?: string | null
+          next_attempt_at?: string
+          operation?: string
+          org_id?: string
+          payload_hash?: string | null
+          status?: string
+          subevent_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "google_sync_outbox_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "cronograma_eventos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "google_sync_outbox_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "cronograma_eventos_full"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "google_sync_outbox_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "google_sync_outbox_subevent_id_fkey"
+            columns: ["subevent_id"]
+            isOneToOne: false
+            referencedRelation: "cronograma_subeventos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       guests: {
         Row: {
           checkin_em: string | null
@@ -1542,6 +1818,27 @@ export type Database = {
           telefone?: string
           tipo?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      notification_session_seen: {
+        Row: {
+          id: string
+          session_id: string
+          shown_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          session_id: string
+          shown_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          session_id?: string
+          shown_at?: string
+          user_id?: string
         }
         Relationships: []
       }
@@ -3449,10 +3746,21 @@ export type Database = {
         Args: { expected_lock_version?: number; payload: Json }
         Returns: Json
       }
+      enqueue_google_sync: {
+        Args: { _event_id: string; _operation: string }
+        Returns: undefined
+      }
       get_user_org_ids: { Args: { _user_id: string }; Returns: string[] }
       get_user_org_role: {
         Args: { _org_id: string; _user_id: string }
         Returns: Database["public"]["Enums"]["org_role"]
+      }
+      google_sync_affected_users: {
+        Args: { _event_id: string }
+        Returns: {
+          org_id: string
+          user_id: string
+        }[]
       }
       has_capability: {
         Args: { _capability: string; _org_id: string; _user_id: string }
