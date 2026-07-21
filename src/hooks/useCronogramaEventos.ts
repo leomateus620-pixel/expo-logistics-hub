@@ -132,6 +132,16 @@ function readNumber(row: Record<string, unknown>, key: string): number | null {
   return typeof value === 'number' ? value : null;
 }
 
+function readBoolean(row: Record<string, unknown>, key: string): boolean | null {
+  const value = row[key];
+  return typeof value === 'boolean' ? value : null;
+}
+
+function normalizeTime(value: string | null): string | null {
+  if (!value) return null;
+  return /^\d{2}:\d{2}/.test(value) ? value.slice(0, 5) : value;
+}
+
 function readObject(row: Record<string, unknown>, key: string): Record<string, unknown> {
   const value = row[key];
   return value && typeof value === 'object' && !Array.isArray(value)
@@ -170,8 +180,60 @@ function isUuid(value: string | null | undefined) {
   return Boolean(value && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value));
 }
 
+function mapCommissionRel(item: unknown) {
+  const record = item as Record<string, unknown>;
+  return {
+    commissionId: readString(record, 'commission_id'),
+    commissionSlug: readString(record, 'commission_slug'),
+    commissionName: readString(record, 'commission_name'),
+    isPrimary: readString(record, 'relation_role') === 'principal' || readBoolean(record, 'is_primary') === true,
+  };
+}
+
+function mapResponsibleRel(item: unknown) {
+  const record = item as Record<string, unknown>;
+  return {
+    userId: readString(record, 'user_id'),
+    name: readString(record, 'name'),
+    role: readString(record, 'role'),
+    isPrimary: readBoolean(record, 'is_primary') === true,
+    responsibleType: (readString(record, 'responsible_type') ?? 'external') as 'member' | 'external',
+  };
+}
+
+function fromViewSubevent(item: unknown): CronogramaSubeventSeed {
+  const record = item as Record<string, unknown>;
+  const commissions = parseJsonArray(record.commissions).map(mapCommissionRel);
+  const responsibles = parseJsonArray(record.responsibles).map(mapResponsibleRel);
+  const primaryCommission = commissions.find((commission) => commission.isPrimary) ?? commissions[0];
+  const primaryResponsible = responsibles.find((responsible) => responsible.isPrimary) ?? responsibles[0];
+  return {
+    id: readString(record, 'id') ?? '',
+    title: readString(record, 'title') ?? '',
+    description: readString(record, 'description'),
+    startDate: readString(record, 'start_date'),
+    endDate: readString(record, 'end_date'),
+    startTime: normalizeTime(readString(record, 'start_time')),
+    endTime: normalizeTime(readString(record, 'end_time')),
+    status: (readString(record, 'status') ?? 'planejado') as CronogramaStatus,
+    priority: (readString(record, 'priority') ?? 'media') as CronogramaPriority,
+    commissionSlug: primaryCommission?.commissionSlug ?? readString(record, 'commission_slug'),
+    commissionName: primaryCommission?.commissionName ?? null,
+    responsibleName: primaryResponsible?.name ?? readString(record, 'responsible_name'),
+    sortOrder: readNumber(record, 'sort_order') ?? 0,
+    lockVersion: readNumber(record, 'lock_version'),
+    storage: 'relational',
+    createdAt: readString(record, 'created_at'),
+    updatedAt: readString(record, 'updated_at'),
+  };
+}
+
 function fromDbRow(row: unknown): CronogramaEvent {
   const record = row as Record<string, unknown>;
+  const commissionsRel = parseJsonArray(record.commissions_rel).map(mapCommissionRel);
+  const responsiblesRel = parseJsonArray(record.responsibles_rel).map(mapResponsibleRel);
+  const viewSubevents = parseJsonArray(record.subevents_rel).map(fromViewSubevent);
+  const legacySubevents = parseJsonArray<CronogramaSubeventSeed>(record.subevents);
   return decorateEmbeddedSubevents({
     id: readString(record, 'id') ?? readString(record, 'source_key') ?? '',
     sourceKey: readString(record, 'source_key') ?? '',
@@ -187,7 +249,9 @@ function fromDbRow(row: unknown): CronogramaEvent {
     status: (readString(record, 'status') ?? 'planejado') as CronogramaStatus,
     priority: (readString(record, 'priority') ?? 'media') as CronogramaPriority,
     location: readString(record, 'location'),
-    time: readString(record, 'event_time'),
+    time: normalizeTime(readString(record, 'event_time')),
+    startTime: normalizeTime(readString(record, 'start_time')),
+    endTime: normalizeTime(readString(record, 'end_time')),
     daysRemaining: readNumber(record, 'days_remaining'),
     commissionSlug: readString(record, 'commission_slug'),
     commissionName: readString(record, 'commission_name'),
@@ -199,7 +263,10 @@ function fromDbRow(row: unknown): CronogramaEvent {
     isOfficialSeed: record.is_official_seed === true,
     hasExactDate: record.has_exact_date === false ? false : true,
     linkedCommissions: parseJsonArray<CronogramaCommissionLink>(record.linked_commissions),
-    subevents: parseJsonArray<CronogramaSubeventSeed>(record.subevents),
+    subevents: viewSubevents.length > 0 ? viewSubevents : legacySubevents,
+    lockVersion: readNumber(record, 'lock_version'),
+    commissionsRel,
+    responsiblesRel,
     createdAt: readString(record, 'created_at'),
     updatedAt: readString(record, 'updated_at'),
   });
@@ -214,11 +281,14 @@ function fromDbSubeventRow(row: unknown): CronogramaSubeventSeed & { parentEvent
     description: readString(record, 'description'),
     startDate: readString(record, 'start_date'),
     endDate: readString(record, 'end_date'),
+    startTime: normalizeTime(readString(record, 'start_time')),
+    endTime: normalizeTime(readString(record, 'end_time')),
     status: (readString(record, 'status') ?? 'planejado') as CronogramaStatus,
     priority: (readString(record, 'priority') ?? 'media') as CronogramaPriority,
     commissionSlug: readString(record, 'commission_slug'),
     responsibleName: readString(record, 'responsible_name'),
     sortOrder: readNumber(record, 'sort_order') ?? 0,
+    lockVersion: readNumber(record, 'lock_version'),
     storage: 'relational',
     createdAt: readString(record, 'created_at'),
     updatedAt: readString(record, 'updated_at'),
@@ -249,6 +319,8 @@ function toDbPayload(event: CronogramaEventSeed | CronogramaEvent, orgId: string
       description: subevent.description ?? null,
       startDate: subevent.startDate ?? null,
       endDate: subevent.endDate ?? null,
+      startTime: subevent.startTime ?? null,
+      endTime: subevent.endTime ?? null,
       status: subevent.status ?? 'planejado',
       priority: subevent.priority ?? 'media',
       commissionSlug: subevent.commissionSlug ?? null,
@@ -272,6 +344,8 @@ function toDbPayload(event: CronogramaEventSeed | CronogramaEvent, orgId: string
     priority: event.priority,
     location: event.location ?? null,
     event_time: event.time ?? null,
+    start_time: event.startTime ?? null,
+    end_time: event.endTime ?? null,
     days_remaining: event.daysRemaining ?? null,
     commission_slug: event.commissionSlug ?? null,
     commission_name: event.commissionName ?? null,
@@ -284,17 +358,66 @@ function toDbPayload(event: CronogramaEventSeed | CronogramaEvent, orgId: string
     has_exact_date: event.hasExactDate,
     linked_commissions: event.linkedCommissions ?? [],
     subevents: embeddedSubevents,
+    pending_reason: event.sourceNote ?? null,
+    decision_needed: null,
     created_by_user_id: createdByUserId ?? null,
+  };
+}
+
+function toRpcEventPayload(event: CronogramaEventSeed | CronogramaEvent, orgId: string): CronogramaSaveEventPayload {
+  return {
+    id: 'id' in event && isUuid(event.id) ? event.id : undefined,
+    org_id: orgId,
+    source_key: event.sourceKey,
+    title: event.title,
+    description: event.description ?? null,
+    category: event.category,
+    category_key: 'categoryKey' in event && typeof event.categoryKey === 'string' ? event.categoryKey : null,
+    event_type: event.eventType,
+    source_year: event.sourceYear,
+    start_date: event.startDate ?? null,
+    end_date: event.endDate ?? null,
+    month_label: event.monthLabel ?? null,
+    week_label: event.weekLabel ?? null,
+    status: event.status,
+    priority: event.priority,
+    location: event.location ?? null,
+    event_time: event.time ?? event.startTime ?? null,
+    start_time: event.startTime ?? event.time ?? null,
+    end_time: event.endTime ?? null,
+    commission_slug: event.commissionSlug ?? null,
+    commission_name: event.commissionName ?? null,
+    responsible_name: event.responsibleName ?? null,
+    has_exact_date: event.hasExactDate,
+    is_official_seed: event.isOfficialSeed,
+    pending_reason: event.sourceNote ?? null,
+    decision_needed: null,
+    commissions: (event.commissionsRel ?? []).map((commission) => ({
+      commission_id: commission.commissionId ?? null,
+      commission_slug: commission.commissionSlug ?? null,
+      commission_name: commission.commissionName ?? null,
+      relation_role: commission.isPrimary ? 'principal' : 'participante',
+    })),
+    responsibles: (event.responsiblesRel ?? []).map((responsible) => ({
+      user_id: responsible.userId ?? null,
+      name: responsible.name ?? null,
+      role: responsible.role ?? null,
+      is_primary: responsible.isPrimary ?? false,
+      responsible_type: responsible.responsibleType ?? (responsible.userId ? 'member' : 'external'),
+    })),
   };
 }
 
 function toDbSubeventPayload(parentEventId: string, draft: CronogramaSubeventDraft) {
   return {
+    id: isUuid(draft.id) ? draft.id : undefined,
     parent_event_id: parentEventId,
     title: draft.title.trim(),
     description: draft.description?.trim() || null,
     start_date: draft.startDate ?? null,
     end_date: draft.endDate ?? draft.startDate ?? null,
+    start_time: draft.startTime ?? null,
+    end_time: draft.endTime ?? null,
     status: draft.status ?? 'planejado',
     priority: draft.priority ?? 'media',
     commission_slug: draft.commissionSlug ?? null,
@@ -363,29 +486,22 @@ function replaceEventInList(events: CronogramaEvent[], event: CronogramaEvent) {
   return sortCronogramaEvents(events.map((item, index) => (index === existingIndex ? event : item)));
 }
 
-async function insertRelationalSubevent(
+async function saveRelationalSubevent(
   parentEventId: string,
   draft: CronogramaSubeventDraft,
   requestId: string,
 ) {
-  const result = await cronogramaDb
-    .from('cronograma_subeventos')
-    .insert({ id: requestId, ...toDbSubeventPayload(parentEventId, draft) })
-    .select('*')
-    .single();
-
-  if (!result.error) return fromDbSubeventRow(result.data);
-  if (result.error.code !== '23505') throw result.error;
-
-  const existing = await cronogramaDb
-    .from('cronograma_subeventos')
-    .select('*')
-    .eq('id', requestId)
-    .eq('parent_event_id', parentEventId)
-    .limit(1);
-  if (existing.error) throw existing.error;
-  if (!existing.data?.[0]) throw result.error;
-  return fromDbSubeventRow(existing.data[0]);
+  const payload = {
+    ...toDbSubeventPayload(parentEventId, draft),
+    id: requestId,
+    legacy_key: requestId,
+  };
+  const savedParent = await cronogramaSaveSubevent(payload, draft.lockVersion ?? null);
+  const parent = fromDbRow(savedParent);
+  const created = (parent.subevents ?? []).find((subevent) => subevent.id === requestId)
+    ?? (parent.subevents ?? []).slice().sort((left, right) => (right.sortOrder ?? 0) - (left.sortOrder ?? 0))[0];
+  if (!created) throw new Error('Subevento salvo, mas não retornou na leitura consolidada. Atualize a página.');
+  return { parent, subevent: created };
 }
 
 export function useCronogramaEventos() {
