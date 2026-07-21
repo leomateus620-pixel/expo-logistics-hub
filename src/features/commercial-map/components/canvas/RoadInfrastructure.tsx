@@ -1,6 +1,7 @@
 import { memo, useEffect, useMemo } from 'react';
 import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
+import { ROAD_MATERIAL_COLORS, ROAD_SURFACE_PROFILE } from '../../constants';
 import type { MapEntity } from '../../types';
 import {
   buildRoadNetworkGeometries,
@@ -22,15 +23,6 @@ interface RoadLayerNetworkProps extends Omit<RoadInfrastructureProps, 'layerOpac
   opacity: number;
 }
 
-const ROAD_PALETTE = {
-  asphalt: '#453a35',
-  pedestrian: '#b8ad99',
-  curb: '#e5e2da',
-  gutter: '#231d1a',
-  selected: '#5a4638',
-  selectionEdge: '#f4d676',
-  match: '#deb85e',
-} as const;
 const NO_RAYCAST = () => undefined;
 
 function textureNoise(x: number, y: number, seed: number) {
@@ -40,14 +32,26 @@ function textureNoise(x: number, y: number, seed: number) {
 }
 
 function createSurfaceTexture(seed: number, paving = false) {
-  const size = 96;
+  const size = ROAD_SURFACE_PROFILE.textureSize;
   const data = new Uint8Array(size * size * 4);
   for (let y = 0; y < size; y += 1) {
     for (let x = 0; x < size; x += 1) {
       const fine = textureNoise(x, y, seed) - 0.5;
       const coarse = Math.sin((x + seed) * 0.24) * 0.5 + Math.cos((y - seed) * 0.19) * 0.5;
+      const broad = Math.sin((x + y + seed) * 0.055) * 0.5
+        + Math.cos((x - y - seed) * 0.041) * 0.5;
       const joint = paving && (x % 24 <= 1 || y % 16 <= 1) ? -22 : 0;
-      const value = THREE.MathUtils.clamp(Math.round((paving ? 222 : 216) + fine * 18 + coarse * 5 + joint), 160, 242);
+      const value = THREE.MathUtils.clamp(
+        Math.round(
+          (paving ? 222 : ROAD_SURFACE_PROFILE.asphaltTextureBase)
+          + fine * (paving ? 18 : ROAD_SURFACE_PROFILE.asphaltGrainAmplitude)
+          + coarse * (paving ? 5 : 3)
+          + broad * (paving ? 0 : 2.5)
+          + joint,
+        ),
+        paving ? 160 : 204,
+        paving ? 242 : 246,
+      );
       const offset = (y * size + x) * 4;
       data[offset] = value;
       data[offset + 1] = value;
@@ -138,12 +142,12 @@ const RoadLayerNetwork = memo(function RoadLayerNetwork({
       {network.asphalt && contextOpacity > 0.015 && (
         <mesh geometry={network.asphalt} receiveShadow raycast={NO_RAYCAST}>
           <meshStandardMaterial
-            color={ROAD_PALETTE.asphalt}
+            color={ROAD_MATERIAL_COLORS.asphalt}
             map={reducedGraphics ? undefined : ASPHALT_COLOR_TEXTURE}
             roughnessMap={reducedGraphics ? undefined : ASPHALT_ROUGHNESS_TEXTURE}
             bumpMap={reducedGraphics ? undefined : ASPHALT_ROUGHNESS_TEXTURE}
-            bumpScale={0.008}
-            roughness={0.96}
+            bumpScale={ROAD_SURFACE_PROFILE.asphaltBumpScale}
+            roughness={ROAD_SURFACE_PROFILE.asphaltRoughness}
             metalness={0}
             transparent={transparent}
             opacity={contextOpacity}
@@ -155,10 +159,12 @@ const RoadLayerNetwork = memo(function RoadLayerNetwork({
       {network.intersections && contextOpacity > 0.015 && (
         <mesh geometry={network.intersections} receiveShadow raycast={NO_RAYCAST}>
           <meshStandardMaterial
-            color={ROAD_PALETTE.asphalt}
+            color={ROAD_MATERIAL_COLORS.asphalt}
             map={reducedGraphics ? undefined : ASPHALT_COLOR_TEXTURE}
             roughnessMap={reducedGraphics ? undefined : ASPHALT_ROUGHNESS_TEXTURE}
-            roughness={0.96}
+            bumpMap={reducedGraphics ? undefined : ASPHALT_ROUGHNESS_TEXTURE}
+            bumpScale={ROAD_SURFACE_PROFILE.asphaltBumpScale * 0.9}
+            roughness={ROAD_SURFACE_PROFILE.asphaltRoughness}
             metalness={0}
             transparent={transparent}
             opacity={contextOpacity}
@@ -173,7 +179,7 @@ const RoadLayerNetwork = memo(function RoadLayerNetwork({
       {network.pedestrian && contextOpacity > 0.015 && (
         <mesh geometry={network.pedestrian} receiveShadow raycast={NO_RAYCAST}>
           <meshStandardMaterial
-            color={ROAD_PALETTE.pedestrian}
+            color={ROAD_MATERIAL_COLORS.pedestrian}
             map={reducedGraphics ? undefined : PEDESTRIAN_COLOR_TEXTURE}
             roughnessMap={reducedGraphics ? undefined : PEDESTRIAN_ROUGHNESS_TEXTURE}
             bumpMap={reducedGraphics ? undefined : PEDESTRIAN_ROUGHNESS_TEXTURE}
@@ -190,7 +196,7 @@ const RoadLayerNetwork = memo(function RoadLayerNetwork({
       {network.gutters && contextOpacity > 0.015 && !reducedGraphics && (
         <mesh geometry={network.gutters} receiveShadow raycast={NO_RAYCAST} renderOrder={2}>
           <meshStandardMaterial
-            color={ROAD_PALETTE.gutter}
+            color={ROAD_MATERIAL_COLORS.gutter}
             roughness={1}
             metalness={0}
             transparent
@@ -203,7 +209,7 @@ const RoadLayerNetwork = memo(function RoadLayerNetwork({
       {network.curbs && contextOpacity > 0.015 && (
         <mesh geometry={network.curbs} receiveShadow raycast={NO_RAYCAST}>
           <meshStandardMaterial
-            color={ROAD_PALETTE.curb}
+            color={ROAD_MATERIAL_COLORS.curb}
             roughness={0.9}
             metalness={0}
             transparent={transparent}
@@ -216,9 +222,9 @@ const RoadLayerNetwork = memo(function RoadLayerNetwork({
       {matchedGeometry && (
         <mesh geometry={matchedGeometry} position={[0, 0.008, 0]} raycast={NO_RAYCAST} renderOrder={4}>
           <meshStandardMaterial
-            color={ROAD_PALETTE.match}
-            emissive={ROAD_PALETTE.match}
-            emissiveIntensity={0.16}
+            color={ROAD_MATERIAL_COLORS.match}
+            emissive={ROAD_MATERIAL_COLORS.match}
+            emissiveIntensity={0.1}
             roughness={0.92}
             metalness={0}
             transparent
@@ -232,19 +238,21 @@ const RoadLayerNetwork = memo(function RoadLayerNetwork({
         <group position={[0, 0.052, 0]}>
           <mesh geometry={selectedGeometry} receiveShadow raycast={NO_RAYCAST} renderOrder={5}>
             <meshStandardMaterial
-              color={ROAD_PALETTE.selected}
+              color={ROAD_MATERIAL_COLORS.selected}
               map={reducedGraphics ? undefined : ASPHALT_COLOR_TEXTURE}
               roughnessMap={reducedGraphics ? undefined : ASPHALT_ROUGHNESS_TEXTURE}
-              emissive={ROAD_PALETTE.selectionEdge}
-              emissiveIntensity={0.12}
-              roughness={0.94}
+              bumpMap={reducedGraphics ? undefined : ASPHALT_ROUGHNESS_TEXTURE}
+              bumpScale={ROAD_SURFACE_PROFILE.asphaltBumpScale}
+              emissive={ROAD_MATERIAL_COLORS.selectionGlow}
+              emissiveIntensity={0.05}
+              roughness={ROAD_SURFACE_PROFILE.asphaltRoughness}
               metalness={0}
               depthWrite
             />
           </mesh>
           {selectedEdges && (
             <lineSegments geometry={selectedEdges} raycast={NO_RAYCAST} renderOrder={6}>
-              <lineBasicMaterial color={ROAD_PALETTE.selectionEdge} toneMapped={false} />
+              <lineBasicMaterial color={ROAD_MATERIAL_COLORS.selectionEdge} toneMapped={false} />
             </lineSegments>
           )}
         </group>

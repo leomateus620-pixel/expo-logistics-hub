@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import type { BufferGeometry } from 'three';
+import {
+  CLASSIFICATION_COLORS,
+  DEFAULT_REFERENCE_LAYERS,
+  ROAD_MATERIAL_COLORS,
+  ROAD_SURFACE_PROFILE,
+} from '@/features/commercial-map/constants';
 import { OFFICIAL_REFERENCE_DATA } from '@/features/commercial-map/data/officialReference2026';
 import {
   ROAD_INFRASTRUCTURE,
@@ -15,6 +21,10 @@ function triangleCount(geometry: BufferGeometry | null) {
   return (geometry.index?.count ?? geometry.getAttribute('position').count) / 3;
 }
 
+function rgb(hex: string) {
+  return [1, 3, 5].map((offset) => Number.parseInt(hex.slice(offset, offset + 2), 16));
+}
+
 describe('infraestrutura viária do Mapa Comercial', () => {
   const circulation = OFFICIAL_REFERENCE_DATA.entities.filter(isRoadInfrastructureEntity);
   const roads = circulation.filter((entity) => entity.classification === 'ROAD');
@@ -24,6 +34,28 @@ describe('infraestrutura viária do Mapa Comercial', () => {
     expect(circulation.filter((entity) => entity.classification === 'PEDESTRIAN_PATH')).toHaveLength(1);
     expect(circulation.every((entity) => entity.geometry.elevation === 0)).toBe(true);
     expect(roads.every((entity) => entity.geometry.extrusionHeight === ROAD_INFRASTRUCTURE.asphaltHeight)).toBe(true);
+  });
+
+  it('usa asfalto cinza-escuro neutro e uma textura otimizada', () => {
+    const [red, green, blue] = rgb(ROAD_MATERIAL_COLORS.asphalt);
+    const circulationLayer = DEFAULT_REFERENCE_LAYERS.find((layer) => layer.key === 'circulation');
+
+    (['asphalt', 'gutter', 'selected', 'selectionGlow', 'match'] as const).forEach((key) => {
+      const [stateRed, stateGreen, stateBlue] = rgb(ROAD_MATERIAL_COLORS[key]);
+      expect(stateRed, `${key} não pode puxar para marrom`).toBeLessThanOrEqual(stateGreen);
+      expect(stateGreen, `${key} deve manter viés neutro/frio`).toBeLessThanOrEqual(stateBlue);
+    });
+
+    expect(red).toBeLessThanOrEqual(green);
+    expect(green).toBeLessThanOrEqual(blue);
+    expect(Math.max(red, green, blue) - Math.min(red, green, blue)).toBeLessThanOrEqual(10);
+    expect((red + green + blue) / 3).toBeGreaterThanOrEqual(70);
+    expect((red + green + blue) / 3).toBeLessThanOrEqual(90);
+    expect(CLASSIFICATION_COLORS.ROAD).toBe(ROAD_MATERIAL_COLORS.asphalt);
+    expect(circulationLayer?.color).toBe(ROAD_MATERIAL_COLORS.asphalt);
+    expect(ROAD_SURFACE_PROFILE.textureSize).toBeLessThanOrEqual(128);
+    expect(ROAD_SURFACE_PROFILE.asphaltRoughness).toBeGreaterThanOrEqual(0.9);
+    expect(ROAD_SURFACE_PROFILE.asphaltBumpScale).toBeLessThanOrEqual(0.008);
   });
 
   it('fecha somente as quatro microfrestas validadas entre corredores oficiais', () => {

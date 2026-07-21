@@ -5,6 +5,25 @@ export const MAP_REFERENCE_WIDTH = 120;
 export const MAP_REFERENCE_HEIGHT = 90.545455;
 export const OFFICIAL_REFERENCE_IMAGE = '/maps/fenasoja-oficial-2026-park.webp';
 
+export const ROAD_MATERIAL_COLORS = {
+  asphalt: '#4b5054',
+  pedestrian: '#b8ad99',
+  curb: '#dfe2e0',
+  gutter: '#34393d',
+  selected: '#596168',
+  selectionGlow: '#c9d1d5',
+  selectionEdge: '#f4d676',
+  match: '#93a4ad',
+} as const;
+
+export const ROAD_SURFACE_PROFILE = {
+  textureSize: 96,
+  asphaltTextureBase: 228,
+  asphaltGrainAmplitude: 10,
+  asphaltRoughness: 0.98,
+  asphaltBumpScale: 0.005,
+} as const;
+
 export const CLASSIFICATION_LABELS: Record<MapClassification, string> = {
   SELLABLE_LOT: 'Lote comercial',
   INTERNAL_STAND: 'Estande interno',
@@ -89,8 +108,8 @@ export const CLASSIFICATION_COLORS: Record<MapClassification, string> = {
   CHEMICAL_RESTROOM: '#168eb8',
   GATE: '#f4cd21',
   PARKING: '#d4b985',
-  ROAD: '#3b332f',
-  PEDESTRIAN_PATH: '#b8ad99',
+  ROAD: ROAD_MATERIAL_COLORS.asphalt,
+  PEDESTRIAN_PATH: ROAD_MATERIAL_COLORS.pedestrian,
   GREEN_AREA: '#75bf48',
   TREE: '#3c8b42',
   WATER: '#6fb6cf',
@@ -117,7 +136,7 @@ export const DEFAULT_REFERENCE_LAYERS: MapLayer[] = [
   ['safety', 'Emergência e segurança', '#d83c45', 60],
   ['gates', 'Portões', '#f4cd21', 70],
   ['parking', 'Estacionamentos', '#c9ad79', 80],
-  ['circulation', 'Ruas e circulação', '#3b332f', 90],
+  ['circulation', 'Ruas e circulação', ROAD_MATERIAL_COLORS.asphalt, 90],
   ['green', 'Áreas verdes', '#6fb846', 100],
   ['exporural', 'Exporural e pecuária', '#69ae42', 120],
   ['reference', 'Referência oficial 2026', '#94a3b8', 130],
