@@ -195,7 +195,11 @@ export function useGoogleCalendarConnection() {
     exchangeCode?: string | null,
   ) => {
     for (let attempt = 0; attempt < attempts; attempt += 1) {
-      const response = await invoke<CompleteResponse>('complete', { orgId: activeOrgId, connectionKey, code: exchangeCode });
+      const response = await invoke<CompleteResponse>('complete', {
+        orgId: activeOrgId,
+        connectionKey,
+        code: attempt === 0 ? exchangeCode : null,
+      });
       if (!response.pending) return response;
       await new Promise((resolve) => window.setTimeout(resolve, attempt < 3 ? 1400 : 2400));
     }
