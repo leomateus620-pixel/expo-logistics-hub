@@ -124,11 +124,24 @@ async function scheduleReminders(supa: ReturnType<typeof db>) {
   const horizon = addUtcDays(today, 30);
 
   const { data: events, error: eventsError } = await supa.from("cronograma_eventos")
-    .select("id, org_id, title, start_date, end_date, start_time, end_time, lock_version, has_exact_date")
+    .select("id, org_id, title, start_date, end_date, start_time, end_time, lock_version, has_exact_date, event_type")
     .eq("has_exact_date", true)
+    .neq("event_type", "feriado")
     .gte("start_date", today)
     .lte("start_date", horizon);
   if (eventsError) throw new Error("reminder_events_query_failed");
+
+  // Global recipients: users with capability 'cronograma_reminder_all' receive reminders for every non-holiday event of their org.
+  const { data: globalCaps } = await supa
+    .from("user_capabilities")
+    .select("user_id, org_id")
+    .eq("capability", "cronograma_reminder_all");
+  const globalByOrg = new Map<string, Array<{ user_id: string; org_id: string }>>();
+  for (const cap of (globalCaps ?? []) as Array<{ user_id: string; org_id: string }>) {
+    const list = globalByOrg.get(cap.org_id) ?? [];
+    list.push({ user_id: cap.user_id, org_id: cap.org_id });
+    globalByOrg.set(cap.org_id, list);
+  }
 
   for (const event of (events ?? []) as ScheduledEventRow[]) {
     const normalized = normalizeEventDateTime({
@@ -151,6 +164,8 @@ async function scheduleReminders(supa: ReturnType<typeof db>) {
       continue;
     }
 
+    const recipients = new Map<string, { user_id: string; org_id: string }>();
+
     const { data: links, error: linksError } = await supa
       .from("cronograma_evento_comissoes")
       .select("commission_id, org_id")
@@ -158,32 +173,35 @@ async function scheduleReminders(supa: ReturnType<typeof db>) {
       .not("commission_id", "is", null);
     if (linksError) {
       console.error("event_reminder_relations_query_failed", { eventId: event.id });
-      continue;
     }
     const commissionIds = [...new Set(
       ((links ?? []) as Array<{ commission_id: string | null }>)
         .map((link) => link.commission_id)
         .filter((id): id is string => Boolean(id)),
     )];
-    if (!commissionIds.length) continue;
 
-    const { data: members, error: membersError } = await supa
-      .from("org_members")
-      .select("user_id, org_id, commission_id, is_active")
-      .eq("org_id", event.org_id)
-      .eq("is_active", true)
-      .in("commission_id", commissionIds);
-    if (membersError) {
-      console.error("event_reminder_members_query_failed", { eventId: event.id });
-      continue;
-    }
-
-    const recipients = new Map<string, { user_id: string; org_id: string }>();
-    for (const member of (members ?? []) as OrgMemberRow[]) {
-      if (member.user_id && member.org_id) {
-        recipients.set(member.user_id, { user_id: member.user_id, org_id: member.org_id });
+    if (commissionIds.length) {
+      const { data: members, error: membersError } = await supa
+        .from("org_members")
+        .select("user_id, org_id, commission_id, is_active")
+        .eq("org_id", event.org_id)
+        .eq("is_active", true)
+        .in("commission_id", commissionIds);
+      if (membersError) {
+        console.error("event_reminder_members_query_failed", { eventId: event.id });
+      }
+      for (const member of (members ?? []) as OrgMemberRow[]) {
+        if (member.user_id && member.org_id) {
+          recipients.set(member.user_id, { user_id: member.user_id, org_id: member.org_id });
+        }
       }
     }
+
+    for (const globalRecipient of globalByOrg.get(event.org_id) ?? []) {
+      recipients.set(globalRecipient.user_id, globalRecipient);
+    }
+
+    if (!recipients.size) continue;
 
     for (const offsetMinutes of [1440, 120]) {
       const scheduledFor = new Date(normalized.value.scheduleAt.getTime() - offsetMinutes * 60_000);
@@ -356,8 +374,13 @@ async function sendPending(supa: ReturnType<typeof db>) {
     const googleMap = googleMapByRecipientEvent.get(`${delivery.user_id}|${delivery.event_id}`);
 
     try {
-      const { data, error } = await supa.functions.invoke("send-transactional-email", {
-        body: {
+      const invokeRes = await fetch(`${supabaseUrl}/functions/v1/send-transactional-email`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${service}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
           templateName: "event-reminder",
           recipientEmail: email,
           idempotencyKey: `reminder-${delivery.event_id}-${delivery.event_version}-${delivery.offset_minutes}-${delivery.user_id}`,
@@ -376,9 +399,19 @@ async function sendPending(supa: ReturnType<typeof db>) {
               googleMap?.google_calendar_id,
             ),
           },
-        },
+        }),
       });
-      if (error) throw new Error("transactional_email_request_failed");
+      const rawBody = await invokeRes.text();
+      let data: any = null;
+      try { data = JSON.parse(rawBody); } catch { /* keep raw */ }
+      if (!invokeRes.ok) {
+        console.error("event_reminder_send_http_failed", {
+          deliveryId: delivery.id,
+          status: invokeRes.status,
+          body: rawBody.slice(0, 200),
+        });
+        throw new Error(`transactional_email_http_${invokeRes.status}`);
+      }
       if (data?.success === false) {
         await supa.from("event_reminder_deliveries").update({
           status: "skipped", last_error: String(data.reason ?? "email_not_sent"),
