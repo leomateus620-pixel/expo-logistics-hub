@@ -16,6 +16,7 @@ export default function GoogleCalendarCallbackPage() {
   useEffect(() => {
     const next = getGoogleCalendarCallbackNext(window.location.search);
     const fallbackTarget = appendGoogleCalendarCallbackSignal(next);
+    const connectionKey = extractGoogleCalendarConnectionKey(window.location.search);
     window.history.replaceState({}, '', cleanGoogleCalendarCallbackUrl(window.location));
 
     const status = feedback.kind === 'success'
@@ -26,8 +27,6 @@ export default function GoogleCalendarCallbackPage() {
     const code = feedback.kind === 'cancelled' || feedback.kind === 'failed'
       ? feedback.code
       : undefined;
-    const connectionKey = extractGoogleCalendarConnectionKey(window.location.search);
-
     if (window.opener && !window.opener.closed) {
       window.opener.postMessage({ type: MESSAGE_TYPE, status, code, connectionKey }, window.location.origin);
       window.setTimeout(() => window.close(), 120);
