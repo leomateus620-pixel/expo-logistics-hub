@@ -374,8 +374,13 @@ async function sendPending(supa: ReturnType<typeof db>) {
     const googleMap = googleMapByRecipientEvent.get(`${delivery.user_id}|${delivery.event_id}`);
 
     try {
-      const { data, error } = await supa.functions.invoke("send-transactional-email", {
-        body: {
+      const invokeRes = await fetch(`${supabaseUrl}/functions/v1/send-transactional-email`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${service}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
           templateName: "event-reminder",
           recipientEmail: email,
           idempotencyKey: `reminder-${delivery.event_id}-${delivery.event_version}-${delivery.offset_minutes}-${delivery.user_id}`,
@@ -394,9 +399,19 @@ async function sendPending(supa: ReturnType<typeof db>) {
               googleMap?.google_calendar_id,
             ),
           },
-        },
+        }),
       });
-      if (error) throw new Error("transactional_email_request_failed");
+      const rawBody = await invokeRes.text();
+      let data: any = null;
+      try { data = JSON.parse(rawBody); } catch { /* keep raw */ }
+      if (!invokeRes.ok) {
+        console.error("event_reminder_send_http_failed", {
+          deliveryId: delivery.id,
+          status: invokeRes.status,
+          body: rawBody.slice(0, 200),
+        });
+        throw new Error(`transactional_email_http_${invokeRes.status}`);
+      }
       if (data?.success === false) {
         await supa.from("event_reminder_deliveries").update({
           status: "skipped", last_error: String(data.reason ?? "email_not_sent"),
