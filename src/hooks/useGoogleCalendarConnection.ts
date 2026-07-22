@@ -122,7 +122,12 @@ interface PopupMessage {
   type: 'fenasoja:google-calendar-oauth';
   status: 'success' | 'cancelled' | 'failed';
   code?: GoogleCalendarErrorCode;
+  exchangeCode?: string | null;
   connectionKey?: string | null;
+}
+
+function extractGoogleCalendarExchangeCode(search: string) {
+  return new URLSearchParams(search).get('code')?.trim() || null;
 }
 
 function waitForPopupResult(popup: Window): Promise<PopupMessage | { status: 'closed' }> {
@@ -183,9 +188,14 @@ export function useGoogleCalendarConnection() {
     },
   });
 
-  const completeConnection = useCallback(async (activeOrgId: string, attempts = 6, connectionKey?: string | null) => {
+  const completeConnection = useCallback(async (
+    activeOrgId: string,
+    attempts = 6,
+    connectionKey?: string | null,
+    exchangeCode?: string | null,
+  ) => {
     for (let attempt = 0; attempt < attempts; attempt += 1) {
-      const response = await invoke<CompleteResponse>('complete', { orgId: activeOrgId, connectionKey });
+      const response = await invoke<CompleteResponse>('complete', { orgId: activeOrgId, connectionKey, code: exchangeCode });
       if (!response.pending) return response;
       await new Promise((resolve) => window.setTimeout(resolve, attempt < 3 ? 1400 : 2400));
     }
@@ -240,6 +250,7 @@ export function useGoogleCalendarConnection() {
             orgId,
             popupResult.status === 'closed' ? 10 : 6,
             'connectionKey' in popupResult ? popupResult.connectionKey : null,
+            'exchangeCode' in popupResult ? popupResult.exchangeCode : null,
           );
         } catch (error) {
           if (popupRef.current === preparedPopup) popupRef.current = null;
@@ -299,6 +310,8 @@ export function useGoogleCalendarConnection() {
     const feedback = parseGoogleCalendarCallbackFeedback(window.location.search);
     if (feedback.kind === 'none') return;
     callbackHandledRef.current = true;
+    const connectionKey = extractGoogleCalendarConnectionKey(window.location.search);
+    const exchangeCode = extractGoogleCalendarExchangeCode(window.location.search);
     window.history.replaceState({}, '', cleanGoogleCalendarCallbackUrl(window.location));
 
     const notifyOpener = (message: PopupMessage) => {
@@ -322,7 +335,7 @@ export function useGoogleCalendarConnection() {
     }
 
     setFlowPhase('returning');
-    completeConnection(orgId, 6, extractGoogleCalendarConnectionKey(window.location.search))
+    completeConnection(orgId, 10, connectionKey, exchangeCode)
       .then((result) => {
         setFlowPhase('success');
         setFlowErrorCode(null);
@@ -330,6 +343,8 @@ export function useGoogleCalendarConnection() {
         const openerNotified = notifyOpener({
           type: 'fenasoja:google-calendar-oauth',
           status: 'success',
+          exchangeCode,
+          connectionKey,
         });
         if (!openerNotified) {
           toast({
