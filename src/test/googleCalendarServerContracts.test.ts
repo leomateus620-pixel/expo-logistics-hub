@@ -27,6 +27,19 @@ describe('contratos server-side do Google Agenda e lembretes', () => {
     expect(oauth).not.toContain('error: String((e as Error).message');
   });
 
+  it('usa connection_key per-user para chamadas reais ao Google sem expor segredo ao navegador', () => {
+    const oauth = read('supabase/functions/google-calendar-oauth/index.ts');
+    const worker = read('supabase/functions/google-sync-worker/index.ts');
+    const gateway = read('supabase/functions/_shared/googleCalendarGateway.ts');
+    expect(gateway).toContain('headers.set("X-Connection-Api-Key", key)');
+    expect(gateway).not.toContain('headers.set("X-App-User-Id"');
+    expect(gateway).toContain('extractConnectionKey');
+    expect(oauth).toContain('connection_key: connectionKey');
+    expect(oauth).toContain('const { connection_key: _connectionKey');
+    expect(worker).toContain('!connection.connection_key');
+    expect(worker).toContain('const connectionKey = connection.connection_key as string');
+  });
+
   it('fortalece retry e idempotência sem criar outro worker ou outra rota', () => {
     const oauth = read('supabase/functions/google-calendar-oauth/index.ts');
     const worker = read('supabase/functions/google-sync-worker/index.ts');
