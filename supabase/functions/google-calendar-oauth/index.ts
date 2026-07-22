@@ -11,6 +11,8 @@ const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const anon = Deno.env.get("SUPABASE_ANON_KEY")!;
 const service = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const APP_ROUTE = "/cronograma-eventos";
+const CALLBACK_ROUTE = "/google-calendar/callback";
+const STALE_AUTHORIZATION_MS = 4 * 60 * 1000;
 
 function admin() {
   return createClient(supabaseUrl, service, { auth: { persistSession: false } });
@@ -46,27 +48,57 @@ function allowedReturnOrigins() {
   return origins;
 }
 
+function isAllowedReturnOrigin(origin: string, allowedOrigins: Set<string>) {
+  if (allowedOrigins.has(origin)) return true;
+  try {
+    const url = new URL(origin);
+    if (url.protocol !== "https:") return false;
+    if (url.hostname === "fenasojagestao.com" || url.hostname === "www.fenasojagestao.com") return true;
+    return url.hostname.endsWith(".lovable.app");
+  } catch {
+    return false;
+  }
+}
+
 export function resolveReturnUrl(req: Request, raw?: string) {
   const requestOrigin = req.headers.get("Origin");
   const allowedOrigins = allowedReturnOrigins();
-  const fallbackOrigin = requestOrigin && allowedOrigins.has(requestOrigin)
+  const fallbackOrigin = requestOrigin && isAllowedReturnOrigin(requestOrigin, allowedOrigins)
     ? requestOrigin
     : configuredAppOrigin();
-  const fallback = new URL(APP_ROUTE, fallbackOrigin);
+  const fallback = new URL(CALLBACK_ROUTE, fallbackOrigin);
   fallback.searchParams.set("google", "connected");
+  fallback.searchParams.set("next", APP_ROUTE);
   if (!raw) return fallback.toString();
 
   try {
     const parsed = new URL(raw);
-    if (!allowedOrigins.has(parsed.origin) || parsed.pathname !== APP_ROUTE) return fallback.toString();
-    for (const key of ["google", "google_error", "error", "error_description", "code", "state", "scope"]) {
-      parsed.searchParams.delete(key);
+    if (!isAllowedReturnOrigin(parsed.origin, allowedOrigins) || parsed.pathname !== CALLBACK_ROUTE) return fallback.toString();
+    const next = parsed.searchParams.get("next") ?? APP_ROUTE;
+    try {
+      const parsedNext = new URL(next, parsed.origin);
+      if (parsedNext.origin !== parsed.origin || parsedNext.pathname !== APP_ROUTE) {
+        parsed.searchParams.set("next", APP_ROUTE);
+      }
+    } catch {
+      parsed.searchParams.set("next", APP_ROUTE);
     }
+    for (const key of ["google_error", "error", "error_description", "code", "state", "scope"]) parsed.searchParams.delete(key);
     parsed.searchParams.set("google", "connected");
     return parsed.toString();
   } catch {
     return fallback.toString();
   }
+}
+
+async function triggerGoogleSyncWorker() {
+  if (!service) return;
+  const response = await fetch(`${supabaseUrl}/functions/v1/google-sync-worker`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${service}` },
+  });
+  await response.text();
+  if (!response.ok) console.warn("google_sync_worker_trigger_failed", { status: response.status });
 }
 
 async function requireUser(req: Request) {
@@ -226,6 +258,7 @@ Deno.serve(async (req) => {
           String(existing.connected_at ?? existing.updated_at ?? "0"),
           existing.backfill_done ?? 0,
         );
+        if (backfill > 0) await triggerGoogleSyncWorker().catch(() => undefined);
         return json({
           ok: true,
           calendarId: existing.secondary_calendar_id,
@@ -290,6 +323,7 @@ Deno.serve(async (req) => {
         last_error: null,
       }, { onConflict: "user_id" });
       const backfill = await prepareInitialBackfill(db, user.id, orgId, connectedAt, 0);
+      if (backfill > 0) await triggerGoogleSyncWorker().catch(() => undefined);
 
       return json({ ok: true, calendarId, backfill });
     }
@@ -327,6 +361,21 @@ Deno.serve(async (req) => {
         .select("user_id, org_id, google_email, secondary_calendar_id, status, last_sync_at, last_error, backfill_total, backfill_done, connected_at")
         .eq("user_id", user.id)
         .maybeSingle();
+      const connectedAtMs = Date.parse(String(connection?.connected_at ?? ""));
+      if (
+        connection
+        && ["connecting", "completing"].includes(connection.status)
+        && !connection.last_error
+        && (!Number.isFinite(connectedAtMs) || Date.now() - connectedAtMs > STALE_AUTHORIZATION_MS)
+      ) {
+        await db.from("google_calendar_connections")
+          .update({ status: "error", last_error: "authorization_not_confirmed" })
+          .eq("user_id", user.id)
+          .in("status", ["connecting", "completing"])
+          .is("last_error", null);
+        connection.status = "error";
+        connection.last_error = "authorization_not_confirmed";
+      }
       const { data: outboxRows } = await db.from("google_sync_outbox")
         .select("status")
         .eq("user_id", user.id)

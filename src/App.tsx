@@ -45,6 +45,7 @@ const ExpensesPage = lazy(() => import('./pages/ExpensesPage'));
 const MobilityAuthPage = lazy(() => import('./pages/MobilityAuthPage'));
 const FenasojaEventsPage = lazy(() => import('./pages/FenasojaEventsPage'));
 const CronogramaEventosPage = lazy(() => import('./pages/CronogramaEventosPage'));
+const GoogleCalendarCallbackPage = lazy(() => import('./pages/GoogleCalendarCallbackPage'));
 const FenasojaCountdownExperiencePage = lazy(
   () => import('./pages/FenasojaCountdownExperiencePage'),
 );
@@ -342,6 +343,7 @@ const App = () => (
               <Route path="/unsubscribe" element={<Suspended><UnsubscribePage /></Suspended>} />
               <Route path="/login/admin" element={<LoginPage />} />
               <Route path="/login/:moduleSlug" element={<LoginPage />} />
+              <Route path="/google-calendar/callback" element={<Suspended><GoogleCalendarCallbackPage /></Suspended>} />
               <Route path="/admin/*" element={<AdminRoutes />} />
               <Route
                 path="/cronograma-eventos/contagem-oficial"

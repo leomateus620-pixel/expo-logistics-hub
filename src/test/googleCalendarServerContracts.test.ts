@@ -9,7 +9,9 @@ describe('contratos server-side do Google Agenda e lembretes', () => {
     const oauth = read('supabase/functions/google-calendar-oauth/index.ts');
     const gateway = read('supabase/functions/_shared/googleCalendarGateway.ts');
     expect(app).toContain('path="/cronograma-eventos"');
+    expect(app).toContain('path="/google-calendar/callback"');
     expect(oauth).toContain('const APP_ROUTE = "/cronograma-eventos"');
+    expect(oauth).toContain('const CALLBACK_ROUTE = "/google-calendar/callback"');
     expect(gateway).toContain('https://connector-gateway.lovable.dev');
     expect(gateway).toContain('/api/v1/app-users/oauth2/authorize');
   });
@@ -18,7 +20,7 @@ describe('contratos server-side do Google Agenda e lembretes', () => {
     const oauth = read('supabase/functions/google-calendar-oauth/index.ts');
     expect(oauth).toContain('await requireUser(req)');
     expect(oauth).toContain('requireActiveOrgMembership');
-    expect(oauth).toContain('parsed.pathname !== APP_ROUTE');
+    expect(oauth).toContain('parsed.pathname !== CALLBACK_ROUTE');
     expect(oauth).toContain('GOOGLE_CALENDAR_ALLOWED_RETURN_ORIGINS');
     expect(oauth).not.toContain('new Set([requestOrigin');
     expect(oauth).toContain('status: "completing"');

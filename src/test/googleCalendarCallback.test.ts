@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
+  appendGoogleCalendarCallbackSignal,
   buildGoogleCalendarReturnUrl,
   cleanGoogleCalendarCallbackUrl,
+  getGoogleCalendarCallbackNext,
   parseGoogleCalendarCallbackFeedback,
 } from '@/lib/google-calendar-callback';
 
@@ -41,10 +43,16 @@ describe('retorno OAuth do Google Agenda', () => {
     expect(cleaned).toBe('/cronograma-eventos?event=abc&mode=view#detalhes');
   });
 
-  it('constrói o retorno na mesma rota sem carregar códigos antigos', () => {
+  it('constrói o retorno público sem carregar códigos antigos e preserva a rota em next', () => {
     const result = buildGoogleCalendarReturnUrl(
       'https://fenasojagestao.com/cronograma-eventos?event=abc&code=antigo&state=antigo',
     );
-    expect(result).toBe('https://fenasojagestao.com/cronograma-eventos?event=abc&google=connected');
+    expect(result).toBe('https://fenasojagestao.com/google-calendar/callback?google=connected&next=%2Fcronograma-eventos%3Fevent%3Dabc');
+  });
+
+  it('valida o destino de retorno público e adiciona o sinal somente nele', () => {
+    expect(getGoogleCalendarCallbackNext('?next=%2Fcronograma-eventos%3FtimelineYear%3D2026')).toBe('/cronograma-eventos?timelineYear=2026');
+    expect(getGoogleCalendarCallbackNext('?next=https%3A%2F%2Fevil.test%2Fcronograma-eventos')).toBe('/cronograma-eventos');
+    expect(appendGoogleCalendarCallbackSignal('/cronograma-eventos?timelineMonth=2026-06')).toBe('/cronograma-eventos?timelineMonth=2026-06&google=connected');
   });
 });
