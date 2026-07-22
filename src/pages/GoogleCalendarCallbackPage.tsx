@@ -10,6 +10,10 @@ import {
 
 const MESSAGE_TYPE = 'fenasoja:google-calendar-oauth';
 
+function extractExchangeCode(search: string) {
+  return new URLSearchParams(search).get('code')?.trim() || null;
+}
+
 export default function GoogleCalendarCallbackPage() {
   const feedback = useMemo(() => parseGoogleCalendarCallbackFeedback(window.location.search), []);
 
@@ -17,6 +21,7 @@ export default function GoogleCalendarCallbackPage() {
     const next = getGoogleCalendarCallbackNext(window.location.search);
     const fallbackTarget = appendGoogleCalendarCallbackSignal(next);
     const connectionKey = extractGoogleCalendarConnectionKey(window.location.search);
+    const exchangeCode = extractExchangeCode(window.location.search);
     window.history.replaceState({}, '', cleanGoogleCalendarCallbackUrl(window.location));
 
     const status = feedback.kind === 'success'
@@ -28,7 +33,7 @@ export default function GoogleCalendarCallbackPage() {
       ? feedback.code
       : undefined;
     if (window.opener && !window.opener.closed) {
-      window.opener.postMessage({ type: MESSAGE_TYPE, status, code, connectionKey }, window.location.origin);
+      window.opener.postMessage({ type: MESSAGE_TYPE, status, code, connectionKey, exchangeCode }, window.location.origin);
       window.setTimeout(() => window.close(), 120);
       return;
     }
