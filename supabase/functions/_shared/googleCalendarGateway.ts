@@ -29,23 +29,59 @@ export function clientApiKey(): string {
 export function extractConnectionKey(payload: unknown): string | null {
   if (!payload || typeof payload !== "object") return null;
   const record = payload as Record<string, unknown>;
-  const candidates = [
-    record.session_id,
-    record.sessionId,
-    record.oauth_session_id,
-    record.oauthSessionId,
+  const connection = record.connection && typeof record.connection === "object"
+    ? record.connection as Record<string, unknown>
+    : null;
+
+  // O gateway pode devolver tanto o identificador da sessão OAuth quanto a
+  // chave final da conexão. Para chamadas reais ao Google, a chave final deve
+  // sempre prevalecer; usar session_id em X-Connection-Api-Key gera 401.
+  const finalizedCandidates = [
     record.connection_key,
     record.connectionKey,
     record.connection_api_key,
     record.connectionApiKey,
     record.app_user_connection_key,
     record.appUserConnectionKey,
-    (record.connection && typeof record.connection === "object"
-      ? (record.connection as Record<string, unknown>).key
-      : null),
-    (record.connection && typeof record.connection === "object"
-      ? (record.connection as Record<string, unknown>).connection_key
-      : null),
+    connection?.connection_key,
+    connection?.connectionKey,
+    connection?.connection_api_key,
+    connection?.connectionApiKey,
+    connection?.app_user_connection_key,
+    connection?.appUserConnectionKey,
+    connection?.key,
+  ];
+  const sessionCandidates = [
+    record.session_id,
+    record.sessionId,
+    record.oauth_session_id,
+    record.oauthSessionId,
+  ];
+  const key = [...finalizedCandidates, ...sessionCandidates]
+    .find((value) => typeof value === "string" && value.trim().length > 0);
+  return typeof key === "string" ? key.trim() : null;
+}
+
+export function extractFinalizedConnectionKey(payload: unknown): string | null {
+  if (!payload || typeof payload !== "object") return null;
+  const record = payload as Record<string, unknown>;
+  const connection = record.connection && typeof record.connection === "object"
+    ? record.connection as Record<string, unknown>
+    : null;
+  const candidates = [
+    record.connection_key,
+    record.connectionKey,
+    record.connection_api_key,
+    record.connectionApiKey,
+    record.app_user_connection_key,
+    record.appUserConnectionKey,
+    connection?.connection_key,
+    connection?.connectionKey,
+    connection?.connection_api_key,
+    connection?.connectionApiKey,
+    connection?.app_user_connection_key,
+    connection?.appUserConnectionKey,
+    connection?.key,
   ];
   const key = candidates.find((value) => typeof value === "string" && value.trim().length > 0);
   return typeof key === "string" ? key.trim() : null;
@@ -71,8 +107,8 @@ async function gatewayErrorCode(response: Response, text?: string) {
 /**
  * Inicia o fluxo OAuth do App User Connector.
  * Retorna { authorization_url, session_id } que o frontend abre em popup.
- * No App User Connector, o session_id é a credencial opaca que passa a ser
- * utilizável pelo gateway depois que o usuário conclui o consentimento.
+ * O session_id identifica a autorização inicial; a chave utilizável nas
+ * chamadas ao Google deve vir da troca do code no callback.
  */
 export async function startOAuth(returnUrl: string, appUserId: string) {
   const res = await fetch(`${GATEWAY_BASE}/api/v1/app-users/oauth2/authorize`, {
@@ -95,7 +131,33 @@ export async function startOAuth(returnUrl: string, appUserId: string) {
     throw new Error(`oauth_start_failed:${res.status}`);
   }
   const payload = await res.json();
-  return { ...payload, connection_key: extractConnectionKey(payload) };
+  return { ...payload, connection_key: extractFinalizedConnectionKey(payload) };
+}
+
+export async function exchangeOAuthCode(code: string, appUserId: string) {
+  const trimmedCode = String(code ?? "").trim();
+  if (!trimmedCode) throw new Error("missing_exchange_code");
+  const res = await fetch(`${GATEWAY_BASE}/api/v1/app-users/oauth2/exchange`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${lovableApiKey()}`,
+      "X-Client-Api-Key": clientApiKey(),
+    },
+    body: JSON.stringify({
+      code: trimmedCode,
+      connector_id: CONNECTOR_ID,
+      app_user_id: appUserId,
+      credentials_configuration: { scopes: GOOGLE_SCOPES },
+    }),
+  });
+  if (!res.ok) {
+    const reason = await gatewayErrorCode(res);
+    console.warn("google_calendar_oauth_exchange_rejected", { status: res.status, reason });
+    throw new Error(`oauth_exchange_failed:${res.status}:${reason}`);
+  }
+  const payload = await res.json();
+  return { ...payload, connection_key: extractFinalizedConnectionKey(payload) };
 }
 
 /**

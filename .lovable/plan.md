@@ -1,34 +1,43 @@
-## Diagnóstico confirmado
+## Plano de correção do Google Agenda
 
-- O cliente do Google Calendar App User Connector está vinculado ao projeto e com acesso offline ativo.
-- No banco, a conexão mais recente do usuário ficou como `status: error`, `last_error: authorization_not_confirmed`, sem `google_email`, sem `secondary_calendar_id` e sem `connection_key`.
-- Isso explica os dois sintomas: a UI mostra “autorização ainda não confirmada” e nenhum evento entra no Google Agenda, porque o sistema não recebeu/persistiu a chave per-user retornada ao final do OAuth.
+### Diagnóstico confirmado
+- A conexão mais recente do usuário está presa como `connecting`, com `connection_key` preenchida, mas sem `google_email`, sem `secondary_calendar_id` e sem sincronização concluída.
+- Os logs da função mostram várias tentativas rejeitadas pelo gateway com `401 unauthorized` ao validar a credencial.
+- Existem 63 eventos na fila de sincronização (`queued`), então os eventos não chegam ao Google Agenda porque a conexão nunca vira `connected`.
+- O client App User Connector **Cronograma e eventos** está vinculado ao projeto e com `offline access` ativo.
 
-## Plano de correção
+### Causa provável a corrigir
+O fluxo atual está tratando o `session_id` inicial do OAuth como se já fosse uma credencial final para chamadas Google. O Google confirma o consentimento, mas a validação do backend usa uma chave que o gateway ainda rejeita como `unauthorized`; por isso a UI cai em “autorização não confirmada” e a fila não roda.
 
-1. **Corrigir o handshake OAuth final**
-   - Ajustar o callback/retorno para completar a conexão mesmo quando o popup fecha ou retorna sem enviar `postMessage`.
-   - Fazer o backend consultar/recuperar a conexão autorizada no gateway quando a conexão já aparece como concedida no Google, em vez de depender apenas da chave enviada no payload inicial.
+### Implementação proposta
+1. **Corrigir o contrato com o gateway do App User Connector**
+   - Ajustar o helper server-side para iniciar OAuth, salvar a sessão temporária e finalizar/revalidar a conexão usando a credencial realmente autorizada pelo gateway.
+   - Não considerar `session_id` automaticamente como conexão válida sem uma chamada Google bem-sucedida.
 
-2. **Persistir corretamente a conexão ativa**
-   - Garantir que `connection_key`, `google_email`, `secondary_calendar_id`, `status: connected` e `last_error: null` sejam gravados juntos somente depois de uma chamada Google válida.
-   - Remover o estado preso atual para permitir uma reconexão limpa após a correção.
+2. **Tornar o `complete` resiliente e idempotente**
+   - Ao receber retorno do OAuth, tentar finalizar a conexão em etapas com polling controlado.
+   - Se o gateway responder `401 unauthorized`, manter estado recuperável por curto período, mas depois liberar nova tentativa sem travar a UI.
+   - Só gravar `status: connected` quando conseguir criar/validar o calendário secundário e obter uma chamada Google válida.
 
-3. **Acionar backfill dos eventos automaticamente**
-   - Assim que a conexão virar `connected`, criar/validar o calendário secundário “FENASOJA — Cronograma”.
-   - Enfileirar os eventos vinculados às comissões do usuário e disparar o worker de sincronização.
-   - Manter feriados/eventos sem data fora do envio quando aplicável ao fluxo existente.
+3. **Limpar estado preso do usuário atual**
+   - Remover ou resetar o registro `connecting` atual que está usando uma chave rejeitada.
+   - Reenfileirar os 63 eventos apenas depois da conexão válida.
 
-4. **Melhorar os estados da UI**
-   - Evitar que “Aguardando autorização” fique indefinidamente.
-   - Mostrar “Conectado” quando o backend detectar conexão válida, mesmo que o popup tenha sido fechado.
-   - Mostrar “Tentar novamente” apenas quando a conexão realmente não tiver sido finalizada.
+4. **Garantir sincronização inicial**
+   - Após conectar, criar/validar o calendário “FENASOJA — Cronograma”.
+   - Rodar o worker de sincronização e verificar que os itens saem de `queued` para sincronizados.
+   - Se houver falha de permissão/scope, mostrar o erro real na UI e nos logs.
 
-5. **Validar ponta a ponta**
-   - Testar a função de status/conclusão com a sessão atual.
-   - Verificar no banco se a conexão passou para `connected` com email e calendário.
-   - Confirmar que a fila (`google_sync_outbox`) recebeu eventos e que o worker processou sem dead-letter/reconnect.
+5. **Ajustar a UI do widget**
+   - Mostrar “Conectado” somente com `status: connected` real.
+   - Em erro recuperável, exibir botão claro de “Conectar novamente” sem loop infinito.
+   - No mobile, evitar popup preso em “aguardando autorização” quando a janela fecha ou retorna sem credencial final.
 
-## Resultado esperado
+6. **Validação final**
+   - Validar o endpoint `google-calendar-oauth` com a sessão autenticada disponível.
+   - Validar no banco: conexão com `google_email`, `secondary_calendar_id`, `status: connected`, `last_error: null`.
+   - Validar fila: eventos processados pelo `google-sync-worker` e mapeados em `google_calendar_event_map`.
+   - Validar visualmente no preview desktop/mobile que o widget não mostra mais erro nem loading infinito.
 
-Depois da implementação, ao finalizar o login Google, o widget deve sair de “Aguardando autorização”, mostrar “Conectado” com o e-mail usado e começar a inserir os eventos no calendário “FENASOJA — Cronograma” da conta conectada.
+### Observação importante
+Se, após a correção, o gateway continuar retornando `401 unauthorized` para uma autorização recém-concluída, a configuração do Google já feita pode estar correta, mas o client do App User Connector pode precisar ser reconectado no workspace para regenerar a chave/callback do conector. Nesse caso, o sistema deverá exibir essa instrução de forma clara em vez de manter a tela em loop.

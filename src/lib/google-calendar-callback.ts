@@ -35,10 +35,10 @@ export function parseGoogleCalendarCallbackFeedback(search: string): GoogleCalen
   }
   if (providerError) return { kind: 'failed', code: 'authorization_failed' };
   if (googleResult === 'connected') return { kind: 'success' };
+  if (params.has('code')) return { kind: 'success' };
 
-  // Códigos e estados OAuth pertencem ao callback protegido do gateway. Se
-  // chegarem diretamente à aplicação, não devem ser processados no cliente.
-  if (params.has('code') || params.has('state')) {
+  // Estados OAuth sem código útil indicam retorno incompleto/replay.
+  if (params.has('state')) {
     return { kind: 'failed', code: 'invalid_callback' };
   }
   return { kind: 'none' };

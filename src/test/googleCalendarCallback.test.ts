@@ -19,7 +19,7 @@ describe('retorno OAuth do Google Agenda', () => {
     });
   });
 
-  it('rejeita state inválido, código ausente e callback direto no frontend', () => {
+  it('aceita o código de troca do gateway e rejeita retorno incompleto', () => {
     expect(parseGoogleCalendarCallbackFeedback('?google_error=invalid_state')).toEqual({
       kind: 'failed',
       code: 'invalid_callback',
@@ -28,7 +28,8 @@ describe('retorno OAuth do Google Agenda', () => {
       kind: 'failed',
       code: 'invalid_callback',
     });
-    expect(parseGoogleCalendarCallbackFeedback('?code=segredo&state=replay')).toEqual({
+    expect(parseGoogleCalendarCallbackFeedback('?code=troca&state=ok')).toEqual({ kind: 'success' });
+    expect(parseGoogleCalendarCallbackFeedback('?state=replay')).toEqual({
       kind: 'failed',
       code: 'invalid_callback',
     });
