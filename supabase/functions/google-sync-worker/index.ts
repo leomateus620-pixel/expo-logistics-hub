@@ -91,9 +91,9 @@ function buildGoogleEvent(event: CronEvent, subevents: GoogleSubevent[]) {
   };
 }
 
-async function findRemoteEventId(appUserId: string, calendarId: string, eventId: string) {
+async function findRemoteEventId(connectionKey: string, calendarId: string, eventId: string) {
   const response = await callGoogleJson<{ items?: Array<{ id?: string }> }>(
-    appUserId,
+    connectionKey,
     `/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events?singleEvents=true&showDeleted=false&maxResults=2&privateExtendedProperty=${encodeURIComponent(`fenasoja_event_id=${eventId}`)}`,
   );
   return response.items?.find((item) => item.id)?.id ?? null;
@@ -113,16 +113,16 @@ function syncFailureCode(message: string) {
 async function processTask(supa: ReturnType<typeof db>, task: SyncTask) {
   const { data: connection } = await supa.from("google_calendar_connections")
     .select("*").eq("user_id", task.user_id).maybeSingle();
-  if (!connection || connection.status !== "connected" || !connection.secondary_calendar_id) {
+  if (!connection || connection.status !== "connected" || !connection.secondary_calendar_id || !connection.connection_key) {
     await supa.from("google_sync_outbox").update({
       status: "reconnect_required",
-      last_error: "connection_missing_or_disconnected",
+      last_error: !connection?.connection_key ? "connection_key_missing" : "connection_missing_or_disconnected",
     }).eq("id", task.id).eq("status", "in_flight");
     return;
   }
 
   const calendarId = connection.secondary_calendar_id;
-  const appUserId = task.user_id;
+  const connectionKey = connection.connection_key as string;
   const { data: mappingRows } = await supa.from("google_calendar_event_map")
     .select("*")
     .eq("user_id", task.user_id)
@@ -136,10 +136,10 @@ async function processTask(supa: ReturnType<typeof db>, task: SyncTask) {
     if (task.operation === "delete") {
       const googleEventId = existing?.google_calendar_id === calendarId && !existing.deleted_at
         ? existing.google_event_id
-        : await findRemoteEventId(appUserId, calendarId, task.event_id);
+        : await findRemoteEventId(connectionKey, calendarId, task.event_id);
       if (googleEventId) {
         const response = await callGoogle(
-          appUserId,
+          connectionKey,
           `/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events/${encodeURIComponent(googleEventId)}`,
           { method: "DELETE" },
         );
@@ -168,10 +168,10 @@ async function processTask(supa: ReturnType<typeof db>, task: SyncTask) {
       if (!googleEvent) {
         const googleEventId = existing?.google_calendar_id === calendarId && !existing.deleted_at
           ? existing.google_event_id
-          : await findRemoteEventId(appUserId, calendarId, event.id);
+          : await findRemoteEventId(connectionKey, calendarId, event.id);
         if (googleEventId) {
           await callGoogle(
-            appUserId,
+            connectionKey,
             `/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events/${encodeURIComponent(googleEventId)}`,
             { method: "DELETE" },
           ).catch(() => undefined);
@@ -185,18 +185,18 @@ async function processTask(supa: ReturnType<typeof db>, task: SyncTask) {
           ? existing.google_event_id
           : null;
         if (!googleEventId) {
-          googleEventId = await findRemoteEventId(appUserId, calendarId, event.id);
+          googleEventId = await findRemoteEventId(connectionKey, calendarId, event.id);
         }
 
         if (googleEventId) {
           await callGoogleJson(
-            appUserId,
+            connectionKey,
             `/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events/${encodeURIComponent(googleEventId)}`,
             { method: "PATCH", body: JSON.stringify(googleEvent) },
           );
         } else {
           const created = await callGoogleJson<{ id: string }>(
-            appUserId,
+            connectionKey,
             `/calendar/v3/calendars/${encodeURIComponent(calendarId)}/events`,
             { method: "POST", body: JSON.stringify(googleEvent) },
           );

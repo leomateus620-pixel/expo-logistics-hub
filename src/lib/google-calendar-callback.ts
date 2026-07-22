@@ -8,6 +8,10 @@ const GOOGLE_CALLBACK_KEYS = [
   'scope',
   'authuser',
   'prompt',
+  'connection_key',
+  'connectionKey',
+  'connection_api_key',
+  'connectionApiKey',
 ] as const;
 
 const GOOGLE_CALENDAR_CALLBACK_PATH = '/google-calendar/callback';
@@ -66,6 +70,16 @@ export function appendGoogleCalendarCallbackSignal(path: string) {
   GOOGLE_CALLBACK_KEYS.forEach((key) => parsed.searchParams.delete(key));
   parsed.searchParams.set('google', 'connected');
   return `${parsed.pathname}${parsed.search}${parsed.hash}`;
+}
+
+export function extractGoogleCalendarConnectionKey(search: string) {
+  const params = new URLSearchParams(search);
+  return (
+    params.get('connection_key')
+    ?? params.get('connectionKey')
+    ?? params.get('connection_api_key')
+    ?? params.get('connectionApiKey')
+  )?.trim() || null;
 }
 
 export function buildGoogleCalendarReturnUrl(currentUrl: string) {

@@ -3,6 +3,7 @@ import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import {
   callGoogleJson,
   ensureSecondaryCalendar,
+  extractConnectionKey,
   probeConnection,
   startOAuth,
 } from "../_shared/googleCalendarGateway.ts";
@@ -134,6 +135,7 @@ async function requireActiveOrgMembership(db: ReturnType<typeof admin>, userId: 
 
 function connectionErrorCode(lastError: unknown) {
   const message = String(lastError ?? "").toLowerCase();
+  if (message.includes("missing_connection_key")) return "authorization_not_confirmed";
   if (message.includes(":401:") || message.includes("unauthorized") || message.includes("revoked")) {
     return "authorization_revoked";
   }
@@ -147,6 +149,17 @@ function safeServerError(error: unknown) {
   if (message.includes("oauth_start_failed")) return "request_failed";
   if (message.includes("Missing env")) return "request_failed";
   return "request_failed";
+}
+
+function redactConnectionSecrets(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(redactConnectionSecrets);
+  if (!value || typeof value !== "object") return value;
+  const redacted: Record<string, unknown> = {};
+  for (const [key, entry] of Object.entries(value as Record<string, unknown>)) {
+    if (["connection_key", "connectionKey", "connection_api_key", "connectionApiKey", "app_user_connection_key", "appUserConnectionKey"].includes(key)) continue;
+    redacted[key] = redactConnectionSecrets(entry);
+  }
+  return redacted;
 }
 
 async function prepareInitialBackfill(
@@ -214,16 +227,17 @@ async function finalizeAuthorizedConnection(
   db: ReturnType<typeof admin>,
   userId: string,
   orgId: string,
+  connectionKey: string | null,
   existingCalendarId?: string | null,
   completedCount = 0,
 ) {
-  const authorized = await probeConnection(userId);
+  const authorized = await probeConnection(connectionKey);
   if (!authorized) return null;
 
-  const calendarId = await ensureSecondaryCalendar(userId, existingCalendarId);
+  const calendarId = await ensureSecondaryCalendar(connectionKey!, existingCalendarId);
   let email: string | null = null;
   try {
-    const profile = await callGoogleJson<{ email?: string }>(userId, "/oauth2/v2/userinfo");
+    const profile = await callGoogleJson<{ email?: string }>(connectionKey!, "/oauth2/v2/userinfo");
     email = profile.email ?? null;
   } catch {
     // O e-mail é metadado opcional e não bloqueia a conexão.
@@ -234,6 +248,7 @@ async function finalizeAuthorizedConnection(
     user_id: userId,
     org_id: orgId,
     google_email: email,
+    connection_key: connectionKey,
     secondary_calendar_id: calendarId,
     status: "connected",
     scopes_granted: ["calendar", "calendar.events", "userinfo.email", "userinfo.profile"],
@@ -261,16 +276,18 @@ Deno.serve(async (req) => {
       const orgId = await requireActiveOrgMembership(db, user.id, (body as { orgId?: string }).orgId);
       const returnUrl = resolveReturnUrl(req, (body as { returnUrl?: string }).returnUrl);
       const oauth = await startOAuth(returnUrl, user.id);
+      const connectionKey = extractConnectionKey(oauth);
       const now = new Date().toISOString();
       await db.from("google_calendar_connections").upsert({
         user_id: user.id,
         org_id: orgId,
+        connection_key: connectionKey,
         status: "connecting",
         last_error: null,
         updated_at: now,
         connected_at: now,
       }, { onConflict: "user_id" });
-      return json(oauth);
+      return json(redactConnectionSecrets(oauth) as Record<string, unknown>);
     }
 
     if (action === "reset") {
@@ -284,7 +301,7 @@ Deno.serve(async (req) => {
     if (action === "complete") {
       const orgId = await requireActiveOrgMembership(db, user.id, (body as { orgId?: string }).orgId);
       const { data: existing } = await db.from("google_calendar_connections")
-        .select("status, secondary_calendar_id, backfill_total, backfill_done, updated_at, connected_at, org_id, last_error")
+        .select("status, connection_key, secondary_calendar_id, backfill_total, backfill_done, updated_at, connected_at, org_id, last_error")
         .eq("user_id", user.id)
         .maybeSingle();
 
@@ -326,11 +343,19 @@ Deno.serve(async (req) => {
           .eq("status", "completing");
       }
 
+      const callbackConnectionKey = extractConnectionKey(body);
+      if (callbackConnectionKey && callbackConnectionKey !== existing?.connection_key) {
+        await db.from("google_calendar_connections")
+          .update({ connection_key: callbackConnectionKey, updated_at: new Date().toISOString() })
+          .eq("user_id", user.id);
+      }
+      const effectiveConnectionKey = callbackConnectionKey ?? existing?.connection_key ?? null;
+
       const { data: claim } = await db.from("google_calendar_connections")
-        .update({ status: "completing", last_error: null })
+        .update({ status: "completing", last_error: null, connection_key: effectiveConnectionKey })
         .eq("user_id", user.id)
         .in("status", ["connecting", "error", "reconnect_required", "disconnected"])
-        .select("secondary_calendar_id, updated_at")
+        .select("connection_key, secondary_calendar_id, updated_at")
         .maybeSingle();
       if (!claim) return json({ ok: false, pending: true });
 
@@ -338,6 +363,7 @@ Deno.serve(async (req) => {
         db,
         user.id,
         orgId,
+        claim.connection_key ?? effectiveConnectionKey,
         claim.secondary_calendar_id,
         existing?.backfill_done ?? 0,
       );
@@ -382,7 +408,7 @@ Deno.serve(async (req) => {
 
     if (action === "status") {
       const { data: connection } = await db.from("google_calendar_connections")
-        .select("user_id, org_id, google_email, secondary_calendar_id, status, last_sync_at, last_error, backfill_total, backfill_done, connected_at, updated_at")
+        .select("user_id, org_id, google_email, connection_key, secondary_calendar_id, status, last_sync_at, last_error, backfill_total, backfill_done, connected_at, updated_at")
         .eq("user_id", user.id)
         .maybeSingle();
       if (
@@ -405,6 +431,7 @@ Deno.serve(async (req) => {
             db,
             user.id,
             connection.org_id,
+            connection.connection_key,
             connection.secondary_calendar_id,
             connection.backfill_done ?? 0,
           ).catch(() => null);

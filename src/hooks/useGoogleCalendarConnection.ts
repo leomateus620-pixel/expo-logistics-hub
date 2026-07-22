@@ -7,6 +7,7 @@ import { useToast } from '@/hooks/use-toast';
 import {
   buildGoogleCalendarReturnUrl,
   cleanGoogleCalendarCallbackUrl,
+  extractGoogleCalendarConnectionKey,
   parseGoogleCalendarCallbackFeedback,
 } from '@/lib/google-calendar-callback';
 import type {
@@ -121,6 +122,7 @@ interface PopupMessage {
   type: 'fenasoja:google-calendar-oauth';
   status: 'success' | 'cancelled' | 'failed';
   code?: GoogleCalendarErrorCode;
+  connectionKey?: string | null;
 }
 
 function waitForPopupResult(popup: Window): Promise<PopupMessage | { status: 'closed' }> {
@@ -181,9 +183,9 @@ export function useGoogleCalendarConnection() {
     },
   });
 
-  const completeConnection = useCallback(async (activeOrgId: string, attempts = 6) => {
+  const completeConnection = useCallback(async (activeOrgId: string, attempts = 6, connectionKey?: string | null) => {
     for (let attempt = 0; attempt < attempts; attempt += 1) {
-      const response = await invoke<CompleteResponse>('complete', { orgId: activeOrgId });
+      const response = await invoke<CompleteResponse>('complete', { orgId: activeOrgId, connectionKey });
       if (!response.pending) return response;
       await new Promise((resolve) => window.setTimeout(resolve, attempt < 3 ? 1400 : 2400));
     }
@@ -234,7 +236,11 @@ export function useGoogleCalendarConnection() {
           }
 
           setFlowPhase('returning');
-          return completeConnection(orgId, popupResult.status === 'closed' ? 10 : 6);
+          return completeConnection(
+            orgId,
+            popupResult.status === 'closed' ? 10 : 6,
+            'connectionKey' in popupResult ? popupResult.connectionKey : null,
+          );
         } catch (error) {
           if (popupRef.current === preparedPopup) popupRef.current = null;
           if (preparedPopup && !preparedPopup.closed && flowPhase !== 'waiting_oauth') {
@@ -316,7 +322,7 @@ export function useGoogleCalendarConnection() {
     }
 
     setFlowPhase('returning');
-    completeConnection(orgId)
+    completeConnection(orgId, 6, extractGoogleCalendarConnectionKey(window.location.search))
       .then((result) => {
         setFlowPhase('success');
         setFlowErrorCode(null);
