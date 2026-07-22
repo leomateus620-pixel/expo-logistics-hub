@@ -134,6 +134,32 @@ export async function startOAuth(returnUrl: string, appUserId: string) {
   return { ...payload, connection_key: extractFinalizedConnectionKey(payload) };
 }
 
+export async function exchangeOAuthCode(code: string, appUserId: string) {
+  const trimmedCode = String(code ?? "").trim();
+  if (!trimmedCode) throw new Error("missing_exchange_code");
+  const res = await fetch(`${GATEWAY_BASE}/api/v1/app-users/oauth2/exchange`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${lovableApiKey()}`,
+      "X-Client-Api-Key": clientApiKey(),
+    },
+    body: JSON.stringify({
+      code: trimmedCode,
+      connector_id: CONNECTOR_ID,
+      app_user_id: appUserId,
+      credentials_configuration: { scopes: GOOGLE_SCOPES },
+    }),
+  });
+  if (!res.ok) {
+    const reason = await gatewayErrorCode(res);
+    console.warn("google_calendar_oauth_exchange_rejected", { status: res.status, reason });
+    throw new Error(`oauth_exchange_failed:${res.status}:${reason}`);
+  }
+  const payload = await res.json();
+  return { ...payload, connection_key: extractConnectionKey(payload) };
+}
+
 /**
  * Chama a API do Google via gateway, autenticando como app_user.
  */
