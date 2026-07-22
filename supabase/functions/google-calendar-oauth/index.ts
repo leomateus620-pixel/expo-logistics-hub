@@ -3,6 +3,7 @@ import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 import {
   callGoogleJson,
   ensureSecondaryCalendar,
+  exchangeOAuthCode,
   extractConnectionKey,
   extractFinalizedConnectionKey,
   probeConnection,
@@ -149,6 +150,7 @@ function connectionErrorCode(lastError: unknown) {
 function safeServerError(error: unknown) {
   const message = String((error as Error)?.message ?? error);
   if (message.includes("oauth_start_failed")) return "request_failed";
+  if (message.includes("oauth_exchange_failed")) return "authorization_failed";
   if (message.includes("Missing env")) return "request_failed";
   return "request_failed";
 }
@@ -385,7 +387,14 @@ Deno.serve(async (req) => {
           .eq("status", "completing");
       }
 
-      const callbackConnectionKey = extractConnectionKey(body);
+      const callbackCode = typeof (body as { code?: unknown }).code === "string"
+        ? String((body as { code: string }).code).trim()
+        : "";
+      let callbackConnectionKey = extractConnectionKey(body);
+      if (callbackCode) {
+        const exchanged = await exchangeOAuthCode(callbackCode, user.id);
+        callbackConnectionKey = extractConnectionKey(exchanged) ?? callbackConnectionKey;
+      }
       if (callbackConnectionKey && callbackConnectionKey !== existing?.connection_key) {
         await db.from("google_calendar_connections")
           .update({ connection_key: callbackConnectionKey, updated_at: new Date().toISOString() })
