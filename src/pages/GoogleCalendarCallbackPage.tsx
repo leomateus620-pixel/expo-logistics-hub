@@ -3,6 +3,7 @@ import { CalendarCheck2, Loader2 } from 'lucide-react';
 import {
   appendGoogleCalendarCallbackSignal,
   cleanGoogleCalendarCallbackUrl,
+  extractGoogleCalendarConnectionKey,
   getGoogleCalendarCallbackNext,
   parseGoogleCalendarCallbackFeedback,
 } from '@/lib/google-calendar-callback';
@@ -25,9 +26,10 @@ export default function GoogleCalendarCallbackPage() {
     const code = feedback.kind === 'cancelled' || feedback.kind === 'failed'
       ? feedback.code
       : undefined;
+    const connectionKey = extractGoogleCalendarConnectionKey(window.location.search);
 
     if (window.opener && !window.opener.closed) {
-      window.opener.postMessage({ type: MESSAGE_TYPE, status, code }, window.location.origin);
+      window.opener.postMessage({ type: MESSAGE_TYPE, status, code, connectionKey }, window.location.origin);
       window.setTimeout(() => window.close(), 120);
       return;
     }
