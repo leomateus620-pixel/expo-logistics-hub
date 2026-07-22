@@ -276,7 +276,8 @@ Deno.serve(async (req) => {
         updated_at: now,
         connected_at: now,
       }, { onConflict: "user_id" });
-      return json(oauth);
+      const { connection_key: _connectionKey, connectionKey: _camelConnectionKey, connection_api_key: _apiConnectionKey, connectionApiKey: _camelApiConnectionKey, ...safeOauth } = oauth as Record<string, unknown>;
+      return json(safeOauth);
     }
 
     if (action === "reset") {
