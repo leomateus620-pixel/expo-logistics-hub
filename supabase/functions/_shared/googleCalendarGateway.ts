@@ -30,6 +30,10 @@ export function extractConnectionKey(payload: unknown): string | null {
   if (!payload || typeof payload !== "object") return null;
   const record = payload as Record<string, unknown>;
   const candidates = [
+    record.session_id,
+    record.sessionId,
+    record.oauth_session_id,
+    record.oauthSessionId,
     record.connection_key,
     record.connectionKey,
     record.connection_api_key,
@@ -67,6 +71,8 @@ async function gatewayErrorCode(response: Response, text?: string) {
 /**
  * Inicia o fluxo OAuth do App User Connector.
  * Retorna { authorization_url, session_id } que o frontend abre em popup.
+ * No App User Connector, o session_id é a credencial opaca que passa a ser
+ * utilizável pelo gateway depois que o usuário conclui o consentimento.
  */
 export async function startOAuth(returnUrl: string, appUserId: string) {
   const res = await fetch(`${GATEWAY_BASE}/api/v1/app-users/oauth2/authorize`, {

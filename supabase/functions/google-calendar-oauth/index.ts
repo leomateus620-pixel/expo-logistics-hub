@@ -157,10 +157,43 @@ function redactConnectionSecrets(value: unknown): unknown {
   if (!value || typeof value !== "object") return value;
   const redacted: Record<string, unknown> = {};
   for (const [key, entry] of Object.entries(value as Record<string, unknown>)) {
-    if (["connection_key", "connectionKey", "connection_api_key", "connectionApiKey", "app_user_connection_key", "appUserConnectionKey"].includes(key)) continue;
+    if ([
+      "session_id",
+      "sessionId",
+      "oauth_session_id",
+      "oauthSessionId",
+      "connection_key",
+      "connectionKey",
+      "connection_api_key",
+      "connectionApiKey",
+      "app_user_connection_key",
+      "appUserConnectionKey",
+    ].includes(key)) continue;
     redacted[key] = redactConnectionSecrets(entry);
   }
   return redacted;
+}
+
+async function recoverCompletingConnection(
+  db: ReturnType<typeof admin>,
+  userId: string,
+  orgId: string,
+  existing: {
+    connection_key?: string | null;
+    secondary_calendar_id?: string | null;
+    backfill_done?: number | null;
+    updated_at?: string | null;
+  },
+) {
+  if (!existing.connection_key) return null;
+  return await finalizeAuthorizedConnection(
+    db,
+    userId,
+    orgId,
+    existing.connection_key,
+    existing.secondary_calendar_id,
+    existing.backfill_done ?? 0,
+  ).catch(() => null);
 }
 
 async function prepareInitialBackfill(
@@ -336,7 +369,13 @@ Deno.serve(async (req) => {
       if (existing?.status === "completing") {
         const updatedAt = Date.parse(String(existing.updated_at ?? ""));
         const claimIsStale = !Number.isFinite(updatedAt) || Date.now() - updatedAt > 120_000;
-        if (!claimIsStale) return json({ ok: false, pending: true });
+        if (!claimIsStale) {
+          const recovered = await recoverCompletingConnection(db, user.id, orgId, existing);
+          if (recovered) {
+            return json({ ok: true, calendarId: recovered.calendarId, backfill: recovered.backfill });
+          }
+          return json({ ok: false, pending: true });
+        }
 
         // Permite retomar com segurança um callback interrompido depois do prazo da trava.
         await db.from("google_calendar_connections")
@@ -379,10 +418,10 @@ Deno.serve(async (req) => {
       );
       if (!finalized) {
         await db.from("google_calendar_connections")
-          .update({ status: "error", last_error: "authorization_not_confirmed" })
+          .update({ last_error: "authorization_pending", updated_at: new Date().toISOString() })
           .eq("user_id", user.id)
           .eq("status", "completing");
-        return json({ ok: false, pending: false, error: "authorization_not_confirmed" }, { status: 202 });
+        return json({ ok: false, pending: true }, { status: 202 });
       }
 
       return json({ ok: true, calendarId: finalized.calendarId, backfill: finalized.backfill });
@@ -464,17 +503,18 @@ Deno.serve(async (req) => {
       }
 
       const authorizationUpdatedAtMs = Date.parse(String(connection?.updated_at ?? connection?.connected_at ?? ""));
+      const staleAuthorizationError = String(connection?.last_error ?? "");
       if (
         connection
         && ["connecting", "completing"].includes(connection.status)
-        && !connection.last_error
+        && (!connection.last_error || staleAuthorizationError === "authorization_pending" || staleAuthorizationError === "stale_completion_claim")
         && (!Number.isFinite(authorizationUpdatedAtMs) || Date.now() - authorizationUpdatedAtMs > STALE_AUTHORIZATION_MS)
       ) {
         await db.from("google_calendar_connections")
           .update({ status: "error", last_error: "authorization_not_confirmed" })
           .eq("user_id", user.id)
           .in("status", ["connecting", "completing"])
-          .is("last_error", null);
+          .or("last_error.is.null,last_error.in.(authorization_pending,stale_completion_claim)");
         connection.status = "error";
         connection.last_error = "authorization_not_confirmed";
       }
