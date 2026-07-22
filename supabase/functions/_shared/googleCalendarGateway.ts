@@ -29,23 +29,59 @@ export function clientApiKey(): string {
 export function extractConnectionKey(payload: unknown): string | null {
   if (!payload || typeof payload !== "object") return null;
   const record = payload as Record<string, unknown>;
-  const candidates = [
-    record.session_id,
-    record.sessionId,
-    record.oauth_session_id,
-    record.oauthSessionId,
+  const connection = record.connection && typeof record.connection === "object"
+    ? record.connection as Record<string, unknown>
+    : null;
+
+  // O gateway pode devolver tanto o identificador da sessão OAuth quanto a
+  // chave final da conexão. Para chamadas reais ao Google, a chave final deve
+  // sempre prevalecer; usar session_id em X-Connection-Api-Key gera 401.
+  const finalizedCandidates = [
     record.connection_key,
     record.connectionKey,
     record.connection_api_key,
     record.connectionApiKey,
     record.app_user_connection_key,
     record.appUserConnectionKey,
-    (record.connection && typeof record.connection === "object"
-      ? (record.connection as Record<string, unknown>).key
-      : null),
-    (record.connection && typeof record.connection === "object"
-      ? (record.connection as Record<string, unknown>).connection_key
-      : null),
+    connection?.connection_key,
+    connection?.connectionKey,
+    connection?.connection_api_key,
+    connection?.connectionApiKey,
+    connection?.app_user_connection_key,
+    connection?.appUserConnectionKey,
+    connection?.key,
+  ];
+  const sessionCandidates = [
+    record.session_id,
+    record.sessionId,
+    record.oauth_session_id,
+    record.oauthSessionId,
+  ];
+  const key = [...finalizedCandidates, ...sessionCandidates]
+    .find((value) => typeof value === "string" && value.trim().length > 0);
+  return typeof key === "string" ? key.trim() : null;
+}
+
+export function extractFinalizedConnectionKey(payload: unknown): string | null {
+  if (!payload || typeof payload !== "object") return null;
+  const record = payload as Record<string, unknown>;
+  const connection = record.connection && typeof record.connection === "object"
+    ? record.connection as Record<string, unknown>
+    : null;
+  const candidates = [
+    record.connection_key,
+    record.connectionKey,
+    record.connection_api_key,
+    record.connectionApiKey,
+    record.app_user_connection_key,
+    record.appUserConnectionKey,
+    connection?.connection_key,
+    connection?.connectionKey,
+    connection?.connection_api_key,
+    connection?.connectionApiKey,
+    connection?.app_user_connection_key,
+    connection?.appUserConnectionKey,
+    connection?.key,
   ];
   const key = candidates.find((value) => typeof value === "string" && value.trim().length > 0);
   return typeof key === "string" ? key.trim() : null;
@@ -95,7 +131,7 @@ export async function startOAuth(returnUrl: string, appUserId: string) {
     throw new Error(`oauth_start_failed:${res.status}`);
   }
   const payload = await res.json();
-  return { ...payload, connection_key: extractConnectionKey(payload) };
+  return { ...payload, connection_key: extractFinalizedConnectionKey(payload) };
 }
 
 /**

@@ -4,6 +4,7 @@ import {
   callGoogleJson,
   ensureSecondaryCalendar,
   extractConnectionKey,
+  extractFinalizedConnectionKey,
   probeConnection,
   startOAuth,
 } from "../_shared/googleCalendarGateway.ts";
@@ -311,7 +312,7 @@ Deno.serve(async (req) => {
       const orgId = await requireActiveOrgMembership(db, user.id, (body as { orgId?: string }).orgId);
       const returnUrl = resolveReturnUrl(req, (body as { returnUrl?: string }).returnUrl);
       const oauth = await startOAuth(returnUrl, user.id);
-      const connectionKey = extractConnectionKey(oauth);
+      const connectionKey = extractFinalizedConnectionKey(oauth);
       const now = new Date().toISOString();
       await db.from("google_calendar_connections").upsert({
         user_id: user.id,
