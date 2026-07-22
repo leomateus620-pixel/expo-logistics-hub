@@ -136,7 +136,7 @@ function connectionErrorCode(lastError: unknown) {
   if (message.includes(":401:") || message.includes("unauthorized") || message.includes("revoked")) {
     return "authorization_revoked";
   }
-  if (message.includes("no_connection")) return "authorization_not_confirmed";
+  if (message.includes("no_connection") || message.includes("authorization_not_confirmed")) return "authorization_not_confirmed";
   if (message) return "sync_failed";
   return null;
 }
