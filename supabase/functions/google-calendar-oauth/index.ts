@@ -13,6 +13,7 @@ const service = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const APP_ROUTE = "/cronograma-eventos";
 const CALLBACK_ROUTE = "/google-calendar/callback";
 const STALE_AUTHORIZATION_MS = 4 * 60 * 1000;
+const RECOVERABLE_AUTHORIZATION_ERRORS = new Set(["authorization_not_confirmed", "no_connection", "calendar_id_missing"]);
 
 function admin() {
   return createClient(supabaseUrl, service, { auth: { persistSession: false } });
@@ -209,6 +210,43 @@ async function prepareInitialBackfill(
   return rows.length;
 }
 
+async function finalizeAuthorizedConnection(
+  db: ReturnType<typeof admin>,
+  userId: string,
+  orgId: string,
+  existingCalendarId?: string | null,
+  completedCount = 0,
+) {
+  const authorized = await probeConnection(userId);
+  if (!authorized) return null;
+
+  const calendarId = await ensureSecondaryCalendar(userId, existingCalendarId);
+  let email: string | null = null;
+  try {
+    const profile = await callGoogleJson<{ email?: string }>(userId, "/oauth2/v2/userinfo");
+    email = profile.email ?? null;
+  } catch {
+    // O e-mail é metadado opcional e não bloqueia a conexão.
+  }
+
+  const connectedAt = new Date().toISOString();
+  await db.from("google_calendar_connections").upsert({
+    user_id: userId,
+    org_id: orgId,
+    google_email: email,
+    secondary_calendar_id: calendarId,
+    status: "connected",
+    scopes_granted: ["calendar", "calendar.events", "userinfo.email", "userinfo.profile"],
+    connected_at: connectedAt,
+    last_error: null,
+    updated_at: connectedAt,
+  }, { onConflict: "user_id" });
+
+  const backfill = await prepareInitialBackfill(db, userId, orgId, connectedAt, completedCount);
+  if (backfill > 0) await triggerGoogleSyncWorker().catch(() => undefined);
+  return { calendarId, backfill, connectedAt };
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return json({ error: "request_failed" }, { status: 405 });
@@ -223,18 +261,21 @@ Deno.serve(async (req) => {
       const orgId = await requireActiveOrgMembership(db, user.id, (body as { orgId?: string }).orgId);
       const returnUrl = resolveReturnUrl(req, (body as { returnUrl?: string }).returnUrl);
       const oauth = await startOAuth(returnUrl, user.id);
+      const now = new Date().toISOString();
       await db.from("google_calendar_connections").upsert({
         user_id: user.id,
         org_id: orgId,
         status: "connecting",
         last_error: null,
+        updated_at: now,
+        connected_at: now,
       }, { onConflict: "user_id" });
       return json(oauth);
     }
 
     if (action === "reset") {
       await db.from("google_calendar_connections")
-        .update({ status: "disconnected", last_error: null })
+        .update({ status: "disconnected", last_error: null, updated_at: new Date().toISOString() })
         .eq("user_id", user.id)
         .in("status", ["connecting", "error", "reconnect_required", "disconnected"]);
       return json({ ok: true });
@@ -243,7 +284,7 @@ Deno.serve(async (req) => {
     if (action === "complete") {
       const orgId = await requireActiveOrgMembership(db, user.id, (body as { orgId?: string }).orgId);
       const { data: existing } = await db.from("google_calendar_connections")
-        .select("status, secondary_calendar_id, backfill_total, backfill_done, updated_at, connected_at, org_id")
+        .select("status, secondary_calendar_id, backfill_total, backfill_done, updated_at, connected_at, org_id, last_error")
         .eq("user_id", user.id)
         .maybeSingle();
 
@@ -293,8 +334,14 @@ Deno.serve(async (req) => {
         .maybeSingle();
       if (!claim) return json({ ok: false, pending: true });
 
-      const authorized = await probeConnection(user.id);
-      if (!authorized) {
+      const finalized = await finalizeAuthorizedConnection(
+        db,
+        user.id,
+        orgId,
+        claim.secondary_calendar_id,
+        existing?.backfill_done ?? 0,
+      );
+      if (!finalized) {
         await db.from("google_calendar_connections")
           .update({ status: "connecting", last_error: "no_connection" })
           .eq("user_id", user.id)
@@ -302,30 +349,7 @@ Deno.serve(async (req) => {
         return json({ ok: false, pending: true });
       }
 
-      const calendarId = await ensureSecondaryCalendar(user.id, claim.secondary_calendar_id);
-      let email: string | null = null;
-      try {
-        const profile = await callGoogleJson<{ email?: string }>(user.id, "/oauth2/v2/userinfo");
-        email = profile.email ?? null;
-      } catch {
-        // O e-mail é metadado opcional e não bloqueia a conexão.
-      }
-
-      const connectedAt = new Date().toISOString();
-      await db.from("google_calendar_connections").upsert({
-        user_id: user.id,
-        org_id: orgId,
-        google_email: email,
-        secondary_calendar_id: calendarId,
-        status: "connected",
-        scopes_granted: ["calendar", "calendar.events", "userinfo.email", "userinfo.profile"],
-        connected_at: connectedAt,
-        last_error: null,
-      }, { onConflict: "user_id" });
-      const backfill = await prepareInitialBackfill(db, user.id, orgId, connectedAt, 0);
-      if (backfill > 0) await triggerGoogleSyncWorker().catch(() => undefined);
-
-      return json({ ok: true, calendarId, backfill });
+      return json({ ok: true, calendarId: finalized.calendarId, backfill: finalized.backfill });
     }
 
     if (action === "retry") {
@@ -358,15 +382,47 @@ Deno.serve(async (req) => {
 
     if (action === "status") {
       const { data: connection } = await db.from("google_calendar_connections")
-        .select("user_id, org_id, google_email, secondary_calendar_id, status, last_sync_at, last_error, backfill_total, backfill_done, connected_at")
+        .select("user_id, org_id, google_email, secondary_calendar_id, status, last_sync_at, last_error, backfill_total, backfill_done, connected_at, updated_at")
         .eq("user_id", user.id)
         .maybeSingle();
-      const connectedAtMs = Date.parse(String(connection?.connected_at ?? ""));
+      if (
+        connection
+        && connection.org_id
+        && (
+          ["connecting", "completing"].includes(connection.status)
+          || (connection.status === "error" && RECOVERABLE_AUTHORIZATION_ERRORS.has(String(connection.last_error ?? "")))
+        )
+      ) {
+        const member = await db.from("org_members")
+          .select("user_id")
+          .eq("user_id", user.id)
+          .eq("org_id", connection.org_id)
+          .eq("is_active", true)
+          .limit(1)
+          .maybeSingle();
+        if (member.data) {
+          const recovered = await finalizeAuthorizedConnection(
+            db,
+            user.id,
+            connection.org_id,
+            connection.secondary_calendar_id,
+            connection.backfill_done ?? 0,
+          ).catch(() => null);
+          if (recovered) {
+            connection.status = "connected";
+            connection.last_error = null;
+            connection.secondary_calendar_id = recovered.calendarId;
+            connection.connected_at = recovered.connectedAt;
+          }
+        }
+      }
+
+      const authorizationUpdatedAtMs = Date.parse(String(connection?.updated_at ?? connection?.connected_at ?? ""));
       if (
         connection
         && ["connecting", "completing"].includes(connection.status)
         && !connection.last_error
-        && (!Number.isFinite(connectedAtMs) || Date.now() - connectedAtMs > STALE_AUTHORIZATION_MS)
+        && (!Number.isFinite(authorizationUpdatedAtMs) || Date.now() - authorizationUpdatedAtMs > STALE_AUTHORIZATION_MS)
       ) {
         await db.from("google_calendar_connections")
           .update({ status: "error", last_error: "authorization_not_confirmed" })

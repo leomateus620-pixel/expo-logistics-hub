@@ -28,6 +28,7 @@ import {
 } from '@/lib/google-calendar-state';
 
 const GOOGLE_CALENDAR_URL = 'https://calendar.google.com/calendar/u/0/r';
+const GOOGLE_OAUTH_POPUP_FEATURES = 'width=540,height=720,resizable=yes,scrollbars=yes';
 
 function formatLastSync(value: string | null | undefined) {
   if (!value) return null;
@@ -125,7 +126,8 @@ export const GoogleCalendarHeroWidget = memo(function GoogleCalendarHeroWidget()
   const runAction = (action: GoogleCalendarAction) => {
     if (controlsLocked && action !== 'cancel_oauth') return;
     if (action === 'connect' || action === 'retry_connection' || action === 'reconnect') {
-      connect.mutate();
+      const popup = window.open('about:blank', 'fenasoja-google-oauth', GOOGLE_OAUTH_POPUP_FEATURES);
+      connect.mutate(popup);
     } else if (action === 'retry_sync') {
       retry.mutate();
     } else if (action === 'refresh') {

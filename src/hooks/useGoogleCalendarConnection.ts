@@ -70,6 +70,8 @@ const SAFE_ERROR_COPY: Record<GoogleCalendarErrorCode, string> = {
 const isKnownErrorCode = (value: unknown): value is GoogleCalendarErrorCode =>
   typeof value === 'string' && value in SAFE_ERROR_COPY;
 
+const GOOGLE_OAUTH_POPUP_FEATURES = 'width=540,height=720,resizable=yes,scrollbars=yes';
+
 async function getValidatedAccessToken() {
   const { data: sessionData } = await supabase.auth.getSession();
   const token = sessionData.session?.access_token;
@@ -189,44 +191,57 @@ export function useGoogleCalendarConnection() {
   }, []);
 
   const connect = useMutation({
-    mutationFn: async () => {
+    mutationFn: async (preOpenedPopup?: Window | null) => {
       if (connectPromiseRef.current) return connectPromiseRef.current;
 
       const operation = (async () => {
-        if (!orgId) throw new GoogleCalendarFlowError('no_active_organization');
-        oauthCancelledRef.current = false;
-        setFlowErrorCode(null);
-        setFlowPhase('starting');
-        await invoke('reset');
+        let preparedPopup = preOpenedPopup && !preOpenedPopup.closed ? preOpenedPopup : null;
+        try {
+          if (!orgId) throw new GoogleCalendarFlowError('no_active_organization');
+          oauthCancelledRef.current = false;
+          setFlowErrorCode(null);
+          setFlowPhase('starting');
+          await invoke('reset').catch(() => undefined);
 
-        const oauth = await invoke<{
-          authorization_url?: string;
-          authorize_url?: string;
-          url?: string;
-        }>('start', {
-          orgId,
-          returnUrl: buildGoogleCalendarReturnUrl(window.location.href),
-        });
-        const authorizeUrl = oauth.authorization_url ?? oauth.authorize_url ?? oauth.url;
-        if (!authorizeUrl) throw new GoogleCalendarFlowError('oauth_url_missing');
+          const oauth = await invoke<{
+            authorization_url?: string;
+            authorize_url?: string;
+            url?: string;
+          }>('start', {
+            orgId,
+            returnUrl: buildGoogleCalendarReturnUrl(window.location.href),
+          });
+          const authorizeUrl = oauth.authorization_url ?? oauth.authorize_url ?? oauth.url;
+          if (!authorizeUrl) throw new GoogleCalendarFlowError('oauth_url_missing');
 
-        const popup = window.open(authorizeUrl, 'fenasoja-google-oauth', 'width=540,height=720,resizable=yes,scrollbars=yes');
-        if (!popup) throw new GoogleCalendarFlowError('oauth_popup_blocked');
-        popupRef.current = popup;
-        popup.focus();
-        setFlowPhase('waiting_oauth');
+          if (preparedPopup) {
+            preparedPopup.location.href = authorizeUrl;
+          } else {
+            preparedPopup = window.open(authorizeUrl, 'fenasoja-google-oauth', GOOGLE_OAUTH_POPUP_FEATURES);
+          }
+          if (!preparedPopup) throw new GoogleCalendarFlowError('oauth_popup_blocked');
+          popupRef.current = preparedPopup;
+          preparedPopup.focus();
+          setFlowPhase('waiting_oauth');
 
-        const popupResult = await waitForPopupResult(popup);
-        popupRef.current = null;
-        if (oauthCancelledRef.current || popupResult.status === 'cancelled') {
-          throw new GoogleCalendarFlowError('authorization_cancelled');
+          const popupResult = await waitForPopupResult(preparedPopup);
+          popupRef.current = null;
+          if (oauthCancelledRef.current || popupResult.status === 'cancelled') {
+            throw new GoogleCalendarFlowError('authorization_cancelled');
+          }
+          if (popupResult.status === 'failed') {
+            throw new GoogleCalendarFlowError(popupResult.code ?? 'authorization_failed');
+          }
+
+          setFlowPhase('returning');
+          return completeConnection(orgId, popupResult.status === 'closed' ? 10 : 6);
+        } catch (error) {
+          if (popupRef.current === preparedPopup) popupRef.current = null;
+          if (preparedPopup && !preparedPopup.closed && flowPhase !== 'waiting_oauth') {
+            preparedPopup.close();
+          }
+          throw error;
         }
-        if (popupResult.status === 'failed') {
-          throw new GoogleCalendarFlowError(popupResult.code ?? 'authorization_failed');
-        }
-
-        setFlowPhase('returning');
-        return completeConnection(orgId, popupResult.status === 'closed' ? 10 : 6);
       })();
 
       connectPromiseRef.current = operation;
