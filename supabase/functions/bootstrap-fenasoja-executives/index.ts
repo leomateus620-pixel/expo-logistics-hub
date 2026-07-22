@@ -28,6 +28,24 @@ function randomPassword() {
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
 
+  const url = new URL(req.url);
+  const action = url.searchParams.get("action") ?? "bootstrap";
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+
+  if (action === "trigger") {
+    const mode = url.searchParams.get("mode") ?? "both";
+    const res = await fetch(`${supabaseUrl}/functions/v1/event-reminders?mode=${mode}`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${serviceKey}` },
+    });
+    const body = await res.text();
+    return new Response(JSON.stringify({ status: res.status, body }), {
+      headers: { ...cors, "Content-Type": "application/json" },
+    });
+  }
+
+
   const supa = createClient(
     Deno.env.get("SUPABASE_URL")!,
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
