@@ -35,7 +35,8 @@ describe('contratos server-side do Google Agenda e lembretes', () => {
     expect(gateway).not.toContain('headers.set("X-App-User-Id"');
     expect(gateway).toContain('extractConnectionKey');
     expect(oauth).toContain('connection_key: connectionKey');
-    expect(oauth).toContain('const { connection_key: _connectionKey');
+    expect(oauth).toContain('redactConnectionSecrets');
+    expect(oauth).toContain('appUserConnectionKey');
     expect(worker).toContain('!connection.connection_key');
     expect(worker).toContain('const connectionKey = connection.connection_key as string');
   });
