@@ -354,7 +354,7 @@ export function deriveGoogleCalendarState({
   if (!connection) return VIEWS.disconnected;
 
   if (connection.error_code === 'authorization_not_confirmed') return VIEWS.authorization_not_confirmed;
-  if (connection.status === 'connecting') return VIEWS.waiting_oauth;
+  if (connection.status === 'connecting') return VIEWS.authorization_not_confirmed;
   if (connection.status === 'completing') return VIEWS.returning_from_oauth;
   if (connection.status === 'disconnected') return VIEWS.disconnected;
   if (connection.status === 'reconnect_required') {

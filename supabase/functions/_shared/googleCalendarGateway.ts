@@ -127,6 +127,7 @@ export async function callGoogleJson<T = unknown>(
  * Retorna true se o gateway aceita chamadas como esse app_user.
  */
 export async function probeConnection(connectionKey: string | null | undefined): Promise<boolean> {
+  if (!String(connectionKey ?? "").trim()) return false;
   try {
     const res = await callGoogle(requireConnectionKey(connectionKey), "/calendar/v3/users/me/settings/timezone");
     if (res.ok) {
@@ -138,7 +139,7 @@ export async function probeConnection(connectionKey: string | null | undefined):
     return false;
   } catch (error) {
     const message = String((error as Error)?.message ?? error);
-    console.warn("probeConnection failed", { reason: message === "missing_connection_key" ? message : "gateway_unavailable" });
+    console.warn("probeConnection failed", { reason: message === "missing_connection_key" ? "authorization_pending" : "gateway_unavailable" });
     return false;
   }
 }

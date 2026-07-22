@@ -136,6 +136,7 @@ async function requireActiveOrgMembership(db: ReturnType<typeof admin>, userId: 
 function connectionErrorCode(lastError: unknown) {
   const message = String(lastError ?? "").toLowerCase();
   if (message.includes("missing_connection_key")) return "authorization_not_confirmed";
+  if (message.includes("authorization_pending")) return "authorization_not_confirmed";
   if (message.includes(":401:") || message.includes("unauthorized") || message.includes("revoked")) {
     return "authorization_revoked";
   }
@@ -231,6 +232,7 @@ async function finalizeAuthorizedConnection(
   existingCalendarId?: string | null,
   completedCount = 0,
 ) {
+  if (!String(connectionKey ?? "").trim()) return null;
   const authorized = await probeConnection(connectionKey);
   if (!authorized) return null;
 
@@ -351,6 +353,14 @@ Deno.serve(async (req) => {
       }
       const effectiveConnectionKey = callbackConnectionKey ?? existing?.connection_key ?? null;
 
+      if (!effectiveConnectionKey) {
+        await db.from("google_calendar_connections")
+          .update({ status: "error", last_error: "authorization_not_confirmed", updated_at: new Date().toISOString() })
+          .eq("user_id", user.id)
+          .in("status", ["connecting", "completing", "error", "reconnect_required", "disconnected"]);
+        return json({ ok: false, pending: false, error: "authorization_not_confirmed" }, { status: 202 });
+      }
+
       const { data: claim } = await db.from("google_calendar_connections")
         .update({ status: "completing", last_error: null, connection_key: effectiveConnectionKey })
         .eq("user_id", user.id)
@@ -369,10 +379,10 @@ Deno.serve(async (req) => {
       );
       if (!finalized) {
         await db.from("google_calendar_connections")
-          .update({ status: "connecting", last_error: "no_connection" })
+          .update({ status: "error", last_error: "authorization_not_confirmed" })
           .eq("user_id", user.id)
           .eq("status", "completing");
-        return json({ ok: false, pending: true });
+        return json({ ok: false, pending: false, error: "authorization_not_confirmed" }, { status: 202 });
       }
 
       return json({ ok: true, calendarId: finalized.calendarId, backfill: finalized.backfill });
@@ -427,19 +437,28 @@ Deno.serve(async (req) => {
           .limit(1)
           .maybeSingle();
         if (member.data) {
-          const recovered = await finalizeAuthorizedConnection(
-            db,
-            user.id,
-            connection.org_id,
-            connection.connection_key,
-            connection.secondary_calendar_id,
-            connection.backfill_done ?? 0,
-          ).catch(() => null);
+          const recovered = connection.connection_key
+            ? await finalizeAuthorizedConnection(
+              db,
+              user.id,
+              connection.org_id,
+              connection.connection_key,
+              connection.secondary_calendar_id,
+              connection.backfill_done ?? 0,
+            ).catch(() => null)
+            : null;
           if (recovered) {
             connection.status = "connected";
             connection.last_error = null;
             connection.secondary_calendar_id = recovered.calendarId;
             connection.connected_at = recovered.connectedAt;
+          } else if (!connection.connection_key && ["connecting", "completing"].includes(connection.status)) {
+            await db.from("google_calendar_connections")
+              .update({ status: "error", last_error: "authorization_not_confirmed", updated_at: new Date().toISOString() })
+              .eq("user_id", user.id)
+              .in("status", ["connecting", "completing"]);
+            connection.status = "error";
+            connection.last_error = "authorization_not_confirmed";
           }
         }
       }
