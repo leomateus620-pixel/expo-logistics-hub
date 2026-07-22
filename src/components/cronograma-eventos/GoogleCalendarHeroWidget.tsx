@@ -155,7 +155,8 @@ export const GoogleCalendarHeroWidget = memo(function GoogleCalendarHeroWidget()
       );
     }
 
-    const disabled = state.primaryAction === 'none' || controlsLocked || state.busy;
+    const canRetryConnection = ['connect', 'retry_connection', 'reconnect'].includes(state.primaryAction);
+    const disabled = state.primaryAction === 'none' || controlsLocked || (state.busy && !canRetryConnection);
     return (
       <button
         type="button"
