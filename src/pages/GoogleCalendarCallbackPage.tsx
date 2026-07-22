@@ -19,9 +19,12 @@ export default function GoogleCalendarCallbackPage() {
 
   useEffect(() => {
     const next = getGoogleCalendarCallbackNext(window.location.search);
-    const fallbackTarget = appendGoogleCalendarCallbackSignal(next);
     const connectionKey = extractGoogleCalendarConnectionKey(window.location.search);
     const exchangeCode = extractExchangeCode(window.location.search);
+    const fallback = new URL(appendGoogleCalendarCallbackSignal(next), window.location.origin);
+    if (connectionKey) fallback.searchParams.set('connection_key', connectionKey);
+    if (exchangeCode) fallback.searchParams.set('code', exchangeCode);
+    const fallbackTarget = `${fallback.pathname}${fallback.search}${fallback.hash}`;
     window.history.replaceState({}, '', cleanGoogleCalendarCallbackUrl(window.location));
 
     const status = feedback.kind === 'success'
