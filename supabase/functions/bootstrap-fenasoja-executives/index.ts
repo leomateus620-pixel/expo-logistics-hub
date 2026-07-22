@@ -45,6 +45,34 @@ Deno.serve(async (req) => {
     });
   }
 
+  if (action === "test-send") {
+    const res = await fetch(`${supabaseUrl}/functions/v1/send-transactional-email`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${serviceKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        templateName: "event-reminder",
+        recipientEmail: "soltis.fs@gmail.com",
+        idempotencyKey: `probe-${Date.now()}`,
+        templateData: {
+          eventTitle: "ENCONTRO REGIONAL DE INOVAÇÃO E EMPREENDEDORISMO",
+          reminderType: "24h",
+          dateLabel: "Sexta-feira, 24 de julho de 2026",
+          timeLabel: "08h00",
+          location: null,
+          commissionNames: ["CENTRAL"],
+          subevents: [],
+          pendingItems: [],
+          ctaUrl: "https://fenasojagestao.com/cronograma-eventos?event=ee37d7f7-9dac-4797-8b0c-7a0073b5119f",
+        },
+      }),
+    });
+    const body = await res.text();
+    return new Response(JSON.stringify({ status: res.status, body }), {
+      headers: { ...cors, "Content-Type": "application/json" },
+    });
+  }
+
+
 
   const supa = createClient(
     Deno.env.get("SUPABASE_URL")!,
