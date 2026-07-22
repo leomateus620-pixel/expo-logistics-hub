@@ -107,8 +107,8 @@ async function gatewayErrorCode(response: Response, text?: string) {
 /**
  * Inicia o fluxo OAuth do App User Connector.
  * Retorna { authorization_url, session_id } que o frontend abre em popup.
- * No App User Connector, o session_id é a credencial opaca que passa a ser
- * utilizável pelo gateway depois que o usuário conclui o consentimento.
+ * O session_id identifica a autorização inicial; a chave utilizável nas
+ * chamadas ao Google deve vir da troca do code no callback.
  */
 export async function startOAuth(returnUrl: string, appUserId: string) {
   const res = await fetch(`${GATEWAY_BASE}/api/v1/app-users/oauth2/authorize`, {
@@ -157,7 +157,7 @@ export async function exchangeOAuthCode(code: string, appUserId: string) {
     throw new Error(`oauth_exchange_failed:${res.status}:${reason}`);
   }
   const payload = await res.json();
-  return { ...payload, connection_key: extractConnectionKey(payload) };
+  return { ...payload, connection_key: extractFinalizedConnectionKey(payload) };
 }
 
 /**
