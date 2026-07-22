@@ -72,6 +72,19 @@ Deno.serve(async (req) => {
     });
   }
 
+  if (action === "reset-test") {
+    const supa = createClient(supabaseUrl, serviceKey, { auth: { persistSession: false } });
+    const { error, count } = await supa
+      .from("event_reminder_deliveries")
+      .update({ status: "pending", last_error: null }, { count: "exact" })
+      .eq("event_id", "ee37d7f7-9dac-4797-8b0c-7a0073b5119f")
+      .eq("status", "failed");
+    return new Response(JSON.stringify({ ok: !error, count, error: error?.message }), {
+      headers: { ...cors, "Content-Type": "application/json" },
+    });
+  }
+
+
 
 
   const supa = createClient(
