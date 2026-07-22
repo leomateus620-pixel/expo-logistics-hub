@@ -503,17 +503,18 @@ Deno.serve(async (req) => {
       }
 
       const authorizationUpdatedAtMs = Date.parse(String(connection?.updated_at ?? connection?.connected_at ?? ""));
+      const staleAuthorizationError = String(connection?.last_error ?? "");
       if (
         connection
         && ["connecting", "completing"].includes(connection.status)
-        && !connection.last_error
+        && (!connection.last_error || staleAuthorizationError === "authorization_pending" || staleAuthorizationError === "stale_completion_claim")
         && (!Number.isFinite(authorizationUpdatedAtMs) || Date.now() - authorizationUpdatedAtMs > STALE_AUTHORIZATION_MS)
       ) {
         await db.from("google_calendar_connections")
           .update({ status: "error", last_error: "authorization_not_confirmed" })
           .eq("user_id", user.id)
           .in("status", ["connecting", "completing"])
-          .is("last_error", null);
+          .or("last_error.is.null,last_error.in.(authorization_pending,stale_completion_claim)");
         connection.status = "error";
         connection.last_error = "authorization_not_confirmed";
       }
