@@ -29,6 +29,7 @@ export type GoogleCalendarUiStateId =
   | 'partial_failure'
   | 'temporary_failure'
   | 'authorization_cancelled'
+  | 'authorization_not_confirmed'
   | 'authorization_revoked'
   | 'reconnect_required'
   | 'retry_in_progress'
@@ -251,6 +252,14 @@ const VIEWS: Record<GoogleCalendarUiStateId, GoogleCalendarStateView> = {
     'retry_connection',
     'Tentar novamente',
   ),
+  authorization_not_confirmed: view(
+    'authorization_not_confirmed',
+    'Conexão não finalizada',
+    'A autorização não foi confirmada pelo Google Agenda. Inicie a conexão novamente.',
+    'warning',
+    'retry_connection',
+    'Tentar novamente',
+  ),
   authorization_revoked: view(
     'authorization_revoked',
     'Autorização removida',
@@ -344,6 +353,7 @@ export function deriveGoogleCalendarState({
   if (statusErrorCode || flowErrorCode) return VIEWS.temporary_failure;
   if (!connection) return VIEWS.disconnected;
 
+  if (connection.error_code === 'authorization_not_confirmed') return VIEWS.authorization_not_confirmed;
   if (connection.status === 'connecting') return VIEWS.waiting_oauth;
   if (connection.status === 'completing') return VIEWS.returning_from_oauth;
   if (connection.status === 'disconnected') return VIEWS.disconnected;
@@ -354,7 +364,7 @@ export function deriveGoogleCalendarState({
   }
   if (connection.status === 'error') {
     if (connection.error_code === 'authorization_revoked') return VIEWS.authorization_revoked;
-    if (connection.error_code === 'authorization_not_confirmed') return VIEWS.authorization_cancelled;
+    if (connection.error_code === 'authorization_not_confirmed') return VIEWS.authorization_not_confirmed;
     return VIEWS.temporary_failure;
   }
   if (connection.status !== 'connected') return VIEWS.fallback;

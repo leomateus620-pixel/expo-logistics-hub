@@ -179,11 +179,11 @@ export function useGoogleCalendarConnection() {
     },
   });
 
-  const completeConnection = useCallback(async (activeOrgId: string) => {
-    for (let attempt = 0; attempt < 6; attempt += 1) {
+  const completeConnection = useCallback(async (activeOrgId: string, attempts = 6) => {
+    for (let attempt = 0; attempt < attempts; attempt += 1) {
       const response = await invoke<CompleteResponse>('complete', { orgId: activeOrgId });
       if (!response.pending) return response;
-      await new Promise((resolve) => window.setTimeout(resolve, 1600));
+      await new Promise((resolve) => window.setTimeout(resolve, attempt < 3 ? 1400 : 2400));
     }
     throw new GoogleCalendarFlowError('authorization_not_confirmed');
   }, []);
@@ -226,7 +226,7 @@ export function useGoogleCalendarConnection() {
         }
 
         setFlowPhase('returning');
-        return completeConnection(orgId);
+        return completeConnection(orgId, popupResult.status === 'closed' ? 10 : 6);
       })();
 
       connectPromiseRef.current = operation;

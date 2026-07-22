@@ -45,6 +45,9 @@ describe('máquina de estados do Google Agenda', () => {
     }],
     ['temporary_failure', { statusErrorCode: 'request_failed' }],
     ['authorization_cancelled', { flowPhase: 'cancelled' }],
+    ['authorization_not_confirmed', {
+      connection: { ...connected, status: 'connecting', error_code: 'authorization_not_confirmed' },
+    }],
     ['authorization_revoked', {
       connection: { ...connected, status: 'reconnect_required', error_code: 'authorization_revoked' },
     }],
@@ -85,7 +88,7 @@ describe('máquina de estados do Google Agenda', () => {
   it('diferencia cancelamento, revogação e falha temporária no status de backend', () => {
     expect(derive({
       connection: { ...connected, status: 'error', error_code: 'authorization_not_confirmed' },
-    }).id).toBe('authorization_cancelled');
+    }).id).toBe('authorization_not_confirmed');
     expect(derive({
       connection: { ...connected, status: 'error', error_code: 'authorization_revoked' },
     }).id).toBe('authorization_revoked');
