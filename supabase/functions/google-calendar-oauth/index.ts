@@ -151,6 +151,17 @@ function safeServerError(error: unknown) {
   return "request_failed";
 }
 
+function redactConnectionSecrets(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(redactConnectionSecrets);
+  if (!value || typeof value !== "object") return value;
+  const redacted: Record<string, unknown> = {};
+  for (const [key, entry] of Object.entries(value as Record<string, unknown>)) {
+    if (["connection_key", "connectionKey", "connection_api_key", "connectionApiKey", "app_user_connection_key", "appUserConnectionKey"].includes(key)) continue;
+    redacted[key] = redactConnectionSecrets(entry);
+  }
+  return redacted;
+}
+
 async function prepareInitialBackfill(
   db: ReturnType<typeof admin>,
   userId: string,
@@ -276,8 +287,7 @@ Deno.serve(async (req) => {
         updated_at: now,
         connected_at: now,
       }, { onConflict: "user_id" });
-      const { connection_key: _connectionKey, connectionKey: _camelConnectionKey, connection_api_key: _apiConnectionKey, connectionApiKey: _camelApiConnectionKey, ...safeOauth } = oauth as Record<string, unknown>;
-      return json(safeOauth);
+      return json(redactConnectionSecrets(oauth) as Record<string, unknown>);
     }
 
     if (action === "reset") {
