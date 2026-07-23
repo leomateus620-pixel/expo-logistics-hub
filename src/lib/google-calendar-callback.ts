@@ -2,6 +2,7 @@ const GOOGLE_CALLBACK_KEYS = [
   'google',
   'google_error',
   'google_result',
+  'result',
   'error',
   'error_description',
   'code',
