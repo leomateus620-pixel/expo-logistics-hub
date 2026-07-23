@@ -1478,14 +1478,11 @@ export type Database = {
       }
       google_calendar_connections: {
         Row: {
-          active_oauth_attempt_id: string | null
           backfill_done: number
           backfill_total: number
-          connected_at: string | null
-          connection_generation: string | null
+          connected_at: string
           connection_key: string | null
           created_at: string
-          error_code: string | null
           google_email: string | null
           last_error: string | null
           last_sync_at: string | null
@@ -1495,17 +1492,13 @@ export type Database = {
           status: string
           updated_at: string
           user_id: string
-          verified_at: string | null
         }
         Insert: {
-          active_oauth_attempt_id?: string | null
           backfill_done?: number
           backfill_total?: number
-          connected_at?: string | null
-          connection_generation?: string | null
+          connected_at?: string
           connection_key?: string | null
           created_at?: string
-          error_code?: string | null
           google_email?: string | null
           last_error?: string | null
           last_sync_at?: string | null
@@ -1515,17 +1508,13 @@ export type Database = {
           status?: string
           updated_at?: string
           user_id: string
-          verified_at?: string | null
         }
         Update: {
-          active_oauth_attempt_id?: string | null
           backfill_done?: number
           backfill_total?: number
-          connected_at?: string | null
-          connection_generation?: string | null
+          connected_at?: string
           connection_key?: string | null
           created_at?: string
-          error_code?: string | null
           google_email?: string | null
           last_error?: string | null
           last_sync_at?: string | null
@@ -1535,86 +1524,10 @@ export type Database = {
           status?: string
           updated_at?: string
           user_id?: string
-          verified_at?: string | null
         }
         Relationships: [
-          {
-            foreignKeyName: "google_calendar_connections_active_oauth_attempt_id_fkey"
-            columns: ["active_oauth_attempt_id"]
-            isOneToOne: false
-            referencedRelation: "google_calendar_oauth_attempts"
-            referencedColumns: ["id"]
-          },
           {
             foreignKeyName: "google_calendar_connections_org_id_fkey"
-            columns: ["org_id"]
-            isOneToOne: false
-            referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      google_calendar_oauth_attempts: {
-        Row: {
-          callback_path: string
-          consumed_at: string | null
-          created_at: string
-          error_code: string | null
-          exchange_code_hash: string | null
-          expires_at: string
-          id: string
-          next_path: string
-          oauth_session_id_hash: string | null
-          org_id: string
-          prior_connection_status: string | null
-          prior_error_code: string | null
-          provider_state_hash: string | null
-          return_origin: string
-          status: string
-          updated_at: string
-          user_id: string
-        }
-        Insert: {
-          callback_path: string
-          consumed_at?: string | null
-          created_at?: string
-          error_code?: string | null
-          exchange_code_hash?: string | null
-          expires_at: string
-          id?: string
-          next_path: string
-          oauth_session_id_hash?: string | null
-          org_id: string
-          prior_connection_status?: string | null
-          prior_error_code?: string | null
-          provider_state_hash?: string | null
-          return_origin: string
-          status: string
-          updated_at?: string
-          user_id: string
-        }
-        Update: {
-          callback_path?: string
-          consumed_at?: string | null
-          created_at?: string
-          error_code?: string | null
-          exchange_code_hash?: string | null
-          expires_at?: string
-          id?: string
-          next_path?: string
-          oauth_session_id_hash?: string | null
-          org_id?: string
-          prior_connection_status?: string | null
-          prior_error_code?: string | null
-          provider_state_hash?: string | null
-          return_origin?: string
-          status?: string
-          updated_at?: string
-          user_id?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "google_calendar_oauth_attempts_org_id_fkey"
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "organizations"
@@ -1662,12 +1575,33 @@ export type Database = {
           updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "google_calendar_event_map_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "cronograma_eventos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "google_calendar_event_map_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "cronograma_eventos_full"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "google_calendar_event_map_subevent_id_fkey"
+            columns: ["subevent_id"]
+            isOneToOne: false
+            referencedRelation: "cronograma_subeventos"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       google_sync_outbox: {
         Row: {
           attempts: number
-          connection_generation: string | null
           created_at: string
           dedupe_key: string
           event_id: string | null
@@ -1685,7 +1619,6 @@ export type Database = {
         }
         Insert: {
           attempts?: number
-          connection_generation?: string | null
           created_at?: string
           dedupe_key: string
           event_id?: string | null
@@ -1703,7 +1636,6 @@ export type Database = {
         }
         Update: {
           attempts?: number
-          connection_generation?: string | null
           created_at?: string
           dedupe_key?: string
           event_id?: string | null
@@ -1721,10 +1653,31 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "google_sync_outbox_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "cronograma_eventos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "google_sync_outbox_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "cronograma_eventos_full"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "google_sync_outbox_org_id_fkey"
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "google_sync_outbox_subevent_id_fkey"
+            columns: ["subevent_id"]
+            isOneToOne: false
+            referencedRelation: "cronograma_subeventos"
             referencedColumns: ["id"]
           },
         ]
@@ -3890,18 +3843,6 @@ export type Database = {
           table_name: string
         }[]
       }
-      claim_google_sync_batch: {
-        Args: { batch_size?: number }
-        Returns: Database["public"]["Tables"]["google_sync_outbox"]["Row"][]
-      }
-      complete_google_sync_task: {
-        Args: {
-          target_is_initial_backfill: boolean
-          target_task_id: string
-          target_user_id: string
-        }
-        Returns: boolean
-      }
       create_org_with_member: { Args: { org_nome: string }; Returns: string }
       cronograma_delete_subevent: {
         Args: { expected_lock_version?: number; subevent_id: string }
@@ -3944,10 +3885,6 @@ export type Database = {
           user_id: string
         }[]
       }
-      google_user_eligible_for_event: {
-        Args: { _event_id: string; _org_id: string; _user_id: string }
-        Returns: boolean
-      }
       has_capability: {
         Args: { _capability: string; _org_id: string; _user_id: string }
         Returns: boolean
@@ -3962,17 +3899,6 @@ export type Database = {
       is_org_member: {
         Args: { _org_id: string; _user_id: string }
         Returns: boolean
-      }
-      queue_google_sync_for_user: {
-        Args: {
-          _event_id: string
-          _initial_backfill?: boolean
-          _operation: string
-          _org_id: string
-          _payload_hash?: string | null
-          _user_id: string
-        }
-        Returns: undefined
       }
       move_to_dlq: {
         Args: {
