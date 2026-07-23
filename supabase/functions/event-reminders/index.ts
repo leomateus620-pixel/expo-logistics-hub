@@ -203,7 +203,7 @@ async function scheduleReminders(supa: ReturnType<typeof db>) {
 
     if (!recipients.size) continue;
 
-    for (const offsetMinutes of [1440, 120]) {
+    for (const offsetMinutes of [1440, 120, 60]) {
       const scheduledFor = new Date(normalized.value.scheduleAt.getTime() - offsetMinutes * 60_000);
       if (scheduledFor <= now) continue;
       for (const recipient of recipients.values()) {
@@ -386,7 +386,7 @@ async function sendPending(supa: ReturnType<typeof db>) {
           idempotencyKey: `reminder-${delivery.event_id}-${delivery.event_version}-${delivery.offset_minutes}-${delivery.user_id}`,
           templateData: {
             eventTitle: event.title,
-            reminderType: delivery.offset_minutes >= 1440 ? "24h" : "2h",
+            reminderType: delivery.offset_minutes >= 1440 ? "24h" : delivery.offset_minutes >= 120 ? "2h" : "1h",
             dateLabel: normalized.value.dateLong,
             timeLabel: normalized.value.timeLabel,
             location: event.location ?? null,

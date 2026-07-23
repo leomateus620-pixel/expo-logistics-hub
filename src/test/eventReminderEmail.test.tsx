@@ -62,6 +62,22 @@ describe('e-mail de lembrete de evento', () => {
     expect(text).not.toContain('Ver também no Google Agenda');
   });
 
+  it('renderiza o lembrete de 1 hora com título e intro dedicados', async () => {
+    const data: EventReminderTemplateData = {
+      ...timedReminder,
+      reminderType: '1h',
+      subevents: [],
+      pendingItems: [],
+    };
+    const html = await renderReminder(data);
+    const text = await renderReminder(data, true);
+    expect(html).toContain('Seu evento começa em 1 hora');
+    expect(text).toMatch(/começa em 1 hora/i);
+    expect(`${html}\n${text}`).not.toMatch(/\b(?:Invalid Date|undefined|null|NaN)\b/i);
+  });
+
+
+
   it('distingue evento de dia inteiro sem inventar horário', async () => {
     const data: EventReminderTemplateData = {
       ...timedReminder,
