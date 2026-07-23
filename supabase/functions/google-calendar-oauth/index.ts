@@ -20,7 +20,7 @@ const APP_ROUTE = "/cronograma-eventos";
 const CALLBACK_ROUTE = "/google-calendar/callback";
 const ATTEMPT_TTL_MS = 10 * 60 * 1000;
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-const CONTRACT_VERSION = "2026-07-23.observe-keepalive";
+const CONTRACT_VERSION = "2026-07-23.verified-probe";
 
 type AdminClient = ReturnType<typeof admin>;
 
@@ -248,7 +248,12 @@ function safeServerError(error: unknown) {
     return "invalid_callback";
   }
   if (message.startsWith("oauth_exchange_failed")) return "authorization_failed";
+  if (message.startsWith("google_probe_failed:")) {
+    const [, safeCode] = message.split(":");
+    return safeCode || "authorization_not_confirmed";
+  }
   if (message === "google_probe_failed") return "authorization_not_confirmed";
+  if (message.startsWith("provider_")) return message;
   if (message.includes("calendar") || message.includes("google_api")) return "calendar_preparation_failed";
   if (message.includes("backfill")) return "backfill_failed";
   if (message.startsWith("disconnect_failed")) return "provider_unavailable";
@@ -260,6 +265,8 @@ function errorHttpStatus(code: string) {
   if (code === "callback_replayed") return 409;
   if (code === "invalid_callback") return 400;
   if (code === "authorization_expired") return 410;
+  if (code === "provider_rate_limited") return 429;
+  if (["provider_unauthorized", "provider_bad_request", "provider_not_found", "provider_conflict", "provider_rejected"].includes(code)) return 422;
   if (["authorization_failed", "authorization_not_confirmed"].includes(code)) return 422;
   return 503;
 }
