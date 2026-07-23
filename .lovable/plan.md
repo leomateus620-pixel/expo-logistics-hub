@@ -1,46 +1,96 @@
-## Diagnóstico (a confirmar no primeiro passo)
+# Plano — OAuth e sincronização Google Agenda
 
-Nos logs mais recentes do edge function `google-calendar-oauth` (23/07 00:57) aparece `oauth_start_succeeded` mas **nunca** aparece `oauth_callback_received`. O toast que o usuário recebe ("O retorno da autorização não pôde ser validado") é gerado em `src/pages/GoogleCalendarCallbackPage.tsx` quando `parseGoogleCalendarCallbackFeedback` classifica o retorno como `failed:invalid_callback`.
+## Objetivo
+Descobrir o formato real do retorno do App User Connector (hoje o handshake falha entre `oauth_start_succeeded` e `connection_key_retrieved`), corrigir o handshake com base em evidência, restaurar o worker autenticado e validar ponta-a-ponta.
 
-Essa classificação (em `src/lib/google-calendar-callback.ts`) exige três coisas simultâneas no query string do callback: `code`, `state` **e** `attempt`. O `attempt` é gerado por nós e colocado no `return_url` que enviamos ao gateway em `resolveReturnUrl` (`supabase/functions/google-calendar-oauth/index.ts`). A hipótese mais forte é que o `connector-gateway.lovable.dev` está descartando o query string do `return_url` antes de anexar `code`/`state`, então o `attempt` chega vazio e a página aborta antes de chamar `complete`.
+## Fase 1 — Gate de evidência (antes de qualquer correção definitiva)
 
-O primeiro passo do plano é confirmar isso instrumentando o callback (log dos params recebidos) e capturar uma nova tentativa antes de aplicar a correção definitiva.
+1. Nova ação autenticada `observe_callback` em `supabase/functions/google-calendar-oauth/index.ts`:
+   - Resolve usuário/org/tentativa por `auth.uid()` + tentativa ativa.
+   - Aceita só metadados sanitizados: nomes de parâmetros presentes, flags de presença (`hasCode/hasState/hasAttempt/hasError`), comprimentos, transporte (`query|hash|message`), rota, `contract_version`.
+   - Nunca recebe/loga valores; grava em `google_calendar_oauth_attempts` (coluna JSONB `callback_observation`).
+2. `GoogleCalendarCallbackPage.tsx`:
+   - Capturar a observação sanitizada, chamar `observe_callback`, limpar URL, então interpretar.
+   - Remover o `console.info('google_calendar_callback_params', …)` atual.
+3. Adicionar `contract_version` no retorno de `start`, `complete`, `status`.
+4. Publicar preview autorizado e reproduzir uma autorização limpa com `leomateus620@gmail.com`. Capturar (sem valores):
+   - Campos de `/oauth2/authorize`.
+   - Parâmetros que chegam ao callback.
+   - Se `complete` foi chamado.
+   - Status e nomes de campos de `/oauth2/exchange`.
+   - Estrutura de `GET /api/v1/app-users/connections?connector_id=google_calendar&app_user_id=<user.id>`.
+5. Repetir uma vez em produção só se o preview divergir.
 
-## Correção proposta
+Decisão do handshake final segue o retorno comprovado:
 
-Parar de depender do query string do `return_url` para transportar o `attempt`. Vamos amarrar o `attempt_id` ao `state` do OAuth (que o gateway sempre preserva) e resolver o attempt a partir do `state` recebido.
+| Retorno comprovado | Implementação |
+| --- | --- |
+| Endpoint `connections` devolve a conexão final por `app_user_id` | Recuperação server-side por usuário (preferido) |
+| Callback devolve `code`+`state` | Exchange server-side com validação integral do state |
+| Callback devolve só `code` | Aceitar só se `exchange`/lookup comprovar vínculo com o mesmo `app_user_id` |
+| `web_message` com código verificável | Mesmo connector com origem e `event.source` estritos |
+| Só chave/token chega ao browser | Rejeitar |
+| Nenhum modo seguro | Declarar App User Connector inadequado; substituir por OAuth Google server-side na mesma rota |
 
-### Backend — `supabase/functions/google-calendar-oauth/index.ts` e `_shared/googleCalendarGateway.ts`
+## Fase 2 — Correção permanente do handshake
 
-- Deixar de setar `attempt` no `return_url` (`resolveReturnUrl`).
-- Após `startOAuth`, extrair o `state` que o gateway devolveu, gravar `provider_state_hash` (já é feito) e também guardar o `state` cru em uma nova coluna indexada `provider_state_lookup` (hash SHA-256 diferente/mesmo hash com índice único) na tabela `google_calendar_oauth_attempts`, para busca reversa por `state`.
-- Na `action: "complete"`:
-  - Aceitar payload `{ code, state }` sem `attemptId`.
-  - Buscar o attempt por `provider_state_lookup = sha256(state)` + `user_id` + status `waiting_authorization` + `expires_at > now`.
-  - Continuar validando `Origin` = `return_origin` e o `provider_state_hash` já existente.
-  - Manter a proteção contra replay (transição atômica para `completing`).
+- Manter rotas `/cronograma-eventos` e `/google-calendar/callback` e o App User Connector.
+- Manter tipos separados `OAuthSessionId`, `OAuthExchangeCode`, `FinalizedConnectionKey`. `session_id` fica só como correlação hash; nunca vira `X-Connection-Api-Key`.
+- Abertura atômica da autorização:
+  - Uma tentativa ativa por `user_id`; expirar anteriores em todas as orgs.
+  - Validar associação ativa à organização.
+  - Transição `starting → waiting_authorization`; não tocar em `connected_at`.
+- Mesmo `auth.uid()` em `authorize`, lookup/exchange, storage, `status`, sync.
+- Exigir `Origin` presente e idêntico à origem permitida, rota exata, tentativa ativa, validade temporal, org ativa.
+- Validar `state` sempre que o contrato o devolver. Callback sem `state` só aceito quando o lookup por `app_user_id` comprovar propriedade.
+- Claim atômico da tentativa antes de exchange/lookup; anti-replay por estado + hash do código quando aplicável.
+- Remover aliases especulativos (`connection_key ?? api_key ?? connection_api_key`). Schema estrito derivado da resposta real.
+- `connected` só depois de: chave final obtida, probe Calendar 2xx, conta Google identificada, calendário "FENASOJA — Cronograma" criado/recuperado, `secondary_calendar_id` acessível, org+user revalidados.
+- Callback exibe "Validando autorização" → "Preparando calendário"; sucesso só após confirmação do backend.
+- `status` reverifica conexões antigas/suspeitas e retorna `reconnect_required` se revogadas.
 
-### Front — `src/lib/google-calendar-callback.ts` + `GoogleCalendarCallbackPage.tsx` + hook
+Interfaces:
+- `start` → `authorization_url, attempt_id, expires_at, contract_version`.
+- `observe_callback` → só metadados sanitizados.
+- `complete` → payload do contrato real; nunca aceita chave enviada pelo browser.
+- `status` → conexão verificada, progresso da fila, última sync, `contract_version`.
 
-- `parseGoogleCalendarCallbackFeedback`: aceitar callback quando `code` e `state` existirem, mesmo sem `attempt` (o attempt vira opcional só para telemetria/`postMessage`).
-- `GoogleCalendarCallbackPage`: chamar `invokeOAuth('complete', { code, state })` (sem `attemptId`). Se veio `attempt`, ainda o repassa para o `postMessage` para o hook casar com `activeAttemptRef`.
-- `useGoogleCalendarConnection`: aceitar `postMessage` sem `attemptId`; nesse caso confia no `waitForBackendConfirmation`.
+## Fase 3 — Calendário, backfill, worker
 
-### Instrumentação (passo 1, antes da correção)
+- Confirmar escopos concedidos: `calendar` (criação via POST), `calendar.events`, `openid`, `profile`.
+- Recuperação/criação idempotente por `secondary_calendar_id` e busca em `users/me/calendarList`.
+- Auditar `leomateus620@gmail.com`: associação ativa, `cronograma_evento_comissoes`, eventos com `start_date`, admins com `full_access`.
+- Confirmar dedupe da outbox e do Google por `user_id + org_id + event_id + connection_generation`.
+- Worker:
+  - Restaurar `verify_jwt = true` em `supabase/config.toml` para `google-sync-worker`.
+  - `invoke_google_sync_worker()` volta a usar service-role do Vault; remover `internal_worker_tokens` e o header `X-Worker-Token`.
+  - Manter recuperação de `in_flight` vencido, tentativas limitadas, dead-letter.
+- Auditar `supabase_migrations.schema_migrations` antes de qualquer SQL. As migrations `20260722234000` e `20260723004740` são quase duplicadas — não reaplicar cegamente; nova migration só aditiva (coluna `callback_observation`).
 
-Adicionar no `GoogleCalendarCallbackPage` um `console.info('google_calendar_callback_params', Object.fromEntries(params))` **antes** do `history.replaceState`, e no edge function um `diagnostic("oauth_callback_params_missing", { hasCode, hasState, hasAttempt })` quando um dos três faltar. Pedir ao usuário uma nova tentativa para confirmar exatamente qual param o gateway está devolvendo. Se por acaso o gateway estiver preservando `attempt` e o problema for outro (ex.: `Origin` ausente porque o gateway redireciona por navegação top-level), essa telemetria mostra na hora e o resto do plano se ajusta antes do deploy.
+## Fase 4 — Validação e publicação
 
-## Passos
+- Corrigir os 3 testes focados atualmente quebrados.
+- Cobrir: callback real, `state` ausente/mismatch, tentativa ausente, replay, `Origin`/rota incorreta, expiração, dois fluxos simultâneos, usuários/orgs distintos.
+- Cobrir: lookup/exchange com schema real, proibição de session ID como chave, probe obrigatório, calendário idempotente.
+- Cobrir: admins, comissões, outbox duplicada, retries, dead-letter, acesso revogado, desconexão/reconexão, isolamento entre dois usuários.
+- Rodar: lint, `tsc --noEmit`, unit, integração, build de produção, varredura de segredos no diff/histórico da branch.
+- Ordem de publicação: migration aditiva → Edge Functions → frontend. Edge nova mantém compat temporária com frontend antigo.
+- E2E real com 2 usuários e 2 contas Google: conectar, calendário via API, criar/editar/remover evento, `google_calendar_event_map`, `extendedProperties.private.fenasoja_event_id`, desconectar/reconectar, provar isolamento.
+- Rollback: frontend, Edge e cron reverssíveis independentemente; migrations aditivas; nenhuma conexão válida apagada automaticamente.
 
-1. **Instrumentar e reproduzir** (front + edge function) e pedir ao Leonardo uma nova tentativa de conexão. Ler os logs do `google-calendar-oauth` e o console do popup para confirmar quais parâmetros o gateway devolve.
-2. **Migração** `google_calendar_oauth_attempts`: adicionar coluna `provider_state_lookup TEXT` + índice único parcial `(user_id, provider_state_lookup) WHERE status = 'waiting_authorization'`.
-3. **Edge function**: parar de anexar `attempt` no `return_url`; gravar `provider_state_lookup`; refatorar `action: complete` para buscar attempt por `state`.
-4. **Front**: relaxar o parser do callback, ajustar o POST de `complete` e o `postMessage`.
-5. **Redeploy** de `google-calendar-oauth` e teste ponta-a-ponta com a conta `leomateus620@gmail.com` (start → popup → callback → `oauth_callback_received` no log → `connection_key_retrieved` → `connected`).
-6. **Limpar** registros travados de tentativas anteriores desse usuário/org antes do teste (`google_calendar_oauth_attempts` em `waiting_authorization` e `google_calendar_connections.status IN ('starting','waiting_authorization','completing','error')`).
+## Detalhes técnicos
+
+- Migration aditiva:
+  ```sql
+  ALTER TABLE public.google_calendar_oauth_attempts
+    ADD COLUMN IF NOT EXISTS callback_observation JSONB;
+  ```
+- `supabase/config.toml`: `[functions.google-sync-worker] verify_jwt = true`.
+- Remover `internal_worker_tokens` do fluxo (tabela pode continuar no DB por enquanto; drop só depois do worker estabilizado).
+- Contrato `contract_version` como string curta (ex.: `"2026-07-23"`), incluída em start/complete/status/observe.
+- Sanitização do observe: `{ transport, params: [{name, length}], hasCode, hasState, hasAttempt, hasError, route, contract_version }` — sem valores.
 
 ## Fora de escopo
-
-- Não mexer no `google-sync-worker` nem no fluxo `X-Worker-Token` (já validado, respondendo 200).
-- Não mexer em UI do widget além do necessário para o parser do callback.
-- Não trocar `response_mode` para popup/postMessage do próprio gateway — mantemos o fluxo redirect atual, apenas robustecemos a validação.
+- Rotas de UI além do necessário para o callback.
+- Mudança do provider social (segue Google via App User Connector, exceto se Fase 1 provar inadequação).
+- Alterações no fluxo de lembretes por e-mail (já validado).

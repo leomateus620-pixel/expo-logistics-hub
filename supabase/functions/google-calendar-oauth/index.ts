@@ -20,6 +20,7 @@ const APP_ROUTE = "/cronograma-eventos";
 const CALLBACK_ROUTE = "/google-calendar/callback";
 const ATTEMPT_TTL_MS = 10 * 60 * 1000;
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const CONTRACT_VERSION = "2026-07-23.observe";
 
 type AdminClient = ReturnType<typeof admin>;
 
@@ -501,7 +502,7 @@ Deno.serve(async (req) => {
           httpStatus: 200,
           responseFields: oauth.responseFields,
         });
-        return json({ authorization_url: oauth.authorizationUrl, attempt_id: attemptId, expires_at: expiresAt });
+        return json({ authorization_url: oauth.authorizationUrl, attempt_id: attemptId, expires_at: expiresAt, contract_version: CONTRACT_VERSION });
       } catch (error) {
         const code = safeServerError(error);
         await db.from("google_calendar_oauth_attempts").update({ status: "error", error_code: code })
@@ -514,6 +515,65 @@ Deno.serve(async (req) => {
         }).eq("user_id", user.id).eq("org_id", orgId).eq("active_oauth_attempt_id", attemptId);
         throw error;
       }
+    }
+
+    if (action === "observe_callback") {
+      // Evidence gate: record sanitized metadata about what the connector
+      // gateway actually returned to the callback. Never accept raw values.
+      const rawObs = (body.observation && typeof body.observation === "object")
+        ? body.observation as Record<string, unknown>
+        : {};
+      const paramNamesInput = Array.isArray(rawObs.params) ? rawObs.params : [];
+      const params = paramNamesInput.slice(0, 32).map((entry) => {
+        const item = (entry && typeof entry === "object") ? entry as Record<string, unknown> : {};
+        const name = typeof item.name === "string" ? item.name.slice(0, 64) : "";
+        const length = typeof item.length === "number" && Number.isFinite(item.length)
+          ? Math.max(0, Math.min(4096, Math.floor(item.length)))
+          : 0;
+        return { name, length };
+      }).filter((p) => p.name);
+      const observation = {
+        contract_version: CONTRACT_VERSION,
+        client_contract_version: typeof rawObs.contract_version === "string" ? String(rawObs.contract_version).slice(0, 64) : null,
+        transport: typeof rawObs.transport === "string" ? String(rawObs.transport).slice(0, 16) : "query",
+        route: typeof rawObs.route === "string" ? String(rawObs.route).slice(0, 128) : null,
+        has_code: Boolean(rawObs.hasCode),
+        has_state: Boolean(rawObs.hasState),
+        has_attempt: Boolean(rawObs.hasAttempt),
+        has_error: Boolean(rawObs.hasError),
+        params,
+        observed_at: new Date().toISOString(),
+      };
+      const { data: activeAttempt, error: activeError } = await db.from("google_calendar_oauth_attempts")
+        .select("id, user_id, callback_observation")
+        .eq("user_id", user.id)
+        .in("status", ["waiting_authorization", "starting", "completing"])
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      assertDb(activeError, "observation_lookup_failed");
+      if (activeAttempt) {
+        const prior = Array.isArray((activeAttempt.callback_observation as { history?: unknown } | null)?.history)
+          ? ((activeAttempt.callback_observation as { history: unknown[] }).history)
+          : [];
+        const merged = { latest: observation, history: [...prior, observation].slice(-10) };
+        await db.from("google_calendar_oauth_attempts")
+          .update({ callback_observation: merged })
+          .eq("id", activeAttempt.id)
+          .eq("user_id", user.id);
+      }
+      diagnostic("oauth_callback_observed", {
+        user: shortUserId(user.id),
+        attemptId: activeAttempt?.id ?? null,
+        transport: observation.transport,
+        hasCode: observation.has_code,
+        hasState: observation.has_state,
+        hasAttempt: observation.has_attempt,
+        hasError: observation.has_error,
+        paramCount: params.length,
+        paramNames: params.map((p) => p.name),
+      });
+      return json({ ok: true, contract_version: CONTRACT_VERSION });
     }
 
     if (action === "complete") {
@@ -629,7 +689,7 @@ Deno.serve(async (req) => {
           exchanged.connectionKey,
           connection.secondary_calendar_id,
         );
-        return json({ ok: true, calendarId: finalized.calendarId, backfill: finalized.backfill });
+        return json({ ok: true, calendarId: finalized.calendarId, backfill: finalized.backfill, contract_version: CONTRACT_VERSION });
       } catch (error) {
         const code = safeServerError(error);
         await db.from("google_calendar_oauth_attempts").update({ status: "error", error_code: code })
@@ -794,6 +854,7 @@ Deno.serve(async (req) => {
         connection: safeConnection,
         pending: counts.queued + counts.inFlight + counts.failed,
         outbox: counts,
+        contract_version: CONTRACT_VERSION,
       });
     }
 

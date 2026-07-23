@@ -1598,6 +1598,7 @@ export type Database = {
       }
       google_calendar_oauth_attempts: {
         Row: {
+          callback_observation: Json | null
           callback_path: string
           consumed_at: string | null
           created_at: string
@@ -1617,6 +1618,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          callback_observation?: Json | null
           callback_path: string
           consumed_at?: string | null
           created_at?: string
@@ -1636,6 +1638,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          callback_observation?: Json | null
           callback_path?: string
           consumed_at?: string | null
           created_at?: string
