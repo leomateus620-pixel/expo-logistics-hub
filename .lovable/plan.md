@@ -1,55 +1,97 @@
-Vou tratar isso como uma correção única de ponta a ponta, não como novas fases experimentais.
+## Marco real identificado
 
-**Evidência já confirmada**
-- O callback do Google está chegando no app: a tentativa mais recente registrou `attempt` + `code` + `success`.
-- O retorno não trouxe `state` (`has_state: false`), mas o código atual exige `state` para prosseguir.
-- O callback também chegou sem sessão autenticada do app (`auth_present: false`), mas o endpoint `complete` atualmente exige usuário autenticado antes de finalizar.
-- Resultado: a conexão fica em `waiting_authorization`, não troca o `code` por uma chave de conexão, não cria/verifica o calendário FENASOJA e não dispara a sincronização dos eventos.
+O último marco comprovado no backend foi:
 
-**Plano de correção definitiva**
-1. **Finalizar OAuth pelo `attemptId`, sem depender da sessão do popup**
-   - Atualizar o callback para considerar válido o retorno `attempt + code + success`, mesmo sem `state`.
-   - Atualizar o backend para permitir `complete` anônimo somente quando houver `attemptId` explícito válido, pendente, não expirado e vinculado à conexão ativa.
-   - Manter validação forte: tentativa única, status correto, expiração, caminho de callback correto e consumo atômico para impedir replay.
+1. O popup retornou para `/google-calendar/callback` com `attempt` e `code` presentes.
+2. O backend trocou o `code` e armazenou uma `connection_key` na tabela de conexões.
 
-2. **Manter `state` quando existir, mas não bloquear quando o gateway não devolve**
-   - Se `state` vier no callback, comparar com o hash salvo.
-   - Se `state` não vier, confiar no `attemptId` gerado pelo servidor e no `code` one-time do gateway para finalizar a autorização.
+O marco que **não foi concluído** foi a validação Google pós-troca:
 
-3. **Garantir gravação da conexão e calendário antes de mostrar sucesso**
-   - Trocar o `code` pelo `connection_key`.
-   - Salvar a chave na conexão correta do usuário/organização.
-   - Provar acesso ao Google Agenda.
-   - Criar ou recuperar o calendário secundário “FENASOJA — Cronograma”.
-   - Só então marcar a conexão como `connected`/`synchronizing` com `secondary_calendar_id` e `verified_at` preenchidos.
+- `google_probe_succeeded` não apareceu nos logs.
+- A conexão ficou com `status = error`, `error_code = authorization_not_confirmed`.
+- Não existe `secondary_calendar_id`, `verified_at`, `connected_at` nem evento real sincronizado.
+- Há 63 itens na fila, mas eles não podem ser processados enquanto a conexão não tiver calendário verificado e geração ativa.
 
-4. **Sincronizar todos os eventos existentes após conectar**
-   - Enfileirar todos os eventos do Cronograma com data, respeitando a regra já existente de acesso.
-   - Acionar o worker imediatamente após a conexão.
-   - Corrigir qualquer ponto que impeça o worker de sair de `queued` para eventos reais no Google Agenda.
+## Correção definitiva proposta
 
-5. **Limpar o estado quebrado atual antes do novo teste**
-   - Encerrar tentativas presas em `waiting_authorization`.
-   - Restaurar a conexão do Leonardo para estado limpo de reconexão.
-   - Preservar dados de cronograma/eventos; a limpeza será apenas do estado OAuth/sync travado.
+### 1. Tornar o probe Google observável e resiliente
 
-6. **Validação final obrigatória**
-   - Testar o endpoint de status.
-   - Fazer uma nova conexão pelo widget.
-   - Confirmar no banco que a conexão ficou com `secondary_calendar_id` e `verified_at`.
-   - Rodar o worker.
-   - Confirmar que os registros foram criados em `google_calendar_event_map` e que a fila não ficou travada.
-   - Validar um evento específico no Google Agenda conectado, incluindo “ENCONTRO REGIONAL DE INOVAÇÃO E EMPREENDEDORISMO” se ele estiver elegível para sincronização.
+Alterar o helper do Google Calendar para que `probeConnection` não retorne apenas `true/false`.
 
-**Arquivos que serão ajustados**
-- `src/lib/google-calendar-callback.ts`
-- `src/pages/GoogleCalendarCallbackPage.tsx`
-- `supabase/functions/google-calendar-oauth/index.ts`
-- Se necessário após validação: `supabase/functions/google-sync-worker/index.ts`
+Ele passará a retornar um resultado estruturado:
 
-**Critério de pronto**
-- O botão “Conectar Google Agenda” termina em sucesso real.
-- A conta conectada aparece no widget.
-- O calendário FENASOJA é criado/recuperado no Google Agenda.
-- Eventos do Cronograma aparecem no Google Agenda conectado.
-- A interface não fica mais presa em “Aguardando autorização” ou “Confirmando autorização”.
+```ts
+{
+  ok: boolean,
+  stage: 'calendar_list_probe',
+  status: number | null,
+  safeCode: string,
+  attempts: number
+}
+```
+
+Também terá retry curto com backoff para cobrir atraso de propagação da chave recém-gerada pelo conector.
+
+### 2. Só marcar conexão como ativa após provas reais
+
+No `google-calendar-oauth`:
+
+- registrar logs sanitizados para cada marco: callback recebido, code trocado, probe Google, calendário pronto, backfill criado;
+- se o probe falhar, salvar `error_code` preciso, como `provider_unauthorized`, `provider_bad_request`, `provider_unavailable`, etc.;
+- manter a conexão sem `connected_at` e sem `verified_at` até o Google responder 2xx e o calendário secundário estar acessível.
+
+### 3. Garantir calendário secundário e sincronização inicial
+
+Após probe 2xx:
+
+- recuperar ou criar o calendário “FENASOJA — Cronograma”;
+- validar acesso ao calendário;
+- criar `connection_generation`;
+- enfileirar os eventos elegíveis;
+- acionar imediatamente o worker de sincronização.
+
+### 4. Corrigir o worker e a prova de evento real
+
+No worker:
+
+- manter processamento apenas quando a conexão estiver verificada;
+- registrar erro real de provider em vez de erro genérico;
+- confirmar evento remoto via leitura do evento criado/atualizado;
+- só considerar tarefa concluída após confirmação do evento no Google.
+
+### 5. Ajustar testes de contrato
+
+Atualizar os testes que ainda esperam a validação antiga por `state` obrigatório, porque o próprio gateway já mostrou que o retorno real vem com `attempt + code` e sem `state`.
+
+Os testes vão cobrir:
+
+- callback com `attempt + code` sem `state`;
+- `probeConnection` estruturado;
+- conexão só confirmada após probe e calendário;
+- frontend não recebe nem expõe `connection_key`.
+
+### 6. Implantar e validar com dados reais
+
+Depois da correção:
+
+- limpar somente os estados travados/incompletos do usuário afetado;
+- publicar as funções `google-calendar-oauth` e `google-sync-worker`;
+- testar uma nova conexão;
+- verificar no banco os marcos reais:
+  - `status` conectado/sincronizando;
+  - `connection_key` presente;
+  - `secondary_calendar_id` presente;
+  - `verified_at` presente;
+  - pelo menos um item em `google_calendar_event_map` com `google_event_id`;
+  - fila avançando para `completed`.
+
+## Resultado esperado
+
+A UI só mostrará “Google Agenda conectado” depois que o backend tiver:
+
+1. recebido o callback OAuth;
+2. trocado o código por chave final;
+3. recebido 2xx do Google Calendar;
+4. criado/validado o calendário FENASOJA;
+5. disparado sincronização inicial;
+6. confirmado evento real no Google Agenda.
