@@ -1478,6 +1478,9 @@ export type Database = {
       }
       google_calendar_connections: {
         Row: {
+          access_token_ciphertext: string | null
+          access_token_iv: string | null
+          access_token_tag: string | null
           active_oauth_attempt_id: string | null
           backfill_done: number
           backfill_total: number
@@ -1487,17 +1490,26 @@ export type Database = {
           created_at: string
           error_code: string | null
           google_email: string | null
+          google_subject: string | null
           last_error: string | null
           last_sync_at: string | null
+          oauth_provider: string
           org_id: string
+          refresh_token_ciphertext: string | null
+          refresh_token_iv: string | null
+          refresh_token_tag: string | null
           scopes_granted: string[]
           secondary_calendar_id: string | null
           status: string
+          token_expires_at: string | null
           updated_at: string
           user_id: string
           verified_at: string | null
         }
         Insert: {
+          access_token_ciphertext?: string | null
+          access_token_iv?: string | null
+          access_token_tag?: string | null
           active_oauth_attempt_id?: string | null
           backfill_done?: number
           backfill_total?: number
@@ -1507,17 +1519,26 @@ export type Database = {
           created_at?: string
           error_code?: string | null
           google_email?: string | null
+          google_subject?: string | null
           last_error?: string | null
           last_sync_at?: string | null
+          oauth_provider?: string
           org_id: string
+          refresh_token_ciphertext?: string | null
+          refresh_token_iv?: string | null
+          refresh_token_tag?: string | null
           scopes_granted?: string[]
           secondary_calendar_id?: string | null
           status?: string
+          token_expires_at?: string | null
           updated_at?: string
           user_id: string
           verified_at?: string | null
         }
         Update: {
+          access_token_ciphertext?: string | null
+          access_token_iv?: string | null
+          access_token_tag?: string | null
           active_oauth_attempt_id?: string | null
           backfill_done?: number
           backfill_total?: number
@@ -1527,12 +1548,18 @@ export type Database = {
           created_at?: string
           error_code?: string | null
           google_email?: string | null
+          google_subject?: string | null
           last_error?: string | null
           last_sync_at?: string | null
+          oauth_provider?: string
           org_id?: string
+          refresh_token_ciphertext?: string | null
+          refresh_token_iv?: string | null
+          refresh_token_tag?: string | null
           scopes_granted?: string[]
           secondary_calendar_id?: string | null
           status?: string
+          token_expires_at?: string | null
           updated_at?: string
           user_id?: string
           verified_at?: string | null
@@ -3747,6 +3774,62 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "cronograma_eventos_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      google_calendar_connections_public: {
+        Row: {
+          backfill_done: number | null
+          backfill_total: number | null
+          connected_at: string | null
+          connection_generation: string | null
+          error_code: string | null
+          google_email: string | null
+          last_sync_at: string | null
+          oauth_provider: string | null
+          org_id: string | null
+          secondary_calendar_id: string | null
+          status: string | null
+          user_id: string | null
+          verified_at: string | null
+        }
+        Insert: {
+          backfill_done?: number | null
+          backfill_total?: number | null
+          connected_at?: string | null
+          connection_generation?: string | null
+          error_code?: string | null
+          google_email?: string | null
+          last_sync_at?: string | null
+          oauth_provider?: string | null
+          org_id?: string | null
+          secondary_calendar_id?: string | null
+          status?: string | null
+          user_id?: string | null
+          verified_at?: string | null
+        }
+        Update: {
+          backfill_done?: number | null
+          backfill_total?: number | null
+          connected_at?: string | null
+          connection_generation?: string | null
+          error_code?: string | null
+          google_email?: string | null
+          last_sync_at?: string | null
+          oauth_provider?: string | null
+          org_id?: string | null
+          secondary_calendar_id?: string | null
+          status?: string | null
+          user_id?: string | null
+          verified_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "google_calendar_connections_org_id_fkey"
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "organizations"
