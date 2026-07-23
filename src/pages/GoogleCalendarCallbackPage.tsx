@@ -84,6 +84,18 @@ export default function GoogleCalendarCallbackPage() {
   });
 
   useEffect(() => {
+    // Diagnostic: record what the Lovable connector gateway actually returns
+    // on the callback URL, before we strip it from history.
+    try {
+      const raw = new URLSearchParams(window.location.search);
+      const snapshot: Record<string, string> = {};
+      raw.forEach((v, k) => {
+        if (k === 'code' || k === 'state') snapshot[k] = `${v.slice(0, 6)}…(${v.length})`;
+        else snapshot[k] = v.length > 40 ? `${v.slice(0, 40)}…` : v;
+      });
+      console.info('google_calendar_callback_params', snapshot);
+    } catch { /* ignore */ }
+
     // Codes, state and attempt identifiers leave browser history before any
     // network work begins. Captured values remain only in this closure.
     window.history.replaceState({}, '', cleanGoogleCalendarCallbackUrl(window.location));
@@ -134,12 +146,15 @@ export default function GoogleCalendarCallbackPage() {
 
       try {
         const result = await invokeOAuth('complete', {
-          attemptId: feedback.attemptId,
+          // attemptId is optional — the backend resolves the attempt from
+          // `state` when the gateway strips our custom query param.
+          ...(feedback.attemptId ? { attemptId: feedback.attemptId } : {}),
           code: feedback.code,
           state: feedback.state,
           callbackPath: GOOGLE_CALENDAR_CALLBACK_PATH,
         });
         if (!result.ok) throw new Error('authorization_not_confirmed');
+
         if (!active) return;
         setUi({
           status: 'success',
