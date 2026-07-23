@@ -191,6 +191,22 @@ async function requireUser(req: Request) {
   return user;
 }
 
+async function optionalUser(req: Request) {
+  const authHeader = req.headers.get("Authorization") ?? "";
+  if (!authHeader.startsWith("Bearer ") || authHeader.length < 16) return null;
+  try {
+    const supabase = createClient(supabaseUrl, anonKey, {
+      auth: { persistSession: false },
+      global: { headers: { Authorization: authHeader } },
+    });
+    const { data: { user }, error } = await supabase.auth.getUser();
+    if (error || !user) return null;
+    return user;
+  } catch {
+    return null;
+  }
+}
+
 async function requireActiveOrgMembership(db: AdminClient, userId: string, rawOrgId: unknown) {
   const orgId = requireUuid(rawOrgId, "no_active_organization");
   const { data, error } = await db.from("org_members")
