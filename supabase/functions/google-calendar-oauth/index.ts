@@ -20,6 +20,7 @@ const APP_ROUTE = "/cronograma-eventos";
 const CALLBACK_ROUTE = "/google-calendar/callback";
 const ATTEMPT_TTL_MS = 10 * 60 * 1000;
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const CONTRACT_VERSION = "2026-07-23.observe";
 
 type AdminClient = ReturnType<typeof admin>;
 
