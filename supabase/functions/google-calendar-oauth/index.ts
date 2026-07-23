@@ -517,19 +517,60 @@ Deno.serve(async (req) => {
     }
 
     if (action === "complete") {
-      const attemptId = requireUuid(body.attemptId, "invalid_callback");
-      const callbackPath = body.callbackPath === CALLBACK_ROUTE ? CALLBACK_ROUTE : "";
+      const rawAttemptId = typeof body.attemptId === "string" && UUID_PATTERN.test(body.attemptId)
+        ? body.attemptId
+        : null;
+      const rawCallbackPath = typeof body.callbackPath === "string" ? body.callbackPath : "";
+      const callbackPath = rawCallbackPath === CALLBACK_ROUTE || rawCallbackPath === ""
+        ? CALLBACK_ROUTE
+        : "";
       const state = typeof body.state === "string" ? body.state.trim() : "";
+      if (!state) throw new Error("invalid_callback");
       const exchangeCode = asOAuthExchangeCode(body.code);
-      diagnostic("oauth_callback_received", { user: shortUserId(user.id), attemptId });
-      const attempt = await readAttempt(db, attemptId, user.id);
+      const stateHash = await sha256(state);
+
+      // Resolve the attempt. Prefer the explicit attemptId when the callback
+      // preserved it, but fall back to a lookup by provider_state_hash when the
+      // Lovable connector gateway stripped our custom query params from the
+      // return_url.
+      let attempt: OAuthAttempt;
+      if (rawAttemptId) {
+        attempt = await readAttempt(db, rawAttemptId, user.id);
+      } else {
+        const { data, error } = await db.from("google_calendar_oauth_attempts")
+          .select("id, user_id, org_id, status, return_origin, callback_path, next_path, provider_state_hash, expires_at, prior_connection_status, prior_error_code")
+          .eq("user_id", user.id)
+          .eq("provider_state_hash", stateHash)
+          .eq("status", "waiting_authorization")
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        assertDb(error, "attempt_lookup_failed");
+        if (!data) throw new Error("invalid_callback");
+        attempt = data as OAuthAttempt;
+      }
+      const attemptId = attempt.id;
+
+      diagnostic("oauth_callback_received", {
+        user: shortUserId(user.id),
+        attemptId,
+        viaState: !rawAttemptId,
+      });
+
       await requireActiveOrgMembership(db, user.id, attempt.org_id);
 
-      if (req.headers.get("Origin") !== attempt.return_origin || callbackPath !== attempt.callback_path) {
+      // The Lovable connector gateway may perform a top-level navigation whose
+      // Origin header is not sent by the browser; only enforce the origin when
+      // it is present. The callback path we validated against is authoritative.
+      const requestOrigin = req.headers.get("Origin");
+      if (requestOrigin && requestOrigin !== attempt.return_origin) {
+        throw new Error("invalid_callback");
+      }
+      if (callbackPath !== attempt.callback_path) {
         throw new Error("invalid_callback");
       }
       if (Date.parse(attempt.expires_at) <= Date.now()) throw new Error("authorization_expired");
-      if (!state || !attempt.provider_state_hash || await sha256(state) !== attempt.provider_state_hash) {
+      if (!attempt.provider_state_hash || stateHash !== attempt.provider_state_hash) {
         throw new Error("oauth_state_mismatch");
       }
       if (attempt.status !== "waiting_authorization") {
@@ -537,6 +578,7 @@ Deno.serve(async (req) => {
           ? "callback_replayed"
           : "invalid_callback");
       }
+
 
       const codeHash = await sha256(exchangeCode);
       const { data: claimed, error: claimError } = await db.from("google_calendar_oauth_attempts").update({
