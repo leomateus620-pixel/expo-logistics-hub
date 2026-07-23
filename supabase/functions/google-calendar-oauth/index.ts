@@ -689,7 +689,7 @@ Deno.serve(async (req) => {
           exchanged.connectionKey,
           connection.secondary_calendar_id,
         );
-        return json({ ok: true, calendarId: finalized.calendarId, backfill: finalized.backfill });
+        return json({ ok: true, calendarId: finalized.calendarId, backfill: finalized.backfill, contract_version: CONTRACT_VERSION });
       } catch (error) {
         const code = safeServerError(error);
         await db.from("google_calendar_oauth_attempts").update({ status: "error", error_code: code })
