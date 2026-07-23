@@ -175,6 +175,7 @@ export default function GoogleCalendarCallbackPage() {
 
       if (feedback.kind !== 'completion_required') {
         const code = feedback.kind === 'failed' ? feedback.code : 'invalid_callback';
+        const attemptId = feedback.kind === 'failed' ? feedback.attemptId : null;
         if (!active) return;
         setUi({
           status: 'failed',
@@ -182,7 +183,7 @@ export default function GoogleCalendarCallbackPage() {
           description: safeCallbackCopy(code),
           code,
         });
-        finish('failed', code);
+        finish('failed', code, attemptId);
         return;
       }
 
