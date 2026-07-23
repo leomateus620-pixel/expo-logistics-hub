@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import {
+  FENASOJA_2028_CYCLE_START_ISO,
   FENASOJA_2028_OPENING_ISO,
+  FENASOJA_2028_OPENING_LABEL,
   FENASOJA_2028_TIME_ZONE,
   formatFenasojaCountdownLabel,
   formatFenasojaCountdownSummary,
@@ -10,7 +12,8 @@ import {
 
 describe('contagem regressiva da Fenasoja 2028', () => {
   it('mantém a abertura centralizada no horário de Brasília', () => {
-    expect(new Date(FENASOJA_2028_OPENING_ISO).toISOString()).toBe('2028-05-01T13:00:00.000Z');
+    expect(FENASOJA_2028_OPENING_LABEL).toBe('29 de abril de 2028, às 10h');
+    expect(new Date(FENASOJA_2028_OPENING_ISO).toISOString()).toBe('2028-04-29T13:00:00.000Z');
 
     const parts = Object.fromEntries(
       new Intl.DateTimeFormat('pt-BR', {
@@ -27,12 +30,23 @@ describe('contagem regressiva da Fenasoja 2028', () => {
     );
 
     expect(parts).toMatchObject({
-      day: '01',
+      day: '29',
       hour: '10',
       minute: '00',
-      month: '05',
+      month: '04',
       year: '2028',
     });
+  });
+
+  it('atinge 100% do ciclo somente no instante oficial da abertura', () => {
+    const cycleStartTimestamp = Date.parse(FENASOJA_2028_CYCLE_START_ISO);
+    const openingTimestamp = Date.parse(FENASOJA_2028_OPENING_ISO);
+
+    expect(getFenasojaCountdown(cycleStartTimestamp - 1).cycleProgress).toBe(0);
+    expect(getFenasojaCountdown(cycleStartTimestamp).cycleProgress).toBe(0);
+    expect(getFenasojaCountdown(openingTimestamp - 1).cycleProgress).toBe(99);
+    expect(getFenasojaCountdown(openingTimestamp).cycleProgress).toBe(100);
+    expect(getFenasojaCountdown(openingTimestamp + 1).cycleProgress).toBe(100);
   });
 
   it('separa o tempo restante em dias, horas, minutos e segundos', () => {

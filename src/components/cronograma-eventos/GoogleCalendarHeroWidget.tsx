@@ -30,19 +30,6 @@ import {
 const GOOGLE_CALENDAR_URL = 'https://calendar.google.com/calendar/u/0/r';
 const GOOGLE_OAUTH_POPUP_FEATURES = 'width=540,height=720,resizable=yes,scrollbars=yes';
 
-function formatLastSync(value: string | null | undefined) {
-  if (!value) return null;
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return null;
-  return new Intl.DateTimeFormat('pt-BR', {
-    day: '2-digit',
-    month: 'short',
-    hour: '2-digit',
-    minute: '2-digit',
-    timeZone: 'America/Sao_Paulo',
-  }).format(date).replace(',', ' ·');
-}
-
 function statusLabel(state: GoogleCalendarStateView) {
   if (state.tone === 'success') return 'Conectado';
   if (state.tone === 'progress') return 'Em andamento';
@@ -117,10 +104,6 @@ export const GoogleCalendarHeroWidget = memo(function GoogleCalendarHeroWidget()
     statusErrorCode,
   ]);
 
-  const backfillPct = connection && connection.backfill_total > 0
-    ? Math.min(100, Math.round((connection.backfill_done / connection.backfill_total) * 100))
-    : null;
-  const lastSync = formatLastSync(connection?.last_sync_at);
   const controlsLocked = connect.isPending || retry.isPending || disconnect.isPending || isRefreshing;
 
   const runAction = (action: GoogleCalendarAction) => {
@@ -175,7 +158,7 @@ export const GoogleCalendarHeroWidget = memo(function GoogleCalendarHeroWidget()
     <>
       <article
         ref={widgetRef}
-        className="fenasoja-google-widget"
+        className="fenasoja-google-widget fenasoja-google-widget--compact"
         data-state={state.id}
         data-tone={state.tone}
         data-busy={state.busy || undefined}
@@ -184,80 +167,30 @@ export const GoogleCalendarHeroWidget = memo(function GoogleCalendarHeroWidget()
         aria-describedby="google-calendar-widget-description"
         aria-busy={state.busy}
       >
-        <div
-          className="fenasoja-google-widget-icon"
-          role="img"
-          aria-label="Google Agenda"
-        >
-          <img src={googleCalendarIcon} alt="" width="48" height="48" />
-          <span className="fenasoja-google-widget-icon-status">
-            <StatusGlyph state={state} />
-          </span>
-        </div>
+        <div className="fenasoja-google-widget-heading">
+          <div
+            className="fenasoja-google-widget-icon"
+            role="img"
+            aria-label="Google Agenda"
+          >
+            <img src={googleCalendarIcon} alt="" width="48" height="48" />
+            <span className="fenasoja-google-widget-icon-status">
+              <StatusGlyph state={state} />
+            </span>
+          </div>
 
-        <div className="fenasoja-google-widget-body">
-          <div className="fenasoja-google-widget-heading">
-            <div>
-              <span className="fenasoja-google-widget-eyebrow">{state.eyebrow}</span>
-              <span className="fenasoja-google-widget-name">Google Agenda</span>
-            </div>
+          <div className="fenasoja-google-widget-identity">
+            <h3 id="google-calendar-widget-title">Google Agenda</h3>
             <span className="fenasoja-google-widget-status" data-tone={state.tone}>
               <StatusGlyph state={state} />
               {statusLabel(state)}
             </span>
           </div>
-
-          <h3 id="google-calendar-widget-title">{state.title}</h3>
-          <p id="google-calendar-widget-description">{state.description}</p>
-
-          {(connection?.google_email || lastSync || pending > 0 || (outbox?.failed ?? 0) > 0) && (
-            <dl className="fenasoja-google-widget-meta">
-              {connection?.google_email && (
-                <div>
-                  <dt>Conta</dt>
-                  <dd title={connection.google_email}>{connection.google_email}</dd>
-                </div>
-              )}
-              {lastSync && (
-                <div>
-                  <dt>Última sincronização</dt>
-                  <dd>{lastSync}</dd>
-                </div>
-              )}
-              {pending > 0 && (
-                <div>
-                  <dt>Fila</dt>
-                  <dd>{outbox?.queued ?? 0} aguardando · {outbox?.inFlight ?? 0} em processamento</dd>
-                </div>
-              )}
-              {(outbox?.failed ?? 0) + (outbox?.deadLetter ?? 0) > 0 && (
-                <div>
-                  <dt>Falhas</dt>
-                  <dd>{(outbox?.failed ?? 0) + (outbox?.deadLetter ?? 0)} com ação disponível</dd>
-                </div>
-              )}
-            </dl>
-          )}
-
-          {backfillPct !== null && backfillPct < 100 && connection && (
-            <div
-              className="fenasoja-google-widget-progress"
-              role="progressbar"
-              aria-label="Progresso da sincronização inicial"
-              aria-valuemin={0}
-              aria-valuemax={100}
-              aria-valuenow={backfillPct}
-            >
-              <span>
-                <strong>{backfillPct}%</strong>
-                <span>{connection.backfill_done} de {connection.backfill_total} eventos</span>
-              </span>
-              <span className="fenasoja-google-widget-track" aria-hidden="true">
-                <span style={{ transform: `scaleX(${backfillPct / 100})` }} />
-              </span>
-            </div>
-          )}
         </div>
+
+        <p id="google-calendar-widget-description" className="fenasoja-google-widget-message">
+          {state.title}
+        </p>
 
         <div className="fenasoja-google-widget-actions">
           {renderPrimaryAction()}

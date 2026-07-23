@@ -8,7 +8,7 @@ A nova seção mantém os comandos e sinais que ajudam a operar o cronograma, ma
 
 ## Decisões técnicas
 
-- A abertura está centralizada em `2028-05-01T10:00:00-03:00`, no fuso `America/Sao_Paulo`, conforme a data e o horário já representados no módulo.
+- A abertura está centralizada em `2028-04-29T10:00:00-03:00`, no fuso `America/Sao_Paulo`, conforme a data e o horário oficiais do módulo.
 - O relógio usa um único temporizador alinhado ao próximo segundo, com limpeza completa no desmonte e valores limitados a zero após a abertura.
 - A atmosfera agrícola usa luz e textura estáticas; a chuva contínua de partículas foi removida para reduzir trabalho de GPU e preservar causalidade visual.
 - `prefers-reduced-motion` mantém uma composição estática e remove transições não essenciais.

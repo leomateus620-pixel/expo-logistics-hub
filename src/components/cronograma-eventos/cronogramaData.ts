@@ -4,6 +4,7 @@ import type {
   CronogramaPriority,
   CronogramaStatus,
 } from './types';
+import { FENASOJA_2028_SCHEDULE } from '@/config/fenasoja-2028';
 import { CRONOGRAMA_CYCLE_YEARS } from '@/lib/cronograma-cycle';
 
 export const CRONOGRAMA_YEARS = CRONOGRAMA_CYCLE_YEARS;
@@ -331,7 +332,7 @@ export const officialCronogramaEvents: CronogramaEvent[] = [
     id: 'fenasoja-2028-abertura',
     title: 'Abertura oficial Fenasoja 2028',
     summary: 'Marco principal da feira, com recepção institucional e ativação completa das áreas operacionais.',
-    date: '2028-05-01',
+    date: FENASOJA_2028_SCHEDULE.openingDate,
     startTime: '10:00',
     endTime: '12:00',
     year: 2028,

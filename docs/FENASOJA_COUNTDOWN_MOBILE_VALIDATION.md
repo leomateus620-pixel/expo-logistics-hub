@@ -13,7 +13,7 @@ A falha estava na camada visual compartilhada por compacto e expandido: o gradie
 - Separados o glifo e sua curta transição de entrada. A animação atua somente em `opacity` e `transform`, sem `filter`, máscara, desfoque ou `will-change` persistente.
 - Cada unidade é memorizada; quando um segundo muda, os nós de dias, horas e minutos permanecem estáveis.
 - O relógio da experiência expandida foi isolado em um componente memorizado, evitando que a página, a navegação e o ambiente de soja sejam renderizados novamente a cada segundo.
-- O cálculo continua derivado do timestamp absoluto configurado para 1º de maio de 2028, às 10h em Brasília. O agendamento é reconciliado em foco, `pageshow` e retorno da aba, e suspenso enquanto a página está oculta.
+- O cálculo continua derivado do timestamp absoluto configurado para 29 de abril de 2028, às 10h em Brasília. O agendamento é reconciliado em foco, `pageshow` e retorno da aba, e suspenso enquanto a página está oculta.
 - O anúncio para tecnologia assistiva não inclui segundos e, portanto, é atualizado no máximo uma vez por minuto.
 
 ## Refinamento visual

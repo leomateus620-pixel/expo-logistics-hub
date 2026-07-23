@@ -67,8 +67,8 @@ afterEach(cleanup);
 describe('cartão do Google Agenda', () => {
   it('renderiza estado desconectado com ativo oficial, hierarquia e botão sem div clicável', () => {
     const { container } = render(<GoogleCalendarHeroWidget />);
-    expect(screen.getByRole('heading', { name: 'Conecte sua agenda' })).toBeVisible();
-    expect(screen.getByText('Google Agenda')).toBeVisible();
+    expect(screen.getByRole('heading', { name: 'Google Agenda' })).toBeVisible();
+    expect(screen.getByText('Conecte sua agenda')).toBeVisible();
     const icon = screen.getByRole('img', { name: 'Google Agenda' });
     expect(icon.querySelector('img')?.getAttribute('src')).toContain('google-calendar');
     const button = screen.getByRole('button', { name: 'Conectar Google Agenda' });
@@ -141,27 +141,24 @@ describe('cartão do Google Agenda', () => {
     expect(mutateDisconnect).toHaveBeenCalledTimes(1);
   });
 
-  it('preserva e quebra com segurança um e-mail longo e omite metadados ausentes', () => {
+  it('omite metadados técnicos mesmo quando a conexão os fornece', () => {
     const longEmail = 'responsavel.pela.comissao.central.e.operacoes.institucionais@dominio-extremamente-longo.fenasoja.com.br';
     hookMock.mockReturnValue(hookValue({
       connection: { ...connected, google_email: longEmail, last_sync_at: null },
     }));
     render(<GoogleCalendarHeroWidget />);
-    expect(screen.getByText(longEmail)).toHaveAttribute('title', longEmail);
-
-    cleanup();
-    hookMock.mockReturnValue(hookValue({
-      connection: { ...connected, google_email: null, last_sync_at: null },
-    }));
-    render(<GoogleCalendarHeroWidget />);
+    expect(screen.queryByText(longEmail)).not.toBeInTheDocument();
     expect(screen.queryByText('Conta')).not.toBeInTheDocument();
     expect(screen.queryByText('Última sincronização')).not.toBeInTheDocument();
+    expect(screen.queryByRole('progressbar')).not.toBeInTheDocument();
   });
 
   it('mantém regras explícitas para mobile, foco e movimento reduzido', () => {
     const css = readFileSync('src/styles/fenasoja-countdown.css', 'utf8');
     expect(css).toContain('@media (max-width: 520px)');
     expect(css).toContain('grid-template-columns: minmax(0, 1fr)');
+    expect(css).toContain('.fenasoja-countdown-secondary');
+    expect(css).toContain('grid-template-columns: minmax(0, 19rem)');
     expect(css).toContain(':focus-visible');
     expect(css).toContain('@media (prefers-reduced-motion: reduce)');
     expect(css).toContain('animation: none !important');

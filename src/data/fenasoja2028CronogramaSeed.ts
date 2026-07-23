@@ -1127,7 +1127,7 @@ export const fenasoja2028CronogramaSeed: CronogramaEventSeed[] = [
       ],
       sourceSheet: cronogramaOfficialSheets[2028],
       sourceRow: 'R19',
-      sourceNote: 'Destaque visual máximo solicitado para o período de 01/05/2028 a 07/05/2028.',
+      sourceNote: 'Destaque visual máximo solicitado para o período de 29/04/2028 a 07/05/2028.',
     },
   ),
   undated('2028-reuniao-conselho-fiscal-sem-data', {
