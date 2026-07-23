@@ -1,4 +1,4 @@
-export type EventReminderType = '24h' | '2h'
+export type EventReminderType = '24h' | '2h' | '1h'
 
 export interface EventReminderRelatedItem {
   title: string
@@ -87,7 +87,7 @@ export function normalizeEventReminderTemplateData(raw: EventReminderTemplateDat
   const eventTitle = requiredText(raw.eventTitle, 'eventTitle')
   const dateLabel = requiredText(raw.dateLabel, 'dateLabel')
   const timeLabel = requiredText(raw.timeLabel, 'timeLabel')
-  const reminderType = raw.reminderType === '24h' || raw.reminderType === '2h'
+  const reminderType: EventReminderType = raw.reminderType === '24h' || raw.reminderType === '2h' || raw.reminderType === '1h'
     ? raw.reminderType
     : (() => { throw new Error('invalid_template_data:reminderType') })()
   const ctaUrl = safeHttpsUrl(raw.ctaUrl, 'ctaUrl', ['fenasojagestao.com', 'www.fenasojagestao.com'])
@@ -100,16 +100,24 @@ export function normalizeEventReminderTemplateData(raw: EventReminderTemplateDat
 
   const heading = reminderType === '24h'
     ? 'Seu evento é amanhã'
-    : isAllDay
-      ? 'Seu evento acontece hoje'
-      : 'Seu evento começa em 2 horas'
+    : reminderType === '1h'
+      ? isAllDay
+        ? 'Seu evento acontece hoje'
+        : 'Seu evento começa em 1 hora'
+      : isAllDay
+        ? 'Seu evento acontece hoje'
+        : 'Seu evento começa em 2 horas'
   const intro = reminderType === '24h'
     ? isAllDay
       ? `Este é um lembrete de que “${eventTitle}” acontece amanhã, durante todo o dia.`
       : `Este é um lembrete de que “${eventTitle}” começa amanhã, às ${timeLabel.split('–')[0]}.`
-    : isAllDay
-      ? `Confira os detalhes de “${eventTitle}”, programado para hoje durante todo o dia.`
-      : `“${eventTitle}” começa em 2 horas. Confira os detalhes e as demandas relacionadas antes do início.`
+    : reminderType === '1h'
+      ? isAllDay
+        ? `Confira os detalhes de “${eventTitle}”, programado para hoje durante todo o dia.`
+        : `“${eventTitle}” começa em 1 hora. Revise os detalhes finais e confirme presença antes do início.`
+      : isAllDay
+        ? `Confira os detalhes de “${eventTitle}”, programado para hoje durante todo o dia.`
+        : `“${eventTitle}” começa em 2 horas. Confira os detalhes e as demandas relacionadas antes do início.`
   const recipientContext = commissionNames.length === 1
     ? `Você recebeu este lembrete porque participa da ${commissionNames[0]}, vinculada a este evento.`
     : commissionNames.length > 1
