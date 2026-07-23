@@ -270,6 +270,28 @@ Deno.serve(async (req) => {
     // Exchange code for tokens (server-side, direct to Google).
     const tokens = await exchangeAuthorizationCode(code);
 
+    // Validate granted scopes BEFORE persisting anything. If the user did not
+    // tick the Calendar checkboxes on Google's consent screen, revoke the fresh
+    // token and force reconnect with a clear, actionable code.
+    const missing = missingRequiredScopes(tokens.scope);
+    if (missing.length > 0) {
+      diagnostic("google_scopes_insufficient", {
+        user: shortUserId(attempt.user_id),
+        granted: tokens.scope ?? "",
+        missing,
+      });
+      await revokeToken(tokens.access_token);
+      await markAttemptError(db, attempt.id, "google_insufficient_scope");
+      await db.from("google_calendar_connections").update({
+        status: "reconnect_required",
+        error_code: "google_insufficient_scope",
+        last_error: "google_insufficient_scope",
+        active_oauth_attempt_id: null,
+        scopes_granted: (tokens.scope ?? "").split(/\s+/).filter(Boolean),
+      }).eq("user_id", attempt.user_id).eq("org_id", attempt.org_id);
+      return redirect303(frontendCallbackUrl(attempt.id, "error", "google_insufficient_scope"));
+    }
+
     // Encrypt and persist tokens.
     const columns = await buildEncryptedTokenColumns(
       tokens.access_token,
