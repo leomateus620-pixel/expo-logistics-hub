@@ -210,7 +210,7 @@ export const GoogleCalendarHeroWidget = memo(function GoogleCalendarHeroWidget()
           <h3 id="google-calendar-widget-title">{state.title}</h3>
           <p id="google-calendar-widget-description">{state.description}</p>
 
-          {(connection?.google_email || lastSync || pending > 0) && (
+          {(connection?.google_email || lastSync || pending > 0 || (outbox?.failed ?? 0) > 0) && (
             <dl className="fenasoja-google-widget-meta">
               {connection?.google_email && (
                 <div>
@@ -227,7 +227,13 @@ export const GoogleCalendarHeroWidget = memo(function GoogleCalendarHeroWidget()
               {pending > 0 && (
                 <div>
                   <dt>Fila</dt>
-                  <dd>{pending} {pending === 1 ? 'atualização' : 'atualizações'}</dd>
+                  <dd>{outbox?.queued ?? 0} aguardando · {outbox?.inFlight ?? 0} em processamento</dd>
+                </div>
+              )}
+              {(outbox?.failed ?? 0) + (outbox?.deadLetter ?? 0) > 0 && (
+                <div>
+                  <dt>Falhas</dt>
+                  <dd>{(outbox?.failed ?? 0) + (outbox?.deadLetter ?? 0)} com ação disponível</dd>
                 </div>
               )}
             </dl>

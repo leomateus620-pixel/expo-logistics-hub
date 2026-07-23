@@ -3,8 +3,12 @@ export type GoogleCalendarBackendStatus =
   | 'reconnect_required'
   | 'disconnected'
   | 'error'
-  | 'connecting'
-  | 'completing';
+  | 'starting'
+  | 'waiting_authorization'
+  | 'completing'
+  | 'preparing_calendar'
+  | 'synchronizing'
+  | 'disconnecting';
 
 export type GoogleCalendarFlowPhase =
   | 'idle'
@@ -21,6 +25,7 @@ export type GoogleCalendarUiStateId =
   | 'starting_connection'
   | 'waiting_oauth'
   | 'returning_from_oauth'
+  | 'preparing_calendar'
   | 'connection_success'
   | 'initial_sync_queued'
   | 'initial_sync_in_progress'
@@ -69,6 +74,8 @@ export interface GoogleCalendarStateView {
 
 export interface GoogleCalendarConnectionSnapshot {
   status: GoogleCalendarBackendStatus | string;
+  secondary_calendar_id?: string | null;
+  verified_at?: string | null;
   backfill_total: number;
   backfill_done: number;
   error_code?: string | null;
@@ -168,6 +175,17 @@ const VIEWS: Record<GoogleCalendarUiStateId, GoogleCalendarStateView> = {
     'progress',
     'none',
     'Confirmando…',
+    undefined,
+    undefined,
+    true,
+  ),
+  preparing_calendar: view(
+    'preparing_calendar',
+    'Preparando o calendário FENASOJA',
+    'A conta já foi validada. Estamos criando ou recuperando o calendário secundário.',
+    'progress',
+    'none',
+    'Preparando calendário…',
     undefined,
     undefined,
     true,
@@ -350,12 +368,19 @@ export function deriveGoogleCalendarState({
   }
   if (flowPhase === 'disconnected_success') return VIEWS.disconnected_success;
   if (isLoading) return VIEWS.checking;
+  if (flowErrorCode === 'authorization_not_confirmed' || flowErrorCode === 'invalid_callback' || flowErrorCode === 'callback_replayed') {
+    return VIEWS.authorization_not_confirmed;
+  }
+  if (flowErrorCode === 'authorization_expired') return VIEWS.reconnect_required;
   if (statusErrorCode || flowErrorCode) return VIEWS.temporary_failure;
   if (!connection) return VIEWS.disconnected;
 
   if (connection.error_code === 'authorization_not_confirmed') return VIEWS.authorization_not_confirmed;
-  if (connection.status === 'connecting') return VIEWS.authorization_not_confirmed;
+  if (connection.status === 'starting') return VIEWS.starting_connection;
+  if (connection.status === 'waiting_authorization') return VIEWS.waiting_oauth;
   if (connection.status === 'completing') return VIEWS.returning_from_oauth;
+  if (connection.status === 'preparing_calendar') return VIEWS.preparing_calendar;
+  if (connection.status === 'disconnecting') return VIEWS.disconnecting;
   if (connection.status === 'disconnected') return VIEWS.disconnected;
   if (connection.status === 'reconnect_required') {
     return connection.error_code === 'authorization_revoked'
@@ -365,9 +390,12 @@ export function deriveGoogleCalendarState({
   if (connection.status === 'error') {
     if (connection.error_code === 'authorization_revoked') return VIEWS.authorization_revoked;
     if (connection.error_code === 'authorization_not_confirmed') return VIEWS.authorization_not_confirmed;
+    if (connection.error_code === 'authorization_expired') return VIEWS.reconnect_required;
+    if (connection.error_code === 'calendar_not_verified') return VIEWS.reconnect_required;
     return VIEWS.temporary_failure;
   }
-  if (connection.status !== 'connected') return VIEWS.fallback;
+  if (!['connected', 'synchronizing'].includes(connection.status)) return VIEWS.fallback;
+  if (!connection.secondary_calendar_id || !connection.verified_at) return VIEWS.authorization_not_confirmed;
 
   const queue = {
     queued: outbox?.queued ?? 0,

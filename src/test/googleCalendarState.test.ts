@@ -8,6 +8,8 @@ import {
 
 const connected: GoogleCalendarConnectionSnapshot = {
   status: 'connected',
+  secondary_calendar_id: 'calendar-id',
+  verified_at: '2026-07-22T20:00:00.000Z',
   backfill_total: 0,
   backfill_done: 0,
   error_code: null,
@@ -28,6 +30,7 @@ describe('máquina de estados do Google Agenda', () => {
     ['starting_connection', { flowPhase: 'starting' }],
     ['waiting_oauth', { flowPhase: 'waiting_oauth' }],
     ['returning_from_oauth', { flowPhase: 'returning' }],
+    ['preparing_calendar', { connection: { ...connected, status: 'preparing_calendar' } }],
     ['connection_success', { flowPhase: 'success' }],
     ['initial_sync_queued', {
       connection: { ...connected, backfill_total: 10, backfill_done: 0 },
@@ -46,7 +49,7 @@ describe('máquina de estados do Google Agenda', () => {
     ['temporary_failure', { statusErrorCode: 'request_failed' }],
     ['authorization_cancelled', { flowPhase: 'cancelled' }],
     ['authorization_not_confirmed', {
-      connection: { ...connected, status: 'connecting', error_code: 'authorization_not_confirmed' },
+      connection: { ...connected, status: 'waiting_authorization', error_code: 'authorization_not_confirmed' },
     }],
     ['authorization_revoked', {
       connection: { ...connected, status: 'reconnect_required', error_code: 'authorization_revoked' },
@@ -102,5 +105,14 @@ describe('máquina de estados do Google Agenda', () => {
       derive({ connection: connected, outbox: { failed: 1 } }),
     ).join(' ');
     expect(copy).not.toMatch(/stack|oauth code|provider payload|exception/i);
+  });
+
+  it('não apresenta conexão sem calendário e verificação confirmados pelo backend', () => {
+    expect(derive({
+      connection: { ...connected, secondary_calendar_id: null },
+    }).id).toBe('authorization_not_confirmed');
+    expect(derive({
+      connection: { ...connected, verified_at: null },
+    }).id).toBe('authorization_not_confirmed');
   });
 });
