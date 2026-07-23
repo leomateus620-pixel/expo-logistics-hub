@@ -1,45 +1,50 @@
-## Diagnóstico confirmado (logs reais)
+# Validação e sincronização completa do Google Agenda
 
-O último callback registrou:
-- `google_probe_failed { httpStatus: 403, stage: "calendar_list_probe" }`
-- `oauth_callback_failed { errorCode: "google_insufficient_scope" }`
+Contexto: Google Calendar API agora está **Ativada** no seu projeto Google Cloud (confirmado na screenshot). A conexão travada foi limpa e o callback endurecido classifica corretamente probe 403 vs escopos vs API desativada.
 
-Não houve `google_scopes_insufficient`, ou seja, os escopos vieram completos. O 403 em `/calendarList` com escopos válidos = **Google Calendar API não habilitada no projeto Google Cloud** que emite o OAuth Client. A classificação atual "insufficient_scope" mascara isso e faz o usuário reabrir consentimento sem sucesso.
+## Passo 1 — Você reconecta (única ação manual)
+1. Abrir `/cronograma-eventos`
+2. Clicar **Reconectar Google Agenda** no widget
+3. Login com `leomateus620@gmail.com`
+4. Marcar **as duas caixas** de permissão de Agenda
+5. Fechar o popup quando o Google mostrar sucesso
 
-## O que precisa acontecer no Google Cloud (você faz uma vez)
+Enquanto isso, monitoro os logs em tempo real.
 
-No projeto Cloud do OAuth Client atual:
-1. Abrir **APIs & Services → Library**.
-2. Habilitar **Google Calendar API**.
-3. Confirmar que **People API** está habilitada (usada por `userinfo`).
-4. Aguardar ~1 min de propagação.
+## Passo 2 — Validação técnica automática (eu executo)
+Assim que a conexão fechar como `synchronizing`, verifico na ordem:
 
-Sem esse passo, nenhuma correção de código resolve — o Google continua respondendo 403.
+1. **Logs do callback**: `google_probe_succeeded` (não mais `google_probe_failed`)
+2. **Banco**: `google_calendar_connections` do seu user_id com
+   - `status = 'connected'` ou `'synchronizing'`
+   - `secondary_calendar_id` preenchido (calendário FENASOJA criado)
+   - `verified_at` preenchido
+   - `error_code IS NULL`
+3. **Google real**: o worker cria/atualiza um evento e loga `remote_event_verified` com o `htmlLink` do Google
 
-## Correções de código (para nunca mais confundir esse cenário)
+Se algo falhar, capturo o `safeCode` do log e corrijo antes de prosseguir — sem loop silencioso.
 
-### 1. `supabase/functions/_shared/googleCalendarClient.ts`
-- No `probeConnection`: além do status, ler o body do 403 e detectar `"accessNotConfigured"` / `"PERMISSION_DENIED"` / `"SERVICE_DISABLED"`. Retornar `safeCode: "google_api_disabled"` quando presente; `"google_insufficient_scope"` só quando o body indicar `insufficientPermissions` / `ACCESS_TOKEN_SCOPE_INSUFFICIENT`.
+## Passo 3 — Enfileirar todos os eventos para o seu calendário
+Para todo evento em `cronograma_eventos` com data ≥ hoje e vinculado à sua organização:
 
-### 2. `supabase/functions/google-calendar-oauth-callback/index.ts`
-- Trocar o mapeamento fixo `probe.status === 403 → google_insufficient_scope` por `probe.safeCode` já classificado no client.
-- Quando o probe falhar por `google_api_disabled`, marcar a connection como `status='error'` (não `reconnect_required`) e gravar `last_error='google_api_disabled'` — reconectar não vai adiantar até a API ser habilitada.
-- Reverter o `status: "preparing_calendar"` gravado antes do probe (linhas 302–310) para não deixar a UI achando que a etapa avançou quando o probe falha logo em seguida.
+1. Inserir/atualizar linha em `google_calendar_event_mappings` com
+   - `user_id` = seu id
+   - `event_id` = id do cronograma
+   - `sync_status = 'pending'`
+   - `operation = 'upsert'`
+2. Disparar `google-sync-worker` manualmente (batch 25) até drenar a fila
+3. Contar quantos eventos ficaram com `sync_status = 'synced'` e quantos com `error`
+4. Para cada erro, mostrar o código Google exato retornado
 
-### 3. `src/hooks/useGoogleCalendarConnection.ts`
-- Cópia PT-BR de `google_api_disabled`: instruir explicitamente "Habilite a Google Calendar API no console do Google Cloud (APIs & Services → Library) e clique em Reconectar." (a string atual já existe, só garantir que aparece com destaque).
-- No refetch loop: quando `connection.status === 'error'` com um `error_code` conhecido, parar de considerar como "in progress" (hoje `IN_PROGRESS_STATUSES` não inclui `error`, ok, mas o `flowPhase` local fica em `returning` até o polling confirmar — forçar `setFlowPhase('idle')` assim que o status virar `error`/`reconnect_required` com error_code).
+## Passo 4 — Prova viva
+- Envio o link `htmlLink` de 1 evento sincronizado (você abre e vê no seu Google Agenda)
+- Envio a contagem final: `X sincronizados / Y com erro / Z pendentes`
+- Se houver erro, corrijo na hora antes de encerrar
 
-### 4. `src/pages/GoogleCalendarCallbackPage.tsx`
-- Ao receber `?status=error&code=google_api_disabled`, mostrar mensagem específica ("Ative a Google Calendar API") em vez do genérico atual, e enviar `postMessage` para o opener (ou navegar direto para `/cronograma-eventos`) para destravar a UI da aba original.
+## Detalhes técnicos
+- **Sem novas migrations**: uso apenas `UPDATE`/`INSERT` nas tabelas existentes (`google_calendar_event_mappings`)
+- **Sem novo código de app**: reaproveita `google-sync-worker` já deployado
+- **Disparo do worker**: via `supabase.functions.invoke` com `X-Worker-Token` (token já configurado)
+- **Escopo**: só eventos futuros da sua org atual — não polui o Agenda com eventos vencidos
 
-### 5. `src/lib/google-calendar-state.ts`
-- Já inclui `google_api_disabled` em `providerNeedsReconnect`; adicionar ID de estado `api_disabled` distinto de `reconnect_required` para o widget renderizar CTA "Abrir Google Cloud Console" além de "Reconectar".
-
-## Validação
-1. Reproduzir com API desabilitada → logs devem mostrar `safeCode: "google_api_disabled"`, UI mostra card específico.
-2. Habilitar a Calendar API → reconectar → probe 2xx → estado `synchronizing` → eventos aparecem no calendário "FENASOJA — Cronograma" do Google.
-3. Rodar `vitest run src/test/googleCalendarState.test.ts` para garantir que o novo estado `api_disabled` está coberto.
-
-## Sobre "não recebi eventos no e-mail"
-O `event-reminders` roda separado do sync Google e depende de eventos vinculados a você em `cronograma_evento_responsaveis`. Isso é uma verificação separada — depois que a conexão fechar como `connected`, checo se há eventos futuros vinculados ao seu user e disparo teste manual do `event-reminders`. Não misturo essa correção com a do 403 porque são caminhos independentes.
+Confirma? Ao aprovar, eu apenas espero você clicar Reconectar e a partir daí executo os passos 2–4 sozinho.
