@@ -420,6 +420,20 @@ export function useGoogleCalendarConnection() {
     popupRef.current?.close();
   }, []);
 
+  // When the backend reports a terminal error/reconnect state with a known
+  // provider code, drop any transient local flow phase so the UI stops showing
+  // "aguardando autorização" and surfaces the real error immediately.
+  const backendConnection = status.data?.connection ?? null;
+  const backendStatus = backendConnection?.status ?? null;
+  const backendErrorCode = backendConnection?.error_code ?? null;
+  useEffect(() => {
+    if (!backendStatus) return;
+    if ((backendStatus === 'error' || backendStatus === 'reconnect_required') && backendErrorCode) {
+      setFlowPhase((prev) => (prev === 'idle' || prev === 'cancelled' || prev === 'success' ? prev : 'idle'));
+      setFlowErrorCode((prev) => prev ?? (isKnownErrorCode(backendErrorCode) ? backendErrorCode : 'request_failed'));
+    }
+  }, [backendStatus, backendErrorCode]);
+
   const statusErrorCode = useMemo(() => {
     if (!status.error) return null;
     return status.error instanceof GoogleCalendarFlowError ? status.error.code : 'request_failed';

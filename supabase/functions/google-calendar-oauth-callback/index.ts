@@ -43,6 +43,9 @@ const SAFE_CODES = new Set([
   "request_failed",
 ]);
 
+// Codes that mean "reconnecting won't help until the user fixes something at Google"
+const NON_RECONNECTABLE_CODES = new Set(["google_api_disabled"]);
+
 function safeCallbackCode(error: unknown): string {
   const message = String((error as Error)?.message ?? error);
   if (SAFE_CODES.has(message)) return message;
@@ -312,8 +315,22 @@ Deno.serve(async (req) => {
     // Probe Google Calendar API (2xx required).
     const probe = await probeConnection(tokens.access_token);
     if (!probe.ok) {
-      diagnostic("google_probe_failed", { user: shortUserId(attempt.user_id), stage: probe.stage, httpStatus: probe.status, safeCode: probe.safeCode });
-      const providerCode = probe.status === 403 ? "google_insufficient_scope"
+      diagnostic("google_probe_failed", {
+        user: shortUserId(attempt.user_id),
+        stage: probe.stage,
+        httpStatus: probe.status,
+        safeCode: probe.safeCode,
+        detail: probe.detail?.slice(0, 200),
+      });
+      // Roll back the transient "preparing_calendar" status so the UI does not
+      // show fake progress; the catch block will mark the final error state.
+      await db.from("google_calendar_connections").update({
+        status: "error",
+      }).eq("user_id", attempt.user_id).eq("org_id", attempt.org_id);
+      // Prefer the classified code from the probe body over a raw status map.
+      const providerCode = SAFE_CODES.has(probe.safeCode)
+        ? probe.safeCode
+        : probe.status === 403 ? "google_unauthorized"
         : probe.status === 401 ? "google_unauthorized"
         : probe.status === 429 ? "google_rate_limited"
         : "google_unavailable";
