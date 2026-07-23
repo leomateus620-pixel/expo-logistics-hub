@@ -854,6 +854,7 @@ Deno.serve(async (req) => {
         connection: safeConnection,
         pending: counts.queued + counts.inFlight + counts.failed,
         outbox: counts,
+        contract_version: CONTRACT_VERSION,
       });
     }
 
