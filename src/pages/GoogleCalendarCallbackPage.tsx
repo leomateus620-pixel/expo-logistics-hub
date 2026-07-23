@@ -109,11 +109,15 @@ export default function GoogleCalendarCallbackPage() {
       hasError: params.has('error') || params.has('google_error'),
       params: paramMeta,
     };
+    const observedAttemptId = params.get('attempt');
     // Fire-and-forget observation via supabase-js. If it fails (e.g. session
     // not hydrated in the top-level return context), fall back to a direct
     // anonymous fetch using the publishable apikey so the evidence still
     // reaches the backend regardless of session state.
-    void invokeOAuth('observe_callback', { observation }).catch((error) => {
+    void invokeOAuth('observe_callback', {
+      observation,
+      ...(observedAttemptId ? { attemptId: observedAttemptId } : {}),
+    }).catch((error) => {
       window.console.warn('google_calendar_observe_failed', (error as Error)?.message);
       try {
         const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/google-calendar-oauth`;
@@ -123,7 +127,11 @@ export default function GoogleCalendarCallbackPage() {
           method: 'POST',
           keepalive: true,
           headers: { 'Content-Type': 'application/json', apikey, Authorization: `Bearer ${apikey}` },
-          body: JSON.stringify({ action: 'observe_callback', observation }),
+          body: JSON.stringify({
+            action: 'observe_callback',
+            observation,
+            ...(observedAttemptId ? { attemptId: observedAttemptId } : {}),
+          }),
         }).catch((cause) => window.console.warn('google_calendar_observe_fallback_failed', (cause as Error)?.message));
       } catch (cause) {
         window.console.warn('google_calendar_observe_fallback_error', (cause as Error)?.message);
@@ -167,6 +175,7 @@ export default function GoogleCalendarCallbackPage() {
 
       if (feedback.kind !== 'completion_required') {
         const code = feedback.kind === 'failed' ? feedback.code : 'invalid_callback';
+        const attemptId = feedback.kind === 'failed' ? feedback.attemptId : null;
         if (!active) return;
         setUi({
           status: 'failed',
@@ -174,7 +183,7 @@ export default function GoogleCalendarCallbackPage() {
           description: safeCallbackCopy(code),
           code,
         });
-        finish('failed', code);
+        finish('failed', code, attemptId);
         return;
       }
 

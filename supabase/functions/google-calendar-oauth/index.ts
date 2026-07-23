@@ -121,8 +121,18 @@ function allowedReturnOrigins() {
   return origins;
 }
 
+function isTrustedLovableOrigin(origin: string) {
+  try {
+    const url = new URL(origin);
+    if (url.protocol !== "https:") return false;
+    return url.hostname.endsWith(".lovableproject.com") || url.hostname.endsWith(".lovable.app");
+  } catch {
+    return false;
+  }
+}
+
 function isAllowedReturnOrigin(origin: string, allowedOrigins = allowedReturnOrigins()) {
-  return allowedOrigins.has(origin);
+  return allowedOrigins.has(origin) || isTrustedLovableOrigin(origin);
 }
 
 function safeNextPath(raw: string | null | undefined, origin: string) {
@@ -485,7 +495,27 @@ Deno.serve(async (req) => {
         auth_present: Boolean(maybeUser),
       };
       let attemptRowId: string | null = null;
-      if (maybeUser) {
+      const rawAttemptId = typeof body.attemptId === "string" && UUID_PATTERN.test(body.attemptId)
+        ? body.attemptId
+        : null;
+      if (rawAttemptId) {
+        const { data: explicitAttempt } = await db.from("google_calendar_oauth_attempts")
+          .select("id, user_id, callback_observation")
+          .eq("id", rawAttemptId)
+          .in("status", ["waiting_authorization", "starting", "completing"])
+          .maybeSingle();
+        if (explicitAttempt && (!maybeUser || explicitAttempt.user_id === maybeUser.id)) {
+          attemptRowId = explicitAttempt.id;
+          const prior = Array.isArray((explicitAttempt.callback_observation as { history?: unknown } | null)?.history)
+            ? ((explicitAttempt.callback_observation as { history: unknown[] }).history)
+            : [];
+          const merged = { latest: observation, history: [...prior, observation].slice(-10) };
+          await db.from("google_calendar_oauth_attempts")
+            .update({ callback_observation: merged })
+            .eq("id", explicitAttempt.id);
+        }
+      }
+      if (!attemptRowId && maybeUser) {
         const { data: activeAttempt } = await db.from("google_calendar_oauth_attempts")
           .select("id, callback_observation")
           .eq("user_id", maybeUser.id)
@@ -504,7 +534,8 @@ Deno.serve(async (req) => {
             .eq("id", activeAttempt.id)
             .eq("user_id", maybeUser.id);
         }
-      } else {
+      }
+      if (!attemptRowId && !maybeUser) {
         // No auth: still try to match by most-recent pending attempt using state hash if provided.
         // Nothing to correlate reliably; just log anonymously.
       }

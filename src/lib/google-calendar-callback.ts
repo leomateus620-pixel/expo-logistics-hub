@@ -2,6 +2,7 @@ const GOOGLE_CALLBACK_KEYS = [
   'google',
   'google_error',
   'google_result',
+  'result',
   'error',
   'error_description',
   'code',
@@ -24,7 +25,7 @@ export type GoogleCalendarCallbackFeedback =
   | { kind: 'none' }
   | { kind: 'completion_required'; attemptId: string | null; code: string; state: string }
   | { kind: 'cancelled'; code: 'authorization_cancelled'; attemptId: string | null }
-  | { kind: 'failed'; code: 'invalid_callback' | 'authorization_failed' };
+  | { kind: 'failed'; code: 'invalid_callback' | 'authorization_failed'; attemptId: string | null };
 
 /**
  * Parses provider input only. It deliberately never reports authorization as
@@ -48,6 +49,7 @@ export function parseGoogleCalendarCallbackFeedback(search: string): GoogleCalen
       code: providerError === 'invalid_state' || providerError === 'missing_code'
         ? 'invalid_callback'
         : 'authorization_failed',
+      attemptId,
     };
   }
 
@@ -57,8 +59,21 @@ export function parseGoogleCalendarCallbackFeedback(search: string): GoogleCalen
     return { kind: 'completion_required', attemptId, code, state };
   }
 
+  const connectorResult = (
+    params.get('google_result')
+    ?? params.get('google')
+    ?? params.get('result')
+    ?? ''
+  ).toLowerCase();
+  if (connectorResult === 'cancelled' || connectorResult === 'denied') {
+    return { kind: 'cancelled', code: 'authorization_cancelled', attemptId };
+  }
+  if (connectorResult) {
+    return { kind: 'failed', code: 'invalid_callback', attemptId };
+  }
+
   const hasOAuthSignal = GOOGLE_CALLBACK_KEYS.some((key) => params.has(key));
-  if (hasOAuthSignal) return { kind: 'failed', code: 'invalid_callback' };
+  if (hasOAuthSignal) return { kind: 'failed', code: 'invalid_callback', attemptId };
   return { kind: 'none' };
 }
 
