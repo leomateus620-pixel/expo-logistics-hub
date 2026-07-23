@@ -10,6 +10,7 @@ import { eventDateDiagnosticShape, normalizeEventDateTime } from "../_shared/eve
 
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const workerToken = Deno.env.get("GOOGLE_SYNC_WORKER_TOKEN") ?? "";
 const BATCH_SIZE = 25;
 const MAX_ATTEMPTS = 6;
 
@@ -18,8 +19,11 @@ function db() {
 }
 
 function requireServiceRole(req: Request) {
-  const token = (req.headers.get("Authorization") ?? "").replace(/^Bearer\s+/i, "");
-  return Boolean(serviceRoleKey && token && token === serviceRoleKey);
+  const bearer = (req.headers.get("Authorization") ?? "").replace(/^Bearer\s+/i, "");
+  if (serviceRoleKey && bearer && bearer === serviceRoleKey) return true;
+  const wt = req.headers.get("X-Worker-Token") ?? "";
+  if (workerToken && wt && wt === workerToken) return true;
+  return false;
 }
 
 function shortUserId(userId: string) {
