@@ -451,13 +451,92 @@ Deno.serve(async (req) => {
   try {
     const body = await req.json().catch(() => ({} as Record<string, unknown>)) as Record<string, unknown>;
     const action = typeof body.action === "string" ? body.action : "";
-    const user = await requireUser(req);
     const db = admin();
+
+    if (action === "observe_callback") {
+      // Anonymous-tolerant evidence gate. Runs BEFORE requireUser because the
+      // callback page sometimes lacks a hydrated Supabase session (top-level
+      // navigation return from the Lovable connector gateway). Never accepts
+      // raw OAuth values — only names, lengths, and presence flags.
+      const maybeUser = await optionalUser(req);
+      const rawObs = (body.observation && typeof body.observation === "object")
+        ? body.observation as Record<string, unknown>
+        : {};
+      const paramNamesInput = Array.isArray(rawObs.params) ? rawObs.params : [];
+      const params = paramNamesInput.slice(0, 32).map((entry) => {
+        const item = (entry && typeof entry === "object") ? entry as Record<string, unknown> : {};
+        const name = typeof item.name === "string" ? item.name.slice(0, 64) : "";
+        const length = typeof item.length === "number" && Number.isFinite(item.length)
+          ? Math.max(0, Math.min(4096, Math.floor(item.length)))
+          : 0;
+        return { name, length };
+      }).filter((p) => p.name);
+      const observation = {
+        contract_version: CONTRACT_VERSION,
+        client_contract_version: typeof rawObs.contract_version === "string" ? String(rawObs.contract_version).slice(0, 64) : null,
+        transport: typeof rawObs.transport === "string" ? String(rawObs.transport).slice(0, 16) : "query",
+        route: typeof rawObs.route === "string" ? String(rawObs.route).slice(0, 128) : null,
+        has_code: Boolean(rawObs.hasCode),
+        has_state: Boolean(rawObs.hasState),
+        has_attempt: Boolean(rawObs.hasAttempt),
+        has_error: Boolean(rawObs.hasError),
+        params,
+        observed_at: new Date().toISOString(),
+        auth_present: Boolean(maybeUser),
+      };
+      let attemptRowId: string | null = null;
+      if (maybeUser) {
+        const { data: activeAttempt } = await db.from("google_calendar_oauth_attempts")
+          .select("id, callback_observation")
+          .eq("user_id", maybeUser.id)
+          .in("status", ["waiting_authorization", "starting", "completing"])
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+        if (activeAttempt) {
+          attemptRowId = activeAttempt.id;
+          const prior = Array.isArray((activeAttempt.callback_observation as { history?: unknown } | null)?.history)
+            ? ((activeAttempt.callback_observation as { history: unknown[] }).history)
+            : [];
+          const merged = { latest: observation, history: [...prior, observation].slice(-10) };
+          await db.from("google_calendar_oauth_attempts")
+            .update({ callback_observation: merged })
+            .eq("id", activeAttempt.id)
+            .eq("user_id", maybeUser.id);
+        }
+      } else {
+        // No auth: still try to match by most-recent pending attempt using state hash if provided.
+        // Nothing to correlate reliably; just log anonymously.
+      }
+      diagnostic(maybeUser ? "oauth_callback_observed" : "oauth_callback_observed_anon", {
+        user: maybeUser ? shortUserId(maybeUser.id) : null,
+        attemptId: attemptRowId,
+        transport: observation.transport,
+        hasCode: observation.has_code,
+        hasState: observation.has_state,
+        hasAttempt: observation.has_attempt,
+        hasError: observation.has_error,
+        paramCount: params.length,
+        paramNames: params.map((p) => p.name),
+      });
+      return json({ ok: true, contract_version: CONTRACT_VERSION, auth_present: Boolean(maybeUser) });
+    }
+
+    const user = await requireUser(req);
 
     if (action === "start") {
       const orgId = await requireActiveOrgMembership(db, user.id, body.orgId);
       const attemptId = crypto.randomUUID();
       const returnTarget = resolveReturnUrl(req, body.returnUrl, attemptId);
+      diagnostic("oauth_return_url_resolved", {
+        user: shortUserId(user.id),
+        orgId,
+        attemptId,
+        returnOrigin: returnTarget.origin,
+        returnPath: returnTarget.callbackPath,
+        nextPath: returnTarget.nextPath,
+        requestOrigin: req.headers.get("Origin") ?? null,
+      });
       const { data: existing, error: existingError } = await db.from("google_calendar_connections")
         .select("status, error_code")
         .eq("user_id", user.id)
