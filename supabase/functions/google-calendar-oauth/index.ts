@@ -502,7 +502,7 @@ Deno.serve(async (req) => {
           httpStatus: 200,
           responseFields: oauth.responseFields,
         });
-        return json({ authorization_url: oauth.authorizationUrl, attempt_id: attemptId, expires_at: expiresAt });
+        return json({ authorization_url: oauth.authorizationUrl, attempt_id: attemptId, expires_at: expiresAt, contract_version: CONTRACT_VERSION });
       } catch (error) {
         const code = safeServerError(error);
         await db.from("google_calendar_oauth_attempts").update({ status: "error", error_code: code })
