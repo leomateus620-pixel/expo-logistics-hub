@@ -430,6 +430,30 @@ async function readAttempt(db: AdminClient, attemptId: string, userId: string) {
   return data as OAuthAttempt;
 }
 
+async function readAttemptById(db: AdminClient, attemptId: string) {
+  const { data, error } = await db.from("google_calendar_oauth_attempts")
+    .select("id, user_id, org_id, status, return_origin, callback_path, next_path, provider_state_hash, expires_at, prior_connection_status, prior_error_code")
+    .eq("id", attemptId)
+    .maybeSingle();
+  assertDb(error, "attempt_lookup_failed");
+  if (!data) throw new Error("invalid_callback");
+  return data as OAuthAttempt;
+}
+
+async function validateAttemptConnection(db: AdminClient, attempt: OAuthAttempt) {
+  const { data, error } = await db.from("google_calendar_connections")
+    .select("secondary_calendar_id, active_oauth_attempt_id, status")
+    .eq("user_id", attempt.user_id)
+    .eq("org_id", attempt.org_id)
+    .eq("active_oauth_attempt_id", attempt.id)
+    .maybeSingle();
+  assertDb(error, "connection_lookup_failed");
+  if (!data || data.active_oauth_attempt_id !== attempt.id || data.status !== "waiting_authorization") {
+    throw new Error("invalid_callback");
+  }
+  return data as { secondary_calendar_id: string | null; active_oauth_attempt_id: string; status: string };
+}
+
 async function cancelAttempt(db: AdminClient, userId: string, attemptId: string) {
   const attempt = await readAttempt(db, attemptId, userId);
   if (!["starting", "waiting_authorization"].includes(attempt.status)) return false;
@@ -561,9 +585,8 @@ Deno.serve(async (req) => {
       return json({ ok: true, contract_version: CONTRACT_VERSION, auth_present: Boolean(maybeUser) });
     }
 
-    const user = await requireUser(req);
-
     if (action === "start") {
+      const user = await requireUser(req);
       const orgId = await requireActiveOrgMembership(db, user.id, body.orgId);
       const attemptId = crypto.randomUUID();
       const returnTarget = resolveReturnUrl(req, body.returnUrl, attemptId);
@@ -656,6 +679,7 @@ Deno.serve(async (req) => {
 
 
     if (action === "complete") {
+      const maybeUser = await optionalUser(req);
       const rawAttemptId = typeof body.attemptId === "string" && UUID_PATTERN.test(body.attemptId)
         ? body.attemptId
         : null;
@@ -664,9 +688,9 @@ Deno.serve(async (req) => {
         ? CALLBACK_ROUTE
         : "";
       const state = typeof body.state === "string" ? body.state.trim() : "";
-      if (!state) throw new Error("invalid_callback");
+      if (!state && !rawAttemptId) throw new Error("invalid_callback");
       const exchangeCode = asOAuthExchangeCode(body.code);
-      const stateHash = await sha256(state);
+      const stateHash = state ? await sha256(state) : "";
 
       // Resolve the attempt. Prefer the explicit attemptId when the callback
       // preserved it, but fall back to a lookup by provider_state_hash when the
@@ -674,8 +698,9 @@ Deno.serve(async (req) => {
       // return_url.
       let attempt: OAuthAttempt;
       if (rawAttemptId) {
-        attempt = await readAttempt(db, rawAttemptId, user.id);
+        attempt = maybeUser ? await readAttempt(db, rawAttemptId, maybeUser.id) : await readAttemptById(db, rawAttemptId);
       } else {
+        const user = await requireUser(req);
         const { data, error } = await db.from("google_calendar_oauth_attempts")
           .select("id, user_id, org_id, status, return_origin, callback_path, next_path, provider_state_hash, expires_at, prior_connection_status, prior_error_code")
           .eq("user_id", user.id)
@@ -691,12 +716,14 @@ Deno.serve(async (req) => {
       const attemptId = attempt.id;
 
       diagnostic("oauth_callback_received", {
-        user: shortUserId(user.id),
+        user: shortUserId(attempt.user_id),
         attemptId,
         viaState: !rawAttemptId,
+        authenticated: Boolean(maybeUser),
+        hasState: Boolean(state),
       });
 
-      await requireActiveOrgMembership(db, user.id, attempt.org_id);
+      if (maybeUser) await requireActiveOrgMembership(db, maybeUser.id, attempt.org_id);
 
       // The Lovable connector gateway may perform a top-level navigation whose
       // Origin header is not sent by the browser; only enforce the origin when
@@ -709,7 +736,7 @@ Deno.serve(async (req) => {
         throw new Error("invalid_callback");
       }
       if (Date.parse(attempt.expires_at) <= Date.now()) throw new Error("authorization_expired");
-      if (!attempt.provider_state_hash || stateHash !== attempt.provider_state_hash) {
+      if (state && (!attempt.provider_state_hash || stateHash !== attempt.provider_state_hash)) {
         throw new Error("oauth_state_mismatch");
       }
       if (attempt.status !== "waiting_authorization") {
@@ -724,20 +751,20 @@ Deno.serve(async (req) => {
         status: "completing",
         exchange_code_hash: codeHash,
       }).eq("id", attemptId)
-        .eq("user_id", user.id)
+        .eq("user_id", attempt.user_id)
         .eq("status", "waiting_authorization")
-        .eq("provider_state_hash", attempt.provider_state_hash)
         .select("id")
         .maybeSingle();
       assertDb(claimError, "attempt_claim_failed");
       if (!claimed) throw new Error("callback_replayed");
-      diagnostic("oauth_completion_pending", { user: shortUserId(user.id), orgId: attempt.org_id, attemptId });
+      diagnostic("oauth_completion_pending", { user: shortUserId(attempt.user_id), orgId: attempt.org_id, attemptId });
 
+      await validateAttemptConnection(db, attempt);
       const { data: connection, error: connectionError } = await db.from("google_calendar_connections").update({
         status: "completing",
         error_code: null,
         last_error: null,
-      }).eq("user_id", user.id)
+      }).eq("user_id", attempt.user_id)
         .eq("org_id", attempt.org_id)
         .eq("active_oauth_attempt_id", attemptId)
         .select("secondary_calendar_id")
@@ -748,7 +775,7 @@ Deno.serve(async (req) => {
       try {
         const exchanged = await exchangeOAuthCode(exchangeCode);
         diagnostic("connection_key_retrieved", {
-          user: shortUserId(user.id),
+          user: shortUserId(attempt.user_id),
           orgId: attempt.org_id,
           attemptId,
           httpStatus: 200,
@@ -756,13 +783,13 @@ Deno.serve(async (req) => {
         });
         const { data: keyStored, error: keyStoreError } = await db.from("google_calendar_connections").update({
           connection_key: exchanged.connectionKey,
-        }).eq("user_id", user.id).eq("org_id", attempt.org_id).eq("active_oauth_attempt_id", attemptId)
+        }).eq("user_id", attempt.user_id).eq("org_id", attempt.org_id).eq("active_oauth_attempt_id", attemptId)
           .select("user_id").maybeSingle();
         assertDbRow(keyStored, keyStoreError, "connection_key_store_failed");
 
         const finalized = await finalizeAuthorizedConnection(
           db,
-          user.id,
+          attempt.user_id,
           attempt.org_id,
           attemptId,
           exchanged.connectionKey,
@@ -772,15 +799,15 @@ Deno.serve(async (req) => {
       } catch (error) {
         const code = safeServerError(error);
         await db.from("google_calendar_oauth_attempts").update({ status: "error", error_code: code })
-          .eq("id", attemptId).eq("user_id", user.id).eq("status", "completing");
+          .eq("id", attemptId).eq("user_id", attempt.user_id).eq("status", "completing");
         await db.from("google_calendar_connections").update({
           status: "error",
           error_code: code,
           last_error: code,
           active_oauth_attempt_id: null,
-        }).eq("user_id", user.id).eq("org_id", attempt.org_id).eq("active_oauth_attempt_id", attemptId);
+        }).eq("user_id", attempt.user_id).eq("org_id", attempt.org_id).eq("active_oauth_attempt_id", attemptId);
         diagnostic("oauth_completion_failed", {
-          user: shortUserId(user.id),
+          user: shortUserId(attempt.user_id),
           orgId: attempt.org_id,
           attemptId,
           errorCode: code,
@@ -790,6 +817,7 @@ Deno.serve(async (req) => {
     }
 
     if (action === "cancel" || action === "reset") {
+      const user = await requireUser(req);
       const attemptId = typeof body.attemptId === "string" && UUID_PATTERN.test(body.attemptId)
         ? body.attemptId
         : null;
@@ -798,6 +826,7 @@ Deno.serve(async (req) => {
     }
 
     if (action === "retry") {
+      const user = await requireUser(req);
       const orgId = await requireActiveOrgMembership(db, user.id, body.orgId);
       const { data: connection, error: connectionError } = await db.from("google_calendar_connections")
         .select("status, connection_generation")
@@ -822,6 +851,7 @@ Deno.serve(async (req) => {
     }
 
     if (action === "disconnect") {
+      const user = await requireUser(req);
       const orgId = await requireActiveOrgMembership(db, user.id, body.orgId);
       const { data: connection, error: connectionError } = await db.from("google_calendar_connections")
         .select("connection_key, status")
@@ -859,6 +889,7 @@ Deno.serve(async (req) => {
     }
 
     if (action === "status") {
+      const user = await requireUser(req);
       const orgId = await requireActiveOrgMembership(db, user.id, body.orgId);
       const { data: connectionData, error: connectionError } = await db.from("google_calendar_connections")
         .select("user_id, org_id, google_email, secondary_calendar_id, status, last_sync_at, error_code, backfill_total, backfill_done, connected_at, verified_at, connection_generation, active_oauth_attempt_id, updated_at")

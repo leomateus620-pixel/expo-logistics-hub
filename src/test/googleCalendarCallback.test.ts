@@ -13,6 +13,7 @@ describe('retorno OAuth do Google Agenda', () => {
     expect(parseGoogleCalendarCallbackFeedback('?google=connected')).toEqual({
       kind: 'failed',
       code: 'invalid_callback',
+      attemptId: null,
     });
   });
 
@@ -24,14 +25,18 @@ describe('retorno OAuth do Google Agenda', () => {
     });
   });
 
-  it('exige tentativa, code e state antes de solicitar conclusão server-side', () => {
+  it('aceita conclusão server-side por state ou por tentativa explícita', () => {
     expect(parseGoogleCalendarCallbackFeedback('?code=troca&state=ok')).toEqual({
-      kind: 'failed',
-      code: 'invalid_callback',
+      kind: 'completion_required',
+      attemptId: null,
+      code: 'troca',
+      state: 'ok',
     });
     expect(parseGoogleCalendarCallbackFeedback(`?attempt=${ATTEMPT_ID}&code=troca`)).toEqual({
-      kind: 'failed',
-      code: 'invalid_callback',
+      kind: 'completion_required',
+      attemptId: ATTEMPT_ID,
+      code: 'troca',
+      state: null,
     });
     expect(parseGoogleCalendarCallbackFeedback(`?attempt=${ATTEMPT_ID}&code=troca&state=ok`)).toEqual({
       kind: 'completion_required',

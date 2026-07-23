@@ -6,14 +6,13 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import GoogleCalendarCallbackPage from '@/pages/GoogleCalendarCallbackPage';
 
 const mocks = vi.hoisted(() => ({
-  invoke: vi.fn(),
   getSession: vi.fn(),
+  fetch: vi.fn(),
 }));
 
 vi.mock('@/integrations/supabase/client', () => ({
   supabase: {
     auth: { getSession: mocks.getSession },
-    functions: { invoke: mocks.invoke },
   },
 }));
 
@@ -22,13 +21,15 @@ const ATTEMPT_ID = '11111111-1111-4111-8111-111111111111';
 beforeEach(() => {
   vi.useFakeTimers({ shouldAdvanceTime: true });
   mocks.getSession.mockResolvedValue({ data: { session: { access_token: 'test-token' } } });
-  mocks.invoke.mockResolvedValue({ data: { ok: true, backfill: 3 }, error: null });
+  mocks.fetch.mockResolvedValue({ ok: true, json: async () => ({ ok: true, backfill: 3 }) });
+  vi.stubGlobal('fetch', mocks.fetch);
   window.history.replaceState({}, '', `/google-calendar/callback?attempt=${ATTEMPT_ID}&code=one-time-code&state=expected-state&next=%2Fcronograma-eventos`);
 });
 
 afterEach(() => {
   cleanup();
   vi.useRealTimers();
+  vi.unstubAllGlobals();
   vi.restoreAllMocks();
   Object.defineProperty(window, 'opener', { configurable: true, value: null });
 });
@@ -47,14 +48,16 @@ describe('página de callback do Google Agenda', () => {
     expect(screen.getByRole('heading', { name: 'Validando autorização' })).toBeVisible();
 
     expect(await screen.findByRole('heading', { name: 'Google Agenda conectado' })).toBeVisible();
-    expect(mocks.invoke).toHaveBeenCalledWith('google-calendar-oauth', expect.objectContaining({
-      body: {
+    expect(mocks.fetch).toHaveBeenCalledWith(expect.stringContaining('/functions/v1/google-calendar-oauth'), expect.objectContaining({
+      method: 'POST',
+      keepalive: true,
+      body: JSON.stringify({
         action: 'complete',
         attemptId: ATTEMPT_ID,
         code: 'one-time-code',
         state: 'expected-state',
         callbackPath: '/google-calendar/callback',
-      },
+      }),
     }));
     expect(postMessage).toHaveBeenCalledWith({
       type: 'fenasoja:google-calendar-oauth',
@@ -63,7 +66,7 @@ describe('página de callback do Google Agenda', () => {
       attemptId: ATTEMPT_ID,
     }, window.location.origin);
     expect(close).not.toHaveBeenCalled();
-    await act(async () => vi.advanceTimersByTime(350));
+    await act(async () => vi.advanceTimersByTime(1600));
     expect(close).toHaveBeenCalledTimes(1);
   });
 
@@ -74,7 +77,7 @@ describe('página de callback do Google Agenda', () => {
     await waitFor(() => {
       expect(screen.getByRole('heading', { name: 'Google Agenda conectado' })).toBeVisible();
     });
-    expect(mocks.invoke).toHaveBeenCalledTimes(1);
+    expect(mocks.fetch).toHaveBeenCalledTimes(2);
     expect(window.location.search).toBe('');
   });
 
@@ -82,6 +85,6 @@ describe('página de callback do Google Agenda', () => {
     window.history.replaceState({}, '', '/google-calendar/callback?google=connected');
     render(<GoogleCalendarCallbackPage />);
     expect(await screen.findByRole('heading', { name: 'Autorização não confirmada' })).toBeVisible();
-    expect(mocks.invoke).not.toHaveBeenCalled();
+    expect(mocks.fetch).toHaveBeenCalledTimes(1);
   });
 });

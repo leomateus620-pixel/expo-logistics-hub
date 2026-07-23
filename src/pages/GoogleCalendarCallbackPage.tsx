@@ -80,8 +80,14 @@ function safeCallbackCopy(code: string) {
 export default function GoogleCalendarCallbackPage() {
   const captured = useMemo(() => {
     const search = window.location.search;
+    const hash = window.location.hash;
+    const callbackPayload = search && search.length > 1
+      ? search
+      : hash && hash.length > 1
+        ? `?${hash.replace(/^#/, '')}`
+        : '';
     return {
-      feedback: parseGoogleCalendarCallbackFeedback(search),
+      feedback: parseGoogleCalendarCallbackFeedback(callbackPayload),
       next: getGoogleCalendarCallbackNext(search),
     };
   }, []);
@@ -181,7 +187,7 @@ export default function GoogleCalendarCallbackPage() {
         const result = await keepaliveInvoke('complete', {
           ...(feedback.attemptId ? { attemptId: feedback.attemptId } : {}),
           code: feedback.code,
-          state: feedback.state,
+          ...(feedback.state ? { state: feedback.state } : {}),
           callbackPath: GOOGLE_CALENDAR_CALLBACK_PATH,
         }, 12000);
         if (!result.ok) throw new Error('authorization_not_confirmed');
