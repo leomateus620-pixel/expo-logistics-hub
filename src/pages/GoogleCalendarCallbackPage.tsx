@@ -92,9 +92,6 @@ export default function GoogleCalendarCallbackPage() {
   });
 
   useEffect(() => {
-    // Evidence gate: capture sanitized metadata (names + lengths only, never
-    // values) about what the Lovable connector gateway actually returned to
-    // the callback, then send it to the backend before we strip the URL.
     const rawSearch = window.location.search;
     const rawHash = window.location.hash;
     const source = rawSearch && rawSearch.length > 1
@@ -102,52 +99,28 @@ export default function GoogleCalendarCallbackPage() {
       : rawHash && rawHash.length > 1
         ? { transport: 'hash' as const, raw: rawHash.startsWith('#') ? `?${rawHash.slice(1)}` : rawHash }
         : { transport: 'query' as const, raw: '' };
-    const params = new URLSearchParams(source.raw);
-    const paramMeta: { name: string; length: number }[] = [];
-    params.forEach((value, key) => {
-      paramMeta.push({ name: key.slice(0, 64), length: value.length });
-    });
+    const searchParams = new URLSearchParams(rawSearch);
+    const hashParams = new URLSearchParams(rawHash.startsWith('#') ? rawHash.slice(1) : rawHash);
+    const paramMeta: { name: string; length: number; loc: 'q' | 'h' }[] = [];
+    searchParams.forEach((value, key) => paramMeta.push({ name: key.slice(0, 64), length: value.length, loc: 'q' }));
+    hashParams.forEach((value, key) => paramMeta.push({ name: key.slice(0, 64), length: value.length, loc: 'h' }));
+    const activeParams = new URLSearchParams(source.raw);
     const observation = {
-      contract_version: '2026-07-23.observe',
+      contract_version: '2026-07-23.observe-keepalive',
       transport: source.transport,
       route: GOOGLE_CALENDAR_CALLBACK_PATH,
-      hasCode: params.has('code'),
-      hasState: params.has('state'),
-      hasAttempt: params.has('attempt'),
-      hasError: params.has('error') || params.has('google_error'),
+      hasCode: activeParams.has('code') || hashParams.has('code'),
+      hasState: activeParams.has('state') || hashParams.has('state'),
+      hasAttempt: activeParams.has('attempt') || hashParams.has('attempt'),
+      hasError: activeParams.has('error') || activeParams.has('google_error') || hashParams.has('error'),
       params: paramMeta,
+      searchLength: rawSearch.length,
+      hashLength: rawHash.length,
+      openerPresent: Boolean(window.opener && !window.opener.closed),
     };
-    const observedAttemptId = params.get('attempt');
-    // Fire-and-forget observation via supabase-js. If it fails (e.g. session
-    // not hydrated in the top-level return context), fall back to a direct
-    // anonymous fetch using the publishable apikey so the evidence still
-    // reaches the backend regardless of session state.
-    void invokeOAuth('observe_callback', {
-      observation,
-      ...(observedAttemptId ? { attemptId: observedAttemptId } : {}),
-    }).catch((error) => {
-      window.console.warn('google_calendar_observe_failed', (error as Error)?.message);
-      try {
-        const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/google-calendar-oauth`;
-        const apikey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined;
-        if (!apikey) return;
-        void fetch(url, {
-          method: 'POST',
-          keepalive: true,
-          headers: { 'Content-Type': 'application/json', apikey, Authorization: `Bearer ${apikey}` },
-          body: JSON.stringify({
-            action: 'observe_callback',
-            observation,
-            ...(observedAttemptId ? { attemptId: observedAttemptId } : {}),
-          }),
-        }).catch((cause) => window.console.warn('google_calendar_observe_fallback_failed', (cause as Error)?.message));
-      } catch (cause) {
-        window.console.warn('google_calendar_observe_fallback_error', (cause as Error)?.message);
-      }
-    });
+    const observedAttemptId = activeParams.get('attempt') ?? hashParams.get('attempt');
 
-    // Codes, state and attempt identifiers leave browser history before any
-    // network work begins. Captured values remain only in this closure.
+    // Snapshot everything before mutating history — captured stays valid.
     window.history.replaceState({}, '', cleanGoogleCalendarCallbackUrl(window.location));
     let active = true;
 
@@ -158,17 +131,26 @@ export default function GoogleCalendarCallbackPage() {
     ) => {
       if (window.opener && !window.opener.closed) {
         window.opener.postMessage({ type: MESSAGE_TYPE, status, code, attemptId }, window.location.origin);
-        window.setTimeout(() => window.close(), 350);
+        window.setTimeout(() => window.close(), 1500);
         return;
       }
       window.setTimeout(() => window.location.replace(captured.next), status === 'success' ? 600 : 1800);
     };
 
     const run = async () => {
+      // Phase A: always await observe_callback with keepalive so evidence
+      // survives the popup close race.
+      await keepaliveInvoke('observe_callback', {
+        observation,
+        ...(observedAttemptId ? { attemptId: observedAttemptId } : {}),
+      }).catch((error) => {
+        window.console.warn('google_calendar_observe_failed', (error as Error)?.message);
+      });
+
       const { feedback } = captured;
       if (feedback.kind === 'cancelled') {
         if (feedback.attemptId) {
-          await invokeOAuth('cancel', { attemptId: feedback.attemptId }).catch(() => undefined);
+          await keepaliveInvoke('cancel', { attemptId: feedback.attemptId }).catch(() => undefined);
         }
         if (!active) return;
         setUi({
@@ -196,14 +178,12 @@ export default function GoogleCalendarCallbackPage() {
       }
 
       try {
-        const result = await invokeOAuth('complete', {
-          // attemptId is optional — the backend resolves the attempt from
-          // `state` when the gateway strips our custom query param.
+        const result = await keepaliveInvoke('complete', {
           ...(feedback.attemptId ? { attemptId: feedback.attemptId } : {}),
           code: feedback.code,
           state: feedback.state,
           callbackPath: GOOGLE_CALENDAR_CALLBACK_PATH,
-        });
+        }, 12000);
         if (!result.ok) throw new Error('authorization_not_confirmed');
 
         if (!active) return;
@@ -233,6 +213,7 @@ export default function GoogleCalendarCallbackPage() {
       active = false;
     };
   }, [captured]);
+
 
   const isSuccess = ui.status === 'success';
   const isFailure = ui.status === 'failed' || ui.status === 'cancelled';
