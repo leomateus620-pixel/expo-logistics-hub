@@ -22,26 +22,25 @@ const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3
 
 export type GoogleCalendarCallbackFeedback =
   | { kind: 'none' }
-  | { kind: 'completion_required'; attemptId: string; code: string; state: string }
+  | { kind: 'completion_required'; attemptId: string | null; code: string; state: string }
   | { kind: 'cancelled'; code: 'authorization_cancelled'; attemptId: string | null }
   | { kind: 'failed'; code: 'invalid_callback' | 'authorization_failed' };
 
 /**
  * Parses provider input only. It deliberately never reports authorization as
  * successful: only the backend exchange, Google probe and calendar verification
- * can produce a success message.
+ * can produce a success message. The `attempt` query param is optional — the
+ * Lovable connector gateway may strip custom query params from `return_url`,
+ * so the backend can resolve the attempt from `state` alone when needed.
  */
 export function parseGoogleCalendarCallbackFeedback(search: string): GoogleCalendarCallbackFeedback {
   const params = new URLSearchParams(search);
   const providerError = (params.get('google_error') ?? params.get('error') ?? '').toLowerCase();
-  const attemptId = params.get('attempt')?.trim() ?? '';
+  const attemptRaw = params.get('attempt')?.trim() ?? '';
+  const attemptId = UUID_PATTERN.test(attemptRaw) ? attemptRaw : null;
 
   if (providerError === 'access_denied' || providerError === 'cancelled') {
-    return {
-      kind: 'cancelled',
-      code: 'authorization_cancelled',
-      attemptId: UUID_PATTERN.test(attemptId) ? attemptId : null,
-    };
+    return { kind: 'cancelled', code: 'authorization_cancelled', attemptId };
   }
   if (providerError) {
     return {
@@ -54,7 +53,7 @@ export function parseGoogleCalendarCallbackFeedback(search: string): GoogleCalen
 
   const code = params.get('code')?.trim() ?? '';
   const state = params.get('state')?.trim() ?? '';
-  if (UUID_PATTERN.test(attemptId) && code && state) {
+  if (code && state) {
     return { kind: 'completion_required', attemptId, code, state };
   }
 
@@ -62,6 +61,7 @@ export function parseGoogleCalendarCallbackFeedback(search: string): GoogleCalen
   if (hasOAuthSignal) return { kind: 'failed', code: 'invalid_callback' };
   return { kind: 'none' };
 }
+
 
 export function cleanGoogleCalendarCallbackUrl(location: Pick<Location, 'pathname' | 'search' | 'hash'>) {
   const params = new URLSearchParams(location.search);
