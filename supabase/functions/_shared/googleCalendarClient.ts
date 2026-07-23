@@ -53,8 +53,11 @@ export function buildAuthorizationUrl(state: string): string {
   url.searchParams.set("redirect_uri", googleRedirectUri());
   url.searchParams.set("response_type", "code");
   url.searchParams.set("access_type", "offline");
-  url.searchParams.set("prompt", "consent");
-  url.searchParams.set("include_granted_scopes", "true");
+  // Always reopen account picker + granular scope screen. Do NOT set
+  // include_granted_scopes here — that reuses prior partial consents and
+  // silently strips calendar checkboxes.
+  url.searchParams.set("prompt", "consent select_account");
+  url.searchParams.set("enable_granular_consent", "true");
   url.searchParams.set("state", state);
   url.searchParams.set("scope", GOOGLE_SCOPES.join(" "));
   return url.toString();
