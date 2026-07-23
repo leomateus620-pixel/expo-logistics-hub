@@ -4,7 +4,6 @@ import {
   AlertCircle,
   ArrowLeft,
   ArrowRight,
-  BadgeCheck,
   CalendarDays,
   CalendarRange,
   Check,
@@ -18,12 +17,12 @@ import {
   LockKeyhole,
   Mail,
   Map,
-  Milestone,
   Route,
   ShieldCheck,
   UsersRound,
   type LucideIcon,
 } from 'lucide-react';
+import { CronogramaLoginHero } from '@/components/auth/CronogramaLoginHero';
 import { FenasojaBrand } from '@/components/brand/FenasojaBrand';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -54,29 +53,6 @@ type FormPhase = 'idle' | 'submitting' | 'success';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const SUCCESS_REDIRECT_DELAY_MS = 800;
-
-const cronogramaCapabilities: CapabilityItem[] = [
-  {
-    icon: CalendarDays,
-    label: 'Calendário estratégico',
-    description: 'Marcos e períodos',
-  },
-  {
-    icon: Milestone,
-    label: 'Linha do tempo',
-    description: 'Ciclo 2026—2028',
-  },
-  {
-    icon: UsersRound,
-    label: 'Reuniões centrais',
-    description: 'Agenda compartilhada',
-  },
-  {
-    icon: BadgeCheck,
-    label: 'Decisões do ciclo',
-    description: 'Registro institucional',
-  },
-];
 
 const commercialMapCapabilities: CapabilityItem[] = [
   {
@@ -183,46 +159,40 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
           : 'Comissão de Logística';
   const heroTitleLead = isAdminLogin
     ? 'Governança institucional'
-    : isCronogramaLogin
-      ? 'Planejamento temporal'
-      : isCommercialMapLogin
-        ? 'Gestão territorial'
-        : 'Ambiente seguro';
+    : isCommercialMapLogin
+      ? 'Gestão territorial'
+      : 'Ambiente seguro';
   const heroTitleAccent = isAdminLogin
     ? 'Fenasoja 2028'
-    : isCronogramaLogin
-      ? 'da Fenasoja 2028'
-      : isCommercialMapLogin
-        ? 'e comercial do parque'
-        : 'das comissões';
-  const capabilities = isCronogramaLogin
-    ? cronogramaCapabilities
     : isCommercialMapLogin
-      ? commercialMapCapabilities
-      : isAdminLogin
-        ? adminCapabilities
-        : [
-            {
-              icon: Layers3,
-              label: 'Módulo selecionado',
-              description: selectedModule?.name ?? 'Logística',
-            },
-            {
-              icon: CalendarDays,
-              label: 'Agenda operacional',
-              description: 'Prioridades do ciclo',
-            },
-            {
-              icon: UsersRound,
-              label: 'Equipe conectada',
-              description: 'Papéis definidos',
-            },
-            {
-              icon: ShieldCheck,
-              label: 'Dados do módulo',
-              description: 'Acesso controlado',
-            },
-          ];
+      ? 'e comercial do parque'
+      : 'das comissões';
+  const capabilities = isCommercialMapLogin
+    ? commercialMapCapabilities
+    : isAdminLogin
+      ? adminCapabilities
+      : [
+          {
+            icon: Layers3,
+            label: 'Módulo selecionado',
+            description: selectedModule?.name ?? 'Logística',
+          },
+          {
+            icon: CalendarDays,
+            label: 'Agenda operacional',
+            description: 'Prioridades do ciclo',
+          },
+          {
+            icon: UsersRound,
+            label: 'Equipe conectada',
+            description: 'Papéis definidos',
+          },
+          {
+            icon: ShieldCheck,
+            label: 'Dados do módulo',
+            description: 'Acesso controlado',
+          },
+        ];
   const ContextIcon = isAdminLogin
     ? LockKeyhole
     : isCronogramaLogin
@@ -337,57 +307,67 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
   };
 
   return (
-    <main className="auth-screen" data-auth-phase={phase}>
-      <div className="auth-screen__cycle" aria-hidden="true">
-        <span>2026</span>
-        <i />
-        <span>2027</span>
-        <i />
-        <span data-current="true">2028</span>
-      </div>
+    <main
+      className="auth-screen"
+      data-auth-phase={phase}
+      data-module={selectedSlug}
+    >
+      {!isCronogramaLogin && (
+        <div className="auth-screen__cycle" aria-hidden="true">
+          <span>2026</span>
+          <i />
+          <span>2027</span>
+          <i />
+          <span data-current="true">2028</span>
+        </div>
+      )}
 
       <div className="auth-layout">
-        <section className="auth-hero" aria-labelledby="login-hero-title">
-          <FenasojaBrand
-            className="auth-hero__brand"
-            scale="display"
-            subtitle="Planejamento institucional"
-            tone="dark"
-          />
+        {isCronogramaLogin ? (
+          <CronogramaLoginHero />
+        ) : (
+          <section className="auth-hero" aria-labelledby="login-hero-title">
+            <FenasojaBrand
+              className="auth-hero__brand"
+              scale="display"
+              subtitle="Planejamento institucional"
+              tone="dark"
+            />
 
-          <div className="auth-hero__context">
-            <span className="auth-hero__context-icon" aria-hidden="true">
-              <ShieldCheck />
-            </span>
-            <span className="auth-hero__context-label">Acesso protegido</span>
-            <span className="auth-hero__context-divider" aria-hidden="true" />
-            <span className="auth-hero__context-name">{contextName}</span>
-          </div>
+            <div className="auth-hero__context">
+              <span className="auth-hero__context-icon" aria-hidden="true">
+                <ShieldCheck />
+              </span>
+              <span className="auth-hero__context-label">Acesso protegido</span>
+              <span className="auth-hero__context-divider" aria-hidden="true" />
+              <span className="auth-hero__context-name">{contextName}</span>
+            </div>
 
-          <h1 id="login-hero-title" className="auth-hero__title">
-            {heroTitleLead}
-            <span>{heroTitleAccent}</span>
-          </h1>
+            <h1 id="login-hero-title" className="auth-hero__title">
+              {heroTitleLead}
+              <span>{heroTitleAccent}</span>
+            </h1>
 
-          <p className="auth-hero__capability-label">Capacidades do ambiente</p>
-          <ul className="auth-capabilities" aria-label="Capacidades do ambiente selecionado">
-            {capabilities.map(({ description, icon: Icon, label }, index) => (
-              <li
-                key={label}
-                className="auth-capability"
-                style={{ '--capability-index': index } as CSSProperties}
-              >
-                <span className="auth-capability__icon" aria-hidden="true">
-                  <Icon />
-                </span>
-                <span className="auth-capability__copy">
-                  <strong>{label}</strong>
-                  <span>{description}</span>
-                </span>
-              </li>
-            ))}
-          </ul>
-        </section>
+            <p className="auth-hero__capability-label">Capacidades do ambiente</p>
+            <ul className="auth-capabilities" aria-label="Capacidades do ambiente selecionado">
+              {capabilities.map(({ description, icon: Icon, label }, index) => (
+                <li
+                  key={label}
+                  className="auth-capability"
+                  style={{ '--capability-index': index } as CSSProperties}
+                >
+                  <span className="auth-capability__icon" aria-hidden="true">
+                    <Icon />
+                  </span>
+                  <span className="auth-capability__copy">
+                    <strong>{label}</strong>
+                    <span>{description}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         <section
           className="auth-panel"
@@ -395,7 +375,12 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
           aria-busy={phase === 'submitting'}
         >
           <div className="auth-panel__brand-row">
-            <FenasojaBrand compact subtitle="Acesso ao sistema" tone="light" />
+            <FenasojaBrand
+              compact
+              showEdition={!isCronogramaLogin}
+              subtitle="Acesso ao sistema"
+              tone="light"
+            />
             <div className="auth-module-badge">
               <span className="auth-module-badge__icon" aria-hidden="true">
                 <ContextIcon />
@@ -425,6 +410,7 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
               </label>
               <div
                 className="auth-input-frame"
+                data-field="email"
                 data-filled={email.trim().length > 0}
                 data-invalid={emailInvalid}
                 data-disabled={isBusy}
@@ -437,7 +423,7 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
                   id="login-email"
                   className="auth-input-control"
                   type="email"
-                  placeholder="seu.email@fenasoja.com.br"
+                  placeholder="SEU.EMAIL@FENASOJA.COM.BR"
                   value={email}
                   onChange={(event) => updateEmail(event.target.value)}
                   onBlur={() => {
@@ -474,6 +460,7 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
               </label>
               <div
                 className="auth-input-frame"
+                data-field="password"
                 data-filled={password.length > 0}
                 data-invalid={passwordInvalid}
                 data-disabled={isBusy}

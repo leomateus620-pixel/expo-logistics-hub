@@ -5,6 +5,7 @@ interface FenasojaBrandProps {
   compact?: boolean;
   markOnly?: boolean;
   scale?: 'standard' | 'display';
+  showEdition?: boolean;
   subtitle?: string;
   tone?: 'light' | 'dark';
 }
@@ -14,6 +15,7 @@ export function FenasojaBrand({
   compact = false,
   markOnly = false,
   scale = 'standard',
+  showEdition = true,
   subtitle,
   tone = 'dark',
 }: FenasojaBrandProps) {
@@ -67,22 +69,24 @@ export function FenasojaBrand({
             >
               FENASOJA
             </span>
-            <span
-              className={cn(
-                'fenasoja-brand__edition font-black',
-                isDisplay
-                  ? 'grid min-w-[4.5rem] rounded-[10px] border border-[oklch(var(--brand-gold-400)/0.48)] bg-[oklch(var(--brand-gold-500)/0.10)] px-2.5 py-1 text-center text-[0.8rem] leading-none tracking-[0.1em] text-[oklch(var(--brand-gold-400))] shadow-[inset_0_1px_0_rgb(255_255_255/0.12)]'
-                  : 'rounded-full bg-[oklch(var(--brand-orange-500))] px-1.5 py-0.5 text-[9px] tracking-[0.08em] text-[oklch(var(--brand-navy-900))]',
-                compact && !isDisplay && 'text-[8px]',
-              )}
-            >
-              {isDisplay && (
-                <span className="mb-1 text-[0.5rem] font-bold uppercase tracking-[0.2em] text-[oklch(var(--brand-cream)/0.78)]">
-                  Edição
-                </span>
-              )}
-              <span>2028</span>
-            </span>
+            {showEdition && (
+              <span
+                className={cn(
+                  'fenasoja-brand__edition font-black',
+                  isDisplay
+                    ? 'grid min-w-[4.5rem] rounded-[10px] border border-[oklch(var(--brand-gold-400)/0.48)] bg-[oklch(var(--brand-gold-500)/0.10)] px-2.5 py-1 text-center text-[0.8rem] leading-none tracking-[0.1em] text-[oklch(var(--brand-gold-400))] shadow-[inset_0_1px_0_rgb(255_255_255/0.12)]'
+                    : 'rounded-full bg-[oklch(var(--brand-orange-500))] px-1.5 py-0.5 text-[9px] tracking-[0.08em] text-[oklch(var(--brand-navy-900))]',
+                  compact && !isDisplay && 'text-[8px]',
+                )}
+              >
+                {isDisplay && (
+                  <span className="mb-1 text-[0.5rem] font-bold uppercase tracking-[0.2em] text-[oklch(var(--brand-cream)/0.78)]">
+                    Edição
+                  </span>
+                )}
+                <span>2028</span>
+              </span>
+            )}
           </span>
           {subtitle && (
             <span

@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import LoginPage from '@/pages/LoginPage';
@@ -45,37 +45,44 @@ describe('experiência de autenticação Fenasoja 2028', () => {
     localStorage.clear();
   });
 
-  it('apresenta a marca institucional, as quatro capacidades e remove o bloco obsoleto', () => {
+  it('apresenta o hero simplificado, o título correto e o ciclo estratégico', () => {
     renderLogin();
 
-    expect(
-      screen.getByRole('img', { name: 'Fenasoja 2028, Planejamento institucional' }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('heading', { name: 'Planejamento temporal da Fenasoja 2028' }),
-    ).toBeInTheDocument();
-
-    const capabilities = screen.getByRole('list', {
-      name: 'Capacidades do ambiente selecionado',
+    const heroBrand = screen.getByRole('img', {
+      name: 'Fenasoja 2028, Planejamento institucional',
     });
 
-    for (const label of [
-      'Calendário estratégico',
-      'Linha do tempo',
-      'Reuniões centrais',
-      'Decisões do ciclo',
-    ]) {
-      expect(within(capabilities).getByText(label)).toBeInTheDocument();
-    }
-
-    expect(screen.queryByText('Contexto preservado')).not.toBeInTheDocument();
-    expect(screen.queryByText('Acesso por perfil')).not.toBeInTheDocument();
-    expect(screen.queryByText('Dados protegidos')).not.toBeInTheDocument();
+    expect(heroBrand).toBeInTheDocument();
+    expect(heroBrand.querySelector('.fenasoja-brand__edition')).not.toBeInTheDocument();
     expect(
-      screen.queryByText(
-        'Consulte calendário, linha do tempo, reuniões centrais e decisões do ciclo oficial 2026—2028.',
-      ),
+      screen.getByRole('img', { name: 'Fenasoja 2028, Acesso ao sistema' })
+        .querySelector('.fenasoja-brand__edition'),
     ).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Planejamento da Fenasoja 2028' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('img', {
+        name: 'Ciclo estratégico de 2026 a 2028, com foco atual em 2028',
+      }),
+    ).toBeInTheDocument();
+
+    expect(screen.queryByText('Acesso protegido')).not.toBeInTheDocument();
+    expect(screen.queryByText('Capacidades do ambiente')).not.toBeInTheDocument();
+    expect(screen.queryByText('Calendário estratégico')).not.toBeInTheDocument();
+    expect(screen.queryByText('Linha do tempo')).not.toBeInTheDocument();
+    expect(screen.queryByText('Reuniões centrais')).not.toBeInTheDocument();
+    expect(screen.queryByText('Decisões do ciclo')).not.toBeInTheDocument();
+  });
+
+  it('mantém o e-mail real em minúsculas apesar do tratamento visual em maiúsculas', () => {
+    renderLogin();
+
+    const email = screen.getByLabelText('E-mail');
+    fireEvent.change(email, { target: { value: 'usuario@fenasoja.com.br' } });
+
+    expect(email).toHaveValue('usuario@fenasoja.com.br');
+    expect(email.closest('[data-field="email"]')).toBeInTheDocument();
   });
 
   it('expõe validação local próxima aos campos sem chamar a autenticação', () => {
