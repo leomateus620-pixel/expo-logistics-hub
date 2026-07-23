@@ -82,8 +82,15 @@ export function cleanGoogleCalendarCallbackUrl(location: Pick<Location, 'pathnam
   const params = new URLSearchParams(location.search);
   GOOGLE_CALLBACK_KEYS.forEach((key) => params.delete(key));
   if (location.pathname === GOOGLE_CALENDAR_CALLBACK_PATH) params.delete('next');
+
+  const hashValue = location.hash.startsWith('#') ? location.hash.slice(1) : location.hash;
+  const hashParams = new URLSearchParams(hashValue);
+  const hashHadCallbackKeys = GOOGLE_CALLBACK_KEYS.some((key) => hashParams.has(key));
+  if (hashHadCallbackKeys) GOOGLE_CALLBACK_KEYS.forEach((key) => hashParams.delete(key));
+
   const query = params.toString();
-  return `${location.pathname}${query ? `?${query}` : ''}${location.hash}`;
+  const hash = hashHadCallbackKeys ? hashParams.toString() : hashValue;
+  return `${location.pathname}${query ? `?${query}` : ''}${hash ? `#${hash}` : ''}`;
 }
 
 export function getGoogleCalendarCallbackNext(search: string) {
