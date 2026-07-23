@@ -1232,3 +1232,846 @@
     transform: none;
   }
 }
+
+/* Cronograma e Eventos — institutional 2028 login composition. */
+.auth-screen[data-module='cronograma-eventos'] {
+  background:
+    radial-gradient(ellipse at 13% 14%, oklch(var(--brand-indigo-500) / 0.72), transparent 38%),
+    radial-gradient(ellipse at 54% 76%, oklch(var(--brand-gold-500) / 0.075), transparent 34%),
+    radial-gradient(ellipse at 100% 44%, oklch(var(--brand-blue) / 0.11), transparent 32%),
+    linear-gradient(
+      118deg,
+      oklch(var(--brand-navy-900)) 0%,
+      oklch(18% 0.059 256) 58%,
+      oklch(var(--brand-navy-950)) 100%
+    );
+}
+
+.auth-screen[data-module='cronograma-eventos']::before {
+  background-image:
+    linear-gradient(rgb(255 255 255 / 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(255 255 255 / 0.022) 1px, transparent 1px);
+  background-size: 68px 68px;
+  mask-image:
+    linear-gradient(to right, black, transparent 73%),
+    linear-gradient(to bottom, black, transparent 92%);
+}
+
+.auth-screen[data-module='cronograma-eventos']::after {
+  top: clamp(2rem, 8vh, 6rem);
+  right: clamp(-16rem, -10vw, -6rem);
+  border-color: oklch(var(--brand-gold-400) / 0.11);
+  box-shadow:
+    inset 0 0 0 4.5rem oklch(var(--brand-indigo-500) / 0.022),
+    inset 0 0 0 9rem oklch(var(--brand-blue) / 0.014);
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-layout {
+  width: min(100%, 76rem);
+  grid-template-columns: minmax(0, 1.08fr) minmax(23.5rem, 26.5rem);
+  gap: clamp(3.25rem, 6vw, 6rem);
+}
+
+.auth-hero--cronograma {
+  position: relative;
+  max-width: 43rem;
+}
+
+.auth-hero--cronograma::after {
+  position: absolute;
+  z-index: -1;
+  top: 22%;
+  left: -12%;
+  width: min(32rem, 88%);
+  height: 16rem;
+  border-radius: 50%;
+  background: oklch(var(--brand-indigo-500) / 0.12);
+  content: '';
+  filter: blur(74px);
+  pointer-events: none;
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-hero__brand {
+  filter:
+    drop-shadow(0 18px 28px rgb(3 10 25 / 0.26))
+    drop-shadow(0 0 18px oklch(var(--brand-indigo-300) / 0.09));
+}
+
+.auth-hero__title-group {
+  margin-top: clamp(2.5rem, 6vh, 4.25rem);
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-hero__title--cronograma {
+  max-width: none;
+  margin-top: 0;
+  color: oklch(var(--brand-soft-white));
+  font-size: clamp(3.35rem, 5.35vw, 4.65rem);
+  font-weight: 950;
+  letter-spacing: -0.064em;
+  line-height: 0.91;
+  text-shadow:
+    0 1px 0 rgb(255 255 255 / 0.12),
+    0 5px 0 rgb(1 11 28 / 0.18),
+    0 22px 38px rgb(0 6 20 / 0.34);
+  text-wrap: initial;
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-title-visual,
+.auth-screen[data-module='cronograma-eventos'] .auth-title-line {
+  display: block;
+  margin: 0;
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-title-line--lead {
+  color: oklch(var(--brand-soft-white));
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-title-line--brand {
+  display: flex;
+  align-items: baseline;
+  gap: 0.22em;
+  margin-top: 0.15em;
+  white-space: nowrap;
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-title-word {
+  display: inline-flex;
+  align-items: baseline;
+  margin: 0;
+  color: oklch(var(--brand-cream));
+  text-shadow:
+    0 1px 0 rgb(255 255 255 / 0.16),
+    0 4px 0 oklch(var(--brand-orange-700) / 0.11),
+    0 20px 34px oklch(var(--brand-gold-500) / 0.1);
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-title-soy-o {
+  position: relative;
+  display: inline-grid;
+  width: 0.86em;
+  height: 0.86em;
+  flex: 0 0 auto;
+  place-items: center;
+  align-self: center;
+  margin: 0 -0.015em 0 0.015em;
+  filter:
+    drop-shadow(0 0.06em 0.035em rgb(0 0 0 / 0.3))
+    drop-shadow(0 0.12em 0.18em oklch(var(--brand-gold-500) / 0.22));
+  transform: translateY(0.045em) rotate(-3deg);
+  transform-origin: center;
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-title-soy-o::before {
+  position: absolute;
+  inset: 7%;
+  border: 1px solid oklch(var(--brand-gold-400) / 0.36);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 0.045em oklch(var(--brand-gold-500) / 0.055),
+    0 0 0.22em oklch(var(--brand-gold-400) / 0.13);
+  content: '';
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-title-soy-o img {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 112%;
+  max-width: none;
+  height: 112%;
+  object-fit: contain;
+  user-select: none;
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-title-year {
+  display: inline-block;
+  margin: 0;
+  color: oklch(var(--brand-gold-400));
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.055em;
+  text-shadow:
+    0 1px 0 rgb(255 255 255 / 0.12),
+    0 4px 0 oklch(var(--brand-orange-700) / 0.13),
+    0 18px 30px oklch(var(--brand-gold-500) / 0.12);
+}
+
+@supports ((background-clip: text) or (-webkit-background-clip: text)) {
+  .auth-screen[data-module='cronograma-eventos'] .auth-title-word {
+    background: linear-gradient(
+      118deg,
+      oklch(var(--brand-soft-white)) 4%,
+      oklch(var(--brand-cream)) 58%,
+      oklch(var(--brand-gold-400)) 116%
+    );
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+.auth-strategy-timeline {
+  width: min(100%, 34rem);
+  margin-top: clamp(1.45rem, 3vh, 2rem);
+  padding-block: 0.4rem 0.35rem;
+}
+
+.auth-strategy-timeline__caption {
+  display: block;
+  margin-bottom: 0.4rem;
+  color: oklch(var(--brand-cream) / 0.56);
+  font-size: 0.625rem;
+  font-weight: 800;
+  letter-spacing: 0.17em;
+  text-transform: uppercase;
+}
+
+.auth-strategy-timeline__track {
+  position: relative;
+  display: grid;
+  min-height: 1.75rem;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  align-items: center;
+}
+
+.auth-strategy-timeline__track::before {
+  position: absolute;
+  z-index: -1;
+  top: 50%;
+  right: 0.42rem;
+  left: 0.42rem;
+  height: 2px;
+  border-radius: 999px;
+  background:
+    linear-gradient(
+      90deg,
+      oklch(var(--brand-indigo-300) / 0.34),
+      oklch(var(--brand-gold-500) / 0.34) 72%,
+      oklch(var(--brand-gold-400) / 0.78)
+    );
+  box-shadow:
+    0 1px rgb(255 255 255 / 0.045),
+    0 0 16px oklch(var(--brand-gold-500) / 0.055);
+  content: '';
+  transform: translateY(-50%);
+}
+
+.auth-strategy-timeline__milestone {
+  display: inline-flex;
+  width: max-content;
+  min-height: 1.75rem;
+  align-items: center;
+  gap: 0.42rem;
+  border-radius: 999px;
+  padding: 0.2rem 0.42rem;
+  background: oklch(var(--brand-navy-900) / 0.92);
+  color: oklch(var(--brand-cream) / 0.62);
+  box-shadow: 0 0 0 3px oklch(var(--brand-navy-900) / 0.7);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.675rem;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+}
+
+.auth-strategy-timeline__milestone:nth-child(2) {
+  justify-self: center;
+}
+
+.auth-strategy-timeline__milestone:last-child {
+  justify-self: end;
+}
+
+.auth-strategy-timeline__milestone i {
+  display: block;
+  width: 0.45rem;
+  height: 0.45rem;
+  flex: 0 0 auto;
+  border: 1px solid oklch(var(--brand-gold-400) / 0.56);
+  border-radius: 50%;
+  background: oklch(var(--brand-navy-900));
+  box-shadow: inset 0 0 0 1px oklch(var(--brand-navy-900));
+}
+
+.auth-strategy-timeline__milestone strong {
+  font: inherit;
+}
+
+.auth-strategy-timeline__milestone[data-current='true'] {
+  border: 1px solid oklch(var(--brand-gold-400) / 0.18);
+  padding-inline: 0.52rem;
+  background:
+    linear-gradient(135deg, oklch(var(--brand-gold-500) / 0.11), transparent),
+    oklch(var(--brand-navy-900));
+  box-shadow:
+    0 0 0 3px oklch(var(--brand-navy-900) / 0.76),
+    0 8px 22px -14px oklch(var(--brand-gold-500) / 0.44);
+  color: oklch(var(--brand-gold-400));
+}
+
+.auth-strategy-timeline__milestone[data-current='true'] i {
+  border-color: oklch(var(--brand-gold-400));
+  background: oklch(var(--brand-gold-400));
+  box-shadow:
+    0 0 0 3px oklch(var(--brand-gold-400) / 0.1),
+    0 0 12px oklch(var(--brand-gold-400) / 0.34);
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-panel {
+  border: 1px solid transparent;
+  border-radius: 1.45rem;
+  background:
+    radial-gradient(circle at 100% 0%, oklch(var(--brand-gold-400) / 0.13), transparent 30%) padding-box,
+    linear-gradient(146deg, rgb(255 255 255 / 0.92), oklch(var(--brand-indigo-50) / 0.91)) padding-box,
+    linear-gradient(
+      142deg,
+      oklch(var(--brand-gold-400) / 0.72),
+      rgb(255 255 255 / 0.96) 34%,
+      oklch(var(--brand-indigo-300) / 0.72) 100%
+    ) border-box;
+  box-shadow:
+    0 3px 7px -3px rgb(1 8 24 / 0.3),
+    0 38px 82px -35px rgb(0 5 18 / 0.82),
+    0 15px 34px -26px oklch(var(--brand-gold-500) / 0.42),
+    inset 0 1px rgb(255 255 255 / 0.96);
+  transition:
+    border-color var(--motion-fast) var(--ease-standard),
+    box-shadow var(--motion-base) var(--ease-standard);
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-panel:focus-within {
+  box-shadow:
+    0 4px 10px -4px rgb(1 8 24 / 0.34),
+    0 42px 88px -35px rgb(0 5 18 / 0.86),
+    0 16px 36px -25px oklch(var(--brand-gold-500) / 0.5),
+    inset 0 1px rgb(255 255 255 / 0.98);
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-panel::before {
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.68),
+    inset 0 -1px oklch(var(--brand-indigo-500) / 0.075);
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-panel::after {
+  left: 1.8rem;
+  width: 5.5rem;
+  height: 0.22rem;
+  background: linear-gradient(
+    90deg,
+    oklch(var(--brand-orange-500)),
+    oklch(var(--brand-gold-400))
+  );
+  box-shadow: 0 8px 18px -8px oklch(var(--brand-gold-500) / 0.76);
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-panel__brand-row {
+  align-items: center;
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-module-badge {
+  border-color: oklch(var(--brand-indigo-500) / 0.18);
+  background:
+    linear-gradient(136deg, rgb(255 255 255 / 0.54), transparent 48%),
+    oklch(var(--brand-indigo-100) / 0.68);
+  box-shadow:
+    0 10px 24px -20px oklch(var(--brand-indigo-500) / 0.62),
+    inset 0 1px rgb(255 255 255 / 0.84);
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-module-badge__icon {
+  background: linear-gradient(
+    145deg,
+    oklch(var(--brand-indigo-400)),
+    oklch(var(--brand-indigo-600))
+  );
+  box-shadow:
+    0 7px 14px -9px oklch(var(--brand-indigo-500) / 0.78),
+    inset 0 1px rgb(255 255 255 / 0.18);
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-panel__heading {
+  margin-top: 1.9rem;
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-panel__eyebrow {
+  color: oklch(var(--brand-indigo-500) / 0.88);
+  letter-spacing: 0.145em;
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-panel__heading h2 {
+  position: relative;
+  display: block;
+  width: max-content;
+  margin-top: 0.52rem;
+  padding-bottom: 0.24rem;
+  color: oklch(var(--brand-navy-900));
+  font-size: clamp(2.2rem, 3.5vw, 2.72rem);
+  font-weight: 950;
+  letter-spacing: -0.06em;
+  line-height: 0.94;
+  text-shadow:
+    0 1px rgb(255 255 255 / 0.9),
+    0 9px 18px rgb(3 24 52 / 0.13);
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-panel__heading h2::after {
+  position: absolute;
+  right: -1.05rem;
+  bottom: 0.12rem;
+  width: 1.75rem;
+  height: 0.18rem;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    oklch(var(--brand-gold-500)),
+    oklch(var(--brand-blue) / 0.88)
+  );
+  box-shadow: 0 4px 10px -5px oklch(var(--brand-indigo-500) / 0.58);
+  content: '';
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-panel__heading p:last-child {
+  margin-top: 0.72rem;
+  color: oklch(42% 0.032 258);
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-form {
+  gap: 1.05rem;
+  margin-top: 1.55rem;
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-field__label {
+  letter-spacing: 0.012em;
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-input-frame {
+  min-height: 3.3rem;
+  border-radius: 0.88rem;
+  background: oklch(var(--brand-soft-white) / 0.87);
+  box-shadow:
+    0 1px 2px rgb(3 24 52 / 0.075),
+    inset 0 1px 2px rgb(3 24 52 / 0.032),
+    inset 0 0 0 1px rgb(255 255 255 / 0.48);
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-input-frame[data-field='email'] {
+  border-color: oklch(var(--brand-gold-700) / 0.52);
+  background:
+    linear-gradient(90deg, oklch(var(--brand-gold-500) / 0.055), transparent 38%),
+    oklch(var(--brand-soft-white) / 0.9);
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-input-frame[data-field='email']:hover:not([data-disabled='true']):not([data-invalid='true']),
+.auth-screen[data-module='cronograma-eventos'] .auth-input-frame[data-field='email'][data-filled='true'] {
+  border-color: oklch(var(--brand-gold-700) / 0.7);
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-input-frame[data-field='email']:focus-within {
+  border-color: oklch(var(--brand-gold-700));
+  background:
+    linear-gradient(90deg, oklch(var(--brand-gold-500) / 0.075), transparent 42%),
+    oklch(var(--brand-soft-white));
+  box-shadow:
+    0 0 0 3px oklch(var(--brand-gold-500) / 0.18),
+    0 12px 24px -21px oklch(var(--brand-gold-700) / 0.74),
+    inset 0 1px rgb(255 255 255 / 0.9);
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-input-frame[data-field='email'] .auth-input-frame__icon,
+.auth-screen[data-module='cronograma-eventos'] .auth-input-frame[data-field='email']:focus-within .auth-input-frame__icon,
+.auth-screen[data-module='cronograma-eventos'] .auth-input-frame[data-field='email'][data-filled='true'] .auth-input-frame__icon {
+  color: oklch(var(--brand-gold-700));
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-input-frame[data-field='email'] .auth-input-control {
+  text-transform: uppercase;
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-input-frame[data-field='password'] {
+  border-color: oklch(var(--brand-blue) / 0.48);
+  background:
+    linear-gradient(90deg, oklch(var(--brand-blue) / 0.045), transparent 38%),
+    oklch(var(--brand-soft-white) / 0.9);
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-input-frame[data-field='password']:hover:not([data-disabled='true']):not([data-invalid='true']),
+.auth-screen[data-module='cronograma-eventos'] .auth-input-frame[data-field='password'][data-filled='true'] {
+  border-color: oklch(var(--brand-blue) / 0.66);
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-input-frame[data-field='password']:focus-within {
+  border-color: oklch(var(--brand-blue));
+  background:
+    linear-gradient(90deg, oklch(var(--brand-blue) / 0.07), transparent 42%),
+    oklch(var(--brand-soft-white));
+  box-shadow:
+    0 0 0 3px oklch(var(--brand-blue) / 0.15),
+    0 12px 24px -21px oklch(var(--brand-blue) / 0.75),
+    inset 0 1px rgb(255 255 255 / 0.9);
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-input-frame[data-field='password'] .auth-input-frame__icon,
+.auth-screen[data-module='cronograma-eventos'] .auth-input-frame[data-field='password']:focus-within .auth-input-frame__icon,
+.auth-screen[data-module='cronograma-eventos'] .auth-input-frame[data-field='password'][data-filled='true'] .auth-input-frame__icon {
+  color: oklch(var(--brand-blue));
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-input-frame[data-invalid='true'],
+.auth-screen[data-module='cronograma-eventos'] .auth-input-frame[data-invalid='true']:focus-within {
+  border-color: oklch(var(--semantic-red-500) / 0.86);
+  background: oklch(var(--semantic-red-500) / 0.035);
+  box-shadow:
+    0 0 0 3px oklch(var(--semantic-red-500) / 0.1),
+    inset 0 1px 2px rgb(3 24 52 / 0.035);
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-input-frame[data-invalid='true'] .auth-input-frame__icon {
+  color: oklch(var(--semantic-red-700));
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-password-toggle {
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-submit {
+  isolation: isolate;
+  min-height: 3.35rem;
+  border-color: oklch(var(--brand-orange-700));
+  border-radius: 0.88rem;
+  background: linear-gradient(
+    112deg,
+    oklch(var(--brand-orange-500)),
+    oklch(var(--brand-orange-400)) 64%,
+    oklch(var(--brand-gold-500)) 128%
+  );
+  box-shadow:
+    0 3px 6px rgb(3 24 52 / 0.22),
+    0 18px 32px -17px oklch(var(--brand-orange-500) / 0.76),
+    inset 0 1px rgb(255 255 255 / 0.4),
+    inset 0 -2px rgb(3 24 52 / 0.15);
+  font-weight: 820;
+  letter-spacing: 0.005em;
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-submit::before {
+  position: absolute;
+  z-index: 0;
+  top: -35%;
+  bottom: -35%;
+  left: -38%;
+  width: 28%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgb(255 255 255 / 0.28),
+    transparent
+  );
+  content: '';
+  opacity: 0;
+  pointer-events: none;
+  transform: skewX(-18deg);
+  transition:
+    opacity var(--motion-fast) var(--ease-standard),
+    transform var(--motion-slow) var(--ease-decelerate);
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-submit > * {
+  position: relative;
+  z-index: 1;
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-submit:hover:not(:disabled) {
+  border-color: oklch(var(--brand-orange-700));
+  background: linear-gradient(
+    112deg,
+    oklch(var(--brand-orange-400)),
+    oklch(var(--brand-gold-500)) 135%
+  );
+  box-shadow:
+    0 5px 9px rgb(3 24 52 / 0.23),
+    0 23px 38px -18px oklch(var(--brand-orange-500) / 0.82),
+    inset 0 1px rgb(255 255 255 / 0.46),
+    inset 0 -2px rgb(3 24 52 / 0.13);
+  transform: translateY(-2px);
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-submit:hover:not(:disabled)::before {
+  opacity: 1;
+  transform: translateX(520%) skewX(-18deg);
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-submit:focus-visible {
+  box-shadow:
+    0 0 0 3px oklch(var(--brand-soft-white)),
+    0 0 0 6px oklch(var(--brand-orange-700)),
+    0 18px 32px -17px oklch(var(--brand-orange-500) / 0.76);
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-submit:active:not(:disabled) {
+  box-shadow:
+    0 1px 3px rgb(3 24 52 / 0.26),
+    0 8px 19px -14px oklch(var(--brand-orange-500) / 0.68),
+    inset 0 2px 5px rgb(3 24 52 / 0.21);
+  transform: translateY(1px) scale(0.985);
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-submit[data-phase='submitting'] {
+  background: oklch(var(--brand-orange-600));
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-submit[data-phase='success'] {
+  border-color: oklch(var(--semantic-green-600));
+  background: oklch(var(--brand-green));
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-submit:not([data-phase='idle'])::before {
+  display: none;
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-panel__footer {
+  border-top-color: oklch(var(--brand-indigo-500) / 0.12);
+}
+
+.auth-screen[data-module='cronograma-eventos'] .auth-restricted-note__icon {
+  background:
+    linear-gradient(145deg, rgb(255 255 255 / 0.44), transparent),
+    oklch(var(--brand-indigo-100) / 0.78);
+  box-shadow: inset 0 0 0 1px oklch(var(--brand-indigo-500) / 0.06);
+}
+
+@media (max-width: 1100px) {
+  .auth-screen[data-module='cronograma-eventos'] .auth-layout {
+    gap: clamp(2.5rem, 4.5vw, 3.75rem);
+  }
+
+  .auth-screen[data-module='cronograma-eventos'] .auth-hero__title--cronograma {
+    font-size: clamp(3.1rem, 5.15vw, 4rem);
+  }
+}
+
+@media (max-width: 959px) {
+  .auth-screen[data-module='cronograma-eventos'] .auth-layout {
+    width: min(100%, 44rem);
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.4rem;
+  }
+
+  .auth-hero--cronograma {
+    max-width: none;
+  }
+
+  .auth-hero--cronograma::after {
+    top: 15%;
+    left: -5%;
+    width: 72%;
+    height: 13rem;
+  }
+
+  .auth-hero__title-group {
+    margin-top: 1.8rem;
+  }
+
+  .auth-screen[data-module='cronograma-eventos'] .auth-hero__title--cronograma {
+    font-size: clamp(2.85rem, 7vw, 3.65rem);
+  }
+
+  .auth-strategy-timeline {
+    width: min(100%, 32rem);
+    margin-top: 1.25rem;
+  }
+
+  .auth-screen[data-module='cronograma-eventos'] .auth-panel {
+    width: min(100%, 32rem);
+  }
+}
+
+@media (max-width: 639px) {
+  .auth-screen[data-module='cronograma-eventos'] {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+
+  .auth-screen[data-module='cronograma-eventos']::before {
+    background-size: 52px 52px;
+    mask-image: linear-gradient(to bottom, black, transparent 55%);
+  }
+
+  .auth-screen[data-module='cronograma-eventos'] .auth-layout {
+    gap: 1.05rem;
+  }
+
+  .auth-hero--cronograma {
+    padding-inline: 0.15rem;
+  }
+
+  .auth-hero__title-group {
+    margin-top: 1.35rem;
+  }
+
+  .auth-screen[data-module='cronograma-eventos'] .auth-hero__title--cronograma {
+    font-size: clamp(2.05rem, 9.4vw, 2.8rem);
+    letter-spacing: -0.059em;
+    line-height: 0.94;
+  }
+
+  .auth-screen[data-module='cronograma-eventos'] .auth-title-line--brand {
+    gap: 0.18em;
+    margin-top: 0.13em;
+  }
+
+  .auth-strategy-timeline {
+    margin-top: 1rem;
+    padding-bottom: 0.2rem;
+  }
+
+  .auth-strategy-timeline__caption {
+    margin-bottom: 0.28rem;
+    font-size: 0.58rem;
+  }
+
+  .auth-strategy-timeline__milestone {
+    gap: 0.32rem;
+    min-height: 1.6rem;
+    padding-inline: 0.3rem;
+    font-size: 0.62rem;
+  }
+
+  .auth-strategy-timeline__milestone[data-current='true'] {
+    padding-inline: 0.42rem;
+  }
+
+  .auth-screen[data-module='cronograma-eventos'] .auth-panel {
+    border-radius: 1.12rem;
+  }
+
+  .auth-screen[data-module='cronograma-eventos'] .auth-panel::after {
+    left: 1.25rem;
+    width: 4.5rem;
+  }
+
+  .auth-screen[data-module='cronograma-eventos'] .auth-panel__brand-row {
+    display: grid;
+    grid-template-columns: minmax(0, 0.95fr) minmax(8.75rem, 1.05fr);
+    gap: 0.65rem;
+  }
+
+  .auth-screen[data-module='cronograma-eventos'] .auth-module-badge {
+    width: auto;
+    max-width: none;
+  }
+
+  .auth-screen[data-module='cronograma-eventos'] .auth-module-badge__copy strong {
+    overflow: visible;
+    line-height: 0.86rem;
+    text-overflow: clip;
+    white-space: normal;
+  }
+
+  .auth-screen[data-module='cronograma-eventos'] .auth-panel__heading {
+    margin-top: 1.3rem;
+  }
+
+  .auth-screen[data-module='cronograma-eventos'] .auth-panel__heading h2 {
+    font-size: 2.25rem;
+  }
+
+  .auth-screen[data-module='cronograma-eventos'] .auth-form {
+    gap: 0.95rem;
+    margin-top: 1.25rem;
+  }
+}
+
+@media (max-width: 359px) {
+  .auth-screen[data-module='cronograma-eventos'] .auth-panel__brand-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .auth-screen[data-module='cronograma-eventos'] .auth-module-badge {
+    width: 100%;
+  }
+}
+
+@media (min-width: 960px) and (max-height: 760px) {
+  .auth-hero__title-group {
+    margin-top: 1.65rem;
+  }
+
+  .auth-screen[data-module='cronograma-eventos'] .auth-hero__title--cronograma {
+    font-size: clamp(3rem, 4.45vw, 3.75rem);
+  }
+
+  .auth-strategy-timeline {
+    margin-top: 0.95rem;
+  }
+
+  .auth-screen[data-module='cronograma-eventos'] .auth-panel {
+    padding: 1.35rem;
+  }
+
+  .auth-screen[data-module='cronograma-eventos'] .auth-panel__heading {
+    margin-top: 1.2rem;
+  }
+
+  .auth-screen[data-module='cronograma-eventos'] .auth-panel__heading h2 {
+    font-size: 2.2rem;
+  }
+
+  .auth-screen[data-module='cronograma-eventos'] .auth-form {
+    gap: 0.78rem;
+    margin-top: 1.05rem;
+  }
+
+  .auth-screen[data-module='cronograma-eventos'] .auth-panel__footer {
+    margin-top: 0.9rem;
+  }
+}
+
+@media (prefers-contrast: more), (prefers-reduced-transparency: reduce) {
+  .auth-screen[data-module='cronograma-eventos'] {
+    background: oklch(var(--brand-navy-900));
+  }
+
+  .auth-hero--cronograma::after {
+    display: none;
+  }
+
+  .auth-screen[data-module='cronograma-eventos'] .auth-title-word {
+    background: none;
+    color: oklch(var(--brand-cream));
+    -webkit-text-fill-color: currentColor;
+  }
+
+  .auth-strategy-timeline__milestone,
+  .auth-strategy-timeline__milestone[data-current='true'] {
+    background: oklch(var(--brand-navy-900));
+  }
+
+  .auth-screen[data-module='cronograma-eventos'] .auth-panel {
+    border-color: oklch(var(--brand-indigo-500));
+    background: oklch(var(--brand-soft-white));
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .auth-screen[data-module='cronograma-eventos'] .auth-input-frame[data-field] {
+    border-color: oklch(var(--neutral-600));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-screen[data-module='cronograma-eventos'] .auth-panel,
+  .auth-screen[data-module='cronograma-eventos'] .auth-submit,
+  .auth-screen[data-module='cronograma-eventos'] .auth-submit::before {
+    transition: none;
+  }
+
+  .auth-screen[data-module='cronograma-eventos'] .auth-input-frame:focus-within,
+  .auth-screen[data-module='cronograma-eventos'] .auth-submit:hover,
+  .auth-screen[data-module='cronograma-eventos'] .auth-submit:active {
+    transform: none;
+  }
+
+  .auth-screen[data-module='cronograma-eventos'] .auth-submit:hover::before {
+    opacity: 0;
+    transform: none;
+  }
+}
