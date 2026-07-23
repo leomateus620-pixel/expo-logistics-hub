@@ -612,64 +612,9 @@ Deno.serve(async (req) => {
       }
     }
 
-    if (action === "observe_callback") {
-      // Evidence gate: record sanitized metadata about what the connector
-      // gateway actually returned to the callback. Never accept raw values.
-      const rawObs = (body.observation && typeof body.observation === "object")
-        ? body.observation as Record<string, unknown>
-        : {};
-      const paramNamesInput = Array.isArray(rawObs.params) ? rawObs.params : [];
-      const params = paramNamesInput.slice(0, 32).map((entry) => {
-        const item = (entry && typeof entry === "object") ? entry as Record<string, unknown> : {};
-        const name = typeof item.name === "string" ? item.name.slice(0, 64) : "";
-        const length = typeof item.length === "number" && Number.isFinite(item.length)
-          ? Math.max(0, Math.min(4096, Math.floor(item.length)))
-          : 0;
-        return { name, length };
-      }).filter((p) => p.name);
-      const observation = {
-        contract_version: CONTRACT_VERSION,
-        client_contract_version: typeof rawObs.contract_version === "string" ? String(rawObs.contract_version).slice(0, 64) : null,
-        transport: typeof rawObs.transport === "string" ? String(rawObs.transport).slice(0, 16) : "query",
-        route: typeof rawObs.route === "string" ? String(rawObs.route).slice(0, 128) : null,
-        has_code: Boolean(rawObs.hasCode),
-        has_state: Boolean(rawObs.hasState),
-        has_attempt: Boolean(rawObs.hasAttempt),
-        has_error: Boolean(rawObs.hasError),
-        params,
-        observed_at: new Date().toISOString(),
-      };
-      const { data: activeAttempt, error: activeError } = await db.from("google_calendar_oauth_attempts")
-        .select("id, user_id, callback_observation")
-        .eq("user_id", user.id)
-        .in("status", ["waiting_authorization", "starting", "completing"])
-        .order("created_at", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      assertDb(activeError, "observation_lookup_failed");
-      if (activeAttempt) {
-        const prior = Array.isArray((activeAttempt.callback_observation as { history?: unknown } | null)?.history)
-          ? ((activeAttempt.callback_observation as { history: unknown[] }).history)
-          : [];
-        const merged = { latest: observation, history: [...prior, observation].slice(-10) };
-        await db.from("google_calendar_oauth_attempts")
-          .update({ callback_observation: merged })
-          .eq("id", activeAttempt.id)
-          .eq("user_id", user.id);
-      }
-      diagnostic("oauth_callback_observed", {
-        user: shortUserId(user.id),
-        attemptId: activeAttempt?.id ?? null,
-        transport: observation.transport,
-        hasCode: observation.has_code,
-        hasState: observation.has_state,
-        hasAttempt: observation.has_attempt,
-        hasError: observation.has_error,
-        paramCount: params.length,
-        paramNames: params.map((p) => p.name),
-      });
-      return json({ ok: true, contract_version: CONTRACT_VERSION });
-    }
+    // observe_callback is handled anonymously earlier in the request.
+
+
 
     if (action === "complete") {
       const rawAttemptId = typeof body.attemptId === "string" && UUID_PATTERN.test(body.attemptId)
