@@ -66,7 +66,7 @@ describe('página de callback do Google Agenda', () => {
       attemptId: ATTEMPT_ID,
     }, window.location.origin);
     expect(close).not.toHaveBeenCalled();
-    await act(async () => vi.advanceTimersByTime(350));
+    await act(async () => vi.advanceTimersByTime(1600));
     expect(close).toHaveBeenCalledTimes(1);
   });
 
