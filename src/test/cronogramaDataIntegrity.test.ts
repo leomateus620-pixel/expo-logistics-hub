@@ -15,13 +15,19 @@ describe('integridade do cronograma oficial', () => {
   it('preserva reuniões centrais, períodos e a realização da Fenasoja 2028', () => {
     const normalized = normalizeCronogramaSeed(fenasoja2028CronogramaSeed);
     const centralMeetings = normalized.filter(isCentralMeeting);
+    const mainEvent = fenasoja2028CronogramaSeed.find(
+      (event) => event.sourceKey === '2028-realizacao-fenasoja-2028',
+    );
     const periodEvents = fenasoja2028CronogramaSeed.filter(
       (event) => event.startDate && event.endDate && event.startDate !== event.endDate,
     );
 
     expect(centralMeetings).toHaveLength(28);
     expect(periodEvents.length).toBeGreaterThan(0);
-    expect(fenasoja2028CronogramaSeed.some((event) => event.sourceKey === '2028-realizacao-fenasoja-2028')).toBe(true);
+    expect(mainEvent).toMatchObject({
+      startDate: '2028-04-29',
+      endDate: '2028-05-07',
+    });
   });
 
   it('mescla banco e seed sem apagar oficiais ou eventos manuais', () => {

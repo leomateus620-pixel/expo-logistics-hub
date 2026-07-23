@@ -7,7 +7,7 @@
  */
 export const FENASOJA_2028_SCHEDULE = {
   cycleStartDate: '2026-06-04',
-  openingDate: '2028-05-01',
+  openingDate: '2028-04-29',
   openingLocalTime: '10:00:00',
   openingUtcOffset: '-03:00',
   timeZone: 'America/Sao_Paulo',
@@ -21,5 +21,5 @@ export const FENASOJA_2028_OPENING_ISO =
 export const FENASOJA_2028_CYCLE_START_ISO =
   `${FENASOJA_2028_SCHEDULE.cycleStartDate}T00:00:00${FENASOJA_2028_SCHEDULE.openingUtcOffset}`;
 
-export const FENASOJA_2028_OPENING_LABEL = '1º de maio de 2028, às 10h';
+export const FENASOJA_2028_OPENING_LABEL = '29 de abril de 2028, às 10h';
 export const FENASOJA_2028_TIME_ZONE_LABEL = 'Horário de Brasília';

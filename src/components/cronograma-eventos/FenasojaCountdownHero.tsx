@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useRef, useState } from 'react';
 import {
   ArrowUpRight,
   Clock3,
@@ -9,20 +9,16 @@ import {
 import { FenasojaCountdownDigits } from '@/components/cronograma-eventos/FenasojaCountdownDigits';
 import { GoogleCalendarHeroWidget } from '@/components/cronograma-eventos/GoogleCalendarHeroWidget';
 import { FenasojaPreparationTimeline } from '@/components/cronograma-eventos/FenasojaPreparationTimeline';
-import { useFenasojaCountdown } from '@/hooks/useFenasojaCountdown';
 import {
-  FENASOJA_2028_OPENING_LABEL,
-  getFenasojaCountdown,
-} from '@/lib/fenasoja-countdown';
+  useFenasojaCountdown,
+  useFenasojaCycleProgress,
+} from '@/hooks/useFenasojaCountdown';
+import { FENASOJA_2028_OPENING_LABEL } from '@/lib/fenasoja-countdown';
 import {
   FENASOJA_COUNTDOWN_ROUTE,
   rememberFenasojaCountdownLaunch,
   runFenasojaCountdownViewTransition,
 } from '@/lib/fenasoja-countdown-navigation';
-import {
-  buildCronogramaCommandSummary,
-  getCronogramaCommandReference,
-} from '@/lib/cronograma-command-summary';
 import '@/styles/fenasoja-countdown.css';
 import type { CronogramaEvent } from './types';
 
@@ -99,22 +95,14 @@ const LiveCountdownCore = memo(function LiveCountdownCore({
 });
 
 export function FenasojaCountdownHero({
-  events,
   onNewEvent,
-  onOpenUndated,
   onExpandCountdown,
   canManage,
   presentation,
   availability = 'ready',
 }: FenasojaCountdownHeroProps) {
   const [isExpanding, setIsExpanding] = useState(false);
-  const referenceKey = getCronogramaCommandReference();
-  const { snapshot: timelineSnapshot, nextCountdown } = useMemo(
-    () => buildCronogramaCommandSummary(events, referenceKey),
-    [events, referenceKey],
-  );
-  const cycleProgress = getFenasojaCountdown().cycleProgress;
-  const nextAction = timelineSnapshot.nextOfficialAction;
+  const cycleProgress = useFenasojaCycleProgress();
   const expandControlId = `fenasoja-countdown-expand-${presentation}`;
 
   const openExpandedCountdown = useCallback(() => {
@@ -206,14 +194,11 @@ export function FenasojaCountdownHero({
       </header>
 
       <FenasojaPreparationTimeline
-        events={events}
         cycleProgress={cycleProgress}
-        nextAction={nextAction}
-        nextCountdown={nextCountdown}
         availability={availability}
         presentation={presentation}
       />
-      <div className="fenasoja-countdown-calendar">
+      <div className="fenasoja-countdown-secondary" aria-label="Integrações do cronograma">
         <GoogleCalendarHeroWidget />
       </div>
     </div>

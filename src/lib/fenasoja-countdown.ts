@@ -10,6 +10,7 @@ const SECOND_MS = 1_000;
 const MINUTE_SECONDS = 60;
 const HOUR_SECONDS = 60 * MINUTE_SECONDS;
 const DAY_SECONDS = 24 * HOUR_SECONDS;
+const MAX_TIMER_DELAY_MS = 2_147_000_000;
 
 export {
   FENASOJA_2028_CYCLE_START_ISO,
@@ -58,7 +59,8 @@ export function getFenasojaCountdown(
     minutes: Math.floor((remainingSeconds % HOUR_SECONDS) / MINUTE_SECONDS),
     seconds: remainingSeconds % MINUTE_SECONDS,
     remainingMilliseconds,
-    cycleProgress: cycleDuration > 0 ? Math.round((elapsedCycle / cycleDuration) * 100) : 100,
+    // Flooring keeps the cycle below 100% until the official opening instant.
+    cycleProgress: cycleDuration > 0 ? Math.floor((elapsedCycle / cycleDuration) * 100) : 100,
     phase: remainingMilliseconds > 0 ? 'countdown' : 'open',
   };
 }
@@ -73,6 +75,24 @@ export function getFenasojaCountdownUpdateDelay(reference: Date | number = Date.
 
   // A small tolerance prevents an early timer callback from repeating a visual second.
   return SECOND_MS - remainder + 12;
+}
+
+export function getFenasojaCycleProgressUpdateDelay(
+  reference: Date | number = Date.now(),
+) {
+  const referenceTimestamp = toTimestamp(reference);
+  const openingTimestamp = FENASOJA_2028_OPENING_TIMESTAMP;
+  const cycleStartTimestamp = Date.parse(FENASOJA_2028_CYCLE_START_ISO);
+  const cycleDuration = openingTimestamp - cycleStartTimestamp;
+
+  if (cycleDuration <= 0 || referenceTimestamp >= openingTimestamp) return null;
+
+  const currentProgress = getFenasojaCountdown(referenceTimestamp).cycleProgress;
+  const nextProgress = Math.min(100, currentProgress + 1);
+  const nextProgressTimestamp = cycleStartTimestamp + (cycleDuration * nextProgress) / 100;
+  const delay = Math.ceil(nextProgressTimestamp - referenceTimestamp) + 12;
+
+  return Math.min(MAX_TIMER_DELAY_MS, Math.max(12, delay));
 }
 
 export function formatFenasojaCountdownLabel(snapshot: FenasojaCountdownSnapshot) {

@@ -1570,13 +1570,11 @@ button.fenasoja-countdown-undated:active {
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .fenasoja-countdown-hero:hover,
-  .fenasoja-preparation:hover {
+  .fenasoja-countdown-hero:hover {
     transform: translateY(-2px);
   }
 
-  .fenasoja-countdown-hero,
-  .fenasoja-preparation {
+  .fenasoja-countdown-hero {
     transition: transform 280ms cubic-bezier(0.22, 0.8, 0.25, 1);
   }
 
@@ -2096,4 +2094,378 @@ button.fenasoja-countdown-undated:active {
   0%, 100% { transform: translateX(0); }
   45% { transform: translateX(-3px); }
   75% { transform: translateX(2px); }
+}
+
+/* Compact preparation strip and secondary integrations */
+.fenasoja-preparation {
+  display: grid;
+  gap: 0.68rem;
+  min-width: 0;
+  padding: clamp(0.78rem, 1.2vw, 1rem) clamp(0.9rem, 1.5vw, 1.2rem);
+  border-radius: 1rem;
+  background:
+    linear-gradient(100deg, rgb(255 255 255 / 0.045), transparent 34%),
+    linear-gradient(116deg, #081b38 0%, #0b2448 58%, #091b36 100%);
+  box-shadow:
+    0 16px 34px -29px rgb(2 11 29 / 0.9),
+    0 8px 20px -22px var(--premium-border-color),
+    inset 0 1px 0 rgb(255 255 255 / 0.08);
+}
+
+.fenasoja-preparation::after {
+  inset: 1px;
+  border-radius: calc(1rem - 3px);
+  background: linear-gradient(105deg, rgb(255 255 255 / 0.035), transparent 42%);
+}
+
+.fenasoja-preparation-heading {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1.25rem;
+}
+
+.fenasoja-preparation-title {
+  display: flex;
+  min-width: 0;
+  align-items: baseline;
+  gap: 0.65rem;
+}
+
+.fenasoja-preparation-title h2 {
+  margin: 0;
+  color: #f8fbff;
+  font-size: clamp(0.98rem, 1.25vw, 1.12rem);
+  font-weight: 820;
+  letter-spacing: -0.025em;
+  line-height: 1.15;
+}
+
+.fenasoja-preparation-title > strong {
+  color: #f7d35f;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: clamp(1.1rem, 1.45vw, 1.32rem);
+  font-variant-numeric: tabular-nums;
+  font-weight: 780;
+  letter-spacing: -0.045em;
+  line-height: 1;
+}
+
+.fenasoja-preparation-date {
+  display: flex;
+  min-width: 0;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 0.2rem 0.42rem;
+  margin: 0;
+  color: #b7c6db;
+  font-size: 0.7rem;
+  line-height: 1.3;
+  text-align: right;
+}
+
+.fenasoja-preparation-date > span {
+  color: #8298b6;
+  font-size: 0.59rem;
+  font-weight: 780;
+  letter-spacing: 0.075em;
+  text-transform: uppercase;
+}
+
+.fenasoja-preparation-date > strong {
+  color: #edf3fc;
+  font-weight: 720;
+}
+
+.fenasoja-preparation-date > small {
+  color: #91a5c0;
+  font-size: inherit;
+}
+
+.fenasoja-preparation-meter {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 0.38rem;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid rgb(148 173 208 / 0.14);
+  border-radius: 999px;
+  background: #1b3559;
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.42);
+}
+
+.fenasoja-preparation-meter > span {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #2273da, #4c9ff4 68%, #f2c84b);
+  box-shadow: 0 0 9px rgb(65 146 235 / 0.3);
+  transform: scaleX(var(--preparation-progress));
+  transform-origin: left center;
+  transition: transform 650ms cubic-bezier(0.22, 0.82, 0.24, 1);
+}
+
+.fenasoja-preparation-status {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.38rem;
+  margin: 0;
+  color: #9fb1ca;
+  font-size: 0.66rem;
+  line-height: 1.3;
+}
+
+.fenasoja-preparation-status > span {
+  width: 0.35rem;
+  height: 0.35rem;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: #f2c84b;
+  box-shadow: 0 0 0 3px rgb(242 200 75 / 0.09);
+}
+
+.fenasoja-preparation[data-state='loading'] .fenasoja-preparation-status > span {
+  background: #65adf4;
+}
+
+.fenasoja-preparation[data-state='offline'] .fenasoja-preparation-status {
+  color: #e7cc7d;
+}
+
+.fenasoja-countdown-secondary {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 19rem);
+  align-items: start;
+  justify-content: start;
+}
+
+.fenasoja-countdown-secondary .fenasoja-google-widget,
+.fenasoja-google-widget--compact {
+  display: flex;
+  width: 100%;
+  max-width: 19rem;
+  min-width: 0;
+  min-height: 15.5rem;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.8rem;
+  grid-column: auto;
+  padding: 1rem;
+  border-radius: 1rem;
+  background:
+    radial-gradient(circle at 12% -12%, rgb(67 125 208 / 0.2), transparent 42%),
+    linear-gradient(145deg, #0d2852 0%, #0a2043 58%, #081a36 100%);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.08),
+    0 14px 30px -26px rgb(3 13 34 / 0.8);
+}
+
+.fenasoja-countdown-secondary .fenasoja-google-widget-heading,
+.fenasoja-google-widget--compact .fenasoja-google-widget-heading {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 0.72rem;
+}
+
+.fenasoja-countdown-secondary .fenasoja-google-widget-icon,
+.fenasoja-google-widget--compact .fenasoja-google-widget-icon {
+  position: relative;
+  display: inline-flex;
+  width: 3.25rem;
+  height: 3.25rem;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgb(255 255 255 / 0.72);
+  border-radius: 0.82rem;
+  background: #fff;
+  box-shadow: 0 8px 18px -14px rgb(0 0 0 / 0.74);
+}
+
+.fenasoja-countdown-secondary .fenasoja-google-widget-icon > img,
+.fenasoja-google-widget--compact .fenasoja-google-widget-icon > img {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.fenasoja-countdown-secondary .fenasoja-google-widget-identity,
+.fenasoja-google-widget--compact .fenasoja-google-widget-identity {
+  display: grid;
+  min-width: 0;
+  justify-items: start;
+  gap: 0.36rem;
+}
+
+.fenasoja-countdown-secondary .fenasoja-google-widget h3,
+.fenasoja-google-widget--compact h3 {
+  margin: 0;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 780;
+  letter-spacing: -0.018em;
+  line-height: 1.15;
+}
+
+.fenasoja-countdown-secondary .fenasoja-google-widget-status,
+.fenasoja-google-widget--compact .fenasoja-google-widget-status {
+  min-height: 1.45rem;
+  padding: 0.22rem 0.45rem;
+  font-size: 0.65rem;
+}
+
+.fenasoja-countdown-secondary .fenasoja-google-widget-message,
+.fenasoja-google-widget--compact .fenasoja-google-widget-message {
+  display: -webkit-box;
+  min-height: 2.7em;
+  margin: 0;
+  overflow: hidden;
+  color: #d6e1f1;
+  font-size: 0.82rem;
+  font-weight: 620;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.fenasoja-countdown-secondary .fenasoja-google-widget-actions,
+.fenasoja-google-widget--compact .fenasoja-google-widget-actions {
+  display: grid;
+  width: 100%;
+  max-width: none;
+  align-items: stretch;
+  justify-content: stretch;
+  gap: 0.3rem;
+  margin-top: auto;
+}
+
+.fenasoja-countdown-secondary .fenasoja-google-widget-cta,
+.fenasoja-countdown-secondary .fenasoja-google-widget-ghost,
+.fenasoja-google-widget--compact .fenasoja-google-widget-cta,
+.fenasoja-google-widget--compact .fenasoja-google-widget-ghost {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.6rem 0.72rem;
+  white-space: normal;
+}
+
+.fenasoja-countdown-secondary .fenasoja-google-widget-ghost,
+.fenasoja-google-widget--compact .fenasoja-google-widget-ghost {
+  border-color: transparent;
+  background: transparent;
+  color: #becde1;
+  font-size: 0.75rem;
+  box-shadow: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .fenasoja-countdown-secondary .fenasoja-google-widget-ghost:hover:not(:disabled),
+  .fenasoja-google-widget--compact .fenasoja-google-widget-ghost:hover:not(:disabled) {
+    background: rgb(255 255 255 / 0.055);
+    border-color: rgb(151 177 212 / 0.18);
+  }
+}
+
+@media (max-width: 899px) {
+  .fenasoja-countdown-secondary {
+    grid-template-columns: minmax(0, 19rem);
+  }
+}
+
+@media (max-width: 520px) {
+  .fenasoja-preparation {
+    gap: 0.62rem;
+    padding: 0.78rem 0.82rem;
+  }
+
+  .fenasoja-preparation-heading {
+    display: grid;
+    gap: 0.45rem;
+  }
+
+  .fenasoja-preparation-title {
+    justify-content: space-between;
+  }
+
+  .fenasoja-preparation-date {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    text-align: left;
+  }
+
+  .fenasoja-countdown-secondary {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .fenasoja-countdown-secondary .fenasoja-google-widget,
+  .fenasoja-google-widget--compact {
+    max-width: none;
+    min-height: 0;
+    gap: 0.72rem;
+    padding: 0.88rem;
+  }
+
+  .fenasoja-countdown-secondary .fenasoja-google-widget-message,
+  .fenasoja-google-widget--compact .fenasoja-google-widget-message {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 350px) {
+  .fenasoja-preparation-title {
+    align-items: center;
+    gap: 0.45rem;
+  }
+
+  .fenasoja-preparation-title h2 {
+    font-size: 0.92rem;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .fenasoja-preparation,
+  .fenasoja-countdown-secondary .fenasoja-google-widget,
+  .fenasoja-google-widget--compact {
+    border-width: 2px;
+  }
+
+  .fenasoja-preparation-status,
+  .fenasoja-google-widget-message {
+    color: #fff;
+  }
+}
+
+@media (forced-colors: active) {
+  .fenasoja-preparation,
+  .fenasoja-preparation-meter,
+  .fenasoja-countdown-secondary .fenasoja-google-widget,
+  .fenasoja-google-widget--compact {
+    border: 1px solid CanvasText;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fenasoja-preparation-meter > span,
+  .fenasoja-countdown-secondary .fenasoja-google-widget,
+  .fenasoja-countdown-secondary .fenasoja-google-widget-icon,
+  .fenasoja-countdown-secondary .fenasoja-google-widget-cta,
+  .fenasoja-countdown-secondary .fenasoja-google-widget-ghost,
+  .fenasoja-google-widget--compact,
+  .fenasoja-google-widget--compact .fenasoja-google-widget-icon,
+  .fenasoja-google-widget--compact .fenasoja-google-widget-cta,
+  .fenasoja-google-widget--compact .fenasoja-google-widget-ghost {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+  }
 }

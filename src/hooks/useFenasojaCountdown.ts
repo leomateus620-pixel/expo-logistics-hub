@@ -4,6 +4,7 @@ import {
   formatFenasojaCountdownSummary,
   getFenasojaCountdown,
   getFenasojaCountdownUpdateDelay,
+  getFenasojaCycleProgressUpdateDelay,
 } from '@/lib/fenasoja-countdown';
 
 const lifecycleEvents = ['focus', 'pageshow'] as const;
@@ -76,4 +77,57 @@ export function useFenasojaCountdown(timerEnabled = true) {
     accessibleLabel,
     announcement,
   };
+}
+
+/**
+ * Updates only when the integer cycle percentage can change. This keeps the
+ * compact progress strip current without coupling it to the one-second clock.
+ */
+export function useFenasojaCycleProgress() {
+  const [cycleProgress, setCycleProgress] = useState(
+    () => getFenasojaCountdown().cycleProgress,
+  );
+
+  useEffect(() => {
+    let timeoutId: number | undefined;
+    let mounted = true;
+
+    const clearScheduledUpdate = () => {
+      if (timeoutId === undefined) return;
+      window.clearTimeout(timeoutId);
+      timeoutId = undefined;
+    };
+
+    const schedule = () => {
+      clearScheduledUpdate();
+      if (!mounted || document.visibilityState === 'hidden') return;
+
+      const now = Date.now();
+      setCycleProgress(getFenasojaCountdown(now).cycleProgress);
+
+      const delay = getFenasojaCycleProgressUpdateDelay(now);
+      if (delay !== null) timeoutId = window.setTimeout(schedule, delay);
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        clearScheduledUpdate();
+        return;
+      }
+      schedule();
+    };
+
+    schedule();
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    lifecycleEvents.forEach((eventName) => window.addEventListener(eventName, schedule));
+
+    return () => {
+      mounted = false;
+      clearScheduledUpdate();
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      lifecycleEvents.forEach((eventName) => window.removeEventListener(eventName, schedule));
+    };
+  }, []);
+
+  return cycleProgress;
 }

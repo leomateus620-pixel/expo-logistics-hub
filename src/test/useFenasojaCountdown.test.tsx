@@ -1,6 +1,9 @@
 import { act, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { useFenasojaCountdown } from '@/hooks/useFenasojaCountdown';
+import {
+  useFenasojaCountdown,
+  useFenasojaCycleProgress,
+} from '@/hooks/useFenasojaCountdown';
 import { FENASOJA_2028_OPENING_TIMESTAMP } from '@/lib/fenasoja-countdown';
 
 function setDocumentVisibility(value: DocumentVisibilityState) {
@@ -100,5 +103,20 @@ describe('useFenasojaCountdown', () => {
 
     rerender({ enabled: true });
     expect(result.current.snapshot).toMatchObject({ minutes: 1, seconds: 58 });
+  });
+
+  it('atualiza o progresso isoladamente no instante oficial sem timer por segundo', () => {
+    vi.setSystemTime(FENASOJA_2028_OPENING_TIMESTAMP - 1);
+
+    const { result } = renderHook(() => useFenasojaCycleProgress());
+    expect(result.current).toBe(99);
+    expect(vi.getTimerCount()).toBe(1);
+
+    act(() => {
+      vi.advanceTimersByTime(20);
+    });
+
+    expect(result.current).toBe(100);
+    expect(vi.getTimerCount()).toBe(0);
   });
 });
