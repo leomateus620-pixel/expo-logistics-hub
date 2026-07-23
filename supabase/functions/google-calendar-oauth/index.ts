@@ -363,8 +363,25 @@ async function finalizeAuthorizedConnection(
   connectionKey: FinalizedConnectionKey,
   existingCalendarId: string | null,
 ) {
-  if (!await probeConnection(connectionKey)) throw new Error("google_probe_failed");
-  diagnostic("google_probe_succeeded", { user: shortUserId(userId), orgId, httpStatus: 200 });
+  const probe = await probeConnection(connectionKey);
+  if (!probe.ok) {
+    diagnostic("google_probe_failed", {
+      user: shortUserId(userId),
+      orgId,
+      stage: probe.stage,
+      httpStatus: probe.status,
+      safeCode: probe.safeCode,
+      attempts: probe.attempts,
+    });
+    throw new Error(`google_probe_failed:${probe.safeCode}:${probe.status ?? "network"}`);
+  }
+  diagnostic("google_probe_succeeded", {
+    user: shortUserId(userId),
+    orgId,
+    stage: probe.stage,
+    httpStatus: probe.status,
+    attempts: probe.attempts,
+  });
 
   const { data: preparing, error: preparingError } = await db.from("google_calendar_connections").update({
     status: "preparing_calendar",
