@@ -2,14 +2,13 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   ArrowUpRight,
   Clock3,
-  Flag,
   Maximize2,
   Plus,
   Sprout,
 } from 'lucide-react';
 import { FenasojaCountdownDigits } from '@/components/cronograma-eventos/FenasojaCountdownDigits';
 import { GoogleCalendarHeroWidget } from '@/components/cronograma-eventos/GoogleCalendarHeroWidget';
-import { formatLongDateRange } from '@/components/cronograma-eventos/dateUtils';
+import { FenasojaPreparationTimeline } from '@/components/cronograma-eventos/FenasojaPreparationTimeline';
 import { useFenasojaCountdown } from '@/hooks/useFenasojaCountdown';
 import {
   FENASOJA_2028_OPENING_LABEL,
@@ -34,6 +33,7 @@ export interface FenasojaCountdownHeroProps {
   onExpandCountdown?: () => void;
   canManage: boolean;
   presentation: 'desktop' | 'mobile';
+  availability?: 'ready' | 'loading' | 'offline';
 }
 
 const LiveCountdownCore = memo(function LiveCountdownCore({
@@ -105,6 +105,7 @@ export function FenasojaCountdownHero({
   onExpandCountdown,
   canManage,
   presentation,
+  availability = 'ready',
 }: FenasojaCountdownHeroProps) {
   const [isExpanding, setIsExpanding] = useState(false);
   const referenceKey = getCronogramaCommandReference();
@@ -204,41 +205,17 @@ export function FenasojaCountdownHero({
         </div>
       </header>
 
-      <section
-        className="fenasoja-countdown-ops-card"
-        data-presentation={presentation}
-        aria-label="Painel operacional do cronograma"
-      >
-        <div className="fenasoja-countdown-footer">
-          <div className="fenasoja-countdown-progress">
-            <div className="fenasoja-countdown-progress-heading">
-              <span>Preparação 2026—2028</span>
-              <strong>{cycleProgress}% do ciclo temporal</strong>
-            </div>
-            <span className="fenasoja-countdown-progress-track" aria-hidden="true">
-              <span style={{ width: `${cycleProgress}%` }} />
-            </span>
-            <p>Planejamento conectado ao marco oficial da edição 2028.</p>
-          </div>
-
-          <div className="fenasoja-countdown-operations" aria-label="Resumo operacional do cronograma">
-            <div className="fenasoja-countdown-next-action">
-              <Flag aria-hidden="true" />
-              <span>
-                <small>Próximo marco operacional</small>
-                <strong>{nextAction?.title ?? 'Nenhuma ação futura no recorte atual'}</strong>
-                {nextAction && (
-                  <em>
-                    {formatLongDateRange(nextAction.date, nextAction.endDate)} · {nextCountdown}
-                  </em>
-                )}
-              </span>
-            </div>
-
-            <GoogleCalendarHeroWidget />
-          </div>
-        </div>
-      </section>
+      <FenasojaPreparationTimeline
+        events={events}
+        cycleProgress={cycleProgress}
+        nextAction={nextAction}
+        nextCountdown={nextCountdown}
+        availability={availability}
+        presentation={presentation}
+      />
+      <div className="fenasoja-countdown-calendar">
+        <GoogleCalendarHeroWidget />
+      </div>
     </div>
   );
 }

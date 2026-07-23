@@ -732,6 +732,7 @@ export default function CronogramaEventosPage() {
               onOpenUndated={() => setActiveView('undated')}
               onExpandCountdown={openCountdownExperience}
               canManage={cronograma.canManage}
+              availability={cronograma.isLoading ? 'loading' : cronograma.isSeedFallback ? 'offline' : 'ready'}
             />
             <MobileCronogramaNavigation activeView={activeView} onChange={setActiveView} />
             <MobileCronogramaFilters
@@ -755,6 +756,7 @@ export default function CronogramaEventosPage() {
             onOpenUndated={() => setActiveView('undated')}
             onExpandCountdown={openCountdownExperience}
             canManage={cronograma.canManage}
+            availability={cronograma.isLoading ? 'loading' : cronograma.isSeedFallback ? 'offline' : 'ready'}
           />
 
           <div className="cronograma-command-dock sticky top-[72px] z-20 space-y-2 py-2">

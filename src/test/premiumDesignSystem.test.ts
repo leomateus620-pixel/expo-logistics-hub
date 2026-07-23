@@ -46,7 +46,7 @@ describe('arquitetura visual premium Fenasoja 2028', () => {
     expect(mobileOverlayStyles).toContain('var(--destructive)');
   });
 
-  it('adapta o countdown ao navy 2028 sem animacao decorativa continua', () => {
+  it('adapta o countdown ao navy 2028 com perímetro premium controlado', () => {
     expect(countdownStyles).toContain('--fenasoja-hero-deep: 213 89% 11%');
     expect(countdownStyles).toContain('var(--elevation-4)');
     expect(countdownStyles).toContain('var(--motion-structural)');
@@ -55,7 +55,13 @@ describe('arquitetura visual premium Fenasoja 2028', () => {
     expect(countdownStyles).not.toContain('will-change: opacity, transform');
     expect(countdownStyles).not.toMatch(/@keyframes fenasoja-number-change[\s\S]*?filter:/);
     expect(countdownStyles).not.toMatch(/hsl\(14[0-9]/i);
-    expect(countdownStyles).not.toMatch(/animation:[^;]*infinite/i);
+    expect(countdownStyles).toContain('@property --premium-border-angle');
+    expect(countdownStyles).toContain('@keyframes fenasoja-premium-perimeter');
+    expect(countdownStyles).toContain('fenasoja-premium-perimeter 15s linear infinite');
+    expect(countdownStyles).toMatch(
+      /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.fenasoja-preparation::before[\s\S]*?animation: none !important/,
+    );
+    expect(countdownStyles).toContain('transform: scaleX(var(--preparation-progress))');
   });
 
   it('mantém o login no sistema visual compartilhado com estados e fallbacks completos', () => {
