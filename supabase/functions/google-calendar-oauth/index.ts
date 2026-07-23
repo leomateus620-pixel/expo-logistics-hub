@@ -835,6 +835,7 @@ Deno.serve(async (req) => {
           orgId: attempt.org_id,
           attemptId,
           errorCode: code,
+          errorMessage: String((error as Error)?.message ?? error).slice(0, 160),
         });
         throw error;
       }
@@ -888,7 +889,7 @@ Deno.serve(async (req) => {
       try {
         if (connection.connection_key) {
           const key = asFinalizedConnectionKey(connection.connection_key);
-          if (await probeConnection(key)) await disconnectGoogleConnection(key);
+          if ((await probeConnection(key, { maxAttempts: 1 })).ok) await disconnectGoogleConnection(key);
         }
       } catch (error) {
         await db.from("google_calendar_connections").update({
@@ -996,7 +997,10 @@ Deno.serve(async (req) => {
   } catch (error) {
     if (error instanceof Response) return error;
     const code = safeServerError(error);
-    console.error("google_calendar_oauth_failed", { errorCode: code });
+    console.error("google_calendar_oauth_failed", {
+      errorCode: code,
+      errorMessage: String((error as Error)?.message ?? error).slice(0, 160),
+    });
     return json({ error: code }, { status: errorHttpStatus(code) });
   }
 });
