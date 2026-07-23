@@ -23,7 +23,7 @@ const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3
 
 export type GoogleCalendarCallbackFeedback =
   | { kind: 'none' }
-  | { kind: 'completion_required'; attemptId: string | null; code: string; state: string }
+  | { kind: 'completion_required'; attemptId: string | null; code: string; state: string | null }
   | { kind: 'cancelled'; code: 'authorization_cancelled'; attemptId: string | null }
   | { kind: 'failed'; code: 'invalid_callback' | 'authorization_failed'; attemptId: string | null };
 
@@ -55,8 +55,8 @@ export function parseGoogleCalendarCallbackFeedback(search: string): GoogleCalen
 
   const code = params.get('code')?.trim() ?? '';
   const state = params.get('state')?.trim() ?? '';
-  if (code && state) {
-    return { kind: 'completion_required', attemptId, code, state };
+  if (code && (state || attemptId)) {
+    return { kind: 'completion_required', attemptId, code, state: state || null };
   }
 
   const connectorResult = (
