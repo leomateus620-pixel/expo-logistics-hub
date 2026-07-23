@@ -1785,6 +1785,27 @@ export type Database = {
           },
         ]
       }
+      internal_worker_tokens: {
+        Row: {
+          created_at: string
+          name: string
+          token: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          name: string
+          token: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          name?: string
+          token?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       mobility_authorizations: {
         Row: {
           access_status: string
