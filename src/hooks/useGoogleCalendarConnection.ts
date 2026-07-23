@@ -4,7 +4,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import { useToast } from '@/hooks/use-toast';
-import { buildGoogleCalendarReturnUrl } from '@/lib/google-calendar-callback';
 import type {
   GoogleCalendarBackendStatus,
   GoogleCalendarFlowPhase,
@@ -36,13 +35,23 @@ type GoogleCalendarErrorCode =
   | 'authorization_expired'
   | 'authorization_failed'
   | 'authorization_not_confirmed'
+  | 'authorization_revoked'
   | 'backfill_failed'
-  | 'callback_replayed'
   | 'calendar_not_verified'
   | 'calendar_preparation_failed'
-  | 'invalid_callback'
+  | 'google_api_disabled'
+  | 'google_insufficient_scope'
+  | 'google_rate_limited'
+  | 'google_unauthorized'
+  | 'google_unavailable'
   | 'no_active_organization'
+  | 'oauth_callback_replayed'
+  | 'oauth_client_mismatch'
+  | 'oauth_code_expired'
+  | 'oauth_code_invalid'
   | 'oauth_popup_blocked'
+  | 'oauth_state_expired'
+  | 'oauth_state_invalid'
   | 'oauth_url_missing'
   | 'provider_bad_request'
   | 'provider_conflict'
@@ -51,6 +60,8 @@ type GoogleCalendarErrorCode =
   | 'provider_rejected'
   | 'provider_unauthorized'
   | 'provider_unavailable'
+  | 'refresh_token_invalid'
+  | 'refresh_token_missing'
   | 'request_failed'
   | 'session_expired';
 
@@ -69,13 +80,23 @@ const SAFE_ERROR_COPY: Record<GoogleCalendarErrorCode, string> = {
   authorization_expired: 'A autorização expirou. Inicie a conexão novamente.',
   authorization_failed: 'O Google não confirmou a autorização. Inicie a conexão novamente.',
   authorization_not_confirmed: 'A autorização ainda não foi confirmada pelo servidor.',
+  authorization_revoked: 'O Google revogou o acesso. Reconecte sua conta.',
   backfill_failed: 'A conta foi conectada, mas a sincronização inicial não pôde ser preparada.',
-  callback_replayed: 'Este retorno de autorização já foi utilizado. Inicie uma nova conexão.',
   calendar_not_verified: 'O calendário FENASOJA não está acessível. Reconecte sua conta.',
   calendar_preparation_failed: 'A conta foi autorizada, mas o calendário FENASOJA não pôde ser preparado.',
-  invalid_callback: 'O retorno da autorização não pôde ser validado. Inicie a conexão novamente.',
+  google_api_disabled: 'A API do Google Agenda está desativada nesta conta. Ative-a e reconecte.',
+  google_insufficient_scope: 'A conta não concedeu os escopos necessários. Reconecte marcando todas as permissões.',
+  google_rate_limited: 'O Google limitou temporariamente as solicitações. Tente novamente em instantes.',
+  google_unauthorized: 'O Google não autorizou o acesso à agenda. Verifique as permissões e reconecte.',
+  google_unavailable: 'O Google Agenda está temporariamente indisponível. Tente novamente.',
   no_active_organization: 'Selecione uma organização antes de conectar sua conta Google.',
+  oauth_callback_replayed: 'Este retorno de autorização já foi utilizado. Inicie uma nova conexão.',
+  oauth_client_mismatch: 'A configuração do cliente OAuth do Google está incorreta. Contate o suporte.',
+  oauth_code_expired: 'O código do Google expirou. Inicie a conexão novamente.',
+  oauth_code_invalid: 'O código do Google é inválido. Inicie a conexão novamente.',
   oauth_popup_blocked: 'Permita pop-ups neste site para abrir a autorização do Google.',
+  oauth_state_expired: 'O tempo da autorização expirou. Inicie a conexão novamente.',
+  oauth_state_invalid: 'O retorno da autorização não pôde ser validado. Inicie a conexão novamente.',
   oauth_url_missing: 'O serviço de autorização não respondeu como esperado.',
   provider_bad_request: 'O Google rejeitou a validação da agenda. Reconecte sua conta.',
   provider_conflict: 'O Google retornou conflito ao preparar a agenda. Tente novamente.',
@@ -84,6 +105,8 @@ const SAFE_ERROR_COPY: Record<GoogleCalendarErrorCode, string> = {
   provider_rejected: 'O Google rejeitou a validação da agenda. Reconecte sua conta.',
   provider_unauthorized: 'O Google não autorizou o acesso à agenda. Verifique as permissões e reconecte.',
   provider_unavailable: 'O Google Agenda está temporariamente indisponível. Tente novamente.',
+  refresh_token_invalid: 'A autorização do Google foi revogada. Reconecte sua conta.',
+  refresh_token_missing: 'O Google não devolveu o refresh token. Reconecte marcando "sempre pedir" nas permissões.',
   request_failed: 'O serviço está temporariamente indisponível. Tente novamente em instantes.',
   session_expired: 'Sua sessão expirou. Entre novamente antes de conectar sua conta.',
 };
@@ -116,9 +139,7 @@ async function readFunctionErrorCode(error: unknown): Promise<GoogleCalendarErro
     try {
       const payload = await context.clone().json() as { error?: unknown };
       if (isKnownErrorCode(payload.error)) return payload.error;
-    } catch {
-      // The browser only receives the safe fallback below.
-    }
+    } catch { /* fall through */ }
   }
   const message = String((error as Error)?.message ?? '').toLowerCase();
   if (message.includes('unauthorized')) return 'session_expired';
@@ -209,15 +230,13 @@ export function useGoogleCalendarConnection() {
     refetchInterval: (query) => {
       if (query.state.error) return false;
       const data = query.state.data as GoogleStatusResponse | undefined;
-      if (data?.connection && ['starting', 'waiting_authorization', 'completing', 'preparing_calendar', 'synchronizing'].includes(data.connection.status)) {
-        return 3000;
-      }
+      if (data?.connection && IN_PROGRESS_STATUSES.includes(data.connection.status)) return 3000;
       if ((data?.pending ?? 0) > 0) return 8000;
       return 60000;
     },
   });
 
-  const waitForBackendConfirmation = useCallback(async (activeOrgId: string, attempts = 45) => {
+  const waitForBackendConfirmation = useCallback(async (activeOrgId: string, attempts = 60) => {
     for (let attempt = 0; attempt < attempts; attempt += 1) {
       const result = await invoke<GoogleStatusResponse>('status', { orgId: activeOrgId });
       const connection = result.connection;
@@ -261,10 +280,7 @@ export function useGoogleCalendarConnection() {
           const oauth = await invoke<{
             authorization_url?: string;
             attempt_id?: string;
-          }>('start', {
-            orgId,
-            returnUrl: buildGoogleCalendarReturnUrl(window.location.href),
-          });
+          }>('start', { orgId });
           if (!oauth.authorization_url || !oauth.attempt_id) {
             throw new GoogleCalendarFlowError('oauth_url_missing');
           }
@@ -287,13 +303,6 @@ export function useGoogleCalendarConnection() {
               isKnownErrorCode(popupResult.code) ? popupResult.code : 'authorization_failed',
             );
           }
-          if (
-            popupResult.status === 'success'
-            && popupResult.attemptId
-            && popupResult.attemptId !== activeAttemptRef.current
-          ) {
-            throw new GoogleCalendarFlowError('invalid_callback');
-          }
 
           setFlowPhase('returning');
           return await waitForBackendConfirmation(orgId, popupResult.status === 'closed' ? 60 : 30);
@@ -311,9 +320,8 @@ export function useGoogleCalendarConnection() {
       })();
 
       connectPromiseRef.current = operation;
-      try {
-        return await operation;
-      } finally {
+      try { return await operation; }
+      finally {
         connectPromiseRef.current = null;
         activeAttemptRef.current = null;
       }
