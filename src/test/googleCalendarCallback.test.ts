@@ -1,59 +1,72 @@
 import { describe, expect, it } from 'vitest';
 import {
-  appendGoogleCalendarCallbackSignal,
   buildGoogleCalendarReturnUrl,
   cleanGoogleCalendarCallbackUrl,
   getGoogleCalendarCallbackNext,
   parseGoogleCalendarCallbackFeedback,
 } from '@/lib/google-calendar-callback';
 
+const ATTEMPT_ID = '11111111-1111-4111-8111-111111111111';
+
 describe('retorno OAuth do Google Agenda', () => {
-  it('aceita apenas o sinal de retorno conhecido', () => {
-    expect(parseGoogleCalendarCallbackFeedback('?google=connected')).toEqual({ kind: 'success' });
+  it('não aceita marcador de sucesso inserido antes da autorização', () => {
+    expect(parseGoogleCalendarCallbackFeedback('?google=connected')).toEqual({
+      kind: 'failed',
+      code: 'invalid_callback',
+    });
   });
 
   it('trata cancelamento do usuário como estado recuperável', () => {
-    expect(parseGoogleCalendarCallbackFeedback('?error=access_denied')).toEqual({
+    expect(parseGoogleCalendarCallbackFeedback(`?attempt=${ATTEMPT_ID}&error=access_denied`)).toEqual({
       kind: 'cancelled',
       code: 'authorization_cancelled',
+      attemptId: ATTEMPT_ID,
     });
   });
 
-  it('aceita o código de troca do gateway e rejeita retorno incompleto', () => {
-    expect(parseGoogleCalendarCallbackFeedback('?google_error=invalid_state')).toEqual({
+  it('exige tentativa, code e state antes de solicitar conclusão server-side', () => {
+    expect(parseGoogleCalendarCallbackFeedback('?code=troca&state=ok')).toEqual({
       kind: 'failed',
       code: 'invalid_callback',
     });
-    expect(parseGoogleCalendarCallbackFeedback('?google_error=missing_code')).toEqual({
+    expect(parseGoogleCalendarCallbackFeedback(`?attempt=${ATTEMPT_ID}&code=troca`)).toEqual({
       kind: 'failed',
       code: 'invalid_callback',
     });
-    expect(parseGoogleCalendarCallbackFeedback('?code=troca&state=ok')).toEqual({ kind: 'success' });
-    expect(parseGoogleCalendarCallbackFeedback('?state=replay')).toEqual({
-      kind: 'failed',
-      code: 'invalid_callback',
+    expect(parseGoogleCalendarCallbackFeedback(`?attempt=${ATTEMPT_ID}&code=troca&state=ok`)).toEqual({
+      kind: 'completion_required',
+      attemptId: ATTEMPT_ID,
+      code: 'troca',
+      state: 'ok',
     });
   });
 
-  it('remove somente parâmetros OAuth e preserva o deep link consolidado', () => {
+  it('remove códigos, state, tentativa e chaves legadas do histórico', () => {
     const cleaned = cleanGoogleCalendarCallbackUrl({
-      pathname: '/cronograma-eventos',
-      search: '?event=abc&mode=view&google=connected&code=segredo&state=replay',
-      hash: '#detalhes',
+      pathname: '/google-calendar/callback',
+      search: `?attempt=${ATTEMPT_ID}&next=%2Fcronograma-eventos&code=segredo&state=estado&connection_key=chave`,
+      hash: '',
     } as Location);
-    expect(cleaned).toBe('/cronograma-eventos?event=abc&mode=view#detalhes');
+    expect(cleaned).toBe('/google-calendar/callback');
   });
 
-  it('constrói o retorno público sem carregar códigos antigos e preserva a rota em next', () => {
+  it('constrói o retorno sem sinal prematuro e preserva somente o deep link seguro', () => {
     const result = buildGoogleCalendarReturnUrl(
-      'https://fenasojagestao.com/cronograma-eventos?event=abc&code=antigo&state=antigo',
+      'https://fenasojagestao.com/cronograma-eventos?event=abc&code=antigo&state=antigo&google=connected',
     );
-    expect(result).toBe('https://fenasojagestao.com/google-calendar/callback?google=connected&next=%2Fcronograma-eventos%3Fevent%3Dabc');
+    expect(result).toBe(
+      'https://fenasojagestao.com/google-calendar/callback?next=%2Fcronograma-eventos%3Fevent%3Dabc',
+    );
+    expect(result).not.toContain('google=connected');
   });
 
-  it('valida o destino de retorno público e adiciona o sinal somente nele', () => {
-    expect(getGoogleCalendarCallbackNext('?next=%2Fcronograma-eventos%3FtimelineYear%3D2026')).toBe('/cronograma-eventos?timelineYear=2026');
-    expect(getGoogleCalendarCallbackNext('?next=https%3A%2F%2Fevil.test%2Fcronograma-eventos')).toBe('/cronograma-eventos');
-    expect(appendGoogleCalendarCallbackSignal('/cronograma-eventos?timelineMonth=2026-06')).toBe('/cronograma-eventos?timelineMonth=2026-06&google=connected');
+  it('rejeita destino externo ou rota pública diferente', () => {
+    expect(getGoogleCalendarCallbackNext('?next=%2Fcronograma-eventos%3FtimelineYear%3D2026')).toBe(
+      '/cronograma-eventos?timelineYear=2026',
+    );
+    expect(getGoogleCalendarCallbackNext('?next=https%3A%2F%2Fevil.test%2Fcronograma-eventos')).toBe(
+      '/cronograma-eventos',
+    );
+    expect(getGoogleCalendarCallbackNext('?next=%2Fadmin')).toBe('/cronograma-eventos');
   });
 });

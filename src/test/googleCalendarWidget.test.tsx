@@ -3,7 +3,7 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import { readFileSync } from 'node:fs';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { GoogleCalendarHeroWidget } from '@/components/cronograma-eventos/GoogleCalendarHeroWidget';
 
 const hookMock = vi.hoisted(() => vi.fn());
@@ -16,6 +16,13 @@ const mutateRetry = vi.fn();
 const mutateDisconnect = vi.fn();
 const cancelOAuth = vi.fn();
 const refresh = vi.fn().mockResolvedValue({});
+let windowOpenSpy: ReturnType<typeof vi.spyOn>;
+
+beforeAll(() => {
+  windowOpenSpy = vi.spyOn(window, 'open').mockImplementation(() => null);
+});
+
+afterAll(() => windowOpenSpy.mockRestore());
 
 function hookValue(overrides: Record<string, unknown> = {}) {
   return {
@@ -47,6 +54,7 @@ const connected = {
   backfill_total: 10,
   backfill_done: 10,
   connected_at: '2026-07-21T10:00:00.000Z',
+  verified_at: '2026-07-21T10:00:02.000Z',
 };
 
 beforeEach(() => {
