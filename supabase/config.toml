@@ -1,6 +1,6 @@
 project_id = "btfaumhroqtqzxomqorx"
 [functions.google-calendar-oauth]
-verify_jwt = true
+verify_jwt = false
 
 [functions.google-sync-worker]
 verify_jwt = false
