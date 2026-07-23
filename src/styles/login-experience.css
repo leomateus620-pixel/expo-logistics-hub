@@ -1307,12 +1307,14 @@
   color: oklch(var(--brand-soft-white));
   font-size: clamp(3.35rem, 5.35vw, 4.65rem);
   font-weight: 950;
-  letter-spacing: -0.064em;
+  font-kerning: normal;
+  letter-spacing: -0.05em;
   line-height: 0.91;
   text-shadow:
     0 1px 0 rgb(255 255 255 / 0.12),
     0 5px 0 rgb(1 11 28 / 0.18),
     0 22px 38px rgb(0 6 20 / 0.34);
+  text-rendering: optimizeLegibility;
   text-wrap: initial;
 }
 
@@ -1324,12 +1326,13 @@
 
 .auth-screen[data-module='cronograma-eventos'] .auth-title-line--lead {
   color: oklch(var(--brand-soft-white));
+  letter-spacing: -0.046em;
 }
 
 .auth-screen[data-module='cronograma-eventos'] .auth-title-line--brand {
   display: flex;
   align-items: baseline;
-  gap: 0.22em;
+  gap: 0.27em;
   margin-top: 0.15em;
   white-space: nowrap;
 }
@@ -1339,6 +1342,7 @@
   align-items: baseline;
   margin: 0;
   color: oklch(var(--brand-cream));
+  letter-spacing: -0.032em;
   text-shadow:
     0 1px 0 rgb(255 255 255 / 0.16),
     0 4px 0 oklch(var(--brand-orange-700) / 0.11),
@@ -1348,27 +1352,27 @@
 .auth-screen[data-module='cronograma-eventos'] .auth-title-soy-o {
   position: relative;
   display: inline-grid;
-  width: 0.86em;
-  height: 0.86em;
+  width: 0.72em;
+  height: 0.72em;
   flex: 0 0 auto;
   place-items: center;
   align-self: center;
-  margin: 0 -0.015em 0 0.015em;
+  margin-inline: 0.035em;
   filter:
-    drop-shadow(0 0.06em 0.035em rgb(0 0 0 / 0.3))
-    drop-shadow(0 0.12em 0.18em oklch(var(--brand-gold-500) / 0.22));
-  transform: translateY(0.045em) rotate(-3deg);
+    drop-shadow(0 0.045em 0.025em rgb(0 0 0 / 0.26))
+    drop-shadow(0 0.09em 0.13em oklch(var(--brand-gold-500) / 0.16));
+  transform: translateY(0.035em) rotate(-1deg);
   transform-origin: center;
 }
 
 .auth-screen[data-module='cronograma-eventos'] .auth-title-soy-o::before {
   position: absolute;
-  inset: 7%;
-  border: 1px solid oklch(var(--brand-gold-400) / 0.36);
+  inset: 11%;
+  border: 1px solid oklch(var(--brand-gold-400) / 0.22);
   border-radius: 50%;
   box-shadow:
-    0 0 0 0.045em oklch(var(--brand-gold-500) / 0.055),
-    0 0 0.22em oklch(var(--brand-gold-400) / 0.13);
+    0 0 0 0.035em oklch(var(--brand-gold-500) / 0.04),
+    0 0 0.14em oklch(var(--brand-gold-400) / 0.09);
   content: '';
 }
 
@@ -1376,9 +1380,9 @@
   position: relative;
   z-index: 1;
   display: block;
-  width: 112%;
+  width: 104%;
   max-width: none;
-  height: 112%;
+  height: 104%;
   object-fit: contain;
   user-select: none;
 }
@@ -1388,11 +1392,11 @@
   margin: 0;
   color: oklch(var(--brand-gold-400));
   font-variant-numeric: tabular-nums;
-  letter-spacing: -0.055em;
+  letter-spacing: -0.035em;
   text-shadow:
-    0 1px 0 rgb(255 255 255 / 0.12),
-    0 4px 0 oklch(var(--brand-orange-700) / 0.13),
-    0 18px 30px oklch(var(--brand-gold-500) / 0.12);
+    0 1px 0 rgb(255 255 255 / 0.16),
+    0 2px 0 oklch(var(--brand-gold-700) / 0.18),
+    0 12px 22px oklch(var(--brand-gold-500) / 0.14);
 }
 
 @supports ((background-clip: text) or (-webkit-background-clip: text)) {
@@ -1402,6 +1406,18 @@
       oklch(var(--brand-soft-white)) 4%,
       oklch(var(--brand-cream)) 58%,
       oklch(var(--brand-gold-400)) 116%
+    );
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .auth-screen[data-module='cronograma-eventos'] .auth-title-year {
+    background: linear-gradient(
+      180deg,
+      oklch(var(--brand-gold-400)) 4%,
+      oklch(var(--brand-gold-500)) 62%,
+      oklch(var(--brand-orange-400)) 126%
     );
     background-clip: text;
     -webkit-background-clip: text;
@@ -1909,13 +1925,27 @@
 
   .auth-screen[data-module='cronograma-eventos'] .auth-hero__title--cronograma {
     font-size: clamp(2.05rem, 9.4vw, 2.8rem);
-    letter-spacing: -0.059em;
+    letter-spacing: -0.045em;
     line-height: 0.94;
   }
 
   .auth-screen[data-module='cronograma-eventos'] .auth-title-line--brand {
-    gap: 0.18em;
+    gap: 0.23em;
     margin-top: 0.13em;
+  }
+
+  .auth-screen[data-module='cronograma-eventos'] .auth-title-word {
+    letter-spacing: -0.024em;
+  }
+
+  .auth-screen[data-module='cronograma-eventos'] .auth-title-soy-o {
+    width: 0.7em;
+    height: 0.7em;
+    margin-inline: 0.035em;
+  }
+
+  .auth-screen[data-module='cronograma-eventos'] .auth-title-year {
+    letter-spacing: -0.028em;
   }
 
   .auth-strategy-timeline {
@@ -2034,10 +2064,18 @@
     display: none;
   }
 
-  .auth-screen[data-module='cronograma-eventos'] .auth-title-word {
+  .auth-screen[data-module='cronograma-eventos'] .auth-title-word,
+  .auth-screen[data-module='cronograma-eventos'] .auth-title-year {
     background: none;
-    color: oklch(var(--brand-cream));
     -webkit-text-fill-color: currentColor;
+  }
+
+  .auth-screen[data-module='cronograma-eventos'] .auth-title-word {
+    color: oklch(var(--brand-cream));
+  }
+
+  .auth-screen[data-module='cronograma-eventos'] .auth-title-year {
+    color: oklch(var(--brand-gold-400));
   }
 
   .auth-strategy-timeline__milestone,
