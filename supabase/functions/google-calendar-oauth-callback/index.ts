@@ -43,6 +43,9 @@ const SAFE_CODES = new Set([
   "request_failed",
 ]);
 
+// Codes that mean "reconnecting won't help until the user fixes something at Google"
+const NON_RECONNECTABLE_CODES = new Set(["google_api_disabled"]);
+
 function safeCallbackCode(error: unknown): string {
   const message = String((error as Error)?.message ?? error);
   if (SAFE_CODES.has(message)) return message;
