@@ -356,6 +356,14 @@ export function deriveGoogleCalendarState({
   disconnecting = false,
   confirmingDisconnect = false,
 }: DeriveGoogleCalendarStateInput): GoogleCalendarStateView {
+  const providerNeedsReconnect = (code?: string | null) => [
+    'provider_unauthorized',
+    'provider_bad_request',
+    'provider_rejected',
+    'provider_not_found',
+    'calendar_not_verified',
+  ].includes(code ?? '');
+
   if (disconnecting) return VIEWS.disconnecting;
   if (confirmingDisconnect) return VIEWS.disconnect_confirmation;
   if (retrying) return VIEWS.retry_in_progress;
@@ -371,7 +379,7 @@ export function deriveGoogleCalendarState({
   if (flowErrorCode === 'authorization_not_confirmed' || flowErrorCode === 'invalid_callback' || flowErrorCode === 'callback_replayed') {
     return VIEWS.authorization_not_confirmed;
   }
-  if (flowErrorCode === 'authorization_expired') return VIEWS.reconnect_required;
+  if (flowErrorCode === 'authorization_expired' || providerNeedsReconnect(flowErrorCode)) return VIEWS.reconnect_required;
   if (statusErrorCode || flowErrorCode) return VIEWS.temporary_failure;
   if (!connection) return VIEWS.disconnected;
 
@@ -391,7 +399,7 @@ export function deriveGoogleCalendarState({
     if (connection.error_code === 'authorization_revoked') return VIEWS.authorization_revoked;
     if (connection.error_code === 'authorization_not_confirmed') return VIEWS.authorization_not_confirmed;
     if (connection.error_code === 'authorization_expired') return VIEWS.reconnect_required;
-    if (connection.error_code === 'calendar_not_verified') return VIEWS.reconnect_required;
+    if (providerNeedsReconnect(connection.error_code)) return VIEWS.reconnect_required;
     return VIEWS.temporary_failure;
   }
   if (!['connected', 'synchronizing'].includes(connection.status)) return VIEWS.fallback;

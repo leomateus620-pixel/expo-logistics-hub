@@ -44,6 +44,12 @@ type GoogleCalendarErrorCode =
   | 'no_active_organization'
   | 'oauth_popup_blocked'
   | 'oauth_url_missing'
+  | 'provider_bad_request'
+  | 'provider_conflict'
+  | 'provider_not_found'
+  | 'provider_rate_limited'
+  | 'provider_rejected'
+  | 'provider_unauthorized'
   | 'provider_unavailable'
   | 'request_failed'
   | 'session_expired';
@@ -71,6 +77,12 @@ const SAFE_ERROR_COPY: Record<GoogleCalendarErrorCode, string> = {
   no_active_organization: 'Selecione uma organização antes de conectar sua conta Google.',
   oauth_popup_blocked: 'Permita pop-ups neste site para abrir a autorização do Google.',
   oauth_url_missing: 'O serviço de autorização não respondeu como esperado.',
+  provider_bad_request: 'O Google rejeitou a validação da agenda. Reconecte sua conta.',
+  provider_conflict: 'O Google retornou conflito ao preparar a agenda. Tente novamente.',
+  provider_not_found: 'O calendário do Google não foi encontrado. Reconecte sua conta.',
+  provider_rate_limited: 'O Google limitou temporariamente as solicitações. Tente novamente em instantes.',
+  provider_rejected: 'O Google rejeitou a validação da agenda. Reconecte sua conta.',
+  provider_unauthorized: 'O Google não autorizou o acesso à agenda. Verifique as permissões e reconecte.',
   provider_unavailable: 'O Google Agenda está temporariamente indisponível. Tente novamente.',
   request_failed: 'O serviço está temporariamente indisponível. Tente novamente em instantes.',
   session_expired: 'Sua sessão expirou. Entre novamente antes de conectar sua conta.',

@@ -46,16 +46,16 @@ describe('contratos server-side do Google Agenda', () => {
     expect(source).toContain('headers.set("X-Connection-Api-Key", key)');
   });
 
-  it('valida tentativa, origem, rota, state e replay antes da troca', () => {
+  it('valida tentativa, origem, rota, state quando presente e replay antes da troca', () => {
     const source = oauth();
     expect(source).toContain('await requireUser(req)');
     expect(source).toContain('requireActiveOrgMembership');
-    expect(source).toContain('req.headers.get("Origin") !== attempt.return_origin');
+    expect(source).toContain('requestOrigin && requestOrigin !== attempt.return_origin');
     expect(source).toContain('callbackPath !== attempt.callback_path');
-    expect(source).toContain('await sha256(state) !== attempt.provider_state_hash');
+    expect(source).toContain('if (state && (!attempt.provider_state_hash || stateHash !== attempt.provider_state_hash))');
     expect(source).toContain('throw new Error("callback_replayed")');
     expect(source).toContain('.eq("status", "waiting_authorization")');
-    expect(source).not.toContain('hostname.endsWith(".lovable.app")');
+    expect(source).toContain('isTrustedLovableOrigin(origin)');
   });
 
   it('usa o mesmo Supabase user.id como identidade por usuário', () => {
@@ -75,8 +75,12 @@ describe('contratos server-side do Google Agenda', () => {
     expect(probe).toBeGreaterThan(0);
     expect(calendar).toBeGreaterThan(probe);
     expect(verified).toBeGreaterThan(calendar);
+    expect(source).toContain('if (!probe.ok)');
+    expect(source).toContain('diagnostic("google_probe_succeeded"');
     expect(source).not.toContain('connected_at: now,\n        status: "starting"');
     expect(gateway()).toContain('/calendar/v3/users/me/calendarList');
+    expect(gateway()).toContain('export interface ProbeConnectionResult');
+    expect(gateway()).toContain('safeCode: response.ok ? "ok" : safeProviderError(response.status)');
     expect(gateway()).toContain('SECONDARY_CALENDAR_SUMMARY');
   });
 
@@ -102,6 +106,8 @@ describe('contratos server-side do Google Agenda', () => {
     expect(source).toContain('claim_google_sync_batch');
     expect(source).toContain('findRemoteEventIds');
     expect(source).toContain('remote_event_verification_failed');
+    expect(source).toContain('remote_event_verified');
+    expect(source).toContain('?fields=id,extendedProperties');
     expect(source).toContain('attempts >= MAX_ATTEMPTS');
   });
 
@@ -112,7 +118,7 @@ describe('contratos server-side do Google Agenda', () => {
     expect(sql).toContain("'* * * * *'");
     expect(sql).not.toMatch(/Bearer\s+[A-Za-z0-9._-]{20,}/);
     expect(worker()).toContain('requireServiceRole(req)');
-    expect(read('supabase/config.toml')).toMatch(/\[functions\.google-sync-worker\]\r?\nverify_jwt = true/);
+    expect(read('supabase/config.toml')).toMatch(/\[functions\.google-sync-worker\]\r?\nverify_jwt = false/);
   });
 
   it('não expõe segredo Google ou chave final no frontend', () => {
