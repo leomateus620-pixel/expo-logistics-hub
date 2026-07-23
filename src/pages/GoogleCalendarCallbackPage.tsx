@@ -84,17 +84,33 @@ export default function GoogleCalendarCallbackPage() {
   });
 
   useEffect(() => {
-    // Diagnostic: record what the Lovable connector gateway actually returns
-    // on the callback URL, before we strip it from history.
-    try {
-      const raw = new URLSearchParams(window.location.search);
-      const snapshot: Record<string, string> = {};
-      raw.forEach((v, k) => {
-        if (k === 'code' || k === 'state') snapshot[k] = `${v.slice(0, 6)}…(${v.length})`;
-        else snapshot[k] = v.length > 40 ? `${v.slice(0, 40)}…` : v;
-      });
-      console.info('google_calendar_callback_params', snapshot);
-    } catch { /* ignore */ }
+    // Evidence gate: capture sanitized metadata (names + lengths only, never
+    // values) about what the Lovable connector gateway actually returned to
+    // the callback, then send it to the backend before we strip the URL.
+    const rawSearch = window.location.search;
+    const rawHash = window.location.hash;
+    const source = rawSearch && rawSearch.length > 1
+      ? { transport: 'query' as const, raw: rawSearch }
+      : rawHash && rawHash.length > 1
+        ? { transport: 'hash' as const, raw: rawHash.startsWith('#') ? `?${rawHash.slice(1)}` : rawHash }
+        : { transport: 'query' as const, raw: '' };
+    const params = new URLSearchParams(source.raw);
+    const paramMeta: { name: string; length: number }[] = [];
+    params.forEach((value, key) => {
+      paramMeta.push({ name: key.slice(0, 64), length: value.length });
+    });
+    const observation = {
+      contract_version: '2026-07-23.observe',
+      transport: source.transport,
+      route: GOOGLE_CALENDAR_CALLBACK_PATH,
+      hasCode: params.has('code'),
+      hasState: params.has('state'),
+      hasAttempt: params.has('attempt'),
+      hasError: params.has('error') || params.has('google_error'),
+      params: paramMeta,
+    };
+    // Fire-and-forget observation; never block on it.
+    void invokeOAuth('observe_callback', { observation }).catch(() => undefined);
 
     // Codes, state and attempt identifiers leave browser history before any
     // network work begins. Captured values remain only in this closure.
