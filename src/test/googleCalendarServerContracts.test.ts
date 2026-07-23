@@ -50,7 +50,7 @@ describe('contratos server-side do Google Agenda', () => {
     const source = oauth();
     expect(source).toContain('await requireUser(req)');
     expect(source).toContain('requireActiveOrgMembership');
-    expect(source).toContain('req.headers.get("Origin") !== attempt.return_origin');
+    expect(source).toContain('requestOrigin && requestOrigin !== attempt.return_origin');
     expect(source).toContain('callbackPath !== attempt.callback_path');
     expect(source).toContain('if (state && (!attempt.provider_state_hash || stateHash !== attempt.provider_state_hash))');
     expect(source).toContain('throw new Error("callback_replayed")');
