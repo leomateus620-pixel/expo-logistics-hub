@@ -17,6 +17,18 @@ export const GOOGLE_SCOPES = [
   "https://www.googleapis.com/auth/calendar.events",
 ] as const;
 
+/** Scopes strictly required for the sync to work. Missing any of these = reconnect. */
+export const REQUIRED_CALENDAR_SCOPES = [
+  "https://www.googleapis.com/auth/calendar",
+  "https://www.googleapis.com/auth/calendar.events",
+] as const;
+
+/** Returns the required scopes missing from Google's granted scope string. */
+export function missingRequiredScopes(grantedScope: string | undefined | null): string[] {
+  const granted = new Set((grantedScope ?? "").split(/\s+/).filter(Boolean));
+  return REQUIRED_CALENDAR_SCOPES.filter((s) => !granted.has(s));
+}
+
 export function requireEnv(name: string): string {
   const value = Deno.env.get(name)?.trim();
   if (!value) throw new Error(`missing_env:${name}`);
