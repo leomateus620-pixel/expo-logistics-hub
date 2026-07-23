@@ -1,43 +1,70 @@
-## Plano de correção do Google Agenda
+# Recuperação Google Calendar — PR #16
 
-### Diagnóstico confirmado
-- A conexão mais recente do usuário está presa como `connecting`, com `connection_key` preenchida, mas sem `google_email`, sem `secondary_calendar_id` e sem sincronização concluída.
-- Os logs da função mostram várias tentativas rejeitadas pelo gateway com `401 unauthorized` ao validar a credencial.
-- Existem 63 eventos na fila de sincronização (`queued`), então os eventos não chegam ao Google Agenda porque a conexão nunca vira `connected`.
-- O client App User Connector **Cronograma e eventos** está vinculado ao projeto e com `offline access` ativo.
+Os arquivos da PR #16 já estão presentes no repositório (migração `20260722234000_google_calendar_oauth_hardening.sql`, `google-calendar-oauth`, `google-sync-worker`, `_shared/googleCalendarGateway.ts`, `useGoogleCalendarConnection.ts`, `GoogleCalendarCallbackPage.tsx`, `docs/google-calendar-oauth-recovery.md`). Confirmei que a migração **ainda não foi aplicada** ao banco (`google_calendar_oauth_attempts` não existe). Portanto o trabalho é implantar na ordem correta e validar — não reescrever.
 
-### Causa provável a corrigir
-O fluxo atual está tratando o `session_id` inicial do OAuth como se já fosse uma credencial final para chamadas Google. O Google confirma o consentimento, mas a validação do backend usa uma chave que o gateway ainda rejeita como `unauthorized`; por isso a UI cai em “autorização não confirmada” e a fila não roda.
+## 1. Pré-checagem (sem alterações)
+- Confirmar HEAD da branch importada.
+- Grep no frontend por `GOOGLE_CLIENT_SECRET`, `client_secret`, `X-Connection-Api-Key`, tokens fixos. Abortar se houver segredo exposto.
+- Listar secrets existentes (`fetch_secrets`) para verificar:
+  - `LOVABLE_API_KEY`
+  - `GOOGLE_CALENDAR_APP_USER_CONNECTOR_CLIENT_API_KEY`
+  - `SITE_URL`
+  - `GOOGLE_CALENDAR_ALLOWED_RETURN_ORIGINS`
+- Verificar que o secret Vault `google_sync_worker_service_role_key` está configurado fora do chat. Se ausente → parar e reportar bloqueio.
 
-### Implementação proposta
-1. **Corrigir o contrato com o gateway do App User Connector**
-   - Ajustar o helper server-side para iniciar OAuth, salvar a sessão temporária e finalizar/revalidar a conexão usando a credencial realmente autorizada pelo gateway.
-   - Não considerar `session_id` automaticamente como conexão válida sem uma chamada Google bem-sucedida.
+## 2. Aplicar migração
+- Rodar `supabase/migrations/20260722234000_google_calendar_oauth_hardening.sql` via ferramenta de migração.
+- Verificações pós-migração (sem selecionar valores sensíveis):
+  - Tabela `google_calendar_oauth_attempts` criada.
+  - `google_calendar_connections`: `verified_at`, `connection_generation`, revogação de acesso a `authenticated`.
+  - `google_sync_outbox`: coluna `connection_generation`, índices anti-duplicação, dead-letter.
+  - Trigger `BEFORE DELETE` em eventos; FKs cascade removidas de mapping/outbox.
+  - `pg_cron` job `google-sync-worker-every-minute` ativo.
 
-2. **Tornar o `complete` resiliente e idempotente**
-   - Ao receber retorno do OAuth, tentar finalizar a conexão em etapas com polling controlado.
-   - Se o gateway responder `401 unauthorized`, manter estado recuperável por curto período, mas depois liberar nova tentativa sem travar a UI.
-   - Só gravar `status: connected` quando conseguir criar/validar o calendário secundário e obter uma chamada Google válida.
+## 3. Configurar secrets faltantes
+- Se `SITE_URL` ausente → `set_secret SITE_URL=https://www.fenasojagestao.com`.
+- Se `GOOGLE_CALENDAR_ALLOWED_RETURN_ORIGINS` ausente → definir com origens autorizadas + preview.
+- Não tocar em `LOVABLE_API_KEY` nem no service role.
 
-3. **Limpar estado preso do usuário atual**
-   - Remover ou resetar o registro `connecting` atual que está usando uma chave rejeitada.
-   - Reenfileirar os 63 eventos apenas depois da conexão válida.
+## 4. Deploy Edge Functions
+- Deploy `google-calendar-oauth` e `google-sync-worker`.
+- Confirmar `verify_jwt = true` em ambas (já está no `config.toml`).
+- Não publicar frontend antes disso.
 
-4. **Garantir sincronização inicial**
-   - Após conectar, criar/validar o calendário “FENASOJA — Cronograma”.
-   - Rodar o worker de sincronização e verificar que os itens saem de `queued` para sincronizados.
-   - Se houver falha de permissão/scope, mostrar o erro real na UI e nos logs.
+## 5. Limpar estado travado
+- Remover registro atual em `google_calendar_connections` para o usuário de teste `b664fc22-69d3-40f1-8370-16b8a07ec402` (status error residual).
 
-5. **Ajustar a UI do widget**
-   - Mostrar “Conectado” somente com `status: connected` real.
-   - Em erro recuperável, exibir botão claro de “Conectar novamente” sem loop infinito.
-   - No mobile, evitar popup preso em “aguardando autorização” quando a janela fecha ou retorna sem credencial final.
+## 6. Validação end-to-end (via Playwright + Supabase reads)
+Executar o fluxo real usando a sessão do preview:
+- `oauth_start_started → oauth_start_succeeded → oauth_callback_received → oauth_completion_pending → connection_key_retrieved → google_probe_succeeded → secondary_calendar_ready → backfill_queued → worker_started → event_sync_succeeded`.
+- Card só mostra "Conectado" após `secondary_calendar_id` + `verified_at`.
+- Verificar `google_calendar_event_map`, `google_sync_outbox`, presença de `FENASOJA — Cronograma` via API.
+- Teste CREATE/UPDATE/DELETE com evento temporário `[TESTE GOOGLE CALENDAR] <timestamp>`.
+- Repetir com segundo usuário; validar isolamento (connection keys e mappings distintos).
+- Testar desconexão/reconexão idempotente.
 
-6. **Validação final**
-   - Validar o endpoint `google-calendar-oauth` com a sessão autenticada disponível.
-   - Validar no banco: conexão com `google_email`, `secondary_calendar_id`, `status: connected`, `last_error: null`.
-   - Validar fila: eventos processados pelo `google-sync-worker` e mapeados em `google_calendar_event_map`.
-   - Validar visualmente no preview desktop/mobile que o widget não mostra mais erro nem loading infinito.
+## 7. Validação automatizada
+- `tsgo` typecheck.
+- `bunx vitest run` focado em `googleCalendar*.test.*`, depois suíte completa.
+- Deno check nas Edge Functions.
+- Build de produção.
+- Comparar falhas globais com `origin/main` (reportar dívida preexistente à parte).
 
-### Observação importante
-Se, após a correção, o gateway continuar retornando `401 unauthorized` para uma autorização recém-concluída, a configuração do Google já feita pode estar correta, mas o client do App User Connector pode precisar ser reconectado no workspace para regenerar a chave/callback do conector. Nesse caso, o sistema deverá exibir essa instrução de forma clara em vez de manter a tela em loop.
+## 8. Relatório final
+Entregar no formato solicitado (14 itens), com evidências sanitizadas. Se qualquer evidência real de evento no Google Calendar faltar para ambos os usuários → marcar como **"validação incompleta"** e informar bloqueio exato. Sem uso de "concluído" sem prova.
+
+## Bloqueios possíveis (parar e reportar)
+- `google_sync_worker_service_role_key` ausente no Vault → não posso configurar via chat.
+- Segundo usuário Google real para teste de isolamento → preciso confirmação de qual conta usar.
+- Segredo Google exposto no frontend → parar deploy.
+
+## Rollback
+- Reverter deploy das duas Edge Functions para a versão anterior.
+- A migração permanece (remove exposição de credencial e preserva delete tasks).
+- Suspender processamento: `select cron.unschedule('google-sync-worker-every-minute')`.
+
+## Detalhes técnicos
+- Contrato OAuth preservado: `authorize` → `{authorization_url, session_id}`; callback recebe `code`+`state`; `exchange` com `{ code }` → `{ api_key, connector_id }`. `session_id` **nunca** é usado como `X-Connection-Api-Key`.
+- `app_user_id` = Supabase `user.id`.
+- Redirect URI Google Console: `https://connector-gateway.lovable.dev/api/v1/app-users/oauth2/callback` (já configurado pelo usuário).
+- Scopes: `openid`, `userinfo.email`, `userinfo.profile`, `calendar`, `calendar.events`.
