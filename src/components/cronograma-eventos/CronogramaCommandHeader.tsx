@@ -7,12 +7,14 @@ export function CronogramaCommandHeader({
   onOpenUndated,
   onExpandCountdown,
   canManage,
+  availability,
 }: {
   events: CronogramaEvent[];
   onNewEvent: () => void;
   onOpenUndated: () => void;
   onExpandCountdown?: () => void;
   canManage: boolean;
+  availability?: 'ready' | 'loading' | 'offline';
 }) {
   return (
     <FenasojaCountdownHero
@@ -21,6 +23,7 @@ export function CronogramaCommandHeader({
       onOpenUndated={onOpenUndated}
       onExpandCountdown={onExpandCountdown}
       canManage={canManage}
+      availability={availability}
       presentation="desktop"
     />
   );

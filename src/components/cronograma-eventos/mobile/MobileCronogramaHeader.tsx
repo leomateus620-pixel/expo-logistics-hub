@@ -8,6 +8,7 @@ interface MobileCronogramaHeaderProps {
   onOpenUndated: () => void;
   onExpandCountdown?: () => void;
   canManage: boolean;
+  availability?: 'ready' | 'loading' | 'offline';
 }
 
 export function MobileCronogramaHeader({
@@ -16,6 +17,7 @@ export function MobileCronogramaHeader({
   onOpenUndated,
   onExpandCountdown,
   canManage,
+  availability,
 }: MobileCronogramaHeaderProps) {
   return (
     <FenasojaCountdownHero
@@ -24,6 +26,7 @@ export function MobileCronogramaHeader({
       onOpenUndated={onOpenUndated}
       onExpandCountdown={onExpandCountdown}
       canManage={canManage}
+      availability={availability}
       presentation="mobile"
     />
   );
