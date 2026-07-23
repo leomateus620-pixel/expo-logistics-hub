@@ -3,7 +3,7 @@ project_id = "btfaumhroqtqzxomqorx"
 verify_jwt = true
 
 [functions.google-sync-worker]
-verify_jwt = true
+verify_jwt = false
 
 [functions.event-reminders]
 verify_jwt = true
