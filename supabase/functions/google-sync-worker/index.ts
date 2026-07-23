@@ -315,6 +315,14 @@ async function processTask(supabase: ReturnType<typeof db>, task: SyncTask) {
     ) {
       throw new Error("remote_event_verification_failed");
     }
+    console.info("remote_event_verified", {
+      user: shortUserId(task.user_id),
+      orgId: task.org_id,
+      taskId: task.id,
+      eventId: task.event_id,
+      googleEventId,
+      calendarId,
+    });
 
     for (const duplicateId of remoteIds.filter((id) => id !== googleEventId)) {
       await deleteGoogleEvent(connectionKey, calendarId, duplicateId);
