@@ -200,9 +200,38 @@ export interface ProbeConnectionResult {
   status: number | null;
   safeCode: string;
   attempts: number;
+  detail?: string;
 }
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+/**
+ * Classifies a Google error body from calendarList. Distinguishes:
+ * - google_api_disabled: Calendar API not enabled in the Cloud project (403 SERVICE_DISABLED / accessNotConfigured)
+ * - google_insufficient_scope: token missing the required scope (401/403 with ACCESS_TOKEN_SCOPE_INSUFFICIENT / insufficientPermissions)
+ * - google_unauthorized: generic 401/403
+ */
+export function classifyGoogleErrorBody(status: number, body: string): string {
+  const lower = body.toLowerCase();
+  if (status === 403) {
+    if (lower.includes("accessnotconfigured") || lower.includes("service_disabled") || lower.includes("has not been used") || lower.includes("api has not been used")) {
+      return "google_api_disabled";
+    }
+    if (lower.includes("access_token_scope_insufficient") || lower.includes("insufficientpermissions") || lower.includes("insufficient_scope") || lower.includes("insufficient authentication scopes")) {
+      return "google_insufficient_scope";
+    }
+    return "google_unauthorized";
+  }
+  if (status === 401) {
+    if (lower.includes("insufficient_scope") || lower.includes("access_token_scope_insufficient")) {
+      return "google_insufficient_scope";
+    }
+    return "google_unauthorized";
+  }
+  if (status === 429) return "google_rate_limited";
+  if (status >= 500) return "google_unavailable";
+  return safeProviderError(status);
+}
 
 export async function probeConnection(
   accessToken: string,
@@ -223,13 +252,15 @@ export async function probeConnection(
         accessToken,
         "/users/me/calendarList?maxResults=1&fields=items(id)",
       );
-      await response.text();
+      const body = await response.text();
+      const safeCode = response.ok ? "ok" : classifyGoogleErrorBody(response.status, body);
       last = {
         ok: response.ok,
         stage: "calendar_list_probe",
         status: response.status,
-        safeCode: response.ok ? "ok" : safeProviderError(response.status),
+        safeCode,
         attempts: attempt,
+        detail: response.ok ? undefined : body.slice(0, 400),
       };
       if (response.ok) return last;
       // 401/403 will not recover with retries.
