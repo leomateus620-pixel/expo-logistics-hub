@@ -10,7 +10,9 @@ import {
   exchangeAuthorizationCode,
   fetchGoogleUserinfo,
   GOOGLE_SCOPES,
+  missingRequiredScopes,
   probeConnection,
+  revokeToken,
 } from "../_shared/googleCalendarClient.ts";
 import { buildEncryptedTokenColumns } from "../_shared/googleTokenService.ts";
 
