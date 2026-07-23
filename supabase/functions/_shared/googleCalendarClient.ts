@@ -17,6 +17,18 @@ export const GOOGLE_SCOPES = [
   "https://www.googleapis.com/auth/calendar.events",
 ] as const;
 
+/** Scopes strictly required for the sync to work. Missing any of these = reconnect. */
+export const REQUIRED_CALENDAR_SCOPES = [
+  "https://www.googleapis.com/auth/calendar",
+  "https://www.googleapis.com/auth/calendar.events",
+] as const;
+
+/** Returns the required scopes missing from Google's granted scope string. */
+export function missingRequiredScopes(grantedScope: string | undefined | null): string[] {
+  const granted = new Set((grantedScope ?? "").split(/\s+/).filter(Boolean));
+  return REQUIRED_CALENDAR_SCOPES.filter((s) => !granted.has(s));
+}
+
 export function requireEnv(name: string): string {
   const value = Deno.env.get(name)?.trim();
   if (!value) throw new Error(`missing_env:${name}`);
@@ -41,8 +53,11 @@ export function buildAuthorizationUrl(state: string): string {
   url.searchParams.set("redirect_uri", googleRedirectUri());
   url.searchParams.set("response_type", "code");
   url.searchParams.set("access_type", "offline");
-  url.searchParams.set("prompt", "consent");
-  url.searchParams.set("include_granted_scopes", "true");
+  // Always reopen account picker + granular scope screen. Do NOT set
+  // include_granted_scopes here — that reuses prior partial consents and
+  // silently strips calendar checkboxes.
+  url.searchParams.set("prompt", "consent select_account");
+  url.searchParams.set("enable_granular_consent", "true");
   url.searchParams.set("state", state);
   url.searchParams.set("scope", GOOGLE_SCOPES.join(" "));
   return url.toString();

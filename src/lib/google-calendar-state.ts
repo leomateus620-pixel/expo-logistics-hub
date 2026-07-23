@@ -362,6 +362,9 @@ export function deriveGoogleCalendarState({
     'provider_rejected',
     'provider_not_found',
     'calendar_not_verified',
+    'google_insufficient_scope',
+    'google_unauthorized',
+    'google_api_disabled',
   ].includes(code ?? '');
 
   if (disconnecting) return VIEWS.disconnecting;

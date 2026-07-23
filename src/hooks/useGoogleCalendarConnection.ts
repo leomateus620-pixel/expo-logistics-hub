@@ -85,7 +85,7 @@ const SAFE_ERROR_COPY: Record<GoogleCalendarErrorCode, string> = {
   calendar_not_verified: 'O calendário FENASOJA não está acessível. Reconecte sua conta.',
   calendar_preparation_failed: 'A conta foi autorizada, mas o calendário FENASOJA não pôde ser preparado.',
   google_api_disabled: 'A API do Google Agenda está desativada nesta conta. Ative-a e reconecte.',
-  google_insufficient_scope: 'A conta não concedeu os escopos necessários. Reconecte marcando todas as permissões.',
+  google_insufficient_scope: 'Na tela do Google, marque AS DUAS caixas de permissão de Agenda ("Ver, editar, compartilhar e excluir todos os calendários" e "Ver e editar eventos") antes de continuar. Clique em Reconectar.',
   google_rate_limited: 'O Google limitou temporariamente as solicitações. Tente novamente em instantes.',
   google_unauthorized: 'O Google não autorizou o acesso à agenda. Verifique as permissões e reconecte.',
   google_unavailable: 'O Google Agenda está temporariamente indisponível. Tente novamente.',
