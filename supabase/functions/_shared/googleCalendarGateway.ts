@@ -42,6 +42,14 @@ export interface SecondaryCalendarResult {
   disposition: "existing" | "recovered" | "created";
 }
 
+export interface ProbeConnectionResult {
+  ok: boolean;
+  stage: "calendar_list_probe";
+  status: number | null;
+  safeCode: string;
+  attempts: number;
+}
+
 function requireEnv(name: string): string {
   const value = Deno.env.get(name)?.trim();
   if (!value) throw new Error(`missing_env:${name}`);
@@ -79,7 +87,7 @@ export function asFinalizedConnectionKey(value: unknown): FinalizedConnectionKey
   return value.trim() as FinalizedConnectionKey;
 }
 
-function safeProviderError(status: number) {
+export function safeProviderError(status: number) {
   if (status === 400) return "provider_bad_request";
   if (status === 401 || status === 403) return "provider_unauthorized";
   if (status === 404) return "provider_not_found";
@@ -88,6 +96,8 @@ function safeProviderError(status: number) {
   if (status >= 500) return "provider_unavailable";
   return "provider_rejected";
 }
+
+const delay = (milliseconds: number) => new Promise((resolve) => setTimeout(resolve, milliseconds));
 
 async function readJsonObject(response: Response): Promise<Record<string, unknown>> {
   const text = await response.text();
@@ -212,17 +222,51 @@ export async function callGoogleJson<T = unknown>(
 }
 
 /** Probes an endpoint covered by the requested Calendar scope. */
-export async function probeConnection(connectionKey: FinalizedConnectionKey): Promise<boolean> {
-  try {
-    const response = await callGoogle(
-      connectionKey,
-      "/calendar/v3/users/me/calendarList?maxResults=1&fields=items(id)",
-    );
-    await response.text();
-    return response.ok;
-  } catch {
-    return false;
+export async function probeConnection(
+  connectionKey: FinalizedConnectionKey,
+  options: { maxAttempts?: number; initialDelayMs?: number } = {},
+): Promise<ProbeConnectionResult> {
+  const maxAttempts = Math.max(1, Math.min(options.maxAttempts ?? 8, 12));
+  const initialDelayMs = Math.max(250, options.initialDelayMs ?? 900);
+  let last: ProbeConnectionResult = {
+    ok: false,
+    stage: "calendar_list_probe",
+    status: null,
+    safeCode: "provider_unavailable",
+    attempts: 0,
+  };
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
+    try {
+      const response = await callGoogle(
+        connectionKey,
+        "/calendar/v3/users/me/calendarList?maxResults=1&fields=items(id)",
+      );
+      await response.text();
+      last = {
+        ok: response.ok,
+        stage: "calendar_list_probe",
+        status: response.status,
+        safeCode: response.ok ? "ok" : safeProviderError(response.status),
+        attempts: attempt,
+      };
+      if (response.ok) return last;
+    } catch {
+      last = {
+        ok: false,
+        stage: "calendar_list_probe",
+        status: null,
+        safeCode: "provider_unavailable",
+        attempts: attempt,
+      };
+    }
+
+    if (attempt < maxAttempts) {
+      await delay(Math.min(4500, initialDelayMs * attempt));
+    }
   }
+
+  return last;
 }
 
 interface CalendarListItem {
