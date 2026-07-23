@@ -78,6 +78,13 @@ const SAFE_ERROR_COPY: Record<GoogleCalendarErrorCode, string> = {
 
 const GOOGLE_OAUTH_POPUP_FEATURES = 'width=540,height=720,resizable=yes,scrollbars=yes';
 const VERIFIED_STATUSES: GoogleCalendarBackendStatus[] = ['connected', 'synchronizing'];
+const IN_PROGRESS_STATUSES: GoogleCalendarBackendStatus[] = [
+  'starting',
+  'waiting_authorization',
+  'completing',
+  'preparing_calendar',
+  'synchronizing',
+];
 
 const isKnownErrorCode = (value: unknown): value is GoogleCalendarErrorCode =>
   typeof value === 'string' && value in SAFE_ERROR_COPY;
@@ -198,7 +205,7 @@ export function useGoogleCalendarConnection() {
     },
   });
 
-  const waitForBackendConfirmation = useCallback(async (activeOrgId: string, attempts = 20) => {
+  const waitForBackendConfirmation = useCallback(async (activeOrgId: string, attempts = 45) => {
     for (let attempt = 0; attempt < attempts; attempt += 1) {
       const result = await invoke<GoogleStatusResponse>('status', { orgId: activeOrgId });
       const connection = result.connection;
@@ -219,7 +226,10 @@ export function useGoogleCalendarConnection() {
           isKnownErrorCode(connection.error_code) ? connection.error_code : 'authorization_failed',
         );
       }
-      await delay(attempt < 8 ? 700 : 1200);
+      if (connection && !IN_PROGRESS_STATUSES.includes(connection.status)) {
+        throw new GoogleCalendarFlowError('authorization_not_confirmed');
+      }
+      await delay(attempt < 10 ? 800 : 1500);
     }
     throw new GoogleCalendarFlowError('authorization_not_confirmed');
   }, []);
@@ -274,12 +284,12 @@ export function useGoogleCalendarConnection() {
           }
 
           setFlowPhase('returning');
-          return await waitForBackendConfirmation(orgId, popupResult.status === 'closed' ? 20 : 6);
+          return await waitForBackendConfirmation(orgId, popupResult.status === 'closed' ? 60 : 30);
         } catch (error) {
           if (preparedPopup && !preparedPopup.closed) preparedPopup.close();
           const attemptId = activeAttemptRef.current;
           const code = error instanceof GoogleCalendarFlowError ? error.code : 'request_failed';
-          if (attemptId && ['authorization_cancelled', 'authorization_not_confirmed'].includes(code)) {
+          if (attemptId && code === 'authorization_cancelled') {
             await invoke('cancel', { attemptId }).catch(() => undefined);
           }
           throw error;
