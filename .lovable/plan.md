@@ -1,38 +1,45 @@
-## Diagnóstico
+## Diagnóstico confirmado (logs reais)
 
-O callback recebeu o `code` do Google, trocou por token, mas o probe em `/users/me/calendarList` retornou 403 → mapeado como `google_insufficient_scope` ("A conta não concedeu os escopos necessários").
+O último callback registrou:
+- `google_probe_failed { httpStatus: 403, stage: "calendar_list_probe" }`
+- `oauth_callback_failed { errorCode: "google_insufficient_scope" }`
 
-Causa real: na tela de consentimento do Google, os escopos de Calendar aparecem como **checkboxes granulares** ("Ver, editar, compartilhar e excluir permanentemente todos os calendários…" e "Ver e editar eventos…"). Se o usuário clica em "Continuar" sem marcar as duas caixas, o token vem sem os escopos de calendário e a API retorna 403. Hoje o backend só descobre isso depois do probe e mostra uma mensagem genérica, sem instruir a marcar as caixas nem forçar re-consentimento.
+Não houve `google_scopes_insufficient`, ou seja, os escopos vieram completos. O 403 em `/calendarList` com escopos válidos = **Google Calendar API não habilitada no projeto Google Cloud** que emite o OAuth Client. A classificação atual "insufficient_scope" mascara isso e faz o usuário reabrir consentimento sem sucesso.
 
-## Correções
+## O que precisa acontecer no Google Cloud (você faz uma vez)
 
-### 1. Validar escopos concedidos antes do probe (`google-calendar-oauth-callback/index.ts`)
-Depois de `exchangeAuthorizationCode`, comparar `tokens.scope` (string separada por espaço) contra os escopos obrigatórios `https://www.googleapis.com/auth/calendar` **e** `https://www.googleapis.com/auth/calendar.events`. Se qualquer um estiver ausente:
-- Revogar o `access_token` recém-emitido (best effort, via `revokeToken`) para forçar novo consentimento limpo.
-- Marcar o attempt como `cancelled` com `error_code = "google_insufficient_scope"` e a connection como `reconnect_required` com o mesmo código.
-- Redirecionar para `frontendCallbackUrl(attempt.id, "error", "google_insufficient_scope")` sem tentar o probe.
+No projeto Cloud do OAuth Client atual:
+1. Abrir **APIs & Services → Library**.
+2. Habilitar **Google Calendar API**.
+3. Confirmar que **People API** está habilitada (usada por `userinfo`).
+4. Aguardar ~1 min de propagação.
 
-### 2. Forçar re-consentimento explícito (`_shared/googleCalendarClient.ts`)
-Em `buildAuthorizationUrl`:
-- Adicionar `url.searchParams.set("prompt", "consent select_account")` para sempre reabrir seleção de conta + tela de escopos.
-- Remover `include_granted_scopes=true` (esse parâmetro faz o Google reusar consentimentos anteriores incompletos em vez de reexibir as caixas).
-- Adicionar `enable_granular_consent=true` explicitamente (comportamento padrão hoje, mas fixado para não regredir).
+Sem esse passo, nenhuma correção de código resolve — o Google continua respondendo 403.
 
-### 3. Mensagem clara no frontend (`useGoogleCalendarConnection.ts`)
-Atualizar `google_insufficient_scope` para instrução acionável:
-> "Na tela do Google, marque **as duas caixas** de permissão de Agenda antes de continuar. Clique em Reconectar e revise as permissões."
+## Correções de código (para nunca mais confundir esse cenário)
 
-### 4. Estado de UI (`src/lib/google-calendar-state.ts`)
-`google_insufficient_scope` já cai em `providerNeedsReconnect` via `provider_unauthorized`? Não — é um código novo. Adicionar `google_insufficient_scope` (e `google_unauthorized`) à lista `providerNeedsReconnect` para renderizar `reconnect_required` (botão "Reconectar conta") em vez de `temporary_failure` (botão "Verificar novamente", que é o que está aparecendo no print).
+### 1. `supabase/functions/_shared/googleCalendarClient.ts`
+- No `probeConnection`: além do status, ler o body do 403 e detectar `"accessNotConfigured"` / `"PERMISSION_DENIED"` / `"SERVICE_DISABLED"`. Retornar `safeCode: "google_api_disabled"` quando presente; `"google_insufficient_scope"` só quando o body indicar `insufficientPermissions` / `ACCESS_TOKEN_SCOPE_INSUFFICIENT`.
 
-### 5. Deploy e validação
-- Deploy: `google-calendar-oauth-callback` e `google-calendar-oauth`.
-- Limpar a conexão travada do Leonardo (`google_calendar_connections` do usuário atual) via SQL para permitir reconexão limpa.
-- Teste E2E manual pelo widget: reconectar marcando as duas caixas → verificar que probe passa, calendário secundário é criado, `verified_at` é preenchido, e o outbox drena os 63 eventos pendentes.
-- Verificar logs (`google_probe_succeeded`, `secondary_calendar_ready`, `remote_event_verified`).
+### 2. `supabase/functions/google-calendar-oauth-callback/index.ts`
+- Trocar o mapeamento fixo `probe.status === 403 → google_insufficient_scope` por `probe.safeCode` já classificado no client.
+- Quando o probe falhar por `google_api_disabled`, marcar a connection como `status='error'` (não `reconnect_required`) e gravar `last_error='google_api_disabled'` — reconectar não vai adiantar até a API ser habilitada.
+- Reverter o `status: "preparing_calendar"` gravado antes do probe (linhas 302–310) para não deixar a UI achando que a etapa avançou quando o probe falha logo em seguida.
 
-## Detalhes técnicos
+### 3. `src/hooks/useGoogleCalendarConnection.ts`
+- Cópia PT-BR de `google_api_disabled`: instruir explicitamente "Habilite a Google Calendar API no console do Google Cloud (APIs & Services → Library) e clique em Reconectar." (a string atual já existe, só garantir que aparece com destaque).
+- No refetch loop: quando `connection.status === 'error'` com um `error_code` conhecido, parar de considerar como "in progress" (hoje `IN_PROGRESS_STATUSES` não inclui `error`, ok, mas o `flowPhase` local fica em `returning` até o polling confirmar — forçar `setFlowPhase('idle')` assim que o status virar `error`/`reconnect_required` com error_code).
 
-- Escopos obrigatórios verificados: `https://www.googleapis.com/auth/calendar` (criar/listar calendários) e `https://www.googleapis.com/auth/calendar.events` (eventos). `openid`/`userinfo.*` são bônus e não bloqueiam.
-- `revokeToken` é fire-and-forget; se falhar não bloqueia o redirecionamento de erro.
-- Sem novas migrations necessárias — coluna `scopes_granted` já persiste o que veio, útil para debug posterior.
+### 4. `src/pages/GoogleCalendarCallbackPage.tsx`
+- Ao receber `?status=error&code=google_api_disabled`, mostrar mensagem específica ("Ative a Google Calendar API") em vez do genérico atual, e enviar `postMessage` para o opener (ou navegar direto para `/cronograma-eventos`) para destravar a UI da aba original.
+
+### 5. `src/lib/google-calendar-state.ts`
+- Já inclui `google_api_disabled` em `providerNeedsReconnect`; adicionar ID de estado `api_disabled` distinto de `reconnect_required` para o widget renderizar CTA "Abrir Google Cloud Console" além de "Reconectar".
+
+## Validação
+1. Reproduzir com API desabilitada → logs devem mostrar `safeCode: "google_api_disabled"`, UI mostra card específico.
+2. Habilitar a Calendar API → reconectar → probe 2xx → estado `synchronizing` → eventos aparecem no calendário "FENASOJA — Cronograma" do Google.
+3. Rodar `vitest run src/test/googleCalendarState.test.ts` para garantir que o novo estado `api_disabled` está coberto.
+
+## Sobre "não recebi eventos no e-mail"
+O `event-reminders` roda separado do sync Google e depende de eventos vinculados a você em `cronograma_evento_responsaveis`. Isso é uma verificação separada — depois que a conexão fechar como `connected`, checo se há eventos futuros vinculados ao seu user e disparo teste manual do `event-reminders`. Não misturo essa correção com a do 403 porque são caminhos independentes.
