@@ -1,50 +1,45 @@
-## Diagnóstico confirmado
+## Diagnóstico com evidência
 
-- O app inicia o OAuth corretamente e recebe `authorization_url` do conector.
-- Depois disso, o status fica em `waiting_authorization` até o front cancelar a tentativa.
-- A tentativa mais recente foi marcada como `authorization_cancelled`, mas `callback_observation` continuou vazio.
-- Não há logs de `oauth_callback_received`, `oauth_completion_pending` ou `oauth_callback_observed`.
+- Log `oauth_start_succeeded` confirma que a tentativa `1a4f0b38…` foi iniciada às 03:57:42 com `return_origin: fenasojagestao.com`.
+- Nenhum log `oauth_callback_observed*` ou `oauth_callback_received` foi emitido depois disso.
+- `google_calendar_oauth_attempts.callback_observation` continua `NULL` em todas as tentativas.
+- Você confirmou que viu "Validando autorização" **dentro do popup**, o que prova que `GoogleCalendarCallbackPage` executou.
 
-Conclusão: o popup chega no retorno visual, mas o app não está recebendo/consumindo o retorno final do conector. A tela principal fica presa em “Confirmando autorização” porque o callback não confirma a conexão no backend.
+Conclusão suportada pelas evidências: a página do callback rodou, mas nenhuma das requisições (`observe_callback` e/ou `complete`) chegou ao backend antes de o popup ser fechado. Hoje o `useEffect` dispara `invokeOAuth('observe_callback', …)` fire‑and‑forget e imediatamente chama `finish()`, que faz `postMessage` e agenda `window.close()` em 350ms. Como `supabase.functions.invoke` usa `fetch` normal (sem `keepalive`), o navegador cancela a requisição quando a janela é fechada. O `complete` só é executado quando o feedback é `completion_required`; se o connector gateway não devolveu `code` na query/hash do nosso `return_url` (o histórico mostra que isso é comum), o caminho vai direto para `finish('failed')` sem nunca chamar `complete` — e mesmo quando chega em `complete`, ele sofre do mesmo cancelamento.
 
-## Plano de correção
+## O que fazer
 
-1. **Corrigir o domínio de retorno do OAuth**
-   - Ajustar o backend para aceitar e priorizar o mesmo origin que iniciou o fluxo no preview/editor, não forçar `www.fenasojagestao.com` quando a chamada veio do preview.
-   - Manter os domínios publicados e customizados como permitidos.
-   - Evitar que o popup finalize em um domínio diferente do `window.opener`, pois isso quebra o `postMessage` e a confirmação visual.
+### Fase A — Instrumentar sobrevivência do popup (fonte da falha atual)
 
-2. **Tornar o callback independente do `postMessage`**
-   - No hook `useGoogleCalendarConnection`, tratar popup fechado como “retorno pendente”, não como cancelamento imediato.
-   - Aguardar o backend por mais tempo e consultar status até detectar `connected`, `synchronizing`, `error` ou expiração.
-   - Não chamar `cancel` automaticamente quando o erro for apenas `authorization_not_confirmed`, para não apagar uma tentativa que ainda pode completar.
+1. Em `GoogleCalendarCallbackPage.tsx`:
+   - Primeiro emitir `observe_callback` usando `fetch(url, { method: 'POST', keepalive: true, ... })` diretamente (não `supabase.functions.invoke`), com apikey publishable + Authorization Bearer do access token quando existir. Aguardar essa Promise antes de qualquer `postMessage`/`window.close`.
+   - Só depois disso decidir feedback e, se `completion_required`, disparar `complete` também com `fetch keepalive` e `await`.
+   - Adiar `finish()` para depois das duas respostas (com timeout defensivo de ~4s).
+   - Incluir na `observation` a lista bruta de nomes de parâmetros vistos em `search` **e** em `hash`, o comprimento total do `search` e do `hash`, e um flag `openerPresent` — sem valores.
+2. Em `useGoogleCalendarConnection.ts`:
+   - Aumentar o delay entre `postMessage` e o `window.close` (400 → 1500 ms no `finish` da callback page) para não competir com o keepalive.
+   - Não tratar `authorization_not_confirmed` como cancelamento; deixar o polling de `waitForBackendConfirmation` decidir.
 
-3. **Fortalecer a observação do callback**
-   - Enviar `attemptId` sanitizado na observação quando existir, sem gravar `code`, `state` ou valores sensíveis.
-   - No backend, permitir correlacionar `observe_callback` por `attempt` mesmo sem sessão hidratada.
-   - Registrar metadados suficientes para saber se o Google voltou com `code/state`, `error`, hash ou query.
+### Fase B — Ler evidência e decidir Fase 2
 
-4. **Corrigir parsing de retornos alternativos do conector**
-   - Expandir `parseGoogleCalendarCallbackFeedback` para reconhecer variações seguras que o conector pode devolver, como `google_result`, `google`, ou `error` sem `code/state`.
-   - Se o retorno não trouxer `code/state`, não marcar como sucesso falso; registrar evidência e mostrar erro recuperável com botão para reconectar.
+Depois de você reproduzir uma vez conectando `leomateus620@gmail.com`, eu leio:
+- `google_calendar_oauth_attempts.callback_observation` da tentativa correspondente,
+- logs `oauth_callback_observed*`, `oauth_start_succeeded`, `oauth_return_url_resolved`.
 
-5. **Limpar estado preso do usuário atual**
-   - Após aplicar a correção, limpar apenas tentativas pendentes/erro do usuário e organização atuais, preservando histórico concluído.
-   - Deixar a conexão em `disconnected` para um novo teste limpo.
+Isso vai mostrar objetivamente se o gateway está devolvendo:
+- (a) `code`+`state` normais na query → resolver com `complete` (ajustar lookup por `state` se `attempt` foi removido);
+- (b) parâmetros no `hash` (fluxo `web_message`) → migrar `complete` para ler do hash;
+- (c) nenhum parâmetro (redirect só de status) → alternativa: usar o helper `connector_app_user--connect_client` do gateway em vez do fluxo manual.
 
-6. **Validação**
-   - Reproduzir o fluxo pelo widget do Cronograma.
-   - Confirmar no banco que a tentativa passa por `waiting_authorization` → `completing` → `completed`.
-   - Confirmar que `google_calendar_connections` fica `connected` ou `synchronizing`, com `verified_at` e `secondary_calendar_id` preenchidos.
-   - Confirmar que o card sai de “Confirmando autorização” e mostra “Google Agenda conectado”.
+Só então mexemos no `google-sync-worker` (Fase 3 do plano original).
 
-## Arquivos envolvidos
+## Detalhes técnicos
 
-- `supabase/functions/google-calendar-oauth/index.ts`
-- `src/pages/GoogleCalendarCallbackPage.tsx`
-- `src/hooks/useGoogleCalendarConnection.ts`
-- `src/lib/google-calendar-callback.ts`
+- Arquivos afetados nesta fase: `src/pages/GoogleCalendarCallbackPage.tsx`, `src/hooks/useGoogleCalendarConnection.ts`, `supabase/functions/google-calendar-oauth/index.ts` (apenas para aceitar campos extras em `observation`: `searchLength`, `hashLength`, `openerPresent`, `paramsHash` — sem valores).
+- Sem migrations. Sem alteração de contrato: `contract_version` sobe para `2026-07-23.observe-keepalive`.
+- Sem mudança visual no widget além do texto de estado se necessário.
+- Verificação: após você tentar conectar, eu confiro `callback_observation` da nova tentativa e os logs `oauth_callback_observed*` no `google-calendar-oauth`. Se `observation.hasCode=true` mas `complete` falhou, ajusto o lookup no `complete`. Se `hasCode=false` mas `hash` traz `code`, migro a leitura para hash.
 
-## Resultado esperado
+## Fora do escopo agora
 
-Depois da correção, a autorização do Google Agenda deve finalizar sem loop, o popup deve comunicar o resultado corretamente quando possível, e a tela principal deve se recuperar consultando o backend mesmo quando o popup fechar ou o navegador bloquear a comunicação entre janelas.
+- Mudanças no `google-sync-worker`, no `pg_cron`, nos templates de email e no widget visual — só depois que a conexão estiver realmente confirmada.

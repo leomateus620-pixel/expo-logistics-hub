@@ -20,7 +20,7 @@ const APP_ROUTE = "/cronograma-eventos";
 const CALLBACK_ROUTE = "/google-calendar/callback";
 const ATTEMPT_TTL_MS = 10 * 60 * 1000;
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-const CONTRACT_VERSION = "2026-07-23.observe";
+const CONTRACT_VERSION = "2026-07-23.observe-keepalive";
 
 type AdminClient = ReturnType<typeof admin>;
 
@@ -473,14 +473,18 @@ Deno.serve(async (req) => {
         ? body.observation as Record<string, unknown>
         : {};
       const paramNamesInput = Array.isArray(rawObs.params) ? rawObs.params : [];
-      const params = paramNamesInput.slice(0, 32).map((entry) => {
+      const params = paramNamesInput.slice(0, 64).map((entry) => {
         const item = (entry && typeof entry === "object") ? entry as Record<string, unknown> : {};
         const name = typeof item.name === "string" ? item.name.slice(0, 64) : "";
         const length = typeof item.length === "number" && Number.isFinite(item.length)
           ? Math.max(0, Math.min(4096, Math.floor(item.length)))
           : 0;
-        return { name, length };
+        const loc = item.loc === "h" ? "h" : "q";
+        return { name, length, loc };
       }).filter((p) => p.name);
+      const clampLen = (v: unknown) => (typeof v === "number" && Number.isFinite(v))
+        ? Math.max(0, Math.min(8192, Math.floor(v)))
+        : 0;
       const observation = {
         contract_version: CONTRACT_VERSION,
         client_contract_version: typeof rawObs.contract_version === "string" ? String(rawObs.contract_version).slice(0, 64) : null,
@@ -491,9 +495,13 @@ Deno.serve(async (req) => {
         has_attempt: Boolean(rawObs.hasAttempt),
         has_error: Boolean(rawObs.hasError),
         params,
+        search_length: clampLen(rawObs.searchLength),
+        hash_length: clampLen(rawObs.hashLength),
+        opener_present: Boolean(rawObs.openerPresent),
         observed_at: new Date().toISOString(),
         auth_present: Boolean(maybeUser),
       };
+
       let attemptRowId: string | null = null;
       const rawAttemptId = typeof body.attemptId === "string" && UUID_PATTERN.test(body.attemptId)
         ? body.attemptId
