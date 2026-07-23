@@ -32,31 +32,39 @@ type CallbackUiState =
   | { status: 'success'; title: string; description: string }
   | { status: 'cancelled' | 'failed'; title: string; description: string; code: string };
 
-async function invokeOAuth(action: string, body: Record<string, unknown>) {
-  const { data: sessionData } = await supabase.auth.getSession();
-  const accessToken = sessionData.session?.access_token;
-  if (!accessToken) throw new Error('session_expired');
-  const { data, error } = await supabase.functions.invoke('google-calendar-oauth', {
-    body: { action, ...body },
-    headers: { Authorization: `Bearer ${accessToken}` },
-  });
-  if (error) {
-    const context = (error as { context?: unknown }).context;
-    if (context instanceof Response) {
-      try {
-        const payload = await context.clone().json() as { error?: unknown };
-        if (typeof payload.error === 'string' && SAFE_CALLBACK_CODES.has(payload.error)) {
-          throw new Error(payload.error);
-        }
-      } catch (cause) {
-        const safeCode = normalizeCallbackError(cause);
-        if (safeCode !== 'request_failed') throw new Error(safeCode);
-      }
+const OAUTH_FN_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/google-calendar-oauth`;
+const PUBLISHABLE_APIKEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string | undefined;
+
+async function keepaliveInvoke(action: string, body: Record<string, unknown>, timeoutMs = 4500) {
+  const { data: sessionData } = await supabase.auth.getSession().catch(() => ({ data: { session: null } }));
+  const accessToken = sessionData?.session?.access_token;
+  const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+  if (PUBLISHABLE_APIKEY) headers.apikey = PUBLISHABLE_APIKEY;
+  headers.Authorization = `Bearer ${accessToken ?? PUBLISHABLE_APIKEY ?? ''}`;
+  const controller = new AbortController();
+  const timer = window.setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const response = await fetch(OAUTH_FN_URL, {
+      method: 'POST',
+      keepalive: true,
+      headers,
+      body: JSON.stringify({ action, ...body }),
+      signal: controller.signal,
+    });
+    let payload: { ok?: boolean; error?: unknown; backfill?: number } = {};
+    try { payload = await response.json(); } catch { /* empty body */ }
+    if (!response.ok) {
+      const code = typeof payload.error === 'string' && SAFE_CALLBACK_CODES.has(payload.error)
+        ? payload.error
+        : 'request_failed';
+      throw new Error(code);
     }
-    throw new Error('request_failed');
+    return payload;
+  } finally {
+    window.clearTimeout(timer);
   }
-  return data as { ok?: boolean; backfill?: number };
 }
+
 
 function safeCallbackCopy(code: string) {
   if (code === 'authorization_cancelled') return 'A autorização foi cancelada. Nenhuma alteração foi feita.';
