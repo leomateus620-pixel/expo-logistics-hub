@@ -1,5 +1,17 @@
 import { useEffect, useMemo, useState } from 'react';
-import { CalendarRange, Check, Loader2, Search, SlidersHorizontal, X } from 'lucide-react';
+import {
+  CalendarClock,
+  CalendarDays,
+  CalendarRange,
+  Check,
+  CircleAlert,
+  Loader2,
+  Search,
+  SlidersHorizontal,
+  SunMedium,
+  X,
+  type LucideIcon,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -20,12 +32,12 @@ import type {
   CronogramaStatus,
 } from './types';
 
-const periodOptions: Array<{ value: CronogramaFilters['period']; label: string }> = [
-  { value: 'all', label: 'Todo o ciclo' },
-  { value: 'today', label: 'Hoje' },
-  { value: 'week', label: 'Semana atual' },
-  { value: '30days', label: 'Próximos 30 dias' },
-  { value: 'overdue', label: 'Atrasados' },
+const periodOptions: Array<{ value: CronogramaFilters['period']; label: string; icon: LucideIcon }> = [
+  { value: 'all', label: 'Todo o ciclo', icon: CalendarDays },
+  { value: 'today', label: 'Hoje', icon: SunMedium },
+  { value: 'week', label: 'Semana atual', icon: CalendarRange },
+  { value: '30days', label: 'Próximos 30 dias', icon: CalendarClock },
+  { value: 'overdue', label: 'Atrasados', icon: CircleAlert },
 ];
 
 const periodLabels: Record<CronogramaFilters['period'], string> = {
@@ -85,9 +97,9 @@ export function CronogramaFiltersBar({
   return (
     <section className="cronograma-filter-surface" aria-label="Filtros do cronograma">
       <div className="cronograma-filter-main-row">
-        <label className="relative block min-w-0 flex-1">
+        <label className="cronograma-search-field relative block min-w-0 flex-1">
           <span className="sr-only">Buscar no cronograma</span>
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
+          <span className="cronograma-search-icon" aria-hidden="true"><Search /></span>
           <Input
             value={searchValue}
             onChange={(event) => setSearchValue(event.target.value)}
@@ -97,7 +109,9 @@ export function CronogramaFiltersBar({
         </label>
 
         <div className="cronograma-period-pills" aria-label="Atalhos de período">
-          {periodOptions.map((option) => (
+          {periodOptions.map((option) => {
+            const Icon = option.icon;
+            return (
             <button
               key={option.value}
               type="button"
@@ -105,14 +119,16 @@ export function CronogramaFiltersBar({
               className={cn('cronograma-period-pill focus-ring', filters.period === option.value && 'is-active')}
               aria-pressed={filters.period === option.value}
             >
+              <Icon aria-hidden="true" />
               {option.label}
             </button>
-          ))}
+            );
+          })}
         </div>
 
         <Popover>
           <PopoverTrigger asChild>
-            <Button type="button" variant="outline" className="h-10 shrink-0 rounded-lg px-3 text-xs">
+            <Button type="button" variant="outline" className="cronograma-advanced-filter-trigger h-10 shrink-0 rounded-lg px-3 text-xs">
               <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />
               <span className="hidden sm:inline">Filtros</span>
               {advancedCount > 0 && <span className="cronograma-filter-count">{advancedCount}</span>}
@@ -180,7 +196,7 @@ export function CronogramaFiltersBar({
                 value={filters.period}
                 onValueChange={(value) => onChange({ ...filters, period: value as CronogramaFilters['period'] })}
                 items={[
-                  ...periodOptions,
+                  ...periodOptions.map(({ value, label }) => ({ value, label })),
                   { value: 'upcoming', label: 'Próximos eventos' },
                   { value: 'undated', label: 'Sem data' },
                 ]}

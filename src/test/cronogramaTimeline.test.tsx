@@ -4,6 +4,7 @@ import { act, fireEvent, render, screen, waitFor, within } from '@testing-librar
 import '@testing-library/jest-dom/vitest';
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { CronogramaTimelineBoard } from '@/components/cronograma-eventos/CronogramaTimelineBoard';
+import { CronogramaViewTabs } from '@/components/cronograma-eventos/CronogramaViewTabs';
 import { EventDrawer } from '@/components/cronograma-eventos/EventDrawer';
 import type { CronogramaEvent, CronogramaFilters } from '@/components/cronograma-eventos/types';
 import {
@@ -12,6 +13,8 @@ import {
   isCycleMonthKey,
 } from '@/lib/cronograma-cycle';
 import {
+  buildCronogramaViewSearchParams,
+  classifyCronogramaEvent,
   deriveOperationalStatus,
   filterTimelineEvents,
   getInitialTimelineMonth,
@@ -19,7 +22,10 @@ import {
   getTimelineSnapshot,
   getTodayKey,
   groupTimelineByMonth,
+  partitionCronogramaEvents,
+  resetCronogramaTemporalFilters,
 } from '@/lib/cronograma-timeline';
+import { resolveCronogramaReturnFocus } from '@/lib/cronograma-focus';
 
 const baseEvent: CronogramaEvent = {
   id: 'event-2026-july',
@@ -162,6 +168,8 @@ describe('domínio temporal do cronograma', () => {
   it('deriva atrasos sem alterar estados finais ou itens sem data', () => {
     expect(deriveOperationalStatus(baseEvent, '2026-07-14')).toBe('planned');
     expect(deriveOperationalStatus({ ...baseEvent, date: '2026-07-13' }, '2026-07-14')).toBe('overdue');
+    expect(deriveOperationalStatus({ ...baseEvent, date: '2026-07-13', endDate: '2026-07-14' }, '2026-07-14')).toBe('planned');
+    expect(deriveOperationalStatus({ ...baseEvent, date: '2026-07-12', endDate: '2026-07-13' }, '2026-07-14')).toBe('overdue');
     expect(deriveOperationalStatus({ ...baseEvent, date: '2026-07-13', status: 'completed' }, '2026-07-14')).toBe('completed');
     expect(deriveOperationalStatus({ ...baseEvent, date: null }, '2026-07-14')).toBe('undated');
     expect(deriveOperationalStatus({ ...baseEvent, date: null, status: 'cancelled' }, '2026-07-14')).toBe('cancelled');
@@ -170,6 +178,76 @@ describe('domínio temporal do cronograma', () => {
   it('respeita a virada de dia no fuso de São Paulo', () => {
     expect(getTodayKey(new Date('2026-07-15T02:30:00.000Z'))).toBe('2026-07-14');
     expect(getTodayKey(new Date('2026-07-15T03:30:00.000Z'))).toBe('2026-07-15');
+  });
+
+  it('separa timeline, concluídos e pendências sem mutar o status persistido', () => {
+    const yesterday = { ...baseEvent, id: 'yesterday', date: '2026-07-13', status: 'overdue' as const };
+    const today = { ...baseEvent, id: 'today', date: '2026-07-14' };
+    const futureCompleted = { ...baseEvent, id: 'future-completed', date: '2026-08-10', status: 'completed' as const };
+    const undated = { ...baseEvent, id: 'undated', date: null, status: 'undated' as const };
+    const completedWithoutDate = { ...undated, id: 'completed-without-date', status: 'completed' as const };
+    const multiDayInProgress = { ...baseEvent, id: 'multi-day', date: '2026-07-13', endDate: '2026-07-14' };
+
+    expect(classifyCronogramaEvent(yesterday, '2026-07-14')).toBe('completed');
+    expect(classifyCronogramaEvent(today, '2026-07-14')).toBe('timeline');
+    expect(classifyCronogramaEvent(futureCompleted, '2026-07-14')).toBe('completed');
+    expect(classifyCronogramaEvent(undated, '2026-07-14')).toBe('undated');
+    expect(classifyCronogramaEvent(completedWithoutDate, '2026-07-14')).toBe('completed');
+    expect(classifyCronogramaEvent(multiDayInProgress, '2026-07-14')).toBe('timeline');
+
+    const events = [yesterday, today, futureCompleted, undated, completedWithoutDate, multiDayInProgress];
+    const originalStatuses = events.map((event) => event.status);
+    const buckets = partitionCronogramaEvents(events, '2026-07-14');
+
+    expect(buckets.timeline.map((event) => event.id)).toEqual(['today', 'multi-day']);
+    expect(buckets.completed.map((event) => event.id)).toEqual(['yesterday', 'future-completed', 'completed-without-date']);
+    expect(buckets.undated.map((event) => event.id)).toEqual(['undated']);
+    expect(events.map((event) => event.status)).toEqual(originalStatuses);
+  });
+
+  it('reinicia o período ao alternar de visão sem perder outros parâmetros da URL', () => {
+    const current = new URLSearchParams('view=completed&timelineYear=2026&timelineMonth=2026-07&event=evento-1');
+    const next = buildCronogramaViewSearchParams(current, 'completed', 'timeline');
+
+    expect(next.get('view')).toBeNull();
+    expect(next.get('timelineYear')).toBeNull();
+    expect(next.get('timelineMonth')).toBeNull();
+    expect(next.get('event')).toBe('evento-1');
+    expect(current.get('timelineYear')).toBe('2026');
+  });
+
+  it('preserva o período quando a visão selecionada não muda', () => {
+    const current = new URLSearchParams('view=completed&timelineYear=2026&timelineMonth=2026-07');
+    const next = buildCronogramaViewSearchParams(current, 'completed', 'completed');
+
+    expect(next.get('timelineYear')).toBe('2026');
+    expect(next.get('timelineMonth')).toBe('2026-07');
+  });
+
+  it('neutraliza filtros temporais incompatíveis ao trocar de visão', () => {
+    const filters: CronogramaFilters = {
+      query: 'comissão',
+      year: 2028,
+      month: 7,
+      category: 'governanca',
+      status: 'overdue',
+      priority: 'high',
+      period: '30days',
+      commission: 'all',
+      owner: 'all',
+      officialOnly: true,
+      missingOwner: false,
+      fromDate: '2026-07-01',
+      toDate: '2026-07-31',
+    };
+
+    expect(resetCronogramaTemporalFilters(filters)).toEqual({
+      ...filters,
+      month: 'all',
+      period: 'all',
+      fromDate: '',
+      toDate: '',
+    });
   });
 
   it('abre o mês atual ou o mês futuro mais próximo e agrupa em ordem cronológica', () => {
@@ -438,6 +516,69 @@ describe('navegador do ciclo na linha do tempo', () => {
 });
 
 describe('componentes críticos preservados', () => {
+  it('oferece três tabs desktop com foco roving e navegação por teclado', () => {
+    const onChange = vi.fn();
+    render(<CronogramaViewTabs activeView="timeline" onChange={onChange} />);
+    const tablist = screen.getByRole('tablist');
+    const tabs = within(tablist).getAllByRole('tab');
+
+    expect(tabs).toHaveLength(3);
+    expect(tabs[0]).toHaveAttribute('tabindex', '0');
+    expect(tabs[1]).toHaveAttribute('tabindex', '-1');
+
+    tabs[0].focus();
+    fireEvent.keyDown(tabs[0], { key: 'ArrowRight' });
+    expect(onChange).toHaveBeenCalledWith('completed');
+    expect(tabs[1]).toHaveFocus();
+
+    fireEvent.keyDown(tabs[1], { key: 'End' });
+    expect(onChange).toHaveBeenLastCalledWith('undated');
+    expect(tabs[2]).toHaveFocus();
+  });
+
+  it('usa o painel ativo como retorno de foco quando o card foi removido da visão', () => {
+    const removedTrigger = document.createElement('button');
+    const panel = document.createElement('section');
+    panel.id = 'cronograma-view-panel';
+    document.body.append(removedTrigger, panel);
+    removedTrigger.remove();
+
+    expect(resolveCronogramaReturnFocus(removedTrigger)).toBe(panel);
+
+    panel.remove();
+  });
+
+  it('mantém concluídos sem data visíveis no arquivo desktop', () => {
+    const completedWithoutDate = {
+      ...baseEvent,
+      id: 'completed-without-date',
+      title: 'Encerramento sem data histórica',
+      date: null,
+      status: 'completed' as const,
+    };
+    renderTimeline({
+      events: [completedWithoutDate],
+      allEvents: [completedWithoutDate],
+      variant: 'completed',
+    });
+
+    expect(screen.getByRole('heading', { name: 'Concluídos sem data registrada' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Encerramento sem data histórica/i })).toBeInTheDocument();
+  });
+
+  it('apresenta o histórico derivado sem substituir o status original do evento', () => {
+    const historicalEvent = { ...baseEvent, date: '2026-07-13', status: 'overdue' as const };
+    renderTimeline({
+      events: [historicalEvent],
+      allEvents: [historicalEvent],
+      variant: 'completed',
+    });
+
+    expect(screen.getByRole('region', { name: 'Eventos concluídos por período' })).toBeInTheDocument();
+    expect(screen.getByText('Encerrado por data')).toBeInTheDocument();
+    expect(screen.getByText('Atrasado')).toBeInTheDocument();
+  });
+
   it('seleciona um evento na Timeline', () => {
     const onOpen = vi.fn();
     renderTimeline({ events: [baseEvent], allEvents: cycleEvents, onOpen });

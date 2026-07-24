@@ -126,6 +126,32 @@ describe('linha do tempo móvel', () => {
     expect(shouldReleaseClosedMobileSelection(false, 'event-2', 'event-1')).toBe(false);
   });
 
+  it('mantém concluídos sem data visíveis no arquivo móvel', () => {
+    const completedWithoutDate: CronogramaEvent = {
+      ...baseEvent,
+      id: 'completed-without-date',
+      title: 'Encerramento registrado sem data histórica',
+      date: null,
+      year: 2027,
+      status: 'completed',
+    };
+
+    render(
+      <MobileCronogramaTimeline
+        events={[completedWithoutDate]}
+        allEvents={[completedWithoutDate]}
+        variant="completed"
+        todayKey="2026-07-14"
+        onOpen={vi.fn()}
+        onClearFilters={vi.fn()}
+      />,
+    );
+
+    expect(screen.getByRole('heading', { name: 'Concluídos sem data registrada' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Encerramento registrado sem data histórica/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /2027, etapa Consolidação/i })).toHaveAttribute('aria-pressed', 'true');
+  });
+
   it('reposiciona para o mês e o ano da correspondência quando o filtro temporal muda', async () => {
     const onPositionChange = vi.fn();
     const commonProps = {
@@ -255,17 +281,14 @@ describe('navegação e filtros móveis', () => {
 
     const navigation = screen.getByRole('navigation', { name: 'Visões do cronograma' });
     expect(within(navigation).getByRole('button', { name: 'Linha do tempo' })).toHaveAttribute('aria-current', 'page');
-    expect(within(navigation).getByRole('button', { name: 'Visão geral' })).not.toHaveAttribute('aria-current');
+    expect(within(navigation).getByRole('button', { name: 'Concluídos' })).not.toHaveAttribute('aria-current');
+    expect(within(navigation).getByRole('button', { name: 'Pendências' })).not.toHaveAttribute('aria-current');
 
-    fireEvent.click(within(navigation).getByRole('button', { name: 'Visão geral' }));
-    expect(onViewChange).toHaveBeenCalledWith('overview');
-
-    const moreViews = within(navigation).getByRole('button', { name: 'Mais visualizações' });
-    moreViews.focus();
-    fireEvent.keyDown(moreViews, { key: 'ArrowDown' });
-    const menu = await screen.findByRole('menu');
-    fireEvent.click(within(menu).getByRole('menuitem', { name: 'Calendário' }));
-    expect(onViewChange).toHaveBeenCalledWith('calendar');
+    fireEvent.click(within(navigation).getByRole('button', { name: 'Concluídos' }));
+    expect(onViewChange).toHaveBeenCalledWith('completed');
+    fireEvent.click(within(navigation).getByRole('button', { name: 'Pendências' }));
+    expect(onViewChange).toHaveBeenCalledWith('undated');
+    expect(within(navigation).getAllByRole('button')).toHaveLength(3);
 
     const filters = screen.getByRole('region', { name: 'Busca e filtros do cronograma' });
     expect(within(filters).getByRole('textbox', { name: 'Buscar no cronograma' })).toHaveAttribute(

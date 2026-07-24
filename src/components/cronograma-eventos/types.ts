@@ -1,6 +1,7 @@
 export type CronogramaView =
   | 'overview'
   | 'timeline'
+  | 'completed'
   | 'calendar'
   | 'year'
   | 'category'

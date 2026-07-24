@@ -1,5 +1,17 @@
 import { useMemo, useState } from 'react';
-import { CalendarRange, Check, Loader2, Search, SlidersHorizontal, X } from 'lucide-react';
+import {
+  CalendarClock,
+  CalendarDays,
+  CalendarRange,
+  Check,
+  CircleAlert,
+  Loader2,
+  Search,
+  SlidersHorizontal,
+  SunMedium,
+  X,
+  type LucideIcon,
+} from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -36,13 +48,12 @@ interface MobileCronogramaFiltersProps {
   onOverlayOpenChange?: (open: boolean) => void;
 }
 
-const quickPeriods: Array<{ value: CronogramaFilters['period']; label: string }> = [
-  { value: 'all', label: 'Todo o ciclo' },
-  { value: 'today', label: 'Hoje' },
-  { value: 'week', label: 'Semana' },
-  { value: '30days', label: '30 dias' },
-  { value: 'overdue', label: 'Atrasados' },
-  { value: 'undated', label: 'Sem data' },
+const quickPeriods: Array<{ value: CronogramaFilters['period']; label: string; icon: LucideIcon }> = [
+  { value: 'all', label: 'Todo o ciclo', icon: CalendarDays },
+  { value: 'today', label: 'Hoje', icon: SunMedium },
+  { value: 'week', label: 'Semana', icon: CalendarRange },
+  { value: '30days', label: '30 dias', icon: CalendarClock },
+  { value: 'overdue', label: 'Atrasados', icon: CircleAlert },
 ];
 
 const periodLabels: Record<CronogramaFilters['period'], string> = {
@@ -180,7 +191,9 @@ export function MobileCronogramaFilters({
       </div>
 
       <div className="cronograma-mobile-quick-filters" aria-label="Filtros rápidos">
-        {quickPeriods.map((option) => (
+        {quickPeriods.map((option) => {
+          const Icon = option.icon;
+          return (
           <button
             key={option.value}
             type="button"
@@ -189,9 +202,11 @@ export function MobileCronogramaFilters({
             data-active={filters.period === option.value || undefined}
             aria-pressed={filters.period === option.value}
           >
+            <Icon aria-hidden="true" />
             {option.label}
           </button>
-        ))}
+          );
+        })}
       </div>
 
       <div className="cronograma-mobile-filter-summary">
@@ -295,7 +310,7 @@ export function MobileCronogramaFilters({
                 value={draftFilters.period}
                 onValueChange={(value) => setDraftFilters((current) => ({ ...current, period: value as CronogramaFilters['period'] }))}
                 items={[
-                  ...quickPeriods,
+                  ...quickPeriods.map(({ value, label }) => ({ value, label })),
                   { value: 'upcoming', label: 'Próximos eventos' },
                 ]}
               />

@@ -225,7 +225,7 @@ export function UndatedDecisionCard({
             </Button>
             {onEdit && (
               <Button type="button" size="sm" className="h-8 rounded-full px-3 text-xs" onClick={() => onEdit(event)}>
-                Definir
+                Definir data
               </Button>
             )}
           </div>

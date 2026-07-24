@@ -58,8 +58,15 @@ import {
   consumeFenasojaCountdownLaunch,
   findFenasojaCountdownReturnFocus,
 } from '@/lib/fenasoja-countdown-navigation';
-import { filterTimelineEvents } from '@/lib/cronograma-timeline';
+import {
+  buildCronogramaViewSearchParams,
+  filterTimelineEvents,
+  getTodayKey,
+  partitionCronogramaEvents,
+  resetCronogramaTemporalFilters,
+} from '@/lib/cronograma-timeline';
 import '@/styles/cronograma-timeline-recovery.css';
+import '@/styles/cronograma-timeline-flagship.css';
 
 const EventRelationshipWorkspace = lazy(async () => {
   const module = await import('@/components/cronograma-eventos/workspace/EventRelationshipWorkspace');
@@ -82,20 +89,43 @@ const emptyFilters: CronogramaFilters = {
   toDate: '',
 };
 
-const cronogramaViews: CronogramaView[] = ['overview', 'timeline', 'calendar', 'year', 'category', 'meetings', 'undated'];
+const cronogramaViews: CronogramaView[] = ['overview', 'timeline', 'completed', 'calendar', 'year', 'category', 'meetings', 'undated'];
+const primaryCronogramaViews: CronogramaView[] = ['timeline', 'completed', 'undated'];
 
 const cronogramaViewLabels: Record<CronogramaView, string> = {
   overview: 'Visão geral',
   timeline: 'Linha do tempo',
+  completed: 'Eventos concluídos',
   calendar: 'Calendário',
   year: 'Por ano',
   category: 'Por categoria',
   meetings: 'Reuniões centrais',
-  undated: 'Pendências sem data',
+  undated: 'Pendências',
 };
 
 function isCronogramaView(value: string | null): value is CronogramaView {
   return Boolean(value && cronogramaViews.includes(value as CronogramaView));
+}
+
+function useCurrentCronogramaDay() {
+  const [todayKey, setTodayKey] = useState(() => getTodayKey());
+
+  useEffect(() => {
+    const refreshDay = () => {
+      const nextDay = getTodayKey();
+      setTodayKey((currentDay) => currentDay === nextDay ? currentDay : nextDay);
+    };
+    const interval = window.setInterval(refreshDay, 60_000);
+    window.addEventListener('focus', refreshDay);
+    document.addEventListener('visibilitychange', refreshDay);
+    return () => {
+      window.clearInterval(interval);
+      window.removeEventListener('focus', refreshDay);
+      document.removeEventListener('visibilitychange', refreshDay);
+    };
+  }, []);
+
+  return todayKey;
 }
 
 export default function CronogramaEventosPage() {
@@ -103,6 +133,7 @@ export default function CronogramaEventosPage() {
   const viewportIsMobilePresentation = useCronogramaMobilePresentation();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const todayKey = useCurrentCronogramaDay();
   const [filters, setFilters] = useState<CronogramaFilters>(emptyFilters);
   const [selectedEvent, setSelectedEvent] = useState<CronogramaEvent | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -164,15 +195,28 @@ export default function CronogramaEventosPage() {
   }, []);
 
   const setActiveView = (view: CronogramaView) => {
+    if (activeView !== view) {
+      setFilters(resetCronogramaTemporalFilters);
+    }
     setSearchParams((current) => {
-      const next = new URLSearchParams(current);
-      if (view === 'timeline') next.delete('view');
-      else next.set('view', view);
-      return next;
+      return buildCronogramaViewSearchParams(current, activeView, view);
     }, { replace: true });
   };
 
-  const events = useMemo(() => cronograma.events.map(adaptCronogramaEvent), [cronograma.events]);
+  const events = useMemo(
+    () => cronograma.events.map((event) => adaptCronogramaEvent(event, todayKey)),
+    [cronograma.events, todayKey],
+  );
+  const eventBuckets = useMemo(
+    () => partitionCronogramaEvents(events, todayKey),
+    [events, todayKey],
+  );
+  const eventsForView = useMemo(() => {
+    if (activeView === 'timeline') return eventBuckets.timeline;
+    if (activeView === 'completed') return eventBuckets.completed;
+    if (activeView === 'undated') return eventBuckets.undated;
+    return events;
+  }, [activeView, eventBuckets, events]);
   const workspaceIdentity = searchParams.get('workspace');
   const workspaceEvent = useMemo(() => (
     workspaceIdentity
@@ -234,8 +278,8 @@ export default function CronogramaEventosPage() {
   }, [cronograma.isLoading, drawerOpen, events, overlayIsMobilePresentation, selectedEvent]);
 
   const filteredEvents = useMemo(
-    () => filterTimelineEvents(events, filters).sort(compareEventDates),
-    [events, filters],
+    () => filterTimelineEvents(eventsForView, filters, todayKey).sort(compareEventDates),
+    [eventsForView, filters, todayKey],
   );
   const temporalFocusKey = useMemo(() => [
     filters.year,
@@ -435,11 +479,11 @@ export default function CronogramaEventosPage() {
         id: sourceEvent.id,
         updates: visualEventToSourceUpdates(nextEvent, sourceEvent),
       });
-      setSelectedEvent(adaptCronogramaEvent(updated));
+      setSelectedEvent(adaptCronogramaEvent(updated, todayKey));
       return;
     }
     const created = await cronograma.create.mutateAsync(visualEventToDraft(nextEvent));
-    setSelectedEvent(adaptCronogramaEvent(created));
+    setSelectedEvent(adaptCronogramaEvent(created, todayKey));
   };
 
   const handleCreateSubevent = async (input: CronogramaSubeventInput) => {
@@ -509,7 +553,7 @@ export default function CronogramaEventosPage() {
     const nextEvent = prepareNewEvent(event);
     cronograma.create.mutate(visualEventToDraft(nextEvent), {
       onSuccess: (sourceEvent) => {
-        const createdEvent = adaptCronogramaEvent(sourceEvent);
+        const createdEvent = adaptCronogramaEvent(sourceEvent, todayKey);
         overlayOpenRef.current.create = false;
         setCreateOpen(false);
         openEvent(createdEvent);
@@ -519,7 +563,7 @@ export default function CronogramaEventosPage() {
 
   const handleMobileCreate = async (event: CronogramaEvent) => {
     const created = await cronograma.create.mutateAsync(visualEventToDraft(prepareNewEvent(event)));
-    const createdEvent = adaptCronogramaEvent(created);
+    const createdEvent = adaptCronogramaEvent(created, todayKey);
     setPendingCreatedEvent(createdEvent);
   };
 
@@ -552,7 +596,7 @@ export default function CronogramaEventosPage() {
   const operationalContent = (
     <>
       <p className="sr-only" aria-live="polite">
-        {filteredEvents.length} de {events.length} eventos exibidos na visão atual.
+        {filteredEvents.length} de {eventsForView.length} eventos exibidos na visão atual.
       </p>
 
       {(cronograma.isSeedFallback || cronograma.pendingRelationshipCount > 0) && !cronograma.isLoading && (
@@ -597,7 +641,9 @@ export default function CronogramaEventosPage() {
       ) : (
         <ViewContentTransition
           view={activeView}
-          ariaLabel={contentIsMobilePresentation ? cronogramaViewLabels[activeView] : undefined}
+          ariaLabel={contentIsMobilePresentation || !primaryCronogramaViews.includes(activeView)
+            ? cronogramaViewLabels[activeView]
+            : undefined}
         >
           {activeView === 'overview' && (
             <OverviewBoard
@@ -622,6 +668,7 @@ export default function CronogramaEventosPage() {
                 temporalFocusKey={mobileFocusKey}
                 preferredTemporalYear={preferredTemporalYear}
                 onPositionChange={handleTimelinePositionChange}
+                todayKey={todayKey}
               />
             ) : (
               <CronogramaTimelineBoard
@@ -637,6 +684,42 @@ export default function CronogramaEventosPage() {
                 temporalFocusKey={temporalFocusKey}
                 preferredTemporalYear={preferredTemporalYear}
                 onPositionChange={handleTimelinePositionChange}
+                todayKey={todayKey}
+              />
+            )
+          )}
+
+          {activeView === 'completed' && (
+            contentIsMobilePresentation ? (
+              <MobileCronogramaTimeline
+                events={filteredEvents}
+                allEvents={events}
+                onOpen={(event) => openEvent(event)}
+                onClearFilters={clearFilters}
+                onReturnToFullCycle={returnToFullCycle}
+                requestedYear={requestedTimelineYear}
+                requestedMonth={requestedTimelineMonth}
+                temporalFocusKey={mobileFocusKey}
+                preferredTemporalYear={preferredTemporalYear}
+                onPositionChange={handleTimelinePositionChange}
+                todayKey={todayKey}
+                variant="completed"
+              />
+            ) : (
+              <CronogramaTimelineBoard
+                events={filteredEvents}
+                allEvents={events}
+                selectedEventId={selectedEvent?.id ?? null}
+                onOpen={(event) => openEvent(event)}
+                onClearFilters={clearFilters}
+                onReturnToFullCycle={returnToFullCycle}
+                requestedYear={requestedTimelineYear}
+                requestedMonth={requestedTimelineMonth}
+                temporalFocusKey={temporalFocusKey}
+                preferredTemporalYear={preferredTemporalYear}
+                onPositionChange={handleTimelinePositionChange}
+                todayKey={todayKey}
+                variant="completed"
               />
             )
           )}
@@ -741,7 +824,7 @@ export default function CronogramaEventosPage() {
               onChange={setFilters}
               onClear={clearFilters}
               resultCount={filteredEvents.length}
-              totalCount={events.length}
+              totalCount={eventsForView.length}
               syncing={cronograma.isRefreshing}
               onOverlayOpenChange={handleMobileFiltersOpenChange}
             />
@@ -767,7 +850,7 @@ export default function CronogramaEventosPage() {
               onChange={setFilters}
               onClear={clearFilters}
               resultCount={filteredEvents.length}
-              totalCount={events.length}
+              totalCount={eventsForView.length}
               syncing={cronograma.isRefreshing}
             />
           </div>

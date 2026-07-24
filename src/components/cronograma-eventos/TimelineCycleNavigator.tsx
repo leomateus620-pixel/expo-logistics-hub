@@ -2,6 +2,7 @@ import { useEffect, useRef, type CSSProperties } from 'react';
 import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { CronogramaCycleYear, CronogramaYearSummary } from '@/lib/cronograma-cycle';
+import { CycleYearMark } from './CycleYearMark';
 
 function eventCountLabel(count: number) {
   return `${count} ${count === 1 ? 'evento' : 'eventos'}`;
@@ -55,7 +56,7 @@ export function TimelineCycleNavigator({
       <header className="cronograma-cycle-heading">
         <div className="min-w-0">
           <p className="text-[9px] font-extrabold uppercase tracking-[0.18em] text-muted-foreground">
-            Progressão do ciclo
+            Progresso do ciclo
           </p>
           <h2 id="cronograma-cycle-title" className="mt-1 text-base font-black tracking-tight text-foreground">
             Ciclo 2026–2028
@@ -91,7 +92,9 @@ export function TimelineCycleNavigator({
                 </span>
                 <span className="cronograma-cycle-year-copy">
                   <span className="flex min-w-0 items-center gap-1.5">
-                    <strong className="font-mono text-base leading-none tracking-tight">{summary.year}</strong>
+                    <strong className="font-mono text-base leading-none tracking-tight">
+                      <CycleYearMark year={summary.year} />
+                    </strong>
                     {current && <span className="cronograma-cycle-current-label">Ano atual</span>}
                   </span>
                   <span className="cronograma-cycle-stage">{summary.stage}</span>

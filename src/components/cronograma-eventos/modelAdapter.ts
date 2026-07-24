@@ -8,7 +8,7 @@ import {
   isMainFenasojaEvent,
   type CronogramaEvent as SourceCronogramaEvent,
 } from '@/lib/cronograma-eventos';
-import { deriveOperationalStatus } from '@/lib/cronograma-timeline';
+import { deriveOperationalStatus, getTodayKey } from '@/lib/cronograma-timeline';
 import { categoryLabels } from './cronogramaData';
 import type {
   CronogramaCategory,
@@ -119,7 +119,10 @@ function fallbackSummary(event: SourceCronogramaEvent): string {
   return `${event.category} conforme planilha oficial ${event.sourceYear}.`;
 }
 
-export function adaptCronogramaEvent(event: SourceCronogramaEvent): CronogramaEvent {
+export function adaptCronogramaEvent(
+  event: SourceCronogramaEvent,
+  todayKey = getTodayKey(),
+): CronogramaEvent {
   const category = getVisualCategory(event);
   const centralMeeting = isCentralMeeting(event);
   const sourceStatus = sourceToVisualStatus[event.status] ?? 'planned';
@@ -162,13 +165,13 @@ export function adaptCronogramaEvent(event: SourceCronogramaEvent): CronogramaEv
     commissionsRel: event.commissionsRel ?? [],
     responsiblesRel: event.responsiblesRel ?? [],
   };
-  adapted.status = deriveOperationalStatus(adapted);
+  adapted.status = deriveOperationalStatus(adapted, todayKey);
   adapted.subevents = adapted.subevents?.map((subevent) => ({
     ...subevent,
     status: deriveOperationalStatus({
       date: subevent.date ?? null,
       status: subevent.status ?? 'planned',
-    }),
+    }, todayKey),
   }));
   return adapted;
 }
