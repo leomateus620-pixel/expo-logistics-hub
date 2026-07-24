@@ -11,8 +11,13 @@ export function CycleYearMark({
 
   return (
     <span className={cn('cronograma-cycle-year-mark', className)}>
-      <span aria-hidden="true">
-        2<span className="cronograma-cycle-soy-zero">0<i /></span>28
+      <span className="cronograma-cycle-year-glyphs" aria-hidden="true">
+        <span className="cronograma-cycle-year-digit">2</span>
+        <span className="cronograma-cycle-soy-glyph">
+          <span className="cronograma-cycle-soy-kernel" />
+        </span>
+        <span className="cronograma-cycle-year-digit">2</span>
+        <span className="cronograma-cycle-year-digit">8</span>
       </span>
       <span className="sr-only">2028</span>
     </span>
