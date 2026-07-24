@@ -1,0 +1,515 @@
+/* Event completion harvest. This layer is decorative and scoped to cronograma cards. */
+.cronograma-harvest-slot {
+  display: grid;
+  grid-template-rows: minmax(0, 1fr);
+  min-width: 0;
+}
+
+.cronograma-harvest-slot[data-harvest-phase='harvesting'] {
+  overflow: hidden;
+  animation: cronograma-harvest-slot-collapse 0.65s var(--ease-accelerate) calc(3.8s + var(--harvest-resume, 0ms)) both;
+}
+
+.cronograma-harvest-animation {
+  --harvest-card-surface: oklch(var(--surface-1));
+  position: absolute;
+  z-index: 8;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+  border-radius: inherit;
+  background: linear-gradient(180deg, oklch(var(--brand-cream) / 0.22), var(--harvest-card-surface) 92%);
+  contain: paint;
+  isolation: isolate;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.cronograma-harvest-animation[data-phase='preparing'] {
+  opacity: 0.18;
+}
+
+.cronograma-harvest-animation[data-phase='harvesting'] {
+  animation: cronograma-harvest-lifecycle 4.45s linear calc(0ms + var(--harvest-resume, 0ms)) both;
+  will-change: opacity;
+}
+
+.cronograma-harvest-wash {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  display: block;
+  background:
+    radial-gradient(circle at 26% 18%, oklch(var(--brand-gold-400) / 0.28), transparent 35%),
+    linear-gradient(112deg, oklch(var(--brand-gold-500) / 0.12), transparent 48%);
+  opacity: 0;
+  transform: scaleX(0.72);
+  transform-origin: left center;
+}
+
+.cronograma-harvest-animation[data-phase='preparing'] .cronograma-harvest-wash {
+  opacity: 0.42;
+  transform: scaleX(1);
+}
+
+.cronograma-harvest-animation[data-phase='harvesting'] .cronograma-harvest-wash {
+  animation: cronograma-harvest-wash-in 0.72s var(--ease-decelerate) calc(0ms + var(--harvest-resume, 0ms)) both;
+  will-change: opacity, transform;
+}
+
+.cronograma-harvest-field {
+  position: absolute;
+  z-index: 1;
+  right: -1.5%;
+  bottom: -2%;
+  left: -1.5%;
+  display: block;
+  width: 103%;
+  height: 80%;
+  overflow: visible;
+  opacity: 0;
+  transform: translate3d(0, 18%, 0) scaleY(0.76);
+  transform-origin: center bottom;
+}
+
+.cronograma-harvest-animation[data-phase='preparing'] .cronograma-harvest-field {
+  opacity: 0.18;
+}
+
+.cronograma-harvest-animation[data-phase='harvesting'] .cronograma-harvest-field {
+  animation: cronograma-harvest-field-mature 0.82s var(--ease-decelerate) calc(0.22s + var(--harvest-resume, 0ms)) both;
+  will-change: opacity, transform;
+}
+
+.cronograma-harvest-cleared-strip {
+  position: absolute;
+  z-index: 2;
+  inset: -1px -1px -3%;
+  display: block;
+  height: auto;
+  overflow: hidden;
+  background:
+    linear-gradient(180deg, oklch(var(--brand-cream) / 0.97), oklch(var(--surface-1)) 88%),
+    var(--harvest-card-surface);
+  clip-path: inset(0 100% 0 0);
+}
+
+.cronograma-harvest-animation[data-phase='harvesting'] .cronograma-harvest-cleared-strip {
+  animation: cronograma-harvest-clear-field 2.25s var(--ease-standard) calc(1.05s + var(--harvest-resume, 0ms)) both;
+  will-change: clip-path;
+}
+
+.cronograma-harvest-furrow {
+  position: absolute;
+  right: -8%;
+  left: -8%;
+  display: block;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, oklch(var(--brand-gold-700) / 0.25) 8%, oklch(var(--brand-orange-700) / 0.16) 78%, transparent);
+  transform: rotate(-1deg);
+}
+
+.cronograma-harvest-furrow.is-one { bottom: 14%; }
+.cronograma-harvest-furrow.is-two { bottom: 31%; opacity: 0.72; }
+.cronograma-harvest-furrow.is-three { bottom: 49%; opacity: 0.48; }
+
+.cronograma-harvest-stubble {
+  position: absolute;
+  bottom: 8%;
+  display: block;
+  width: 1px;
+  height: 18%;
+  border-radius: 999px;
+  background: oklch(var(--brand-gold-700) / 0.48);
+  transform: rotate(9deg);
+  transform-origin: center bottom;
+}
+
+.cronograma-harvest-stubble::after {
+  position: absolute;
+  left: 0;
+  top: 28%;
+  width: 0.38rem;
+  height: 1px;
+  background: oklch(var(--brand-gold-700) / 0.34);
+  content: '';
+  transform: rotate(-34deg);
+  transform-origin: left center;
+}
+
+.cronograma-harvest-stubble.is-one { left: 11%; }
+.cronograma-harvest-stubble.is-two { left: 34%; height: 23%; }
+.cronograma-harvest-stubble.is-three { left: 61%; height: 15%; }
+.cronograma-harvest-stubble.is-four { left: 84%; height: 20%; }
+
+.cronograma-harvest-combine-runner {
+  position: absolute;
+  z-index: 4;
+  inset: 0;
+  display: block;
+  transform: translate3d(-30%, 0, 0);
+}
+
+.cronograma-harvest-animation[data-phase='harvesting'] .cronograma-harvest-combine-runner {
+  animation: cronograma-harvest-combine-pass 2.25s var(--ease-standard) calc(1.05s + var(--harvest-resume, 0ms)) both;
+  will-change: transform;
+}
+
+.cronograma-harvest-combine {
+  position: absolute;
+  left: 0;
+  bottom: 3%;
+  display: block;
+  width: clamp(6.3rem, 25%, 9.4rem);
+  max-height: 92%;
+  overflow: visible;
+}
+
+.cronograma-harvest-wheel,
+.cronograma-harvest-reel {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.cronograma-harvest-animation[data-phase='harvesting'] .cronograma-harvest-wheel {
+  animation: cronograma-harvest-wheel-roll 2.25s linear calc(1.05s + var(--harvest-resume, 0ms)) both;
+}
+
+.cronograma-harvest-animation[data-phase='harvesting'] .cronograma-harvest-reel {
+  animation: cronograma-harvest-reel-roll 2.25s linear calc(1.05s + var(--harvest-resume, 0ms)) both;
+}
+
+.cronograma-harvest-dust {
+  position: absolute;
+  z-index: -1;
+  left: 0.4%;
+  bottom: 18%;
+  display: block;
+  width: clamp(2.8rem, 13%, 5.4rem);
+  height: 48%;
+}
+
+.cronograma-harvest-dust > i {
+  position: absolute;
+  left: 35%;
+  bottom: 8%;
+  display: block;
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 50%;
+  background: oklch(var(--brand-cream) / 0.86);
+  opacity: 0;
+}
+
+.cronograma-harvest-animation[data-phase='harvesting'] .cronograma-harvest-dust > i {
+  animation: cronograma-harvest-dust-puff 0.74s var(--ease-decelerate) 2;
+}
+
+.cronograma-harvest-animation[data-phase='harvesting'] .cronograma-harvest-dust > i:nth-child(1) { width: 0.5rem; height: 0.5rem; animation-delay: calc(1.12s + var(--harvest-resume, 0ms)); }
+.cronograma-harvest-animation[data-phase='harvesting'] .cronograma-harvest-dust > i:nth-child(2) { left: 42%; bottom: 24%; width: 0.34rem; height: 0.34rem; animation-delay: calc(1.25s + var(--harvest-resume, 0ms)); }
+.cronograma-harvest-animation[data-phase='harvesting'] .cronograma-harvest-dust > i:nth-child(3) { left: 52%; bottom: 12%; width: 0.66rem; height: 0.66rem; animation-delay: calc(1.37s + var(--harvest-resume, 0ms)); }
+.cronograma-harvest-animation[data-phase='harvesting'] .cronograma-harvest-dust > i:nth-child(4) { left: 47%; bottom: 42%; width: 0.29rem; height: 0.29rem; animation-delay: calc(1.49s + var(--harvest-resume, 0ms)); }
+.cronograma-harvest-animation[data-phase='harvesting'] .cronograma-harvest-dust > i:nth-child(5) { left: 58%; bottom: 30%; width: 0.44rem; height: 0.44rem; animation-delay: calc(1.62s + var(--harvest-resume, 0ms)); }
+.cronograma-harvest-animation[data-phase='harvesting'] .cronograma-harvest-dust > i:nth-child(6) { left: 36%; bottom: 52%; width: 0.25rem; height: 0.25rem; animation-delay: calc(1.74s + var(--harvest-resume, 0ms)); }
+.cronograma-harvest-animation[data-phase='harvesting'] .cronograma-harvest-dust > i:nth-child(7) { left: 64%; bottom: 16%; width: 0.38rem; height: 0.38rem; animation-delay: calc(1.86s + var(--harvest-resume, 0ms)); }
+
+.cronograma-harvest-complete-seal {
+  position: absolute;
+  z-index: 6;
+  left: 50%;
+  top: 50%;
+  display: flex;
+  min-width: min(15rem, calc(100% - 2rem));
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  border: 1px solid oklch(var(--success) / 0.28);
+  border-radius: 0.72rem;
+  padding: 0.52rem 0.72rem;
+  background: oklch(var(--surface-1) / 0.96);
+  color: oklch(var(--brand-navy-900));
+  opacity: 0;
+  transform: translate3d(-50%, -42%, 0) scale(0.94);
+}
+
+.cronograma-harvest-animation[data-phase='harvesting'] .cronograma-harvest-complete-seal {
+  animation: cronograma-harvest-seal 1.18s var(--ease-decelerate) calc(3.2s + var(--harvest-resume, 0ms)) both;
+  will-change: opacity, transform;
+}
+
+.cronograma-harvest-complete-icon {
+  display: grid;
+  width: 1.75rem;
+  height: 1.75rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 50%;
+  background: oklch(var(--success));
+  color: oklch(var(--success-foreground));
+}
+
+.cronograma-harvest-complete-icon svg {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+.cronograma-harvest-complete-seal > span:last-child,
+.cronograma-harvest-complete-seal strong,
+.cronograma-harvest-complete-seal small {
+  display: block;
+}
+
+.cronograma-harvest-complete-seal strong {
+  font-size: 0.74rem;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+}
+
+.cronograma-harvest-complete-seal small {
+  margin-top: 0.08rem;
+  color: oklch(var(--muted-foreground));
+  font-size: 0.58rem;
+  font-weight: 700;
+}
+
+.cronograma-operational-event[data-harvest-phase='harvesting'],
+.cronograma-mobile-event-card[data-harvest-phase='harvesting'] {
+  animation: cronograma-harvest-card-exit 0.65s var(--ease-accelerate) calc(3.8s + var(--harvest-resume, 0ms)) both;
+  will-change: opacity, transform;
+}
+
+.cronograma-operational-event[data-harvest-phase='harvesting'] > :not(.cronograma-harvest-animation),
+.cronograma-mobile-event-card[data-harvest-phase='harvesting'] > :not(.cronograma-harvest-animation) {
+  animation: cronograma-harvest-content-recede 0.62s var(--ease-standard) calc(0.16s + var(--harvest-resume, 0ms)) both;
+}
+
+@keyframes cronograma-harvest-lifecycle {
+  0% { opacity: 0.05; }
+  3%, 89% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes cronograma-harvest-wash-in {
+  from { opacity: 0; transform: scaleX(0.72); }
+  to { opacity: 1; transform: scaleX(1); }
+}
+
+@keyframes cronograma-harvest-field-mature {
+  0% { opacity: 0; transform: translate3d(0, 18%, 0) scaleY(0.76); }
+  58% { opacity: 0.92; }
+  100% { opacity: 1; transform: translate3d(0, 0, 0) scaleY(1); }
+}
+
+@keyframes cronograma-harvest-clear-field {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+
+@keyframes cronograma-harvest-combine-pass {
+  0% { transform: translate3d(-30%, 0, 0); }
+  8% { transform: translate3d(-17%, -1%, 0); }
+  92% { transform: translate3d(101%, 0, 0); }
+  100% { transform: translate3d(112%, 1%, 0); }
+}
+
+@keyframes cronograma-harvest-wheel-roll {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(1080deg); }
+}
+
+@keyframes cronograma-harvest-reel-roll {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(720deg); }
+}
+
+@keyframes cronograma-harvest-dust-puff {
+  0% { opacity: 0; transform: translate3d(0, 0, 0) scale(0.35); }
+  24% { opacity: 0.62; }
+  100% { opacity: 0; transform: translate3d(-1.9rem, -0.8rem, 0) scale(1.65); }
+}
+
+@keyframes cronograma-harvest-seal {
+  0% { opacity: 0; transform: translate3d(-50%, -42%, 0) scale(0.94); }
+  22%, 72% { opacity: 1; transform: translate3d(-50%, -50%, 0) scale(1); }
+  100% { opacity: 0; transform: translate3d(-50%, -56%, 0) scale(0.98); }
+}
+
+@keyframes cronograma-harvest-content-recede {
+  from { opacity: 1; transform: translate3d(0, 0, 0); }
+  to { opacity: 0.14; transform: translate3d(0, -0.12rem, 0); }
+}
+
+@keyframes cronograma-harvest-card-exit {
+  0% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+  100% { opacity: 0; transform: translate3d(1.25rem, -0.16rem, 0) scale(0.97); }
+}
+
+@keyframes cronograma-harvest-slot-collapse {
+  from { grid-template-rows: minmax(0, 1fr); }
+  to { grid-template-rows: minmax(0, 0fr); }
+}
+
+@keyframes cronograma-harvest-reduced-lifecycle {
+  0% { opacity: 0; }
+  10%, 72% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes cronograma-harvest-reduced-field {
+  from { opacity: 0; transform: translate3d(0, 8%, 0) scaleY(0.9); }
+  to { opacity: 0.78; transform: translate3d(0, 0, 0) scaleY(1); }
+}
+
+@keyframes cronograma-harvest-reduced-seal {
+  0%, 34% { opacity: 0; transform: translate3d(-50%, -44%, 0) scale(0.98); }
+  48%, 82% { opacity: 1; transform: translate3d(-50%, -50%, 0) scale(1); }
+  100% { opacity: 0; transform: translate3d(-50%, -53%, 0) scale(0.99); }
+}
+
+.cronograma-harvest-animation[data-phase='harvesting'][data-reduced-motion='true'] {
+  animation: cronograma-harvest-reduced-lifecycle 0.58s linear calc(0ms + var(--harvest-resume, 0ms)) both;
+}
+
+.cronograma-harvest-animation[data-phase='harvesting'][data-reduced-motion='true'] .cronograma-harvest-wash {
+  animation: cronograma-harvest-wash-in 0.12s var(--ease-decelerate) calc(0ms + var(--harvest-resume, 0ms)) both;
+}
+
+.cronograma-harvest-animation[data-phase='harvesting'][data-reduced-motion='true'] .cronograma-harvest-field {
+  animation: cronograma-harvest-reduced-field 0.14s var(--ease-decelerate) calc(0ms + var(--harvest-resume, 0ms)) both;
+}
+
+.cronograma-harvest-animation[data-phase='harvesting'][data-reduced-motion='true'] .cronograma-harvest-cleared-strip {
+  animation: none;
+  clip-path: inset(0);
+}
+
+.cronograma-harvest-animation[data-phase='harvesting'][data-reduced-motion='true'] .cronograma-harvest-combine-runner {
+  animation: none;
+  transform: translate3d(42%, 0, 0);
+}
+
+.cronograma-harvest-animation[data-phase='harvesting'][data-reduced-motion='true'] .cronograma-harvest-wheel,
+.cronograma-harvest-animation[data-phase='harvesting'][data-reduced-motion='true'] .cronograma-harvest-reel {
+  animation: none;
+}
+
+.cronograma-harvest-animation[data-phase='harvesting'][data-reduced-motion='true'] .cronograma-harvest-dust {
+  display: none;
+}
+
+.cronograma-harvest-animation[data-phase='harvesting'][data-reduced-motion='true'] .cronograma-harvest-complete-seal {
+  animation: cronograma-harvest-reduced-seal 0.58s linear calc(0ms + var(--harvest-resume, 0ms)) both;
+}
+
+.cronograma-operational-event[data-harvest-phase='harvesting'][data-reduced-motion='true'],
+.cronograma-mobile-event-card[data-harvest-phase='harvesting'][data-reduced-motion='true'] {
+  animation: cronograma-harvest-card-exit 0.2s var(--ease-accelerate) calc(0.38s + var(--harvest-resume, 0ms)) both;
+}
+
+.cronograma-harvest-slot[data-harvest-phase='harvesting'][data-reduced-motion='true'] {
+  animation: cronograma-harvest-slot-collapse 0.2s var(--ease-accelerate) calc(0.38s + var(--harvest-resume, 0ms)) both;
+}
+
+.cronograma-operational-event[data-harvest-phase='harvesting'][data-reduced-motion='true'] > :not(.cronograma-harvest-animation),
+.cronograma-mobile-event-card[data-harvest-phase='harvesting'][data-reduced-motion='true'] > :not(.cronograma-harvest-animation) {
+  animation: cronograma-harvest-content-recede 0.12s linear calc(0ms + var(--harvest-resume, 0ms)) both;
+}
+
+.cronograma-mobile-event-card .cronograma-harvest-field,
+.cronograma-harvest-animation.is-compact .cronograma-harvest-field {
+  height: 72%;
+}
+
+.cronograma-mobile-event-card .cronograma-harvest-cleared-strip,
+.cronograma-harvest-animation.is-compact .cronograma-harvest-cleared-strip {
+  height: auto;
+}
+
+.cronograma-mobile-event-card .cronograma-harvest-combine,
+.cronograma-harvest-animation.is-compact .cronograma-harvest-combine {
+  bottom: 5%;
+  width: clamp(5.2rem, 32%, 7.2rem);
+}
+
+.cronograma-mobile-event-card .cronograma-harvest-dust,
+.cronograma-harvest-animation.is-compact .cronograma-harvest-dust {
+  bottom: 22%;
+  width: 20%;
+}
+
+.cronograma-mobile-event-card .cronograma-harvest-complete-seal,
+.cronograma-harvest-animation.is-compact .cronograma-harvest-complete-seal {
+  min-width: min(13rem, calc(100% - 1.25rem));
+  padding: 0.45rem 0.58rem;
+}
+
+@media (max-width: 420px) {
+  .cronograma-mobile-event-card .cronograma-harvest-combine {
+    width: clamp(4.8rem, 35%, 6.4rem);
+  }
+
+  .cronograma-harvest-complete-seal strong {
+    font-size: 0.68rem;
+  }
+
+  .cronograma-harvest-complete-seal small {
+    font-size: 0.54rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cronograma-harvest-animation[data-phase='harvesting'] {
+    animation: cronograma-harvest-reduced-lifecycle 0.58s linear calc(0ms + var(--harvest-resume, 0ms)) both !important;
+  }
+
+  .cronograma-harvest-animation[data-phase='harvesting'] .cronograma-harvest-wash {
+    animation: cronograma-harvest-wash-in 0.12s var(--ease-decelerate) calc(0ms + var(--harvest-resume, 0ms)) both !important;
+  }
+
+  .cronograma-harvest-animation[data-phase='harvesting'] .cronograma-harvest-field {
+    animation: cronograma-harvest-reduced-field 0.14s var(--ease-decelerate) calc(0ms + var(--harvest-resume, 0ms)) both !important;
+  }
+
+  .cronograma-harvest-animation[data-phase='harvesting'] .cronograma-harvest-cleared-strip {
+    animation: none !important;
+    clip-path: inset(0);
+  }
+
+  .cronograma-harvest-animation[data-phase='harvesting'] .cronograma-harvest-combine-runner {
+    animation: none !important;
+    transform: translate3d(42%, 0, 0);
+  }
+
+  .cronograma-harvest-animation[data-phase='harvesting'] .cronograma-harvest-wheel,
+  .cronograma-harvest-animation[data-phase='harvesting'] .cronograma-harvest-reel {
+    animation: none !important;
+  }
+
+  .cronograma-harvest-animation[data-phase='harvesting'] .cronograma-harvest-dust {
+    display: none;
+  }
+
+  .cronograma-harvest-animation[data-phase='harvesting'] .cronograma-harvest-complete-seal {
+    animation: cronograma-harvest-reduced-seal 0.58s linear calc(0ms + var(--harvest-resume, 0ms)) both !important;
+  }
+
+  .cronograma-operational-event[data-harvest-phase='harvesting'],
+  .cronograma-mobile-event-card[data-harvest-phase='harvesting'] {
+    animation: cronograma-harvest-card-exit 0.2s var(--ease-accelerate) calc(0.38s + var(--harvest-resume, 0ms)) both !important;
+  }
+
+  .cronograma-harvest-slot[data-harvest-phase='harvesting'] {
+    animation: cronograma-harvest-slot-collapse 0.2s var(--ease-accelerate) calc(0.38s + var(--harvest-resume, 0ms)) both !important;
+  }
+
+  .cronograma-operational-event[data-harvest-phase='harvesting'] > :not(.cronograma-harvest-animation),
+  .cronograma-mobile-event-card[data-harvest-phase='harvesting'] > :not(.cronograma-harvest-animation) {
+    animation: cronograma-harvest-content-recede 0.12s linear calc(0ms + var(--harvest-resume, 0ms)) both !important;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .cronograma-harvest-complete-seal {
+    border-color: currentColor;
+  }
+}

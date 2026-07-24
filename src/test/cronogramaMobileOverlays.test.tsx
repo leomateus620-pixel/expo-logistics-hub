@@ -71,12 +71,14 @@ function installHistoryBackBehavior() {
 function EventScreenHarness({
   initialEvent = baseEvent,
   onSave = vi.fn().mockResolvedValue(undefined),
+  onComplete,
   onEditWorkspace,
   startInEdit = false,
   sourceUnavailable = false,
 }: {
   initialEvent?: CronogramaEvent;
   onSave?: (event: CronogramaEvent) => Promise<void> | void;
+  onComplete?: (event: CronogramaEvent) => Promise<void> | void;
   onEditWorkspace?: (event: CronogramaEvent) => void;
   startInEdit?: boolean;
   sourceUnavailable?: boolean;
@@ -102,6 +104,7 @@ function EventScreenHarness({
         open={open}
         onOpenChange={setOpen}
         onSave={handleSave}
+        onComplete={onComplete}
         onEditWorkspace={onEditWorkspace}
         startInEdit={startInEdit}
         sourceUnavailable={sourceUnavailable}
@@ -286,6 +289,41 @@ describe('overlays móveis do cronograma', () => {
     expect(await screen.findAllByRole('alert')).not.toHaveLength(0);
     expect(screen.getAllByText('Falha simulada ao salvar').length).toBeGreaterThan(0);
     expect(screen.getByRole('textbox', { name: 'Título' })).toHaveValue('Título preservado após falha');
+    expect(screen.getByTestId('cronograma-mobile-event-dialog')).toBeInTheDocument();
+  });
+
+  it('conclui uma única vez e fecha pelo histórico móvel somente após sucesso', async () => {
+    let resolveCompletion: (() => void) | undefined;
+    const completion = new Promise<void>((resolve) => {
+      resolveCompletion = resolve;
+    });
+    const onComplete = vi.fn(() => completion);
+    render(<EventScreenHarness onComplete={onComplete} />);
+    const dialog = await screen.findByTestId('cronograma-mobile-event-dialog');
+    const action = within(dialog).getByRole('button', { name: 'Marcar como concluído' });
+
+    fireEvent.click(action);
+    fireEvent.click(action);
+    expect(onComplete).toHaveBeenCalledTimes(1);
+    expect(action).toBeDisabled();
+    expect(screen.getByTestId('cronograma-mobile-event-dialog')).toBeInTheDocument();
+
+    await act(async () => {
+      resolveCompletion?.();
+      await completion;
+    });
+    await expectMobileOverlayRemoved();
+    expect(window.history.state.__cronogramaMobileOverlay).toBeUndefined();
+  });
+
+  it('mantém o detalhe móvel aberto quando a conclusão falha', async () => {
+    const onComplete = vi.fn().mockRejectedValue(new Error('Falha controlada na conclusão móvel'));
+    render(<EventScreenHarness onComplete={onComplete} />);
+    const dialog = await screen.findByTestId('cronograma-mobile-event-dialog');
+
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Marcar como concluído' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Falha controlada na conclusão móvel');
     expect(screen.getByTestId('cronograma-mobile-event-dialog')).toBeInTheDocument();
   });
 

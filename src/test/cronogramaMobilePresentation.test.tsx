@@ -196,6 +196,40 @@ describe('linha do tempo móvel', () => {
       replace: true,
     });
   });
+
+  it('escala a colheita compacta dentro do card e respeita movimento reduzido', () => {
+    const onOpen = vi.fn();
+    const { container } = render(
+      <MobileCronogramaTimeline
+        events={[baseEvent]}
+        allEvents={cycleEvents}
+        onOpen={onOpen}
+        onClearFilters={vi.fn()}
+        requestedYear={2026}
+        requestedMonth="2026-07"
+        todayKey="2026-07-14"
+        harvestJobs={{
+          [baseEvent.sourceKey!]: {
+            event: baseEvent,
+            phase: 'harvesting',
+            reducedMotion: true,
+          },
+        }}
+      />,
+    );
+
+    const card = screen.getByRole('button', {
+      name: /Reunião de estruturação.*Colheita de conclusão em andamento/i,
+    });
+    expect(card).toHaveAttribute('aria-busy', 'true');
+    expect(card).toHaveAttribute('data-reduced-motion', 'true');
+    expect(container.querySelector('.cronograma-harvest-animation.is-compact')).toBeInTheDocument();
+    expect(container.querySelector('.cronograma-harvest-cleared-strip')).toBeInTheDocument();
+    expect(container.querySelector('.cronograma-harvest-complete-seal')).toBeInTheDocument();
+
+    fireEvent.click(card);
+    expect(onOpen).not.toHaveBeenCalled();
+  });
 });
 
 describe('cadastro móvel e histórico', () => {

@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, type CSSProperties } from 'react';
 import {
   BadgeCheck,
   CalendarClock,
@@ -15,6 +15,12 @@ import {
   UserRound,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import {
+  getHarvestEventKey,
+  getHarvestResumeDelay,
+  type HarvestCompletionJob,
+  type HarvestCompletionJobs,
+} from '@/hooks/useEventHarvestCompletion';
 import { useTimelineCycleNavigation, type TimelinePositionChange } from '@/hooks/useTimelineCycleNavigation';
 import {
   buildCronogramaYearSummaries,
@@ -40,6 +46,7 @@ import {
 } from './CronogramaBadges';
 import { statusLabels } from './cronogramaData';
 import { formatLongDate } from './dateUtils';
+import { EventHarvestAnimation } from './EventHarvestAnimation';
 import { TimelineCycleNavigator } from './TimelineCycleNavigator';
 import type { CronogramaEvent } from './types';
 
@@ -49,6 +56,7 @@ const monthYearFormatter = new Intl.DateTimeFormat('pt-BR', {
   timeZone: 'UTC',
 });
 const NOOP = () => undefined;
+const EMPTY_HARVEST_JOBS: HarvestCompletionJobs = {};
 type TimelineVariant = 'timeline' | 'completed';
 
 const monthShortFormatter = new Intl.DateTimeFormat('pt-BR', {
@@ -77,6 +85,7 @@ export function CronogramaTimelineBoard({
   onPositionChange,
   todayKey: todayKeyOverride,
   variant = 'timeline',
+  harvestJobs = EMPTY_HARVEST_JOBS,
 }: {
   events: CronogramaEvent[];
   allEvents?: CronogramaEvent[];
@@ -92,6 +101,7 @@ export function CronogramaTimelineBoard({
   onPositionChange?: (change: TimelinePositionChange) => void;
   todayKey?: string;
   variant?: TimelineVariant;
+  harvestJobs?: HarvestCompletionJobs;
 }) {
   const completeEvents = allEvents ?? events;
   const returnToFullCycle = onReturnToFullCycle ?? onClearFilters;
@@ -314,6 +324,7 @@ export function CronogramaTimelineBoard({
                               todayKey={todayKey}
                               isNextOfficial={variant === 'timeline' && snapshot.nextOfficialAction?.id === event.id}
                               variant={variant}
+                              harvestJob={harvestJobs[getHarvestEventKey(event)]}
                               onOpen={openTimelineEvent}
                             />
                           ))}
@@ -438,6 +449,7 @@ function TimelineEventRow({
   todayKey,
   isNextOfficial,
   variant,
+  harvestJob,
   onOpen,
 }: {
   event: CronogramaEvent;
@@ -445,28 +457,48 @@ function TimelineEventRow({
   todayKey: string;
   isNextOfficial: boolean;
   variant: TimelineVariant;
+  harvestJob?: HarvestCompletionJob;
   onOpen: (event: CronogramaEvent) => void;
 }) {
   const progress = getSubeventProgress(event);
   const date = event.date!;
   const dateObject = new Date(`${date}T12:00:00Z`);
   const isToday = date === todayKey;
+  const completionPending = Boolean(harvestJob);
+  const harvesting = harvestJob?.phase === 'harvesting';
+  const eventKey = getHarvestEventKey(event);
+  const harvestStyle = harvesting
+    ? { '--harvest-resume': `${getHarvestResumeDelay(harvestJob)}ms` } as CSSProperties
+    : undefined;
 
   return (
-    <button
-      type="button"
-      onClick={() => onOpen(event)}
-      className="cronograma-operational-event focus-ring"
-      data-status={event.status}
-      data-today={isToday || undefined}
-      data-next={isNextOfficial || undefined}
-      data-selected={selected || undefined}
-      data-variant={variant}
-      data-derived-complete={variant === 'completed' && event.status !== 'completed' || undefined}
-      data-event-id={event.id}
-      aria-pressed={selected}
-      aria-label={`${event.title}. ${formatLongDate(event.date)}. Status ${statusLabels[event.status]}.${variant === 'completed' ? ' Classificado em eventos concluídos.' : ''}`}
+    <div
+      className="cronograma-harvest-slot"
+      style={harvestStyle}
+      data-harvest-phase={harvestJob?.phase}
+      data-reduced-motion={harvestJob?.reducedMotion || undefined}
     >
+      <button
+        type="button"
+        onClick={() => {
+          if (!harvestJob) onOpen(event);
+        }}
+        className="cronograma-operational-event focus-ring"
+        data-status={event.status}
+        data-today={isToday || undefined}
+        data-next={isNextOfficial || undefined}
+        data-selected={selected || undefined}
+        data-variant={variant}
+        data-derived-complete={variant === 'completed' && event.status !== 'completed' || undefined}
+        data-event-id={event.id}
+        data-harvest-event-key={eventKey}
+        data-harvest-phase={harvestJob?.phase}
+        data-reduced-motion={harvestJob?.reducedMotion || undefined}
+        aria-busy={completionPending || undefined}
+        aria-disabled={completionPending ? 'true' : undefined}
+        aria-pressed={selected}
+        aria-label={`${event.title}. ${formatLongDate(event.date)}. Status ${statusLabels[event.status]}.${variant === 'completed' ? ' Classificado em eventos concluídos.' : ''}${harvesting ? ' Colheita de conclusão em andamento.' : completionPending ? ' Conclusão sendo confirmada.' : ''}`}
+      >
       <span className="cronograma-event-date-block">
         <strong className="font-mono text-xl leading-none text-foreground">{String(dateObject.getUTCDate()).padStart(2, '0')}</strong>
         <span className="mt-1 text-[9px] font-extrabold uppercase tracking-[0.13em] text-muted-foreground">
@@ -506,7 +538,9 @@ function TimelineEventRow({
         <CronogramaStatusIndicator status={event.status} compact />
         <CronogramaPriorityIndicator priority={event.priority} compact />
       </span>
-    </button>
+        {harvestJob && <EventHarvestAnimation phase={harvestJob.phase} reducedMotion={harvestJob.reducedMotion} />}
+      </button>
+    </div>
   );
 }
 
