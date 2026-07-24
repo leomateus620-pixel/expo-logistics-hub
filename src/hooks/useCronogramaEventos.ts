@@ -999,6 +999,7 @@ export function useCronogramaEventos() {
     [queuedRelationshipsForOrg, sessionEvents],
   );
   const isSeedFallback = dbUnavailable || !orgId || !query.data;
+  const canWriteEvents = isWritableRole(myRole) && !dbUnavailable && isOnline && Boolean(orgId && query.data);
   const relationshipSyncUnavailable = dbUnavailable || relationshipsUnavailable || !isOnline || !query.data;
 
   const saveEventRpc = useMutation({
@@ -1030,6 +1031,7 @@ export function useCronogramaEventos() {
     error: query.error,
     refetch: query.refetch,
     canManage: isWritableRole(myRole),
+    canWriteEvents,
     canDeleteSubevents: myRole === 'admin' || myRole === 'gestor',
     relationshipsUnavailable,
     relationshipSyncUnavailable,

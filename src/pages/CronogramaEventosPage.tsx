@@ -1,6 +1,7 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { AlertTriangle, CalendarDays, Loader2, RefreshCw } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
+import { toast } from 'sonner';
 import { CalendarMonthView } from '@/components/cronograma-eventos/CalendarMonthView';
 import {
   CategoryBoard,
@@ -43,6 +44,11 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useCronogramaEventHistory, useCronogramaEventos } from '@/hooks/useCronogramaEventos';
 import {
+  getHarvestEventKey,
+  mergeHarvestCompletionSnapshots,
+  useEventHarvestCompletion,
+} from '@/hooks/useEventHarvestCompletion';
+import {
   shouldReleaseClosedMobileSelection,
   useCronogramaMobilePresentation,
 } from '@/hooks/useCronogramaMobilePresentation';
@@ -67,6 +73,7 @@ import {
 } from '@/lib/cronograma-timeline';
 import '@/styles/cronograma-timeline-recovery.css';
 import '@/styles/cronograma-timeline-flagship.css';
+import '@/styles/cronograma-harvest-completion.css';
 
 const EventRelationshipWorkspace = lazy(async () => {
   const module = await import('@/components/cronograma-eventos/workspace/EventRelationshipWorkspace');
@@ -142,6 +149,8 @@ export default function CronogramaEventosPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [pendingCreatedEvent, setPendingCreatedEvent] = useState<CronogramaEvent | null>(null);
   const [presentationLock, setPresentationLock] = useState<boolean | null>(null);
+  const [completionAnnouncement, setCompletionAnnouncement] = useState('');
+  const harvestCompletion = useEventHarvestCompletion();
   const overlayIsMobilePresentation = presentationLock ?? viewportIsMobilePresentation;
   // Preserve the trigger, scroll context and form tree during rotation. Overlay CSS
   // adapts the locked presentation to the physical viewport until the interaction closes.
@@ -150,6 +159,8 @@ export default function CronogramaEventosPage() {
   const timelinePositionRef = useRef({ x: 0, y: 0 });
   const workspacePositionRef = useRef({ x: 0, y: 0 });
   const workspaceTransitionRef = useRef(false);
+  const activeHarvestCountRef = useRef(0);
+  const completionAnimationEventKeyRef = useRef<string | null>(null);
   const selectedPresenceRef = useRef({ id: '', seenInData: false });
   const overlayOpenRef = useRef({ drawer: false, create: false, filters: false });
   const activeView = isCronogramaView(searchParams.get('view'))
@@ -203,9 +214,13 @@ export default function CronogramaEventosPage() {
     }, { replace: true });
   };
 
-  const events = useMemo(
+  const persistedEvents = useMemo(
     () => cronograma.events.map((event) => adaptCronogramaEvent(event, todayKey)),
     [cronograma.events, todayKey],
+  );
+  const events = useMemo(
+    () => mergeHarvestCompletionSnapshots(persistedEvents, harvestCompletion.jobs),
+    [harvestCompletion.jobs, persistedEvents],
   );
   const eventBuckets = useMemo(
     () => partitionCronogramaEvents(events, todayKey),
@@ -220,9 +235,9 @@ export default function CronogramaEventosPage() {
   const workspaceIdentity = searchParams.get('workspace');
   const workspaceEvent = useMemo(() => (
     workspaceIdentity
-      ? events.find((event) => event.id === workspaceIdentity || event.sourceKey === workspaceIdentity) ?? null
+      ? persistedEvents.find((event) => event.id === workspaceIdentity || event.sourceKey === workspaceIdentity) ?? null
       : null
-  ), [events, workspaceIdentity]);
+  ), [persistedEvents, workspaceIdentity]);
   const sourceById = useMemo(() => {
     const map = new Map<string, SourceCronogramaEvent>();
     cronograma.events.forEach((event) => {
@@ -253,7 +268,7 @@ export default function CronogramaEventosPage() {
     if (selectedPresenceRef.current.id !== selectedEvent.id) {
       selectedPresenceRef.current = { id: selectedEvent.id, seenInData: false };
     }
-    const freshEvent = events.find((event) => event.id === selectedEvent.id || event.sourceKey === selectedEvent.sourceKey);
+    const freshEvent = persistedEvents.find((event) => event.id === selectedEvent.id || event.sourceKey === selectedEvent.sourceKey);
     if (freshEvent) {
       selectedPresenceRef.current.seenInData = true;
       setSelectedSourceUnavailable(false);
@@ -272,10 +287,10 @@ export default function CronogramaEventosPage() {
     setSelectedEvent(null);
     const { x, y } = timelinePositionRef.current;
     window.setTimeout(() => window.scrollTo({ left: x, top: y, behavior: 'auto' }), 0);
-    if (!overlayOpenRef.current.create && !overlayOpenRef.current.filters) {
+    if (!overlayOpenRef.current.create && !overlayOpenRef.current.filters && activeHarvestCountRef.current === 0) {
       setPresentationLock(null);
     }
-  }, [cronograma.isLoading, drawerOpen, events, overlayIsMobilePresentation, selectedEvent]);
+  }, [cronograma.isLoading, drawerOpen, overlayIsMobilePresentation, persistedEvents, selectedEvent]);
 
   const filteredEvents = useMemo(
     () => filterTimelineEvents(eventsForView, filters, todayKey).sort(compareEventDates),
@@ -341,15 +356,23 @@ export default function CronogramaEventosPage() {
     }, { replace });
   }, [setSearchParams]);
 
-  const openEvent = useCallback((event: CronogramaEvent, edit = false) => {
+  const openEvent = useCallback((
+    event: CronogramaEvent,
+    edit = false,
+    completionAnimationEligible = false,
+  ) => {
     overlayOpenRef.current.drawer = true;
     setPresentationLock((current) => current ?? viewportIsMobilePresentation);
     timelinePositionRef.current = { x: window.scrollX, y: window.scrollY };
-    if (document.activeElement instanceof HTMLElement) {
-      drawerReturnFocusRef.current = document.activeElement;
-    }
+    const activeTrigger = document.activeElement instanceof HTMLElement
+      ? document.activeElement
+      : null;
+    if (activeTrigger) drawerReturnFocusRef.current = activeTrigger;
     setSelectedSourceUnavailable(false);
     setSelectedEvent(event);
+    completionAnimationEventKeyRef.current = activeView === 'timeline' && completionAnimationEligible
+      ? getHarvestEventKey(event)
+      : null;
     setDrawerStartsEditing(edit);
     setDrawerOpen(true);
     const identity = event.sourceKey ?? event.id;
@@ -360,7 +383,7 @@ export default function CronogramaEventosPage() {
       next.delete('subevent');
       return next;
     }, { replace: true });
-  }, [setSearchParams, viewportIsMobilePresentation]);
+  }, [activeView, setSearchParams, viewportIsMobilePresentation]);
 
   // Deep-link sync: ?event=<id|sourceKey>&mode=view|edit&subevent=<id>
   useEffect(() => {
@@ -382,6 +405,7 @@ export default function CronogramaEventosPage() {
     setDrawerStartsEditing(false);
     setSelectedEvent(null);
     setSelectedSourceUnavailable(false);
+    completionAnimationEventKeyRef.current = null;
     setPresentationLock(null);
     setSearchParams((current) => {
       const next = new URLSearchParams(current);
@@ -405,6 +429,7 @@ export default function CronogramaEventosPage() {
     overlayOpenRef.current.drawer = open;
     setDrawerOpen(open);
     if (!open) {
+      completionAnimationEventKeyRef.current = null;
       setDrawerStartsEditing(false);
       setSearchParams((current) => {
         const next = new URLSearchParams(current);
@@ -430,7 +455,7 @@ export default function CronogramaEventosPage() {
             ) ? null : current
           ));
         }
-        if (!overlayOpenRef.current.create && !overlayOpenRef.current.drawer && !overlayOpenRef.current.filters) {
+        if (!overlayOpenRef.current.create && !overlayOpenRef.current.drawer && !overlayOpenRef.current.filters && activeHarvestCountRef.current === 0) {
           setPresentationLock(null);
         }
       }, overlayIsMobilePresentation ? 230 : 0);
@@ -452,7 +477,7 @@ export default function CronogramaEventosPage() {
     }
     setCreateOpen(false);
     window.setTimeout(() => {
-      if (!overlayOpenRef.current.create && !overlayOpenRef.current.drawer && !overlayOpenRef.current.filters) {
+      if (!overlayOpenRef.current.create && !overlayOpenRef.current.drawer && !overlayOpenRef.current.filters && activeHarvestCountRef.current === 0) {
         setPresentationLock(null);
       }
     }, overlayIsMobilePresentation ? 230 : 0);
@@ -465,7 +490,7 @@ export default function CronogramaEventosPage() {
       return;
     }
     window.setTimeout(() => {
-      if (!overlayOpenRef.current.create && !overlayOpenRef.current.drawer && !overlayOpenRef.current.filters) {
+      if (!overlayOpenRef.current.create && !overlayOpenRef.current.drawer && !overlayOpenRef.current.filters && activeHarvestCountRef.current === 0) {
         setPresentationLock(null);
       }
     }, 230);
@@ -484,6 +509,83 @@ export default function CronogramaEventosPage() {
     }
     const created = await cronograma.create.mutateAsync(visualEventToDraft(nextEvent));
     setSelectedEvent(adaptCronogramaEvent(created, todayKey));
+  };
+
+  const handleCompleteEvent = async (event: CronogramaEvent) => {
+    if (!cronograma.canWriteEvents) {
+      throw new Error(
+        'A conclusão exige conexão com a base sincronizada. O evento foi mantido na Linha do tempo sem alterações.',
+      );
+    }
+    const completionSnapshot = event.status === 'completed'
+      && selectedEvent
+      && getHarvestEventKey(selectedEvent) === getHarvestEventKey(event)
+      ? selectedEvent
+      : event;
+    const shouldAnimate = completionAnimationEventKeyRef.current
+      === getHarvestEventKey(completionSnapshot);
+
+    if (!shouldAnimate) {
+      setCompletionAnnouncement(`Salvando a conclusão de ${completionSnapshot.title}.`);
+      try {
+        await handleSave({ ...event, status: 'completed' });
+        completionAnimationEventKeyRef.current = null;
+        setCompletionAnnouncement(`${completionSnapshot.title} foi movido para Eventos concluídos.`);
+        toast.success('Evento movido para Eventos concluídos.', {
+          description: completionSnapshot.title,
+          action: {
+            label: 'Ver concluídos',
+            onClick: () => setActiveView('completed'),
+          },
+        });
+        return;
+      } catch (error) {
+        setCompletionAnnouncement(`A conclusão de ${completionSnapshot.title} não foi aplicada.`);
+        throw error;
+      }
+    }
+
+    if (!harvestCompletion.prepare(completionSnapshot)) {
+      throw new Error('A conclusão deste evento já está em andamento. Aguarde a colheita terminar.');
+    }
+
+    activeHarvestCountRef.current += 1;
+    completionAnimationEventKeyRef.current = null;
+    setCompletionAnnouncement(`Salvando a conclusão de ${completionSnapshot.title}.`);
+    try {
+      await handleSave({ ...event, status: 'completed' });
+      drawerReturnFocusRef.current = document.getElementById('cronograma-view-panel');
+      setCompletionAnnouncement(`Conclusão de ${completionSnapshot.title} confirmada. Colheita em andamento.`);
+      const duration = harvestCompletion.play(completionSnapshot, (completedEvent) => {
+        activeHarvestCountRef.current = Math.max(0, activeHarvestCountRef.current - 1);
+        setCompletionAnnouncement(`${completedEvent.title} foi movido para Eventos concluídos.`);
+        if (
+          activeHarvestCountRef.current === 0
+          && !overlayOpenRef.current.create
+          && !overlayOpenRef.current.drawer
+          && !overlayOpenRef.current.filters
+        ) {
+          setPresentationLock(null);
+        }
+        toast.success('Evento movido para Eventos concluídos.', {
+          description: completedEvent.title,
+          action: {
+            label: 'Ver concluídos',
+            onClick: () => setActiveView('completed'),
+          },
+        });
+      });
+      if (duration === 0) {
+        activeHarvestCountRef.current = Math.max(0, activeHarvestCountRef.current - 1);
+        harvestCompletion.cancel(completionSnapshot);
+      }
+    } catch (error) {
+      activeHarvestCountRef.current = Math.max(0, activeHarvestCountRef.current - 1);
+      harvestCompletion.cancel(completionSnapshot);
+      completionAnimationEventKeyRef.current = getHarvestEventKey(completionSnapshot);
+      setCompletionAnnouncement(`A conclusão de ${completionSnapshot.title} não foi aplicada. O evento permanece na Linha do tempo.`);
+      throw error;
+    }
   };
 
   const handleCreateSubevent = async (input: CronogramaSubeventInput) => {
@@ -592,7 +694,6 @@ export default function CronogramaEventosPage() {
   }, [createOpen, handleTimelinePositionChange, openEvent, pendingCreatedEvent]);
 
   const preferredCalendarYear = filters.year === 'all' ? undefined : filters.year;
-
   const operationalContent = (
     <>
       <p className="sr-only" aria-live="polite">
@@ -659,7 +760,7 @@ export default function CronogramaEventosPage() {
               <MobileCronogramaTimeline
                 events={filteredEvents}
                 allEvents={events}
-                onOpen={(event) => openEvent(event)}
+                onOpen={(event) => openEvent(event, false, true)}
                 onClearFilters={clearFilters}
                 onReturnToFullCycle={returnToFullCycle}
                 onOpenUndated={() => setActiveView('undated')}
@@ -669,13 +770,14 @@ export default function CronogramaEventosPage() {
                 preferredTemporalYear={preferredTemporalYear}
                 onPositionChange={handleTimelinePositionChange}
                 todayKey={todayKey}
+                harvestJobs={harvestCompletion.jobs}
               />
             ) : (
               <CronogramaTimelineBoard
                 events={filteredEvents}
                 allEvents={events}
                 selectedEventId={selectedEvent?.id ?? null}
-                onOpen={(event) => openEvent(event)}
+                onOpen={(event) => openEvent(event, false, true)}
                 onClearFilters={clearFilters}
                 onReturnToFullCycle={returnToFullCycle}
                 onOpenUndated={() => setActiveView('undated')}
@@ -685,6 +787,7 @@ export default function CronogramaEventosPage() {
                 preferredTemporalYear={preferredTemporalYear}
                 onPositionChange={handleTimelinePositionChange}
                 todayKey={todayKey}
+                harvestJobs={harvestCompletion.jobs}
               />
             )
           )}
@@ -767,6 +870,9 @@ export default function CronogramaEventosPage() {
       className={`cronograma-page min-h-screen ${workspaceIdentity ? '' : 'pb-10'}`}
       data-presentation={contentIsMobilePresentation ? 'mobile' : 'desktop'}
     >
+      <span className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+        {completionAnnouncement}
+      </span>
       {workspaceIdentity ? (
         workspaceEvent ? (
           <Suspense fallback={<WorkspaceLoadingState />}>
@@ -869,6 +975,7 @@ export default function CronogramaEventosPage() {
             open={drawerOpen}
             onOpenChange={handleDrawerOpenChange}
             onSave={handleSave}
+            onComplete={handleCompleteEvent}
             onEditWorkspace={openWorkspace}
             startInEdit={drawerStartsEditing}
             canManage={cronograma.canManage}
@@ -886,6 +993,7 @@ export default function CronogramaEventosPage() {
           open={drawerOpen}
           onOpenChange={handleDrawerOpenChange}
           onSave={handleSave}
+          onComplete={handleCompleteEvent}
           onEditWorkspace={openWorkspace}
           startInEdit={drawerStartsEditing}
           canManage={cronograma.canManage}

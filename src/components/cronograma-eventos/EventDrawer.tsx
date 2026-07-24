@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type RefObject } from 'react';
+import { useEffect, useMemo, useRef, useState, type RefObject } from 'react';
 import {
   AlertTriangle,
   CalendarClock,
@@ -55,6 +55,7 @@ interface EventDrawerProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSave: (event: CronogramaEvent) => Promise<void> | void;
+  onComplete?: (event: CronogramaEvent) => Promise<void> | void;
   onEditWorkspace?: (event: CronogramaEvent) => void;
   startInEdit?: boolean;
   canManage?: boolean;
@@ -70,6 +71,7 @@ export function EventDrawer({
   open,
   onOpenChange,
   onSave,
+  onComplete,
   onEditWorkspace,
   startInEdit = false,
   canManage = false,
@@ -84,6 +86,7 @@ export function EventDrawer({
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [confirmDiscard, setConfirmDiscard] = useState(false);
+  const completionPendingRef = useRef(false);
 
   useEffect(() => {
     if (!open) return;
@@ -122,12 +125,20 @@ export function EventDrawer({
   };
 
   const handleSave = async (nextEvent: CronogramaEvent) => {
+    const completesEvent = event.status !== 'completed' && nextEvent.status === 'completed' && Boolean(onComplete);
+    if (completesEvent && completionPendingRef.current) return;
+    if (completesEvent) completionPendingRef.current = true;
     setSaving(true);
     setSaveError(null);
     try {
-      await onSave(nextEvent);
+      if (completesEvent && onComplete) await onComplete(nextEvent);
+      else await onSave(nextEvent);
       setDirty(false);
       setEditMode(false);
+      if (completesEvent) {
+        setSaving(false);
+        closeDrawer();
+      }
     } catch (error) {
       setSaveError(
         error instanceof Error
@@ -135,6 +146,7 @@ export function EventDrawer({
           : 'Não foi possível salvar as alterações. Tente novamente.',
       );
     } finally {
+      if (completesEvent) completionPendingRef.current = false;
       setSaving(false);
     }
   };
@@ -148,7 +160,26 @@ export function EventDrawer({
   };
 
   const handleMarkCompleted = async () => {
-    await handleSave({ ...event, status: 'completed' });
+    if (saving || completionPendingRef.current) return;
+    completionPendingRef.current = true;
+    setSaving(true);
+    setSaveError(null);
+    try {
+      if (onComplete) await onComplete(event);
+      else await onSave({ ...event, status: 'completed' });
+      setDirty(false);
+      setSaving(false);
+      closeDrawer();
+    } catch (error) {
+      setSaveError(
+        error instanceof Error
+          ? error.message
+          : 'Não foi possível concluir o evento. Ele permanece na Linha do tempo.',
+      );
+    } finally {
+      completionPendingRef.current = false;
+      setSaving(false);
+    }
   };
 
   return (
@@ -380,11 +411,12 @@ export function EventDrawer({
                       Marcar concluído
                     </Button>
                   )}
-                  <Button type="button" variant="outline" onClick={requestClose} className="rounded-lg">Fechar</Button>
+                  <Button type="button" variant="outline" onClick={requestClose} disabled={saving} className="rounded-lg">Fechar</Button>
                   {canManage && (
                     <Button
                       type="button"
                       onClick={() => onEditWorkspace ? onEditWorkspace(event) : setEditMode(true)}
+                      disabled={saving}
                       className="rounded-lg"
                     >
                       <Edit3 className="h-4 w-4" /> Editar evento

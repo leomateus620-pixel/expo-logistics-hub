@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from 'react';
 import {
   BadgeCheck,
   CalendarClock,
@@ -12,6 +12,12 @@ import {
   Sparkles,
   UserRound,
 } from 'lucide-react';
+import {
+  getHarvestEventKey,
+  getHarvestResumeDelay,
+  type HarvestCompletionJob,
+  type HarvestCompletionJobs,
+} from '@/hooks/useEventHarvestCompletion';
 import type { TimelinePositionChange, TimelinePositionReason } from '@/hooks/useTimelineCycleNavigation';
 import {
   buildCronogramaYearSummaries,
@@ -38,6 +44,7 @@ import {
 import { statusLabels } from '../cronogramaData';
 import { compareEventDates, formatLongDate } from '../dateUtils';
 import { CycleYearMark } from '../CycleYearMark';
+import { EventHarvestAnimation } from '../EventHarvestAnimation';
 import type { CronogramaEvent } from '../types';
 
 const monthYearFormatter = new Intl.DateTimeFormat('pt-BR', {
@@ -54,6 +61,7 @@ const monthShortFormatter = new Intl.DateTimeFormat('pt-BR', {
 const cycleMonths = CRONOGRAMA_CYCLE.flatMap(({ year }) => (
   Array.from({ length: 12 }, (_, index) => `${year}-${String(index + 1).padStart(2, '0')}`)
 ));
+const EMPTY_HARVEST_JOBS: HarvestCompletionJobs = {};
 
 interface MobileCronogramaTimelineProps {
   events: CronogramaEvent[];
@@ -69,6 +77,7 @@ interface MobileCronogramaTimelineProps {
   onPositionChange?: (change: TimelinePositionChange) => void;
   todayKey?: string;
   variant?: 'timeline' | 'completed';
+  harvestJobs?: HarvestCompletionJobs;
 }
 
 type MobileTimelinePosition = {
@@ -148,6 +157,7 @@ export function MobileCronogramaTimeline({
   onPositionChange,
   todayKey: todayKeyOverride,
   variant = 'timeline',
+  harvestJobs = EMPTY_HARVEST_JOBS,
 }: MobileCronogramaTimelineProps) {
   const completeEvents = allEvents ?? events;
   const todayKey = todayKeyOverride ?? getTodayKey();
@@ -385,6 +395,7 @@ export function MobileCronogramaTimeline({
               todayKey={todayKey}
               isNextOfficial={variant === 'timeline' && snapshot.nextOfficialAction?.id === event.id}
               variant={variant}
+              harvestJob={harvestJobs[getHarvestEventKey(event)]}
               onOpen={onOpen}
             />
           ))}
@@ -457,31 +468,53 @@ function MobileTimelineEventCard({
   todayKey,
   isNextOfficial,
   variant,
+  harvestJob,
   onOpen,
 }: {
   event: CronogramaEvent;
   todayKey: string;
   isNextOfficial: boolean;
   variant: 'timeline' | 'completed';
+  harvestJob?: HarvestCompletionJob;
   onOpen: (event: CronogramaEvent) => void;
 }) {
   const progress = getSubeventProgress(event);
   const date = event.date!;
   const dateObject = new Date(`${date}T12:00:00Z`);
   const isToday = date === todayKey;
+  const completionPending = Boolean(harvestJob);
+  const harvesting = harvestJob?.phase === 'harvesting';
+  const eventKey = getHarvestEventKey(event);
+  const harvestStyle = harvesting
+    ? { '--harvest-resume': `${getHarvestResumeDelay(harvestJob)}ms` } as CSSProperties
+    : undefined;
 
   return (
-    <button
-      type="button"
-      onClick={() => onOpen(event)}
-      className="cronograma-mobile-event-card"
-      data-status={event.status}
-      data-today={isToday || undefined}
-      data-next={isNextOfficial || undefined}
-      data-variant={variant}
-      data-derived-complete={variant === 'completed' && event.status !== 'completed' || undefined}
-      aria-label={`${event.title}. ${formatLongDate(event.date)}. Status ${statusLabels[event.status]}.${variant === 'completed' ? ' Classificado em eventos concluídos.' : ''}`}
+    <div
+      className="cronograma-harvest-slot"
+      style={harvestStyle}
+      data-harvest-phase={harvestJob?.phase}
+      data-reduced-motion={harvestJob?.reducedMotion || undefined}
     >
+      <button
+        type="button"
+        onClick={() => {
+          if (!harvestJob) onOpen(event);
+        }}
+        className="cronograma-mobile-event-card"
+        data-status={event.status}
+        data-today={isToday || undefined}
+        data-next={isNextOfficial || undefined}
+        data-variant={variant}
+        data-derived-complete={variant === 'completed' && event.status !== 'completed' || undefined}
+        data-event-id={event.id}
+        data-harvest-event-key={eventKey}
+        data-harvest-phase={harvestJob?.phase}
+        data-reduced-motion={harvestJob?.reducedMotion || undefined}
+        aria-busy={completionPending || undefined}
+        aria-disabled={completionPending ? 'true' : undefined}
+        aria-label={`${event.title}. ${formatLongDate(event.date)}. Status ${statusLabels[event.status]}.${variant === 'completed' ? ' Classificado em eventos concluídos.' : ''}${harvesting ? ' Colheita de conclusão em andamento.' : completionPending ? ' Conclusão sendo confirmada.' : ''}`}
+      >
       <span className="cronograma-mobile-event-date">
         <strong>{String(dateObject.getUTCDate()).padStart(2, '0')}</strong>
         <span>{monthShortFormatter.format(dateObject).replace('.', '')}</span>
@@ -537,6 +570,8 @@ function MobileTimelineEventCard({
       </span>
 
       <ChevronRight className="cronograma-mobile-event-chevron" aria-hidden="true" />
-    </button>
+        {harvestJob && <EventHarvestAnimation compact phase={harvestJob.phase} reducedMotion={harvestJob.reducedMotion} />}
+      </button>
+    </div>
   );
 }

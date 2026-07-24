@@ -586,6 +586,60 @@ describe('componentes críticos preservados', () => {
     expect(onOpen).toHaveBeenCalledWith(baseEvent);
   });
 
+  it('contém a colheita no card ativo e bloqueia reabertura durante a animação', () => {
+    const onOpen = vi.fn();
+    const { container } = renderTimeline({
+      events: [baseEvent],
+      allEvents: cycleEvents,
+      onOpen,
+      harvestJobs: {
+        [baseEvent.sourceKey!]: {
+          event: baseEvent,
+          phase: 'harvesting',
+          reducedMotion: false,
+        },
+      },
+    });
+
+    const card = screen.getByRole('button', {
+      name: /Reunião da Comissão Central.*Colheita de conclusão em andamento/i,
+    });
+    expect(card).toHaveAttribute('aria-busy', 'true');
+    expect(card).toHaveAttribute('aria-disabled', 'true');
+    expect(card.closest('.cronograma-harvest-slot')).toHaveAttribute('data-harvest-phase', 'harvesting');
+    expect(container.querySelector('.cronograma-harvest-animation')).toBeInTheDocument();
+    expect(container.querySelector('.cronograma-harvest-field')).toBeInTheDocument();
+    expect(container.querySelector('.cronograma-harvest-combine')).toBeInTheDocument();
+    expect(container.querySelectorAll('.cronograma-harvest-dust > i')).toHaveLength(7);
+
+    fireEvent.click(card);
+    expect(onOpen).not.toHaveBeenCalled();
+  });
+
+  it('mantém o card congelado em preparação enquanto o backend confirma a conclusão', () => {
+    const onOpen = vi.fn();
+    const { container } = renderTimeline({
+      events: [baseEvent],
+      allEvents: cycleEvents,
+      onOpen,
+      harvestJobs: {
+        [baseEvent.sourceKey!]: {
+          event: baseEvent,
+          phase: 'preparing',
+          reducedMotion: false,
+        },
+      },
+    });
+
+    const card = screen.getByRole('button', {
+      name: /Reunião da Comissão Central.*Conclusão sendo confirmada/i,
+    });
+    expect(card).toHaveAttribute('aria-busy', 'true');
+    expect(container.querySelector('.cronograma-harvest-animation')).toHaveAttribute('data-phase', 'preparing');
+    fireEvent.click(card);
+    expect(onOpen).not.toHaveBeenCalled();
+  });
+
   it('separa leitura e edição e protege alterações não salvas', async () => {
     const onOpenChange = vi.fn();
     const onSave = vi.fn();

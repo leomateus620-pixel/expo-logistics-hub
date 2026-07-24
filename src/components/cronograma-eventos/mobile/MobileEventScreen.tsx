@@ -40,6 +40,7 @@ export function MobileEventScreen({
   open,
   onOpenChange,
   onSave,
+  onComplete,
   onEditWorkspace,
   startInEdit = false,
   canManage = false,
@@ -54,6 +55,7 @@ export function MobileEventScreen({
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onSave: (event: CronogramaEvent) => Promise<void> | void;
+  onComplete?: (event: CronogramaEvent) => Promise<void> | void;
   onEditWorkspace?: (event: CronogramaEvent) => void;
   startInEdit?: boolean;
   canManage?: boolean;
@@ -70,6 +72,7 @@ export function MobileEventScreen({
   const [saveError, setSaveError] = useState<string | null>(null);
   const [discardTarget, setDiscardTarget] = useState<DiscardTarget>(null);
   const workspaceTargetRef = useRef<CronogramaEvent | null>(null);
+  const completionPendingRef = useRef(false);
   const eventIdentity = event?.sourceKey ?? event?.id;
 
   useEffect(() => {
@@ -112,12 +115,20 @@ export function MobileEventScreen({
       setSaveError('Este evento não está mais disponível na base sincronizada. Revise os dados antes de descartar o formulário.');
       return;
     }
+    const completesEvent = event.status !== 'completed' && nextEvent.status === 'completed' && Boolean(onComplete);
+    if (completesEvent && completionPendingRef.current) return;
+    if (completesEvent) completionPendingRef.current = true;
     setSaving(true);
     setSaveError(null);
     try {
-      await onSave(nextEvent);
+      if (completesEvent && onComplete) await onComplete(nextEvent);
+      else await onSave(nextEvent);
       setDirty(false);
       if (leaveEditMode) setEditMode(false);
+      if (completesEvent) {
+        setSaving(false);
+        overlayHistory.discardAndClose();
+      }
     } catch (error) {
       setSaveError(
         error instanceof Error
@@ -125,6 +136,35 @@ export function MobileEventScreen({
           : 'Não foi possível salvar as alterações. Seus dados continuam no formulário.',
       );
     } finally {
+      if (completesEvent) completionPendingRef.current = false;
+      setSaving(false);
+    }
+  };
+
+  const performCompletion = async () => {
+    if (saving || completionPendingRef.current) return;
+    if (sourceUnavailable) {
+      setSaveError('Este evento não está mais disponível na base sincronizada. A conclusão não foi aplicada.');
+      return;
+    }
+
+    completionPendingRef.current = true;
+    setSaving(true);
+    setSaveError(null);
+    try {
+      if (onComplete) await onComplete(event);
+      else await onSave({ ...event, status: 'completed' });
+      setDirty(false);
+      setSaving(false);
+      overlayHistory.discardAndClose();
+    } catch (error) {
+      setSaveError(
+        error instanceof Error
+          ? error.message
+          : 'Não foi possível concluir o evento. Ele permanece na Linha do tempo.',
+      );
+    } finally {
+      completionPendingRef.current = false;
       setSaving(false);
     }
   };
@@ -222,7 +262,7 @@ export function MobileEventScreen({
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => performSave({ ...event, status: 'completed' }, false)}
+                    onClick={performCompletion}
                     disabled={saving}
                     className="is-wide rounded-xl"
                   >
