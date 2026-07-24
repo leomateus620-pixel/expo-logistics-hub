@@ -327,7 +327,7 @@ export function UndatedBoard({
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-950/65">Central de decisões pendentes</p>
-            <h2 className="text-2xl font-black tracking-tight">Pendências sem data</h2>
+            <h2 className="text-2xl font-black tracking-tight">Pendências</h2>
             <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
               Itens sem data oficial continuam preservados, mas aparecem como decisões de planejamento em vez de alertas genéricos.
             </p>
@@ -336,9 +336,10 @@ export function UndatedBoard({
         </div>
       </section>
 
-      <div className="grid gap-4 xl:grid-cols-2">
-        {byCategory.map(({ category, events: categoryEvents }) => (
-          <section key={category} className="rounded-[1.75rem] border border-white/60 bg-white/58 p-4 shadow-[0_18px_58px_-44px_rgb(21_62_39/0.42),inset_0_1px_0_rgb(255_255_255/0.62)]">
+      {byCategory.length > 0 ? (
+        <div className="grid gap-4 xl:grid-cols-2">
+          {byCategory.map(({ category, events: categoryEvents }) => (
+          <section key={category} className="cronograma-pending-group">
             <div className="mb-4 flex items-center justify-between gap-3">
               <div>
                 <CronogramaCategoryMarker category={category} className="mb-2" />
@@ -352,8 +353,17 @@ export function UndatedBoard({
               ))}
             </div>
           </section>
-        ))}
-      </div>
+          ))}
+        </div>
+      ) : (
+        <section className="cronograma-pending-empty" role="status">
+          <Route aria-hidden="true" />
+          <div>
+            <h3>Nenhuma pendência nesta visão</h3>
+            <p>Os itens sem data aparecerão aqui sem alterar o cadastro original.</p>
+          </div>
+        </section>
+      )}
     </div>
   );
 }

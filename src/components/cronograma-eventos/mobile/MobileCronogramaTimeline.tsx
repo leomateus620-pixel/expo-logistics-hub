@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
+  BadgeCheck,
   CalendarClock,
   CalendarDays,
   ChevronLeft,
@@ -36,6 +37,7 @@ import {
 } from '../CronogramaBadges';
 import { statusLabels } from '../cronogramaData';
 import { compareEventDates, formatLongDate } from '../dateUtils';
+import { CycleYearMark } from '../CycleYearMark';
 import type { CronogramaEvent } from '../types';
 
 const monthYearFormatter = new Intl.DateTimeFormat('pt-BR', {
@@ -66,6 +68,7 @@ interface MobileCronogramaTimelineProps {
   preferredTemporalYear?: CronogramaCycleYear | null;
   onPositionChange?: (change: TimelinePositionChange) => void;
   todayKey?: string;
+  variant?: 'timeline' | 'completed';
 }
 
 type MobileTimelinePosition = {
@@ -144,6 +147,7 @@ export function MobileCronogramaTimeline({
   preferredTemporalYear = null,
   onPositionChange,
   todayKey: todayKeyOverride,
+  variant = 'timeline',
 }: MobileCronogramaTimelineProps) {
   const completeEvents = allEvents ?? events;
   const todayKey = todayKeyOverride ?? getTodayKey();
@@ -162,13 +166,15 @@ export function MobileCronogramaTimeline({
   const firstCompleteMonthByYear = useMemo(() => Object.fromEntries(
     CRONOGRAMA_CYCLE.map(({ year }) => [year, getFirstRelevantMonthForYear(completeEvents, year, todayKey)]),
   ) as Record<CronogramaCycleYear, string | null>, [completeEvents, todayKey]);
-  const initialMonth = useMemo(
-    () => getInitialTimelineMonth(events.length ? events : completeEvents, todayKey),
-    [completeEvents, events, todayKey],
-  );
   const firstMatchingYear = useMemo(
     () => events.find((event) => isCronogramaCycleYear(event.year))?.year ?? null,
     [events],
+  );
+  const initialMonth = useMemo(
+    () => events.some((event) => event.date) || !firstMatchingYear
+      ? getInitialTimelineMonth(events.length ? events : completeEvents, todayKey)
+      : `${firstMatchingYear}-01`,
+    [completeEvents, events, firstMatchingYear, todayKey],
   );
   const [position, setPosition] = useState<MobileTimelinePosition>(() => resolveInitialPosition({
     requestedYear,
@@ -274,11 +280,15 @@ export function MobileCronogramaTimeline({
   };
 
   return (
-    <section className="cronograma-mobile-timeline" aria-label="Linha do tempo operacional móvel">
+    <section
+      className="cronograma-mobile-timeline"
+      data-variant={variant}
+      aria-label={variant === 'completed' ? 'Eventos concluídos por período' : 'Linha do tempo operacional móvel'}
+    >
       <div className="cronograma-mobile-cycle" aria-labelledby="cronograma-mobile-cycle-title">
         <div className="cronograma-mobile-cycle-heading">
           <div>
-            <p>Progressão do ciclo</p>
+            <p>Progresso do ciclo</p>
             <h2 id="cronograma-mobile-cycle-title">2026–2028</h2>
           </div>
           <span>{selectedSummary?.stage ?? 'Ciclo oficial'}</span>
@@ -300,7 +310,7 @@ export function MobileCronogramaTimeline({
                 aria-pressed={selected}
                 aria-label={`${summary.year}, etapa ${summary.stage}, ${summary.filtered === summary.total ? summary.total : `${summary.filtered} de ${summary.total}`} eventos${current ? ', ano atual' : ''}`}
               >
-                <strong>{summary.year}</strong>
+                <strong><CycleYearMark year={summary.year} /></strong>
                 <span>{summary.stage}</span>
                 <small>{summary.filtered === summary.total ? summary.total : `${summary.filtered}/${summary.total}`} eventos</small>
               </button>
@@ -320,7 +330,7 @@ export function MobileCronogramaTimeline({
           <ChevronLeft aria-hidden="true" />
         </button>
         <div className="cronograma-mobile-month-context">
-          <p>Período em foco</p>
+          <p>{variant === 'completed' ? 'Arquivo em foco' : 'Período em foco'}</p>
           <h2>{mobileMonthLabel(position.month)}</h2>
           <span>{selectedSummary?.stage ?? position.year}</span>
         </div>
@@ -338,9 +348,10 @@ export function MobileCronogramaTimeline({
           onClick={goToToday}
           className="cronograma-mobile-today-button"
           data-current={isCurrentMonth || undefined}
+          aria-label={variant === 'completed' ? 'Ir para o mês atual no histórico' : undefined}
         >
           <CalendarDays aria-hidden="true" />
-          {isCurrentMonth ? 'Mês atual' : 'Ir para hoje'}
+          {variant === 'completed' ? 'Mês atual' : isCurrentMonth ? 'Mês atual' : 'Ir para hoje'}
         </button>
       </nav>
 
@@ -352,8 +363,14 @@ export function MobileCronogramaTimeline({
         <div>
           <p>{mobileMonthLabel(position.month)}</p>
           <span>
-            {monthSummary.total} {monthSummary.total === 1 ? 'evento' : 'eventos'} ·{' '}
-            {monthSummary.completed} {monthSummary.completed === 1 ? 'concluído' : 'concluídos'}
+            {variant === 'completed' ? (
+              <>{monthSummary.total} {monthSummary.total === 1 ? 'registro histórico' : 'registros históricos'}</>
+            ) : (
+              <>
+                {monthSummary.total} {monthSummary.total === 1 ? 'evento' : 'eventos'} ·{' '}
+                {monthSummary.completed} {monthSummary.completed === 1 ? 'concluído' : 'concluídos'}
+              </>
+            )}
           </span>
         </div>
         {monthSummary.overdue > 0 && <strong>{monthSummary.overdue} atrasados</strong>}
@@ -366,7 +383,8 @@ export function MobileCronogramaTimeline({
               key={event.id}
               event={event}
               todayKey={todayKey}
-              isNextOfficial={snapshot.nextOfficialAction?.id === event.id}
+              isNextOfficial={variant === 'timeline' && snapshot.nextOfficialAction?.id === event.id}
+              variant={variant}
               onOpen={onOpen}
             />
           ))}
@@ -391,6 +409,35 @@ export function MobileCronogramaTimeline({
         </div>
       )}
 
+      {variant === 'completed' && selectedYearUndated.length > 0 && (
+        <section
+          className="cronograma-mobile-undated-archive"
+          aria-labelledby={`cronograma-mobile-undated-archive-${position.year}`}
+        >
+          <header>
+            <span><BadgeCheck aria-hidden="true" /></span>
+            <div>
+              <p>Arquivo sem data</p>
+              <h3 id={`cronograma-mobile-undated-archive-${position.year}`}>
+                Concluídos sem data registrada
+              </h3>
+            </div>
+            <strong>{selectedYearUndated.length}</strong>
+          </header>
+          <div>
+            {selectedYearUndated.map((event) => (
+              <button key={event.id} type="button" onClick={() => onOpen(event)} className="focus-ring">
+                <span>
+                  <strong>{event.title}</strong>
+                  <small>Concluído manualmente · referência {position.year}</small>
+                </span>
+                <ChevronRight aria-hidden="true" />
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+
       {monthEvents.length > 0 && selectedYearUndated.length > 0 && onOpenUndated && (
         <button type="button" onClick={onOpenUndated} className="cronograma-mobile-undated-link">
           <CalendarClock aria-hidden="true" />
@@ -409,11 +456,13 @@ function MobileTimelineEventCard({
   event,
   todayKey,
   isNextOfficial,
+  variant,
   onOpen,
 }: {
   event: CronogramaEvent;
   todayKey: string;
   isNextOfficial: boolean;
+  variant: 'timeline' | 'completed';
   onOpen: (event: CronogramaEvent) => void;
 }) {
   const progress = getSubeventProgress(event);
@@ -429,7 +478,9 @@ function MobileTimelineEventCard({
       data-status={event.status}
       data-today={isToday || undefined}
       data-next={isNextOfficial || undefined}
-      aria-label={`${event.title}. ${formatLongDate(event.date)}. Status ${statusLabels[event.status]}.`}
+      data-variant={variant}
+      data-derived-complete={variant === 'completed' && event.status !== 'completed' || undefined}
+      aria-label={`${event.title}. ${formatLongDate(event.date)}. Status ${statusLabels[event.status]}.${variant === 'completed' ? ' Classificado em eventos concluídos.' : ''}`}
     >
       <span className="cronograma-mobile-event-date">
         <strong>{String(dateObject.getUTCDate()).padStart(2, '0')}</strong>
@@ -438,14 +489,20 @@ function MobileTimelineEventCard({
       </span>
 
       <span className="cronograma-mobile-event-content">
-        {(isNextOfficial || isToday) && (
+        {(isNextOfficial || (isToday && variant === 'timeline')) && (
           <span className="cronograma-mobile-event-highlights">
             {isNextOfficial && <span><Sparkles aria-hidden="true" />Próxima ação</span>}
-            {isToday && <span>Hoje</span>}
+            {isToday && variant === 'timeline' && <span>Hoje</span>}
           </span>
         )}
 
         <strong className="cronograma-mobile-event-title">{event.title}</strong>
+
+        {variant === 'completed' && (
+          <span className="cronograma-mobile-archive-state">
+            {event.status === 'completed' ? 'Concluído' : 'Encerrado por data'}
+          </span>
+        )}
 
         <span className="cronograma-mobile-event-badges">
           <CronogramaStatusIndicator status={event.status} />

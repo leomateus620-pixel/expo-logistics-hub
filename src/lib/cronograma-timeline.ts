@@ -2,10 +2,19 @@ import type {
   CronogramaEvent,
   CronogramaFilters,
   CronogramaStatus,
+  CronogramaView,
 } from '@/components/cronograma-eventos/types';
 
 const DAY_MS = 86_400_000;
 export const CRONOGRAMA_TIME_ZONE = 'America/Sao_Paulo';
+
+export type CronogramaPrimaryView = 'timeline' | 'completed' | 'undated';
+
+export interface CronogramaTimelineBuckets {
+  timeline: CronogramaEvent[];
+  completed: CronogramaEvent[];
+  undated: CronogramaEvent[];
+}
 
 function normalizeSearch(value: string | null | undefined) {
   return (value ?? '')
@@ -43,7 +52,7 @@ export function differenceInCalendarDays(dateKey: string, baseKey: string) {
 }
 
 export function deriveOperationalStatus(
-  event: Pick<CronogramaEvent, 'date' | 'status'>,
+  event: Pick<CronogramaEvent, 'date' | 'status'> & Partial<Pick<CronogramaEvent, 'endDate'>>,
   todayKey = getTodayKey(),
 ): CronogramaStatus {
   if (event.status === 'completed' || event.status === 'cancelled' || event.status === 'rescheduled') {
@@ -53,8 +62,71 @@ export function deriveOperationalStatus(
   if (event.status === 'in_progress' || event.status === 'blocked' || event.status === 'in_definition') {
     return event.status;
   }
-  if (event.date < todayKey) return 'overdue';
+  const effectiveEndDate = event.endDate && event.endDate >= event.date
+    ? event.endDate
+    : event.date;
+  if (effectiveEndDate < todayKey) return 'overdue';
   return event.status;
+}
+
+/**
+ * Classifies an event for the three flagship views without mutating its
+ * persisted status. Explicit completion wins; otherwise undated items stay in
+ * the operational backlog and dated items before today move to the archive.
+ */
+export function classifyCronogramaEvent(
+  event: Pick<CronogramaEvent, 'date' | 'endDate' | 'status'>,
+  todayKey = getTodayKey(),
+): CronogramaPrimaryView {
+  if (event.status === 'completed') return 'completed';
+  if (!event.date) return 'undated';
+  const effectiveEndDate = event.endDate && event.endDate >= event.date
+    ? event.endDate
+    : event.date;
+  if (effectiveEndDate < todayKey) return 'completed';
+  return 'timeline';
+}
+
+export function partitionCronogramaEvents(
+  events: CronogramaEvent[],
+  todayKey = getTodayKey(),
+): CronogramaTimelineBuckets {
+  return events.reduce<CronogramaTimelineBuckets>((buckets, event) => {
+    buckets[classifyCronogramaEvent(event, todayKey)].push(event);
+    return buckets;
+  }, { timeline: [], completed: [], undated: [] });
+}
+
+export function buildCronogramaViewSearchParams(
+  current: URLSearchParams,
+  currentView: CronogramaView,
+  nextView: CronogramaView,
+) {
+  const next = new URLSearchParams(current);
+  if (currentView !== nextView) {
+    next.delete('timelineYear');
+    next.delete('timelineMonth');
+  }
+  if (nextView === 'timeline') next.delete('view');
+  else next.set('view', nextView);
+  return next;
+}
+
+export function resetCronogramaTemporalFilters(filters: CronogramaFilters) {
+  if (
+    filters.month === 'all'
+    && filters.period === 'all'
+    && !filters.fromDate
+    && !filters.toDate
+  ) return filters;
+
+  return {
+    ...filters,
+    month: 'all' as const,
+    period: 'all' as const,
+    fromDate: '',
+    toDate: '',
+  };
 }
 
 export function monthKeyFromDate(date: string) {

@@ -1,6 +1,7 @@
 import * as DialogPrimitive from '@radix-ui/react-dialog';
 import { X } from 'lucide-react';
 import type { CSSProperties, ReactNode, RefObject } from 'react';
+import { resolveCronogramaReturnFocus } from '@/lib/cronograma-focus';
 import { useMobileViewport } from './useMobileViewport';
 
 interface MobileDialogFrameProps {
@@ -58,9 +59,10 @@ export function MobileDialogFrame({
           }}
           onPointerDownOutside={(event) => event.preventDefault()}
           onCloseAutoFocus={(event) => {
-            if (!returnFocusRef?.current) return;
+            const focusTarget = resolveCronogramaReturnFocus(returnFocusRef?.current);
+            if (!focusTarget) return;
             event.preventDefault();
-            returnFocusRef.current.focus({ preventScroll: true });
+            focusTarget.focus({ preventScroll: true });
           }}
         >
           <header className="cronograma-mobile-dialog-header">

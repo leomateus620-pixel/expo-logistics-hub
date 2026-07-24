@@ -1,5 +1,6 @@
 import { useCallback, useMemo } from 'react';
 import {
+  BadgeCheck,
   CalendarClock,
   CalendarDays,
   ChevronDown,
@@ -48,6 +49,7 @@ const monthYearFormatter = new Intl.DateTimeFormat('pt-BR', {
   timeZone: 'UTC',
 });
 const NOOP = () => undefined;
+type TimelineVariant = 'timeline' | 'completed';
 
 const monthShortFormatter = new Intl.DateTimeFormat('pt-BR', {
   month: 'short',
@@ -74,6 +76,7 @@ export function CronogramaTimelineBoard({
   preferredTemporalYear = null,
   onPositionChange,
   todayKey: todayKeyOverride,
+  variant = 'timeline',
 }: {
   events: CronogramaEvent[];
   allEvents?: CronogramaEvent[];
@@ -88,6 +91,7 @@ export function CronogramaTimelineBoard({
   preferredTemporalYear?: CronogramaCycleYear | null;
   onPositionChange?: (change: TimelinePositionChange) => void;
   todayKey?: string;
+  variant?: TimelineVariant;
 }) {
   const completeEvents = allEvents ?? events;
   const returnToFullCycle = onReturnToFullCycle ?? onClearFilters;
@@ -143,7 +147,11 @@ export function CronogramaTimelineBoard({
   }, [onOpen, reflectEventMonth]);
 
   return (
-    <section className="cronograma-timeline-shell" aria-label="Linha do tempo operacional">
+    <section
+      className="cronograma-timeline-shell"
+      data-variant={variant}
+      aria-label={variant === 'completed' ? 'Eventos concluídos por período' : 'Linha do tempo operacional'}
+    >
       <TimelineCycleNavigator
         summaries={summaries}
         selectedYear={navigation.selectedYear}
@@ -152,9 +160,14 @@ export function CronogramaTimelineBoard({
       />
 
       <div className="cronograma-timeline-workspace">
-        <nav className="cronograma-temporal-nav" aria-label="Navegação entre períodos">
+        <nav
+          className="cronograma-temporal-nav"
+          aria-label={variant === 'completed' ? 'Navegação do histórico concluído' : 'Navegação entre períodos'}
+        >
           <div className="min-w-0">
-            <p className="text-[9px] font-bold uppercase tracking-[0.17em] text-muted-foreground">Período em foco</p>
+            <p className="text-[9px] font-bold uppercase tracking-[0.17em] text-muted-foreground">
+              {variant === 'completed' ? 'Arquivo em foco' : 'Período em foco'}
+            </p>
             <p className="truncate text-lg font-black tracking-tight text-foreground">{focusedLabel}</p>
           </div>
           <div className="ml-auto flex items-center gap-1.5">
@@ -266,13 +279,23 @@ export function CronogramaTimelineBoard({
                           <span className="flex flex-wrap items-center gap-2">
                             <strong id={`cronograma-month-${key}`} className="text-base font-black tracking-tight text-foreground sm:text-lg">{monthLabel(key)}</strong>
                             <span className="rounded-full bg-primary/[0.06] px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.12em] text-primary">{getCronogramaCycleStage(monthYear).stage}</span>
+                            {variant === 'completed' && <span className="cronograma-archive-month-label">Histórico</span>}
                             {isCurrent && <span className="rounded-full bg-gold/15 px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-[0.12em] text-amber-950">Mês atual</span>}
                           </span>
                           <span className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-muted-foreground">
-                            <span>{summary.total} eventos</span>
-                            <span>{summary.completed} concluídos</span>
-                            {summary.overdue > 0 && <span className="font-bold text-red-800">{summary.overdue} atrasados</span>}
-                            {summary.pending > 0 && <span>{summary.pending} pendentes</span>}
+                            {variant === 'completed' ? (
+                              <>
+                                <span>{summary.total} registros históricos</span>
+                                <span>{summary.completed} concluídos manualmente</span>
+                              </>
+                            ) : (
+                              <>
+                                <span>{summary.total} eventos</span>
+                                <span>{summary.completed} concluídos</span>
+                                {summary.overdue > 0 && <span className="font-bold text-red-800">{summary.overdue} atrasados</span>}
+                                {summary.pending > 0 && <span>{summary.pending} pendentes</span>}
+                              </>
+                            )}
                           </span>
                         </span>
                         <span className="flex items-center gap-2 text-xs font-bold text-primary">
@@ -289,7 +312,8 @@ export function CronogramaTimelineBoard({
                               event={event}
                               selected={selectedEventId === event.id}
                               todayKey={todayKey}
-                              isNextOfficial={snapshot.nextOfficialAction?.id === event.id}
+                              isNextOfficial={variant === 'timeline' && snapshot.nextOfficialAction?.id === event.id}
+                              variant={variant}
                               onOpen={openTimelineEvent}
                             />
                           ))}
@@ -304,21 +328,35 @@ export function CronogramaTimelineBoard({
         </div>
 
         {undated.length > 0 && (
-          <section className="cronograma-undated-section" aria-labelledby="cronograma-undated-title">
+          <section
+            className="cronograma-undated-section"
+            data-variant={variant}
+            aria-labelledby="cronograma-undated-title"
+          >
             <header className="flex flex-wrap items-start justify-between gap-3 border-b border-amber-900/10 px-4 py-3 sm:px-5">
               <div>
-                <p className="text-[9px] font-bold uppercase tracking-[0.17em] text-amber-900/70">Backlog institucional</p>
-                <h3 id="cronograma-undated-title" className="mt-1 text-lg font-black tracking-tight text-foreground">Ações aguardando definição de data</h3>
+                <p className="text-[9px] font-bold uppercase tracking-[0.17em] text-amber-900/70">
+                  {variant === 'completed' ? 'Arquivo sem data' : 'Backlog institucional'}
+                </p>
+                <h3 id="cronograma-undated-title" className="mt-1 text-lg font-black tracking-tight text-foreground">
+                  {variant === 'completed' ? 'Concluídos sem data registrada' : 'Ações aguardando definição de data'}
+                </h3>
               </div>
               <span className="rounded-full bg-amber-100 px-3 py-1 font-mono text-xs font-bold text-amber-950">{undated.length}</span>
             </header>
             <div className="divide-y divide-amber-900/10">
               {undated.slice(0, 8).map((event) => (
                 <button key={event.id} type="button" onClick={() => openTimelineEvent(event)} className="cronograma-undated-action focus-ring">
-                  <CalendarClock className="mt-0.5 h-4 w-4 shrink-0 text-amber-800" aria-hidden="true" />
+                  {variant === 'completed'
+                    ? <BadgeCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-800" aria-hidden="true" />
+                    : <CalendarClock className="mt-0.5 h-4 w-4 shrink-0 text-amber-800" aria-hidden="true" />}
                   <span className="min-w-0 flex-1 text-left">
                     <span className="block text-sm font-bold text-foreground">{event.title}</span>
-                    <span className="mt-1 block truncate text-xs text-muted-foreground">{event.pendingReason || 'Aguardando agendamento institucional.'}</span>
+                    <span className="mt-1 block truncate text-xs text-muted-foreground">
+                      {variant === 'completed'
+                        ? 'Concluído manualmente sem data histórica registrada.'
+                        : event.pendingReason || 'Aguardando agendamento institucional.'}
+                    </span>
                   </span>
                   <CronogramaPriorityIndicator priority={event.priority} compact />
                 </button>
@@ -399,12 +437,14 @@ function TimelineEventRow({
   selected,
   todayKey,
   isNextOfficial,
+  variant,
   onOpen,
 }: {
   event: CronogramaEvent;
   selected: boolean;
   todayKey: string;
   isNextOfficial: boolean;
+  variant: TimelineVariant;
   onOpen: (event: CronogramaEvent) => void;
 }) {
   const progress = getSubeventProgress(event);
@@ -421,16 +461,18 @@ function TimelineEventRow({
       data-today={isToday || undefined}
       data-next={isNextOfficial || undefined}
       data-selected={selected || undefined}
+      data-variant={variant}
+      data-derived-complete={variant === 'completed' && event.status !== 'completed' || undefined}
       data-event-id={event.id}
       aria-pressed={selected}
-      aria-label={`${event.title}. ${formatLongDate(event.date)}. Status ${statusLabels[event.status]}.`}
+      aria-label={`${event.title}. ${formatLongDate(event.date)}. Status ${statusLabels[event.status]}.${variant === 'completed' ? ' Classificado em eventos concluídos.' : ''}`}
     >
       <span className="cronograma-event-date-block">
         <strong className="font-mono text-xl leading-none text-foreground">{String(dateObject.getUTCDate()).padStart(2, '0')}</strong>
         <span className="mt-1 text-[9px] font-extrabold uppercase tracking-[0.13em] text-muted-foreground">
           {monthShortFormatter.format(dateObject).replace('.', '')}
         </span>
-        <span className="mt-1 font-mono text-[9px] text-muted-foreground">{event.startTime || '—'}</span>
+        <span className="cronograma-event-time">{event.startTime || '—'}</span>
       </span>
 
       <span className="cronograma-event-rail" aria-hidden="true"><span /></span>
@@ -440,6 +482,11 @@ function TimelineEventRow({
           <strong className="text-sm font-black leading-snug text-foreground sm:text-[15px]">{event.title}</strong>
           {isNextOfficial && <span className="inline-flex items-center gap-1 rounded-full bg-gold/15 px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-[0.1em] text-amber-950"><Sparkles className="h-3 w-3" />Próxima ação</span>}
           {isToday && <span className="rounded-full bg-primary px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-[0.1em] text-white">Hoje</span>}
+          {variant === 'completed' && (
+            <span className="cronograma-archive-state">
+              {event.status === 'completed' ? 'Concluído' : 'Encerrado por data'}
+            </span>
+          )}
         </span>
         <span className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-muted-foreground">
           <CronogramaCategoryMarker category={event.category} />

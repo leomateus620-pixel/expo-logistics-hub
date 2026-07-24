@@ -18,6 +18,7 @@ import {
   X,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { resolveCronogramaReturnFocus } from '@/lib/cronograma-focus';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -158,9 +159,10 @@ export function EventDrawer({
           overlayClassName="cronograma-drawer-overlay"
           closeLabel="Fechar detalhes do evento"
           onCloseAutoFocus={(closeEvent) => {
-            if (!returnFocusRef?.current) return;
+            const focusTarget = resolveCronogramaReturnFocus(returnFocusRef?.current);
+            if (!focusTarget) return;
             closeEvent.preventDefault();
-            returnFocusRef.current.focus({ preventScroll: true });
+            focusTarget.focus({ preventScroll: true });
           }}
           onEscapeKeyDown={(escapeEvent) => {
             if (saving) escapeEvent.preventDefault();
