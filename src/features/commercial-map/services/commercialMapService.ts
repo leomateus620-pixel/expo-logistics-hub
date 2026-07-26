@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { OFFICIAL_REFERENCE_DATA, OFFICIAL_REFERENCE_REVISION } from '../data/officialReference2026';
+import { reconcileExporuralReference } from '../data/reconcileExporuralReference';
 import type {
   CommercialLot,
   CommercialMapData,
@@ -286,7 +287,7 @@ export async function fetchCommercialMap(orgId: string): Promise<CommercialMapDa
     };
   }
 
-  return {
+  return reconcileExporuralReference({
     source: 'database',
     sourceMessage: project.isPublished ? null : 'Projeto cartográfico em rascunho. Alterações ainda não estão publicadas para toda a equipe.',
     project,
@@ -294,7 +295,7 @@ export async function fetchCommercialMap(orgId: string): Promise<CommercialMapDa
     layers: (layersResult.data ?? []).map(mapLayer),
     entities,
     lots: lotRows.map(mapLot),
-  };
+  });
 }
 
 export async function bootstrapOfficialReference(orgId: string): Promise<string> {
@@ -349,6 +350,9 @@ export async function bootstrapOfficialReference(orgId: string): Promise<string>
       isCorner: lot.isCorner,
       isCovered: lot.isCovered,
       accessibilityNotes: lot.accessibilityNotes,
+      officialAreaSqm: lot.officialAreaSqm,
+      calculatedAreaSqm: lot.calculatedAreaSqm,
+      areaValidationStatus: lot.areaValidationStatus,
     })),
     p_calibration: source.calibration ? {
       referenceImagePath: source.calibration.referenceImagePath,
@@ -374,6 +378,62 @@ export async function bootstrapOfficialReference(orgId: string): Promise<string>
     throw error;
   }
   return String(data);
+}
+
+export async function applyExporuralReference(orgId: string) {
+  const source = OFFICIAL_REFERENCE_DATA;
+  const entities = source.entities.filter((entity) => entity.metadata.areaCode === 'EXPORURAL');
+  const entityIdentifiers = new Set(entities.map((entity) => entity.publicIdentifier));
+  const lots = source.lots.filter((lot) => entityIdentifiers.has(lot.publicIdentifier));
+  const { data, error } = await db.rpc('apply_exporural_reference_2026', {
+    p_org_id: orgId,
+    p_source_revision: OFFICIAL_REFERENCE_REVISION,
+    p_entities: entities.map((entity) => ({
+      publicIdentifier: entity.publicIdentifier,
+      name: entity.name,
+      description: entity.description,
+      classification: entity.classification,
+      layerKey: entity.layerId.replace('reference:', ''),
+      parentPublicIdentifier: typeof entity.metadata.parentPublicIdentifier === 'string'
+        ? entity.metadata.parentPublicIdentifier
+        : null,
+      verificationStatus: entity.verificationStatus,
+      isSellable: entity.isSellable,
+      geometry: entity.geometry,
+      metadata: {
+        ...entity.metadata,
+        seedManaged: true,
+        sourceRevision: OFFICIAL_REFERENCE_REVISION,
+      },
+    })),
+    p_lots: lots.map((lot) => ({
+      publicIdentifier: lot.publicIdentifier,
+      block: lot.block,
+      lotNumber: lot.lotNumber,
+      levelLabel: lot.levelLabel,
+      displayName: lot.displayName,
+      description: lot.description,
+      officialAreaSqm: lot.officialAreaSqm,
+      calculatedAreaSqm: lot.calculatedAreaSqm,
+      areaValidationStatus: lot.areaValidationStatus,
+      infrastructure: lot.infrastructure,
+      hasElectricity: lot.hasElectricity,
+      hasWater: lot.hasWater,
+      hasInternet: lot.hasInternet,
+      isCorner: lot.isCorner,
+      isCovered: lot.isCovered,
+      accessibilityNotes: lot.accessibilityNotes,
+    })),
+  });
+  if (error) throw error;
+  return data as {
+    projectId: string;
+    snapshotId: string;
+    referenceRevision: string;
+    geometryRevision: string;
+    geometriesVersioned: number;
+    lotsValidated: number;
+  };
 }
 
 export async function saveGeometryRevision(params: {

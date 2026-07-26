@@ -40,6 +40,7 @@ import {
   strategicLandmarkSupportsInterior,
 } from '../../utils/landmarks';
 import { normalizeMapEntityMetadata } from '../../utils/mapMetadata';
+import type { CommercialMapAreaScope } from '../../utils/areaScope';
 import type { CommercialLot, MapEntity, MapLayer, MapPermissions } from '../../types';
 import { LotWorkflowDialog, type LotWorkflow } from '../commercial/LotWorkflowDialog';
 import { LotStructureDialog, type LotStructureOperation } from '../commercial/LotStructureDialog';
@@ -48,6 +49,7 @@ import { EntityVerificationDialog } from '../commercial/EntityVerificationDialog
 
 const currency = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 const number = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 });
+const areaNumber = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const dateTime = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
 
 function PanelHeader({ title, eyebrow, onClose }: { title: string; eyebrow: string; onClose: () => void }) {
@@ -61,7 +63,13 @@ function PanelHeader({ title, eyebrow, onClose }: { title: string; eyebrow: stri
     </div>
   );
 }
-export function CommercialSummary({ lots }: { lots: CommercialLot[] }) {
+export function CommercialSummary({
+  lots,
+  scope = 'park',
+}: {
+  lots: CommercialLot[];
+  scope?: CommercialMapAreaScope;
+}) {
   const toggleStatus = useCommercialMapStore((state) => state.toggleStatus);
   const statusFilters = useCommercialMapStore((state) => state.statusFilters);
   const totals = useMemo(() => {
@@ -77,10 +85,10 @@ export function CommercialSummary({ lots }: { lots: CommercialLot[] }) {
   }, [lots]);
 
   return (
-    <div className="commercial-map-summary" aria-label="Resumo comercial">
+    <div className="commercial-map-summary" aria-label={scope === 'exporural' ? 'Resumo comercial da Exporural' : 'Resumo comercial'}>
       <div className="commercial-map-summary-primary">
         <strong>{lots.length}</strong>
-        <span>lotes cadastrados</span>
+        <span>{scope === 'exporural' ? 'lotes Exporural' : 'lotes cadastrados'}</span>
       </div>
       {(['BLOCKED', 'AVAILABLE', 'RESERVED', 'IN_NEGOTIATION', 'SOLD'] as const).map((status) => (
         <button
@@ -96,20 +104,20 @@ export function CommercialSummary({ lots }: { lots: CommercialLot[] }) {
         </button>
       ))}
       <div className="commercial-map-summary-value">
-        <strong>{number.format(totals.availableArea)} m²</strong>
+        <strong>{areaNumber.format(totals.availableArea)} m²</strong>
         <span>área oficial disponível</span>
       </div>
     </div>
   );
 }
 
-export function StatusLegend() {
+export function StatusLegend({ scope = 'park' }: { scope?: CommercialMapAreaScope }) {
   const [expanded, setExpanded] = useState(false);
   return (
     <div className={`commercial-map-legend ${expanded ? 'is-expanded' : ''}`}>
       <button type="button" onClick={() => setExpanded((value) => !value)} aria-expanded={expanded}>
         <Info className="h-3.5 w-3.5" />
-        Situações comerciais
+        {scope === 'exporural' ? 'Legenda Exporural' : 'Situações comerciais'}
         <ChevronRight className="h-3.5 w-3.5" />
       </button>
       {expanded && (
@@ -225,6 +233,9 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions }:
   const activity = useLotActivity(lot?.id ?? null);
   const contracts = useLotContractVersions(lot?.id ?? null, permissions.canManageContracts);
   const areaMapUnits = polygonAreaMapUnits(entity.geometry);
+  const areaDifferenceSqm = lot?.officialAreaSqm != null && lot.calculatedAreaSqm != null
+    ? lot.calculatedAreaSqm - lot.officialAreaSqm
+    : null;
   const status = lot ? STATUS_CONFIG[lot.status] : null;
   const metadata = normalizeMapEntityMetadata(entity, lot);
   const structuralReady = lot ? ['AVAILABLE', 'BLOCKED', 'UNAVAILABLE'].includes(lot.status) : false;
@@ -267,8 +278,25 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions }:
             </TabsList>
             <TabsContent value="overview">
               <div className="commercial-map-detail-grid">
-                <DetailMetric icon={Ruler} label="Área oficial" value={lot?.officialAreaSqm ? `${number.format(lot.officialAreaSqm)} m²` : 'Não validada'} warning={!lot?.officialAreaSqm} />
-                <DetailMetric icon={MapPinned} label="Área cartográfica" value={`${number.format(areaMapUnits)} un²`} warning={!entity.geometry.calibrationVersion} />
+                <DetailMetric icon={Ruler} label="Área oficial" value={lot?.officialAreaSqm ? `${areaNumber.format(lot.officialAreaSqm)} m²` : 'Não validada'} warning={!lot?.officialAreaSqm} />
+                {lot ? (
+                  <DetailMetric
+                    icon={MapPinned}
+                    label="Área calculada"
+                    value={lot.calculatedAreaSqm != null ? `${areaNumber.format(lot.calculatedAreaSqm)} m²` : 'Sem calibração'}
+                    warning={lot.areaValidationStatus !== 'VALIDATED'}
+                  />
+                ) : (
+                  <DetailMetric icon={MapPinned} label="Área cartográfica" value={`${number.format(areaMapUnits)} un²`} warning={!entity.geometry.calibrationVersion} />
+                )}
+                {areaDifferenceSqm != null && (
+                  <DetailMetric
+                    icon={BadgeCheck}
+                    label="Diferença geométrica"
+                    value={`${areaDifferenceSqm >= 0 ? '+' : ''}${areaNumber.format(areaDifferenceSqm)} m²`}
+                    warning={Math.abs(areaDifferenceSqm) > 0.01}
+                  />
+                )}
                 {lot && <DetailMetric icon={Tag} label="Preço solicitado" value={lot.askingPrice ? currency.format(lot.askingPrice) : 'A negociar'} />}
                 {lot && <DetailMetric icon={Building2} label="Bloco / lote" value={[lot.block, lot.lotNumber].filter(Boolean).join(' · ') || 'Não informado'} />}
                 {lot?.levelLabel && <DetailMetric icon={Layers3} label="Piso / nível" value={lot.levelLabel} />}

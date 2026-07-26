@@ -4,6 +4,7 @@ import { useCapabilities } from '@/hooks/useCapabilities';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import { toast } from 'sonner';
 import {
+  applyExporuralReference,
   bootstrapOfficialReference,
   createCommercialLot,
   fetchCommercialMap,
@@ -53,6 +54,12 @@ const MAP_ERROR_MESSAGES: Record<string, string> = {
   MAP_PROJECT_ALREADY_EXISTS: 'Já existe um projeto cartográfico ativo para esta organização.',
   VALIDATED_AREA_REQUIRED_FOR_SQM_PRICE: 'Valide a área oficial antes de usar preço por metro quadrado.',
   MINIMUM_PRICE_ABOVE_ASKING_PRICE: 'O preço mínimo não pode superar o valor solicitado.',
+  EXPORURAL_LOT_OVERLAP: 'A revisão foi bloqueada porque dois lotes Exporural se sobrepõem.',
+  EXPORURAL_LOT_ROAD_OVERLAP: 'A revisão foi bloqueada porque um lote invade uma rua da Exporural.',
+  EXPORURAL_PROTECTED_STRUCTURE_OVERLAP: 'A revisão foi bloqueada para preservar Floriculturas, Cozinha da Soja ou Mirante.',
+  EXPORURAL_AREA_TOLERANCE_EXCEEDED: 'A diferença entre área oficial e calculada excede a tolerância cadastral.',
+  EXPORURAL_MANUAL_ENTITY_CONFLICT: 'Há uma entidade manual no mesmo identificador. A migração foi interrompida sem alterar dados.',
+  EXPORURAL_LEGACY_SEMEAR_REQUIRES_MANUAL_LINEAGE: 'O Espaço Semear legado possui vínculos comerciais e exige migração manual de linhagem.',
   LOT_NOT_AVAILABLE: 'Este lote não está mais disponível para reserva.',
   LOT_NOT_NEGOTIABLE: 'A situação atual do lote não permite iniciar uma negociação.',
   LOT_CANNOT_BE_SOLD: 'A situação atual do lote não permite registrar a venda.',
@@ -189,6 +196,16 @@ export function useMapMutations() {
     },
     onError: (error) => toast.error('Falha ao iniciar a base cartográfica', { description: errorMessage(error) }),
   });
+  const exporuralSync = useMutation({
+    mutationFn: () => applyExporuralReference(orgId!),
+    onSuccess: async (result) => {
+      await invalidate();
+      toast.success('Exporural 2026.3 persistida e versionada.', {
+        description: `${result.lotsValidated} lotes validados; snapshot de rollback registrado.`,
+      });
+    },
+    onError: (error) => toast.error('A revisão Exporural não foi aplicada', { description: errorMessage(error) }),
+  });
   const geometry = useMutation({
     mutationFn: saveGeometryRevision,
     onSuccess: async () => {
@@ -301,7 +318,7 @@ export function useMapMutations() {
     onError: (error) => toast.error('Falha no envio do contrato', { description: errorMessage(error) }),
   });
 
-  return { bootstrap, geometry, lotCreation, lotUpdate, layerLock, verification, publish, calibration, split, merge, referenceUpload, reservation, negotiation, sale, contract };
+  return { bootstrap, exporuralSync, geometry, lotCreation, lotUpdate, layerLock, verification, publish, calibration, split, merge, referenceUpload, reservation, negotiation, sale, contract };
 }
 
 export function useLotActivity(lotId: string | null) {

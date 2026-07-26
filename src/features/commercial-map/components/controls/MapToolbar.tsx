@@ -9,6 +9,7 @@ import {
   MousePointer2,
   ParkingCircle,
   Search,
+  ScanSearch,
   SlidersHorizontal,
   SquareStack,
   Warehouse,
@@ -20,6 +21,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { CAMERA_PRESETS } from '../../constants';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import type { CameraPreset, MapPermissions } from '../../types';
+import type { CommercialMapAreaScope } from '../../utils/areaScope';
+import { canUseTechnicalValidationOverlay } from '../../utils/technicalValidation';
 
 const presetIcons: Record<CameraPreset, typeof Map> = {
   overview: Map,
@@ -29,9 +32,21 @@ const presetIcons: Record<CameraPreset, typeof Map> = {
   pavilions: Warehouse,
   parking: ParkingCircle,
   gates: CarFront,
+  exporural: Map,
+  'quadra-r': SquareStack,
+  'quadra-s': SquareStack,
+  semear: Building2,
 };
 
-export function MapToolbar({ permissions, hasSelection }: { permissions: MapPermissions; hasSelection: boolean }) {
+export function MapToolbar({
+  permissions,
+  hasSelection,
+  areaScope,
+}: {
+  permissions: MapPermissions;
+  hasSelection: boolean;
+  areaScope: CommercialMapAreaScope;
+}) {
   const search = useCommercialMapStore((state) => state.search);
   const setSearch = useCommercialMapStore((state) => state.setSearch);
   const activePanel = useCommercialMapStore((state) => state.activePanel);
@@ -40,6 +55,12 @@ export function MapToolbar({ permissions, hasSelection }: { permissions: MapPerm
   const setWorkspaceMode = useCommercialMapStore((state) => state.setWorkspaceMode);
   const requestCameraPreset = useCommercialMapStore((state) => state.requestCameraPreset);
   const focusSelection = useCommercialMapStore((state) => state.focusSelection);
+  const technicalValidationVisible = useCommercialMapStore((state) => state.technicalValidationVisible);
+  const setTechnicalValidationVisible = useCommercialMapStore((state) => state.setTechnicalValidationVisible);
+  const canUseTechnicalValidation = canUseTechnicalValidationOverlay(areaScope, permissions);
+  const presets: CameraPreset[] = areaScope === 'exporural'
+    ? ['exporural', 'top', 'isometric', 'quadra-r', 'quadra-s', 'semear']
+    : ['overview', 'top', 'isometric'];
 
   return (
     <>
@@ -59,8 +80,8 @@ export function MapToolbar({ permissions, hasSelection }: { permissions: MapPerm
               setActivePanel('results');
             }
           }}
-          placeholder="ID, nome, quadra, lote, rua ou empresa"
-          aria-label="Buscar no mapa comercial"
+          placeholder={areaScope === 'exporural' ? 'Lote, quadra, rua ou estrutura Exporural' : 'ID, nome, quadra, lote, rua ou empresa'}
+          aria-label={areaScope === 'exporural' ? 'Buscar somente na Exporural' : 'Buscar no mapa comercial'}
           aria-keyshortcuts="Control+K Meta+K"
           autoComplete="off"
         />
@@ -69,7 +90,7 @@ export function MapToolbar({ permissions, hasSelection }: { permissions: MapPerm
       </div>
 
       <div className="commercial-map-toolbar" aria-label="Controles do mapa">
-        {(Object.keys(CAMERA_PRESETS) as CameraPreset[]).slice(0, 3).map((preset) => {
+        {presets.map((preset) => {
           const Icon = presetIcons[preset];
           return (
             <Tooltip key={preset}>
@@ -99,6 +120,24 @@ export function MapToolbar({ permissions, hasSelection }: { permissions: MapPerm
           </TooltipTrigger>
           <TooltipContent>Camadas</TooltipContent>
         </Tooltip>
+        {canUseTechnicalValidation && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                className={technicalValidationVisible ? 'is-active' : ''}
+                onClick={() => setTechnicalValidationVisible(!technicalValidationVisible)}
+                aria-label="Validação técnica da Exporural"
+                aria-pressed={technicalValidationVisible}
+              >
+                <ScanSearch className="h-4 w-4" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>
+              {technicalValidationVisible ? 'Ocultar validação técnica' : 'Validar geometrias da Exporural'}
+            </TooltipContent>
+          </Tooltip>
+        )}
         <Tooltip>
           <TooltipTrigger asChild>
             <button type="button" className={workspaceMode === 'list' ? 'is-active' : ''} onClick={() => setWorkspaceMode(workspaceMode === 'list' ? '3d' : 'list')} aria-label="Lista acessível de entidades">

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import {
   AlertTriangle,
   ArrowLeft,
@@ -12,6 +13,8 @@ import {
   Ruler,
   Send,
   Sparkles,
+  Tractor,
+  Trees,
 } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
@@ -31,6 +34,13 @@ import {
 import { MapListView, ResultsPanel } from './components/panels/EntityExplorer';
 import { CalibrationPanel } from './components/panels/CalibrationPanel';
 import { resolveStrategicLandmarkKind } from './utils/landmarks';
+import { OFFICIAL_REFERENCE_REVISION } from './data/officialReference2026';
+import {
+  areaScopeFromSearchParams,
+  scopeCommercialMapData,
+  type CommercialMapAreaScope,
+} from './utils/areaScope';
+import { canUseTechnicalValidationOverlay } from './utils/technicalValidation';
 import './commercial-map.css';
 
 function supportsWebGL() {
@@ -51,9 +61,12 @@ function MapPageSkeleton() {
 }
 
 export default function CommercialMapPage() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const areaScope = areaScopeFromSearchParams(searchParams);
+  const isExporural = areaScope === 'exporural';
   const mapQuery = useCommercialMap();
   const permissions = useMapPermissions();
-  const { bootstrap, publish } = useMapMutations();
+  const { bootstrap, exporuralSync, publish } = useMapMutations();
   const selectedEntityId = useCommercialMapStore((state) => state.selectedEntityId);
   const interiorEntityId = useCommercialMapStore((state) => state.interiorEntityId);
   const exitInterior = useCommercialMapStore((state) => state.exitInterior);
@@ -61,18 +74,69 @@ export default function CommercialMapPage() {
   const setActivePanel = useCommercialMapStore((state) => state.setActivePanel);
   const workspaceMode = useCommercialMapStore((state) => state.workspaceMode);
   const setWorkspaceMode = useCommercialMapStore((state) => state.setWorkspaceMode);
+  const clearExplorerFilters = useCommercialMapStore((state) => state.clearExplorerFilters);
+  const setTechnicalValidationVisible = useCommercialMapStore((state) => state.setTechnicalValidationVisible);
+  const requestCameraPreset = useCommercialMapStore((state) => state.requestCameraPreset);
+  const setSelectedEntityId = useCommercialMapStore((state) => state.setSelectedEntityId);
   const interiorBackButtonRef = useRef<HTMLButtonElement>(null);
   const lastInteriorEntityId = useRef<string | null>(null);
+  const previousAreaScope = useRef<CommercialMapAreaScope>(areaScope);
+  const initializedAreaScope = useRef(false);
   const [webglAvailable] = useState(() => supportsWebGL());
   const [publishReason, setPublishReason] = useState('Publicação após revisão cartográfica e comercial');
+  const technicalValidationAllowed = canUseTechnicalValidationOverlay(areaScope, permissions);
 
   const data = mapQuery.data;
-  const mapFilter = useMapEntityFilter(data?.entities ?? [], data?.lots ?? []);
-  const selectedEntity = data?.entities.find((entity) => entity.id === selectedEntityId) ?? null;
-  const selectedLot = data?.lots.find((lot) => lot.entityId === selectedEntityId);
+  const scopedData = useMemo(
+    () => scopeCommercialMapData(
+      { entities: data?.entities ?? [], lots: data?.lots ?? [] },
+      areaScope,
+    ),
+    [areaScope, data?.entities, data?.lots],
+  );
+  const mapFilter = useMapEntityFilter(scopedData.entities, scopedData.lots);
+  const selectedEntity = scopedData.entities.find((entity) => entity.id === selectedEntityId) ?? null;
+  const selectedLot = scopedData.lots.find((lot) => lot.entityId === selectedEntityId);
   const selectedKind = selectedEntity ? resolveStrategicLandmarkKind(selectedEntity) : null;
   const interiorEntity = data?.entities.find((entity) => entity.id === interiorEntityId) ?? null;
   const interiorKind = interiorEntity ? resolveStrategicLandmarkKind(interiorEntity) : null;
+
+  const setAreaScope = (nextScope: CommercialMapAreaScope) => {
+    const next = new URLSearchParams(searchParams);
+    if (nextScope === 'exporural') next.set('area', 'exporural');
+    else next.delete('area');
+    setSearchParams(next, { replace: false });
+  };
+
+  useEffect(() => {
+    if (!initializedAreaScope.current) {
+      initializedAreaScope.current = true;
+      if (areaScope === 'exporural') requestCameraPreset('exporural');
+      return;
+    }
+    if (previousAreaScope.current === areaScope) return;
+    previousAreaScope.current = areaScope;
+    clearExplorerFilters();
+    setSelectedEntityId(null);
+    setActivePanel(null);
+    setWorkspaceMode('3d');
+    requestCameraPreset(areaScope === 'exporural' ? 'exporural' : 'overview');
+  }, [
+    areaScope,
+    clearExplorerFilters,
+    requestCameraPreset,
+    setActivePanel,
+    setSelectedEntityId,
+    setWorkspaceMode,
+  ]);
+
+  useEffect(() => {
+    if (selectedEntityId && !scopedData.entityIds.has(selectedEntityId)) setSelectedEntityId(null);
+  }, [scopedData.entityIds, selectedEntityId, setSelectedEntityId]);
+
+  useEffect(() => {
+    if (!technicalValidationAllowed) setTechnicalValidationVisible(false);
+  }, [setTechnicalValidationVisible, technicalValidationAllowed]);
 
   useEffect(() => {
     const shortcut = (event: KeyboardEvent) => {
@@ -141,7 +205,7 @@ export default function CommercialMapPage() {
 
   return (
     <section
-      className={`commercial-map-shell ${interiorEntityId ? 'is-interior' : ''} ${interiorKind === 'livestock-pavilion' ? 'is-livestock-interior' : ''} ${interiorKind === 'mirante-pavilion' ? 'is-mirante-interior' : ''} ${selectedKind === 'livestock-pavilion' || selectedKind === 'mirante-pavilion' ? 'has-architectural-selection' : ''}`}
+      className={`commercial-map-shell ${isExporural ? 'is-exporural' : ''} ${interiorEntityId ? 'is-interior' : ''} ${interiorKind === 'livestock-pavilion' ? 'is-livestock-interior' : ''} ${interiorKind === 'mirante-pavilion' ? 'is-mirante-interior' : ''} ${selectedKind === 'livestock-pavilion' || selectedKind === 'mirante-pavilion' ? 'has-architectural-selection' : ''}`}
       aria-label="Plataforma de gestão do mapa comercial"
     >
       <header className="commercial-map-command-header">
@@ -149,11 +213,57 @@ export default function CommercialMapPage() {
           <div className="commercial-map-title-icon"><MapPinned /></div>
           <div>
             <span>Gestão territorial e comercial · Fenasoja 2028</span>
-            <h1>Mapa Comercial</h1>
-            <p>Referência cartográfica: {data.project.name}</p>
+            <h1>{isExporural ? 'Exporural' : 'Mapa Comercial'}</h1>
+            <p>{isExporural ? 'Vista isolada · Quadras R e S · referência cadastral 2026' : `Referência cartográfica: ${data.project.name}`}</p>
           </div>
         </div>
+        <nav className="commercial-map-view-selector" aria-label="Área exibida no mapa">
+          <button
+            type="button"
+            className={!isExporural ? 'is-active' : ''}
+            onClick={() => setAreaScope('park')}
+            aria-pressed={!isExporural}
+          >
+            <Trees />Parque completo
+          </button>
+          <button
+            type="button"
+            className={isExporural ? 'is-active' : ''}
+            onClick={() => setAreaScope('exporural')}
+            aria-pressed={isExporural}
+          >
+            <Tractor />Exporural
+          </button>
+        </nav>
         <div className="commercial-map-header-actions">
+          {data.source === 'database'
+            && permissions.isMapAdmin
+            && data.project.referenceRevision !== OFFICIAL_REFERENCE_REVISION
+            && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <Button variant="outline" size="sm"><DatabaseZap />Persistir Exporural</Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <div className="commercial-map-dialog-icon"><DatabaseZap /></div>
+                    <AlertDialogTitle>Aplicar a revisão Exporural 2026.3?</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      A operação é limitada às Quadras R/S, suas sete ruas e apoios confirmados. Antes de escrever, o banco valida áreas, sobreposições e estruturas protegidas, cria um snapshot e preserva status, preços, reservas, vendas e contratos.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                    <AlertDialogAction
+                      disabled={exporuralSync.isPending}
+                      onClick={() => exporuralSync.mutate()}
+                    >
+                      Validar e versionar
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
           {permissions.isMapAdmin && (
             <Button variant="outline" size="sm" onClick={() => setActivePanel('calibration')}><Ruler />Calibrar</Button>
           )}
@@ -206,9 +316,25 @@ export default function CommercialMapPage() {
         </div>
       </header>
 
+      {data.sourceMessage && (
+        <div
+          className={`commercial-map-source-notice is-${data.source}`}
+          role="status"
+          title={data.sourceMessage}
+        >
+          <AlertTriangle aria-hidden="true" />
+          <strong>
+            {data.source === 'official-reference'
+              ? 'Referência oficial · somente leitura'
+              : 'Estado da base persistida'}
+          </strong>
+          <span>{data.sourceMessage}</span>
+        </div>
+      )}
+
       <div className="commercial-map-viewport">
         {workspaceMode === 'create' ? (
-          <LotCreationWorkspace project={data.project} calibration={data.calibration} layers={data.layers} entities={data.entities} />
+          <LotCreationWorkspace project={data.project} calibration={data.calibration} layers={data.layers} entities={scopedData.entities} />
         ) : workspaceMode === 'edit' && selectedEntity ? (
           <GeometryEditor entity={selectedEntity} calibration={data.calibration} />
         ) : workspaceMode === 'list' || !webglAvailable ? (
@@ -216,11 +342,14 @@ export default function CommercialMapPage() {
         ) : (
           <>
             <CommercialMapCanvas
-              entities={data.entities}
-              lots={data.lots}
+              key={areaScope}
+              entities={scopedData.entities}
+              lots={scopedData.lots}
               calibration={data.calibration}
               matchingEntityIds={mapFilter.matchingEntityIds}
               filtersActive={mapFilter.hasActiveCriteria}
+              isolatedArea={isExporural ? 'exporural' : null}
+              technicalValidationAllowed={technicalValidationAllowed}
             />
             {interiorEntity ? (
               <div
@@ -252,22 +381,22 @@ export default function CommercialMapPage() {
               </div>
             ) : (
               <>
-                <CommercialSummary lots={data.lots} />
-                <MapToolbar permissions={permissions} hasSelection={Boolean(selectedEntity)} />
-                <StatusLegend />
+                <CommercialSummary lots={scopedData.lots} scope={areaScope} />
+                <MapToolbar permissions={permissions} hasSelection={Boolean(selectedEntity)} areaScope={areaScope} />
+                <StatusLegend scope={areaScope} />
               </>
             )}
 
-            {!interiorEntityId && data.lots.length === 0 && (
+            {!interiorEntityId && scopedData.lots.length === 0 && (
               <div className="commercial-map-onboarding-note">
                 <Sparkles />
                 <span><strong>Parque digitalizado, cadastro comercial protegido</strong>A base não contém lotes fictícios. Trace e valide cada unidade antes de ativar preços e vendas.</span>
               </div>
             )}
 
-            {!interiorEntityId && activePanel === 'layers' && <LayersPanel layers={data.layers} entities={data.entities} permissions={permissions} />}
+            {!interiorEntityId && activePanel === 'layers' && <LayersPanel layers={data.layers} entities={scopedData.entities} permissions={permissions} />}
             {!interiorEntityId && activePanel === 'results' && <ResultsPanel explorer={mapFilter} />}
-            {!interiorEntityId && activePanel === 'details' && selectedEntity && <EntityDetailsPanel entity={selectedEntity} lot={selectedLot} entities={data.entities} lots={data.lots} permissions={permissions} />}
+            {!interiorEntityId && activePanel === 'details' && selectedEntity && <EntityDetailsPanel entity={selectedEntity} lot={selectedLot} entities={scopedData.entities} lots={scopedData.lots} permissions={permissions} />}
             {!interiorEntityId && activePanel === 'calibration' && <CalibrationPanel project={data.project} calibration={data.calibration} />}
           </>
         )}

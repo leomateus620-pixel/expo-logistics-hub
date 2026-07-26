@@ -13,6 +13,18 @@ import type {
   PolygonGeometry,
   VerificationStatus,
 } from '../types';
+import {
+  EXPORURAL_AREA_CODE,
+  EXPORURAL_GEOMETRY_REVISION,
+  EXPORURAL_GEOMETRY_VERSION,
+  EXPORURAL_LOT_REFERENCES,
+  EXPORURAL_MAP_UNITS_PER_METER,
+  EXPORURAL_ROAD_IDENTIFIERS,
+  EXPORURAL_SOURCE_MANIFEST,
+  EXPORURAL_SUPPORT_IDENTIFIERS,
+  getExporuralReference,
+  sourcePolygonAreaSqm,
+} from './exporuralReference2026';
 
 type PdfPoint = [number, number];
 type PdfPolygon = PdfPoint[];
@@ -31,7 +43,7 @@ interface ReferenceEntityInput {
   metadata?: Record<string, unknown>;
 }
 
-export const OFFICIAL_REFERENCE_REVISION = '2026.2';
+export const OFFICIAL_REFERENCE_REVISION = '2026.3';
 
 /**
  * Reproducible crop used by the runtime underlay. Coordinates are PDF points
@@ -84,7 +96,12 @@ function diamondPdf([x, y]: PdfPoint, radius = 22): PdfPolygon {
   return [[x, y - radius], [x + radius, y], [x, y + radius], [x - radius, y]];
 }
 
-function geometry(polygon: PdfPolygon, height = 0.16): PolygonGeometry {
+function geometry(
+  polygon: PdfPolygon,
+  height = 0.16,
+  geometryVersion = 1,
+  calibrationVersion: number | null = null,
+): PolygonGeometry {
   const ring = polygon.map(pdfToLocal);
   ring.push([...ring[0]] as Coordinate);
   return {
@@ -94,8 +111,8 @@ function geometry(polygon: PdfPolygon, height = 0.16): PolygonGeometry {
     elevation: 0,
     extrusionHeight: height,
     rotation: 0,
-    geometryVersion: 1,
-    calibrationVersion: null,
+    geometryVersion,
+    calibrationVersion,
   };
 }
 
@@ -107,6 +124,7 @@ function addEntity(input: ReferenceEntityInput) {
 }
 
 function addQuadra(code: string, bounds: PdfBounds, metadata?: Record<string, unknown>) {
+  const isExporural = code === 'R' || code === 'S';
   addEntity({
     publicIdentifier: `QUADRA-${code}`,
     name: `Quadra ${code}`,
@@ -114,7 +132,19 @@ function addQuadra(code: string, bounds: PdfBounds, metadata?: Record<string, un
     layer: 'quadras',
     polygon: rectPdf(bounds),
     height: 0.025,
-    metadata: { renderMode: 'outline', labelPriority: 'quadra', block: code, ...metadata },
+    parentPublicIdentifier: isExporural ? EXPORURAL_AREA_CODE : undefined,
+    verificationStatus: isExporural ? 'VERIFIED' : undefined,
+    metadata: {
+      renderMode: 'outline',
+      labelPriority: 'quadra',
+      block: code,
+      ...(isExporural ? {
+        areaCode: EXPORURAL_AREA_CODE,
+        entityType: 'EXPORURAL_QUADRA',
+        geometryRevision: EXPORURAL_GEOMETRY_REVISION,
+      } : {}),
+      ...metadata,
+    },
   });
 }
 
@@ -162,10 +192,41 @@ function addTwoRowGrid(block: string, bounds: PdfBounds, top: number[], bottom: 
   addRow(block, bottom, [x1, middle, x2, y2]);
 }
 
+addEntity({
+  publicIdentifier: EXPORURAL_AREA_CODE,
+  name: 'Exporural',
+  description: 'Setor cadastral Exporural, composto pelas Quadras R e S, suas vias internas e estruturas de apoio.',
+  classification: 'RURAL_EXHIBITION',
+  layer: 'exporural',
+  polygon: [
+    [3230, 1265],
+    [6008, 1265],
+    [6008, 2080],
+    [5948, 2334],
+    [5840, 2600],
+    [5140, 2585],
+    [3940, 2467],
+    [3230, 2445],
+  ],
+  height: 0.018,
+  verificationStatus: 'VERIFIED',
+  metadata: {
+    areaCode: EXPORURAL_AREA_CODE,
+    entityType: 'EXPORURAL_AREA',
+    renderMode: 'outline',
+    labelPriority: 'area',
+    geometryRevision: EXPORURAL_GEOMETRY_REVISION,
+    geometryBoundsSource: [3230, 1265, 6008, 2600],
+    defaultCameraPreset: 'exporural',
+    mapUnitsPerMeter: EXPORURAL_MAP_UNITS_PER_METER,
+    sourceManifest: EXPORURAL_SOURCE_MANIFEST,
+  },
+});
+
 // Official quadra envelopes. These are hierarchy/label boundaries, not lots.
 ([
-  ['S', [3985, 1270, 5940, 1725]],
-  ['R', [3230, 1760, 5960, 2575]],
+  ['S', [3985, 1270, 6010, 1730]],
+  ['R', [3230, 1760, 6010, 2620]],
   ['V', [1650, 2468, 2220, 2578]],
   ['Q', [2243, 2472, 2785, 2578]],
   ['N', [2830, 2470, 3440, 2578]],
@@ -191,33 +252,30 @@ function addTwoRowGrid(block: string, bounds: PdfBounds, top: number[], bottom: 
   code === 'G' ? { unresolvedPrintedLots: ['03', '04'], sourceNote: 'B40 cobre a coluna regular; os números 03/04 não estão impressos no mapa oficial.' } : undefined,
 ));
 
-// Quadra S — 01–36, preserving the two separated east/west bands.
-addRow('S', [36, 35, 34, 33, 32, 31, 30, 29, 28, 27, 26], [4026, 1277, 5185, 1479]);
-addRow('S', [25, 24, 23, 22, 21, 20, 19], [5227, 1277, 5930, 1479]);
-addRow('S', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], [4038, 1519, 5185, 1722]);
-addRow('S', [12, 13, 14, 15, 16], [5227, 1519, 5734, 1722]);
-addLot('S', 17, rectPdf([5734, 1519, 5840, 1722], LOT_INSET), { infrastructureOverlay: 'B35' });
-addLot('S', 18, rectPdf([5840, 1519, 5920, 1722], LOT_INSET));
-
-// Quadra R — 01–59 distributed around four streets and event overlays.
-addRow('R', [15, 16, 17, 18, 19], [3287, 1763, 3651, 2033]);
-addRow('R', [5, 6, 7, 8], [3652, 1763, 3939, 2033]);
-addRow('R', [9, 10, 11, 12], [3994, 1763, 4335, 2033]);
-addRow('R', [31, 32, 33, 34, 35, 36, 37, 38, 39, 40], [4335, 1763, 5185, 2033]);
-addRow('R', [48, 49, 50, 51, 52], [5227, 1763, 5649, 2033]);
-addRow('R', [53, 54, 55], [5650, 1950, 5950, 2033]);
-addLot('R', 13, rectPdf([3246, 2078, 3630, 2170], LOT_INSET));
-addLot('R', 14, rectPdf([3540, 2172, 3685, 2420], LOT_INSET));
-addLot('R', 1, rectPdf([3687, 2078, 3940, 2248], LOT_INSET));
-addLot('R', 2, rectPdf([3687, 2248, 3940, 2420], LOT_INSET));
-addLot('R', 3, rectPdf([3994, 2078, 4251, 2260], LOT_INSET));
-addLot('R', 4, rectPdf([3994, 2260, 4251, 2443], LOT_INSET));
-addRow('R', [20, 21, 22, 23], [4252, 2078, 4561, 2443]);
-addRow('R', [24, 25, 26, 27], [4562, 2078, 4868, 2443]);
-addRow('R', [28, 29, 30], [4910, 2078, 5186, 2330]);
-addRow('R', [41, 42, 43], [5228, 2078, 5498, 2330]);
-addRow('R', [44, 45, 46, 47], [5520, 2078, 5925, 2330]);
-addRow('R', [56, 57, 58, 59], [5382, 2369, 5816, 2570]);
+// Quadras R/S — explicit, calibrated polygons from the Exporural cadastral
+// references. Regular parcels retain measured proportions; endpoint, island
+// and perimeter parcels carry their own rounded/trapezoidal/fan vertices.
+EXPORURAL_LOT_REFERENCES.forEach((reference) => addLot(
+  reference.block,
+  reference.lotNumber,
+  reference.sourcePolygon,
+  {
+    areaCode: EXPORURAL_AREA_CODE,
+    entityType: 'EXPORURAL_COMMERCIAL_LOT',
+    officialAreaSqm: reference.officialAreaSqm,
+    calculatedAreaSqm: sourcePolygonAreaSqm(reference.sourcePolygon),
+    mapUnitsPerMeter: EXPORURAL_MAP_UNITS_PER_METER,
+    geometryKind: reference.geometryKind,
+    geometryRevision: EXPORURAL_GEOMETRY_REVISION,
+    sourceReference: reference.sourceAnnex,
+    reviewerNote: reference.reviewerNote,
+    labelSourcePoint: reference.labelSourcePoint,
+    cartographicAreaOnly: false,
+    officialMeasurements: true,
+    areaValidationStatus: 'VALIDATED',
+    infrastructureOverlay: reference.block === 'S' && reference.lotNumber === '17' ? 'B35' : undefined,
+  },
+));
 
 // Compact commercial quadras in the park core.
 addLot('V', 6, rectPdf([1650, 2468, 1750, 2578], LOT_INSET));
@@ -272,13 +330,13 @@ Object.entries(expectedLotCounts).forEach(([block, expected]) => {
 
 // Internal streets and public circulation — each corridor remains a real separator.
 const roadInputs: Array<[string, string, PdfPolygon, MapClassification?]> = [
-  ['RUA-BRUNO-SCHWARTZ', 'Rua Bruno Schwartz', rectPdf([3985, 1480, 5940, 1518])],
-  ['RUA-JOHAN-MULLER', 'Rua Johan Muller', rectPdf([3985, 1723, 5940, 1762])],
-  ['RUA-GUSTAVO-BESSEL', 'Rua Gustavo Bessel', rectPdf([3985, 2034, 5940, 2076])],
-  ['RUA-EMANUEL-BRACHMANN', 'Rua Emanuel Brachmann', rectPdf([4980, 2331, 5940, 2370])],
-  ['RUA-PASTOR-ALBERT-LEHENBAUER', 'Rua Pastor Albert Lehenbauer', rectPdf([3941, 1758, 3984, 2445])],
-  ['RUA-15-NOVEMBRO', 'Rua 15 de Novembro', rectPdf([5186, 1758, 5227, 2370])],
-  ['RUA-UBIRETAMA', 'Rua Ubiretama', rectPdf([5940, 1265, 5984, 2080])],
+  ['RUA-BRUNO-SCHWARTZ', 'Rua Bruno Schwartz', rectPdf([3985, 1484, 5966, 1518])],
+  ['RUA-JOHAN-MULLER', 'Rua Johan Muller', rectPdf([3985, 1726, 5966, 1762])],
+  ['RUA-GUSTAVO-BESSEL', 'Rua Gustavo Bessel', rectPdf([3985, 2041, 5966, 2078])],
+  ['RUA-EMANUEL-BRACHMANN', 'Rua Emanuel Brachmann', rectPdf([4980, 2333, 5966, 2372])],
+  ['RUA-PASTOR-ALBERT-LEHENBAUER', 'Rua Pastor Albert Lehenbauer', rectPdf([3945, 1758, 3984, 2445])],
+  ['RUA-15-NOVEMBRO', 'Rua 15 de Novembro', rectPdf([5188, 1758, 5226, 2372])],
+  ['RUA-UBIRETAMA', 'Rua Ubiretama', rectPdf([5966, 1265, 6008, 2080])],
   ['RUA-BUENOS-AIRES', 'Rua Buenos Aires', rectPdf([1600, 2410, 1648, 3145])],
   ['RUA-PARAGUAI', 'Rua Paraguai', rectPdf([1640, 2444, 3945, 2467])],
   ['RUA-BOLIVIA', 'Rua Bolívia', rectPdf([1640, 2579, 3945, 2624])],
@@ -296,15 +354,29 @@ const roadInputs: Array<[string, string, PdfPolygon, MapClassification?]> = [
   ['RODOVIA-RS-472', 'Rodovia RS 472', [[5935, 1280], [5995, 1290], [6100, 4300], [6035, 4300]]],
 ];
 
-roadInputs.forEach(([publicIdentifier, name, polygon, classification = 'ROAD']) => addEntity({
-  publicIdentifier,
-  name,
-  classification,
-  layer: 'circulation',
-  polygon,
-  height: classification === 'ROAD' ? 0.032 : 0.026,
-  metadata: { labelPriority: 'road', isSeparator: true },
-}));
+const exporuralRoadIdentifiers = new Set<string>(EXPORURAL_ROAD_IDENTIFIERS);
+roadInputs.forEach(([publicIdentifier, name, polygon, classification = 'ROAD']) => {
+  const isExporuralRoad = exporuralRoadIdentifiers.has(publicIdentifier);
+  addEntity({
+    publicIdentifier,
+    name,
+    classification,
+    layer: 'circulation',
+    polygon,
+    height: classification === 'ROAD' ? 0.032 : 0.026,
+    parentPublicIdentifier: isExporuralRoad ? EXPORURAL_AREA_CODE : undefined,
+    verificationStatus: isExporuralRoad ? 'VERIFIED' : undefined,
+    metadata: {
+      labelPriority: 'road',
+      isSeparator: true,
+      ...(isExporuralRoad ? {
+        areaCode: EXPORURAL_AREA_CODE,
+        entityType: 'EXPORURAL_ROAD',
+        geometryRevision: EXPORURAL_GEOMETRY_REVISION,
+      } : {}),
+    },
+  });
+});
 
 function addStructure(
   publicIdentifier: string,
@@ -397,7 +469,17 @@ const bStructures: Array<[string, string, MapClassification, string, PdfBounds |
   ['B33', 'ACISAP', 'BUILDING', 'structures', [2997, 3803], { width: 84, depth: 52 }],
   ['B34', 'Tomelero', 'BUILDING', 'structures', [2821, 3803], { width: 84, depth: 52 }],
   ['B35', 'Simulador AGCO', 'ATTRACTION', 'structures', [5784, 1625], { parent: 'S', width: 96, depth: 120 }],
-  ['B36', 'Palco Semear', 'EVENT_VENUE', 'structures', [5660, 1770, 5920, 2030], { parent: 'R', height: 1.05, metadata: { commercialLotsInsideFootprint: ['R-53', 'R-54', 'R-55'] } }],
+  ['B36', 'Palco Semear', 'EVENT_VENUE', 'structures', [5748, 1846, 5850, 1950], {
+    parent: 'R',
+    height: 1.05,
+    metadata: {
+      entityType: 'EXPORURAL_NON_COMMERCIAL_STAGE',
+      nonCommercial: true,
+      supportOverlayForLots: ['R-53', 'R-54', 'R-55'],
+      replacesLegacyMonolith: 'Espaço Semear',
+      geometryRevision: EXPORURAL_GEOMETRY_REVISION,
+    },
+  }],
   ['B37', 'Comissão Exporural', 'ADMINISTRATION', 'structures', [5380, 1324], { parent: 'S', width: 84, depth: 88 }],
   ['B38', 'Área de Lazer', 'ATTRACTION', 'structures', [5278, 1438], { parent: 'S', width: 88, depth: 82 }],
   ['B39', 'Caminhos da Soja — Emater / Ascar', 'ATTRACTION', 'structures', [1960, 2500, 2148, 2574], { parent: 'V', metadata: { overlaysLotsWithoutRemovingThem: true } }],
@@ -485,7 +567,18 @@ addStructure('ESPACO-ETNIA-RUSSA', 'Espaço destinado à Etnia Russa', 'ATTRACTI
 addStructure('ESPACO-ETNIA-ARABE', 'Espaço destinado à Etnia Árabe', 'ATTRACTION', 'structures', [5080, 4430, 5285, 4740], { height: 0.08 });
 addStructure('ESPACO-ETNIA-PORTUGUESA', 'Espaço destinado à Etnia Portuguesa', 'ATTRACTION', 'structures', [5080, 4780, 5285, 5050], { height: 0.08 });
 
+const exporuralSupportIdentifiers = new Set<string>(EXPORURAL_SUPPORT_IDENTIFIERS);
+
 function toEntity(input: ReferenceEntityInput): MapEntity {
+  const isExporural = input.metadata?.areaCode === EXPORURAL_AREA_CODE
+    || input.publicIdentifier === EXPORURAL_AREA_CODE
+    || exporuralSupportIdentifiers.has(input.publicIdentifier);
+  const isExporuralLot = input.metadata?.entityType === 'EXPORURAL_COMMERCIAL_LOT';
+  const sourceLabelPoint = Array.isArray(input.metadata?.labelSourcePoint)
+    && input.metadata.labelSourcePoint.length === 2
+    && input.metadata.labelSourcePoint.every((value) => typeof value === 'number')
+    ? input.metadata.labelSourcePoint as Coordinate
+    : null;
   return {
     id: entityId(input.publicIdentifier),
     projectId: 'reference:fenasoja-2026',
@@ -495,10 +588,15 @@ function toEntity(input: ReferenceEntityInput): MapEntity {
     name: input.name,
     description: input.description ?? null,
     classification: input.classification,
-    verificationStatus: input.verificationStatus ?? 'NEEDS_REVIEW',
+    verificationStatus: input.verificationStatus ?? (isExporuralLot ? 'VERIFIED' : 'NEEDS_REVIEW'),
     isSellable: input.classification === 'SELLABLE_LOT' || input.classification === 'INTERNAL_STAND',
     isArchived: false,
-    geometry: geometry(input.polygon, input.height),
+    geometry: geometry(
+      input.polygon,
+      input.height,
+      isExporural ? EXPORURAL_GEOMETRY_VERSION : 1,
+      isExporural ? EXPORURAL_GEOMETRY_VERSION : null,
+    ),
     metadata: {
       seedManaged: true,
       sourceRevision: OFFICIAL_REFERENCE_REVISION,
@@ -508,6 +606,11 @@ function toEntity(input: ReferenceEntityInput): MapEntity {
       sourcePdfPolygon: input.polygon,
       parentPublicIdentifier: input.parentPublicIdentifier ?? null,
       buyerDataImported: false,
+      ...(isExporural ? {
+        areaCode: EXPORURAL_AREA_CODE,
+        geometryRevision: EXPORURAL_GEOMETRY_REVISION,
+        ...(sourceLabelPoint ? { labelAnchor: pdfToLocal(sourceLabelPoint) } : {}),
+      } : {}),
       ...input.metadata,
     },
   };
@@ -520,6 +623,11 @@ const officialLotEntities = OFFICIAL_REFERENCE_ENTITIES.filter((entity) => entit
 export const OFFICIAL_REFERENCE_LOTS: CommercialLot[] = officialLotEntities.map((entity) => {
   const block = String(entity.metadata.block);
   const number = String(entity.metadata.lotNumber);
+  const exporuralReference = getExporuralReference(block, number);
+  const officialAreaSqm = exporuralReference?.officialAreaSqm ?? null;
+  const calculatedAreaSqm = exporuralReference
+    ? sourcePolygonAreaSqm(exporuralReference.sourcePolygon)
+    : null;
   return {
     id: `reference:2026:lot:${slug(`${block}-${number}`)}`,
     entityId: entity.id,
@@ -530,9 +638,9 @@ export const OFFICIAL_REFERENCE_LOTS: CommercialLot[] = officialLotEntities.map(
     displayName: `Lote ${number}`,
     description: `Unidade numerada da Quadra ${block} conforme a planta oficial Fenasoja 2026.`,
     status: 'BLOCKED',
-    officialAreaSqm: null,
-    calculatedAreaSqm: null,
-    areaValidationStatus: 'UNVALIDATED',
+    officialAreaSqm,
+    calculatedAreaSqm,
+    areaValidationStatus: exporuralReference ? 'VALIDATED' : 'UNVALIDATED',
     frontageMeters: null,
     depthMeters: null,
     pricingMode: 'NOT_FOR_SALE',
@@ -564,7 +672,7 @@ export const OFFICIAL_REFERENCE_LOTS: CommercialLot[] = officialLotEntities.map(
 
 export const OFFICIAL_REFERENCE_DATA: CommercialMapData = {
   source: 'official-reference',
-  sourceMessage: 'Planta oficial 2026 digitalizada sem importar a lista de compradores. Os 262 lotes numerados permanecem bloqueados até validação de área, preço e disponibilidade comercial.',
+  sourceMessage: 'Planta oficial 2026 digitalizada sem importar a lista de compradores. Os 95 lotes da Exporural possuem áreas cadastrais validadas; todos os 262 lotes permanecem bloqueados até liberação comercial.',
   project: {
     id: 'reference:fenasoja-2026',
     orgId: null,
@@ -573,7 +681,7 @@ export const OFFICIAL_REFERENCE_DATA: CommercialMapData = {
     coordinateSystem: 'LOCAL_NORMALIZED',
     referenceWidth: MAP_REFERENCE_WIDTH,
     referenceHeight: MAP_REFERENCE_HEIGHT,
-    activeVersion: 3,
+    activeVersion: 4,
     isPublished: false,
     referenceRevision: OFFICIAL_REFERENCE_REVISION,
   },
@@ -594,7 +702,7 @@ export const OFFICIAL_REFERENCE_DATA: CommercialMapData = {
     knownDistanceMeters: null,
     mapUnitsPerMeter: null,
     status: 'UNVALIDATED',
-    version: 3,
+    version: 4,
   },
   layers: DEFAULT_REFERENCE_LAYERS,
   entities: OFFICIAL_REFERENCE_ENTITIES,

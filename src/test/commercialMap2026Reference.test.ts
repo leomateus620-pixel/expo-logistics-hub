@@ -6,6 +6,7 @@ import {
   OFFICIAL_REFERENCE_REVISION,
 } from '@/features/commercial-map/data/officialReference2026';
 import type { MapEntity } from '@/features/commercial-map/types';
+import { polygonInteriorsOverlap } from '@/features/commercial-map/utils/geometry';
 import { normalizeMapEntityMetadata } from '@/features/commercial-map/utils/mapMetadata';
 
 const expectedLots: Record<string, number[]> = {
@@ -36,7 +37,7 @@ function bounds(entity: MapEntity) {
 
 describe('referência cartográfica oficial Fenasoja 2026', () => {
   it('mantém manifesto reproduzível e exclui a lista lateral de compradores', () => {
-    expect(OFFICIAL_REFERENCE_REVISION).toBe('2026.2');
+    expect(OFFICIAL_REFERENCE_REVISION).toBe('2026.3');
     expect(OFFICIAL_2026_SOURCE_MANIFEST.parkCropPdf.x + OFFICIAL_2026_SOURCE_MANIFEST.parkCropPdf.width)
       .toBeLessThan(OFFICIAL_2026_SOURCE_MANIFEST.buyerListExcludedFromX);
     expect(OFFICIAL_REFERENCE_DATA.project.referenceRevision).toBe(OFFICIAL_REFERENCE_REVISION);
@@ -84,12 +85,11 @@ describe('referência cartográfica oficial Fenasoja 2026', () => {
     });
 
     for (let first = 0; first < lotEntities.length; first += 1) {
-      const a = bounds(lotEntities[first]);
       for (let second = first + 1; second < lotEntities.length; second += 1) {
-        const b = bounds(lotEntities[second]);
-        const overlapWidth = Math.min(a.maxX, b.maxX) - Math.max(a.minX, b.minX);
-        const overlapHeight = Math.min(a.maxY, b.maxY) - Math.max(a.minY, b.minY);
-        expect(overlapWidth > 0.000001 && overlapHeight > 0.000001).toBe(false);
+        expect(
+          polygonInteriorsOverlap(lotEntities[first].geometry, lotEntities[second].geometry),
+          `${lotEntities[first].publicIdentifier} ${JSON.stringify(bounds(lotEntities[first]))} × ${lotEntities[second].publicIdentifier} ${JSON.stringify(bounds(lotEntities[second]))}`,
+        ).toBe(false);
       }
     }
   });

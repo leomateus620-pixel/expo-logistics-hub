@@ -55,7 +55,7 @@ describe('fonte de verdade arquitetônica do Espaço Mirante', () => {
         geometryVersion: 1,
       },
       metadata: {
-        sourceRevision: '2026.2',
+        sourceRevision: '2026.3',
         cartographicConfidence: 'official_visual_reference',
         officialMeasurements: false,
       },

@@ -161,6 +161,10 @@ export const CAMERA_PRESETS = {
   pavilions: { label: 'Pavilhões', position: [-22, 42, 58] as const, target: [-14, 0, 24] as const },
   parking: { label: 'Estacionamentos', position: [47, 58, 35] as const, target: [37, 0, 24] as const },
   gates: { label: 'Portões', position: [3, 100, 105] as const, target: [0, 0, 3] as const },
+  exporural: { label: 'Visão geral da Exporural', position: [58, 42, 16] as const, target: [27.5, 0, -22.6] as const },
+  'quadra-r': { label: 'Quadra R', position: [48, 27, 4] as const, target: [28, 0, -17.2] as const },
+  'quadra-s': { label: 'Quadra S', position: [49, 26, -8] as const, target: [34, 0, -32.1] as const },
+  semear: { label: 'Área Semear', position: [62, 18, -7] as const, target: [53.1, 0, -22.4] as const },
 };
 
 export const MAP_CAPABILITIES = [

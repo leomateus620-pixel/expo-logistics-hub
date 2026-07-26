@@ -63,6 +63,15 @@ function stringArrayMetadata(entity: MapEntity, key: string): string[] {
     : [];
 }
 
+function coordinateMetadata(entity: MapEntity, key: string): Coordinate | null {
+  const value = entity.metadata[key];
+  return Array.isArray(value)
+    && value.length === 2
+    && value.every((coordinate) => typeof coordinate === 'number' && Number.isFinite(coordinate))
+    ? [value[0], value[1]]
+    : null;
+}
+
 function structureCode(entity: MapEntity): string | null {
   const legendCode = stringMetadata(entity, 'legendCode');
   if (legendCode) return legendCode;
@@ -114,7 +123,7 @@ export function normalizeMapEntityMetadata(entity: MapEntity, lot?: CommercialLo
     ...stringArrayMetadata(entity, 'searchKeywords'),
     ...stringArrayMetadata(entity, 'keywords'),
   ]);
-  const labelAnchor = geometryCentroid(entity.geometry);
+  const labelAnchor = coordinateMetadata(entity, 'labelAnchor') ?? geometryCentroid(entity.geometry);
   const preferredLabelVisibility = preferredVisibility(entity);
   const searchKeywords = unique([
     officialDisplayName,
