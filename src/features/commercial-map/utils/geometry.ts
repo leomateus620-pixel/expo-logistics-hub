@@ -71,6 +71,72 @@ export function segmentsIntersect(a: Coordinate, b: Coordinate, c: Coordinate, d
   return false;
 }
 
+function properSegmentsIntersect(a: Coordinate, b: Coordinate, c: Coordinate, d: Coordinate): boolean {
+  const cross = (origin: Coordinate, first: Coordinate, second: Coordinate) => (
+    (first[0] - origin[0]) * (second[1] - origin[1])
+    - (first[1] - origin[1]) * (second[0] - origin[0])
+  );
+  const abC = cross(a, b, c);
+  const abD = cross(a, b, d);
+  const cdA = cross(c, d, a);
+  const cdB = cross(c, d, b);
+  return ((abC > EPSILON && abD < -EPSILON) || (abC < -EPSILON && abD > EPSILON))
+    && ((cdA > EPSILON && cdB < -EPSILON) || (cdA < -EPSILON && cdB > EPSILON));
+}
+
+function pointOnRingBoundary(point: Coordinate, ring: Coordinate[]) {
+  const points = withoutClosingPoint(ring);
+  return points.some((start, index) => {
+    const end = points[(index + 1) % points.length];
+    const cross = (end[0] - start[0]) * (point[1] - start[1])
+      - (end[1] - start[1]) * (point[0] - start[0]);
+    if (Math.abs(cross) > EPSILON) return false;
+    return point[0] >= Math.min(start[0], end[0]) - EPSILON
+      && point[0] <= Math.max(start[0], end[0]) + EPSILON
+      && point[1] >= Math.min(start[1], end[1]) - EPSILON
+      && point[1] <= Math.max(start[1], end[1]) + EPSILON;
+  });
+}
+
+function pointInsideRingStrict(point: Coordinate, ring: Coordinate[]) {
+  if (pointOnRingBoundary(point, ring)) return false;
+  const points = withoutClosingPoint(ring);
+  let inside = false;
+  points.forEach((start, index) => {
+    const end = points[(index + 1) % points.length];
+    const crosses = (start[1] > point[1]) !== (end[1] > point[1])
+      && point[0] < ((end[0] - start[0]) * (point[1] - start[1])) / (end[1] - start[1]) + start[0];
+    if (crosses) inside = !inside;
+  });
+  return inside;
+}
+
+/**
+ * Returns true only when two simple polygon interiors overlap. Shared lot
+ * boundaries and corner touches are intentionally accepted.
+ */
+export function polygonInteriorsOverlap(
+  first: Pick<PolygonGeometry, 'coordinates'>,
+  second: Pick<PolygonGeometry, 'coordinates'>,
+) {
+  const firstRing = withoutClosingPoint(first.coordinates[0] ?? []);
+  const secondRing = withoutClosingPoint(second.coordinates[0] ?? []);
+  if (firstRing.length < 3 || secondRing.length < 3) return false;
+
+  for (let firstIndex = 0; firstIndex < firstRing.length; firstIndex += 1) {
+    const firstStart = firstRing[firstIndex];
+    const firstEnd = firstRing[(firstIndex + 1) % firstRing.length];
+    for (let secondIndex = 0; secondIndex < secondRing.length; secondIndex += 1) {
+      const secondStart = secondRing[secondIndex];
+      const secondEnd = secondRing[(secondIndex + 1) % secondRing.length];
+      if (properSegmentsIntersect(firstStart, firstEnd, secondStart, secondEnd)) return true;
+    }
+  }
+
+  return firstRing.some((point) => pointInsideRingStrict(point, secondRing))
+    || secondRing.some((point) => pointInsideRingStrict(point, firstRing));
+}
+
 export function isSelfIntersecting(ring: Coordinate[]): boolean {
   const points = withoutClosingPoint(ring);
   if (points.length < 4) return false;

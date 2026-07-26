@@ -39,6 +39,7 @@ import { HeadquartersInteriorScene } from './HeadquartersInteriorScene';
 import { LivestockPavilionInteriorScene } from './LivestockPavilionInteriorScene';
 import { RoadInfrastructure } from './RoadInfrastructure';
 import { StrategicLandmarkMesh } from './StrategicLandmarks';
+import { TechnicalValidationOverlay } from './TechnicalValidationOverlay';
 
 const MiranteInteriorScene = lazy(async () => {
   const module = await import('./MiranteInteriorScene');
@@ -51,6 +52,8 @@ interface CommercialMapCanvasProps {
   calibration: MapCalibration | null;
   matchingEntityIds: ReadonlySet<string>;
   filtersActive: boolean;
+  isolatedArea?: 'exporural' | null;
+  technicalValidationAllowed?: boolean;
 }
 
 interface SceneExtent {
@@ -69,6 +72,7 @@ interface SceneExtent {
 const NO_RAYCAST = () => undefined;
 const LABEL_LEVEL_RANK: Record<MapLabelVisibility, number> = { far: 0, medium: 1, near: 2 };
 const MAP_BACKGROUND_COLOR = new THREE.Color('#dfe8de');
+const AREA_NUMBER = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 function createGateArrowGeometry() {
   const shape = new THREE.Shape();
@@ -137,10 +141,10 @@ function entityLabelHeight(entity: MapEntity) {
 }
 
 function getSceneExtent(entities: MapEntity[]): SceneExtent {
-  let minX = -MAP_REFERENCE_WIDTH / 2;
-  let maxX = MAP_REFERENCE_WIDTH / 2;
-  let minZ = -MAP_REFERENCE_HEIGHT / 2;
-  let maxZ = MAP_REFERENCE_HEIGHT / 2;
+  let minX = entities.length > 0 ? Number.POSITIVE_INFINITY : -MAP_REFERENCE_WIDTH / 2;
+  let maxX = entities.length > 0 ? Number.NEGATIVE_INFINITY : MAP_REFERENCE_WIDTH / 2;
+  let minZ = entities.length > 0 ? Number.POSITIVE_INFINITY : -MAP_REFERENCE_HEIGHT / 2;
+  let maxZ = entities.length > 0 ? Number.NEGATIVE_INFINITY : MAP_REFERENCE_HEIGHT / 2;
   let maxHeight = 1;
 
   entities.forEach((entity) => {
@@ -161,6 +165,12 @@ function getSceneExtent(entities: MapEntity[]): SceneExtent {
     );
   });
 
+  if (![minX, maxX, minZ, maxZ].every(Number.isFinite)) {
+    minX = -MAP_REFERENCE_WIDTH / 2;
+    maxX = MAP_REFERENCE_WIDTH / 2;
+    minZ = -MAP_REFERENCE_HEIGHT / 2;
+    maxZ = MAP_REFERENCE_HEIGHT / 2;
+  }
   const width = Math.max(4, maxX - minX);
   const depth = Math.max(4, maxZ - minZ);
   return {
@@ -414,7 +424,7 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
 }: EntityMeshProps) {
   const classification = entity.classification;
   const isRoad = classification === 'ROAD';
-  const isQuadra = classification === 'QUADRA';
+  const isQuadra = classification === 'QUADRA' || entity.metadata.renderMode === 'outline';
   const isPavilion = classification === 'PAVILION';
   const isGate = classification === 'GATE';
   const isRestroom = classification === 'RESTROOM' || classification === 'CHEMICAL_RESTROOM';
@@ -901,7 +911,7 @@ const EntityLabel = memo(function EntityLabel({
   const metadata = useMemo(() => normalizeMapEntityMetadata(entity, lot), [entity, lot]);
   const classification = entity.classification;
   const isRoad = classification === 'ROAD' || classification === 'PEDESTRIAN_PATH';
-  const isQuadra = classification === 'QUADRA';
+  const isQuadra = classification === 'QUADRA' || entity.metadata.renderMode === 'outline';
   const isGate = classification === 'GATE';
   const isRestroom = classification === 'RESTROOM' || classification === 'CHEMICAL_RESTROOM';
   const isArchitecturalLandmark = Boolean(resolveStrategicLandmarkKind(entity));
@@ -921,6 +931,9 @@ const EntityLabel = memo(function EntityLabel({
         <div data-map-entity-id={entity.id} data-map-label-mode={selected ? 'focus' : 'navigation'} className={`commercial-map-label is-lot ${selected ? 'is-selected' : ''} ${dimmed ? 'is-dimmed' : ''}`}>
           <span aria-label={`Lote ${metadata.lotNumber ?? ''}`}>{metadata.lotNumber}</span>
           {(selected || hovered) && metadata.block && <strong>{quadraLabel(metadata.block)}</strong>}
+          {(selected || hovered) && lot.officialAreaSqm && (
+            <small className="commercial-map-label-area">{AREA_NUMBER.format(lot.officialAreaSqm)} m²</small>
+          )}
           {(selected || hovered) && status && <small><b aria-hidden="true">{status.symbol}</b> {status.label}</small>}
         </div>
       ) : isRoad ? (
@@ -1059,7 +1072,15 @@ function useSemanticLabelVisibility({
   return focusedVisibility ?? visibility;
 }
 
-function CameraRig({ selectedEntity, extent }: { selectedEntity: MapEntity | null; extent: SceneExtent }) {
+function CameraRig({
+  selectedEntity,
+  extent,
+  isolatedArea,
+}: {
+  selectedEntity: MapEntity | null;
+  extent: SceneExtent;
+  isolatedArea?: 'exporural' | null;
+}) {
   const controlsRef = useRef<OrbitControlsImpl>(null);
   const { camera, size, invalidate, gl } = useThree();
   const preset = useCommercialMapStore((state) => state.cameraPreset);
@@ -1110,7 +1131,10 @@ function CameraRig({ selectedEntity, extent }: { selectedEntity: MapEntity | nul
     const perspective = camera as THREE.PerspectiveCamera;
     const aspect = size.width / Math.max(size.height, 1);
     const config = CAMERA_PRESETS[nextPreset];
-    const useFullExtent = nextPreset === 'overview' || nextPreset === 'top' || nextPreset === 'isometric';
+    const useFullExtent = nextPreset === 'overview'
+      || nextPreset === 'top'
+      || nextPreset === 'isometric'
+      || nextPreset === 'exporural';
     const lookAt = useFullExtent
       ? new THREE.Vector3(extent.centerX, Math.min(extent.maxHeight * 0.12, 1.2), extent.centerZ)
       : new THREE.Vector3(...config.target);
@@ -1123,13 +1147,21 @@ function CameraRig({ selectedEntity, extent }: { selectedEntity: MapEntity | nul
           ? new THREE.Vector3(0.64, 0.58, 0.64)
           : configuredDirection;
     direction.normalize();
-    const distance = fitDistanceForDirection(
+    const fullDistance = fitDistanceForDirection(
       extent,
       perspective.fov || 38,
       aspect,
       direction,
-      nextPreset === 'top' ? 1.08 : nextPreset === 'isometric' ? 0.92 : 1.1,
+      nextPreset === 'top' ? 1.08 : nextPreset === 'isometric' ? 0.92 : nextPreset === 'exporural' ? 1.02 : 1.1,
     );
+    const focusScale = nextPreset === 'quadra-r'
+      ? 0.62
+      : nextPreset === 'quadra-s'
+        ? 0.48
+        : nextPreset === 'semear'
+          ? 0.28
+          : 1;
+    const distance = Math.max(11, fullDistance * focusScale);
     targetLookAt.current.copy(lookAt);
     targetPosition.current.copy(lookAt).add(direction.multiplyScalar(distance));
     perspective.fov = 38;
@@ -1272,7 +1304,9 @@ function CameraRig({ selectedEntity, extent }: { selectedEntity: MapEntity | nul
   const clampTarget = useCallback(() => {
     const controls = controlsRef.current;
     if (!controls) return;
-    const margin = Math.max(3, extent.diagonal * 0.08);
+    const margin = isolatedArea === 'exporural'
+      ? Math.max(1.6, extent.diagonal * 0.035)
+      : Math.max(3, extent.diagonal * 0.08);
     const targetMinimumY = selectedEntity
       && resolveStrategicLandmarkKind(selectedEntity) === 'mirante-pavilion'
       ? -extent.maxHeight * 1.2
@@ -1284,7 +1318,7 @@ function CameraRig({ selectedEntity, extent }: { selectedEntity: MapEntity | nul
       extent.maxHeight * 2 + 4,
     );
     controls.target.z = THREE.MathUtils.clamp(controls.target.z, extent.minZ - margin, extent.maxZ + margin);
-  }, [extent, selectedEntity]);
+  }, [extent, isolatedArea, selectedEntity]);
 
   const handleControlsStart = useCallback(() => {
     const controls = controlsRef.current;
@@ -1359,10 +1393,14 @@ function CameraRig({ selectedEntity, extent }: { selectedEntity: MapEntity | nul
   const miranteExtent = miranteSelected && selectedEntity ? getEntityExtent(selectedEntity) : null;
   const miranteMinimumDistance = miranteExtent
     ? Math.max(7.5, miranteExtent.diagonal * 0.8)
-    : Math.max(8, extent.diagonal * 0.055);
+    : isolatedArea === 'exporural'
+      ? Math.max(6.5, extent.diagonal * 0.12)
+      : Math.max(8, extent.diagonal * 0.055);
   const miranteMaximumDistance = miranteExtent
     ? Math.max(30, miranteExtent.diagonal * 4)
-    : Math.max(260, extent.diagonal * 4.5);
+    : isolatedArea === 'exporural'
+      ? Math.max(96, extent.diagonal * 2.15)
+      : Math.max(260, extent.diagonal * 4.5);
 
   return (
     <OrbitControls
@@ -1387,7 +1425,15 @@ function CameraRig({ selectedEntity, extent }: { selectedEntity: MapEntity | nul
   );
 }
 
-function Scene({ entities, lots, calibration, matchingEntityIds, filtersActive }: CommercialMapCanvasProps) {
+function Scene({
+  entities,
+  lots,
+  calibration,
+  matchingEntityIds,
+  filtersActive,
+  isolatedArea,
+  technicalValidationAllowed = false,
+}: CommercialMapCanvasProps) {
   const selectedEntityId = useCommercialMapStore((state) => state.selectedEntityId);
   const interiorEntityId = useCommercialMapStore((state) => state.interiorEntityId);
   const hoveredEntityId = useCommercialMapStore((state) => state.hoveredEntityId);
@@ -1400,6 +1446,7 @@ function Scene({ entities, lots, calibration, matchingEntityIds, filtersActive }
   const layerOpacity = useCommercialMapStore((state) => state.layerOpacity);
   const reducedGraphics = useCommercialMapStore((state) => state.reducedGraphics);
   const cameraNavigating = useCommercialMapStore((state) => state.cameraNavigating);
+  const technicalValidationVisible = useCommercialMapStore((state) => state.technicalValidationVisible);
   const { gl, invalidate } = useThree();
   const setCanvasCursor = useCallback((cursor: 'grab' | 'grabbing' | 'pointer') => {
     gl.domElement.style.cursor = cursor;
@@ -1501,7 +1548,7 @@ function Scene({ entities, lots, calibration, matchingEntityIds, filtersActive }
         <planeGeometry args={[extent.width + groundMargin, extent.depth + groundMargin]} />
         <meshStandardMaterial color="#cfdccc" roughness={1} metalness={0} />
       </mesh>
-      <ReferenceUnderlay calibration={calibration} />
+      {!isolatedArea && <ReferenceUnderlay calibration={calibration} />}
       <RoadInfrastructure
         entities={circulationEntities}
         selectedEntityId={selectedEntityId}
@@ -1553,7 +1600,16 @@ function Scene({ entities, lots, calibration, matchingEntityIds, filtersActive }
           level={labelVisibility.level}
         />
       ))}
-      <CameraRig selectedEntity={selectedEntity} extent={extent} />
+      {technicalValidationAllowed
+        && isolatedArea === 'exporural'
+        && technicalValidationVisible
+        && (
+          <TechnicalValidationOverlay
+            entities={renderedEntities}
+            lots={lots}
+          />
+        )}
+      <CameraRig selectedEntity={selectedEntity} extent={extent} isolatedArea={isolatedArea} />
       <AdaptiveDpr pixelated={reducedGraphics} />
       <Preload all />
     </>
@@ -1573,7 +1629,15 @@ function CanvasLoader() {
 }
 
 export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: CommercialMapCanvasProps) {
-  const { entities, lots, calibration, matchingEntityIds, filtersActive } = props;
+  const {
+    entities,
+    lots,
+    calibration,
+    matchingEntityIds,
+    filtersActive,
+    isolatedArea,
+    technicalValidationAllowed,
+  } = props;
   const setSelectedEntityId = useCommercialMapStore((state) => state.setSelectedEntityId);
   const interiorEntityId = useCommercialMapStore((state) => state.interiorEntityId);
   const reducedGraphics = useCommercialMapStore((state) => state.reducedGraphics);
@@ -1622,6 +1686,8 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
           calibration={calibration}
           matchingEntityIds={matchingEntityIds}
           filtersActive={filtersActive}
+          isolatedArea={isolatedArea}
+          technicalValidationAllowed={technicalValidationAllowed}
         />
       </Suspense>
     </Canvas>

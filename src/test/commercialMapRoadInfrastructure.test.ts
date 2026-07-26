@@ -58,7 +58,7 @@ describe('infraestrutura viária do Mapa Comercial', () => {
     expect(ROAD_SURFACE_PROFILE.asphaltBumpScale).toBeLessThanOrEqual(0.008);
   });
 
-  it('fecha somente as quatro microfrestas validadas entre corredores oficiais', () => {
+  it('fecha somente as três microfrestas validadas entre corredores oficiais', () => {
     const byId = new Map(roads.map((entity) => [entity.id, entity.name]));
     const microGaps = findRoadConnections(roads)
       .filter((connection) => connection.kind === 'micro-gap')
@@ -66,7 +66,6 @@ describe('infraestrutura viária do Mapa Comercial', () => {
       .sort();
 
     expect(microGaps).toEqual([
-      'Rodovia RS 472 + Rua Bruno Schwartz',
       'Rua Argentina + Rua Montevidéu',
       'Rua Gustavo Bessel + Rua Pastor Albert Lehenbauer',
       'Rua Johan Muller + Rua Pastor Albert Lehenbauer',
@@ -94,7 +93,7 @@ describe('infraestrutura viária do Mapa Comercial', () => {
       expect(detailed.diagnostics).toMatchObject({
         roadCount: 21,
         pedestrianPathCount: 1,
-        microGapCount: 4,
+        microGapCount: 3,
       });
       expect(detailed.diagnostics.estimatedBaseDrawCalls)
         .toBeLessThanOrEqual(ROAD_INFRASTRUCTURE.maximumBaseDrawCalls);

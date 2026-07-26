@@ -75,6 +75,9 @@ describe('explorador compartilhado de entidades do mapa comercial', () => {
   it('filtra cada situação comercial e combina texto, tipo, local e verificação', () => {
     const statuses: CommercialStatus[] = ['AVAILABLE', 'RESERVED', 'IN_NEGOTIATION', 'SOLD', 'BLOCKED', 'UNAVAILABLE'];
     const statusByLotId = new Map(OFFICIAL_REFERENCE_DATA.lots.slice(0, statuses.length).map((lot, index) => [lot.id, statuses[index]]));
+    const quadraSLots = OFFICIAL_REFERENCE_DATA.lots.filter((lot) => lot.block === 'S');
+    statusByLotId.set(quadraSLots[0].id, 'AVAILABLE');
+    statusByLotId.set(quadraSLots[1].id, 'RESERVED');
     const variedLots = OFFICIAL_REFERENCE_DATA.lots.map((lot) => ({ ...lot, status: statusByLotId.get(lot.id) ?? lot.status }));
     const variedIndex = buildEntityExplorerIndex(OFFICIAL_REFERENCE_DATA.entities, variedLots);
 
@@ -89,7 +92,7 @@ describe('explorador compartilhado de entidades do mapa comercial', () => {
       statusFilters: ['AVAILABLE', 'RESERVED'],
       classificationFilters: ['SELLABLE_LOT'],
       locationFilter: 'block:S',
-      verificationFilters: ['NEEDS_REVIEW'],
+      verificationFilters: ['VERIFIED'],
     }, variedIndex);
     expect(combined).toHaveLength(2);
     expect(combined.every((item) => item.metadata.block === 'S' && item.entity.classification === 'SELLABLE_LOT')).toBe(true);

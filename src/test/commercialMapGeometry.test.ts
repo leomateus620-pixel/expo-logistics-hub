@@ -97,11 +97,16 @@ describe('regras comerciais e segurança', () => {
   });
 
   it('importa somente os lotes numerados pela planta e os mantém comercialmente bloqueados', () => {
+    const exporuralLots = OFFICIAL_REFERENCE_DATA.entities.filter(
+      (entity) => entity.metadata.entityType === 'EXPORURAL_COMMERCIAL_LOT',
+    );
+
     expect(OFFICIAL_REFERENCE_DATA.lots).toHaveLength(262);
     expect(OFFICIAL_REFERENCE_DATA.lots.every((lot) => lot.status === 'BLOCKED')).toBe(true);
     expect(OFFICIAL_REFERENCE_DATA.lots.every((lot) => lot.pricingMode === 'NOT_FOR_SALE')).toBe(true);
     expect(OFFICIAL_REFERENCE_DATA.lots.every((lot) => lot.currentBuyer === null)).toBe(true);
-    expect(OFFICIAL_REFERENCE_DATA.entities.every((entity) => entity.verificationStatus === 'NEEDS_REVIEW')).toBe(true);
+    expect(exporuralLots).toHaveLength(95);
+    expect(exporuralLots.every((entity) => entity.verificationStatus === 'VERIFIED')).toBe(true);
     expect(OFFICIAL_REFERENCE_DATA.entities.filter((entity) => !validateGeometry(entity.geometry).valid)).toEqual([]);
   });
 });
