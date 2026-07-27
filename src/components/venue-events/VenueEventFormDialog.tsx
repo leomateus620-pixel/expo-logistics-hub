@@ -57,6 +57,7 @@ import {
   venueEventDraftSchema,
   type AvailabilityConflict,
   type VenueEventDraft,
+  type VenueResourceType,
   type VenueWorkspaceData,
 } from "@/lib/venue-operations";
 
