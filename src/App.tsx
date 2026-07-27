@@ -2,7 +2,7 @@ import { lazy, Suspense, type ReactNode } from 'react';
 import { Toaster } from '@/components/ui/toaster';
 import { Toaster as Sonner } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { QueryClient } from '@tanstack/react-query';
+import { QueryClient, defaultShouldDehydrateQuery } from '@tanstack/react-query';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister';
 import { BrowserRouter, Navigate, Route, Routes, useParams } from 'react-router-dom';
@@ -22,6 +22,12 @@ import {
   CronogramaRouteBoundary,
   CronogramaRouteLoading,
 } from './components/cronograma-eventos/CronogramaRouteState';
+import { VenueModuleShell } from './components/venue-events/VenueModuleShell';
+import {
+  VenuePermissionDenied,
+  VenueRouteBoundary,
+  VenueRouteLoading,
+} from './components/venue-events/VenueRouteState';
 import LoginPage from './pages/LoginPage';
 import {
   getCommissionModule,
@@ -45,6 +51,7 @@ const ExpensesPage = lazy(() => import('./pages/ExpensesPage'));
 const MobilityAuthPage = lazy(() => import('./pages/MobilityAuthPage'));
 const FenasojaEventsPage = lazy(() => import('./pages/FenasojaEventsPage'));
 const CronogramaEventosPage = lazy(() => import('./pages/CronogramaEventosPage'));
+const VenueEventsPage = lazy(() => import('./pages/VenueEventsPage'));
 const GoogleCalendarCallbackPage = lazy(() => import('./pages/GoogleCalendarCallbackPage'));
 const FenasojaCountdownExperiencePage = lazy(
   () => import('./pages/FenasojaCountdownExperiencePage'),
@@ -297,6 +304,24 @@ function CronogramaCountdownExperienceRoute() {
   );
 }
 
+function VenueEventsModuleRoute() {
+  return (
+    <VenueRouteBoundary>
+      <AuthGuard>
+        <OrgGuard>
+          <CapabilityGuard capability="venue_events_access" fallback={<VenuePermissionDenied />}>
+            <VenueModuleShell>
+              <Suspense fallback={<VenueRouteLoading />}>
+                <VenueEventsPage />
+              </Suspense>
+            </VenueModuleShell>
+          </CapabilityGuard>
+        </OrgGuard>
+      </AuthGuard>
+    </VenueRouteBoundary>
+  );
+}
+
 function LegacyLogisticsRoutes() {
   return (
     <AuthenticatedLogisticsLayout>
@@ -329,7 +354,15 @@ function LegacyLogisticsRoutes() {
 const App = () => (
   <PersistQueryClientProvider
     client={queryClient}
-    persistOptions={{ persister, maxAge: 1000 * 60 * 60 * 24, buster: lastUserId }}
+    persistOptions={{
+      persister,
+      maxAge: 1000 * 60 * 60 * 24,
+      buster: lastUserId,
+      dehydrateOptions: {
+        shouldDehydrateQuery: (query) =>
+          query.meta?.persist !== false && defaultShouldDehydrateQuery(query),
+      },
+    }}
   >
     <AuthProvider>
       <CapabilitiesProvider>
@@ -350,6 +383,7 @@ const App = () => (
                 element={<CronogramaCountdownExperienceRoute />}
               />
               <Route path="/cronograma-eventos" element={<CronogramaModuleRoute />} />
+              <Route path="/eventos-restaurante-arena" element={<VenueEventsModuleRoute />} />
               <Route path="/mapa-comercial" element={<CommercialMapRoute />} />
               <Route path="/comissoes/logistica/*" element={<LogisticaModuleRoutes />} />
               <Route path="/comissoes/:moduleSlug/*" element={<CommissionModuleRoutes />} />

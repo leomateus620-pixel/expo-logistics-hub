@@ -188,6 +188,11 @@
   margin-bottom: clamp(2.5rem, 4vw, 3.75rem);
 }
 
+.fenasoja-portal__primary-grid {
+  display: grid;
+  gap: 1rem;
+}
+
 .fenasoja-portal .cronograma-portal-card {
   position: relative;
   isolation: isolate;
