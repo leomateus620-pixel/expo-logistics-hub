@@ -90,6 +90,15 @@ const STEPS = [
   { label: "Revisão", icon: ShieldAlert },
 ];
 
+const REQUIRED_FIELDS = new Set<keyof VenueEventDraft>([
+  "title",
+  "eventType",
+  "venueIds",
+  "requesterName",
+  "priority",
+  "visibility",
+]);
+
 function Field({
   id,
   field,
@@ -97,6 +106,7 @@ function Field({
   children,
   hint,
   error,
+  required,
 }: {
   id: string;
   field: keyof VenueEventDraft;
@@ -104,17 +114,23 @@ function Field({
   children: React.ReactNode;
   hint?: string;
   error?: string;
+  required?: boolean;
 }) {
   const hintId = hint ? `${id}-hint` : undefined;
   const errorId = error ? `${id}-error` : undefined;
+  const isRequired = required ?? REQUIRED_FIELDS.has(field);
   return (
     <div
       className="venue-field"
       data-venue-field={field}
       data-hint-id={hintId}
       data-error-id={errorId}
+      data-required={isRequired}
     >
-      <Label htmlFor={id}>{label}</Label>
+      <Label htmlFor={id}>
+        <span>{label}</span>
+        <small>{isRequired ? "Obrigatório" : "Opcional"}</small>
+      </Label>
       {children}
       {hint && (
         <p id={hintId} className="venue-field__hint">
@@ -228,7 +244,9 @@ export function VenueEventFormDialog({
   const [baseline, setBaseline] = useState("");
   const [discardOpen, setDiscardOpen] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
   const initializationKeyRef = useRef("");
+  const previousStepRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (!open) {
@@ -252,6 +270,25 @@ export function VenueEventFormDialog({
     setReviewedAvailabilityFingerprint("");
     setDiscardOpen(false);
   }, [defaultRequesterName, initialDraft, open]);
+
+  useEffect(() => {
+    if (!open) {
+      previousStepRef.current = null;
+      return;
+    }
+    const shouldAnnounceStep =
+      previousStepRef.current !== null && previousStepRef.current !== step;
+    previousStepRef.current = step;
+    const frame = window.requestAnimationFrame(() => {
+      bodyRef.current?.scrollTo({ top: 0, behavior: "auto" });
+      if (shouldAnnounceStep) {
+        bodyRef.current
+          ?.querySelector<HTMLElement>(".venue-form-section__intro h3")
+          ?.focus({ preventScroll: true });
+      }
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [open, step]);
 
   const isDirty = open && baseline !== "" && JSON.stringify(draft) !== baseline;
 
@@ -468,6 +505,7 @@ export function VenueEventFormDialog({
                 key={label}
                 data-active={index === step}
                 data-complete={index < step}
+                aria-current={index === step ? "step" : undefined}
               >
                 <span>{index < step ? <Check /> : <Icon />}</span>
                 <button
@@ -482,7 +520,11 @@ export function VenueEventFormDialog({
             ))}
           </ol>
 
-          <div className="venue-event-form__body">
+          <div
+            ref={bodyRef}
+            className="venue-event-form__body"
+            data-step={step + 1}
+          >
             {Object.keys(errors).length > 0 && (
               <div
                 className="venue-inline-alert is-danger"
@@ -497,7 +539,7 @@ export function VenueEventFormDialog({
             {step === 0 && (
               <div className="venue-form-section">
                 <div className="venue-form-section__intro">
-                  <h3>Identificação e ocupação</h3>
+                  <h3 tabIndex={-1}>Identificação e ocupação</h3>
                   <p>
                     Defina o que acontecerá e qual estrutura será reservada.
                   </p>
@@ -520,7 +562,12 @@ export function VenueEventFormDialog({
                       }
                     />
                   </Field>
-                  <Field id="venue-event-type" field="eventType" label="Tipo">
+                  <Field
+                    id="venue-event-type"
+                    field="eventType"
+                    label="Tipo"
+                    error={errors.eventType}
+                  >
                     <Select
                       value={draft.eventType}
                       onValueChange={(value) =>
@@ -530,7 +577,15 @@ export function VenueEventFormDialog({
                         )
                       }
                     >
-                      <SelectTrigger id="venue-event-type">
+                      <SelectTrigger
+                        id="venue-event-type"
+                        aria-invalid={Boolean(errors.eventType)}
+                        aria-describedby={
+                          errors.eventType
+                            ? "venue-event-type-error"
+                            : undefined
+                        }
+                      >
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
@@ -581,7 +636,10 @@ export function VenueEventFormDialog({
                     errors.venueIds ? "venue-event-venues-error" : undefined
                   }
                 >
-                  <legend>Espaços</legend>
+                  <legend>
+                    <span>Espaços</span>
+                    <small>Obrigatório</small>
+                  </legend>
                   <div className="venue-space-choice-grid">
                     {activeSpaces.map((space) => (
                       <label
@@ -643,6 +701,7 @@ export function VenueEventFormDialog({
                           id="venue-event-start-date"
                           field="startDate"
                           label="Início"
+                          required={!draft.pendingDate}
                           error={errors.startDate}
                         >
                           <Input
@@ -664,6 +723,7 @@ export function VenueEventFormDialog({
                           id="venue-event-start-time"
                           field="startTime"
                           label="Hora"
+                          required={!draft.pendingDate}
                           error={errors.startTime}
                         >
                           <Input
@@ -685,6 +745,7 @@ export function VenueEventFormDialog({
                           id="venue-event-end-date"
                           field="endDate"
                           label="Término"
+                          required={!draft.pendingDate}
                           error={errors.endDate}
                         >
                           <Input
@@ -706,6 +767,7 @@ export function VenueEventFormDialog({
                           id="venue-event-end-time"
                           field="endTime"
                           label="Hora"
+                          required={!draft.pendingDate}
                           error={errors.endTime}
                         >
                           <Input
@@ -798,7 +860,7 @@ export function VenueEventFormDialog({
             {step === 1 && (
               <div className="venue-form-section">
                 <div className="venue-form-section__intro">
-                  <h3>Responsáveis e contrapartida</h3>
+                  <h3 tabIndex={-1}>Responsáveis e contrapartida</h3>
                   <p>Conecte o evento às organizações e contratos corretos.</p>
                 </div>
                 <div className="venue-form-grid">
@@ -1112,7 +1174,7 @@ export function VenueEventFormDialog({
             {step === 2 && (
               <div className="venue-form-section">
                 <div className="venue-form-section__intro">
-                  <h3>Recursos e execução</h3>
+                  <h3 tabIndex={-1}>Recursos e execução</h3>
                   <p>
                     Antecipe demandas para que a equipe possa confirmar a
                     prontidão.
@@ -1281,7 +1343,7 @@ export function VenueEventFormDialog({
             {step === 3 && (
               <div className="venue-form-section">
                 <div className="venue-form-section__intro">
-                  <h3>Revisão e disponibilidade</h3>
+                  <h3 tabIndex={-1}>Revisão e disponibilidade</h3>
                   <p>
                     Esta é a última conferência antes da gravação transacional.
                   </p>
@@ -1431,6 +1493,7 @@ export function VenueEventFormDialog({
                           field="conflictOverrideReason"
                           label="Justificativa da exceção"
                           error={errors.conflictOverrideReason}
+                          required={draft.conflictOverride}
                         >
                           <Textarea
                             id="venue-event-conflict-reason"

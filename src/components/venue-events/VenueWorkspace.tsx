@@ -6,6 +6,7 @@ import {
   CalendarDays,
   CalendarOff,
   CheckCircle2,
+  ChevronLeft,
   ChevronRight,
   ClipboardCheck,
   Clock3,
@@ -85,12 +86,16 @@ import {
 import { VenueSpaceDialog } from "@/components/venue-events/VenueSpaceDialog";
 import { VenueSpaceManagementPanel } from "@/components/venue-events/VenueSpaceManagementPanel";
 import "@/styles/venue-events.css";
+import "@/styles/venue-events-production.css";
+
+type NavGroupId = "planejamento" | "gestao" | "controle";
 
 interface NavItem {
   id: VenueView;
   label: string;
   shortLabel: string;
   icon: LucideIcon;
+  group: NavGroupId;
   primary?: boolean;
 }
 
@@ -100,6 +105,7 @@ const NAV_ITEMS: NavItem[] = [
     label: "Visão geral",
     shortLabel: "Início",
     icon: LayoutDashboard,
+    group: "planejamento",
     primary: true,
   },
   {
@@ -107,6 +113,7 @@ const NAV_ITEMS: NavItem[] = [
     label: "Agenda",
     shortLabel: "Agenda",
     icon: CalendarDays,
+    group: "planejamento",
     primary: true,
   },
   {
@@ -114,6 +121,7 @@ const NAV_ITEMS: NavItem[] = [
     label: "Eventos",
     shortLabel: "Eventos",
     icon: ListChecks,
+    group: "planejamento",
     primary: true,
   },
   {
@@ -121,38 +129,145 @@ const NAV_ITEMS: NavItem[] = [
     label: "Contrapartidas",
     shortLabel: "Contratos",
     icon: FileKey2,
+    group: "gestao",
   },
   {
     id: "patrocinadores",
     label: "Patrocinadores",
     shortLabel: "Parceiros",
     icon: UsersRound,
+    group: "gestao",
   },
   {
     id: "operacao",
     label: "Operação",
     shortLabel: "Operação",
     icon: ClipboardCheck,
+    group: "gestao",
   },
   {
     id: "historico",
     label: "Histórico",
     shortLabel: "Histórico",
     icon: History,
+    group: "controle",
   },
   {
     id: "relatorios",
     label: "Relatórios",
     shortLabel: "Relatórios",
     icon: BarChart3,
+    group: "controle",
   },
   {
     id: "pendencias",
     label: "Pendências",
     shortLabel: "Pendências",
     icon: ShieldAlert,
+    group: "controle",
   },
 ];
+
+const NAV_GROUPS: Array<{ id: NavGroupId; label: string }> = [
+  { id: "planejamento", label: "Planejamento" },
+  { id: "gestao", label: "Gestão" },
+  { id: "controle", label: "Controle" },
+];
+
+const VIEW_CONTEXT: Record<
+  VenueView,
+  { eyebrow: string; description: string }
+> = {
+  "visao-geral": {
+    eyebrow: "Comando do dia",
+    description:
+      "Prioridades, disponibilidade e decisões dos espaços Restaurante e Arena.",
+  },
+  agenda: {
+    eyebrow: "Planejamento de ocupação",
+    description: "Períodos, espaços, bloqueios e janelas operacionais.",
+  },
+  eventos: {
+    eyebrow: "Registro operacional",
+    description: "Reservas, aprovações, responsáveis e condições de execução.",
+  },
+  contrapartidas: {
+    eyebrow: "Governança contratual",
+    description: "Concessões, consumo, reservas, saldos e excessos projetados.",
+  },
+  patrocinadores: {
+    eyebrow: "Relacionamentos institucionais",
+    description: "Organizações, contratos ativos, contatos e pontos de atenção.",
+  },
+  operacao: {
+    eyebrow: "Execução em campo",
+    description: "Prontidão, recursos, checklists, equipes e bloqueios.",
+  },
+  historico: {
+    eyebrow: "Rastreabilidade",
+    description: "Linha do tempo de decisões e alterações institucionais.",
+  },
+  relatorios: {
+    eyebrow: "Leitura gerencial",
+    description: "Indicadores reais de ocupação, uso e contrapartidas.",
+  },
+  pendencias: {
+    eyebrow: "Fila de resolução",
+    description: "Exceções organizadas por severidade, prazo e responsável.",
+  },
+};
+
+const APPROVAL_STATUS_LABELS: Record<string, string> = {
+  nao_solicitado: "Aprovação não solicitada",
+  pendente: "Aprovação pendente",
+  em_analise: "Aprovação em análise",
+  aprovado: "Aprovado",
+  recusado: "Aprovação recusada",
+  dispensado: "Aprovação dispensada",
+};
+
+const AUDIT_ACTION_LABELS: Record<string, string> = {
+  event_created: "Evento criado",
+  event_updated: "Evento atualizado",
+  event_rescheduled: "Data ou janela operacional alterada",
+  event_material_change: "Informações relevantes do evento alteradas",
+  checklist_item_obsoleted: "Item de checklist substituído",
+  checklist_status_changed: "Checklist atualizado",
+  resource_status_changed: "Recurso operacional atualizado",
+  document_registered: "Documento registrado",
+  mark_no_show: "Ausência registrada",
+  create: "Registro criado",
+  update: "Registro atualizado",
+  status_change: "Status alterado",
+  approve: "Evento aprovado",
+  reject: "Evento recusado",
+  cancel: "Evento cancelado",
+  complete: "Evento concluído",
+  reschedule: "Evento reprogramado",
+};
+
+function presentAuditAction(value: unknown) {
+  const key = String(value || "update");
+  return (
+    AUDIT_ACTION_LABELS[key] ||
+    key
+      .replaceAll("_", " ")
+      .replace(/^./, (character) => character.toLocaleUpperCase("pt-BR"))
+  );
+}
+
+function presentPendencyType(type: string) {
+  const labels: Record<string, string> = {
+    aprovacao: "Aprovação",
+    data: "Agendamento",
+    responsavel: "Responsável",
+    conflito: "Conflito",
+    resultado: "Pós-evento",
+    checklist: "Operação",
+    contrapartida: "Contrapartida",
+  };
+  return labels[type] || type.replaceAll("_", " ");
+}
 
 const VALID_VIEWS = new Set(NAV_ITEMS.map((item) => item.id));
 
@@ -221,11 +336,15 @@ function EventRow({
   event,
   spaces,
   sponsor,
+  responsible,
+  hasCounterpart,
   onOpen,
 }: {
   event: VenueEvent;
   spaces: string;
   sponsor: string;
+  responsible: string;
+  hasCounterpart: boolean;
   onOpen: () => void;
 }) {
   return (
@@ -251,22 +370,30 @@ function EventRow({
         </small>
       </span>
       <span className="venue-event-row__main">
-        <span>
+        <span className="venue-event-row__status-line">
           <StatusBadge status={event.status} />
-          <small>{EVENT_TYPE_LABELS[event.event_type]}</small>
+          <small>
+            {APPROVAL_STATUS_LABELS[event.approval_status] ||
+              EVENT_TYPE_LABELS[event.event_type]}
+          </small>
         </span>
-        <strong>{event.title}</strong>
-        <small>
-          {spaces} · {sponsor}
+        <strong title={event.title}>{event.title}</strong>
+        <small title={`${event.requester_name} · ${sponsor}`}>
+          {event.requester_name} · {sponsor}
         </small>
       </span>
       <span className="venue-event-row__period">
         <strong>{formatVenuePeriod(event.start_at, event.end_at)}</strong>
-        <small>
-          {event.estimated_audience
-            ? `${event.estimated_audience.toLocaleString("pt-BR")} pessoas`
-            : "Público a confirmar"}
-        </small>
+        <small title={spaces}>{spaces}</small>
+      </span>
+      <span className="venue-event-row__signals">
+        <span>
+          <small>Responsável</small>
+          <strong title={responsible}>{responsible}</strong>
+        </span>
+        <span data-state={hasCounterpart ? "linked" : "unlinked"}>
+          {hasCounterpart ? "Contrapartida vinculada" : "Sem contrapartida"}
+        </span>
       </span>
       {event.conflict_status === "conflito" && (
         <span
@@ -286,21 +413,28 @@ function EmptyState({
   icon: Icon,
   title,
   description,
+  context,
   action,
+  tone = "neutral",
 }: {
   icon: LucideIcon;
   title: string;
   description: string;
+  context?: React.ReactNode;
   action?: React.ReactNode;
+  tone?: "neutral" | "positive" | "warning" | "restricted";
 }) {
   return (
-    <div className="venue-empty-state">
-      <span>
+    <div className="venue-empty-state" data-tone={tone}>
+      <span className="venue-empty-state__icon" aria-hidden="true">
         <Icon />
       </span>
-      <h3>{title}</h3>
-      <p>{description}</p>
-      {action}
+      <div className="venue-empty-state__copy">
+        <h3>{title}</h3>
+        <p>{description}</p>
+      </div>
+      {context && <div className="venue-empty-state__context">{context}</div>}
+      {action && <div className="venue-empty-state__actions">{action}</div>}
     </div>
   );
 }
@@ -347,6 +481,8 @@ export function VenueWorkspace() {
   const [reportStatusFilter, setReportStatusFilter] = useState("all");
   const [reportApprovalFilter, setReportApprovalFilter] = useState("all");
   const [reportCounterpartFilter, setReportCounterpartFilter] = useState("all");
+  const [historySearch, setHistorySearch] = useState("");
+  const [historyActionFilter, setHistoryActionFilter] = useState("all");
 
   const historyQuery = useVenueAuditHistory(
     view === "historico" && operations.permissions.venue_events_audit_view,
@@ -522,8 +658,28 @@ export function VenueWorkspace() {
     );
   });
 
+  const agendaCandidateEvents = workspace.events.filter((event) => {
+    const spaces = getSpaceNames(
+      event.id,
+      workspace.allocations,
+      workspace.spaces,
+    );
+    const sponsor = getStakeholderName(
+      event.sponsor_id,
+      workspace.stakeholders,
+    );
+    return (
+      eventMatchesSearch(event, search, sponsor, spaces) &&
+      (spaceFilter === "all" ||
+        workspace.allocations.some(
+          (allocation) =>
+            allocation.event_id === event.id &&
+            allocation.space_id === spaceFilter,
+        ))
+    );
+  });
   const agendaRange = dateWindow(agendaDate, agendaMode);
-  const agendaEvents = filteredEvents
+  const agendaEvents = agendaCandidateEvents
     .filter((event) => {
       if (!event.start_at) return false;
       const time = new Date(event.start_at).getTime();
@@ -549,6 +705,37 @@ export function VenueWorkspace() {
       .find(([key]) => key === localDateKey(event.start_at!))?.[1]
       .push(event),
   );
+  const agendaRangeStart = agendaRange.from.slice(0, 10);
+  const agendaRangeEnd = shiftDateKey(agendaRange.to.slice(0, 10), -1);
+  const formatAgendaDate = (dateKey: string) =>
+    new Intl.DateTimeFormat("pt-BR", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+      timeZone: "America/Sao_Paulo",
+    })
+      .format(new Date(`${dateKey}T12:00:00-03:00`))
+      .replaceAll(".", "");
+  const agendaRangeLabel =
+    agendaRangeStart === agendaRangeEnd
+      ? formatAgendaDate(agendaRangeStart)
+      : `${formatAgendaDate(agendaRangeStart)} — ${formatAgendaDate(agendaRangeEnd)}`;
+  const selectedAgendaSpace =
+    spaceFilter === "all"
+      ? "Restaurante e Arena"
+      : workspace.spaces.find((space) => space.id === spaceFilter)?.name ||
+        "Espaço selecionado";
+  const nextOccupiedEvent = agendaCandidateEvents
+    .filter(
+      (event) =>
+        event.start_at &&
+        new Date(event.start_at).getTime() >= new Date(agendaRange.to).getTime(),
+    )
+    .sort(
+      (first, second) =>
+        new Date(first.start_at!).getTime() -
+        new Date(second.start_at!).getTime(),
+    )[0];
   const reportEvents = workspace.events.filter((event) => {
     const usage = workspace.usages.find(
       (item) => item.event_id === event.id && !item.superseded_at,
@@ -614,10 +801,57 @@ export function VenueWorkspace() {
       matchesCondition
     );
   });
+  const historyEntries = historyQuery.data ?? [];
+  const historyActions = Array.from(
+    new Set(
+      historyEntries.map((entry) =>
+        String(entry.after_data?.venue_action || entry.action),
+      ),
+    ),
+  );
+  const filteredHistoryEntries = historyEntries.filter((entry) => {
+    const event = workspace.events.find(
+      (item) =>
+        item.id === entry.entity_id || entry.after_data?.event_id === item.id,
+    );
+    const action = String(entry.after_data?.venue_action || entry.action);
+    const actor = workspace.members.find(
+      (member) => member.user_id === entry.actor_user_id,
+    );
+    const haystack = `${presentAuditAction(action)} ${event?.title || ""} ${actor?.nome_exibicao || ""}`.toLocaleLowerCase(
+      "pt-BR",
+    );
+    return (
+      (historyActionFilter === "all" || action === historyActionFilter) &&
+      haystack.includes(historySearch.trim().toLocaleLowerCase("pt-BR"))
+    );
+  });
+  const historyGroups = Array.from(
+    filteredHistoryEntries
+      .reduce((groups, entry) => {
+        const dateKey = localDateKey(entry.created_at);
+        const group = groups.get(dateKey) ?? [];
+        group.push(entry);
+        groups.set(dateKey, group);
+        return groups;
+      }, new Map<string, typeof filteredHistoryEntries>())
+      .entries(),
+  );
 
   const startNewEvent = () => {
     setEditingEventId(null);
     setFormOpen(true);
+  };
+  const moveAgenda = (direction: -1 | 1) => {
+    if (agendaMode === "mes") {
+      const cursor = new Date(`${agendaDate}T12:00:00Z`);
+      cursor.setUTCMonth(cursor.getUTCMonth() + direction);
+      setAgendaDate(cursor.toISOString().slice(0, 10));
+      return;
+    }
+    setAgendaDate(
+      shiftDateKey(agendaDate, direction * (agendaMode === "semana" ? 7 : 1)),
+    );
   };
   const editEvent = (event: VenueEvent) => {
     setEditingEventId(event.id);
@@ -668,7 +902,7 @@ export function VenueWorkspace() {
   const renderOverview = () => (
     <div className="venue-view-stack">
       <section className="venue-kpi-grid" aria-label="Indicadores operacionais">
-        <article>
+        <article data-priority="primary" data-state={eventsToday.length ? "active" : "calm"}>
           <span className="is-indigo">
             <CalendarDays />
           </span>
@@ -678,7 +912,7 @@ export function VenueWorkspace() {
             <p>ocupações em andamento ou previstas</p>
           </div>
         </article>
-        <article>
+        <article data-priority="secondary">
           <span className="is-green">
             <CalendarDays />
           </span>
@@ -688,7 +922,7 @@ export function VenueWorkspace() {
             <p>Restaurante e Arena</p>
           </div>
         </article>
-        <article>
+        <article data-priority="attention" data-state={pendingApprovals.length ? "warning" : "calm"}>
           <span className="is-orange">
             <ShieldAlert />
           </span>
@@ -698,7 +932,7 @@ export function VenueWorkspace() {
             <p>aprovações formais</p>
           </div>
         </article>
-        <article>
+        <article data-priority="attention" data-state={conflictedEvents.length ? "critical" : "calm"}>
           <span className={conflictedEvents.length ? "is-red" : "is-gold"}>
             <AlertTriangle />
           </span>
@@ -761,20 +995,39 @@ export function VenueWorkspace() {
                     workspace.allocations,
                     workspace.spaces,
                   )}
-                  sponsor={getStakeholderName(
-                    event.sponsor_id,
-                    workspace.stakeholders,
-                  )}
-                  onOpen={() => openEvent(event.id)}
-                />
+                   sponsor={getStakeholderName(
+                     event.sponsor_id,
+                     workspace.stakeholders,
+                   )}
+                   responsible={
+                     workspace.members.find(
+                       (member) => member.user_id === event.responsible_user_id,
+                     )?.nome_exibicao || "Não definido"
+                   }
+                   hasCounterpart={Boolean(event.counterpart_agreement_id)}
+                   onOpen={() => openEvent(event.id)}
+                 />
               ))}
             </div>
           ) : (
-            <EmptyState
-              icon={CalendarDays}
-              title="Agenda livre no período"
-              description="Nenhum evento confirmado ou solicitado para os próximos 30 dias."
-              action={
+           <EmptyState
+             icon={CalendarDays}
+             title="Agenda livre no período"
+             description="Nenhum evento confirmado ou solicitado para os próximos 30 dias."
+             tone="positive"
+             context={
+               <>
+                 <span>
+                   <strong>{workspace.spaces.filter((space) => space.active).length}</strong>
+                   espaços operacionais disponíveis
+                 </span>
+                 <span>
+                   <strong>{pendingApprovals.length}</strong>
+                   solicitações aguardando decisão
+                 </span>
+               </>
+             }
+             action={
                 permissions.venue_events_create ? (
                   <Button onClick={startNewEvent}>
                     <Plus /> Novo evento
@@ -910,12 +1163,39 @@ export function VenueWorkspace() {
               </button>
             ))}
           </div>
-          <Input
-            type="date"
-            aria-label="Data de referência da agenda"
-            value={agendaDate}
-            onChange={(event) => setAgendaDate(event.target.value)}
-          />
+          <div className="venue-agenda-date-nav">
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              aria-label="Período anterior"
+              onClick={() => moveAgenda(-1)}
+            >
+              <ChevronLeft />
+            </Button>
+            <Input
+              type="date"
+              aria-label="Data de referência da agenda"
+              value={agendaDate}
+              onChange={(event) => setAgendaDate(event.target.value)}
+            />
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setAgendaDate(currentDateKey)}
+            >
+              Hoje
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              aria-label="Próximo período"
+              onClick={() => moveAgenda(1)}
+            >
+              <ChevronRight />
+            </Button>
+          </div>
         </div>
       </header>
       <div className="venue-filter-bar">
@@ -943,6 +1223,23 @@ export function VenueWorkspace() {
               ))}
           </SelectContent>
         </Select>
+      </div>
+      <div className="venue-agenda-period" role="status" aria-live="polite">
+        <CalendarDays aria-hidden="true" />
+        <span>
+          <small>Janela selecionada</small>
+          <strong>{agendaRangeLabel}</strong>
+        </span>
+        <span>
+          <small>Espaços</small>
+          <strong>{selectedAgendaSpace}</strong>
+        </span>
+        <span data-state={agendaEvents.length ? "occupied" : "available"}>
+          <small>Ocupação encontrada</small>
+          <strong>
+            {agendaEvents.length} {agendaEvents.length === 1 ? "evento" : "eventos"}
+          </strong>
+        </span>
       </div>
       {agendaGroups.length ? (
         <div className="venue-agenda-timeline">
@@ -1008,7 +1305,27 @@ export function VenueWorkspace() {
         <EmptyState
           icon={CalendarDays}
           title="Nenhuma ocupação nesta janela"
-          description="Altere o período ou cadastre um novo evento. Reservas preliminares sem data aparecem na lista de eventos."
+          description={`O período ${agendaRangeLabel} está livre para ${selectedAgendaSpace}.`}
+          tone="positive"
+          context={
+            <>
+              <span>
+                <strong>{nextOccupiedEvent ? formatVenueDateTime(nextOccupiedEvent.start_at) : "Sem previsão"}</strong>
+                próxima ocupação encontrada
+              </span>
+              <span>
+                <strong>Reservas preliminares</strong>
+                continuam acessíveis na lista de eventos
+              </span>
+            </>
+          }
+          action={
+            permissions.venue_events_create ? (
+              <Button onClick={startNewEvent}>
+                <Plus /> Criar reserva
+              </Button>
+            ) : undefined
+          }
         />
       )}
       {workspace.blocks.filter(
@@ -1109,19 +1426,62 @@ export function VenueWorkspace() {
                   workspace.allocations,
                   workspace.spaces,
                 )}
-                sponsor={getStakeholderName(
-                  event.sponsor_id,
-                  workspace.stakeholders,
-                )}
-                onOpen={() => openEvent(event.id)}
-              />
+                 sponsor={getStakeholderName(
+                   event.sponsor_id,
+                   workspace.stakeholders,
+                 )}
+                 responsible={
+                   workspace.members.find(
+                     (member) => member.user_id === event.responsible_user_id,
+                   )?.nome_exibicao || "Não definido"
+                 }
+                 hasCounterpart={Boolean(event.counterpart_agreement_id)}
+                 onOpen={() => openEvent(event.id)}
+               />
             ))}
         </div>
       ) : (
         <EmptyState
           icon={ListChecks}
           title="Nenhum evento encontrado"
-          description="Remova filtros ou crie o primeiro registro deste domínio."
+          description={
+            workspace.events.length
+              ? "Os filtros atuais não correspondem aos registros persistidos."
+              : "O registro mestre ainda não possui eventos neste domínio."
+          }
+          context={
+            <>
+              <span>
+                <strong>{workspace.events.length}</strong>
+                eventos cadastrados
+              </span>
+              <span>
+                <strong>{statusFilter === "all" ? "Todos" : EVENT_STATUS_LABELS[statusFilter]}</strong>
+                status consultado
+              </span>
+            </>
+          }
+          action={
+            <>
+              {workspace.events.length > 0 && (
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setSearch("");
+                    setStatusFilter("all");
+                    setSpaceFilter("all");
+                  }}
+                >
+                  Limpar filtros
+                </Button>
+              )}
+              {permissions.venue_events_create && (
+                <Button onClick={startNewEvent}>
+                  <Plus /> Novo evento
+                </Button>
+              )}
+            </>
+          }
         />
       )}
     </section>
@@ -1146,9 +1506,31 @@ export function VenueWorkspace() {
             const balance = workspace.balances.find(
               (item) => item.id === agreement.id,
             );
-            const committed =
-              Number(balance?.consumed_quantity || 0) +
-              Number(balance?.reserved_quantity || 0);
+            const consumed = Number(balance?.consumed_quantity || 0);
+            const reserved = Number(balance?.reserved_quantity || 0);
+            const committed = consumed + reserved;
+            const remaining = Number(balance?.remaining_quantity || 0);
+            const projectedExcess = Number(
+              balance?.projected_excess_quantity || 0,
+            );
+            const confirmedExcess = Number(
+              balance?.confirmed_excess_quantity || 0,
+            );
+            const granted = Number(agreement.granted_quantity);
+            const balanceState =
+              confirmedExcess > 0
+                ? "exceeded"
+                : projectedExcess > 0
+                  ? "projected"
+                  : granted > 0 && remaining / granted <= 0.2
+                    ? "attention"
+                    : "healthy";
+            const balanceStateLabel = {
+              exceeded: "Excesso confirmado",
+              projected: "Excesso projetado",
+              attention: "Saldo próximo do limite",
+              healthy: "Saldo disponível",
+            }[balanceState];
             const percent = Number(agreement.granted_quantity)
               ? Math.min(
                   100,
@@ -1160,6 +1542,7 @@ export function VenueWorkspace() {
                 type="button"
                 key={agreement.id}
                 className="venue-agreement-card"
+                data-state={balanceState}
                 onClick={() =>
                   permissions.venue_counterparts_manage &&
                   editAgreement(agreement)
@@ -1178,13 +1561,10 @@ export function VenueWorkspace() {
                       )}
                     </strong>
                   </div>
-                  <Badge
-                    variant={
-                      agreement.status === "ativo" ? "default" : "secondary"
-                    }
-                  >
-                    {agreement.status}
-                  </Badge>
+                  <span className="venue-agreement-card__state">
+                    <small>{agreement.status}</small>
+                    <strong>{balanceStateLabel}</strong>
+                  </span>
                 </header>
                 <h3>{agreement.benefit_type}</h3>
                 <p>
@@ -1203,22 +1583,28 @@ export function VenueWorkspace() {
                     </strong>
                   </span>
                   <span>
-                    <small>Comprometido</small>
-                    <strong>{formatQuantity(committed)}</strong>
+                    <small>Consumido</small>
+                    <strong>{formatQuantity(consumed)}</strong>
                   </span>
-                  <span
-                    data-warning={
-                      Number(balance?.projected_excess_quantity || 0) > 0
-                    }
-                  >
-                    <small>Disponível</small>
-                    <strong>
-                      {formatQuantity(Number(balance?.remaining_quantity || 0))}
-                    </strong>
+                  <span>
+                    <small>Reservado</small>
+                    <strong>{formatQuantity(reserved)}</strong>
+                  </span>
+                  <span data-warning={balanceState !== "healthy"}>
+                    <small>
+                      {confirmedExcess > 0
+                        ? "Excesso confirmado"
+                        : projectedExcess > 0
+                          ? "Excesso projetado"
+                          : "Saldo disponível"}
+                    </small>
+                    <strong>{formatQuantity(confirmedExcess || projectedExcess || remaining)}</strong>
                   </span>
                 </div>
                 <footer>
-                  <span>{COUNTERPART_UNIT_LABELS[agreement.unit_type]}</span>
+                  <span>
+                    {COUNTERPART_UNIT_LABELS[agreement.unit_type]} · {formatQuantity(committed)} comprometido
+                  </span>
                   <span>
                     até{" "}
                     {new Date(
@@ -1261,13 +1647,50 @@ export function VenueWorkspace() {
                 event.sponsor_id === item.id ||
                 event.responsible_organization_id === item.id,
             ).length;
-            const contracts = workspace.agreements.filter(
+            const stakeholderAgreements = workspace.agreements.filter(
               (agreement) => agreement.stakeholder_id === item.id,
+            );
+            const activeContracts = stakeholderAgreements.filter(
+              (agreement) => agreement.status === "ativo",
             ).length;
+            const stakeholderBalances = workspace.balances.filter(
+              (balance) => balance.stakeholder_id === item.id,
+            );
+            const projectedExcess = stakeholderBalances.reduce(
+              (sum, balance) =>
+                sum + Number(balance.projected_excess_quantity || 0),
+              0,
+            );
+            const confirmedExcess = stakeholderBalances.reduce(
+              (sum, balance) =>
+                sum + Number(balance.confirmed_excess_quantity || 0),
+              0,
+            );
+            const availableBalance = stakeholderBalances.reduce(
+              (sum, balance) => sum + Number(balance.remaining_quantity || 0),
+              0,
+            );
+            const relationshipState = !item.active
+              ? "inactive"
+              : confirmedExcess > 0
+                ? "critical"
+                : projectedExcess > 0
+                  ? "attention"
+                  : activeContracts > 0
+                    ? "active"
+                    : "uncontracted";
+            const relationshipStateLabel = {
+              inactive: "Cadastro inativo",
+              critical: "Excesso confirmado",
+              attention: "Excesso projetado",
+              active: "Relação ativa",
+              uncontracted: "Sem contrato ativo",
+            }[relationshipState];
             return (
               <button
                 type="button"
                 key={item.id}
+                data-state={relationshipState}
                 onClick={() =>
                   permissions.venue_sponsors_manage && editStakeholder(item)
                 }
@@ -1280,16 +1703,33 @@ export function VenueWorkspace() {
                 <div>
                   <span>
                     <Badge variant="outline">{item.relationship_type}</Badge>
-                    {!item.active && <Badge variant="secondary">Inativo</Badge>}
+                    <span className="venue-stakeholder-state">
+                      {relationshipStateLabel}
+                    </span>
                   </span>
-                  <strong>{item.trade_name || item.legal_name}</strong>
+                  <strong title={item.trade_name || item.legal_name}>
+                    {item.trade_name || item.legal_name}
+                  </strong>
                   <small>
                     {item.contact_name || "Contato não informado"}
                     {item.email ? ` · ${item.email}` : ""}
                   </small>
-                  <p>
-                    {events} eventos · {contracts} contratos
-                  </p>
+                  <div className="venue-stakeholder-metrics">
+                    <span>
+                      <strong>{events}</strong>
+                      eventos
+                    </span>
+                    <span>
+                      <strong>{activeContracts}</strong>
+                      contratos ativos
+                    </span>
+                    <span>
+                      <strong>{formatQuantity(confirmedExcess || projectedExcess || availableBalance)}</strong>
+                      {confirmedExcess > 0 || projectedExcess > 0
+                        ? " em excesso"
+                        : " de saldo"}
+                    </span>
+                  </div>
                 </div>
                 <ChevronRight />
               </button>
@@ -1344,6 +1784,21 @@ export function VenueWorkspace() {
                   workspace.checklist,
                   workspace.resources,
                 );
+                const pendingChecklist = workspace.checklist.filter(
+                  (item) =>
+                    item.event_id === event.id &&
+                    item.required &&
+                    !["concluido", "dispensado", "obsoleto"].includes(
+                      item.status,
+                    ),
+                ).length;
+                const unavailableResources = workspace.resources.filter(
+                  (resource) =>
+                    resource.event_id === event.id &&
+                    ["indisponivel", "solicitado"].includes(
+                      resource.confirmation_status,
+                    ),
+                ).length;
                 return (
                   <button
                     key={event.id}
@@ -1362,6 +1817,31 @@ export function VenueWorkspace() {
                         workspace.spaces,
                       )}
                     </p>
+                    <div className="venue-operation-cards__window">
+                      <span>
+                        <small>Janela operacional</small>
+                        <strong>
+                          {event.setup_start_at && event.teardown_end_at
+                            ? formatVenuePeriod(
+                                event.setup_start_at,
+                                event.teardown_end_at,
+                              )
+                            : "A confirmar"}
+                        </strong>
+                      </span>
+                      <span data-warning={pendingChecklist > 0}>
+                        <small>Checklist obrigatório</small>
+                        <strong>{pendingChecklist} pendentes</strong>
+                      </span>
+                      <span data-warning={unavailableResources > 0}>
+                        <small>Recursos</small>
+                        <strong>
+                          {unavailableResources
+                            ? `${unavailableResources} exigem atenção`
+                            : "Sem bloqueios"}
+                        </strong>
+                      </span>
+                    </div>
                     <Progress value={ready.percentage} />
                     <footer>
                       <span>{ready.percentage}% pronto</span>
@@ -1378,6 +1858,19 @@ export function VenueWorkspace() {
               icon={ClipboardCheck}
               title="Nenhum evento em execução"
               description="Eventos confirmados aparecerão aqui com checklists e recursos."
+              tone="positive"
+              context={
+                <>
+                  <span>
+                    <strong>{workspace.blocks.filter((block) => block.active).length}</strong>
+                    bloqueios ativos
+                  </span>
+                  <span>
+                    <strong>{missingResponsibleEvents.length}</strong>
+                    eventos sem responsável
+                  </span>
+                </>
+              }
             />
           )}
         </section>
@@ -1444,11 +1937,40 @@ export function VenueWorkspace() {
           {historyQuery.data?.length ?? 0} registros carregados
         </Badge>
       </header>
+      {permissions.venue_events_audit_view && historyEntries.length > 0 && (
+        <div className="venue-filter-bar venue-history-filters">
+          <label>
+            <Search />
+            <Input
+              value={historySearch}
+              onChange={(event) => setHistorySearch(event.target.value)}
+              placeholder="Buscar ação, evento ou responsável"
+            />
+          </label>
+          <Select
+            value={historyActionFilter}
+            onValueChange={setHistoryActionFilter}
+          >
+            <SelectTrigger aria-label="Filtrar histórico por ação">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todas as ações</SelectItem>
+              {historyActions.map((action) => (
+                <SelectItem key={action} value={action}>
+                  {presentAuditAction(action)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      )}
       {!permissions.venue_events_audit_view ? (
         <EmptyState
           icon={History}
           title="Histórico restrito"
           description="Seu perfil não possui permissão para consultar a trilha institucional."
+          tone="restricted"
         />
       ) : historyQuery.isLoading ? (
         <div className="venue-loading-inline">
@@ -1474,7 +1996,7 @@ export function VenueWorkspace() {
             </Button>
           }
         />
-      ) : historyQuery.data?.length ? (
+      ) : historyEntries.length ? (
         <>
           {historyQuery.isError && (
             <div className="venue-inline-alert is-danger" role="alert">
@@ -1491,37 +2013,76 @@ export function VenueWorkspace() {
               </Button>
             </div>
           )}
-          <div className="venue-audit-table">
-            {historyQuery.data.map((entry) => {
-              const event = workspace.events.find(
-                (item) =>
-                  item.id === entry.entity_id ||
-                  entry.after_data?.event_id === item.id,
-              );
-              return (
-                <article key={entry.id}>
-                  <span>
-                    <History />
-                  </span>
-                  <div>
-                    <strong>
-                      {String(
-                        entry.after_data?.venue_action || entry.action,
-                      ).replaceAll("_", " ")}
-                    </strong>
-                    <small>
-                      {event?.title || entry.entity.replaceAll("_", " ")} ·{" "}
-                      {formatVenueDateTime(entry.created_at)}
-                    </small>
-                    {entry.after_data?.reason && (
-                      <p>{String(entry.after_data.reason)}</p>
-                    )}
+          {historyGroups.length ? (
+            <div className="venue-history-groups">
+              {historyGroups.map(([dateKey, entries]) => (
+                <section key={dateKey}>
+                  <header>
+                    <time dateTime={dateKey}>{formatAgendaDate(dateKey)}</time>
+                    <span>{entries.length} alterações</span>
+                  </header>
+                  <div className="venue-audit-table">
+                    {entries.map((entry) => {
+                      const event = workspace.events.find(
+                        (item) =>
+                          item.id === entry.entity_id ||
+                          entry.after_data?.event_id === item.id,
+                      );
+                      const actor = workspace.members.find(
+                        (member) => member.user_id === entry.actor_user_id,
+                      );
+                      return (
+                        <article key={entry.id}>
+                          <span aria-hidden="true">
+                            <History />
+                          </span>
+                          <div>
+                            <strong>
+                              {presentAuditAction(
+                                entry.after_data?.venue_action || entry.action,
+                              )}
+                            </strong>
+                            <small>
+                              {event?.title ||
+                                entry.entity.replaceAll("_", " ")}
+                            </small>
+                            {entry.after_data?.reason && (
+                              <p>{String(entry.after_data.reason)}</p>
+                            )}
+                          </div>
+                          <div className="venue-audit-table__actor">
+                            <strong>
+                              {actor?.nome_exibicao || "Equipe Fenasoja"}
+                            </strong>
+                            <time dateTime={entry.created_at}>
+                              {formatVenueDateTime(entry.created_at)}
+                            </time>
+                          </div>
+                        </article>
+                      );
+                    })}
                   </div>
-                  <code>{entry.actor_user_id.slice(0, 8)}</code>
-                </article>
-              );
-            })}
-          </div>
+                </section>
+              ))}
+            </div>
+          ) : (
+            <EmptyState
+              icon={Search}
+              title="Nenhuma alteração corresponde aos filtros"
+              description="A trilha carregada foi preservada; ajuste a busca ou o tipo de ação."
+              action={
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setHistorySearch("");
+                    setHistoryActionFilter("all");
+                  }}
+                >
+                  Limpar filtros
+                </Button>
+              }
+            />
+          )}
           {historyQuery.hasMore && (
             <div className="venue-history-load-more">
               <Button
@@ -1730,15 +2291,29 @@ export function VenueWorkspace() {
               icon={BarChart3}
               title="Nenhum dado no recorte"
               description="Ajuste o período ou os filtros para consultar indicadores persistidos."
+              context={
+                <>
+                  <span>
+                    <strong>{reportFrom}</strong>
+                    início do recorte
+                  </span>
+                  <span>
+                    <strong>{reportTo}</strong>
+                    fim do recorte
+                  </span>
+                </>
+              }
             />
           )}
         </section>
-        <div className="venue-report-grid">
+        {report.totalEvents > 0 && (
+          <>
+          <div className="venue-report-grid">
           <section className="venue-panel">
             <header className="venue-panel__header">
               <div>
                 <p className="venue-eyebrow">Por espaço</p>
-                <h2>Uso da infraestrutura</h2>
+                <h2>Qual espaço concentrou mais uso?</h2>
               </div>
             </header>
             <div className="venue-bar-list">
@@ -1762,7 +2337,7 @@ export function VenueWorkspace() {
             <header className="venue-panel__header">
               <div>
                 <p className="venue-eyebrow">Distribuição</p>
-                <h2>Status do período</h2>
+                <h2>Como os eventos se distribuem?</h2>
               </div>
             </header>
             <div className="venue-status-distribution">
@@ -1781,13 +2356,13 @@ export function VenueWorkspace() {
               ))}
             </div>
           </section>
-        </div>
-        <div className="venue-report-grid">
+          </div>
+          <div className="venue-report-grid">
           <section className="venue-panel">
             <header className="venue-panel__header">
               <div>
                 <p className="venue-eyebrow">Por patrocinador</p>
-                <h2>Histórico de uso no período</h2>
+                <h2>Quanto cada patrocinador utilizou?</h2>
               </div>
             </header>
             {report.bySponsor.length ? (
@@ -1810,7 +2385,7 @@ export function VenueWorkspace() {
             <header className="venue-panel__header">
               <div>
                 <p className="venue-eyebrow">Operação</p>
-                <h2>Leitura do período</h2>
+                <h2>O que o período exige?</h2>
               </div>
             </header>
             <div className="venue-report-summary-list">
@@ -1839,12 +2414,14 @@ export function VenueWorkspace() {
               </p>
             </div>
           </section>
-        </div>
+          </div>
+          </>
+        )}
         <section className="venue-panel">
           <header className="venue-panel__header">
             <div>
               <p className="venue-eyebrow">Posição contratual atual</p>
-              <h2>Concedido, comprometido e saldo</h2>
+              <h2>Quais contratos exigem atenção?</h2>
             </div>
             <Badge variant="outline">{reportBalances.length} contratos</Badge>
           </header>
@@ -1923,40 +2500,90 @@ export function VenueWorkspace() {
       </header>
       {pendencies.length ? (
         <div className="venue-pendency-list">
-          {pendencies.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              data-severity={item.severity}
-              onClick={() =>
-                item.eventId
-                  ? openEvent(item.eventId)
-                  : setView(item.actionView)
-              }
-            >
-              <span>
-                {item.severity === "critical" ? (
-                  <AlertTriangle />
-                ) : item.severity === "warning" ? (
-                  <Clock3 />
-                ) : (
-                  <FileClock />
-                )}
-              </span>
-              <div>
-                <small>{item.type.replaceAll("_", " ")}</small>
-                <strong>{item.title}</strong>
-                <p>{item.description}</p>
-              </div>
-              <ChevronRight />
-            </button>
-          ))}
+          {pendencies.map((item) => {
+            const affectedEvent = item.eventId
+              ? workspace.events.find((event) => event.id === item.eventId)
+              : undefined;
+            const affectedAgreement = item.agreementId
+              ? workspace.agreements.find(
+                  (agreement) => agreement.id === item.agreementId,
+                )
+              : undefined;
+            const responsible = affectedEvent?.responsible_user_id
+              ? workspace.members.find(
+                  (member) =>
+                    member.user_id === affectedEvent.responsible_user_id,
+                )?.nome_exibicao
+              : undefined;
+            const deadline = affectedEvent?.start_at
+              ? formatVenueDateTime(affectedEvent.start_at)
+              : affectedAgreement?.valid_until
+                ? new Date(
+                    `${affectedAgreement.valid_until}T12:00:00`,
+                  ).toLocaleDateString("pt-BR")
+                : "Sem prazo definido";
+            return (
+              <button
+                key={item.id}
+                type="button"
+                data-severity={item.severity}
+                onClick={() =>
+                  item.eventId
+                    ? openEvent(item.eventId)
+                    : setView(item.actionView)
+                }
+              >
+                <span aria-hidden="true">
+                  {item.severity === "critical" ? (
+                    <AlertTriangle />
+                  ) : item.severity === "warning" ? (
+                    <Clock3 />
+                  ) : (
+                    <FileClock />
+                  )}
+                </span>
+                <div>
+                  <small>{presentPendencyType(item.type)}</small>
+                  <strong>{item.title}</strong>
+                  <p>{item.description}</p>
+                  <div className="venue-pendency-list__meta">
+                    <span>
+                      <small>Responsável</small>
+                      <strong>{responsible || "A definir"}</strong>
+                    </span>
+                    <span>
+                      <small>Prazo operacional</small>
+                      <strong>{deadline}</strong>
+                    </span>
+                    <span>
+                      <small>Próxima ação</small>
+                      <strong>Abrir {NAV_ITEMS.find((nav) => nav.id === item.actionView)?.label}</strong>
+                    </span>
+                  </div>
+                </div>
+                <ChevronRight />
+              </button>
+            );
+          })}
         </div>
       ) : (
         <EmptyState
           icon={CheckCircle2}
           title="Operação sem pendências"
           description="Todos os registros estão coerentes com as regras atuais."
+          tone="positive"
+          context={
+            <>
+              <span>
+                <strong>{workspace.events.length}</strong>
+                eventos verificados
+              </span>
+              <span>
+                <strong>{workspace.agreements.length}</strong>
+                contratos verificados
+              </span>
+            </>
+          }
         />
       )}
     </section>
@@ -1975,6 +2602,7 @@ export function VenueWorkspace() {
   };
 
   const activeNav = NAV_ITEMS.find((item) => item.id === view)!;
+  const MobileMoreIcon = activeNav.primary ? MoreHorizontal : activeNav.icon;
 
   return (
     <div className="venue-workspace">
@@ -1987,16 +2615,16 @@ export function VenueWorkspace() {
           </span>
         </div>
       )}
-      <section className="venue-command-hero">
+      <section
+        className="venue-command-hero"
+        data-variant={view === "visao-geral" ? "overview" : "compact"}
+      >
         <div className="venue-command-hero__copy">
           <p className="venue-eyebrow">
-            <Sparkles /> Domínio operacional independente
+            <Sparkles /> {VIEW_CONTEXT[view].eyebrow}
           </p>
           <h1>{activeNav.label}</h1>
-          <p>
-            Reservas, aprovações, contrapartidas, recursos e auditoria dos
-            espaços Restaurante e Arena.
-          </p>
+          <p>{VIEW_CONTEXT[view].description}</p>
         </div>
         <div className="venue-command-hero__actions">
           {operations.isFetching && (
@@ -2021,20 +2649,33 @@ export function VenueWorkspace() {
       </section>
 
       <nav className="venue-desktop-nav" aria-label="Navegação do módulo">
-        {NAV_ITEMS.map(({ id, icon: Icon, label }) => (
-          <button
-            type="button"
-            key={id}
-            data-active={view === id}
-            aria-current={view === id ? "page" : undefined}
-            onClick={() => setView(id)}
+        {NAV_GROUPS.map((group) => (
+          <div
+            className="venue-desktop-nav__group"
+            data-group={group.id}
+            key={group.id}
           >
-            <Icon />
-            <span>{label}</span>
-            {id === "pendencias" && pendencies.length > 0 && (
-              <small>{pendencies.length}</small>
-            )}
-          </button>
+            <span>{group.label}</span>
+            <div>
+              {NAV_ITEMS.filter((item) => item.group === group.id).map(
+                ({ id, icon: Icon, label }) => (
+                  <button
+                    type="button"
+                    key={id}
+                    data-active={view === id}
+                    aria-current={view === id ? "page" : undefined}
+                    onClick={() => setView(id)}
+                  >
+                    <Icon />
+                    <span>{label}</span>
+                    {id === "pendencias" && pendencies.length > 0 && (
+                      <small>{pendencies.length}</small>
+                    )}
+                  </button>
+                ),
+              )}
+            </div>
+          </div>
         ))}
       </nav>
 
@@ -2065,11 +2706,12 @@ export function VenueWorkspace() {
             <button
               type="button"
               data-active={!activeNav.primary}
+              aria-current={!activeNav.primary ? "page" : undefined}
               aria-expanded={mobileMoreOpen}
               aria-controls="venue-mobile-more"
             >
-              <MoreHorizontal />
-              <span>Mais</span>
+              <MobileMoreIcon />
+              <span>{activeNav.primary ? "Mais" : activeNav.shortLabel}</span>
             </button>
           </SheetTrigger>
         </nav>
