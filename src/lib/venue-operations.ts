@@ -1408,7 +1408,7 @@ export function eventReadiness(
 
 export function toEventRpcPayload(draft: VenueEventDraft) {
   const parsed = venueEventDraftSchema.parse(draft);
-  const schedule = buildDraftSchedule(parsed);
+  const schedule = buildDraftSchedule(parsed as VenueEventDraft);
   return {
     title: parsed.title,
     executive_description: parsed.executiveDescription || null,
