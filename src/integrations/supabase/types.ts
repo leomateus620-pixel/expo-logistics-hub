@@ -3564,6 +3564,1361 @@ export type Database = {
           },
         ]
       }
+      venue_booking_units: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          name: string
+          org_id: string
+          slug: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          name: string
+          org_id: string
+          slug: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          name?: string
+          org_id?: string
+          slug?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venue_booking_units_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      venue_checklist_templates: {
+        Row: {
+          active: boolean
+          created_at: string
+          created_by: string | null
+          deadline_offset_hours: number | null
+          event_type: string | null
+          id: string
+          org_id: string
+          phase: string
+          required: boolean
+          sort_order: number
+          space_id: string | null
+          title: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          deadline_offset_hours?: number | null
+          event_type?: string | null
+          id?: string
+          org_id: string
+          phase?: string
+          required?: boolean
+          sort_order?: number
+          space_id?: string | null
+          title: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          deadline_offset_hours?: number | null
+          event_type?: string | null
+          id?: string
+          org_id?: string
+          phase?: string
+          required?: boolean
+          sort_order?: number
+          space_id?: string | null
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venue_checklist_templates_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venue_checklist_templates_space_fk"
+            columns: ["org_id", "space_id"]
+            isOneToOne: false
+            referencedRelation: "venue_spaces"
+            referencedColumns: ["org_id", "id"]
+          },
+        ]
+      }
+      venue_counterpart_agreements: {
+        Row: {
+          allowed_event_types: string[]
+          benefit_type: string
+          contract_reference: string
+          created_at: string
+          created_by: string
+          document_path: string | null
+          granted_quantity: number
+          id: string
+          no_show_consumes_allowance: boolean
+          notes: string | null
+          org_id: string
+          requires_approval: boolean
+          responsible_approver_id: string | null
+          restrictions: string[]
+          space_id: string | null
+          stakeholder_id: string
+          status: string
+          unit_type: string
+          updated_at: string
+          updated_by: string
+          valid_from: string
+          valid_until: string
+          value_per_excess_unit: number | null
+          version: number
+        }
+        Insert: {
+          allowed_event_types?: string[]
+          benefit_type: string
+          contract_reference: string
+          created_at?: string
+          created_by: string
+          document_path?: string | null
+          granted_quantity: number
+          id?: string
+          no_show_consumes_allowance?: boolean
+          notes?: string | null
+          org_id: string
+          requires_approval?: boolean
+          responsible_approver_id?: string | null
+          restrictions?: string[]
+          space_id?: string | null
+          stakeholder_id: string
+          status?: string
+          unit_type: string
+          updated_at?: string
+          updated_by: string
+          valid_from: string
+          valid_until: string
+          value_per_excess_unit?: number | null
+          version?: number
+        }
+        Update: {
+          allowed_event_types?: string[]
+          benefit_type?: string
+          contract_reference?: string
+          created_at?: string
+          created_by?: string
+          document_path?: string | null
+          granted_quantity?: number
+          id?: string
+          no_show_consumes_allowance?: boolean
+          notes?: string | null
+          org_id?: string
+          requires_approval?: boolean
+          responsible_approver_id?: string | null
+          restrictions?: string[]
+          space_id?: string | null
+          stakeholder_id?: string
+          status?: string
+          unit_type?: string
+          updated_at?: string
+          updated_by?: string
+          valid_from?: string
+          valid_until?: string
+          value_per_excess_unit?: number | null
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venue_counterpart_agreements_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venue_counterpart_space_fk"
+            columns: ["org_id", "space_id"]
+            isOneToOne: false
+            referencedRelation: "venue_spaces"
+            referencedColumns: ["org_id", "id"]
+          },
+          {
+            foreignKeyName: "venue_counterpart_stakeholder_fk"
+            columns: ["org_id", "stakeholder_id"]
+            isOneToOne: false
+            referencedRelation: "venue_stakeholder_directory"
+            referencedColumns: ["org_id", "id"]
+          },
+          {
+            foreignKeyName: "venue_counterpart_stakeholder_fk"
+            columns: ["org_id", "stakeholder_id"]
+            isOneToOne: false
+            referencedRelation: "venue_stakeholders"
+            referencedColumns: ["org_id", "id"]
+          },
+        ]
+      }
+      venue_counterpart_ledger: {
+        Row: {
+          actor_user_id: string
+          agreement_id: string
+          consumed_delta: number
+          created_at: string
+          event_id: string
+          excess_delta: number
+          id: string
+          movement_type: string
+          org_id: string
+          reason: string
+          request_id: string
+          reserved_delta: number
+          usage_id: string
+        }
+        Insert: {
+          actor_user_id: string
+          agreement_id: string
+          consumed_delta?: number
+          created_at?: string
+          event_id: string
+          excess_delta?: number
+          id?: string
+          movement_type: string
+          org_id: string
+          reason: string
+          request_id: string
+          reserved_delta?: number
+          usage_id: string
+        }
+        Update: {
+          actor_user_id?: string
+          agreement_id?: string
+          consumed_delta?: number
+          created_at?: string
+          event_id?: string
+          excess_delta?: number
+          id?: string
+          movement_type?: string
+          org_id?: string
+          reason?: string
+          request_id?: string
+          reserved_delta?: number
+          usage_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venue_counterpart_ledger_agreement_fk"
+            columns: ["org_id", "agreement_id"]
+            isOneToOne: false
+            referencedRelation: "venue_counterpart_agreements"
+            referencedColumns: ["org_id", "id"]
+          },
+          {
+            foreignKeyName: "venue_counterpart_ledger_agreement_fk"
+            columns: ["org_id", "agreement_id"]
+            isOneToOne: false
+            referencedRelation: "venue_counterpart_balances"
+            referencedColumns: ["org_id", "id"]
+          },
+          {
+            foreignKeyName: "venue_counterpart_ledger_event_fk"
+            columns: ["org_id", "event_id"]
+            isOneToOne: false
+            referencedRelation: "venue_events"
+            referencedColumns: ["org_id", "id"]
+          },
+          {
+            foreignKeyName: "venue_counterpart_ledger_integrity_fk"
+            columns: ["org_id", "usage_id", "agreement_id", "event_id"]
+            isOneToOne: false
+            referencedRelation: "venue_counterpart_usage"
+            referencedColumns: ["org_id", "id", "agreement_id", "event_id"]
+          },
+          {
+            foreignKeyName: "venue_counterpart_ledger_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venue_counterpart_ledger_usage_fk"
+            columns: ["org_id", "usage_id"]
+            isOneToOne: false
+            referencedRelation: "venue_counterpart_usage"
+            referencedColumns: ["org_id", "id"]
+          },
+        ]
+      }
+      venue_counterpart_usage: {
+        Row: {
+          agreement_id: string
+          approved_at: string | null
+          approved_by: string | null
+          approved_excess_quantity: number
+          created_at: string
+          event_id: string
+          excess_approval_status: string
+          excess_quantity: number
+          id: string
+          observation: string | null
+          org_id: string
+          requested_quantity: number
+          superseded_at: string | null
+          updated_at: string
+          usage_state: string
+        }
+        Insert: {
+          agreement_id: string
+          approved_at?: string | null
+          approved_by?: string | null
+          approved_excess_quantity?: number
+          created_at?: string
+          event_id: string
+          excess_approval_status?: string
+          excess_quantity?: number
+          id?: string
+          observation?: string | null
+          org_id: string
+          requested_quantity?: number
+          superseded_at?: string | null
+          updated_at?: string
+          usage_state?: string
+        }
+        Update: {
+          agreement_id?: string
+          approved_at?: string | null
+          approved_by?: string | null
+          approved_excess_quantity?: number
+          created_at?: string
+          event_id?: string
+          excess_approval_status?: string
+          excess_quantity?: number
+          id?: string
+          observation?: string | null
+          org_id?: string
+          requested_quantity?: number
+          superseded_at?: string | null
+          updated_at?: string
+          usage_state?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venue_counterpart_usage_agreement_fk"
+            columns: ["org_id", "agreement_id"]
+            isOneToOne: false
+            referencedRelation: "venue_counterpart_agreements"
+            referencedColumns: ["org_id", "id"]
+          },
+          {
+            foreignKeyName: "venue_counterpart_usage_agreement_fk"
+            columns: ["org_id", "agreement_id"]
+            isOneToOne: false
+            referencedRelation: "venue_counterpart_balances"
+            referencedColumns: ["org_id", "id"]
+          },
+          {
+            foreignKeyName: "venue_counterpart_usage_event_fk"
+            columns: ["org_id", "event_id"]
+            isOneToOne: false
+            referencedRelation: "venue_events"
+            referencedColumns: ["org_id", "id"]
+          },
+          {
+            foreignKeyName: "venue_counterpart_usage_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      venue_event_approvals: {
+        Row: {
+          approver_id: string
+          created_at: string
+          decision: string
+          event_id: string
+          id: string
+          new_status: string
+          observation: string | null
+          org_id: string
+          previous_status: string
+          reason: string | null
+        }
+        Insert: {
+          approver_id: string
+          created_at?: string
+          decision: string
+          event_id: string
+          id?: string
+          new_status: string
+          observation?: string | null
+          org_id: string
+          previous_status: string
+          reason?: string | null
+        }
+        Update: {
+          approver_id?: string
+          created_at?: string
+          decision?: string
+          event_id?: string
+          id?: string
+          new_status?: string
+          observation?: string | null
+          org_id?: string
+          previous_status?: string
+          reason?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venue_event_approvals_event_fk"
+            columns: ["org_id", "event_id"]
+            isOneToOne: false
+            referencedRelation: "venue_events"
+            referencedColumns: ["org_id", "id"]
+          },
+          {
+            foreignKeyName: "venue_event_approvals_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      venue_event_checklist_items: {
+        Row: {
+          completed_at: string | null
+          completed_by: string | null
+          created_at: string
+          created_by: string
+          deadline: string | null
+          event_id: string
+          id: string
+          note: string | null
+          org_id: string
+          phase: string
+          required: boolean
+          responsible_user_id: string | null
+          sort_order: number
+          status: string
+          template_id: string | null
+          title: string
+          updated_at: string
+          updated_by: string
+          version: number
+        }
+        Insert: {
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          created_by: string
+          deadline?: string | null
+          event_id: string
+          id?: string
+          note?: string | null
+          org_id: string
+          phase?: string
+          required?: boolean
+          responsible_user_id?: string | null
+          sort_order?: number
+          status?: string
+          template_id?: string | null
+          title: string
+          updated_at?: string
+          updated_by: string
+          version?: number
+        }
+        Update: {
+          completed_at?: string | null
+          completed_by?: string | null
+          created_at?: string
+          created_by?: string
+          deadline?: string | null
+          event_id?: string
+          id?: string
+          note?: string | null
+          org_id?: string
+          phase?: string
+          required?: boolean
+          responsible_user_id?: string | null
+          sort_order?: number
+          status?: string
+          template_id?: string | null
+          title?: string
+          updated_at?: string
+          updated_by?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venue_event_checklist_event_fk"
+            columns: ["org_id", "event_id"]
+            isOneToOne: false
+            referencedRelation: "venue_events"
+            referencedColumns: ["org_id", "id"]
+          },
+          {
+            foreignKeyName: "venue_event_checklist_items_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venue_event_checklist_template_fk"
+            columns: ["org_id", "template_id"]
+            isOneToOne: false
+            referencedRelation: "venue_checklist_templates"
+            referencedColumns: ["org_id", "id"]
+          },
+        ]
+      }
+      venue_event_documents: {
+        Row: {
+          created_at: string
+          document_type: string
+          event_id: string
+          file_name: string
+          id: string
+          mime_type: string
+          org_id: string
+          sensitive: boolean
+          size_bytes: number
+          storage_path: string
+          uploaded_by: string
+        }
+        Insert: {
+          created_at?: string
+          document_type: string
+          event_id: string
+          file_name: string
+          id?: string
+          mime_type: string
+          org_id: string
+          sensitive?: boolean
+          size_bytes: number
+          storage_path: string
+          uploaded_by: string
+        }
+        Update: {
+          created_at?: string
+          document_type?: string
+          event_id?: string
+          file_name?: string
+          id?: string
+          mime_type?: string
+          org_id?: string
+          sensitive?: boolean
+          size_bytes?: number
+          storage_path?: string
+          uploaded_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venue_event_documents_event_fk"
+            columns: ["org_id", "event_id"]
+            isOneToOne: false
+            referencedRelation: "venue_events"
+            referencedColumns: ["org_id", "id"]
+          },
+          {
+            foreignKeyName: "venue_event_documents_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      venue_event_resources: {
+        Row: {
+          completion_status: string
+          confirmation_status: string
+          created_at: string
+          created_by: string
+          event_id: string
+          id: string
+          notes: string | null
+          org_id: string
+          quantity: number
+          required_at: string | null
+          resource_type: string
+          responsible_team: string | null
+          responsible_user_id: string | null
+          updated_at: string
+          updated_by: string
+          version: number
+        }
+        Insert: {
+          completion_status?: string
+          confirmation_status?: string
+          created_at?: string
+          created_by: string
+          event_id: string
+          id?: string
+          notes?: string | null
+          org_id: string
+          quantity?: number
+          required_at?: string | null
+          resource_type: string
+          responsible_team?: string | null
+          responsible_user_id?: string | null
+          updated_at?: string
+          updated_by: string
+          version?: number
+        }
+        Update: {
+          completion_status?: string
+          confirmation_status?: string
+          created_at?: string
+          created_by?: string
+          event_id?: string
+          id?: string
+          notes?: string | null
+          org_id?: string
+          quantity?: number
+          required_at?: string | null
+          resource_type?: string
+          responsible_team?: string | null
+          responsible_user_id?: string | null
+          updated_at?: string
+          updated_by?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venue_event_resources_event_fk"
+            columns: ["org_id", "event_id"]
+            isOneToOne: false
+            referencedRelation: "venue_events"
+            referencedColumns: ["org_id", "id"]
+          },
+          {
+            foreignKeyName: "venue_event_resources_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      venue_event_responsibles: {
+        Row: {
+          created_at: string
+          event_id: string
+          id: string
+          org_id: string
+          responsibility_role: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          id?: string
+          org_id: string
+          responsibility_role?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          id?: string
+          org_id?: string
+          responsibility_role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venue_event_responsibles_event_fk"
+            columns: ["org_id", "event_id"]
+            isOneToOne: false
+            referencedRelation: "venue_events"
+            referencedColumns: ["org_id", "id"]
+          },
+          {
+            foreignKeyName: "venue_event_responsibles_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      venue_event_spaces: {
+        Row: {
+          blocks_availability: boolean
+          conflict_override: boolean
+          created_at: string
+          end_at: string | null
+          event_id: string
+          id: string
+          org_id: string
+          requested_area: string | null
+          setup_start_at: string | null
+          space_id: string
+          start_at: string | null
+          teardown_end_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          blocks_availability?: boolean
+          conflict_override?: boolean
+          created_at?: string
+          end_at?: string | null
+          event_id: string
+          id?: string
+          org_id: string
+          requested_area?: string | null
+          setup_start_at?: string | null
+          space_id: string
+          start_at?: string | null
+          teardown_end_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          blocks_availability?: boolean
+          conflict_override?: boolean
+          created_at?: string
+          end_at?: string | null
+          event_id?: string
+          id?: string
+          org_id?: string
+          requested_area?: string | null
+          setup_start_at?: string | null
+          space_id?: string
+          start_at?: string | null
+          teardown_end_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venue_event_spaces_event_fk"
+            columns: ["org_id", "event_id"]
+            isOneToOne: false
+            referencedRelation: "venue_events"
+            referencedColumns: ["org_id", "id"]
+          },
+          {
+            foreignKeyName: "venue_event_spaces_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venue_event_spaces_space_fk"
+            columns: ["org_id", "space_id"]
+            isOneToOne: false
+            referencedRelation: "venue_spaces"
+            referencedColumns: ["org_id", "id"]
+          },
+        ]
+      }
+      venue_events: {
+        Row: {
+          approval_status: string
+          cancellation_reason: string | null
+          completed_at: string | null
+          confirmed_audience: number | null
+          conflict_override_fingerprint: string | null
+          conflict_override_reason: string | null
+          conflict_status: string
+          counterpart_agreement_id: string | null
+          counterpart_requested_quantity: number | null
+          created_at: string
+          created_by: string
+          end_at: string | null
+          estimated_audience: number | null
+          event_result: string | null
+          event_type: string
+          executive_description: string | null
+          id: string
+          observations: string | null
+          org_id: string
+          pending_date: boolean
+          priority: string
+          requested_area: string | null
+          requester_name: string
+          requester_user_id: string | null
+          responsible_organization_id: string | null
+          responsible_user_id: string | null
+          setup_start_at: string | null
+          sponsor_id: string | null
+          start_at: string | null
+          status: string
+          target_audience: string | null
+          teardown_end_at: string | null
+          title: string
+          updated_at: string
+          updated_by: string
+          version: number
+          visibility: string
+        }
+        Insert: {
+          approval_status?: string
+          cancellation_reason?: string | null
+          completed_at?: string | null
+          confirmed_audience?: number | null
+          conflict_override_fingerprint?: string | null
+          conflict_override_reason?: string | null
+          conflict_status?: string
+          counterpart_agreement_id?: string | null
+          counterpart_requested_quantity?: number | null
+          created_at?: string
+          created_by: string
+          end_at?: string | null
+          estimated_audience?: number | null
+          event_result?: string | null
+          event_type: string
+          executive_description?: string | null
+          id?: string
+          observations?: string | null
+          org_id: string
+          pending_date?: boolean
+          priority?: string
+          requested_area?: string | null
+          requester_name: string
+          requester_user_id?: string | null
+          responsible_organization_id?: string | null
+          responsible_user_id?: string | null
+          setup_start_at?: string | null
+          sponsor_id?: string | null
+          start_at?: string | null
+          status?: string
+          target_audience?: string | null
+          teardown_end_at?: string | null
+          title: string
+          updated_at?: string
+          updated_by: string
+          version?: number
+          visibility?: string
+        }
+        Update: {
+          approval_status?: string
+          cancellation_reason?: string | null
+          completed_at?: string | null
+          confirmed_audience?: number | null
+          conflict_override_fingerprint?: string | null
+          conflict_override_reason?: string | null
+          conflict_status?: string
+          counterpart_agreement_id?: string | null
+          counterpart_requested_quantity?: number | null
+          created_at?: string
+          created_by?: string
+          end_at?: string | null
+          estimated_audience?: number | null
+          event_result?: string | null
+          event_type?: string
+          executive_description?: string | null
+          id?: string
+          observations?: string | null
+          org_id?: string
+          pending_date?: boolean
+          priority?: string
+          requested_area?: string | null
+          requester_name?: string
+          requester_user_id?: string | null
+          responsible_organization_id?: string | null
+          responsible_user_id?: string | null
+          setup_start_at?: string | null
+          sponsor_id?: string | null
+          start_at?: string | null
+          status?: string
+          target_audience?: string | null
+          teardown_end_at?: string | null
+          title?: string
+          updated_at?: string
+          updated_by?: string
+          version?: number
+          visibility?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venue_events_counterpart_fk"
+            columns: ["org_id", "counterpart_agreement_id"]
+            isOneToOne: false
+            referencedRelation: "venue_counterpart_agreements"
+            referencedColumns: ["org_id", "id"]
+          },
+          {
+            foreignKeyName: "venue_events_counterpart_fk"
+            columns: ["org_id", "counterpart_agreement_id"]
+            isOneToOne: false
+            referencedRelation: "venue_counterpart_balances"
+            referencedColumns: ["org_id", "id"]
+          },
+          {
+            foreignKeyName: "venue_events_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venue_events_responsible_org_fk"
+            columns: ["org_id", "responsible_organization_id"]
+            isOneToOne: false
+            referencedRelation: "venue_stakeholder_directory"
+            referencedColumns: ["org_id", "id"]
+          },
+          {
+            foreignKeyName: "venue_events_responsible_org_fk"
+            columns: ["org_id", "responsible_organization_id"]
+            isOneToOne: false
+            referencedRelation: "venue_stakeholders"
+            referencedColumns: ["org_id", "id"]
+          },
+          {
+            foreignKeyName: "venue_events_sponsor_fk"
+            columns: ["org_id", "sponsor_id"]
+            isOneToOne: false
+            referencedRelation: "venue_stakeholder_directory"
+            referencedColumns: ["org_id", "id"]
+          },
+          {
+            foreignKeyName: "venue_events_sponsor_fk"
+            columns: ["org_id", "sponsor_id"]
+            isOneToOne: false
+            referencedRelation: "venue_stakeholders"
+            referencedColumns: ["org_id", "id"]
+          },
+        ]
+      }
+      venue_mutation_receipts: {
+        Row: {
+          actor_user_id: string
+          created_at: string
+          id: string
+          idempotency_key: string
+          operation: string
+          org_id: string
+          request_hash: string
+          result: Json | null
+        }
+        Insert: {
+          actor_user_id: string
+          created_at?: string
+          id?: string
+          idempotency_key: string
+          operation: string
+          org_id: string
+          request_hash: string
+          result?: Json | null
+        }
+        Update: {
+          actor_user_id?: string
+          created_at?: string
+          id?: string
+          idempotency_key?: string
+          operation?: string
+          org_id?: string
+          request_hash?: string
+          result?: Json | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venue_mutation_receipts_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      venue_occupancies: {
+        Row: {
+          active: boolean
+          booking_unit_id: string
+          conflict_override: boolean
+          created_at: string
+          event_id: string
+          event_space_id: string
+          id: string
+          occupied_during: unknown
+          org_id: string
+          override_reason: string | null
+          setup_start_at: string
+          teardown_end_at: string
+        }
+        Insert: {
+          active?: boolean
+          booking_unit_id: string
+          conflict_override?: boolean
+          created_at?: string
+          event_id: string
+          event_space_id: string
+          id?: string
+          occupied_during?: unknown
+          org_id: string
+          override_reason?: string | null
+          setup_start_at: string
+          teardown_end_at: string
+        }
+        Update: {
+          active?: boolean
+          booking_unit_id?: string
+          conflict_override?: boolean
+          created_at?: string
+          event_id?: string
+          event_space_id?: string
+          id?: string
+          occupied_during?: unknown
+          org_id?: string
+          override_reason?: string | null
+          setup_start_at?: string
+          teardown_end_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venue_occupancies_event_fk"
+            columns: ["org_id", "event_id"]
+            isOneToOne: false
+            referencedRelation: "venue_events"
+            referencedColumns: ["org_id", "id"]
+          },
+          {
+            foreignKeyName: "venue_occupancies_event_space_fk"
+            columns: ["org_id", "event_space_id", "event_id"]
+            isOneToOne: false
+            referencedRelation: "venue_event_spaces"
+            referencedColumns: ["org_id", "id", "event_id"]
+          },
+          {
+            foreignKeyName: "venue_occupancies_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venue_occupancies_unit_fk"
+            columns: ["org_id", "booking_unit_id"]
+            isOneToOne: false
+            referencedRelation: "venue_booking_units"
+            referencedColumns: ["org_id", "id"]
+          },
+        ]
+      }
+      venue_space_blocks: {
+        Row: {
+          active: boolean
+          block_type: string
+          created_at: string
+          created_by: string
+          ends_at: string
+          id: string
+          org_id: string
+          reason: string
+          space_id: string
+          stakeholder_id: string | null
+          starts_at: string
+          title: string
+          updated_at: string
+          updated_by: string
+          version: number
+        }
+        Insert: {
+          active?: boolean
+          block_type: string
+          created_at?: string
+          created_by: string
+          ends_at: string
+          id?: string
+          org_id: string
+          reason: string
+          space_id: string
+          stakeholder_id?: string | null
+          starts_at: string
+          title: string
+          updated_at?: string
+          updated_by: string
+          version?: number
+        }
+        Update: {
+          active?: boolean
+          block_type?: string
+          created_at?: string
+          created_by?: string
+          ends_at?: string
+          id?: string
+          org_id?: string
+          reason?: string
+          space_id?: string
+          stakeholder_id?: string | null
+          starts_at?: string
+          title?: string
+          updated_at?: string
+          updated_by?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venue_space_blocks_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venue_space_blocks_space_fk"
+            columns: ["org_id", "space_id"]
+            isOneToOne: false
+            referencedRelation: "venue_spaces"
+            referencedColumns: ["org_id", "id"]
+          },
+          {
+            foreignKeyName: "venue_space_blocks_stakeholder_fk"
+            columns: ["org_id", "stakeholder_id"]
+            isOneToOne: false
+            referencedRelation: "venue_stakeholder_directory"
+            referencedColumns: ["org_id", "id"]
+          },
+          {
+            foreignKeyName: "venue_space_blocks_stakeholder_fk"
+            columns: ["org_id", "stakeholder_id"]
+            isOneToOne: false
+            referencedRelation: "venue_stakeholders"
+            referencedColumns: ["org_id", "id"]
+          },
+        ]
+      }
+      venue_space_booking_units: {
+        Row: {
+          booking_unit_id: string
+          created_at: string
+          org_id: string
+          space_id: string
+        }
+        Insert: {
+          booking_unit_id: string
+          created_at?: string
+          org_id: string
+          space_id: string
+        }
+        Update: {
+          booking_unit_id?: string
+          created_at?: string
+          org_id?: string
+          space_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venue_space_booking_units_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venue_space_booking_units_space_fk"
+            columns: ["org_id", "space_id"]
+            isOneToOne: false
+            referencedRelation: "venue_spaces"
+            referencedColumns: ["org_id", "id"]
+          },
+          {
+            foreignKeyName: "venue_space_booking_units_unit_fk"
+            columns: ["org_id", "booking_unit_id"]
+            isOneToOne: false
+            referencedRelation: "venue_booking_units"
+            referencedColumns: ["org_id", "id"]
+          },
+        ]
+      }
+      venue_spaces: {
+        Row: {
+          active: boolean
+          allowed_event_types: string[]
+          available_areas: string[]
+          available_resources: string[]
+          capacity: number | null
+          created_at: string
+          created_by: string | null
+          default_responsible_team: string | null
+          description: string | null
+          id: string
+          internal_notes: string | null
+          location: string | null
+          name: string
+          org_id: string
+          parent_space_id: string | null
+          required_setup_minutes: number
+          required_teardown_minutes: number
+          restrictions: string[]
+          slug: string
+          standard_opening_hours: Json
+          type: string
+          updated_at: string
+          updated_by: string | null
+          version: number
+        }
+        Insert: {
+          active?: boolean
+          allowed_event_types?: string[]
+          available_areas?: string[]
+          available_resources?: string[]
+          capacity?: number | null
+          created_at?: string
+          created_by?: string | null
+          default_responsible_team?: string | null
+          description?: string | null
+          id?: string
+          internal_notes?: string | null
+          location?: string | null
+          name: string
+          org_id: string
+          parent_space_id?: string | null
+          required_setup_minutes?: number
+          required_teardown_minutes?: number
+          restrictions?: string[]
+          slug: string
+          standard_opening_hours?: Json
+          type?: string
+          updated_at?: string
+          updated_by?: string | null
+          version?: number
+        }
+        Update: {
+          active?: boolean
+          allowed_event_types?: string[]
+          available_areas?: string[]
+          available_resources?: string[]
+          capacity?: number | null
+          created_at?: string
+          created_by?: string | null
+          default_responsible_team?: string | null
+          description?: string | null
+          id?: string
+          internal_notes?: string | null
+          location?: string | null
+          name?: string
+          org_id?: string
+          parent_space_id?: string | null
+          required_setup_minutes?: number
+          required_teardown_minutes?: number
+          restrictions?: string[]
+          slug?: string
+          standard_opening_hours?: Json
+          type?: string
+          updated_at?: string
+          updated_by?: string | null
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venue_spaces_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venue_spaces_parent_fk"
+            columns: ["org_id", "parent_space_id"]
+            isOneToOne: false
+            referencedRelation: "venue_spaces"
+            referencedColumns: ["org_id", "id"]
+          },
+        ]
+      }
+      venue_stakeholders: {
+        Row: {
+          active: boolean
+          active_from: string | null
+          active_until: string | null
+          contact_name: string | null
+          contract_reference: string | null
+          created_at: string
+          created_by: string
+          document_identifier: string | null
+          email: string | null
+          id: string
+          legal_name: string
+          normalized_name: string | null
+          notes: string | null
+          org_id: string
+          phone: string | null
+          relationship_type: string
+          sponsor_category: string | null
+          trade_name: string | null
+          updated_at: string
+          updated_by: string
+          version: number
+        }
+        Insert: {
+          active?: boolean
+          active_from?: string | null
+          active_until?: string | null
+          contact_name?: string | null
+          contract_reference?: string | null
+          created_at?: string
+          created_by: string
+          document_identifier?: string | null
+          email?: string | null
+          id?: string
+          legal_name: string
+          normalized_name?: string | null
+          notes?: string | null
+          org_id: string
+          phone?: string | null
+          relationship_type: string
+          sponsor_category?: string | null
+          trade_name?: string | null
+          updated_at?: string
+          updated_by: string
+          version?: number
+        }
+        Update: {
+          active?: boolean
+          active_from?: string | null
+          active_until?: string | null
+          contact_name?: string | null
+          contract_reference?: string | null
+          created_at?: string
+          created_by?: string
+          document_identifier?: string | null
+          email?: string | null
+          id?: string
+          legal_name?: string
+          normalized_name?: string | null
+          notes?: string | null
+          org_id?: string
+          phone?: string | null
+          relationship_type?: string
+          sponsor_category?: string | null
+          trade_name?: string | null
+          updated_at?: string
+          updated_by?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venue_stakeholders_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       weather_city_cache: {
         Row: {
           city_key: string
@@ -3949,6 +5304,127 @@ export type Database = {
           },
         ]
       }
+      venue_counterpart_balances: {
+        Row: {
+          confirmed_excess_quantity: number | null
+          consumed_quantity: number | null
+          contract_reference: string | null
+          granted_quantity: number | null
+          id: string | null
+          org_id: string | null
+          pending_quantity: number | null
+          projected_excess_quantity: number | null
+          remaining_quantity: number | null
+          reserved_quantity: number | null
+          space_id: string | null
+          stakeholder_id: string | null
+          unit_type: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venue_counterpart_agreements_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venue_counterpart_space_fk"
+            columns: ["org_id", "space_id"]
+            isOneToOne: false
+            referencedRelation: "venue_spaces"
+            referencedColumns: ["org_id", "id"]
+          },
+          {
+            foreignKeyName: "venue_counterpart_stakeholder_fk"
+            columns: ["org_id", "stakeholder_id"]
+            isOneToOne: false
+            referencedRelation: "venue_stakeholder_directory"
+            referencedColumns: ["org_id", "id"]
+          },
+          {
+            foreignKeyName: "venue_counterpart_stakeholder_fk"
+            columns: ["org_id", "stakeholder_id"]
+            isOneToOne: false
+            referencedRelation: "venue_stakeholders"
+            referencedColumns: ["org_id", "id"]
+          },
+        ]
+      }
+      venue_stakeholder_directory: {
+        Row: {
+          active: boolean | null
+          active_from: string | null
+          active_until: string | null
+          contact_name: string | null
+          contract_reference: string | null
+          created_at: string | null
+          document_identifier: string | null
+          email: string | null
+          id: string | null
+          legal_name: string | null
+          normalized_name: string | null
+          notes: string | null
+          org_id: string | null
+          phone: string | null
+          relationship_type: string | null
+          sponsor_category: string | null
+          trade_name: string | null
+          updated_at: string | null
+          version: number | null
+        }
+        Insert: {
+          active?: boolean | null
+          active_from?: string | null
+          active_until?: string | null
+          contact_name?: string | null
+          contract_reference?: never
+          created_at?: string | null
+          document_identifier?: never
+          email?: never
+          id?: string | null
+          legal_name?: string | null
+          normalized_name?: string | null
+          notes?: never
+          org_id?: string | null
+          phone?: never
+          relationship_type?: string | null
+          sponsor_category?: string | null
+          trade_name?: string | null
+          updated_at?: string | null
+          version?: number | null
+        }
+        Update: {
+          active?: boolean | null
+          active_from?: string | null
+          active_until?: string | null
+          contact_name?: string | null
+          contract_reference?: never
+          created_at?: string | null
+          document_identifier?: never
+          email?: never
+          id?: string | null
+          legal_name?: string | null
+          normalized_name?: string | null
+          notes?: never
+          org_id?: string | null
+          phone?: never
+          relationship_type?: string | null
+          sponsor_category?: string | null
+          trade_name?: string | null
+          updated_at?: string | null
+          version?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venue_stakeholders_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       _cronograma_apply_event_commissions: {
@@ -4183,6 +5659,20 @@ export type Database = {
         Args: { _form_id: string }
         Returns: undefined
       }
+      venue_can_delete_orphan_storage_object: {
+        Args: { _object_name: string }
+        Returns: boolean
+      }
+      venue_can_view_event: {
+        Args: { _event_id: string; _org_id: string }
+        Returns: boolean
+      }
+      venue_has_capability: {
+        Args: { _capability: string; _org_id: string }
+        Returns: boolean
+      }
+      venue_normalize_name: { Args: { value: string }; Returns: string }
+      venue_seed_org_defaults: { Args: { _org_id: string }; Returns: undefined }
     }
     Enums: {
       app_role: "admin" | "user"

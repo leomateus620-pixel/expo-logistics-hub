@@ -1408,7 +1408,7 @@ export function eventReadiness(
 
 export function toEventRpcPayload(draft: VenueEventDraft) {
   const parsed = venueEventDraftSchema.parse(draft);
-  const schedule = buildDraftSchedule(parsed);
+  const schedule = buildDraftSchedule(parsed as VenueEventDraft);
   return {
     title: parsed.title,
     executive_description: parsed.executiveDescription || null,
@@ -1561,7 +1561,7 @@ export function eventToDraft(
     resources: resources
       .filter((resource) => resource.event_id === event.id)
       .map((resource) => ({
-        resourceType: resource.resource_type,
+        resourceType: resource.resource_type as VenueResourceType,
         quantity: Number(resource.quantity),
         responsibleTeam: resource.responsible_team ?? "",
         notes: resource.notes ?? "",
