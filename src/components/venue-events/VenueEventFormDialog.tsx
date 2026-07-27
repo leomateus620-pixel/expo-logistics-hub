@@ -415,7 +415,7 @@ export function VenueEventFormDialog({
     );
   };
 
-  const toggleResource = (resourceType: string, checked: boolean) => {
+  const toggleResource = (resourceType: VenueResourceType, checked: boolean) => {
     update(
       "resources",
       checked
