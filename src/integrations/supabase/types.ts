@@ -5659,6 +5659,29 @@ export type Database = {
         Args: { _form_id: string }
         Returns: undefined
       }
+      venue_assert_capability: {
+        Args: { _capability: string; _org_id: string }
+        Returns: string
+      }
+      venue_begin_mutation: {
+        Args: {
+          _idempotency_key: string
+          _operation: string
+          _org_id: string
+          _payload: Json
+        }
+        Returns: Json
+      }
+      venue_calculate_usage_quantity: {
+        Args: {
+          _audience: number
+          _end_at: string
+          _explicit_quantity: number
+          _start_at: string
+          _unit_type: string
+        }
+        Returns: number
+      }
       venue_can_delete_orphan_storage_object: {
         Args: { _object_name: string }
         Returns: boolean
@@ -5667,12 +5690,194 @@ export type Database = {
         Args: { _event_id: string; _org_id: string }
         Returns: boolean
       }
+      venue_check_availability: {
+        Args: {
+          _audience?: number
+          _event_end_at?: string
+          _event_start_at?: string
+          _event_type?: string
+          _exclude_event_id?: string
+          _org_id: string
+          _setup_start_at: string
+          _space_ids: string[]
+          _teardown_end_at: string
+        }
+        Returns: {
+          conflict_id: string
+          conflict_kind: string
+          detail: string
+          ends_at: string
+          evidence_token: string
+          space_id: string
+          starts_at: string
+          title: string
+        }[]
+      }
+      venue_clear_usage_excess_approval: {
+        Args: { _reason: string; _request_id: string; _usage_id: string }
+        Returns: undefined
+      }
+      venue_finish_mutation: {
+        Args: {
+          _idempotency_key: string
+          _operation: string
+          _org_id: string
+          _result: Json
+        }
+        Returns: Json
+      }
+      venue_get_audit_history: {
+        Args: {
+          _before?: string
+          _before_id?: string
+          _event_id?: string
+          _limit?: number
+          _org_id: string
+        }
+        Returns: {
+          action: Database["public"]["Enums"]["audit_action"]
+          actor_user_id: string
+          after_data: Json
+          before_data: Json
+          created_at: string
+          entity: string
+          entity_id: string
+          id: string
+          org_id: string
+        }[]
+      }
+      venue_get_permissions: { Args: { _org_id: string }; Returns: Json }
       venue_has_capability: {
         Args: { _capability: string; _org_id: string }
         Returns: boolean
       }
+      venue_log_audit: {
+        Args: {
+          _action: Database["public"]["Enums"]["audit_action"]
+          _after: Json
+          _before: Json
+          _entity: string
+          _entity_id: string
+          _org_id: string
+          _reason: string
+          _request_id: string
+          _venue_action: string
+        }
+        Returns: undefined
+      }
       venue_normalize_name: { Args: { value: string }; Returns: string }
+      venue_recalculate_agreement_excess: {
+        Args: { _agreement_id: string; _reason: string; _request_id: string }
+        Returns: undefined
+      }
+      venue_redact_document_snapshot: {
+        Args: { _snapshot: Json }
+        Returns: Json
+      }
+      venue_redact_stakeholder_snapshot: {
+        Args: { _snapshot: Json }
+        Returns: Json
+      }
+      venue_refresh_occupancies: {
+        Args: { _event_id: string }
+        Returns: undefined
+      }
+      venue_register_document: {
+        Args: {
+          _event_id: string
+          _idempotency_key: string
+          _org_id: string
+          _payload: Json
+        }
+        Returns: Json
+      }
+      venue_save_event: {
+        Args: {
+          _event_id: string
+          _expected_version: number
+          _idempotency_key: string
+          _org_id: string
+          _payload: Json
+        }
+        Returns: Json
+      }
       venue_seed_org_defaults: { Args: { _org_id: string }; Returns: undefined }
+      venue_sync_event_counterpart: {
+        Args: { _event_id: string; _reason: string; _request_id: string }
+        Returns: undefined
+      }
+      venue_transition_event: {
+        Args: {
+          _event_id: string
+          _expected_version: number
+          _idempotency_key: string
+          _org_id: string
+          _payload?: Json
+          _reason: string
+          _transition: string
+        }
+        Returns: Json
+      }
+      venue_update_checklist_item: {
+        Args: {
+          _expected_version: number
+          _idempotency_key: string
+          _item_id: string
+          _org_id: string
+          _payload: Json
+        }
+        Returns: Json
+      }
+      venue_update_resource: {
+        Args: {
+          _expected_version: number
+          _idempotency_key: string
+          _org_id: string
+          _payload: Json
+          _resource_id: string
+        }
+        Returns: Json
+      }
+      venue_upsert_agreement: {
+        Args: {
+          _agreement_id: string
+          _expected_version: number
+          _idempotency_key: string
+          _org_id: string
+          _payload: Json
+        }
+        Returns: Json
+      }
+      venue_upsert_space: {
+        Args: {
+          _expected_version: number
+          _idempotency_key: string
+          _org_id: string
+          _payload: Json
+          _space_id: string
+        }
+        Returns: Json
+      }
+      venue_upsert_space_block: {
+        Args: {
+          _block_id: string
+          _expected_version: number
+          _idempotency_key: string
+          _org_id: string
+          _payload: Json
+        }
+        Returns: Json
+      }
+      venue_upsert_stakeholder: {
+        Args: {
+          _expected_version: number
+          _idempotency_key: string
+          _org_id: string
+          _payload: Json
+          _stakeholder_id: string
+        }
+        Returns: Json
+      }
     }
     Enums: {
       app_role: "admin" | "user"
