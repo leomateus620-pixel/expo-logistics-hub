@@ -1125,20 +1125,23 @@ export function VenueEventFormDialog({
                   <legend>Recursos necessários</legend>
                   <div className="venue-resource-picker">
                     {Object.entries(RESOURCE_TYPE_LABELS).map(
-                      ([type, label]) => (
-                        <label
-                          key={type}
-                          data-selected={selectedResources.has(type)}
-                        >
-                          <Checkbox
-                            checked={selectedResources.has(type)}
-                            onCheckedChange={(checked) =>
-                              toggleResource(type, checked === true)
-                            }
-                          />
-                          <span>{label}</span>
-                        </label>
-                      ),
+                      ([type, label]) => {
+                        const typedResource = type as VenueResourceType;
+                        return (
+                          <label
+                            key={type}
+                            data-selected={selectedResources.has(typedResource)}
+                          >
+                            <Checkbox
+                              checked={selectedResources.has(typedResource)}
+                              onCheckedChange={(checked) =>
+                                toggleResource(typedResource, checked === true)
+                              }
+                            />
+                            <span>{label}</span>
+                          </label>
+                        );
+                      },
                     )}
                   </div>
                 </fieldset>
