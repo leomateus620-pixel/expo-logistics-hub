@@ -1,8 +1,14 @@
-import { createContext, useContext, useMemo, useCallback, ReactNode } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { supabase } from '@/integrations/supabase/client';
-import { useAuth } from '@/hooks/useAuth';
-import { useCurrentOrg } from '@/hooks/useCurrentOrg';
+import {
+  createContext,
+  useContext,
+  useMemo,
+  useCallback,
+  ReactNode,
+} from "react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { useCurrentOrg } from "@/hooks/useCurrentOrg";
 
 interface CapabilitiesContextValue {
   hasFullAccess: boolean;
@@ -11,57 +17,100 @@ interface CapabilitiesContextValue {
   capSet: Set<string>;
 }
 
-const CapabilitiesContext = createContext<CapabilitiesContextValue | undefined>(undefined);
+const CapabilitiesContext = createContext<CapabilitiesContextValue | undefined>(
+  undefined,
+);
+
+const VENUE_GESTOR_CAPABILITIES = new Set([
+  "venue_events_access",
+  "venue_events_create",
+  "venue_events_manage",
+  "venue_events_cancel",
+  "venue_venues_manage",
+  "venue_operations_manage",
+  "venue_reports_view",
+  "venue_events_audit_view",
+]);
+
+const VENUE_OPERATOR_CAPABILITIES = new Set([
+  "venue_events_access",
+  "venue_events_create",
+  "venue_operations_manage",
+  "venue_reports_view",
+]);
 
 export function CapabilitiesProvider({ children }: { children: ReactNode }) {
   const { user, loading: authLoading } = useAuth();
   const { orgId, myRole, isLoading: orgLoading } = useCurrentOrg();
 
-  const hasFullAccessByRole = myRole === 'admin' || myRole === 'gestor' || myRole === 'operador';
-  const roleResolved = !authLoading && !orgLoading && !!user && !!orgId && myRole !== null && myRole !== undefined;
+  const hasFullAccessByRole =
+    myRole === "admin" || myRole === "gestor" || myRole === "operador";
+  const roleResolved =
+    !authLoading &&
+    !orgLoading &&
+    !!user &&
+    !!orgId &&
+    myRole !== null &&
+    myRole !== undefined;
 
   const { data: capabilities = [], isLoading: capLoading } = useQuery({
-    queryKey: ['user-capabilities', user?.id, orgId],
+    queryKey: ["user-capabilities", user?.id, orgId],
     queryFn: async () => {
       if (!user || !orgId) return [];
-      const { data, error } = await (supabase as any)
-        .from('user_capabilities')
-        .select('capability')
-        .eq('user_id', user.id)
-        .eq('org_id', orgId);
+      const { data, error } = await supabase
+        .from("user_capabilities")
+        .select("capability")
+        .eq("user_id", user.id)
+        .eq("org_id", orgId);
       if (error) throw error;
-      return (data || []).map((r: any) => r.capability as string);
+      return (data || []).map((row) => row.capability);
     },
     enabled: roleResolved && !hasFullAccessByRole,
     staleTime: 60000,
   });
 
   const capSet = useMemo(() => new Set<string>(capabilities), [capabilities]);
-  const hasFullAccess = hasFullAccessByRole || capSet.has('full_access');
+  const hasFullAccess = hasFullAccessByRole || capSet.has("full_access");
 
   const isLoading =
     authLoading ||
-    (!!user && (orgLoading || (!!orgId && (myRole === null || myRole === undefined)))) ||
+    (!!user &&
+      (orgLoading || (!!orgId && (myRole === null || myRole === undefined)))) ||
     (roleResolved && !hasFullAccessByRole && capLoading);
 
   const hasCapability = useCallback(
     (cap: string) => {
+      if (cap.startsWith("venue_")) {
+        if (myRole === "admin") return true;
+        if (myRole === "gestor" && VENUE_GESTOR_CAPABILITIES.has(cap))
+          return true;
+        if (myRole === "operador" && VENUE_OPERATOR_CAPABILITIES.has(cap))
+          return true;
+        return capSet.has(cap) || capSet.has("venue_events_full_access");
+      }
       if (hasFullAccess) return true;
       return capSet.has(cap);
     },
-    [hasFullAccess, capSet]
+    [hasFullAccess, capSet, myRole],
   );
 
   const value = useMemo(
     () => ({ hasFullAccess, hasCapability, isLoading, capSet }),
-    [hasFullAccess, hasCapability, isLoading, capSet]
+    [hasFullAccess, hasCapability, isLoading, capSet],
   );
 
-  return <CapabilitiesContext.Provider value={value}>{children}</CapabilitiesContext.Provider>;
+  return (
+    <CapabilitiesContext.Provider value={value}>
+      {children}
+    </CapabilitiesContext.Provider>
+  );
 }
 
 export function useCapabilitiesContext() {
   const ctx = useContext(CapabilitiesContext);
-  if (!ctx) throw new Error('useCapabilitiesContext must be used within CapabilitiesProvider');
+  if (!ctx)
+    throw new Error(
+      "useCapabilitiesContext must be used within CapabilitiesProvider",
+    );
   return ctx;
 }

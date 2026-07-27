@@ -11,6 +11,7 @@ import {
 import CommissionCard from '@/components/commissions/CommissionCard';
 import { FenasojaBrand } from '@/components/brand/FenasojaBrand';
 import { CronogramaPortalCard } from '@/components/cronograma-eventos/CronogramaPortalCard';
+import { VenuePortalCard } from '@/components/venue-events/VenuePortalCard';
 import '@/styles/commission-portal.css';
 import {
   SELECTED_COMMISSION_STORAGE_KEY,
@@ -73,6 +74,11 @@ export default function CommissionPortalPage() {
   const accessCronograma = () => {
     saveSelectedModule('cronograma-eventos');
     navigate('/login/cronograma-eventos');
+  };
+
+  const accessVenueEvents = () => {
+    saveSelectedModule('eventos-restaurante-arena');
+    navigate('/login/eventos-restaurante-arena');
   };
 
   const accessAdmin = () => {
@@ -142,8 +148,11 @@ export default function CommissionPortalPage() {
           </h1>
         </section>
 
-        <section aria-label="Acesso principal ao Cronograma e Eventos" className="fenasoja-portal__primary portal-reveal">
-          <CronogramaPortalCard onAccess={accessCronograma} />
+        <section aria-label="Acessos aos domínios operacionais" className="fenasoja-portal__primary portal-reveal">
+          <div className="fenasoja-portal__primary-grid">
+            <CronogramaPortalCard onAccess={accessCronograma} />
+            <VenuePortalCard onAccess={accessVenueEvents} />
+          </div>
         </section>
 
         <section ref={gridRef} aria-labelledby="commission-list-title" className="fenasoja-portal__commissions portal-reveal">

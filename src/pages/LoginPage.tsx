@@ -4,9 +4,11 @@ import {
   AlertCircle,
   ArrowLeft,
   ArrowRight,
+  Building2,
   CalendarDays,
   CalendarRange,
   Check,
+  ClipboardCheck,
   Eye,
   EyeOff,
   FileCheck2,
@@ -19,6 +21,7 @@ import {
   Map,
   Route,
   ShieldCheck,
+  UtensilsCrossed,
   UsersRound,
   type LucideIcon,
 } from 'lucide-react';
@@ -100,6 +103,29 @@ const adminCapabilities: CapabilityItem[] = [
   },
 ];
 
+const venueCapabilities: CapabilityItem[] = [
+  {
+    icon: UtensilsCrossed,
+    label: 'Restaurante e Arena',
+    description: 'Reservas coordenadas',
+  },
+  {
+    icon: CalendarRange,
+    label: 'Conflitos em tempo real',
+    description: 'Agenda e capacidade',
+  },
+  {
+    icon: ClipboardCheck,
+    label: 'Operação rastreável',
+    description: 'Aprovações e recursos',
+  },
+  {
+    icon: ShieldCheck,
+    label: 'Contrapartidas seguras',
+    description: 'Consumo transacional',
+  },
+];
+
 function getStoredModuleSlug() {
   try {
     return localStorage.getItem(SELECTED_COMMISSION_STORAGE_KEY);
@@ -146,60 +172,72 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
     ? 'admin'
     : moduleSlug || getModuleSlugFromPath(returnTo) || getStoredModuleSlug() || 'logistica';
   const isCronogramaLogin = selectedSlug === 'cronograma-eventos' || returnTo?.startsWith('/cronograma-eventos');
+  const isVenueEventsLogin =
+    selectedSlug === 'eventos-restaurante-arena' || returnTo?.startsWith('/eventos-restaurante-arena');
   const isCommercialMapLogin = selectedSlug === 'mapa-comercial' || returnTo?.startsWith('/mapa-comercial');
   const selectedModule = getCommissionModule(selectedSlug);
   const contextName = isAdminLogin
     ? 'Administrador'
     : isCronogramaLogin
       ? 'Cronograma e Eventos'
-      : isCommercialMapLogin
-        ? 'Mapa Comercial'
-        : selectedModule
-          ? `Comissão de ${selectedModule.name}`
-          : 'Comissão de Logística';
+      : isVenueEventsLogin
+        ? 'Eventos Restaurante e Arena'
+        : isCommercialMapLogin
+          ? 'Mapa Comercial'
+          : selectedModule
+            ? `Comissão de ${selectedModule.name}`
+            : 'Comissão de Logística';
   const heroTitleLead = isAdminLogin
     ? 'Governança institucional'
-    : isCommercialMapLogin
-      ? 'Gestão territorial'
-      : 'Ambiente seguro';
+    : isVenueEventsLogin
+      ? 'Gestão operacional'
+      : isCommercialMapLogin
+        ? 'Gestão territorial'
+        : 'Ambiente seguro';
   const heroTitleAccent = isAdminLogin
     ? 'Fenasoja 2028'
+    : isVenueEventsLogin
+      ? 'do Restaurante e da Arena'
+      : isCommercialMapLogin
+        ? 'e comercial do parque'
+        : 'das comissões';
+  const capabilities = isVenueEventsLogin
+    ? venueCapabilities
     : isCommercialMapLogin
-      ? 'e comercial do parque'
-      : 'das comissões';
-  const capabilities = isCommercialMapLogin
-    ? commercialMapCapabilities
-    : isAdminLogin
-      ? adminCapabilities
-      : [
-          {
-            icon: Layers3,
-            label: 'Módulo selecionado',
-            description: selectedModule?.name ?? 'Logística',
-          },
-          {
-            icon: CalendarDays,
-            label: 'Agenda operacional',
-            description: 'Prioridades do ciclo',
-          },
-          {
-            icon: UsersRound,
-            label: 'Equipe conectada',
-            description: 'Papéis definidos',
-          },
-          {
-            icon: ShieldCheck,
-            label: 'Dados do módulo',
-            description: 'Acesso controlado',
-          },
-        ];
+      ? commercialMapCapabilities
+      : isAdminLogin
+        ? adminCapabilities
+        : [
+            {
+              icon: Layers3,
+              label: 'Módulo selecionado',
+              description: selectedModule?.name ?? 'Logística',
+            },
+            {
+              icon: CalendarDays,
+              label: 'Agenda operacional',
+              description: 'Prioridades do ciclo',
+            },
+            {
+              icon: UsersRound,
+              label: 'Equipe conectada',
+              description: 'Papéis definidos',
+            },
+            {
+              icon: ShieldCheck,
+              label: 'Dados do módulo',
+              description: 'Acesso controlado',
+            },
+          ];
   const ContextIcon = isAdminLogin
     ? LockKeyhole
     : isCronogramaLogin
       ? CalendarRange
-      : isCommercialMapLogin
-        ? Map
-        : Layers3;
+      : isVenueEventsLogin
+        ? Building2
+        : isCommercialMapLogin
+          ? Map
+          : Layers3;
   const isBusy = phase !== 'idle';
   const emailInvalid = Boolean(fieldErrors.email || authError);
   const passwordInvalid = Boolean(fieldErrors.password || authError);
@@ -216,6 +254,7 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
     if (returnTo && returnTo !== '/' && !returnTo.startsWith('/login')) return returnTo;
     if (isAdminLogin) return '/admin';
     if (isCronogramaLogin) return '/cronograma-eventos';
+    if (isVenueEventsLogin) return '/eventos-restaurante-arena';
     if (isCommercialMapLogin) return '/mapa-comercial';
     if (selectedModule) return getModuleRoute(selectedModule);
     return '/comissoes/logistica/dashboard';
