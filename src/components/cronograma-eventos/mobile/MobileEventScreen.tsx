@@ -418,11 +418,7 @@ export function MobileEventScreen({
               </section>
             )}
 
-            {event.id && (
-              <section className="cronograma-mobile-event-section">
-                <EventoAnexosSection eventId={event.id} />
-              </section>
-            )}
+            {event.id && <EventoAnexosSection eventId={event.id} className="cronograma-mobile-event-section" />}
 
             <section className="cronograma-mobile-event-section" aria-labelledby="cronograma-mobile-trace-title">
               <div className="flex items-start gap-3">
