@@ -471,6 +471,47 @@ export function EventDrawer({
           </AlertDialogContent>
         </AlertDialog>
       )}
+
+      {confirmDelete && onDelete && (
+        <AlertDialog open onOpenChange={(nextOpen) => { if (!nextOpen && !deleting) setConfirmDelete(false); }}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Excluir evento?</AlertDialogTitle>
+              <AlertDialogDescription>
+                O evento <strong>{event.title}</strong> será removido do cronograma e do Google Agenda de todos os usuários conectados. Esta ação não pode ser desfeita.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={deleting}>Cancelar</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={async (e) => {
+                  e.preventDefault();
+                  setDeleting(true);
+                  try {
+                    await onDelete(event);
+                    setConfirmDelete(false);
+                    closeDrawer();
+                  } catch (error) {
+                    setSaveError(
+                      error instanceof Error
+                        ? error.message
+                        : 'Não foi possível excluir o evento. Tente novamente.',
+                    );
+                    setConfirmDelete(false);
+                  } finally {
+                    setDeleting(false);
+                  }
+                }}
+                disabled={deleting}
+                className="bg-red-700 text-white hover:bg-red-800"
+              >
+                {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                {deleting ? 'Excluindo…' : 'Sim, excluir'}
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
     </>
   );
 }
