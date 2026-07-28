@@ -360,7 +360,7 @@ const App = () => (
       buster: lastUserId,
       dehydrateOptions: {
         shouldDehydrateQuery: (query) =>
-          query.meta?.persist !== false && defaultShouldDehydrateQuery(query),
+          query.meta?.persist !== false && defaultShouldDehydrateQuery(query as any),
       },
     }}
   >
