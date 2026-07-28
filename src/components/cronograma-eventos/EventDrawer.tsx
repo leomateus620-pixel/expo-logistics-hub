@@ -77,8 +77,10 @@ export function EventDrawer({
   onSave,
   onComplete,
   onEditWorkspace,
+  onDelete,
   startInEdit = false,
   canManage = false,
+  canDelete = false,
   returnFocusRef,
   history = [],
   historyLoading = false,
@@ -90,7 +92,10 @@ export function EventDrawer({
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [confirmDiscard, setConfirmDiscard] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const completionPendingRef = useRef(false);
+
 
   useEffect(() => {
     if (!open) return;
