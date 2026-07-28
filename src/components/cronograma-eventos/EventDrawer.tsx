@@ -58,14 +58,17 @@ interface EventDrawerProps {
   onSave: (event: CronogramaEvent) => Promise<void> | void;
   onComplete?: (event: CronogramaEvent) => Promise<void> | void;
   onEditWorkspace?: (event: CronogramaEvent) => void;
+  onDelete?: (event: CronogramaEvent) => Promise<void> | void;
   startInEdit?: boolean;
   canManage?: boolean;
+  canDelete?: boolean;
   returnFocusRef?: RefObject<HTMLElement>;
   history?: CronogramaHistoryEntry[];
   historyLoading?: boolean;
   historyError?: unknown;
   canViewHistory?: boolean;
 }
+
 
 export function EventDrawer({
   event,
