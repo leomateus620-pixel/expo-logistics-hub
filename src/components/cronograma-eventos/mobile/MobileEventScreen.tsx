@@ -30,6 +30,7 @@ import {
 import { formatLongDate, formatLongDateRange } from '../dateUtils';
 import { EventForm } from '../EventForm';
 import type { CronogramaEvent, CronogramaHistoryEntry } from '../types';
+import { EventoAnexosSection } from '../EventoAnexosSection';
 import { MobileConfirmDialog } from './MobileConfirmDialog';
 import { MobileDialogFrame } from './MobileDialogFrame';
 import { useMobileOverlayHistory } from './useMobileOverlayHistory';
