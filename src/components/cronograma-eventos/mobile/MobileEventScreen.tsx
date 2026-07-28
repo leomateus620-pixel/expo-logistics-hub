@@ -485,9 +485,39 @@ export function MobileEventScreen({
         onConfirm={handleConfirmDiscard}
         onCancel={() => setDiscardTarget(null)}
       />
+
+      {onDelete && (
+        <MobileConfirmDialog
+          open={confirmDelete}
+          title="Excluir evento?"
+          description={`O evento "${event.title}" será removido do cronograma e do Google Agenda de todos os usuários conectados. Esta ação não pode ser desfeita.`}
+          confirmLabel={deleting ? 'Excluindo…' : 'Sim, excluir'}
+          cancelLabel="Cancelar"
+          onConfirm={async () => {
+            if (deleting) return;
+            setDeleting(true);
+            try {
+              await onDelete(event);
+              setConfirmDelete(false);
+              overlayHistory.discardAndClose();
+            } catch (error) {
+              setSaveError(
+                error instanceof Error
+                  ? error.message
+                  : 'Não foi possível excluir o evento. Tente novamente.',
+              );
+              setConfirmDelete(false);
+            } finally {
+              setDeleting(false);
+            }
+          }}
+          onCancel={() => { if (!deleting) setConfirmDelete(false); }}
+        />
+      )}
     </>
   );
 }
+
 
 function MobileInfo({
   icon: Icon,
