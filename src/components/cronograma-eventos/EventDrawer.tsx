@@ -328,6 +328,9 @@ export function EventDrawer({
                   <p className="mt-2 text-sm leading-relaxed text-foreground/80">{event.summary}</p>
                 </section>
 
+                {event.id && !String(event.id).startsWith('manual-') === false ? null : null}
+                {event.id && <EventoAnexosSection eventId={event.id} />}
+
                 <section className="cronograma-history-panel" aria-label="Rastreabilidade do registro">
                   <FileClock className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
                   <div>
