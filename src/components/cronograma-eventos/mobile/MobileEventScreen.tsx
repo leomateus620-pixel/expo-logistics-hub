@@ -289,11 +289,23 @@ export function MobileEventScreen({
                 >
                   <Edit3 className="h-4 w-4" />Editar
                 </Button>
+                {canDelete && onDelete && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setConfirmDelete(true)}
+                    disabled={saving || deleting}
+                    className="is-wide rounded-xl border-red-200 text-red-700 hover:bg-red-50 hover:text-red-800"
+                  >
+                    <Trash2 className="h-4 w-4" />Excluir evento
+                  </Button>
+                )}
               </>
             )}
           </div>
         )}
       >
+
         {sourceUnavailable && (
           <p className="cronograma-mobile-event-error" role="alert">
             Este evento não está mais disponível na base sincronizada. O rascunho local foi preservado para revisão antes do descarte.
