@@ -603,6 +603,16 @@ export function useCronogramaEventos() {
     }
   }, [isSeedingOfficialData, myRole, orgId, query.data, seedMissingOfficialData]);
 
+  const triggerSyncWorker = useCallback(() => {
+    // Fire-and-forget push so Google Calendar mirrors changes immediately,
+    // without waiting for the pg_cron minute tick.
+    try {
+      void supabase.functions.invoke('google-sync-worker', { body: {} }).catch(() => undefined);
+    } catch {
+      // Ignore — the pg_cron fallback will retry.
+    }
+  }, []);
+
   const create = useMutation({
     mutationFn: async (draft: CronogramaEventDraft) => {
       const event = draftToEvent(draft);
@@ -621,8 +631,10 @@ export function useCronogramaEventos() {
         return sortCronogramaEvents(current.map((item, index) => (index === existingIndex ? event : item)));
       });
       queryClient.invalidateQueries({ queryKey: ['cronograma-eventos'] });
+      triggerSyncWorker();
     },
   });
+
 
   const replaceSessionEvent = (event: CronogramaEvent) => {
     setSessionEvents((current) => replaceEventInList(current, event));
