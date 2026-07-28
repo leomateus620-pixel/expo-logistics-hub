@@ -418,6 +418,12 @@ export function MobileEventScreen({
               </section>
             )}
 
+            {event.id && (
+              <section className="cronograma-mobile-event-section">
+                <EventoAnexosSection eventId={event.id} />
+              </section>
+            )}
+
             <section className="cronograma-mobile-event-section" aria-labelledby="cronograma-mobile-trace-title">
               <div className="flex items-start gap-3">
                 <span className="cronograma-mobile-info-icon" aria-hidden="true"><FileClock className="h-4 w-4" /></span>
