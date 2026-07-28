@@ -43,8 +43,10 @@ export function MobileEventScreen({
   onSave,
   onComplete,
   onEditWorkspace,
+  onDelete,
   startInEdit = false,
   canManage = false,
+  canDelete = false,
   returnFocusRef,
   history = [],
   historyLoading = false,
@@ -58,8 +60,10 @@ export function MobileEventScreen({
   onSave: (event: CronogramaEvent) => Promise<void> | void;
   onComplete?: (event: CronogramaEvent) => Promise<void> | void;
   onEditWorkspace?: (event: CronogramaEvent) => void;
+  onDelete?: (event: CronogramaEvent) => Promise<void> | void;
   startInEdit?: boolean;
   canManage?: boolean;
+  canDelete?: boolean;
   returnFocusRef?: RefObject<HTMLElement>;
   history?: CronogramaHistoryEntry[];
   historyLoading?: boolean;
@@ -72,9 +76,12 @@ export function MobileEventScreen({
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [discardTarget, setDiscardTarget] = useState<DiscardTarget>(null);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const workspaceTargetRef = useRef<CronogramaEvent | null>(null);
   const completionPendingRef = useRef(false);
   const eventIdentity = event?.sourceKey ?? event?.id;
+
 
   useEffect(() => {
     if (!open) return;
