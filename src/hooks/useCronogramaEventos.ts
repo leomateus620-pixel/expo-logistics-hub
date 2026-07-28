@@ -603,6 +603,16 @@ export function useCronogramaEventos() {
     }
   }, [isSeedingOfficialData, myRole, orgId, query.data, seedMissingOfficialData]);
 
+  const triggerSyncWorker = useCallback(() => {
+    // Fire-and-forget push so Google Calendar mirrors changes immediately,
+    // without waiting for the pg_cron minute tick.
+    try {
+      void supabase.functions.invoke('google-sync-worker', { body: {} }).catch(() => undefined);
+    } catch {
+      // Ignore — the pg_cron fallback will retry.
+    }
+  }, []);
+
   const create = useMutation({
     mutationFn: async (draft: CronogramaEventDraft) => {
       const event = draftToEvent(draft);
@@ -621,8 +631,10 @@ export function useCronogramaEventos() {
         return sortCronogramaEvents(current.map((item, index) => (index === existingIndex ? event : item)));
       });
       queryClient.invalidateQueries({ queryKey: ['cronograma-eventos'] });
+      triggerSyncWorker();
     },
   });
+
 
   const replaceSessionEvent = (event: CronogramaEvent) => {
     setSessionEvents((current) => replaceEventInList(current, event));
@@ -702,8 +714,49 @@ export function useCronogramaEventos() {
       replaceSessionEvent(event);
       queryClient.invalidateQueries({ queryKey: ['cronograma-eventos'] });
       queryClient.invalidateQueries({ queryKey: ['cronograma-event-history', event.id] });
+      triggerSyncWorker();
     },
   });
+
+  const deleteEvent = useMutation({
+    mutationFn: async (eventId: string) => {
+      const current = findSessionEvent(eventId);
+      if (!current) throw new Error('Evento não encontrado. Atualize a página e tente novamente.');
+      if (!isWritableRole(myRole)) throw new Error('Seu perfil possui acesso somente para consulta.');
+      if (myRole !== 'admin' && myRole !== 'gestor') {
+        throw new Error('Somente administradores e gestores podem excluir eventos.');
+      }
+      if (!orgId) throw new Error('Não foi possível identificar a organização atual.');
+
+      // Non-persisted (seed/queued) — remove locally only.
+      if (!isUuid(current.id)) {
+        setSessionEvents((prev) => prev.filter((item) => item.id !== current.id && item.sourceKey !== current.sourceKey));
+        return { id: current.id, remote: false as const };
+      }
+
+      if (dbUnavailable) {
+        throw new Error('A sincronização está indisponível. A exclusão não foi realizada. Tente novamente em instantes.');
+      }
+
+      const { error } = await cronogramaDb
+        .from('cronograma_eventos')
+        .delete()
+        .eq('id', current.id)
+        .eq('org_id', orgId);
+      if (error) throw new Error(error.message || 'Não foi possível excluir o evento.');
+
+      return { id: current.id, remote: true as const, sourceKey: current.sourceKey };
+    },
+    onSuccess: (result) => {
+      setSessionEvents((prev) => prev.filter((item) => item.id !== result.id));
+      queryClient.invalidateQueries({ queryKey: ['cronograma-eventos'] });
+      if (result.remote) {
+        // DB trigger enqueues delete for every connected user; push immediately.
+        triggerSyncWorker();
+      }
+    },
+  });
+
 
   const queueSubevent = (
     current: CronogramaEvent,
@@ -1041,6 +1094,8 @@ export function useCronogramaEventos() {
     retryRelationships,
     create,
     update,
+    deleteEvent,
+
     createSubevent,
     updateSubevent,
     deleteSubevent,

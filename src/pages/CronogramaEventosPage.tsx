@@ -511,6 +511,25 @@ export default function CronogramaEventosPage() {
     setSelectedEvent(adaptCronogramaEvent(created, todayKey));
   };
 
+  const handleDeleteEvent = async (event: CronogramaEvent) => {
+    const sourceEvent = sourceById.get(event.id)
+      || (event.sourceKey ? sourceById.get(event.sourceKey) : undefined);
+    const targetId = sourceEvent?.id ?? event.id;
+    try {
+      await cronograma.deleteEvent.mutateAsync(targetId);
+      setSelectedEvent(null);
+      toast.success('Evento excluído.', {
+        description: `${event.title} foi removido do cronograma e da agenda dos usuários conectados.`,
+      });
+    } catch (error) {
+      toast.error(
+        error instanceof Error ? error.message : 'Não foi possível excluir o evento.',
+      );
+      throw error;
+    }
+  };
+
+
   const handleCompleteEvent = async (event: CronogramaEvent) => {
     if (!cronograma.canWriteEvents) {
       throw new Error(
@@ -977,8 +996,10 @@ export default function CronogramaEventosPage() {
             onSave={handleSave}
             onComplete={handleCompleteEvent}
             onEditWorkspace={openWorkspace}
+            onDelete={handleDeleteEvent}
             startInEdit={drawerStartsEditing}
             canManage={cronograma.canManage}
+            canDelete={cronograma.canDeleteSubevents}
             returnFocusRef={drawerReturnFocusRef}
             history={eventHistory.entries}
             historyLoading={eventHistory.isLoading}
@@ -995,8 +1016,10 @@ export default function CronogramaEventosPage() {
           onSave={handleSave}
           onComplete={handleCompleteEvent}
           onEditWorkspace={openWorkspace}
+          onDelete={handleDeleteEvent}
           startInEdit={drawerStartsEditing}
           canManage={cronograma.canManage}
+          canDelete={cronograma.canDeleteSubevents}
           returnFocusRef={drawerReturnFocusRef}
           history={eventHistory.entries}
           historyLoading={eventHistory.isLoading}
@@ -1004,6 +1027,7 @@ export default function CronogramaEventosPage() {
           canViewHistory={eventHistory.canViewHistory}
         />
       )}
+
 
       {overlayIsMobilePresentation ? (
         <MobileCreateEventScreen

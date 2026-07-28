@@ -14,6 +14,7 @@ import {
   Route,
   Save,
   Sparkles,
+  Trash2,
   UserRound,
   X,
 } from 'lucide-react';
@@ -42,8 +43,10 @@ export function MobileEventScreen({
   onSave,
   onComplete,
   onEditWorkspace,
+  onDelete,
   startInEdit = false,
   canManage = false,
+  canDelete = false,
   returnFocusRef,
   history = [],
   historyLoading = false,
@@ -57,8 +60,10 @@ export function MobileEventScreen({
   onSave: (event: CronogramaEvent) => Promise<void> | void;
   onComplete?: (event: CronogramaEvent) => Promise<void> | void;
   onEditWorkspace?: (event: CronogramaEvent) => void;
+  onDelete?: (event: CronogramaEvent) => Promise<void> | void;
   startInEdit?: boolean;
   canManage?: boolean;
+  canDelete?: boolean;
   returnFocusRef?: RefObject<HTMLElement>;
   history?: CronogramaHistoryEntry[];
   historyLoading?: boolean;
@@ -71,9 +76,12 @@ export function MobileEventScreen({
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [discardTarget, setDiscardTarget] = useState<DiscardTarget>(null);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const workspaceTargetRef = useRef<CronogramaEvent | null>(null);
   const completionPendingRef = useRef(false);
   const eventIdentity = event?.sourceKey ?? event?.id;
+
 
   useEffect(() => {
     if (!open) return;
@@ -281,11 +289,23 @@ export function MobileEventScreen({
                 >
                   <Edit3 className="h-4 w-4" />Editar
                 </Button>
+                {canDelete && onDelete && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setConfirmDelete(true)}
+                    disabled={saving || deleting}
+                    className="is-wide rounded-xl border-red-200 text-red-700 hover:bg-red-50 hover:text-red-800"
+                  >
+                    <Trash2 className="h-4 w-4" />Excluir evento
+                  </Button>
+                )}
               </>
             )}
           </div>
         )}
       >
+
         {sourceUnavailable && (
           <p className="cronograma-mobile-event-error" role="alert">
             Este evento não está mais disponível na base sincronizada. O rascunho local foi preservado para revisão antes do descarte.
@@ -465,9 +485,39 @@ export function MobileEventScreen({
         onConfirm={handleConfirmDiscard}
         onCancel={() => setDiscardTarget(null)}
       />
+
+      {onDelete && (
+        <MobileConfirmDialog
+          open={confirmDelete}
+          title="Excluir evento?"
+          description={`O evento "${event.title}" será removido do cronograma e do Google Agenda de todos os usuários conectados. Esta ação não pode ser desfeita.`}
+          confirmLabel={deleting ? 'Excluindo…' : 'Sim, excluir'}
+          cancelLabel="Cancelar"
+          onConfirm={async () => {
+            if (deleting) return;
+            setDeleting(true);
+            try {
+              await onDelete(event);
+              setConfirmDelete(false);
+              overlayHistory.discardAndClose();
+            } catch (error) {
+              setSaveError(
+                error instanceof Error
+                  ? error.message
+                  : 'Não foi possível excluir o evento. Tente novamente.',
+              );
+              setConfirmDelete(false);
+            } finally {
+              setDeleting(false);
+            }
+          }}
+          onCancel={() => { if (!deleting) setConfirmDelete(false); }}
+        />
+      )}
     </>
   );
 }
+
 
 function MobileInfo({
   icon: Icon,

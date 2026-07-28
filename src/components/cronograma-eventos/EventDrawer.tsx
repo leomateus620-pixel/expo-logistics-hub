@@ -14,6 +14,7 @@ import {
   Route,
   Save,
   Sparkles,
+  Trash2,
   UserRound,
   X,
 } from 'lucide-react';
@@ -57,14 +58,17 @@ interface EventDrawerProps {
   onSave: (event: CronogramaEvent) => Promise<void> | void;
   onComplete?: (event: CronogramaEvent) => Promise<void> | void;
   onEditWorkspace?: (event: CronogramaEvent) => void;
+  onDelete?: (event: CronogramaEvent) => Promise<void> | void;
   startInEdit?: boolean;
   canManage?: boolean;
+  canDelete?: boolean;
   returnFocusRef?: RefObject<HTMLElement>;
   history?: CronogramaHistoryEntry[];
   historyLoading?: boolean;
   historyError?: unknown;
   canViewHistory?: boolean;
 }
+
 
 export function EventDrawer({
   event,
@@ -73,8 +77,10 @@ export function EventDrawer({
   onSave,
   onComplete,
   onEditWorkspace,
+  onDelete,
   startInEdit = false,
   canManage = false,
+  canDelete = false,
   returnFocusRef,
   history = [],
   historyLoading = false,
@@ -86,7 +92,10 @@ export function EventDrawer({
   const [saving, setSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const [confirmDiscard, setConfirmDiscard] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const completionPendingRef = useRef(false);
+
 
   useEffect(() => {
     if (!open) return;
@@ -405,6 +414,18 @@ export function EventDrawer({
                   </span>
                 )}
                 <div className="ml-auto flex flex-wrap justify-end gap-2">
+                  {canManage && canDelete && onDelete && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setConfirmDelete(true)}
+                      disabled={saving || deleting}
+                      className="rounded-lg border-red-200 text-red-700 hover:bg-red-50 hover:text-red-800"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      Excluir
+                    </Button>
+                  )}
                   {canManage && event.status !== 'completed' && (
                     <Button type="button" variant="outline" onClick={handleMarkCompleted} disabled={saving} className="cronograma-complete-action rounded-lg">
                       {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
@@ -424,6 +445,7 @@ export function EventDrawer({
                   )}
                 </div>
               </div>
+
             )}
           </div>
         </SheetContent>
@@ -444,6 +466,47 @@ export function EventDrawer({
               <AlertDialogCancel>Continuar editando</AlertDialogCancel>
               <AlertDialogAction onClick={closeDrawer} className="bg-red-700 text-white hover:bg-red-800">
                 Descartar e fechar
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      )}
+
+      {confirmDelete && onDelete && (
+        <AlertDialog open onOpenChange={(nextOpen) => { if (!nextOpen && !deleting) setConfirmDelete(false); }}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Excluir evento?</AlertDialogTitle>
+              <AlertDialogDescription>
+                O evento <strong>{event.title}</strong> será removido do cronograma e do Google Agenda de todos os usuários conectados. Esta ação não pode ser desfeita.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel disabled={deleting}>Cancelar</AlertDialogCancel>
+              <AlertDialogAction
+                onClick={async (e) => {
+                  e.preventDefault();
+                  setDeleting(true);
+                  try {
+                    await onDelete(event);
+                    setConfirmDelete(false);
+                    closeDrawer();
+                  } catch (error) {
+                    setSaveError(
+                      error instanceof Error
+                        ? error.message
+                        : 'Não foi possível excluir o evento. Tente novamente.',
+                    );
+                    setConfirmDelete(false);
+                  } finally {
+                    setDeleting(false);
+                  }
+                }}
+                disabled={deleting}
+                className="bg-red-700 text-white hover:bg-red-800"
+              >
+                {deleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
+                {deleting ? 'Excluindo…' : 'Sim, excluir'}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
