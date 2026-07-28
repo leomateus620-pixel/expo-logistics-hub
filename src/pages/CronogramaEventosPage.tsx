@@ -996,8 +996,10 @@ export default function CronogramaEventosPage() {
             onSave={handleSave}
             onComplete={handleCompleteEvent}
             onEditWorkspace={openWorkspace}
+            onDelete={handleDeleteEvent}
             startInEdit={drawerStartsEditing}
             canManage={cronograma.canManage}
+            canDelete={cronograma.canDeleteSubevents}
             returnFocusRef={drawerReturnFocusRef}
             history={eventHistory.entries}
             historyLoading={eventHistory.isLoading}
@@ -1014,8 +1016,10 @@ export default function CronogramaEventosPage() {
           onSave={handleSave}
           onComplete={handleCompleteEvent}
           onEditWorkspace={openWorkspace}
+          onDelete={handleDeleteEvent}
           startInEdit={drawerStartsEditing}
           canManage={cronograma.canManage}
+          canDelete={cronograma.canDeleteSubevents}
           returnFocusRef={drawerReturnFocusRef}
           history={eventHistory.entries}
           historyLoading={eventHistory.isLoading}
@@ -1023,6 +1027,7 @@ export default function CronogramaEventosPage() {
           canViewHistory={eventHistory.canViewHistory}
         />
       )}
+
 
       {overlayIsMobilePresentation ? (
         <MobileCreateEventScreen
