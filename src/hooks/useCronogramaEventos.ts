@@ -1094,6 +1094,8 @@ export function useCronogramaEventos() {
     retryRelationships,
     create,
     update,
+    deleteEvent,
+
     createSubevent,
     updateSubevent,
     deleteSubevent,
