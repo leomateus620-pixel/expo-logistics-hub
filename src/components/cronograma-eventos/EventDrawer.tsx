@@ -50,6 +50,7 @@ import {
 import { EventForm } from './EventForm';
 import { formatLongDate, formatLongDateRange } from './dateUtils';
 import type { CronogramaEvent, CronogramaHistoryEntry } from './types';
+import { EventoAnexosSection } from './EventoAnexosSection';
 
 interface EventDrawerProps {
   event: CronogramaEvent | null;
@@ -326,6 +327,8 @@ export function EventDrawer({
                   <h3 id="cronograma-executive-title" className="sr-only">Resumo executivo</h3>
                   <p className="mt-2 text-sm leading-relaxed text-foreground/80">{event.summary}</p>
                 </section>
+
+                {event.id && <EventoAnexosSection eventId={event.id} />}
 
                 <section className="cronograma-history-panel" aria-label="Rastreabilidade do registro">
                   <FileClock className="mt-0.5 h-4 w-4 shrink-0 text-primary" />

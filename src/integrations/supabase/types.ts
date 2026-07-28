@@ -320,6 +320,76 @@ export type Database = {
           },
         ]
       }
+      cronograma_evento_anexos: {
+        Row: {
+          caption: string | null
+          created_at: string
+          event_id: string
+          file_name: string
+          file_path: string
+          id: string
+          kind: string
+          mime_type: string
+          org_id: string
+          size_bytes: number
+          updated_at: string
+          uploaded_by: string | null
+          uploader_name: string | null
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          event_id: string
+          file_name: string
+          file_path: string
+          id?: string
+          kind?: string
+          mime_type: string
+          org_id: string
+          size_bytes?: number
+          updated_at?: string
+          uploaded_by?: string | null
+          uploader_name?: string | null
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          event_id?: string
+          file_name?: string
+          file_path?: string
+          id?: string
+          kind?: string
+          mime_type?: string
+          org_id?: string
+          size_bytes?: number
+          updated_at?: string
+          uploaded_by?: string | null
+          uploader_name?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cronograma_evento_anexos_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "cronograma_eventos"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cronograma_evento_anexos_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "cronograma_eventos_full"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cronograma_evento_anexos_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cronograma_evento_comissoes: {
         Row: {
           commission_id: string | null

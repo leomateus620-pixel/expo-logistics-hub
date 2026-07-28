@@ -30,6 +30,7 @@ import {
 import { formatLongDate, formatLongDateRange } from '../dateUtils';
 import { EventForm } from '../EventForm';
 import type { CronogramaEvent, CronogramaHistoryEntry } from '../types';
+import { EventoAnexosSection } from '../EventoAnexosSection';
 import { MobileConfirmDialog } from './MobileConfirmDialog';
 import { MobileDialogFrame } from './MobileDialogFrame';
 import { useMobileOverlayHistory } from './useMobileOverlayHistory';
@@ -414,6 +415,12 @@ export function MobileEventScreen({
                     );
                   })}
                 </div>
+              </section>
+            )}
+
+            {event.id && (
+              <section className="cronograma-mobile-event-section">
+                <EventoAnexosSection eventId={event.id} />
               </section>
             )}
 
