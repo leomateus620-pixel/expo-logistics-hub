@@ -414,6 +414,18 @@ export function EventDrawer({
                   </span>
                 )}
                 <div className="ml-auto flex flex-wrap justify-end gap-2">
+                  {canManage && canDelete && onDelete && (
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => setConfirmDelete(true)}
+                      disabled={saving || deleting}
+                      className="rounded-lg border-red-200 text-red-700 hover:bg-red-50 hover:text-red-800"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      Excluir
+                    </Button>
+                  )}
                   {canManage && event.status !== 'completed' && (
                     <Button type="button" variant="outline" onClick={handleMarkCompleted} disabled={saving} className="cronograma-complete-action rounded-lg">
                       {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
@@ -433,6 +445,7 @@ export function EventDrawer({
                   )}
                 </div>
               </div>
+
             )}
           </div>
         </SheetContent>
