@@ -1,0 +1,680 @@
+.cronograma-attachments {
+  position: relative;
+  min-width: 0;
+}
+
+.cronograma-attachments__surface {
+  margin-top: 0.65rem;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid oklch(var(--border) / 0.9);
+  border-radius: 0.95rem;
+  padding: 0.9rem;
+  background:
+    radial-gradient(
+      circle at 100% 0%,
+      oklch(var(--action) / 0.055),
+      transparent 32%
+    ),
+    linear-gradient(155deg, rgb(255 255 255 / 0.96), oklch(var(--muted) / 0.3));
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.86),
+    0 16px 36px -32px oklch(var(--primary) / 0.48);
+}
+
+.cronograma-attachments__header {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  gap: 0.7rem;
+}
+
+.cronograma-attachments__heading-icon {
+  display: grid;
+  width: 2.15rem;
+  height: 2.15rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid oklch(var(--primary) / 0.15);
+  border-radius: 0.68rem;
+  background: oklch(var(--primary) / 0.065);
+  color: oklch(var(--primary));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.82);
+}
+
+.cronograma-attachments__heading-icon svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.cronograma-attachments__title-row {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.cronograma-attachments__title-row h3 {
+  color: oklch(var(--foreground));
+  font-size: 0.92rem;
+  font-weight: 900;
+  letter-spacing: -0.015em;
+  line-height: 1.25;
+}
+
+.cronograma-attachments__count {
+  display: inline-flex;
+  min-width: 1.4rem;
+  height: 1.4rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid oklch(var(--primary) / 0.13);
+  border-radius: 999px;
+  padding-inline: 0.38rem;
+  background: oklch(var(--primary) / 0.07);
+  color: oklch(var(--primary));
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.62rem;
+  font-weight: 800;
+}
+
+.cronograma-attachments__guidance {
+  margin-top: 0.28rem;
+  max-width: 34rem;
+  color: oklch(var(--muted-foreground));
+  font-size: 0.72rem;
+  line-height: 1.52;
+}
+
+.cronograma-attachments__formats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+  margin-top: 0.5rem;
+}
+
+.cronograma-attachments__formats span {
+  display: inline-flex;
+  min-height: 1.45rem;
+  align-items: center;
+  border: 1px solid oklch(var(--border) / 0.78);
+  border-radius: 999px;
+  padding: 0.18rem 0.48rem;
+  background: rgb(255 255 255 / 0.72);
+  color: oklch(var(--foreground) / 0.75);
+  font-size: 0.62rem;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.cronograma-attachments__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.78rem;
+}
+
+.cronograma-attachments__upload-button {
+  position: relative;
+  isolation: isolate;
+  container-type: inline-size;
+  min-width: 10.9rem;
+  min-height: 2.75rem;
+  overflow: hidden;
+  border-color: oklch(var(--action));
+  border-radius: 0.72rem;
+  background:
+    linear-gradient(105deg, rgb(255 255 255 / 0.11), transparent 36%),
+    oklch(var(--action));
+  color: oklch(var(--action-foreground));
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.34),
+    inset 0 -1px 0 rgb(51 20 0 / 0.13),
+    0 12px 24px -16px oklch(var(--action) / 0.78);
+  transform: translateZ(0);
+  transition:
+    background-color 150ms ease,
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    transform 150ms ease;
+}
+
+.cronograma-attachments__upload-button::after {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background: linear-gradient(
+    110deg,
+    transparent 22%,
+    rgb(255 255 255 / 0.14) 48%,
+    transparent 72%
+  );
+  content: "";
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(-70%);
+  transition: opacity 150ms ease;
+}
+
+.cronograma-attachments__upload-content {
+  position: relative;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.48rem;
+  white-space: nowrap;
+}
+
+.cronograma-attachments__upload-button[data-state="success"] {
+  border-color: oklch(var(--success));
+  background: oklch(var(--success));
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.28),
+    0 12px 24px -16px oklch(var(--success) / 0.68);
+}
+
+.cronograma-attachments__upload-button[data-state="error"] {
+  border-color: oklch(var(--destructive) / 0.75);
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.18),
+    0 12px 24px -16px oklch(var(--destructive) / 0.5);
+}
+
+.cronograma-attachments__upload-button:disabled {
+  border-color: oklch(var(--border));
+  background: oklch(var(--muted));
+  color: oklch(var(--muted-foreground));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.7);
+  opacity: 1;
+}
+
+.cronograma-attachments__upload-button:focus-visible {
+  outline: 3px solid oklch(var(--ring) / 0.42);
+  outline-offset: 2px;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.34),
+    0 0 0 1px oklch(var(--ring)),
+    0 12px 24px -16px oklch(var(--action) / 0.78);
+}
+
+.cronograma-attachments__camera-button {
+  min-height: 2.75rem;
+  border-radius: 0.72rem;
+  background: rgb(255 255 255 / 0.72);
+}
+
+.cronograma-attachments__soybean-layer {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.cronograma-attachments__soybean-flight {
+  position: absolute;
+  top: var(--soy-y);
+  left: -2rem;
+  display: block;
+  width: 1.45rem;
+  height: 1.05rem;
+  opacity: 0;
+  will-change: transform, opacity;
+  animation: cronograma-attachment-soybean-cross 920ms
+    cubic-bezier(0.2, 0.74, 0.24, 1) var(--soy-delay) both;
+}
+
+.cronograma-attachments__soybean {
+  display: block;
+  width: 1.45rem !important;
+  height: 1.05rem !important;
+  filter: drop-shadow(0 1px 1px rgb(74 38 0 / 0.24));
+}
+
+.cronograma-attachments__reduced-feedback {
+  display: none;
+}
+
+@keyframes cronograma-attachment-soybean-cross {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 0, 0) rotate(0deg)
+      scale(calc(var(--soy-scale) * 0.82));
+  }
+
+  12% {
+    opacity: var(--soy-opacity);
+  }
+
+  70% {
+    opacity: var(--soy-opacity);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate3d(calc(100cqw + 3.2rem), var(--soy-shift), 0)
+      rotate(var(--soy-rotate)) scale(var(--soy-scale));
+  }
+}
+
+.cronograma-attachments__status-wrap {
+  margin-top: 0.58rem;
+}
+
+.cronograma-attachments__status {
+  display: flex;
+  min-height: 1.2rem;
+  align-items: flex-start;
+  gap: 0.35rem;
+  color: oklch(var(--muted-foreground));
+  font-size: 0.66rem;
+  font-weight: 650;
+  line-height: 1.45;
+}
+
+.cronograma-attachments__status svg {
+  width: 0.86rem;
+  height: 0.86rem;
+  flex: 0 0 auto;
+  margin-top: 0.05rem;
+}
+
+.cronograma-attachments__status[data-state="uploading"] {
+  color: oklch(var(--primary));
+}
+
+.cronograma-attachments__status[data-state="success"] {
+  color: oklch(var(--success));
+}
+
+.cronograma-attachments__status[data-state="error"] {
+  color: oklch(var(--destructive));
+}
+
+.cronograma-attachments__progress {
+  position: relative;
+  display: block;
+  height: 0.18rem;
+  margin-top: 0.34rem;
+  overflow: hidden;
+  border-radius: 999px;
+  background: oklch(var(--primary) / 0.1);
+}
+
+.cronograma-attachments__progress span {
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  width: 42%;
+  border-radius: inherit;
+  background: oklch(var(--primary));
+  will-change: transform;
+  animation: cronograma-attachment-progress 900ms ease-in-out infinite;
+}
+
+@keyframes cronograma-attachment-progress {
+  from {
+    transform: translateX(-110%);
+  }
+
+  to {
+    transform: translateX(340%);
+  }
+}
+
+.cronograma-attachments__content {
+  margin-top: 0.72rem;
+  border-top: 1px solid oklch(var(--border) / 0.66);
+  padding-top: 0.72rem;
+}
+
+.cronograma-attachments__loading {
+  display: flex;
+  min-height: 3.4rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  color: oklch(var(--muted-foreground));
+  font-size: 0.7rem;
+}
+
+.cronograma-attachments__loading svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.cronograma-attachments__empty {
+  display: flex;
+  min-height: 3.4rem;
+  align-items: center;
+  gap: 0.68rem;
+  border: 1px dashed oklch(var(--border) / 0.92);
+  border-radius: 0.76rem;
+  padding: 0.68rem 0.75rem;
+  background: rgb(255 255 255 / 0.58);
+}
+
+.cronograma-attachments__empty-icon {
+  display: grid;
+  width: 2.1rem;
+  height: 2.1rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 0.62rem;
+  background: oklch(var(--primary) / 0.055);
+  color: oklch(var(--primary) / 0.8);
+}
+
+.cronograma-attachments__empty-icon svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.cronograma-attachments__empty p {
+  color: oklch(var(--foreground));
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.cronograma-attachments__empty span:not(.cronograma-attachments__empty-icon) {
+  display: block;
+  margin-top: 0.12rem;
+  color: oklch(var(--muted-foreground));
+  font-size: 0.66rem;
+  line-height: 1.4;
+}
+
+.cronograma-attachments__list-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  margin-bottom: 0.48rem;
+}
+
+.cronograma-attachments__list-heading p {
+  color: oklch(var(--foreground));
+  font-size: 0.68rem;
+  font-weight: 850;
+}
+
+.cronograma-attachments__list-heading span {
+  color: oklch(var(--muted-foreground));
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.6rem;
+  font-weight: 700;
+}
+
+.cronograma-attachments__list {
+  display: grid;
+  min-width: 0;
+  gap: 0.48rem;
+}
+
+.cronograma-attachments__item {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: 3.15rem minmax(0, 1fr) 2.5rem;
+  align-items: center;
+  gap: 0.62rem;
+  border: 1px solid oklch(var(--border) / 0.82);
+  border-radius: 0.78rem;
+  padding: 0.5rem;
+  background: rgb(255 255 255 / 0.74);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.76);
+  transition:
+    border-color 150ms ease,
+    background-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.cronograma-attachments__thumbnail,
+.cronograma-attachments__document-icon {
+  display: grid;
+  width: 3.15rem;
+  height: 3.15rem;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid oklch(var(--border) / 0.82);
+  border-radius: 0.65rem;
+  background: oklch(var(--muted) / 0.58);
+}
+
+.cronograma-attachments__thumbnail {
+  cursor: zoom-in;
+}
+
+.cronograma-attachments__thumbnail:disabled {
+  cursor: default;
+}
+
+.cronograma-attachments__document-icon {
+  color: oklch(var(--primary));
+}
+
+.cronograma-attachments__document-icon svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.cronograma-attachments__file-info {
+  min-width: 0;
+}
+
+.cronograma-attachments__file-name {
+  overflow: hidden;
+  color: oklch(var(--foreground));
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cronograma-attachments__file-meta {
+  display: flex;
+  min-width: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.22rem;
+  margin-top: 0.16rem;
+  color: oklch(var(--muted-foreground));
+  font-size: 0.61rem;
+  line-height: 1.35;
+}
+
+.cronograma-attachments__file-provenance {
+  row-gap: 0.15rem;
+}
+
+.cronograma-attachments__readonly {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 0.08rem 0.28rem;
+  background: oklch(var(--muted));
+  color: oklch(var(--foreground) / 0.66);
+  font-size: 0.55rem;
+  font-weight: 750;
+}
+
+.cronograma-attachments__menu-trigger {
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 0.62rem;
+  color: oklch(var(--foreground) / 0.7);
+}
+
+.cronograma-attachments__lightbox-content {
+  width: min(calc(100vw - 2rem), 76rem);
+  max-width: 76rem;
+  max-height: calc(100dvh - 2rem);
+  overflow: visible;
+  border-color: rgb(255 255 255 / 0.18);
+  padding: 0;
+  background: rgb(3 12 25 / 0.92);
+  box-shadow: 0 28px 90px rgb(0 0 0 / 0.48);
+  backdrop-filter: none;
+}
+
+.cronograma-attachments__lightbox-close {
+  position: absolute;
+  top: max(0.65rem, env(safe-area-inset-top));
+  right: max(0.65rem, env(safe-area-inset-right));
+  display: grid;
+  width: 2.75rem;
+  height: 2.75rem;
+  place-items: center;
+  border: 1px solid rgb(255 255 255 / 0.2);
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.11);
+  color: white;
+  transition: background-color 150ms ease;
+}
+
+.cronograma-attachments__lightbox-close svg {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.cronograma-attachments__lightbox-image {
+  width: 100%;
+  max-height: calc(100dvh - 2rem);
+  border-radius: inherit;
+  object-fit: contain;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cronograma-attachments__upload-button:not(:disabled):hover {
+    border-color: oklch(var(--action) / 0.94);
+    background:
+      linear-gradient(105deg, rgb(255 255 255 / 0.16), transparent 38%),
+      oklch(var(--action) / 0.92);
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.38),
+      inset 0 -1px 0 rgb(51 20 0 / 0.13),
+      0 16px 28px -16px oklch(var(--action) / 0.86);
+    transform: translateY(-1px);
+  }
+
+  .cronograma-attachments__upload-button:not(:disabled):hover::after {
+    opacity: 1;
+  }
+
+  .cronograma-attachments__upload-button:not(:disabled):active {
+    box-shadow:
+      inset 0 2px 2px rgb(51 20 0 / 0.16),
+      0 7px 16px -13px oklch(var(--action) / 0.72);
+    transform: translateY(1px) scale(0.99);
+  }
+
+  .cronograma-attachments__item:hover {
+    border-color: oklch(var(--primary) / 0.2);
+    background: rgb(255 255 255 / 0.92);
+    box-shadow: 0 10px 24px -24px oklch(var(--primary) / 0.5);
+  }
+
+  .cronograma-attachments__lightbox-close:hover {
+    background: rgb(255 255 255 / 0.2);
+  }
+}
+
+@media (max-width: 639px) {
+  .cronograma-attachments__surface {
+    padding: 0.78rem;
+  }
+
+  .cronograma-attachments__actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cronograma-attachments__upload-button,
+  .cronograma-attachments__camera-button {
+    width: 100%;
+    min-width: 0;
+    min-height: 2.75rem;
+  }
+
+  .cronograma-attachments__item {
+    grid-template-columns: 2.85rem minmax(0, 1fr) 2.75rem;
+    gap: 0.52rem;
+    padding: 0.46rem;
+  }
+
+  .cronograma-attachments__thumbnail,
+  .cronograma-attachments__document-icon {
+    width: 2.85rem;
+    height: 2.85rem;
+  }
+
+  .cronograma-attachments__menu-trigger {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .cronograma-attachments__heading-icon {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .cronograma-attachments__formats {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .cronograma-attachments__formats span {
+    min-height: 1.35rem;
+  }
+
+  .cronograma-attachments__file-provenance > span:nth-child(2),
+  .cronograma-attachments__file-provenance > span:nth-child(3) {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cronograma-attachments__upload-button,
+  .cronograma-attachments__item,
+  .cronograma-attachments__lightbox-close {
+    transition: none;
+  }
+
+  .cronograma-attachments__upload-button:not(:disabled):hover,
+  .cronograma-attachments__upload-button:not(:disabled):active {
+    transform: none;
+  }
+
+  .cronograma-attachments__soybean-flight,
+  .cronograma-attachments__progress span {
+    display: none;
+    animation: none !important;
+  }
+
+  .cronograma-attachments__reduced-feedback {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    opacity: 0.68;
+    animation: none;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .cronograma-attachments__surface,
+  .cronograma-attachments__item,
+  .cronograma-attachments__empty {
+    border-color: oklch(var(--foreground) / 0.55);
+  }
+
+  .cronograma-attachments__status {
+    color: oklch(var(--foreground));
+  }
+}
