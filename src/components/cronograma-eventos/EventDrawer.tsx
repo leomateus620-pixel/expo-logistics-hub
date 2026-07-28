@@ -14,6 +14,7 @@ import {
   Route,
   Save,
   Sparkles,
+  Trash2,
   UserRound,
   X,
 } from 'lucide-react';
