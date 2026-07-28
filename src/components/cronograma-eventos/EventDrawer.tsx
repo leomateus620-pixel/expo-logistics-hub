@@ -50,6 +50,7 @@ import {
 import { EventForm } from './EventForm';
 import { formatLongDate, formatLongDateRange } from './dateUtils';
 import type { CronogramaEvent, CronogramaHistoryEntry } from './types';
+import { EventoAnexosSection } from './EventoAnexosSection';
 
 interface EventDrawerProps {
   event: CronogramaEvent | null;
