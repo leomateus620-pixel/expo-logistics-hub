@@ -1,64 +1,19 @@
-## Objetivo
-Cadastrar os 6 patrocinadores da Arena (do anexo), com valor, disponibilidade anual de eventos e alertas de UI quando o uso da cota anual for atingido.
+# Substituição do logo circular oficial
 
 ## Escopo
-- Apenas **Arena Fenasoja** (espaço `47bdc5e2…`).
-- Vigência: 10 anos / 5 edições Fenasoja a partir de 2022 → `valid_from=2022-01-01`, `valid_until=2031-12-31`.
-- Regra: cota **não acumulativa** entre anos (já suportada pela infra `venue_counterpart_agreements` + `venue_counterpart_usage`).
+O visual mostrado no primeiro anexo (círculo azul/laranja/verde no header, sidebar, portais, login etc.) vem do SVG inline dentro de `src/components/brand/FenasojaBrand.tsx`. Esse componente é usado em todo o sistema (Sidebar, LoginPage, CommissionPortalPage, VenueModuleShell, CronogramaModuleShell, CreateOrgPage, AdminFrame, RouteState, CountdownExperience, CronogramaLoginHero, CommissionSidebar). Substituir a arte lá troca a marca em todos os pontos de uma só vez.
 
-## Dados a cadastrar
+Fora do escopo: `fenasoja-logo-horizontal.png`, `fenasoja-golden-soybean.png`, `logofeira26.webp` e backgrounds/splashes — são artes distintas (horizontal, soja dourada, feira), não o "círculo" mostrado no anexo. Se quiser trocar essas também, avise.
 
-Stakeholders (tipo `sponsor`) + Agreements (`benefit_type='space_usage'`, `unit_type='events'`, `space_id=Arena`):
+## Passos
+1. Fazer upload de `user-uploads://9CE480F7-6A7E-40D0-AB32-890EAC3562EE.png` como asset CDN em `src/assets/fenasoja-logo-oficial.png.asset.json` via `lovable-assets create` (mantém a resolução 4K original).
+2. Em `FenasojaBrand.tsx`:
+   - Remover o `<svg>` inline (linhas ~47–58) e trocar por `<img src={fenasojaLogoOficial.url} alt="" />` importando o pointer.
+   - Preservar o wrapper `.fenasoja-brand__mark` e todas as classes de tamanho (`compact`, `display`, standard), só ajustando o fundo/borda para não competir com o logo (fundo transparente ou branco suave conforme já usado no display).
+   - Manter `object-contain` e as dimensões `h-7 w-7 / h-9 w-9 / h-12 w-12 sm:h-14 sm:w-14` para paridade visual.
+3. Verificação visual rápida (Playwright) em Sidebar, LoginPage e VenueModuleShell para confirmar que o novo logo renderiza nítido e alinhado nos três tamanhos.
 
-| Patrocinador | Valor (R$) | Eventos/ano | Contrato |
-|---|---|---|---|
-| Tabacaria / Cavaline | 150.000 | 3 | — |
-| Sicredi e Icatu | 150.000 (Rec. livre 1x) | 3 | 02/12/2019 |
-| Alibem | 200.000 (Rouanet) | 2 | 20/12/2019 |
-| Steffen | 150.000 (100k Rec.Livre 8x + 50k Rouanet) | 3 | 17/03/2020 |
-| Via Certa | 270.000 (120k Rouanet + 150k Rec. Livre 1x) | 2 | 02/12/2019 |
-| Cotrirosa | 150.000 (Licenciamento) | 2 | 15/10/2020 |
-
-Observações do contrato salvas no campo `notes` de cada agreement; valor total no campo `notes`/`contract_reference` (não há coluna monetária dedicada — usaremos `notes` estruturado, ver seção técnica).
-
-## Alerta de uso (UI)
-
-Na tela de detalhe de eventos da Arena e no painel de patrocinadores em `VenueWorkspace`:
-
-- **Cota disponível** (verde): `used < granted - 1`
-- **Última cota do ano** (âmbar): `used == granted - 1` — aviso "Última utilização disponível em {ano}"
-- **Cota esgotada** (vermelho, bloqueio de vínculo automático): `used >= granted` — aviso "Cota anual atingida — excedente requer aprovação"
-- Barra de progresso `used / granted` por ano corrente, com breakdown dos eventos que consumiram a cota.
-- Toast + `AlertDialog` ao tentar vincular patrocinador a um novo evento quando cota esgotada, com opção "Solicitar excedente" (já existe `approved_excess_quantity` no schema).
-
-## Passos técnicos
-
-1. **Migration de seed** (`supabase--migration`):
-   - `INSERT` 6 linhas em `venue_stakeholders` (kind=`sponsor`, org da Fenasoja).
-   - `INSERT` 6 linhas em `venue_counterpart_agreements` via `venue_upsert_agreement` (dentro de bloco `DO $$`) para respeitar auditoria/versão.
-   - `notes` em JSON leve: `{"valor_total": 150000, "modalidade": "Rec. livre 1x", "contrato": "02/12/2019"}`.
-
-2. **Componente novo** `src/components/venue-events/ArenaSponsorsPanel.tsx`:
-   - Lista os 6 agreements da Arena com card liquid glass (verde/gold da identidade).
-   - Mostra `granted_quantity` vs `used_this_year` (query em `venue_counterpart_ledger` filtrando por ano corrente e agreement).
-   - Badge de status (Disponível / Última cota / Esgotada) com cores semânticas.
-
-3. **Integração em `VenueWorkspace`**:
-   - Nova aba "Patrocinadores" ou seção no dashboard da Arena.
-   - Reutiliza hook `useVenueOperations` (`listAgreements`, `listLedger`).
-
-4. **Aviso no formulário de vínculo** (`VenueEventFormDialog`):
-   - Ao selecionar `counterpart_agreement_id`, mostrar mini-badge de cota restante do ano.
-   - Se `used_this_year >= granted_quantity` → confirm dialog exigindo justificativa (já cai no fluxo de excedente existente).
-
-5. **Verificação de prontidão** antes/depois:
-   - Rodar `supabase--linter` para RLS.
-   - `tsgo` para tipos após regenerar `types.ts`.
-   - Confirmar que `venue_recalculate_agreement_excess` roda no INSERT do ledger (já garantido por trigger existente).
-
-## Fora de escopo
-- Restaurante Fenasoja (usuário pediu apenas Arena).
-- Cadastro de contratos digitalizados (upload PDF) — pode ser feito depois via `document_path` do agreement.
-
-## Perguntas rápidas
-Confirmar apenas: **posso usar `valid_from=2022-01-01` e `valid_until=2031-12-31`** para todos (interpretação de "10 anos / 5 edições a partir de Fenasoja 2022")? Se preferir outra janela, ajusto no seed.
+## Detalhes técnicos
+- Nenhuma mudança em rotas, dados ou lógica — só o mark visual e o import do asset.
+- O `showEdition` (badge "2028") e o wordmark "FENASOJA" continuam intocados.
+- Testes existentes de `FenasojaBrand`/tokens não asseguram o SVG específico, então a troca não deve quebrá-los; rodo `vitest` nos arquivos de brand caso relevante.
