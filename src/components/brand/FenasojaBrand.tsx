@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils';
+import fenasojaLogoOficial from '@/assets/fenasoja-logo-oficial.png.asset.json';
 
 interface FenasojaBrandProps {
   className?: string;
