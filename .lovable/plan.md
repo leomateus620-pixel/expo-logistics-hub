@@ -1,48 +1,64 @@
-# Anexos e fotos em eventos do Cronograma
+## Objetivo
+Cadastrar os 6 patrocinadores da Arena (do anexo), com valor, disponibilidade anual de eventos e alertas de UI quando o uso da cota anual for atingido.
 
-Permitir que qualquer usuário autenticado anexe fotos/documentos a um evento do módulo "Cronograma e Eventos" para registro/validação de reuniões, com visualização imediata ao abrir o evento.
+## Escopo
+- Apenas **Arena Fenasoja** (espaço `47bdc5e2…`).
+- Vigência: 10 anos / 5 edições Fenasoja a partir de 2022 → `valid_from=2022-01-01`, `valid_until=2031-12-31`.
+- Regra: cota **não acumulativa** entre anos (já suportada pela infra `venue_counterpart_agreements` + `venue_counterpart_usage`).
 
-## Backend (Lovable Cloud)
+## Dados a cadastrar
 
-**Nova tabela `cronograma_evento_anexos`** (migration única):
-- Campos de domínio: `event_id` (FK `cronograma_eventos`), `org_id`, `uploaded_by` (auth.users), `uploader_name`, `file_name`, `file_path` (chave no bucket), `mime_type`, `size_bytes`, `kind` (`foto` | `documento`), `caption` (opcional).
-- Padrão: `created_at`, `updated_at`, trigger `set_updated_at`.
-- GRANTs para `authenticated` e `service_role`; RLS habilitada.
-- Políticas PERMISSIVE:
-  - SELECT / INSERT: membros da mesma `org_id` (via `is_org_member`).
-  - UPDATE / DELETE: apenas quem enviou (`uploaded_by = auth.uid()`) ou admin/gestor (via `has_capability`/`get_user_org_role`).
-- Cascata: ao excluir o evento, apaga anexos (ON DELETE CASCADE); trigger em delete registra em `audit_log`.
+Stakeholders (tipo `sponsor`) + Agreements (`benefit_type='space_usage'`, `unit_type='events'`, `space_id=Arena`):
 
-**Storage**: novo bucket privado `cronograma-event-attachments` (via ferramenta de storage). RLS em `storage.objects` restringe leitura/escrita aos membros da org (path prefixado por `{org_id}/{event_id}/`). URLs assinadas de 1h para exibição/download.
+| Patrocinador | Valor (R$) | Eventos/ano | Contrato |
+|---|---|---|---|
+| Tabacaria / Cavaline | 150.000 | 3 | — |
+| Sicredi e Icatu | 150.000 (Rec. livre 1x) | 3 | 02/12/2019 |
+| Alibem | 200.000 (Rouanet) | 2 | 20/12/2019 |
+| Steffen | 150.000 (100k Rec.Livre 8x + 50k Rouanet) | 3 | 17/03/2020 |
+| Via Certa | 270.000 (120k Rouanet + 150k Rec. Livre 1x) | 2 | 02/12/2019 |
+| Cotrirosa | 150.000 (Licenciamento) | 2 | 15/10/2020 |
 
-## Frontend
+Observações do contrato salvas no campo `notes` de cada agreement; valor total no campo `notes`/`contract_reference` (não há coluna monetária dedicada — usaremos `notes` estruturado, ver seção técnica).
 
-**Hook `useEventoAnexos(eventId)`** em `src/hooks/`:
-- `list`, `upload` (multipart → storage + insert em anexos), `remove`, `getSignedUrl`.
-- Invalidação de cache TanStack Query por `eventId`.
+## Alerta de uso (UI)
 
-**Componente `EventoAnexosSection`** em `src/components/cronograma-eventos/`:
-- Botão principal "Anexar foto/documento" (ícone `Paperclip` + `Camera` para mobile capture), estilo Liquid Glass alinhado ao drawer atual.
-- Grid de miniaturas para imagens (lightbox ao clicar) + lista para documentos (PDF/etc.), com nome do autor, data, tamanho e botão de excluir (respeitando RLS).
-- Suporte a drag-and-drop no desktop e `capture="environment"` no mobile.
-- Barra de progresso durante upload; validação de tipo (imagens, PDF, docx, xlsx) e tamanho (≤ 20 MB por arquivo).
+Na tela de detalhe de eventos da Arena e no painel de patrocinadores em `VenueWorkspace`:
 
-**Integração na UI** (feature aberta a todos os usuários com acesso ao evento):
-- `src/components/cronograma-eventos/EventDrawer.tsx`: nova seção "Anexos e registros" logo acima de "Rastreabilidade".
-- `src/components/cronograma-eventos/mobile/MobileEventScreen.tsx`: mesma seção, com FAB flutuante para câmera.
-- Badge no cabeçalho do evento mostrando contagem de anexos (ícone `Paperclip` + número), visível na abertura.
+- **Cota disponível** (verde): `used < granted - 1`
+- **Última cota do ano** (âmbar): `used == granted - 1` — aviso "Última utilização disponível em {ano}"
+- **Cota esgotada** (vermelho, bloqueio de vínculo automático): `used >= granted` — aviso "Cota anual atingida — excedente requer aprovação"
+- Barra de progresso `used / granted` por ano corrente, com breakdown dos eventos que consumiram a cota.
+- Toast + `AlertDialog` ao tentar vincular patrocinador a um novo evento quando cota esgotada, com opção "Solicitar excedente" (já existe `approved_excess_quantity` no schema).
 
-## Detalhes técnicos
+## Passos técnicos
 
-- Upload usa `supabase.storage.from('cronograma-event-attachments').upload(path, file)` e depois `insert` no anexo com metadados; ambos dentro de try/catch com toast padrão.
-- Preview de imagem gera signed URL cacheada por 50 min no cliente.
-- Sem alteração no fluxo do Google Calendar (anexos são registro interno, não sincronizam).
-- Tipos gerados automaticamente após a migration; hooks tipados com `Database['public']['Tables']['cronograma_evento_anexos']`.
+1. **Migration de seed** (`supabase--migration`):
+   - `INSERT` 6 linhas em `venue_stakeholders` (kind=`sponsor`, org da Fenasoja).
+   - `INSERT` 6 linhas em `venue_counterpart_agreements` via `venue_upsert_agreement` (dentro de bloco `DO $$`) para respeitar auditoria/versão.
+   - `notes` em JSON leve: `{"valor_total": 150000, "modalidade": "Rec. livre 1x", "contrato": "02/12/2019"}`.
 
-## Entregáveis
+2. **Componente novo** `src/components/venue-events/ArenaSponsorsPanel.tsx`:
+   - Lista os 6 agreements da Arena com card liquid glass (verde/gold da identidade).
+   - Mostra `granted_quantity` vs `used_this_year` (query em `venue_counterpart_ledger` filtrando por ano corrente e agreement).
+   - Badge de status (Disponível / Última cota / Esgotada) com cores semânticas.
 
-1. Migration `create_cronograma_evento_anexos` + criação do bucket.
-2. `useEventoAnexos.ts`.
-3. `EventoAnexosSection.tsx` (desktop + mobile responsive).
-4. Integração em `EventDrawer.tsx` e `MobileEventScreen.tsx` + badge de contagem.
-5. Toasts padrão de sucesso/erro e AlertDialog para exclusão.
+3. **Integração em `VenueWorkspace`**:
+   - Nova aba "Patrocinadores" ou seção no dashboard da Arena.
+   - Reutiliza hook `useVenueOperations` (`listAgreements`, `listLedger`).
+
+4. **Aviso no formulário de vínculo** (`VenueEventFormDialog`):
+   - Ao selecionar `counterpart_agreement_id`, mostrar mini-badge de cota restante do ano.
+   - Se `used_this_year >= granted_quantity` → confirm dialog exigindo justificativa (já cai no fluxo de excedente existente).
+
+5. **Verificação de prontidão** antes/depois:
+   - Rodar `supabase--linter` para RLS.
+   - `tsgo` para tipos após regenerar `types.ts`.
+   - Confirmar que `venue_recalculate_agreement_excess` roda no INSERT do ledger (já garantido por trigger existente).
+
+## Fora de escopo
+- Restaurante Fenasoja (usuário pediu apenas Arena).
+- Cadastro de contratos digitalizados (upload PDF) — pode ser feito depois via `document_path` do agreement.
+
+## Perguntas rápidas
+Confirmar apenas: **posso usar `valid_from=2022-01-01` e `valid_until=2031-12-31`** para todos (interpretação de "10 anos / 5 edições a partir de Fenasoja 2022")? Se preferir outra janela, ajusto no seed.
