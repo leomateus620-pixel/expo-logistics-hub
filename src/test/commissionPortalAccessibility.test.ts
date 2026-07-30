@@ -30,32 +30,24 @@ function contrastRatio(first: string, second: string): number {
 }
 
 const normalTextPairs = [
-  ['texto principal no navy', '#F8FAFC', '#061D3D'],
-  ['texto secundário no card', '#C6D2E0', '#082241'],
-  ['texto sutil no agrupador', '#AEBDD0', '#041832'],
-  ['texto escuro na ação laranja', '#071A34', '#FF8A24'],
-  ['nome da frente ativa', '#082541', '#F2F5F1'],
-  ['metadado da frente ativa', '#53697F', '#F2F5F1'],
-  ['estado ativo', '#07533E', '#D9F8EC'],
-  ['estado em estruturação', '#684000', '#FFF0BD'],
-  ['estado restrito', '#861D25', '#FFE4E6'],
-  ['aviso sensível', '#7D2028', '#FFE8E9'],
+  ['texto principal no navy', '#F8FAFC', '#041832'],
+  ['texto secundário no card', '#C6D2E0', '#041832'],
+  ['texto sutil no agrupador', '#9EB0C5', '#041832'],
+  ['destaque dourado', '#FFD35C', '#041832'],
+  ['estado permitido', '#A7F3D0', '#08294D'],
+  ['estado em estruturação', '#FFE69A', '#08294D'],
+  ['estado sem permissão', '#FECACA', '#041832'],
 ] as const;
 
 const graphicalPairs = [
-  ['foco dourado no navy', '#FFD35C', '#061D3D'],
-  ['foco navy no card claro', '#082541', '#FFFDF7'],
-  ['ícone amber no card escuro', '#FCD34D', '#102946'],
-  ['ícone lime no card escuro', '#BEF264', '#102946'],
-  ['ícone cyan no card escuro', '#67E8F9', '#102946'],
-  ['ícone rose no card escuro', '#FDA4AF', '#102946'],
-  ['ícone sky no card escuro', '#7DD3FC', '#102946'],
-  ['ícone red no card escuro', '#FCA5A5', '#102946'],
-  ['ícone teal no card escuro', '#5EEAD4', '#102946'],
-  ['ícone gold no card escuro', '#FDE047', '#102946'],
+  ['foco dourado no navy', '#FFD35C', '#041832'],
+  ['ícone azul no navy', '#68A5FF', '#041832'],
+  ['ícone teal no navy', '#5EEAD4', '#041832'],
+  ['ícone âmbar no navy', '#FDE68A', '#08294D'],
+  ['ícone red no navy', '#FCA5A5', '#08294D'],
 ] as const;
 
-describe('acessibilidade visual do portal de comissões', () => {
+describe('acessibilidade visual do hub Fenasoja', () => {
   it.each(normalTextPairs)('%s alcança WCAG AA para texto normal', (_label, foreground, background) => {
     expect(contrastRatio(foreground, background)).toBeGreaterThanOrEqual(4.5);
   });
@@ -65,20 +57,30 @@ describe('acessibilidade visual do portal de comissões', () => {
   });
 
   it('preserva movimento reduzido, alto contraste, transparência reduzida e áreas seguras', () => {
+    expect(portalStyles).toContain('animation: portal-reveal 250ms both');
+    expect(portalStyles).toContain('transition: grid-template-rows 230ms');
     expect(portalStyles).toContain('@media (prefers-reduced-motion: reduce)');
     expect(portalStyles).toContain('@media (prefers-reduced-transparency: reduce)');
     expect(portalStyles).toContain('@media (forced-colors: active)');
     expect(portalStyles).toContain('env(safe-area-inset-top)');
     expect(portalStyles).toContain('env(safe-area-inset-bottom)');
-    expect(portalStyles).toContain('.commission-access-card__toggle:focus-visible');
+    expect(portalStyles).toContain('.portal-primary-entry__control:focus-visible');
+    expect(portalStyles).toContain('.portal-destination-card:focus-visible');
+    expect(portalStyles).toContain('.commission-access-card:focus-visible');
   });
 
-  it('entrega somente o recorte fotográfico adequado e mantém os assets leves', () => {
+  it('entrega AVIF, WebP e fallback responsivos com payload controlado', () => {
     expect(portalPage).toContain('(max-width: 900px) and (orientation: portrait)');
+    expect(portalPage).toContain('type="image/avif"');
+    expect(portalPage).toContain('type="image/webp"');
 
     for (const asset of [
-      'public/portal/soybean-atmosphere-landscape.jpg',
-      'public/portal/soybean-atmosphere-portrait.jpg',
+      'public/portal/soybean-atmosphere-2028-landscape.avif',
+      'public/portal/soybean-atmosphere-2028-landscape.webp',
+      'public/portal/soybean-atmosphere-2028-landscape.jpg',
+      'public/portal/soybean-atmosphere-2028-portrait.avif',
+      'public/portal/soybean-atmosphere-2028-portrait.webp',
+      'public/portal/soybean-atmosphere-2028-portrait.jpg',
     ]) {
       expect(statSync(resolve(asset)).size).toBeLessThan(200_000);
     }

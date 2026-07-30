@@ -1,99 +1,82 @@
-import { ArrowRight, ChevronDown, ShieldCheck } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import type { CSSProperties } from 'react';
+import { Link } from 'react-router-dom';
+import { ArrowUpRight, Building2, Loader2, LockKeyhole, LogIn, ShieldCheck } from 'lucide-react';
 import {
   statusLabels,
   type CommissionModule,
   type CommissionStatus,
 } from '@/modules/commissions/commissionRegistry';
+import type { PortalAccessPresentation } from '@/components/portal/portalTypes';
 
 interface CommissionCardProps {
-  module: Pick<CommissionModule, 'slug' | 'name' | 'description' | 'icon' | 'status' | 'accentClass'> & {
-    sensitive?: boolean;
-    visual?: Partial<CommissionModule['visual']>;
-  };
-  actionLabel?: string;
+  access: PortalAccessPresentation;
   index?: number;
-  expanded?: boolean;
-  onToggle?: () => void;
-  onAccess: () => void;
+  module: CommissionModule;
+  onSelect: () => void;
 }
 
-export default function CommissionCard({
-  module,
-  actionLabel = 'Acessar módulo',
-  index = 0,
-  expanded = false,
-  onToggle,
-  onAccess,
-}: CommissionCardProps) {
+function AccessIcon({ state }: Pick<PortalAccessPresentation, 'state'>) {
+  if (state === 'loading') return <Loader2 className="portal-access-icon--loading" aria-hidden="true" />;
+  if (state === 'denied') return <LockKeyhole aria-hidden="true" />;
+  if (state === 'login') return <LogIn aria-hidden="true" />;
+  if (state === 'setup') return <Building2 aria-hidden="true" />;
+  return <ShieldCheck aria-hidden="true" />;
+}
+
+export default function CommissionCard({ access, index = 0, module, onSelect }: CommissionCardProps) {
   const Icon = module.icon;
   const status = module.status as CommissionStatus;
-  const detailsId = `commission-${module.slug}-details`;
+  const content = (
+    <>
+      <span className="commission-access-card__icon" data-tone={module.visual.tone} aria-hidden="true">
+        <Icon />
+      </span>
+      <span className="commission-access-card__copy">
+        <span className="commission-access-card__heading">
+          <span className="commission-access-card__name">{module.name}</span>
+          <span className="commission-access-card__status" data-status={status}>
+            {statusLabels[status]}
+          </span>
+        </span>
+        <span className="commission-access-card__description">{module.description}</span>
+        <span className="commission-access-card__permission" data-state={access.state}>
+          <AccessIcon state={access.state} />
+          {access.label}
+        </span>
+      </span>
+      <span className="commission-access-card__direction" aria-hidden="true">
+        {access.target ? <ArrowUpRight /> : <LockKeyhole />}
+      </span>
+    </>
+  );
+
+  if (access.target) {
+    return (
+      <Link
+        to={access.target}
+        onClick={onSelect}
+        className="commission-access-card"
+        data-status={status}
+        data-access-state={access.state}
+        data-module={module.slug}
+        style={{ animationDelay: `${Math.min(index, 7) * 24}ms` } as CSSProperties}
+        aria-label={`${module.name}. ${statusLabels[status]}. ${access.label}.`}
+      >
+        {content}
+      </Link>
+    );
+  }
 
   return (
     <article
-      className="commission-access-card portal-card-enter"
-      data-expanded={expanded}
+      className="commission-access-card commission-access-card--static"
       data-status={status}
-      data-tone={module.visual?.tone}
+      data-access-state={access.state}
       data-module={module.slug}
-      style={{ animationDelay: `${Math.min(index, 8) * 35}ms` }}
+      style={{ animationDelay: `${Math.min(index, 7) * 24}ms` } as CSSProperties}
+      aria-label={`${module.name}. ${statusLabels[status]}. ${access.label}. ${access.detail ?? ''}`}
     >
-      <button
-        type="button"
-        onClick={onToggle}
-        aria-expanded={expanded}
-        aria-controls={detailsId}
-        className="commission-access-card__toggle"
-      >
-        <span
-          className={cn('commission-access-card__icon', module.visual?.iconBackground)}
-          aria-hidden="true"
-        >
-          <Icon />
-        </span>
-
-        <span className="commission-access-card__identity">
-          <span className="commission-access-card__name">{module.name}</span>
-          <span className="commission-access-card__type">Comissão operacional</span>
-        </span>
-
-        <span className="commission-access-card__status">{statusLabels[status]}</span>
-
-        <ChevronDown
-          className={cn('commission-access-card__chevron', expanded && 'rotate-180')}
-          aria-hidden="true"
-        />
-      </button>
-
-      {expanded && (
-        <div
-          id={detailsId}
-          className="commission-access-card__details animate-soft-rise"
-          role="region"
-          aria-label={`Detalhes de ${module.name}`}
-        >
-          <p>{module.description}</p>
-
-          {module.sensitive && (
-            <div className="commission-access-card__sensitive">
-              <ShieldCheck aria-hidden="true" />
-              Acesso sujeito a permissão específica
-            </div>
-          )}
-
-          <button
-            type="button"
-            onClick={onAccess}
-            className="commission-access-card__action"
-            data-variant={status === 'active' ? 'primary' : 'secondary'}
-            aria-label={`${actionLabel} ${module.name}`}
-          >
-            {actionLabel}
-            <ArrowRight aria-hidden="true" />
-          </button>
-        </div>
-      )}
+      {content}
     </article>
   );
 }

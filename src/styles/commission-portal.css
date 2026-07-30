@@ -1,25 +1,34 @@
 .fenasoja-portal {
-  --portal-navy-950: #031630;
-  --portal-navy-900: #061d3d;
-  --portal-navy-800: #0c2b50;
-  --portal-cream: #fffaf0;
+  --portal-navy-950: #020d1d;
+  --portal-navy-900: #041832;
+  --portal-navy-850: #06203f;
+  --portal-navy-800: #08294d;
+  --portal-blue: #2d69ff;
+  --portal-gold: #ffd35c;
+  --portal-gold-strong: #ffb82f;
   --portal-text: #f8fafc;
   --portal-muted: #c6d2e0;
-  --portal-subtle: #aebdd0;
-  --portal-gold: #f8d55b;
-  --portal-orange: #ff8a24;
+  --portal-subtle: #9eb0c5;
+  --portal-border: rgb(158 188 221 / 22%);
+  min-height: 100vh;
+  min-height: 100svh;
   position: relative;
   isolation: isolate;
-  min-height: 100dvh;
   overflow-x: clip;
   background: var(--portal-navy-950);
   color: var(--portal-text);
 }
 
+.fenasoja-portal *,
+.fenasoja-portal *::before,
+.fenasoja-portal *::after {
+  box-sizing: border-box;
+}
+
 .fenasoja-portal__atmosphere {
   position: fixed;
+  z-index: 0;
   inset: 0;
-  z-index: -2;
   overflow: hidden;
   pointer-events: none;
   background: var(--portal-navy-950);
@@ -34,1100 +43,1126 @@
 
 .fenasoja-portal__atmosphere img {
   object-fit: cover;
-  object-position: center bottom;
-  animation: portal-atmosphere-drift 22s ease-in-out infinite alternate;
+  object-position: 50% 50%;
+}
+
+.fenasoja-portal__atmosphere::before,
+.fenasoja-portal__atmosphere::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+}
+
+.fenasoja-portal__atmosphere::before {
+  z-index: 1;
+  background:
+    linear-gradient(180deg, rgb(2 12 28 / 24%) 0%, rgb(2 14 31 / 42%) 52%, rgb(2 12 27 / 74%) 100%),
+    radial-gradient(circle at 50% 34%, transparent 0%, rgb(1 10 24 / 14%) 45%, rgb(1 9 22 / 46%) 100%);
 }
 
 .fenasoja-portal__atmosphere::after {
-  position: absolute;
-  inset: 0;
+  z-index: 2;
   background:
-    radial-gradient(ellipse at 50% 20%, rgb(3 22 48 / 0.20), rgb(3 22 48 / 0.76) 76%),
-    linear-gradient(90deg, rgb(2 18 40 / 0.48), transparent 24%, transparent 76%, rgb(2 18 40 / 0.42)),
-    linear-gradient(180deg, rgb(2 16 36 / 0.18), rgb(2 16 36 / 0.62));
-  content: '';
+    linear-gradient(90deg, rgb(2 13 29 / 38%) 0%, rgb(2 16 35 / 54%) 28%, rgb(2 16 35 / 46%) 68%, rgb(2 13 29 / 22%) 100%),
+    linear-gradient(180deg, transparent 52%, rgb(3 15 31 / 52%) 100%);
 }
 
 .fenasoja-portal__shell {
-  --portal-shell-gutter: clamp(1rem, 2.2vw, 2rem);
   position: relative;
-  width: min(100%, 90rem);
-  min-height: 100dvh;
+  z-index: 1;
+  width: min(1180px, calc(100% - 48px));
+  min-height: 100svh;
   margin-inline: auto;
-  padding-top: max(var(--portal-shell-gutter), env(safe-area-inset-top));
-  padding-right: max(var(--portal-shell-gutter), env(safe-area-inset-right));
-  padding-bottom: max(clamp(3rem, 7vw, 6rem), calc(env(safe-area-inset-bottom) + 1.5rem));
-  padding-left: max(var(--portal-shell-gutter), env(safe-area-inset-left));
+  padding:
+    max(18px, env(safe-area-inset-top))
+    0
+    max(18px, env(safe-area-inset-bottom));
 }
 
 .fenasoja-portal__header {
   display: flex;
-  min-height: 4rem;
+  min-height: 62px;
   align-items: center;
   justify-content: space-between;
-  gap: 1rem;
-  padding: 0.7rem 0.85rem;
-  border: 1px solid rgb(211 225 242 / 0.30);
-  border-radius: 1rem;
-  background:
-    linear-gradient(135deg, rgb(255 255 255 / 0.055), transparent 48%),
-    rgb(7 31 61 / 0.84);
+  gap: 20px;
+  padding: 10px 12px 10px 16px;
+  border: 1px solid rgb(157 191 224 / 29%);
+  border-radius: 16px;
+  background: rgb(3 22 47 / 88%);
   box-shadow:
-    0 1px 0 rgb(255 255 255 / 0.10) inset,
-    0 18px 42px -30px rgb(0 0 0 / 0.82);
-  backdrop-filter: blur(16px) saturate(1.18);
-  -webkit-backdrop-filter: blur(16px) saturate(1.18);
+    0 18px 50px -34px rgb(0 0 0 / 92%),
+    inset 0 1px 0 rgb(255 255 255 / 5%);
+}
+
+.fenasoja-portal__brand-compact {
+  display: none !important;
 }
 
 .fenasoja-portal__admin {
   display: inline-flex;
-  min-width: 2.75rem;
-  height: 2.75rem;
+  min-height: 44px;
+  flex: 0 0 auto;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  padding-inline: 0.9rem;
-  border: 1px solid rgb(248 213 91 / 0.42);
-  border-radius: 0.75rem;
-  background: rgb(255 255 255 / 0.055);
-  color: var(--portal-text);
-  font-size: 0.875rem;
-  font-weight: 760;
-  box-shadow: 0 1px 0 rgb(255 255 255 / 0.10) inset;
-  transition:
-    transform 180ms cubic-bezier(0.22, 1, 0.36, 1),
-    border-color 180ms ease,
-    background-color 180ms ease,
-    box-shadow 180ms ease;
-}
-
-.fenasoja-portal__brand-compact {
-  display: none;
+  gap: 9px;
+  padding: 0 14px;
+  border: 1px solid rgb(255 211 92 / 38%);
+  border-radius: 12px;
+  background: rgb(255 211 92 / 7%);
+  color: #fff7dc;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-decoration: none;
+  transition: border-color 190ms ease, background-color 190ms ease, transform 190ms ease;
 }
 
 .fenasoja-portal__admin svg {
-  width: 1rem;
-  height: 1rem;
-}
-
-.fenasoja-portal__admin svg:first-child {
+  width: 16px;
+  height: 16px;
   color: var(--portal-gold);
 }
 
-.fenasoja-portal__admin svg:last-child {
-  transition: transform 180ms ease;
+.fenasoja-portal__admin:hover {
+  border-color: rgb(255 211 92 / 68%);
+  background: rgb(255 211 92 / 12%);
+  transform: translateY(-1px);
 }
 
-.fenasoja-portal__admin:focus-visible,
-.fenasoja-portal .cronograma-portal-card:focus-visible,
-.commission-access-card__action:focus-visible {
-  outline: 3px solid #ffd35c;
-  outline-offset: 3px;
+.fenasoja-portal__admin--locked {
+  border-color: rgb(197 208 222 / 18%);
+  background: rgb(255 255 255 / 3%);
+  color: var(--portal-muted);
 }
 
-.commission-access-card__toggle:focus-visible {
-  outline: none;
-  box-shadow: inset 0 0 0 3px #ffd35c;
-}
-
-.commission-access-card[data-status='active'] .commission-access-card__toggle:focus-visible {
-  box-shadow:
-    inset 0 0 0 3px #082541,
-    inset 0 0 0 5px #ffd35c;
-}
-
-.commission-access-card[data-status='active'] .commission-access-card__action:focus-visible {
-  outline-color: #082541;
+.fenasoja-portal__admin-status {
+  font-size: 0.68rem;
+  font-weight: 650;
+  color: var(--portal-subtle);
 }
 
 .fenasoja-portal__hero {
-  padding: clamp(2.4rem, 4vw, 3.75rem) 0 clamp(1.75rem, 3vw, 2.5rem);
+  margin: clamp(22px, 3vw, 38px) 0 clamp(18px, 2.5vw, 30px);
+  padding-inline: 2px;
 }
 
 .fenasoja-portal__eyebrow {
   display: flex;
   align-items: center;
-  gap: 0.65rem;
-  color: var(--portal-gold);
+  gap: 10px;
+  margin: 0 0 12px;
+  color: #ffe08a;
   font-size: 0.7rem;
   font-weight: 850;
-  letter-spacing: 0.18em;
-  line-height: 1.4;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 
 .fenasoja-portal__eyebrow > span {
-  width: 2.25rem;
+  width: 26px;
   height: 1px;
-  flex: 0 0 auto;
-  background: linear-gradient(90deg, var(--portal-orange), var(--portal-gold));
-  box-shadow: 0 0 12px rgb(248 213 91 / 0.40);
+  background: linear-gradient(90deg, var(--portal-gold), transparent);
+}
+
+.fenasoja-portal__hero-copy {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(260px, 0.55fr);
+  align-items: end;
+  gap: clamp(30px, 6vw, 86px);
 }
 
 .fenasoja-portal__headline {
-  max-width: 100%;
-  margin-top: 0.8rem;
+  max-width: 820px;
+  margin: 0;
   color: var(--portal-text);
-  font-size: clamp(2.15rem, 3.25vw, 3.25rem);
-  font-weight: 950;
-  letter-spacing: -0.052em;
+  font-size: clamp(2.15rem, 4.15vw, 3.75rem);
+  font-weight: 900;
   line-height: 0.98;
+  letter-spacing: -0.052em;
+  text-wrap: balance;
+  text-shadow: 0 8px 32px rgb(0 0 0 / 28%);
+}
+
+.fenasoja-portal__headline span {
+  color: #ffe093;
+}
+
+.fenasoja-portal__hero-copy > p {
+  max-width: 390px;
+  margin: 0 0 2px;
+  color: #d5dfeb;
+  font-size: 0.9rem;
+  line-height: 1.62;
   text-wrap: pretty;
-  text-shadow: 0 12px 38px rgb(0 0 0 / 0.34);
 }
 
-.fenasoja-portal__headline-accent {
-  color: #fff1c4;
-  background: linear-gradient(105deg, #fffaf0 10%, #f8d55b 94%);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.fenasoja-portal__primary {
-  margin-bottom: clamp(2.5rem, 4vw, 3.75rem);
-}
-
-.fenasoja-portal__primary-grid {
+.fenasoja-portal__hub {
   display: grid;
-  gap: 1rem;
+  gap: 9px;
 }
 
-.fenasoja-portal .cronograma-portal-card {
-  position: relative;
-  isolation: isolate;
-  display: block;
-  width: 100%;
-  overflow: hidden;
-  border: 1px solid rgb(255 166 64 / 0.72);
-  border-radius: 1.35rem;
-  outline: none;
-  background:
-    radial-gradient(circle at 84% -35%, rgb(76 99 255 / 0.46), transparent 45%),
-    radial-gradient(circle at 0% 120%, rgb(255 138 36 / 0.18), transparent 38%),
-    linear-gradient(120deg, rgb(12 40 73 / 0.96), rgb(7 30 65 / 0.95));
-  color: var(--portal-text);
-  text-align: left;
-  box-shadow:
-    0 1px 0 rgb(255 255 255 / 0.12) inset,
-    0 28px 62px -34px rgb(0 0 0 / 0.94),
-    0 18px 48px -34px rgb(255 138 36 / 0.56);
-  cursor: pointer;
-  backdrop-filter: blur(14px) saturate(1.15);
-  -webkit-backdrop-filter: blur(14px) saturate(1.15);
-  transition:
-    transform 220ms cubic-bezier(0.22, 1, 0.36, 1),
-    border-color 180ms ease,
-    box-shadow 220ms ease;
-}
-
-.fenasoja-portal .cronograma-portal-card::before {
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 0.28rem;
-  background: linear-gradient(180deg, var(--portal-gold), var(--portal-orange));
-  content: '';
-}
-
-.fenasoja-portal .cronograma-portal-card::after {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: linear-gradient(120deg, rgb(255 255 255 / 0.055), transparent 38%);
-  content: '';
-  pointer-events: none;
-}
-
-.cronograma-portal-card__content {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: clamp(1rem, 2vw, 1.5rem);
-  padding: clamp(1.25rem, 2.4vw, 1.8rem);
-}
-
-.fenasoja-portal .cronograma-portal-icon {
-  display: grid;
-  width: 4rem;
-  height: 4rem;
-  place-items: center;
-  border: 1px solid rgb(248 213 91 / 0.42);
-  border-radius: 1rem;
-  background:
-    radial-gradient(circle at 30% 15%, rgb(255 255 255 / 0.13), transparent 42%),
-    rgb(248 213 91 / 0.12);
-  color: var(--portal-gold);
-  box-shadow:
-    0 1px 0 rgb(255 255 255 / 0.13) inset,
-    0 14px 28px -20px rgb(248 213 91 / 0.75);
-}
-
-.fenasoja-portal .cronograma-portal-icon svg {
-  width: 1.85rem;
-  height: 1.85rem;
-}
-
-.cronograma-portal-card__body {
-  display: block;
-  min-width: 0;
-}
-
-.cronograma-portal-card__meta {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  color: var(--portal-gold);
-  font-size: 0.68rem;
-  font-weight: 850;
-  letter-spacing: 0.15em;
-  line-height: 1.4;
-  text-transform: uppercase;
-}
-
-.cronograma-portal-card__availability {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.3rem;
-  padding: 0.2rem 0.45rem;
-  border: 1px solid rgb(93 220 177 / 0.34);
-  border-radius: 999px;
-  background: rgb(26 90 70 / 0.50);
-  color: #c9f8e8;
-  font-size: 0.66rem;
-  font-weight: 800;
-  letter-spacing: 0;
-  text-transform: none;
-}
-
-.cronograma-portal-card__availability svg {
-  width: 0.8rem;
-  height: 0.8rem;
-}
-
-.cronograma-portal-card__title {
-  display: block;
-  margin-top: 0.55rem;
-  color: var(--portal-text);
-  font-size: clamp(1.45rem, 2.3vw, 1.9rem);
-  font-weight: 920;
-  letter-spacing: -0.035em;
-  line-height: 1.05;
-}
-
-.cronograma-portal-card__description {
-  display: block;
-  max-width: 48rem;
-  margin-top: 0.4rem;
-  color: var(--portal-muted);
-  font-size: 0.9rem;
-  line-height: 1.55;
-}
-
-.cronograma-portal-card__cycle {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
-  margin-top: 0.8rem;
-  color: var(--portal-subtle);
-  font-size: 0.72rem;
-  font-weight: 700;
-}
-
-.cronograma-portal-card__cycle strong {
-  color: #fff4cf;
-  font-weight: 850;
-  letter-spacing: 0.04em;
-}
-
-.cronograma-portal-card__cta {
-  display: inline-flex;
-  min-height: 3rem;
-  align-items: center;
-  justify-content: center;
-  gap: 0.6rem;
-  padding: 0.78rem 1.15rem;
-  border: 1px solid rgb(255 220 122 / 0.72);
-  border-radius: 0.85rem;
-  background: linear-gradient(135deg, #ffad3d, var(--portal-orange));
-  color: #071a34;
-  font-size: 0.875rem;
-  font-weight: 900;
-  line-height: 1.1;
-  box-shadow:
-    0 1px 0 rgb(255 255 255 / 0.42) inset,
-    0 16px 28px -18px rgb(255 138 36 / 0.90),
-    0 6px 12px -8px rgb(0 0 0 / 0.68);
-  transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
-}
-
-.cronograma-portal-card__cta svg {
-  width: 1rem;
-  height: 1rem;
-  transition: transform 180ms ease;
-}
-
-.fenasoja-portal__commissions {
-  padding-bottom: 1rem;
-}
-
-.fenasoja-portal__section-header {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 1.25rem;
-  margin-bottom: 1.15rem;
-}
-
-.fenasoja-portal__section-kicker {
-  color: var(--portal-gold);
-  font-size: 0.68rem;
-  font-weight: 850;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-}
-
-.fenasoja-portal__section-header h2 {
-  margin-top: 0.25rem;
-  color: var(--portal-text);
-  font-size: clamp(1.45rem, 2.2vw, 1.8rem);
-  font-weight: 900;
-  letter-spacing: -0.035em;
-  line-height: 1.1;
-}
-
-.fenasoja-portal__profile-note {
-  display: inline-flex;
-  min-height: 2.25rem;
-  align-items: center;
-  gap: 0.45rem;
-  padding: 0.45rem 0.7rem;
-  border: 1px solid rgb(211 225 242 / 0.22);
-  border-radius: 999px;
-  background: rgb(6 29 59 / 0.72);
-  color: #d8e2ee;
-  font-size: 0.75rem;
-  font-weight: 720;
-  white-space: nowrap;
-}
-
-.fenasoja-portal__profile-note svg {
-  width: 0.9rem;
-  height: 0.9rem;
-  color: var(--portal-gold);
-}
-
-.fenasoja-portal__groups {
-  display: grid;
-  gap: 1rem;
-}
-
-.commission-access-group {
-  --group-accent: #f8d55b;
+.portal-primary-entry {
+  --entry-accent: #7dd3fc;
   position: relative;
   overflow: hidden;
-  padding: 0.9rem;
-  border: 1px solid rgb(211 225 242 / 0.18);
-  border-radius: 1.15rem;
-  background:
-    linear-gradient(135deg, rgb(255 255 255 / 0.035), transparent 40%),
-    rgb(4 24 50 / 0.82);
+  border: 1px solid var(--portal-border);
+  border-radius: 17px;
+  background: rgb(4 24 50 / 92%);
   box-shadow:
-    0 1px 0 rgb(255 255 255 / 0.06) inset,
-    0 22px 44px -34px rgb(0 0 0 / 0.82);
-  backdrop-filter: blur(12px) saturate(1.08);
-  -webkit-backdrop-filter: blur(12px) saturate(1.08);
+    0 20px 45px -38px rgb(0 0 0 / 92%),
+    inset 0 1px 0 rgb(255 255 255 / 4%);
 }
 
-.commission-access-group::before {
-  position: absolute;
-  inset: 0 auto 0 0;
-  width: 2px;
-  background: linear-gradient(180deg, var(--group-accent), transparent 85%);
+.portal-primary-entry[data-tone='agenda'] {
+  --entry-accent: #ffd35c;
+}
+
+.portal-primary-entry[data-tone='map'] {
+  --entry-accent: #68a5ff;
+  background:
+    linear-gradient(90deg, rgb(28 78 171 / 16%), transparent 52%),
+    rgb(4 24 50 / 94%);
+}
+
+.portal-primary-entry[data-tone='commissions'] {
+  --entry-accent: #5eead4;
+}
+
+.portal-primary-entry[data-tone='finance'] {
+  --entry-accent: #ffbd4a;
+  background:
+    linear-gradient(90deg, rgb(255 190 76 / 8%), transparent 52%),
+    rgb(4 24 50 / 94%);
+}
+
+.portal-primary-entry::before {
   content: '';
+  position: absolute;
+  z-index: 2;
+  inset: 11px auto 11px 0;
+  width: 3px;
+  border-radius: 0 4px 4px 0;
+  background: var(--entry-accent);
+  opacity: 0.76;
+  box-shadow: 0 0 18px color-mix(in srgb, var(--entry-accent) 58%, transparent);
+  transition: inset 210ms ease, opacity 210ms ease;
 }
 
-.commission-access-group[data-status='active'] {
-  --group-accent: #54dcb0;
+.portal-primary-entry[data-expanded='true']::before {
+  inset-block: 0;
+  opacity: 1;
 }
 
-.commission-access-group[data-status='structuring'] {
-  --group-accent: #f8d55b;
-}
-
-.commission-access-group[data-status='restricted'] {
-  --group-accent: #ff7d84;
-}
-
-.commission-access-group__header {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 0.7rem;
-  margin-bottom: 0.75rem;
-  padding: 0.1rem 0.15rem;
-}
-
-.commission-access-group__icon {
-  display: grid;
-  width: 2.25rem;
-  height: 2.25rem;
-  place-items: center;
-  border: 1px solid color-mix(in srgb, var(--group-accent) 42%, transparent);
-  border-radius: 0.7rem;
-  background: color-mix(in srgb, var(--group-accent) 12%, transparent);
-  color: var(--group-accent);
-}
-
-.commission-access-group__icon svg {
-  width: 1rem;
-  height: 1rem;
-}
-
-.commission-access-group__header h3 {
-  color: var(--portal-text);
-  font-size: 0.98rem;
-  font-weight: 850;
-  letter-spacing: -0.015em;
-  line-height: 1.2;
-}
-
-.commission-access-group__header p {
-  margin-top: 0.15rem;
-  color: var(--portal-subtle);
-  font-size: 0.78rem;
-  line-height: 1.4;
-}
-
-.commission-access-group__count {
-  display: grid;
-  min-width: 2rem;
-  height: 2rem;
-  place-items: center;
-  border: 1px solid rgb(211 225 242 / 0.18);
-  border-radius: 999px;
-  background: rgb(255 255 255 / 0.055);
-  color: var(--portal-text);
-  font-size: 0.75rem;
-  font-weight: 850;
-}
-
-.commission-access-group__grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  align-items: start;
-  gap: 0.65rem;
-}
-
-.commission-access-group[data-status='active'] .commission-access-group__grid,
-.commission-access-group[data-status='restricted'] .commission-access-group__grid {
-  grid-template-columns: minmax(0, 1fr);
-}
-
-.commission-access-card {
+.portal-primary-entry__control {
   position: relative;
-  overflow: hidden;
-  border: 1px solid rgb(211 225 242 / 0.18);
-  border-radius: 0.9rem;
-  background:
-    linear-gradient(135deg, rgb(255 255 255 / 0.04), transparent 46%),
-    rgb(8 34 65 / 0.94);
-  color: var(--portal-text);
-  box-shadow:
-    0 1px 0 rgb(255 255 255 / 0.055) inset,
-    0 12px 24px -22px rgb(0 0 0 / 0.88);
-  transition: transform 190ms ease, border-color 180ms ease, box-shadow 190ms ease;
-}
-
-.commission-access-card[data-status='active'] {
-  border-color: rgb(223 232 231 / 0.86);
-  background:
-    radial-gradient(circle at 0% 0%, rgb(84 220 176 / 0.11), transparent 32%),
-    linear-gradient(140deg, #fffdf7, #f2f5f1);
-  color: #082541;
-  box-shadow:
-    0 1px 0 rgb(255 255 255 / 0.94) inset,
-    0 18px 34px -26px rgb(0 0 0 / 0.66),
-    0 12px 28px -26px rgb(84 220 176 / 0.68);
-}
-
-.commission-access-card[data-expanded='true'] {
-  border-color: color-mix(in srgb, var(--group-accent, #f8d55b) 56%, transparent);
-  box-shadow:
-    0 1px 0 rgb(255 255 255 / 0.08) inset,
-    0 20px 36px -26px rgb(0 0 0 / 0.92),
-    0 0 0 1px rgb(248 213 91 / 0.08);
-}
-
-.commission-access-card__toggle {
+  z-index: 1;
   display: grid;
   width: 100%;
-  min-height: 4.25rem;
-  grid-template-columns: auto minmax(0, 1fr) auto auto;
+  min-height: 82px;
+  grid-template-columns: 34px 48px minmax(0, 1fr) minmax(145px, auto) 36px;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.7rem 0.85rem;
-  border-radius: inherit;
+  gap: 14px;
+  padding: 12px 15px 12px 18px;
+  border: 0;
+  background: transparent;
   color: inherit;
+  font: inherit;
   text-align: left;
-  transition: background-color 160ms ease;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 190ms ease;
 }
 
-.commission-access-card__icon {
-  display: grid;
-  width: 2.55rem;
-  height: 2.55rem;
-  place-items: center;
-  border: 1px solid rgb(211 225 242 / 0.26);
-  border-radius: 0.75rem;
-  box-shadow: 0 1px 0 rgb(255 255 255 / 0.16) inset;
+.portal-primary-entry__control:hover {
+  background: rgb(255 255 255 / 3.5%);
 }
 
-.commission-access-card__icon svg {
-  width: 1.15rem;
-  height: 1.15rem;
+.portal-primary-entry__control--static {
+  cursor: default;
 }
 
-.commission-access-card:not([data-status='active'])[data-tone='amber'] .commission-access-card__icon {
-  color: #fcd34d;
+.portal-primary-entry[data-access-state='denied'] .portal-primary-entry__control--static {
+  background: rgb(1 12 27 / 18%);
 }
 
-.commission-access-card:not([data-status='active'])[data-tone='lime'] .commission-access-card__icon {
-  color: #bef264;
-}
-
-.commission-access-card:not([data-status='active'])[data-tone='cyan'] .commission-access-card__icon {
-  color: #67e8f9;
-}
-
-.commission-access-card:not([data-status='active'])[data-tone='rose'] .commission-access-card__icon {
-  color: #fda4af;
-}
-
-.commission-access-card:not([data-status='active'])[data-tone='sky'] .commission-access-card__icon {
-  color: #7dd3fc;
-}
-
-.commission-access-card:not([data-status='active'])[data-tone='red'] .commission-access-card__icon {
-  color: #fca5a5;
-}
-
-.commission-access-card:not([data-status='active'])[data-tone='teal'] .commission-access-card__icon {
-  color: #5eead4;
-}
-
-.commission-access-card:not([data-status='active'])[data-tone='gold'] .commission-access-card__icon {
-  color: #fde047;
-}
-
-.commission-access-card__identity {
-  min-width: 0;
-}
-
-.commission-access-card__name {
-  display: block;
-  overflow: hidden;
-  color: var(--portal-text);
-  font-size: 0.9rem;
+.portal-primary-entry__index {
+  color: rgb(198 213 229 / 52%);
+  font-size: 0.63rem;
+  font-variant-numeric: tabular-nums;
   font-weight: 850;
-  letter-spacing: -0.018em;
-  line-height: 1.2;
+  letter-spacing: 0.14em;
+}
+
+.portal-primary-entry__icon {
+  display: grid;
+  width: 46px;
+  height: 46px;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--entry-accent) 34%, transparent);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--entry-accent) 11%, transparent);
+  color: var(--entry-accent);
+}
+
+.portal-primary-entry__icon svg {
+  width: 21px;
+  height: 21px;
+  stroke-width: 1.8;
+}
+
+.portal-primary-entry__copy {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+.portal-primary-entry__title {
+  color: var(--portal-text);
+  font-size: 1.08rem;
+  font-weight: 850;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+}
+
+.portal-primary-entry__description {
+  overflow: hidden;
+  color: var(--portal-muted);
+  font-size: 0.79rem;
+  line-height: 1.42;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.commission-access-card[data-status='active'] .commission-access-card__name {
-  color: #082541;
+.portal-primary-entry__meta {
+  display: grid;
+  justify-items: end;
+  gap: 4px;
 }
 
-.commission-access-card__type {
-  display: block;
-  margin-top: 0.18rem;
-  color: var(--portal-subtle);
-  font-size: 0.7rem;
-  font-weight: 800;
-  letter-spacing: 0.13em;
-  line-height: 1.3;
+.portal-primary-entry__eyebrow {
+  color: color-mix(in srgb, var(--entry-accent) 84%, white);
+  font-size: 0.61rem;
+  font-weight: 850;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
-.commission-access-card[data-status='active'] .commission-access-card__type {
-  color: #53697f;
-}
-
-.commission-access-card__status {
+.portal-primary-entry__status {
   display: inline-flex;
-  min-height: 1.65rem;
   align-items: center;
-  justify-content: center;
-  padding: 0.25rem 0.5rem;
-  border: 1px solid transparent;
-  border-radius: 999px;
-  font-size: 0.7rem;
-  font-weight: 850;
-  line-height: 1.1;
+  justify-content: flex-end;
+  gap: 6px;
+  color: var(--portal-subtle);
+  font-size: 0.68rem;
+  font-weight: 700;
   white-space: nowrap;
 }
 
-.commission-access-card[data-status='active'] .commission-access-card__status {
-  border-color: #75cbb0;
-  background: #d9f8ec;
-  color: #07533e;
+.portal-primary-entry__status[data-state='allowed'] {
+  color: #a7f3d0;
 }
 
-.commission-access-card[data-status='structuring'] .commission-access-card__status {
-  border-color: #d9b347;
-  background: #fff0bd;
-  color: #684000;
+.portal-primary-entry__status[data-state='login'] {
+  color: #dbeafe;
 }
 
-.commission-access-card[data-status='restricted'] .commission-access-card__status {
-  border-color: #dc9297;
-  background: #ffe4e6;
-  color: #861d25;
+.portal-primary-entry__status[data-state='setup'] {
+  color: #ffe69a;
 }
 
-.commission-access-card__chevron {
-  width: 1rem;
-  height: 1rem;
-  color: var(--portal-muted);
-  transition: transform 180ms ease, color 180ms ease;
+.portal-primary-entry__status[data-state='denied'] {
+  color: #fecaca;
 }
 
-.commission-access-card[data-status='active'] .commission-access-card__chevron {
-  color: #3f5870;
+.portal-primary-entry__status svg {
+  width: 13px;
+  height: 13px;
 }
 
-.commission-access-card__details {
-  padding: 0.9rem;
-  border-top: 1px solid rgb(211 225 242 / 0.16);
-  background: rgb(1 15 34 / 0.28);
+.portal-primary-entry__direction {
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid rgb(163 190 218 / 18%);
+  border-radius: 11px;
+  color: var(--entry-accent);
+  transition: border-color 200ms ease, background-color 200ms ease, transform 220ms ease;
 }
 
-.commission-access-card__details > p {
-  max-width: 58rem;
-  color: var(--portal-muted);
-  font-size: 0.84rem;
-  line-height: 1.65;
+.portal-primary-entry__direction svg {
+  width: 17px;
+  height: 17px;
 }
 
-.commission-access-card[data-status='active'] .commission-access-card__details {
-  border-top-color: rgb(8 37 65 / 0.12);
-  background: rgb(8 37 65 / 0.025);
+.portal-primary-entry[data-expanded='true'] .portal-primary-entry__direction {
+  border-color: color-mix(in srgb, var(--entry-accent) 42%, transparent);
+  background: color-mix(in srgb, var(--entry-accent) 9%, transparent);
+  transform: rotate(180deg);
 }
 
-.commission-access-card[data-status='active'] .commission-access-card__details > p {
-  color: #3f5870;
+.portal-primary-entry__panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 230ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.commission-access-card__sensitive {
+.portal-primary-entry[data-expanded='true'] .portal-primary-entry__panel {
+  grid-template-rows: 1fr;
+}
+
+.portal-primary-entry__panel-clip {
+  min-height: 0;
+  overflow: hidden;
+}
+
+.portal-primary-entry__panel-content {
+  margin: 0 16px 16px 114px;
+  padding-top: 14px;
+  border-top: 1px solid rgb(157 188 220 / 14%);
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity 170ms ease, transform 210ms ease;
+}
+
+.portal-primary-entry[data-expanded='true'] .portal-primary-entry__panel-content {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: 40ms;
+}
+
+.portal-agenda-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.portal-destination-card {
+  display: grid;
+  min-width: 0;
+  min-height: 124px;
+  grid-template-columns: 42px minmax(0, 1fr);
+  grid-template-rows: auto auto;
+  align-items: start;
+  gap: 0 12px;
+  padding: 15px;
+  border: 1px solid rgb(161 193 225 / 18%);
+  border-radius: 14px;
+  background: rgb(9 38 72 / 78%);
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 190ms ease, background-color 190ms ease, transform 190ms ease;
+}
+
+.portal-destination-card[href]:hover {
+  border-color: rgb(255 211 92 / 46%);
+  background: rgb(11 45 84 / 92%);
+  transform: translateY(-2px);
+}
+
+.portal-destination-card--static {
+  background: rgb(4 25 50 / 72%);
+}
+
+.portal-destination-card__icon {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  grid-row: 1 / span 2;
+  place-items: center;
+  border: 1px solid rgb(255 211 92 / 26%);
+  border-radius: 12px;
+  background: rgb(255 211 92 / 8%);
+  color: var(--portal-gold);
+}
+
+.portal-destination-card__icon svg {
+  width: 19px;
+  height: 19px;
+}
+
+.portal-destination-card__copy {
+  display: grid;
+  gap: 5px;
+}
+
+.portal-destination-card__title {
+  color: var(--portal-text);
+  font-size: 0.9rem;
+  font-weight: 820;
+  line-height: 1.2;
+}
+
+.portal-destination-card__description {
+  color: #b9c8d9;
+  font-size: 0.72rem;
+  line-height: 1.48;
+  text-wrap: pretty;
+}
+
+.portal-destination-card__action {
+  display: inline-flex;
+  min-height: 28px;
+  align-items: center;
+  align-self: end;
+  gap: 6px;
+  margin-top: 9px;
+  color: #dbeafe;
+  font-size: 0.67rem;
+  font-weight: 780;
+}
+
+.portal-destination-card__action[data-state='allowed'] {
+  color: #a7f3d0;
+}
+
+.portal-destination-card__action[data-state='setup'] {
+  color: #ffe69a;
+}
+
+.portal-destination-card__action[data-state='denied'] {
+  color: #fecaca;
+}
+
+.portal-destination-card__action svg {
+  width: 13px;
+  height: 13px;
+}
+
+.portal-commissions-panel {
+  display: grid;
+  gap: 12px;
+}
+
+.portal-commissions-panel__intro {
   display: flex;
   align-items: center;
-  gap: 0.45rem;
-  margin-top: 0.75rem;
-  padding: 0.6rem 0.7rem;
-  border: 1px solid #e3a1a6;
-  border-radius: 0.65rem;
-  background: #ffe8e9;
-  color: #7d2028;
-  font-size: 0.75rem;
-  font-weight: 800;
+  justify-content: space-between;
+  gap: 20px;
 }
 
-.commission-access-card__sensitive svg {
-  width: 0.9rem;
-  height: 0.9rem;
+.portal-commissions-panel__intro > div {
+  display: grid;
+  gap: 2px;
+}
+
+.portal-commissions-panel__intro span {
+  color: #d8fff6;
+  font-size: 0.68rem;
+  font-weight: 850;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.portal-commissions-panel__intro p {
+  margin: 0;
+  color: var(--portal-subtle);
+  font-size: 0.71rem;
+  line-height: 1.4;
+}
+
+.portal-commissions-panel__intro strong {
+  display: grid;
+  width: 34px;
+  height: 34px;
   flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid rgb(94 234 212 / 26%);
+  border-radius: 11px;
+  background: rgb(94 234 212 / 8%);
+  color: #99f6e4;
+  font-size: 0.74rem;
 }
 
-.commission-access-card__action {
+.portal-commissions-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.commission-access-card {
+  display: grid;
+  min-width: 0;
+  min-height: 132px;
+  grid-template-columns: 38px minmax(0, 1fr) 22px;
+  align-items: start;
+  gap: 10px;
+  padding: 13px;
+  border: 1px solid rgb(157 190 222 / 16%);
+  border-radius: 13px;
+  background: rgb(8 35 66 / 76%);
+  color: inherit;
+  text-decoration: none;
+  animation: portal-card-enter 240ms both;
+  transition: border-color 180ms ease, background-color 180ms ease, transform 180ms ease;
+}
+
+.commission-access-card[href]:hover {
+  border-color: rgb(94 234 212 / 38%);
+  background: rgb(10 43 78 / 92%);
+  transform: translateY(-2px);
+}
+
+.commission-access-card--static {
+  background: rgb(5 27 52 / 72%);
+}
+
+.commission-access-card__icon {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 1px solid rgb(255 255 255 / 10%);
+  border-radius: 11px;
+  background: rgb(255 255 255 / 5%);
+  color: #99f6e4;
+}
+
+.commission-access-card__icon[data-tone='amber'],
+.commission-access-card__icon[data-tone='gold'] {
+  color: #fde68a;
+}
+
+.commission-access-card__icon[data-tone='lime'] {
+  color: #bef264;
+}
+
+.commission-access-card__icon[data-tone='cyan'] {
+  color: #67e8f9;
+}
+
+.commission-access-card__icon[data-tone='rose'] {
+  color: #fda4af;
+}
+
+.commission-access-card__icon[data-tone='sky'] {
+  color: #7dd3fc;
+}
+
+.commission-access-card__icon[data-tone='red'] {
+  color: #fca5a5;
+}
+
+.commission-access-card__icon svg {
+  width: 17px;
+  height: 17px;
+}
+
+.commission-access-card__copy {
+  display: grid;
+  min-width: 0;
+  gap: 7px;
+}
+
+.commission-access-card__heading {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 7px;
+}
+
+.commission-access-card__name {
+  overflow: hidden;
+  color: var(--portal-text);
+  font-size: 0.79rem;
+  font-weight: 820;
+  line-height: 1.22;
+  text-overflow: ellipsis;
+}
+
+.commission-access-card__status {
+  flex: 0 0 auto;
+  padding: 2px 5px;
+  border: 1px solid rgb(255 211 92 / 24%);
+  border-radius: 999px;
+  background: rgb(255 211 92 / 8%);
+  color: #ffe69a;
+  font-size: 0.53rem;
+  font-weight: 830;
+  line-height: 1.35;
+  white-space: nowrap;
+}
+
+.commission-access-card__status[data-status='active'] {
+  border-color: rgb(52 211 153 / 24%);
+  background: rgb(52 211 153 / 8%);
+  color: #a7f3d0;
+}
+
+.commission-access-card__description {
+  display: -webkit-box;
+  overflow: hidden;
+  color: #afc0d2;
+  font-size: 0.66rem;
+  line-height: 1.43;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+.commission-access-card__permission {
   display: inline-flex;
-  min-height: 2.75rem;
+  align-items: center;
+  gap: 5px;
+  color: #dbeafe;
+  font-size: 0.61rem;
+  font-weight: 760;
+}
+
+.commission-access-card__permission[data-state='allowed'] {
+  color: #a7f3d0;
+}
+
+.commission-access-card__permission[data-state='setup'] {
+  color: #ffe69a;
+}
+
+.commission-access-card__permission[data-state='denied'] {
+  color: #fecaca;
+}
+
+.commission-access-card__permission svg {
+  width: 12px;
+  height: 12px;
+}
+
+.commission-access-card__direction {
+  display: grid;
+  width: 22px;
+  height: 22px;
+  place-items: center;
+  color: #98acc2;
+}
+
+.commission-access-card[href] .commission-access-card__direction {
+  color: #99f6e4;
+}
+
+.commission-access-card__direction svg {
+  width: 14px;
+  height: 14px;
+}
+
+.fenasoja-portal__footer {
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  margin-top: 0.9rem;
-  padding: 0.65rem 0.9rem;
-  border: 1px solid rgb(211 225 242 / 0.28);
-  border-radius: 0.7rem;
-  background: rgb(255 255 255 / 0.075);
-  color: var(--portal-text);
-  font-size: 0.8rem;
-  font-weight: 850;
-  box-shadow: 0 1px 0 rgb(255 255 255 / 0.08) inset;
-  transition: transform 170ms ease, background-color 170ms ease, border-color 170ms ease, box-shadow 170ms ease;
+  gap: 8px;
+  padding: 15px 8px 0;
+  color: rgb(198 211 226 / 74%);
+  font-size: 0.65rem;
+  font-weight: 650;
+  text-align: center;
 }
 
-.commission-access-card__action[data-variant='primary'] {
-  border-color: #f2b04a;
-  background: linear-gradient(135deg, #ffad3d, var(--portal-orange));
-  color: #071a34;
-  box-shadow:
-    0 1px 0 rgb(255 255 255 / 0.40) inset,
-    0 12px 22px -16px rgb(255 138 36 / 0.84);
+.fenasoja-portal__footer svg {
+  width: 13px;
+  height: 13px;
+  color: var(--portal-gold);
 }
 
-.commission-access-card__action svg {
-  width: 0.95rem;
-  height: 0.95rem;
-  transition: transform 170ms ease;
+.portal-primary-entry__control:focus-visible,
+.portal-destination-card:focus-visible,
+.commission-access-card:focus-visible,
+.fenasoja-portal__admin:focus-visible {
+  outline: 3px solid #ffd35c;
+  outline-offset: 3px;
+}
+
+.portal-access-icon--loading {
+  animation: portal-spin 900ms linear infinite;
 }
 
 .portal-reveal {
-  animation: portal-reveal 560ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: portal-reveal 250ms both;
 }
 
 .fenasoja-portal__hero.portal-reveal {
-  animation-delay: 70ms;
+  animation-delay: 45ms;
 }
 
-.fenasoja-portal__primary.portal-reveal {
+.fenasoja-portal__hub.portal-reveal {
+  animation-delay: 90ms;
+}
+
+.fenasoja-portal__footer.portal-reveal {
   animation-delay: 130ms;
 }
 
-.fenasoja-portal__commissions.portal-reveal {
-  animation-delay: 190ms;
-}
-
-.fenasoja-portal .portal-card-enter {
-  animation: commission-card-enter 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
-}
-
-@keyframes portal-atmosphere-drift {
-  from { transform: scale(1.015) translate3d(0, -2px, 0); }
-  to { transform: scale(1.03) translate3d(0, 2px, 0); }
-}
-
 @keyframes portal-reveal {
-  from { opacity: 0; transform: translateY(12px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-@keyframes commission-card-enter {
-  from { opacity: 0; transform: translateY(7px); }
-  to { opacity: 1; transform: translateY(0); }
+@keyframes portal-card-enter {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
-@media (min-width: 64rem) {
+@keyframes portal-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (min-width: 2100px) {
+  .fenasoja-portal__shell {
+    width: min(1280px, calc(100% - 96px));
+  }
+
   .fenasoja-portal__headline {
-    white-space: nowrap;
+    font-size: 4rem;
   }
 
-  .fenasoja-portal__headline > span {
-    display: inline;
-  }
-}
-
-@media (max-width: 63.999rem) {
-  .fenasoja-portal__headline > span {
-    display: block;
-  }
-
-  .fenasoja-portal__headline-accent {
-    margin-top: 0.12em;
+  .portal-primary-entry__control {
+    min-height: 88px;
   }
 }
 
-@media (max-width: 56.25rem) and (orientation: portrait), (max-width: 47.999rem) {
-  .cronograma-portal-card__content {
-    grid-template-columns: auto minmax(0, 1fr);
+@media (max-width: 1180px) {
+  .fenasoja-portal__shell {
+    width: min(100% - 36px, 1080px);
   }
 
-  .cronograma-portal-card__cta {
-    grid-column: 1 / -1;
-    width: 100%;
+  .portal-primary-entry__panel-content {
+    margin-left: 98px;
+  }
+
+  .portal-commissions-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 56.25rem) {
+@media (max-width: 900px) {
+  .fenasoja-portal__shell {
+    width: min(100% - 28px, 760px);
+  }
+
   .fenasoja-portal__atmosphere img {
-    animation: none;
+    object-position: 54% 50%;
   }
 
-  .fenasoja-portal__header,
-  .fenasoja-portal .cronograma-portal-card,
-  .commission-access-group {
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
+  .fenasoja-portal__hero-copy {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .fenasoja-portal__hero-copy > p {
+    max-width: 620px;
+  }
+
+  .portal-primary-entry__control {
+    grid-template-columns: 28px 46px minmax(0, 1fr) minmax(132px, auto) 34px;
+    gap: 11px;
+  }
+
+  .portal-primary-entry__panel-content {
+    margin-left: 16px;
+  }
+
+  .portal-commissions-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 47.999rem) {
-  .fenasoja-portal__atmosphere img {
-    object-position: center bottom;
+@media (max-width: 640px) {
+  .fenasoja-portal__shell {
+    width: auto;
+    margin: 0;
+    padding:
+      max(10px, env(safe-area-inset-top))
+      max(11px, env(safe-area-inset-right))
+      max(14px, env(safe-area-inset-bottom))
+      max(11px, env(safe-area-inset-left));
+  }
+
+  .fenasoja-portal__atmosphere::before {
+    background:
+      linear-gradient(180deg, rgb(2 12 28 / 34%) 0%, rgb(2 14 31 / 60%) 51%, rgb(2 12 27 / 84%) 100%),
+      radial-gradient(circle at 50% 30%, transparent 0%, rgb(1 10 24 / 16%) 44%, rgb(1 9 22 / 52%) 100%);
   }
 
   .fenasoja-portal__atmosphere::after {
-    background:
-      radial-gradient(ellipse at 48% 20%, rgb(3 22 48 / 0.28), rgb(3 22 48 / 0.78) 72%),
-      linear-gradient(180deg, rgb(2 16 36 / 0.18), rgb(2 16 36 / 0.68));
+    background: linear-gradient(90deg, rgb(2 13 29 / 38%), rgb(2 16 35 / 48%) 55%, rgb(2 13 29 / 28%));
   }
 
-  .fenasoja-portal__shell {
-    padding-top: max(1rem, env(safe-area-inset-top));
-    padding-right: max(1rem, env(safe-area-inset-right));
-    padding-bottom: max(3.5rem, calc(env(safe-area-inset-bottom) + 1.5rem));
-    padding-left: max(1rem, env(safe-area-inset-left));
-  }
-
-  .fenasoja-portal__hero {
-    padding: 2.25rem 0 1.7rem;
-  }
-
-  .fenasoja-portal__eyebrow {
-    font-size: 0.7rem;
-    letter-spacing: 0.14em;
-  }
-
-  .fenasoja-portal__headline {
-    font-size: clamp(2rem, 8.5vw, 2.3rem);
-    line-height: 0.99;
-  }
-
-  .fenasoja-portal__primary {
-    margin-bottom: 2.5rem;
-  }
-
-  .cronograma-portal-card__content {
-    gap: 0.9rem;
-    padding: 1.1rem;
-  }
-
-  .fenasoja-portal .cronograma-portal-icon {
-    width: 3.25rem;
-    height: 3.25rem;
-  }
-
-  .fenasoja-portal .cronograma-portal-icon svg {
-    width: 1.55rem;
-    height: 1.55rem;
-  }
-
-  .cronograma-portal-card__meta {
-    gap: 0.45rem;
-    font-size: 0.7rem;
-    letter-spacing: 0.11em;
-  }
-
-  .cronograma-portal-card__title {
-    font-size: 1.38rem;
-  }
-
-  .fenasoja-portal__section-header {
-    align-items: center;
-  }
-
-  .fenasoja-portal__profile-note {
-    font-size: 0.72rem;
-  }
-
-  .commission-access-group {
-    padding: 0.75rem;
-  }
-
-  .commission-access-group__grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .commission-access-group__header p {
-    max-width: 26rem;
-  }
-}
-
-@media (max-width: 35rem) {
   .fenasoja-portal__header {
-    min-height: 3.75rem;
-    padding: 0.6rem;
-  }
-
-  .fenasoja-portal__admin {
-    padding-inline: 0.7rem;
-  }
-
-  .fenasoja-portal__eyebrow > span {
-    width: 1.35rem;
-  }
-
-  .fenasoja-portal__section-header {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 0.7rem;
-  }
-
-  .commission-access-group__header {
-    align-items: start;
-  }
-
-  .commission-access-group__header p {
-    font-size: 0.74rem;
-  }
-
-  .commission-access-card__toggle {
-    gap: 0.55rem;
-    padding-inline: 0.7rem;
-  }
-
-  .commission-access-card__status {
-    font-size: 0.7rem;
-  }
-}
-
-@media (max-width: 22.5rem) {
-  .commission-access-card__toggle {
-    grid-template-columns: auto minmax(0, 1fr) auto;
-  }
-
-  .commission-access-card__status {
-    grid-column: 2;
-    justify-self: start;
-  }
-
-  .commission-access-card__chevron {
-    grid-column: 3;
-    grid-row: 1;
-  }
-}
-
-@media (max-width: 21rem) {
-  .fenasoja-portal__header {
-    gap: 0.5rem;
+    min-height: 54px;
+    gap: 10px;
+    padding: 7px 8px 7px 10px;
+    border-radius: 14px;
   }
 
   .fenasoja-portal__brand-standard {
-    display: none;
+    display: none !important;
   }
 
   .fenasoja-portal__brand-compact {
-    display: inline-flex;
-    gap: 0.5rem;
+    display: inline-flex !important;
   }
 
   .fenasoja-portal__admin {
-    gap: 0.4rem;
-    padding-inline: 0.6rem;
+    min-height: 44px;
+    gap: 7px;
+    padding-inline: 10px;
+    border-radius: 11px;
+    font-size: 0.69rem;
   }
 
-  .fenasoja-portal__admin svg:last-child {
+  .fenasoja-portal__admin > svg:last-child {
     display: none;
   }
 
+  .fenasoja-portal__admin-status {
+    display: none;
+  }
+
+  .fenasoja-portal__hero {
+    margin: 18px 2px 16px;
+  }
+
+  .fenasoja-portal__eyebrow {
+    margin-bottom: 9px;
+    font-size: 0.59rem;
+    letter-spacing: 0.11em;
+  }
+
   .fenasoja-portal__headline {
-    font-size: 1.75rem;
-    letter-spacing: -0.045em;
+    max-width: 520px;
+    font-size: clamp(1.85rem, 9.1vw, 2.45rem);
+    line-height: 1.01;
+  }
+
+  .fenasoja-portal__hero-copy {
+    gap: 9px;
+  }
+
+  .fenasoja-portal__hero-copy > p {
+    font-size: 0.77rem;
+    line-height: 1.48;
+  }
+
+  .fenasoja-portal__hub {
+    gap: 8px;
+  }
+
+  .portal-primary-entry {
+    border-radius: 15px;
+  }
+
+  .portal-primary-entry__control {
+    min-height: 96px;
+    grid-template-areas:
+      'icon copy direction'
+      'icon meta direction';
+    grid-template-columns: 42px minmax(0, 1fr) 30px;
+    grid-template-rows: auto auto;
+    gap: 5px 11px;
+    padding: 12px 11px 12px 14px;
+  }
+
+  .portal-primary-entry__index {
+    display: none;
+  }
+
+  .portal-primary-entry__icon {
+    width: 42px;
+    height: 42px;
+    grid-area: icon;
+    align-self: center;
+    border-radius: 12px;
+  }
+
+  .portal-primary-entry__copy {
+    grid-area: copy;
+    gap: 3px;
+  }
+
+  .portal-primary-entry__title {
+    font-size: 0.94rem;
+  }
+
+  .portal-primary-entry__description {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: 0.68rem;
+    white-space: normal;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .portal-primary-entry__meta {
+    display: flex;
+    grid-area: meta;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
+  }
+
+  .portal-primary-entry__eyebrow {
+    font-size: 0.52rem;
+  }
+
+  .portal-primary-entry__status {
+    font-size: 0.59rem;
+  }
+
+  .portal-primary-entry__direction {
+    width: 30px;
+    height: 30px;
+    grid-area: direction;
+    align-self: center;
+    border-radius: 10px;
+  }
+
+  .portal-primary-entry__panel-content {
+    margin: 0 10px 10px;
+    padding-top: 10px;
+  }
+
+  .portal-agenda-grid,
+  .portal-commissions-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .portal-destination-card {
+    min-height: 116px;
+    padding: 13px;
+  }
+
+  .portal-commissions-panel__intro {
+    gap: 12px;
+    padding-inline: 2px;
+  }
+
+  .portal-commissions-panel__intro p {
+    max-width: 270px;
+    font-size: 0.65rem;
+  }
+
+  .commission-access-card {
+    min-height: 104px;
+    grid-template-columns: 38px minmax(0, 1fr) 22px;
+  }
+
+  .commission-access-card__description {
+    -webkit-line-clamp: 2;
+  }
+
+  .fenasoja-portal__footer {
+    align-items: flex-start;
+    padding-top: 12px;
+    font-size: 0.58rem;
   }
 }
 
-@media (hover: hover) and (pointer: fine) {
-  .fenasoja-portal__admin:hover {
-    border-color: rgb(255 170 67 / 0.78);
-    background: rgb(255 255 255 / 0.095);
-    box-shadow:
-      0 1px 0 rgb(255 255 255 / 0.14) inset,
-      0 12px 22px -16px rgb(255 138 36 / 0.54);
-    transform: translateY(-1px);
+@media (max-width: 380px) {
+  .fenasoja-portal__admin {
+    padding-inline: 8px;
   }
 
-  .fenasoja-portal__admin:hover svg:last-child,
-  .fenasoja-portal .cronograma-portal-card:hover .cronograma-portal-card__cta svg,
-  .commission-access-card__action:hover svg {
-    transform: translateX(3px);
+  .fenasoja-portal__headline {
+    font-size: 1.82rem;
   }
 
-  .fenasoja-portal .cronograma-portal-card:hover {
-    border-color: rgb(255 190 93 / 0.94);
-    box-shadow:
-      0 1px 0 rgb(255 255 255 / 0.15) inset,
-      0 34px 70px -36px rgb(0 0 0 / 0.96),
-      0 20px 50px -30px rgb(255 138 36 / 0.62);
-    transform: translateY(-2px);
+  .portal-primary-entry__control {
+    grid-template-columns: 40px minmax(0, 1fr) 28px;
+    gap-inline: 9px;
+    padding-inline: 12px 9px;
   }
 
-  .fenasoja-portal .cronograma-portal-card:hover .cronograma-portal-card__cta {
-    box-shadow:
-      0 1px 0 rgb(255 255 255 / 0.46) inset,
-      0 18px 30px -16px rgb(255 138 36 / 0.96),
-      0 7px 14px -8px rgb(0 0 0 / 0.72);
-    filter: brightness(1.035);
-    transform: translateY(-1px);
-  }
-
-  .commission-access-card__toggle:hover {
-    background: rgb(255 255 255 / 0.045);
-  }
-
-  .commission-access-card[data-status='active']:hover {
-    border-color: #8dd4bd;
-    box-shadow:
-      0 1px 0 rgb(255 255 255 / 0.94) inset,
-      0 22px 38px -26px rgb(0 0 0 / 0.70),
-      0 16px 30px -24px rgb(84 220 176 / 0.72);
-    transform: translateY(-2px);
-  }
-
-  .commission-access-card:not([data-status='active']):hover {
-    border-color: rgb(248 213 91 / 0.38);
-  }
-
-  .commission-access-card__action:hover {
-    border-color: rgb(248 213 91 / 0.56);
-    background: rgb(255 255 255 / 0.12);
-    transform: translateY(-1px);
-  }
-
-  .commission-access-card__action[data-variant='primary']:hover {
-    background: linear-gradient(135deg, #ffb54d, #ff922f);
+  .portal-primary-entry__status svg {
+    display: none;
   }
 }
 
-.fenasoja-portal__admin:active,
-.fenasoja-portal .cronograma-portal-card:active,
-.commission-access-card__action:active {
-  transform: translateY(0) scale(0.985);
+@media (max-width: 900px) and (orientation: landscape) {
+  .fenasoja-portal__shell {
+    width: min(100% - 28px, 840px);
+  }
+
+  .fenasoja-portal__hero {
+    margin-block: 16px 14px;
+  }
+
+  .fenasoja-portal__headline {
+    font-size: 2.15rem;
+  }
+
+  .portal-commissions-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 901px) and (max-height: 780px) {
+  .fenasoja-portal__shell {
+    padding-block: 12px;
+  }
+
+  .fenasoja-portal__header {
+    min-height: 56px;
+    padding-block: 7px;
+  }
+
+  .fenasoja-portal__hero {
+    margin-block: 15px 14px;
+  }
+
+  .fenasoja-portal__eyebrow {
+    margin-bottom: 8px;
+  }
+
+  .fenasoja-portal__headline {
+    font-size: clamp(2rem, 3.6vw, 3rem);
+  }
+
+  .portal-primary-entry__control {
+    min-height: 72px;
+    padding-block: 9px;
+  }
+
+  .portal-primary-entry__icon {
+    width: 42px;
+    height: 42px;
+  }
+
+  .fenasoja-portal__footer {
+    padding-top: 9px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .fenasoja-portal__atmosphere img,
-  .portal-reveal,
-  .fenasoja-portal .portal-card-enter {
-    animation: none;
-  }
-
-  .fenasoja-portal__admin,
-  .fenasoja-portal .cronograma-portal-card,
-  .cronograma-portal-card__cta,
-  .cronograma-portal-card__cta svg,
-  .commission-access-card,
-  .commission-access-card__toggle,
-  .commission-access-card__action,
-  .commission-access-card__action svg,
-  .commission-access-card__chevron {
-    transition: none;
-  }
-}
-
-@media (prefers-contrast: more) {
-  .fenasoja-portal__header,
-  .fenasoja-portal .cronograma-portal-card,
-  .commission-access-group,
-  .commission-access-card {
-    border-color: rgb(255 255 255 / 0.58);
-  }
-
-  .fenasoja-portal__atmosphere::after {
-    background: rgb(3 22 48 / 0.86);
+  .fenasoja-portal *,
+  .fenasoja-portal *::before,
+  .fenasoja-portal *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }
 
 @media (prefers-reduced-transparency: reduce) {
   .fenasoja-portal__header,
-  .fenasoja-portal .cronograma-portal-card,
-  .commission-access-group {
-    backdrop-filter: none;
-    -webkit-backdrop-filter: none;
+  .portal-primary-entry {
+    background: #041832;
   }
 
-  .fenasoja-portal__header,
-  .commission-access-group {
-    background: var(--portal-navy-900);
+  .portal-destination-card,
+  .commission-access-card {
+    background: #08294d;
   }
 }
 
@@ -1136,23 +1171,20 @@
     display: none;
   }
 
-  .fenasoja-portal__headline-accent {
-    background: none;
-    color: CanvasText;
-    -webkit-text-fill-color: currentColor;
-  }
-
-  .fenasoja-portal__admin,
-  .fenasoja-portal .cronograma-portal-card,
-  .commission-access-group,
+  .fenasoja-portal__header,
+  .portal-primary-entry,
+  .portal-destination-card,
   .commission-access-card,
-  .commission-access-card__action {
-    border: 1px solid ButtonText;
-    forced-color-adjust: auto;
+  .fenasoja-portal__admin {
+    border: 1px solid CanvasText;
+    background: Canvas;
+    color: CanvasText;
   }
 
-  .commission-access-card__toggle:focus-visible {
-    outline: 2px solid Highlight;
-    outline-offset: -3px;
+  .portal-primary-entry__control:focus-visible,
+  .portal-destination-card:focus-visible,
+  .commission-access-card:focus-visible,
+  .fenasoja-portal__admin:focus-visible {
+    outline: 3px solid Highlight;
   }
 }
