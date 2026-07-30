@@ -34,6 +34,7 @@ const normalTextPairs = [
   ['texto secundário no card', '#C6D2E0', '#041832'],
   ['texto sutil no agrupador', '#9EB0C5', '#041832'],
   ['destaque dourado', '#FFD35C', '#041832'],
+  ['texto do card Gestão Operacional', '#FFF5CF', '#03162F'],
   ['estado permitido', '#A7F3D0', '#08294D'],
   ['estado em estruturação', '#FFE69A', '#08294D'],
   ['estado sem permissão', '#FECACA', '#041832'],
