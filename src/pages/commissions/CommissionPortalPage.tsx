@@ -1,24 +1,31 @@
-import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import {
-  ArrowRight,
-  CheckCircle2,
-  Clock3,
-  LockKeyhole,
-  ShieldCheck,
-  type LucideIcon,
-} from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
+import { ArrowUpRight, LockKeyhole, ShieldCheck } from 'lucide-react';
 import CommissionCard from '@/components/commissions/CommissionCard';
 import { FenasojaBrand } from '@/components/brand/FenasojaBrand';
-import { CronogramaPortalCard } from '@/components/cronograma-eventos/CronogramaPortalCard';
-import { VenuePortalCard } from '@/components/venue-events/VenuePortalCard';
-import '@/styles/commission-portal.css';
+import { PortalDestinationCard } from '@/components/portal/PortalDestinationCard';
+import { PortalPrimaryEntry } from '@/components/portal/PortalPrimaryEntry';
+import type { PortalAccessPresentation } from '@/components/portal/portalTypes';
+import { useAuth } from '@/hooks/useAuth';
+import { useCapabilities } from '@/hooks/useCapabilities';
+import { useCurrentOrg } from '@/hooks/useCurrentOrg';
+import { resolveModuleAccess } from '@/hooks/useModuleAccess';
 import {
   SELECTED_COMMISSION_STORAGE_KEY,
-  getPublicCommissionModules,
   type CommissionModule,
-  type CommissionStatus,
 } from '@/modules/commissions/commissionRegistry';
+import {
+  commercialMapDestination,
+  financePortalModule,
+  getCommissionDestination,
+  getCommissionLoginPath,
+  getPortalCommissionModules,
+  portalAgendaDestinations,
+  portalPrimaryEntries,
+  type PortalDestination,
+  type PortalEntryId,
+} from '@/modules/portal/portalRegistry';
+import '@/styles/commission-portal.css';
 
 function saveSelectedModule(slug: string) {
   try {
@@ -28,81 +35,140 @@ function saveSelectedModule(slug: string) {
   }
 }
 
-interface CommissionAccessGroup {
-  status: CommissionStatus;
-  title: string;
-  description: string;
-  icon: LucideIcon;
-  modules: CommissionModule[];
+function anonymousAccess(target: string): PortalAccessPresentation {
+  return {
+    state: 'login',
+    label: 'Entrar para acessar',
+    detail: 'Identificação necessária para continuar.',
+    target,
+  };
+}
+
+function loadingAccess(): PortalAccessPresentation {
+  return {
+    state: 'loading',
+    label: 'Verificando perfil',
+    detail: 'Aguarde enquanto confirmamos suas permissões.',
+  };
+}
+
+function deniedAccess(detail: string): PortalAccessPresentation {
+  return {
+    state: 'denied',
+    label: 'Sem permissão',
+    detail,
+  };
+}
+
+function allowedAccess(target: string): PortalAccessPresentation {
+  return {
+    state: 'allowed',
+    label: 'Acesso liberado',
+    target,
+  };
+}
+
+function organizationSetupAccess(target: string): PortalAccessPresentation {
+  return {
+    state: 'setup',
+    label: 'Configurar organização',
+    detail: 'Conclua a criação da sua organização para continuar.',
+    target,
+  };
 }
 
 export default function CommissionPortalPage() {
-  const navigate = useNavigate();
-  const modules = getPublicCommissionModules();
-  const [expandedSlug, setExpandedSlug] = useState<string | null>(null);
-  const gridRef = useRef<HTMLElement>(null);
+  const { user, loading: authLoading } = useAuth();
+  const {
+    capSet,
+    hasCapability,
+    hasFullAccess,
+    isLoading: capabilitiesLoading,
+  } = useCapabilities();
+  const { hasOrg, myRole, isLoading: orgLoading } = useCurrentOrg();
+  const [expandedEntry, setExpandedEntry] = useState<PortalEntryId | null>(null);
+  const entryButtonRefs = useRef<Partial<Record<PortalEntryId, HTMLButtonElement | null>>>({});
+  const commissionModules = useMemo(() => getPortalCommissionModules(), []);
+  const accessLoading = authLoading || capabilitiesLoading || orgLoading;
+  const moduleAccessContext = { capSet, hasFullAccess, myRole };
 
-  const accessGroups: CommissionAccessGroup[] = [
-    {
-      status: 'active',
-      title: 'Disponível agora',
-      description: 'Operação habilitada conforme as permissões do seu perfil.',
-      icon: CheckCircle2,
-      modules: modules.filter((module) => module.status === 'active'),
-    },
-    {
-      status: 'structuring',
-      title: 'Em estruturação',
-      description: 'Frentes com escopo consultável e ambiente em evolução.',
-      icon: Clock3,
-      modules: modules.filter((module) => module.status === 'structuring'),
-    },
-    {
-      status: 'restricted',
-      title: 'Acesso restrito',
-      description: 'Dados sensíveis disponíveis somente para perfis autorizados.',
-      icon: LockKeyhole,
-      modules: modules.filter((module) => module.status === 'restricted'),
-    },
-  ];
-
-  const accessModule = (slug: string) => {
-    saveSelectedModule(slug);
-    navigate(`/login/${slug}`);
+  const resolveCapabilityAccess = (destination: PortalDestination): PortalAccessPresentation => {
+    if (authLoading) return loadingAccess();
+    if (!user) return anonymousAccess(destination.loginPath);
+    if (accessLoading) return loadingAccess();
+    if (!hasOrg) return organizationSetupAccess(destination.route);
+    if (hasCapability(destination.capability)) return allowedAccess(destination.route);
+    return deniedAccess('Seu perfil ou organização não possui a permissão necessária para este destino.');
   };
 
-  const accessCronograma = () => {
-    saveSelectedModule('cronograma-eventos');
-    navigate('/login/cronograma-eventos');
+  const resolveCommissionAccess = (module: CommissionModule): PortalAccessPresentation => {
+    if (authLoading) return loadingAccess();
+    if (!user) return anonymousAccess(getCommissionLoginPath(module));
+    if (accessLoading) return loadingAccess();
+    if (!hasOrg) return organizationSetupAccess(getCommissionDestination(module));
+
+    const { canAccess } = resolveModuleAccess(module, false, moduleAccessContext);
+    if (canAccess) return allowedAccess(getCommissionDestination(module));
+
+    return deniedAccess(
+      module.sensitive
+        ? 'Os dados financeiros permanecem protegidos para perfis expressamente autorizados.'
+        : 'Esta frente está registrada, mas o seu perfil não possui acesso ao módulo.',
+    );
   };
 
-  const accessVenueEvents = () => {
-    saveSelectedModule('eventos-restaurante-arena');
-    navigate('/login/eventos-restaurante-arena');
+  const resolveAdminAccess = (): PortalAccessPresentation => {
+    if (authLoading) return loadingAccess();
+    if (!user) return anonymousAccess('/login/admin');
+    if (accessLoading) return loadingAccess();
+    if (!hasOrg) return organizationSetupAccess('/admin');
+    const { canAccess } = resolveModuleAccess(undefined, true, moduleAccessContext);
+    return canAccess
+      ? allowedAccess('/admin')
+      : deniedAccess('Área administrativa disponível somente para perfis autorizados.');
   };
 
-  const accessAdmin = () => {
-    saveSelectedModule('admin');
-    navigate('/login/admin');
-  };
+  const mapAccess = resolveCapabilityAccess(commercialMapDestination);
+  const financeAccess = resolveCommissionAccess(financePortalModule);
+  const adminAccess = resolveAdminAccess();
 
   useEffect(() => {
-    if (!expandedSlug) return;
+    if (!expandedEntry) return;
     const closeOnEscape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setExpandedSlug(null);
-    };
-    const closeOutside = (event: MouseEvent) => {
-      if (gridRef.current && !gridRef.current.contains(event.target as Node)) {
-        setExpandedSlug(null);
+      if (event.key === 'Escape') {
+        entryButtonRefs.current[expandedEntry]?.focus();
+        setExpandedEntry(null);
       }
     };
     window.addEventListener('keydown', closeOnEscape);
-    window.addEventListener('mousedown', closeOutside);
-    return () => {
-      window.removeEventListener('keydown', closeOnEscape);
-      window.removeEventListener('mousedown', closeOutside);
-    };
-  }, [expandedSlug]);
+    return () => window.removeEventListener('keydown', closeOnEscape);
+  }, [expandedEntry]);
+
+  const toggleEntry = (entryId: PortalEntryId) => {
+    setExpandedEntry((current) => (current === entryId ? null : entryId));
+  };
+
+  const getEntryAccess = (entryId: PortalEntryId): PortalAccessPresentation => {
+    if (entryId === 'agenda') {
+      return {
+        state: 'group',
+        label: expandedEntry === entryId ? 'Agenda aberta' : 'Explorar agenda',
+      };
+    }
+    if (entryId === 'comissoes') {
+      return {
+        state: 'group',
+        label: expandedEntry === entryId ? 'Comissões abertas' : 'Ver comissões',
+      };
+    }
+    return entryId === 'mapa-comercial' ? mapAccess : financeAccess;
+  };
+
+  const getEntrySelection = (entryId: PortalEntryId) => {
+    if (entryId === 'mapa-comercial') return () => saveSelectedModule(commercialMapDestination.storageSlug);
+    if (entryId === 'financeiro') return () => saveSelectedModule(financePortalModule.slug);
+    return undefined;
+  };
 
   return (
     <div className="fenasoja-portal">
@@ -110,10 +176,22 @@ export default function CommissionPortalPage() {
         <picture>
           <source
             media="(max-width: 900px) and (orientation: portrait)"
-            srcSet="/portal/soybean-atmosphere-portrait.jpg"
+            type="image/avif"
+            srcSet="/portal/soybean-atmosphere-2028-portrait.avif"
           />
+          <source
+            media="(max-width: 900px) and (orientation: portrait)"
+            type="image/webp"
+            srcSet="/portal/soybean-atmosphere-2028-portrait.webp"
+          />
+          <source
+            media="(max-width: 900px) and (orientation: portrait)"
+            srcSet="/portal/soybean-atmosphere-2028-portrait.jpg"
+          />
+          <source type="image/avif" srcSet="/portal/soybean-atmosphere-2028-landscape.avif" />
+          <source type="image/webp" srcSet="/portal/soybean-atmosphere-2028-landscape.webp" />
           <img
-            src="/portal/soybean-atmosphere-landscape.jpg"
+            src="/portal/soybean-atmosphere-2028-landscape.jpg"
             alt=""
             decoding="async"
           />
@@ -122,96 +200,110 @@ export default function CommissionPortalPage() {
 
       <main className="fenasoja-portal__shell">
         <header className="fenasoja-portal__header portal-reveal">
-          <FenasojaBrand className="fenasoja-portal__brand-standard" subtitle="Sistema integrado de gestão" tone="dark" />
+          <FenasojaBrand
+            className="fenasoja-portal__brand-standard"
+            subtitle="Sistema integrado de gestão"
+            tone="dark"
+          />
           <FenasojaBrand className="fenasoja-portal__brand-compact" compact tone="dark" />
-          <button
-            type="button"
-            onClick={accessAdmin}
-            className="fenasoja-portal__admin"
-            aria-label="Acessar área administrativa"
-          >
-            <ShieldCheck aria-hidden="true" />
-            <span className="hidden sm:inline">Administrador</span>
-            <span className="sm:hidden">Admin</span>
-            <ArrowRight aria-hidden="true" />
-          </button>
+
+          {adminAccess.target ? (
+            <Link
+              to={adminAccess.target}
+              onClick={() => saveSelectedModule('admin')}
+              className="fenasoja-portal__admin"
+              aria-label="Acessar área administrativa"
+            >
+              <ShieldCheck aria-hidden="true" />
+              <span>Administrador</span>
+              <ArrowUpRight aria-hidden="true" />
+            </Link>
+          ) : (
+            <div
+              className="fenasoja-portal__admin fenasoja-portal__admin--locked"
+              aria-label={`Administrador. ${adminAccess.label}. ${adminAccess.detail ?? ''}`}
+            >
+              <LockKeyhole aria-hidden="true" />
+              <span>Administrador</span>
+              <span className="fenasoja-portal__admin-status">{adminAccess.label}</span>
+            </div>
+          )}
         </header>
 
         <section className="fenasoja-portal__hero portal-reveal" aria-labelledby="portal-title">
           <p className="fenasoja-portal__eyebrow">
             <span aria-hidden="true" />
-            Portal das comissões · edição 2028
+            Hub operacional · edição 2028
           </p>
-          <h1 id="portal-title" className="fenasoja-portal__headline">
-            <span>Operação conectada para construir</span>{' '}
-            <span className="fenasoja-portal__headline-accent">a próxima Fenasoja.</span>
-          </h1>
-        </section>
-
-        <section aria-label="Acessos aos domínios operacionais" className="fenasoja-portal__primary portal-reveal">
-          <div className="fenasoja-portal__primary-grid">
-            <CronogramaPortalCard onAccess={accessCronograma} />
-            <VenuePortalCard onAccess={accessVenueEvents} />
+          <div className="fenasoja-portal__hero-copy">
+            <h1 id="portal-title" className="fenasoja-portal__headline">
+              Um portal. <span>Todos os caminhos da Fenasoja.</span>
+            </h1>
+            <p>
+              Acesse planejamento, mapa, frentes operacionais e gestão financeira a partir de uma única hierarquia.
+            </p>
           </div>
         </section>
 
-        <section ref={gridRef} aria-labelledby="commission-list-title" className="fenasoja-portal__commissions portal-reveal">
-          <header className="fenasoja-portal__section-header">
-            <div>
-              <p className="fenasoja-portal__section-kicker">Acessos operacionais</p>
-              <h2 id="commission-list-title">Frentes de trabalho</h2>
-            </div>
-            <p className="fenasoja-portal__profile-note">
-              <ShieldCheck aria-hidden="true" />
-              Acesso conforme perfil
-            </p>
-          </header>
+        <nav className="fenasoja-portal__hub portal-reveal" aria-label="Áreas do sistema Fenasoja 2028">
+          {portalPrimaryEntries.map((entry, index) => (
+            <PortalPrimaryEntry
+              key={entry.id}
+              entry={entry}
+              index={index}
+              controlRef={entry.kind === 'expandable'
+                ? (node) => {
+                    entryButtonRefs.current[entry.id] = node;
+                  }
+                : undefined}
+              expanded={expandedEntry === entry.id}
+              access={getEntryAccess(entry.id)}
+              onToggle={entry.kind === 'expandable' ? () => toggleEntry(entry.id) : undefined}
+              onSelect={getEntrySelection(entry.id)}
+            >
+              {entry.id === 'agenda' && (
+                <div className="portal-agenda-grid" aria-label="Destinos da Agenda">
+                  {portalAgendaDestinations.map((destination) => (
+                    <PortalDestinationCard
+                      key={destination.id}
+                      destination={destination}
+                      access={resolveCapabilityAccess(destination)}
+                      onSelect={() => saveSelectedModule(destination.storageSlug)}
+                    />
+                  ))}
+                </div>
+              )}
 
-          <div className="fenasoja-portal__groups">
-            {accessGroups.map((group) => {
-              const GroupIcon = group.icon;
-              const groupId = `commission-group-${group.status}`;
-
-              return (
-                <section
-                  key={group.status}
-                  className="commission-access-group"
-                  data-status={group.status}
-                  aria-labelledby={groupId}
-                >
-                  <header className="commission-access-group__header">
-                    <span className="commission-access-group__icon" aria-hidden="true">
-                      <GroupIcon />
-                    </span>
+              {entry.id === 'comissoes' && (
+                <div className="portal-commissions-panel">
+                  <div className="portal-commissions-panel__intro">
                     <div>
-                      <h3 id={groupId}>{group.title}</h3>
-                      <p>{group.description}</p>
+                      <span>Frentes registradas</span>
+                      <p>Disponibilidade operacional e permissão são apresentadas separadamente.</p>
                     </div>
-                    <span
-                      className="commission-access-group__count"
-                      aria-label={`${group.modules.length} ${group.modules.length === 1 ? 'frente' : 'frentes'}`}
-                    >
-                      {group.modules.length}
-                    </span>
-                  </header>
-
-                  <div className="commission-access-group__grid">
-                    {group.modules.map((module, index) => (
+                    <strong>{commissionModules.length}</strong>
+                  </div>
+                  <div className="portal-commissions-grid" aria-label="Comissões disponíveis no portal">
+                    {commissionModules.map((module, moduleIndex) => (
                       <CommissionCard
                         key={module.slug}
                         module={module}
-                        index={index}
-                        expanded={expandedSlug === module.slug}
-                        onToggle={() => setExpandedSlug((current) => (current === module.slug ? null : module.slug))}
-                        onAccess={() => accessModule(module.slug)}
+                        index={moduleIndex}
+                        access={resolveCommissionAccess(module)}
+                        onSelect={() => saveSelectedModule(module.slug)}
                       />
                     ))}
                   </div>
-                </section>
-              );
-            })}
-          </div>
-        </section>
+                </div>
+              )}
+            </PortalPrimaryEntry>
+          ))}
+        </nav>
+
+        <footer className="fenasoja-portal__footer portal-reveal">
+          <ShieldCheck aria-hidden="true" />
+          <span>Autenticação, organização e permissões validadas em cada destino.</span>
+        </footer>
       </main>
     </div>
   );
