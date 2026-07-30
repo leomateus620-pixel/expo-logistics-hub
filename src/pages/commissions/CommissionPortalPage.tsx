@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowUpRight, LockKeyhole, ShieldCheck } from 'lucide-react';
 import CommissionCard from '@/components/commissions/CommissionCard';
 import { FenasojaBrand } from '@/components/brand/FenasojaBrand';
+import { FenasojaPortalWordmark } from '@/components/portal/FenasojaPortalWordmark';
 import { PortalDestinationCard } from '@/components/portal/PortalDestinationCard';
 import { PortalPrimaryEntry } from '@/components/portal/PortalPrimaryEntry';
 import type { PortalAccessPresentation } from '@/components/portal/portalTypes';
@@ -231,17 +232,8 @@ export default function CommissionPortalPage() {
         </header>
 
         <section className="fenasoja-portal__hero portal-reveal" aria-labelledby="portal-title">
-          <p className="fenasoja-portal__eyebrow">
-            <span aria-hidden="true" />
-            Hub operacional · edição 2028
-          </p>
-          <div className="fenasoja-portal__hero-copy">
-            <h1 id="portal-title" className="fenasoja-portal__headline">
-              Um portal. <span>Todos os caminhos da Fenasoja.</span>
-            </h1>
-            <p>
-              Acesse planejamento, mapa, frentes operacionais e gestão financeira a partir de uma única hierarquia.
-            </p>
+          <div className="fenasoja-portal__hero-frame">
+            <FenasojaPortalWordmark />
           </div>
         </section>
 

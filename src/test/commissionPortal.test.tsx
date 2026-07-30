@@ -83,8 +83,15 @@ describe('CommissionPortalPage', () => {
       'Financeiro',
     ]);
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
-      'Um portal. Todos os caminhos da Fenasoja.',
+      'FENASOJA 2028',
     );
+    expect(screen.getByText('Gestão Operacional')).toBeInTheDocument();
+    expect(screen.queryByText(/Um portal/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Acesse planejamento/)).not.toBeInTheDocument();
+    expect(container.querySelector('[data-testid="portal-soybean"]')).toBeInTheDocument();
+    const roots = [...container.querySelectorAll('[data-portal-root]')];
+    expect(roots).toHaveLength(5);
+    expect(roots.every((root) => root.getAttribute('d')?.startsWith('M560 9'))).toBe(true);
     expect(screen.getByRole('link', { name: 'Acessar área administrativa' })).toBeInTheDocument();
     expect(container.querySelector('.fenasoja-brand__mark img')).toBeInTheDocument();
   });
