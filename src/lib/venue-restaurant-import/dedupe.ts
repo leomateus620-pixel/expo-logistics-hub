@@ -219,7 +219,10 @@ export function deduplicate(
   const events = [...byOrganizerDate.values()];
 
 
-  // Conflitos: mesmo ano, mesma organização e título, datas diferentes.
+  // Conflitos: mesma organização e título em datas próximas (até 21 dias).
+  // Eventos recorrentes ao longo do ano — como o Almoço de Ideias da Acisap —
+  // são legítimos e não devem ser sinalizados.
+  const CONFLICT_WINDOW_DAYS = 21;
   const bySimilarity = new Map<string, ParsedRestaurantEvent[]>();
   for (const event of events) {
     const key = similarityKey(event);
@@ -227,17 +230,27 @@ export function deduplicate(
   }
   for (const group of bySimilarity.values()) {
     if (group.length < 2) continue;
-    const dates = group.map((event) => event.startDate ?? "sem data").join(", ");
-    for (const event of group) {
-      event.requiresReview = true;
-      event.reviewReasons = [
-        ...new Set([
-          ...event.reviewReasons,
-          `Possível conflito de agenda: o mesmo evento aparece em datas diferentes (${dates}).`,
-        ]),
-      ];
+    const dated = group
+      .filter((event) => event.startDate)
+      .sort((a, b) => (a.startDate! < b.startDate! ? -1 : 1));
+
+    for (let index = 1; index < dated.length; index += 1) {
+      const previous = dated[index - 1];
+      const current = dated[index];
+      const gapDays =
+        (Date.parse(`${current.startDate}T00:00:00Z`) -
+          Date.parse(`${previous.startDate}T00:00:00Z`)) /
+        86_400_000;
+      if (gapDays > CONFLICT_WINDOW_DAYS) continue;
+
+      const reason = `Possível conflito de agenda: o mesmo evento aparece em ${previous.startDate} e ${current.startDate}.`;
+      for (const event of [previous, current]) {
+        event.requiresReview = true;
+        event.reviewReasons = [...new Set([...event.reviewReasons, reason])];
+      }
     }
   }
+
 
   for (const event of events) {
     reconciliation.push({
