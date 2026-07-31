@@ -76,6 +76,13 @@ import {
   type VenueStakeholder,
   type VenueView,
 } from "@/lib/venue-operations";
+import {
+  agendaBadges,
+  agendaSearchTokens,
+  eventYear,
+  monthGroupLabel,
+  normalizeSearchText,
+} from "@/lib/venue-agenda";
 import { VenueEventDetail } from "@/components/venue-events/VenueEventDetail";
 import { VenueEventFormDialog } from "@/components/venue-events/VenueEventFormDialog";
 import {
