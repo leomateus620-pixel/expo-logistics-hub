@@ -110,21 +110,17 @@ describe('CommissionPortalPage', () => {
     expect(roots).toHaveLength(5);
     expect(roots.every((root) => root.getAttribute('d')?.startsWith('M560 9'))).toBe(true);
     const rootScenes = [...container.querySelectorAll('[data-root-scene]')];
-    expect(rootScenes).toHaveLength(5);
-    expect(rootScenes.map((scene) => scene.getAttribute('data-root-path'))).toEqual([
-      '1',
-      '2',
-      '3',
-      '4',
-      '5',
-    ]);
+    expect(rootScenes).toHaveLength(4);
+    expect(rootScenes.map((scene) => scene.getAttribute('data-root-between'))).toEqual(['1-2', '2-3', '3-4', '4-5']);
     expect(rootScenes.map((scene) => scene.getAttribute('clip-path'))).toEqual([
-      'url(#portal-root-clip-planting)',
-      'url(#portal-root-clip-cultivation)',
-      'url(#portal-root-clip-grain)',
-      'url(#portal-root-clip-harvest)',
-      'url(#portal-root-clip-world)',
+      'url(#portal-root-zone-planting)',
+      'url(#portal-root-zone-cultivation)',
+      'url(#portal-root-zone-harvest)',
+      'url(#portal-root-zone-world)',
     ]);
+    const rootZones = [...container.querySelectorAll('[data-root-zone-boundary]')];
+    expect(rootZones.map((zone) => zone.getAttribute('data-root-zone-boundary'))).toEqual(['1-2', '2-3', '3-4', '4-5']);
+    expect(rootZones.every((zone) => zone.getAttribute('d')?.startsWith('M560 9'))).toBe(true);
     const illustrationLayer = container.querySelector('[data-root-illustrations]');
     expect(illustrationLayer).not.toBeNull();
     expect(illustrationLayer?.textContent?.trim()).toBe('');
@@ -151,11 +147,7 @@ describe('CommissionPortalPage', () => {
     expect(container.querySelectorAll('[data-world-soybean] animateMotion')).toHaveLength(0);
     expect(
       [...container.querySelectorAll('[data-world-soybean]')].map((grain) => grain.getAttribute('transform')),
-    ).toEqual([
-      'translate(969 96)',
-      'translate(981 121)',
-      'translate(1030 105)',
-    ]);
+    ).toEqual(['translate(903 126)', 'translate(915 151)', 'translate(969 142)']);
   });
 
   it('keeps a vector brand mark when the official remote asset is unavailable', () => {

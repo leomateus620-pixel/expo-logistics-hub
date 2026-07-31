@@ -91,9 +91,11 @@ describe('acessibilidade visual do hub Fenasoja', () => {
     }
   });
 
-  it('mantém as ilustrações dentro das raízes, sem imagem, legenda ou biblioteca de motion', () => {
-    expect(portalWordmark.match(/data-root-scene=/g)).toHaveLength(5);
-    expect(portalWordmark.match(/clipPath="url\(#portal-root-clip-/g)).toHaveLength(5);
+  it('mantém as ilustrações entre raízes adjacentes, sem imagem, legenda ou biblioteca de motion', () => {
+    expect(portalWordmark.match(/data-root-scene=/g)).toHaveLength(4);
+    expect(portalWordmark.match(/data-root-between=/g)).toHaveLength(4);
+    expect(portalWordmark.match(/clipPath="url\(#portal-root-zone-/g)).toHaveLength(4);
+    expect(portalWordmark.match(/data-root-zone-boundary=/g)).toHaveLength(4);
     expect(portalWordmark).toContain('data-root-illustrations');
     expect(portalWordmark).not.toMatch(/<img|<text|\.webp|portal-story/);
     expect(portalWordmark).not.toMatch(/framer-motion|@react-spring|gsap/);
