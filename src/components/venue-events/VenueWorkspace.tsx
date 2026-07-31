@@ -76,6 +76,13 @@ import {
   type VenueStakeholder,
   type VenueView,
 } from "@/lib/venue-operations";
+import {
+  agendaBadges,
+  agendaSearchTokens,
+  eventYear,
+  monthGroupLabel,
+  normalizeSearchText,
+} from "@/lib/venue-agenda";
 import { VenueEventDetail } from "@/components/venue-events/VenueEventDetail";
 import { VenueEventFormDialog } from "@/components/venue-events/VenueEventFormDialog";
 import {
@@ -317,11 +324,17 @@ function eventMatchesSearch(
   sponsorName: string,
   spaceNames: string,
 ) {
-  const haystack =
-    `${event.title} ${event.requester_name} ${sponsorName} ${spaceNames}`.toLocaleLowerCase(
-      "pt-BR",
-    );
-  return haystack.includes(search.trim().toLocaleLowerCase("pt-BR"));
+  const term = normalizeSearchText(search);
+  if (!term) return true;
+  const haystack = normalizeSearchText(
+    `${event.title} ${event.requester_name} ${sponsorName} ${spaceNames} ${agendaSearchTokens(event)}`,
+  );
+  const digits = search.replace(/\D/g, "");
+  if (digits.length >= 4) {
+    const phoneDigits = (event.contact_phone ?? "").replace(/\D/g, "");
+    if (phoneDigits.includes(digits)) return true;
+  }
+  return haystack.includes(term);
 }
 
 function StatusBadge({ status }: { status: VenueEventStatus }) {
@@ -381,6 +394,20 @@ function EventRow({
         <small title={`${event.requester_name} · ${sponsor}`}>
           {event.requester_name} · {sponsor}
         </small>
+        {agendaBadges(event).length > 0 && (
+          <span className="venue-agenda-badges">
+            {agendaBadges(event).map((badge) => (
+              <span
+                key={badge.key}
+                className="venue-agenda-badge"
+                data-tone={badge.tone}
+                title={badge.title}
+              >
+                {badge.label}
+              </span>
+            ))}
+          </span>
+        )}
       </span>
       <span className="venue-event-row__period">
         <strong>{formatVenuePeriod(event.start_at, event.end_at)}</strong>
@@ -469,6 +496,8 @@ export function VenueWorkspace() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [spaceFilter, setSpaceFilter] = useState("all");
+  const [yearFilter, setYearFilter] = useState("all");
+  const [reviewOnly, setReviewOnly] = useState(false);
   const [agendaMode, setAgendaMode] = useState<"dia" | "semana" | "mes">(
     "semana",
   );
@@ -649,6 +678,8 @@ export function VenueWorkspace() {
     return (
       eventMatchesSearch(event, search, sponsor, spaces) &&
       (statusFilter === "all" || event.status === statusFilter) &&
+      (yearFilter === "all" || eventYear(event) === yearFilter) &&
+      (!reviewOnly || event.requires_review) &&
       (spaceFilter === "all" ||
         workspace.allocations.some(
           (allocation) =>
@@ -657,6 +688,30 @@ export function VenueWorkspace() {
         ))
     );
   });
+
+  const availableYears = Array.from(
+    new Set(
+      workspace.events
+        .map((event) => eventYear(event))
+        .filter((year): year is string => Boolean(year)),
+    ),
+  ).sort();
+  const reviewCount = workspace.events.filter(
+    (event) => event.requires_review,
+  ).length;
+
+  const sortedFilteredEvents = [...filteredEvents].sort(
+    (a, b) =>
+      (a.start_at ? new Date(a.start_at).getTime() : Number.MAX_SAFE_INTEGER) -
+      (b.start_at ? new Date(b.start_at).getTime() : Number.MAX_SAFE_INTEGER),
+  );
+  const monthlyEventGroups: Array<{ label: string; events: VenueEvent[] }> = [];
+  for (const event of sortedFilteredEvents) {
+    const label = monthGroupLabel(event.start_at);
+    const last = monthlyEventGroups[monthlyEventGroups.length - 1];
+    if (last && last.label === label) last.events.push(event);
+    else monthlyEventGroups.push({ label, events: [event] });
+  }
 
   const agendaCandidateEvents = workspace.events.filter((event) => {
     const spaces = getSpaceNames(
@@ -1369,13 +1424,13 @@ export function VenueWorkspace() {
           {filteredEvents.length} de {workspace.events.length}
         </Badge>
       </header>
-      <div className="venue-filter-bar venue-filter-bar--three">
+      <div className="venue-filter-bar venue-filter-bar--agenda">
         <label>
           <Search />
           <Input
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Buscar por título, pessoa ou organização"
+            placeholder="Buscar por título, organização, solicitante ou telefone"
           />
         </label>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
@@ -1404,41 +1459,60 @@ export function VenueWorkspace() {
             ))}
           </SelectContent>
         </Select>
+        <Select value={yearFilter} onValueChange={setYearFilter}>
+          <SelectTrigger aria-label="Filtrar eventos por ano">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos os anos</SelectItem>
+            {availableYears.map((year) => (
+              <SelectItem key={year} value={year}>
+                {year}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Button
+          type="button"
+          variant={reviewOnly ? "default" : "outline"}
+          aria-pressed={reviewOnly}
+          onClick={() => setReviewOnly((value) => !value)}
+        >
+          <AlertTriangle /> Revisar ({reviewCount})
+        </Button>
       </div>
       {filteredEvents.length ? (
         <div className="venue-event-list">
-          {filteredEvents
-            .sort(
-              (a, b) =>
-                (a.start_at
-                  ? new Date(a.start_at).getTime()
-                  : Number.MAX_SAFE_INTEGER) -
-                (b.start_at
-                  ? new Date(b.start_at).getTime()
-                  : Number.MAX_SAFE_INTEGER),
-            )
-            .map((event) => (
-              <EventRow
-                key={event.id}
-                event={event}
-                spaces={getSpaceNames(
-                  event.id,
-                  workspace.allocations,
-                  workspace.spaces,
-                )}
-                 sponsor={getStakeholderName(
-                   event.sponsor_id,
-                   workspace.stakeholders,
-                 )}
-                 responsible={
-                   workspace.members.find(
-                     (member) => member.user_id === event.responsible_user_id,
-                   )?.nome_exibicao || "Não definido"
-                 }
-                 hasCounterpart={Boolean(event.counterpart_agreement_id)}
-                 onOpen={() => openEvent(event.id)}
-               />
-            ))}
+          {monthlyEventGroups.map((group) => (
+            <div key={group.label} className="venue-event-group">
+              <p className="venue-event-group__label">
+                {group.label}
+                <span>{group.events.length}</span>
+              </p>
+              {group.events.map((event) => (
+                <EventRow
+                  key={event.id}
+                  event={event}
+                  spaces={getSpaceNames(
+                    event.id,
+                    workspace.allocations,
+                    workspace.spaces,
+                  )}
+                  sponsor={getStakeholderName(
+                    event.sponsor_id,
+                    workspace.stakeholders,
+                  )}
+                  responsible={
+                    workspace.members.find(
+                      (member) => member.user_id === event.responsible_user_id,
+                    )?.nome_exibicao || "Não definido"
+                  }
+                  hasCounterpart={Boolean(event.counterpart_agreement_id)}
+                  onOpen={() => openEvent(event.id)}
+                />
+              ))}
+            </div>
+          ))}
         </div>
       ) : (
         <EmptyState

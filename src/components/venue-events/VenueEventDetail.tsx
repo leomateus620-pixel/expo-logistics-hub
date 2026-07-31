@@ -82,6 +82,12 @@ import {
   type VenueMember,
   type VenueWorkspaceData,
 } from "@/lib/venue-operations";
+import {
+  SHIFT_LABELS,
+  agendaBadges,
+  formatBrPhone,
+  formatBrl,
+} from "@/lib/venue-agenda";
 
 type TransitionName =
   | "submit"
@@ -269,6 +275,129 @@ function DetailFact({
     </div>
   );
 }
+
+function formatIsoDate(value: string | null | undefined): string {
+  if (!value) return "";
+  const iso = /^\d{4}-\d{2}-\d{2}$/.test(value) ? `${value}T12:00:00-03:00` : value;
+  return new Intl.DateTimeFormat("pt-BR", {
+    timeZone: "America/Sao_Paulo",
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  }).format(new Date(iso));
+}
+
+function AgendaOperationalSection({
+  event,
+  showImport,
+}: {
+  event: VenueEvent;
+  showImport: boolean;
+}) {
+  const badges = agendaBadges(event);
+  const contactLine = [event.contact_name, formatBrPhone(event.contact_phone)]
+    .filter(Boolean)
+    .join(" · ");
+  const feeLine = [
+    event.fee_type,
+    event.fee_amount != null ? formatBrl(event.fee_amount) : "",
+    event.fee_quantity != null ? `${event.fee_quantity}x` : "",
+  ]
+    .filter(Boolean)
+    .join(" · ");
+  const cleaningLine = [
+    event.cleaning_responsibility,
+    event.cleaning_fee != null ? formatBrl(event.cleaning_fee) : "",
+  ]
+    .filter(Boolean)
+    .join(" · ");
+  const preparationLine = [
+    event.preparation_notes,
+    event.preparation_start_date
+      ? `Início ${formatIsoDate(event.preparation_start_date)}`
+      : "",
+    event.preparation_end_date
+      ? `Fim ${formatIsoDate(event.preparation_end_date)}`
+      : "",
+  ]
+    .filter(Boolean)
+    .join(" · ");
+  const reservationLine =
+    event.reservation_start_date || event.reservation_end_date
+      ? [
+          formatIsoDate(event.reservation_start_date),
+          formatIsoDate(event.reservation_end_date),
+        ]
+          .filter(Boolean)
+          .join(" — ")
+      : "";
+
+  const rows: Array<{ label: string; value: string }> = [
+    { label: "Turno", value: event.shift ? SHIFT_LABELS[event.shift] ?? event.shift : "" },
+    { label: "Contato", value: contactLine },
+    { label: "Taxas", value: feeLine },
+    { label: "Limpeza", value: cleaningLine },
+    { label: "Energia", value: event.electricity_fee ?? "" },
+    { label: "Preparação", value: preparationLine },
+    { label: "Reserva", value: reservationLine },
+    { label: "Desmontagem", value: event.teardown_deadline_note ?? "" },
+    { label: "Notas operacionais", value: event.operational_notes ?? "" },
+    { label: "Notas internas", value: event.internal_notes ?? "" },
+  ].filter((row) => Boolean(row.value));
+
+  if (showImport && event.source_document) {
+    rows.push({
+      label: "Origem da importação",
+      value: `${event.source_document}${event.source_row ? ` · linha ${event.source_row}` : ""}`,
+    });
+  }
+
+  if (!rows.length && !badges.length) return null;
+
+  return (
+    <section className="venue-detail-section">
+      <header>
+        <div>
+          <p className="venue-eyebrow">Agenda operacional</p>
+          <h3>Confirmação, contrato e condições</h3>
+        </div>
+      </header>
+      {badges.length > 0 && (
+        <div className="venue-agenda-badges">
+          {badges.map((badge) => (
+            <span
+              key={badge.key}
+              className="venue-agenda-badge"
+              data-tone={badge.tone}
+              title={badge.title}
+            >
+              {badge.label}
+            </span>
+          ))}
+        </div>
+      )}
+      {event.requires_review && event.review_reasons?.length > 0 && (
+        <ul className="venue-agenda-review">
+          {event.review_reasons.map((reason) => (
+            <li key={reason}>{reason}</li>
+          ))}
+        </ul>
+      )}
+      {rows.length > 0 && (
+        <dl className="venue-agenda-grid">
+          {rows.map((row) => (
+            <div key={row.label}>
+              <dt>{row.label}</dt>
+              <dd>{row.value}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
+    </section>
+  );
+}
+
+
 
 export function VenueEventDetail({
   event,
@@ -781,6 +910,10 @@ export function VenueEventDetail({
                     }
                   />
                 </div>
+                <AgendaOperationalSection
+                  event={event}
+                  showImport={permissions.venue_events_audit_view}
+                />
                 <section className="venue-detail-section">
                   <header>
                     <div>
