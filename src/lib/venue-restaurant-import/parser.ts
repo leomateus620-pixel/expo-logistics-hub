@@ -663,6 +663,8 @@ export function parseSourceRow(row: RestaurantSourceRow): ParsedRestaurantEvent 
       startTime: null,
       endTime: null,
       shift: null,
+      shiftInferred: false,
+
       preparationStartDate: null,
       preparationEndDate: null,
       preparationNotes: null,
