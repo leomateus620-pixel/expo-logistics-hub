@@ -72,6 +72,9 @@ export interface ParsedRestaurantEvent {
   startTime: string | null;
   endTime: string | null;
   shift: EventShift | null;
+  /** `true` quando o turno não constava no documento e recebeu a faixa padrão. */
+  shiftInferred: boolean;
+
 
   preparationStartDate: string | null;
   preparationEndDate: string | null;
