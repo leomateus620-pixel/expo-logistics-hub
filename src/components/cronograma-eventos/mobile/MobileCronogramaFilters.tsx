@@ -79,6 +79,13 @@ type ActiveChip = {
 
 function buildActiveChips(filters: CronogramaFilters): ActiveChip[] {
   const chips: ActiveChip[] = [];
+  if (filters.scopeEventIds?.length) {
+    chips.push({
+      key: 'dashboard-scope',
+      label: filters.scopeLabel ?? `Recorte do Dashboard (${filters.scopeEventIds.length})`,
+      clear: (value) => ({ ...value, scopeEventIds: undefined, scopeLabel: undefined }),
+    });
+  }
   if (filters.query) chips.push({ key: 'query', label: `Busca: ${filters.query}`, clear: (value) => ({ ...value, query: '' }) });
   if (filters.period !== 'all') chips.push({ key: 'period', label: periodLabels[filters.period], clear: (value) => ({ ...value, period: 'all' }) });
   if (filters.year !== 'all') chips.push({ key: 'year', label: String(filters.year), clear: (value) => ({ ...value, year: 'all' }) });

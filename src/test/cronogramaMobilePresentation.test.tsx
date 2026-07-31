@@ -314,15 +314,16 @@ describe('navegação e filtros móveis', () => {
     );
 
     const navigation = screen.getByRole('navigation', { name: 'Visões do cronograma' });
+    expect(within(navigation).getByRole('button', { name: 'Dashboard' })).not.toHaveAttribute('aria-current');
     expect(within(navigation).getByRole('button', { name: 'Linha do tempo' })).toHaveAttribute('aria-current', 'page');
-    expect(within(navigation).getByRole('button', { name: 'Concluídos' })).not.toHaveAttribute('aria-current');
-    expect(within(navigation).getByRole('button', { name: 'Pendências' })).not.toHaveAttribute('aria-current');
+    expect(within(navigation).getByRole('button', { name: 'Eventos concluídos' })).not.toHaveAttribute('aria-current');
 
-    fireEvent.click(within(navigation).getByRole('button', { name: 'Concluídos' }));
+    fireEvent.click(within(navigation).getByRole('button', { name: 'Eventos concluídos' }));
     expect(onViewChange).toHaveBeenCalledWith('completed');
-    fireEvent.click(within(navigation).getByRole('button', { name: 'Pendências' }));
-    expect(onViewChange).toHaveBeenCalledWith('undated');
-    expect(within(navigation).getAllByRole('button')).toHaveLength(3);
+    expect(
+      within(navigation).getByRole('button', { name: 'Abrir mais visões do cronograma' }),
+    ).toHaveAttribute('aria-haspopup', 'menu');
+    expect(within(navigation).getAllByRole('button')).toHaveLength(4);
 
     const filters = screen.getByRole('region', { name: 'Busca e filtros do cronograma' });
     expect(within(filters).getByRole('textbox', { name: 'Buscar no cronograma' })).toHaveAttribute(

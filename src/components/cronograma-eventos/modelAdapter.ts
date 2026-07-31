@@ -146,7 +146,7 @@ export function adaptCronogramaEvent(
     priority: sourceToVisualPriority[event.priority] ?? 'medium',
     kind: centralMeeting ? 'meeting' : sourceToVisualKind[event.eventType] ?? 'event',
     location: event.location ?? undefined,
-    owner: primaryResponsible?.name ?? event.responsibleName ?? event.commissionName ?? undefined,
+    owner: primaryResponsible?.name ?? event.responsibleName ?? undefined,
     commission: primaryCommission?.commissionName ?? event.commissionName ?? event.linkedCommissions?.[0]?.name,
     relatedCommissionIds: [
       event.commissionSlug,
@@ -164,6 +164,23 @@ export function adaptCronogramaEvent(
     lockVersion: event.lockVersion,
     commissionsRel: event.commissionsRel ?? [],
     responsiblesRel: event.responsiblesRel ?? [],
+    dataQuality: {
+      date: Boolean(event.hasExactDate && event.startDate),
+      responsible: event.sourceDataQuality?.responsible
+        ?? Boolean(primaryResponsible?.name?.trim() || event.responsibleName?.trim()),
+      commission: event.sourceDataQuality?.commission
+        ?? Boolean(
+          primaryCommission?.commissionName?.trim()
+          || primaryCommission?.commissionSlug?.trim()
+          || event.commissionName?.trim()
+          || event.commissionSlug?.trim(),
+        ),
+      location: event.sourceDataQuality?.location ?? Boolean(event.location?.trim()),
+      description: event.sourceDataQuality?.description ?? Boolean(event.description?.trim()),
+      priority: event.sourceDataQuality?.priority ?? Boolean(event.priority),
+      status: event.sourceDataQuality?.status ?? Boolean(event.status),
+      updatedAt: event.sourceDataQuality?.updatedAt ?? Boolean(event.updatedAt),
+    },
   };
   adapted.status = deriveOperationalStatus(adapted, todayKey);
   adapted.subevents = adapted.subevents?.map((subevent) => ({

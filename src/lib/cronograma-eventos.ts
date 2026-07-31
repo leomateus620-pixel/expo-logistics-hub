@@ -9,6 +9,15 @@ export interface CronogramaEvent extends CronogramaEventSeed {
   id: string;
   createdAt?: string | null;
   updatedAt?: string | null;
+  sourceDataQuality?: {
+    description: boolean;
+    location: boolean;
+    responsible: boolean;
+    commission: boolean;
+    priority: boolean;
+    status: boolean;
+    updatedAt: boolean;
+  };
 }
 
 export interface CronogramaFilters {

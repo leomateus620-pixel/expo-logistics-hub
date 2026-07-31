@@ -51,6 +51,33 @@ export function differenceInCalendarDays(dateKey: string, baseKey: string) {
   return Math.round((toUtcDate(dateKey).getTime() - toUtcDate(baseKey).getTime()) / DAY_MS);
 }
 
+export function isCronogramaDateKey(value: string | null | undefined): value is string {
+  if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+  return fromUtcDate(toUtcDate(value)) === value;
+}
+
+export function getCronogramaEventDeadline(
+  event: Pick<CronogramaEvent, 'date' | 'endDate'>,
+) {
+  if (
+    isCronogramaDateKey(event.endDate)
+    && (!isCronogramaDateKey(event.date) || event.endDate >= event.date)
+  ) return event.endDate;
+  return isCronogramaDateKey(event.date) ? event.date : null;
+}
+
+export function isCronogramaEventOverdue(
+  event: Pick<CronogramaEvent, 'date' | 'endDate' | 'status'>,
+  todayKey = getTodayKey(),
+) {
+  const deadline = getCronogramaEventDeadline(event);
+  return Boolean(
+    deadline
+    && deadline < todayKey
+    && !['completed', 'cancelled', 'rescheduled'].includes(event.status),
+  );
+}
+
 export function deriveOperationalStatus(
   event: Pick<CronogramaEvent, 'date' | 'status'> & Partial<Pick<CronogramaEvent, 'endDate'>>,
   todayKey = getTodayKey(),
@@ -107,7 +134,7 @@ export function buildCronogramaViewSearchParams(
     next.delete('timelineYear');
     next.delete('timelineMonth');
   }
-  if (nextView === 'timeline') next.delete('view');
+  if (nextView === 'overview') next.delete('view');
   else next.set('view', nextView);
   return next;
 }
@@ -168,9 +195,12 @@ export function getSubeventProgress(event: Pick<CronogramaEvent, 'subevents'>) {
   };
 }
 
-export function getMonthOperationalSummary(events: CronogramaEvent[]) {
+export function getMonthOperationalSummary(
+  events: CronogramaEvent[],
+  todayKey = getTodayKey(),
+) {
   const completed = events.filter((event) => event.status === 'completed').length;
-  const overdue = events.filter((event) => event.status === 'overdue').length;
+  const overdue = events.filter((event) => isCronogramaEventOverdue(event, todayKey)).length;
   const pending = events.filter((event) => !['completed', 'cancelled', 'rescheduled'].includes(event.status)).length;
   return {
     total: events.length,
@@ -205,7 +235,7 @@ export function getTimelineSnapshot(events: CronogramaEvent[], todayKey = getTod
     nextAction: upcoming[0] ?? null,
     nextOfficialAction: upcoming.find((event) => event.isOfficial || event.isMain) ?? upcoming[0] ?? null,
     edition,
-    overdue: events.filter((event) => event.status === 'overdue').length,
+    overdue: events.filter((event) => isCronogramaEventOverdue(event, todayKey)).length,
     undated: events.filter((event) => !event.date).length,
     missingOwner: events.filter((event) => !event.owner).length,
     completed,
@@ -232,6 +262,7 @@ export function filterTimelineEvents(
   const next30 = addDays(todayKey, 30);
 
   return events.filter((event) => {
+    if (filters.scopeEventIds?.length && !filters.scopeEventIds.includes(event.id)) return false;
     if (query) {
       const haystack = normalizeSearch([
         event.title,
@@ -264,7 +295,9 @@ export function filterTimelineEvents(
       filters.period === 'upcoming'
       && (!event.date || event.date < todayKey || ['completed', 'cancelled', 'rescheduled'].includes(event.status))
     ) return false;
-    if (filters.period === 'overdue' && event.status !== 'overdue') return false;
+    if (filters.period === 'overdue') {
+      if (!isCronogramaEventOverdue(event, todayKey)) return false;
+    }
     if (filters.period === 'undated' && event.date) return false;
     return true;
   });

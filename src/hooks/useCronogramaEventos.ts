@@ -269,6 +269,24 @@ function fromDbRow(row: unknown): CronogramaEvent {
     responsiblesRel,
     createdAt: readString(record, 'created_at'),
     updatedAt: readString(record, 'updated_at'),
+    sourceDataQuality: {
+      description: Boolean(readString(record, 'description')?.trim()),
+      location: Boolean(readString(record, 'location')?.trim()),
+      responsible: Boolean(
+        responsiblesRel.some((responsible) => Boolean(responsible.name?.trim()))
+        || readString(record, 'responsible_name')?.trim(),
+      ),
+      commission: Boolean(
+        commissionsRel.some((commission) => Boolean(
+          commission.commissionName?.trim() || commission.commissionSlug?.trim(),
+        ))
+        || readString(record, 'commission_name')?.trim()
+        || readString(record, 'commission_slug')?.trim(),
+      ),
+      priority: Boolean(readString(record, 'priority')?.trim()),
+      status: Boolean(readString(record, 'status')?.trim()),
+      updatedAt: Boolean(readString(record, 'updated_at')),
+    },
   });
 }
 
@@ -462,6 +480,24 @@ function draftToEvent(draft: CronogramaEventDraft): CronogramaEvent {
     subevents: draft.subevents ?? [],
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
+    sourceDataQuality: {
+      description: Boolean(draft.description?.trim()),
+      location: Boolean(draft.location?.trim()),
+      responsible: Boolean(
+        draft.responsiblesRel?.some((responsible) => Boolean(responsible.name?.trim()))
+        || draft.responsibleName?.trim(),
+      ),
+      commission: Boolean(
+        draft.commissionsRel?.some((commission) => Boolean(
+          commission.commissionName?.trim() || commission.commissionSlug?.trim(),
+        ))
+        || draft.commissionName?.trim()
+        || draft.commissionSlug?.trim(),
+      ),
+      priority: Boolean(draft.priority),
+      status: Boolean(draft.status),
+      updatedAt: true,
+    },
   };
 }
 

@@ -1,9 +1,12 @@
+import { Check, ChevronDown, MoreHorizontal } from 'lucide-react';
 import {
-  BadgeCheck,
-  CalendarClock,
-  Route,
-  type LucideIcon,
-} from 'lucide-react';
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { CRONOGRAMA_VIEW_DEFINITIONS } from '../cronogramaViews';
 import type { CronogramaView } from '../types';
 
 interface MobileCronogramaNavigationProps {
@@ -11,11 +14,8 @@ interface MobileCronogramaNavigationProps {
   onChange: (view: CronogramaView) => void;
 }
 
-const primaryViews: Array<{ value: CronogramaView; label: string; icon: LucideIcon }> = [
-  { value: 'timeline', label: 'Linha do tempo', icon: Route },
-  { value: 'completed', label: 'Concluídos', icon: BadgeCheck },
-  { value: 'undated', label: 'Pendências', icon: CalendarClock },
-];
+const primaryViews = CRONOGRAMA_VIEW_DEFINITIONS.slice(0, 3);
+const secondaryViews = CRONOGRAMA_VIEW_DEFINITIONS.slice(3);
 
 export function MobileCronogramaNavigation({
   activeView,
@@ -33,13 +33,58 @@ export function MobileCronogramaNavigation({
             onClick={() => onChange(view.value)}
             className="cronograma-mobile-navigation-item"
             data-active={active || undefined}
+            aria-label={view.label}
             aria-current={active ? 'page' : undefined}
           >
             <Icon aria-hidden="true" />
-            <span>{view.label}</span>
+            <span>{view.shortLabel}</span>
           </button>
         );
       })}
+
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button
+            type="button"
+            className="cronograma-mobile-navigation-item cronograma-mobile-navigation-more"
+            data-active={secondaryViews.some((view) => view.value === activeView) || undefined}
+            aria-label="Abrir mais visões do cronograma"
+          >
+            <MoreHorizontal aria-hidden="true" />
+            <span>Mais</span>
+            <ChevronDown className="cronograma-mobile-navigation-chevron" aria-hidden="true" />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          align="end"
+          sideOffset={8}
+          className="cronograma-mobile-navigation-menu"
+        >
+          <DropdownMenuLabel className="cronograma-mobile-navigation-menu-label">
+            Outras visões
+          </DropdownMenuLabel>
+          {secondaryViews.map((view) => {
+            const Icon = view.icon;
+            const active = activeView === view.value;
+            return (
+              <DropdownMenuItem
+                key={view.value}
+                onSelect={() => onChange(view.value)}
+                className="cronograma-mobile-navigation-menu-item"
+              >
+                <Icon aria-hidden="true" />
+                <span>{view.label}</span>
+                {active && (
+                  <Check
+                    className="cronograma-mobile-navigation-menu-check"
+                    aria-hidden="true"
+                  />
+                )}
+              </DropdownMenuItem>
+            );
+          })}
+        </DropdownMenuContent>
+      </DropdownMenu>
     </nav>
   );
 }

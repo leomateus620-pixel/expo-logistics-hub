@@ -5,6 +5,7 @@ import '@testing-library/jest-dom/vitest';
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 import { CronogramaTimelineBoard } from '@/components/cronograma-eventos/CronogramaTimelineBoard';
 import { CronogramaViewTabs } from '@/components/cronograma-eventos/CronogramaViewTabs';
+import { resolveCronogramaView } from '@/components/cronograma-eventos/cronogramaViews';
 import { EventDrawer } from '@/components/cronograma-eventos/EventDrawer';
 import type { CronogramaEvent, CronogramaFilters } from '@/components/cronograma-eventos/types';
 import {
@@ -18,6 +19,7 @@ import {
   deriveOperationalStatus,
   filterTimelineEvents,
   getInitialTimelineMonth,
+  getMonthOperationalSummary,
   getSubeventProgress,
   getTimelineSnapshot,
   getTodayKey,
@@ -165,6 +167,14 @@ beforeEach(() => {
 });
 
 describe('domínio temporal do cronograma', () => {
+  it('abre o Dashboard por padrão e preserva deep links legados da Timeline', () => {
+    expect(resolveCronogramaView(new URLSearchParams())).toBe('overview');
+    expect(resolveCronogramaView(new URLSearchParams('event=evento-1'))).toBe('overview');
+    expect(resolveCronogramaView(new URLSearchParams('view=timeline'))).toBe('timeline');
+    expect(resolveCronogramaView(new URLSearchParams('timelineYear=2027&timelineMonth=2027-03'))).toBe('timeline');
+    expect(resolveCronogramaView(new URLSearchParams('view=calendar'))).toBe('calendar');
+  });
+
   it('deriva atrasos sem alterar estados finais ou itens sem data', () => {
     expect(deriveOperationalStatus(baseEvent, '2026-07-14')).toBe('planned');
     expect(deriveOperationalStatus({ ...baseEvent, date: '2026-07-13' }, '2026-07-14')).toBe('overdue');
@@ -205,15 +215,19 @@ describe('domínio temporal do cronograma', () => {
     expect(events.map((event) => event.status)).toEqual(originalStatuses);
   });
 
-  it('reinicia o período ao alternar de visão sem perder outros parâmetros da URL', () => {
+  it('mantém a Timeline explícita e reserva a URL canônica para o Dashboard', () => {
     const current = new URLSearchParams('view=completed&timelineYear=2026&timelineMonth=2026-07&event=evento-1');
     const next = buildCronogramaViewSearchParams(current, 'completed', 'timeline');
 
-    expect(next.get('view')).toBeNull();
+    expect(next.get('view')).toBe('timeline');
     expect(next.get('timelineYear')).toBeNull();
     expect(next.get('timelineMonth')).toBeNull();
     expect(next.get('event')).toBe('evento-1');
     expect(current.get('timelineYear')).toBe('2026');
+
+    const dashboard = buildCronogramaViewSearchParams(next, 'timeline', 'overview');
+    expect(dashboard.get('view')).toBeNull();
+    expect(dashboard.get('event')).toBe('evento-1');
   });
 
   it('preserva o período quando a visão selecionada não muda', () => {
@@ -304,6 +318,23 @@ describe('domínio temporal do cronograma', () => {
       baseEvent,
       { ...baseEvent, id: 'completed', status: 'completed' },
     ], { ...emptyFilters, period: 'upcoming' }, '2026-07-14')).toEqual([baseEvent]);
+  });
+
+  it('usa o prazo efetivo, e não apenas o rótulo persistido, nos totais de atraso', () => {
+    const events = [
+      { ...baseEvent, id: 'planned-overdue', date: '2026-07-12', status: 'planned' as const },
+      { ...baseEvent, id: 'in-progress-overdue', date: '2026-07-13', status: 'in_progress' as const },
+      { ...baseEvent, id: 'multi-day-active', date: '2026-07-12', endDate: '2026-07-14', status: 'in_progress' as const },
+      { ...baseEvent, id: 'completed', date: '2026-07-12', status: 'completed' as const },
+    ];
+
+    expect(getMonthOperationalSummary(events, '2026-07-14')).toMatchObject({
+      total: 4,
+      completed: 1,
+      overdue: 2,
+    });
+    expect(filterTimelineEvents(events, { ...emptyFilters, period: 'overdue' }, '2026-07-14')
+      .map((event) => event.id)).toEqual(['planned-overdue', 'in-progress-overdue']);
   });
 
   it('calcula progresso de checklist e próxima ação oficial', () => {
@@ -516,24 +547,25 @@ describe('navegador do ciclo na linha do tempo', () => {
 });
 
 describe('componentes críticos preservados', () => {
-  it('oferece três tabs desktop com foco roving e navegação por teclado', () => {
+  it('oferece as oito visões desktop com foco roving e navegação por teclado', () => {
     const onChange = vi.fn();
     render(<CronogramaViewTabs activeView="timeline" onChange={onChange} />);
     const tablist = screen.getByRole('tablist');
     const tabs = within(tablist).getAllByRole('tab');
 
-    expect(tabs).toHaveLength(3);
-    expect(tabs[0]).toHaveAttribute('tabindex', '0');
-    expect(tabs[1]).toHaveAttribute('tabindex', '-1');
+    expect(tabs).toHaveLength(8);
+    expect(tabs[0]).toHaveAccessibleName('Dashboard');
+    expect(tabs[0]).toHaveAttribute('tabindex', '-1');
+    expect(tabs[1]).toHaveAttribute('tabindex', '0');
 
-    tabs[0].focus();
-    fireEvent.keyDown(tabs[0], { key: 'ArrowRight' });
+    tabs[1].focus();
+    fireEvent.keyDown(tabs[1], { key: 'ArrowRight' });
     expect(onChange).toHaveBeenCalledWith('completed');
-    expect(tabs[1]).toHaveFocus();
-
-    fireEvent.keyDown(tabs[1], { key: 'End' });
-    expect(onChange).toHaveBeenLastCalledWith('undated');
     expect(tabs[2]).toHaveFocus();
+
+    fireEvent.keyDown(tabs[2], { key: 'End' });
+    expect(onChange).toHaveBeenLastCalledWith('meetings');
+    expect(tabs[7]).toHaveFocus();
   });
 
   it('usa o painel ativo como retorno de foco quando o card foi removido da visão', () => {
