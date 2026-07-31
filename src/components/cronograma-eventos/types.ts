@@ -68,6 +68,19 @@ export interface CronogramaEvent {
   commissionsRel?: CronogramaEventCommissionLink[];
   /** Relational responsibles (multi-select) — mirrors `cronograma_evento_responsaveis`. */
   responsiblesRel?: CronogramaEventResponsibleLink[];
+  /** Presence of persisted source fields before presentation fallbacks. */
+  dataQuality?: CronogramaEventDataQuality;
+}
+
+export interface CronogramaEventDataQuality {
+  date: boolean;
+  responsible: boolean;
+  commission: boolean;
+  location: boolean;
+  description: boolean;
+  priority: boolean;
+  status: boolean;
+  updatedAt: boolean;
 }
 
 export interface CronogramaEventCommissionLink {
@@ -133,6 +146,9 @@ export interface CronogramaFilters {
   missingOwner: boolean;
   fromDate: string;
   toDate: string;
+  /** Exact event subset produced by a Dashboard drill-down. */
+  scopeEventIds?: string[];
+  scopeLabel?: string;
 }
 
 export interface CronogramaOption<T extends string | number> {

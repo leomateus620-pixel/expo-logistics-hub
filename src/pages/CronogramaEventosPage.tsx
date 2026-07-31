@@ -6,7 +6,6 @@ import { CalendarMonthView } from '@/components/cronograma-eventos/CalendarMonth
 import {
   CategoryBoard,
   MeetingsBoard,
-  OverviewBoard,
   UndatedBoard,
   YearBoard,
 } from '@/components/cronograma-eventos/CronogramaBoards';
@@ -40,8 +39,14 @@ import type {
   CronogramaSubeventInput,
   CronogramaView,
 } from '@/components/cronograma-eventos/types';
+import {
+  CRONOGRAMA_VIEW_LABELS,
+  resolveCronogramaView,
+} from '@/components/cronograma-eventos/cronogramaViews';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { useCronogramaDashboardActivity } from '@/hooks/useCronogramaDashboardActivity';
+import { useCronogramaDashboardData } from '@/hooks/useCronogramaDashboardData';
 import { useCronogramaEventHistory, useCronogramaEventos } from '@/hooks/useCronogramaEventos';
 import {
   getHarvestEventKey,
@@ -59,6 +64,7 @@ import {
   type CronogramaCycleYear,
 } from '@/lib/cronograma-cycle';
 import type { CronogramaEvent as SourceCronogramaEvent } from '@/lib/cronograma-eventos';
+import type { DashboardDrilldown } from '@/lib/cronograma-dashboard-selectors';
 import {
   FENASOJA_COUNTDOWN_ROUTE,
   consumeFenasojaCountdownLaunch,
@@ -69,11 +75,18 @@ import {
   filterTimelineEvents,
   getTodayKey,
   partitionCronogramaEvents,
-  resetCronogramaTemporalFilters,
 } from '@/lib/cronograma-timeline';
 import '@/styles/cronograma-timeline-recovery.css';
 import '@/styles/cronograma-timeline-flagship.css';
 import '@/styles/cronograma-harvest-completion.css';
+import '@/styles/cronograma-dashboard.css';
+
+const CronogramaDashboardBoard = lazy(async () => {
+  const module = await import(
+    '@/components/cronograma-eventos/dashboard/CronogramaDashboardBoard'
+  );
+  return { default: module.default };
+});
 
 const EventRelationshipWorkspace = lazy(async () => {
   const module = await import('@/components/cronograma-eventos/workspace/EventRelationshipWorkspace');
@@ -95,24 +108,6 @@ const emptyFilters: CronogramaFilters = {
   fromDate: '',
   toDate: '',
 };
-
-const cronogramaViews: CronogramaView[] = ['overview', 'timeline', 'completed', 'calendar', 'year', 'category', 'meetings', 'undated'];
-const primaryCronogramaViews: CronogramaView[] = ['timeline', 'completed', 'undated'];
-
-const cronogramaViewLabels: Record<CronogramaView, string> = {
-  overview: 'Visão geral',
-  timeline: 'Linha do tempo',
-  completed: 'Eventos concluídos',
-  calendar: 'Calendário',
-  year: 'Por ano',
-  category: 'Por categoria',
-  meetings: 'Reuniões centrais',
-  undated: 'Pendências',
-};
-
-function isCronogramaView(value: string | null): value is CronogramaView {
-  return Boolean(value && cronogramaViews.includes(value as CronogramaView));
-}
 
 function useCurrentCronogramaDay() {
   const [todayKey, setTodayKey] = useState(() => getTodayKey());
@@ -163,9 +158,7 @@ export default function CronogramaEventosPage() {
   const completionAnimationEventKeyRef = useRef<string | null>(null);
   const selectedPresenceRef = useRef({ id: '', seenInData: false });
   const overlayOpenRef = useRef({ drawer: false, create: false, filters: false });
-  const activeView = isCronogramaView(searchParams.get('view'))
-    ? searchParams.get('view') as CronogramaView
-    : 'timeline';
+  const activeView = resolveCronogramaView(searchParams);
   const requestedTimelineYear = isCronogramaCycleYear(searchParams.get('timelineYear'))
     ? Number(searchParams.get('timelineYear')) as CronogramaCycleYear
     : null;
@@ -206,9 +199,6 @@ export default function CronogramaEventosPage() {
   }, []);
 
   const setActiveView = (view: CronogramaView) => {
-    if (activeView !== view) {
-      setFilters(resetCronogramaTemporalFilters);
-    }
     setSearchParams((current) => {
       return buildCronogramaViewSearchParams(current, activeView, view);
     }, { replace: true });
@@ -227,11 +217,12 @@ export default function CronogramaEventosPage() {
     [events, todayKey],
   );
   const eventsForView = useMemo(() => {
+    if (filters.scopeEventIds?.length) return events;
     if (activeView === 'timeline') return eventBuckets.timeline;
     if (activeView === 'completed') return eventBuckets.completed;
     if (activeView === 'undated') return eventBuckets.undated;
     return events;
-  }, [activeView, eventBuckets, events]);
+  }, [activeView, eventBuckets, events, filters.scopeEventIds]);
   const workspaceIdentity = searchParams.get('workspace');
   const workspaceEvent = useMemo(() => (
     workspaceIdentity
@@ -296,6 +287,20 @@ export default function CronogramaEventosPage() {
     () => filterTimelineEvents(eventsForView, filters, todayKey).sort(compareEventDates),
     [eventsForView, filters, todayKey],
   );
+  const dashboardEventIds = useMemo(
+    () => events.map((event) => event.id),
+    [events],
+  );
+  const dashboardActivity = useCronogramaDashboardActivity(
+    dashboardEventIds,
+    activeView === 'overview',
+  );
+  const dashboardModel = useCronogramaDashboardData({
+    events: filteredEvents,
+    logs: dashboardActivity.logs,
+    logStatus: dashboardActivity.status,
+    todayKey,
+  });
   const temporalFocusKey = useMemo(() => [
     filters.year,
     filters.month,
@@ -332,8 +337,21 @@ export default function CronogramaEventosPage() {
       period: 'all',
       fromDate: '',
       toDate: '',
+      scopeEventIds: undefined,
+      scopeLabel: undefined,
     }));
   }, []);
+  const handleDashboardDrilldown = useCallback((drilldown: DashboardDrilldown) => {
+    setFilters({
+      ...emptyFilters,
+      ...drilldown.filterPatch,
+      scopeEventIds: drilldown.eventIds,
+      scopeLabel: drilldown.label,
+    });
+    setSearchParams((current) => (
+      buildCronogramaViewSearchParams(current, activeView, drilldown.view)
+    ), { replace: true });
+  }, [activeView, setSearchParams]);
   const handleTimelinePositionChange = useCallback(({
     year,
     month,
@@ -761,17 +779,23 @@ export default function CronogramaEventosPage() {
       ) : (
         <ViewContentTransition
           view={activeView}
-          ariaLabel={contentIsMobilePresentation || !primaryCronogramaViews.includes(activeView)
-            ? cronogramaViewLabels[activeView]
+          ariaLabel={contentIsMobilePresentation
+            ? CRONOGRAMA_VIEW_LABELS[activeView]
             : undefined}
         >
           {activeView === 'overview' && (
-            <OverviewBoard
-              events={filteredEvents}
-              onOpen={(event) => openEvent(event)}
-              onEdit={openWorkspace}
-              onSwitchView={setActiveView}
-            />
+            <Suspense fallback={<DashboardLoadingState />}>
+              <CronogramaDashboardBoard
+                model={dashboardModel}
+                logStatus={dashboardActivity.status}
+                isFallback={cronograma.isSeedFallback}
+                onOpenEvent={(event) => openEvent(event)}
+                onDrilldown={handleDashboardDrilldown}
+                onRetryActivity={() => {
+                  void dashboardActivity.refetch();
+                }}
+              />
+            </Suspense>
           )}
 
           {activeView === 'timeline' && (
@@ -1075,6 +1099,23 @@ function WorkspaceLoadingState() {
         <Loader2 className="h-4 w-4 animate-spin text-primary" aria-hidden="true" />
         Preparando conexões do evento…
       </div>
+    </div>
+  );
+}
+
+function DashboardLoadingState() {
+  return (
+    <div className="grid gap-3" role="status" aria-label="Preparando Dashboard executivo">
+      <div className="h-44 animate-pulse rounded-2xl border border-border/50 bg-white/65 motion-reduce:animate-none" />
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-5">
+        {Array.from({ length: 5 }, (_, index) => (
+          <div
+            key={index}
+            className="h-28 animate-pulse rounded-xl border border-border/50 bg-white/65 motion-reduce:animate-none"
+          />
+        ))}
+      </div>
+      <span className="sr-only">Preparando indicadores, gráficos e análises do cronograma.</span>
     </div>
   );
 }

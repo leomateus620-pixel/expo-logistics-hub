@@ -1,18 +1,7 @@
-import {
-  BadgeCheck,
-  CalendarClock,
-  Route,
-} from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
 import type { KeyboardEvent, ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 import type { CronogramaView } from './types';
-
-const tabs: Array<{ value: CronogramaView; label: string; shortLabel: string; icon: LucideIcon }> = [
-  { value: 'timeline', label: 'Linha do tempo', shortLabel: 'Timeline', icon: Route },
-  { value: 'completed', label: 'Eventos concluídos', shortLabel: 'Concluídos', icon: BadgeCheck },
-  { value: 'undated', label: 'Pendências', shortLabel: 'Pendências', icon: CalendarClock },
-];
+import { CRONOGRAMA_VIEW_DEFINITIONS } from './cronogramaViews';
 
 export function CronogramaViewTabs({
   activeView,
@@ -21,25 +10,30 @@ export function CronogramaViewTabs({
   activeView: CronogramaView;
   onChange: (view: CronogramaView) => void;
 }) {
-  const hasActiveTab = tabs.some((tab) => tab.value === activeView);
+  const hasActiveTab = CRONOGRAMA_VIEW_DEFINITIONS.some((tab) => tab.value === activeView);
   const handleKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
     let nextIndex: number | null = null;
-    if (event.key === 'ArrowRight') nextIndex = (index + 1) % tabs.length;
-    if (event.key === 'ArrowLeft') nextIndex = (index - 1 + tabs.length) % tabs.length;
+    if (event.key === 'ArrowRight') nextIndex = (index + 1) % CRONOGRAMA_VIEW_DEFINITIONS.length;
+    if (event.key === 'ArrowLeft') {
+      nextIndex = (index - 1 + CRONOGRAMA_VIEW_DEFINITIONS.length)
+        % CRONOGRAMA_VIEW_DEFINITIONS.length;
+    }
     if (event.key === 'Home') nextIndex = 0;
-    if (event.key === 'End') nextIndex = tabs.length - 1;
+    if (event.key === 'End') nextIndex = CRONOGRAMA_VIEW_DEFINITIONS.length - 1;
     if (nextIndex === null) return;
 
     event.preventDefault();
-    const nextTab = tabs[nextIndex];
+    const nextTab = CRONOGRAMA_VIEW_DEFINITIONS[nextIndex];
     onChange(nextTab.value);
-    document.getElementById(`cronograma-tab-${nextTab.value}`)?.focus();
+    const nextElement = document.getElementById(`cronograma-tab-${nextTab.value}`);
+    nextElement?.focus();
+    nextElement?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
   };
 
   return (
     <nav className="cronograma-view-nav" aria-label="Visões do cronograma">
       <div className="cronograma-view-track" role="tablist" aria-orientation="horizontal">
-        {tabs.map((tab, index) => {
+        {CRONOGRAMA_VIEW_DEFINITIONS.map((tab, index) => {
           const active = activeView === tab.value;
           const Icon = tab.icon;
           return (
@@ -48,6 +42,7 @@ export function CronogramaViewTabs({
               id={`cronograma-tab-${tab.value}`}
               type="button"
               role="tab"
+              aria-label={tab.label}
               aria-selected={active}
               aria-controls="cronograma-view-panel"
               tabIndex={active || (!hasActiveTab && index === 0) ? 0 : -1}
@@ -56,8 +51,8 @@ export function CronogramaViewTabs({
               className={cn('cronograma-view-tab focus-ring', active && 'is-active')}
             >
               <Icon className="h-4 w-4 shrink-0" aria-hidden="true" />
-              <span className="hidden sm:inline">{tab.label}</span>
-              <span className="sm:hidden">{tab.shortLabel}</span>
+              <span className="hidden xl:inline">{tab.label}</span>
+              <span className="xl:hidden">{tab.shortLabel}</span>
             </button>
           );
         })}
