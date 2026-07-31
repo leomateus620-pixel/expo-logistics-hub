@@ -82,6 +82,12 @@ import {
   type VenueMember,
   type VenueWorkspaceData,
 } from "@/lib/venue-operations";
+import {
+  SHIFT_LABELS,
+  agendaBadges,
+  formatBrPhone,
+  formatBrl,
+} from "@/lib/venue-agenda";
 
 type TransitionName =
   | "submit"
