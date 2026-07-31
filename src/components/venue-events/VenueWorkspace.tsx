@@ -1459,41 +1459,60 @@ export function VenueWorkspace() {
             ))}
           </SelectContent>
         </Select>
+        <Select value={yearFilter} onValueChange={setYearFilter}>
+          <SelectTrigger aria-label="Filtrar eventos por ano">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos os anos</SelectItem>
+            {availableYears.map((year) => (
+              <SelectItem key={year} value={year}>
+                {year}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Button
+          type="button"
+          variant={reviewOnly ? "default" : "outline"}
+          aria-pressed={reviewOnly}
+          onClick={() => setReviewOnly((value) => !value)}
+        >
+          <AlertTriangle /> Revisar ({reviewCount})
+        </Button>
       </div>
       {filteredEvents.length ? (
         <div className="venue-event-list">
-          {filteredEvents
-            .sort(
-              (a, b) =>
-                (a.start_at
-                  ? new Date(a.start_at).getTime()
-                  : Number.MAX_SAFE_INTEGER) -
-                (b.start_at
-                  ? new Date(b.start_at).getTime()
-                  : Number.MAX_SAFE_INTEGER),
-            )
-            .map((event) => (
-              <EventRow
-                key={event.id}
-                event={event}
-                spaces={getSpaceNames(
-                  event.id,
-                  workspace.allocations,
-                  workspace.spaces,
-                )}
-                 sponsor={getStakeholderName(
-                   event.sponsor_id,
-                   workspace.stakeholders,
-                 )}
-                 responsible={
-                   workspace.members.find(
-                     (member) => member.user_id === event.responsible_user_id,
-                   )?.nome_exibicao || "Não definido"
-                 }
-                 hasCounterpart={Boolean(event.counterpart_agreement_id)}
-                 onOpen={() => openEvent(event.id)}
-               />
-            ))}
+          {monthlyEventGroups.map((group) => (
+            <div key={group.label} className="venue-event-group">
+              <p className="venue-event-group__label">
+                {group.label}
+                <span>{group.events.length}</span>
+              </p>
+              {group.events.map((event) => (
+                <EventRow
+                  key={event.id}
+                  event={event}
+                  spaces={getSpaceNames(
+                    event.id,
+                    workspace.allocations,
+                    workspace.spaces,
+                  )}
+                  sponsor={getStakeholderName(
+                    event.sponsor_id,
+                    workspace.stakeholders,
+                  )}
+                  responsible={
+                    workspace.members.find(
+                      (member) => member.user_id === event.responsible_user_id,
+                    )?.nome_exibicao || "Não definido"
+                  }
+                  hasCounterpart={Boolean(event.counterpart_agreement_id)}
+                  onOpen={() => openEvent(event.id)}
+                />
+              ))}
+            </div>
+          ))}
         </div>
       ) : (
         <EmptyState
