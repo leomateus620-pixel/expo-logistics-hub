@@ -910,6 +910,10 @@ export function VenueEventDetail({
                     }
                   />
                 </div>
+                <AgendaOperationalSection
+                  event={event}
+                  showImport={permissions.venue_events_audit_view}
+                />
                 <section className="venue-detail-section">
                   <header>
                     <div>
