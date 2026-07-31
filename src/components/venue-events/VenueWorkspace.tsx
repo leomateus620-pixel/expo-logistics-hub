@@ -394,6 +394,20 @@ function EventRow({
         <small title={`${event.requester_name} · ${sponsor}`}>
           {event.requester_name} · {sponsor}
         </small>
+        {agendaBadges(event).length > 0 && (
+          <span className="venue-agenda-badges">
+            {agendaBadges(event).map((badge) => (
+              <span
+                key={badge.key}
+                className="venue-agenda-badge"
+                data-tone={badge.tone}
+                title={badge.title}
+              >
+                {badge.label}
+              </span>
+            ))}
+          </span>
+        )}
       </span>
       <span className="venue-event-row__period">
         <strong>{formatVenuePeriod(event.start_at, event.end_at)}</strong>
