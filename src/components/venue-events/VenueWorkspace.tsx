@@ -317,11 +317,17 @@ function eventMatchesSearch(
   sponsorName: string,
   spaceNames: string,
 ) {
-  const haystack =
-    `${event.title} ${event.requester_name} ${sponsorName} ${spaceNames}`.toLocaleLowerCase(
-      "pt-BR",
-    );
-  return haystack.includes(search.trim().toLocaleLowerCase("pt-BR"));
+  const term = normalizeSearchText(search);
+  if (!term) return true;
+  const haystack = normalizeSearchText(
+    `${event.title} ${event.requester_name} ${sponsorName} ${spaceNames} ${agendaSearchTokens(event)}`,
+  );
+  const digits = search.replace(/\D/g, "");
+  if (digits.length >= 4) {
+    const phoneDigits = (event.contact_phone ?? "").replace(/\D/g, "");
+    if (phoneDigits.includes(digits)) return true;
+  }
+  return haystack.includes(term);
 }
 
 function StatusBadge({ status }: { status: VenueEventStatus }) {
@@ -469,6 +475,8 @@ export function VenueWorkspace() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [spaceFilter, setSpaceFilter] = useState("all");
+  const [yearFilter, setYearFilter] = useState("all");
+  const [reviewOnly, setReviewOnly] = useState(false);
   const [agendaMode, setAgendaMode] = useState<"dia" | "semana" | "mes">(
     "semana",
   );

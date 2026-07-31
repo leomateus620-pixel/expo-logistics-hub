@@ -182,7 +182,35 @@ export interface VenueEvent {
   version: number;
   created_at: string;
   updated_at: string;
+  // Agenda operacional (importação Agenda Restaurante Fenasoja)
+  confirmation_status: string;
+  contract_status: string;
+  payment_status: string;
+  shift: string | null;
+  contact_name: string | null;
+  contact_phone: string | null;
+  fee_type: string | null;
+  fee_amount: number | null;
+  fee_quantity: number | null;
+  cleaning_responsibility: string | null;
+  cleaning_fee: number | null;
+  electricity_fee: string | null;
+  preparation_notes: string | null;
+  preparation_start_date: string | null;
+  preparation_end_date: string | null;
+  teardown_deadline_note: string | null;
+  reservation_start_date: string | null;
+  reservation_end_date: string | null;
+  operational_notes: string | null;
+  internal_notes: string | null;
+  requires_review: boolean;
+  review_reasons: string[];
+  source_document: string | null;
+  source_row: number | null;
+  source_fingerprint: string | null;
+  import_batch_id: string | null;
 }
+
 
 export interface VenueEventAllocation {
   id: string;
