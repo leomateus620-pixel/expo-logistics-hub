@@ -3204,3 +3204,40 @@
 .dark .venue-agenda-badge[data-tone="warning"] {
   color: hsl(40 96% 70%);
 }
+
+.venue-agenda-review {
+  margin: 0.6rem 0 0;
+  padding-left: 1.1rem;
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+  color: hsl(var(--destructive));
+}
+.venue-agenda-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(13rem, 1fr));
+  gap: 0.75rem;
+  margin: 0.85rem 0 0;
+}
+.venue-agenda-grid > div {
+  min-width: 0;
+  padding: 0.6rem 0.75rem;
+  border: 1px solid hsl(var(--border) / 0.8);
+  border-radius: 0.75rem;
+  background: hsl(var(--muted) / 0.35);
+}
+.venue-agenda-grid dt {
+  margin: 0 0 0.15rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: hsl(var(--muted-foreground));
+}
+.venue-agenda-grid dd {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.45;
+  color: hsl(var(--foreground));
+  overflow-wrap: anywhere;
+}
