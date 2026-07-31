@@ -109,13 +109,29 @@ describe('CommissionPortalPage', () => {
     const roots = [...container.querySelectorAll('[data-portal-root]')];
     expect(roots).toHaveLength(5);
     expect(roots.every((root) => root.getAttribute('d')?.startsWith('M560 9'))).toBe(true);
-    expect(container.querySelectorAll('[data-portal-scene]')).toHaveLength(3);
-    expect(screen.getByText('Plantio de precisão')).toBeInTheDocument();
-    expect(screen.getByText('Colheita em escala')).toBeInTheDocument();
-    expect(screen.getByText('Grão em movimento')).toBeInTheDocument();
-    expect(screen.getByTestId('portal-world-map')).toHaveAccessibleName(
-      /três grãos de soja partem do Brasil/i,
-    );
+    const rootScenes = [...container.querySelectorAll('[data-root-scene]')];
+    expect(rootScenes).toHaveLength(5);
+    expect(rootScenes.map((scene) => scene.getAttribute('data-root-path'))).toEqual([
+      '1',
+      '2',
+      '3',
+      '4',
+      '5',
+    ]);
+    expect(rootScenes.map((scene) => scene.getAttribute('clip-path'))).toEqual([
+      'url(#portal-root-clip-planting)',
+      'url(#portal-root-clip-cultivation)',
+      'url(#portal-root-clip-grain)',
+      'url(#portal-root-clip-harvest)',
+      'url(#portal-root-clip-world)',
+    ]);
+    const illustrationLayer = container.querySelector('[data-root-illustrations]');
+    expect(illustrationLayer).not.toBeNull();
+    expect(illustrationLayer?.textContent?.trim()).toBe('');
+    expect(illustrationLayer?.querySelectorAll('text, image')).toHaveLength(0);
+    expect(screen.queryByText('Da terra para o mundo')).not.toBeInTheDocument();
+    expect(screen.queryByText('Plantio de precisão')).not.toBeInTheDocument();
+    expect(screen.getByTestId('portal-world-map')).toBeInTheDocument();
     const worldSoybeans = [...container.querySelectorAll('[data-world-soybean]')];
     expect(worldSoybeans).toHaveLength(3);
     expect(worldSoybeans.map((grain) => grain.getAttribute('data-world-soybean'))).toEqual([
@@ -136,9 +152,9 @@ describe('CommissionPortalPage', () => {
     expect(
       [...container.querySelectorAll('[data-world-soybean]')].map((grain) => grain.getAttribute('transform')),
     ).toEqual([
-      'translate(151 40)',
-      'translate(181 58)',
-      'translate(248 56)',
+      'translate(969 96)',
+      'translate(981 121)',
+      'translate(1030 105)',
     ]);
   });
 

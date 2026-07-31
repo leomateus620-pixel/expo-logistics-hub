@@ -1,19 +1,19 @@
 import { useEffect, useState } from 'react';
 
 const ROOT_PATHS = [
-  'M560 9 C514 35 472 58 414 74 C332 97 250 110 178 148 C131 173 92 199 47 220',
-  'M560 9 C536 50 512 78 470 104 C424 132 379 158 350 205 C338 224 330 242 316 260',
-  'M560 9 C556 57 548 94 553 132 C558 168 576 193 570 224 C567 241 560 252 554 264',
-  'M560 9 C585 48 615 76 658 101 C708 131 750 160 780 205 C794 226 801 243 814 258',
-  'M560 9 C608 33 657 50 717 62 C797 79 873 99 944 132 C1004 160 1042 190 1080 215',
+  'M560 9 C510 35 445 58 366 78 C260 104 162 122 58 177',
+  'M560 9 C527 48 491 75 449 103 C402 134 360 164 323 212',
+  'M560 9 C558 54 552 91 555 128 C558 162 562 187 560 218',
+  'M560 9 C593 48 629 75 671 103 C718 134 760 164 797 212',
+  'M560 9 C610 35 675 58 754 78 C860 104 958 122 1062 177',
 ] as const;
 
 const ROOT_NODES = [
-  [47, 220],
-  [316, 260],
-  [554, 264],
-  [814, 258],
-  [1080, 215],
+  [58, 177],
+  [323, 212],
+  [560, 218],
+  [797, 212],
+  [1062, 177],
 ] as const;
 
 const WORDMARK_LETTERS = [
@@ -29,48 +29,27 @@ const WORDMARK_END_LETTERS = [
   ['A', 'a-last'],
 ] as const;
 
-const AGRICULTURAL_SCENES = [
-  {
-    id: 'plantio',
-    eyebrow: 'Plantio de precisão',
-    title: 'Onde o futuro cria raízes',
-    image: '/portal/fenasoja-plantio-premium.webp',
-  },
-  {
-    id: 'colheita',
-    eyebrow: 'Colheita em escala',
-    title: 'A força que move o Brasil',
-    image: '/portal/fenasoja-colheita-premium.webp',
-  },
-  {
-    id: 'abundancia',
-    eyebrow: 'Grão em movimento',
-    title: 'Valor que segue para o mundo',
-    image: '/portal/fenasoja-abundancia-premium.webp',
-  },
-] as const;
-
 const WORLD_ROUTES = [
   {
     id: 'europa',
-    path: 'M101 95 C111 68 128 49 151 40',
-    destination: [151, 40],
-    duration: '7.8s',
+    path: 'M909 143 C925 118 945 102 969 96',
+    destination: [969, 96],
+    duration: '8.6s',
     begin: '0s',
   },
   {
     id: 'africa',
-    path: 'M101 95 C126 86 151 69 181 58',
-    destination: [181, 58],
-    duration: '8.4s',
-    begin: '1.6s',
+    path: 'M909 143 C936 139 956 131 981 121',
+    destination: [981, 121],
+    duration: '9.2s',
+    begin: '2s',
   },
   {
     id: 'asia',
-    path: 'M101 95 C149 93 204 76 248 56',
-    destination: [248, 56],
-    duration: '9s',
-    begin: '3.2s',
+    path: 'M909 143 C946 128 991 109 1030 105',
+    destination: [1030, 105],
+    duration: '9.8s',
+    begin: '4s',
   },
 ] as const;
 
@@ -93,101 +72,143 @@ function useReducedMotionPreference() {
   return reducedMotion;
 }
 
-function AgriculturalScene({
-  id,
-  eyebrow,
-  title,
-  image,
-}: (typeof AGRICULTURAL_SCENES)[number]) {
+function RootIllustrations({ reducedMotion }: { reducedMotion: boolean }) {
   return (
-    <article
-      className={`portal-story__node portal-story__node--${id}`}
-      data-portal-scene={id}
-    >
-      <img src={image} alt="" loading="lazy" decoding="async" />
-      <span className="portal-story__node-light" aria-hidden="true" />
-      <span className="portal-story__node-copy">
-        <span className="portal-story__node-eyebrow">{eyebrow}</span>
-        <strong>{title}</strong>
-      </span>
-    </article>
-  );
-}
-
-function WorldSupplyMap() {
-  const reducedMotion = useReducedMotionPreference();
-
-  return (
-    <article
-      className="portal-story__node portal-story__node--world"
-      data-testid="portal-world-map"
-      aria-label="O Brasil abastece o mundo: três grãos de soja partem do Brasil para diferentes continentes."
-    >
-      <span className="portal-story__node-copy portal-story__node-copy--world">
-        <span className="portal-story__node-eyebrow">Brasil → mundo</span>
-        <strong>Soja que abastece continentes</strong>
-      </span>
-
-      <svg
-        className="portal-world"
-        viewBox="0 0 300 150"
-        role="presentation"
-        aria-hidden="true"
-        focusable="false"
+    <g className="portal-root-scenes" data-root-illustrations>
+      <g
+        className="portal-root-scene portal-root-scene--planting"
+        data-root-scene="planting"
+        data-root-path="1"
+        clipPath="url(#portal-root-clip-planting)"
       >
-        <defs>
-          <radialGradient id="portal-world-origin" cx="50%" cy="50%" r="50%">
-            <stop offset="0" stopColor="#fff9bc" />
-            <stop offset="0.34" stopColor="#ffd75d" />
-            <stop offset="1" stopColor="#d48b18" stopOpacity="0" />
-          </radialGradient>
-          <linearGradient id="portal-world-soy" x1="-5" y1="-4" x2="5" y2="4">
-            <stop stopColor="#fff6ad" />
-            <stop offset="0.45" stopColor="#f4bd37" />
-            <stop offset="1" stopColor="#9b570b" />
-          </linearGradient>
-          <filter id="portal-world-glow" x="-80%" y="-80%" width="260%" height="260%">
-            <feGaussianBlur stdDeviation="2.4" result="blur" />
-            <feMerge>
-              <feMergeNode in="blur" />
-              <feMergeNode in="SourceGraphic" />
-            </feMerge>
-          </filter>
-        </defs>
-
-        <g className="portal-world__continents">
-          <path d="M19 38 31 25 54 20 72 27 85 24 98 33 90 45 79 50 72 62 60 67 52 60 42 60 37 51 25 48Z" />
-          <path d="M83 72 98 69 111 77 118 91 113 105 108 119 99 137 91 128 88 112 83 99 76 87Z" />
-          <path d="M135 34 145 29 160 32 165 39 157 44 148 42 142 48 134 43Z" />
-          <path d="M143 51 161 47 177 58 174 78 164 99 153 111 144 96 135 80 136 64Z" />
-          <path d="M164 32 190 25 221 29 238 38 265 43 277 56 265 66 244 64 231 74 215 67 202 72 188 61 174 55 166 44Z" />
-          <path d="M231 100 247 95 268 104 271 117 255 126 237 121 225 110Z" />
+        <path className="portal-root-scene__atmosphere" d="M48 174C109 127 192 105 302 87L320 119C250 165 158 187 64 190Z" />
+        <g className="portal-root-field-lines">
+          <path d="M48 181C121 149 203 131 306 118" />
+          <path d="M56 190C137 164 218 149 310 140" />
+          <path d="M93 193C162 174 232 163 307 158" />
         </g>
+        <g className="portal-root-machine portal-root-machine--planter" transform="translate(154 118)">
+          <circle cx="-24" cy="19" r="10" />
+          <circle cx="20" cy="20" r="7" />
+          <circle className="portal-root-machine__hub" cx="-24" cy="19" r="3" />
+          <circle className="portal-root-machine__hub" cx="20" cy="20" r="2.4" />
+          <path d="M-38 10-29-5H1L14 4 33 8 31 16H-39Z" />
+          <path d="M-15-5-8-18H8L18 2" />
+          <path className="portal-root-machine__highlight" d="M-29 4H2L15 9" />
+          <path d="M31 11H69M38 11l8 13m4-13 7 11m5-11 6 8" />
+        </g>
+      </g>
 
-        <g className="portal-world__routes">
+      <g
+        className="portal-root-scene portal-root-scene--cultivation"
+        data-root-scene="cultivation"
+        data-root-path="2"
+        clipPath="url(#portal-root-clip-cultivation)"
+      >
+        <path className="portal-root-scene__atmosphere" d="M302 205C329 151 374 112 450 86L474 113C438 166 392 200 326 224Z" />
+        <g className="portal-root-crop-lines">
+          <path d="M315 210C351 176 394 151 454 128" />
+          <path d="M329 218C368 188 408 166 456 151" />
+        </g>
+        <g className="portal-root-sprouts">
+          <g transform="translate(362 170)">
+            <path d="M0 35C2 19 1 7 5-8" />
+            <path d="M4 1C-7-2-14-9-14-19 0-19 7-12 4 1Z" />
+            <path d="M4 10C14 7 23 0 25-10 12-12 4-4 4 10Z" />
+          </g>
+          <g transform="translate(407 144) scale(.82)">
+            <path d="M0 35C2 19 1 7 5-8" />
+            <path d="M4 1C-7-2-14-9-14-19 0-19 7-12 4 1Z" />
+            <path d="M4 10C14 7 23 0 25-10 12-12 4-4 4 10Z" />
+          </g>
+        </g>
+      </g>
+
+      <g
+        className="portal-root-scene portal-root-scene--grain"
+        data-root-scene="grain"
+        data-root-path="3"
+        clipPath="url(#portal-root-clip-grain)"
+      >
+        <path className="portal-root-scene__atmosphere" d="M505 88C530 76 590 76 615 90L594 139C578 165 578 190 576 224H544C542 190 542 165 526 139Z" />
+        <path className="portal-root-grain-chute" d="M520 87H603L587 118H538Z" />
+        <g className="portal-root-grain-flow">
+          <ellipse cx="548" cy="126" rx="4.5" ry="3.3" transform="rotate(24 548 126)" />
+          <ellipse cx="561" cy="130" rx="4.8" ry="3.5" transform="rotate(-18 561 130)" />
+          <ellipse cx="575" cy="125" rx="4.3" ry="3.1" transform="rotate(34 575 125)" />
+          <ellipse cx="554" cy="143" rx="4.5" ry="3.2" transform="rotate(-30 554 143)" />
+          <ellipse cx="570" cy="147" rx="4.9" ry="3.5" transform="rotate(18 570 147)" />
+          <ellipse cx="548" cy="160" rx="4.2" ry="3" transform="rotate(12 548 160)" />
+          <ellipse cx="563" cy="166" rx="4.8" ry="3.4" transform="rotate(-22 563 166)" />
+          <ellipse cx="576" cy="177" rx="4.4" ry="3.1" transform="rotate(28 576 177)" />
+          <ellipse cx="552" cy="187" rx="4.7" ry="3.4" transform="rotate(-10 552 187)" />
+          <ellipse cx="568" cy="199" rx="4.5" ry="3.2" transform="rotate(20 568 199)" />
+        </g>
+      </g>
+
+      <g
+        className="portal-root-scene portal-root-scene--harvest"
+        data-root-scene="harvest"
+        data-root-path="4"
+        clipPath="url(#portal-root-clip-harvest)"
+      >
+        <path className="portal-root-scene__atmosphere" d="M646 91C723 115 768 151 818 209L793 226C727 202 681 168 646 116Z" />
+        <g className="portal-root-harvest-lines">
+          <path d="M662 131C718 151 762 177 805 216" />
+          <path d="M655 152C707 169 752 193 785 224" />
+        </g>
+        <g className="portal-root-machine portal-root-machine--harvester" transform="translate(718 144)">
+          <circle cx="-13" cy="27" r="12" />
+          <circle cx="29" cy="28" r="7" />
+          <circle className="portal-root-machine__hub" cx="-13" cy="27" r="3.4" />
+          <circle className="portal-root-machine__hub" cx="29" cy="28" r="2.3" />
+          <path d="M-36 18-29-5H13L30 8 40 18 38 23H-37Z" />
+          <path d="M-16-5-8-24H11L21 5" />
+          <path className="portal-root-machine__highlight" d="M-27 7H15L29 13" />
+          <path d="M38 17H73L82 27H42Z" />
+          <path d="M48 17v11m8-11 4 12m6-12 7 12" />
+        </g>
+      </g>
+
+      <g
+        className="portal-root-scene portal-root-scene--world"
+        data-root-scene="world"
+        data-root-path="5"
+        data-testid="portal-world-map"
+        clipPath="url(#portal-root-clip-world)"
+      >
+        <path className="portal-root-scene__atmosphere" d="M800 88C910 105 993 128 1072 174L1056 192C962 186 870 165 800 121Z" />
+        <g className="portal-root-world__globe">
+          <ellipse cx="940" cy="130" rx="105" ry="43" />
+          <path d="M838 130C884 116 993 113 1043 131" />
+          <path d="M940 89C917 108 916 151 943 172" />
+        </g>
+        <g className="portal-root-world__continents">
+          <path d="M836 106 850 96 871 97 885 105 879 114 866 116 859 127 847 123 842 114Z" />
+          <path d="M875 128 888 127 896 138 893 151 885 163 878 154 875 142 870 134Z" />
+          <path d="M920 101 937 94 961 99 978 108 1001 108 1027 120 1015 131 993 128 979 137 964 131 949 136 936 124 920 119 912 109Z" />
+          <path d="M956 143 971 139 986 148 981 160 963 163 950 153Z" />
+        </g>
+        <g className="portal-root-world__routes">
           {WORLD_ROUTES.map((route) => (
             <path key={route.id} d={route.path} pathLength="1" />
           ))}
         </g>
-
-        <g className="portal-world__brazil">
-          <circle cx="101" cy="94" r="18" fill="url(#portal-world-origin)" />
-          <path d="M94 81 105 81 112 89 109 100 101 108 94 102 89 92Z" />
-          <circle cx="101" cy="94" r="3.4" />
+        <g className="portal-root-world__brazil">
+          <circle cx="909" cy="143" r="12" />
+          <path d="M903 134 912 134 917 141 914 150 908 155 902 150 899 142Z" />
         </g>
-
         {WORLD_ROUTES.map((route, index) => (
           <g
             key={route.id}
-            className={`portal-world__soybean portal-world__soybean--${index + 1}`}
+            className={`portal-root-world__soybean portal-root-world__soybean--${index + 1}`}
             data-world-soybean={route.id}
             opacity={reducedMotion ? 1 : 0}
             transform={reducedMotion
               ? `translate(${route.destination[0]} ${route.destination[1]})`
               : undefined}
           >
-            <path d="M-5-1.2C-4.1-5.2 1.2-6.5 4.2-3.4 7.1-.4 4.7 4.8.7 5.4-3.6 6-6.1 2.7-5-1.2Z" />
-            <path className="portal-world__soybean-sheen" d="M-2.9-2.3C-1.4-4 1.1-4.4 2.6-3.2" />
+            <path d="M-3.8-.9C-3.1-3.8.9-4.8 3.2-2.6 5.4-.3 3.6 3.6.5 4.1-2.7 4.5-4.6 2-3.8-.9Z" />
             {!reducedMotion && (
               <>
                 <animateMotion
@@ -195,12 +216,11 @@ function WorldSupplyMap() {
                   dur={route.duration}
                   begin={route.begin}
                   repeatCount="indefinite"
-                  rotate="auto"
                 />
                 <animate
                   attributeName="opacity"
                   values="0;1;1;0"
-                  keyTimes="0;0.12;0.84;1"
+                  keyTimes="0;0.16;0.82;1"
                   dur={route.duration}
                   begin={route.begin}
                   repeatCount="indefinite"
@@ -209,35 +229,19 @@ function WorldSupplyMap() {
             )}
           </g>
         ))}
-      </svg>
-    </article>
-  );
-}
-
-function PortalAgricultureStory() {
-  return (
-    <div
-      className="portal-story"
-      role="group"
-      aria-label="Da precisão no plantio à colheita em escala, a soja brasileira gera valor e abastece o mundo."
-    >
-      <span className="portal-story__kicker">Da terra para o mundo</span>
-      <div className="portal-story__grid">
-        {AGRICULTURAL_SCENES.map((scene) => (
-          <AgriculturalScene key={scene.id} {...scene} />
-        ))}
-        <WorldSupplyMap />
-      </div>
-    </div>
+      </g>
+    </g>
   );
 }
 
 function SoybeanEmblem() {
+  const reducedMotion = useReducedMotionPreference();
+
   return (
     <span className="portal-soybean" data-testid="portal-soybean" aria-hidden="true">
       <svg
         className="portal-soybean__roots"
-        viewBox="0 0 1120 270"
+        viewBox="0 0 1120 230"
         preserveAspectRatio="none"
         focusable="false"
       >
@@ -255,7 +259,60 @@ function SoybeanEmblem() {
               <feMergeNode in="SourceGraphic" />
             </feMerge>
           </filter>
+          <linearGradient id="portal-root-scene-sky" x1="0" y1="0" x2="1" y2="1">
+            <stop stopColor="#164f7a" stopOpacity="0.16" />
+            <stop offset="0.45" stopColor="#1882a0" stopOpacity="0.54" />
+            <stop offset="1" stopColor="#f0b83e" stopOpacity="0.14" />
+          </linearGradient>
+          <linearGradient id="portal-root-scene-soil" x1="0" y1="0" x2="1" y2="0">
+            <stop stopColor="#bf7a24" stopOpacity="0.08" />
+            <stop offset="0.5" stopColor="#f0c35d" stopOpacity="0.7" />
+            <stop offset="1" stopColor="#6bb67d" stopOpacity="0.12" />
+          </linearGradient>
+          <linearGradient id="portal-root-scene-green" x1="0" y1="0" x2="0" y2="1">
+            <stop stopColor="#b8e982" />
+            <stop offset="0.5" stopColor="#43a66e" />
+            <stop offset="1" stopColor="#155e4a" />
+          </linearGradient>
+          <linearGradient id="portal-root-scene-machine" x1="0" y1="0" x2="1" y2="1">
+            <stop stopColor="#b7df70" />
+            <stop offset="0.48" stopColor="#4f9a55" />
+            <stop offset="1" stopColor="#1f6749" />
+          </linearGradient>
+          <linearGradient id="portal-root-scene-grain" x1="0" y1="0" x2="1" y2="1">
+            <stop stopColor="#fff4a8" />
+            <stop offset="0.5" stopColor="#eab33b" />
+            <stop offset="1" stopColor="#9f5c14" />
+          </linearGradient>
+          <radialGradient id="portal-root-world-origin" cx="50%" cy="50%" r="50%">
+            <stop stopColor="#fffbd0" stopOpacity="0.9" />
+            <stop offset="0.35" stopColor="#ffd75d" stopOpacity="0.58" />
+            <stop offset="1" stopColor="#d48b18" stopOpacity="0" />
+          </radialGradient>
+          <filter id="portal-root-scene-glow" x="-35%" y="-35%" width="170%" height="170%">
+            <feGaussianBlur stdDeviation="1.8" result="sceneBlur" />
+            <feMerge>
+              <feMergeNode in="sceneBlur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+          <clipPath id="portal-root-clip-planting">
+            <path d="M48 174C109 127 192 105 302 87L320 119C250 165 158 187 64 190Z" />
+          </clipPath>
+          <clipPath id="portal-root-clip-cultivation">
+            <path d="M302 205C329 151 374 112 450 86L474 113C438 166 392 200 326 224Z" />
+          </clipPath>
+          <clipPath id="portal-root-clip-grain">
+            <path d="M505 88C530 76 590 76 615 90L594 139C578 165 578 190 576 224H544C542 190 542 165 526 139Z" />
+          </clipPath>
+          <clipPath id="portal-root-clip-harvest">
+            <path d="M646 91C723 115 768 151 818 209L793 226C727 202 681 168 646 116Z" />
+          </clipPath>
+          <clipPath id="portal-root-clip-world">
+            <path d="M800 88C910 105 993 128 1072 174L1056 192C962 186 870 165 800 121Z" />
+          </clipPath>
         </defs>
+        <RootIllustrations reducedMotion={reducedMotion} />
         <g fill="none" stroke="url(#portal-root-gold)" strokeLinecap="round" filter="url(#portal-root-glow)">
           {ROOT_PATHS.map((path, index) => (
             <path
@@ -378,8 +435,6 @@ export function FenasojaPortalWordmark() {
           </span>
         </span>
       </h1>
-
-      <PortalAgricultureStory />
 
       <div className="portal-identity__card">
         <span className="portal-identity__card-mark" aria-hidden="true">
