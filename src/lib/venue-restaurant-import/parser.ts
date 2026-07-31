@@ -724,12 +724,6 @@ export function parseSourceRow(row: RestaurantSourceRow): ParsedRestaurantEvent 
   reviewReasons.push(...dateParsed.reviewReasons);
 
   const statuses = mergeStatuses(statusTokens);
-  for (const token of statuses.unreliableTokens) {
-    if (parseShiftToken(token)) continue;
-    reviewReasons.push(
-      `Valor "${token}" não pôde ser classificado com segurança — confirmar manualmente.`,
-    );
-  }
 
   // Horário explícito (ex.: "18;30", "14h", "18h de sábado início").
   const explicitTime =
@@ -737,8 +731,18 @@ export function parseSourceRow(row: RestaurantSourceRow): ParsedRestaurantEvent 
     parseExplicitTime(eventCell) ??
     null;
 
+  for (const token of statuses.unreliableTokens) {
+    // Turnos e horários já foram consumidos como agenda, não como status.
+    if (parseShiftToken(token)) continue;
+    if (explicitTime && parseExplicitTime(token) === explicitTime) continue;
+    reviewReasons.push(
+      `Valor "${token}" não pôde ser classificado com segurança — confirmar manualmente.`,
+    );
+  }
+
   let startTime: string | null = null;
   let endTime: string | null = null;
+  let shiftInferred = false;
   if (explicitTime) {
     startTime = explicitTime;
     const [hour] = explicitTime.split(":").map(Number);
@@ -749,13 +753,15 @@ export function parseSourceRow(row: RestaurantSourceRow): ParsedRestaurantEvent 
     startTime = window.start;
     endTime = window.end;
   } else {
+    // Decisão operacional aprovada: turno ausente recebe a faixa padrão da
+    // noite e é registrado como inferido — isso, por si só, não exige revisão.
     const window = shiftWindow("noite");
+    shift = "noite";
+    shiftInferred = true;
     startTime = window.start;
     endTime = window.end;
-    reviewReasons.push(
-      "Turno não informado no documento — aplicada a faixa padrão da noite (19:00–23:30).",
-    );
   }
+
 
   const fees = parseFees(`${row.requester} ${row.event}`);
   if (statuses.feeQuantity != null && fees.feeQuantity == null) {
