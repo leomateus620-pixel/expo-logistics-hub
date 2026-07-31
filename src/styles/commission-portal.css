@@ -1068,8 +1068,10 @@
   transition: background-color 190ms ease;
 }
 
-.portal-primary-entry__control:hover {
-  background: rgb(255 255 255 / 3.5%);
+@media (hover: hover) and (pointer: fine) {
+  .portal-primary-entry__control:hover {
+    background: rgb(255 255 255 / 3.5%);
+  }
 }
 
 .portal-primary-entry__control--static {
@@ -1259,10 +1261,12 @@
     transform 190ms ease;
 }
 
-.portal-destination-card[href]:hover {
-  border-color: rgb(255 211 92 / 46%);
-  background: rgb(11 45 84 / 92%);
-  transform: translateY(-2px);
+@media (hover: hover) and (pointer: fine) {
+  .portal-destination-card[href]:hover {
+    border-color: rgb(255 211 92 / 46%);
+    background: rgb(11 45 84 / 92%);
+    transform: translateY(-2px);
+  }
 }
 
 .portal-destination-card--static {
@@ -1405,10 +1409,12 @@
     transform 180ms ease;
 }
 
-.commission-access-card[href]:hover {
-  border-color: rgb(94 234 212 / 38%);
-  background: rgb(10 43 78 / 92%);
-  transform: translateY(-2px);
+@media (hover: hover) and (pointer: fine) {
+  .commission-access-card[href]:hover {
+    border-color: rgb(94 234 212 / 38%);
+    background: rgb(10 43 78 / 92%);
+    transform: translateY(-2px);
+  }
 }
 
 .commission-access-card--static {
