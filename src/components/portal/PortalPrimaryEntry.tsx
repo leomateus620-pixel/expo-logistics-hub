@@ -32,6 +32,26 @@ function AccessIcon({ state }: Pick<PortalAccessPresentation, 'state'>) {
   return null;
 }
 
+function getActionLabel(
+  entry: PortalPrimaryEntryConfig,
+  access: PortalAccessPresentation,
+  expanded: boolean,
+) {
+  if (entry.kind === 'expandable') {
+    if (entry.id === 'agenda') return expanded ? 'Recolher destinos' : 'Ver destinos';
+    return expanded ? 'Recolher frentes' : 'Ver frentes';
+  }
+
+  if (access.state === 'allowed') {
+    return entry.id === 'mapa-comercial' ? 'Abrir mapa' : 'Abrir financeiro';
+  }
+  if (access.state === 'loading') return 'Aguarde';
+  if (access.state === 'denied') return 'Indisponível';
+  if (access.state === 'login') return 'Identificar acesso';
+  if (access.state === 'setup') return 'Configurar acesso';
+  return access.label;
+}
+
 export function PortalPrimaryEntry({
   access,
   children,
@@ -46,11 +66,13 @@ export function PortalPrimaryEntry({
   const panelId = `portal-entry-panel-${entry.id}`;
   const statusId = `portal-entry-status-${entry.id}`;
   const isExpandable = entry.kind === 'expandable';
+  const actionLabel = getActionLabel(entry, access, expanded);
 
   const content = (
     <>
       <span className="portal-primary-entry__index" aria-hidden="true">
-        {String(index + 1).padStart(2, '0')}
+        <span>{String(index + 1).padStart(2, '0')}</span>
+        <span className="portal-primary-entry__index-line" />
       </span>
       <span className="portal-primary-entry__icon" aria-hidden="true">
         <Icon />
@@ -68,8 +90,11 @@ export function PortalPrimaryEntry({
           {access.label}
         </span>
       </span>
-      <span className="portal-primary-entry__direction" aria-hidden="true">
-        {isExpandable ? <ChevronDown /> : access.target ? <ArrowRight /> : <LockKeyhole />}
+      <span className="portal-primary-entry__action" aria-hidden="true">
+        <span className="portal-primary-entry__action-label">{actionLabel}</span>
+        <span className="portal-primary-entry__direction">
+          {isExpandable ? <ChevronDown /> : access.target ? <ArrowRight /> : <LockKeyhole />}
+        </span>
       </span>
     </>
   );

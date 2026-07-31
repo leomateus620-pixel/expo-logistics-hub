@@ -2,8 +2,10 @@ import { readFileSync, statSync } from 'node:fs';
 import { resolve } from 'node:path';
 
 const portalStyles = readFileSync(resolve('src/styles/commission-portal.css'), 'utf8');
+const accessNavigationStyles = readFileSync(resolve('src/styles/portal-access-navigation.css'), 'utf8');
 const portalPage = readFileSync(resolve('src/pages/commissions/CommissionPortalPage.tsx'), 'utf8');
 const portalWordmark = readFileSync(resolve('src/components/portal/FenasojaPortalWordmark.tsx'), 'utf8');
+const primaryEntry = readFileSync(resolve('src/components/portal/PortalPrimaryEntry.tsx'), 'utf8');
 
 function hexToRgb(hex: string): [number, number, number] {
   const channels = hex.replace('#', '').match(/.{2}/g);
@@ -39,6 +41,10 @@ const normalTextPairs = [
   ['estado permitido', '#A7F3D0', '#08294D'],
   ['estado em estruturação', '#FFE69A', '#08294D'],
   ['estado sem permissão', '#FECACA', '#041832'],
+  ['título refinado no navy', '#FFFDF8', '#061D3D'],
+  ['descrição principal refinada', '#C8D5E3', '#061D3D'],
+  ['descrição de destino', '#C1D0DF', '#0A315B'],
+  ['descrição de comissão', '#B8C8D8', '#061D3D'],
 ] as const;
 
 const graphicalPairs = [
@@ -47,6 +53,11 @@ const graphicalPairs = [
   ['ícone teal no navy', '#5EEAD4', '#041832'],
   ['ícone âmbar no navy', '#FDE68A', '#08294D'],
   ['ícone red no navy', '#FCA5A5', '#08294D'],
+  ['identidade Agenda', '#F7CA52', '#061D3D'],
+  ['identidade Mapa Comercial', '#4F91FF', '#041832'],
+  ['identidade Comissões', '#39D8C4', '#041832'],
+  ['identidade Financeiro', '#EDB84A', '#041832'],
+  ['foco do access hub', '#FFE07A', '#041832'],
 ] as const;
 
 describe('acessibilidade visual do hub Fenasoja', () => {
@@ -72,6 +83,35 @@ describe('acessibilidade visual do hub Fenasoja', () => {
     expect(portalStyles).toContain('.portal-root-world__soybean');
     expect(portalWordmark).toContain('useReducedMotionPreference');
     expect(portalWordmark).toContain('prefers-reduced-motion: reduce');
+  });
+
+  it('mantém a camada premium escopada, sem transições genéricas ou hover em dispositivos touch', () => {
+    expect(portalPage).toContain("import '@/styles/commission-portal.css';\nimport '@/styles/portal-access-navigation.css';");
+    expect(accessNavigationStyles).toContain('--access-radius-parent');
+    expect(accessNavigationStyles).toContain('--access-shadow-raised');
+    expect(accessNavigationStyles).toContain('@media (hover: hover) and (pointer: fine)');
+    expect(accessNavigationStyles).toContain('@media (prefers-contrast: more)');
+    expect(accessNavigationStyles).toContain('@media (prefers-reduced-transparency: reduce)');
+    expect(accessNavigationStyles).toContain('@media (forced-colors: active)');
+    expect(accessNavigationStyles).toContain('.portal-primary-entry__control:active');
+    expect(accessNavigationStyles).toContain('outline-offset: -4px');
+    expect(portalStyles).not.toMatch(/^\.portal-primary-entry__control:hover/m);
+    expect(portalStyles).not.toMatch(/^\.portal-destination-card\[href\]:hover/m);
+    expect(portalStyles).not.toMatch(/^\.commission-access-card\[href\]:hover/m);
+    expect(accessNavigationStyles).not.toContain('transition: all');
+  });
+
+  it('preserva ordem visível no mobile e continuidade acessível da expansão', () => {
+    expect(accessNavigationStyles).toMatch(
+      /@media \(max-width: 640px\)[\s\S]*?\.portal-primary-entry__index \{[\s\S]*?display: flex/,
+    );
+    expect(primaryEntry).toContain('aria-expanded={expanded}');
+    expect(primaryEntry).toContain('aria-controls={panelId}');
+    expect(primaryEntry).toContain('aria-hidden={!expanded}');
+    expect(primaryEntry).toContain("inert: ''");
+    expect(portalPage).toContain('useLayoutEffect');
+    expect(portalPage).toContain('window.requestAnimationFrame(stabilizeControl)');
+    expect(portalPage).toContain("window.scrollBy({ top: offset, left: 0, behavior: 'auto' })");
   });
 
   it('entrega AVIF, WebP e fallback responsivos com payload controlado', () => {

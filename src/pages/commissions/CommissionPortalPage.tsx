@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowUpRight, LockKeyhole, ShieldCheck } from 'lucide-react';
 import CommissionCard from '@/components/commissions/CommissionCard';
@@ -27,6 +27,7 @@ import {
   type PortalEntryId,
 } from '@/modules/portal/portalRegistry';
 import '@/styles/commission-portal.css';
+import '@/styles/portal-access-navigation.css';
 
 function saveSelectedModule(slug: string) {
   try {
@@ -89,6 +90,7 @@ export default function CommissionPortalPage() {
   const { hasOrg, myRole, isLoading: orgLoading } = useCurrentOrg();
   const [expandedEntry, setExpandedEntry] = useState<PortalEntryId | null>(null);
   const entryButtonRefs = useRef<Partial<Record<PortalEntryId, HTMLButtonElement | null>>>({});
+  const pendingEntryPosition = useRef<{ entryId: PortalEntryId; top: number } | null>(null);
   const commissionModules = useMemo(() => getPortalCommissionModules(), []);
   const accessLoading = authLoading || capabilitiesLoading || orgLoading;
   const moduleAccessContext = { capSet, hasFullAccess, myRole };
@@ -145,7 +147,42 @@ export default function CommissionPortalPage() {
     return () => window.removeEventListener('keydown', closeOnEscape);
   }, [expandedEntry]);
 
+  useLayoutEffect(() => {
+    const pending = pendingEntryPosition.current;
+    pendingEntryPosition.current = null;
+    if (!pending) return;
+
+    const reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+    const stabilizationDuration = reducedMotion ? 0 : 280;
+    const startedAt = performance.now();
+    let animationFrame = 0;
+
+    const stabilizeControl = (timestamp = startedAt) => {
+      const control = entryButtonRefs.current[pending.entryId];
+      if (!control) return;
+
+      const offset = control.getBoundingClientRect().top - pending.top;
+      if (Math.abs(offset) > 1) {
+        window.scrollBy({ top: offset, left: 0, behavior: 'auto' });
+      }
+
+      if (timestamp - startedAt < stabilizationDuration) {
+        animationFrame = window.requestAnimationFrame(stabilizeControl);
+      }
+    };
+
+    stabilizeControl();
+    return () => window.cancelAnimationFrame(animationFrame);
+  }, [expandedEntry]);
+
   const toggleEntry = (entryId: PortalEntryId) => {
+    const control = entryButtonRefs.current[entryId];
+    if (control) {
+      pendingEntryPosition.current = {
+        entryId,
+        top: control.getBoundingClientRect().top,
+      };
+    }
     setExpandedEntry((current) => (current === entryId ? null : entryId));
   };
 
@@ -255,10 +292,11 @@ export default function CommissionPortalPage() {
             >
               {entry.id === 'agenda' && (
                 <div className="portal-agenda-grid" aria-label="Destinos da Agenda">
-                  {portalAgendaDestinations.map((destination) => (
+                  {portalAgendaDestinations.map((destination, destinationIndex) => (
                     <PortalDestinationCard
                       key={destination.id}
                       destination={destination}
+                      index={destinationIndex}
                       access={resolveCapabilityAccess(destination)}
                       onSelect={() => saveSelectedModule(destination.storageSlug)}
                     />
@@ -270,10 +308,12 @@ export default function CommissionPortalPage() {
                 <div className="portal-commissions-panel">
                   <div className="portal-commissions-panel__intro">
                     <div>
-                      <span>Frentes registradas</span>
-                      <p>Disponibilidade operacional e permissão são apresentadas separadamente.</p>
+                      <span>Frentes operacionais</span>
+                      <p>Status do módulo e acesso do seu perfil.</p>
                     </div>
-                    <strong>{commissionModules.length}</strong>
+                    <strong aria-label={`${commissionModules.length} frentes registradas`}>
+                      {commissionModules.length}
+                    </strong>
                   </div>
                   <div className="portal-commissions-grid" aria-label="Comissões disponíveis no portal">
                     {commissionModules.map((module, moduleIndex) => (

@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import CommissionPortalPage from '@/pages/commissions/CommissionPortalPage';
@@ -186,10 +186,62 @@ describe('CommissionPortalPage', () => {
     expect(agendaToggle).toHaveFocus();
   });
 
+  it('keeps the selected group control stable while switching expanded sections', () => {
+    let commissionsTop = 420;
+    let scheduledFrame: FrameRequestCallback | null = null;
+    const scrollBy = vi.spyOn(window, 'scrollBy').mockImplementation((options) => {
+      const top = (options as ScrollToOptions | null | undefined)?.top;
+      if (typeof top === 'number') {
+        commissionsTop -= top;
+      }
+    });
+    const requestAnimationFrame = vi
+      .spyOn(window, 'requestAnimationFrame')
+      .mockImplementation((callback) => {
+        scheduledFrame = callback;
+        return 1;
+      });
+    renderPortal();
+
+    const agendaToggle = screen.getByRole('button', { name: /Agenda/ });
+    const commissionsToggle = screen.getByRole('button', { name: /Comissões/ });
+    const rectAt = (top: number) => ({
+      bottom: top + 44,
+      height: 44,
+      left: 0,
+      right: 320,
+      top,
+      width: 320,
+      x: 0,
+      y: top,
+      toJSON: () => ({}),
+    }) as DOMRect;
+
+    vi.spyOn(agendaToggle, 'getBoundingClientRect').mockReturnValue(rectAt(120));
+    vi.spyOn(commissionsToggle, 'getBoundingClientRect')
+      .mockImplementation(() => rectAt(commissionsTop));
+
+    fireEvent.click(agendaToggle);
+    fireEvent.click(commissionsToggle);
+    commissionsTop = 360;
+
+    act(() => {
+      scheduledFrame?.(performance.now() + 100);
+    });
+
+    expect(scrollBy).toHaveBeenLastCalledWith({ top: -60, left: 0, behavior: 'auto' });
+    expect(commissionsTop).toBe(420);
+    requestAnimationFrame.mockRestore();
+    scrollBy.mockRestore();
+  });
+
   it('routes every anonymous primary access through the existing login flow', () => {
     const { unmount } = renderPortal();
 
-    fireEvent.click(screen.getByRole('link', { name: /Mapa Comercial/ }));
+    const commercialMapLink = screen.getByRole('link', { name: /Mapa Comercial/ });
+    expect(commercialMapLink).toHaveTextContent('Identificar acesso');
+    expect(commercialMapLink.textContent?.match(/Entrar para acessar/g)).toHaveLength(1);
+    fireEvent.click(commercialMapLink);
     expect(screen.getByTestId('current-location')).toHaveTextContent('/login/mapa-comercial');
     expect(localStorage.getItem(SELECTED_COMMISSION_STORAGE_KEY)).toBe('mapa-comercial');
 
