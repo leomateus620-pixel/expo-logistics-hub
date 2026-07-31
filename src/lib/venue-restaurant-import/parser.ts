@@ -843,6 +843,8 @@ export function parseSourceRow(row: RestaurantSourceRow): ParsedRestaurantEvent 
     startTime,
     endTime,
     shift,
+    shiftInferred,
+
     preparationStartDate: dateParsed.preparationStartDate,
     preparationEndDate: dateParsed.preparationEndDate,
     preparationNotes: dateParsed.preparationNotes,
