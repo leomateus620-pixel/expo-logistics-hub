@@ -678,6 +678,8 @@ export function VenueWorkspace() {
     return (
       eventMatchesSearch(event, search, sponsor, spaces) &&
       (statusFilter === "all" || event.status === statusFilter) &&
+      (yearFilter === "all" || eventYear(event) === yearFilter) &&
+      (!reviewOnly || event.requires_review) &&
       (spaceFilter === "all" ||
         workspace.allocations.some(
           (allocation) =>
@@ -686,6 +688,30 @@ export function VenueWorkspace() {
         ))
     );
   });
+
+  const availableYears = Array.from(
+    new Set(
+      workspace.events
+        .map((event) => eventYear(event))
+        .filter((year): year is string => Boolean(year)),
+    ),
+  ).sort();
+  const reviewCount = workspace.events.filter(
+    (event) => event.requires_review,
+  ).length;
+
+  const sortedFilteredEvents = [...filteredEvents].sort(
+    (a, b) =>
+      (a.start_at ? new Date(a.start_at).getTime() : Number.MAX_SAFE_INTEGER) -
+      (b.start_at ? new Date(b.start_at).getTime() : Number.MAX_SAFE_INTEGER),
+  );
+  const monthlyEventGroups: Array<{ label: string; events: VenueEvent[] }> = [];
+  for (const event of sortedFilteredEvents) {
+    const label = monthGroupLabel(event.start_at);
+    const last = monthlyEventGroups[monthlyEventGroups.length - 1];
+    if (last && last.label === label) last.events.push(event);
+    else monthlyEventGroups.push({ label, events: [event] });
+  }
 
   const agendaCandidateEvents = workspace.events.filter((event) => {
     const spaces = getSpaceNames(
