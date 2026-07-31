@@ -590,8 +590,18 @@ export function extractContactName(raw: string): string | null {
       return candidate.split(/\s+/).slice(0, 3).join(" ");
     }
   }
+
+  // Fallback: nome escrito imediatamente antes de um telefone, sem separador.
+  const beforePhone = raw.match(/^([A-Za-zÀ-ÿ.'\s]{2,40}?)\s*\d[\d\s-]{7,}/);
+  if (beforePhone) {
+    const candidate = beforePhone[1].replace(/\s+/g, " ").trim();
+    if (candidate.length >= 2 && !/taxa|salário|salario|limpo|limpar/i.test(candidate)) {
+      return candidate.split(/\s+/).slice(0, 3).join(" ");
+    }
+  }
   return null;
 }
+
 
 // ------------------------------------------------------------- notas soltas
 
