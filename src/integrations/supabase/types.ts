@@ -4406,35 +4406,61 @@ export type Database = {
         Row: {
           approval_status: string
           cancellation_reason: string | null
+          cleaning_fee: number | null
+          cleaning_responsibility: string | null
           completed_at: string | null
+          confirmation_status: string
           confirmed_audience: number | null
           conflict_override_fingerprint: string | null
           conflict_override_reason: string | null
           conflict_status: string
+          contact_name: string | null
+          contact_phone: string | null
+          contract_status: string
           counterpart_agreement_id: string | null
           counterpart_requested_quantity: number | null
           created_at: string
           created_by: string
+          electricity_fee: string | null
           end_at: string | null
           estimated_audience: number | null
           event_result: string | null
           event_type: string
           executive_description: string | null
+          fee_amount: number | null
+          fee_quantity: number | null
+          fee_type: string | null
           id: string
+          import_batch_id: string | null
+          internal_notes: string | null
           observations: string | null
+          operational_notes: string | null
           org_id: string
+          payment_status: string
           pending_date: boolean
+          preparation_end_date: string | null
+          preparation_notes: string | null
+          preparation_start_date: string | null
           priority: string
           requested_area: string | null
           requester_name: string
           requester_user_id: string | null
+          requires_review: boolean
+          reservation_end_date: string | null
+          reservation_start_date: string | null
           responsible_organization_id: string | null
           responsible_user_id: string | null
+          review_reasons: string[]
           setup_start_at: string | null
+          shift: string | null
+          source_document: string | null
+          source_fingerprint: string | null
+          source_row: number | null
           sponsor_id: string | null
           start_at: string | null
           status: string
           target_audience: string | null
+          teardown_deadline_note: string | null
           teardown_end_at: string | null
           title: string
           updated_at: string
@@ -4445,35 +4471,61 @@ export type Database = {
         Insert: {
           approval_status?: string
           cancellation_reason?: string | null
+          cleaning_fee?: number | null
+          cleaning_responsibility?: string | null
           completed_at?: string | null
+          confirmation_status?: string
           confirmed_audience?: number | null
           conflict_override_fingerprint?: string | null
           conflict_override_reason?: string | null
           conflict_status?: string
+          contact_name?: string | null
+          contact_phone?: string | null
+          contract_status?: string
           counterpart_agreement_id?: string | null
           counterpart_requested_quantity?: number | null
           created_at?: string
           created_by: string
+          electricity_fee?: string | null
           end_at?: string | null
           estimated_audience?: number | null
           event_result?: string | null
           event_type: string
           executive_description?: string | null
+          fee_amount?: number | null
+          fee_quantity?: number | null
+          fee_type?: string | null
           id?: string
+          import_batch_id?: string | null
+          internal_notes?: string | null
           observations?: string | null
+          operational_notes?: string | null
           org_id: string
+          payment_status?: string
           pending_date?: boolean
+          preparation_end_date?: string | null
+          preparation_notes?: string | null
+          preparation_start_date?: string | null
           priority?: string
           requested_area?: string | null
           requester_name: string
           requester_user_id?: string | null
+          requires_review?: boolean
+          reservation_end_date?: string | null
+          reservation_start_date?: string | null
           responsible_organization_id?: string | null
           responsible_user_id?: string | null
+          review_reasons?: string[]
           setup_start_at?: string | null
+          shift?: string | null
+          source_document?: string | null
+          source_fingerprint?: string | null
+          source_row?: number | null
           sponsor_id?: string | null
           start_at?: string | null
           status?: string
           target_audience?: string | null
+          teardown_deadline_note?: string | null
           teardown_end_at?: string | null
           title: string
           updated_at?: string
@@ -4484,35 +4536,61 @@ export type Database = {
         Update: {
           approval_status?: string
           cancellation_reason?: string | null
+          cleaning_fee?: number | null
+          cleaning_responsibility?: string | null
           completed_at?: string | null
+          confirmation_status?: string
           confirmed_audience?: number | null
           conflict_override_fingerprint?: string | null
           conflict_override_reason?: string | null
           conflict_status?: string
+          contact_name?: string | null
+          contact_phone?: string | null
+          contract_status?: string
           counterpart_agreement_id?: string | null
           counterpart_requested_quantity?: number | null
           created_at?: string
           created_by?: string
+          electricity_fee?: string | null
           end_at?: string | null
           estimated_audience?: number | null
           event_result?: string | null
           event_type?: string
           executive_description?: string | null
+          fee_amount?: number | null
+          fee_quantity?: number | null
+          fee_type?: string | null
           id?: string
+          import_batch_id?: string | null
+          internal_notes?: string | null
           observations?: string | null
+          operational_notes?: string | null
           org_id?: string
+          payment_status?: string
           pending_date?: boolean
+          preparation_end_date?: string | null
+          preparation_notes?: string | null
+          preparation_start_date?: string | null
           priority?: string
           requested_area?: string | null
           requester_name?: string
           requester_user_id?: string | null
+          requires_review?: boolean
+          reservation_end_date?: string | null
+          reservation_start_date?: string | null
           responsible_organization_id?: string | null
           responsible_user_id?: string | null
+          review_reasons?: string[]
           setup_start_at?: string | null
+          shift?: string | null
+          source_document?: string | null
+          source_fingerprint?: string | null
+          source_row?: number | null
           sponsor_id?: string | null
           start_at?: string | null
           status?: string
           target_audience?: string | null
+          teardown_deadline_note?: string | null
           teardown_end_at?: string | null
           title?: string
           updated_at?: string
@@ -4569,6 +4647,128 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "venue_stakeholders"
             referencedColumns: ["org_id", "id"]
+          },
+        ]
+      }
+      venue_import_batches: {
+        Row: {
+          created_at: string
+          created_count: number
+          error_message: string | null
+          executed_by: string | null
+          id: string
+          matched_count: number
+          merged_count: number
+          not_event_count: number
+          org_id: string
+          review_count: number
+          skipped_count: number
+          source_document: string
+          status: string
+          total_rows: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_count?: number
+          error_message?: string | null
+          executed_by?: string | null
+          id?: string
+          matched_count?: number
+          merged_count?: number
+          not_event_count?: number
+          org_id: string
+          review_count?: number
+          skipped_count?: number
+          source_document: string
+          status?: string
+          total_rows?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_count?: number
+          error_message?: string | null
+          executed_by?: string | null
+          id?: string
+          matched_count?: number
+          merged_count?: number
+          not_event_count?: number
+          org_id?: string
+          review_count?: number
+          skipped_count?: number
+          source_document?: string
+          status?: string
+          total_rows?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venue_import_batches_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      venue_import_rows: {
+        Row: {
+          batch_id: string
+          created_at: string
+          disposition: string
+          event_id: string | null
+          fingerprint: string | null
+          id: string
+          org_id: string
+          raw_text: string
+          reason: string | null
+          source_document: string
+          source_row: number
+          source_year: number | null
+        }
+        Insert: {
+          batch_id: string
+          created_at?: string
+          disposition: string
+          event_id?: string | null
+          fingerprint?: string | null
+          id?: string
+          org_id: string
+          raw_text: string
+          reason?: string | null
+          source_document: string
+          source_row: number
+          source_year?: number | null
+        }
+        Update: {
+          batch_id?: string
+          created_at?: string
+          disposition?: string
+          event_id?: string | null
+          fingerprint?: string | null
+          id?: string
+          org_id?: string
+          raw_text?: string
+          reason?: string | null
+          source_document?: string
+          source_row?: number
+          source_year?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "venue_import_rows_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "venue_import_batches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "venue_import_rows_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
           },
         ]
       }
@@ -5869,6 +6069,10 @@ export type Database = {
           _org_id: string
           _payload: Json
         }
+        Returns: Json
+      }
+      venue_save_event_agenda: {
+        Args: { _event_id: string; _org_id: string; _payload: Json }
         Returns: Json
       }
       venue_seed_org_defaults: { Args: { _org_id: string }; Returns: undefined }
