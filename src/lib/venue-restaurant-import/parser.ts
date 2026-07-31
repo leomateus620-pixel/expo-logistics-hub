@@ -809,6 +809,15 @@ export function parseSourceRow(row: RestaurantSourceRow): ParsedRestaurantEvent 
     }
   }
 
+  // O título nunca carrega telefone nem sobras de pontuação.
+  if (eventTitle) {
+    eventTitle = eventTitle
+      .replace(/\(?\s*\d[\d\s.-]{6,}\)?/g, " ")
+      .replace(/\s+/g, " ")
+      .replace(/[\s,;.–—-]+$/, "")
+      .trim();
+  }
+
 
   if (!eventTitle) {
     reviewReasons.push("Não há título nem organização identificáveis nesta linha.");
