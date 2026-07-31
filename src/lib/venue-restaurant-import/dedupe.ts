@@ -182,7 +182,42 @@ export function deduplicate(
     });
   }
 
-  const events = [...byIdentity.values()];
+  // Segunda passada: mesma organização e mesma data inicial, com títulos
+  // diferentes (o documento repete a reserva descrevendo-a de outra forma).
+  const byOrganizerDate = new Map<string, ParsedRestaurantEvent>();
+  for (const event of [...byIdentity.values()]) {
+    const organizer = normalizeText(event.organizerName ?? "");
+    const key = `${organizer}|${event.startDate ?? "sem-data"}`;
+    if (!organizer || !event.startDate) {
+      byOrganizerDate.set(`unico:${event.fingerprint}`, event);
+      continue;
+    }
+    const existing = byOrganizerDate.get(key);
+    if (!existing) {
+      byOrganizerDate.set(key, event);
+      continue;
+    }
+    merged += 1;
+    const [primary, secondary] =
+      completeness(event) > completeness(existing)
+        ? [event, existing]
+        : [existing, event];
+    byOrganizerDate.set(key, mergePair(primary, secondary));
+    reconciliation.push({
+      sourceRows: secondary.sourceRows,
+      fingerprint: secondary.fingerprint,
+      disposition: "mesclado",
+      title: secondary.eventTitle,
+      startDate: secondary.startDate,
+      endDate: secondary.endDate,
+      reasons: [
+        "Mesma organização e mesma data de outra linha — reserva duplicada no documento.",
+      ],
+    });
+  }
+
+  const events = [...byOrganizerDate.values()];
+
 
   // Conflitos: mesmo ano, mesma organização e título, datas diferentes.
   const bySimilarity = new Map<string, ParsedRestaurantEvent[]>();
