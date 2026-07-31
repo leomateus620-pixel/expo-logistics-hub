@@ -785,7 +785,10 @@ export function parseSourceRow(row: RestaurantSourceRow): ParsedRestaurantEvent 
   }
 
   if (!eventTitle) {
-    if (organizerName) {
+    if (looksLikeEventName(requesterCell)) {
+      // A célula de solicitante já traz o nome do evento (colunas deslocadas).
+      eventTitle = requesterCell.replace(/\s+/g, " ").trim();
+    } else if (organizerName) {
       eventTitle = `Evento ${organizerName}`;
       reviewReasons.push(
         "Nome do evento ausente no documento — título derivado da organização solicitante.",
@@ -794,6 +797,7 @@ export function parseSourceRow(row: RestaurantSourceRow): ParsedRestaurantEvent 
       eventTitle = requesterCell.replace(/\s+/g, " ").trim();
     }
   }
+
 
   if (!eventTitle) {
     reviewReasons.push("Não há título nem organização identificáveis nesta linha.");
