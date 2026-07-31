@@ -1424,13 +1424,13 @@ export function VenueWorkspace() {
           {filteredEvents.length} de {workspace.events.length}
         </Badge>
       </header>
-      <div className="venue-filter-bar venue-filter-bar--three">
+      <div className="venue-filter-bar venue-filter-bar--agenda">
         <label>
           <Search />
           <Input
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Buscar por título, pessoa ou organização"
+            placeholder="Buscar por título, organização, solicitante ou telefone"
           />
         </label>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
