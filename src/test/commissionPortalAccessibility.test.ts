@@ -3,6 +3,7 @@ import { resolve } from 'node:path';
 
 const portalStyles = readFileSync(resolve('src/styles/commission-portal.css'), 'utf8');
 const portalPage = readFileSync(resolve('src/pages/commissions/CommissionPortalPage.tsx'), 'utf8');
+const portalWordmark = readFileSync(resolve('src/components/portal/FenasojaPortalWordmark.tsx'), 'utf8');
 
 function hexToRgb(hex: string): [number, number, number] {
   const channels = hex.replace('#', '').match(/.{2}/g);
@@ -35,6 +36,8 @@ const normalTextPairs = [
   ['texto sutil no agrupador', '#9EB0C5', '#041832'],
   ['destaque dourado', '#FFD35C', '#041832'],
   ['texto do card Gestão Operacional', '#FFF5CF', '#03162F'],
+  ['título das cenas agrícolas', '#FFF8DF', '#03162F'],
+  ['legenda dourada das cenas', '#FFDC72', '#03162F'],
   ['estado permitido', '#A7F3D0', '#08294D'],
   ['estado em estruturação', '#FFE69A', '#08294D'],
   ['estado sem permissão', '#FECACA', '#041832'],
@@ -68,6 +71,9 @@ describe('acessibilidade visual do hub Fenasoja', () => {
     expect(portalStyles).toContain('.portal-primary-entry__control:focus-visible');
     expect(portalStyles).toContain('.portal-destination-card:focus-visible');
     expect(portalStyles).toContain('.commission-access-card:focus-visible');
+    expect(portalStyles).toContain('.portal-world__soybean');
+    expect(portalWordmark).toContain('useReducedMotionPreference');
+    expect(portalWordmark).toContain('prefers-reduced-motion: reduce');
   });
 
   it('entrega AVIF, WebP e fallback responsivos com payload controlado', () => {
@@ -85,5 +91,20 @@ describe('acessibilidade visual do hub Fenasoja', () => {
     ]) {
       expect(statSync(resolve(asset)).size).toBeLessThan(200_000);
     }
+  });
+
+  it('mantém as três ilustrações narrativas otimizadas e sem biblioteca de motion adicional', () => {
+    for (const asset of [
+      'public/portal/fenasoja-plantio-premium.webp',
+      'public/portal/fenasoja-colheita-premium.webp',
+      'public/portal/fenasoja-abundancia-premium.webp',
+    ]) {
+      expect(statSync(resolve(asset)).size).toBeLessThan(150_000);
+    }
+
+    expect(portalWordmark).toContain('loading="lazy"');
+    expect(portalWordmark).toContain('decoding="async"');
+    expect(portalWordmark).toContain('Da terra para o mundo');
+    expect(portalWordmark).not.toMatch(/framer-motion|@react-spring|gsap/);
   });
 });

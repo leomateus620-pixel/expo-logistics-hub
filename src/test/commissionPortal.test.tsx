@@ -60,8 +60,25 @@ function renderPortal() {
   );
 }
 
+function setReducedMotionPreference(matches: boolean) {
+  Object.defineProperty(window, 'matchMedia', {
+    configurable: true,
+    value: vi.fn().mockImplementation((query: string) => ({
+      matches: query.includes('prefers-reduced-motion') ? matches : false,
+      media: query,
+      onchange: null,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })),
+  });
+}
+
 describe('CommissionPortalPage', () => {
   beforeEach(() => {
+    setReducedMotionPreference(false);
     localStorage.clear();
     portalMocks.auth.loading = false;
     portalMocks.auth.user = null;
@@ -92,8 +109,37 @@ describe('CommissionPortalPage', () => {
     const roots = [...container.querySelectorAll('[data-portal-root]')];
     expect(roots).toHaveLength(5);
     expect(roots.every((root) => root.getAttribute('d')?.startsWith('M560 9'))).toBe(true);
+    expect(container.querySelectorAll('[data-portal-scene]')).toHaveLength(3);
+    expect(screen.getByText('Plantio de precisão')).toBeInTheDocument();
+    expect(screen.getByText('Colheita em escala')).toBeInTheDocument();
+    expect(screen.getByText('Grão em movimento')).toBeInTheDocument();
+    expect(screen.getByTestId('portal-world-map')).toHaveAccessibleName(
+      /três grãos de soja partem do Brasil/i,
+    );
+    const worldSoybeans = [...container.querySelectorAll('[data-world-soybean]')];
+    expect(worldSoybeans).toHaveLength(3);
+    expect(worldSoybeans.map((grain) => grain.getAttribute('data-world-soybean'))).toEqual([
+      'europa',
+      'africa',
+      'asia',
+    ]);
     expect(screen.getByRole('link', { name: 'Acessar área administrativa' })).toBeInTheDocument();
     expect(container.querySelector('.fenasoja-brand__mark img')).toBeInTheDocument();
+  });
+
+  it('keeps all three global destinations visible without travel motion when reduced motion is requested', () => {
+    setReducedMotionPreference(true);
+    const { container } = renderPortal();
+
+    expect(container.querySelectorAll('[data-world-soybean]')).toHaveLength(3);
+    expect(container.querySelectorAll('[data-world-soybean] animateMotion')).toHaveLength(0);
+    expect(
+      [...container.querySelectorAll('[data-world-soybean]')].map((grain) => grain.getAttribute('transform')),
+    ).toEqual([
+      'translate(151 40)',
+      'translate(181 58)',
+      'translate(248 56)',
+    ]);
   });
 
   it('keeps a vector brand mark when the official remote asset is unavailable', () => {

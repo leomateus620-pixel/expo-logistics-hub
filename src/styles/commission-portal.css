@@ -148,9 +148,9 @@
   border: 1px solid rgb(174 204 234 / 24%);
   border-radius: clamp(20px, 2vw, 28px);
   background:
-    radial-gradient(circle at 67% 22%, rgb(255 205 71 / 10%) 0%, transparent 28%),
-    radial-gradient(circle at 32% 12%, rgb(65 128 255 / 16%) 0%, transparent 34%),
-    linear-gradient(128deg, rgb(3 24 52 / 96%) 0%, rgb(4 29 61 / 94%) 48%, rgb(3 19 42 / 97%) 100%);
+    radial-gradient(circle at 76% 32%, rgb(255 205 71 / 11%) 0%, transparent 30%),
+    radial-gradient(circle at 29% 18%, rgb(65 128 255 / 18%) 0%, transparent 36%),
+    linear-gradient(128deg, rgb(3 24 52 / 97%) 0%, rgb(4 29 61 / 95%) 48%, rgb(3 19 42 / 98%) 100%);
   box-shadow:
     0 26px 70px -46px rgb(0 0 0 / 96%),
     0 0 0 1px rgb(255 211 92 / 4%),
@@ -188,10 +188,10 @@
   position: relative;
   z-index: 1;
   display: grid;
-  min-height: clamp(220px, 20vw, 258px);
+  min-height: clamp(408px, 32vw, 456px);
   place-items: center;
   overflow: hidden;
-  padding: clamp(24px, 3vw, 38px) clamp(18px, 4vw, 54px) clamp(20px, 2.6vw, 32px);
+  padding: clamp(28px, 3vw, 40px) clamp(18px, 4vw, 54px) clamp(22px, 2.6vw, 34px);
 }
 
 .fenasoja-portal__hero-frame::before,
@@ -224,12 +224,14 @@
   position: relative;
   z-index: 2;
   display: grid;
-  width: min(100%, 1040px);
+  width: min(100%, 1100px);
   justify-items: center;
-  gap: clamp(14px, 1.8vw, 20px);
+  gap: clamp(10px, 1.3vw, 16px);
 }
 
 .portal-identity__title {
+  position: relative;
+  z-index: 5;
   width: 100%;
   margin: 0;
 }
@@ -336,14 +338,14 @@
 
 .portal-soybean__roots {
   position: absolute;
-  z-index: -1;
+  z-index: 1;
   top: 72%;
   left: 50%;
   display: block;
-  width: clamp(680px, 84vw, 1050px);
-  height: clamp(148px, 18vw, 222px);
+  width: clamp(760px, 88vw, 1120px);
+  height: clamp(202px, 22vw, 286px);
   overflow: visible;
-  opacity: 0.78;
+  opacity: 0.76;
   pointer-events: none;
   transform: translateX(-50%);
 }
@@ -378,6 +380,268 @@
 .portal-soybean__root--5 {
   stroke-width: 1.35;
   animation-delay: 300ms;
+}
+
+.portal-soybean__root-nodes {
+  fill: #ffd65c;
+  filter: url(#portal-root-glow);
+  stroke: #fff7bc;
+  stroke-width: 1.2;
+}
+
+.portal-soybean__root-node {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation:
+    portal-root-node-arrive 440ms cubic-bezier(0.16, 1, 0.3, 1) both,
+    portal-root-node-breathe 5.6s ease-in-out 1.4s infinite;
+}
+
+.portal-soybean__root-node--1 {
+  animation-delay: 620ms, 1.4s;
+}
+
+.portal-soybean__root-node--2 {
+  animation-delay: 700ms, 1.7s;
+}
+
+.portal-soybean__root-node--3 {
+  animation-delay: 540ms, 1.55s;
+}
+
+.portal-soybean__root-node--4 {
+  animation-delay: 760ms, 1.9s;
+}
+
+.portal-soybean__root-node--5 {
+  animation-delay: 820ms, 2.1s;
+}
+
+.portal-story {
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  margin-top: clamp(15px, 1.8vw, 22px);
+}
+
+.portal-story__kicker {
+  display: block;
+  margin-bottom: 8px;
+  color: rgb(255 232 156 / 78%);
+  font-size: 0.57rem;
+  font-weight: 800;
+  letter-spacing: 0.24em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.portal-story__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: start;
+  gap: clamp(9px, 1.2vw, 14px);
+  padding-bottom: 18px;
+}
+
+.portal-story__node {
+  position: relative;
+  isolation: isolate;
+  min-width: 0;
+  min-height: clamp(112px, 9vw, 128px);
+  overflow: hidden;
+  border: 1px solid rgb(255 221 119 / 34%);
+  border-radius: 22px 22px 34px 34px;
+  background:
+    radial-gradient(circle at 78% 24%, rgb(255 211 92 / 14%), transparent 34%),
+    linear-gradient(145deg, rgb(8 42 78 / 96%), rgb(3 20 43 / 98%));
+  box-shadow:
+    0 20px 36px -28px rgb(0 0 0 / 95%),
+    0 0 0 1px rgb(255 255 255 / 3%),
+    inset 0 1px 0 rgb(255 255 255 / 9%);
+  animation: portal-story-node-reveal 680ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.portal-story__node--plantio {
+  animation-delay: 330ms;
+}
+
+.portal-story__node--colheita {
+  margin-top: 16px;
+  animation-delay: 410ms;
+}
+
+.portal-story__node--abundancia {
+  margin-top: 16px;
+  animation-delay: 490ms;
+}
+
+.portal-story__node--world {
+  animation-delay: 570ms;
+}
+
+.portal-story__node::before,
+.portal-story__node::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.portal-story__node::before {
+  z-index: 2;
+  background:
+    linear-gradient(180deg, rgb(2 13 29 / 8%) 0%, rgb(2 13 29 / 18%) 38%, rgb(2 13 29 / 92%) 100%),
+    linear-gradient(90deg, rgb(2 13 29 / 42%), transparent 26%, transparent 74%, rgb(2 13 29 / 45%));
+}
+
+.portal-story__node::after {
+  z-index: 4;
+  inset: 1px;
+  border: 1px solid rgb(255 255 255 / 5%);
+  border-radius: inherit;
+  box-shadow: inset 0 -18px 38px rgb(0 8 21 / 24%);
+}
+
+.portal-story__node img {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: saturate(0.9) contrast(1.08);
+  transform: scale(1.035);
+}
+
+.portal-story__node--plantio img {
+  object-position: 53% 55%;
+}
+
+.portal-story__node--colheita img {
+  object-position: 50% 54%;
+}
+
+.portal-story__node--abundancia img {
+  object-position: 49% 45%;
+}
+
+.portal-story__node-light {
+  position: absolute;
+  z-index: 3;
+  top: -28px;
+  right: 9%;
+  width: 86px;
+  height: 72px;
+  border-radius: 50%;
+  background: rgb(255 201 72 / 14%);
+  filter: blur(20px);
+  pointer-events: none;
+}
+
+.portal-story__node-copy {
+  position: absolute;
+  z-index: 5;
+  right: 13px;
+  bottom: 11px;
+  left: 13px;
+  display: grid;
+  gap: 3px;
+  text-align: left;
+}
+
+.portal-story__node-copy strong {
+  overflow: hidden;
+  color: #fff8df;
+  font-size: clamp(0.68rem, 0.78vw, 0.82rem);
+  font-weight: 780;
+  letter-spacing: -0.012em;
+  line-height: 1.14;
+  text-overflow: ellipsis;
+  text-shadow: 0 2px 12px rgb(0 5 15 / 82%);
+  white-space: nowrap;
+}
+
+.portal-story__node-eyebrow {
+  color: #ffdc72;
+  font-size: clamp(0.46rem, 0.5vw, 0.54rem);
+  font-weight: 850;
+  letter-spacing: 0.14em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.portal-story__node--world::before {
+  z-index: 1;
+  background:
+    radial-gradient(circle at 34% 64%, rgb(255 205 71 / 17%), transparent 28%),
+    linear-gradient(180deg, transparent 22%, rgb(2 13 29 / 86%) 100%);
+}
+
+.portal-story__node-copy--world {
+  z-index: 5;
+}
+
+.portal-world {
+  position: absolute;
+  z-index: 2;
+  top: 1px;
+  left: 3%;
+  display: block;
+  width: 94%;
+  height: 82%;
+  overflow: visible;
+}
+
+.portal-world__continents {
+  fill: rgb(118 162 204 / 28%);
+  stroke: rgb(186 216 241 / 46%);
+  stroke-linejoin: round;
+  stroke-width: 1;
+}
+
+.portal-world__routes {
+  fill: none;
+  filter: url(#portal-world-glow);
+  stroke: rgb(255 211 92 / 68%);
+  stroke-dasharray: 0.055 0.055;
+  stroke-linecap: round;
+  stroke-width: 1.15;
+}
+
+.portal-world__brazil {
+  filter: url(#portal-world-glow);
+}
+
+.portal-world__brazil circle:first-child {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: portal-world-origin-pulse 4.8s ease-in-out infinite;
+}
+
+.portal-world__brazil path {
+  fill: #ffd75d;
+  stroke: #fff7b5;
+  stroke-width: 0.9;
+}
+
+.portal-world__brazil circle:last-child {
+  fill: #fffbd2;
+}
+
+.portal-world__soybean {
+  fill: url(#portal-world-soy);
+  filter: url(#portal-world-glow);
+  stroke: #fff3a1;
+  stroke-width: 0.65;
+}
+
+.portal-world__soybean-sheen {
+  fill: none;
+  stroke: rgb(255 255 255 / 72%);
+  stroke-linecap: round;
+  stroke-width: 0.7;
 }
 
 .portal-wordmark__edition {
@@ -1148,6 +1412,52 @@
   }
 }
 
+@keyframes portal-root-node-arrive {
+  from {
+    opacity: 0;
+    transform: scale(0.35);
+  }
+  to {
+    opacity: 0.9;
+    transform: scale(1);
+  }
+}
+
+@keyframes portal-root-node-breathe {
+  0%,
+  100% {
+    opacity: 0.62;
+    transform: scale(0.9);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.16);
+  }
+}
+
+@keyframes portal-story-node-reveal {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes portal-world-origin-pulse {
+  0%,
+  100% {
+    opacity: 0.48;
+    transform: scale(0.84);
+  }
+  50% {
+    opacity: 0.92;
+    transform: scale(1.08);
+  }
+}
+
 @keyframes portal-identity-card-arrive {
   from {
     opacity: 0;
@@ -1182,7 +1492,7 @@
   }
 
   .fenasoja-portal__hero-frame {
-    min-height: 276px;
+    min-height: 486px;
   }
 
   .portal-wordmark__name {
@@ -1191,6 +1501,10 @@
 
   .portal-wordmark__edition {
     font-size: 5rem;
+  }
+
+  .portal-story__node {
+    min-height: 142px;
   }
 
   .portal-primary-entry__control {
@@ -1222,8 +1536,8 @@
   }
 
   .fenasoja-portal__hero-frame {
-    min-height: 220px;
-    padding-inline: 24px;
+    min-height: 470px;
+    padding: 28px 24px 24px;
   }
 
   .portal-wordmark {
@@ -1231,8 +1545,31 @@
   }
 
   .portal-soybean__roots {
-    width: clamp(640px, 96vw, 820px);
-    height: clamp(142px, 22vw, 184px);
+    width: clamp(680px, 102vw, 820px);
+    height: clamp(260px, 39vw, 324px);
+  }
+
+  .portal-identity {
+    width: min(100%, 760px);
+  }
+
+  .portal-story {
+    margin-top: 16px;
+  }
+
+  .portal-story__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px 12px;
+    padding-bottom: 0;
+  }
+
+  .portal-story__node {
+    min-height: 118px;
+  }
+
+  .portal-story__node--colheita,
+  .portal-story__node--abundancia {
+    margin-top: 0;
   }
 
   .portal-primary-entry__control {
@@ -1307,7 +1644,7 @@
   }
 
   .fenasoja-portal__hero-frame {
-    min-height: 224px;
+    min-height: 448px;
     padding: 22px 12px 18px;
   }
 
@@ -1318,7 +1655,7 @@
   }
 
   .portal-identity {
-    gap: 11px;
+    gap: 9px;
   }
 
   .portal-wordmark {
@@ -1342,8 +1679,55 @@
   .portal-soybean__roots {
     top: 68%;
     width: 620px;
-    height: 164px;
-    opacity: 0.68;
+    height: 300px;
+    opacity: 0.62;
+  }
+
+  .portal-story {
+    margin-top: 11px;
+  }
+
+  .portal-story__kicker {
+    margin-bottom: 7px;
+    font-size: 0.5rem;
+    letter-spacing: 0.19em;
+  }
+
+  .portal-story__grid {
+    gap: 8px;
+  }
+
+  .portal-story__node {
+    min-height: 98px;
+    border-radius: 18px 18px 27px 27px;
+  }
+
+  .portal-story__node-copy {
+    right: 9px;
+    bottom: 8px;
+    left: 9px;
+    gap: 2px;
+  }
+
+  .portal-story__node-copy strong {
+    display: -webkit-box;
+    font-size: 0.62rem;
+    line-height: 1.12;
+    white-space: normal;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .portal-story__node-eyebrow {
+    font-size: 0.43rem;
+    letter-spacing: 0.1em;
+  }
+
+  .portal-world {
+    top: -2px;
+    left: 1%;
+    width: 98%;
+    height: 78%;
   }
 
   .portal-identity__card {
@@ -1490,6 +1874,18 @@
     width: 560px;
   }
 
+  .fenasoja-portal__hero-frame {
+    min-height: 432px;
+  }
+
+  .portal-story__node {
+    min-height: 93px;
+  }
+
+  .portal-story__node-copy strong {
+    font-size: 0.58rem;
+  }
+
   .portal-primary-entry__control {
     grid-template-columns: 40px minmax(0, 1fr) 28px;
     gap-inline: 9px;
@@ -1511,7 +1907,7 @@
   }
 
   .fenasoja-portal__hero-frame {
-    min-height: 176px;
+    min-height: 294px;
     padding-block: 18px 14px;
   }
 
@@ -1525,6 +1921,34 @@
 
   .portal-identity {
     gap: 9px;
+  }
+
+  .portal-story {
+    margin-top: 8px;
+  }
+
+  .portal-story__kicker {
+    display: none;
+  }
+
+  .portal-story__grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+    padding-bottom: 10px;
+  }
+
+  .portal-story__node {
+    min-height: 92px;
+  }
+
+  .portal-story__node--colheita,
+  .portal-story__node--abundancia {
+    margin-top: 10px;
+  }
+
+  .portal-soybean__roots {
+    width: min(840px, 104vw);
+    height: 205px;
   }
 
   .portal-identity__card {
@@ -1552,7 +1976,7 @@
   }
 
   .fenasoja-portal__hero-frame {
-    min-height: 182px;
+    min-height: 346px;
     padding-block: 20px 16px;
   }
 
@@ -1565,7 +1989,34 @@
   }
 
   .portal-identity {
-    gap: 11px;
+    gap: 8px;
+  }
+
+  .portal-story {
+    margin-top: 9px;
+  }
+
+  .portal-story__kicker {
+    margin-bottom: 5px;
+    font-size: 0.5rem;
+  }
+
+  .portal-story__grid {
+    padding-bottom: 11px;
+  }
+
+  .portal-story__node {
+    min-height: 94px;
+    border-radius: 18px 18px 28px 28px;
+  }
+
+  .portal-story__node--colheita,
+  .portal-story__node--abundancia {
+    margin-top: 10px;
+  }
+
+  .portal-soybean__roots {
+    height: 220px;
   }
 
   .portal-identity__card {
@@ -1608,6 +2059,7 @@
   }
 
   .portal-identity__card,
+  .portal-story__node,
   .portal-destination-card,
   .commission-access-card {
     background: #08294d;
@@ -1622,6 +2074,7 @@
   .fenasoja-portal__header,
   .fenasoja-portal__hero,
   .portal-identity__card,
+  .portal-story__node,
   .portal-primary-entry,
   .portal-destination-card,
   .commission-access-card,
@@ -1642,6 +2095,18 @@
 
   .portal-soybean__roots {
     display: none;
+  }
+
+  .portal-story__node img,
+  .portal-world {
+    opacity: 0.18;
+  }
+
+  .portal-story__node-copy,
+  .portal-story__node-eyebrow,
+  .portal-story__node-copy strong {
+    color: CanvasText;
+    text-shadow: none;
   }
 
   .portal-soybean__grain {
