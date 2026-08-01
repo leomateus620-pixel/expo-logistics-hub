@@ -33,10 +33,18 @@ import {
 } from './components/panels/MapPanels';
 import { MapListView, ResultsPanel } from './components/panels/EntityExplorer';
 import { CalibrationPanel } from './components/panels/CalibrationPanel';
+import { SegmentLegend } from './components/segments/SegmentLegend';
 import { resolveStrategicLandmarkKind } from './utils/landmarks';
 import { OFFICIAL_REFERENCE_REVISION } from './data/officialReference2026';
 import {
+  COMMERCIAL_MAP_SEGMENT_IDS,
+  buildCommercialMapSegmentIndex,
+  getCommercialMapSegment,
+  type CommercialMapSegmentId,
+} from './data/commercialMapSegments';
+import {
   areaScopeFromSearchParams,
+  isSegmentCompatibleWithAreaScope,
   scopeCommercialMapData,
   type CommercialMapAreaScope,
 } from './utils/areaScope';
@@ -77,6 +85,9 @@ export default function CommercialMapPage() {
   const clearExplorerFilters = useCommercialMapStore((state) => state.clearExplorerFilters);
   const setTechnicalValidationVisible = useCommercialMapStore((state) => state.setTechnicalValidationVisible);
   const requestCameraPreset = useCommercialMapStore((state) => state.requestCameraPreset);
+  const activeSegmentId = useCommercialMapStore((state) => state.activeSegmentId);
+  const requestSegmentFocus = useCommercialMapStore((state) => state.requestSegmentFocus);
+  const clearSegmentFocus = useCommercialMapStore((state) => state.clearSegmentFocus);
   const setSelectedEntityId = useCommercialMapStore((state) => state.setSelectedEntityId);
   const interiorBackButtonRef = useRef<HTMLButtonElement>(null);
   const lastInteriorEntityId = useRef<string | null>(null);
@@ -94,6 +105,16 @@ export default function CommercialMapPage() {
     ),
     [areaScope, data?.entities, data?.lots],
   );
+  const scopedSegmentIndex = useMemo(
+    () => buildCommercialMapSegmentIndex(scopedData.entities, scopedData.lots),
+    [scopedData.entities, scopedData.lots],
+  );
+  const activeSegment = getCommercialMapSegment(activeSegmentId);
+  const summaryLots = useMemo(() => (
+    activeSegment?.behavior.interaction === 'filter-and-focus' && activeSegmentId
+      ? scopedData.lots.filter((lot) => scopedSegmentIndex.get(lot.entityId)?.id === activeSegmentId)
+      : scopedData.lots
+  ), [activeSegment?.behavior.interaction, activeSegmentId, scopedData.lots, scopedSegmentIndex]);
   const mapFilter = useMapEntityFilter(scopedData.entities, scopedData.lots);
   const selectedEntity = scopedData.entities.find((entity) => entity.id === selectedEntityId) ?? null;
   const selectedLot = scopedData.lots.find((lot) => lot.entityId === selectedEntityId);
@@ -102,29 +123,64 @@ export default function CommercialMapPage() {
   const interiorKind = interiorEntity ? resolveStrategicLandmarkKind(interiorEntity) : null;
 
   const setAreaScope = (nextScope: CommercialMapAreaScope) => {
+    if (nextScope === 'exporural' && activeSegmentId !== COMMERCIAL_MAP_SEGMENT_IDS.exporural) {
+      clearSegmentFocus();
+    }
+    requestCameraPreset(nextScope === 'exporural' ? 'exporural' : 'overview');
     const next = new URLSearchParams(searchParams);
     if (nextScope === 'exporural') next.set('area', 'exporural');
     else next.delete('area');
     setSearchParams(next, { replace: false });
   };
 
+  const handleSegmentSelect = (segmentId: CommercialMapSegmentId) => {
+    if (segmentId === activeSegmentId) {
+      clearSegmentFocus();
+      if (workspaceMode !== 'list') requestCameraPreset(isExporural ? 'exporural' : 'overview');
+      return;
+    }
+
+    requestSegmentFocus(segmentId);
+    if (isExporural && segmentId !== COMMERCIAL_MAP_SEGMENT_IDS.exporural) {
+      const next = new URLSearchParams(searchParams);
+      next.delete('area');
+      setSearchParams(next, { replace: false });
+    }
+  };
+
+  const handleSegmentClear = () => {
+    clearSegmentFocus();
+    if (workspaceMode !== 'list') requestCameraPreset(isExporural ? 'exporural' : 'overview');
+  };
+
   useEffect(() => {
     if (!initializedAreaScope.current) {
       initializedAreaScope.current = true;
-      if (areaScope === 'exporural') requestCameraPreset('exporural');
+      const compatibleSegment = isSegmentCompatibleWithAreaScope(activeSegmentId, areaScope);
+      if (activeSegmentId && compatibleSegment) requestSegmentFocus(activeSegmentId);
+      else if (areaScope === 'exporural') {
+        if (activeSegmentId) clearSegmentFocus();
+        requestCameraPreset('exporural');
+      }
       return;
     }
     if (previousAreaScope.current === areaScope) return;
     previousAreaScope.current = areaScope;
+    const focusedSegment = useCommercialMapStore.getState().activeSegmentId;
+    const compatibleSegment = isSegmentCompatibleWithAreaScope(focusedSegment, areaScope);
     clearExplorerFilters();
     setSelectedEntityId(null);
     setActivePanel(null);
     setWorkspaceMode('3d');
-    requestCameraPreset(areaScope === 'exporural' ? 'exporural' : 'overview');
+    if (focusedSegment && compatibleSegment) requestSegmentFocus(focusedSegment);
+    else requestCameraPreset(areaScope === 'exporural' ? 'exporural' : 'overview');
   }, [
+    activeSegmentId,
     areaScope,
+    clearSegmentFocus,
     clearExplorerFilters,
     requestCameraPreset,
+    requestSegmentFocus,
     setActivePanel,
     setSelectedEntityId,
     setWorkspaceMode,
@@ -332,7 +388,17 @@ export default function CommercialMapPage() {
         </div>
       )}
 
-      <div className="commercial-map-viewport">
+      {!interiorEntityId && workspaceMode !== 'edit' && workspaceMode !== 'create' && (
+        <SegmentLegend
+          entities={data.entities}
+          lots={data.lots}
+          activeSegmentId={activeSegmentId}
+          onSelect={handleSegmentSelect}
+          onClear={handleSegmentClear}
+        />
+      )}
+
+      <div id="commercial-map-viewport" className="commercial-map-viewport">
         {workspaceMode === 'create' ? (
           <LotCreationWorkspace project={data.project} calibration={data.calibration} layers={data.layers} entities={scopedData.entities} />
         ) : workspaceMode === 'edit' && selectedEntity ? (
@@ -381,7 +447,11 @@ export default function CommercialMapPage() {
               </div>
             ) : (
               <>
-                <CommercialSummary lots={scopedData.lots} scope={areaScope} />
+                <CommercialSummary
+                  lots={summaryLots}
+                  scope={areaScope}
+                  segmentName={activeSegment?.name}
+                />
                 <MapToolbar permissions={permissions} hasSelection={Boolean(selectedEntity)} areaScope={areaScope} />
                 <StatusLegend scope={areaScope} />
               </>

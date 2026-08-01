@@ -9,6 +9,7 @@ import type {
   MapWorkspaceMode,
   VerificationStatus,
 } from '../types';
+import type { CommercialMapSegmentId } from '../data/commercialMapSegments';
 
 export interface CommercialMapCameraView {
   position: [number, number, number];
@@ -33,6 +34,7 @@ interface CommercialMapState {
   workspaceMode: MapWorkspaceMode;
   cameraPreset: CameraPreset;
   cameraSequence: number;
+  activeSegmentId: CommercialMapSegmentId | null;
   referenceVisible: boolean;
   referenceOpacity: number;
   labelsVisible: boolean;
@@ -60,6 +62,8 @@ interface CommercialMapState {
   setActivePanel: (panel: MapPanel) => void;
   setWorkspaceMode: (mode: MapWorkspaceMode) => void;
   requestCameraPreset: (preset: CameraPreset) => void;
+  requestSegmentFocus: (segmentId: CommercialMapSegmentId) => void;
+  clearSegmentFocus: () => void;
   focusSelection: () => void;
   setReferenceVisible: (visible: boolean) => void;
   setReferenceOpacity: (opacity: number) => void;
@@ -87,6 +91,7 @@ export const useCommercialMapStore = create<CommercialMapState>((set) => ({
   workspaceMode: '3d',
   cameraPreset: 'overview',
   cameraSequence: 0,
+  activeSegmentId: null,
   referenceVisible: true,
   referenceOpacity: 0.18,
   labelsVisible: true,
@@ -145,6 +150,7 @@ export const useCommercialMapStore = create<CommercialMapState>((set) => ({
     locationFilter: null,
     verificationFilters: [],
     sortOrder: 'relevance',
+    activeSegmentId: null,
   }),
   selectEntityFromExplorer: (selectedEntityId) => set((state) => ({
     selectedEntityId,
@@ -178,6 +184,21 @@ export const useCommercialMapStore = create<CommercialMapState>((set) => ({
     workspaceMode: '3d',
     interiorEntityId: null,
     interiorReturnView: null,
+  })),
+  requestSegmentFocus: (activeSegmentId) => set((state) => ({
+    activeSegmentId,
+    selectedEntityId: null,
+    hoveredEntityId: null,
+    activePanel: null,
+    workspaceMode: state.workspaceMode === 'list' ? 'list' : '3d',
+    interiorEntityId: null,
+    interiorReturnView: null,
+    cameraNavigating: false,
+    cameraSequence: state.workspaceMode === 'list' ? state.cameraSequence : state.cameraSequence + 1,
+  })),
+  clearSegmentFocus: () => set((state) => ({
+    activeSegmentId: null,
+    cameraSequence: state.workspaceMode === 'list' ? state.cameraSequence : state.cameraSequence + 1,
   })),
   focusSelection: () => set((state) => ({ cameraSequence: state.cameraSequence + 1, workspaceMode: '3d' })),
   setReferenceVisible: (referenceVisible) => set({ referenceVisible }),

@@ -354,6 +354,7 @@ function ResultCard({
     item.locationLabel,
     item.lot ? STATUS_CONFIG[item.lot.status].label : 'Não comercial',
     item.companyLabel,
+    item.segment?.name,
   ].filter(Boolean).join(', ');
 
   return (
@@ -385,6 +386,12 @@ function ResultCard({
         {item.locationLabel && <span className="commercial-map-result-location"><MapPinned aria-hidden="true" />{item.locationLabel}</span>}
         <span className="commercial-map-result-meta">
           <EntityStatusBadge item={item} />
+          {item.segment && (
+            <small className="commercial-map-segment-tag">
+              <i style={{ background: item.segment.palette.surface }} aria-hidden="true" />
+              {item.segment.name}
+            </small>
+          )}
           {item.companyLabel && <small>{item.companyLabel}</small>}
           {area && <small>{number.format(area)} m²</small>}
         </span>
@@ -537,7 +544,16 @@ const EntityTable = memo(function EntityTable({ items, selectedEntityId, density
               <td data-label="Entidade">
                 <div className="commercial-map-table-identity">
                   <span className="commercial-map-entity-type-mark" aria-hidden="true">{classificationInitial(item.entity.classification)}</span>
-                  <span><strong>{item.metadata.officialDisplayName}</strong><small>{item.entity.publicIdentifier}</small></span>
+                  <span>
+                    <strong>{item.metadata.officialDisplayName}</strong>
+                    <small>{item.entity.publicIdentifier}</small>
+                    {item.segment && (
+                      <small className="commercial-map-segment-tag">
+                        <i style={{ background: item.segment.palette.surface }} aria-hidden="true" />
+                        {item.segment.name}
+                      </small>
+                    )}
+                  </span>
                 </div>
               </td>
               <td data-label="Tipo"><span className="commercial-map-table-type">{CLASSIFICATION_LABELS[item.entity.classification]}</span></td>

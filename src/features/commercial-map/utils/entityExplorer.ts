@@ -8,6 +8,10 @@ import type {
   VerificationStatus,
 } from '../types';
 import { normalizeMapEntityMetadata, type NormalizedMapMetadata } from './mapMetadata';
+import {
+  buildCommercialMapSegmentIndex,
+  type CommercialMapSegmentDefinition,
+} from '../data/commercialMapSegments';
 
 const collator = new Intl.Collator('pt-BR', { numeric: true, sensitivity: 'base' });
 
@@ -67,6 +71,7 @@ export interface EntityExplorerItem {
   entity: MapEntity;
   lot?: CommercialLot;
   metadata: NormalizedMapMetadata;
+  segment: CommercialMapSegmentDefinition | null;
   locationLabel: string | null;
   locationDetail: string | null;
   locationFacets: EntityLocationFacet[];
@@ -148,10 +153,12 @@ function buildLocation(
 
 export function buildEntityExplorerIndex(entities: MapEntity[], lots: CommercialLot[]): EntityExplorerItem[] {
   const lotByEntity = new Map(lots.map((lot) => [lot.entityId, lot]));
+  const segmentByEntity = buildCommercialMapSegmentIndex(entities, lots);
 
   return entities.map((entity) => {
     const lot = lotByEntity.get(entity.id);
     const metadata = normalizeMapEntityMetadata(entity, lot);
+    const segment = segmentByEntity.get(entity.id) ?? null;
     const location = buildLocation(entity, lot, metadata);
     const commercialStatus = lot?.status ?? 'NOT_COMMERCIAL';
     const statusLabel = lot ? STATUS_CONFIG[lot.status].label : 'Não comercial';
@@ -183,6 +190,8 @@ export function buildEntityExplorerIndex(entities: MapEntity[], lots: Commercial
       statusLabel,
       entity.description,
       lot?.description,
+      segment?.name,
+      segment?.code,
     ]);
     const haystack = [...new Set([
       ...identifiers,
@@ -197,6 +206,7 @@ export function buildEntityExplorerIndex(entities: MapEntity[], lots: Commercial
       entity,
       lot,
       metadata,
+      segment,
       ...location,
       companyLabel: lot?.currentBuyer ?? null,
       commercialStatus,

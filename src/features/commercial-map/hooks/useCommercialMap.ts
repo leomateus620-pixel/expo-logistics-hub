@@ -35,6 +35,7 @@ import {
   type EntityExplorerItem,
 } from '../utils/entityExplorer';
 import { resolveMapPermissions } from '../utils/permissions';
+import { getCommercialMapSegment, withCommercialMapSegments } from '../data/commercialMapSegments';
 
 const MAP_ERROR_MESSAGES: Record<string, string> = {
   MAP_PERMISSION_DENIED: 'Você não possui permissão para concluir esta operação.',
@@ -89,6 +90,7 @@ export function useCommercialMap() {
   const query = useQuery({
     queryKey: ['commercial-map', orgId],
     queryFn: () => fetchCommercialMap(orgId!),
+    select: withCommercialMapSegments,
     enabled: Boolean(orgId),
     staleTime: 30_000,
     retry: 1,
@@ -139,16 +141,24 @@ export function useMapEntityFilter(entities: MapEntity[], lots: CommercialLot[])
   const verificationFilters = useCommercialMapStore((state) => state.verificationFilters);
   const sortOrder = useCommercialMapStore((state) => state.sortOrder);
   const layerVisibility = useCommercialMapStore((state) => state.layerVisibility);
+  const activeSegmentId = useCommercialMapStore((state) => state.activeSegmentId);
+  const activeSegment = getCommercialMapSegment(activeSegmentId);
   const debouncedSearch = useDebouncedValue(search, 140);
   const indexedItems = useMemo(() => buildEntityExplorerIndex(entities, lots), [entities, lots]);
   const visibleItems = useMemo(
     () => indexedItems.filter((item) => layerVisibility[item.entity.layerId] !== false),
     [indexedItems, layerVisibility],
   );
-  const facets = useMemo(() => buildEntityExplorerFacets(visibleItems), [visibleItems]);
+  const segmentItems = useMemo(
+    () => activeSegment?.behavior.interaction === 'filter-and-focus'
+      ? visibleItems.filter((item) => item.segment?.id === activeSegmentId)
+      : visibleItems,
+    [activeSegment?.behavior.interaction, activeSegmentId, visibleItems],
+  );
+  const facets = useMemo(() => buildEntityExplorerFacets(segmentItems), [segmentItems]);
 
   const stableResult = useMemo(() => {
-    const filteredItems = filterAndSortEntityExplorerItems(visibleItems, {
+    const filteredItems = filterAndSortEntityExplorerItems(segmentItems, {
       query: debouncedSearch,
       statusFilters,
       classificationFilters,
@@ -168,12 +178,13 @@ export function useMapEntityFilter(entities: MapEntity[], lots: CommercialLot[])
         || classificationFilters.length
         || locationFilter
         || verificationFilters.length
+        || activeSegmentId
       ),
       totalCount: visibleItems.length,
       filteredCount: filteredItems.length,
       facets,
     };
-  }, [classificationFilters, debouncedSearch, facets, locationFilter, sortOrder, statusFilters, verificationFilters, visibleItems]);
+  }, [activeSegmentId, classificationFilters, debouncedSearch, facets, locationFilter, segmentItems, sortOrder, statusFilters, verificationFilters, visibleItems.length]);
 
   return stableResult;
 }

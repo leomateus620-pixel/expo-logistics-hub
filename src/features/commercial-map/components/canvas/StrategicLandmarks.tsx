@@ -17,6 +17,7 @@ import {
 } from '../../utils/landmarks';
 import { LivestockPavilion } from './LivestockPavilion';
 import { MirantePavilion } from './MirantePavilion';
+import type { CommercialMapSegmentDefinition } from '../../data/commercialMapSegments';
 
 const NO_RAYCAST = () => undefined;
 const MAP_BACKGROUND_COLOR = new THREE.Color('#dfe8de');
@@ -235,6 +236,7 @@ function useLandmarkMaterials(
   toneDown: number,
   selected: boolean,
   hovered: boolean,
+  segment: CommercialMapSegmentDefinition | null,
 ): LandmarkMaterialSet {
   const invalidate = useThree((state) => state.invalidate);
   const materials = useMemo<LandmarkMaterialSet>(() => {
@@ -277,13 +279,28 @@ function useLandmarkMaterials(
     (Object.keys(materials) as Array<keyof LandmarkMaterialSet>).forEach((key) => {
       const item = materials[key];
       const baseColor = new THREE.Color(palette[key]);
+      if (segment) {
+        const tintWeight: Record<keyof LandmarkMaterialSet, number> = {
+          wall: 0.34,
+          accent: 0.5,
+          roof: 0.28,
+          trim: 0.2,
+          dark: 0.08,
+          glass: 0.12,
+          green: 0.18,
+          white: 0.14,
+          platform: 0.3,
+          metal: 0.12,
+        };
+        baseColor.lerp(new THREE.Color(segment.palette.surface), tintWeight[key]);
+      }
       item.color.copy(baseColor).lerp(MAP_BACKGROUND_COLOR, THREE.MathUtils.clamp(toneDown, 0, 0.9) * 0.82);
       if (selected) item.color.lerp(new THREE.Color('#fff1bd'), 0.06);
       item.emissive.copy(baseColor);
       item.emissiveIntensity = selected ? 0.04 : hovered ? 0.012 : 0;
     });
     invalidate();
-  }, [hovered, invalidate, kind, materials, selected, toneDown]);
+  }, [hovered, invalidate, kind, materials, segment, selected, toneDown]);
 
   useEffect(() => () => {
     Object.values(materials).forEach((item) => item.dispose());
@@ -2398,6 +2415,7 @@ interface LandmarkModelProps {
 
 export interface StrategicLandmarkMeshProps {
   entity: MapEntity;
+  segment: CommercialMapSegmentDefinition | null;
   selected: boolean;
   hovered: boolean;
   filtersActive: boolean;
@@ -2413,6 +2431,7 @@ export interface StrategicLandmarkMeshProps {
 
 export function StrategicLandmarkMesh({
   entity,
+  segment,
   selected,
   hovered,
   filtersActive,
@@ -2436,7 +2455,18 @@ export function StrategicLandmarkMesh({
   const outline = useMemo(() => createLocalFootprintOutline(entity, bounds), [bounds, entity]);
   const filterStrength = filtersActive && !isMatch && !selected ? 0.42 : 1;
   const toneDown = 1 - THREE.MathUtils.clamp(layerOpacity * filterStrength, 0, 1);
-  const materials = useLandmarkMaterials(kind ?? 'german-pavilion', toneDown, selected, hovered);
+  const materials = useLandmarkMaterials(kind ?? 'german-pavilion', toneDown, selected, hovered, segment);
+  const segmentOutlineColor = useMemo(() => (
+    segment
+      ? new THREE.Color(segment.palette.edge).lerp(MAP_BACKGROUND_COLOR, toneDown * 0.82)
+      : null
+  ), [segment, toneDown]);
+  const segmentOutlineMaterial = useMemo(() => segment ? new THREE.LineBasicMaterial({
+    color: segment.palette.edge,
+    transparent: true,
+    opacity: 0.86,
+    toneMapped: false,
+  }) : null, [segment]);
   const { showDetail, showFocusDetail } = useArchitecturalDetail(
     kind ?? 'german-pavilion',
     bounds,
@@ -2460,6 +2490,16 @@ export function StrategicLandmarkMesh({
     hitVolume.dispose();
     outline.dispose();
   }, [footprint, hitVolume, outline]);
+
+  useEffect(() => () => segmentOutlineMaterial?.dispose(), [segmentOutlineMaterial]);
+
+  useEffect(() => {
+    if (!segmentOutlineMaterial || !segmentOutlineColor) return;
+    segmentOutlineMaterial.color.copy(segmentOutlineColor);
+    segmentOutlineMaterial.opacity = THREE.MathUtils.clamp(layerOpacity * filterStrength * 0.86, 0, 0.86);
+    segmentOutlineMaterial.needsUpdate = true;
+    invalidate();
+  }, [filterStrength, invalidate, layerOpacity, segmentOutlineColor, segmentOutlineMaterial]);
 
   useEffect(() => {
     gl.shadowMap.needsUpdate = true;
@@ -2527,6 +2567,15 @@ export function StrategicLandmarkMesh({
         {kind === 'fenasoja-restaurant' && <FenasojaRestaurant {...modelProps} />}
         {kind === 'sicredi-arena' && <SicrediArena {...modelProps} />}
       </group>
+      {segment && !selected && !hovered && (
+        <lineSegments
+          geometry={outline}
+          material={segmentOutlineMaterial!}
+          raycast={NO_RAYCAST}
+          renderOrder={3}
+          dispose={null}
+        />
+      )}
       {(selected || hovered) && (
         <>
           <mesh

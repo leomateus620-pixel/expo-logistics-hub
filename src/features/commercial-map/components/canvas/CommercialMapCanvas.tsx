@@ -40,6 +40,12 @@ import { LivestockPavilionInteriorScene } from './LivestockPavilionInteriorScene
 import { RoadInfrastructure } from './RoadInfrastructure';
 import { StrategicLandmarkMesh } from './StrategicLandmarks';
 import { TechnicalValidationOverlay } from './TechnicalValidationOverlay';
+import {
+  buildCommercialMapSegmentIndex,
+  getCommercialMapSegment,
+  isSegmentTintClassification,
+  type CommercialMapSegmentDefinition,
+} from '../../data/commercialMapSegments';
 
 const MiranteInteriorScene = lazy(async () => {
   const module = await import('./MiranteInteriorScene');
@@ -73,6 +79,9 @@ const NO_RAYCAST = () => undefined;
 const LABEL_LEVEL_RANK: Record<MapLabelVisibility, number> = { far: 0, medium: 1, near: 2 };
 const MAP_BACKGROUND_COLOR = new THREE.Color('#dfe8de');
 const AREA_NUMBER = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const SEGMENT_LOT_SURFACE_WEIGHT = 0.94;
+const STATUS_MARK_LONG_RATIO = 0.34;
+const STATUS_MARK_SHORT_RATIO = 0.09;
 
 function createGateArrowGeometry() {
   const shape = new THREE.Shape();
@@ -394,6 +403,7 @@ function quadraLabel(value: string) {
 
 interface EntityMeshProps {
   entity: MapEntity;
+  segment: CommercialMapSegmentDefinition | null;
   selected: boolean;
   hovered: boolean;
   filtersActive: boolean;
@@ -410,6 +420,7 @@ interface EntityMeshProps {
 
 const GenericEntityMesh = memo(function GenericEntityMesh({
   entity,
+  segment,
   selected,
   hovered,
   filtersActive,
@@ -442,7 +453,9 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
     sceneCenter[1] - markerCenter[1],
   ), [markerCenter, sceneCenter]);
   const gateAccessMode = useMemo(() => resolveGateAccessMode(entity.name), [entity.name]);
-  const baseColor = CLASSIFICATION_COLORS[entity.classification] ?? '#78907d';
+  const baseColor = segment && isSegmentTintClassification(entity.classification)
+    ? segment.palette.surface
+    : CLASSIFICATION_COLORS[entity.classification] ?? '#78907d';
   const matched = Boolean(filtersActive && isMatch);
   const filterStrength = filtersActive && !isMatch && !selected ? 0.42 : 1;
   const visualOpacity = selected ? Math.max(0.94, layerOpacity) : layerOpacity * filterStrength;
@@ -461,12 +474,17 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
     : hovered && isInteractive
       ? '#f0d36a'
       : isQuadra
-        ? '#3f7b4d'
+        ? segment?.palette.edge ?? '#3f7b4d'
         : isRoad
           ? '#7c857f'
           : isPavilion
-            ? '#21313a'
+            ? segment?.palette.edge ?? '#21313a'
             : '#1f3327';
+  const displayOutlineColor = useMemo(() => {
+    if (!solidRendering || selected || hovered) return outlineColor;
+    const strength = THREE.MathUtils.clamp(layerOpacity * filterStrength, 0, 1);
+    return `#${new THREE.Color(outlineColor).lerp(MAP_BACKGROUND_COLOR, (1 - strength) * 0.82).getHexString()}`;
+  }, [filterStrength, hovered, layerOpacity, outlineColor, selected, solidRendering]);
 
   useEffect(() => () => {
     geometry?.dispose();
@@ -603,7 +621,7 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
           renderOrder={selected ? 4 : solidRendering ? 2 : 1}
         >
           <lineBasicMaterial
-            color={outlineColor}
+            color={displayOutlineColor}
             transparent={!solidRendering}
             opacity={solidRendering ? 1 : selected ? 1 : Math.min(isQuadra ? 0.82 : isRoad ? 0.42 : 0.72, visualOpacity)}
             depthTest
@@ -642,6 +660,7 @@ const EntityMesh = memo(function EntityMesh(props: EntityMeshProps) {
     return (
       <StrategicLandmarkMesh
         entity={props.entity}
+        segment={props.segment}
         selected={props.selected}
         hovered={props.hovered}
         filtersActive={props.filtersActive}
@@ -664,9 +683,18 @@ interface LotEntry {
   lot: CommercialLot;
 }
 
-function lotColor(entry: LotEntry, filtersActive: boolean, isMatch: boolean, selected: boolean, hovered: boolean) {
+function lotColor(
+  entry: LotEntry,
+  segment: CommercialMapSegmentDefinition | null,
+  filtersActive: boolean,
+  isMatch: boolean,
+  selected: boolean,
+  hovered: boolean,
+) {
   const status = STATUS_CONFIG[entry.lot.status];
-  const color = new THREE.Color(status.color);
+  const color = segment
+    ? new THREE.Color(status.color).lerp(new THREE.Color(segment.palette.surface), SEGMENT_LOT_SURFACE_WEIGHT)
+    : new THREE.Color(status.color);
   if (filtersActive && !isMatch && !selected) color.lerp(new THREE.Color('#c7d1c9'), 0.76);
   if (hovered) color.lerp(new THREE.Color('#ffffff'), 0.1);
   if (selected) color.lerp(new THREE.Color('#fff4b8'), 0.14);
@@ -694,6 +722,102 @@ function LotSelectionOutline({ entity }: { entity: MapEntity }) {
   );
 }
 
+function SegmentLotAccents({
+  entries,
+  segmentByEntity,
+  matchingEntityIds,
+  filtersActive,
+  layerOpacity,
+}: {
+  entries: LotEntry[];
+  segmentByEntity: ReadonlyMap<string, CommercialMapSegmentDefinition>;
+  matchingEntityIds: ReadonlySet<string>;
+  filtersActive: boolean;
+  layerOpacity: Record<string, number>;
+}) {
+  const invalidate = useThree((state) => state.invalidate);
+  const accents = useMemo(() => {
+    const accentedEntries = entries.filter((entry) => segmentByEntity.has(entry.entity.id));
+    if (accentedEntries.length === 0) return null;
+    const geometry = new THREE.BoxGeometry(1, 1, 1);
+    const material = new THREE.MeshStandardMaterial({
+      color: '#ffffff',
+      roughness: 0.66,
+      metalness: 0.04,
+    });
+    const mesh = new THREE.InstancedMesh(geometry, material, accentedEntries.length);
+    const matrix = new THREE.Matrix4();
+    const position = new THREE.Vector3();
+    const scale = new THREE.Vector3();
+    const quaternion = new THREE.Quaternion();
+
+    accentedEntries.forEach(({ entity }, index) => {
+      const ring = withoutClosingPoint(entity.geometry.coordinates[0] ?? []);
+      const xs = ring.map(([x]) => x);
+      const zs = ring.map(([, z]) => z);
+      const width = ring.length > 0
+        ? Math.max(0.12, Math.max(...xs) - Math.min(...xs))
+        : 0.12;
+      const depth = ring.length > 0
+        ? Math.max(0.12, Math.max(...zs) - Math.min(...zs))
+        : 0.12;
+      const horizontal = width >= depth;
+      const [centerX, centerZ] = geometryCentroid(entity.geometry);
+      position.set(
+        centerX,
+        entity.geometry.elevation + Math.max(0.025, entity.geometry.extrusionHeight) + 0.024,
+        centerZ,
+      );
+      scale.set(
+        horizontal ? Math.max(0.14, width * STATUS_MARK_LONG_RATIO) : Math.max(0.06, width * STATUS_MARK_SHORT_RATIO),
+        0.028,
+        horizontal ? Math.max(0.06, depth * STATUS_MARK_SHORT_RATIO) : Math.max(0.14, depth * STATUS_MARK_LONG_RATIO),
+      );
+      matrix.compose(position, quaternion, scale);
+      mesh.setMatrixAt(index, matrix);
+    });
+    mesh.instanceMatrix.needsUpdate = true;
+    mesh.castShadow = false;
+    mesh.receiveShadow = false;
+    mesh.renderOrder = 3;
+    return { accentedEntries, geometry, material, mesh };
+  }, [entries, segmentByEntity]);
+
+  useEffect(() => () => {
+    accents?.mesh.dispose?.();
+    accents?.geometry.dispose();
+    accents?.material.dispose();
+  }, [accents]);
+
+  useEffect(() => {
+    if (!accents) return;
+    accents.accentedEntries.forEach(({ entity, lot }, index) => {
+      const segment = segmentByEntity.get(entity.id)!;
+      // Segment owns the lot surface; this roof band keeps commercial status visible as a second channel.
+      const color = new THREE.Color(STATUS_CONFIG[lot.status].color)
+        .lerp(new THREE.Color(segment.palette.accent), 0.08);
+      if (filtersActive && !matchingEntityIds.has(entity.id)) color.lerp(MAP_BACKGROUND_COLOR, 0.86);
+      accents.mesh.setColorAt(index, color);
+    });
+    if (accents.mesh.instanceColor) accents.mesh.instanceColor.needsUpdate = true;
+    invalidate();
+  }, [accents, filtersActive, invalidate, matchingEntityIds, segmentByEntity]);
+
+  useEffect(() => {
+    if (!accents) return;
+    const opacity = entries.length > 0 ? (layerOpacity[entries[0].entity.layerId] ?? 1) : 1;
+    accents.material.opacity = opacity;
+    accents.material.transparent = opacity < 0.995;
+    accents.material.depthWrite = opacity > 0.42;
+    accents.material.needsUpdate = true;
+    invalidate();
+  }, [accents, entries, invalidate, layerOpacity]);
+
+  return accents
+    ? <primitive object={accents.mesh} raycast={NO_RAYCAST} dispose={null} />
+    : null;
+}
+
 function BatchedLots({
   entries,
   selectedEntityId,
@@ -701,6 +825,7 @@ function BatchedLots({
   matchingEntityIds,
   filtersActive,
   layerOpacity,
+  segmentByEntity,
   onSelect,
   onHover,
   onFocus,
@@ -713,6 +838,7 @@ function BatchedLots({
   matchingEntityIds: ReadonlySet<string>;
   filtersActive: boolean;
   layerOpacity: Record<string, number>;
+  segmentByEntity: ReadonlyMap<string, CommercialMapSegmentDefinition>;
   onSelect: (id: string) => void;
   onHover: (id: string | null) => void;
   onFocus: () => void;
@@ -749,13 +875,16 @@ function BatchedLots({
       const batchId = mesh.addInstance(geometryId);
       matrix.makeTranslation(0, entry.entity.geometry.elevation, 0);
       mesh.setMatrixAt(batchId, matrix);
-      mesh.setColorAt(batchId, new THREE.Color(STATUS_CONFIG[entry.lot.status].color));
+      const segment = segmentByEntity.get(entry.entity.id) ?? null;
+      mesh.setColorAt(batchId, lotColor(entry, segment, false, true, false, false));
       entityByBatchId.set(batchId, entry.entity.id);
       batchIdByEntity.set(entry.entity.id, batchId);
 
       const edgeGeometry = new THREE.EdgesGeometry(geometry, 28);
       const positions = edgeGeometry.getAttribute('position');
-      const borderColor = new THREE.Color(STATUS_CONFIG[entry.lot.status].border);
+      const borderColor = segment
+        ? new THREE.Color(segment.palette.edge).lerp(new THREE.Color(STATUS_CONFIG[entry.lot.status].border), 0.12)
+        : new THREE.Color(STATUS_CONFIG[entry.lot.status].border);
       for (let positionIndex = 0; positionIndex < positions.count; positionIndex += 1) {
         edgePositions.push(
           positions.getX(positionIndex),
@@ -778,7 +907,7 @@ function BatchedLots({
     mesh.castShadow = false;
     mesh.receiveShadow = true;
     return { mesh, material, edgeGeometry, entityByBatchId, batchIdByEntity, raycast: mesh.raycast };
-  }, [entries]);
+  }, [entries, segmentByEntity]);
 
   useEffect(() => () => {
     batch?.edgeGeometry.dispose();
@@ -796,10 +925,17 @@ function BatchedLots({
     const selected = currentSelection === entityId;
     const hovered = currentHover === entityId;
     const matrix = new THREE.Matrix4();
-    batch.mesh.setColorAt(batchId, lotColor(entry, filtersActive, matchingEntityIds.has(entityId), selected, hovered));
+    batch.mesh.setColorAt(batchId, lotColor(
+      entry,
+      segmentByEntity.get(entityId) ?? null,
+      filtersActive,
+      matchingEntityIds.has(entityId),
+      selected,
+      hovered,
+    ));
     matrix.makeTranslation(0, entry.entity.geometry.elevation + (selected ? 0.055 : hovered ? 0.035 : 0), 0);
     batch.mesh.setMatrixAt(batchId, matrix);
-  }, [batch, entryByEntity, filtersActive, matchingEntityIds]);
+  }, [batch, entryByEntity, filtersActive, matchingEntityIds, segmentByEntity]);
 
   useEffect(() => {
     if (!batch) return;
@@ -851,6 +987,13 @@ function BatchedLots({
 
   return (
     <>
+      <SegmentLotAccents
+        entries={entries}
+        segmentByEntity={segmentByEntity}
+        matchingEntityIds={matchingEntityIds}
+        filtersActive={filtersActive}
+        layerOpacity={layerOpacity}
+      />
       <primitive
         object={batch.mesh}
         raycast={batch.raycast}
@@ -884,7 +1027,16 @@ function BatchedLots({
         }}
       />
       <lineSegments geometry={batch.edgeGeometry} raycast={NO_RAYCAST}>
-        <lineBasicMaterial vertexColors transparent opacity={0.7} toneMapped={false} />
+        <lineBasicMaterial
+          vertexColors
+          transparent
+          opacity={Math.min(
+            0.7,
+            (entries.length > 0 ? layerOpacity[entries[0].entity.layerId] ?? 1 : 1)
+              * (filtersActive ? 0.46 : 0.7),
+          )}
+          toneMapped={false}
+        />
       </lineSegments>
       {selectedEntity && <LotSelectionOutline entity={selectedEntity} />}
     </>
@@ -1076,10 +1228,14 @@ function CameraRig({
   selectedEntity,
   extent,
   isolatedArea,
+  activeSegment,
+  activeSegmentEntities,
 }: {
   selectedEntity: MapEntity | null;
   extent: SceneExtent;
   isolatedArea?: 'exporural' | null;
+  activeSegment: CommercialMapSegmentDefinition | null;
+  activeSegmentEntities: MapEntity[];
 }) {
   const controlsRef = useRef<OrbitControlsImpl>(null);
   const { camera, size, invalidate, gl } = useThree();
@@ -1100,6 +1256,7 @@ function CameraRig({
   const previousPreset = useRef<CameraPreset>(preset);
   const previousSequence = useRef(cameraSequence);
   const previousSelection = useRef<string | null>(selectedEntity?.id ?? null);
+  const previousSegment = useRef(activeSegment?.id ?? null);
   const returnView = useRef(useCommercialMapStore.getState().interiorReturnView);
   const [reducedMotion, setReducedMotion] = useState(() => (
     typeof window !== 'undefined'
@@ -1258,9 +1415,51 @@ function CameraRig({
     startCameraMove();
   }, [activePanel, camera, extent, size.height, size.width, startCameraMove]);
 
+  const queueSegment = useCallback((segment: CommercialMapSegmentDefinition, segmentEntities: MapEntity[]) => {
+    if (segmentEntities.length === 0) {
+      queuePreset(preset);
+      return;
+    }
+    const perspective = camera as THREE.PerspectiveCamera;
+    const segmentExtent = getSceneExtent(segmentEntities);
+    const aspect = size.width / Math.max(size.height, 1);
+    const direction = preset === 'top'
+      ? new THREE.Vector3(0, 1, 0.001)
+      : preset === 'isometric'
+        ? new THREE.Vector3(0.64, 0.58, 0.64)
+        : new THREE.Vector3(...segment.camera.direction);
+    direction.normalize();
+    const lookAt = new THREE.Vector3(
+      segmentExtent.centerX,
+      Math.min(segmentExtent.maxHeight * 0.16, 1.4),
+      segmentExtent.centerZ,
+    );
+    const fittedDistance = fitDistanceForDirection(
+      segmentExtent,
+      perspective.fov || 38,
+      aspect,
+      direction,
+      segment.camera.padding * (preset === 'top' ? 1.04 : preset === 'isometric' ? 0.96 : 1),
+    );
+    const distance = THREE.MathUtils.clamp(
+      fittedDistance,
+      Math.max(10, segmentExtent.diagonal * segment.camera.minDistanceRatio),
+      Math.max(72, segmentExtent.diagonal * segment.camera.maxDistanceRatio),
+    );
+    targetLookAt.current.copy(lookAt);
+    targetPosition.current.copy(lookAt).add(direction.multiplyScalar(distance));
+    perspective.fov = 38;
+    perspective.near = Math.max(0.04, distance / 1600);
+    perspective.far = Math.max(720, extent.diagonal * 9, distance * 4);
+    perspective.updateProjectionMatrix();
+    startCameraMove();
+  }, [camera, extent.diagonal, preset, queuePreset, size.height, size.width, startCameraMove]);
+
   useEffect(() => {
     const selectedId = selectedEntity?.id ?? null;
     const selectionChanged = selectedId !== previousSelection.current;
+    const segmentId = activeSegment?.id ?? null;
+    const segmentChanged = segmentId !== previousSegment.current;
     const presetChanged = preset !== previousPreset.current;
     const sequenceChanged = cameraSequence !== previousSequence.current;
 
@@ -1281,12 +1480,18 @@ function CameraRig({
         useCommercialMapStore.getState().setInteriorReturnView(null);
         invalidate();
       } else if (selectedEntity) queueSelection(selectedEntity);
+      else if (activeSegment) queueSegment(activeSegment, activeSegmentEntities);
       else queuePreset(preset);
       initialized.current = true;
     } else if (presetChanged) {
-      queuePreset(preset);
+      if (activeSegment) queueSegment(activeSegment, activeSegmentEntities);
+      else queuePreset(preset);
+    } else if (segmentChanged) {
+      if (activeSegment) queueSegment(activeSegment, activeSegmentEntities);
+      else queuePreset(preset);
     } else if (sequenceChanged) {
       if (selectedEntity) queueSelection(selectedEntity);
+      else if (activeSegment) queueSegment(activeSegment, activeSegmentEntities);
       else queuePreset(preset);
     } else if (selectionChanged && selectedEntity) {
       queueSelection(selectedEntity);
@@ -1299,7 +1504,20 @@ function CameraRig({
     previousSelection.current = selectedId;
     previousPreset.current = preset;
     previousSequence.current = cameraSequence;
-  }, [camera, cameraSequence, extent.diagonal, invalidate, preset, queuePreset, queueSelection, selectedEntity]);
+    previousSegment.current = segmentId;
+  }, [
+    activeSegment,
+    activeSegmentEntities,
+    camera,
+    cameraSequence,
+    extent.diagonal,
+    invalidate,
+    preset,
+    queuePreset,
+    queueSegment,
+    queueSelection,
+    selectedEntity,
+  ]);
 
   const clampTarget = useCallback(() => {
     const controls = controlsRef.current;
@@ -1391,13 +1609,20 @@ function CameraRig({
   const selectedKind = selectedEntity ? resolveStrategicLandmarkKind(selectedEntity) : null;
   const miranteSelected = selectedKind === 'mirante-pavilion';
   const miranteExtent = miranteSelected && selectedEntity ? getEntityExtent(selectedEntity) : null;
+  const segmentExtent = activeSegment && activeSegmentEntities.length > 0
+    ? getSceneExtent(activeSegmentEntities)
+    : null;
   const miranteMinimumDistance = miranteExtent
     ? Math.max(7.5, miranteExtent.diagonal * 0.8)
+    : segmentExtent && activeSegment
+      ? Math.max(6.5, segmentExtent.diagonal * activeSegment.camera.minDistanceRatio)
     : isolatedArea === 'exporural'
       ? Math.max(6.5, extent.diagonal * 0.12)
       : Math.max(8, extent.diagonal * 0.055);
   const miranteMaximumDistance = miranteExtent
     ? Math.max(30, miranteExtent.diagonal * 4)
+    : segmentExtent && activeSegment
+      ? Math.max(96, segmentExtent.diagonal * activeSegment.camera.maxDistanceRatio)
     : isolatedArea === 'exporural'
       ? Math.max(96, extent.diagonal * 2.15)
       : Math.max(260, extent.diagonal * 4.5);
@@ -1447,6 +1672,7 @@ function Scene({
   const reducedGraphics = useCommercialMapStore((state) => state.reducedGraphics);
   const cameraNavigating = useCommercialMapStore((state) => state.cameraNavigating);
   const technicalValidationVisible = useCommercialMapStore((state) => state.technicalValidationVisible);
+  const activeSegmentId = useCommercialMapStore((state) => state.activeSegmentId);
   const { gl, invalidate } = useThree();
   const setCanvasCursor = useCallback((cursor: 'grab' | 'grabbing' | 'pointer') => {
     gl.domElement.style.cursor = cursor;
@@ -1454,6 +1680,24 @@ function Scene({
   const extent = useMemo(() => getSceneExtent(entities), [entities]);
   const sceneCenter = useMemo(() => [extent.centerX, extent.centerZ] as const, [extent.centerX, extent.centerZ]);
   const lotByEntity = useMemo(() => new Map(lots.map((lot) => [lot.entityId, lot])), [lots]);
+  const resolvedSegmentByEntity = useMemo(
+    () => buildCommercialMapSegmentIndex(entities, lots),
+    [entities, lots],
+  );
+  const requestedSegment = getCommercialMapSegment(activeSegmentId);
+  const activeSegment = requestedSegment?.behavior.interaction === 'filter-and-focus'
+    ? requestedSegment
+    : null;
+  const segmentByEntity = useMemo(() => {
+    if ([...resolvedSegmentByEntity.values()].every((segment) => segment.behavior.visibleByDefault)) {
+      return resolvedSegmentByEntity;
+    }
+    return new Map(
+      [...resolvedSegmentByEntity].filter(([, segment]) => (
+        segment.behavior.visibleByDefault || segment.id === activeSegmentId
+      )),
+    );
+  }, [activeSegmentId, resolvedSegmentByEntity]);
   const selectedEntity = entities.find((entity) => entity.id === selectedEntityId) ?? null;
   const interiorEntity = entities.find((entity) => (
     entity.id === interiorEntityId && strategicLandmarkSupportsInterior(entity)
@@ -1475,6 +1719,12 @@ function Scene({
   const structuralEntities = useMemo(() => nonLotEntities.filter((entity) => (
     entity.classification !== 'ROAD' && entity.classification !== 'PEDESTRIAN_PATH'
   )), [nonLotEntities]);
+  const activeSegmentEntities = useMemo(
+    () => activeSegment
+      ? renderedEntities.filter((entity) => segmentByEntity.get(entity.id)?.id === activeSegment.id)
+      : [],
+    [activeSegment, renderedEntities, segmentByEntity],
+  );
   const labelVisibility = useSemanticLabelVisibility({
     entities: renderedEntities,
     lotByEntity,
@@ -1564,6 +1814,7 @@ function Scene({
         matchingEntityIds={matchingEntityIds}
         filtersActive={filtersActive}
         layerOpacity={layerOpacity}
+        segmentByEntity={segmentByEntity}
         onSelect={setSelectedEntityId}
         onHover={setHoveredEntityId}
         onFocus={focusSelection}
@@ -1574,6 +1825,7 @@ function Scene({
         <EntityMesh
           key={entity.id}
           entity={entity}
+          segment={segmentByEntity.get(entity.id) ?? null}
           selected={selectedEntityId === entity.id}
           hovered={hoveredEntityId === entity.id}
           filtersActive={filtersActive}
@@ -1609,7 +1861,13 @@ function Scene({
             lots={lots}
           />
         )}
-      <CameraRig selectedEntity={selectedEntity} extent={extent} isolatedArea={isolatedArea} />
+      <CameraRig
+        selectedEntity={selectedEntity}
+        extent={extent}
+        isolatedArea={isolatedArea}
+        activeSegment={activeSegment}
+        activeSegmentEntities={activeSegmentEntities}
+      />
       <AdaptiveDpr pixelated={reducedGraphics} />
       <Preload all />
     </>

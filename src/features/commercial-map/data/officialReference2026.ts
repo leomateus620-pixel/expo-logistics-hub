@@ -25,6 +25,7 @@ import {
   getExporuralReference,
   sourcePolygonAreaSqm,
 } from './exporuralReference2026';
+import { withCommercialMapSegmentMetadata } from './commercialMapSegments';
 
 type PdfPoint = [number, number];
 type PdfPolygon = PdfPoint[];
@@ -616,7 +617,7 @@ function toEntity(input: ReferenceEntityInput): MapEntity {
   };
 }
 
-export const OFFICIAL_REFERENCE_ENTITIES = entityInputs.map(toEntity);
+export const OFFICIAL_REFERENCE_ENTITIES = entityInputs.map(toEntity).map(withCommercialMapSegmentMetadata);
 
 const officialLotEntities = OFFICIAL_REFERENCE_ENTITIES.filter((entity) => entity.classification === 'SELLABLE_LOT');
 
