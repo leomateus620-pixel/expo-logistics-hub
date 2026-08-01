@@ -108,46 +108,19 @@ describe('CommissionPortalPage', () => {
     expect(container.querySelector('[data-testid="portal-soybean"]')).toBeInTheDocument();
     const roots = [...container.querySelectorAll('[data-portal-root]')];
     expect(roots).toHaveLength(5);
-    expect(roots.every((root) => root.getAttribute('d')?.startsWith('M560 9'))).toBe(true);
-    const rootScenes = [...container.querySelectorAll('[data-root-scene]')];
-    expect(rootScenes).toHaveLength(4);
-    expect(rootScenes.map((scene) => scene.getAttribute('data-root-between'))).toEqual(['1-2', '2-3', '3-4', '4-5']);
-    expect(rootScenes.map((scene) => scene.getAttribute('clip-path'))).toEqual([
-      'url(#portal-root-zone-planting)',
-      'url(#portal-root-zone-cultivation)',
-      'url(#portal-root-zone-harvest)',
-      'url(#portal-root-zone-world)',
-    ]);
-    const rootZones = [...container.querySelectorAll('[data-root-zone-boundary]')];
-    expect(rootZones.map((zone) => zone.getAttribute('data-root-zone-boundary'))).toEqual(['1-2', '2-3', '3-4', '4-5']);
-    expect(rootZones.every((zone) => zone.getAttribute('d')?.startsWith('M560 9'))).toBe(true);
-    const illustrationLayer = container.querySelector('[data-root-illustrations]');
-    expect(illustrationLayer).not.toBeNull();
-    expect(illustrationLayer?.textContent?.trim()).toBe('');
-    expect(illustrationLayer?.querySelectorAll('text, image')).toHaveLength(0);
+    expect(roots.every((root) => root.getAttribute('d')?.startsWith('M560 8'))).toBe(true);
+    expect(container.querySelectorAll('[data-root-layer="halo"] path')).toHaveLength(5);
+    expect(container.querySelectorAll('[data-root-layer="core"] [data-portal-root]')).toHaveLength(5);
+    expect(container.querySelector('[data-root-illustrations]')).not.toBeInTheDocument();
+    expect(container.querySelector('[data-root-scene]')).not.toBeInTheDocument();
+    expect(container.querySelector('[data-world-soybean]')).not.toBeInTheDocument();
+    expect(container.querySelector('animateMotion')).not.toBeInTheDocument();
+    expect(container.querySelector('.portal-soybean__roots image')).not.toBeInTheDocument();
+    expect(container.querySelector('.portal-soybean__roots text')).not.toBeInTheDocument();
     expect(screen.queryByText('Da terra para o mundo')).not.toBeInTheDocument();
     expect(screen.queryByText('Plantio de precisão')).not.toBeInTheDocument();
-    expect(screen.getByTestId('portal-world-map')).toBeInTheDocument();
-    const worldSoybeans = [...container.querySelectorAll('[data-world-soybean]')];
-    expect(worldSoybeans).toHaveLength(3);
-    expect(worldSoybeans.map((grain) => grain.getAttribute('data-world-soybean'))).toEqual([
-      'europa',
-      'africa',
-      'asia',
-    ]);
     expect(screen.getByRole('link', { name: 'Acessar área administrativa' })).toBeInTheDocument();
     expect(container.querySelector('.fenasoja-brand__mark img')).toBeInTheDocument();
-  });
-
-  it('keeps all three global destinations visible without travel motion when reduced motion is requested', () => {
-    setReducedMotionPreference(true);
-    const { container } = renderPortal();
-
-    expect(container.querySelectorAll('[data-world-soybean]')).toHaveLength(3);
-    expect(container.querySelectorAll('[data-world-soybean] animateMotion')).toHaveLength(0);
-    expect(
-      [...container.querySelectorAll('[data-world-soybean]')].map((grain) => grain.getAttribute('transform')),
-    ).toEqual(['translate(903 126)', 'translate(915 151)', 'translate(969 142)']);
   });
 
   it('keeps a vector brand mark when the official remote asset is unavailable', () => {

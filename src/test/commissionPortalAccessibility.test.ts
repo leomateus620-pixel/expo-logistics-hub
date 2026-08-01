@@ -37,7 +37,7 @@ const normalTextPairs = [
   ['texto secundário no card', '#C6D2E0', '#041832'],
   ['texto sutil no agrupador', '#9EB0C5', '#041832'],
   ['destaque dourado', '#FFD35C', '#041832'],
-  ['texto do card Gestão Operacional', '#FFF5CF', '#03162F'],
+  ['texto do card Gestão Operacional', '#FFF7D9', '#03142B'],
   ['estado permitido', '#A7F3D0', '#08294D'],
   ['estado em estruturação', '#FFE69A', '#08294D'],
   ['estado sem permissão', '#FECACA', '#041832'],
@@ -80,13 +80,16 @@ describe('acessibilidade visual do hub Fenasoja', () => {
     expect(portalStyles).toContain('.portal-primary-entry__control:focus-visible');
     expect(portalStyles).toContain('.portal-destination-card:focus-visible');
     expect(portalStyles).toContain('.commission-access-card:focus-visible');
-    expect(portalStyles).toContain('.portal-root-world__soybean');
-    expect(portalWordmark).toContain('useReducedMotionPreference');
-    expect(portalWordmark).toContain('prefers-reduced-motion: reduce');
+    expect(portalStyles).toContain('.portal-soybean__root-halo');
+    expect(portalStyles).toContain('animation: portal-root-grow 900ms');
+    expect(portalStyles).not.toContain('portal-root-node-breathe');
+    expect(portalStyles).not.toContain('portal-root-scene-reveal');
+    expect(portalWordmark).not.toMatch(/animateMotion|useReducedMotionPreference/);
   });
 
   it('mantém a camada premium escopada, sem transições genéricas ou hover em dispositivos touch', () => {
-    expect(portalPage).toContain("import '@/styles/commission-portal.css';\nimport '@/styles/portal-access-navigation.css';");
+    expect(portalPage).toContain("import '@/styles/commission-portal.css';");
+    expect(portalPage).toContain("import '@/styles/portal-access-navigation.css';");
     expect(accessNavigationStyles).toContain('--access-radius-parent');
     expect(accessNavigationStyles).toContain('--access-shadow-raised');
     expect(accessNavigationStyles).toContain('@media (hover: hover) and (pointer: fine)');
@@ -131,12 +134,13 @@ describe('acessibilidade visual do hub Fenasoja', () => {
     }
   });
 
-  it('mantém as ilustrações entre raízes adjacentes, sem imagem, legenda ou biblioteca de motion', () => {
-    expect(portalWordmark.match(/data-root-scene=/g)).toHaveLength(4);
-    expect(portalWordmark.match(/data-root-between=/g)).toHaveLength(4);
-    expect(portalWordmark.match(/clipPath="url\(#portal-root-zone-/g)).toHaveLength(4);
-    expect(portalWordmark.match(/data-root-zone-boundary=/g)).toHaveLength(4);
-    expect(portalWordmark).toContain('data-root-illustrations');
+  it('mantém o hero limpo com cinco raízes vetoriais e sem narrativa ilustrativa', () => {
+    expect(portalWordmark.match(/^\s+'M560 8/gm)).toHaveLength(5);
+    expect(portalWordmark).toContain('data-root-layer="halo"');
+    expect(portalWordmark).toContain('data-root-layer="core"');
+    expect(portalWordmark).toContain('portal-root-taper-mask');
+    expect(portalWordmark).not.toMatch(/data-root-scene|data-root-between|data-root-zone-boundary/);
+    expect(portalWordmark).not.toMatch(/data-root-illustrations|data-world-soybean|animateMotion/);
     expect(portalWordmark).not.toMatch(/<img|<text|\.webp|portal-story/);
     expect(portalWordmark).not.toMatch(/framer-motion|@react-spring|gsap/);
   });
