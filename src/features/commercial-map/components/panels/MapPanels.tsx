@@ -66,9 +66,11 @@ function PanelHeader({ title, eyebrow, onClose }: { title: string; eyebrow: stri
 export function CommercialSummary({
   lots,
   scope = 'park',
+  segmentName,
 }: {
   lots: CommercialLot[];
   scope?: CommercialMapAreaScope;
+  segmentName?: string;
 }) {
   const toggleStatus = useCommercialMapStore((state) => state.toggleStatus);
   const statusFilters = useCommercialMapStore((state) => state.statusFilters);
@@ -85,10 +87,15 @@ export function CommercialSummary({
   }, [lots]);
 
   return (
-    <div className="commercial-map-summary" aria-label={scope === 'exporural' ? 'Resumo comercial da Exporural' : 'Resumo comercial'}>
+    <div
+      className="commercial-map-summary"
+      aria-label={segmentName
+        ? `Resumo comercial de ${segmentName}`
+        : scope === 'exporural' ? 'Resumo comercial da Exporural' : 'Resumo comercial'}
+    >
       <div className="commercial-map-summary-primary">
         <strong>{lots.length}</strong>
-        <span>{scope === 'exporural' ? 'lotes Exporural' : 'lotes cadastrados'}</span>
+        <span>{segmentName ? 'lotes no segmento' : scope === 'exporural' ? 'lotes Exporural' : 'lotes cadastrados'}</span>
       </div>
       {(['BLOCKED', 'AVAILABLE', 'RESERVED', 'IN_NEGOTIATION', 'SOLD'] as const).map((status) => (
         <button

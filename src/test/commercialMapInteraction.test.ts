@@ -8,6 +8,7 @@ import {
   selectionFocusProfile,
 } from '@/features/commercial-map/utils/interaction';
 import { useCommercialMapStore } from '@/features/commercial-map/state/useCommercialMapStore';
+import { COMMERCIAL_MAP_SEGMENT_IDS } from '@/features/commercial-map/data/commercialMapSegments';
 
 describe('pipeline de seleção do mapa comercial', () => {
   beforeEach(() => {
@@ -25,6 +26,7 @@ describe('pipeline de seleção do mapa comercial', () => {
       activePanel: null,
       workspaceMode: '3d',
       cameraNavigating: false,
+      activeSegmentId: null,
     });
   });
 
@@ -146,6 +148,7 @@ describe('pipeline de seleção do mapa comercial', () => {
       verificationFilters: ['VERIFIED'],
       sortOrder: 'status',
       tableDensity: 'compact',
+      activeSegmentId: COMMERCIAL_MAP_SEGMENT_IDS.automotive,
     });
 
     useCommercialMapStore.getState().clearExplorerFilters();
@@ -159,6 +162,52 @@ describe('pipeline de seleção do mapa comercial', () => {
       verificationFilters: [],
       sortOrder: 'relevance',
       tableDensity: 'compact',
+      activeSegmentId: null,
+    });
+  });
+
+  it('mantém o filtro de segmento ao alternar vistas e o limpa somente por ação explícita', () => {
+    const initialSequence = useCommercialMapStore.getState().cameraSequence;
+
+    useCommercialMapStore.getState().requestSegmentFocus(COMMERCIAL_MAP_SEGMENT_IDS.industry);
+    expect(useCommercialMapStore.getState()).toMatchObject({
+      activeSegmentId: COMMERCIAL_MAP_SEGMENT_IDS.industry,
+      activePanel: null,
+      cameraSequence: initialSequence + 1,
+    });
+
+    useCommercialMapStore.getState().requestCameraPreset('top');
+    expect(useCommercialMapStore.getState()).toMatchObject({
+      activeSegmentId: COMMERCIAL_MAP_SEGMENT_IDS.industry,
+      cameraPreset: 'top',
+      cameraSequence: initialSequence + 2,
+    });
+
+    useCommercialMapStore.getState().clearSegmentFocus();
+    expect(useCommercialMapStore.getState()).toMatchObject({
+      activeSegmentId: null,
+      cameraSequence: initialSequence + 3,
+    });
+  });
+
+  it('filtra a lista por segmento sem expulsar o usuário para o canvas 3D', () => {
+    const initialSequence = useCommercialMapStore.getState().cameraSequence;
+    useCommercialMapStore.setState({ workspaceMode: 'list' });
+
+    useCommercialMapStore.getState().requestSegmentFocus(COMMERCIAL_MAP_SEGMENT_IDS.automotive);
+
+    expect(useCommercialMapStore.getState()).toMatchObject({
+      activeSegmentId: COMMERCIAL_MAP_SEGMENT_IDS.automotive,
+      workspaceMode: 'list',
+      cameraSequence: initialSequence,
+    });
+
+    useCommercialMapStore.getState().clearSegmentFocus();
+
+    expect(useCommercialMapStore.getState()).toMatchObject({
+      activeSegmentId: null,
+      workspaceMode: 'list',
+      cameraSequence: initialSequence,
     });
   });
 });

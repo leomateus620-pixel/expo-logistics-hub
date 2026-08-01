@@ -6,6 +6,10 @@ import {
   EXPORURAL_TOTALS,
 } from '../data/exporuralReference2026';
 import type { CommercialLot, CommercialMapData, MapEntity } from '../types';
+import {
+  COMMERCIAL_MAP_SEGMENT_IDS,
+  type CommercialMapSegmentId,
+} from '../data/commercialMapSegments';
 
 export type CommercialMapAreaScope = 'park' | 'exporural';
 
@@ -28,6 +32,15 @@ export function areaScopeFromSearchParams(searchParams: URLSearchParams): Commer
   return searchParams.get('area')?.toLocaleLowerCase('pt-BR') === 'exporural'
     ? 'exporural'
     : 'park';
+}
+
+export function isSegmentCompatibleWithAreaScope(
+  segmentId: CommercialMapSegmentId | null,
+  scope: CommercialMapAreaScope,
+) {
+  return !segmentId
+    || scope === 'park'
+    || segmentId === COMMERCIAL_MAP_SEGMENT_IDS.exporural;
 }
 
 export function isExporuralEntity(entity: MapEntity) {
