@@ -34,7 +34,7 @@ export function useFenasojaCountdown(timerEnabled = true) {
       const now = Date.now();
       setReferenceTime((current) => (current === now ? current : now));
 
-      if (getFenasojaCountdown(now).phase === 'open') return;
+      if (getFenasojaCountdown(now).phase !== 'countdown') return;
       timeoutId = window.setTimeout(schedule, getFenasojaCountdownUpdateDelay(now));
     };
 

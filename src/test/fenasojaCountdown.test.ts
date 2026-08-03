@@ -7,6 +7,7 @@ import {
   formatFenasojaCountdownLabel,
   formatFenasojaCountdownSummary,
   getFenasojaCountdown,
+  getFenasojaCountdownForTarget,
   getFenasojaCountdownUpdateDelay,
 } from '@/lib/fenasoja-countdown';
 
@@ -121,6 +122,22 @@ describe('contagem regressiva da Fenasoja 2028', () => {
       phase: 'open',
     });
     expect(formatFenasojaCountdownLabel(snapshot)).toBe('A Fenasoja 2028 está oficialmente aberta.');
+  });
+
+  it('falha de forma explícita e segura quando o alvo temporal é inválido', () => {
+    const snapshot = getFenasojaCountdownForTarget(Date.now(), Number.NaN, 0);
+
+    expect(snapshot).toEqual({
+      days: 0,
+      hours: 0,
+      minutes: 0,
+      seconds: 0,
+      remainingMilliseconds: 0,
+      cycleProgress: 0,
+      phase: 'invalid',
+    });
+    expect(formatFenasojaCountdownLabel(snapshot)).toContain('não está disponível');
+    expect(formatFenasojaCountdownSummary(snapshot)).toContain('Não foi possível calcular');
   });
 
   it('gera uma descrição completa para tecnologias assistivas', () => {

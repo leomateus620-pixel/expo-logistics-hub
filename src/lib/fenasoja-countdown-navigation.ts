@@ -6,15 +6,20 @@ export interface FenasojaCountdownLaunchContext {
   focusId: string;
   scrollX: number;
   scrollY: number;
+  originPath?: '/portal' | '/cronograma-eventos';
 }
 
-export function rememberFenasojaCountdownLaunch(focusId: string) {
+export function rememberFenasojaCountdownLaunch(
+  focusId: string,
+  originPath?: FenasojaCountdownLaunchContext['originPath'],
+) {
   if (typeof window === 'undefined') return;
 
   const context: FenasojaCountdownLaunchContext = {
     focusId,
     scrollX: window.scrollX,
     scrollY: window.scrollY,
+    ...(originPath ? { originPath } : {}),
   };
 
   try {
@@ -24,12 +29,11 @@ export function rememberFenasojaCountdownLaunch(focusId: string) {
   }
 }
 
-export function consumeFenasojaCountdownLaunch(): FenasojaCountdownLaunchContext | null {
+export function peekFenasojaCountdownLaunch(): FenasojaCountdownLaunchContext | null {
   if (typeof window === 'undefined') return null;
 
   try {
     const serialized = window.sessionStorage.getItem(launchStorageKey);
-    window.sessionStorage.removeItem(launchStorageKey);
     if (!serialized) return null;
 
     const parsed = JSON.parse(serialized) as Partial<FenasojaCountdownLaunchContext>;
@@ -39,6 +43,11 @@ export function consumeFenasojaCountdownLaunch(): FenasojaCountdownLaunchContext
       || !Number.isFinite(parsed.scrollX)
       || typeof parsed.scrollY !== 'number'
       || !Number.isFinite(parsed.scrollY)
+      || (
+        parsed.originPath !== undefined
+        && parsed.originPath !== '/portal'
+        && parsed.originPath !== '/cronograma-eventos'
+      )
     ) {
       return null;
     }
@@ -47,6 +56,18 @@ export function consumeFenasojaCountdownLaunch(): FenasojaCountdownLaunchContext
   } catch {
     return null;
   }
+}
+
+export function consumeFenasojaCountdownLaunch(): FenasojaCountdownLaunchContext | null {
+  const context = peekFenasojaCountdownLaunch();
+
+  try {
+    window.sessionStorage.removeItem(launchStorageKey);
+  } catch {
+    // A valid navigation context remains usable even if removal is blocked.
+  }
+
+  return context;
 }
 
 export function findFenasojaCountdownReturnFocus(

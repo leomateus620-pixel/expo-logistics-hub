@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { FenasojaCountdownDigits } from '@/components/cronograma-eventos/FenasojaCountdownDigits';
+import { OfficialCountdownDigits } from '@/components/countdown/OfficialCountdownDigits';
 import type { FenasojaCountdownSnapshot } from '@/lib/fenasoja-countdown';
 
 const snapshot: FenasojaCountdownSnapshot = {
@@ -13,10 +13,10 @@ const snapshot: FenasojaCountdownSnapshot = {
   phase: 'countdown',
 };
 
-describe('FenasojaCountdownDigits', () => {
+describe('OfficialCountdownDigits', () => {
   it('mantém os quatro valores reais no DOM e em uma única fonte acessível', () => {
     render(
-      <FenasojaCountdownDigits
+      <OfficialCountdownDigits
         snapshot={snapshot}
         accessibleLabel="Faltam 654 dias, 3 horas, 2 minutos e 9 segundos."
       />,
@@ -34,7 +34,7 @@ describe('FenasojaCountdownDigits', () => {
 
   it('troca somente os rótulos de apresentação sem duplicar o relógio', () => {
     render(
-      <FenasojaCountdownDigits
+      <OfficialCountdownDigits
         snapshot={snapshot}
         accessibleLabel="Contagem oficial da Fenasoja 2028"
         variant="immersive"
@@ -50,7 +50,7 @@ describe('FenasojaCountdownDigits', () => {
 
   it('preserva os algarismos que não mudaram durante a atualização de segundo', () => {
     const { rerender } = render(
-      <FenasojaCountdownDigits
+      <OfficialCountdownDigits
         snapshot={snapshot}
         accessibleLabel="Contagem em andamento"
       />,
@@ -60,7 +60,7 @@ describe('FenasojaCountdownDigits', () => {
     );
 
     rerender(
-      <FenasojaCountdownDigits
+      <OfficialCountdownDigits
         snapshot={{ ...snapshot, seconds: 8 }}
         accessibleLabel="Contagem em andamento"
       />,

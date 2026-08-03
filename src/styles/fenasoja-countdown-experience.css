@@ -322,6 +322,17 @@ body[data-countdown-experience='open'] {
   animation: fenasoja-experience-clock-in 560ms var(--ease-decelerate) 160ms both;
 }
 
+.fenasoja-countdown-experience__clock--error {
+  display: grid;
+  min-height: clamp(8rem, 18vw, 13rem);
+  place-items: center;
+  color: #fff1b8;
+  font-size: clamp(0.9rem, 1.4vw, 1.08rem);
+  font-weight: 700;
+  line-height: 1.5;
+  text-align: center;
+}
+
 .fenasoja-countdown-experience__clock::before {
   position: absolute;
   inset: 0 8% auto;

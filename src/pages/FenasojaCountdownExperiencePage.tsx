@@ -13,13 +13,14 @@ import {
 import { ArrowLeft, CalendarClock, Clock3, Radio, ShieldCheck } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { FenasojaBrand } from '@/components/brand/FenasojaBrand';
-import { FenasojaCountdownDigits } from '@/components/cronograma-eventos/FenasojaCountdownDigits';
+import { OfficialCountdownDigits } from '@/components/countdown/OfficialCountdownDigits';
 import { useFenasojaCountdown } from '@/hooks/useFenasojaCountdown';
 import {
   FENASOJA_2028_OPENING_LABEL,
   FENASOJA_2028_TIME_ZONE_LABEL,
 } from '@/lib/fenasoja-countdown';
 import {
+  peekFenasojaCountdownLaunch,
   runFenasojaCountdownViewTransition,
 } from '@/lib/fenasoja-countdown-navigation';
 import '@/styles/fenasoja-countdown-experience.css';
@@ -119,6 +120,18 @@ class AtmosphereBoundary extends Component<
 const FenasojaCountdownExperienceClock = memo(function FenasojaCountdownExperienceClock() {
   const { snapshot, accessibleLabel, announcement } = useFenasojaCountdown();
 
+  if (snapshot.phase === 'invalid') {
+    return (
+      <div
+        className="fenasoja-countdown-experience__clock fenasoja-countdown-experience__clock--error"
+        data-phase={snapshot.phase}
+        role="status"
+      >
+        Não foi possível calcular a contagem oficial. A data configurada precisa ser revisada.
+      </div>
+    );
+  }
+
   return (
     <>
       <div className="fenasoja-countdown-experience__clock" data-phase={snapshot.phase}>
@@ -127,7 +140,7 @@ const FenasojaCountdownExperienceClock = memo(function FenasojaCountdownExperien
           <span>{snapshot.phase === 'open' ? 'Fenasoja aberta' : 'Atualização contínua'}</span>
         </div>
 
-        <FenasojaCountdownDigits
+        <OfficialCountdownDigits
           snapshot={snapshot}
           accessibleLabel={accessibleLabel}
           variant="immersive"
@@ -184,19 +197,26 @@ export default function FenasojaCountdownExperiencePage() {
   const returnButtonRef = useRef<HTMLButtonElement>(null);
   const capabilities = useExperienceCapabilities();
   const [enhancedReady, setEnhancedReady] = useState(false);
-  const openedFromCronograma = Boolean(
-    (location.state as { fromCronograma?: boolean } | null)?.fromCronograma,
+  const launchState = location.state as {
+    fromCronograma?: boolean;
+    fromPortal?: boolean;
+  } | null;
+  const rememberedLaunch = peekFenasojaCountdownLaunch();
+  const openedFromPortal = Boolean(
+    launchState?.fromPortal || rememberedLaunch?.originPath === '/portal',
   );
+  const openedFromKnownOrigin = openedFromPortal || Boolean(launchState?.fromCronograma);
+  const returnLabel = openedFromPortal ? 'portal' : 'cronograma';
 
-  const returnToCronograma = useCallback(() => {
+  const returnFromCountdown = useCallback(() => {
     runFenasojaCountdownViewTransition(() => {
-      if (openedFromCronograma) {
+      if (openedFromKnownOrigin) {
         navigate(-1);
         return;
       }
       navigate('/cronograma-eventos', { replace: true });
     });
-  }, [navigate, openedFromCronograma]);
+  }, [navigate, openedFromKnownOrigin]);
 
   useEffect(() => {
     const previousTitle = document.title;
@@ -224,12 +244,12 @@ export default function FenasojaCountdownExperiencePage() {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key !== 'Escape') return;
       event.preventDefault();
-      returnToCronograma();
+      returnFromCountdown();
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [returnToCronograma]);
+  }, [returnFromCountdown]);
 
   useEffect(() => {
     if (
@@ -317,12 +337,12 @@ export default function FenasojaCountdownExperiencePage() {
           ref={returnButtonRef}
           type="button"
           className="fenasoja-countdown-experience__return"
-          onClick={returnToCronograma}
-          aria-label="Voltar ao Cronograma e Eventos"
+          onClick={returnFromCountdown}
+          aria-label={openedFromPortal ? 'Voltar ao portal Fenasoja 2028' : 'Voltar ao Cronograma e Eventos'}
         >
           <ArrowLeft aria-hidden="true" />
           <span className="fenasoja-countdown-experience__return-label">
-            <span className="fenasoja-countdown-experience__return-label-long">Voltar ao cronograma</span>
+            <span className="fenasoja-countdown-experience__return-label-long">Voltar ao {returnLabel}</span>
             <span className="fenasoja-countdown-experience__return-label-short">Voltar</span>
           </span>
           <kbd>Esc</kbd>

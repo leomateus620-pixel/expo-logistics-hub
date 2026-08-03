@@ -1,26 +1,12 @@
-import { FenasojaCountdownHero } from './FenasojaCountdownHero';
-import type { CronogramaEvent } from './types';
+import { CronogramaOperationalHeader } from './CronogramaOperationalHeader';
 
 export function CronogramaCommandHeader({
-  events,
-  onOpenUndated,
-  onExpandCountdown,
   availability,
 }: {
-  events: CronogramaEvent[];
-  /** Kept as an optional compatibility prop; creation now lives beside view navigation. */
-  onNewEvent?: () => void;
-  onOpenUndated: () => void;
-  onExpandCountdown?: () => void;
-  /** Kept as an optional compatibility prop; the relocated action owns the permission gate. */
-  canManage?: boolean;
   availability?: 'ready' | 'loading' | 'offline';
 }) {
   return (
-    <FenasojaCountdownHero
-      events={events}
-      onOpenUndated={onOpenUndated}
-      onExpandCountdown={onExpandCountdown}
+    <CronogramaOperationalHeader
       availability={availability}
       presentation="desktop"
     />

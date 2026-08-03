@@ -175,13 +175,12 @@ describe('cartão do Google Agenda', () => {
   });
 
   it('mantém regras explícitas para mobile, foco e movimento reduzido', () => {
-    const css = readFileSync('src/styles/fenasoja-countdown.css', 'utf8');
+    const css = readFileSync('src/styles/cronograma-operational-header.css', 'utf8');
     expect(css).toContain('@media (max-width: 520px)');
-    expect(css).toContain('.fenasoja-countdown-operations');
-    expect(css).toContain('.fenasoja-countdown-secondary');
-    expect(css).toContain('grid-template-columns: minmax(0, 1fr) clamp(24rem, 32vw, 30rem)');
-    expect(css).not.toContain('min-height: 15.5rem');
-    expect(css).not.toContain('grid-template-columns: minmax(0, 19rem)');
+    expect(css).toContain('grid-template-columns: minmax(0, 1fr)');
+    expect(css).toContain('.cronograma-operational-header__calendar');
+    expect(css).toContain('.fenasoja-google-widget--compact');
+    expect(css).toContain('min-height: 2.5rem');
     expect(css).toContain(':focus-visible');
     expect(css).toContain('@media (prefers-reduced-motion: reduce)');
     expect(css).toContain('animation: none !important');

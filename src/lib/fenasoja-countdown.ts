@@ -22,7 +22,7 @@ export {
 export const FENASOJA_2028_TIME_ZONE = FENASOJA_2028_SCHEDULE.timeZone;
 export const FENASOJA_2028_OPENING_TIMESTAMP = Date.parse(FENASOJA_2028_OPENING_ISO);
 
-export type FenasojaCountdownPhase = 'countdown' | 'open';
+export type FenasojaCountdownPhase = 'countdown' | 'open' | 'invalid';
 
 export interface FenasojaCountdownSnapshot {
   days: number;
@@ -34,6 +34,16 @@ export interface FenasojaCountdownSnapshot {
   phase: FenasojaCountdownPhase;
 }
 
+const invalidCountdownSnapshot: FenasojaCountdownSnapshot = {
+  days: 0,
+  hours: 0,
+  minutes: 0,
+  seconds: 0,
+  remainingMilliseconds: 0,
+  cycleProgress: 0,
+  phase: 'invalid',
+};
+
 function toTimestamp(reference: Date | number) {
   return reference instanceof Date ? reference.getTime() : reference;
 }
@@ -42,12 +52,22 @@ function clamp(value: number, minimum: number, maximum: number) {
   return Math.min(Math.max(value, minimum), maximum);
 }
 
-export function getFenasojaCountdown(
-  reference: Date | number = Date.now(),
+export function getFenasojaCountdownForTarget(
+  reference: Date | number,
+  openingTimestamp: number,
+  cycleStartTimestamp: number,
 ): FenasojaCountdownSnapshot {
   const referenceTimestamp = toTimestamp(reference);
-  const openingTimestamp = FENASOJA_2028_OPENING_TIMESTAMP;
-  const cycleStartTimestamp = Date.parse(FENASOJA_2028_CYCLE_START_ISO);
+
+  if (
+    !Number.isFinite(referenceTimestamp)
+    || !Number.isFinite(openingTimestamp)
+    || !Number.isFinite(cycleStartTimestamp)
+    || cycleStartTimestamp >= openingTimestamp
+  ) {
+    return invalidCountdownSnapshot;
+  }
+
   const remainingMilliseconds = Math.max(0, openingTimestamp - referenceTimestamp);
   const remainingSeconds = Math.ceil(remainingMilliseconds / SECOND_MS);
   const cycleDuration = openingTimestamp - cycleStartTimestamp;
@@ -63,6 +83,16 @@ export function getFenasojaCountdown(
     cycleProgress: cycleDuration > 0 ? Math.floor((elapsedCycle / cycleDuration) * 100) : 100,
     phase: remainingMilliseconds > 0 ? 'countdown' : 'open',
   };
+}
+
+export function getFenasojaCountdown(
+  reference: Date | number = Date.now(),
+): FenasojaCountdownSnapshot {
+  return getFenasojaCountdownForTarget(
+    reference,
+    FENASOJA_2028_OPENING_TIMESTAMP,
+    Date.parse(FENASOJA_2028_CYCLE_START_ISO),
+  );
 }
 
 function pluralize(value: number, singular: string, plural: string) {
@@ -85,7 +115,13 @@ export function getFenasojaCycleProgressUpdateDelay(
   const cycleStartTimestamp = Date.parse(FENASOJA_2028_CYCLE_START_ISO);
   const cycleDuration = openingTimestamp - cycleStartTimestamp;
 
-  if (cycleDuration <= 0 || referenceTimestamp >= openingTimestamp) return null;
+  if (
+    !Number.isFinite(referenceTimestamp)
+    || !Number.isFinite(openingTimestamp)
+    || !Number.isFinite(cycleStartTimestamp)
+    || cycleDuration <= 0
+    || referenceTimestamp >= openingTimestamp
+  ) return null;
 
   const currentProgress = getFenasojaCountdown(referenceTimestamp).cycleProgress;
   const nextProgress = Math.min(100, currentProgress + 1);
@@ -96,6 +132,9 @@ export function getFenasojaCycleProgressUpdateDelay(
 }
 
 export function formatFenasojaCountdownLabel(snapshot: FenasojaCountdownSnapshot) {
+  if (snapshot.phase === 'invalid') {
+    return 'A data da abertura oficial da Fenasoja 2028 não está disponível.';
+  }
   if (snapshot.phase === 'open') return 'A Fenasoja 2028 está oficialmente aberta.';
 
   return `Faltam ${[
@@ -107,6 +146,9 @@ export function formatFenasojaCountdownLabel(snapshot: FenasojaCountdownSnapshot
 }
 
 export function formatFenasojaCountdownSummary(snapshot: FenasojaCountdownSnapshot) {
+  if (snapshot.phase === 'invalid') {
+    return 'Não foi possível calcular a contagem oficial da Fenasoja 2028.';
+  }
   if (snapshot.phase === 'open') return 'A Fenasoja 2028 está oficialmente aberta.';
 
   return `Contagem oficial: faltam ${[

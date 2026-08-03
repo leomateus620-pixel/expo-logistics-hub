@@ -7,7 +7,9 @@ const globalStyles = readFileSync(resolve('src/index.css'), 'utf8');
 const workspaceStyles = readFileSync(resolve('src/styles/cronograma-workspace.css'), 'utf8');
 const mobileStyles = readFileSync(resolve('src/styles/cronograma-mobile.css'), 'utf8');
 const mobileOverlayStyles = readFileSync(resolve('src/styles/cronograma-mobile-overlays.css'), 'utf8');
-const countdownStyles = readFileSync(resolve('src/styles/fenasoja-countdown.css'), 'utf8');
+const countdownStyles = readFileSync(resolve('src/styles/official-countdown-digits.css'), 'utf8');
+const operationalHeaderStyles = readFileSync(resolve('src/styles/cronograma-operational-header.css'), 'utf8');
+const cronogramaTemporalStyles = readFileSync(resolve('src/styles/fenasoja-countdown.css'), 'utf8');
 const loginStyles = readFileSync(resolve('src/styles/login-experience.css'), 'utf8');
 
 describe('arquitetura visual premium Fenasoja 2028', () => {
@@ -46,22 +48,20 @@ describe('arquitetura visual premium Fenasoja 2028', () => {
     expect(mobileOverlayStyles).toContain('var(--destructive)');
   });
 
-  it('adapta o countdown ao navy 2028 com perímetro premium controlado', () => {
-    expect(countdownStyles).toContain('--fenasoja-hero-deep: 213 89% 11%');
-    expect(countdownStyles).toContain('var(--elevation-4)');
-    expect(countdownStyles).toContain('var(--motion-structural)');
+  it('mantém o countdown compartilhado estável e o topo operacional compacto', () => {
+    expect(countdownStyles).toContain('font-variant-numeric: tabular-nums lining-nums');
+    expect(countdownStyles).toContain("font-feature-settings: 'tnum' 1, 'zero' 1");
     expect(countdownStyles).toContain('-webkit-text-fill-color: currentColor');
     expect(countdownStyles).not.toContain('-webkit-text-fill-color: transparent');
     expect(countdownStyles).not.toContain('will-change: opacity, transform');
-    expect(countdownStyles).not.toMatch(/@keyframes fenasoja-number-change[\s\S]*?filter:/);
+    expect(countdownStyles).not.toMatch(/@keyframes official-countdown-number-change[\s\S]*?filter:/);
     expect(countdownStyles).not.toMatch(/hsl\(14[0-9]/i);
-    expect(countdownStyles).toContain('@property --premium-border-angle');
-    expect(countdownStyles).toContain('@keyframes fenasoja-premium-perimeter');
-    expect(countdownStyles).toContain('fenasoja-premium-perimeter 15s linear infinite');
-    expect(countdownStyles).toMatch(
-      /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.fenasoja-preparation::before[\s\S]*?animation: none !important/,
-    );
-    expect(countdownStyles).toContain('transform: scaleX(var(--preparation-progress))');
+    expect(countdownStyles).toContain('@media (prefers-reduced-motion: reduce)');
+    expect(countdownStyles).toContain('@media (forced-colors: active)');
+    expect(operationalHeaderStyles).toContain('.cronograma-operational-header__services');
+    expect(operationalHeaderStyles).toContain('@media (max-width: 899px)');
+    expect(operationalHeaderStyles).toContain('@media (prefers-reduced-motion: reduce)');
+    expect(cronogramaTemporalStyles).toContain('transform: scaleX(var(--preparation-progress))');
   });
 
   it('mantém o login no sistema visual compartilhado com estados e fallbacks completos', () => {

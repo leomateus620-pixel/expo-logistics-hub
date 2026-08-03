@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import type { FenasojaCountdownSnapshot } from '@/lib/fenasoja-countdown';
-import '@/styles/fenasoja-countdown.css';
+import '@/styles/official-countdown-digits.css';
 
 type CountdownUnitName = 'days' | 'hours' | 'minutes' | 'seconds';
 
@@ -38,7 +38,7 @@ const CountdownUnit = memo(function CountdownUnit({
   );
 });
 
-export const FenasojaCountdownDigits = memo(function FenasojaCountdownDigits({
+export const OfficialCountdownDigits = memo(function OfficialCountdownDigits({
   snapshot,
   accessibleLabel,
   variant = 'compact',
