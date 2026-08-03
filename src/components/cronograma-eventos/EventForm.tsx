@@ -251,6 +251,43 @@ export function EventForm({
     () => responsibleLinksToSelections(form.responsiblesRel),
     [form.responsiblesRel],
   );
+  const responsibleOptions = useMemo(() => {
+    const options: Array<{ id: string; label: string; hint?: string; group?: string }> = [];
+    const seenNames = new Set<string>();
+
+    (members ?? []).forEach((member: any) => {
+      const label = (member?.nome_exibicao ?? '').trim();
+      if (!label || !member?.user_id) return;
+      const key = normalizeSearchTerm(label);
+      if (seenNames.has(key)) return;
+      seenNames.add(key);
+      options.push({
+        id: member.user_id as string,
+        label,
+        hint: member.cargo || member.commission_nome || undefined,
+        group: 'Membros do sistema',
+      });
+    });
+
+    units.forEach((unit) => {
+      unit.responsibles.forEach((person) => {
+        const label = (person.displayName ?? '').trim();
+        if (!label) return;
+        const key = normalizeSearchTerm(label);
+        if (seenNames.has(key)) return;
+        seenNames.add(key);
+        options.push({
+          id: person.userId ?? `custom:${label.toLocaleLowerCase('pt-BR')}`,
+          label,
+          hint: unit.name,
+          group: 'Responsáveis institucionais',
+        });
+      });
+    });
+
+    return options;
+  }, [members, units]);
+
   const linkedUnitIds = useMemo(
     () => (form.commissionsRel ?? []).map((link) => link.commissionId).filter(Boolean) as string[],
     [form.commissionsRel],
@@ -554,14 +591,32 @@ export function EventForm({
           )}
           <RelationalMultiSelect
             label="Responsáveis do evento"
-            placeholder="Nome, comissão ou papel…"
-            emptyLabel="Nenhum responsável relacional. Adicione um nome ou selecione um membro."
-            options={[]}
+            placeholder="Buscar pessoa do sistema ou digitar um nome…"
+            emptyLabel="Nenhum responsável vinculado. Selecione pessoas do sistema ou digite um nome."
+            options={responsibleOptions}
             value={responsibleSelections}
-            onChange={(next) => update('responsiblesRel', selectionsToResponsibleLinks(next))}
+            onChange={(next) => {
+              const reconciled = next.map((selection) => {
+                if (!selection.id.startsWith('custom:') && !selection.id.startsWith('external:')) return selection;
+                const match = responsibleOptions.find(
+                  (option) => normalizeSearchTerm(option.label) === normalizeSearchTerm(selection.label),
+                );
+                return match ? { ...selection, id: match.id, hint: selection.hint ?? match.hint } : selection;
+              });
+              const seen = new Set<string>();
+              const unique = reconciled.filter((selection) => {
+                const key = normalizeSearchTerm(selection.label);
+                if (seen.has(key)) return false;
+                seen.add(key);
+                return true;
+              });
+              update('responsiblesRel', selectionsToResponsibleLinks(unique));
+            }}
+
             allowCustom
             primaryLabel="Principal"
           />
+
           <p className="text-[11px] leading-relaxed text-muted-foreground">
             Os vínculos relacionais são persistidos pelas RPCs oficiais (<code>cronograma_save_event</code>) e complementam
             o campo &quot;Responsável&quot; para eventos já salvos.
