@@ -11,7 +11,6 @@ import {
   Loader2,
   MoreVertical,
   Paperclip,
-  ShieldCheck,
   Trash2,
   X,
 } from "lucide-react";
@@ -63,7 +62,7 @@ export const SOYBEAN_ANIMATION_DURATION_MS = 1_300;
 
 const INITIAL_FEEDBACK: UploadFeedback = {
   phase: "idle",
-  message: "Envio protegido pelas permissões deste evento.",
+  message: "",
 };
 
 const SOYBEAN_FLIGHTS = [
@@ -291,6 +290,7 @@ export function EventoAnexosSection({ eventId, className }: Props) {
     : uploading && feedback.phase !== "uploading"
       ? "Enviando arquivo…"
       : feedback.message;
+  const showStatus = !canUpload || effectivePhase !== "idle";
 
   const buttonLabel = !canUpload
     ? "Acesso necessário"
@@ -365,17 +365,14 @@ export function EventoAnexosSection({ eventId, className }: Props) {
     if (failures.length === 0) {
       const message =
         successCount === 1
-          ? "Arquivo anexado com sucesso."
-          : `${successCount} arquivos anexados com sucesso.`;
+          ? "Arquivo anexado."
+          : `${successCount} arquivos anexados.`;
       setFeedback({
         phase: "success",
         message,
-        buttonLabel:
-          successCount === 1 ? "Arquivo anexado" : "Arquivos anexados",
       });
       toast({
         title: successCount === 1 ? "Arquivo anexado" : "Arquivos anexados",
-        description: message,
       });
       scheduleIdleFeedback();
     } else {
@@ -393,8 +390,8 @@ export function EventoAnexosSection({ eventId, className }: Props) {
       toast({
         title:
           successCount > 0
-            ? "Envio concluído com pendência"
-            : "Falha no upload",
+            ? "Alguns arquivos não foram anexados"
+            : "Falha ao anexar",
         description: message,
         variant: "destructive",
       });
@@ -463,7 +460,7 @@ export function EventoAnexosSection({ eventId, className }: Props) {
     if (effectivePhase === "uploading")
       return <Loader2 className="animate-spin" aria-hidden="true" />;
     if (effectivePhase === "success") return <Check aria-hidden="true" />;
-    return <ShieldCheck aria-hidden="true" />;
+    return null;
   };
 
   return (
@@ -475,8 +472,6 @@ export function EventoAnexosSection({ eventId, className }: Props) {
       aria-labelledby={titleId}
       aria-busy={uploadBusy}
     >
-      <p className="cronograma-section-eyebrow">Registros e comprovações</p>
-
       <div className="cronograma-attachments__surface">
         <header className="cronograma-attachments__header">
           <span
@@ -487,7 +482,7 @@ export function EventoAnexosSection({ eventId, className }: Props) {
           </span>
           <div className="min-w-0 flex-1">
             <div className="cronograma-attachments__title-row">
-              <h3 id={titleId}>Anexos e fotos</h3>
+              <h3 id={titleId}>Anexos</h3>
               {anexos.length > 0 && (
                 <span
                   className="cronograma-attachments__count"
@@ -497,13 +492,9 @@ export function EventoAnexosSection({ eventId, className }: Props) {
                 </span>
               )}
             </div>
-            <p id={guidanceId} className="cronograma-attachments__guidance">
-              Registre fotos e documentos que comprovem as informações deste
-              evento.
-            </p>
             <div
+              id={guidanceId}
               className="cronograma-attachments__formats"
-              aria-label="Formatos e limite aceitos"
             >
               <span>Imagens, PDF, Word, Excel ou TXT</span>
               <span>Até 20 MB por arquivo</span>
@@ -520,7 +511,7 @@ export function EventoAnexosSection({ eventId, className }: Props) {
             className="cronograma-attachments__upload-button"
             data-state={effectivePhase}
             data-soy-active={soybeanActive ? "true" : "false"}
-            aria-describedby={`${guidanceId} ${statusId}`}
+            aria-describedby={showStatus ? `${guidanceId} ${statusId}` : guidanceId}
             aria-busy={uploadBusy}
           >
             <SoybeanBurst active={soybeanActive} />
@@ -545,7 +536,7 @@ export function EventoAnexosSection({ eventId, className }: Props) {
             onClick={() => cameraRef.current?.click()}
             disabled={!canUpload || uploadBusy}
             className="cronograma-attachments__camera-button sm:hidden"
-            aria-describedby={statusId}
+            aria-describedby={showStatus ? `${guidanceId} ${statusId}` : guidanceId}
           >
             <Camera aria-hidden="true" />
             Tirar foto
@@ -573,29 +564,31 @@ export function EventoAnexosSection({ eventId, className }: Props) {
           />
         </div>
 
-        <div className="cronograma-attachments__status-wrap">
-          <p
-            id={statusId}
-            className="cronograma-attachments__status"
-            data-state={!canUpload ? "error" : effectivePhase}
-            role={effectivePhase === "error" || !canUpload ? "alert" : "status"}
-            aria-live={
-              effectivePhase === "error" || !canUpload ? "assertive" : "polite"
-            }
-            aria-atomic="true"
-          >
-            {renderStatusIcon()}
-            <span>{statusMessage}</span>
-          </p>
-          {uploadBusy && (
-            <span
-              className="cronograma-attachments__progress"
-              aria-hidden="true"
+        {showStatus && (
+          <div className="cronograma-attachments__status-wrap">
+            <p
+              id={statusId}
+              className="cronograma-attachments__status"
+              data-state={!canUpload ? "error" : effectivePhase}
+              role={effectivePhase === "error" || !canUpload ? "alert" : "status"}
+              aria-live={
+                effectivePhase === "error" || !canUpload ? "assertive" : "polite"
+              }
+              aria-atomic="true"
             >
-              <span />
-            </span>
-          )}
-        </div>
+              {renderStatusIcon()}
+              <span>{statusMessage}</span>
+            </p>
+            {uploadBusy && (
+              <span
+                className="cronograma-attachments__progress"
+                aria-hidden="true"
+              >
+                <span />
+              </span>
+            )}
+          </div>
+        )}
 
         <div className="cronograma-attachments__content">
           {isLoading ? (
@@ -616,18 +609,11 @@ export function EventoAnexosSection({ eventId, className }: Props) {
                 <FileImage />
               </span>
               <div>
-                <p>Nenhum anexo enviado ainda</p>
-                <span>Seja o primeiro a registrar uma foto ou documento.</span>
+                <p>Nenhum anexo enviado</p>
               </div>
             </div>
           ) : (
             <div>
-              <div className="cronograma-attachments__list-heading">
-                <p>Arquivos anexados</p>
-                <span>
-                  {anexos.length === 1 ? "1 item" : `${anexos.length} itens`}
-                </span>
-              </div>
               <ul
                 className="cronograma-attachments__list"
                 aria-label="Arquivos anexados ao evento"
@@ -672,11 +658,6 @@ export function EventoAnexosSection({ eventId, className }: Props) {
                           </span>
                           <span aria-hidden="true">•</span>
                           <span>{formatUploadDate(anexo.created_at)}</span>
-                          {!canDelete && (
-                            <span className="cronograma-attachments__readonly">
-                              Exclusão restrita
-                            </span>
-                          )}
                         </p>
                       </div>
 

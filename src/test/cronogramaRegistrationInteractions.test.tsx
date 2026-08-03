@@ -117,7 +117,7 @@ afterEach(() => {
 });
 
 describe('interações do cadastro do cronograma', () => {
-  it('exibe o CTA somente para quem pode gerenciar e encaminha a criação ao handler existente', () => {
+  it('exibe uma única ação semântica somente para quem pode gerenciar', () => {
     const onCreate = vi.fn();
     const { rerender } = render(
       <CronogramaRegistrationAction
@@ -127,7 +127,7 @@ describe('interações do cadastro do cronograma', () => {
       />,
     );
 
-    expect(screen.queryByRole('button', { name: 'Criar novo evento no cronograma' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Novo evento: cadastrar ação no cronograma' })).not.toBeInTheDocument();
 
     rerender(
       <CronogramaRegistrationAction
@@ -137,7 +137,40 @@ describe('interações do cadastro do cronograma', () => {
       />,
     );
 
-    fireEvent.click(screen.getByRole('button', { name: 'Criar novo evento no cronograma' }));
+    const action = screen.getByRole('button', { name: 'Novo evento: cadastrar ação no cronograma' });
+    expect(action.tagName).toBe('BUTTON');
+    expect(action).toHaveAttribute('type', 'button');
+    expect(action.querySelector('button, a, [role="button"]')).not.toBeInTheDocument();
+    expect(screen.queryByText('Gestão do cronograma')).not.toBeInTheDocument();
+    expect(screen.queryByText('Cronograma e Eventos')).not.toBeInTheDocument();
+    expect(screen.queryByText('Acompanhe, organize e execute as ações do ciclo oficial.')).not.toBeInTheDocument();
+
+    fireEvent.click(within(action).getByText('Novo evento'));
+    expect(onCreate).toHaveBeenCalledTimes(1);
+    fireEvent.click(within(action).getByText('Cadastrar ação no cronograma'));
+    expect(onCreate).toHaveBeenCalledTimes(2);
+    const icon = action.querySelector('.cronograma-registration-action__icon svg');
+    const arrow = action.querySelector('.cronograma-registration-action__arrow');
+    expect(icon).toBeInTheDocument();
+    expect(arrow).toBeInTheDocument();
+    fireEvent.click(icon!);
+    fireEvent.click(arrow!);
+    expect(onCreate).toHaveBeenCalledTimes(4);
+  });
+
+  it('mantém a mesma superfície completa no mobile', () => {
+    const onCreate = vi.fn();
+    render(
+      <CronogramaRegistrationAction
+        canManage
+        onCreate={onCreate}
+        presentation="mobile"
+      />,
+    );
+
+    const action = screen.getByRole('button', { name: 'Novo evento: cadastrar ação no cronograma' });
+    expect(action).toHaveAttribute('data-presentation', 'mobile');
+    fireEvent.click(action);
     expect(onCreate).toHaveBeenCalledOnce();
   });
 

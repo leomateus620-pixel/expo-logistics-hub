@@ -4,7 +4,6 @@ import {
   CalendarCheck2,
   ChevronDown,
   ChevronRight,
-  Flag,
   Layers3,
   Route,
   Sparkles,
@@ -55,10 +54,8 @@ export function OverviewBoard({
               <div className="min-w-0">
                 <div className="mb-4 flex flex-wrap items-center gap-2">
                   <CronogramaMetaBadge icon={Sparkles} tone="gold">Marco principal</CronogramaMetaBadge>
-                  <CronogramaMetaBadge icon={Flag} tone="green">Fenasoja 2028</CronogramaMetaBadge>
                 </div>
-                <p className="text-[11px] font-bold uppercase tracking-[0.22em] text-primary/75">Destaque executivo</p>
-                <h2 className="mt-2 text-3xl font-black tracking-tight text-foreground sm:text-4xl">{main2028.title}</h2>
+                <h2 className="text-3xl font-black tracking-tight text-foreground sm:text-4xl">{main2028.title}</h2>
                 <p className="mt-3 max-w-3xl text-sm leading-relaxed text-muted-foreground">{main2028.summary}</p>
                 <div className="mt-5 flex flex-wrap items-center gap-3">
                   <EventMetaLine event={main2028} />
@@ -79,7 +76,6 @@ export function OverviewBoard({
         <section className="cronograma-ledger p-4">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Leitura rápida</p>
               <h2 className="text-xl font-black tracking-tight">Próximos eventos oficiais</h2>
             </div>
             <Button type="button" variant="ghost" size="sm" onClick={() => onSwitchView('timeline')} className="rounded-full text-xs">
@@ -99,7 +95,6 @@ export function OverviewBoard({
         <section className="cronograma-ledger is-undated p-4">
           <div className="mb-4 flex items-center justify-between gap-3">
             <div>
-              <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Central de decisão</p>
               <h2 className="text-xl font-black tracking-tight">Pendências sem data</h2>
             </div>
             <AlertCircle className="h-5 w-5 text-amber-800" />
@@ -162,7 +157,6 @@ export function TimelineBoard({
                       className="mb-3 flex w-full items-center justify-between gap-3 rounded-xl text-left focus-ring"
                     >
                       <span>
-                        <span className="block text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">Mês</span>
                         <span className="text-lg font-black tracking-tight text-foreground">{getMonthLabel(month)}</span>
                       </span>
                       <span className="flex items-center gap-2 text-xs font-bold text-primary">
@@ -236,7 +230,7 @@ export function YearBoard({
               {yearEvents.filter((event) => !event.date).map((event) => (
                 <UndatedDecisionCard key={event.id} event={event} onOpen={onOpen} onEdit={onEdit} />
               ))}
-              {yearEvents.length === 0 && <EmptyBoardState title={`Sem itens em ${year}`} text="Nenhum evento atende aos filtros atuais." />}
+              {yearEvents.length === 0 && <EmptyBoardState title={`Nenhum evento atende aos filtros em ${year}.`} />}
             </div>
           </section>
         );
@@ -282,7 +276,6 @@ export function MeetingsBoard({
       <section className="cronograma-board-heading p-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-muted-foreground">Agenda institucional</p>
             <h2 className="text-2xl font-black tracking-tight">Reuniões centrais por ano</h2>
           </div>
           <CronogramaMetaBadge icon={CalendarCheck2} tone="green">{meetings.length} reuniões</CronogramaMetaBadge>
@@ -297,7 +290,7 @@ export function MeetingsBoard({
               {yearMeetings.map((event, index) => (
                 <MeetingAgendaCard key={event.id} event={event} index={index} onOpen={onOpen} />
               ))}
-              {yearMeetings.length === 0 && <EmptyBoardState title="Sem reunião central" text="Nenhuma reunião atende aos filtros atuais." />}
+              {yearMeetings.length === 0 && <EmptyBoardState title="Nenhuma reunião atende aos filtros atuais." />}
             </div>
           </section>
         ))}
@@ -326,11 +319,7 @@ export function UndatedBoard({
       <section className="cronograma-board-heading is-undated p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-amber-950/65">Central de decisões pendentes</p>
             <h2 className="text-2xl font-black tracking-tight">Pendências</h2>
-            <p className="mt-2 max-w-3xl text-sm leading-relaxed text-muted-foreground">
-              Itens sem data oficial continuam preservados, mas aparecem como decisões de planejamento em vez de alertas genéricos.
-            </p>
           </div>
           <CronogramaMetaBadge icon={Route} tone="gold">{undated.length} decisões</CronogramaMetaBadge>
         </div>
@@ -360,7 +349,6 @@ export function UndatedBoard({
           <Route aria-hidden="true" />
           <div>
             <h3>Nenhuma pendência nesta visão</h3>
-            <p>Os itens sem data aparecerão aqui sem alterar o cadastro original.</p>
           </div>
         </section>
       )}
@@ -380,12 +368,12 @@ function groupByMonth(events: CronogramaEvent[]) {
   return map;
 }
 
-function EmptyBoardState({ title, text }: { title: string; text: string }) {
+function EmptyBoardState({ title, text }: { title: string; text?: string }) {
   return (
     <div className="rounded-2xl border border-dashed border-border/55 bg-white/38 p-5 text-center">
       <Layers3 className="mx-auto h-5 w-5 text-muted-foreground" />
       <p className="mt-2 text-sm font-bold text-foreground">{title}</p>
-      <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{text}</p>
+      {text && <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{text}</p>}
     </div>
   );
 }

@@ -539,7 +539,7 @@ async function saveRelationalSubevent(
   const parent = fromDbRow(savedParent);
   const created = (parent.subevents ?? []).find((subevent) => subevent.id === requestId)
     ?? (parent.subevents ?? []).slice().sort((left, right) => (right.sortOrder ?? 0) - (left.sortOrder ?? 0))[0];
-  if (!created) throw new Error('Subevento salvo, mas não retornou na leitura consolidada. Atualize a página.');
+  if (!created) throw new Error('O subevento foi salvo, mas ainda não apareceu. Atualize a página.');
   return { parent, subevent: created };
 }
 
@@ -709,7 +709,7 @@ export function useCronogramaEventos() {
     action = 'updated',
     allowUnavailable = false,
   ) => {
-    if (!orgId || !next.sourceKey) throw new Error('O evento não possui vínculo persistente com a organização atual.');
+    if (!orgId || !next.sourceKey) throw new Error('Este evento não está associado à organização atual.');
     if (dbUnavailable && !allowUnavailable) {
       throw new Error('A sincronização está indisponível. As alterações não foram salvas para evitar perda de dados. Tente novamente mais tarde.');
     }
@@ -721,7 +721,7 @@ export function useCronogramaEventos() {
 
   const ensurePersistedParent = async (current: CronogramaEvent, allowUnavailable = false) => {
     if (isUuid(current.id)) return current;
-    if (!orgId || !current.sourceKey) throw new Error('O evento principal não possui vínculo persistente.');
+    if (!orgId || !current.sourceKey) throw new Error('O evento principal não está associado à organização atual.');
 
       const existing = await cronogramaDb
         .from('cronograma_eventos_full')
@@ -837,7 +837,7 @@ export function useCronogramaEventos() {
       if (!current) throw new Error('Evento principal não encontrado. Atualize a página e tente novamente.');
       const id = requestId
         ?? (typeof crypto !== 'undefined' && 'randomUUID' in crypto ? crypto.randomUUID() : undefined);
-      if (!id) throw new Error('Não foi possível gerar uma identidade segura para o subevento. Tente novamente.');
+      if (!id) throw new Error('Não foi possível preparar o subevento. Tente novamente.');
       const normalizedDraft = {
         ...draft,
         sortOrder: draft.sortOrder ?? nextSubeventSortOrder(current),
@@ -893,7 +893,7 @@ export function useCronogramaEventos() {
           recordQueuedCronogramaAttempt(
             orgId,
             item.requestId,
-            new Error('O evento principal desta conexão não está disponível no recorte atual.'),
+            new Error('O evento principal deste subevento não está disponível na visualização atual.'),
           );
           failed += 1;
           continue;
@@ -1004,7 +1004,7 @@ export function useCronogramaEventos() {
       }
 
       if (dbUnavailable || relationshipsUnavailable) {
-        throw new Error('Os relacionamentos online estão indisponíveis. Tente novamente em instantes.');
+        throw new Error('A sincronização de subeventos está indisponível. Tente novamente em instantes.');
       }
       const parent = await ensurePersistedParent(current);
       const data = await cronogramaSaveSubevent(
@@ -1037,7 +1037,7 @@ export function useCronogramaEventos() {
       }
 
       if (myRole !== 'admin' && myRole !== 'gestor') {
-        throw new Error('Somente administradores e gestores podem remover subeventos persistidos.');
+        throw new Error('Somente administradores e gestores podem remover subeventos já salvos.');
       }
 
       if (existingSubevent.storage !== 'relational' || !isUuid(subeventId)) {
@@ -1049,7 +1049,7 @@ export function useCronogramaEventos() {
       }
 
       if (dbUnavailable || relationshipsUnavailable) {
-        throw new Error('Os relacionamentos online estão indisponíveis. Tente novamente em instantes.');
+        throw new Error('A sincronização de subeventos está indisponível. Tente novamente em instantes.');
       }
       const parent = await ensurePersistedParent(current);
       const data = await cronogramaDeleteSubevent(subeventId, existingSubevent.lockVersion ?? null);
@@ -1065,19 +1065,19 @@ export function useCronogramaEventos() {
 
   const retryRelationships = async () => {
     if (!isOnline) {
-      throw new Error('Este dispositivo está offline. Os rascunhos permanecem preservados e serão enviados quando a conexão voltar.');
+      throw new Error('Este dispositivo está offline. Os subeventos pendentes continuam salvos aqui e serão enviados quando a conexão voltar.');
     }
     const refreshed = await query.refetch();
     if (refreshed.error) {
-      throw new Error('O serviço do cronograma ainda não está disponível. Nenhum rascunho foi perdido; tente novamente mais tarde.');
+      throw new Error('O cronograma ainda não está disponível. Os subeventos pendentes continuam salvos; tente novamente mais tarde.');
     }
     lastAutoSyncSignature.current = '';
     const result = await syncQueuedRelationships.mutateAsync();
     if (result.failed > 0) {
       throw new Error(
         result.synced > 0
-          ? `${result.synced} conexões foram sincronizadas, mas ${result.failed} ainda precisam de revisão.`
-          : 'As conexões continuam preservadas localmente, mas o serviço ainda não aceitou a sincronização.',
+          ? `${result.synced} subeventos foram sincronizados, mas ${result.failed} ainda precisam de revisão.`
+          : 'Os subeventos continuam salvos neste dispositivo e ainda não foram sincronizados.',
       );
     }
     return result;

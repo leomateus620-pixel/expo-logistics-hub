@@ -316,7 +316,7 @@ export function RelationalMultiSelect({
         isPrimary: !alreadyPrimary,
       },
     ]);
-    setAnnouncement(`${term} adicionado como nome externo.`);
+    setAnnouncement(`${term} adicionado como responsável externo.`);
     setSearch('');
     setActiveIndex(options.length > 0 ? 0 : -1);
   };
@@ -398,11 +398,9 @@ export function RelationalMultiSelect({
       </span>
       <span id={`${fieldId}-trigger-label`} className="cronograma-relation-trigger__copy">
         <strong>{value.length > 0 ? selectedTriggerLabel : triggerLabel}</strong>
-        <small>
-          {value.length > 0
-            ? `${value.length} ${value.length === 1 ? 'selecionado' : 'selecionados'}`
-            : 'Busca rápida no registro oficial'}
-        </small>
+        {value.length > 0 && (
+          <small>{value.length} {value.length === 1 ? 'selecionado' : 'selecionados'}</small>
+        )}
       </span>
       <ChevronDown className="cronograma-relation-trigger__chevron" aria-hidden="true" />
     </button>
@@ -449,7 +447,6 @@ export function RelationalMultiSelect({
             ? 'Carregando opções…'
             : `${matchingOptions.length} ${matchingOptions.length === 1 ? 'resultado' : 'resultados'}`}
         </span>
-        <span>{value.length} {value.length === 1 ? 'selecionado' : 'selecionados'}</span>
       </div>
 
       <div
@@ -463,8 +460,7 @@ export function RelationalMultiSelect({
         {isLoading && (
           <div className="cronograma-relation-state" role="status">
             <Loader2 className="cronograma-relation-state__spinner" aria-hidden="true" />
-            <strong>Carregando registro oficial</strong>
-            <span>As opções aparecerão assim que a consulta for concluída.</span>
+            <strong>Carregando opções…</strong>
           </div>
         )}
 
@@ -487,7 +483,6 @@ export function RelationalMultiSelect({
           <div className="cronograma-relation-state">
             <Search aria-hidden="true" />
             <strong>Nenhum resultado encontrado para esta busca.</strong>
-            <span>Tente buscar por outro nome, função ou área.</span>
           </div>
         )}
 
@@ -556,7 +551,7 @@ export function RelationalMultiSelect({
             <span className="cronograma-relation-option__identity" aria-hidden="true"><Plus /></span>
             <span className="cronograma-relation-option__copy">
               <strong>Adicionar “{search.trim()}”</strong>
-              <span>Nome externo permitido pelo fluxo atual</span>
+              <span>Responsável externo</span>
             </span>
           </button>
         )}
@@ -576,11 +571,6 @@ export function RelationalMultiSelect({
           <h4 id={labelId}>{label}</h4>
           {description && <p id={descriptionId}>{description}</p>}
         </div>
-        {value.length > 0 && (
-          <span className="cronograma-relation-field__count" aria-label={`${value.length} selecionados`}>
-            {value.length}
-          </span>
-        )}
       </div>
 
       {isMobile ? (
@@ -595,7 +585,6 @@ export function RelationalMultiSelect({
             onOpenAutoFocus={(event) => event.preventDefault()}
           >
             <SheetHeader className="cronograma-relation-sheet__header">
-              <span className="cronograma-relation-sheet__eyebrow">Vínculos relacionais</span>
               <SheetTitle>{label}</SheetTitle>
               {description && <SheetDescription>{description}</SheetDescription>}
             </SheetHeader>
@@ -642,14 +631,14 @@ export function RelationalMultiSelect({
             const matchingOption = optionById.get(item.id) ?? optionByName.get(normalizeSearchTerm(item.label));
             const detail = matchingOption?.description ?? item.hint;
             const context = matchingOption?.context
-              ?? ((item.id.startsWith('custom:') || item.id.startsWith('external:')) ? 'Nome externo' : undefined);
+              ?? ((item.id.startsWith('custom:') || item.id.startsWith('external:')) ? 'Responsável externo' : undefined);
             return (
               <li key={item.id} className="cronograma-relation-selected__item" data-primary={item.isPrimary || undefined}>
                 <span className="cronograma-relation-selected__identity" aria-hidden="true">
                   {variant === 'organization' ? <Building2 /> : initialsFor(item.label)}
                 </span>
                 <span className="cronograma-relation-selected__copy">
-                  <small>{item.isPrimary ? primaryLabel : variant === 'organization' ? 'Vínculo institucional' : 'Responsável vinculado'}</small>
+                  <small>{variant === 'organization' ? 'Área institucional' : 'Responsável'}</small>
                   <strong title={item.label}>{item.label}</strong>
                   {detail && <span>{detail}</span>}
                   {context && context !== detail && <em>{context}</em>}

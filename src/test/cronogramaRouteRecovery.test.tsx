@@ -8,6 +8,10 @@ import {
   CronogramaRouteLoading,
 } from '@/components/cronograma-eventos/CronogramaRouteState';
 
+vi.mock('@/components/cronograma-eventos/GoogleCalendarHeroWidget', () => ({
+  GoogleCalendarHeroWidget: () => <div data-testid="google-calendar-widget" />,
+}));
+
 afterEach(() => {
   vi.restoreAllMocks();
 });
@@ -24,7 +28,8 @@ describe('Cronograma route recovery contract', () => {
     );
 
     expect(screen.getByRole('heading', { name: 'FENASOJA 2028' })).toBeInTheDocument();
-    expect(screen.getByText('Nenhuma ação futura no recorte atual')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Preparação 2026—2028' })).toBeInTheDocument();
+    expect(screen.getByTestId('google-calendar-widget')).toBeInTheDocument();
   });
 
   it('delegates the immersive route action and exposes its loading state', () => {
@@ -80,7 +85,7 @@ describe('Cronograma route recovery contract', () => {
       </MemoryRouter>,
     );
 
-    expect(screen.getByRole('status')).toHaveTextContent('Carregando Cronograma e Eventos');
+    expect(screen.getByRole('status')).toHaveTextContent('Carregando…');
 
     rerender(
       <MemoryRouter>

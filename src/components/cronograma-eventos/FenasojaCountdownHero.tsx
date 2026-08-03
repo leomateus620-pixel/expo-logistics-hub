@@ -56,7 +56,7 @@ const LiveCountdownCore = memo(function LiveCountdownCore({
       <div className="fenasoja-countdown-story">
         <p className="fenasoja-countdown-overline">
           <span aria-hidden="true" />
-          A próxima grande história começa em
+          Abertura oficial em
         </p>
         <h1 id={`fenasoja-countdown-title-${presentation}`}>
           <span className="fenasoja-countdown-wordmark">FENASOJA</span>
@@ -76,7 +76,6 @@ const LiveCountdownCore = memo(function LiveCountdownCore({
       <section className="fenasoja-countdown-clock" aria-label="Contagem regressiva para a Fenasoja 2028">
         <div className="fenasoja-countdown-clock-heading">
           <span><Clock3 aria-hidden="true" /> Tempo até a abertura</span>
-          <span className="fenasoja-countdown-live"><i aria-hidden="true" /> Atualização em tempo real</span>
         </div>
 
         <FenasojaCountdownDigits
@@ -137,7 +136,6 @@ export function FenasojaCountdownHero({
               </span>
               <span>
                 <strong>Contagem oficial</strong>
-                <small>Cronograma e Eventos</small>
               </span>
             </div>
 
@@ -158,7 +156,6 @@ export function FenasojaCountdownHero({
                 </span>
                 <span>
                   <strong>{isExpanding ? 'Abrindo experiência…' : 'Abrir contagem'}</strong>
-                  <small>Experiência imersiva</small>
                 </span>
                 <ArrowUpRight className="fenasoja-countdown-expand-arrow" aria-hidden="true" />
               </button>
@@ -169,8 +166,6 @@ export function FenasojaCountdownHero({
           <LiveCountdownCore presentation={presentation} />
 
           <div className="fenasoja-countdown-card-meta">
-            <span>Marco oficial</span>
-            <i aria-hidden="true" />
             <span>{FENASOJA_2028_OPENING_LABEL}</span>
             <i aria-hidden="true" />
             <span>Horário de Brasília</span>
@@ -178,13 +173,15 @@ export function FenasojaCountdownHero({
         </div>
       </header>
 
-      <FenasojaPreparationTimeline
-        cycleProgress={cycleProgress}
-        availability={availability}
-        presentation={presentation}
-      />
-      <div className="fenasoja-countdown-secondary" aria-label="Integrações do cronograma">
-        <GoogleCalendarHeroWidget />
+      <div className="fenasoja-countdown-operations">
+        <FenasojaPreparationTimeline
+          cycleProgress={cycleProgress}
+          availability={availability}
+          presentation={presentation}
+        />
+        <div className="fenasoja-countdown-secondary">
+          <GoogleCalendarHeroWidget />
+        </div>
       </div>
     </div>
   );

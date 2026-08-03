@@ -79,15 +79,15 @@ describe('cartão do Google Agenda', () => {
     expect(container.querySelector('[aria-live="polite"]')).toHaveTextContent('Conecte sua agenda');
   });
 
-  it('bloqueia somente o controle afetado enquanto prepara a conexão', () => {
+  it('mantém um estado compacto e estável enquanto prepara a conexão', () => {
     hookMock.mockReturnValue(hookValue({
       flowPhase: 'starting',
       connect: { isPending: true, mutate: mutateConnect },
     }));
-    render(<GoogleCalendarHeroWidget />);
-    const button = screen.getByRole('button', { name: 'Preparando…' });
-    expect(button).toBeDisabled();
-    expect(button).toHaveAttribute('aria-busy', 'true');
+    const { container } = render(<GoogleCalendarHeroWidget />);
+    expect(screen.getByText('Preparando conexão')).toBeVisible();
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    expect(container.querySelector('article')).toHaveAttribute('aria-busy', 'true');
   });
 
   it('permite cancelar apenas a autorização em espera', () => {
@@ -96,7 +96,9 @@ describe('cartão do Google Agenda', () => {
       connect: { isPending: true, mutate: mutateConnect },
     }));
     render(<GoogleCalendarHeroWidget />);
-    expect(screen.getByRole('button', { name: 'Aguardando autorização' })).toBeDisabled();
+    expect(screen.getByText('Autorize sua conta Google')).toBeVisible();
+    expect(screen.getByText('Conclua a autorização na janela aberta para continuar.')).toBeVisible();
+    expect(screen.getAllByRole('button')).toHaveLength(1);
     fireEvent.click(screen.getByRole('button', { name: 'Cancelar' }));
     expect(cancelOAuth).toHaveBeenCalledTimes(1);
   });
@@ -117,9 +119,28 @@ describe('cartão do Google Agenda', () => {
       statusErrorCode: 'request_failed',
       isRefreshing: true,
     }));
-    render(<GoogleCalendarHeroWidget />);
-    expect(screen.getByRole('button', { name: 'Tentando novamente…' })).toBeDisabled();
+    const { container } = render(<GoogleCalendarHeroWidget />);
+    expect(screen.getByText('Tentando sincronizar novamente')).toBeVisible();
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    expect(container.querySelector('article')).toHaveAttribute('aria-busy', 'true');
     expect(refresh).not.toHaveBeenCalled();
+  });
+
+  it('mostra uma única mensagem coerente após desconectar', () => {
+    hookMock.mockReturnValue(hookValue({ flowPhase: 'disconnected_success' }));
+    render(<GoogleCalendarHeroWidget />);
+    expect(screen.getByText('Google Agenda desconectado')).toBeVisible();
+    expect(screen.queryByText('Conectado')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Conectar novamente' })).toBeVisible();
+  });
+
+  it('oferece ação contextual compacta quando a agenda está conectada', () => {
+    hookMock.mockReturnValue(hookValue({ connection: connected }));
+    render(<GoogleCalendarHeroWidget />);
+    expect(screen.getByRole('link', { name: 'Gerenciar' })).toHaveAttribute(
+      'href',
+      'https://calendar.google.com/calendar/u/0/r',
+    );
   });
 
   it('usa o handler existente de reconexão quando a autorização expirou', () => {
@@ -156,9 +177,11 @@ describe('cartão do Google Agenda', () => {
   it('mantém regras explícitas para mobile, foco e movimento reduzido', () => {
     const css = readFileSync('src/styles/fenasoja-countdown.css', 'utf8');
     expect(css).toContain('@media (max-width: 520px)');
-    expect(css).toContain('grid-template-columns: minmax(0, 1fr)');
+    expect(css).toContain('.fenasoja-countdown-operations');
     expect(css).toContain('.fenasoja-countdown-secondary');
-    expect(css).toContain('grid-template-columns: minmax(0, 19rem)');
+    expect(css).toContain('grid-template-columns: minmax(0, 1fr) clamp(24rem, 32vw, 30rem)');
+    expect(css).not.toContain('min-height: 15.5rem');
+    expect(css).not.toContain('grid-template-columns: minmax(0, 19rem)');
     expect(css).toContain(':focus-visible');
     expect(css).toContain('@media (prefers-reduced-motion: reduce)');
     expect(css).toContain('animation: none !important');

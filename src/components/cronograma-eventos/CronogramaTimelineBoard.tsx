@@ -175,9 +175,6 @@ export function CronogramaTimelineBoard({
           aria-label={variant === 'completed' ? 'Navegação do histórico concluído' : 'Navegação entre períodos'}
         >
           <div className="min-w-0">
-            <p className="text-[9px] font-bold uppercase tracking-[0.17em] text-muted-foreground">
-              {variant === 'completed' ? 'Arquivo em foco' : 'Período em foco'}
-            </p>
             <p className="truncate text-lg font-black tracking-tight text-foreground">{focusedLabel}</p>
           </div>
           <div className="ml-auto flex items-center gap-1.5">
@@ -289,14 +286,13 @@ export function CronogramaTimelineBoard({
                           <span className="flex flex-wrap items-center gap-2">
                             <strong id={`cronograma-month-${key}`} className="text-base font-black tracking-tight text-foreground sm:text-lg">{monthLabel(key)}</strong>
                             <span className="rounded-full bg-primary/[0.06] px-2 py-0.5 text-[9px] font-bold uppercase tracking-[0.12em] text-primary">{getCronogramaCycleStage(monthYear).stage}</span>
-                            {variant === 'completed' && <span className="cronograma-archive-month-label">Histórico</span>}
                             {isCurrent && <span className="rounded-full bg-gold/15 px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-[0.12em] text-amber-950">Mês atual</span>}
                           </span>
                           <span className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-muted-foreground">
                             {variant === 'completed' ? (
                               <>
-                                <span>{summary.total} registros históricos</span>
-                                <span>{summary.completed} concluídos manualmente</span>
+                                <span>{summary.total} eventos</span>
+                                <span>{summary.completed} concluídos</span>
                               </>
                             ) : (
                               <>
@@ -346,10 +342,7 @@ export function CronogramaTimelineBoard({
           >
             <header className="flex flex-wrap items-start justify-between gap-3 border-b border-amber-900/10 px-4 py-3 sm:px-5">
               <div>
-                <p className="text-[9px] font-bold uppercase tracking-[0.17em] text-amber-900/70">
-                  {variant === 'completed' ? 'Arquivo sem data' : 'Backlog institucional'}
-                </p>
-                <h3 id="cronograma-undated-title" className="mt-1 text-lg font-black tracking-tight text-foreground">
+                <h3 id="cronograma-undated-title" className="text-lg font-black tracking-tight text-foreground">
                   {variant === 'completed' ? 'Concluídos sem data registrada' : 'Ações aguardando definição de data'}
                 </h3>
               </div>
@@ -365,8 +358,8 @@ export function CronogramaTimelineBoard({
                     <span className="block text-sm font-bold text-foreground">{event.title}</span>
                     <span className="mt-1 block truncate text-xs text-muted-foreground">
                       {variant === 'completed'
-                        ? 'Concluído manualmente sem data histórica registrada.'
-                        : event.pendingReason || 'Aguardando agendamento institucional.'}
+                        ? 'Sem data registrada.'
+                        : event.pendingReason || 'Aguardando definição de data.'}
                     </span>
                   </span>
                   <CronogramaPriorityIndicator priority={event.priority} compact />
@@ -399,17 +392,17 @@ function TimelineYearEmptyState({
 }) {
   const focusedMonthLabel = focusedMonth ? monthLabel(focusedMonth) : null;
   let title = `Nenhum evento encontrado em ${summary.year} com os filtros atuais.`;
-  let description = 'Os filtros foram preservados. Ajuste o recorte ou escolha outro ano no ciclo.';
+  let description = 'Ajuste os filtros ou escolha outro ano.';
 
   if (!summary.available) {
     title = `Ainda não há eventos cadastrados em ${summary.year}.`;
-    description = 'A etapa continua visível no ciclo e será habilitada quando receber eventos.';
+    description = 'Escolha outro ano do ciclo.';
   } else if (summary.undatedFiltered > 0 && summary.datedFiltered === 0) {
     title = `${summary.undatedFiltered} ${summary.undatedFiltered === 1 ? 'evento atende' : 'eventos atendem'} aos filtros, mas ${summary.undatedFiltered === 1 ? 'ainda não possui' : 'ainda não possuem'} data.`;
-    description = `Consulte as pendências sem data de ${summary.year} ou mantenha os filtros para escolher outra etapa.`;
+    description = `Consulte as pendências sem data de ${summary.year}.`;
   } else if (focusedMonthLabel && summary.datedFiltered > 0) {
     title = `Nenhum evento encontrado em ${focusedMonthLabel} com os filtros atuais.`;
-    description = `Há outros meses disponíveis em ${summary.year}; use os controles de período para continuar a navegação.`;
+    description = `Escolha outro mês de ${summary.year}.`;
   }
 
   return (

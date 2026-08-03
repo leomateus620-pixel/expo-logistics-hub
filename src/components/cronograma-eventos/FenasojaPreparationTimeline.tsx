@@ -16,7 +16,7 @@ function getPreparationStatus(cycleProgress: number, availability: TimelineAvail
   if (availability === 'loading') return 'Atualizando o progresso oficial…';
   if (availability === 'offline') return 'Progresso temporal disponível; sincronização online indisponível.';
   if (cycleProgress >= 100) return 'Ciclo concluído no marco oficial.';
-  return 'Construção em andamento.';
+  return null;
 }
 
 export const FenasojaPreparationTimeline = memo(function FenasojaPreparationTimeline({
@@ -57,10 +57,12 @@ export const FenasojaPreparationTimeline = memo(function FenasojaPreparationTime
         <span style={{ '--preparation-progress': cycleProgress / 100 } as CSSProperties} />
       </div>
 
-      <p className="fenasoja-preparation-status" role="status">
-        <span aria-hidden="true" />
-        {status}
-      </p>
+      {status && (
+        <p className="fenasoja-preparation-status" role="status">
+          <span aria-hidden="true" />
+          {status}
+        </p>
+      )}
     </section>
   );
 });

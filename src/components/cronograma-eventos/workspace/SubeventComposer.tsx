@@ -93,7 +93,7 @@ export function SubeventComposer({
     event.preventDefault();
     if (saving) return;
     if (!form.title.trim()) {
-      setTitleError('Informe um título para conectar este subevento.');
+      setTitleError('Informe o título do subevento.');
       document.getElementById(fieldId('title'))?.focus();
       return;
     }
@@ -131,16 +131,15 @@ export function SubeventComposer({
           {mode === 'create' ? <Sparkles /> : <Link2 />}
         </span>
         <div className="min-w-0">
-          <p>{mode === 'create' ? 'Nova conexão' : 'Ajustar conexão'}</p>
           <h3>{mode === 'create' ? 'Adicionar subevento' : 'Editar subevento'}</h3>
-          <span>Ligado a: {connectedTo}</span>
+          <span>Evento principal: {connectedTo}</span>
         </div>
         <button
           type="button"
           className="cronograma-thought-close focus-ring"
           onClick={onCancel}
           disabled={saving}
-          aria-label="Fechar painel de subevento"
+          aria-label="Fechar formulário de subevento"
         >
           <X aria-hidden="true" />
         </button>
@@ -156,7 +155,7 @@ export function SubeventComposer({
               update('title', event.target.value);
               if (titleError) setTitleError(null);
             }}
-            placeholder="Ex: confirmar fornecedores da operação"
+            placeholder="Ex.: Confirmar fornecedores"
             autoFocus
             aria-invalid={Boolean(titleError) || undefined}
             aria-describedby={titleError ? fieldId('title-error') : undefined}
@@ -170,7 +169,7 @@ export function SubeventComposer({
             id={fieldId('description')}
             value={form.description}
             onChange={(event) => update('description', event.target.value)}
-            placeholder="Contexto curto, resultado esperado ou dependência."
+            placeholder="Resultado esperado ou observações"
             rows={3}
           />
         </div>
@@ -232,7 +231,7 @@ export function SubeventComposer({
         </div>
 
         <div className="cronograma-thought-field">
-          <Label htmlFor={fieldId('commission')}>Comissão / categoria</Label>
+          <Label htmlFor={fieldId('commission')}>Comissão ou assessoria</Label>
           <select
             id={fieldId('commission')}
             className="cronograma-thought-select focus-ring"
@@ -255,7 +254,7 @@ export function SubeventComposer({
         </Button>
         <Button type="submit" disabled={saving} className="rounded-xl">
           {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
-          {saving ? 'Conectando…' : mode === 'create' ? 'Conectar subevento' : 'Salvar conexão'}
+          {saving ? 'Salvando…' : mode === 'create' ? 'Adicionar subevento' : 'Salvar alterações'}
         </Button>
       </div>
     </form>

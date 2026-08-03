@@ -90,23 +90,15 @@ describe("Anexos e fotos", () => {
   it("integra orientação, ação e estado vazio em uma única região acessível", () => {
     render(<EventoAnexosSection eventId="event-1" />);
 
-    const region = screen.getByRole("region", { name: "Anexos e fotos" });
-    expect(within(region).getByText("Registros e comprovações")).toBeVisible();
+    const region = screen.getByRole("region", { name: "Anexos" });
     expect(
       within(region).getByText("Imagens, PDF, Word, Excel ou TXT"),
     ).toBeVisible();
     expect(within(region).getByText("Até 20 MB por arquivo")).toBeVisible();
     expect(
-      within(region).getByText("Nenhum anexo enviado ainda"),
+      within(region).getByText("Nenhum anexo enviado"),
     ).toBeVisible();
-    expect(
-      within(region).getByText(
-        "Seja o primeiro a registrar uma foto ou documento.",
-      ),
-    ).toBeVisible();
-    expect(within(region).getByRole("status")).toHaveTextContent(
-      "Envio protegido pelas permissões deste evento.",
-    );
+    expect(within(region).queryByRole("status")).not.toBeInTheDocument();
 
     const action = within(region).getByRole("button", {
       name: "Anexar arquivo",
@@ -158,10 +150,10 @@ describe("Anexos e fotos", () => {
 
     await waitFor(() => expect(upload).toHaveBeenCalledWith(file));
     expect(await screen.findByRole("status")).toHaveTextContent(
-      "Arquivo anexado com sucesso.",
+      "Arquivo anexado.",
     );
     expect(
-      screen.getByRole("button", { name: "Arquivo anexado" }),
+      screen.getByRole("button", { name: "Anexar arquivo" }),
     ).toBeEnabled();
     expect(mocks.toast).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -190,7 +182,7 @@ describe("Anexos e fotos", () => {
     ).toBeEnabled();
     expect(mocks.toast).toHaveBeenCalledWith(
       expect.objectContaining({
-        title: "Falha no upload",
+        title: "Falha ao anexar",
         variant: "destructive",
       }),
     );
@@ -239,7 +231,6 @@ describe("Anexos e fotos", () => {
     expect(screen.getByText("Excel")).toBeVisible();
     expect(screen.getByText("2.0 MB")).toBeVisible();
     expect(screen.getByText("Comissão Central")).toBeVisible();
-    expect(screen.getByText("Exclusão restrita")).toBeVisible();
     expect(
       screen.getByRole("button", { name: `Ações para ${longName}` }),
     ).toBeVisible();

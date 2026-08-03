@@ -143,10 +143,7 @@ export function CronogramaFiltersBar({
           </PopoverTrigger>
           <PopoverContent align="end" className="w-[min(94vw,46rem)] rounded-2xl border-border/60 bg-white p-4 shadow-2xl">
             <div className="mb-4 flex items-start justify-between gap-4">
-              <div>
-                <p className="text-sm font-black text-foreground">Filtros avançados</p>
-                <p className="mt-1 text-xs text-muted-foreground">Combine período, classificação e responsabilidade.</p>
-              </div>
+              <p className="text-sm font-black text-foreground">Filtros avançados</p>
               <span className="rounded-full bg-primary/7 px-2.5 py-1 font-mono text-[10px] font-bold text-primary">{resultCount} resultados</span>
             </div>
 
@@ -233,22 +230,22 @@ export function CronogramaFiltersBar({
             Sincronizando
           </span>
         )}
-        <div className="cronograma-active-filters" aria-label="Filtros ativos">
-          {activeChips.length === 0 ? (
-            <span className="text-[11px] text-muted-foreground">Sem filtros adicionais</span>
-          ) : activeChips.map((chip) => (
-            <button
-              key={chip.key}
-              type="button"
-              onClick={() => onChange(chip.clear(filters))}
-              className="cronograma-filter-chip focus-ring"
-              aria-label={`Remover filtro ${chip.label}`}
-            >
-              {chip.label}
-              <X className="h-3 w-3" aria-hidden="true" />
-            </button>
-          ))}
-        </div>
+        {activeChips.length > 0 && (
+          <div className="cronograma-active-filters" aria-label="Filtros ativos">
+            {activeChips.map((chip) => (
+              <button
+                key={chip.key}
+                type="button"
+                onClick={() => onChange(chip.clear(filters))}
+                className="cronograma-filter-chip focus-ring"
+                aria-label={`Remover filtro ${chip.label}`}
+              >
+                {chip.label}
+                <X className="h-3 w-3" aria-hidden="true" />
+              </button>
+            ))}
+          </div>
+        )}
         {activeChips.length > 0 && (
           <Button type="button" variant="ghost" size="sm" onClick={onClear} className="h-7 shrink-0 rounded-full px-2 text-[10px]">
             Limpar tudo

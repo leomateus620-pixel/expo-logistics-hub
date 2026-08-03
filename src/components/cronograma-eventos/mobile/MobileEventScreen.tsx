@@ -5,7 +5,6 @@ import {
   Check,
   CheckCircle2,
   Edit3,
-  FileClock,
   History,
   Layers3,
   Loader2,
@@ -121,7 +120,7 @@ export function MobileEventScreen({
   const performSave = async (nextEvent: CronogramaEvent, leaveEditMode = true) => {
     if (saving) return;
     if (sourceUnavailable) {
-      setSaveError('Este evento não está mais disponível na base sincronizada. Revise os dados antes de descartar o formulário.');
+      setSaveError('Este evento não está mais disponível. Revise o formulário antes de descartar suas alterações.');
       return;
     }
     const completesEvent = event.status !== 'completed' && nextEvent.status === 'completed' && Boolean(onComplete);
@@ -153,7 +152,7 @@ export function MobileEventScreen({
   const performCompletion = async () => {
     if (saving || completionPendingRef.current) return;
     if (sourceUnavailable) {
-      setSaveError('Este evento não está mais disponível na base sincronizada. A conclusão não foi aplicada.');
+      setSaveError('Este evento não está mais disponível. A conclusão não foi salva.');
       return;
     }
 
@@ -240,7 +239,7 @@ export function MobileEventScreen({
       <MobileDialogFrame
         open={open}
         title={event.title}
-        description={editMode ? 'Atualize os dados operacionais e salve as alterações.' : event.summary}
+        description={editMode ? `Formulário de edição de ${event.title}.` : event.summary}
         headerContent={headerContent}
         onRequestClose={() => {
           if (!saving) overlayHistory.requestClose();
@@ -309,7 +308,7 @@ export function MobileEventScreen({
 
         {sourceUnavailable && (
           <p className="cronograma-mobile-event-error" role="alert">
-            Este evento não está mais disponível na base sincronizada. O rascunho local foi preservado para revisão antes do descarte.
+            Este evento não está mais disponível. Suas alterações continuam neste formulário.
           </p>
         )}
         {saveError && <p className="cronograma-mobile-event-error" role="alert">{saveError}</p>}
@@ -329,9 +328,8 @@ export function MobileEventScreen({
         ) : (
           <div>
             <section className="cronograma-mobile-event-section" aria-labelledby="cronograma-mobile-essential-title">
-              <p className="cronograma-mobile-section-kicker">Informações essenciais</p>
-              <h2 id="cronograma-mobile-essential-title" className="mt-1 text-base font-black tracking-tight text-foreground">
-                Quando, onde e com quem
+              <h2 id="cronograma-mobile-essential-title" className="text-base font-black tracking-tight text-foreground">
+                Informações do evento
               </h2>
               <div className="cronograma-mobile-info-list">
                 <MobileInfo
@@ -352,34 +350,28 @@ export function MobileEventScreen({
                     <AlertTriangle className="h-4 w-4" />
                   </span>
                   <div className="min-w-0">
-                    <p className="cronograma-mobile-section-kicker">Definição pendente</p>
-                    <h2 id="cronograma-mobile-pending-title" className="mt-1 text-sm font-black text-foreground">
-                      Próximo encaminhamento necessário
+                    <h2 id="cronograma-mobile-pending-title" className="text-sm font-black text-foreground">
+                      Definição pendente
                     </h2>
                     <p className="mt-2 text-sm leading-6 text-foreground/80">
                       {event.pendingReason || 'Este item ainda não possui data oficial definida.'}
                     </p>
-                    {event.decisionNeeded && <p className="mt-2 text-sm font-semibold text-amber-950">{event.decisionNeeded}</p>}
+                    {event.decisionNeeded && (
+                      <p className="mt-2 text-sm font-semibold text-amber-950">
+                        Decisão necessária: {event.decisionNeeded}
+                      </p>
+                    )}
                   </div>
                 </div>
               </section>
             )}
 
-            <section className="cronograma-mobile-event-section" aria-labelledby="cronograma-mobile-summary-title">
-              <p className="cronograma-mobile-section-kicker">Descrição executiva</p>
-              <h2 id="cronograma-mobile-summary-title" className="sr-only">Descrição do evento</h2>
-              <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-foreground/82">
-                {event.summary || 'Nenhuma descrição executiva foi informada.'}
-              </p>
-            </section>
-
             {event.subevents && event.subevents.length > 0 && (
               <section className="cronograma-mobile-event-section" aria-labelledby="cronograma-mobile-subevents-title">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="cronograma-mobile-section-kicker">Checklist</p>
-                    <h2 id="cronograma-mobile-subevents-title" className="mt-1 text-base font-black text-foreground">
-                      Entregas e subeventos
+                    <h2 id="cronograma-mobile-subevents-title" className="text-base font-black text-foreground">
+                      Subeventos
                     </h2>
                   </div>
                   <span className="cronograma-progress-label">{progress?.completed ?? 0}/{progress?.total ?? 0}</span>
@@ -406,7 +398,7 @@ export function MobileEventScreen({
                             {subevent.title}
                           </p>
                           <p className="mt-1 text-xs leading-5 text-muted-foreground">
-                            {subevent.date ? formatLongDate(subevent.date) : 'Sem data vinculada'}
+                            {subevent.date ? formatLongDate(subevent.date) : 'Sem data'}
                             {subevent.owner ? ` · ${subevent.owner}` : ''}
                           </p>
                         </div>
@@ -420,29 +412,12 @@ export function MobileEventScreen({
 
             {event.id && <EventoAnexosSection eventId={event.id} className="cronograma-mobile-event-section" />}
 
-            <section className="cronograma-mobile-event-section" aria-labelledby="cronograma-mobile-trace-title">
-              <div className="flex items-start gap-3">
-                <span className="cronograma-mobile-info-icon" aria-hidden="true"><FileClock className="h-4 w-4" /></span>
-                <div className="min-w-0">
-                  <p className="cronograma-mobile-section-kicker">Rastreabilidade</p>
-                  <h2 id="cronograma-mobile-trace-title" className="mt-1 text-sm font-black text-foreground">Origem do registro</h2>
-                  <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                    {event.sourceSheet ? `Origem: ${event.sourceSheet}. ` : ''}
-                    {event.updatedAt
-                      ? `Atualizado em ${new Intl.DateTimeFormat('pt-BR', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(event.updatedAt))}.`
-                      : 'Registro consolidado a partir do cronograma oficial.'}
-                  </p>
-                </div>
-              </div>
-            </section>
-
             {canViewHistory && (
               <section className="cronograma-mobile-event-section" aria-labelledby="cronograma-mobile-history-title">
                 <details>
                   <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 focus-ring">
                     <span>
-                      <span className="cronograma-mobile-section-kicker">Auditoria</span>
-                      <span id="cronograma-mobile-history-title" className="mt-1 flex items-center gap-2 text-sm font-black text-foreground">
+                      <span id="cronograma-mobile-history-title" className="flex items-center gap-2 text-sm font-black text-foreground">
                         <History className="h-4 w-4 text-primary" />Histórico de alterações
                       </span>
                     </span>
@@ -455,10 +430,10 @@ export function MobileEventScreen({
                     </div>
                   ) : historyError ? (
                     <p className="mt-3 rounded-lg bg-amber-50 p-3 text-xs leading-5 text-amber-950">
-                      O histórico online não pôde ser carregado. Os dados do evento continuam disponíveis.
+                      Não foi possível carregar o histórico.
                     </p>
                   ) : history.length === 0 ? (
-                    <p className="mt-3 text-xs leading-5 text-muted-foreground">Nenhuma alteração manual registrada.</p>
+                    <p className="mt-3 text-xs leading-5 text-muted-foreground">Nenhuma alteração registrada.</p>
                   ) : (
                     <ol className="mt-3 space-y-2">
                       {history.slice(0, 5).map((entry) => (
@@ -483,7 +458,7 @@ export function MobileEventScreen({
       <MobileConfirmDialog
         open={discardTarget !== null}
         title="Descartar alterações?"
-        description="As informações modificadas continuam somente neste formulário e ainda não foram salvas."
+        description="As alterações ainda não foram salvas."
         confirmLabel={discardTarget === 'close' ? 'Descartar e fechar' : 'Descartar alterações'}
         onConfirm={handleConfirmDiscard}
         onCancel={() => setDiscardTarget(null)}

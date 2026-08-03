@@ -83,7 +83,7 @@ export function CronogramaSubeventForm({
   onDeletePersist,
   presentation = 'desktop',
   disabled = false,
-  emptyLabel = 'Nenhum subevento vinculado.',
+  emptyLabel = 'Nenhum subevento cadastrado.',
   defaultDate = null,
 }: CronogramaSubeventFormProps) {
   const [pendingDeleteIndex, setPendingDeleteIndex] = useState<number | null>(null);
@@ -184,10 +184,10 @@ export function CronogramaSubeventForm({
       <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <div>
           <h3 className="text-sm font-black uppercase tracking-[0.14em] text-foreground/72">
-            Subeventos vinculados
+            Subeventos
           </h3>
           <p className="mt-1 text-xs text-muted-foreground">
-            Arraste pela alça para reordenar. As alterações são salvas junto com o evento.
+            Use a alça para alterar a ordem.
           </p>
         </div>
         <Button
@@ -323,7 +323,7 @@ function SortableSubeventRow({
                 id={`${rowId}-title`}
                 value={subevent.title}
                 onChange={(event) => onUpdate(index, 'title', event.target.value)}
-                placeholder="Ex: validação de fornecedores"
+                placeholder="Ex.: Validar fornecedores"
                 className="bg-white/72"
                 disabled={disabled}
               />
@@ -369,7 +369,7 @@ function SortableSubeventRow({
                 id={`${rowId}-owner`}
                 value={subevent.owner || ''}
                 onChange={(event) => onUpdate(index, 'owner', event.target.value)}
-                placeholder="Comissão ou responsável"
+                placeholder="Pessoa ou equipe responsável"
                 className="bg-white/72"
                 disabled={disabled}
               />
@@ -413,7 +413,7 @@ function SortableSubeventRow({
               rows={2}
               value={subevent.description || ''}
               onChange={(event) => onUpdate(index, 'description', event.target.value)}
-              placeholder="Detalhes operacionais (opcional)"
+              placeholder="Observações (opcional)"
               className="rounded-2xl bg-white/72"
               disabled={disabled}
             />

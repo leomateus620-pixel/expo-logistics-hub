@@ -650,7 +650,9 @@ export default function CronogramaEventosPage() {
   };
 
   const handleUpdateSubevent = async (subevent: CronogramaSubevent, input: CronogramaSubeventInput) => {
-    if (!workspaceEvent || !subevent.id) throw new Error('A conexão selecionada não possui identidade persistente.');
+    if (!workspaceEvent || !subevent.id) {
+      throw new Error('Não foi possível identificar este subevento. Atualize a página e tente novamente.');
+    }
     const draft = visualSubeventToSourceDraft({
       ...subevent,
       title: input.title,
@@ -671,7 +673,9 @@ export default function CronogramaEventosPage() {
   };
 
   const handleRemoveSubevent = async (subevent: CronogramaSubevent) => {
-    if (!workspaceEvent || !subevent.id) throw new Error('A conexão selecionada não possui identidade persistente.');
+    if (!workspaceEvent || !subevent.id) {
+      throw new Error('Não foi possível identificar este subevento. Atualize a página e tente novamente.');
+    }
     await cronograma.deleteSubevent.mutateAsync({
       eventId: workspaceEvent.sourceKey ?? workspaceEvent.id,
       subeventId: subevent.id,
@@ -985,7 +989,7 @@ export default function CronogramaEventosPage() {
           </div>
         </MobileCronogramaErrorBoundary>
       ) : (
-        <div className="mx-auto flex w-full max-w-[1680px] flex-col gap-4 px-3 sm:px-5 2xl:px-8">
+        <div className="mx-auto flex w-full max-w-[1680px] flex-col gap-3 px-3 sm:px-5 2xl:px-8">
           <CronogramaCommandHeader
             events={events}
             onOpenUndated={() => setActiveView('undated')}
@@ -999,7 +1003,7 @@ export default function CronogramaEventosPage() {
             presentation="desktop"
           />
 
-          <div className="cronograma-command-dock sticky top-[72px] z-20 space-y-2 py-2">
+          <div className="cronograma-command-dock sticky top-[72px] z-20 space-y-2 pb-2">
             <CronogramaViewTabs activeView={activeView} onChange={setActiveView} />
             <CronogramaFiltersBar
               filters={filters}
@@ -1076,10 +1080,10 @@ export default function CronogramaEventosPage() {
             <DialogHeader>
               <DialogTitle className="flex items-center gap-2">
                 <CalendarDays className="h-5 w-5 text-gold" />
-                Novo evento do cronograma
+                Novo evento
               </DialogTitle>
               <DialogDescription>
-                Cadastre uma ação complementar no cronograma da organização. Os dados oficiais existentes permanecem preservados.
+                Preencha as informações essenciais do evento.
               </DialogDescription>
             </DialogHeader>
             <div className="overflow-y-auto pr-1">

@@ -466,7 +466,7 @@ export function EventForm({
       <div className="cronograma-form-section">
         <div className="mb-3 flex items-center gap-2">
           <CalendarClock className="h-4 w-4 text-gold" />
-          <h3 className="text-sm font-black uppercase tracking-[0.14em] text-foreground/72">Identidade do evento</h3>
+          <h3 className="text-sm font-black uppercase tracking-[0.14em] text-foreground/72">Informações principais</h3>
         </div>
         <div className="grid gap-3">
           <div className="space-y-1.5">
@@ -495,14 +495,14 @@ export function EventForm({
           </div>
           <div className="space-y-1.5">
             <Label htmlFor={fieldId('summary')}>
-              Resumo executivo <span className="font-normal text-muted-foreground">(opcional)</span>
+              Resumo <span className="font-normal text-muted-foreground">(opcional)</span>
             </Label>
             <Textarea
               id={fieldId('summary')}
               rows={3}
               value={form.summary}
               onChange={(event) => update('summary', event.target.value)}
-              placeholder="Síntese clara para leitura rápida no cronograma."
+              placeholder="Objetivo ou contexto do evento"
               className="rounded-2xl bg-white/72"
             />
           </div>
@@ -551,7 +551,7 @@ export function EventForm({
         <div className="grid gap-3 sm:grid-cols-3">
           <div className="space-y-1.5">
             <Label htmlFor={fieldId('date')}>
-              Data {presentation === 'mobile' && <span className="font-normal text-muted-foreground">(opcional)</span>}
+              Data <span className="font-normal text-muted-foreground">(opcional)</span>
             </Label>
             <Input
               id={fieldId('date')}
@@ -618,9 +618,6 @@ export function EventForm({
               placeholder="Preenchido automaticamente"
               className="cursor-not-allowed bg-muted/60 text-foreground/80"
             />
-            <p className="text-[11px] leading-relaxed text-muted-foreground">
-              Preenchido automaticamente com o usuário logado.
-            </p>
           </div>
 
         </div>
@@ -633,19 +630,17 @@ export function EventForm({
               <UserRound />
             </span>
             <div>
-              <p>Cadastro conectado</p>
-              <h3>Vínculos relacionais</h3>
-              <span>Separe a área institucional de quem executará ou acompanhará o evento.</span>
+              <h3>Áreas e responsáveis</h3>
+              <span>Defina a área institucional e quem executará ou acompanhará o evento.</span>
             </div>
           </div>
           <div className="cronograma-relations-section__fields">
             <RelationalMultiSelect
               label={ORG_UNIT_SELECT_LABEL}
-              description="Vincule a área institucional principal do evento."
               placeholder="Buscar comissão, assessoria ou responsável"
               triggerLabel="Selecionar comissão ou assessoria"
               selectedTriggerLabel="Adicionar ou alterar áreas"
-              emptyLabel="Nenhuma comissão ou assessoria vinculada."
+              emptyLabel="Nenhuma área vinculada."
               options={commissionOptions}
               value={commissionSelections}
               onChange={(next) => update('commissionsRel', selectionsToCommissionLinks(next, commissions))}
@@ -659,11 +654,11 @@ export function EventForm({
             {missingOfficialResponsibles.length > 0 && (
               <div className="cronograma-relation-institutional-action">
                 <div>
-                  <strong>Responsáveis institucionais disponíveis</strong>
+                  <strong>Responsáveis da área</strong>
                   <p>{missingOfficialResponsibles.join(', ')}</p>
                 </div>
                 <button type="button" onClick={applyOfficialResponsibles}>
-                  Usar no evento
+                  Adicionar
                   <span>{missingOfficialResponsibles.length}</span>
                 </button>
               </div>
@@ -671,11 +666,10 @@ export function EventForm({
 
             <RelationalMultiSelect
               label="Responsáveis do evento"
-              description="Defina quem executará ou acompanhará esta ação."
               placeholder="Buscar pessoa por nome ou função"
               triggerLabel="Selecionar responsáveis"
               selectedTriggerLabel="Adicionar ou alterar responsáveis"
-              emptyLabel="Nenhum responsável operacional vinculado."
+              emptyLabel="Nenhum responsável vinculado."
               options={responsibleOptions}
               value={responsibleSelections}
               onChange={(next) => {
