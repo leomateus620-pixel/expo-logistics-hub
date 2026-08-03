@@ -12,6 +12,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useOrgCommissions } from '@/hooks/useOrgCommissions';
+import { useAuth } from '@/hooks/useAuth';
+import { useOrgMembers } from '@/hooks/useOrgMembers';
 import { OrgUnitSummary } from '@/components/org-units/OrgUnitSelect';
 import {
   ORG_UNIT_SELECT_LABEL,
@@ -157,6 +159,19 @@ export function EventForm({
   const formInstanceId = useId().replace(/:/g, '');
   const fieldId = (name: string) => `${formInstanceId}-${name}`;
   const { units, commissions, isLoading: commissionsLoading } = useOrgCommissions();
+  const { user } = useAuth();
+  const { members } = useOrgMembers();
+  const currentUserName = useMemo(() => {
+    if (!user) return '';
+    const member = (members ?? []).find((item: any) => item.user_id === user.id);
+    return (
+      member?.nome_exibicao
+      || (user.user_metadata as any)?.full_name
+      || (user.user_metadata as any)?.name
+      || user.email
+      || ''
+    );
+  }, [members, user]);
   const initialForm = useMemo<CronogramaEvent>(() => {
     const next = {
       ...defaultForm,
@@ -197,6 +212,32 @@ export function EventForm({
     dirtyRef.current = dirty;
     onDirtyChange?.(dirty);
   }, [baselineSignature, form, onDirtyChange]);
+
+  const autoOwnerAppliedRef = useRef(false);
+  useEffect(() => {
+    if (event) return;
+    if (!currentUserName) return;
+    if (autoOwnerAppliedRef.current) return;
+    autoOwnerAppliedRef.current = true;
+    setForm((current) => {
+      const next = { ...current };
+      if (!next.owner?.trim()) next.owner = currentUserName;
+      if (!(next.responsiblesRel ?? []).length) {
+        next.responsiblesRel = [
+          {
+            userId: user?.id ?? null,
+            name: currentUserName,
+            role: null,
+            isPrimary: true,
+            responsibleType: user?.id ? 'member' : 'external',
+          },
+        ];
+      }
+      return next;
+    });
+  }, [currentUserName, event, user?.id]);
+
+
 
   const update = <K extends keyof CronogramaEvent>(key: K, value: CronogramaEvent[K]) => {
     setForm((current) => ({ ...current, [key]: value }));
@@ -461,15 +502,21 @@ export function EventForm({
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor={fieldId('owner')}>Responsável (fallback)</Label>
+            <Label htmlFor={fieldId('owner')}>Responsável</Label>
             <Input
               id={fieldId('owner')}
               value={form.owner || ''}
-              onChange={(event) => update('owner', event.target.value)}
-              placeholder="Legado: comissão ou pessoa (use os vínculos abaixo quando possível)"
-              className="bg-white/72"
+              readOnly
+              aria-readonly="true"
+              tabIndex={-1}
+              placeholder="Preenchido automaticamente"
+              className="cursor-not-allowed bg-muted/60 text-foreground/80"
             />
+            <p className="text-[11px] leading-relaxed text-muted-foreground">
+              Preenchido automaticamente com o usuário logado.
+            </p>
           </div>
+
         </div>
       </div>
 
@@ -516,9 +563,10 @@ export function EventForm({
             primaryLabel="Principal"
           />
           <p className="text-[11px] leading-relaxed text-muted-foreground">
-            Os vínculos relacionais são persistidos pelas RPCs oficiais (<code>cronograma_save_event</code>) e substituem
-            o campo &quot;Responsável (fallback)&quot; para eventos já salvos.
+            Os vínculos relacionais são persistidos pelas RPCs oficiais (<code>cronograma_save_event</code>) e complementam
+            o campo &quot;Responsável&quot; para eventos já salvos.
           </p>
+
         </div>
       )}
 
