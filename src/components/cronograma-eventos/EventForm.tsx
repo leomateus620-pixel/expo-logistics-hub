@@ -595,7 +595,24 @@ export function EventForm({
             emptyLabel="Nenhum responsável vinculado. Selecione pessoas do sistema ou digite um nome."
             options={responsibleOptions}
             value={responsibleSelections}
-            onChange={(next) => update('responsiblesRel', selectionsToResponsibleLinks(next))}
+            onChange={(next) => {
+              const reconciled = next.map((selection) => {
+                if (!selection.id.startsWith('custom:') && !selection.id.startsWith('external:')) return selection;
+                const match = responsibleOptions.find(
+                  (option) => normalizeSearchTerm(option.label) === normalizeSearchTerm(selection.label),
+                );
+                return match ? { ...selection, id: match.id, hint: selection.hint ?? match.hint } : selection;
+              });
+              const seen = new Set<string>();
+              const unique = reconciled.filter((selection) => {
+                const key = normalizeSearchTerm(selection.label);
+                if (seen.has(key)) return false;
+                seen.add(key);
+                return true;
+              });
+              update('responsiblesRel', selectionsToResponsibleLinks(unique));
+            }}
+
             allowCustom
             primaryLabel="Principal"
           />
