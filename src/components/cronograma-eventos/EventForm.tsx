@@ -288,7 +288,7 @@ export function EventForm({
     });
 
     return options;
-  }, [members, units]);
+  }, [loginMembers, units]);
 
   const linkedUnitIds = useMemo(
     () => (form.commissionsRel ?? []).map((link) => link.commissionId).filter(Boolean) as string[],
