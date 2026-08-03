@@ -201,7 +201,7 @@ export default function EventForm({ open, onOpenChange, editing }: EventFormProp
                 <SelectTrigger><SelectValue placeholder="Selecionar" /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">Ninguém</SelectItem>
-                  {members.map((m: any) => (
+                  {loginMembers.map((m: any) => (
                     <SelectItem key={m.user_id} value={m.user_id}>{m.nome_exibicao}</SelectItem>
                   ))}
                 </SelectContent>
