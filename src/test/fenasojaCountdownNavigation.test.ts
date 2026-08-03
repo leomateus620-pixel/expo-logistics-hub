@@ -3,6 +3,7 @@ import {
   FENASOJA_COUNTDOWN_ROUTE,
   consumeFenasojaCountdownLaunch,
   findFenasojaCountdownReturnFocus,
+  peekFenasojaCountdownLaunch,
   rememberFenasojaCountdownLaunch,
 } from '@/lib/fenasoja-countdown-navigation';
 
@@ -26,6 +27,20 @@ describe('navegação da contagem oficial', () => {
       scrollY: 640,
     });
     expect(consumeFenasojaCountdownLaunch()).toBeNull();
+  });
+
+  it('preserva a origem do Portal durante um eventual fluxo de login', () => {
+    rememberFenasojaCountdownLaunch('fenasoja-countdown-expand-portal', '/portal');
+
+    expect(peekFenasojaCountdownLaunch()).toEqual({
+      focusId: 'fenasoja-countdown-expand-portal',
+      originPath: '/portal',
+      scrollX: 24,
+      scrollY: 640,
+    });
+    expect(peekFenasojaCountdownLaunch()).not.toBeNull();
+    expect(consumeFenasojaCountdownLaunch()?.originPath).toBe('/portal');
+    expect(peekFenasojaCountdownLaunch()).toBeNull();
   });
 
   it('ignora contexto adulterado sem interromper o retorno', () => {

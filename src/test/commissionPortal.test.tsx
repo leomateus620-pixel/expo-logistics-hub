@@ -80,6 +80,7 @@ describe('CommissionPortalPage', () => {
   beforeEach(() => {
     setReducedMotionPreference(false);
     localStorage.clear();
+    sessionStorage.clear();
     portalMocks.auth.loading = false;
     portalMocks.auth.user = null;
     portalMocks.capabilities.capSet = new Set<string>();
@@ -103,6 +104,12 @@ describe('CommissionPortalPage', () => {
       'FENASOJA 2028',
     );
     expect(screen.getByText('Gestão Operacional')).toBeInTheDocument();
+    expect(screen.getByText('Abertura oficial em')).toBeInTheDocument();
+    expect(screen.getByText('29 de abril de 2028, às 10h')).toBeInTheDocument();
+    expect(screen.getAllByRole('timer')).toHaveLength(1);
+    expect(screen.getByRole('button', {
+      name: 'Abrir contagem oficial da Fenasoja 2028',
+    })).toHaveTextContent('Abrir contagem');
     expect(screen.queryByText(/Um portal/)).not.toBeInTheDocument();
     expect(screen.queryByText(/Acesse planejamento/)).not.toBeInTheDocument();
     expect(container.querySelector('[data-testid="portal-soybean"]')).toBeInTheDocument();
@@ -121,6 +128,22 @@ describe('CommissionPortalPage', () => {
     expect(screen.queryByText('Plantio de precisão')).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Acessar área administrativa' })).toBeInTheDocument();
     expect(container.querySelector('.fenasoja-brand__mark img')).toBeInTheDocument();
+  });
+
+  it('abre a experiência oficial pela rota existente e mantém um único launcher', () => {
+    renderPortal();
+
+    const expandButton = screen.getByRole('button', {
+      name: 'Abrir contagem oficial da Fenasoja 2028',
+    });
+    fireEvent.click(expandButton);
+
+    expect(screen.getByTestId('current-location')).toHaveTextContent(
+      '/cronograma-eventos/contagem-oficial',
+    );
+    expect(expandButton).toBeDisabled();
+    expect(expandButton).toHaveAttribute('aria-busy', 'true');
+    expect(screen.getAllByRole('timer')).toHaveLength(1);
   });
 
   it('keeps a vector brand mark when the official remote asset is unavailable', () => {

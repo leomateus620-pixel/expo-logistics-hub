@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { CronogramaCommandHeader } from '@/components/cronograma-eventos/CronogramaCommandHeader';
 import {
@@ -9,7 +9,7 @@ import {
 } from '@/components/cronograma-eventos/CronogramaRouteState';
 
 vi.mock('@/components/cronograma-eventos/GoogleCalendarHeroWidget', () => ({
-  GoogleCalendarHeroWidget: () => <div data-testid="google-calendar-widget" />,
+  GoogleCalendarHeroWidget: () => <div data-testid="google-agenda-operacional">Google Agenda</div>,
 }));
 
 afterEach(() => {
@@ -17,42 +17,14 @@ afterEach(() => {
 });
 
 describe('Cronograma route recovery contract', () => {
-  it('renders the command header without relying on browser globals', () => {
-    render(
-      <CronogramaCommandHeader
-        events={[]}
-        onNewEvent={vi.fn()}
-        onOpenUndated={vi.fn()}
-        canManage={false}
-      />,
-    );
+  it('mantém a hierarquia operacional sem montar a contagem oficial', () => {
+    render(<CronogramaCommandHeader />);
 
-    expect(screen.getByRole('heading', { name: 'FENASOJA 2028' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Preparação 2026—2028' })).toBeInTheDocument();
-    expect(screen.getByTestId('google-calendar-widget')).toBeInTheDocument();
-  });
-
-  it('delegates the immersive route action and exposes its loading state', () => {
-    const onExpandCountdown = vi.fn();
-    render(
-      <CronogramaCommandHeader
-        events={[]}
-        onNewEvent={vi.fn()}
-        onOpenUndated={vi.fn()}
-        onExpandCountdown={onExpandCountdown}
-        canManage={false}
-      />,
-    );
-
-    const expandButton = screen.getByRole('button', {
-      name: 'Ver contagem completa da Fenasoja 2028',
-    });
-    fireEvent.click(expandButton);
-
-    expect(onExpandCountdown).toHaveBeenCalledTimes(1);
-    expect(expandButton).toBeDisabled();
-    expect(expandButton).toHaveAttribute('aria-busy', 'true');
-    expect(screen.getByText('Abrindo experiência…')).toBeInTheDocument();
+    expect(screen.getByTestId('google-agenda-operacional')).toHaveTextContent('Google Agenda');
+    expect(screen.queryByRole('timer')).not.toBeInTheDocument();
+    expect(screen.queryByText('Abrir contagem')).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'FENASOJA 2028' })).not.toBeInTheDocument();
   });
 
   it('replaces a render crash with a visible recovery state and sanitized diagnostics', () => {

@@ -3,6 +3,8 @@ import { resolve } from 'node:path';
 
 const portalStyles = readFileSync(resolve('src/styles/commission-portal.css'), 'utf8');
 const accessNavigationStyles = readFileSync(resolve('src/styles/portal-access-navigation.css'), 'utf8');
+const countdownStyles = readFileSync(resolve('src/styles/official-countdown-digits.css'), 'utf8');
+const countdownDigits = readFileSync(resolve('src/components/countdown/OfficialCountdownDigits.tsx'), 'utf8');
 const portalPage = readFileSync(resolve('src/pages/commissions/CommissionPortalPage.tsx'), 'utf8');
 const portalWordmark = readFileSync(resolve('src/components/portal/FenasojaPortalWordmark.tsx'), 'utf8');
 const primaryEntry = readFileSync(resolve('src/components/portal/PortalPrimaryEntry.tsx'), 'utf8');
@@ -143,5 +145,16 @@ describe('acessibilidade visual do hub Fenasoja', () => {
     expect(portalWordmark).not.toMatch(/data-root-illustrations|data-world-soybean|animateMotion/);
     expect(portalWordmark).not.toMatch(/<img|<text|\.webp|portal-story/);
     expect(portalWordmark).not.toMatch(/framer-motion|@react-spring|gsap/);
+  });
+
+  it('integra uma única contagem responsiva sem duplicar marca ou timer', () => {
+    expect(portalPage).toContain("import { FenasojaPortalHero }");
+    expect(portalPage).not.toContain('FenasojaCountdownHero');
+    expect(portalStyles).toContain('.portal-official-countdown');
+    expect(portalStyles).toContain('grid-template-columns: repeat(2, minmax(0, 1fr))');
+    expect(portalStyles).toContain('min-height: 44px');
+    expect(portalStyles).toContain('@media (min-width: 901px) and (max-height: 780px)');
+    expect(countdownStyles).toContain('font-variant-numeric: tabular-nums lining-nums');
+    expect(countdownDigits).toContain('aria-live="off"');
   });
 });

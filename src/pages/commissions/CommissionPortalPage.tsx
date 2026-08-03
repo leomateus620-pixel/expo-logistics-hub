@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowUpRight, LockKeyhole, ShieldCheck } from 'lucide-react';
 import CommissionCard from '@/components/commissions/CommissionCard';
 import { FenasojaBrand } from '@/components/brand/FenasojaBrand';
-import { FenasojaPortalWordmark } from '@/components/portal/FenasojaPortalWordmark';
+import { FenasojaPortalHero } from '@/components/portal/FenasojaPortalHero';
 import { PortalDestinationCard } from '@/components/portal/PortalDestinationCard';
 import { PortalPrimaryEntry } from '@/components/portal/PortalPrimaryEntry';
 import type { PortalAccessPresentation } from '@/components/portal/portalTypes';
@@ -11,6 +11,10 @@ import { useAuth } from '@/hooks/useAuth';
 import { useCapabilities } from '@/hooks/useCapabilities';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import { resolveModuleAccess } from '@/hooks/useModuleAccess';
+import {
+  consumeFenasojaCountdownLaunch,
+  findFenasojaCountdownReturnFocus,
+} from '@/lib/fenasoja-countdown-navigation';
 import {
   SELECTED_COMMISSION_STORAGE_KEY,
   type CommissionModule,
@@ -134,6 +138,30 @@ export default function CommissionPortalPage() {
   const mapAccess = resolveCapabilityAccess(commercialMapDestination);
   const financeAccess = resolveCommissionAccess(financePortalModule);
   const adminAccess = resolveAdminAccess();
+
+  useEffect(() => {
+    const launchContext = consumeFenasojaCountdownLaunch();
+    if (!launchContext) return;
+
+    let focusFrame = 0;
+    const scrollFrame = window.requestAnimationFrame(() => {
+      focusFrame = window.requestAnimationFrame(() => {
+        window.scrollTo({
+          left: launchContext.scrollX,
+          top: launchContext.scrollY,
+          behavior: 'auto',
+        });
+        findFenasojaCountdownReturnFocus(launchContext.focusId)?.focus({
+          preventScroll: true,
+        });
+      });
+    });
+
+    return () => {
+      window.cancelAnimationFrame(scrollFrame);
+      if (focusFrame) window.cancelAnimationFrame(focusFrame);
+    };
+  }, []);
 
   useEffect(() => {
     if (!expandedEntry) return;
@@ -268,11 +296,7 @@ export default function CommissionPortalPage() {
           )}
         </header>
 
-        <section className="fenasoja-portal__hero portal-reveal" aria-labelledby="portal-title">
-          <div className="fenasoja-portal__hero-frame">
-            <FenasojaPortalWordmark />
-          </div>
-        </section>
+        <FenasojaPortalHero />
 
         <nav className="fenasoja-portal__hub portal-reveal" aria-label="Áreas do sistema Fenasoja 2028">
           {portalPrimaryEntries.map((entry, index) => (

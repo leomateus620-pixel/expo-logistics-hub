@@ -67,11 +67,6 @@ import {
 import type { CronogramaEvent as SourceCronogramaEvent } from '@/lib/cronograma-eventos';
 import type { DashboardDrilldown } from '@/lib/cronograma-dashboard-selectors';
 import {
-  FENASOJA_COUNTDOWN_ROUTE,
-  consumeFenasojaCountdownLaunch,
-  findFenasojaCountdownReturnFocus,
-} from '@/lib/fenasoja-countdown-navigation';
-import {
   buildCronogramaViewSearchParams,
   filterTimelineEvents,
   getTodayKey,
@@ -169,36 +164,6 @@ export default function CronogramaEventosPage() {
   const deepLinkEvent = searchParams.get('event');
   const deepLinkSubevent = searchParams.get('subevent');
   const deepLinkMode = searchParams.get('mode') === 'edit' ? 'edit' : 'view';
-  const openCountdownExperience = useCallback(() => {
-    navigate(FENASOJA_COUNTDOWN_ROUTE, {
-      state: { fromCronograma: true },
-    });
-  }, [navigate]);
-
-  useEffect(() => {
-    const launchContext = consumeFenasojaCountdownLaunch();
-    if (!launchContext) return;
-
-    let focusFrame = 0;
-    const scrollFrame = window.requestAnimationFrame(() => {
-      focusFrame = window.requestAnimationFrame(() => {
-        window.scrollTo({
-          left: launchContext.scrollX,
-          top: launchContext.scrollY,
-          behavior: 'auto',
-        });
-        findFenasojaCountdownReturnFocus(launchContext.focusId)?.focus({
-          preventScroll: true,
-        });
-      });
-    });
-
-    return () => {
-      window.cancelAnimationFrame(scrollFrame);
-      if (focusFrame) window.cancelAnimationFrame(focusFrame);
-    };
-  }, []);
-
   const setActiveView = (view: CronogramaView) => {
     setSearchParams((current) => {
       return buildCronogramaViewSearchParams(current, activeView, view);
@@ -964,9 +929,6 @@ export default function CronogramaEventosPage() {
         >
           <div className="cronograma-mobile-experience mx-auto flex w-full max-w-3xl min-w-0 flex-col gap-3 overflow-x-clip px-3">
             <MobileCronogramaHeader
-              events={events}
-              onOpenUndated={() => setActiveView('undated')}
-              onExpandCountdown={openCountdownExperience}
               availability={cronograma.isLoading ? 'loading' : cronograma.isSeedFallback ? 'offline' : 'ready'}
             />
             <CronogramaRegistrationAction
@@ -991,9 +953,6 @@ export default function CronogramaEventosPage() {
       ) : (
         <div className="mx-auto flex w-full max-w-[1680px] flex-col gap-3 px-3 sm:px-5 2xl:px-8">
           <CronogramaCommandHeader
-            events={events}
-            onOpenUndated={() => setActiveView('undated')}
-            onExpandCountdown={openCountdownExperience}
             availability={cronograma.isLoading ? 'loading' : cronograma.isSeedFallback ? 'offline' : 'ready'}
           />
 

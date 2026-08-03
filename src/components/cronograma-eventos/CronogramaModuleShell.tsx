@@ -67,7 +67,7 @@ export function CronogramaModuleShell({ children }: { children: ReactNode }) {
         </div>
       </header>
 
-      <div id="cronograma-main">{children}</div>
+      {children}
     </div>
   );
 }

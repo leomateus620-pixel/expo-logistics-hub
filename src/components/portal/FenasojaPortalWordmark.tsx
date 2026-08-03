@@ -1,3 +1,5 @@
+import { memo } from 'react';
+
 const ROOT_PATHS = [
   'M560 8 C510 34 464 57 402 76 C316 102 231 119 154 157 C104 181 65 207 24 232',
   'M560 8 C534 47 505 77 462 103 C414 132 374 166 344 207 C327 230 313 250 300 266',
@@ -179,7 +181,7 @@ function LetterGroup({ letters }: { letters: ReadonlyArray<readonly [string, str
   );
 }
 
-export function FenasojaPortalWordmark() {
+export const FenasojaPortalWordmark = memo(function FenasojaPortalWordmark() {
   return (
     <div className="portal-identity">
       <h1 id="portal-title" className="portal-identity__title">
@@ -213,4 +215,4 @@ export function FenasojaPortalWordmark() {
       </div>
     </div>
   );
-}
+});
