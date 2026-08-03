@@ -591,14 +591,15 @@ export function EventForm({
           )}
           <RelationalMultiSelect
             label="Responsáveis do evento"
-            placeholder="Nome, comissão ou papel…"
-            emptyLabel="Nenhum responsável relacional. Adicione um nome ou selecione um membro."
-            options={[]}
+            placeholder="Buscar pessoa do sistema ou digitar um nome…"
+            emptyLabel="Nenhum responsável vinculado. Selecione pessoas do sistema ou digite um nome."
+            options={responsibleOptions}
             value={responsibleSelections}
             onChange={(next) => update('responsiblesRel', selectionsToResponsibleLinks(next))}
             allowCustom
             primaryLabel="Principal"
           />
+
           <p className="text-[11px] leading-relaxed text-muted-foreground">
             Os vínculos relacionais são persistidos pelas RPCs oficiais (<code>cronograma_save_event</code>) e complementam
             o campo &quot;Responsável&quot; para eventos já salvos.
