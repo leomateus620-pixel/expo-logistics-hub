@@ -563,9 +563,10 @@ export function EventForm({
             primaryLabel="Principal"
           />
           <p className="text-[11px] leading-relaxed text-muted-foreground">
-            Os vínculos relacionais são persistidos pelas RPCs oficiais (<code>cronograma_save_event</code>) e substituem
-            o campo &quot;Responsável (fallback)&quot; para eventos já salvos.
+            Os vínculos relacionais são persistidos pelas RPCs oficiais (<code>cronograma_save_event</code>) e complementam
+            o campo &quot;Responsável&quot; para eventos já salvos.
           </p>
+
         </div>
       )}
 
