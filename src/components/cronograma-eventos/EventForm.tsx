@@ -255,19 +255,21 @@ export function EventForm({
     const options: Array<{ id: string; label: string; hint?: string; group?: string }> = [];
     const seenNames = new Set<string>();
 
-    (members ?? []).forEach((member: any) => {
-      const label = (member?.nome_exibicao ?? '').trim();
-      if (!label || !member?.user_id) return;
-      const key = normalizeSearchTerm(label);
-      if (seenNames.has(key)) return;
-      seenNames.add(key);
-      options.push({
-        id: member.user_id as string,
-        label,
-        hint: member.cargo || member.commission_nome || undefined,
-        group: 'Membros do sistema',
+    [...(loginMembers ?? [])]
+      .sort((a: any, b: any) => (a?.nome_exibicao ?? '').localeCompare(b?.nome_exibicao ?? '', 'pt-BR'))
+      .forEach((member: any) => {
+        const label = (member?.nome_exibicao ?? '').trim();
+        if (!label || !member?.user_id) return;
+        const key = normalizeSearchTerm(label);
+        if (seenNames.has(key)) return;
+        seenNames.add(key);
+        options.push({
+          id: member.user_id as string,
+          label,
+          hint: member.cargo || undefined,
+          group: 'Membros do sistema',
+        });
       });
-    });
 
     units.forEach((unit) => {
       unit.responsibles.forEach((person) => {
