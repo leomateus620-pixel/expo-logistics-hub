@@ -86,5 +86,5 @@ export function useOrgMembers() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['org-members'] }),
   });
 
-  return { members, isLoading, addMember, updateMember, removeMember };
+  return { members, loginMembers, isLoading, isLoadingLoginMembers, addMember, updateMember, removeMember };
 }
