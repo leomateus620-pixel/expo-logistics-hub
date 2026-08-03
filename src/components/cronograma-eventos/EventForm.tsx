@@ -251,6 +251,43 @@ export function EventForm({
     () => responsibleLinksToSelections(form.responsiblesRel),
     [form.responsiblesRel],
   );
+  const responsibleOptions = useMemo(() => {
+    const options: Array<{ id: string; label: string; hint?: string; group?: string }> = [];
+    const seenNames = new Set<string>();
+
+    (members ?? []).forEach((member: any) => {
+      const label = (member?.nome_exibicao ?? '').trim();
+      if (!label || !member?.user_id) return;
+      const key = normalizeSearchTerm(label);
+      if (seenNames.has(key)) return;
+      seenNames.add(key);
+      options.push({
+        id: member.user_id as string,
+        label,
+        hint: member.cargo || member.commission_nome || undefined,
+        group: 'Membros do sistema',
+      });
+    });
+
+    units.forEach((unit) => {
+      unit.responsibles.forEach((person) => {
+        const label = (person.displayName ?? '').trim();
+        if (!label) return;
+        const key = normalizeSearchTerm(label);
+        if (seenNames.has(key)) return;
+        seenNames.add(key);
+        options.push({
+          id: person.userId ?? `custom:${label.toLocaleLowerCase('pt-BR')}`,
+          label,
+          hint: unit.name,
+          group: 'Responsáveis institucionais',
+        });
+      });
+    });
+
+    return options;
+  }, [members, units]);
+
   const linkedUnitIds = useMemo(
     () => (form.commissionsRel ?? []).map((link) => link.commissionId).filter(Boolean) as string[],
     [form.commissionsRel],
