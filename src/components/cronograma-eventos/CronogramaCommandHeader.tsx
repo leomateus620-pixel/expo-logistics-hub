@@ -3,26 +3,24 @@ import type { CronogramaEvent } from './types';
 
 export function CronogramaCommandHeader({
   events,
-  onNewEvent,
   onOpenUndated,
   onExpandCountdown,
-  canManage,
   availability,
 }: {
   events: CronogramaEvent[];
-  onNewEvent: () => void;
+  /** Kept as an optional compatibility prop; creation now lives beside view navigation. */
+  onNewEvent?: () => void;
   onOpenUndated: () => void;
   onExpandCountdown?: () => void;
-  canManage: boolean;
+  /** Kept as an optional compatibility prop; the relocated action owns the permission gate. */
+  canManage?: boolean;
   availability?: 'ready' | 'loading' | 'offline';
 }) {
   return (
     <FenasojaCountdownHero
       events={events}
-      onNewEvent={onNewEvent}
       onOpenUndated={onOpenUndated}
       onExpandCountdown={onExpandCountdown}
-      canManage={canManage}
       availability={availability}
       presentation="desktop"
     />

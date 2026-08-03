@@ -7,7 +7,7 @@ export function useOrgMembers() {
   const { orgId } = useCurrentOrg();
   const qc = useQueryClient();
 
-  const { data: members = [], isLoading } = useQuery({
+  const { data: members = [], isLoading, error } = useQuery({
     queryKey: ['org-members', orgId],
     queryFn: async () => {
       if (!orgId) return [];
@@ -34,7 +34,11 @@ export function useOrgMembers() {
   });
 
   // Somente pessoas com conta de acesso real que já entraram no sistema
-  const { data: loginMembers = [], isLoading: isLoadingLoginMembers } = useQuery({
+  const {
+    data: loginMembers = [],
+    isLoading: isLoadingLoginMembers,
+    error: loginMembersError,
+  } = useQuery({
     queryKey: ['org-login-members', orgId],
     queryFn: async () => {
       if (!orgId) return [];
@@ -86,5 +90,15 @@ export function useOrgMembers() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['org-members'] }),
   });
 
-  return { members, loginMembers, isLoading, isLoadingLoginMembers, addMember, updateMember, removeMember };
+  return {
+    members,
+    loginMembers,
+    isLoading,
+    isLoadingLoginMembers,
+    error,
+    loginMembersError,
+    addMember,
+    updateMember,
+    removeMember,
+  };
 }
