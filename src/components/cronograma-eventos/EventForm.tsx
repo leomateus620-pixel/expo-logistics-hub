@@ -220,20 +220,8 @@ export function EventForm({
     if (autoOwnerAppliedRef.current) return;
     autoOwnerAppliedRef.current = true;
     setForm((current) => {
-      const next = { ...current };
-      if (!next.owner?.trim()) next.owner = currentUserName;
-      if (!(next.responsiblesRel ?? []).length) {
-        next.responsiblesRel = [
-          {
-            userId: user?.id ?? null,
-            name: currentUserName,
-            role: null,
-            isPrimary: true,
-            responsibleType: user?.id ? 'member' : 'external',
-          },
-        ];
-      }
-      return next;
+      if (current.owner?.trim()) return current;
+      return { ...current, owner: currentUserName };
     });
   }, [currentUserName, event, user?.id]);
 
