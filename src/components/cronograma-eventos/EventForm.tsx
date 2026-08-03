@@ -160,10 +160,10 @@ export function EventForm({
   const fieldId = (name: string) => `${formInstanceId}-${name}`;
   const { units, commissions, isLoading: commissionsLoading } = useOrgCommissions();
   const { user } = useAuth();
-  const { members } = useOrgMembers();
+  const { members, loginMembers } = useOrgMembers();
   const currentUserName = useMemo(() => {
     if (!user) return '';
-    const member = (members ?? []).find((item: any) => item.user_id === user.id);
+    const member = ([...(loginMembers ?? []), ...(members ?? [])] as any[]).find((item: any) => item.user_id === user.id);
     return (
       member?.nome_exibicao
       || (user.user_metadata as any)?.full_name
