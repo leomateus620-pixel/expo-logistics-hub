@@ -213,6 +213,32 @@ export function EventForm({
     onDirtyChange?.(dirty);
   }, [baselineSignature, form, onDirtyChange]);
 
+  const autoOwnerAppliedRef = useRef(false);
+  useEffect(() => {
+    if (event) return;
+    if (!currentUserName) return;
+    if (autoOwnerAppliedRef.current) return;
+    autoOwnerAppliedRef.current = true;
+    setForm((current) => {
+      const next = { ...current };
+      if (!next.owner?.trim()) next.owner = currentUserName;
+      if (!(next.responsiblesRel ?? []).length) {
+        next.responsiblesRel = [
+          {
+            userId: user?.id ?? null,
+            name: currentUserName,
+            role: null,
+            isPrimary: true,
+            responsibleType: user?.id ? 'member' : 'external',
+          },
+        ];
+      }
+      return next;
+    });
+  }, [currentUserName, event, user?.id]);
+
+
+
   const update = <K extends keyof CronogramaEvent>(key: K, value: CronogramaEvent[K]) => {
     setForm((current) => ({ ...current, [key]: value }));
   };
