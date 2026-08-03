@@ -32,8 +32,12 @@ export function useMobileOverlayHistory({
     activeRef.current = true;
     closingRef.current = false;
 
-    const handlePopState = () => {
+    const handlePopState = (event: PopStateEvent) => {
       if (!activeRef.current) return;
+      // Nested selectors also use this history contract. If the browser returned
+      // to this overlay's own marker, a child overlay closed and this parent must
+      // remain active.
+      if (event.state?.[HISTORY_KEY] === marker) return;
       activeRef.current = false;
       closingRef.current = false;
       if (dirtyRef.current) {

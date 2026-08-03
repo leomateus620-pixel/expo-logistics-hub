@@ -3,7 +3,6 @@ import {
   ArrowUpRight,
   Clock3,
   Maximize2,
-  Plus,
   Sprout,
 } from 'lucide-react';
 import { FenasojaCountdownDigits } from '@/components/cronograma-eventos/FenasojaCountdownDigits';
@@ -24,10 +23,8 @@ import type { CronogramaEvent } from './types';
 
 export interface FenasojaCountdownHeroProps {
   events: CronogramaEvent[];
-  onNewEvent: () => void;
   onOpenUndated: () => void;
   onExpandCountdown?: () => void;
-  canManage: boolean;
   presentation: 'desktop' | 'mobile';
   availability?: 'ready' | 'loading' | 'offline';
 }
@@ -95,9 +92,7 @@ const LiveCountdownCore = memo(function LiveCountdownCore({
 });
 
 export function FenasojaCountdownHero({
-  onNewEvent,
   onExpandCountdown,
-  canManage,
   presentation,
   availability = 'ready',
 }: FenasojaCountdownHeroProps) {
@@ -168,16 +163,6 @@ export function FenasojaCountdownHero({
                 <ArrowUpRight className="fenasoja-countdown-expand-arrow" aria-hidden="true" />
               </button>
 
-              {canManage && (
-                <button
-                  type="button"
-                  onClick={onNewEvent}
-                  className="fenasoja-countdown-new-event"
-                >
-                  <Plus aria-hidden="true" />
-                  <span>Novo evento</span>
-                </button>
-              )}
             </div>
           </div>
 

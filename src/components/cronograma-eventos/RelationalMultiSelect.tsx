@@ -1,24 +1,58 @@
-import { useMemo, useState } from 'react';
-import { Check, ChevronDown, Plus, Star, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import {
+  useEffect,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type KeyboardEvent,
+} from 'react';
+import {
+  AlertCircle,
+  Building2,
+  Check,
+  ChevronDown,
+  Loader2,
+  Plus,
+  Search,
+  Star,
+  UserRound,
+  X,
+} from 'lucide-react';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
-import { cn } from '@/lib/utils';
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
 import { normalizeSearchTerm } from '@/lib/org-units';
+import { useMobileOverlayHistory } from './mobile/useMobileOverlayHistory';
+import '@/styles/cronograma-registration-interactions.css';
+
+const MAX_VISIBLE_OPTIONS = 120;
 
 export interface RelationalOption {
   /** Stable identifier used as React key and equality check. */
   id: string;
-  /** Human label shown in chips/list. */
+  /** Human label shown in the selected summary and result list. */
   label: string;
-  /** Optional secondary line (e.g. slug, role). */
+  /** Persisted auxiliary value. Keep visual-only metadata out of this field. */
   hint?: string;
   /** Optional group heading (e.g. "Comissões", "Assessorias"). */
   group?: string;
+  /** Visual secondary line, such as type + institutional responsible or role. */
+  description?: string;
+  /** Visual tertiary context, such as organizational unit or user type. */
+  context?: string;
+  /** Additional normalized-search source that is never persisted. */
+  searchText?: string;
 }
 
 export interface RelationalSelection {
@@ -30,8 +64,11 @@ export interface RelationalSelection {
 
 interface RelationalMultiSelectProps {
   label: string;
+  description?: string;
   placeholder?: string;
   emptyLabel?: string;
+  triggerLabel?: string;
+  selectedTriggerLabel?: string;
   options: RelationalOption[];
   value: RelationalSelection[];
   onChange: (next: RelationalSelection[]) => void;
@@ -41,19 +78,40 @@ interface RelationalMultiSelectProps {
   allowCustom?: boolean;
   disabled?: boolean;
   isLoading?: boolean;
+  errorMessage?: string | null;
   primaryLabel?: string;
   id?: string;
+  presentation?: 'desktop' | 'mobile';
+  variant?: 'organization' | 'person';
 }
 
-/**
- * Chip multi-select used in Cronograma & Eventos to attach commissions
- * or responsibles to an event/subevent, with an optional "primary" toggle
- * (`is_primary` / `relation_role='principal'`).
- */
+function initialsFor(label: string): string {
+  const words = label.trim().split(/\s+/).filter(Boolean);
+  if (words.length === 0) return '?';
+  const initials = words.length === 1
+    ? words[0].slice(0, 2)
+    : `${words[0][0]}${words[words.length - 1][0]}`;
+  return initials.toLocaleUpperCase('pt-BR');
+}
+
+function optionSearchValue(option: RelationalOption): string {
+  return normalizeSearchTerm([
+    option.label,
+    option.hint,
+    option.group,
+    option.description,
+    option.context,
+    option.searchText,
+  ].filter(Boolean).join(' '));
+}
+
 export function RelationalMultiSelect({
   label,
+  description,
   placeholder = 'Buscar…',
   emptyLabel = 'Nenhum vínculo selecionado.',
+  triggerLabel = 'Selecionar vínculo',
+  selectedTriggerLabel = 'Adicionar ou alterar vínculos',
   options,
   value,
   onChange,
@@ -61,43 +119,176 @@ export function RelationalMultiSelect({
   allowCustom = false,
   disabled = false,
   isLoading = false,
+  errorMessage,
   primaryLabel = 'Principal',
   id,
+  presentation = 'desktop',
+  variant = 'person',
 }: RelationalMultiSelectProps) {
+  const generatedId = useId().replace(/:/g, '');
+  const fieldId = id ?? `cronograma-relation-${generatedId}`;
+  const labelId = `${fieldId}-label`;
+  const descriptionId = `${fieldId}-description`;
+  const listboxId = `${fieldId}-listbox`;
+  const searchRef = useRef<HTMLInputElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
+  const [activeIndex, setActiveIndex] = useState(-1);
+  const [announcement, setAnnouncement] = useState('');
+  const [sheetStyle, setSheetStyle] = useState<CSSProperties>();
+  const isMobile = presentation === 'mobile';
 
-  const selectedIds = useMemo(() => new Set(value.map((item) => item.id)), [value]);
-  const filteredOptions = useMemo(() => {
-    const term = normalizeSearchTerm(search);
-    return options
-      .filter((option) => !selectedIds.has(option.id))
-      .filter((option) => {
-        if (!term) return true;
-        const haystack = normalizeSearchTerm(`${option.label} ${option.hint ?? ''} ${option.group ?? ''}`);
-        return term.split(' ').every((token) => haystack.includes(token));
-      })
-      .slice(0, 60);
-  }, [options, search, selectedIds]);
+  const normalizedSearch = normalizeSearchTerm(search);
+  const selectedById = useMemo(() => new Map(value.map((item) => [item.id, item])), [value]);
+  const selectedByName = useMemo(
+    () => new Map(value.map((item) => [normalizeSearchTerm(item.label), item])),
+    [value],
+  );
+  const optionById = useMemo(() => new Map(options.map((option) => [option.id, option])), [options]);
+  const optionByName = useMemo(
+    () => new Map(options.map((option) => [normalizeSearchTerm(option.label), option])),
+    [options],
+  );
 
+  const matchingOptions = useMemo(() => options.filter((option) => {
+    if (!normalizedSearch) return true;
+    const haystack = optionSearchValue(option);
+    return normalizedSearch.split(' ').every((token) => haystack.includes(token));
+  }), [normalizedSearch, options]);
+
+  const visibleOptions = useMemo(
+    () => matchingOptions.slice(0, MAX_VISIBLE_OPTIONS),
+    [matchingOptions],
+  );
   const groupedOptions = useMemo(() => {
-    const buckets: { label: string; options: RelationalOption[] }[] = [];
-    filteredOptions.forEach((option) => {
-      const label = option.group ?? '';
-      const bucket = buckets.find((item) => item.label === label);
-      if (bucket) bucket.options.push(option);
-      else buckets.push({ label, options: [option] });
+    const buckets = new Map<string, RelationalOption[]>();
+    visibleOptions.forEach((option) => {
+      const group = option.group ?? '';
+      const bucket = buckets.get(group);
+      if (bucket) bucket.push(option);
+      else buckets.set(group, [option]);
     });
-    return buckets;
-  }, [filteredOptions]);
+    return Array.from(buckets, ([group, items]) => ({ group, items }));
+  }, [visibleOptions]);
+  const navigableOptions = useMemo(
+    () => groupedOptions.flatMap(({ items }) => items),
+    [groupedOptions],
+  );
 
-  const canAddCustom =
-    allowCustom &&
-    search.trim().length >= 2 &&
-    !options.some((option) => option.label.toLocaleLowerCase('pt-BR') === search.trim().toLocaleLowerCase('pt-BR')) &&
-    !value.some((item) => item.label.toLocaleLowerCase('pt-BR') === search.trim().toLocaleLowerCase('pt-BR'));
+  const normalizedCustomLabel = normalizeSearchTerm(search.trim());
+  const canAddCustom = allowCustom
+    && search.trim().length >= 2
+    && Boolean(normalizedCustomLabel)
+    && !options.some((option) => normalizeSearchTerm(option.label) === normalizedCustomLabel)
+    && !value.some((item) => normalizeSearchTerm(item.label) === normalizedCustomLabel);
+  const navigableCount = navigableOptions.length + (canAddCustom ? 1 : 0);
+
+  const findSelectionForOption = (option: RelationalOption) => (
+    selectedById.get(option.id) ?? selectedByName.get(normalizeSearchTerm(option.label))
+  );
+
+  const closeSelector = () => {
+    setOpen(false);
+    setSearch('');
+    setActiveIndex(-1);
+  };
+
+  const mobileHistory = useMobileOverlayHistory({
+    open: isMobile && open,
+    dirty: false,
+    onClose: closeSelector,
+    onDirtyClose: closeSelector,
+  });
+
+  const requestClose = () => {
+    if (isMobile) {
+      mobileHistory.requestClose();
+      return;
+    }
+    closeSelector();
+  };
+
+  const handleOpenChange = (nextOpen: boolean) => {
+    if (nextOpen) {
+      setOpen(true);
+      setActiveIndex(navigableCount > 0 ? 0 : -1);
+      return;
+    }
+    requestClose();
+  };
+
+  useEffect(() => {
+    if (!open) return;
+    const frame = window.requestAnimationFrame(() => searchRef.current?.focus({ preventScroll: true }));
+    return () => window.cancelAnimationFrame(frame);
+  }, [open, presentation]);
+
+  useEffect(() => {
+    setActiveIndex((current) => {
+      if (navigableCount === 0) return -1;
+      if (current < 0) return 0;
+      return Math.min(current, navigableCount - 1);
+    });
+  }, [navigableCount]);
+
+  useEffect(() => {
+    if (!open || activeIndex < 0) return;
+    const activeOption = listRef.current?.querySelector<HTMLElement>(`[data-option-index="${activeIndex}"]`);
+    activeOption?.scrollIntoView({ block: 'nearest' });
+  }, [activeIndex, open]);
+
+  useEffect(() => {
+    if (!isMobile || !open) {
+      setSheetStyle(undefined);
+      return;
+    }
+
+    const visualViewport = window.visualViewport;
+    let frame = 0;
+    const updateViewport = () => {
+      window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(() => {
+        const height = Math.round(visualViewport?.height ?? window.innerHeight);
+        const offsetTop = Math.round(visualViewport?.offsetTop ?? 0);
+        const bottom = Math.max(0, window.innerHeight - (offsetTop + height));
+        setSheetStyle({
+          height: `${Math.min(704, Math.max(280, height - 8))}px`,
+          bottom: `${bottom}px`,
+        });
+      });
+    };
+
+    updateViewport();
+    window.addEventListener('resize', updateViewport);
+    window.addEventListener('orientationchange', updateViewport);
+    visualViewport?.addEventListener('resize', updateViewport);
+    visualViewport?.addEventListener('scroll', updateViewport);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener('resize', updateViewport);
+      window.removeEventListener('orientationchange', updateViewport);
+      visualViewport?.removeEventListener('resize', updateViewport);
+      visualViewport?.removeEventListener('scroll', updateViewport);
+    };
+  }, [isMobile, open]);
+
+  const removeAt = (selectionId: string) => {
+    const removed = value.find((item) => item.id === selectionId);
+    const filtered = value.filter((item) => item.id !== selectionId);
+    if (singlePrimary && filtered.length > 0 && !filtered.some((item) => item.isPrimary)) {
+      filtered[0] = { ...filtered[0], isPrimary: true };
+    }
+    onChange(filtered);
+    if (removed) setAnnouncement(`${removed.label} removido da seleção.`);
+  };
 
   const addOption = (option: RelationalOption) => {
+    const existing = findSelectionForOption(option);
+    if (existing) {
+      removeAt(existing.id);
+      return;
+    }
     const alreadyPrimary = value.some((item) => item.isPrimary);
     onChange([
       ...value,
@@ -108,167 +299,394 @@ export function RelationalMultiSelect({
         isPrimary: !alreadyPrimary,
       },
     ]);
+    setAnnouncement(`${option.label} adicionado à seleção.`);
     setSearch('');
+    setActiveIndex(options.length > 0 ? 0 : -1);
   };
 
   const addCustom = () => {
     const term = search.trim();
-    if (!term) return;
+    if (!term || !canAddCustom) return;
     const alreadyPrimary = value.some((item) => item.isPrimary);
     onChange([
       ...value,
-      { id: `custom:${term.toLocaleLowerCase('pt-BR')}`, label: term, isPrimary: !alreadyPrimary },
+      {
+        id: `custom:${normalizedCustomLabel}`,
+        label: term,
+        isPrimary: !alreadyPrimary,
+      },
     ]);
+    setAnnouncement(`${term} adicionado como nome externo.`);
     setSearch('');
+    setActiveIndex(options.length > 0 ? 0 : -1);
   };
 
-  const removeAt = (id: string) => {
-    const filtered = value.filter((item) => item.id !== id);
-    // Ensure at least one primary remains if there are entries.
-    if (singlePrimary && filtered.length > 0 && !filtered.some((item) => item.isPrimary)) {
-      filtered[0] = { ...filtered[0], isPrimary: true };
-    }
-    onChange(filtered);
-  };
-
-  const togglePrimary = (id: string) => {
+  const togglePrimary = (selectionId: string) => {
+    const selected = value.find((item) => item.id === selectionId);
+    if (!selected) return;
     if (singlePrimary) {
-      onChange(value.map((item) => ({ ...item, isPrimary: item.id === id })));
+      onChange(value.map((item) => ({ ...item, isPrimary: item.id === selectionId })));
     } else {
-      onChange(value.map((item) => (item.id === id ? { ...item, isPrimary: !item.isPrimary } : item)));
+      onChange(value.map((item) => (
+        item.id === selectionId ? { ...item, isPrimary: !item.isPrimary } : item
+      )));
+    }
+    setAnnouncement(`${selected.label} definido como ${primaryLabel.toLocaleLowerCase('pt-BR')}.`);
+  };
+
+  const activateIndex = (index: number) => {
+    if (index < navigableOptions.length) {
+      addOption(navigableOptions[index]);
+      return;
+    }
+    if (canAddCustom) addCustom();
+  };
+
+  const handleSearchKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      event.stopPropagation();
+      requestClose();
+      return;
+    }
+    if (navigableCount === 0) return;
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      setActiveIndex((current) => (current + 1 + navigableCount) % navigableCount);
+      return;
+    }
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      setActiveIndex((current) => (current - 1 + navigableCount) % navigableCount);
+      return;
+    }
+    if (event.key === 'Home') {
+      event.preventDefault();
+      setActiveIndex(0);
+      return;
+    }
+    if (event.key === 'End') {
+      event.preventDefault();
+      setActiveIndex(navigableCount - 1);
+      return;
+    }
+    if (event.key === 'Enter' && activeIndex >= 0) {
+      event.preventDefault();
+      activateIndex(activeIndex);
     }
   };
+
+  const activeDescendant = activeIndex < 0
+    ? undefined
+    : activeIndex < navigableOptions.length
+      ? `${fieldId}-option-${activeIndex}`
+      : `${fieldId}-custom-option`;
+
+  const trigger = (
+    <button
+      id={`${fieldId}-trigger`}
+      type="button"
+      disabled={disabled}
+      className="cronograma-relation-trigger focus-ring"
+      aria-haspopup="listbox"
+      aria-expanded={open}
+      aria-controls={open ? listboxId : undefined}
+      aria-labelledby={`${labelId} ${fieldId}-trigger-label`}
+    >
+      <span className="cronograma-relation-trigger__icon" aria-hidden="true">
+        {variant === 'organization' ? <Building2 /> : <UserRound />}
+      </span>
+      <span id={`${fieldId}-trigger-label`} className="cronograma-relation-trigger__copy">
+        <strong>{value.length > 0 ? selectedTriggerLabel : triggerLabel}</strong>
+        <small>
+          {value.length > 0
+            ? `${value.length} ${value.length === 1 ? 'selecionado' : 'selecionados'}`
+            : 'Busca rápida no registro oficial'}
+        </small>
+      </span>
+      <ChevronDown className="cronograma-relation-trigger__chevron" aria-hidden="true" />
+    </button>
+  );
+
+  const selectorPanel = (
+    <div className="cronograma-relation-panel">
+      <div className="cronograma-relation-search">
+        <Search aria-hidden="true" />
+        <input
+          ref={searchRef}
+          value={search}
+          onChange={(event) => {
+            setSearch(event.target.value);
+            setActiveIndex(0);
+          }}
+          onKeyDown={handleSearchKeyDown}
+          placeholder={placeholder}
+          role="combobox"
+          aria-label={placeholder}
+          aria-expanded="true"
+          aria-autocomplete="list"
+          aria-controls={listboxId}
+          aria-activedescendant={activeDescendant}
+        />
+        {search && (
+          <button
+            type="button"
+            onClick={() => {
+              setSearch('');
+              setActiveIndex(0);
+              searchRef.current?.focus();
+            }}
+            aria-label="Limpar busca"
+          >
+            <X aria-hidden="true" />
+          </button>
+        )}
+      </div>
+
+      <div className="cronograma-relation-results-summary" aria-live="polite">
+        <span>
+          {isLoading
+            ? 'Carregando opções…'
+            : `${matchingOptions.length} ${matchingOptions.length === 1 ? 'resultado' : 'resultados'}`}
+        </span>
+        <span>{value.length} {value.length === 1 ? 'selecionado' : 'selecionados'}</span>
+      </div>
+
+      <div
+        ref={listRef}
+        id={listboxId}
+        className="cronograma-relation-results"
+        role="listbox"
+        aria-label={label}
+        aria-multiselectable="true"
+      >
+        {isLoading && (
+          <div className="cronograma-relation-state" role="status">
+            <Loader2 className="cronograma-relation-state__spinner" aria-hidden="true" />
+            <strong>Carregando registro oficial</strong>
+            <span>As opções aparecerão assim que a consulta for concluída.</span>
+          </div>
+        )}
+
+        {!isLoading && errorMessage && (
+          <div
+            className={`cronograma-relation-state is-error${matchingOptions.length > 0 || canAddCustom ? ' has-results' : ''}`}
+            role="alert"
+          >
+            <AlertCircle aria-hidden="true" />
+            <strong>
+              {matchingOptions.length > 0 || canAddCustom
+                ? 'Parte do registro pode estar indisponível'
+                : 'Não foi possível carregar as opções'}
+            </strong>
+            <span>{errorMessage}</span>
+          </div>
+        )}
+
+        {!isLoading && matchingOptions.length === 0 && !canAddCustom && !errorMessage && (
+          <div className="cronograma-relation-state">
+            <Search aria-hidden="true" />
+            <strong>Nenhum resultado encontrado para esta busca.</strong>
+            <span>Tente buscar por outro nome, função ou área.</span>
+          </div>
+        )}
+
+        {!isLoading && groupedOptions.map(({ group, items }) => {
+          const groupId = `${fieldId}-group-${normalizeSearchTerm(group) || 'sem-grupo'}`;
+          return (
+            <div key={group || 'sem-grupo'} className="cronograma-relation-group" role="group" aria-labelledby={group ? groupId : undefined}>
+              {group && <p id={groupId} className="cronograma-relation-group__label">{group}</p>}
+              {items.map((option) => {
+                const optionIndex = navigableOptions.indexOf(option);
+                const selected = findSelectionForOption(option);
+                return (
+                  <button
+                    key={option.id}
+                    id={`${fieldId}-option-${optionIndex}`}
+                    type="button"
+                    role="option"
+                    tabIndex={-1}
+                    aria-selected={Boolean(selected)}
+                    data-selected={selected ? 'true' : undefined}
+                    data-active={activeIndex === optionIndex ? 'true' : undefined}
+                    data-option-index={optionIndex}
+                    className="cronograma-relation-option"
+                    onMouseMove={() => setActiveIndex(optionIndex)}
+                    onClick={() => addOption(option)}
+                  >
+                    <span className="cronograma-relation-option__identity" aria-hidden="true">
+                      {variant === 'organization' ? <Building2 /> : initialsFor(option.label)}
+                    </span>
+                    <span className="cronograma-relation-option__copy">
+                      <strong title={option.label}>{option.label}</strong>
+                      {(option.description || option.hint) && (
+                        <span>{option.description ?? option.hint}</span>
+                      )}
+                      {option.context && <small>{option.context}</small>}
+                    </span>
+                    <span className="cronograma-relation-option__check" aria-hidden="true">
+                      <Check />
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          );
+        })}
+
+        {!isLoading && matchingOptions.length > MAX_VISIBLE_OPTIONS && (
+          <p className="cronograma-relation-limit">
+            Exibindo os primeiros {MAX_VISIBLE_OPTIONS} resultados. Refine a busca para localizar outros registros.
+          </p>
+        )}
+
+        {!isLoading && canAddCustom && (
+          <button
+            id={`${fieldId}-custom-option`}
+            type="button"
+            role="option"
+            tabIndex={-1}
+            aria-selected="false"
+            data-active={activeIndex === navigableOptions.length ? 'true' : undefined}
+            data-option-index={navigableOptions.length}
+            className="cronograma-relation-option is-custom"
+            onMouseMove={() => setActiveIndex(navigableOptions.length)}
+            onClick={addCustom}
+          >
+            <span className="cronograma-relation-option__identity" aria-hidden="true"><Plus /></span>
+            <span className="cronograma-relation-option__copy">
+              <strong>Adicionar “{search.trim()}”</strong>
+              <span>Nome externo permitido pelo fluxo atual</span>
+            </span>
+          </button>
+        )}
+      </div>
+    </div>
+  );
 
   return (
-    <div className="space-y-2" id={id}>
-      <div className="flex items-center justify-between">
-        <span className="text-xs font-black uppercase tracking-[0.14em] text-foreground/72">{label}</span>
-        <Popover open={open} onOpenChange={setOpen}>
-          <PopoverTrigger asChild>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              disabled={disabled}
-              className="h-8 rounded-full bg-white/70 text-xs"
-              aria-label={`Adicionar ${label.toLowerCase()}`}
-            >
-              <Plus className="h-3.5 w-3.5" />
-              Adicionar
-              <ChevronDown className="ml-1 h-3.5 w-3.5" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="z-[95] w-[min(22rem,90vw)] rounded-2xl p-0" align="end">
-            <div className="border-b border-border/40 p-2">
-              <Input
-                autoFocus
-                value={search}
-                onChange={(event) => setSearch(event.target.value)}
-                placeholder={placeholder}
-                onKeyDown={(event) => {
-                  if (event.key === 'Enter' && canAddCustom) {
-                    event.preventDefault();
-                    addCustom();
-                  }
-                }}
-                className="h-9 rounded-xl bg-white/80 text-sm"
-                aria-label={`Buscar ${label.toLowerCase()}`}
-              />
+    <section
+      className="cronograma-relation-field"
+      data-variant={variant}
+      aria-labelledby={labelId}
+      aria-describedby={description ? descriptionId : undefined}
+    >
+      <div className="cronograma-relation-field__heading">
+        <div>
+          <h4 id={labelId}>{label}</h4>
+          {description && <p id={descriptionId}>{description}</p>}
+        </div>
+        {value.length > 0 && (
+          <span className="cronograma-relation-field__count" aria-label={`${value.length} selecionados`}>
+            {value.length}
+          </span>
+        )}
+      </div>
+
+      {isMobile ? (
+        <Sheet open={open} onOpenChange={handleOpenChange}>
+          <SheetTrigger asChild>{trigger}</SheetTrigger>
+          <SheetContent
+            side="bottom"
+            style={sheetStyle}
+            className="cronograma-relation-sheet"
+            overlayClassName="cronograma-relation-sheet-overlay"
+            closeLabel={`Fechar seleção de ${label.toLocaleLowerCase('pt-BR')}`}
+            onOpenAutoFocus={(event) => event.preventDefault()}
+          >
+            <SheetHeader className="cronograma-relation-sheet__header">
+              <span className="cronograma-relation-sheet__eyebrow">Vínculos relacionais</span>
+              <SheetTitle>{label}</SheetTitle>
+              {description && <SheetDescription>{description}</SheetDescription>}
+            </SheetHeader>
+            {selectorPanel}
+            <div className="cronograma-relation-sheet__footer">
+              <button type="button" onClick={requestClose} className="cronograma-relation-done focus-ring">
+                Concluir seleção
+                {value.length > 0 && <span>{value.length}</span>}
+              </button>
             </div>
-            <div className="max-h-[min(20rem,60dvh)] overflow-y-auto p-1" role="listbox">
-              {isLoading && (
-                <div className="p-3 text-xs text-muted-foreground">Carregando opções…</div>
-              )}
-              {!isLoading && filteredOptions.length === 0 && !canAddCustom && (
-                <div className="p-3 text-xs text-muted-foreground">Nenhum resultado.</div>
-              )}
-              {groupedOptions.map((group) => (
-                <div key={group.label || 'sem-grupo'} role="group" aria-label={group.label || undefined}>
-                  {group.label && (
-                    <p className="px-3 pb-1 pt-2 text-[0.62rem] font-black uppercase tracking-[0.16em] text-muted-foreground">
-                      {group.label}
-                    </p>
-                  )}
-                  {group.options.map((option) => (
-                <button
-                  key={option.id}
-                  type="button"
-                  onClick={() => addOption(option)}
-                  className="flex w-full items-start gap-2 rounded-xl px-3 py-2 text-left text-sm hover:bg-primary/10 focus:bg-primary/10 focus:outline-none"
-                  role="option"
-                  aria-selected={false}
-                >
-                  <span className="mt-0.5 flex h-5 w-5 items-center justify-center rounded-md bg-primary/10 text-primary">
-                    <Check className="h-3.5 w-3.5 opacity-0" aria-hidden="true" />
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate font-semibold text-foreground">{option.label}</span>
-                    {option.hint && (
-                      <span className="block truncate text-xs text-muted-foreground">{option.hint}</span>
-                    )}
-                  </span>
-                </button>
-                  ))}
-                </div>
-              ))}
-              {canAddCustom && (
-                <button
-                  type="button"
-                  onClick={addCustom}
-                  className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-left text-sm text-primary hover:bg-primary/10"
-                >
-                  <Plus className="h-3.5 w-3.5" />
-                  Adicionar &quot;{search.trim()}&quot;
-                </button>
-              )}
+          </SheetContent>
+        </Sheet>
+      ) : (
+        <Popover open={open} onOpenChange={handleOpenChange}>
+          <PopoverTrigger asChild>{trigger}</PopoverTrigger>
+          <PopoverContent
+            align="start"
+            sideOffset={8}
+            collisionPadding={12}
+            className="cronograma-relation-popover z-[95] p-0"
+            onOpenAutoFocus={(event) => event.preventDefault()}
+            onEscapeKeyDown={(event) => {
+              event.preventDefault();
+              requestClose();
+            }}
+          >
+            {selectorPanel}
+            <div className="cronograma-relation-popover__footer">
+              <span>{value.length > 0 ? `${value.length} selecionados` : 'Nenhum selecionado'}</span>
+              <button type="button" onClick={requestClose}>Concluir</button>
             </div>
           </PopoverContent>
         </Popover>
-      </div>
+      )}
 
       {value.length === 0 ? (
-        <p className="rounded-xl border border-dashed border-border/50 bg-white/40 p-2.5 text-center text-xs text-muted-foreground">
-          {emptyLabel}
-        </p>
+        <div className="cronograma-relation-empty">
+          <span aria-hidden="true">{variant === 'organization' ? <Building2 /> : <UserRound />}</span>
+          <p>{emptyLabel}</p>
+        </div>
       ) : (
-        <ul className="flex flex-wrap gap-1.5" aria-label={`${label} selecionados`}>
-          {value.map((item) => (
-            <li key={item.id}>
-              <span
-                className={cn(
-                  'inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-semibold',
-                  item.isPrimary
-                    ? 'border-gold/60 bg-gold/15 text-amber-950'
-                    : 'border-border/60 bg-white/75 text-foreground/80',
-                )}
-              >
-                <button
-                  type="button"
-                  onClick={() => togglePrimary(item.id)}
-                  className={cn(
-                    'flex h-5 w-5 items-center justify-center rounded-full transition',
-                    item.isPrimary ? 'bg-gold/30 text-amber-900' : 'bg-transparent text-muted-foreground hover:bg-primary/10',
+        <ul className="cronograma-relation-selected" aria-label={`${label} selecionados`} aria-live="polite">
+          {value.map((item) => {
+            const matchingOption = optionById.get(item.id) ?? optionByName.get(normalizeSearchTerm(item.label));
+            const detail = matchingOption?.description ?? item.hint;
+            const context = matchingOption?.context
+              ?? ((item.id.startsWith('custom:') || item.id.startsWith('external:')) ? 'Nome externo' : undefined);
+            return (
+              <li key={item.id} className="cronograma-relation-selected__item" data-primary={item.isPrimary || undefined}>
+                <span className="cronograma-relation-selected__identity" aria-hidden="true">
+                  {variant === 'organization' ? <Building2 /> : initialsFor(item.label)}
+                </span>
+                <span className="cronograma-relation-selected__copy">
+                  <small>{item.isPrimary ? primaryLabel : variant === 'organization' ? 'Vínculo institucional' : 'Responsável vinculado'}</small>
+                  <strong title={item.label}>{item.label}</strong>
+                  {detail && <span>{detail}</span>}
+                  {context && context !== detail && <em>{context}</em>}
+                </span>
+                <span className="cronograma-relation-selected__actions">
+                  {item.isPrimary && singlePrimary ? (
+                    <span className="cronograma-relation-primary" title={primaryLabel}>
+                      <Star aria-hidden="true" />
+                      <span>{primaryLabel}</span>
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => togglePrimary(item.id)}
+                      className="cronograma-relation-mark-primary"
+                      aria-label={`Marcar ${item.label} como ${primaryLabel.toLocaleLowerCase('pt-BR')}`}
+                    >
+                      <Star aria-hidden="true" />
+                      <span>Definir como principal</span>
+                    </button>
                   )}
-                  aria-label={item.isPrimary ? `Remover marcação de ${primaryLabel.toLowerCase()}` : `Marcar como ${primaryLabel.toLowerCase()}`}
-                  aria-pressed={item.isPrimary || false}
-                  title={primaryLabel}
-                >
-                  <Star className={cn('h-3 w-3', item.isPrimary && 'fill-current')} aria-hidden="true" />
-                </button>
-                <span className="max-w-[14rem] truncate">{item.label}</span>
-                <button
-                  type="button"
-                  onClick={() => removeAt(item.id)}
-                  className="flex h-5 w-5 items-center justify-center rounded-full text-muted-foreground hover:bg-red-100 hover:text-red-800"
-                  aria-label={`Remover ${item.label}`}
-                >
-                  <X className="h-3 w-3" />
-                </button>
-              </span>
-            </li>
-          ))}
+                  <button
+                    type="button"
+                    onClick={() => removeAt(item.id)}
+                    className="cronograma-relation-remove"
+                    aria-label={`Remover ${item.label}`}
+                  >
+                    <X aria-hidden="true" />
+                  </button>
+                </span>
+              </li>
+            );
+          })}
         </ul>
       )}
-    </div>
+
+      <p className="sr-only" aria-live="polite" aria-atomic="true">{announcement}</p>
+    </section>
   );
 }

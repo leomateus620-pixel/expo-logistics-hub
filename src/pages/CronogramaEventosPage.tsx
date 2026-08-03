@@ -11,6 +11,7 @@ import {
 } from '@/components/cronograma-eventos/CronogramaBoards';
 import { CronogramaCommandHeader } from '@/components/cronograma-eventos/CronogramaCommandHeader';
 import { CronogramaFiltersBar } from '@/components/cronograma-eventos/CronogramaFiltersBar';
+import { CronogramaRegistrationAction } from '@/components/cronograma-eventos/CronogramaRegistrationAction';
 import {
   CronogramaTimelineBoard,
   CronogramaTimelineSkeleton,
@@ -960,11 +961,14 @@ export default function CronogramaEventosPage() {
           <div className="cronograma-mobile-experience mx-auto flex w-full max-w-3xl min-w-0 flex-col gap-3 overflow-x-clip px-3">
             <MobileCronogramaHeader
               events={events}
-              onNewEvent={openCreate}
               onOpenUndated={() => setActiveView('undated')}
               onExpandCountdown={openCountdownExperience}
-              canManage={cronograma.canManage}
               availability={cronograma.isLoading ? 'loading' : cronograma.isSeedFallback ? 'offline' : 'ready'}
+            />
+            <CronogramaRegistrationAction
+              canManage={cronograma.canManage}
+              onCreate={openCreate}
+              presentation="mobile"
             />
             <MobileCronogramaNavigation activeView={activeView} onChange={setActiveView} />
             <MobileCronogramaFilters
@@ -984,11 +988,15 @@ export default function CronogramaEventosPage() {
         <div className="mx-auto flex w-full max-w-[1680px] flex-col gap-4 px-3 sm:px-5 2xl:px-8">
           <CronogramaCommandHeader
             events={events}
-            onNewEvent={openCreate}
             onOpenUndated={() => setActiveView('undated')}
             onExpandCountdown={openCountdownExperience}
-            canManage={cronograma.canManage}
             availability={cronograma.isLoading ? 'loading' : cronograma.isSeedFallback ? 'offline' : 'ready'}
+          />
+
+          <CronogramaRegistrationAction
+            canManage={cronograma.canManage}
+            onCreate={openCreate}
+            presentation="desktop"
           />
 
           <div className="cronograma-command-dock sticky top-[72px] z-20 space-y-2 py-2">

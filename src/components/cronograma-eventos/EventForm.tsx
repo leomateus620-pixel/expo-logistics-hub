@@ -14,17 +14,17 @@ import {
 import { useOrgCommissions } from '@/hooks/useOrgCommissions';
 import { useAuth } from '@/hooks/useAuth';
 import { useOrgMembers } from '@/hooks/useOrgMembers';
-import { OrgUnitSummary } from '@/components/org-units/OrgUnitSelect';
 import {
   ORG_UNIT_SELECT_LABEL,
+  normalizeSearchTerm,
   orgUnitGroupLabel,
   orgUnitHint,
+  responsibleRoleLabel,
   selectableOrgUnits,
 } from '@/lib/org-units';
 import { categoryLabels, priorityLabels, statusLabels } from './cronogramaData';
 import { CronogramaSubeventForm } from './CronogramaSubeventForm';
 import { RelationalMultiSelect, type RelationalSelection } from './RelationalMultiSelect';
-import { normalizeSearchTerm } from '@/lib/org-units';
 import type {
   CronogramaCategory,
   CronogramaEvent,
@@ -52,6 +52,14 @@ const editableStatusLabels: Partial<Record<CronogramaStatus, string>> = {
   completed: statusLabels.completed,
   cancelled: statusLabels.cancelled,
 };
+
+interface EventFormMember {
+  user_id?: string | null;
+  nome_exibicao?: string | null;
+  cargo?: string | null;
+  role?: string | null;
+  commission_nome?: string | null;
+}
 
 function normalizeEditableStatus(status: CronogramaStatus): CronogramaStatus {
   if (status === 'overdue' || status === 'confirmed' || status === 'rescheduled') return 'planned';
@@ -158,9 +166,21 @@ export function EventForm({
 }) {
   const formInstanceId = useId().replace(/:/g, '');
   const fieldId = (name: string) => `${formInstanceId}-${name}`;
-  const { units, commissions, isLoading: commissionsLoading } = useOrgCommissions();
+  const {
+    units,
+    commissions,
+    isLoading: commissionsLoading,
+    error: commissionsError,
+  } = useOrgCommissions();
   const { user } = useAuth();
-  const { members, loginMembers } = useOrgMembers();
+  const {
+    members,
+    loginMembers,
+    isLoading: membersLoading,
+    isLoadingLoginMembers,
+    error: membersError,
+    loginMembersError,
+  } = useOrgMembers();
   const currentUserName = useMemo(() => {
     if (!user) return '';
     const member = ([...(loginMembers ?? []), ...(members ?? [])] as any[]).find((item: any) => item.user_id === user.id);
@@ -240,43 +260,98 @@ export function EventForm({
     [form.responsiblesRel],
   );
   const responsibleOptions = useMemo(() => {
-    const options: Array<{ id: string; label: string; hint?: string; group?: string }> = [];
+    const options: Array<{
+      id: string;
+      label: string;
+      hint?: string;
+      group?: string;
+      description?: string;
+      context?: string;
+      searchText?: string;
+    }> = [];
     const seenNames = new Set<string>();
-
-    [...(loginMembers ?? [])]
-      .sort((a: any, b: any) => (a?.nome_exibicao ?? '').localeCompare(b?.nome_exibicao ?? '', 'pt-BR'))
-      .forEach((member: any) => {
-        const label = (member?.nome_exibicao ?? '').trim();
-        if (!label || !member?.user_id) return;
-        const key = normalizeSearchTerm(label);
-        if (seenNames.has(key)) return;
-        seenNames.add(key);
-        options.push({
-          id: member.user_id as string,
-          label,
-          hint: member.cargo || undefined,
-          group: 'Membros do sistema',
-        });
-      });
+    const typedMembers = members as EventFormMember[];
+    const typedLoginMembers = loginMembers as EventFormMember[];
+    const memberByUserId = new Map<string, EventFormMember>(
+      typedMembers.flatMap((member) => (
+        member.user_id ? [[member.user_id, member] as const] : []
+      )),
+    );
+    const institutionalByName = new Map<string, {
+      label: string;
+      userId: string | null;
+      firstUnitName: string;
+      unitNames: Set<string>;
+      roles: Set<string>;
+    }>();
 
     units.forEach((unit) => {
       unit.responsibles.forEach((person) => {
         const label = (person.displayName ?? '').trim();
         if (!label) return;
         const key = normalizeSearchTerm(label);
-        if (seenNames.has(key)) return;
-        seenNames.add(key);
-        options.push({
-          id: person.userId ?? `custom:${label.toLocaleLowerCase('pt-BR')}`,
+        const existing = institutionalByName.get(key);
+        if (existing) {
+          existing.unitNames.add(unit.name);
+          existing.roles.add(responsibleRoleLabel(person.relationshipRole));
+          return;
+        }
+        institutionalByName.set(key, {
           label,
-          hint: unit.name,
-          group: 'Responsáveis institucionais',
+          userId: person.userId,
+          firstUnitName: unit.name,
+          unitNames: new Set([unit.name]),
+          roles: new Set([responsibleRoleLabel(person.relationshipRole)]),
         });
       });
     });
 
+    [...typedLoginMembers]
+      .sort((a, b) => (a.nome_exibicao ?? '').localeCompare(b.nome_exibicao ?? '', 'pt-BR'))
+      .forEach((member) => {
+        const label = (member?.nome_exibicao ?? '').trim();
+        if (!label || !member?.user_id) return;
+        const key = normalizeSearchTerm(label);
+        if (seenNames.has(key)) return;
+        seenNames.add(key);
+        const memberProfile = memberByUserId.get(member.user_id);
+        const institutional = institutionalByName.get(key);
+        const persistedRole = member.cargo || undefined;
+        const displayRole = member.cargo || memberProfile?.cargo || member.role || undefined;
+        const contexts = new Set<string>();
+        if (memberProfile?.commission_nome) contexts.add(memberProfile.commission_nome);
+        institutional?.unitNames.forEach((unitName) => contexts.add(unitName));
+        options.push({
+          id: member.user_id as string,
+          label,
+          // `hint` is persisted as the event relationship role; keep the existing contract.
+          hint: persistedRole,
+          description: displayRole || 'Membro do sistema',
+          context: contexts.size > 0 ? Array.from(contexts).join(' · ') : 'Membro do sistema',
+          searchText: [member.role, memberProfile?.role, ...(institutional?.roles ?? [])].filter(Boolean).join(' '),
+          group: 'Membros do sistema',
+        });
+      });
+
+    institutionalByName.forEach((person, key) => {
+      if (seenNames.has(key)) return;
+      seenNames.add(key);
+      const unitNames = Array.from(person.unitNames);
+      const roles = Array.from(person.roles);
+      options.push({
+        id: person.userId ?? `custom:${person.label.toLocaleLowerCase('pt-BR')}`,
+        label: person.label,
+        // Preserve the existing persisted fallback role for institutional names.
+        hint: person.firstUnitName,
+        description: roles.join(' · ') || 'Responsável institucional',
+        context: unitNames.join(' · '),
+        searchText: [...unitNames, ...roles].join(' '),
+        group: 'Responsáveis institucionais',
+      });
+    });
+
     return options;
-  }, [loginMembers, units]);
+  }, [loginMembers, members, units]);
 
   const linkedUnitIds = useMemo(
     () => (form.commissionsRel ?? []).map((link) => link.commissionId).filter(Boolean) as string[],
@@ -286,7 +361,11 @@ export function EventForm({
     () => selectableOrgUnits(units, linkedUnitIds).map((unit) => ({
       id: unit.id,
       label: unit.name,
+      // `hint` participates in the existing persistence fallback; preserve it byte-for-byte.
       hint: orgUnitHint(unit),
+      description: orgUnitHint(unit),
+      context: unit.isLegacy ? 'Registro histórico' : 'Área institucional oficial',
+      searchText: unit.responsibles.map((person) => person.displayName).join(' '),
       group: orgUnitGroupLabel(unit.type),
     })),
     [units, linkedUnitIds],
@@ -548,70 +627,86 @@ export function EventForm({
       </div>
 
       {showRelational && (
-        <div className="cronograma-form-section space-y-4">
-          <div className="flex items-center gap-2">
-            <UserRound className="h-4 w-4 text-primary" />
-            <h3 className="text-sm font-black uppercase tracking-[0.14em] text-foreground/72">Vínculos relacionais</h3>
-          </div>
-          <RelationalMultiSelect
-            label={ORG_UNIT_SELECT_LABEL}
-            placeholder="Buscar por comissão, assessoria ou responsável…"
-            emptyLabel="Nenhuma comissão ou assessoria vinculada. Adicione uma ou mais e marque a principal."
-            options={commissionOptions}
-            value={commissionSelections}
-            onChange={(next) => update('commissionsRel', selectionsToCommissionLinks(next, commissions))}
-            isLoading={commissionsLoading}
-            primaryLabel="Principal"
-          />
-          {selectedUnits.length > 0 && (
-            <div className="space-y-2">
-              {selectedUnits.map((unit) => (
-                <OrgUnitSummary key={unit.id} unit={unit} />
-              ))}
-              {missingOfficialResponsibles.length > 0 && (
-                <button
-                  type="button"
-                  onClick={applyOfficialResponsibles}
-                  className="rounded-full border border-primary/40 bg-primary/10 px-3 py-2 text-xs font-bold text-primary"
-                >
-                  Usar responsáveis institucionais ({missingOfficialResponsibles.length})
-                </button>
-              )}
+        <div className="cronograma-form-section cronograma-relations-section">
+          <div className="cronograma-relations-section__header">
+            <span className="cronograma-relations-section__icon" aria-hidden="true">
+              <UserRound />
+            </span>
+            <div>
+              <p>Cadastro conectado</p>
+              <h3>Vínculos relacionais</h3>
+              <span>Separe a área institucional de quem executará ou acompanhará o evento.</span>
             </div>
-          )}
-          <RelationalMultiSelect
-            label="Responsáveis do evento"
-            placeholder="Buscar pessoa do sistema ou digitar um nome…"
-            emptyLabel="Nenhum responsável vinculado. Selecione pessoas do sistema ou digite um nome."
-            options={responsibleOptions}
-            value={responsibleSelections}
-            onChange={(next) => {
-              const reconciled = next.map((selection) => {
-                if (!selection.id.startsWith('custom:') && !selection.id.startsWith('external:')) return selection;
-                const match = responsibleOptions.find(
-                  (option) => normalizeSearchTerm(option.label) === normalizeSearchTerm(selection.label),
-                );
-                return match ? { ...selection, id: match.id, hint: selection.hint ?? match.hint } : selection;
-              });
-              const seen = new Set<string>();
-              const unique = reconciled.filter((selection) => {
-                const key = normalizeSearchTerm(selection.label);
-                if (seen.has(key)) return false;
-                seen.add(key);
-                return true;
-              });
-              update('responsiblesRel', selectionsToResponsibleLinks(unique));
-            }}
+          </div>
+          <div className="cronograma-relations-section__fields">
+            <RelationalMultiSelect
+              label={ORG_UNIT_SELECT_LABEL}
+              description="Vincule a área institucional principal do evento."
+              placeholder="Buscar comissão, assessoria ou responsável"
+              triggerLabel="Selecionar comissão ou assessoria"
+              selectedTriggerLabel="Adicionar ou alterar áreas"
+              emptyLabel="Nenhuma comissão ou assessoria vinculada."
+              options={commissionOptions}
+              value={commissionSelections}
+              onChange={(next) => update('commissionsRel', selectionsToCommissionLinks(next, commissions))}
+              isLoading={commissionsLoading}
+              errorMessage={commissionsError ? 'Tente novamente em instantes.' : null}
+              primaryLabel="Comissão principal"
+              presentation={presentation}
+              variant="organization"
+            />
 
-            allowCustom
-            primaryLabel="Principal"
-          />
+            {missingOfficialResponsibles.length > 0 && (
+              <div className="cronograma-relation-institutional-action">
+                <div>
+                  <strong>Responsáveis institucionais disponíveis</strong>
+                  <p>{missingOfficialResponsibles.join(', ')}</p>
+                </div>
+                <button type="button" onClick={applyOfficialResponsibles}>
+                  Usar no evento
+                  <span>{missingOfficialResponsibles.length}</span>
+                </button>
+              </div>
+            )}
 
-          <p className="text-[11px] leading-relaxed text-muted-foreground">
-            Os vínculos relacionais são persistidos pelas RPCs oficiais (<code>cronograma_save_event</code>) e complementam
-            o campo &quot;Responsável&quot; para eventos já salvos.
-          </p>
-
+            <RelationalMultiSelect
+              label="Responsáveis do evento"
+              description="Defina quem executará ou acompanhará esta ação."
+              placeholder="Buscar pessoa por nome ou função"
+              triggerLabel="Selecionar responsáveis"
+              selectedTriggerLabel="Adicionar ou alterar responsáveis"
+              emptyLabel="Nenhum responsável operacional vinculado."
+              options={responsibleOptions}
+              value={responsibleSelections}
+              onChange={(next) => {
+                const reconciled = next.map((selection) => {
+                  if (!selection.id.startsWith('custom:') && !selection.id.startsWith('external:')) return selection;
+                  const match = responsibleOptions.find(
+                    (option) => normalizeSearchTerm(option.label) === normalizeSearchTerm(selection.label),
+                  );
+                  return match ? { ...selection, id: match.id, hint: selection.hint ?? match.hint } : selection;
+                });
+                const seen = new Set<string>();
+                const unique = reconciled.filter((selection) => {
+                  const key = normalizeSearchTerm(selection.label);
+                  if (seen.has(key)) return false;
+                  seen.add(key);
+                  return true;
+                });
+                update('responsiblesRel', selectionsToResponsibleLinks(unique));
+              }}
+              allowCustom
+              isLoading={membersLoading || isLoadingLoginMembers}
+              errorMessage={
+                loginMembersError || membersError
+                  ? 'Tente novamente em instantes.'
+                  : null
+              }
+              primaryLabel="Responsável principal"
+              presentation={presentation}
+              variant="person"
+            />
+          </div>
         </div>
       )}
 
