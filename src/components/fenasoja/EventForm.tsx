@@ -34,7 +34,7 @@ const empty = {
 
 export default function EventForm({ open, onOpenChange, editing }: EventFormProps) {
   const { create, update } = useFenasojaEvents();
-  const { members } = useOrgMembers();
+  const { loginMembers } = useOrgMembers();
   const { commissions } = useCommissions();
 
   const [form, setForm] = useState(() => {
