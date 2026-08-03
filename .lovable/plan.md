@@ -1,59 +1,61 @@
-# Entrega única: Fases 3 a 8 da Agenda Restaurante Fenasoja
+# Registro organizacional oficial Fenasoja 2028 (fonte única compartilhada)
 
-Base já pronta: migration aplicada (campos operacionais + `venue_import_batches`/`venue_import_rows` + `venue_save_event_agenda`), `sourceRows.ts` (99 linhas), `parser.ts` (881 linhas), `dedupe.ts` e 31 testes verdes.
+Objetivo: uma única lista oficial de Comissões e Assessorias (com seus responsáveis institucionais) consumida por "Cronograma e Eventos" e "Eventos Restaurante e Arena", sem listas fixas no frontend e sem perder eventos já cadastrados.
 
-## 1. Execução da importação (Fase 3)
+## Diagnóstico do que já existe
 
-Edge Function `venue-import-restaurant-agenda`:
-- Valida JWT + capacidade admin, usa service role.
-- Modo `dry_run` (padrão) e `commit`, para conferência antes de gravar.
-- Cria o batch em `venue_import_batches`, registra cada linha em `venue_import_rows` com disposição: `created | merged | matched | skipped_duplicate | review_required | not_an_event`.
-- Cria stakeholders faltantes (`relationship_type='externo'`) reaproveitando `normalized_name`; cria eventos vinculados ao espaço **Restaurante Fenasoja**.
-- Idempotência garantida pelo índice único de `source_fingerprint`: segunda execução reporta `skipped`, não duplica.
-- Status inicial `confirmado` quando há confirmação explícita, senão `solicitado`. Nunca `concluido` por data passada.
-- Erro no lote → rollback; nenhum evento existente é apagado ou sobrescrito.
-- Gatilho na UI: botão "Importar agenda do restaurante" visível apenas para admin, com prévia (dry run) e confirmação.
+- Tabela `commissions` (por organização, com `slug`, `is_active`) já é o registro central usado pelo Cronograma — hoje com 30 registros e nomes em caixa alta.
+- Vínculos de evento já são relacionais: `cronograma_evento_comissoes` (68 vínculos, com papel `principal`/`participante`) e `cronograma_evento_responsaveis`.
+- O módulo Restaurante e Arena não tem campo de comissão: usa `venue_stakeholders` (que já aceita o tipo `comissao`) como organização solicitante.
+- Faltam na base: Soy Summit, Assessoria de Sistemas, Mercosul, Relacionamento e Experiência, Acolhimento e Bem Comum, Relações Estratégicas, Gastronomia (existe), Arte e Cultura (existe) e o cadastro de responsáveis.
 
-Resultado esperado do parser atual: 97 eventos únicos, 1 mesclado (APROMES), 1 não-evento, 23 marcados para revisão.
+## 1. Registro central
 
-## 2. Reforma do formulário (Fase 4)
+Reutilizar `commissions` (nada de tabela paralela), acrescentando:
+- `unit_type`: `comissao` ou `assessoria`;
+- `display_order`, `is_official` e `is_legacy` (unidade histórica que não aparece para novos cadastros);
+- `normalized_name` gerado (sem acento, sem pontuação, caixa única) para deduplicação.
 
-`VenueEventFormDialog.tsx` (1.588 linhas) dividido em subcomponentes e reorganizado em etapas:
-- **Etapa 1 — essencial**: título, período (date-range), horário/turno, organização solicitante (busca com acento-insensível), contato, telefone (máscara BR), confirmação, contrato, pagamento, observações operacionais.
-- **Seções recolhidas**: preparação e desmontagem · taxas e condições financeiras (BRL) · limpeza e energia · observações internas · anexos/contrato.
-- Campos sobrepostos fundidos em um status estruturado + notas por tema; segmented control para status finitos; validações em português.
+Nova tabela `commission_responsibles`: unidade, nome exibido, tipo (`pessoa` ou `equipe`), papel (`principal`, `corresponsavel`, `copresidente`, `equipe_apoio`), `user_id` quando o nome corresponder a um membro já cadastrado, ordem e ativo. Permissões: leitura para membros da organização; escrita apenas admin/gestor.
 
-## 3. Correção de bugs (Fase 5)
+## 2. Sincronização idempotente
 
-Auditoria e correção no formulário, mutations e listagem:
-- Guarda de submissão contra duplo clique; chave de idempotência da RPC.
-- Data deslocada por UTC, fim antes do início, evento que atravessa a madrugada.
-- String vazia gravada no lugar de `null`; campos ocultos retendo valores obsoletos.
-- Edição não carregando valores persistidos; modal fechando antes do fim da mutation; erro de banco silencioso.
-- Invalidação de cache após criar/editar/excluir; busca ignorando acentos.
-- Overflow horizontal no mobile e quebra de notas longas nos cards.
+Migração + rotina de sincronização que:
+- casa por `normalized_name`/slug e renomeia as unidades equivalentes para o nome oficial, preservando o `id` e todos os vínculos de eventos (ex.: "RECEPÇÃO e CERIMONIAL" → "Recepção e Eventos", "INOVAÇÃO E EXPERIÊNCIA" → "Inovação e Tecnologia", "ASSESSORIA PROJETOS e CAPTAÇÕES INSTITUCIONAIS" → "Assessoria de Projetos e Captações");
+- cria as unidades oficiais faltantes (inclui Soy Summit);
+- mantém CENTRAL, ETNIAS e RELAÇÕES INSTITUCIONAIS ativas, marcadas como legado;
+- insere os responsáveis oficiais (7 Assessorias e 26 Comissões), incluindo os casos múltiplos: Imprensa (2), Projetos e Captações (1 pessoa + Equipe do EP como equipe), Jurídica (2), Relações Internacionais (3), Relações Estratégicas (2);
+- espelha cada unidade oficial em `venue_stakeholders` com tipo `comissao`, reaproveitando o registro existente pelo nome normalizado;
+- pode rodar quantas vezes for necessário sem duplicar nem apagar nada.
 
-## 4. Visualização (Fase 6)
+Nomes exibidos em capitalização normal ("Assessoria de Relações Internacionais"), acentuação e grafia oficiais preservadas.
 
-`VenueWorkspace.tsx` e `VenueEventDetail.tsx`:
-- Lista cronológica com agrupamento mensal, próximos × passados, badges de confirmação/contrato/pagamento e selo de revisão.
-- Filtros de ano, mês, confirmação, contrato e pagamento; busca por título, organização, solicitante ou telefone.
-- Multi-dia como intervalo único; aviso visual de conflito de agenda.
-- Detalhe em 7 seções, incluindo "dados de importação" somente para admin.
-- Sem rótulos vazios nem placeholders com traço.
+## 3. Seletor "Comissão ou Assessoria responsável"
 
-## 5. Testes e validação (Fase 7)
+Componente único e pesquisável, usado nos dois módulos:
+- resultados agrupados em Comissões e Assessorias, com rolagem controlada;
+- cada opção mostra nome, tipo e responsáveis ("Relações Estratégicas · Comissão · Miguel Nedel e Diana Nedel");
+- busca por nome da unidade ou do responsável, ignorando acentos e maiúsculas, com correspondência parcial;
+- unidades legado só aparecem em eventos que já as usam;
+- teclado, foco visível, rótulo associado e leitura por leitor de tela; no celular ocupa a largura toda, com alvos de toque de ~44px.
 
-- Complementos em `src/test/venueRestaurantImportParser.test.ts` e nova suíte para o fluxo de importação (idempotência, disposições, revisão) e para o formulário (obrigatórios, permissões, atualização da lista).
-- `bunx vitest run` completo.
-- Validação visual via Playwright em 360 px, 768 px e 1440 px, com captura dos estados vazio, carregando, erro, sucesso, dado completo/incompleto, multi-dia, passado e futuro.
+Após selecionar, um resumo abaixo do campo mostra a unidade e a lista completa de responsáveis institucionais (sem esconder nomes atrás de "+2"), com ação de trocar/remover.
 
-## 6. Relatório de reconciliação (Fase 8)
+## 4. Cronograma e Eventos
 
-`docs/IMPORTACAO_AGENDA_RESTAURANTE.md` com totais por disposição e por ano, cada linha ambígua com motivo, bugs encontrados/corrigidos, campos removidos/fundidos/adicionados, arquivos e migrations tocados e resultado dos testes. Toda linha do documento terá disposição final registrada.
+- `EventForm` passa a usar o novo seletor, mantendo o modelo relacional atual (unidade principal + adicionais, sem duplicar).
+- Responsáveis oficiais podem ser sugeridos como responsáveis do evento, com confirmação — nunca sobrescrevendo um responsável já escolhido manualmente.
+- Filtros da Timeline, do Dashboard, visões por comissão e resumos passam a ler o registro oficial; nenhuma lista fixa permanece.
 
-## Detalhes técnicos
+## 5. Eventos Restaurante e Arena
 
-- A importação roda server-side com service role sob verificação de capacidade admin; nenhuma linha de evento fica embutida em componente de UI.
-- Nenhuma tabela ou política existente é removida; RLS atual respeitada.
-- Rótulo e rota `/eventos-restaurante-arena` preservados.
+- Campo de organização solicitante passa a usar o mesmo seletor, oferecendo as Comissões e Assessorias oficiais (espelhadas como stakeholders) junto dos patrocinadores/parceiros já existentes.
+- Detalhe do evento, filtros e relatórios exibem unidade + responsáveis com os mesmos nomes do Cronograma.
+
+## 6. Testes e validação
+
+Testes automatizados para: presença das 7 Assessorias e das 26 Comissões (incluindo Soy Summit), busca por unidade e por pessoa, seleção com 1, 2 e 3 responsáveis, caso pessoa + equipe, edição de evento existente sem perder o responsável operacional, ausência de opções duplicadas, filtros usando o registro novo, idempotência da sincronização e restrição de permissões. Validação visual em 360px, 768px e 1440px nos dois módulos.
+
+## Entrega final
+
+Relatório com diagnóstico, entidades reaproveitadas/criadas, unidades registradas, casos de múltiplos responsáveis, mapeamento de nomes legados, componentes alterados e confirmação de que nenhum evento foi perdido ou duplicado.
