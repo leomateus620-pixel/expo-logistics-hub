@@ -34,7 +34,7 @@ describe('FenasojaPreparationTimeline', () => {
     expect(screen.getByLabelText('47% do ciclo')).toBeVisible();
     expect(screen.getByText('29 de abril de 2028, às 10h')).toBeVisible();
     expect(screen.getByText('Horário de Brasília')).toBeVisible();
-    expect(screen.getByRole('status')).toHaveTextContent('Construção em andamento');
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
     expect(screen.queryByRole('list')).not.toBeInTheDocument();
     expect(screen.queryByText('Próximo marco operacional')).not.toBeInTheDocument();
   });

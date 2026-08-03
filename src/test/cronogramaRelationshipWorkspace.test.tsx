@@ -145,7 +145,7 @@ describe('EventRelationshipWorkspace', () => {
     fireEvent.click(within(editor).getByRole('button', { name: 'Cancelar' }));
 
     fireEvent.click(screen.getByRole('button', { name: 'Remover subevento Confirmar fornecedores' }));
-    expect(await screen.findByRole('alertdialog')).toHaveTextContent('Remover esta conexão?');
+    expect(await screen.findByRole('alertdialog')).toHaveTextContent('Remover subevento?');
     fireEvent.click(screen.getByRole('button', { name: 'Remover subevento' }));
     await waitFor(() => expect(onRemove).toHaveBeenCalledWith(expect.objectContaining({
       id: 'embedded:main-event:0',
@@ -159,15 +159,15 @@ describe('EventRelationshipWorkspace', () => {
     const addBubble = screen.getByRole('button', { name: 'Adicionar subevento' });
     fireEvent.click(addBubble);
     const composer = screen.getByTestId('subevent-composer');
-    fireEvent.click(within(composer).getByRole('button', { name: 'Conectar subevento' }));
-    expect(await screen.findByText('Informe um título para conectar este subevento.')).toBeVisible();
+    fireEvent.click(within(composer).getByRole('button', { name: 'Adicionar subevento' }));
+    expect(await screen.findByText('Informe o título do subevento.')).toBeVisible();
 
     fireEvent.change(within(composer).getByLabelText('Título'), { target: { value: 'Liberar plano de montagem' } });
     fireEvent.change(within(composer).getByLabelText('Descrição'), { target: { value: 'Consolidar responsáveis por cada frente.' } });
     fireEvent.change(within(composer).getByLabelText('Data ou prazo'), { target: { value: '2026-07-21' } });
     fireEvent.change(within(composer).getByLabelText('Responsável'), { target: { value: 'Coordenação de Montagem' } });
-    fireEvent.change(within(composer).getByLabelText('Comissão / categoria'), { target: { value: 'infraestrutura' } });
-    fireEvent.click(within(composer).getByRole('button', { name: 'Conectar subevento' }));
+    fireEvent.change(within(composer).getByLabelText('Comissão ou assessoria'), { target: { value: 'infraestrutura' } });
+    fireEvent.click(within(composer).getByRole('button', { name: 'Adicionar subevento' }));
 
     await waitFor(() => expect(onCreate).toHaveBeenCalledWith(expect.objectContaining({
       title: 'Liberar plano de montagem',
@@ -212,14 +212,14 @@ describe('EventRelationshipWorkspace', () => {
       />,
     );
 
-    expect(screen.getByRole('status')).toHaveTextContent('1 conexão aguarda sincronização');
+    expect(screen.getByRole('status')).toHaveTextContent('1 subevento aguarda envio');
     expect(screen.getByRole('button', { name: 'Adicionar subevento' })).toBeEnabled();
     expect(screen.getByRole('button', { name: 'Remover subevento Validar acesso de montagem' })).toBeVisible();
     expect(screen.queryByRole('button', { name: 'Remover subevento Publicar pauta final' })).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Adicionar subevento' }));
     expect(screen.getByTestId('subevent-composer')).toBeVisible();
-    fireEvent.click(screen.getByRole('button', { name: 'Tentar agora' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Tentar novamente' }));
     await waitFor(() => expect(onRetry).toHaveBeenCalledTimes(1));
   });
 });

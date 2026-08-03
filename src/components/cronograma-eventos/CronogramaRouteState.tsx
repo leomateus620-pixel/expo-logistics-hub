@@ -49,10 +49,9 @@ export class CronogramaRouteBoundary extends Component<
         <span className="flex h-12 w-12 items-center justify-center rounded-xl border border-destructive/20 bg-destructive/10 text-destructive shadow-[var(--elevation-1)]">
           <AlertTriangle className="h-6 w-6" aria-hidden="true" />
         </span>
-        <p className="mt-5 text-[10px] font-black uppercase tracking-[0.18em] text-destructive">Falha de renderização</p>
-        <h1 className="mt-2 text-2xl font-black tracking-tight text-foreground">O cronograma não pôde ser exibido</h1>
+        <h1 className="mt-5 text-2xl font-black tracking-tight text-foreground">O cronograma não pôde ser exibido</h1>
         <p className="mt-3 max-w-md text-sm leading-6 text-muted-foreground">
-          Seus dados permanecem preservados. Recarregue o módulo ou volte ao portal enquanto a conexão é restabelecida.
+          Seus dados permanecem preservados. Tente novamente ou volte ao portal.
         </p>
         <div className="mt-6 flex flex-col gap-2 sm:flex-row">
           <Button type="button" onClick={this.retry}>
@@ -68,14 +67,13 @@ export class CronogramaRouteBoundary extends Component<
   }
 }
 
-export function CronogramaRouteLoading({ label = 'Carregando Cronograma e Eventos…' }: { label?: string }) {
+export function CronogramaRouteLoading({ label = 'Carregando…' }: { label?: string }) {
   return (
     <RouteStateFrame role="status" ariaLive="polite">
       <span className="flex h-12 w-12 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 text-primary shadow-[var(--elevation-1)]">
         <Loader2 className="h-6 w-6 animate-spin" aria-hidden="true" />
       </span>
       <p className="mt-5 text-sm font-bold text-foreground">{label}</p>
-      <p className="mt-1 text-xs text-muted-foreground">Preparando calendário, linha do tempo e permissões.</p>
     </RouteStateFrame>
   );
 }
@@ -86,10 +84,9 @@ export function CronogramaPermissionDenied() {
       <span className="flex h-12 w-12 items-center justify-center rounded-xl border border-warning/25 bg-warning/[0.12] text-warning-foreground shadow-[var(--elevation-1)]">
         <ShieldX className="h-6 w-6" aria-hidden="true" />
       </span>
-      <p className="mt-5 text-[10px] font-black uppercase tracking-[0.18em] text-primary">Acesso por perfil</p>
-      <h1 className="mt-2 text-2xl font-black tracking-tight text-foreground">Cronograma não liberado para este perfil</h1>
+      <h1 className="mt-5 text-2xl font-black tracking-tight text-foreground">Cronograma não liberado para este perfil</h1>
       <p className="mt-3 max-w-md text-sm leading-6 text-muted-foreground">
-        A rota está disponível, mas sua conta não possui a permissão necessária. Solicite acesso ao administrador responsável.
+        Sua conta não possui acesso a este módulo. Solicite a liberação ao administrador responsável.
       </p>
       <Button asChild variant="outline" className="mt-6">
         <Link to="/portal">Voltar ao portal</Link>

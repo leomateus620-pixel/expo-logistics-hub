@@ -5,7 +5,6 @@ import {
   Check,
   CheckCircle2,
   Edit3,
-  FileClock,
   History,
   Layers3,
   Loader2,
@@ -222,8 +221,8 @@ export function EventDrawer({
                 )}
               </div>
               <SheetTitle className="cronograma-drawer-title">{event.title}</SheetTitle>
-              <SheetDescription className="cronograma-drawer-description">
-                {editMode ? 'Atualize os dados operacionais e salve para registrar as alterações.' : event.summary}
+              <SheetDescription className={editMode ? 'sr-only' : 'cronograma-drawer-description'}>
+                {editMode ? `Formulário de edição de ${event.title}.` : event.summary}
               </SheetDescription>
             </SheetHeader>
             <div className="mt-4 flex flex-wrap items-center gap-2">
@@ -232,7 +231,7 @@ export function EventDrawer({
               {editMode && (
                 <span className="cronograma-editing-badge">
                   <Edit3 className="h-3.5 w-3.5" />
-                  Modo de edição
+                  Editando
                 </span>
               )}
             </div>
@@ -291,8 +290,7 @@ export function EventDrawer({
                   <section className="cronograma-drawer-section border-t border-border/50 pt-5" aria-labelledby="cronograma-subevents-title">
                     <div className="mb-4 flex items-start justify-between gap-4">
                       <div>
-                        <p className="cronograma-section-eyebrow">Checklist vinculado</p>
-                        <h3 id="cronograma-subevents-title" className="mt-1 font-black tracking-tight text-foreground">Entregas e subeventos</h3>
+                        <h3 id="cronograma-subevents-title" className="font-black tracking-tight text-foreground">Subeventos</h3>
                       </div>
                       <span className="cronograma-progress-label">{progress?.completed ?? 0} de {progress?.total ?? 0}</span>
                     </div>
@@ -310,7 +308,7 @@ export function EventDrawer({
                             <div className="min-w-0 flex-1">
                               <p className={cn('text-sm font-bold leading-tight text-foreground', completed && 'line-through opacity-65')}>{subevent.title}</p>
                               <p className="mt-1 text-xs text-muted-foreground">
-                                {subevent.date ? formatLongDate(subevent.date) : 'Sem data vinculada'}
+                                {subevent.date ? formatLongDate(subevent.date) : 'Sem data'}
                                 {subevent.owner ? ` · ${subevent.owner}` : ''}
                               </p>
                             </div>
@@ -322,33 +320,13 @@ export function EventDrawer({
                   </section>
                 )}
 
-                <section className="cronograma-drawer-section border-t border-border/50 pt-5" aria-labelledby="cronograma-executive-title">
-                  <p className="cronograma-section-eyebrow">Leitura executiva</p>
-                  <h3 id="cronograma-executive-title" className="sr-only">Resumo executivo</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-foreground/80">{event.summary}</p>
-                </section>
-
                 {event.id && <EventoAnexosSection eventId={event.id} />}
-
-                <section className="cronograma-history-panel" aria-label="Rastreabilidade do registro">
-                  <FileClock className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
-                  <div>
-                    <p className="text-sm font-bold text-foreground">Rastreabilidade do registro</p>
-                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
-                      {event.sourceSheet ? `Origem: ${event.sourceSheet}. ` : ''}
-                      {event.updatedAt
-                        ? `Última atualização registrada em ${new Intl.DateTimeFormat('pt-BR', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(event.updatedAt))}.`
-                        : 'Registro consolidado a partir do cronograma oficial.'}
-                    </p>
-                  </div>
-                </section>
 
                 {canViewHistory && (
                   <section className="cronograma-audit-section" aria-labelledby="cronograma-history-title">
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <p className="cronograma-section-eyebrow">Auditoria</p>
-                        <h3 id="cronograma-history-title" className="mt-1 flex items-center gap-2 text-sm font-black text-foreground">
+                        <h3 id="cronograma-history-title" className="flex items-center gap-2 text-sm font-black text-foreground">
                           <History className="h-4 w-4 text-primary" aria-hidden="true" />
                           Histórico de alterações
                         </h3>
@@ -363,10 +341,10 @@ export function EventDrawer({
                       </div>
                     ) : historyError ? (
                       <p className="mt-3 rounded-lg border border-amber-900/10 bg-amber-50 p-3 text-xs leading-relaxed text-amber-950">
-                        O histórico online não pôde ser carregado agora. Os dados do evento continuam disponíveis.
+                        Não foi possível carregar o histórico agora.
                       </p>
                     ) : history.length === 0 ? (
-                      <p className="mt-3 text-xs leading-relaxed text-muted-foreground">Nenhuma alteração manual registrada para este evento.</p>
+                      <p className="mt-3 text-xs leading-relaxed text-muted-foreground">Nenhuma alteração registrada.</p>
                     ) : (
                       <ol className="mt-3 space-y-2">
                         {history.slice(0, 5).map((entry) => (
@@ -376,7 +354,7 @@ export function EventDrawer({
                               <p className="text-xs font-bold text-foreground">
                                 {entry.changedFields.length > 0
                                   ? `Alteração em ${entry.changedFields.join(', ')}`
-                                  : 'Dados operacionais atualizados'}
+                                  : 'Evento atualizado'}
                               </p>
                               <p className="mt-1 text-[11px] text-muted-foreground">
                                 {entry.userLabel} · {new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(entry.createdAt))}
@@ -395,9 +373,9 @@ export function EventDrawer({
           <div className="cronograma-drawer-footer">
             {editMode ? (
               <div className="flex w-full flex-wrap items-center justify-between gap-3">
-                <p className="hidden text-xs font-medium text-muted-foreground sm:block">
-                  {dirty ? 'Há alterações ainda não salvas.' : 'Nenhuma alteração pendente.'}
-                </p>
+                {dirty && (
+                  <p className="hidden text-xs font-medium text-muted-foreground sm:block">Alterações não salvas.</p>
+                )}
                 <div className="ml-auto flex gap-2">
                   <Button type="button" variant="outline" onClick={handleCancelEdit} disabled={saving} className="rounded-lg">
                     <X className="h-4 w-4" />

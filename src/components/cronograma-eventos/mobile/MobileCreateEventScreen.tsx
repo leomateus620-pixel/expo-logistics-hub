@@ -1,5 +1,5 @@
 import { useEffect, useId, useState } from 'react';
-import { CalendarDays, Loader2, Save, X } from 'lucide-react';
+import { Loader2, Save, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { EventForm } from '../EventForm';
 import type { CronogramaEvent } from '../types';
@@ -74,9 +74,8 @@ export function MobileCreateEventScreen({
     <>
       <MobileDialogFrame
         open={open}
-        title="Novo evento do cronograma"
-        eyebrow="Cadastro operacional"
-        description="Comece pelas informações essenciais. A data e os detalhes complementares podem ser definidos depois."
+        title="Novo evento"
+        description="Preencha as informações essenciais do evento."
         onRequestClose={requestClose}
         closeDisabled={saving}
         closeLabel="Fechar criação de evento"
@@ -93,12 +92,6 @@ export function MobileCreateEventScreen({
           </div>
         )}
       >
-        <div className="mb-3 flex items-center gap-3 rounded-xl border border-primary/10 bg-primary/[0.045] p-3">
-          <span className="cronograma-mobile-info-icon" aria-hidden="true"><CalendarDays className="h-4 w-4" /></span>
-          <p className="text-xs leading-5 text-foreground/75">
-            É possível salvar uma ação sem data e completar o planejamento quando a decisão estiver confirmada.
-          </p>
-        </div>
         <EventForm
           formId={formId}
           presentation="mobile"
@@ -115,7 +108,7 @@ export function MobileCreateEventScreen({
       <MobileConfirmDialog
         open={confirmDiscard}
         title="Descartar novo evento?"
-        description="Os dados preenchidos ainda não foram salvos no cronograma."
+        description="As informações preenchidas serão perdidas."
         confirmLabel="Descartar cadastro"
         onConfirm={() => {
           setConfirmDiscard(false);

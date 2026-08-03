@@ -258,8 +258,8 @@ export function MobileCronogramaFilters({
         >
           <SheetHeader className="cronograma-mobile-filter-sheet-header">
             <SheetTitle>Filtros avançados</SheetTitle>
-            <SheetDescription>
-              Refine o período, a classificação e os responsáveis sem perder o contexto atual.
+            <SheetDescription className="sr-only">
+              Selecione os critérios para filtrar os eventos.
             </SheetDescription>
           </SheetHeader>
 

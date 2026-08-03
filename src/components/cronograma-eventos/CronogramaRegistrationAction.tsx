@@ -15,34 +15,21 @@ export function CronogramaRegistrationAction({
   if (!canManage) return null;
 
   return (
-    <section
+    <button
+      type="button"
       className="cronograma-registration-action"
       data-presentation={presentation}
-      aria-labelledby={`cronograma-registration-title-${presentation}`}
+      onClick={onCreate}
+      aria-label="Novo evento: cadastrar ação no cronograma"
     >
-      <div className="cronograma-registration-action__heading">
-        <span className="cronograma-registration-action__eyebrow">Gestão do cronograma</span>
-        <div>
-          <h2 id={`cronograma-registration-title-${presentation}`}>Cronograma e Eventos</h2>
-          <p>Acompanhe, organize e execute as ações do ciclo oficial.</p>
-        </div>
-      </div>
-
-      <button
-        type="button"
-        onClick={onCreate}
-        className="cronograma-registration-action__button focus-ring"
-        aria-label="Criar novo evento no cronograma"
-      >
-        <span className="cronograma-registration-action__icon" aria-hidden="true">
-          <CalendarPlus2 />
-        </span>
-        <span className="cronograma-registration-action__label">
-          <strong>Novo evento</strong>
-          <small>Cadastrar ação no cronograma</small>
-        </span>
-        <ArrowRight className="cronograma-registration-action__arrow" aria-hidden="true" />
-      </button>
-    </section>
+      <span className="cronograma-registration-action__icon" aria-hidden="true">
+        <CalendarPlus2 />
+      </span>
+      <span className="cronograma-registration-action__label">
+        <strong>Novo evento</strong>
+        <small>Cadastrar ação no cronograma</small>
+      </span>
+      <ArrowRight className="cronograma-registration-action__arrow" aria-hidden="true" />
+    </button>
   );
 }

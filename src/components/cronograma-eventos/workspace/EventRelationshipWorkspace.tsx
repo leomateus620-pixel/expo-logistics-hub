@@ -18,7 +18,6 @@ import {
   Loader2,
   LockKeyhole,
   MapPin,
-  Network,
   Plus,
   RefreshCw,
   RotateCcw,
@@ -122,8 +121,8 @@ export function EventRelationshipWorkspace({
     setComposerOpen(false);
     setAnnouncement(
       disposition === 'queued'
-        ? `${input.title} foi preservado como rascunho e aguarda sincronização. A ação Adicionar subevento está pronta novamente.`
-        : `${input.title} foi conectado ao evento principal. A ação Adicionar subevento está pronta novamente.`,
+        ? `${input.title} foi salvo neste dispositivo e aguarda sincronização.`
+        : `${input.title} foi adicionado ao evento.`,
     );
     window.requestAnimationFrame(() => addBubbleRef.current?.focus({ preventScroll: true }));
   };
@@ -138,18 +137,18 @@ export function EventRelationshipWorkspace({
         : 0;
       setAnnouncement(
         synced > 0
-          ? `${synced} ${synced === 1 ? 'conexão foi sincronizada' : 'conexões foram sincronizadas'}.`
-          : 'A sincronização foi revisada. Não há novas conexões confirmadas neste momento.',
+          ? `${synced} ${synced === 1 ? 'subevento foi sincronizado' : 'subeventos foram sincronizados'}.`
+          : 'A sincronização foi verificada. Nenhum subevento novo foi sincronizado.',
       );
     } catch (error) {
-      setActionError(error instanceof Error ? error.message : 'Não foi possível sincronizar as conexões pendentes.');
+      setActionError(error instanceof Error ? error.message : 'Não foi possível sincronizar os subeventos pendentes.');
     }
   };
 
   const handleUpdate = async (subevent: CronogramaSubevent, input: CronogramaSubeventInput) => {
     await onUpdateSubevent(subevent, input);
     setEditingNodeId(null);
-    setAnnouncement(`${input.title} foi atualizado na árvore de execução.`);
+    setAnnouncement(`${input.title} foi atualizado.`);
   };
 
   const handleToggleCompleted = async (subevent: CronogramaSubevent, index: number) => {
@@ -185,7 +184,7 @@ export function EventRelationshipWorkspace({
     try {
       await onRemoveSubevent(target);
       setRemovalTarget(null);
-      setAnnouncement(`${target.title} foi removido da árvore de execução.`);
+      setAnnouncement(`${target.title} foi removido.`);
     } catch (error) {
       setActionError(error instanceof Error ? error.message : 'Não foi possível remover o subevento.');
       setRemovalTarget(null);
@@ -227,15 +226,14 @@ export function EventRelationshipWorkspace({
           <div className="cronograma-workspace-heading">
             <span className="cronograma-workspace-heading-icon" aria-hidden="true"><BrainCircuit /></span>
             <div>
-              <p>Workspace de relações</p>
-              <h1>Planejamento conectado</h1>
+              <h1>Evento e subeventos</h1>
             </div>
           </div>
 
-          <div className="cronograma-workspace-summary" aria-label="Resumo das conexões">
-            <span><GitBranch aria-hidden="true" /> {subevents.length} conexões</span>
-            <span><CheckCircle2 aria-hidden="true" /> {completed} concluídas</span>
-            {pendingRelationshipCount > 0 && <span><CloudOff aria-hidden="true" /> {pendingRelationshipCount} pendentes</span>}
+          <div className="cronograma-workspace-summary" aria-label="Resumo dos subeventos">
+            <span><GitBranch aria-hidden="true" /> {subevents.length} {subevents.length === 1 ? 'subevento' : 'subeventos'}</span>
+            <span><CheckCircle2 aria-hidden="true" /> {completed} {completed === 1 ? 'concluído' : 'concluídos'}</span>
+            {pendingRelationshipCount > 0 && <span><CloudOff aria-hidden="true" /> {pendingRelationshipCount} aguardando envio</span>}
             <strong>{progress}%</strong>
           </div>
         </div>
@@ -248,14 +246,12 @@ export function EventRelationshipWorkspace({
 
         <div className="cronograma-workspace-intro">
           <div>
-            <p className="cronograma-workspace-eyebrow"><Network aria-hidden="true" /> Fluxo de execução</p>
-            <h2>Conecte cada demanda ao resultado principal.</h2>
-            <p>O evento ancora a estratégia. Cada ramo abaixo transforma planejamento em responsabilidade, prazo e entrega verificável.</p>
+            <h2>Subeventos</h2>
           </div>
-          <div className="cronograma-workspace-filter" role="group" aria-label="Filtrar conexões">
-            <button type="button" onClick={() => setFilter('all')} aria-pressed={filter === 'all'}>Todas <span>{subevents.length}</span></button>
-            <button type="button" onClick={() => setFilter('open')} aria-pressed={filter === 'open'}>Em curso <span>{subevents.length - completed}</span></button>
-            <button type="button" onClick={() => setFilter('completed')} aria-pressed={filter === 'completed'}>Concluídas <span>{completed}</span></button>
+          <div className="cronograma-workspace-filter" role="group" aria-label="Filtrar subeventos">
+            <button type="button" onClick={() => setFilter('all')} aria-pressed={filter === 'all'}>Todos <span>{subevents.length}</span></button>
+            <button type="button" onClick={() => setFilter('open')} aria-pressed={filter === 'open'}>Em aberto <span>{subevents.length - completed}</span></button>
+            <button type="button" onClick={() => setFilter('completed')} aria-pressed={filter === 'completed'}>Concluídos <span>{completed}</span></button>
           </div>
         </div>
 
@@ -271,17 +267,17 @@ export function EventRelationshipWorkspace({
             <div>
               <strong>
                 {isSyncingRelationships
-                  ? 'Sincronizando conexões'
+                  ? 'Sincronizando subeventos'
                   : pendingRelationshipCount > 0
-                    ? `${pendingRelationshipCount} ${pendingRelationshipCount === 1 ? 'conexão aguarda' : 'conexões aguardam'} sincronização`
-                    : 'Modo resiliente ativo'}
+                    ? `${pendingRelationshipCount} ${pendingRelationshipCount === 1 ? 'subevento aguarda' : 'subeventos aguardam'} envio`
+                    : 'Sincronização indisponível'}
               </strong>
               <p>
                 {failedRelationshipCount > 0
-                  ? `${failedRelationshipCount} ${failedRelationshipCount === 1 ? 'tentativa precisa' : 'tentativas precisam'} de revisão. Edite, cancele ou tente novamente sem risco de duplicação.`
+                  ? `${failedRelationshipCount} ${failedRelationshipCount === 1 ? 'subevento precisa' : 'subeventos precisam'} de revisão. Revise ou tente novamente.`
                   : relationshipsUnavailable
-                    ? 'Novas conexões ficam preservadas neste dispositivo e serão enviadas automaticamente quando o serviço responder.'
-                    : 'Os rascunhos possuem identidade estável e serão retirados da fila somente após confirmação do servidor.'}
+                    ? 'Os subeventos pendentes ficam salvos neste dispositivo e serão enviados quando a conexão voltar.'
+                    : 'Os subeventos continuam salvos neste dispositivo até a sincronização ser confirmada.'}
               </p>
             </div>
             {canManage && onRetryRelationships && (
@@ -294,7 +290,7 @@ export function EventRelationshipWorkspace({
                 className="cronograma-workspace-sync-action rounded-xl"
               >
                 <RefreshCw className={isSyncingRelationships ? 'animate-spin' : ''} aria-hidden="true" />
-                {isSyncingRelationships ? 'Sincronizando…' : 'Tentar agora'}
+                {isSyncingRelationships ? 'Sincronizando…' : 'Tentar novamente'}
               </Button>
             )}
           </div>
@@ -334,7 +330,7 @@ export function EventRelationshipWorkspace({
                 aria-expanded={editingMain}
               >
                 <Edit3 className="h-4 w-4" aria-hidden="true" />
-                {editingMain ? 'Fechar ajustes' : 'Ajustar evento principal'}
+                {editingMain ? 'Fechar edição' : 'Editar evento'}
               </Button>
             </div>
           )}
@@ -345,10 +341,8 @@ export function EventRelationshipWorkspace({
           <div className="cronograma-main-editor" data-testid="main-event-editor">
             <div className="cronograma-main-editor-heading">
               <div>
-                <p>Ajuste contextual</p>
-                <h3>Dados do evento principal</h3>
+                <h3>Editar evento principal</h3>
               </div>
-              <span>As conexões permanecem preservadas.</span>
             </div>
             <EventForm
               event={event}
@@ -357,7 +351,7 @@ export function EventRelationshipWorkspace({
               isSaving={mainSaving}
               submitError={mainSaveError}
               showSubevents={false}
-              submitLabel="Salvar evento principal"
+              submitLabel="Salvar alterações"
             />
           </div>
         )}
@@ -370,18 +364,18 @@ export function EventRelationshipWorkspace({
               <span className="empty-thought thought-a" aria-hidden="true" />
               <span className="empty-thought thought-b" aria-hidden="true" />
               <span className="cronograma-relationship-empty-icon" aria-hidden="true"><GitBranch /></span>
-              <p>Nenhuma ramificação criada ainda.</p>
-              <strong>Comece conectando a primeira demanda operacional.</strong>
+              <p>Nenhum subevento cadastrado.</p>
+              <strong>Adicione a primeira etapa deste evento.</strong>
             </div>
           )}
 
           {subevents.length > 0 && filteredSubevents.length === 0 && (
             <div className="cronograma-relationship-filter-empty" role="status">
-              Nenhuma conexão corresponde a este filtro.
+              Nenhum subevento corresponde a este filtro.
             </div>
           )}
 
-          <ol className="cronograma-relationship-branches" aria-label="Subeventos conectados ao evento principal">
+          <ol className="cronograma-relationship-branches" aria-label="Subeventos do evento principal">
             {filteredSubevents.map((subevent, index) => {
               const originalIndex = subevents.indexOf(subevent);
               const identity = subeventIdentity(subevent, originalIndex);
@@ -446,9 +440,9 @@ export function EventRelationshipWorkspace({
                 <small>
                   {canManage
                     ? relationshipsUnavailable
-                      ? 'Salvar como rascunho sincronizável'
-                      : 'Criar uma nova conexão'
-                    : 'Disponível para perfis de gestão'}
+                      ? 'Será enviado quando a conexão voltar'
+                      : 'Cadastrar etapa do evento'
+                    : 'Somente perfis de gestão podem adicionar'}
                 </small>
               </span>
               <Sparkles className="cronograma-add-thought-spark" aria-hidden="true" />
@@ -475,15 +469,15 @@ export function EventRelationshipWorkspace({
       }}>
         <AlertDialogContent className="cronograma-workspace-remove-dialog">
           <AlertDialogHeader>
-            <AlertDialogTitle>Remover esta conexão?</AlertDialogTitle>
+            <AlertDialogTitle>Remover subevento?</AlertDialogTitle>
             <AlertDialogDescription>
               {removalTarget?.storage === 'queued'
-                ? `“${removalTarget.title}” será cancelado antes do envio. O evento principal e as demais conexões serão preservados.`
-                : `“${removalTarget?.title}” deixará de fazer parte da árvore deste evento. O evento principal e as demais conexões serão preservados.`}
+                ? `“${removalTarget.title}” será excluído deste dispositivo antes da sincronização. O evento e os demais subeventos não serão alterados.`
+                : `“${removalTarget?.title}” será removido deste evento. O evento e os demais subeventos não serão alterados.`}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={Boolean(pendingAction)}>Manter conexão</AlertDialogCancel>
+            <AlertDialogCancel disabled={Boolean(pendingAction)}>Cancelar</AlertDialogCancel>
             <AlertDialogAction onClick={handleRemove} disabled={Boolean(pendingAction)} className="bg-red-700 text-white hover:bg-red-800">
               {pendingAction ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
               Remover subevento
@@ -528,12 +522,12 @@ function SubeventNode({
       data-testid="subevent-node"
     >
       <div className="cronograma-subevent-node-kicker">
-        <span><GitBranch aria-hidden="true" /> Conexão {String(index + 1).padStart(2, '0')}</span>
+        <span><GitBranch aria-hidden="true" /> Subevento {String(index + 1).padStart(2, '0')}</span>
         <div className="cronograma-subevent-node-state">
           {subevent.storage === 'queued' && (
             <span className="cronograma-subevent-sync-badge" data-state={subevent.syncState ?? 'pending'}>
               <CloudOff aria-hidden="true" />
-              {subevent.syncState === 'failed' ? 'Revisar envio' : 'Pendente'}
+              {subevent.syncState === 'failed' ? 'Falha no envio' : 'Aguardando envio'}
             </span>
           )}
           <CronogramaStatusIndicator status={subevent.status ?? 'planned'} compact />
@@ -549,19 +543,9 @@ function SubeventNode({
 
       {expanded && (
         <div className="cronograma-subevent-expanded" role="region" aria-label={`Detalhes de ${subevent.title}`}>
-          <p>{subevent.description || 'Nenhuma descrição adicional foi registrada para esta conexão.'}</p>
-          <div>
-            <span>Origem</span>
-            <strong>
-              {subevent.storage === 'relational'
-                ? 'Relação persistida'
-                : subevent.storage === 'queued'
-                  ? 'Rascunho seguro neste dispositivo'
-                  : 'Registro consolidado legado'}
-            </strong>
-          </div>
+          <p>{subevent.description || 'Sem descrição.'}</p>
           {subevent.storage === 'queued' && subevent.syncError && (
-            <p className="cronograma-subevent-sync-error">Última tentativa: {subevent.syncError}</p>
+            <p className="cronograma-subevent-sync-error">Falha no último envio: {subevent.syncError}</p>
           )}
         </div>
       )}

@@ -16,7 +16,6 @@ import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/compone
 import { cn } from '@/lib/utils';
 import {
   CronogramaCategoryMarker,
-  CronogramaMetaBadge,
   CronogramaPriorityIndicator,
   CronogramaStatusIndicator,
 } from './CronogramaBadges';
@@ -431,7 +430,6 @@ function CalendarToolbar({
               onNext={() => onChangeYear(1)}
             />
           </div>
-          <p className="mt-1 text-xs text-muted-foreground">Passe o mouse no ano e role para alternar 2026, 2027 e 2028.</p>
         </div>
         <Button type="button" variant="outline" size="icon" onClick={() => onChangeMonth(1)} className="h-10 w-10 rounded-full border-border bg-card">
           <ChevronRight className="h-4 w-4" />
@@ -440,9 +438,6 @@ function CalendarToolbar({
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <CronogramaMetaBadge icon={CalendarDays} tone="green">
-          Modo planejamento
-        </CronogramaMetaBadge>
         {expanded && (
           <Button type="button" variant="outline" size="sm" onClick={onToggleSide} className="h-9 rounded-lg border-border bg-card px-3 text-xs">
             {sideCollapsed ? <PanelRightOpen className="h-4 w-4" /> : <PanelRightClose className="h-4 w-4" />}
@@ -578,8 +573,9 @@ function CalendarSidePanel({
       <section className="surface-primary rounded-xl p-4">
         <div className="mb-3 flex items-center justify-between gap-3">
           <div>
-            <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">Mês selecionado</p>
-            <h3 className="text-lg font-black tracking-tight text-foreground">{monthEvents.length} eventos</h3>
+            <h3 className="text-lg font-black tracking-tight text-foreground">
+              {monthEvents.length} {monthEvents.length === 1 ? 'evento' : 'eventos'} no mês
+            </h3>
           </div>
           <CalendarDays className="h-5 w-5 text-gold" />
         </div>
@@ -589,23 +585,22 @@ function CalendarSidePanel({
             onClick={() => onOpen(nextMonthEvent)}
             className="interactive-lift w-full rounded-xl border border-border bg-card p-3 text-left transition-colors hover:border-gold/40 hover:bg-secondary focus-ring"
           >
-            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-primary">Próximo do mês</p>
+            <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-primary">Próximo evento</p>
             <p className="mt-1 text-sm font-bold leading-tight text-foreground">{nextMonthEvent.title}</p>
             <p className="mt-1 text-xs text-muted-foreground">{formatShortDateRange(nextMonthEvent.date, nextMonthEvent.endDate)} · {nextMonthEvent.startTime || 'horário a definir'}</p>
           </button>
         ) : (
-          <EmptyCalendarState title="Sem eventos neste mês" text="Use a navegação por ano para localizar os marcos oficiais." />
+          <EmptyCalendarState title="Sem eventos neste mês" text="Escolha outro mês ou ano." />
         )}
       </section>
 
       <section className="surface-primary rounded-xl p-4">
         <div className="mb-3">
-          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground">Dia selecionado</p>
           <h3 className="text-lg font-black tracking-tight text-foreground">{formatLongDate(selectedDate)}</h3>
         </div>
 
         {dayEvents.length === 0 ? (
-          <EmptyCalendarState title="Nenhum evento neste dia" text="O dia fica livre no recorte filtrado atual." />
+          <EmptyCalendarState title="Nenhum evento neste dia" text="Nenhum evento atende aos filtros." />
         ) : (
           <div className="space-y-2">
             {dayEvents.map((event) => (

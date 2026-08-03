@@ -340,9 +340,7 @@ export function MobileCronogramaTimeline({
           <ChevronLeft aria-hidden="true" />
         </button>
         <div className="cronograma-mobile-month-context">
-          <p>{variant === 'completed' ? 'Arquivo em foco' : 'Período em foco'}</p>
           <h2>{mobileMonthLabel(position.month)}</h2>
-          <span>{selectedSummary?.stage ?? position.year}</span>
         </div>
         <button
           type="button"
@@ -371,10 +369,9 @@ export function MobileCronogramaTimeline({
 
       <div className="cronograma-mobile-month-summary">
         <div>
-          <p>{mobileMonthLabel(position.month)}</p>
           <span>
             {variant === 'completed' ? (
-              <>{monthSummary.total} {monthSummary.total === 1 ? 'registro histórico' : 'registros históricos'}</>
+              <>{monthSummary.total} {monthSummary.total === 1 ? 'evento' : 'eventos'}</>
             ) : (
               <>
                 {monthSummary.total} {monthSummary.total === 1 ? 'evento' : 'eventos'} ·{' '}
@@ -404,7 +401,7 @@ export function MobileCronogramaTimeline({
         <div className="cronograma-mobile-empty-month" role="status">
           <span className="cronograma-mobile-empty-icon"><SearchX aria-hidden="true" /></span>
           <h3>Nenhum evento neste mês</h3>
-          <p>O período e os filtros foram preservados. Ajuste o recorte ou consulte o ciclo completo.</p>
+          <p>Ajuste os filtros ou escolha outro período.</p>
           <div className="cronograma-mobile-empty-actions">
             {selectedYearUndated.length > 0 && onOpenUndated && (
               <button type="button" onClick={onOpenUndated}>
@@ -428,7 +425,6 @@ export function MobileCronogramaTimeline({
           <header>
             <span><BadgeCheck aria-hidden="true" /></span>
             <div>
-              <p>Arquivo sem data</p>
               <h3 id={`cronograma-mobile-undated-archive-${position.year}`}>
                 Concluídos sem data registrada
               </h3>
@@ -440,7 +436,6 @@ export function MobileCronogramaTimeline({
               <button key={event.id} type="button" onClick={() => onOpen(event)} className="focus-ring">
                 <span>
                   <strong>{event.title}</strong>
-                  <small>Concluído manualmente · referência {position.year}</small>
                 </span>
                 <ChevronRight aria-hidden="true" />
               </button>
@@ -454,7 +449,6 @@ export function MobileCronogramaTimeline({
           <CalendarClock aria-hidden="true" />
           <span>
             <strong>{selectedYearUndated.length} {selectedYearUndated.length === 1 ? 'pendência' : 'pendências'} sem data</strong>
-            <small>Consultar backlog de {position.year}</small>
           </span>
           <ChevronRight aria-hidden="true" />
         </button>
