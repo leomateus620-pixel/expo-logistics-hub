@@ -502,15 +502,21 @@ export function EventForm({
             />
           </div>
           <div className="space-y-1.5">
-            <Label htmlFor={fieldId('owner')}>Responsável (fallback)</Label>
+            <Label htmlFor={fieldId('owner')}>Responsável</Label>
             <Input
               id={fieldId('owner')}
               value={form.owner || ''}
-              onChange={(event) => update('owner', event.target.value)}
-              placeholder="Legado: comissão ou pessoa (use os vínculos abaixo quando possível)"
-              className="bg-white/72"
+              readOnly
+              aria-readonly="true"
+              tabIndex={-1}
+              placeholder="Preenchido automaticamente"
+              className="cursor-not-allowed bg-muted/60 text-foreground/80"
             />
+            <p className="text-[11px] leading-relaxed text-muted-foreground">
+              Preenchido automaticamente com o usuário logado.
+            </p>
           </div>
+
         </div>
       </div>
 
