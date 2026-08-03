@@ -34,6 +34,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { OrgUnitSelect } from "@/components/org-units/OrgUnitSelect";
+import { useOrgCommissions } from "@/hooks/useOrgCommissions";
+import { findOrgUnitByName, type OrgUnit } from "@/lib/org-units";
 import { Label } from "@/components/ui/label";
 import {
   Select,
@@ -296,6 +299,26 @@ export function VenueEventFormDialog({
   const activeStakeholders = workspace.stakeholders.filter(
     (stakeholder) => stakeholder.active,
   );
+  const { units: officialUnits, isLoading: officialUnitsLoading } = useOrgCommissions();
+  const organizationUnits = useMemo<OrgUnit[]>(
+    () =>
+      activeStakeholders.map((stakeholder) => {
+        const name = stakeholder.trade_name || stakeholder.legal_name;
+        const official = findOrgUnitByName(officialUnits, name);
+        return {
+          id: stakeholder.id,
+          name,
+          slug: stakeholder.id,
+          type: official?.type ?? (stakeholder.relationship_type === "comissao" ? "comissao" : "externo"),
+          displayOrder: official?.displayOrder ?? 999,
+          isOfficial: Boolean(official?.isOfficial),
+          isLegacy: false,
+          responsibles: official?.responsibles ?? [],
+        };
+      }),
+    [activeStakeholders, officialUnits],
+  );
+
   const sponsors = activeStakeholders.filter(
     (stakeholder) =>
       stakeholder.relationship_type === "patrocinador" ||
@@ -887,32 +910,22 @@ export function VenueEventFormDialog({
                   <Field
                     id="venue-event-organization"
                     field="responsibleOrganizationId"
-                    label="Organização responsável"
+                    label="Comissão ou Assessoria responsável"
                     error={errors.responsibleOrganizationId}
                   >
-                    <Select
-                      value={draft.responsibleOrganizationId || "none"}
-                      onValueChange={(value) =>
-                        update(
-                          "responsibleOrganizationId",
-                          value === "none" ? "" : value,
-                        )
+                    <OrgUnitSelect
+                      id="venue-event-organization"
+                      label="Comissão ou Assessoria responsável"
+                      hideLabel
+                      units={organizationUnits}
+                      value={draft.responsibleOrganizationId || null}
+                      onChange={(unitId) =>
+                        update("responsibleOrganizationId", unitId ?? "")
                       }
-                    >
-                      <SelectTrigger id="venue-event-organization">
-                        <SelectValue placeholder="Sem organização vinculada" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="none">
-                          Sem organização vinculada
-                        </SelectItem>
-                        {activeStakeholders.map((item) => (
-                          <SelectItem key={item.id} value={item.id}>
-                            {item.trade_name || item.legal_name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      isLoading={officialUnitsLoading}
+                      invalid={Boolean(errors.responsibleOrganizationId)}
+                      emptyOptionLabel="Sem organização vinculada"
+                    />
                   </Field>
                   <Field
                     id="venue-event-responsible"
