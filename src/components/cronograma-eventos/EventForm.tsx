@@ -159,6 +159,19 @@ export function EventForm({
   const formInstanceId = useId().replace(/:/g, '');
   const fieldId = (name: string) => `${formInstanceId}-${name}`;
   const { units, commissions, isLoading: commissionsLoading } = useOrgCommissions();
+  const { user } = useAuth();
+  const { members } = useOrgMembers();
+  const currentUserName = useMemo(() => {
+    if (!user) return '';
+    const member = (members ?? []).find((item: any) => item.user_id === user.id);
+    return (
+      member?.nome_exibicao
+      || (user.user_metadata as any)?.full_name
+      || (user.user_metadata as any)?.name
+      || user.email
+      || ''
+    );
+  }, [members, user]);
   const initialForm = useMemo<CronogramaEvent>(() => {
     const next = {
       ...defaultForm,
