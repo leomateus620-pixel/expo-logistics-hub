@@ -148,32 +148,110 @@ export type Database = {
         }
         Relationships: []
       }
+      commission_responsibles: {
+        Row: {
+          active: boolean
+          commission_id: string
+          created_at: string
+          display_name: string
+          display_order: number
+          id: string
+          is_primary: boolean
+          normalized_name: string | null
+          org_id: string
+          relationship_role: string
+          responsible_type: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          active?: boolean
+          commission_id: string
+          created_at?: string
+          display_name: string
+          display_order?: number
+          id?: string
+          is_primary?: boolean
+          normalized_name?: string | null
+          org_id: string
+          relationship_role?: string
+          responsible_type?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          active?: boolean
+          commission_id?: string
+          created_at?: string
+          display_name?: string
+          display_order?: number
+          id?: string
+          is_primary?: boolean
+          normalized_name?: string | null
+          org_id?: string
+          relationship_role?: string
+          responsible_type?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commission_responsibles_commission_org_fkey"
+            columns: ["commission_id", "org_id"]
+            isOneToOne: false
+            referencedRelation: "commissions"
+            referencedColumns: ["id", "org_id"]
+          },
+          {
+            foreignKeyName: "commission_responsibles_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       commissions: {
         Row: {
           created_at: string
+          display_order: number
           id: string
           is_active: boolean
+          is_legacy: boolean
+          is_official: boolean
           nome: string
+          normalized_name: string | null
           org_id: string
           slug: string
+          unit_type: string
           updated_at: string
         }
         Insert: {
           created_at?: string
+          display_order?: number
           id?: string
           is_active?: boolean
+          is_legacy?: boolean
+          is_official?: boolean
           nome: string
+          normalized_name?: string | null
           org_id: string
           slug: string
+          unit_type?: string
           updated_at?: string
         }
         Update: {
           created_at?: string
+          display_order?: number
           id?: string
           is_active?: boolean
+          is_legacy?: boolean
+          is_official?: boolean
           nome?: string
+          normalized_name?: string | null
           org_id?: string
           slug?: string
+          unit_type?: string
           updated_at?: string
         }
         Relationships: []
@@ -5925,6 +6003,7 @@ export type Database = {
         Args: { _form_id: string }
         Returns: undefined
       }
+      sync_official_units_2028: { Args: { _org_id: string }; Returns: Json }
       sync_public_mobility_form: {
         Args: { _form_id: string }
         Returns: undefined

@@ -12,9 +12,17 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useOrgCommissions } from '@/hooks/useOrgCommissions';
+import { OrgUnitSummary } from '@/components/org-units/OrgUnitSelect';
+import {
+  ORG_UNIT_SELECT_LABEL,
+  orgUnitGroupLabel,
+  orgUnitHint,
+  selectableOrgUnits,
+} from '@/lib/org-units';
 import { categoryLabels, priorityLabels, statusLabels } from './cronogramaData';
 import { CronogramaSubeventForm } from './CronogramaSubeventForm';
 import { RelationalMultiSelect, type RelationalSelection } from './RelationalMultiSelect';
+import { normalizeSearchTerm } from '@/lib/org-units';
 import type {
   CronogramaCategory,
   CronogramaEvent,
@@ -148,7 +156,7 @@ export function EventForm({
 }) {
   const formInstanceId = useId().replace(/:/g, '');
   const fieldId = (name: string) => `${formInstanceId}-${name}`;
-  const { commissions, isLoading: commissionsLoading } = useOrgCommissions();
+  const { units, commissions, isLoading: commissionsLoading } = useOrgCommissions();
   const initialForm = useMemo<CronogramaEvent>(() => {
     const next = {
       ...defaultForm,
@@ -202,14 +210,52 @@ export function EventForm({
     () => responsibleLinksToSelections(form.responsiblesRel),
     [form.responsiblesRel],
   );
-  const commissionOptions = useMemo(
-    () => commissions.map((commission) => ({
-      id: commission.id,
-      label: commission.nome,
-      hint: commission.slug,
-    })),
-    [commissions],
+  const linkedUnitIds = useMemo(
+    () => (form.commissionsRel ?? []).map((link) => link.commissionId).filter(Boolean) as string[],
+    [form.commissionsRel],
   );
+  const commissionOptions = useMemo(
+    () => selectableOrgUnits(units, linkedUnitIds).map((unit) => ({
+      id: unit.id,
+      label: unit.name,
+      hint: orgUnitHint(unit),
+      group: orgUnitGroupLabel(unit.type),
+    })),
+    [units, linkedUnitIds],
+  );
+  const selectedUnits = useMemo(
+    () => linkedUnitIds
+      .map((unitId) => units.find((unit) => unit.id === unitId))
+      .filter((unit): unit is NonNullable<typeof unit> => Boolean(unit)),
+    [linkedUnitIds, units],
+  );
+  const officialResponsibleNames = useMemo(
+    () => Array.from(new Set(selectedUnits.flatMap((unit) => unit.responsibles.map((person) => person.displayName)))),
+    [selectedUnits],
+  );
+  const missingOfficialResponsibles = useMemo(() => {
+    const current = new Set(
+      (form.responsiblesRel ?? []).map((link) => normalizeSearchTerm(link.name ?? '')),
+    );
+    return officialResponsibleNames.filter((name) => !current.has(normalizeSearchTerm(name)));
+  }, [form.responsiblesRel, officialResponsibleNames]);
+
+  const applyOfficialResponsibles = () => {
+    if (missingOfficialResponsibles.length === 0) return;
+    const hasPrimary = (form.responsiblesRel ?? []).some((link) => link.isPrimary);
+    const confirmed = window.confirm(
+      hasPrimary
+        ? `Adicionar ${missingOfficialResponsibles.join(', ')} como responsáveis institucionais? O responsável principal atual será mantido.`
+        : `Definir ${missingOfficialResponsibles.join(', ')} como responsáveis do evento?`,
+    );
+    if (!confirmed) return;
+    const additions = missingOfficialResponsibles.map((name, index) => ({
+      id: `custom:${name.toLocaleLowerCase('pt-BR')}`,
+      label: name,
+      isPrimary: !hasPrimary && index === 0,
+    }));
+    update('responsiblesRel', selectionsToResponsibleLinks([...responsibleSelections, ...additions]));
+  };
 
   const handleSubmit = (submitEvent: FormEvent<HTMLFormElement>) => {
     submitEvent.preventDefault();
@@ -434,17 +480,33 @@ export function EventForm({
             <h3 className="text-sm font-black uppercase tracking-[0.14em] text-foreground/72">Vínculos relacionais</h3>
           </div>
           <RelationalMultiSelect
-            label="Comissões vinculadas"
-            placeholder="Buscar comissão…"
-            emptyLabel="Nenhuma comissão vinculada. Adicione uma ou mais e marque a principal."
+            label={ORG_UNIT_SELECT_LABEL}
+            placeholder="Buscar por comissão, assessoria ou responsável…"
+            emptyLabel="Nenhuma comissão ou assessoria vinculada. Adicione uma ou mais e marque a principal."
             options={commissionOptions}
             value={commissionSelections}
             onChange={(next) => update('commissionsRel', selectionsToCommissionLinks(next, commissions))}
             isLoading={commissionsLoading}
             primaryLabel="Principal"
           />
+          {selectedUnits.length > 0 && (
+            <div className="space-y-2">
+              {selectedUnits.map((unit) => (
+                <OrgUnitSummary key={unit.id} unit={unit} />
+              ))}
+              {missingOfficialResponsibles.length > 0 && (
+                <button
+                  type="button"
+                  onClick={applyOfficialResponsibles}
+                  className="rounded-full border border-primary/40 bg-primary/10 px-3 py-2 text-xs font-bold text-primary"
+                >
+                  Usar responsáveis institucionais ({missingOfficialResponsibles.length})
+                </button>
+              )}
+            </div>
+          )}
           <RelationalMultiSelect
-            label="Responsáveis"
+            label="Responsáveis do evento"
             placeholder="Nome, comissão ou papel…"
             emptyLabel="Nenhum responsável relacional. Adicione um nome ou selecione um membro."
             options={[]}

@@ -8,6 +8,7 @@ import {
   PopoverTrigger,
 } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
+import { normalizeSearchTerm } from '@/lib/org-units';
 
 export interface RelationalOption {
   /** Stable identifier used as React key and equality check. */
@@ -16,6 +17,8 @@ export interface RelationalOption {
   label: string;
   /** Optional secondary line (e.g. slug, role). */
   hint?: string;
+  /** Optional group heading (e.g. "Comissões", "Assessorias"). */
+  group?: string;
 }
 
 export interface RelationalSelection {
@@ -66,18 +69,27 @@ export function RelationalMultiSelect({
 
   const selectedIds = useMemo(() => new Set(value.map((item) => item.id)), [value]);
   const filteredOptions = useMemo(() => {
-    const term = search.trim().toLocaleLowerCase('pt-BR');
+    const term = normalizeSearchTerm(search);
     return options
       .filter((option) => !selectedIds.has(option.id))
       .filter((option) => {
         if (!term) return true;
-        return (
-          option.label.toLocaleLowerCase('pt-BR').includes(term) ||
-          option.hint?.toLocaleLowerCase('pt-BR').includes(term)
-        );
+        const haystack = normalizeSearchTerm(`${option.label} ${option.hint ?? ''} ${option.group ?? ''}`);
+        return term.split(' ').every((token) => haystack.includes(token));
       })
-      .slice(0, 40);
+      .slice(0, 60);
   }, [options, search, selectedIds]);
+
+  const groupedOptions = useMemo(() => {
+    const buckets: { label: string; options: RelationalOption[] }[] = [];
+    filteredOptions.forEach((option) => {
+      const label = option.group ?? '';
+      const bucket = buckets.find((item) => item.label === label);
+      if (bucket) bucket.options.push(option);
+      else buckets.push({ label, options: [option] });
+    });
+    return buckets;
+  }, [filteredOptions]);
 
   const canAddCustom =
     allowCustom &&
@@ -170,7 +182,14 @@ export function RelationalMultiSelect({
               {!isLoading && filteredOptions.length === 0 && !canAddCustom && (
                 <div className="p-3 text-xs text-muted-foreground">Nenhum resultado.</div>
               )}
-              {filteredOptions.map((option) => (
+              {groupedOptions.map((group) => (
+                <div key={group.label || 'sem-grupo'} role="group" aria-label={group.label || undefined}>
+                  {group.label && (
+                    <p className="px-3 pb-1 pt-2 text-[0.62rem] font-black uppercase tracking-[0.16em] text-muted-foreground">
+                      {group.label}
+                    </p>
+                  )}
+                  {group.options.map((option) => (
                 <button
                   key={option.id}
                   type="button"
@@ -189,6 +208,8 @@ export function RelationalMultiSelect({
                     )}
                   </span>
                 </button>
+                  ))}
+                </div>
               ))}
               {canAddCustom && (
                 <button

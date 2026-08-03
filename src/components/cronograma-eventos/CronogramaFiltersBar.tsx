@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useOrgCommissions } from '@/hooks/useOrgCommissions';
 import {
   CalendarClock,
   CalendarDays,
@@ -82,9 +83,15 @@ export function CronogramaFiltersBar({
     return () => window.clearTimeout(timer);
   }, [filters, onChange, searchValue]);
 
+  const { units: officialUnits } = useOrgCommissions();
   const commissions = useMemo(
-    () => Array.from(new Set(events.map((event) => event.commission).filter(Boolean) as string[])).sort((a, b) => a.localeCompare(b, 'pt-BR')),
-    [events],
+    () => Array.from(
+      new Set([
+        ...officialUnits.filter((unit) => !unit.isLegacy).map((unit) => unit.name),
+        ...(events.map((event) => event.commission).filter(Boolean) as string[]),
+      ]),
+    ).sort((a, b) => a.localeCompare(b, 'pt-BR')),
+    [events, officialUnits],
   );
   const owners = useMemo(
     () => Array.from(new Set(events.map((event) => event.owner).filter(Boolean) as string[])).sort((a, b) => a.localeCompare(b, 'pt-BR')),
