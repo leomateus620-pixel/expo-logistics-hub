@@ -33,6 +33,19 @@ export function useOrgMembers() {
     staleTime: 30000,
   });
 
+  // Somente pessoas com conta de acesso real que já entraram no sistema
+  const { data: loginMembers = [], isLoading: isLoadingLoginMembers } = useQuery({
+    queryKey: ['org-login-members', orgId],
+    queryFn: async () => {
+      if (!orgId) return [];
+      const { data, error } = await (supabase as any).rpc('list_org_login_members', { _org_id: orgId });
+      if (error) throw error;
+      return data ?? [];
+    },
+    enabled: !!orgId,
+    staleTime: 60000,
+  });
+
   const addMember = useMutation({
     mutationFn: async (member: { user_id: string; role?: string; nome_exibicao: string; cargo?: string; telefone?: string; avatar_color?: string }) => {
       const { data, error } = await (supabase as any)
@@ -73,5 +86,5 @@ export function useOrgMembers() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ['org-members'] }),
   });
 
-  return { members, isLoading, addMember, updateMember, removeMember };
+  return { members, loginMembers, isLoading, isLoadingLoginMembers, addMember, updateMember, removeMember };
 }

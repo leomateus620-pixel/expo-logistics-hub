@@ -5918,6 +5918,16 @@ export type Database = {
         Args: { _org_id: string; _user_id: string }
         Returns: boolean
       }
+      list_org_login_members: {
+        Args: { _org_id: string }
+        Returns: {
+          cargo: string
+          last_sign_in_at: string
+          nome_exibicao: string
+          role: string
+          user_id: string
+        }[]
+      }
       move_to_dlq: {
         Args: {
           dlq_name: string
