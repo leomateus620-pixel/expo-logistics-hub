@@ -4,12 +4,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FenasojaBrand } from '@/components/brand/FenasojaBrand';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
-import { useCurrentOrg } from '@/hooks/useCurrentOrg';
-import { presentFenasojaProductName } from '@/lib/fenasoja-brand';
 
 export function CronogramaModuleShell({ children }: { children: ReactNode }) {
   const { signOut } = useAuth();
-  const { orgName } = useCurrentOrg();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
@@ -49,10 +46,6 @@ export function CronogramaModuleShell({ children }: { children: ReactNode }) {
           </div>
 
           <div className="flex items-center gap-2">
-            <div className="cronograma-module-chip-3d hidden text-right lg:inline-flex">
-              <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/60">Ciclo oficial</p>
-              <p className="text-xs font-semibold text-white/90">{presentFenasojaProductName(orgName)} · 2026—2028</p>
-            </div>
             <Button
               type="button"
               variant="ghost"

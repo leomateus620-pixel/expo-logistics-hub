@@ -3,9 +3,6 @@ export type CronogramaView =
   | 'timeline'
   | 'completed'
   | 'calendar'
-  | 'year'
-  | 'category'
-  | 'meetings'
   | 'undated';
 
 export type CronogramaCategory =

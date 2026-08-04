@@ -1718,6 +1718,8 @@ input::placeholder, textarea::placeholder {
   position: sticky;
   top: 0;
   z-index: 40;
+  isolation: isolate;
+  overflow: hidden;
   border-bottom: 1px solid oklch(var(--brand-orange-500) / 0.28);
   background:
     radial-gradient(120% 140% at 12% -20%, oklch(var(--brand-orange-500) / 0.10), transparent 55%),
@@ -1730,6 +1732,62 @@ input::placeholder, textarea::placeholder {
     inset 0 -1px 0 rgb(0 0 0 / 0.35);
   backdrop-filter: blur(20px) saturate(1.4);
   -webkit-backdrop-filter: blur(20px) saturate(1.4);
+}
+
+/* Camada decorativa: grãos de soja dourados sobre o azul institucional. */
+.cronograma-module-bar::before,
+.cronograma-module-bar::after {
+  position: absolute;
+  z-index: 0;
+  content: '';
+  pointer-events: none;
+}
+
+.cronograma-module-bar::before {
+  inset: 0;
+  background:
+    radial-gradient(circle at 18% 74%, rgb(255 232 154 / 0.55) 0 2.1px, transparent 2.6px),
+    radial-gradient(circle at 27% 26%, rgb(255 216 108 / 0.42) 0 3.2px, transparent 3.8px),
+    radial-gradient(circle at 39% 62%, rgb(255 240 186 / 0.30) 0 1.6px, transparent 2.1px),
+    radial-gradient(circle at 52% 22%, rgb(246 198 79 / 0.38) 0 2.6px, transparent 3.2px),
+    radial-gradient(circle at 63% 78%, rgb(255 226 132 / 0.50) 0 3.6px, transparent 4.3px),
+    radial-gradient(circle at 74% 38%, rgb(255 243 195 / 0.28) 0 1.8px, transparent 2.3px),
+    radial-gradient(circle at 84% 68%, rgb(240 186 60 / 0.42) 0 3px, transparent 3.6px),
+    radial-gradient(circle at 93% 30%, rgb(255 236 168 / 0.34) 0 2.2px, transparent 2.8px),
+    radial-gradient(circle at 8% 40%, rgb(255 222 120 / 0.26) 0 2.4px, transparent 3px);
+  opacity: 0.9;
+  filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.55));
+}
+
+.cronograma-module-bar::after {
+  inset: -40% -6% -40% 42%;
+  background:
+    radial-gradient(50% 70% at 78% 50%, oklch(var(--brand-gold-500) / 0.20), transparent 70%),
+    radial-gradient(38% 62% at 96% 40%, oklch(var(--brand-orange-500) / 0.16), transparent 72%);
+  opacity: 0.85;
+}
+
+.cronograma-module-bar > * {
+  position: relative;
+  z-index: 1;
+}
+
+@media (max-width: 40rem) {
+  .cronograma-module-bar::before {
+    opacity: 0.55;
+  }
+
+  .cronograma-module-bar::after {
+    inset: -30% -6% -30% 58%;
+    opacity: 0.6;
+  }
+}
+
+@media (prefers-contrast: more), (prefers-reduced-transparency: reduce) {
+  .cronograma-module-bar::before,
+  .cronograma-module-bar::after {
+    opacity: 0.35;
+  }
 }
 
 .cronograma-module-back,
