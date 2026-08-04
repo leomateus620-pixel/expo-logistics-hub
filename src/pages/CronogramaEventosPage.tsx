@@ -3,12 +3,7 @@ import { AlertTriangle, CalendarDays, Loader2, RefreshCw } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { CalendarMonthView } from '@/components/cronograma-eventos/CalendarMonthView';
-import {
-  CategoryBoard,
-  MeetingsBoard,
-  UndatedBoard,
-  YearBoard,
-} from '@/components/cronograma-eventos/CronogramaBoards';
+import { UndatedBoard } from '@/components/cronograma-eventos/CronogramaBoards';
 import { CronogramaCommandHeader } from '@/components/cronograma-eventos/CronogramaCommandHeader';
 import { CronogramaFiltersBar } from '@/components/cronograma-eventos/CronogramaFiltersBar';
 import { CronogramaRegistrationAction } from '@/components/cronograma-eventos/CronogramaRegistrationAction';
