@@ -134,7 +134,7 @@ export function buildCronogramaViewSearchParams(
     next.delete('timelineYear');
     next.delete('timelineMonth');
   }
-  if (nextView === 'overview') next.delete('view');
+  if (nextView === 'timeline') next.delete('view');
   else next.set('view', nextView);
   return next;
 }
