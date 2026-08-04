@@ -1,13 +1,13 @@
+import { memo } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowUpRight, Building2, Loader2, LockKeyhole, LogIn, ShieldCheck } from 'lucide-react';
+import { ArrowUpRight, Building2, Loader2, LockKeyhole, LogIn } from 'lucide-react';
 import type { PortalDestination } from '@/modules/portal/portalRegistry';
 import type { PortalAccessPresentation } from '@/components/portal/portalTypes';
 
 interface PortalDestinationCardProps {
   access: PortalAccessPresentation;
   destination: PortalDestination;
-  index: number;
-  onSelect: () => void;
+  onSelect: (storageSlug: string) => void;
 }
 
 function DestinationStateIcon({ state }: Pick<PortalAccessPresentation, 'state'>) {
@@ -15,31 +15,29 @@ function DestinationStateIcon({ state }: Pick<PortalAccessPresentation, 'state'>
   if (state === 'denied') return <LockKeyhole aria-hidden="true" />;
   if (state === 'login') return <LogIn aria-hidden="true" />;
   if (state === 'setup') return <Building2 aria-hidden="true" />;
-  return <ShieldCheck aria-hidden="true" />;
+  return <ArrowUpRight aria-hidden="true" />;
 }
 
 function getDestinationActionLabel(access: PortalAccessPresentation) {
   if (access.state === 'allowed') return 'Abrir destino';
-  if (access.state === 'loading') return 'Aguarde';
-  if (access.state === 'denied') return 'Indisponível';
-  if (access.state === 'login') return 'Identificar acesso';
-  if (access.state === 'setup') return 'Configurar acesso';
+  if (access.state === 'loading') return 'Verificando acesso';
+  if (access.state === 'denied') return 'Perfil sem acesso';
+  if (access.state === 'login') return 'Entrar para acessar';
+  if (access.state === 'setup') return 'Configurar organização';
   return access.label;
 }
 
-export function PortalDestinationCard({
+function PortalDestinationCardComponent({
   access,
   destination,
-  index,
   onSelect,
 }: PortalDestinationCardProps) {
   const Icon = destination.icon;
   const actionLabel = getDestinationActionLabel(access);
+  const statusId = `portal-destination-status-${destination.id}`;
+  const stateDescription = access.detail ?? access.label;
   const content = (
     <>
-      <span className="portal-destination-card__order" aria-hidden="true">
-        Destino {String(index + 1).padStart(2, '0')}
-      </span>
       <span className="portal-destination-card__icon" aria-hidden="true">
         <Icon />
       </span>
@@ -48,14 +46,18 @@ export function PortalDestinationCard({
         <span className="portal-destination-card__description">{destination.description}</span>
       </span>
       <span className="portal-destination-card__footer">
-        <span className="portal-destination-card__state" data-state={access.state}>
-          <DestinationStateIcon state={access.state} />
-          <span>{access.label}</span>
-        </span>
         <span className="portal-destination-card__action" data-state={access.state} aria-hidden="true">
           <span>{actionLabel}</span>
-          {access.target && <ArrowUpRight />}
+          <span className="portal-destination-card__direction">
+            {access.target ? <ArrowUpRight /> : <DestinationStateIcon state={access.state} />}
+          </span>
         </span>
+      </span>
+      <span
+        id={statusId}
+        className="portal-access-sr-only"
+      >
+        {stateDescription}
       </span>
     </>
   );
@@ -64,11 +66,12 @@ export function PortalDestinationCard({
     return (
       <Link
         to={access.target}
-        onClick={onSelect}
+        onClick={() => onSelect(destination.storageSlug)}
         className="portal-destination-card"
         data-destination={destination.id}
         data-access-state={access.state}
-        aria-label={`${destination.title}. ${access.label}. ${destination.description}`}
+        aria-label={`${actionLabel}: ${destination.title}`}
+        aria-describedby={statusId}
       >
         {content}
       </Link>
@@ -80,9 +83,24 @@ export function PortalDestinationCard({
       className="portal-destination-card portal-destination-card--static"
       data-destination={destination.id}
       data-access-state={access.state}
-      aria-label={`${destination.title}. ${access.label}. ${access.detail ?? destination.description}`}
+      aria-label={`${actionLabel}: ${destination.title}`}
+      aria-describedby={statusId}
+      aria-disabled="true"
+      aria-busy={access.state === 'loading' ? 'true' : undefined}
     >
       {content}
     </article>
   );
 }
+
+export const PortalDestinationCard = memo(
+  PortalDestinationCardComponent,
+  (previous, next) => (
+    previous.destination === next.destination
+    && previous.onSelect === next.onSelect
+    && previous.access.state === next.access.state
+    && previous.access.label === next.access.label
+    && previous.access.detail === next.access.detail
+    && previous.access.target === next.access.target
+  ),
+);

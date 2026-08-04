@@ -69,7 +69,7 @@ function deniedAccess(detail: string): PortalAccessPresentation {
 function allowedAccess(target: string): PortalAccessPresentation {
   return {
     state: 'allowed',
-    label: 'Acesso liberado',
+    label: 'Disponível para o seu perfil',
     target,
   };
 }
@@ -218,13 +218,13 @@ export default function CommissionPortalPage() {
     if (entryId === 'agenda') {
       return {
         state: 'group',
-        label: expandedEntry === entryId ? 'Agenda aberta' : 'Explorar agenda',
+        label: 'Grupo de destinos da Agenda',
       };
     }
     if (entryId === 'comissoes') {
       return {
         state: 'group',
-        label: expandedEntry === entryId ? 'Comissões abertas' : 'Ver comissões',
+        label: 'Grupo de comissões operacionais',
       };
     }
     return entryId === 'mapa-comercial' ? mapAccess : financeAccess;
@@ -298,6 +298,15 @@ export default function CommissionPortalPage() {
 
         <FenasojaPortalHero />
 
+        <p
+          className="portal-access-sr-only"
+          role="status"
+          aria-live="polite"
+          aria-atomic="true"
+        >
+          {accessLoading ? 'Verificando os acessos disponíveis para o seu perfil.' : ''}
+        </p>
+
         <nav className="fenasoja-portal__hub portal-reveal" aria-label="Áreas do sistema Fenasoja 2028">
           {portalPrimaryEntries.map((entry, index) => (
             <PortalPrimaryEntry
@@ -316,13 +325,12 @@ export default function CommissionPortalPage() {
             >
               {entry.id === 'agenda' && (
                 <div className="portal-agenda-grid" aria-label="Destinos da Agenda">
-                  {portalAgendaDestinations.map((destination, destinationIndex) => (
+                  {portalAgendaDestinations.map((destination) => (
                     <PortalDestinationCard
                       key={destination.id}
                       destination={destination}
-                      index={destinationIndex}
                       access={resolveCapabilityAccess(destination)}
-                      onSelect={() => saveSelectedModule(destination.storageSlug)}
+                      onSelect={saveSelectedModule}
                     />
                   ))}
                 </div>
@@ -330,23 +338,13 @@ export default function CommissionPortalPage() {
 
               {entry.id === 'comissoes' && (
                 <div className="portal-commissions-panel">
-                  <div className="portal-commissions-panel__intro">
-                    <div>
-                      <span>Frentes operacionais</span>
-                      <p>Status do módulo e acesso do seu perfil.</p>
-                    </div>
-                    <strong aria-label={`${commissionModules.length} frentes registradas`}>
-                      {commissionModules.length}
-                    </strong>
-                  </div>
                   <div className="portal-commissions-grid" aria-label="Comissões disponíveis no portal">
-                    {commissionModules.map((module, moduleIndex) => (
+                    {commissionModules.map((module) => (
                       <CommissionCard
                         key={module.slug}
                         module={module}
-                        index={moduleIndex}
                         access={resolveCommissionAccess(module)}
-                        onSelect={() => saveSelectedModule(module.slug)}
+                        onSelect={saveSelectedModule}
                       />
                     ))}
                   </div>
@@ -355,11 +353,6 @@ export default function CommissionPortalPage() {
             </PortalPrimaryEntry>
           ))}
         </nav>
-
-        <footer className="fenasoja-portal__footer portal-reveal">
-          <ShieldCheck aria-hidden="true" />
-          <span>Autenticação, organização e permissões validadas em cada destino.</span>
-        </footer>
       </main>
     </div>
   );

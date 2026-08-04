@@ -7,7 +7,6 @@ import {
   Loader2,
   LockKeyhole,
   LogIn,
-  ShieldCheck,
 } from 'lucide-react';
 import type { PortalPrimaryEntry as PortalPrimaryEntryConfig } from '@/modules/portal/portalRegistry';
 import type { PortalAccessPresentation } from '@/components/portal/portalTypes';
@@ -28,8 +27,7 @@ function AccessIcon({ state }: Pick<PortalAccessPresentation, 'state'>) {
   if (state === 'denied') return <LockKeyhole aria-hidden="true" />;
   if (state === 'login') return <LogIn aria-hidden="true" />;
   if (state === 'setup') return <Building2 aria-hidden="true" />;
-  if (state === 'allowed') return <ShieldCheck aria-hidden="true" />;
-  return null;
+  return <ArrowRight aria-hidden="true" />;
 }
 
 function getActionLabel(
@@ -39,16 +37,18 @@ function getActionLabel(
 ) {
   if (entry.kind === 'expandable') {
     if (entry.id === 'agenda') return expanded ? 'Recolher destinos' : 'Ver destinos';
-    return expanded ? 'Recolher frentes' : 'Ver frentes';
+    return expanded ? 'Recolher comissões' : 'Ver comissões';
   }
 
   if (access.state === 'allowed') {
     return entry.id === 'mapa-comercial' ? 'Abrir mapa' : 'Abrir financeiro';
   }
-  if (access.state === 'loading') return 'Aguarde';
-  if (access.state === 'denied') return 'Indisponível';
-  if (access.state === 'login') return 'Identificar acesso';
-  if (access.state === 'setup') return 'Configurar acesso';
+  if (access.state === 'loading') return 'Verificando acesso';
+  if (access.state === 'denied') {
+    return entry.id === 'financeiro' ? 'Restrito ao perfil' : 'Perfil sem acesso';
+  }
+  if (access.state === 'login') return 'Entrar para acessar';
+  if (access.state === 'setup') return 'Configurar organização';
   return access.label;
 }
 
@@ -67,12 +67,12 @@ export function PortalPrimaryEntry({
   const statusId = `portal-entry-status-${entry.id}`;
   const isExpandable = entry.kind === 'expandable';
   const actionLabel = getActionLabel(entry, access, expanded);
+  const stateDescription = access.detail ?? access.label;
 
   const content = (
     <>
       <span className="portal-primary-entry__index" aria-hidden="true">
-        <span>{String(index + 1).padStart(2, '0')}</span>
-        <span className="portal-primary-entry__index-line" />
+        {String(index + 1).padStart(2, '0')}
       </span>
       <span className="portal-primary-entry__icon" aria-hidden="true">
         <Icon />
@@ -83,18 +83,20 @@ export function PortalPrimaryEntry({
         </span>
         <span className="portal-primary-entry__description">{entry.description}</span>
       </span>
-      <span className="portal-primary-entry__meta" id={statusId}>
-        <span className="portal-primary-entry__eyebrow">{entry.eyebrow}</span>
-        <span className="portal-primary-entry__status" data-state={access.state}>
-          <AccessIcon state={access.state} />
-          {access.label}
-        </span>
-      </span>
+      {entry.countLabel && (
+        <span className="portal-primary-entry__count">{entry.countLabel}</span>
+      )}
       <span className="portal-primary-entry__action" aria-hidden="true">
         <span className="portal-primary-entry__action-label">{actionLabel}</span>
         <span className="portal-primary-entry__direction">
-          {isExpandable ? <ChevronDown /> : access.target ? <ArrowRight /> : <LockKeyhole />}
+          {isExpandable ? <ChevronDown /> : access.target ? <ArrowRight /> : <AccessIcon state={access.state} />}
         </span>
+      </span>
+      <span
+        id={statusId}
+        className="portal-access-sr-only"
+      >
+        {stateDescription}
       </span>
     </>
   );
@@ -106,6 +108,7 @@ export function PortalPrimaryEntry({
       data-kind={entry.kind}
       data-tone={entry.tone}
       data-access-state={access.state}
+      aria-busy={access.state === 'loading' ? 'true' : undefined}
     >
       {isExpandable ? (
         <button
@@ -113,6 +116,7 @@ export function PortalPrimaryEntry({
           type="button"
           className="portal-primary-entry__control"
           onClick={onToggle}
+          aria-label={`${actionLabel}: ${entry.title}`}
           aria-expanded={expanded}
           aria-controls={panelId}
           aria-describedby={statusId}
@@ -124,6 +128,7 @@ export function PortalPrimaryEntry({
           to={access.target}
           className="portal-primary-entry__control"
           onClick={onSelect}
+          aria-label={`${actionLabel}: ${entry.title}`}
           aria-describedby={statusId}
         >
           {content}
@@ -131,7 +136,10 @@ export function PortalPrimaryEntry({
       ) : (
         <div
           className="portal-primary-entry__control portal-primary-entry__control--static"
-          aria-label={`${entry.title}. ${access.label}. ${access.detail ?? entry.description}`}
+          role="group"
+          aria-label={`${actionLabel}: ${entry.title}`}
+          aria-describedby={statusId}
+          aria-disabled="true"
         >
           {content}
         </div>
