@@ -50,10 +50,10 @@ export function CronogramaModuleShell({ children }: { children: ReactNode }) {
 
           <div className="flex items-center gap-2">
             <div className="cronograma-module-chip-3d hidden text-right lg:inline-flex">
+            <div className="cronograma-module-chip-3d hidden text-right lg:inline-flex">
               <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-white/60">Ciclo oficial</p>
               <p className="text-xs font-semibold text-white/90">{presentFenasojaProductName(orgName)} · 2026—2028</p>
             </div>
-            <Button
               type="button"
               variant="ghost"
               size="sm"
