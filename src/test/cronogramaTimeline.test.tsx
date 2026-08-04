@@ -167,9 +167,11 @@ beforeEach(() => {
 });
 
 describe('domínio temporal do cronograma', () => {
-  it('abre o Dashboard por padrão e preserva deep links legados da Timeline', () => {
-    expect(resolveCronogramaView(new URLSearchParams())).toBe('overview');
-    expect(resolveCronogramaView(new URLSearchParams('event=evento-1'))).toBe('overview');
+  it('abre a Linha do tempo por padrão e preserva deep links de visões válidas', () => {
+    expect(resolveCronogramaView(new URLSearchParams())).toBe('timeline');
+    expect(resolveCronogramaView(new URLSearchParams('event=evento-1'))).toBe('timeline');
+    expect(resolveCronogramaView(new URLSearchParams('view=year'))).toBe('timeline');
+    expect(resolveCronogramaView(new URLSearchParams('view=overview'))).toBe('overview');
     expect(resolveCronogramaView(new URLSearchParams('view=timeline'))).toBe('timeline');
     expect(resolveCronogramaView(new URLSearchParams('timelineYear=2027&timelineMonth=2027-03'))).toBe('timeline');
     expect(resolveCronogramaView(new URLSearchParams('view=calendar'))).toBe('calendar');
@@ -219,14 +221,14 @@ describe('domínio temporal do cronograma', () => {
     const current = new URLSearchParams('view=completed&timelineYear=2026&timelineMonth=2026-07&event=evento-1');
     const next = buildCronogramaViewSearchParams(current, 'completed', 'timeline');
 
-    expect(next.get('view')).toBe('timeline');
+    expect(next.get('view')).toBeNull();
     expect(next.get('timelineYear')).toBeNull();
     expect(next.get('timelineMonth')).toBeNull();
     expect(next.get('event')).toBe('evento-1');
     expect(current.get('timelineYear')).toBe('2026');
 
     const dashboard = buildCronogramaViewSearchParams(next, 'timeline', 'overview');
-    expect(dashboard.get('view')).toBeNull();
+    expect(dashboard.get('view')).toBe('overview');
     expect(dashboard.get('event')).toBe('evento-1');
   });
 
@@ -547,13 +549,13 @@ describe('navegador do ciclo na linha do tempo', () => {
 });
 
 describe('componentes críticos preservados', () => {
-  it('oferece as oito visões desktop com foco roving e navegação por teclado', () => {
+  it('oferece as cinco visões desktop com foco roving e navegação por teclado', () => {
     const onChange = vi.fn();
     render(<CronogramaViewTabs activeView="timeline" onChange={onChange} />);
     const tablist = screen.getByRole('tablist');
     const tabs = within(tablist).getAllByRole('tab');
 
-    expect(tabs).toHaveLength(8);
+    expect(tabs).toHaveLength(5);
     expect(tabs[0]).toHaveAccessibleName('Dashboard');
     expect(tabs[0]).toHaveAttribute('tabindex', '-1');
     expect(tabs[1]).toHaveAttribute('tabindex', '0');
@@ -564,8 +566,8 @@ describe('componentes críticos preservados', () => {
     expect(tabs[2]).toHaveFocus();
 
     fireEvent.keyDown(tabs[2], { key: 'End' });
-    expect(onChange).toHaveBeenLastCalledWith('meetings');
-    expect(tabs[7]).toHaveFocus();
+    expect(onChange).toHaveBeenLastCalledWith('calendar');
+    expect(tabs[4]).toHaveFocus();
   });
 
   it('usa o painel ativo como retorno de foco quando o card foi removido da visão', () => {
