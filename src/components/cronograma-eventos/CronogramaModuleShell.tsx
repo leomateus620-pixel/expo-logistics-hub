@@ -4,12 +4,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { FenasojaBrand } from '@/components/brand/FenasojaBrand';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
-import { useCurrentOrg } from '@/hooks/useCurrentOrg';
-import { presentFenasojaProductName } from '@/lib/fenasoja-brand';
 
 export function CronogramaModuleShell({ children }: { children: ReactNode }) {
   const { signOut } = useAuth();
-  const { orgName } = useCurrentOrg();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
