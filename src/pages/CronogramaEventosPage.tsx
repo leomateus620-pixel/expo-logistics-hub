@@ -849,22 +849,6 @@ export default function CronogramaEventosPage() {
             />
           )}
 
-          {activeView === 'year' && (
-            <YearBoard
-              events={filteredEvents}
-              onOpen={(event) => openEvent(event)}
-              onEdit={openWorkspace}
-            />
-          )}
-
-          {activeView === 'category' && (
-            <CategoryBoard events={filteredEvents} onOpen={(event) => openEvent(event)} />
-          )}
-
-          {activeView === 'meetings' && (
-            <MeetingsBoard events={filteredEvents} onOpen={(event) => openEvent(event)} />
-          )}
-
           {activeView === 'undated' && (
             <UndatedBoard
               events={filteredEvents}
