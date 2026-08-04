@@ -2,11 +2,8 @@ import {
   BadgeCheck,
   CalendarClock,
   CalendarDays,
-  Columns3,
   LayoutDashboard,
   Route,
-  Tags,
-  UsersRound,
   type LucideIcon,
 } from 'lucide-react';
 import type { CronogramaView } from './types';
