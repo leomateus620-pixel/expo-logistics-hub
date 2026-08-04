@@ -6,7 +6,6 @@ import {
   List,
   Map,
   Maximize2,
-  MousePointer2,
   ParkingCircle,
   Search,
   ScanSearch,
@@ -153,17 +152,6 @@ export function MapToolbar({
           <SlidersHorizontal className="h-4 w-4" />
           Filtros
         </Button>
-        {permissions.canEditGeometry && (
-          <Button
-            size="sm"
-            className="commercial-map-edit-button"
-            onClick={() => setWorkspaceMode(workspaceMode === 'edit' ? '3d' : 'edit')}
-            disabled={!hasSelection}
-          >
-            <MousePointer2 className="h-4 w-4" />
-            {workspaceMode === 'edit' ? 'Sair da edição' : 'Editar geometria'}
-          </Button>
-        )}
       </div>
     </>
   );

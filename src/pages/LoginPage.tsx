@@ -18,7 +18,6 @@ import {
   Loader2,
   LockKeyhole,
   Mail,
-  Map,
   Route,
   ShieldCheck,
   UtensilsCrossed,
@@ -26,6 +25,7 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { CronogramaLoginHero } from '@/components/auth/CronogramaLoginHero';
+import { CommercialMapLoginHero } from '@/components/auth/CommercialMapLoginHero';
 import { FenasojaBrand } from '@/components/brand/FenasojaBrand';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -56,29 +56,6 @@ type FormPhase = 'idle' | 'submitting' | 'success';
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const SUCCESS_REDIRECT_DELAY_MS = 800;
-
-const commercialMapCapabilities: CapabilityItem[] = [
-  {
-    icon: Map,
-    label: 'Parque mapeado',
-    description: 'Estruturas oficiais',
-  },
-  {
-    icon: Landmark,
-    label: 'Disponibilidade',
-    description: 'Situação comercial',
-  },
-  {
-    icon: FileCheck2,
-    label: 'Contratos',
-    description: 'Histórico conectado',
-  },
-  {
-    icon: ShieldCheck,
-    label: 'Acesso controlado',
-    description: 'Perfis e permissões',
-  },
-];
 
 const adminCapabilities: CapabilityItem[] = [
   {
@@ -191,21 +168,15 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
     ? 'Governança institucional'
     : isVenueEventsLogin
       ? 'Gestão operacional'
-      : isCommercialMapLogin
-        ? 'Gestão territorial'
-        : 'Ambiente seguro';
+      : 'Ambiente seguro';
   const heroTitleAccent = isAdminLogin
     ? 'Fenasoja 2028'
     : isVenueEventsLogin
       ? 'do Restaurante e da Arena'
-      : isCommercialMapLogin
-        ? 'e comercial do parque'
-        : 'das comissões';
+      : 'das comissões';
   const capabilities = isVenueEventsLogin
     ? venueCapabilities
-    : isCommercialMapLogin
-      ? commercialMapCapabilities
-      : isAdminLogin
+    : isAdminLogin
         ? adminCapabilities
         : [
             {
@@ -233,11 +204,9 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
     ? LockKeyhole
     : isCronogramaLogin
       ? CalendarRange
-      : isVenueEventsLogin
-        ? Building2
-        : isCommercialMapLogin
-          ? Map
-          : Layers3;
+    : isVenueEventsLogin
+      ? Building2
+        : Layers3;
   const isBusy = phase !== 'idle';
   const emailInvalid = Boolean(fieldErrors.email || authError);
   const passwordInvalid = Boolean(fieldErrors.password || authError);
@@ -351,7 +320,7 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
       data-auth-phase={phase}
       data-module={selectedSlug}
     >
-      {!isCronogramaLogin && (
+      {!isCronogramaLogin && !isCommercialMapLogin && (
         <div className="auth-screen__cycle" aria-hidden="true">
           <span>2026</span>
           <i />
@@ -364,6 +333,8 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
       <div className="auth-layout">
         {isCronogramaLogin ? (
           <CronogramaLoginHero />
+        ) : isCommercialMapLogin ? (
+          <CommercialMapLoginHero />
         ) : (
           <section className="auth-hero" aria-labelledby="login-hero-title">
             <FenasojaBrand
@@ -413,32 +384,36 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
           aria-labelledby="login-title"
           aria-busy={phase === 'submitting'}
         >
-          <div className="auth-panel__brand-row">
-            <FenasojaBrand
-              compact
-              showEdition={!isCronogramaLogin}
-              subtitle="Acesso ao sistema"
-              tone="light"
-            />
-            <div className="auth-module-badge">
-              <span className="auth-module-badge__icon" aria-hidden="true">
-                <ContextIcon />
-              </span>
-              <span className="auth-module-badge__copy">
-                <span>Módulo selecionado</span>
-                <strong>{contextName}</strong>
-              </span>
+          {!isCommercialMapLogin && (
+            <div className="auth-panel__brand-row">
+              <FenasojaBrand
+                compact
+                showEdition={!isCronogramaLogin}
+                subtitle="Acesso ao sistema"
+                tone="light"
+              />
+              <div className="auth-module-badge">
+                <span className="auth-module-badge__icon" aria-hidden="true">
+                  <ContextIcon />
+                </span>
+                <span className="auth-module-badge__copy">
+                  <span>Módulo selecionado</span>
+                  <strong>{contextName}</strong>
+                </span>
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="auth-panel__heading">
             <p className="auth-panel__eyebrow">
               <ShieldCheck aria-hidden="true" />
-              Identificação segura
+              {isCommercialMapLogin ? 'Acesso institucional' : 'Identificação segura'}
             </p>
             <h2 id="login-title">Entrar</h2>
             <p>
-              Use suas credenciais institucionais para continuar em <strong>{contextName}</strong>.
+              {isCommercialMapLogin
+                ? 'Use seu e-mail e senha institucionais para continuar.'
+                : <>Use suas credenciais institucionais para continuar em <strong>{contextName}</strong>.</>}
             </p>
           </div>
 
@@ -597,15 +572,17 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
           </form>
 
           <div className="auth-panel__footer">
-            <div className="auth-restricted-note">
-              <span className="auth-restricted-note__icon" aria-hidden="true">
-                <ShieldCheck />
-              </span>
-              <span>
-                <strong>Acesso restrito</strong>
-                Solicite suas credenciais ao administrador.
-              </span>
-            </div>
+            {!isCommercialMapLogin && (
+              <div className="auth-restricted-note">
+                <span className="auth-restricted-note__icon" aria-hidden="true">
+                  <ShieldCheck />
+                </span>
+                <span>
+                  <strong>Acesso restrito</strong>
+                  Solicite suas credenciais ao administrador.
+                </span>
+              </div>
+            )}
             <Link to="/portal" className="auth-back-link">
               <ArrowLeft aria-hidden="true" />
               Voltar ao portal

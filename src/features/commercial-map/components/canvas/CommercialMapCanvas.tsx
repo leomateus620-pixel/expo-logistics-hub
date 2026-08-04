@@ -1258,6 +1258,7 @@ function CameraRig({
   const previousSelection = useRef<string | null>(selectedEntity?.id ?? null);
   const previousSegment = useRef(activeSegment?.id ?? null);
   const returnView = useRef(useCommercialMapStore.getState().interiorReturnView);
+  const previousViewportSize = useRef({ width: size.width, height: size.height });
   const [reducedMotion, setReducedMotion] = useState(() => (
     typeof window !== 'undefined'
     && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
@@ -1517,6 +1518,33 @@ function CameraRig({
     queueSegment,
     queueSelection,
     selectedEntity,
+  ]);
+
+  useEffect(() => {
+    const previous = previousViewportSize.current;
+    const resized = Math.abs(previous.width - size.width) >= 2
+      || Math.abs(previous.height - size.height) >= 2;
+    previousViewportSize.current = { width: size.width, height: size.height };
+
+    if (!resized || !initialized.current) return undefined;
+
+    const frame = window.requestAnimationFrame(() => {
+      if (selectedEntity) queueSelection(selectedEntity);
+      else if (activeSegment) queueSegment(activeSegment, activeSegmentEntities);
+      else queuePreset(preset);
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [
+    activeSegment,
+    activeSegmentEntities,
+    preset,
+    queuePreset,
+    queueSegment,
+    queueSelection,
+    selectedEntity,
+    size.height,
+    size.width,
   ]);
 
   const clampTarget = useCallback(() => {

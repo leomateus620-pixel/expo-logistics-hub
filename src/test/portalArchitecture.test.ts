@@ -38,12 +38,14 @@ describe('arquitetura de acesso do portal', () => {
     expect(modules).not.toContain(financePortalModule);
   });
 
-  it('remove somente o atalho do Mapa Comercial da apresentação de Logística', () => {
+  it('preserva o destino e o guard do Mapa Comercial fora da apresentação de Logística', () => {
     const sidebar = readFileSync(resolve('src/components/Sidebar.tsx'), 'utf8');
+    const logisticsLayout = readFileSync(resolve('src/components/Layout.tsx'), 'utf8');
     const app = readFileSync(resolve('src/App.tsx'), 'utf8');
     const login = readFileSync(resolve('src/pages/LoginPage.tsx'), 'utf8');
 
     expect(sidebar).not.toContain("to: '/mapa-comercial'");
+    expect(logisticsLayout).not.toContain("['/mapa-comercial', 'Mapa Comercial']");
     expect(sidebar).toContain("to: '/transports'");
     expect(sidebar).toContain("to: '/expenses'");
     expect(app).toContain('path="/mapa-comercial"');

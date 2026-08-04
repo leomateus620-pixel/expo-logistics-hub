@@ -10,7 +10,6 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { useDriverAutoArm } from '@/hooks/useDriverAutoArm';
 
 const routeLabels: Array<[string, string]> = [
-  ['/mapa-comercial', 'Mapa Comercial'],
   ['/transports', 'Transportes'],
   ['/vehicles', 'Veículos'],
   ['/electric-carts', 'Carrinhos Elétricos'],

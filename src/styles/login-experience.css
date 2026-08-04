@@ -1233,6 +1233,286 @@
   }
 }
 
+/* Mapa Comercial — acesso direto, limpo e independente da Logística. */
+.auth-screen[data-module='mapa-comercial'] {
+  background:
+    radial-gradient(ellipse at 13% 24%, rgba(47, 130, 178, 0.2), transparent 34%),
+    radial-gradient(ellipse at 88% 78%, rgba(228, 157, 73, 0.08), transparent 30%),
+    linear-gradient(118deg, rgb(7 28 50) 0%, rgb(10 37 64) 54%, rgb(7 26 46) 100%);
+}
+
+.auth-screen[data-module='mapa-comercial']::before {
+  background-image:
+    linear-gradient(rgba(144, 197, 225, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(144, 197, 225, 0.035) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: linear-gradient(105deg, black, transparent 74%);
+}
+
+.auth-screen[data-module='mapa-comercial']::after {
+  top: auto;
+  right: -8rem;
+  bottom: -10rem;
+  width: min(42rem, 58vw);
+  border-color: rgba(132, 192, 223, 0.1);
+  box-shadow:
+    inset 0 0 0 4rem rgba(62, 140, 183, 0.02),
+    inset 0 0 0 8rem rgba(62, 140, 183, 0.014);
+  transform: rotate(-7deg);
+}
+
+.auth-screen[data-module='mapa-comercial'] .auth-layout {
+  width: min(100%, 70rem);
+  grid-template-columns: minmax(0, 1.08fr) minmax(22rem, 25.5rem);
+  gap: clamp(3rem, 7vw, 6.5rem);
+}
+
+.auth-hero--commercial-map {
+  position: relative;
+  max-width: 36rem;
+}
+
+.auth-hero--commercial-map .auth-hero__brand {
+  filter: drop-shadow(0 16px 26px rgba(1, 10, 22, 0.3));
+}
+
+.commercial-map-login__identity {
+  margin-top: clamp(2.5rem, 7vh, 4.75rem);
+}
+
+.commercial-map-login__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.48rem;
+  color: rgb(169 215 238);
+  font-size: 0.7rem;
+  font-weight: 820;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+}
+
+.commercial-map-login__eyebrow svg {
+  width: 1rem;
+  height: 1rem;
+  color: rgb(116 191 223);
+}
+
+.commercial-map-login__title {
+  max-width: 8ch;
+  margin-top: 0.8rem;
+  color: rgb(248 251 253);
+  font-size: clamp(3.5rem, 7.2vw, 5.75rem);
+  font-weight: 920;
+  letter-spacing: -0.075em;
+  line-height: 0.82;
+  text-wrap: balance;
+}
+
+.commercial-map-login__title span {
+  display: block;
+  margin-top: 0.14em;
+  background: linear-gradient(100deg, rgb(182 226 245) 0%, rgb(120 189 220) 52%, rgb(231 194 140) 118%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: rgb(159 212 235);
+  font-weight: 720;
+  letter-spacing: -0.065em;
+  -webkit-text-fill-color: transparent;
+}
+
+.commercial-map-login__description {
+  max-width: 39ch;
+  margin-top: 1.35rem;
+  color: rgba(226, 238, 245, 0.78);
+  font-size: 0.95rem;
+  font-weight: 520;
+  line-height: 1.55;
+}
+
+.auth-screen[data-module='mapa-comercial'] .auth-panel {
+  width: min(100%, 25.5rem);
+  justify-self: end;
+  border-color: rgba(172, 202, 219, 0.76);
+  border-radius: 1.15rem;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.82), transparent 42%),
+    rgb(248 251 252);
+  box-shadow:
+    0 2px 7px -3px rgba(2, 21, 38, 0.34),
+    0 34px 72px -32px rgba(0, 10, 24, 0.76),
+    inset 0 1px rgb(255 255 255);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.auth-screen[data-module='mapa-comercial'] .auth-panel::after {
+  left: 1.75rem;
+  width: 5rem;
+  background: linear-gradient(90deg, rgb(42 129 177), rgb(118 190 220));
+  box-shadow: 0 7px 16px -8px rgba(30, 111, 157, 0.72);
+}
+
+.auth-screen[data-module='mapa-comercial'] .auth-panel__heading {
+  margin-top: 0.35rem;
+}
+
+.auth-screen[data-module='mapa-comercial'] .auth-panel__eyebrow {
+  color: rgb(43 103 140);
+}
+
+.auth-screen[data-module='mapa-comercial'] .auth-panel__eyebrow svg {
+  color: rgb(42 127 171);
+}
+
+.auth-screen[data-module='mapa-comercial'] .auth-panel__heading h2 {
+  font-size: clamp(2rem, 3.2vw, 2.45rem);
+}
+
+.auth-screen[data-module='mapa-comercial'] .auth-input-frame {
+  border-color: rgb(183 203 216);
+  background: rgb(255 255 255);
+}
+
+.auth-screen[data-module='mapa-comercial'] .auth-input-frame:hover:not([data-disabled='true']):not([data-invalid='true']) {
+  border-color: rgb(120 174 202);
+}
+
+.auth-screen[data-module='mapa-comercial'] .auth-input-frame:focus-within {
+  border-color: rgb(40 125 171);
+  box-shadow: 0 0 0 3px rgba(40, 125, 171, 0.17), inset 0 1px rgb(255 255 255);
+  transform: none;
+}
+
+.auth-screen[data-module='mapa-comercial'] .auth-input-frame:focus-within .auth-input-frame__icon,
+.auth-screen[data-module='mapa-comercial'] .auth-input-frame[data-filled='true'] .auth-input-frame__icon {
+  color: rgb(33 111 155);
+}
+
+.auth-screen[data-module='mapa-comercial'] .auth-submit {
+  border-color: rgb(203 101 23);
+  background: linear-gradient(110deg, rgb(239 119 28), rgb(242 138 47));
+  box-shadow:
+    0 3px 6px rgba(5, 32, 51, 0.2),
+    0 18px 30px -18px rgba(219, 100, 20, 0.7),
+    inset 0 1px rgba(255, 255, 255, 0.42);
+}
+
+.auth-screen[data-module='mapa-comercial'] .auth-submit:hover:not(:disabled) {
+  background: linear-gradient(110deg, rgb(230 107 20), rgb(241 138 45));
+}
+
+.auth-screen[data-module='mapa-comercial'] .auth-submit:focus-visible {
+  box-shadow: 0 0 0 3px rgb(248 251 252), 0 0 0 6px rgb(29 111 155);
+}
+
+.auth-screen[data-module='mapa-comercial'] .auth-panel__footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.auth-screen[data-module='mapa-comercial'] .auth-back-link {
+  min-height: 2.75rem;
+}
+
+@media (max-width: 959px) {
+  .auth-screen[data-module='mapa-comercial'] .auth-layout {
+    width: min(100%, 36rem);
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.15rem;
+  }
+
+  .auth-hero--commercial-map { max-width: none; }
+
+  .commercial-map-login__identity {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    margin-top: 1.5rem;
+  }
+
+  .commercial-map-login__title {
+    max-width: none;
+    font-size: clamp(2.8rem, 9vw, 4rem);
+    line-height: 0.88;
+  }
+
+  .commercial-map-login__title span { display: inline; margin-left: 0.16em; }
+  .commercial-map-login__description { margin-top: 0.85rem; }
+
+  .auth-screen[data-module='mapa-comercial'] .auth-panel {
+    width: min(100%, 30rem);
+    justify-self: center;
+  }
+}
+
+@media (max-width: 639px) {
+  .auth-screen[data-module='mapa-comercial'] {
+    padding-top: max(0.85rem, env(safe-area-inset-top));
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+
+  .auth-screen[data-module='mapa-comercial'] .auth-layout { gap: 0.85rem; }
+
+  .auth-hero--commercial-map .auth-hero__brand.fenasoja-brand[data-scale='display'] .fenasoja-brand__mark {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .auth-hero--commercial-map .auth-hero__brand.fenasoja-brand[data-scale='display'] .fenasoja-brand__wordmark {
+    font-size: 1.25rem;
+  }
+
+  .auth-hero--commercial-map .auth-hero__brand.fenasoja-brand[data-scale='display'] .fenasoja-brand__edition {
+    min-width: 3.35rem;
+    padding: 0.32rem 0.4rem;
+    font-size: 0.62rem;
+  }
+
+  .auth-hero--commercial-map .fenasoja-brand__subtitle { display: none; }
+
+  .commercial-map-login__identity { margin-top: 0.85rem; }
+  .commercial-map-login__eyebrow { font-size: 0.62rem; }
+
+  .commercial-map-login__title {
+    margin-top: 0.55rem;
+    font-size: clamp(2.25rem, 11vw, 3rem);
+  }
+
+  .commercial-map-login__description {
+    margin-top: 0.55rem;
+    font-size: 0.78rem;
+    line-height: 1.35;
+  }
+
+  .auth-screen[data-module='mapa-comercial'] .auth-panel {
+    border-radius: 1rem;
+    padding: 1.15rem;
+  }
+
+  .auth-screen[data-module='mapa-comercial'] .auth-panel::after { left: 1.15rem; }
+  .auth-screen[data-module='mapa-comercial'] .auth-panel__heading h2 { font-size: 1.85rem; }
+  .auth-screen[data-module='mapa-comercial'] .auth-form { gap: 0.9rem; margin-top: 1.1rem; }
+  .auth-screen[data-module='mapa-comercial'] .auth-input-frame .auth-input-control { font-size: 1rem; }
+  .auth-screen[data-module='mapa-comercial'] .auth-panel__footer { margin-top: 0.85rem; }
+}
+
+@media (min-width: 960px) and (max-height: 760px) {
+  .commercial-map-login__identity { margin-top: 1.75rem; }
+  .commercial-map-login__title { font-size: clamp(3.2rem, 6vw, 4.55rem); }
+  .commercial-map-login__description { margin-top: 1rem; }
+  .auth-screen[data-module='mapa-comercial'] .auth-panel { padding: 1.35rem; }
+  .auth-screen[data-module='mapa-comercial'] .auth-panel__heading { margin-top: 0.2rem; }
+  .auth-screen[data-module='mapa-comercial'] .auth-form { gap: 0.8rem; margin-top: 1rem; }
+  .auth-screen[data-module='mapa-comercial'] .auth-panel__footer { margin-top: 0.85rem; }
+}
+
+@media (prefers-contrast: more), (prefers-reduced-transparency: reduce) {
+  .commercial-map-login__title span {
+    background: none;
+    color: rgb(169 215 238);
+    -webkit-text-fill-color: currentColor;
+  }
+}
+
 /* Cronograma e Eventos — institutional 2028 login composition. */
 .auth-screen[data-module='cronograma-eventos'] {
   background:

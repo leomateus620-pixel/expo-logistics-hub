@@ -242,4 +242,60 @@ describe("experiência de autenticação Fenasoja 2028", () => {
       { timeout: 1_500 },
     );
   });
+
+  it("apresenta o acesso do Mapa Comercial sem capacidades ou linguagem da Logística", () => {
+    renderLogin("/login/mapa-comercial");
+
+    expect(
+      screen.getByRole("heading", { name: "Mapa Comercial" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Gestão visual dos espaços, lotes e disponibilidade do parque.",
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText("E-mail")).toBeInTheDocument();
+    expect(screen.getByLabelText("Senha")).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Entrar no sistema" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("link", { name: "Voltar ao portal" }),
+    ).toHaveAttribute("href", "/portal");
+
+    expect(screen.queryByText("Acesso protegido")).not.toBeInTheDocument();
+    expect(screen.queryByText("Capacidades do ambiente")).not.toBeInTheDocument();
+    expect(screen.queryByText("Módulo selecionado")).not.toBeInTheDocument();
+    expect(screen.queryByText("Acesso restrito")).not.toBeInTheDocument();
+    expect(screen.queryByText("Parque mapeado")).not.toBeInTheDocument();
+    expect(screen.queryByText("Estruturas oficiais")).not.toBeInTheDocument();
+    expect(screen.queryByText("Disponibilidade")).not.toBeInTheDocument();
+    expect(screen.queryByText("Situação comercial")).not.toBeInTheDocument();
+    expect(screen.queryByText("Contratos")).not.toBeInTheDocument();
+    expect(screen.queryByText("Histórico conectado")).not.toBeInTheDocument();
+    expect(screen.queryByText("Acesso controlado")).not.toBeInTheDocument();
+    expect(screen.queryByText("Perfis e permissões")).not.toBeInTheDocument();
+  });
+
+  it("preserva o redirect dedicado do Mapa Comercial após autenticação", async () => {
+    authMocks.signIn.mockResolvedValue({ error: null });
+    renderLogin("/login/mapa-comercial");
+
+    fireEvent.change(screen.getByLabelText("E-mail"), {
+      target: { value: "usuario@fenasoja.com.br" },
+    });
+    fireEvent.change(screen.getByLabelText("Senha"), {
+      target: { value: "senha-segura" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Entrar no sistema" }));
+
+    await waitFor(
+      () => {
+        expect(screen.getByTestId("current-location")).toHaveTextContent(
+          "/mapa-comercial",
+        );
+      },
+      { timeout: 1_500 },
+    );
+  });
 });

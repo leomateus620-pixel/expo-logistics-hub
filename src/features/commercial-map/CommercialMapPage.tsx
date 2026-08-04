@@ -5,13 +5,16 @@ import {
   ArrowLeft,
   BadgeCheck,
   Box,
+  ChevronDown,
   DatabaseZap,
   Loader2,
   MapPinned,
   MapPinPlus,
+  MousePointer2,
   RefreshCw,
   Ruler,
   Send,
+  Settings2,
   Sparkles,
   Tractor,
   Trees,
@@ -245,6 +248,9 @@ export default function CommercialMapPage() {
     return { verified, review: data.entities.length - verified };
   }, [data]);
   const publishReady = data?.calibration?.status === 'VALIDATED' && projectStats?.review === 0;
+  const hasManagementActions = permissions.isMapAdmin
+    || permissions.canManageLots
+    || permissions.canEditGeometry;
 
   if (mapQuery.isLoading) return <MapPageSkeleton />;
   if (mapQuery.isError || !data) {
@@ -268,8 +274,8 @@ export default function CommercialMapPage() {
         <div className="commercial-map-title-lockup">
           <div className="commercial-map-title-icon"><MapPinned /></div>
           <div>
-            <span>Gestão territorial e comercial · Fenasoja 2028</span>
-            <h1>{isExporural ? 'Exporural' : 'Mapa Comercial'}</h1>
+            <span>{isExporural ? 'Área comercial · Exporural' : 'Parque Fenasoja · visão comercial'}</span>
+            <h1>{isExporural ? 'Exporural' : 'Parque completo'}</h1>
             <p>{isExporural ? 'Vista isolada · Quadras R e S · referência cadastral 2026' : `Referência cartográfica: ${data.project.name}`}</p>
           </div>
         </div>
@@ -291,7 +297,25 @@ export default function CommercialMapPage() {
             <Tractor />Exporural
           </button>
         </nav>
-        <div className="commercial-map-header-actions">
+        {hasManagementActions && (
+          <details className="commercial-map-management">
+            <summary>
+              <Settings2 aria-hidden="true" />
+              <span>Gestão</span>
+              <ChevronDown className="commercial-map-management-chevron" aria-hidden="true" />
+            </summary>
+            <div className="commercial-map-header-actions" aria-label="Ferramentas administrativas do mapa">
+              {permissions.canEditGeometry && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setWorkspaceMode(workspaceMode === 'edit' ? '3d' : 'edit')}
+                  disabled={!selectedEntity}
+                >
+                  <MousePointer2 />
+                  {workspaceMode === 'edit' ? 'Sair da edição' : 'Editar geometria'}
+                </Button>
+              )}
           {data.source === 'database'
             && permissions.isMapAdmin
             && data.project.referenceRevision !== OFFICIAL_REFERENCE_REVISION
@@ -367,9 +391,11 @@ export default function CommercialMapPage() {
                   <AlertDialogAction onClick={() => bootstrap.mutate()}>Sincronizar como rascunho</AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
-            </AlertDialog>
-          )}
-        </div>
+              </AlertDialog>
+            )}
+            </div>
+          </details>
+        )}
       </header>
 
       {data.sourceMessage && (

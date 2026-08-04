@@ -178,11 +178,9 @@ function CommercialMapRoute() {
     <AuthGuard>
       <OrgGuard>
         <CapabilityGuard capability="map.view">
-          <Layout>
-            <Suspended>
-              <CommercialMapPage />
-            </Suspended>
-          </Layout>
+          <Suspended>
+            <CommercialMapPage />
+          </Suspended>
         </CapabilityGuard>
       </OrgGuard>
     </AuthGuard>
