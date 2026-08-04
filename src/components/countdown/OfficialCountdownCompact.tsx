@@ -1,5 +1,5 @@
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
-import { ArrowUpRight, CalendarDays, Maximize2 } from 'lucide-react';
+import { CalendarDays, Maximize2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { OfficialCountdownDigits } from '@/components/countdown/OfficialCountdownDigits';
 import { useFenasojaCountdown } from '@/hooks/useFenasojaCountdown';
@@ -58,9 +58,12 @@ export const OfficialCountdownCompact = memo(function OfficialCountdownCompact()
         <p id="portal-official-countdown-title">Abertura oficial em</p>
         <p className="portal-official-countdown__date">
           <CalendarDays aria-hidden="true" />
-          <span>
+          <span className="portal-official-countdown__date-line">
             <strong>{FENASOJA_2028_OPENING_LABEL}</strong>
-            <small>{FENASOJA_2028_TIME_ZONE_LABEL}</small>
+            <small title={FENASOJA_2028_TIME_ZONE_LABEL}>
+              <span className="sr-only">, {FENASOJA_2028_TIME_ZONE_LABEL}</span>
+              <span aria-hidden="true">· Brasília</span>
+            </small>
           </span>
         </p>
       </div>
@@ -89,7 +92,6 @@ export const OfficialCountdownCompact = memo(function OfficialCountdownCompact()
       >
         <Maximize2 aria-hidden="true" />
         <span>{isExpanding ? 'Abrindo contagem…' : 'Abrir contagem'}</span>
-        <ArrowUpRight aria-hidden="true" />
       </button>
 
       {!isInvalid && (

@@ -103,27 +103,29 @@ describe('CommissionPortalPage', () => {
     expect(screen.getByRole('heading', { level: 1 })).toHaveTextContent(
       'FENASOJA 2028',
     );
-    expect(screen.getByText('Gestão Operacional')).toBeInTheDocument();
+    expect(screen.queryByText('Gestão Operacional')).not.toBeInTheDocument();
     expect(screen.getByText('Abertura oficial em')).toBeInTheDocument();
     expect(screen.getByText('29 de abril de 2028, às 10h')).toBeInTheDocument();
     expect(screen.getAllByRole('timer')).toHaveLength(1);
     expect(screen.getByRole('button', {
       name: 'Abrir contagem oficial da Fenasoja 2028',
     })).toHaveTextContent('Abrir contagem');
+    expect(screen.getByRole('button', {
+      name: 'Abrir contagem oficial da Fenasoja 2028',
+    }).querySelectorAll('svg')).toHaveLength(1);
+    expect(screen.getByText(/Horário de Brasília/)).toHaveClass('sr-only');
+    expect(screen.getByText('· Brasília')).toHaveAttribute('aria-hidden', 'true');
     expect(screen.queryByText(/Um portal/)).not.toBeInTheDocument();
     expect(screen.queryByText(/Acesse planejamento/)).not.toBeInTheDocument();
     expect(container.querySelector('[data-testid="portal-soybean"]')).toBeInTheDocument();
-    const roots = [...container.querySelectorAll('[data-portal-root]')];
-    expect(roots).toHaveLength(5);
-    expect(roots.every((root) => root.getAttribute('d')?.startsWith('M560 8'))).toBe(true);
-    expect(container.querySelectorAll('[data-root-layer="halo"] path')).toHaveLength(5);
-    expect(container.querySelectorAll('[data-root-layer="core"] [data-portal-root]')).toHaveLength(5);
+    expect(container.querySelector('.portal-identity__card')).not.toBeInTheDocument();
+    expect(container.querySelector('.portal-soybean__roots')).not.toBeInTheDocument();
+    expect(container.querySelector('[data-portal-root]')).not.toBeInTheDocument();
+    expect(container.querySelector('[data-root-layer]')).not.toBeInTheDocument();
     expect(container.querySelector('[data-root-illustrations]')).not.toBeInTheDocument();
     expect(container.querySelector('[data-root-scene]')).not.toBeInTheDocument();
     expect(container.querySelector('[data-world-soybean]')).not.toBeInTheDocument();
     expect(container.querySelector('animateMotion')).not.toBeInTheDocument();
-    expect(container.querySelector('.portal-soybean__roots image')).not.toBeInTheDocument();
-    expect(container.querySelector('.portal-soybean__roots text')).not.toBeInTheDocument();
     expect(screen.queryByText('Da terra para o mundo')).not.toBeInTheDocument();
     expect(screen.queryByText('Plantio de precisão')).not.toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Acessar área administrativa' })).toBeInTheDocument();
