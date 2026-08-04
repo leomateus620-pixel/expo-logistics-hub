@@ -34,7 +34,7 @@ export interface PortalPrimaryEntry {
   title: string;
   description: string;
   icon: LucideIcon;
-  eyebrow: string;
+  countLabel?: string;
   tone: 'agenda' | 'map' | 'commissions' | 'finance';
 }
 
@@ -42,7 +42,7 @@ export const portalAgendaDestinations: PortalDestination[] = [
   {
     id: 'cronograma-eventos',
     title: 'Cronograma e Eventos',
-    description: 'Planejamento central, linha do tempo, calendário, reuniões e ações do ciclo oficial.',
+    description: 'Planejamento, linha do tempo, calendário e execução do ciclo oficial.',
     icon: CalendarRange,
     capability: 'cronograma_eventos_access',
     loginPath: '/login/cronograma-eventos',
@@ -52,7 +52,7 @@ export const portalAgendaDestinations: PortalDestination[] = [
   {
     id: 'eventos-restaurante-arena',
     title: 'Eventos Restaurante e Arena',
-    description: 'Reservas, aprovações, contrapartidas, eventos e recursos operacionais dos espaços.',
+    description: 'Reservas, aprovações, contrapartidas e operação dos espaços.',
     icon: Building2,
     capability: 'venue_events_access',
     loginPath: '/login/eventos-restaurante-arena',
@@ -85,36 +85,34 @@ export const portalPrimaryEntries: PortalPrimaryEntry[] = [
     id: 'agenda',
     kind: 'expandable',
     title: 'Agenda',
-    description: 'Planejamento, eventos institucionais, reservas e operação dos espaços.',
+    description: 'Planejamento, calendário, reservas e operação dos eventos oficiais.',
     icon: Route,
-    eyebrow: `${portalAgendaDestinations.length} destinos`,
+    countLabel: `${portalAgendaDestinations.length} destinos`,
     tone: 'agenda',
   },
   {
     id: 'mapa-comercial',
     kind: 'direct',
     title: commercialMapDestination.title,
-    description: commercialMapDestination.description,
+    description: 'Visão de lotes, pavilhões, espaços comerciais e disponibilidade do parque.',
     icon: commercialMapDestination.icon,
-    eyebrow: 'Acesso direto',
     tone: 'map',
   },
   {
     id: 'comissoes',
     kind: 'expandable',
     title: 'Comissões',
-    description: 'Acesso às frentes operacionais responsáveis pela execução da Fenasoja.',
+    description: 'Frentes responsáveis pela execução operacional da Fenasoja.',
     icon: UsersRound,
-    eyebrow: `${getPortalCommissionModules().length} frentes`,
+    countLabel: `${getPortalCommissionModules().length} frentes`,
     tone: 'commissions',
   },
   {
     id: 'financeiro',
     kind: 'direct',
     title: 'Financeiro',
-    description: 'Gestão financeira gerencial e informações restritas conforme o perfil.',
+    description: 'Gestão executiva, orçamento e informações restritas conforme o perfil.',
     icon: BadgeDollarSign,
-    eyebrow: 'Acesso restrito',
     tone: 'finance',
   },
 ];

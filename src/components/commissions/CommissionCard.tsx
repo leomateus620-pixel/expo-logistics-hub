@@ -1,6 +1,6 @@
-import type { CSSProperties } from 'react';
+import { memo } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowUpRight, Building2, Loader2, LockKeyhole, LogIn, ShieldCheck } from 'lucide-react';
+import { ArrowUpRight, Building2, Loader2, LockKeyhole, LogIn } from 'lucide-react';
 import {
   statusLabels,
   type CommissionModule,
@@ -10,9 +10,8 @@ import type { PortalAccessPresentation } from '@/components/portal/portalTypes';
 
 interface CommissionCardProps {
   access: PortalAccessPresentation;
-  index?: number;
   module: CommissionModule;
-  onSelect: () => void;
+  onSelect: (moduleSlug: string) => void;
 }
 
 function AccessIcon({ state }: Pick<PortalAccessPresentation, 'state'>) {
@@ -20,50 +19,58 @@ function AccessIcon({ state }: Pick<PortalAccessPresentation, 'state'>) {
   if (state === 'denied') return <LockKeyhole aria-hidden="true" />;
   if (state === 'login') return <LogIn aria-hidden="true" />;
   if (state === 'setup') return <Building2 aria-hidden="true" />;
-  return <ShieldCheck aria-hidden="true" />;
+  return <ArrowUpRight aria-hidden="true" />;
 }
 
 function getCommissionActionLabel(access: PortalAccessPresentation) {
   if (access.state === 'allowed') return 'Abrir frente';
-  if (access.state === 'loading') return 'Aguarde';
-  if (access.state === 'denied') return 'Indisponível';
-  if (access.state === 'login') return 'Identificar acesso';
-  if (access.state === 'setup') return 'Configurar acesso';
+  if (access.state === 'loading') return 'Verificando acesso';
+  if (access.state === 'denied') return 'Perfil sem acesso';
+  if (access.state === 'login') return 'Entrar para acessar';
+  if (access.state === 'setup') return 'Configurar organização';
   return access.label;
 }
 
-export default function CommissionCard({ access, index = 0, module, onSelect }: CommissionCardProps) {
+function CommissionCard({ access, module, onSelect }: CommissionCardProps) {
   const Icon = module.icon;
   const status = module.status as CommissionStatus;
   const actionLabel = getCommissionActionLabel(access);
+  const showModuleStatus = status !== 'active';
+  const statusId = `commission-access-status-${module.slug}`;
+  const statusDescription = showModuleStatus ? `${statusLabels[status]}. ` : '';
+  const accessDescription = access.detail ?? `${access.label}.`;
+  const stateDescription = access.target
+    ? accessDescription
+    : `${statusDescription}${accessDescription}`;
   const content = (
     <>
-      <span className="commission-access-card__order" aria-hidden="true">
-        {String(index + 1).padStart(2, '0')}
-      </span>
       <span className="commission-access-card__icon" data-tone={module.visual.tone} aria-hidden="true">
         <Icon />
       </span>
       <span className="commission-access-card__copy">
         <span className="commission-access-card__heading">
           <span className="commission-access-card__name">{module.name}</span>
-          <span className="commission-access-card__status" data-status={status}>
-            {statusLabels[status]}
-          </span>
+          {showModuleStatus && (
+            <span className="commission-access-card__status" data-status={status}>
+              {statusLabels[status]}
+            </span>
+          )}
         </span>
         <span className="commission-access-card__description">{module.description}</span>
         <span className="commission-access-card__footer">
-          <span className="commission-access-card__permission" data-state={access.state}>
-            <AccessIcon state={access.state} />
-            {access.label}
-          </span>
-          <span className="commission-access-card__action" aria-hidden="true">
+          <span className="commission-access-card__action" data-state={access.state} aria-hidden="true">
             <span>{actionLabel}</span>
             <span className="commission-access-card__direction">
-              {access.target ? <ArrowUpRight /> : <LockKeyhole />}
+              {access.target ? <ArrowUpRight /> : <AccessIcon state={access.state} />}
             </span>
           </span>
         </span>
+      </span>
+      <span
+        id={statusId}
+        className="portal-access-sr-only"
+      >
+        {stateDescription}
       </span>
     </>
   );
@@ -72,14 +79,14 @@ export default function CommissionCard({ access, index = 0, module, onSelect }: 
     return (
       <Link
         to={access.target}
-        onClick={onSelect}
+        onClick={() => onSelect(module.slug)}
         className="commission-access-card"
         data-status={status}
         data-access-state={access.state}
         data-tone={module.visual.tone}
         data-module={module.slug}
-        style={{ animationDelay: `${Math.min(index, 7) * 24}ms` } as CSSProperties}
-        aria-label={`${module.name}. ${statusLabels[status]}. ${access.label}.`}
+        aria-label={`${actionLabel}: ${module.name}${showModuleStatus ? `. ${statusLabels[status]}` : ''}`}
+        aria-describedby={statusId}
       >
         {content}
       </Link>
@@ -93,10 +100,24 @@ export default function CommissionCard({ access, index = 0, module, onSelect }: 
       data-access-state={access.state}
       data-tone={module.visual.tone}
       data-module={module.slug}
-      style={{ animationDelay: `${Math.min(index, 7) * 24}ms` } as CSSProperties}
-      aria-label={`${module.name}. ${statusLabels[status]}. ${access.label}. ${access.detail ?? ''}`}
+      aria-label={`${actionLabel}: ${module.name}`}
+      aria-describedby={statusId}
+      aria-disabled="true"
+      aria-busy={access.state === 'loading' ? 'true' : undefined}
     >
       {content}
     </article>
   );
 }
+
+export default memo(
+  CommissionCard,
+  (previous, next) => (
+    previous.module === next.module
+    && previous.onSelect === next.onSelect
+    && previous.access.state === next.access.state
+    && previous.access.label === next.access.label
+    && previous.access.detail === next.access.detail
+    && previous.access.target === next.access.target
+  ),
+);
