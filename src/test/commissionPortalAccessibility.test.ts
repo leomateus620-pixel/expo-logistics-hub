@@ -39,7 +39,6 @@ const normalTextPairs = [
   ['texto secundário no card', '#C6D2E0', '#041832'],
   ['texto sutil no agrupador', '#9EB0C5', '#041832'],
   ['destaque dourado', '#FFD35C', '#041832'],
-  ['texto do card Gestão Operacional', '#FFF7D9', '#03142B'],
   ['estado permitido', '#A7F3D0', '#08294D'],
   ['estado em estruturação', '#FFE69A', '#08294D'],
   ['estado sem permissão', '#FECACA', '#041832'],
@@ -82,8 +81,10 @@ describe('acessibilidade visual do hub Fenasoja', () => {
     expect(portalStyles).toContain('.portal-primary-entry__control:focus-visible');
     expect(portalStyles).toContain('.portal-destination-card:focus-visible');
     expect(portalStyles).toContain('.commission-access-card:focus-visible');
-    expect(portalStyles).toContain('.portal-soybean__root-halo');
-    expect(portalStyles).toContain('animation: portal-root-grow 900ms');
+    expect(portalStyles).not.toContain('.portal-soybean__roots');
+    expect(portalStyles).not.toContain('portal-root-grow');
+    expect(portalStyles).not.toContain('.portal-identity__card');
+    expect(portalStyles).not.toContain('portal-identity-card-arrive');
     expect(portalStyles).not.toContain('portal-root-node-breathe');
     expect(portalStyles).not.toContain('portal-root-scene-reveal');
     expect(portalWordmark).not.toMatch(/animateMotion|useReducedMotionPreference/);
@@ -136,11 +137,9 @@ describe('acessibilidade visual do hub Fenasoja', () => {
     }
   });
 
-  it('mantém o hero limpo com cinco raízes vetoriais e sem narrativa ilustrativa', () => {
-    expect(portalWordmark.match(/^\s+'M560 8/gm)).toHaveLength(5);
-    expect(portalWordmark).toContain('data-root-layer="halo"');
-    expect(portalWordmark).toContain('data-root-layer="core"');
-    expect(portalWordmark).toContain('portal-root-taper-mask');
+  it('mantém a soja como foco sem raízes, badge ou narrativa ilustrativa', () => {
+    expect(portalWordmark).not.toMatch(/portal-root|data-portal-root|portal-soybean__roots/);
+    expect(portalWordmark).not.toMatch(/portal-identity__card|Gestão Operacional/);
     expect(portalWordmark).not.toMatch(/data-root-scene|data-root-between|data-root-zone-boundary/);
     expect(portalWordmark).not.toMatch(/data-root-illustrations|data-world-soybean|animateMotion/);
     expect(portalWordmark).not.toMatch(/<img|<text|\.webp|portal-story/);
@@ -151,8 +150,10 @@ describe('acessibilidade visual do hub Fenasoja', () => {
     expect(portalPage).toContain("import { FenasojaPortalHero }");
     expect(portalPage).not.toContain('FenasojaCountdownHero');
     expect(portalStyles).toContain('.portal-official-countdown');
+    expect(portalStyles).toContain('grid-template-columns: minmax(0, 1.08fr) minmax(380px, 0.92fr)');
     expect(portalStyles).toContain('grid-template-columns: repeat(2, minmax(0, 1fr))');
     expect(portalStyles).toContain('min-height: 44px');
+    expect(portalStyles).toContain('min-height: 52px');
     expect(portalStyles).toContain('@media (min-width: 901px) and (max-height: 780px)');
     expect(countdownStyles).toContain('font-variant-numeric: tabular-nums lining-nums');
     expect(countdownDigits).toContain('aria-live="off"');
