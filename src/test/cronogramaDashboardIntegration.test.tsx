@@ -18,6 +18,7 @@ vi.mock('recharts', () => {
     Area: Element,
     BarChart: Chart,
     Bar: Element,
+    Cell: Element,
     CartesianGrid: Element,
     Line: Element,
     Tooltip: Element,
@@ -97,8 +98,7 @@ describe('Dashboard executivo do cronograma', () => {
     );
 
     expect(screen.getByRole('heading', { name: 'Prontidão Fenasoja 2028' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Planejado × realizado' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Desempenho por comissão' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Volume de eventos' })).toBeInTheDocument();
     expect(screen.getByText('Acesso gerencial necessário')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /Eventos atrasados: 1\./ }));
