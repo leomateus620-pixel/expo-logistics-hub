@@ -125,10 +125,11 @@ Deno.serve(async (req) => {
         const entityIds = (segmentEntities ?? []).map((row) => row.id);
         let lotCount = 0;
         for (let index = 0; index < entityIds.length; index += 50) {
-          const { count } = await client
+          const { count, error: lotError } = await client
             .from("commercial_lots")
             .select("id", { count: "exact", head: true })
             .in("entity_id", entityIds.slice(index, index + 50));
+          if (lotError) throw lotError;
           lotCount += count ?? 0;
         }
         const inventory = await client.rpc("get_commission_map_segment_inventory", {
