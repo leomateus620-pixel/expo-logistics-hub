@@ -56,8 +56,8 @@ describe('Volume de eventos', () => {
     expect(screen.getByRole('heading', { name: 'Volume de eventos' })).toBeInTheDocument();
     expect(screen.getAllByText(/3 eventos/).length).toBeGreaterThan(0);
 
-    fireEvent.click(screen.getByRole('button', { name: /12 meses/ }));
-    expect(screen.getByRole('button', { name: /12 meses/ })).toHaveAttribute('data-active', 'true');
+    fireEvent.click(screen.getByRole('button', { name: '1 ano' }));
+    expect(screen.getByRole('button', { name: '1 ano' })).toHaveAttribute('data-active', 'true');
   });
 
   it('faz drill-down mensal e envia apenas os eventos daquele mês', () => {
