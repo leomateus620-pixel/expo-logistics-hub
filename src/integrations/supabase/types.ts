@@ -7137,6 +7137,10 @@ export type Database = {
           user_id: string
         }[]
       }
+      map_entity_inherits_segment: {
+        Args: { _entity_id: string; _segment_id: string }
+        Returns: boolean
+      }
       map_geometry_overlaps_sellable: {
         Args: {
           _excluded_entity_ids?: string[]
@@ -7266,6 +7270,10 @@ export type Database = {
       reset_transport_tracking: {
         Args: { _transport_id: string }
         Returns: undefined
+      }
+      resolve_commission_map_segment_slug: {
+        Args: { _metadata: Json; _public_identifier: string }
+        Returns: string
       }
       rollback_exporural_reference_2026: {
         Args: { p_org_id: string; p_reason: string; p_snapshot_id: string }
