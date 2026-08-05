@@ -254,6 +254,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "commercial_lots_entity_project_fk"
+            columns: ["entity_id", "project_id"]
+            isOneToOne: false
+            referencedRelation: "map_entities"
+            referencedColumns: ["id", "project_id"]
+          },
+          {
             foreignKeyName: "commercial_lots_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
@@ -2621,6 +2628,7 @@ export type Database = {
           parent_entity_id: string | null
           project_id: string
           public_identifier: string
+          segment_id: string | null
           updated_at: string
           updated_by: string | null
           verification_status: string
@@ -2639,6 +2647,7 @@ export type Database = {
           parent_entity_id?: string | null
           project_id: string
           public_identifier: string
+          segment_id?: string | null
           updated_at?: string
           updated_by?: string | null
           verification_status?: string
@@ -2657,6 +2666,7 @@ export type Database = {
           parent_entity_id?: string | null
           project_id?: string
           public_identifier?: string
+          segment_id?: string | null
           updated_at?: string
           updated_by?: string | null
           verification_status?: string
@@ -2668,6 +2678,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "map_layers"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "map_entities_layer_project_fk"
+            columns: ["layer_id", "project_id"]
+            isOneToOne: false
+            referencedRelation: "map_layers"
+            referencedColumns: ["id", "project_id"]
           },
           {
             foreignKeyName: "map_entities_parent_entity_id_fkey"
@@ -2682,6 +2699,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "map_projects"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "map_entities_segment_id_fkey"
+            columns: ["segment_id"]
+            isOneToOne: false
+            referencedRelation: "map_segments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "map_entities_segment_project_fk"
+            columns: ["segment_id", "project_id"]
+            isOneToOne: false
+            referencedRelation: "map_segments"
+            referencedColumns: ["id", "project_id"]
           },
         ]
       }
@@ -2751,6 +2782,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "map_projects"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "map_geometries_entity_project_fk"
+            columns: ["entity_id", "project_id"]
+            isOneToOne: false
+            referencedRelation: "map_entities"
+            referencedColumns: ["id", "project_id"]
           },
         ]
       }
@@ -3032,6 +3070,62 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "map_reference_migration_snapshots_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "map_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      map_segments: {
+        Row: {
+          boundary_data: Json
+          camera_config: Json
+          created_at: string
+          display_name: string
+          id: string
+          is_active: boolean
+          name: string
+          project_id: string
+          required_capability: string
+          slug: string
+          source_reference: string
+          updated_at: string
+          visual_config: Json
+        }
+        Insert: {
+          boundary_data?: Json
+          camera_config?: Json
+          created_at?: string
+          display_name: string
+          id?: string
+          is_active?: boolean
+          name: string
+          project_id: string
+          required_capability: string
+          slug: string
+          source_reference: string
+          updated_at?: string
+          visual_config?: Json
+        }
+        Update: {
+          boundary_data?: Json
+          camera_config?: Json
+          created_at?: string
+          display_name?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          project_id?: string
+          required_capability?: string
+          slug?: string
+          source_reference?: string
+          updated_at?: string
+          visual_config?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "map_segments_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "map_projects"
@@ -6993,9 +7087,25 @@ export type Database = {
         Args: { _event_id: string; _operation: string }
         Returns: undefined
       }
+      ensure_commission_map_segments: {
+        Args: { _project_id: string }
+        Returns: undefined
+      }
       expire_commercial_reservations: {
         Args: { p_org_id: string }
         Returns: number
+      }
+      expire_commission_segment_reservations: {
+        Args: { p_segment_id: string }
+        Returns: number
+      }
+      get_commission_map_segment_inventory: {
+        Args: { p_segment_id: string }
+        Returns: {
+          expected_entity_count: number
+          expected_lot_count: number
+          lineage_delta: number
+        }[]
       }
       get_user_org_ids: { Args: { _user_id: string }; Returns: string[] }
       get_user_org_role: {
@@ -7039,6 +7149,18 @@ export type Database = {
           user_id: string
         }[]
       }
+      map_can_access_segment: {
+        Args: { _segment_id: string }
+        Returns: boolean
+      }
+      map_can_view_any_segment: {
+        Args: { _project_id: string }
+        Returns: boolean
+      }
+      map_entity_inherits_segment: {
+        Args: { _entity_id: string; _segment_id: string }
+        Returns: boolean
+      }
       map_geometry_overlaps_sellable: {
         Args: {
           _excluded_entity_ids?: string[]
@@ -7052,6 +7174,22 @@ export type Database = {
         Returns: boolean
       }
       map_polygon_from_geojson: { Args: { _geometry: Json }; Returns: unknown }
+      map_segment_baseline_count: {
+        Args: { _boundary_data: Json; _key: string }
+        Returns: number
+      }
+      map_segment_is_complete: {
+        Args: { _segment_id: string }
+        Returns: boolean
+      }
+      map_segment_lineage_baseline: {
+        Args: { _boundary_data: Json }
+        Returns: string
+      }
+      map_segment_lineage_inventory_delta: {
+        Args: { _segment_id: string }
+        Returns: number
+      }
       merge_commercial_lots: {
         Args: {
           p_display_name: string
@@ -7119,6 +7257,10 @@ export type Database = {
           read_ct: number
         }[]
       }
+      reconcile_commission_map_lineage: {
+        Args: { _project_id: string }
+        Returns: undefined
+      }
       reconcile_google_sync_event: {
         Args: { _event_id: string; _org_id: string }
         Returns: undefined
@@ -7168,6 +7310,10 @@ export type Database = {
       reset_transport_tracking: {
         Args: { _transport_id: string }
         Returns: undefined
+      }
+      resolve_commission_map_segment_slug: {
+        Args: { _metadata: Json; _public_identifier: string }
+        Returns: string
       }
       rollback_exporural_reference_2026: {
         Args: { p_org_id: string; p_reason: string; p_snapshot_id: string }
@@ -7281,6 +7427,10 @@ export type Database = {
           p_reason: string
         }
         Returns: string
+      }
+      validate_commercial_map_segments: {
+        Args: { _project_id: string }
+        Returns: Json
       }
       venue_assert_capability: {
         Args: { _capability: string; _org_id: string }
