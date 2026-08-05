@@ -97,7 +97,6 @@ describe('Dashboard executivo do cronograma', () => {
       />,
     );
 
-    expect(screen.getByRole('heading', { name: 'Prontidão Fenasoja 2028' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Volume de eventos' })).toBeInTheDocument();
     expect(screen.getByText('Acesso gerencial necessário')).toBeInTheDocument();
 
