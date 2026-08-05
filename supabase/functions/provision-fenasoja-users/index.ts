@@ -8,11 +8,48 @@ const corsHeaders = {
 };
 
 const ORG_ID = "985888b8-155f-4bbe-b6b9-6bef2893d99b";
-const PASSWORD = "Fenaosja@2028";
 
-const USERS = [
-  { email: "fer.secklereich@gmail.com", full_name: "Fernanda Secklereich" },
-  { email: "fenasojafeira@gmail.com", full_name: "Cléo — FENASOJA Feira" },
+interface ProvisionUser {
+  email: string;
+  full_name: string;
+  password: string;
+  role: "admin" | "gestor" | "operador" | "leitura";
+  cargo?: string | null;
+  is_core_team?: boolean;
+  capabilities: string[];
+  /** Legacy volunteer rows (other user ids) with these names get deactivated. */
+  deactivate_duplicates?: string[];
+}
+
+const USERS: ProvisionUser[] = [
+  {
+    email: "rvlugoch@gmail.com",
+    full_name: "Roque Vanderlei Lugoch",
+    password: "Fenasoja@2028",
+    role: "gestor",
+    cargo: "Coordenador Financeiro",
+    is_core_team: true,
+    capabilities: [
+      "full_access",
+      "mobility_access",
+      "cronograma_eventos_access",
+      "cronograma_reminder_all",
+      "venue_events_access",
+      "venue_events_full_access",
+      "logistica_access",
+      "gastronomia_access",
+      "infraestrutura_access",
+      "servicos_access",
+      "arte_cultura_access",
+      "novas_geracoes_access",
+      "seguranca_access",
+      "limpeza_access",
+      "exporural_access",
+      "industria_comercio_servicos_access",
+      "map.view",
+    ],
+    deactivate_duplicates: ["ROQUE VANDERLEI LUGOCH"],
+  },
 ];
 
 Deno.serve(async (req) => {
@@ -39,7 +76,7 @@ Deno.serve(async (req) => {
 
     const { data: created, error: createErr } = await admin.auth.admin.createUser({
       email: u.email,
-      password: PASSWORD,
+      password: u.password,
       email_confirm: true,
       user_metadata: { full_name: u.full_name },
     });
@@ -51,7 +88,7 @@ Deno.serve(async (req) => {
       if (found) {
         userId = found.id;
         await admin.auth.admin.updateUserById(found.id, {
-          password: PASSWORD,
+          password: u.password,
           email_confirm: true,
           user_metadata: { full_name: u.full_name },
         });
@@ -75,29 +112,39 @@ Deno.serve(async (req) => {
       { onConflict: "user_id,role" },
     );
 
-    // org_members: insert if missing, else ensure active + operador
+    const memberPayload = {
+      role: u.role,
+      nome_exibicao: u.full_name,
+      cargo: u.cargo ?? null,
+      is_active: true,
+      is_core_team: u.is_core_team ?? false,
+    };
+
     const { data: existingMember } = await admin.from("org_members")
-      .select("user_id, role, is_active")
+      .select("id")
       .eq("org_id", ORG_ID).eq("user_id", userId).maybeSingle();
 
-    if (!existingMember) {
-      await admin.from("org_members").insert({
-        org_id: ORG_ID,
-        user_id: userId,
-        role: "operador",
-        nome_exibicao: u.full_name,
-        is_active: true,
-      });
-    } else if (!existingMember.is_active) {
-      await admin.from("org_members").update({ is_active: true, role: "operador" })
-        .eq("org_id", ORG_ID).eq("user_id", userId);
+    if (existingMember) {
+      await admin.from("org_members").update(memberPayload).eq("id", existingMember.id);
+    } else {
+      await admin.from("org_members").insert({ org_id: ORG_ID, user_id: userId, ...memberPayload });
     }
 
-    // Grant full_access capability so Google Calendar backfill includes ALL org events.
-    await admin.from("user_capabilities").upsert(
-      { user_id: userId, org_id: ORG_ID, capability: "full_access" },
-      { onConflict: "user_id,org_id,capability" },
-    );
+    // Deactivate legacy duplicated volunteer rows for the same person.
+    for (const name of u.deactivate_duplicates ?? []) {
+      await admin.from("org_members")
+        .update({ is_active: false })
+        .eq("org_id", ORG_ID)
+        .eq("nome_exibicao", name)
+        .neq("user_id", userId);
+    }
+
+    for (const capability of u.capabilities) {
+      await admin.from("user_capabilities").upsert(
+        { user_id: userId, org_id: ORG_ID, capability },
+        { onConflict: "user_id,org_id,capability" },
+      );
+    }
 
     results.push({ email: u.email, user_id: userId, ok: true });
   }
