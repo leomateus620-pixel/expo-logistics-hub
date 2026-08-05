@@ -2928,6 +2928,7 @@ export type Database = {
           name: string
           org_id: string
           reference_height: number
+          reference_revision: string | null
           reference_width: number
           updated_at: string
           updated_by: string | null
@@ -2944,6 +2945,7 @@ export type Database = {
           name: string
           org_id: string
           reference_height?: number
+          reference_revision?: string | null
           reference_width?: number
           updated_at?: string
           updated_by?: string | null
@@ -2960,6 +2962,7 @@ export type Database = {
           name?: string
           org_id?: string
           reference_height?: number
+          reference_revision?: string | null
           reference_width?: number
           updated_at?: string
           updated_by?: string | null
@@ -2970,6 +2973,68 @@ export type Database = {
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      map_reference_migration_snapshots: {
+        Row: {
+          applied_at: string | null
+          apply_result: Json
+          area_code: string
+          created_at: string
+          created_by: string | null
+          id: string
+          org_id: string
+          payload_hash: string
+          project_id: string
+          rollback_reason: string | null
+          rolled_back_at: string | null
+          rolled_back_by: string | null
+          snapshot: Json
+          source_revision: string
+          status: string
+        }
+        Insert: {
+          applied_at?: string | null
+          apply_result?: Json
+          area_code: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          org_id: string
+          payload_hash: string
+          project_id: string
+          rollback_reason?: string | null
+          rolled_back_at?: string | null
+          rolled_back_by?: string | null
+          snapshot: Json
+          source_revision: string
+          status?: string
+        }
+        Update: {
+          applied_at?: string | null
+          apply_result?: Json
+          area_code?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          org_id?: string
+          payload_hash?: string
+          project_id?: string
+          rollback_reason?: string | null
+          rolled_back_at?: string | null
+          rolled_back_by?: string | null
+          snapshot?: Json
+          source_revision?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "map_reference_migration_snapshots_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "map_projects"
             referencedColumns: ["id"]
           },
         ]
@@ -6800,6 +6865,15 @@ export type Database = {
         Args: { _org_id: string }
         Returns: undefined
       }
+      apply_exporural_reference_2026: {
+        Args: {
+          p_entities: Json
+          p_lots: Json
+          p_org_id: string
+          p_source_revision: string
+        }
+        Returns: Json
+      }
       audit_check_rls_status: {
         Args: never
         Returns: {
@@ -6813,6 +6887,16 @@ export type Database = {
           policy_count: number
           table_name: string
         }[]
+      }
+      bootstrap_commercial_map: {
+        Args: {
+          p_calibration: Json
+          p_entities: Json
+          p_layers: Json
+          p_org_id: string
+          p_project: Json
+        }
+        Returns: string
       }
       can_view_commercial_map: { Args: { _org_id: string }; Returns: boolean }
       claim_google_sync_batch: {
@@ -6850,6 +6934,35 @@ export type Database = {
         }
         Returns: boolean
       }
+      create_commercial_lot: {
+        Args: {
+          p_area_validation_status: string
+          p_asking_price: number
+          p_block: string
+          p_calibration_version: number
+          p_classification: string
+          p_depth_meters: number
+          p_description: string
+          p_display_name: string
+          p_elevation: number
+          p_extrusion_height: number
+          p_fixed_total: number
+          p_frontage_meters: number
+          p_geometry: Json
+          p_layer_id: string
+          p_level_label: string
+          p_lot_number: string
+          p_minimum_price: number
+          p_official_area_sqm: number
+          p_parent_entity_id: string
+          p_price_per_sqm: number
+          p_pricing_mode: string
+          p_project_id: string
+          p_public_identifier: string
+          p_reason: string
+        }
+        Returns: string
+      }
       create_org_with_member: { Args: { org_nome: string }; Returns: string }
       cronograma_delete_subevent: {
         Args: { expected_lock_version?: number; subevent_id: string }
@@ -6879,6 +6992,10 @@ export type Database = {
       enqueue_google_sync: {
         Args: { _event_id: string; _operation: string }
         Returns: undefined
+      }
+      expire_commercial_reservations: {
+        Args: { p_org_id: string }
+        Returns: number
       }
       get_user_org_ids: { Args: { _user_id: string }; Returns: string[] }
       get_user_org_role: {
@@ -6935,6 +7052,16 @@ export type Database = {
         Returns: boolean
       }
       map_polygon_from_geojson: { Args: { _geometry: Json }; Returns: unknown }
+      merge_commercial_lots: {
+        Args: {
+          p_display_name: string
+          p_geometry: Json
+          p_public_identifier: string
+          p_reason: string
+          p_source_lot_ids: string[]
+        }
+        Returns: Json
+      }
       move_to_dlq: {
         Args: {
           dlq_name: string
@@ -6942,6 +7069,10 @@ export type Database = {
           payload: Json
           source_queue: string
         }
+        Returns: number
+      }
+      publish_commercial_map: {
+        Args: { p_project_id: string; p_reason: string }
         Returns: number
       }
       publish_transport_location:
@@ -6996,13 +7127,115 @@ export type Database = {
         Args: { _org_id: string; _user_id: string }
         Returns: undefined
       }
+      register_commercial_sale: {
+        Args: {
+          p_buyer_name: string
+          p_contract_number: string
+          p_document_number: string
+          p_lot_id: string
+          p_negotiated_value: number
+          p_notes: string
+          p_payment_status: string
+          p_sale_date: string
+          p_salesperson_name: string
+        }
+        Returns: string
+      }
+      register_lot_contract_version: {
+        Args: {
+          p_contract_number: string
+          p_file_size: number
+          p_lot_id: string
+          p_mime_type: string
+          p_original_name: string
+          p_storage_path: string
+        }
+        Returns: string
+      }
+      reserve_commercial_lot: {
+        Args: {
+          p_company_name: string
+          p_contact_name: string
+          p_document_number: string
+          p_email: string
+          p_expires_at: string
+          p_lot_id: string
+          p_notes: string
+          p_phone: string
+        }
+        Returns: string
+      }
       reset_transport_tracking: {
         Args: { _transport_id: string }
         Returns: undefined
       }
+      save_map_calibration: {
+        Args: {
+          p_image_offset_x: number
+          p_image_offset_y: number
+          p_image_rotation_degrees: number
+          p_image_scale_x: number
+          p_image_scale_y: number
+          p_is_locked: boolean
+          p_known_distance_meters: number
+          p_map_units_per_meter: number
+          p_opacity: number
+          p_point_a: Json
+          p_point_b: Json
+          p_project_id: string
+          p_reason: string
+          p_reference_image_path: string
+          p_status: string
+        }
+        Returns: number
+      }
+      save_map_geometry: {
+        Args: {
+          p_change_reason: string
+          p_elevation: number
+          p_expected_version: number
+          p_extrusion_height: number
+          p_geometry: Json
+          p_geometry_id: string
+          p_rotation: number
+        }
+        Returns: number
+      }
+      set_map_entity_verification: {
+        Args: { p_entity_id: string; p_reason: string; p_status: string }
+        Returns: string
+      }
+      set_map_layer_lock: {
+        Args: { p_is_locked: boolean; p_layer_id: string; p_reason: string }
+        Returns: boolean
+      }
       set_transport_guests: {
         Args: { _guest_ids: string[]; _org_id: string; _transport_id: string }
         Returns: undefined
+      }
+      split_commercial_lot: {
+        Args: {
+          p_first_geometry: Json
+          p_first_identifier: string
+          p_first_name: string
+          p_reason: string
+          p_second_geometry: Json
+          p_second_identifier: string
+          p_second_name: string
+          p_source_lot_id: string
+        }
+        Returns: Json
+      }
+      start_commercial_negotiation: {
+        Args: {
+          p_company_name: string
+          p_contact_name: string
+          p_document_number: string
+          p_lot_id: string
+          p_notes: string
+          p_proposed_value: number
+        }
+        Returns: string
       }
       submit_public_mobility_form: {
         Args: {
@@ -7016,6 +7249,17 @@ export type Database = {
         }
         Returns: string
       }
+      sync_commercial_map_reference_2026: {
+        Args: {
+          p_calibration: Json
+          p_entities: Json
+          p_layers: Json
+          p_lots: Json
+          p_org_id: string
+          p_project: Json
+        }
+        Returns: string
+      }
       sync_internal_mobility_form: {
         Args: { _form_id: string }
         Returns: undefined
@@ -7024,6 +7268,15 @@ export type Database = {
       sync_public_mobility_form: {
         Args: { _form_id: string }
         Returns: undefined
+      }
+      update_commercial_lot: {
+        Args: {
+          p_expected_updated_at: string
+          p_lot_id: string
+          p_patch: Json
+          p_reason: string
+        }
+        Returns: string
       }
       venue_assert_capability: {
         Args: { _capability: string; _org_id: string }
