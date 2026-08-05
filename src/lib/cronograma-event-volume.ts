@@ -392,7 +392,9 @@ export function buildEventVolumeModel({
   }
 
   const busiestDays = getBusiestDates(inRange, 3);
-  const totalEvents = inRange.length;
+  // Total sempre derivado das barras visíveis, garantindo igualdade com o gráfico.
+  const totalEvents = buckets.reduce((sum, bucket) => sum + bucket.total, 0);
+
 
   return {
     granularity,
