@@ -120,8 +120,8 @@ Deno.serve(async (req) => {
           .eq("segment_id", segment.id);
         const { count: lotCount } = await client
           .from("commercial_lots")
-          .select("id", { count: "exact", head: true })
-          .eq("segment_id", segment.id);
+          .select("id, entity:map_entities!inner(segment_id)", { count: "exact", head: true })
+          .eq("entity.segment_id", segment.id);
         const inventory = await client.rpc("get_commission_map_segment_inventory", {
           p_segment_id: segment.id,
         });
