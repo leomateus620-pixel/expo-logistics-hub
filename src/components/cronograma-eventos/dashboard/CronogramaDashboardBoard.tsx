@@ -746,7 +746,6 @@ export default function CronogramaDashboardBoard({
         </div>
       )}
 
-      <ReadinessHero model={model} />
       <ExecutiveKpis model={model} onDrilldown={onDrilldown} />
 
       <EventVolumePanel
