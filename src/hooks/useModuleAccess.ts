@@ -19,14 +19,20 @@ export function resolveModuleAccess(
   const hasSpecificCapability = module ? capSet.has(module.capability) : false;
   const hasLegacyLogisticsAccess = module?.slug === 'logistica'
     && (hasFullAccess || hasAdminAccess || capSet.has('logistica_access'));
+  // Sensitive modules (Financeiro Gerencial) require an explicit financial grant:
+  // generic full access / gestor role is not enough.
+  const hasSensitiveAccess = myRole === 'admin'
+    || capSet.has('admin_access')
+    || capSet.has('financial_access');
 
   const canAccess = adminArea
     ? hasAdminAccess
     : module?.sensitive
-      ? hasAdminAccess || capSet.has('financial_access')
+      ? hasSensitiveAccess
       : hasAdminAccess || hasSpecificCapability || hasLegacyLogisticsAccess;
 
   return { canAccess, hasAdminAccess };
+
 }
 
 export function useModuleAccess(module?: CommissionModule, adminArea = false) {
