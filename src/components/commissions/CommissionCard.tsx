@@ -31,10 +31,20 @@ function getCommissionActionLabel(access: PortalAccessPresentation) {
   return access.label;
 }
 
+function getCommissionVisualActionLabel(access: PortalAccessPresentation) {
+  if (access.state === 'allowed') return 'Abrir frente';
+  if (access.state === 'loading') return 'Verificando';
+  if (access.state === 'denied') return 'Sem acesso';
+  if (access.state === 'login') return 'Entrar';
+  if (access.state === 'setup') return 'Configurar';
+  return access.label;
+}
+
 function CommissionCard({ access, module, onSelect }: CommissionCardProps) {
   const Icon = module.icon;
   const status = module.status as CommissionStatus;
   const actionLabel = getCommissionActionLabel(access);
+  const visualActionLabel = getCommissionVisualActionLabel(access);
   const showModuleStatus = status !== 'active';
   const statusId = `commission-access-status-${module.slug}`;
   const statusDescription = showModuleStatus ? `${statusLabels[status]}. ` : '';
@@ -56,10 +66,9 @@ function CommissionCard({ access, module, onSelect }: CommissionCardProps) {
             </span>
           )}
         </span>
-        <span className="commission-access-card__description">{module.description}</span>
         <span className="commission-access-card__footer">
           <span className="commission-access-card__action" data-state={access.state} aria-hidden="true">
-            <span>{actionLabel}</span>
+            <span>{visualActionLabel}</span>
             <span className="commission-access-card__direction">
               {access.target ? <ArrowUpRight /> : <AccessIcon state={access.state} />}
             </span>

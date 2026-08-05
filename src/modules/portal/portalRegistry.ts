@@ -80,6 +80,12 @@ if (!financeModule) {
 
 export const financePortalModule: CommissionModule = financeModule;
 
+const highlightedCommissionOrder = new Map([
+  ['logistica', 0],
+  ['exporural', 1],
+  ['industria-comercio-servicos', 2],
+]);
+
 export const portalPrimaryEntries: PortalPrimaryEntry[] = [
   {
     id: 'agenda',
@@ -118,7 +124,19 @@ export const portalPrimaryEntries: PortalPrimaryEntry[] = [
 ];
 
 export function getPortalCommissionModules() {
-  return getPublicCommissionModules().filter((module) => module.slug !== financePortalModule.slug);
+  return getPublicCommissionModules()
+    .filter((module) => module.slug !== financePortalModule.slug)
+    .sort((first, second) => {
+      const firstPosition = highlightedCommissionOrder.get(first.slug);
+      const secondPosition = highlightedCommissionOrder.get(second.slug);
+
+      if (firstPosition !== undefined || secondPosition !== undefined) {
+        return (firstPosition ?? Number.POSITIVE_INFINITY)
+          - (secondPosition ?? Number.POSITIVE_INFINITY);
+      }
+
+      return first.order - second.order;
+    });
 }
 
 export function getCommissionLoginPath(module: CommissionModule) {

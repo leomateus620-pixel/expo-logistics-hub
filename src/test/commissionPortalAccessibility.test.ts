@@ -109,11 +109,6 @@ normalTextPairs.push(
     cssHexProperty('.fenasoja-portal', '--access-destination-description'),
     cssHexProperty('.fenasoja-portal', '--access-destination-surface'),
   ],
-  [
-    'descrição de comissão',
-    cssHexProperty('.fenasoja-portal', '--access-commission-description'),
-    cssHexProperty('.fenasoja-portal', '--access-commission-surface'),
-  ],
 );
 
 const graphicalPairs: Array<readonly [string, string, string]> = primaryPalettes.map(

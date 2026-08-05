@@ -298,11 +298,26 @@ describe('CommissionPortalPage', () => {
 
     const commissionCards = container.querySelectorAll('[data-module]');
     expect(commissionCards).toHaveLength(10);
+    expect(Array.from(commissionCards, (card) => card.getAttribute('data-module'))).toEqual([
+      'logistica',
+      'exporural',
+      'industria-comercio-servicos',
+      'gastronomia',
+      'infraestrutura',
+      'servicos',
+      'arte-cultura',
+      'novas-geracoes',
+      'seguranca',
+      'limpeza',
+    ]);
     expect(container.querySelector('[data-module="logistica"]')).toBeInTheDocument();
     expect(container.querySelector('[data-module="gastronomia"]')).toBeInTheDocument();
     expect(container.querySelector('[data-module="exporural"]')).toBeInTheDocument();
     expect(container.querySelector('[data-module="industria-comercio-servicos"]')).toBeInTheDocument();
     expect(container.querySelector('[data-module="financeiro-gerencial"]')).not.toBeInTheDocument();
+    expect(screen.queryByText(/Transportes, frota, carrinhos/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Gestão comercial dedicada às Quadras/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Pavilhões, quadras e lotes/)).not.toBeInTheDocument();
 
     expect(screen.getByRole('link', { name: 'Entrar para acessar: Exporural' })).toHaveAttribute(
       'href',

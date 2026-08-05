@@ -957,16 +957,6 @@
   color: #a7f3d0;
 }
 
-.commission-access-card__description {
-  display: -webkit-box;
-  overflow: hidden;
-  color: #afc0d2;
-  font-size: 0.66rem;
-  line-height: 1.43;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-}
-
 .commission-access-card__permission {
   display: inline-flex;
   align-items: center;
@@ -1372,10 +1362,6 @@
   .commission-access-card {
     min-height: 104px;
     grid-template-columns: 38px minmax(0, 1fr) 22px;
-  }
-
-  .commission-access-card__description {
-    -webkit-line-clamp: 2;
   }
 
   .fenasoja-portal__footer {

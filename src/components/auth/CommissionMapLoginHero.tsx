@@ -1,4 +1,3 @@
-import { Factory, MapPinned, Tractor } from 'lucide-react';
 import { FenasojaBrand } from '@/components/brand/FenasojaBrand';
 import type { CommissionMapPortalConfig } from '@/modules/commissions/commissionMapPortalRegistry';
 
@@ -50,7 +49,6 @@ function IndustryTitle() {
 
 export function CommissionMapLoginHero({ portal }: CommissionMapLoginHeroProps) {
   const isRural = portal.theme === 'rural';
-  const ContextIcon = isRural ? Tractor : Factory;
 
   return (
     <section
@@ -62,24 +60,12 @@ export function CommissionMapLoginHero({ portal }: CommissionMapLoginHeroProps) 
         className="auth-hero__brand"
         scale="display"
         subtitle="Gestão comercial por comissão"
+        soybeanWordmark
         tone="dark"
       />
 
       <div className="commission-login-identity">
-        <p className="commission-login-eyebrow">
-          <ContextIcon aria-hidden="true" />
-          Comissão Fenasoja 2028
-        </p>
-
         {isRural ? <ExporuralTitle /> : <IndustryTitle />}
-
-        <div className="commission-login-scope">
-          <MapPinned aria-hidden="true" />
-          <span>
-            <strong>Mapa Comercial</strong>
-            Segmento exclusivo e acesso protegido
-          </span>
-        </div>
       </div>
     </section>
   );

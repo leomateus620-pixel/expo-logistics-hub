@@ -1296,7 +1296,11 @@
 
 .auth-hero--commission-map {
   position: relative;
+  display: flex;
+  min-height: min(34rem, calc(100svh - 2.5rem));
   max-width: 45rem;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .auth-hero--commission-map .auth-hero__brand {
@@ -1305,41 +1309,42 @@
     drop-shadow(0 0 20px rgb(191 156 80 / 0.065));
 }
 
+.auth-hero--commission-map .fenasoja-brand__wordmark--soybean {
+  gap: 0;
+}
+
+.auth-hero--commission-map .fenasoja-brand__inline-soybean {
+  display: inline-grid;
+  width: 0.7em;
+  height: 0.95em;
+  flex: 0 0 auto;
+  place-items: center;
+  margin: 0 -0.012em 0 -0.028em;
+  transform: translateY(0.045em);
+}
+
+.auth-hero--commission-map .fenasoja-brand__inline-soybean-grain {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter:
+    drop-shadow(0 0 0.16em rgb(255 211 92 / 0.34))
+    drop-shadow(0 0.18em 0.18em rgb(4 19 12 / 0.28));
+}
+
+.auth-hero--commission-map .fenasoja-brand__inline-soybean-aura {
+  opacity: 0.82;
+}
+
 .commission-login-identity {
-  margin-top: clamp(2.25rem, 6vh, 4.25rem);
-}
-
-.commission-login-eyebrow {
-  display: inline-flex;
-  min-height: 2rem;
-  align-items: center;
-  gap: 0.55rem;
-  border: 1px solid rgb(240 231 204 / 0.15);
-  border-radius: 999px;
-  padding: 0.36rem 0.72rem;
-  background: rgb(5 24 17 / 0.26);
-  color: rgb(235 221 180 / 0.88);
-  font-size: 0.68rem;
-  font-weight: 820;
-  letter-spacing: 0.135em;
-  text-transform: uppercase;
-}
-
-[data-commission-theme='industry'] .commission-login-eyebrow {
-  background: rgb(5 21 32 / 0.32);
-  color: rgb(214 227 234 / 0.9);
-}
-
-.commission-login-eyebrow svg {
-  width: 0.95rem;
-  height: 0.95rem;
-  color: var(--commission-login-accent);
+  margin-top: clamp(3.75rem, 8vh, 5.5rem);
 }
 
 .commission-login-title {
   position: relative;
   z-index: 1;
-  margin-top: 1.05rem;
+  margin-top: 0;
   color: rgb(247 242 226);
   font-size: clamp(4rem, 7.1vw, 6.5rem);
   font-weight: 910;
@@ -1491,38 +1496,6 @@
 .commission-login-industry-structure i:nth-child(3) { left: 52%; --structure-height: 58%; }
 .commission-login-industry-structure i:nth-child(4) { left: 76%; --structure-height: 78%; }
 
-.commission-login-scope {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.72rem;
-  margin-top: 1.55rem;
-  color: rgb(225 231 211 / 0.76);
-}
-
-[data-commission-theme='industry'] .commission-login-scope {
-  color: rgb(216 228 234 / 0.76);
-}
-
-.commission-login-scope > svg {
-  width: 1.25rem;
-  height: 1.25rem;
-  color: var(--commission-login-accent);
-}
-
-.commission-login-scope span {
-  display: grid;
-  gap: 0.16rem;
-  font-size: 0.72rem;
-  letter-spacing: 0.025em;
-}
-
-.commission-login-scope strong {
-  color: rgb(248 242 224);
-  font-size: 0.79rem;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
 .auth-screen[data-commission-theme] .auth-panel {
   width: min(100%, 25.5rem);
   justify-self: end;
@@ -1598,6 +1571,7 @@
 .auth-screen[data-commission-theme] .auth-submit {
   border-color: var(--commission-login-focus);
   background: linear-gradient(112deg, var(--commission-login-focus), color-mix(in srgb, var(--commission-login-focus) 78%, black));
+  color: rgb(255 255 255);
   box-shadow:
     0 14px 26px -16px color-mix(in srgb, var(--commission-login-focus) 74%, transparent),
     inset 0 1px rgb(255 255 255 / 0.22);
@@ -1621,6 +1595,12 @@
 
 .auth-screen[data-commission-theme] .auth-back-link {
   min-height: 2.75rem;
+  color: var(--commission-login-focus);
+}
+
+.auth-screen[data-commission-theme] .auth-back-link:hover {
+  background: color-mix(in srgb, var(--commission-login-focus) 9%, white);
+  color: color-mix(in srgb, var(--commission-login-focus) 76%, black);
 }
 
 .auth-screen--invalid-context {
@@ -1665,6 +1645,7 @@
   }
 
   .auth-hero--commission-map {
+    min-height: 0;
     max-width: none;
     padding-block: 0;
   }
@@ -1684,10 +1665,6 @@
 
   .commission-login-industry-structure {
     height: 8.6rem;
-  }
-
-  .commission-login-scope {
-    margin-top: 1rem;
   }
 
   .auth-screen[data-commission-theme] .auth-panel {
@@ -1722,14 +1699,7 @@
     margin-top: 0.75rem;
   }
 
-  .commission-login-eyebrow {
-    min-height: 1.75rem;
-    padding: 0.28rem 0.58rem;
-    font-size: 0.58rem;
-  }
-
   .commission-login-title {
-    margin-top: 0.65rem;
     font-size: clamp(2.72rem, 14vw, 3.75rem);
   }
 
@@ -1751,18 +1721,6 @@
 
   .commission-login-title__harvest {
     opacity: 0.74;
-  }
-
-  .commission-login-scope {
-    margin-top: 0.7rem;
-  }
-
-  .commission-login-scope span {
-    font-size: 0.64rem;
-  }
-
-  .commission-login-scope strong {
-    font-size: 0.69rem;
   }
 
   .auth-screen[data-commission-theme] .auth-panel {
@@ -1789,10 +1747,6 @@
 }
 
 @media (max-width: 374px), (max-height: 760px) and (max-width: 639px) {
-  .commission-login-scope {
-    display: none;
-  }
-
   .commission-login-title {
     font-size: clamp(2.45rem, 13.5vw, 3.25rem);
   }
@@ -1806,7 +1760,6 @@
   .commission-login-identity { margin-top: 1.5rem; }
   .commission-login-title { font-size: clamp(3.55rem, 5.8vw, 5rem); }
   .commission-login-title--industry { font-size: clamp(3.05rem, 5vw, 4.35rem); }
-  .commission-login-scope { margin-top: 1rem; }
   .auth-screen[data-commission-theme] .auth-panel { padding: 1.3rem; }
   .auth-screen[data-commission-theme] .auth-panel__heading { margin-top: 0.15rem; }
   .auth-screen[data-commission-theme] .auth-form { gap: 0.8rem; margin-top: 1rem; }
