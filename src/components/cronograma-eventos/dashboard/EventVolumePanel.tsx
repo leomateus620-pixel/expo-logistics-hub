@@ -112,10 +112,19 @@ export default function EventVolumePanel({
     openEvents(`Volume · ${bucket.fullLabel}`, bucket.eventIds);
   }, [granularity, openEvents]);
 
+  // Domínio do eixo Y calculado do maior valor visível: sem área vazia e sem cortar a maior barra.
+  const yAxisMax = useMemo(() => {
+    const max = model.buckets.reduce((peak, bucket) => Math.max(peak, bucket.total), 0);
+    if (max <= 4) return Math.max(max + 1, 2);
+    const step = max <= 10 ? 2 : max <= 40 ? 5 : 10;
+    return Math.ceil((max + step / 2) / step) * step;
+  }, [model.buckets]);
+
   const monthDays = useMemo(
     () => (selectedMonth ? buildDayBuckets(events, selectedMonth) : []),
     [events, selectedMonth],
   );
+
   const selectedMonthBucket = selectedMonth
     ? model.buckets.find((bucket) => bucket.key === selectedMonth) ?? null
     : null;
