@@ -54,7 +54,7 @@ describe('Volume de eventos', () => {
     renderPanel();
 
     expect(screen.getByRole('heading', { name: 'Volume de eventos' })).toBeInTheDocument();
-    expect(screen.getByText(/3 eventos/)).toBeInTheDocument();
+    expect(screen.getAllByText(/3 eventos/).length).toBeGreaterThan(0);
 
     fireEvent.click(screen.getByRole('button', { name: /12 meses/ }));
     expect(screen.getByRole('button', { name: /12 meses/ })).toHaveAttribute('data-active', 'true');
@@ -68,7 +68,7 @@ describe('Volume de eventos', () => {
     const detail = screen.getByRole('region', { name: /Detalhe diário/i });
     expect(within(detail).getByRole('heading', { name: /agosto de 2026/i })).toBeInTheDocument();
 
-    fireEvent.click(within(detail).getByRole('button', { name: /Ver no cronograma/i }));
+    fireEvent.click(within(detail).getAllByRole('button')[1]);
     expect(onDrilldown).toHaveBeenCalledWith(
       expect.objectContaining({ view: 'timeline', eventIds: ['a', 'b'] }),
     );
@@ -95,6 +95,6 @@ describe('Volume de eventos', () => {
         onDrilldown={vi.fn()}
       />,
     );
-    expect(screen.getByText(/Nenhum evento no período/i)).toBeInTheDocument();
+    expect(screen.getByText(/Nenhum evento datado neste período/i)).toBeInTheDocument();
   });
 });

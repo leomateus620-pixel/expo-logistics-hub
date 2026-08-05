@@ -255,6 +255,7 @@ export default function EventVolumePanel({
                     <button
                       type="button"
                       data-active={bucket.key === selectedMonth}
+                      aria-label={`${bucket.fullLabel}: ${bucket.total} ${bucket.total === 1 ? 'evento' : 'eventos'}`}
                       onClick={() => handleBucket(bucket)}
                     >
                       {bucket.label}
@@ -279,7 +280,7 @@ export default function EventVolumePanel({
       )}
 
       {selectedMonth && (
-        <div className="cronograma-volume-drilldown">
+        <section className="cronograma-volume-drilldown" aria-label="Detalhe diário do mês selecionado">
           <div className="cronograma-volume-drilldown-head">
             <h3>Eventos por dia — {selectedMonthBucket?.fullLabel ?? selectedMonth}</h3>
             <button type="button" onClick={() => setSelectedMonth(null)}>
@@ -287,7 +288,7 @@ export default function EventVolumePanel({
             </button>
           </div>
           <EventVolumeDailyChart days={monthDays} onOpenDay={openEvents} />
-        </div>
+        </section>
       )}
     </section>
   );
