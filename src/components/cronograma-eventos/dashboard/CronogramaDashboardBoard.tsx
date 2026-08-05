@@ -49,7 +49,7 @@ interface CronogramaDashboardBoardProps {
   onRetryActivity?: () => void;
 }
 
-const kpiIcons = [Target, AlertTriangle, CalendarDays, UserRoundX, CalendarClock];
+const kpiIcons = [BarChart3, AlertTriangle, CalendarDays, UserRoundX, CalendarClock];
 
 const priorityLabels: Record<CronogramaEvent['priority'], string> = {
   low: 'Baixa',
