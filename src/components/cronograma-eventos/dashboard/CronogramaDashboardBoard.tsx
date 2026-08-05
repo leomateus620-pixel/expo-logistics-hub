@@ -13,9 +13,7 @@ import {
   Flag,
   History,
   RefreshCw,
-  ShieldAlert,
   Sparkles,
-  Target,
   UserRoundX,
 } from 'lucide-react';
 import {
@@ -28,14 +26,6 @@ import {
   YAxis,
 } from 'recharts';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import type { CronogramaEvent } from '../types';
 import { getTodayKey } from '@/lib/cronograma-timeline';
