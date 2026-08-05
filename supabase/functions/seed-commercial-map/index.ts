@@ -19,21 +19,54 @@ Deno.serve(async (req) => {
     });
   }
 
+  const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+  const anonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
   const admin = createClient(
-    Deno.env.get("SUPABASE_URL")!,
+    supabaseUrl,
     Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
     { auth: { persistSession: false } },
   );
+
+  async function clientForActor(actorUserId: string) {
+    const { data: userData, error: userError } = await admin.auth.admin.getUserById(actorUserId);
+    if (userError) throw userError;
+    const email = userData.user?.email;
+    if (!email) throw new Error("ACTOR_WITHOUT_EMAIL");
+
+    const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({
+      type: "magiclink",
+      email,
+    });
+    if (linkError) throw linkError;
+    const tokenHash = linkData.properties?.hashed_token;
+    if (!tokenHash) throw new Error("ACTOR_TOKEN_UNAVAILABLE");
+
+    const actor = createClient(supabaseUrl, anonKey, { auth: { persistSession: false } });
+    const { data: sessionData, error: sessionError } = await actor.auth.verifyOtp({
+      type: "email",
+      token_hash: tokenHash,
+    });
+    if (sessionError) throw sessionError;
+    const accessToken = sessionData.session?.access_token;
+    if (!accessToken) throw new Error("ACTOR_SESSION_UNAVAILABLE");
+
+    return createClient(supabaseUrl, anonKey, {
+      auth: { persistSession: false },
+      global: { headers: { Authorization: `Bearer ${accessToken}` } },
+    });
+  }
 
   try {
     const body = await req.json();
     const action = String(body.action ?? "sync_reference");
 
     if (action === "sync_reference") {
-      const { data, error } = await admin.rpc("sync_commercial_map_reference_2026", body.payload);
+      const actorClient = await clientForActor(body.actorUserId);
+      const { data, error } = await actorClient.rpc("sync_commercial_map_reference_2026", body.payload);
       if (error) throw error;
       return json({ projectId: data });
     }
+
 
     if (action === "ensure_segments") {
       const { error } = await admin.rpc("ensure_commission_map_segments", {
