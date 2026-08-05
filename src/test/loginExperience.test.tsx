@@ -303,8 +303,13 @@ describe("experiência de autenticação Fenasoja 2028", () => {
     const { container } = renderLogin("/login/exporural");
 
     expect(screen.getByRole("heading", { name: "Exporural" })).toBeInTheDocument();
-    expect(screen.getByText("Comissão Fenasoja 2028")).toBeInTheDocument();
-    expect(screen.getByText("Segmento exclusivo e acesso protegido")).toBeInTheDocument();
+    expect(screen.queryByText("Comissão Fenasoja 2028")).not.toBeInTheDocument();
+    expect(screen.queryByText("Mapa Comercial")).not.toBeInTheDocument();
+    expect(screen.queryByText("Segmento exclusivo e acesso protegido")).not.toBeInTheDocument();
+    expect(screen.getByRole("img", {
+      name: "Fenasoja 2028, Gestão comercial por comissão",
+    }).querySelector('[data-soybean-wordmark="true"]')).toBeInTheDocument();
+    expect(screen.getByTestId("login-brand-soybean")).toBeInTheDocument();
     expect(container.querySelector(".commission-login-title__expo img")).toBeNull();
     expect(
       container.querySelector('.commission-login-title__rural img[src="/commissions/exporural-harvester.webp"]'),
@@ -321,6 +326,13 @@ describe("experiência de autenticação Fenasoja 2028", () => {
     })).toBeInTheDocument();
     expect(container.querySelector('[data-commission-theme="industry"]')).toBeInTheDocument();
     expect(container.querySelectorAll(".commission-login-industry-structure i")).toHaveLength(4);
+    expect(screen.queryByText("Comissão Fenasoja 2028")).not.toBeInTheDocument();
+    expect(screen.queryByText("Mapa Comercial")).not.toBeInTheDocument();
+    expect(screen.queryByText("Segmento exclusivo e acesso protegido")).not.toBeInTheDocument();
+    expect(screen.getByRole("img", {
+      name: "Fenasoja 2028, Gestão comercial por comissão",
+    }).querySelector('[data-soybean-wordmark="true"]')).toBeInTheDocument();
+    expect(screen.getByTestId("login-brand-soybean")).toBeInTheDocument();
     expect(screen.getByLabelText("E-mail")).toBeInTheDocument();
     expect(screen.getByLabelText("Senha")).toBeInTheDocument();
   });

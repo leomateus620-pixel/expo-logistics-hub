@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { FenasojaGoldenSoybean } from '@/components/brand/FenasojaGoldenSoybean';
 import { cn } from '@/lib/utils';
 import fenasojaLogoOficial from '@/assets/fenasoja-logo-oficial.png.asset.json';
 
@@ -8,6 +9,7 @@ interface FenasojaBrandProps {
   markOnly?: boolean;
   scale?: 'standard' | 'display';
   showEdition?: boolean;
+  soybeanWordmark?: boolean;
   subtitle?: string;
   tone?: 'light' | 'dark';
 }
@@ -18,6 +20,7 @@ export function FenasojaBrand({
   markOnly = false,
   scale = 'standard',
   showEdition = true,
+  soybeanWordmark = false,
   subtitle,
   tone = 'dark',
 }: FenasojaBrandProps) {
@@ -93,12 +96,27 @@ export function FenasojaBrand({
           <span className={cn('flex', isDisplay ? 'items-center gap-3' : 'items-baseline gap-2')}>
             <span
               className={cn(
-                'fenasoja-brand__wordmark truncate font-black tracking-[-0.04em]',
+                'fenasoja-brand__wordmark font-black tracking-[-0.04em]',
+                soybeanWordmark
+                  ? 'fenasoja-brand__wordmark--soybean inline-flex items-center overflow-visible'
+                  : 'truncate',
                 compact ? 'text-sm' : isDisplay ? 'text-[1.7rem] leading-none sm:text-[2rem]' : 'text-lg',
                 tone === 'dark' ? 'text-[oklch(var(--brand-soft-white))]' : 'text-[oklch(var(--brand-navy-900))]',
               )}
+              data-soybean-wordmark={soybeanWordmark || undefined}
             >
-              FENASOJA
+              {soybeanWordmark ? (
+                <>
+                  <span>FENAS</span>
+                  <FenasojaGoldenSoybean
+                    className="fenasoja-brand__inline-soybean"
+                    grainClassName="fenasoja-brand__inline-soybean-grain"
+                    auraClassName="fenasoja-brand__inline-soybean-aura"
+                    dataTestId="login-brand-soybean"
+                  />
+                  <span>JA</span>
+                </>
+              ) : 'FENASOJA'}
             </span>
             {showEdition && (
               <span

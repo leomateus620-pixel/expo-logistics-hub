@@ -27,6 +27,8 @@ describe('arquitetura de acesso do portal', () => {
     const modules = getPortalCommissionModules();
     expect(modules.map((module) => module.slug)).toEqual([
       'logistica',
+      'exporural',
+      'industria-comercio-servicos',
       'gastronomia',
       'infraestrutura',
       'servicos',
@@ -34,8 +36,6 @@ describe('arquitetura de acesso do portal', () => {
       'novas-geracoes',
       'seguranca',
       'limpeza',
-      'exporural',
-      'industria-comercio-servicos',
     ]);
     expect(modules).not.toContain(financePortalModule);
   });

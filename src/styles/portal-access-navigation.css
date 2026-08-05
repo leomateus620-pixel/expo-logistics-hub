@@ -13,7 +13,6 @@
   --access-denied: #f4d0ca;
   --access-destination-description: #d8e0e6;
   --access-destination-surface: #40474a;
-  --access-commission-description: #d0dae2;
   --access-commission-surface: #2f4649;
   --access-shadow-rest:
     0 18px 42px -34px rgb(0 7 18 / 82%),
@@ -596,8 +595,8 @@
 
 .portal-commissions-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 12px;
 }
 
 .commission-access-card {
@@ -606,19 +605,22 @@
   isolation: isolate;
   display: grid;
   min-width: 0;
-  min-height: 138px;
-  grid-template-columns: 42px minmax(0, 1fr);
-  align-items: start;
-  gap: 11px;
+  min-height: 154px;
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  align-items: stretch;
+  gap: 12px;
   overflow: clip;
-  border: 1px solid color-mix(in srgb, var(--module-accent) 25%, rgb(255 255 255 / 11%));
-  border-radius: 14px;
-  padding: 13px;
-  background: linear-gradient(145deg, var(--access-commission-surface), #1b353d);
+  border: 1px solid color-mix(in srgb, var(--module-accent) 20%, rgb(255 255 255 / 9%));
+  border-radius: 16px;
+  padding: 14px;
+  background:
+    radial-gradient(circle at 12% 4%, color-mix(in srgb, var(--module-accent) 8%, transparent), transparent 38%),
+    linear-gradient(145deg, var(--access-commission-surface), #1b353d);
   color: inherit;
   box-shadow:
-    0 14px 28px -27px rgb(0 5 14 / 88%),
-    inset 0 1px 0 rgb(255 255 255 / 7%);
+    0 15px 30px -28px rgb(0 5 14 / 82%),
+    inset 0 1px 0 rgb(255 255 255 / 6%);
   text-decoration: none;
   touch-action: manipulation;
   transition:
@@ -686,16 +688,16 @@
 .commission-access-card::before {
   background: linear-gradient(
     122deg,
-    color-mix(in srgb, var(--module-accent) 10%, transparent),
+    color-mix(in srgb, var(--module-accent) 7%, transparent),
     transparent 44%,
     rgb(255 255 255 / 1.8%)
   );
-  opacity: 0.82;
+  opacity: 0.68;
   box-shadow: none;
 }
 
 .commission-access-card::after {
-  background: linear-gradient(108deg, transparent 22%, rgb(255 255 255 / 6.5%) 48%, transparent 72%);
+  background: linear-gradient(108deg, transparent 25%, rgb(255 255 255 / 4.5%) 50%, transparent 75%);
   opacity: 0;
   transform: translateX(-18%);
   transition:
@@ -714,15 +716,22 @@
 }
 
 .commission-access-card__icon {
+  position: relative;
+  isolation: isolate;
   display: grid;
-  width: 42px;
-  height: 42px;
+  width: 46px;
+  height: 46px;
   place-items: center;
-  border: 1px solid color-mix(in srgb, var(--module-accent) 36%, transparent);
-  border-radius: 12px;
-  background: color-mix(in srgb, var(--module-accent) 9%, transparent);
-  color: color-mix(in srgb, var(--module-accent) 82%, white);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 9%);
+  border: 0;
+  border-radius: 15px;
+  background:
+    radial-gradient(circle at 32% 22%, color-mix(in srgb, var(--module-accent) 34%, white), transparent 35%),
+    linear-gradient(145deg, color-mix(in srgb, var(--module-accent) 18%, transparent), color-mix(in srgb, var(--module-accent) 7%, transparent));
+  color: color-mix(in srgb, var(--module-accent) 84%, white);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--module-accent) 36%, transparent),
+    inset 0 1px 0 rgb(255 255 255 / 12%),
+    0 12px 22px -18px var(--module-accent);
   transition:
     border-color var(--access-duration-fast) ease,
     background-color var(--access-duration-fast) ease,
@@ -730,49 +739,48 @@
 }
 
 .commission-access-card__icon svg {
-  width: 18px;
-  height: 18px;
-  stroke-width: 1.85;
+  width: 21px;
+  height: 21px;
+  stroke-width: 1.8;
 }
 
 .commission-access-card__copy {
   display: grid;
   min-width: 0;
   min-height: 100%;
-  grid-template-rows: auto minmax(0, 1fr) auto;
-  gap: 7px;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 12px;
 }
 
 .commission-access-card__heading {
-  display: flex;
+  display: grid;
   min-width: 0;
-  flex-wrap: wrap;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 5px 8px;
+  align-content: start;
+  justify-items: start;
+  gap: 8px;
 }
 
 .commission-access-card__name {
   min-width: 0;
   color: #fffdfa;
-  font-size: 0.84rem;
-  font-weight: 800;
-  letter-spacing: -0.018em;
-  line-height: 1.2;
+  font-size: clamp(0.94rem, 1.22vw, 1.08rem);
+  font-weight: 860;
+  letter-spacing: -0.032em;
+  line-height: 1.12;
   text-wrap: balance;
 }
 
 .commission-access-card__status {
   display: inline-flex;
-  min-height: 20px;
+  min-height: 19px;
   align-items: center;
   border: 1px solid rgb(224 191 126 / 28%);
   border-radius: 999px;
   padding: 1px 7px;
   background: rgb(224 191 126 / 9%);
   color: #f2d69d;
-  font-size: 0.65rem;
-  font-weight: 700;
+  font-size: 0.61rem;
+  font-weight: 730;
   letter-spacing: 0;
   line-height: 1.25;
   white-space: nowrap;
@@ -784,33 +792,24 @@
   color: #f4c0c0;
 }
 
-.commission-access-card__description {
-  display: -webkit-box;
-  overflow: hidden;
-  color: var(--access-commission-description);
-  font-size: 0.75rem;
-  line-height: 1.43;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-}
-
 .commission-access-card__footer {
   display: flex;
   min-width: 0;
-  min-height: 30px;
+  min-height: 29px;
   align-items: end;
-  justify-content: flex-end;
+  justify-content: stretch;
 }
 
 .commission-access-card__action {
   display: inline-flex;
+  width: 100%;
   min-width: 0;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 7px;
   color: color-mix(in srgb, var(--module-accent) 75%, white);
-  font-size: 0.72rem;
-  font-weight: 700;
+  font-size: 0.69rem;
+  font-weight: 720;
   line-height: 1.2;
   white-space: nowrap;
 }
@@ -938,7 +937,7 @@
   }
 
   .portal-commissions-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(5, minmax(0, 1fr));
   }
 }
 
@@ -956,9 +955,14 @@
     justify-self: start;
   }
 
-  .portal-agenda-grid,
-  .portal-commissions-grid {
+  .portal-agenda-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .portal-commissions-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
@@ -1073,20 +1077,16 @@
   }
 
   .commission-access-card {
-    min-height: 112px;
-    grid-template-columns: 40px minmax(0, 1fr);
-    gap: 10px;
+    min-height: 106px;
+    grid-template-columns: 44px minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+    gap: 11px;
     padding: 12px;
   }
 
   .commission-access-card__icon {
-    width: 40px;
-    height: 40px;
-  }
-
-  .commission-access-card__description {
-    font-size: 0.72rem;
-    -webkit-line-clamp: 2;
+    width: 44px;
+    height: 44px;
   }
 
   .commission-access-card__footer {
@@ -1172,12 +1172,8 @@
   }
 
   .commission-access-card {
-    min-height: 118px;
+    min-height: 148px;
     padding: 10px;
-  }
-
-  .commission-access-card__description {
-    -webkit-line-clamp: 2;
   }
 }
 
@@ -1189,8 +1185,7 @@
   }
 
   .portal-primary-entry__description,
-  .portal-destination-card__description,
-  .commission-access-card__description {
+  .portal-destination-card__description {
     color: #fff;
   }
 
