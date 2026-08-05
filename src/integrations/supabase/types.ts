@@ -7428,6 +7428,10 @@ export type Database = {
         }
         Returns: string
       }
+      validate_commercial_map_segments: {
+        Args: { _project_id: string }
+        Returns: Json
+      }
       venue_assert_capability: {
         Args: { _capability: string; _org_id: string }
         Returns: string
