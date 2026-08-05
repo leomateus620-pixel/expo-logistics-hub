@@ -3,6 +3,7 @@ import {
   Activity,
   AlertTriangle,
   ArrowRight,
+  BarChart3,
   CalendarClock,
   CalendarDays,
   CheckCircle2,
@@ -13,9 +14,7 @@ import {
   Flag,
   History,
   RefreshCw,
-  ShieldAlert,
   Sparkles,
-  Target,
   UserRoundX,
 } from 'lucide-react';
 import {
@@ -28,14 +27,6 @@ import {
   YAxis,
 } from 'recharts';
 import { Button } from '@/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import type { CronogramaEvent } from '../types';
 import { getTodayKey } from '@/lib/cronograma-timeline';
@@ -58,7 +49,7 @@ interface CronogramaDashboardBoardProps {
   onRetryActivity?: () => void;
 }
 
-const kpiIcons = [Target, AlertTriangle, CalendarDays, UserRoundX, CalendarClock];
+const kpiIcons = [BarChart3, AlertTriangle, CalendarDays, UserRoundX, CalendarClock];
 
 const priorityLabels: Record<CronogramaEvent['priority'], string> = {
   low: 'Baixa',
@@ -141,85 +132,6 @@ function EmptyDashboardPanel({
         <p>{description}</p>
       </div>
     </div>
-  );
-}
-
-function ReadinessHero({ model }: { model: CronogramaDashboardModel }) {
-  const { readiness } = model;
-  const value = readiness.score;
-
-  return (
-    <section
-      className="cronograma-readiness"
-      data-classification={readiness.classification}
-      aria-labelledby="cronograma-readiness-title"
-    >
-      <div className="cronograma-readiness-copy">
-        <div className="cronograma-readiness-heading">
-          <span className="cronograma-readiness-icon" aria-hidden="true">
-            <Target />
-          </span>
-          <div>
-            <p className="cronograma-dashboard-eyebrow">Visão presidencial</p>
-            <h1 id="cronograma-readiness-title">Prontidão Fenasoja 2028</h1>
-          </div>
-        </div>
-        <p className="cronograma-readiness-summary">{readiness.summary}</p>
-        <p className="sr-only">
-          Índice de Prontidão: {value === null ? 'indisponível' : `${value} de 100`}.
-          Classificação {readiness.classification}. O cálculo usa os componentes disponíveis
-          e normaliza seus pesos.
-        </p>
-      </div>
-
-      <div className="cronograma-readiness-score" aria-hidden="true">
-        <span>{value === null ? '—' : value}</span>
-        <small>{value === null ? 'sem base suficiente' : '/ 100'}</small>
-        <strong>{readiness.classification}</strong>
-      </div>
-
-      <div className="cronograma-readiness-meter" aria-hidden="true">
-        <span style={{ width: `${value ?? 0}%` }} />
-      </div>
-
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button type="button" variant="outline" className="cronograma-readiness-audit">
-            <ShieldAlert aria-hidden="true" />
-            Auditar cálculo
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="cronograma-readiness-dialog">
-          <DialogHeader>
-            <DialogTitle>Como o Índice de Prontidão é calculado</DialogTitle>
-            <DialogDescription>
-              Componentes sem fonte suficiente ficam indisponíveis e os pesos restantes são
-              normalizados proporcionalmente.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="cronograma-readiness-formula" role="list">
-            {readiness.components.map((component) => (
-              <article key={component.key} role="listitem">
-                <div>
-                  <strong>{component.label}</strong>
-                  <span>Peso nominal {Math.round(component.weight * 100)}%</span>
-                </div>
-                <b>{component.score === null ? 'Indisponível' : `${Math.round(component.score * 100)}%`}</b>
-                <p>{component.explanation}</p>
-                <small>
-                  Base: {component.numerator.toLocaleString('pt-BR')} de{' '}
-                  {component.denominator.toLocaleString('pt-BR')} registros
-                </small>
-              </article>
-            ))}
-          </div>
-          <p className="cronograma-readiness-note">
-            Fórmula: soma de cada pontuação normalizada × peso disponível. Janela de
-            atualização recente: 30 dias.
-          </p>
-        </DialogContent>
-      </Dialog>
-    </section>
   );
 }
 
@@ -834,7 +746,6 @@ export default function CronogramaDashboardBoard({
         </div>
       )}
 
-      <ReadinessHero model={model} />
       <ExecutiveKpis model={model} onDrilldown={onDrilldown} />
 
       <EventVolumePanel

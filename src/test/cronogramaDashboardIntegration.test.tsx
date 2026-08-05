@@ -97,7 +97,6 @@ describe('Dashboard executivo do cronograma', () => {
       />,
     );
 
-    expect(screen.getByRole('heading', { name: 'Prontidão Fenasoja 2028' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Volume de eventos' })).toBeInTheDocument();
     expect(screen.getByText('Acesso gerencial necessário')).toBeInTheDocument();
 
@@ -113,14 +112,6 @@ describe('Dashboard executivo do cronograma', () => {
     });
     fireEvent.click(majorProgress.closest('button')!);
     expect(onOpenEvent).toHaveBeenCalledWith(main);
-
-    fireEvent.click(screen.getByRole('button', { name: 'Auditar cálculo' }));
-    const dialog = await screen.findByRole('dialog', {
-      name: 'Como o Índice de Prontidão é calculado',
-    });
-    expect(within(dialog).getByText('Conclusão geral')).toBeInTheDocument();
-    expect(within(dialog).getByText(/Peso nominal 35%/)).toBeInTheDocument();
-    expect(within(dialog).getByText(/Janela de atualização recente: 30 dias/)).toBeInTheDocument();
   });
 
   it('explicita fallback remoto e não fabrica gráficos quando não há eventos', () => {
