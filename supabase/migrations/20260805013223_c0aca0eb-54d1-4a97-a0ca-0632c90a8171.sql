@@ -1,0 +1,1266 @@
+CREATE OR REPLACE FUNCTION public.apply_exporural_reference_2026(
+  p_org_id uuid,
+  p_source_revision text,
+  p_entities jsonb,
+  p_lots jsonb
+)
+RETURNS jsonb
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path = public, pg_temp
+AS $$
+DECLARE
+  v_project public.map_projects%ROWTYPE;
+  v_existing public.map_entities%ROWTYPE;
+  v_current_geometry public.map_entity_geometries%ROWTYPE;
+  v_existing_lot public.commercial_lots%ROWTYPE;
+  v_current_calibration public.map_calibrations%ROWTYPE;
+  v_technical_calibration public.map_calibrations%ROWTYPE;
+  v_active_snapshot public.map_reference_migration_snapshots%ROWTYPE;
+  v_entity jsonb;
+  v_lot jsonb;
+  v_geometry jsonb;
+  v_metadata jsonb;
+  v_identifier text;
+  v_parent_identifier text;
+  v_layer_key text;
+  v_layer_id uuid;
+  v_parent_id uuid;
+  v_entity_id uuid;
+  v_lot_id uuid;
+  v_auxiliary_id uuid;
+  v_calibration_id uuid;
+  v_calibration_version integer;
+  v_geometry_version integer;
+  v_snapshot_id uuid;
+  v_payload_hash text;
+  v_applied_at timestamptz;
+  v_official_area numeric;
+  v_metadata_official_area numeric;
+  v_calculated_area numeric;
+  v_area_difference_percent numeric;
+  v_map_units_per_meter constant numeric := 0.15;
+  v_primary_control_distance_meters constant numeric := 30;
+  v_primary_control_point_a constant jsonb := '[16.519090909090906, -37.04727272727273]'::jsonb;
+  v_primary_control_point_b constant jsonb := '[16.519090909090906, -32.54727272727273]'::jsonb;
+  v_excluded_entity_ids uuid[] := '{}'::uuid[];
+  v_inserted_entity_ids uuid[] := '{}'::uuid[];
+  v_inserted_lot_ids uuid[] := '{}'::uuid[];
+  v_inserted_price_ids uuid[] := '{}'::uuid[];
+  v_inserted_status_history_ids uuid[] := '{}'::uuid[];
+  v_inserted_lineage_ids uuid[] := '{}'::uuid[];
+  v_calibration_created boolean := false;
+  v_state_is_current boolean := false;
+  v_geometry_changed boolean := false;
+  v_calibration_changed boolean := false;
+  v_legacy_lot record;
+  v_inserted integer := 0;
+  v_updated integer := 0;
+  v_geometry_updates integer := 0;
+  v_lot_updates integer := 0;
+  v_legacy_archived integer := 0;
+BEGIN
+  IF p_org_id IS NULL OR NOT public.map_has_explicit_capability(p_org_id, 'map.admin') THEN
+    RAISE EXCEPTION 'MAP_PERMISSION_DENIED';
+  END IF;
+
+  IF trim(coalesce(p_source_revision, '')) <> '2026.3'
+    OR jsonb_typeof(p_entities) <> 'array'
+    OR jsonb_array_length(p_entities) <> 116
+    OR jsonb_typeof(p_lots) <> 'array'
+    OR jsonb_array_length(p_lots) <> 95
+  THEN
+    RAISE EXCEPTION 'INVALID_EXPORURAL_2026_PAYLOAD';
+  END IF;
+
+  PERFORM pg_advisory_xact_lock(hashtextextended('commercial-map:exporural:' || p_org_id::text, 0));
+
+  SELECT *
+  INTO v_project
+  FROM public.map_projects
+  WHERE org_id = p_org_id AND is_archived = false
+  ORDER BY updated_at DESC
+  LIMIT 1
+  FOR UPDATE;
+
+  IF NOT FOUND THEN RAISE EXCEPTION 'MAP_PROJECT_NOT_FOUND'; END IF;
+
+  v_payload_hash := md5(p_source_revision || '|' || p_entities::text || '|' || p_lots::text);
+
+  SELECT *
+  INTO v_active_snapshot
+  FROM public.map_reference_migration_snapshots
+  WHERE project_id = v_project.id
+    AND area_code = 'EXPORURAL'
+    AND source_revision = p_source_revision
+    AND status = 'APPLIED'
+  ORDER BY applied_at DESC NULLS LAST
+  LIMIT 1
+  FOR UPDATE;
+
+  IF FOUND THEN
+    IF v_active_snapshot.payload_hash IS DISTINCT FROM v_payload_hash THEN
+      RAISE EXCEPTION 'EXPORURAL_REFERENCE_PAYLOAD_CONFLICT';
+    END IF;
+
+    SELECT
+      v_project.reference_revision = p_source_revision
+      AND (
+        SELECT count(*)
+        FROM public.map_entities entity
+        WHERE entity.project_id = v_project.id
+          AND entity.is_archived = false
+          AND upper(entity.public_identifier) IN (
+            SELECT upper(trim(item->>'publicIdentifier'))
+            FROM jsonb_array_elements(p_entities) item
+          )
+          AND entity.metadata->>'geometryRevision' = '2026.3-exporural.1'
+      ) = 116
+      AND (
+        SELECT count(*)
+        FROM public.commercial_lots lot
+        WHERE lot.project_id = v_project.id
+          AND lot.archived_at IS NULL
+          AND upper(lot.public_identifier) IN (
+            SELECT upper(trim(item->>'publicIdentifier'))
+            FROM jsonb_array_elements(p_lots) item
+          )
+          AND lot.area_validation_status = 'VALIDATED'
+      ) = 95
+      AND (
+        SELECT count(*)
+        FROM public.map_entities entity
+        JOIN public.map_entity_geometries geometry
+          ON geometry.entity_id = entity.id AND geometry.is_current = true
+        WHERE entity.project_id = v_project.id
+          AND entity.is_archived = false
+          AND upper(entity.public_identifier) IN (
+            SELECT upper(trim(item->>'publicIdentifier'))
+            FROM jsonb_array_elements(p_entities) item
+          )
+      ) = 116
+      AND NOT EXISTS (
+        SELECT 1
+        FROM public.map_entities legacy
+        WHERE legacy.project_id = v_project.id
+          AND legacy.is_archived = false
+          AND (
+            lower(legacy.name) IN ('espaço semear', 'espaco semear')
+            OR upper(legacy.public_identifier) = 'ESPACO-SEMEAR'
+          )
+      )
+      AND NOT EXISTS (
+        SELECT 1
+        FROM public.map_entities entity
+        JOIN public.map_entity_geometries geometry
+          ON geometry.entity_id = entity.id AND geometry.is_current = true
+        LEFT JOIN public.map_calibrations calibration
+          ON calibration.project_id = geometry.project_id
+          AND calibration.version = geometry.calibration_version
+        WHERE entity.project_id = v_project.id
+          AND entity.is_archived = false
+          AND upper(entity.public_identifier) IN (
+            SELECT upper(trim(item->>'publicIdentifier'))
+            FROM jsonb_array_elements(p_entities) item
+          )
+          AND (
+            calibration.id IS NULL
+            OR calibration.status <> 'VALIDATED'
+            OR calibration.map_units_per_meter IS DISTINCT FROM v_map_units_per_meter
+          )
+      )
+    INTO v_state_is_current;
+
+    IF NOT v_state_is_current THEN
+      RAISE EXCEPTION 'EXPORURAL_REFERENCE_ALREADY_APPLIED_WITH_DRIFT:%', v_active_snapshot.id;
+    END IF;
+
+    RETURN v_active_snapshot.apply_result || jsonb_build_object(
+      'projectId', v_project.id,
+      'snapshotId', v_active_snapshot.id,
+      'referenceRevision', p_source_revision,
+      'geometryRevision', '2026.3-exporural.1',
+      'changed', false
+    );
+  END IF;
+
+  -- Close the preflight/write TOCTOU window. Geometry writers lock their current
+  -- row, while lot creation locks the project; taking both lock families here
+  -- serializes target, protected and persisted sellable geometry until commit.
+  PERFORM entity.id
+  FROM public.map_entities entity
+  WHERE entity.project_id = v_project.id
+    AND (
+      entity.is_sellable = true
+      OR upper(entity.public_identifier) IN (
+        SELECT upper(trim(item->>'publicIdentifier'))
+        FROM jsonb_array_elements(p_entities) item
+      )
+      OR upper(entity.public_identifier) IN ('B7', 'B8', 'D3')
+      OR lower(entity.name) IN ('espaço semear', 'espaco semear')
+      OR upper(entity.public_identifier) = 'ESPACO-SEMEAR'
+    )
+  ORDER BY entity.id
+  FOR UPDATE OF entity;
+
+  PERFORM geometry.id
+  FROM public.map_entity_geometries geometry
+  JOIN public.map_entities entity ON entity.id = geometry.entity_id
+  WHERE geometry.project_id = v_project.id
+    AND geometry.is_current = true
+    AND (
+      entity.is_sellable = true
+      OR upper(entity.public_identifier) IN (
+        SELECT upper(trim(item->>'publicIdentifier'))
+        FROM jsonb_array_elements(p_entities) item
+      )
+      OR upper(entity.public_identifier) IN ('B7', 'B8', 'D3')
+      OR lower(entity.name) IN ('espaço semear', 'espaco semear')
+      OR upper(entity.public_identifier) = 'ESPACO-SEMEAR'
+    )
+  ORDER BY geometry.id
+  FOR UPDATE OF geometry;
+
+  PERFORM lot.id
+  FROM public.commercial_lots lot
+  WHERE lot.project_id = v_project.id
+    AND (
+      upper(lot.public_identifier) IN (
+        SELECT upper(trim(item->>'publicIdentifier'))
+        FROM jsonb_array_elements(p_lots) item
+      )
+      OR upper(lot.public_identifier) = 'ESPACO-SEMEAR'
+      OR lot.entity_id IN (
+        SELECT entity.id
+        FROM public.map_entities entity
+        WHERE entity.project_id = v_project.id
+          AND lower(entity.name) IN ('espaço semear', 'espaco semear')
+      )
+    )
+  ORDER BY lot.id
+  FOR UPDATE OF lot;
+
+  IF EXISTS (
+    SELECT 1
+    FROM public.commercial_lots lot
+    WHERE lot.project_id = v_project.id
+      AND lot.archived_at IS NOT NULL
+      AND upper(lot.public_identifier) IN (
+        SELECT upper(trim(item->>'publicIdentifier'))
+        FROM jsonb_array_elements(p_lots) item
+      )
+  ) THEN
+    RAISE EXCEPTION 'EXPORURAL_ARCHIVED_LOT_REQUIRES_MANUAL_REVIEW';
+  END IF;
+
+  IF EXISTS (
+    SELECT 1
+    FROM (
+      SELECT upper(trim(item->>'publicIdentifier')) AS identifier, count(*) AS total
+      FROM jsonb_array_elements(p_entities) AS item
+      GROUP BY upper(trim(item->>'publicIdentifier'))
+    ) candidate
+    WHERE coalesce(identifier, '') = '' OR total > 1
+  ) THEN
+    RAISE EXCEPTION 'INVALID_OR_DUPLICATE_EXPORURAL_ENTITY';
+  END IF;
+
+  IF EXISTS (
+    SELECT 1
+    FROM jsonb_array_elements(p_entities) AS item
+    WHERE upper(trim(item->>'publicIdentifier')) NOT IN (
+      'EXPORURAL', 'QUADRA-R', 'QUADRA-S',
+      'RUA-BRUNO-SCHWARTZ', 'RUA-JOHAN-MULLER', 'RUA-GUSTAVO-BESSEL',
+      'RUA-15-NOVEMBRO', 'RUA-EMANUEL-BRACHMANN',
+      'RUA-PASTOR-ALBERT-LEHENBAUER', 'RUA-UBIRETAMA',
+      'B35', 'B36', 'B37', 'B38', 'C4', 'D6-01', 'D6-02', 'D6-03',
+      'E-01', 'E-02', 'E-06'
+    )
+      AND upper(trim(item->>'publicIdentifier')) !~ '^Q-[RS]-[0-9]{2}$'
+  ) THEN
+    RAISE EXCEPTION 'EXPORURAL_ENTITY_OUTSIDE_ALLOWLIST';
+  END IF;
+
+  IF EXISTS (
+    SELECT 1
+    FROM jsonb_array_elements(p_entities) AS item
+    WHERE jsonb_typeof(item->'geometry') <> 'object'
+      OR item#>>'{geometry,type}' <> 'Polygon'
+      OR jsonb_typeof(item#>'{geometry,coordinates}') <> 'array'
+      OR jsonb_typeof(item->'metadata') <> 'object'
+      OR item#>>'{metadata,areaCode}' <> 'EXPORURAL'
+      OR item#>>'{metadata,geometryRevision}' <> '2026.3-exporural.1'
+      OR lower(coalesce(item#>>'{metadata,seedManaged}', 'false')) <> 'true'
+  ) THEN
+    RAISE EXCEPTION 'INVALID_EXPORURAL_ENTITY_METADATA';
+  END IF;
+
+  IF (
+    SELECT count(*)
+    FROM jsonb_array_elements(p_entities) item
+    WHERE upper(item->>'publicIdentifier') ~ '^Q-R-[0-9]{2}$'
+  ) <> 59 OR (
+    SELECT count(*)
+    FROM jsonb_array_elements(p_entities) item
+    WHERE upper(item->>'publicIdentifier') ~ '^Q-S-[0-9]{2}$'
+  ) <> 36 THEN
+    RAISE EXCEPTION 'INVALID_EXPORURAL_LOT_INVENTORY';
+  END IF;
+
+  IF EXISTS (
+    WITH expected AS (
+      SELECT 'Q-R-' || lpad(series::text, 2, '0') AS identifier
+      FROM generate_series(1, 59) series
+      UNION ALL
+      SELECT 'Q-S-' || lpad(series::text, 2, '0')
+      FROM generate_series(1, 36) series
+    ),
+    actual AS (
+      SELECT upper(trim(item->>'publicIdentifier')) AS identifier
+      FROM jsonb_array_elements(p_entities) item
+      WHERE upper(trim(item->>'publicIdentifier')) ~ '^Q-[RS]-[0-9]{2}$'
+    ),
+    differences AS (
+      (SELECT identifier FROM expected EXCEPT SELECT identifier FROM actual)
+      UNION ALL
+      (SELECT identifier FROM actual EXCEPT SELECT identifier FROM expected)
+    )
+    SELECT 1 FROM differences
+  ) THEN
+    RAISE EXCEPTION 'INVALID_EXPORURAL_EXACT_LOT_INVENTORY';
+  END IF;
+
+  IF EXISTS (
+    SELECT 1
+    FROM (
+      SELECT upper(trim(item->>'publicIdentifier')) AS identifier, count(*) AS total
+      FROM jsonb_array_elements(p_lots) AS item
+      GROUP BY upper(trim(item->>'publicIdentifier'))
+    ) candidate
+    WHERE identifier !~ '^Q-[RS]-[0-9]{2}$' OR total > 1
+  ) THEN
+    RAISE EXCEPTION 'INVALID_OR_DUPLICATE_EXPORURAL_LOT';
+  END IF;
+
+  IF EXISTS (
+    SELECT 1
+    FROM jsonb_array_elements(p_entities) entity
+    WHERE upper(trim(entity->>'publicIdentifier')) ~ '^Q-[RS]-[0-9]{2}$'
+      AND (
+        entity->>'classification' <> 'SELLABLE_LOT'
+        OR lower(coalesce(entity->>'isSellable', 'false')) <> 'true'
+        OR trim(entity->>'layerKey') <> 'commercial'
+        OR upper(trim(entity->>'parentPublicIdentifier'))
+          <> 'QUADRA-' || substring(upper(trim(entity->>'publicIdentifier')) from 3 for 1)
+        OR upper(trim(entity#>>'{metadata,block}'))
+          <> substring(upper(trim(entity->>'publicIdentifier')) from 3 for 1)
+        OR lpad(trim(entity#>>'{metadata,lotNumber}'), 2, '0')
+          <> right(upper(trim(entity->>'publicIdentifier')), 2)
+      )
+  ) THEN
+    RAISE EXCEPTION 'INVALID_EXPORURAL_COMMERCIAL_ENTITY';
+  END IF;
+
+  IF EXISTS (
+    (
+      SELECT upper(trim(item->>'publicIdentifier'))
+      FROM jsonb_array_elements(p_lots) item
+      EXCEPT
+      SELECT upper(trim(item->>'publicIdentifier'))
+      FROM jsonb_array_elements(p_entities) item
+      WHERE item->>'classification' = 'SELLABLE_LOT'
+        AND lower(coalesce(item->>'isSellable', 'false')) = 'true'
+    )
+    UNION ALL
+    (
+      SELECT upper(trim(item->>'publicIdentifier'))
+      FROM jsonb_array_elements(p_entities) item
+      WHERE item->>'classification' = 'SELLABLE_LOT'
+        AND lower(coalesce(item->>'isSellable', 'false')) = 'true'
+      EXCEPT
+      SELECT upper(trim(item->>'publicIdentifier'))
+      FROM jsonb_array_elements(p_lots) item
+    )
+  ) THEN
+    RAISE EXCEPTION 'EXPORURAL_LOT_ENTITY_SET_MISMATCH';
+  END IF;
+
+  FOR v_lot IN SELECT value FROM jsonb_array_elements(p_lots)
+  LOOP
+    v_identifier := upper(trim(v_lot->>'publicIdentifier'));
+    v_official_area := nullif(v_lot->>'officialAreaSqm', '')::numeric;
+
+    IF upper(trim(v_lot->>'block')) <> substring(v_identifier from 3 for 1)
+      OR lpad(trim(v_lot->>'lotNumber'), 2, '0') <> right(v_identifier, 2)
+    THEN
+      RAISE EXCEPTION 'INVALID_EXPORURAL_LOT_IDENTITY:%', v_identifier;
+    END IF;
+
+    SELECT
+      extensions.ST_Area(
+        public.map_polygon_from_geojson(
+          jsonb_build_object(
+            'type', 'Polygon',
+            'coordinates', entity#>'{geometry,coordinates}'
+          )
+        )
+      ) / (v_map_units_per_meter * v_map_units_per_meter),
+      nullif(entity#>>'{metadata,officialAreaSqm}', '')::numeric
+    INTO v_calculated_area, v_metadata_official_area
+    FROM jsonb_array_elements(p_entities) entity
+    WHERE upper(trim(entity->>'publicIdentifier')) = v_identifier
+      AND entity->>'classification' = 'SELLABLE_LOT'
+      AND lower(coalesce(entity->>'isSellable', 'false')) = 'true';
+
+    IF v_official_area IS NULL OR v_official_area <= 0
+      OR v_calculated_area IS NULL OR v_calculated_area <= 0
+      OR v_metadata_official_area IS NULL
+      OR v_metadata_official_area IS DISTINCT FROM v_official_area
+    THEN
+      RAISE EXCEPTION 'INVALID_EXPORURAL_AREA:%', v_identifier;
+    END IF;
+
+    v_area_difference_percent := abs(v_calculated_area - v_official_area) / v_official_area * 100;
+    IF v_area_difference_percent > 0.15 THEN
+      RAISE EXCEPTION 'EXPORURAL_AREA_TOLERANCE_EXCEEDED:%:%',
+        v_identifier, v_area_difference_percent;
+    END IF;
+
+    IF nullif(v_lot->>'calculatedAreaSqm', '') IS NOT NULL
+      AND abs((v_lot->>'calculatedAreaSqm')::numeric - v_calculated_area)
+        / v_calculated_area * 100 > 0.15
+    THEN
+      RAISE EXCEPTION 'EXPORURAL_CLIENT_AREA_STALE:%', v_identifier;
+    END IF;
+  END LOOP;
+
+  IF EXISTS (
+    SELECT 1
+    FROM public.map_entities legacy
+    LEFT JOIN public.commercial_lots lot ON lot.entity_id = legacy.id
+    WHERE legacy.project_id = v_project.id
+      AND legacy.is_archived = false
+      AND (
+        lower(legacy.name) IN ('espaço semear', 'espaco semear')
+        OR upper(legacy.public_identifier) = 'ESPACO-SEMEAR'
+      )
+      AND (
+        lower(coalesce(legacy.metadata->>'seedManaged', 'false')) <> 'true'
+        OR (
+          lot.id IS NOT NULL
+          AND (
+            lot.archived_at IS NOT NULL
+            OR lot.status <> 'BLOCKED'
+            OR lot.official_area_sqm IS NOT NULL
+            OR lot.calculated_area_sqm IS NOT NULL
+            OR lot.frontage_meters IS NOT NULL
+            OR lot.depth_meters IS NOT NULL
+            OR lot.commercial_notes IS NOT NULL
+            OR lot.internal_notes IS NOT NULL
+            OR EXISTS (
+              SELECT 1
+              FROM public.lot_prices price
+              WHERE price.lot_id = lot.id
+                AND (
+                  price.pricing_mode <> 'NOT_FOR_SALE'
+                  OR price.base_price IS NOT NULL
+                  OR price.price_per_sqm IS NOT NULL
+                  OR price.asking_price IS NOT NULL
+                  OR price.minimum_price IS NOT NULL
+                )
+            )
+            OR EXISTS (SELECT 1 FROM public.lot_reservations record WHERE record.lot_id = lot.id)
+            OR EXISTS (SELECT 1 FROM public.lot_negotiations record WHERE record.lot_id = lot.id)
+            OR EXISTS (SELECT 1 FROM public.lot_sales record WHERE record.lot_id = lot.id)
+            OR EXISTS (SELECT 1 FROM public.lot_contracts record WHERE record.lot_id = lot.id)
+            OR EXISTS (
+              SELECT 1
+              FROM public.lot_status_history history
+              WHERE history.lot_id = lot.id
+                AND history.previous_status IS NOT NULL
+            )
+          )
+        )
+      )
+  ) THEN
+    RAISE EXCEPTION 'EXPORURAL_LEGACY_SEMEAR_REQUIRES_MANUAL_LINEAGE';
+  END IF;
+
+  SELECT coalesce(array_agg(entity.id), '{}'::uuid[])
+  INTO v_excluded_entity_ids
+  FROM public.map_entities entity
+  WHERE entity.project_id = v_project.id
+    AND (
+      upper(entity.public_identifier) IN (
+        SELECT upper(trim(item->>'publicIdentifier'))
+        FROM jsonb_array_elements(p_entities) item
+      )
+      OR (
+        entity.is_archived = false
+        AND (
+          lower(entity.name) IN ('espaço semear', 'espaco semear')
+          OR upper(entity.public_identifier) = 'ESPACO-SEMEAR'
+        )
+      )
+    );
+
+  IF EXISTS (
+    WITH candidates AS (
+      SELECT
+        upper(item->>'publicIdentifier') AS identifier,
+        item->>'classification' AS classification,
+        extensions.ST_SetSRID(
+          extensions.ST_GeomFromGeoJSON(
+            jsonb_build_object(
+              'type', 'Polygon',
+              'coordinates', item#>'{geometry,coordinates}'
+            )::text
+          ),
+          0
+        ) AS geom
+      FROM jsonb_array_elements(p_entities) item
+    )
+    SELECT 1
+    FROM candidates
+    WHERE NOT extensions.ST_IsValid(geom)
+      OR extensions.ST_IsEmpty(geom)
+      OR extensions.ST_Area(geom) <= 0.00000001
+  ) THEN
+    RAISE EXCEPTION 'INVALID_EXPORURAL_GEOMETRY';
+  END IF;
+
+  IF EXISTS (
+    WITH lots AS (
+      SELECT
+        upper(item->>'publicIdentifier') AS identifier,
+        extensions.ST_SetSRID(
+          extensions.ST_GeomFromGeoJSON(
+            jsonb_build_object('type', 'Polygon', 'coordinates', item#>'{geometry,coordinates}')::text
+          ),
+          0
+        ) AS geom
+      FROM jsonb_array_elements(p_entities) item
+      WHERE item->>'classification' = 'SELLABLE_LOT'
+    )
+    SELECT 1
+    FROM lots a
+    JOIN lots b ON a.identifier < b.identifier
+    WHERE extensions.ST_Area(extensions.ST_Intersection(a.geom, b.geom)) > 0.00000001
+  ) THEN
+    RAISE EXCEPTION 'EXPORURAL_LOT_OVERLAP';
+  END IF;
+
+  IF EXISTS (
+    SELECT 1
+    FROM jsonb_array_elements(p_entities) item
+    WHERE item->>'classification' = 'SELLABLE_LOT'
+      AND public.map_geometry_overlaps_sellable(
+        v_project.id,
+        jsonb_build_object(
+          'type', 'Polygon',
+          'coordinates', item#>'{geometry,coordinates}'
+        ),
+        v_excluded_entity_ids
+      )
+  ) THEN
+    RAISE EXCEPTION 'EXPORURAL_PERSISTED_SELLABLE_OVERLAP';
+  END IF;
+
+  IF EXISTS (
+    WITH candidates AS (
+      SELECT
+        upper(item->>'publicIdentifier') AS identifier,
+        item->>'classification' AS classification,
+        extensions.ST_SetSRID(
+          extensions.ST_GeomFromGeoJSON(
+            jsonb_build_object('type', 'Polygon', 'coordinates', item#>'{geometry,coordinates}')::text
+          ),
+          0
+        ) AS geom
+      FROM jsonb_array_elements(p_entities) item
+    )
+    SELECT 1
+    FROM candidates lot
+    JOIN candidates road ON road.classification = 'ROAD'
+    WHERE lot.classification = 'SELLABLE_LOT'
+      AND extensions.ST_Area(extensions.ST_Intersection(lot.geom, road.geom)) > 0.00000001
+  ) THEN
+    RAISE EXCEPTION 'EXPORURAL_LOT_ROAD_OVERLAP';
+  END IF;
+
+  IF EXISTS (
+    WITH incoming_lots AS (
+      SELECT extensions.ST_SetSRID(
+        extensions.ST_GeomFromGeoJSON(
+          jsonb_build_object('type', 'Polygon', 'coordinates', item#>'{geometry,coordinates}')::text
+        ),
+        0
+      ) AS geom
+      FROM jsonb_array_elements(p_entities) item
+      WHERE item->>'classification' = 'SELLABLE_LOT'
+    )
+    SELECT 1
+    FROM incoming_lots incoming
+    JOIN public.map_entities protected
+      ON protected.project_id = v_project.id
+      AND protected.public_identifier IN ('B7', 'B8', 'D3')
+      AND protected.is_archived = false
+    JOIN public.map_entity_geometries protected_geometry
+      ON protected_geometry.entity_id = protected.id
+      AND protected_geometry.is_current = true
+    WHERE extensions.ST_Area(
+      extensions.ST_Intersection(incoming.geom, protected_geometry.native_geometry)
+    ) > 0.00000001
+  ) THEN
+    RAISE EXCEPTION 'EXPORURAL_PROTECTED_STRUCTURE_OVERLAP';
+  END IF;
+
+  WITH target_identifiers AS (
+    SELECT upper(trim(item->>'publicIdentifier')) AS identifier
+    FROM jsonb_array_elements(p_entities) item
+  ),
+  affected_entities AS (
+    SELECT entity.*
+    FROM public.map_entities entity
+    WHERE entity.project_id = v_project.id
+      AND (
+        upper(entity.public_identifier) IN (SELECT identifier FROM target_identifiers)
+        OR lower(entity.name) IN ('espaço semear', 'espaco semear')
+        OR upper(entity.public_identifier) = 'ESPACO-SEMEAR'
+      )
+  ),
+  affected_lots AS (
+    SELECT lot.*
+    FROM public.commercial_lots lot
+    WHERE lot.project_id = v_project.id
+      AND (
+        lot.entity_id IN (SELECT id FROM affected_entities)
+        OR upper(lot.public_identifier) IN (
+          SELECT upper(trim(item->>'publicIdentifier'))
+          FROM jsonb_array_elements(p_lots) item
+        )
+        OR upper(lot.public_identifier) = 'ESPACO-SEMEAR'
+      )
+  )
+  INSERT INTO public.map_reference_migration_snapshots (
+    org_id, project_id, area_code, source_revision, payload_hash,
+    status, snapshot, created_by
+  )
+  SELECT
+    p_org_id,
+    v_project.id,
+    'EXPORURAL',
+    p_source_revision,
+    v_payload_hash,
+    'PENDING',
+    jsonb_build_object(
+      'schemaVersion', 2,
+      'project', to_jsonb(v_project),
+      'calibrations', coalesce((
+        SELECT jsonb_agg(to_jsonb(calibration) ORDER BY calibration.version)
+        FROM public.map_calibrations calibration
+        WHERE calibration.project_id = v_project.id
+      ), '[]'::jsonb),
+      'entities', coalesce((
+        SELECT jsonb_agg(to_jsonb(entity) ORDER BY entity.public_identifier)
+        FROM affected_entities entity
+      ), '[]'::jsonb),
+      'geometries', coalesce((
+        SELECT jsonb_agg((to_jsonb(geometry) - 'native_geometry') ORDER BY geometry.entity_id)
+        FROM public.map_entity_geometries geometry
+        WHERE geometry.entity_id IN (SELECT id FROM affected_entities)
+          AND geometry.is_current = true
+      ), '[]'::jsonb),
+      'geometryVersions', coalesce((
+        SELECT jsonb_agg(to_jsonb(version) ORDER BY version.entity_id, version.version)
+        FROM public.map_geometry_versions version
+        WHERE version.entity_id IN (SELECT id FROM affected_entities)
+      ), '[]'::jsonb),
+      'lots', coalesce((
+        SELECT jsonb_agg(to_jsonb(lot) ORDER BY lot.public_identifier)
+        FROM affected_lots lot
+      ), '[]'::jsonb),
+      'lotPrices', coalesce((
+        SELECT jsonb_agg(to_jsonb(price) ORDER BY price.created_at)
+        FROM public.lot_prices price
+        WHERE price.lot_id IN (SELECT id FROM affected_lots)
+      ), '[]'::jsonb),
+      'lotReservations', coalesce((
+        SELECT jsonb_agg(to_jsonb(reservation) ORDER BY reservation.created_at)
+        FROM public.lot_reservations reservation
+        WHERE reservation.lot_id IN (SELECT id FROM affected_lots)
+      ), '[]'::jsonb),
+      'lotNegotiations', coalesce((
+        SELECT jsonb_agg(to_jsonb(negotiation) ORDER BY negotiation.created_at)
+        FROM public.lot_negotiations negotiation
+        WHERE negotiation.lot_id IN (SELECT id FROM affected_lots)
+      ), '[]'::jsonb),
+      'lotSales', coalesce((
+        SELECT jsonb_agg(to_jsonb(sale) ORDER BY sale.created_at)
+        FROM public.lot_sales sale
+        WHERE sale.lot_id IN (SELECT id FROM affected_lots)
+      ), '[]'::jsonb),
+      'lotContracts', coalesce((
+        SELECT jsonb_agg(to_jsonb(contract) ORDER BY contract.created_at)
+        FROM public.lot_contracts contract
+        WHERE contract.lot_id IN (SELECT id FROM affected_lots)
+      ), '[]'::jsonb),
+      'lotContractVersions', coalesce((
+        SELECT jsonb_agg(to_jsonb(contract_version) ORDER BY contract_version.contract_id, contract_version.version)
+        FROM public.lot_contract_versions contract_version
+        WHERE contract_version.contract_id IN (
+          SELECT contract.id
+          FROM public.lot_contracts contract
+          WHERE contract.lot_id IN (SELECT id FROM affected_lots)
+        )
+      ), '[]'::jsonb),
+      'lotStatusHistory', coalesce((
+        SELECT jsonb_agg(to_jsonb(history) ORDER BY history.changed_at)
+        FROM public.lot_status_history history
+        WHERE history.lot_id IN (SELECT id FROM affected_lots)
+      ), '[]'::jsonb),
+      'lotLineage', coalesce((
+        SELECT jsonb_agg(to_jsonb(lineage) ORDER BY lineage.created_at)
+        FROM public.map_lot_lineage lineage
+        WHERE lineage.source_lot_id IN (SELECT id FROM affected_lots)
+          OR lineage.target_lot_id IN (SELECT id FROM affected_lots)
+      ), '[]'::jsonb),
+      'targetIdentifiers', (
+        SELECT jsonb_agg(identifier ORDER BY identifier)
+        FROM target_identifiers
+      )
+    ),
+    auth.uid()
+  RETURNING id INTO v_snapshot_id;
+
+  SELECT *
+  INTO v_current_calibration
+  FROM public.map_calibrations
+  WHERE project_id = v_project.id
+  ORDER BY version DESC
+  LIMIT 1
+  FOR UPDATE;
+
+  SELECT *
+  INTO v_technical_calibration
+  FROM public.map_calibrations
+  WHERE project_id = v_project.id
+    AND status = 'VALIDATED'
+    AND map_units_per_meter = v_map_units_per_meter
+    AND known_distance_meters = v_primary_control_distance_meters
+    AND point_a = v_primary_control_point_a
+    AND point_b = v_primary_control_point_b
+  ORDER BY version DESC
+  LIMIT 1
+  FOR UPDATE;
+
+  IF FOUND THEN
+    v_calibration_id := v_technical_calibration.id;
+    v_calibration_version := v_technical_calibration.version;
+  ELSE
+    SELECT coalesce(max(version), 0) + 1
+    INTO v_calibration_version
+    FROM public.map_calibrations
+    WHERE project_id = v_project.id;
+
+    INSERT INTO public.map_calibrations (
+      project_id, reference_image_path, opacity, is_locked,
+      image_offset_x, image_offset_y, image_scale_x, image_scale_y,
+      image_rotation_degrees, point_a, point_b, known_distance_meters,
+      map_units_per_meter, status, version, invalidated_reason, created_by
+    ) VALUES (
+      v_project.id,
+      v_current_calibration.reference_image_path,
+      coalesce(v_current_calibration.opacity, 0.2),
+      true,
+      coalesce(v_current_calibration.image_offset_x, 0),
+      coalesce(v_current_calibration.image_offset_y, 0),
+      coalesce(v_current_calibration.image_scale_x, 1),
+      coalesce(v_current_calibration.image_scale_y, 1),
+      coalesce(v_current_calibration.image_rotation_degrees, 0),
+      v_primary_control_point_a,
+      v_primary_control_point_b,
+      v_primary_control_distance_meters,
+      v_map_units_per_meter,
+      'VALIDATED',
+      v_calibration_version,
+      NULL,
+      auth.uid()
+    )
+    RETURNING id INTO v_calibration_id;
+    v_calibration_created := true;
+  END IF;
+
+  IF abs(
+    sqrt(
+      power((v_primary_control_point_b->>0)::numeric - (v_primary_control_point_a->>0)::numeric, 2)
+      + power((v_primary_control_point_b->>1)::numeric - (v_primary_control_point_a->>1)::numeric, 2)
+    ) / v_primary_control_distance_meters
+    - v_map_units_per_meter
+  ) > 0.000000001 THEN
+    RAISE EXCEPTION 'EXPORURAL_TECHNICAL_CALIBRATION_INVALID';
+  END IF;
+
+  FOR v_legacy_lot IN
+    SELECT lot.id, lot.status
+    FROM public.commercial_lots lot
+    JOIN public.map_entities legacy ON legacy.id = lot.entity_id
+    WHERE legacy.project_id = v_project.id
+      AND legacy.is_archived = false
+      AND (
+        lower(legacy.name) IN ('espaço semear', 'espaco semear')
+        OR upper(legacy.public_identifier) = 'ESPACO-SEMEAR'
+      )
+    FOR UPDATE OF lot
+  LOOP
+    IF v_legacy_lot.status <> 'UNAVAILABLE' THEN
+      INSERT INTO public.lot_status_history (
+        lot_id, previous_status, new_status, reason, changed_by
+      ) VALUES (
+        v_legacy_lot.id,
+        v_legacy_lot.status,
+        'UNAVAILABLE',
+        'Espaço Semear substituído pelos lotes cadastrais R-53, R-54 e R-55; snapshot ' || v_snapshot_id,
+        auth.uid()
+      )
+      RETURNING id INTO v_auxiliary_id;
+      v_inserted_status_history_ids := array_append(v_inserted_status_history_ids, v_auxiliary_id);
+    END IF;
+
+    UPDATE public.commercial_lots
+    SET status = 'UNAVAILABLE',
+        archived_at = now(),
+        internal_notes = concat_ws(
+          E'\n',
+          internal_notes,
+          'Arquivado pela migração Exporural 2026.3; snapshot ' || v_snapshot_id
+        ),
+        updated_by = auth.uid(),
+        updated_at = now()
+    WHERE id = v_legacy_lot.id;
+  END LOOP;
+
+  UPDATE public.map_entities legacy
+  SET is_archived = true,
+      verification_status = 'ARCHIVED',
+      metadata = legacy.metadata || jsonb_build_object(
+        'archivedByReferenceRevision', p_source_revision,
+        'migrationSnapshotId', v_snapshot_id,
+        'replacementLotIdentifiers', jsonb_build_array('Q-R-53', 'Q-R-54', 'Q-R-55')
+      ),
+      updated_by = auth.uid(),
+      updated_at = now()
+  WHERE legacy.project_id = v_project.id
+    AND legacy.is_archived = false
+    AND (
+      lower(legacy.name) IN ('espaço semear', 'espaco semear')
+      OR upper(legacy.public_identifier) = 'ESPACO-SEMEAR'
+    );
+  GET DIAGNOSTICS v_legacy_archived = ROW_COUNT;
+
+  FOR v_entity IN
+    SELECT value
+    FROM jsonb_array_elements(p_entities)
+    ORDER BY CASE
+      WHEN value->>'publicIdentifier' = 'EXPORURAL' THEN 0
+      WHEN value->>'publicIdentifier' IN ('QUADRA-R', 'QUADRA-S') THEN 1
+      ELSE 2
+    END
+  LOOP
+    v_identifier := upper(trim(v_entity->>'publicIdentifier'));
+    v_layer_key := trim(v_entity->>'layerKey');
+    v_parent_identifier := nullif(trim(v_entity->>'parentPublicIdentifier'), '');
+    v_geometry := jsonb_build_object(
+      'type', 'Polygon',
+      'coordinates', v_entity#>'{geometry,coordinates}'
+    );
+    v_metadata := v_entity->'metadata' || jsonb_build_object(
+      'technicalCalibrationVersion', v_calibration_version,
+      'mapUnitsPerMeter', v_map_units_per_meter,
+      'calculatedAreaSource', 'POSTGIS_VALIDATED_CALIBRATION',
+      'migrationSnapshotId', v_snapshot_id
+    );
+
+    SELECT id INTO v_layer_id
+    FROM public.map_layers
+    WHERE project_id = v_project.id AND layer_key = v_layer_key;
+    IF v_layer_id IS NULL THEN RAISE EXCEPTION 'EXPORURAL_LAYER_NOT_FOUND:%', v_layer_key; END IF;
+
+    v_parent_id := NULL;
+    IF v_parent_identifier IS NOT NULL THEN
+      SELECT id INTO v_parent_id
+      FROM public.map_entities
+      WHERE project_id = v_project.id
+        AND upper(public_identifier) = upper(v_parent_identifier)
+        AND is_archived = false;
+      IF v_parent_id IS NULL THEN
+        RAISE EXCEPTION 'EXPORURAL_PARENT_NOT_FOUND:%:%', v_identifier, v_parent_identifier;
+      END IF;
+    END IF;
+
+    SELECT * INTO v_existing
+    FROM public.map_entities
+    WHERE project_id = v_project.id AND upper(public_identifier) = v_identifier
+    FOR UPDATE;
+
+    IF FOUND AND v_existing.metadata->>'seedManaged' IS DISTINCT FROM 'true' THEN
+      RAISE EXCEPTION 'EXPORURAL_MANUAL_ENTITY_CONFLICT:%', v_identifier;
+    END IF;
+
+    IF v_existing.id IS NULL THEN
+      INSERT INTO public.map_entities (
+        project_id, layer_id, parent_entity_id, public_identifier, name, description,
+        classification, verification_status, is_sellable, is_archived, metadata,
+        created_by, updated_by
+      ) VALUES (
+        v_project.id,
+        v_layer_id,
+        v_parent_id,
+        v_identifier,
+        v_entity->>'name',
+        nullif(v_entity->>'description', ''),
+        v_entity->>'classification',
+        v_entity->>'verificationStatus',
+        coalesce((v_entity->>'isSellable')::boolean, false),
+        false,
+        v_metadata || jsonb_build_object(
+          'createdByExporuralSnapshotId', v_snapshot_id,
+          'createdByReferenceRevision', p_source_revision
+        ),
+        auth.uid(),
+        auth.uid()
+      )
+      RETURNING id INTO v_entity_id;
+      v_inserted_entity_ids := array_append(v_inserted_entity_ids, v_entity_id);
+      v_inserted := v_inserted + 1;
+    ELSE
+      v_entity_id := v_existing.id;
+      UPDATE public.map_entities
+      SET layer_id = v_layer_id,
+          parent_entity_id = v_parent_id,
+          name = v_entity->>'name',
+          description = nullif(v_entity->>'description', ''),
+          classification = v_entity->>'classification',
+          verification_status = v_entity->>'verificationStatus',
+          is_sellable = coalesce((v_entity->>'isSellable')::boolean, false),
+          is_archived = false,
+          metadata = (
+            map_entities.metadata
+            - 'rolledBackBySnapshotId'
+            - 'rolledBackAt'
+          ) || v_metadata,
+          updated_by = auth.uid(),
+          updated_at = now()
+      WHERE id = v_entity_id;
+      v_updated := v_updated + 1;
+    END IF;
+
+    SELECT * INTO v_current_geometry
+    FROM public.map_entity_geometries
+    WHERE entity_id = v_entity_id AND is_current = true
+    FOR UPDATE;
+
+    IF v_current_geometry.id IS NULL THEN
+      SELECT coalesce(max(version), 0) + 1
+      INTO v_geometry_version
+      FROM (
+        SELECT version
+        FROM public.map_entity_geometries
+        WHERE entity_id = v_entity_id
+        UNION ALL
+        SELECT version
+        FROM public.map_geometry_versions
+        WHERE entity_id = v_entity_id
+      ) versions;
+
+      INSERT INTO public.map_entity_geometries (
+        project_id, entity_id, geometry, elevation, extrusion_height, rotation,
+        calibration_version, version, is_current, change_reason, created_by
+      ) VALUES (
+        v_project.id,
+        v_entity_id,
+        v_geometry,
+        coalesce((v_entity#>>'{geometry,elevation}')::numeric, 0),
+        coalesce((v_entity#>>'{geometry,extrusionHeight}')::numeric, 0.15),
+        coalesce((v_entity#>>'{geometry,rotation}')::numeric, 0),
+        v_calibration_version,
+        v_geometry_version,
+        true,
+        'Implantação direcionada Exporural 2026.3; snapshot ' || v_snapshot_id,
+        auth.uid()
+      );
+      v_geometry_updates := v_geometry_updates + 1;
+    ELSE
+      v_geometry_changed :=
+        v_current_geometry.geometry IS DISTINCT FROM v_geometry
+        OR v_current_geometry.elevation IS DISTINCT FROM coalesce((v_entity#>>'{geometry,elevation}')::numeric, 0)
+        OR v_current_geometry.extrusion_height IS DISTINCT FROM coalesce((v_entity#>>'{geometry,extrusionHeight}')::numeric, 0.15)
+        OR v_current_geometry.rotation IS DISTINCT FROM coalesce((v_entity#>>'{geometry,rotation}')::numeric, 0);
+      v_calibration_changed :=
+        v_current_geometry.calibration_version IS DISTINCT FROM v_calibration_version;
+
+      IF v_calibration_changed AND NOT v_geometry_changed THEN
+        INSERT INTO public.map_geometry_versions (
+          geometry_id, project_id, entity_id, geometry, elevation, extrusion_height,
+          rotation, calibration_version, version, change_reason, created_by, created_at
+        ) VALUES (
+          v_current_geometry.id,
+          v_current_geometry.project_id,
+          v_current_geometry.entity_id,
+          v_current_geometry.geometry,
+          v_current_geometry.elevation,
+          v_current_geometry.extrusion_height,
+          v_current_geometry.rotation,
+          v_current_geometry.calibration_version,
+          v_current_geometry.version,
+          v_current_geometry.change_reason,
+          v_current_geometry.created_by,
+          v_current_geometry.created_at
+        );
+      END IF;
+
+      IF v_geometry_changed OR v_calibration_changed THEN
+      UPDATE public.map_entity_geometries
+      SET geometry = v_geometry,
+          elevation = coalesce((v_entity#>>'{geometry,elevation}')::numeric, 0),
+          extrusion_height = coalesce((v_entity#>>'{geometry,extrusionHeight}')::numeric, 0.15),
+          rotation = coalesce((v_entity#>>'{geometry,rotation}')::numeric, 0),
+          calibration_version = v_calibration_version,
+          version = v_current_geometry.version + 1,
+          change_reason = 'Revisão dirigida Exporural 2026.3; snapshot ' || v_snapshot_id,
+          created_by = auth.uid(),
+          updated_at = now()
+      WHERE id = v_current_geometry.id;
+      v_geometry_updates := v_geometry_updates + 1;
+      END IF;
+    END IF;
+  END LOOP;
+
+  FOR v_lot IN SELECT value FROM jsonb_array_elements(p_lots)
+  LOOP
+    v_identifier := upper(trim(v_lot->>'publicIdentifier'));
+    v_official_area := (v_lot->>'officialAreaSqm')::numeric;
+
+    SELECT
+      entity.id,
+      extensions.ST_Area(geometry.native_geometry)
+        / (calibration.map_units_per_meter * calibration.map_units_per_meter)
+    INTO v_entity_id, v_calculated_area
+    FROM public.map_entities entity
+    JOIN public.map_entity_geometries geometry
+      ON geometry.entity_id = entity.id AND geometry.is_current = true
+    JOIN public.map_calibrations calibration
+      ON calibration.project_id = geometry.project_id
+      AND calibration.version = geometry.calibration_version
+      AND calibration.status = 'VALIDATED'
+    WHERE entity.project_id = v_project.id
+      AND upper(entity.public_identifier) = v_identifier
+      AND entity.is_archived = false
+      AND entity.classification = 'SELLABLE_LOT'
+      AND entity.is_sellable = true;
+
+    IF v_entity_id IS NULL OR v_calculated_area IS NULL THEN
+      RAISE EXCEPTION 'EXPORURAL_LOT_ENTITY_OR_CALIBRATION_NOT_FOUND:%', v_identifier;
+    END IF;
+
+    v_area_difference_percent := abs(v_calculated_area - v_official_area) / v_official_area * 100;
+    IF v_area_difference_percent > 0.15 THEN
+      RAISE EXCEPTION 'EXPORURAL_PERSISTED_AREA_TOLERANCE_EXCEEDED:%:%',
+        v_identifier, v_area_difference_percent;
+    END IF;
+
+    IF jsonb_typeof(coalesce(v_lot->'infrastructure', '[]'::jsonb)) <> 'array' THEN
+      RAISE EXCEPTION 'INVALID_EXPORURAL_LOT_INFRASTRUCTURE:%', v_identifier;
+    END IF;
+
+    IF EXISTS (
+      SELECT 1
+      FROM public.commercial_lots conflict
+      WHERE conflict.project_id = v_project.id
+        AND upper(conflict.public_identifier) = v_identifier
+        AND conflict.entity_id <> v_entity_id
+    ) THEN
+      RAISE EXCEPTION 'EXPORURAL_COMMERCIAL_LOT_IDENTITY_CONFLICT:%', v_identifier;
+    END IF;
+
+    SELECT *
+    INTO v_existing_lot
+    FROM public.commercial_lots
+    WHERE entity_id = v_entity_id
+    FOR UPDATE;
+
+    IF v_existing_lot.id IS NULL THEN
+      INSERT INTO public.commercial_lots (
+        project_id, entity_id, public_identifier, block, lot_number, level_label,
+        display_name, description, status, official_area_sqm, calculated_area_sqm,
+        area_validation_status, infrastructure, has_electricity, has_water,
+        has_internet, is_corner, is_covered, accessibility_notes, created_by, updated_by
+      ) VALUES (
+        v_project.id,
+        v_entity_id,
+        v_identifier,
+        nullif(trim(v_lot->>'block'), ''),
+        nullif(trim(v_lot->>'lotNumber'), ''),
+        nullif(trim(v_lot->>'levelLabel'), ''),
+        coalesce(nullif(trim(v_lot->>'displayName'), ''), v_identifier),
+        nullif(trim(v_lot->>'description'), ''),
+        'BLOCKED',
+        v_official_area,
+        round(v_calculated_area, 4),
+        'VALIDATED',
+        coalesce(v_lot->'infrastructure', '[]'::jsonb),
+        coalesce((nullif(v_lot->>'hasElectricity', ''))::boolean, false),
+        coalesce((nullif(v_lot->>'hasWater', ''))::boolean, false),
+        coalesce((nullif(v_lot->>'hasInternet', ''))::boolean, false),
+        coalesce((nullif(v_lot->>'isCorner', ''))::boolean, false),
+        coalesce((nullif(v_lot->>'isCovered', ''))::boolean, false),
+        nullif(trim(v_lot->>'accessibilityNotes'), ''),
+        auth.uid(),
+        auth.uid()
+      )
+      RETURNING id INTO v_lot_id;
+      v_inserted_lot_ids := array_append(v_inserted_lot_ids, v_lot_id);
+
+      INSERT INTO public.lot_prices (
+        lot_id, pricing_mode, base_price, price_per_sqm, asking_price,
+        minimum_price, is_active, created_by
+      ) VALUES (
+        v_lot_id, 'NOT_FOR_SALE', NULL, NULL, NULL, NULL, true, auth.uid()
+      )
+      RETURNING id INTO v_auxiliary_id;
+      v_inserted_price_ids := array_append(v_inserted_price_ids, v_auxiliary_id);
+
+      INSERT INTO public.lot_status_history (
+        lot_id, previous_status, new_status, reason, changed_by
+      ) VALUES (
+        v_lot_id,
+        NULL,
+        'BLOCKED',
+        'Lote cadastral Exporural 2026.3 criado bloqueado; snapshot ' || v_snapshot_id,
+        auth.uid()
+      )
+      RETURNING id INTO v_auxiliary_id;
+      v_inserted_status_history_ids := array_append(v_inserted_status_history_ids, v_auxiliary_id);
+    ELSE
+      v_lot_id := v_existing_lot.id;
+      UPDATE public.commercial_lots
+      SET public_identifier = v_identifier,
+          block = nullif(trim(v_lot->>'block'), ''),
+          lot_number = nullif(trim(v_lot->>'lotNumber'), ''),
+          level_label = nullif(trim(v_lot->>'levelLabel'), ''),
+          display_name = coalesce(nullif(trim(v_lot->>'displayName'), ''), v_identifier),
+          description = nullif(trim(v_lot->>'description'), ''),
+          official_area_sqm = v_official_area,
+          calculated_area_sqm = round(v_calculated_area, 4),
+          area_validation_status = 'VALIDATED',
+          updated_by = auth.uid(),
+          updated_at = now()
+      WHERE id = v_existing_lot.id;
+    END IF;
+
+    v_lot_updates := v_lot_updates + 1;
+  END LOOP;
+
+  FOR v_legacy_lot IN
+    SELECT
+      source_lot.id AS source_lot_id,
+      target_lot.id AS target_lot_id
+    FROM public.commercial_lots source_lot
+    JOIN public.map_entities legacy ON legacy.id = source_lot.entity_id
+    CROSS JOIN public.commercial_lots target_lot
+    WHERE legacy.project_id = v_project.id
+      AND source_lot.archived_at IS NOT NULL
+      AND legacy.metadata->>'migrationSnapshotId' = v_snapshot_id::text
+      AND target_lot.project_id = v_project.id
+      AND target_lot.archived_at IS NULL
+      AND upper(target_lot.public_identifier) IN ('Q-R-53', 'Q-R-54', 'Q-R-55')
+  LOOP
+    v_auxiliary_id := NULL;
+    INSERT INTO public.map_lot_lineage (
+      source_lot_id, target_lot_id, relationship, created_by
+    ) VALUES (
+      v_legacy_lot.source_lot_id,
+      v_legacy_lot.target_lot_id,
+      'SPLIT_FROM',
+      auth.uid()
+    )
+    ON CONFLICT (source_lot_id, target_lot_id, relationship) DO NOTHING
+    RETURNING id INTO v_auxiliary_id;
+
+    IF v_auxiliary_id IS NOT NULL THEN
+      v_inserted_lineage_ids := array_append(v_inserted_lineage_ids, v_auxiliary_id);
+    END IF;
+  END LOOP;
+
+  UPDATE public.map_projects
+  SET reference_revision = p_source_revision,
+      active_version = greatest(active_version + 1, 4),
+      is_published = false,
+      updated_by = auth.uid(),
+      updated_at = now()
+  WHERE id = v_project.id
+  RETURNING * INTO v_project;
+
+  v_applied_at := clock_timestamp();
+  v_metadata := jsonb_build_object(
+    'projectId', v_project.id,
+    'snapshotId', v_snapshot_id,
+    'referenceRevision', p_source_revision,
+    'geometryRevision', '2026.3-exporural.1',
+    'changed', true,
+    'entitiesInserted', v_inserted,
+    'entitiesUpdated', v_updated,
+    'geometriesVersioned', v_geometry_updates,
+    'lotsValidated', v_lot_updates,
+    'legacySemearArchived', v_legacy_archived,
+    'calibrationId', v_calibration_id,
+    'calibrationVersion', v_calibration_version,
+    'calibrationCreated', v_calibration_created,
+    'mapUnitsPerMeter', v_map_units_per_meter,
+    'calibrationEvidence', jsonb_build_object(
+      'source', 'Anexos cadastrais Exporural 2026',
+      'primaryControlMeters', v_primary_control_distance_meters,
+      'pointA', v_primary_control_point_a,
+      'pointB', v_primary_control_point_b,
+      'repeatedControls', jsonb_build_array(
+        'Quadra S: módulos repetidos de 30,00 m x 15,00 m',
+        'Quadra R: módulos oficiais de 500,00 m2',
+        'Corredores transversais cotados em 6,00 m'
+      )
+    ),
+    'insertedEntityIds', to_jsonb(v_inserted_entity_ids),
+    'insertedLotIds', to_jsonb(v_inserted_lot_ids),
+    'insertedPriceIds', to_jsonb(v_inserted_price_ids),
+    'insertedStatusHistoryIds', to_jsonb(v_inserted_status_history_ids),
+    'insertedLineageIds', to_jsonb(v_inserted_lineage_ids),
+    'projectVersionAfter', v_project.active_version,
+    'appliedAt', v_applied_at
+  );
+
+  UPDATE public.map_reference_migration_snapshots
+  SET status = 'APPLIED',
+      apply_result = v_metadata,
+      applied_at = v_applied_at
+  WHERE id = v_snapshot_id;
+
+  INSERT INTO public.map_activity_logs (
+    org_id, project_id, action, reason, before_state, after_state, actor_user_id
+  ) VALUES (
+    p_org_id,
+    v_project.id,
+    'EXPORURAL_REFERENCE_2026_APPLIED',
+    'Revisão cartográfica dirigida das Quadras R/S e subdivisão Semear',
+    (SELECT snapshot->'project' FROM public.map_reference_migration_snapshots WHERE id = v_snapshot_id),
+    v_metadata,
+    auth.uid()
+  );
+
+  RETURN v_metadata;
+END;
+$$;
+
+REVOKE ALL ON FUNCTION public.apply_exporural_reference_2026(uuid, text, jsonb, jsonb) FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION public.apply_exporural_reference_2026(uuid, text, jsonb, jsonb) TO authenticated;
+
+COMMENT ON FUNCTION public.apply_exporural_reference_2026(uuid, text, jsonb, jsonb) IS
+  'Explicit map.admin-only Exporural 2026.3 rollout with pre-apply snapshot, PostGIS validation and preserved commercial state.';
