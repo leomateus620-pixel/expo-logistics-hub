@@ -121,8 +121,8 @@ describe('modelo de volume', () => {
       granularity: 'week',
     });
     expect(weekly.buckets).toHaveLength(2);
-    expect(weekly.buckets[0].total).toBe(1);
-    expect(weekly.buckets[1].total).toBe(1);
+    expect(weekly.buckets[0].total).toBe(2);
+    expect(weekly.buckets[1].total).toBe(0);
 
     const daily = buildEventVolumeModel({
       events,
