@@ -242,14 +242,26 @@ function statusSlices(events: CronogramaEvent[]): VolumeStatusSlice[] {
     .map(([status, count]) => ({ status, label: STATUS_LABELS[status], count }));
 }
 
-/** Builds the preset range: current month plus the following N-1 months. */
+/**
+ * Janela operacional dos presets, a partir do mês corrente normalizado:
+ * - `3m`: mês anterior, mês atual e próximo mês;
+ * - `6m`: mês anterior, mês atual e os quatro meses seguintes;
+ * - `12m`: janeiro a dezembro do ano corrente.
+ * Todos os meses da janela aparecem, inclusive os sem eventos.
+ */
 export function resolvePresetRange(preset: Exclude<VolumePeriodPreset, 'custom'>, todayKey: string): VolumeRange {
-  const months = preset === '3m' ? 3 : preset === '6m' ? 6 : 12;
   const [year, month] = todayKey.slice(0, 7).split('-').map(Number);
-  const start = new Date(year, month - 1, 1);
-  const end = new Date(year, month - 1 + months, 0);
+  if (preset === '12m') {
+    return { from: toDateKey(new Date(year, 0, 1)), to: toDateKey(new Date(year, 12, 0)) };
+  }
+  const months = preset === '3m' ? 3 : 6;
+  // O mês anterior sempre entra na janela para preservar a leitura do que acabou de ocorrer.
+  const startMonthIndex = month - 2;
+  const start = new Date(year, startMonthIndex, 1);
+  const end = new Date(year, startMonthIndex + months, 0);
   return { from: toDateKey(start), to: toDateKey(end) };
 }
+
 
 export function isValidRange(range: VolumeRange): boolean {
   return (
