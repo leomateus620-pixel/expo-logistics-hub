@@ -19,12 +19,9 @@ import {
   UserRoundX,
 } from 'lucide-react';
 import {
-  Area,
-  AreaChart,
   Bar,
   BarChart,
   CartesianGrid,
-  Line,
   ResponsiveContainer,
   Tooltip as RechartsTooltip,
   XAxis,
@@ -41,10 +38,10 @@ import {
 } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
 import type { CronogramaEvent } from '../types';
+import { getTodayKey } from '@/lib/cronograma-timeline';
+import EventVolumePanel from './EventVolumePanel';
 import type {
   ActivityDetail,
-  CommissionPerformanceRow,
-  CommissionSegmentKey,
   CronogramaDashboardModel,
   DashboardDrilldown,
   DashboardKpi,
@@ -62,13 +59,6 @@ interface CronogramaDashboardBoardProps {
 }
 
 const kpiIcons = [Target, AlertTriangle, CalendarDays, UserRoundX, CalendarClock];
-const commissionSegmentOrder: CommissionSegmentKey[] = [
-  'completed',
-  'inProgress',
-  'planned',
-  'overdue',
-  'undated',
-];
 
 const priorityLabels: Record<CronogramaEvent['priority'], string> = {
   low: 'Baixa',
@@ -274,215 +264,6 @@ function ExecutiveKpis({
         );
       })}
     </section>
-  );
-}
-
-function PlannedCompletedChart({ model }: { model: CronogramaDashboardModel }) {
-  const { series, actualCompletionCount, estimatedCompletionCount, undatedExcluded } =
-    model.plannedCompleted;
-  const latest = series.at(-1);
-  const summary = latest
-    ? `Até ${latest.label}, havia ${latest.planned} entregas planejadas e ${latest.completed} concluídas, com desvio de ${latest.deviation}.`
-    : 'Não há datas suficientes para comparar o planejamento e a realização.';
-
-  return (
-    <section className="cronograma-dashboard-panel cronograma-dashboard-main-chart">
-      <DashboardSectionHeader
-        eyebrow="Evolução acumulada"
-        title="Planejado × realizado"
-        description="Compara prazos assumidos com a conclusão registrada no histórico."
-      />
-      <p className="sr-only">{summary}</p>
-      {series.length === 0 ? (
-        <EmptyDashboardPanel
-          title="Sem série temporal"
-          description="Defina datas nos eventos para habilitar esta comparação."
-        />
-      ) : (
-        <>
-          <div className="cronograma-dashboard-chart" role="img" aria-label={summary}>
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={series} margin={{ top: 14, right: 14, left: -18, bottom: 2 }}>
-                <defs>
-                  <linearGradient id="cronogramaCompletedArea" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="oklch(var(--success))" stopOpacity={0.28} />
-                    <stop offset="100%" stopColor="oklch(var(--success))" stopOpacity={0.02} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid
-                  strokeDasharray="4 5"
-                  stroke="oklch(var(--border) / 0.5)"
-                  vertical={false}
-                />
-                <XAxis
-                  dataKey="label"
-                  tick={{ fontSize: 11, fill: 'oklch(var(--muted-foreground))' }}
-                  axisLine={false}
-                  tickLine={false}
-                  minTickGap={22}
-                />
-                <YAxis
-                  allowDecimals={false}
-                  tick={{ fontSize: 11, fill: 'oklch(var(--muted-foreground))' }}
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <RechartsTooltip
-                  cursor={{ stroke: 'oklch(var(--primary) / 0.25)' }}
-                  content={({ active, payload }) => {
-                    const point = payload?.[0]?.payload as typeof series[number] | undefined;
-                    if (!active || !point) return null;
-                    return (
-                      <div className="cronograma-chart-tooltip">
-                        <strong>{point.label}</strong>
-                        <span>Planejado acumulado: {point.planned}</span>
-                        <span>Concluído acumulado: {point.completed}</span>
-                        <span>Desvio: {point.deviation}</span>
-                        <span>
-                          Conclusão: {point.completionPercentage === null ? 'indisponível' : `${point.completionPercentage}%`}
-                        </span>
-                      </div>
-                    );
-                  }}
-                />
-                <Area
-                  type="monotone"
-                  dataKey="completed"
-                  name="Realizado"
-                  stroke="oklch(var(--success))"
-                  strokeWidth={3}
-                  fill="url(#cronogramaCompletedArea)"
-                  isAnimationActive={false}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="planned"
-                  name="Planejado"
-                  stroke="oklch(var(--primary))"
-                  strokeWidth={2.5}
-                  strokeDasharray="7 5"
-                  dot={false}
-                  isAnimationActive={false}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="cronograma-chart-legend" aria-hidden="true">
-            <span data-series="planned">Planejado</span>
-            <span data-series="completed">Realizado</span>
-          </div>
-          <footer className="cronograma-dashboard-footnote">
-            <History aria-hidden="true" />
-            {estimatedCompletionCount > 0
-              ? `${actualCompletionCount} conclusões têm data histórica; ${estimatedCompletionCount} usam updated_at como estimativa identificada.`
-              : `${actualCompletionCount} conclusões posicionadas pelo histórico real.`}
-            {undatedExcluded > 0 && ` ${undatedExcluded} eventos sem data ficaram fora do eixo mensal.`}
-          </footer>
-        </>
-      )}
-    </section>
-  );
-}
-
-type CommissionSort = 'risk' | 'volume' | 'completion';
-
-function CommissionPerformance({
-  model,
-  onDrilldown,
-}: {
-  model: CronogramaDashboardModel;
-  onDrilldown: (drilldown: DashboardDrilldown) => void;
-}) {
-  const [sort, setSort] = useState<CommissionSort>('risk');
-  const rows = useMemo(() => {
-    const sorted = [...model.commissions];
-    if (sort === 'volume') sorted.sort((a, b) => b.total - a.total);
-    else if (sort === 'completion') {
-      sorted.sort((a, b) => b.completionPercentage - a.completionPercentage);
-    } else sorted.sort((a, b) => b.riskScore - a.riskScore);
-    return sorted;
-  }, [model.commissions, sort]);
-
-  return (
-    <section className="cronograma-dashboard-panel cronograma-commission-panel">
-      <DashboardSectionHeader
-        eyebrow="Responsabilidade primária"
-        title="Desempenho por comissão"
-        description="Cada evento aparece uma única vez, atribuído à comissão principal."
-        action={(
-          <label className="cronograma-dashboard-sort">
-            <span>Ordenar</span>
-            <select value={sort} onChange={(event) => setSort(event.target.value as CommissionSort)}>
-              <option value="risk">Maior risco</option>
-              <option value="volume">Maior volume</option>
-              <option value="completion">Maior conclusão</option>
-            </select>
-          </label>
-        )}
-      />
-      {rows.length === 0 ? (
-        <EmptyDashboardPanel
-          title="Sem comissões atribuídas"
-          description="Os eventos do recorte ainda não possuem comissão principal."
-        />
-      ) : (
-        <>
-          <p className="sr-only">
-            Lista de comissões ordenada por {sort === 'risk' ? 'risco' : sort === 'volume' ? 'volume' : 'conclusão'}.
-            Cada segmento abre os eventos que compõem o total.
-          </p>
-          <div className="cronograma-commission-list">
-            {rows.slice(0, 12).map((row) => (
-              <CommissionRow key={row.key} row={row} onDrilldown={onDrilldown} />
-            ))}
-          </div>
-          <div className="cronograma-commission-legend" aria-label="Legenda">
-            {commissionSegmentOrder.map((key) => (
-              <span key={key} data-segment={key}>{rows[0].segments[key].label}</span>
-            ))}
-          </div>
-        </>
-      )}
-    </section>
-  );
-}
-
-function CommissionRow({
-  row,
-  onDrilldown,
-}: {
-  row: CommissionPerformanceRow;
-  onDrilldown: (drilldown: DashboardDrilldown) => void;
-}) {
-  return (
-    <article className="cronograma-commission-row">
-      <header>
-        <strong>{row.name}</strong>
-        <span>{row.total} eventos · {row.completionPercentage}% concluído</span>
-      </header>
-      <div className="cronograma-commission-bar" aria-label={`Distribuição de ${row.name}`}>
-        {commissionSegmentOrder.map((key) => {
-          const segment = row.segments[key];
-          if (!segment.count) return null;
-          return (
-            <button
-              key={key}
-              type="button"
-              data-segment={key}
-              style={{ flexGrow: segment.count }}
-              onClick={() => segment.drilldown && onDrilldown(segment.drilldown)}
-              aria-label={`${row.name}: ${segment.count} ${segment.label}. Abrir eventos.`}
-              title={`${segment.label}: ${segment.count}`}
-            >
-              <span>{segment.count}</span>
-            </button>
-          );
-        })}
-      </div>
-      {row.participatingCommissions.length > 0 && (
-        <small>Participações adicionais: {row.participatingCommissions.join(', ')}</small>
-      )}
-    </article>
   );
 }
 
@@ -1056,10 +837,11 @@ export default function CronogramaDashboardBoard({
       <ReadinessHero model={model} />
       <ExecutiveKpis model={model} onDrilldown={onDrilldown} />
 
-      <div className="cronograma-dashboard-analytics">
-        <PlannedCompletedChart model={model} />
-        <CommissionPerformance model={model} onDrilldown={onDrilldown} />
-      </div>
+      <EventVolumePanel
+        events={model.eligibleEvents}
+        todayKey={getTodayKey()}
+        onDrilldown={onDrilldown}
+      />
 
       <UpcomingMilestones model={model} onOpenEvent={onOpenEvent} />
 
