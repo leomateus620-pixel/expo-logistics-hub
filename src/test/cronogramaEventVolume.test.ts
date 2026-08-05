@@ -61,11 +61,17 @@ describe('elegibilidade e referência temporal', () => {
 });
 
 describe('períodos e granularidade', () => {
-  it('resolve presets a partir do mês corrente', () => {
-    expect(resolvePresetRange('3m', '2026-08-05')).toEqual({ from: '2026-08-01', to: '2026-10-31' });
-    expect(resolvePresetRange('6m', '2026-08-05')).toEqual({ from: '2026-08-01', to: '2027-01-31' });
-    expect(resolvePresetRange('12m', '2026-12-31')).toEqual({ from: '2026-12-01', to: '2027-11-30' });
+  it('inclui o mês anterior nos presets e o ano-calendário em 1 ano', () => {
+    expect(resolvePresetRange('3m', '2026-08-05')).toEqual({ from: '2026-07-01', to: '2026-09-30' });
+    expect(resolvePresetRange('6m', '2026-08-05')).toEqual({ from: '2026-07-01', to: '2026-12-31' });
+    expect(resolvePresetRange('12m', '2026-12-31')).toEqual({ from: '2026-01-01', to: '2026-12-31' });
   });
+
+  it('atravessa a virada de ano nos presets', () => {
+    expect(resolvePresetRange('3m', '2027-01-15')).toEqual({ from: '2026-12-01', to: '2027-02-28' });
+    expect(resolvePresetRange('6m', '2026-12-10')).toEqual({ from: '2026-11-01', to: '2027-04-30' });
+  });
+
 
   it('bloqueia intervalos inválidos e sugere a granularidade adequada', () => {
     expect(isValidRange({ from: '2026-08-10', to: '2026-08-01' })).toBe(false);

@@ -112,10 +112,19 @@ export default function EventVolumePanel({
     openEvents(`Volume · ${bucket.fullLabel}`, bucket.eventIds);
   }, [granularity, openEvents]);
 
+  // Domínio do eixo Y calculado do maior valor visível: sem área vazia e sem cortar a maior barra.
+  const yAxisMax = useMemo(() => {
+    const max = model.buckets.reduce((peak, bucket) => Math.max(peak, bucket.total), 0);
+    if (max <= 4) return Math.max(max + 1, 2);
+    const step = max <= 10 ? 2 : max <= 40 ? 5 : 10;
+    return Math.ceil((max + step / 2) / step) * step;
+  }, [model.buckets]);
+
   const monthDays = useMemo(
     () => (selectedMonth ? buildDayBuckets(events, selectedMonth) : []),
     [events, selectedMonth],
   );
+
   const selectedMonthBucket = selectedMonth
     ? model.buckets.find((bucket) => bucket.key === selectedMonth) ?? null
     : null;
@@ -216,23 +225,31 @@ export default function EventVolumePanel({
           ) : (
             <>
               <div className="cronograma-volume-chart" data-dense={model.dense || undefined}>
-                <div style={{ minWidth: `${Math.max(320, model.buckets.length * 46)}px`, height: 280 }}>
+                <div style={{ minWidth: `${Math.max(320, model.buckets.length * 56)}px`, height: 300 }}>
                   <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={model.buckets} margin={{ top: 12, right: 8, bottom: 4, left: -14 }}>
-                      <CartesianGrid vertical={false} strokeDasharray="3 6" stroke="oklch(var(--border) / 0.7)" />
+                    <BarChart data={model.buckets} margin={{ top: 16, right: 12, bottom: 4, left: -16 }} barCategoryGap="28%">
+                      <CartesianGrid vertical={false} strokeDasharray="3 6" stroke="oklch(var(--border) / 0.6)" />
                       <XAxis
                         dataKey="label"
                         tickLine={false}
                         axisLine={false}
                         interval={0}
+                        tickMargin={8}
+                        tick={{ fontSize: 12, fontWeight: 600 }}
+                      />
+                      <YAxis
+                        allowDecimals={false}
+                        tickLine={false}
+                        axisLine={false}
+                        width={34}
+                        domain={[0, yAxisMax]}
                         tick={{ fontSize: 11 }}
                       />
-                      <YAxis allowDecimals={false} tickLine={false} axisLine={false} width={34} tick={{ fontSize: 11 }} />
-                      <RechartsTooltip cursor={{ fill: 'oklch(var(--muted) / 0.45)' }} content={<VolumeTooltip />} />
+                      <RechartsTooltip cursor={{ fill: 'oklch(var(--muted) / 0.4)' }} content={<VolumeTooltip />} />
                       <Bar
                         dataKey="total"
-                        radius={[8, 8, 2, 2]}
-                        maxBarSize={54}
+                        radius={[10, 10, 3, 3]}
+                        maxBarSize={48}
                         onClick={(payload: unknown) => handleBucket(payload as VolumeBucket)}
                         cursor="pointer"
                       >
@@ -242,6 +259,7 @@ export default function EventVolumePanel({
                             fill={bucket.key === selectedMonth
                               ? 'oklch(var(--gold))'
                               : 'oklch(var(--primary))'}
+                            fillOpacity={selectedMonth && bucket.key !== selectedMonth ? 0.55 : 1}
                           />
                         ))}
                       </Bar>
@@ -249,7 +267,7 @@ export default function EventVolumePanel({
                   </ResponsiveContainer>
                 </div>
               </div>
-              <ul className="cronograma-volume-keys" aria-label="Selecionar período do gráfico">
+              <ul className="sr-only" aria-label="Selecionar período do gráfico">
                 {model.buckets.map((bucket) => (
                   <li key={bucket.key}>
                     <button
@@ -258,14 +276,14 @@ export default function EventVolumePanel({
                       aria-label={`${bucket.fullLabel}: ${bucket.total} ${bucket.total === 1 ? 'evento' : 'eventos'}`}
                       onClick={() => handleBucket(bucket)}
                     >
-                      {bucket.label}
-                      <span>{bucket.total}</span>
+                      {bucket.label} {bucket.total}
                     </button>
                   </li>
                 ))}
               </ul>
             </>
           )}
+
         </div>
 
         <EventVolumeTopDays days={model.busiestDays} onOpenDay={openEvents} />

@@ -1373,21 +1373,36 @@
 .cronograma-volume-periods,
 .cronograma-volume-granularity {
   display: flex;
-  flex-wrap: wrap;
-  gap: 0.35rem;
+  align-items: center;
+  gap: 0.25rem;
+  max-width: 100%;
+  padding: 0.25rem;
+  border: 1px solid oklch(var(--border) / 0.85);
+  border-radius: 999px;
+  background: oklch(var(--muted) / 0.35);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.cronograma-volume-periods::-webkit-scrollbar,
+.cronograma-volume-granularity::-webkit-scrollbar {
+  display: none;
 }
 
 .cronograma-volume-periods button,
 .cronograma-volume-granularity button {
+  flex: 0 0 auto;
   min-height: 2.25rem;
-  padding: 0.35rem 0.8rem;
+  padding: 0.35rem 0.95rem;
   border-radius: 999px;
-  border: 1px solid oklch(var(--border));
-  background: oklch(var(--neutral-0) / 0.9);
-  font-size: 0.78rem;
-  font-weight: 600;
+  border: 1px solid transparent;
+  background: transparent;
+  font-size: 0.8rem;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
   color: var(--dashboard-navy);
-  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease, box-shadow 160ms ease;
 }
 
 .cronograma-volume-periods button em,
@@ -1398,7 +1413,14 @@
 
 .cronograma-volume-periods button:hover,
 .cronograma-volume-granularity button:hover {
-  border-color: oklch(var(--brand-indigo-400) / 0.6);
+  background: oklch(var(--neutral-0) / 0.85);
+  border-color: oklch(var(--brand-indigo-400) / 0.5);
+}
+
+.cronograma-volume-periods button:focus-visible,
+.cronograma-volume-granularity button:focus-visible {
+  outline: 2px solid oklch(var(--brand-indigo-500));
+  outline-offset: 2px;
 }
 
 .cronograma-volume-periods button[data-active='true'],
@@ -1406,7 +1428,9 @@
   background: var(--dashboard-indigo);
   border-color: var(--dashboard-indigo);
   color: oklch(var(--neutral-0));
+  box-shadow: 0 6px 14px -10px oklch(var(--brand-indigo-700) / 0.9);
 }
+
 
 .cronograma-volume-custom {
   display: flex;
