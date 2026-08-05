@@ -105,7 +105,45 @@ Deno.serve(async (req) => {
       return json({ inventory: data });
     }
 
+    if (action === "probe") {
+      const client = await clientForActor(body.actorUserId);
+      const { data: segments } = await admin
+        .from("map_segments")
+        .select("id, slug")
+        .eq("project_id", body.projectId);
+
+      const result: Record<string, unknown> = {};
+      for (const segment of segments ?? []) {
+        const { count: entityCount } = await client
+          .from("map_entities")
+          .select("id", { count: "exact", head: true })
+          .eq("segment_id", segment.id);
+        const { count: lotCount } = await client
+          .from("commercial_lots")
+          .select("id", { count: "exact", head: true })
+          .eq("segment_id", segment.id);
+        const inventory = await client.rpc("get_commission_map_segment_inventory", {
+          p_segment_id: segment.id,
+        });
+        result[segment.slug] = {
+          entities: entityCount ?? 0,
+          lots: lotCount ?? 0,
+          inventory: inventory.error ? `ERROR: ${inventory.error.message}` : inventory.data,
+        };
+      }
+
+      const { count: calibrations } = await client
+        .from("map_calibrations")
+        .select("id", { count: "exact", head: true });
+      const { count: visibleSegments } = await client
+        .from("map_segments")
+        .select("id", { count: "exact", head: true });
+
+      return json({ segments: result, calibrations: calibrations ?? 0, visibleSegments: visibleSegments ?? 0 });
+    }
+
     return json({ error: "UNKNOWN_ACTION" }, 400);
+
   } catch (error) {
     return json({ error: (error as Error).message, details: error }, 400);
   }
