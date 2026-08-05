@@ -1303,13 +1303,6 @@
     height: 0.82rem;
   }
 
-  .cronograma-readiness {
-    grid-template-columns: minmax(0, 1fr) 4.7rem;
-  }
-
-  .cronograma-readiness-score > span {
-    font-size: 2.3rem;
-  }
 
   .cronograma-kpi {
     padding: 0.65rem;
