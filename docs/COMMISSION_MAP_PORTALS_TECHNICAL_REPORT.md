@@ -2,7 +2,18 @@
 
 ## Situação da entrega
 
-Os dois portais foram implementados sobre a autenticação e a arquitetura existentes, com rotas protegidas, navegação responsiva e leitura isolada do Mapa Comercial. A implementação local está funcional e coberta por validações focadas, mas a liberação em produção permanece **NO-GO** até a migration e a matriz de segurança serem verificadas no projeto Supabase de destino com sessões reais.
+Migrations aplicadas e referência oficial 2026.3 semeada no banco atual. Inventário e isolamento validados com sessões reais (05/08/2026):
+
+- projeto cartográfico `0538d132-34dd-4347-a33c-526edac7339c`, revisão `2026.3`, 13 camadas, 415 entidades, 262 lotes;
+- `validate_commercial_map_segments`: `exporural` 116 entidades / 95 lotes e `industria-comercio-servicos` 140 entidades / 103 lotes, `complete = true`, geometria vigente 1:1, `invalidSegmentReferences = 0`, `exclusiveAssignmentConflicts = 0`;
+- admin: enxerga os dois segmentos com contagens exatas;
+- usuário `leitura` sem capacidade: 0 entidades, 0 lotes, RPC de inventário nega com `MAP_PERMISSION_DENIED`;
+- usuário com apenas `exporural_access`: 116/95 no Exporural, 0 no segmento oposto, `map_calibrations` invisível (capacidade de teste revogada em seguida);
+- suítes `commercialMapSegments`, `commissionMapPortals`, `commissionMapSidebar` e `commissionMapMigration.contract`: 21 testes aprovados.
+
+Pendência conhecida: `publish_commercial_map` exige calibração validada (`VALIDATED_CALIBRATION_REQUIRED`); os portais de comissão não dependem da publicação, mas o mapa completo permanece não publicado até a calibração ser validada.
+
+
 
 ## Rotas, autenticação e navegação
 
