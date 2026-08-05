@@ -254,6 +254,13 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
+            foreignKeyName: "commercial_lots_entity_project_fk"
+            columns: ["entity_id", "project_id"]
+            isOneToOne: false
+            referencedRelation: "map_entities"
+            referencedColumns: ["id", "project_id"]
+          },
+          {
             foreignKeyName: "commercial_lots_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
@@ -2621,6 +2628,7 @@ export type Database = {
           parent_entity_id: string | null
           project_id: string
           public_identifier: string
+          segment_id: string | null
           updated_at: string
           updated_by: string | null
           verification_status: string
@@ -2639,6 +2647,7 @@ export type Database = {
           parent_entity_id?: string | null
           project_id: string
           public_identifier: string
+          segment_id?: string | null
           updated_at?: string
           updated_by?: string | null
           verification_status?: string
@@ -2657,6 +2666,7 @@ export type Database = {
           parent_entity_id?: string | null
           project_id?: string
           public_identifier?: string
+          segment_id?: string | null
           updated_at?: string
           updated_by?: string | null
           verification_status?: string
@@ -2668,6 +2678,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "map_layers"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "map_entities_layer_project_fk"
+            columns: ["layer_id", "project_id"]
+            isOneToOne: false
+            referencedRelation: "map_layers"
+            referencedColumns: ["id", "project_id"]
           },
           {
             foreignKeyName: "map_entities_parent_entity_id_fkey"
@@ -2682,6 +2699,20 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "map_projects"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "map_entities_segment_id_fkey"
+            columns: ["segment_id"]
+            isOneToOne: false
+            referencedRelation: "map_segments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "map_entities_segment_project_fk"
+            columns: ["segment_id", "project_id"]
+            isOneToOne: false
+            referencedRelation: "map_segments"
+            referencedColumns: ["id", "project_id"]
           },
         ]
       }
@@ -2751,6 +2782,13 @@ export type Database = {
             isOneToOne: false
             referencedRelation: "map_projects"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "map_geometries_entity_project_fk"
+            columns: ["entity_id", "project_id"]
+            isOneToOne: false
+            referencedRelation: "map_entities"
+            referencedColumns: ["id", "project_id"]
           },
         ]
       }
@@ -3032,6 +3070,62 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "map_reference_migration_snapshots_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "map_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      map_segments: {
+        Row: {
+          boundary_data: Json
+          camera_config: Json
+          created_at: string
+          display_name: string
+          id: string
+          is_active: boolean
+          name: string
+          project_id: string
+          required_capability: string
+          slug: string
+          source_reference: string
+          updated_at: string
+          visual_config: Json
+        }
+        Insert: {
+          boundary_data?: Json
+          camera_config?: Json
+          created_at?: string
+          display_name: string
+          id?: string
+          is_active?: boolean
+          name: string
+          project_id: string
+          required_capability: string
+          slug: string
+          source_reference: string
+          updated_at?: string
+          visual_config?: Json
+        }
+        Update: {
+          boundary_data?: Json
+          camera_config?: Json
+          created_at?: string
+          display_name?: string
+          id?: string
+          is_active?: boolean
+          name?: string
+          project_id?: string
+          required_capability?: string
+          slug?: string
+          source_reference?: string
+          updated_at?: string
+          visual_config?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "map_segments_project_id_fkey"
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "map_projects"
@@ -6991,6 +7085,10 @@ export type Database = {
       }
       enqueue_google_sync: {
         Args: { _event_id: string; _operation: string }
+        Returns: undefined
+      }
+      ensure_commission_map_segments: {
+        Args: { _project_id: string }
         Returns: undefined
       }
       expire_commercial_reservations: {
