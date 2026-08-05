@@ -350,7 +350,7 @@ export function buildEventVolumeModel({
   const dense = ranges.length > MAX_READABLE_BARS;
   const suggested = suggestGranularity(range);
 
-  const buckets: VolumeBucket[] = ranges.map((bucketRange, index) => {
+  const buckets: VolumeBucket[] = ranges.map((bucketRange) => {
     const bucketEvents: CronogramaEvent[] = [];
     for (const [date, dayEvents] of byDay) {
       if (date >= bucketRange.from && date <= bucketRange.to) bucketEvents.push(...dayEvents);
@@ -372,8 +372,7 @@ export function buildEventVolumeModel({
       changePercent: null,
       busiestDay: busiest ? { date: busiest[0], count: busiest[1].length } : null,
       range: bucketRange,
-      _index: index,
-    } as VolumeBucket;
+    };
   });
 
   for (let index = 1; index < buckets.length; index += 1) {
