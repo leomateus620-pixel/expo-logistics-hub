@@ -7169,6 +7169,10 @@ export type Database = {
         Args: { _transport_id: string }
         Returns: undefined
       }
+      rollback_exporural_reference_2026: {
+        Args: { p_org_id: string; p_reason: string; p_snapshot_id: string }
+        Returns: Json
+      }
       save_map_calibration: {
         Args: {
           p_image_offset_x: number
