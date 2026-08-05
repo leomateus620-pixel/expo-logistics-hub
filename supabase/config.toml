@@ -25,6 +25,3 @@ verify_jwt = false
 
 [functions.handle-email-suppression]
 verify_jwt = false
-
-[functions.seed-commercial-map]
-verify_jwt = false
