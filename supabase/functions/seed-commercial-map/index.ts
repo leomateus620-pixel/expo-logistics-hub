@@ -77,7 +77,8 @@ Deno.serve(async (req) => {
     }
 
     if (action === "publish") {
-      const { data, error } = await admin.rpc("publish_commercial_map", {
+      const actorClient = await clientForActor(body.actorUserId);
+      const { data, error } = await actorClient.rpc("publish_commercial_map", {
         p_project_id: body.projectId,
         p_reason: body.reason ?? "Publicação da referência oficial 2026",
       });
@@ -86,7 +87,8 @@ Deno.serve(async (req) => {
     }
 
     if (action === "validate") {
-      const { data, error } = await admin.rpc("validate_commercial_map_segments", {
+      const client = body.actorUserId ? await clientForActor(body.actorUserId) : admin;
+      const { data, error } = await client.rpc("validate_commercial_map_segments", {
         _project_id: body.projectId,
       });
       if (error) throw error;
@@ -94,10 +96,12 @@ Deno.serve(async (req) => {
     }
 
     if (action === "inventory") {
-      const { data, error } = await admin.rpc("get_commission_map_segment_inventory", {
+      const client = body.actorUserId ? await clientForActor(body.actorUserId) : admin;
+      const { data, error } = await client.rpc("get_commission_map_segment_inventory", {
         p_segment_id: body.segmentId,
       });
       if (error) throw error;
+
       return json({ inventory: data });
     }
 
