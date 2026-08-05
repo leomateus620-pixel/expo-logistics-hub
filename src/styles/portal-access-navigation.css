@@ -656,6 +656,22 @@
   --module-accent: #73c7bd;
 }
 
+.commission-access-card[data-module='exporural'] {
+  --module-accent: #b9c879;
+  background:
+    radial-gradient(circle at 12% 8%, rgb(185 200 121 / 14%), transparent 34%),
+    linear-gradient(145deg, #18372c, #1b3530);
+}
+
+.commission-access-card[data-module='industria-comercio-servicos'] {
+  --module-accent: #7fc3d1;
+  background:
+    linear-gradient(90deg, rgb(127 195 209 / 7%) 1px, transparent 1px),
+    linear-gradient(0deg, rgb(127 195 209 / 5%) 1px, transparent 1px),
+    linear-gradient(145deg, #173342, #1a3440);
+  background-size: 28px 28px, 28px 28px, auto;
+}
+
 .commission-access-card::before,
 .commission-access-card::after {
   position: absolute;

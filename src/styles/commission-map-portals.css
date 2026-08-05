@@ -1,0 +1,188 @@
+.commission-layout--map {
+  --commission-sidebar-surface: rgb(14 41 30);
+  --commission-sidebar-surface-strong: rgb(9 31 22);
+  --commission-sidebar-ink: rgb(243 239 222);
+  --commission-sidebar-muted: rgb(222 226 207 / 0.58);
+  background: rgb(220 230 220);
+}
+
+.commission-layout--map[data-commission='industria-comercio-servicos'] {
+  --commission-sidebar-surface: rgb(15 39 55);
+  --commission-sidebar-surface-strong: rgb(10 30 44);
+  --commission-sidebar-ink: rgb(237 242 244);
+  --commission-sidebar-muted: rgb(215 227 233 / 0.58);
+  background: rgb(218 229 234);
+}
+
+.commission-layout--map .commission-layout__map-main {
+  padding-top: 0;
+}
+
+.commission-layout--map .commercial-map-shell {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+.commission-layout--map .commission-sidebar {
+  border-color: rgb(255 255 255 / 0.09);
+  background:
+    radial-gradient(circle at 18% 8%, color-mix(in srgb, var(--commission-accent) 20%, transparent), transparent 30%),
+    linear-gradient(180deg, var(--commission-sidebar-surface), var(--commission-sidebar-surface-strong));
+  color: var(--commission-sidebar-ink);
+  box-shadow: 18px 0 40px -32px rgb(0 10 6 / 0.8);
+}
+
+.commission-layout--map [id='commission-mobile-navigation'] {
+  animation: commission-map-drawer-in 180ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes commission-map-drawer-in {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+.commission-layout--map .commission-sidebar > div,
+.commission-layout--map .commission-sidebar > nav {
+  border-color: rgb(255 255 255 / 0.09);
+}
+
+.commission-layout--map .commission-sidebar p,
+.commission-layout--map .commission-sidebar a:not([aria-current='page']),
+.commission-layout--map .commission-sidebar button {
+  color: var(--commission-sidebar-muted);
+}
+
+.commission-layout--map .commission-sidebar h2,
+.commission-layout--map .commission-sidebar strong,
+.commission-layout--map .commission-sidebar [aria-current='page'] {
+  color: var(--commission-sidebar-ink);
+}
+
+.commission-layout--map .commission-sidebar [aria-current='page'] {
+  border: 1px solid color-mix(in srgb, var(--commission-accent) 42%, transparent);
+  background:
+    linear-gradient(115deg, color-mix(in srgb, var(--commission-accent) 20%, transparent), transparent 76%),
+    rgb(255 255 255 / 0.075);
+  box-shadow:
+    0 14px 28px -24px rgb(0 0 0 / 0.84),
+    inset 3px 0 var(--commission-accent);
+}
+
+.commission-layout--map .commission-sidebar [aria-current='page'] svg {
+  color: color-mix(in srgb, var(--commission-accent) 72%, white);
+}
+
+.commission-layout--map .commission-sidebar nav a {
+  min-height: 3rem;
+}
+
+.commission-layout--map .commission-sidebar nav a:focus-visible,
+.commission-layout--map .commission-sidebar button:focus-visible,
+.commission-layout--map .commission-sidebar a:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--commission-accent) 58%, white);
+  outline-offset: 2px;
+}
+
+.commission-layout--map .commercial-map-shell.is-commission-scope {
+  --map-forest: rgb(52 112 70);
+  --map-gold: rgb(178 132 55);
+}
+
+.commission-layout--map[data-commission='industria-comercio-servicos'] .commercial-map-shell.is-commission-scope {
+  --map-forest: rgb(35 100 136);
+  --map-gold: rgb(192 123 53);
+}
+
+.commercial-map-shell.is-commission-scope .commercial-map-command-header {
+  grid-template-columns: minmax(0, 1fr);
+  border-bottom-color: color-mix(in srgb, var(--commission-accent) 24%, transparent);
+  background:
+    linear-gradient(100deg, color-mix(in srgb, var(--commission-accent) 7%, white), white 52%);
+}
+
+.commercial-map-shell.is-commission-scope .commercial-map-title-icon {
+  background: var(--map-forest);
+  color: rgb(245 226 172);
+}
+
+.commercial-map-shell.is-commission-scope .commercial-map-title-lockup h1 {
+  overflow: hidden;
+  max-width: 100%;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.commercial-map-shell.is-commission-scope .commercial-map-title-lockup p {
+  max-width: min(72vw, 60rem);
+}
+
+.commercial-map-shell.is-commission-scope .commercial-map-source-notice {
+  border-radius: 0;
+}
+
+@media (max-width: 767px) {
+  .commission-layout--map .commercial-map-command-header {
+    min-height: 64px;
+    padding-left: 4rem;
+  }
+
+  .commission-layout--map .commercial-map-title-lockup {
+    gap: 0.65rem;
+  }
+
+  .commission-layout--map .commercial-map-title-icon {
+    width: 2.35rem;
+    height: 2.35rem;
+  }
+
+  .commission-layout--map .commercial-map-title-lockup h1 {
+    font-size: clamp(0.95rem, 4.2vw, 1.25rem);
+  }
+
+  .commission-layout--map .commercial-map-title-lockup p {
+    max-width: calc(100vw - 8rem);
+  }
+
+  .commission-layout--map .commission-sidebar {
+    width: min(19rem, calc(100vw - 2.5rem));
+  }
+}
+
+@media (max-width: 390px) {
+  .commission-layout--map .commercial-map-command-header {
+    padding-right: 0.6rem;
+  }
+
+  .commission-layout--map .commercial-map-title-icon {
+    display: none;
+  }
+
+  .commission-layout--map .commercial-map-title-lockup p {
+    max-width: calc(100vw - 5.25rem);
+  }
+}
+
+@supports (top: max(0px, env(safe-area-inset-top))) {
+  .commission-layout--map > button[aria-controls='commission-mobile-navigation'] {
+    top: max(0.75rem, env(safe-area-inset-top));
+    left: max(0.75rem, env(safe-area-inset-left));
+  }
+
+  .commission-layout--map [id='commission-mobile-navigation'] .commission-sidebar > div:first-child {
+    padding-top: max(1rem, env(safe-area-inset-top));
+    padding-left: max(1rem, env(safe-area-inset-left));
+  }
+
+  .commission-layout--map [id='commission-mobile-navigation'] .commission-sidebar > div:last-child {
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+    padding-left: max(1rem, env(safe-area-inset-left));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .commission-layout--map .commission-sidebar,
+  .commission-layout--map [id='commission-mobile-navigation'] {
+    transition: none;
+  }
+}

@@ -222,27 +222,44 @@ function entityBlockCode(entity: MapEntity, lot?: CommercialLot | null) {
   return block?.toLocaleUpperCase('pt-BR') ?? null;
 }
 
-function segmentFromMetadata(entity: MapEntity) {
-  const id = metadataString(entity, 'segmentId') as CommercialMapSegmentId | null;
-  if (id && SEGMENT_BY_ID.has(id)) return SEGMENT_BY_ID.get(id) ?? null;
-  const code = metadataString(entity, 'segmentCode')?.toLocaleUpperCase('pt-BR');
-  if (code && SEGMENT_BY_CODE.has(code)) return SEGMENT_BY_CODE.get(code) ?? null;
-  if (metadataString(entity, 'areaCode') === EXPORURAL_AREA_CODE) {
-    return SEGMENT_BY_ID.get(COMMERCIAL_MAP_SEGMENT_IDS.exporural) ?? null;
+function segmentsFromMetadata(entity: MapEntity) {
+  const matches = new Map<CommercialMapSegmentId, CommercialMapSegmentDefinition>();
+  const persistedId = entity.segmentId as CommercialMapSegmentId | null | undefined;
+  if (persistedId && SEGMENT_BY_ID.has(persistedId)) {
+    matches.set(persistedId, SEGMENT_BY_ID.get(persistedId)!);
   }
-  return null;
+  const id = metadataString(entity, 'segmentId') as CommercialMapSegmentId | null;
+  if (id && SEGMENT_BY_ID.has(id)) matches.set(id, SEGMENT_BY_ID.get(id)!);
+  const code = metadataString(entity, 'segmentCode')?.toLocaleUpperCase('pt-BR');
+  if (code && SEGMENT_BY_CODE.has(code)) {
+    const segment = SEGMENT_BY_CODE.get(code)!;
+    matches.set(segment.id, segment);
+  }
+  if (metadataString(entity, 'areaCode') === EXPORURAL_AREA_CODE) {
+    const segment = SEGMENT_BY_ID.get(COMMERCIAL_MAP_SEGMENT_IDS.exporural)!;
+    matches.set(segment.id, segment);
+  }
+  return [...matches.values()];
 }
 
 export function findCommercialMapSegmentsForEntity(
   entity: MapEntity,
   lot?: CommercialLot | null,
 ): CommercialMapSegmentDefinition[] {
+  const canonicalSegmentId = entity.segmentId as CommercialMapSegmentId | null | undefined;
+  if (
+    entity.segmentSource === 'database'
+    && canonicalSegmentId
+    && SEGMENT_BY_ID.has(canonicalSegmentId)
+  ) {
+    return [SEGMENT_BY_ID.get(canonicalSegmentId)!];
+  }
   const block = entityBlockCode(entity, lot);
-  const metadataSegment = segmentFromMetadata(entity);
+  const metadataSegments = new Set(segmentsFromMetadata(entity).map((segment) => segment.id));
   return COMMERCIAL_MAP_SEGMENTS.filter((segment) => {
     const exclusions = EXCLUSIONS_BY_SEGMENT.get(segment.id);
     if (exclusions?.has(entity.publicIdentifier)) return false;
-    if (metadataSegment?.id === segment.id) return true;
+    if (metadataSegments.has(segment.id)) return true;
     if (ENTITIES_BY_SEGMENT.get(segment.id)?.has(entity.publicIdentifier)) return true;
     return Boolean(block && BLOCKS_BY_SEGMENT.get(segment.id)?.has(block));
   });
@@ -292,6 +309,8 @@ export function withCommercialMapSegmentMetadata(entity: MapEntity): MapEntity {
   if (!segment) return entity;
   return {
     ...entity,
+    segmentId: segment.id,
+    segmentSource: entity.segmentSource ?? 'derived',
     metadata: {
       ...entity.metadata,
       segmentId: segment.id,
@@ -315,6 +334,8 @@ export function withCommercialMapSegments<T extends CommercialMapData>(data: T):
       if (!segment) return entity;
       return {
         ...entity,
+        segmentId: segment.id,
+        segmentSource: entity.segmentSource ?? 'derived',
         metadata: {
           ...entity.metadata,
           segmentId: segment.id,

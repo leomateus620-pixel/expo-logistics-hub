@@ -34,6 +34,8 @@ describe('arquitetura de acesso do portal', () => {
       'novas-geracoes',
       'seguranca',
       'limpeza',
+      'exporural',
+      'industria-comercio-servicos',
     ]);
     expect(modules).not.toContain(financePortalModule);
   });

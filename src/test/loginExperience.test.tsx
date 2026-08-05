@@ -298,4 +298,68 @@ describe("experiência de autenticação Fenasoja 2028", () => {
       { timeout: 1_500 },
     );
   });
+
+  it("apresenta a identidade Exporural com a colheita contida somente no título Rural", () => {
+    const { container } = renderLogin("/login/exporural");
+
+    expect(screen.getByRole("heading", { name: "Exporural" })).toBeInTheDocument();
+    expect(screen.getByText("Comissão Fenasoja 2028")).toBeInTheDocument();
+    expect(screen.getByText("Segmento exclusivo e acesso protegido")).toBeInTheDocument();
+    expect(container.querySelector(".commission-login-title__expo img")).toBeNull();
+    expect(
+      container.querySelector('.commission-login-title__rural img[src="/commissions/exporural-harvester.webp"]'),
+    ).toBeInTheDocument();
+    expect(container.querySelector('[data-commission-theme="rural"]')).toBeInTheDocument();
+    expect(screen.queryByText("Capacidades do ambiente")).not.toBeInTheDocument();
+  });
+
+  it("apresenta a identidade institucional exclusiva de Indústria, Comércio e Serviços", () => {
+    const { container } = renderLogin("/login/industria-comercio-servicos");
+
+    expect(screen.getByRole("heading", {
+      name: "Indústria, Comércio e Serviços",
+    })).toBeInTheDocument();
+    expect(container.querySelector('[data-commission-theme="industry"]')).toBeInTheDocument();
+    expect(container.querySelectorAll(".commission-login-industry-structure i")).toHaveLength(4);
+    expect(screen.getByLabelText("E-mail")).toBeInTheDocument();
+    expect(screen.getByLabelText("Senha")).toBeInTheDocument();
+  });
+
+  it.each([
+    ["/login/exporural", "/comissoes/exporural/mapa-comercial"],
+    [
+      "/login/industria-comercio-servicos",
+      "/comissoes/industria-comercio-servicos/mapa-comercial",
+    ],
+  ])("preserva o destino protegido de %s", async (loginPath, destination) => {
+    authMocks.signIn.mockResolvedValue({ error: null });
+    renderLogin(loginPath);
+
+    fireEvent.change(screen.getByLabelText("E-mail"), {
+      target: { value: "usuario@fenasoja.com.br" },
+    });
+    fireEvent.change(screen.getByLabelText("Senha"), {
+      target: { value: "senha-segura" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Entrar no sistema" }));
+
+    await waitFor(
+      () => expect(screen.getByTestId("current-location")).toHaveTextContent(destination),
+      { timeout: 1_500 },
+    );
+  });
+
+  it("falha de modo seguro para um slug de login inexistente", () => {
+    renderLogin("/login/comissao-inexistente");
+
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "Esta comissão não está configurada.",
+    );
+    expect(screen.getByRole("link", { name: "Voltar ao portal" })).toHaveAttribute(
+      "href",
+      "/portal",
+    );
+    expect(screen.queryByLabelText("E-mail")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Senha")).not.toBeInTheDocument();
+  });
 });

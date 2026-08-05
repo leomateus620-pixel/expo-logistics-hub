@@ -260,12 +260,18 @@ function adaptMutationOptions<TData, TInput>(
   | undefined {
   if (!options) return undefined;
   return {
-    onSuccess: (data, variables, context) =>
-      options.onSuccess?.(data, variables.input, context),
-    onError: (error, variables, context) =>
-      options.onError?.(error, variables.input, context),
-    onSettled: (data, error, variables, context) =>
-      options.onSettled?.(data, error, variables.input, context),
+    onSuccess: (data, variables, onMutateResult, context) =>
+      options.onSuccess?.(data, variables.input, onMutateResult, context),
+    onError: (error, variables, onMutateResult, context) =>
+      options.onError?.(error, variables.input, onMutateResult, context),
+    onSettled: (data, error, variables, onMutateResult, context) =>
+      options.onSettled?.(
+        data,
+        error,
+        variables.input,
+        onMutateResult,
+        context,
+      ),
   };
 
 }

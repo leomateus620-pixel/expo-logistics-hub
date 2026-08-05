@@ -1233,6 +1233,615 @@
   }
 }
 
+/* Dedicated commission map portals: one auth foundation, two identities. */
+.auth-screen[data-commission-theme] {
+  --commission-login-accent: rgb(181 139 62);
+  --commission-login-accent-strong: rgb(132 93 30);
+  --commission-login-focus: rgb(54 111 71);
+  background:
+    radial-gradient(ellipse at 14% 18%, rgb(86 127 71 / 0.32), transparent 36%),
+    radial-gradient(ellipse at 74% 78%, rgb(176 131 65 / 0.1), transparent 32%),
+    linear-gradient(122deg, rgb(19 48 35) 0%, rgb(25 60 42) 52%, rgb(14 37 29) 100%);
+}
+
+.auth-screen[data-commission-theme='industry'] {
+  --commission-login-accent: rgb(203 139 65);
+  --commission-login-accent-strong: rgb(165 99 38);
+  --commission-login-focus: rgb(38 104 142);
+  background:
+    radial-gradient(ellipse at 16% 20%, rgb(64 117 145 / 0.28), transparent 38%),
+    radial-gradient(ellipse at 74% 82%, rgb(196 130 57 / 0.075), transparent 30%),
+    linear-gradient(122deg, rgb(13 36 53) 0%, rgb(18 48 69) 55%, rgb(12 31 45) 100%);
+}
+
+.auth-screen[data-commission-theme]::before {
+  background-image:
+    linear-gradient(rgb(234 223 191 / 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(234 223 191 / 0.028) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: linear-gradient(108deg, black, transparent 77%);
+}
+
+.auth-screen[data-commission-theme='rural']::after {
+  top: auto;
+  right: auto;
+  bottom: -18rem;
+  left: -12rem;
+  width: min(52rem, 68vw);
+  border-color: rgb(199 172 99 / 0.08);
+  border-radius: 47% 53% 61% 39%;
+  box-shadow:
+    inset 0 0 0 4rem rgb(128 156 76 / 0.018),
+    inset 0 0 0 9rem rgb(128 156 76 / 0.012);
+  transform: rotate(12deg);
+}
+
+.auth-screen[data-commission-theme='industry']::after {
+  top: 8%;
+  right: -15rem;
+  width: min(48rem, 58vw);
+  border-color: rgb(125 174 199 / 0.08);
+  border-radius: 1.5rem;
+  box-shadow:
+    inset 0 0 0 5rem rgb(103 157 183 / 0.014),
+    inset 0 0 0 10rem rgb(103 157 183 / 0.01);
+  transform: rotate(-8deg);
+}
+
+.auth-screen[data-commission-theme] .auth-layout {
+  width: min(100%, 74rem);
+  grid-template-columns: minmax(0, 1.08fr) minmax(22rem, 25.5rem);
+  gap: clamp(2.75rem, 6vw, 5.75rem);
+}
+
+.auth-hero--commission-map {
+  position: relative;
+  max-width: 45rem;
+}
+
+.auth-hero--commission-map .auth-hero__brand {
+  filter:
+    drop-shadow(0 18px 28px rgb(1 14 9 / 0.32))
+    drop-shadow(0 0 20px rgb(191 156 80 / 0.065));
+}
+
+.commission-login-identity {
+  margin-top: clamp(2.25rem, 6vh, 4.25rem);
+}
+
+.commission-login-eyebrow {
+  display: inline-flex;
+  min-height: 2rem;
+  align-items: center;
+  gap: 0.55rem;
+  border: 1px solid rgb(240 231 204 / 0.15);
+  border-radius: 999px;
+  padding: 0.36rem 0.72rem;
+  background: rgb(5 24 17 / 0.26);
+  color: rgb(235 221 180 / 0.88);
+  font-size: 0.68rem;
+  font-weight: 820;
+  letter-spacing: 0.135em;
+  text-transform: uppercase;
+}
+
+[data-commission-theme='industry'] .commission-login-eyebrow {
+  background: rgb(5 21 32 / 0.32);
+  color: rgb(214 227 234 / 0.9);
+}
+
+.commission-login-eyebrow svg {
+  width: 0.95rem;
+  height: 0.95rem;
+  color: var(--commission-login-accent);
+}
+
+.commission-login-title {
+  position: relative;
+  z-index: 1;
+  margin-top: 1.05rem;
+  color: rgb(247 242 226);
+  font-size: clamp(4rem, 7.1vw, 6.5rem);
+  font-weight: 910;
+  letter-spacing: -0.078em;
+  line-height: 0.86;
+  text-shadow: 0 20px 38px rgb(0 12 6 / 0.28);
+}
+
+.commission-login-title--exporural {
+  display: flex;
+  width: max-content;
+  max-width: 100%;
+  align-items: baseline;
+  white-space: nowrap;
+}
+
+.commission-login-title__expo,
+.commission-login-title__rural,
+.commission-login-title__letters {
+  display: inline-block;
+}
+
+.commission-login-title__expo {
+  position: relative;
+  z-index: 3;
+  color: rgb(246 239 216);
+}
+
+.commission-login-title__rural {
+  position: relative;
+  isolation: isolate;
+  z-index: 1;
+  overflow: clip;
+  margin: -0.68em -0.08em -0.2em -0.02em;
+  padding: 0.68em 0.08em 0.2em 0.02em;
+}
+
+.commission-login-title__letters {
+  position: relative;
+  z-index: 2;
+  color: rgb(224 220 171);
+  text-shadow:
+    0 2px 0 rgb(20 48 31 / 0.7),
+    0 12px 24px rgb(5 26 15 / 0.5);
+}
+
+.commission-login-title__harvest {
+  position: absolute;
+  z-index: 1;
+  inset: 0.08em -0.08em -0.02em -0.03em;
+  display: block;
+  opacity: 0.82;
+  pointer-events: none;
+  transform-origin: 52% 72%;
+}
+
+.commission-login-title__harvest picture,
+.commission-login-title__harvest img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.commission-login-title__harvest img {
+  object-fit: contain;
+  object-position: 54% 66%;
+  filter:
+    saturate(0.78)
+    contrast(0.98)
+    drop-shadow(0 8px 13px rgb(3 22 12 / 0.32));
+  transform: scale(1.16);
+}
+
+.commission-login-title--industry {
+  display: grid;
+  max-width: 10.4ch;
+  gap: 0.08em;
+  font-size: clamp(3.45rem, 6vw, 5.55rem);
+  letter-spacing: -0.068em;
+  line-height: 0.91;
+}
+
+.commission-login-title--industry span {
+  display: block;
+}
+
+.commission-login-title--industry span:last-child {
+  color: rgb(216 226 230);
+  font-size: 0.69em;
+  letter-spacing: -0.055em;
+}
+
+.commission-login-title--industry em {
+  color: var(--commission-login-accent);
+  font-family: ui-serif, Georgia, serif;
+  font-size: 0.76em;
+  font-style: italic;
+  font-weight: 600;
+}
+
+.commission-login-industry-lockup {
+  position: relative;
+}
+
+.commission-login-industry-structure {
+  position: absolute;
+  z-index: 0;
+  top: 0.2rem;
+  left: -1.4rem;
+  width: min(37rem, 90%);
+  height: 12rem;
+  overflow: hidden;
+  opacity: 0.32;
+  pointer-events: none;
+  transform: skewX(-8deg);
+}
+
+.commission-login-industry-structure::before,
+.commission-login-industry-structure::after,
+.commission-login-industry-structure i {
+  position: absolute;
+  border: 1px solid rgb(125 174 199 / 0.28);
+  content: '';
+}
+
+.commission-login-industry-structure::before {
+  inset: 1.8rem 0 0 2.2rem;
+  border-bottom: 0;
+}
+
+.commission-login-industry-structure::after {
+  right: 1rem;
+  bottom: 0;
+  left: 0;
+  height: 1px;
+  border: 0;
+  background: linear-gradient(90deg, transparent, rgb(202 139 65 / 0.5), transparent);
+}
+
+.commission-login-industry-structure i {
+  bottom: 0;
+  width: 18%;
+  height: var(--structure-height, 56%);
+  border-bottom: 0;
+}
+
+.commission-login-industry-structure i:nth-child(1) { left: 4%; --structure-height: 48%; }
+.commission-login-industry-structure i:nth-child(2) { left: 28%; --structure-height: 68%; }
+.commission-login-industry-structure i:nth-child(3) { left: 52%; --structure-height: 58%; }
+.commission-login-industry-structure i:nth-child(4) { left: 76%; --structure-height: 78%; }
+
+.commission-login-scope {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.72rem;
+  margin-top: 1.55rem;
+  color: rgb(225 231 211 / 0.76);
+}
+
+[data-commission-theme='industry'] .commission-login-scope {
+  color: rgb(216 228 234 / 0.76);
+}
+
+.commission-login-scope > svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--commission-login-accent);
+}
+
+.commission-login-scope span {
+  display: grid;
+  gap: 0.16rem;
+  font-size: 0.72rem;
+  letter-spacing: 0.025em;
+}
+
+.commission-login-scope strong {
+  color: rgb(248 242 224);
+  font-size: 0.79rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.auth-screen[data-commission-theme] .auth-panel {
+  width: min(100%, 25.5rem);
+  justify-self: end;
+  border-color: rgb(229 218 190 / 0.72);
+  border-radius: 1.35rem;
+  background:
+    linear-gradient(145deg, rgb(255 255 255 / 0.72), transparent 38%),
+    rgb(250 248 240 / 0.97);
+  box-shadow:
+    0 38px 82px -38px rgb(0 15 8 / 0.88),
+    0 2px 8px rgb(0 17 10 / 0.2),
+    inset 0 1px rgb(255 255 255 / 0.96);
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.auth-screen[data-commission-theme='industry'] .auth-panel {
+  border-color: rgb(190 211 221 / 0.76);
+  background:
+    linear-gradient(145deg, rgb(255 255 255 / 0.76), transparent 38%),
+    rgb(247 249 249 / 0.98);
+  box-shadow:
+    0 38px 82px -38px rgb(0 12 22 / 0.88),
+    0 2px 8px rgb(0 17 27 / 0.2),
+    inset 0 1px rgb(255 255 255 / 0.98);
+}
+
+.auth-screen[data-commission-theme] .auth-panel::after {
+  left: 1.75rem;
+  width: 5rem;
+  background: linear-gradient(90deg, var(--commission-login-focus), var(--commission-login-accent));
+  box-shadow: 0 7px 16px -8px color-mix(in srgb, var(--commission-login-accent) 72%, transparent);
+}
+
+.auth-screen[data-commission-theme] .auth-panel__heading {
+  margin-top: 0.35rem;
+}
+
+.auth-screen[data-commission-theme] .auth-panel__eyebrow,
+.auth-screen[data-commission-theme] .auth-panel__eyebrow svg {
+  color: var(--commission-login-focus);
+}
+
+.auth-screen[data-commission-theme] .auth-panel__heading h2 {
+  font-size: clamp(2.05rem, 3.2vw, 2.5rem);
+}
+
+.auth-screen[data-commission-theme] .auth-input-frame {
+  border-color: rgb(194 199 184);
+  background: rgb(255 255 252);
+}
+
+.auth-screen[data-commission-theme='industry'] .auth-input-frame {
+  border-color: rgb(185 202 211);
+  background: rgb(255 255 255);
+}
+
+.auth-screen[data-commission-theme] .auth-input-frame:hover:not([data-disabled='true']):not([data-invalid='true']) {
+  border-color: color-mix(in srgb, var(--commission-login-focus) 58%, white);
+}
+
+.auth-screen[data-commission-theme] .auth-input-frame:focus-within {
+  border-color: var(--commission-login-focus);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--commission-login-focus) 17%, transparent);
+  transform: none;
+}
+
+.auth-screen[data-commission-theme] .auth-input-frame:focus-within .auth-input-frame__icon,
+.auth-screen[data-commission-theme] .auth-input-frame[data-filled='true'] .auth-input-frame__icon {
+  color: var(--commission-login-focus);
+}
+
+.auth-screen[data-commission-theme] .auth-submit {
+  border-color: var(--commission-login-focus);
+  background: linear-gradient(112deg, var(--commission-login-focus), color-mix(in srgb, var(--commission-login-focus) 78%, black));
+  box-shadow:
+    0 14px 26px -16px color-mix(in srgb, var(--commission-login-focus) 74%, transparent),
+    inset 0 1px rgb(255 255 255 / 0.22);
+}
+
+.auth-screen[data-commission-theme] .auth-submit:hover:not(:disabled) {
+  background: linear-gradient(112deg, color-mix(in srgb, var(--commission-login-focus) 91%, white), var(--commission-login-focus));
+}
+
+.auth-screen[data-commission-theme] .auth-submit:focus-visible {
+  box-shadow:
+    0 0 0 3px rgb(250 248 240),
+    0 0 0 6px var(--commission-login-focus),
+    0 16px 30px -18px var(--commission-login-focus);
+}
+
+.auth-screen[data-commission-theme] .auth-panel__footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.auth-screen[data-commission-theme] .auth-back-link {
+  min-height: 2.75rem;
+}
+
+.auth-screen--invalid-context {
+  display: grid;
+  place-items: center;
+}
+
+.auth-context-error {
+  display: grid;
+  width: min(100%, 30rem);
+  justify-items: center;
+  gap: 0.75rem;
+  border: 1px solid rgb(255 255 255 / 0.16);
+  border-radius: 1.25rem;
+  padding: clamp(1.5rem, 4vw, 2.5rem);
+  background: rgb(8 24 42 / 0.86);
+  box-shadow: 0 32px 70px -36px rgb(0 0 0 / 0.82);
+  text-align: center;
+}
+
+.auth-context-error__icon {
+  display: grid;
+  width: 3rem;
+  height: 3rem;
+  place-items: center;
+  border-radius: 999px;
+  background: rgb(224 157 74 / 0.14);
+  color: rgb(240 181 103);
+}
+
+.auth-context-error__icon svg { width: 1.35rem; height: 1.35rem; }
+.auth-context-error > p { color: rgb(240 181 103); font-size: 0.72rem; font-weight: 850; letter-spacing: 0.14em; text-transform: uppercase; }
+.auth-context-error > h1 { max-width: 16ch; font-size: clamp(1.65rem, 5vw, 2.25rem); line-height: 1.05; }
+.auth-context-error > span { color: rgb(236 239 242 / 0.68); font-size: 0.92rem; }
+.auth-context-error .auth-back-link { margin-top: 0.5rem; color: white; }
+
+@media (max-width: 959px) {
+  .auth-screen[data-commission-theme] .auth-layout {
+    width: min(100%, 38rem);
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.15rem;
+  }
+
+  .auth-hero--commission-map {
+    max-width: none;
+    padding-block: 0;
+  }
+
+  .commission-login-identity {
+    margin-top: 1.4rem;
+  }
+
+  .commission-login-title {
+    font-size: clamp(3.2rem, 10.5vw, 5.25rem);
+  }
+
+  .commission-login-title--industry {
+    max-width: 12ch;
+    font-size: clamp(2.95rem, 8.8vw, 4.6rem);
+  }
+
+  .commission-login-industry-structure {
+    height: 8.6rem;
+  }
+
+  .commission-login-scope {
+    margin-top: 1rem;
+  }
+
+  .auth-screen[data-commission-theme] .auth-panel {
+    width: min(100%, 31rem);
+    justify-self: center;
+  }
+}
+
+@media (max-width: 639px) {
+  .auth-screen[data-commission-theme] {
+    padding-top: max(0.75rem, env(safe-area-inset-top));
+    padding-bottom: max(0.9rem, env(safe-area-inset-bottom));
+  }
+
+  .auth-screen[data-commission-theme] .auth-layout {
+    gap: 0.8rem;
+  }
+
+  .auth-hero--commission-map .auth-hero__brand.fenasoja-brand[data-scale='display'] .fenasoja-brand__mark {
+    width: 2.45rem;
+  }
+
+  .auth-hero--commission-map .auth-hero__brand.fenasoja-brand[data-scale='display'] .fenasoja-brand__edition {
+    font-size: 1.35rem;
+  }
+
+  .auth-hero--commission-map .auth-hero__brand .fenasoja-brand__subtitle {
+    display: none;
+  }
+
+  .commission-login-identity {
+    margin-top: 0.75rem;
+  }
+
+  .commission-login-eyebrow {
+    min-height: 1.75rem;
+    padding: 0.28rem 0.58rem;
+    font-size: 0.58rem;
+  }
+
+  .commission-login-title {
+    margin-top: 0.65rem;
+    font-size: clamp(2.72rem, 14vw, 3.75rem);
+  }
+
+  .commission-login-title--industry {
+    max-width: 100%;
+    font-size: clamp(2.25rem, 11.6vw, 3.25rem);
+    line-height: 0.92;
+  }
+
+  .commission-login-title--industry span:last-child {
+    font-size: 0.66em;
+  }
+
+  .commission-login-industry-structure {
+    left: -0.7rem;
+    width: 94%;
+    height: 6.6rem;
+  }
+
+  .commission-login-title__harvest {
+    opacity: 0.74;
+  }
+
+  .commission-login-scope {
+    margin-top: 0.7rem;
+  }
+
+  .commission-login-scope span {
+    font-size: 0.64rem;
+  }
+
+  .commission-login-scope strong {
+    font-size: 0.69rem;
+  }
+
+  .auth-screen[data-commission-theme] .auth-panel {
+    border-radius: 1rem;
+    padding: 1.1rem;
+  }
+
+  .auth-screen[data-commission-theme] .auth-panel::after {
+    left: 1.1rem;
+  }
+
+  .auth-screen[data-commission-theme] .auth-panel__heading h2 {
+    font-size: 1.85rem;
+  }
+
+  .auth-screen[data-commission-theme] .auth-form {
+    gap: 0.85rem;
+    margin-top: 1rem;
+  }
+
+  .auth-screen[data-commission-theme] .auth-panel__footer {
+    margin-top: 0.75rem;
+  }
+}
+
+@media (max-width: 374px), (max-height: 760px) and (max-width: 639px) {
+  .commission-login-scope {
+    display: none;
+  }
+
+  .commission-login-title {
+    font-size: clamp(2.45rem, 13.5vw, 3.25rem);
+  }
+
+  .commission-login-title--industry {
+    font-size: clamp(2.05rem, 11vw, 2.8rem);
+  }
+}
+
+@media (min-width: 960px) and (max-height: 760px) {
+  .commission-login-identity { margin-top: 1.5rem; }
+  .commission-login-title { font-size: clamp(3.55rem, 5.8vw, 5rem); }
+  .commission-login-title--industry { font-size: clamp(3.05rem, 5vw, 4.35rem); }
+  .commission-login-scope { margin-top: 1rem; }
+  .auth-screen[data-commission-theme] .auth-panel { padding: 1.3rem; }
+  .auth-screen[data-commission-theme] .auth-panel__heading { margin-top: 0.15rem; }
+  .auth-screen[data-commission-theme] .auth-form { gap: 0.8rem; margin-top: 1rem; }
+  .auth-screen[data-commission-theme] .auth-panel__footer { margin-top: 0.8rem; }
+}
+
+@media (prefers-contrast: more), (prefers-reduced-transparency: reduce) {
+  .auth-screen[data-commission-theme='rural'] { background: rgb(15 46 31); }
+  .auth-screen[data-commission-theme='industry'] { background: rgb(12 37 54); }
+  .commission-login-industry-structure { display: none; }
+  .commission-login-title__harvest { opacity: 0.5; }
+  .auth-screen[data-commission-theme] .auth-panel {
+    border-color: var(--commission-login-focus);
+    background: rgb(255 255 255);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .commission-login-title__harvest {
+    animation: none;
+  }
+
+  .auth-screen[data-commission-theme] .auth-panel,
+  .auth-screen[data-commission-theme] .auth-submit,
+  .auth-screen[data-commission-theme] .auth-input-frame {
+    transition: none;
+  }
+
+  .auth-screen[data-commission-theme] .auth-submit:hover,
+  .auth-screen[data-commission-theme] .auth-submit:active,
+  .auth-screen[data-commission-theme] .auth-input-frame:focus-within {
+    transform: none;
+  }
+}
+
 /* Mapa Comercial — acesso direto, limpo e independente da Logística. */
 .auth-screen[data-module='mapa-comercial'] {
   background:

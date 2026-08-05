@@ -32,6 +32,7 @@ import LoginPage from './pages/LoginPage';
 import {
   getCommissionModule,
 } from './modules/commissions/commissionRegistry';
+import { getCommissionMapPortal } from './modules/commissions/commissionMapPortalRegistry';
 
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const VehiclesPage = lazy(() => import('./pages/VehiclesPage'));
@@ -61,6 +62,7 @@ const NotFound = lazy(() => import('./pages/NotFound'));
 const UnsubscribePage = lazy(() => import('./pages/UnsubscribePage'));
 const CommissionPortalPage = lazy(() => import('./pages/commissions/CommissionPortalPage'));
 const CommissionDashboardPlaceholder = lazy(() => import('./pages/commissions/CommissionDashboardPlaceholder'));
+const CommissionCommercialMapPage = lazy(() => import('./pages/commissions/CommissionCommercialMapPage'));
 const AdminPortalPage = lazy(() => import('./pages/admin/AdminPortalPage'));
 const AdminOverviewPage = lazy(() => import('./pages/admin/AdminOverviewPage'));
 const AdminCommissionPage = lazy(() => import('./pages/admin/AdminCommissionPage'));
@@ -221,6 +223,7 @@ function LogisticaModuleRoutes() {
 function CommissionModuleRoutes() {
   const { moduleSlug } = useParams();
   const module = getCommissionModule(moduleSlug);
+  const mapPortal = getCommissionMapPortal(moduleSlug);
 
   if (!module) {
     return (
@@ -232,6 +235,29 @@ function CommissionModuleRoutes() {
 
   if (module.slug === 'logistica') {
     return <Navigate to="/comissoes/logistica/dashboard" replace />;
+  }
+
+  if (mapPortal) {
+    return (
+      <AuthGuard>
+        <OrgGuard>
+          <ModuleAccessGuard module={module}>
+            <CommissionLayout module={module} variant="map">
+              <Suspended>
+                <Routes>
+                  <Route index element={<Navigate to="mapa-comercial" replace />} />
+                  <Route
+                    path="mapa-comercial"
+                    element={<CommissionCommercialMapPage portal={mapPortal} />}
+                  />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Suspended>
+            </CommissionLayout>
+          </ModuleAccessGuard>
+        </OrgGuard>
+      </AuthGuard>
+    );
   }
 
   return (
@@ -358,7 +384,7 @@ const App = () => (
       buster: lastUserId,
       dehydrateOptions: {
         shouldDehydrateQuery: (query) =>
-          query.meta?.persist !== false && defaultShouldDehydrateQuery(query as any),
+          query.meta?.persist !== false && defaultShouldDehydrateQuery(query),
       },
     }}
   >

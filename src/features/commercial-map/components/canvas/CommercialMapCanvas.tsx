@@ -45,6 +45,7 @@ import {
   getCommercialMapSegment,
   isSegmentTintClassification,
   type CommercialMapSegmentDefinition,
+  type CommercialMapSegmentId,
 } from '../../data/commercialMapSegments';
 
 const MiranteInteriorScene = lazy(async () => {
@@ -58,7 +59,8 @@ interface CommercialMapCanvasProps {
   calibration: MapCalibration | null;
   matchingEntityIds: ReadonlySet<string>;
   filtersActive: boolean;
-  isolatedArea?: 'exporural' | null;
+  isolatedArea?: CommercialMapSegmentId | null;
+  segmentOverride?: CommercialMapSegmentDefinition | null;
   technicalValidationAllowed?: boolean;
 }
 
@@ -1233,7 +1235,7 @@ function CameraRig({
 }: {
   selectedEntity: MapEntity | null;
   extent: SceneExtent;
-  isolatedArea?: 'exporural' | null;
+  isolatedArea?: CommercialMapSegmentId | null;
   activeSegment: CommercialMapSegmentDefinition | null;
   activeSegmentEntities: MapEntity[];
 }) {
@@ -1550,7 +1552,7 @@ function CameraRig({
   const clampTarget = useCallback(() => {
     const controls = controlsRef.current;
     if (!controls) return;
-    const margin = isolatedArea === 'exporural'
+    const margin = isolatedArea
       ? Math.max(1.6, extent.diagonal * 0.035)
       : Math.max(3, extent.diagonal * 0.08);
     const targetMinimumY = selectedEntity
@@ -1644,14 +1646,14 @@ function CameraRig({
     ? Math.max(7.5, miranteExtent.diagonal * 0.8)
     : segmentExtent && activeSegment
       ? Math.max(6.5, segmentExtent.diagonal * activeSegment.camera.minDistanceRatio)
-    : isolatedArea === 'exporural'
+    : isolatedArea
       ? Math.max(6.5, extent.diagonal * 0.12)
       : Math.max(8, extent.diagonal * 0.055);
   const miranteMaximumDistance = miranteExtent
     ? Math.max(30, miranteExtent.diagonal * 4)
     : segmentExtent && activeSegment
       ? Math.max(96, segmentExtent.diagonal * activeSegment.camera.maxDistanceRatio)
-    : isolatedArea === 'exporural'
+    : isolatedArea
       ? Math.max(96, extent.diagonal * 2.15)
       : Math.max(260, extent.diagonal * 4.5);
 
@@ -1685,6 +1687,7 @@ function Scene({
   matchingEntityIds,
   filtersActive,
   isolatedArea,
+  segmentOverride,
   technicalValidationAllowed = false,
 }: CommercialMapCanvasProps) {
   const selectedEntityId = useCommercialMapStore((state) => state.selectedEntityId);
@@ -1712,7 +1715,9 @@ function Scene({
     () => buildCommercialMapSegmentIndex(entities, lots),
     [entities, lots],
   );
-  const requestedSegment = getCommercialMapSegment(activeSegmentId);
+  const requestedSegment = segmentOverride?.id === activeSegmentId
+    ? segmentOverride
+    : getCommercialMapSegment(activeSegmentId);
   const activeSegment = requestedSegment?.behavior.interaction === 'filter-and-focus'
     ? requestedSegment
     : null;
@@ -1922,6 +1927,7 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
     matchingEntityIds,
     filtersActive,
     isolatedArea,
+    segmentOverride,
     technicalValidationAllowed,
   } = props;
   const setSelectedEntityId = useCommercialMapStore((state) => state.setSelectedEntityId);
@@ -1973,6 +1979,7 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
           matchingEntityIds={matchingEntityIds}
           filtersActive={filtersActive}
           isolatedArea={isolatedArea}
+          segmentOverride={segmentOverride}
           technicalValidationAllowed={technicalValidationAllowed}
         />
       </Suspense>
