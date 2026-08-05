@@ -122,6 +122,10 @@ export interface MapEntity {
   projectId: string;
   layerId: string;
   parentEntityId: string | null;
+  /** Persisted exclusive commission segment. NULL/undefined is intentionally unclassified. */
+  segmentId?: string | null;
+  /** Identifies whether segmentId came from the canonical DB relation or client compatibility rules. */
+  segmentSource?: 'database' | 'derived';
   publicIdentifier: string;
   name: string;
   description: string | null;
@@ -206,7 +210,22 @@ export interface CommercialMapData {
   layers: MapLayer[];
   entities: MapEntity[];
   lots: CommercialLot[];
+  scope?: {
+    mode: 'full' | 'commission';
+    commissionId?: string;
+    segmentId?: string;
+    boundaryData?: Record<string, unknown>;
+    cameraConfig?: Record<string, unknown>;
+  };
 }
+
+export type CommercialMapQueryScope =
+  | { mode: 'full' }
+  | {
+      mode: 'commission';
+      commissionId: string;
+      segmentId: string;
+    };
 
 export interface MapPermissions {
   canView: boolean;

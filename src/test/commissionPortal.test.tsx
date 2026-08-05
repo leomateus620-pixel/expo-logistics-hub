@@ -297,10 +297,20 @@ describe('CommissionPortalPage', () => {
     fireEvent.click(screen.getByRole('button', { name: /Comissões/ }));
 
     const commissionCards = container.querySelectorAll('[data-module]');
-    expect(commissionCards).toHaveLength(8);
+    expect(commissionCards).toHaveLength(10);
     expect(container.querySelector('[data-module="logistica"]')).toBeInTheDocument();
     expect(container.querySelector('[data-module="gastronomia"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-module="exporural"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-module="industria-comercio-servicos"]')).toBeInTheDocument();
     expect(container.querySelector('[data-module="financeiro-gerencial"]')).not.toBeInTheDocument();
+
+    expect(screen.getByRole('link', { name: 'Entrar para acessar: Exporural' })).toHaveAttribute(
+      'href',
+      '/login/exporural',
+    );
+    expect(screen.getByRole('link', {
+      name: 'Entrar para acessar: Indústria, Comércio e Serviços',
+    })).toHaveAttribute('href', '/login/industria-comercio-servicos');
 
     const logisticsCard = screen.getByRole('link', { name: 'Entrar para acessar: Logística' });
     expect(logisticsCard).not.toHaveTextContent('Ativo');

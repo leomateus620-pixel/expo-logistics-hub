@@ -4,6 +4,7 @@ import { reconcileExporuralReference } from '../data/reconcileExporuralReference
 import type {
   CommercialLot,
   CommercialMapData,
+  CommercialMapQueryScope,
   LotContractVersion,
   MapActivity,
   MapCalibration,
@@ -13,6 +14,11 @@ import type {
   PolygonGeometry,
 } from '../types';
 import { validateContractFile } from '../utils/contracts';
+import {
+  getCommercialMapSegment,
+  type CommercialMapSegmentId,
+} from '../data/commercialMapSegments';
+import { isCommissionInventoryConsistent } from '../utils/commissionInventory';
 
 interface ProjectRow {
   id: string; org_id: string; name: string; description: string | null; coordinate_system: MapProject['coordinateSystem'];
@@ -32,9 +38,20 @@ interface CalibrationRow {
 }
 interface EntityRow {
   id: string; project_id: string; layer_id: string; parent_entity_id: string | null; public_identifier: string;
+  segment_id?: string | null;
   name: string; description: string | null; classification: MapEntity['classification'];
   verification_status: MapEntity['verificationStatus']; is_sellable: boolean; is_archived: boolean; metadata: Record<string, unknown> | null;
 }
+interface SegmentRow {
+  id: string;
+  project_id: string;
+  slug: string;
+  display_name: string;
+  boundary_data: Record<string, unknown>;
+  camera_config: Record<string, unknown>;
+  is_active: boolean;
+}
+interface SegmentLookupRow { id: string; slug: string; }
 interface GeometryRow {
   id: string; entity_id: string; geometry: { type: 'Polygon'; coordinates: [number, number][][] };
   elevation: number | string; extrusion_height: number | string; rotation: number | string; version: number; calibration_version: number | null;
@@ -64,6 +81,29 @@ function isMissingMapInfrastructure(error: { code?: string; message?: string }):
   return error.code === '42P01'
     || error.code === 'PGRST205'
     || Boolean(error.message?.includes('map_projects') && error.message.includes('schema cache'));
+}
+
+function isMissingMapSegmentInfrastructure(error: { code?: string; message?: string }): boolean {
+  return error.code === '42P01'
+    || error.code === '42703'
+    || error.code === '42883'
+    || error.code === 'PGRST204'
+    || error.code === 'PGRST205'
+    || error.code === 'PGRST202'
+    || Boolean(error.message?.includes('map_segments'))
+    || Boolean(error.message?.includes('segment_id'));
+}
+
+function commissionMapError(
+  code:
+    | 'MAP_SEGMENT_CONFIGURATION_UNAVAILABLE'
+    | 'MAP_SEGMENT_EMPTY'
+    | 'MAP_SEGMENT_GEOMETRY_INCOMPLETE'
+    | 'MAP_SEGMENT_INVENTORY_MISMATCH',
+) {
+  const error = new Error(code);
+  error.name = 'CommercialMapCommissionScopeError';
+  return error;
 }
 
 function isMissingReservationMaintenance(error: { code?: string; message?: string }): boolean {
@@ -153,13 +193,20 @@ function mapCalibration(row: CalibrationRow): MapCalibration {
   };
 }
 
-function mapEntity(row: EntityRow, geometryRow: GeometryRow): MapEntity {
+function mapEntity(
+  row: EntityRow,
+  geometryRow: GeometryRow,
+  forcedSegmentId?: CommercialMapSegmentId,
+): MapEntity {
   const storedGeometry = geometryRow.geometry;
+  const segment = getCommercialMapSegment(forcedSegmentId);
   return {
     id: row.id,
     projectId: row.project_id,
     layerId: row.layer_id,
     parentEntityId: row.parent_entity_id,
+    segmentId: forcedSegmentId ?? null,
+    segmentSource: forcedSegmentId ? 'database' : undefined,
     publicIdentifier: row.public_identifier,
     name: row.name,
     description: row.description,
@@ -177,7 +224,14 @@ function mapEntity(row: EntityRow, geometryRow: GeometryRow): MapEntity {
       geometryVersion: geometryRow.version,
       calibrationVersion: geometryRow.calibration_version,
     },
-    metadata: row.metadata ?? {},
+    metadata: segment
+      ? {
+          ...(row.metadata ?? {}),
+          segmentId: segment.id,
+          segmentCode: segment.code,
+          segmentName: segment.name,
+        }
+      : row.metadata ?? {},
   };
 }
 
@@ -236,9 +290,181 @@ async function signedReferenceUrl(calibration: MapCalibration | null): Promise<M
   return { ...calibration, referenceImageUrl: data.signedUrl };
 }
 
-export async function fetchCommercialMap(orgId: string): Promise<CommercialMapData> {
-  const maintenance = await db.rpc('expire_commercial_reservations', { p_org_id: orgId });
-  if (maintenance.error && !isMissingReservationMaintenance(maintenance.error)) throw maintenance.error;
+async function fetchCommissionCommercialMap(
+  project: MapProject,
+  scope: Extract<CommercialMapQueryScope, { mode: 'commission' }>,
+): Promise<CommercialMapData> {
+  const localSegment = getCommercialMapSegment(scope.segmentId as CommercialMapSegmentId);
+  if (!localSegment) throw commissionMapError('MAP_SEGMENT_CONFIGURATION_UNAVAILABLE');
+
+  const segmentResult = await db
+    .from('map_segments')
+    .select('id, project_id, slug, display_name, boundary_data, camera_config, is_active')
+    .eq('project_id', project.id)
+    .eq('slug', scope.segmentId)
+    .eq('is_active', true)
+    .maybeSingle();
+
+  if (segmentResult.error) {
+    if (isMissingMapSegmentInfrastructure(segmentResult.error)) {
+      throw commissionMapError('MAP_SEGMENT_CONFIGURATION_UNAVAILABLE');
+    }
+    throw segmentResult.error;
+  }
+
+  const segment = segmentResult.data as SegmentRow | null;
+  if (!segment || segment.slug !== localSegment.id) {
+    throw commissionMapError('MAP_SEGMENT_CONFIGURATION_UNAVAILABLE');
+  }
+  const baselineEntityCount = Number(segment.boundary_data.expectedEntityCount);
+  const baselineLotCount = Number(segment.boundary_data.expectedLotCount);
+  const persistedDirection = segment.camera_config.direction;
+  const cameraValues = [
+    ...(Array.isArray(persistedDirection) ? persistedDirection : []),
+    segment.camera_config.padding,
+    segment.camera_config.minDistanceRatio,
+    segment.camera_config.maxDistanceRatio,
+  ].map(Number);
+  if (
+    segment.boundary_data.resolution !== 'explicit-entity-union'
+    || !Number.isInteger(baselineEntityCount)
+    || !Number.isInteger(baselineLotCount)
+    || baselineLotCount <= 0
+    || baselineEntityCount < baselineLotCount
+    || !Array.isArray(persistedDirection)
+    || persistedDirection.length !== 3
+    || cameraValues.length !== 6
+    || cameraValues.some((value) => !Number.isFinite(value) || value <= 0)
+  ) {
+    throw commissionMapError('MAP_SEGMENT_CONFIGURATION_UNAVAILABLE');
+  }
+
+  const inventoryResult = await db.rpc('get_commission_map_segment_inventory', {
+    p_segment_id: segment.id,
+  });
+  if (inventoryResult.error) {
+    if (isMissingMapSegmentInfrastructure(inventoryResult.error)) {
+      throw commissionMapError('MAP_SEGMENT_CONFIGURATION_UNAVAILABLE');
+    }
+    throw inventoryResult.error;
+  }
+  const inventoryRow = (Array.isArray(inventoryResult.data)
+    ? inventoryResult.data[0]
+    : inventoryResult.data) as {
+      expected_entity_count?: number | string;
+      expected_lot_count?: number | string;
+      lineage_delta?: number | string;
+    } | null;
+  const expectedEntityCount = Number(inventoryRow?.expected_entity_count);
+  const expectedLotCount = Number(inventoryRow?.expected_lot_count);
+  const lineageDelta = Number(inventoryRow?.lineage_delta);
+  if (
+    !inventoryRow
+    || !Number.isInteger(expectedEntityCount)
+    || !Number.isInteger(expectedLotCount)
+    || !Number.isInteger(lineageDelta)
+    || expectedLotCount <= 0
+    || expectedEntityCount < expectedLotCount
+    || expectedEntityCount !== baselineEntityCount + lineageDelta
+    || expectedLotCount !== baselineLotCount + lineageDelta
+  ) {
+    throw commissionMapError('MAP_SEGMENT_CONFIGURATION_UNAVAILABLE');
+  }
+
+  const maintenanceResult = await db.rpc('expire_commission_segment_reservations', {
+    p_segment_id: segment.id,
+  });
+  if (maintenanceResult.error) {
+    if (isMissingMapSegmentInfrastructure(maintenanceResult.error)) {
+      throw commissionMapError('MAP_SEGMENT_CONFIGURATION_UNAVAILABLE');
+    }
+    throw maintenanceResult.error;
+  }
+
+  const entitiesResult = await db
+    .from('map_entities')
+    .select('*')
+    .eq('project_id', project.id)
+    .eq('segment_id', segment.id)
+    .eq('is_archived', false);
+
+  if (entitiesResult.error) {
+    if (isMissingMapSegmentInfrastructure(entitiesResult.error)) {
+      throw commissionMapError('MAP_SEGMENT_CONFIGURATION_UNAVAILABLE');
+    }
+    throw entitiesResult.error;
+  }
+
+  const entityRows = (entitiesResult.data ?? []) as EntityRow[];
+  if (entityRows.length === 0) throw commissionMapError('MAP_SEGMENT_EMPTY');
+
+  const entityIds = entityRows.map((entity) => entity.id);
+  const layerIds = [...new Set(entityRows.map((entity) => entity.layer_id))];
+  const [layersResult, geometriesResult, lotsResult] = await Promise.all([
+    db.from('map_layers').select('*').eq('project_id', project.id).in('id', layerIds).order('sort_order'),
+    db.from('map_entity_geometries').select('*').eq('project_id', project.id).eq('is_current', true).in('entity_id', entityIds),
+    db.from('commercial_lots').select(`
+      *,
+      lot_prices(is_active, pricing_mode, base_price, price_per_sqm, asking_price, minimum_price),
+      lot_reservations(status, company_name, expires_at, responsible_name),
+      lot_sales(status, buyer_name, sale_date, salesperson_name, contract_number)
+    `).eq('project_id', project.id).is('archived_at', null).in('entity_id', entityIds),
+  ]);
+
+  const firstError = [layersResult, geometriesResult, lotsResult]
+    .find((result) => result.error)?.error;
+  if (firstError) throw firstError;
+
+  const geometryByEntity = new Map<string, GeometryRow>(
+    (geometriesResult.data ?? []).map((row: GeometryRow) => [row.entity_id, row]),
+  );
+  const entities = entityRows
+    .filter((row) => geometryByEntity.has(row.id))
+    .map((row) => mapEntity(row, geometryByEntity.get(row.id)!, localSegment.id));
+
+  if (entities.length !== entityRows.length) {
+    throw commissionMapError('MAP_SEGMENT_GEOMETRY_INCOMPLETE');
+  }
+  const lotRows = (lotsResult.data ?? []) as LotRow[];
+  if (!isCommissionInventoryConsistent({
+    expectedEntityCount,
+    expectedLotCount,
+    entityIds,
+    lotEntityIds: lotRows.map((lot) => lot.entity_id),
+  })) {
+    throw commissionMapError('MAP_SEGMENT_INVENTORY_MISMATCH');
+  }
+
+  return {
+    source: 'database',
+    sourceMessage: project.isPublished
+      ? null
+      : 'O segmento está vinculado a uma versão cartográfica ainda não publicada.',
+    project,
+    // A calibration may reference the complete park plan. Commission scopes
+    // deliberately omit it so the API response cannot reveal off-segment geometry.
+    calibration: null,
+    layers: (layersResult.data ?? []).map(mapLayer),
+    entities,
+    lots: lotRows.map(mapLot),
+    scope: {
+      mode: 'commission',
+      commissionId: scope.commissionId,
+      segmentId: localSegment.id,
+      boundaryData: segment.boundary_data,
+      cameraConfig: segment.camera_config,
+    },
+  };
+}
+
+export async function fetchCommercialMap(
+  orgId: string,
+  scope: CommercialMapQueryScope = { mode: 'full' },
+): Promise<CommercialMapData> {
+  if (scope.mode === 'full') {
+    const maintenance = await db.rpc('expire_commercial_reservations', { p_org_id: orgId });
+    if (maintenance.error && !isMissingReservationMaintenance(maintenance.error)) throw maintenance.error;
+  }
   const { data: projectRow, error: projectError } = await db
     .from('map_projects')
     .select('*')
@@ -250,6 +476,9 @@ export async function fetchCommercialMap(orgId: string): Promise<CommercialMapDa
 
   if (projectError) {
     if (isMissingMapInfrastructure(projectError)) {
+      if (scope.mode === 'commission') {
+        throw commissionMapError('MAP_SEGMENT_CONFIGURATION_UNAVAILABLE');
+      }
       return {
         ...OFFICIAL_REFERENCE_DATA,
         sourceMessage: 'A infraestrutura cartográfica aguarda a aplicação da migration. A referência oficial 2026 permanece disponível em modo seguro de leitura.',
@@ -258,25 +487,65 @@ export async function fetchCommercialMap(orgId: string): Promise<CommercialMapDa
     throw projectError;
   }
 
-  if (!projectRow) return OFFICIAL_REFERENCE_DATA;
+  if (!projectRow) {
+    if (scope.mode === 'commission') {
+      throw commissionMapError('MAP_SEGMENT_CONFIGURATION_UNAVAILABLE');
+    }
+    return OFFICIAL_REFERENCE_DATA;
+  }
   const project = mapProject(projectRow);
 
-  const [layersResult, entitiesResult, geometriesResult, calibrationResult, lotsResult, lotPresenceResult] = await Promise.all([
+  if (scope.mode === 'commission') {
+    return fetchCommissionCommercialMap(project, scope);
+  }
+
+  const [
+    layersResult,
+    entitiesResult,
+    geometriesResult,
+    calibrationResult,
+    lotsResult,
+    lotPresenceResult,
+    segmentsResult,
+  ] = await Promise.all([
     db.from('map_layers').select('*').eq('project_id', project.id).order('sort_order'),
     db.from('map_entities').select('*').eq('project_id', project.id).eq('is_archived', false),
     db.from('map_entity_geometries').select('*').eq('project_id', project.id).eq('is_current', true),
     db.from('map_calibrations').select('*').eq('project_id', project.id).order('version', { ascending: false }).limit(1).maybeSingle(),
     db.from('commercial_lots').select('*, lot_prices(*), lot_reservations(*), lot_sales(*)').eq('project_id', project.id).is('archived_at', null),
     db.from('commercial_lots').select('id').eq('project_id', project.id).limit(1),
+    db.from('map_segments').select('id, slug').eq('project_id', project.id).eq('is_active', true),
   ]);
 
-  const firstError = [layersResult, entitiesResult, geometriesResult, calibrationResult, lotsResult, lotPresenceResult]
+  const segmentLookupError = segmentsResult.error
+    && !isMissingMapSegmentInfrastructure(segmentsResult.error)
+    ? segmentsResult.error
+    : null;
+  const firstError = [
+    layersResult,
+    entitiesResult,
+    geometriesResult,
+    calibrationResult,
+    lotsResult,
+    lotPresenceResult,
+  ]
     .find((result) => result.error)?.error;
-  if (firstError) throw firstError;
+  if (firstError || segmentLookupError) throw firstError ?? segmentLookupError;
+  const segmentSlugById = new Map<string, CommercialMapSegmentId>(
+    ((segmentsResult.data ?? []) as SegmentLookupRow[])
+      .map((segment) => [segment.id, segment.slug] as const)
+      .filter((entry): entry is readonly [string, CommercialMapSegmentId] => (
+        Boolean(getCommercialMapSegment(entry[1] as CommercialMapSegmentId))
+      )),
+  );
   const geometryByEntity = new Map<string, GeometryRow>((geometriesResult.data ?? []).map((row: GeometryRow) => [row.entity_id, row]));
   const entities = (entitiesResult.data ?? [])
     .filter((row: EntityRow) => geometryByEntity.has(row.id))
-    .map((row: EntityRow) => mapEntity(row, geometryByEntity.get(row.id)!));
+    .map((row: EntityRow) => mapEntity(
+      row,
+      geometryByEntity.get(row.id)!,
+      row.segment_id ? segmentSlugById.get(row.segment_id) : undefined,
+    ));
   const entityRows = (entitiesResult.data ?? []) as EntityRow[];
   const lotRows = (lotsResult.data ?? []) as LotRow[];
 

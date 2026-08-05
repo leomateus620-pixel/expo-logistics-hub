@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { ChevronLeft, LogOut, Menu, X } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
@@ -19,9 +20,71 @@ interface CommissionSidebarProps {
 export default function CommissionSidebar({ module, mobileOpen, onMobileOpen, onMobileClose }: CommissionSidebarProps) {
   const { signOut } = useAuth();
   const ModuleIcon = module.icon;
+  const openButtonRef = useRef<HTMLButtonElement>(null);
+  const mobileDrawerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (typeof window.matchMedia !== 'function') return undefined;
+    const desktopViewport = window.matchMedia('(min-width: 768px)');
+    const closeAtDesktop = (event: MediaQueryListEvent | MediaQueryList) => {
+      if (event.matches) onMobileClose();
+    };
+    desktopViewport.addEventListener?.('change', closeAtDesktop);
+    closeAtDesktop(desktopViewport);
+    return () => desktopViewport.removeEventListener?.('change', closeAtDesktop);
+  }, [onMobileClose]);
+
+  useEffect(() => {
+    if (!mobileOpen) return undefined;
+
+    const previousOverflow = document.body.style.overflow;
+    const restoreFocusButton = openButtonRef.current;
+    document.body.style.overflow = 'hidden';
+    const frame = window.requestAnimationFrame(() => {
+      mobileDrawerRef.current
+        ?.querySelector<HTMLButtonElement>('[data-commission-menu-close]')
+        ?.focus();
+    });
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        onMobileClose();
+        return;
+      }
+      if (event.key !== 'Tab') return;
+
+      const focusable = Array.from(
+        mobileDrawerRef.current?.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ) ?? [],
+      ).filter((element) => element.offsetParent !== null);
+      if (focusable.length === 0) return;
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = previousOverflow;
+      restoreFocusButton?.focus({ preventScroll: true });
+    };
+  }, [mobileOpen, onMobileClose]);
 
   const nav = (
-    <aside className="flex h-full w-[288px] flex-col overflow-hidden border-r border-sidebar-border bg-sidebar text-sidebar-foreground">
+    <aside
+      className="commission-sidebar flex h-full w-[288px] flex-col overflow-hidden border-r border-sidebar-border bg-sidebar text-sidebar-foreground"
+      data-commission={module.slug}
+    >
       <div className="flex min-h-[76px] items-center gap-3 border-b border-sidebar-border p-4">
         <FenasojaBrand compact markOnly tone="dark" />
         <div className="min-w-0 flex-1">
@@ -33,7 +96,8 @@ export default function CommissionSidebar({ module, mobileOpen, onMobileOpen, on
         <button
           type="button"
           onClick={onMobileClose}
-          className="rounded-lg p-2 text-sidebar-foreground/70 transition-colors hover:bg-white/10 md:hidden"
+          data-commission-menu-close
+          className="inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg p-2 text-sidebar-foreground/70 transition-colors hover:bg-white/10 md:hidden"
           aria-label="Fechar menu"
         >
           <X className="h-4 w-4" aria-hidden="true" />
@@ -104,10 +168,13 @@ export default function CommissionSidebar({ module, mobileOpen, onMobileOpen, on
   return (
     <>
       <button
+        ref={openButtonRef}
         type="button"
         onClick={onMobileOpen}
-        className="fixed left-3 top-3 z-30 rounded-lg border border-border bg-card p-2.5 text-foreground shadow-[var(--shadow-xs)] focus-ring md:hidden"
+        className="fixed left-3 top-3 z-30 inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg border border-border bg-card p-2.5 text-foreground shadow-[var(--shadow-xs)] focus-ring md:hidden"
         aria-label="Abrir menu"
+        aria-expanded={mobileOpen}
+        aria-controls="commission-mobile-navigation"
       >
         <Menu className="h-5 w-5" aria-hidden="true" />
       </button>
@@ -115,16 +182,24 @@ export default function CommissionSidebar({ module, mobileOpen, onMobileOpen, on
       <div className="fixed inset-y-0 left-0 z-40 hidden md:block">{nav}</div>
 
       {mobileOpen && (
-        <div className="fixed inset-0 z-40 bg-[oklch(var(--overlay)/0.70)] md:hidden" onClick={onMobileClose} />
+        <div
+          className="fixed inset-0 z-40 bg-[oklch(var(--overlay)/0.70)] md:hidden"
+          onMouseDown={onMobileClose}
+          aria-hidden="true"
+        />
       )}
-      <div
-        className={cn(
-          'fixed inset-y-0 left-0 z-50 transition-transform duration-200 md:hidden',
-          mobileOpen ? 'translate-x-0' : '-translate-x-full'
-        )}
-      >
-        {nav}
-      </div>
+      {mobileOpen && (
+        <div
+          ref={mobileDrawerRef}
+          id="commission-mobile-navigation"
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Navegação da comissão ${module.name}`}
+          className="fixed inset-y-0 left-0 z-50 md:hidden"
+        >
+          {nav}
+        </div>
+      )}
     </>
   );
 }

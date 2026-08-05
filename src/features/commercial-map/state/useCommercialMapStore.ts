@@ -17,6 +17,7 @@ export interface CommercialMapCameraView {
 }
 
 interface CommercialMapState {
+  activeScopeKey: string | null;
   selectedEntityId: string | null;
   interiorEntityId: string | null;
   interiorReturnView: CommercialMapCameraView | null;
@@ -41,6 +42,7 @@ interface CommercialMapState {
   technicalValidationVisible: boolean;
   reducedGraphics: boolean;
   cameraNavigating: boolean;
+  activateScope: (scopeKey: string, segmentId: CommercialMapSegmentId | null) => void;
   setSelectedEntityId: (id: string | null) => void;
   enterInterior: (id: string) => void;
   exitInterior: () => void;
@@ -74,6 +76,7 @@ interface CommercialMapState {
 }
 
 export const useCommercialMapStore = create<CommercialMapState>((set) => ({
+  activeScopeKey: null,
   selectedEntityId: null,
   interiorEntityId: null,
   interiorReturnView: null,
@@ -98,6 +101,31 @@ export const useCommercialMapStore = create<CommercialMapState>((set) => ({
   technicalValidationVisible: false,
   reducedGraphics: false,
   cameraNavigating: false,
+  activateScope: (activeScopeKey, activeSegmentId) => set((state) => {
+    if (state.activeScopeKey === activeScopeKey && state.activeSegmentId === activeSegmentId) return state;
+    return {
+      activeScopeKey,
+      activeSegmentId,
+      selectedEntityId: null,
+      interiorEntityId: null,
+      interiorReturnView: null,
+      hoveredEntityId: null,
+      search: '',
+      statusFilters: [],
+      classificationFilters: [],
+      locationFilter: null,
+      verificationFilters: [],
+      sortOrder: 'relevance',
+      layerVisibility: {},
+      layerOpacity: {},
+      activePanel: null,
+      workspaceMode: '3d',
+      cameraPreset: activeSegmentId === 'exporural' ? 'exporural' : 'overview',
+      cameraSequence: state.cameraSequence + 1,
+      technicalValidationVisible: false,
+      cameraNavigating: false,
+    };
+  }),
   setSelectedEntityId: (selectedEntityId) => set((state) => ({
     selectedEntityId,
     interiorEntityId: state.interiorEntityId === selectedEntityId ? state.interiorEntityId : null,

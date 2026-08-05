@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCapabilities } from '@/hooks/useCapabilities';
+import { useAuth } from '@/hooks/useAuth';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import { toast } from 'sonner';
 import {
@@ -25,7 +26,12 @@ import {
   updateCommercialLot,
 } from '../services/commercialMapService';
 import { useCommercialMapStore } from '../state/useCommercialMapStore';
-import type { CommercialLot, MapEntity, MapPermissions } from '../types';
+import type {
+  CommercialLot,
+  CommercialMapQueryScope,
+  MapEntity,
+  MapPermissions,
+} from '../types';
 import {
   buildEntityExplorerFacets,
   buildEntityExplorerIndex,
@@ -66,6 +72,10 @@ const MAP_ERROR_MESSAGES: Record<string, string> = {
   LOT_CANNOT_BE_SOLD: 'A situação atual do lote não permite registrar a venda.',
   lot_reservations_one_active_per_lot: 'Outra reserva ativa já foi registrada para este lote.',
   lot_sales_one_confirmed_per_lot: 'Este lote já possui uma venda confirmada.',
+  MAP_SEGMENT_CONFIGURATION_UNAVAILABLE: 'A configuração segura deste segmento ainda não está disponível.',
+  MAP_SEGMENT_EMPTY: 'Nenhuma entidade classificada foi encontrada para este segmento.',
+  MAP_SEGMENT_GEOMETRY_INCOMPLETE: 'O segmento possui entidades sem geometria vigente e foi bloqueado por segurança.',
+  MAP_SEGMENT_INVENTORY_MISMATCH: 'O inventário persistido diverge do perímetro aprovado e foi bloqueado por segurança.',
 };
 
 function mapErrorMessage(error: unknown): string {
@@ -82,23 +92,46 @@ export function useMapPermissions(): MapPermissions {
   return resolveMapPermissions(myRole, capSet);
 }
 
-export function useCommercialMap() {
+export const FULL_COMMERCIAL_MAP_SCOPE: CommercialMapQueryScope = { mode: 'full' };
+
+export function commercialMapQueryKey(
+  userId: string | null | undefined,
+  orgId: string | null | undefined,
+  scope: CommercialMapQueryScope,
+) {
+  return scope.mode === 'commission'
+    ? ['commercial-map', 'commission', userId, orgId, scope.commissionId, scope.segmentId] as const
+    : ['commercial-map', 'full', userId, orgId] as const;
+}
+
+export function useCommercialMap(scope: CommercialMapQueryScope = FULL_COMMERCIAL_MAP_SCOPE) {
   const { orgId } = useCurrentOrg();
+  const { user } = useAuth();
   const initializeLayers = useCommercialMapStore((state) => state.initializeLayers);
   const setReferenceOpacity = useCommercialMapStore((state) => state.setReferenceOpacity);
+  const activeScopeKey = useCommercialMapStore((state) => state.activeScopeKey);
   const syncedCalibration = useRef<string | null>(null);
+  const scopeKey = scope.mode === 'commission'
+    ? `commission:${scope.commissionId}:${scope.segmentId}`
+    : 'full-map';
   const query = useQuery({
-    queryKey: ['commercial-map', orgId],
-    queryFn: () => fetchCommercialMap(orgId!),
+    queryKey: commercialMapQueryKey(user?.id, orgId, scope),
+    queryFn: () => fetchCommercialMap(orgId!, scope),
     select: withCommercialMapSegments,
-    enabled: Boolean(orgId),
+    enabled: Boolean(orgId && user),
     staleTime: 30_000,
     retry: 1,
+    meta: { persist: scope.mode !== 'commission' },
   });
 
   useEffect(() => {
-    if (query.data?.layers) initializeLayers(query.data.layers);
-  }, [initializeLayers, query.data?.layers]);
+    // CommercialMapPage activates (and resets) the store scope after hooks are
+    // registered. Wait for that activation before hydrating persisted layer
+    // visibility so cached queries cannot be reset back to "all visible".
+    if (activeScopeKey === scopeKey && query.data?.layers) {
+      initializeLayers(query.data.layers);
+    }
+  }, [activeScopeKey, initializeLayers, query.data?.layers, scopeKey]);
 
   useEffect(() => {
     const calibration = query.data?.calibration;
@@ -196,7 +229,7 @@ export function useFilteredMapEntities(entities: MapEntity[], lots: CommercialLo
 export function useMapMutations() {
   const queryClient = useQueryClient();
   const { orgId } = useCurrentOrg();
-  const invalidate = () => queryClient.invalidateQueries({ queryKey: ['commercial-map', orgId] });
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: ['commercial-map'] });
   const errorMessage = mapErrorMessage;
 
   const bootstrap = useMutation({

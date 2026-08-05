@@ -7,11 +7,12 @@ import {
 } from '../data/exporuralReference2026';
 import type { CommercialLot, CommercialMapData, MapEntity } from '../types';
 import {
-  COMMERCIAL_MAP_SEGMENT_IDS,
+  buildCommercialMapSegmentIndex,
+  getCommercialMapSegment,
   type CommercialMapSegmentId,
 } from '../data/commercialMapSegments';
 
-export type CommercialMapAreaScope = 'park' | 'exporural';
+export type CommercialMapAreaScope = 'park' | CommercialMapSegmentId;
 
 const exporuralRoads = new Set<string>(EXPORURAL_ROAD_IDENTIFIERS);
 const exporuralSupports = new Set<string>(EXPORURAL_SUPPORT_IDENTIFIERS);
@@ -29,9 +30,8 @@ export const EXPORURAL_VIEW_BOUNDS = {
 } as const;
 
 export function areaScopeFromSearchParams(searchParams: URLSearchParams): CommercialMapAreaScope {
-  return searchParams.get('area')?.toLocaleLowerCase('pt-BR') === 'exporural'
-    ? 'exporural'
-    : 'park';
+  const requested = searchParams.get('area')?.toLocaleLowerCase('pt-BR') as CommercialMapSegmentId | undefined;
+  return requested && getCommercialMapSegment(requested) ? requested : 'park';
 }
 
 export function isSegmentCompatibleWithAreaScope(
@@ -40,7 +40,7 @@ export function isSegmentCompatibleWithAreaScope(
 ) {
   return !segmentId
     || scope === 'park'
-    || segmentId === COMMERCIAL_MAP_SEGMENT_IDS.exporural;
+    || segmentId === scope;
 }
 
 export function isExporuralEntity(entity: MapEntity) {
@@ -65,7 +65,8 @@ export function scopeCommercialMapData(
     };
   }
 
-  const entities = data.entities.filter(isExporuralEntity);
+  const segmentIndex = buildCommercialMapSegmentIndex(data.entities, data.lots);
+  const entities = data.entities.filter((entity) => segmentIndex.get(entity.id)?.id === scope);
   const entityIds = new Set(entities.map((entity) => entity.id));
   return {
     entities,

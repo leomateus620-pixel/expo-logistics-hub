@@ -26,6 +26,7 @@ import {
   Wrench,
   Zap,
 } from 'lucide-react';
+import { COMMISSION_MAP_PORTALS } from './commissionMapPortalRegistry';
 
 export type CommissionStatus = 'active' | 'structuring' | 'restricted';
 export type CommissionTone = 'emerald' | 'amber' | 'lime' | 'cyan' | 'rose' | 'sky' | 'red' | 'teal' | 'gold';
@@ -72,6 +73,7 @@ export interface CommissionModule {
   sensitive: boolean;
   adminOnly: boolean;
   basePath: string;
+  defaultMenuPath?: string;
   order: number;
   publicPortal: boolean;
   legacyRoutes?: string[];
@@ -417,6 +419,7 @@ const baseCommissionModules: CommissionModule[] = [
       { label: 'Relatórios', path: 'relatorios', description: 'Relatórios futuros do módulo.', icon: FileText },
     ],
   },
+  ...COMMISSION_MAP_PORTALS.map((portal) => portal.module),
 ];
 
 type CommissionModuleTextScope = Partial<Pick<CommissionModule, 'name' | 'shortName' | 'description'>>;
@@ -3361,7 +3364,7 @@ export function getPublicCommissionModules() {
   return commissionModules.filter((module) => module.publicPortal && !module.adminOnly);
 }
 
-export function getModuleRoute(module: CommissionModule, menuPath = 'dashboard') {
+export function getModuleRoute(module: CommissionModule, menuPath = module.defaultMenuPath ?? 'dashboard') {
   const suffix = menuPath === 'dashboard' ? '/dashboard' : `/${menuPath}`;
   return `${module.basePath}${suffix}`;
 }

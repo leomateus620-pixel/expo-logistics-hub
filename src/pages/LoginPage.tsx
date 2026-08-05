@@ -26,6 +26,7 @@ import {
 } from 'lucide-react';
 import { CronogramaLoginHero } from '@/components/auth/CronogramaLoginHero';
 import { CommercialMapLoginHero } from '@/components/auth/CommercialMapLoginHero';
+import { CommissionMapLoginHero } from '@/components/auth/CommissionMapLoginHero';
 import { FenasojaBrand } from '@/components/brand/FenasojaBrand';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -35,6 +36,7 @@ import {
   getCommissionModule,
   getModuleRoute,
 } from '@/modules/commissions/commissionRegistry';
+import { getCommissionMapPortal } from '@/modules/commissions/commissionMapPortalRegistry';
 import '@/styles/login-experience.css';
 
 interface LoginPageProps {
@@ -153,6 +155,15 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
     selectedSlug === 'eventos-restaurante-arena' || returnTo?.startsWith('/eventos-restaurante-arena');
   const isCommercialMapLogin = selectedSlug === 'mapa-comercial' || returnTo?.startsWith('/mapa-comercial');
   const selectedModule = getCommissionModule(selectedSlug);
+  const commissionMapPortal = getCommissionMapPortal(selectedSlug);
+  const isCommissionMapLogin = Boolean(commissionMapPortal);
+  const isKnownSpecialLogin = isCronogramaLogin || isVenueEventsLogin || isCommercialMapLogin;
+  const isUnknownModuleLogin = Boolean(
+    moduleSlug
+    && !isAdminLogin
+    && !selectedModule
+    && !isKnownSpecialLogin,
+  );
   const contextName = isAdminLogin
     ? 'Administrador'
     : isCronogramaLogin
@@ -162,7 +173,9 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
         : isCommercialMapLogin
           ? 'Mapa Comercial'
           : selectedModule
-            ? `Comissão de ${selectedModule.name}`
+            ? commissionMapPortal
+              ? selectedModule.name
+              : `Comissão de ${selectedModule.name}`
             : 'Comissão de Logística';
   const heroTitleLead = isAdminLogin
     ? 'Governança institucional'
@@ -200,13 +213,13 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
               description: 'Acesso controlado',
             },
           ];
-  const ContextIcon = isAdminLogin
+  const ContextIcon = commissionMapPortal?.icon ?? (isAdminLogin
     ? LockKeyhole
     : isCronogramaLogin
       ? CalendarRange
-    : isVenueEventsLogin
-      ? Building2
-        : Layers3;
+      : isVenueEventsLogin
+        ? Building2
+        : Layers3);
   const isBusy = phase !== 'idle';
   const emailInvalid = Boolean(fieldErrors.email || authError);
   const passwordInvalid = Boolean(fieldErrors.password || authError);
@@ -221,6 +234,7 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
 
   const resolveTarget = () => {
     if (returnTo && returnTo !== '/' && !returnTo.startsWith('/login')) return returnTo;
+    if (isUnknownModuleLogin) return '/portal';
     if (isAdminLogin) return '/admin';
     if (isCronogramaLogin) return '/cronograma-eventos';
     if (isVenueEventsLogin) return '/eventos-restaurante-arena';
@@ -314,13 +328,33 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
     }
   };
 
+  if (isUnknownModuleLogin) {
+    return (
+      <main className="auth-screen auth-screen--invalid-context" data-module="invalid">
+        <section className="auth-context-error" role="alert" aria-labelledby="invalid-login-title">
+          <span className="auth-context-error__icon" aria-hidden="true">
+            <AlertCircle />
+          </span>
+          <p>Acesso indisponível</p>
+          <h1 id="invalid-login-title">Esta comissão não está configurada.</h1>
+          <span>Volte ao portal para escolher um ambiente válido.</span>
+          <Link to="/portal" className="auth-back-link">
+            <ArrowLeft aria-hidden="true" />
+            Voltar ao portal
+          </Link>
+        </section>
+      </main>
+    );
+  }
+
   return (
     <main
       className="auth-screen"
       data-auth-phase={phase}
       data-module={selectedSlug}
+      data-commission-theme={commissionMapPortal?.theme}
     >
-      {!isCronogramaLogin && !isCommercialMapLogin && (
+      {!isCronogramaLogin && !isCommercialMapLogin && !isCommissionMapLogin && (
         <div className="auth-screen__cycle" aria-hidden="true">
           <span>2026</span>
           <i />
@@ -333,6 +367,8 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
       <div className="auth-layout">
         {isCronogramaLogin ? (
           <CronogramaLoginHero />
+        ) : commissionMapPortal ? (
+          <CommissionMapLoginHero portal={commissionMapPortal} />
         ) : isCommercialMapLogin ? (
           <CommercialMapLoginHero />
         ) : (
@@ -384,7 +420,7 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
           aria-labelledby="login-title"
           aria-busy={phase === 'submitting'}
         >
-          {!isCommercialMapLogin && (
+          {!isCommercialMapLogin && !isCommissionMapLogin && (
             <div className="auth-panel__brand-row">
               <FenasojaBrand
                 compact
@@ -407,11 +443,15 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
           <div className="auth-panel__heading">
             <p className="auth-panel__eyebrow">
               <ShieldCheck aria-hidden="true" />
-              {isCommercialMapLogin ? 'Acesso institucional' : 'Identificação segura'}
+              {isCommercialMapLogin
+                ? 'Acesso institucional'
+                : isCommissionMapLogin
+                  ? 'Acesso à comissão'
+                  : 'Identificação segura'}
             </p>
             <h2 id="login-title">Entrar</h2>
             <p>
-              {isCommercialMapLogin
+              {isCommercialMapLogin || isCommissionMapLogin
                 ? 'Use seu e-mail e senha institucionais para continuar.'
                 : <>Use suas credenciais institucionais para continuar em <strong>{contextName}</strong>.</>}
             </p>
@@ -572,7 +612,7 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
           </form>
 
           <div className="auth-panel__footer">
-            {!isCommercialMapLogin && (
+            {!isCommercialMapLogin && !isCommissionMapLogin && (
               <div className="auth-restricted-note">
                 <span className="auth-restricted-note__icon" aria-hidden="true">
                   <ShieldCheck />
