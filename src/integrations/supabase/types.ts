@@ -148,6 +148,127 @@ export type Database = {
         }
         Relationships: []
       }
+      commercial_lots: {
+        Row: {
+          accessibility_notes: string | null
+          archived_at: string | null
+          area_validation_status: string
+          block: string | null
+          calculated_area_sqm: number | null
+          commercial_notes: string | null
+          created_at: string
+          created_by: string | null
+          depth_meters: number | null
+          description: string | null
+          display_name: string
+          entity_id: string
+          frontage_meters: number | null
+          has_electricity: boolean
+          has_internet: boolean
+          has_water: boolean
+          id: string
+          infrastructure: Json
+          internal_notes: string | null
+          is_corner: boolean
+          is_covered: boolean
+          level_label: string | null
+          lot_number: string | null
+          official_area_sqm: number | null
+          project_id: string
+          public_identifier: string
+          status: string
+          superseded_by_lot_id: string | null
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          accessibility_notes?: string | null
+          archived_at?: string | null
+          area_validation_status?: string
+          block?: string | null
+          calculated_area_sqm?: number | null
+          commercial_notes?: string | null
+          created_at?: string
+          created_by?: string | null
+          depth_meters?: number | null
+          description?: string | null
+          display_name: string
+          entity_id: string
+          frontage_meters?: number | null
+          has_electricity?: boolean
+          has_internet?: boolean
+          has_water?: boolean
+          id?: string
+          infrastructure?: Json
+          internal_notes?: string | null
+          is_corner?: boolean
+          is_covered?: boolean
+          level_label?: string | null
+          lot_number?: string | null
+          official_area_sqm?: number | null
+          project_id: string
+          public_identifier: string
+          status?: string
+          superseded_by_lot_id?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          accessibility_notes?: string | null
+          archived_at?: string | null
+          area_validation_status?: string
+          block?: string | null
+          calculated_area_sqm?: number | null
+          commercial_notes?: string | null
+          created_at?: string
+          created_by?: string | null
+          depth_meters?: number | null
+          description?: string | null
+          display_name?: string
+          entity_id?: string
+          frontage_meters?: number | null
+          has_electricity?: boolean
+          has_internet?: boolean
+          has_water?: boolean
+          id?: string
+          infrastructure?: Json
+          internal_notes?: string | null
+          is_corner?: boolean
+          is_covered?: boolean
+          level_label?: string | null
+          lot_number?: string | null
+          official_area_sqm?: number | null
+          project_id?: string
+          public_identifier?: string
+          status?: string
+          superseded_by_lot_id?: string | null
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commercial_lots_entity_id_fkey"
+            columns: ["entity_id"]
+            isOneToOne: true
+            referencedRelation: "map_entities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commercial_lots_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "map_projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "commercial_lots_superseded_by_lot_id_fkey"
+            columns: ["superseded_by_lot_id"]
+            isOneToOne: false
+            referencedRelation: "commercial_lots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       commission_responsibles: {
         Row: {
           active: boolean
@@ -1983,6 +2104,875 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      lot_contract_versions: {
+        Row: {
+          contract_id: string
+          file_size: number
+          id: string
+          mime_type: string
+          original_name: string
+          storage_path: string
+          superseded_at: string | null
+          uploaded_at: string
+          uploaded_by: string
+          version: number
+        }
+        Insert: {
+          contract_id: string
+          file_size: number
+          id?: string
+          mime_type: string
+          original_name: string
+          storage_path: string
+          superseded_at?: string | null
+          uploaded_at?: string
+          uploaded_by: string
+          version: number
+        }
+        Update: {
+          contract_id?: string
+          file_size?: number
+          id?: string
+          mime_type?: string
+          original_name?: string
+          storage_path?: string
+          superseded_at?: string | null
+          uploaded_at?: string
+          uploaded_by?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lot_contract_versions_contract_id_fkey"
+            columns: ["contract_id"]
+            isOneToOne: false
+            referencedRelation: "lot_contracts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lot_contracts: {
+        Row: {
+          active_version: number
+          contract_number: string | null
+          created_at: string
+          created_by: string
+          id: string
+          is_active: boolean
+          lot_id: string
+          updated_at: string
+        }
+        Insert: {
+          active_version?: number
+          contract_number?: string | null
+          created_at?: string
+          created_by: string
+          id?: string
+          is_active?: boolean
+          lot_id: string
+          updated_at?: string
+        }
+        Update: {
+          active_version?: number
+          contract_number?: string | null
+          created_at?: string
+          created_by?: string
+          id?: string
+          is_active?: boolean
+          lot_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lot_contracts_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "commercial_lots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lot_negotiations: {
+        Row: {
+          company_name: string
+          contact_name: string | null
+          created_at: string
+          document_number: string | null
+          id: string
+          lot_id: string
+          notes: string | null
+          proposed_value: number | null
+          responsible_user_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          company_name: string
+          contact_name?: string | null
+          created_at?: string
+          document_number?: string | null
+          id?: string
+          lot_id: string
+          notes?: string | null
+          proposed_value?: number | null
+          responsible_user_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          company_name?: string
+          contact_name?: string | null
+          created_at?: string
+          document_number?: string | null
+          id?: string
+          lot_id?: string
+          notes?: string | null
+          proposed_value?: number | null
+          responsible_user_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lot_negotiations_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "commercial_lots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lot_prices: {
+        Row: {
+          asking_price: number | null
+          base_price: number | null
+          created_at: string
+          created_by: string | null
+          id: string
+          is_active: boolean
+          lot_id: string
+          minimum_price: number | null
+          price_per_sqm: number | null
+          pricing_mode: string
+          valid_from: string
+          valid_until: string | null
+        }
+        Insert: {
+          asking_price?: number | null
+          base_price?: number | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          lot_id: string
+          minimum_price?: number | null
+          price_per_sqm?: number | null
+          pricing_mode: string
+          valid_from?: string
+          valid_until?: string | null
+        }
+        Update: {
+          asking_price?: number | null
+          base_price?: number | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          is_active?: boolean
+          lot_id?: string
+          minimum_price?: number | null
+          price_per_sqm?: number | null
+          pricing_mode?: string
+          valid_from?: string
+          valid_until?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lot_prices_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "commercial_lots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lot_reservations: {
+        Row: {
+          cancelled_at: string | null
+          company_name: string
+          contact_name: string
+          created_at: string
+          document_number: string | null
+          email: string | null
+          expires_at: string
+          id: string
+          lot_id: string
+          notes: string | null
+          phone: string | null
+          reserved_at: string
+          responsible_name: string | null
+          responsible_user_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          cancelled_at?: string | null
+          company_name: string
+          contact_name: string
+          created_at?: string
+          document_number?: string | null
+          email?: string | null
+          expires_at: string
+          id?: string
+          lot_id: string
+          notes?: string | null
+          phone?: string | null
+          reserved_at?: string
+          responsible_name?: string | null
+          responsible_user_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          cancelled_at?: string | null
+          company_name?: string
+          contact_name?: string
+          created_at?: string
+          document_number?: string | null
+          email?: string | null
+          expires_at?: string
+          id?: string
+          lot_id?: string
+          notes?: string | null
+          phone?: string | null
+          reserved_at?: string
+          responsible_name?: string | null
+          responsible_user_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lot_reservations_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "commercial_lots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lot_sales: {
+        Row: {
+          buyer_name: string
+          contract_number: string | null
+          created_at: string
+          document_number: string | null
+          id: string
+          internal_notes: string | null
+          lot_id: string
+          negotiated_value: number
+          payment_status: string
+          reverted_at: string | null
+          reverted_by: string | null
+          sale_date: string
+          salesperson_name: string
+          salesperson_user_id: string
+          status: string
+        }
+        Insert: {
+          buyer_name: string
+          contract_number?: string | null
+          created_at?: string
+          document_number?: string | null
+          id?: string
+          internal_notes?: string | null
+          lot_id: string
+          negotiated_value: number
+          payment_status?: string
+          reverted_at?: string | null
+          reverted_by?: string | null
+          sale_date: string
+          salesperson_name: string
+          salesperson_user_id: string
+          status?: string
+        }
+        Update: {
+          buyer_name?: string
+          contract_number?: string | null
+          created_at?: string
+          document_number?: string | null
+          id?: string
+          internal_notes?: string | null
+          lot_id?: string
+          negotiated_value?: number
+          payment_status?: string
+          reverted_at?: string | null
+          reverted_by?: string | null
+          sale_date?: string
+          salesperson_name?: string
+          salesperson_user_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lot_sales_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "commercial_lots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      lot_status_history: {
+        Row: {
+          changed_at: string
+          changed_by: string
+          id: string
+          lot_id: string
+          new_status: string
+          previous_status: string | null
+          reason: string | null
+        }
+        Insert: {
+          changed_at?: string
+          changed_by: string
+          id?: string
+          lot_id: string
+          new_status: string
+          previous_status?: string | null
+          reason?: string | null
+        }
+        Update: {
+          changed_at?: string
+          changed_by?: string
+          id?: string
+          lot_id?: string
+          new_status?: string
+          previous_status?: string | null
+          reason?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lot_status_history_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "commercial_lots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      map_activity_logs: {
+        Row: {
+          action: string
+          actor_user_id: string | null
+          after_state: Json | null
+          before_state: Json | null
+          created_at: string
+          entity_id: string | null
+          id: string
+          lot_id: string | null
+          org_id: string
+          project_id: string
+          reason: string | null
+        }
+        Insert: {
+          action: string
+          actor_user_id?: string | null
+          after_state?: Json | null
+          before_state?: Json | null
+          created_at?: string
+          entity_id?: string | null
+          id?: string
+          lot_id?: string | null
+          org_id: string
+          project_id: string
+          reason?: string | null
+        }
+        Update: {
+          action?: string
+          actor_user_id?: string | null
+          after_state?: Json | null
+          before_state?: Json | null
+          created_at?: string
+          entity_id?: string | null
+          id?: string
+          lot_id?: string | null
+          org_id?: string
+          project_id?: string
+          reason?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "map_activity_logs_entity_id_fkey"
+            columns: ["entity_id"]
+            isOneToOne: false
+            referencedRelation: "map_entities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "map_activity_logs_lot_id_fkey"
+            columns: ["lot_id"]
+            isOneToOne: false
+            referencedRelation: "commercial_lots"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "map_activity_logs_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "map_activity_logs_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "map_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      map_calibrations: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          id: string
+          image_offset_x: number
+          image_offset_y: number
+          image_rotation_degrees: number
+          image_scale_x: number
+          image_scale_y: number
+          invalidated_reason: string | null
+          is_locked: boolean
+          known_distance_meters: number | null
+          map_units_per_meter: number | null
+          opacity: number
+          point_a: Json | null
+          point_b: Json | null
+          project_id: string
+          reference_image_path: string | null
+          status: string
+          version: number
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          image_offset_x?: number
+          image_offset_y?: number
+          image_rotation_degrees?: number
+          image_scale_x?: number
+          image_scale_y?: number
+          invalidated_reason?: string | null
+          is_locked?: boolean
+          known_distance_meters?: number | null
+          map_units_per_meter?: number | null
+          opacity?: number
+          point_a?: Json | null
+          point_b?: Json | null
+          project_id: string
+          reference_image_path?: string | null
+          status?: string
+          version?: number
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          image_offset_x?: number
+          image_offset_y?: number
+          image_rotation_degrees?: number
+          image_scale_x?: number
+          image_scale_y?: number
+          invalidated_reason?: string | null
+          is_locked?: boolean
+          known_distance_meters?: number | null
+          map_units_per_meter?: number | null
+          opacity?: number
+          point_a?: Json | null
+          point_b?: Json | null
+          project_id?: string
+          reference_image_path?: string | null
+          status?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "map_calibrations_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "map_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      map_entities: {
+        Row: {
+          classification: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_archived: boolean
+          is_sellable: boolean
+          layer_id: string
+          metadata: Json
+          name: string
+          parent_entity_id: string | null
+          project_id: string
+          public_identifier: string
+          updated_at: string
+          updated_by: string | null
+          verification_status: string
+        }
+        Insert: {
+          classification: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_archived?: boolean
+          is_sellable?: boolean
+          layer_id: string
+          metadata?: Json
+          name: string
+          parent_entity_id?: string | null
+          project_id: string
+          public_identifier: string
+          updated_at?: string
+          updated_by?: string | null
+          verification_status?: string
+        }
+        Update: {
+          classification?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_archived?: boolean
+          is_sellable?: boolean
+          layer_id?: string
+          metadata?: Json
+          name?: string
+          parent_entity_id?: string | null
+          project_id?: string
+          public_identifier?: string
+          updated_at?: string
+          updated_by?: string | null
+          verification_status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "map_entities_layer_id_fkey"
+            columns: ["layer_id"]
+            isOneToOne: false
+            referencedRelation: "map_layers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "map_entities_parent_entity_id_fkey"
+            columns: ["parent_entity_id"]
+            isOneToOne: false
+            referencedRelation: "map_entities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "map_entities_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "map_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      map_entity_geometries: {
+        Row: {
+          calibration_version: number | null
+          change_reason: string
+          created_at: string
+          created_by: string | null
+          elevation: number
+          entity_id: string
+          extrusion_height: number
+          geometry: Json
+          id: string
+          is_current: boolean
+          native_geometry: unknown
+          project_id: string
+          rotation: number
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          calibration_version?: number | null
+          change_reason: string
+          created_at?: string
+          created_by?: string | null
+          elevation?: number
+          entity_id: string
+          extrusion_height?: number
+          geometry: Json
+          id?: string
+          is_current?: boolean
+          native_geometry?: unknown
+          project_id: string
+          rotation?: number
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          calibration_version?: number | null
+          change_reason?: string
+          created_at?: string
+          created_by?: string | null
+          elevation?: number
+          entity_id?: string
+          extrusion_height?: number
+          geometry?: Json
+          id?: string
+          is_current?: boolean
+          native_geometry?: unknown
+          project_id?: string
+          rotation?: number
+          updated_at?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "map_entity_geometries_entity_id_fkey"
+            columns: ["entity_id"]
+            isOneToOne: false
+            referencedRelation: "map_entities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "map_entity_geometries_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "map_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      map_geometry_versions: {
+        Row: {
+          calibration_version: number | null
+          change_reason: string
+          created_at: string
+          created_by: string | null
+          elevation: number
+          entity_id: string
+          extrusion_height: number
+          geometry: Json
+          geometry_id: string
+          id: string
+          project_id: string
+          rotation: number
+          superseded_at: string
+          version: number
+        }
+        Insert: {
+          calibration_version?: number | null
+          change_reason: string
+          created_at: string
+          created_by?: string | null
+          elevation: number
+          entity_id: string
+          extrusion_height: number
+          geometry: Json
+          geometry_id: string
+          id?: string
+          project_id: string
+          rotation: number
+          superseded_at?: string
+          version: number
+        }
+        Update: {
+          calibration_version?: number | null
+          change_reason?: string
+          created_at?: string
+          created_by?: string | null
+          elevation?: number
+          entity_id?: string
+          extrusion_height?: number
+          geometry?: Json
+          geometry_id?: string
+          id?: string
+          project_id?: string
+          rotation?: number
+          superseded_at?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "map_geometry_versions_entity_id_fkey"
+            columns: ["entity_id"]
+            isOneToOne: false
+            referencedRelation: "map_entities"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "map_geometry_versions_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "map_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      map_layers: {
+        Row: {
+          color: string
+          created_at: string
+          description: string | null
+          id: string
+          is_locked: boolean
+          is_visible: boolean
+          layer_key: string
+          name: string
+          opacity: number
+          project_id: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          color?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_locked?: boolean
+          is_visible?: boolean
+          layer_key: string
+          name: string
+          opacity?: number
+          project_id: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          color?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_locked?: boolean
+          is_visible?: boolean
+          layer_key?: string
+          name?: string
+          opacity?: number
+          project_id?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "map_layers_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "map_projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      map_lot_lineage: {
+        Row: {
+          created_at: string
+          created_by: string
+          id: string
+          relationship: string
+          source_lot_id: string
+          target_lot_id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          id?: string
+          relationship: string
+          source_lot_id: string
+          target_lot_id: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          id?: string
+          relationship?: string
+          source_lot_id?: string
+          target_lot_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "map_lot_lineage_source_lot_id_fkey"
+            columns: ["source_lot_id"]
+            isOneToOne: false
+            referencedRelation: "commercial_lots"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "map_lot_lineage_target_lot_id_fkey"
+            columns: ["target_lot_id"]
+            isOneToOne: false
+            referencedRelation: "commercial_lots"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      map_projects: {
+        Row: {
+          active_version: number
+          coordinate_system: string
+          created_at: string
+          created_by: string | null
+          description: string | null
+          id: string
+          is_archived: boolean
+          is_published: boolean
+          name: string
+          org_id: string
+          reference_height: number
+          reference_width: number
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          active_version?: number
+          coordinate_system?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_archived?: boolean
+          is_published?: boolean
+          name: string
+          org_id: string
+          reference_height?: number
+          reference_width?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          active_version?: number
+          coordinate_system?: string
+          created_at?: string
+          created_by?: string | null
+          description?: string | null
+          id?: string
+          is_archived?: boolean
+          is_published?: boolean
+          name?: string
+          org_id?: string
+          reference_height?: number
+          reference_width?: number
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "map_projects_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       mobility_authorizations: {
         Row: {
@@ -5824,6 +6814,7 @@ export type Database = {
           table_name: string
         }[]
       }
+      can_view_commercial_map: { Args: { _org_id: string }; Returns: boolean }
       claim_google_sync_batch: {
         Args: { batch_size?: number }
         Returns: {
@@ -5931,6 +6922,19 @@ export type Database = {
           user_id: string
         }[]
       }
+      map_geometry_overlaps_sellable: {
+        Args: {
+          _excluded_entity_ids?: string[]
+          _geometry: Json
+          _project_id: string
+        }
+        Returns: boolean
+      }
+      map_has_explicit_capability: {
+        Args: { _capability: string; _org_id: string }
+        Returns: boolean
+      }
+      map_polygon_from_geojson: { Args: { _geometry: Json }; Returns: unknown }
       move_to_dlq: {
         Args: {
           dlq_name: string
