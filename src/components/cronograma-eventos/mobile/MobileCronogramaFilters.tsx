@@ -228,14 +228,37 @@ export function MobileCronogramaFilters({
           closeLabel="Fechar filtros avançados"
         >
           <SheetHeader className="cronograma-mobile-filter-sheet-header">
-            <SheetTitle>Filtros avançados</SheetTitle>
+            <SheetTitle>Filtros</SheetTitle>
             <SheetDescription className="sr-only">
               Selecione os critérios para filtrar os eventos.
             </SheetDescription>
           </SheetHeader>
 
           <div className="cronograma-mobile-filter-sheet-body">
+            <div className="cronograma-mobile-filter-period">
+              <span className="cronograma-mobile-filter-period-label">Período</span>
+              <div className="cronograma-mobile-quick-filters" aria-label="Atalhos de período">
+                {quickPeriods.map((option) => {
+                  const Icon = option.icon;
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => setDraftFilters((current) => ({ ...current, period: option.value }))}
+                      className="cronograma-mobile-quick-filter"
+                      data-active={draftFilters.period === option.value || undefined}
+                      aria-pressed={draftFilters.period === option.value}
+                    >
+                      <Icon aria-hidden="true" />
+                      {option.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             <div className="cronograma-mobile-filter-grid">
+
               <MobileFilterSelect
                 label="Ano"
                 value={String(draftFilters.year)}
