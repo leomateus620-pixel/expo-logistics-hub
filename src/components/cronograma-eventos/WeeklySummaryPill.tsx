@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CalendarClock, ChevronRight, Loader2, RefreshCw } from 'lucide-react';
+import { CalendarClock, ChevronDown, Loader2, ChevronRight, RefreshCw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Drawer, DrawerContent, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer';
@@ -8,11 +8,13 @@ import { useCronogramaMobilePresentation } from '@/hooks/useCronogramaMobilePres
 import { useCronogramaWeeklySummary } from '@/hooks/useCronogramaWeeklySummary';
 import {
   buildCollapsedLabel,
+  buildCollapsedParts,
   formatDurationLabel,
   type WeeklySummary,
   type WeeklySummaryEntry,
 } from '@/lib/cronograma-weekly-summary';
 import '@/styles/cronograma-weekly-summary.css';
+
 
 function EntryRow({ entry, onSelect }: { entry: WeeklySummaryEntry; onSelect: () => void }) {
   return (
@@ -137,6 +139,8 @@ export function WeeklySummaryPill({ presentation = 'desktop' }: { presentation?:
     navigate('/cronograma-eventos?view=timeline&week=me');
   };
 
+  const parts = buildCollapsedParts(summary);
+
   const trigger = (
     <button
       type="button"
@@ -145,14 +149,19 @@ export function WeeklySummaryPill({ presentation = 'desktop' }: { presentation?:
       aria-label={`Resumo da semana: ${buildCollapsedLabel(summary)}`}
     >
       <span className="cronograma-week-pill__icon">
-        <CalendarClock className="h-3.5 w-3.5" aria-hidden="true" />
+        <CalendarClock className="h-4 w-4" aria-hidden="true" />
       </span>
       <span className="cronograma-week-pill__label">
         <span className="cronograma-week-pill__caption">Resumo da semana</span>
-        <span className="cronograma-week-pill__value">{buildCollapsedLabel(summary)}</span>
+        <span className="cronograma-week-pill__value">
+          <span className="cronograma-week-pill__period">{parts.prefix}</span>
+          <span className="cronograma-week-pill__metrics">{parts.summary}</span>
+        </span>
       </span>
+      <ChevronDown className="cronograma-week-pill__chevron h-4 w-4" aria-hidden="true" />
     </button>
   );
+
 
   if (useDrawer) {
     return (

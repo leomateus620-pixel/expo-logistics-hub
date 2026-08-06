@@ -46,10 +46,11 @@ export function CronogramaModuleShell({ children }: { children: ReactNode }) {
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-4">
             <div className="hidden md:block">
               <WeeklySummaryPill />
             </div>
+            <span className="hidden h-8 w-px bg-white/12 md:block" aria-hidden="true" />
             <Button
               type="button"
               variant="ghost"
@@ -61,6 +62,7 @@ export function CronogramaModuleShell({ children }: { children: ReactNode }) {
               <span className="hidden sm:inline">Sair</span>
             </Button>
           </div>
+
         </div>
 
         <div className="mx-auto w-full max-w-[1760px] px-3 pb-2 md:hidden sm:px-5">
