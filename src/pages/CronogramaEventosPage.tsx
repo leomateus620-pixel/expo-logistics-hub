@@ -44,6 +44,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { useCronogramaDashboardActivity } from '@/hooks/useCronogramaDashboardActivity';
 import { useCronogramaDashboardData } from '@/hooks/useCronogramaDashboardData';
 import { useCronogramaEventHistory, useCronogramaEventos } from '@/hooks/useCronogramaEventos';
+import { useCronogramaWeeklySummary } from '@/hooks/useCronogramaWeeklySummary';
 import {
   getHarvestEventKey,
   mergeHarvestCompletionSnapshots,
