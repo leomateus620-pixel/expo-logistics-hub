@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { CalendarRange, ChevronLeft, LogOut } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FenasojaBrand } from '@/components/brand/FenasojaBrand';
+import { WeeklySummaryPill } from '@/components/cronograma-eventos/WeeklySummaryPill';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 
