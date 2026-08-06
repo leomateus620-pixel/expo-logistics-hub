@@ -73,15 +73,9 @@ export function CronogramaFiltersBar({
   totalCount: number;
   syncing?: boolean;
 }) {
-  const [searchValue, setSearchValue] = useState(filters.query);
+  const [panelOpen, setPanelOpen] = useState(false);
 
-  useEffect(() => setSearchValue(filters.query), [filters.query]);
-  useEffect(() => {
-    const timer = window.setTimeout(() => {
-      if (searchValue !== filters.query) onChange({ ...filters, query: searchValue });
-    }, 220);
-    return () => window.clearTimeout(timer);
-  }, [filters, onChange, searchValue]);
+
 
   const { units: officialUnits } = useOrgCommissions();
   const commissions = useMemo(
