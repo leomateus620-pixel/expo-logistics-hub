@@ -625,16 +625,8 @@ export function EventForm({
 
       {showRelational && (
         <div className="cronograma-form-section cronograma-relations-section">
-          <div className="cronograma-relations-section__header">
-            <span className="cronograma-relations-section__icon" aria-hidden="true">
-              <UserRound />
-            </span>
-            <div>
-              <h3>Áreas e responsáveis</h3>
-              <span>Defina a área institucional e quem executará ou acompanhará o evento.</span>
-            </div>
-          </div>
           <div className="cronograma-relations-section__fields">
+
             <RelationalMultiSelect
               label={ORG_UNIT_SELECT_LABEL}
               placeholder="Buscar comissão, assessoria ou responsável"
