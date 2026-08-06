@@ -1387,3 +1387,49 @@
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Filtros do cronograma no mobile: gatilho único, período dentro do sheet. */
+.cronograma-mobile-filter-trigger--full {
+  width: 100%;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  min-height: 2.9rem;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.cronograma-mobile-filter-trigger--full em {
+  margin-left: auto;
+  font-style: normal;
+  font-size: 0.7rem;
+  font-weight: 700;
+  opacity: 0.72;
+}
+
+.cronograma-mobile-filter-trigger--full[data-open] {
+  transform: translateY(-1px);
+}
+
+.cronograma-mobile-filter-period {
+  display: grid;
+  gap: 0.5rem;
+  margin-bottom: 0.85rem;
+}
+
+.cronograma-mobile-filter-period-label {
+  font-size: 0.62rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: oklch(var(--muted-foreground));
+}
+
+.cronograma-mobile-filter-period .cronograma-mobile-quick-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  overflow: visible;
+}
+
+.cronograma-mobile-filter-period .cronograma-mobile-quick-filter {
+  min-height: 2.75rem;
+}
