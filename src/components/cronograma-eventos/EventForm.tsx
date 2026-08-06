@@ -704,32 +704,8 @@ export function EventForm({
         </div>
       )}
 
-      <div className="cronograma-form-section is-pending">
-        <h3 className="mb-3 text-sm font-black uppercase tracking-[0.14em] text-amber-950/72">Quando ainda não há data</h3>
-        <div className="grid gap-3">
-          <div className="space-y-1.5">
-            <Label htmlFor={fieldId('pending')}>Motivo da pendência</Label>
-            <Input
-              id={fieldId('pending')}
-              value={form.pendingReason || ''}
-              onChange={(event) => update('pendingReason', event.target.value)}
-              placeholder="Ex: aguardando contrato, fornecedor ou validação externa"
-              className="bg-white/72"
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor={fieldId('decision')}>Decisão necessária</Label>
-            <Textarea
-              id={fieldId('decision')}
-              rows={2}
-              value={form.decisionNeeded || ''}
-              onChange={(event) => update('decisionNeeded', event.target.value)}
-              placeholder="Qual decisão destrava este item?"
-              className="rounded-2xl bg-white/72"
-            />
-          </div>
-        </div>
-      </div>
+
+
 
       {showSubevents && (
         <div className="cronograma-form-section">
