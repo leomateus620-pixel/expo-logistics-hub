@@ -168,53 +168,24 @@ export function MobileCronogramaFilters({
   };
 
   return (
-    <section className="cronograma-mobile-filters" aria-label="Busca e filtros do cronograma">
+    <section className="cronograma-mobile-filters" aria-label="Filtros do cronograma">
       <div className="cronograma-mobile-search-row">
-        <label className="cronograma-mobile-search-field">
-          <span className="sr-only">Buscar no cronograma</span>
-          <Search aria-hidden="true" />
-          <Input
-            value={filters.query}
-            onChange={(event) => onChange({ ...filters, query: event.target.value })}
-            placeholder="Buscar evento, pessoa ou comissão"
-            className="cronograma-mobile-search-input"
-            autoComplete="off"
-            enterKeyHint="search"
-          />
-        </label>
-
         <button
           type="button"
           onClick={() => handleAdvancedOpenChange(true)}
-          className="cronograma-mobile-filter-trigger"
+          className="cronograma-mobile-filter-trigger cronograma-mobile-filter-trigger--full"
+          data-open={advancedOpen || undefined}
           aria-label={advancedCount > 0
-            ? `Abrir filtros avançados, ${advancedCount} ativos`
-            : 'Abrir filtros avançados'}
+            ? `Abrir filtros, ${advancedCount} ativos`
+            : 'Abrir filtros'}
         >
           <SlidersHorizontal aria-hidden="true" />
           <span>Filtros</span>
+          <em>{periodLabels[filters.period]}</em>
           {advancedCount > 0 && <strong>{advancedCount}</strong>}
         </button>
       </div>
 
-      <div className="cronograma-mobile-quick-filters" aria-label="Filtros rápidos">
-        {quickPeriods.map((option) => {
-          const Icon = option.icon;
-          return (
-          <button
-            key={option.value}
-            type="button"
-            onClick={() => onChange({ ...filters, period: option.value })}
-            className="cronograma-mobile-quick-filter"
-            data-active={filters.period === option.value || undefined}
-            aria-pressed={filters.period === option.value}
-          >
-            <Icon aria-hidden="true" />
-            {option.label}
-          </button>
-          );
-        })}
-      </div>
 
       <div className="cronograma-mobile-filter-summary">
         <span className="cronograma-mobile-result-count" aria-live="polite">
