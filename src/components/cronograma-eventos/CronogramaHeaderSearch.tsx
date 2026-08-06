@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { Search, X } from 'lucide-react';
+import '@/styles/cronograma-header-search.css';
 import { cn } from '@/lib/utils';
 import { useCronogramaSearch } from './CronogramaSearchContext';
+
 
 export function CronogramaHeaderSearch({ className }: { className?: string }) {
   const search = useCronogramaSearch();
