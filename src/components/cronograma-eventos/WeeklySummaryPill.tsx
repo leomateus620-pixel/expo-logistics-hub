@@ -27,7 +27,7 @@ function EntryRow({ entry, onSelect }: { entry: WeeklySummaryEntry; onSelect: ()
         )}
       </span>
       <span className="cronograma-week-row__duration">
-        {entry.durationMinutes === null ? 'duração não informada' : formatDurationLabel(entry.durationMinutes)}
+        {entry.durationMinutes === null ? '—' : formatDurationLabel(entry.durationMinutes)}
       </span>
     </button>
   );
@@ -37,13 +37,15 @@ function WeeklySummaryPanel({
   summary,
   onSelectEvent,
   onSeeAll,
+  variant = 'popover',
 }: {
   summary: WeeklySummary;
   onSelectEvent: (entry: WeeklySummaryEntry) => void;
   onSeeAll: () => void;
+  variant?: 'popover' | 'sheet';
 }) {
   return (
-    <div className="cronograma-week-panel">
+    <div className="cronograma-week-panel" data-variant={variant}>
       <div className="cronograma-week-panel__head">
         <p className="cronograma-week-panel__title">Sua semana</p>
         <div className="cronograma-week-panel__metrics">
@@ -57,7 +59,7 @@ function WeeklySummaryPanel({
           </p>
           <p className="cronograma-week-panel__metric">
             {summary.daysWithEvents}
-            <span>{summary.daysWithEvents === 1 ? 'dia com evento' : 'dias com eventos'}</span>
+            <span>{summary.daysWithEvents === 1 ? 'dia' : 'dias'}</span>
           </p>
         </div>
         {summary.eventsWithoutDuration > 0 && (
@@ -69,25 +71,29 @@ function WeeklySummaryPanel({
         )}
       </div>
 
-      {summary.eventCount === 0 ? (
-        <p className="cronograma-week-panel__note">Nenhum evento vinculado nesta semana.</p>
-      ) : (
-        <div className="cronograma-week-panel__days">
-          {summary.days.map((day) => (
-            <div key={day.dateKey}>
-              <p className="cronograma-week-panel__day-label">{day.weekdayLabel}</p>
-              {day.entries.map((entry) => (
-                <EntryRow key={entry.identity} entry={entry} onSelect={() => onSelectEvent(entry)} />
-              ))}
-            </div>
-          ))}
-        </div>
-      )}
+      <div className="cronograma-week-panel__scroll">
+        {summary.eventCount === 0 ? (
+          <p className="cronograma-week-panel__note">Nenhum evento vinculado nesta semana.</p>
+        ) : (
+          <div className="cronograma-week-panel__days">
+            {summary.days.map((day) => (
+              <div key={day.dateKey}>
+                <p className="cronograma-week-panel__day-label">{day.weekdayLabel}</p>
+                {day.entries.map((entry) => (
+                  <EntryRow key={entry.identity} entry={entry} onSelect={() => onSelectEvent(entry)} />
+                ))}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
 
-      <Button type="button" variant="outline" size="sm" className="w-full rounded-xl" onClick={onSeeAll}>
-        Ver todos os eventos
-        <ChevronRight className="h-4 w-4" aria-hidden="true" />
-      </Button>
+      <div className="cronograma-week-panel__foot">
+        <Button type="button" variant="outline" size="sm" className="w-full rounded-xl" onClick={onSeeAll}>
+          Ver todos os eventos
+          <ChevronRight className="h-4 w-4" aria-hidden="true" />
+        </Button>
+      </div>
     </div>
   );
 }
@@ -167,11 +173,14 @@ export function WeeklySummaryPill({ presentation = 'desktop' }: { presentation?:
     return (
       <Drawer open={open} onOpenChange={setOpen}>
         <DrawerTrigger asChild>{trigger}</DrawerTrigger>
-        <DrawerContent className="z-50 max-h-[90dvh] px-4 pb-6">
+        <DrawerContent className="cronograma-week-sheet z-50">
           <DrawerTitle className="sr-only">Resumo da semana</DrawerTitle>
-          <div className="mt-2">
-            <WeeklySummaryPanel summary={summary} onSelectEvent={handleSelectEvent} onSeeAll={handleSeeAll} />
-          </div>
+          <WeeklySummaryPanel
+            summary={summary}
+            onSelectEvent={handleSelectEvent}
+            onSeeAll={handleSeeAll}
+            variant="sheet"
+          />
         </DrawerContent>
       </Drawer>
     );
