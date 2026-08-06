@@ -320,7 +320,11 @@ export default function CronogramaEventosPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [weekScopeRequested, weeklySummaryReady, weeklyScopeSignature, setSearchParams]);
 
-  const clearFilters = useCallback(() => setFilters(emptyFilters), []);
+  const clearFilters = useCallback(() => {
+    headerSearch?.setQuery('');
+    setFilters(emptyFilters);
+  }, [headerSearch]);
+
   const returnToFullCycle = useCallback(() => {
     setFilters((current) => ({
       ...current,
