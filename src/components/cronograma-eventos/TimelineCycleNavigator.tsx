@@ -54,6 +54,7 @@ export function TimelineCycleNavigator({
       style={{ '--cycle-progress': progress } as CSSProperties}
     >
       <header className="cronograma-cycle-heading">
+        {filtersSlot && <div className="cronograma-cycle-filter-slot">{filtersSlot}</div>}
         <div className="min-w-0">
           <p className="text-[9px] font-extrabold uppercase tracking-[0.18em] text-muted-foreground">
             Progresso do ciclo
