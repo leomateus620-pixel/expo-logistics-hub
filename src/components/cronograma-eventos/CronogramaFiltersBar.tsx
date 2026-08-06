@@ -95,7 +95,6 @@ export function CronogramaFiltersBar({
   const activeChips = buildActiveChips(filters);
   const advancedCount = activeChips.filter((chip) => !['query', 'period'].includes(chip.key)).length;
 
-  const [panelOpen, setPanelOpen] = useState(false);
 
   return (
     <section className="cronograma-filter-surface" aria-label="Filtros do cronograma">
