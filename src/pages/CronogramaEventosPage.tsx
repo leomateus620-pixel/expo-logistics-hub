@@ -327,6 +327,12 @@ export default function CronogramaEventosPage() {
     setFilters(emptyFilters);
   }, [headerSearch]);
 
+  const applyFilters = useCallback((next: CronogramaFilters) => {
+    if (headerSearch && next.query !== headerSearch.query) headerSearch.setQuery(next.query);
+    setFilters(next);
+  }, [headerSearch]);
+
+
   const returnToFullCycle = useCallback(() => {
     setFilters((current) => ({
       ...current,
