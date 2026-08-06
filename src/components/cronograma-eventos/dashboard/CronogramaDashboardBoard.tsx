@@ -31,6 +31,8 @@ import { cn } from '@/lib/utils';
 import type { CronogramaEvent } from '../types';
 import { getTodayKey } from '@/lib/cronograma-timeline';
 import EventVolumePanel from './EventVolumePanel';
+import TimeDemandPanel from './TimeDemandPanel';
+
 import type {
   ActivityDetail,
   CronogramaDashboardModel,
@@ -179,41 +181,8 @@ function ExecutiveKpis({
   );
 }
 
-function UpcomingMilestones({
-  model,
-  onOpenEvent,
-}: {
-  model: CronogramaDashboardModel;
-  onOpenEvent: (event: CronogramaEvent) => void;
-}) {
-  return (
-    <section className="cronograma-dashboard-panel cronograma-milestones">
-      <DashboardSectionHeader
-        eyebrow="Agenda estratégica"
-        title="Próximos marcos"
-        description="Entregas institucionais e prioridades no horizonte atual."
-      />
-      {model.upcomingMilestones.length === 0 ? (
-        <EmptyDashboardPanel
-          title="Nenhum marco futuro no recorte"
-          description="Amplie o período ou revise as datas dos eventos prioritários."
-        />
-      ) : (
-        <div className="cronograma-milestone-track">
-          {model.upcomingMilestones.slice(0, 6).map(({ event, deadline, daysRemaining }) => (
-            <button key={event.id} type="button" onClick={() => onOpenEvent(event)}>
-              <span className="cronograma-milestone-date">{formatDate(deadline)}</span>
-              <strong>{event.title}</strong>
-              <small>{event.commission || 'Sem comissão'}</small>
-              <span>{event.owner || 'Sem responsável'}</span>
-              <b>{daysLabel(daysRemaining)}</b>
-            </button>
-          ))}
-        </div>
-      )}
-    </section>
-  );
-}
+
+
 
 function MajorEventProgress({
   model,
@@ -754,7 +723,12 @@ export default function CronogramaDashboardBoard({
         onDrilldown={onDrilldown}
       />
 
-      <UpcomingMilestones model={model} onOpenEvent={onOpenEvent} />
+      <TimeDemandPanel
+        events={model.eligibleEvents}
+        todayKey={getTodayKey()}
+        onDrilldown={onDrilldown}
+      />
+
 
       <div className="cronograma-dashboard-operations">
         <MajorEventProgress model={model} onOpenEvent={onOpenEvent} />
