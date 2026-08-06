@@ -44,6 +44,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { useCronogramaDashboardActivity } from '@/hooks/useCronogramaDashboardActivity';
 import { useCronogramaDashboardData } from '@/hooks/useCronogramaDashboardData';
 import { useCronogramaEventHistory, useCronogramaEventos } from '@/hooks/useCronogramaEventos';
+import { useCronogramaWeeklySummary } from '@/hooks/useCronogramaWeeklySummary';
 import {
   getHarvestEventKey,
   mergeHarvestCompletionSnapshots,
@@ -288,6 +289,30 @@ export default function CronogramaEventosPage() {
   const mobileCreationYear = requestedTimelineYear
     ?? preferredTemporalYear
     ?? getClosestCycleYear(new Date().toISOString().slice(0, 10));
+
+  // Deep-link from the personal weekly summary: ?week=me scopes the timeline
+  // to the events linked to the authenticated user in the current week.
+  const weeklySummary = useCronogramaWeeklySummary();
+  const weekScopeRequested = searchParams.get('week') === 'me';
+  const weeklySummaryReady = !weeklySummary.isLoading;
+  const weeklyScopeSignature = weeklySummary.summary.eventIds.join('|');
+  useEffect(() => {
+    if (!weekScopeRequested || !weeklySummaryReady) return;
+    const { window: weekWindow, eventIds } = weeklySummary.summary;
+    setFilters({
+      ...emptyFilters,
+      fromDate: weekWindow.startKey,
+      toDate: weekWindow.endKey,
+      scopeEventIds: eventIds,
+      scopeLabel: 'Minha semana',
+    });
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current);
+      next.delete('week');
+      return next;
+    }, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [weekScopeRequested, weeklySummaryReady, weeklyScopeSignature, setSearchParams]);
 
   const clearFilters = useCallback(() => setFilters(emptyFilters), []);
   const returnToFullCycle = useCallback(() => {
