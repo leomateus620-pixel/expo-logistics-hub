@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { CalendarClock, ChevronRight, Loader2, RefreshCw } from 'lucide-react';
+import { CalendarClock, ChevronDown, Loader2, ChevronRight, RefreshCw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Drawer, DrawerContent, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer';
@@ -8,11 +8,13 @@ import { useCronogramaMobilePresentation } from '@/hooks/useCronogramaMobilePres
 import { useCronogramaWeeklySummary } from '@/hooks/useCronogramaWeeklySummary';
 import {
   buildCollapsedLabel,
+  buildCollapsedParts,
   formatDurationLabel,
   type WeeklySummary,
   type WeeklySummaryEntry,
 } from '@/lib/cronograma-weekly-summary';
 import '@/styles/cronograma-weekly-summary.css';
+
 
 function EntryRow({ entry, onSelect }: { entry: WeeklySummaryEntry; onSelect: () => void }) {
   return (
