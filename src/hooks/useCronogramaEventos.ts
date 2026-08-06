@@ -572,6 +572,7 @@ export function useCronogramaEventos() {
     return () => window.removeEventListener('storage', handleStorage);
   }, [orgId, refreshQueuedRelationships]);
 
+
   const query = useQuery({
     queryKey: cronogramaEventsQueryKey(orgId),
     enabled: !!orgId,
