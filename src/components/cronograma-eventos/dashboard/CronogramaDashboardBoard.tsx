@@ -721,7 +721,12 @@ export default function CronogramaDashboardBoard({
         onDrilldown={onDrilldown}
       />
 
-      <UpcomingMilestones model={model} onOpenEvent={onOpenEvent} />
+      <TimeDemandPanel
+        events={model.eligibleEvents}
+        todayKey={getTodayKey()}
+        onDrilldown={onDrilldown}
+      />
+
 
       <div className="cronograma-dashboard-operations">
         <MajorEventProgress model={model} onOpenEvent={onOpenEvent} />
