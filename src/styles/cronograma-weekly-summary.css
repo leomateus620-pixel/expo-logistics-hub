@@ -3,7 +3,7 @@
   align-items: center;
   gap: 0.7rem;
   min-height: 2.6rem;
-  padding: 0.4rem 0.75rem 0.4rem 0.55rem;
+  padding: 0.42rem 0.8rem 0.42rem 0.5rem;
   border: 1px solid rgb(146 178 224 / 26%);
   border-radius: 0.9rem;
   background: rgb(12 33 63 / 78%);
@@ -105,9 +105,21 @@
 }
 
 .cronograma-week-pill--mobile {
+  display: flex;
   width: 100%;
   justify-content: flex-start;
-  min-height: 2.9rem;
+  min-height: 3rem;
+  padding-right: 0.65rem;
+}
+
+.cronograma-week-pill--mobile .cronograma-week-pill__value {
+  flex-wrap: wrap;
+  white-space: normal;
+}
+
+.cronograma-week-pill--mobile .cronograma-week-pill__metrics {
+  overflow: visible;
+  text-overflow: clip;
 }
 
 .cronograma-week-pill--mobile .cronograma-week-pill__label {
