@@ -543,6 +543,26 @@ async function saveRelationalSubevent(
   return { parent, subevent: created };
 }
 
+export function cronogramaEventsQueryKey(orgId: string | null | undefined) {
+  return ['cronograma-eventos', orgId] as const;
+}
+
+/** Single source of truth for reading the module dataset, so every consumer
+ *  (workspace and personal weekly summary) shares the same cache entry. */
+export async function fetchCronogramaEventsForOrg(orgId: string): Promise<CronogramaEvent[]> {
+  const { data, error } = await cronogramaDb
+    .from('cronograma_eventos_full')
+    .select('*')
+    .eq('org_id', orgId)
+    .order('start_date', { ascending: true, nullsFirst: false })
+    .order('title', { ascending: true })
+    .limit(1000);
+
+  if (error) throw error;
+  return (data ?? []).map(fromDbRow) as CronogramaEvent[];
+}
+
+
 export function useCronogramaEventos() {
   const { orgId, myRole } = useCurrentOrg();
   const queryClient = useQueryClient();
