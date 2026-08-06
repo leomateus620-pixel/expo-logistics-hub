@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useOrgCommissions } from '@/hooks/useOrgCommissions';
 import {
   CalendarClock,
@@ -7,7 +7,6 @@ import {
   Check,
   CircleAlert,
   Loader2,
-  Search,
   SlidersHorizontal,
   SunMedium,
   X,
@@ -16,6 +15,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+
 import {
   Select,
   SelectContent,
