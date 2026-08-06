@@ -31,6 +31,8 @@ import { cn } from '@/lib/utils';
 import type { CronogramaEvent } from '../types';
 import { getTodayKey } from '@/lib/cronograma-timeline';
 import EventVolumePanel from './EventVolumePanel';
+import TimeDemandPanel from './TimeDemandPanel';
+
 import type {
   ActivityDetail,
   CronogramaDashboardModel,
