@@ -962,7 +962,7 @@ export default function CronogramaEventosPage() {
             <MobileCronogramaFilters
               filters={filters}
               events={events}
-              onChange={setFilters}
+              onChange={applyFilters}
               onClear={clearFilters}
               resultCount={filteredEvents.length}
               totalCount={eventsForView.length}
@@ -989,7 +989,7 @@ export default function CronogramaEventosPage() {
             <CronogramaFiltersBar
               filters={filters}
               events={events}
-              onChange={setFilters}
+              onChange={applyFilters}
               onClear={clearFilters}
               resultCount={filteredEvents.length}
               totalCount={eventsForView.length}
