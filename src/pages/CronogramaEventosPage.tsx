@@ -973,24 +973,45 @@ export default function CronogramaEventosPage() {
           </div>
         </MobileCronogramaErrorBoundary>
       ) : (
-        <div className="mx-auto flex w-full max-w-[1680px] flex-col gap-3 px-3 sm:px-5 2xl:px-8">
-          <CronogramaCommandHeader
-            availability={cronograma.isLoading ? 'loading' : cronograma.isSeedFallback ? 'offline' : 'ready'}
-          />
+        <CronogramaFiltersSlotProvider
+          slot={(
+            <CronogramaFiltersTrigger
+              filters={filters}
+              events={events}
+              onChange={applyFilters}
+              onClear={clearFilters}
+              resultCount={filteredEvents.length}
+              syncing={cronograma.isRefreshing}
+            />
+          )}
+        >
+          <div className="mx-auto flex w-full max-w-[1680px] flex-col gap-3 px-3 sm:px-5 2xl:px-8">
+            <CronogramaCommandHeader
+              availability={cronograma.isLoading ? 'loading' : cronograma.isSeedFallback ? 'offline' : 'ready'}
+            />
 
-          <CronogramaRegistrationAction
-            canManage={cronograma.canManage}
-            onCreate={openCreate}
-            presentation="desktop"
-          />
+            <CronogramaRegistrationAction
+              canManage={cronograma.canManage}
+              onCreate={openCreate}
+              presentation="desktop"
+            />
 
-          <div className="cronograma-command-dock sticky top-[84px] z-20 pb-2">
-            <CronogramaViewTabs activeView={activeView} onChange={setActiveView} />
+            <div className="cronograma-command-dock sticky top-[84px] z-20 pb-2">
+              <CronogramaViewTabs activeView={activeView} onChange={setActiveView} />
+            </div>
+
+            {activeView !== 'timeline' && activeView !== 'completed' && (
+              <CronogramaCycleBar
+                label="Visão operacional"
+                title={CRONOGRAMA_VIEW_LABELS[activeView]}
+              />
+            )}
+
+            {operationalContent}
           </div>
-
-          {operationalContent}
-        </div>
+        </CronogramaFiltersSlotProvider>
       )}
+
 
 
       {overlayIsMobilePresentation ? (
