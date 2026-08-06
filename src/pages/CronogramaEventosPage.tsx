@@ -1015,15 +1015,18 @@ export default function CronogramaEventosPage() {
       ) : (
         <Dialog open={createOpen} onOpenChange={handleCreateOpenChange}>
           <DialogContent className="cronograma-create-dialog max-w-3xl">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-2">
-                <CalendarDays className="h-5 w-5 text-gold" />
+            <DialogHeader className="cronograma-create-dialog__header">
+              <DialogTitle className="cronograma-create-dialog__title">
+                <span className="cronograma-create-dialog__badge" aria-hidden="true">
+                  <CalendarDays />
+                </span>
                 Novo evento
               </DialogTitle>
-              <DialogDescription>
-                Preencha as informações essenciais do evento.
+              <DialogDescription className="sr-only">
+                Formulário de cadastro de evento do cronograma.
               </DialogDescription>
             </DialogHeader>
+
             <div className="overflow-y-auto pr-1">
               <EventForm
                 onSubmit={handleCreate}

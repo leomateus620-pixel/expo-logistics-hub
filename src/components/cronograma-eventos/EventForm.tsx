@@ -1,5 +1,5 @@
 import { useEffect, useId, useMemo, useRef, useState, type FormEvent } from 'react';
-import { CalendarClock, Layers3, Save, UserRound, X } from 'lucide-react';
+import { CalendarClock, Layers3, Save, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -370,39 +370,10 @@ export function EventForm({
     })),
     [units, linkedUnitIds],
   );
-  const selectedUnits = useMemo(
-    () => linkedUnitIds
-      .map((unitId) => units.find((unit) => unit.id === unitId))
-      .filter((unit): unit is NonNullable<typeof unit> => Boolean(unit)),
-    [linkedUnitIds, units],
-  );
-  const officialResponsibleNames = useMemo(
-    () => Array.from(new Set(selectedUnits.flatMap((unit) => unit.responsibles.map((person) => person.displayName)))),
-    [selectedUnits],
-  );
-  const missingOfficialResponsibles = useMemo(() => {
-    const current = new Set(
-      (form.responsiblesRel ?? []).map((link) => normalizeSearchTerm(link.name ?? '')),
-    );
-    return officialResponsibleNames.filter((name) => !current.has(normalizeSearchTerm(name)));
-  }, [form.responsiblesRel, officialResponsibleNames]);
 
-  const applyOfficialResponsibles = () => {
-    if (missingOfficialResponsibles.length === 0) return;
-    const hasPrimary = (form.responsiblesRel ?? []).some((link) => link.isPrimary);
-    const confirmed = window.confirm(
-      hasPrimary
-        ? `Adicionar ${missingOfficialResponsibles.join(', ')} como responsáveis institucionais? O responsável principal atual será mantido.`
-        : `Definir ${missingOfficialResponsibles.join(', ')} como responsáveis do evento?`,
-    );
-    if (!confirmed) return;
-    const additions = missingOfficialResponsibles.map((name, index) => ({
-      id: `custom:${name.toLocaleLowerCase('pt-BR')}`,
-      label: name,
-      isPrimary: !hasPrimary && index === 0,
-    }));
-    update('responsiblesRel', selectionsToResponsibleLinks([...responsibleSelections, ...additions]));
-  };
+
+
+
 
   const handleSubmit = (submitEvent: FormEvent<HTMLFormElement>) => {
     submitEvent.preventDefault();
@@ -625,16 +596,8 @@ export function EventForm({
 
       {showRelational && (
         <div className="cronograma-form-section cronograma-relations-section">
-          <div className="cronograma-relations-section__header">
-            <span className="cronograma-relations-section__icon" aria-hidden="true">
-              <UserRound />
-            </span>
-            <div>
-              <h3>Áreas e responsáveis</h3>
-              <span>Defina a área institucional e quem executará ou acompanhará o evento.</span>
-            </div>
-          </div>
           <div className="cronograma-relations-section__fields">
+
             <RelationalMultiSelect
               label={ORG_UNIT_SELECT_LABEL}
               placeholder="Buscar comissão, assessoria ou responsável"
@@ -651,18 +614,8 @@ export function EventForm({
               variant="organization"
             />
 
-            {missingOfficialResponsibles.length > 0 && (
-              <div className="cronograma-relation-institutional-action">
-                <div>
-                  <strong>Responsáveis da área</strong>
-                  <p>{missingOfficialResponsibles.join(', ')}</p>
-                </div>
-                <button type="button" onClick={applyOfficialResponsibles}>
-                  Adicionar
-                  <span>{missingOfficialResponsibles.length}</span>
-                </button>
-              </div>
-            )}
+
+
 
             <RelationalMultiSelect
               label="Responsáveis do evento"
@@ -704,32 +657,8 @@ export function EventForm({
         </div>
       )}
 
-      <div className="cronograma-form-section is-pending">
-        <h3 className="mb-3 text-sm font-black uppercase tracking-[0.14em] text-amber-950/72">Quando ainda não há data</h3>
-        <div className="grid gap-3">
-          <div className="space-y-1.5">
-            <Label htmlFor={fieldId('pending')}>Motivo da pendência</Label>
-            <Input
-              id={fieldId('pending')}
-              value={form.pendingReason || ''}
-              onChange={(event) => update('pendingReason', event.target.value)}
-              placeholder="Ex: aguardando contrato, fornecedor ou validação externa"
-              className="bg-white/72"
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor={fieldId('decision')}>Decisão necessária</Label>
-            <Textarea
-              id={fieldId('decision')}
-              rows={2}
-              value={form.decisionNeeded || ''}
-              onChange={(event) => update('decisionNeeded', event.target.value)}
-              placeholder="Qual decisão destrava este item?"
-              className="rounded-2xl bg-white/72"
-            />
-          </div>
-        </div>
-      </div>
+
+
 
       {showSubevents && (
         <div className="cronograma-form-section">
