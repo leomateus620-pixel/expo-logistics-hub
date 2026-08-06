@@ -5,7 +5,9 @@ import { toast } from 'sonner';
 import { CalendarMonthView } from '@/components/cronograma-eventos/CalendarMonthView';
 import { UndatedBoard } from '@/components/cronograma-eventos/CronogramaBoards';
 import { CronogramaCommandHeader } from '@/components/cronograma-eventos/CronogramaCommandHeader';
-import { CronogramaFiltersBar } from '@/components/cronograma-eventos/CronogramaFiltersBar';
+import { CronogramaCycleBar } from '@/components/cronograma-eventos/CronogramaCycleBar';
+import { CronogramaFiltersSlotProvider } from '@/components/cronograma-eventos/CronogramaFiltersSlot';
+import { CronogramaFiltersTrigger } from '@/components/cronograma-eventos/CronogramaFiltersTrigger';
 import { CronogramaRegistrationAction } from '@/components/cronograma-eventos/CronogramaRegistrationAction';
 import { useCronogramaSearch } from '@/components/cronograma-eventos/CronogramaSearchContext';
 
@@ -973,33 +975,46 @@ export default function CronogramaEventosPage() {
           </div>
         </MobileCronogramaErrorBoundary>
       ) : (
-        <div className="mx-auto flex w-full max-w-[1680px] flex-col gap-3 px-3 sm:px-5 2xl:px-8">
-          <CronogramaCommandHeader
-            availability={cronograma.isLoading ? 'loading' : cronograma.isSeedFallback ? 'offline' : 'ready'}
-          />
-
-          <CronogramaRegistrationAction
-            canManage={cronograma.canManage}
-            onCreate={openCreate}
-            presentation="desktop"
-          />
-
-          <div className="cronograma-command-dock sticky top-[72px] z-20 space-y-2 pb-2">
-            <CronogramaViewTabs activeView={activeView} onChange={setActiveView} />
-            <CronogramaFiltersBar
+        <CronogramaFiltersSlotProvider
+          slot={(
+            <CronogramaFiltersTrigger
               filters={filters}
               events={events}
               onChange={applyFilters}
               onClear={clearFilters}
               resultCount={filteredEvents.length}
-              totalCount={eventsForView.length}
               syncing={cronograma.isRefreshing}
             />
-          </div>
+          )}
+        >
+          <div className="mx-auto flex w-full max-w-[1680px] flex-col gap-3 px-3 sm:px-5 2xl:px-8">
+            <CronogramaCommandHeader
+              availability={cronograma.isLoading ? 'loading' : cronograma.isSeedFallback ? 'offline' : 'ready'}
+            />
 
-          {operationalContent}
-        </div>
+            <CronogramaRegistrationAction
+              canManage={cronograma.canManage}
+              onCreate={openCreate}
+              presentation="desktop"
+            />
+
+            <div className="cronograma-command-dock sticky top-[84px] z-20 pb-2">
+              <CronogramaViewTabs activeView={activeView} onChange={setActiveView} />
+            </div>
+
+            {activeView !== 'timeline' && activeView !== 'completed' && (
+              <CronogramaCycleBar
+                label="Visão operacional"
+                title={CRONOGRAMA_VIEW_LABELS[activeView]}
+              />
+            )}
+
+            {operationalContent}
+          </div>
+        </CronogramaFiltersSlotProvider>
       )}
+
+
 
       {overlayIsMobilePresentation ? (
         <MobileCronogramaErrorBoundary
