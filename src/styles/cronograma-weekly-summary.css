@@ -3,7 +3,7 @@
   align-items: center;
   gap: 0.7rem;
   min-height: 2.6rem;
-  padding: 0.4rem 0.75rem 0.4rem 0.55rem;
+  padding: 0.42rem 0.8rem 0.42rem 0.5rem;
   border: 1px solid rgb(146 178 224 / 26%);
   border-radius: 0.9rem;
   background: rgb(12 33 63 / 78%);
@@ -105,9 +105,21 @@
 }
 
 .cronograma-week-pill--mobile {
+  display: flex;
   width: 100%;
   justify-content: flex-start;
-  min-height: 2.9rem;
+  min-height: 3rem;
+  padding-right: 0.65rem;
+}
+
+.cronograma-week-pill--mobile .cronograma-week-pill__value {
+  flex-wrap: wrap;
+  white-space: normal;
+}
+
+.cronograma-week-pill--mobile .cronograma-week-pill__metrics {
+  overflow: visible;
+  text-overflow: clip;
 }
 
 .cronograma-week-pill--mobile .cronograma-week-pill__label {
@@ -115,21 +127,24 @@
 }
 
 .cronograma-week-panel {
-  display: grid;
-  gap: 1rem;
+  display: flex;
+  min-height: 0;
+  flex-direction: column;
+  gap: 0.85rem;
   padding: 0.25rem;
 }
 
 .cronograma-week-panel__head {
   display: grid;
-  gap: 0.35rem;
+  flex: none;
+  gap: 0.3rem;
 }
 
 .cronograma-week-panel__title {
-  font-size: 0.72rem;
+  font-size: 0.66rem;
   font-weight: 700;
-  letter-spacing: 0.1em;
-  opacity: 0.7;
+  letter-spacing: 0.12em;
+  opacity: 0.62;
   text-transform: uppercase;
 }
 
@@ -137,11 +152,11 @@
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  gap: 0.4rem 1.1rem;
+  gap: 0.25rem 1rem;
 }
 
 .cronograma-week-panel__metric {
-  font-size: 1.4rem;
+  font-size: 1.25rem;
   font-weight: 800;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
@@ -149,11 +164,11 @@
 }
 
 .cronograma-week-panel__metric span {
-  margin-left: 0.3rem;
-  font-size: 0.7rem;
+  margin-left: 0.28rem;
+  font-size: 0.68rem;
   font-weight: 600;
   letter-spacing: 0;
-  opacity: 0.62;
+  opacity: 0.6;
 }
 
 .cronograma-week-panel__note {
@@ -162,35 +177,50 @@
   opacity: 0.7;
 }
 
+.cronograma-week-panel__scroll {
+  min-height: 0;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
 .cronograma-week-panel__days {
   display: grid;
+  gap: 0.8rem;
+  padding-right: 0.15rem;
+}
+
+.cronograma-week-panel[data-variant='popover'] .cronograma-week-panel__scroll {
   max-height: 18rem;
-  gap: 0.9rem;
-  overflow-y: auto;
-  padding-right: 0.25rem;
 }
 
 .cronograma-week-panel__days > div + div {
   border-top: 1px solid hsl(var(--border) / 55%);
-  padding-top: 0.9rem;
+  padding-top: 0.8rem;
 }
 
 .cronograma-week-panel__day-label {
-  margin-bottom: 0.4rem;
-  font-size: 0.63rem;
+  margin-bottom: 0.3rem;
+  font-size: 0.62rem;
   font-weight: 700;
-  letter-spacing: 0.09em;
-  opacity: 0.6;
+  letter-spacing: 0.1em;
+  opacity: 0.58;
   text-transform: uppercase;
+}
+
+.cronograma-week-panel__foot {
+  flex: none;
+  padding-top: 0.1rem;
 }
 
 .cronograma-week-row {
   display: grid;
   width: 100%;
   grid-template-columns: 3rem minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 0.6rem;
-  padding: 0.5rem 0.6rem;
+  align-items: start;
+  gap: 0.55rem;
+  padding: 0.5rem 0.55rem;
   border: 1px solid transparent;
   border-radius: 0.7rem;
   text-align: left;
@@ -198,7 +228,7 @@
 }
 
 .cronograma-week-row + .cronograma-week-row {
-  margin-top: 0.25rem;
+  margin-top: 0.2rem;
 }
 
 .cronograma-week-row:hover {
@@ -210,17 +240,22 @@
   font-size: 0.78rem;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
+  line-height: 1.35;
 }
 
 .cronograma-week-row__title {
+  display: -webkit-box;
   overflow: hidden;
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   font-weight: 600;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .cronograma-week-row__context {
+  margin-top: 0.1rem;
   font-size: 0.66rem;
   font-weight: 500;
   opacity: 0.6;
@@ -229,8 +264,40 @@
 .cronograma-week-row__duration {
   font-size: 0.7rem;
   font-weight: 600;
+  line-height: 1.5;
   opacity: 0.72;
   white-space: nowrap;
+}
+
+/* Bottom sheet (mobile) */
+.cronograma-week-sheet {
+  max-height: min(78dvh, 44rem);
+  border-color: hsl(var(--border));
+  border-radius: 1.25rem 1.25rem 0 0;
+  background: hsl(var(--card));
+  backdrop-filter: none;
+  padding: 0 1rem calc(0.9rem + env(safe-area-inset-bottom));
+  overflow: hidden;
+}
+
+.cronograma-week-sheet .cronograma-week-panel {
+  height: 100%;
+  padding: 0.5rem 0 0;
+}
+
+.cronograma-week-sheet .cronograma-week-panel__metric {
+  font-size: 1.15rem;
+}
+
+.cronograma-week-sheet .cronograma-week-row {
+  min-height: 2.9rem;
+  align-items: center;
+  padding: 0.55rem 0.5rem;
+}
+
+.cronograma-week-sheet .cronograma-week-panel__foot {
+  border-top: 1px solid hsl(var(--border) / 55%);
+  padding-top: 0.75rem;
 }
 
 @media (prefers-reduced-motion: reduce) {
