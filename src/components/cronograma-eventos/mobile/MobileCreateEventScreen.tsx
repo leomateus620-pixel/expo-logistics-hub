@@ -75,7 +75,7 @@ export function MobileCreateEventScreen({
       <MobileDialogFrame
         open={open}
         title="Novo evento"
-        description="Preencha as informações essenciais do evento."
+        
         onRequestClose={requestClose}
         closeDisabled={saving}
         closeLabel="Fechar criação de evento"
