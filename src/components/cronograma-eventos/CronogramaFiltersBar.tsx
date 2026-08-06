@@ -114,9 +114,10 @@ export function CronogramaFiltersBar({
             </Button>
           </PopoverTrigger>
           <PopoverContent
-            side="bottom"
+            side="right"
             align="start"
-            sideOffset={10}
+            sideOffset={12}
+            collisionPadding={16}
             className="cronograma-filter-panel w-[min(94vw,46rem)] rounded-2xl border-border/60 bg-white p-4 shadow-2xl"
           >
             <div className="mb-4 flex items-start justify-between gap-4">
