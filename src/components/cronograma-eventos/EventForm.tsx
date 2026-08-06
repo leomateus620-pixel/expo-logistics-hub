@@ -370,12 +370,8 @@ export function EventForm({
     })),
     [units, linkedUnitIds],
   );
-  const selectedUnits = useMemo(
-    () => linkedUnitIds
-      .map((unitId) => units.find((unit) => unit.id === unitId))
-      .filter((unit): unit is NonNullable<typeof unit> => Boolean(unit)),
-    [linkedUnitIds, units],
-  );
+
+
 
 
 
