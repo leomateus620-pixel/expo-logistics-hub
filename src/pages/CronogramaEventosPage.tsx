@@ -984,22 +984,14 @@ export default function CronogramaEventosPage() {
             presentation="desktop"
           />
 
-          <div className="cronograma-command-dock sticky top-[72px] z-20 space-y-2 pb-2">
+          <div className="cronograma-command-dock sticky top-[84px] z-20 pb-2">
             <CronogramaViewTabs activeView={activeView} onChange={setActiveView} />
-            <CronogramaFiltersBar
-              filters={filters}
-              events={events}
-              onChange={applyFilters}
-              onClear={clearFilters}
-              resultCount={filteredEvents.length}
-              totalCount={eventsForView.length}
-              syncing={cronograma.isRefreshing}
-            />
           </div>
 
           {operationalContent}
         </div>
       )}
+
 
       {overlayIsMobilePresentation ? (
         <MobileCronogramaErrorBoundary
