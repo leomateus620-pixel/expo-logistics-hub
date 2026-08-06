@@ -7,6 +7,8 @@ import { UndatedBoard } from '@/components/cronograma-eventos/CronogramaBoards';
 import { CronogramaCommandHeader } from '@/components/cronograma-eventos/CronogramaCommandHeader';
 import { CronogramaFiltersBar } from '@/components/cronograma-eventos/CronogramaFiltersBar';
 import { CronogramaRegistrationAction } from '@/components/cronograma-eventos/CronogramaRegistrationAction';
+import { useCronogramaSearch } from '@/components/cronograma-eventos/CronogramaSearchContext';
+
 import {
   CronogramaTimelineBoard,
   CronogramaTimelineSkeleton,
