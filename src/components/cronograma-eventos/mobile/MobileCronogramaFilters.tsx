@@ -6,7 +6,7 @@ import {
   Check,
   CircleAlert,
   Loader2,
-  Search,
+  
   SlidersHorizontal,
   SunMedium,
   X,
