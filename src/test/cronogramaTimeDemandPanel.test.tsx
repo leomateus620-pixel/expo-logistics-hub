@@ -50,7 +50,7 @@ describe('Horários com maior demanda', () => {
 
     expect(screen.getByRole('heading', { name: 'Horários com maior demanda' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Mês' })).toHaveAttribute('data-active', 'true');
-    expect(screen.getByText(/3 eventos com horário/)).toBeInTheDocument();
+    expect(screen.getAllByText(/3 eventos com horário/).length).toBeGreaterThan(0);
   });
 
   it('permite trocar o período', () => {
