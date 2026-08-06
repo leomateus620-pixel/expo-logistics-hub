@@ -573,27 +573,20 @@ export function useCronogramaEventos() {
   }, [orgId, refreshQueuedRelationships]);
 
   const query = useQuery({
-    queryKey: ['cronograma-eventos', orgId],
+    queryKey: cronogramaEventsQueryKey(orgId),
     enabled: !!orgId,
     staleTime: 30000,
     queryFn: async () => {
       if (!orgId) return [];
-      const { data, error } = await cronogramaDb
-        .from('cronograma_eventos_full')
-        .select('*')
-        .eq('org_id', orgId)
-        .order('start_date', { ascending: true, nullsFirst: false })
-        .order('title', { ascending: true })
-        .limit(1000);
-
-      if (error) {
+      try {
+        const events = await fetchCronogramaEventsForOrg(orgId);
+        setDbUnavailable(false);
+        setRelationshipsUnavailable(false);
+        return events;
+      } catch (error) {
         setDbUnavailable(true);
         throw error;
       }
-
-      setDbUnavailable(false);
-      setRelationshipsUnavailable(false);
-      return (data ?? []).map(fromDbRow) as CronogramaEvent[];
     },
     retry: false,
   });
