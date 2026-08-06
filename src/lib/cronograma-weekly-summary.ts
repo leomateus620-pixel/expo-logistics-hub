@@ -210,16 +210,30 @@ export function buildWeeklySummary(
   };
 }
 
-export function buildCollapsedLabel(summary: WeeklySummary): string {
+export interface CollapsedLabelParts {
+  prefix: string;
+  summary: string;
+}
+
+/** Splits the collapsed label so the header can emphasize the numbers. */
+export function buildCollapsedParts(summary: WeeklySummary): CollapsedLabelParts {
   const prefix = summary.window.isLastBusinessDay ? 'Esta semana' : 'Semana atual';
-  if (summary.eventCount === 0) return `${prefix} · nenhum evento`;
+  if (summary.eventCount === 0) return { prefix, summary: 'nenhum evento' };
 
   const eventsLabel = `${summary.eventCount} ${summary.eventCount === 1 ? 'evento' : 'eventos'}`;
-  if (summary.totalMinutes === 0) return `${prefix} · ${eventsLabel} · duração não informada`;
+  if (summary.totalMinutes === 0) return { prefix, summary: `${eventsLabel} · duração não informada` };
 
   const durationLabel = formatDurationLabel(summary.totalMinutes);
-  if (summary.eventsWithoutDuration > 0) {
-    return `${prefix} · ${eventsLabel} · ${durationLabel} contabilizadas`;
-  }
-  return `${prefix} · ${eventsLabel} · ${durationLabel} de agenda`;
+  return {
+    prefix,
+    summary: summary.eventsWithoutDuration > 0
+      ? `${eventsLabel} · ${durationLabel} contabilizadas`
+      : `${eventsLabel} · ${durationLabel} de agenda`,
+  };
 }
+
+export function buildCollapsedLabel(summary: WeeklySummary): string {
+  const parts = buildCollapsedParts(summary);
+  return `${parts.prefix} · ${parts.summary}`;
+}
+
