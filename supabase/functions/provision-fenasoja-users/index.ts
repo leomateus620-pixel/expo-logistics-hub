@@ -21,36 +21,49 @@ interface ProvisionUser {
   deactivate_duplicates?: string[];
 }
 
+const BASE_CAPABILITIES = [
+  "full_access",
+  "mobility_access",
+  "cronograma_eventos_access",
+  "cronograma_reminder_all",
+  "venue_events_access",
+  "venue_events_full_access",
+  "logistica_access",
+  "gastronomia_access",
+  "infraestrutura_access",
+  "servicos_access",
+  "arte_cultura_access",
+  "novas_geracoes_access",
+  "seguranca_access",
+  "limpeza_access",
+  "exporural_access",
+  "industria_comercio_servicos_access",
+  "map.view",
+];
+
 const USERS: ProvisionUser[] = [
   {
-    email: "rvlugoch@gmail.com",
-    full_name: "Roque Vanderlei Lugoch",
+    email: "tenservat@gmail.com",
+    full_name: "Marcos Eduardo Servat",
     password: "Fenasoja@2028",
     role: "gestor",
-    cargo: "Coordenador Financeiro",
+    cargo: "Comissão Central",
     is_core_team: true,
-    capabilities: [
-      "full_access",
-      "mobility_access",
-      "cronograma_eventos_access",
-      "cronograma_reminder_all",
-      "venue_events_access",
-      "venue_events_full_access",
-      "logistica_access",
-      "gastronomia_access",
-      "infraestrutura_access",
-      "servicos_access",
-      "arte_cultura_access",
-      "novas_geracoes_access",
-      "seguranca_access",
-      "limpeza_access",
-      "exporural_access",
-      "industria_comercio_servicos_access",
-      "map.view",
-    ],
-    deactivate_duplicates: ["ROQUE VANDERLEI LUGOCH"],
+    capabilities: [...BASE_CAPABILITIES, "financial_access"],
+    deactivate_duplicates: ["MARCOS EDUARDO SERVAT"],
+  },
+  {
+    email: "advdariogermano@gmail.com",
+    full_name: "Dário Júnior da Motta Germano",
+    password: "Fenasoja@2028",
+    role: "gestor",
+    cargo: "Comissão Central",
+    is_core_team: true,
+    capabilities: [...BASE_CAPABILITIES],
+    deactivate_duplicates: ["DARIO JÚNIOR DA MOTTA GERMANO"],
   },
 ];
+
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
