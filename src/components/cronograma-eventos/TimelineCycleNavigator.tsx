@@ -3,6 +3,7 @@ import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { CronogramaCycleYear, CronogramaYearSummary } from '@/lib/cronograma-cycle';
 import { CycleYearMark } from './CycleYearMark';
+import { useCronogramaFiltersSlot } from './CronogramaFiltersSlot';
 
 function eventCountLabel(count: number) {
   return `${count} ${count === 1 ? 'evento' : 'eventos'}`;
@@ -33,6 +34,7 @@ export function TimelineCycleNavigator({
   currentYear: CronogramaCycleYear | null;
   onSelectYear: (year: CronogramaCycleYear) => void;
 }) {
+  const filtersSlot = useCronogramaFiltersSlot();
   const selectedIndex = Math.max(0, summaries.findIndex((summary) => summary.year === selectedYear));
   const selectedButtonRef = useRef<HTMLButtonElement>(null);
   const progress = summaries.length > 1 ? selectedIndex / (summaries.length - 1) : 0;
