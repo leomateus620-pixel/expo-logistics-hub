@@ -5,7 +5,9 @@ import { toast } from 'sonner';
 import { CalendarMonthView } from '@/components/cronograma-eventos/CalendarMonthView';
 import { UndatedBoard } from '@/components/cronograma-eventos/CronogramaBoards';
 import { CronogramaCommandHeader } from '@/components/cronograma-eventos/CronogramaCommandHeader';
-import { CronogramaFiltersBar } from '@/components/cronograma-eventos/CronogramaFiltersBar';
+import { CronogramaCycleBar } from '@/components/cronograma-eventos/CronogramaCycleBar';
+import { CronogramaFiltersSlotProvider } from '@/components/cronograma-eventos/CronogramaFiltersSlot';
+import { CronogramaFiltersTrigger } from '@/components/cronograma-eventos/CronogramaFiltersTrigger';
 import { CronogramaRegistrationAction } from '@/components/cronograma-eventos/CronogramaRegistrationAction';
 import { useCronogramaSearch } from '@/components/cronograma-eventos/CronogramaSearchContext';
 
