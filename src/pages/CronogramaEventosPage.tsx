@@ -129,6 +129,12 @@ export default function CronogramaEventosPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const todayKey = useCurrentCronogramaDay();
   const [filters, setFilters] = useState<CronogramaFilters>(emptyFilters);
+  const headerSearch = useCronogramaSearch();
+  const headerQuery = headerSearch?.query ?? '';
+  useEffect(() => {
+    setFilters((current) => (current.query === headerQuery ? current : { ...current, query: headerQuery }));
+  }, [headerQuery]);
+
   const [selectedEvent, setSelectedEvent] = useState<CronogramaEvent | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerStartsEditing, setDrawerStartsEditing] = useState(false);
