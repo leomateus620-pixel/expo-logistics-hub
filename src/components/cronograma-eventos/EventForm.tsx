@@ -376,33 +376,8 @@ export function EventForm({
       .filter((unit): unit is NonNullable<typeof unit> => Boolean(unit)),
     [linkedUnitIds, units],
   );
-  const officialResponsibleNames = useMemo(
-    () => Array.from(new Set(selectedUnits.flatMap((unit) => unit.responsibles.map((person) => person.displayName)))),
-    [selectedUnits],
-  );
-  const missingOfficialResponsibles = useMemo(() => {
-    const current = new Set(
-      (form.responsiblesRel ?? []).map((link) => normalizeSearchTerm(link.name ?? '')),
-    );
-    return officialResponsibleNames.filter((name) => !current.has(normalizeSearchTerm(name)));
-  }, [form.responsiblesRel, officialResponsibleNames]);
 
-  const applyOfficialResponsibles = () => {
-    if (missingOfficialResponsibles.length === 0) return;
-    const hasPrimary = (form.responsiblesRel ?? []).some((link) => link.isPrimary);
-    const confirmed = window.confirm(
-      hasPrimary
-        ? `Adicionar ${missingOfficialResponsibles.join(', ')} como responsáveis institucionais? O responsável principal atual será mantido.`
-        : `Definir ${missingOfficialResponsibles.join(', ')} como responsáveis do evento?`,
-    );
-    if (!confirmed) return;
-    const additions = missingOfficialResponsibles.map((name, index) => ({
-      id: `custom:${name.toLocaleLowerCase('pt-BR')}`,
-      label: name,
-      isPrimary: !hasPrimary && index === 0,
-    }));
-    update('responsiblesRel', selectionsToResponsibleLinks([...responsibleSelections, ...additions]));
-  };
+
 
   const handleSubmit = (submitEvent: FormEvent<HTMLFormElement>) => {
     submitEvent.preventDefault();
