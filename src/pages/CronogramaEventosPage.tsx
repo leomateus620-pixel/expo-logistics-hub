@@ -7,6 +7,8 @@ import { UndatedBoard } from '@/components/cronograma-eventos/CronogramaBoards';
 import { CronogramaCommandHeader } from '@/components/cronograma-eventos/CronogramaCommandHeader';
 import { CronogramaFiltersBar } from '@/components/cronograma-eventos/CronogramaFiltersBar';
 import { CronogramaRegistrationAction } from '@/components/cronograma-eventos/CronogramaRegistrationAction';
+import { useCronogramaSearch } from '@/components/cronograma-eventos/CronogramaSearchContext';
+
 import {
   CronogramaTimelineBoard,
   CronogramaTimelineSkeleton,
@@ -129,6 +131,12 @@ export default function CronogramaEventosPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const todayKey = useCurrentCronogramaDay();
   const [filters, setFilters] = useState<CronogramaFilters>(emptyFilters);
+  const headerSearch = useCronogramaSearch();
+  const headerQuery = headerSearch?.query ?? '';
+  useEffect(() => {
+    setFilters((current) => (current.query === headerQuery ? current : { ...current, query: headerQuery }));
+  }, [headerQuery]);
+
   const [selectedEvent, setSelectedEvent] = useState<CronogramaEvent | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [drawerStartsEditing, setDrawerStartsEditing] = useState(false);
@@ -314,7 +322,17 @@ export default function CronogramaEventosPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [weekScopeRequested, weeklySummaryReady, weeklyScopeSignature, setSearchParams]);
 
-  const clearFilters = useCallback(() => setFilters(emptyFilters), []);
+  const clearFilters = useCallback(() => {
+    headerSearch?.setQuery('');
+    setFilters(emptyFilters);
+  }, [headerSearch]);
+
+  const applyFilters = useCallback((next: CronogramaFilters) => {
+    if (headerSearch && next.query !== headerSearch.query) headerSearch.setQuery(next.query);
+    setFilters(next);
+  }, [headerSearch]);
+
+
   const returnToFullCycle = useCallback(() => {
     setFilters((current) => ({
       ...current,
@@ -944,7 +962,7 @@ export default function CronogramaEventosPage() {
             <MobileCronogramaFilters
               filters={filters}
               events={events}
-              onChange={setFilters}
+              onChange={applyFilters}
               onClear={clearFilters}
               resultCount={filteredEvents.length}
               totalCount={eventsForView.length}
@@ -971,7 +989,7 @@ export default function CronogramaEventosPage() {
             <CronogramaFiltersBar
               filters={filters}
               events={events}
-              onChange={setFilters}
+              onChange={applyFilters}
               onClear={clearFilters}
               resultCount={filteredEvents.length}
               totalCount={eventsForView.length}

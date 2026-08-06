@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useOrgCommissions } from '@/hooks/useOrgCommissions';
 import {
   CalendarClock,
@@ -7,7 +7,6 @@ import {
   Check,
   CircleAlert,
   Loader2,
-  Search,
   SlidersHorizontal,
   SunMedium,
   X,
@@ -16,6 +15,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+
 import {
   Select,
   SelectContent,
@@ -73,15 +73,9 @@ export function CronogramaFiltersBar({
   totalCount: number;
   syncing?: boolean;
 }) {
-  const [searchValue, setSearchValue] = useState(filters.query);
+  const [panelOpen, setPanelOpen] = useState(false);
 
-  useEffect(() => setSearchValue(filters.query), [filters.query]);
-  useEffect(() => {
-    const timer = window.setTimeout(() => {
-      if (searchValue !== filters.query) onChange({ ...filters, query: searchValue });
-    }, 220);
-    return () => window.clearTimeout(timer);
-  }, [filters, onChange, searchValue]);
+
 
   const { units: officialUnits } = useOrgCommissions();
   const commissions = useMemo(
@@ -101,53 +95,58 @@ export function CronogramaFiltersBar({
   const activeChips = buildActiveChips(filters);
   const advancedCount = activeChips.filter((chip) => !['query', 'period'].includes(chip.key)).length;
 
+
   return (
     <section className="cronograma-filter-surface" aria-label="Filtros do cronograma">
       <div className="cronograma-filter-main-row">
-        <label className="cronograma-search-field relative block min-w-0 flex-1">
-          <span className="sr-only">Buscar no cronograma</span>
-          <span className="cronograma-search-icon" aria-hidden="true"><Search /></span>
-          <Input
-            value={searchValue}
-            onChange={(event) => setSearchValue(event.target.value)}
-            placeholder="Buscar evento, pessoa, comissão ou local"
-            className="cronograma-search-input h-10 pl-9 text-sm normal-case"
-          />
-        </label>
-
-        <div className="cronograma-period-pills" aria-label="Atalhos de período">
-          {periodOptions.map((option) => {
-            const Icon = option.icon;
-            return (
-            <button
-              key={option.value}
-              type="button"
-              onClick={() => onChange({ ...filters, period: option.value })}
-              className={cn('cronograma-period-pill focus-ring', filters.period === option.value && 'is-active')}
-              aria-pressed={filters.period === option.value}
-            >
-              <Icon aria-hidden="true" />
-              {option.label}
-            </button>
-            );
-          })}
-        </div>
-
-        <Popover>
+        <Popover open={panelOpen} onOpenChange={setPanelOpen}>
           <PopoverTrigger asChild>
-            <Button type="button" variant="outline" className="cronograma-advanced-filter-trigger h-10 shrink-0 rounded-lg px-3 text-xs">
-              <SlidersHorizontal className="h-4 w-4" aria-hidden="true" />
-              <span className="hidden sm:inline">Filtros</span>
+            <Button
+              type="button"
+              variant="outline"
+              data-open={panelOpen || undefined}
+              className="cronograma-advanced-filter-trigger h-10 shrink-0 rounded-xl px-3.5 text-xs"
+            >
+              <SlidersHorizontal className="cronograma-filter-trigger-icon h-4 w-4" aria-hidden="true" />
+              <span>Filtros</span>
+              <span className="cronograma-filter-trigger-period">{periodLabels[filters.period]}</span>
               {advancedCount > 0 && <span className="cronograma-filter-count">{advancedCount}</span>}
             </Button>
           </PopoverTrigger>
-          <PopoverContent align="end" className="w-[min(94vw,46rem)] rounded-2xl border-border/60 bg-white p-4 shadow-2xl">
+          <PopoverContent
+            side="right"
+            align="start"
+            sideOffset={12}
+            collisionPadding={16}
+            className="cronograma-filter-panel w-[min(94vw,46rem)] rounded-2xl border-border/60 bg-white p-4 shadow-2xl"
+          >
             <div className="mb-4 flex items-start justify-between gap-4">
-              <p className="text-sm font-black text-foreground">Filtros avançados</p>
+              <p className="text-sm font-black text-foreground">Filtros</p>
               <span className="rounded-full bg-primary/7 px-2.5 py-1 font-mono text-[10px] font-bold text-primary">{resultCount} resultados</span>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="cronograma-filter-panel-section">
+              <span className="cronograma-filter-panel-label">Período</span>
+              <div className="cronograma-period-pills" aria-label="Atalhos de período">
+                {periodOptions.map((option) => {
+                  const Icon = option.icon;
+                  return (
+                    <button
+                      key={option.value}
+                      type="button"
+                      onClick={() => onChange({ ...filters, period: option.value })}
+                      className={cn('cronograma-period-pill focus-ring', filters.period === option.value && 'is-active')}
+                      aria-pressed={filters.period === option.value}
+                    >
+                      <Icon aria-hidden="true" />
+                      {option.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="mt-4 grid gap-3 border-t border-border/50 pt-4 sm:grid-cols-2 lg:grid-cols-4">
               <FilterSelect
                 label="Ano"
                 value={String(filters.year)}
@@ -219,6 +218,7 @@ export function CronogramaFiltersBar({
           </PopoverContent>
         </Popover>
       </div>
+
 
       <div className="cronograma-filter-status-row">
         <span className="shrink-0 font-mono text-[10px] font-bold text-muted-foreground">

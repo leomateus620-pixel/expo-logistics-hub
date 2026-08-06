@@ -2,6 +2,8 @@ import type { ReactNode } from 'react';
 import { CalendarRange, ChevronLeft, LogOut } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FenasojaBrand } from '@/components/brand/FenasojaBrand';
+import { CronogramaHeaderSearch } from '@/components/cronograma-eventos/CronogramaHeaderSearch';
+import { CronogramaSearchProvider } from '@/components/cronograma-eventos/CronogramaSearchContext';
 import { WeeklySummaryPill } from '@/components/cronograma-eventos/WeeklySummaryPill';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
@@ -16,62 +18,69 @@ export function CronogramaModuleShell({ children }: { children: ReactNode }) {
   };
 
   return (
-    <div className="cronograma-module-shell min-h-screen">
-      <a href="#cronograma-main" className="skip-to-content">
-        Ir para o conteúdo do cronograma
-      </a>
+    <CronogramaSearchProvider>
+      <div className="cronograma-module-shell min-h-screen">
+        <a href="#cronograma-main" className="skip-to-content">
+          Ir para o conteúdo do cronograma
+        </a>
 
-      <header className="cronograma-module-bar">
-        <div className="mx-auto flex min-h-[68px] w-full max-w-[1760px] items-center justify-between gap-3 px-3 sm:px-5 2xl:px-8">
-          <div className="flex min-w-0 items-center gap-3">
-            <Link
-              to="/portal"
-              className="cronograma-module-back focus-ring"
-              aria-label="Voltar ao portal de acesso"
-            >
-              <ChevronLeft className="h-4 w-4" aria-hidden="true" />
-              <span className="hidden sm:inline">Portal</span>
-            </Link>
+        <header className="cronograma-module-bar">
+          <div className="mx-auto flex min-h-[68px] w-full max-w-[1760px] items-center justify-between gap-3 px-3 sm:px-5 2xl:px-8">
+            <div className="flex min-w-0 flex-1 items-center gap-3">
+              <Link
+                to="/portal"
+                className="cronograma-module-back focus-ring"
+                aria-label="Voltar ao portal de acesso"
+              >
+                <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+                <span className="hidden sm:inline">Portal</span>
+              </Link>
 
-            <span className="h-8 w-px bg-white/14" aria-hidden="true" />
+              <span className="h-8 w-px bg-white/14" aria-hidden="true" />
 
-            <div className="flex min-w-0 items-center gap-3">
-              <FenasojaBrand compact markOnly tone="dark" className="hidden sm:inline-flex" />
-              <span className="cronograma-module-tile-3d" aria-hidden="true">
-                <CalendarRange className="h-4 w-4" />
-              </span>
-              <p className="cronograma-module-title truncate text-base font-bold sm:text-lg">
-                Cronograma e Eventos
-              </p>
+              <div className="flex min-w-0 items-center gap-3">
+                <FenasojaBrand compact markOnly tone="dark" className="hidden sm:inline-flex" />
+                <span className="cronograma-module-tile-3d" aria-hidden="true">
+                  <CalendarRange className="h-4 w-4" />
+                </span>
+                <p className="cronograma-module-title truncate text-base font-bold sm:text-lg">
+                  Cronograma e Eventos
+                </p>
+              </div>
+
+              <CronogramaHeaderSearch className="hidden lg:flex" />
             </div>
+
+            <div className="flex items-center gap-4">
+              <div className="hidden md:block">
+                <WeeklySummaryPill />
+              </div>
+              <span className="hidden h-8 w-px bg-white/12 md:block" aria-hidden="true" />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={handleSignOut}
+                className="cronograma-module-signout h-11 min-w-11 rounded-lg px-2.5 text-xs sm:h-9 sm:min-w-0"
+              >
+                <LogOut className="h-4 w-4" aria-hidden="true" />
+                <span className="hidden sm:inline">Sair</span>
+              </Button>
+            </div>
+
           </div>
 
-          <div className="flex items-center gap-4">
-            <div className="hidden md:block">
-              <WeeklySummaryPill />
+          <div className="mx-auto w-full max-w-[1760px] space-y-2 px-3 pb-2 lg:hidden sm:px-5">
+            <CronogramaHeaderSearch className="w-full" />
+            <div className="md:hidden">
+              <WeeklySummaryPill presentation="mobile" />
             </div>
-            <span className="hidden h-8 w-px bg-white/12 md:block" aria-hidden="true" />
-            <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={handleSignOut}
-              className="cronograma-module-signout h-11 min-w-11 rounded-lg px-2.5 text-xs sm:h-9 sm:min-w-0"
-            >
-              <LogOut className="h-4 w-4" aria-hidden="true" />
-              <span className="hidden sm:inline">Sair</span>
-            </Button>
           </div>
-
-        </div>
-
-        <div className="mx-auto w-full max-w-[1760px] px-3 pb-2 md:hidden sm:px-5">
-          <WeeklySummaryPill presentation="mobile" />
-        </div>
-      </header>
+        </header>
 
 
-      {children}
-    </div>
+        {children}
+      </div>
+    </CronogramaSearchProvider>
   );
 }
