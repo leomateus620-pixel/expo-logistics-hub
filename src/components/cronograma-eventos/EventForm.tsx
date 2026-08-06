@@ -651,18 +651,8 @@ export function EventForm({
               variant="organization"
             />
 
-            {missingOfficialResponsibles.length > 0 && (
-              <div className="cronograma-relation-institutional-action">
-                <div>
-                  <strong>Responsáveis da área</strong>
-                  <p>{missingOfficialResponsibles.join(', ')}</p>
-                </div>
-                <button type="button" onClick={applyOfficialResponsibles}>
-                  Adicionar
-                  <span>{missingOfficialResponsibles.length}</span>
-                </button>
-              </div>
-            )}
+
+
 
             <RelationalMultiSelect
               label="Responsáveis do evento"
