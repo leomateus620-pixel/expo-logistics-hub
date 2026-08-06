@@ -132,59 +132,8 @@
     inset 0 1px 0 oklch(var(--neutral-0));
 }
 
-.cronograma-relations-section__header {
-  display: flex;
-  align-items: flex-start;
-  gap: 0.72rem;
-  border-bottom: 1px solid oklch(var(--brand-indigo-100));
-  padding: 0.92rem 1rem 0.82rem;
-}
 
-.cronograma-relations-section__icon {
-  display: grid;
-  width: 2rem;
-  height: 2rem;
-  flex: 0 0 auto;
-  place-items: center;
-  border-radius: 0.62rem;
-  background: oklch(var(--brand-indigo-100));
-  color: oklch(var(--brand-indigo-500));
-}
 
-.cronograma-relations-section__icon svg {
-  width: 1rem;
-  height: 1rem;
-}
-
-.cronograma-relations-section__header > div {
-  min-width: 0;
-}
-
-.cronograma-relations-section__header p {
-  color: oklch(var(--brand-indigo-500));
-  font-size: 0.61rem;
-  font-weight: 850;
-  letter-spacing: 0.1em;
-  line-height: 1.2;
-  text-transform: uppercase;
-}
-
-.cronograma-relations-section__header h3 {
-  margin-top: 0.12rem;
-  color: oklch(var(--brand-navy-900));
-  font-size: 0.98rem;
-  font-weight: 900;
-  line-height: 1.2;
-  letter-spacing: -0.02em;
-}
-
-.cronograma-relations-section__header div > span {
-  display: block;
-  margin-top: 0.22rem;
-  color: oklch(var(--muted-foreground));
-  font-size: 0.72rem;
-  line-height: 1.42;
-}
 
 .cronograma-relations-section__fields {
   display: grid;
