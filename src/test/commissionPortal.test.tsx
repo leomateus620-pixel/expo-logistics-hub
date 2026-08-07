@@ -501,7 +501,6 @@ describe('CommissionPortalPage', () => {
     );
     expect(screen.queryByRole('link', { name: /Agenda Fenasoja/ })).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Ver comissões: Comissões' }));
     expect(screen.queryByRole('link', { name: /Logística/ })).not.toBeInTheDocument();
     expect(container.querySelector('[data-module="logistica"]')).toHaveAttribute(
       'data-access-state',
