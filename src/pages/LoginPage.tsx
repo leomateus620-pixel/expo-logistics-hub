@@ -8,7 +8,6 @@ import {
   CalendarDays,
   CalendarRange,
   Check,
-  ClipboardCheck,
   Eye,
   EyeOff,
   FileCheck2,
@@ -20,7 +19,6 @@ import {
   Mail,
   Route,
   ShieldCheck,
-  UtensilsCrossed,
   UsersRound,
   type LucideIcon,
 } from 'lucide-react';
