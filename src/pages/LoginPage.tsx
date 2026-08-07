@@ -634,7 +634,7 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
           </form>
 
           <div className="auth-panel__footer">
-            {!isCommercialMapLogin && !isCommissionMapLogin && (
+            {!isCommercialMapLogin && !isCommissionMapLogin && !isVenueEventsLogin && (
               <div className="auth-restricted-note">
                 <span className="auth-restricted-note__icon" aria-hidden="true">
                   <ShieldCheck />
