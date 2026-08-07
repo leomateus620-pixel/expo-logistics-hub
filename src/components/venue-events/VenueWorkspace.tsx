@@ -158,13 +158,6 @@ const NAV_ITEMS: NavItem[] = [
     icon: BarChart3,
     group: "controle",
   },
-  {
-    id: "relatorios",
-    label: "Relatórios",
-    shortLabel: "Relatórios",
-    icon: BarChart3,
-    group: "controle",
-  },
 ];
 
 const NAV_GROUPS: Array<{ id: NavGroupId; label: string }> = [
