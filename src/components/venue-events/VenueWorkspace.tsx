@@ -108,14 +108,6 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   {
-    id: "visao-geral",
-    label: "Visão geral",
-    shortLabel: "Início",
-    icon: LayoutDashboard,
-    group: "planejamento",
-    primary: true,
-  },
-  {
     id: "agenda",
     label: "Agenda",
     shortLabel: "Agenda",
