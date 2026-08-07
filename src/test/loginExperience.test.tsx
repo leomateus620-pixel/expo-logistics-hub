@@ -216,12 +216,10 @@ describe("experiência de autenticação Fenasoja 2028", () => {
     renderLogin("/login/eventos-restaurante-arena");
 
     expect(
-      screen.getByRole("heading", {
-        name: /Gestão operacional do Restaurante e da Arena/i,
-      }),
+      screen.getByRole("heading", { name: "Agenda Restaurante e Arena" }),
     ).toBeInTheDocument();
     expect(
-      screen.getAllByText("Eventos Restaurante e Arena").length,
+      screen.getAllByText("Agenda Restaurante e Arena").length,
     ).toBeGreaterThan(0);
     expect(screen.getByText("Conflitos em tempo real")).toBeInTheDocument();
 

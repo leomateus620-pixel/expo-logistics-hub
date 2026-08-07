@@ -85,7 +85,7 @@ interface VenueRouteLoadingProps {
 }
 
 export function VenueRouteLoading({
-  label = "Carregando Eventos Restaurante e Arena…",
+  label = "Carregando Agenda Restaurante e Arena…",
 }: VenueRouteLoadingProps) {
   return (
     <VenueRouteStateFrame role="status" ariaLive="polite" isBusy>
@@ -152,7 +152,7 @@ function VenueRouteStateFrame({
         <div className="venue-route-state__brand-row">
           <FenasojaBrand
             compact
-            subtitle="Eventos Restaurante e Arena"
+            subtitle="Agenda Restaurante e Arena"
             tone="light"
           />
           <UtensilsCrossed

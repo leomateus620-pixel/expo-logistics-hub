@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { CalendarRange, ChevronLeft, LogOut } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
+import { AgendaWordmark } from '@/components/brand/AgendaWordmark';
 import { FenasojaBrand } from '@/components/brand/FenasojaBrand';
 import { CronogramaHeaderSearch } from '@/components/cronograma-eventos/CronogramaHeaderSearch';
 import { CronogramaSearchProvider } from '@/components/cronograma-eventos/CronogramaSearchContext';
@@ -44,7 +45,7 @@ export function CronogramaModuleShell({ children }: { children: ReactNode }) {
                   <CalendarRange className="h-4 w-4" />
                 </span>
                 <p className="cronograma-module-title truncate text-base font-bold sm:text-lg">
-                  Cronograma e Eventos
+                  <AgendaWordmark variant="fenasoja" />
                 </p>
               </div>
 

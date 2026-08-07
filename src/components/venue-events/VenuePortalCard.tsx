@@ -16,7 +16,7 @@ export function VenuePortalCard({ onAccess }: VenuePortalCardProps) {
       type="button"
       onClick={onAccess}
       className="venue-portal-card"
-      aria-label="Acessar Eventos Restaurante e Arena"
+      aria-label="Acessar Agenda Restaurante e Arena"
     >
       <span className="venue-portal-card__content">
         <span className="venue-portal-card__icon" aria-hidden="true">
@@ -33,7 +33,7 @@ export function VenuePortalCard({ onAccess }: VenuePortalCardProps) {
           </span>
 
           <span className="venue-portal-card__title">
-            Eventos Restaurante e Arena
+            Agenda Restaurante e Arena
           </span>
           <span className="venue-portal-card__description">
             Reservas, contrapartidas de patrocinadores, aprovações e recursos

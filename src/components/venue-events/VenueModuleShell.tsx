@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from "react";
 import { ChevronLeft, Loader2, LogOut, UtensilsCrossed } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import { AgendaWordmark } from '@/components/brand/AgendaWordmark';
 import { FenasojaBrand } from "@/components/brand/FenasojaBrand";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -35,7 +36,7 @@ export function VenueModuleShell({ children }: VenueModuleShellProps) {
   return (
     <div className="venue-module-shell">
       <a className="venue-module-shell__skip-link" href="#venue-events-main">
-        Ir para o conteúdo de Eventos Restaurante e Arena
+        Ir para o conteúdo da Agenda Restaurante e Arena
       </a>
 
       <header className="venue-module-shell__bar">
@@ -70,7 +71,7 @@ export function VenueModuleShell({ children }: VenueModuleShellProps) {
                   Gestão de espaços
                 </span>
                 <span className="venue-module-shell__title">
-                  Eventos Restaurante e Arena
+                  <AgendaWordmark variant="venue" />
                 </span>
               </span>
             </div>

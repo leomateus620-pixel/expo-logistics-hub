@@ -1,0 +1,141 @@
+/* Wordmark institucional das agendas (Fenasoja / Restaurante e Arena) */
+
+.agenda-wordmark {
+  --wordmark-lead: #f4ecdb;
+  --wordmark-accent-start: #f6dea4;
+  --wordmark-accent-end: #d9a94f;
+  --wordmark-halo: rgb(226 186 108 / 38%);
+  --wordmark-size: 1.15rem;
+  --wordmark-gap: 0.4em;
+
+  display: inline-flex;
+  max-width: 100%;
+}
+
+.agenda-wordmark[data-variant='venue'] {
+  --wordmark-accent-start: #ffd9a8;
+  --wordmark-accent-end: #d8813f;
+  --wordmark-halo: rgb(216 129 63 / 34%);
+}
+
+.agenda-wordmark[data-scale='compact'] {
+  --wordmark-size: 1rem;
+}
+
+.agenda-wordmark[data-scale='display'] {
+  --wordmark-size: clamp(1.9rem, 4vw, 3rem);
+  --wordmark-gap: 0.34em;
+}
+
+.agenda-wordmark__visual {
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--wordmark-gap);
+  font-size: var(--wordmark-size);
+  font-weight: 700;
+  letter-spacing: -0.012em;
+  line-height: 1.12;
+}
+
+.agenda-wordmark__lead {
+  color: var(--wordmark-lead);
+  font-weight: 600;
+  text-shadow: 0 1px 0 rgb(0 0 0 / 32%);
+}
+
+.agenda-wordmark__accent {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.agenda-wordmark__accent-text {
+  background: linear-gradient(
+    105deg,
+    var(--wordmark-accent-start) 0%,
+    var(--wordmark-accent-end) 58%,
+    var(--wordmark-accent-start) 100%
+  );
+  background-size: 220% 100%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  font-weight: 800;
+  letter-spacing: -0.018em;
+  filter: drop-shadow(0 1px 0 rgb(0 0 0 / 34%)) drop-shadow(0 6px 16px var(--wordmark-halo));
+  animation: agenda-wordmark-sheen 7s ease-in-out infinite;
+}
+
+.agenda-wordmark__underline {
+  display: block;
+  height: 0.14em;
+  min-height: 2px;
+  margin-top: 0.16em;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--wordmark-accent-start) 18%,
+    var(--wordmark-accent-end) 74%,
+    transparent 100%
+  );
+  opacity: 0.85;
+  box-shadow: 0 2px 10px var(--wordmark-halo);
+}
+
+/* Superfícies claras */
+.agenda-wordmark[data-surface='light'] {
+  --wordmark-lead: #1e2c3a;
+  --wordmark-accent-start: #a9761c;
+  --wordmark-accent-end: #7a4d10;
+  --wordmark-halo: rgb(169 118 28 / 22%);
+}
+
+.agenda-wordmark[data-surface='light'] .agenda-wordmark__lead {
+  text-shadow: none;
+}
+
+.agenda-wordmark[data-surface='light'][data-variant='venue'] {
+  --wordmark-accent-start: #a85a1c;
+  --wordmark-accent-end: #7a3a0f;
+  --wordmark-halo: rgb(168 90 28 / 20%);
+}
+
+@keyframes agenda-wordmark-sheen {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .agenda-wordmark__accent-text {
+    animation: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .agenda-wordmark[data-scale='display'] {
+    --wordmark-size: clamp(1.6rem, 8vw, 2.2rem);
+  }
+}
+
+@media (forced-colors: active) {
+  .agenda-wordmark__accent-text {
+    background: none;
+    color: CanvasText;
+    -webkit-text-fill-color: CanvasText;
+    filter: none;
+  }
+
+  .agenda-wordmark__underline {
+    background: CanvasText;
+  }
+}

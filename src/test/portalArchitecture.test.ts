@@ -4,19 +4,21 @@ import { describe, expect, it } from 'vitest';
 import {
   financePortalModule,
   getPortalCommissionModules,
-  portalAgendaDestinations,
+  agendaFenasojaDestination,
+  agendaVenueDestination,
   portalPrimaryEntries,
 } from '@/modules/portal/portalRegistry';
 
 describe('arquitetura de acesso do portal', () => {
   it('centraliza a hierarquia e preserva os destinos existentes', () => {
     expect(portalPrimaryEntries.map((entry) => entry.id)).toEqual([
-      'agenda',
+      'agenda-fenasoja',
+      'agenda-restaurante-arena',
       'mapa-comercial',
       'comissoes',
       'financeiro',
     ]);
-    expect(portalAgendaDestinations.map((destination) => destination.route)).toEqual([
+    expect([agendaFenasojaDestination.route, agendaVenueDestination.route]).toEqual([
       '/cronograma-eventos',
       '/eventos-restaurante-arena',
     ]);
