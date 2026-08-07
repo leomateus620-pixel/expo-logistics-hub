@@ -260,7 +260,7 @@ export function VenueEventFormDialog({
       initializationKeyRef.current = "";
       return;
     }
-    const initializationKey = `${initialDraft?.id ?? "new"}:${defaultRequesterName}`;
+    const initializationKey = `${initialDraft?.id ?? "new"}:${defaultRequesterName}:${(defaultVenueIds ?? []).join(",")}`;
     if (initializationKeyRef.current === initializationKey) return;
     initializationKeyRef.current = initializationKey;
     const next = initialDraft
@@ -268,6 +268,7 @@ export function VenueEventFormDialog({
       : {
           ...createEmptyVenueEventDraft(),
           requesterName: defaultRequesterName,
+          venueIds: defaultVenueIds?.length ? [defaultVenueIds[0]] : [],
         };
     setDraft(next);
     setBaseline(JSON.stringify(next));
@@ -276,7 +277,7 @@ export function VenueEventFormDialog({
     setServerConflicts([]);
     setReviewedAvailabilityFingerprint("");
     setDiscardOpen(false);
-  }, [defaultRequesterName, initialDraft, open]);
+  }, [defaultRequesterName, defaultVenueIds, initialDraft, open]);
 
   useEffect(() => {
     if (!open) {
