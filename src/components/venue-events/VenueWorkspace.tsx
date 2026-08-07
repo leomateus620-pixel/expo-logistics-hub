@@ -2917,8 +2917,7 @@ export function VenueWorkspace() {
         workspace={fullWorkspace}
         permissions={permissions}
         defaultRequesterName={defaultRequester}
-        defaultVenueIds={Array.from(activeSpaceIds)}
-        activeVenueLabel={venueDefinition.shortLabel}
+        defaultVenueIds={activeRootSpaceId ? [activeRootSpaceId] : []}
         isSaving={operations.saveEvent.isPending}
         onCheckAvailability={operations.checkAvailability}
         onSave={(draft) =>
