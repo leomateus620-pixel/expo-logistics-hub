@@ -2913,9 +2913,11 @@ export function VenueWorkspace() {
         open={formOpen}
         onOpenChange={setFormOpen}
         initialDraft={editingDraft}
-        workspace={workspace}
+        workspace={fullWorkspace}
         permissions={permissions}
         defaultRequesterName={defaultRequester}
+        defaultVenueIds={Array.from(activeSpaceIds)}
+        activeVenueLabel={venueDefinition.shortLabel}
         isSaving={operations.saveEvent.isPending}
         onCheckAvailability={operations.checkAvailability}
         onSave={(draft) =>
@@ -2926,7 +2928,7 @@ export function VenueWorkspace() {
         event={selectedEvent}
         open={Boolean(selectedEvent)}
         onOpenChange={(next) => !next && closeEvent()}
-        workspace={workspace}
+        workspace={fullWorkspace}
         permissions={permissions}
         members={workspace.members}
         onEdit={editEvent}
