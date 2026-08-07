@@ -408,6 +408,8 @@ const App = () => (
               />
               <Route path="/cronograma-eventos" element={<CronogramaModuleRoute />} />
               <Route path="/eventos-restaurante-arena" element={<VenueEventsModuleRoute />} />
+              <Route path="/eventos-restaurante-arena/:venueSlug" element={<VenueEventsModuleRoute />} />
+              <Route path="/eventos-restaurante-arena/:venueSlug/:viewSlug" element={<VenueEventsModuleRoute />} />
               <Route path="/mapa-comercial" element={<CommercialMapRoute />} />
               <Route path="/comissoes/logistica/*" element={<LogisticaModuleRoutes />} />
               <Route path="/comissoes/:moduleSlug/*" element={<CommissionModuleRoutes />} />

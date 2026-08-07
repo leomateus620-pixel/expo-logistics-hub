@@ -1,5 +1,5 @@
-import { useMemo, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import {
   AlertTriangle,
   BarChart3,
@@ -55,6 +55,7 @@ import {
   useVenueOperations,
 } from "@/hooks/useVenueOperations";
 import {
+  VENUE_MODULE_ROUTE,
   COUNTERPART_UNIT_LABELS,
   EVENT_STATUS_LABELS,
   EVENT_TYPE_LABELS,
@@ -92,6 +93,19 @@ import {
 } from "@/components/venue-events/VenueManagementDialogs";
 import { VenueSpaceDialog } from "@/components/venue-events/VenueSpaceDialog";
 import { VenueSpaceManagementPanel } from "@/components/venue-events/VenueSpaceManagementPanel";
+import { VenueWorkspaceSwitcher } from "@/components/venue-events/VenueWorkspaceSwitcher";
+import {
+  DEFAULT_VENUE_WORKSPACE,
+  getVenueWorkspace,
+  isSharedVenueEvent,
+  isVenueWorkspaceId,
+  readStoredVenueWorkspace,
+  resolveVenueRootSpaceId,
+  resolveVenueSpaceIds,
+  scopeVenueWorkspaceData,
+  storeVenueWorkspace,
+  type VenueWorkspaceId,
+} from "@/components/venue-events/venueWorkspaces";
 import "@/styles/venue-events.css";
 import "@/styles/venue-events-production.css";
 
@@ -107,14 +121,6 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  {
-    id: "visao-geral",
-    label: "Visão geral",
-    shortLabel: "Início",
-    icon: LayoutDashboard,
-    group: "planejamento",
-    primary: true,
-  },
   {
     id: "agenda",
     label: "Agenda",
@@ -164,13 +170,6 @@ const NAV_ITEMS: NavItem[] = [
     label: "Relatórios",
     shortLabel: "Relatórios",
     icon: BarChart3,
-    group: "controle",
-  },
-  {
-    id: "pendencias",
-    label: "Pendências",
-    shortLabel: "Pendências",
-    icon: ShieldAlert,
     group: "controle",
   },
 ];
@@ -470,13 +469,38 @@ export function VenueWorkspace() {
   const operations = useVenueOperations();
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const params = useParams();
   const currentDateKey = todayKey();
   const currentYear = currentDateKey.slice(0, 4);
-  const requestedView = searchParams.get("visao") as VenueView | null;
+  const venueId: VenueWorkspaceId = isVenueWorkspaceId(params.venueSlug)
+    ? params.venueSlug
+    : DEFAULT_VENUE_WORKSPACE;
+  const venueDefinition = getVenueWorkspace(venueId);
+  const requestedView = (params.viewSlug ??
+    searchParams.get("visao")) as VenueView | null;
   const view: VenueView =
-    requestedView && VALID_VIEWS.has(requestedView)
-      ? requestedView
-      : "visao-geral";
+    requestedView && VALID_VIEWS.has(requestedView) ? requestedView : "agenda";
+  const routeIsCanonical =
+    isVenueWorkspaceId(params.venueSlug) && params.viewSlug === view;
+
+  useEffect(() => {
+    if (routeIsCanonical) {
+      storeVenueWorkspace(venueId);
+      return;
+    }
+    const fallbackVenue = isVenueWorkspaceId(params.venueSlug)
+      ? params.venueSlug
+      : readStoredVenueWorkspace();
+    const next = new URLSearchParams(searchParams);
+    next.delete("visao");
+    const query = next.toString();
+    navigate(
+      `${VENUE_MODULE_ROUTE}/${fallbackVenue}/${view}${query ? `?${query}` : ""}`,
+      { replace: true },
+    );
+  }, [routeIsCanonical, params.venueSlug, view, venueId, navigate, searchParams]);
+
   const selectedEventId = searchParams.get("evento");
   const [formOpen, setFormOpen] = useState(false);
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
@@ -517,11 +541,25 @@ export function VenueWorkspace() {
     view === "historico" && operations.permissions.venue_events_audit_view,
   );
 
-  const setView = (nextView: VenueView) => {
+  const buildModulePath = (
+    nextVenue: VenueWorkspaceId,
+    nextView: VenueView,
+    keepEvent = false,
+  ) => {
     const next = new URLSearchParams(searchParams);
-    next.set("visao", nextView);
-    next.delete("evento");
-    setSearchParams(next, { replace: true });
+    next.delete("visao");
+    if (!keepEvent) next.delete("evento");
+    const query = next.toString();
+    return `${VENUE_MODULE_ROUTE}/${nextVenue}/${nextView}${query ? `?${query}` : ""}`;
+  };
+  const setView = (nextView: VenueView) => {
+    navigate(buildModulePath(venueId, nextView));
+    setMobileMoreOpen(false);
+  };
+  const setVenue = (nextVenue: VenueWorkspaceId) => {
+    if (nextVenue === venueId) return;
+    storeVenueWorkspace(nextVenue);
+    navigate(buildModulePath(nextVenue, view));
     setMobileMoreOpen(false);
   };
   const openEvent = (eventId: string) => {
@@ -561,7 +599,29 @@ export function VenueWorkspace() {
     );
   }
 
-  const workspace = operations.workspace;
+  const fullWorkspace = operations.workspace;
+  const restauranteSpaceIds = resolveVenueSpaceIds(
+    fullWorkspace.spaces,
+    "restaurante",
+  );
+  const arenaSpaceIds = resolveVenueSpaceIds(fullWorkspace.spaces, "arena");
+  const activeSpaceIds =
+    venueId === "arena" ? arenaSpaceIds : restauranteSpaceIds;
+  const activeRootSpaceId = resolveVenueRootSpaceId(
+    fullWorkspace.spaces,
+    venueId,
+  );
+  const workspace = scopeVenueWorkspaceData(fullWorkspace, activeSpaceIds);
+  const countEventsIn = (spaceIds: Set<string>) =>
+    new Set(
+      fullWorkspace.allocations
+        .filter((allocation) => spaceIds.has(allocation.space_id))
+        .map((allocation) => allocation.event_id),
+    ).size;
+  const venueEventCounts: Record<VenueWorkspaceId, number> = {
+    restaurante: countEventsIn(restauranteSpaceIds),
+    arena: countEventsIn(arenaSpaceIds),
+  };
   const permissions = operations.permissions;
   const selectedEvent =
     workspace.events.find((event) => event.id === selectedEventId) ?? null;
@@ -777,9 +837,17 @@ export function VenueWorkspace() {
       : `${formatAgendaDate(agendaRangeStart)} — ${formatAgendaDate(agendaRangeEnd)}`;
   const selectedAgendaSpace =
     spaceFilter === "all"
-      ? "Restaurante e Arena"
+      ? venueDefinition.shortLabel
       : workspace.spaces.find((space) => space.id === spaceFilter)?.name ||
         "Espaço selecionado";
+  const sharedAgendaEventsCount = agendaEvents.filter((event) =>
+    isSharedVenueEvent(
+      event.id,
+      fullWorkspace.allocations,
+      restauranteSpaceIds,
+      arenaSpaceIds,
+    ),
+  ).length;
   const nextOccupiedEvent = agendaCandidateEvents
     .filter(
       (event) =>
@@ -1203,7 +1271,7 @@ export function VenueWorkspace() {
       <header className="venue-panel__header venue-panel__header--responsive">
         <div>
           <p className="venue-eyebrow">Ocupação real</p>
-          <h2>Agenda de Restaurante e Arena</h2>
+          <h2>{venueDefinition.agendaTitle}</h2>
         </div>
         <div className="venue-agenda-controls">
           <div className="venue-segmented">
@@ -1268,7 +1336,7 @@ export function VenueWorkspace() {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Todos os espaços</SelectItem>
+            <SelectItem value="all">Todas as áreas</SelectItem>
             {workspace.spaces
               .filter((space) => space.active)
               .map((space) => (
@@ -1285,16 +1353,21 @@ export function VenueWorkspace() {
           <small>Janela selecionada</small>
           <strong>{agendaRangeLabel}</strong>
         </span>
-        <span>
-          <small>Espaços</small>
-          <strong>{selectedAgendaSpace}</strong>
-        </span>
         <span data-state={agendaEvents.length ? "occupied" : "available"}>
           <small>Ocupação encontrada</small>
           <strong>
             {agendaEvents.length} {agendaEvents.length === 1 ? "evento" : "eventos"}
           </strong>
         </span>
+        {sharedAgendaEventsCount > 0 && (
+          <span data-state="shared">
+            <small>Compartilhados</small>
+            <strong>
+              {sharedAgendaEventsCount}{" "}
+              {sharedAgendaEventsCount === 1 ? "evento" : "eventos"}
+            </strong>
+          </span>
+        )}
       </div>
       {agendaGroups.length ? (
         <div className="venue-agenda-timeline">
@@ -1451,7 +1524,7 @@ export function VenueWorkspace() {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Todos os espaços</SelectItem>
+            <SelectItem value="all">Todas as áreas</SelectItem>
             {workspace.spaces.map((space) => (
               <SelectItem key={space.id} value={space.id}>
                 {space.name}
@@ -2227,7 +2300,7 @@ export function VenueWorkspace() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todos os espaços</SelectItem>
+                <SelectItem value="all">Todas as áreas</SelectItem>
                 {workspace.spaces.map((space) => (
                   <SelectItem key={space.id} value={space.id}>
                     {space.name}
@@ -2691,14 +2764,28 @@ export function VenueWorkspace() {
       )}
       <section
         className="venue-command-hero"
-        data-variant={view === "visao-geral" ? "overview" : "compact"}
+        data-variant="switcher"
+        data-venue={venueId}
       >
         <div className="venue-command-hero__copy">
-          <p className="venue-eyebrow">
-            <Sparkles /> {VIEW_CONTEXT[view].eyebrow}
+          <VenueWorkspaceSwitcher
+            active={venueId}
+            counts={venueEventCounts}
+            onSelect={setVenue}
+          />
+          <p className="venue-command-hero__context">
+            <Sparkles aria-hidden="true" />
+            <strong>{activeNav.label}</strong>
+            <span>
+              {workspace.spaces[0]?.name ?? venueDefinition.shortLabel}
+              {workspace.spaces[0]?.capacity
+                ? ` · até ${workspace.spaces[0].capacity.toLocaleString("pt-BR")} pessoas`
+                : ""}
+              {` · ${venueEventCounts[venueId]} ${
+                venueEventCounts[venueId] === 1 ? "evento" : "eventos"
+              }`}
+            </span>
           </p>
-          <h1>{activeNav.label}</h1>
-          <p>{VIEW_CONTEXT[view].description}</p>
         </div>
         <div className="venue-command-hero__actions">
           {operations.isFetching && (
@@ -2831,9 +2918,10 @@ export function VenueWorkspace() {
         open={formOpen}
         onOpenChange={setFormOpen}
         initialDraft={editingDraft}
-        workspace={workspace}
+        workspace={fullWorkspace}
         permissions={permissions}
         defaultRequesterName={defaultRequester}
+        defaultVenueIds={activeRootSpaceId ? [activeRootSpaceId] : []}
         isSaving={operations.saveEvent.isPending}
         onCheckAvailability={operations.checkAvailability}
         onSave={(draft) =>
@@ -2844,7 +2932,7 @@ export function VenueWorkspace() {
         event={selectedEvent}
         open={Boolean(selectedEvent)}
         onOpenChange={(next) => !next && closeEvent()}
-        workspace={workspace}
+        workspace={fullWorkspace}
         permissions={permissions}
         members={workspace.members}
         onEdit={editEvent}
