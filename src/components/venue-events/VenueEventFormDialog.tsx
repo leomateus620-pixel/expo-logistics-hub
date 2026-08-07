@@ -81,6 +81,8 @@ interface VenueEventFormDialogProps {
   workspace: VenueWorkspaceData;
   permissions: VenuePermissionMap;
   defaultRequesterName: string;
+  defaultVenueIds?: string[];
+  activeVenueLabel?: string;
   isSaving: boolean;
   onCheckAvailability: (draft: VenueEventDraft) => Promise<ServerConflict[]>;
   onSave: (draft: VenueEventDraft) => Promise<{ event_id: string }>;
