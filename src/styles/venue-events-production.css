@@ -345,7 +345,8 @@
 
 .venue-agenda-period {
   display: grid;
-  grid-template-columns: auto repeat(3, minmax(0, 1fr));
+  grid-template-columns: auto repeat(auto-fit, minmax(0, 1fr));
+
   align-items: center;
   gap: 0.8rem;
   margin-bottom: 0.85rem;
