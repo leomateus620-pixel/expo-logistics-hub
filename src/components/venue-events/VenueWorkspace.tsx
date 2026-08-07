@@ -55,6 +55,7 @@ import {
   useVenueOperations,
 } from "@/hooks/useVenueOperations";
 import {
+  VENUE_MODULE_ROUTE,
   COUNTERPART_UNIT_LABELS,
   EVENT_STATUS_LABELS,
   EVENT_TYPE_LABELS,
