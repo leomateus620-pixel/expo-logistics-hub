@@ -92,6 +92,18 @@ import {
 } from "@/components/venue-events/VenueManagementDialogs";
 import { VenueSpaceDialog } from "@/components/venue-events/VenueSpaceDialog";
 import { VenueSpaceManagementPanel } from "@/components/venue-events/VenueSpaceManagementPanel";
+import { VenueWorkspaceSwitcher } from "@/components/venue-events/VenueWorkspaceSwitcher";
+import {
+  DEFAULT_VENUE_WORKSPACE,
+  getVenueWorkspace,
+  isSharedVenueEvent,
+  isVenueWorkspaceId,
+  readStoredVenueWorkspace,
+  resolveVenueSpaceIds,
+  scopeVenueWorkspaceData,
+  storeVenueWorkspace,
+  type VenueWorkspaceId,
+} from "@/components/venue-events/venueWorkspaces";
 import "@/styles/venue-events.css";
 import "@/styles/venue-events-production.css";
 
