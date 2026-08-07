@@ -233,6 +233,8 @@ export function VenueEventFormDialog({
   workspace,
   permissions,
   defaultRequesterName,
+  defaultVenueIds,
+  activeVenueLabel,
   isSaving,
   onCheckAvailability,
   onSave,
