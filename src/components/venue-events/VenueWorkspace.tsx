@@ -1331,7 +1331,7 @@ export function VenueWorkspace() {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Todos os espaços</SelectItem>
+            <SelectItem value="all">Todas as áreas</SelectItem>
             {workspace.spaces
               .filter((space) => space.active)
               .map((space) => (
@@ -1519,7 +1519,7 @@ export function VenueWorkspace() {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Todos os espaços</SelectItem>
+            <SelectItem value="all">Todas as áreas</SelectItem>
             {workspace.spaces.map((space) => (
               <SelectItem key={space.id} value={space.id}>
                 {space.name}
@@ -2295,7 +2295,7 @@ export function VenueWorkspace() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Todos os espaços</SelectItem>
+                <SelectItem value="all">Todas as áreas</SelectItem>
                 {workspace.spaces.map((space) => (
                   <SelectItem key={space.id} value={space.id}>
                     {space.name}
