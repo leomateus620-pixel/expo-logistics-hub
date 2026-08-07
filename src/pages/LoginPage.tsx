@@ -194,9 +194,7 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
     : isVenueEventsLogin
       ? 'do Restaurante e da Arena'
       : 'das comissões';
-  const capabilities = isVenueEventsLogin
-    ? venueCapabilities
-    : isAdminLogin
+  const capabilities = isAdminLogin
         ? adminCapabilities
         : [
             {
