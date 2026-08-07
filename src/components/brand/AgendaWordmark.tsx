@@ -1,7 +1,7 @@
 import '@/styles/agenda-wordmark.css';
 
 export type AgendaWordmarkVariant = 'fenasoja' | 'venue';
-export type AgendaWordmarkScale = 'compact' | 'default' | 'display';
+export type AgendaWordmarkScale = 'compact' | 'default' | 'display' | 'hero';
 
 interface AgendaWordmarkProps {
   variant: AgendaWordmarkVariant;

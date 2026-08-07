@@ -2955,3 +2955,116 @@
     transform: none;
   }
 }
+
+/* ==========================================================================
+   Login Agenda Restaurante e Arena — layout limpo e foco nas credenciais
+   ========================================================================== */
+
+.auth-screen[data-module='eventos-restaurante-arena'] .auth-layout {
+  width: min(100%, 74rem);
+  grid-template-columns: minmax(0, 1fr) minmax(22.5rem, 25.5rem);
+  gap: clamp(3rem, 6vw, 5.5rem);
+  align-items: center;
+}
+
+.auth-hero--venue {
+  position: relative;
+  max-width: 40rem;
+}
+
+.auth-hero__title-group--venue {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.85rem;
+  margin-top: clamp(2rem, 5vh, 3.25rem);
+}
+
+.auth-venue-tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.34rem 0.85rem;
+  border: 1px solid oklch(var(--brand-orange-700) / 0.35);
+  border-radius: 999px;
+  background: oklch(var(--brand-orange-700) / 0.12);
+  color: oklch(var(--brand-cream));
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.auth-screen[data-module='eventos-restaurante-arena'] .auth-hero__title--venue {
+  max-width: none;
+  margin: 0;
+}
+
+.auth-screen[data-module='eventos-restaurante-arena'] .auth-hero__subtitle {
+  max-width: 34ch;
+  margin-top: 0.35rem;
+  color: oklch(var(--brand-soft-white) / 0.72);
+  font-size: 0.86rem;
+  font-weight: 500;
+  line-height: 1.5rem;
+}
+
+/* Cartão de credenciais */
+.auth-screen[data-module='eventos-restaurante-arena'] .auth-panel__heading {
+  margin-top: 0;
+}
+
+.auth-screen[data-module='eventos-restaurante-arena'] .auth-panel__heading h2 {
+  margin-top: 0;
+  font-size: clamp(1.95rem, 3.2vw, 2.4rem);
+  letter-spacing: -0.045em;
+}
+
+.auth-screen[data-module='eventos-restaurante-arena'] .auth-panel__heading p:last-child {
+  margin-top: 0.5rem;
+  font-size: 0.82rem;
+}
+
+.auth-screen[data-module='eventos-restaurante-arena'] .auth-field__label {
+  color: oklch(var(--brand-navy-900));
+  font-size: 0.7rem;
+  font-weight: 850;
+  letter-spacing: 0.06em;
+}
+
+.auth-screen[data-module='eventos-restaurante-arena'] .auth-input-frame {
+  border-radius: 0.95rem;
+}
+
+.auth-screen[data-module='eventos-restaurante-arena'] .auth-input-frame .auth-input-control {
+  height: 3.25rem;
+  font-size: 0.9rem;
+}
+
+.auth-screen[data-module='eventos-restaurante-arena'] .auth-input-frame:focus-within {
+  border-color: oklch(var(--brand-orange-700) / 0.55);
+  box-shadow:
+    0 0 0 4px oklch(var(--brand-orange-700) / 0.14),
+    0 14px 30px rgb(6 14 30 / 0.1);
+}
+
+.auth-screen[data-module='eventos-restaurante-arena'] .auth-submit {
+  height: 3.35rem;
+  border-radius: 0.95rem;
+  font-size: 0.92rem;
+  letter-spacing: 0.005em;
+}
+
+.auth-screen[data-module='eventos-restaurante-arena'] .auth-panel__footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1.35rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid oklch(var(--neutral-600) / 0.14);
+}
+
+@media (max-width: 1024px) {
+  .auth-screen[data-module='eventos-restaurante-arena'] .auth-layout {
+    grid-template-columns: minmax(0, 1fr);
+    align-items: start;
+  }
+}

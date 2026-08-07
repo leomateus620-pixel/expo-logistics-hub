@@ -8,7 +8,6 @@ import {
   CalendarDays,
   CalendarRange,
   Check,
-  ClipboardCheck,
   Eye,
   EyeOff,
   FileCheck2,
@@ -20,7 +19,6 @@ import {
   Mail,
   Route,
   ShieldCheck,
-  UtensilsCrossed,
   UsersRound,
   type LucideIcon,
 } from 'lucide-react';
@@ -84,28 +82,6 @@ const adminCapabilities: CapabilityItem[] = [
   },
 ];
 
-const venueCapabilities: CapabilityItem[] = [
-  {
-    icon: UtensilsCrossed,
-    label: 'Restaurante e Arena',
-    description: 'Reservas coordenadas',
-  },
-  {
-    icon: CalendarRange,
-    label: 'Conflitos em tempo real',
-    description: 'Agenda e capacidade',
-  },
-  {
-    icon: ClipboardCheck,
-    label: 'Operação rastreável',
-    description: 'Aprovações e recursos',
-  },
-  {
-    icon: ShieldCheck,
-    label: 'Contrapartidas seguras',
-    description: 'Consumo transacional',
-  },
-];
 
 function getStoredModuleSlug() {
   try {
@@ -194,9 +170,7 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
     : isVenueEventsLogin
       ? 'do Restaurante e da Arena'
       : 'das comissões';
-  const capabilities = isVenueEventsLogin
-    ? venueCapabilities
-    : isAdminLogin
+  const capabilities = isAdminLogin
         ? adminCapabilities
         : [
             {
@@ -429,7 +403,7 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
           aria-labelledby="login-title"
           aria-busy={phase === 'submitting'}
         >
-          {!isCommercialMapLogin && !isCommissionMapLogin && (
+          {!isCommercialMapLogin && !isCommissionMapLogin && !isVenueEventsLogin && (
             <div className="auth-panel__brand-row">
               <FenasojaBrand
                 compact
@@ -458,21 +432,26 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
           )}
 
           <div className="auth-panel__heading">
-            <p className="auth-panel__eyebrow">
-              <ShieldCheck aria-hidden="true" />
-              {isCommercialMapLogin
-                ? 'Acesso institucional'
-                : isCommissionMapLogin
-                  ? 'Acesso à comissão'
-                  : 'Identificação segura'}
-            </p>
+            {!isVenueEventsLogin && (
+              <p className="auth-panel__eyebrow">
+                <ShieldCheck aria-hidden="true" />
+                {isCommercialMapLogin
+                  ? 'Acesso institucional'
+                  : isCommissionMapLogin
+                    ? 'Acesso à comissão'
+                    : 'Identificação segura'}
+              </p>
+            )}
             <h2 id="login-title">Entrar</h2>
             <p>
-              {isCommercialMapLogin || isCommissionMapLogin
-                ? 'Use seu e-mail e senha institucionais para continuar.'
-                : <>Use suas credenciais institucionais para continuar em <strong>{contextName}</strong>.</>}
+              {isVenueEventsLogin
+                ? 'Informe suas credenciais para continuar.'
+                : isCommercialMapLogin || isCommissionMapLogin
+                  ? 'Use seu e-mail e senha institucionais para continuar.'
+                  : <>Use suas credenciais institucionais para continuar em <strong>{contextName}</strong>.</>}
             </p>
           </div>
+
 
           <form className="auth-form" onSubmit={handleSubmit} noValidate>
             <div className="auth-field">
@@ -629,7 +608,7 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
           </form>
 
           <div className="auth-panel__footer">
-            {!isCommercialMapLogin && !isCommissionMapLogin && (
+            {!isCommercialMapLogin && !isCommissionMapLogin && !isVenueEventsLogin && (
               <div className="auth-restricted-note">
                 <span className="auth-restricted-note__icon" aria-hidden="true">
                   <ShieldCheck />
