@@ -429,7 +429,7 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
           aria-labelledby="login-title"
           aria-busy={phase === 'submitting'}
         >
-          {!isCommercialMapLogin && !isCommissionMapLogin && (
+          {!isCommercialMapLogin && !isCommissionMapLogin && !isVenueEventsLogin && (
             <div className="auth-panel__brand-row">
               <FenasojaBrand
                 compact
@@ -458,21 +458,26 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
           )}
 
           <div className="auth-panel__heading">
-            <p className="auth-panel__eyebrow">
-              <ShieldCheck aria-hidden="true" />
-              {isCommercialMapLogin
-                ? 'Acesso institucional'
-                : isCommissionMapLogin
-                  ? 'Acesso à comissão'
-                  : 'Identificação segura'}
-            </p>
+            {!isVenueEventsLogin && (
+              <p className="auth-panel__eyebrow">
+                <ShieldCheck aria-hidden="true" />
+                {isCommercialMapLogin
+                  ? 'Acesso institucional'
+                  : isCommissionMapLogin
+                    ? 'Acesso à comissão'
+                    : 'Identificação segura'}
+              </p>
+            )}
             <h2 id="login-title">Entrar</h2>
             <p>
-              {isCommercialMapLogin || isCommissionMapLogin
-                ? 'Use seu e-mail e senha institucionais para continuar.'
-                : <>Use suas credenciais institucionais para continuar em <strong>{contextName}</strong>.</>}
+              {isVenueEventsLogin
+                ? 'Informe suas credenciais para continuar.'
+                : isCommercialMapLogin || isCommissionMapLogin
+                  ? 'Use seu e-mail e senha institucionais para continuar.'
+                  : <>Use suas credenciais institucionais para continuar em <strong>{contextName}</strong>.</>}
             </p>
           </div>
+
 
           <form className="auth-form" onSubmit={handleSubmit} noValidate>
             <div className="auth-field">
