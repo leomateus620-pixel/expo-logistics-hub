@@ -598,7 +598,25 @@ export function VenueWorkspace() {
     );
   }
 
-  const workspace = operations.workspace;
+  const fullWorkspace = operations.workspace;
+  const restauranteSpaceIds = resolveVenueSpaceIds(
+    fullWorkspace.spaces,
+    "restaurante",
+  );
+  const arenaSpaceIds = resolveVenueSpaceIds(fullWorkspace.spaces, "arena");
+  const activeSpaceIds =
+    venueId === "arena" ? arenaSpaceIds : restauranteSpaceIds;
+  const workspace = scopeVenueWorkspaceData(fullWorkspace, activeSpaceIds);
+  const countEventsIn = (spaceIds: Set<string>) =>
+    new Set(
+      fullWorkspace.allocations
+        .filter((allocation) => spaceIds.has(allocation.space_id))
+        .map((allocation) => allocation.event_id),
+    ).size;
+  const venueEventCounts: Record<VenueWorkspaceId, number> = {
+    restaurante: countEventsIn(restauranteSpaceIds),
+    arena: countEventsIn(arenaSpaceIds),
+  };
   const permissions = operations.permissions;
   const selectedEvent =
     workspace.events.find((event) => event.id === selectedEventId) ?? null;
