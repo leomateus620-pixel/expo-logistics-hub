@@ -832,9 +832,17 @@ export function VenueWorkspace() {
       : `${formatAgendaDate(agendaRangeStart)} — ${formatAgendaDate(agendaRangeEnd)}`;
   const selectedAgendaSpace =
     spaceFilter === "all"
-      ? "Restaurante e Arena"
+      ? venueDefinition.shortLabel
       : workspace.spaces.find((space) => space.id === spaceFilter)?.name ||
         "Espaço selecionado";
+  const sharedAgendaEventsCount = agendaEvents.filter((event) =>
+    isSharedVenueEvent(
+      event.id,
+      fullWorkspace.allocations,
+      restauranteSpaceIds,
+      arenaSpaceIds,
+    ),
+  ).length;
   const nextOccupiedEvent = agendaCandidateEvents
     .filter(
       (event) =>
