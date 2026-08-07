@@ -159,10 +159,10 @@ const NAV_ITEMS: NavItem[] = [
     group: "controle",
   },
   {
-    id: "pendencias",
-    label: "Pendências",
-    shortLabel: "Pendências",
-    icon: ShieldAlert,
+    id: "relatorios",
+    label: "Relatórios",
+    shortLabel: "Relatórios",
+    icon: BarChart3,
     group: "controle",
   },
 ];
