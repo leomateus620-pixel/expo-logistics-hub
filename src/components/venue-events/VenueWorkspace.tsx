@@ -2746,14 +2746,28 @@ export function VenueWorkspace() {
       )}
       <section
         className="venue-command-hero"
-        data-variant={view === "visao-geral" ? "overview" : "compact"}
+        data-variant="switcher"
+        data-venue={venueId}
       >
         <div className="venue-command-hero__copy">
-          <p className="venue-eyebrow">
-            <Sparkles /> {VIEW_CONTEXT[view].eyebrow}
+          <VenueWorkspaceSwitcher
+            active={venueId}
+            counts={venueEventCounts}
+            onSelect={setVenue}
+          />
+          <p className="venue-command-hero__context">
+            <Sparkles aria-hidden="true" />
+            <strong>{activeNav.label}</strong>
+            <span>
+              {workspace.spaces[0]?.name ?? venueDefinition.shortLabel}
+              {workspace.spaces[0]?.capacity
+                ? ` · até ${workspace.spaces[0].capacity.toLocaleString("pt-BR")} pessoas`
+                : ""}
+              {` · ${venueEventCounts[venueId]} ${
+                venueEventCounts[venueId] === 1 ? "evento" : "eventos"
+              }`}
+            </span>
           </p>
-          <h1>{activeNav.label}</h1>
-          <p>{VIEW_CONTEXT[view].description}</p>
         </div>
         <div className="venue-command-hero__actions">
           {operations.isFetching && (
