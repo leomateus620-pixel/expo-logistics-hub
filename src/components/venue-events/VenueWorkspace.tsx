@@ -100,6 +100,7 @@ import {
   isSharedVenueEvent,
   isVenueWorkspaceId,
   readStoredVenueWorkspace,
+  resolveVenueRootSpaceId,
   resolveVenueSpaceIds,
   scopeVenueWorkspaceData,
   storeVenueWorkspace,
