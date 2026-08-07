@@ -467,13 +467,38 @@ export function VenueWorkspace() {
   const operations = useVenueOperations();
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const params = useParams();
   const currentDateKey = todayKey();
   const currentYear = currentDateKey.slice(0, 4);
-  const requestedView = searchParams.get("visao") as VenueView | null;
+  const venueId: VenueWorkspaceId = isVenueWorkspaceId(params.venueSlug)
+    ? params.venueSlug
+    : DEFAULT_VENUE_WORKSPACE;
+  const venueDefinition = getVenueWorkspace(venueId);
+  const requestedView = (params.viewSlug ??
+    searchParams.get("visao")) as VenueView | null;
   const view: VenueView =
-    requestedView && VALID_VIEWS.has(requestedView)
-      ? requestedView
-      : "visao-geral";
+    requestedView && VALID_VIEWS.has(requestedView) ? requestedView : "agenda";
+  const routeIsCanonical =
+    isVenueWorkspaceId(params.venueSlug) && params.viewSlug === view;
+
+  useEffect(() => {
+    if (routeIsCanonical) {
+      storeVenueWorkspace(venueId);
+      return;
+    }
+    const fallbackVenue = isVenueWorkspaceId(params.venueSlug)
+      ? params.venueSlug
+      : readStoredVenueWorkspace();
+    const next = new URLSearchParams(searchParams);
+    next.delete("visao");
+    const query = next.toString();
+    navigate(
+      `${VENUE_MODULE_ROUTE}/${fallbackVenue}/${view}${query ? `?${query}` : ""}`,
+      { replace: true },
+    );
+  }, [routeIsCanonical, params.venueSlug, view, venueId, navigate, searchParams]);
+
   const selectedEventId = searchParams.get("evento");
   const [formOpen, setFormOpen] = useState(false);
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
