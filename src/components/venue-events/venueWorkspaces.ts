@@ -88,6 +88,15 @@ export function resolveVenueSpaceIds(
   return ids;
 }
 
+/** Id do espaço raiz do ambiente ativo (Restaurante Fenasoja / Arena Fenasoja). */
+export function resolveVenueRootSpaceId(
+  spaces: VenueWorkspaceData["spaces"],
+  workspaceId: VenueWorkspaceId,
+): string | null {
+  const definition = getVenueWorkspace(workspaceId);
+  return spaces.find((space) => space.type === definition.spaceType)?.id ?? null;
+}
+
 /**
  * Recorta os dados operacionais para o ambiente ativo.
  * Patrocinadores (stakeholders) e membros permanecem compartilhados.
