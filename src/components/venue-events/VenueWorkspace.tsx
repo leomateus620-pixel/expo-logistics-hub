@@ -1266,7 +1266,7 @@ export function VenueWorkspace() {
       <header className="venue-panel__header venue-panel__header--responsive">
         <div>
           <p className="venue-eyebrow">Ocupação real</p>
-          <h2>Agenda de Restaurante e Arena</h2>
+          <h2>{venueDefinition.agendaTitle}</h2>
         </div>
         <div className="venue-agenda-controls">
           <div className="venue-segmented">
