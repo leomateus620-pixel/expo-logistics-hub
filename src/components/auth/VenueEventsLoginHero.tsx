@@ -8,7 +8,7 @@ export function VenueEventsLoginHero() {
         className="auth-hero__brand"
         scale="display"
         showEdition={false}
-        subtitle="Operação de espaços"
+        subtitle="Portal institucional"
         tone="dark"
       />
 
