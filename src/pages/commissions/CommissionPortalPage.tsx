@@ -4,7 +4,6 @@ import { ArrowUpRight, LockKeyhole, ShieldCheck } from 'lucide-react';
 import CommissionCard from '@/components/commissions/CommissionCard';
 import { FenasojaBrand } from '@/components/brand/FenasojaBrand';
 import { FenasojaPortalHero } from '@/components/portal/FenasojaPortalHero';
-import { PortalDestinationCard } from '@/components/portal/PortalDestinationCard';
 import { PortalPrimaryEntry } from '@/components/portal/PortalPrimaryEntry';
 import type { PortalAccessPresentation } from '@/components/portal/portalTypes';
 import { useAuth } from '@/hooks/useAuth';
@@ -20,12 +19,13 @@ import {
   type CommissionModule,
 } from '@/modules/commissions/commissionRegistry';
 import {
+  agendaFenasojaDestination,
+  agendaVenueDestination,
   commercialMapDestination,
   financePortalModule,
   getCommissionDestination,
   getCommissionLoginPath,
   getPortalCommissionModules,
-  portalAgendaDestinations,
   portalPrimaryEntries,
   type PortalDestination,
   type PortalEntryId,
@@ -135,6 +135,8 @@ export default function CommissionPortalPage() {
       : deniedAccess('Área administrativa disponível somente para perfis autorizados.');
   };
 
+  const agendaFenasojaAccess = resolveCapabilityAccess(agendaFenasojaDestination);
+  const agendaVenueAccess = resolveCapabilityAccess(agendaVenueDestination);
   const mapAccess = resolveCapabilityAccess(commercialMapDestination);
   const financeAccess = resolveCommissionAccess(financePortalModule);
   const adminAccess = resolveAdminAccess();
@@ -215,26 +217,29 @@ export default function CommissionPortalPage() {
   };
 
   const getEntryAccess = (entryId: PortalEntryId): PortalAccessPresentation => {
-    if (entryId === 'agenda') {
-      return {
-        state: 'group',
-        label: 'Grupo de destinos da Agenda',
-      };
-    }
     if (entryId === 'comissoes') {
       return {
         state: 'group',
         label: 'Grupo de comissões operacionais',
       };
     }
+    if (entryId === 'agenda-fenasoja') return agendaFenasojaAccess;
+    if (entryId === 'agenda-restaurante-arena') return agendaVenueAccess;
     return entryId === 'mapa-comercial' ? mapAccess : financeAccess;
   };
 
   const getEntrySelection = (entryId: PortalEntryId) => {
+    if (entryId === 'agenda-fenasoja') {
+      return () => saveSelectedModule(agendaFenasojaDestination.storageSlug);
+    }
+    if (entryId === 'agenda-restaurante-arena') {
+      return () => saveSelectedModule(agendaVenueDestination.storageSlug);
+    }
     if (entryId === 'mapa-comercial') return () => saveSelectedModule(commercialMapDestination.storageSlug);
     if (entryId === 'financeiro') return () => saveSelectedModule(financePortalModule.slug);
     return undefined;
   };
+
 
   return (
     <div className="fenasoja-portal">
@@ -323,19 +328,6 @@ export default function CommissionPortalPage() {
               onToggle={entry.kind === 'expandable' ? () => toggleEntry(entry.id) : undefined}
               onSelect={getEntrySelection(entry.id)}
             >
-              {entry.id === 'agenda' && (
-                <div className="portal-agenda-grid" aria-label="Destinos da Agenda">
-                  {portalAgendaDestinations.map((destination) => (
-                    <PortalDestinationCard
-                      key={destination.id}
-                      destination={destination}
-                      access={resolveCapabilityAccess(destination)}
-                      onSelect={saveSelectedModule}
-                    />
-                  ))}
-                </div>
-              )}
-
               {entry.id === 'comissoes' && (
                 <div className="portal-commissions-panel">
                   <div className="portal-commissions-grid" aria-label="Comissões disponíveis no portal">

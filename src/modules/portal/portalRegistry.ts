@@ -3,7 +3,6 @@ import {
   Building2,
   CalendarRange,
   MapPinned,
-  Route,
   UsersRound,
   type LucideIcon,
 } from 'lucide-react';
@@ -14,7 +13,12 @@ import {
   type CommissionModule,
 } from '@/modules/commissions/commissionRegistry';
 
-export type PortalEntryId = 'agenda' | 'mapa-comercial' | 'comissoes' | 'financeiro';
+export type PortalEntryId =
+  | 'agenda-fenasoja'
+  | 'agenda-restaurante-arena'
+  | 'mapa-comercial'
+  | 'comissoes'
+  | 'financeiro';
 export type PortalEntryKind = 'expandable' | 'direct';
 
 export interface PortalDestination {
@@ -35,31 +39,38 @@ export interface PortalPrimaryEntry {
   description: string;
   icon: LucideIcon;
   countLabel?: string;
-  tone: 'agenda' | 'map' | 'commissions' | 'finance';
+  wordmark?: 'fenasoja' | 'venue';
+  tone: 'agenda' | 'venue' | 'map' | 'commissions' | 'finance';
 }
 
+
+export const agendaFenasojaDestination: PortalDestination = {
+  id: 'cronograma-eventos',
+  title: 'Agenda Fenasoja',
+  description: 'Planejamento, linha do tempo, calendário e execução do ciclo oficial.',
+  icon: CalendarRange,
+  capability: 'cronograma_eventos_access',
+  loginPath: '/login/cronograma-eventos',
+  route: '/cronograma-eventos',
+  storageSlug: 'cronograma-eventos',
+};
+
+export const agendaVenueDestination: PortalDestination = {
+  id: 'eventos-restaurante-arena',
+  title: 'Agenda Restaurante e Arena',
+  description: 'Reservas, aprovações, contrapartidas e operação dos espaços.',
+  icon: Building2,
+  capability: 'venue_events_access',
+  loginPath: '/login/eventos-restaurante-arena',
+  route: '/eventos-restaurante-arena',
+  storageSlug: 'eventos-restaurante-arena',
+};
+
 export const portalAgendaDestinations: PortalDestination[] = [
-  {
-    id: 'cronograma-eventos',
-    title: 'Cronograma e Eventos',
-    description: 'Planejamento, linha do tempo, calendário e execução do ciclo oficial.',
-    icon: CalendarRange,
-    capability: 'cronograma_eventos_access',
-    loginPath: '/login/cronograma-eventos',
-    route: '/cronograma-eventos',
-    storageSlug: 'cronograma-eventos',
-  },
-  {
-    id: 'eventos-restaurante-arena',
-    title: 'Eventos Restaurante e Arena',
-    description: 'Reservas, aprovações, contrapartidas e operação dos espaços.',
-    icon: Building2,
-    capability: 'venue_events_access',
-    loginPath: '/login/eventos-restaurante-arena',
-    route: '/eventos-restaurante-arena',
-    storageSlug: 'eventos-restaurante-arena',
-  },
+  agendaFenasojaDestination,
+  agendaVenueDestination,
 ];
+
 
 export const commercialMapDestination: PortalDestination = {
   id: 'mapa-comercial',
@@ -88,14 +99,24 @@ const highlightedCommissionOrder = new Map([
 
 export const portalPrimaryEntries: PortalPrimaryEntry[] = [
   {
-    id: 'agenda',
-    kind: 'expandable',
-    title: 'Agenda',
-    description: 'Planejamento, calendário, reservas e operação dos eventos oficiais.',
-    icon: Route,
-    countLabel: `${portalAgendaDestinations.length} destinos`,
+    id: 'agenda-fenasoja',
+    kind: 'direct',
+    title: agendaFenasojaDestination.title,
+    description: agendaFenasojaDestination.description,
+    icon: agendaFenasojaDestination.icon,
+    wordmark: 'fenasoja',
     tone: 'agenda',
   },
+  {
+    id: 'agenda-restaurante-arena',
+    kind: 'direct',
+    title: agendaVenueDestination.title,
+    description: agendaVenueDestination.description,
+    icon: agendaVenueDestination.icon,
+    wordmark: 'venue',
+    tone: 'venue',
+  },
+
   {
     id: 'mapa-comercial',
     kind: 'direct',

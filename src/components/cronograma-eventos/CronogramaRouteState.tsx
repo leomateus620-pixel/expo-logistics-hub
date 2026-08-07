@@ -112,7 +112,7 @@ function RouteStateFrame({
         aria-live={ariaLive}
       >
         <div className="mb-6 flex items-center justify-center gap-3 border-b border-border/70 pb-5 text-left">
-          <FenasojaBrand compact subtitle="Cronograma e Eventos" tone="light" />
+          <FenasojaBrand compact subtitle="Agenda Fenasoja" tone="light" />
           <CalendarRange className="ml-auto h-5 w-5 text-primary" aria-hidden="true" />
         </div>
         <div className="flex flex-col items-center">{children}</div>

@@ -74,6 +74,18 @@
   background: linear-gradient(105deg, var(--entry-surface-start), var(--entry-surface-end));
 }
 
+.portal-primary-entry[data-tone='venue'] {
+  --entry-accent: #efb173;
+  --entry-accent-strong: #ffd6a8;
+  --entry-title: #fff4e6;
+  --entry-border: rgb(224 155 90 / 52%);
+  --entry-icon-surface: rgb(239 177 115 / 12%);
+  --entry-shadow-color: rgb(186 108 48 / 22%);
+  --entry-surface-start: #3a3630;
+  --entry-surface-end: #1b2c39;
+  background: linear-gradient(105deg, var(--entry-surface-start), var(--entry-surface-end));
+}
+
 .portal-primary-entry[data-tone='map'] {
   --entry-accent: #83bdea;
   --entry-accent-strong: #b7dcf7;
@@ -1200,6 +1212,10 @@
     background: #243746;
   }
 
+  .portal-primary-entry[data-tone='venue'] {
+    background: #33302b;
+  }
+
   .portal-primary-entry[data-tone='map'] {
     background: #1a3c58;
   }
@@ -1264,4 +1280,11 @@
   .commission-access-card:focus-visible {
     outline: 3px solid Highlight;
   }
+}
+
+.portal-primary-entry__title .agenda-wordmark {
+  --wordmark-lead: var(--entry-title);
+  --wordmark-accent-start: var(--entry-accent-strong);
+  --wordmark-accent-end: var(--entry-accent);
+  --wordmark-halo: var(--entry-shadow-color);
 }

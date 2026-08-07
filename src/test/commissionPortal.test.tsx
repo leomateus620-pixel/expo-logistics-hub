@@ -95,11 +95,14 @@ describe('CommissionPortalPage', () => {
     portalMocks.org.myRole = null;
   });
 
-  it('presents the four primary entries in the required order', () => {
+  it('presents the five primary entries in the required order', () => {
     const { container } = renderPortal();
 
-    expect(screen.getAllByTestId('portal-primary-title').map((title) => title.textContent)).toEqual([
-      'Agenda',
+    expect(screen.getAllByTestId('portal-primary-title').map((title) => (
+      title.querySelector('.sr-only')?.textContent ?? title.textContent
+    ))).toEqual([
+      'Agenda Fenasoja',
+      'Agenda Restaurante e Arena',
       'Mapa Comercial',
       'Comissões',
       'Financeiro',
@@ -164,33 +167,21 @@ describe('CommissionPortalPage', () => {
     expect(brandMark!.querySelector('svg')).toBeInTheDocument();
   });
 
-  it('opens Agenda destinations while keeping only one primary group expanded', () => {
+  it('exposes both agendas as independent direct entries without a shared group', () => {
     renderPortal();
 
-    const agendaToggle = screen.getByRole('button', { name: /Agenda/ });
+    expect(screen.queryByRole('button', { name: 'Ver destinos: Agenda' })).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Entrar para acessar: Agenda Fenasoja' })).toHaveAttribute(
+      'href',
+      '/login/cronograma-eventos',
+    );
+    expect(screen.getByRole('link', {
+      name: 'Entrar para acessar: Agenda Restaurante e Arena',
+    })).toHaveAttribute('href', '/login/eventos-restaurante-arena');
+
     const commissionsToggle = screen.getByRole('button', { name: /Comissões/ });
-
-    expect(agendaToggle.tagName).toBe('BUTTON');
-    expect(agendaToggle).toHaveAttribute('type', 'button');
-
-    fireEvent.click(agendaToggle);
-    expect(agendaToggle).toHaveAttribute('aria-expanded', 'true');
-    const cronogramaLink = screen.getByRole('link', { name: /Cronograma e Eventos/ });
-    expect(cronogramaLink).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Eventos Restaurante e Arena/ })).toBeInTheDocument();
-
     fireEvent.click(commissionsToggle);
-    expect(agendaToggle).toHaveAttribute('aria-expanded', 'false');
     expect(commissionsToggle).toHaveAttribute('aria-expanded', 'true');
-    expect(screen.queryByRole('link', { name: /Cronograma e Eventos/ })).not.toBeInTheDocument();
-
-    fireEvent.click(agendaToggle);
-    screen.getByRole('link', { name: /Cronograma e Eventos/ }).focus();
-    fireEvent.keyDown(window, { key: 'Escape' });
-    expect(agendaToggle).toHaveAttribute('aria-expanded', 'false');
-    expect(agendaToggle).toHaveFocus();
-
-    fireEvent.click(commissionsToggle);
     screen.getByRole('link', { name: /Logística/ }).focus();
     fireEvent.keyDown(window, { key: 'Escape' });
     expect(commissionsToggle).toHaveAttribute('aria-expanded', 'false');
@@ -214,7 +205,6 @@ describe('CommissionPortalPage', () => {
       });
     renderPortal();
 
-    const agendaToggle = screen.getByRole('button', { name: /Agenda/ });
     const commissionsToggle = screen.getByRole('button', { name: /Comissões/ });
     const rectAt = (top: number) => ({
       bottom: top + 44,
@@ -228,11 +218,11 @@ describe('CommissionPortalPage', () => {
       toJSON: () => ({}),
     }) as DOMRect;
 
-    vi.spyOn(agendaToggle, 'getBoundingClientRect').mockReturnValue(rectAt(120));
     vi.spyOn(commissionsToggle, 'getBoundingClientRect')
       .mockImplementation(() => rectAt(commissionsTop));
 
-    fireEvent.click(agendaToggle);
+    fireEvent.click(commissionsToggle);
+    fireEvent.click(commissionsToggle);
     fireEvent.click(commissionsToggle);
     commissionsTop = 360;
 
@@ -270,11 +260,8 @@ describe('CommissionPortalPage', () => {
     const selectedModuleWrites = vi.spyOn(Storage.prototype, 'setItem');
     const { unmount } = renderPortal();
 
-    const agendaToggle = screen.getByRole('button', { name: /Agenda/ });
-    fireEvent.click(agendaToggle);
-    fireEvent.click(screen.getByRole('link', { name: /Cronograma e Eventos/ }));
+    fireEvent.click(screen.getByRole('link', { name: 'Entrar para acessar: Agenda Fenasoja' }));
     expect(screen.getByTestId('current-location')).toHaveTextContent('/login/cronograma-eventos');
-    expect(agendaToggle).toHaveAttribute('aria-expanded', 'true');
     expect(localStorage.getItem(SELECTED_COMMISSION_STORAGE_KEY)).toBe('cronograma-eventos');
     expect(selectedModuleWrites.mock.calls.filter(([key]) => (
       key === SELECTED_COMMISSION_STORAGE_KEY
@@ -284,8 +271,9 @@ describe('CommissionPortalPage', () => {
     localStorage.clear();
     renderPortal();
 
-    fireEvent.click(screen.getByRole('button', { name: /Agenda/ }));
-    fireEvent.click(screen.getByRole('link', { name: /Eventos Restaurante e Arena/ }));
+    fireEvent.click(screen.getByRole('link', {
+      name: 'Entrar para acessar: Agenda Restaurante e Arena',
+    }));
     expect(screen.getByTestId('current-location')).toHaveTextContent('/login/eventos-restaurante-arena');
     expect(localStorage.getItem(SELECTED_COMMISSION_STORAGE_KEY)).toBe('eventos-restaurante-arena');
     selectedModuleWrites.mockRestore();
@@ -358,13 +346,12 @@ describe('CommissionPortalPage', () => {
       '/comissoes/financeiro-gerencial/dashboard',
     );
 
-    fireEvent.click(screen.getByRole('button', { name: /Agenda/ }));
-    expect(screen.getByRole('link', { name: 'Abrir destino: Cronograma e Eventos' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Abrir agenda: Agenda Fenasoja' })).toHaveAttribute(
       'href',
       '/cronograma-eventos',
     );
-    expect(screen.queryByRole('link', { name: /Eventos Restaurante e Arena/ })).not.toBeInTheDocument();
-    expect(screen.getByLabelText('Perfil sem acesso: Eventos Restaurante e Arena')).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /Agenda Restaurante e Arena/ })).not.toBeInTheDocument();
+    expect(screen.getByLabelText('Perfil sem acesso: Agenda Restaurante e Arena')).toBeInTheDocument();
   });
 
   it('does not promise Financeiro or Admin access to an operator without explicit permission', () => {
@@ -403,9 +390,8 @@ describe('CommissionPortalPage', () => {
       '/admin',
     );
 
-    fireEvent.click(screen.getByRole('button', { name: /Agenda/ }));
     expect(screen.getByRole('link', {
-      name: 'Configurar organização: Cronograma e Eventos',
+      name: 'Configurar organização: Agenda Fenasoja',
     })).toHaveAttribute(
       'href',
       '/cronograma-eventos',
@@ -430,10 +416,10 @@ describe('CommissionPortalPage', () => {
     expect(screen.queryByText('Explorar agenda')).not.toBeInTheDocument();
     expect(screen.queryByText('Status do módulo e acesso do seu perfil.')).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Ver destinos: Agenda' }));
+
     expect(screen.queryByText(/Destino 0/)).not.toBeInTheDocument();
     expect(screen.getByRole('link', {
-      name: 'Abrir destino: Cronograma e Eventos',
+      name: 'Abrir agenda: Agenda Fenasoja',
     }).querySelectorAll('a, button')).toHaveLength(0);
 
     fireEvent.click(screen.getByRole('button', { name: 'Ver comissões: Comissões' }));
@@ -499,8 +485,8 @@ describe('CommissionPortalPage', () => {
       '/comissoes/logistica/dashboard',
     );
 
-    fireEvent.click(screen.getByRole('button', { name: 'Ver destinos: Agenda' }));
-    expect(screen.getByRole('link', { name: 'Abrir destino: Cronograma e Eventos' })).toHaveAttribute(
+
+    expect(screen.getByRole('link', { name: 'Abrir agenda: Agenda Fenasoja' })).toHaveAttribute(
       'href',
       '/cronograma-eventos',
     );
@@ -513,7 +499,7 @@ describe('CommissionPortalPage', () => {
       'aria-disabled',
       'true',
     );
-    expect(screen.queryByRole('link', { name: /Cronograma e Eventos/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /Agenda Fenasoja/ })).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Ver comissões: Comissões' }));
     expect(screen.queryByRole('link', { name: /Logística/ })).not.toBeInTheDocument();

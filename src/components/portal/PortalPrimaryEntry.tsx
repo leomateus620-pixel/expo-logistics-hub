@@ -8,6 +8,8 @@ import {
   LockKeyhole,
   LogIn,
 } from 'lucide-react';
+import { AgendaWordmark } from '@/components/brand/AgendaWordmark';
+
 import type { PortalPrimaryEntry as PortalPrimaryEntryConfig } from '@/modules/portal/portalRegistry';
 import type { PortalAccessPresentation } from '@/components/portal/portalTypes';
 
@@ -36,12 +38,13 @@ function getActionLabel(
   expanded: boolean,
 ) {
   if (entry.kind === 'expandable') {
-    if (entry.id === 'agenda') return expanded ? 'Recolher destinos' : 'Ver destinos';
     return expanded ? 'Recolher comissões' : 'Ver comissões';
   }
 
   if (access.state === 'allowed') {
-    return entry.id === 'mapa-comercial' ? 'Abrir mapa' : 'Abrir financeiro';
+    if (entry.id === 'mapa-comercial') return 'Abrir mapa';
+    if (entry.id === 'financeiro') return 'Abrir financeiro';
+    return 'Abrir agenda';
   }
   if (access.state === 'loading') return 'Verificando acesso';
   if (access.state === 'denied') {
@@ -51,6 +54,7 @@ function getActionLabel(
   if (access.state === 'setup') return 'Configurar organização';
   return access.label;
 }
+
 
 export function PortalPrimaryEntry({
   access,
@@ -79,8 +83,13 @@ export function PortalPrimaryEntry({
       </span>
       <span className="portal-primary-entry__copy">
         <span className="portal-primary-entry__title" data-testid="portal-primary-title">
-          {entry.title}
+          {entry.wordmark ? (
+            <AgendaWordmark variant={entry.wordmark} />
+          ) : (
+            entry.title
+          )}
         </span>
+
         <span className="portal-primary-entry__description">{entry.description}</span>
       </span>
       {entry.countLabel && (

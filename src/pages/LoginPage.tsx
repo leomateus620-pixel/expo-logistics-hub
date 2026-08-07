@@ -25,6 +25,8 @@ import {
   type LucideIcon,
 } from 'lucide-react';
 import { CronogramaLoginHero } from '@/components/auth/CronogramaLoginHero';
+import { VenueEventsLoginHero } from '@/components/auth/VenueEventsLoginHero';
+import { AgendaWordmark } from '@/components/brand/AgendaWordmark';
 import { CommercialMapLoginHero } from '@/components/auth/CommercialMapLoginHero';
 import { CommissionMapLoginHero } from '@/components/auth/CommissionMapLoginHero';
 import { FenasojaBrand } from '@/components/brand/FenasojaBrand';
@@ -167,9 +169,9 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
   const contextName = isAdminLogin
     ? 'Administrador'
     : isCronogramaLogin
-      ? 'Cronograma e Eventos'
+      ? 'Agenda Fenasoja'
       : isVenueEventsLogin
-        ? 'Eventos Restaurante e Arena'
+        ? 'Agenda Restaurante e Arena'
         : isCommercialMapLogin
           ? 'Mapa Comercial'
           : selectedModule
@@ -177,6 +179,11 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
               ? selectedModule.name
               : `Comissão de ${selectedModule.name}`
             : 'Comissão de Logística';
+  const agendaWordmark: 'fenasoja' | 'venue' | undefined = isCronogramaLogin
+    ? 'fenasoja'
+    : isVenueEventsLogin
+      ? 'venue'
+      : undefined;
   const heroTitleLead = isAdminLogin
     ? 'Governança institucional'
     : isVenueEventsLogin
@@ -367,6 +374,8 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
       <div className="auth-layout">
         {isCronogramaLogin ? (
           <CronogramaLoginHero />
+        ) : isVenueEventsLogin ? (
+          <VenueEventsLoginHero />
         ) : commissionMapPortal ? (
           <CommissionMapLoginHero portal={commissionMapPortal} />
         ) : isCommercialMapLogin ? (
@@ -434,7 +443,15 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
                 </span>
                 <span className="auth-module-badge__copy">
                   <span>Módulo selecionado</span>
-                  <strong>{contextName}</strong>
+                  {agendaWordmark ? (
+                    <AgendaWordmark
+                      className="auth-module-badge__wordmark"
+                      variant={agendaWordmark}
+                      scale="compact"
+                    />
+                  ) : (
+                    <strong>{contextName}</strong>
+                  )}
                 </span>
               </div>
             </div>
