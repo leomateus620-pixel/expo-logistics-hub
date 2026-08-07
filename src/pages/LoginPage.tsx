@@ -84,28 +84,6 @@ const adminCapabilities: CapabilityItem[] = [
   },
 ];
 
-const venueCapabilities: CapabilityItem[] = [
-  {
-    icon: UtensilsCrossed,
-    label: 'Restaurante e Arena',
-    description: 'Reservas coordenadas',
-  },
-  {
-    icon: CalendarRange,
-    label: 'Conflitos em tempo real',
-    description: 'Agenda e capacidade',
-  },
-  {
-    icon: ClipboardCheck,
-    label: 'Operação rastreável',
-    description: 'Aprovações e recursos',
-  },
-  {
-    icon: ShieldCheck,
-    label: 'Contrapartidas seguras',
-    description: 'Consumo transacional',
-  },
-];
 
 function getStoredModuleSlug() {
   try {
