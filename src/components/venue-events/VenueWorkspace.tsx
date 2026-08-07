@@ -607,6 +607,10 @@ export function VenueWorkspace() {
   const arenaSpaceIds = resolveVenueSpaceIds(fullWorkspace.spaces, "arena");
   const activeSpaceIds =
     venueId === "arena" ? arenaSpaceIds : restauranteSpaceIds;
+  const activeRootSpaceId = resolveVenueRootSpaceId(
+    fullWorkspace.spaces,
+    venueId,
+  );
   const workspace = scopeVenueWorkspaceData(fullWorkspace, activeSpaceIds);
   const countEventsIn = (spaceIds: Set<string>) =>
     new Set(
