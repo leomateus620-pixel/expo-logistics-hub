@@ -1348,16 +1348,21 @@ export function VenueWorkspace() {
           <small>Janela selecionada</small>
           <strong>{agendaRangeLabel}</strong>
         </span>
-        <span>
-          <small>Espaços</small>
-          <strong>{selectedAgendaSpace}</strong>
-        </span>
         <span data-state={agendaEvents.length ? "occupied" : "available"}>
           <small>Ocupação encontrada</small>
           <strong>
             {agendaEvents.length} {agendaEvents.length === 1 ? "evento" : "eventos"}
           </strong>
         </span>
+        {sharedAgendaEventsCount > 0 && (
+          <span data-state="shared">
+            <small>Compartilhados</small>
+            <strong>
+              {sharedAgendaEventsCount}{" "}
+              {sharedAgendaEventsCount === 1 ? "evento" : "eventos"}
+            </strong>
+          </span>
+        )}
       </div>
       {agendaGroups.length ? (
         <div className="venue-agenda-timeline">
