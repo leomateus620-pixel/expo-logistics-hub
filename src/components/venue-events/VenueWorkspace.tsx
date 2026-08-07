@@ -540,11 +540,25 @@ export function VenueWorkspace() {
     view === "historico" && operations.permissions.venue_events_audit_view,
   );
 
-  const setView = (nextView: VenueView) => {
+  const buildModulePath = (
+    nextVenue: VenueWorkspaceId,
+    nextView: VenueView,
+    keepEvent = false,
+  ) => {
     const next = new URLSearchParams(searchParams);
-    next.set("visao", nextView);
-    next.delete("evento");
-    setSearchParams(next, { replace: true });
+    next.delete("visao");
+    if (!keepEvent) next.delete("evento");
+    const query = next.toString();
+    return `${VENUE_MODULE_ROUTE}/${nextVenue}/${nextView}${query ? `?${query}` : ""}`;
+  };
+  const setView = (nextView: VenueView) => {
+    navigate(buildModulePath(venueId, nextView));
+    setMobileMoreOpen(false);
+  };
+  const setVenue = (nextVenue: VenueWorkspaceId) => {
+    if (nextVenue === venueId) return;
+    storeVenueWorkspace(nextVenue);
+    navigate(buildModulePath(nextVenue, view));
     setMobileMoreOpen(false);
   };
   const openEvent = (eventId: string) => {
