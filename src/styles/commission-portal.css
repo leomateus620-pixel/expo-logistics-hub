@@ -1727,3 +1727,22 @@
   }
 }
 
+
+@media (max-width: 640px) {
+  .fenasoja-portal__header .fenasoja-brand__wordmark {
+    font-size: 1.02rem;
+    letter-spacing: 0.01em;
+    overflow: visible;
+    text-overflow: clip;
+  }
+
+  .fenasoja-portal__header .fenasoja-brand__mark {
+    width: 34px;
+    height: 34px;
+  }
+
+  .fenasoja-portal__header .fenasoja-brand__edition {
+    padding: 2px 8px;
+    font-size: 0.62rem;
+  }
+}
