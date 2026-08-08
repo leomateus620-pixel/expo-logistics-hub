@@ -1,5 +1,5 @@
 import { memo, useCallback, useEffect, useRef, useState } from 'react';
-import { CalendarDays, Maximize2 } from 'lucide-react';
+import { ArrowUpRight, CalendarDays } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { OfficialCountdownDigits } from '@/components/countdown/OfficialCountdownDigits';
 import { useFenasojaCountdown } from '@/hooks/useFenasojaCountdown';
@@ -94,7 +94,7 @@ export const OfficialCountdownCompact = memo(function OfficialCountdownCompact()
         aria-busy={isExpanding}
         aria-label="Abrir contagem oficial da Fenasoja 2028"
       >
-        <Maximize2 aria-hidden="true" />
+        <ArrowUpRight aria-hidden="true" />
         <span>{isExpanding ? 'Abrindo contagem…' : 'Abrir contagem'}</span>
       </button>
 
