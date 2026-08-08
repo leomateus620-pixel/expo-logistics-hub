@@ -1287,7 +1287,7 @@
   gap: clamp(8px, 1vw, 13px);
 }
 
-.portal-official-countdown__intro > p:first-child {
+.portal-official-countdown__intro #portal-official-countdown-title {
   position: relative;
   margin: 0;
   animation: portal-countdown-title-in 620ms cubic-bezier(0.16, 1, 0.3, 1) both;
@@ -1309,7 +1309,7 @@
   -webkit-text-fill-color: transparent;
 }
 
-.portal-official-countdown__intro > p:first-child::after {
+.portal-official-countdown__intro #portal-official-countdown-title::after {
   position: absolute;
   z-index: -1;
   inset: -0.4em -0.6em;
@@ -1440,13 +1440,17 @@
 }
 
 .portal-official-countdown .fenasoja-countdown-value {
-  color: transparent;
+  color: #ffd75e;
   font-family: Inter, ui-sans-serif, system-ui, sans-serif;
   font-size: clamp(2.3rem, 6.4vw, 4.6rem);
   font-weight: 900;
   letter-spacing: -0.03em;
   text-indent: 0;
   text-shadow: none;
+  filter: drop-shadow(0 8px 14px rgb(0 0 0 / 45%));
+}
+
+.portal-official-countdown .fenasoja-countdown-value-glyph {
   background: linear-gradient(
     180deg,
     #fff3c4 0%,
@@ -1455,14 +1459,9 @@
     #f8db85 100%
   );
   background-clip: text;
+  color: transparent;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 8px 14px rgb(0 0 0 / 45%));
-}
-
-.portal-official-countdown .fenasoja-countdown-value-glyph {
-  color: inherit;
-  -webkit-text-fill-color: inherit;
 }
 
 .portal-official-countdown .fenasoja-countdown-unit-label {
@@ -1674,7 +1673,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .portal-official-countdown__intro > p:first-child,
+  .portal-official-countdown__intro #portal-official-countdown-title,
   .portal-official-countdown__spark,
   .portal-official-countdown__date {
     animation: none !important;
@@ -1714,8 +1713,8 @@
     color: CanvasText;
   }
 
-  .portal-official-countdown__intro > p:first-child,
-  .portal-official-countdown .fenasoja-countdown-value {
+  .portal-official-countdown__intro #portal-official-countdown-title,
+  .portal-official-countdown .fenasoja-countdown-value-glyph {
     background: none;
     color: CanvasText;
     -webkit-text-fill-color: CanvasText;
