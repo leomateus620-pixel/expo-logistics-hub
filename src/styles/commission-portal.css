@@ -1564,6 +1564,8 @@
 
 /* Premium metallic wordmark in the portal top bar. */
 .fenasoja-portal__header .fenasoja-brand__wordmark {
+  font-size: clamp(1.15rem, 2.1vw, 1.6rem);
+  line-height: 1.05;
   background: linear-gradient(180deg, #ffffff 0%, #dfe9f6 42%, #9fb3cc 66%, #f2f7ff 100%);
   background-clip: text;
   color: transparent;
@@ -1574,6 +1576,8 @@
 }
 
 .fenasoja-portal__header .fenasoja-brand__edition {
+  padding: clamp(3px, 0.4vw, 5px) clamp(9px, 1vw, 14px);
+  font-size: clamp(0.66rem, 1vw, 0.84rem);
   border: 1px solid rgb(255 196 120 / 72%);
   background: linear-gradient(180deg, #ffb35c 0%, #f7852a 58%, #e0691a 100%);
   box-shadow:
@@ -1586,6 +1590,8 @@
 }
 
 .fenasoja-portal__header .fenasoja-brand__mark {
+  width: clamp(38px, 3.4vw, 48px);
+  height: clamp(38px, 3.4vw, 48px);
   filter: drop-shadow(0 0 12px rgb(120 175 255 / 30%));
 }
 
