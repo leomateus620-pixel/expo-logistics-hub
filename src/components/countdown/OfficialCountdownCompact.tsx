@@ -55,6 +55,9 @@ export const OfficialCountdownCompact = memo(function OfficialCountdownCompact()
       aria-labelledby="portal-official-countdown-title"
     >
       <div className="portal-official-countdown__intro">
+        <span className="portal-official-countdown__spark" aria-hidden="true">
+          <span />
+        </span>
         <p id="portal-official-countdown-title">Abertura oficial em</p>
         <p className="portal-official-countdown__date">
           <CalendarDays aria-hidden="true" />
@@ -67,6 +70,7 @@ export const OfficialCountdownCompact = memo(function OfficialCountdownCompact()
           </span>
         </p>
       </div>
+
 
       {isInvalid ? (
         <p className="portal-official-countdown__error" role="status">
