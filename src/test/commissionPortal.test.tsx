@@ -124,9 +124,7 @@ describe('CommissionPortalPage', () => {
     expect(screen.getByText('· Brasília')).toHaveAttribute('aria-hidden', 'true');
     expect(screen.queryByText(/Um portal/)).not.toBeInTheDocument();
     expect(screen.queryByText(/Acesse planejamento/)).not.toBeInTheDocument();
-    expect(container.querySelector('[data-testid="portal-soybean"]')).toBeInTheDocument();
     expect(container.querySelector('.portal-identity__card')).not.toBeInTheDocument();
-    expect(container.querySelector('.portal-soybean__roots')).not.toBeInTheDocument();
     expect(container.querySelector('[data-portal-root]')).not.toBeInTheDocument();
     expect(container.querySelector('[data-root-layer]')).not.toBeInTheDocument();
     expect(container.querySelector('[data-root-illustrations]')).not.toBeInTheDocument();

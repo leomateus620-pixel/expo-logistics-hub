@@ -255,193 +255,6 @@
   border-radius: 0 0 8px;
 }
 
-.portal-identity {
-  position: relative;
-  z-index: 2;
-  display: grid;
-  width: min(100%, 1060px);
-  justify-items: center;
-  gap: 0;
-}
-
-.portal-identity__title {
-  width: 100%;
-  margin: 0;
-}
-
-.portal-wordmark {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: clamp(28px, 3.8vw, 54px);
-  line-height: 0.8;
-  white-space: nowrap;
-}
-
-.portal-wordmark__name {
-  position: relative;
-  isolation: isolate;
-  display: inline-flex;
-  align-items: center;
-  color: var(--portal-text);
-  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
-  font-size: clamp(3.7rem, 6.8vw, 6.2rem);
-  font-weight: 900;
-  font-kerning: none;
-  letter-spacing: 0;
-  line-height: 0.82;
-  text-rendering: geometricPrecision;
-}
-
-.portal-wordmark__letters {
-  position: relative;
-  z-index: 2;
-  display: inline-flex;
-  align-items: center;
-}
-
-.portal-wordmark__letter {
-  display: inline-block;
-  background: linear-gradient(180deg, #ffffff 0%, #f7faff 38%, #c8d5e4 100%);
-  background-clip: text;
-  color: transparent;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  -webkit-text-stroke: 0.5px rgb(255 255 255 / 36%);
-  text-shadow:
-    0 1px 0 rgb(255 255 255 / 24%),
-    0 10px 24px rgb(0 5 17 / 48%);
-  transform-origin: center bottom;
-}
-
-.portal-wordmark__letter--e,
-.portal-wordmark__letter--n,
-.portal-wordmark__letter--a-first,
-.portal-wordmark__letter--s {
-  margin-left: -0.066em;
-}
-
-.portal-wordmark__letter--e {
-  transform: scaleX(0.96);
-}
-
-.portal-wordmark__letter--n {
-  transform: scaleX(0.985);
-}
-
-.portal-wordmark__letter--a-first {
-  transform: scaleX(0.97);
-}
-
-.portal-wordmark__letter--s {
-  transform: scaleX(0.965);
-}
-
-.portal-wordmark__letter--j {
-  margin-left: -0.02em;
-  transform: scaleX(0.94);
-}
-
-.portal-wordmark__letter--a-last {
-  margin-left: -0.105em;
-  transform: scaleX(0.97);
-}
-
-.portal-soybean {
-  position: relative;
-  display: inline-grid;
-  width: 0.76em;
-  height: 0.98em;
-  flex: 0 0 auto;
-  place-items: center;
-  margin: 0 -0.018em 0 -0.03em;
-  transform: translateY(0.04em);
-}
-
-.portal-soybean__grain {
-  position: relative;
-  z-index: 3;
-  display: block;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-  transform-origin: 50% 78%;
-  animation: portal-soybean-arrive 420ms cubic-bezier(0.16, 1, 0.3, 1) 60ms
-    both;
-}
-
-.portal-soybean__aura {
-  opacity: 0.68;
-}
-
-.portal-wordmark__edition {
-  position: relative;
-  z-index: 2;
-  display: inline-flex;
-  align-items: center;
-  gap: clamp(18px, 2.3vw, 30px);
-  color: var(--portal-gold);
-  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
-  font-size: clamp(2.9rem, 5.2vw, 4.7rem);
-  font-weight: 900;
-  font-variant-numeric: tabular-nums;
-  font-kerning: none;
-  line-height: 0.86;
-  letter-spacing: 0;
-  text-rendering: geometricPrecision;
-}
-
-.portal-wordmark__edition-rule {
-  width: clamp(28px, 3.2vw, 46px);
-  height: 1px;
-  background: linear-gradient(
-    90deg,
-    rgb(255 211 92 / 24%),
-    rgb(255 222 122 / 92%)
-  );
-  box-shadow: 0 0 10px rgb(255 201 60 / 28%);
-}
-
-.portal-wordmark__edition-rule--end {
-  transform: scaleX(-1);
-}
-
-.portal-wordmark__year {
-  display: inline-flex;
-  align-items: center;
-}
-
-.portal-wordmark__digit {
-  display: inline-block;
-  background: linear-gradient(180deg, #fff9cf 0%, #ffdc68 44%, #e8a126 100%);
-  background-clip: text;
-  color: transparent;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  -webkit-text-stroke: 0.45px rgb(255 248 198 / 34%);
-  text-shadow:
-    0 0 18px rgb(255 191 43 / 13%),
-    0 9px 22px rgb(0 5 17 / 44%);
-}
-
-.portal-wordmark__digit--2,
-.portal-wordmark__digit--3,
-.portal-wordmark__digit--4 {
-  margin-left: -0.065em;
-}
-
-.portal-wordmark__digit--1 {
-  transform: scaleX(0.97);
-}
-
-.portal-wordmark__digit--3 {
-  transform: scaleX(0.96);
-}
-
-.portal-wordmark__digit--4 {
-  transform: scaleX(0.98);
-}
-
 .fenasoja-portal__hub {
   display: grid;
   gap: 9px;
@@ -1057,17 +870,6 @@
   }
 }
 
-@keyframes portal-soybean-arrive {
-  from {
-    opacity: 0.72;
-    transform: translateY(-2px) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
 @keyframes portal-card-enter {
   from {
     opacity: 0;
@@ -1092,14 +894,6 @@
 
   .fenasoja-portal__hero-frame {
     min-height: 294px;
-  }
-
-  .portal-wordmark__name {
-    font-size: 6.6rem;
-  }
-
-  .portal-wordmark__edition {
-    font-size: 5rem;
   }
 
   .portal-primary-entry__control {
@@ -1133,14 +927,6 @@
   .fenasoja-portal__hero-frame {
     min-height: 252px;
     padding: 24px 22px 21px;
-  }
-
-  .portal-wordmark {
-    gap: clamp(20px, 3vw, 32px);
-  }
-
-  .portal-identity {
-    width: min(100%, 760px);
   }
 
   .portal-primary-entry__control {
@@ -1237,28 +1023,6 @@
   .fenasoja-portal__hero-frame::after {
     width: 46px;
     height: 28px;
-  }
-
-  .portal-identity {
-    gap: 11px;
-  }
-
-  .portal-wordmark {
-    flex-direction: column;
-    gap: 9px;
-  }
-
-  .portal-wordmark__name {
-    font-size: clamp(2.65rem, 13vw, 4.1rem);
-  }
-
-  .portal-wordmark__edition {
-    gap: 12px;
-    font-size: clamp(2.15rem, 9.9vw, 3.1rem);
-  }
-
-  .portal-wordmark__edition-rule {
-    width: 28px;
   }
 
   .fenasoja-portal__hub {
@@ -1376,14 +1140,6 @@
     padding-inline: 8px;
   }
 
-  .portal-wordmark__name {
-    font-size: 2.68rem;
-  }
-
-  .portal-wordmark__edition {
-    font-size: 2.12rem;
-  }
-
   .fenasoja-portal__hero-frame {
     min-height: 220px;
   }
@@ -1413,23 +1169,6 @@
     padding-block: 18px 14px;
   }
 
-  .portal-wordmark {
-    flex-direction: row;
-    gap: clamp(18px, 3vw, 30px);
-  }
-
-  .portal-wordmark__name {
-    font-size: clamp(3.05rem, 7.2vw, 3.8rem);
-  }
-
-  .portal-wordmark__edition {
-    font-size: clamp(2.4rem, 5.5vw, 3rem);
-  }
-
-  .portal-identity {
-    gap: 9px;
-  }
-
   .portal-commissions-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -1452,18 +1191,6 @@
   .fenasoja-portal__hero-frame {
     min-height: 196px;
     padding-block: 20px 16px;
-  }
-
-  .portal-wordmark__name {
-    font-size: clamp(3.35rem, 5.2vw, 4.45rem);
-  }
-
-  .portal-wordmark__edition {
-    font-size: clamp(2.7rem, 4vw, 3.5rem);
-  }
-
-  .portal-identity {
-    gap: 10px;
   }
 
   .portal-primary-entry__control {
@@ -1522,19 +1249,6 @@
     color: CanvasText;
   }
 
-  .portal-wordmark__letter,
-  .portal-wordmark__digit {
-    background: none;
-    color: CanvasText;
-    -webkit-text-fill-color: CanvasText;
-    -webkit-text-stroke: 0;
-    text-shadow: none;
-  }
-
-  .portal-soybean__grain {
-    forced-color-adjust: none;
-  }
-
   .portal-primary-entry__control:focus-visible,
   .portal-destination-card:focus-visible,
   .commission-access-card:focus-visible,
@@ -1543,97 +1257,121 @@
   }
 }
 
-/* Integrated institutional hero: static brand + one shared live countdown. */
+/* Institutional hero: single premium countdown surface. */
 .fenasoja-portal__hero-frame {
   min-height: 0;
-  grid-template-columns: minmax(0, 1.08fr) minmax(380px, 0.92fr);
+  grid-template-columns: minmax(0, 1fr);
   align-items: center;
-  gap: clamp(20px, 2.5vw, 36px);
-  padding: clamp(20px, 2vw, 26px) clamp(26px, 3.1vw, 40px);
-}
-
-.fenasoja-portal__hero-brand {
-  position: relative;
-  display: grid;
-  min-width: 0;
-  min-height: 168px;
-  place-items: center;
-  overflow: clip;
-  border-radius: 15px;
-  padding: 8px 4px 6px;
-}
-
-.fenasoja-portal__hero-brand .portal-identity {
-  width: min(100%, 600px);
   gap: 0;
-}
-
-.fenasoja-portal__hero-brand .portal-wordmark {
-  flex-direction: column;
-  gap: clamp(4px, 0.65vw, 9px);
-}
-
-.fenasoja-portal__hero-brand .portal-wordmark__name {
-  font-size: clamp(2.9rem, 4.25vw, 4.05rem);
-}
-
-.fenasoja-portal__hero-brand .portal-wordmark__edition {
-  gap: clamp(10px, 1.3vw, 18px);
-  font-size: clamp(2rem, 2.75vw, 2.6rem);
+  padding: clamp(18px, 2.4vw, 34px) clamp(16px, 3.4vw, 46px);
 }
 
 .portal-official-countdown {
-  --fenasoja-hero-gold: 47 98% 60%;
+  --countdown-gold: 44 96% 62%;
+  --countdown-gold-soft: 46 100% 78%;
   position: relative;
   z-index: 3;
   display: grid;
+  width: min(100%, 940px);
   min-width: 0;
-  align-content: center;
-  gap: 10px;
-  border-left: 1px solid rgb(255 221 112 / 24%);
-  padding: 2px 0 2px clamp(20px, 2.2vw, 28px);
-}
-
-.portal-official-countdown::before {
-  position: absolute;
-  top: 14%;
-  bottom: 14%;
-  left: -1px;
-  width: 1px;
-  background: linear-gradient(transparent, rgb(255 220 105 / 74%), transparent);
-  box-shadow: 0 0 14px rgb(255 203 58 / 22%);
-  content: '';
+  justify-items: center;
+  gap: clamp(12px, 1.5vw, 20px);
+  margin-inline: auto;
 }
 
 .portal-official-countdown__intro {
   display: grid;
+  width: 100%;
   min-width: 0;
-  gap: 5px;
+  justify-items: center;
+  gap: clamp(8px, 1vw, 13px);
 }
 
-.portal-official-countdown__intro > p:first-child {
+.portal-official-countdown__intro #portal-official-countdown-title {
+  position: relative;
   margin: 0;
-  color: #ffe078;
-  font-size: 0.62rem;
-  font-weight: 850;
-  letter-spacing: 0.13em;
+  animation: portal-countdown-title-in 620ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  background: linear-gradient(
+    180deg,
+    hsl(var(--countdown-gold-soft)) 0%,
+    hsl(var(--countdown-gold)) 46%,
+    #d69b16 100%
+  );
+  background-clip: text;
+  color: transparent;
+  font-size: clamp(1.05rem, 2.9vw, 2.05rem);
+  font-weight: 900;
+  letter-spacing: clamp(0.06em, 0.5vw, 0.12em);
+  line-height: 1.05;
+  text-align: center;
   text-transform: uppercase;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.portal-official-countdown__intro #portal-official-countdown-title::after {
+  position: absolute;
+  z-index: -1;
+  inset: -0.4em -0.6em;
+  background: radial-gradient(ellipse at 50% 50%, hsl(var(--countdown-gold) / 16%), transparent 68%);
+  content: '';
+  pointer-events: none;
+}
+
+.portal-official-countdown__spark {
+  display: flex;
+  width: min(100%, 560px);
+  align-items: center;
+  justify-content: center;
+  animation: portal-countdown-spark-in 700ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  gap: 10px;
+}
+
+.portal-official-countdown__spark::before,
+.portal-official-countdown__spark::after {
+  height: 1px;
+  flex: 1 1 auto;
+  content: '';
+}
+
+.portal-official-countdown__spark::before {
+  background: linear-gradient(90deg, transparent, hsl(var(--countdown-gold) / 62%));
+}
+
+.portal-official-countdown__spark::after {
+  background: linear-gradient(90deg, hsl(var(--countdown-gold) / 62%), transparent);
+}
+
+.portal-official-countdown__spark > span {
+  width: 9px;
+  height: 9px;
+  flex: 0 0 auto;
+  background: hsl(var(--countdown-gold-soft));
+  box-shadow: 0 0 14px hsl(var(--countdown-gold) / 70%);
+  clip-path: polygon(50% 0%, 60% 40%, 100% 50%, 60% 60%, 50% 100%, 40% 60%, 0% 50%, 40% 40%);
 }
 
 .portal-official-countdown__date {
-  display: flex;
+  display: inline-flex;
   min-width: 0;
+  max-width: 100%;
   align-items: center;
-  gap: 7px;
+  gap: 10px;
   margin: 0;
+  animation: portal-countdown-title-in 660ms cubic-bezier(0.16, 1, 0.3, 1) 90ms both;
+  border: 1px solid hsl(var(--countdown-gold) / 34%);
+  border-radius: 999px;
+  padding: clamp(6px, 0.8vw, 10px) clamp(14px, 1.7vw, 22px);
+  background: linear-gradient(180deg, rgb(255 255 255 / 5%), rgb(255 255 255 / 1%)), rgb(3 20 44 / 62%);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 8%);
   color: #f7f8fb;
 }
 
 .portal-official-countdown__date > svg {
-  width: 16px;
-  height: 16px;
+  width: clamp(17px, 1.6vw, 22px);
+  height: clamp(17px, 1.6vw, 22px);
   flex: 0 0 auto;
-  color: var(--portal-gold);
+  color: hsl(var(--countdown-gold));
 }
 
 .portal-official-countdown__date-line {
@@ -1641,89 +1379,133 @@
   min-width: 0;
   flex-wrap: wrap;
   align-items: baseline;
-  gap: 2px 4px;
+  gap: 2px 7px;
 }
 
 .portal-official-countdown__date strong {
-  font-size: 0.74rem;
-  font-weight: 760;
+  font-size: clamp(0.82rem, 1.4vw, 1.08rem);
+  font-weight: 800;
+  letter-spacing: -0.01em;
 }
 
 .portal-official-countdown__date small {
-  color: var(--portal-subtle);
-  font-size: 0.6rem;
+  color: rgb(197 212 230 / 88%);
+  font-size: clamp(0.68rem, 1.05vw, 0.86rem);
   font-weight: 650;
 }
 
 .portal-official-countdown .fenasoja-countdown-grid {
-  gap: 6px;
+  width: 100%;
+  gap: clamp(8px, 1.1vw, 16px);
 }
 
 .portal-official-countdown .fenasoja-countdown-unit {
-  min-height: 64px;
-  border-color: rgb(175 201 228 / 20%);
-  border-radius: 9px;
-  padding: 6px 4px 5px;
+  min-height: clamp(96px, 10vw, 150px);
+  border: 1px solid hsl(var(--countdown-gold) / 42%);
+  border-radius: clamp(12px, 1.2vw, 18px);
+  padding: clamp(10px, 1.1vw, 16px) 6px clamp(8px, 0.9vw, 13px);
   background:
-    linear-gradient(180deg, rgb(255 255 255 / 5%), rgb(255 255 255 / 1.5%)),
-    rgb(2 19 42 / 66%);
+    radial-gradient(ellipse at 50% -8%, rgb(88 152 255 / 22%), transparent 62%),
+    linear-gradient(180deg, rgb(255 255 255 / 6%), rgb(255 255 255 / 1%) 55%, rgb(0 0 0 / 16%)),
+    rgb(3 19 44 / 82%);
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 7%),
-    0 12px 22px -21px rgb(0 0 0 / 92%);
-}
-
-.portal-official-countdown .fenasoja-countdown-unit[data-unit='seconds'] {
-  border-color: rgb(255 211 92 / 44%);
-  background:
-    radial-gradient(circle at 50% -18%, rgb(255 211 92 / 16%), transparent 58%),
-    rgb(2 19 42 / 76%);
+    0 24px 42px -32px rgb(0 0 0 / 92%),
+    inset 0 1px 0 rgb(255 255 255 / 12%),
+    inset 0 -1px 0 rgb(0 0 0 / 46%);
 }
 
 .portal-official-countdown .fenasoja-countdown-unit::before {
-  inset: 7px 18% auto;
-  opacity: 0.55;
+  z-index: 1;
+  inset: clamp(6px, 0.6vw, 9px) 30% auto;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgb(150 196 255 / 92%), transparent);
+  box-shadow: 0 0 16px rgb(120 175 255 / 60%);
+  opacity: 1;
 }
 
 .portal-official-countdown .fenasoja-countdown-unit::after {
-  inset: auto 28% 6px;
+  z-index: 1;
+  inset: auto 24% clamp(24px, 2.4vw, 34px);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, hsl(var(--countdown-gold) / 78%), transparent);
+  box-shadow: 0 0 12px hsl(var(--countdown-gold) / 46%);
+}
+
+.portal-official-countdown .fenasoja-countdown-unit[data-unit='seconds'] {
+  border-color: hsl(var(--countdown-gold) / 52%);
+  background:
+    radial-gradient(ellipse at 50% -8%, rgb(88 152 255 / 22%), transparent 62%),
+    linear-gradient(180deg, hsl(var(--countdown-gold) / 8%), transparent 58%),
+    rgb(3 19 44 / 84%);
 }
 
 .portal-official-countdown .fenasoja-countdown-value {
-  font-size: clamp(1.5rem, 2vw, 2.15rem);
+  color: #ffd75e;
+  font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+  font-size: clamp(2.3rem, 6.4vw, 4.6rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  text-indent: 0;
+  text-shadow: none;
+  filter: drop-shadow(0 8px 14px rgb(0 0 0 / 45%));
+}
+
+.portal-official-countdown .fenasoja-countdown-value-glyph {
+  background: linear-gradient(
+    180deg,
+    #fff3c4 0%,
+    hsl(var(--countdown-gold)) 42%,
+    #e0a41c 72%,
+    #f8db85 100%
+  );
+  background-clip: text;
+  color: transparent;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
 .portal-official-countdown .fenasoja-countdown-unit-label {
-  margin-top: 4px;
-  color: #b9c8da;
-  font-size: 0.48rem;
-  letter-spacing: 0.12em;
+  margin-top: clamp(8px, 1vw, 14px);
+  color: rgb(212 226 244 / 92%);
+  font-size: clamp(0.56rem, 1.05vw, 0.8rem);
+  font-weight: 800;
+  letter-spacing: 0.22em;
 }
 
 .portal-official-countdown__expand {
   display: inline-flex;
-  min-height: 44px;
+  min-height: clamp(46px, 4.4vw, 60px);
   align-items: center;
   justify-content: center;
-  justify-self: end;
-  gap: 7px;
-  border: 1px solid rgb(255 211 92 / 40%);
-  border-radius: 10px;
-  padding: 0 14px;
-  background: rgb(255 211 92 / 7%);
-  color: #fff7d9;
-  font-size: 0.68rem;
-  font-weight: 800;
+  justify-self: center;
+  gap: 12px;
+  border: 1px solid #fff0b8;
+  border-radius: 999px;
+  padding: 0 clamp(20px, 2.6vw, 38px);
+  background: linear-gradient(180deg, #ffe488 0%, hsl(var(--countdown-gold)) 45%, #e5a615 100%);
+  box-shadow:
+    0 18px 34px -22px hsl(var(--countdown-gold) / 70%),
+    inset 0 1px 0 rgb(255 255 255 / 62%),
+    inset 0 -2px 0 rgb(140 92 0 / 32%);
+  color: #08192f;
+  font-size: clamp(0.82rem, 1.3vw, 1.02rem);
+  font-weight: 850;
+  letter-spacing: 0.01em;
   touch-action: manipulation;
   transition:
-    border-color 180ms ease,
-    background-color 180ms ease,
+    box-shadow 180ms ease,
+    filter 180ms ease,
     transform 180ms ease;
 }
 
 .portal-official-countdown__expand > svg {
-  width: 14px;
-  height: 14px;
-  color: var(--portal-gold);
+  width: clamp(26px, 2.4vw, 32px);
+  height: clamp(26px, 2.4vw, 32px);
+  flex: 0 0 auto;
+  border-radius: 999px;
+  padding: 6px;
+  background: #08192f;
+  color: #ffd75e;
 }
 
 .portal-official-countdown__expand:focus-visible {
@@ -1733,111 +1515,93 @@
 
 .portal-official-countdown__expand:disabled {
   cursor: wait;
-  opacity: 0.72;
+  opacity: 0.76;
 }
 
 .portal-official-countdown__error {
   margin: 0;
   border: 1px solid rgb(253 230 138 / 34%);
-  border-radius: 10px;
-  padding: 12px;
-  background: rgb(253 230 138 / 7%);
+  border-radius: 12px;
+  padding: 12px 16px;
+  background: rgb(253 230 138 / 8%);
   color: #fff1b8;
-  font-size: 0.78rem;
+  font-size: 0.82rem;
   line-height: 1.45;
+  text-align: center;
+}
+
+@keyframes portal-countdown-title-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes portal-countdown-spark-in {
+  from {
+    opacity: 0;
+    transform: scaleX(0.72);
+  }
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+  }
 }
 
 @media (hover: hover) and (pointer: fine) {
   .portal-official-countdown__expand:hover:not(:disabled) {
-    border-color: rgb(255 211 92 / 68%);
-    background: rgb(255 211 92 / 12%);
+    filter: brightness(1.05);
+    box-shadow:
+      0 22px 40px -20px hsl(var(--countdown-gold) / 82%),
+      inset 0 1px 0 rgb(255 255 255 / 70%);
     transform: translateY(-1px);
   }
 }
 
-@media (max-width: 1080px) and (min-width: 901px) {
-  .fenasoja-portal__hero-frame {
-    grid-template-columns: minmax(0, 0.98fr) minmax(368px, 1.02fr);
-    gap: 20px;
-    padding-inline: 22px;
-  }
+/* Premium metallic wordmark in the portal top bar. */
+.fenasoja-portal__header .fenasoja-brand__wordmark {
+  font-size: clamp(1.15rem, 2.1vw, 1.6rem);
+  line-height: 1.05;
+  background: linear-gradient(180deg, #ffffff 0%, #dfe9f6 42%, #9fb3cc 66%, #f2f7ff 100%);
+  background-clip: text;
+  color: transparent;
+  letter-spacing: -0.035em;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 1px 0 rgb(255 255 255 / 35%)) drop-shadow(0 6px 12px rgb(0 0 0 / 55%));
+}
 
-  .fenasoja-portal__hero-brand {
-    min-height: 156px;
-  }
+.fenasoja-portal__header .fenasoja-brand__edition {
+  padding: clamp(3px, 0.4vw, 5px) clamp(9px, 1vw, 14px);
+  font-size: clamp(0.66rem, 1vw, 0.84rem);
+  border: 1px solid rgb(255 196 120 / 72%);
+  background: linear-gradient(180deg, #ffb35c 0%, #f7852a 58%, #e0691a 100%);
+  box-shadow:
+    0 0 18px rgb(247 133 42 / 42%),
+    inset 0 1px 0 rgb(255 255 255 / 46%),
+    inset 0 -2px 0 rgb(120 52 0 / 26%);
+  color: #0b1a30;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+}
 
-  .fenasoja-portal__hero-brand .portal-wordmark__name {
-    font-size: clamp(2.8rem, 4.55vw, 3.5rem);
-  }
+.fenasoja-portal__header .fenasoja-brand__mark {
+  width: clamp(38px, 3.4vw, 48px);
+  height: clamp(38px, 3.4vw, 48px);
+  filter: drop-shadow(0 0 12px rgb(120 175 255 / 30%));
+}
 
-  .fenasoja-portal__hero-brand .portal-wordmark__edition {
-    font-size: clamp(1.95rem, 2.9vw, 2.4rem);
-  }
-
+.fenasoja-portal__header .fenasoja-brand__wordmark:not(.truncate) {
+  overflow: visible;
 }
 
 @media (max-width: 900px) {
   .fenasoja-portal__hero-frame {
-    min-height: 0;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 8px;
-    padding: 16px 20px 14px;
-  }
-
-  .fenasoja-portal__hero-brand {
-    min-height: 116px;
-    padding: 4px;
-  }
-
-  .fenasoja-portal__hero-brand .portal-identity {
-    width: min(100%, 680px);
-  }
-
-  .fenasoja-portal__hero-brand .portal-wordmark {
-    flex-direction: row;
-    gap: clamp(16px, 2.8vw, 26px);
-  }
-
-  .fenasoja-portal__hero-brand .portal-wordmark__name {
-    font-size: clamp(2.7rem, 7.2vw, 3.65rem);
-  }
-
-  .fenasoja-portal__hero-brand .portal-wordmark__edition {
-    font-size: clamp(1.9rem, 4.8vw, 2.5rem);
-  }
-
-  .portal-official-countdown {
-    grid-template-areas:
-      'intro action'
-      'clock clock';
-    grid-template-columns: minmax(0, 1fr) auto;
-    border-top: 1px solid rgb(255 221 112 / 22%);
-    border-left: 0;
-    gap: 8px;
-    padding: 11px 0 0;
-  }
-
-  .portal-official-countdown::before {
-    top: -1px;
-    right: 18%;
-    bottom: auto;
-    left: 18%;
-    width: auto;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgb(255 220 105 / 68%), transparent);
-  }
-
-  .portal-official-countdown__intro {
-    grid-area: intro;
-  }
-
-  .portal-official-countdown .fenasoja-countdown-grid {
-    grid-area: clock;
-  }
-
-  .portal-official-countdown__expand {
-    grid-area: action;
-    align-self: center;
+    padding: 18px 16px 16px;
   }
 }
 
@@ -1848,8 +1612,7 @@
   }
 
   .fenasoja-portal__hero-frame {
-    gap: 7px;
-    padding: 12px 11px;
+    padding: 16px 12px 14px;
   }
 
   .fenasoja-portal__hero-frame::before,
@@ -1868,73 +1631,30 @@
     bottom: 9px;
   }
 
-  .fenasoja-portal__hero-brand {
-    min-height: 92px;
-    padding: 2px;
-  }
-
-  .fenasoja-portal__hero-brand .portal-wordmark {
-    flex-direction: column;
-    gap: 3px;
-  }
-
-  .fenasoja-portal__hero-brand .portal-wordmark__name {
-    font-size: clamp(2.15rem, 10.8vw, 2.85rem);
-  }
-
-  .fenasoja-portal__hero-brand .portal-wordmark__edition {
-    gap: 8px;
-    font-size: clamp(1.55rem, 7vw, 1.95rem);
-  }
-
-  .fenasoja-portal__hero-brand .portal-wordmark__edition-rule {
-    width: 20px;
-  }
-
   .portal-official-countdown {
-    grid-template-areas:
-      'intro'
-      'clock'
-      'action';
-    grid-template-columns: minmax(0, 1fr);
-    gap: 7px;
-    padding-top: 10px;
-  }
-
-  .portal-official-countdown__intro {
-    gap: 3px;
-  }
-
-  .portal-official-countdown__intro > p:first-child {
-    font-size: 0.56rem;
-  }
-
-  .portal-official-countdown__date strong {
-    font-size: 0.68rem;
-  }
-
-  .portal-official-countdown__date small {
-    font-size: 0.6rem;
+    gap: 11px;
   }
 
   .portal-official-countdown .fenasoja-countdown-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 5px;
+    gap: 8px;
   }
 
   .portal-official-countdown .fenasoja-countdown-unit {
-    min-height: 52px;
-    border-radius: 8px;
-    padding-block: 4px;
+    min-height: 84px;
   }
 
   .portal-official-countdown .fenasoja-countdown-value {
-    font-size: clamp(1.45rem, 7.2vw, 1.82rem);
+    font-size: clamp(2rem, 11vw, 2.9rem);
+  }
+
+  .portal-official-countdown .fenasoja-countdown-unit::after {
+    inset: auto 26% 22px;
   }
 
   .portal-official-countdown .fenasoja-countdown-unit-label {
-    margin-top: 3px;
-    font-size: 0.46rem;
+    margin-top: 6px;
+    letter-spacing: 0.18em;
   }
 
   .portal-official-countdown__expand {
@@ -1943,104 +1663,28 @@
   }
 }
 
-@media (max-width: 380px) {
-  .fenasoja-portal__hero-frame {
-    min-height: 0;
-    padding-inline: 9px;
-  }
-
-  .fenasoja-portal__hero-brand {
-    min-height: 88px;
-  }
-
-  .fenasoja-portal__hero-brand .portal-wordmark__name {
-    font-size: 2.18rem;
-  }
-
-  .fenasoja-portal__hero-brand .portal-wordmark__edition {
-    font-size: 1.55rem;
-  }
-
-}
-
-@media (min-width: 720px) and (max-width: 900px) and (orientation: landscape) {
-  .fenasoja-portal__hero-frame {
-    grid-template-columns: minmax(0, 0.9fr) minmax(374px, 1.1fr);
-    align-items: center;
-    gap: 18px;
-    padding: 14px 20px;
-  }
-
-  .fenasoja-portal__hero-brand {
-    min-height: 120px;
-  }
-
-  .fenasoja-portal__hero-brand .portal-wordmark {
-    flex-direction: column;
-    gap: 7px;
-  }
-
-  .fenasoja-portal__hero-brand .portal-wordmark__name {
-    font-size: clamp(2.45rem, 5.6vw, 3rem);
-  }
-
-  .fenasoja-portal__hero-brand .portal-wordmark__edition {
-    font-size: clamp(1.75rem, 4vw, 2.15rem);
-  }
-
-  .portal-official-countdown {
-    grid-template-areas:
-      'intro action'
-      'clock clock';
-    grid-template-columns: minmax(0, 1fr) auto;
-    border-top: 0;
-    border-left: 1px solid rgb(255 221 112 / 24%);
-    padding: 4px 0 4px 18px;
-  }
-
-  .portal-official-countdown::before {
-    top: 12%;
-    right: auto;
-    bottom: 12%;
-    left: -1px;
-    width: 1px;
-    height: auto;
-    background: linear-gradient(transparent, rgb(255 220 105 / 68%), transparent);
-  }
-
-  .portal-official-countdown .fenasoja-countdown-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-}
-
 @media (min-width: 901px) and (max-height: 780px) {
   .fenasoja-portal__hero-frame {
     min-height: 0;
-    padding-block: 16px;
-  }
-
-  .fenasoja-portal__hero-brand {
-    min-height: 145px;
-  }
-
-  .fenasoja-portal__hero-brand .portal-wordmark__name {
-    font-size: clamp(2.8rem, 3.9vw, 3.5rem);
-  }
-
-  .fenasoja-portal__hero-brand .portal-wordmark__edition {
-    font-size: clamp(1.95rem, 2.6vw, 2.35rem);
+    padding-block: 18px;
   }
 
   .portal-official-countdown .fenasoja-countdown-unit {
-    min-height: 58px;
+    min-height: clamp(88px, 8vw, 112px);
   }
 
   .portal-official-countdown .fenasoja-countdown-value {
-    font-size: clamp(1.48rem, 1.8vw, 1.92rem);
+    font-size: clamp(2.1rem, 3.6vw, 3.1rem);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .portal-official-countdown__intro #portal-official-countdown-title,
+  .portal-official-countdown__spark,
+  .portal-official-countdown__date {
+    animation: none !important;
+  }
+
   .portal-official-countdown__expand {
     transition-duration: 0.01ms !important;
   }
@@ -2048,15 +1692,14 @@
 
 @media (prefers-reduced-transparency: reduce) {
   .portal-official-countdown .fenasoja-countdown-unit,
-  .portal-official-countdown__expand {
+  .portal-official-countdown__date {
     background: #031a38;
   }
 }
 
 @media (prefers-contrast: more) {
-  .portal-official-countdown,
   .portal-official-countdown .fenasoja-countdown-unit,
-  .portal-official-countdown__expand {
+  .portal-official-countdown__date {
     border-color: #ffe07a;
   }
 
@@ -2067,8 +1710,8 @@
 }
 
 @media (forced-colors: active) {
-  .portal-official-countdown,
   .portal-official-countdown .fenasoja-countdown-unit,
+  .portal-official-countdown__date,
   .portal-official-countdown__expand,
   .portal-official-countdown__error {
     border: 1px solid CanvasText;
@@ -2076,7 +1719,30 @@
     color: CanvasText;
   }
 
-  .portal-official-countdown::before {
-    display: none;
+  .portal-official-countdown__intro #portal-official-countdown-title,
+  .portal-official-countdown .fenasoja-countdown-value-glyph {
+    background: none;
+    color: CanvasText;
+    -webkit-text-fill-color: CanvasText;
+  }
+}
+
+
+@media (max-width: 640px) {
+  .fenasoja-portal__header .fenasoja-brand__wordmark {
+    font-size: 1.02rem;
+    letter-spacing: 0.01em;
+    overflow: visible;
+    text-overflow: clip;
+  }
+
+  .fenasoja-portal__header .fenasoja-brand__mark {
+    width: 34px;
+    height: 34px;
+  }
+
+  .fenasoja-portal__header .fenasoja-brand__edition {
+    padding: 2px 8px;
+    font-size: 0.62rem;
   }
 }

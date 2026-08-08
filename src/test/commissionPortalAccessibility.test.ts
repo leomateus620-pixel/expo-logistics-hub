@@ -6,7 +6,7 @@ const accessNavigationStyles = readFileSync(resolve('src/styles/portal-access-na
 const countdownStyles = readFileSync(resolve('src/styles/official-countdown-digits.css'), 'utf8');
 const countdownDigits = readFileSync(resolve('src/components/countdown/OfficialCountdownDigits.tsx'), 'utf8');
 const portalPage = readFileSync(resolve('src/pages/commissions/CommissionPortalPage.tsx'), 'utf8');
-const portalWordmark = readFileSync(resolve('src/components/portal/FenasojaPortalWordmark.tsx'), 'utf8');
+const portalHero = readFileSync(resolve('src/components/portal/FenasojaPortalHero.tsx'), 'utf8');
 const primaryEntry = readFileSync(resolve('src/components/portal/PortalPrimaryEntry.tsx'), 'utf8');
 const destinationCard = readFileSync(resolve('src/components/portal/PortalDestinationCard.tsx'), 'utf8');
 const commissionCard = readFileSync(resolve('src/components/commissions/CommissionCard.tsx'), 'utf8');
@@ -170,7 +170,7 @@ describe('acessibilidade visual do hub Fenasoja', () => {
     expect(portalStyles).not.toContain('portal-identity-card-arrive');
     expect(portalStyles).not.toContain('portal-root-node-breathe');
     expect(portalStyles).not.toContain('portal-root-scene-reveal');
-    expect(portalWordmark).not.toMatch(/animateMotion|useReducedMotionPreference/);
+    expect(portalHero).not.toMatch(/animateMotion|useReducedMotionPreference/);
   });
 
   it('mantém a camada premium escopada, sem transições genéricas ou hover em dispositivos touch', () => {
@@ -276,23 +276,20 @@ describe('acessibilidade visual do hub Fenasoja', () => {
     }
   });
 
-  it('mantém a soja como foco sem raízes, badge ou narrativa ilustrativa', () => {
-    expect(portalWordmark).not.toMatch(/portal-root|data-portal-root|portal-soybean__roots/);
-    expect(portalWordmark).not.toMatch(/portal-identity__card|Gestão Operacional/);
-    expect(portalWordmark).not.toMatch(/data-root-scene|data-root-between|data-root-zone-boundary/);
-    expect(portalWordmark).not.toMatch(/data-root-illustrations|data-world-soybean|animateMotion/);
-    expect(portalWordmark).not.toMatch(/<img|<text|\.webp|portal-story/);
-    expect(portalWordmark).not.toMatch(/framer-motion|@react-spring|gsap/);
+  it('mantém o hero focado apenas na contagem oficial', () => {
+    expect(portalHero).not.toMatch(/FenasojaPortalWordmark|portal-soybean|portal-wordmark/);
+    expect(portalHero).not.toMatch(/<img|<text|\.webp|portal-story/);
+    expect(portalHero).not.toMatch(/framer-motion|@react-spring|gsap/);
+    expect(portalHero).toContain('OfficialCountdownCompact');
+    expect(portalStyles).not.toContain('.portal-wordmark');
   });
 
   it('integra uma única contagem responsiva sem duplicar marca ou timer', () => {
     expect(portalPage).toContain("import { FenasojaPortalHero }");
     expect(portalPage).not.toContain('FenasojaCountdownHero');
     expect(portalStyles).toContain('.portal-official-countdown');
-    expect(portalStyles).toContain('grid-template-columns: minmax(0, 1.08fr) minmax(380px, 0.92fr)');
     expect(portalStyles).toContain('grid-template-columns: repeat(2, minmax(0, 1fr))');
-    expect(portalStyles).toContain('min-height: 44px');
-    expect(portalStyles).toContain('min-height: 52px');
+    expect(portalStyles).toContain('@keyframes portal-countdown-title-in');
     expect(portalStyles).toContain('@media (min-width: 901px) and (max-height: 780px)');
     expect(countdownStyles).toContain('font-variant-numeric: tabular-nums lining-nums');
     expect(countdownDigits).toContain('aria-live="off"');

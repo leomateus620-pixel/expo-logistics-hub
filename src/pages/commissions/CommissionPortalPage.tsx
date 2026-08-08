@@ -271,7 +271,9 @@ export default function CommissionPortalPage() {
 
       <main className="fenasoja-portal__shell">
         <header className="fenasoja-portal__header portal-reveal">
+          <h1 className="sr-only">FENASOJA 2028</h1>
           <FenasojaBrand
+
             className="fenasoja-portal__brand-standard"
             subtitle="Sistema integrado de gestão"
             tone="dark"
