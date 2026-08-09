@@ -1,0 +1,540 @@
+import type {
+  BudgetAttentionStatus,
+  CommissionBudget,
+  CommissionBudgetSource,
+  ExpenseCategory,
+  FinancialExpense,
+  FinancialExpenseSourceRow,
+  FinancialRevenue,
+  FinancialScenario,
+  FinancialSemanticStatus,
+  FundingType,
+  GeneralBudgetItem,
+  GeneralBudgetItemKind,
+  ScenarioId,
+  Sponsor,
+  SponsorTier,
+} from '../types';
+import { roundCurrency } from '../utils/financialFormatters';
+
+const SPONSOR_TIER_ORDER: readonly SponsorTier[] = [
+  'Grão de Ouro',
+  'Ouro',
+  'Prata',
+  'Bronze',
+  'Soy Summit',
+  'Outros Apoios',
+  'Não classificado',
+];
+
+export type ExpenseFundingSource = 'free-resource' | 'municipality-plan' | 'rouanet';
+
+export interface RevenueTotals {
+  projectedAmount: number;
+  consolidatedAmount: number;
+  /** Sum of the workbook's explicit A Receber field. Never inferred from the gap. */
+  explicitReceivableAmount: number;
+  consolidationGapAmount: number;
+  consolidationRate: number;
+}
+
+export interface ExpenseGroupSummary<Key extends string = string> {
+  key: Key;
+  label: string;
+  expenseCount: number;
+  value2025Amount: number;
+  value2026Amount: number;
+  realizedAmount: number;
+}
+
+export interface CommissionExpenseGroupSummary extends ExpenseGroupSummary {
+  budgetCap: number;
+  /** Orçado até o momento informado no cabeçalho da comissão. */
+  budgetedAmount: number;
+  remainingAmount: number;
+  utilizationPercentage: number;
+  status: BudgetAttentionStatus;
+}
+
+export interface ExpenseFundingSummary {
+  key: ExpenseFundingSource;
+  label: string;
+  amount: number;
+  /** Share only among the three registered source columns; not a share of realized expenses. */
+  registeredSharePercentage: number;
+}
+
+export type ExpenseLedgerMode = 'planning' | 'realized';
+export type ExpenseGroupingMode = 'commission' | 'category' | 'value' | 'period';
+
+export interface RevenueReceiptStatus {
+  status: FinancialSemanticStatus;
+  label: string;
+}
+
+export interface GeneralBudgetSummary {
+  kind: GeneralBudgetItemKind;
+  itemCount: number;
+  budgetCap: number;
+  budgetedAmount: number;
+  remainingAmount: number;
+}
+
+export interface RevenueGroupSummary<Key extends string = string> {
+  key: Key;
+  label: string;
+  revenueCount: number;
+  projectedAmount: number;
+  consolidatedAmount: number;
+  explicitReceivableAmount: number;
+  consolidationGapAmount: number;
+  consolidationRate: number;
+}
+
+export interface SponsorTotals {
+  sponsorCount: number;
+  declaredValue: number;
+  projectedFreeResource: number;
+  consolidatedFreeResource: number;
+  explicitReceivableAmount: number;
+  projectedRouanet: number;
+  consolidatedRouanet: number;
+  totalProjectedAmount: number;
+  totalConsolidatedAmount: number;
+  vehicleCredentials: number;
+  soySummitCredentials: number;
+  inKindContributionCount: number;
+}
+
+export interface SponsorTierDistribution extends SponsorTotals {
+  tier: SponsorTier;
+  sponsorSharePercentage: number;
+  projectedSharePercentage: number;
+}
+
+export interface FinancialScenarioSummary {
+  id: ScenarioId;
+  label: string;
+  commercialization: number;
+  exporural: number;
+  externalArea: number;
+  agroindustryPavilion: number;
+  foodPoints: number;
+  parking: number;
+  commercialRevenue: number;
+  freeSponsorship: number;
+  rouanetSponsorship: number;
+  sponsorshipRevenue: number;
+  totalRevenue: number;
+  operatingExecution: number;
+  historicalObligations: number;
+  reserve: number;
+  totalCommitments: number;
+  investmentCapacity: number;
+  negativeResult: number;
+}
+
+function roundPercentage(value: number): number {
+  if (!Number.isFinite(value)) return 0;
+  const sign = value < 0 ? -1 : 1;
+  return sign * (Math.round((Math.abs(value) + Number.EPSILON) * 100) / 100);
+}
+
+function sumCurrency(values: Iterable<number>): number {
+  let cents = 0;
+  for (const value of values) {
+    cents += Math.round(roundCurrency(value) * 100);
+  }
+  return roundCurrency(cents / 100);
+}
+
+function percentageOf(numerator: number, denominator: number): number {
+  if (!Number.isFinite(denominator) || denominator === 0) return 0;
+  return roundPercentage((numerator / denominator) * 100);
+}
+
+function normalizeExpense(expense: FinancialExpenseSourceRow): FinancialExpenseSourceRow {
+  return {
+    ...expense,
+    value2025: roundCurrency(expense.value2025),
+    value2026: roundCurrency(expense.value2026),
+    realizedAmount: roundCurrency(expense.realizedAmount),
+    paidWithFreeResource: roundCurrency(expense.paidWithFreeResource),
+    municipalityPlanAmount: roundCurrency(expense.municipalityPlanAmount),
+    rouanetAmount: roundCurrency(expense.rouanetAmount),
+    paidMarkerAmount: roundCurrency(expense.paidMarkerAmount),
+  };
+}
+
+export function selectRevenueTotals(revenues: readonly FinancialRevenue[]): RevenueTotals {
+  const projectedAmount = sumCurrency(revenues.map((revenue) => revenue.projectedAmount));
+  const consolidatedAmount = sumCurrency(revenues.map((revenue) => revenue.consolidatedAmount));
+
+  return {
+    projectedAmount,
+    consolidatedAmount,
+    explicitReceivableAmount: sumCurrency(revenues.map((revenue) => revenue.receivableAmount)),
+    consolidationGapAmount: roundCurrency(projectedAmount - consolidatedAmount),
+    consolidationRate: percentageOf(consolidatedAmount, projectedAmount),
+  };
+}
+
+export function calculateRevenueGap(revenue: FinancialRevenue): number {
+  return roundCurrency(revenue.projectedAmount - revenue.consolidatedAmount);
+}
+
+export function classifyRevenueConsolidationStatus(
+  revenue: FinancialRevenue,
+): FinancialSemanticStatus {
+  if (revenue.projectedAmount === 0 && revenue.consolidatedAmount === 0) return 'unreported';
+  if (revenue.consolidatedAmount >= revenue.projectedAmount) return 'consolidated';
+  if (revenue.consolidatedAmount > 0) return 'partial';
+  return 'projected';
+}
+
+export function selectRevenueReceiptStatus(revenue: FinancialRevenue): RevenueReceiptStatus {
+  if (revenue.receivableAmount !== 0) {
+    return { status: 'receivable', label: 'A receber informado' };
+  }
+  if (revenue.receivedOn !== undefined) {
+    return { status: 'realized', label: 'Data informada' };
+  }
+  return { status: 'unreported', label: 'NÃ£o informado' };
+}
+
+export function flattenCommissionExpenses(
+  commissionSources: readonly CommissionBudgetSource[],
+): FinancialExpense[] {
+  return commissionSources.flatMap((commission) => commission.expenses.map((sourceExpense) => ({
+    ...normalizeExpense(sourceExpense),
+    commissionId: commission.id,
+    commission: commission.commission,
+    commissionBudgetCap: roundCurrency(commission.budgetCap),
+    commissionBudgetedAmount: roundCurrency(commission.budgetedAmount),
+  })));
+}
+
+export function selectExpenseDisplayAmount(
+  expense: FinancialExpense,
+  mode: ExpenseLedgerMode,
+): number {
+  return mode === 'realized'
+    ? roundCurrency(expense.realizedAmount)
+    : sumCurrency([expense.value2025, expense.value2026]);
+}
+
+export function selectExpenseLedgerTotal(
+  expenses: readonly FinancialExpense[],
+  mode: ExpenseLedgerMode,
+): number {
+  return sumCurrency(expenses.map((expense) => selectExpenseDisplayAmount(expense, mode)));
+}
+
+export function sortExpensesForLedger(
+  expenses: readonly FinancialExpense[],
+  mode: ExpenseLedgerMode,
+  grouping: ExpenseGroupingMode,
+): FinancialExpense[] {
+  const amount = (expense: FinancialExpense) => selectExpenseDisplayAmount(expense, mode);
+  return [...expenses].sort((left, right) => {
+    if (grouping === 'category') {
+      return left.category.localeCompare(right.category, 'pt-BR') || amount(right) - amount(left);
+    }
+    if (grouping === 'value') return amount(right) - amount(left);
+    if (grouping === 'period') return right.value2026 - left.value2026;
+    return left.commission.localeCompare(right.commission, 'pt-BR') || amount(right) - amount(left);
+  });
+}
+
+export function selectGeneralBudgetSummaries(
+  items: readonly GeneralBudgetItem[],
+): GeneralBudgetSummary[] {
+  return (['historical-obligation', 'investment'] as const).map((kind) => {
+    const matching = items.filter((item) => item.kind === kind);
+    const budgetCap = sumCurrency(matching.map((item) => item.budgetCap));
+    const budgetedAmount = sumCurrency(matching.map((item) => item.budgetedAmount));
+    return {
+      kind,
+      itemCount: matching.length,
+      budgetCap,
+      budgetedAmount,
+      remainingAmount: roundCurrency(budgetCap - budgetedAmount),
+    };
+  });
+}
+
+export function calculateBudgetUtilization(budgetCap: number, budgetedAmount: number): number {
+  if (!Number.isFinite(budgetCap) || budgetCap <= 0) return 0;
+  return percentageOf(roundCurrency(budgetedAmount), roundCurrency(budgetCap));
+}
+
+/**
+ * Presentation-only thresholds from the product specification. They are not
+ * formal Fenasoja accounting rules.
+ */
+export function classifyBudgetStatus(
+  budgetCap: number,
+  budgetedAmount: number,
+): BudgetAttentionStatus {
+  const normalizedCap = roundCurrency(budgetCap);
+  const normalizedBudgeted = roundCurrency(budgetedAmount);
+
+  if (normalizedBudgeted > normalizedCap) return 'over-budget';
+  if (normalizedCap <= 0 && normalizedBudgeted === 0) return 'no-budget-cap';
+  if (normalizedCap <= 0) return 'normal';
+
+  const utilization = calculateBudgetUtilization(normalizedCap, normalizedBudgeted);
+  if (utilization >= 95) return 'near-limit';
+  if (utilization >= 80) return 'attention';
+  return 'normal';
+}
+
+export function selectCommissionBudgets(
+  commissionSources: readonly CommissionBudgetSource[],
+): CommissionBudget[] {
+  return commissionSources.map((commission) => {
+    const expenses = flattenCommissionExpenses([commission]);
+    const budgetCap = roundCurrency(commission.budgetCap);
+    const budgetedAmount = roundCurrency(commission.budgetedAmount);
+
+    return {
+      id: commission.id,
+      sourceLabel: commission.sourceLabel,
+      commission: commission.commission,
+      responsible: commission.responsible,
+      budgetCap,
+      budgetedAmount,
+      realizedAmount: sumCurrency(expenses.map((expense) => expense.realizedAmount)),
+      remainingAmount: roundCurrency(budgetCap - budgetedAmount),
+      utilizationPercentage: calculateBudgetUtilization(budgetCap, budgetedAmount),
+      status: classifyBudgetStatus(budgetCap, budgetedAmount),
+      expenseCount: expenses.length,
+      expenses,
+    };
+  });
+}
+
+export function selectOverBudgetCommissions(
+  budgets: readonly CommissionBudget[],
+): CommissionBudget[] {
+  return budgets.filter((budget) => budget.status === 'over-budget');
+}
+
+function groupExpenses<Key extends string>(
+  expenses: readonly FinancialExpense[],
+  resolveGroup: (expense: FinancialExpense) => { key: Key; label: string },
+): ExpenseGroupSummary<Key>[] {
+  const groups = new Map<Key, { label: string; expenses: FinancialExpense[] }>();
+
+  for (const expense of expenses) {
+    const { key, label } = resolveGroup(expense);
+    const current = groups.get(key);
+    if (current) current.expenses.push(expense);
+    else groups.set(key, { label, expenses: [expense] });
+  }
+
+  return Array.from(groups, ([key, group]) => ({
+    key,
+    label: group.label,
+    expenseCount: group.expenses.length,
+    value2025Amount: sumCurrency(group.expenses.map((expense) => expense.value2025)),
+    value2026Amount: sumCurrency(group.expenses.map((expense) => expense.value2026)),
+    realizedAmount: sumCurrency(group.expenses.map((expense) => expense.realizedAmount)),
+  }));
+}
+
+export function groupExpensesByCategory(
+  expenses: readonly FinancialExpense[],
+): ExpenseGroupSummary<ExpenseCategory>[] {
+  return groupExpenses(expenses, (expense) => ({
+    key: expense.category,
+    label: expense.category,
+  }));
+}
+
+export function groupExpensesByCommission(
+  expenses: readonly FinancialExpense[],
+): CommissionExpenseGroupSummary[] {
+  const periodGroups = groupExpenses(expenses, (expense) => ({
+    key: expense.commissionId,
+    label: expense.commission,
+  }));
+  const anchorByCommission = new Map<string, FinancialExpense>();
+
+  for (const expense of expenses) {
+    if (!anchorByCommission.has(expense.commissionId)) {
+      anchorByCommission.set(expense.commissionId, expense);
+    }
+  }
+
+  return periodGroups.map((group) => {
+    const anchor = anchorByCommission.get(group.key);
+    const budgetCap = roundCurrency(anchor?.commissionBudgetCap ?? 0);
+    const budgetedAmount = roundCurrency(anchor?.commissionBudgetedAmount ?? 0);
+
+    return {
+      ...group,
+      budgetCap,
+      budgetedAmount,
+      remainingAmount: roundCurrency(budgetCap - budgetedAmount),
+      utilizationPercentage: calculateBudgetUtilization(budgetCap, budgetedAmount),
+      status: classifyBudgetStatus(budgetCap, budgetedAmount),
+    };
+  });
+}
+
+export function groupExpensesByFundingSource(
+  expenses: readonly FinancialExpense[],
+): ExpenseFundingSummary[] {
+  const groups: Array<Omit<ExpenseFundingSummary, 'amount' | 'registeredSharePercentage'> & { values: number[] }> = [
+    {
+      key: 'free-resource',
+      label: 'Recurso Livre',
+      values: expenses.map((expense) => expense.paidWithFreeResource),
+    },
+    {
+      key: 'municipality-plan',
+      label: 'Prefeitura / Plano de Trabalho',
+      values: expenses.map((expense) => expense.municipalityPlanAmount),
+    },
+    {
+      key: 'rouanet',
+      label: 'Lei Rouanet',
+      values: expenses.map((expense) => expense.rouanetAmount),
+    },
+  ];
+  const total = sumCurrency(groups.flatMap((group) => group.values));
+
+  return groups.map(({ key, label, values }) => {
+    const amount = sumCurrency(values);
+    return {
+      key,
+      label,
+      amount,
+      registeredSharePercentage: percentageOf(amount, total),
+    };
+  });
+}
+
+function groupRevenues<Key extends string>(
+  revenues: readonly FinancialRevenue[],
+  resolveGroup: (revenue: FinancialRevenue) => { key: Key; label: string },
+): RevenueGroupSummary<Key>[] {
+  const groups = new Map<Key, { label: string; revenues: FinancialRevenue[] }>();
+
+  for (const revenue of revenues) {
+    const { key, label } = resolveGroup(revenue);
+    const current = groups.get(key);
+    if (current) current.revenues.push(revenue);
+    else groups.set(key, { label, revenues: [revenue] });
+  }
+
+  return Array.from(groups, ([key, group]) => ({
+    key,
+    label: group.label,
+    revenueCount: group.revenues.length,
+    ...selectRevenueTotals(group.revenues),
+  }));
+}
+
+export function groupRevenuesByCategory(
+  revenues: readonly FinancialRevenue[],
+): RevenueGroupSummary<FinancialRevenue['category']>[] {
+  return groupRevenues(revenues, (revenue) => ({
+    key: revenue.category,
+    label: revenue.category,
+  }));
+}
+
+export function groupRevenuesByFundingType(
+  revenues: readonly FinancialRevenue[],
+): RevenueGroupSummary<FundingType>[] {
+  return groupRevenues(revenues, (revenue) => ({
+    key: revenue.fundingType,
+    label: revenue.fundingType,
+  }));
+}
+
+function hasInKindContribution(sponsor: Sponsor): boolean {
+  if (typeof sponsor.inKindContribution === 'number') return sponsor.inKindContribution !== 0;
+  return Boolean(sponsor.inKindContribution?.trim());
+}
+
+export function selectSponsorTotals(sponsors: readonly Sponsor[]): SponsorTotals {
+  const projectedFreeResource = sumCurrency(sponsors.map((sponsor) => sponsor.projectedFreeResource));
+  const consolidatedFreeResource = sumCurrency(sponsors.map((sponsor) => sponsor.consolidatedFreeResource));
+  const projectedRouanet = sumCurrency(sponsors.map((sponsor) => sponsor.projectedRouanet));
+  const consolidatedRouanet = sumCurrency(sponsors.map((sponsor) => sponsor.consolidatedRouanet));
+
+  return {
+    sponsorCount: sponsors.length,
+    declaredValue: sumCurrency(sponsors.map((sponsor) => sponsor.declaredValue)),
+    projectedFreeResource,
+    consolidatedFreeResource,
+    explicitReceivableAmount: sumCurrency(sponsors.map((sponsor) => sponsor.receivableAmount)),
+    projectedRouanet,
+    consolidatedRouanet,
+    totalProjectedAmount: sumCurrency([projectedFreeResource, projectedRouanet]),
+    totalConsolidatedAmount: sumCurrency([consolidatedFreeResource, consolidatedRouanet]),
+    vehicleCredentials: sponsors.reduce((total, sponsor) => total + sponsor.vehicleCredentials, 0),
+    soySummitCredentials: sponsors.reduce((total, sponsor) => total + sponsor.soySummitCredentials, 0),
+    inKindContributionCount: sponsors.filter(hasInKindContribution).length,
+  };
+}
+
+export function selectSponsorTierDistribution(
+  sponsors: readonly Sponsor[],
+  includeEmpty = false,
+): SponsorTierDistribution[] {
+  const totals = selectSponsorTotals(sponsors);
+
+  return SPONSOR_TIER_ORDER.flatMap((tier) => {
+    const tierSponsors = sponsors.filter((sponsor) => sponsor.tier === tier);
+    if (!includeEmpty && tierSponsors.length === 0) return [];
+
+    const tierTotals = selectSponsorTotals(tierSponsors);
+    return [{
+      tier,
+      ...tierTotals,
+      sponsorSharePercentage: percentageOf(tierTotals.sponsorCount, totals.sponsorCount),
+      projectedSharePercentage: percentageOf(
+        tierTotals.totalProjectedAmount,
+        totals.totalProjectedAmount,
+      ),
+    }];
+  });
+}
+
+export function selectScenarioSummaries(
+  scenarios: readonly FinancialScenario[],
+): FinancialScenarioSummary[] {
+  return scenarios.map((scenario) => {
+    const freeSponsorship = roundCurrency(scenario.freeSponsorship);
+    const rouanetSponsorship = roundCurrency(scenario.rouanetSponsorship);
+    const operatingExecution = roundCurrency(scenario.operatingExecution);
+    const historicalObligations = roundCurrency(scenario.historicalObligations);
+    const reserve = roundCurrency(scenario.reserve);
+
+    return {
+      id: scenario.id,
+      label: scenario.label,
+      commercialization: roundCurrency(scenario.commercialization),
+      exporural: roundCurrency(scenario.exporural),
+      externalArea: roundCurrency(scenario.externalArea),
+      agroindustryPavilion: roundCurrency(scenario.agroindustryPavilion),
+      foodPoints: roundCurrency(scenario.foodPoints),
+      parking: roundCurrency(scenario.parking),
+      commercialRevenue: roundCurrency(scenario.commercialRevenue),
+      freeSponsorship,
+      rouanetSponsorship,
+      sponsorshipRevenue: sumCurrency([freeSponsorship, rouanetSponsorship]),
+      totalRevenue: roundCurrency(scenario.totalRevenue),
+      operatingExecution,
+      historicalObligations,
+      reserve,
+      totalCommitments: sumCurrency([operatingExecution, historicalObligations, reserve]),
+      investmentCapacity: roundCurrency(scenario.investmentCapacity),
+      negativeResult: roundCurrency(scenario.negativeResult),
+    };
+  });
+}

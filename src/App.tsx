@@ -62,6 +62,7 @@ const NotFound = lazy(() => import('./pages/NotFound'));
 const UnsubscribePage = lazy(() => import('./pages/UnsubscribePage'));
 const CommissionPortalPage = lazy(() => import('./pages/commissions/CommissionPortalPage'));
 const CommissionDashboardPlaceholder = lazy(() => import('./pages/commissions/CommissionDashboardPlaceholder'));
+const FinancialManagementPage = lazy(() => import('./pages/commissions/FinancialManagementPage'));
 const CommissionCommercialMapPage = lazy(() => import('./pages/commissions/CommissionCommercialMapPage'));
 const AdminPortalPage = lazy(() => import('./pages/admin/AdminPortalPage'));
 const AdminOverviewPage = lazy(() => import('./pages/admin/AdminOverviewPage'));
@@ -266,7 +267,11 @@ function CommissionModuleRoutes() {
         <ModuleAccessGuard module={module}>
           <CommissionLayout module={module}>
             <Suspended>
-              <CommissionDashboardPlaceholder module={module} />
+              {module.slug === 'financeiro-gerencial' ? (
+                <FinancialManagementPage module={module} />
+              ) : (
+                <CommissionDashboardPlaceholder module={module} />
+              )}
             </Suspended>
           </CommissionLayout>
         </ModuleAccessGuard>
