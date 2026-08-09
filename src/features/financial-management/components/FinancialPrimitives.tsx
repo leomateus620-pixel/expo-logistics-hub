@@ -1,4 +1,4 @@
-import type { CSSProperties, HTMLAttributes, ReactNode } from 'react';
+import { useEffect, useRef, type CSSProperties, type HTMLAttributes, type ReactNode } from 'react';
 import {
   AlertTriangle,
   BadgeCheck,
@@ -60,8 +60,103 @@ function isFiniteFinancialValue(value: number) {
 export interface FinancialAmountProps extends Omit<HTMLAttributes<HTMLSpanElement>, 'children'> {
   value: number;
   compact?: boolean;
+  animate?: boolean;
   accessibleLabel?: string;
   fallback?: string;
+}
+
+type AnimatedFinancialValueKind = 'currency' | 'compact-currency' | 'percentage' | 'number';
+
+const FINANCIAL_VALUE_ANIMATION_DURATION = 640;
+
+function formatAnimatedFinancialValue(value: number, kind: AnimatedFinancialValueKind) {
+  if (kind === 'compact-currency') return formatCompactCurrency(value);
+  if (kind === 'currency') return formatFullCurrency(value);
+  if (kind === 'percentage') return `${percentageFormatter.format(value)}%`;
+  return numberFormatter.format(value);
+}
+
+interface AnimatedFinancialVisualProps {
+  value: number;
+  kind: AnimatedFinancialValueKind;
+}
+
+/**
+ * Animates only the presentational text node. The exact final value remains in
+ * a separate screen-reader node, avoiding dozens of React renders per card.
+ */
+function AnimatedFinancialVisual({ value, kind }: AnimatedFinancialVisualProps) {
+  const visualRef = useRef<HTMLSpanElement>(null);
+  const displayedValueRef = useRef(0);
+
+  useEffect(() => {
+    const visual = visualRef.current;
+    if (!visual) return undefined;
+
+    if (!Number.isFinite(value)) {
+      visual.textContent = formatAnimatedFinancialValue(0, kind);
+      displayedValueRef.current = 0;
+      return undefined;
+    }
+
+    if (typeof window === 'undefined' || typeof window.requestAnimationFrame !== 'function') {
+      visual.textContent = formatAnimatedFinancialValue(value, kind);
+      displayedValueRef.current = value;
+      return undefined;
+    }
+
+    const from = displayedValueRef.current;
+    const delta = value - from;
+    if (delta === 0) {
+      visual.textContent = formatAnimatedFinancialValue(value, kind);
+      return undefined;
+    }
+
+    let animationFrame = 0;
+    let startedAt: number | undefined;
+    let previousFrameAt: number | undefined;
+
+    const renderFrame = (timestamp: number) => {
+      if (
+        !Number.isFinite(timestamp)
+        || (previousFrameAt !== undefined && timestamp <= previousFrameAt)
+      ) {
+        visual.textContent = formatAnimatedFinancialValue(value, kind);
+        displayedValueRef.current = value;
+        return;
+      }
+
+      startedAt ??= timestamp;
+      previousFrameAt = timestamp;
+      const elapsed = timestamp - startedAt;
+      const progress = Math.min(elapsed / FINANCIAL_VALUE_ANIMATION_DURATION, 1);
+      const easedProgress = 1 - ((1 - progress) ** 3);
+      const displayedValue = from + (delta * easedProgress);
+
+      visual.textContent = formatAnimatedFinancialValue(displayedValue, kind);
+      displayedValueRef.current = displayedValue;
+
+      if (progress < 1) {
+        animationFrame = window.requestAnimationFrame(renderFrame);
+      } else {
+        visual.textContent = formatAnimatedFinancialValue(value, kind);
+        displayedValueRef.current = value;
+      }
+    };
+
+    animationFrame = window.requestAnimationFrame(renderFrame);
+    return () => {
+      if (typeof window.cancelAnimationFrame === 'function') {
+        window.cancelAnimationFrame(animationFrame);
+      }
+    };
+  }, [kind, value]);
+
+  return (
+    <span ref={visualRef} aria-hidden="true">
+      {formatAnimatedFinancialValue(displayedValueRef.current, kind)}
+    </span>
+  );
 }
 
 /**
@@ -71,6 +166,7 @@ export interface FinancialAmountProps extends Omit<HTMLAttributes<HTMLSpanElemen
 export function FinancialAmount({
   value,
   compact = false,
+  animate = false,
   accessibleLabel,
   fallback = 'Valor não informado',
   className,
@@ -88,12 +184,23 @@ export function FinancialAmount({
 
   return (
     <span
-      className={cn('financial-amount', compact && 'financial-amount--compact', className)}
+      className={cn(
+        'financial-amount',
+        compact && 'financial-amount--compact',
+        animate && hasValue && 'financial-amount--animated',
+        className,
+      )}
+      data-financial-animated={animate && hasValue ? true : undefined}
       title={title ?? exactValue}
       {...props}
     >
       <span className="financial-amount__visual" aria-hidden="true">
-        {visualValue}
+        {animate && hasValue ? (
+          <AnimatedFinancialVisual
+            value={value}
+            kind={compact ? 'compact-currency' : 'currency'}
+          />
+        ) : visualValue}
       </span>
       <span className="sr-only">{spokenValue}</span>
     </span>
@@ -165,7 +272,11 @@ export interface FinancialKpiCardProps extends Omit<HTMLAttributes<HTMLElement>,
   icon?: LucideIcon;
   status?: FinancialStatus;
   statusLabel?: string;
+  showStatus?: boolean;
   tone?: FinancialStatus | 'neutral' | 'gold';
+  priority?: 'primary' | 'secondary';
+  animateValue?: boolean;
+  sourceLabel?: string;
   footer?: ReactNode;
 }
 
@@ -174,18 +285,40 @@ function renderKpiValue(
   valueKind: FinancialKpiValueKind,
   compactValue: boolean,
   label: string,
+  animateValue: boolean,
 ) {
   if (typeof value !== 'number') return value;
 
   if (valueKind === 'currency') {
-    return <FinancialAmount value={value} compact={compactValue} accessibleLabel={label} />;
+    return (
+      <FinancialAmount
+        value={value}
+        compact={compactValue}
+        animate={animateValue}
+        accessibleLabel={label}
+      />
+    );
   }
 
-  if (valueKind === 'percentage') {
-    return `${percentageFormatter.format(value)}%`;
-  }
+  const exactValue = valueKind === 'percentage'
+    ? `${percentageFormatter.format(value)}%`
+    : numberFormatter.format(value);
 
-  return numberFormatter.format(value);
+  if (!animateValue || !Number.isFinite(value)) return exactValue;
+
+  return (
+    <span
+      className="financial-kpi-card__animated-value"
+      data-financial-animated="true"
+      title={exactValue}
+    >
+      <AnimatedFinancialVisual
+        value={value}
+        kind={valueKind === 'percentage' ? 'percentage' : 'number'}
+      />
+      <span className="sr-only">{`${label}: ${exactValue}`}</span>
+    </span>
+  );
 }
 
 export function FinancialKpiCard({
@@ -198,15 +331,26 @@ export function FinancialKpiCard({
   icon: Icon,
   status,
   statusLabel,
+  showStatus = true,
   tone = 'neutral',
+  priority,
+  animateValue = false,
+  sourceLabel,
   footer,
   className,
   ...props
 }: FinancialKpiCardProps) {
   return (
     <article
-      className={cn('financial-kpi-card', `financial-kpi-card--${tone}`, className)}
+      className={cn(
+        'financial-kpi-card',
+        `financial-kpi-card--${tone}`,
+        priority && `financial-kpi-card--priority-${priority}`,
+        className,
+      )}
       data-financial-tone={tone}
+      data-financial-priority={priority}
+      data-financial-animate-value={animateValue || undefined}
       {...props}
     >
       <div className="financial-kpi-card__topline">
@@ -214,7 +358,23 @@ export function FinancialKpiCard({
           {eyebrow && <span className="financial-kpi-card__eyebrow">{eyebrow}</span>}
           <h3 className="financial-kpi-card__label">{label}</h3>
         </div>
-        {Icon && (
+        {sourceLabel ? (
+          <span className="financial-kpi-card__signals">
+            <span
+              className="financial-kpi-card__source"
+              role="img"
+              aria-label={sourceLabel}
+              title={sourceLabel}
+            >
+              <Database aria-hidden="true" />
+            </span>
+            {Icon && (
+              <span className="financial-kpi-card__icon-shell" aria-hidden="true">
+                <Icon className="financial-kpi-card__icon" />
+              </span>
+            )}
+          </span>
+        ) : Icon && (
           <span className="financial-kpi-card__icon-shell" aria-hidden="true">
             <Icon className="financial-kpi-card__icon" />
           </span>
@@ -222,13 +382,13 @@ export function FinancialKpiCard({
       </div>
 
       <div className="financial-kpi-card__value">
-        {renderKpiValue(value, valueKind, compactValue, label)}
+        {renderKpiValue(value, valueKind, compactValue, label, animateValue)}
       </div>
 
-      {(detail || status) && (
+      {(detail || (status && showStatus)) && (
         <div className="financial-kpi-card__context">
           {detail && <div className="financial-kpi-card__detail">{detail}</div>}
-          {status && <FinancialStatusBadge status={status} label={statusLabel} />}
+          {status && showStatus && <FinancialStatusBadge status={status} label={statusLabel} />}
         </div>
       )}
 
