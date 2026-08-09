@@ -396,7 +396,7 @@ const baseCommissionModules: CommissionModule[] = [
     slug: 'financeiro-gerencial',
     name: 'Financeiro Gerencial',
     shortName: 'Financeiro',
-    description: 'Estrutura sensível para orçamento, receitas, despesas, patrocínios e simulações.',
+    description: 'Gestão executiva e restrita da base orçamentária Fenasoja 2026, com receitas, despesas, patrocínios, comissões e cenários.',
     icon: BadgeDollarSign,
     accentClass: visualThemes.gold.accentGradient,
     visual: visualThemes.gold,
@@ -408,15 +408,15 @@ const baseCommissionModules: CommissionModule[] = [
     order: 9,
     publicPortal: true,
     menus: [
-      { ...dashboardMenu, label: 'Painel Financeiro', description: 'Visão executiva e estrutura restrita do módulo financeiro.' },
-      { label: 'Receitas Projetadas', path: 'receitas-projetadas', description: 'Estrutura futura para receitas projetadas.', icon: ChartColumn },
-      { label: 'Receitas Confirmadas', path: 'receitas-confirmadas', description: 'Estrutura futura para receitas confirmadas.', icon: Receipt },
-      { label: 'Despesas Previstas', path: 'despesas-previstas', description: 'Estrutura futura para despesas previstas.', icon: ClipboardList },
-      { label: 'Despesas Realizadas', path: 'despesas-realizadas', description: 'Estrutura futura para despesas realizadas.', icon: Receipt },
-      { label: 'Orçamento por Comissão', path: 'orcamento-comissoes', description: 'Estrutura futura para orçamentos por comissão.', icon: BadgeDollarSign },
-      { label: 'Patrocínios', path: 'patrocinios', description: 'Estrutura futura para patrocínios.', icon: Sparkles },
-      { label: 'Simulações', path: 'simulacoes', description: 'Estrutura futura para simulações gerenciais.', icon: ChartColumn },
-      { label: 'Relatórios', path: 'relatorios', description: 'Relatórios futuros do módulo.', icon: FileText },
+      { ...dashboardMenu, label: 'Painel Financeiro', description: 'Visão executiva 2026 de receitas, orçamento, risco e capacidade.' },
+      { label: 'Receitas Projetadas', path: 'receitas-projetadas', description: 'Projeções por fonte, categoria e ecossistema financeiro.', icon: ChartColumn },
+      { label: 'Receitas Confirmadas', path: 'receitas-confirmadas', description: 'Consolidação, lacuna e A Receber explícito, sem misturar conceitos.', icon: Receipt },
+      { label: 'Despesas Previstas', path: 'despesas-previstas', description: 'Plano de despesas por comissão, categoria, valor e período.', icon: ClipboardList },
+      { label: 'Despesas Realizadas', path: 'despesas-realizadas', description: 'Realizado da fonte e origens de recursos informadas.', icon: Receipt },
+      { label: 'Orçamento por Comissão', path: 'orcamento-comissoes', description: 'Teto, orçado, saldo, utilização e alertas por comissão.', icon: BadgeDollarSign },
+      { label: 'Patrocínios', path: 'patrocinios', description: 'Carteira, categorias explícitas, recursos, recebimentos e contrapartidas.', icon: Sparkles },
+      { label: 'Simulações', path: 'simulacoes', description: 'Cenários Realista, Pessimista e Otimista da base 2026.', icon: ChartColumn },
+      { label: 'Relatórios', path: 'relatorios', description: 'Catálogo de análises financeiras realmente disponíveis.', icon: FileText },
     ],
   },
   ...COMMISSION_MAP_PORTALS.map((portal) => portal.module),
@@ -459,7 +459,7 @@ const moduleTextScopes: Record<string, CommissionModuleTextScope> = {
     description: 'Rotinas, demandas, equipes, áreas, ocorrências e relatórios.',
   },
   'financeiro-gerencial': {
-    description: 'Estrutura sensível para orçamento, receitas, despesas, patrocínios e simulações.',
+    description: 'Gestão executiva e restrita da base orçamentária Fenasoja 2026, com receitas, despesas, patrocínios, comissões e cenários.',
   },
 };
 
@@ -2922,11 +2922,11 @@ const menuOperationalScopes: Record<string, Record<string, CommissionMenuScope>>
   'financeiro-gerencial': {
     dashboard: {
       label: 'Painel Financeiro',
-      description: 'Visão executiva futura para orçamento, receitas, despesas, projeções e simulações.',
-      objective: 'Estruturar uma visão gerencial futura e restrita, sem inserir dados financeiros reais nesta etapa.',
+      description: 'Visão executiva 2026 de receitas, orçamento, risco, patrocínios e capacidade.',
+      objective: 'Dar leitura gerencial restrita da planilha oficial Fenasoja 2026 sem alterar dados ou substituir a contabilidade.',
       activities: [
         'Organizar escopo de orçamento, receitas e despesas.',
-        'Preparar leitura futura de projeções e confirmações.',
+        'Comparar projeções, consolidações e valores informados a receber.',
         'Separar dados projetados de dados realizados.',
         'Manter alerta de módulo sensível.',
       ],
@@ -2937,24 +2937,24 @@ const menuOperationalScopes: Record<string, Record<string, CommissionMenuScope>>
         'Planejar auditoria e trilha de alterações.',
       ],
       dataInputs: [
-        'Campos futuros de orçamento',
-        'Campos futuros de receitas',
-        'Campos futuros de despesas',
+        'Tetos e valores orçados da planilha 2026',
+        'Receitas projetadas, consolidadas e A Receber',
+        'Despesas por período e realizado da fonte',
         'Responsáveis autorizados',
         'Status gerencial',
       ],
       outputs: [
-        'Visão gerencial futura',
+        'Visão gerencial executiva 2026',
         'Base de projeções',
         'Alertas de sensibilidade e restrição',
       ],
       indicators: [
-        'Indicadores financeiros futuros',
+        'Indicadores financeiros reconciliados',
         'Projeções pendentes de validação',
         'Orçamentos por comissão',
       ],
       reports: [
-        'Relatório financeiro gerencial futuro',
+        'Painel financeiro gerencial',
         'Relatório de projeção versus confirmado',
       ],
       responsibleProfiles: [
@@ -2964,18 +2964,18 @@ const menuOperationalScopes: Record<string, Record<string, CommissionMenuScope>>
       ],
       notes: [
         'Este módulo permanece sensível e restrito.',
-        'Nenhum valor financeiro real ou mock financeiro enganoso deve ser criado nesta etapa.',
+        'Os valores exibidos vêm da planilha oficial informada e permanecem em modo somente leitura.',
       ],
     },
     'receitas-projetadas': {
       label: 'Receitas Projetadas',
-      description: 'Estrutura futura para previsões de entrada de recursos ainda não confirmadas.',
-      objective: 'Preparar o controle gerencial de receitas previstas, com probabilidade e status, sem registrar valores reais agora.',
+      description: 'Projeções por fonte, categoria e ecossistema financeiro na base 2026.',
+      objective: 'Apresentar as receitas projetadas da fonte com hierarquia clara e comparação segura com o consolidado.',
       activities: [
-        'Definir fontes futuras de receita projetada.',
+        'Analisar fontes de receita projetada da base 2026.',
         'Separar projeções de receitas confirmadas.',
         'Registrar probabilidade e responsável quando o fluxo real existir.',
-        'Apoiar simulações gerenciais futuras.',
+        'Apoiar a comparação dos cenários gerenciais informados.',
       ],
       tasks: [
         'Validar quem poderá cadastrar projeções.',
@@ -2991,12 +2991,12 @@ const menuOperationalScopes: Record<string, Record<string, CommissionMenuScope>>
         'Status',
       ],
       outputs: [
-        'Mapa futuro de receitas projetadas',
+        'Mapa de receitas projetadas',
         'Base para simulações',
-        'Comparativo futuro com receitas confirmadas',
+        'Comparativo com receitas consolidadas',
       ],
       indicators: [
-        'Total projetado futuro',
+        'Total projetado',
         'Projeções por fonte',
         'Projeções por probabilidade',
       ],
@@ -3010,13 +3010,13 @@ const menuOperationalScopes: Record<string, Record<string, CommissionMenuScope>>
         'Gestão administrativa',
       ],
       notes: [
-        'Os campos descrevem estrutura futura; não há lançamento de valores reais nesta etapa.',
+        'A visão é somente leitura e não cria lançamentos financeiros.',
       ],
     },
     'receitas-confirmadas': {
       label: 'Receitas Confirmadas',
-      description: 'Estrutura futura para receitas já confirmadas ou consolidadas.',
-      objective: 'Organizar o escopo de receitas confirmadas sem substituir controles financeiros oficiais.',
+      description: 'Consolidação, lacuna e A Receber explícito, sem misturar conceitos.',
+      objective: 'Comparar projetado e consolidado preservando o A Receber informado como um campo financeiro distinto.',
       activities: [
         'Separar receitas confirmadas de projeções.',
         'Registrar status de consolidação quando houver fluxo real.',
@@ -3025,7 +3025,7 @@ const menuOperationalScopes: Record<string, Record<string, CommissionMenuScope>>
       tasks: [
         'Definir fonte oficial de confirmação.',
         'Planejar validação por perfil autorizado.',
-        'Definir anexos e evidências necessários no futuro.',
+        'Preservar datas e observações existentes na fonte.',
       ],
       dataInputs: [
         'Fonte',
@@ -3036,12 +3036,12 @@ const menuOperationalScopes: Record<string, Record<string, CommissionMenuScope>>
         'Observação',
       ],
       outputs: [
-        'Resumo futuro de receitas confirmadas',
+        'Resumo de receitas consolidadas',
         'Base de comparação com projeções',
         'Histórico gerencial autorizado',
       ],
       indicators: [
-        'Receitas confirmadas futuras',
+        'Receitas consolidadas',
         'Diferença entre projetado e confirmado',
         'Receitas por fonte',
       ],
@@ -3059,11 +3059,11 @@ const menuOperationalScopes: Record<string, Record<string, CommissionMenuScope>>
     },
     'despesas-previstas': {
       label: 'Despesas Previstas',
-      description: 'Estrutura futura para previsão de gastos antes da contratação ou execução.',
-      objective: 'Permitir planejamento gerencial de despesas previstas sem criar lançamentos reais nesta fase.',
+      description: 'Plano de despesas por comissão, categoria, valor e período.',
+      objective: 'Permitir leitura gerencial das despesas planejadas e do impacto no teto, preservando a descrição original.',
       activities: [
         'Classificar despesas planejadas.',
-        'Vincular previsão a comissão ou categoria futura.',
+        'Relacionar previsão à comissão e à categoria analítica.',
         'Preparar análise de impacto no orçamento.',
       ],
       tasks: [
@@ -3080,12 +3080,12 @@ const menuOperationalScopes: Record<string, Record<string, CommissionMenuScope>>
         'Status',
       ],
       outputs: [
-        'Mapa futuro de despesas previstas',
+        'Mapa de despesas previstas',
         'Base de orçamento por comissão',
         'Alertas de variação prevista',
       ],
       indicators: [
-        'Despesas previstas futuras',
+        'Despesas previstas por período',
         'Previsão por comissão',
         'Previsão por categoria',
       ],
@@ -3101,8 +3101,8 @@ const menuOperationalScopes: Record<string, Record<string, CommissionMenuScope>>
     },
     'despesas-realizadas': {
       label: 'Despesas Realizadas',
-      description: 'Estrutura futura para despesas efetivamente realizadas, sem substituir sistema contábil.',
-      objective: 'Preparar acompanhamento gerencial de despesas realizadas com acesso restrito e validação posterior.',
+      description: 'Realizado da fonte e origens de recursos informadas.',
+      objective: 'Apresentar a execução da planilha com alertas de integridade e sem substituir o sistema contábil.',
       activities: [
         'Separar despesa realizada de despesa prevista.',
         'Planejar vínculo com comprovantes autorizados.',
@@ -3122,12 +3122,12 @@ const menuOperationalScopes: Record<string, Record<string, CommissionMenuScope>>
         'Status de conferência',
       ],
       outputs: [
-        'Resumo futuro de despesas realizadas',
+        'Resumo de despesas realizadas',
         'Comparativo com previsão',
         'Base de fechamento gerencial',
       ],
       indicators: [
-        'Despesas realizadas futuras',
+        'Despesas realizadas na fonte',
         'Variação previsto versus realizado',
         'Despesas por comissão',
       ],
@@ -3146,11 +3146,11 @@ const menuOperationalScopes: Record<string, Record<string, CommissionMenuScope>>
     },
     'orcamento-comissoes': {
       label: 'Orçamento por Comissão',
-      description: 'Estrutura futura para orçamento previsto, executado e saldo por comissão.',
-      objective: 'Dar visão gerencial futura do orçamento por comissão, mantendo acesso restrito.',
+      description: 'Teto, orçado, saldo, utilização e alertas por comissão.',
+      objective: 'Dar visão gerencial do orçamento por comissão e evidenciar faixas de atenção e excesso real.',
       activities: [
         'Definir orçamento previsto por comissão.',
-        'Comparar execução futura com saldo.',
+        'Comparar valor orçado com teto e saldo.',
         'Sinalizar comissões com risco orçamentário.',
       ],
       tasks: [
@@ -3167,7 +3167,7 @@ const menuOperationalScopes: Record<string, Record<string, CommissionMenuScope>>
         'Status',
       ],
       outputs: [
-        'Resumo futuro por comissão',
+        'Resumo por comissão',
         'Saldo gerencial',
         'Alertas de variação',
       ],
@@ -3189,17 +3189,17 @@ const menuOperationalScopes: Record<string, Record<string, CommissionMenuScope>>
     },
     patrocinios: {
       label: 'Patrocínios',
-      description: 'Estrutura futura para negociações, valores projetados, confirmados e recebidos.',
+      description: 'Carteira, categorias explícitas, recursos, recebimentos e contrapartidas.',
       objective: 'Acompanhar patrocínios em perspectiva gerencial, separando negociação, confirmação e recebimento.',
       activities: [
         'Mapear patrocínios em negociação.',
-        'Separar valores projetados, confirmados e recebidos no futuro.',
+        'Separar valores projetados, consolidados e recebimentos informados.',
         'Acompanhar responsável e status.',
       ],
       tasks: [
         'Definir etapas da negociação.',
         'Registrar responsável autorizado.',
-        'Planejar vínculo documental futuro.',
+        'Preservar datas, contrapartidas e observações da fonte.',
       ],
       dataInputs: [
         'Patrocinador',
@@ -3211,14 +3211,14 @@ const menuOperationalScopes: Record<string, Record<string, CommissionMenuScope>>
         'Status',
       ],
       outputs: [
-        'Funil futuro de patrocínios',
+        'Carteira de patrocínios por categoria explícita',
         'Resumo por status',
         'Base para projeções de receita',
       ],
       indicators: [
         'Patrocínios em negociação',
         'Patrocínios confirmados',
-        'Valores projetados futuros',
+        'Valores projetados',
       ],
       reports: [
         'Relatório de patrocínios',
@@ -3235,8 +3235,8 @@ const menuOperationalScopes: Record<string, Record<string, CommissionMenuScope>>
     },
     simulacoes: {
       label: 'Simulações',
-      description: 'Estrutura futura para cenários gerenciais de receitas, despesas, orçamento e contratações.',
-      objective: 'Permitir cenários gerenciais futuros sem alterar dados oficiais ou criar lançamentos reais.',
+      description: 'Cenários Realista, Pessimista e Otimista da base 2026.',
+      objective: 'Comparar cenários gerenciais locais sem alterar dados oficiais ou criar lançamentos.',
       activities: [
         'Simular entrada de receita.',
         'Simular aumento de despesa.',
@@ -3282,8 +3282,8 @@ const menuOperationalScopes: Record<string, Record<string, CommissionMenuScope>>
     },
     relatorios: {
       label: 'Relatórios',
-      description: 'Relatórios gerenciais futuros de projeções, receitas, despesas, patrocínios e simulações.',
-      objective: 'Estruturar relatórios financeiros gerenciais futuros com acesso restrito e linguagem clara de sensibilidade.',
+      description: 'Catálogo de análises financeiras realmente disponíveis.',
+      objective: 'Organizar acessos às leituras gerenciais existentes com linguagem clara e sem exportações fictícias.',
       activities: [
         'Consolidar projeção versus confirmação.',
         'Organizar receitas por fonte.',
