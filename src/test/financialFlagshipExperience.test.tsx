@@ -239,17 +239,20 @@ describe('experiência financeira flagship', () => {
     );
   });
 
-  it('isola o movimento integral apenas nas três visões executivas', () => {
+  it('estende o movimento integral às seis visões financeiras flagship', () => {
     expect(financialPageSource).toContain("view === 'dashboard'");
     expect(financialPageSource).toContain("view === 'receitas-projetadas'");
     expect(financialPageSource).toContain("view === 'receitas-confirmadas'");
-    expect(financialPageSource).toContain("data-financial-motion={isExecutiveFinanceView ? 'full' : 'system'}");
+    expect(financialPageSource).toContain("view === 'despesas-previstas'");
+    expect(financialPageSource).toContain("view === 'despesas-realizadas'");
+    expect(financialPageSource).toContain("view === 'orcamento-comissoes'");
+    expect(financialPageSource).toContain("data-financial-motion={isFlagshipFinanceView ? 'full' : 'system'}");
     expect(financialPageSource).toContain('Planilha oficial · somente leitura');
     expect(financialPageSource).toContain('const revenueComposition = revenueCategoryGroups.map');
     expect(financialPageSource).not.toContain('revenueCategoryGroups.slice');
     expect(financialPageSource).not.toContain('.slice(0, 8)');
-    expect(financialPageSource.match(/variant="executive"/g)).toHaveLength(2);
-    expect(financialPageSource.match(/forceMotion/g)).toHaveLength(2);
+    expect(financialPageSource.match(/variant="executive"/g)?.length ?? 0).toBeGreaterThanOrEqual(3);
+    expect(financialPageSource.match(/forceMotion/g)?.length ?? 0).toBeGreaterThanOrEqual(10);
 
     expect(financialStyles).toContain(
       ".financial-management-page:not([data-financial-motion='full']) *",

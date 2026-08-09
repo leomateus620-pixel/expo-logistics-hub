@@ -50,6 +50,7 @@ import {
   FinancialStatePanel,
   FinancialStatusBadge,
 } from './FinancialPrimitives';
+import '@/styles/financial-expense-ledgers.css';
 
 function getExpenseFundingLabels(expense: FinancialExpense) {
   const labels: string[] = [];
@@ -316,15 +317,22 @@ interface ExpenseLedgerProps {
 export function ExpenseLedger({ expenses, mode, emptyFromSearch = false }: ExpenseLedgerProps) {
   if (expenses.length === 0) return <FinancialTableEmpty search={emptyFromSearch} />;
   const isPlanning = mode === 'planning';
+  const primaryColumn = isPlanning ? 'period-total' : 'realized';
 
   return (
     <div
-      className="financial-ledger"
+      className="financial-ledger financial-expense-ledger"
       data-financial-ledger="expense"
       data-financial-expense-mode={mode}
+      data-financial-primary-column={primaryColumn}
     >
-      <div className="financial-table-shell financial-desktop-only">
-        <table className="financial-table">
+      <div
+        className="financial-table-shell financial-desktop-only financial-ledger-table-region"
+        role="region"
+        aria-label={isPlanning ? 'Tabela rolável de despesas previstas' : 'Tabela rolável de despesas realizadas'}
+        tabIndex={0}
+      >
+        <table className="financial-table financial-table--expenses">
           <caption className="sr-only">
             {isPlanning ? 'Despesas previstas por comissão e período' : 'Despesas realizadas e origens registradas'}
           </caption>
@@ -333,11 +341,27 @@ export function ExpenseLedger({ expenses, mode, emptyFromSearch = false }: Expen
               <th scope="col">Despesa</th>
               <th scope="col">Comissão</th>
               {isPlanning && <th scope="col">Categoria analítica</th>}
-              {!isPlanning && <th scope="col" className="financial-table__number">Realizado</th>}
-              <th scope="col" className="financial-table__number">2025</th>
-              <th scope="col" className="financial-table__number">2026</th>
-              {isPlanning && <th scope="col" className="financial-table__number">Soma dos períodos</th>}
-              {isPlanning && <th scope="col" className="financial-table__number">Impacto no teto</th>}
+              {!isPlanning && (
+                <th scope="col" className="financial-table__number financial-table__column--primary">
+                  Realizado
+                </th>
+              )}
+              <th scope="col" className="financial-table__number financial-table__column--supporting">
+                2025
+              </th>
+              <th scope="col" className="financial-table__number financial-table__column--supporting">
+                2026
+              </th>
+              {isPlanning && (
+                <th scope="col" className="financial-table__number financial-table__column--primary">
+                  Soma dos períodos
+                </th>
+              )}
+              {isPlanning && (
+                <th scope="col" className="financial-table__number">
+                  Impacto no teto
+                </th>
+              )}
               {!isPlanning && <th scope="col">Origem registrada</th>}
               {!isPlanning && <th scope="col">Observação</th>}
               <th scope="col">Status</th>
@@ -348,29 +372,46 @@ export function ExpenseLedger({ expenses, mode, emptyFromSearch = false }: Expen
               const periodTotal = selectExpenseDisplayAmount(expense, 'planning');
               const fundingLabels = getExpenseFundingLabels(expense);
               const paymentStatus = getExpensePaymentStatus(expense);
-              const impact = expense.commissionBudgetCap > 0
-                ? (periodTotal / expense.commissionBudgetCap) * 100
-                : 0;
+              const rowStatus = isPlanning ? (periodTotal > 0 ? 'projected' : 'unreported') : paymentStatus.status;
+              const impact = expense.commissionBudgetCap > 0 ? (periodTotal / expense.commissionBudgetCap) * 100 : 0;
               return (
-                <tr key={expense.id} data-source-row={expense.sourceRow}>
+                <tr
+                  key={expense.id}
+                  className={cn('financial-table__data-row', `financial-table__data-row--${rowStatus}`)}
+                  data-source-row={expense.sourceRow}
+                  data-financial-row-status={rowStatus}
+                  data-financial-has-observation={expense.observation ? 'true' : undefined}
+                >
                   <th scope="row">
                     <span className="financial-table__primary">
                       {expense.description || `Sem descrição na fonte — linha ${expense.sourceRow}`}
                     </span>
                     <span className="financial-table__secondary">Linha {expense.sourceRow} da planilha</span>
                   </th>
-                  <td>{expense.commission}</td>
-                  {isPlanning && <td>{expense.category}</td>}
-                  {!isPlanning && <td className="financial-table__number"><FinancialAmount value={expense.realizedAmount} /></td>}
-                  <td className="financial-table__number"><FinancialAmount value={expense.value2025} /></td>
-                  <td className="financial-table__number"><FinancialAmount value={expense.value2026} /></td>
-                  {isPlanning && <td className="financial-table__number"><FinancialAmount value={periodTotal} /></td>}
-                  {isPlanning && <td className="financial-table__number">{formatPercentage(impact)}</td>}
-                  {!isPlanning && <td>{fundingLabels.join(' + ') || 'Não informada'}</td>}
+                  <td className="financial-table__context-cell">{expense.commission}</td>
+                  {isPlanning && <td className="financial-table__context-cell">{expense.category}</td>}
+                  {!isPlanning && (
+                    <td className="financial-table__number financial-table__number--primary">
+                      <FinancialAmount value={expense.realizedAmount} />
+                    </td>
+                  )}
+                  <td className="financial-table__number financial-table__number--supporting">
+                    <FinancialAmount value={expense.value2025} />
+                  </td>
+                  <td className="financial-table__number financial-table__number--supporting">
+                    <FinancialAmount value={expense.value2026} />
+                  </td>
+                  {isPlanning && (
+                    <td className="financial-table__number financial-table__number--primary">
+                      <FinancialAmount value={periodTotal} />
+                    </td>
+                  )}
+                  {isPlanning && <td className="financial-table__number financial-table__number--ratio">{formatPercentage(impact)}</td>}
+                  {!isPlanning && <td className="financial-table__context-cell">{fundingLabels.join(' + ') || 'Não informada'}</td>}
                   {!isPlanning && <td className="financial-table__observation">{expense.observation || '—'}</td>}
-                  <td>
+                  <td className="financial-table__status-cell">
                     {isPlanning ? (
-                      <FinancialStatusBadge status={periodTotal > 0 ? 'projected' : 'unreported'} />
+                      <FinancialStatusBadge status={rowStatus} />
                     ) : (
                       <FinancialStatusBadge status={paymentStatus.status} label={paymentStatus.label} />
                     )}
@@ -387,33 +428,61 @@ export function ExpenseLedger({ expenses, mode, emptyFromSearch = false }: Expen
           const periodTotal = selectExpenseDisplayAmount(expense, 'planning');
           const fundingLabels = getExpenseFundingLabels(expense);
           const paymentStatus = getExpensePaymentStatus(expense);
+          const rowStatus = isPlanning ? (periodTotal > 0 ? 'projected' : 'unreported') : paymentStatus.status;
           return (
-            <article key={expense.id} className="financial-mobile-card">
+            <article
+              key={expense.id}
+              className={cn('financial-mobile-card', 'financial-mobile-card--expense', `financial-mobile-card--expense-${mode}`)}
+              data-financial-row-status={rowStatus}
+              data-source-row={expense.sourceRow}
+            >
               <header className="financial-mobile-card__header">
                 <div>
                   <p className="financial-mobile-card__eyebrow">{expense.commission}</p>
                   <h3>{expense.description || `Sem descrição na fonte — linha ${expense.sourceRow}`}</h3>
                 </div>
-                <FinancialStatusBadge
-                  status={isPlanning ? (periodTotal > 0 ? 'projected' : 'unreported') : paymentStatus.status}
-                  label={isPlanning ? undefined : paymentStatus.label}
-                />
+                <FinancialStatusBadge status={rowStatus} label={isPlanning ? undefined : paymentStatus.label} />
               </header>
-              <div className="financial-mobile-card__hero-amount">
+              <div
+                className="financial-mobile-card__hero-amount financial-mobile-card__hero-amount--primary"
+                data-financial-primary-amount={primaryColumn}
+              >
                 <span>{isPlanning ? 'Soma dos períodos' : 'Realizado na fonte'}</span>
                 <FinancialAmount value={isPlanning ? periodTotal : expense.realizedAmount} />
               </div>
               <dl className="financial-mobile-card__amount-grid">
-                <div><dt>2025</dt><dd><FinancialAmount value={expense.value2025} /></dd></div>
-                <div><dt>2026</dt><dd><FinancialAmount value={expense.value2026} /></dd></div>
+                <div>
+                  <dt>2025</dt>
+                  <dd>
+                    <FinancialAmount value={expense.value2025} />
+                  </dd>
+                </div>
+                <div>
+                  <dt>2026</dt>
+                  <dd>
+                    <FinancialAmount value={expense.value2026} />
+                  </dd>
+                </div>
               </dl>
               <details className="financial-mobile-card__details">
                 <summary>Ver contexto financeiro</summary>
                 <dl>
-                  <div><dt>Categoria</dt><dd>{expense.category}</dd></div>
-                  <div><dt>Teto da comissão</dt><dd>{formatBRL(expense.commissionBudgetCap)}</dd></div>
-                  <div><dt>Orçado da comissão</dt><dd>{formatBRL(expense.commissionBudgetedAmount)}</dd></div>
-                  <div><dt>Origem registrada</dt><dd>{fundingLabels.join(' + ') || 'Não informada'}</dd></div>
+                  <div>
+                    <dt>Categoria</dt>
+                    <dd>{expense.category}</dd>
+                  </div>
+                  <div>
+                    <dt>Teto da comissão</dt>
+                    <dd>{formatBRL(expense.commissionBudgetCap)}</dd>
+                  </div>
+                  <div>
+                    <dt>Orçado da comissão</dt>
+                    <dd>{formatBRL(expense.commissionBudgetedAmount)}</dd>
+                  </div>
+                  <div>
+                    <dt>Origem registrada</dt>
+                    <dd>{fundingLabels.join(' + ') || 'Não informada'}</dd>
+                  </div>
                 </dl>
                 {expense.observation && <p>{expense.observation}</p>}
               </details>
@@ -532,14 +601,12 @@ export function CommissionBudgetLedger({ budgets }: CommissionBudgetLedgerProps)
 
   const categories = selected ? groupExpensesByCategory(selected.expenses) : [];
   const funding = selected ? groupExpensesByFundingSource(selected.expenses) : [];
-  const largestExpenses = selected
-    ? [...selected.expenses].sort((a, b) => b.realizedAmount - a.realizedAmount).slice(0, 5)
-    : [];
+  const largestExpenses = selected ? [...selected.expenses].sort((a, b) => b.realizedAmount - a.realizedAmount).slice(0, 5) : [];
   const observations = selected?.expenses.filter((expense) => expense.observation) ?? [];
 
   return (
-    <>
-      <div className="financial-table-controls" aria-label="Ordenação e filtros do orçamento">
+    <div className="financial-commission-ledger" data-financial-ledger="commission-budget" data-financial-primary-column="budgeted">
+      <div className="financial-table-controls financial-commission-ledger__controls" aria-label="Ordenação e filtros do orçamento">
         <label>
           <ArrowDownWideNarrow aria-hidden="true" />
           <span>Ordenar</span>
@@ -565,40 +632,71 @@ export function CommissionBudgetLedger({ budgets }: CommissionBudgetLedgerProps)
         <FinancialTableEmpty search />
       ) : (
         <>
-          <div className="financial-table-shell financial-desktop-only">
+          <div
+            className="financial-table-shell financial-desktop-only financial-ledger-table-region"
+            role="region"
+            aria-label="Tabela rolável de orçamento por comissão"
+            tabIndex={0}
+          >
             <table className="financial-table financial-table--commissions">
               <caption className="sr-only">Orçamento e utilização por comissão</caption>
               <thead>
                 <tr>
                   <th scope="col">Comissão</th>
-                  <th scope="col" className="financial-table__number">Teto</th>
-                  <th scope="col" className="financial-table__number">Orçado</th>
-                  <th scope="col" className="financial-table__number">Saldo</th>
-                  <th scope="col" className="financial-table__number">Utilização</th>
-                  <th scope="col" className="financial-table__number">Despesas</th>
+                  <th scope="col" className="financial-table__number">
+                    Teto
+                  </th>
+                  <th scope="col" className="financial-table__number financial-table__column--primary">
+                    Orçado
+                  </th>
+                  <th scope="col" className="financial-table__number">
+                    Saldo
+                  </th>
+                  <th scope="col" className="financial-table__number">
+                    Utilização
+                  </th>
+                  <th scope="col" className="financial-table__number">
+                    Despesas
+                  </th>
                   <th scope="col">Status</th>
-                  <th scope="col"><span className="sr-only">Detalhes</span></th>
+                  <th scope="col">
+                    <span className="sr-only">Detalhes</span>
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {visibleBudgets.map((budget) => (
-                  <tr key={budget.id} data-selected={selected?.id === budget.id || undefined}>
+                  <tr
+                    key={budget.id}
+                    className={cn('financial-table__data-row', `financial-table__data-row--${budget.status}`)}
+                    data-selected={selected?.id === budget.id || undefined}
+                    data-financial-row-status={budget.status}
+                  >
                     <th scope="row">
                       <span className="financial-table__primary">{budget.commission}</span>
                       {budget.responsible && <span className="financial-table__secondary">Responsável: {budget.responsible}</span>}
                     </th>
-                    <td className="financial-table__number"><FinancialAmount value={budget.budgetCap} /></td>
-                    <td className="financial-table__number"><FinancialAmount value={budget.budgetedAmount} /></td>
-                    <td className={cn('financial-table__number', budget.remainingAmount < 0 && 'financial-table__number--risk')}>
+                    <td className="financial-table__number financial-table__number--reference">
+                      <FinancialAmount value={budget.budgetCap} />
+                    </td>
+                    <td className="financial-table__number financial-table__number--primary">
+                      <FinancialAmount value={budget.budgetedAmount} />
+                    </td>
+                    <td
+                      className={cn(
+                        'financial-table__number',
+                        'financial-table__number--balance',
+                        budget.remainingAmount < 0 && 'financial-table__number--risk',
+                      )}
+                    >
                       <FinancialAmount value={budget.remainingAmount} />
                     </td>
-                    <td className="financial-table__number">{formatPercentage(budget.utilizationPercentage)}</td>
-                    <td className="financial-table__number">{budget.expenseCount}</td>
-                    <td>
-                      <FinancialStatusBadge
-                        status={budget.status}
-                        label={budget.budgetCap === 0 ? 'Sem teto definido' : undefined}
-                      />
+                    <td className="financial-table__number financial-table__number--utilization">
+                      {formatPercentage(budget.utilizationPercentage)}
+                    </td>
+                    <td className="financial-table__number financial-table__number--count">{budget.expenseCount}</td>
+                    <td className="financial-table__status-cell">
+                      <FinancialStatusBadge status={budget.status} label={budget.budgetCap === 0 ? 'Sem teto definido' : undefined} />
                     </td>
                     <td>
                       <button
@@ -618,7 +716,11 @@ export function CommissionBudgetLedger({ budgets }: CommissionBudgetLedgerProps)
 
           <div className="financial-mobile-list financial-mobile-only">
             {visibleBudgets.map((budget) => (
-              <article key={budget.id} className="financial-commission-card">
+              <article
+                key={budget.id}
+                className={cn('financial-commission-card', `financial-commission-card--${budget.status}`)}
+                data-financial-row-status={budget.status}
+              >
                 <BudgetProgress
                   label={budget.commission}
                   budgetCap={budget.budgetCap}
@@ -629,7 +731,7 @@ export function CommissionBudgetLedger({ budgets }: CommissionBudgetLedgerProps)
                   balanceLabel={budget.remainingAmount < 0 ? 'Excedente' : 'Saldo'}
                   compactAmounts={false}
                 />
-                <Button type="button" variant="outline" onClick={() => setSelected(budget)}>
+                <Button type="button" variant="outline" className="financial-commission-card__action" onClick={() => setSelected(budget)}>
                   Ver {budget.expenseCount} despesas
                   <ChevronRight className="ml-2 h-4 w-4" aria-hidden="true" />
                 </Button>
@@ -648,9 +750,7 @@ export function CommissionBudgetLedger({ budgets }: CommissionBudgetLedgerProps)
                   <BadgeDollarSign aria-hidden="true" /> Orçamento por comissão
                 </div>
                 <SheetTitle>{selected.commission}</SheetTitle>
-                <SheetDescription>
-                  Leitura da base 2026. Teto, orçado e períodos permanecem conforme a planilha.
-                </SheetDescription>
+                <SheetDescription>Leitura da base 2026. Teto, orçado e períodos permanecem conforme a planilha.</SheetDescription>
               </SheetHeader>
               <div className="financial-detail-sheet__body">
                 <BudgetProgress
@@ -665,19 +765,26 @@ export function CommissionBudgetLedger({ budgets }: CommissionBudgetLedgerProps)
                 />
 
                 <section className="financial-detail-block">
-                  <h3><Layers3 aria-hidden="true" /> Categorias de despesa</h3>
+                  <h3>
+                    <Layers3 aria-hidden="true" /> Categorias de despesa
+                  </h3>
                   <div className="financial-detail-list">
-                    {categories.sort((a, b) => b.realizedAmount - a.realizedAmount).slice(0, 6).map((category) => (
-                      <div key={category.key}>
-                        <span>{category.label}</span>
-                        <strong>{formatBRL(category.realizedAmount)}</strong>
-                      </div>
-                    ))}
+                    {categories
+                      .sort((a, b) => b.realizedAmount - a.realizedAmount)
+                      .slice(0, 6)
+                      .map((category) => (
+                        <div key={category.key}>
+                          <span>{category.label}</span>
+                          <strong>{formatBRL(category.realizedAmount)}</strong>
+                        </div>
+                      ))}
                   </div>
                 </section>
 
                 <section className="financial-detail-block">
-                  <h3><ReceiptText aria-hidden="true" /> Maiores despesas</h3>
+                  <h3>
+                    <ReceiptText aria-hidden="true" /> Maiores despesas
+                  </h3>
                   <ol className="financial-ranked-list">
                     {largestExpenses.map((expense) => (
                       <li key={expense.id}>
@@ -689,7 +796,9 @@ export function CommissionBudgetLedger({ budgets }: CommissionBudgetLedgerProps)
                 </section>
 
                 <section className="financial-detail-block">
-                  <h3><CircleDollarSign aria-hidden="true" /> Valores registrados por origem</h3>
+                  <h3>
+                    <CircleDollarSign aria-hidden="true" /> Valores registrados por origem
+                  </h3>
                   <div className="financial-detail-list">
                     {funding.map((item) => (
                       <div key={item.key}>
@@ -703,7 +812,9 @@ export function CommissionBudgetLedger({ budgets }: CommissionBudgetLedgerProps)
 
                 {observations.length > 0 && (
                   <section className="financial-detail-block">
-                    <h3><TicketCheck aria-hidden="true" /> Observações da fonte</h3>
+                    <h3>
+                      <TicketCheck aria-hidden="true" /> Observações da fonte
+                    </h3>
                     <ul className="financial-note-list">
                       {observations.slice(0, 8).map((expense) => (
                         <li key={expense.id}>{expense.observation}</li>
@@ -716,7 +827,7 @@ export function CommissionBudgetLedger({ budgets }: CommissionBudgetLedgerProps)
           )}
         </SheetContent>
       </Sheet>
-    </>
+    </div>
   );
 }
 
