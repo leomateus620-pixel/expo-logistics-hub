@@ -105,10 +105,16 @@ interface RevenueLedgerProps {
 export function RevenueLedger({ revenues, emptyFromSearch = false, confirmedView = false }: RevenueLedgerProps) {
   if (revenues.length === 0) return <FinancialTableEmpty search={emptyFromSearch} />;
 
+  const primaryColumn = confirmedView ? 'consolidated' : 'projected';
+
   return (
-    <div className="financial-ledger" data-financial-ledger="revenue">
+    <div
+      className="financial-ledger"
+      data-financial-ledger="revenue"
+      data-financial-primary-column={primaryColumn}
+    >
       <div className="financial-table-shell financial-desktop-only">
-        <table className="financial-table">
+        <table className="financial-table financial-table--revenue">
           <caption className="sr-only">
             {confirmedView ? 'Receitas consolidadas por fonte' : 'Receitas projetadas por fonte'}
           </caption>
@@ -117,8 +123,26 @@ export function RevenueLedger({ revenues, emptyFromSearch = false, confirmedView
               <th scope="col">Fonte</th>
               <th scope="col">Categoria</th>
               <th scope="col">Recurso</th>
-              <th scope="col" className="financial-table__number">Projetado</th>
-              <th scope="col" className="financial-table__number">Consolidado</th>
+              <th
+                scope="col"
+                className={cn(
+                  'financial-table__number',
+                  !confirmedView && 'financial-table__number--primary',
+                )}
+                data-financial-column="projected"
+              >
+                Projetado
+              </th>
+              <th
+                scope="col"
+                className={cn(
+                  'financial-table__number',
+                  confirmedView && 'financial-table__number--primary',
+                )}
+                data-financial-column="consolidated"
+              >
+                Consolidado
+              </th>
               <th scope="col" className="financial-table__number">Lacuna</th>
               <th scope="col" className="financial-table__number">A receber informado</th>
               <th scope="col">Consolidação</th>
@@ -135,13 +159,37 @@ export function RevenueLedger({ revenues, emptyFromSearch = false, confirmedView
                   <th scope="row">
                     <span className="financial-table__primary">{revenue.source}</span>
                     <span className="financial-table__secondary">
-                      {revenue.ecosystem === 'sponsorship' ? 'Captação e patrocínio' : 'Receita comercial'}
+                      {revenue.ecosystem === 'sponsorship' ? 'Patrocínios' : 'Comercial'}
                     </span>
                   </th>
-                  <td>{revenue.category}</td>
-                  <td>{revenue.fundingType}</td>
-                  <td className="financial-table__number"><FinancialAmount value={revenue.projectedAmount} /></td>
-                  <td className="financial-table__number"><FinancialAmount value={revenue.consolidatedAmount} /></td>
+                  <td>
+                    <span className="financial-table__quiet-chip financial-table__quiet-chip--category">
+                      {revenue.category}
+                    </span>
+                  </td>
+                  <td>
+                    <span className="financial-table__quiet-chip financial-table__quiet-chip--resource">
+                      {revenue.fundingType}
+                    </span>
+                  </td>
+                  <td
+                    className={cn(
+                      'financial-table__number',
+                      !confirmedView && 'financial-table__number--primary',
+                    )}
+                    data-financial-column="projected"
+                  >
+                    <FinancialAmount value={revenue.projectedAmount} />
+                  </td>
+                  <td
+                    className={cn(
+                      'financial-table__number',
+                      confirmedView && 'financial-table__number--primary',
+                    )}
+                    data-financial-column="consolidated"
+                  >
+                    <FinancialAmount value={revenue.consolidatedAmount} />
+                  </td>
                   <td className={cn('financial-table__number', gap < 0 && 'financial-table__number--positive')}>
                     <FinancialAmount value={gap} />
                   </td>
@@ -167,32 +215,84 @@ export function RevenueLedger({ revenues, emptyFromSearch = false, confirmedView
           const status = classifyRevenueConsolidationStatus(revenue);
           const receipt = selectRevenueReceiptStatus(revenue);
           const gap = calculateRevenueGap(revenue);
+          const hasProjectionBase = revenue.projectedAmount > 0;
+          const rawConsolidationPercentage = hasProjectionBase
+            ? (revenue.consolidatedAmount / revenue.projectedAmount) * 100
+            : 0;
+          const consolidationPercentage = Number.isFinite(rawConsolidationPercentage)
+            ? Math.max(rawConsolidationPercentage, 0)
+            : 0;
+          const visualConsolidationPercentage = Math.min(consolidationPercentage, 100);
+          const consolidationLabel = hasProjectionBase
+            ? formatPercentage(consolidationPercentage)
+            : 'Sem projeção-base';
           return (
-            <article key={revenue.id} className="financial-mobile-card">
+            <article
+              key={revenue.id}
+              className="financial-mobile-card financial-mobile-card--revenue"
+              data-financial-primary-column={primaryColumn}
+            >
               <header className="financial-mobile-card__header">
                 <div>
-                  <p className="financial-mobile-card__eyebrow">{revenue.category}</p>
+                  <p className="financial-mobile-card__eyebrow">
+                    <span className="financial-table__quiet-chip financial-table__quiet-chip--category">
+                      {revenue.category}
+                    </span>
+                  </p>
                   <h3>{revenue.source}</h3>
                 </div>
                 <FinancialStatusBadge status={status} />
               </header>
               <dl className="financial-mobile-card__amount-grid">
-                <div>
+                <div
+                  className="financial-mobile-card__amount financial-mobile-card__amount--primary"
+                  data-financial-column={confirmedView ? 'consolidated' : 'projected'}
+                >
                   <dt>{confirmedView ? 'Consolidado' : 'Projetado'}</dt>
                   <dd><FinancialAmount value={confirmedView ? revenue.consolidatedAmount : revenue.projectedAmount} /></dd>
                 </div>
-                <div>
+                <div
+                  className="financial-mobile-card__amount financial-mobile-card__amount--secondary"
+                  data-financial-column={confirmedView ? 'projected' : 'consolidated'}
+                >
                   <dt>{confirmedView ? 'Projetado' : 'Consolidado'}</dt>
                   <dd><FinancialAmount value={confirmedView ? revenue.projectedAmount : revenue.consolidatedAmount} /></dd>
                 </div>
               </dl>
+              <div className="financial-mobile-card__consolidation">
+                <div className="financial-mobile-card__consolidation-label" aria-hidden="true">
+                  <span>Consolidação</span>
+                  <strong>{consolidationLabel}</strong>
+                </div>
+                <div
+                  className="financial-mobile-card__consolidation-track"
+                  role="progressbar"
+                  aria-label={`Consolidação de ${revenue.source}`}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-valuenow={visualConsolidationPercentage}
+                  aria-valuetext={`${formatBRL(revenue.consolidatedAmount)} consolidados de ${formatBRL(revenue.projectedAmount)} projetados (${consolidationLabel})`}
+                >
+                  <span
+                    className="financial-mobile-card__consolidation-fill"
+                    style={{ transform: `scaleX(${visualConsolidationPercentage / 100})` }}
+                  />
+                </div>
+              </div>
               <details className="financial-mobile-card__details">
-                <summary>Ver composição financeira</summary>
+                <summary>Ver detalhes</summary>
                 <dl>
                   <div><dt>Lacuna de consolidação</dt><dd>{formatBRL(gap)}</dd></div>
                   <div><dt>A receber informado</dt><dd>{formatBRL(revenue.receivableAmount)}</dd></div>
                   <div><dt>Situação de recebimento</dt><dd>{receipt.label}</dd></div>
-                  <div><dt>Tipo de recurso</dt><dd>{revenue.fundingType}</dd></div>
+                  <div>
+                    <dt>Tipo de recurso</dt>
+                    <dd>
+                      <span className="financial-table__quiet-chip financial-table__quiet-chip--resource">
+                        {revenue.fundingType}
+                      </span>
+                    </dd>
+                  </div>
                   {revenue.receivedOn !== undefined && (
                     <div><dt>Data informada</dt><dd>{formatExcelSerialDate(revenue.receivedOn)}</dd></div>
                   )}

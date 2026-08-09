@@ -18,7 +18,6 @@ import {
   Layers3,
   LayoutDashboard,
   LineChart,
-  ListTree,
   PiggyBank,
   ReceiptText,
   Search,
@@ -43,7 +42,6 @@ import {
 } from '@/features/financial-management/components/FinancialCharts';
 import {
   BudgetProgress,
-  FinancialAmount,
   FinancialDataProvenance,
   FinancialKpiCard,
   FinancialKpiGrid,
@@ -293,11 +291,13 @@ function DataQualityNote({
 
 function ExecutiveStrip({
   items,
+  className,
 }: {
   items: ReadonlyArray<{ label: string; value: ReactNode; detail?: string }>;
+  className?: string;
 }) {
   return (
-    <dl className="financial-executive-strip">
+    <dl className={cn('financial-executive-strip', className)}>
       {items.map((item) => (
         <div key={item.label}>
           <dt>{item.label}</dt>
@@ -312,28 +312,39 @@ function ExecutiveStrip({
 function AboutFinancialModule({
   module,
   activeDescription,
+  compact = false,
 }: {
   module: CommissionModule;
   activeDescription: string;
+  compact?: boolean;
 }) {
   return (
-    <details className="financial-about">
+    <details className={cn('financial-about', compact && 'financial-about--compact')}>
       <summary>
-        <span><BookOpenCheck aria-hidden="true" /> Sobre esta visão e sua governança</span>
-        <span className="financial-about__hint">Base somente leitura</span>
+        <span>
+          <BookOpenCheck aria-hidden="true" />
+          {compact ? 'Fonte e metodologia' : 'Sobre esta visão e sua governança'}
+        </span>
+        {!compact && <span className="financial-about__hint">Base somente leitura</span>}
       </summary>
       <div className="financial-about__content">
-        <div>
-          <h2>Propósito atual</h2>
-          <p>{activeDescription}</p>
-        </div>
+        {!compact && (
+          <div>
+            <h2>Propósito atual</h2>
+            <p>{activeDescription}</p>
+          </div>
+        )}
         <div>
           <h2>Fonte</h2>
           <p>{financial2026Source.workbook}, abas Despesas, Receitas e PROJEÇÃO 2026.</p>
         </div>
         <div>
-          <h2>Limite operacional</h2>
-          <p>A experiência não grava, corrige ou sincroniza valores no Supabase. {module.name} continua protegido pela permissão financeira existente.</p>
+          <h2>{compact ? 'Leitura' : 'Limite operacional'}</h2>
+          <p>
+            {compact
+              ? 'Somente leitura: sem gravação, correção ou sincronização. A permissão financeira permanece inalterada.'
+              : `A experiência não grava, corrige ou sincroniza valores no Supabase. ${module.name} continua protegido pela permissão financeira existente.`}
+          </p>
         </div>
       </div>
     </details>
@@ -349,6 +360,9 @@ export default function FinancialManagementPage({ module }: FinancialManagementP
     : 'dashboard';
   const viewCopy = VIEW_COPY[view];
   const activeMenu = module.menus.find((menu) => menu.path === view) ?? module.menus[0];
+  const isExecutiveFinanceView = view === 'dashboard'
+    || view === 'receitas-projetadas'
+    || view === 'receitas-confirmadas';
 
   const [revenueSearch, setRevenueSearch] = useState('');
   const [revenueCategory, setRevenueCategory] = useState<'all' | RevenueCategory>('all');
@@ -492,7 +506,7 @@ export default function FinancialManagementPage({ module }: FinancialManagementP
       consolidatedAmount: totals.consolidatedAmount,
     };
   });
-  const revenueComposition = revenueCategoryGroups.slice(0, 7).map((group) => ({
+  const revenueComposition = revenueCategoryGroups.map((group) => ({
     id: group.key,
     label: group.label,
     amount: group.projectedAmount,
@@ -509,50 +523,61 @@ export default function FinancialManagementPage({ module }: FinancialManagementP
 
   const renderDashboard = () => (
     <div className="financial-view-stack">
-      <FinancialKpiGrid columns={6}>
-        <FinancialKpiCard label="Receita projetada" value={revenueTotals.projectedAmount} status="projected" icon={TrendingUp} tone="projected" detail="Receitas!K131" />
-        <FinancialKpiCard label="Receita consolidada" value={revenueTotals.consolidatedAmount} status="consolidated" icon={CheckCircle2} tone="consolidated" detail={`${formatPercentage(revenueTotals.consolidationRate)} da projeção`} />
-        <FinancialKpiCard label="A receber informado" value={explicitReceivable} status="receivable" icon={CircleDollarSign} tone="receivable" detail="Patrocínios + comercial" />
-        <FinancialKpiCard label="Teto das comissões" value={financialWorkbookTotals.coreCommissionBudgetCap} icon={Target} tone="neutral" detail="Despesas!B310" />
-        <FinancialKpiCard label="Orçado até o momento" value={financialWorkbookTotals.coreCommissionBudgeted} status="attention" icon={ReceiptText} tone="gold" detail={`${formatPercentage(coreBudgetUtilization)} do teto`} />
-        <FinancialKpiCard label="Saldo das comissões" value={coreBudgetBalance} icon={WalletCards} tone="consolidated" detail="Teto menos orçado" />
+      <FinancialKpiGrid columns={4} className="financial-kpi-grid--decision" aria-label="Posição financeira executiva">
+        <FinancialKpiCard
+          label="Receita projetada"
+          value={revenueTotals.projectedAmount}
+          status="projected"
+          showStatus={false}
+          icon={TrendingUp}
+          tone="projected"
+          priority="primary"
+          animateValue
+          sourceLabel="Fonte: Receitas!K131"
+        />
+        <FinancialKpiCard
+          label="Receita consolidada"
+          value={revenueTotals.consolidatedAmount}
+          status="consolidated"
+          showStatus={false}
+          icon={CheckCircle2}
+          tone="consolidated"
+          priority="primary"
+          animateValue
+          detail={`${formatPercentage(revenueTotals.consolidationRate)} da projeção`}
+        />
+        <FinancialKpiCard
+          label="A receber informado"
+          value={explicitReceivable}
+          status="receivable"
+          showStatus={false}
+          icon={CircleDollarSign}
+          tone="receivable"
+          priority="primary"
+          animateValue
+          detail="Patrocínios + Comercial"
+        />
+        <FinancialKpiCard
+          label="Lacuna de consolidação"
+          value={revenueTotals.consolidationGapAmount}
+          status="partial"
+          icon={TrendingDown}
+          tone="gold"
+          priority="primary"
+          animateValue
+          detail="Não equivale a A Receber"
+        />
       </FinancialKpiGrid>
 
-      <ExecutiveStrip items={[
-        { label: 'Lacuna de consolidação', value: formatBRL(revenueTotals.consolidationGapAmount), detail: 'Não equivale a A Receber' },
-        { label: 'Orçamento geral', value: formatBRL(financialWorkbookTotals.generalBudgeted), detail: `de ${formatBRL(financialWorkbookTotals.generalBudgetCap)}` },
-        { label: 'Saldo geral', value: formatBRL(generalBudgetBalance), detail: `${formatPercentage(generalBudgetUtilization)} utilizado` },
-        { label: 'Comissões acima do teto', value: String(overBudgetCommissions.length), detail: 'Marketing, Inovação e Experiência, Gastronomia' },
-        { label: 'Capacidade realista', value: formatBRL(financialScenarios[0].investmentCapacity), detail: 'Valor literal de PROJEÇÃO 2026!C18' },
-      ]} />
-
-      <div className="financial-dashboard-grid">
-        <FinancialPanel
-          title="Receita por ecossistema"
-          description="Patrocínio e comercial lado a lado: projetado versus consolidado."
-          icon={BarChart3}
-          className="financial-panel--span-7"
-        >
-          <RevenueComparisonChart data={revenueByEcosystem} />
-        </FinancialPanel>
-        <FinancialPanel
-          title="Composição projetada"
-          description="Principais frentes que formam a receita prevista."
-          icon={Layers3}
-          className="financial-panel--span-5"
-        >
-          <RevenueCompositionChart data={revenueComposition} />
-        </FinancialPanel>
-      </div>
-
       <FinancialPanel
-        title="Pressão orçamentária das comissões"
-        description="O valor orçado usa o cabeçalho de cada comissão; o realizado usa a coluna consolidada da fonte."
+        title="Pressão orçamentária"
         icon={BadgeDollarSign}
+        action={<span className="financial-source-pill" title="Fonte: Despesas!B310">Despesas!B310</span>}
+        className="financial-panel--budget-command"
       >
         <div className="financial-budget-command">
           <BudgetProgress
-            label="Orçamento-base das comissões"
+            label="Comissões"
             budgetCap={financialWorkbookTotals.coreCommissionBudgetCap}
             budgetedAmount={financialWorkbookTotals.coreCommissionBudgeted}
             remainingAmount={coreBudgetBalance}
@@ -560,7 +585,7 @@ export default function FinancialManagementPage({ module }: FinancialManagementP
             status="attention"
             compactAmounts={false}
           />
-          <div className="financial-budget-risks">
+          <div className="financial-budget-risks" aria-label="Comissões acima do teto">
             {overBudgetCommissions.map((budget) => (
               <article key={budget.id}>
                 <FinancialStatusBadge status="over-budget" />
@@ -571,29 +596,59 @@ export default function FinancialManagementPage({ module }: FinancialManagementP
             ))}
           </div>
         </div>
+
+        <ExecutiveStrip
+          className="financial-executive-strip--inside"
+          items={[
+            { label: 'Orçamento geral', value: formatBRL(financialWorkbookTotals.generalBudgeted), detail: `Teto ${formatBRL(financialWorkbookTotals.generalBudgetCap)}` },
+            { label: 'Saldo geral', value: formatBRL(generalBudgetBalance), detail: `${formatPercentage(generalBudgetUtilization)} utilizado` },
+            { label: 'Comissões acima do teto', value: String(overBudgetCommissions.length), detail: 'Marketing, Inovação e Experiência, Gastronomia' },
+            { label: 'Capacidade realista', value: formatBRL(financialScenarios[0].investmentCapacity), detail: 'Capacidade registrada' },
+          ]}
+        />
       </FinancialPanel>
 
       <div className="financial-dashboard-grid">
         <FinancialPanel
-          title="Maiores orçamentos"
-          description="Comparação entre teto e valor orçado nas dez maiores comissões."
-          icon={ChartNoAxesCombined}
+          title="Receita por ecossistema"
+          icon={BarChart3}
           className="financial-panel--span-7"
         >
-          <CommissionBudgetUtilizationChart data={topCommissionBudgets} />
+          <RevenueComparisonChart data={revenueByEcosystem} height={442} />
         </FinancialPanel>
         <FinancialPanel
-          title="Valores por origem registrada"
-          description="Colunas independentes da planilha; não representam 100% do realizado."
-          icon={Landmark}
+          title="Composição projetada"
+          icon={Layers3}
           className="financial-panel--span-5"
         >
-          <FundingSourceChart data={fundingData} />
+          <RevenueCompositionChart data={revenueComposition} height={442} />
         </FinancialPanel>
       </div>
 
-      <DataQualityNote title="Ponto de reconciliação preservado na fonte">
-        <p>O realizado oficial é {formatBRL(coreRealizedAmount)}. A soma dos períodos 2025 e 2026 resulta em {formatBRL(periodBridgeTotal)}, diferença de {formatBRL(periodIntegrityDelta)} causada pela linha 14, que possui valor em 2026 e célula consolidada vazia. O painel não corrige a planilha silenciosamente.</p>
+      <div className="financial-dashboard-grid">
+        <FinancialPanel
+          title="10 maiores orçamentos"
+          icon={ChartNoAxesCombined}
+          className="financial-panel--span-7"
+        >
+          <CommissionBudgetUtilizationChart
+            data={topCommissionBudgets}
+            forceMotion
+            variant="executive"
+          />
+        </FinancialPanel>
+        <FinancialPanel
+          title="Valores por origem registrada"
+          description="Origens independentes; não totalizam o realizado."
+          icon={Landmark}
+          className="financial-panel--span-5"
+        >
+          <FundingSourceChart data={fundingData} forceMotion variant="executive" />
+        </FinancialPanel>
+      </div>
+
+      <DataQualityNote title="Conciliação da fonte">
+        <p>Realizado oficial: {formatBRL(coreRealizedAmount)}. Períodos 2025 + 2026: {formatBRL(periodBridgeTotal)}. Diferença: {formatBRL(periodIntegrityDelta)}, na linha 14 (valor em 2026 e consolidado vazio).</p>
       </DataQualityNote>
     </div>
   );
@@ -620,61 +675,128 @@ export default function FinancialManagementPage({ module }: FinancialManagementP
       });
     const composition = groupRevenuesByCategory(filteredRevenues)
       .sort((a, b) => (confirmed ? b.consolidatedAmount - a.consolidatedAmount : b.projectedAmount - a.projectedAmount))
-      .slice(0, 8)
       .map((group) => ({
         id: group.key,
         label: group.label,
         amount: confirmed ? group.consolidatedAmount : group.projectedAmount,
       }));
+    const comparisonPanel = (
+      <FinancialPanel
+        title="Projetado versus consolidado"
+        description="A diferença indica lacuna de consolidação — não A Receber."
+        icon={BarChart3}
+        className={confirmed ? 'financial-panel--span-7' : 'financial-panel--span-5'}
+      >
+        <RevenueComparisonChart data={filteredRevenueByEcosystem} height={442} />
+      </FinancialPanel>
+    );
+    const compositionPanel = (
+      <FinancialPanel
+        title={confirmed ? 'Consolidado por categoria' : 'Projeção por categoria'}
+        icon={Layers3}
+        className={confirmed ? 'financial-panel--span-5' : 'financial-panel--span-7'}
+      >
+        <RevenueCompositionChart
+          data={composition}
+          height={442}
+          title={confirmed ? 'Receita consolidada por categoria' : 'Receita projetada por categoria'}
+          summary={`Composição da receita ${confirmed ? 'consolidada' : 'projetada'} por categoria.`}
+        />
+      </FinancialPanel>
+    );
+
     return (
       <div className="financial-view-stack">
         {confirmed ? (
-          <FinancialKpiGrid columns={6}>
-            <FinancialKpiCard label="Consolidado" value={filteredTotals.consolidatedAmount} status="consolidated" icon={CheckCircle2} tone="consolidated" />
-            <FinancialKpiCard label="Taxa de consolidação" value={filteredTotals.consolidationRate} valueKind="percentage" icon={Target} tone="neutral" detail="Consolidado ÷ projetado" />
-            <FinancialKpiCard label="A receber informado" value={filteredTotals.explicitReceivableAmount} status="receivable" icon={CircleDollarSign} tone="receivable" />
-            <FinancialKpiCard label="Patrocínio livre consolidado" value={filteredFreeConsolidated} icon={WalletCards} tone="consolidated" />
-            <FinancialKpiCard label="Rouanet consolidado" value={filteredRouanetConsolidated} icon={Landmark} tone="consolidated" />
-            <FinancialKpiCard label="Lacuna de consolidação" value={filteredTotals.consolidationGapAmount} status="partial" icon={TrendingDown} tone="gold" />
-          </FinancialKpiGrid>
+          <>
+            <FinancialKpiGrid columns={4} className="financial-kpi-grid--decision" aria-label="Posição das receitas confirmadas">
+              <FinancialKpiCard
+                label="Consolidado"
+                value={filteredTotals.consolidatedAmount}
+                status="consolidated"
+                showStatus={false}
+                icon={CheckCircle2}
+                tone="consolidated"
+                priority="primary"
+                animateValue
+              />
+              <FinancialKpiCard
+                label="Taxa de consolidação"
+                value={filteredTotals.consolidationRate}
+                valueKind="percentage"
+                icon={Target}
+                tone="neutral"
+                priority="primary"
+                animateValue
+                detail="Consolidado ÷ projetado"
+              />
+              <FinancialKpiCard
+                label="A receber informado"
+                value={filteredTotals.explicitReceivableAmount}
+                status="receivable"
+                showStatus={false}
+                icon={CircleDollarSign}
+                tone="receivable"
+                priority="primary"
+                animateValue
+              />
+              <FinancialKpiCard
+                label="Lacuna de consolidação"
+                value={filteredTotals.consolidationGapAmount}
+                status="partial"
+                icon={TrendingDown}
+                tone="gold"
+                priority="primary"
+                animateValue
+                detail="Não equivale a A Receber"
+              />
+            </FinancialKpiGrid>
+            <FinancialKpiGrid columns={2} className="financial-kpi-grid--secondary" aria-label="Composição consolidada por recurso">
+              <FinancialKpiCard label="Patrocínio livre consolidado" value={filteredFreeConsolidated} icon={WalletCards} tone="consolidated" priority="secondary" animateValue />
+              <FinancialKpiCard label="Rouanet consolidado" value={filteredRouanetConsolidated} icon={Landmark} tone="consolidated" priority="secondary" animateValue />
+            </FinancialKpiGrid>
+          </>
         ) : (
-          <FinancialKpiGrid columns={6}>
-            <FinancialKpiCard label="Total projetado" value={filteredTotals.projectedAmount} status="projected" icon={TrendingUp} tone="projected" />
-            <FinancialKpiCard label="Patrocínio livre projetado" value={filteredFreeProjected} icon={WalletCards} tone="projected" />
-            <FinancialKpiCard label="Rouanet projetado" value={filteredRouanetProjected} icon={Landmark} tone="projected" />
-            <FinancialKpiCard label="Comercialização projetada" value={filteredCommercialTotals.projectedAmount} icon={Banknote} tone="projected" />
-            <FinancialKpiCard label="Consolidado" value={filteredTotals.consolidatedAmount} status="consolidated" icon={CheckCircle2} tone="consolidated" />
-            <FinancialKpiCard label="Fontes na visão" value={filteredRevenues.length} valueKind="number" icon={ListTree} tone="neutral" detail={`${revenueSources.length} fontes na base`} />
-          </FinancialKpiGrid>
+          <>
+            <FinancialKpiGrid columns={4} className="financial-kpi-grid--decision" aria-label="Composição executiva das receitas projetadas">
+              <FinancialKpiCard
+                label="Total projetado"
+                value={filteredTotals.projectedAmount}
+                status="projected"
+                showStatus={false}
+                icon={TrendingUp}
+                tone="projected"
+                priority="primary"
+                animateValue
+              />
+              <FinancialKpiCard label="Patrocínio livre projetado" value={filteredFreeProjected} icon={WalletCards} tone="projected" priority="primary" animateValue />
+              <FinancialKpiCard label="Comercialização projetada" value={filteredCommercialTotals.projectedAmount} icon={Banknote} tone="projected" priority="primary" animateValue />
+              <FinancialKpiCard label="Rouanet projetado" value={filteredRouanetProjected} icon={Landmark} tone="projected" priority="primary" animateValue />
+            </FinancialKpiGrid>
+            <ExecutiveStrip
+              className="financial-executive-strip--revenue"
+              items={[
+                { label: 'Consolidado', value: formatBRL(filteredTotals.consolidatedAmount), detail: `${formatPercentage(filteredTotals.consolidationRate)} da projeção` },
+                { label: 'Lacuna de consolidação', value: formatBRL(filteredTotals.consolidationGapAmount), detail: 'Não equivale a A Receber' },
+                { label: 'A receber informado', value: formatBRL(filteredTotals.explicitReceivableAmount), detail: 'Campo explícito da fonte' },
+                { label: 'Fontes na visão', value: String(filteredRevenues.length), detail: `${revenueSources.length} no total` },
+              ]}
+            />
+          </>
         )}
 
-        <div className="financial-dashboard-grid">
-          <FinancialPanel
-            title={confirmed ? 'Consolidado por categoria' : 'Projeção por categoria'}
-            description="A composição responde aos filtros aplicados na listagem."
-            icon={Layers3}
-            className="financial-panel--span-5"
-          >
-            <RevenueCompositionChart
-              data={composition}
-              title={confirmed ? 'Receita consolidada por categoria' : 'Receita projetada por categoria'}
-              summary={`Composição da receita ${confirmed ? 'consolidada' : 'projetada'} por categoria.`}
-            />
-          </FinancialPanel>
-          <FinancialPanel
-            title="Projetado versus consolidado"
-            description="A diferença visual é uma lacuna de consolidação, não um cálculo de contas a receber."
-            icon={BarChart3}
-            className="financial-panel--span-7"
-          >
-            <RevenueComparisonChart data={filteredRevenueByEcosystem} />
-          </FinancialPanel>
+        <div className="financial-dashboard-grid financial-dashboard-grid--revenue">
+          {confirmed ? (
+            <>{comparisonPanel}{compositionPanel}</>
+          ) : (
+            <>{compositionPanel}{comparisonPanel}</>
+          )}
         </div>
 
         <FinancialPanel
-          title={confirmed ? 'Livro de receitas consolidadas' : 'Livro de receitas projetadas'}
-          description="Valores e descrições mantidos conforme a referência oficial de 2026."
+          title={confirmed ? 'Receitas consolidadas por fonte' : 'Receitas projetadas por fonte'}
           icon={FileSpreadsheet}
+          className="financial-panel--revenue-ledger"
         >
           <FinancialFilterBar resultLabel={`${filteredRevenues.length} de ${revenueSources.length} fontes`}>
             <SearchField value={revenueSearch} onChange={setRevenueSearch} label="Buscar receita" placeholder="Buscar fonte, categoria ou recurso" />
@@ -695,9 +817,6 @@ export default function FinancialManagementPage({ module }: FinancialManagementP
           <RevenueLedger revenues={filteredRevenues} emptyFromSearch={Boolean(revenueSearch || revenueCategory !== 'all' || revenueFundingType !== 'all' || revenueEcosystem !== 'all')} confirmedView={confirmed} />
         </FinancialPanel>
 
-        <DataQualityNote title="Leitura financeira correta" tone="information">
-          <p>Nesta visão filtrada, a lacuna projetado − consolidado é {formatBRL(filteredTotals.consolidationGapAmount)} e o A Receber explícito é {formatBRL(filteredTotals.explicitReceivableAmount)}. Os dois conceitos vêm de campos distintos e permanecem separados em toda a interface.</p>
-        </DataQualityNote>
       </div>
     );
   };
@@ -1017,8 +1136,12 @@ export default function FinancialManagementPage({ module }: FinancialManagementP
   };
 
   return (
-    <div className="financial-management-page" data-financial-view={view}>
-      <section className="financial-page-header">
+    <div
+      className="financial-management-page"
+      data-financial-view={view}
+      data-financial-motion={isExecutiveFinanceView ? 'full' : 'system'}
+    >
+      <section className={cn('financial-page-header', isExecutiveFinanceView && 'financial-page-header--executive')}>
         <div className="financial-page-header__main">
           <div className="financial-page-header__badges">
             <FinancialRestrictedBadge />
@@ -1031,23 +1154,33 @@ export default function FinancialManagementPage({ module }: FinancialManagementP
               <h1>{viewCopy.title}</h1>
             </div>
           </div>
-          <p className="financial-page-header__description">{viewCopy.description}</p>
-          <div className="financial-semantic-legend" aria-label="Hierarquia semântica dos valores">
-            <FinancialStatusBadge status="projected" />
-            <FinancialStatusBadge status="consolidated" />
-            <FinancialStatusBadge status="receivable" />
-            <FinancialStatusBadge status="realized" />
-          </div>
+          {!isExecutiveFinanceView && (
+            <>
+              <p className="financial-page-header__description">{viewCopy.description}</p>
+              <div className="financial-semantic-legend" aria-label="Hierarquia semântica dos valores">
+                <FinancialStatusBadge status="projected" />
+                <FinancialStatusBadge status="consolidated" />
+                <FinancialStatusBadge status="receivable" />
+                <FinancialStatusBadge status="realized" />
+              </div>
+            </>
+          )}
         </div>
         <FinancialDataProvenance
           label="Base Orçamentária Fenasoja 2026"
-          detail="Planilha oficial em modo somente leitura; sem persistência ou correção automática."
+          detail={isExecutiveFinanceView
+            ? 'Planilha oficial · somente leitura'
+            : 'Planilha oficial em modo somente leitura; sem persistência ou correção automática.'}
         />
       </section>
 
       {viewContent[view]()}
 
-      <AboutFinancialModule module={module} activeDescription={activeMenu.description} />
+      <AboutFinancialModule
+        module={module}
+        activeDescription={activeMenu.description}
+        compact={isExecutiveFinanceView}
+      />
     </div>
   );
 }
