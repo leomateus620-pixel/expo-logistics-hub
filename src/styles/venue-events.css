@@ -3241,3 +3241,246 @@
   color: hsl(var(--foreground));
   overflow-wrap: anywhere;
 }
+
+/* ============================================================
+   Agenda — cards de evento (v2)
+   ============================================================ */
+.venue-agenda-timeline--v2 {
+  gap: 1.35rem;
+}
+.venue-agenda-timeline--v2 > section {
+  grid-template-columns: 7.5rem minmax(0, 1fr);
+  gap: 1rem;
+}
+.venue-agenda-timeline--v2 > section > header time {
+  padding-top: 0.35rem;
+  display: block;
+}
+.venue-agenda-timeline--v2 > section > header strong {
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: oklch(var(--muted-foreground));
+}
+.venue-agenda-timeline--v2 > section > header b {
+  display: block;
+  margin-top: 0.1rem;
+  font-size: 1.65rem;
+  font-weight: 850;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--venue-indigo);
+}
+.venue-agenda-timeline--v2 > section > header span {
+  margin-top: 0.15rem;
+  font-size: 0.6rem;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: oklch(var(--muted-foreground));
+}
+.venue-agenda-timeline--v2 > section > header i::before {
+  top: 0.85rem;
+  width: 0.62rem;
+  height: 0.62rem;
+  box-shadow: 0 0 0 4px oklch(var(--background));
+}
+.venue-agenda-timeline--v2 > section > div {
+  gap: 0.55rem;
+}
+
+.venue-agenda-timeline--v2 > section > div > button {
+  position: relative;
+  display: grid;
+  grid-template-columns: 5.2rem minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.95rem;
+  min-height: 74px;
+  padding: 0.7rem 0.9rem 0.7rem 1.05rem;
+  border: 1px solid oklch(var(--border));
+  border-left: none;
+  border-radius: 0.95rem;
+  background:
+    linear-gradient(180deg, oklch(var(--glass-surface-strong, var(--card))), oklch(var(--card)));
+  box-shadow: var(--elevation-1);
+  backdrop-filter: blur(14px) saturate(1.05);
+  overflow: hidden;
+  transition:
+    transform 160ms ease,
+    box-shadow 160ms ease,
+    border-color 160ms ease;
+}
+.venue-agenda-timeline--v2 > section > div > button::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 4px;
+  border-radius: 0.95rem 0 0 0.95rem;
+  background: linear-gradient(180deg, var(--venue-indigo), oklch(var(--brand-indigo-200)));
+}
+.venue-agenda-timeline--v2 > section > div > button[data-status="confirmado"]::before,
+.venue-agenda-timeline--v2 > section > div > button[data-status="confirmed"]::before {
+  background: linear-gradient(180deg, oklch(var(--success)), oklch(var(--success) / 0.5));
+}
+.venue-agenda-timeline--v2 > section > div > button[data-status="solicitado"]::before,
+.venue-agenda-timeline--v2 > section > div > button[data-status="pendente"]::before {
+  background: linear-gradient(180deg, oklch(var(--warning)), oklch(var(--warning) / 0.5));
+}
+.venue-agenda-timeline--v2 > section > div > button[data-status="cancelado"]::before {
+  background: linear-gradient(180deg, oklch(var(--destructive)), oklch(var(--destructive) / 0.5));
+}
+.venue-agenda-timeline--v2 > section > div > button:hover {
+  transform: translateY(-2px);
+  border-color: oklch(var(--brand-indigo-200));
+  box-shadow: var(--elevation-3, var(--elevation-2));
+}
+.venue-agenda-timeline--v2 > section > div > button:focus-visible {
+  outline: 2px solid var(--venue-indigo);
+  outline-offset: 2px;
+}
+
+.venue-agenda-card__time {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.08rem;
+  padding-right: 0.9rem;
+  border-right: 1px dashed oklch(var(--border));
+  min-height: 46px;
+}
+.venue-agenda-card__time time {
+  font-size: 1.05rem;
+  font-weight: 850;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+  color: var(--venue-indigo);
+}
+.venue-agenda-card__time em {
+  font-size: 0.7rem;
+  font-style: normal;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  color: oklch(var(--muted-foreground));
+}
+.venue-agenda-card__time i {
+  margin-top: 0.15rem;
+  padding: 0.05rem 0.32rem;
+  border-radius: 999px;
+  background: oklch(var(--neutral-100));
+  color: oklch(var(--muted-foreground));
+  font-size: 0.55rem;
+  font-style: normal;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+}
+
+.venue-agenda-card__body {
+  min-width: 0;
+}
+.venue-agenda-card__body > strong {
+  display: block;
+  overflow: hidden;
+  font-size: 0.92rem;
+  font-weight: 780;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: oklch(var(--foreground));
+}
+.venue-agenda-card__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.4rem;
+}
+.venue-agenda-card__chips > span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  max-width: 16rem;
+  padding: 0.14rem 0.48rem;
+  border: 1px solid oklch(var(--border));
+  border-radius: 999px;
+  background: oklch(var(--neutral-100));
+  color: oklch(var(--muted-foreground));
+  font-size: 0.63rem;
+  font-weight: 650;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.venue-agenda-card__chips > span svg {
+  width: 0.72rem;
+  height: 0.72rem;
+  flex-shrink: 0;
+  color: var(--venue-indigo);
+}
+.venue-agenda-card__chips > span[data-empty="true"] {
+  opacity: 0.75;
+  font-style: italic;
+}
+
+.venue-agenda-card__aside {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.venue-agenda-card__aside svg {
+  width: 1rem;
+  height: 1rem;
+  color: oklch(var(--muted-foreground));
+  transition: transform 160ms ease;
+}
+.venue-agenda-timeline--v2 > section > div > button:hover .venue-agenda-card__aside svg {
+  transform: translateX(2px);
+  color: var(--venue-indigo);
+}
+
+@media (max-width: 640px) {
+  .venue-agenda-timeline--v2 > section > header time {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+  }
+  .venue-agenda-timeline--v2 > section > header b {
+    margin-top: 0;
+    font-size: 1.15rem;
+  }
+  .venue-agenda-timeline--v2 > section > header span {
+    margin-top: 0;
+  }
+  .venue-agenda-timeline--v2 > section > div > button {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: start;
+    gap: 0.5rem 0.75rem;
+    min-height: 88px;
+    padding: 0.75rem 0.8rem 0.75rem 1rem;
+  }
+  .venue-agenda-card__time {
+    flex-direction: row;
+    align-items: center;
+    gap: 0.4rem;
+    min-height: 0;
+    padding-right: 0;
+    border-right: none;
+  }
+  .venue-agenda-card__time time {
+    font-size: 0.95rem;
+  }
+  .venue-agenda-card__body {
+    grid-column: 1 / -1;
+  }
+  .venue-agenda-card__aside {
+    justify-self: end;
+  }
+  .venue-agenda-card__chips > span {
+    min-height: 26px;
+    max-width: 100%;
+  }
+}
