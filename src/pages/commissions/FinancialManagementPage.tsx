@@ -93,10 +93,18 @@ import {
   selectSponsorTotals,
   sortExpensesForLedger,
 } from '@/features/financial-management/selectors/financialSelectors';
+import {
+  selectExpenseExecutionModel,
+} from '@/features/financial-management/selectors/financialSelectors';
 import type {
+  ExpenseExecutionGroupingMode,
   ExpenseGroupingMode,
   ExpenseVisualizationCoverage,
 } from '@/features/financial-management/selectors/financialSelectors';
+import {
+  ExpenseExecutionBoard,
+  FundingDistributionStrip,
+} from '@/features/financial-management/components/FinancialExecutiveBoard';
 import {
   formatBRL,
   formatPercentage,
@@ -111,6 +119,7 @@ import type {
   SponsorTier,
 } from '@/features/financial-management/types';
 import '@/styles/financial-management.css';
+import '@/styles/financial-executive-panel.css';
 
 interface FinancialManagementPageProps {
   module: CommissionModule;
@@ -449,6 +458,7 @@ export default function FinancialManagementPage({ module }: FinancialManagementP
     : 'dashboard';
   const viewCopy = VIEW_COPY[view];
   const activeMenu = module.menus.find((menu) => menu.path === view) ?? module.menus[0];
+  const isDashboardView = view === 'dashboard';
   const isFlagshipFinanceView = view === 'dashboard'
     || view === 'receitas-projetadas'
     || view === 'receitas-confirmadas'
@@ -467,6 +477,7 @@ export default function FinancialManagementPage({ module }: FinancialManagementP
   const [sponsorSearch, setSponsorSearch] = useState('');
   const [sponsorTier, setSponsorTier] = useState<'all' | SponsorTier>('all');
   const [scenarioId, setScenarioId] = useState<ScenarioId>('realistic');
+  const [executionGrouping, setExecutionGrouping] = useState<ExpenseExecutionGroupingMode>('commission');
 
   const commissionBudgets = useMemo(() => selectCommissionBudgets(commissionBudgetSources), []);
   const expenses = useMemo(() => flattenCommissionExpenses(commissionBudgetSources), []);
@@ -607,53 +618,145 @@ export default function FinancialManagementPage({ module }: FinancialManagementP
     { id: 'rouanet', fundingType: 'Lei Rouanet', amount: financialWorkbookTotals.rouanetAmount },
   ];
 
+  const executionModel = useMemo(
+    () => selectExpenseExecutionModel(expenses, executionGrouping),
+    [expenses, executionGrouping],
+  );
+  const fundingDistribution = useMemo(() => {
+    const registeredTotal = fundingData.reduce((total, item) => total + Math.max(item.amount, 0), 0);
+    return ([
+      { key: 'free-resource' as const, label: 'Recurso Livre', amount: financialWorkbookTotals.paidWithFreeResource },
+      { key: 'municipality-plan' as const, label: 'Prefeitura / Plano de Trabalho', amount: financialWorkbookTotals.municipalityPlanAmount },
+      { key: 'rouanet' as const, label: 'Lei Rouanet', amount: financialWorkbookTotals.rouanetAmount },
+    ]).map((item) => ({
+      ...item,
+      registeredSharePercentage: registeredTotal > 0 ? (item.amount / registeredTotal) * 100 : 0,
+    }));
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const renderDashboard = () => (
-    <div className="financial-view-stack">
-      <FinancialKpiGrid columns={4} className="financial-kpi-grid--decision" aria-label="Posição financeira executiva">
-        <FinancialKpiCard
-          label="Receita projetada"
-          value={revenueTotals.projectedAmount}
-          status="projected"
-          showStatus={false}
-          icon={TrendingUp}
-          tone="projected"
-          priority="primary"
-          animateValue
-          sourceLabel="Fonte: Receitas!K131"
+    <div className="financial-view-stack financial-view-stack--executive">
+      <section className="financial-exec-kpis" aria-label="Posição financeira executiva">
+        <div className="financial-exec-kpis__block financial-exec-kpis__block--revenue">
+          <h2 className="financial-exec-kpis__title">Receitas</h2>
+          <div className="financial-exec-kpis__cards">
+            <FinancialKpiCard
+              label="Projetada"
+              value={revenueTotals.projectedAmount}
+              icon={TrendingUp}
+              tone="projected"
+              priority="primary"
+              showStatus={false}
+              animateValue
+              className="financial-kpi-card--exec"
+            />
+            <FinancialKpiCard
+              label="Consolidada"
+              value={revenueTotals.consolidatedAmount}
+              icon={CheckCircle2}
+              tone="consolidated"
+              priority="primary"
+              showStatus={false}
+              animateValue
+              detail={`${formatPercentage(revenueTotals.consolidationRate)} da projeção`}
+              className="financial-kpi-card--exec"
+            />
+            <FinancialKpiCard
+              label="A receber"
+              value={explicitReceivable}
+              icon={CircleDollarSign}
+              tone="receivable"
+              priority="secondary"
+              showStatus={false}
+              animateValue
+              className="financial-kpi-card--exec"
+            />
+            <FinancialKpiCard
+              label="Lacuna de consolidação"
+              value={revenueTotals.consolidationGapAmount}
+              icon={TrendingDown}
+              tone="gold"
+              priority="secondary"
+              showStatus={false}
+              animateValue
+              detail="Não equivale a A Receber"
+              className="financial-kpi-card--exec"
+            />
+          </div>
+        </div>
+
+        <div className="financial-exec-kpis__block financial-exec-kpis__block--expense">
+          <h2 className="financial-exec-kpis__title">Despesas</h2>
+          <div className="financial-exec-kpis__cards">
+            <FinancialKpiCard
+              label="Previstas"
+              value={executionModel.plannedTotal}
+              icon={Layers3}
+              tone="attention"
+              priority="primary"
+              showStatus={false}
+              animateValue
+              detail="Períodos 2025 + 2026"
+              className="financial-kpi-card--exec financial-kpi-card--planned"
+            />
+            <FinancialKpiCard
+              label="Realizadas"
+              value={executionModel.realizedTotal}
+              icon={ReceiptText}
+              tone="realized"
+              priority="primary"
+              showStatus={false}
+              animateValue
+              detail={executionModel.hasExecutionRate
+                ? `${formatPercentage(executionModel.executionPercentage)} do previsto`
+                : 'Sem base de comparação'}
+              className="financial-kpi-card--exec financial-kpi-card--realized"
+            />
+          </div>
+        </div>
+
+        <div className="financial-exec-kpis__block financial-exec-kpis__block--budget">
+          <h2 className="financial-exec-kpis__title">Orçamento</h2>
+          <div className="financial-exec-kpis__cards">
+            <FinancialKpiCard
+              label="Orçado"
+              value={financialWorkbookTotals.coreCommissionBudgeted}
+              icon={Calculator}
+              tone="neutral"
+              priority="secondary"
+              showStatus={false}
+              animateValue
+              detail={`Teto ${formatBRL(financialWorkbookTotals.coreCommissionBudgetCap)}`}
+              className="financial-kpi-card--exec"
+            />
+            <FinancialKpiCard
+              label="Saldo"
+              value={coreBudgetBalance}
+              icon={PiggyBank}
+              tone="neutral"
+              priority="secondary"
+              showStatus={false}
+              animateValue
+              detail={`${formatPercentage(coreBudgetUtilization)} utilizado`}
+              className="financial-kpi-card--exec"
+            />
+          </div>
+        </div>
+      </section>
+
+      <FinancialPanel
+        title="Previsto versus realizado"
+        description="Base completa de despesas agrupada; nenhuma linha é descartada."
+        icon={ChartNoAxesCombined}
+        className="financial-panel--execution"
+      >
+        <ExpenseExecutionBoard
+          model={executionModel}
+          grouping={executionGrouping}
+          onGroupingChange={setExecutionGrouping}
         />
-        <FinancialKpiCard
-          label="Receita consolidada"
-          value={revenueTotals.consolidatedAmount}
-          status="consolidated"
-          showStatus={false}
-          icon={CheckCircle2}
-          tone="consolidated"
-          priority="primary"
-          animateValue
-          detail={`${formatPercentage(revenueTotals.consolidationRate)} da projeção`}
-        />
-        <FinancialKpiCard
-          label="A receber informado"
-          value={explicitReceivable}
-          status="receivable"
-          showStatus={false}
-          icon={CircleDollarSign}
-          tone="receivable"
-          priority="primary"
-          animateValue
-          detail="Patrocínios + Comercial"
-        />
-        <FinancialKpiCard
-          label="Lacuna de consolidação"
-          value={revenueTotals.consolidationGapAmount}
-          status="partial"
-          icon={TrendingDown}
-          tone="gold"
-          priority="primary"
-          animateValue
-          detail="Não equivale a A Receber"
-        />
-      </FinancialKpiGrid>
+      </FinancialPanel>
 
       <FinancialPanel
         title="Pressão orçamentária"
@@ -700,22 +803,23 @@ export default function FinancialManagementPage({ module }: FinancialManagementP
           icon={BarChart3}
           className="financial-panel--span-7"
         >
-          <RevenueComparisonChart data={revenueByEcosystem} height={442} />
+          <RevenueComparisonChart data={revenueByEcosystem} height={400} />
         </FinancialPanel>
         <FinancialPanel
           title="Composição projetada"
           icon={Layers3}
           className="financial-panel--span-5"
         >
-          <RevenueCompositionChart data={revenueComposition} height={442} />
+          <RevenueCompositionChart data={revenueComposition} height={400} />
         </FinancialPanel>
       </div>
 
       <div className="financial-dashboard-grid">
         <FinancialPanel
           title="10 maiores orçamentos"
+          description="Ranking executivo; não representa a base completa."
           icon={ChartNoAxesCombined}
-          className="financial-panel--span-7"
+          className="financial-panel--span-7 financial-panel--ranking"
         >
           <CommissionBudgetUtilizationChart
             data={topCommissionBudgets}
@@ -724,12 +828,11 @@ export default function FinancialManagementPage({ module }: FinancialManagementP
           />
         </FinancialPanel>
         <FinancialPanel
-          title="Valores por origem registrada"
-          description="Origens independentes; não totalizam o realizado."
+          title="Origem dos recursos"
           icon={Landmark}
-          className="financial-panel--span-5"
+          className="financial-panel--span-5 financial-panel--funding"
         >
-          <FundingSourceChart data={fundingData} forceMotion variant="executive" />
+          <FundingDistributionStrip data={fundingDistribution} />
         </FinancialPanel>
       </div>
 
@@ -1365,12 +1468,20 @@ export default function FinancialManagementPage({ module }: FinancialManagementP
       data-financial-view={view}
       data-financial-motion={isFlagshipFinanceView ? 'full' : 'system'}
     >
-      <section className={cn('financial-page-header', isFlagshipFinanceView && 'financial-page-header--executive')}>
+      <section
+        className={cn(
+          'financial-page-header',
+          isFlagshipFinanceView && 'financial-page-header--executive',
+          isDashboardView && 'financial-page-header--command',
+        )}
+      >
         <div className="financial-page-header__main">
-          <div className="financial-page-header__badges">
-            <FinancialRestrictedBadge />
-            <span className="financial-period-badge">Planejamento 2026</span>
-          </div>
+          {!isDashboardView && (
+            <div className="financial-page-header__badges">
+              <FinancialRestrictedBadge />
+              <span className="financial-period-badge">Planejamento 2026</span>
+            </div>
+          )}
           <div className="financial-page-header__identity">
             <span className="financial-page-header__icon" aria-hidden="true"><viewCopy.icon /></span>
             <div>
@@ -1390,12 +1501,14 @@ export default function FinancialManagementPage({ module }: FinancialManagementP
             </>
           )}
         </div>
-        <FinancialDataProvenance
-          label="Base Orçamentária Fenasoja 2026"
-          detail={isFlagshipFinanceView
-            ? 'Planilha oficial · somente leitura'
-            : 'Planilha oficial em modo somente leitura; sem persistência ou correção automática.'}
-        />
+        {!isDashboardView && (
+          <FinancialDataProvenance
+            label="Base Orçamentária Fenasoja 2026"
+            detail={isFlagshipFinanceView
+              ? 'Planilha oficial · somente leitura'
+              : 'Planilha oficial em modo somente leitura; sem persistência ou correção automática.'}
+          />
+        )}
       </section>
 
       {viewContent[view]()}
