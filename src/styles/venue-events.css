@@ -3720,25 +3720,111 @@
   outline-offset: 2px;
 }
 
-.venue-event-card__time b {
+/* Coluna dedicada à data */
+.venue-event-card__date {
   display: flex;
-  align-items: baseline;
-  gap: 0.28rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.05rem;
+  min-height: 3.4rem;
+  padding: 0.4rem 0.25rem;
+  border: 1px solid oklch(var(--border) / 0.9);
+  border-radius: 0.75rem;
+  background: linear-gradient(
+    180deg,
+    oklch(var(--card)),
+    oklch(var(--neutral-100) / 0.75)
+  );
+  box-shadow:
+    inset 0 1px 0 oklch(1 0 0 / 0.6),
+    0 6px 14px -12px oklch(0 0 0 / 0.55);
+}
+
+.venue-event-card__date b {
   color: oklch(var(--foreground));
-  font-size: 1.12rem;
+  font-size: 1.28rem;
   font-weight: 850;
   font-variant-numeric: tabular-nums;
   line-height: 1;
+  letter-spacing: -0.02em;
 }
 
-.venue-event-card__time b i {
-  color: oklch(var(--muted-foreground));
-  font-size: 0.62rem;
+.venue-event-card__date i {
+  color: var(--venue-indigo, oklch(var(--primary)));
+  font-size: 0.6rem;
   font-style: normal;
-  font-weight: 800;
-  letter-spacing: 0.12em;
+  font-weight: 850;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
 }
+
+.venue-event-card__date u {
+  color: oklch(var(--muted-foreground));
+  font-size: 0.56rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+}
+
+/* Coluna dedicada ao horário */
+.venue-event-card__hours {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.2rem;
+  min-height: 3.4rem;
+  padding-right: 0.85rem;
+  border-right: 1px dashed oklch(var(--border));
+}
+
+.venue-event-card__hours time {
+  position: relative;
+  color: var(--venue-indigo, oklch(var(--primary)));
+  font-size: 1.02rem;
+  font-weight: 850;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+.venue-event-card__hours-end {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.venue-event-card__hours-end em {
+  color: oklch(var(--muted-foreground));
+  font-size: 0.76rem;
+  font-style: normal;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.venue-event-card__hours-end i {
+  padding: 0.06rem 0.36rem;
+  border: 1px solid oklch(var(--border));
+  border-radius: 999px;
+  background: oklch(var(--neutral-100));
+  color: oklch(var(--muted-foreground));
+  font-size: 0.56rem;
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.venue-event-card__hours-empty {
+  color: oklch(var(--muted-foreground));
+  font-size: 0.66rem;
+  font-weight: 700;
+  line-height: 1.25;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
 
 .venue-event-card__conflict {
   width: 1rem;
