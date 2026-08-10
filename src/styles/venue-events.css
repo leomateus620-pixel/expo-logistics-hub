@@ -3659,7 +3659,7 @@
 .venue-event-card {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(4.6rem, auto) minmax(0, 1fr) auto;
+  grid-template-columns: 4rem 6.5rem minmax(0, 1fr) auto;
   align-items: center;
   gap: 0.9rem;
   width: 100%;
