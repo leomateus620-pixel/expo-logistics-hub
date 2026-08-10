@@ -520,13 +520,16 @@ export function VenueWorkspace() {
   const [spaceOpen, setSpaceOpen] = useState(false);
   const [selectedSpaceId, setSelectedSpaceId] = useState<string | null>(null);
   const [mobileMoreOpen, setMobileMoreOpen] = useState(false);
-  const [search, setSearch] = useState("");
+  const venueSearch = useVenueSearch();
+  const [localSearch, setLocalSearch] = useState("");
+  const search = venueSearch?.query ?? localSearch;
+  const setSearch = venueSearch?.setQuery ?? setLocalSearch;
   const [statusFilter, setStatusFilter] = useState("all");
   const [spaceFilter, setSpaceFilter] = useState("all");
   const [yearFilter, setYearFilter] = useState("all");
   const [reviewOnly, setReviewOnly] = useState(false);
   const [agendaMode, setAgendaMode] = useState<"dia" | "semana" | "mes">(
-    "semana",
+    "mes",
   );
   const [agendaDate, setAgendaDate] = useState(currentDateKey);
   const [reportFrom, setReportFrom] = useState(`${currentYear}-01-01`);
