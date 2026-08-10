@@ -1353,7 +1353,7 @@ export function VenueWorkspace() {
       </div>
 
       {agendaGroups.length ? (
-        <div className="venue-agenda-timeline">
+        <div className="venue-agenda-timeline venue-agenda-timeline--v2">
           {agendaGroups.map(([date, events]) => (
             <section key={date}>
               <header>
@@ -1364,10 +1364,16 @@ export function VenueWorkspace() {
                       timeZone: "America/Sao_Paulo",
                     }).format(new Date(`${date}T12:00:00-03:00`))}
                   </strong>
-                  <span>
+                  <b>
                     {new Intl.DateTimeFormat("pt-BR", {
                       day: "2-digit",
-                      month: "long",
+                      timeZone: "America/Sao_Paulo",
+                    }).format(new Date(`${date}T12:00:00-03:00`))}
+                  </b>
+                  <span>
+                    {new Intl.DateTimeFormat("pt-BR", {
+                      month: "short",
+                      year: "numeric",
                       timeZone: "America/Sao_Paulo",
                     }).format(new Date(`${date}T12:00:00-03:00`))}
                   </span>
@@ -1375,41 +1381,64 @@ export function VenueWorkspace() {
                 <i />
               </header>
               <div>
-                {events.map((event) => (
-                  <button
-                    key={event.id}
-                    type="button"
-                    onClick={() => openEvent(event.id)}
-                    data-status={event.status}
-                  >
-                    <time>
-                      {new Intl.DateTimeFormat("pt-BR", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                        timeZone: "America/Sao_Paulo",
-                      }).format(new Date(event.start_at!))}
-                    </time>
-                    <span>
-                      <strong>{event.title}</strong>
-                      <small>
-                        {getSpaceNames(
-                          event.id,
-                          workspace.allocations,
-                          workspace.spaces,
-                        )}{" "}
-                        ·{" "}
-                        {getStakeholderName(
-                          event.sponsor_id,
-                          workspace.stakeholders,
-                        )}
-                      </small>
-                    </span>
-                    <StatusBadge status={event.status} />
-                    <ChevronRight />
-                  </button>
-                ))}
+                {events.map((event) => {
+                  const startLabel = formatAgendaHour(event.start_at);
+                  const endLabel = formatAgendaHour(event.end_at);
+                  const durationLabel = formatAgendaDuration(
+                    event.start_at,
+                    event.end_at,
+                  );
+                  const spaceLabel = getSpaceNames(
+                    event.id,
+                    workspace.allocations,
+                    workspace.spaces,
+                  );
+                  const sponsorLabel = getStakeholderName(
+                    event.sponsor_id,
+                    workspace.stakeholders,
+                  );
+
+                  return (
+                    <button
+                      key={event.id}
+                      type="button"
+                      onClick={() => openEvent(event.id)}
+                      data-status={event.status}
+                      className="venue-agenda-card"
+                      aria-label={`${event.title} — ${startLabel ?? "sem horário"}${endLabel ? ` às ${endLabel}` : ""}`}
+                    >
+                      <span className="venue-agenda-card__time">
+                        <time dateTime={event.start_at ?? undefined}>
+                          {startLabel ?? "--:--"}
+                        </time>
+                        {endLabel && <em>{endLabel}</em>}
+                        {durationLabel && <i>{durationLabel}</i>}
+                      </span>
+
+                      <span className="venue-agenda-card__body">
+                        <strong>{event.title}</strong>
+                        <span className="venue-agenda-card__chips">
+                          <span data-kind="space">
+                            <MapPin aria-hidden="true" />
+                            {spaceLabel || "Área não definida"}
+                          </span>
+                          <span data-kind="sponsor" data-empty={!sponsorLabel || sponsorLabel === "Sem vínculo"}>
+                            <Building2 aria-hidden="true" />
+                            {sponsorLabel || "Sem vínculo"}
+                          </span>
+                        </span>
+                      </span>
+
+                      <span className="venue-agenda-card__aside">
+                        <StatusBadge status={event.status} />
+                        <ChevronRight aria-hidden="true" />
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             </section>
+
           ))}
         </div>
       ) : (
