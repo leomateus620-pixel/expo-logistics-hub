@@ -722,3 +722,99 @@ export function selectScenarioSummaries(
     };
   });
 }
+
+export type ExpenseExecutionGroupingMode = 'commission' | 'category';
+
+/**
+ * Comparative planning-versus-execution reading of a single expense group.
+ *
+ * `plannedAmount` reuses the planning ledger definition (2025 + 2026 periods)
+ * and `realizedAmount` reuses the realized column. Neither value is redefined
+ * here: both come from the same aggregation used by the specialised menus.
+ */
+export interface ExpenseExecutionGroup {
+  key: string;
+  label: string;
+  expenseCount: number;
+  plannedAmount: number;
+  realizedAmount: number;
+  /** Realizado − Previsto. Positivo indica execução acima do previsto. */
+  differenceAmount: number;
+  executionPercentage: number;
+  /** Falso quando não há previsto positivo, evitando percentual sem sentido. */
+  hasExecutionRate: boolean;
+  plannedSharePercentage: number;
+  realizedSharePercentage: number;
+}
+
+export interface ExpenseExecutionModel {
+  groups: ExpenseExecutionGroup[];
+  plannedTotal: number;
+  realizedTotal: number;
+  differenceAmount: number;
+  executionPercentage: number;
+  hasExecutionRate: boolean;
+  /** Maior valor absoluto entre previsto e realizado; escala comum dos dois gráficos. */
+  maxAmount: number;
+  groupCount: number;
+  expenseCount: number;
+}
+
+function toSharePercentage(amount: number, total: number): number {
+  if (!Number.isFinite(total) || total <= 0) return 0;
+  return (amount / total) * 100;
+}
+
+/**
+ * Consolidates the whole expense base into comparable planning/execution
+ * groups. Every line is represented — grouping never truncates the base.
+ */
+export function selectExpenseExecutionModel(
+  expenses: readonly FinancialExpense[],
+  grouping: ExpenseExecutionGroupingMode,
+): ExpenseExecutionModel {
+  const baseGroups = grouping === 'category'
+    ? groupExpensesByCategory(expenses)
+    : groupExpensesByCommission(expenses);
+
+  const plannedTotal = selectExpenseLedgerTotal(expenses, 'planning');
+  const realizedTotal = selectExpenseLedgerTotal(expenses, 'realized');
+
+  const groups = baseGroups.map<ExpenseExecutionGroup>((group) => {
+    const plannedAmount = sumCurrency([group.value2025Amount, group.value2026Amount]);
+    const realizedAmount = roundCurrency(group.realizedAmount);
+    const hasExecutionRate = plannedAmount > 0;
+
+    return {
+      key: group.key,
+      label: group.label,
+      expenseCount: group.expenseCount,
+      plannedAmount,
+      realizedAmount,
+      differenceAmount: roundCurrency(realizedAmount - plannedAmount),
+      executionPercentage: hasExecutionRate ? (realizedAmount / plannedAmount) * 100 : 0,
+      hasExecutionRate,
+      plannedSharePercentage: toSharePercentage(plannedAmount, plannedTotal),
+      realizedSharePercentage: toSharePercentage(realizedAmount, realizedTotal),
+    };
+  }).sort((left, right) => (
+    (right.plannedAmount + right.realizedAmount) - (left.plannedAmount + left.realizedAmount)
+  ));
+
+  const maxAmount = groups.reduce(
+    (largest, group) => Math.max(largest, group.plannedAmount, group.realizedAmount),
+    0,
+  );
+
+  return {
+    groups,
+    plannedTotal,
+    realizedTotal,
+    differenceAmount: roundCurrency(realizedTotal - plannedTotal),
+    executionPercentage: plannedTotal > 0 ? (realizedTotal / plannedTotal) * 100 : 0,
+    hasExecutionRate: plannedTotal > 0,
+    maxAmount,
+    groupCount: groups.length,
+    expenseCount: expenses.length,
+  };
+}
