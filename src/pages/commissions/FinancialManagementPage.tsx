@@ -458,6 +458,7 @@ export default function FinancialManagementPage({ module }: FinancialManagementP
     : 'dashboard';
   const viewCopy = VIEW_COPY[view];
   const activeMenu = module.menus.find((menu) => menu.path === view) ?? module.menus[0];
+  const isDashboardView = view === 'dashboard';
   const isFlagshipFinanceView = view === 'dashboard'
     || view === 'receitas-projetadas'
     || view === 'receitas-confirmadas'
@@ -1467,12 +1468,20 @@ export default function FinancialManagementPage({ module }: FinancialManagementP
       data-financial-view={view}
       data-financial-motion={isFlagshipFinanceView ? 'full' : 'system'}
     >
-      <section className={cn('financial-page-header', isFlagshipFinanceView && 'financial-page-header--executive')}>
+      <section
+        className={cn(
+          'financial-page-header',
+          isFlagshipFinanceView && 'financial-page-header--executive',
+          isDashboardView && 'financial-page-header--command',
+        )}
+      >
         <div className="financial-page-header__main">
-          <div className="financial-page-header__badges">
-            <FinancialRestrictedBadge />
-            <span className="financial-period-badge">Planejamento 2026</span>
-          </div>
+          {!isDashboardView && (
+            <div className="financial-page-header__badges">
+              <FinancialRestrictedBadge />
+              <span className="financial-period-badge">Planejamento 2026</span>
+            </div>
+          )}
           <div className="financial-page-header__identity">
             <span className="financial-page-header__icon" aria-hidden="true"><viewCopy.icon /></span>
             <div>
@@ -1492,12 +1501,14 @@ export default function FinancialManagementPage({ module }: FinancialManagementP
             </>
           )}
         </div>
-        <FinancialDataProvenance
-          label="Base Orçamentária Fenasoja 2026"
-          detail={isFlagshipFinanceView
-            ? 'Planilha oficial · somente leitura'
-            : 'Planilha oficial em modo somente leitura; sem persistência ou correção automática.'}
-        />
+        {!isDashboardView && (
+          <FinancialDataProvenance
+            label="Base Orçamentária Fenasoja 2026"
+            detail={isFlagshipFinanceView
+              ? 'Planilha oficial · somente leitura'
+              : 'Planilha oficial em modo somente leitura; sem persistência ou correção automática.'}
+          />
+        )}
       </section>
 
       {viewContent[view]()}
