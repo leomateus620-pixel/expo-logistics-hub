@@ -17,6 +17,8 @@ import {
   LayoutDashboard,
   ListChecks,
   Loader2,
+  Building2,
+  MapPin,
   MoreHorizontal,
   Plus,
   RefreshCw,
