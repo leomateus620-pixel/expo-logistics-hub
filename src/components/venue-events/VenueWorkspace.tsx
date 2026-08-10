@@ -2767,46 +2767,11 @@ export function VenueWorkspace() {
         data-variant="switcher"
         data-venue={venueId}
       >
-        <div className="venue-command-hero__copy">
-          <VenueWorkspaceSwitcher
-            active={venueId}
-            counts={venueEventCounts}
-            onSelect={setVenue}
-          />
-          <p className="venue-command-hero__context">
-            <Sparkles aria-hidden="true" />
-            <strong>{activeNav.label}</strong>
-            <span>
-              {workspace.spaces[0]?.name ?? venueDefinition.shortLabel}
-              {workspace.spaces[0]?.capacity
-                ? ` · até ${workspace.spaces[0].capacity.toLocaleString("pt-BR")} pessoas`
-                : ""}
-              {` · ${venueEventCounts[venueId]} ${
-                venueEventCounts[venueId] === 1 ? "evento" : "eventos"
-              }`}
-            </span>
-          </p>
-        </div>
-        <div className="venue-command-hero__actions">
-          {operations.isFetching && (
-            <span className="venue-sync-indicator">
-              <Loader2 className="animate-spin" /> Sincronizando
-            </span>
-          )}
-          {permissions.venue_events_create && (
-            <Button onClick={startNewEvent} disabled={!operations.isOnline}>
-              <Plus /> Novo evento
-            </Button>
-          )}
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={() => operations.refetch()}
-            aria-label="Atualizar dados"
-          >
-            <RefreshCw />
-          </Button>
-        </div>
+        <VenueWorkspaceSwitcher
+          active={venueId}
+          counts={venueEventCounts}
+          onSelect={setVenue}
+        />
       </section>
 
       <nav className="venue-desktop-nav" aria-label="Navegação do módulo">

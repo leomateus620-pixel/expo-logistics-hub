@@ -12,6 +12,7 @@ const form = read(
   "src/components/venue-events/VenueEventFormDialog.tsx",
 );
 const productionCss = read("src/styles/venue-events-production.css");
+const switcher = read("src/components/venue-events/VenueWorkspaceSwitcher.tsx");
 const app = read("src/App.tsx");
 
 describe("contrato de apresentação de Eventos Restaurante e Arena", () => {
@@ -32,7 +33,14 @@ describe("contrato de apresentação de Eventos Restaurante e Arena", () => {
     expect(workspace).toContain('{ id: "gestao", label: "Gestão" }');
     expect(workspace).toContain('{ id: "controle", label: "Controle" }');
     expect(workspace).toContain('className="venue-desktop-nav__group"');
-    expect(workspace).toContain("VIEW_CONTEXT[view].description");
+  });
+
+  it("exibe o seletor de workspaces em duas metades sem ações do hero", () => {
+    expect(productionCss).toContain("grid-template-columns: 1fr 1fr");
+    expect(switcher).not.toContain("{description}");
+    expect(switcher).not.toContain("<small>");
+    expect(workspace).not.toContain("venue-command-hero__actions");
+    expect(workspace).not.toContain("venue-command-hero__context");
   });
 
   it("mantém o formulário sólido, com uma única rolagem e rodapé estável", () => {
