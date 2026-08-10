@@ -34,7 +34,14 @@ import {
   type CommissionModule,
 } from '@/modules/commissions/commissionRegistry';
 import {
+  BudgetStatusDonutChart,
   CommissionBudgetUtilizationChart,
+  ExpenseCategoryDonutChart,
+  ExpenseDistributionBarChart,
+  ExpenseFundingStackedBarChart,
+  ExpensePeriodComparisonChart,
+  ExpenseTreemapChart,
+  FinancialDistributionDonutChart,
   FundingSourceChart,
   RevenueComparisonChart,
   RevenueCompositionChart,
@@ -71,9 +78,12 @@ import {
   flattenCommissionExpenses,
   groupExpensesByCategory,
   groupExpensesByCommission,
+  groupExpensesByFundingSource,
   groupRevenuesByCategory,
-  selectExpenseDisplayAmount,
+  hasRealizedExpenseActivity,
+  selectBudgetStatusComposition,
   selectExpenseLedgerTotal,
+  selectExpenseVisualizationCoverage,
   selectGeneralBudgetSummaries,
   selectCommissionBudgets,
   selectOverBudgetCommissions,
@@ -83,7 +93,10 @@ import {
   selectSponsorTotals,
   sortExpensesForLedger,
 } from '@/features/financial-management/selectors/financialSelectors';
-import type { ExpenseGroupingMode } from '@/features/financial-management/selectors/financialSelectors';
+import type {
+  ExpenseGroupingMode,
+  ExpenseVisualizationCoverage,
+} from '@/features/financial-management/selectors/financialSelectors';
 import {
   formatBRL,
   formatPercentage,
@@ -309,6 +322,82 @@ function ExecutiveStrip({
   );
 }
 
+function ExpenseCoverageBand({
+  coverage,
+  availableLineCount,
+}: {
+  coverage: ExpenseVisualizationCoverage;
+  availableLineCount: number;
+}) {
+  const geometryLineCount = coverage.positiveVisualLineCount + coverage.negativeVisualLineCount;
+  const isFiltered = coverage.totalLineCount !== availableLineCount;
+
+  return (
+    <section className="financial-coverage-band" aria-label="Cobertura da base de despesas">
+      <div className="financial-coverage-band__lead">
+        <span className="financial-coverage-band__icon"><Layers3 aria-hidden="true" /></span>
+        <div>
+          <p>Cobertura integral</p>
+          <strong>{coverage.representationPercentage}% da base preservada</strong>
+          <span>{isFiltered ? 'Visualizações sincronizadas com o recorte ativo' : 'Todas as linhas seguem disponíveis nas camadas analítica e detalhada'}</span>
+        </div>
+      </div>
+      <dl>
+        <div>
+          <dt>Linhas no recorte</dt>
+          <dd>{coverage.totalLineCount}<small> de {availableLineCount}</small></dd>
+        </div>
+        <div>
+          <dt>Atividade registrada</dt>
+          <dd>{coverage.activeLineCount}</dd>
+        </div>
+        <div>
+          <dt>Com área monetária</dt>
+          <dd>{geometryLineCount}</dd>
+        </div>
+        <div>
+          <dt>Sem área monetária</dt>
+          <dd>{coverage.zeroVisualLineCount}<small> no ledger</small></dd>
+        </div>
+        <div>
+          <dt>Valor visualizado</dt>
+          <dd>{formatBRL(coverage.visualAmount)}</dd>
+        </div>
+      </dl>
+    </section>
+  );
+}
+
+function FinancialDisclosureSection({
+  title,
+  summary,
+  meta,
+  icon: Icon = BookOpenCheck,
+  tone = 'neutral',
+  children,
+}: {
+  title: string;
+  summary: string;
+  meta?: string;
+  icon?: LucideIcon;
+  tone?: 'neutral' | 'attention' | 'information';
+  children: ReactNode;
+}) {
+  return (
+    <details className={cn('financial-disclosure-section', `financial-disclosure-section--${tone}`)}>
+      <summary>
+        <span className="financial-disclosure-section__icon"><Icon aria-hidden="true" /></span>
+        <span className="financial-disclosure-section__copy">
+          <strong>{title}</strong>
+          <small>{summary}</small>
+        </span>
+        {meta && <span className="financial-disclosure-section__meta">{meta}</span>}
+      </summary>
+      <div className="financial-disclosure-section__content">{children}</div>
+    </details>
+  );
+}
+
 function AboutFinancialModule({
   module,
   activeDescription,
@@ -360,9 +449,12 @@ export default function FinancialManagementPage({ module }: FinancialManagementP
     : 'dashboard';
   const viewCopy = VIEW_COPY[view];
   const activeMenu = module.menus.find((menu) => menu.path === view) ?? module.menus[0];
-  const isExecutiveFinanceView = view === 'dashboard'
+  const isFlagshipFinanceView = view === 'dashboard'
     || view === 'receitas-projetadas'
-    || view === 'receitas-confirmadas';
+    || view === 'receitas-confirmadas'
+    || view === 'despesas-previstas'
+    || view === 'despesas-realizadas'
+    || view === 'orcamento-comissoes';
 
   const [revenueSearch, setRevenueSearch] = useState('');
   const [revenueCategory, setRevenueCategory] = useState<'all' | RevenueCategory>('all');
@@ -449,13 +541,7 @@ export default function FinancialManagementPage({ module }: FinancialManagementP
   }, [expenseCategory, expenseCommission, expenseSearch, expenses]);
 
   const realizedExpenses = useMemo(
-    () => filteredExpenses.filter((expense) => (
-      expense.realizedAmount !== 0
-      || expense.paidWithFreeResource !== 0
-      || expense.municipalityPlanAmount !== 0
-      || expense.rouanetAmount !== 0
-      || expense.paidMarkerAmount !== 0
-    )),
+    () => filteredExpenses.filter(hasRealizedExpenseActivity),
     [filteredExpenses],
   );
 
@@ -823,64 +909,49 @@ export default function FinancialManagementPage({ module }: FinancialManagementP
 
   const renderExpenses = (realized: boolean) => {
     const mode = realized ? 'realized' : 'planning';
-    const sourceRows = realized ? realizedExpenses : filteredExpenses;
-    const rows = sortExpensesForLedger(sourceRows, mode, expenseGrouping);
+    const availableRows = expenses;
+    const chartRows = realized ? realizedExpenses : filteredExpenses;
+    const rows = sortExpensesForLedger(filteredExpenses, mode, expenseGrouping);
     const visibleAmount = selectExpenseLedgerTotal(rows, mode);
-    const expenseInsights = realized
-      ? []
-      : expenseGrouping === 'category'
-        ? groupExpensesByCategory(rows)
-          .map((item) => ({
-            label: item.label,
-            value: roundCurrency(item.value2025Amount + item.value2026Amount),
-            detail: `${item.expenseCount} itens`,
-          }))
-          .sort((a, b) => b.value - a.value)
-          .slice(0, 4)
-        : expenseGrouping === 'commission'
-          ? groupExpensesByCommission(rows)
-            .map((item) => ({
-              label: item.label,
-              value: roundCurrency(item.value2025Amount + item.value2026Amount),
-              detail: `${item.expenseCount} itens`,
-            }))
-            .sort((a, b) => b.value - a.value)
-            .slice(0, 4)
-          : rows.slice(0, 4).map((item) => ({
-            label: item.description || `Linha ${item.sourceRow}`,
-            value: expenseGrouping === 'period'
-              ? item.value2026
-              : selectExpenseDisplayAmount(item, 'planning'),
-            detail: item.commission,
-          }));
+    const coverage = selectExpenseVisualizationCoverage(filteredExpenses, mode);
+    const categoryGroups = groupExpensesByCategory(chartRows);
+    const commissionGroups = groupExpensesByCommission(chartRows);
+    const fundingComposition = groupExpensesByFundingSource(chartRows);
+    const registeredFundingTotal = roundCurrency(
+      fundingComposition.reduce((total, item) => total + item.amount, 0),
+    );
+    const hasActiveExpenseFilters = Boolean(
+      expenseSearch || expenseCommission !== 'all' || expenseCategory !== 'all',
+    );
     return (
       <div className="financial-view-stack">
         {realized ? (
-          <FinancialKpiGrid columns={5}>
-            <FinancialKpiCard label="Total realizado" value={coreRealizedAmount} status="realized" icon={Banknote} tone="consolidated" detail="Âncora: coluna realizado da fonte" />
-            <FinancialKpiCard label="Recurso Livre" value={financialWorkbookTotals.paidWithFreeResource} icon={WalletCards} tone="gold" detail="Valor registrado" />
-            <FinancialKpiCard label="Prefeitura / Plano de Trabalho" value={financialWorkbookTotals.municipalityPlanAmount} icon={Landmark} tone="neutral" detail="Valor registrado" />
-            <FinancialKpiCard label="Lei Rouanet" value={financialWorkbookTotals.rouanetAmount} icon={FileSpreadsheet} tone="projected" detail="Valor registrado" />
-            <FinancialKpiCard label="Maior execução por comissão" value={highestExecutionCommission?.realizedAmount ?? 0} icon={TrendingUp} tone="neutral" detail={highestExecutionCommission?.label ?? 'Sem comissão'} />
+          <FinancialKpiGrid columns={5} className="financial-kpi-grid--decision financial-kpi-grid--five">
+            <FinancialKpiCard label="Total realizado" value={coreRealizedAmount} status="realized" icon={Banknote} tone="consolidated" priority="primary" animateValue sourceLabel="Despesas · coluna Realizado" />
+            <FinancialKpiCard label="Recurso Livre" value={financialWorkbookTotals.paidWithFreeResource} icon={WalletCards} tone="gold" priority="primary" animateValue sourceLabel="Despesas · Recurso Livre" />
+            <FinancialKpiCard label="Prefeitura / Plano de Trabalho" value={financialWorkbookTotals.municipalityPlanAmount} icon={Landmark} tone="neutral" priority="secondary" animateValue sourceLabel="Despesas · Prefeitura" />
+            <FinancialKpiCard label="Lei Rouanet" value={financialWorkbookTotals.rouanetAmount} icon={FileSpreadsheet} tone="projected" priority="secondary" animateValue sourceLabel="Despesas · Lei Rouanet" />
+            <FinancialKpiCard label="Maior execução por comissão" value={highestExecutionCommission?.realizedAmount ?? 0} icon={TrendingUp} tone="neutral" priority="secondary" animateValue detail={highestExecutionCommission?.label ?? 'Sem comissão'} sourceLabel="Agrupamento por comissão" />
           </FinancialKpiGrid>
         ) : (
-          <FinancialKpiGrid columns={5}>
-            <FinancialKpiCard label="Teto das comissões" value={financialWorkbookTotals.coreCommissionBudgetCap} icon={Target} tone="neutral" />
-            <FinancialKpiCard label="Orçado até o momento" value={financialWorkbookTotals.coreCommissionBudgeted} status="attention" icon={ReceiptText} tone="gold" />
-            <FinancialKpiCard label="Período 2025" value={period2025Total} icon={ReceiptText} tone="neutral" detail="Soma da coluna 2025" />
-            <FinancialKpiCard label="Período 2026" value={period2026Total} icon={ReceiptText} tone="projected" detail="Soma da coluna 2026" />
-            <FinancialKpiCard label="Saldo das comissões" value={coreBudgetBalance} icon={WalletCards} tone="consolidated" />
+          <FinancialKpiGrid columns={5} className="financial-kpi-grid--decision financial-kpi-grid--five">
+            <FinancialKpiCard label="Teto das comissões" value={financialWorkbookTotals.coreCommissionBudgetCap} icon={Target} tone="neutral" priority="primary" animateValue sourceLabel="Cabeçalhos das comissões" />
+            <FinancialKpiCard label="Orçado até o momento" value={financialWorkbookTotals.coreCommissionBudgeted} status="attention" icon={ReceiptText} tone="gold" priority="primary" animateValue sourceLabel="Cabeçalhos das comissões" />
+            <FinancialKpiCard label="Período 2025" value={period2025Total} icon={ReceiptText} tone="neutral" priority="secondary" animateValue sourceLabel="Despesas · 2025" />
+            <FinancialKpiCard label="Período 2026" value={period2026Total} icon={ReceiptText} tone="projected" priority="secondary" animateValue sourceLabel="Despesas · 2026" />
+            <FinancialKpiCard label="Saldo das comissões" value={coreBudgetBalance} icon={WalletCards} tone="consolidated" priority="secondary" animateValue sourceLabel="Teto menos orçado" />
           </FinancialKpiGrid>
         )}
 
-        <FinancialPanel
-          title={realized ? 'Execução e origens registradas' : 'Plano detalhado de despesas'}
-          description={realized
-            ? 'A coluna realizado é a âncora da fonte; as origens registradas são campos independentes e não exaustivos.'
-            : 'Ordene por comissão, categoria, valor ou período sem alterar a taxonomia e a descrição da planilha.'}
-          icon={realized ? Banknote : ReceiptText}
-        >
-          <FinancialFilterBar resultLabel={`${rows.length} despesas · ${formatBRL(visibleAmount)} ${realized ? 'na coluna realizado' : 'planejados nos períodos'}`}>
+        <section className="financial-analysis-toolbar" aria-label="Filtros das visualizações de despesas">
+          <div className="financial-analysis-toolbar__heading">
+            <span><Search aria-hidden="true" /></span>
+            <div>
+              <strong>Explorar a base completa</strong>
+              <small>Gráficos e detalhamento respondem ao mesmo recorte.</small>
+            </div>
+          </div>
+          <FinancialFilterBar resultLabel={`${rows.length} de ${availableRows.length} despesas · ${formatBRL(visibleAmount)}`}>
             <SearchField value={expenseSearch} onChange={setExpenseSearch} label="Buscar despesa" placeholder="Buscar despesa, comissão ou observação" />
             <SelectField value={expenseCommission} onChange={setExpenseCommission} label="Comissão">
               <option value="all">Todas as comissões</option>
@@ -897,80 +968,233 @@ export default function FinancialManagementPage({ module }: FinancialManagementP
               <option value="period">Por período 2026</option>
             </SelectField>
           </FinancialFilterBar>
+        </section>
 
-          {!realized && expenseInsights.length > 0 && (
-            <div className="financial-insight-grid" aria-label="Destaques do agrupamento selecionado">
-              {expenseInsights.map((item) => (
-                <article key={`${item.label}-${item.detail}`}>
-                  <p>{item.label}</p>
-                  <strong>{formatBRL(item.value)}</strong>
-                  <span>{item.detail}</span>
-                </article>
-              ))}
+        <ExpenseCoverageBand coverage={coverage} availableLineCount={availableRows.length} />
+
+        {realized ? (
+          <>
+            <div className="financial-analytics-grid">
+              <FinancialPanel
+                title="Distribuição entre origens declaradas"
+                description="Participação no subtotal preenchido; não representa a composição integral do realizado."
+                icon={CircleDollarSign}
+                className="financial-panel--span-5"
+              >
+                <FinancialDistributionDonutChart
+                  data={fundingComposition.map((item) => ({
+                    id: item.key,
+                    label: item.label,
+                    value: item.amount,
+                    detail: `${formatPercentage(item.registeredSharePercentage)} entre as origens declaradas`,
+                  }))}
+                  centerLabel="Origens declaradas"
+                  centerValue={registeredFundingTotal}
+                  title="Distribuição entre origens declaradas"
+                  summary="As três colunas de origem são independentes e não exaustivas."
+                  forceMotion
+                />
+              </FinancialPanel>
+              <FinancialPanel title="Execução por categoria" icon={BarChart3} className="financial-panel--span-7">
+                <ExpenseDistributionBarChart data={categoryGroups} mode="realized" dimension="category" forceMotion />
+              </FinancialPanel>
             </div>
-          )}
-          <ExpenseLedger expenses={rows} mode={realized ? 'realized' : 'planning'} emptyFromSearch={Boolean(expenseSearch || expenseCommission !== 'all' || expenseCategory !== 'all')} />
+            <FinancialPanel
+              title="Mapa completo da execução"
+              description="Categoria → despesa. Todas as linhas do recorte permanecem no sistema em camadas."
+              icon={Layers3}
+              className="financial-panel--treemap"
+            >
+              <ExpenseTreemapChart expenses={filteredExpenses} mode="realized" forceMotion height={620} mobileHeight={520} />
+            </FinancialPanel>
+            <div className="financial-analytics-grid">
+              <FinancialPanel title="Execução por comissão" icon={ChartNoAxesCombined} className="financial-panel--span-6">
+                <ExpenseDistributionBarChart data={commissionGroups} mode="realized" dimension="commission" forceMotion />
+              </FinancialPanel>
+              <FinancialPanel
+                title="Origens declaradas por comissão"
+                description="Barras empilhadas sobre o subtotal declarado, sem inferir cobertura total."
+                icon={Landmark}
+                className="financial-panel--span-6"
+              >
+                <ExpenseFundingStackedBarChart expenses={chartRows} forceMotion />
+              </FinancialPanel>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="financial-analytics-grid">
+              <FinancialPanel title="Composição por categoria" icon={CircleDollarSign} className="financial-panel--span-5">
+                <ExpenseCategoryDonutChart data={categoryGroups} mode="planning" forceMotion />
+              </FinancialPanel>
+              <FinancialPanel title="Planejamento 2025 × 2026" icon={BarChart3} className="financial-panel--span-7">
+                <ExpensePeriodComparisonChart data={categoryGroups} forceMotion />
+              </FinancialPanel>
+            </div>
+            <FinancialPanel
+              title="Mapa completo das despesas previstas"
+              description="Categoria → despesa, com o valor integral do recorte e acesso ao detalhamento abaixo."
+              icon={Layers3}
+              className="financial-panel--treemap"
+            >
+              <ExpenseTreemapChart expenses={filteredExpenses} mode="planning" forceMotion height={620} mobileHeight={520} />
+            </FinancialPanel>
+            <div className="financial-analytics-grid">
+              <FinancialPanel title="Distribuição por comissão" icon={ChartNoAxesCombined} className="financial-panel--span-6">
+                <ExpenseDistributionBarChart data={commissionGroups} mode="planning" dimension="commission" forceMotion />
+              </FinancialPanel>
+              <FinancialPanel title="Categorias em comparação" icon={BarChart3} className="financial-panel--span-6">
+                <ExpenseDistributionBarChart data={categoryGroups} mode="planning" dimension="category" forceMotion />
+              </FinancialPanel>
+            </div>
+          </>
+        )}
+
+        <FinancialPanel title={realized ? 'Base realizada detalhada' : 'Base planejada detalhada'} icon={realized ? Banknote : ReceiptText} className="financial-panel--ledger">
+          <ExpenseLedger expenses={rows} mode={mode} emptyFromSearch={hasActiveExpenseFilters} />
         </FinancialPanel>
 
         {!realized && (
-          <FinancialPanel
-            title="Orçamento geral fora das comissões"
-            description="Obrigações históricas e investimentos das linhas 311–342, mantidos separados dos tetos das comissões."
-            icon={Landmark}
-          >
-            <ExecutiveStrip items={[
-              { label: 'Obrigações históricas', value: formatBRL(historicalBudgetSummary?.budgetedAmount ?? 0), detail: `${historicalBudgetSummary?.itemCount ?? 0} itens orçados` },
-              { label: 'Teto histórico', value: formatBRL(historicalBudgetSummary?.budgetCap ?? 0), detail: `Saldo ${formatBRL(historicalBudgetSummary?.remainingAmount ?? 0)}` },
-              { label: 'Investimentos / obras', value: formatBRL(investmentBudgetSummary?.budgetedAmount ?? 0), detail: `${investmentBudgetSummary?.itemCount ?? 0} itens` },
-              { label: 'Teto de investimentos', value: formatBRL(investmentBudgetSummary?.budgetCap ?? 0), detail: `Saldo ${formatBRL(investmentBudgetSummary?.remainingAmount ?? 0)}` },
-              { label: 'Itens gerais', value: String(generalBudgetItems.length), detail: 'Linhas 311–342 da fonte' },
-            ]} />
-            <GeneralBudgetLedger items={generalBudgetItems} />
-          </FinancialPanel>
+          <>
+            <FinancialDisclosureSection
+              title="Reconciliação dos períodos"
+              summary="2025 + 2026 divergem da coluna Realizado na linha 14."
+              meta={`Diferença ${formatBRL(periodIntegrityDelta)}`}
+              icon={AlertTriangle}
+              tone="attention"
+            >
+              <div className="financial-governance-copy">
+                <p>Os períodos somam <strong>{formatBRL(periodBridgeTotal)}</strong>, enquanto o realizado oficial registra <strong>{formatBRL(coreRealizedAmount)}</strong>. A diferença de <strong>{formatBRL(periodIntegrityDelta)}</strong> permanece visível e não é corrigida silenciosamente.</p>
+              </div>
+            </FinancialDisclosureSection>
+            <FinancialDisclosureSection
+              title="Orçamento geral fora das comissões"
+              summary="Linhas 311–342, mantidas fora dos tetos de comissão."
+              meta={`${generalBudgetItems.length} itens · ${formatBRL(generalBudgetSummaries.reduce((total, item) => total + item.budgetedAmount, 0))}`}
+              icon={Landmark}
+            >
+              <ExecutiveStrip className="financial-executive-strip--inside" items={[
+                { label: 'Obrigações históricas', value: formatBRL(historicalBudgetSummary?.budgetedAmount ?? 0), detail: `${historicalBudgetSummary?.itemCount ?? 0} itens` },
+                { label: 'Teto histórico', value: formatBRL(historicalBudgetSummary?.budgetCap ?? 0), detail: `Saldo ${formatBRL(historicalBudgetSummary?.remainingAmount ?? 0)}` },
+                { label: 'Investimentos / obras', value: formatBRL(investmentBudgetSummary?.budgetedAmount ?? 0), detail: `${investmentBudgetSummary?.itemCount ?? 0} itens` },
+                { label: 'Teto de investimentos', value: formatBRL(investmentBudgetSummary?.budgetCap ?? 0), detail: `Saldo ${formatBRL(investmentBudgetSummary?.remainingAmount ?? 0)}` },
+              ]} />
+              <GeneralBudgetLedger items={generalBudgetItems} />
+            </FinancialDisclosureSection>
+          </>
         )}
 
         {realized && (
-          <div className="financial-dashboard-grid">
-            <FinancialPanel title="Valores por origem registrada" description="Comparação absoluta, sem leitura proporcional do total." icon={Landmark} className="financial-panel--span-5">
-              <FundingSourceChart data={fundingData} />
-            </FinancialPanel>
-            <div className="financial-panel--span-7 financial-note-stack">
+          <FinancialDisclosureSection
+            title="Integridade e limites da fonte"
+            summary="Reconciliação oficial e cobertura das origens declaradas."
+            meta="2 notas"
+            icon={AlertTriangle}
+            tone="attention"
+          >
+            <div className="financial-disclosure-note-grid">
               <DataQualityNote title="A soma dos períodos não fecha com o realizado oficial">
                 <p>2025 + 2026 soma {formatBRL(periodBridgeTotal)}, enquanto a coluna realizado registra {formatBRL(coreRealizedAmount)}. A diferença de {formatBRL(periodIntegrityDelta)} está na linha 14 e permanece visível como questão de qualidade da fonte.</p>
               </DataQualityNote>
               <DataQualityNote title="Origens não exaustivas" tone="information">
-                <p>Recurso Livre, Prefeitura / Plano de Trabalho e Lei Rouanet são colunas independentes. Elas não devem ser somadas como se fossem a composição integral do realizado.</p>
+                <p>Recurso Livre, Prefeitura / Plano de Trabalho e Lei Rouanet são campos independentes. O subtotal declarado não substitui a coluna Realizado.</p>
               </DataQualityNote>
             </div>
-          </div>
+          </FinancialDisclosureSection>
         )}
       </div>
     );
   };
 
-  const renderCommissionBudgets = () => (
-    <div className="financial-view-stack">
-      <FinancialKpiGrid columns={5}>
-        <FinancialKpiCard label="Teto das comissões" value={financialWorkbookTotals.coreCommissionBudgetCap} icon={Target} tone="neutral" />
-        <FinancialKpiCard label="Orçado" value={financialWorkbookTotals.coreCommissionBudgeted} status="attention" icon={BadgeDollarSign} tone="gold" />
-        <FinancialKpiCard label="Saldo" value={coreBudgetBalance} icon={WalletCards} tone="consolidated" />
-        <FinancialKpiCard label="Utilização" value={coreBudgetUtilization} valueKind="percentage" icon={Calculator} tone="gold" detail="Faixa de atenção executiva" />
-        <FinancialKpiCard label="Acima do teto" value={overBudgetCommissions.length} valueKind="number" status="over-budget" icon={AlertTriangle} tone="over-budget" detail="3 comissões" />
-      </FinancialKpiGrid>
+  const renderCommissionBudgets = () => {
+    const budgetStatusComposition = selectBudgetStatusComposition(commissionBudgets);
+    const countByStatus = (status: (typeof budgetStatusComposition)[number]['status']) => (
+      budgetStatusComposition.find((item) => item.status === status)?.commissionCount ?? 0
+    );
+    const budgetsByAmount = [...commissionBudgets].sort((left, right) => (
+      right.budgetedAmount - left.budgetedAmount
+    ));
+    const budgetsByPressure = [...commissionBudgets].sort((left, right) => {
+      if (left.status === 'no-budget-cap') return 1;
+      if (right.status === 'no-budget-cap') return -1;
+      return right.utilizationPercentage - left.utilizationPercentage;
+    });
 
-      <FinancialPanel title="10 maiores orçamentos" description="Recorte ordenado pelo valor orçado. Vermelho indica excesso real; amarelo e laranja representam faixas de atenção visual." icon={ChartNoAxesCombined}>
-        <CommissionBudgetUtilizationChart data={topCommissionBudgets} title="Utilização nos 10 maiores orçamentos" height={500} mobileHeight={390} />
-      </FinancialPanel>
+    return (
+      <div className="financial-view-stack">
+        <FinancialKpiGrid columns={5} className="financial-kpi-grid--decision financial-kpi-grid--five">
+          <FinancialKpiCard label="Teto das comissões" value={financialWorkbookTotals.coreCommissionBudgetCap} icon={Target} tone="neutral" priority="primary" animateValue sourceLabel="Cabeçalhos das comissões" />
+          <FinancialKpiCard label="Orçado" value={financialWorkbookTotals.coreCommissionBudgeted} status="attention" icon={BadgeDollarSign} tone="gold" priority="primary" animateValue sourceLabel="Cabeçalhos das comissões" />
+          <FinancialKpiCard label="Saldo" value={coreBudgetBalance} icon={WalletCards} tone="consolidated" priority="secondary" animateValue sourceLabel="Teto menos orçado" />
+          <FinancialKpiCard label="Utilização" value={coreBudgetUtilization} valueKind="percentage" icon={Calculator} tone="gold" priority="secondary" animateValue sourceLabel="Orçado sobre teto" />
+          <FinancialKpiCard label="Acima do teto" value={overBudgetCommissions.length} valueKind="number" status="over-budget" icon={AlertTriangle} tone="over-budget" priority="secondary" animateValue sourceLabel="Faixa acima de 100%" />
+        </FinancialKpiGrid>
 
-      <FinancialPanel title="Orçamento completo por comissão" description="Ordene o portfólio e abra cada comissão para examinar categorias, maiores itens e observações." icon={BadgeDollarSign}>
-        <CommissionBudgetLedger budgets={commissionBudgets} />
-      </FinancialPanel>
+        <ExecutiveStrip className="financial-executive-strip--budget-coverage" items={[
+          { label: 'Cobertura do portfólio', value: `${commissionBudgets.length} de ${commissionBudgets.length}`, detail: 'Todas as comissões' },
+          { label: 'Dentro do esperado', value: String(countByStatus('normal')), detail: 'Abaixo de 80%' },
+          { label: 'Em atenção', value: String(countByStatus('attention')), detail: 'Entre 80% e 95%' },
+          { label: 'Próximas do teto', value: String(countByStatus('near-limit')), detail: 'Entre 95% e 100%' },
+          { label: 'Acima do teto', value: String(countByStatus('over-budget')), detail: 'Excesso real' },
+          { label: 'Sem teto definido', value: String(countByStatus('no-budget-cap')), detail: 'Exceção preservada' },
+        ]} />
 
-      <DataQualityNote title="Comissão sem teto definido" tone="information">
-        <p>Indústria, Comércio e Serviços possui teto e orçamento iguais a zero na fonte. A interface apresenta “Sem teto definido”, evitando uma leitura enganosa de 0% como desempenho normal.</p>
-      </DataQualityNote>
-    </div>
-  );
+        <div className="financial-analytics-grid">
+          <FinancialPanel title="Composição do status orçamentário" icon={CircleDollarSign} className="financial-panel--span-5">
+            <BudgetStatusDonutChart budgets={commissionBudgets} forceMotion />
+          </FinancialPanel>
+          <FinancialPanel
+            title="Teto × orçado — visão absoluta"
+            description="25 comissões na mesma escala monetária."
+            icon={ChartNoAxesCombined}
+            className="financial-panel--span-7"
+          >
+            <CommissionBudgetUtilizationChart
+              data={budgetsByAmount}
+              title="Teto e valor orçado de todas as comissões"
+              summary="Comparação monetária absoluta, sem truncar o portfólio."
+              height={760}
+              mobileHeight={680}
+              forceMotion
+            />
+          </FinancialPanel>
+        </div>
+
+        <FinancialPanel
+          title="Pressão orçamentária comissão a comissão"
+          description="Escala relativa por linha para comparar utilização sem apagar comissões menores."
+          icon={Target}
+          className="financial-panel--budget-pressure"
+        >
+          <CommissionBudgetUtilizationChart
+            data={budgetsByPressure}
+            title="Utilização completa por comissão"
+            summary="Bullet chart relativo com teto, orçado, excesso e status para todas as comissões."
+            forceMotion
+            variant="executive"
+            scaleMode="relative"
+          />
+        </FinancialPanel>
+
+        <FinancialPanel title="Posição completa por comissão" description="Todas as comissões, ordenáveis e detalháveis." icon={BadgeDollarSign} className="financial-panel--ledger">
+          <CommissionBudgetLedger budgets={commissionBudgets} />
+        </FinancialPanel>
+
+        <FinancialDisclosureSection
+          title="Faixas de leitura e exceções"
+          summary="Limiar visual para decisão; não altera regras contábeis."
+          meta="1 comissão sem teto"
+          icon={AlertTriangle}
+          tone="information"
+        >
+          <div className="financial-governance-copy">
+            <p><strong>Atenção</strong> a partir de 80%; <strong>próximo do teto</strong> a partir de 95%; <strong>acima do teto</strong> somente acima de 100%.</p>
+            <p>Indústria, Comércio e Serviços possui teto e orçamento iguais a zero na fonte. O estado “Sem teto definido” evita uma leitura enganosa de 0% como desempenho normal.</p>
+          </div>
+        </FinancialDisclosureSection>
+      </div>
+    );
+  };
 
   const renderSponsorships = () => (
     <div className="financial-view-stack">
@@ -1139,9 +1363,9 @@ export default function FinancialManagementPage({ module }: FinancialManagementP
     <div
       className="financial-management-page"
       data-financial-view={view}
-      data-financial-motion={isExecutiveFinanceView ? 'full' : 'system'}
+      data-financial-motion={isFlagshipFinanceView ? 'full' : 'system'}
     >
-      <section className={cn('financial-page-header', isExecutiveFinanceView && 'financial-page-header--executive')}>
+      <section className={cn('financial-page-header', isFlagshipFinanceView && 'financial-page-header--executive')}>
         <div className="financial-page-header__main">
           <div className="financial-page-header__badges">
             <FinancialRestrictedBadge />
@@ -1154,7 +1378,7 @@ export default function FinancialManagementPage({ module }: FinancialManagementP
               <h1>{viewCopy.title}</h1>
             </div>
           </div>
-          {!isExecutiveFinanceView && (
+          {!isFlagshipFinanceView && (
             <>
               <p className="financial-page-header__description">{viewCopy.description}</p>
               <div className="financial-semantic-legend" aria-label="Hierarquia semântica dos valores">
@@ -1168,7 +1392,7 @@ export default function FinancialManagementPage({ module }: FinancialManagementP
         </div>
         <FinancialDataProvenance
           label="Base Orçamentária Fenasoja 2026"
-          detail={isExecutiveFinanceView
+          detail={isFlagshipFinanceView
             ? 'Planilha oficial · somente leitura'
             : 'Planilha oficial em modo somente leitura; sem persistência ou correção automática.'}
         />
@@ -1179,7 +1403,7 @@ export default function FinancialManagementPage({ module }: FinancialManagementP
       <AboutFinancialModule
         module={module}
         activeDescription={activeMenu.description}
-        compact={isExecutiveFinanceView}
+        compact={isFlagshipFinanceView}
       />
     </div>
   );

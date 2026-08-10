@@ -27,6 +27,14 @@ const SPONSOR_TIER_ORDER: readonly SponsorTier[] = [
   'Não classificado',
 ];
 
+const BUDGET_STATUS_COMPOSITION_ORDER: readonly BudgetAttentionStatus[] = [
+  'normal',
+  'attention',
+  'near-limit',
+  'over-budget',
+  'no-budget-cap',
+];
+
 export type ExpenseFundingSource = 'free-resource' | 'municipality-plan' | 'rouanet';
 
 export interface RevenueTotals {
@@ -64,8 +72,62 @@ export interface ExpenseFundingSummary {
   registeredSharePercentage: number;
 }
 
+/**
+ * Commission-level reading of the workbook's registered-origin columns.
+ *
+ * The three origin amounts are intentionally exposed independently. They are
+ * neither exhaustive nor guaranteed to form a partition of `realizedAmount`,
+ * so this view model deliberately does not provide a combined origin total or
+ * a share of realized expenses.
+ */
+export interface CommissionExpenseFundingSummary {
+  commissionId: string;
+  commission: string;
+  expenseCount: number;
+  realizedAmount: number;
+  freeResourceAmount: number;
+  municipalityPlanAmount: number;
+  rouanetAmount: number;
+}
+
+export interface BudgetStatusCompositionSummary {
+  status: BudgetAttentionStatus;
+  commissionCount: number;
+  budgetCap: number;
+  budgetedAmount: number;
+  balanceAmount: number;
+}
+
 export type ExpenseLedgerMode = 'planning' | 'realized';
 export type ExpenseGroupingMode = 'commission' | 'category' | 'value' | 'period';
+
+/**
+ * Coverage contract for layered expense visualizations.
+ *
+ * Amount-bearing rows can be represented by charts while zero-value and
+ * negative-value rows remain explicitly represented by the complete ledger.
+ * `activeLineCount` is broader than `positiveVisualLineCount` in realized
+ * mode because a row may register a funding origin while its realized anchor
+ * remains zero.
+ */
+export interface ExpenseVisualizationCoverage {
+  mode: ExpenseLedgerMode;
+  totalLineCount: number;
+  activeLineCount: number;
+  positiveVisualLineCount: number;
+  zeroVisualLineCount: number;
+  negativeVisualLineCount: number;
+  ledgerLineCount: number;
+  representedLineCount: number;
+  representationPercentage: number;
+  visualAmount: number;
+  activeExpenseIds: string[];
+  positiveVisualExpenseIds: string[];
+  negativeVisualExpenseIds: string[];
+  zeroValueLedgerExpenseIds: string[];
+  ledgerExpenseIds: string[];
+  representedExpenseIds: string[];
+}
 
 export interface RevenueReceiptStatus {
   status: FinancialSemanticStatus;
@@ -223,11 +285,73 @@ export function selectExpenseDisplayAmount(
     : sumCurrency([expense.value2025, expense.value2026]);
 }
 
+export function hasRealizedExpenseActivity(
+  expense: FinancialExpenseSourceRow,
+): boolean {
+  return expense.realizedAmount !== 0
+    || expense.paidWithFreeResource !== 0
+    || expense.municipalityPlanAmount !== 0
+    || expense.rouanetAmount !== 0
+    || expense.paidMarkerAmount !== 0;
+}
+
 export function selectExpenseLedgerTotal(
   expenses: readonly FinancialExpense[],
   mode: ExpenseLedgerMode,
 ): number {
   return sumCurrency(expenses.map((expense) => selectExpenseDisplayAmount(expense, mode)));
+}
+
+export function selectExpenseVisualizationCoverage(
+  expenses: readonly FinancialExpense[],
+  mode: ExpenseLedgerMode,
+): ExpenseVisualizationCoverage {
+  const activeExpenseIds: string[] = [];
+  const positiveVisualExpenseIds: string[] = [];
+  const negativeVisualExpenseIds: string[] = [];
+  const zeroValueLedgerExpenseIds: string[] = [];
+  const ledgerExpenseIds = expenses.map((expense) => expense.id);
+
+  for (const expense of expenses) {
+    const visualAmount = selectExpenseDisplayAmount(expense, mode);
+    if (visualAmount > 0) positiveVisualExpenseIds.push(expense.id);
+    else if (visualAmount < 0) negativeVisualExpenseIds.push(expense.id);
+    else zeroValueLedgerExpenseIds.push(expense.id);
+
+    const isActive = mode === 'realized'
+      ? hasRealizedExpenseActivity(expense)
+      : visualAmount !== 0;
+    if (isActive) activeExpenseIds.push(expense.id);
+  }
+
+  const totalLineCount = expenses.length;
+  const representedExpenseIds = Array.from(new Set([
+    ...positiveVisualExpenseIds,
+    ...negativeVisualExpenseIds,
+    ...zeroValueLedgerExpenseIds,
+  ]));
+  const representedLineCount = representedExpenseIds.length;
+
+  return {
+    mode,
+    totalLineCount,
+    activeLineCount: activeExpenseIds.length,
+    positiveVisualLineCount: positiveVisualExpenseIds.length,
+    zeroVisualLineCount: zeroValueLedgerExpenseIds.length,
+    negativeVisualLineCount: negativeVisualExpenseIds.length,
+    ledgerLineCount: ledgerExpenseIds.length,
+    representedLineCount,
+    representationPercentage: totalLineCount === 0
+      ? 0
+      : percentageOf(representedLineCount, totalLineCount),
+    visualAmount: selectExpenseLedgerTotal(expenses, mode),
+    activeExpenseIds,
+    positiveVisualExpenseIds,
+    negativeVisualExpenseIds,
+    zeroValueLedgerExpenseIds,
+    ledgerExpenseIds,
+    representedExpenseIds,
+  };
 }
 
 export function sortExpensesForLedger(
@@ -310,6 +434,26 @@ export function selectCommissionBudgets(
       status: classifyBudgetStatus(budgetCap, budgetedAmount),
       expenseCount: expenses.length,
       expenses,
+    };
+  });
+}
+
+export function selectBudgetStatusComposition(
+  budgets: readonly CommissionBudget[],
+): BudgetStatusCompositionSummary[] {
+  return BUDGET_STATUS_COMPOSITION_ORDER.map((status) => {
+    const matchingBudgets = budgets.filter((budget) => budget.status === status);
+    const budgetCap = sumCurrency(matchingBudgets.map((budget) => budget.budgetCap));
+    const budgetedAmount = sumCurrency(
+      matchingBudgets.map((budget) => budget.budgetedAmount),
+    );
+
+    return {
+      status,
+      commissionCount: matchingBudgets.length,
+      budgetCap,
+      budgetedAmount,
+      balanceAmount: roundCurrency(budgetCap - budgetedAmount),
     };
   });
 }
@@ -412,6 +556,46 @@ export function groupExpensesByFundingSource(
       label,
       amount,
       registeredSharePercentage: percentageOf(amount, total),
+    };
+  });
+}
+
+export function selectCommissionExpenseFundingSummaries(
+  expenses: readonly FinancialExpense[],
+): CommissionExpenseFundingSummary[] {
+  const expensesByCommission = new Map<string, {
+    commission: string;
+    expenses: FinancialExpense[];
+  }>();
+
+  for (const expense of expenses) {
+    const current = expensesByCommission.get(expense.commissionId);
+    if (current) current.expenses.push(expense);
+    else {
+      expensesByCommission.set(expense.commissionId, {
+        commission: expense.commission,
+        expenses: [expense],
+      });
+    }
+  }
+
+  return Array.from(expensesByCommission, ([commissionId, group]) => {
+    return {
+      commissionId,
+      commission: group.commission,
+      expenseCount: group.expenses.length,
+      realizedAmount: sumCurrency(
+        group.expenses.map((expense) => expense.realizedAmount),
+      ),
+      freeResourceAmount: sumCurrency(
+        group.expenses.map((expense) => expense.paidWithFreeResource),
+      ),
+      municipalityPlanAmount: sumCurrency(
+        group.expenses.map((expense) => expense.municipalityPlanAmount),
+      ),
+      rouanetAmount: sumCurrency(
+        group.expenses.map((expense) => expense.rouanetAmount),
+      ),
     };
   });
 }
