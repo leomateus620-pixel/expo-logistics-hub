@@ -36,6 +36,7 @@ export function VenueModuleShell({ children }: VenueModuleShellProps) {
   const organizationLabel = presentFenasojaProductName(orgName);
 
   return (
+    <VenueSearchProvider>
     <div className="venue-module-shell">
       <a className="venue-module-shell__skip-link" href="#venue-events-main">
         Ir para o conteúdo da Agenda Restaurante e Arena
