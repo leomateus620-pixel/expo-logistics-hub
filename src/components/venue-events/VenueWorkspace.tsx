@@ -1516,17 +1516,16 @@ export function VenueWorkspace() {
           <p className="venue-eyebrow">Registro mestre</p>
           <h2>
             Todos os eventos
-            <span className="venue-events-registry__sep" aria-hidden="true">
-              ·
-            </span>
             <span
               key={venueId}
               className="venue-events-registry__scope"
               data-venue={venueId}
             >
+              <i aria-hidden="true" />
               {venueDefinition.shortLabel}
             </span>
           </h2>
+
         </div>
         <div className="venue-events-registry__tools">
           <VenueEventsYearSelector
@@ -1611,6 +1610,12 @@ export function VenueWorkspace() {
                       .format(new Date(event.start_at))
                       .replace(".", "")
                   : "s/ data";
+                const yearLabel = event.start_at
+                  ? new Intl.DateTimeFormat("pt-BR", {
+                      timeZone: "America/Sao_Paulo",
+                      year: "numeric",
+                    }).format(new Date(event.start_at))
+                  : "";
 
                 return (
                   <button
@@ -1619,19 +1624,38 @@ export function VenueWorkspace() {
                     onClick={() => openEvent(event.id)}
                     data-status={event.status}
                     className="venue-agenda-card venue-event-card"
-                    aria-label={`${event.title} — ${dayLabel} ${monthLabel}${startLabel ? `, ${startLabel}` : ""}`}
+                    aria-label={`${event.title} — ${dayLabel} ${monthLabel} ${yearLabel}${startLabel ? `, ${startLabel}` : ""}`}
                   >
-                    <span className="venue-agenda-card__time venue-event-card__time">
-                      <b>
-                        {dayLabel}
-                        <i>{monthLabel}</i>
-                      </b>
-                      <time dateTime={event.start_at ?? undefined}>
-                        {startLabel ?? "--:--"}
-                      </time>
-                      {endLabel && <em>{endLabel}</em>}
-                      {durationLabel && <i>{durationLabel}</i>}
+                    <span className="venue-event-card__date">
+                      <b>{dayLabel}</b>
+                      <i>{monthLabel}</i>
+                      {yearLabel && <u>{yearLabel}</u>}
                     </span>
+
+                    <span
+                      className="venue-event-card__hours"
+                      data-empty={!startLabel}
+                    >
+                      {startLabel ? (
+                        <>
+                          <time dateTime={event.start_at ?? undefined}>
+                            {startLabel}
+                          </time>
+                          {endLabel && (
+                            <span className="venue-event-card__hours-end">
+                              <em>{endLabel}</em>
+                              {durationLabel && <i>{durationLabel}</i>}
+                            </span>
+                          )}
+                        </>
+                      ) : (
+                        <span className="venue-event-card__hours-empty">
+                          Horário
+                          <br />a definir
+                        </span>
+                      )}
+                    </span>
+
 
                     <span className="venue-agenda-card__body">
                       <strong>{event.title}</strong>

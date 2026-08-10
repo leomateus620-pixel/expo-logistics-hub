@@ -3499,34 +3499,73 @@
 
 .venue-events-registry__identity h2 {
   display: inline-flex;
-  align-items: baseline;
-  gap: 0.45rem;
+  align-items: center;
+  gap: 0.55rem;
   overflow: hidden;
 }
 
-.venue-events-registry__sep {
-  color: oklch(var(--muted-foreground) / 0.55);
-  font-weight: 500;
-}
-
 .venue-events-registry__scope {
-  display: inline-block;
-  font-size: 0.82em;
-  font-weight: 750;
-  letter-spacing: -0.01em;
-  color: var(--venue-indigo, oklch(var(--primary)));
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.24rem 0.7rem 0.24rem 0.55rem;
+  border: 1px solid oklch(var(--border));
+  border-radius: 999px;
+  background: linear-gradient(
+    180deg,
+    oklch(var(--card) / 0.9),
+    oklch(var(--neutral-100) / 0.85)
+  );
+  color: oklch(var(--foreground));
+  font-size: 0.72em;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+  box-shadow:
+    inset 0 1px 0 oklch(1 0 0 / 0.55),
+    var(--elevation-1);
   animation: venue-scope-swap 460ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
+.venue-events-registry__scope i {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 999px;
+  background: currentColor;
+  box-shadow: 0 0 0 3px currentColor;
+  opacity: 0.9;
+}
+
 .venue-events-registry__scope[data-venue="restaurante"] {
-  color: oklch(var(--brand-gold-500, var(--warning)));
-  text-shadow: 0 0 18px oklch(var(--brand-gold-500, var(--warning)) / 0.32);
+  border-color: oklch(var(--warning) / 0.45);
+  background: linear-gradient(
+    180deg,
+    oklch(var(--warning) / 0.18),
+    oklch(var(--warning) / 0.08)
+  );
+  color: oklch(var(--warning-foreground, var(--foreground)));
+}
+
+.venue-events-registry__scope[data-venue="restaurante"] i {
+  color: oklch(var(--warning));
+  box-shadow: 0 0 0 3px oklch(var(--warning) / 0.22);
 }
 
 .venue-events-registry__scope[data-venue="arena"] {
+  border-color: oklch(var(--primary) / 0.4);
+  background: linear-gradient(
+    180deg,
+    oklch(var(--primary) / 0.14),
+    oklch(var(--primary) / 0.06)
+  );
   color: var(--venue-indigo, oklch(var(--primary)));
-  text-shadow: 0 0 18px oklch(var(--primary) / 0.28);
 }
+
+.venue-events-registry__scope[data-venue="arena"] i {
+  color: var(--venue-indigo, oklch(var(--primary)));
+  box-shadow: 0 0 0 3px oklch(var(--primary) / 0.2);
+}
+
 
 @keyframes venue-scope-swap {
   0% {
@@ -3620,7 +3659,7 @@
 .venue-event-card {
   position: relative;
   display: grid;
-  grid-template-columns: minmax(4.6rem, auto) minmax(0, 1fr) auto;
+  grid-template-columns: 4rem 6.5rem minmax(0, 1fr) auto;
   align-items: center;
   gap: 0.9rem;
   width: 100%;
@@ -3681,25 +3720,111 @@
   outline-offset: 2px;
 }
 
-.venue-event-card__time b {
+/* Coluna dedicada à data */
+.venue-event-card__date {
   display: flex;
-  align-items: baseline;
-  gap: 0.28rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.05rem;
+  min-height: 3.4rem;
+  padding: 0.4rem 0.25rem;
+  border: 1px solid oklch(var(--border) / 0.9);
+  border-radius: 0.75rem;
+  background: linear-gradient(
+    180deg,
+    oklch(var(--card)),
+    oklch(var(--neutral-100) / 0.75)
+  );
+  box-shadow:
+    inset 0 1px 0 oklch(1 0 0 / 0.6),
+    0 6px 14px -12px oklch(0 0 0 / 0.55);
+}
+
+.venue-event-card__date b {
   color: oklch(var(--foreground));
-  font-size: 1.12rem;
+  font-size: 1.28rem;
   font-weight: 850;
   font-variant-numeric: tabular-nums;
   line-height: 1;
+  letter-spacing: -0.02em;
 }
 
-.venue-event-card__time b i {
-  color: oklch(var(--muted-foreground));
-  font-size: 0.62rem;
+.venue-event-card__date i {
+  color: var(--venue-indigo, oklch(var(--primary)));
+  font-size: 0.6rem;
   font-style: normal;
-  font-weight: 800;
-  letter-spacing: 0.12em;
+  font-weight: 850;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
 }
+
+.venue-event-card__date u {
+  color: oklch(var(--muted-foreground));
+  font-size: 0.56rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+}
+
+/* Coluna dedicada ao horário */
+.venue-event-card__hours {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 0.2rem;
+  min-height: 3.4rem;
+  padding-right: 0.85rem;
+  border-right: 1px dashed oklch(var(--border));
+}
+
+.venue-event-card__hours time {
+  position: relative;
+  color: var(--venue-indigo, oklch(var(--primary)));
+  font-size: 1.02rem;
+  font-weight: 850;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: -0.01em;
+}
+
+.venue-event-card__hours-end {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.venue-event-card__hours-end em {
+  color: oklch(var(--muted-foreground));
+  font-size: 0.76rem;
+  font-style: normal;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.venue-event-card__hours-end i {
+  padding: 0.06rem 0.36rem;
+  border: 1px solid oklch(var(--border));
+  border-radius: 999px;
+  background: oklch(var(--neutral-100));
+  color: oklch(var(--muted-foreground));
+  font-size: 0.56rem;
+  font-style: normal;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.venue-event-card__hours-empty {
+  color: oklch(var(--muted-foreground));
+  font-size: 0.66rem;
+  font-weight: 700;
+  line-height: 1.25;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
 
 .venue-event-card__conflict {
   width: 1rem;
@@ -3739,15 +3864,27 @@
   }
 
   .venue-event-card {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 0.55rem;
+    grid-template-columns: 3.6rem minmax(0, 1fr);
+    gap: 0.55rem 0.7rem;
   }
 
-  .venue-event-card__time {
+  .venue-event-card__date {
+    min-height: 3rem;
+  }
+
+  .venue-event-card__hours {
     flex-direction: row;
     align-items: center;
     gap: 0.5rem;
+    min-height: 0;
+    padding-right: 0;
+    border-right: none;
   }
+
+  .venue-event-card .venue-agenda-card__body {
+    grid-column: 1 / -1;
+  }
+
 
   .venue-event-card .venue-agenda-card__aside {
     flex-direction: row;
