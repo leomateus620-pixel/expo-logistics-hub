@@ -528,7 +528,8 @@ export function VenueWorkspace() {
   const setSearch = venueSearch?.setQuery ?? setLocalSearch;
   const [statusFilter, setStatusFilter] = useState("all");
   const [spaceFilter, setSpaceFilter] = useState("all");
-  const [yearFilter, setYearFilter] = useState("all");
+  const [yearFilter, setYearFilter] = useState("2026");
+  const [includeHistory, setIncludeHistory] = useState(false);
   const [reviewOnly, setReviewOnly] = useState(false);
   const [agendaMode, setAgendaMode] = useState<"dia" | "semana" | "mes">(
     "mes",
@@ -746,7 +747,10 @@ export function VenueWorkspace() {
     return (
       eventMatchesSearch(event, search, sponsor, spaces) &&
       (statusFilter === "all" || event.status === statusFilter) &&
-      (yearFilter === "all" || eventYear(event) === yearFilter) &&
+      (includeHistory
+        ? true
+        : (eventYear(event) ?? "9999") >= "2026") &&
+      (includeHistory || yearFilter === "all" || eventYear(event) === yearFilter) &&
       (!reviewOnly || event.requires_review) &&
       (spaceFilter === "all" ||
         workspace.allocations.some(
@@ -757,13 +761,20 @@ export function VenueWorkspace() {
     );
   });
 
-  const availableYears = Array.from(
-    new Set(
-      workspace.events
-        .map((event) => eventYear(event))
-        .filter((year): year is string => Boolean(year)),
-    ),
-  ).sort();
+  const CYCLE_YEARS = ["2026", "2027", "2028"];
+  const availableYears = CYCLE_YEARS;
+  const yearCounts = workspace.events.reduce<Record<string, number>>(
+    (acc, event) => {
+      const year = eventYear(event);
+      if (year) acc[year] = (acc[year] ?? 0) + 1;
+      return acc;
+    },
+    {},
+  );
+  const historyCount = workspace.events.filter((event) => {
+    const year = eventYear(event);
+    return Boolean(year) && year! < "2026";
+  }).length;
   const reviewCount = workspace.events.filter(
     (event) => event.requires_review,
   ).length;
