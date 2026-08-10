@@ -11,6 +11,8 @@ const countdownStyles = readFileSync(resolve('src/styles/official-countdown-digi
 const operationalHeaderStyles = readFileSync(resolve('src/styles/cronograma-operational-header.css'), 'utf8');
 const cronogramaTemporalStyles = readFileSync(resolve('src/styles/fenasoja-countdown.css'), 'utf8');
 const loginStyles = readFileSync(resolve('src/styles/login-experience.css'), 'utf8');
+const financialLoginStyles = readFileSync(resolve('src/styles/financial-login.css'), 'utf8');
+const financialLoginHero = readFileSync(resolve('src/components/auth/FinancialLoginHero.tsx'), 'utf8');
 
 describe('arquitetura visual premium Fenasoja 2028', () => {
   it('mantém a hierarquia semântica de elevação zero a quatro', () => {
@@ -78,5 +80,18 @@ describe('arquitetura visual premium Fenasoja 2028', () => {
     expect(loginStyles).not.toMatch(/animation:[^;]*infinite/i);
     expect(globalStyles).not.toContain('.auth-glass-panel');
     expect(globalStyles).not.toContain('.auth-primary-action');
+  });
+
+  it('isola a identidade financeira e preserva movimento e linhas acessíveis', () => {
+    expect(financialLoginStyles).toContain(".auth-screen[data-module='financeiro-gerencial']");
+    expect(financialLoginStyles).toContain('vector-effect: non-scaling-stroke');
+    expect(financialLoginStyles).toContain('@media (prefers-reduced-motion: reduce)');
+    expect(financialLoginStyles).toContain(".auth-input-frame[data-invalid='true']");
+    expect(financialLoginStyles).toContain(".auth-submit[data-phase='submitting']");
+    expect(financialLoginStyles).toContain(".auth-submit[data-phase='success']");
+    expect(financialLoginStyles).not.toMatch(/#[0-9a-f]{3,8}/i);
+    expect(financialLoginStyles).not.toMatch(/animation:[^;]*infinite/i);
+    expect(financialLoginHero).not.toMatch(/R\$\s*\d/i);
+    expect(financialLoginHero).not.toContain('financial2026Data');
   });
 });

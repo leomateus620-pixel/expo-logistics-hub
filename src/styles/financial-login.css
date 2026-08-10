@@ -1,0 +1,963 @@
+/* Financeiro — identidade pública dedicada, sem expor dados protegidos do módulo. */
+.auth-screen[data-module='financeiro-gerencial'] {
+  --finance-login-navy: rgb(4 24 49);
+  --finance-login-navy-deep: rgb(2 16 35);
+  --finance-login-blue: rgb(66 132 177);
+  --finance-login-revenue: rgb(66 164 147);
+  --finance-login-expense: rgb(235 119 43);
+  --finance-login-gold: rgb(220 177 78);
+  --finance-login-surface: rgb(249 249 246);
+  padding-right: max(clamp(1.5rem, 3vw, 3rem), env(safe-area-inset-right));
+  padding-left: max(clamp(1.5rem, 3vw, 3rem), env(safe-area-inset-left));
+  background:
+    radial-gradient(ellipse at 13% 13%, rgb(36 103 158 / 0.22), transparent 38%),
+    radial-gradient(ellipse at 53% 92%, rgb(45 137 130 / 0.08), transparent 34%),
+    radial-gradient(ellipse at 96% 44%, rgb(226 137 55 / 0.06), transparent 30%),
+    linear-gradient(116deg, var(--finance-login-navy) 0%, rgb(5 29 57) 54%, var(--finance-login-navy-deep) 100%);
+}
+
+.auth-screen[data-module='financeiro-gerencial']::before {
+  background-image:
+    linear-gradient(rgb(144 185 211 / 0.032) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(144 185 211 / 0.026) 1px, transparent 1px),
+    linear-gradient(116deg, transparent 0 47%, rgb(65 154 145 / 0.028) 47.2% 47.35%, transparent 47.55% 100%);
+  background-size: 78px 78px, 78px 78px, 100% 100%;
+  mask-image: linear-gradient(105deg, black 0%, rgb(0 0 0 / 0.88) 54%, transparent 92%);
+  animation: financial-login-grid-enter 520ms var(--ease-decelerate) both;
+}
+
+.auth-screen[data-module='financeiro-gerencial']::after {
+  top: 12%;
+  right: auto;
+  left: -21rem;
+  width: min(68rem, 74vw);
+  aspect-ratio: 1.72;
+  border-color: rgb(82 153 190 / 0.08);
+  box-shadow:
+    inset 0 0 0 5rem rgb(43 122 153 / 0.012),
+    inset 0 0 0 10rem rgb(63 155 145 / 0.01);
+  opacity: 0.9;
+  transform: rotate(8deg);
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .auth-layout {
+  position: relative;
+  width: min(100%, 78rem);
+  grid-template-columns: minmax(0, 1.48fr) minmax(22.75rem, 25.25rem);
+  gap: clamp(3.25rem, 6vw, 6.75rem);
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .auth-layout::before {
+  position: absolute;
+  z-index: -1;
+  top: 50%;
+  left: 1.25rem;
+  width: min(56%, 42rem);
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgb(142 185 211 / 0.13), transparent);
+  content: '';
+  pointer-events: none;
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .auth-hero--financial {
+  position: relative;
+  max-width: 49rem;
+  padding-block: 1.25rem;
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .auth-hero--financial::before {
+  position: absolute;
+  z-index: -1;
+  inset: 8% 3% 5% -4%;
+  background:
+    linear-gradient(90deg, transparent 12%, rgb(132 181 207 / 0.04) 12.1%, transparent 12.2%),
+    linear-gradient(90deg, transparent 73%, rgb(220 177 78 / 0.04) 73.1%, transparent 73.2%);
+  content: '';
+  pointer-events: none;
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .financial-login__brand {
+  filter: drop-shadow(0 16px 25px rgb(0 6 18 / 0.28));
+  animation: financial-login-brand-enter 380ms var(--ease-decelerate) 40ms both;
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .financial-login__brand .fenasoja-brand__mark {
+  width: 3.35rem;
+  height: 3.35rem;
+  border-radius: 0.85rem;
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .financial-login__brand .fenasoja-brand__wordmark {
+  font-size: 1.68rem;
+  letter-spacing: -0.045em;
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .financial-login__brand .fenasoja-brand__edition {
+  min-width: 3.8rem;
+  border-color: rgb(220 177 78 / 0.38);
+  border-radius: 0.55rem;
+  padding: 0.35rem 0.48rem;
+  background: rgb(220 177 78 / 0.065);
+  color: rgb(231 197 118);
+  font-size: 0.66rem;
+  box-shadow: inset 0 1px rgb(255 255 255 / 0.06);
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .financial-login__brand .fenasoja-brand__edition > span:first-child {
+  margin-bottom: 0.2rem;
+  color: rgb(236 226 202 / 0.62);
+  font-size: 0.43rem;
+  letter-spacing: 0.18em;
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .financial-login__identity {
+  margin-top: clamp(3.75rem, 8.5vh, 6.25rem);
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .financial-login__title {
+  display: flex;
+  align-items: baseline;
+  max-width: 100%;
+  color: rgb(247 249 248);
+  font-size: clamp(4rem, 6.35vw, 6.65rem);
+  line-height: 0.84;
+  text-shadow: 0 16px 34px rgb(0 8 23 / 0.24);
+  white-space: nowrap;
+  animation: financial-login-title-enter 460ms var(--ease-decelerate) 95ms both;
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .financial-login__title-lead {
+  font-weight: 880;
+  letter-spacing: -0.075em;
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .financial-login__title-tail {
+  margin-left: -0.025em;
+  color: rgb(215 226 232);
+  font-weight: 510;
+  letter-spacing: -0.067em;
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .financial-login__title-ledger {
+  display: flex;
+  width: min(100%, 43rem);
+  align-items: center;
+  gap: 0.72rem;
+  margin-top: 1.35rem;
+  transform-origin: left center;
+  animation: financial-login-ledger-enter 420ms var(--ease-decelerate) 175ms both;
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .financial-login__title-ledger > span {
+  width: clamp(4.5rem, 10vw, 7.2rem);
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--finance-login-expense), rgb(241 149 69));
+  box-shadow: 0 0 16px rgb(235 119 43 / 0.14);
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .financial-login__title-ledger > i {
+  width: 1px;
+  height: 0.48rem;
+  flex: 0 0 auto;
+  background: rgb(189 213 225 / 0.3);
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .financial-login__title-ledger > strong {
+  position: relative;
+  height: 1px;
+  flex: 1;
+  background: linear-gradient(90deg, rgb(137 184 207 / 0.24), rgb(66 164 147 / 0.08));
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .financial-login__title-ledger > strong::after {
+  position: absolute;
+  top: 50%;
+  right: 16%;
+  width: 0.4rem;
+  height: 0.4rem;
+  border: 1px solid rgb(220 177 78 / 0.72);
+  border-radius: 999px;
+  background: var(--finance-login-navy);
+  box-shadow: 0 0 0 4px rgb(220 177 78 / 0.055);
+  content: '';
+  transform: translateY(-50%);
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .financial-login__description {
+  margin-top: 0.9rem;
+  color: rgb(222 232 236 / 0.67);
+  font-size: 0.76rem;
+  font-weight: 580;
+  letter-spacing: 0.075em;
+  line-height: 1.35;
+  animation: financial-login-copy-enter 360ms var(--ease-decelerate) 205ms both;
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .financial-login__signature {
+  width: min(100%, 45rem);
+  margin-top: clamp(2.1rem, 4.8vh, 3.25rem);
+  animation: financial-login-copy-enter 420ms var(--ease-decelerate) 235ms both;
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .financial-login__legend {
+  display: flex;
+  align-items: center;
+  gap: clamp(1rem, 3vw, 2rem);
+  padding-inline: 0.1rem;
+  color: rgb(180 204 217 / 0.58);
+  font-family: 'JetBrains Mono', ui-monospace, monospace;
+  font-size: 0.56rem;
+  font-weight: 650;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .financial-login__legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.42rem;
+  white-space: nowrap;
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .financial-login__legend span::before {
+  width: 0.35rem;
+  height: 0.35rem;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  background: currentColor;
+  content: '';
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .financial-login__legend [data-flow='revenue'] {
+  color: rgb(100 190 171 / 0.84);
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .financial-login__legend [data-flow='expense'] {
+  color: rgb(241 145 77 / 0.84);
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .financial-login__legend [data-flow='budget'] {
+  color: rgb(126 178 207 / 0.76);
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .financial-login__legend [data-flow='balance'] {
+  color: rgb(225 190 110 / 0.82);
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .financial-login__flow {
+  display: block;
+  width: 100%;
+  height: clamp(6.8rem, 14vh, 9rem);
+  margin-top: 0.55rem;
+  overflow: hidden;
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .financial-login__flow-grid path {
+  fill: none;
+  stroke: rgb(145 185 207 / 0.105);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .financial-login__bars rect {
+  transform: scaleY(0);
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: financial-login-bar-enter 460ms var(--ease-decelerate) 310ms forwards;
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .financial-login__bars rect[data-tone='revenue'] {
+  fill: rgb(66 164 147 / 0.22);
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .financial-login__bars rect[data-tone='expense'] {
+  fill: rgb(235 119 43 / 0.18);
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .financial-login__trajectory {
+  fill: none;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+  animation: financial-login-trajectory-draw 760ms var(--ease-decelerate) 270ms forwards;
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .financial-login__trajectory--revenue {
+  stroke: rgb(73 177 157 / 0.78);
+  stroke-width: 2;
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .financial-login__trajectory--expense {
+  stroke: rgb(239 128 52 / 0.72);
+  stroke-width: 1.8;
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .financial-login__balance-point {
+  opacity: 0;
+  transform: scale(0.75);
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: financial-login-balance-enter 300ms var(--ease-decelerate) 850ms forwards;
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .financial-login__balance-point circle:first-child {
+  fill: var(--finance-login-navy);
+  stroke: rgb(220 177 78 / 0.56);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .financial-login__balance-point circle:nth-child(2) {
+  fill: rgb(225 190 110);
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .financial-login__balance-point path {
+  fill: none;
+  stroke: rgb(220 177 78 / 0.3);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .auth-panel {
+  width: min(100%, 25.25rem);
+  justify-self: end;
+  overflow: hidden;
+  border: 1px solid rgb(189 201 207 / 0.82);
+  border-radius: 1.15rem;
+  padding: clamp(1.45rem, 2.3vw, 1.9rem);
+  background: var(--finance-login-surface);
+  box-shadow:
+    0 2px 7px -3px rgb(1 18 35 / 0.34),
+    0 36px 76px -34px rgb(0 8 24 / 0.76),
+    0 14px 30px -26px rgb(231 117 37 / 0.4),
+    inset 0 1px rgb(255 255 255);
+  animation: financial-login-panel-enter 440ms var(--ease-decelerate) 145ms both;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .auth-panel::before {
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.68),
+    inset 0 -1px rgb(23 74 99 / 0.045);
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .auth-panel::after {
+  left: 1.75rem;
+  width: 4.8rem;
+  height: 0.19rem;
+  background: linear-gradient(90deg, var(--finance-login-expense), var(--finance-login-gold));
+  box-shadow: 0 7px 16px -8px rgb(235 119 43 / 0.7);
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .auth-panel__heading {
+  margin-top: 0.3rem;
+  animation: financial-login-form-item-enter 320ms var(--ease-decelerate) 260ms both;
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .auth-panel__eyebrow {
+  color: rgb(31 101 122);
+  letter-spacing: 0.14em;
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .auth-panel__eyebrow svg {
+  color: rgb(37 127 124);
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .auth-panel__heading h2 {
+  margin-top: 0.55rem;
+  font-size: clamp(2.05rem, 3.2vw, 2.45rem);
+  letter-spacing: -0.052em;
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .auth-panel__heading p:last-child {
+  max-width: 31ch;
+  margin-top: 0.55rem;
+  color: rgb(77 91 99);
+  font-size: 0.76rem;
+  line-height: 1.3rem;
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .auth-form {
+  gap: 0.95rem;
+  margin-top: 1.4rem;
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .auth-field:first-child {
+  animation: financial-login-form-item-enter 320ms var(--ease-decelerate) 305ms both;
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .auth-field:nth-child(2) {
+  animation: financial-login-form-item-enter 320ms var(--ease-decelerate) 345ms both;
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .auth-field__label {
+  color: rgb(8 35 57);
+  font-size: 0.71rem;
+  font-weight: 760;
+  letter-spacing: 0.015em;
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .auth-input-frame {
+  min-height: 3.2rem;
+  border-color: rgb(180 193 199);
+  border-radius: 0.75rem;
+  background: rgb(255 255 253);
+  box-shadow:
+    0 1px 2px rgb(4 28 48 / 0.045),
+    inset 0 1px 2px rgb(4 28 48 / 0.025);
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .auth-input-frame[data-filled='true'] {
+  border-color: rgb(119 159 168);
+  background: rgb(255 255 255);
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .auth-input-frame[data-invalid='true'] {
+  border-color: oklch(var(--semantic-red-500) / 0.78);
+  background: oklch(var(--semantic-red-500) / 0.035);
+  box-shadow:
+    0 0 0 3px oklch(var(--semantic-red-500) / 0.075),
+    inset 0 1px 2px rgb(4 28 48 / 0.025);
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .auth-input-frame[data-disabled='true'] {
+  border-color: rgb(202 208 209);
+  background: rgb(239 241 239);
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .auth-input-frame:hover:not([data-disabled='true']):not([data-invalid='true']) {
+  border-color: rgb(94 151 157);
+  background: rgb(255 255 255);
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .auth-input-frame:focus-within {
+  border-color: rgb(37 127 124);
+  background: rgb(255 255 255);
+  box-shadow:
+    0 0 0 3px rgb(37 127 124 / 0.135),
+    0 12px 24px -23px rgb(21 96 107 / 0.72),
+    inset 0 1px rgb(255 255 255);
+  transform: translateY(-1px);
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .auth-input-frame[data-invalid='true']:focus-within {
+  border-color: oklch(var(--semantic-red-700));
+  box-shadow: 0 0 0 3px oklch(var(--semantic-red-700) / 0.18);
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .auth-input-frame:focus-within .auth-input-frame__icon,
+.auth-screen[data-module='financeiro-gerencial'] .auth-input-frame[data-filled='true'] .auth-input-frame__icon {
+  color: rgb(31 112 113);
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .auth-input-frame[data-invalid='true'] .auth-input-frame__icon {
+  color: oklch(var(--semantic-red-700));
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .auth-input-frame .auth-input-control {
+  height: 3.1rem;
+  color: rgb(5 30 52);
+  font-size: 0.8rem;
+  font-weight: 640;
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .auth-input-frame .auth-input-control::placeholder {
+  color: rgb(99 111 117);
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .auth-password-toggle:hover {
+  background: rgb(35 118 119 / 0.075);
+  color: rgb(25 98 104);
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .auth-password-toggle:focus-visible {
+  color: rgb(5 30 52);
+  box-shadow: inset 0 0 0 2px rgb(37 127 124 / 0.62);
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .auth-form__alert {
+  border-radius: 0.68rem;
+  padding: 0.68rem 0.75rem;
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .auth-submit {
+  min-height: 3.2rem;
+  border-color: rgb(198 85 17);
+  border-radius: 0.75rem;
+  background: linear-gradient(108deg, rgb(235 104 22), rgb(244 137 49));
+  color: rgb(4 25 46);
+  font-weight: 780;
+  box-shadow:
+    0 3px 6px rgb(4 30 49 / 0.2),
+    0 18px 30px -18px rgb(221 93 21 / 0.72),
+    inset 0 1px rgb(255 255 255 / 0.38),
+    inset 0 -1px rgb(81 40 10 / 0.13);
+  animation: financial-login-form-item-enter 320ms var(--ease-decelerate) 385ms backwards;
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .auth-submit:hover:not(:disabled) {
+  border-color: rgb(184 75 14);
+  background: linear-gradient(108deg, rgb(225 91 15), rgb(242 127 37));
+  box-shadow:
+    0 5px 8px rgb(4 30 49 / 0.22),
+    0 21px 34px -17px rgb(221 93 21 / 0.78),
+    inset 0 1px rgb(255 255 255 / 0.42);
+  transform: translateY(-1px);
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .auth-submit:focus-visible {
+  box-shadow:
+    0 0 0 3px var(--finance-login-surface),
+    0 0 0 6px rgb(27 105 111),
+    0 17px 28px -17px rgb(221 93 21 / 0.72);
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .auth-submit:active:not(:disabled) {
+  box-shadow:
+    0 1px 2px rgb(4 30 49 / 0.24),
+    0 7px 18px -14px rgb(221 93 21 / 0.64),
+    inset 0 2px 4px rgb(60 32 12 / 0.2);
+  transform: translateY(1px) scale(0.985);
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .auth-submit[data-phase='submitting'] {
+  cursor: wait;
+  border-color: rgb(190 80 17);
+  background: linear-gradient(108deg, rgb(213 91 19), rgb(229 117 34));
+  box-shadow:
+    0 2px 4px rgb(4 30 49 / 0.18),
+    0 10px 22px -16px rgb(221 93 21 / 0.66),
+    inset 0 2px 3px rgb(69 36 12 / 0.12);
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .auth-submit[data-phase='success'] {
+  border-color: rgb(34 112 91);
+  background: linear-gradient(108deg, rgb(54 145 119), rgb(72 164 137));
+  color: rgb(255 255 255);
+  box-shadow:
+    0 2px 4px rgb(4 30 49 / 0.18),
+    0 14px 28px -18px rgb(54 145 119 / 0.72),
+    inset 0 1px rgb(255 255 255 / 0.25);
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .auth-panel__footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1.25rem;
+  border-color: rgb(21 62 82 / 0.13);
+  padding-top: 0.9rem;
+  animation: financial-login-form-item-enter 300ms var(--ease-decelerate) 425ms both;
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .auth-back-link {
+  min-height: 2.75rem;
+  color: rgb(24 85 108);
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .auth-back-link:hover {
+  background: rgb(33 112 117 / 0.07);
+  color: rgb(5 39 59);
+}
+
+.auth-screen[data-module='financeiro-gerencial'] .auth-back-link:focus-visible {
+  box-shadow: inset 0 0 0 2px rgb(37 127 124 / 0.7);
+}
+
+@keyframes financial-login-grid-enter {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes financial-login-brand-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes financial-login-title-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(-14px, 8px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes financial-login-ledger-enter {
+  from {
+    opacity: 0;
+    transform: scaleX(0.3);
+  }
+  to {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+}
+
+@keyframes financial-login-copy-enter {
+  from {
+    opacity: 0;
+    transform: translateY(7px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes financial-login-trajectory-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+@keyframes financial-login-bar-enter {
+  to { transform: scaleY(1); }
+}
+
+@keyframes financial-login-balance-enter {
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes financial-login-panel-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes financial-login-form-item-enter {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 1199px) {
+  .auth-screen[data-module='financeiro-gerencial'] .auth-layout {
+    grid-template-columns: minmax(0, 1.3fr) minmax(22.5rem, 24.5rem);
+    gap: clamp(2.6rem, 4.4vw, 4rem);
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .financial-login__title {
+    font-size: clamp(3.65rem, 6.15vw, 5.2rem);
+  }
+}
+
+@media (max-width: 959px) {
+  .auth-screen[data-module='financeiro-gerencial'] {
+    padding-block: max(1.25rem, env(safe-area-inset-top)) max(1.5rem, env(safe-area-inset-bottom));
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .auth-layout {
+    width: min(100%, 41rem);
+    min-height: auto;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.2rem;
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .auth-layout::before {
+    display: none;
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .auth-hero--financial {
+    max-width: none;
+    padding-block: 0;
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .financial-login__identity {
+    margin-top: 1.8rem;
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .financial-login__title {
+    font-size: clamp(3.1rem, 8.6vw, 4.5rem);
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .financial-login__signature {
+    margin-top: 1.55rem;
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .financial-login__flow {
+    height: 7.1rem;
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .auth-panel {
+    width: min(100%, 31rem);
+    justify-self: center;
+  }
+}
+
+@media (max-width: 639px) {
+  .auth-screen[data-module='financeiro-gerencial'] {
+    padding-right: max(0.85rem, env(safe-area-inset-right));
+    padding-top: max(0.78rem, env(safe-area-inset-top));
+    padding-bottom: max(0.9rem, env(safe-area-inset-bottom));
+    padding-left: max(0.85rem, env(safe-area-inset-left));
+  }
+
+  .auth-screen[data-module='financeiro-gerencial']::before {
+    background-size: 56px 56px, 56px 56px, 100% 100%;
+    mask-image: linear-gradient(to bottom, black 0%, rgb(0 0 0 / 0.7) 44%, transparent 76%);
+  }
+
+  .auth-screen[data-module='financeiro-gerencial']::after {
+    top: -2rem;
+    left: -15rem;
+    width: 34rem;
+    opacity: 0.62;
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .auth-layout {
+    gap: 0.78rem;
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .auth-hero--financial {
+    padding-inline: 0.12rem;
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .financial-login__brand {
+    gap: 0.72rem;
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .financial-login__brand .fenasoja-brand__mark {
+    width: 2.45rem;
+    height: 2.45rem;
+    border-radius: 0.65rem;
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .financial-login__brand .fenasoja-brand__wordmark {
+    font-size: 1.22rem;
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .financial-login__brand .fenasoja-brand__edition {
+    min-width: 3.2rem;
+    padding: 0.3rem 0.35rem;
+    font-size: 0.58rem;
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .financial-login__identity {
+    margin-top: 0.8rem;
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .financial-login__title {
+    font-size: clamp(2.25rem, 10.6vw, 3rem);
+    line-height: 0.88;
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .financial-login__title-ledger {
+    gap: 0.5rem;
+    margin-top: 0.68rem;
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .financial-login__title-ledger > span {
+    width: 3.8rem;
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .financial-login__description {
+    margin-top: 0.62rem;
+    font-size: 0.67rem;
+    letter-spacing: 0.055em;
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .financial-login__signature {
+    margin-top: 0.82rem;
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .financial-login__legend {
+    justify-content: space-between;
+    gap: 0.55rem;
+    font-size: 0.49rem;
+    letter-spacing: 0.065em;
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .financial-login__legend span {
+    gap: 0.28rem;
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .financial-login__legend span::before {
+    width: 0.28rem;
+    height: 0.28rem;
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .financial-login__flow {
+    height: 4.3rem;
+    margin-top: 0.28rem;
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .financial-login__flow-grid path:nth-child(n + 4) {
+    display: none;
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .financial-login__bars {
+    opacity: 0.72;
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .auth-panel {
+    border-radius: 1rem;
+    padding: 1.1rem;
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .auth-panel::after {
+    left: 1.1rem;
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .auth-panel__heading {
+    margin-top: 0.18rem;
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .auth-panel__heading h2 {
+    font-size: 1.85rem;
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .auth-panel__heading p:last-child {
+    margin-top: 0.45rem;
+    font-size: 0.72rem;
+    line-height: 1.15rem;
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .auth-form {
+    gap: 0.82rem;
+    margin-top: 1rem;
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .auth-input-frame .auth-input-control {
+    font-size: 1rem;
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .auth-panel__footer {
+    margin-top: 0.78rem;
+    padding-top: 0.68rem;
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .auth-back-link {
+    width: 100%;
+  }
+}
+
+@media (max-width: 374px), (max-height: 760px) and (max-width: 639px) {
+  .auth-screen[data-module='financeiro-gerencial'] .financial-login__title {
+    font-size: clamp(2rem, 10.4vw, 2.45rem);
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .financial-login__signature {
+    margin-top: 0.55rem;
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .financial-login__legend {
+    display: none;
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .financial-login__flow {
+    height: 3.25rem;
+    margin-top: 0;
+  }
+}
+
+@media (min-width: 960px) and (max-height: 760px) {
+  .auth-screen[data-module='financeiro-gerencial'] .financial-login__identity {
+    margin-top: 2rem;
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .financial-login__title {
+    font-size: clamp(3.35rem, 5.4vw, 4.75rem);
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .financial-login__signature {
+    margin-top: 1.3rem;
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .financial-login__flow {
+    height: 5.6rem;
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .auth-panel {
+    padding: 1.3rem;
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .auth-panel__heading {
+    margin-top: 0.15rem;
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .auth-form {
+    gap: 0.78rem;
+    margin-top: 1rem;
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .auth-panel__footer {
+    margin-top: 0.78rem;
+  }
+}
+
+@media (prefers-contrast: more), (prefers-reduced-transparency: reduce) {
+  .auth-screen[data-module='financeiro-gerencial'] {
+    background: var(--finance-login-navy);
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .auth-panel {
+    border-color: rgb(31 101 122);
+    background: rgb(255 255 255);
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .financial-login__trajectory--revenue,
+  .auth-screen[data-module='financeiro-gerencial'] .financial-login__trajectory--expense {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .auth-screen[data-module='financeiro-gerencial']::before,
+  .auth-screen[data-module='financeiro-gerencial'] .financial-login__brand,
+  .auth-screen[data-module='financeiro-gerencial'] .financial-login__title,
+  .auth-screen[data-module='financeiro-gerencial'] .financial-login__title-ledger,
+  .auth-screen[data-module='financeiro-gerencial'] .financial-login__description,
+  .auth-screen[data-module='financeiro-gerencial'] .financial-login__signature,
+  .auth-screen[data-module='financeiro-gerencial'] .financial-login__bars rect,
+  .auth-screen[data-module='financeiro-gerencial'] .financial-login__trajectory,
+  .auth-screen[data-module='financeiro-gerencial'] .financial-login__balance-point,
+  .auth-screen[data-module='financeiro-gerencial'] .auth-panel,
+  .auth-screen[data-module='financeiro-gerencial'] .auth-panel__heading,
+  .auth-screen[data-module='financeiro-gerencial'] .auth-field,
+  .auth-screen[data-module='financeiro-gerencial'] .auth-submit,
+  .auth-screen[data-module='financeiro-gerencial'] .auth-panel__footer {
+    animation: none;
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .financial-login__bars rect {
+    transform: scaleY(1);
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .financial-login__trajectory {
+    stroke-dashoffset: 0;
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .financial-login__balance-point {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .auth-screen[data-module='financeiro-gerencial'] .auth-input-frame:focus-within,
+  .auth-screen[data-module='financeiro-gerencial'] .auth-submit:hover,
+  .auth-screen[data-module='financeiro-gerencial'] .auth-submit:active {
+    transform: none;
+  }
+}

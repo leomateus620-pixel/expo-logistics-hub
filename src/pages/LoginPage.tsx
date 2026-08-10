@@ -27,6 +27,7 @@ import { VenueEventsLoginHero } from '@/components/auth/VenueEventsLoginHero';
 import { AgendaWordmark } from '@/components/brand/AgendaWordmark';
 import { CommercialMapLoginHero } from '@/components/auth/CommercialMapLoginHero';
 import { CommissionMapLoginHero } from '@/components/auth/CommissionMapLoginHero';
+import { FinancialLoginHero } from '@/components/auth/FinancialLoginHero';
 import { FenasojaBrand } from '@/components/brand/FenasojaBrand';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -38,6 +39,7 @@ import {
 } from '@/modules/commissions/commissionRegistry';
 import { getCommissionMapPortal } from '@/modules/commissions/commissionMapPortalRegistry';
 import '@/styles/login-experience.css';
+import '@/styles/financial-login.css';
 
 interface LoginPageProps {
   returnTo?: string;
@@ -132,6 +134,7 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
   const isVenueEventsLogin =
     selectedSlug === 'eventos-restaurante-arena' || returnTo?.startsWith('/eventos-restaurante-arena');
   const isCommercialMapLogin = selectedSlug === 'mapa-comercial' || returnTo?.startsWith('/mapa-comercial');
+  const isFinancialLogin = selectedSlug === 'financeiro-gerencial';
   const selectedModule = getCommissionModule(selectedSlug);
   const commissionMapPortal = getCommissionMapPortal(selectedSlug);
   const isCommissionMapLogin = Boolean(commissionMapPortal);
@@ -335,7 +338,7 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
       data-module={selectedSlug}
       data-commission-theme={commissionMapPortal?.theme}
     >
-      {!isCronogramaLogin && !isCommercialMapLogin && !isCommissionMapLogin && (
+      {!isCronogramaLogin && !isCommercialMapLogin && !isCommissionMapLogin && !isFinancialLogin && (
         <div className="auth-screen__cycle" aria-hidden="true">
           <span>2026</span>
           <i />
@@ -354,6 +357,8 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
           <CommissionMapLoginHero portal={commissionMapPortal} />
         ) : isCommercialMapLogin ? (
           <CommercialMapLoginHero />
+        ) : isFinancialLogin ? (
+          <FinancialLoginHero />
         ) : (
           <section className="auth-hero" aria-labelledby="login-hero-title">
             <FenasojaBrand
@@ -403,7 +408,7 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
           aria-labelledby="login-title"
           aria-busy={phase === 'submitting'}
         >
-          {!isCommercialMapLogin && !isCommissionMapLogin && !isVenueEventsLogin && (
+          {!isCommercialMapLogin && !isCommissionMapLogin && !isVenueEventsLogin && !isFinancialLogin && (
             <div className="auth-panel__brand-row">
               <FenasojaBrand
                 compact
@@ -439,14 +444,18 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
                   ? 'Acesso institucional'
                   : isCommissionMapLogin
                     ? 'Acesso à comissão'
-                    : 'Identificação segura'}
+                    : isFinancialLogin
+                      ? 'Acesso financeiro'
+                      : 'Identificação segura'}
               </p>
             )}
             <h2 id="login-title">Entrar</h2>
             <p>
               {isVenueEventsLogin
                 ? 'Informe suas credenciais para continuar.'
-                : isCommercialMapLogin || isCommissionMapLogin
+                : isFinancialLogin
+                  ? 'Use seu e-mail e senha institucionais.'
+                  : isCommercialMapLogin || isCommissionMapLogin
                   ? 'Use seu e-mail e senha institucionais para continuar.'
                   : <>Use suas credenciais institucionais para continuar em <strong>{contextName}</strong>.</>}
             </p>
@@ -608,7 +617,7 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
           </form>
 
           <div className="auth-panel__footer">
-            {!isCommercialMapLogin && !isCommissionMapLogin && !isVenueEventsLogin && (
+            {!isCommercialMapLogin && !isCommissionMapLogin && !isVenueEventsLogin && !isFinancialLogin && (
               <div className="auth-restricted-note">
                 <span className="auth-restricted-note__icon" aria-hidden="true">
                   <ShieldCheck />
