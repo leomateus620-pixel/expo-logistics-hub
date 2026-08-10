@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurrentOrg } from "@/hooks/useCurrentOrg";
 import { presentFenasojaProductName } from "@/lib/fenasoja-brand";
+import { VenueHeaderSearch } from "@/components/venue-events/VenueHeaderSearch";
+import { VenueSearchProvider } from "@/components/venue-events/VenueSearchContext";
 import "@/styles/venue-events-shell.css";
 
 interface VenueModuleShellProps {
@@ -34,6 +36,7 @@ export function VenueModuleShell({ children }: VenueModuleShellProps) {
   const organizationLabel = presentFenasojaProductName(orgName);
 
   return (
+    <VenueSearchProvider>
     <div className="venue-module-shell">
       <a className="venue-module-shell__skip-link" href="#venue-events-main">
         Ir para o conteúdo da Agenda Restaurante e Arena
@@ -74,7 +77,10 @@ export function VenueModuleShell({ children }: VenueModuleShellProps) {
                   <AgendaWordmark variant="venue" />
                 </span>
               </span>
+
+              <VenueHeaderSearch className="venue-module-shell__search" />
             </div>
+
           </div>
 
           <div className="venue-module-shell__actions">
@@ -119,5 +125,6 @@ export function VenueModuleShell({ children }: VenueModuleShellProps) {
         {children}
       </div>
     </div>
+    </VenueSearchProvider>
   );
 }
