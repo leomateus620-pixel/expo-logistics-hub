@@ -125,5 +125,6 @@ export function VenueModuleShell({ children }: VenueModuleShellProps) {
         {children}
       </div>
     </div>
+    </VenueSearchProvider>
   );
 }
