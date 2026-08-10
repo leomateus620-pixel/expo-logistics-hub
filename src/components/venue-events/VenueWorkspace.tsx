@@ -1274,87 +1274,37 @@ export function VenueWorkspace() {
           <h2>{venueDefinition.agendaTitle}</h2>
         </div>
         <div className="venue-agenda-controls">
-          <div className="venue-segmented">
-            {(["dia", "semana", "mes"] as const).map((mode) => (
-              <button
-                key={mode}
-                type="button"
-                data-active={agendaMode === mode}
-                onClick={() => setAgendaMode(mode)}
-              >
-                {mode === "mes" ? "Mês" : mode[0].toUpperCase() + mode.slice(1)}
-              </button>
-            ))}
-          </div>
-          <div className="venue-agenda-date-nav">
-            <Button
-              type="button"
-              variant="outline"
-              size="icon"
-              aria-label="Período anterior"
-              onClick={() => moveAgenda(-1)}
-            >
-              <ChevronLeft />
-            </Button>
-            <Input
-              type="date"
-              aria-label="Data de referência da agenda"
-              value={agendaDate}
-              onChange={(event) => setAgendaDate(event.target.value)}
-            />
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setAgendaDate(currentDateKey)}
-            >
-              Hoje
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="icon"
-              aria-label="Próximo período"
-              onClick={() => moveAgenda(1)}
-            >
-              <ChevronRight />
-            </Button>
-          </div>
+          <VenueAgendaFiltersTrigger
+            mode={agendaMode}
+            onModeChange={setAgendaMode}
+            date={agendaDate}
+            onDateChange={setAgendaDate}
+            onToday={() => setAgendaDate(currentDateKey)}
+            onMove={moveAgenda}
+            spaceFilter={spaceFilter}
+            onSpaceFilterChange={setSpaceFilter}
+            spaces={workspace.spaces
+              .filter((space) => space.active)
+              .map((space) => ({ id: space.id, name: space.name }))}
+            onClear={() => {
+              setSpaceFilter("all");
+              setAgendaMode("mes");
+            }}
+          />
         </div>
       </header>
-      <div className="venue-filter-bar">
-        <label>
-          <Search />
-          <Input
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            placeholder="Buscar evento, solicitante ou patrocinador"
-          />
-        </label>
-        <Select value={spaceFilter} onValueChange={setSpaceFilter}>
-          <SelectTrigger aria-label="Filtrar agenda por espaço">
-            <Filter />
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todas as áreas</SelectItem>
-            {workspace.spaces
-              .filter((space) => space.active)
-              .map((space) => (
-                <SelectItem key={space.id} value={space.id}>
-                  {space.name}
-                </SelectItem>
-              ))}
-          </SelectContent>
-        </Select>
-      </div>
-      <div className="venue-agenda-period" role="status" aria-live="polite">
+      <div
+        className="venue-agenda-period venue-agenda-period--compact"
+        role="status"
+        aria-live="polite"
+      >
         <CalendarDays aria-hidden="true" />
         <span>
-          <small>Janela selecionada</small>
+          <small>Janela</small>
           <strong>{agendaRangeLabel}</strong>
         </span>
         <span data-state={agendaEvents.length ? "occupied" : "available"}>
-          <small>Ocupação encontrada</small>
+          <small>Ocupação</small>
           <strong>
             {agendaEvents.length} {agendaEvents.length === 1 ? "evento" : "eventos"}
           </strong>
@@ -1369,6 +1319,7 @@ export function VenueWorkspace() {
           </span>
         )}
       </div>
+
       {agendaGroups.length ? (
         <div className="venue-agenda-timeline">
           {agendaGroups.map(([date, events]) => (
