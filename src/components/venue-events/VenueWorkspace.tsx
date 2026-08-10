@@ -1274,6 +1274,30 @@ export function VenueWorkspace() {
     </div>
   );
 
+  const agendaHourFormatter = new Intl.DateTimeFormat("pt-BR", {
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "America/Sao_Paulo",
+  });
+
+  const formatAgendaHour = (value: string | null | undefined) =>
+    value ? agendaHourFormatter.format(new Date(value)) : null;
+
+  const formatAgendaDuration = (
+    start: string | null | undefined,
+    end: string | null | undefined,
+  ) => {
+    if (!start || !end) return null;
+    const diff = new Date(end).getTime() - new Date(start).getTime();
+    if (!Number.isFinite(diff) || diff <= 0) return null;
+    const totalMinutes = Math.round(diff / 60000);
+    const hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+    if (hours && minutes) return `${hours}h${String(minutes).padStart(2, "0")}`;
+    if (hours) return `${hours}h`;
+    return `${minutes}min`;
+  };
+
   const renderAgenda = () => (
     <section className="venue-panel venue-agenda-view">
       <header className="venue-panel__header venue-panel__header--responsive">
