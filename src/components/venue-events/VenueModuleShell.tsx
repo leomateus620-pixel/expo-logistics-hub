@@ -84,13 +84,7 @@ export function VenueModuleShell({ children }: VenueModuleShellProps) {
           </div>
 
           <div className="venue-module-shell__actions">
-            <div
-              className="venue-module-shell__organization"
-              aria-label={`Organização ativa: ${organizationLabel}`}
-            >
-              <span>Organização ativa</span>
-              <strong>{organizationLabel}</strong>
-            </div>
+
 
             <Button
               type="button"
