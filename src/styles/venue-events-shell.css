@@ -195,38 +195,6 @@
   white-space: nowrap;
 }
 
-.venue-module-shell__organization {
-  display: inline-flex;
-  max-width: 18rem;
-  min-height: 2.75rem;
-  flex-direction: column;
-  justify-content: center;
-  padding: 0.4rem 0.7rem;
-  border: 1px solid oklch(var(--brand-soft-white) / 0.13);
-  border-radius: var(--radius-sm);
-  background: oklch(var(--brand-soft-white) / 0.055);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.08);
-}
-
-.venue-module-shell__organization span {
-  color: oklch(var(--brand-cream) / 0.6);
-  font-size: 0.56rem;
-  font-weight: 800;
-  letter-spacing: 0.14em;
-  line-height: 1.2;
-  text-transform: uppercase;
-}
-
-.venue-module-shell__organization strong {
-  overflow: hidden;
-  color: oklch(var(--brand-soft-white) / 0.92);
-  font-size: 0.72rem;
-  font-weight: 750;
-  line-height: 1.3;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
 .venue-module-shell .venue-module-shell__sign-out {
   height: 2.75rem;
   padding-inline: 0.75rem;
@@ -446,10 +414,7 @@
 }
 
 @media (max-width: 64rem) {
-  .venue-module-shell__organization {
-    display: none;
   }
-}
 
 @media (max-width: 40rem) {
   .venue-module-shell__bar-inner {
