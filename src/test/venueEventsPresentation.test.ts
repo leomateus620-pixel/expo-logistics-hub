@@ -39,8 +39,7 @@ describe("contrato de apresentação de Eventos Restaurante e Arena", () => {
     expect(productionCss).toContain("grid-template-columns: 1fr 1fr");
     expect(switcher).not.toContain("{description}");
     expect(switcher).not.toContain("<small>");
-    expect(workspace).not.toContain("<Plus /> Novo evento");
-    expect(workspace).not.toContain('aria-label="Atualizar dados"');
+    expect(workspace).not.toContain("venue-command-hero__actions");
     expect(workspace).not.toContain("venue-command-hero__context");
   });
 
