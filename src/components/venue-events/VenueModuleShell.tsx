@@ -74,7 +74,10 @@ export function VenueModuleShell({ children }: VenueModuleShellProps) {
                   <AgendaWordmark variant="venue" />
                 </span>
               </span>
+
+              <VenueHeaderSearch className="venue-module-shell__search" />
             </div>
+
           </div>
 
           <div className="venue-module-shell__actions">
