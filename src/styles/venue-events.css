@@ -3864,15 +3864,27 @@
   }
 
   .venue-event-card {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 0.55rem;
+    grid-template-columns: 3.6rem minmax(0, 1fr);
+    gap: 0.55rem 0.7rem;
   }
 
-  .venue-event-card__time {
+  .venue-event-card__date {
+    min-height: 3rem;
+  }
+
+  .venue-event-card__hours {
     flex-direction: row;
     align-items: center;
     gap: 0.5rem;
+    min-height: 0;
+    padding-right: 0;
+    border-right: none;
   }
+
+  .venue-event-card .venue-agenda-card__body {
+    grid-column: 1 / -1;
+  }
+
 
   .venue-event-card .venue-agenda-card__aside {
     flex-direction: row;
