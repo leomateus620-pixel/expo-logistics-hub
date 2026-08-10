@@ -221,7 +221,9 @@ describe("experiência de autenticação Fenasoja 2028", () => {
     expect(
       screen.getAllByText("Agenda Restaurante e Arena").length,
     ).toBeGreaterThan(0);
-    expect(screen.getByText("Conflitos em tempo real")).toBeInTheDocument();
+    expect(
+      screen.getByText("Reservas, aprovações e contrapartidas em um ambiente único."),
+    ).toBeInTheDocument();
 
     fireEvent.change(screen.getByLabelText("E-mail"), {
       target: { value: "usuario@fenasoja.com.br" },
@@ -291,6 +293,74 @@ describe("experiência de autenticação Fenasoja 2028", () => {
       () => {
         expect(screen.getByTestId("current-location")).toHaveTextContent(
           "/mapa-comercial",
+        );
+      },
+      { timeout: 1_500 },
+    );
+  });
+
+  it("apresenta o Financeiro com identidade própria, wordmark limpo e formulário objetivo", () => {
+    const { container } = renderLogin("/login/financeiro-gerencial");
+
+    const screenRoot = container.querySelector(
+      '.auth-screen[data-module="financeiro-gerencial"]',
+    );
+    const brand = screen.getByRole("img", { name: "Fenasoja 2028" });
+
+    expect(screenRoot).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Financeiro" })).toBeInTheDocument();
+    expect(screen.getByText("Gestão financeira institucional")).toBeInTheDocument();
+    expect(screen.getByText("Acesso financeiro")).toBeInTheDocument();
+    expect(
+      screen.getByText("Use seu e-mail e senha institucionais."),
+    ).toBeInTheDocument();
+
+    expect(brand.querySelector('[data-soybean-wordmark="true"]')).toBeNull();
+    expect(screen.queryByTestId("login-brand-soybean")).not.toBeInTheDocument();
+    expect(container.querySelectorAll(".financial-login__trajectory")).toHaveLength(2);
+    expect(container.querySelector(".financial-login__balance-point")).toBeInTheDocument();
+    expect(container.querySelector(".financial-login__signature")).toHaveAttribute(
+      "aria-hidden",
+      "true",
+    );
+
+    expect(screen.getByLabelText("E-mail")).toBeInTheDocument();
+    expect(screen.getByLabelText("Senha")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Entrar no sistema" })).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Voltar ao portal" })).toHaveAttribute(
+      "href",
+      "/portal",
+    );
+
+    expect(screen.queryByText("Ambiente seguro")).not.toBeInTheDocument();
+    expect(screen.queryByText("das comissões")).not.toBeInTheDocument();
+    expect(screen.queryByText("Capacidades do ambiente")).not.toBeInTheDocument();
+    expect(screen.queryByText("Módulo selecionado")).not.toBeInTheDocument();
+    expect(screen.queryByText("Agenda operacional")).not.toBeInTheDocument();
+    expect(screen.queryByText("Equipe conectada")).not.toBeInTheDocument();
+    expect(screen.queryByText("Dados do módulo")).not.toBeInTheDocument();
+    expect(screen.queryByText("Acesso restrito")).not.toBeInTheDocument();
+  });
+
+  it("preserva o destino protegido do Financeiro após autenticação", async () => {
+    authMocks.signIn.mockResolvedValue({ error: null });
+    renderLogin("/login/financeiro-gerencial");
+
+    fireEvent.change(screen.getByLabelText("E-mail"), {
+      target: { value: "usuario@fenasoja.com.br" },
+    });
+    fireEvent.change(screen.getByLabelText("Senha"), {
+      target: { value: "senha-segura" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Entrar no sistema" }));
+
+    expect(
+      await screen.findByRole("button", { name: "Acesso confirmado" }),
+    ).toBeDisabled();
+    await waitFor(
+      () => {
+        expect(screen.getByTestId("current-location")).toHaveTextContent(
+          "/comissoes/financeiro-gerencial/dashboard",
         );
       },
       { timeout: 1_500 },
