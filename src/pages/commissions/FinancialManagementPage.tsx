@@ -93,10 +93,18 @@ import {
   selectSponsorTotals,
   sortExpensesForLedger,
 } from '@/features/financial-management/selectors/financialSelectors';
+import {
+  selectExpenseExecutionModel,
+} from '@/features/financial-management/selectors/financialSelectors';
 import type {
+  ExpenseExecutionGroupingMode,
   ExpenseGroupingMode,
   ExpenseVisualizationCoverage,
 } from '@/features/financial-management/selectors/financialSelectors';
+import {
+  ExpenseExecutionBoard,
+  FundingDistributionStrip,
+} from '@/features/financial-management/components/FinancialExecutiveBoard';
 import {
   formatBRL,
   formatPercentage,
@@ -111,6 +119,7 @@ import type {
   SponsorTier,
 } from '@/features/financial-management/types';
 import '@/styles/financial-management.css';
+import '@/styles/financial-executive-panel.css';
 
 interface FinancialManagementPageProps {
   module: CommissionModule;
@@ -467,6 +476,7 @@ export default function FinancialManagementPage({ module }: FinancialManagementP
   const [sponsorSearch, setSponsorSearch] = useState('');
   const [sponsorTier, setSponsorTier] = useState<'all' | SponsorTier>('all');
   const [scenarioId, setScenarioId] = useState<ScenarioId>('realistic');
+  const [executionGrouping, setExecutionGrouping] = useState<ExpenseExecutionGroupingMode>('commission');
 
   const commissionBudgets = useMemo(() => selectCommissionBudgets(commissionBudgetSources), []);
   const expenses = useMemo(() => flattenCommissionExpenses(commissionBudgetSources), []);
