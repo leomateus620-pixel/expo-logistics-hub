@@ -2731,6 +2731,14 @@ export function VenueWorkspace() {
         />
       </section>
 
+      {permissions.venue_events_create && (
+        <VenueCreateEventBar
+          venueId={venueId}
+          venueLabel={venueDefinition.label}
+          onCreate={startNewEvent}
+        />
+      )}
+
       <nav className="venue-desktop-nav" aria-label="Navegação do módulo">
         {NAV_GROUPS.map((group) => (
           <div
