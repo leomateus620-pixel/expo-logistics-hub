@@ -71,7 +71,20 @@ describe("contrato de apresentação de Eventos Restaurante e Arena", () => {
     expect(form).toContain("?.focus({ preventScroll: true })");
   });
 
+  it("mantém o registro mestre limpo, com anos do ciclo e histórico opcional", () => {
+    expect(workspace).toContain("venue-events-registry__scope");
+    expect(workspace).toContain("<VenueEventsYearSelector");
+    expect(workspace).toContain("<VenueEventsFiltersTrigger");
+    expect(workspace).toContain('const CYCLE_YEARS = ["2026", "2027", "2028"]');
+    expect(workspace).toContain("venue-event-card");
+    expect(workspace).not.toContain("venue-filter-bar--agenda");
+    expect(read("src/components/venue-events/VenueModuleShell.tsx")).not.toContain(
+      "venue-module-shell__organization",
+    );
+  });
+
   it("limita movimento a interações intencionais e respeita preferências do sistema", () => {
+
     expect(productionCss).not.toMatch(/transition\s*:\s*all/);
     expect(productionCss).toContain("@media (hover: hover) and (pointer: fine)");
     expect(productionCss).toContain("@media (prefers-reduced-motion: reduce)");
