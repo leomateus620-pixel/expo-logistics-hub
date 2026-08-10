@@ -841,18 +841,6 @@ export default function FinancialManagementPage({ module }: FinancialManagementP
     </div>
   );
 
-          className="financial-panel--span-5"
-        >
-          <FundingSourceChart data={fundingData} forceMotion variant="executive" />
-        </FinancialPanel>
-      </div>
-
-      <DataQualityNote title="Conciliação da fonte">
-        <p>Realizado oficial: {formatBRL(coreRealizedAmount)}. Períodos 2025 + 2026: {formatBRL(periodBridgeTotal)}. Diferença: {formatBRL(periodIntegrityDelta)}, na linha 14 (valor em 2026 e consolidado vazio).</p>
-      </DataQualityNote>
-    </div>
-  );
-
   const renderRevenues = (confirmed: boolean) => {
     const filteredTotals = selectRevenueTotals(filteredRevenues);
     const filteredFreeProjected = roundCurrency(filteredRevenues.reduce((total, revenue) => total + revenue.projectedFreeResource, 0));
