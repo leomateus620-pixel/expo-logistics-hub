@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useCurrentOrg } from "@/hooks/useCurrentOrg";
 import { presentFenasojaProductName } from "@/lib/fenasoja-brand";
+import { VenueHeaderSearch } from "@/components/venue-events/VenueHeaderSearch";
+import { VenueSearchProvider } from "@/components/venue-events/VenueSearchContext";
 import "@/styles/venue-events-shell.css";
 
 interface VenueModuleShellProps {
