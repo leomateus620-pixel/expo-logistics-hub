@@ -1576,28 +1576,107 @@ export function VenueWorkspace() {
                 {group.label}
                 <span>{group.events.length}</span>
               </p>
-              {group.events.map((event) => (
-                <EventRow
-                  key={event.id}
-                  event={event}
-                  spaces={getSpaceNames(
-                    event.id,
-                    workspace.allocations,
-                    workspace.spaces,
-                  )}
-                  sponsor={getStakeholderName(
-                    event.sponsor_id,
-                    workspace.stakeholders,
-                  )}
-                  responsible={
-                    workspace.members.find(
-                      (member) => member.user_id === event.responsible_user_id,
-                    )?.nome_exibicao || "Não definido"
-                  }
-                  hasCounterpart={Boolean(event.counterpart_agreement_id)}
-                  onOpen={() => openEvent(event.id)}
-                />
-              ))}
+              {group.events.map((event) => {
+                const startLabel = formatAgendaHour(event.start_at);
+                const endLabel = formatAgendaHour(event.end_at);
+                const durationLabel = formatAgendaDuration(
+                  event.start_at,
+                  event.end_at,
+                );
+                const spaceLabel = getSpaceNames(
+                  event.id,
+                  workspace.allocations,
+                  workspace.spaces,
+                );
+                const sponsorLabel = getStakeholderName(
+                  event.sponsor_id,
+                  workspace.stakeholders,
+                );
+                const responsibleLabel =
+                  workspace.members.find(
+                    (member) => member.user_id === event.responsible_user_id,
+                  )?.nome_exibicao || "Não definido";
+                const hasCounterpart = Boolean(event.counterpart_agreement_id);
+                const dayLabel = event.start_at
+                  ? new Intl.DateTimeFormat("pt-BR", {
+                      timeZone: "America/Sao_Paulo",
+                      day: "2-digit",
+                    }).format(new Date(event.start_at))
+                  : "—";
+                const monthLabel = event.start_at
+                  ? new Intl.DateTimeFormat("pt-BR", {
+                      timeZone: "America/Sao_Paulo",
+                      month: "short",
+                    })
+                      .format(new Date(event.start_at))
+                      .replace(".", "")
+                  : "s/ data";
+
+                return (
+                  <button
+                    key={event.id}
+                    type="button"
+                    onClick={() => openEvent(event.id)}
+                    data-status={event.status}
+                    className="venue-agenda-card venue-event-card"
+                    aria-label={`${event.title} — ${dayLabel} ${monthLabel}${startLabel ? `, ${startLabel}` : ""}`}
+                  >
+                    <span className="venue-agenda-card__time venue-event-card__time">
+                      <b>
+                        {dayLabel}
+                        <i>{monthLabel}</i>
+                      </b>
+                      <time dateTime={event.start_at ?? undefined}>
+                        {startLabel ?? "--:--"}
+                      </time>
+                      {endLabel && <em>{endLabel}</em>}
+                      {durationLabel && <i>{durationLabel}</i>}
+                    </span>
+
+                    <span className="venue-agenda-card__body">
+                      <strong>{event.title}</strong>
+                      <span className="venue-agenda-card__chips">
+                        <span data-kind="space">
+                          <MapPin aria-hidden="true" />
+                          {spaceLabel || "Área não definida"}
+                        </span>
+                        <span
+                          data-kind="sponsor"
+                          data-empty={!sponsorLabel || sponsorLabel === "Sem vínculo"}
+                        >
+                          <Building2 aria-hidden="true" />
+                          {sponsorLabel || "Sem vínculo"}
+                        </span>
+                        <span data-kind="responsible">
+                          <UserRound aria-hidden="true" />
+                          {responsibleLabel}
+                        </span>
+                        <span
+                          data-kind="counterpart"
+                          data-empty={!hasCounterpart}
+                        >
+                          <Handshake aria-hidden="true" />
+                          {hasCounterpart
+                            ? "Contrapartida vinculada"
+                            : "Sem contrapartida"}
+                        </span>
+                      </span>
+                    </span>
+
+                    <span className="venue-agenda-card__aside">
+                      {event.conflict_status === "conflito" && (
+                        <AlertTriangle
+                          className="venue-event-card__conflict"
+                          aria-label="Conflito pendente"
+                        />
+                      )}
+                      <StatusBadge status={event.status} />
+                      <ChevronRight aria-hidden="true" />
+                    </span>
+                  </button>
+                );
+              })}
+
             </div>
           ))}
         </div>
