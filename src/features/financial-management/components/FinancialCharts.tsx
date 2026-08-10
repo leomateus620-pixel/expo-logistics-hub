@@ -15,7 +15,6 @@ import {
   Legend,
   Pie,
   PieChart,
-  ReferenceLine,
   ResponsiveContainer,
   Tooltip,
   Treemap,
@@ -29,7 +28,6 @@ import type {
   CommissionBudget,
   ExpenseCategory,
   FinancialExpense,
-  FinancialScenario,
   FundingType,
   RevenueCategory,
 } from '@/features/financial-management/types';
@@ -2692,141 +2690,6 @@ export function BudgetStatusDonutChart({
       className={className}
       height={height}
       mobileHeight={mobileHeight}
-    />
-  );
-}
-
-export interface ScenarioComparisonChartProps extends BaseFinancialChartProps {
-  data: ReadonlyArray<FinancialScenario>;
-}
-
-export function ScenarioComparisonChart({
-  data,
-  title = 'Comparação de cenários financeiros',
-  summary = 'Comparação entre receita total, compromissos e resultado líquido — capacidade positiva ou déficit — nos cenários gerenciais.',
-  className,
-  height = 360,
-  mobileHeight = 300,
-}: ScenarioComparisonChartProps) {
-  const reducedMotion = usePrefersReducedMotion();
-  const chartData = data.map((item) => ({
-    ...item,
-    totalCommitments: Math.round((
-      item.operatingExecution + item.historicalObligations + item.reserve
-    ) * 100) / 100,
-    netResult: item.negativeResult > 0 ? -Math.abs(item.negativeResult) : item.investmentCapacity,
-  }));
-
-  if (chartData.length === 0) {
-    return <FinancialStatePanel state="empty" title={`Sem dados para ${title}`} />;
-  }
-
-  return (
-    <FinancialChartFrame
-      title={title}
-      summary={summary}
-      className={cn('financial-chart--scenario-comparison', className)}
-      height={height}
-      mobileHeight={mobileHeight}
-      chart={(
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart data={chartData} margin={{ top: 16, right: 12, bottom: 8, left: 0 }}>
-            <CartesianGrid vertical={false} stroke="var(--financial-chart-grid, oklch(var(--border)))" />
-            <ReferenceLine
-              y={0}
-              stroke="var(--financial-chart-axis, oklch(var(--muted-foreground)))"
-            />
-            <XAxis
-              dataKey="label"
-              axisLine={false}
-              tickLine={false}
-              tickMargin={10}
-            />
-            <YAxis
-              axisLine={false}
-              tickLine={false}
-              tickFormatter={formatCompactCurrency}
-              width={76}
-            />
-            <Tooltip
-              cursor={{ fill: 'var(--financial-chart-hover, oklch(var(--muted) / 0.45))' }}
-              content={(
-                <FinancialChartTooltip
-                  valueLabels={{
-                    totalRevenue: 'Receita total',
-                    totalCommitments: 'Compromissos',
-                    netResult: 'Resultado líquido',
-                  }}
-                />
-              )}
-            />
-            <Legend
-              formatter={(value) => {
-                if (value === 'totalRevenue') return 'Receita total';
-                if (value === 'totalCommitments') return 'Compromissos';
-                return 'Capacidade / déficit';
-              }}
-            />
-            <Bar
-              dataKey="totalRevenue"
-              name="totalRevenue"
-              fill={chartColors.projected}
-              radius={[5, 5, 0, 0]}
-              isAnimationActive={!reducedMotion}
-              animationDuration={360}
-              animationEasing="ease-out"
-            />
-            <Bar
-              dataKey="totalCommitments"
-              name="totalCommitments"
-              fill={chartColors.attention}
-              radius={[5, 5, 0, 0]}
-              isAnimationActive={!reducedMotion}
-              animationDuration={360}
-              animationEasing="ease-out"
-            />
-            <Bar
-              dataKey="netResult"
-              name="netResult"
-              fill={chartColors.consolidated}
-              radius={[5, 5, 0, 0]}
-              isAnimationActive={!reducedMotion}
-              animationDuration={360}
-              animationEasing="ease-out"
-            >
-              {chartData.map((item) => (
-                <Cell
-                  key={item.id}
-                  fill={item.netResult < 0 ? chartColors.danger : chartColors.consolidated}
-                />
-              ))}
-            </Bar>
-          </BarChart>
-        </ResponsiveContainer>
-      )}
-      accessibleTable={(
-        <table>
-          <caption>{title}</caption>
-          <thead>
-            <tr>
-              <th scope="col">Cenário</th>
-              <th scope="col">Receita total</th>
-              <th scope="col">Compromissos</th>
-              <th scope="col">Capacidade ou déficit</th>
-            </tr>
-          </thead>
-          <tbody>
-            {chartData.map((item) => (
-              <tr key={item.id}>
-                <th scope="row">{item.label}</th>
-                <td>{formatFullCurrency(item.totalRevenue)}</td>
-                <td>{formatFullCurrency(item.totalCommitments)}</td>
-                <td>{formatFullCurrency(item.netResult)}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
     />
   );
 }

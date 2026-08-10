@@ -17,7 +17,10 @@ import {
   selectOverBudgetCommissions,
   selectRevenueReceiptStatus,
   selectRevenueTotals,
+  selectScenarioBridge,
+  selectScenarioContributions,
   selectScenarioSummaries,
+  selectSponsorshipIntelligence,
   selectSponsorTierDistribution,
   selectSponsorTotals,
   sortExpensesForLedger,
@@ -521,6 +524,7 @@ describe('patrocinadores e cenários', () => {
 
     expect(selectSponsorTotals(sponsors)).toEqual({
       sponsorCount: 3,
+      financialSponsorCount: 3,
       declaredValue: 130,
       projectedFreeResource: 80,
       consolidatedFreeResource: 65,
@@ -529,6 +533,8 @@ describe('patrocinadores e cenários', () => {
       consolidatedRouanet: 20,
       totalProjectedAmount: 120,
       totalConsolidatedAmount: 85,
+      consolidationGapAmount: 35,
+      consolidationRate: 70.83,
       vehicleCredentials: 3,
       soySummitCredentials: 3,
       inKindContributionCount: 2,
@@ -541,7 +547,81 @@ describe('patrocinadores e cenários', () => {
       totalProjectedAmount: 90,
       sponsorSharePercentage: 66.67,
       projectedSharePercentage: 75,
+      consolidatedSharePercentage: 76.47,
       explicitReceivableAmount: 9,
+    });
+
+    const intelligence = selectSponsorshipIntelligence(sponsors);
+    expect(intelligence.totals).toMatchObject({
+      sponsorCount: 3,
+      financialSponsorCount: 3,
+      totalProjectedAmount: 120,
+      totalConsolidatedAmount: 85,
+      consolidationGapAmount: 35,
+      consolidationRate: 70.83,
+      explicitReceivableAmount: 12,
+    });
+    expect(intelligence.totals.explicitReceivableAmount)
+      .not.toBe(intelligence.totals.consolidationGapAmount);
+    expect(intelligence.portfolio.map((item) => item.sponsor.id)).toEqual([
+      'gold-1',
+      'silver-1',
+      'gold-2',
+    ]);
+    expect(intelligence.portfolio.map((item) => ({
+      projectedAmount: item.projectedAmount,
+      consolidatedAmount: item.consolidatedAmount,
+      sharePercentage: item.sharePercentage,
+      cumulativeSharePercentage: item.cumulativeSharePercentage,
+    }))).toEqual([
+      {
+        projectedAmount: 100,
+        consolidatedAmount: 70,
+        sharePercentage: 83.33,
+        cumulativeSharePercentage: 83.33,
+      },
+      {
+        projectedAmount: 30,
+        consolidatedAmount: 20,
+        sharePercentage: 25,
+        cumulativeSharePercentage: 108.33,
+      },
+      {
+        projectedAmount: -10,
+        consolidatedAmount: -5,
+        sharePercentage: -8.33,
+        cumulativeSharePercentage: 100,
+      },
+    ]);
+    expect(intelligence.portfolio[0].resourceMix).toEqual({
+      freeResource: {
+        projectedAmount: 70,
+        consolidatedAmount: 50,
+        consolidationGapAmount: 20,
+        consolidationRate: 71.43,
+        projectedSharePercentage: 70,
+        consolidatedSharePercentage: 71.43,
+      },
+      rouanet: {
+        projectedAmount: 30,
+        consolidatedAmount: 20,
+        consolidationGapAmount: 10,
+        consolidationRate: 66.67,
+        projectedSharePercentage: 30,
+        consolidatedSharePercentage: 28.57,
+      },
+    });
+    expect(intelligence.resourceComposition.freeResource).toMatchObject({
+      key: 'free-resource',
+      projectedAmount: 80,
+      consolidatedAmount: 65,
+      projectedSharePercentage: 66.67,
+      consolidatedSharePercentage: 76.47,
+    });
+    expect(intelligence.concentration).toMatchObject({
+      top5SharePercentage: 100,
+      top10SharePercentage: 100,
+      top20SharePercentage: 100,
     });
   });
 
@@ -579,6 +659,68 @@ describe('patrocinadores e cenários', () => {
     });
     expect(summaries[1].negativeResult).toBe(-10.01);
     expect(summaries[2].investmentCapacity).toBe(100.01);
+  });
+
+  it('deriva bridge literal e contribuições sem corrigir diferenças da fonte', () => {
+    const summaries = selectScenarioSummaries(financialScenarios);
+    const realistic = selectScenarioBridge(summaries[0]);
+    const pessimistic = selectScenarioBridge(summaries[1]);
+    const optimistic = selectScenarioBridge(summaries[2]);
+
+    expect(realistic.steps.map((step) => step.key)).toEqual([
+      'commercial-revenue',
+      'free-sponsorship',
+      'rouanet-sponsorship',
+      'total-revenue',
+      'operating-execution',
+      'historical-obligations',
+      'reserve',
+      'literal-result',
+    ]);
+    expect(realistic).toMatchObject({
+      computedResult: 1_595_583.26,
+      literalResult: 1_595_583.2,
+      resultKind: 'capacity',
+      reconciliationDelta: -0.06,
+    });
+    expect(realistic.steps[4]).toMatchObject({
+      kind: 'negative',
+      amount: 6_519_000,
+      signedAmount: -6_519_000,
+      startAmount: 9_205_583.26,
+      endAmount: 2_686_583.26,
+    });
+    expect(pessimistic).toMatchObject({
+      computedResult: -436_533.4,
+      literalResult: -436_533.4,
+      resultKind: 'deficit',
+      reconciliationDelta: 0,
+    });
+    expect(pessimistic.steps.at(-1)).toMatchObject({
+      label: 'Déficit',
+      amount: -436_533.4,
+    });
+    expect(optimistic).toMatchObject({
+      computedResult: 2_405_483.26,
+      literalResult: 2_405_483.3,
+      resultKind: 'capacity',
+      reconciliationDelta: 0.04,
+    });
+
+    const contributions = selectScenarioContributions(summaries[0]);
+    expect(contributions).toHaveLength(11);
+    expect(contributions.filter((item) => item.direction === 'positive')).toHaveLength(8);
+    expect(contributions.filter((item) => item.direction === 'negative')).toHaveLength(3);
+    expect(contributions.find((item) => item.key === 'commercialization')).toMatchObject({
+      amount: 2_046_838.75,
+      signedAmount: 2_046_838.75,
+      direction: 'positive',
+    });
+    expect(contributions.find((item) => item.key === 'historical-obligations')).toMatchObject({
+      amount: 891_000,
+      signedAmount: -891_000,
+      direction: 'negative',
+    });
   });
 });
 
@@ -651,6 +793,33 @@ describe('reconciliação da base Fenasoja 2026', () => {
         rawValue: 46183,
       },
     });
+  });
+
+  it('mantém os 100 patrocinadores no Pareto e separa lacuna de A Receber', () => {
+    const intelligence = selectSponsorshipIntelligence(workbookSponsors);
+
+    expect(intelligence.portfolio).toHaveLength(100);
+    expect(intelligence.portfolio.map((item) => item.rank)).toEqual(
+      Array.from({ length: 100 }, (_, index) => index + 1),
+    );
+    expect(intelligence.totals).toMatchObject({
+      sponsorCount: 100,
+      financialSponsorCount: 54,
+      totalProjectedAmount: financialWorkbookTotals.sponsorshipProjected,
+      totalConsolidatedAmount: financialWorkbookTotals.sponsorshipConsolidated,
+      consolidationGapAmount: 104_255,
+      explicitReceivableAmount: financialWorkbookTotals.sponsorshipReceivableReported,
+    });
+    expect(intelligence.totals.explicitReceivableAmount).toBe(493_666.66);
+    expect(intelligence.totals.explicitReceivableAmount)
+      .not.toBe(intelligence.totals.consolidationGapAmount);
+    expect(intelligence.portfolio.at(-1)?.cumulativeSharePercentage).toBe(100);
+    expect(intelligence.portfolio.find((item) => item.sponsor.sourceRow === 75)?.flags)
+      .toMatchObject({
+        hasReceivableNote: true,
+        hasInKindContribution: false,
+        hasSourceQualityFlag: true,
+      });
   });
 
   it('separa obrigações históricas de investimentos no orçamento geral', () => {

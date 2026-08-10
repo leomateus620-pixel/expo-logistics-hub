@@ -155,6 +155,8 @@ export interface RevenueGroupSummary<Key extends string = string> {
 
 export interface SponsorTotals {
   sponsorCount: number;
+  /** Sponsors with at least one explicit, non-zero financial value in the workbook. */
+  financialSponsorCount: number;
   declaredValue: number;
   projectedFreeResource: number;
   consolidatedFreeResource: number;
@@ -163,6 +165,8 @@ export interface SponsorTotals {
   consolidatedRouanet: number;
   totalProjectedAmount: number;
   totalConsolidatedAmount: number;
+  consolidationGapAmount: number;
+  consolidationRate: number;
   vehicleCredentials: number;
   soySummitCredentials: number;
   inKindContributionCount: number;
@@ -172,6 +176,79 @@ export interface SponsorTierDistribution extends SponsorTotals {
   tier: SponsorTier;
   sponsorSharePercentage: number;
   projectedSharePercentage: number;
+  consolidatedSharePercentage: number;
+}
+
+export interface SponsorResourceMixPart {
+  projectedAmount: number;
+  consolidatedAmount: number;
+  consolidationGapAmount: number;
+  consolidationRate: number;
+  projectedSharePercentage: number;
+  consolidatedSharePercentage: number;
+}
+
+export interface SponsorResourceMix {
+  freeResource: SponsorResourceMixPart;
+  rouanet: SponsorResourceMixPart;
+}
+
+export interface SponsorshipPortfolioFlags {
+  hasFinancialValue: boolean;
+  hasProjectedValue: boolean;
+  hasConsolidatedValue: boolean;
+  hasExplicitReceivable: boolean;
+  hasReceivableNote: boolean;
+  hasInKindContribution: boolean;
+  hasSourceQualityFlag: boolean;
+}
+
+export interface SponsorshipPortfolioItem {
+  rank: number;
+  sponsor: Sponsor;
+  projectedAmount: number;
+  consolidatedAmount: number;
+  consolidationGapAmount: number;
+  consolidationRate: number;
+  /** Share of the complete portfolio's projected amount. */
+  sharePercentage: number;
+  /** Cumulative projected share in Pareto order. */
+  cumulativeSharePercentage: number;
+  resourceMix: SponsorResourceMix;
+  flags: SponsorshipPortfolioFlags;
+}
+
+export type SponsorshipResourceKey = 'free-resource' | 'rouanet';
+
+export interface SponsorshipResourceCompositionItem extends SponsorResourceMixPart {
+  key: SponsorshipResourceKey;
+  label: string;
+}
+
+export interface SponsorshipConcentrationSegment {
+  limit: 5 | 10 | 20;
+  sponsorCount: number;
+  projectedAmount: number;
+  sharePercentage: number;
+}
+
+export interface SponsorshipConcentration {
+  top5SharePercentage: number;
+  top10SharePercentage: number;
+  top20SharePercentage: number;
+  segments: SponsorshipConcentrationSegment[];
+}
+
+export interface SponsorshipIntelligence {
+  totals: SponsorTotals;
+  tiers: SponsorTierDistribution[];
+  /** Complete portfolio, including zero-value rows, ordered for a Pareto reading. */
+  portfolio: SponsorshipPortfolioItem[];
+  resourceComposition: {
+    freeResource: SponsorshipResourceCompositionItem;
+    rouanet: SponsorshipResourceCompositionItem;
+  };
+  concentration: SponsorshipConcentration;
 }
 
 export interface FinancialScenarioSummary {
@@ -194,6 +271,64 @@ export interface FinancialScenarioSummary {
   totalCommitments: number;
   investmentCapacity: number;
   negativeResult: number;
+}
+
+export type ScenarioBridgeStepKey =
+  | 'commercial-revenue'
+  | 'free-sponsorship'
+  | 'rouanet-sponsorship'
+  | 'total-revenue'
+  | 'operating-execution'
+  | 'historical-obligations'
+  | 'reserve'
+  | 'literal-result';
+
+export type ScenarioBridgeStepKind = 'positive' | 'subtotal' | 'negative' | 'result';
+
+export interface ScenarioBridgeStep {
+  key: ScenarioBridgeStepKey;
+  label: string;
+  kind: ScenarioBridgeStepKind;
+  /** Literal source amount. `kind` defines whether it adds, subtracts, or anchors. */
+  amount: number;
+  signedAmount: number;
+  startAmount: number;
+  endAmount: number;
+  runningTotal: number;
+}
+
+export interface ScenarioBridge {
+  scenarioId: ScenarioId;
+  steps: ScenarioBridgeStep[];
+  computedResult: number;
+  literalResult: number;
+  resultKind: 'capacity' | 'deficit' | 'balanced';
+  /** Literal result minus the arithmetically computed bridge. */
+  reconciliationDelta: number;
+}
+
+export type ScenarioContributionKey =
+  | 'commercialization'
+  | 'exporural'
+  | 'external-area'
+  | 'agroindustry-pavilion'
+  | 'food-points'
+  | 'parking'
+  | 'free-sponsorship'
+  | 'rouanet-sponsorship'
+  | 'operating-execution'
+  | 'historical-obligations'
+  | 'reserve';
+
+export interface ScenarioContribution {
+  key: ScenarioContributionKey;
+  label: string;
+  direction: 'positive' | 'negative';
+  /** Literal source amount, before applying contribution direction. */
+  amount: number;
+  signedAmount: number;
+  /** Share within positive sources or within commitments, according to direction. */
+  sharePercentage: number;
 }
 
 function roundPercentage(value: number): number {
@@ -644,22 +779,93 @@ function hasInKindContribution(sponsor: Sponsor): boolean {
   return Boolean(sponsor.inKindContribution?.trim());
 }
 
+function hasFinancialSponsorValue(sponsor: Sponsor): boolean {
+  return [
+    sponsor.declaredValue,
+    sponsor.projectedFreeResource,
+    sponsor.consolidatedFreeResource,
+    sponsor.receivableAmount,
+    sponsor.projectedRouanet,
+    sponsor.consolidatedRouanet,
+  ].some((amount) => roundCurrency(amount) !== 0);
+}
+
+function createSponsorResourceMixPart(
+  projectedAmount: number,
+  consolidatedAmount: number,
+  totalProjectedAmount: number,
+  totalConsolidatedAmount: number,
+): SponsorResourceMixPart {
+  const normalizedProjectedAmount = roundCurrency(projectedAmount);
+  const normalizedConsolidatedAmount = roundCurrency(consolidatedAmount);
+
+  return {
+    projectedAmount: normalizedProjectedAmount,
+    consolidatedAmount: normalizedConsolidatedAmount,
+    consolidationGapAmount: roundCurrency(
+      normalizedProjectedAmount - normalizedConsolidatedAmount,
+    ),
+    consolidationRate: percentageOf(
+      normalizedConsolidatedAmount,
+      normalizedProjectedAmount,
+    ),
+    projectedSharePercentage: percentageOf(
+      normalizedProjectedAmount,
+      totalProjectedAmount,
+    ),
+    consolidatedSharePercentage: percentageOf(
+      normalizedConsolidatedAmount,
+      totalConsolidatedAmount,
+    ),
+  };
+}
+
+function selectSponsorResourceMix(sponsor: Sponsor): SponsorResourceMix {
+  const projectedFreeResource = roundCurrency(sponsor.projectedFreeResource);
+  const consolidatedFreeResource = roundCurrency(sponsor.consolidatedFreeResource);
+  const projectedRouanet = roundCurrency(sponsor.projectedRouanet);
+  const consolidatedRouanet = roundCurrency(sponsor.consolidatedRouanet);
+  const totalProjectedAmount = sumCurrency([projectedFreeResource, projectedRouanet]);
+  const totalConsolidatedAmount = sumCurrency([consolidatedFreeResource, consolidatedRouanet]);
+
+  return {
+    freeResource: createSponsorResourceMixPart(
+      projectedFreeResource,
+      consolidatedFreeResource,
+      totalProjectedAmount,
+      totalConsolidatedAmount,
+    ),
+    rouanet: createSponsorResourceMixPart(
+      projectedRouanet,
+      consolidatedRouanet,
+      totalProjectedAmount,
+      totalConsolidatedAmount,
+    ),
+  };
+}
+
 export function selectSponsorTotals(sponsors: readonly Sponsor[]): SponsorTotals {
   const projectedFreeResource = sumCurrency(sponsors.map((sponsor) => sponsor.projectedFreeResource));
   const consolidatedFreeResource = sumCurrency(sponsors.map((sponsor) => sponsor.consolidatedFreeResource));
   const projectedRouanet = sumCurrency(sponsors.map((sponsor) => sponsor.projectedRouanet));
   const consolidatedRouanet = sumCurrency(sponsors.map((sponsor) => sponsor.consolidatedRouanet));
 
+  const totalProjectedAmount = sumCurrency([projectedFreeResource, projectedRouanet]);
+  const totalConsolidatedAmount = sumCurrency([consolidatedFreeResource, consolidatedRouanet]);
+
   return {
     sponsorCount: sponsors.length,
+    financialSponsorCount: sponsors.filter(hasFinancialSponsorValue).length,
     declaredValue: sumCurrency(sponsors.map((sponsor) => sponsor.declaredValue)),
     projectedFreeResource,
     consolidatedFreeResource,
     explicitReceivableAmount: sumCurrency(sponsors.map((sponsor) => sponsor.receivableAmount)),
     projectedRouanet,
     consolidatedRouanet,
-    totalProjectedAmount: sumCurrency([projectedFreeResource, projectedRouanet]),
-    totalConsolidatedAmount: sumCurrency([consolidatedFreeResource, consolidatedRouanet]),
+    totalProjectedAmount,
+    totalConsolidatedAmount,
+    consolidationGapAmount: roundCurrency(totalProjectedAmount - totalConsolidatedAmount),
+    consolidationRate: percentageOf(totalConsolidatedAmount, totalProjectedAmount),
     vehicleCredentials: sponsors.reduce((total, sponsor) => total + sponsor.vehicleCredentials, 0),
     soySummitCredentials: sponsors.reduce((total, sponsor) => total + sponsor.soySummitCredentials, 0),
     inKindContributionCount: sponsors.filter(hasInKindContribution).length,
@@ -685,8 +891,124 @@ export function selectSponsorTierDistribution(
         tierTotals.totalProjectedAmount,
         totals.totalProjectedAmount,
       ),
+      consolidatedSharePercentage: percentageOf(
+        tierTotals.totalConsolidatedAmount,
+        totals.totalConsolidatedAmount,
+      ),
     }];
   });
+}
+
+export function selectSponsorshipIntelligence(
+  sponsors: readonly Sponsor[],
+): SponsorshipIntelligence {
+  const totals = selectSponsorTotals(sponsors);
+  const rankedSponsors = sponsors
+    .map((sponsor) => ({
+      sponsor,
+      projectedAmount: sumCurrency([
+        sponsor.projectedFreeResource,
+        sponsor.projectedRouanet,
+      ]),
+      consolidatedAmount: sumCurrency([
+        sponsor.consolidatedFreeResource,
+        sponsor.consolidatedRouanet,
+      ]),
+    }))
+    .sort((left, right) => (
+      right.projectedAmount - left.projectedAmount
+      || left.sponsor.sourceRow - right.sponsor.sourceRow
+      || left.sponsor.name.localeCompare(right.sponsor.name, 'pt-BR')
+    ));
+
+  let cumulativeProjectedAmount = 0;
+  const portfolio = rankedSponsors.map((entry, index): SponsorshipPortfolioItem => {
+    cumulativeProjectedAmount = sumCurrency([
+      cumulativeProjectedAmount,
+      entry.projectedAmount,
+    ]);
+
+    return {
+      rank: index + 1,
+      sponsor: entry.sponsor,
+      projectedAmount: entry.projectedAmount,
+      consolidatedAmount: entry.consolidatedAmount,
+      consolidationGapAmount: roundCurrency(
+        entry.projectedAmount - entry.consolidatedAmount,
+      ),
+      consolidationRate: percentageOf(
+        entry.consolidatedAmount,
+        entry.projectedAmount,
+      ),
+      sharePercentage: percentageOf(
+        entry.projectedAmount,
+        totals.totalProjectedAmount,
+      ),
+      cumulativeSharePercentage: percentageOf(
+        cumulativeProjectedAmount,
+        totals.totalProjectedAmount,
+      ),
+      resourceMix: selectSponsorResourceMix(entry.sponsor),
+      flags: {
+        hasFinancialValue: hasFinancialSponsorValue(entry.sponsor),
+        hasProjectedValue: entry.projectedAmount !== 0,
+        hasConsolidatedValue: entry.consolidatedAmount !== 0,
+        hasExplicitReceivable: roundCurrency(entry.sponsor.receivableAmount) !== 0,
+        hasReceivableNote: Boolean(entry.sponsor.receivableNote?.trim()),
+        hasInKindContribution: hasInKindContribution(entry.sponsor),
+        hasSourceQualityFlag: entry.sponsor.sourceQualityFlag !== undefined,
+      },
+    };
+  });
+
+  const resourceComposition = {
+    freeResource: {
+      key: 'free-resource' as const,
+      label: 'Recurso Livre',
+      ...createSponsorResourceMixPart(
+        totals.projectedFreeResource,
+        totals.consolidatedFreeResource,
+        totals.totalProjectedAmount,
+        totals.totalConsolidatedAmount,
+      ),
+    },
+    rouanet: {
+      key: 'rouanet' as const,
+      label: 'Lei Rouanet',
+      ...createSponsorResourceMixPart(
+        totals.projectedRouanet,
+        totals.consolidatedRouanet,
+        totals.totalProjectedAmount,
+        totals.totalConsolidatedAmount,
+      ),
+    },
+  };
+
+  const limits = [5, 10, 20] as const;
+  const segments = limits.map((limit): SponsorshipConcentrationSegment => {
+    const projectedAmount = sumCurrency(
+      portfolio.slice(0, limit).map((item) => item.projectedAmount),
+    );
+    return {
+      limit,
+      sponsorCount: Math.min(limit, portfolio.length),
+      projectedAmount,
+      sharePercentage: percentageOf(projectedAmount, totals.totalProjectedAmount),
+    };
+  });
+
+  return {
+    totals,
+    tiers: selectSponsorTierDistribution(sponsors),
+    portfolio,
+    resourceComposition,
+    concentration: {
+      top5SharePercentage: segments[0].sharePercentage,
+      top10SharePercentage: segments[1].sharePercentage,
+      top20SharePercentage: segments[2].sharePercentage,
+      segments,
+    },
+  };
 }
 
 export function selectScenarioSummaries(
@@ -721,6 +1043,193 @@ export function selectScenarioSummaries(
       negativeResult: roundCurrency(scenario.negativeResult),
     };
   });
+}
+
+export function selectScenarioBridge(summary: FinancialScenarioSummary): ScenarioBridge {
+  const commercialRevenue = roundCurrency(summary.commercialRevenue);
+  const freeSponsorship = roundCurrency(summary.freeSponsorship);
+  const rouanetSponsorship = roundCurrency(summary.rouanetSponsorship);
+  const totalRevenue = roundCurrency(summary.totalRevenue);
+  const operatingExecution = roundCurrency(summary.operatingExecution);
+  const historicalObligations = roundCurrency(summary.historicalObligations);
+  const reserve = roundCurrency(summary.reserve);
+
+  const afterCommercialRevenue = commercialRevenue;
+  const afterFreeSponsorship = sumCurrency([afterCommercialRevenue, freeSponsorship]);
+  const afterRouanetSponsorship = sumCurrency([afterFreeSponsorship, rouanetSponsorship]);
+  const afterOperatingExecution = sumCurrency([totalRevenue, -operatingExecution]);
+  const afterHistoricalObligations = sumCurrency([
+    afterOperatingExecution,
+    -historicalObligations,
+  ]);
+  const computedResult = sumCurrency([afterHistoricalObligations, -reserve]);
+  const normalizedInvestmentCapacity = roundCurrency(summary.investmentCapacity);
+  const normalizedNegativeResult = roundCurrency(summary.negativeResult);
+  const literalResult = normalizedInvestmentCapacity !== 0
+    ? normalizedInvestmentCapacity
+    : normalizedNegativeResult !== 0
+      ? roundCurrency(-Math.abs(normalizedNegativeResult))
+      : 0;
+  const reconciliationDelta = roundCurrency(literalResult - computedResult);
+
+  return {
+    scenarioId: summary.id,
+    computedResult,
+    literalResult,
+    resultKind: literalResult > 0
+      ? 'capacity'
+      : literalResult < 0
+        ? 'deficit'
+        : 'balanced',
+    reconciliationDelta,
+    steps: [
+      {
+        key: 'commercial-revenue',
+        label: 'Receita Comercial',
+        kind: 'positive',
+        amount: commercialRevenue,
+        signedAmount: commercialRevenue,
+        startAmount: 0,
+        endAmount: afterCommercialRevenue,
+        runningTotal: afterCommercialRevenue,
+      },
+      {
+        key: 'free-sponsorship',
+        label: 'Patrocínio Livre',
+        kind: 'positive',
+        amount: freeSponsorship,
+        signedAmount: freeSponsorship,
+        startAmount: afterCommercialRevenue,
+        endAmount: afterFreeSponsorship,
+        runningTotal: afterFreeSponsorship,
+      },
+      {
+        key: 'rouanet-sponsorship',
+        label: 'Patrocínio Rouanet',
+        kind: 'positive',
+        amount: rouanetSponsorship,
+        signedAmount: rouanetSponsorship,
+        startAmount: afterFreeSponsorship,
+        endAmount: afterRouanetSponsorship,
+        runningTotal: afterRouanetSponsorship,
+      },
+      {
+        key: 'total-revenue',
+        label: 'Receita Total',
+        kind: 'subtotal',
+        amount: totalRevenue,
+        signedAmount: totalRevenue,
+        startAmount: 0,
+        endAmount: totalRevenue,
+        runningTotal: totalRevenue,
+      },
+      {
+        key: 'operating-execution',
+        label: 'Execução operacional',
+        kind: 'negative',
+        amount: operatingExecution,
+        signedAmount: roundCurrency(-operatingExecution),
+        startAmount: totalRevenue,
+        endAmount: afterOperatingExecution,
+        runningTotal: afterOperatingExecution,
+      },
+      {
+        key: 'historical-obligations',
+        label: 'Obrigações históricas',
+        kind: 'negative',
+        amount: historicalObligations,
+        signedAmount: roundCurrency(-historicalObligations),
+        startAmount: afterOperatingExecution,
+        endAmount: afterHistoricalObligations,
+        runningTotal: afterHistoricalObligations,
+      },
+      {
+        key: 'reserve',
+        label: 'Reserva',
+        kind: 'negative',
+        amount: reserve,
+        signedAmount: roundCurrency(-reserve),
+        startAmount: afterHistoricalObligations,
+        endAmount: computedResult,
+        runningTotal: computedResult,
+      },
+      {
+        key: 'literal-result',
+        label: literalResult < 0 ? 'Déficit' : 'Capacidade de investimento',
+        kind: 'result',
+        amount: literalResult,
+        signedAmount: literalResult,
+        startAmount: 0,
+        endAmount: literalResult,
+        runningTotal: literalResult,
+      },
+    ],
+  };
+}
+
+export function selectScenarioContributions(
+  summary: FinancialScenarioSummary,
+): ScenarioContribution[] {
+  const positiveSources: Array<{
+    key: ScenarioContributionKey;
+    label: string;
+    amount: number;
+  }> = [
+    { key: 'commercialization', label: 'Comercialização', amount: summary.commercialization },
+    { key: 'exporural', label: 'Exporural', amount: summary.exporural },
+    { key: 'external-area', label: 'Área externa', amount: summary.externalArea },
+    {
+      key: 'agroindustry-pavilion',
+      label: 'Pavilhão da agroindústria',
+      amount: summary.agroindustryPavilion,
+    },
+    { key: 'food-points', label: 'Pontos de alimentação', amount: summary.foodPoints },
+    { key: 'parking', label: 'Estacionamento', amount: summary.parking },
+    { key: 'free-sponsorship', label: 'Patrocínio Livre', amount: summary.freeSponsorship },
+    { key: 'rouanet-sponsorship', label: 'Patrocínio Rouanet', amount: summary.rouanetSponsorship },
+  ].map((source): {
+    key: ScenarioContributionKey;
+    label: string;
+    amount: number;
+  } => ({
+    key: source.key as ScenarioContributionKey,
+    label: source.label,
+    amount: roundCurrency(source.amount),
+  }));
+  const commitments: Array<{
+    key: ScenarioContributionKey;
+    label: string;
+    amount: number;
+  }> = [
+    {
+      key: 'operating-execution',
+      label: 'Execução operacional',
+      amount: roundCurrency(summary.operatingExecution),
+    },
+    {
+      key: 'historical-obligations',
+      label: 'Obrigações históricas',
+      amount: roundCurrency(summary.historicalObligations),
+    },
+    { key: 'reserve', label: 'Reserva', amount: roundCurrency(summary.reserve) },
+  ];
+  const positiveTotal = sumCurrency(positiveSources.map((source) => source.amount));
+  const commitmentTotal = sumCurrency(commitments.map((commitment) => commitment.amount));
+
+  return [
+    ...positiveSources.map((source): ScenarioContribution => ({
+      ...source,
+      direction: 'positive',
+      signedAmount: source.amount,
+      sharePercentage: percentageOf(source.amount, positiveTotal),
+    })),
+    ...commitments.map((commitment): ScenarioContribution => ({
+      ...commitment,
+      direction: 'negative',
+      signedAmount: roundCurrency(-commitment.amount),
+      sharePercentage: percentageOf(commitment.amount, commitmentTotal),
+    })),
+  ];
 }
 
 export type ExpenseExecutionGroupingMode = 'commission' | 'category';

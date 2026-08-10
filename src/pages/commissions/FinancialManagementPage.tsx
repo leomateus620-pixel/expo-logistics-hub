@@ -1,4 +1,4 @@
-import { useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   AlertTriangle,
@@ -17,7 +17,6 @@ import {
   Landmark,
   Layers3,
   LayoutDashboard,
-  LineChart,
   PiggyBank,
   ReceiptText,
   Search,
@@ -45,7 +44,6 @@ import {
   FundingSourceChart,
   RevenueComparisonChart,
   RevenueCompositionChart,
-  ScenarioComparisonChart,
 } from '@/features/financial-management/components/FinancialCharts';
 import {
   BudgetProgress,
@@ -61,8 +59,6 @@ import {
   ExpenseLedger,
   GeneralBudgetLedger,
   RevenueLedger,
-  SponsorLedger,
-  SponsorTierBadge,
 } from '@/features/financial-management/components/FinancialTables';
 import {
   commissionBudgetSources,
@@ -72,7 +68,6 @@ import {
   financialWorkbookTotals,
   generalBudgetItems,
   revenueSources,
-  sponsors,
 } from '@/features/financial-management/data/financial2026Data';
 import {
   flattenCommissionExpenses,
@@ -88,9 +83,6 @@ import {
   selectCommissionBudgets,
   selectOverBudgetCommissions,
   selectRevenueTotals,
-  selectScenarioSummaries,
-  selectSponsorTierDistribution,
-  selectSponsorTotals,
   sortExpensesForLedger,
 } from '@/features/financial-management/selectors/financialSelectors';
 import {
@@ -105,6 +97,8 @@ import {
   ExpenseExecutionBoard,
   FundingDistributionStrip,
 } from '@/features/financial-management/components/FinancialExecutiveBoard';
+import { SponsorshipIntelligenceView } from '@/features/financial-management/components/SponsorshipIntelligenceView';
+import { ScenarioIntelligenceView } from '@/features/financial-management/components/ScenarioIntelligenceView';
 import {
   formatBRL,
   formatPercentage,
@@ -115,11 +109,10 @@ import type {
   FinancialViewPath,
   FundingType,
   RevenueCategory,
-  ScenarioId,
-  SponsorTier,
 } from '@/features/financial-management/types';
 import '@/styles/financial-management.css';
 import '@/styles/financial-executive-panel.css';
+import '@/styles/financial-intelligence-shell.css';
 
 interface FinancialManagementPageProps {
   module: CommissionModule;
@@ -193,17 +186,6 @@ function normalizeSearch(value: string) {
     .replace(/[\u0300-\u036f]/g, '')
     .toLocaleLowerCase('pt-BR')
     .trim();
-}
-
-function hasFinancialSponsorValue(sponsor: (typeof sponsors)[number]) {
-  return [
-    sponsor.declaredValue,
-    sponsor.projectedFreeResource,
-    sponsor.consolidatedFreeResource,
-    sponsor.receivableAmount,
-    sponsor.projectedRouanet,
-    sponsor.consolidatedRouanet,
-  ].some((value) => value !== 0);
 }
 
 function FinancialPanel({
@@ -459,12 +441,19 @@ export default function FinancialManagementPage({ module }: FinancialManagementP
   const viewCopy = VIEW_COPY[view];
   const activeMenu = module.menus.find((menu) => menu.path === view) ?? module.menus[0];
   const isDashboardView = view === 'dashboard';
+  const isIntelligenceView = view === 'patrocinios' || view === 'simulacoes';
   const isFlagshipFinanceView = view === 'dashboard'
     || view === 'receitas-projetadas'
     || view === 'receitas-confirmadas'
     || view === 'despesas-previstas'
     || view === 'despesas-realizadas'
-    || view === 'orcamento-comissoes';
+    || view === 'orcamento-comissoes'
+    || isIntelligenceView;
+
+  useEffect(() => {
+    if (!isIntelligenceView) return;
+    window.scrollTo({ left: 0, top: 0, behavior: 'auto' });
+  }, [isIntelligenceView, view]);
 
   const [revenueSearch, setRevenueSearch] = useState('');
   const [revenueCategory, setRevenueCategory] = useState<'all' | RevenueCategory>('all');
@@ -474,9 +463,6 @@ export default function FinancialManagementPage({ module }: FinancialManagementP
   const [expenseCategory, setExpenseCategory] = useState<'all' | ExpenseCategory>('all');
   const [expenseCommission, setExpenseCommission] = useState('all');
   const [expenseGrouping, setExpenseGrouping] = useState<ExpenseGroupingMode>('commission');
-  const [sponsorSearch, setSponsorSearch] = useState('');
-  const [sponsorTier, setSponsorTier] = useState<'all' | SponsorTier>('all');
-  const [scenarioId, setScenarioId] = useState<ScenarioId>('realistic');
   const [executionGrouping, setExecutionGrouping] = useState<ExpenseExecutionGroupingMode>('commission');
 
   const commissionBudgets = useMemo(() => selectCommissionBudgets(commissionBudgetSources), []);
@@ -502,9 +488,6 @@ export default function FinancialManagementPage({ module }: FinancialManagementP
     () => groupRevenuesByCategory(revenueSources).sort((a, b) => b.projectedAmount - a.projectedAmount),
     [],
   );
-  const sponsorTotals = useMemo(() => selectSponsorTotals(sponsors), []);
-  const sponsorTiers = useMemo(() => selectSponsorTierDistribution(sponsors), []);
-  const scenarioSummaries = useMemo(() => selectScenarioSummaries(financialScenarios), []);
   const generalBudgetSummaries = useMemo(
     () => selectGeneralBudgetSummaries(generalBudgetItems),
     [],
@@ -515,7 +498,6 @@ export default function FinancialManagementPage({ module }: FinancialManagementP
   const investmentBudgetSummary = generalBudgetSummaries.find(
     (summary) => summary.kind === 'investment',
   );
-  const selectedScenario = scenarioSummaries.find((scenario) => scenario.id === scenarioId) ?? scenarioSummaries[0];
   const overBudgetCommissions = useMemo(
     () => selectOverBudgetCommissions(commissionBudgets),
     [commissionBudgets],
@@ -556,19 +538,6 @@ export default function FinancialManagementPage({ module }: FinancialManagementP
     [filteredExpenses],
   );
 
-  const filteredSponsors = useMemo(() => {
-    const query = normalizeSearch(sponsorSearch);
-    return sponsors.filter((sponsor) => {
-      const matchesQuery = !query || normalizeSearch([
-        sponsor.name,
-        sponsor.tier,
-        sponsor.receivableNote ?? '',
-        sponsor.inKindContribution !== undefined ? String(sponsor.inKindContribution) : '',
-      ].join(' ')).includes(query);
-      return matchesQuery && (sponsorTier === 'all' || sponsor.tier === sponsorTier);
-    });
-  }, [sponsorSearch, sponsorTier]);
-
   const coreBudgetBalance = roundCurrency(
     financialWorkbookTotals.coreCommissionBudgetCap - financialWorkbookTotals.coreCommissionBudgeted,
   );
@@ -590,7 +559,6 @@ export default function FinancialManagementPage({ module }: FinancialManagementP
     expenses.reduce((total, expense) => total + expense.realizedAmount, 0),
   );
   const periodIntegrityDelta = roundCurrency(periodBridgeTotal - coreRealizedAmount);
-  const financialSponsorCount = sponsors.filter(hasFinancialSponsorValue).length;
   const highestExecutionCommission = [...groupExpensesByCommission(expenses)]
     .sort((left, right) => right.realizedAmount - left.realizedAmount)[0];
 
@@ -1299,124 +1267,9 @@ export default function FinancialManagementPage({ module }: FinancialManagementP
     );
   };
 
-  const renderSponsorships = () => (
-    <div className="financial-view-stack">
-      <FinancialKpiGrid columns={6}>
-        <FinancialKpiCard label="Patrocínio projetado" value={sponsorTotals.totalProjectedAmount} status="projected" icon={TrendingUp} tone="projected" />
-        <FinancialKpiCard label="Patrocínio consolidado" value={sponsorTotals.totalConsolidatedAmount} status="consolidated" icon={CheckCircle2} tone="consolidated" />
-        <FinancialKpiCard label="A receber informado" value={sponsorTotals.explicitReceivableAmount} status="receivable" icon={CircleDollarSign} tone="receivable" />
-        <FinancialKpiCard label="Recurso Livre projetado" value={sponsorTotals.projectedFreeResource} icon={WalletCards} tone="projected" detail={`${formatBRL(sponsorTotals.consolidatedFreeResource)} consolidado`} />
-        <FinancialKpiCard label="Rouanet projetado" value={sponsorTotals.projectedRouanet} icon={Landmark} tone="projected" detail={`${formatBRL(sponsorTotals.consolidatedRouanet)} consolidado`} />
-        <FinancialKpiCard label="Patrocinadores com valor" value={financialSponsorCount} valueKind="number" icon={Handshake} tone="neutral" detail={`${sponsorTotals.sponsorCount} registros nomeados`} />
-      </FinancialKpiGrid>
+  const renderSponsorships = () => <SponsorshipIntelligenceView module={module} />;
 
-      <ExecutiveStrip items={[
-        { label: 'Credenciais veículos', value: String(sponsorTotals.vehicleCredentials), detail: 'Total informado na planilha' },
-        { label: 'Credenciais Soy Summit', value: String(sponsorTotals.soySummitCredentials), detail: 'Não define categoria automaticamente' },
-        { label: 'Contrapartidas registradas', value: String(sponsorTotals.inKindContributionCount), detail: 'Textos ou valores informados' },
-        { label: 'Livre consolidado', value: formatBRL(sponsorTotals.consolidatedFreeResource), detail: 'Patrocínios' },
-        { label: 'Rouanet consolidado', value: formatBRL(sponsorTotals.consolidatedRouanet), detail: 'Patrocínios' },
-      ]} />
-
-      <FinancialPanel title="Categorias explicitamente marcadas" description="Nenhuma categoria é inferida pelo nome ou pela quantidade de credenciais." icon={Layers3}>
-        <div className="financial-tier-grid">
-          {sponsorTiers.map((tier) => (
-            <button
-              key={tier.tier}
-              type="button"
-              className={cn('financial-tier-card', sponsorTier === tier.tier && 'is-active')}
-              aria-pressed={sponsorTier === tier.tier}
-              onClick={() => setSponsorTier((current) => current === tier.tier ? 'all' : tier.tier)}
-            >
-              <SponsorTierBadge tier={tier.tier} />
-              <strong>{tier.sponsorCount}</strong>
-              <span>{formatBRL(tier.totalProjectedAmount)} projetado</span>
-            </button>
-          ))}
-        </div>
-      </FinancialPanel>
-
-      <FinancialPanel title="Carteira de patrocínios" description="Valores financeiros, categoria, recebimento e contrapartidas em uma leitura única." icon={Handshake}>
-        <FinancialFilterBar resultLabel={`${filteredSponsors.length} de ${sponsors.length} patrocinadores`}>
-          <SearchField value={sponsorSearch} onChange={setSponsorSearch} label="Buscar patrocinador" placeholder="Buscar patrocinador ou contrapartida" />
-          <SelectField value={sponsorTier} onChange={(value) => setSponsorTier(value as 'all' | SponsorTier)} label="Categoria">
-            <option value="all">Todas as categorias</option>
-            {sponsorTiers.map((tier) => <option key={tier.tier} value={tier.tier}>{tier.tier}</option>)}
-          </SelectField>
-        </FinancialFilterBar>
-        <SponsorLedger sponsors={filteredSponsors} emptyFromSearch={Boolean(sponsorSearch || sponsorTier !== 'all')} />
-      </FinancialPanel>
-
-      <DataQualityNote title="Categorias e situações preservadas" tone="information">
-        <p>Soy Summit só é tratado como categoria quando existe marcação explícita na coluna correspondente. Textos como “pago” nas células de A Receber permanecem como situação informada, sem conversão artificial em valor.</p>
-      </DataQualityNote>
-    </div>
-  );
-
-  const renderScenarios = () => (
-    <div className="financial-view-stack">
-      <div className="financial-simulation-banner" role="note">
-        <SlidersHorizontal aria-hidden="true" />
-        <div>
-          <strong>Simulação gerencial local</strong>
-          <span>Alternar cenários não altera dados oficiais, Supabase ou a planilha de referência.</span>
-        </div>
-      </div>
-
-      <div className="financial-scenario-tabs" role="group" aria-label="Selecionar cenário em destaque">
-        {scenarioSummaries.map((scenario) => (
-          <button
-            key={scenario.id}
-            type="button"
-            aria-pressed={scenarioId === scenario.id}
-            className={cn('financial-scenario-tab', scenarioId === scenario.id && 'is-active')}
-            onClick={() => setScenarioId(scenario.id)}
-          >
-            <span>{scenario.label}</span>
-            <strong>{formatBRL(scenario.totalRevenue)}</strong>
-            <small>{scenario.negativeResult > 0 ? `${formatBRL(scenario.negativeResult)} de déficit` : `${formatBRL(scenario.investmentCapacity)} de capacidade`}</small>
-          </button>
-        ))}
-      </div>
-
-      <FinancialKpiGrid columns={5}>
-        <FinancialKpiCard label="Receita comercial" value={selectedScenario.commercialRevenue} icon={Banknote} tone="projected" />
-        <FinancialKpiCard label="Patrocínios" value={selectedScenario.sponsorshipRevenue} icon={Handshake} tone="projected" />
-        <FinancialKpiCard label="Receita total" value={selectedScenario.totalRevenue} icon={TrendingUp} tone="consolidated" />
-        <FinancialKpiCard label="Compromissos" value={selectedScenario.totalCommitments} icon={ReceiptText} tone="gold" />
-        <FinancialKpiCard
-          label={selectedScenario.negativeResult > 0 ? 'Déficit projetado' : 'Capacidade de investimento'}
-          value={selectedScenario.negativeResult > 0 ? selectedScenario.negativeResult : selectedScenario.investmentCapacity}
-          icon={selectedScenario.negativeResult > 0 ? TrendingDown : PiggyBank}
-          tone={selectedScenario.negativeResult > 0 ? 'over-budget' : 'consolidated'}
-          status={selectedScenario.negativeResult > 0 ? 'over-budget' : 'consolidated'}
-        />
-      </FinancialKpiGrid>
-
-      <div className="financial-dashboard-grid">
-        <FinancialPanel title="Comparação de cenários" description="Receita total, compromissos, capacidade e déficit lado a lado." icon={LineChart} className="financial-panel--span-7">
-          <ScenarioComparisonChart data={financialScenarios} />
-        </FinancialPanel>
-        <FinancialPanel title={`Ponte do cenário ${selectedScenario.label}`} description="Composição preservada dos campos da planilha de projeção." icon={Calculator} className="financial-panel--span-5">
-          <dl className="financial-scenario-bridge">
-            <div><dt>Comercialização</dt><dd>{formatBRL(selectedScenario.commercialization)}</dd></div>
-            <div><dt>Exporural</dt><dd>{formatBRL(selectedScenario.exporural)}</dd></div>
-            <div><dt>Área externa</dt><dd>{formatBRL(selectedScenario.externalArea)}</dd></div>
-            <div><dt>Pavilhão agroindústria</dt><dd>{formatBRL(selectedScenario.agroindustryPavilion)}</dd></div>
-            <div><dt>Pontos de alimentação</dt><dd>{formatBRL(selectedScenario.foodPoints)}</dd></div>
-            <div><dt>Estacionamento</dt><dd>{formatBRL(selectedScenario.parking)}</dd></div>
-            <div className="is-total"><dt>Execução operacional</dt><dd>− {formatBRL(selectedScenario.operatingExecution)}</dd></div>
-            <div><dt>Obrigações históricas</dt><dd>− {formatBRL(selectedScenario.historicalObligations)}</dd></div>
-            <div><dt>Reserva</dt><dd>− {formatBRL(selectedScenario.reserve)}</dd></div>
-          </dl>
-        </FinancialPanel>
-      </div>
-
-      <DataQualityNote title="Valores literais dos cenários">
-        <p>A capacidade Realista registrada é {formatBRL(financialScenarios[0].investmentCapacity)} — R$ 0,06 abaixo da ponte aritmética. A capacidade Otimista é {formatBRL(financialScenarios[2].investmentCapacity)} — R$ 0,04 acima. Os valores da fonte foram preservados.</p>
-      </DataQualityNote>
-    </div>
-  );
+  const renderScenarios = () => <ScenarioIntelligenceView module={module} />;
 
   const renderReports = () => (
     <div className="financial-view-stack">
@@ -1473,35 +1326,42 @@ export default function FinancialManagementPage({ module }: FinancialManagementP
           'financial-page-header',
           isFlagshipFinanceView && 'financial-page-header--executive',
           isDashboardView && 'financial-page-header--command',
+          isIntelligenceView && 'financial-page-header--intelligence',
         )}
       >
-        <div className="financial-page-header__main">
-          {!isDashboardView && (
-            <div className="financial-page-header__badges">
-              <FinancialRestrictedBadge />
-              <span className="financial-period-badge">Planejamento 2026</span>
-            </div>
-          )}
-          <div className="financial-page-header__identity">
-            <span className="financial-page-header__icon" aria-hidden="true"><viewCopy.icon /></span>
-            <div>
-              <p>{viewCopy.eyebrow}</p>
-              <h1>{viewCopy.title}</h1>
-            </div>
+        {isIntelligenceView ? (
+          <div className="financial-page-header__intelligence-title">
+            <h1>{viewCopy.title}</h1>
           </div>
-          {!isFlagshipFinanceView && (
-            <>
-              <p className="financial-page-header__description">{viewCopy.description}</p>
-              <div className="financial-semantic-legend" aria-label="Hierarquia semântica dos valores">
-                <FinancialStatusBadge status="projected" />
-                <FinancialStatusBadge status="consolidated" />
-                <FinancialStatusBadge status="receivable" />
-                <FinancialStatusBadge status="realized" />
+        ) : (
+          <div className="financial-page-header__main">
+            {!isDashboardView && (
+              <div className="financial-page-header__badges">
+                <FinancialRestrictedBadge />
+                <span className="financial-period-badge">Planejamento 2026</span>
               </div>
-            </>
-          )}
-        </div>
-        {!isDashboardView && (
+            )}
+            <div className="financial-page-header__identity">
+              <span className="financial-page-header__icon" aria-hidden="true"><viewCopy.icon /></span>
+              <div>
+                <p>{viewCopy.eyebrow}</p>
+                <h1>{viewCopy.title}</h1>
+              </div>
+            </div>
+            {!isFlagshipFinanceView && (
+              <>
+                <p className="financial-page-header__description">{viewCopy.description}</p>
+                <div className="financial-semantic-legend" aria-label="Hierarquia semântica dos valores">
+                  <FinancialStatusBadge status="projected" />
+                  <FinancialStatusBadge status="consolidated" />
+                  <FinancialStatusBadge status="receivable" />
+                  <FinancialStatusBadge status="realized" />
+                </div>
+              </>
+            )}
+          </div>
+        )}
+        {!isDashboardView && !isIntelligenceView && (
           <FinancialDataProvenance
             label="Base Orçamentária Fenasoja 2026"
             detail={isFlagshipFinanceView
@@ -1513,11 +1373,13 @@ export default function FinancialManagementPage({ module }: FinancialManagementP
 
       {viewContent[view]()}
 
-      <AboutFinancialModule
-        module={module}
-        activeDescription={activeMenu.description}
-        compact={isFlagshipFinanceView}
-      />
+      {!isIntelligenceView && (
+        <AboutFinancialModule
+          module={module}
+          activeDescription={activeMenu.description}
+          compact={isFlagshipFinanceView}
+        />
+      )}
     </div>
   );
 }

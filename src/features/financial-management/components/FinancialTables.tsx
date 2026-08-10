@@ -3,6 +3,7 @@ import {
   AlertTriangle,
   ArrowDownWideNarrow,
   BadgeDollarSign,
+  ChevronDown,
   ChevronRight,
   CircleDollarSign,
   Handshake,
@@ -86,6 +87,13 @@ function getSponsorStatus(sponsor: Sponsor) {
   if (consolidated >= projected) return 'consolidated' as const;
   if (consolidated > 0) return 'partial' as const;
   return 'projected' as const;
+}
+
+function getSponsorResourceLabel(sponsor: Sponsor) {
+  return [
+    sponsor.projectedFreeResource || sponsor.consolidatedFreeResource ? 'Livre' : '',
+    sponsor.projectedRouanet || sponsor.consolidatedRouanet ? 'Rouanet' : '',
+  ].filter(Boolean).join(' + ') || 'Não informado';
 }
 
 function FinancialTableEmpty({ search = false }: { search?: boolean }) {
@@ -843,17 +851,55 @@ export function SponsorTierBadge({ tier }: { tier: SponsorTier }) {
 interface SponsorLedgerProps {
   sponsors: readonly Sponsor[];
   emptyFromSearch?: boolean;
+  selectedSponsorId?: string | null;
+  onSelectSponsor?: (sponsor: Sponsor) => void;
+  mobileVisibleCount?: number;
 }
 
-export function SponsorLedger({ sponsors, emptyFromSearch = false }: SponsorLedgerProps) {
-  const [selected, setSelected] = useState<Sponsor | null>(null);
+export function SponsorLedger({
+  sponsors,
+  emptyFromSearch = false,
+  selectedSponsorId,
+  onSelectSponsor,
+  mobileVisibleCount,
+}: SponsorLedgerProps) {
+  const [internalSelected, setInternalSelected] = useState<Sponsor | null>(null);
+  const [expandedSponsorIds, setExpandedSponsorIds] = useState<Set<string>>(() => new Set());
   if (sponsors.length === 0) return <FinancialTableEmpty search={emptyFromSearch} />;
+
+  const activeSelectedId = selectedSponsorId ?? internalSelected?.id ?? null;
+  const mobileSponsors = mobileVisibleCount === undefined
+    ? sponsors
+    : sponsors.slice(0, mobileVisibleCount);
+  const selectSponsor = (sponsor: Sponsor) => {
+    if (onSelectSponsor) {
+      onSelectSponsor(sponsor);
+      return;
+    }
+    setInternalSelected(sponsor);
+  };
+  const toggleMobileSponsor = (sponsorId: string) => {
+    setExpandedSponsorIds((current) => {
+      const next = new Set(current);
+      if (next.has(sponsorId)) next.delete(sponsorId);
+      else next.add(sponsorId);
+      return next;
+    });
+  };
 
   return (
     <>
-      <div className="financial-table-shell financial-desktop-only">
+      <div
+        className="financial-table-shell financial-desktop-only"
+        data-financial-ledger="sponsor"
+        role="region"
+        aria-label="Carteira completa de patrocínios"
+        tabIndex={0}
+      >
         <table className="financial-table financial-table--sponsors">
-          <caption className="sr-only">Patrocínios Fenasoja 2026</caption>
+          <caption className="sr-only">
+            Patrocínios Fenasoja 2026. Pressione Enter ou Espaço em uma linha para abrir os detalhes.
+          </caption>
           <thead>
             <tr>
               <th scope="col">Patrocinador</th>
@@ -871,12 +917,26 @@ export function SponsorLedger({ sponsors, emptyFromSearch = false }: SponsorLedg
             {sponsors.map((sponsor) => {
               const amounts = getSponsorAmounts(sponsor);
               const status = getSponsorStatus(sponsor);
-              const resources = [
-                sponsor.projectedFreeResource || sponsor.consolidatedFreeResource ? 'Livre' : '',
-                sponsor.projectedRouanet || sponsor.consolidatedRouanet ? 'Rouanet' : '',
-              ].filter(Boolean).join(' + ') || 'Não informado';
+              const resources = getSponsorResourceLabel(sponsor);
               return (
-                <tr key={sponsor.id} data-selected={selected?.id === sponsor.id || undefined}>
+                <tr
+                  key={sponsor.id}
+                  className="financial-table__interactive-row"
+                  data-interactive="true"
+                  data-selected={activeSelectedId === sponsor.id || undefined}
+                  tabIndex={0}
+                  onClick={(event) => {
+                    const target = event.target as HTMLElement;
+                    if (target.closest('button, a, input, select, textarea')) return;
+                    selectSponsor(sponsor);
+                  }}
+                  onKeyDown={(event) => {
+                    if (event.target !== event.currentTarget) return;
+                    if (event.key !== 'Enter' && event.key !== ' ') return;
+                    event.preventDefault();
+                    selectSponsor(sponsor);
+                  }}
+                >
                   <th scope="row"><span className="financial-table__primary">{sponsor.name}</span></th>
                   <td><SponsorTierBadge tier={sponsor.tier} /></td>
                   <td className="financial-table__number"><FinancialAmount value={amounts.projected} /></td>
@@ -891,7 +951,10 @@ export function SponsorLedger({ sponsors, emptyFromSearch = false }: SponsorLedg
                     <button
                       type="button"
                       className="financial-table__detail-button"
-                      onClick={() => setSelected(sponsor)}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        selectSponsor(sponsor);
+                      }}
                       aria-label={`Ver detalhes de ${sponsor.name}`}
                     >
                       <ChevronRight aria-hidden="true" />
@@ -905,10 +968,16 @@ export function SponsorLedger({ sponsors, emptyFromSearch = false }: SponsorLedg
       </div>
 
       <div className="financial-mobile-list financial-mobile-only">
-        {sponsors.map((sponsor) => {
+        {mobileSponsors.map((sponsor) => {
           const amounts = getSponsorAmounts(sponsor);
+          const expanded = expandedSponsorIds.has(sponsor.id);
+          const detailsId = `financial-sponsor-mobile-details-${sponsor.id}`;
           return (
-            <article key={sponsor.id} className="financial-mobile-card financial-sponsor-card">
+            <article
+              key={sponsor.id}
+              className="financial-mobile-card financial-sponsor-card"
+              data-selected={activeSelectedId === sponsor.id || undefined}
+            >
               <header className="financial-mobile-card__header">
                 <div>
                   <SponsorTierBadge tier={sponsor.tier} />
@@ -920,13 +989,74 @@ export function SponsorLedger({ sponsors, emptyFromSearch = false }: SponsorLedg
                 <div><dt>Projetado</dt><dd><FinancialAmount value={amounts.projected} /></dd></div>
                 <div><dt>Consolidado</dt><dd><FinancialAmount value={amounts.consolidated} /></dd></div>
               </dl>
-              {sponsor.receivableAmount > 0 && (
+
+              <button
+                type="button"
+                className="financial-sponsor-card__expand-control"
+                aria-expanded={expanded}
+                aria-controls={detailsId}
+                aria-label={`${expanded ? 'Ocultar' : 'Mostrar'} detalhes de ${sponsor.name}`}
+                onClick={() => toggleMobileSponsor(sponsor.id)}
+              >
+                <span>{expanded ? 'Ocultar detalhes' : 'Mais detalhes'}</span>
+                <ChevronDown aria-hidden="true" data-expanded={expanded || undefined} />
+              </button>
+
+              <div
+                id={detailsId}
+                className="financial-sponsor-card__expanded-details"
+                hidden={!expanded}
+              >
+                <dl className="financial-sponsor-card__detail-grid">
+                  <div>
+                    <dt>A receber informado</dt>
+                    <dd><FinancialAmount value={sponsor.receivableAmount} /></dd>
+                  </div>
+                  <div>
+                    <dt>Recurso</dt>
+                    <dd>{getSponsorResourceLabel(sponsor)}</dd>
+                  </div>
+                  <div>
+                    <dt>Livre · projetado / consolidado</dt>
+                    <dd>{formatBRL(sponsor.projectedFreeResource)} / {formatBRL(sponsor.consolidatedFreeResource)}</dd>
+                  </div>
+                  <div>
+                    <dt>Rouanet · projetado / consolidado</dt>
+                    <dd>{formatBRL(sponsor.projectedRouanet)} / {formatBRL(sponsor.consolidatedRouanet)}</dd>
+                  </div>
+                  <div>
+                    <dt>Credenciais · veículos / Soy Summit</dt>
+                    <dd>{sponsor.vehicleCredentials || '—'} / {sponsor.soySummitCredentials || '—'}</dd>
+                  </div>
+                  <div>
+                    <dt>Recebimento</dt>
+                    <dd>{formatExcelSerialDate(sponsor.receivedOn)}</dd>
+                  </div>
+                </dl>
+                {sponsor.receivableNote && (
+                  <p className="financial-sponsor-card__receivable-note">
+                    <strong>Situação em A Receber:</strong> {sponsor.receivableNote}
+                  </p>
+                )}
+                {sponsor.inKindContribution !== undefined && (
+                  <p className="financial-sponsor-card__contribution">
+                    <strong>Contrapartida:</strong> {String(sponsor.inKindContribution)}
+                  </p>
+                )}
+              </div>
+
+              {sponsor.receivableAmount > 0 && !expanded && (
                 <div className="financial-sponsor-card__receivable">
                   <span>A receber informado</span>
                   <FinancialAmount value={sponsor.receivableAmount} />
                 </div>
               )}
-              <Button type="button" variant="outline" onClick={() => setSelected(sponsor)}>
+              <Button
+                type="button"
+                variant="outline"
+                className="financial-sponsor-card__composition-button"
+                onClick={() => selectSponsor(sponsor)}
+              >
                 Ver composição
                 <ChevronRight className="ml-2 h-4 w-4" aria-hidden="true" />
               </Button>
@@ -935,63 +1065,81 @@ export function SponsorLedger({ sponsors, emptyFromSearch = false }: SponsorLedg
         })}
       </div>
 
-      <Sheet open={Boolean(selected)} onOpenChange={(open) => !open && setSelected(null)}>
+      {!onSelectSponsor && (
+        <SponsorDetailSheet
+          sponsor={internalSelected}
+          onOpenChange={(open) => !open && setInternalSelected(null)}
+        />
+      )}
+    </>
+  );
+}
+
+export function SponsorDetailSheet({
+  sponsor,
+  onOpenChange,
+}: {
+  sponsor: Sponsor | null;
+  onOpenChange: (open: boolean) => void;
+}) {
+  return (
+    <Sheet open={Boolean(sponsor)} onOpenChange={onOpenChange}>
         <SheetContent side="right" className="financial-detail-sheet">
-          {selected && (() => {
-            const amounts = getSponsorAmounts(selected);
+          {sponsor && (() => {
+            const amounts = getSponsorAmounts(sponsor);
             return (
               <div className="financial-detail-sheet__layout">
                 <SheetHeader className="financial-detail-sheet__header">
                   <div className="financial-detail-sheet__eyebrow"><Handshake aria-hidden="true" /> Patrocínio Fenasoja 2026</div>
-                  <SheetTitle>{selected.name}</SheetTitle>
+                  <SheetTitle>{sponsor.name}</SheetTitle>
                   <SheetDescription>Composição financeira e contrapartidas preservadas da planilha de referência.</SheetDescription>
                 </SheetHeader>
                 <div className="financial-detail-sheet__body">
                   <div className="financial-sponsor-detail__hero">
-                    <SponsorTierBadge tier={selected.tier} />
-                    <FinancialStatusBadge status={getSponsorStatus(selected)} />
+                    <SponsorTierBadge tier={sponsor.tier} />
+                    <FinancialStatusBadge status={getSponsorStatus(sponsor)} />
                   </div>
                   <dl className="financial-detail-metrics">
                     <div><dt>Projetado</dt><dd>{formatBRL(amounts.projected)}</dd></div>
                     <div><dt>Consolidado</dt><dd>{formatBRL(amounts.consolidated)}</dd></div>
-                    <div><dt>A receber informado</dt><dd>{formatBRL(selected.receivableAmount)}</dd></div>
-                    <div><dt>Valor declarado</dt><dd>{formatBRL(selected.declaredValue)}</dd></div>
+                    <div><dt>A receber informado</dt><dd>{formatBRL(sponsor.receivableAmount)}</dd></div>
+                    <div><dt>Valor declarado</dt><dd>{formatBRL(sponsor.declaredValue)}</dd></div>
                   </dl>
-                  {selected.receivableNote && (
+                  {sponsor.receivableNote && (
                     <section className="financial-detail-block">
                       <h3><ReceiptText aria-hidden="true" /> Situação informada em A Receber</h3>
-                      <p>{selected.receivableNote}</p>
+                      <p>{sponsor.receivableNote}</p>
                     </section>
                   )}
                   <section className="financial-detail-block">
                     <h3><CircleDollarSign aria-hidden="true" /> Composição por recurso</h3>
                     <div className="financial-detail-list">
-                      <div><span>Recurso Livre projetado</span><strong>{formatBRL(selected.projectedFreeResource)}</strong></div>
-                      <div><span>Recurso Livre consolidado</span><strong>{formatBRL(selected.consolidatedFreeResource)}</strong></div>
-                      <div><span>Rouanet projetado</span><strong>{formatBRL(selected.projectedRouanet)}</strong></div>
-                      <div><span>Rouanet consolidado</span><strong>{formatBRL(selected.consolidatedRouanet)}</strong></div>
+                      <div><span>Recurso Livre projetado</span><strong>{formatBRL(sponsor.projectedFreeResource)}</strong></div>
+                      <div><span>Recurso Livre consolidado</span><strong>{formatBRL(sponsor.consolidatedFreeResource)}</strong></div>
+                      <div><span>Rouanet projetado</span><strong>{formatBRL(sponsor.projectedRouanet)}</strong></div>
+                      <div><span>Rouanet consolidado</span><strong>{formatBRL(sponsor.consolidatedRouanet)}</strong></div>
                     </div>
                   </section>
                   <section className="financial-detail-block">
                     <h3><TicketCheck aria-hidden="true" /> Credenciais e recebimento</h3>
                     <div className="financial-detail-list">
-                      <div><span>Veículos / credenciais</span><strong>{selected.vehicleCredentials || '—'}</strong></div>
-                      <div><span>Soy Summit</span><strong>{selected.soySummitCredentials || '—'}</strong></div>
-                      <div><span>Data de recebimento</span><strong>{formatExcelSerialDate(selected.receivedOn)}</strong></div>
+                      <div><span>Veículos / credenciais</span><strong>{sponsor.vehicleCredentials || '—'}</strong></div>
+                      <div><span>Soy Summit</span><strong>{sponsor.soySummitCredentials || '—'}</strong></div>
+                      <div><span>Data de recebimento</span><strong>{formatExcelSerialDate(sponsor.receivedOn)}</strong></div>
                     </div>
                   </section>
-                  {selected.inKindContribution !== undefined && (
+                  {sponsor.inKindContribution !== undefined && (
                     <section className="financial-detail-block">
                       <h3><Handshake aria-hidden="true" /> Outras contrapartidas</h3>
-                      <p>{String(selected.inKindContribution)}</p>
+                      <p>{String(sponsor.inKindContribution)}</p>
                     </section>
                   )}
-                  {selected.sourceQualityFlag?.code === 'DATE_LIKE_VALUE_IN_CONTRIBUTION_COLUMN' && (
+                  {sponsor.sourceQualityFlag?.code === 'DATE_LIKE_VALUE_IN_CONTRIBUTION_COLUMN' && (
                     <section className="financial-detail-block financial-detail-block--quality">
                       <h3><AlertTriangle aria-hidden="true" /> Valor atípico na fonte</h3>
                       <p>
-                        {formatExcelSerialDate(selected.sourceQualityFlag.rawValue)} foi registrado em{' '}
-                        <strong>{selected.sourceQualityFlag.cell}</strong>, coluna “Outras contrapartidas”.
+                        {formatExcelSerialDate(sponsor.sourceQualityFlag.rawValue)} foi registrado em{' '}
+                        <strong>{sponsor.sourceQualityFlag.cell}</strong>, coluna “Outras contrapartidas”.
                         O valor foi preservado como ocorrência de qualidade e não contabilizado como contrapartida.
                       </p>
                     </section>
@@ -1002,6 +1150,5 @@ export function SponsorLedger({ sponsors, emptyFromSearch = false }: SponsorLedg
           })()}
         </SheetContent>
       </Sheet>
-    </>
   );
 }
