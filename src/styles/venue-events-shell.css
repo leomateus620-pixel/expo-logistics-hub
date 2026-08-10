@@ -568,3 +568,92 @@
     border: 1px solid CanvasText;
   }
 }
+
+/* Busca compacta no cabeçalho do módulo. */
+.venue-module-shell__search {
+  display: flex;
+  min-width: 0;
+  max-width: 20rem;
+  flex: 1 1 14rem;
+  align-items: center;
+  gap: 0.45rem;
+  height: 2.25rem;
+  margin-left: 0.85rem;
+  padding-inline: 0.7rem;
+  border: 1px solid rgb(196 213 255 / 0.24);
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.12), rgb(4 12 32 / 0.35));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.16);
+  transition: border-color 180ms ease, box-shadow 220ms ease, background 220ms ease;
+}
+
+.venue-module-shell__search:focus-within,
+.venue-module-shell__search[data-active] {
+  border-color: rgb(240 190 96 / 0.55);
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.18), rgb(6 16 40 / 0.5));
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.22),
+    0 0 0 3px rgb(240 190 96 / 0.14);
+}
+
+.venue-header-search__icon {
+  width: 0.95rem;
+  height: 0.95rem;
+  flex: 0 0 auto;
+  color: rgb(240 202 128 / 0.9);
+}
+
+.venue-header-search__input {
+  min-width: 0;
+  flex: 1 1 auto;
+  border: 0;
+  background: transparent;
+  color: rgb(238 244 255 / 0.95);
+  font-size: 0.78rem;
+  font-weight: 600;
+  outline: none;
+}
+
+.venue-header-search__input::placeholder {
+  color: rgb(206 219 250 / 0.55);
+  font-weight: 500;
+}
+
+.venue-header-search__input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.venue-header-search__clear {
+  display: grid;
+  width: 1.35rem;
+  height: 1.35rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.12);
+  color: rgb(232 240 255 / 0.9);
+}
+
+.venue-header-search__clear svg {
+  width: 0.75rem;
+  height: 0.75rem;
+}
+
+.venue-header-search__clear:hover {
+  background: rgb(255 255 255 / 0.2);
+}
+
+@media (max-width: 900px) {
+  .venue-module-shell__bar-inner {
+    flex-wrap: wrap;
+  }
+
+  .venue-module-shell__search {
+    order: 3;
+    max-width: none;
+    flex: 1 0 100%;
+    height: 2.75rem;
+    margin-left: 0;
+    margin-top: 0.5rem;
+  }
+}
