@@ -12,6 +12,7 @@ const form = read(
   "src/components/venue-events/VenueEventFormDialog.tsx",
 );
 const productionCss = read("src/styles/venue-events-production.css");
+const switcher = read("src/components/venue-events/VenueWorkspaceSwitcher.tsx");
 const app = read("src/App.tsx");
 
 describe("contrato de apresentação de Eventos Restaurante e Arena", () => {
