@@ -1516,17 +1516,16 @@ export function VenueWorkspace() {
           <p className="venue-eyebrow">Registro mestre</p>
           <h2>
             Todos os eventos
-            <span className="venue-events-registry__sep" aria-hidden="true">
-              ·
-            </span>
             <span
               key={venueId}
               className="venue-events-registry__scope"
               data-venue={venueId}
             >
+              <i aria-hidden="true" />
               {venueDefinition.shortLabel}
             </span>
           </h2>
+
         </div>
         <div className="venue-events-registry__tools">
           <VenueEventsYearSelector
