@@ -560,3 +560,12 @@
     width: min(20rem, calc(100vw - 3rem));
   }
 }
+
+.financial-panel--funding .fin-funding {
+  height: 100%;
+  justify-content: center;
+  gap: clamp(0.85rem, 2vw, 1.6rem);
+}
+
+.financial-panel--funding .fin-funding__legend { gap: clamp(0.5rem, 1.6vw, 1.1rem); }
+.financial-panel--funding .fin-funding__legend li { padding-bottom: clamp(0.4rem, 1.4vw, 0.9rem); }
