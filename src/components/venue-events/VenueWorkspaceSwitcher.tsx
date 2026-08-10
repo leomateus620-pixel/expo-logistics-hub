@@ -21,7 +21,7 @@ export function VenueWorkspaceSwitcher({
       role="tablist"
       aria-label="Selecionar ambiente operacional"
     >
-      {VENUE_WORKSPACES.map(({ id, label, description, icon: Icon }) => {
+      {VENUE_WORKSPACES.map(({ id, label, icon: Icon }) => {
         const isActive = id === active;
         return (
           <button
@@ -39,7 +39,6 @@ export function VenueWorkspaceSwitcher({
             </span>
             <span className="venue-workspace-switcher__copy">
               <strong>{label}</strong>
-              <small>{description}</small>
             </span>
             <span className="venue-workspace-switcher__count">
               <CalendarDays aria-hidden="true" />
