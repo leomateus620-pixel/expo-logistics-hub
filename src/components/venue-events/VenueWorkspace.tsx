@@ -19,6 +19,8 @@ import {
   Loader2,
   Building2,
   MapPin,
+  UserRound,
+  Handshake,
   MoreHorizontal,
   Plus,
   RefreshCw,
@@ -96,6 +98,8 @@ import {
 import { VenueSpaceDialog } from "@/components/venue-events/VenueSpaceDialog";
 import { VenueSpaceManagementPanel } from "@/components/venue-events/VenueSpaceManagementPanel";
 import { VenueWorkspaceSwitcher } from "@/components/venue-events/VenueWorkspaceSwitcher";
+import { VenueEventsFiltersTrigger } from "@/components/venue-events/VenueEventsFiltersTrigger";
+import { VenueEventsYearSelector } from "@/components/venue-events/VenueEventsYearSelector";
 import { VenueAgendaFiltersTrigger } from "@/components/venue-events/VenueAgendaFiltersTrigger";
 import { VenueCreateEventBar } from "@/components/venue-events/VenueCreateEventBar";
 import { useVenueSearch } from "@/components/venue-events/VenueSearchContext";
@@ -528,7 +532,8 @@ export function VenueWorkspace() {
   const setSearch = venueSearch?.setQuery ?? setLocalSearch;
   const [statusFilter, setStatusFilter] = useState("all");
   const [spaceFilter, setSpaceFilter] = useState("all");
-  const [yearFilter, setYearFilter] = useState("all");
+  const [yearFilter, setYearFilter] = useState("2026");
+  const [includeHistory, setIncludeHistory] = useState(false);
   const [reviewOnly, setReviewOnly] = useState(false);
   const [agendaMode, setAgendaMode] = useState<"dia" | "semana" | "mes">(
     "mes",
@@ -746,7 +751,10 @@ export function VenueWorkspace() {
     return (
       eventMatchesSearch(event, search, sponsor, spaces) &&
       (statusFilter === "all" || event.status === statusFilter) &&
-      (yearFilter === "all" || eventYear(event) === yearFilter) &&
+      (includeHistory
+        ? true
+        : (eventYear(event) ?? "9999") >= "2026") &&
+      (includeHistory || yearFilter === "all" || eventYear(event) === yearFilter) &&
       (!reviewOnly || event.requires_review) &&
       (spaceFilter === "all" ||
         workspace.allocations.some(
@@ -757,13 +765,16 @@ export function VenueWorkspace() {
     );
   });
 
-  const availableYears = Array.from(
-    new Set(
-      workspace.events
-        .map((event) => eventYear(event))
-        .filter((year): year is string => Boolean(year)),
-    ),
-  ).sort();
+  const CYCLE_YEARS = ["2026", "2027", "2028"];
+  const availableYears = CYCLE_YEARS;
+  const yearCounts = workspace.events.reduce<Record<string, number>>(
+    (acc, event) => {
+      const year = eventYear(event);
+      if (year) acc[year] = (acc[year] ?? 0) + 1;
+      return acc;
+    },
+    {},
+  );
   const reviewCount = workspace.events.filter(
     (event) => event.requires_review,
   ).length;
@@ -1499,73 +1510,64 @@ export function VenueWorkspace() {
   );
 
   const renderEvents = () => (
-    <section className="venue-panel">
-      <header className="venue-panel__header">
-        <div>
+    <section className="venue-panel venue-events-registry">
+      <header className="venue-panel__header venue-events-registry__header">
+        <div className="venue-events-registry__identity">
           <p className="venue-eyebrow">Registro mestre</p>
-          <h2>Todos os eventos</h2>
+          <h2>
+            Todos os eventos
+            <span className="venue-events-registry__sep" aria-hidden="true">
+              ·
+            </span>
+            <span
+              key={venueId}
+              className="venue-events-registry__scope"
+              data-venue={venueId}
+            >
+              {venueDefinition.shortLabel}
+            </span>
+          </h2>
         </div>
-        <Badge variant="outline">
-          {filteredEvents.length} de {workspace.events.length}
-        </Badge>
-      </header>
-      <div className="venue-filter-bar venue-filter-bar--agenda">
-        <label>
-          <Search />
-          <Input
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            placeholder="Buscar por título, organização, solicitante ou telefone"
+        <div className="venue-events-registry__tools">
+          <VenueEventsYearSelector
+            years={availableYears}
+            value={includeHistory ? "" : yearFilter}
+            counts={yearCounts}
+            onChange={(year) => {
+              setIncludeHistory(false);
+              setYearFilter(year);
+            }}
           />
-        </label>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger aria-label="Filtrar eventos por status">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos os status</SelectItem>
-            {Object.entries(EVENT_STATUS_LABELS).map(([status, label]) => (
-              <SelectItem key={status} value={status}>
-                {label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select value={spaceFilter} onValueChange={setSpaceFilter}>
-          <SelectTrigger aria-label="Filtrar eventos por espaço">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todas as áreas</SelectItem>
-            {workspace.spaces.map((space) => (
-              <SelectItem key={space.id} value={space.id}>
-                {space.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select value={yearFilter} onValueChange={setYearFilter}>
-          <SelectTrigger aria-label="Filtrar eventos por ano">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos os anos</SelectItem>
-            {availableYears.map((year) => (
-              <SelectItem key={year} value={year}>
-                {year}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Button
-          type="button"
-          variant={reviewOnly ? "default" : "outline"}
-          aria-pressed={reviewOnly}
-          onClick={() => setReviewOnly((value) => !value)}
-        >
-          <AlertTriangle /> Revisar ({reviewCount})
-        </Button>
-      </div>
+          <VenueEventsFiltersTrigger
+            statusFilter={statusFilter}
+            onStatusFilterChange={setStatusFilter}
+            statusOptions={Object.entries(EVENT_STATUS_LABELS).map(
+              ([value, label]) => ({ value, label }),
+            )}
+            spaceFilter={spaceFilter}
+            onSpaceFilterChange={setSpaceFilter}
+            spaces={workspace.spaces.map((space) => ({
+              value: space.id,
+              label: space.name,
+            }))}
+            reviewOnly={reviewOnly}
+            onReviewOnlyChange={setReviewOnly}
+            reviewCount={reviewCount}
+            includeHistory={includeHistory}
+            onIncludeHistoryChange={setIncludeHistory}
+            onClear={() => {
+              setStatusFilter("all");
+              setSpaceFilter("all");
+              setReviewOnly(false);
+              setIncludeHistory(false);
+            }}
+          />
+          <Badge variant="outline" className="venue-events-registry__count">
+            {filteredEvents.length} de {workspace.events.length}
+          </Badge>
+        </div>
+      </header>
+
       {filteredEvents.length ? (
         <div className="venue-event-list">
           {monthlyEventGroups.map((group) => (
@@ -1574,28 +1576,107 @@ export function VenueWorkspace() {
                 {group.label}
                 <span>{group.events.length}</span>
               </p>
-              {group.events.map((event) => (
-                <EventRow
-                  key={event.id}
-                  event={event}
-                  spaces={getSpaceNames(
-                    event.id,
-                    workspace.allocations,
-                    workspace.spaces,
-                  )}
-                  sponsor={getStakeholderName(
-                    event.sponsor_id,
-                    workspace.stakeholders,
-                  )}
-                  responsible={
-                    workspace.members.find(
-                      (member) => member.user_id === event.responsible_user_id,
-                    )?.nome_exibicao || "Não definido"
-                  }
-                  hasCounterpart={Boolean(event.counterpart_agreement_id)}
-                  onOpen={() => openEvent(event.id)}
-                />
-              ))}
+              {group.events.map((event) => {
+                const startLabel = formatAgendaHour(event.start_at);
+                const endLabel = formatAgendaHour(event.end_at);
+                const durationLabel = formatAgendaDuration(
+                  event.start_at,
+                  event.end_at,
+                );
+                const spaceLabel = getSpaceNames(
+                  event.id,
+                  workspace.allocations,
+                  workspace.spaces,
+                );
+                const sponsorLabel = getStakeholderName(
+                  event.sponsor_id,
+                  workspace.stakeholders,
+                );
+                const responsibleLabel =
+                  workspace.members.find(
+                    (member) => member.user_id === event.responsible_user_id,
+                  )?.nome_exibicao || "Não definido";
+                const hasCounterpart = Boolean(event.counterpart_agreement_id);
+                const dayLabel = event.start_at
+                  ? new Intl.DateTimeFormat("pt-BR", {
+                      timeZone: "America/Sao_Paulo",
+                      day: "2-digit",
+                    }).format(new Date(event.start_at))
+                  : "—";
+                const monthLabel = event.start_at
+                  ? new Intl.DateTimeFormat("pt-BR", {
+                      timeZone: "America/Sao_Paulo",
+                      month: "short",
+                    })
+                      .format(new Date(event.start_at))
+                      .replace(".", "")
+                  : "s/ data";
+
+                return (
+                  <button
+                    key={event.id}
+                    type="button"
+                    onClick={() => openEvent(event.id)}
+                    data-status={event.status}
+                    className="venue-agenda-card venue-event-card"
+                    aria-label={`${event.title} — ${dayLabel} ${monthLabel}${startLabel ? `, ${startLabel}` : ""}`}
+                  >
+                    <span className="venue-agenda-card__time venue-event-card__time">
+                      <b>
+                        {dayLabel}
+                        <i>{monthLabel}</i>
+                      </b>
+                      <time dateTime={event.start_at ?? undefined}>
+                        {startLabel ?? "--:--"}
+                      </time>
+                      {endLabel && <em>{endLabel}</em>}
+                      {durationLabel && <i>{durationLabel}</i>}
+                    </span>
+
+                    <span className="venue-agenda-card__body">
+                      <strong>{event.title}</strong>
+                      <span className="venue-agenda-card__chips">
+                        <span data-kind="space">
+                          <MapPin aria-hidden="true" />
+                          {spaceLabel || "Área não definida"}
+                        </span>
+                        <span
+                          data-kind="sponsor"
+                          data-empty={!sponsorLabel || sponsorLabel === "Sem vínculo"}
+                        >
+                          <Building2 aria-hidden="true" />
+                          {sponsorLabel || "Sem vínculo"}
+                        </span>
+                        <span data-kind="responsible">
+                          <UserRound aria-hidden="true" />
+                          {responsibleLabel}
+                        </span>
+                        <span
+                          data-kind="counterpart"
+                          data-empty={!hasCounterpart}
+                        >
+                          <Handshake aria-hidden="true" />
+                          {hasCounterpart
+                            ? "Contrapartida vinculada"
+                            : "Sem contrapartida"}
+                        </span>
+                      </span>
+                    </span>
+
+                    <span className="venue-agenda-card__aside">
+                      {event.conflict_status === "conflito" && (
+                        <AlertTriangle
+                          className="venue-event-card__conflict"
+                          aria-label="Conflito pendente"
+                        />
+                      )}
+                      <StatusBadge status={event.status} />
+                      <ChevronRight aria-hidden="true" />
+                    </span>
+                  </button>
+                );
+              })}
+
             </div>
           ))}
         </div>

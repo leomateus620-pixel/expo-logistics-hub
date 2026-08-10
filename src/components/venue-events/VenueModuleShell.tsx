@@ -5,8 +5,6 @@ import { AgendaWordmark } from '@/components/brand/AgendaWordmark';
 import { FenasojaBrand } from "@/components/brand/FenasojaBrand";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
-import { useCurrentOrg } from "@/hooks/useCurrentOrg";
-import { presentFenasojaProductName } from "@/lib/fenasoja-brand";
 import { VenueHeaderSearch } from "@/components/venue-events/VenueHeaderSearch";
 import { VenueSearchProvider } from "@/components/venue-events/VenueSearchContext";
 import "@/styles/venue-events-shell.css";
@@ -17,7 +15,6 @@ interface VenueModuleShellProps {
 
 export function VenueModuleShell({ children }: VenueModuleShellProps) {
   const { signOut } = useAuth();
-  const { orgName } = useCurrentOrg();
   const navigate = useNavigate();
   const [isSigningOut, setIsSigningOut] = useState(false);
 
@@ -32,8 +29,6 @@ export function VenueModuleShell({ children }: VenueModuleShellProps) {
       setIsSigningOut(false);
     }
   };
-
-  const organizationLabel = presentFenasojaProductName(orgName);
 
   return (
     <VenueSearchProvider>
@@ -84,13 +79,7 @@ export function VenueModuleShell({ children }: VenueModuleShellProps) {
           </div>
 
           <div className="venue-module-shell__actions">
-            <div
-              className="venue-module-shell__organization"
-              aria-label={`Organização ativa: ${organizationLabel}`}
-            >
-              <span>Organização ativa</span>
-              <strong>{organizationLabel}</strong>
-            </div>
+
 
             <Button
               type="button"
