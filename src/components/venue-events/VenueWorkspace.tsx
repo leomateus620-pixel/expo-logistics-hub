@@ -94,6 +94,9 @@ import {
 import { VenueSpaceDialog } from "@/components/venue-events/VenueSpaceDialog";
 import { VenueSpaceManagementPanel } from "@/components/venue-events/VenueSpaceManagementPanel";
 import { VenueWorkspaceSwitcher } from "@/components/venue-events/VenueWorkspaceSwitcher";
+import { VenueAgendaFiltersTrigger } from "@/components/venue-events/VenueAgendaFiltersTrigger";
+import { VenueCreateEventBar } from "@/components/venue-events/VenueCreateEventBar";
+import { useVenueSearch } from "@/components/venue-events/VenueSearchContext";
 import {
   DEFAULT_VENUE_WORKSPACE,
   getVenueWorkspace,
