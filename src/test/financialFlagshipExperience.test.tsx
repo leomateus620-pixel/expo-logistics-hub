@@ -251,7 +251,9 @@ describe('experiência financeira flagship', () => {
     expect(financialPageSource).toContain('const revenueComposition = revenueCategoryGroups.map');
     expect(financialPageSource).not.toContain('revenueCategoryGroups.slice');
     expect(financialPageSource).not.toContain('.slice(0, 8)');
-    expect(financialPageSource.match(/variant="executive"/g)?.length ?? 0).toBeGreaterThanOrEqual(3);
+    expect(financialPageSource.match(/variant="executive"/g)?.length ?? 0).toBeGreaterThanOrEqual(2);
+    expect(financialPageSource).toContain('<ExpenseExecutionBoard');
+    expect(financialPageSource).toContain('<FundingDistributionStrip');
     expect(financialPageSource.match(/forceMotion/g)?.length ?? 0).toBeGreaterThanOrEqual(10);
 
     expect(financialStyles).toContain(
