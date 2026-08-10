@@ -42,7 +42,7 @@
 
 .financial-exec-kpis {
   display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: clamp(0.7rem, 1.1vw, 1rem);
   align-items: stretch;
 }
@@ -70,12 +70,17 @@
   flex: 1;
 }
 
+.financial-exec-kpis__cards > * { min-width: 0; }
+
+.financial-exec-kpis__block--revenue { grid-column: span 2; }
+
 .financial-exec-kpis__block--expense .financial-exec-kpis__cards,
 .financial-exec-kpis__block--budget .financial-exec-kpis__cards {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
 }
 
 .financial-kpi-card--exec {
+  min-height: 7.4rem;
   padding: clamp(0.75rem, 1.1vw, 1rem);
   border-radius: 1rem;
   gap: 0.45rem;
@@ -525,12 +530,11 @@
 /* ─── Responsividade ─────────────────────────────────────────── */
 
 @media (max-width: 1280px) {
-  .financial-exec-kpis {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  }
+  .financial-exec-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .financial-exec-kpis__block--revenue { grid-column: 1 / -1; }
-  .financial-exec-kpis__block--revenue .financial-exec-kpis__cards {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+  .financial-exec-kpis__block--expense .financial-exec-kpis__cards,
+  .financial-exec-kpis__block--budget .financial-exec-kpis__cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
