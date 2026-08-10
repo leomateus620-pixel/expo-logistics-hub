@@ -19,6 +19,8 @@ import {
   Loader2,
   Building2,
   MapPin,
+  UserRound,
+  Handshake,
   MoreHorizontal,
   Plus,
   RefreshCw,
@@ -96,6 +98,8 @@ import {
 import { VenueSpaceDialog } from "@/components/venue-events/VenueSpaceDialog";
 import { VenueSpaceManagementPanel } from "@/components/venue-events/VenueSpaceManagementPanel";
 import { VenueWorkspaceSwitcher } from "@/components/venue-events/VenueWorkspaceSwitcher";
+import { VenueEventsFiltersTrigger } from "@/components/venue-events/VenueEventsFiltersTrigger";
+import { VenueEventsYearSelector } from "@/components/venue-events/VenueEventsYearSelector";
 import { VenueAgendaFiltersTrigger } from "@/components/venue-events/VenueAgendaFiltersTrigger";
 import { VenueCreateEventBar } from "@/components/venue-events/VenueCreateEventBar";
 import { useVenueSearch } from "@/components/venue-events/VenueSearchContext";
@@ -771,10 +775,6 @@ export function VenueWorkspace() {
     },
     {},
   );
-  const historyCount = workspace.events.filter((event) => {
-    const year = eventYear(event);
-    return Boolean(year) && year! < "2026";
-  }).length;
   const reviewCount = workspace.events.filter(
     (event) => event.requires_review,
   ).length;
