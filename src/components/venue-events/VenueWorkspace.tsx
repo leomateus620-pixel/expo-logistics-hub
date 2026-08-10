@@ -1510,73 +1510,64 @@ export function VenueWorkspace() {
   );
 
   const renderEvents = () => (
-    <section className="venue-panel">
-      <header className="venue-panel__header">
-        <div>
+    <section className="venue-panel venue-events-registry">
+      <header className="venue-panel__header venue-events-registry__header">
+        <div className="venue-events-registry__identity">
           <p className="venue-eyebrow">Registro mestre</p>
-          <h2>Todos os eventos</h2>
+          <h2>
+            Todos os eventos
+            <span className="venue-events-registry__sep" aria-hidden="true">
+              ·
+            </span>
+            <span
+              key={venueId}
+              className="venue-events-registry__scope"
+              data-venue={venueId}
+            >
+              {venueDefinition.shortLabel}
+            </span>
+          </h2>
         </div>
-        <Badge variant="outline">
-          {filteredEvents.length} de {workspace.events.length}
-        </Badge>
-      </header>
-      <div className="venue-filter-bar venue-filter-bar--agenda">
-        <label>
-          <Search />
-          <Input
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            placeholder="Buscar por título, organização, solicitante ou telefone"
+        <div className="venue-events-registry__tools">
+          <VenueEventsYearSelector
+            years={availableYears}
+            value={includeHistory ? "" : yearFilter}
+            counts={yearCounts}
+            onChange={(year) => {
+              setIncludeHistory(false);
+              setYearFilter(year);
+            }}
           />
-        </label>
-        <Select value={statusFilter} onValueChange={setStatusFilter}>
-          <SelectTrigger aria-label="Filtrar eventos por status">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos os status</SelectItem>
-            {Object.entries(EVENT_STATUS_LABELS).map(([status, label]) => (
-              <SelectItem key={status} value={status}>
-                {label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select value={spaceFilter} onValueChange={setSpaceFilter}>
-          <SelectTrigger aria-label="Filtrar eventos por espaço">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todas as áreas</SelectItem>
-            {workspace.spaces.map((space) => (
-              <SelectItem key={space.id} value={space.id}>
-                {space.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Select value={yearFilter} onValueChange={setYearFilter}>
-          <SelectTrigger aria-label="Filtrar eventos por ano">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="all">Todos os anos</SelectItem>
-            {availableYears.map((year) => (
-              <SelectItem key={year} value={year}>
-                {year}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <Button
-          type="button"
-          variant={reviewOnly ? "default" : "outline"}
-          aria-pressed={reviewOnly}
-          onClick={() => setReviewOnly((value) => !value)}
-        >
-          <AlertTriangle /> Revisar ({reviewCount})
-        </Button>
-      </div>
+          <VenueEventsFiltersTrigger
+            statusFilter={statusFilter}
+            onStatusFilterChange={setStatusFilter}
+            statusOptions={Object.entries(EVENT_STATUS_LABELS).map(
+              ([value, label]) => ({ value, label }),
+            )}
+            spaceFilter={spaceFilter}
+            onSpaceFilterChange={setSpaceFilter}
+            spaces={workspace.spaces.map((space) => ({
+              value: space.id,
+              label: space.name,
+            }))}
+            reviewOnly={reviewOnly}
+            onReviewOnlyChange={setReviewOnly}
+            reviewCount={reviewCount}
+            includeHistory={includeHistory}
+            onIncludeHistoryChange={setIncludeHistory}
+            onClear={() => {
+              setStatusFilter("all");
+              setSpaceFilter("all");
+              setReviewOnly(false);
+              setIncludeHistory(false);
+            }}
+          />
+          <Badge variant="outline" className="venue-events-registry__count">
+            {filteredEvents.length} de {workspace.events.length}
+          </Badge>
+        </div>
+      </header>
+
       {filteredEvents.length ? (
         <div className="venue-event-list">
           {monthlyEventGroups.map((group) => (
