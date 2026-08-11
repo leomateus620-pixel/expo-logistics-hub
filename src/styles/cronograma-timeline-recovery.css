@@ -151,7 +151,6 @@
 }
 
 .cronograma-page .cronograma-temporal-nav {
-  position: sticky;
   overflow: hidden;
   border-color: oklch(var(--brand-indigo-200) / 0.58);
   background:
@@ -167,6 +166,29 @@
   border-radius: 999px;
   background: linear-gradient(oklch(var(--brand-orange-500)), oklch(var(--brand-gold-400)));
   content: '';
+}
+
+/* Desktop: nenhuma barra acompanha a rolagem — abas, "Visão operacional" e a
+   navegação do mês rolam junto com o conteúdo (mobile usa outra árvore). */
+@media (min-width: 900px) {
+  .cronograma-page .cronograma-command-dock {
+    position: static;
+  }
+
+  .cronograma-page .cronograma-cycle-bar {
+    position: static;
+  }
+
+  .cronograma-page .cronograma-month-section,
+  .cronograma-page .cronograma-year-empty-state {
+    scroll-margin-top: 0.75rem;
+  }
+}
+
+@media (min-width: 1180px) {
+  .cronograma-page .cronograma-timeline-shell .cronograma-cycle-navigator {
+    top: 0.75rem;
+  }
 }
 
 .cronograma-page .cronograma-month-stream {
