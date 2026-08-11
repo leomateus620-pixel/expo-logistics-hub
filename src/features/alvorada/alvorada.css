@@ -70,8 +70,8 @@
 .alvorada-overlay__close {
   position: absolute;
   z-index: 8;
-  top: max(14px, env(safe-area-inset-top));
-  right: max(14px, env(safe-area-inset-right));
+  top: calc(env(safe-area-inset-top, 0px) + 14px);
+  right: calc(env(safe-area-inset-right, 0px) + 14px);
   display: grid;
   width: 44px;
   height: 44px;
@@ -202,8 +202,8 @@
 
 @media (max-width: 640px) {
   .alvorada-overlay__close {
-    top: max(10px, env(safe-area-inset-top));
-    right: max(10px, env(safe-area-inset-right));
+    top: calc(env(safe-area-inset-top, 0px) + 10px);
+    right: calc(env(safe-area-inset-right, 0px) + 10px);
   }
 
   .alvorada-fallback__title {
@@ -222,10 +222,32 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .alvorada-overlay,
-  .alvorada-overlay--leaving,
+  /*
+   * This opt-in cinematic is intentionally isolated from the portal's global
+   * reduced-motion rule. Opening it is an explicit request to play the full
+   * real-time identity journey; the rest of the application remains unchanged.
+   */
+  .alvorada-overlay {
+    animation-duration: 280ms !important;
+    animation-iteration-count: 1 !important;
+  }
+
+  .alvorada-overlay--leaving {
+    animation-duration: 400ms !important;
+    animation-iteration-count: 1 !important;
+  }
+
   .alvorada-overlay__loader-orbit {
-    animation-duration: 1ms;
+    animation-duration: 900ms !important;
+    animation-iteration-count: infinite !important;
+  }
+
+  .alvorada-overlay__loader {
+    transition-duration: 340ms !important;
+  }
+
+  .alvorada-overlay__close {
+    transition-duration: 180ms !important;
   }
 }
 

@@ -21,7 +21,6 @@ interface SceneControllerProps {
   initialElapsed: number;
   onProgress: (elapsed: number) => void;
   onReady: () => void;
-  onSequenceComplete: () => void;
   quality: AlvoradaQualityProfile;
 }
 
@@ -29,18 +28,16 @@ function MasterTimeline({
   initialElapsed,
   onProgress,
   onReady,
-  onSequenceComplete,
 }: Pick<
   SceneControllerProps,
-  'initialElapsed' | 'onProgress' | 'onReady' | 'onSequenceComplete'
+  'initialElapsed' | 'onProgress' | 'onReady'
 >) {
   const timeline = useAlvoradaTimeline();
+  const { gl } = useThree();
   const startedAt = useRef<number | null>(null);
   const hiddenAt = useRef<number | null>(null);
   const hiddenDuration = useRef(0);
   const ready = useRef(false);
-  const complete = useRef(false);
-
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.hidden) {
@@ -57,36 +54,38 @@ function MasterTimeline({
     return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, []);
 
-  useFrame((state) => {
-    const clockTime = state.clock.elapsedTime;
-    if (startedAt.current === null) startedAt.current = clockTime;
-    const elapsed = Math.min(
-      ALVORADA_SEQUENCE_DURATION,
-      Math.max(
-        0,
-        initialElapsed + clockTime - startedAt.current - hiddenDuration.current,
-      ),
+  useFrame(() => {
+    const now = performance.now();
+    if (startedAt.current === null) startedAt.current = now;
+    const activeRuntime = Math.max(
+      0,
+      (now - startedAt.current) / 1000 - hiddenDuration.current,
     );
-    const delta = Math.min(0.1, Math.max(0, elapsed - timeline.current.elapsed));
+    const ambientElapsed = Math.max(0, initialElapsed + activeRuntime);
+    const elapsed = Math.min(ALVORADA_SEQUENCE_DURATION, ambientElapsed);
+    const delta = Math.min(
+      0.1,
+      Math.max(0, ambientElapsed - timeline.current.ambientElapsed),
+    );
 
     if (!ready.current) {
       ready.current = true;
       onReady();
     }
 
-    if (timeline.current.elapsed < ALVORADA_SEQUENCE_DURATION) {
-      timeline.current.delta = delta;
-      timeline.current.elapsed = elapsed;
-      timeline.current.progress = timeline.current.elapsed / ALVORADA_SEQUENCE_DURATION;
-      timeline.current.phase = getAlvoradaPhase(timeline.current.elapsed);
-    }
+    timeline.current.ambientElapsed = ambientElapsed;
+    timeline.current.delta = delta;
+    timeline.current.elapsed = elapsed;
+    timeline.current.progress = elapsed / ALVORADA_SEQUENCE_DURATION;
+    timeline.current.phase = getAlvoradaPhase(ambientElapsed);
 
-    onProgress(timeline.current.elapsed);
+    // Lightweight diagnostics used by visual QA and field support. Keeping the
+    // values on the existing canvas avoids React updates inside the render loop.
+    gl.domElement.dataset.elapsed = elapsed.toFixed(3);
+    gl.domElement.dataset.ambientElapsed = ambientElapsed.toFixed(3);
+    gl.domElement.dataset.phase = timeline.current.phase;
 
-    if (!complete.current && timeline.current.elapsed >= ALVORADA_SEQUENCE_DURATION) {
-      complete.current = true;
-      onSequenceComplete();
-    }
+    onProgress(elapsed);
   }, -2);
 
   return null;
@@ -112,9 +111,32 @@ function SceneAtmosphere() {
 
   useFrame(() => {
     const elapsed = timeline.current.elapsed;
-    const city = smoothRange(elapsed, 4.48, 5.08);
-    fog.density = city * THREE.MathUtils.lerp(0.0085, 0.0032, smoothRange(elapsed, 5.0, 7.2));
-    gl.toneMappingExposure = THREE.MathUtils.lerp(0.67, 0.88, smoothRange(elapsed, 0.4, 7.4));
+    const city = smoothRange(elapsed, 4.38, 5.35);
+    const settled = smoothRange(elapsed, 5.15, 6.4);
+    const cloudBridge = smoothRange(elapsed, 4.34, 4.84)
+      * (1 - smoothRange(elapsed, 4.98, 5.52));
+    fog.color.setRGB(
+      THREE.MathUtils.lerp(0.38, 0.52, settled),
+      THREE.MathUtils.lerp(0.48, 0.63, settled),
+      THREE.MathUtils.lerp(0.62, 0.76, settled),
+    );
+    fog.density = cloudBridge * 0.01
+      + city * THREE.MathUtils.lerp(0.0046, 0.00145, settled);
+    const orbitalExposure = THREE.MathUtils.lerp(
+      0.68,
+      0.77,
+      smoothRange(elapsed, 0.5, 3.8),
+    );
+    const dawnExposure = THREE.MathUtils.lerp(
+      0.76,
+      0.88,
+      smoothRange(elapsed, 5.2, 9.6),
+    );
+    gl.toneMappingExposure = THREE.MathUtils.lerp(
+      orbitalExposure,
+      dawnExposure,
+      smoothRange(elapsed, 4.3, 5.35),
+    );
   });
 
   return null;
@@ -124,7 +146,6 @@ export function SceneController({
   initialElapsed,
   onProgress,
   onReady,
-  onSequenceComplete,
   quality,
 }: SceneControllerProps) {
   const timeline = useRef(
@@ -137,7 +158,6 @@ export function SceneController({
         initialElapsed={initialElapsed}
         onProgress={onProgress}
         onReady={onReady}
-        onSequenceComplete={onSequenceComplete}
       />
       <SceneAtmosphere />
       <CinematicCamera quality={quality} />

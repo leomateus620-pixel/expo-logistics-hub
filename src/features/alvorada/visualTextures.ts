@@ -8,27 +8,33 @@ export function seededRandom(seed: number) {
   };
 }
 
-export function createCloudTexture(size = 256) {
+export function createCloudTexture(size = 256, seed = 2028) {
   const canvas = document.createElement('canvas');
   canvas.width = size;
   canvas.height = size;
   const context = canvas.getContext('2d');
   if (!context) return new THREE.CanvasTexture(canvas);
 
-  const random = seededRandom(2028);
+  const random = seededRandom(seed);
   context.clearRect(0, 0, size, size);
   context.globalCompositeOperation = 'lighter';
 
-  for (let index = 0; index < 28; index += 1) {
-    const x = size * (0.18 + random() * 0.64);
-    const y = size * (0.28 + random() * 0.44);
-    const radius = size * (0.09 + random() * 0.19);
-    const gradient = context.createRadialGradient(x, y, 0, x, y, radius);
-    gradient.addColorStop(0, `rgba(255,255,255,${0.11 + random() * 0.13})`);
-    gradient.addColorStop(0.46, 'rgba(240,247,255,.07)');
+  for (let index = 0; index < 52; index += 1) {
+    const x = size * (0.12 + random() * 0.76);
+    const y = size * (0.32 + random() * 0.36);
+    const radiusX = size * (0.055 + random() * 0.16);
+    const radiusY = radiusX * (0.28 + random() * 0.42);
+    const gradient = context.createRadialGradient(0, 0, 0, 0, 0, 1);
+    gradient.addColorStop(0, `rgba(255,255,255,${0.07 + random() * 0.12})`);
+    gradient.addColorStop(0.52, 'rgba(240,247,255,.045)');
     gradient.addColorStop(1, 'rgba(218,231,248,0)');
+    context.save();
+    context.translate(x, y);
+    context.rotate((random() - 0.5) * 0.22);
+    context.scale(radiusX, radiusY);
     context.fillStyle = gradient;
-    context.fillRect(x - radius, y - radius, radius * 2, radius * 2);
+    context.fillRect(-1, -1, 2, 2);
+    context.restore();
   }
 
   const texture = new THREE.CanvasTexture(canvas);

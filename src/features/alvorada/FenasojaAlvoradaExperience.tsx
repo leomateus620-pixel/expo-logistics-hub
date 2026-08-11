@@ -40,9 +40,8 @@ interface AlvoradaErrorBoundaryState {
 
 const ALVORADA_CONTEXT_RECOVERY_DELAY_MS = 500;
 const ALVORADA_CONTEXT_RECOVERY_TIMEOUT_MS = 3000;
-const ALVORADA_MIN_FALLBACK_DURATION_MS = 1000;
 
-type AlvoradaVisibleTimerKey = 'fallback' | 'recovery-delay' | 'recovery-timeout';
+type AlvoradaVisibleTimerKey = 'recovery-delay' | 'recovery-timeout';
 
 interface AlvoradaVisibleTimer {
   callback: (() => void) | null;
@@ -62,7 +61,6 @@ function createVisibleTimer(): AlvoradaVisibleTimer {
 
 function useAlvoradaVisibleTimeouts() {
   const timers = useRef<Record<AlvoradaVisibleTimerKey, AlvoradaVisibleTimer>>({
-    fallback: createVisibleTimer(),
     'recovery-delay': createVisibleTimer(),
     'recovery-timeout': createVisibleTimer(),
   });
@@ -182,7 +180,7 @@ function AlvoradaFallback({ showTitle = true }: { showTitle?: boolean }) {
 
 export default function FenasojaAlvoradaExperience({ onComplete }: FenasojaAlvoradaExperienceProps) {
   const [rendererTier] = useState(getAlvoradaWebGLTier);
-  const [quality] = useState(() => getAlvoradaQualityProfile(rendererTier));
+  const [quality, setQuality] = useState(() => getAlvoradaQualityProfile(rendererTier));
   const [rendererState, setRendererState] = useState<AlvoradaRendererState>(
     rendererTier === 'unavailable' ? 'fallback' : 'loading',
   );
@@ -203,6 +201,25 @@ export default function FenasojaAlvoradaExperience({ onComplete }: FenasojaAlvor
   const exitTimer = useRef<number | null>(null);
   const recoveryFrame = useRef<number | null>(null);
   const { armTimer, clearTimer, clearTimers } = useAlvoradaVisibleTimeouts();
+
+  useEffect(() => {
+    let resizeFrame: number | null = null;
+    const updateQuality = () => {
+      if (resizeFrame !== null) window.cancelAnimationFrame(resizeFrame);
+      resizeFrame = window.requestAnimationFrame(() => {
+        resizeFrame = null;
+        setQuality(getAlvoradaQualityProfile(rendererTier));
+      });
+    };
+
+    window.addEventListener('resize', updateQuality, { passive: true });
+    window.addEventListener('orientationchange', updateQuality, { passive: true });
+    return () => {
+      window.removeEventListener('resize', updateQuality);
+      window.removeEventListener('orientationchange', updateQuality);
+      if (resizeFrame !== null) window.cancelAnimationFrame(resizeFrame);
+    };
+  }, [rendererTier]);
 
   const transitionRenderer = useCallback((nextState: AlvoradaRendererState) => {
     rendererStateRef.current = nextState;
@@ -296,21 +313,6 @@ export default function FenasojaAlvoradaExperience({ onComplete }: FenasojaAlvor
   }, [armTimer, clearRuntimeTimers, enterTerminalFallback, transitionRenderer]);
 
   useEffect(() => {
-    if (rendererState !== 'fallback') return undefined;
-
-    const remainingSequenceMs = (
-      ALVORADA_SEQUENCE_DURATION - currentElapsed.current
-    ) * 1000;
-    armTimer(
-      'fallback',
-      Math.max(ALVORADA_MIN_FALLBACK_DURATION_MS, remainingSequenceMs),
-      finish,
-    );
-
-    return () => clearTimer('fallback');
-  }, [armTimer, clearTimer, finish, rendererState]);
-
-  useEffect(() => {
     const focusFrame = window.requestAnimationFrame(() => closeButton.current?.focus({
       preventScroll: true,
     }));
@@ -348,6 +350,7 @@ export default function FenasojaAlvoradaExperience({ onComplete }: FenasojaAlvor
       data-testid="alvorada-experience"
       data-renderer-state={rendererState}
       data-fallback-reason={fallbackReason ?? undefined}
+      data-quality={quality.level}
       role="dialog"
       aria-modal="true"
       aria-label="O Nascer da Alvorada"
@@ -368,7 +371,6 @@ export default function FenasojaAlvoradaExperience({ onComplete }: FenasojaAlvor
               onContextLost={handleContextLost}
               onProgress={handleProgress}
               onReady={handleReady}
-              onSequenceComplete={finish}
               quality={quality}
               rendererTier={rendererTier}
             />

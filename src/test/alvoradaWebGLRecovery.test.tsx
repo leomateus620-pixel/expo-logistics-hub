@@ -7,7 +7,6 @@ interface MockCanvasProps {
   onContextLost: (elapsed: number) => void;
   onProgress: (elapsed: number) => void;
   onReady: () => void;
-  onSequenceComplete: () => void;
   rendererTier: 'hardware' | 'compatible';
 }
 
@@ -133,7 +132,7 @@ describe('recuperação WebGL da experiência Alvorada', () => {
     Reflect.deleteProperty(document, 'hidden');
   });
 
-  it('mantém WebGL montado com movimento reduzido e não encerra antes de dois segundos', () => {
+  it('mantém WebGL montado com movimento reduzido e não encurta a jornada', () => {
     runtime.reducedMotion = true;
     const onComplete = vi.fn();
 
@@ -157,6 +156,11 @@ describe('recuperação WebGL da experiência Alvorada', () => {
       'webgl',
     );
     expect(onComplete).not.toHaveBeenCalled();
+
+    act(() => currentCanvas().props.onProgress(10.5));
+    advance(60_000);
+    expect(screen.getByTestId('mock-alvorada-canvas')).toBeInTheDocument();
+    expect(onComplete).not.toHaveBeenCalled();
   });
 
   it('monta a experiência WebGL com o tier compatible reduzido', () => {
@@ -174,7 +178,7 @@ describe('recuperação WebGL da experiência Alvorada', () => {
     );
   });
 
-  it('mantém o fallback indisponível por toda a sequência de 8,6 segundos', () => {
+  it('mantém o fallback indisponível aberto indefinidamente até o X', () => {
     runtime.rendererTier = 'unavailable';
     const onComplete = vi.fn();
 
@@ -186,26 +190,24 @@ describe('recuperação WebGL da experiência Alvorada', () => {
       'unsupported-webgl',
     );
 
-    advance(8599);
+    advance(120_000);
     expect(onComplete).not.toHaveBeenCalled();
     expect(screen.getByRole('dialog', { name: 'O Nascer da Alvorada' })).toBeInTheDocument();
 
-    advance(1);
-    expect(screen.getByTestId('alvorada-experience')).toHaveClass('alvorada-overlay--leaving');
-    expect(onComplete).not.toHaveBeenCalled();
-
+    fireEvent.click(screen.getByRole('button', { name: 'Fechar O Nascer da Alvorada' }));
     advance(399);
     expect(onComplete).not.toHaveBeenCalled();
     advance(1);
     expect(onComplete).toHaveBeenCalledTimes(1);
   });
 
-  it('remove o loader imediatamente quando a renderização lança erro', () => {
+  it('remove o loader no render-error e não fecha o fallback automaticamente', () => {
     runtime.renderError = true;
+    const onComplete = vi.fn();
     vi.spyOn(console, 'error').mockImplementation(() => undefined);
     vi.spyOn(console, 'warn').mockImplementation(() => undefined);
 
-    render(<FenasojaAlvoradaExperience onComplete={vi.fn()} />);
+    render(<FenasojaAlvoradaExperience onComplete={onComplete} />);
 
     expect(screen.getByTestId('alvorada-fallback')).toBeInTheDocument();
     expect(screen.getByTestId('alvorada-experience')).toHaveAttribute(
@@ -217,6 +219,10 @@ describe('recuperação WebGL da experiência Alvorada', () => {
       'render-error',
     );
     expect(screen.queryByText('Preparando a Alvorada')).not.toBeInTheDocument();
+
+    advance(120_000);
+    expect(onComplete).not.toHaveBeenCalled();
+    expect(screen.getByRole('dialog', { name: 'O Nascer da Alvorada' })).toBeInTheDocument();
   });
 
   it('remonta uma única vez após 500ms mais um frame e retoma o elapsed exato', () => {
@@ -270,8 +276,9 @@ describe('recuperação WebGL da experiência Alvorada', () => {
     );
   });
 
-  it('degrada no segundo context loss sem montar um terceiro Canvas', () => {
-    render(<FenasojaAlvoradaExperience onComplete={vi.fn()} />);
+  it('degrada no segundo context loss sem montar terceiro Canvas nem auto-fechar', () => {
+    const onComplete = vi.fn();
+    render(<FenasojaAlvoradaExperience onComplete={onComplete} />);
     const firstCanvas = currentCanvas();
 
     act(() => firstCanvas.props.onContextLost(2.75));
@@ -290,12 +297,13 @@ describe('recuperação WebGL da experiência Alvorada', () => {
     );
     expect(screen.getByTestId('alvorada-fallback')).toBeInTheDocument();
 
-    advance(4000);
+    advance(120_000);
     expect(runtime.canvasMounts).toHaveLength(2);
     expect(screen.queryByTestId('mock-alvorada-canvas')).not.toBeInTheDocument();
+    expect(onComplete).not.toHaveBeenCalled();
   });
 
-  it('encerra a única recuperação que não fica pronta e respeita o tempo restante', () => {
+  it('degrada a recuperação sem ready após o watchdog e permanece aberta', () => {
     const onComplete = vi.fn();
     render(<FenasojaAlvoradaExperience onComplete={onComplete} />);
 
@@ -322,40 +330,66 @@ describe('recuperação WebGL da experiência Alvorada', () => {
       'context-lost',
     );
 
-    advance(1699);
+    advance(120_000);
     expect(onComplete).not.toHaveBeenCalled();
-    advance(1);
-    expect(screen.getByTestId('alvorada-experience')).toHaveClass(
-      'alvorada-overlay--leaving',
-    );
-    advance(400);
-    expect(onComplete).toHaveBeenCalledTimes(1);
     expect(runtime.canvasMounts).toHaveLength(2);
+    expect(screen.getByRole('dialog', { name: 'O Nascer da Alvorada' })).toBeInTheDocument();
   });
 
-  it('aplica o piso de um segundo no fallback de uma falha próxima ao fim', () => {
+  it('permanece no quadro final WebGL até fechamento explícito', () => {
     const onComplete = vi.fn();
     render(<FenasojaAlvoradaExperience onComplete={onComplete} />);
+    const canvas = currentCanvas();
 
-    act(() => currentCanvas().props.onContextLost(8.2));
-    advance(516);
-    const retryCanvas = currentCanvas();
-    act(() => retryCanvas.props.onReady());
-    act(() => retryCanvas.props.onContextLost(8.4));
-    act(() => retryCanvas.props.onContextLost(8.4));
+    act(() => {
+      canvas.props.onReady();
+      canvas.props.onProgress(10.5);
+    });
+    advance(120_000);
 
     expect(screen.getByTestId('alvorada-experience')).toHaveAttribute(
       'data-renderer-state',
-      'fallback',
+      'webgl',
     );
-    advance(999);
+    expect(screen.getByTestId('mock-alvorada-canvas')).toBeInTheDocument();
     expect(onComplete).not.toHaveBeenCalled();
-    advance(1);
-    expect(screen.getByTestId('alvorada-experience')).toHaveClass(
-      'alvorada-overlay--leaving',
-    );
+
+    fireEvent.keyDown(window, { key: 'Escape' });
     advance(400);
     expect(onComplete).toHaveBeenCalledTimes(1);
+  });
+
+  it('recupera uma perda no finalHold no mesmo quadro e permanece aberto', () => {
+    const onComplete = vi.fn();
+    render(<FenasojaAlvoradaExperience onComplete={onComplete} />);
+    const firstCanvas = currentCanvas();
+
+    act(() => {
+      firstCanvas.props.onReady();
+      firstCanvas.props.onProgress(10.5);
+      firstCanvas.props.onContextLost(10.5);
+    });
+    advance(516);
+
+    const retryCanvas = currentCanvas();
+    expect(retryCanvas.props.initialElapsed).toBe(10.5);
+    expect(screen.getByTestId('mock-alvorada-canvas')).toHaveAttribute(
+      'data-initial-elapsed',
+      '10.5',
+    );
+
+    act(() => {
+      retryCanvas.props.onReady();
+      retryCanvas.props.onProgress(10.5);
+    });
+    advance(120_000);
+
+    expect(screen.getByTestId('alvorada-experience')).toHaveAttribute(
+      'data-renderer-state',
+      'webgl',
+    );
+    expect(screen.getByTestId('mock-alvorada-canvas')).toBeInTheDocument();
+    expect(onComplete).not.toHaveBeenCalled();
   });
 
   it('fecha por Escape durante recovering sem executar o retry pendente', () => {
@@ -375,32 +409,9 @@ describe('recuperação WebGL da experiência Alvorada', () => {
     expect(runtime.canvasMounts).toHaveLength(1);
   });
 
-  it('pausa fallback e watchdog enquanto a aba está oculta', () => {
-    runtime.rendererTier = 'unavailable';
-    const fallbackComplete = vi.fn();
-    const fallbackRender = render(
-      <FenasojaAlvoradaExperience onComplete={fallbackComplete} />,
-    );
-
-    advance(4000);
-    setDocumentHidden(true);
-    advance(10_000);
-    expect(fallbackComplete).not.toHaveBeenCalled();
-    expect(screen.getByTestId('alvorada-experience')).not.toHaveClass(
-      'alvorada-overlay--leaving',
-    );
-
-    setDocumentHidden(false);
-    advance(4599);
-    expect(fallbackComplete).not.toHaveBeenCalled();
-    advance(1);
-    expect(screen.getByTestId('alvorada-experience')).toHaveClass(
-      'alvorada-overlay--leaving',
-    );
-    fallbackRender.unmount();
-
-    runtime.rendererTier = 'hardware';
-    render(<FenasojaAlvoradaExperience onComplete={vi.fn()} />);
+  it('pausa o watchdog de recuperação enquanto a aba está oculta', () => {
+    const onComplete = vi.fn();
+    render(<FenasojaAlvoradaExperience onComplete={onComplete} />);
     act(() => currentCanvas().props.onContextLost(2));
     advance(516);
     advance(1000);
@@ -422,15 +433,23 @@ describe('recuperação WebGL da experiência Alvorada', () => {
       'data-renderer-state',
       'fallback',
     );
+    advance(120_000);
+    expect(onComplete).not.toHaveBeenCalled();
   });
 
-  it('contém foco e Tab, fecha por Escape uma vez e limpa timers ao desmontar', () => {
+  it('só fecha por X ou Escape, contém foco e ignora interações no fundo', () => {
     const onComplete = vi.fn();
     const { unmount } = render(<FenasojaAlvoradaExperience onComplete={onComplete} />);
+    const dialog = screen.getByRole('dialog', { name: 'O Nascer da Alvorada' });
     const close = screen.getByRole('button', { name: 'Fechar O Nascer da Alvorada' });
 
+    expect(screen.getAllByRole('button')).toHaveLength(1);
     advance(16);
     expect(close).toHaveFocus();
+
+    fireEvent.click(dialog);
+    advance(10_000);
+    expect(onComplete).not.toHaveBeenCalled();
 
     close.blur();
     fireEvent.keyDown(window, { key: 'Tab' });
@@ -450,14 +469,25 @@ describe('recuperação WebGL da experiência Alvorada', () => {
     expect(onComplete).toHaveBeenCalledTimes(1);
   });
 
-  it('cancela fallback e exit pendentes quando desmonta antes da conclusão', () => {
-    runtime.rendererTier = 'unavailable';
-    const onComplete = vi.fn();
-    const { unmount } = render(<FenasojaAlvoradaExperience onComplete={onComplete} />);
-
-    unmount();
+  it('cancela recuperação e saída pendentes ao desmontar', () => {
+    const recoveryComplete = vi.fn();
+    const recoveryRender = render(
+      <FenasojaAlvoradaExperience onComplete={recoveryComplete} />,
+    );
+    act(() => currentCanvas().props.onContextLost(4.75));
+    recoveryRender.unmount();
     advance(10_000);
+    expect(runtime.canvasMounts).toHaveLength(1);
+    expect(recoveryComplete).not.toHaveBeenCalled();
 
-    expect(onComplete).not.toHaveBeenCalled();
+    runtime.rendererTier = 'unavailable';
+    const exitComplete = vi.fn();
+    const exitRender = render(
+      <FenasojaAlvoradaExperience onComplete={exitComplete} />,
+    );
+    fireEvent.keyDown(window, { key: 'Escape' });
+    exitRender.unmount();
+    advance(10_000);
+    expect(exitComplete).not.toHaveBeenCalled();
   });
 });
