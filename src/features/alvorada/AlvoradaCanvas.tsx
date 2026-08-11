@@ -1,18 +1,22 @@
-import { Suspense, useEffect } from 'react';
+import { Suspense, useCallback, useEffect, useRef } from 'react';
 import { AdaptiveDpr, PerformanceMonitor, Preload } from '@react-three/drei';
 import { Canvas, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { AlvoradaQualityProfile } from './capabilities';
 import { SceneController } from './SceneController';
+import type { AlvoradaWebGLTier } from './types';
 
 interface AlvoradaCanvasProps {
+  initialElapsed: number;
+  onProgress: (elapsed: number) => void;
   onReady: () => void;
-  onContextLost: () => void;
+  onContextLost: (elapsed: number) => void;
   onSequenceComplete: () => void;
   quality: AlvoradaQualityProfile;
+  rendererTier: Exclude<AlvoradaWebGLTier, 'unavailable'>;
 }
 
-function CanvasRuntimeGuard({ onContextLost }: Pick<AlvoradaCanvasProps, 'onContextLost'>) {
+function CanvasRuntimeGuard({ onContextLost }: { onContextLost: () => void }) {
   const { gl, performance } = useThree();
 
   useEffect(() => {
@@ -34,11 +38,23 @@ function CanvasRuntimeGuard({ onContextLost }: Pick<AlvoradaCanvasProps, 'onCont
 }
 
 export function AlvoradaCanvas({
+  initialElapsed,
   onContextLost,
+  onProgress,
   onReady,
   onSequenceComplete,
   quality,
+  rendererTier,
 }: AlvoradaCanvasProps) {
+  const elapsed = useRef(initialElapsed);
+  const handleProgress = useCallback((nextElapsed: number) => {
+    elapsed.current = nextElapsed;
+    onProgress(nextElapsed);
+  }, [onProgress]);
+  const handleContextLost = useCallback(() => {
+    onContextLost(elapsed.current);
+  }, [onContextLost]);
+
   return (
     <Canvas
       camera={{
@@ -52,7 +68,8 @@ export function AlvoradaCanvas({
       gl={{
         alpha: false,
         antialias: quality.antialias,
-        powerPreference: 'high-performance',
+        failIfMajorPerformanceCaveat: rendererTier === 'hardware',
+        powerPreference: rendererTier === 'hardware' ? 'high-performance' : 'default',
         stencil: false,
       }}
       performance={{ min: 0.55, debounce: 180 }}
@@ -65,9 +82,11 @@ export function AlvoradaCanvas({
         gl.setClearColor('#010713', 1);
       }}
     >
+      <CanvasRuntimeGuard onContextLost={handleContextLost} />
       <Suspense fallback={null}>
-        <CanvasRuntimeGuard onContextLost={onContextLost} />
         <SceneController
+          initialElapsed={initialElapsed}
+          onProgress={handleProgress}
           onReady={onReady}
           onSequenceComplete={onSequenceComplete}
           quality={quality}

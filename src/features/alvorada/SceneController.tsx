@@ -18,15 +18,22 @@ import { FenasojaTitle3D } from './scenes/FenasojaTitle3D';
 import { SantaRosaCity } from './scenes/SantaRosaCity';
 
 interface SceneControllerProps {
+  initialElapsed: number;
+  onProgress: (elapsed: number) => void;
   onReady: () => void;
   onSequenceComplete: () => void;
   quality: AlvoradaQualityProfile;
 }
 
 function MasterTimeline({
+  initialElapsed,
+  onProgress,
   onReady,
   onSequenceComplete,
-}: Pick<SceneControllerProps, 'onReady' | 'onSequenceComplete'>) {
+}: Pick<
+  SceneControllerProps,
+  'initialElapsed' | 'onProgress' | 'onReady' | 'onSequenceComplete'
+>) {
   const timeline = useAlvoradaTimeline();
   const startedAt = useRef<number | null>(null);
   const hiddenAt = useRef<number | null>(null);
@@ -55,7 +62,10 @@ function MasterTimeline({
     if (startedAt.current === null) startedAt.current = clockTime;
     const elapsed = Math.min(
       ALVORADA_SEQUENCE_DURATION,
-      Math.max(0, clockTime - startedAt.current - hiddenDuration.current),
+      Math.max(
+        0,
+        initialElapsed + clockTime - startedAt.current - hiddenDuration.current,
+      ),
     );
     const delta = Math.min(0.1, Math.max(0, elapsed - timeline.current.elapsed));
 
@@ -70,6 +80,8 @@ function MasterTimeline({
       timeline.current.progress = timeline.current.elapsed / ALVORADA_SEQUENCE_DURATION;
       timeline.current.phase = getAlvoradaPhase(timeline.current.elapsed);
     }
+
+    onProgress(timeline.current.elapsed);
 
     if (!complete.current && timeline.current.elapsed >= ALVORADA_SEQUENCE_DURATION) {
       complete.current = true;
@@ -108,12 +120,25 @@ function SceneAtmosphere() {
   return null;
 }
 
-export function SceneController({ onReady, onSequenceComplete, quality }: SceneControllerProps) {
-  const timeline = useRef(createInitialTimelineState()) as MutableRefObject<AlvoradaTimelineState>;
+export function SceneController({
+  initialElapsed,
+  onProgress,
+  onReady,
+  onSequenceComplete,
+  quality,
+}: SceneControllerProps) {
+  const timeline = useRef(
+    createInitialTimelineState(initialElapsed),
+  ) as MutableRefObject<AlvoradaTimelineState>;
 
   return (
     <AlvoradaTimelineContext.Provider value={timeline}>
-      <MasterTimeline onReady={onReady} onSequenceComplete={onSequenceComplete} />
+      <MasterTimeline
+        initialElapsed={initialElapsed}
+        onProgress={onProgress}
+        onReady={onReady}
+        onSequenceComplete={onSequenceComplete}
+      />
       <SceneAtmosphere />
       <CinematicCamera quality={quality} />
       <EarthScene />

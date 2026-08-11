@@ -1,3 +1,5 @@
+import type { AlvoradaWebGLTier } from './types';
+
 export interface AlvoradaQualityProfile {
   antialias: boolean;
   buildingCount: number;
@@ -44,24 +46,43 @@ export function warmAlvoradaAssets() {
   });
 }
 
-export function supportsAlvoradaWebGL() {
-  if (typeof document === 'undefined') return false;
-
+function canCreateWebGL2Context(attributes: WebGLContextAttributes) {
   try {
     const canvas = document.createElement('canvas');
-    if (typeof window.WebGL2RenderingContext === 'undefined') return false;
-    const context = canvas.getContext('webgl2', {
-      failIfMajorPerformanceCaveat: true,
-      powerPreference: 'high-performance',
-    });
-    context?.getExtension('WEBGL_lose_context')?.loseContext();
-    return Boolean(context);
+    const context = canvas.getContext('webgl2', attributes);
+    if (!context) return false;
+
+    context.getExtension('WEBGL_lose_context')?.loseContext();
+    return true;
   } catch {
     return false;
   }
 }
 
-export function getAlvoradaQualityProfile(): AlvoradaQualityProfile {
+export function getAlvoradaWebGLTier(): AlvoradaWebGLTier {
+  if (
+    typeof document === 'undefined'
+    || typeof window === 'undefined'
+    || typeof window.WebGL2RenderingContext === 'undefined'
+  ) {
+    return 'unavailable';
+  }
+
+  if (canCreateWebGL2Context({
+    failIfMajorPerformanceCaveat: true,
+    powerPreference: 'high-performance',
+  })) {
+    return 'hardware';
+  }
+
+  return canCreateWebGL2Context({ powerPreference: 'default' })
+    ? 'compatible'
+    : 'unavailable';
+}
+
+export function getAlvoradaQualityProfile(
+  rendererTier: AlvoradaWebGLTier = 'hardware',
+): AlvoradaQualityProfile {
   const coarsePointer = typeof window !== 'undefined'
     && window.matchMedia?.('(pointer: coarse)').matches;
   const narrowViewport = typeof window !== 'undefined' && window.innerWidth < 760;
@@ -71,21 +92,17 @@ export function getAlvoradaQualityProfile(): AlvoradaQualityProfile {
   const lowMemory = (navigatorHints?.deviceMemory ?? 8) <= 3;
   const lowConcurrency = (navigatorHints?.hardwareConcurrency ?? 8) <= 4;
   const mobile = Boolean(coarsePointer || narrowViewport);
-  const reduced = mobile || lowMemory || lowConcurrency;
+  const compatibleRenderer = rendererTier === 'compatible';
+  const reduced = compatibleRenderer || mobile || lowMemory || lowConcurrency;
 
   return {
     antialias: !reduced,
-    buildingCount: reduced ? 320 : 780,
-    cloudCount: reduced ? 7 : 13,
-    dpr: reduced ? [0.75, 1.1] : [1, 1.5],
+    buildingCount: compatibleRenderer ? 240 : reduced ? 320 : 780,
+    cloudCount: compatibleRenderer ? 5 : reduced ? 7 : 13,
+    dpr: compatibleRenderer ? [0.65, 1] : reduced ? [0.75, 1.1] : [1, 1.5],
     mobile,
-    shadowMapSize: reduced ? 512 : 1024,
+    shadowMapSize: compatibleRenderer ? 256 : reduced ? 512 : 1024,
     shadows: !reduced,
-    treeCount: reduced ? 320 : 680,
+    treeCount: compatibleRenderer ? 240 : reduced ? 320 : 680,
   };
-}
-
-export function prefersReducedAlvoradaMotion() {
-  return typeof window !== 'undefined'
-    && Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches);
 }

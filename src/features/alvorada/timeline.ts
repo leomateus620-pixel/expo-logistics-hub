@@ -59,11 +59,13 @@ export function getAlvoradaPhase(elapsed: number): AlvoradaPhase {
   return 'finalHold';
 }
 
-export function createInitialTimelineState(): AlvoradaTimelineState {
+export function createInitialTimelineState(initialElapsed = 0): AlvoradaTimelineState {
+  const elapsed = Math.min(ALVORADA_SEQUENCE_DURATION, Math.max(0, initialElapsed));
+
   return {
-    elapsed: 0,
+    elapsed,
     delta: 0,
-    progress: 0,
-    phase: 'orbitalBrazil',
+    progress: elapsed / ALVORADA_SEQUENCE_DURATION,
+    phase: getAlvoradaPhase(elapsed),
   };
 }
