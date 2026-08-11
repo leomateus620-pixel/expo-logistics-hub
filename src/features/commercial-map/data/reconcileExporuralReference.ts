@@ -2,7 +2,7 @@ import { OFFICIAL_REFERENCE_REVISION } from './officialReference2026';
 import type { CommercialMapData } from '../types';
 
 const STALE_EXPORURAL_MESSAGE = [
-  'A revisão Exporural 2026.3 ainda não foi confirmada na base persistida.',
+  'A revisão Exporural 2026.4 ainda não foi confirmada na base persistida.',
   'A visualização mantém exatamente as geometrias e áreas retornadas pelo banco até que um administrador execute a migração versionada.',
 ].join(' ');
 

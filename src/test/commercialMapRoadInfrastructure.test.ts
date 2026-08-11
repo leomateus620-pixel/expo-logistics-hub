@@ -58,7 +58,7 @@ describe('infraestrutura viária do Mapa Comercial', () => {
     expect(ROAD_SURFACE_PROFILE.asphaltBumpScale).toBeLessThanOrEqual(0.008);
   });
 
-  it('fecha somente as três microfrestas validadas entre corredores oficiais', () => {
+  it('mantém somente a microfresta herdada fora da Exporural', () => {
     const byId = new Map(roads.map((entity) => [entity.id, entity.name]));
     const microGaps = findRoadConnections(roads)
       .filter((connection) => connection.kind === 'micro-gap')
@@ -67,9 +67,24 @@ describe('infraestrutura viária do Mapa Comercial', () => {
 
     expect(microGaps).toEqual([
       'Rua Argentina + Rua Montevidéu',
-      'Rua Gustavo Bessel + Rua Pastor Albert Lehenbauer',
-      'Rua Johan Muller + Rua Pastor Albert Lehenbauer',
     ]);
+  });
+
+  it('materializa o grafo contínuo de A8/A9 e das ruas internas da Exporural', () => {
+    const byId = new Map(roads.map((entity) => [entity.id, entity.name]));
+    const connections = new Set(findRoadConnections(roads)
+      .filter((connection) => connection.kind === 'overlap')
+      .map((connection) => [byId.get(connection.firstId), byId.get(connection.secondId)].sort().join(' + ')));
+
+    [
+      'Rua Bruno Schwartz + Rua Pastor Albert Lehenbauer',
+      'Rua Johan Muller + Rua Pastor Albert Lehenbauer',
+      'Rua Gustavo Bessel + Rua Pastor Albert Lehenbauer',
+      'Rua 15 de Novembro + Rua Bruno Schwartz',
+      'Rua 15 de Novembro + Rua Johan Muller',
+      'Rua 15 de Novembro + Rua Gustavo Bessel',
+      'Rua 15 de Novembro + Rua Emanuel Brachmann',
+    ].forEach((edge) => expect(connections.has(edge), edge).toBe(true));
   });
 
   it('mantém acessos abertos e interrompe meios-fios nas interseções', () => {
@@ -93,7 +108,7 @@ describe('infraestrutura viária do Mapa Comercial', () => {
       expect(detailed.diagnostics).toMatchObject({
         roadCount: 21,
         pedestrianPathCount: 1,
-        microGapCount: 3,
+        microGapCount: 1,
       });
       expect(detailed.diagnostics.estimatedBaseDrawCalls)
         .toBeLessThanOrEqual(ROAD_INFRASTRUCTURE.maximumBaseDrawCalls);

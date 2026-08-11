@@ -1,11 +1,12 @@
 # Matriz de validação cadastral — Exporural 2026
 
-Revisão geométrica: `2026.3-exporural.1`
+Revisão geométrica vigente: `2026.4-exporural.1`
 
 Fontes efetivamente fornecidas e conferidas:
 
 - `Exporural.jpg`: organização topológica, nomenclatura, vias e estruturas;
 - `IMG_8480.jpeg`, `IMG_8481.jpeg` e `IMG_8482.jpeg`: numeração, cotas e áreas cadastrais;
+- planta oficial integral Fenasoja 2026 (SHA-256 `650080ace6fa8656863f9decc98d5fc6721eb8a2e91f48e18a28e280434eea38`) e os cinco pares de recortes de detalhe registrados em `EXPORURAL_CARTOGRAPHIC_FIDELITY_2026_4.md`: continuidade viária A8/A9, extensão A7/B8, cruzamento central e borda R-56–R-59;
 - os anexos 5, 6 e 7 mencionados no briefing não foram fornecidos nesta execução e não originaram nenhum dado estimado.
 
 A escala técnica usa controles repetidos de 30 m × 15 m das plantas cadastrais: 6,875 unidades da planta por metro, equivalentes a 0,15 unidade de cena por metro. A área calculada abaixo vem do polígono-fonte calibrado, sem substituir o valor oficial transcrito.
@@ -117,3 +118,5 @@ A escala técnica usa controles repetidos de 30 m × 15 m das plantas cadastrais
 | **Exporural** | **95** | **47.884,87** | **47.884,87** | **0,00** |
 
 Os testes automatizados repetem a contagem, os totais, a tolerância individual, a validade dos polígonos e a ausência de sobreposição interior. Limites compartilhados entre lotes vizinhos são aceitos; invasão real de interior é bloqueada.
+
+Na revisão 2026.4, `B35`, `B36` e `D6-01` a `D6-03` deixam de integrar a cartografia ativa. A remoção é exclusiva aos cinco overlays: os 95 lotes e 47.884,87 m² permanecem invariantes, inclusive `Q-S-17` e `Q-R-52` a `Q-R-55`.

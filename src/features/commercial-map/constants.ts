@@ -164,7 +164,8 @@ export const CAMERA_PRESETS = {
   exporural: { label: 'Visão geral da Exporural', position: [58, 42, 16] as const, target: [27.5, 0, -22.6] as const },
   'quadra-r': { label: 'Quadra R', position: [48, 27, 4] as const, target: [28, 0, -17.2] as const },
   'quadra-s': { label: 'Quadra S', position: [49, 26, -8] as const, target: [34, 0, -32.1] as const },
-  semear: { label: 'Área Semear', position: [62, 18, -7] as const, target: [53.1, 0, -22.4] as const },
+  // Stable key retained for saved UI state; the target no longer represents B36/Palco Semear.
+  semear: { label: 'Extremo leste da Exporural', position: [62, 18, -7] as const, target: [52.4, 0, -22.6] as const },
 };
 
 export const MAP_CAPABILITIES = [

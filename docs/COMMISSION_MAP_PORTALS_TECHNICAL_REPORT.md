@@ -1,8 +1,18 @@
 # Portais Exporural e Indústria, Comércio e Serviços
 
+## Atualização cartográfica Exporural 2026.4
+
+A revisão local `2026.4-exporural.1` substitui a geometria Exporural 2026.3 pela reconstrução baseada na planta oficial e nos recortes de detalhe recebidos em 11/08/2026. O mapa completo, o filtro Exporural e o portal vinculado continuam consumindo a mesma referência canônica; nenhuma rota, guard ou regra de navegação foi alterada.
+
+O inventário-base Exporural passa a **111 entidades / 95 lotes**. A redução de cinco entidades corresponde somente a `B35` (Simulador AGCO), `B36` (Palco Semear) e `D6-01` a `D6-03` (Food Trucks). Os 95 lotes permanecem, inclusive `Q-S-17` e `Q-R-52` a `Q-R-55`, que formam o substrato cadastral sob esses overlays.
+
+A migration aditiva `20260811153000_apply_exporural_reference_2026_4_fidelity.sql` versiona as geometrias, arquiva somente esses cinco apoios após preflight e atualiza resolver, atribuição canônica, RPC auditada e baseline 111/95. Sua aplicação e a validação autenticada no projeto Supabase correto continuam **NO-GO** até a execução dos gates remotos desta página. O manifesto de fontes e a matriz de validação específica estão em `EXPORURAL_CARTOGRAPHIC_FIDELITY_2026_4.md`.
+
+Evidência local 2026.4: 140/140 testes focados aprovados em 21 arquivos; type-check, ESLint tocado e build aprovados; migration aceita pelo `pglast` (23 statements); Canvas corrigido validado em 1440 × 900 e 480 × 844 nas vistas superior e isométrica. A suíte global manteve 635 testes aprovados e 29 falhas herdadas exclusivamente nos quatro arquivos de Cronograma fora do diff.
+
 ## Situação da entrega
 
-Migrations aplicadas e referência oficial 2026.3 semeada no banco atual. Inventário e isolamento validados com sessões reais (05/08/2026):
+Evidência histórica da referência oficial 2026.3, anterior à correção 2026.4: migrations aplicadas e inventário/isolamento validados com sessões reais em 05/08/2026:
 
 - projeto cartográfico `0538d132-34dd-4347-a33c-526edac7339c`, revisão `2026.3`, 13 camadas, 415 entidades, 262 lotes;
 - `validate_commercial_map_segments`: `exporural` 116 entidades / 95 lotes e `industria-comercio-servicos` 140 entidades / 103 lotes, `complete = true`, geometria vigente 1:1, `invalidSegmentReferences = 0`, `exclusiveAssignmentConflicts = 0`;
@@ -34,7 +44,7 @@ A migration `20260804090000_create_commission_map_segments.sql` cria `map_segmen
 
 | Segmento | Inventário-base | Delimitação canônica |
 | --- | --- | --- |
-| Exporural | 116 entidades / 95 lotes | Quadras R e S, vias e estruturas rurais explicitamente classificadas; `B7`, `B8` e `D3` excluídos |
+| Exporural | 111 entidades / 95 lotes após 2026.4 (116/95 na evidência histórica 2026.3) | Quadras R e S, vias e estruturas rurais explicitamente classificadas; `B35`, `B36`, `D6-01` a `D6-03`, `B7`, `B8` e `D3` excluídos |
 | Indústria, Comércio e Serviços | 140 entidades / 103 lotes | Quadras M, G, L, F, J, E, I e D e suas estruturas comerciais, com lista explícita de exclusões fora do contorno aprovado |
 
 No modo comissão:
@@ -83,7 +93,7 @@ Triggers preservam projeto e segmento em operações de linhagem, impedem troca 
 ### Dívida global separada
 
 - `eslint .` ainda reporta **974 erros e 33 warnings herdados** do repositório; esse resultado não é apresentado como verde.
-- A rodada global final terminou com **464 testes aprovados e 27 falhas em 4 arquivos**. Todas as falhas remanescentes estão nas suítes preexistentes de Cronograma (`cronogramaMobileOverlays`, `cronogramaMobilePresentation`, `eventHarvestCompletion` e `cronogramaTimeline`); as suítes dos portais e do mapa ficaram verdes.
+- A rodada global atual terminou com **635 testes aprovados e 29 falhas em 4 arquivos**. Todas as falhas remanescentes estão nas suítes preexistentes de Cronograma (`cronogramaMobileOverlays`, `cronogramaMobilePresentation`, `eventHarvestCompletion` e `cronogramaTimeline`); as suítes dos portais e do mapa ficaram verdes.
 
 ## Gate de implantação — NO-GO
 

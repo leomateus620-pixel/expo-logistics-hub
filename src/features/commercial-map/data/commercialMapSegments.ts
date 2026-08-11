@@ -1,6 +1,7 @@
 import {
   EXPORURAL_AREA_CODE,
   EXPORURAL_PROTECTED_IDENTIFIERS,
+  EXPORURAL_REMOVED_IDENTIFIERS,
   EXPORURAL_ROAD_IDENTIFIERS,
   EXPORURAL_SUPPORT_IDENTIFIERS,
 } from './exporuralReference2026';
@@ -103,11 +104,16 @@ export const COMMERCIAL_MAP_SEGMENTS: readonly CommercialMapSegmentDefinition[] 
     },
     boundary: {
       source: 'official-cadastral-2026',
-      reference: 'Perímetro cadastral Exporural 2026.3',
+      reference: 'Perímetro cadastral Exporural 2026.4',
       resolution: 'explicit-entity-union',
       blockIdentifiers: ['QUADRA-R', 'QUADRA-S'],
-      perimeter: ['Rua Ubiretama', 'Rua Bruno Schwartz', 'Rua Gustavo Bessel', 'Rua Emanuel Brachmann'],
-      excludedIdentifiers: EXPORURAL_PROTECTED_IDENTIFIERS,
+      perimeter: [
+        'Norte — acessos A8/A9 e faixa inferior ao estacionamento',
+        'Oeste — Rua Pastor Albert Lehenbauer e extensão A7',
+        'Leste — Rua Ubiretama',
+        'Sul — Rua Emanuel Brachmann e contorno irregular de R-56 a R-59',
+      ],
+      excludedIdentifiers: [...EXPORURAL_PROTECTED_IDENTIFIERS, ...EXPORURAL_REMOVED_IDENTIFIERS],
     },
     membership: {
       blockCodes: ['R', 'S'],
@@ -116,7 +122,7 @@ export const COMMERCIAL_MAP_SEGMENTS: readonly CommercialMapSegmentDefinition[] 
         ...EXPORURAL_ROAD_IDENTIFIERS,
         ...EXPORURAL_SUPPORT_IDENTIFIERS,
       ],
-      excludedIdentifiers: EXPORURAL_PROTECTED_IDENTIFIERS,
+      excludedIdentifiers: [...EXPORURAL_PROTECTED_IDENTIFIERS, ...EXPORURAL_REMOVED_IDENTIFIERS],
     },
     camera: {
       direction: [0.62, 0.72, 0.46],

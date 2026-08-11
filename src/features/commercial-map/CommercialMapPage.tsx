@@ -409,9 +409,9 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
                 <AlertDialogContent>
                   <AlertDialogHeader>
                     <div className="commercial-map-dialog-icon"><DatabaseZap /></div>
-                    <AlertDialogTitle>Aplicar a revisão Exporural 2026.3?</AlertDialogTitle>
+                    <AlertDialogTitle>Aplicar a revisão Exporural 2026.4?</AlertDialogTitle>
                     <AlertDialogDescription>
-                      A operação é limitada às Quadras R/S, suas sete ruas e apoios confirmados. Antes de escrever, o banco valida áreas, sobreposições e estruturas protegidas, cria um snapshot e preserva status, preços, reservas, vendas e contratos.
+                      A operação é limitada às Quadras R/S, suas sete ruas e seis apoios confirmados. Antes de escrever, o banco valida áreas, sobreposições e estruturas protegidas, cria um snapshot e preserva status, preços, reservas, vendas e contratos.
                     </AlertDialogDescription>
                   </AlertDialogHeader>
                   <AlertDialogFooter>

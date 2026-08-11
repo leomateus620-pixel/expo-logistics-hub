@@ -44,7 +44,8 @@ interface ReferenceEntityInput {
   metadata?: Record<string, unknown>;
 }
 
-export const OFFICIAL_REFERENCE_REVISION = '2026.3';
+export const OFFICIAL_REFERENCE_REVISION = '2026.4';
+const NON_EXPORURAL_SOURCE_REVISION = '2026.3';
 
 /**
  * Reproducible crop used by the runtime underlay. Coordinates are PDF points
@@ -124,14 +125,19 @@ function addEntity(input: ReferenceEntityInput) {
   entityInputs.push(input);
 }
 
-function addQuadra(code: string, bounds: PdfBounds, metadata?: Record<string, unknown>) {
+function addQuadra(
+  code: string,
+  bounds: PdfBounds,
+  metadata?: Record<string, unknown>,
+  sourcePolygon?: PdfPolygon,
+) {
   const isExporural = code === 'R' || code === 'S';
   addEntity({
     publicIdentifier: `QUADRA-${code}`,
     name: `Quadra ${code}`,
     classification: 'QUADRA',
     layer: 'quadras',
-    polygon: rectPdf(bounds),
+    polygon: sourcePolygon ?? rectPdf(bounds),
     height: 0.025,
     parentPublicIdentifier: isExporural ? EXPORURAL_AREA_CODE : undefined,
     verificationStatus: isExporural ? 'VERIFIED' : undefined,
@@ -193,22 +199,36 @@ function addTwoRowGrid(block: string, bounds: PdfBounds, top: number[], bottom: 
   addRow(block, bottom, [x1, middle, x2, y2]);
 }
 
+const EXPORURAL_AREA_SOURCE_POLYGON: PdfPolygon = [
+  [3985, 1265], [6008, 1265], [6008, 2372], [5966, 2372],
+  [5880, 2570], [5832, 2640], [5700, 2660], [5600, 2645],
+  [5500, 2615], [5370, 2520], [5140, 2490], [5100, 2482],
+  [4980, 2482], [4100, 2438], [3994, 2438], [3984, 2438],
+  [3984, 2445], [3945, 2445], [3940, 2418], [3687, 2418],
+  [3562, 2388], [3541, 2180], [3244, 2167], [3230, 2080],
+  [3230, 1760], [3945, 1760], [3945, 1265],
+];
+
+const EXPORURAL_R_SOURCE_POLYGON: PdfPolygon = [
+  [3230, 1760], [5966, 1760], [5966, 2372], [5880, 2570],
+  [5832, 2640], [5700, 2660], [5600, 2645],
+  [5500, 2615], [5370, 2520], [5140, 2490], [5100, 2482],
+  [4980, 2482], [4100, 2438], [3994, 2438], [3984, 2438],
+  [3984, 2445], [3945, 2445], [3940, 2418], [3687, 2418],
+  [3562, 2388], [3541, 2180], [3244, 2167], [3230, 2080],
+];
+
+const EXPORURAL_S_SOURCE_POLYGON: PdfPolygon = [
+  [3985, 1265], [6008, 1265], [6008, 1762], [3985, 1762],
+];
+
 addEntity({
   publicIdentifier: EXPORURAL_AREA_CODE,
   name: 'Exporural',
   description: 'Setor cadastral Exporural, composto pelas Quadras R e S, suas vias internas e estruturas de apoio.',
   classification: 'RURAL_EXHIBITION',
   layer: 'exporural',
-  polygon: [
-    [3230, 1265],
-    [6008, 1265],
-    [6008, 2080],
-    [5948, 2334],
-    [5840, 2600],
-    [5140, 2585],
-    [3940, 2467],
-    [3230, 2445],
-  ],
+  polygon: EXPORURAL_AREA_SOURCE_POLYGON,
   height: 0.018,
   verificationStatus: 'VERIFIED',
   metadata: {
@@ -217,7 +237,7 @@ addEntity({
     renderMode: 'outline',
     labelPriority: 'area',
     geometryRevision: EXPORURAL_GEOMETRY_REVISION,
-    geometryBoundsSource: [3230, 1265, 6008, 2600],
+    geometryBoundsSource: [3230, 1265, 6008, 2660],
     defaultCameraPreset: 'exporural',
     mapUnitsPerMeter: EXPORURAL_MAP_UNITS_PER_METER,
     sourceManifest: EXPORURAL_SOURCE_MANIFEST,
@@ -251,6 +271,7 @@ addEntity({
   code,
   bounds,
   code === 'G' ? { unresolvedPrintedLots: ['03', '04'], sourceNote: 'B40 cobre a coluna regular; os números 03/04 não estão impressos no mapa oficial.' } : undefined,
+  code === 'R' ? EXPORURAL_R_SOURCE_POLYGON : code === 'S' ? EXPORURAL_S_SOURCE_POLYGON : undefined,
 ));
 
 // Quadras R/S — explicit, calibrated polygons from the Exporural cadastral
@@ -274,7 +295,6 @@ EXPORURAL_LOT_REFERENCES.forEach((reference) => addLot(
     cartographicAreaOnly: false,
     officialMeasurements: true,
     areaValidationStatus: 'VALIDATED',
-    infrastructureOverlay: reference.block === 'S' && reference.lotNumber === '17' ? 'B35' : undefined,
   },
 ));
 
@@ -331,13 +351,24 @@ Object.entries(expectedLotCounts).forEach(([block, expected]) => {
 
 // Internal streets and public circulation — each corridor remains a real separator.
 const roadInputs: Array<[string, string, PdfPolygon, MapClassification?]> = [
-  ['RUA-BRUNO-SCHWARTZ', 'Rua Bruno Schwartz', rectPdf([3985, 1484, 5966, 1518])],
-  ['RUA-JOHAN-MULLER', 'Rua Johan Muller', rectPdf([3985, 1726, 5966, 1762])],
-  ['RUA-GUSTAVO-BESSEL', 'Rua Gustavo Bessel', rectPdf([3985, 2041, 5966, 2078])],
-  ['RUA-EMANUEL-BRACHMANN', 'Rua Emanuel Brachmann', rectPdf([4980, 2333, 5966, 2372])],
-  ['RUA-PASTOR-ALBERT-LEHENBAUER', 'Rua Pastor Albert Lehenbauer', rectPdf([3945, 1758, 3984, 2445])],
-  ['RUA-15-NOVEMBRO', 'Rua 15 de Novembro', rectPdf([5188, 1758, 5226, 2372])],
-  ['RUA-UBIRETAMA', 'Rua Ubiretama', rectPdf([5966, 1265, 6008, 2080])],
+  ['RUA-BRUNO-SCHWARTZ', 'Rua Bruno Schwartz', rectPdf([3984, 1484, 5966, 1518])],
+  ['RUA-JOHAN-MULLER', 'Rua Johan Muller', rectPdf([3984, 1726, 5966, 1762])],
+  ['RUA-GUSTAVO-BESSEL', 'Rua Gustavo Bessel', [
+    [3230, 2058], [3985, 2058], [3985, 2041], [5966, 2041],
+    [5966, 2078], [3985, 2078], [3985, 2080], [3230, 2080],
+  ]],
+  ['RUA-EMANUEL-BRACHMANN', 'Rua Emanuel Brachmann', rectPdf([5227, 2333, 5966, 2372])],
+  ['RUA-PASTOR-ALBERT-LEHENBAUER', 'Rua Pastor Albert Lehenbauer', [
+    [3968, 1265], [4004, 1265], [4004, 1484], [3985, 1518],
+    [3984, 1726], [3984, 2445], [3945, 2445], [3945, 1758],
+    [3963, 1726], [3963, 1518], [3968, 1484],
+  ]],
+  ['RUA-15-NOVEMBRO', 'Rua 15 de Novembro', rectPdf([5188, 1265, 5227, 2372])],
+  ['RUA-UBIRETAMA', 'Rua Ubiretama', [
+    [5966, 1265], [6008, 1265], [6008, 2080], [5960, 2320],
+    [5880, 2570], [5832, 2640], [5800, 2618], [5842, 2550],
+    [5920, 2310], [5966, 2070],
+  ]],
   ['RUA-BUENOS-AIRES', 'Rua Buenos Aires', rectPdf([1600, 2410, 1648, 3145])],
   ['RUA-PARAGUAI', 'Rua Paraguai', rectPdf([1640, 2444, 3945, 2467])],
   ['RUA-BOLIVIA', 'Rua Bolívia', rectPdf([1640, 2579, 3945, 2624])],
@@ -469,20 +500,14 @@ const bStructures: Array<[string, string, MapClassification, string, PdfBounds |
   ['B32', 'Expo BM', 'SECURITY', 'safety', [4198, 3927], { parent: 'A', width: 70, depth: 125 }],
   ['B33', 'ACISAP', 'BUILDING', 'structures', [2997, 3803], { width: 84, depth: 52 }],
   ['B34', 'Tomelero', 'BUILDING', 'structures', [2821, 3803], { width: 84, depth: 52 }],
-  ['B35', 'Simulador AGCO', 'ATTRACTION', 'structures', [5784, 1625], { parent: 'S', width: 96, depth: 120 }],
-  ['B36', 'Palco Semear', 'EVENT_VENUE', 'structures', [5748, 1846, 5850, 1950], {
-    parent: 'R',
-    height: 1.05,
-    metadata: {
-      entityType: 'EXPORURAL_NON_COMMERCIAL_STAGE',
-      nonCommercial: true,
-      supportOverlayForLots: ['R-53', 'R-54', 'R-55'],
-      replacesLegacyMonolith: 'Espaço Semear',
-      geometryRevision: EXPORURAL_GEOMETRY_REVISION,
-    },
+  ['B37', 'Comissão Exporural', 'ADMINISTRATION', 'structures', [5380, 1324], {
+    parent: 'S', width: 84, depth: 88, height: 0.18,
+    metadata: { overlaysLotsWithoutRemovingThem: true, hostLot: 'S-24' },
   }],
-  ['B37', 'Comissão Exporural', 'ADMINISTRATION', 'structures', [5380, 1324], { parent: 'S', width: 84, depth: 88 }],
-  ['B38', 'Área de Lazer', 'ATTRACTION', 'structures', [5278, 1438], { parent: 'S', width: 88, depth: 82 }],
+  ['B38', 'Área de Lazer', 'ATTRACTION', 'structures', [5278, 1438], {
+    parent: 'S', width: 88, depth: 82, height: 0.18,
+    metadata: { overlaysLotsWithoutRemovingThem: true, hostLot: 'S-25' },
+  }],
   ['B39', 'Caminhos da Soja — Emater / Ascar', 'ATTRACTION', 'structures', [1960, 2500, 2148, 2574], { parent: 'V', metadata: { overlaysLotsWithoutRemovingThem: true } }],
   ['B40', 'Espaço Institucional — Emater / Ascar', 'BUILDING', 'structures', [3553, 2645, 3618, 2828], { parent: 'G', metadata: { suppressesUnprintedLots: ['03', '04'] } }],
   ['B41', 'Sala de Reuniões Fenasoja', 'ADMINISTRATION', 'structures', [2266, 3740], { width: 74, depth: 66 }],
@@ -511,19 +536,6 @@ const namedStructures: Array<[string, string, MapClassification, string, PdfBoun
   ['J', 'Parque de Diversões', 'ATTRACTION', 'structures', [930, 2450, 1600, 3000], { parent: 'X', height: 0.12, verificationStatus: 'NEEDS_REVIEW', metadata: { sourceDiscrepancy: 'Marcador J visível no mapa e ausente na legenda inferior.' } }],
 ];
 namedStructures.forEach(([code, name, classification, layer, footprint, options]) => addStructure(code, name, classification, layer, footprint, options));
-
-([
-  ['D6-01', [5626, 1813]],
-  ['D6-02', [5626, 1901]],
-  ['D6-03', [5626, 1988]],
-] as Array<[string, PdfPoint]>).forEach(([id, center], index) => addStructure(
-  id,
-  'Food Truck',
-  'FOOD_AREA',
-  'food',
-  center,
-  { parent: 'R', width: 42, depth: 74, height: 0.55, metadata: { legendCode: 'D6', instance: index + 1 } },
-));
 
 // Repeated official E markers are sanitary facilities, never water features.
 export const OFFICIAL_RESTROOM_CENTERS_2026: readonly PdfPoint[] = [
@@ -600,7 +612,7 @@ function toEntity(input: ReferenceEntityInput): MapEntity {
     ),
     metadata: {
       seedManaged: true,
-      sourceRevision: OFFICIAL_REFERENCE_REVISION,
+      sourceRevision: isExporural ? OFFICIAL_REFERENCE_REVISION : NON_EXPORURAL_SOURCE_REVISION,
       source: 'Mapa oficial Fenasoja 2026 — PDF Mapa do Parque 300x200',
       cartographicConfidence: 'official_visual_reference',
       officialMeasurements: false,
@@ -682,7 +694,7 @@ export const OFFICIAL_REFERENCE_DATA: CommercialMapData = {
     coordinateSystem: 'LOCAL_NORMALIZED',
     referenceWidth: MAP_REFERENCE_WIDTH,
     referenceHeight: MAP_REFERENCE_HEIGHT,
-    activeVersion: 4,
+    activeVersion: 5,
     isPublished: false,
     referenceRevision: OFFICIAL_REFERENCE_REVISION,
   },
@@ -703,7 +715,7 @@ export const OFFICIAL_REFERENCE_DATA: CommercialMapData = {
     knownDistanceMeters: null,
     mapUnitsPerMeter: null,
     status: 'UNVALIDATED',
-    version: 4,
+    version: 5,
   },
   layers: DEFAULT_REFERENCE_LAYERS,
   entities: OFFICIAL_REFERENCE_ENTITIES,

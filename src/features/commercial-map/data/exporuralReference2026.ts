@@ -19,8 +19,8 @@ export interface ExporuralLotReference {
 }
 
 export const EXPORURAL_AREA_CODE = 'EXPORURAL';
-export const EXPORURAL_GEOMETRY_REVISION = '2026.3-exporural.1';
-export const EXPORURAL_GEOMETRY_VERSION = 4;
+export const EXPORURAL_GEOMETRY_REVISION = '2026.4-exporural.1';
+export const EXPORURAL_GEOMETRY_VERSION = 5;
 
 /**
  * Cross-calibration from repeated 30 m x 15 m cadastral modules in Annexes
@@ -34,6 +34,38 @@ export const EXPORURAL_AREA_TOLERANCE_PERCENT = 0.15;
 export const EXPORURAL_SOURCE_MANIFEST = {
   topology: 'Exporural.jpg',
   cadastral: ['IMG_8480.jpeg', 'IMG_8481.jpeg', 'IMG_8482.jpeg'],
+  fullMap: {
+    filename: 'codex-clipboard-e3d3649c-c6c2-4167-9615-c2019fb634f4.jpg',
+    role: 'official-cartographic-source-of-truth',
+    sha256: '650080ace6fa8656863f9decc98d5fc6721eb8a2e91f48e18a28e280434eea38',
+  },
+  detailReferences: [
+    {
+      role: 'a8-and-central-rua-15-de-novembro',
+      current: { filename: '6e76daf3-60ba-40e1-901b-53a5a9c04a05.png', sha256: 'f425d874e10581b9d6f59edb0dd06e4e7b341e3b1b581f660fb843616b5e049c' },
+      official: { filename: '183e3347-b274-4393-9c4e-15cba2389bc3.png', sha256: 'b47bf70672388c6fb81bf6b97ca510ae002412e4edc0122e754fed09472c653c' },
+    },
+    {
+      role: 'a9-western-street-continuity',
+      current: { filename: '3ecc5c43-1ef5-44df-8a91-ee8fe16a6402.png', sha256: '9e5aaad41f3cdc00c08409a673db2385bac36a98bdbd9d888a6dcb359d456501' },
+      official: { filename: '04ca722b-7e9c-4d19-9615-7c22e41dd00f.png', sha256: 'be457f724827ff9e8649e1f3b591fb0588c9dd775cb3c603de2bb5fa48f3d7ee' },
+    },
+    {
+      role: 'a7-western-lot-extension',
+      current: { filename: '52f185d3-0b95-4445-b5cf-22d050cf9f36.png', sha256: '2fd0fbf1778dcbb75aa59a32c8ab1acb9f0cc32d485d3e8d2563a1d5d9d15727' },
+      official: { filename: 'f7e16047-7c04-49d3-9c92-9ceee9ba1bc2.png', sha256: '67d190f059898a330379f19aa92be856027551fbe4a47910ad5d0ad2b1ea97da' },
+    },
+    {
+      role: 'southern-r56-r59-perimeter',
+      current: { filename: 'b0e897c7-f592-4bc6-a667-9a5cfc605d7e.png', sha256: '63fd6dbefd669bae650bb6a0fd25c3fa8b83596f21f4cfe587dc016dd40c992a' },
+      official: { filename: '60f64bd3-b01e-4f96-bbf2-c9b356ef1d2a.png', sha256: 'e19c13c602dbaa42bc1b5e186debc9d756dd5416609530e7021e0df2bbdbbf22' },
+    },
+    {
+      role: 'central-islands-28-30-and-41-43',
+      current: { filename: '59ad9094-460d-463c-a582-c7bc958fb109.png', sha256: 'ae42a37f97570ed7994c61a851a82f024949948454532d87b6737b7f2a7bc4e2' },
+      official: { filename: 'codex-clipboard-e3d3649c-c6c2-4167-9615-c2019fb634f4.jpg', sha256: '650080ace6fa8656863f9decc98d5fc6721eb8a2e91f48e18a28e280434eea38' },
+    },
+  ],
   calibrationControls: [
     'Quadra S: módulos repetidos de 30,00 m × 15,00 m',
     'Quadra R: módulos repetidos de 500,00 m² com cotas longitudinais próximas de 40,00 m',
@@ -228,10 +260,68 @@ function pushHorizontalRow(
   });
 }
 
+/**
+ * Official R-islands have one continuous, level frontage and one continuous
+ * rear edge. Only the outside corners are softened; internal dividers remain
+ * full-depth and shared by adjacent parcels.
+ */
+function roundedIslandParcelForArea(
+  x: number,
+  y: number,
+  depth: number,
+  officialAreaSqm: number,
+  edge: 'left' | 'none' | 'right',
+  radius = 12,
+) {
+  const nominalWidth = (officialAreaSqm * SOURCE_AREA_PER_SQM) / depth;
+  const width = nominalWidth + (edge === 'none' ? 0 : radius * 0.18);
+  if (edge === 'none') return rectangleForArea(x, y, depth, officialAreaSqm);
+  const raw: Coordinate[] = edge === 'left'
+    ? [
+        [x + radius, y], [x + width, y], [x + width, y + depth], [x + radius, y + depth],
+        [x + 4, y + depth - 4], [x, y + depth - radius], [x, y + radius], [x + 4, y + 4],
+      ]
+    : [
+        [x, y], [x + width - radius, y], [x + width - 4, y + 4], [x + width, y + radius],
+        [x + width, y + depth - radius], [x + width - 4, y + depth - 4],
+        [x + width - radius, y + depth], [x, y + depth],
+      ];
+  return fitPolygonAreaX(raw, officialAreaSqm, x);
+}
+
+function pushEqualDepthIsland(
+  numbers: number[],
+  startX: number,
+  y: number,
+  depth: number,
+  softenLast = true,
+) {
+  let cursor = startX;
+  numbers.forEach((number, index) => {
+    const edge = index === 0
+      ? 'left'
+      : index === numbers.length - 1 && softenLast
+        ? 'right'
+        : 'none';
+    const polygon = roundedIslandParcelForArea(cursor, y, depth, rAreas[number], edge);
+    pushReference(
+      'R',
+      number,
+      polygon,
+      edge === 'none' ? 'regular' : 'rounded-end',
+      edge === 'none'
+        ? 'Ilha cadastral com frente e fundo nivelados e divisas internas contínuas.'
+        : 'Terminal externo suavizado sem deformar a rua nem a divisa compartilhada.',
+    );
+    cursor = maxX(polygon);
+  });
+  return cursor;
+}
+
 // Quadra S: four independent bands separated by Rua Bruno Schwartz and the
 // transversal Portão 8 corridor. Numbering deliberately follows the source.
 pushHorizontalRow('S', [36, 35, 34, 33, 32, 31, 30, 29, 28, 27, 26], 4004, 1277, 206.25, { 26: 'right' });
-pushHorizontalRow('S', [25, 24, 23, 22, 21, 20, 19], 5227, 1277, 206.25, { 25: 'left', 19: 'right' });
+pushHorizontalRow('S', [25, 24, 23, 22, 21, 20, 19], 5227, 1277, 206.25, { 19: 'right' });
 pushHorizontalRow('S', [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11], 4004, 1519, 206.25, { 1: 'left', 11: 'right' });
 pushHorizontalRow('S', [12, 13, 14, 15, 16, 17, 18], 5227, 1519, 206.25, { 12: 'left', 18: 'right' });
 
@@ -246,13 +336,24 @@ pushHorizontalRow('R', [9, 10, 11, 12, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40], 
 // independent R-53, R-54 and R-55 cadastral parcels; R-55 keeps its large arc.
 pushHorizontalRow('R', [48, 49, 50, 51, 52, 53, 54, 55], 5227, 1763, 270, { 48: 'left', 55: 'right' });
 
-// Distinct western parcels with their own proportions.
-pushReference('R', 13, trapezoidForArea(3244, 2080, 98, 94, rAreas[13], 2), 'trapezoid', 'Parcela transversal própria, separada de R-14 e da estrutura B8.');
-pushReference('R', 14, roundedEndForArea(3541, 2080, 292, rAreas[14], 'left', 18), 'rounded-end', 'Parcela longitudinal de contorno próprio, sem absorver R-01/R-02.');
+// A7 western extension: the four official footprints share their printed
+// edges. R-13 remains a shallow strip, R-14 follows the tapered west contour,
+// and R-01/R-02 stay stacked beside Rua Pastor Albert Lehenbauer.
+const r13Width = 297;
+const r13LeftDepth = 85;
+const r13RightDepth = (2 * rAreas[13] * SOURCE_AREA_PER_SQM) / r13Width - r13LeftDepth;
+const r13RightBottom = 2080 + r13RightDepth;
+pushReference('R', 13, [
+  [3244, 2080], [3541, 2080], [3541, r13RightBottom], [3244, 2080 + r13LeftDepth],
+], 'trapezoid', 'Faixa rasa de A7, com divisa contínua com R-14 e sem absorver B8.');
 
-const r01 = trapezoidForArea(3687, 2080, 166, 168, rAreas[1], 1);
-pushReference('R', 1, r01, 'trapezoid', 'Parcela cadastral superior da dupla R-01/R-02.');
-pushReference('R', 2, trapezoidForArea(3687, 2250, 168, 166, rAreas[2], -1), 'trapezoid', 'Parcela cadastral inferior da dupla R-01/R-02.');
+pushReference('R', 14, [
+  [3541, 2080], [3687, 2080], [3687, 2385.226398], [3562, 2385.226398], [3541, r13RightBottom],
+], 'trapezoid', 'Parcela longitudinal afunilada entre R-13 e a dupla R-01/R-02.');
+
+const r01Depth = (rAreas[1] * SOURCE_AREA_PER_SQM) / 253;
+pushReference('R', 1, rectangleForArea(3687, 2080, r01Depth, rAreas[1]), 'regular', 'Parcela cadastral superior da dupla R-01/R-02.');
+pushReference('R', 2, rectangleForArea(3687, 2080 + r01Depth, r01Depth, rAreas[2]), 'regular', 'Parcela cadastral inferior da dupla R-01/R-02.');
 
 const r03Width = 264;
 const r03Depth = (rAreas[3] * SOURCE_AREA_PER_SQM) / r03Width;
@@ -272,41 +373,49 @@ pushReference('R', 4, trapezoidForArea(3994, 2080 + r03Depth, r04Depth - 2, r04D
   }
 }
 
-// Three smaller radiused islands.
-{
-  const groups: Array<{ numbers: number[]; x: number; depths: number[] }> = [
-    { numbers: [28, 29, 30], x: 4898, depths: [238, 250, 252, 240] },
-    { numbers: [41, 42, 43], x: 5228, depths: [238, 250, 252, 240] },
-    { numbers: [44, 45, 46, 47], x: 5520, depths: [238, 249, 252, 250, 225] },
-  ];
-  groups.forEach(({ numbers, x, depths }) => {
-    let cursor = x;
-    numbers.forEach((number, index) => {
-      const polygon = curvedFanForArea(cursor, 2080, depths[index], depths[index + 1], rAreas[number], index === 0 || index === numbers.length - 1 ? 4 : 1.5);
-      pushReference(
-        'R',
-        number,
-        polygon,
-        index === 0 || index === numbers.length - 1 ? 'rounded-end' : 'trapezoid',
-        number === 47
-          ? 'Terminal ampliado com fechamento inclinado e radiado.'
-          : 'Ilha cadastral independente com pequenas variações angulares.',
-      );
-      cursor = maxX(polygon);
-    });
-  });
-}
+// Three independent islands south of Rua Gustavo Bessel. Their old generated
+// fans produced concave rear edges and visually swallowed Rua Emanuel
+// Brachmann; the official plan uses level, continuous blocks.
+pushEqualDepthIsland([28, 29, 30], 4900, 2080, 252);
+pushEqualDepthIsland([41, 42, 43], 5228, 2080, 252);
+const r47Left = pushEqualDepthIsland([44, 45, 46], 5520, 2080, 252, false);
+const r47TopRight = 5940;
+const r47AverageWidth = (rAreas[47] * SOURCE_AREA_PER_SQM) / 252;
+const r47BottomRight = r47Left + 2 * r47AverageWidth - (r47TopRight - r47Left);
+pushReference('R', 47, [
+  [r47Left, 2080], [r47TopRight, 2080], [r47BottomRight, 2332], [r47Left, 2332],
+], 'trapezoid', 'Terminal leste fortemente afunilado junto ao contorno viário do parque.');
 
-// Southern perimeter R-56–R-59: four distinct fan polygons on the curved edge.
+// Southern perimeter R-56–R-59: one contiguous fan block below Rua Emanuel
+// Brachmann. The north frontage is level; internal dividers are shared; only
+// the outside contour follows the diagonal/rounded park boundary.
 {
-  const depths = [184, 201, 222, 236, 210];
-  let cursor = 5378;
-  for (let number = 56; number <= 59; number += 1) {
-    const index = number - 56;
-    const polygon = curvedFanForArea(cursor, 2374, depths[index], depths[index + 1], rAreas[number], 5 + index * 1.5);
-    pushReference('R', number, polygon, 'curved-fan', 'Faixa periférica em leque, com borda sul curva e lote independente.');
-    cursor = maxX(polygon);
-  }
+  const top = 2374;
+  const targetArea = rAreas[56] * SOURCE_AREA_PER_SQM;
+  const r57AverageDepth = targetArea / 99;
+  const r57LeftBottom = top + r57AverageDepth - 6;
+  const r57RightBottom = top + r57AverageDepth + 6;
+  const r56LeftBottom = top + (2 * targetArea) / 129 - (r57LeftBottom - top);
+
+  pushReference('R', 56, [
+    [5378, top], [5507, top], [5507, r57LeftBottom], [5378, r56LeftBottom],
+  ], 'trapezoid', 'Terminal oeste do leque, com frente reta e limite sul diagonal.');
+  pushReference('R', 57, [
+    [5507, top], [5606, top], [5606, r57RightBottom], [5507, r57LeftBottom],
+  ], 'trapezoid', 'Parcela central que mantém a inclinação contínua do limite sul.');
+
+  const r58RightBottom = 2620;
+  const r58Width = targetArea / (((r57RightBottom - top) + (r58RightBottom - top)) / 2);
+  const r58Right = 5606 + r58Width;
+  pushReference('R', 58, [
+    [5606, top], [r58Right, top], [r58Right, r58RightBottom], [5606, r57RightBottom],
+  ], 'trapezoid', 'Parcela central com divisas contínuas e limite sul ascendente.');
+
+  const r59 = fitPolygonAreaX([
+    [r58Right, top], [5842, top], [5834, 2410], [5808, 2480],
+    [5778, 2555], [5752, 2605], [5728, 2620], [r58Right, r58RightBottom],
+  ], rAreas[59], r58Right);
+  pushReference('R', 59, r59, 'curved-fan', 'Terminal leste afunilado e suavizado junto à via perimetral.');
 }
 
 export const EXPORURAL_LOT_REFERENCES = references
@@ -343,17 +452,21 @@ export const EXPORURAL_ROAD_IDENTIFIERS = [
 ] as const;
 
 export const EXPORURAL_SUPPORT_IDENTIFIERS = [
-  'B35',
-  'B36',
   'B37',
   'B38',
   'C4',
-  'D6-01',
-  'D6-02',
-  'D6-03',
   'E-01',
   'E-02',
   'E-06',
+] as const;
+
+/** Explicit user-directed removals for reference 2026.4; host lots remain. */
+export const EXPORURAL_REMOVED_IDENTIFIERS = [
+  'B35',
+  'B36',
+  'D6-01',
+  'D6-02',
+  'D6-03',
 ] as const;
 
 export const EXPORURAL_PROTECTED_IDENTIFIERS = ['B7', 'B8', 'D3'] as const;

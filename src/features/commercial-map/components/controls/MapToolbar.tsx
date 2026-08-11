@@ -34,7 +34,7 @@ const presetIcons: Record<CameraPreset, typeof Map> = {
   exporural: Map,
   'quadra-r': SquareStack,
   'quadra-s': SquareStack,
-  semear: Building2,
+  semear: Map,
 };
 
 export function MapToolbar({
