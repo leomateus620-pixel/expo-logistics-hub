@@ -1,6 +1,16 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import {
+  lazy,
+  Suspense,
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
+import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
-import { ArrowUpRight, LockKeyhole, ShieldCheck } from 'lucide-react';
+import { ArrowUpRight, LockKeyhole, ShieldCheck, X } from 'lucide-react';
 import CommissionCard from '@/components/commissions/CommissionCard';
 import { FenasojaBrand } from '@/components/brand/FenasojaBrand';
 import { FenasojaPortalHero } from '@/components/portal/FenasojaPortalHero';
@@ -10,6 +20,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useCapabilities } from '@/hooks/useCapabilities';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import { resolveModuleAccess } from '@/hooks/useModuleAccess';
+import { warmAlvoradaAssets } from '@/features/alvorada/capabilities';
 import {
   consumeFenasojaCountdownLaunch,
   findFenasojaCountdownReturnFocus,
@@ -32,6 +43,9 @@ import {
 } from '@/modules/portal/portalRegistry';
 import '@/styles/commission-portal.css';
 import '@/styles/portal-access-navigation.css';
+
+const loadAlvoradaExperience = () => import('@/features/alvorada/FenasojaAlvoradaExperience');
+const FenasojaAlvoradaExperience = lazy(loadAlvoradaExperience);
 
 function saveSelectedModule(slug: string) {
   try {
@@ -93,6 +107,10 @@ export default function CommissionPortalPage() {
   } = useCapabilities();
   const { hasOrg, myRole, isLoading: orgLoading } = useCurrentOrg();
   const [expandedEntry, setExpandedEntry] = useState<PortalEntryId | null>(null);
+  const [alvoradaOpen, setAlvoradaOpen] = useState(false);
+  const portalRef = useRef<HTMLDivElement>(null);
+  const alvoradaLauncherRef = useRef<HTMLButtonElement>(null);
+  const alvoradaSuspenseCloseRef = useRef<HTMLButtonElement>(null);
   const entryButtonRefs = useRef<Partial<Record<PortalEntryId, HTMLButtonElement | null>>>({});
   const pendingEntryPosition = useRef<{ entryId: PortalEntryId; top: number } | null>(null);
   const commissionModules = useMemo(() => getPortalCommissionModules(), []);
@@ -216,6 +234,67 @@ export default function CommissionPortalPage() {
     setExpandedEntry((current) => (current === entryId ? null : entryId));
   };
 
+  const warmAlvorada = useCallback(() => {
+    warmAlvoradaAssets();
+    void loadAlvoradaExperience();
+  }, []);
+
+  const openAlvorada = useCallback(() => {
+    warmAlvorada();
+    setAlvoradaOpen(true);
+  }, [warmAlvorada]);
+
+  const closeAlvorada = useCallback(() => {
+    setAlvoradaOpen(false);
+    window.requestAnimationFrame(() => {
+      alvoradaLauncherRef.current?.focus({ preventScroll: true });
+    });
+  }, []);
+
+  useLayoutEffect(() => {
+    if (!alvoradaOpen) return undefined;
+
+    const portal = portalRef.current;
+    const bodyOverflow = document.body.style.overflow;
+    const documentOverflow = document.documentElement.style.overflow;
+    const previousAriaHidden = portal?.getAttribute('aria-hidden');
+    const hadInert = portal?.hasAttribute('inert') ?? false;
+
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overflow = 'hidden';
+    portal?.setAttribute('aria-hidden', 'true');
+    portal?.setAttribute('inert', '');
+
+    const focusFrame = window.requestAnimationFrame(() => {
+      alvoradaSuspenseCloseRef.current?.focus({ preventScroll: true });
+    });
+
+    const containSuspenseKeyboard = (event: KeyboardEvent) => {
+      if (document.querySelector('.alvorada-overlay')) return;
+      if (event.key === 'Tab') {
+        event.preventDefault();
+        alvoradaSuspenseCloseRef.current?.focus({ preventScroll: true });
+      }
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        closeAlvorada();
+      }
+    };
+
+    window.addEventListener('keydown', containSuspenseKeyboard, true);
+
+    return () => {
+      window.cancelAnimationFrame(focusFrame);
+      window.removeEventListener('keydown', containSuspenseKeyboard, true);
+      document.body.style.overflow = bodyOverflow;
+      document.documentElement.style.overflow = documentOverflow;
+      if (previousAriaHidden === null) portal?.removeAttribute('aria-hidden');
+      else portal?.setAttribute('aria-hidden', previousAriaHidden);
+      if (!hadInert) portal?.removeAttribute('inert');
+    };
+  }, [alvoradaOpen, closeAlvorada]);
+
   const getEntryAccess = (entryId: PortalEntryId): PortalAccessPresentation => {
     if (entryId === 'comissoes') {
       return {
@@ -242,7 +321,7 @@ export default function CommissionPortalPage() {
 
 
   return (
-    <div className="fenasoja-portal">
+    <div ref={portalRef} className="fenasoja-portal">
       <div className="fenasoja-portal__atmosphere" aria-hidden="true">
         <picture>
           <source
@@ -272,13 +351,25 @@ export default function CommissionPortalPage() {
       <main className="fenasoja-portal__shell">
         <header className="fenasoja-portal__header portal-reveal">
           <h1 className="sr-only">FENASOJA 2028</h1>
-          <FenasojaBrand
-
-            className="fenasoja-portal__brand-standard"
-            subtitle="Sistema integrado de gestão"
-            tone="dark"
-          />
-          <FenasojaBrand className="fenasoja-portal__brand-compact" compact tone="dark" />
+          <button
+            ref={alvoradaLauncherRef}
+            type="button"
+            className="fenasoja-portal__alvorada-launcher"
+            aria-label="Abrir O Nascer da Alvorada"
+            aria-haspopup="dialog"
+            aria-expanded={alvoradaOpen}
+            onClick={openAlvorada}
+            onFocus={warmAlvorada}
+            onPointerEnter={warmAlvorada}
+            onTouchStart={warmAlvorada}
+          >
+            <FenasojaBrand
+              className="fenasoja-portal__brand-standard"
+              subtitle="Sistema integrado de gestão"
+              tone="dark"
+            />
+            <FenasojaBrand className="fenasoja-portal__brand-compact" compact tone="dark" />
+          </button>
 
           {adminAccess.target ? (
             <Link
@@ -348,6 +439,33 @@ export default function CommissionPortalPage() {
           ))}
         </nav>
       </main>
+
+      {alvoradaOpen && (
+        <Suspense
+          fallback={createPortal((
+            <section
+              className="fenasoja-portal__alvorada-suspense"
+              role="dialog"
+              aria-modal="true"
+              aria-label="O Nascer da Alvorada"
+            >
+              <span aria-hidden="true" />
+              <p>Preparando a Alvorada</p>
+              <button
+                ref={alvoradaSuspenseCloseRef}
+                type="button"
+                className="fenasoja-portal__alvorada-suspense-close"
+                aria-label="Fechar O Nascer da Alvorada"
+                onClick={closeAlvorada}
+              >
+                <X aria-hidden="true" />
+              </button>
+            </section>
+          ), document.body)}
+        >
+          <FenasojaAlvoradaExperience onComplete={closeAlvorada} />
+        </Suspense>
+      )}
     </div>
   );
 }
