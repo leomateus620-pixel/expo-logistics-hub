@@ -1,0 +1,101 @@
+import { describe, expect, it } from 'vitest';
+import {
+  ALVORADA_PHASES,
+  ALVORADA_SEQUENCE_DURATION,
+  bellCurve,
+  clamp01,
+  createInitialTimelineState,
+  getAlvoradaPhase,
+  rangeProgress,
+  smootherstep,
+  smoothRange,
+  smoothstep,
+} from '@/features/alvorada/timeline';
+
+describe('timeline cinematográfica da Alvorada', () => {
+  it('mantém a jornada completa entre oito e nove segundos', () => {
+    expect(ALVORADA_SEQUENCE_DURATION).toBeGreaterThanOrEqual(8);
+    expect(ALVORADA_SEQUENCE_DURATION).toBeLessThanOrEqual(9);
+    expect(ALVORADA_PHASES.orbitalBrazil).toEqual({ start: 0, end: 2 });
+    expect(ALVORADA_PHASES.rioGrandeDoSul).toEqual({ start: 2, end: 4 });
+    expect(ALVORADA_PHASES.santaRosaDescent).toEqual({ start: 4, end: 5.5 });
+    expect(ALVORADA_PHASES.dawnRise).toEqual({ start: 5.5, end: 7 });
+    expect(ALVORADA_PHASES.titleReveal).toEqual({ start: 7, end: 8.05 });
+    expect(ALVORADA_PHASES.finalHold.end).toBe(ALVORADA_SEQUENCE_DURATION);
+  });
+
+  it('seleciona cada fase narrativa nos limites definidos', () => {
+    const phaseCases = [
+      [-1, 'orbitalBrazil'],
+      [0, 'orbitalBrazil'],
+      [1.999, 'orbitalBrazil'],
+      [2, 'rioGrandeDoSul'],
+      [3.999, 'rioGrandeDoSul'],
+      [4, 'santaRosaDescent'],
+      [5.049, 'santaRosaDescent'],
+      [5.05, 'cityFlight'],
+      [5.499, 'cityFlight'],
+      [5.5, 'dawnRise'],
+      [6.999, 'dawnRise'],
+      [7, 'titleReveal'],
+      [8.049, 'titleReveal'],
+      [8.05, 'finalHold'],
+      [ALVORADA_SEQUENCE_DURATION, 'finalHold'],
+    ] as const;
+
+    for (const [elapsed, expectedPhase] of phaseCases) {
+      expect(getAlvoradaPhase(elapsed)).toBe(expectedPhase);
+    }
+  });
+
+  it('inicializa a câmera no Brasil orbital sem progresso residual', () => {
+    expect(createInitialTimelineState()).toEqual({
+      elapsed: 0,
+      delta: 0,
+      progress: 0,
+      phase: 'orbitalBrazil',
+    });
+  });
+
+  it('limita e normaliza intervalos inclusive quando o intervalo é degenerado', () => {
+    expect(clamp01(-3)).toBe(0);
+    expect(clamp01(0.35)).toBe(0.35);
+    expect(clamp01(7)).toBe(1);
+    expect(rangeProgress(1, 2, 4)).toBe(0);
+    expect(rangeProgress(3, 2, 4)).toBe(0.5);
+    expect(rangeProgress(5, 2, 4)).toBe(1);
+    expect(rangeProgress(1, 2, 2)).toBe(0);
+    expect(rangeProgress(2, 2, 2)).toBe(1);
+  });
+
+  it('usa interpolações monotônicas com velocidade nula nas extremidades', () => {
+    const samples = Array.from({ length: 101 }, (_, index) => index / 100);
+    const smoothValues = samples.map(smoothstep);
+    const smootherValues = samples.map(smootherstep);
+
+    for (let index = 1; index < samples.length; index += 1) {
+      expect(smoothValues[index]).toBeGreaterThanOrEqual(smoothValues[index - 1]);
+      expect(smootherValues[index]).toBeGreaterThanOrEqual(smootherValues[index - 1]);
+    }
+
+    const epsilon = 0.0001;
+    const derivativeAtStart = (smootherstep(epsilon) - smootherstep(0)) / epsilon;
+    const derivativeAtEnd = (smootherstep(1) - smootherstep(1 - epsilon)) / epsilon;
+    expect(derivativeAtStart).toBeLessThan(0.001);
+    expect(derivativeAtEnd).toBeLessThan(0.001);
+    expect(smoothRange(2, 2, 4)).toBe(0);
+    expect(smoothRange(4, 2, 4)).toBe(1);
+  });
+
+  it('produz uma máscara de nuvem contínua, simétrica e sem estouro', () => {
+    expect(bellCurve(3, 4, 5, 6)).toBe(0);
+    expect(bellCurve(4, 4, 5, 6)).toBe(0);
+    expect(bellCurve(5, 4, 5, 6)).toBe(1);
+    expect(bellCurve(6, 4, 5, 6)).toBe(0);
+    expect(bellCurve(4.5, 4, 5, 6)).toBeCloseTo(bellCurve(5.5, 4, 5, 6), 8);
+
+    const epsilon = 0.0001;
+    expect(Math.abs(bellCurve(5 - epsilon, 4, 5, 6) - bellCurve(5 + epsilon, 4, 5, 6)))
+      .toBeLessThan(0.000001);
+  });
+});

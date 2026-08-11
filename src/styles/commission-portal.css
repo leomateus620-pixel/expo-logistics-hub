@@ -112,6 +112,83 @@
   display: none !important;
 }
 
+.fenasoja-portal__alvorada-launcher {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: filter 180ms ease, transform 180ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .fenasoja-portal__alvorada-launcher:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+  }
+}
+
+.fenasoja-portal__alvorada-launcher:focus-visible {
+  outline: 3px solid var(--portal-gold);
+  outline-offset: 4px;
+}
+
+.fenasoja-portal__alvorada-suspense {
+  position: fixed;
+  z-index: 9999;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 14px;
+  background: #010713;
+  color: rgb(226 235 246 / 84%);
+  font-size: 0.7rem;
+  font-weight: 760;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.fenasoja-portal__alvorada-suspense > span {
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgb(155 195 238 / 22%);
+  border-top-color: var(--portal-gold-strong);
+  border-radius: 50%;
+  animation: portal-alvorada-loader 900ms linear infinite;
+}
+
+.fenasoja-portal__alvorada-suspense-close {
+  position: fixed;
+  top: max(18px, env(safe-area-inset-top));
+  right: max(18px, env(safe-area-inset-right));
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border: 1px solid rgb(255 255 255 / 20%);
+  border-radius: 50%;
+  background: rgb(1 8 20 / 64%);
+  color: #f5f8fc;
+  cursor: pointer;
+}
+
+.fenasoja-portal__alvorada-suspense-close:focus-visible {
+  outline: 3px solid var(--portal-gold);
+  outline-offset: 3px;
+}
+
+.fenasoja-portal__alvorada-suspense-close svg {
+  width: 18px;
+  height: 18px;
+}
+
 .fenasoja-portal__admin {
   display: inline-flex;
   min-height: 44px;
@@ -1218,6 +1295,10 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+@keyframes portal-alvorada-loader {
+  to { transform: rotate(1turn); }
 }
 
 @media (prefers-reduced-transparency: reduce) {
