@@ -1,19 +1,24 @@
-export const ALVORADA_SEQUENCE_DURATION = 8.6;
+/** End of the authored journey. The renderer remains alive in finalHold. */
+export const ALVORADA_SEQUENCE_DURATION = 10.5;
 export const ALVORADA_EXIT_DURATION_MS = 400;
 
 export const ALVORADA_PHASES = {
   orbitalBrazil: { start: 0, end: 2 },
   rioGrandeDoSul: { start: 2, end: 4 },
-  santaRosaDescent: { start: 4, end: 5.5 },
-  cityFlight: { start: 5.05, end: 6.2 },
-  dawnRise: { start: 5.5, end: 7 },
-  titleReveal: { start: 7, end: 8.05 },
-  finalHold: { start: 8.05, end: ALVORADA_SEQUENCE_DURATION },
+  santaRosaStabilization: { start: 4, end: 4.5 },
+  santaRosaDescent: { start: 4.5, end: 6 },
+  cityFlight: { start: 6, end: 7.5 },
+  dawnRise: { start: 7.5, end: 9 },
+  titleReveal: { start: 9, end: ALVORADA_SEQUENCE_DURATION },
+  finalHold: { start: ALVORADA_SEQUENCE_DURATION, end: Number.POSITIVE_INFINITY },
 } as const;
 
 export type AlvoradaPhase = keyof typeof ALVORADA_PHASES;
 
 export interface AlvoradaTimelineState {
+  /** Visible runtime, including the living final composition. */
+  ambientElapsed: number;
+  /** Authored sequence time, clamped at the final brand frame. */
   elapsed: number;
   delta: number;
   progress: number;
@@ -51,7 +56,8 @@ export function bellCurve(elapsed: number, start: number, peak: number, end: num
 
 export function getAlvoradaPhase(elapsed: number): AlvoradaPhase {
   if (elapsed < ALVORADA_PHASES.rioGrandeDoSul.start) return 'orbitalBrazil';
-  if (elapsed < ALVORADA_PHASES.santaRosaDescent.start) return 'rioGrandeDoSul';
+  if (elapsed < ALVORADA_PHASES.santaRosaStabilization.start) return 'rioGrandeDoSul';
+  if (elapsed < ALVORADA_PHASES.santaRosaDescent.start) return 'santaRosaStabilization';
   if (elapsed < ALVORADA_PHASES.cityFlight.start) return 'santaRosaDescent';
   if (elapsed < ALVORADA_PHASES.dawnRise.start) return 'cityFlight';
   if (elapsed < ALVORADA_PHASES.titleReveal.start) return 'dawnRise';
@@ -63,6 +69,7 @@ export function createInitialTimelineState(initialElapsed = 0): AlvoradaTimeline
   const elapsed = Math.min(ALVORADA_SEQUENCE_DURATION, Math.max(0, initialElapsed));
 
   return {
+    ambientElapsed: elapsed,
     elapsed,
     delta: 0,
     progress: elapsed / ALVORADA_SEQUENCE_DURATION,

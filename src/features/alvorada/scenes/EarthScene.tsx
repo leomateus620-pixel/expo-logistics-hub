@@ -22,6 +22,7 @@ const earthVertexShader = `
 `;
 
 const earthFragmentShader = `
+  #include <common>
   uniform sampler2D dayMap;
   uniform sampler2D nightMap;
   uniform sampler2D normalMap;
@@ -33,8 +34,8 @@ const earthFragmentShader = `
   void main() {
     vec3 dayColor = texture2D(dayMap, vUv).rgb;
     vec3 cityLights = texture2D(nightMap, vUv).rgb;
-    vec3 terrainNormal = texture2D(normalMap, vUv).rgb * 2.0 - 1.0;
-    vec3 normal = normalize(vWorldNormal + terrainNormal * 0.045);
+    float surfaceDetail = texture2D(normalMap, vUv).r;
+    vec3 normal = normalize(vWorldNormal);
     float lightAmount = dot(normal, normalize(sunDirection));
     float dayAmount = smoothstep(-0.12, 0.44, lightAmount);
     float nightAmount = 1.0 - smoothstep(-0.2, 0.2, lightAmount);
@@ -45,8 +46,11 @@ const earthFragmentShader = `
     vec3 color = mix(nightSurface, litSurface, dayAmount);
     color += cityLights * nightAmount * 0.62;
     color += vec3(1.0, 0.37, 0.08) * horizon * 0.13;
+    color *= mix(0.965, 1.035, surfaceDetail);
 
     gl_FragColor = vec4(color, opacity);
+    #include <tonemapping_fragment>
+    #include <colorspace_fragment>
   }
 `;
 
@@ -62,6 +66,7 @@ const atmosphereVertexShader = `
 `;
 
 const atmosphereFragmentShader = `
+  #include <common>
   uniform vec3 sunDirection;
   uniform float opacity;
   varying vec3 vNormal;
@@ -74,6 +79,8 @@ const atmosphereFragmentShader = `
     vec3 warm = vec3(1.0, 0.36, 0.08);
     vec3 color = mix(cool, warm, sunEdge * 0.82);
     gl_FragColor = vec4(color, fresnel * opacity);
+    #include <tonemapping_fragment>
+    #include <colorspace_fragment>
   }
 `;
 
@@ -139,15 +146,15 @@ export function EarthScene() {
 
   useEffect(() => () => glowTexture.dispose(), [glowTexture]);
 
-  useFrame((state) => {
+  useFrame(() => {
     const elapsed = timeline.current.elapsed;
-    const fade = 1 - smoothRange(elapsed, 4.3, 4.62);
+    const fade = 1 - smoothRange(elapsed, 4.34, 4.86);
     if (spaceRoot.current) spaceRoot.current.visible = fade > 0.001;
     if (earthRoot.current) {
       earthRoot.current.visible = fade > 0.001;
       earthRoot.current.scale.setScalar(1 + smoothRange(elapsed, 3.7, 4.5) * 0.025);
     }
-    if (cloudMesh.current) cloudMesh.current.rotation.y = state.clock.elapsedTime * 0.006;
+    if (cloudMesh.current) cloudMesh.current.rotation.y = timeline.current.ambientElapsed * 0.0045;
     if (earthMaterial.current) earthMaterial.current.uniforms.opacity.value = fade;
     if (atmosphereMaterial.current) atmosphereMaterial.current.uniforms.opacity.value = fade * 0.38;
     if (sunMaterial.current) sunMaterial.current.opacity = fade * (0.66 + smoothRange(elapsed, 0, 2) * 0.22);
@@ -172,8 +179,8 @@ export function EarthScene() {
           <meshBasicMaterial
             map={cloudMap}
             color="#d8e9f8"
-            blending={THREE.AdditiveBlending}
-            opacity={0.34}
+            blending={THREE.NormalBlending}
+            opacity={0.27}
             transparent
             depthWrite={false}
           />
@@ -217,7 +224,7 @@ export function EarthScene() {
         factor={2.1}
         saturation={0.14}
         fade
-        speed={0.08}
+        speed={0}
       />
     </group>
   );

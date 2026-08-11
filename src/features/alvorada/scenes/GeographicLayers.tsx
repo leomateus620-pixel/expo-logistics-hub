@@ -98,7 +98,7 @@ function createMarkerLabelTexture() {
 
 export function SantaRosaMarker() {
   const timeline = useAlvoradaTimeline();
-  const { size } = useThree();
+  const { camera, size } = useThree();
   const mobile = size.width < 760;
   const root = useRef<THREE.Group>(null);
   const marker = useRef<THREE.Group>(null);
@@ -120,13 +120,22 @@ export function SantaRosaMarker() {
   useFrame(() => {
     const elapsed = timeline.current.elapsed;
     const reveal = smoothRange(elapsed, 2.72, 3.12);
-    const fade = 1 - smoothRange(elapsed, 3.72, 4.08);
-    const pulse = bellCurve(elapsed, 3.05, 3.25, 3.62);
+    const fade = 1 - smoothRange(elapsed, 4.34, 4.82);
+    const pulse = bellCurve(elapsed, 3.05, 3.25, 3.62)
+      + bellCurve(elapsed, 4.02, 4.18, 4.45) * 0.18;
     const visibility = reveal * fade;
 
     if (root.current) root.current.visible = visibility > 0.002;
     if (marker.current) {
-      const scale = Math.max(0.001, visibility * (1 + pulse * 0.16));
+      const screenSpaceScale = THREE.MathUtils.clamp(
+        camera.position.distanceTo(position) * 0.22,
+        0.035,
+        0.72,
+      );
+      const scale = Math.max(
+        0.001,
+        visibility * screenSpaceScale * (1 + pulse * 0.12),
+      );
       marker.current.scale.setScalar(scale);
     }
     if (ringMaterial.current) ringMaterial.current.opacity = visibility * (0.72 - pulse * 0.3);

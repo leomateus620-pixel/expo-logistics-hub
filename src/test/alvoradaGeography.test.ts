@@ -1,3 +1,4 @@
+import { Buffer } from 'node:buffer';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -13,14 +14,49 @@ import {
 
 type Coordinate = [number, number];
 
-interface SantaRosaRoadDataset {
-  attribution: string;
-  bounds: [number, number, number, number];
+interface SantaRosaCityDataset {
+  version: number;
+  generated: string;
   center: Coordinate;
   metersPerUnit: number;
-  roads: Array<{
-    c: 'p' | 's' | 't' | 'r' | 'u';
-    p: Coordinate[];
+  aoiMeters: {
+    city: number;
+    terrain: number;
+  };
+  sources: {
+    buildings: {
+      name: string;
+      license: string;
+      url: string;
+      sha256: string;
+      candidateCount: number;
+      selectedCount: number;
+    };
+    terrain: {
+      name: string;
+      license: string;
+      url: string;
+      format: string;
+      zoom: number;
+    };
+  };
+  terrain: {
+    resolution: number;
+    sizeMeters: number;
+    baseElevation: number;
+    heightScale: number;
+    minimumElevation: number;
+    maximumElevation: number;
+    heights: string;
+  };
+  buildings: Array<{
+    p: number[];
+    h: number;
+    c: number;
+    r: number;
+    v: number;
+    o: [number, number, number];
+    q: number;
   }>;
 }
 
@@ -28,6 +64,12 @@ function loadBoundary(file: string) {
   return parseBoundaryGeoJson(
     readFileSync(resolve('public/alvorada', file), 'utf8'),
   );
+}
+
+function loadCityDataset() {
+  return JSON.parse(
+    readFileSync(resolve('public/alvorada/santa-rosa-city-v2.json'), 'utf8'),
+  ) as SantaRosaCityDataset;
 }
 
 function pointInsideRing([longitude, latitude]: Coordinate, ring: Coordinate[]) {
@@ -93,23 +135,106 @@ describe('geografia oficial da Alvorada', () => {
     expect(pointInsideBoundary(marker, brazil)).toBe(true);
   });
 
-  it('usa a malha viária real de Santa Rosa como base da cidade procedural', () => {
-    const dataset = JSON.parse(
-      readFileSync(resolve('public/alvorada', 'santa-rosa-roads.json'), 'utf8'),
-    ) as SantaRosaRoadDataset;
+  it('mantém metadados, licenças e bounds geográficos verificáveis no city-v2', () => {
+    const dataset = loadCityDataset();
 
-    expect(dataset.attribution).toContain('OpenStreetMap contributors');
+    expect(dataset.version).toBe(2);
+    expect(dataset.generated).toMatch(/^\d{4}-\d{2}-\d{2}$/);
     expect(dataset.center).toEqual([
       SANTA_ROSA_COORDINATES.latitude,
       SANTA_ROSA_COORDINATES.longitude,
     ]);
     expect(dataset.metersPerUnit).toBeGreaterThan(0);
-    expect(dataset.roads.length).toBeGreaterThan(700);
-    expect(dataset.roads.every((road) => road.p.length >= 2)).toBe(true);
-    expect(dataset.bounds[0]).toBeLessThan(SANTA_ROSA_COORDINATES.latitude);
-    expect(dataset.bounds[1]).toBeLessThan(SANTA_ROSA_COORDINATES.longitude);
-    expect(dataset.bounds[2]).toBeGreaterThan(SANTA_ROSA_COORDINATES.latitude);
-    expect(dataset.bounds[3]).toBeGreaterThan(SANTA_ROSA_COORDINATES.longitude);
+    expect(dataset.aoiMeters.city).toBeGreaterThan(0);
+    expect(dataset.aoiMeters.terrain).toBeGreaterThan(dataset.aoiMeters.city);
+
+    expect(dataset.sources.buildings.name).toContain('Microsoft');
+    expect(dataset.sources.buildings.license).toBe('CDLA-Permissive-2.0');
+    expect(dataset.sources.buildings.url).toMatch(/^https:\/\//);
+    expect(dataset.sources.buildings.sha256).toMatch(/^[a-f\d]{64}$/);
+    expect(dataset.sources.buildings.candidateCount)
+      .toBeGreaterThanOrEqual(dataset.sources.buildings.selectedCount);
+    expect(dataset.sources.terrain.name).toContain('Mapzen');
+    expect(dataset.sources.terrain.license).toBe('CC-BY-4.0');
+    expect(dataset.sources.terrain.url).toMatch(/^https:\/\//);
+    expect(dataset.sources.terrain.format).toBe('Terrarium');
+    expect(dataset.terrain.sizeMeters).toBe(dataset.aoiMeters.terrain);
+  });
+
+  it('entrega exatamente 9000 footprints válidos e contidos no AOI urbano', () => {
+    const dataset = loadCityDataset();
+    const cityWorldSize = dataset.aoiMeters.city / dataset.metersPerUnit;
+    const halfCityWorldSize = cityWorldSize / 2;
+    const bounds = dataset.buildings.reduce((current, building) => {
+      for (let index = 0; index < building.p.length; index += 2) {
+        current.minX = Math.min(current.minX, building.p[index]);
+        current.maxX = Math.max(current.maxX, building.p[index]);
+        current.minZ = Math.min(current.minZ, building.p[index + 1]);
+        current.maxZ = Math.max(current.maxZ, building.p[index + 1]);
+      }
+      return current;
+    }, {
+      minX: Number.POSITIVE_INFINITY,
+      maxX: Number.NEGATIVE_INFINITY,
+      minZ: Number.POSITIVE_INFINITY,
+      maxZ: Number.NEGATIVE_INFINITY,
+    });
+
+    expect(dataset.buildings).toHaveLength(9000);
+    expect(dataset.sources.buildings.selectedCount).toBe(9000);
+    expect(dataset.buildings.every((building) => (
+      building.p.length >= 6
+      && building.p.length % 2 === 0
+      && building.p.every(Number.isFinite)
+      && Number.isFinite(building.h)
+      && building.h > 0
+      && building.o.length === 3
+      && building.o.every(Number.isFinite)
+      && building.o[1] > 0
+      && building.o[2] > 0
+      && Number.isInteger(building.c)
+      && Number.isInteger(building.r)
+      && Number.isInteger(building.v)
+      && building.q >= 0
+      && building.q <= 1
+    ))).toBe(true);
+    expect(bounds.maxX - bounds.minX)
+      .toBeLessThanOrEqual(cityWorldSize + 1);
+    expect(bounds.maxZ - bounds.minZ)
+      .toBeLessThanOrEqual(cityWorldSize + 1);
+    expect(Math.abs(bounds.minX)).toBeLessThanOrEqual(halfCityWorldSize + 0.5);
+    expect(Math.abs(bounds.maxX)).toBeLessThanOrEqual(halfCityWorldSize + 0.5);
+    expect(Math.abs(bounds.minZ)).toBeLessThanOrEqual(halfCityWorldSize + 0.5);
+    expect(Math.abs(bounds.maxZ)).toBeLessThanOrEqual(halfCityWorldSize + 0.5);
+    expect(bounds.minX).toBeLessThan(0);
+    expect(bounds.maxX).toBeGreaterThan(0);
+    expect(bounds.minZ).toBeLessThan(0);
+    expect(bounds.maxZ).toBeGreaterThan(0);
+  });
+
+  it('decodifica um heightfield 129² finito e coerente com os metadados', () => {
+    const { terrain } = loadCityDataset();
+    const encodedHeights = Buffer.from(terrain.heights, 'base64');
+    const expectedSamples = terrain.resolution ** 2;
+    const elevations: number[] = [];
+
+    expect(terrain.resolution).toBe(129);
+    expect(terrain.heightScale).toBeGreaterThan(0);
+    expect(encodedHeights.toString('base64')).toBe(terrain.heights);
+    expect(encodedHeights.byteLength).toBe(expectedSamples * Int16Array.BYTES_PER_ELEMENT);
+
+    for (let index = 0; index < expectedSamples; index += 1) {
+      elevations.push(
+        terrain.baseElevation
+        + encodedHeights.readInt16LE(index * Int16Array.BYTES_PER_ELEMENT) * terrain.heightScale,
+      );
+    }
+
+    expect(elevations).toHaveLength(expectedSamples);
+    expect(elevations.every(Number.isFinite)).toBe(true);
+    expect(Math.min(...elevations)).toBeCloseTo(terrain.minimumElevation, 5);
+    expect(Math.max(...elevations)).toBeCloseTo(terrain.maximumElevation, 5);
+    expect(terrain.minimumElevation).toBeLessThan(terrain.maximumElevation);
   });
 
   it('projeta latitude e longitude na superfície correta do globo', () => {

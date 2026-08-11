@@ -3,11 +3,15 @@ import type { AlvoradaWebGLTier } from './types';
 export interface AlvoradaQualityProfile {
   antialias: boolean;
   buildingCount: number;
+  bloom: boolean;
   cloudCount: number;
   dpr: [number, number];
+  level: 'high' | 'medium' | 'low';
   mobile: boolean;
+  postprocessing: boolean;
   shadowMapSize: number;
   shadows: boolean;
+  terrainSegments: number;
   treeCount: number;
 }
 
@@ -27,6 +31,7 @@ const ALVORADA_DATA_ASSETS = [
   '/alvorada/rio-grande-do-sul-min.geojson',
   '/alvorada/santa-rosa-min.geojson',
   '/alvorada/santa-rosa-roads.json',
+  '/alvorada/santa-rosa-city-v2.json',
   '/alvorada/helvetiker-bold.typeface.json',
 ] as const;
 
@@ -94,15 +99,24 @@ export function getAlvoradaQualityProfile(
   const mobile = Boolean(coarsePointer || narrowViewport);
   const compatibleRenderer = rendererTier === 'compatible';
   const reduced = compatibleRenderer || mobile || lowMemory || lowConcurrency;
+  const level: AlvoradaQualityProfile['level'] = compatibleRenderer
+    ? 'low'
+    : reduced
+      ? 'medium'
+      : 'high';
 
   return {
-    antialias: !reduced,
-    buildingCount: compatibleRenderer ? 240 : reduced ? 320 : 780,
+    antialias: !compatibleRenderer,
+    buildingCount: compatibleRenderer ? 3000 : reduced ? 5400 : 9000,
+    bloom: !compatibleRenderer,
     cloudCount: compatibleRenderer ? 5 : reduced ? 7 : 13,
-    dpr: compatibleRenderer ? [0.65, 1] : reduced ? [0.75, 1.1] : [1, 1.5],
+    dpr: compatibleRenderer ? [0.85, 1.2] : reduced ? [1, 1.5] : [1, 1.85],
+    level,
     mobile,
-    shadowMapSize: compatibleRenderer ? 256 : reduced ? 512 : 1024,
-    shadows: !reduced,
-    treeCount: compatibleRenderer ? 240 : reduced ? 320 : 680,
+    postprocessing: !compatibleRenderer,
+    shadowMapSize: compatibleRenderer ? 512 : reduced ? 1024 : 2048,
+    shadows: !compatibleRenderer && !mobile && !lowMemory,
+    terrainSegments: compatibleRenderer ? 64 : reduced ? 96 : 128,
+    treeCount: compatibleRenderer ? 700 : reduced ? 1600 : 2500,
   };
 }

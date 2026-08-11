@@ -24,6 +24,8 @@ describe('contrato de acesso exclusivo à Alvorada', () => {
   const logisticsLayout = source('src/components/Layout.tsx');
   const brand = source('src/components/brand/FenasojaBrand.tsx');
   const portalHero = source('src/components/portal/FenasojaPortalHero.tsx');
+  const capabilities = source('src/features/alvorada/capabilities.ts');
+  const alvoradaCss = source('src/features/alvorada/alvorada.css');
   const experience = source('src/features/alvorada/FenasojaAlvoradaExperience.tsx');
   const allImplementation = implementationSources(resolve('src'))
     .map((file) => readFileSync(file, 'utf8'))
@@ -75,10 +77,24 @@ describe('contrato de acesso exclusivo à Alvorada', () => {
     expect(portalPage).toContain('<FenasojaAlvoradaExperience onComplete={closeAlvorada} />');
 
     const shippedAssets = readdirSync(resolve('public/alvorada'));
+    expect(shippedAssets).toContain('santa-rosa-city-v2.json');
+    expect(capabilities).toContain("'/alvorada/santa-rosa-city-v2.json'");
     expect(shippedAssets).not.toContain('IMG_8957.jpeg');
     expect(shippedAssets).not.toContain('A13B1DEF-5041-4481-A578-F6CE0A44EAA7.png');
     expect(shippedAssets).not.toContain('39DA8852-B59F-4676-928D-EC0CD74917EE.png');
     expect(shippedAssets).not.toContain('AF1D2AF0-2CC5-467E-B1A1-6A108279BCCB.png');
     expect(shippedAssets).not.toContain('0317D251-1A8A-4036-91C2-8DF02808D0DC.png');
+  });
+
+  it('não encurta nem oculta a experiência WebGL no CSS de movimento reduzido', () => {
+    const localAnimationDurations = [...alvoradaCss.matchAll(
+      /animation-duration\s*:\s*([\d.]+)ms/gi,
+    )].map((match) => Number(match[1]));
+
+    expect(localAnimationDurations.length).toBeGreaterThan(0);
+    expect(localAnimationDurations.every((duration) => duration >= 200)).toBe(true);
+    expect(alvoradaCss).not.toMatch(
+      /prefers-reduced-motion[\s\S]*?\.alvorada-overlay__canvas[\s\S]*?(?:display\s*:\s*none|visibility\s*:\s*hidden)/i,
+    );
   });
 });

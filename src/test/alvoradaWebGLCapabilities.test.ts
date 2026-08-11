@@ -76,6 +76,10 @@ describe('probe de compatibilidade WebGL da Alvorada', () => {
     expect(compatible.cloudCount).toBeLessThan(hardware.cloudCount);
     expect(compatible.shadows).toBe(false);
     expect(compatible.antialias).toBe(false);
-    expect(compatible.dpr[1]).toBeLessThanOrEqual(1);
+    expect(compatible.dpr[1]).toBeLessThan(hardware.dpr[1]);
+    expect(compatible.terrainSegments).toBeLessThan(hardware.terrainSegments);
+    expect(compatible.postprocessing).toBe(false);
+    expect(compatible.bloom).toBe(false);
+    expect(compatible.level).toBe('low');
   });
 });

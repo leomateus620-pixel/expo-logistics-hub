@@ -1,102 +1,293 @@
-import { useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useAlvoradaTimeline } from './TimelineContext';
 import { bellCurve, smoothRange } from './timeline';
+import { createCloudTexture, seededRandom } from './visualTextures';
 
-const vertexShader = `
+interface CorridorCloudPlacement {
+  depth: number;
+  drift: number;
+  phase: number;
+  position: [number, number, number];
+  rotation: number;
+  scale: [number, number, number];
+  stratum: number;
+  travel: number;
+}
+
+type AmbientTimelineState = {
+  ambientElapsed?: number;
+  elapsed: number;
+};
+
+const CARD_VERTEX_SHADER = `
   varying vec2 vUv;
+  varying vec3 vWorldPosition;
+
   void main() {
     vUv = uv;
+    vec4 worldPosition = modelMatrix * vec4(position, 1.0);
+    vWorldPosition = worldPosition.xyz;
+    gl_Position = projectionMatrix * viewMatrix * worldPosition;
+  }
+`;
+
+const CARD_FRAGMENT_SHADER = `
+  uniform sampler2D cloudMap;
+  uniform vec2 texelSize;
+  uniform vec3 coolColor;
+  uniform vec3 warmColor;
+  uniform float opacity;
+  uniform float time;
+  uniform float warmth;
+
+  varying vec2 vUv;
+  varying vec3 vWorldPosition;
+
+  void main() {
+    vec2 driftUv = vUv + vec2(sin(time * 0.07) * 0.006, cos(time * 0.053) * 0.004);
+    float density = texture2D(cloudMap, driftUv).a;
+    if (density < 0.01) discard;
+
+    float east = texture2D(cloudMap, driftUv + vec2(texelSize.x, 0.0)).a;
+    float north = texture2D(cloudMap, driftUv + vec2(0.0, texelSize.y)).a;
+    vec2 gradient = vec2(density - east, density - north);
+    vec2 sunAcrossCard = normalize(vec2(0.84, 0.31));
+    float directionalLight = 0.52 + max(dot(normalize(gradient + vec2(0.0001)), sunAcrossCard), 0.0) * 0.48;
+    float body = smoothstep(0.018, 0.25, density);
+    float edgeLight = (1.0 - smoothstep(0.07, 0.31, density)) * directionalLight;
+    float horizonWarmth = warmth * (0.35 + edgeLight * 0.65);
+    vec3 color = mix(coolColor, warmColor, horizonWarmth);
+    color *= 0.78 + directionalLight * 0.28;
+
+    gl_FragColor = vec4(color, body * opacity);
+    #include <tonemapping_fragment>
+    #include <colorspace_fragment>
+  }
+`;
+
+const HAZE_VERTEX_SHADER = `
+  varying vec3 vDirection;
+
+  void main() {
+    vDirection = normalize(position);
     gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
   }
 `;
 
-const fragmentShader = `
+const HAZE_FRAGMENT_SHADER = `
   uniform float opacity;
   uniform float time;
   uniform float warmth;
-  varying vec2 vUv;
+  varying vec3 vDirection;
 
-  float hash(vec2 p) {
-    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
+  float hash(vec3 p) {
+    p = fract(p * 0.3183099 + 0.1);
+    p *= 17.0;
+    return fract(p.x * p.y * p.z * (p.x + p.y + p.z));
   }
 
-  float noise(vec2 p) {
-    vec2 i = floor(p);
-    vec2 f = fract(p);
+  float noise(vec3 p) {
+    vec3 i = floor(p);
+    vec3 f = fract(p);
     f = f * f * (3.0 - 2.0 * f);
-    return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x),
-      mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), f.x), f.y);
+
+    return mix(
+      mix(mix(hash(i), hash(i + vec3(1.0, 0.0, 0.0)), f.x),
+        mix(hash(i + vec3(0.0, 1.0, 0.0)), hash(i + vec3(1.0, 1.0, 0.0)), f.x), f.y),
+      mix(mix(hash(i + vec3(0.0, 0.0, 1.0)), hash(i + vec3(1.0, 0.0, 1.0)), f.x),
+        mix(hash(i + vec3(0.0, 1.0, 1.0)), hash(i + vec3(1.0, 1.0, 1.0)), f.x), f.y),
+      f.z
+    );
   }
 
-  float fbm(vec2 p) {
+  float fbm(vec3 p) {
     float value = 0.0;
-    float amplitude = 0.52;
-    for (int i = 0; i < 5; i++) {
-      value += amplitude * noise(p);
-      p = p * 2.03 + 11.7;
-      amplitude *= 0.5;
+    float amplitude = 0.54;
+    for (int octave = 0; octave < 3; octave++) {
+      value += noise(p) * amplitude;
+      p = p * 2.03 + 7.1;
+      amplitude *= 0.48;
     }
     return value;
   }
 
   void main() {
-    vec2 uv = vUv;
-    float cloud = fbm(uv * 3.25 + vec2(time * 0.035, -time * 0.018));
-    cloud = smoothstep(0.32, 0.82, cloud + opacity * 0.2);
-    vec3 cool = vec3(0.22, 0.34, 0.5);
-    vec3 warm = vec3(0.82, 0.49, 0.3);
-    vec3 color = mix(cool, warm, warmth) + cloud * vec3(0.16, 0.14, 0.12);
-    float edge = smoothstep(0.0, 0.12, uv.x) * smoothstep(0.0, 0.12, uv.y)
-      * smoothstep(0.0, 0.12, 1.0 - uv.x) * smoothstep(0.0, 0.12, 1.0 - uv.y);
-    gl_FragColor = vec4(color, clamp(opacity * (0.72 + cloud * 0.26) * edge, 0.0, 1.0));
+    vec3 samplePosition = vDirection * 3.4 + vec3(time * 0.025, -time * 0.011, 0.0);
+    float structure = fbm(samplePosition);
+    vec3 cool = vec3(0.32, 0.43, 0.56);
+    vec3 warm = vec3(0.86, 0.58, 0.38);
+    vec3 color = mix(cool, warm, warmth * (0.74 + structure * 0.26));
+    color += vec3(structure - 0.5) * 0.075;
+    float alpha = opacity * (0.965 + structure * 0.035);
+
+    gl_FragColor = vec4(color, alpha);
+    #include <tonemapping_fragment>
+    #include <colorspace_fragment>
   }
 `;
+
+function createCorridorPlacements() {
+  const random = seededRandom(20280430);
+
+  return Array.from({ length: 12 }, (_, index): CorridorCloudPlacement => {
+    const stratum = index % 3;
+    const depth = 0.34 + Math.pow(random(), 1.42) * 5.3;
+    const horizontalReach = 0.32 + depth * 0.68;
+    const verticalReach = 0.2 + depth * 0.38;
+
+    return {
+      depth,
+      drift: 0.17 + random() * 0.21,
+      phase: random() * Math.PI * 2,
+      position: [
+        (random() * 2 - 1) * horizontalReach,
+        (random() * 2 - 1) * verticalReach,
+        -depth,
+      ],
+      rotation: (random() - 0.5) * 0.58,
+      scale: [
+        0.9 + depth * 0.66 + random() * 0.7,
+        0.52 + depth * 0.31 + random() * 0.38,
+        1,
+      ],
+      stratum,
+      travel: 0.08 + Math.min(depth * 0.12, 0.48),
+    };
+  });
+}
+
+function createCorridorMaterial(texture: THREE.Texture, stratum: number) {
+  const coolColors = ['#819bb6', '#96aabf', '#a9b7c5'] as const;
+  const warmColors = ['#e5a16e', '#edb083', '#f2c39a'] as const;
+
+  return new THREE.ShaderMaterial({
+    depthTest: true,
+    depthWrite: false,
+    fragmentShader: CARD_FRAGMENT_SHADER,
+    fog: false,
+    side: THREE.DoubleSide,
+    transparent: true,
+    uniforms: {
+      cloudMap: { value: texture },
+      coolColor: { value: new THREE.Color(coolColors[stratum]) },
+      opacity: { value: 0 },
+      texelSize: { value: new THREE.Vector2(1 / 384, 1 / 384) },
+      time: { value: 0 },
+      warmColor: { value: new THREE.Color(warmColors[stratum]) },
+      warmth: { value: 0 },
+    },
+    vertexShader: CARD_VERTEX_SHADER,
+  });
+}
+
+function createHazeMaterial() {
+  return new THREE.ShaderMaterial({
+    depthTest: true,
+    depthWrite: false,
+    fragmentShader: HAZE_FRAGMENT_SHADER,
+    fog: false,
+    side: THREE.BackSide,
+    transparent: true,
+    uniforms: {
+      opacity: { value: 0 },
+      time: { value: 0 },
+      warmth: { value: 0 },
+    },
+    vertexShader: HAZE_VERTEX_SHADER,
+  });
+}
 
 export function TransitionCloudLayer() {
   const timeline = useAlvoradaTimeline();
   const { camera } = useThree();
-  const mesh = useRef<THREE.Mesh>(null);
-  const material = useRef<THREE.ShaderMaterial>(null);
-  const direction = useMemo(() => new THREE.Vector3(), []);
-  const uniforms = useMemo(() => ({
-    opacity: { value: 0 },
-    time: { value: 0 },
-    warmth: { value: 0 },
-  }), []);
+  const root = useRef<THREE.Group>(null);
+  const cloudMeshes = useRef<THREE.Mesh[]>([]);
+  const texture = useMemo(() => createCloudTexture(384), []);
+  const placements = useMemo(createCorridorPlacements, []);
+  const cardMaterials = useMemo(
+    () => [0, 1, 2].map((stratum) => createCorridorMaterial(texture, stratum)),
+    [texture],
+  );
+  const hazeMaterial = useMemo(createHazeMaterial, []);
 
-  useFrame((state) => {
-    const elapsed = timeline.current.elapsed;
-    const descentMask = bellCurve(elapsed, 4.02, 4.53, 5.12);
-    const atmosphericHaze = smoothRange(elapsed, 4.88, 5.18) * (1 - smoothRange(elapsed, 5.18, 5.6)) * 0.22;
-    const opacity = Math.min(1, descentMask * 1.1 + atmosphericHaze);
+  useEffect(() => () => {
+    cardMaterials.forEach((material) => material.dispose());
+    hazeMaterial.dispose();
+    texture.dispose();
+  }, [cardMaterials, hazeMaterial, texture]);
 
-    if (mesh.current) {
-      camera.getWorldDirection(direction);
-      mesh.current.position.copy(camera.position).addScaledVector(direction, 0.72);
-      mesh.current.quaternion.copy(camera.quaternion);
-      mesh.current.visible = opacity > 0.002;
+  useFrame(() => {
+    const timelineState = timeline.current as AmbientTimelineState;
+    const elapsed = timelineState.elapsed;
+    const ambientElapsed = timelineState.ambientElapsed ?? elapsed;
+    const corridor = bellCurve(elapsed, 3.98, 4.53, 5.28);
+    const seamOcclusion = smoothRange(elapsed, 4.27, 4.48)
+      * (1 - smoothRange(elapsed, 4.6, 4.94));
+    const trailingHaze = smoothRange(elapsed, 4.82, 5.08)
+      * (1 - smoothRange(elapsed, 5.24, 5.62));
+    const visibility = Math.max(corridor, seamOcclusion, trailingHaze * 0.24);
+    const warmth = smoothRange(elapsed, 4.24, 5.08);
+    const passage = smoothRange(elapsed, 4.02, 5.24);
+
+    if (root.current) {
+      root.current.visible = visibility > 0.001;
+      root.current.position.copy(camera.position);
+      root.current.quaternion.copy(camera.quaternion);
     }
-    if (material.current) {
-      material.current.uniforms.opacity.value = opacity;
-      material.current.uniforms.time.value = state.clock.elapsedTime;
-      material.current.uniforms.warmth.value = smoothRange(elapsed, 4.28, 4.92);
-    }
+
+    cardMaterials.forEach((material, stratum) => {
+      material.uniforms.opacity.value = Math.min(
+        0.72,
+        corridor * (0.58 - stratum * 0.085) + trailingHaze * 0.03,
+      );
+      material.uniforms.time.value = ambientElapsed;
+      material.uniforms.warmth.value = warmth;
+    });
+
+    hazeMaterial.uniforms.opacity.value = Math.min(
+      0.985,
+      seamOcclusion * 0.985 + corridor * 0.095 + trailingHaze * 0.025,
+    );
+    hazeMaterial.uniforms.time.value = ambientElapsed;
+    hazeMaterial.uniforms.warmth.value = warmth;
+
+    placements.forEach((placement, index) => {
+      const mesh = cloudMeshes.current[index];
+      if (!mesh) return;
+      const motion = ambientElapsed * placement.drift + placement.phase;
+      mesh.position.set(
+        placement.position[0] + Math.sin(motion) * (0.06 + placement.depth * 0.025),
+        placement.position[1] + Math.cos(motion * 0.74) * (0.04 + placement.depth * 0.012),
+        placement.position[2] + passage * placement.travel,
+      );
+      mesh.rotation.z = placement.rotation + Math.sin(motion * 0.43) * 0.025;
+    });
   });
 
   return (
-    <mesh ref={mesh} renderOrder={1000} visible={false}>
-      <planeGeometry args={[3.2, 3.2]} />
-      <shaderMaterial
-        ref={material}
-        depthTest={false}
-        depthWrite={false}
-        fragmentShader={fragmentShader}
-        transparent
-        uniforms={uniforms}
-        vertexShader={vertexShader}
-      />
-    </mesh>
+    <group ref={root} visible={false}>
+      {placements.map((placement, index) => (
+        <mesh
+          key={`${placement.stratum}-${index}`}
+          ref={(mesh) => {
+            if (mesh) cloudMeshes.current[index] = mesh;
+          }}
+          frustumCulled={false}
+          position={placement.position}
+          rotation={[0, 0, placement.rotation]}
+          scale={placement.scale}
+        >
+          <planeGeometry args={[1, 1, 1, 1]} />
+          <primitive attach="material" object={cardMaterials[placement.stratum]} />
+        </mesh>
+      ))}
+
+      <mesh frustumCulled={false} renderOrder={1000}>
+        <sphereGeometry args={[0.2, 24, 16]} />
+        <primitive attach="material" object={hazeMaterial} />
+      </mesh>
+    </group>
   );
 }
