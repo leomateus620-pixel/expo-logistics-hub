@@ -192,7 +192,8 @@ export default function CronogramaEventosPage() {
     if (filters.scopeEventIds?.length) return events;
     if (activeView === 'timeline') return eventBuckets.timeline;
     if (activeView === 'completed') return eventBuckets.completed;
-    if (activeView === 'undated') return eventBuckets.undated;
+    // Pendências: a exclusão de concluídos/cancelados é aplicada pelo board,
+    // depois dos filtros globais — aqui a visão recebe o universo completo.
     return events;
   }, [activeView, eventBuckets, events, filters.scopeEventIds]);
   const workspaceIdentity = searchParams.get('workspace');
@@ -892,6 +893,7 @@ export default function CronogramaEventosPage() {
           {activeView === 'undated' && (
             <UndatedBoard
               events={filteredEvents}
+              todayKey={todayKey}
               onOpen={(event) => openEvent(event)}
               onEdit={openWorkspace}
             />
