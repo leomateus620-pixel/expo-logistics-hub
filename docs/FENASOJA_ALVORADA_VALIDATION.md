@@ -32,8 +32,12 @@ A posição e o `lookAt` da câmera percorrem splines independentes, com FOV e b
 - Carregamento lazy: o chunk da experiência só é solicitado por foco, hover, toque ou clique na marca.
 - DPR e densidade adaptativos, instancing de cidade/vegetação, sombras e detalhe reduzidos no mobile.
 - `PerformanceMonitor` reduz qualidade diante de regressão sustentada.
-- Perda de contexto WebGL troca a cena por um fallback leve sem derrubar o portal.
-- WebGL indisponível ou `prefers-reduced-motion` usa um quadro CSS acessível, sem mídia pré-renderizada.
+- A sonda de renderização possui os níveis `hardware`, `compatible` e `unavailable`. O modo compatível mantém a cena WebGL com DPR, sombras e densidade reduzidos antes de considerar o fallback.
+- `prefers-reduced-motion` não desativa nem encurta a jornada cinematográfica. A preferência reduz somente animações periféricas da interface, como entrada, saída e indicador de carregamento.
+- Na primeira perda real de contexto, a timeline é congelada, o quadro CSS é apresentado e o Canvas é remontado uma única vez após 500 ms, retomando a fase e o tempo preservados.
+- Erro determinístico de asset/shader, segunda perda de contexto ou falha da única recuperação entram diretamente no fallback terminal, sem loader sobreposto.
+- Quando WebGL está indisponível desde o início, o fallback CSS permanece pelos 8,6 segundos completos. Em uma falha posterior, ele respeita no mínimo 1 segundo e todo o tempo restante da jornada.
+- Timeline, watchdog de recuperação e fallback terminal pausam seus saldos enquanto a aba está oculta, evitando conclusão ou degradação fora de vista.
 - Overlay modal contém `Tab`/`Escape`, bloqueia scroll, aplica `inert` ao portal e restaura foco ao launcher.
 
 ## Validação executada
@@ -46,9 +50,21 @@ Validação visual autenticada no portal local com a conta indicada pelo solicit
 - somente um launcher `Abrir O Nascer da Alvorada` presente;
 - URL permaneceu em `/portal` ao abrir e concluir;
 - título final permaneceu legível e sem recorte nos dois formatos;
-- modo de movimento reduzido, fechamento automático, Escape e restauração de foco verificados;
-- perda real do contexto WebGL provocada no navegador e recuperação por fallback confirmada;
+- modo de movimento reduzido executando a experiência WebGL completa, fechamento automático, Escape e restauração de foco verificados;
+- perda real do contexto WebGL provocada no navegador, com uma remontagem e retomada temporal confirmadas; segunda perda validada em fallback terminal;
 - captura instrumentada durante a animação ficou aproximadamente em 41–42 FPS, sem travamentos visíveis; esse valor é uma amostra durante screencast, não um benchmark de laboratório.
+
+### Revalidação do hotfix de recuperação
+
+Em 11 de agosto de 2026, o hotfix foi revalidado no mesmo Chrome em que `prefers-reduced-motion: reduce` estava ativo:
+
+- desktop real em `2049 × 898` e viewport mobile emulado em `390 × 844`;
+- o renderer permaneceu em `webgl` além de 2 segundos, com Canvas ativo e sem alterar `/portal`;
+- a sequência de 8,6 segundos concluiu e devolveu o foco ao único launcher;
+- `WEBGL_lose_context` foi acionado pela extensão real durante Brasil, Santa Rosa e a revelação final;
+- a primeira perda exibiu `recovering`, desmontou o Canvas anterior, criou um novo Canvas e retornou a `webgl` sem reiniciar a fase;
+- uma segunda perda entrou em `fallback` com motivo `context-lost` e permaneceu pelo tempo restante;
+- o console não registrou erro da Alvorada/WebGL; apenas os dois avisos futuros já conhecidos do React Router.
 
 ## Verificações automatizadas
 
@@ -58,5 +74,7 @@ Validação visual autenticada no portal local com a conta indicada pelo solicit
 - ESLint direcionado aos arquivos alterados;
 - build de produção;
 - `git diff --check`.
+
+No hotfix: 36 testes dedicados passaram. A suíte completa fechou em 606 de 635 testes, mantendo exatamente as 29 falhas herdadas em quatro arquivos de Cronograma, sem nova falha introduzida pela Alvorada.
 
 O áudio, definido como opcional no escopo, não foi incluído. A cidade é uma composição híbrida baseada na malha viária real, não fotogrametria.

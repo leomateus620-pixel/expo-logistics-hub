@@ -12,10 +12,16 @@ import { X } from 'lucide-react';
 import { AlvoradaCanvas } from './AlvoradaCanvas';
 import {
   getAlvoradaQualityProfile,
-  prefersReducedAlvoradaMotion,
-  supportsAlvoradaWebGL,
+  getAlvoradaWebGLTier,
 } from './capabilities';
-import { ALVORADA_EXIT_DURATION_MS } from './timeline';
+import {
+  ALVORADA_EXIT_DURATION_MS,
+  ALVORADA_SEQUENCE_DURATION,
+} from './timeline';
+import type {
+  AlvoradaFallbackReason,
+  AlvoradaRendererState,
+} from './types';
 import './alvorada.css';
 
 interface FenasojaAlvoradaExperienceProps {
@@ -30,6 +36,102 @@ interface AlvoradaErrorBoundaryProps {
 
 interface AlvoradaErrorBoundaryState {
   failed: boolean;
+}
+
+const ALVORADA_CONTEXT_RECOVERY_DELAY_MS = 500;
+const ALVORADA_CONTEXT_RECOVERY_TIMEOUT_MS = 3000;
+const ALVORADA_MIN_FALLBACK_DURATION_MS = 1000;
+
+type AlvoradaVisibleTimerKey = 'fallback' | 'recovery-delay' | 'recovery-timeout';
+
+interface AlvoradaVisibleTimer {
+  callback: (() => void) | null;
+  remainingMs: number;
+  startedAt: number | null;
+  timeoutId: number | null;
+}
+
+function createVisibleTimer(): AlvoradaVisibleTimer {
+  return {
+    callback: null,
+    remainingMs: 0,
+    startedAt: null,
+    timeoutId: null,
+  };
+}
+
+function useAlvoradaVisibleTimeouts() {
+  const timers = useRef<Record<AlvoradaVisibleTimerKey, AlvoradaVisibleTimer>>({
+    fallback: createVisibleTimer(),
+    'recovery-delay': createVisibleTimer(),
+    'recovery-timeout': createVisibleTimer(),
+  });
+
+  const scheduleTimer = useCallback((timer: AlvoradaVisibleTimer) => {
+    if (timer.callback === null || timer.timeoutId !== null || document.hidden) return;
+
+    timer.startedAt = Date.now();
+    timer.timeoutId = window.setTimeout(() => {
+      timer.timeoutId = null;
+      timer.startedAt = null;
+      timer.remainingMs = 0;
+      const callback = timer.callback;
+      timer.callback = null;
+      callback?.();
+    }, Math.max(0, timer.remainingMs));
+  }, []);
+
+  const clearTimer = useCallback((key: AlvoradaVisibleTimerKey) => {
+    const timer = timers.current[key];
+    if (timer.timeoutId !== null) window.clearTimeout(timer.timeoutId);
+    timer.callback = null;
+    timer.remainingMs = 0;
+    timer.startedAt = null;
+    timer.timeoutId = null;
+  }, []);
+
+  const clearTimers = useCallback(() => {
+    (Object.keys(timers.current) as AlvoradaVisibleTimerKey[]).forEach(clearTimer);
+  }, [clearTimer]);
+
+  const armTimer = useCallback((
+    key: AlvoradaVisibleTimerKey,
+    durationMs: number,
+    callback: () => void,
+  ) => {
+    clearTimer(key);
+    const timer = timers.current[key];
+    timer.callback = callback;
+    timer.remainingMs = Math.max(0, durationMs);
+    scheduleTimer(timer);
+  }, [clearTimer, scheduleTimer]);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      const activeTimers = Object.values(timers.current);
+      if (document.hidden) {
+        const hiddenAt = Date.now();
+        activeTimers.forEach((timer) => {
+          if (timer.timeoutId === null || timer.startedAt === null) return;
+          window.clearTimeout(timer.timeoutId);
+          timer.timeoutId = null;
+          timer.remainingMs = Math.max(0, timer.remainingMs - (hiddenAt - timer.startedAt));
+          timer.startedAt = null;
+        });
+        return;
+      }
+
+      activeTimers.forEach(scheduleTimer);
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      clearTimers();
+    };
+  }, [clearTimers, scheduleTimer]);
+
+  return { armTimer, clearTimer, clearTimers };
 }
 
 class AlvoradaErrorBoundary extends Component<
@@ -54,55 +156,164 @@ class AlvoradaErrorBoundary extends Component<
   }
 }
 
-function AlvoradaFallback({ onSettled, reducedMotion }: {
-  onSettled: () => void;
-  reducedMotion: boolean;
-}) {
-  useEffect(() => {
-    const timeout = window.setTimeout(onSettled, reducedMotion ? 1800 : 3200);
-    return () => window.clearTimeout(timeout);
-  }, [onSettled, reducedMotion]);
-
+function AlvoradaFallback({ showTitle = true }: { showTitle?: boolean }) {
   return (
     <div
       className="alvorada-fallback"
       data-testid="alvorada-fallback"
       role="img"
-      aria-label="FENASOJA 2028 revelada na Alvorada de Santa Rosa"
+      aria-label={showTitle
+        ? 'FENASOJA 2028 revelada na Alvorada de Santa Rosa'
+        : 'Recuperando a Alvorada de Santa Rosa'}
     >
       <div className="alvorada-fallback__sun" aria-hidden="true" />
       <div className="alvorada-fallback__cloud alvorada-fallback__cloud--one" aria-hidden="true" />
       <div className="alvorada-fallback__cloud alvorada-fallback__cloud--two" aria-hidden="true" />
       <div className="alvorada-fallback__horizon" aria-hidden="true" />
-      <div className="alvorada-fallback__title" aria-hidden="true">
-        <span>FENASOJA</span>
-        <strong>2028</strong>
-      </div>
+      {showTitle && (
+        <div className="alvorada-fallback__title" aria-hidden="true">
+          <span>FENASOJA</span>
+          <strong>2028</strong>
+        </div>
+      )}
     </div>
   );
 }
 
 export default function FenasojaAlvoradaExperience({ onComplete }: FenasojaAlvoradaExperienceProps) {
-  const [quality] = useState(getAlvoradaQualityProfile);
-  const [webglAvailable] = useState(supportsAlvoradaWebGL);
-  const [reducedMotion] = useState(prefersReducedAlvoradaMotion);
-  const [renderFailure, setRenderFailure] = useState(false);
-  const [ready, setReady] = useState(false);
+  const [rendererTier] = useState(getAlvoradaWebGLTier);
+  const [quality] = useState(() => getAlvoradaQualityProfile(rendererTier));
+  const [rendererState, setRendererState] = useState<AlvoradaRendererState>(
+    rendererTier === 'unavailable' ? 'fallback' : 'loading',
+  );
+  const [fallbackReason, setFallbackReason] = useState<AlvoradaFallbackReason | null>(
+    rendererTier === 'unavailable' ? 'unsupported-webgl' : null,
+  );
+  const [canvasAttempt, setCanvasAttempt] = useState(0);
+  const [initialElapsed, setInitialElapsed] = useState(0);
+  const [ready, setReady] = useState(rendererTier === 'unavailable');
   const [leaving, setLeaving] = useState(false);
   const closeButton = useRef<HTMLButtonElement>(null);
+  const rendererStateRef = useRef<AlvoradaRendererState>(
+    rendererTier === 'unavailable' ? 'fallback' : 'loading',
+  );
+  const currentElapsed = useRef(0);
+  const recoveryAttempts = useRef(0);
   const exitStarted = useRef(false);
   const exitTimer = useRef<number | null>(null);
+  const recoveryFrame = useRef<number | null>(null);
+  const { armTimer, clearTimer, clearTimers } = useAlvoradaVisibleTimeouts();
+
+  const transitionRenderer = useCallback((nextState: AlvoradaRendererState) => {
+    rendererStateRef.current = nextState;
+    setRendererState(nextState);
+  }, []);
+
+  const clearRuntimeTimers = useCallback(() => {
+    if (recoveryFrame.current !== null) window.cancelAnimationFrame(recoveryFrame.current);
+    clearTimers();
+    recoveryFrame.current = null;
+  }, [clearTimers]);
 
   const finish = useCallback(() => {
     if (exitStarted.current) return;
     exitStarted.current = true;
+    clearRuntimeTimers();
     setLeaving(true);
     exitTimer.current = window.setTimeout(onComplete, ALVORADA_EXIT_DURATION_MS);
-  }, [onComplete]);
-  const handleRenderFailure = useCallback(() => setRenderFailure(true), []);
+  }, [clearRuntimeTimers, onComplete]);
+
+  const enterTerminalFallback = useCallback((reason: AlvoradaFallbackReason) => {
+    if (exitStarted.current || rendererStateRef.current === 'fallback') return;
+    clearRuntimeTimers();
+    setFallbackReason(reason);
+    transitionRenderer('fallback');
+    setReady(true);
+  }, [clearRuntimeTimers, transitionRenderer]);
+
+  const handleProgress = useCallback((elapsed: number) => {
+    if (
+      rendererStateRef.current !== 'loading'
+      && rendererStateRef.current !== 'webgl'
+    ) return;
+
+    currentElapsed.current = Math.min(
+      ALVORADA_SEQUENCE_DURATION,
+      Math.max(0, elapsed),
+    );
+  }, []);
+
+  const handleReady = useCallback(() => {
+    if (exitStarted.current || rendererStateRef.current !== 'loading') return;
+    clearTimer('recovery-timeout');
+    setFallbackReason(null);
+    transitionRenderer('webgl');
+    setReady(true);
+  }, [clearTimer, transitionRenderer]);
+
+  const handleContextLost = useCallback((elapsed: number) => {
+    if (
+      exitStarted.current
+      || rendererStateRef.current === 'recovering'
+      || rendererStateRef.current === 'fallback'
+    ) return;
+
+    const elapsedSnapshot = Math.min(
+      ALVORADA_SEQUENCE_DURATION,
+      Math.max(0, elapsed),
+    );
+    currentElapsed.current = elapsedSnapshot;
+
+    if (recoveryAttempts.current >= 1) {
+      enterTerminalFallback('context-lost');
+      return;
+    }
+
+    recoveryAttempts.current += 1;
+    setInitialElapsed(elapsedSnapshot);
+    setFallbackReason('context-lost');
+    transitionRenderer('recovering');
+    setReady(true);
+    clearRuntimeTimers();
+
+    armTimer('recovery-delay', ALVORADA_CONTEXT_RECOVERY_DELAY_MS, () => {
+      if (exitStarted.current) return;
+
+      recoveryFrame.current = window.requestAnimationFrame(() => {
+        recoveryFrame.current = null;
+        if (exitStarted.current) return;
+
+        setCanvasAttempt((attempt) => attempt + 1);
+        transitionRenderer('loading');
+        setReady(false);
+        armTimer(
+          'recovery-timeout',
+          ALVORADA_CONTEXT_RECOVERY_TIMEOUT_MS,
+          () => enterTerminalFallback('context-lost'),
+        );
+      });
+    });
+  }, [armTimer, clearRuntimeTimers, enterTerminalFallback, transitionRenderer]);
 
   useEffect(() => {
-    const focusFrame = window.requestAnimationFrame(() => closeButton.current?.focus({ preventScroll: true }));
+    if (rendererState !== 'fallback') return undefined;
+
+    const remainingSequenceMs = (
+      ALVORADA_SEQUENCE_DURATION - currentElapsed.current
+    ) * 1000;
+    armTimer(
+      'fallback',
+      Math.max(ALVORADA_MIN_FALLBACK_DURATION_MS, remainingSequenceMs),
+      finish,
+    );
+
+    return () => clearTimer('fallback');
+  }, [armTimer, clearTimer, finish, rendererState]);
+
+  useEffect(() => {
+    const focusFrame = window.requestAnimationFrame(() => closeButton.current?.focus({
+      preventScroll: true,
+    }));
 
     const containKeyboard = (event: KeyboardEvent) => {
       if (event.key === 'Tab') {
@@ -120,41 +331,52 @@ export default function FenasojaAlvoradaExperience({ onComplete }: FenasojaAlvor
     return () => {
       window.cancelAnimationFrame(focusFrame);
       window.removeEventListener('keydown', containKeyboard, true);
+      clearRuntimeTimers();
       if (exitTimer.current !== null) window.clearTimeout(exitTimer.current);
     };
-  }, [finish]);
+  }, [clearRuntimeTimers, finish]);
 
-  const fallback = (
-    <AlvoradaFallback onSettled={finish} reducedMotion={reducedMotion} />
-  );
-  const canRenderWebGL = webglAvailable && !reducedMotion && !renderFailure;
+  const fallback = <AlvoradaFallback />;
+  const recoveryFallback = <AlvoradaFallback showTitle={false} />;
+  const shouldRenderWebGL = rendererTier !== 'unavailable'
+    && (rendererState === 'loading' || rendererState === 'webgl');
+  const dataRenderer = shouldRenderWebGL ? 'webgl' : rendererState;
 
   return createPortal(
     <section
       className={`alvorada-overlay${ready ? ' alvorada-overlay--ready' : ''}${leaving ? ' alvorada-overlay--leaving' : ''}`}
       data-testid="alvorada-experience"
+      data-renderer-state={rendererState}
+      data-fallback-reason={fallbackReason ?? undefined}
       role="dialog"
       aria-modal="true"
       aria-label="O Nascer da Alvorada"
     >
       <div
         className="alvorada-overlay__canvas"
-        aria-hidden={canRenderWebGL ? true : undefined}
-        data-renderer={canRenderWebGL ? 'webgl' : 'fallback'}
+        aria-hidden={shouldRenderWebGL ? true : undefined}
+        data-renderer={dataRenderer}
       >
-        {canRenderWebGL ? (
-          <AlvoradaErrorBoundary fallback={fallback} onError={handleRenderFailure}>
+        {shouldRenderWebGL ? (
+          <AlvoradaErrorBoundary
+            key={canvasAttempt}
+            fallback={fallback}
+            onError={() => enterTerminalFallback('render-error')}
+          >
             <AlvoradaCanvas
-              onContextLost={handleRenderFailure}
-              onReady={() => setReady(true)}
+              initialElapsed={initialElapsed}
+              onContextLost={handleContextLost}
+              onProgress={handleProgress}
+              onReady={handleReady}
               onSequenceComplete={finish}
               quality={quality}
+              rendererTier={rendererTier}
             />
           </AlvoradaErrorBoundary>
-        ) : fallback}
+        ) : rendererState === 'recovering' ? recoveryFallback : fallback}
       </div>
 
-      {canRenderWebGL && !ready && (
+      {rendererState === 'loading' && (
         <div className="alvorada-overlay__loader" aria-live="polite" aria-atomic="true">
           <span className="alvorada-overlay__loader-orbit" aria-hidden="true" />
           <span>Preparando a Alvorada</span>

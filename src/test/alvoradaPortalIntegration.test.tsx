@@ -5,8 +5,8 @@ import CommissionPortalPage from '@/pages/commissions/CommissionPortalPage';
 
 const integrationMocks = vi.hoisted(() => ({
   canvasFails: false,
+  rendererTier: 'unavailable' as 'hardware' | 'compatible' | 'unavailable',
   warmAssets: vi.fn(),
-  webglAvailable: false,
 }));
 
 vi.mock('@/hooks/useAuth', () => ({
@@ -37,8 +37,7 @@ vi.mock('@/features/alvorada/capabilities', () => ({
     shadows: false,
     treeCount: 0,
   }),
-  prefersReducedAlvoradaMotion: () => false,
-  supportsAlvoradaWebGL: () => integrationMocks.webglAvailable,
+  getAlvoradaWebGLTier: () => integrationMocks.rendererTier,
   warmAlvoradaAssets: integrationMocks.warmAssets,
 }));
 
@@ -73,7 +72,7 @@ function renderPortal() {
 describe('integração do launcher da Alvorada no portal', () => {
   beforeEach(() => {
     integrationMocks.canvasFails = false;
-    integrationMocks.webglAvailable = false;
+    integrationMocks.rendererTier = 'unavailable';
     integrationMocks.warmAssets.mockClear();
     Object.defineProperty(window, 'matchMedia', {
       configurable: true,
@@ -144,7 +143,7 @@ describe('integração do launcher da Alvorada no portal', () => {
   });
 
   it('remove o loader e anuncia o fallback quando a renderização WebGL falha', async () => {
-    integrationMocks.webglAvailable = true;
+    integrationMocks.rendererTier = 'hardware';
     integrationMocks.canvasFails = true;
     vi.spyOn(console, 'error').mockImplementation(() => undefined);
     vi.spyOn(console, 'warn').mockImplementation(() => undefined);

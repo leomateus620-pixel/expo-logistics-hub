@@ -57,6 +57,18 @@ describe('timeline cinematográfica da Alvorada', () => {
     });
   });
 
+  it('restaura o tempo e a fase preservados após remontar o Canvas', () => {
+    const restored = createInitialTimelineState(5.75);
+
+    expect(restored.elapsed).toBe(5.75);
+    expect(restored.delta).toBe(0);
+    expect(restored.progress).toBeCloseTo(5.75 / ALVORADA_SEQUENCE_DURATION, 8);
+    expect(restored.phase).toBe('dawnRise');
+    expect(createInitialTimelineState(-2).elapsed).toBe(0);
+    expect(createInitialTimelineState(20).elapsed).toBe(ALVORADA_SEQUENCE_DURATION);
+    expect(createInitialTimelineState(20).phase).toBe('finalHold');
+  });
+
   it('limita e normaliza intervalos inclusive quando o intervalo é degenerado', () => {
     expect(clamp01(-3)).toBe(0);
     expect(clamp01(0.35)).toBe(0.35);
