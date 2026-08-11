@@ -153,7 +153,7 @@ function normalizeEvent(input: SeedInput): CronogramaEventSeed {
     startDate: input.startDate ?? null,
     endDate: input.endDate ?? null,
     status: input.status ?? (input.hasExactDate === false ? 'aguardando_definicao' : 'planejado'),
-    priority: input.priority ?? (input.eventType === 'feriado' ? 'baixa' : 'media'),
+    priority: input.priority ?? 'media',
     hasExactDate: input.hasExactDate ?? Boolean(input.startDate),
     commissionName: input.commissionName ?? commission?.name ?? null,
     linkedCommissions,
