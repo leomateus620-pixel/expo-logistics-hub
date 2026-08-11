@@ -4,7 +4,7 @@ import { Sky } from 'three/examples/jsm/objects/Sky.js';
 import * as THREE from 'three';
 import type { AlvoradaQualityProfile } from '../capabilities';
 import { useAlvoradaTimeline } from '../TimelineContext';
-import { smoothRange } from '../timeline';
+import { deriveAlvoradaVisualState, smoothRange } from '../timeline';
 import { createCloudTexture, seededRandom } from '../visualTextures';
 
 interface DawnEnvironmentProps {
@@ -98,49 +98,60 @@ function createPhysicalSky() {
   material.transparent = true;
   material.depthWrite = false;
   material.uniforms.skyOpacity = { value: 0 };
-  material.uniforms.skyRadiance = { value: 0.68 };
-  material.uniforms.turbidity.value = 7.4;
-  material.uniforms.rayleigh.value = 2.8;
-  material.uniforms.mieCoefficient.value = 0.0085;
-  material.uniforms.mieDirectionalG.value = 0.79;
+  material.uniforms.skyRadiance = { value: 0.78 };
+  material.uniforms.skyDawn = { value: 0 };
+  material.uniforms.turbidity.value = 6.4;
+  material.uniforms.rayleigh.value = 3.1;
+  material.uniforms.mieCoefficient.value = 0.0055;
+  material.uniforms.mieDirectionalG.value = 0.77;
   material.fragmentShader = material.fragmentShader
     .replace(
       'uniform float mieDirectionalG;',
-      'uniform float mieDirectionalG;\nuniform float skyOpacity;\nuniform float skyRadiance;',
+      'uniform float mieDirectionalG;\nuniform float skyOpacity;\nuniform float skyRadiance;\nuniform float skyDawn;',
     )
     .replace(
       'gl_FragColor = vec4( retColor, 1.0 );',
-      `float alvoradaAltitude = smoothstep(-0.015, 0.48, direction.y);
+      `float alvoradaAltitude = clamp(direction.y, -0.04, 1.0);
       vec3 alvoradaPhysicalSky = max(retColor, vec3(0.0));
-      alvoradaPhysicalSky /= vec3(1.0) + alvoradaPhysicalSky * 0.16;
-      float alvoradaHorizon = 1.0 - smoothstep(-0.02, 0.34, direction.y);
+      alvoradaPhysicalSky /= vec3(1.0) + alvoradaPhysicalSky * 0.14;
+      float alvoradaHorizon = 1.0 - smoothstep(-0.015, 0.3, alvoradaAltitude);
+      float alvoradaMiddle = smoothstep(0.035, 0.24, alvoradaAltitude)
+        * (1.0 - smoothstep(0.36, 0.72, alvoradaAltitude));
+      float alvoradaZenith = smoothstep(0.2, 0.82, alvoradaAltitude);
       float alvoradaSunAlignment = pow(
         max(dot(direction, normalize(vSunDirection)), 0.0),
-        18.0
+        22.0
       );
-      vec3 alvoradaBalancedSky = alvoradaPhysicalSky;
-      alvoradaBalancedSky *= mix(
-        vec3(1.04, 0.93, 0.78),
-        vec3(0.67, 0.9, 1.36),
-        alvoradaAltitude * 0.78
+      vec3 alvoradaGold = vec3(1.28, 0.58, 0.09);
+      vec3 alvoradaOrange = vec3(0.98, 0.22, 0.035);
+      vec3 alvoradaLavender = vec3(0.34, 0.39, 0.61);
+      vec3 alvoradaBlue = vec3(0.025, 0.13, 0.5);
+      vec3 alvoradaDeepBlue = vec3(0.003, 0.025, 0.18);
+      float alvoradaLowBlend = smoothstep(-0.01, 0.12, alvoradaAltitude);
+      float alvoradaBlueBlend = smoothstep(0.12, 0.48, alvoradaAltitude);
+      float alvoradaDeepBlend = smoothstep(0.38, 0.88, alvoradaAltitude);
+      vec3 alvoradaSpectralSky = mix(alvoradaGold, alvoradaOrange, alvoradaLowBlend);
+      alvoradaSpectralSky = mix(alvoradaSpectralSky, alvoradaLavender, alvoradaMiddle);
+      alvoradaSpectralSky = mix(alvoradaSpectralSky, alvoradaBlue, alvoradaBlueBlend);
+      alvoradaSpectralSky = mix(alvoradaSpectralSky, alvoradaDeepBlue, alvoradaDeepBlend);
+      vec3 alvoradaBalancedSky = mix(
+        alvoradaPhysicalSky,
+        alvoradaSpectralSky,
+        0.58 + skyDawn * 0.2
       );
-      alvoradaBalancedSky += vec3(1.0, 0.34, 0.025)
+      alvoradaBalancedSky += vec3(1.0, 0.54, 0.16)
         * alvoradaHorizon
-        * (0.045 + alvoradaSunAlignment * 0.24);
-      alvoradaBalancedSky += vec3(1.0, 0.72, 0.28)
+        * (0.055 + alvoradaSunAlignment * 0.31);
+      alvoradaBalancedSky += vec3(1.0, 0.84, 0.46)
         * alvoradaSunAlignment
         * alvoradaHorizon
-        * 0.1;
-      float alvoradaUpperBlue = smoothstep(0.1, 0.58, direction.y);
-      vec3 alvoradaDeepBlue = vec3(0.022, 0.105, 0.39)
-        + alvoradaPhysicalSky * vec3(0.22, 0.28, 0.38);
-      alvoradaBalancedSky = mix(
-        alvoradaBalancedSky,
-        alvoradaDeepBlue,
-        max(alvoradaUpperBlue, alvoradaAltitude * 0.72)
-      );
-      gl_FragColor = vec4(alvoradaBalancedSky * skyRadiance, skyOpacity);`,
+        * 0.18;
+      alvoradaBalancedSky *= 0.92 + alvoradaZenith * 0.11;
+      float alvoradaDither = fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233))) * 43758.5453);
+      alvoradaBalancedSky += (alvoradaDither - 0.5) / 255.0;
+      gl_FragColor = vec4(max(alvoradaBalancedSky, vec3(0.0)) * skyRadiance, skyOpacity);`,
     );
+  material.customProgramCacheKey = () => 'alvorada-premium-dawn-sky-v2';
   material.needsUpdate = true;
 
   return sky;
@@ -212,18 +223,19 @@ function createCloudMaterial(
   });
 }
 
-function createCloudPlacements(count: number) {
+function createCloudPlacements(count: number, mobile: boolean) {
   const random = seededRandom(4317202);
+  const horizontalSpan = mobile ? 18 : 35;
 
   return Array.from({ length: count }, (_, index): CloudPlacement => {
     const stratum = index % 3;
     const depth = 32 + stratum * 13 + random() * 48;
-    let x = -35 + random() * 70;
+    let x = -horizontalSpan + random() * horizontalSpan * 2;
     const y = 9 + stratum * 3.4 + random() * 10;
 
     // Keep the center of the final brand composition comparatively quiet.
-    if (Math.abs(x) < 9 && y > 13 && depth < 66) {
-      x += x < 0 ? -10 : 10;
+    if (Math.abs(x) < (mobile ? 6 : 9) && y > 13 && depth < 66) {
+      x += x < 0 ? (mobile ? -7 : -10) : (mobile ? 7 : 10);
     }
 
     return {
@@ -254,7 +266,7 @@ export function DawnEnvironment({ quality }: DawnEnvironmentProps) {
     () => horizontalSunDirection.clone(),
     [horizontalSunDirection],
   );
-  const cloudTextureSize = quality.mobile ? 256 : 384;
+  const cloudTextureSize = quality.level === 'low' ? 192 : quality.mobile ? 256 : 384;
   const cloudTextures = useMemo(
     () => [2028, 4317, 2029].map((seed) => createCloudTexture(cloudTextureSize, seed)),
     [cloudTextureSize],
@@ -269,8 +281,8 @@ export function DawnEnvironment({ quality }: DawnEnvironmentProps) {
     [cloudTextureSize, cloudTextures, sunDirection],
   );
   const clouds = useMemo(
-    () => createCloudPlacements(quality.cloudCount),
-    [quality.cloudCount],
+    () => createCloudPlacements(quality.cloudCount, quality.mobile),
+    [quality.cloudCount, quality.mobile],
   );
   const warmLightColor = useMemo(() => new THREE.Color('#ffd0a0'), []);
   const goldenLightColor = useMemo(() => new THREE.Color('#ffe1b8'), []);
@@ -287,9 +299,10 @@ export function DawnEnvironment({ quality }: DawnEnvironmentProps) {
     const timelineState = timeline.current as AmbientTimelineState;
     const elapsed = timelineState.elapsed;
     const ambientElapsed = timelineState.ambientElapsed ?? elapsed;
-    const reveal = smoothRange(elapsed, 4.48, 5.08);
-    const dawn = smoothRange(elapsed, 5.15, 9.35);
-    const elevation = THREE.MathUtils.degToRad(0.34 + dawn * 1.48);
+    const visualState = deriveAlvoradaVisualState(elapsed);
+    const reveal = visualState.skyOpacity;
+    const dawn = smoothRange(elapsed, 5.35, 11.55);
+    const elevation = THREE.MathUtils.degToRad(0.42 + dawn * 1.62);
 
     sunDirection.set(
       horizontalSunDirection.x * Math.cos(elevation),
@@ -299,31 +312,32 @@ export function DawnEnvironment({ quality }: DawnEnvironmentProps) {
 
     sky.visible = reveal > 0.001;
     sky.material.uniforms.skyOpacity.value = reveal;
-    sky.material.uniforms.skyRadiance.value = THREE.MathUtils.lerp(0.68, 0.8, dawn);
+    sky.material.uniforms.skyRadiance.value = THREE.MathUtils.lerp(0.8, 1.02, dawn);
+    sky.material.uniforms.skyDawn.value = dawn;
     sky.material.uniforms.sunPosition.value.copy(sunDirection);
-    sky.material.uniforms.turbidity.value = THREE.MathUtils.lerp(7.4, 5.2, dawn);
-    sky.material.uniforms.rayleigh.value = THREE.MathUtils.lerp(2.8, 3.7, dawn);
-    sky.material.uniforms.mieCoefficient.value = THREE.MathUtils.lerp(0.0085, 0.0038, dawn);
+    sky.material.uniforms.turbidity.value = THREE.MathUtils.lerp(6.4, 4.7, dawn);
+    sky.material.uniforms.rayleigh.value = THREE.MathUtils.lerp(3.1, 4.35, dawn);
+    sky.material.uniforms.mieCoefficient.value = THREE.MathUtils.lerp(0.0055, 0.0028, dawn);
 
     if (root.current) root.current.visible = reveal > 0.001;
     if (sunVisual.current) {
       sunVisual.current.position.copy(camera.position).addScaledVector(sunDirection, 120);
       sunVisual.current.quaternion.copy(camera.quaternion);
       sunVisual.current.scale.setScalar(THREE.MathUtils.lerp(0.74, 1, dawn));
-      sunMaterial.uniforms.sunOpacity.value = reveal * 0.76;
+      sunMaterial.uniforms.sunOpacity.value = reveal * THREE.MathUtils.lerp(0.72, 0.9, dawn);
     }
     if (solarLight.current) {
       solarLight.current.position.copy(sunDirection).multiplyScalar(90);
-      solarLight.current.intensity = reveal * THREE.MathUtils.lerp(2.15, 3.65, dawn);
+      solarLight.current.intensity = reveal * THREE.MathUtils.lerp(1.55, 2.8, dawn);
       solarLight.current.color.lerpColors(warmLightColor, goldenLightColor, dawn);
     }
     if (ambientLight.current) {
-      ambientLight.current.intensity = reveal * THREE.MathUtils.lerp(0.66, 0.92, dawn);
+      ambientLight.current.intensity = reveal * THREE.MathUtils.lerp(0.72, 1.02, dawn);
     }
 
     cloudMaterials.forEach((material, stratum) => {
-      material.uniforms.opacity.value = reveal * (0.24 - stratum * 0.032);
-      material.uniforms.warmth.value = THREE.MathUtils.lerp(0.5, 0.82, dawn);
+      material.uniforms.opacity.value = reveal * (0.27 - stratum * 0.032);
+      material.uniforms.warmth.value = THREE.MathUtils.lerp(0.44, 0.86, dawn);
     });
 
     clouds.forEach((cloud, index) => {
@@ -371,7 +385,7 @@ export function DawnEnvironment({ quality }: DawnEnvironmentProps) {
 
       <hemisphereLight
         ref={ambientLight}
-        args={['#9fc7ee', '#64766c', 0]}
+        args={['#8fc2f4', '#6f6559', 0]}
       />
       <directionalLight
         ref={solarLight}

@@ -11,6 +11,7 @@ import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { AlvoradaCanvas } from './AlvoradaCanvas';
 import {
+  degradeAlvoradaQualityProfile,
   getAlvoradaQualityProfile,
   getAlvoradaWebGLTier,
 } from './capabilities';
@@ -261,6 +262,10 @@ export default function FenasojaAlvoradaExperience({ onComplete }: FenasojaAlvor
     );
   }, []);
 
+  const handleQualityDecline = useCallback(() => {
+    setQuality((current) => degradeAlvoradaQualityProfile(current));
+  }, []);
+
   const handleReady = useCallback(() => {
     if (exitStarted.current || rendererStateRef.current !== 'loading') return;
     clearTimer('recovery-timeout');
@@ -371,6 +376,7 @@ export default function FenasojaAlvoradaExperience({ onComplete }: FenasojaAlvor
               initialElapsed={initialElapsed}
               onContextLost={handleContextLost}
               onProgress={handleProgress}
+              onQualityDecline={handleQualityDecline}
               onReady={handleReady}
               quality={quality}
               rendererTier={rendererTier}

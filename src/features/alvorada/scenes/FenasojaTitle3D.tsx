@@ -4,7 +4,12 @@ import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { AlvoradaQualityProfile } from '../capabilities';
 import { useAlvoradaTimeline } from '../TimelineContext';
-import { bellCurve, smoothRange } from '../timeline';
+import {
+  ALVORADA_PHASES,
+  bellCurve,
+  deriveAlvoradaVisualState,
+  smoothRange,
+} from '../timeline';
 
 interface FenasojaTitle3DProps {
   quality: AlvoradaQualityProfile;
@@ -155,19 +160,29 @@ export function FenasojaTitle3D({ quality }: FenasojaTitle3DProps) {
   useEffect(() => () => {
     symbol.material.dispose();
     symbolTexture.dispose();
+    symbolSource.dispose();
+    useTexture.clear(SYMBOL_URL);
     word.material.dispose();
     badge.material.dispose();
     edition.material.dispose();
-  }, [badge.material, edition.material, symbol.material, symbolTexture, word.material]);
+  }, [badge.material, edition.material, symbol.material, symbolSource, symbolTexture, word.material]);
 
   useFrame(() => {
     const elapsed = timeline.current.elapsed;
     const ambientElapsed = timeline.current.ambientElapsed;
-    const wordReveal = smoothRange(elapsed, 9.02, 10.03);
-    const editionReveal = smoothRange(elapsed, 9.18, 10.18);
-    const symbolReveal = smoothRange(elapsed, 8.92, 9.82);
-    const sweep = smoothRange(elapsed, 9.64, 10.38);
-    const sweepEnergy = bellCurve(elapsed, 9.55, 9.96, 10.48);
+    const visualState = deriveAlvoradaVisualState(elapsed);
+    const revealStart = ALVORADA_PHASES.titleReveal.start;
+    const revealEnd = ALVORADA_PHASES.titleReveal.end;
+    const wordReveal = smoothRange(elapsed, revealStart + 0.08, revealStart + 1.15);
+    const editionReveal = smoothRange(elapsed, revealStart + 0.24, revealStart + 1.34);
+    const symbolReveal = smoothRange(elapsed, revealStart, revealStart + 0.98);
+    const sweep = smoothRange(elapsed, revealStart + 0.86, revealEnd - 0.12);
+    const sweepEnergy = bellCurve(
+      elapsed,
+      revealStart + 0.78,
+      revealStart + 1.24,
+      revealEnd,
+    );
 
     word.reveal.value = THREE.MathUtils.lerp(-7.2, 7.2, wordReveal);
     badge.reveal.value = THREE.MathUtils.lerp(-2.1, 2.1, editionReveal);
@@ -179,14 +194,14 @@ export function FenasojaTitle3D({ quality }: FenasojaTitle3DProps) {
     symbol.sweep.value = THREE.MathUtils.lerp(-0.2, 1.2, sweep);
 
     if (root.current) {
-      root.current.visible = elapsed >= 8.98;
+      root.current.visible = visualState.titleProgress > 0.001;
       const titleViewport = viewport.getCurrentViewport(camera, titlePosition);
-      const targetWidth = titleViewport.width * (quality.mobile ? 0.76 : 0.64);
+      const targetWidth = titleViewport.width * (quality.mobile ? 0.56 : 0.58);
       const scale = targetWidth / TITLE_WIDTH;
       root.current.scale.setScalar(scale);
       root.current.position.copy(titlePosition);
-      root.current.position.y += elapsed >= 10.5
-        ? Math.sin((ambientElapsed - 10.5) * 0.16) * 0.012
+      root.current.position.y += elapsed >= revealEnd
+        ? Math.sin((ambientElapsed - revealEnd) * 0.16) * 0.012
         : 0;
     }
     if (sweepLight.current) {
@@ -262,5 +277,3 @@ export function FenasojaTitle3D({ quality }: FenasojaTitle3DProps) {
     </group>
   );
 }
-
-useTexture.preload(SYMBOL_URL);

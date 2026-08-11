@@ -1,11 +1,13 @@
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import FenasojaAlvoradaExperience from '@/features/alvorada/FenasojaAlvoradaExperience';
+import { ALVORADA_SEQUENCE_DURATION } from '@/features/alvorada/timeline';
 
 interface MockCanvasProps {
   initialElapsed: number;
   onContextLost: (elapsed: number) => void;
   onProgress: (elapsed: number) => void;
+  onQualityDecline: () => void;
   onReady: () => void;
   rendererTier: 'hardware' | 'compatible';
 }
@@ -25,6 +27,7 @@ const runtime = vi.hoisted(() => ({
 }));
 
 vi.mock('@/features/alvorada/capabilities', () => ({
+  degradeAlvoradaQualityProfile: (profile: unknown) => profile,
   getAlvoradaQualityProfile: (rendererTier: string) => ({
     antialias: rendererTier === 'hardware',
     buildingCount: 1,
@@ -157,7 +160,7 @@ describe('recuperação WebGL da experiência Alvorada', () => {
     );
     expect(onComplete).not.toHaveBeenCalled();
 
-    act(() => currentCanvas().props.onProgress(10.5));
+    act(() => currentCanvas().props.onProgress(ALVORADA_SEQUENCE_DURATION));
     advance(60_000);
     expect(screen.getByTestId('mock-alvorada-canvas')).toBeInTheDocument();
     expect(onComplete).not.toHaveBeenCalled();
@@ -347,7 +350,7 @@ describe('recuperação WebGL da experiência Alvorada', () => {
 
     act(() => {
       canvas.props.onReady();
-      canvas.props.onProgress(10.5);
+      canvas.props.onProgress(ALVORADA_SEQUENCE_DURATION);
     });
     advance(120_000);
 
@@ -370,21 +373,21 @@ describe('recuperação WebGL da experiência Alvorada', () => {
 
     act(() => {
       firstCanvas.props.onReady();
-      firstCanvas.props.onProgress(10.5);
-      firstCanvas.props.onContextLost(10.5);
+      firstCanvas.props.onProgress(ALVORADA_SEQUENCE_DURATION);
+      firstCanvas.props.onContextLost(ALVORADA_SEQUENCE_DURATION);
     });
     advance(516);
 
     const retryCanvas = currentCanvas();
-    expect(retryCanvas.props.initialElapsed).toBe(10.5);
+    expect(retryCanvas.props.initialElapsed).toBe(ALVORADA_SEQUENCE_DURATION);
     expect(screen.getByTestId('mock-alvorada-canvas')).toHaveAttribute(
       'data-initial-elapsed',
-      '10.5',
+      String(ALVORADA_SEQUENCE_DURATION),
     );
 
     act(() => {
       retryCanvas.props.onReady();
-      retryCanvas.props.onProgress(10.5);
+      retryCanvas.props.onProgress(ALVORADA_SEQUENCE_DURATION);
     });
     advance(120_000);
 

@@ -1,8 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import {
+  degradeAlvoradaQualityProfile,
   getAlvoradaQualityProfile,
   getAlvoradaWebGLTier,
 } from '@/features/alvorada/capabilities';
+
+const originalMatchMedia = window.matchMedia;
 
 function webglContext() {
   const loseContext = vi.fn();
@@ -26,6 +29,14 @@ describe('probe de compatibilidade WebGL da Alvorada', () => {
   afterEach(() => {
     vi.restoreAllMocks();
     Reflect.deleteProperty(window, 'WebGL2RenderingContext');
+    Object.defineProperty(window, 'innerWidth', {
+      configurable: true,
+      value: 1024,
+    });
+    Object.defineProperty(window, 'matchMedia', {
+      configurable: true,
+      value: originalMatchMedia,
+    });
   });
 
   it('classifica hardware quando o contexto de alto desempenho é aceito', () => {
@@ -81,5 +92,52 @@ describe('probe de compatibilidade WebGL da Alvorada', () => {
     expect(compatible.postprocessing).toBe(false);
     expect(compatible.bloom).toBe(false);
     expect(compatible.level).toBe('low');
+  });
+
+  it('trata viewport portrait como mobile e desliga os custos críticos', () => {
+    Object.defineProperty(window, 'innerWidth', {
+      configurable: true,
+      value: 390,
+    });
+    Object.defineProperty(window, 'matchMedia', {
+      configurable: true,
+      value: vi.fn().mockReturnValue({ matches: true }),
+    });
+
+    const mobile = getAlvoradaQualityProfile('hardware');
+
+    expect(mobile).toMatchObject({
+      antialias: false,
+      bloom: false,
+      buildingCount: 3000,
+      cloudCount: 5,
+      level: 'medium',
+      mobile: true,
+      postprocessing: false,
+      shadows: false,
+      terrainSegments: 72,
+      treeCount: 900,
+    });
+    expect(mobile.dpr).toEqual([0.85, 1.25]);
+  });
+
+  it('degrada qualidade em no máximo dois passos e estabiliza no tier baixo', () => {
+    const high = {
+      ...getAlvoradaQualityProfile('hardware'),
+      level: 'high' as const,
+      mobile: false,
+    };
+    const medium = degradeAlvoradaQualityProfile(high);
+    const low = degradeAlvoradaQualityProfile(medium);
+
+    expect(medium.level).toBe('medium');
+    expect(medium.shadows).toBe(false);
+    expect(medium.bloom).toBe(false);
+    expect(medium.buildingCount).toBeLessThanOrEqual(5400);
+    expect(low.level).toBe('low');
+    expect(low.postprocessing).toBe(false);
+    expect(low.antialias).toBe(false);
+    expect(low.buildingCount).toBeLessThanOrEqual(2600);
+    expect(degradeAlvoradaQualityProfile(low)).toBe(low);
   });
 });

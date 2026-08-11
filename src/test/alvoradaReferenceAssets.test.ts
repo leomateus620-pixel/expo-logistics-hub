@@ -1,4 +1,4 @@
-import { readFileSync, statSync } from 'node:fs';
+import { existsSync, readFileSync, statSync } from 'node:fs';
 import { basename, resolve } from 'node:path';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -98,13 +98,13 @@ describe('assets oficiais e panoramas da Alvorada', () => {
     expect(symbolSize).toEqual({ width: 512, height: 512 });
   });
 
-  it('consome os panoramas responsivos e o símbolo no WebGL e no fallback', () => {
-    const backdrop = readFileSync(
-      resolve('src/features/alvorada/scenes/SantaRosaCinematicBackdrop.tsx'),
-      'utf8',
-    );
+  it('mantém os panoramas fora do runtime e usa apenas o símbolo oficial', () => {
     const controller = readFileSync(
       resolve('src/features/alvorada/SceneController.tsx'),
+      'utf8',
+    );
+    const capabilities = readFileSync(
+      resolve('src/features/alvorada/capabilities.ts'),
       'utf8',
     );
     const title = readFileSync(
@@ -116,69 +116,61 @@ describe('assets oficiais e panoramas da Alvorada', () => {
       'utf8',
     );
 
-    expect(backdrop).toContain("const DESKTOP_SOURCE = '/alvorada/santa-rosa-horizon.webp'");
-    expect(backdrop).toContain("const PORTRAIT_SOURCE = '/alvorada/santa-rosa-horizon-portrait.webp'");
-    expect(backdrop).toContain('const portrait = viewport.aspect < 1');
-    expect(backdrop).toContain('useTexture(portrait ? PORTRAIT_SOURCE : DESKTOP_SOURCE)');
-    expect(backdrop).toContain('useTexture.preload(DESKTOP_SOURCE)');
-    expect(backdrop).toContain('useTexture.preload(PORTRAIT_SOURCE)');
-    expect(controller).toContain('<SantaRosaCinematicBackdrop quality={quality} />');
+    expect(existsSync(resolve(
+      'src/features/alvorada/scenes/SantaRosaCinematicBackdrop.tsx',
+    ))).toBe(false);
+    expect(controller).not.toContain('SantaRosaCinematicBackdrop');
+    expect(controller).not.toContain('santa-rosa-horizon');
+    expect(capabilities).not.toContain('santa-rosa-horizon');
 
     expect(title).toContain("const SYMBOL_URL = '/alvorada/fenasoja-symbol-official.png'");
     expect(title).toContain('const symbolSource = useTexture(SYMBOL_URL)');
     expect(title).toMatch(/<mesh[\s\S]*?material=\{symbol\.material\}[\s\S]*?<planeGeometry/);
-    expect(title).toContain('useTexture.preload(SYMBOL_URL)');
+    expect(title).not.toContain('useTexture.preload(SYMBOL_URL)');
     expect(experience).toContain('<img src="/alvorada/fenasoja-symbol-official.png" alt="" />');
   });
 
-  it('aquece todos os assets críticos uma única vez antes da jornada', async () => {
-    const warmedImages: string[] = [];
+  it('separa assets orbitais críticos dos assets secundários da jornada', async () => {
     const fetchMock = vi.fn().mockResolvedValue({ ok: true });
-
-    class MockImage {
-      decoding = '';
-      private source = '';
-
-      get src() {
-        return this.source;
-      }
-
-      set src(value: string) {
-        this.source = value;
-        warmedImages.push(value);
-      }
-    }
-
-    vi.stubGlobal('Image', MockImage);
     vi.stubGlobal('fetch', fetchMock);
     vi.resetModules();
 
-    const { warmAlvoradaAssets } = await import('@/features/alvorada/capabilities');
+    const {
+      streamAlvoradaSecondaryAssets,
+      warmAlvoradaAssets,
+    } = await import('@/features/alvorada/capabilities');
     warmAlvoradaAssets();
 
-    expect(warmedImages).toEqual([
+    expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
       '/alvorada/earth-day-2048.jpg',
       '/alvorada/earth-night-lights-2048.png',
       '/alvorada/earth-normal-2048.jpg',
       '/alvorada/earth-clouds-1024.png',
-      '/alvorada/santa-rosa-horizon.webp',
-      '/alvorada/santa-rosa-horizon-portrait.webp',
-      '/alvorada/fenasoja-symbol-official.png',
+      '/alvorada/brazil-min.geojson',
+      '/alvorada/rio-grande-do-sul-min.geojson',
+      '/alvorada/santa-rosa-min.geojson',
     ]);
+    expect(fetchMock.mock.calls.every(([, options]) => (
+      (options as RequestInit).cache === 'force-cache'
+    ))).toBe(true);
+
+    streamAlvoradaSecondaryAssets();
     expect(fetchMock.mock.calls.map(([url]) => url)).toEqual([
+      '/alvorada/earth-day-2048.jpg',
+      '/alvorada/earth-night-lights-2048.png',
+      '/alvorada/earth-normal-2048.jpg',
+      '/alvorada/earth-clouds-1024.png',
       '/alvorada/brazil-min.geojson',
       '/alvorada/rio-grande-do-sul-min.geojson',
       '/alvorada/santa-rosa-min.geojson',
       '/alvorada/santa-rosa-roads.json',
       '/alvorada/santa-rosa-city-v2.json',
       '/alvorada/helvetiker-bold.typeface.json',
+      '/alvorada/fenasoja-symbol-official.png',
     ]);
-    expect(fetchMock.mock.calls.every(([, options]) => (
-      (options as RequestInit).cache === 'force-cache'
-    ))).toBe(true);
 
     warmAlvoradaAssets();
-    expect(warmedImages).toHaveLength(7);
-    expect(fetchMock).toHaveBeenCalledTimes(6);
+    streamAlvoradaSecondaryAssets();
+    expect(fetchMock).toHaveBeenCalledTimes(11);
   });
 });

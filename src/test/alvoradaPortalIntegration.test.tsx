@@ -6,6 +6,7 @@ import CommissionPortalPage from '@/pages/commissions/CommissionPortalPage';
 const integrationMocks = vi.hoisted(() => ({
   canvasFails: false,
   rendererTier: 'unavailable' as 'hardware' | 'compatible' | 'unavailable',
+  streamAssets: vi.fn(),
   warmAssets: vi.fn(),
 }));
 
@@ -27,6 +28,7 @@ vi.mock('@/hooks/useCurrentOrg', () => ({
 }));
 
 vi.mock('@/features/alvorada/capabilities', () => ({
+  degradeAlvoradaQualityProfile: (profile: unknown) => profile,
   getAlvoradaQualityProfile: () => ({
     antialias: false,
     buildingCount: 0,
@@ -38,6 +40,7 @@ vi.mock('@/features/alvorada/capabilities', () => ({
     treeCount: 0,
   }),
   getAlvoradaWebGLTier: () => integrationMocks.rendererTier,
+  streamAlvoradaSecondaryAssets: integrationMocks.streamAssets,
   warmAlvoradaAssets: integrationMocks.warmAssets,
 }));
 
@@ -73,6 +76,7 @@ describe('integração do launcher da Alvorada no portal', () => {
   beforeEach(() => {
     integrationMocks.canvasFails = false;
     integrationMocks.rendererTier = 'unavailable';
+    integrationMocks.streamAssets.mockClear();
     integrationMocks.warmAssets.mockClear();
     Object.defineProperty(window, 'matchMedia', {
       configurable: true,
@@ -117,8 +121,10 @@ describe('integração do launcher da Alvorada no portal', () => {
     expect(screen.getByTestId('alvorada-location')).toHaveTextContent('/portal');
     expect(container.querySelector('.fenasoja-portal')).toHaveAttribute('inert');
     expect(container.querySelector('.fenasoja-portal')).toHaveAttribute('aria-hidden', 'true');
+    expect(document.documentElement.style.scrollbarGutter).toBe('auto');
     expect(screen.getByRole('button', { name: 'Fechar O Nascer da Alvorada' })).toHaveFocus();
     expect(integrationMocks.warmAssets).toHaveBeenCalled();
+    expect(integrationMocks.streamAssets).toHaveBeenCalledTimes(1);
 
     fireEvent.keyDown(window, { key: 'Escape' });
 
@@ -130,6 +136,7 @@ describe('integração do launcher da Alvorada no portal', () => {
     expect(screen.getByTestId('alvorada-location')).toHaveTextContent('/portal');
     expect(container.querySelector('.fenasoja-portal')).not.toHaveAttribute('inert');
     expect(container.querySelector('.fenasoja-portal')).not.toHaveAttribute('aria-hidden');
+    expect(document.documentElement.style.scrollbarGutter).not.toBe('auto');
 
     fireEvent.click(launcher);
     await screen.findByRole('dialog', { name: 'O Nascer da Alvorada' });

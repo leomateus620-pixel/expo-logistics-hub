@@ -24,34 +24,45 @@ const ALVORADA_CRITICAL_ASSETS = [
   '/alvorada/earth-night-lights-2048.png',
   '/alvorada/earth-normal-2048.jpg',
   '/alvorada/earth-clouds-1024.png',
-  '/alvorada/santa-rosa-horizon.webp',
-  '/alvorada/santa-rosa-horizon-portrait.webp',
-  '/alvorada/fenasoja-symbol-official.png',
-] as const;
-
-const ALVORADA_DATA_ASSETS = [
   '/alvorada/brazil-min.geojson',
   '/alvorada/rio-grande-do-sul-min.geojson',
   '/alvorada/santa-rosa-min.geojson',
+] as const;
+
+const ALVORADA_SECONDARY_ASSETS = [
   '/alvorada/santa-rosa-roads.json',
   '/alvorada/santa-rosa-city-v2.json',
   '/alvorada/helvetiker-bold.typeface.json',
+  '/alvorada/fenasoja-symbol-official.png',
 ] as const;
 
 let assetsWarmed = false;
+let secondaryAssetsStreaming = false;
+
+function streamAssets(sources: readonly string[]) {
+  sources.forEach((source) => {
+    // Fetch warms the HTTP cache without eagerly decoding another Image. The
+    // Three loaders consume the same response when their phase is mounted.
+    void fetch(source, { cache: 'force-cache' }).catch(() => undefined);
+  });
+}
 
 export function warmAlvoradaAssets() {
   if (assetsWarmed || typeof window === 'undefined') return;
   assetsWarmed = true;
 
-  ALVORADA_CRITICAL_ASSETS.forEach((source) => {
-    const image = new Image();
-    image.decoding = 'async';
-    image.src = source;
-  });
-  ALVORADA_DATA_ASSETS.forEach((source) => {
-    void fetch(source, { cache: 'force-cache' }).catch(() => undefined);
-  });
+  streamAssets(ALVORADA_CRITICAL_ASSETS);
+}
+
+/**
+ * Starts non-orbital downloads only after the experience is opened. It is
+ * intentionally separate from hover/focus warming so mobile does not decode
+ * or retain the city and title assets while the user remains on the portal.
+ */
+export function streamAlvoradaSecondaryAssets() {
+  if (secondaryAssetsStreaming || typeof window === 'undefined') return;
+  secondaryAssetsStreaming = true;
+  streamAssets(ALVORADA_SECONDARY_ASSETS);
 }
 
 function canCreateWebGL2Context(attributes: WebGLContextAttributes) {
@@ -109,17 +120,66 @@ export function getAlvoradaQualityProfile(
       : 'high';
 
   return {
-    antialias: !compatibleRenderer,
-    buildingCount: compatibleRenderer ? 3000 : reduced ? 5400 : 9000,
-    bloom: !compatibleRenderer,
-    cloudCount: compatibleRenderer ? 5 : reduced ? 7 : 13,
-    dpr: compatibleRenderer ? [0.85, 1.2] : reduced ? [1, 1.5] : [1, 1.85],
+    antialias: !compatibleRenderer && !mobile,
+    buildingCount: compatibleRenderer ? 1800 : mobile ? 3000 : reduced ? 4200 : 9000,
+    bloom: !compatibleRenderer && !mobile && !reduced,
+    cloudCount: compatibleRenderer ? 4 : mobile ? 5 : reduced ? 7 : 13,
+    dpr: compatibleRenderer
+      ? [0.75, 1]
+      : mobile
+        ? [0.85, 1.25]
+        : reduced
+          ? [0.9, 1.4]
+          : [1, 1.85],
     level,
     mobile,
-    postprocessing: !compatibleRenderer,
+    postprocessing: !compatibleRenderer && !mobile,
     shadowMapSize: compatibleRenderer ? 512 : reduced ? 1024 : 2048,
-    shadows: !compatibleRenderer && !lowMemory && (!mobile || !lowConcurrency),
-    terrainSegments: compatibleRenderer ? 64 : reduced ? 96 : 128,
-    treeCount: compatibleRenderer ? 1200 : reduced ? 3000 : 4500,
+    shadows: !compatibleRenderer && !mobile && !lowMemory,
+    terrainSegments: compatibleRenderer ? 56 : mobile ? 72 : reduced ? 96 : 128,
+    treeCount: compatibleRenderer ? 500 : mobile ? 900 : reduced ? 1400 : 4500,
+  };
+}
+
+/**
+ * Applies one durable runtime downgrade. PerformanceMonitor calls this only
+ * when a sustained decline is detected, so React work is limited to at most
+ * two scene rebuilds (high -> medium -> low), never one update per frame.
+ */
+export function degradeAlvoradaQualityProfile(
+  current: AlvoradaQualityProfile,
+): AlvoradaQualityProfile {
+  if (current.level === 'low') return current;
+
+  if (current.level === 'high') {
+    return {
+      ...current,
+      antialias: !current.mobile,
+      bloom: false,
+      buildingCount: Math.min(current.buildingCount, current.mobile ? 2400 : 5400),
+      cloudCount: Math.min(current.cloudCount, current.mobile ? 5 : 7),
+      dpr: current.mobile ? [0.8, 1.1] : [0.85, 1.45],
+      level: 'medium',
+      postprocessing: !current.mobile,
+      shadowMapSize: Math.min(current.shadowMapSize, 1024),
+      shadows: false,
+      terrainSegments: Math.min(current.terrainSegments, current.mobile ? 64 : 96),
+      treeCount: Math.min(current.treeCount, current.mobile ? 700 : 1800),
+    };
+  }
+
+  return {
+    ...current,
+    antialias: false,
+    bloom: false,
+    buildingCount: Math.min(current.buildingCount, current.mobile ? 1600 : 2600),
+    cloudCount: Math.min(current.cloudCount, 4),
+    dpr: [0.75, 1],
+    level: 'low',
+    postprocessing: false,
+    shadowMapSize: 512,
+    shadows: false,
+    terrainSegments: Math.min(current.terrainSegments, current.mobile ? 48 : 64),
+    treeCount: Math.min(current.treeCount, current.mobile ? 450 : 700),
   };
 }

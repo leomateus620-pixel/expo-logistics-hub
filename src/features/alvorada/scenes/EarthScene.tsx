@@ -2,10 +2,18 @@ import { useEffect, useMemo, useRef } from 'react';
 import { Stars, useTexture } from '@react-three/drei';
 import { useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
+import type { AlvoradaQualityProfile } from '../capabilities';
 import { EARTH_RADIUS } from '../geo';
 import { useAlvoradaTimeline } from '../TimelineContext';
-import { smoothRange } from '../timeline';
+import { deriveAlvoradaVisualState, smoothRange } from '../timeline';
 import { BrazilLayer, RioGrandeDoSulLayer, SantaRosaMarker } from './GeographicLayers';
+
+const EARTH_TEXTURE_URLS = [
+  '/alvorada/earth-day-2048.jpg',
+  '/alvorada/earth-night-lights-2048.png',
+  '/alvorada/earth-normal-2048.jpg',
+  '/alvorada/earth-clouds-1024.png',
+];
 
 const earthVertexShader = `
   varying vec2 vUv;
@@ -104,7 +112,7 @@ function createOrbitalGlowTexture() {
   return texture;
 }
 
-export function EarthScene() {
+export function EarthScene({ quality }: { quality: AlvoradaQualityProfile }) {
   const timeline = useAlvoradaTimeline();
   const spaceRoot = useRef<THREE.Group>(null);
   const earthRoot = useRef<THREE.Group>(null);
@@ -112,24 +120,22 @@ export function EarthScene() {
   const earthMaterial = useRef<THREE.ShaderMaterial>(null);
   const atmosphereMaterial = useRef<THREE.ShaderMaterial>(null);
   const sunMaterial = useRef<THREE.SpriteMaterial>(null);
-  const [dayMap, nightMap, normalMap, cloudMap] = useTexture([
-    '/alvorada/earth-day-2048.jpg',
-    '/alvorada/earth-night-lights-2048.png',
-    '/alvorada/earth-normal-2048.jpg',
-    '/alvorada/earth-clouds-1024.png',
-  ]);
+  const stars = useRef<THREE.Points>(null);
+  const [dayMap, nightMap, normalMap, cloudMap] = useTexture(EARTH_TEXTURE_URLS);
   const glowTexture = useMemo(createOrbitalGlowTexture, []);
   const sunDirection = useMemo(() => new THREE.Vector3(0.42, 0.63, -0.24).normalize(), []);
+  const earthSegments = quality.mobile ? [96, 64] : [128, 96];
+  const atmosphereSegments = quality.mobile ? [64, 48] : [96, 64];
 
   useEffect(() => {
     dayMap.colorSpace = THREE.SRGBColorSpace;
     nightMap.colorSpace = THREE.SRGBColorSpace;
     cloudMap.colorSpace = THREE.SRGBColorSpace;
     [dayMap, nightMap, normalMap, cloudMap].forEach((texture) => {
-      texture.anisotropy = 4;
+      texture.anisotropy = quality.mobile ? 2 : 4;
       texture.needsUpdate = true;
     });
-  }, [cloudMap, dayMap, nightMap, normalMap]);
+  }, [cloudMap, dayMap, nightMap, normalMap, quality.mobile]);
 
   const earthUniforms = useMemo(() => ({
     dayMap: { value: dayMap },
@@ -144,11 +150,15 @@ export function EarthScene() {
     sunDirection: { value: sunDirection },
   }), [sunDirection]);
 
-  useEffect(() => () => glowTexture.dispose(), [glowTexture]);
+  useEffect(() => () => {
+    glowTexture.dispose();
+    [dayMap, nightMap, normalMap, cloudMap].forEach((texture) => texture.dispose());
+    EARTH_TEXTURE_URLS.forEach((url) => useTexture.clear(url));
+  }, [cloudMap, dayMap, glowTexture, nightMap, normalMap]);
 
   useFrame(() => {
     const elapsed = timeline.current.elapsed;
-    const fade = 1 - smoothRange(elapsed, 4.34, 4.86);
+    const fade = deriveAlvoradaVisualState(elapsed).earthOpacity;
     if (spaceRoot.current) spaceRoot.current.visible = fade > 0.001;
     if (earthRoot.current) {
       earthRoot.current.visible = fade > 0.001;
@@ -158,13 +168,16 @@ export function EarthScene() {
     if (earthMaterial.current) earthMaterial.current.uniforms.opacity.value = fade;
     if (atmosphereMaterial.current) atmosphereMaterial.current.uniforms.opacity.value = fade * 0.38;
     if (sunMaterial.current) sunMaterial.current.opacity = fade * (0.66 + smoothRange(elapsed, 0, 2) * 0.22);
+    if (stars.current) {
+      (stars.current.material as THREE.PointsMaterial).opacity = fade;
+    }
   });
 
   return (
     <group ref={spaceRoot}>
       <group ref={earthRoot}>
         <mesh>
-          <sphereGeometry args={[EARTH_RADIUS, 128, 96]} />
+          <sphereGeometry args={[EARTH_RADIUS, earthSegments[0], earthSegments[1]]} />
           <shaderMaterial
             ref={earthMaterial}
             fragmentShader={earthFragmentShader}
@@ -175,7 +188,7 @@ export function EarthScene() {
         </mesh>
 
         <mesh ref={cloudMesh} scale={1.006}>
-          <sphereGeometry args={[EARTH_RADIUS, 96, 64]} />
+          <sphereGeometry args={[EARTH_RADIUS, atmosphereSegments[0], atmosphereSegments[1]]} />
           <meshBasicMaterial
             map={cloudMap}
             color="#d8e9f8"
@@ -187,7 +200,7 @@ export function EarthScene() {
         </mesh>
 
         <mesh scale={1.019}>
-          <sphereGeometry args={[EARTH_RADIUS, 96, 64]} />
+          <sphereGeometry args={[EARTH_RADIUS, atmosphereSegments[0], atmosphereSegments[1]]} />
           <shaderMaterial
             ref={atmosphereMaterial}
             blending={THREE.AdditiveBlending}
@@ -218,9 +231,10 @@ export function EarthScene() {
       </sprite>
 
       <Stars
+        ref={stars}
         radius={68}
         depth={32}
-        count={1250}
+        count={quality.mobile ? 720 : 1250}
         factor={2.1}
         saturation={0.14}
         fade
