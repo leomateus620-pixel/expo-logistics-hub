@@ -601,7 +601,7 @@ export async function bootstrapOfficialReference(orgId: string): Promise<string>
       metadata: {
         ...entity.metadata,
         seedManaged: true,
-        sourceRevision: OFFICIAL_REFERENCE_REVISION,
+        sourceRevision: entity.metadata.sourceRevision,
       },
     })),
     p_lots: source.lots.map((lot) => ({

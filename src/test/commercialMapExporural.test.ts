@@ -6,6 +6,7 @@ import {
   EXPORURAL_LOT_REFERENCES,
   EXPORURAL_OFFICIAL_AREAS,
   EXPORURAL_PROTECTED_IDENTIFIERS,
+  EXPORURAL_REMOVED_IDENTIFIERS,
   EXPORURAL_ROAD_IDENTIFIERS,
   EXPORURAL_TOTALS,
   sourcePolygonAreaSqm,
@@ -109,7 +110,7 @@ describe('referência cadastral e vista dedicada da Exporural', () => {
     expect(rTotal).toBeCloseTo(EXPORURAL_TOTALS.R.officialAreaSqm, 2);
     expect(sTotal).toBeCloseTo(EXPORURAL_TOTALS.S.officialAreaSqm, 2);
     expect(rTotal + sTotal).toBeCloseTo(EXPORURAL_TOTALS.all.officialAreaSqm, 2);
-    expect(scoped.entities).toHaveLength(116);
+    expect(scoped.entities).toHaveLength(111);
     expect(scoped.lots).toHaveLength(EXPORURAL_TOTALS.all.lotCount);
     expect(scoped.lots.every((lot) => lot.officialAreaSqm !== null)).toBe(true);
     expect(scoped.lots.every((lot) => lot.calculatedAreaSqm !== null)).toBe(true);
@@ -137,7 +138,7 @@ describe('referência cadastral e vista dedicada da Exporural', () => {
       EXPORURAL_LOT_REFERENCES.map((reference) => [`${reference.block}-${reference.lotNumber}`, reference]),
     );
 
-    ['R-20', 'R-27', 'R-55', 'R-56', 'R-57', 'R-58', 'R-59']
+    ['R-20', 'R-27', 'R-55', 'R-59']
       .forEach((identifier) => {
         expect(references.get(identifier)?.geometryKind, identifier).toMatch(/curved-fan|rounded-end/);
         expect(references.get(identifier)?.sourcePolygon.length, identifier).toBeGreaterThanOrEqual(7);
@@ -148,22 +149,16 @@ describe('referência cadastral e vista dedicada da Exporural', () => {
     });
   });
 
-  it('remove o monólito Espaço Semear e mantém B36 como palco não comercial', () => {
+  it('remove somente os cinco overlays solicitados e preserva seus lotes hospedeiros', () => {
     const names = OFFICIAL_REFERENCE_DATA.entities.map((entity) => entity.name.trim().toLocaleLowerCase('pt-BR'));
-    const stage = OFFICIAL_REFERENCE_DATA.entities.find((entity) => entity.publicIdentifier === 'B36');
 
     expect(names).not.toContain('espaço semear');
-    expect(stage).toMatchObject({
-      name: 'Palco Semear',
-      classification: 'EVENT_VENUE',
-      isSellable: false,
-      metadata: {
-        areaCode: EXPORURAL_AREA_CODE,
-        entityType: 'EXPORURAL_NON_COMMERCIAL_STAGE',
-        nonCommercial: true,
-      },
+    EXPORURAL_REMOVED_IDENTIFIERS.forEach((identifier) => {
+      expect(OFFICIAL_REFERENCE_DATA.entities.some((entity) => entity.publicIdentifier === identifier), identifier).toBe(false);
     });
-    expect(OFFICIAL_REFERENCE_DATA.lots.some((lot) => lot.entityId === stage?.id)).toBe(false);
+    expect(['Q-S-17', 'Q-R-52', 'Q-R-53', 'Q-R-54', 'Q-R-55'].every((identifier) => (
+      OFFICIAL_REFERENCE_DATA.lots.some((lot) => lot.publicIdentifier === identifier)
+    ))).toBe(true);
     expect(['R-53', 'R-54', 'R-55'].map((id) => EXPORURAL_OFFICIAL_AREAS[id]))
       .toEqual([500, 500, 705.35]);
   });
@@ -241,6 +236,7 @@ describe('referência cadastral e vista dedicada da Exporural', () => {
     });
     expect(EXPORURAL_VIEW_BOUNDS.minDistance).toBeGreaterThan(0);
     expect(EXPORURAL_VIEW_BOUNDS.maxDistance).toBeGreaterThan(EXPORURAL_VIEW_BOUNDS.minDistance);
+    expect(CAMERA_PRESETS.semear.label).toBe('Extremo leste da Exporural');
   });
 
   it('não mascara uma base 2026.2 com geometria ou áreas canônicas apenas no cliente', () => {

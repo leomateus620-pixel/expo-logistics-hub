@@ -37,10 +37,14 @@ function bounds(entity: MapEntity) {
 
 describe('referência cartográfica oficial Fenasoja 2026', () => {
   it('mantém manifesto reproduzível e exclui a lista lateral de compradores', () => {
-    expect(OFFICIAL_REFERENCE_REVISION).toBe('2026.3');
+    expect(OFFICIAL_REFERENCE_REVISION).toBe('2026.4');
     expect(OFFICIAL_2026_SOURCE_MANIFEST.parkCropPdf.x + OFFICIAL_2026_SOURCE_MANIFEST.parkCropPdf.width)
       .toBeLessThan(OFFICIAL_2026_SOURCE_MANIFEST.buyerListExcludedFromX);
     expect(OFFICIAL_REFERENCE_DATA.project.referenceRevision).toBe(OFFICIAL_REFERENCE_REVISION);
+    expect(OFFICIAL_REFERENCE_DATA.entities.find((entity) => entity.publicIdentifier === 'D3')?.metadata.sourceRevision)
+      .toBe('2026.3');
+    expect(OFFICIAL_REFERENCE_DATA.entities.find((entity) => entity.publicIdentifier === 'EXPORURAL')?.metadata.sourceRevision)
+      .toBe(OFFICIAL_REFERENCE_REVISION);
   });
 
   it('representa o conjunto oficial de quadras sem inventar H ou K', () => {
@@ -119,7 +123,7 @@ describe('referência cartográfica oficial Fenasoja 2026', () => {
     const gates = OFFICIAL_REFERENCE_DATA.entities.filter((entity) => entity.classification === 'GATE');
     expect(gates.map((gate) => gate.publicIdentifier).sort()).toEqual(['A1', 'A10', 'A11', 'A2', 'A3', 'A4', 'A5', 'A6', 'A7', 'A8', 'A9']);
     expect(OFFICIAL_REFERENCE_DATA.entities.filter((entity) => entity.metadata.legendCode === 'E')).toHaveLength(26);
-    expect(OFFICIAL_REFERENCE_DATA.entities.filter((entity) => entity.metadata.legendCode === 'D6')).toHaveLength(3);
+    expect(OFFICIAL_REFERENCE_DATA.entities.filter((entity) => entity.metadata.legendCode === 'D6')).toHaveLength(0);
     expect(OFFICIAL_REFERENCE_DATA.entities.filter((entity) => entity.metadata.legendCode === 'B42')).toHaveLength(2);
   });
 

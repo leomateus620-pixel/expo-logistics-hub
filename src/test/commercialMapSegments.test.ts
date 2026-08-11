@@ -79,7 +79,7 @@ describe('registro de segmentos do Mapa Comercial 3D', () => {
     const inventory = commercialMapSegmentInventory(OFFICIAL_REFERENCE_ENTITIES, OFFICIAL_REFERENCE_LOTS);
     const exporural = inventory.find(({ segment }) => segment.id === COMMERCIAL_MAP_SEGMENT_IDS.exporural);
 
-    expect(exporural).toMatchObject({ entityCount: 116, lotCount: 95 });
+    expect(exporural).toMatchObject({ entityCount: 111, lotCount: 95 });
     expect(publicIdentifiersForSegment(COMMERCIAL_MAP_SEGMENT_IDS.exporural)).toContain(EXPORURAL_AREA_CODE);
     expect(publicIdentifiersForSegment(COMMERCIAL_MAP_SEGMENT_IDS.exporural)).toContain('QUADRA-R');
     expect(publicIdentifiersForSegment(COMMERCIAL_MAP_SEGMENT_IDS.exporural)).toContain('QUADRA-S');

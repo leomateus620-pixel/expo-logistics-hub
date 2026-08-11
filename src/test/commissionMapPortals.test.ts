@@ -73,7 +73,7 @@ describe('portais comerciais por comissão', () => {
       'industria-comercio-servicos',
     );
 
-    expect(rural.entities).toHaveLength(116);
+    expect(rural.entities).toHaveLength(111);
     expect(rural.lots).toHaveLength(95);
     expect(industry.entities).toHaveLength(140);
     expect(industry.lots).toHaveLength(103);
@@ -155,10 +155,10 @@ describe('portais comerciais por comissão', () => {
 
   it('mantém o inventário válido após split e merge sem aceitar vínculos quebrados', () => {
     const baseline = {
-      expectedEntityCount: 116,
+      expectedEntityCount: 111,
       expectedLotCount: 95,
     };
-    const entityIds = Array.from({ length: 116 }, (_, index) => `entity-${index}`);
+    const entityIds = Array.from({ length: 111 }, (_, index) => `entity-${index}`);
     const lotEntityIds = entityIds.slice(0, 95);
 
     expect(isCommissionInventoryConsistent({ ...baseline, entityIds, lotEntityIds })).toBe(true);

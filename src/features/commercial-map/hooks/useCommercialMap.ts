@@ -244,7 +244,7 @@ export function useMapMutations() {
     mutationFn: () => applyExporuralReference(orgId!),
     onSuccess: async (result) => {
       await invalidate();
-      toast.success('Exporural 2026.3 persistida e versionada.', {
+      toast.success('Exporural 2026.4 persistida e versionada.', {
         description: `${result.lotsValidated} lotes validados; snapshot de rollback registrado.`,
       });
     },
