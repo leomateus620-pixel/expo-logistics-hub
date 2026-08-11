@@ -14,7 +14,6 @@ export type CronogramaEventType =
   | 'reuniao'
   | 'evento_institucional'
   | 'feira_externa'
-  | 'feriado'
   | 'planejamento'
   | 'contratacao'
   | 'infraestrutura'
@@ -154,7 +153,7 @@ function normalizeEvent(input: SeedInput): CronogramaEventSeed {
     startDate: input.startDate ?? null,
     endDate: input.endDate ?? null,
     status: input.status ?? (input.hasExactDate === false ? 'aguardando_definicao' : 'planejado'),
-    priority: input.priority ?? (input.eventType === 'feriado' ? 'baixa' : 'media'),
+    priority: input.priority ?? 'media',
     hasExactDate: input.hasExactDate ?? Boolean(input.startDate),
     commissionName: input.commissionName ?? commission?.name ?? null,
     linkedCommissions,
@@ -238,14 +237,6 @@ function centralMeeting(date: string, daysRemaining: number, sourceYear: 2026 | 
 const feiraComLogistica = [commissionBySlug.get('logistica')!];
 
 export const fenasoja2028CronogramaSeed: CronogramaEventSeed[] = [
-  ...dated('2026-feriados', ['2026-06-04', '2026-08-10', '2026-09-07', '2026-09-20', '2026-10-12', '2026-10-30', '2026-11-02', '2026-11-15', '2026-11-20', '2026-12-25'], {
-    title: 'Feriado municipal, estadual ou federal',
-    category: 'Feriados e datas especiais',
-    eventType: 'feriado',
-    sourceYear: 2026,
-    sourceSheet: cronogramaOfficialSheets[2026],
-    sourceRow: 'R6',
-  }),
   normalizeEvent({
     sourceKey: '2026-apresentacao-jantar-encerramento-2026-06-16',
     title: 'Apresentação e Jantar de Encerramento Fenasoja 2026',
@@ -598,14 +589,6 @@ export const fenasoja2028CronogramaSeed: CronogramaEventSeed[] = [
     sourceRow: 'R37',
   }),
 
-  ...dated('2027-feriados', ['2027-01-01', '2027-02-09', '2027-03-26', '2027-04-21', '2027-05-01', '2027-05-27', '2027-07-10', '2027-09-07', '2027-09-20', '2027-10-12', '2027-11-02', '2027-11-15', '2027-11-20', '2027-12-25'], {
-    title: 'Feriado municipal, estadual ou federal',
-    category: 'Feriados e datas especiais',
-    eventType: 'feriado',
-    sourceYear: 2027,
-    sourceSheet: cronogramaOfficialSheets[2027],
-    sourceRow: 'R6',
-  }),
   ...[
     centralMeeting('2027-01-19', 466, 2027),
     centralMeeting('2027-02-16', 438, 2027),
@@ -956,14 +939,6 @@ export const fenasoja2028CronogramaSeed: CronogramaEventSeed[] = [
     hasExactDate: true,
   }),
 
-  ...dated('2028-feriados', ['2028-01-01', '2028-02-29', '2028-04-14', '2028-04-21', '2028-05-01', '2028-06-15'], {
-    title: 'Feriado municipal, estadual ou federal',
-    category: 'Feriados e datas especiais',
-    eventType: 'feriado',
-    sourceYear: 2028,
-    sourceSheet: cronogramaOfficialSheets[2028],
-    sourceRow: 'R6',
-  }),
   ...[
     centralMeeting('2028-01-18', 102, 2028),
     centralMeeting('2028-02-08', 81, 2028),

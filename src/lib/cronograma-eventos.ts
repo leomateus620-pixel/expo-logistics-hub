@@ -64,7 +64,6 @@ export const typeLabels: Record<CronogramaEventType, string> = {
   reuniao: 'Reunião',
   evento_institucional: 'Evento institucional',
   feira_externa: 'Feira externa',
-  feriado: 'Feriado',
   planejamento: 'Planejamento',
   contratacao: 'Contratação',
   infraestrutura: 'Infraestrutura',

@@ -72,7 +72,6 @@ const sourceToVisualKind: Record<SourceCronogramaEvent['eventType'], CronogramaK
   reuniao: 'meeting',
   evento_institucional: 'event',
   feira_externa: 'event',
-  feriado: 'milestone',
   planejamento: 'milestone',
   contratacao: 'deadline',
   infraestrutura: 'deadline',
