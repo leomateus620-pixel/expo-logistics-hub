@@ -14,6 +14,11 @@ function cinematicCurve(points: THREE.Vector3[]) {
   return new THREE.CatmullRomCurve3(points, false, 'catmullrom', 0.52);
 }
 
+function flowingRange(value: number, start: number, end: number) {
+  const linear = THREE.MathUtils.clamp((value - start) / (end - start), 0, 1);
+  return linear * linear * linear * (linear * (linear * 6 - 15) + 10);
+}
+
 /**
  * Position and look-at travel on independent splines. The orbital and local
  * frames meet inside the spatial cloud corridor, with the same projected FOV
@@ -75,36 +80,36 @@ export function CinematicCamera({ quality }: CinematicCameraProps) {
       localDescentPosition: cinematicCurve([
         new THREE.Vector3(9, 42, 58),
         new THREE.Vector3(6, 27, 40),
-        new THREE.Vector3(3.8, 14, 27),
-        new THREE.Vector3(2.4, 7.3, 18.5),
+        new THREE.Vector3(4.2, 13.5, 26),
+        new THREE.Vector3(3.2, 6.2, 16),
       ]),
       localDescentLook: cinematicCurve([
         new THREE.Vector3(-4, 0.4, -2),
         new THREE.Vector3(-1, 0.85, -5),
-        new THREE.Vector3(0.4, 1.15, -8),
+        new THREE.Vector3(0.4, 1.05, -10),
       ]),
       cityPosition: cinematicCurve([
-        new THREE.Vector3(2.4, 7.3, 18.5),
-        new THREE.Vector3(1.2, 6.4, 14),
-        new THREE.Vector3(-0.8, 5.6, 9),
-        new THREE.Vector3(-2.4, 4.9, 4),
+        new THREE.Vector3(3.2, 6.2, 16),
+        new THREE.Vector3(1.7, 5.1, 9),
+        new THREE.Vector3(-0.5, 4.3, 2),
+        new THREE.Vector3(-2.8, 3.9, -5),
       ]),
       cityLook: cinematicCurve([
-        new THREE.Vector3(0.4, 1.15, -8),
-        new THREE.Vector3(0.55, 0.95, -12),
-        new THREE.Vector3(0.2, 1.05, -17),
+        new THREE.Vector3(0.4, 1.05, -10),
+        new THREE.Vector3(0.8, 0.82, -17),
+        new THREE.Vector3(0.2, 1.0, -24),
       ]),
       skyPosition: cinematicCurve([
-        new THREE.Vector3(-2.4, 4.9, 4),
-        new THREE.Vector3(-1.4, 6, 7),
-        new THREE.Vector3(-0.35, 6.35, 7.4),
+        new THREE.Vector3(-2.8, 3.9, -5),
+        new THREE.Vector3(-1.7, 5.3, -2),
+        new THREE.Vector3(-0.5, 6.4, 2),
         new THREE.Vector3(0, 7.9, 11),
       ]),
       skyLook: cinematicCurve([
-        new THREE.Vector3(0.2, 1.05, -17),
+        new THREE.Vector3(0.2, 1.0, -24),
         new THREE.Vector3(0.1, 5.8, -30),
-        new THREE.Vector3(0, 10.1, -32),
-        new THREE.Vector3(0, 12.2, -33),
+        new THREE.Vector3(0, 12.2, -32),
+        new THREE.Vector3(0, 17.2, -33),
       ]),
       finalPosition: cinematicCurve([
         new THREE.Vector3(0, 7.9, 11),
@@ -112,9 +117,9 @@ export function CinematicCamera({ quality }: CinematicCameraProps) {
         new THREE.Vector3(0.22, 8.05, 11.3),
       ]),
       finalLook: cinematicCurve([
-        new THREE.Vector3(0, 12.2, -33),
-        new THREE.Vector3(0, 12.35, -33),
-        new THREE.Vector3(0, 12.4, -33),
+        new THREE.Vector3(0, 17.2, -33),
+        new THREE.Vector3(0, 17.4, -33),
+        new THREE.Vector3(0, 17.5, -33),
       ]),
     };
   }, []);
@@ -145,28 +150,31 @@ export function CinematicCamera({ quality }: CinematicCameraProps) {
       fov = quality.mobile ? 50 : 46;
       bank = Math.sin(progress * Math.PI) * 0.004;
     } else if (elapsed < 6) {
-      const progress = smoothRange(elapsed, 4.5, 6);
+      const progress = flowingRange(elapsed, 4.5, 6);
       paths.localDescentPosition.getPointAt(progress, position);
       paths.localDescentLook.getPointAt(progress, lookAt);
       if (quality.mobile) {
         position.y += THREE.MathUtils.lerp(1.35, 0.55, progress);
         position.z += THREE.MathUtils.lerp(2.8, 1.8, progress);
       }
-      fov = THREE.MathUtils.lerp(quality.mobile ? 50 : 46, quality.mobile ? 47 : 43, progress);
+      fov = THREE.MathUtils.lerp(quality.mobile ? 50 : 46, quality.mobile ? 46 : 42, progress);
       bank = Math.sin(progress * Math.PI) * -0.006;
     } else if (elapsed < 7.5) {
-      const progress = smoothRange(elapsed, 6, 7.5);
+      const progress = flowingRange(elapsed, 6, 7.5);
       paths.cityPosition.getPointAt(progress, position);
       paths.cityLook.getPointAt(progress, lookAt);
-      if (quality.mobile) position.z += THREE.MathUtils.lerp(1.8, 1.05, progress);
-      fov = THREE.MathUtils.lerp(quality.mobile ? 47 : 43, quality.mobile ? 44 : 40, progress);
+      if (quality.mobile) {
+        position.y += THREE.MathUtils.lerp(0.55, 0, progress);
+        position.z += THREE.MathUtils.lerp(1.8, 1.05, progress);
+      }
+      fov = THREE.MathUtils.lerp(quality.mobile ? 46 : 42, quality.mobile ? 42 : 38, progress);
       bank = Math.sin(progress * Math.PI) * -0.003;
     } else if (elapsed < 9) {
-      const progress = smoothRange(elapsed, 7.5, 9);
+      const progress = flowingRange(elapsed, 7.5, 9);
       paths.skyPosition.getPointAt(progress, position);
       paths.skyLook.getPointAt(progress, lookAt);
       if (quality.mobile) position.z += THREE.MathUtils.lerp(1.05, 2.8, progress);
-      fov = THREE.MathUtils.lerp(quality.mobile ? 44 : 40, quality.mobile ? 48 : 44, progress);
+      fov = THREE.MathUtils.lerp(quality.mobile ? 42 : 38, quality.mobile ? 48 : 44, progress);
       bank = Math.sin(progress * Math.PI) * 0.002;
     } else {
       const progress = smoothRange(elapsed, 9, 10.5);

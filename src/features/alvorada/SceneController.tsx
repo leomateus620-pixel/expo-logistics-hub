@@ -15,6 +15,7 @@ import { TransitionCloudLayer } from './TransitionCloudLayer';
 import { DawnEnvironment } from './scenes/DawnEnvironment';
 import { EarthScene } from './scenes/EarthScene';
 import { FenasojaTitle3D } from './scenes/FenasojaTitle3D';
+import { SantaRosaCinematicBackdrop } from './scenes/SantaRosaCinematicBackdrop';
 import { SantaRosaCity } from './scenes/SantaRosaCity';
 
 interface SceneControllerProps {
@@ -129,7 +130,7 @@ function SceneAtmosphere() {
     );
     const dawnExposure = THREE.MathUtils.lerp(
       0.76,
-      0.88,
+      0.82,
       smoothRange(elapsed, 5.2, 9.6),
     );
     gl.toneMappingExposure = THREE.MathUtils.lerp(
@@ -163,6 +164,7 @@ export function SceneController({
       <CinematicCamera quality={quality} />
       <EarthScene />
       <DawnEnvironment quality={quality} />
+      <SantaRosaCinematicBackdrop quality={quality} />
       <SantaRosaCity quality={quality} />
       <FenasojaTitle3D quality={quality} />
       <TransitionCloudLayer />

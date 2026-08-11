@@ -1,6 +1,43 @@
 # Alvorada asset attribution
 
-These files support the real-time WebGL experience and were retrieved from official upstream sources on 2026-08-10.
+These files support the real-time WebGL experience. This document separates
+project-authored assets, requester-approved brand artwork and third-party data
+retrieved from official upstream sources.
+
+## Project-authored Santa Rosa environment
+
+`santa-rosa-horizon.webp` and `santa-rosa-horizon-portrait.webp` are runtime
+variants prepared from an original environmental panorama generated for this
+project with OpenAI ImageGen. The source panorama was created from an authored
+prompt and a Santa Rosa photograph used only as a compositional reference. The
+reference photograph was not copied into the runtime asset, embedded in the
+generated output or redistributed by this repository.
+
+The two WebP files are environmental texture layers composed with the live
+Three.js terrain, buildings, vegetation, atmosphere and camera. They are not a
+pre-rendered animation, video or replacement for the real-time WebGL sequence.
+
+## Requester-approved official FENASOJA symbol
+
+`fenasoja-symbol-official.png` was prepared from the official FENASOJA symbol
+supplied and approved by the requester for this implementation. The packaging
+step only removed near-transparent stray pixels, cropped the transparent
+bounds and centered the unchanged artwork on a 512 x 512 transparent canvas.
+It did not redraw, trace, recolor or replace any part of the symbol.
+
+The FENASOJA name and symbol remain protected brand artwork; no open-license
+grant or authorization for reuse outside this project is asserted here.
+
+## Authored-asset manifest
+
+`reference-assets.json` is the versioned provenance manifest for the authored
+environment and approved symbol. It records the SHA-256 of each supplied source
+and the runtime filenames produced by `scripts/build_alvorada_reference_assets.py`.
+
+| Source role | Source SHA-256 | Runtime asset |
+| --- | --- | --- |
+| ImageGen Santa Rosa environmental panorama | `89c25b44bc3afaf9b49e688b3214c13f9da613de4371e3145915e822b4808ecd` | `santa-rosa-horizon.webp`, `santa-rosa-horizon-portrait.webp` |
+| Requester-approved official FENASOJA symbol | `cafa3155fc8f7e7d060dafc2ab5ff619e4c953565bc57821133b39a011b23811` | `fenasoja-symbol-official.png` |
 
 ## Three.js r170
 
@@ -46,4 +83,9 @@ The 129 x 129 signed heightfield embedded in `santa-rosa-city-v2.json` was sampl
 
 ## User-supplied references
 
-The images attached by the user were not copied into this directory or redistributed. They were used only as visual references for geography, composition, lighting, atmosphere, and the approved FENASOJA 2028 identity direction.
+The geographic and photographic references attached by the requester were not
+copied into this directory or redistributed. They were used only as visual
+guidance for geography, composition, lighting and atmosphere. The two explicit
+runtime assets documented above are different in provenance: the panorama is
+an original ImageGen output, and the official symbol is requester-approved
+brand artwork packaged without visual redesign.

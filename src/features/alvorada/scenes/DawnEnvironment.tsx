@@ -82,8 +82,8 @@ const CLOUD_FRAGMENT_SHADER = `
   }
 `;
 
-const HORIZONTAL_SUN_DIRECTION = new THREE.Vector3(0.53, 0, -0.848).normalize();
-const MOBILE_SUN_DIRECTION = new THREE.Vector3(0.25, 0, -0.968).normalize();
+const HORIZONTAL_SUN_DIRECTION = new THREE.Vector3(0.46, 0, -0.888).normalize();
+const MOBILE_SUN_DIRECTION = new THREE.Vector3(0.12, 0, -0.993).normalize();
 const AMBIENT_COLORS = ['#9db8d5', '#a8bfd7', '#b7c8dc'] as const;
 const LAYER_TINTS = ['#d8e0ea', '#e4e4e3', '#eee4dc'] as const;
 
@@ -98,11 +98,11 @@ function createPhysicalSky() {
   material.transparent = true;
   material.depthWrite = false;
   material.uniforms.skyOpacity = { value: 0 };
-  material.uniforms.skyRadiance = { value: 0.78 };
-  material.uniforms.turbidity.value = 6.2;
-  material.uniforms.rayleigh.value = 3.2;
-  material.uniforms.mieCoefficient.value = 0.0045;
-  material.uniforms.mieDirectionalG.value = 0.76;
+  material.uniforms.skyRadiance = { value: 0.68 };
+  material.uniforms.turbidity.value = 7.4;
+  material.uniforms.rayleigh.value = 2.8;
+  material.uniforms.mieCoefficient.value = 0.0085;
+  material.uniforms.mieDirectionalG.value = 0.79;
   material.fragmentShader = material.fragmentShader
     .replace(
       'uniform float mieDirectionalG;',
@@ -110,21 +110,35 @@ function createPhysicalSky() {
     )
     .replace(
       'gl_FragColor = vec4( retColor, 1.0 );',
-      `float alvoradaAltitude = smoothstep(-0.015, 0.36, direction.y);
+      `float alvoradaAltitude = smoothstep(-0.015, 0.48, direction.y);
       vec3 alvoradaPhysicalSky = max(retColor, vec3(0.0));
-      float alvoradaLuminance = max(
-        dot(alvoradaPhysicalSky, vec3(0.2126, 0.7152, 0.0722)),
-        0.0
+      alvoradaPhysicalSky /= vec3(1.0) + alvoradaPhysicalSky * 0.16;
+      float alvoradaHorizon = 1.0 - smoothstep(-0.02, 0.34, direction.y);
+      float alvoradaSunAlignment = pow(
+        max(dot(direction, normalize(vSunDirection)), 0.0),
+        18.0
       );
-      vec3 alvoradaIdentityColor = mix(
-        vec3(1.38, 0.24, 0.018),
-        vec3(0.018, 0.22, 1.05),
-        alvoradaAltitude
-      ) * (0.46 + min(alvoradaLuminance, 1.4) * 0.62);
-      vec3 alvoradaBalancedSky = mix(alvoradaPhysicalSky, alvoradaIdentityColor, 0.72);
-      float alvoradaSunBand = pow(max(dot(direction, normalize(vSunDirection)), 0.0), 10.0)
-        * pow(1.0 - clamp(direction.y, 0.0, 1.0), 5.0);
-      alvoradaBalancedSky += vec3(1.0, 0.47, 0.09) * alvoradaSunBand * 0.13;
+      vec3 alvoradaBalancedSky = alvoradaPhysicalSky;
+      alvoradaBalancedSky *= mix(
+        vec3(1.04, 0.93, 0.78),
+        vec3(0.67, 0.9, 1.36),
+        alvoradaAltitude * 0.78
+      );
+      alvoradaBalancedSky += vec3(1.0, 0.34, 0.025)
+        * alvoradaHorizon
+        * (0.045 + alvoradaSunAlignment * 0.24);
+      alvoradaBalancedSky += vec3(1.0, 0.72, 0.28)
+        * alvoradaSunAlignment
+        * alvoradaHorizon
+        * 0.1;
+      float alvoradaUpperBlue = smoothstep(0.1, 0.58, direction.y);
+      vec3 alvoradaDeepBlue = vec3(0.022, 0.105, 0.39)
+        + alvoradaPhysicalSky * vec3(0.22, 0.28, 0.38);
+      alvoradaBalancedSky = mix(
+        alvoradaBalancedSky,
+        alvoradaDeepBlue,
+        max(alvoradaUpperBlue, alvoradaAltitude * 0.72)
+      );
       gl_FragColor = vec4(alvoradaBalancedSky * skyRadiance, skyOpacity);`,
     );
   material.needsUpdate = true;
@@ -135,7 +149,7 @@ function createPhysicalSky() {
 function createSunMaterial() {
   return new THREE.ShaderMaterial({
     blending: THREE.AdditiveBlending,
-    depthTest: false,
+    depthTest: true,
     depthWrite: false,
     fragmentShader: `
       varying vec2 vUv;
@@ -285,26 +299,26 @@ export function DawnEnvironment({ quality }: DawnEnvironmentProps) {
 
     sky.visible = reveal > 0.001;
     sky.material.uniforms.skyOpacity.value = reveal;
-    sky.material.uniforms.skyRadiance.value = THREE.MathUtils.lerp(0.78, 0.92, dawn);
+    sky.material.uniforms.skyRadiance.value = THREE.MathUtils.lerp(0.68, 0.8, dawn);
     sky.material.uniforms.sunPosition.value.copy(sunDirection);
-    sky.material.uniforms.turbidity.value = THREE.MathUtils.lerp(6.2, 4.8, dawn);
-    sky.material.uniforms.rayleigh.value = THREE.MathUtils.lerp(3.2, 4.0, dawn);
-    sky.material.uniforms.mieCoefficient.value = THREE.MathUtils.lerp(0.0045, 0.0024, dawn);
+    sky.material.uniforms.turbidity.value = THREE.MathUtils.lerp(7.4, 5.2, dawn);
+    sky.material.uniforms.rayleigh.value = THREE.MathUtils.lerp(2.8, 3.7, dawn);
+    sky.material.uniforms.mieCoefficient.value = THREE.MathUtils.lerp(0.0085, 0.0038, dawn);
 
     if (root.current) root.current.visible = reveal > 0.001;
     if (sunVisual.current) {
       sunVisual.current.position.copy(camera.position).addScaledVector(sunDirection, 120);
       sunVisual.current.quaternion.copy(camera.quaternion);
       sunVisual.current.scale.setScalar(THREE.MathUtils.lerp(0.74, 1, dawn));
-      sunMaterial.uniforms.sunOpacity.value = reveal;
+      sunMaterial.uniforms.sunOpacity.value = reveal * 0.76;
     }
     if (solarLight.current) {
       solarLight.current.position.copy(sunDirection).multiplyScalar(90);
-      solarLight.current.intensity = reveal * THREE.MathUtils.lerp(1.35, 2.35, dawn);
+      solarLight.current.intensity = reveal * THREE.MathUtils.lerp(2.15, 3.65, dawn);
       solarLight.current.color.lerpColors(warmLightColor, goldenLightColor, dawn);
     }
     if (ambientLight.current) {
-      ambientLight.current.intensity = reveal * THREE.MathUtils.lerp(0.76, 1.08, dawn);
+      ambientLight.current.intensity = reveal * THREE.MathUtils.lerp(0.66, 0.92, dawn);
     }
 
     cloudMaterials.forEach((material, stratum) => {
@@ -336,7 +350,7 @@ export function DawnEnvironment({ quality }: DawnEnvironmentProps) {
           material={sunMaterial}
           renderOrder={-40}
         >
-          <planeGeometry args={[12, 12]} />
+        <planeGeometry args={[10, 10]} />
         </mesh>
 
         {clouds.map((cloud, index) => (
@@ -357,7 +371,7 @@ export function DawnEnvironment({ quality }: DawnEnvironmentProps) {
 
       <hemisphereLight
         ref={ambientLight}
-        args={['#8fb9e6', '#52636b', 0]}
+        args={['#9fc7ee', '#64766c', 0]}
       />
       <directionalLight
         ref={solarLight}
@@ -370,10 +384,10 @@ export function DawnEnvironment({ quality }: DawnEnvironmentProps) {
         shadow-mapSize-height={quality.shadowMapSize}
         shadow-mapSize-width={quality.shadowMapSize}
         shadow-camera-far={100}
-        shadow-camera-left={-34}
-        shadow-camera-right={34}
-        shadow-camera-top={34}
-        shadow-camera-bottom={-34}
+        shadow-camera-left={-24}
+        shadow-camera-right={24}
+        shadow-camera-top={24}
+        shadow-camera-bottom={-24}
       />
     </>
   );

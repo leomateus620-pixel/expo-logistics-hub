@@ -168,12 +168,19 @@
   top: 46%;
   left: 50%;
   display: flex;
-  width: min(82vw, 920px);
+  width: min(90vw, 1080px);
   align-items: center;
   justify-content: center;
   gap: clamp(12px, 2vw, 26px);
   transform: translate(-50%, -50%);
   filter: drop-shadow(0 12px 24px rgb(0 7 19 / 38%));
+}
+
+.alvorada-fallback__title > img {
+  width: clamp(2.4rem, 7vw, 6.6rem);
+  height: auto;
+  flex: 0 0 auto;
+  object-fit: contain;
 }
 
 .alvorada-fallback__title > span {
@@ -208,8 +215,12 @@
 
   .alvorada-fallback__title {
     top: 44%;
-    width: 92vw;
-    gap: 9px;
+    width: 95vw;
+    gap: 7px;
+  }
+
+  .alvorada-fallback__title > img {
+    width: clamp(2rem, 10vw, 3.1rem);
   }
 
   .alvorada-fallback__title > span {
