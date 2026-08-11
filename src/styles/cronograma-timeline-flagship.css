@@ -543,6 +543,12 @@
     inset 0 1px 0 oklch(var(--neutral-0));
 }
 
+.cronograma-page .cronograma-pending-group.is-overdue {
+  border-color: oklch(var(--destructive) / 0.32);
+  background:
+    linear-gradient(145deg, oklch(var(--destructive) / 0.055), oklch(var(--neutral-0) / 0.94));
+}
+
 .cronograma-page .cronograma-undated-row {
   border: 1px solid oklch(var(--brand-gold-500) / 0.26);
   border-left: 3px solid oklch(var(--brand-gold-700));

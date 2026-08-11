@@ -25,12 +25,14 @@ export function CronogramaEventCard({
   event,
   index = 0,
   compact = false,
+  contextNote,
   onOpen,
   onEdit,
 }: {
   event: CronogramaEvent;
   index?: number;
   compact?: boolean;
+  contextNote?: string | null;
   onOpen: (event: CronogramaEvent) => void;
   onEdit?: (event: CronogramaEvent) => void;
 }) {
@@ -66,6 +68,11 @@ export function CronogramaEventCard({
         </button>
         {!compact && <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-muted-foreground">{event.summary}</p>}
         <EventMetaLine event={event} dense className="mt-2" />
+        {contextNote && (
+          <p className="mt-2 line-clamp-2 border-l-2 border-gold/50 pl-2.5 text-xs font-medium leading-relaxed text-muted-foreground">
+            {contextNote}
+          </p>
+        )}
       </div>
 
       <div className="cronograma-event-actions">
