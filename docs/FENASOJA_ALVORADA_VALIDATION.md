@@ -36,6 +36,16 @@ A cidade anterior, baseada em blocos genéricos, foi substituída por uma pipeli
 
 Os dados são convertidos por `scripts/build_alvorada_geodata.py` para um ativo compacto carregado uma única vez. Edifícios, vias, telhados, terreno e vegetação são mesclados/instanciados; não existem milhares de componentes React nem material único por prédio.
 
+O horizonte distante usa `santa-rosa-horizon.webp` no desktop/landscape e
+`santa-rosa-horizon-portrait.webp` no portrait. Ambos são variantes ambientais
+de um panorama original gerado para o projeto com OpenAI ImageGen, a partir de
+prompt autoral e de uma fotografia usada somente como referência
+composicional. A fotografia não foi incorporada nem redistribuída. Durante a
+chegada, uma placa ambiental temporária acompanha a câmera para ocultar a troca
+de escala; ela desaparece antes da ascensão. Depois disso, o panorama distante
+permanece atrás da cidade WebGL. Geometria, iluminação, atmosfera, parallax e
+câmera continuam executados ao vivo; não é uma sequência pré-renderizada.
+
 ## Alvorada, luz e identidade
 
 O céu CSS/gradiente foi substituído pelo modelo físico `Sky` do Three.js, baseado em Preetham, com Rayleigh, Mie, turbidez, direção solar e exposição animadas. Uma calibração espectral preserva a energia do scattering e enfatiza a estrutura identitária sem pintar um gradiente de interface:
@@ -47,7 +57,33 @@ O céu CSS/gradiente foi substituído pelo modelo físico `Sky` do Three.js, bas
 
 O sol possui núcleo preciso, corona controlada e bloom seletivo. Nuvens usam três texturas procedurais distintas, estratos, deriva e iluminação quente/fria. A mesma direção solar alimenta o `Sky`, as nuvens, o disco solar e a luz direcional da cidade. ACES, sRGB, exposição, SMAA, bloom discreto e vignette leve fecham a cadeia de cor.
 
-O título final é geometria 3D de alta resolução, não texto HTML. `FENASOJA` usa material físico branco/prata com reflexos quentes e frios. `2028` permanece no badge laranja tridimensional aprovado. Não há soja, símbolo adicional, card ou painel. A revelação usa máscara direcional, dithering, reflexo progressivo e sweep especular; no final ocupa aproximadamente 58% da largura desktop e 72% no portrait.
+O título final é composto integralmente dentro do WebGL, não como texto HTML.
+O símbolo oficial FENASOJA aparece ao lado do wordmark em um plano texturizado
+com recorte alpha e revelação luminosa própria. `FENASOJA` permanece como
+geometria 3D de alta resolução, com material físico branco/prata e reflexos
+quentes e frios; `2028` permanece no badge laranja tridimensional aprovado. O
+símbolo não substitui o “O”, não há soja dourada, card ou painel. Símbolo,
+wordmark e edição compartilham máscara direcional, dithering e sweep especular;
+no final, o conjunto ocupa aproximadamente 64% da largura desktop e 76% no
+portrait.
+
+## Assets autorais, marca e manifesto
+
+| Asset | Proveniência | Transformação de runtime |
+| --- | --- | --- |
+| `santa-rosa-horizon.webp` | panorama ambiental original gerado com OpenAI ImageGen | variante horizontal com céu removido e transparência suave para composição com o `Sky` ao vivo |
+| `santa-rosa-horizon-portrait.webp` | mesma fonte ImageGen | enquadramento portrait específico, sem copiar ou redistribuir a fotografia de referência |
+| `fenasoja-symbol-official.png` | símbolo oficial fornecido e aprovado pelo solicitante | somente limpeza de pixels quase transparentes, recorte e centralização em canvas transparente de 512 × 512; sem redesenho ou alteração cromática |
+| `reference-assets.json` | manifesto versionado local | registra SHA-256 das fontes aprovadas e os nomes dos assets derivados |
+
+O manifesto registra o panorama ImageGen pela origem
+`89c25b44bc3afaf9b49e688b3214c13f9da613de4371e3145915e822b4808ecd`
+e o símbolo aprovado pela origem
+`cafa3155fc8f7e7d060dafc2ab5ff619e4c953565bc57821133b39a011b23811`.
+O empacotamento reproduzível fica em
+`scripts/build_alvorada_reference_assets.py`. O símbolo continua sendo marca
+protegida da FENASOJA; este relatório não declara licença aberta nem autorização
+de reutilização fora do projeto.
 
 ## Geografia e licenças
 
@@ -57,7 +93,7 @@ O título final é geometria 3D de alta resolução, não texto HTML. `FENASOJA`
 - Terreno: Mapzen Terrain Tiles — CC BY 4.0.
 - Vias: OpenStreetMap — ODbL.
 - Créditos, versões, licenças e URLs: [`public/alvorada/ATTRIBUTION.md`](../public/alvorada/ATTRIBUTION.md).
-- As imagens fornecidas pelo solicitante foram usadas somente como direção visual e não são redistribuídas.
+- As referências geográficas e fotográficas fornecidas pelo solicitante não são redistribuídas. O panorama de runtime é um asset original ImageGen; o símbolo oficial é a exceção de marca explicitamente fornecida e aprovada para esta implementação, conforme o manifesto.
 
 ## Desempenho e resiliência
 
@@ -74,25 +110,28 @@ O título final é geometria 3D de alta resolução, não texto HTML. `FENASOJA`
 
 ## Validação visual e funcional executada
 
-O fluxo foi exercitado no Chrome real pelo launcher existente em `/portal`. A rota local é pública e, por isso, as credenciais fornecidas não foram necessárias nem persistidas. O código novo ainda não estava implantado no ambiente remoto durante esta validação.
+O fluxo atualizado foi exercitado no Chrome real pelo único launcher existente
+no bloco `FENASOJA 2028` do portal. A URL permaneceu `/portal` durante abertura,
+execução, fallback e fechamento; nenhum launcher, rota ou deep link secundário
+foi exposto.
 
-- desktop solicitado em 1440 × 900 e portrait solicitado em 390 × 844; o controlador Chrome reportou respectivamente 2160 × 1350 e 585 × 1266 por aplicar `devicePixelRatio` 0,667;
-- frames inspecionados: Brasil, aproximação ao RS, marcador, estabilização 4,25 s, ponte atmosférica 5,25 s, chegada 6,8 s, ascensão, entrada do título e quadro final 10,5 s;
-- título sem recorte, horizonte protegido e controle de fechar dentro da safe area nos dois formatos;
-- final `finalHold` continuou aberto por mais de 5 s, com `ambientElapsed` avançando e `elapsed` fixo em 10,5 s;
-- `prefers-reduced-motion: reduce` confirmado pelo navegador com renderer `webgl`, timeline completa e final aberto;
-- `WEBGL_lose_context` real provocado em Brasil, descida de Santa Rosa (4,958 s), ascensão (8,934 s), revelação (9,950 s) e quadro final;
-- em todas as primeiras perdas, o Canvas voltou a `webgl` no mesmo tempo/fase; uma segunda perda entrou em `fallback` com motivo `context-lost` e permaneceu aberta;
-- X fechou sem navegar e o foco retornou ao launcher `Abrir O Nascer da Alvorada`;
-- uma aba Chrome nova terminou sem erros da aplicação/WebGL; permaneceram somente dois avisos futuros conhecidos do React Router.
+- viewport desktop efetivo de 1440 × 900;
+- viewport mobile portrait efetivo de 375 × 844;
+- viewport small mobile efetivo de 305 × 568;
+- frame `cityFlight` capturado por volta de 6,42 s, com panorama, cidade WebGL e movimento local ativos;
+- composição `finalHold` alcançada e capturada depois da revelação do símbolo oficial, `FENASOJA` e `2028`;
+- `prefers-reduced-motion: reduce` emulado no navegador manteve o renderer `webgl`, executou a timeline cinematográfica completa e alcançou `finalHold`;
+- uma perda real provocada por `WEBGL_lose_context` recuperou o Canvas uma vez;
+- a segunda perda real entrou no fallback terminal e permaneceu aberta por 5,2 s, sem auto-close;
+- o fechamento não alterou a URL `/portal`, preservando o launcher exclusivo como única entrada da experiência.
 
 ## Verificações automatizadas
 
-- 40 testes dedicados cobrem timeline, hold infinito, geografia, dataset v2, tiers WebGL, reduced motion, recovery, fallback, foco e exclusividade de acesso;
+- 44 testes dedicados cobrem timeline, hold infinito, geografia, dataset v2, tiers WebGL, reduced motion, recovery, fallback, foco e exclusividade de acesso;
 - TypeScript `--noEmit`;
 - ESLint direcionado aos arquivos alterados;
 - build de produção;
-- suíte Vitest completa: 610 de 639 testes passaram; as 29 falhas permanecem restritas aos quatro arquivos herdados de Cronograma (`cronogramaMobileOverlays`, `cronogramaMobilePresentation`, `cronogramaTimeline` e `eventHarvestCompletion`), sem regressão nova da Alvorada;
+- suíte Vitest completa: 614 de 643 testes passaram; as 29 falhas permanecem restritas aos quatro arquivos herdados de Cronograma (`cronogramaMobileOverlays`, `cronogramaMobilePresentation`, `cronogramaTimeline` e `eventHarvestCompletion`), sem regressão nova da Alvorada;
 - `git diff --check`.
 
 O áudio, definido como opcional, permanece fora do escopo. A cidade é uma reconstrução híbrida em tempo real baseada em dados geográficos, não fotogrametria.

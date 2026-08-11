@@ -25,6 +25,7 @@ interface GeometryAccumulator {
   facadeUvs: number[];
   indices: number[];
   positions: number[];
+  surfaceTypes: number[];
 }
 
 interface BuildingBatch {
@@ -40,29 +41,36 @@ interface TreePlacement {
   width: number;
 }
 
+interface ArchitecturalAccentPlacement {
+  color: THREE.Color;
+  position: THREE.Vector3;
+  rotation: number;
+  scale: THREE.Vector3;
+}
+
 interface BuildingMaterialBundle {
   material: THREE.MeshStandardMaterial;
   windowGlow: { value: number };
 }
 
 const WALL_PALETTES: Record<SantaRosaBuildingClass, readonly string[]> = {
-  0: ['#d9d0c2', '#e6ddd0', '#c9c4bb', '#eee5d7'],
-  1: ['#d5cec4', '#c7c9c7', '#e0d6ca', '#b9b7b1'],
-  2: ['#d7d9d7', '#c5c9c8', '#ddd5c9', '#b9c2c1'],
-  3: ['#d8d9d6', '#c8cbc9', '#e2ddd4', '#b5bdbe'],
-  4: ['#cfd4d4', '#bcc6ca', '#dfe0da', '#aeb9bd'],
-  5: ['#aeb4b0', '#bbb7ab', '#9fa9aa', '#c2b8a8'],
-  6: ['#d8d5ce', '#c5cbc8', '#e4ddd0', '#b8c0bd'],
+  0: ['#efe2cf', '#f3eadc', '#d8c8b6', '#f5eee5', '#d6bfa7'],
+  1: ['#e4d8c8', '#c9d0cf', '#eadac8', '#b9b8b1', '#d8c1aa'],
+  2: ['#e1e2dd', '#c4cecd', '#e7d7c3', '#b6c4c7', '#d8c5ad'],
+  3: ['#e6e5df', '#c7cfce', '#eadfd0', '#aebdc2', '#d9c6b3'],
+  4: ['#dce2e2', '#bccbd0', '#f0ede4', '#a9bbc2', '#d7c5b5'],
+  5: ['#aeb8b5', '#c4bba9', '#99a9ad', '#c7b39d', '#899a9d'],
+  6: ['#e2ddd2', '#c8d0cc', '#eee0ca', '#b6c5c2', '#d2bda5'],
 };
 
 const ROOF_PALETTES: Record<SantaRosaBuildingClass, readonly string[]> = {
-  0: ['#995b42', '#7f4938', '#a96a49', '#6c4b42'],
-  1: ['#835747', '#6f5046', '#9b6549', '#5b4e48'],
-  2: ['#716d67', '#8b786a', '#5f6869', '#9c735b'],
-  3: ['#687173', '#75716c', '#596467', '#84766a'],
-  4: ['#697477', '#5b676b', '#7b7d78', '#4e5b60'],
-  5: ['#727876', '#626866', '#85827a', '#5c615e'],
-  6: ['#766e64', '#666d6a', '#887667', '#596467'],
+  0: ['#a95436', '#824532', '#bd6843', '#6d4940', '#9b593b'],
+  1: ['#8d5541', '#6e5046', '#aa6746', '#55504b', '#98583e'],
+  2: ['#77716a', '#967a66', '#59686c', '#a56f54', '#675d55'],
+  3: ['#677378', '#80746a', '#53666c', '#917361', '#5e686b'],
+  4: ['#68777c', '#526970', '#85827a', '#455d65', '#6f6257'],
+  5: ['#737d7a', '#5c6a68', '#8e8679', '#59625f', '#716353'],
+  6: ['#7d6e61', '#626f6c', '#92755f', '#56696d', '#756258'],
 };
 
 const ROAD_WIDTH_METERS: Record<SantaRosaRoadClass, number> = {
@@ -74,11 +82,11 @@ const ROAD_WIDTH_METERS: Record<SantaRosaRoadClass, number> = {
 };
 
 const ROAD_COLORS: Record<SantaRosaRoadClass, string> = {
-  p: '#77756e',
-  s: '#706f69',
-  t: '#676964',
-  r: '#5c625f',
-  u: '#4f5a55',
+  p: '#505453',
+  s: '#4b5050',
+  t: '#464c4b',
+  r: '#414846',
+  u: '#39433f',
 };
 
 const SIDEWALK_COLORS: Record<SantaRosaRoadClass, string> = {
@@ -106,6 +114,7 @@ function createAccumulator(): GeometryAccumulator {
     facadeUvs: [],
     indices: [],
     positions: [],
+    surfaceTypes: [],
   };
 }
 
@@ -118,12 +127,14 @@ function appendVertex(
   facadeU = 0,
   facadeV = 0,
   buildingSeed = 0,
+  surfaceType = 0,
 ) {
   const index = target.positions.length / 3;
   target.positions.push(x, y, z);
   target.colors.push(color.r, color.g, color.b);
   target.facadeUvs.push(facadeU, facadeV);
   target.buildingSeeds.push(buildingSeed);
+  target.surfaceTypes.push(surfaceType);
   return index;
 }
 
@@ -133,6 +144,7 @@ function geometryFromAccumulator(target: GeometryAccumulator) {
   geometry.setAttribute('color', new THREE.Float32BufferAttribute(target.colors, 3));
   geometry.setAttribute('facadeUv', new THREE.Float32BufferAttribute(target.facadeUvs, 2));
   geometry.setAttribute('buildingSeed', new THREE.Float32BufferAttribute(target.buildingSeeds, 1));
+  geometry.setAttribute('surfaceType', new THREE.Float32BufferAttribute(target.surfaceTypes, 1));
   geometry.setIndex(target.indices);
   geometry.computeVertexNormals();
   geometry.computeBoundingSphere();
@@ -207,11 +219,15 @@ function appendBuilding(
       eave + roofRise,
       building.centroid[1],
       roofColor,
+      0,
+      0,
+      buildingSeed,
+      1,
     );
     footprint.forEach(([x, z], index) => {
       const [nextX, nextZ] = footprint[(index + 1) % footprint.length];
-      const edgeStart = appendVertex(target, x, eave, z, roofColor);
-      const edgeEnd = appendVertex(target, nextX, eave, nextZ, roofColor);
+      const edgeStart = appendVertex(target, x, eave, z, roofColor, 0, 0, buildingSeed, 1);
+      const edgeEnd = appendVertex(target, nextX, eave, nextZ, roofColor, 0, 0, buildingSeed, 1);
       target.indices.push(edgeStart, edgeEnd, center);
     });
     return;
@@ -233,6 +249,10 @@ function appendBuilding(
       : eave + 0.006,
     z,
     roofColor,
+    0,
+    0,
+    buildingSeed,
+    1,
   ));
   THREE.ShapeUtils.triangulateShape(contour, []).forEach(([first, second, third]) => {
     target.indices.push(roofVertices[first], roofVertices[second], roofVertices[third]);
@@ -326,7 +346,9 @@ function createBuildingBatches(
 
 function createBuildingMaterial(classId: SantaRosaBuildingClass): BuildingMaterialBundle {
   const windowGlow = { value: 0.6 };
-  const material = new THREE.MeshStandardMaterial({
+  const material = new THREE.MeshPhysicalMaterial({
+    clearcoat: classId >= 3 ? 0.08 : 0.02,
+    clearcoatRoughness: 0.72,
     emissive: classId >= 3 ? '#282b2f' : '#211e1b',
     emissiveIntensity: classId >= 3 ? 0.095 : 0.045,
     metalness: classId === 4 ? 0.11 : 0.012,
@@ -339,11 +361,11 @@ function createBuildingMaterial(classId: SantaRosaBuildingClass): BuildingMateri
     shader.vertexShader = shader.vertexShader
       .replace(
         '#include <common>',
-        '#include <common>\nattribute vec2 facadeUv;\nattribute float buildingSeed;\nvarying vec2 vAlvoradaFacadeUv;\nvarying float vAlvoradaBuildingSeed;\nvarying vec3 vAlvoradaBuildingWorldNormal;',
+        '#include <common>\nattribute vec2 facadeUv;\nattribute float buildingSeed;\nattribute float surfaceType;\nvarying vec2 vAlvoradaFacadeUv;\nvarying float vAlvoradaBuildingSeed;\nvarying float vAlvoradaSurfaceType;\nvarying vec3 vAlvoradaBuildingWorldNormal;\nvarying vec3 vAlvoradaBuildingWorldPosition;',
       )
       .replace(
         '#include <begin_vertex>',
-        '#include <begin_vertex>\nvAlvoradaFacadeUv = facadeUv;\nvAlvoradaBuildingSeed = buildingSeed;',
+        '#include <begin_vertex>\nvAlvoradaFacadeUv = facadeUv;\nvAlvoradaBuildingSeed = buildingSeed;\nvAlvoradaSurfaceType = surfaceType;\nvAlvoradaBuildingWorldPosition = (modelMatrix * vec4(position, 1.0)).xyz;',
       )
       .replace(
         '#include <defaultnormal_vertex>',
@@ -352,7 +374,34 @@ function createBuildingMaterial(classId: SantaRosaBuildingClass): BuildingMateri
     shader.fragmentShader = shader.fragmentShader
       .replace(
         '#include <common>',
-        '#include <common>\nvarying vec2 vAlvoradaFacadeUv;\nvarying float vAlvoradaBuildingSeed;\nvarying vec3 vAlvoradaBuildingWorldNormal;\nuniform float uAlvoradaWindowGlow;',
+        '#include <common>\nvarying vec2 vAlvoradaFacadeUv;\nvarying float vAlvoradaBuildingSeed;\nvarying float vAlvoradaSurfaceType;\nvarying vec3 vAlvoradaBuildingWorldNormal;\nvarying vec3 vAlvoradaBuildingWorldPosition;\nuniform float uAlvoradaWindowGlow;',
+      )
+      .replace(
+        '#include <color_fragment>',
+        `#include <color_fragment>
+        float alvoradaSurfaceNoise = fract(sin(dot(
+          vAlvoradaBuildingWorldPosition.xz,
+          vec2(71.37, 119.17)
+        ) + vAlvoradaBuildingSeed * 41.7) * 43758.5453);
+        float alvoradaRoofSurface = step(0.5, vAlvoradaSurfaceType);
+        float alvoradaTileBand = 0.5 + 0.5 * sin(
+          (vAlvoradaBuildingWorldPosition.x + vAlvoradaBuildingWorldPosition.z) * 235.0
+          + vAlvoradaBuildingSeed * 19.0
+        );
+        diffuseColor.rgb *= mix(
+          0.91 + alvoradaSurfaceNoise * 0.14,
+          0.86 + alvoradaTileBand * 0.22,
+          alvoradaRoofSurface
+        );`,
+      )
+      .replace(
+        '#include <roughnessmap_fragment>',
+        `#include <roughnessmap_fragment>
+        roughnessFactor = mix(
+          roughnessFactor * (0.92 + alvoradaSurfaceNoise * 0.12),
+          0.78 + alvoradaTileBand * 0.14,
+          alvoradaRoofSurface
+        );`,
       )
       .replace(
         '#include <opaque_fragment>',
@@ -393,7 +442,7 @@ function createBuildingMaterial(classId: SantaRosaBuildingClass): BuildingMateri
         #include <opaque_fragment>`,
       );
   };
-  material.customProgramCacheKey = () => `alvorada-city-facade-${classId}-v2`;
+  material.customProgramCacheKey = () => `alvorada-city-facade-${classId}-v3`;
   return { material, windowGlow };
 }
 
@@ -488,11 +537,11 @@ function createLandscapeTexture(terrain: SantaRosaTerrainData, reduced: boolean)
   const image = context.createImageData(resolution, resolution);
   const halfSize = terrain.size / 2;
   const palettes = [
-    [86, 102, 57],
-    [112, 116, 63],
-    [132, 118, 64],
-    [72, 100, 62],
-    [145, 126, 72],
+    [61, 91, 49],
+    [91, 105, 54],
+    [119, 105, 55],
+    [52, 88, 55],
+    [132, 111, 62],
   ];
 
   for (let row = 0; row < resolution; row += 1) {
@@ -514,7 +563,7 @@ function createLandscapeTexture(terrain: SantaRosaTerrainData, reduced: boolean)
       const ruralRed = palette[0] + fieldShade - woodland * 24;
       const ruralGreen = palette[1] + fieldShade - woodland * 8;
       const ruralBlue = palette[2] + fieldShade - woodland * 4;
-      const urbanColor = [111, 117, 101];
+      const urbanColor = [72, 82, 69];
       const greenInfluence = Math.max(park, woodland);
       const offset = (row * resolution + column) * 4;
       image.data[offset] = THREE.MathUtils.clamp(
@@ -684,6 +733,9 @@ function createTreePlacements(
   });
 
   const placements: TreePlacement[] = [];
+  const greenRoads = city.roads.filter((road) => (
+    road.points.length >= 2 && road.classId !== 'u'
+  ));
   const halfSize = city.terrain.size / 2 - 2;
   let attempts = 0;
   while (placements.length < count && attempts < count * 70) {
@@ -691,10 +743,26 @@ function createTreePlacements(
     const progress = placements.length / Math.max(1, count);
     let x: number;
     let z: number;
-    if (progress < 0.42) {
+    if (progress < 0.32) {
       x = 5.5 + (random() - 0.5) * 9;
       z = -13 + random() * 41;
-    } else if (progress < 0.7) {
+    } else if (progress < 0.62 && greenRoads.length > 0) {
+      const road = greenRoads[Math.floor(random() * greenRoads.length)];
+      const segmentIndex = Math.floor(random() * (road.points.length - 1));
+      const start = road.points[segmentIndex];
+      const end = road.points[segmentIndex + 1];
+      const segmentProgress = random();
+      const deltaX = end[0] - start[0];
+      const deltaZ = end[1] - start[1];
+      const segmentLength = Math.max(0.001, Math.hypot(deltaX, deltaZ));
+      const side = random() > 0.5 ? 1 : -1;
+      const avenueOffset = (ROAD_WIDTH_METERS[road.classId] * 0.5 + 5.5)
+        / city.metersPerUnit;
+      x = THREE.MathUtils.lerp(start[0], end[0], segmentProgress)
+        - deltaZ / segmentLength * avenueOffset * side;
+      z = THREE.MathUtils.lerp(start[1], end[1], segmentProgress)
+        + deltaX / segmentLength * avenueOffset * side;
+    } else if (progress < 0.82) {
       const angle = random() * Math.PI * 2;
       const radius = 18 + Math.sqrt(random()) * 28;
       x = Math.cos(angle) * radius;
@@ -710,16 +778,127 @@ function createTreePlacements(
     if (occupied.has(key)) continue;
     occupied.add(key);
     const height = (4.2 + random() * 7.6) / city.metersPerUnit;
-    const green = new THREE.Color(['#2c6842', '#39764b', '#477d50', '#315e40'][Math.floor(random() * 4)]);
+    const green = new THREE.Color(
+      ['#1d6437', '#2c7541', '#3b8148', '#255f37', '#477e46'][Math.floor(random() * 5)],
+    );
     placements.push({
       crownColor: green,
       height,
       position: new THREE.Vector3(x, sampleSantaRosaTerrain(city.terrain, x, z), z),
       shape: Math.floor(random() * 3),
-      width: height * (0.29 + random() * 0.14),
+      width: height * (0.34 + random() * 0.18),
     });
   }
   return placements;
+}
+
+function createArchitecturalAccents(
+  buildings: ReadonlyArray<SantaRosaBuilding>,
+  terrain: SantaRosaTerrainData,
+  mobile: boolean,
+) {
+  const candidates = buildings
+    .filter((building) => building.classId >= 2)
+    .sort((left, right) => (
+      Math.hypot(left.centroid[0], left.centroid[1])
+      - Math.hypot(right.centroid[0], right.centroid[1])
+    ))
+    .slice(0, mobile ? 260 : 460);
+  const placements: ArchitecturalAccentPlacement[] = [];
+  const accentColors = ['#e7dfd3', '#c9d0d0', '#d8c6b3', '#b7c3c5'];
+
+  candidates.forEach((building) => {
+    const [rotation, width, depth] = building.orientedBounds;
+    const ground = sampleSantaRosaTerrain(
+      terrain,
+      building.centroid[0],
+      building.centroid[1],
+    );
+    const accentColor = new THREE.Color(
+      accentColors[(building.variant + building.classId) % accentColors.length],
+    );
+
+    placements.push({
+      color: accentColor.clone().multiplyScalar(0.86),
+      position: new THREE.Vector3(
+        building.centroid[0],
+        ground + building.height + 0.026,
+        building.centroid[1],
+      ),
+      rotation: -rotation,
+      scale: new THREE.Vector3(
+        Math.max(0.06, width * 0.34),
+        building.classId >= 4 ? 0.075 : 0.045,
+        Math.max(0.06, depth * 0.34),
+      ),
+    });
+
+    if (building.classId < 3 || building.height < 0.34) return;
+    const ledgeCount = building.classId === 4 ? 4 : 3;
+    for (let index = 1; index <= ledgeCount; index += 1) {
+      const progress = index / (ledgeCount + 1);
+      placements.push({
+        color: accentColor,
+        position: new THREE.Vector3(
+          building.centroid[0],
+          ground + building.height * progress,
+          building.centroid[1],
+        ),
+        rotation: -rotation,
+        scale: new THREE.Vector3(
+          Math.max(0.08, width + 0.035),
+          0.012,
+          Math.max(0.08, depth + 0.035),
+        ),
+      });
+    }
+  });
+
+  return placements;
+}
+
+function ArchitecturalAccents({
+  placements,
+  shadows,
+}: {
+  placements: ReadonlyArray<ArchitecturalAccentPlacement>;
+  shadows: boolean;
+}) {
+  const mesh = useRef<THREE.InstancedMesh>(null);
+
+  useLayoutEffect(() => {
+    const matrix = new THREE.Matrix4();
+    const quaternion = new THREE.Quaternion();
+    const rotationAxis = new THREE.Vector3(0, 1, 0);
+    placements.forEach((placement, index) => {
+      quaternion.setFromAxisAngle(rotationAxis, placement.rotation);
+      matrix.compose(placement.position, quaternion, placement.scale);
+      mesh.current?.setMatrixAt(index, matrix);
+      mesh.current?.setColorAt(index, placement.color);
+    });
+    if (!mesh.current) return;
+    mesh.current.instanceMatrix.needsUpdate = true;
+    if (mesh.current.instanceColor) mesh.current.instanceColor.needsUpdate = true;
+  }, [placements]);
+
+  return (
+    <instancedMesh
+      ref={mesh}
+      args={[undefined, undefined, placements.length]}
+      castShadow={shadows}
+      receiveShadow
+    >
+      <boxGeometry args={[1, 1, 1]} />
+      <meshPhysicalMaterial
+        color="#ffffff"
+        clearcoat={0.08}
+        clearcoatRoughness={0.74}
+        metalness={0.02}
+        roughness={0.76}
+        vertexColors
+      />
+    </instancedMesh>
+  );
 }
 
 function Vegetation({
@@ -823,11 +1002,12 @@ function Vegetation({
         ref={crownLower}
         args={[canopyGeometry, undefined, placements.length]}
         castShadow={shadows}
+        receiveShadow
       >
         <meshStandardMaterial
           color="#ffffff"
-          emissive="#173724"
-          emissiveIntensity={0.24}
+          emissive="#0d2617"
+          emissiveIntensity={0.1}
           roughness={0.96}
           vertexColors
         />
@@ -836,11 +1016,12 @@ function Vegetation({
         ref={crownUpper}
         args={[canopyGeometry, undefined, placements.length]}
         castShadow={shadows}
+        receiveShadow
       >
         <meshStandardMaterial
           color="#ffffff"
-          emissive="#183c27"
-          emissiveIntensity={0.28}
+          emissive="#102b1a"
+          emissiveIntensity={0.11}
           roughness={0.94}
           vertexColors
         />
@@ -892,6 +1073,10 @@ export function SantaRosaCity({ quality }: SantaRosaCityProps) {
   const treePlacements = useMemo(
     () => createTreePlacements(city, selectedBuildings, quality.treeCount),
     [city, quality.treeCount, selectedBuildings],
+  );
+  const architecturalAccents = useMemo(
+    () => createArchitecturalAccents(selectedBuildings, city.terrain, quality.mobile),
+    [city.terrain, quality.mobile, selectedBuildings],
   );
 
   useEffect(() => () => {
@@ -979,6 +1164,11 @@ export function SantaRosaCity({ quality }: SantaRosaCityProps) {
           />
         </mesh>
       ))}
+
+      <ArchitecturalAccents
+        placements={architecturalAccents}
+        shadows={quality.shadows}
+      />
 
       <Vegetation
         mobile={quality.mobile}

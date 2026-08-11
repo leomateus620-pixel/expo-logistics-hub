@@ -189,6 +189,10 @@ describe('recuperação WebGL da experiência Alvorada', () => {
       'data-fallback-reason',
       'unsupported-webgl',
     );
+    expect(screen.getByTestId('alvorada-fallback').querySelector('img')).toHaveAttribute(
+      'src',
+      '/alvorada/fenasoja-symbol-official.png',
+    );
 
     advance(120_000);
     expect(onComplete).not.toHaveBeenCalled();

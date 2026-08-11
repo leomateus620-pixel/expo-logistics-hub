@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef } from 'react';
-import { RoundedBox, Text3D } from '@react-three/drei';
+import { RoundedBox, Text3D, useTexture } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { AlvoradaQualityProfile } from '../capabilities';
@@ -16,8 +16,15 @@ interface RevealMaterial {
   sweep: { value: number };
 }
 
+interface SymbolRevealMaterial {
+  material: THREE.MeshBasicMaterial;
+  reveal: { value: number };
+  sweep: { value: number };
+}
+
 const FONT_URL = '/alvorada/helvetiker-bold.typeface.json';
-const TITLE_WIDTH = 13.7;
+const SYMBOL_URL = '/alvorada/fenasoja-symbol-official.png';
+const TITLE_WIDTH = 15.7;
 
 function createRevealMaterial(
   parameters: THREE.MeshPhysicalMaterialParameters,
@@ -66,21 +73,68 @@ function createRevealMaterial(
   return { material, reveal, sweep };
 }
 
+function createSymbolRevealMaterial(map: THREE.Texture): SymbolRevealMaterial {
+  const reveal = { value: 0 };
+  const sweep = { value: -1 };
+  const material = new THREE.MeshBasicMaterial({
+    alphaTest: 0.018,
+    depthWrite: false,
+    map,
+    toneMapped: false,
+    transparent: true,
+  });
+  material.dithering = true;
+  material.onBeforeCompile = (shader) => {
+    shader.uniforms.uAlvoradaSymbolReveal = reveal;
+    shader.uniforms.uAlvoradaSymbolSweep = sweep;
+    shader.fragmentShader = shader.fragmentShader
+      .replace(
+        '#include <common>',
+        '#include <common>\nuniform float uAlvoradaSymbolReveal;\nuniform float uAlvoradaSymbolSweep;',
+      )
+      .replace(
+        '#include <map_fragment>',
+        `#include <map_fragment>
+        float alvoradaSymbolMask = smoothstep(
+          -0.08,
+          0.12,
+          uAlvoradaSymbolReveal - vMapUv.x
+        );
+        diffuseColor.a *= alvoradaSymbolMask;
+        float alvoradaSymbolSweep = exp(-pow((vMapUv.x - uAlvoradaSymbolSweep) * 8.0, 2.0));
+        diffuseColor.rgb += vec3(1.0, 0.82, 0.48) * alvoradaSymbolSweep * 0.34;`,
+      );
+  };
+  material.customProgramCacheKey = () => 'alvorada-official-symbol-reveal-v1';
+  return { material, reveal, sweep };
+}
+
 export function FenasojaTitle3D({ quality }: FenasojaTitle3DProps) {
   const timeline = useAlvoradaTimeline();
   const { camera, viewport } = useThree();
   const root = useRef<THREE.Group>(null);
   const sweepLight = useRef<THREE.PointLight>(null);
-  const titlePosition = useMemo(() => new THREE.Vector3(0, 12.35, -28.5), []);
+  const titlePosition = useMemo(() => new THREE.Vector3(0, 17.38, -28.5), []);
+  const symbolSource = useTexture(SYMBOL_URL);
+  const symbolTexture = useMemo(() => {
+    const clone = symbolSource.clone();
+    clone.colorSpace = THREE.SRGBColorSpace;
+    clone.anisotropy = quality.mobile ? 4 : 8;
+    clone.minFilter = THREE.LinearMipmapLinearFilter;
+    clone.generateMipmaps = true;
+    clone.needsUpdate = true;
+    return clone;
+  }, [quality.mobile, symbolSource]);
+  const symbol = useMemo(() => createSymbolRevealMaterial(symbolTexture), [symbolTexture]);
   const word = useMemo(() => createRevealMaterial({
-    color: '#eef4fb',
-    emissive: '#91a6bf',
-    emissiveIntensity: 0.56,
-    metalness: 0.58,
-    roughness: 0.28,
-    clearcoat: 0.52,
-    clearcoatRoughness: 0.2,
-  }, 'word'), []);
+    color: '#fbfdff',
+    emissive: '#9fb6ca',
+    emissiveIntensity: 0.42,
+    metalness: 0.46,
+    roughness: 0.24,
+    clearcoat: 0.78,
+    clearcoatRoughness: 0.12,
+  }, 'word-v2'), []);
   const badge = useMemo(() => createRevealMaterial({
     color: '#ff8a32',
     emissive: '#f05c18',
@@ -99,16 +153,19 @@ export function FenasojaTitle3D({ quality }: FenasojaTitle3DProps) {
   }, 'edition'), []);
 
   useEffect(() => () => {
+    symbol.material.dispose();
+    symbolTexture.dispose();
     word.material.dispose();
     badge.material.dispose();
     edition.material.dispose();
-  }, [badge.material, edition.material, word.material]);
+  }, [badge.material, edition.material, symbol.material, symbolTexture, word.material]);
 
   useFrame(() => {
     const elapsed = timeline.current.elapsed;
     const ambientElapsed = timeline.current.ambientElapsed;
     const wordReveal = smoothRange(elapsed, 9.02, 10.03);
     const editionReveal = smoothRange(elapsed, 9.18, 10.18);
+    const symbolReveal = smoothRange(elapsed, 8.92, 9.82);
     const sweep = smoothRange(elapsed, 9.64, 10.38);
     const sweepEnergy = bellCurve(elapsed, 9.55, 9.96, 10.48);
 
@@ -118,11 +175,13 @@ export function FenasojaTitle3D({ quality }: FenasojaTitle3DProps) {
     word.sweep.value = THREE.MathUtils.lerp(-7.8, 7.8, sweep);
     badge.sweep.value = THREE.MathUtils.lerp(-2.4, 2.4, sweep);
     edition.sweep.value = THREE.MathUtils.lerp(-2, 2, sweep);
+    symbol.reveal.value = THREE.MathUtils.lerp(0, 1.12, symbolReveal);
+    symbol.sweep.value = THREE.MathUtils.lerp(-0.2, 1.2, sweep);
 
     if (root.current) {
       root.current.visible = elapsed >= 8.98;
       const titleViewport = viewport.getCurrentViewport(camera, titlePosition);
-      const targetWidth = titleViewport.width * (quality.mobile ? 0.72 : 0.58);
+      const targetWidth = titleViewport.width * (quality.mobile ? 0.76 : 0.64);
       const scale = targetWidth / TITLE_WIDTH;
       root.current.scale.setScalar(scale);
       root.current.position.copy(titlePosition);
@@ -138,16 +197,24 @@ export function FenasojaTitle3D({ quality }: FenasojaTitle3DProps) {
 
   return (
     <group ref={root} visible={false}>
+      <mesh
+        material={symbol.material}
+        position={[-8.2, 0.05, 0.18]}
+        renderOrder={4}
+      >
+        <planeGeometry args={[1.92, 1.92]} />
+      </mesh>
+
       <Text3D
         font={FONT_URL}
         size={1.34}
-        height={0.16}
+        height={0.2}
         curveSegments={quality.mobile ? 8 : 12}
         bevelEnabled
         bevelSegments={quality.mobile ? 3 : 5}
-        bevelSize={0.034}
-        bevelThickness={0.03}
-        position={[-1.9, 0, 0]}
+        bevelSize={0.042}
+        bevelThickness={0.038}
+        position={[-1.55, 0, 0]}
         onUpdate={(mesh) => mesh.geometry.center()}
       >
         FENASOJA
@@ -183,8 +250,17 @@ export function FenasojaTitle3D({ quality }: FenasojaTitle3DProps) {
         intensity={0}
         position={[-8.5, 2.1, 4]}
       />
-      <directionalLight color="#d7e9ff" intensity={1.35} position={[-7, 8, 12]} />
-      <directionalLight color="#ffd09b" intensity={1.05} position={[10, -2, 10]} />
+      <pointLight
+        color="#edf7ff"
+        decay={2}
+        distance={28}
+        intensity={15}
+        position={[0, 3.8, 9]}
+      />
+      <directionalLight color="#d7e9ff" intensity={2.15} position={[-7, 8, 12]} />
+      <directionalLight color="#ffd09b" intensity={1.65} position={[10, -2, 10]} />
     </group>
   );
 }
+
+useTexture.preload(SYMBOL_URL);

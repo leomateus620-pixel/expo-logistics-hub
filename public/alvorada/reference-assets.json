@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "cityPanorama": {
+    "sourceSha256": "89c25b44bc3afaf9b49e688b3214c13f9da613de4371e3145915e822b4808ecd",
+    "desktop": "santa-rosa-horizon.webp",
+    "portrait": "santa-rosa-horizon-portrait.webp"
+  },
+  "symbol": {
+    "sourceSha256": "cafa3155fc8f7e7d060dafc2ab5ff619e4c953565bc57821133b39a011b23811",
+    "asset": "fenasoja-symbol-official.png"
+  }
+}

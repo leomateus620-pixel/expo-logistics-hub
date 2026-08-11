@@ -170,6 +170,7 @@ function AlvoradaFallback({ showTitle = true }: { showTitle?: boolean }) {
       <div className="alvorada-fallback__horizon" aria-hidden="true" />
       {showTitle && (
         <div className="alvorada-fallback__title" aria-hidden="true">
+          <img src="/alvorada/fenasoja-symbol-official.png" alt="" />
           <span>FENASOJA</span>
           <strong>2028</strong>
         </div>

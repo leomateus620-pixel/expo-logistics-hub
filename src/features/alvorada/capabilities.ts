@@ -24,6 +24,9 @@ const ALVORADA_CRITICAL_ASSETS = [
   '/alvorada/earth-night-lights-2048.png',
   '/alvorada/earth-normal-2048.jpg',
   '/alvorada/earth-clouds-1024.png',
+  '/alvorada/santa-rosa-horizon.webp',
+  '/alvorada/santa-rosa-horizon-portrait.webp',
+  '/alvorada/fenasoja-symbol-official.png',
 ] as const;
 
 const ALVORADA_DATA_ASSETS = [
@@ -115,8 +118,8 @@ export function getAlvoradaQualityProfile(
     mobile,
     postprocessing: !compatibleRenderer,
     shadowMapSize: compatibleRenderer ? 512 : reduced ? 1024 : 2048,
-    shadows: !compatibleRenderer && !mobile && !lowMemory,
+    shadows: !compatibleRenderer && !lowMemory && (!mobile || !lowConcurrency),
     terrainSegments: compatibleRenderer ? 64 : reduced ? 96 : 128,
-    treeCount: compatibleRenderer ? 700 : reduced ? 1600 : 2500,
+    treeCount: compatibleRenderer ? 1200 : reduced ? 3000 : 4500,
   };
 }

@@ -22,7 +22,10 @@ describe('timeline cinematográfica da Alvorada', () => {
     expect(ALVORADA_PHASES.cityFlight).toEqual({ start: 6, end: 7.5 });
     expect(ALVORADA_PHASES.dawnRise).toEqual({ start: 7.5, end: 9 });
     expect(ALVORADA_PHASES.titleReveal).toEqual({ start: 9, end: 10.5 });
-    expect(ALVORADA_PHASES.finalHold.start).toBe(ALVORADA_SEQUENCE_DURATION);
+    expect(ALVORADA_PHASES.finalHold).toEqual({
+      start: ALVORADA_SEQUENCE_DURATION,
+      end: Number.POSITIVE_INFINITY,
+    });
     expect(getAlvoradaPhase(60)).toBe('finalHold');
     expect(getAlvoradaPhase(Number.MAX_SAFE_INTEGER)).toBe('finalHold');
   });
