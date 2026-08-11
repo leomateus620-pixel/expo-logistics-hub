@@ -20,7 +20,10 @@ import { useAuth } from '@/hooks/useAuth';
 import { useCapabilities } from '@/hooks/useCapabilities';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import { resolveModuleAccess } from '@/hooks/useModuleAccess';
-import { warmAlvoradaAssets } from '@/features/alvorada/capabilities';
+import {
+  streamAlvoradaSecondaryAssets,
+  warmAlvoradaAssets,
+} from '@/features/alvorada/capabilities';
 import {
   consumeFenasojaCountdownLaunch,
   findFenasojaCountdownReturnFocus,
@@ -241,6 +244,7 @@ export default function CommissionPortalPage() {
 
   const openAlvorada = useCallback(() => {
     warmAlvorada();
+    streamAlvoradaSecondaryAssets();
     setAlvoradaOpen(true);
   }, [warmAlvorada]);
 
@@ -257,11 +261,13 @@ export default function CommissionPortalPage() {
     const portal = portalRef.current;
     const bodyOverflow = document.body.style.overflow;
     const documentOverflow = document.documentElement.style.overflow;
+    const documentScrollbarGutter = document.documentElement.style.scrollbarGutter;
     const previousAriaHidden = portal?.getAttribute('aria-hidden');
     const hadInert = portal?.hasAttribute('inert') ?? false;
 
     document.body.style.overflow = 'hidden';
     document.documentElement.style.overflow = 'hidden';
+    document.documentElement.style.scrollbarGutter = 'auto';
     portal?.setAttribute('aria-hidden', 'true');
     portal?.setAttribute('inert', '');
 
@@ -289,6 +295,7 @@ export default function CommissionPortalPage() {
       window.removeEventListener('keydown', containSuspenseKeyboard, true);
       document.body.style.overflow = bodyOverflow;
       document.documentElement.style.overflow = documentOverflow;
+      document.documentElement.style.scrollbarGutter = documentScrollbarGutter;
       if (previousAriaHidden === null) portal?.removeAttribute('aria-hidden');
       else portal?.setAttribute('aria-hidden', previousAriaHidden);
       if (!hadInert) portal?.removeAttribute('inert');

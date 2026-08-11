@@ -13,15 +13,15 @@ import {
 } from '@/features/alvorada/timeline';
 
 describe('timeline cinematográfica da Alvorada', () => {
-  it('mantém os sete movimentos até 10,5s e entra em hold final indefinido', () => {
-    expect(ALVORADA_SEQUENCE_DURATION).toBe(10.5);
+  it('mantém os sete movimentos até 12,4s e entra em hold final indefinido', () => {
+    expect(ALVORADA_SEQUENCE_DURATION).toBe(12.4);
     expect(ALVORADA_PHASES.orbitalBrazil).toEqual({ start: 0, end: 2 });
     expect(ALVORADA_PHASES.rioGrandeDoSul).toEqual({ start: 2, end: 4 });
-    expect(Object.values(ALVORADA_PHASES)).toContainEqual({ start: 4, end: 4.5 });
-    expect(ALVORADA_PHASES.santaRosaDescent).toEqual({ start: 4.5, end: 6 });
-    expect(ALVORADA_PHASES.cityFlight).toEqual({ start: 6, end: 7.5 });
-    expect(ALVORADA_PHASES.dawnRise).toEqual({ start: 7.5, end: 9 });
-    expect(ALVORADA_PHASES.titleReveal).toEqual({ start: 9, end: 10.5 });
+    expect(Object.values(ALVORADA_PHASES)).toContainEqual({ start: 4, end: 4.8 });
+    expect(ALVORADA_PHASES.santaRosaDescent).toEqual({ start: 4.8, end: 6.4 });
+    expect(ALVORADA_PHASES.cityFlight).toEqual({ start: 6.4, end: 8.8 });
+    expect(ALVORADA_PHASES.dawnRise).toEqual({ start: 8.8, end: 10.6 });
+    expect(ALVORADA_PHASES.titleReveal).toEqual({ start: 10.6, end: 12.4 });
     expect(ALVORADA_PHASES.finalHold).toEqual({
       start: ALVORADA_SEQUENCE_DURATION,
       end: Number.POSITIVE_INFINITY,
@@ -32,7 +32,7 @@ describe('timeline cinematográfica da Alvorada', () => {
 
   it('seleciona cada fase narrativa nos limites definidos', () => {
     const stabilizationPhase = Object.entries(ALVORADA_PHASES).find(([, interval]) => (
-      interval.start === 4 && interval.end === 4.5
+      interval.start === 4 && interval.end === 4.8
     ))?.[0];
 
     expect(stabilizationPhase).toBeDefined();
@@ -44,16 +44,16 @@ describe('timeline cinematográfica da Alvorada', () => {
       [2, 'rioGrandeDoSul'],
       [3.999, 'rioGrandeDoSul'],
       [4, stabilizationPhase],
-      [4.499, stabilizationPhase],
-      [4.5, 'santaRosaDescent'],
-      [5.999, 'santaRosaDescent'],
-      [6, 'cityFlight'],
-      [7.499, 'cityFlight'],
-      [7.5, 'dawnRise'],
-      [8.999, 'dawnRise'],
-      [9, 'titleReveal'],
-      [10.499, 'titleReveal'],
-      [10.5, 'finalHold'],
+      [4.799, stabilizationPhase],
+      [4.8, 'santaRosaDescent'],
+      [6.399, 'santaRosaDescent'],
+      [6.4, 'cityFlight'],
+      [8.799, 'cityFlight'],
+      [8.8, 'dawnRise'],
+      [10.599, 'dawnRise'],
+      [10.6, 'titleReveal'],
+      [12.399, 'titleReveal'],
+      [12.4, 'finalHold'],
       [ALVORADA_SEQUENCE_DURATION + 120, 'finalHold'],
     ] as const;
 
@@ -79,7 +79,7 @@ describe('timeline cinematográfica da Alvorada', () => {
     expect(restored.ambientElapsed).toBe(8.25);
     expect(restored.delta).toBe(0);
     expect(restored.progress).toBeCloseTo(8.25 / ALVORADA_SEQUENCE_DURATION, 8);
-    expect(restored.phase).toBe('dawnRise');
+    expect(restored.phase).toBe('cityFlight');
     expect(createInitialTimelineState(-2).elapsed).toBe(0);
     expect(createInitialTimelineState(20).elapsed).toBe(ALVORADA_SEQUENCE_DURATION);
     expect(createInitialTimelineState(20).ambientElapsed).toBe(ALVORADA_SEQUENCE_DURATION);

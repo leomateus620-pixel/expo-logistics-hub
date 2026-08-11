@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useAlvoradaTimeline } from './TimelineContext';
-import { bellCurve, smoothRange } from './timeline';
+import { deriveAlvoradaVisualState, smoothRange } from './timeline';
 import { createCloudTexture, seededRandom } from './visualTextures';
 
 interface CorridorCloudPlacement {
@@ -116,11 +116,12 @@ const HAZE_FRAGMENT_SHADER = `
   void main() {
     vec3 samplePosition = vDirection * 3.4 + vec3(time * 0.025, -time * 0.011, 0.0);
     float structure = fbm(samplePosition);
-    vec3 cool = vec3(0.32, 0.43, 0.56);
-    vec3 warm = vec3(0.86, 0.58, 0.38);
+    vec3 cool = vec3(0.12, 0.29, 0.51);
+    vec3 warm = vec3(0.94, 0.49, 0.2);
     vec3 color = mix(cool, warm, warmth * (0.74 + structure * 0.26));
-    color += vec3(structure - 0.5) * 0.075;
-    float alpha = opacity * (0.965 + structure * 0.035);
+    color += vec3(structure - 0.5) * 0.11;
+    float structureMask = smoothstep(0.2, 0.78, structure);
+    float alpha = opacity * (0.68 + structureMask * 0.32);
 
     gl_FragColor = vec4(color, alpha);
     #include <tonemapping_fragment>
@@ -159,7 +160,7 @@ function createCorridorPlacements() {
 }
 
 function createCorridorMaterial(texture: THREE.Texture, stratum: number) {
-  const coolColors = ['#819bb6', '#96aabf', '#a9b7c5'] as const;
+  const coolColors = ['#6685a5', '#7994af', '#91a5b9'] as const;
   const warmColors = ['#e5a16e', '#edb083', '#f2c39a'] as const;
 
   return new THREE.ShaderMaterial({
@@ -222,14 +223,10 @@ export function TransitionCloudLayer() {
     const timelineState = timeline.current as AmbientTimelineState;
     const elapsed = timelineState.elapsed;
     const ambientElapsed = timelineState.ambientElapsed ?? elapsed;
-    const corridor = bellCurve(elapsed, 3.98, 4.53, 5.28);
-    const seamOcclusion = smoothRange(elapsed, 4.27, 4.48)
-      * (1 - smoothRange(elapsed, 4.6, 4.94));
-    const trailingHaze = smoothRange(elapsed, 4.82, 5.08)
-      * (1 - smoothRange(elapsed, 5.24, 5.62));
-    const visibility = Math.max(corridor, seamOcclusion, trailingHaze * 0.24);
-    const warmth = smoothRange(elapsed, 4.24, 5.08);
-    const passage = smoothRange(elapsed, 4.02, 5.24);
+    const visualState = deriveAlvoradaVisualState(elapsed);
+    const visibility = visualState.transitionOpacity;
+    const warmth = smoothRange(elapsed, 4.35, 5.95);
+    const passage = smoothRange(elapsed, 4.2, 6.25);
 
     if (root.current) {
       root.current.visible = visibility > 0.001;
@@ -239,16 +236,16 @@ export function TransitionCloudLayer() {
 
     cardMaterials.forEach((material, stratum) => {
       material.uniforms.opacity.value = Math.min(
-        0.72,
-        corridor * (0.58 - stratum * 0.085) + trailingHaze * 0.03,
+        0.2,
+        visibility * (0.22 - stratum * 0.04),
       );
       material.uniforms.time.value = ambientElapsed;
       material.uniforms.warmth.value = warmth;
     });
 
     hazeMaterial.uniforms.opacity.value = Math.min(
-      0.985,
-      seamOcclusion * 0.985 + corridor * 0.095 + trailingHaze * 0.025,
+      0.34,
+      visibility * 0.45,
     );
     hazeMaterial.uniforms.time.value = ambientElapsed;
     hazeMaterial.uniforms.warmth.value = warmth;

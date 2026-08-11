@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { useLoader } from '@react-three/fiber';
 import * as THREE from 'three';
 
@@ -227,6 +227,11 @@ export function useSantaRosaCityData() {
     SANTA_ROSA_CITY_DATA_URL,
     SANTA_ROSA_ROADS_DATA_URL,
   ]) as string[];
+
+  useEffect(() => () => {
+    useLoader.clear(THREE.FileLoader, SANTA_ROSA_CITY_DATA_URL);
+    useLoader.clear(THREE.FileLoader, SANTA_ROSA_ROADS_DATA_URL);
+  }, []);
 
   return useMemo(
     () => decodeSantaRosaCityData(citySource, roadSource),

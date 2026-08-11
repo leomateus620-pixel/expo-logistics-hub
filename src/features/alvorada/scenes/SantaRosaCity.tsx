@@ -12,7 +12,7 @@ import {
   useSantaRosaCityData,
 } from '../cityData';
 import { useAlvoradaTimeline } from '../TimelineContext';
-import { smoothRange } from '../timeline';
+import { deriveAlvoradaVisualState, smoothRange } from '../timeline';
 import { seededRandom } from '../visualTextures';
 
 interface SantaRosaCityProps {
@@ -516,6 +516,47 @@ function createTerrainGeometry(terrain: SantaRosaTerrainData, segments: number) 
   geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
   geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
   geometry.setIndex(indices);
+  geometry.computeVertexNormals();
+  geometry.computeBoundingSphere();
+  return geometry;
+}
+
+function createDistantTerrainGeometry(terrain: SantaRosaTerrainData, mobile: boolean) {
+  const segments = mobile ? 24 : 36;
+  const geometry = new THREE.PlaneGeometry(1_600, 1_600, segments, segments);
+  geometry.rotateX(-Math.PI / 2);
+  const positions = geometry.getAttribute('position') as THREE.BufferAttribute;
+  const localRadius = terrain.size * 0.52;
+  const colors: number[] = [];
+  const nearColor = new THREE.Color('#3c5035');
+  const horizonColor = new THREE.Color('#a18e76');
+  const vertexColor = new THREE.Color();
+
+  for (let index = 0; index < positions.count; index += 1) {
+    const x = positions.getX(index);
+    const z = positions.getZ(index);
+    const radius = Math.hypot(x, z);
+    const distanceBlend = THREE.MathUtils.smoothstep(
+      radius,
+      localRadius,
+      localRadius + 135,
+    );
+    const rollingRelief = (
+      Math.sin(x * 0.026 + z * 0.009) * 0.72
+      + Math.sin(z * 0.019 - x * 0.006) * 0.48
+    ) * distanceBlend;
+    positions.setY(index, -0.72 + rollingRelief);
+    const horizonBlend = THREE.MathUtils.smoothstep(
+      radius,
+      localRadius * 0.82,
+      localRadius + 240,
+    );
+    vertexColor.lerpColors(nearColor, horizonColor, horizonBlend);
+    colors.push(vertexColor.r, vertexColor.g, vertexColor.b);
+  }
+
+  positions.needsUpdate = true;
+  geometry.setAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
   geometry.computeVertexNormals();
   geometry.computeBoundingSphere();
   return geometry;
@@ -1044,6 +1085,10 @@ export function SantaRosaCity({ quality }: SantaRosaCityProps) {
     () => createTerrainGeometry(city.terrain, quality.terrainSegments),
     [city.terrain, quality.terrainSegments],
   );
+  const distantTerrainGeometry = useMemo(
+    () => createDistantTerrainGeometry(city.terrain, quality.mobile),
+    [city.terrain, quality.mobile],
+  );
   const landscapeTexture = useMemo(
     () => createLandscapeTexture(city.terrain, reduced),
     [city.terrain, reduced],
@@ -1081,6 +1126,7 @@ export function SantaRosaCity({ quality }: SantaRosaCityProps) {
 
   useEffect(() => () => {
     terrainGeometry.dispose();
+    distantTerrainGeometry.dispose();
     landscapeTexture.dispose();
     sidewalkGeometry.dispose();
     roadGeometry.dispose();
@@ -1091,6 +1137,7 @@ export function SantaRosaCity({ quality }: SantaRosaCityProps) {
   }, [
     buildingData,
     buildingMaterials,
+    distantTerrainGeometry,
     landscapeTexture,
     roadGeometry,
     roadMarkingGeometry,
@@ -1100,18 +1147,23 @@ export function SantaRosaCity({ quality }: SantaRosaCityProps) {
 
   useFrame(() => {
     const elapsed = timeline.current.elapsed;
-    if (root.current) root.current.visible = elapsed >= 4.45;
+    const visualState = deriveAlvoradaVisualState(elapsed);
+    if (root.current) root.current.visible = visualState.cityVisible;
     if (lightMaterial.current) {
-      const dawn = smoothRange(elapsed, 5.2, 8.6);
+      const dawn = smoothRange(elapsed, 6.1, 10.4);
       lightMaterial.current.opacity = (1 - dawn) * 0.78;
     }
     buildingMaterials.forEach(({ windowGlow }) => {
-      windowGlow.value = 1 - smoothRange(elapsed, 5.3, 8.7);
+      windowGlow.value = 1 - smoothRange(elapsed, 6.2, 10.5);
     });
   });
 
   return (
     <group ref={root} visible={false}>
+      <mesh geometry={distantTerrainGeometry}>
+        <meshBasicMaterial color="#ffffff" vertexColors />
+      </mesh>
+
       <mesh geometry={terrainGeometry} receiveShadow>
         <meshStandardMaterial
           color="#ffffff"

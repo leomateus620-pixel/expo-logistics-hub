@@ -4,7 +4,7 @@ import * as THREE from 'three';
 import type { AlvoradaQualityProfile } from './capabilities';
 import { latitudeLongitudeToVector3, SANTA_ROSA_COORDINATES, tangentAt } from './geo';
 import { useAlvoradaTimeline } from './TimelineContext';
-import { smoothRange } from './timeline';
+import { ALVORADA_PHASES, smoothRange } from './timeline';
 
 interface CinematicCameraProps {
   quality: AlvoradaQualityProfile;
@@ -78,10 +78,10 @@ export function CinematicCamera({ quality }: CinematicCameraProps) {
         santaRosa.clone().multiplyScalar(4.02),
       ]),
       localDescentPosition: cinematicCurve([
-        new THREE.Vector3(9, 42, 58),
-        new THREE.Vector3(6, 27, 40),
-        new THREE.Vector3(4.2, 13.5, 26),
-        new THREE.Vector3(3.2, 6.2, 16),
+        new THREE.Vector3(7.5, 34, 52),
+        new THREE.Vector3(5.8, 24, 39),
+        new THREE.Vector3(4.1, 13, 27),
+        new THREE.Vector3(3, 6.6, 17),
       ]),
       localDescentLook: cinematicCurve([
         new THREE.Vector3(-4, 0.4, -2),
@@ -89,10 +89,10 @@ export function CinematicCamera({ quality }: CinematicCameraProps) {
         new THREE.Vector3(0.4, 1.05, -10),
       ]),
       cityPosition: cinematicCurve([
-        new THREE.Vector3(3.2, 6.2, 16),
-        new THREE.Vector3(1.7, 5.1, 9),
-        new THREE.Vector3(-0.5, 4.3, 2),
-        new THREE.Vector3(-2.8, 3.9, -5),
+        new THREE.Vector3(3, 6.6, 17),
+        new THREE.Vector3(1.9, 5.7, 10),
+        new THREE.Vector3(-0.25, 4.8, 2.4),
+        new THREE.Vector3(-2.5, 4.35, -5.2),
       ]),
       cityLook: cinematicCurve([
         new THREE.Vector3(0.4, 1.05, -10),
@@ -100,9 +100,9 @@ export function CinematicCamera({ quality }: CinematicCameraProps) {
         new THREE.Vector3(0.2, 1.0, -24),
       ]),
       skyPosition: cinematicCurve([
-        new THREE.Vector3(-2.8, 3.9, -5),
-        new THREE.Vector3(-1.7, 5.3, -2),
-        new THREE.Vector3(-0.5, 6.4, 2),
+        new THREE.Vector3(-2.5, 4.35, -5.2),
+        new THREE.Vector3(-1.65, 5.45, -2.1),
+        new THREE.Vector3(-0.5, 6.55, 2.2),
         new THREE.Vector3(0, 7.9, 11),
       ]),
       skyLook: cinematicCurve([
@@ -131,26 +131,42 @@ export function CinematicCamera({ quality }: CinematicCameraProps) {
     let bank = 0;
     let fov = quality.mobile ? 48 : 44;
 
-    if (elapsed < 2) {
-      const progress = smoothRange(elapsed, 0, 2);
+    if (elapsed < ALVORADA_PHASES.orbitalBrazil.end) {
+      const progress = smoothRange(
+        elapsed,
+        ALVORADA_PHASES.orbitalBrazil.start,
+        ALVORADA_PHASES.orbitalBrazil.end,
+      );
       paths.orbitalPosition.getPointAt(progress, position);
       paths.orbitalLook.getPointAt(progress, lookAt);
       fov = THREE.MathUtils.lerp(quality.mobile ? 52 : 46, quality.mobile ? 46 : 39, progress);
       bank = Math.sin(progress * Math.PI) * -0.022;
-    } else if (elapsed < 4) {
-      const progress = smoothRange(elapsed, 2, 4);
+    } else if (elapsed < ALVORADA_PHASES.rioGrandeDoSul.end) {
+      const progress = smoothRange(
+        elapsed,
+        ALVORADA_PHASES.rioGrandeDoSul.start,
+        ALVORADA_PHASES.rioGrandeDoSul.end,
+      );
       paths.statePosition.getPointAt(progress, position);
       paths.stateLook.getPointAt(progress, lookAt);
       fov = THREE.MathUtils.lerp(quality.mobile ? 46 : 39, quality.mobile ? 50 : 46, progress);
       bank = Math.sin(progress * Math.PI) * 0.014;
-    } else if (elapsed < 4.5) {
-      const progress = smoothRange(elapsed, 4, 4.5);
+    } else if (elapsed < ALVORADA_PHASES.santaRosaStabilization.end) {
+      const progress = smoothRange(
+        elapsed,
+        ALVORADA_PHASES.santaRosaStabilization.start,
+        ALVORADA_PHASES.santaRosaStabilization.end,
+      );
       paths.stabilizationPosition.getPointAt(progress, position);
       paths.stabilizationLook.getPointAt(progress, lookAt);
       fov = quality.mobile ? 50 : 46;
       bank = Math.sin(progress * Math.PI) * 0.004;
-    } else if (elapsed < 6) {
-      const progress = flowingRange(elapsed, 4.5, 6);
+    } else if (elapsed < ALVORADA_PHASES.santaRosaDescent.end) {
+      const progress = flowingRange(
+        elapsed,
+        ALVORADA_PHASES.santaRosaDescent.start,
+        ALVORADA_PHASES.santaRosaDescent.end,
+      );
       paths.localDescentPosition.getPointAt(progress, position);
       paths.localDescentLook.getPointAt(progress, lookAt);
       if (quality.mobile) {
@@ -159,8 +175,12 @@ export function CinematicCamera({ quality }: CinematicCameraProps) {
       }
       fov = THREE.MathUtils.lerp(quality.mobile ? 50 : 46, quality.mobile ? 46 : 42, progress);
       bank = Math.sin(progress * Math.PI) * -0.006;
-    } else if (elapsed < 7.5) {
-      const progress = flowingRange(elapsed, 6, 7.5);
+    } else if (elapsed < ALVORADA_PHASES.cityFlight.end) {
+      const progress = flowingRange(
+        elapsed,
+        ALVORADA_PHASES.cityFlight.start,
+        ALVORADA_PHASES.cityFlight.end,
+      );
       paths.cityPosition.getPointAt(progress, position);
       paths.cityLook.getPointAt(progress, lookAt);
       if (quality.mobile) {
@@ -169,15 +189,23 @@ export function CinematicCamera({ quality }: CinematicCameraProps) {
       }
       fov = THREE.MathUtils.lerp(quality.mobile ? 46 : 42, quality.mobile ? 42 : 38, progress);
       bank = Math.sin(progress * Math.PI) * -0.003;
-    } else if (elapsed < 9) {
-      const progress = flowingRange(elapsed, 7.5, 9);
+    } else if (elapsed < ALVORADA_PHASES.dawnRise.end) {
+      const progress = flowingRange(
+        elapsed,
+        ALVORADA_PHASES.dawnRise.start,
+        ALVORADA_PHASES.dawnRise.end,
+      );
       paths.skyPosition.getPointAt(progress, position);
       paths.skyLook.getPointAt(progress, lookAt);
       if (quality.mobile) position.z += THREE.MathUtils.lerp(1.05, 2.8, progress);
       fov = THREE.MathUtils.lerp(quality.mobile ? 42 : 38, quality.mobile ? 48 : 44, progress);
       bank = Math.sin(progress * Math.PI) * 0.002;
     } else {
-      const progress = smoothRange(elapsed, 9, 10.5);
+      const progress = smoothRange(
+        elapsed,
+        ALVORADA_PHASES.titleReveal.start,
+        ALVORADA_PHASES.titleReveal.end,
+      );
       paths.finalPosition.getPointAt(progress, position);
       paths.finalLook.getPointAt(progress, lookAt);
       if (quality.mobile) position.z += 2.8;
