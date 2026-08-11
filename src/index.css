@@ -1748,8 +1748,7 @@ input::placeholder, textarea::placeholder {
 }
 
 .cronograma-module-bar {
-  position: sticky;
-  top: 0;
+  position: relative;
   z-index: 40;
   isolation: isolate;
   overflow: hidden;

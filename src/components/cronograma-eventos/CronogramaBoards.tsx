@@ -3,8 +3,6 @@ import {
   AlertCircle,
   AlertTriangle,
   CalendarCheck2,
-  CalendarClock,
-  CalendarX2,
   ChevronDown,
   ChevronRight,
   Layers3,
@@ -30,7 +28,7 @@ import {
 } from './EventCards';
 import { CRONOGRAMA_YEARS, categoryLabels } from './cronogramaData';
 import { compareEventDates, formatLongDateRange, formatShortDateRange, getDateParts, getMonthLabel } from './dateUtils';
-import type { CronogramaCategory, CronogramaEvent, CronogramaPriority, CronogramaView } from './types';
+import type { CronogramaCategory, CronogramaEvent, CronogramaView } from './types';
 
 export function OverviewBoard({
   events,
@@ -303,13 +301,6 @@ export function MeetingsBoard({
   );
 }
 
-const PENDING_PRIORITY_WEIGHT: Record<CronogramaPriority, number> = {
-  critical: 0,
-  high: 1,
-  medium: 2,
-  low: 3,
-};
-
 export function UndatedBoard({
   events,
   todayKey,
@@ -321,43 +312,13 @@ export function UndatedBoard({
   onOpen: (event: CronogramaEvent) => void;
   onEdit: (event: CronogramaEvent) => void;
 }) {
-  const [openMonths, setOpenMonths] = useState<Record<string, boolean>>({});
-  const pending = useMemo(
-    () => events.filter((event) => event.status !== 'completed' && event.status !== 'cancelled'),
-    [events],
-  );
   const overdue = useMemo(
-    () => pending.filter((event) => isCronogramaEventOverdue(event, todayKey)).sort(compareEventDates),
-    [pending, todayKey],
-  );
-  const scheduled = useMemo(
-    () => pending
-      .filter((event) => event.date && !isCronogramaEventOverdue(event, todayKey))
+    () => events
+      .filter((event) => event.status !== 'completed' && event.status !== 'cancelled')
+      .filter((event) => isCronogramaEventOverdue(event, todayKey))
       .sort(compareEventDates),
-    [pending, todayKey],
+    [events, todayKey],
   );
-  const undated = useMemo(
-    () => pending
-      .filter((event) => !event.date)
-      .sort(
-        (a, b) =>
-          PENDING_PRIORITY_WEIGHT[a.priority] - PENDING_PRIORITY_WEIGHT[b.priority]
-          || a.title.localeCompare(b.title, 'pt-BR'),
-      ),
-    [pending],
-  );
-  const scheduledByYear = useMemo(() => {
-    const map = new Map<number, Map<number, CronogramaEvent[]>>();
-    scheduled.forEach((event) => {
-      const parts = getDateParts(event.date);
-      if (!parts) return;
-      if (!map.has(parts.year)) map.set(parts.year, new Map());
-      const yearMap = map.get(parts.year)!;
-      if (!yearMap.has(parts.month)) yearMap.set(parts.month, []);
-      yearMap.get(parts.month)!.push(event);
-    });
-    return map;
-  }, [scheduled]);
 
   return (
     <div className="space-y-4">
@@ -366,106 +327,36 @@ export function UndatedBoard({
           <div className="min-w-0">
             <h2 className="text-2xl font-black tracking-tight">Pendências</h2>
             <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-              Eventos que ainda não foram concluídos nem cancelados.
+              Eventos passados que ainda não foram concluídos nem cancelados.
             </p>
           </div>
-          <CronogramaMetaBadge icon={Route} tone="gold">{pending.length} pendentes</CronogramaMetaBadge>
+          <CronogramaMetaBadge icon={AlertTriangle} tone="gold">{overdue.length} atrasados</CronogramaMetaBadge>
         </div>
-        <div className="mt-4 grid grid-cols-3 gap-2 text-center sm:max-w-md">
-          <div className="rounded-xl bg-primary/[0.06] px-2 py-2">
-            <p className="text-lg font-black leading-none text-primary">{pending.length}</p>
-            <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">pendentes</p>
-          </div>
+        <div className="mt-4 grid grid-cols-1 gap-2 text-center sm:max-w-[10rem]">
           <div className="rounded-xl bg-red-50/80 px-2 py-2">
             <p className="text-lg font-black leading-none text-red-800">{overdue.length}</p>
             <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">atrasados</p>
           </div>
-          <div className="rounded-xl bg-gold/[0.10] px-2 py-2">
-            <p className="text-lg font-black leading-none text-amber-950">{undated.length}</p>
-            <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">sem data</p>
-          </div>
         </div>
       </section>
 
-      {pending.length === 0 ? (
+      {overdue.length === 0 ? (
         <section className="cronograma-pending-empty" role="status">
           <Route aria-hidden="true" />
           <div>
-            <h3>Nenhuma pendência nesta visão</h3>
-            <p>Todos os eventos foram concluídos ou cancelados com os filtros atuais.</p>
+            <h3>Nenhum evento atrasado</h3>
+            <p>Tudo em dia: não há eventos passados aguardando conclusão.</p>
           </div>
         </section>
       ) : (
-        <>
-          {overdue.length > 0 && (
-            <section className="cronograma-pending-group is-overdue">
-              <PendingSectionHeader icon={AlertTriangle} title="Atrasados" count={overdue.length} tone="overdue" />
-              <div className="divide-y divide-border/40">
-                {overdue.map((event, index) => (
-                  <CronogramaEventCard key={event.id} event={event} index={index} onOpen={onOpen} onEdit={onEdit} />
-                ))}
-              </div>
-            </section>
-          )}
-
-          {scheduled.length > 0 && (
-            <section className="cronograma-pending-group">
-              <PendingSectionHeader icon={CalendarClock} title="Programados" count={scheduled.length} tone="primary" />
-              <div className="space-y-3">
-                {Array.from(scheduledByYear.entries()).map(([year, months]) => (
-                  <div key={year} className="space-y-2.5">
-                    <p className="px-1 text-[11px] font-bold uppercase tracking-[0.18em] text-muted-foreground">{year}</p>
-                    {Array.from(months.entries()).map(([month, monthEvents]) => {
-                      const key = `${year}-${month}`;
-                      const open = openMonths[key] ?? true;
-                      return (
-                        <div key={key} className="rounded-2xl border border-border/35 bg-white/58 p-3">
-                          <button
-                            type="button"
-                            onClick={() => setOpenMonths((value) => ({ ...value, [key]: !open }))}
-                            className="mb-2 flex w-full items-center justify-between gap-3 rounded-xl text-left focus-ring"
-                            aria-expanded={open}
-                          >
-                            <span className="text-base font-black tracking-tight text-foreground">{getMonthLabel(month)}</span>
-                            <span className="flex items-center gap-2 text-xs font-bold text-primary">
-                              {monthEvents.length} {monthEvents.length === 1 ? 'evento' : 'eventos'}
-                              {open ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-                            </span>
-                          </button>
-                          <div className={cn('grid overflow-hidden transition-opacity duration-200', open ? 'max-h-[6000px] opacity-100' : 'max-h-0 opacity-0')}>
-                            <div className="divide-y divide-border/40">
-                              {monthEvents.map((event, index) => (
-                                <CronogramaEventCard key={event.id} event={event} index={index} compact onOpen={onOpen} onEdit={onEdit} />
-                              ))}
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {undated.length > 0 && (
-            <section className="cronograma-pending-group">
-              <PendingSectionHeader icon={CalendarX2} title="Sem data definida" count={undated.length} tone="gold" />
-              <div className="divide-y divide-border/40">
-                {undated.map((event, index) => (
-                  <CronogramaEventCard
-                    key={event.id}
-                    event={event}
-                    index={index}
-                    contextNote={event.pendingReason || event.decisionNeeded}
-                    onOpen={onOpen}
-                    onEdit={onEdit}
-                  />
-                ))}
-              </div>
-            </section>
-          )}
-        </>
+        <section className="cronograma-pending-group is-overdue">
+          <PendingSectionHeader icon={AlertTriangle} title="Atrasados" count={overdue.length} tone="overdue" />
+          <div className="divide-y divide-border/40">
+            {overdue.map((event, index) => (
+              <CronogramaEventCard key={event.id} event={event} index={index} onOpen={onOpen} onEdit={onEdit} />
+            ))}
+          </div>
+        </section>
       )}
     </div>
   );
