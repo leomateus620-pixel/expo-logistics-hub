@@ -179,6 +179,10 @@
     position: static;
   }
 
+  .cronograma-page .cronograma-temporal-nav {
+    position: static;
+  }
+
   .cronograma-page .cronograma-month-section,
   .cronograma-page .cronograma-year-empty-state {
     scroll-margin-top: 0.75rem;
