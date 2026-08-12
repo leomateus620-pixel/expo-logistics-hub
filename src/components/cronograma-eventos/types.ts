@@ -153,10 +153,19 @@ export interface CronogramaOption<T extends string | number> {
   label: string;
 }
 
+export interface CronogramaHistoryChange {
+  field: string;
+  label: string;
+  before: string | null;
+  after: string | null;
+}
+
 export interface CronogramaHistoryEntry {
   id: string;
   action: string;
   createdAt: string;
   userLabel: string;
   changedFields: string[];
+  /** Structured per-field diff (antes → depois) for readable history. */
+  changes?: CronogramaHistoryChange[];
 }

@@ -159,9 +159,31 @@ const historyFieldLabels: Array<[string[], string]> = [
   [['priority'], 'prioridade'],
   [['location'], 'local'],
   [['responsible_name', 'responsibleName'], 'responsável'],
+  [['responsibles', 'responsiblesRel'], 'responsáveis'],
   [['commission_name', 'commissionName'], 'comissão'],
+  [['commissions', 'commissionsRel'], 'comissões'],
   [['subevents'], 'checklist'],
 ];
+
+const historyStatusLabels: Record<string, string> = {
+  confirmed: 'Confirmado',
+  planned: 'Planejado',
+  in_progress: 'Em andamento',
+  completed: 'Concluído',
+  overdue: 'Atrasado',
+  rescheduled: 'Remarcado',
+  cancelled: 'Cancelado',
+  undated: 'Sem data',
+  in_definition: 'Em definição',
+  blocked: 'Bloqueado',
+};
+
+const historyPriorityLabels: Record<string, string> = {
+  critical: 'Crítica',
+  high: 'Alta',
+  medium: 'Média',
+  low: 'Baixa',
+};
 
 function firstValue(record: Record<string, unknown>, keys: string[]) {
   for (const key of keys) {
@@ -170,10 +192,54 @@ function firstValue(record: Record<string, unknown>, keys: string[]) {
   return undefined;
 }
 
+function formatHistoryValue(keys: string[], value: unknown): string | null {
+  if (value === null || value === undefined || value === '') return null;
+  if (Array.isArray(value)) {
+    const names = value
+      .map((item) => {
+        if (item && typeof item === 'object') {
+          const record = item as Record<string, unknown>;
+          return (record.name ?? record.commission_name ?? record.commissionName ?? record.title ?? '') as string;
+        }
+        return String(item ?? '');
+      })
+      .map((name) => name.trim())
+      .filter(Boolean);
+    return names.length > 0 ? names.join(', ') : null;
+  }
+  const raw = String(value);
+  const field = keys[0] ?? '';
+  if ((field.includes('date') || field.includes('Date')) && /^\d{4}-\d{2}-\d{2}/.test(raw)) {
+    const [year, month, day] = raw.slice(0, 10).split('-');
+    return `${day}/${month}/${year}`;
+  }
+  if (field === 'status') return historyStatusLabels[raw] ?? raw;
+  if (field === 'priority') return historyPriorityLabels[raw] ?? raw;
+  return raw;
+}
+
+export interface CronogramaHistoryDiff {
+  field: string;
+  label: string;
+  before: string | null;
+  after: string | null;
+}
+
 function summarizeHistoryChange(previous: Record<string, unknown>, next: Record<string, unknown>) {
   return historyFieldLabels
     .filter(([keys]) => JSON.stringify(firstValue(previous, keys)) !== JSON.stringify(firstValue(next, keys)))
     .map(([, label]) => label);
+}
+
+function diffHistoryChange(previous: Record<string, unknown>, next: Record<string, unknown>): CronogramaHistoryDiff[] {
+  return historyFieldLabels
+    .filter(([keys]) => JSON.stringify(firstValue(previous, keys)) !== JSON.stringify(firstValue(next, keys)))
+    .map(([keys, label]) => ({
+      field: keys[0] ?? label,
+      label,
+      before: formatHistoryValue(keys, firstValue(previous, keys)),
+      after: formatHistoryValue(keys, firstValue(next, keys)),
+    }));
 }
 
 function isUuid(value: string | null | undefined) {
@@ -653,15 +719,28 @@ export function useCronogramaEventos() {
     }
   }, [isSeedingOfficialData, myRole, orgId, query.data, seedMissingOfficialData]);
 
+  const googleSyncEligibility = useRef<Record<string, boolean>>({});
   const triggerSyncWorker = useCallback(() => {
     // Fire-and-forget push so Google Calendar mirrors changes immediately,
-    // without waiting for the pg_cron minute tick.
-    try {
-      void supabase.functions.invoke('google-sync-worker', { body: {} }).catch(() => undefined);
-    } catch {
-      // Ignore — the pg_cron fallback will retry.
-    }
-  }, []);
+    // without waiting for the pg_cron minute tick. Skipped entirely when the
+    // org has no active Google connection (avoids a noisy 401 on every save).
+    if (!orgId) return;
+    void (async () => {
+      try {
+        if (!(orgId in googleSyncEligibility.current)) {
+          const { count } = await supabase
+            .from('google_calendar_connections')
+            .select('id', { count: 'exact', head: true })
+            .eq('org_id', orgId);
+          googleSyncEligibility.current[orgId] = (count ?? 0) > 0;
+        }
+        if (!googleSyncEligibility.current[orgId]) return;
+        await supabase.functions.invoke('google-sync-worker', { body: {} }).catch(() => undefined);
+      } catch {
+        // Ignore — the pg_cron fallback will retry.
+      }
+    })();
+  }, [orgId]);
 
   const create = useMutation({
     mutationFn: async (draft: CronogramaEventDraft) => {
@@ -1202,6 +1281,7 @@ export function useCronogramaEventHistory(eventId: string | null | undefined) {
           createdAt: readString(row, 'created_at') ?? new Date().toISOString(),
           userLabel: (userId && profileByUserId.get(userId)) || 'Usuário autenticado',
           changedFields: summarizeHistoryChange(previous, next),
+          changes: diffHistoryChange(previous, next),
         };
       });
     },
