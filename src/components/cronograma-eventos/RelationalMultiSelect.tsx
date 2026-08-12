@@ -178,6 +178,13 @@ export function RelationalMultiSelect({
     [groupedOptions],
   );
 
+  /** Distinct group labels across ALL options (drives the bulk-action bar). */
+  const bulkGroups = useMemo(
+    () => Array.from(new Set(options.map((option) => option.group).filter(Boolean) as string[])),
+    [options],
+  );
+  const showBulkBar = bulkGroups.length > 1 && !isLoading && !errorMessage;
+
   const normalizedCustomLabel = normalizeSearchTerm(search.trim());
   const canAddCustom = allowCustom
     && search.trim().length >= 2
@@ -447,6 +454,25 @@ export function RelationalMultiSelect({
 
   const selectorPanel = (
     <div className="cronograma-relation-panel">
+      {showBulkBar && (
+        <div className="cronograma-relation-bulk" role="group" aria-label="Seleção rápida">
+          <button type="button" onClick={() => addMany(options, 'todos os grupos')}>
+            Tudo
+          </button>
+          {bulkGroups.map((group) => (
+            <button
+              key={group}
+              type="button"
+              onClick={() => addMany(options.filter((option) => option.group === group), group)}
+            >
+              {group}
+            </button>
+          ))}
+          <button type="button" data-tone="danger" onClick={clearAll} disabled={value.length === 0}>
+            Limpar
+          </button>
+        </div>
+      )}
       <div className="cronograma-relation-search">
         <Search aria-hidden="true" />
         <input
