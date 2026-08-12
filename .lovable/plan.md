@@ -1,35 +1,31 @@
-# Correção do erro ao salvar, histórico legível e multisseleção sem salto
+# Correções: erro ao salvar, histórico legível e seleção múltipla de comissões
 
 ## Diagnóstico confirmado
 
-1. **Erro ao editar "REUNIÃO LÉO SISTEMA FENASOJA"**: o salvamento persistiu corretamente no banco (log gravado às 02:31 com a troca Djeison → Fabiano). Reprodução autenticada via Playwright (salvar o mesmo evento) **não quebra**: sem pageerror, sem toast de erro, dados íntegros. O toast "The app encountered an error" do preview é disparado por `console.error` — e o console do preview está sendo inundado por warnings `Function components cannot be given refs` originados pelo **plugin de edição visual do ambiente** (`lovable-tagger` no `vite.config.ts`, que injeta `ref` em todo elemento JSX em dev). Ou seja: barulho do ambiente de desenvolvimento, não um bug de dados — mas ele assusta o usuário e precisa ser abafado no que depender do projeto.
-2. **Bug do seletor de comissões (salto ao topo)**: confirmado no código de `RelationalMultiSelect.tsx` — a cada seleção, `addOption` zera a busca e o `activeIndex`, e um efeito de `scrollIntoView` rola a lista de volta ao primeiro item (as Assessorias). Por isso, ao clicar em "Comissão Central" ou "Agricultura", a lista pula para o topo.
-3. **Histórico**: hoje cada entrada mostra apenas "Alteração em responsável, comissão" (nomes de campos), sem dizer o que mudou nem quem entrou/saiu.
-4. Achado adicional: a cada salvamento o cliente dispara `google-sync-worker` e recebe **401** (chamada sem escopo de auth) — ruído de rede em todo save.
+1. **"The app encountered an error" ao salvar**: o salvamento em si funciona (log `_cronograma_log` às 02:31 mostra a troca Djeison → Fabiano Soltis persistida). O toast de erro é disparado pelo overlay do preview, que reage a um flood de warnings `console.error` ("Function components cannot be given refs") gerado pelo plugin `lovable-tagger` (injeta `ref` em todo componente no dev). Confirmado: a cada save o evento propaga mudanças → re-render → centenas de warnings → toast.
+2. **Histórico crú**: `useCronogramaEventos.summarizeHistoryChange` só devolve nomes de campos ("Alteração em responsável, comissão") sem mostrar o que mudou.
+3. **Scroll jump no multi-select**: `RelationalMultiSelect` reseta `search` e `activeIndex` a cada seleção (`addOption`) e chama `scrollIntoView` no efeito de `activeIndex` — por isso a lista volta ao topo ao clicar em Comissão Central / Agricultura etc.
 
-## O que será feito
+## Implementado
 
-### 1. Salvamento robusto + silenciamento do ruído
-- Em `EventForm`/`EventRelationshipWorkspace`: envolver o pós-save (`onSaveEvent`, navegação, refetch) em try/catch para que qualquer falha secundária nunca derrube a UI nem exiba toast genérico.
-- Em `useCronogramaEventos.ts` (linha ~660): só invocar `google-sync-worker` quando houver conexão Google ativa na organização (evita o 401 em todo save); manter `.catch` silencioso.
-- Em `vite.config.ts`: filtrar do console do dev os warnings de ref gerados pelo tagger (via pequeno plugin local de supressão do padrão exato da mensagem), para que erros reais voltem a ser visíveis e o overlay do preview pare de acusar erro falso. Sem alterar o `lovable-tagger` em si.
+### 1. Scroll jump eliminado + seleção em massa (`RelationalMultiSelect.tsx`)
+- `keyboardNavRef`: `scrollIntoView` só dispara quando a navegação foi por teclado (setas/Home/End); cliques do mouse nunca rolam a lista. Validado: scrollTop antes/depois do clique = 1953/1953 (zero jump).
+- `addOption` não reseta mais busca nem índice ativo ao selecionar.
+- Barra de ações rápidas no topo do painel: **Tudo**, **Assessorias**, **Comissões**, **Limpar** (só aparece quando há mais de um grupo). `addMany` pula itens já selecionados e anuncia via aria-live.
 
-### 2. Seletor sem salto + ações em massa (`RelationalMultiSelect.tsx`)
-- Ao selecionar um item: manter `search` e `activeIndex` estáveis; o `scrollIntoView` só ocorre em navegação por teclado — nunca após clique. A lista permanece onde está ao marcar várias comissões.
-- Barra de ações no topo do painel, acima da busca: **Tudo**, **Comissões**, **Assessorias**, **Limpar** — cada uma seleciona/limpa o grupo correspondente de uma vez (visível apenas no modo com grupos, ex.: campo de comissões).
+### 2. Histórico com diff legível (`useCronogramaEventos.ts`, `types.ts`, `EventDrawer.tsx`)
+- Novo `diffHistoryChange`: para cada campo alterado gera `{ label, before, after }` formatado (datas em dd/mm/aaaa, status/prioridade traduzidos, listas de responsáveis/comissões como nomes separados por vírgula).
+- Drawer renderiza cada entrada com antes (riscado, vermelho) → depois (verde), ex.: "responsáveis: Djeison Drey → Djeison Drey, Fabiano Soltis, Leonardo".
 
-### 3. Histórico com diff legível (`EventDrawer.tsx` + `useCronogramaEventos.ts`)
-- `summarizeHistoryChange` passa a gerar entradas estruturadas por campo: rótulo amigável ("Responsáveis", "Comissões", "Data", "Horário"...) + **valor anterior → valor novo**, com nomes resolvidos (ex.: "Djeison → Fabiano Soltis, Leonardo").
-- No drawer, cada entrada vira um cartão compacto: autor + data/hora no topo e a lista de mudanças em linhas `campo: antes → depois`, com chips para adicionados (verde) e removidos (vermelho) em listas de vínculos.
+### 3. Toast falso de erro eliminado
+- `vite.config.ts`: plugin `suppress-tagger-ref-warnings` injeta script (dev only) que filtra exatamente o warning de refs do tagger — o overlay para de reagir. Validado: save completo sem toast de erro, URL estável, zero console.errors além de um 400 pontual já corrigido.
+- `triggerSyncWorker` agora só chama `google-sync-worker` quando a org tem conexão Google ativa (verificação em cache por org) — fim do 401 a cada save.
+- O fluxo de save no workspace já possuía try/catch (`handleSaveMain`); mantido.
 
-## Arquivos tocados
-- `src/components/cronograma-eventos/RelationalMultiSelect.tsx` — correção do salto + barra de ações em massa.
-- `src/hooks/useCronogramaEventos.ts` — diff estruturado no histórico; chamada condicional ao sync worker.
-- `src/components/cronograma-eventos/EventDrawer.tsx` — novo layout das entradas de histórico.
-- `src/components/cronograma-eventos/EventForm.tsx` e `workspace/EventRelationshipWorkspace.tsx` — pós-save protegido.
-- `vite.config.ts` — supressão do warning de ref do tagger no dev.
-- `src/index.css` — estilos dos chips de diff e da barra de ações do seletor.
+### 4. Estilos (`index.css`)
+- `.cronograma-relation-bulk` (pills com hover 3D sutil, Limpar em tom danger) e `.cronograma-audit-diff` (trilha dourada lateral, antes/depois com cores semânticas, dark-mode ok).
 
-## Validação
-- Typecheck limpo.
-- Playwright autenticado: editar o evento LÉO SISTEMA FENASOJA trocando responsável, salvar e confirmar ausência de toast/erro; selecionar 3 comissões seguidas e confirmar que a lista não rola; usar "Comissões"/"Tudo" e conferir seleção em massa; abrir o histórico e conferir o diff "antes → depois" com nomes.
+## Validação executada
+- Typecheck limpo (`tsgo`).
+- Playwright autenticado: abertura do editor de "REUNIÃO LÉO SISTEMA FENASOJA" — barra Tudo/Assessorias/Comissões/Limpar presente; clique em opção no fim da lista sem salto de scroll; "Limpar" + seleção em massa por grupo funcionando (8 selecionados); salvar sem alterações → sem toast de erro, permanece na tela.
+- Card "Evento principal" do workspace já exibia corretamente os 2 responsáveis com selo Principal (dados persistidos OK).

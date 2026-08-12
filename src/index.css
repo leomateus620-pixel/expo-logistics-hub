@@ -3424,3 +3424,94 @@ input::placeholder, textarea::placeholder {
   }
 }
 
+
+/* Bulk-action bar inside RelationalMultiSelect panel (Tudo / grupos / Limpar) */
+.cronograma-relation-bulk {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 10px 12px;
+  border-bottom: 1px solid hsl(var(--border) / 0.6);
+  background: linear-gradient(135deg, hsl(210 40% 12% / 0.04), hsl(43 74% 49% / 0.06));
+}
+.cronograma-relation-bulk button {
+  appearance: none;
+  border: 1px solid hsl(var(--border));
+  background: hsl(var(--card) / 0.85);
+  color: hsl(var(--foreground));
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  padding: 5px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+.cronograma-relation-bulk button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: hsl(43 74% 49% / 0.6);
+  box-shadow: 0 4px 12px -6px hsl(210 40% 12% / 0.35);
+}
+.cronograma-relation-bulk button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.cronograma-relation-bulk button[data-tone='danger'] {
+  margin-left: auto;
+  color: hsl(var(--destructive));
+  border-color: hsl(var(--destructive) / 0.35);
+}
+
+/* Readable per-field diff inside the drawer history entries */
+.cronograma-audit-diff {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border-left: 2px solid hsl(43 74% 49% / 0.45);
+  padding-left: 10px;
+}
+.cronograma-audit-diff li {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.cronograma-audit-diff__field {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: hsl(var(--muted-foreground));
+}
+.cronograma-audit-diff__values {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  line-height: 1.45;
+}
+.cronograma-audit-diff__old {
+  color: hsl(var(--destructive) / 0.9);
+  text-decoration: line-through;
+  text-decoration-thickness: 1px;
+  word-break: break-word;
+}
+.cronograma-audit-diff__new {
+  color: hsl(150 60% 30%);
+  font-weight: 700;
+  word-break: break-word;
+}
+.cronograma-audit-diff__old.is-empty,
+.cronograma-audit-diff__new.is-empty {
+  color: hsl(var(--muted-foreground));
+  text-decoration: none;
+  font-weight: 500;
+}
+.cronograma-audit-diff__arrow {
+  color: hsl(var(--muted-foreground));
+  font-weight: 700;
+}
+.dark .cronograma-audit-diff__new {
+  color: hsl(150 55% 55%);
+}
