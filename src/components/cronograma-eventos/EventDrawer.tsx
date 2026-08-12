@@ -517,14 +517,54 @@ export function EventDrawer({
   );
 }
 
-function InfoBlock({ icon: Icon, label, value }: { icon: LucideIcon; label: string; value: string }) {
+function InfoCard({ icon: Icon, label, value }: { icon: LucideIcon; label: string; value: string }) {
   return (
-    <div className="cronograma-info-row py-3">
-      <div className="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
-        <Icon className="h-3.5 w-3.5 text-gold" />
-        {label}
+    <div className="cronograma-info-card">
+      <span className="cronograma-info-card-icon" aria-hidden="true">
+        <Icon />
+      </span>
+      <div className="min-w-0 flex-1">
+        <p className="cronograma-info-card-label">{label}</p>
+        <p className="cronograma-info-card-value">{value}</p>
       </div>
-      <p className="text-sm font-semibold leading-relaxed text-foreground">{value}</p>
+    </div>
+  );
+}
+
+function RelationCard({
+  icon,
+  label,
+  items,
+  emptyLabel,
+}: {
+  icon: LucideIcon;
+  label: string;
+  items: EventRelationItem[];
+  emptyLabel: string;
+}) {
+  const Icon = icon;
+  return (
+    <div className={cn('cronograma-info-card cronograma-info-card--relation', items.length > 1 && 'is-multi')}>
+      <span className="cronograma-info-card-icon" aria-hidden="true">
+        <Icon />
+      </span>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-2">
+          <p className="cronograma-info-card-label">{label}</p>
+          {items.length > 1 && (
+            <span className="cronograma-relation-count" aria-label={`${items.length} vínculos`}>
+              {items.length}
+            </span>
+          )}
+        </div>
+        <EventRelationList
+          items={items}
+          emptyLabel={emptyLabel}
+          icon={Icon}
+          collapseAfter={5}
+          className="mt-1.5"
+        />
+      </div>
     </div>
   );
 }
