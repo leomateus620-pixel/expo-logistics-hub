@@ -62,6 +62,16 @@ const USERS: ProvisionUser[] = [
     capabilities: [...BASE_CAPABILITIES],
     deactivate_duplicates: ["DARIO JÚNIOR DA MOTTA GERMANO"],
   },
+  {
+    email: "germanotbuttow@gmail.com",
+    full_name: "Germano Tessmer Büttow",
+    password: "Fenasoja@2028",
+    role: "leitura",
+    cargo: "Presidente — Comissão Exporural",
+    is_core_team: true,
+    capabilities: ["cronograma_eventos_access", "map.view", "cronograma_scoped_access"],
+    deactivate_duplicates: ["GERMANO TESSMER BÜTTOW"],
+  },
 ];
 
 
