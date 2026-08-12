@@ -6,6 +6,7 @@ import {
   COMMERCIAL_PAVILION_PUBLIC_IDENTIFIERS,
   commercialPavilionFacingRadians,
   commercialPavilionFocusDirection,
+  commercialPavilionModelBounds,
   commercialPavilionSupportsInterior,
   commercialPavilionVisualHeight,
   createCommercialPavilionLayout,
@@ -24,6 +25,14 @@ const EXPECTED_PAVILION_NUMBERS = {
   B5: 13,
   B6: 3,
 } as const;
+const EXPECTED_FACING_RADIANS = {
+  B1: Math.PI / 2,
+  B2: Math.PI / 2,
+  B3: Math.PI,
+  B4: Math.PI,
+  B5: Math.PI,
+  B6: Math.PI,
+} as const satisfies Record<CommercialPavilionPublicIdentifier, number>;
 
 const officialPavilions = EXPECTED_IDENTIFIERS.map((publicIdentifier) => {
   const entity = OFFICIAL_REFERENCE_ENTITIES.find(
@@ -37,6 +46,78 @@ function boundsFor(entity: MapEntity): CommercialPavilionBoundsDimensions {
   const coordinates = entity.geometry.coordinates.flat();
   const xs = coordinates.map(([x]) => x);
   const zs = coordinates.map(([, z]) => z);
+  return {
+    width: Math.max(...xs) - Math.min(...xs),
+    depth: Math.max(...zs) - Math.min(...zs),
+  };
+}
+
+function centerFor(entity: MapEntity): readonly [number, number] {
+  const coordinates = entity.geometry.coordinates.flat();
+  const xs = coordinates.map(([x]) => x);
+  const zs = coordinates.map(([, z]) => z);
+  return [
+    (Math.min(...xs) + Math.max(...xs)) / 2,
+    (Math.min(...zs) + Math.max(...zs)) / 2,
+  ];
+}
+
+function unitHorizontal([x, z]: readonly [number, number]): readonly [number, number] {
+  const length = Math.hypot(x, z);
+  if (length === 0) throw new Error('Expected a non-zero horizontal vector');
+  return [x / length, z / length];
+}
+
+function horizontalDot(
+  left: readonly [number, number],
+  right: readonly [number, number],
+): number {
+  const normalizedLeft = unitHorizontal(left);
+  const normalizedRight = unitHorizontal(right);
+  return normalizedLeft[0] * normalizedRight[0] + normalizedLeft[1] * normalizedRight[1];
+}
+
+function closestLotInBlock(entity: MapEntity, block: 'I' | 'D'): MapEntity {
+  const [centerX, centerZ] = centerFor(entity);
+  const candidates = OFFICIAL_REFERENCE_ENTITIES.filter((candidate) => (
+    candidate.classification === 'SELLABLE_LOT' && candidate.metadata.block === block
+  ));
+  const closest = candidates.reduce<MapEntity | null>((current, candidate) => {
+    if (!current) return candidate;
+    const [candidateX, candidateZ] = centerFor(candidate);
+    const [currentX, currentZ] = centerFor(current);
+    const candidateDistance = Math.hypot(candidateX - centerX, candidateZ - centerZ);
+    const currentDistance = Math.hypot(currentX - centerX, currentZ - centerZ);
+    return candidateDistance < currentDistance ? candidate : current;
+  }, null);
+  if (!closest) throw new Error(`Missing official lots for block ${block}`);
+  return closest;
+}
+
+function targetFor(publicIdentifier: CommercialPavilionPublicIdentifier): MapEntity {
+  if (publicIdentifier === 'B1') {
+    const lot = OFFICIAL_REFERENCE_ENTITIES.find((entity) => entity.publicIdentifier === 'Q-I-01');
+    if (!lot) throw new Error('Missing official lot Q-I-01');
+    return lot;
+  }
+  if (publicIdentifier === 'B2') return officialPavilions[2];
+  const pavilion = officialPavilions[EXPECTED_IDENTIFIERS.indexOf(publicIdentifier)];
+  return closestLotInBlock(pavilion, publicIdentifier === 'B6' ? 'D' : 'I');
+}
+
+function rotatedAabbDimensions(
+  bounds: CommercialPavilionBoundsDimensions,
+  radians: number,
+): CommercialPavilionBoundsDimensions {
+  const cosine = Math.cos(radians);
+  const sine = Math.sin(radians);
+  const corners = [-1, 1].flatMap((xSign) => [-1, 1].map((zSign) => {
+    const x = xSign * bounds.width / 2;
+    const z = zSign * bounds.depth / 2;
+    return [x * cosine + z * sine, -x * sine + z * cosine] as const;
+  }));
+  const xs = corners.map(([x]) => x);
+  const zs = corners.map(([, z]) => z);
   return {
     width: Math.max(...xs) - Math.min(...xs),
     depth: Math.max(...zs) - Math.min(...zs),
@@ -88,17 +169,37 @@ describe('família arquitetônica dos pavilhões comerciais', () => {
     expect(new Set(definitions.map((definition) => definition.entrancePattern)).size).toBe(6);
 
     definitions.forEach((definition) => {
-      expect(definition.facingRadians).toBe(0);
+      expect(definition.facingRadians).toBe(EXPECTED_FACING_RADIANS[definition.publicIdentifier]);
       expect(definition.focusDirection).toHaveLength(3);
       expect(definition.focusDirection.every(Number.isFinite)).toBe(true);
       expect(definition.focusDirection[1]).toBeGreaterThan(0);
-      expect(definition.focusDirection[2]).toBeGreaterThan(0.9);
       expect(definition.visualHeight.min).toBeLessThan(definition.visualHeight.max);
     });
+  });
 
-    const pavilionOneDirection = COMMERCIAL_PAVILION_DEFINITIONS.B1.focusDirection;
-    expect(pavilionOneDirection[1] / pavilionOneDirection[2]).toBeGreaterThan(1.45);
-    expect(-pavilionOneDirection[0] / pavilionOneDirection[2]).toBeGreaterThanOrEqual(0.9);
+  it('orienta as fachadas para seus alvos físicos e posiciona a câmera no mesmo lado público', () => {
+    EXPECTED_IDENTIFIERS.forEach((publicIdentifier, index) => {
+      const pavilion = officialPavilions[index];
+      const target = targetFor(publicIdentifier);
+      const definition = COMMERCIAL_PAVILION_DEFINITIONS[publicIdentifier];
+      const [pavilionX, pavilionZ] = centerFor(pavilion);
+      const [targetX, targetZ] = centerFor(target);
+      const facadeDirection = [
+        Math.sin(definition.facingRadians),
+        Math.cos(definition.facingRadians),
+      ] as const;
+      const targetDirection = [targetX - pavilionX, targetZ - pavilionZ] as const;
+      const focusDirection = [definition.focusDirection[0], definition.focusDirection[2]] as const;
+
+      expect(horizontalDot(facadeDirection, targetDirection)).toBeGreaterThan(0.95);
+      expect(horizontalDot(facadeDirection, focusDirection)).toBeGreaterThan(0.65);
+      expect(definition.focusDirection[1]).toBeGreaterThan(0);
+    });
+
+    const pavilionOneFocus = COMMERCIAL_PAVILION_DEFINITIONS.B1.focusDirection;
+    expect(
+      pavilionOneFocus[1] / Math.hypot(pavilionOneFocus[0], pavilionOneFocus[2]),
+    ).toBeGreaterThan(1);
   });
 
   it('materializa as entradas solicitadas e os elementos de separação das fachadas', () => {
@@ -106,7 +207,10 @@ describe('família arquitetônica dos pavilhões comerciais', () => {
       const definition = resolveCommercialPavilionDefinition(entity)!;
       return [
         entity.publicIdentifier,
-        createCommercialPavilionLayout(boundsFor(entity), definition),
+        createCommercialPavilionLayout(
+          commercialPavilionModelBounds(boundsFor(entity), definition.facingRadians),
+          definition,
+        ),
       ];
     })) as Record<CommercialPavilionPublicIdentifier, ReturnType<typeof createCommercialPavilionLayout>>;
 
@@ -141,7 +245,7 @@ describe('família arquitetônica dos pavilhões comerciais', () => {
       const entity = { publicIdentifier };
       expect(resolveCommercialPavilionDefinition(entity)?.publicIdentifier).toBe(publicIdentifier);
       expect(commercialPavilionSupportsInterior(entity)).toBe(true);
-      expect(commercialPavilionFacingRadians(entity)).toBe(0);
+      expect(commercialPavilionFacingRadians(entity)).toBe(EXPECTED_FACING_RADIANS[publicIdentifier]);
       expect(commercialPavilionFocusDirection(entity)).toEqual(
         COMMERCIAL_PAVILION_DEFINITIONS[publicIdentifier].focusDirection,
       );
@@ -154,16 +258,36 @@ describe('família arquitetônica dos pavilhões comerciais', () => {
     expect(resolveCommercialPavilionDefinition({ publicIdentifier: 'B10' })).toBeNull();
   });
 
+  it('troca os eixos somente em quartos de volta cardinais', () => {
+    const bounds = { width: 4, depth: 2 };
+
+    expect(commercialPavilionModelBounds(bounds, Math.PI / 2)).toEqual({ width: 2, depth: 4 });
+    expect(commercialPavilionModelBounds(bounds, -Math.PI / 2)).toEqual({ width: 2, depth: 4 });
+    expect(commercialPavilionModelBounds(bounds, 0)).toBe(bounds);
+    expect(commercialPavilionModelBounds(bounds, Math.PI)).toBe(bounds);
+    expect(commercialPavilionModelBounds(bounds, -Math.PI / 18)).toBe(bounds);
+  });
+
   it('deriva dimensões finitas e mantém exterior e acessos dentro dos footprints oficiais', () => {
     officialPavilions.forEach((entity) => {
       const definition = resolveCommercialPavilionDefinition(entity)!;
       const bounds = boundsFor(entity);
+      const modelBounds = commercialPavilionModelBounds(bounds, definition.facingRadians);
       const visualHeight = commercialPavilionVisualHeight(bounds, definition);
-      const layout = createCommercialPavilionLayout(bounds, definition, visualHeight);
+      const layout = createCommercialPavilionLayout(modelBounds, definition, visualHeight);
+      const worldAabb = rotatedAabbDimensions(modelBounds, definition.facingRadians);
 
       expect(everyNumberIsFinite(layout)).toBe(true);
-      expect(layout.width).toBeCloseTo(bounds.width, 10);
-      expect(layout.depth).toBeCloseTo(bounds.depth, 10);
+      expect(layout.width).toBeCloseTo(modelBounds.width, 10);
+      expect(layout.depth).toBeCloseTo(modelBounds.depth, 10);
+      expect(worldAabb.width).toBeCloseTo(bounds.width, 10);
+      expect(worldAabb.depth).toBeCloseTo(bounds.depth, 10);
+      if (definition.facingRadians === Math.PI / 2) {
+        expect(modelBounds.width).toBeCloseTo(bounds.depth, 10);
+        expect(modelBounds.depth).toBeCloseTo(bounds.width, 10);
+      } else {
+        expect(modelBounds).toEqual(bounds);
+      }
       expect(layout.height).toBe(visualHeight);
       expect(layout.height).toBeGreaterThan(entity.geometry.extrusionHeight);
       expect(layout.exterior.slab.width).toBe(layout.width);
@@ -196,7 +320,10 @@ describe('família arquitetônica dos pavilhões comerciais', () => {
   it('oferece um interior proporcional, legível e estruturalmente ritmado para todos', () => {
     officialPavilions.forEach((entity) => {
       const definition = resolveCommercialPavilionDefinition(entity)!;
-      const layout = createCommercialPavilionLayout(boundsFor(entity), definition);
+      const layout = createCommercialPavilionLayout(
+        commercialPavilionModelBounds(boundsFor(entity), definition.facingRadians),
+        definition,
+      );
       const { interior } = layout;
 
       expect(interior.clearWidth).toBeGreaterThan(0);

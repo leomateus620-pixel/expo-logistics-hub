@@ -7,6 +7,7 @@ import { withoutClosingPoint } from '../../utils/geometry';
 import { isMapSelectionClick } from '../../utils/interaction';
 import { LIVESTOCK_PAVILION_RENDER_BUDGET } from '../../utils/livestockPavilion';
 import { MIRANTE_RENDER_BUDGET } from '../../utils/mirante';
+import { commercialPavilionModelBounds } from '../../utils/commercialPavilions';
 import {
   resolveStrategicLandmarkKind,
   strategicLandmarkBounds,
@@ -2502,15 +2503,10 @@ export function StrategicLandmarkMesh({
     selected,
   );
   const facingRadians = strategicLandmarkFacingRadians(entity);
-  const modelBounds = useMemo(() => {
-    const quarterTurn = Math.abs(Math.sin(facingRadians)) > 0.7;
-    if (!quarterTurn) return bounds;
-    return {
-      ...bounds,
-      width: bounds.depth,
-      depth: bounds.width,
-    };
-  }, [bounds, facingRadians]);
+  const modelBounds = useMemo(
+    () => commercialPavilionModelBounds(bounds, facingRadians),
+    [bounds, facingRadians],
+  );
   const gl = useThree((state) => state.gl);
   const invalidate = useThree((state) => state.invalidate);
 

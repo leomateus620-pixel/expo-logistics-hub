@@ -166,8 +166,8 @@ export const COMMERCIAL_PAVILION_DEFINITIONS = {
     roofProfile: 'broad-gable',
     entrancePattern: 'grand-central',
     entranceCount: 1,
-    facingRadians: 0,
-    focusDirection: [-0.92, 1.44, 0.92],
+    facingRadians: Math.PI / 2,
+    focusDirection: [0.92, 1.44, -0.92],
     visualHeight: { scale: 0.49, min: 2.35, max: 2.72 },
     facade: {
       entranceWidthRatio: 0.48,
@@ -184,8 +184,8 @@ export const COMMERCIAL_PAVILION_DEFINITIONS = {
     roofProfile: 'twin-offset-gables',
     entrancePattern: 'split-central-mass',
     entranceCount: 2,
-    facingRadians: 0,
-    focusDirection: [-0.12, 0.76, 0.94],
+    facingRadians: Math.PI / 2,
+    focusDirection: [0.94, 0.76, 0.12],
     visualHeight: { scale: 0.47, min: 2.25, max: 2.58 },
     facade: {
       entranceWidthRatio: 0.22,
@@ -202,8 +202,8 @@ export const COMMERCIAL_PAVILION_DEFINITIONS = {
     roofProfile: 'northlight-sawtooth',
     entrancePattern: 'paired-offset',
     entranceCount: 2,
-    facingRadians: 0,
-    focusDirection: [-0.04, 0.78, 0.95],
+    facingRadians: Math.PI,
+    focusDirection: [0.04, 0.78, -0.95],
     visualHeight: { scale: 0.43, min: 2.48, max: 2.82 },
     facade: {
       entranceWidthRatio: 0.2,
@@ -220,8 +220,8 @@ export const COMMERCIAL_PAVILION_DEFINITIONS = {
     roofProfile: 'raised-monitor',
     entrancePattern: 'side-service',
     entranceCount: 1,
-    facingRadians: 0,
-    focusDirection: [0.06, 0.8, 0.95],
+    facingRadians: Math.PI,
+    focusDirection: [-0.06, 0.8, -0.95],
     visualHeight: { scale: 0.53, min: 2.1, max: 2.42 },
     facade: {
       entranceWidthRatio: 0.34,
@@ -238,8 +238,8 @@ export const COMMERCIAL_PAVILION_DEFINITIONS = {
     roofProfile: 'asymmetric-shed',
     entrancePattern: 'recessed-central',
     entranceCount: 1,
-    facingRadians: 0,
-    focusDirection: [0.14, 0.78, 0.94],
+    facingRadians: Math.PI,
+    focusDirection: [-0.14, 0.78, -0.94],
     visualHeight: { scale: 0.5, min: 2.08, max: 2.38 },
     facade: {
       entranceWidthRatio: 0.36,
@@ -256,8 +256,8 @@ export const COMMERCIAL_PAVILION_DEFINITIONS = {
     roofProfile: 'triple-gable',
     entrancePattern: 'triple-bays',
     entranceCount: 3,
-    facingRadians: 0,
-    focusDirection: [0.22, 0.76, 0.92],
+    facingRadians: Math.PI,
+    focusDirection: [-0.22, 0.76, -0.92],
     visualHeight: { scale: 0.47, min: 2.35, max: 2.68 },
     facade: {
       entranceWidthRatio: 0.2,
@@ -303,6 +303,27 @@ export function commercialPavilionFocusDirection(
   entity: Pick<MapEntity, 'publicIdentifier'>,
 ): readonly [number, number, number] | null {
   return resolveCommercialPavilionDefinition(entity)?.focusDirection ?? null;
+}
+
+/**
+ * Converts world-aligned footprint dimensions into pavilion-local dimensions.
+ * The model's facade is authored on local +Z, so odd quarter turns exchange
+ * width and depth before the model is rotated back into world space.
+ */
+export function commercialPavilionModelBounds<
+  Bounds extends CommercialPavilionBoundsDimensions,
+>(bounds: Bounds, facingRadians: number): Bounds {
+  const quarterTurns = Math.round(facingRadians / (Math.PI / 2));
+  const snappedRadians = quarterTurns * (Math.PI / 2);
+  const isCardinalQuarterTurn = Math.abs(facingRadians - snappedRadians) < 1e-8
+    && Math.abs(quarterTurns) % 2 === 1;
+  if (!isCardinalQuarterTurn) return bounds;
+
+  return {
+    ...bounds,
+    width: bounds.depth,
+    depth: bounds.width,
+  };
 }
 
 function finitePositive(value: number, fallback: number): number {
