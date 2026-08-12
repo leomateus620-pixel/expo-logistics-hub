@@ -730,8 +730,9 @@ export function useCronogramaEventos() {
         if (!(orgId in googleSyncEligibility.current)) {
           const { count } = await supabase
             .from('google_calendar_connections')
-            .select('id', { count: 'exact', head: true })
-            .eq('org_id', orgId);
+            .select('user_id', { count: 'exact', head: true })
+            .eq('org_id', orgId)
+            .eq('status', 'connected');
           googleSyncEligibility.current[orgId] = (count ?? 0) > 0;
         }
         if (!googleSyncEligibility.current[orgId]) return;
