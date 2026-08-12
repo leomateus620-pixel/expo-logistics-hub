@@ -2677,7 +2677,7 @@ input::placeholder, textarea::placeholder {
   font-weight: 650;
   line-height: 1.35;
   color: oklch(var(--foreground));
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 
 .cronograma-relation-primary-badge {

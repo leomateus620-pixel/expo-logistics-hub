@@ -503,7 +503,7 @@
 
 /* Vínculos múltiplos no card "Evento principal" */
 .cronograma-main-anchor-meta div[data-multi] {
-  grid-row: span 2;
+  grid-column: span 2;
 }
 
 .cronograma-main-anchor-meta dd:has(.cronograma-relation-list) {
