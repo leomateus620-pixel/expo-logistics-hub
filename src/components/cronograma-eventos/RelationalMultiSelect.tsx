@@ -132,6 +132,8 @@ export function RelationalMultiSelect({
   const listboxId = `${fieldId}-listbox`;
   const searchRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
+  /** Set only by keyboard navigation so scrollIntoView never fires on mouse selection. */
+  const keyboardNavRef = useRef(false);
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [activeIndex, setActiveIndex] = useState(-1);
@@ -234,6 +236,8 @@ export function RelationalMultiSelect({
 
   useEffect(() => {
     if (!open || activeIndex < 0) return;
+    if (!keyboardNavRef.current) return;
+    keyboardNavRef.current = false;
     const activeOption = listRef.current?.querySelector<HTMLElement>(`[data-option-index="${activeIndex}"]`);
     activeOption?.scrollIntoView({ block: 'nearest' });
   }, [activeIndex, open]);
@@ -300,8 +304,39 @@ export function RelationalMultiSelect({
       },
     ]);
     setAnnouncement(`${option.label} adicionado à seleção.`);
-    setSearch('');
-    setActiveIndex(options.length > 0 ? 0 : -1);
+    // Keep search text and active index untouched so the list never jumps
+    // back to the top while the user selects multiple entries.
+  };
+
+  /** Select every option in the given scope, skipping ones already selected. */
+  const addMany = (items: RelationalOption[], scopeLabel: string) => {
+    const next = [...value];
+    let added = 0;
+    items.forEach((option) => {
+      const alreadySelected = next.some(
+        (item) => item.id === option.id || normalizeSearchTerm(item.label) === normalizeSearchTerm(option.label),
+      );
+      if (alreadySelected) return;
+      next.push({
+        id: option.id,
+        label: option.label,
+        hint: option.hint,
+        isPrimary: !next.some((item) => item.isPrimary),
+      });
+      added += 1;
+    });
+    if (added === 0) {
+      setAnnouncement(`Todos os itens de ${scopeLabel} já estavam selecionados.`);
+      return;
+    }
+    onChange(next);
+    setAnnouncement(`${added} ${added === 1 ? 'item adicionado' : 'itens adicionados'} de ${scopeLabel}.`);
+  };
+
+  const clearAll = () => {
+    if (value.length === 0) return;
+    onChange([]);
+    setAnnouncement('Seleção limpa.');
   };
 
   const addCustom = () => {
@@ -352,21 +387,25 @@ export function RelationalMultiSelect({
     if (navigableCount === 0) return;
     if (event.key === 'ArrowDown') {
       event.preventDefault();
+      keyboardNavRef.current = true;
       setActiveIndex((current) => (current + 1 + navigableCount) % navigableCount);
       return;
     }
     if (event.key === 'ArrowUp') {
       event.preventDefault();
+      keyboardNavRef.current = true;
       setActiveIndex((current) => (current - 1 + navigableCount) % navigableCount);
       return;
     }
     if (event.key === 'Home') {
       event.preventDefault();
+      keyboardNavRef.current = true;
       setActiveIndex(0);
       return;
     }
     if (event.key === 'End') {
       event.preventDefault();
+      keyboardNavRef.current = true;
       setActiveIndex(navigableCount - 1);
       return;
     }
