@@ -6,6 +6,7 @@ import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import type { MapEntity } from '../../types';
 import {
   createCommercialPavilionLayout,
+  commercialPavilionModelBounds,
   resolveCommercialPavilionDefinition,
   type CommercialPavilionLayout,
   type CommercialPavilionRect,
@@ -277,10 +278,14 @@ export const CommercialPavilionInteriorScene = memo(function CommercialPavilionI
 }) {
   const definition = resolveCommercialPavilionDefinition(entity);
   const bounds = useMemo(() => strategicLandmarkBounds(entity), [entity]);
-  const layout = useMemo(() => definition
-    ? createCommercialPavilionLayout(bounds, definition)
-    : null, [bounds, definition]);
   const facing = strategicLandmarkFacingRadians(entity);
+  const modelBounds = useMemo(
+    () => commercialPavilionModelBounds(bounds, facing),
+    [bounds, facing],
+  );
+  const layout = useMemo(() => definition
+    ? createCommercialPavilionLayout(modelBounds, definition)
+    : null, [definition, modelBounds]);
   const floorTexture = useMemo(() => createCommercialPavilionTexture('floor'), []);
   const materials = useMemo(() => ({
     floor: new THREE.MeshStandardMaterial({

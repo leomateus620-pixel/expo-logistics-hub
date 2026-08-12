@@ -13,6 +13,10 @@ import {
   buildEntityExplorerIndex,
   filterAndSortEntityExplorerItems,
 } from '@/features/commercial-map/utils/entityExplorer';
+import {
+  COMMERCIAL_PAVILION_DEFINITIONS,
+  type CommercialPavilionPublicIdentifier,
+} from '@/features/commercial-map/utils/commercialPavilions';
 
 const targetIdentifiers = [
   'B11',
@@ -35,7 +39,29 @@ const targets = Object.fromEntries(
     .map((entity) => [entity.publicIdentifier, entity]),
 );
 
+const expectedCommercialPavilionFacing = [
+  ['B1', Math.PI / 2],
+  ['B2', Math.PI / 2],
+  ['B3', Math.PI],
+  ['B4', Math.PI],
+  ['B5', Math.PI],
+  ['B6', Math.PI],
+] as const satisfies ReadonlyArray<readonly [CommercialPavilionPublicIdentifier, number]>;
+
 describe('marcos arquitetônicos estratégicos', () => {
+  it('propaga orientação, foco e interior dos seis pavilhões comerciais ao canvas', () => {
+    expectedCommercialPavilionFacing.forEach(([publicIdentifier, facingRadians]) => {
+      const entity = { publicIdentifier };
+
+      expect(resolveStrategicLandmarkKind(entity)).toBe('commercial-pavilion');
+      expect(strategicLandmarkFacingRadians(entity)).toBe(facingRadians);
+      expect(strategicLandmarkFocusDirection(entity)).toEqual(
+        COMMERCIAL_PAVILION_DEFINITIONS[publicIdentifier].focusDirection,
+      );
+      expect(strategicLandmarkSupportsInterior(entity)).toBe(true);
+    });
+  });
+
   it('resolve os assets pelo identificador público sem depender do id persistido', () => {
     const persistedAdministrativeCenter = { ...targets.B11, id: 'db:uuid:centro-administrativo' };
     const persistedHeadquarters = { ...targets.B12, id: 'db:uuid:sede' };
