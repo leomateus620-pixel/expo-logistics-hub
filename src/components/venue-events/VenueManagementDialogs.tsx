@@ -12,6 +12,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -48,21 +49,27 @@ import {
   type VenueSpaceBlock,
   type VenueStakeholder,
 } from "@/lib/venue-operations";
+import {
+  presentCounterpartBenefit,
+  presentSponsorName,
+} from "@/lib/venue-counterparts";
 
 function FormField({
   id,
   label,
   children,
   hint,
+  className,
 }: {
   id: string;
   label: string;
   children: React.ReactNode;
   hint?: string;
+  className?: string;
 }) {
   const hintId = hint ? `${id}-hint` : undefined;
   return (
-    <div className="venue-field">
+    <div className={`venue-field${className ? ` ${className}` : ""}`}>
       <Label htmlFor={id}>{label}</Label>
       {children}
       {hint && (
@@ -472,10 +479,12 @@ export function VenueAgreementDialog({
   const [form, setForm] = useState<VenueAgreementInput>(() =>
     agreementToInput(),
   );
+  const [benefitDisplay, setBenefitDisplay] = useState("");
   const [restrictionText, setRestrictionText] = useState("");
   const [baseline, setBaseline] = useState("");
   const [discardOpen, setDiscardOpen] = useState(false);
   const initializationKeyRef = useRef("");
+  const initialBenefitValueRef = useRef("");
   useEffect(() => {
     if (!open) {
       initializationKeyRef.current = "";
@@ -486,7 +495,13 @@ export function VenueAgreementDialog({
     initializationKeyRef.current = initializationKey;
     const nextForm = agreementToInput(agreement);
     const nextRestrictionText = agreement?.restrictions.join("\n") ?? "";
+    initialBenefitValueRef.current = nextForm.benefitType;
     setForm(nextForm);
+    setBenefitDisplay(
+      nextForm.benefitType
+        ? presentCounterpartBenefit(nextForm.benefitType)
+        : "",
+    );
     setRestrictionText(nextRestrictionText);
     setBaseline(
       JSON.stringify({
@@ -541,8 +556,8 @@ export function VenueAgreementDialog({
   return (
     <>
       <Dialog open={open} onOpenChange={requestOpenChange}>
-        <DialogContent className="venue-management-dialog max-w-4xl">
-          <DialogHeader>
+        <DialogContent className="venue-management-dialog venue-management-dialog--agreement max-w-4xl">
+          <DialogHeader className="venue-agreement-dialog__header">
             <span className="venue-dialog-icon">
               <FileKey2 />
             </span>
@@ -556,292 +571,418 @@ export function VenueAgreementDialog({
               manuais no cliente.
             </DialogDescription>
           </DialogHeader>
-          <div className="venue-dialog-scroll">
-            <div className="venue-form-grid">
-              <FormField
-                id="venue-agreement-stakeholder"
-                label="Patrocinador ou parceiro"
-              >
-                <Select
-                  value={form.stakeholderId || "none"}
-                  onValueChange={(value) =>
-                    update("stakeholderId", value === "none" ? "" : value)
-                  }
+          <div className="venue-dialog-scroll venue-agreement-form">
+            <section
+              className="venue-agreement-form__section"
+              aria-labelledby="venue-agreement-identification-title"
+            >
+              <header className="venue-agreement-form__section-heading">
+                <h3 id="venue-agreement-identification-title">Identificação</h3>
+                <p>Patrocinador, espaço e referência do direito contratual.</p>
+              </header>
+              <div className="venue-form-grid venue-agreement-form__grid">
+                <FormField
+                  id="venue-agreement-stakeholder"
+                  label="Patrocinador ou parceiro"
                 >
-                  <SelectTrigger id="venue-agreement-stakeholder">
-                    <SelectValue placeholder="Selecione" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="none">Selecione</SelectItem>
-                    {eligible.map((item) => (
-                      <SelectItem key={item.id} value={item.id}>
-                        {item.trade_name || item.legal_name}
+                  <Select
+                    value={form.stakeholderId || "none"}
+                    onValueChange={(value) =>
+                      update("stakeholderId", value === "none" ? "" : value)
+                    }
+                  >
+                    <SelectTrigger
+                      id="venue-agreement-stakeholder"
+                      className="venue-refined-select"
+                    >
+                      <SelectValue placeholder="Selecione um patrocinador" />
+                    </SelectTrigger>
+                    <SelectContent className="venue-refined-select__content">
+                      <SelectItem className="venue-refined-select__item" value="none">
+                        Selecione um patrocinador
                       </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormField>
-              <FormField id="venue-agreement-space" label="Espaço contemplado">
-                <Select
-                  value={form.spaceId || "all"}
-                  onValueChange={(value) =>
-                    update("spaceId", value === "all" ? "" : value)
-                  }
-                >
-                  <SelectTrigger id="venue-agreement-space">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">
-                      Restaurante e Arena / qualquer espaço
-                    </SelectItem>
-                    {spaces
-                      .filter((space) => space.active)
-                      .map((space) => (
-                        <SelectItem key={space.id} value={space.id}>
-                          {space.name}
+                      {eligible.map((item) => (
+                        <SelectItem
+                          className="venue-refined-select__item"
+                          key={item.id}
+                          value={item.id}
+                        >
+                          {presentSponsorName(item.trade_name || item.legal_name)}
                         </SelectItem>
                       ))}
-                  </SelectContent>
-                </Select>
-              </FormField>
-              <FormField
-                id="venue-agreement-reference"
-                label="Referência contratual"
-              >
-                <Input
-                  id="venue-agreement-reference"
-                  value={form.contractReference}
-                  onChange={(event) =>
-                    update("contractReference", event.target.value)
-                  }
-                />
-              </FormField>
-              <FormField id="venue-agreement-benefit" label="Benefício">
-                <Input
-                  id="venue-agreement-benefit"
-                  value={form.benefitType}
-                  onChange={(event) =>
-                    update("benefitType", event.target.value)
-                  }
-                  placeholder="Ex.: direito de uso da Arena"
-                />
-              </FormField>
-              <FormField id="venue-agreement-unit" label="Unidade">
-                <Select
-                  value={form.unitType}
-                  onValueChange={(value) =>
-                    update("unitType", value as VenueAgreementInput["unitType"])
-                  }
-                >
-                  <SelectTrigger id="venue-agreement-unit">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {COUNTERPART_UNITS.map((unit) => (
-                      <SelectItem key={unit} value={unit}>
-                        {COUNTERPART_UNIT_LABELS[unit]}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </FormField>
-              <FormField
-                id="venue-agreement-quantity"
-                label="Quantidade concedida"
-              >
-                <Input
-                  id="venue-agreement-quantity"
-                  type="number"
-                  min="0.01"
-                  step="0.01"
-                  value={form.grantedQuantity}
-                  onChange={(event) =>
-                    update("grantedQuantity", Number(event.target.value))
-                  }
-                />
-              </FormField>
-              <FormField
-                id="venue-agreement-excess-value"
-                label="Valor por unidade excedente"
-              >
-                <Input
-                  id="venue-agreement-excess-value"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={form.valuePerExcessUnit ?? ""}
-                  onChange={(event) =>
-                    update(
-                      "valuePerExcessUnit",
-                      event.target.value ? Number(event.target.value) : null,
-                    )
-                  }
-                />
-              </FormField>
-              <FormField
-                id="venue-agreement-valid-from"
-                label="Vigência inicial"
-              >
-                <Input
-                  id="venue-agreement-valid-from"
-                  type="date"
-                  value={form.validFrom}
-                  onChange={(event) => update("validFrom", event.target.value)}
-                />
-              </FormField>
-              <FormField
-                id="venue-agreement-valid-until"
-                label="Vigência final"
-              >
-                <Input
-                  id="venue-agreement-valid-until"
-                  type="date"
-                  value={form.validUntil}
-                  onChange={(event) => update("validUntil", event.target.value)}
-                />
-              </FormField>
-              <FormField id="venue-agreement-status" label="Status">
-                <Select
-                  value={form.status}
-                  onValueChange={(value) =>
-                    update("status", value as VenueAgreementInput["status"])
-                  }
-                >
-                  <SelectTrigger id="venue-agreement-status">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="rascunho">Rascunho</SelectItem>
-                    <SelectItem value="ativo">Ativo</SelectItem>
-                    <SelectItem value="suspenso">Suspenso</SelectItem>
-                    <SelectItem value="encerrado">Encerrado</SelectItem>
-                  </SelectContent>
-                </Select>
-              </FormField>
-            </div>
-            <fieldset className="venue-choice-group">
-              <legend>Tipos de evento permitidos</legend>
-              <div className="venue-resource-picker">
-                {VENUE_EVENT_TYPES.map((type) => (
-                  <label
-                    key={type}
-                    data-selected={form.allowedEventTypes.includes(type)}
+                    </SelectContent>
+                  </Select>
+                </FormField>
+                <FormField id="venue-agreement-space" label="Espaço contemplado">
+                  <Select
+                    value={form.spaceId || "all"}
+                    onValueChange={(value) =>
+                      update("spaceId", value === "all" ? "" : value)
+                    }
                   >
-                    <input
-                      type="checkbox"
-                      checked={form.allowedEventTypes.includes(type)}
-                      onChange={(event) =>
-                        update(
-                          "allowedEventTypes",
-                          event.target.checked
-                            ? [...form.allowedEventTypes, type]
-                            : form.allowedEventTypes.filter(
-                                (item) => item !== type,
-                              ),
-                        )
-                      }
-                    />
-                    <span>{EVENT_TYPE_LABELS[type]}</span>
-                  </label>
-                ))}
-              </div>
-            </fieldset>
-            <FormField
-              id="venue-agreement-restrictions"
-              label="Restrições contratuais"
-              hint="Uma restrição por linha."
-            >
-              <Textarea
-                id="venue-agreement-restrictions"
-                aria-describedby="venue-agreement-restrictions-hint"
-                rows={4}
-                value={restrictionText}
-                onChange={(event) => setRestrictionText(event.target.value)}
-              />
-            </FormField>
-            <FormField id="venue-agreement-notes" label="Observações">
-              <Textarea
-                id="venue-agreement-notes"
-                rows={3}
-                value={form.notes}
-                onChange={(event) => update("notes", event.target.value)}
-              />
-            </FormField>
-            <FormField
-              id="venue-agreement-approver"
-              label="Aprovador designado"
-              hint="Quando definido, somente este membro poderá decidir a contrapartida e autorizar excessos."
-            >
-              <Select
-                value={form.responsibleApproverId || "none"}
-                onValueChange={(value) =>
-                  update("responsibleApproverId", value === "none" ? "" : value)
-                }
-              >
-                <SelectTrigger
-                  id="venue-agreement-approver"
-                  aria-describedby="venue-agreement-approver-hint"
-                >
-                  <SelectValue placeholder="Qualquer aprovador autorizado" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">
-                    Qualquer aprovador autorizado
-                  </SelectItem>
-                  {members
-                    .filter((member) => member.is_active)
-                    .map((member) => (
-                      <SelectItem key={member.user_id} value={member.user_id}>
-                        {member.nome_exibicao ||
-                          `Usuário ${member.user_id.slice(0, 8)}`}
+                    <SelectTrigger
+                      id="venue-agreement-space"
+                      className="venue-refined-select"
+                    >
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="venue-refined-select__content">
+                      <SelectItem className="venue-refined-select__item" value="all">
+                        Restaurante e Arena / qualquer espaço
                       </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
-            </FormField>
-            <div className="venue-preliminary-toggle">
-              <div>
-                <strong>Exigir aprovação formal</strong>
-                <p>
-                  Eventos vinculados passarão pela autorização de excesso e
-                  aprovação do evento.
-                </p>
+                      {spaces
+                        .filter((space) => space.active)
+                        .map((space) => (
+                          <SelectItem
+                            className="venue-refined-select__item"
+                            key={space.id}
+                            value={space.id}
+                          >
+                            {space.name}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                </FormField>
+                <FormField
+                  id="venue-agreement-reference"
+                  label="Referência contratual"
+                >
+                  <Input
+                    id="venue-agreement-reference"
+                    value={form.contractReference}
+                    onChange={(event) =>
+                      update("contractReference", event.target.value)
+                    }
+                    placeholder="Ex.: CONTRATO 20/12/2019"
+                  />
+                </FormField>
+                <FormField id="venue-agreement-benefit" label="Benefício">
+                  <Input
+                    id="venue-agreement-benefit"
+                    value={benefitDisplay}
+                    onChange={(event) => {
+                      const nextDisplay = event.target.value;
+                      const initialValue = initialBenefitValueRef.current;
+                      setBenefitDisplay(nextDisplay);
+                      update(
+                        "benefitType",
+                        initialValue &&
+                          nextDisplay === presentCounterpartBenefit(initialValue)
+                          ? initialValue
+                          : nextDisplay,
+                      );
+                    }}
+                    onBlur={() =>
+                      benefitDisplay &&
+                      setBenefitDisplay(
+                        presentCounterpartBenefit(benefitDisplay),
+                      )
+                    }
+                    placeholder="Ex.: Uso do Espaço"
+                  />
+                </FormField>
               </div>
-              <Switch
-                id="venue-agreement-requires-approval"
-                aria-label="Exigir aprovação formal"
-                checked={form.requiresApproval}
-                onCheckedChange={(checked) =>
-                  update("requiresApproval", checked)
-                }
-              />
-            </div>
-            <div className="venue-preliminary-toggle">
-              <div>
-                <strong>No-show consome franquia</strong>
-                <p>
-                  Quando habilitado pelo contrato, a ausência após o horário do
-                  evento é convertida em consumo; caso contrário, a reserva é
-                  liberada.
-                </p>
+            </section>
+
+            <section
+              className="venue-agreement-form__section"
+              aria-labelledby="venue-agreement-conditions-title"
+            >
+              <header className="venue-agreement-form__section-heading">
+                <h3 id="venue-agreement-conditions-title">Condições</h3>
+                <p>Unidade de controle, franquia concedida e eventual excedente.</p>
+              </header>
+              <div className="venue-form-grid venue-agreement-form__grid venue-agreement-form__grid--three">
+                <FormField id="venue-agreement-unit" label="Unidade">
+                  <Select
+                    value={form.unitType}
+                    onValueChange={(value) =>
+                      update("unitType", value as VenueAgreementInput["unitType"])
+                    }
+                  >
+                    <SelectTrigger
+                      id="venue-agreement-unit"
+                      className="venue-refined-select"
+                    >
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="venue-refined-select__content">
+                      {COUNTERPART_UNITS.map((unit) => (
+                        <SelectItem
+                          className="venue-refined-select__item"
+                          key={unit}
+                          value={unit}
+                        >
+                          {COUNTERPART_UNIT_LABELS[unit]}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </FormField>
+                <FormField
+                  id="venue-agreement-quantity"
+                  label="Quantidade concedida"
+                >
+                  <Input
+                    id="venue-agreement-quantity"
+                    type="number"
+                    min="0.01"
+                    step="0.01"
+                    value={form.grantedQuantity}
+                    onChange={(event) =>
+                      update("grantedQuantity", Number(event.target.value))
+                    }
+                  />
+                </FormField>
+                <FormField
+                  id="venue-agreement-excess-value"
+                  label="Valor por unidade excedente"
+                >
+                  <Input
+                    id="venue-agreement-excess-value"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={form.valuePerExcessUnit ?? ""}
+                    onChange={(event) =>
+                      update(
+                        "valuePerExcessUnit",
+                        event.target.value ? Number(event.target.value) : null,
+                      )
+                    }
+                    placeholder="Opcional"
+                  />
+                </FormField>
               </div>
-              <Switch
-                id="venue-agreement-no-show"
-                aria-label="No-show consome franquia"
-                checked={form.noShowConsumesAllowance}
-                onCheckedChange={(checked) =>
-                  update("noShowConsumesAllowance", checked)
-                }
-              />
-            </div>
+            </section>
+
+            <section
+              className="venue-agreement-form__section"
+              aria-labelledby="venue-agreement-validity-title"
+            >
+              <header className="venue-agreement-form__section-heading">
+                <h3 id="venue-agreement-validity-title">Vigência</h3>
+                <p>Período contratual e condição operacional atual.</p>
+              </header>
+              <div className="venue-form-grid venue-agreement-form__grid venue-agreement-form__grid--three">
+                <FormField
+                  id="venue-agreement-valid-from"
+                  label="Vigência inicial"
+                >
+                  <Input
+                    id="venue-agreement-valid-from"
+                    type="date"
+                    value={form.validFrom}
+                    onChange={(event) => update("validFrom", event.target.value)}
+                  />
+                </FormField>
+                <FormField
+                  id="venue-agreement-valid-until"
+                  label="Vigência final"
+                >
+                  <Input
+                    id="venue-agreement-valid-until"
+                    type="date"
+                    value={form.validUntil}
+                    onChange={(event) => update("validUntil", event.target.value)}
+                  />
+                </FormField>
+                <FormField id="venue-agreement-status" label="Status">
+                  <Select
+                    value={form.status}
+                    onValueChange={(value) =>
+                      update("status", value as VenueAgreementInput["status"])
+                    }
+                  >
+                    <SelectTrigger
+                      id="venue-agreement-status"
+                      className="venue-refined-select"
+                    >
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="venue-refined-select__content">
+                      <SelectItem className="venue-refined-select__item" value="rascunho">
+                        Rascunho
+                      </SelectItem>
+                      <SelectItem className="venue-refined-select__item" value="ativo">
+                        Ativo
+                      </SelectItem>
+                      <SelectItem className="venue-refined-select__item" value="suspenso">
+                        Suspenso
+                      </SelectItem>
+                      <SelectItem className="venue-refined-select__item" value="encerrado">
+                        Encerrado
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </FormField>
+              </div>
+            </section>
+
+            <section
+              className="venue-agreement-form__section"
+              aria-labelledby="venue-agreement-event-types-title"
+            >
+              <fieldset className="venue-choice-group venue-agreement-event-types">
+                <legend id="venue-agreement-event-types-title">
+                  <span>Tipos de evento permitidos</span>
+                  <small>{form.allowedEventTypes.length} selecionados</small>
+                </legend>
+                <p>Marque as categorias cobertas por este contrato.</p>
+                <div className="venue-resource-picker">
+                  {VENUE_EVENT_TYPES.map((type) => {
+                    const checkboxId = `venue-agreement-event-type-${type}`;
+                    const selected = form.allowedEventTypes.includes(type);
+                    return (
+                      <label
+                        htmlFor={checkboxId}
+                        key={type}
+                        data-selected={selected}
+                      >
+                        <Checkbox
+                          id={checkboxId}
+                          checked={selected}
+                          onCheckedChange={(checked) =>
+                            update(
+                              "allowedEventTypes",
+                              checked === true
+                                ? [...form.allowedEventTypes, type]
+                                : form.allowedEventTypes.filter(
+                                    (item) => item !== type,
+                                  ),
+                            )
+                          }
+                        />
+                        <span>{EVENT_TYPE_LABELS[type]}</span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </fieldset>
+            </section>
+
+            <section
+              className="venue-agreement-form__section"
+              aria-labelledby="venue-agreement-governance-title"
+            >
+              <header className="venue-agreement-form__section-heading">
+                <h3 id="venue-agreement-governance-title">Regras e governança</h3>
+                <p>Restrições, aprovador e políticas aplicáveis ao uso.</p>
+              </header>
+              <div className="venue-form-grid venue-agreement-form__grid">
+                <FormField
+                  id="venue-agreement-restrictions"
+                  label="Restrições contratuais"
+                  hint="Uma restrição por linha."
+                >
+                  <Textarea
+                    id="venue-agreement-restrictions"
+                    aria-describedby="venue-agreement-restrictions-hint"
+                    rows={4}
+                    value={restrictionText}
+                    onChange={(event) => setRestrictionText(event.target.value)}
+                  />
+                </FormField>
+                <FormField id="venue-agreement-notes" label="Observações">
+                  <Textarea
+                    id="venue-agreement-notes"
+                    rows={4}
+                    value={form.notes}
+                    onChange={(event) => update("notes", event.target.value)}
+                  />
+                </FormField>
+                <FormField
+                  id="venue-agreement-approver"
+                  label="Aprovador designado"
+                  hint="Quando definido, somente este membro poderá decidir a contrapartida e autorizar excessos."
+                  className="venue-agreement-form__full-row"
+                >
+                  <Select
+                    value={form.responsibleApproverId || "none"}
+                    onValueChange={(value) =>
+                      update(
+                        "responsibleApproverId",
+                        value === "none" ? "" : value,
+                      )
+                    }
+                  >
+                    <SelectTrigger
+                      id="venue-agreement-approver"
+                      className="venue-refined-select"
+                      aria-describedby="venue-agreement-approver-hint"
+                    >
+                      <SelectValue placeholder="Qualquer aprovador autorizado" />
+                    </SelectTrigger>
+                    <SelectContent className="venue-refined-select__content">
+                      <SelectItem className="venue-refined-select__item" value="none">
+                        Qualquer aprovador autorizado
+                      </SelectItem>
+                      {members
+                        .filter((member) => member.is_active)
+                        .map((member) => (
+                          <SelectItem
+                            className="venue-refined-select__item"
+                            key={member.user_id}
+                            value={member.user_id}
+                          >
+                            {member.nome_exibicao ||
+                              `Usuário ${member.user_id.slice(0, 8)}`}
+                          </SelectItem>
+                        ))}
+                    </SelectContent>
+                  </Select>
+                </FormField>
+              </div>
+              <div className="venue-agreement-policy-grid">
+                <div className="venue-preliminary-toggle">
+                  <div>
+                    <strong>Exigir aprovação formal</strong>
+                    <p>
+                      Eventos vinculados passam pela autorização de excesso e
+                      aprovação do evento.
+                    </p>
+                  </div>
+                  <Switch
+                    id="venue-agreement-requires-approval"
+                    aria-label="Exigir aprovação formal"
+                    checked={form.requiresApproval}
+                    onCheckedChange={(checked) =>
+                      update("requiresApproval", checked)
+                    }
+                  />
+                </div>
+                <div className="venue-preliminary-toggle">
+                  <div>
+                    <strong>No-show consome franquia</strong>
+                    <p>
+                      A ausência após o horário converte a reserva em consumo;
+                      caso contrário, ela é liberada.
+                    </p>
+                  </div>
+                  <Switch
+                    id="venue-agreement-no-show"
+                    aria-label="No-show consome franquia"
+                    checked={form.noShowConsumesAllowance}
+                    onCheckedChange={(checked) =>
+                      update("noShowConsumesAllowance", checked)
+                    }
+                  />
+                </div>
+              </div>
+            </section>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => requestOpenChange(false)}>
+          <DialogFooter className="venue-agreement-dialog__actions">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => requestOpenChange(false)}
+            >
               Cancelar
             </Button>
-            <Button onClick={submit} disabled={isSaving}>
-              {isSaving && <Loader2 className="animate-spin" />}Salvar contrato
+            <Button type="button" onClick={submit} disabled={isSaving}>
+              {isSaving && <Loader2 className="animate-spin" />}
+              {isSaving ? "Salvando…" : "Salvar contrato"}
             </Button>
           </DialogFooter>
         </DialogContent>

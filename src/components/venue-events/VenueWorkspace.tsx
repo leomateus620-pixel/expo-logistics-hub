@@ -102,7 +102,9 @@ import { VenueEventsFiltersTrigger } from "@/components/venue-events/VenueEvents
 import { VenueEventsYearSelector } from "@/components/venue-events/VenueEventsYearSelector";
 import { VenueAgendaFiltersTrigger } from "@/components/venue-events/VenueAgendaFiltersTrigger";
 import { VenueCreateEventBar } from "@/components/venue-events/VenueCreateEventBar";
+import { VenueAgreementCard } from "@/components/venue-events/VenueAgreementCard";
 import { useVenueSearch } from "@/components/venue-events/VenueSearchContext";
+import { countCommittedCounterpartEvents } from "@/lib/venue-counterparts";
 import {
   DEFAULT_VENUE_WORKSPACE,
   getVenueWorkspace,
@@ -1770,113 +1772,32 @@ export function VenueWorkspace() {
             const balance = workspace.balances.find(
               (item) => item.id === agreement.id,
             );
-            const consumed = Number(balance?.consumed_quantity || 0);
-            const reserved = Number(balance?.reserved_quantity || 0);
-            const committed = consumed + reserved;
-            const remaining = Number(balance?.remaining_quantity || 0);
-            const projectedExcess = Number(
-              balance?.projected_excess_quantity || 0,
+            const sponsorName = getStakeholderName(
+              agreement.stakeholder_id,
+              workspace.stakeholders,
             );
-            const confirmedExcess = Number(
-              balance?.confirmed_excess_quantity || 0,
+            const spaceName = agreement.space_id
+              ? workspace.spaces.find((space) => space.id === agreement.space_id)
+                  ?.name || "Espaço não disponível"
+              : "Restaurante e Arena";
+            const committedEvents = countCommittedCounterpartEvents(
+              agreement,
+              fullWorkspace.usages,
             );
-            const granted = Number(agreement.granted_quantity);
-            const balanceState =
-              confirmedExcess > 0
-                ? "exceeded"
-                : projectedExcess > 0
-                  ? "projected"
-                  : granted > 0 && remaining / granted <= 0.2
-                    ? "attention"
-                    : "healthy";
-            const balanceStateLabel = {
-              exceeded: "Excesso confirmado",
-              projected: "Excesso projetado",
-              attention: "Saldo próximo do limite",
-              healthy: "Saldo disponível",
-            }[balanceState];
-            const percent = Number(agreement.granted_quantity)
-              ? Math.min(
-                  100,
-                  (committed / Number(agreement.granted_quantity)) * 100,
-                )
-              : 0;
             return (
-              <button
-                type="button"
+              <VenueAgreementCard
                 key={agreement.id}
-                className="venue-agreement-card"
-                data-state={balanceState}
-                onClick={() =>
-                  permissions.venue_counterparts_manage &&
-                  editAgreement(agreement)
+                agreement={agreement}
+                balance={balance}
+                sponsorName={sponsorName}
+                spaceName={spaceName}
+                committedEvents={committedEvents}
+                canEdit={permissions.venue_counterparts_manage}
+                selected={
+                  agreementOpen && selectedAgreementId === agreement.id
                 }
-              >
-                <header>
-                  <span>
-                    <FileKey2 />
-                  </span>
-                  <div>
-                    <small>{agreement.contract_reference}</small>
-                    <strong>
-                      {getStakeholderName(
-                        agreement.stakeholder_id,
-                        workspace.stakeholders,
-                      )}
-                    </strong>
-                  </div>
-                  <span className="venue-agreement-card__state">
-                    <small>{agreement.status}</small>
-                    <strong>{balanceStateLabel}</strong>
-                  </span>
-                </header>
-                <h3>{agreement.benefit_type}</h3>
-                <p>
-                  {agreement.space_id
-                    ? workspace.spaces.find(
-                        (space) => space.id === agreement.space_id,
-                      )?.name
-                    : "Restaurante e Arena"}
-                </p>
-                <Progress value={percent} />
-                <div className="venue-agreement-metrics">
-                  <span>
-                    <small>Concedido</small>
-                    <strong>
-                      {formatQuantity(Number(agreement.granted_quantity))}
-                    </strong>
-                  </span>
-                  <span>
-                    <small>Consumido</small>
-                    <strong>{formatQuantity(consumed)}</strong>
-                  </span>
-                  <span>
-                    <small>Reservado</small>
-                    <strong>{formatQuantity(reserved)}</strong>
-                  </span>
-                  <span data-warning={balanceState !== "healthy"}>
-                    <small>
-                      {confirmedExcess > 0
-                        ? "Excesso confirmado"
-                        : projectedExcess > 0
-                          ? "Excesso projetado"
-                          : "Saldo disponível"}
-                    </small>
-                    <strong>{formatQuantity(confirmedExcess || projectedExcess || remaining)}</strong>
-                  </span>
-                </div>
-                <footer>
-                  <span>
-                    {COUNTERPART_UNIT_LABELS[agreement.unit_type]} · {formatQuantity(committed)} comprometido
-                  </span>
-                  <span>
-                    até{" "}
-                    {new Date(
-                      `${agreement.valid_until}T12:00:00`,
-                    ).toLocaleDateString("pt-BR")}
-                  </span>
-                </footer>
-              </button>
+                onEdit={() => editAgreement(agreement)}
+              />
             );
           })}
         </div>

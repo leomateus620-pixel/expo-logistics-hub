@@ -82,6 +82,7 @@ import {
   type VenueMember,
   type VenueWorkspaceData,
 } from "@/lib/venue-operations";
+import { presentCounterpartBenefit } from "@/lib/venue-counterparts";
 import {
   SHIFT_LABELS,
   agendaBadges,
@@ -1223,7 +1224,7 @@ export function VenueEventDetail({
                       <p className="venue-eyebrow">
                         {agreement.contract_reference}
                       </p>
-                      <h3>{agreement.benefit_type}</h3>
+                      <h3>{presentCounterpartBenefit(agreement.benefit_type)}</h3>
                       <p>
                         {getStakeholderName(
                           agreement.stakeholder_id,

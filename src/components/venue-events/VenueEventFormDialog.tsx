@@ -63,6 +63,7 @@ import {
   type VenueResourceType,
   type VenueWorkspaceData,
 } from "@/lib/venue-operations";
+import { presentCounterpartBenefit } from "@/lib/venue-counterparts";
 
 interface ServerConflict {
   conflict_kind: string;
@@ -1142,7 +1143,7 @@ export function VenueEventFormDialog({
                           {availableAgreements.map((agreement) => (
                             <SelectItem key={agreement.id} value={agreement.id}>
                               {agreement.contract_reference} ·{" "}
-                              {agreement.benefit_type}
+                              {presentCounterpartBenefit(agreement.benefit_type)}
                             </SelectItem>
                           ))}
                         </SelectContent>
