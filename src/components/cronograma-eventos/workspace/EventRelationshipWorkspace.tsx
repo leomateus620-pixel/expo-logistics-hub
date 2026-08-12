@@ -43,6 +43,11 @@ import {
   CronogramaStatusIndicator,
 } from '@/components/cronograma-eventos/CronogramaBadges';
 import { EventForm } from '@/components/cronograma-eventos/EventForm';
+import {
+  EventRelationList,
+  getEventCommissionItems,
+  getEventResponsibleItems,
+} from '@/components/cronograma-eventos/EventRelationFields';
 import type {
   CronogramaEvent,
   CronogramaSubevent,
@@ -115,6 +120,8 @@ export function EventRelationshipWorkspace({
     if (filter === 'open') return !isCompleted(subevent);
     return true;
   });
+  const responsibleItems = getEventResponsibleItems(event);
+  const commissionItems = getEventCommissionItems(event);
 
   const handleCreate = async (input: CronogramaSubeventInput) => {
     const disposition = await onCreateSubevent(input);
@@ -316,8 +323,18 @@ export function EventRelationshipWorkspace({
           </div>
           <dl className="cronograma-main-anchor-meta">
             <div><dt><CalendarDays aria-hidden="true" /> Data</dt><dd>{formatLongDateRange(event.date, event.endDate)}</dd></div>
-            <div><dt><UserRound aria-hidden="true" /> Responsável</dt><dd>{event.owner || 'A definir'}</dd></div>
-            <div><dt><Layers3 aria-hidden="true" /> Comissão</dt><dd>{event.commission || 'A definir'}</dd></div>
+            <div data-multi={responsibleItems.length > 1 || undefined}>
+              <dt><UserRound aria-hidden="true" /> {responsibleItems.length > 1 ? `Responsáveis (${responsibleItems.length})` : 'Responsável'}</dt>
+              <dd>
+                <EventRelationList items={responsibleItems} emptyLabel="A definir" icon={UserRound} collapseAfter={3} />
+              </dd>
+            </div>
+            <div data-multi={commissionItems.length > 1 || undefined}>
+              <dt><Layers3 aria-hidden="true" /> {commissionItems.length > 1 ? `Comissões (${commissionItems.length})` : 'Comissão'}</dt>
+              <dd>
+                <EventRelationList items={commissionItems} emptyLabel="A definir" icon={Layers3} collapseAfter={3} />
+              </dd>
+            </div>
             <div><dt><MapPin aria-hidden="true" /> Local</dt><dd>{event.location || 'A definir'}</dd></div>
           </dl>
           {canManage && (

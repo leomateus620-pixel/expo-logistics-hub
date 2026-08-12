@@ -44,12 +44,17 @@ import {
   CronogramaMetaBadge,
   CronogramaPriorityIndicator,
   CronogramaStatusIndicator,
-  EventIdentityStrip,
 } from './CronogramaBadges';
 import { EventForm } from './EventForm';
 import { formatLongDate, formatLongDateRange } from './dateUtils';
 import type { CronogramaEvent, CronogramaHistoryEntry } from './types';
 import { EventoAnexosSection } from './EventoAnexosSection';
+import {
+  EventRelationList,
+  getEventCommissionItems,
+  getEventResponsibleItems,
+  type EventRelationItem,
+} from './EventRelationFields';
 
 interface EventDrawerProps {
   event: CronogramaEvent | null;
@@ -109,6 +114,10 @@ export function EventDrawer({
   const progress = useMemo(() => (event ? getSubeventProgress(event) : null), [event]);
 
   if (!event) return null;
+
+  const commissionItems = getEventCommissionItems(event);
+  const responsibleItems = getEventResponsibleItems(event);
+
 
   const closeDrawer = () => {
     setDirty(false);
@@ -209,7 +218,6 @@ export function EventDrawer({
           }}
         >
           <div className="cronograma-drawer-header relative">
-            <EventIdentityStrip event={event} className="left-0 inset-y-6" />
             <SheetHeader className="pr-11 text-left">
               <div className="mb-3 flex flex-wrap items-center gap-2">
                 <CronogramaCategoryMarker category={event.category} />
@@ -256,15 +264,27 @@ export function EventDrawer({
               />
             ) : (
               <div className="space-y-5">
-                <section className="cronograma-drawer-section grid gap-x-6 sm:grid-cols-2" aria-label="Informações principais">
-                  <InfoBlock
-                    icon={CalendarClock}
-                    label="Data e horário"
-                    value={`${formatLongDateRange(event.date, event.endDate)}${event.startTime ? ` · ${event.startTime}` : ''}${event.endTime ? ` às ${event.endTime}` : ''}`}
-                  />
-                  <InfoBlock icon={MapPin} label="Local" value={event.location || 'Local a definir'} />
-                  <InfoBlock icon={UserRound} label="Responsável" value={event.owner || 'Responsável a definir'} />
-                  <InfoBlock icon={Layers3} label="Comissão" value={event.commission || 'Comissão a definir'} />
+                <section className="cronograma-drawer-section" aria-label="Informações principais">
+                  <div className="cronograma-info-grid">
+                    <InfoCard
+                      icon={CalendarClock}
+                      label="Data e horário"
+                      value={`${formatLongDateRange(event.date, event.endDate)}${event.startTime ? ` · ${event.startTime}` : ''}${event.endTime ? ` às ${event.endTime}` : ''}`}
+                    />
+                    <InfoCard icon={MapPin} label="Local" value={event.location || 'Local a definir'} />
+                    <RelationCard
+                      icon={UserRound}
+                      label={responsibleItems.length > 1 ? 'Responsáveis' : 'Responsável'}
+                      items={responsibleItems}
+                      emptyLabel="Responsável a definir"
+                    />
+                    <RelationCard
+                      icon={Layers3}
+                      label={commissionItems.length > 1 ? 'Comissões' : 'Comissão'}
+                      items={commissionItems}
+                      emptyLabel="Comissão a definir"
+                    />
+                  </div>
                 </section>
 
                 {(event.pendingReason || event.decisionNeeded || !event.date) && (
@@ -497,14 +517,54 @@ export function EventDrawer({
   );
 }
 
-function InfoBlock({ icon: Icon, label, value }: { icon: LucideIcon; label: string; value: string }) {
+function InfoCard({ icon: Icon, label, value }: { icon: LucideIcon; label: string; value: string }) {
   return (
-    <div className="cronograma-info-row py-3">
-      <div className="mb-2 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.16em] text-muted-foreground">
-        <Icon className="h-3.5 w-3.5 text-gold" />
-        {label}
+    <div className="cronograma-info-card">
+      <span className="cronograma-info-card-icon" aria-hidden="true">
+        <Icon />
+      </span>
+      <div className="min-w-0 flex-1">
+        <p className="cronograma-info-card-label">{label}</p>
+        <p className="cronograma-info-card-value">{value}</p>
       </div>
-      <p className="text-sm font-semibold leading-relaxed text-foreground">{value}</p>
+    </div>
+  );
+}
+
+function RelationCard({
+  icon,
+  label,
+  items,
+  emptyLabel,
+}: {
+  icon: LucideIcon;
+  label: string;
+  items: EventRelationItem[];
+  emptyLabel: string;
+}) {
+  const Icon = icon;
+  return (
+    <div className={cn('cronograma-info-card cronograma-info-card--relation', items.length > 1 && 'is-multi')}>
+      <span className="cronograma-info-card-icon" aria-hidden="true">
+        <Icon />
+      </span>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-2">
+          <p className="cronograma-info-card-label">{label}</p>
+          {items.length > 1 && (
+            <span className="cronograma-relation-count" aria-label={`${items.length} vínculos`}>
+              {items.length}
+            </span>
+          )}
+        </div>
+        <EventRelationList
+          items={items}
+          emptyLabel={emptyLabel}
+          icon={Icon}
+          collapseAfter={5}
+          className="mt-1.5"
+        />
+      </div>
     </div>
   );
 }

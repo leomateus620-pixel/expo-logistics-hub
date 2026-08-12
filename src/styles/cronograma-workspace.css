@@ -501,6 +501,67 @@
   text-overflow: ellipsis;
 }
 
+/* Vínculos múltiplos no card "Evento principal" */
+.cronograma-main-anchor-meta div[data-multi] {
+  grid-column: span 2;
+}
+
+.cronograma-main-anchor-meta dd:has(.cronograma-relation-list) {
+  overflow: visible;
+  text-overflow: clip;
+}
+
+.cronograma-main-anchor-meta .cronograma-relation-list ul {
+  gap: 0.28rem;
+  margin-top: 0.1rem;
+}
+
+.cronograma-main-anchor-meta .cronograma-relation-item {
+  gap: 0.4rem;
+  padding: 0.26rem 0.42rem;
+  border-radius: 0.55rem;
+}
+
+.cronograma-main-anchor-meta .cronograma-relation-item-icon {
+  width: 1.15rem;
+  height: 1.15rem;
+  border-radius: 0.38rem;
+}
+
+.cronograma-main-anchor-meta .cronograma-relation-item-icon svg {
+  width: 0.62rem;
+  height: 0.62rem;
+}
+
+.cronograma-main-anchor-meta .cronograma-relation-item-label {
+  font-size: 0.66rem;
+  font-weight: 800;
+}
+
+.cronograma-main-anchor-meta .cronograma-relation-primary-badge {
+  padding: 0.08rem 0.34rem;
+  font-size: 0.5rem;
+  gap: 0.16rem;
+}
+
+.cronograma-main-anchor-meta .cronograma-relation-primary-badge svg {
+  width: 0.5rem;
+  height: 0.5rem;
+}
+
+.cronograma-main-anchor-meta .cronograma-relation-toggle {
+  margin-top: 0.32rem;
+  padding: 0.18rem 0.45rem;
+  font-size: 0.58rem;
+}
+
+.cronograma-main-anchor-meta .cronograma-relation-empty {
+  margin-top: 0;
+  font-size: 0.68rem;
+  font-weight: 800;
+  color: oklch(var(--foreground) / 0.55);
+}
+
 .cronograma-main-anchor-actions {
   position: relative;
   margin-top: 0.85rem;
