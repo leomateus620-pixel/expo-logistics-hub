@@ -379,6 +379,24 @@ export function EventDrawer({
                               <p className="mt-1 text-[11px] text-muted-foreground">
                                 {entry.userLabel} · {new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(entry.createdAt))}
                               </p>
+                              {entry.changes && entry.changes.length > 0 && (
+                                <ul className="cronograma-audit-diff" aria-label="Detalhes da alteração">
+                                  {entry.changes.map((change) => (
+                                    <li key={change.field}>
+                                      <span className="cronograma-audit-diff__field">{change.label}</span>
+                                      <span className="cronograma-audit-diff__values">
+                                        <span className={change.before ? 'cronograma-audit-diff__old' : 'cronograma-audit-diff__old is-empty'}>
+                                          {change.before ?? '—'}
+                                        </span>
+                                        <span className="cronograma-audit-diff__arrow" aria-hidden="true">→</span>
+                                        <span className={change.after ? 'cronograma-audit-diff__new' : 'cronograma-audit-diff__new is-empty'}>
+                                          {change.after ?? '—'}
+                                        </span>
+                                      </span>
+                                    </li>
+                                  ))}
+                                </ul>
+                              )}
                             </div>
                           </li>
                         ))}
