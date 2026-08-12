@@ -1,31 +1,49 @@
-# Correções: erro ao salvar, histórico legível e seleção múltipla de comissões
+# Google Agenda da Zélia: limpeza da conexão + política "somente eventos dela"
 
-## Diagnóstico confirmado
+## Estado atual (confirmado no banco)
 
-1. **"The app encountered an error" ao salvar**: o salvamento em si funciona (log `_cronograma_log` às 02:31 mostra a troca Djeison → Fabiano Soltis persistida). O toast de erro é disparado pelo overlay do preview, que reage a um flood de warnings `console.error` ("Function components cannot be given refs") gerado pelo plugin `lovable-tagger` (injeta `ref` em todo componente no dev). Confirmado: a cada save o evento propaga mudanças → re-render → centenas de warnings → toast.
-2. **Histórico crú**: `useCronogramaEventos.summarizeHistoryChange` só devolve nomes de campos ("Alteração em responsável, comissão") sem mostrar o que mudou.
-3. **Scroll jump no multi-select**: `RelationalMultiSelect` reseta `search` e `activeIndex` a cada seleção (`addOption`) e chama `scrollIntoView` no efeito de `activeIndex` — por isso a lista volta ao topo ao clicar em Comissão Central / Agricultura etc.
+- A conexão é da conta **zelia.savoldi@hotmail.com** (user `74a71a9f…`, org `985888b8…`). Status `connected`, backfill **165/165** — ou seja, **todos os 165 eventos da organização** foram parar na agenda dela, porque a regra atual dá a agenda inteira a quem tem acesso total (ela é gestora).
+- Existe uma segunda conta `zelia@fenasoja.com.br` (perfil leitura, sem conexão Google) — não será tocada.
+- Regra atual de elegibilidade (`google_user_eligible_for_event`): acesso total → todos os eventos; senão → eventos da comissão do membro.
+- **Não há trigger em `cronograma_evento_responsaveis`**: hoje, adicionar/remover a Zélia como responsável não dispara sincronização.
+- Já existe `reconcile_google_sync_event(event_id, org_id)` que enfileira `upsert` para quem é elegível e `delete` para quem deixou de ser — será reutilizada.
+- Zélia é responsável (vínculo de membro) em **23 eventos**.
 
-## Implementado
+## Decisões do usuário
 
-### 1. Scroll jump eliminado + seleção em massa (`RelationalMultiSelect.tsx`)
-- `keyboardNavRef`: `scrollIntoView` só dispara quando a navegação foi por teclado (setas/Home/End); cliques do mouse nunca rolam a lista. Validado: scrollTop antes/depois do clique = 1953/1953 (zero jump).
-- `addOption` não reseta mais busca nem índice ativo ao selecionar.
-- Barra de ações rápidas no topo do painel: **Tudo**, **Assessorias**, **Comissões**, **Limpar** (só aparece quando há mais de um grupo). `addMany` pula itens já selecionados e anuncia via aria-live.
+- Política aplicada **somente à Zélia** (piloto). Demais usuários continuam como hoje.
+- "Relacionado a ela" = eventos em que ela é **responsável** (vínculo de membro) **+ eventos criados por ela**.
 
-### 2. Histórico com diff legível (`useCronogramaEventos.ts`, `types.ts`, `EventDrawer.tsx`)
-- Novo `diffHistoryChange`: para cada campo alterado gera `{ label, before, after }` formatado (datas em dd/mm/aaaa, status/prioridade traduzidos, listas de responsáveis/comissões como nomes separados por vírgula).
-- Drawer renderiza cada entrada com antes (riscado, vermelho) → depois (verde), ex.: "responsáveis: Djeison Drey → Djeison Drey, Fabiano Soltis, Leonardo".
+## Implementação
 
-### 3. Toast falso de erro eliminado
-- `vite.config.ts`: plugin `suppress-tagger-ref-warnings` injeta script (dev only) que filtra exatamente o warning de refs do tagger — o overlay para de reagir. Validado: save completo sem toast de erro, URL estável, zero console.errors além de um 400 pontual já corrigido.
-- `triggerSyncWorker` agora só chama `google-sync-worker` quando a org tem conexão Google ativa (verificação em cache por org) — fim do 401 a cada save.
-- O fluxo de save no workspace já possuía try/catch (`handleSaveMain`); mantido.
+### 1. Limpeza da conexão da Zélia
+Ordem importante: primeiro remover os eventos do Google dela, depois apagar os dados locais.
 
-### 4. Estilos (`index.css`)
-- `.cronograma-relation-bulk` (pills com hover 3D sutil, Limpar em tom danger) e `.cronograma-audit-diff` (trilha dourada lateral, antes/depois com cores semânticas, dark-mode ok).
+1. Enfileirar operação `delete` para cada evento mapeado dela (`google_calendar_event_map`, 165 eventos) via RPC `queue_google_sync_for_user`.
+2. Executar o worker `google-sync-worker` (lotes de 25, ~7 rodadas) até a fila drenar — isso apaga os eventos do calendário "FENASOJA" no Google Agenda dela.
+3. Apagar as linhas locais dela: `google_sync_outbox`, `google_calendar_event_map`, `google_calendar_oauth_attempts` e `google_calendar_connections` (somente user `74a71a9f…` + org `985888b8…`).
+4. Resultado: o widget dela volta ao estado "não conectado", pronto para o teste limpo.
 
-## Validação executada
-- Typecheck limpo (`tsgo`).
-- Playwright autenticado: abertura do editor de "REUNIÃO LÉO SISTEMA FENASOJA" — barra Tudo/Assessorias/Comissões/Limpar presente; clique em opção no fim da lista sem salto de scroll; "Limpar" + seleção em massa por grupo funcionando (8 selecionados); salvar sem alterações → sem toast de erro, permanece na tela.
-- Card "Evento principal" do workspace já exibia corretamente os 2 responsáveis com selo Principal (dados persistidos OK).
+### 2. Política por usuário (migration)
+- Nova tabela `public.google_calendar_sync_preferences` (`user_id`, `org_id`, `sync_scope` = `all` | `mine`), com GRANT apenas para `service_role` e RLS habilitado — configuração server-side, invisível ao app.
+- Seed: Zélia (hotmail) → `mine`.
+- Nova coluna `sync_scope` (default `all`) em `google_calendar_connections`, copiada da preferência no momento da conexão — assim o reconectar dela já nasce com a política certa, sem passo manual.
+- Reescrita de `google_user_eligible_for_event`: quando a conexão do usuário tem `sync_scope = 'mine'`, ele só é elegível se **criou o evento** (`created_by_user_id`) ou é **responsável membro** em `cronograma_evento_responsaveis`. Escopo `all` mantém o comportamento atual (acesso total ou comissão).
+- Novo trigger em `cronograma_evento_responsaveis` (insert/update/delete) chamando `reconcile_google_sync_event`: adicionar a Zélia como responsável passa a enviar o evento para a agenda dela; remover, apaga de lá automaticamente.
+
+### 3. Edge function `google-calendar-oauth-callback`
+- `prepareInitialBackfill`: ler o `sync_scope` da conexão; se `mine`, os candidatos ao backfill são apenas eventos criados pela usuária + eventos em que ela é responsável (com data definida). Escopo `all` inalterado.
+- Redeploy da função.
+
+### 4. Validação
+- SQL: conferir que o backfill dela totaliza apenas os eventos dela (~23 como responsável + criados por ela), não 165.
+- Teste guiado: Zélia reconecta → agenda recebe só os eventos dela.
+- Teste de ida e volta: adicioná-la como responsável em um evento novo → aparece na agenda; remover → some.
+
+## Detalhes técnicos
+
+- Tabelas: `google_calendar_connections` (nova coluna `sync_scope`), nova `google_calendar_sync_preferences`, trigger novo em `cronograma_evento_responsaveis`.
+- Funções: `google_user_eligible_for_event` (reescrita), reuso de `reconcile_google_sync_event` e `queue_google_sync_for_user`.
+- Edge functions: `google-calendar-oauth-callback` (backfill com escopo); worker `google-sync-worker` executado via service role apenas na etapa de limpeza.
+- Nada muda para os demais usuários conectados: escopo default `all` preserva o comportamento atual.
+- Nenhuma alteração de UI neste ciclo.
