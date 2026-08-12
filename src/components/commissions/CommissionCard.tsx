@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowUpRight, Building2, Loader2, LockKeyhole, LogIn } from 'lucide-react';
+import { ArrowRight, Building2, Loader2, LockKeyhole, LogIn } from 'lucide-react';
 import {
   statusLabels,
   type CommissionModule,
@@ -19,7 +19,7 @@ function AccessIcon({ state }: Pick<PortalAccessPresentation, 'state'>) {
   if (state === 'denied') return <LockKeyhole aria-hidden="true" />;
   if (state === 'login') return <LogIn aria-hidden="true" />;
   if (state === 'setup') return <Building2 aria-hidden="true" />;
-  return <ArrowUpRight aria-hidden="true" />;
+  return <ArrowRight aria-hidden="true" />;
 }
 
 function getCommissionActionLabel(access: PortalAccessPresentation) {
@@ -54,7 +54,7 @@ function CommissionCard({ access, module, onSelect }: CommissionCardProps) {
     : `${statusDescription}${accessDescription}`;
   const content = (
     <>
-      <span className="commission-access-card__icon" data-tone={module.visual.tone} aria-hidden="true">
+      <span className="commission-access-card__icon" aria-hidden="true">
         <Icon />
       </span>
       <span className="commission-access-card__copy">
@@ -70,7 +70,7 @@ function CommissionCard({ access, module, onSelect }: CommissionCardProps) {
           <span className="commission-access-card__action" data-state={access.state} aria-hidden="true">
             <span>{visualActionLabel}</span>
             <span className="commission-access-card__direction">
-              {access.target ? <ArrowUpRight /> : <AccessIcon state={access.state} />}
+              {access.target ? <ArrowRight /> : <AccessIcon state={access.state} />}
             </span>
           </span>
         </span>
@@ -92,7 +92,6 @@ function CommissionCard({ access, module, onSelect }: CommissionCardProps) {
         className="commission-access-card"
         data-status={status}
         data-access-state={access.state}
-        data-tone={module.visual.tone}
         data-module={module.slug}
         aria-label={`${actionLabel}: ${module.name}${showModuleStatus ? `. ${statusLabels[status]}` : ''}`}
         aria-describedby={statusId}
@@ -107,7 +106,6 @@ function CommissionCard({ access, module, onSelect }: CommissionCardProps) {
       className="commission-access-card commission-access-card--static"
       data-status={status}
       data-access-state={access.state}
-      data-tone={module.visual.tone}
       data-module={module.slug}
       aria-label={`${actionLabel}: ${module.name}`}
       aria-describedby={statusId}

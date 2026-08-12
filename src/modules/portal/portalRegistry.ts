@@ -38,16 +38,13 @@ export interface PortalPrimaryEntry {
   title: string;
   description: string;
   icon: LucideIcon;
-  countLabel?: string;
-  wordmark?: 'fenasoja' | 'venue';
-  tone: 'agenda' | 'venue' | 'map' | 'commissions' | 'finance';
 }
 
 
 export const agendaFenasojaDestination: PortalDestination = {
   id: 'cronograma-eventos',
   title: 'Agenda Fenasoja',
-  description: 'Planejamento, linha do tempo, calendário e execução do ciclo oficial.',
+  description: 'Planejamento, calendário e execução do ciclo oficial.',
   icon: CalendarRange,
   capability: 'cronograma_eventos_access',
   loginPath: '/login/cronograma-eventos',
@@ -58,7 +55,7 @@ export const agendaFenasojaDestination: PortalDestination = {
 export const agendaVenueDestination: PortalDestination = {
   id: 'eventos-restaurante-arena',
   title: 'Agenda Restaurante e Arena',
-  description: 'Reservas, aprovações, contrapartidas e operação dos espaços.',
+  description: 'Reservas, aprovações e operação dos espaços.',
   icon: Building2,
   capability: 'venue_events_access',
   loginPath: '/login/eventos-restaurante-arena',
@@ -104,8 +101,6 @@ export const portalPrimaryEntries: PortalPrimaryEntry[] = [
     title: agendaFenasojaDestination.title,
     description: agendaFenasojaDestination.description,
     icon: agendaFenasojaDestination.icon,
-    wordmark: 'fenasoja',
-    tone: 'agenda',
   },
   {
     id: 'agenda-restaurante-arena',
@@ -113,34 +108,28 @@ export const portalPrimaryEntries: PortalPrimaryEntry[] = [
     title: agendaVenueDestination.title,
     description: agendaVenueDestination.description,
     icon: agendaVenueDestination.icon,
-    wordmark: 'venue',
-    tone: 'venue',
   },
 
   {
     id: 'mapa-comercial',
     kind: 'direct',
     title: commercialMapDestination.title,
-    description: 'Visão de lotes, pavilhões, espaços comerciais e disponibilidade do parque.',
+    description: 'Lotes, pavilhões e disponibilidade comercial do parque.',
     icon: commercialMapDestination.icon,
-    tone: 'map',
   },
   {
     id: 'comissoes',
     kind: 'expandable',
     title: 'Comissões',
-    description: 'Frentes responsáveis pela execução operacional da Fenasoja.',
+    description: 'Frentes responsáveis pela operação da Fenasoja.',
     icon: UsersRound,
-    countLabel: `${getPortalCommissionModules().length} frentes`,
-    tone: 'commissions',
   },
   {
     id: 'financeiro',
     kind: 'direct',
     title: 'Financeiro',
-    description: 'Gestão executiva, orçamento e informações restritas conforme o perfil.',
+    description: 'Orçamento e gestão executiva conforme o perfil.',
     icon: BadgeDollarSign,
-    tone: 'finance',
   },
 ];
 

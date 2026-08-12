@@ -54,91 +54,59 @@ function cssHexProperty(selector: string, property: string): string {
   return match[1].toUpperCase();
 }
 
-function cssRgbAlphaProperty(selector: string, property: string) {
-  const escapedProperty = property.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const match = cssRule(selector).match(
-    new RegExp(`${escapedProperty}:\\s*rgb\\((\\d+)\\s+(\\d+)\\s+(\\d+)\\s*\\/\\s*(\\d+)%\\)`, 'i'),
-  );
-  if (!match) throw new Error(`Cor RGB alpha ${property} não encontrada em ${selector}`);
-  return {
-    channels: [Number(match[1]), Number(match[2]), Number(match[3])] as [number, number, number],
-    alpha: Number(match[4]) / 100,
-  };
-}
-
-function compositeHex(
-  foreground: [number, number, number],
-  background: string,
-  alpha: number,
-): string {
-  const backgroundChannels = hexToRgb(background);
-  return `#${foreground.map((channel, index) => (
-    Math.round(channel * alpha + backgroundChannels[index] * (1 - alpha))
-      .toString(16)
-      .padStart(2, '0')
-  )).join('')}`.toUpperCase();
-}
-
-const primaryPalettes = [
-  ['Agenda', ".portal-primary-entry[data-tone='agenda']"],
-  ['Mapa Comercial', ".portal-primary-entry[data-tone='map']"],
-  ['Comissões', ".portal-primary-entry[data-tone='commissions']"],
-  ['Financeiro', ".portal-primary-entry[data-tone='finance']"],
+const primaryModules = [
+  'Agenda Fenasoja',
+  'Agenda Restaurante e Arena',
+  'Mapa Comercial',
+  'Comissões',
+  'Financeiro',
 ] as const;
 
 const descriptionColor = cssHexProperty('.fenasoja-portal', '--access-description');
+const sharedSurface = cssHexProperty('.fenasoja-portal', '--access-surface');
+const sharedTitle = cssHexProperty('.fenasoja-portal', '--access-title');
+const sharedAccent = cssHexProperty('.fenasoja-portal', '--access-accent');
+const sharedBorder = cssHexProperty('.fenasoja-portal', '--access-border');
 
-const normalTextPairs: Array<readonly [string, string, string]> = primaryPalettes.flatMap(
-  ([label, selector]) => {
-    const surface = cssHexProperty(selector, '--entry-surface-start');
-    return [
-      [`título de ${label}`, cssHexProperty(selector, '--entry-title'), surface] as const,
-      [`descrição de ${label}`, descriptionColor, surface] as const,
-    ];
-  },
+const normalTextPairs: Array<readonly [string, string, string]> = primaryModules.flatMap(
+  (label) => [
+    [`título de ${label}`, sharedTitle, sharedSurface] as const,
+    [`descrição de ${label}`, descriptionColor, sharedSurface] as const,
+  ],
 );
 
 normalTextPairs.push(
   [
     'estado sem permissão',
     cssHexProperty('.fenasoja-portal', '--access-denied'),
-    cssHexProperty(".portal-primary-entry[data-tone='finance']", '--entry-surface-start'),
+    sharedSurface,
   ],
   [
     'descrição de destino',
     cssHexProperty('.fenasoja-portal', '--access-destination-description'),
-    cssHexProperty('.fenasoja-portal', '--access-destination-surface'),
+    cssHexProperty('.fenasoja-portal', '--access-child-surface'),
   ],
 );
 
-const graphicalPairs: Array<readonly [string, string, string]> = primaryPalettes.map(
-  ([label, selector]) => [
-    `identidade ${label}`,
-    cssHexProperty(selector, '--entry-accent'),
-    cssHexProperty(selector, '--entry-surface-start'),
-  ],
-);
+const graphicalPairs: Array<readonly [string, string, string]> = [
+  ['ação compartilhada', sharedAccent, sharedSurface],
+];
 
 graphicalPairs.push([
   'foco do access hub',
   cssHexProperty('.fenasoja-portal', '--access-focus'),
-  cssHexProperty(".portal-primary-entry[data-tone='map']", '--entry-surface-start'),
+  sharedSurface,
 ]);
 
 const portalBackdropMatch = portalStyles.match(/--portal-navy-950:\s*(#[0-9a-f]{6})/i);
 if (!portalBackdropMatch) throw new Error('Fundo base do portal não encontrado.');
 const portalBackdrop = portalBackdropMatch[1].toUpperCase();
 
-const borderPairs: Array<readonly [string, string, string]> = primaryPalettes.map(
-  ([label, selector]) => {
-    const border = cssRgbAlphaProperty(selector, '--entry-border');
-    return [
-      `borda de ${label}`,
-      compositeHex(border.channels, portalBackdrop, border.alpha),
-      portalBackdrop,
-    ];
-  },
-);
+const borderPairs: Array<readonly [string, string, string]> = [[
+  'borda compartilhada',
+  sharedBorder,
+  portalBackdrop,
+]];
 
 describe('acessibilidade visual do hub Fenasoja', () => {
   it.each(normalTextPairs)('%s alcança WCAG AA para texto normal', (_label, foreground, background) => {
@@ -196,7 +164,7 @@ describe('acessibilidade visual do hub Fenasoja', () => {
 
   it('preserva hierarquia mobile e continuidade acessível da expansão', () => {
     expect(accessNavigationStyles).toMatch(
-      /@media \(max-width: 640px\)[\s\S]*?\.portal-primary-entry__index,[\s\S]*?display: none/,
+      /@media \(max-width: 640px\)[\s\S]*?\.portal-primary-entry__index\s*\{[\s\S]*?display: none/,
     );
     expect(accessNavigationStyles).toMatch(
       /@media \(max-width: 640px\)[\s\S]*?\.portal-agenda-grid,[\s\S]*?grid-template-columns: minmax\(0, 1fr\)/,
@@ -213,16 +181,27 @@ describe('acessibilidade visual do hub Fenasoja', () => {
     expect(portalPage).toContain("window.scrollBy({ top: offset, left: 0, behavior: 'auto' })");
   });
 
-  it('usa identidades de superfície completas e remove metadados redundantes', () => {
+  it('usa uma superfície compartilhada e remove temas e metadados redundantes', () => {
     for (const token of [
-      '--entry-surface-start: #2d3b45',
-      '--entry-surface-start: #214563',
-      '--entry-surface-start: #20444b',
-      '--entry-surface-start: #403b38',
+      '--access-surface: #14283a',
+      '--access-child-surface: #172d40',
+      '--access-border: #607990',
+      '--access-title: #f4f8fc',
+      '--access-accent: #e3d2a1',
     ]) {
       expect(accessNavigationStyles).toContain(token);
     }
 
+    expect(accessNavigationStyles).not.toContain(".portal-primary-entry[data-tone=");
+    expect(accessNavigationStyles).not.toContain(".commission-access-card[data-tone=");
+    expect(accessNavigationStyles).not.toContain(".commission-access-card[data-module=");
+    expect(accessNavigationStyles).not.toContain(".portal-destination-card[data-destination=");
+    expect(portalStyles).not.toContain('.portal-primary-entry[data-tone=');
+    expect(portalStyles).not.toContain('.commission-access-card__icon[data-tone=');
+    expect(primaryEntry).not.toContain('AgendaWordmark');
+    expect(primaryEntry).not.toContain('countLabel');
+    expect(primaryEntry).not.toContain('data-tone');
+    expect(commissionCard).not.toContain('data-tone');
     expect(accessNavigationStyles).not.toContain('inset: 10px auto 10px 0');
     expect(accessNavigationStyles).not.toContain('width: 3px');
     expect(accessNavigationStyles).not.toContain('transition: all');

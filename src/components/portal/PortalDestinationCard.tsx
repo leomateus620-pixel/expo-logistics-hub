@@ -1,6 +1,6 @@
 import { memo } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowUpRight, Building2, Loader2, LockKeyhole, LogIn } from 'lucide-react';
+import { ArrowRight, Building2, Loader2, LockKeyhole, LogIn } from 'lucide-react';
 import type { PortalDestination } from '@/modules/portal/portalRegistry';
 import type { PortalAccessPresentation } from '@/components/portal/portalTypes';
 
@@ -15,7 +15,7 @@ function DestinationStateIcon({ state }: Pick<PortalAccessPresentation, 'state'>
   if (state === 'denied') return <LockKeyhole aria-hidden="true" />;
   if (state === 'login') return <LogIn aria-hidden="true" />;
   if (state === 'setup') return <Building2 aria-hidden="true" />;
-  return <ArrowUpRight aria-hidden="true" />;
+  return <ArrowRight aria-hidden="true" />;
 }
 
 function getDestinationActionLabel(access: PortalAccessPresentation) {
@@ -49,7 +49,7 @@ function PortalDestinationCardComponent({
         <span className="portal-destination-card__action" data-state={access.state} aria-hidden="true">
           <span>{actionLabel}</span>
           <span className="portal-destination-card__direction">
-            {access.target ? <ArrowUpRight /> : <DestinationStateIcon state={access.state} />}
+            {access.target ? <ArrowRight /> : <DestinationStateIcon state={access.state} />}
           </span>
         </span>
       </span>
