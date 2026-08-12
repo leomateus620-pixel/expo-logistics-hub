@@ -6,8 +6,12 @@ export function resolveMapPermissions(role: string | null, capabilities: Iterabl
   const explicit = (capability: string) => capabilitySet.has(capability)
     || capabilitySet.has('map.admin')
     || capabilitySet.has('full_access');
+  // Commission map portals (Exporural / Indústria, Comércio e Serviços) grant
+  // read-only access to their scoped segment even without the global map.view.
+  const hasCommissionPortalView = capabilitySet.has('exporural_access')
+    || capabilitySet.has('industria_comercio_servicos_access');
   return {
-    canView: elevated || role === 'operador' || explicit('map.view'),
+    canView: elevated || role === 'operador' || explicit('map.view') || hasCommissionPortalView,
     canEdit: elevated || explicit('map.edit'),
     canEditGeometry: elevated || explicit('map.edit_geometry'),
     canManageLots: elevated || explicit('map.manage_lots'),

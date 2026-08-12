@@ -10,6 +10,7 @@ import {
   type CronogramaSaveSubeventPayload,
 } from '@/lib/cronograma-rpc';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
+import { useCapabilities } from '@/hooks/useCapabilities';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 import {
   fenasoja2028CronogramaSeed,
@@ -631,6 +632,10 @@ export async function fetchCronogramaEventsForOrg(orgId: string): Promise<Cronog
 
 export function useCronogramaEventos() {
   const { orgId, myRole } = useCurrentOrg();
+  const { capSet } = useCapabilities();
+  // Escrita liberada para papéis operacionais OU para quem recebeu a
+  // capability explícita (ex.: presidente de comissão com visão restrita).
+  const canWriteCronograma = isWritableRole(myRole) || capSet.has('cronograma_eventos_write');
   const queryClient = useQueryClient();
   const isOnline = useOnlineStatus();
   const [sessionEvents, setSessionEvents] = useState<CronogramaEvent[]>(officialSeedEvents);
@@ -926,7 +931,7 @@ export function useCronogramaEventos() {
       draft: CronogramaSubeventDraft;
       requestId?: string;
     }) => {
-      if (!isWritableRole(myRole)) throw new Error('Seu perfil possui acesso somente para consulta.');
+      if (!canWriteCronograma) throw new Error('Seu perfil possui acesso somente para consulta.');
       const current = findSessionEvent(eventId);
       if (!current) throw new Error('Evento principal não encontrado. Atualize a página e tente novamente.');
       const id = requestId
@@ -970,7 +975,7 @@ export function useCronogramaEventos() {
 
   const syncQueuedRelationships = useMutation({
     mutationFn: async () => {
-      if (!orgId || !isWritableRole(myRole)) return { synced: 0, failed: 0 };
+      if (!orgId || !canWriteCronograma) return { synced: 0, failed: 0 };
       const queued = readCronogramaRelationshipQueue(orgId);
       let remaining = [...queued];
       let workingEvents = sessionEvents;
@@ -1069,7 +1074,7 @@ export function useCronogramaEventos() {
       subeventId: string;
       draft: CronogramaSubeventDraft;
     }) => {
-      if (!isWritableRole(myRole)) throw new Error('Seu perfil possui acesso somente para consulta.');
+      if (!canWriteCronograma) throw new Error('Seu perfil possui acesso somente para consulta.');
       const current = findSessionEvent(eventId);
       if (!current) throw new Error('Evento principal não encontrado. Atualize a página e tente novamente.');
       const existingSubevent = (current.subevents ?? []).find((subevent) => subevent.id === subeventId);
@@ -1182,7 +1187,7 @@ export function useCronogramaEventos() {
     [queuedRelationshipsForOrg, sessionEvents],
   );
   const isSeedFallback = dbUnavailable || !orgId || !query.data;
-  const canWriteEvents = isWritableRole(myRole) && !dbUnavailable && isOnline && Boolean(orgId && query.data);
+  const canWriteEvents = canWriteCronograma && !dbUnavailable && isOnline && Boolean(orgId && query.data);
   const relationshipSyncUnavailable = dbUnavailable || relationshipsUnavailable || !isOnline || !query.data;
 
   const saveEventRpc = useMutation({
@@ -1213,7 +1218,7 @@ export function useCronogramaEventos() {
     isSeedFallback,
     error: query.error,
     refetch: query.refetch,
-    canManage: isWritableRole(myRole),
+    canManage: canWriteCronograma,
     canWriteEvents,
     canDeleteSubevents: myRole === 'admin' || myRole === 'gestor',
     relationshipsUnavailable,
