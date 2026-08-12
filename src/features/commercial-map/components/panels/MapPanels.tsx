@@ -247,7 +247,8 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions }:
   const metadata = normalizeMapEntityMetadata(entity, lot);
   const structuralReady = lot ? ['AVAILABLE', 'BLOCKED', 'UNAVAILABLE'].includes(lot.status) : false;
   const landmarkKind = resolveStrategicLandmarkKind(entity);
-  const usesInspectionCopy = landmarkKind === 'livestock-pavilion'
+  const usesInspectionCopy = landmarkKind === 'commercial-pavilion'
+    || landmarkKind === 'livestock-pavilion'
     || landmarkKind === 'mirante-pavilion';
 
   return (

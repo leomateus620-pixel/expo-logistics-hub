@@ -17,6 +17,7 @@ import {
 } from '../../utils/landmarks';
 import { LivestockPavilion } from './LivestockPavilion';
 import { MirantePavilion } from './MirantePavilion';
+import { CommercialPavilion } from './CommercialPavilion';
 import type { CommercialMapSegmentDefinition } from '../../data/commercialMapSegments';
 
 const NO_RAYCAST = () => undefined;
@@ -122,6 +123,18 @@ const LANDMARK_PALETTES: Record<StrategicLandmarkKind, LandmarkPalette> = {
     white: '#f3f3ee',
     platform: '#77716a',
     metal: '#626969',
+  },
+  'commercial-pavilion': {
+    wall: '#bbb9b1',
+    accent: '#3f767c',
+    roof: '#c5cdcd',
+    trim: '#d5d2c9',
+    dark: '#263234',
+    glass: '#6f9699',
+    green: '#356749',
+    white: '#f1f0e9',
+    platform: '#898b86',
+    metal: '#596568',
   },
   'livestock-pavilion': {
     wall: '#557d88',
@@ -254,7 +267,7 @@ function useLandmarkMaterials(
       metal: material(palette.metal, 0.62, 0.16),
     };
     result.white.side = THREE.DoubleSide;
-    if (kind === 'livestock-pavilion' || kind === 'mirante-pavilion') {
+    if (kind === 'commercial-pavilion' || kind === 'livestock-pavilion' || kind === 'mirante-pavilion') {
       result.roof.roughness = 0.6;
       result.roof.metalness = 0.16;
       result.metal.roughness = 0.5;
@@ -292,7 +305,21 @@ function useLandmarkMaterials(
           platform: 0.3,
           metal: 0.12,
         };
-        baseColor.lerp(new THREE.Color(segment.palette.surface), tintWeight[key]);
+        const appliedWeight = kind === 'commercial-pavilion'
+          ? ({
+              wall: 0.08,
+              accent: 0.42,
+              roof: 0.06,
+              trim: 0.08,
+              dark: 0.04,
+              glass: 0.16,
+              green: 0.14,
+              white: 0.04,
+              platform: 0.08,
+              metal: 0.06,
+            } satisfies Record<keyof LandmarkMaterialSet, number>)[key]
+          : tintWeight[key];
+        baseColor.lerp(new THREE.Color(segment.palette.surface), appliedWeight);
       }
       item.color.copy(baseColor).lerp(MAP_BACKGROUND_COLOR, THREE.MathUtils.clamp(toneDown, 0, 0.9) * 0.82);
       if (selected) item.color.lerp(new THREE.Color('#fff1bd'), 0.06);
@@ -1068,6 +1095,8 @@ function useArchitecturalDetail(
           MIRANTE_RENDER_BUDGET.detailDistanceMinimum,
           Math.max(bounds.width, bounds.depth) * MIRANTE_RENDER_BUDGET.detailDistanceMultiplier,
         )
+      : kind === 'commercial-pavilion'
+        ? Math.max(24, Math.max(bounds.width, bounds.depth) * 4.4)
       : kind === 'fenasoja-restaurant'
         ? Math.max(20, bounds.width * 5)
         : kind === 'administrative-center'
@@ -2519,6 +2548,7 @@ export function StrategicLandmarkMesh({
     onSelect(entity.id);
     if (
       kind === 'fenasoja-headquarters'
+      || kind === 'commercial-pavilion'
       || kind === 'livestock-pavilion'
     ) onEnterInterior(entity.id);
     else onFocus();
@@ -2558,6 +2588,9 @@ export function StrategicLandmarkMesh({
       <group rotation={[0, facingRadians, 0]} dispose={null}>
         {kind === 'administrative-center' && <AdministrativeCenter {...modelProps} />}
         {kind === 'fenasoja-headquarters' && <FenasojaHeadquarters {...modelProps} />}
+        {kind === 'commercial-pavilion' && (
+          <CommercialPavilion publicIdentifier={entity.publicIdentifier} {...modelProps} />
+        )}
         {kind === 'livestock-pavilion' && <LivestockPavilion {...modelProps} />}
         {kind === 'mirante-pavilion' && <MirantePavilion {...modelProps} />}
         {kind === 'polish-pavilion' && <PolishPavilion {...modelProps} />}
