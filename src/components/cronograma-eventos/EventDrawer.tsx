@@ -44,12 +44,17 @@ import {
   CronogramaMetaBadge,
   CronogramaPriorityIndicator,
   CronogramaStatusIndicator,
-  EventIdentityStrip,
 } from './CronogramaBadges';
 import { EventForm } from './EventForm';
 import { formatLongDate, formatLongDateRange } from './dateUtils';
 import type { CronogramaEvent, CronogramaHistoryEntry } from './types';
 import { EventoAnexosSection } from './EventoAnexosSection';
+import {
+  EventRelationList,
+  getEventCommissionItems,
+  getEventResponsibleItems,
+  type EventRelationItem,
+} from './EventRelationFields';
 
 interface EventDrawerProps {
   event: CronogramaEvent | null;
@@ -209,7 +214,6 @@ export function EventDrawer({
           }}
         >
           <div className="cronograma-drawer-header relative">
-            <EventIdentityStrip event={event} className="left-0 inset-y-6" />
             <SheetHeader className="pr-11 text-left">
               <div className="mb-3 flex flex-wrap items-center gap-2">
                 <CronogramaCategoryMarker category={event.category} />
