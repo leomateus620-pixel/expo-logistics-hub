@@ -17,7 +17,7 @@ export function getEventCommissionItems(event: CronogramaEvent): EventRelationIt
   const links = event.commissionsRel ?? [];
   if (links.length === 0) {
     return event.commission
-      ? [{ key: 'legacy-commission', label: event.commission, isPrimary: true }]
+      ? [{ key: 'legacy-commission', label: event.commission, isPrimary: false }]
       : [];
   }
   return links
@@ -34,7 +34,7 @@ export function getEventResponsibleItems(event: CronogramaEvent): EventRelationI
   const links = event.responsiblesRel ?? [];
   if (links.length === 0) {
     return event.owner
-      ? [{ key: 'legacy-responsible', label: event.owner, isPrimary: true }]
+      ? [{ key: 'legacy-responsible', label: event.owner, isPrimary: false }]
       : [];
   }
   return links
