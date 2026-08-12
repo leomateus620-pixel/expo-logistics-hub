@@ -115,6 +115,10 @@ export function EventDrawer({
 
   if (!event) return null;
 
+  const commissionItems = getEventCommissionItems(event);
+  const responsibleItems = getEventResponsibleItems(event);
+
+
   const closeDrawer = () => {
     setDirty(false);
     setConfirmDiscard(false);
@@ -260,15 +264,27 @@ export function EventDrawer({
               />
             ) : (
               <div className="space-y-5">
-                <section className="cronograma-drawer-section grid gap-x-6 sm:grid-cols-2" aria-label="Informações principais">
-                  <InfoBlock
-                    icon={CalendarClock}
-                    label="Data e horário"
-                    value={`${formatLongDateRange(event.date, event.endDate)}${event.startTime ? ` · ${event.startTime}` : ''}${event.endTime ? ` às ${event.endTime}` : ''}`}
-                  />
-                  <InfoBlock icon={MapPin} label="Local" value={event.location || 'Local a definir'} />
-                  <InfoBlock icon={UserRound} label="Responsável" value={event.owner || 'Responsável a definir'} />
-                  <InfoBlock icon={Layers3} label="Comissão" value={event.commission || 'Comissão a definir'} />
+                <section className="cronograma-drawer-section" aria-label="Informações principais">
+                  <div className="cronograma-info-grid">
+                    <InfoCard
+                      icon={CalendarClock}
+                      label="Data e horário"
+                      value={`${formatLongDateRange(event.date, event.endDate)}${event.startTime ? ` · ${event.startTime}` : ''}${event.endTime ? ` às ${event.endTime}` : ''}`}
+                    />
+                    <InfoCard icon={MapPin} label="Local" value={event.location || 'Local a definir'} />
+                    <RelationCard
+                      icon={UserRound}
+                      label={responsibleItems.length > 1 ? 'Responsáveis' : 'Responsável'}
+                      items={responsibleItems}
+                      emptyLabel="Responsável a definir"
+                    />
+                    <RelationCard
+                      icon={Layers3}
+                      label={commissionItems.length > 1 ? 'Comissões' : 'Comissão'}
+                      items={commissionItems}
+                      emptyLabel="Comissão a definir"
+                    />
+                  </div>
                 </section>
 
                 {(event.pendingReason || event.decisionNeeded || !event.date) && (
