@@ -8,8 +8,6 @@ import {
   LockKeyhole,
   LogIn,
 } from 'lucide-react';
-import { AgendaWordmark } from '@/components/brand/AgendaWordmark';
-
 import type { PortalPrimaryEntry as PortalPrimaryEntryConfig } from '@/modules/portal/portalRegistry';
 import type { PortalAccessPresentation } from '@/components/portal/portalTypes';
 
@@ -83,18 +81,11 @@ export function PortalPrimaryEntry({
       </span>
       <span className="portal-primary-entry__copy">
         <span className="portal-primary-entry__title" data-testid="portal-primary-title">
-          {entry.wordmark ? (
-            <AgendaWordmark variant={entry.wordmark} />
-          ) : (
-            entry.title
-          )}
+          {entry.title}
         </span>
 
         <span className="portal-primary-entry__description">{entry.description}</span>
       </span>
-      {entry.countLabel && (
-        <span className="portal-primary-entry__count">{entry.countLabel}</span>
-      )}
       <span className="portal-primary-entry__action" aria-hidden="true">
         <span className="portal-primary-entry__action-label">{actionLabel}</span>
         <span className="portal-primary-entry__direction">
@@ -115,7 +106,6 @@ export function PortalPrimaryEntry({
       className="portal-primary-entry"
       data-expanded={expanded}
       data-kind={entry.kind}
-      data-tone={entry.tone}
       data-access-state={access.state}
       aria-busy={access.state === 'loading' ? 'true' : undefined}
     >

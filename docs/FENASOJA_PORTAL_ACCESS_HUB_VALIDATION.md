@@ -1,89 +1,81 @@
-# Fenasoja 2028 — refinamento da navegação principal
+# Fenasoja 2028 — sistema visual unificado dos acessos
 
-Validação executada em 03/08/2026.
+Validação executada em 12/08/2026.
 
-## Problemas visuais corrigidos
+## Resultado
 
-- Superfícies navy quase uniformes deixavam as quatro entradas pesadas e com pouca diferenciação.
-- Barras laterais coloridas concentravam a identidade em uma faixa desconectada do restante do cartão.
-- Rótulos como “Acesso direto”, “Acesso liberado” e “Acesso protegido” repetiam o estado já comunicado pela própria ação.
-- Agenda e Comissões abertas acrescentavam contêineres escuros, numeração e metadados que aumentavam a densidade.
-- Título, descrição, status e ação competiam pela mesma hierarquia tipográfica.
-- O layout mobile reduzia o desktop sem uma composição própria para toque e leitura curta.
+Os cinco acessos principais — Agenda Fenasoja, Agenda Restaurante e Arena, Mapa Comercial, Comissões e Financeiro — agora compartilham uma única linguagem de superfície, borda, profundidade, tipografia, ícone, ação e interação. A diferenciação permanece no nome, no ícone e no conteúdo de cada módulo, sem fundos temáticos concorrentes.
 
-## Novo sistema visual
+| Elemento | Antes | Depois |
+| --- | --- | --- |
+| Superfície | Navy, marrom, azul e teal por módulo | Base navy/blue-gray única (`#14283a`) |
+| Borda | Intensidade e matiz variáveis | Borda premium neutra (`#607990`) |
+| Ícones | Fundos, brilhos e tons distintos | Contêiner único de 46 px, mesma borda e peso visual |
+| Títulos | Tratamentos especiais e truncamento | Tipografia de interface uniforme, forte e legível |
+| Ações | Setas e destaques diferentes | Uma ação com seta horizontal e microdeslocamento comum |
+| Expansão | Painéis com identidade paralela | Continuação tonal e estrutural do cartão pai |
 
-| Módulo | Superfície | Acento | Título | Intenção |
-| --- | --- | --- | --- | --- |
-| Agenda | `#2d3b45 → #172b3b` | `#dfc58d` | `#fff8e9` | Champanhe e âmbar suave para planejamento institucional |
-| Mapa Comercial | `#214563 → #14334e` | `#83bdea` | `#f1faff` | Azul-celeste e cornflower para leitura espacial |
-| Comissões | `#20444b → #12343e` | `#70c9bf` | `#f0fffb` | Turquesa mineral e teal para colaboração operacional |
-| Financeiro | `#403b38 → #26323b` | `#d0a47e` | `#fff5ea` | Bronze e cobre contidos para confiança executiva |
+O CSS de acesso tem agora um único proprietário: `portal-access-navigation.css`. O bloco legado duplicado foi removido de `commission-portal.css`, que continua responsável apenas pelo shell, hero, cabeçalho, rodapé e coreografia geral da página.
 
-Cada paleta atua sobre o cartão inteiro com gradiente tonal, camada de iluminação, borda e sombra próprias. Não há faixa lateral, neon contínuo, blur de grande área nem animação automática. Estados restritos preservam texto e semântica, com contraste neutro e sem depender apenas de cor.
+## Hierarquia e composição
 
-## Superfície, tipografia e redução de ruído
+- Cada acesso comunica somente índice, ícone, nome do módulo, descrição funcional curta e ação primária.
+- O nome é o elemento de maior presença: peso 800, espaçamento óptico controlado, contraste alto e sombra de texto mínima.
+- O tratamento é inspirado na clareza e na presença do wordmark FENASOJA, sem converter os nomes em logotipos metálicos.
+- Metadados decorativos, contagens e variações visuais por `data-tone` foram removidos.
+- As descrições foram reduzidas e mantêm quebra natural, inclusive em “Agenda Restaurante e Arena”.
+- Altura, padding, alinhamento do ícone, baseline, descrição e ação seguem a mesma grade em todos os acessos.
 
-- Os cartões recolhidos permanecem compactos e alinhados, com ícone de 44 px, título mais legível, descrição curta e uma única ação.
-- Contagens aparecem somente em Agenda e Comissões, onde “2 destinos” e “8 frentes” ajudam a antecipar o conteúdo.
-- Foram removidos da interface visível rótulos redundantes de liberação/proteção, numeração interna de destinos e comissões, subtítulos técnicos, rodapé de permissão e ações duplicadas.
-- A informação de loading, restrição ou indisponibilidade só aparece quando muda o que o usuário pode fazer; a descrição completa permanece disponível para tecnologia assistiva.
-- Títulos usam maior peso e contraste; descrições receberam linha mais confortável, largura controlada e quebra previsível.
+## Interação e acessibilidade
 
-## Agenda expandida
+- O cartão inteiro é a superfície interativa, tanto para links quanto para o controle expansível de Comissões.
+- Hover eleva a superfície em 1 px, ilumina a borda de forma controlada e desloca a seta em 2 px.
+- O estado pressionado elimina a elevação; o foco visível combina borda do cartão e anel interno sem depender de glow.
+- Comissões mantém `aria-expanded`, `aria-controls`, painel com `aria-hidden` e `inert` quando recolhido.
+- Enter expande; Escape recolhe e devolve o foco ao controlador.
+- Alvos interativos preservam pelo menos 44 px e há tratamentos dedicados para `prefers-reduced-motion`, transparência reduzida, contraste aumentado e forced colors.
+- Não há `transition: all`, animação de entrada por cartão, gradiente temático amplo, neon ou brilho contínuo.
 
-- O cartão pai mantém o champanhe como identidade e conecta visualmente o painel por borda e superfície contínuas.
-- Cronograma e Eventos e Eventos Restaurante e Arena usam cartões internos mais claros, sem numeração e sem “Acesso liberado”.
-- Cada destino tem ícone, nome, descrição concisa e apenas uma ação contextual.
-- A grade usa duas colunas quando há espaço e uma coluna antes de o conteúdo comprimir.
+## Estado expandido
 
-## Comissões expandida
+- O pai expandido usa uma variação navy mais profunda (`#12293c`), mantendo a mesma borda e linguagem de profundidade.
+- Os destinos internos usam superfície secundária comum (`#172d40`), ícones padronizados e a mesma seta dos acessos principais.
+- As dez frentes continuam derivadas de `commissionRegistry`; não foi criado um segundo mapa de navegação ou permissão.
+- Separação, espaçamento e tipografia são mais leves que no pai, mas pertencem ao mesmo sistema visual.
+- A grade passa de cinco para duas e depois uma coluna, sem introduzir outra paleta.
 
-- As oito frentes continuam derivadas do `commissionRegistry`; não existe novo mapa de navegação ou permissão.
-- A grade responde em quatro, duas e uma coluna, com cartões memoizados e densidade controlada.
-- O estado acessível não recebe etiqueta redundante. “Em estruturação”, restrição e indisponibilidade aparecem somente quando afetam a ação e sempre incluem texto/semântica, não apenas cor.
-- A ação é única em cada frente e o painel permanece ligado ao controlador principal.
+## Matriz responsiva inspecionada
 
-## Interação, acessibilidade e desempenho
+| Viewport | Cartões principais | Destinos expandidos | Overflow horizontal |
+| --- | --- | --- | --- |
+| 1920×1080 | 90 px, cinco alinhados | 5 colunas | Não |
+| 1680×1050 | 90 px, cinco alinhados | 5 colunas | Não |
+| 1366×768 | 76 px, cinco alinhados | 5 colunas | Não |
+| 768×1024 | 90 px, cinco alinhados | 2 colunas | Não |
+| 430×932 | 134 px, coluna única | 1 coluna | Não |
+| 390×844 | 134 px, coluna única | 1 coluna; 116 px por destino | Não |
+| 360×800 | 134 px, coluna única | 1 coluna | Não |
 
-- Hover em 215 ms e expansão em 270 ms usam somente propriedades leves e específicas; não há `transition: all`.
-- A superfície inteira responde com iluminação, borda e elevação; a seta se desloca poucos pixels e o pressionado reduz a elevação.
-- Botões de expansão mantêm `aria-expanded` e `aria-controls`; painéis recolhidos usam `aria-hidden` e `inert`.
-- Enter expande, Escape recolhe e devolve o foco ao controlador. O foco cobre a superfície interativa com contorno de 3 px.
-- Alvos de toque têm pelo menos 44 px. Há suporte a `prefers-reduced-motion`, transparência reduzida, contraste aumentado e forced colors.
-- O React usa limites estáveis e `memo` com comparadores focados para que a abertura de um grupo não recalcule cartões sem mudança. Nenhuma dependência visual ou de animação foi adicionada.
+Nos três viewports mobile, os nomes permanecem integrais, os índices decorativos são ocultados, as descrições quebram naturalmente e os ícones não dominam a composição. Em 390×844, as dez frentes expandidas mantiveram a mesma altura de 116 px.
 
-## Matriz responsiva e inspeção visual
+Evidências visuais:
 
-Sem overflow horizontal, ações cortadas ou erros de console em:
-
-- desktop/notebook: 1920×1080, 1680×1050, 1536×864, 1440×900 e 1366×768;
-- tablet: 768×1024, com duas colunas para Agenda e Comissões;
-- mobile: 430×932, 390×844, 376×812 e 360×800, com coluna única e ordem visual preservada.
-
-O controlador arredonda a largura física solicitada de 375 px para 376 px; o breakpoint de 375×812 foi corroborado pelos vizinhos 376×812 e 360×800 e pela regra dedicada abaixo de 380 px.
-
-Em 1366×768, Agenda aberta mantém os dois destinos e todas as ações visíveis, com apenas 6 px de rolagem vertical adicional. Em mobile, os destinos e frentes empilham sem perda de foco, corte ou overflow.
-
-Evidências:
-
-- recolhido: `docs/screenshots/portal-access-navigation-v2-desktop-1366x768.png`;
-- Agenda aberta: `docs/screenshots/portal-access-navigation-v2-agenda-1366x768.png`;
-- Comissões abertas: `docs/screenshots/portal-access-navigation-v2-commissions-1366x960.png`;
-- mobile: `docs/screenshots/portal-access-navigation-v2-mobile-390x844.png`.
+- [desktop 1440×900](screenshots/portal-unified-cards-desktop-1440x900.png);
+- [Comissões expandida](screenshots/portal-unified-cards-commissions-expanded.png);
+- [mobile 390×844](screenshots/portal-unified-cards-mobile-390x844.png).
 
 ## Validação automatizada
 
-- 74/74 testes focados e adjacentes aprovados em 7 arquivos.
-- ESLint dos 7 arquivos TypeScript/TSX tocados: aprovado sem ocorrências.
+- 49/49 testes focados e adjacentes aprovados em 6 arquivos, incluindo arquitetura, acesso sensível, estados do portal, acessibilidade e integração Alvorada.
+- ESLint dos arquivos TypeScript/TSX tocados: aprovado sem ocorrências.
 - TypeScript global (`tsc --noEmit`): aprovado.
-- Build de produção: aprovado, 4.748 módulos transformados; bundle do portal com 23,21 kB de JS e 60,88 kB de CSS antes de gzip.
-- `git diff --check`: aprovado; busca negativa confirmou a ausência dos quatro rótulos redundantes na produção.
-
-Baseline global fora deste escopo: 440/467 testes aprovados; 27 falhas em 4 arquivos de Cronograma não tocados por esta entrega. A maioria continua ligada a harnesses sem `AuthProvider`, além de expectativas antigas da timeline. O build mantém os avisos herdados de Browserslist desatualizado e chunks grandes de mapas.
+- Build de produção: aprovado; 4.899 módulos transformados em 25,28 s.
+- `git diff --check`: aprovado.
+- Console do navegador: nenhum erro da aplicação. Permanecem somente avisos herdados sobre future flags do React Router.
+- O build mantém os avisos herdados de Browserslist desatualizado e chunks de mapas acima de 500 kB; nenhum deles foi introduzido pelo sistema de cartões.
 
 ## Escopo funcional preservado
 
-As rotas, nomes, guards, callbacks de autenticação, Supabase, RLS, permissões, validação de acesso, disponibilidade de módulos, Administrator, dados, regras de negócio e destinos não foram alterados. O trabalho reutiliza `portalRegistry`, `commissionRegistry`, `resolveModuleAccess`, handlers e consultas existentes.
+Ordem dos cinco acessos, rotas, nomes, guards, callbacks de autenticação, Supabase, RLS, permissões, `resolveModuleAccess`, disponibilidade de módulos, dados e regras de negócio não foram alterados. Agenda Fenasoja, Agenda Restaurante e Arena, Mapa Comercial e Financeiro continuam acessos diretos; Comissões continua sendo o único grupo expansível.
 
-O navegador local estava sem sessão autenticada. Foram validados o estado anônimo e seus deep links de login, a navegação por teclado, a renderização responsiva e os estados permitidos/loading/restritos por testes automatizados. Smoke autenticado por perfil no ambiente-alvo permanece como evidência de release e não é apresentado aqui como executado.
+O navegador local estava sem sessão autenticada. Foram inspecionados o estado anônimo, a composição responsiva, as interações de teclado e o painel expandido; estados permitidos, loading, restritos e integrações de rota foram cobertos pelos testes automatizados. Smoke autenticado por perfil no ambiente-alvo não é apresentado como executado.
