@@ -7112,6 +7112,10 @@ export type Database = {
         Args: { expected_lock_version?: number; payload: Json }
         Returns: Json
       }
+      cronograma_scoped_event_visible: {
+        Args: { _event_id: string; _user_id: string }
+        Returns: boolean
+      }
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
@@ -7170,6 +7174,10 @@ export type Database = {
           _role: Database["public"]["Enums"]["app_role"]
           _user_id: string
         }
+        Returns: boolean
+      }
+      has_scoped_cronograma_access: {
+        Args: { _org_id: string; _user_id: string }
         Returns: boolean
       }
       invoke_google_sync_worker: { Args: never; Returns: number }
