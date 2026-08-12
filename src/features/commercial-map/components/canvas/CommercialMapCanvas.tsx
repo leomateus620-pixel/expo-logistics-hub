@@ -53,6 +53,11 @@ const MiranteInteriorScene = lazy(async () => {
   return { default: module.MiranteInteriorScene };
 });
 
+const CommercialPavilionInteriorScene = lazy(async () => {
+  const module = await import('./CommercialPavilionInteriorScene');
+  return { default: module.CommercialPavilionInteriorScene };
+});
+
 interface CommercialMapCanvasProps {
   entities: MapEntity[];
   lots: CommercialLot[];
@@ -236,6 +241,9 @@ function focusProfileForEntity(entity: MapEntity) {
   }
   if (landmark === 'fenasoja-headquarters') {
     return { ...profile, contextRatio: 0.055, fitPadding: 1.16, minDistanceRatio: 0.05, maxDistanceRatio: 0.3, minimumDirectionY: 0.32 };
+  }
+  if (landmark === 'commercial-pavilion') {
+    return { ...profile, contextRatio: 0.075, fitPadding: 1.24, minDistanceRatio: 0.06, maxDistanceRatio: 0.4, minimumDirectionY: 0.48 };
   }
   if (landmark === 'livestock-pavilion') {
     return { ...profile, contextRatio: 0.068, fitPadding: 1.08, minDistanceRatio: 0.055, maxDistanceRatio: 0.38, minimumDirectionY: 0.28 };
@@ -1786,6 +1794,9 @@ function Scene({
 
   if (interiorEntity) {
     const interiorKind = resolveStrategicLandmarkKind(interiorEntity);
+    if (interiorKind === 'commercial-pavilion') {
+      return <CommercialPavilionInteriorScene entity={interiorEntity} reducedGraphics={reducedGraphics} />;
+    }
     if (interiorKind === 'livestock-pavilion') {
       return <LivestockPavilionInteriorScene entity={interiorEntity} reducedGraphics={reducedGraphics} />;
     }

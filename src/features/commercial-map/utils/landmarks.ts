@@ -1,10 +1,16 @@
 import type { MapEntity } from '../types';
 import { livestockPavilionVisualHeight } from './livestockPavilion';
 import { miranteVisualHeight } from './mirante';
+import {
+  commercialPavilionVisualHeight,
+  resolveCommercialPavilionDefinition,
+  type CommercialPavilionPublicIdentifier,
+} from './commercialPavilions';
 
 export type StrategicLandmarkKind =
   | 'administrative-center'
   | 'fenasoja-headquarters'
+  | 'commercial-pavilion'
   | 'livestock-pavilion'
   | 'mirante-pavilion'
   | 'polish-pavilion'
@@ -33,7 +39,31 @@ interface StrategicLandmarkDefinition {
   visualHeight: (bounds: StrategicLandmarkBounds) => number;
 }
 
+function commercialPavilionLandmark(
+  publicIdentifier: CommercialPavilionPublicIdentifier,
+): StrategicLandmarkDefinition {
+  const definition = resolveCommercialPavilionDefinition({ publicIdentifier });
+  if (!definition) throw new Error(`Pavilhão comercial sem definição: ${publicIdentifier}`);
+  return {
+    kind: 'commercial-pavilion',
+    aliases: [
+      `Pavilhão ${definition.pavilionNumber}`,
+      definition.officialName,
+      `Pavilhão comercial ${definition.pavilionNumber}`,
+    ],
+    facingRadians: definition.facingRadians,
+    focusDirection: definition.focusDirection,
+    visualHeight: (bounds) => commercialPavilionVisualHeight(bounds, definition),
+  };
+}
+
 const STRATEGIC_LANDMARKS: Readonly<Record<string, StrategicLandmarkDefinition>> = {
+  B1: commercialPavilionLandmark('B1'),
+  B2: commercialPavilionLandmark('B2'),
+  B3: commercialPavilionLandmark('B3'),
+  B4: commercialPavilionLandmark('B4'),
+  B5: commercialPavilionLandmark('B5'),
+  B6: commercialPavilionLandmark('B6'),
   B9: {
     kind: 'livestock-pavilion',
     aliases: [
@@ -154,6 +184,7 @@ export function strategicLandmarkSupportsInterior(
 ): boolean {
   const kind = resolveStrategicLandmarkKind(entity);
   return kind === 'fenasoja-headquarters'
+    || kind === 'commercial-pavilion'
     || kind === 'livestock-pavilion'
     || kind === 'mirante-pavilion';
 }

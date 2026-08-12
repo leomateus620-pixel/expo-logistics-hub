@@ -57,7 +57,7 @@ describe('marcos arquitetônicos estratégicos', () => {
     expect(resolveStrategicLandmarkKind(persistedRestaurant)).toBe('fenasoja-restaurant');
     expect(resolveStrategicLandmarkKind(persistedArena)).toBe('sicredi-arena');
     expect(resolveStrategicLandmarkKind(targets.B41)).toBeNull();
-    expect(resolveStrategicLandmarkKind({ publicIdentifier: 'B1' })).toBeNull();
+    expect(resolveStrategicLandmarkKind({ publicIdentifier: 'B1' })).toBe('commercial-pavilion');
 
     expect(strategicLandmarkFacingRadians(persistedAdministrativeCenter)).toBeCloseTo(Math.PI / 2);
     expect(strategicLandmarkFacingRadians(persistedHeadquarters)).toBeCloseTo(-Math.PI / 18);
@@ -201,6 +201,8 @@ describe('marcos arquitetônicos estratégicos', () => {
   });
 
   it('limita a inspeção interna aos marcos que possuem uma cena vinculada', () => {
+    expect(strategicLandmarkSupportsInterior({ publicIdentifier: 'B1' })).toBe(true);
+    expect(strategicLandmarkSupportsInterior({ publicIdentifier: 'B6' })).toBe(true);
     expect(strategicLandmarkSupportsInterior(targets.B9)).toBe(true);
     expect(strategicLandmarkSupportsInterior(targets.B12)).toBe(true);
     expect(strategicLandmarkSupportsInterior(targets.B11)).toBe(false);

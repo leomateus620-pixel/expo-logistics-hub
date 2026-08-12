@@ -349,7 +349,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
 
   return (
     <section
-      className={`commercial-map-shell ${isCommissionScope ? 'is-commission-scope' : ''} ${isExporural ? 'is-exporural' : ''} ${areaScope === COMMERCIAL_MAP_SEGMENT_IDS.industry ? 'is-industry' : ''} ${interiorEntityId ? 'is-interior' : ''} ${interiorKind === 'livestock-pavilion' ? 'is-livestock-interior' : ''} ${interiorKind === 'mirante-pavilion' ? 'is-mirante-interior' : ''} ${selectedKind === 'livestock-pavilion' || selectedKind === 'mirante-pavilion' ? 'has-architectural-selection' : ''}`}
+      className={`commercial-map-shell ${isCommissionScope ? 'is-commission-scope' : ''} ${isExporural ? 'is-exporural' : ''} ${areaScope === COMMERCIAL_MAP_SEGMENT_IDS.industry ? 'is-industry' : ''} ${interiorEntityId ? 'is-interior' : ''} ${interiorKind === 'commercial-pavilion' ? 'is-commercial-pavilion-interior' : ''} ${interiorKind === 'livestock-pavilion' ? 'is-livestock-interior' : ''} ${interiorKind === 'mirante-pavilion' ? 'is-mirante-interior' : ''} ${selectedKind === 'commercial-pavilion' || selectedKind === 'livestock-pavilion' || selectedKind === 'mirante-pavilion' ? 'has-architectural-selection' : ''}`}
       aria-label="Plataforma de gestão do mapa comercial"
     >
       <header className="commercial-map-command-header">
@@ -542,10 +542,12 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
                   <ArrowLeft />Voltar ao mapa
                 </Button>
                 <div>
-                  <span>Inspeção interna · {interiorEntity.publicIdentifier}</span>
+                  <span>{interiorKind === 'commercial-pavilion' ? 'Modelo interno provisório' : 'Inspeção interna'} · {interiorEntity.publicIdentifier}</span>
                   <strong>{interiorEntity.name}</strong>
                   <small>
-                    {interiorKind === 'livestock-pavilion'
+                    {interiorKind === 'commercial-pavilion'
+                      ? 'Vista superior ilustrativa · arraste para percorrer e role para aproximar'
+                      : interiorKind === 'livestock-pavilion'
                       ? 'Arraste para percorrer o corredor e as baias · role para aproximar'
                       : interiorKind === 'mirante-pavilion'
                         ? 'Arraste para observar o salão e a vista da Arena · role para aproximar'
