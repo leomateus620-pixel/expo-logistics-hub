@@ -1742,3 +1742,939 @@
 .venue-agenda-period--compact strong {
   font-size: 0.68rem;
 }
+
+/* ===== Contrapartidas: leitura executiva, progresso contratual e edição ===== */
+.venue-agreement-grid {
+  align-items: stretch;
+  gap: clamp(0.75rem, 1vw, 1rem);
+}
+
+.venue-agreement-card--premium {
+  --agreement-accent: var(--venue-success);
+  position: relative;
+  display: grid;
+  width: 100%;
+  min-width: 0;
+  min-height: 22rem;
+  height: 100%;
+  grid-template-rows: auto auto minmax(3.3rem, auto) auto auto 1fr;
+  align-content: start;
+  gap: 0.82rem;
+  padding: 1rem 1.05rem 0.92rem;
+  overflow: hidden;
+  border: 1px solid color-mix(in oklab, var(--venue-border-strong) 86%, white);
+  border-top: 1px solid color-mix(in oklab, var(--venue-border-strong) 86%, white);
+  border-radius: 0.9rem;
+  background: white;
+  box-shadow:
+    inset 0 2px 0 color-mix(in oklab, var(--agreement-accent) 62%, white),
+    0 10px 30px -28px rgb(10 29 65 / 0.7);
+  color: var(--venue-ink);
+  text-align: left;
+  transition:
+    border-color 180ms ease,
+    box-shadow 180ms ease,
+    transform 180ms cubic-bezier(0.2, 0.75, 0.25, 1),
+    background-color 180ms ease;
+}
+
+.venue-agreement-card--premium[data-state="attention"],
+.venue-agreement-card--premium[data-state="exhausted"] {
+  --agreement-accent: var(--venue-warning);
+}
+
+.venue-agreement-card--premium[data-state="projected"],
+.venue-agreement-card--premium[data-state="exceeded"] {
+  --agreement-accent: var(--venue-danger);
+}
+
+.venue-agreement-card--premium:hover {
+  border-color: color-mix(in oklab, var(--venue-border-strong) 86%, white);
+  box-shadow:
+    inset 0 2px 0 color-mix(in oklab, var(--agreement-accent) 62%, white),
+    0 10px 30px -28px rgb(10 29 65 / 0.7);
+  transform: none;
+}
+
+.venue-agreement-card--premium:has(.venue-agreement-card__action:active) {
+  transform: scale(0.997);
+}
+
+.venue-agreement-card--premium[data-selected="true"] {
+  border-color: color-mix(in oklab, var(--venue-indigo) 58%, white);
+  background: color-mix(in oklab, var(--venue-indigo) 1.8%, white);
+  box-shadow:
+    inset 0 2px 0 var(--venue-indigo),
+    0 0 0 2px color-mix(in oklab, var(--venue-indigo) 13%, transparent),
+    0 16px 40px -30px rgb(8 24 58 / 0.72);
+}
+
+.venue-agreement-card--premium:focus-within {
+  outline: none;
+  border-color: var(--venue-indigo);
+  box-shadow:
+    inset 0 2px 0 color-mix(in oklab, var(--agreement-accent) 72%, white),
+    0 0 0 3px color-mix(in oklab, var(--venue-indigo) 16%, transparent),
+    0 16px 40px -30px rgb(8 24 58 / 0.72);
+}
+
+.venue-agreement-card__action {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: inherit;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.venue-agreement-card__action:hover,
+.venue-agreement-card__action:active,
+.venue-agreement-card__action:focus-visible {
+  outline: none;
+  background: transparent;
+}
+
+.venue-agreement-card__identity {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 0.7rem;
+}
+
+.venue-agreement-card__icon {
+  display: grid;
+  width: 2.45rem;
+  height: 2.45rem;
+  place-items: center;
+  border: 1px solid color-mix(in oklab, var(--venue-indigo) 12%, white);
+  border-radius: 0.72rem;
+  background: color-mix(in oklab, var(--venue-indigo) 8%, white);
+  color: var(--venue-indigo);
+}
+
+.venue-agreement-card__icon svg {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+.venue-agreement-card__sponsor {
+  display: grid;
+  min-width: 0;
+  gap: 0.16rem;
+}
+
+.venue-agreement-card__sponsor small,
+.venue-agreement-card__contract small,
+.venue-agreement-card__balance small,
+.venue-agreement-card__benefit > small {
+  color: var(--venue-ink-soft);
+  font-size: 0.62rem;
+  font-weight: 720;
+  letter-spacing: 0.025em;
+  line-height: 1.25;
+  text-transform: none;
+}
+
+.venue-agreement-card__sponsor strong {
+  display: -webkit-box;
+  min-height: 2.35rem;
+  overflow: hidden;
+  color: var(--venue-ink);
+  font-size: clamp(0.98rem, 1.25vw, 1.1rem);
+  font-weight: 830;
+  letter-spacing: -0.025em;
+  line-height: 1.13;
+  text-overflow: ellipsis;
+  white-space: normal;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.venue-agreement-card__status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.32rem;
+  padding-top: 0.18rem;
+  color: var(--venue-ink-soft);
+  font-size: 0.62rem;
+  font-weight: 760;
+  white-space: nowrap;
+}
+
+.venue-agreement-card__status i {
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 50%;
+  background: var(--venue-success);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--venue-success) 11%, white);
+}
+
+.venue-agreement-card__status[data-status="rascunho"] i,
+.venue-agreement-card__status[data-status="suspenso"] i {
+  background: var(--venue-warning);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--venue-warning) 11%, white);
+}
+
+.venue-agreement-card__status[data-status="encerrado"] i {
+  background: var(--venue-ink-soft);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--venue-ink-soft) 9%, white);
+}
+
+.venue-agreement-card__contract-row {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 0.9rem;
+  padding-block: 0.78rem;
+  border-top: 1px solid color-mix(in oklab, var(--venue-border-strong) 54%, white);
+  border-bottom: 1px solid color-mix(in oklab, var(--venue-border-strong) 54%, white);
+}
+
+.venue-agreement-card__contract,
+.venue-agreement-card__balance,
+.venue-agreement-card__benefit {
+  display: grid;
+  min-width: 0;
+}
+
+.venue-agreement-card__contract {
+  gap: 0.22rem;
+}
+
+.venue-agreement-card__contract strong {
+  display: -webkit-box;
+  min-height: 1rem;
+  overflow: hidden;
+  color: var(--venue-ink);
+  font-size: 0.76rem;
+  font-weight: 790;
+  line-height: 1.3;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.venue-agreement-card__balance {
+  justify-items: end;
+  gap: 0.15rem;
+  color: var(--venue-success);
+  text-align: right;
+}
+
+.venue-agreement-card__balance[data-state="attention"],
+.venue-agreement-card__balance[data-state="exhausted"] {
+  color: var(--venue-warning);
+}
+
+.venue-agreement-card__balance[data-state="projected"],
+.venue-agreement-card__balance[data-state="exceeded"] {
+  color: var(--venue-danger);
+}
+
+.venue-agreement-card__balance strong {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 0.28rem;
+  font-size: 1.12rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 840;
+  letter-spacing: -0.035em;
+  line-height: 1;
+}
+
+.venue-agreement-card__balance strong span {
+  color: var(--venue-ink-soft);
+  font-size: 0.58rem;
+  font-weight: 680;
+  letter-spacing: 0;
+}
+
+.venue-agreement-card__benefit {
+  align-content: start;
+  gap: 0.16rem;
+}
+
+.venue-agreement-card__benefit > strong {
+  color: var(--venue-ink);
+  font-size: 0.82rem;
+  font-weight: 790;
+  line-height: 1.25;
+}
+
+.venue-agreement-card__benefit > span {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.1rem;
+  overflow: hidden;
+  color: var(--venue-ink-soft);
+  font-size: 0.65rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.venue-agreement-card__benefit svg {
+  width: 0.72rem;
+  height: 0.72rem;
+  flex: 0 0 auto;
+}
+
+.venue-agreement-progress {
+  display: block;
+  padding-top: 0.06rem;
+}
+
+.venue-agreement-progress__track {
+  position: relative;
+  display: block;
+  height: 0.62rem;
+  overflow: hidden;
+  border: 1px solid color-mix(in oklab, var(--venue-border-strong) 42%, white);
+  border-radius: 999px;
+  background: var(--venue-surface-muted);
+}
+
+.venue-agreement-progress__segments {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: inherit;
+  animation: venue-agreement-progress-reveal 560ms
+    cubic-bezier(0.22, 0.72, 0.28, 1) both;
+}
+
+.venue-agreement-progress__segments > span {
+  display: block;
+  width: var(--segment-size);
+  min-width: 0;
+  height: 100%;
+}
+
+.venue-agreement-progress__segments > [data-segment="consumed"] {
+  background: color-mix(in oklab, var(--venue-indigo-deep) 84%, white);
+}
+
+.venue-agreement-progress__segments > [data-segment="reserved"] {
+  background: color-mix(in oklab, var(--venue-orange) 62%, white);
+}
+
+.venue-agreement-progress__segments > [data-segment="available"] {
+  background: color-mix(in oklab, var(--venue-success) 13%, white);
+}
+
+.venue-agreement-progress__track[data-state="exhausted"]
+  .venue-agreement-progress__segments > [data-segment="available"],
+.venue-agreement-progress__track[data-state="projected"]
+  .venue-agreement-progress__segments > [data-segment="available"],
+.venue-agreement-progress__track[data-state="exceeded"]
+  .venue-agreement-progress__segments > [data-segment="available"] {
+  background: color-mix(in oklab, var(--venue-danger) 9%, white);
+}
+
+@keyframes venue-agreement-progress-reveal {
+  from {
+    opacity: 0.62;
+    clip-path: inset(0 100% 0 0 round 999px);
+  }
+
+  to {
+    opacity: 1;
+    clip-path: inset(0 0 0 0 round 999px);
+  }
+}
+
+.venue-agreement-card--premium .venue-agreement-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 0;
+  margin-top: 0;
+}
+
+.venue-agreement-card--premium .venue-agreement-metrics > span {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  align-content: start;
+  gap: 0.2rem;
+  padding: 0.12rem 0.52rem;
+  border-radius: 0;
+  background: transparent;
+}
+
+.venue-agreement-card--premium .venue-agreement-metrics > span:first-child {
+  padding-left: 0;
+}
+
+.venue-agreement-card--premium .venue-agreement-metrics > span:last-child {
+  padding-right: 0;
+}
+
+.venue-agreement-card--premium .venue-agreement-metrics > span + span {
+  border-left: 1px solid color-mix(in oklab, var(--venue-border-strong) 54%, white);
+}
+
+.venue-agreement-card--premium .venue-agreement-metrics small {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.27rem;
+  color: var(--venue-ink-soft);
+  font-size: 0.6rem;
+  line-height: 1.15;
+}
+
+.venue-agreement-card--premium .venue-agreement-metrics small::before {
+  width: 0.38rem;
+  height: 0.38rem;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--venue-border-strong);
+  content: "";
+}
+
+.venue-agreement-card--premium
+  .venue-agreement-metrics [data-metric="consumed"] small::before {
+  background: color-mix(in oklab, var(--venue-indigo-deep) 84%, white);
+}
+
+.venue-agreement-card--premium
+  .venue-agreement-metrics [data-metric="reserved"] small::before {
+  background: color-mix(in oklab, var(--venue-orange) 62%, white);
+}
+
+.venue-agreement-card--premium
+  .venue-agreement-metrics [data-metric="available"] small::before {
+  background: color-mix(in oklab, var(--venue-success) 56%, white);
+}
+
+.venue-agreement-card--premium .venue-agreement-metrics strong {
+  margin-top: 0;
+  color: var(--venue-ink);
+  font-size: 0.88rem;
+  font-variant-numeric: tabular-nums;
+  font-weight: 810;
+  line-height: 1;
+}
+
+.venue-agreement-card--premium
+  .venue-agreement-metrics [data-metric="available"] strong {
+  color: var(--venue-success);
+}
+
+.venue-agreement-card--premium
+  .venue-agreement-metrics [data-metric="available"][data-state="attention"] strong,
+.venue-agreement-card--premium
+  .venue-agreement-metrics [data-metric="available"][data-state="exhausted"] strong {
+  color: var(--venue-warning);
+}
+
+.venue-agreement-card--premium
+  .venue-agreement-metrics [data-metric="available"][data-state="projected"] strong,
+.venue-agreement-card--premium
+  .venue-agreement-metrics [data-metric="available"][data-state="exceeded"] strong {
+  color: var(--venue-danger);
+}
+
+.venue-agreement-card__footer {
+  display: flex;
+  min-width: 0;
+  align-self: end;
+  justify-content: space-between;
+  gap: 0.7rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid color-mix(in oklab, var(--venue-border-strong) 54%, white);
+  color: var(--venue-ink-soft);
+  font-size: 0.61rem;
+  line-height: 1.35;
+}
+
+.venue-agreement-card__footer > span:last-child {
+  text-align: right;
+}
+
+.venue-agreement-card__edit-hint {
+  display: none;
+}
+
+.venue-agreement-card--premium[data-selected="true"]
+  .venue-agreement-card__edit-hint {
+  position: absolute;
+  top: 3rem;
+  right: 1.05rem;
+  display: block;
+  color: var(--venue-indigo);
+  font-size: 0.56rem;
+  font-weight: 780;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .venue-agreement-card--premium:not([data-readonly="true"]):hover {
+    border-color: color-mix(in oklab, var(--venue-indigo) 30%, white);
+    box-shadow:
+      inset 0 2px 0 color-mix(in oklab, var(--agreement-accent) 72%, white),
+      0 20px 48px -34px rgb(8 24 58 / 0.68);
+    transform: translateY(-2px);
+  }
+}
+
+.venue-management-dialog--agreement {
+  width: min(94vw, 860px);
+  max-width: 860px !important;
+  max-height: min(92dvh, 860px) !important;
+  padding: 0 !important;
+}
+
+.venue-agreement-dialog__header {
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 0.8rem;
+  row-gap: 0.2rem;
+  padding: 1.2rem 4rem 1rem 1.35rem;
+  border-bottom: 1px solid color-mix(in oklab, var(--venue-border-strong) 62%, white);
+  background: white;
+  text-align: left;
+}
+
+.venue-agreement-dialog__header .venue-dialog-icon {
+  grid-row: 1 / span 2;
+  margin: 0;
+}
+
+.venue-agreement-dialog__header h2 {
+  align-self: end;
+  color: var(--venue-ink);
+  font-size: 1.1rem;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.venue-agreement-dialog__header p {
+  max-width: 42rem;
+  color: var(--venue-ink-soft);
+  font-size: 0.72rem;
+  line-height: 1.45;
+}
+
+.venue-management-dialog--agreement > button {
+  top: 0.8rem;
+  right: 0.85rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 1px solid transparent;
+  border-radius: 0.68rem;
+}
+
+.venue-management-dialog--agreement > button:hover {
+  border-color: color-mix(in oklab, var(--venue-border-strong) 62%, white);
+  background: var(--venue-surface-subtle);
+  color: var(--venue-ink);
+}
+
+.venue-management-dialog--agreement .venue-agreement-form {
+  display: block;
+  margin: 0;
+  padding: 0 1.35rem 1.45rem;
+  scroll-padding-block: 1rem 3rem;
+}
+
+.venue-agreement-form__section {
+  padding-block: 1.15rem;
+}
+
+.venue-agreement-form__section + .venue-agreement-form__section {
+  border-top: 1px solid color-mix(in oklab, var(--venue-border-strong) 52%, white);
+}
+
+.venue-agreement-form__section-heading {
+  display: grid;
+  gap: 0.2rem;
+  margin-bottom: 0.78rem;
+}
+
+.venue-agreement-form__section-heading h3 {
+  color: var(--venue-ink);
+  font-size: 0.86rem;
+  font-weight: 820;
+  letter-spacing: -0.012em;
+}
+
+.venue-agreement-form__section-heading p,
+.venue-agreement-event-types > p {
+  color: var(--venue-ink-soft);
+  font-size: 0.67rem;
+  line-height: 1.45;
+}
+
+.venue-agreement-form__grid {
+  gap: 0.72rem 0.8rem;
+}
+
+.venue-agreement-form__grid--three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.venue-agreement-form__full-row {
+  grid-column: 1 / -1;
+}
+
+.venue-management-dialog--agreement .venue-field {
+  gap: 0.32rem;
+}
+
+.venue-management-dialog--agreement .venue-field > label,
+.venue-management-dialog--agreement .venue-choice-group legend {
+  font-size: 0.68rem;
+  font-weight: 760;
+}
+
+.venue-management-dialog--agreement input,
+.venue-management-dialog--agreement textarea,
+.venue-management-dialog--agreement .venue-refined-select {
+  min-height: 46px;
+  border-color: color-mix(in oklab, var(--venue-border-strong) 94%, white);
+  border-radius: 0.68rem;
+  background: white;
+  font-size: 0.82rem;
+  text-transform: none;
+  transition:
+    border-color 160ms ease,
+    box-shadow 160ms ease,
+    background-color 160ms ease;
+}
+
+.venue-management-dialog--agreement textarea {
+  min-height: 6.7rem;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.venue-management-dialog--agreement input:hover,
+.venue-management-dialog--agreement textarea:hover,
+.venue-management-dialog--agreement .venue-refined-select:hover {
+  border-color: color-mix(in oklab, var(--venue-indigo) 32%, white);
+}
+
+.venue-management-dialog--agreement input:focus-visible,
+.venue-management-dialog--agreement textarea:focus-visible,
+.venue-management-dialog--agreement .venue-refined-select:focus-visible {
+  border-color: var(--venue-indigo);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--venue-indigo) 12%, transparent);
+}
+
+.venue-refined-select {
+  min-height: 46px;
+  border-radius: 0.68rem;
+  font-size: 0.82rem;
+  font-weight: 690;
+}
+
+.venue-refined-select > svg {
+  width: 1rem;
+  height: 1rem;
+  color: var(--venue-indigo);
+  opacity: 0.72;
+}
+
+.venue-refined-select__content {
+  z-index: 80;
+  border-color: color-mix(in oklab, var(--venue-border-strong) 92%, white);
+  border-radius: 0.75rem;
+  background: white;
+  box-shadow: 0 18px 46px -28px rgb(8 24 58 / 0.72);
+}
+
+.venue-refined-select__item {
+  min-height: 40px;
+  border-radius: 0.52rem;
+  font-size: 0.8rem;
+  line-height: 1.3;
+}
+
+.venue-refined-select__item:focus,
+.venue-refined-select__item[data-highlighted] {
+  background: color-mix(in oklab, var(--venue-indigo) 8%, white);
+  color: var(--venue-ink);
+}
+
+.venue-agreement-event-types legend {
+  width: 100%;
+  margin-bottom: 0.18rem;
+}
+
+.venue-agreement-event-types legend small {
+  color: var(--venue-indigo);
+  font-size: 0.6rem;
+  font-weight: 760;
+}
+
+.venue-agreement-event-types .venue-resource-picker {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.42rem;
+  margin-top: 0.72rem;
+}
+
+.venue-agreement-event-types .venue-resource-picker label {
+  min-height: 44px;
+  gap: 0.5rem;
+  padding: 0.48rem 0.58rem;
+  border-color: color-mix(in oklab, var(--venue-border-strong) 82%, white);
+  border-radius: 0.62rem;
+  background: white;
+  color: var(--venue-ink-soft);
+  font-size: 0.7rem;
+  font-weight: 680;
+  transition:
+    border-color 150ms ease,
+    color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.venue-agreement-event-types .venue-resource-picker label:hover {
+  border-color: color-mix(in oklab, var(--venue-indigo) 34%, white);
+  color: var(--venue-ink);
+}
+
+.venue-agreement-event-types .venue-resource-picker label:focus-within {
+  border-color: var(--venue-indigo);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--venue-indigo) 10%, transparent);
+}
+
+.venue-agreement-event-types .venue-resource-picker label[data-selected="true"] {
+  border-color: color-mix(in oklab, var(--venue-indigo) 54%, white);
+  background: white;
+  box-shadow: inset 3px 0 0 color-mix(in oklab, var(--venue-indigo) 70%, white);
+  color: var(--venue-indigo-deep);
+}
+
+.venue-agreement-event-types [role="checkbox"] {
+  width: 1.05rem;
+  height: 1.05rem;
+  border-color: color-mix(in oklab, var(--venue-ink-soft) 54%, white);
+  border-radius: 0.3rem;
+  color: white;
+}
+
+.venue-agreement-event-types [role="checkbox"][data-state="checked"] {
+  border-color: var(--venue-indigo);
+  background: var(--venue-indigo);
+}
+
+.venue-agreement-event-types [role="checkbox"] svg {
+  width: 0.82rem;
+  height: 0.82rem;
+}
+
+.venue-agreement-policy-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+  margin-top: 0.8rem;
+}
+
+.venue-management-dialog--agreement .venue-preliminary-toggle {
+  min-height: 5.1rem;
+  padding: 0.75rem 0.8rem;
+  border: 1px solid color-mix(in oklab, var(--venue-border-strong) 68%, white);
+  border-radius: 0.72rem;
+  background: var(--venue-surface-subtle);
+}
+
+.venue-management-dialog--agreement .venue-preliminary-toggle strong {
+  color: var(--venue-ink);
+  font-size: 0.72rem;
+}
+
+.venue-management-dialog--agreement .venue-preliminary-toggle p {
+  margin-top: 0.16rem;
+  color: var(--venue-ink-soft);
+  font-size: 0.62rem;
+  line-height: 1.4;
+}
+
+.venue-agreement-dialog__actions {
+  z-index: 2;
+  min-height: 66px;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.35rem max(0.7rem, env(safe-area-inset-bottom));
+  border-top: 1px solid color-mix(in oklab, var(--venue-border-strong) 68%, white);
+  background: white;
+  box-shadow: 0 -12px 30px -28px rgb(17 39 76 / 0.48);
+}
+
+.venue-agreement-dialog__actions button {
+  min-width: 7.4rem;
+  min-height: 42px;
+  border-radius: 0.68rem;
+  font-size: 0.78rem;
+  font-weight: 760;
+}
+
+@media (min-width: 641px) and (max-width: 1120px) {
+  .venue-agreement-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .venue-agreement-form__grid--three {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .venue-agreement-event-types .venue-resource-picker {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .venue-agreement-card--premium {
+    min-height: 0;
+    gap: 0.75rem;
+    padding: 0.9rem;
+    border-radius: 0.82rem;
+  }
+
+  .venue-agreement-card__sponsor strong {
+    font-size: 1rem;
+  }
+
+  .venue-agreement-card__contract-row {
+    gap: 0.55rem;
+  }
+
+  .venue-agreement-card--premium .venue-agreement-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.65rem 0;
+  }
+
+  .venue-agreement-card--premium .venue-agreement-metrics > span:nth-child(3) {
+    padding-left: 0;
+    border-left: 0;
+  }
+
+  .venue-agreement-card--premium .venue-agreement-metrics > span:nth-child(-n + 2) {
+    padding-bottom: 0.6rem;
+    border-bottom: 1px solid color-mix(in oklab, var(--venue-border-strong) 48%, white);
+  }
+
+  .venue-agreement-card__footer {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 0.22rem;
+  }
+
+  .venue-agreement-card__footer > span:last-child {
+    text-align: left;
+  }
+
+  .venue-management-dialog--agreement {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+  }
+
+  .venue-agreement-dialog__header {
+    padding:
+      max(0.8rem, env(safe-area-inset-top))
+      max(3.65rem, calc(3.1rem + env(safe-area-inset-right))) 0.72rem
+      max(0.9rem, env(safe-area-inset-left));
+  }
+
+  .venue-agreement-dialog__header .venue-dialog-icon {
+    width: 2.1rem;
+    height: 2.1rem;
+  }
+
+  .venue-agreement-dialog__header h2 {
+    font-size: 1rem;
+  }
+
+  .venue-agreement-dialog__header p {
+    display: none;
+  }
+
+  .venue-management-dialog--agreement .venue-agreement-form {
+    padding: 0 max(0.9rem, env(safe-area-inset-left)) 1.5rem;
+  }
+
+  .venue-agreement-form__section {
+    padding-block: 0.95rem;
+  }
+
+  .venue-agreement-form__grid,
+  .venue-agreement-form__grid--three {
+    grid-template-columns: 1fr;
+  }
+
+  .venue-agreement-event-types .venue-resource-picker {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .venue-agreement-policy-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .venue-agreement-dialog__actions {
+    flex-flow: row nowrap;
+    padding-right: max(0.9rem, env(safe-area-inset-right));
+    padding-left: max(0.9rem, env(safe-area-inset-left));
+  }
+
+  .venue-agreement-dialog__actions button {
+    min-width: 0;
+    flex: 1 1 0;
+  }
+}
+
+@media (max-width: 380px) {
+  .venue-agreement-card__identity {
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
+  .venue-agreement-card__status {
+    grid-column: 2;
+    justify-self: start;
+    margin-top: -0.35rem;
+  }
+
+  .venue-agreement-card__contract-row {
+    grid-template-columns: 1fr;
+  }
+
+  .venue-agreement-card__balance {
+    justify-items: start;
+    text-align: left;
+  }
+
+  .venue-agreement-card__balance strong {
+    justify-content: flex-start;
+  }
+
+  .venue-agreement-event-types .venue-resource-picker {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .venue-agreement-progress__segments {
+    animation: none !important;
+  }
+
+  .venue-agreement-card--premium {
+    transition: none !important;
+  }
+}

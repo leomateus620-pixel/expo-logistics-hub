@@ -11,6 +11,12 @@ const workspace = read(
 const form = read(
   "src/components/venue-events/VenueEventFormDialog.tsx",
 );
+const managementDialogs = read(
+  "src/components/venue-events/VenueManagementDialogs.tsx",
+);
+const agreementCard = read(
+  "src/components/venue-events/VenueAgreementCard.tsx",
+);
 const productionCss = read("src/styles/venue-events-production.css");
 const switcher = read("src/components/venue-events/VenueWorkspaceSwitcher.tsx");
 const app = read("src/App.tsx");
@@ -52,14 +58,48 @@ describe("contrato de apresentação de Eventos Restaurante e Arena", () => {
     expect(productionCss).toContain("overflow-y: auto;");
     expect(productionCss).toContain(".venue-supporting-team > div");
     expect(productionCss).toContain("max-height: none;");
+    expect(managementDialogs).toContain("venue-agreement-dialog__actions");
+    expect(managementDialogs).toContain("venue-dialog-scroll venue-agreement-form");
+  });
+
+  it("organiza a edição contratual sem etapas e preserva todos os grupos", () => {
+    expect(managementDialogs).toContain(">Identificação</h3>");
+    expect(managementDialogs).toContain(">Condições</h3>");
+    expect(managementDialogs).toContain(">Vigência</h3>");
+    expect(managementDialogs).toContain(">Tipos de evento permitidos</span>");
+    expect(managementDialogs).toContain(">Regras e governança</h3>");
+    expect(managementDialogs).toContain("venue-agreement-restrictions");
+    expect(managementDialogs).toContain("venue-agreement-notes");
+    expect(managementDialogs).toContain("venue-agreement-approver");
+    expect(managementDialogs).toContain("venue-agreement-requires-approval");
+    expect(managementDialogs).toContain("venue-agreement-no-show");
+    expect(managementDialogs).not.toContain("USO_ESPACO");
+  });
+
+  it("usa progresso segmentado acessível e estados de edição precisos", () => {
+    expect(agreementCard).toContain('role="progressbar"');
+    expect(agreementCard).toContain('data-segment="consumed"');
+    expect(agreementCard).toContain('data-segment="reserved"');
+    expect(agreementCard).toContain('data-segment="available"');
+    expect(agreementCard).toContain("aria-valuetext={progressDescription}");
+    expect(agreementCard).toContain('aria-haspopup="dialog"');
+    expect(agreementCard).toContain("aria-expanded={selected}");
+    expect(productionCss).toContain("@keyframes venue-agreement-progress-reveal");
+    expect(productionCss).toContain("venue-agreement-card--premium[data-selected");
   });
 
   it("torna o modal tela cheia em celulares e evita zoom dos campos", () => {
+    expect(productionCss).toMatch(
+      /@media \(min-width: 641px\) and \(max-width: 1120px\)[\s\S]*grid-template-columns: repeat\(2, minmax\(0, 1fr\)\);/,
+    );
     expect(productionCss).toMatch(/@media \(max-width: 640px\)[\s\S]*height: 100dvh !important;/);
     expect(productionCss).toMatch(/@media \(max-width: 640px\)[\s\S]*font-size: 16px;/);
     expect(productionCss).toContain("env(safe-area-inset-bottom)");
     expect(productionCss).toContain("env(safe-area-inset-left)");
     expect(productionCss).toContain("env(safe-area-inset-right)");
+    expect(productionCss).toMatch(
+      /@media \(max-width: 640px\)[\s\S]*\.venue-management-dialog--agreement[\s\S]*height: 100dvh !important;/,
+    );
   });
 
   it("expõe etapas, obrigatoriedade e foco de contexto para tecnologias assistivas", () => {
