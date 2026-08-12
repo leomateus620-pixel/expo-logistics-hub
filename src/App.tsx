@@ -32,7 +32,7 @@ import LoginPage from './pages/LoginPage';
 import {
   getCommissionModule,
 } from './modules/commissions/commissionRegistry';
-import { getCommissionMapPortal } from './modules/commissions/commissionMapPortalRegistry';
+import { COMMISSION_MAP_PORTALS, getCommissionMapPortal } from './modules/commissions/commissionMapPortalRegistry';
 
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const VehiclesPage = lazy(() => import('./pages/VehiclesPage'));
@@ -165,6 +165,15 @@ function RootRoute() {
 
   if (!hasFullAccess && hasCapability('map.view')) {
     return <Navigate to="/mapa-comercial" replace />;
+  }
+
+  // Restricted users whose only map access comes from a commission portal
+  // (e.g. Exporural president) land on that portal's scoped commercial map.
+  if (!hasFullAccess) {
+    const mapPortal = COMMISSION_MAP_PORTALS.find((portal) => hasCapability(portal.capability));
+    if (mapPortal) {
+      return <Navigate to={mapPortal.mapPath} replace />;
+    }
   }
 
   return (

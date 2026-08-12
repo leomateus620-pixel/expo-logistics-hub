@@ -69,7 +69,7 @@ const USERS: ProvisionUser[] = [
     role: "leitura",
     cargo: "Presidente — Comissão Exporural",
     is_core_team: true,
-    capabilities: ["cronograma_eventos_access", "map.view", "cronograma_scoped_access"],
+    capabilities: ["cronograma_eventos_access", "cronograma_eventos_write", "cronograma_scoped_access", "exporural_access"],
     deactivate_duplicates: ["GERMANO TESSMER BÜTTOW"],
   },
 ];
