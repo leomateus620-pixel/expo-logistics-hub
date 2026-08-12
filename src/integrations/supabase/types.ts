@@ -1777,6 +1777,7 @@ export type Database = {
           scopes_granted: string[]
           secondary_calendar_id: string | null
           status: string
+          sync_scope: string
           token_expires_at: string | null
           updated_at: string
           user_id: string
@@ -1806,6 +1807,7 @@ export type Database = {
           scopes_granted?: string[]
           secondary_calendar_id?: string | null
           status?: string
+          sync_scope?: string
           token_expires_at?: string | null
           updated_at?: string
           user_id: string
@@ -1835,6 +1837,7 @@ export type Database = {
           scopes_granted?: string[]
           secondary_calendar_id?: string | null
           status?: string
+          sync_scope?: string
           token_expires_at?: string | null
           updated_at?: string
           user_id?: string
@@ -1963,6 +1966,41 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "google_calendar_oauth_attempts_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      google_calendar_sync_preferences: {
+        Row: {
+          created_at: string
+          id: string
+          org_id: string
+          sync_scope: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          org_id: string
+          sync_scope?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          org_id?: string
+          sync_scope?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "google_calendar_sync_preferences_org_id_fkey"
             columns: ["org_id"]
             isOneToOne: false
             referencedRelation: "organizations"

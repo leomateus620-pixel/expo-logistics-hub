@@ -159,6 +159,11 @@ Deno.serve(async (req) => {
         .eq("user_id", user.id).eq("org_id", orgId)
         .maybeSingle();
 
+      const { data: syncPreference } = await db.from("google_calendar_sync_preferences")
+        .select("sync_scope")
+        .eq("user_id", user.id).eq("org_id", orgId)
+        .maybeSingle();
+
       const { error: attemptInsertError } = await db.from("google_calendar_oauth_attempts").insert({
         id: attemptId,
         user_id: user.id,
@@ -184,6 +189,7 @@ Deno.serve(async (req) => {
         active_oauth_attempt_id: attemptId,
         secondary_calendar_id: existing?.secondary_calendar_id ?? null,
         scopes_granted: [...GOOGLE_SCOPES],
+        sync_scope: syncPreference?.sync_scope === "mine" ? "mine" : "all",
       }, { onConflict: "user_id" });
       assertDb(startingError, "connection_start_update_failed");
 

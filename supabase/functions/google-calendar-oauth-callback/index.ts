@@ -146,9 +146,36 @@ async function prepareInitialBackfill(
   orgId: string,
   generation: string,
 ): Promise<number> {
-  const fullAccess = await hasFullAccess(db, userId, orgId);
+  const { data: connectionRow } = await db.from("google_calendar_connections")
+    .select("sync_scope")
+    .eq("user_id", userId).eq("org_id", orgId)
+    .maybeSingle();
+  const mineScope = connectionRow?.sync_scope === "mine";
+
+  const fullAccess = mineScope ? false : await hasFullAccess(db, userId, orgId);
   let candidateEventIds: string[] = [];
-  if (fullAccess) {
+  if (mineScope) {
+    const { data: createdRows, error: createdError } = await db.from("cronograma_eventos")
+      .select("id").eq("org_id", orgId).eq("created_by_user_id", userId).not("start_date", "is", null);
+    if (createdError) throw new Error("backfill_events_query_failed");
+
+    const { data: responsibleRows, error: responsibleError } = await db.from("cronograma_evento_responsaveis")
+      .select("event_id").eq("org_id", orgId).eq("org_member_user_id", userId).eq("responsible_type", "member");
+    if (responsibleError) throw new Error("backfill_events_query_failed");
+
+    const responsibleIds = [...new Set((responsibleRows ?? []).map((r: { event_id: string }) => r.event_id))];
+    let responsibleEventRows: { id: string }[] = [];
+    if (responsibleIds.length) {
+      const { data, error } = await db.from("cronograma_eventos")
+        .select("id").eq("org_id", orgId).not("start_date", "is", null).in("id", responsibleIds);
+      if (error) throw new Error("backfill_events_query_failed");
+      responsibleEventRows = (data ?? []) as { id: string }[];
+    }
+    candidateEventIds = [
+      ...((createdRows ?? []) as { id: string }[]).map((row) => row.id),
+      ...responsibleEventRows.map((row) => row.id),
+    ];
+  } else if (fullAccess) {
     const { data, error } = await db.from("cronograma_eventos")
       .select("id").eq("org_id", orgId).not("start_date", "is", null);
     if (error) throw new Error("backfill_events_query_failed");
@@ -195,7 +222,7 @@ async function prepareInitialBackfill(
       _initial_backfill: true,
     });
   }
-  diagnostic("backfill_queued", { user: shortUserId(userId), orgId, total: eventIds.length, access: fullAccess ? "full" : "commission" });
+  diagnostic("backfill_queued", { user: shortUserId(userId), orgId, total: eventIds.length, access: mineScope ? "mine" : fullAccess ? "full" : "commission" });
   return eventIds.length;
 }
 
