@@ -29,6 +29,7 @@ import {
 } from '../CronogramaBadges';
 import { formatLongDate, formatLongDateRange } from '../dateUtils';
 import { EventForm } from '../EventForm';
+import { splitEventResponsibles } from '../EventRelationFields';
 import type { CronogramaEvent, CronogramaHistoryEntry } from '../types';
 import { EventoAnexosSection } from '../EventoAnexosSection';
 import { MobileConfirmDialog } from './MobileConfirmDialog';
@@ -94,6 +95,10 @@ export function MobileEventScreen({
   }, [canManage, eventIdentity, open, startInEdit]);
 
   const progress = useMemo(() => (event ? getSubeventProgress(event) : null), [event]);
+  const { responsible: eventResponsible, guests: eventGuests } = useMemo(
+    () => (event ? splitEventResponsibles(event) : { responsible: null, guests: [] }),
+    [event],
+  );
   const overlayHistory = useMobileOverlayHistory({
     open: open && Boolean(event),
     dirty: (editMode && dirty) || saving,
