@@ -1,4 +1,5 @@
 export type ExecutiveCharacterId = 'fabiano-soltis' | 'djeison-drey';
+export const SEATED_EXECUTIVE_CLIP = 'SeatedIdle';
 
 export interface ExecutiveCharacterProfile {
   id: ExecutiveCharacterId;
@@ -6,12 +7,11 @@ export interface ExecutiveCharacterProfile {
   role: string;
   assetUrl: string;
   referenceImages: readonly string[];
-  heightMapUnits: number;
-  route: {
-    lateralOffset: number;
-    longitudinalOffset: number;
-    stridePhase: number;
-    speedVariation: number;
+  heightMeters: number;
+  seated: {
+    position: readonly [number, number, number];
+    rotationY: number;
+    idlePhase: number;
   };
   refinement: {
     definingFacialCharacteristics: readonly string[];
@@ -42,12 +42,11 @@ export const EXECUTIVE_CHARACTER_PROFILES: Readonly<Record<ExecutiveCharacterId,
     role: 'Presidente da Fenasoja',
     assetUrl: '/models/executives/fabiano-soltis.glb',
     referenceImages: ['referência 1 · centro', 'referência 2', 'referência 3 · confirmação facial'],
-    heightMapUnits: 0.505,
-    route: {
-      lateralOffset: -0.135,
-      longitudinalOffset: 0,
-      stridePhase: 0.08,
-      speedVariation: 0.985,
+    heightMeters: 1.78,
+    seated: {
+      position: [0.86, 0, -1.22],
+      rotationY: 0,
+      idlePhase: 0.08,
     },
     refinement: {
       definingFacialCharacteristics: [
@@ -72,8 +71,8 @@ export const EXECUTIVE_CHARACTER_PROFILES: Readonly<Record<ExecutiveCharacterId,
         'óculos leves de aro metálico/rimless exigidos pelo briefing, sem ocultar pálpebras ou sobrancelhas',
       ],
       animationConsiderations: [
-        'passada contida e segura, tronco estável e gestos de baixa amplitude',
-        'aceno curto com mão livre e transição suave para caminhada',
+        'postura sentada madura, tronco estável e respiração de baixa amplitude',
+        'mãos apoiadas naturalmente sem interseção com paletó, pernas ou sofá',
       ],
       currentVisualWeaknesses: [
         'as referências não incluem perfil ortográfico real nem medidas oficiais de altura',
@@ -95,12 +94,11 @@ export const EXECUTIVE_CHARACTER_PROFILES: Readonly<Record<ExecutiveCharacterId,
     role: 'Vice-presidente da Fenasoja',
     assetUrl: '/models/executives/djeison-drey.glb',
     referenceImages: ['referência 1 · direita', 'referência 4', 'referência 5'],
-    heightMapUnits: 0.54,
-    route: {
-      lateralOffset: 0.135,
-      longitudinalOffset: 0.045,
-      stridePhase: 0.43,
-      speedVariation: 1.015,
+    heightMeters: 1.84,
+    seated: {
+      position: [1.68, 0, -1.2],
+      rotationY: 0,
+      idlePhase: 0.43,
     },
     refinement: {
       definingFacialCharacteristics: [
@@ -125,8 +123,8 @@ export const EXECUTIVE_CHARACTER_PROFILES: Readonly<Record<ExecutiveCharacterId,
         'cuia de chimarrão escura na mão esquerda, bomba metálica e erva visível',
       ],
       animationConsiderations: [
-        'passada ligeiramente mais longa e fase diferente da caminhada de Fabiano',
-        'mão esquerda estabilizada para impedir clipping da cuia; aceno usa a mão direita',
+        'postura sentada ligeiramente mais alta e respiração fora de fase com Fabiano',
+        'mão esquerda estabilizada para impedir clipping da cuia com corpo e sofá',
       ],
       currentVisualWeaknesses: [
         'as referências usam lentes e perspectivas diferentes e não fornecem perfil ortográfico puro',

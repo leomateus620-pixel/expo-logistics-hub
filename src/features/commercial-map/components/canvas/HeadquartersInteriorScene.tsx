@@ -1,13 +1,23 @@
-import { memo, useCallback, useEffect, useMemo, useRef } from 'react';
+import { lazy, memo, Suspense, useCallback, useEffect, useMemo, useRef } from 'react';
 import { OrbitControls } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import type { MapEntity } from '../../types';
 import { strategicLandmarkBounds, strategicLandmarkFacingRadians } from '../../utils/landmarks';
+import {
+  HEADQUARTERS_EXECUTIVE_CAMERA,
+  HEADQUARTERS_SOFA_LAYOUT,
+  interiorSupportsSeatedExecutives,
+} from '../../utils/seatedExecutiveExperience';
 
 const NO_RAYCAST = () => undefined;
 const UP = new THREE.Vector3(0, 1, 0);
+
+const SeatedExecutiveCharacters = lazy(async () => {
+  const module = await import('./executives/SeatedExecutiveCharacters');
+  return { default: module.SeatedExecutiveCharacters };
+});
 
 function createPosterWallTexture(era: 'historical' | 'contemporary') {
   if (typeof document === 'undefined') return null;
@@ -211,26 +221,27 @@ function FenasojaInteriorIdentity() {
 }
 
 function LoungeFurniture() {
+  const [sofaX, sofaY, sofaZ] = HEADQUARTERS_SOFA_LAYOUT.center;
   return (
     <group raycast={NO_RAYCAST}>
-      <group position={[1.27, 0, -1.7]}>
-        <mesh position={[0, 0.34, 0]} castShadow>
-          <boxGeometry args={[2.25, 0.38, 0.78]} />
+      <group position={[sofaX, sofaY, sofaZ]}>
+        <mesh position={[0, 0.24, 0]} castShadow receiveShadow>
+          <boxGeometry args={[2.25, 0.3, 0.78]} />
           <meshStandardMaterial color="#eee9dd" roughness={0.92} />
         </mesh>
-        <mesh position={[0, 0.86, -0.29]} castShadow rotation={[-0.08, 0, 0]}>
-          <boxGeometry args={[2.2, 0.78, 0.22]} />
+        <mesh position={[0, 0.78, -0.29]} castShadow receiveShadow rotation={[-0.08, 0, 0]}>
+          <boxGeometry args={[2.2, 0.72, 0.22]} />
           <meshStandardMaterial color="#f6f1e7" roughness={0.94} />
         </mesh>
         {[-0.73, 0, 0.73].map((x) => (
-          <mesh key={x} position={[x, 0.57, 0.04]} castShadow>
-            <boxGeometry args={[0.68, 0.14, 0.68]} />
+          <mesh key={x} position={[x, 0.44, 0.04]} castShadow receiveShadow>
+            <boxGeometry args={[0.68, 0.1, 0.68]} />
             <meshStandardMaterial color={x === 0 ? '#e8e0d2' : '#f1eadf'} roughness={0.96} />
           </mesh>
         ))}
         {[-1.18, 1.18].map((x) => (
-          <mesh key={x} position={[x, 0.59, 0]} castShadow>
-            <boxGeometry args={[0.18, 0.68, 0.82]} />
+          <mesh key={x} position={[x, 0.48, 0]} castShadow receiveShadow>
+            <boxGeometry args={[0.18, 0.58, 0.82]} />
             <meshStandardMaterial color="#e7dfd2" roughness={0.95} />
           </mesh>
         ))}
@@ -316,7 +327,7 @@ function InteriorCameraRig({ entity }: { entity: MapEntity }) {
   const animating = useRef(true);
   const targetPosition = useRef(new THREE.Vector3());
   const targetLookAt = useRef(new THREE.Vector3());
-  const { camera, gl, invalidate } = useThree();
+  const { camera, gl, invalidate, size } = useThree();
   const bounds = useMemo(() => strategicLandmarkBounds(entity), [entity]);
   const facing = strategicLandmarkFacingRadians(entity);
   const center = useMemo(() => new THREE.Vector3(bounds.centerX, entity.geometry.elevation, bounds.centerZ), [bounds.centerX, bounds.centerZ, entity.geometry.elevation]);
@@ -325,13 +336,17 @@ function InteriorCameraRig({ entity }: { entity: MapEntity }) {
   ), [center, facing]);
 
   useEffect(() => {
-    const start = toWorld(0, 1.62, 7.1);
-    targetPosition.current.copy(toWorld(0.12, 1.56, 4.45));
-    targetLookAt.current.copy(toWorld(0, 1.35, -0.45));
+    const compactViewport = size.width <= 640;
+    const start = toWorld(1.25, compactViewport ? 1.56 : 1.48, compactViewport ? 4.25 : 3.82);
+    const cameraPosition = compactViewport
+      ? HEADQUARTERS_EXECUTIVE_CAMERA.compactPosition
+      : HEADQUARTERS_EXECUTIVE_CAMERA.desktopPosition;
+    targetPosition.current.copy(toWorld(cameraPosition[0], cameraPosition[1], cameraPosition[2]));
+    targetLookAt.current.copy(toWorld(...HEADQUARTERS_EXECUTIVE_CAMERA.target));
     camera.position.copy(start);
     camera.near = 0.045;
     camera.updateProjectionMatrix();
-    controls.current?.target.copy(toWorld(0, 1.35, 0.15));
+    controls.current?.target.copy(toWorld(...HEADQUARTERS_EXECUTIVE_CAMERA.target));
     controls.current?.update();
     animating.current = true;
     gl.domElement.style.cursor = 'grab';
@@ -339,7 +354,7 @@ function InteriorCameraRig({ entity }: { entity: MapEntity }) {
     return () => {
       gl.domElement.style.cursor = 'grab';
     };
-  }, [camera, gl, invalidate, toWorld]);
+  }, [camera, gl, invalidate, size.width, toWorld]);
 
   useFrame((_state, delta) => {
     if (!animating.current) return;
@@ -371,7 +386,7 @@ function InteriorCameraRig({ entity }: { entity: MapEntity }) {
       maxDistance={5.3}
       minPolarAngle={0.38}
       maxPolarAngle={Math.PI / 2.02}
-      target={toWorld(0, 1.35, -0.35).toArray()}
+      target={toWorld(...HEADQUARTERS_EXECUTIVE_CAMERA.target).toArray()}
       onStart={() => { animating.current = false; }}
       onChange={() => invalidate()}
     />
@@ -435,6 +450,20 @@ export const HeadquartersInteriorScene = memo(function HeadquartersInteriorScene
         <FenasojaInteriorIdentity />
         <ReceptionDesk />
         <LoungeFurniture />
+        {interiorSupportsSeatedExecutives(entity) && (
+          <>
+            <pointLight
+              position={[1.25, 2.15, -0.75]}
+              intensity={reducedGraphics ? 0.22 : 0.42}
+              distance={4.2}
+              decay={1.9}
+              color="#fff1d2"
+            />
+            <Suspense fallback={null}>
+              <SeatedExecutiveCharacters reducedGraphics={reducedGraphics} />
+            </Suspense>
+          </>
+        )}
         <InteriorPlant position={[-2.34, 0, 2.38]} scale={0.9} />
         <InteriorPlant position={[2.32, 0, -2.65]} scale={0.78} />
         <TrackLighting />

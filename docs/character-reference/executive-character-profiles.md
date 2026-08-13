@@ -14,11 +14,13 @@ describe visible traits rather than making claims about biometric identity.
 3. Clothing: fitted navy executive suit, separate jacket shell/front panels,
    lapels, white shirt/collar/cuffs, green tie, navy trousers, brown leather shoes.
 4. Accessories: thin silver rectangular glasses.
-5. Animation: contained 1 s walk cycle, subtle 4 s breathing idle, right-hand
-   3.2 s executive wave. No root translation.
-6. Addressed weaknesses: reduced eye size, added curved reference-face surface,
-   softened torso/waist volumes, modeled neck/collar transition, increased hair
-   clump density and reduced beard volume.
+5. Animation: 4 s sofa-compatible `SeatedIdle` with restrained breathing and
+   hands at rest. Compatibility clips `Idle`, `Walk`, and `Wave` remain in the
+   GLB but are not consumed by the Commercial Map. No root translation.
+6. Addressed weaknesses: removed duplicate portrait/procedural facial features,
+   replaced the bubble torso and segmented head with continuous anatomical
+   lofts, softened the face-texture edge, modeled knee/elbow tailoring covers,
+   and refined the swept hair and close beard silhouette.
 7. Remaining opportunity: a production facial scan and FACS blendshape session
    would exceed what can be recovered from two still images and one generated
    turnaround, especially at extreme close-up.
@@ -34,10 +36,12 @@ describe visible traits rather than making claims about biometric identity.
 4. Accessories: large rounded gold-metal glasses; realistic chimarrão assembly
    in the left hand, split into `Chimarrao_Cuia`, `Chimarrao_ErvaMate`, and
    `Chimarrao_Bomba` nodes.
-5. Animation: slightly longer stride than Fabiano; restrained left arm to keep
-   the cuia stable; independently phased idle; professional right-hand wave.
-6. Addressed weaknesses: broader organic torso, reduced eye scale, more compact
-   full beard, increased tousled hair clump density, curved reference-face layer,
+5. Animation: 4 s `SeatedIdle`, independently phased from Fabiano, with the
+   left arm restrained to preserve the natural cuia grip. Compatibility clips
+   `Idle`, `Walk`, and `Wave` remain in the GLB but are not consumed by the map.
+6. Addressed weaknesses: broader continuous torso, removed doubled eyes/lips,
+   replaced detached beard volumes with a curved lower-face shell, refined the
+   ginger hair silhouette, added joint tailoring covers, and preserved the
    modeled finger wrap around the cuia.
 7. Remaining opportunity: real-time cloth/hair simulation and high-resolution
    scan displacement are deliberately outside the map performance budget.
@@ -46,13 +50,29 @@ describe visible traits rather than making claims about biometric identity.
 
 - Units: meters, Y-up after glTF export, origin grounded between the feet.
 - Forward: local `+Z` in glTF/Three.js (exportado do `-Y` frontal do Blender).
-- Clips: `Idle` (4.0 s loop), `Walk` (1.0 s loop), `Wave` (3.2 s one-shot).
-- Root motion: zero; the route controller owns world translation and yaw.
+- Runtime clip: `SeatedIdle` (4.0 s loop). Compatibility-only clips retained in
+  each asset: `Idle` (4.0 s loop), `Walk` (1.0 s loop), and `Wave` (3.2 s
+  one-shot).
+- Root motion: zero; the B12 interior scene owns each seated root placement and
+  yaw.
+- Seated contract: each rig keeps its individual floor origin. At frame 30 the
+  Hips land near glTF `Y=0.50 m`, `Z=-0.43 m` (Fabiano) / `Z=-0.44 m`
+  (Djeison), with shoes contacting the original floor plane. The host scene
+  places each character root; the clip itself does not encode sofa position.
 - Modeling: deterministic procedural geometry, layered rigid-weight garments,
-  PBR materials, embedded 512 px curved reference-face texture.
+  PBR materials, embedded 512 px curved reference-face texture with corrected
+  full-face crop, orientation and exposure.
 - Export: Blender 4.5.10 LTS, followed by glTF-Transform 4.2.1 hierarchy
   flattening and unused-attribute pruning only. No mesh join, simplification,
   geometry compression, or texture recompression.
 - The pinned glTF-Transform validation command reports zero errors, warnings,
   infos, and hints for both final assets; reports are CI/build output rather
   than public runtime payload.
+
+The official photographs are the identity authority. The turnaround images are
+used for multi-angle modeling and the two `*-seated-reference.png` sheets are
+pose, garment-fold and silhouette guidance only. These assets remain lightweight
+procedural likenesses, not biometric scans; extreme facial close-ups still need
+photogrammetry/FACS capture for truly photographic fidelity. The delivered QA is
+therefore suitable for the map camera and a draft integration, not a claim of
+scan-grade or cinematic close-up realism.

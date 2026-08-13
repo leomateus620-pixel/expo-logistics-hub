@@ -47,7 +47,6 @@ import {
   type CommercialMapSegmentDefinition,
   type CommercialMapSegmentId,
 } from '../../data/commercialMapSegments';
-import { EXECUTIVE_WALKING_ROUTE } from '../../data/executiveRoute';
 
 const MiranteInteriorScene = lazy(async () => {
   const module = await import('./MiranteInteriorScene');
@@ -57,11 +56,6 @@ const MiranteInteriorScene = lazy(async () => {
 const CommercialPavilionInteriorScene = lazy(async () => {
   const module = await import('./CommercialPavilionInteriorScene');
   return { default: module.CommercialPavilionInteriorScene };
-});
-
-const ExecutiveCharacterExperience = lazy(async () => {
-  const module = await import('./executives/ExecutiveCharacterExperience');
-  return { default: module.ExecutiveCharacterExperience };
 });
 
 interface CommercialMapCanvasProps {
@@ -1259,7 +1253,6 @@ function CameraRig({
   const cameraSequence = useCommercialMapStore((state) => state.cameraSequence);
   const activePanel = useCommercialMapStore((state) => state.activePanel);
   const setCameraNavigating = useCommercialMapStore((state) => state.setCameraNavigating);
-  const executiveFocusActive = useCommercialMapStore((state) => state.executiveFocusActive);
   const targetPosition = useRef(new THREE.Vector3());
   const targetLookAt = useRef(new THREE.Vector3(extent.centerX, 0, extent.centerZ));
   const animating = useRef(true);
@@ -1274,12 +1267,6 @@ function CameraRig({
   const previousSequence = useRef(cameraSequence);
   const previousSelection = useRef<string | null>(selectedEntity?.id ?? null);
   const previousSegment = useRef(activeSegment?.id ?? null);
-  const previousExecutiveFocus = useRef(executiveFocusActive);
-  const executiveManualView = useRef(false);
-  const executiveFrameLookAt = useRef(new THREE.Vector3());
-  const executiveFramePosition = useRef(new THREE.Vector3());
-  const executiveFrameDirection = useRef(new THREE.Vector3());
-  const executiveFollowDelta = useRef(new THREE.Vector3());
   const returnView = useRef(useCommercialMapStore.getState().interiorReturnView);
   const previousViewportSize = useRef({ width: size.width, height: size.height });
   const [reducedMotion, setReducedMotion] = useState(() => (
@@ -1479,36 +1466,6 @@ function CameraRig({
     startCameraMove();
   }, [camera, extent.diagonal, preset, queuePreset, size.height, size.width, startCameraMove]);
 
-  const queueExecutiveFocus = useCallback(() => {
-    const executiveState = useCommercialMapStore.getState();
-    const executiveTarget = executiveState.executiveTarget;
-    const target = executiveTarget ?? EXECUTIVE_WALKING_ROUTE.waypoints[0];
-
-    const perspective = camera as THREE.PerspectiveCamera;
-    const lookAt = new THREE.Vector3(...target);
-    if (!executiveTarget) lookAt.y += 0.29;
-    const currentTarget = controlsRef.current?.target ?? targetLookAt.current;
-    const publishedOffset = executiveState.executiveCameraOffset;
-    const validPublishedOffset = publishedOffset?.every(Number.isFinite)
-      && new THREE.Vector3(...publishedOffset).lengthSq() >= 0.01;
-    const direction = validPublishedOffset
-      ? new THREE.Vector3(...publishedOffset)
-      : camera.position.clone().sub(currentTarget);
-    if (direction.lengthSq() < 0.01) direction.set(0.72, 0.44, 0.82);
-    direction.normalize();
-    direction.y = THREE.MathUtils.clamp(direction.y, 0.24, 0.56);
-    direction.normalize();
-    const distance = size.width <= 640 ? 1.18 : 1.42;
-
-    targetLookAt.current.copy(lookAt);
-    targetPosition.current.copy(lookAt).add(direction.multiplyScalar(distance));
-    perspective.fov = size.width <= 640 ? 37 : 34;
-    perspective.near = 0.01;
-    perspective.far = Math.max(720, extent.diagonal * 9);
-    perspective.updateProjectionMatrix();
-    startCameraMove();
-  }, [camera, extent.diagonal, size.width, startCameraMove]);
-
   useEffect(() => {
     const selectedId = selectedEntity?.id ?? null;
     const selectionChanged = selectedId !== previousSelection.current;
@@ -1516,8 +1473,6 @@ function CameraRig({
     const segmentChanged = segmentId !== previousSegment.current;
     const presetChanged = preset !== previousPreset.current;
     const sequenceChanged = cameraSequence !== previousSequence.current;
-    const executiveFocusChanged = executiveFocusActive !== previousExecutiveFocus.current;
-    if (executiveFocusChanged) executiveManualView.current = false;
 
     if (!initialized.current) {
       if (returnView.current) {
@@ -1539,16 +1494,6 @@ function CameraRig({
       else if (activeSegment) queueSegment(activeSegment, activeSegmentEntities);
       else queuePreset(preset);
       initialized.current = true;
-    } else if (executiveFocusActive && executiveFocusChanged) {
-      queueExecutiveFocus();
-    } else if (!executiveFocusActive && executiveFocusChanged) {
-      // A local asset failure disables follow without scheduling an overview
-      // transition. Stop any in-flight portrait move and leave the map camera
-      // at its last valid pose so the rest of the scene remains interactive.
-      animating.current = false;
-    } else if (executiveFocusActive) {
-      // Route motion is followed imperatively in useFrame; map selection and
-      // overview sequences must not pull the camera away while follow is active.
     } else if (presetChanged) {
       if (activeSegment) queueSegment(activeSegment, activeSegmentEntities);
       else queuePreset(preset);
@@ -1571,18 +1516,15 @@ function CameraRig({
     previousPreset.current = preset;
     previousSequence.current = cameraSequence;
     previousSegment.current = segmentId;
-    previousExecutiveFocus.current = executiveFocusActive;
   }, [
     activeSegment,
     activeSegmentEntities,
     camera,
     cameraSequence,
     extent.diagonal,
-    executiveFocusActive,
     invalidate,
     preset,
     queuePreset,
-    queueExecutiveFocus,
     queueSegment,
     queueSelection,
     selectedEntity,
@@ -1597,8 +1539,7 @@ function CameraRig({
     if (!resized || !initialized.current) return undefined;
 
     const frame = window.requestAnimationFrame(() => {
-      if (executiveFocusActive && !executiveManualView.current) queueExecutiveFocus();
-      else if (selectedEntity) queueSelection(selectedEntity);
+      if (selectedEntity) queueSelection(selectedEntity);
       else if (activeSegment) queueSegment(activeSegment, activeSegmentEntities);
       else queuePreset(preset);
     });
@@ -1607,10 +1548,8 @@ function CameraRig({
   }, [
     activeSegment,
     activeSegmentEntities,
-    executiveFocusActive,
     preset,
     queuePreset,
-    queueExecutiveFocus,
     queueSegment,
     queueSelection,
     selectedEntity,
@@ -1654,13 +1593,12 @@ function CameraRig({
       const targetDelta = controls.target.distanceTo(navigation.current.startTarget);
       if (isCameraNavigationMovement(cameraDelta, targetDelta)) {
         navigation.current.navigating = true;
-        if (executiveFocusActive) executiveManualView.current = true;
         setCameraNavigating(true);
         gl.domElement.style.cursor = 'grabbing';
       }
     }
     invalidate();
-  }, [camera, clampTarget, executiveFocusActive, gl, invalidate, setCameraNavigating]);
+  }, [camera, clampTarget, gl, invalidate, setCameraNavigating]);
 
   const handleControlsEnd = useCallback(() => {
     const wasNavigating = navigation.current.navigating;
@@ -1687,51 +1625,6 @@ function CameraRig({
   }, [camera, gl, setCameraNavigating]);
 
   useFrame((_state, delta) => {
-    if (executiveFocusActive) {
-      const executiveState = useCommercialMapStore.getState();
-      const target = executiveState.executiveTarget;
-      if (target) {
-        const nextLookAt = executiveFrameLookAt.current.set(...target);
-        const publishedOffset = executiveState.executiveCameraOffset;
-        const hasPublishedOffset = Boolean(
-          publishedOffset?.every(Number.isFinite)
-          && executiveFrameDirection.current.set(...publishedOffset).lengthSq() >= 0.01,
-        );
-        const automaticRouteView = !executiveManualView.current
-          && !navigation.current.active
-          && hasPublishedOffset;
-        const followDistance = size.width <= 640 ? 1.18 : 1.42;
-
-        if (automaticRouteView) {
-          executiveFrameDirection.current.normalize();
-          executiveFramePosition.current
-            .copy(nextLookAt)
-            .addScaledVector(executiveFrameDirection.current, followDistance);
-          targetLookAt.current.copy(nextLookAt);
-          targetPosition.current.copy(executiveFramePosition.current);
-        } else {
-          executiveFollowDelta.current.copy(nextLookAt).sub(targetLookAt.current);
-          targetLookAt.current.copy(nextLookAt);
-          targetPosition.current.add(executiveFollowDelta.current);
-        }
-
-        if (!animating.current && controlsRef.current) {
-          if (automaticRouteView) {
-            const followFactor = reducedMotion ? 1 : 1 - Math.exp(-delta * 6.8);
-            camera.position.lerp(executiveFramePosition.current, followFactor);
-            controlsRef.current.target.lerp(nextLookAt, followFactor);
-          } else {
-            // After manual orbit/zoom, translate the user's chosen view with
-            // the pair instead of reapplying the authored route orientation.
-            executiveFollowDelta.current.copy(nextLookAt).sub(controlsRef.current.target);
-            camera.position.add(executiveFollowDelta.current);
-            controlsRef.current.target.copy(nextLookAt);
-          }
-          controlsRef.current.update();
-        }
-      }
-    }
-
     if (animating.current) {
       const factor = 1 - Math.exp(-delta * 5.4);
       camera.position.lerp(targetPosition.current, factor);
@@ -1758,18 +1651,14 @@ function CameraRig({
   const segmentExtent = activeSegment && activeSegmentEntities.length > 0
     ? getSceneExtent(activeSegmentEntities)
     : null;
-  const miranteMinimumDistance = executiveFocusActive
-    ? 0.55
-    : miranteExtent
+  const miranteMinimumDistance = miranteExtent
     ? Math.max(7.5, miranteExtent.diagonal * 0.8)
     : segmentExtent && activeSegment
       ? Math.max(6.5, segmentExtent.diagonal * activeSegment.camera.minDistanceRatio)
     : isolatedArea
       ? Math.max(6.5, extent.diagonal * 0.12)
       : Math.max(8, extent.diagonal * 0.055);
-  const miranteMaximumDistance = executiveFocusActive
-    ? 3.6
-    : miranteExtent
+  const miranteMaximumDistance = miranteExtent
     ? Math.max(30, miranteExtent.diagonal * 4)
     : segmentExtent && activeSegment
       ? Math.max(96, segmentExtent.diagonal * activeSegment.camera.maxDistanceRatio)
@@ -1784,13 +1673,13 @@ function CameraRig({
       regress
       enableDamping={!reducedMotion}
       dampingFactor={0.072}
-      enablePan={!miranteSelected && !executiveFocusActive}
+      enablePan={!miranteSelected}
       minDistance={miranteMinimumDistance}
       maxDistance={miranteMaximumDistance}
       minPolarAngle={0.025}
       maxPolarAngle={Math.PI / 2.08}
       screenSpacePanning
-      zoomToCursor={!miranteSelected && !executiveFocusActive}
+      zoomToCursor={!miranteSelected}
       minAzimuthAngle={miranteSelected ? -2.65 : -Infinity}
       maxAzimuthAngle={miranteSelected ? -0.9 : Infinity}
       onStart={handleControlsStart}
@@ -1915,7 +1804,10 @@ function Scene({
     if (interiorKind === 'mirante-pavilion') {
       return <MiranteInteriorScene entity={interiorEntity} reducedGraphics={reducedGraphics} />;
     }
-    return <HeadquartersInteriorScene entity={interiorEntity} reducedGraphics={reducedGraphics} />;
+    if (interiorKind === 'fenasoja-headquarters') {
+      return <HeadquartersInteriorScene entity={interiorEntity} reducedGraphics={reducedGraphics} />;
+    }
+    return null;
   }
 
   return (
@@ -1963,12 +1855,6 @@ function Scene({
         layerOpacity={layerOpacity}
         reducedGraphics={reducedGraphics}
       />
-      <Suspense fallback={null}>
-        <ExecutiveCharacterExperience
-          isolatedArea={isolatedArea}
-          reducedGraphics={reducedGraphics}
-        />
-      </Suspense>
       <BatchedLots
         entries={lotEntries}
         selectedEntityId={selectedEntityId}
@@ -2061,7 +1947,6 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
   } = props;
   const setSelectedEntityId = useCommercialMapStore((state) => state.setSelectedEntityId);
   const interiorEntityId = useCommercialMapStore((state) => state.interiorEntityId);
-  const executiveFocusActive = useCommercialMapStore((state) => state.executiveFocusActive);
   const reducedGraphics = useCommercialMapStore((state) => state.reducedGraphics);
   const extent = useMemo(() => getSceneExtent(entities), [entities]);
   const viewportWidth = typeof window === 'undefined' ? 1366 : window.innerWidth;
@@ -2096,9 +1981,9 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
           gl.toneMappingExposure = 0.96;
           gl.shadowMap.type = THREE.PCFSoftShadowMap;
           gl.domElement.style.cursor = 'grab';
-        }}
+      }}
       onPointerMissed={() => {
-        if (!interiorEntityId && !executiveFocusActive) setSelectedEntityId(null);
+        if (!interiorEntityId) setSelectedEntityId(null);
       }}
     >
       <Suspense fallback={<CanvasLoader />}>

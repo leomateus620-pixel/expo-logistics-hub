@@ -18,32 +18,37 @@
     "Wave": {
       "duration_seconds": 3.2,
       "loop": false
+    },
+    "SeatedIdle": {
+      "duration_seconds": 4.0,
+      "loop": true
     }
   },
   "characters": [
     {
       "file": "djeison-drey.glb",
-      "bytes": 1496148,
-      "sha256": "9cae3f853e9be22cc7f163fce5751d75ecf9eb84c5c9241dde3afaf829dcc5d1",
-      "nodes": 43,
-      "meshes": 25,
-      "materials": 22,
+      "bytes": 1497872,
+      "sha256": "afbfed4bd3dc82d9458d53cafc2cbccf9cec054206a7584737385fb143567d25",
+      "nodes": 40,
+      "meshes": 22,
+      "materials": 16,
       "skins": 1,
       "animations": [
         "Idle",
         "Walk",
-        "Wave"
+        "Wave",
+        "SeatedIdle"
       ],
       "root_translation_range": 0.0,
       "accessor_bounds": {
         "min": [
-          -0.36997008323669434,
+          -0.3724900186061859,
           0.015333333052694798,
-          -0.1369999498128891
+          -0.13697195053100586
         ],
         "max": [
-          0.36595427989959717,
-          1.8478206396102905,
+          0.3724900186061859,
+          1.8398528099060059,
           0.39311113953590393
         ]
       },
@@ -54,32 +59,64 @@
         "hair": "cabelo ruivo-claro curto, texturizado e levemente despenteado",
         "accessories": "óculos grandes arredondados em metal dourado e chimarrão na mão esquerda",
         "clothing": "terno cinza de alfaiataria, camisa branca, gravata verde e sapatos conhaque",
-        "animation": "passada ligeiramente mais longa, braço esquerdo estável no chimarrão e aceno direito dessíncrono"
+        "animation": "postura sentada cordial, respiração fora de fase e braço esquerdo estável no chimarrão"
+      },
+      "seated_pose": {
+        "frame": 30,
+        "root_translation_m": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "hip_authoring_xyz_m": [
+          0.0,
+          0.4447,
+          0.5135
+        ],
+        "seat_height_m": 0.5135,
+        "hip_back_offset_m": 0.4447,
+        "shoe_vertical_bounds_m": [
+          0.0022,
+          0.1215
+        ],
+        "deformed_aabb_gltf_m": {
+          "min": [
+            -0.3647,
+            0.0022,
+            -0.5805
+          ],
+          "max": [
+            0.371,
+            1.3746,
+            0.2454
+          ]
+        }
       }
     },
     {
       "file": "fabiano-soltis.glb",
-      "bytes": 1276476,
-      "sha256": "3e939e6b2543f108e40611bacd39b10d9509dc34a9e960428d11095332e5b4f9",
-      "nodes": 40,
-      "meshes": 22,
-      "materials": 18,
+      "bytes": 1316816,
+      "sha256": "48cd8072f32f808d2d94d40fa4fb7049a6996c24b3fb182170b84635ac326ab2",
+      "nodes": 37,
+      "meshes": 19,
+      "materials": 12,
       "skins": 1,
       "animations": [
         "Idle",
         "Walk",
-        "Wave"
+        "Wave",
+        "SeatedIdle"
       ],
       "root_translation_range": 0.0,
       "accessor_bounds": {
         "min": [
-          -0.3419618010520935,
+          -0.3440883755683899,
           0.014833332970738411,
           -0.136954203248024
         ],
         "max": [
-          0.3419618010520935,
-          1.7864060401916504,
+          0.3440883755683899,
+          1.7797726392745972,
           0.22002777457237244
         ]
       },
@@ -90,13 +127,45 @@
         "hair": "cabelo castanho-escuro curto, volumoso no topo e penteado lateralmente",
         "accessories": "óculos executivos finos prateados",
         "clothing": "terno azul-marinho ajustado, camisa branca, gravata verde e sapatos marrons",
-        "animation": "passada mais contida, postura madura e aceno curto com a mão direita"
+        "animation": "postura sentada madura, respiração discreta e mãos em repouso sem atravessar o sofá"
+      },
+      "seated_pose": {
+        "frame": 30,
+        "root_translation_m": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "hip_authoring_xyz_m": [
+          0.0,
+          0.4302,
+          0.4969
+        ],
+        "seat_height_m": 0.4969,
+        "hip_back_offset_m": 0.4302,
+        "shoe_vertical_bounds_m": [
+          0.0022,
+          0.1175
+        ],
+        "deformed_aabb_gltf_m": {
+          "min": [
+            -0.3364,
+            0.0022,
+            -0.5659
+          ],
+          "max": [
+            0.3365,
+            1.3299,
+            0.2375
+          ]
+        }
       }
     }
   ],
   "limitations": [
     "Procedural likeness is identity-specific but is not a photogrammetry or FACS facial scan.",
     "Garments are layered rigid-weight meshes with modeled thickness and tailoring; real-time cloth simulation is intentionally omitted.",
-    "Hair and beard use lightweight geometric clumps rather than strand-hair simulation."
+    "Hair and beard use lightweight geometric clumps rather than strand-hair simulation.",
+    "Visual QA is calibrated for the Commercial Map camera; the assets are not scan-grade cinematic close-up humans."
   ]
 }
