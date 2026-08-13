@@ -2678,3 +2678,246 @@
     transition: none !important;
   }
 }
+
+/* ===============================================================
+   Novo evento — formulário único em rolagem (Restaurante e Arena)
+   =============================================================== */
+
+.venue-form-nav {
+  display: flex;
+  gap: 0.3rem;
+  align-items: center;
+  overflow-x: auto;
+  padding: 0.5rem 1.35rem;
+  border-bottom: 1px solid var(--venue-border-strong);
+  background: var(--venue-surface-subtle);
+  scrollbar-width: none;
+}
+
+.venue-form-nav::-webkit-scrollbar {
+  display: none;
+}
+
+.venue-form-nav button {
+  flex: 0 0 auto;
+  min-height: 30px;
+  padding: 0.28rem 0.7rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  color: var(--venue-ink-soft);
+  font-size: 0.68rem;
+  font-weight: 720;
+  letter-spacing: 0.01em;
+  transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
+}
+
+.venue-form-nav button:hover {
+  color: var(--venue-ink);
+  background: color-mix(in oklab, var(--venue-indigo) 7%, white);
+}
+
+.venue-form-nav button[data-active="true"] {
+  border-color: color-mix(in oklab, var(--venue-indigo) 26%, white);
+  background: color-mix(in oklab, var(--venue-indigo) 13%, white);
+  color: var(--venue-indigo);
+}
+
+.venue-event-form__body.is-flow {
+  display: grid;
+  gap: 1.5rem;
+  padding: 1.15rem 1.35rem 2rem;
+  scroll-behavior: smooth;
+}
+
+.venue-event-form__body.is-flow .venue-form-section {
+  gap: 0.85rem;
+  padding-bottom: 1.35rem;
+  border-bottom: 1px solid color-mix(in oklab, var(--venue-border-strong) 55%, white);
+  animation: none;
+  scroll-margin-top: 0.75rem;
+}
+
+.venue-event-form__body.is-flow .venue-form-section:last-child {
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
+.venue-event-form__body.is-flow .venue-form-section__intro {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0;
+  border: 0;
+}
+
+.venue-event-form__body.is-flow .venue-form-section__intro h3 {
+  font-size: 0.95rem;
+  font-weight: 840;
+  letter-spacing: -0.01em;
+  text-transform: none;
+}
+
+.venue-context-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.22rem 0.6rem;
+  border: 1px solid color-mix(in oklab, var(--venue-indigo) 22%, white);
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--venue-indigo) 9%, white);
+  color: var(--venue-indigo);
+  font-size: 0.6rem;
+  font-weight: 780;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.venue-event-form__body.is-flow .venue-form-grid {
+  gap: 0.75rem 0.9rem;
+}
+
+.venue-event-form__body.is-flow .venue-field.is-full {
+  grid-column: 1 / -1;
+}
+
+.venue-event-form__body.is-flow .venue-field > label {
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: -0.005em;
+}
+
+.venue-event-form__body.is-flow input,
+.venue-event-form__body.is-flow textarea,
+.venue-event-form__body.is-flow [role="combobox"] {
+  border-radius: 0.62rem;
+  font-size: 0.82rem;
+}
+
+.venue-event-form__body.is-flow input:not([type="checkbox"]),
+.venue-event-form__body.is-flow [role="combobox"] {
+  min-height: 42px;
+}
+
+.venue-event-form__body.is-flow input:focus-visible,
+.venue-event-form__body.is-flow textarea:focus-visible,
+.venue-event-form__body.is-flow [role="combobox"]:focus-visible {
+  border-color: color-mix(in oklab, var(--venue-indigo) 55%, white) !important;
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--venue-indigo) 16%, transparent) !important;
+  outline: none !important;
+}
+
+.venue-identity-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.venue-identity-card {
+  display: grid;
+  gap: 0.2rem;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--venue-border-strong);
+  border-radius: 0.75rem;
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklab, var(--venue-indigo) 5%, white),
+    white
+  );
+}
+
+.venue-identity-card > span {
+  color: var(--venue-ink-soft);
+  font-size: 0.54rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.venue-identity-card > strong {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--venue-ink);
+  font-size: 0.85rem;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.venue-identity-card > strong svg {
+  width: 0.95rem;
+  height: 0.95rem;
+  color: var(--venue-indigo);
+}
+
+.venue-identity-card > small {
+  color: var(--venue-ink-soft);
+  font-size: 0.6rem;
+}
+
+.venue-event-form__body.is-flow .venue-review-grid article.is-full {
+  grid-column: 1 / -1;
+}
+
+.venue-event-form__body.is-flow .venue-review-grid article {
+  border-color: var(--venue-border-strong);
+  background: var(--venue-surface-subtle);
+}
+
+.venue-event-form__footer.is-flow .venue-form-progress-copy {
+  display: grid;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.venue-event-form__footer.is-flow .venue-form-progress-copy span {
+  color: var(--venue-ink);
+  font-size: 0.68rem;
+  font-weight: 800;
+}
+
+.venue-event-form__footer.is-flow .venue-form-progress-copy small {
+  overflow: hidden;
+  color: var(--venue-ink-soft);
+  font-size: 0.6rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 860px) {
+  .venue-event-form__body.is-flow {
+    gap: 1.1rem;
+    padding: 0.9rem 0.95rem 1.6rem;
+  }
+
+  .venue-event-form__body.is-flow .venue-form-grid,
+  .venue-identity-grid,
+  .venue-event-form__body.is-flow .venue-review-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .venue-event-form__body.is-flow .venue-form-section {
+    gap: 0.7rem;
+    padding-bottom: 1rem;
+  }
+
+  .venue-event-form__body.is-flow .venue-form-section__intro {
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .venue-form-nav {
+    padding: 0.45rem 0.95rem;
+  }
+
+  .venue-event-form__body.is-flow input:not([type="checkbox"]),
+  .venue-event-form__body.is-flow [role="combobox"] {
+    min-height: 46px;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .venue-event-form__footer.is-flow .venue-form-progress-copy {
+    display: none;
+  }
+}
