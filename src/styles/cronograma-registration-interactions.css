@@ -1297,3 +1297,12 @@
     border-color: oklch(var(--brand-navy-900) / 0.62) !important;
   }
 }
+
+/* Convidados: vínculos secundários ficam visualmente subordinados ao responsável */
+.cronograma-relation-selected__item[data-role='guest'] .cronograma-relation-selected__copy small {
+  color: oklch(var(--muted-foreground));
+}
+.cronograma-relation-selected__item[data-role='guest'] .cronograma-relation-selected__identity {
+  background: oklch(var(--neutral-50));
+  color: oklch(var(--muted-foreground));
+}
