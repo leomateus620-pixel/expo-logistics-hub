@@ -11,6 +11,7 @@ import {
   SearchX,
   Sparkles,
   UserRound,
+  UsersRound,
 } from 'lucide-react';
 import {
   getHarvestEventKey,
@@ -541,10 +542,16 @@ function MobileTimelineEventCard({
         </span>
 
         <span className="cronograma-mobile-event-metadata">
-          {(event.owner || event.commission) && (
+          {(responsible || event.owner || event.commission) && (
             <span>
-              {event.owner ? <UserRound aria-hidden="true" /> : <Layers3 aria-hidden="true" />}
-              <span>{event.owner || event.commission}</span>
+              {(responsible || event.owner) ? <UserRound aria-hidden="true" /> : <Layers3 aria-hidden="true" />}
+              <span>{responsible?.label ?? event.owner ?? event.commission}</span>
+            </span>
+          )}
+          {guests.length > 0 && (
+            <span>
+              <UsersRound aria-hidden="true" />
+              <span>{guests.length === 1 ? guests[0].label : `${guests.length} convidados`}</span>
             </span>
           )}
           {event.location && (
