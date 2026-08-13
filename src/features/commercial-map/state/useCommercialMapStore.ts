@@ -10,7 +10,6 @@ import type {
   VerificationStatus,
 } from '../types';
 import type { CommercialMapSegmentId } from '../data/commercialMapSegments';
-import type { ExecutiveInteractionPhase } from '../utils/executiveInteraction';
 
 export interface CommercialMapCameraView {
   position: [number, number, number];
@@ -43,12 +42,6 @@ interface CommercialMapState {
   technicalValidationVisible: boolean;
   reducedGraphics: boolean;
   cameraNavigating: boolean;
-  executiveFocusActive: boolean;
-  executiveTarget: [number, number, number] | null;
-  executiveCameraOffset: [number, number, number] | null;
-  executiveInteractionPhase: ExecutiveInteractionPhase;
-  executiveInteractionEnabled: boolean;
-  executiveExperienceAvailable: boolean;
   activateScope: (scopeKey: string, segmentId: CommercialMapSegmentId | null) => void;
   setSelectedEntityId: (id: string | null) => void;
   enterInterior: (id: string) => void;
@@ -80,12 +73,6 @@ interface CommercialMapState {
   setTechnicalValidationVisible: (visible: boolean) => void;
   setReducedGraphics: (reduced: boolean) => void;
   setCameraNavigating: (navigating: boolean) => void;
-  setExecutiveFocusActive: (active: boolean) => void;
-  setExecutiveTarget: (target: [number, number, number] | null) => void;
-  setExecutiveCameraOffset: (offset: [number, number, number] | null) => void;
-  setExecutiveInteractionPhase: (phase: ExecutiveInteractionPhase) => void;
-  setExecutiveInteractionEnabled: (enabled: boolean) => void;
-  setExecutiveExperienceAvailable: (available: boolean) => void;
 }
 
 export const useCommercialMapStore = create<CommercialMapState>((set) => ({
@@ -114,12 +101,6 @@ export const useCommercialMapStore = create<CommercialMapState>((set) => ({
   technicalValidationVisible: false,
   reducedGraphics: false,
   cameraNavigating: false,
-  executiveFocusActive: false,
-  executiveTarget: null,
-  executiveCameraOffset: null,
-  executiveInteractionPhase: 'walking',
-  executiveInteractionEnabled: false,
-  executiveExperienceAvailable: true,
   activateScope: (activeScopeKey, activeSegmentId) => set((state) => {
     if (state.activeScopeKey === activeScopeKey && state.activeSegmentId === activeSegmentId) return state;
     return {
@@ -143,12 +124,6 @@ export const useCommercialMapStore = create<CommercialMapState>((set) => ({
       cameraSequence: state.cameraSequence + 1,
       technicalValidationVisible: false,
       cameraNavigating: false,
-      executiveFocusActive: false,
-      executiveTarget: null,
-      executiveCameraOffset: null,
-      executiveInteractionPhase: 'walking',
-      executiveInteractionEnabled: false,
-      executiveExperienceAvailable: true,
     };
   }),
   setSelectedEntityId: (selectedEntityId) => set((state) => ({
@@ -156,7 +131,6 @@ export const useCommercialMapStore = create<CommercialMapState>((set) => ({
     interiorEntityId: state.interiorEntityId === selectedEntityId ? state.interiorEntityId : null,
     interiorReturnView: state.interiorEntityId === selectedEntityId ? state.interiorReturnView : null,
     activePanel: selectedEntityId ? 'details' : null,
-    executiveFocusActive: false,
   })),
   enterInterior: (selectedEntityId) => set((state) => ({
     selectedEntityId,
@@ -166,7 +140,6 @@ export const useCommercialMapStore = create<CommercialMapState>((set) => ({
     activePanel: null,
     workspaceMode: '3d',
     cameraNavigating: false,
-    executiveFocusActive: false,
     cameraSequence: state.cameraSequence + 1,
   })),
   exitInterior: () => set((state) => ({
@@ -174,7 +147,6 @@ export const useCommercialMapStore = create<CommercialMapState>((set) => ({
     activePanel: state.selectedEntityId ? 'details' : null,
     workspaceMode: '3d',
     cameraNavigating: false,
-    executiveFocusActive: false,
     cameraSequence: state.cameraSequence + 1,
   })),
   setInteriorReturnView: (interiorReturnView) => set({ interiorReturnView }),
@@ -216,7 +188,6 @@ export const useCommercialMapStore = create<CommercialMapState>((set) => ({
     activePanel: 'details',
     workspaceMode: '3d',
     cameraSequence: state.cameraSequence + 1,
-    executiveFocusActive: false,
   })),
   setLayerVisibility: (layerId, visible) => set((state) => ({ layerVisibility: { ...state.layerVisibility, [layerId]: visible } })),
   setLayerOpacity: (layerId, opacity) => set((state) => ({ layerOpacity: { ...state.layerOpacity, [layerId]: opacity } })),
@@ -234,7 +205,6 @@ export const useCommercialMapStore = create<CommercialMapState>((set) => ({
     workspaceMode,
     interiorEntityId: workspaceMode === '3d' ? state.interiorEntityId : null,
     interiorReturnView: workspaceMode === '3d' ? state.interiorReturnView : null,
-    executiveFocusActive: workspaceMode === '3d' ? state.executiveFocusActive : false,
   })),
   requestCameraPreset: (cameraPreset) => set((state) => ({
     cameraPreset,
@@ -242,7 +212,6 @@ export const useCommercialMapStore = create<CommercialMapState>((set) => ({
     workspaceMode: '3d',
     interiorEntityId: null,
     interiorReturnView: null,
-    executiveFocusActive: false,
   })),
   requestSegmentFocus: (activeSegmentId) => set((state) => ({
     activeSegmentId,
@@ -253,7 +222,6 @@ export const useCommercialMapStore = create<CommercialMapState>((set) => ({
     interiorEntityId: null,
     interiorReturnView: null,
     cameraNavigating: false,
-    executiveFocusActive: false,
     cameraSequence: state.workspaceMode === 'list' ? state.cameraSequence : state.cameraSequence + 1,
   })),
   clearSegmentFocus: () => set((state) => ({
@@ -267,23 +235,4 @@ export const useCommercialMapStore = create<CommercialMapState>((set) => ({
   setTechnicalValidationVisible: (technicalValidationVisible) => set({ technicalValidationVisible }),
   setReducedGraphics: (reducedGraphics) => set({ reducedGraphics }),
   setCameraNavigating: (cameraNavigating) => set({ cameraNavigating }),
-  setExecutiveFocusActive: (executiveFocusActive) => set(() => (
-    executiveFocusActive
-      ? {
-          executiveFocusActive: true,
-          selectedEntityId: null,
-          hoveredEntityId: null,
-          activePanel: null,
-          interiorEntityId: null,
-          interiorReturnView: null,
-          workspaceMode: '3d',
-          cameraNavigating: false,
-        }
-      : { executiveFocusActive: false }
-  )),
-  setExecutiveTarget: (executiveTarget) => set({ executiveTarget }),
-  setExecutiveCameraOffset: (executiveCameraOffset) => set({ executiveCameraOffset }),
-  setExecutiveInteractionPhase: (executiveInteractionPhase) => set({ executiveInteractionPhase }),
-  setExecutiveInteractionEnabled: (executiveInteractionEnabled) => set({ executiveInteractionEnabled }),
-  setExecutiveExperienceAvailable: (executiveExperienceAvailable) => set({ executiveExperienceAvailable }),
 }));

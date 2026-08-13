@@ -64,7 +64,8 @@ describe('assets dos personagens executivos', () => {
   it('mantem o contrato comum de rig, clips, origem e payload', () => {
     expect(manifest.units).toBe('meters');
     expect(manifest.origin).toContain('grounded');
-    expect(Object.keys(manifest.clips)).toEqual(expect.arrayContaining(['Idle', 'Walk', 'Wave']));
+    expect(Object.keys(manifest.clips)).toEqual(expect.arrayContaining(['Idle', 'Walk', 'Wave', 'SeatedIdle']));
+    expect(manifest.clips.SeatedIdle.loop).toBe(true);
     expect(manifest.clips.Wave.loop).toBe(false);
     expect(manifest.characters.map((character) => character.file).sort()).toEqual([
       'djeison-drey.glb',
@@ -80,7 +81,7 @@ describe('assets dos personagens executivos', () => {
       expect(bytes).toBeGreaterThan(250_000);
       expect(createHash('sha256').update(readFileSync(path)).digest('hex')).toBe(character.sha256);
       expect(character.skins).toBeGreaterThan(0);
-      expect(character.animations).toEqual(expect.arrayContaining(['Idle', 'Walk', 'Wave']));
+      expect(character.animations).toEqual(expect.arrayContaining(['Idle', 'Walk', 'Wave', 'SeatedIdle']));
       expect(character.root_translation_range).toBe(0);
       expect(character.forward_axis).toBe('+Z');
     });
@@ -100,7 +101,7 @@ describe('assets dos personagens executivos', () => {
     });
 
     expect(json.skins?.length).toBeGreaterThan(0);
-    expect(animationNames).toEqual(expect.arrayContaining(['Idle', 'Walk', 'Wave']));
+    expect(animationNames).toEqual(expect.arrayContaining(['Idle', 'Walk', 'Wave', 'SeatedIdle']));
     expect(searchableNames).toMatch(skinPattern);
     expect(searchableNames).toMatch(identityPattern);
     expect(json.nodes?.some((node) => node.extras?.forward_axis?.startsWith('+Z'))).toBe(true);
