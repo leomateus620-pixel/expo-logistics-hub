@@ -15,6 +15,7 @@ import {
   Sparkles,
   Trash2,
   UserRound,
+  UsersRound,
   X,
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
@@ -52,7 +53,7 @@ import { EventoAnexosSection } from './EventoAnexosSection';
 import {
   EventRelationList,
   getEventCommissionItems,
-  getEventResponsibleItems,
+  splitEventResponsibles,
   type EventRelationItem,
 } from './EventRelationFields';
 
@@ -116,7 +117,7 @@ export function EventDrawer({
   if (!event) return null;
 
   const commissionItems = getEventCommissionItems(event);
-  const responsibleItems = getEventResponsibleItems(event);
+  const { responsible, guests } = splitEventResponsibles(event);
 
 
   const closeDrawer = () => {
@@ -274,10 +275,18 @@ export function EventDrawer({
                     <InfoCard icon={MapPin} label="Local" value={event.location || 'Local a definir'} />
                     <RelationCard
                       icon={UserRound}
-                      label={responsibleItems.length > 1 ? 'Responsáveis' : 'Responsável'}
-                      items={responsibleItems}
+                      label="Responsável"
+                      items={responsible ? [responsible] : []}
                       emptyLabel="Responsável a definir"
                     />
+                    {guests.length > 0 && (
+                      <RelationCard
+                        icon={UsersRound}
+                        label={guests.length > 1 ? 'Convidados' : 'Convidado'}
+                        items={guests}
+                        emptyLabel="Nenhum convidado"
+                      />
+                    )}
                     <RelationCard
                       icon={Layers3}
                       label={commissionItems.length > 1 ? 'Comissões' : 'Comissão'}
