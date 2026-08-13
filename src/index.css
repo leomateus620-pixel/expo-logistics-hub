@@ -3515,3 +3515,25 @@ input::placeholder, textarea::placeholder {
 .dark .cronograma-audit-diff__new {
   color: hsl(150 55% 55%);
 }
+
+/* Responsável x convidados nos cards da linha do tempo */
+.cronograma-event-person {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 0.25rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  padding: 0.08rem 0.42rem;
+  font-weight: 700;
+}
+.cronograma-event-person[data-role='owner'] {
+  border-color: hsl(var(--primary) / 0.24);
+  background: hsl(var(--primary) / 0.08);
+  color: hsl(var(--primary));
+}
+.cronograma-event-person[data-role='guest'] {
+  border-color: hsl(var(--muted-foreground) / 0.22);
+  background: hsl(var(--muted-foreground) / 0.08);
+  color: hsl(var(--muted-foreground));
+}
