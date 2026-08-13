@@ -249,6 +249,38 @@ export function RelationalMultiSelect({
     activeOption?.scrollIntoView({ block: 'nearest' });
   }, [activeIndex, open]);
 
+  /**
+   * Wheel over the option cards scrolls the list itself. React (and Radix)
+   * attach wheel listeners passively, so the handler must be native and
+   * non-passive to keep the page behind from stealing the gesture.
+   * While scrolling, the card under the pointer stays highlighted.
+   */
+  useEffect(() => {
+    const list = listRef.current;
+    if (!open || !list) return;
+
+    const handleWheel = (wheelEvent: WheelEvent) => {
+      const maxScroll = list.scrollHeight - list.clientHeight;
+      if (maxScroll <= 0) return;
+      const unit = wheelEvent.deltaMode === 1 ? 16 : wheelEvent.deltaMode === 2 ? list.clientHeight : 1;
+      const next = Math.min(maxScroll, Math.max(0, list.scrollTop + wheelEvent.deltaY * unit));
+      if (next === list.scrollTop) return;
+      wheelEvent.preventDefault();
+      wheelEvent.stopPropagation();
+      list.scrollTop = next;
+      const under = document
+        .elementFromPoint(wheelEvent.clientX, wheelEvent.clientY)
+        ?.closest<HTMLElement>('[data-option-index]');
+      const index = under?.dataset.optionIndex;
+      if (index != null) setActiveIndex(Number(index));
+    };
+
+    list.addEventListener('wheel', handleWheel, { passive: false });
+    return () => list.removeEventListener('wheel', handleWheel);
+  }, [open]);
+
+
+
   useEffect(() => {
     if (!isMobile || !open) {
       setSheetStyle(undefined);
