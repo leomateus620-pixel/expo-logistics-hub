@@ -27,6 +27,12 @@ describe('pipeline de seleção do mapa comercial', () => {
       workspaceMode: '3d',
       cameraNavigating: false,
       activeSegmentId: null,
+      executiveFocusActive: false,
+      executiveTarget: null,
+      executiveCameraOffset: null,
+      executiveInteractionPhase: 'walking',
+      executiveInteractionEnabled: false,
+      executiveExperienceAvailable: true,
     });
   });
 
@@ -209,6 +215,42 @@ describe('pipeline de seleção do mapa comercial', () => {
       workspaceMode: 'list',
       cameraSequence: initialSequence,
     });
+  });
+  it('isola o modo de acompanhamento sem apagar o alvo ao sair', () => {
+    useCommercialMapStore.setState({
+      selectedEntityId: 'entity:lot-1',
+      hoveredEntityId: 'entity:lot-2',
+      activePanel: 'details',
+      cameraNavigating: true,
+      executiveTarget: [15.08, 0.105, 16.68],
+      executiveCameraOffset: [0.72, 0.42, -0.55],
+    });
+
+    useCommercialMapStore.getState().setExecutiveFocusActive(true);
+    expect(useCommercialMapStore.getState()).toMatchObject({
+      executiveFocusActive: true,
+      selectedEntityId: null,
+      hoveredEntityId: null,
+      activePanel: null,
+      cameraNavigating: false,
+      workspaceMode: '3d',
+    });
+
+    useCommercialMapStore.getState().setExecutiveFocusActive(false);
+    expect(useCommercialMapStore.getState()).toMatchObject({
+      executiveFocusActive: false,
+      executiveTarget: [15.08, 0.105, 16.68],
+      executiveCameraOffset: [0.72, 0.42, -0.55],
+      workspaceMode: '3d',
+    });
+    expect(useCommercialMapStore.getState().selectedEntityId).toBeNull();
+
+    useCommercialMapStore.getState().setExecutiveCameraOffset(null);
+    expect(useCommercialMapStore.getState().executiveCameraOffset).toBeNull();
+
+    useCommercialMapStore.getState().setExecutiveCameraOffset([0.64, 0.46, -0.62]);
+    useCommercialMapStore.getState().activateScope('test:executive-camera-reset', null);
+    expect(useCommercialMapStore.getState().executiveCameraOffset).toBeNull();
   });
 });
 
