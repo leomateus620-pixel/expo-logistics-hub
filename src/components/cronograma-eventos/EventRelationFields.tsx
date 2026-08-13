@@ -48,6 +48,19 @@ export function getEventResponsibleItems(event: CronogramaEvent): EventRelationI
     .sort((a, b) => Number(b.isPrimary) - Number(a.isPrimary));
 }
 
+/**
+ * Splits responsibles into the single accountable person ("Responsável") and
+ * every other linked person, presented as "Convidados" across the module.
+ */
+export function splitEventResponsibles(event: CronogramaEvent): {
+  responsible: EventRelationItem | null;
+  guests: EventRelationItem[];
+} {
+  const items = getEventResponsibleItems(event);
+  if (items.length === 0) return { responsible: null, guests: [] };
+  return { responsible: items[0], guests: items.slice(1) };
+}
+
 interface EventRelationListProps {
   items: EventRelationItem[];
   emptyLabel: string;
