@@ -46,6 +46,7 @@ import { statusLabels } from '../cronogramaData';
 import { compareEventDates, formatLongDate } from '../dateUtils';
 import { CycleYearMark } from '../CycleYearMark';
 import { EventHarvestAnimation } from '../EventHarvestAnimation';
+import { splitEventResponsibles } from '../EventRelationFields';
 import type { CronogramaEvent } from '../types';
 
 const monthYearFormatter = new Intl.DateTimeFormat('pt-BR', {
@@ -474,6 +475,7 @@ function MobileTimelineEventCard({
   onOpen: (event: CronogramaEvent) => void;
 }) {
   const progress = getSubeventProgress(event);
+  const { responsible, guests } = splitEventResponsibles(event);
   const date = event.date!;
   const dateObject = new Date(`${date}T12:00:00Z`);
   const isToday = date === todayKey;
