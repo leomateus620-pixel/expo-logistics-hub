@@ -13,6 +13,7 @@ import {
   SearchX,
   Sparkles,
   UserRound,
+  UsersRound,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -48,6 +49,7 @@ import { statusLabels } from './cronogramaData';
 import { formatLongDate } from './dateUtils';
 import { EventHarvestAnimation } from './EventHarvestAnimation';
 import { TimelineCycleNavigator } from './TimelineCycleNavigator';
+import { splitEventResponsibles } from './EventRelationFields';
 import type { CronogramaEvent } from './types';
 
 const monthYearFormatter = new Intl.DateTimeFormat('pt-BR', {
@@ -454,6 +456,7 @@ function TimelineEventRow({
   onOpen: (event: CronogramaEvent) => void;
 }) {
   const progress = getSubeventProgress(event);
+  const { responsible, guests } = splitEventResponsibles(event);
   const date = event.date!;
   const dateObject = new Date(`${date}T12:00:00Z`);
   const isToday = date === todayKey;
@@ -516,7 +519,24 @@ function TimelineEventRow({
         <span className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-muted-foreground">
           <CronogramaCategoryMarker category={event.category} />
           {event.commission && <span className="inline-flex items-center gap-1"><Layers3 className="h-3 w-3" />{event.commission}</span>}
-          {event.owner && <span className="inline-flex items-center gap-1"><UserRound className="h-3 w-3" />{event.owner}</span>}
+          {(responsible || event.owner) && (
+            <span className="cronograma-event-person" data-role="owner">
+              <UserRound className="h-3 w-3" aria-hidden="true" />
+              <span className="max-w-52 truncate">{responsible?.label ?? event.owner}</span>
+            </span>
+          )}
+          {guests.length > 0 && (
+            <span
+              className="cronograma-event-person"
+              data-role="guest"
+              title={`Convidados: ${guests.map((guest) => guest.label).join(' · ')}`}
+            >
+              <UsersRound className="h-3 w-3" aria-hidden="true" />
+              <span className="max-w-52 truncate">
+                {guests.length === 1 ? guests[0].label : `${guests.length} convidados`}
+              </span>
+            </span>
+          )}
           {event.location && <span className="inline-flex min-w-0 items-center gap-1"><MapPin className="h-3 w-3" /><span className="max-w-52 truncate">{event.location}</span></span>}
         </span>
         {progress.total > 0 && (
