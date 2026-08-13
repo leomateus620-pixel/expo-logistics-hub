@@ -15,6 +15,7 @@ import {
   Sparkles,
   Trash2,
   UserRound,
+  UsersRound,
   X,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -338,7 +339,18 @@ export function MobileEventScreen({
                   value={`${formatLongDateRange(event.date, event.endDate)}${event.startTime ? ` · ${event.startTime}` : ''}${event.endTime ? ` às ${event.endTime}` : ''}`}
                 />
                 <MobileInfo icon={MapPin} label="Local" value={event.location || 'Local a definir'} />
-                <MobileInfo icon={UserRound} label="Responsável" value={event.owner || 'Responsável a definir'} />
+                <MobileInfo
+                  icon={UserRound}
+                  label="Responsável"
+                  value={eventResponsible?.label ?? event.owner ?? 'Responsável a definir'}
+                />
+                {eventGuests.length > 0 && (
+                  <MobileInfo
+                    icon={UsersRound}
+                    label={eventGuests.length > 1 ? 'Convidados' : 'Convidado'}
+                    value={eventGuests.map((guest) => guest.label).join(' · ')}
+                  />
+                )}
                 <MobileInfo icon={Layers3} label="Comissão" value={event.commission || 'Comissão a definir'} />
               </div>
             </section>
