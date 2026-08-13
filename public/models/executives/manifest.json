@@ -1,0 +1,102 @@
+{
+  "schema_version": 1,
+  "generator": "tools/blender/build_executive_characters.py",
+  "blender_version": "4.5.10 LTS",
+  "units": "meters",
+  "origin": "grounded between the feet",
+  "animation_fps": 30,
+  "post_export": "glTF-Transform 4.2.1 hierarchy flatten plus unused attribute pruning; no mesh join, simplification, texture recompression, or geometry compression",
+  "clips": {
+    "Idle": {
+      "duration_seconds": 4.0,
+      "loop": true
+    },
+    "Walk": {
+      "duration_seconds": 1.0,
+      "loop": true
+    },
+    "Wave": {
+      "duration_seconds": 3.2,
+      "loop": false
+    }
+  },
+  "characters": [
+    {
+      "file": "djeison-drey.glb",
+      "bytes": 1496148,
+      "sha256": "9cae3f853e9be22cc7f163fce5751d75ecf9eb84c5c9241dde3afaf829dcc5d1",
+      "nodes": 43,
+      "meshes": 25,
+      "materials": 22,
+      "skins": 1,
+      "animations": [
+        "Idle",
+        "Walk",
+        "Wave"
+      ],
+      "root_translation_range": 0.0,
+      "accessor_bounds": {
+        "min": [
+          -0.36997008323669434,
+          0.015333333052694798,
+          -0.1369999498128891
+        ],
+        "max": [
+          0.36595427989959717,
+          1.8478206396102905,
+          0.39311113953590393
+        ]
+      },
+      "height_m": 1.84,
+      "forward_axis": "+Z",
+      "profile": {
+        "face": "rosto quadrado-oval amplo, olhos azulados, nariz definido e assimetria cordial no sorriso",
+        "hair": "cabelo ruivo-claro curto, texturizado e levemente despenteado",
+        "accessories": "óculos grandes arredondados em metal dourado e chimarrão na mão esquerda",
+        "clothing": "terno cinza de alfaiataria, camisa branca, gravata verde e sapatos conhaque",
+        "animation": "passada ligeiramente mais longa, braço esquerdo estável no chimarrão e aceno direito dessíncrono"
+      }
+    },
+    {
+      "file": "fabiano-soltis.glb",
+      "bytes": 1276476,
+      "sha256": "3e939e6b2543f108e40611bacd39b10d9509dc34a9e960428d11095332e5b4f9",
+      "nodes": 40,
+      "meshes": 22,
+      "materials": 18,
+      "skins": 1,
+      "animations": [
+        "Idle",
+        "Walk",
+        "Wave"
+      ],
+      "root_translation_range": 0.0,
+      "accessor_bounds": {
+        "min": [
+          -0.3419618010520935,
+          0.014833332970738411,
+          -0.136954203248024
+        ],
+        "max": [
+          0.3419618010520935,
+          1.7864060401916504,
+          0.22002777457237244
+        ]
+      },
+      "height_m": 1.78,
+      "forward_axis": "+Z",
+      "profile": {
+        "face": "rosto oval anguloso, mandíbula limpa, olhos castanhos próximos, nariz reto e sorriso discreto",
+        "hair": "cabelo castanho-escuro curto, volumoso no topo e penteado lateralmente",
+        "accessories": "óculos executivos finos prateados",
+        "clothing": "terno azul-marinho ajustado, camisa branca, gravata verde e sapatos marrons",
+        "animation": "passada mais contida, postura madura e aceno curto com a mão direita"
+      }
+    }
+  ],
+  "limitations": [
+    "Procedural likeness is identity-specific but is not a photogrammetry or FACS facial scan.",
+    "Garments are layered rigid-weight meshes with modeled thickness and tailoring; real-time cloth simulation is intentionally omitted.",
+    "Hair and beard use lightweight geometric clumps rather than strand-hair simulation."
+  ]
+}

@@ -32,6 +32,7 @@ import {
 import { useCommercialMapStore } from './state/useCommercialMapStore';
 import { CommercialMapCanvas } from './components/canvas/CommercialMapCanvas';
 import { MapToolbar } from './components/controls/MapToolbar';
+import { ExecutiveCharacterControls } from './components/controls/ExecutiveCharacterControls';
 import { GeometryEditor } from './components/editor/GeometryEditor';
 import { LotCreationWorkspace } from './components/editor/LotCreationWorkspace';
 import {
@@ -128,6 +129,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
   const { bootstrap, exporuralSync, publish } = useMapMutations();
   const selectedEntityId = useCommercialMapStore((state) => state.selectedEntityId);
   const interiorEntityId = useCommercialMapStore((state) => state.interiorEntityId);
+  const executiveFocusActive = useCommercialMapStore((state) => state.executiveFocusActive);
   const exitInterior = useCommercialMapStore((state) => state.exitInterior);
   const activePanel = useCommercialMapStore((state) => state.activePanel);
   const setActivePanel = useCommercialMapStore((state) => state.setActivePanel);
@@ -282,13 +284,23 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
         (searchTarget as HTMLInputElement | null)?.focus();
       }
       if (event.key === 'Escape' && !event.defaultPrevented) {
-        if (interiorEntityId) exitInterior();
+        if (executiveFocusActive) requestCameraPreset(isExporural ? 'exporural' : 'overview');
+        else if (interiorEntityId) exitInterior();
         else setActivePanel(null);
       }
     };
     window.addEventListener('keydown', shortcut);
     return () => window.removeEventListener('keydown', shortcut);
-  }, [activePanel, exitInterior, interiorEntityId, setActivePanel, workspaceMode]);
+  }, [
+    activePanel,
+    executiveFocusActive,
+    exitInterior,
+    interiorEntityId,
+    isExporural,
+    requestCameraPreset,
+    setActivePanel,
+    workspaceMode,
+  ]);
 
   useEffect(() => {
     if (interiorEntityId) {
@@ -564,6 +576,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
                   segmentName={activeSegment?.name ?? scopedSegment?.name}
                 />
                 <MapToolbar permissions={permissions} hasSelection={Boolean(selectedEntity)} areaScope={areaScope} />
+                {areaScope === 'park' && <ExecutiveCharacterControls />}
                 <StatusLegend scope={areaScope} />
               </>
             )}
