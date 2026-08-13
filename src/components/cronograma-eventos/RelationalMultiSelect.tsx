@@ -729,13 +729,22 @@ export function RelationalMultiSelect({
             const detail = matchingOption?.description ?? item.hint;
             const context = matchingOption?.context
               ?? ((item.id.startsWith('custom:') || item.id.startsWith('external:')) ? 'Responsável externo' : undefined);
+            /** People: first/primary link is the "Responsável", the rest are guests. */
+            const roleLabel = variant === 'organization'
+              ? (item.isPrimary ? 'Área principal' : 'Área institucional')
+              : (item.isPrimary ? 'Responsável' : 'Convidado');
             return (
-              <li key={item.id} className="cronograma-relation-selected__item" data-primary={item.isPrimary || undefined}>
+              <li
+                key={item.id}
+                className="cronograma-relation-selected__item"
+                data-primary={item.isPrimary || undefined}
+                data-role={variant === 'person' && !item.isPrimary ? 'guest' : undefined}
+              >
                 <span className="cronograma-relation-selected__identity" aria-hidden="true">
                   {variant === 'organization' ? <Building2 /> : initialsFor(item.label)}
                 </span>
                 <span className="cronograma-relation-selected__copy">
-                  <small>{variant === 'organization' ? 'Área institucional' : 'Responsável'}</small>
+                  <small>{roleLabel}</small>
                   <strong title={item.label}>{item.label}</strong>
                   {detail && <span>{detail}</span>}
                   {context && context !== detail && <em>{context}</em>}
@@ -754,9 +763,10 @@ export function RelationalMultiSelect({
                       aria-label={`Marcar ${item.label} como ${primaryLabel.toLocaleLowerCase('pt-BR')}`}
                     >
                       <Star aria-hidden="true" />
-                      <span>Definir como principal</span>
+                      <span>{variant === 'person' ? 'Definir como responsável' : 'Definir como principal'}</span>
                     </button>
                   )}
+
                   <button
                     type="button"
                     onClick={() => removeAt(item.id)}
