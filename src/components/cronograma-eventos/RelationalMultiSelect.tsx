@@ -132,6 +132,11 @@ export function RelationalMultiSelect({
   const listboxId = `${fieldId}-listbox`;
   const searchRef = useRef<HTMLInputElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
+  const [listNode, setListNode] = useState<HTMLDivElement | null>(null);
+  const setListRef = useCallback((node: HTMLDivElement | null) => {
+    listRef.current = node;
+    setListNode(node);
+  }, []);
   /** Set only by keyboard navigation so scrollIntoView never fires on mouse selection. */
   const keyboardNavRef = useRef(false);
   const [open, setOpen] = useState(false);
@@ -256,7 +261,7 @@ export function RelationalMultiSelect({
    * While scrolling, the card under the pointer stays highlighted.
    */
   useEffect(() => {
-    const list = listRef.current;
+    const list = listNode;
     if (!open || !list) return;
 
     const handleWheel = (wheelEvent: WheelEvent) => {
@@ -277,7 +282,7 @@ export function RelationalMultiSelect({
 
     list.addEventListener('wheel', handleWheel, { passive: false });
     return () => list.removeEventListener('wheel', handleWheel);
-  }, [open]);
+  }, [open, listNode]);
 
 
 
@@ -547,7 +552,7 @@ export function RelationalMultiSelect({
       </div>
 
       <div
-        ref={listRef}
+        ref={setListRef}
         id={listboxId}
         className="cronograma-relation-results"
         role="listbox"
