@@ -1,5 +1,5 @@
-import fabianoSoltis from '@/assets/fabiano-soltis.png.asset.json';
-import djeisonDrey from '@/assets/djeison-drey.png.asset.json';
+import fabianoSoltis from '@/assets/person-fabiano-soltis.jpg';
+import djeisonDrey from '@/assets/person-djeison-drey.jpg';
 
 /**
  * Only these two members have an official portrait. Everyone else keeps the
