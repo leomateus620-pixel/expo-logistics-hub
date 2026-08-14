@@ -31,6 +31,7 @@ interface SpeechRecognitionEventLike extends Event {
 
 interface SpeechRecognitionErrorEventLike extends Event {
   error: string;
+  message?: string;
 }
 
 interface SpeechRecognitionLike extends EventTarget {
