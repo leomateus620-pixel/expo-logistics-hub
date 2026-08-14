@@ -47,6 +47,7 @@ import { compareEventDates, formatLongDate } from '../dateUtils';
 import { CycleYearMark } from '../CycleYearMark';
 import { EventHarvestAnimation } from '../EventHarvestAnimation';
 import { splitEventResponsibles } from '../EventRelationFields';
+import { EventPeopleAvatars } from '../PersonAvatar';
 import type { CronogramaEvent } from '../types';
 
 const monthYearFormatter = new Intl.DateTimeFormat('pt-BR', {
@@ -527,6 +528,14 @@ function MobileTimelineEventCard({
         )}
 
         <strong className="cronograma-mobile-event-title">{event.title}</strong>
+
+        <EventPeopleAvatars
+          people={[
+            ...(responsible ? [{ key: responsible.key, label: responsible.label, isPrimary: true }] : []),
+            ...guests.map((guest) => ({ key: guest.key, label: guest.label })),
+          ]}
+          className="cronograma-mobile-event-avatars"
+        />
 
         {variant === 'completed' && (
           <span className="cronograma-mobile-archive-state">

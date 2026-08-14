@@ -35,6 +35,7 @@ import {
 } from '@/components/ui/sheet';
 import { normalizeSearchTerm } from '@/lib/org-units';
 import { useMobileOverlayHistory } from './mobile/useMobileOverlayHistory';
+import { PersonAvatar } from './PersonAvatar';
 import '@/styles/cronograma-registration-interactions.css';
 
 const MAX_VISIBLE_OPTIONS = 120;
@@ -612,9 +613,22 @@ export function RelationalMultiSelect({
                     onMouseMove={() => setActiveIndex(optionIndex)}
                     onClick={() => addOption(option)}
                   >
-                    <span className="cronograma-relation-option__identity" aria-hidden="true">
-                      {variant === 'organization' ? <Building2 /> : initialsFor(option.label)}
-                    </span>
+                    {variant === 'organization' ? (
+                      <span className="cronograma-relation-option__identity" aria-hidden="true">
+                        <Building2 />
+                      </span>
+                    ) : (
+                      <PersonAvatar
+                        name={option.label}
+                        size="md"
+                        className="cronograma-relation-option__identity"
+                        fallback={(
+                          <span className="cronograma-relation-option__identity" aria-hidden="true">
+                            {initialsFor(option.label)}
+                          </span>
+                        )}
+                      />
+                    )}
                     <span className="cronograma-relation-option__copy">
                       <strong title={option.label}>{option.label}</strong>
                       {(option.description || option.hint) && (
@@ -746,9 +760,22 @@ export function RelationalMultiSelect({
                 data-primary={item.isPrimary || undefined}
                 data-role={variant === 'person' && !item.isPrimary ? 'guest' : undefined}
               >
-                <span className="cronograma-relation-selected__identity" aria-hidden="true">
-                  {variant === 'organization' ? <Building2 /> : initialsFor(item.label)}
-                </span>
+                {variant === 'organization' ? (
+                  <span className="cronograma-relation-selected__identity" aria-hidden="true">
+                    <Building2 />
+                  </span>
+                ) : (
+                  <PersonAvatar
+                    name={item.label}
+                    size="md"
+                    className="cronograma-relation-selected__identity"
+                    fallback={(
+                      <span className="cronograma-relation-selected__identity" aria-hidden="true">
+                        {initialsFor(item.label)}
+                      </span>
+                    )}
+                  />
+                )}
                 <span className="cronograma-relation-selected__copy">
                   <small>{roleLabel}</small>
                   <strong title={item.label}>{item.label}</strong>

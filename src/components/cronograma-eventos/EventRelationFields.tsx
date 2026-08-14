@@ -3,6 +3,7 @@ import { ChevronDown, ChevronUp, Star, UserPlus } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { CronogramaEvent } from './types';
+import { PersonAvatar } from './PersonAvatar';
 
 export interface EventRelationItem {
   key: string;
@@ -97,9 +98,16 @@ export function EventRelationList({
               className="cronograma-relation-item"
               data-primary={item.isPrimary || undefined}
             >
-              <span className="cronograma-relation-item-icon" aria-hidden="true">
-                <ItemIcon />
-              </span>
+              <PersonAvatar
+                name={item.label}
+                size="md"
+                className="cronograma-relation-item-icon"
+                fallback={(
+                  <span className="cronograma-relation-item-icon" aria-hidden="true">
+                    <ItemIcon />
+                  </span>
+                )}
+              />
               <span className="cronograma-relation-item-label" title={item.hint ?? undefined}>
                 {item.label}
               </span>

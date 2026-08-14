@@ -50,6 +50,7 @@ import { formatLongDate } from './dateUtils';
 import { EventHarvestAnimation } from './EventHarvestAnimation';
 import { TimelineCycleNavigator } from './TimelineCycleNavigator';
 import { splitEventResponsibles } from './EventRelationFields';
+import { EventPeopleAvatars } from './PersonAvatar';
 import type { CronogramaEvent } from './types';
 
 const monthYearFormatter = new Intl.DateTimeFormat('pt-BR', {
@@ -516,6 +517,13 @@ function TimelineEventRow({
             </span>
           )}
         </span>
+        <EventPeopleAvatars
+          people={[
+            ...(responsible ? [{ key: responsible.key, label: responsible.label, isPrimary: true }] : []),
+            ...guests.map((guest) => ({ key: guest.key, label: guest.label })),
+          ]}
+          className="mt-1.5"
+        />
         <span className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] text-muted-foreground">
           <CronogramaCategoryMarker category={event.category} />
           {event.commission && <span className="inline-flex items-center gap-1"><Layers3 className="h-3 w-3" />{event.commission}</span>}
