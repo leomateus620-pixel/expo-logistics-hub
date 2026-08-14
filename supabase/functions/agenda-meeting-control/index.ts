@@ -23,7 +23,11 @@ import {
 } from "../_shared/agenda-meeting/supabase.ts";
 
 const MAX_CONTROL_BODY_BYTES = 4 * 1_024 * 1_024;
+// Captura nativa do navegador: apenas texto trafega. Os tipos de áudio
+// permanecem aceitos por compatibilidade com sessões antigas.
 const CAPTURE_MIME_TYPES = new Set([
+  "text/plain",
+  "text/plain;charset=utf-8",
   "audio/webm",
   "audio/webm;codecs=opus",
   "audio/mp4",
