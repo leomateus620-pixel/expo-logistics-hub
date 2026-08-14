@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type RefObject } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from 'react';
 import {
   AlertTriangle,
   CalendarClock,
@@ -32,6 +32,10 @@ import { EventForm } from '../EventForm';
 import { splitEventResponsibles } from '../EventRelationFields';
 import type { CronogramaEvent, CronogramaHistoryEntry } from '../types';
 import { EventoAnexosSection } from '../EventoAnexosSection';
+import {
+  LazyAgendaMeetingWorkspace,
+  type AgendaMeetingContext,
+} from '../meeting-intelligence/LazyAgendaMeetingWorkspace';
 import { MobileConfirmDialog } from './MobileConfirmDialog';
 import { MobileDialogFrame } from './MobileDialogFrame';
 import { useMobileOverlayHistory } from './useMobileOverlayHistory';
@@ -55,6 +59,7 @@ export function MobileEventScreen({
   historyError,
   canViewHistory = false,
   sourceUnavailable = false,
+  meetingIntelligence,
 }: {
   event: CronogramaEvent | null;
   open: boolean;
@@ -72,6 +77,7 @@ export function MobileEventScreen({
   historyError?: unknown;
   canViewHistory?: boolean;
   sourceUnavailable?: boolean;
+  meetingIntelligence?: AgendaMeetingContext;
 }) {
   const [editMode, setEditMode] = useState(false);
   const [dirty, setDirty] = useState(false);
@@ -80,6 +86,9 @@ export function MobileEventScreen({
   const [discardTarget, setDiscardTarget] = useState<DiscardTarget>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [meetingCaptureActive, setMeetingCaptureActive] = useState(false);
+  const [confirmMeetingExit, setConfirmMeetingExit] = useState(false);
+  const meetingExitHandlerRef = useRef<(() => Promise<void>) | null>(null);
   const workspaceTargetRef = useRef<CronogramaEvent | null>(null);
   const completionPendingRef = useRef(false);
   const eventIdentity = event?.sourceKey ?? event?.id;
@@ -92,7 +101,18 @@ export function MobileEventScreen({
     setSaving(false);
     setSaveError(null);
     setDiscardTarget(null);
+    setMeetingCaptureActive(false);
+    setConfirmMeetingExit(false);
+    meetingExitHandlerRef.current = null;
   }, [canManage, eventIdentity, open, startInEdit]);
+
+  const handleMeetingCaptureChange = useCallback((
+    active: boolean,
+    cancelForExit: (() => Promise<void>) | null,
+  ) => {
+    meetingExitHandlerRef.current = cancelForExit;
+    setMeetingCaptureActive(active);
+  }, []);
 
   const progress = useMemo(() => (event ? getSubeventProgress(event) : null), [event]);
   const { responsible: eventResponsible, guests: eventGuests } = useMemo(
@@ -101,7 +121,7 @@ export function MobileEventScreen({
   );
   const overlayHistory = useMobileOverlayHistory({
     open: open && Boolean(event),
-    dirty: (editMode && dirty) || saving,
+    dirty: (editMode && dirty) || saving || meetingCaptureActive,
     onClose: () => {
       onOpenChange(false);
       const workspaceTarget = workspaceTargetRef.current;
@@ -111,6 +131,10 @@ export function MobileEventScreen({
       }
     },
     onDirtyClose: () => {
+      if (meetingCaptureActive) {
+        setConfirmMeetingExit(true);
+        return;
+      }
       if (!saving) setDiscardTarget('close');
     },
   });
@@ -277,7 +301,7 @@ export function MobileEventScreen({
                     type="button"
                     variant="outline"
                     onClick={performCompletion}
-                    disabled={saving}
+                    disabled={saving || meetingCaptureActive}
                     className="is-wide rounded-xl"
                   >
                     {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <CheckCircle2 className="h-4 w-4" />}
@@ -290,7 +314,7 @@ export function MobileEventScreen({
                 <Button
                   type="button"
                   onClick={handleEdit}
-                  disabled={saving}
+                  disabled={saving || meetingCaptureActive}
                   className="rounded-xl"
                 >
                   <Edit3 className="h-4 w-4" />Editar
@@ -300,7 +324,7 @@ export function MobileEventScreen({
                     type="button"
                     variant="outline"
                     onClick={() => setConfirmDelete(true)}
-                    disabled={saving || deleting}
+                    disabled={saving || deleting || meetingCaptureActive}
                     className="is-wide rounded-xl border-red-200 text-red-700 hover:bg-red-50 hover:text-red-800"
                   >
                     <Trash2 className="h-4 w-4" />Excluir evento
@@ -427,6 +451,15 @@ export function MobileEventScreen({
               </section>
             )}
 
+            {meetingIntelligence && (
+              <LazyAgendaMeetingWorkspace
+                {...meetingIntelligence}
+                className="cronograma-mobile-event-section"
+                eventTitle={event.title}
+                onActiveCaptureChange={handleMeetingCaptureChange}
+              />
+            )}
+
             {event.id && <EventoAnexosSection eventId={event.id} className="cronograma-mobile-event-section" />}
 
             {canViewHistory && (
@@ -479,6 +512,27 @@ export function MobileEventScreen({
         confirmLabel={discardTarget === 'close' ? 'Descartar e fechar' : 'Descartar alterações'}
         onConfirm={handleConfirmDiscard}
         onCancel={() => setDiscardTarget(null)}
+      />
+
+      <MobileConfirmDialog
+        open={confirmMeetingExit}
+        title="Interromper a captura ativa?"
+        description="Fechar agora cancela a sessão e interrompe o microfone. Se o servidor estiver indisponível, o spool criptografado permanece recuperável por até 24 horas."
+        confirmLabel="Cancelar sessão e fechar"
+        cancelLabel="Voltar à reunião"
+        onConfirm={() => {
+          const cancelForExit = meetingExitHandlerRef.current;
+          if (!cancelForExit) return;
+          void cancelForExit()
+            .catch(() => undefined)
+            .finally(() => {
+              meetingExitHandlerRef.current = null;
+              setConfirmMeetingExit(false);
+              setMeetingCaptureActive(false);
+              overlayHistory.discardAndClose();
+            });
+        }}
+        onCancel={() => setConfirmMeetingExit(false)}
       />
 
       {onDelete && (
