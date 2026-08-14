@@ -56,11 +56,11 @@ interface RevisionSegmentRow {
 
 function configuredBatchSize() {
   const configured = Number(
-    Deno.env.get("AGENDA_MEETING_WORKER_BATCH_SIZE") ?? "2",
+    Deno.env.get("AGENDA_MEETING_WORKER_BATCH_SIZE") ?? "1",
   );
   return Number.isFinite(configured)
-    ? Math.max(1, Math.min(5, Math.round(configured)))
-    : 2;
+    ? Math.max(1, Math.min(2, Math.round(configured)))
+    : 1;
 }
 
 function asSafeMilliseconds(value: number | string, code: string) {
@@ -372,7 +372,7 @@ Deno.serve(async (req) => {
     const batchSize = configuredBatchSize();
     const { data, error } = await admin.rpc("agenda_meeting_claim_jobs", {
       p_batch_size: batchSize,
-      p_lease_seconds: 360,
+      p_lease_seconds: 390,
     });
     if (error) throw new HttpError(503, "meeting_job_claim_failed", true);
     if (!Array.isArray(data)) {
