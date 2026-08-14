@@ -75,6 +75,7 @@ const FATAL_ERRORS = new Set(['not-allowed', 'service-not-allowed', 'language-no
 const RESTART_BACKOFF_MS = [250, 500, 1_000, 2_000, 5_000];
 const MAX_RESTART_ATTEMPTS = 24;
 const RESTART_WINDOW_MS = 60_000;
+const STARTUP_WATCHDOG_MS = 5_000;
 const DEBUG =
   typeof window !== 'undefined' &&
   (window as Window & { __FENASOJA_MEETING_DEBUG__?: boolean }).__FENASOJA_MEETING_DEBUG__ === true;
@@ -316,14 +317,17 @@ export class NativeMeetingTranscriptionAdapter {
     this.active = false;
     this.startLock = false;
     this.clearRestartTimer();
+    this.clearStartupWatchdog();
     const recognition = this.recognition;
     this.recognition = null;
     this.interim = '';
     if (!recognition) return;
     recognition.onstart = null;
     recognition.onaudiostart = null;
+    recognition.onsoundstart = null;
     recognition.onspeechstart = null;
     recognition.onspeechend = null;
+    recognition.onsoundend = null;
     recognition.onaudioend = null;
     recognition.onresult = null;
     recognition.onerror = null;
