@@ -151,3 +151,30 @@ export function isMeetingDebugEnabled(): boolean {
   }
   return Boolean((import.meta as { env?: { DEV?: boolean } }).env?.DEV);
 }
+
+export interface MeetingCapabilityEvaluation {
+  readonly state: MeetingCapabilityState;
+  readonly reason: string;
+  readonly environment: MeetingRuntimeEnvironment;
+}
+
+/**
+ * Três estados explícitos de capacidade — uma limitação do runtime nunca deve
+ * ser apresentada como "falha terminal" da reunião.
+ */
+export function evaluateMeetingCapability(): MeetingCapabilityEvaluation {
+  const environment = describeMeetingRuntime();
+  if (environment.selectedImplementation === 'none') {
+    return { state: 'unsupported_by_runtime', reason: 'speech_recognition_unavailable', environment };
+  }
+  if (!environment.secureContext) {
+    return { state: 'supported_requires_configuration', reason: 'insecure_context', environment };
+  }
+  if (!environment.topLevel) {
+    return { state: 'supported_requires_configuration', reason: 'embedded_context', environment };
+  }
+  if (!environment.hasMediaDevices) {
+    return { state: 'supported_requires_configuration', reason: 'media_devices_unavailable', environment };
+  }
+  return { state: 'supported_and_ready', reason: 'ok', environment };
+}
