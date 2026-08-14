@@ -1,21 +1,13 @@
 import {
   isPlainObject,
-  MAX_SEGMENT_BYTES,
-  parseSegmentUploadMetadata,
+  isUuid,
   removeUnsafeControlCharacters,
 } from "../_shared/agenda-meeting/contracts.ts";
-import {
-  constantTimeEqual,
-  randomOpaqueToken,
-  sha256Hex,
-} from "../_shared/agenda-meeting/crypto.ts";
 import {
   errorResponse,
   HttpError,
   jsonResponse,
-  logSafe,
   optionsResponse,
-  readBodyBytes,
 } from "../_shared/agenda-meeting/http.ts";
 import {
   authenticateMeetingUser,
@@ -23,111 +15,85 @@ import {
   createMeetingAdminClient,
   mapDatabaseError,
 } from "../_shared/agenda-meeting/supabase.ts";
-import { DeepgramMeetingSttAdapter } from "../_shared/agenda-meeting/stt.ts";
 
-const CALLBACK_TOKEN_TTL_MS = 30 * 60 * 1_000;
+const MAX_ACTIVE_DURATION_MS = 4 * 60 * 60 * 1_000;
+const MAX_TRANSCRIPT_CHARS = 20_000;
+const MAX_SEQUENCE = 10_000;
+
+interface TextSegmentPayload {
+  sessionId: string;
+  segmentId: string;
+  mutationId: string;
+  sequence: number;
+  captureStartMs: number;
+  captureEndMs: number;
+  transcript: string;
+  confidence: number | null;
+}
 
 interface SessionScope {
   org_id: string;
   event_id: string;
 }
 
-interface PreparedSegment {
-  receiptId: string;
-  canonicalReceiptId?: string | null;
-  attemptId: string;
-  segmentId: string;
-  sequence: number;
-  status: string;
-  retryAfterMs?: number | null;
-  errorCode?: string | null;
-  shouldForward: boolean;
-  keyterms?: unknown;
+function requireInteger(value: unknown, min: number, max: number, code: string) {
+  const number = typeof value === "number" ? value : Number(value);
+  if (!Number.isSafeInteger(number) || number < min || number > max) {
+    throw new HttpError(400, code);
+  }
+  return number;
 }
 
-function requirePreparedSegment(value: unknown): PreparedSegment {
+function parseTextSegmentPayload(body: unknown): TextSegmentPayload {
+  if (!isPlainObject(body)) throw new HttpError(400, "invalid_payload");
   if (
-    !isPlainObject(value) ||
-    typeof value.receiptId !== "string" ||
-    typeof value.attemptId !== "string" ||
-    typeof value.segmentId !== "string" ||
-    !Number.isSafeInteger(value.sequence) ||
-    typeof value.status !== "string" ||
-    typeof value.shouldForward !== "boolean"
+    !isUuid(body.sessionId) || !isUuid(body.segmentId) ||
+    !isUuid(body.mutationId)
   ) {
-    throw new HttpError(503, "invalid_segment_prepare_result", true);
+    throw new HttpError(400, "invalid_segment_identifiers");
   }
-  return value as unknown as PreparedSegment;
-}
-
-function collectActualKeyterms(value: unknown, output: string[], depth = 0) {
-  if (depth > 3 || output.length >= 24) return;
-  if (typeof value === "string") {
-    const normalized = removeUnsafeControlCharacters(value).replace(/\s+/g, " ")
-      .trim();
-    if (normalized) output.push(normalized.slice(0, 80));
-    return;
-  }
-  if (Array.isArray(value)) {
-    for (const item of value) collectActualKeyterms(item, output, depth + 1);
-    return;
-  }
-  if (!isPlainObject(value)) return;
-  for (const key of ["title", "location", "name"]) {
-    if (key in value) collectActualKeyterms(value[key], output, depth + 1);
-  }
-}
-
-function receiptPayload(
-  segment: PreparedSegment,
-  overrides: Record<string, unknown> = {},
-) {
-  const status = typeof overrides.status === "string"
-    ? overrides.status
-    : segment.status;
-  const canonicalReceiptId = overrides.canonicalReceiptId !== undefined
-    ? overrides.canonicalReceiptId
-    : segment.canonicalReceiptId ?? null;
-  const retryAfterMs = overrides.retryAfterMs !== undefined
-    ? overrides.retryAfterMs
-    : segment.retryAfterMs ?? null;
-  const errorCode = overrides.errorCode !== undefined
-    ? overrides.errorCode
-    : segment.errorCode ?? null;
-  const receipt = {
-    segmentId: segment.segmentId,
-    sequence: segment.sequence,
-    status,
-    canonicalReceiptId,
-    retryAfterMs,
-    errorCode,
-  };
-  return {
-    ok: true,
-    status,
-    canonicalReceiptId,
-    retryAfterMs,
-    errorCode,
-    receipt,
-  };
-}
-
-function callbackUrl(
-  attemptId: string,
-  segmentId: string,
-  opaqueToken: string,
-) {
-  const supabaseUrl = Deno.env.get("SUPABASE_URL")?.replace(/\/+$/, "");
-  if (!supabaseUrl) {
-    throw new HttpError(503, "server_configuration_missing", true);
-  }
-  const url = new URL(
-    `${supabaseUrl}/functions/v1/agenda-meeting-stt-callback`,
+  const sequence = requireInteger(body.sequence, 0, MAX_SEQUENCE, "invalid_sequence");
+  const captureStartMs = requireInteger(
+    body.captureStartMs,
+    0,
+    MAX_ACTIVE_DURATION_MS,
+    "invalid_segment_capture_window",
   );
-  url.searchParams.set("attempt", attemptId);
-  url.searchParams.set("segment", segmentId);
-  url.searchParams.set("token", opaqueToken);
-  return url.toString();
+  const captureEndMs = requireInteger(
+    body.captureEndMs,
+    1,
+    MAX_ACTIVE_DURATION_MS,
+    "invalid_segment_capture_window",
+  );
+  if (captureEndMs <= captureStartMs) {
+    throw new HttpError(400, "invalid_segment_capture_window");
+  }
+  if (typeof body.transcript !== "string") {
+    throw new HttpError(400, "invalid_transcript_text");
+  }
+  const transcript = removeUnsafeControlCharacters(body.transcript)
+    .replace(/[ \t]+/g, " ")
+    .replace(/\s*\n\s*/g, "\n")
+    .trim();
+  if (transcript.length > MAX_TRANSCRIPT_CHARS) {
+    throw new HttpError(413, "transcript_segment_too_large");
+  }
+  const rawConfidence = body.confidence;
+  const confidence = typeof rawConfidence === "number" &&
+      Number.isFinite(rawConfidence)
+    ? Math.min(1, Math.max(0, rawConfidence))
+    : null;
+
+  return {
+    sessionId: body.sessionId,
+    segmentId: body.segmentId,
+    mutationId: body.mutationId,
+    sequence,
+    captureStartMs,
+    captureEndMs,
+    transcript,
+    confidence,
+  };
 }
 
 Deno.serve(async (req) => {
@@ -137,14 +103,19 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const metadata = parseSegmentUploadMetadata(req);
+    let rawBody: unknown;
+    try {
+      rawBody = await req.json();
+    } catch {
+      throw new HttpError(400, "invalid_payload");
+    }
+    const payload = parseTextSegmentPayload(rawBody);
     const caller = await authenticateMeetingUser(req);
 
-    // Resolve the scope through a user client, so RLS is evaluated before service role.
     const { data: session, error: scopeError } = await caller.client
       .from("agenda_meeting_sessions")
       .select("org_id,event_id")
-      .eq("id", metadata.sessionId)
+      .eq("id", payload.sessionId)
       .maybeSingle();
     if (scopeError) {
       throw new HttpError(503, "meeting_scope_lookup_failed", true);
@@ -156,141 +127,46 @@ Deno.serve(async (req) => {
       "transcribe_segment",
       scope.org_id,
       scope.event_id,
-      metadata.sessionId,
+      payload.sessionId,
     );
 
-    const bytes = await readBodyBytes(req, MAX_SEGMENT_BYTES);
-    if (bytes.byteLength === 0) {
-      throw new HttpError(400, "audio_segment_required");
-    }
-    const actualSha256 = await sha256Hex(bytes);
-    if (!constantTimeEqual(actualSha256, metadata.sha256)) {
-      throw new HttpError(422, "segment_sha256_mismatch");
-    }
-
-    const opaqueToken = randomOpaqueToken();
-    const callbackTokenHash = await sha256Hex(opaqueToken);
     const admin = createMeetingAdminClient();
-    const { data: preparedData, error: prepareError } = await admin.rpc(
-      "agenda_meeting_prepare_segment",
+    const { data, error } = await admin.rpc(
+      "agenda_meeting_ingest_text_segment",
       {
         p_actor_user_id: caller.id,
-        p_session_id: metadata.sessionId,
-        p_segment_id: metadata.segmentId,
-        p_sequence: metadata.sequence,
-        p_capture_start_ms: metadata.captureStartMs,
-        p_capture_end_ms: metadata.captureEndMs,
-        p_mime_type: metadata.mimeType,
-        p_byte_size: bytes.byteLength,
-        p_sha256: actualSha256,
-        p_mutation_id: metadata.mutationId,
-        p_callback_token_hash: callbackTokenHash,
-        p_callback_token_expires_at: new Date(
-          Date.now() + CALLBACK_TOKEN_TTL_MS,
-        ).toISOString(),
+        p_session_id: payload.sessionId,
+        p_segment_id: payload.segmentId,
+        p_sequence: payload.sequence,
+        p_capture_start_ms: payload.captureStartMs,
+        p_capture_end_ms: payload.captureEndMs,
+        p_transcript: payload.transcript,
+        p_mutation_id: payload.mutationId,
+        p_confidence: payload.confidence,
       },
     );
-    if (prepareError) throw mapDatabaseError(prepareError);
-    const prepared = requirePreparedSegment(preparedData);
-    if (
-      prepared.segmentId !== metadata.segmentId ||
-      prepared.sequence !== metadata.sequence
-    ) {
-      throw new HttpError(409, "segment_prepare_mismatch");
-    }
-    if (!prepared.shouldForward) {
-      if (prepared.status === "accepted") {
-        return jsonResponse(
-          req,
-          receiptPayload(prepared, {
-            status: "retryable_error",
-            retryAfterMs: prepared.retryAfterMs ?? 120_000,
-            errorCode: "segment_submission_pending",
-          }),
-        );
-      }
-      return jsonResponse(req, receiptPayload(prepared));
-    }
+    if (error) throw mapDatabaseError(error);
 
-    const keyterms: string[] = [];
-    collectActualKeyterms(prepared.keyterms, keyterms);
-    const adapter = new DeepgramMeetingSttAdapter();
-    try {
-      const accepted = await adapter.submitSegment({
-        bytes,
-        mimeType: metadata.mimeType,
-        callbackUrl: callbackUrl(
-          prepared.attemptId,
-          prepared.segmentId,
-          opaqueToken,
-        ),
-        attemptId: prepared.attemptId,
-        segmentId: prepared.segmentId,
-        keyterms,
-      });
-      const { data: acceptedData, error: acceptedError } = await admin.rpc(
-        "agenda_meeting_accept_segment",
-        {
-          p_receipt_id: prepared.receiptId,
-          p_provider_request_id: accepted.requestId,
-        },
-      );
-      if (acceptedError) {
-        // Deepgram may already deliver the callback. Do not expose or retain the audio;
-        // polling will converge through the prepared attempt/token pair.
-        logSafe("warn", "agenda_meeting_segment_acceptance_write_deferred", {
-          receiptId: prepared.receiptId,
-          segmentId: prepared.segmentId,
-          sequence: prepared.sequence,
-          errorCode: "acceptance_write_failed",
-        });
-        return jsonResponse(
-          req,
-          receiptPayload(prepared, { status: "processing" }),
-          202,
-        );
-      }
-      const acceptedResult: Record<string, unknown> =
-        isPlainObject(acceptedData) ? acceptedData : {};
-      return jsonResponse(
-        req,
-        receiptPayload(prepared, {
-          status: typeof acceptedResult.status === "string"
-            ? acceptedResult.status
-            : "processing",
-          canonicalReceiptId: acceptedResult.canonicalReceiptId ?? null,
-        }),
-        202,
-      );
-    } catch (providerError) {
-      const failure = adapter.classifyError(providerError);
-      const { data: failedData, error: failedError } = await admin.rpc(
-        "agenda_meeting_fail_segment",
-        {
-          p_receipt_id: prepared.receiptId,
-          p_error_code: failure.code,
-          p_terminal: !failure.retryable,
-          p_retry_after_ms: failure.retryAfterMs,
-        },
-      );
-      if (failedError) throw mapDatabaseError(failedError);
-      const failed: Record<string, unknown> = isPlainObject(failedData)
-        ? failedData
-        : {};
-      return jsonResponse(
-        req,
-        receiptPayload(prepared, {
-          status: typeof failed.status === "string"
-            ? failed.status
-            : failure.retryable
-            ? "retryable_error"
-            : "terminal_error",
-          retryAfterMs: failed.retryAfterMs ?? failure.retryAfterMs,
-          errorCode: failed.errorCode ?? failure.code,
-          canonicalReceiptId: failed.canonicalReceiptId ?? null,
-        }),
-      );
-    }
+    const result: Record<string, unknown> = isPlainObject(data) ? data : {};
+    const canonicalReceiptId = typeof result.canonicalReceiptId === "string"
+      ? result.canonicalReceiptId
+      : null;
+
+    return jsonResponse(req, {
+      ok: true,
+      status: "transcribed",
+      canonicalReceiptId,
+      retryAfterMs: null,
+      errorCode: null,
+      receipt: {
+        segmentId: payload.segmentId,
+        sequence: payload.sequence,
+        status: "transcribed",
+        canonicalReceiptId,
+        retryAfterMs: null,
+        errorCode: null,
+      },
+    });
   } catch (error) {
     return errorResponse(req, error, "agenda_meeting_transcribe_segment");
   }
