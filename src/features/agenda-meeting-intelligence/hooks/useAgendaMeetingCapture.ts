@@ -8,6 +8,7 @@ import {
 } from '../capture/CaptureSegmenter';
 import { createMeetingMutationId } from '../capture/identity';
 import { listSupportedMediaRecorderMimeTypes } from '../capture/mime';
+import { evaluateMeetingCapability, meetingDiagnostics } from '../capture/meetingDiagnostics';
 import { isNativeSpeechRecognitionSupported } from '../capture/NativeMeetingTranscriptionAdapter';
 import {
   INITIAL_AGENDA_MEETING_CAPTURE_STATE,
