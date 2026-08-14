@@ -193,6 +193,8 @@ export const MAX_SEGMENT_SEQUENCE = 10_000;
 export const MAX_MEETING_ACTIVE_DURATION_MS = 4 * 60 * 60 * 1_000;
 
 const ALLOWED_MIME_TYPES = new Set([
+  "text/plain",
+  "text/plain;charset=utf-8",
   "audio/webm",
   "audio/webm;codecs=opus",
   "audio/mp4",
