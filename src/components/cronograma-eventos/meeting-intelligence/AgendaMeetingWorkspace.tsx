@@ -105,6 +105,18 @@ const SESSION_STATE_LABELS: Record<AgendaMeetingSessionSummary['state'], string>
   deleted: 'Excluída',
 };
 
+const LIVE_RECOGNITION_LABELS: Record<string, string> = {
+  idle: 'Aguardando',
+  initializing: 'Iniciando',
+  listening: 'Ouvindo',
+  speech_detected: 'Reconhecendo fala',
+  recovering: 'Reconectando o reconhecimento',
+  paused: 'Pausada',
+  stopping: 'Encerrando',
+  completed: 'Concluída',
+  error: 'Indisponível',
+};
+
 type ConfirmIntent = 'cancel-capture' | 'delete-session' | 'submit-revision' | 'analyze-partial' | null;
 type DetailTab = 'summary' | 'decisions' | 'actions' | 'transcript';
 
