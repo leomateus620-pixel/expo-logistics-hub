@@ -153,6 +153,7 @@ export interface AgendaMeetingFinishInput {
 export interface AgendaMeetingCaptureCapabilities {
   mediaRecorder: boolean;
   audioWorkletWav: boolean;
+  nativeSpeechRecognition: boolean;
   encryptedIndexedDb: boolean;
   supportedMimeTypes: readonly string[];
 }

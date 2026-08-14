@@ -8,6 +8,7 @@ import {
 } from '../capture/CaptureSegmenter';
 import { createMeetingMutationId } from '../capture/identity';
 import { listSupportedMediaRecorderMimeTypes } from '../capture/mime';
+import { isNativeSpeechRecognitionSupported } from '../capture/NativeMeetingTranscriptionAdapter';
 import {
   INITIAL_AGENDA_MEETING_CAPTURE_STATE,
   agendaMeetingCaptureReducer,
@@ -243,6 +244,7 @@ function detectCaptureCapabilities(): AgendaMeetingCaptureCapabilities {
     mediaRecorder: supportedMimeTypes.length > 0,
     audioWorkletWav: Boolean(AudioContextConstructor && typeof AudioWorkletNode !== 'undefined'),
     encryptedIndexedDb: Boolean(globalThis.crypto?.subtle && globalThis.indexedDB),
+    nativeSpeechRecognition: isNativeSpeechRecognitionSupported(),
     supportedMimeTypes,
   };
 }
