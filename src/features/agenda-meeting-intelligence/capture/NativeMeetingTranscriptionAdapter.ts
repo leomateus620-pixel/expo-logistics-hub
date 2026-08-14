@@ -153,6 +153,13 @@ export class NativeMeetingTranscriptionAdapter {
   private restartAttempts = 0;
   private restartWindowStartedAt = 0;
   private state: TranscriptionState = 'idle';
+  private startupWatchdog: ReturnType<typeof setTimeout> | null = null;
+  private onStartReceived = false;
+  private audioStartReceived = false;
+  private speechStartReceived = false;
+  private resultsReceived = 0;
+  private endCount = 0;
+  private lastErrorCode: string | null = null;
 
   /** Append-only: nunca é limpo em reinícios. */
   private finalSegments: string[] = [];
