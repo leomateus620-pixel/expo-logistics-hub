@@ -49,6 +49,8 @@ import { useCronogramaDashboardActivity } from '@/hooks/useCronogramaDashboardAc
 import { useCronogramaDashboardData } from '@/hooks/useCronogramaDashboardData';
 import { useCronogramaEventHistory, useCronogramaEventos } from '@/hooks/useCronogramaEventos';
 import { useCronogramaWeeklySummary } from '@/hooks/useCronogramaWeeklySummary';
+import { useCapabilities } from '@/hooks/useCapabilities';
+import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import {
   getHarvestEventKey,
   mergeHarvestCompletionSnapshots,
@@ -76,6 +78,9 @@ import '@/styles/cronograma-timeline-recovery.css';
 import '@/styles/cronograma-timeline-flagship.css';
 import '@/styles/cronograma-harvest-completion.css';
 import '@/styles/cronograma-dashboard.css';
+import '@/styles/agenda-meeting-intelligence.css';
+
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 const CronogramaDashboardBoard = lazy(async () => {
   const module = await import(
@@ -128,6 +133,8 @@ function useCurrentCronogramaDay() {
 
 export default function CronogramaEventosPage() {
   const cronograma = useCronogramaEventos();
+  const { orgId, myRole } = useCurrentOrg();
+  const { capSet } = useCapabilities();
   const viewportIsMobilePresentation = useCronogramaMobilePresentation();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -217,6 +224,35 @@ export default function CronogramaEventosPage() {
       ?? null;
   }, [selectedEvent, sourceById]);
   const eventHistory = useCronogramaEventHistory(selectedSourceId);
+  const meetingIntelligence = useMemo(() => {
+    const hasCanonicalEvent = Boolean(
+      orgId
+      && selectedSourceId
+      && UUID_PATTERN.test(selectedSourceId)
+      && !cronograma.isSeedFallback
+      && !selectedSourceUnavailable,
+    );
+    return {
+      eventId: hasCanonicalEvent ? selectedSourceId : null,
+      orgId,
+      persistedEvent: hasCanonicalEvent,
+      canRecord: hasCanonicalEvent && cronograma.canWriteEvents,
+      canReview: hasCanonicalEvent && cronograma.canWriteEvents,
+      canDelete: hasCanonicalEvent && (
+        myRole === 'admin'
+        || myRole === 'gestor'
+        || capSet.has('meeting_intelligence_delete')
+      ),
+    };
+  }, [
+    capSet,
+    cronograma.canWriteEvents,
+    cronograma.isSeedFallback,
+    myRole,
+    orgId,
+    selectedSourceId,
+    selectedSourceUnavailable,
+  ]);
 
   useEffect(() => {
     overlayOpenRef.current.drawer = drawerOpen;
@@ -1040,6 +1076,7 @@ export default function CronogramaEventosPage() {
             historyError={eventHistory.error}
             canViewHistory={eventHistory.canViewHistory}
             sourceUnavailable={selectedSourceUnavailable}
+            meetingIntelligence={meetingIntelligence}
           />
         </MobileCronogramaErrorBoundary>
       ) : (
@@ -1059,6 +1096,7 @@ export default function CronogramaEventosPage() {
           historyLoading={eventHistory.isLoading}
           historyError={eventHistory.error}
           canViewHistory={eventHistory.canViewHistory}
+          meetingIntelligence={meetingIntelligence}
         />
       )}
 

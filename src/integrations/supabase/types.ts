@@ -6,6 +6,277 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
+type AgendaMeetingTable<Row, RequiredInsert extends keyof Row> = {
+  Row: Row
+  Insert: Partial<Row> & Pick<Row, RequiredInsert>
+  Update: Partial<Row>
+  Relationships: []
+}
+
+type AgendaMeetingSessionRow = {
+  id: string
+  org_id: string
+  event_id: string
+  started_by: string
+  client_session_key: string
+  capture_state: string
+  processing_state: string
+  version: number
+  consent_confirmed: boolean
+  consent_policy_version: string | null
+  consent_confirmed_at: string | null
+  partial_analysis_confirmed: boolean
+  language: string
+  stt_provider: string
+  stt_model: string
+  analysis_provider: string
+  analysis_model: string
+  analysis_reasoning_effort: string
+  event_context: Json
+  last_received_sequence: number
+  last_contiguous_sequence: number
+  closed_sequence: number | null
+  missing_sequences: number[]
+  unresolved_sequences: number[]
+  active_duration_ms: number
+  heartbeat_at: string | null
+  started_at: string | null
+  paused_at: string | null
+  ended_at: string | null
+  finalized_at: string | null
+  completed_at: string | null
+  last_error_code: string | null
+  last_error_at: string | null
+  deleted_at: string | null
+  created_at: string
+  updated_at: string
+}
+
+type AgendaMeetingReceiptRow = {
+  id: string
+  session_id: string
+  org_id: string
+  event_id: string
+  segment_id: string
+  attempt_id: string
+  sequence: number
+  capture_start_ms: number
+  capture_end_ms: number
+  mime_type: string | null
+  byte_size: number | null
+  sha256: string | null
+  mutation_id: string
+  status: string
+  attempt_count: number
+  retry_after_ms: number | null
+  callback_token_hash: string | null
+  callback_token_expires_at: string | null
+  callback_digest: string | null
+  callback_received_at: string | null
+  provider_request_id: string | null
+  provider_accepted_at: string | null
+  transcribed_at: string | null
+  lost_at: string | null
+  error_code: string | null
+  created_at: string
+  updated_at: string
+}
+
+type AgendaMeetingTranscriptSegmentRow = {
+  id: string
+  session_id: string
+  org_id: string
+  event_id: string
+  receipt_id: string
+  segment_id: string
+  sequence: number
+  transcript_text: string
+  words: Json
+  duration_ms: number | null
+  confidence: number | null
+  provider_request_id: string
+  provider_model: string
+  provider_language: string
+  content_hash: string
+  created_at: string
+}
+
+type AgendaMeetingTranscriptVersionRow = {
+  id: string
+  session_id: string
+  org_id: string
+  event_id: string
+  version: number
+  kind: string
+  parent_version_id: string | null
+  transcript_text: string
+  content_hash: string
+  is_complete: boolean
+  missing_sequences: number[]
+  revision_reason: string | null
+  created_by: string | null
+  created_at: string
+}
+
+type AgendaMeetingRevisionSegmentRow = {
+  id: string
+  transcript_version_id: string
+  session_id: string
+  org_id: string
+  event_id: string
+  source_segment_id: string
+  sequence: number
+  revised_text: string
+  source_content_hash: string
+  revised_content_hash: string
+  created_at: string
+}
+
+type AgendaMeetingMinutesRow = {
+  id: string
+  session_id: string
+  org_id: string
+  event_id: string
+  transcript_version_id: string
+  version: number
+  status: string
+  title: string
+  summary: string
+  minutes_markdown: string
+  transcript_coverage: string
+  analysis_model: string
+  reasoning_effort: string
+  prompt_version: string
+  schema_version: string
+  provider_response_id: string | null
+  provider_usage: Json
+  reviewed_by: string | null
+  reviewed_at: string | null
+  review_note: string | null
+  created_at: string
+}
+
+type AgendaMeetingInsightRow = {
+  id: string
+  session_id: string
+  org_id: string
+  event_id: string
+  minutes_version_id: string
+  insight_type: string
+  position: number
+  title: string
+  description: string
+  evidence: Json
+  confidence: number | null
+  review_state: string
+  created_at: string
+}
+
+type AgendaMeetingActionRow = {
+  id: string
+  session_id: string
+  org_id: string
+  event_id: string
+  minutes_version_id: string
+  position: number
+  title: string
+  description: string
+  responsible_text: string | null
+  suggested_user_id: string | null
+  confirmed_user_id: string | null
+  due_date_text: string | null
+  due_date: string | null
+  due_date_confirmed: boolean
+  status: string
+  evidence: Json
+  confirmed_by: string | null
+  confirmed_at: string | null
+  updated_by: string | null
+  created_at: string
+  updated_at: string
+}
+
+type AgendaMeetingConsentRow = {
+  id: string
+  session_id: string
+  org_id: string
+  event_id: string
+  user_id: string
+  policy_version: string
+  consent_version: number
+  decision: string
+  recorded_by: string
+  recorded_at: string
+}
+
+type AgendaMeetingJobRow = {
+  id: string
+  session_id: string
+  org_id: string
+  event_id: string
+  transcript_version_id: string | null
+  kind: string
+  dedupe_key: string
+  status: string
+  attempts: number
+  max_attempts: number
+  available_at: string
+  lease_token: string | null
+  lease_expires_at: string | null
+  last_error_code: string | null
+  created_at: string
+  updated_at: string
+  completed_at: string | null
+}
+
+type AgendaMeetingAuditRow = {
+  id: string
+  session_id: string
+  org_id: string
+  event_id: string
+  actor_user_id: string | null
+  actor_kind: string
+  action: string
+  entity_type: string
+  entity_id: string | null
+  mutation_id: string | null
+  metadata: Json
+  created_at: string
+}
+
+type AgendaMeetingMutationReceiptRow = {
+  id: string
+  actor_user_id: string
+  org_id: string
+  event_id: string
+  action: string
+  mutation_id: string
+  session_id: string | null
+  response: Json
+  created_at: string
+}
+
+type AgendaMeetingTombstoneRow = {
+  id: string
+  org_id: string
+  event_id: string
+  session_id: string
+  deletion_scope: string
+  actor_user_id: string | null
+  session_version: number
+  capture_state: string
+  processing_state: string
+  receipt_count: number
+  transcript_segment_count: number
+  transcript_version_count: number
+  minutes_version_count: number
+  event_context_hash: string
+  latest_transcript_hash: string | null
+  latest_minutes_hash: string | null
+  session_created_at: string
+  deleted_at: string
+}
+
 export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
@@ -14,6 +285,19 @@ export type Database = {
   }
   public: {
     Tables: {
+      agenda_meeting_action_items: AgendaMeetingTable<AgendaMeetingActionRow, "session_id" | "org_id" | "event_id" | "minutes_version_id" | "title">
+      agenda_meeting_administrative_tombstones: AgendaMeetingTable<AgendaMeetingTombstoneRow, "org_id" | "event_id" | "session_id" | "deletion_scope" | "session_version" | "capture_state" | "processing_state" | "event_context_hash" | "session_created_at">
+      agenda_meeting_audit_events: AgendaMeetingTable<AgendaMeetingAuditRow, "session_id" | "org_id" | "event_id" | "actor_kind" | "action" | "entity_type">
+      agenda_meeting_insights: AgendaMeetingTable<AgendaMeetingInsightRow, "session_id" | "org_id" | "event_id" | "minutes_version_id" | "insight_type" | "title" | "description">
+      agenda_meeting_minutes_versions: AgendaMeetingTable<AgendaMeetingMinutesRow, "session_id" | "org_id" | "event_id" | "transcript_version_id" | "version" | "title" | "summary" | "minutes_markdown" | "transcript_coverage" | "prompt_version" | "schema_version">
+      agenda_meeting_mutation_receipts: AgendaMeetingTable<AgendaMeetingMutationReceiptRow, "actor_user_id" | "org_id" | "event_id" | "action" | "mutation_id" | "response">
+      agenda_meeting_processing_jobs: AgendaMeetingTable<AgendaMeetingJobRow, "session_id" | "org_id" | "event_id" | "kind" | "dedupe_key">
+      agenda_meeting_segment_receipts: AgendaMeetingTable<AgendaMeetingReceiptRow, "session_id" | "org_id" | "event_id" | "segment_id" | "sequence" | "capture_start_ms" | "capture_end_ms" | "mutation_id">
+      agenda_meeting_sessions: AgendaMeetingTable<AgendaMeetingSessionRow, "org_id" | "event_id" | "started_by" | "client_session_key">
+      agenda_meeting_transcript_revision_segments: AgendaMeetingTable<AgendaMeetingRevisionSegmentRow, "transcript_version_id" | "session_id" | "org_id" | "event_id" | "source_segment_id" | "sequence" | "revised_text" | "source_content_hash" | "revised_content_hash">
+      agenda_meeting_transcript_segments: AgendaMeetingTable<AgendaMeetingTranscriptSegmentRow, "session_id" | "org_id" | "event_id" | "receipt_id" | "segment_id" | "sequence" | "transcript_text" | "provider_request_id" | "content_hash">
+      agenda_meeting_transcript_versions: AgendaMeetingTable<AgendaMeetingTranscriptVersionRow, "session_id" | "org_id" | "event_id" | "version" | "kind" | "transcript_text" | "content_hash">
+      agenda_meeting_user_consents: AgendaMeetingTable<AgendaMeetingConsentRow, "session_id" | "org_id" | "event_id" | "user_id" | "policy_version" | "consent_version" | "decision" | "recorded_by">
       audit_log: {
         Row: {
           action: Database["public"]["Enums"]["audit_action"]
@@ -6965,6 +7249,113 @@ export type Database = {
       }
     }
     Functions: {
+      agenda_meeting_accept_segment: {
+        Args: { p_provider_request_id: string; p_receipt_id: string }
+        Returns: Json
+      }
+      agenda_meeting_actor_allowed: {
+        Args: { p_action: string; p_event_id: string; p_org_id: string; p_session_id?: string; p_user_id: string }
+        Returns: boolean
+      }
+      agenda_meeting_analysis_evidence: {
+        Args: { p_segment_ids: Json; p_session_id: string }
+        Returns: Json
+      }
+      agenda_meeting_authorize: {
+        Args: { p_action: string; p_event_id: string; p_org_id: string; p_session_id?: string }
+        Returns: boolean
+      }
+      agenda_meeting_claim_jobs: {
+        Args: { p_batch_size?: number; p_lease_seconds?: number }
+        Returns: AgendaMeetingJobRow[]
+        SetofOptions: {
+          from: "*"
+          to: "agenda_meeting_processing_jobs"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      agenda_meeting_complete_analysis_job: {
+        Args: {
+          p_job_id: string
+          p_lease_token: string
+          p_provider_response_id: string
+          p_result: Json
+          p_transcript_version_id: string
+          p_usage?: Json
+        }
+        Returns: Json
+      }
+      agenda_meeting_complete_assemble_job: {
+        Args: { p_job_id: string; p_lease_token: string }
+        Returns: Json
+      }
+      agenda_meeting_complete_segment: {
+        Args: {
+          p_attempt_id: string
+          p_callback_digest: string
+          p_callback_token_hash: string
+          p_confidence?: number
+          p_duration_ms?: number
+          p_provider_request_id: string
+          p_transcript: string
+          p_words?: Json
+        }
+        Returns: Json
+      }
+      agenda_meeting_control: {
+        Args: {
+          p_action: string
+          p_actor_user_id: string
+          p_event_id: string
+          p_expected_version?: number
+          p_mutation_id?: string
+          p_org_id: string
+          p_payload?: Json
+          p_session_id?: string
+        }
+        Returns: Json
+      }
+      agenda_meeting_detail_json: { Args: { p_session_id: string }; Returns: Json }
+      agenda_meeting_expire_stale_captures: {
+        Args: { p_stale_seconds?: number }
+        Returns: number
+      }
+      agenda_meeting_event_accessible: {
+        Args: { p_event_id: string; p_org_id: string; p_user_id: string }
+        Returns: boolean
+      }
+      agenda_meeting_fail_job: {
+        Args: { p_error_code: string; p_job_id: string; p_lease_token: string; p_retry_after_seconds?: number }
+        Returns: Json
+      }
+      agenda_meeting_fail_segment: {
+        Args: { p_error_code: string; p_receipt_id: string; p_retry_after_ms?: number; p_terminal: boolean }
+        Returns: Json
+      }
+      agenda_meeting_prepare_segment: {
+        Args: {
+          p_actor_user_id: string
+          p_byte_size: number
+          p_callback_token_expires_at: string
+          p_callback_token_hash: string
+          p_capture_end_ms: number
+          p_capture_start_ms: number
+          p_mime_type: string
+          p_mutation_id: string
+          p_segment_id: string
+          p_sequence: number
+          p_session_id: string
+          p_sha256: string
+        }
+        Returns: Json
+      }
+      agenda_meeting_session_readable: {
+        Args: { p_event_id: string; p_org_id: string; p_session_id: string; p_user_id: string }
+        Returns: boolean
+      }
+      agenda_meeting_session_summary_json: { Args: { p_session_id: string }; Returns: Json }
+      invoke_agenda_meeting_worker: { Args: never; Returns: number }
       _cronograma_apply_event_commissions: {
         Args: { _event_id: string; _items: Json; _org_id: string }
         Returns: undefined
