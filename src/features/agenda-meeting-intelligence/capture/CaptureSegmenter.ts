@@ -7,7 +7,8 @@ import {
   type CaptureGapMarker,
 } from '../types';
 import { createCaptureSegmentId } from './identity';
-import { selectMediaRecorderMimeType } from './mime';
+import { AGENDA_MEETING_TEXT_SEGMENT_MIME_TYPE, selectMediaRecorderMimeType } from './mime';
+import { NativeMeetingTranscriptionAdapter } from './NativeMeetingTranscriptionAdapter';
 import { sha256Blob } from './sha256';
 import { encodePcm16Wav } from './wav';
 
@@ -100,6 +101,7 @@ export class CaptureSegmenter {
   private durationTimer: ReturnType<typeof setInterval> | null = null;
   private operation: Promise<void> = Promise.resolve();
   private lifecycleAttached = false;
+  private transcription: NativeMeetingTranscriptionAdapter | null = null;
 
   private readonly onVisibilityChange = () => {
     if (this.options.documentTarget?.visibilityState === 'hidden' && this.mode === 'recording') {
@@ -203,6 +205,17 @@ export class CaptureSegmenter {
     }
 
     await this.prepareInputMeter();
+
+    this.transcription = new NativeMeetingTranscriptionAdapter({
+      onFatalError: (code) => {
+        void this.interrupt('capture_error', new Error(code));
+      },
+    });
+    if (!this.transcription.supported) {
+      this.transcription = null;
+      await this.releaseCaptureResources();
+      throw new Error('speech_recognition_unavailable');
+    }
 
     this.mode = 'prepared';
     this.attachLifecycleListeners();
@@ -357,6 +370,7 @@ export class CaptureSegmenter {
 
   private async startCycle(): Promise<void> {
     if (!this.stream || !this.backend) throw new Error('capture_stream_unavailable');
+    this.transcription?.start();
     this.cycleStartActiveMs = this.activeDurationMs;
     this.scheduleSegmentRotation();
     if (this.backend === 'media_recorder') {
@@ -580,6 +594,8 @@ export class CaptureSegmenter {
   }
 
   private async releaseCaptureResources(): Promise<void> {
+    this.transcription?.stop();
+    this.transcription = null;
     this.workletNode?.disconnect();
     this.workletSource?.disconnect();
     this.silentGain?.disconnect();
