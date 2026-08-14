@@ -171,10 +171,23 @@ function errorMessage(code: string | undefined): string {
       return 'Sua sessão expirou. Entre novamente antes de continuar.';
     case 'network_error':
       return 'Sem conexão com o serviço. Os segmentos pendentes permanecem no spool protegido.';
+    case 'meeting_consent_actor_invalid':
+      return 'Seu usuário não está ativo nesta organização, por isso o consentimento da reunião não pôde ser registrado.';
+    case 'meeting_event_not_found':
+      return 'O evento desta reunião não foi encontrado na organização selecionada.';
+    case 'forbidden':
+      return 'Você não tem permissão para executar esta ação na reunião.';
+    case 'meeting_consent_required':
+      return 'Confirme o consentimento e o aviso aos participantes para iniciar a reunião.';
+    case 'invalid_capture_contract':
+      return 'O contrato de captura enviado pelo navegador não foi aceito pelo servidor.';
+    case 'meeting_persistence_failed':
+      return 'O serviço de reuniões está temporariamente indisponível. Tente novamente em instantes.';
     default:
       return 'Não foi possível concluir esta etapa. Nenhum conteúdo foi inventado ou descartado silenciosamente.';
   }
 }
+
 
 function evidenceLabel(count: number): string {
   if (count === 1) return '1 trecho de origem';

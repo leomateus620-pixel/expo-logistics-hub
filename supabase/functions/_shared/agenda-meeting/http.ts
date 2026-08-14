@@ -24,12 +24,15 @@ export class HttpError extends Error {
   readonly code: string;
   readonly retryable: boolean;
   readonly retryAfterMs: number | null;
+  /** Token técnico opcional para diagnóstico (nunca contém dados do usuário). */
+  readonly detail: string | null;
 
   constructor(
     status: number,
     code: string,
     retryable = false,
     retryAfterMs: number | null = null,
+    detail: string | null = null,
   ) {
     super(code);
     this.name = "HttpError";
@@ -37,6 +40,7 @@ export class HttpError extends Error {
     this.code = code;
     this.retryable = retryable;
     this.retryAfterMs = retryAfterMs;
+    this.detail = detail;
   }
 }
 
@@ -165,6 +169,7 @@ export function errorResponse(req: Request, error: unknown, scope: string) {
   logSafe(httpError.status >= 500 ? "error" : "warn", `${scope}_failed`, {
     errorCode: httpError.code,
     status: httpError.status,
+    detail: httpError.detail,
   });
   const headers = new Headers({
     ...corsHeaders(req),
@@ -182,6 +187,7 @@ export function errorResponse(req: Request, error: unknown, scope: string) {
       code: httpError.code,
       retryable: httpError.retryable,
       retryAfterMs: httpError.retryAfterMs,
+      detail: httpError.detail,
     }),
     { status: httpError.status, headers },
   );
