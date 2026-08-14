@@ -755,3 +755,104 @@
   color: hsl(var(--muted-foreground));
   font-style: italic;
 }
+
+/* ── Diagnóstico técnico da captura ─────────────────────────────────── */
+.agenda-meeting__diagnostics {
+  margin: 1.25rem 0 0.5rem;
+  border-radius: 1rem;
+  border: 1px solid hsl(var(--border) / 0.7);
+  background: hsl(var(--card) / 0.6);
+  backdrop-filter: blur(14px);
+  padding: 0.85rem 1rem;
+}
+
+.agenda-meeting__diagnostics > summary {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: hsl(var(--foreground) / 0.85);
+  list-style: none;
+}
+
+.agenda-meeting__diagnostics > summary::-webkit-details-marker {
+  display: none;
+}
+
+.agenda-meeting__diagnostics > summary strong {
+  margin-left: auto;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid hsl(var(--border));
+  background: hsl(var(--muted) / 0.5);
+  color: hsl(var(--muted-foreground));
+}
+
+.agenda-meeting__diagnostics > summary strong[data-state='supported_and_ready'] {
+  border-color: hsl(var(--primary) / 0.45);
+  color: hsl(var(--primary));
+}
+
+.agenda-meeting__diagnostics > summary strong[data-state='supported_requires_configuration'],
+.agenda-meeting__diagnostics > summary strong[data-state='unsupported_by_runtime'] {
+  border-color: hsl(var(--destructive) / 0.4);
+  color: hsl(var(--destructive));
+}
+
+.agenda-meeting__diagnostics-reason {
+  margin-top: 0.65rem;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: hsl(var(--muted-foreground));
+}
+
+.agenda-meeting__diagnostics-actions {
+  margin-top: 0.65rem;
+}
+
+.agenda-meeting__diagnostics-empty {
+  margin-top: 0.65rem;
+  font-size: 0.76rem;
+  color: hsl(var(--muted-foreground));
+}
+
+.agenda-meeting__diagnostics-log {
+  margin-top: 0.75rem;
+  max-height: 16rem;
+  overflow-y: auto;
+  display: grid;
+  gap: 0.3rem;
+  font-size: 0.72rem;
+  padding-right: 0.35rem;
+}
+
+.agenda-meeting__diagnostics-log li {
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr);
+  gap: 0.35rem 0.6rem;
+  padding: 0.35rem 0.5rem;
+  border-radius: 0.6rem;
+  background: hsl(var(--muted) / 0.35);
+}
+
+.agenda-meeting__diagnostics-log li span {
+  font-variant-numeric: tabular-nums;
+  color: hsl(var(--muted-foreground));
+}
+
+.agenda-meeting__diagnostics-log li code {
+  font-weight: 600;
+  color: hsl(var(--foreground));
+  word-break: break-word;
+}
+
+.agenda-meeting__diagnostics-log li em {
+  grid-column: 2;
+  font-style: normal;
+  color: hsl(var(--muted-foreground));
+  word-break: break-word;
+}
