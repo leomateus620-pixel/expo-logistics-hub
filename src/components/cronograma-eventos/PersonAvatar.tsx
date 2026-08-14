@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 import { getPersonPhoto } from './personPhotos';
+import '@/styles/cronograma-registration-interactions.css';
 
 interface PersonAvatarProps {
   name?: string | null;
