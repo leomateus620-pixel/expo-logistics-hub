@@ -6,8 +6,8 @@ import djeisonDrey from '@/assets/person-djeison-drey.jpg';
  * existing initials / generic icon treatment.
  */
 const PERSON_PHOTOS: Record<string, string> = {
-  'fabiano soltis': fabianoSoltis.url,
-  'djeison drey': djeisonDrey.url,
+  'fabiano soltis': fabianoSoltis,
+  'djeison drey': djeisonDrey,
 };
 
 function normalize(value: string): string {
