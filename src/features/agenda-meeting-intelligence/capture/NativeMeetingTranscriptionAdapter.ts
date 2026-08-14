@@ -394,31 +394,58 @@ export class NativeMeetingTranscriptionAdapter {
     recognition.continuous = true;
     recognition.interimResults = true;
     recognition.maxAlternatives = 1;
+    meetingDiagnostics.record('RECOGNITION_CREATED', {
+      lang: recognition.lang,
+      continuous: recognition.continuous,
+      interimResults: recognition.interimResults,
+      maxAlternatives: recognition.maxAlternatives,
+      processLocallySupported: 'processLocally' in recognition,
+      attempt: this.restartAttempts,
+    });
 
     recognition.onstart = () => {
       this.startLock = false;
+      this.onStartReceived = true;
+      this.clearStartupWatchdog();
+      meetingDiagnostics.record('RECOGNITION_ONSTART');
       debugLog('recognition_start');
       if (this.active) this.setState('listening');
     };
 
     recognition.onaudiostart = () => {
+      this.audioStartReceived = true;
+      this.clearStartupWatchdog();
+      meetingDiagnostics.record('RECOGNITION_AUDIOSTART');
       if (this.active && this.state === 'initializing') this.setState('listening');
     };
 
+    recognition.onsoundstart = () => {
+      meetingDiagnostics.record('RECOGNITION_SOUNDSTART');
+    };
+
     recognition.onspeechstart = () => {
+      this.speechStartReceived = true;
+      meetingDiagnostics.record('RECOGNITION_SPEECHSTART');
       if (this.active) this.setState('speech_detected');
     };
 
     recognition.onspeechend = () => {
+      meetingDiagnostics.record('RECOGNITION_SPEECHEND');
       if (this.active && this.state === 'speech_detected') this.setState('listening');
     };
 
+    recognition.onsoundend = () => {
+      meetingDiagnostics.record('RECOGNITION_SOUNDEND');
+    };
+
     recognition.onaudioend = () => {
+      meetingDiagnostics.record('RECOGNITION_AUDIOEND');
       // O ciclo de áudio pode fechar sozinho; `onend` decide o reinício.
     };
 
     recognition.onresult = (event) => {
       let interim = '';
+      let finals = 0;
       for (let index = event.resultIndex; index < event.results.length; index += 1) {
         const result = event.results[index];
         const alternative = result?.[0];
@@ -428,10 +455,18 @@ export class NativeMeetingTranscriptionAdapter {
         if (result.isFinal) {
           this.appendFinal(text);
           this.restartAttempts = 0;
+          finals += 1;
         } else {
           interim = interim ? `${interim} ${text}` : text;
         }
       }
+      this.resultsReceived += 1;
+      this.clearStartupWatchdog();
+      meetingDiagnostics.record('RECOGNITION_RESULT', {
+        finals,
+        interim: interim.length > 0,
+        total: this.resultsReceived,
+      });
       this.interim = interim;
       this.options.onInterim?.(interim);
       if (this.active && this.state === 'recovering') this.setState('listening');
@@ -439,12 +474,23 @@ export class NativeMeetingTranscriptionAdapter {
 
     recognition.onerror = (event) => {
       const code = event.error;
+      this.lastErrorCode = code;
+      this.clearStartupWatchdog();
+      meetingDiagnostics.record('RECOGNITION_ERROR', {
+        code,
+        message: typeof event.message === 'string' ? event.message.slice(0, 160) : null,
+        onStartReceived: this.onStartReceived,
+        audioStartReceived: this.audioStartReceived,
+        restartAttempt: this.restartAttempts,
+        state: this.state,
+      });
       debugLog('recognition_error', code);
       if (FATAL_ERRORS.has(code)) {
         this.active = false;
         this.startLock = false;
         this.teardown('error');
         this.setState('error');
+        meetingDiagnostics.markTerminal(`recognition_${code}`);
         this.options.onFatalError?.(code);
         return;
       }
@@ -456,21 +502,58 @@ export class NativeMeetingTranscriptionAdapter {
 
     recognition.onend = () => {
       this.startLock = false;
+      this.endCount += 1;
+      meetingDiagnostics.record('RECOGNITION_END', {
+        manualStop: this.manualStop,
+        active: this.active,
+        endCount: this.endCount,
+      });
       debugLog('recognition_end', { manualStop: this.manualStop, active: this.active });
       if (this.recognition === recognition) this.recognition = null;
+      // `onend` isolado NUNCA é falha terminal: apenas reinício controlado.
       if (!this.active || this.manualStop) return;
       this.scheduleRestart(Recognition);
     };
 
     this.recognition = recognition;
+    this.armStartupWatchdog();
+    meetingDiagnostics.record('RECOGNITION_START_CALLED', { attempt: this.restartAttempts });
     try {
       recognition.start();
     } catch (error) {
       // InvalidStateError acontece quando o navegador ainda não liberou a
       // instância anterior: tratamos como reinício controlado.
       this.startLock = false;
+      this.clearStartupWatchdog();
+      meetingDiagnostics.record('RECOGNITION_START_THREW', {
+        name: (error as Error)?.name ?? 'Error',
+        message: (error as Error)?.message?.slice(0, 160) ?? null,
+      });
       debugLog('recognition_start_failed', (error as Error)?.name);
       this.scheduleRestart(Recognition);
     }
   }
+
+  private armStartupWatchdog(): void {
+    this.clearStartupWatchdog();
+    this.startupWatchdog = setTimeout(() => {
+      this.startupWatchdog = null;
+      if (!this.active) return;
+      meetingDiagnostics.record('STARTUP_STALLED', {
+        onStartReceived: this.onStartReceived,
+        audioStartReceived: this.audioStartReceived,
+        resultsReceived: this.resultsReceived,
+        endCount: this.endCount,
+        lastErrorCode: this.lastErrorCode,
+        state: this.state,
+      });
+    }, STARTUP_WATCHDOG_MS);
+  }
+
+  private clearStartupWatchdog(): void {
+    if (!this.startupWatchdog) return;
+    clearTimeout(this.startupWatchdog);
+    this.startupWatchdog = null;
+  }
 }
+
