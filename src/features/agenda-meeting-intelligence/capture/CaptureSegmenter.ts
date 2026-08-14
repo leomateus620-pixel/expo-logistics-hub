@@ -7,6 +7,7 @@ import {
   type CaptureGapMarker,
 } from '../types';
 import { createCaptureSegmentId } from './identity';
+import { meetingDiagnostics } from './meetingDiagnostics';
 import { AGENDA_MEETING_TEXT_SEGMENT_MIME_TYPE, selectMediaRecorderMimeType } from './mime';
 import {
   NativeMeetingTranscriptionAdapter,
@@ -177,13 +178,29 @@ export class CaptureSegmenter {
       },
       video: false,
     };
-    this.stream = await mediaDevices.getUserMedia(constraints);
+    meetingDiagnostics.record('GET_USER_MEDIA_REQUESTED', { explicitDevice: Boolean(deviceId) });
+    try {
+      this.stream = await mediaDevices.getUserMedia(constraints);
+    } catch (error) {
+      meetingDiagnostics.record('GET_USER_MEDIA_FAILED', {
+        name: (error as Error)?.name ?? 'Error',
+        message: (error as Error)?.message?.slice(0, 160) ?? null,
+      });
+      throw error;
+    }
+    meetingDiagnostics.record('GET_USER_MEDIA_GRANTED');
     const selectedTrack = this.stream.getAudioTracks()[0];
     if (!selectedTrack) {
       this.stopTracks();
       throw new Error('audio_track_unavailable');
     }
     this.selectedDeviceId = selectedTrack.getSettings().deviceId ?? deviceId ?? null;
+    meetingDiagnostics.record('AUDIO_TRACK_READY', {
+      readyState: selectedTrack.readyState,
+      muted: selectedTrack.muted,
+      enabled: selectedTrack.enabled,
+      label: selectedTrack.label ? 'present' : 'empty',
+    });
     selectedTrack.addEventListener('ended', this.handleTrackEnded);
 
     // Metadados de compatibilidade: nenhum áudio é codificado ou persistido.
@@ -201,6 +218,9 @@ export class CaptureSegmenter {
       onFatalError: (code) => {
         void this.interrupt('capture_error', new Error(code));
       },
+    });
+    meetingDiagnostics.record('TRANSCRIPTION_ADAPTER_CREATED', {
+      supported: this.transcription.supported,
     });
     if (!this.transcription.supported) {
       this.transcription = null;
@@ -313,6 +333,11 @@ export class CaptureSegmenter {
   async interrupt(reason: CaptureInterruptionReason, error?: Error): Promise<void> {
     if (this.mode === 'interrupted' || this.mode === 'stopped' || this.mode === 'idle') return;
     const wasRecording = this.mode === 'recording';
+    meetingDiagnostics.record('CAPTURE_INTERRUPTED', {
+      reason,
+      wasRecording,
+      error: error?.message?.slice(0, 160) ?? null,
+    });
     if (wasRecording) this.commitActiveInterval();
     this.mode = 'interrupted';
     this.clearTimers();

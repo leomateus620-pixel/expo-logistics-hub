@@ -8,6 +8,7 @@ import {
 } from '../capture/CaptureSegmenter';
 import { createMeetingMutationId } from '../capture/identity';
 import { listSupportedMediaRecorderMimeTypes } from '../capture/mime';
+import { evaluateMeetingCapability, meetingDiagnostics } from '../capture/meetingDiagnostics';
 import { isNativeSpeechRecognitionSupported } from '../capture/NativeMeetingTranscriptionAdapter';
 import {
   INITIAL_AGENDA_MEETING_CAPTURE_STATE,
@@ -541,11 +542,16 @@ export function useAgendaMeetingCapture(
       if (stateRef.current.phase !== 'idle') throw new Error('meeting_capture_already_started');
 
       startCancellationRequestedRef.current = false;
+      meetingDiagnostics.reset();
+      const capability = evaluateMeetingCapability();
+      meetingDiagnostics.record('CAPABILITY', { state: capability.state, reason: capability.reason });
       dispatch({ type: 'phase', phase: 'requesting_permission' });
       const segmenter = createSegmenter();
       let createdSession: AgendaMeetingStartResult['session'] | null = null;
       try {
+        meetingDiagnostics.record('STEP_PREPARE_CAPTURE');
         const prepared = await segmenter.prepare(input.deviceId ?? preferredDeviceId ?? undefined);
+        meetingDiagnostics.record('STEP_PREPARE_CAPTURE_OK', { backend: prepared.backend });
         if (startCancellationRequestedRef.current) {
           throw new Error('meeting_capture_cancelled');
         }
@@ -562,6 +568,7 @@ export function useAgendaMeetingCapture(
             audioPersistence: 'ephemeral_encrypted_only',
           },
         };
+        meetingDiagnostics.record('STEP_CONTROL_START');
         const result = await client.control<AgendaMeetingJson, AgendaMeetingStartResult>({
           action: 'start',
           mutationId: createMeetingMutationId(),
@@ -629,8 +636,14 @@ export function useAgendaMeetingCapture(
         // Persist the server identity before opening the recorder. A browser or
         // backend failure after session creation can then be cancelled or
         // recovered without leaving an invisible recording session behind.
+        meetingDiagnostics.record('STEP_SEGMENTER_START', { sessionId: session.id });
         await segmenter.start({ sessionId: session.id, sequenceStart: 0 });
+        meetingDiagnostics.record('STEP_SEGMENTER_START_OK');
       } catch (error) {
+        meetingDiagnostics.record('START_FAILED', {
+          name: (error as Error)?.name ?? 'Error',
+          message: (error as Error)?.message?.slice(0, 160) ?? null,
+        });
         await segmenter.abort().catch(() => undefined);
         segmenterRef.current = null;
         if (startCancellationRequestedRef.current) {

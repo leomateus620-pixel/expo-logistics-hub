@@ -57,6 +57,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import { cn } from '@/lib/utils';
 
+import { MeetingDiagnosticsPanel } from './MeetingDiagnosticsPanel';
 import { MeetingIntelligenceMark } from './MeetingIntelligenceMark';
 
 const CONSENT_VERSION = 'fenasoja-agenda-meeting-consent-v1';
@@ -823,6 +824,8 @@ function PersistedMeetingWorkspace({
           </div>
         </section>
       )}
+
+      <MeetingDiagnosticsPanel defaultOpen={capture.state.phase === 'fatal_error'} />
 
       <div className="agenda-meeting__history-heading">
         <div>
