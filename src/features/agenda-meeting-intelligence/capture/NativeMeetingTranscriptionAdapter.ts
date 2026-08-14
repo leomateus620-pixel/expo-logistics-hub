@@ -132,7 +132,7 @@ export interface NativeMeetingTranscriptionOptions {
   onFatalError?: (code: string) => void;
   recognitionConstructor?: SpeechRecognitionConstructor;
   restartDelaysMs?: number[];
-  scheduleRestart?: (callback: () => void, delayMs: number) => ReturnType<typeof setTimeout>;
+  scheduleRestart?: (callback: () => void, delayMs: number) => unknown;
 }
 
 export class NativeMeetingTranscriptionAdapter {
@@ -324,13 +324,13 @@ export class NativeMeetingTranscriptionAdapter {
     this.restartAttempts += 1;
     this.setState('recovering');
     debugLog('restart_scheduled', { attempt: this.restartAttempts, delay });
-    const schedule = this.options.scheduleRestart ?? setTimeout;
+    const schedule = this.options.scheduleRestart ?? ((callback: () => void, ms: number) => setTimeout(callback, ms));
     this.clearRestartTimer();
     this.restartTimer = schedule(() => {
       this.restartTimer = null;
       if (!this.active || this.manualStop) return;
       this.spawn(Recognition);
-    }, delay);
+    }, delay) as ReturnType<typeof setTimeout>;
   }
 
   private spawn(Recognition: SpeechRecognitionConstructor): void {
