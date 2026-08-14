@@ -10,6 +10,9 @@
  * Nenhum áudio sai do dispositivo: apenas o texto reconhecido é entregue.
  */
 
+import { meetingDiagnostics } from './meetingDiagnostics';
+
+
 interface SpeechRecognitionAlternativeLike {
   transcript: string;
   confidence: number;
