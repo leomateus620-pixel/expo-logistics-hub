@@ -47,6 +47,7 @@ import { compareEventDates, formatLongDate } from '../dateUtils';
 import { CycleYearMark } from '../CycleYearMark';
 import { EventHarvestAnimation } from '../EventHarvestAnimation';
 import { splitEventResponsibles } from '../EventRelationFields';
+import { EventPeopleAvatars } from '../PersonAvatar';
 import type { CronogramaEvent } from '../types';
 
 const monthYearFormatter = new Intl.DateTimeFormat('pt-BR', {
