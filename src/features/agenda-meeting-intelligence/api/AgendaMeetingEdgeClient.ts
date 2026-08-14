@@ -31,13 +31,20 @@ export class AgendaMeetingEdgeError extends Error {
   readonly code: string;
   readonly retryable: boolean;
   readonly status: number | null;
+  readonly detail: string | null;
 
-  constructor(code: string, retryable: boolean, status: number | null = null) {
-    super(code);
+  constructor(
+    code: string,
+    retryable: boolean,
+    status: number | null = null,
+    detail: string | null = null,
+  ) {
+    super(detail ? `${code} (${detail})` : code);
     this.name = 'AgendaMeetingEdgeError';
     this.code = code;
     this.retryable = retryable;
     this.status = status;
+    this.detail = detail;
   }
 }
 
@@ -52,6 +59,7 @@ interface ErrorPayload {
   error?: string;
   code?: string;
   retryable?: boolean;
+  detail?: string | null;
 }
 
 interface UploadPayload {
@@ -138,7 +146,8 @@ function classifyHttpError(status: number, payload: unknown): AgendaMeetingEdgeE
   const code = typeof body.code === 'string' ? body.code : typeof body.error === 'string' ? body.error : 'request_failed';
   const retryable =
     typeof body.retryable === 'boolean' ? body.retryable : status === 408 || status === 429 || status >= 500;
-  return new AgendaMeetingEdgeError(code, retryable, status);
+  const detail = typeof body.detail === 'string' ? body.detail : null;
+  return new AgendaMeetingEdgeError(code, retryable, status, detail);
 }
 
 function requireConfiguration(value: string | undefined, code: string): string {
