@@ -50,6 +50,7 @@ import { formatLongDate } from './dateUtils';
 import { EventHarvestAnimation } from './EventHarvestAnimation';
 import { TimelineCycleNavigator } from './TimelineCycleNavigator';
 import { splitEventResponsibles } from './EventRelationFields';
+import { EventPeopleAvatars } from './PersonAvatar';
 import type { CronogramaEvent } from './types';
 
 const monthYearFormatter = new Intl.DateTimeFormat('pt-BR', {
