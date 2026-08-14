@@ -1,5 +1,7 @@
-import fabianoSoltis from '@/assets/person-fabiano-soltis.jpg';
-import djeisonDrey from '@/assets/person-djeison-drey.jpg';
+// Os arquivos de origem foram salvos trocados: o retrato do Fabiano está em
+// person-djeison-drey.jpg e vice-versa. Os imports abaixo já corrigem isso.
+import fabianoSoltis from '@/assets/person-djeison-drey.jpg';
+import djeisonDrey from '@/assets/person-fabiano-soltis.jpg';
 
 /**
  * Only these two members have an official portrait. Everyone else keeps the
