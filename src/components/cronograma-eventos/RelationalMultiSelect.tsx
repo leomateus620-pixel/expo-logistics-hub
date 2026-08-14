@@ -760,9 +760,22 @@ export function RelationalMultiSelect({
                 data-primary={item.isPrimary || undefined}
                 data-role={variant === 'person' && !item.isPrimary ? 'guest' : undefined}
               >
-                <span className="cronograma-relation-selected__identity" aria-hidden="true">
-                  {variant === 'organization' ? <Building2 /> : initialsFor(item.label)}
-                </span>
+                {variant === 'organization' ? (
+                  <span className="cronograma-relation-selected__identity" aria-hidden="true">
+                    <Building2 />
+                  </span>
+                ) : (
+                  <PersonAvatar
+                    name={item.label}
+                    size="md"
+                    className="cronograma-relation-selected__identity"
+                    fallback={(
+                      <span className="cronograma-relation-selected__identity" aria-hidden="true">
+                        {initialsFor(item.label)}
+                      </span>
+                    )}
+                  />
+                )}
                 <span className="cronograma-relation-selected__copy">
                   <small>{roleLabel}</small>
                   <strong title={item.label}>{item.label}</strong>
