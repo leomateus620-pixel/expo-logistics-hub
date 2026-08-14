@@ -192,7 +192,10 @@ export class NativeMeetingTranscriptionAdapter {
   start(): void {
     if (this.active) return;
     const Recognition = this.options.recognitionConstructor ?? getSpeechRecognitionConstructor();
-    if (!Recognition) throw new Error('speech_recognition_unavailable');
+    if (!Recognition) {
+      meetingDiagnostics.record('RECOGNITION_UNAVAILABLE');
+      throw new Error('speech_recognition_unavailable');
+    }
     this.active = true;
     this.manualStop = false;
     this.restartAttempts = 0;
@@ -200,6 +203,28 @@ export class NativeMeetingTranscriptionAdapter {
     this.setState('initializing');
     this.spawn(Recognition);
   }
+
+  /** Sinais de vida recebidos do reconhecimento (para diagnóstico). */
+  get lifecycleCounters(): {
+    onStartReceived: boolean;
+    audioStartReceived: boolean;
+    speechStartReceived: boolean;
+    resultsReceived: number;
+    endCount: number;
+    restartAttempt: number;
+    lastErrorCode: string | null;
+  } {
+    return {
+      onStartReceived: this.onStartReceived,
+      audioStartReceived: this.audioStartReceived,
+      speechStartReceived: this.speechStartReceived,
+      resultsReceived: this.resultsReceived,
+      endCount: this.endCount,
+      restartAttempt: this.restartAttempts,
+      lastErrorCode: this.lastErrorCode,
+    };
+  }
+
 
   /** Pausa explícita do usuário: mantém o texto e não reinicia sozinho. */
   pause(): void {
