@@ -146,6 +146,19 @@ function requireConfiguration(value: string | undefined, code: string): string {
   return value.replace(/\/+$/, '');
 }
 
+async function readBlobText(blob: Blob): Promise<string> {
+  if (typeof blob.text === 'function') return blob.text();
+  if (typeof blob.arrayBuffer === 'function') {
+    return new TextDecoder().decode(await blob.arrayBuffer());
+  }
+  return await new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result ?? ''));
+    reader.onerror = () => reject(new AgendaMeetingEdgeError('segment_read_failed', false));
+    reader.readAsText(blob);
+  });
+}
+
 export class AgendaMeetingEdgeClient {
   private readonly supabaseUrl: string;
   private readonly publishableKey: string;
@@ -215,7 +228,7 @@ export class AgendaMeetingEdgeClient {
       throw new AgendaMeetingEdgeError('segment_size_out_of_bounds', false);
     }
     // Somente texto reconhecido localmente trafega para o backend.
-    const transcript = (await input.segment.audio.text()).trim();
+    const transcript = (await readBlobText(input.segment.audio)).trim();
     if (!transcript) {
       throw new AgendaMeetingEdgeError('empty_transcript_segment', false);
     }
