@@ -36,3 +36,33 @@ export function PersonAvatar({ name, fallback, size = 'md', className }: PersonA
 }
 
 export { getPersonPhoto };
+
+interface EventPeopleAvatarsProps {
+  /** Responsible first, guests after — only people with a portrait render. */
+  people: Array<{ key: string; label: string; isPrimary?: boolean }>;
+  className?: string;
+  size?: 'xs' | 'sm' | 'md' | 'lg';
+}
+
+/**
+ * Compact portrait strip shown under the event title on the main timeline.
+ * Renders nothing when none of the linked people has an official photo.
+ */
+export function EventPeopleAvatars({ people, className, size = 'sm' }: EventPeopleAvatarsProps) {
+  const withPhoto = people.filter((person) => getPersonPhoto(person.label));
+  if (withPhoto.length === 0) return null;
+
+  return (
+    <span className={cn('cronograma-person-avatar-row', className)}>
+      {withPhoto.map((person, index) => (
+        <PersonAvatar
+          key={person.key}
+          name={person.label}
+          size={size}
+          className={index === 0 && person.isPrimary ? 'is-primary' : undefined}
+          fallback={null}
+        />
+      ))}
+    </span>
+  );
+}
