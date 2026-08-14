@@ -1,4 +1,5 @@
-import { lazy, Suspense, type ReactNode } from 'react';
+import { Suspense, type ReactNode } from 'react';
+import { lazyWithRetry } from '@/lib/lazyWithRetry';
 import { Toaster } from '@/components/ui/toaster';
 import { Toaster as Sonner } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -34,39 +35,39 @@ import {
 } from './modules/commissions/commissionRegistry';
 import { COMMISSION_MAP_PORTALS, getCommissionMapPortal } from './modules/commissions/commissionMapPortalRegistry';
 
-const Dashboard = lazy(() => import('./pages/Dashboard'));
-const VehiclesPage = lazy(() => import('./pages/VehiclesPage'));
-const ElectricCartsPage = lazy(() => import('./pages/ElectricCartsPage'));
-const ElectricCartsReportPage = lazy(() => import('./pages/ElectricCartsReportPage'));
-const ScootersPage = lazy(() => import('./pages/ScootersPage'));
-const TransportsPage = lazy(() => import('./pages/TransportsPage'));
-const GuestsPage = lazy(() => import('./pages/GuestsPage'));
-const AgendaPage = lazy(() => import('./pages/AgendaPage'));
-const ChecklistPage = lazy(() => import('./pages/ChecklistPage'));
-const TeamPage = lazy(() => import('./pages/TeamPage'));
-const SettingsPage = lazy(() => import('./pages/SettingsPage'));
-const VerEscalaPage = lazy(() => import('./pages/VerEscalaPage'));
-const KmEmissoesPage = lazy(() => import('./pages/KmEmissoesPage'));
-const SystemReportPage = lazy(() => import('./pages/SystemReportPage'));
-const ExpensesPage = lazy(() => import('./pages/ExpensesPage'));
-const MobilityAuthPage = lazy(() => import('./pages/MobilityAuthPage'));
-const FenasojaEventsPage = lazy(() => import('./pages/FenasojaEventsPage'));
-const CronogramaEventosPage = lazy(() => import('./pages/CronogramaEventosPage'));
-const VenueEventsPage = lazy(() => import('./pages/VenueEventsPage'));
-const GoogleCalendarCallbackPage = lazy(() => import('./pages/GoogleCalendarCallbackPage'));
-const FenasojaCountdownExperiencePage = lazy(
+const Dashboard = lazyWithRetry(() => import('./pages/Dashboard'));
+const VehiclesPage = lazyWithRetry(() => import('./pages/VehiclesPage'));
+const ElectricCartsPage = lazyWithRetry(() => import('./pages/ElectricCartsPage'));
+const ElectricCartsReportPage = lazyWithRetry(() => import('./pages/ElectricCartsReportPage'));
+const ScootersPage = lazyWithRetry(() => import('./pages/ScootersPage'));
+const TransportsPage = lazyWithRetry(() => import('./pages/TransportsPage'));
+const GuestsPage = lazyWithRetry(() => import('./pages/GuestsPage'));
+const AgendaPage = lazyWithRetry(() => import('./pages/AgendaPage'));
+const ChecklistPage = lazyWithRetry(() => import('./pages/ChecklistPage'));
+const TeamPage = lazyWithRetry(() => import('./pages/TeamPage'));
+const SettingsPage = lazyWithRetry(() => import('./pages/SettingsPage'));
+const VerEscalaPage = lazyWithRetry(() => import('./pages/VerEscalaPage'));
+const KmEmissoesPage = lazyWithRetry(() => import('./pages/KmEmissoesPage'));
+const SystemReportPage = lazyWithRetry(() => import('./pages/SystemReportPage'));
+const ExpensesPage = lazyWithRetry(() => import('./pages/ExpensesPage'));
+const MobilityAuthPage = lazyWithRetry(() => import('./pages/MobilityAuthPage'));
+const FenasojaEventsPage = lazyWithRetry(() => import('./pages/FenasojaEventsPage'));
+const CronogramaEventosPage = lazyWithRetry(() => import('./pages/CronogramaEventosPage'));
+const VenueEventsPage = lazyWithRetry(() => import('./pages/VenueEventsPage'));
+const GoogleCalendarCallbackPage = lazyWithRetry(() => import('./pages/GoogleCalendarCallbackPage'));
+const FenasojaCountdownExperiencePage = lazyWithRetry(
   () => import('./pages/FenasojaCountdownExperiencePage'),
 );
-const CommercialMapPage = lazy(() => import('./pages/CommercialMapPage'));
-const NotFound = lazy(() => import('./pages/NotFound'));
-const UnsubscribePage = lazy(() => import('./pages/UnsubscribePage'));
-const CommissionPortalPage = lazy(() => import('./pages/commissions/CommissionPortalPage'));
-const CommissionDashboardPlaceholder = lazy(() => import('./pages/commissions/CommissionDashboardPlaceholder'));
-const FinancialManagementPage = lazy(() => import('./pages/commissions/FinancialManagementPage'));
-const CommissionCommercialMapPage = lazy(() => import('./pages/commissions/CommissionCommercialMapPage'));
-const AdminPortalPage = lazy(() => import('./pages/admin/AdminPortalPage'));
-const AdminOverviewPage = lazy(() => import('./pages/admin/AdminOverviewPage'));
-const AdminCommissionPage = lazy(() => import('./pages/admin/AdminCommissionPage'));
+const CommercialMapPage = lazyWithRetry(() => import('./pages/CommercialMapPage'));
+const NotFound = lazyWithRetry(() => import('./pages/NotFound'));
+const UnsubscribePage = lazyWithRetry(() => import('./pages/UnsubscribePage'));
+const CommissionPortalPage = lazyWithRetry(() => import('./pages/commissions/CommissionPortalPage'));
+const CommissionDashboardPlaceholder = lazyWithRetry(() => import('./pages/commissions/CommissionDashboardPlaceholder'));
+const FinancialManagementPage = lazyWithRetry(() => import('./pages/commissions/FinancialManagementPage'));
+const CommissionCommercialMapPage = lazyWithRetry(() => import('./pages/commissions/CommissionCommercialMapPage'));
+const AdminPortalPage = lazyWithRetry(() => import('./pages/admin/AdminPortalPage'));
+const AdminOverviewPage = lazyWithRetry(() => import('./pages/admin/AdminOverviewPage'));
+const AdminCommissionPage = lazyWithRetry(() => import('./pages/admin/AdminCommissionPage'));
 
 const queryClient = new QueryClient({
   defaultOptions: {
