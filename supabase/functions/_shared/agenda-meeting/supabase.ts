@@ -91,9 +91,35 @@ export async function requireInternalWorker(req: Request) {
 }
 
 export function mapDatabaseError(
-  error: { message?: string; code?: string } | null | undefined,
+  error: { message?: string; code?: string; details?: string; hint?: string }
+    | null
+    | undefined,
 ) {
-  const raw = `${error?.code ?? ""} ${error?.message ?? ""}`.toLowerCase();
+  const raw = `${error?.code ?? ""} ${error?.message ?? ""} ${
+    error?.details ?? ""
+  }`.toLowerCase();
+  // O erro bruto do banco fica apenas no log do servidor.
+  logSafe("error", "agenda_meeting_db_error", {
+    pgCode: error?.code ?? null,
+    pgMessage: (error?.message ?? "").slice(0, 300),
+    pgDetails: (error?.details ?? "").slice(0, 300),
+    pgHint: (error?.hint ?? "").slice(0, 200),
+  });
+  if (
+    raw.includes("invalid_consent_actor") || raw.includes("consent_actor")
+  ) {
+    return new HttpError(422, "meeting_consent_actor_invalid");
+  }
+  if (raw.includes("event_not_found")) {
+    return new HttpError(404, "meeting_event_not_found");
+  }
+  if (
+    raw.includes("mutation_id_required") || raw.includes("invalid_request") ||
+    raw.includes("invalid_action")
+  ) {
+    return new HttpError(400, "invalid_request");
+  }
+
   if (raw.includes("version_conflict")) {
     return new HttpError(409, "version_conflict");
   }
