@@ -93,7 +93,7 @@ export class CaptureSegmenter {
   private workletSource: MediaStreamAudioSourceNode | null = null;
   private silentGain: GainNode | null = null;
   private analyser: AnalyserNode | null = null;
-  private analyserBuffer: Float32Array | null = null;
+  private analyserBuffer: Float32Array<ArrayBuffer> | null = null;
   private activeAccumulatedMs = 0;
   private activeStartedAtMonotonic: number | null = null;
   private segmentTimer: ReturnType<typeof setTimeout> | null = null;
@@ -234,7 +234,8 @@ export class CaptureSegmenter {
 
   readInputLevel(): number | null {
     if (this.mode !== 'recording' || !this.analyser) return null;
-    const buffer = this.analyserBuffer ?? new Float32Array(this.analyser.fftSize);
+    const buffer = this.analyserBuffer ??
+      new Float32Array(new ArrayBuffer(this.analyser.fftSize * Float32Array.BYTES_PER_ELEMENT));
     this.analyserBuffer = buffer;
     this.analyser.getFloatTimeDomainData(buffer);
     let energy = 0;

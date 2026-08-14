@@ -30,7 +30,9 @@ interface StoredSessionKey {
 }
 
 interface DirectoryHandleWithEntries extends FileSystemDirectoryHandle {
-  entries(): AsyncIterableIterator<[string, FileSystemHandle]>;
+  entries(): AsyncIterableIterator<
+    [string, FileSystemDirectoryHandle | FileSystemFileHandle]
+  >;
 }
 
 export interface SpoolSegmentDescriptor {
@@ -420,10 +422,14 @@ function sessionKeyId(sessionId: string): string {
   return `session:${sessionId}`;
 }
 
-function additionalAuthenticatedData(metadata: CaptureSegmentState): Uint8Array {
-  return new TextEncoder().encode(
+function additionalAuthenticatedData(metadata: CaptureSegmentState): ArrayBuffer {
+  const encoded = new TextEncoder().encode(
     `${metadata.sessionId}:${metadata.id}:${metadata.sequence}:${metadata.sha256}:${metadata.mimeType}`,
   );
+  return encoded.buffer.slice(
+    encoded.byteOffset,
+    encoded.byteOffset + encoded.byteLength,
+  ) as ArrayBuffer;
 }
 
 export class EncryptedSegmentSpool {
@@ -457,7 +463,7 @@ export class EncryptedSegmentSpool {
     };
     const keyId = sessionKeyId(metadata.sessionId);
     const key = await this.getOrCreateKey(keyId, now);
-    const iv = this.crypto.getRandomValues(new Uint8Array(12));
+    const iv = this.crypto.getRandomValues(new Uint8Array(new ArrayBuffer(12)));
     const plaintext = await blobToArrayBuffer(segment.audio);
     const ciphertext = await this.crypto.subtle.encrypt(
       { name: 'AES-GCM', iv, additionalData: additionalAuthenticatedData(metadata) },
@@ -490,7 +496,7 @@ export class EncryptedSegmentSpool {
       const plaintext = await this.crypto.subtle.decrypt(
         {
           name: 'AES-GCM',
-          iv: new Uint8Array(record.iv),
+          iv: new Uint8Array(record.iv as ArrayBuffer),
           additionalData: additionalAuthenticatedData(record.metadata),
         },
         storedKey.key,
