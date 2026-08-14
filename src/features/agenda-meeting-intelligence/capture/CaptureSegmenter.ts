@@ -333,6 +333,11 @@ export class CaptureSegmenter {
   async interrupt(reason: CaptureInterruptionReason, error?: Error): Promise<void> {
     if (this.mode === 'interrupted' || this.mode === 'stopped' || this.mode === 'idle') return;
     const wasRecording = this.mode === 'recording';
+    meetingDiagnostics.record('CAPTURE_INTERRUPTED', {
+      reason,
+      wasRecording,
+      error: error?.message?.slice(0, 160) ?? null,
+    });
     if (wasRecording) this.commitActiveInterval();
     this.mode = 'interrupted';
     this.clearTimers();
