@@ -893,6 +893,7 @@ export function useAgendaMeetingCapture(
     await coordinatorRef.current?.purgeSession();
     coordinatorRef.current = null;
     removeRecovery(storage, options.orgId, options.eventId);
+    setLiveTranscript({ recognition: 'idle', canonical: '', interim: '', finalSegmentCount: 0 });
     dispatch({ type: 'reset' });
   }, [client, options.eventId, options.orgId, storage]);
 
