@@ -439,7 +439,12 @@ export class CaptureSegmenter {
   }
 
   private async emitCompletedCycle(cycle: CompletedRecorderCycle): Promise<void> {
-    if (!this.sessionId || !this.backend || !this.mimeType || cycle.blob.size === 0) return;
+    if (!this.sessionId || !this.backend) return;
+    // O áudio do ciclo nunca é persistido nem enviado: apenas o texto
+    // reconhecido localmente pela Web Speech API vira segmento.
+    const { transcript } = this.transcription?.drain() ?? { transcript: '' };
+    if (!transcript) return;
+    const payload = new Blob([transcript], { type: AGENDA_MEETING_TEXT_SEGMENT_MIME_TYPE });
     const sequence = this.sequence;
     this.sequence += 1;
     const segmentId = createCaptureSegmentId(this.options.crypto);
@@ -448,16 +453,17 @@ export class CaptureSegmenter {
       sessionId: this.sessionId,
       sequence,
       captureStartMs: Math.round(cycle.captureStartMs),
-      captureEndMs: Math.round(cycle.captureEndMs),
+      captureEndMs: Math.max(Math.round(cycle.captureStartMs) + 1, Math.round(cycle.captureEndMs)),
       durationMs: Math.max(0, Math.round(cycle.captureEndMs - cycle.captureStartMs)),
       capturedAtIso: new Date(this.options.wallClockNow()).toISOString(),
-      mimeType: this.mimeType,
-      bytes: cycle.blob.size,
-      sha256: await sha256Blob(cycle.blob, this.options.crypto),
+      mimeType: AGENDA_MEETING_TEXT_SEGMENT_MIME_TYPE,
+      bytes: payload.size,
+      sha256: await sha256Blob(payload, this.options.crypto),
       backend: this.backend,
     } as const;
-    await this.options.onSegment({ metadata, audio: cycle.blob });
+    await this.options.onSegment({ metadata, audio: payload });
   }
+
 
   private async emitGapMarker(
     reason: Exclude<CaptureInterruptionReason, 'max_duration' | 'backpressure'>,
