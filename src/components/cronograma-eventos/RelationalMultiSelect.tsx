@@ -612,9 +612,22 @@ export function RelationalMultiSelect({
                     onMouseMove={() => setActiveIndex(optionIndex)}
                     onClick={() => addOption(option)}
                   >
-                    <span className="cronograma-relation-option__identity" aria-hidden="true">
-                      {variant === 'organization' ? <Building2 /> : initialsFor(option.label)}
-                    </span>
+                    {variant === 'organization' ? (
+                      <span className="cronograma-relation-option__identity" aria-hidden="true">
+                        <Building2 />
+                      </span>
+                    ) : (
+                      <PersonAvatar
+                        name={option.label}
+                        size="md"
+                        className="cronograma-relation-option__identity"
+                        fallback={(
+                          <span className="cronograma-relation-option__identity" aria-hidden="true">
+                            {initialsFor(option.label)}
+                          </span>
+                        )}
+                      />
+                    )}
                     <span className="cronograma-relation-option__copy">
                       <strong title={option.label}>{option.label}</strong>
                       {(option.description || option.hint) && (
