@@ -35,6 +35,7 @@ import {
 } from '@/components/ui/sheet';
 import { normalizeSearchTerm } from '@/lib/org-units';
 import { useMobileOverlayHistory } from './mobile/useMobileOverlayHistory';
+import { PersonAvatar } from './PersonAvatar';
 import '@/styles/cronograma-registration-interactions.css';
 
 const MAX_VISIBLE_OPTIONS = 120;
