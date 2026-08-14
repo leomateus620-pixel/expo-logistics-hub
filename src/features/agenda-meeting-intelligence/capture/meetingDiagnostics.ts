@@ -32,7 +32,7 @@ export type MeetingCapabilityState =
 const MAX_EVENTS = 400;
 
 function readWindow(): (Window & Record<string, unknown>) | undefined {
-  return typeof window === 'undefined' ? undefined : (window as Window & Record<string, unknown>);
+  return typeof window === 'undefined' ? undefined : (window as unknown as Window & Record<string, unknown>);
 }
 
 export function describeMeetingRuntime(): MeetingRuntimeEnvironment {
