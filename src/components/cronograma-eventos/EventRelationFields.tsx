@@ -3,6 +3,7 @@ import { ChevronDown, ChevronUp, Star, UserPlus } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { CronogramaEvent } from './types';
+import { PersonAvatar } from './PersonAvatar';
 
 export interface EventRelationItem {
   key: string;
