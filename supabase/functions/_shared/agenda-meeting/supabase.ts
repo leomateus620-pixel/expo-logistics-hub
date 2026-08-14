@@ -4,7 +4,7 @@ import {
 } from "https://esm.sh/@supabase/supabase-js@2";
 import { AgendaMeetingControlAction } from "./contracts.ts";
 import { constantTimeEqual } from "./crypto.ts";
-import { HttpError } from "./http.ts";
+import { HttpError, logSafe } from "./http.ts";
 import type { MeetingDatabase } from "./database.ts";
 
 export type MeetingSupabaseClient = SupabaseClient<MeetingDatabase>;
@@ -155,5 +155,13 @@ export function mapDatabaseError(
   if (raw.includes("invalid_payload") || raw.includes("invalid_argument")) {
     return new HttpError(400, "invalid_request");
   }
-  return new HttpError(503, "meeting_persistence_failed", true);
+  const token = (error?.message ?? "").match(/AGENDA_MEETING_[A-Z0-9_]+/)?.[0] ??
+    null;
+  return new HttpError(
+    503,
+    "meeting_persistence_failed",
+    true,
+    null,
+    token ?? (error?.code ? `pg:${error.code}` : null),
+  );
 }
