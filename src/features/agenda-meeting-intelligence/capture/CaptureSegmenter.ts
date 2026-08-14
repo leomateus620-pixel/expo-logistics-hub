@@ -396,6 +396,7 @@ export class CaptureSegmenter {
 
   private async finishCycle(): Promise<CompletedRecorderCycle | null> {
     if (!this.backend) return null;
+    this.transcription?.stop();
     if (this.segmentTimer) {
       clearTimeout(this.segmentTimer);
       this.segmentTimer = null;
@@ -403,7 +404,7 @@ export class CaptureSegmenter {
     const captureEndMs = Math.max(this.cycleStartActiveMs, this.activeDurationMs);
 
     if (this.backend === 'audio_worklet_wav') {
-      if (this.workletChunks.length === 0 || !this.audioContext) return null;
+      if (!this.audioContext) return null;
       const chunks = this.workletChunks;
       this.workletChunks = [];
       return {
@@ -414,7 +415,9 @@ export class CaptureSegmenter {
     }
 
     const recorder = this.recorder;
-    if (!recorder) return null;
+    if (!recorder) {
+      return { blob: new Blob(), captureStartMs: this.cycleStartActiveMs, captureEndMs };
+    }
     const chunks = this.recorderChunks;
     this.recorder = null;
     this.recorderChunks = [];
@@ -444,7 +447,6 @@ export class CaptureSegmenter {
         recorder.stop();
       });
     }
-    if (chunks.length === 0) return null;
     return {
       blob: new Blob(chunks, { type: this.mimeType ?? chunks[0]?.type ?? 'application/octet-stream' }),
       captureStartMs: this.cycleStartActiveMs,
