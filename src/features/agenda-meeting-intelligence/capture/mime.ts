@@ -4,13 +4,18 @@ export const AGENDA_MEETING_ALLOWED_MIME_TYPES = [
   'audio/mp4',
   'audio/ogg;codecs=opus',
   'audio/wav',
+  'text/plain;charset=utf-8',
 ] as const;
+
+export const AGENDA_MEETING_TEXT_SEGMENT_MIME_TYPE = 'text/plain;charset=utf-8';
 
 export type AgendaMeetingAllowedMimeType = (typeof AGENDA_MEETING_ALLOWED_MIME_TYPES)[number];
 
 const MEDIA_RECORDER_CANDIDATES = AGENDA_MEETING_ALLOWED_MIME_TYPES.filter(
-  (mimeType): mimeType is Exclude<AgendaMeetingAllowedMimeType, 'audio/wav'> => mimeType !== 'audio/wav',
+  (mimeType): mimeType is Exclude<AgendaMeetingAllowedMimeType, 'audio/wav' | 'text/plain;charset=utf-8'> =>
+    mimeType !== 'audio/wav' && mimeType.startsWith('audio/'),
 );
+
 
 export function normalizeAudioMimeType(value: string): string {
   return value
