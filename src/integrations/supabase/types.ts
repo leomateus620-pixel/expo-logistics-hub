@@ -8094,6 +8094,20 @@ export type Database = {
         Args: { p_capability: string; p_org_id: string; p_user_id: string }
         Returns: boolean
       }
+      agenda_meeting_ingest_text_segment: {
+        Args: {
+          p_actor_user_id: string
+          p_capture_end_ms: number
+          p_capture_start_ms: number
+          p_confidence?: number
+          p_mutation_id: string
+          p_segment_id: string
+          p_sequence: number
+          p_session_id: string
+          p_transcript: string
+        }
+        Returns: Json
+      }
       agenda_meeting_prepare_segment: {
         Args: {
           p_actor_user_id: string
