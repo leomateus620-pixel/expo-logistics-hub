@@ -11,25 +11,11 @@ import { AGENDA_MEETING_TEXT_SEGMENT_MIME_TYPE, selectMediaRecorderMimeType } fr
 import {
   NativeMeetingTranscriptionAdapter,
   type NativeMeetingTranscriptionOptions,
+  type TranscriptionState,
 } from './NativeMeetingTranscriptionAdapter';
 import { sha256Blob } from './sha256';
-import { encodePcm16Wav } from './wav';
 
 const DURATION_TICK_MS = 250;
-const WORKLET_PROCESSOR_NAME = 'fenasoja-meeting-pcm-capture';
-const WORKLET_SOURCE = `
-class FenasojaMeetingPcmCapture extends AudioWorkletProcessor {
-  process(inputs) {
-    const channel = inputs[0] && inputs[0][0];
-    if (channel && channel.length) {
-      const copy = new Float32Array(channel);
-      this.port.postMessage(copy, [copy.buffer]);
-    }
-    return true;
-  }
-}
-registerProcessor('${WORKLET_PROCESSOR_NAME}', FenasojaMeetingPcmCapture);
-`;
 
 type SegmenterMode = 'idle' | 'prepared' | 'recording' | 'paused' | 'stopped' | 'interrupted';
 
@@ -63,10 +49,11 @@ export interface CaptureSegmenterOptions {
   onLifecycleSignal?: (reason: Extract<CaptureInterruptionReason, 'page_hidden' | 'device_changed'>) => void;
   speechRecognitionConstructor?: NativeMeetingTranscriptionOptions['recognitionConstructor'];
   onInterimTranscript?: (text: string) => void;
+  onFinalTranscript?: (segmentText: string, canonicalTranscript: string) => void;
+  onTranscriptionState?: (state: TranscriptionState) => void;
 }
 
-interface CompletedRecorderCycle {
-  blob: Blob;
+interface CompletedCycle {
   captureStartMs: number;
   captureEndMs: number;
 }
@@ -77,6 +64,15 @@ function getAudioContextConstructor(): typeof AudioContext | undefined {
   return (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
 }
 
+/**
+ * Motor de captura da reunião.
+ *
+ * Arquitetura: o microfone é aberto uma única vez (`getUserMedia`), o
+ * reconhecimento nativo permanece vivo do início ao fim da sessão e a rotação
+ * periódica apenas *drena* o texto já finalizado para persistência. Nenhum
+ * áudio é gravado ou enviado — o `AnalyserNode` existe só para o medidor de
+ * nível de entrada.
+ */
 export class CaptureSegmenter {
   private readonly options: Required<
     Pick<CaptureSegmenterOptions, 'segmentDurationMs' | 'maxActiveDurationMs'>
@@ -90,28 +86,24 @@ export class CaptureSegmenter {
   private selectedDeviceId: string | null = null;
   private sessionId: string | null = null;
   private sequence = 0;
-  private recorder: MediaRecorder | null = null;
-  private recorderChunks: Blob[] = [];
   private cycleStartActiveMs = 0;
-  private workletChunks: Float32Array[] = [];
   private audioContext: AudioContext | null = null;
-  private workletNode: AudioWorkletNode | null = null;
-  private workletSource: MediaStreamAudioSourceNode | null = null;
-  private silentGain: GainNode | null = null;
+  private meterSource: MediaStreamAudioSourceNode | null = null;
   private analyser: AnalyserNode | null = null;
   private analyserBuffer: Float32Array<ArrayBuffer> | null = null;
   private activeAccumulatedMs = 0;
   private activeStartedAtMonotonic: number | null = null;
-  private segmentTimer: ReturnType<typeof setTimeout> | null = null;
+  private segmentTimer: ReturnType<typeof setInterval> | null = null;
   private durationTimer: ReturnType<typeof setInterval> | null = null;
   private operation: Promise<void> = Promise.resolve();
   private lifecycleAttached = false;
   private transcription: NativeMeetingTranscriptionAdapter | null = null;
 
   private readonly onVisibilityChange = () => {
+    // Tela oculta NÃO encerra a reunião: apenas informa a UI. O microfone e o
+    // reconhecimento continuam ativos enquanto o navegador permitir.
     if (this.options.documentTarget?.visibilityState === 'hidden' && this.mode === 'recording') {
       this.options.onLifecycleSignal?.('page_hidden');
-      void this.interrupt('page_hidden');
     }
   };
 
@@ -122,8 +114,7 @@ export class CaptureSegmenter {
   };
 
   private readonly onDeviceChange = () => {
-    if (this.mode === 'recording') void this.interrupt('device_changed');
-    else if (this.mode === 'paused') this.options.onLifecycleSignal?.('device_changed');
+    this.options.onLifecycleSignal?.('device_changed');
   };
 
   constructor(options: CaptureSegmenterOptions) {
@@ -167,6 +158,10 @@ export class CaptureSegmenter {
     };
   }
 
+  get canonicalTranscript(): string {
+    return this.transcription?.canonicalTranscript ?? '';
+  }
+
   async prepare(deviceId?: string): Promise<PreparedAgendaMeetingCapture> {
     if (this.mode !== 'idle' && this.mode !== 'stopped') throw new Error('capture_already_prepared');
     const mediaDevices = this.options.mediaDevices;
@@ -191,29 +186,18 @@ export class CaptureSegmenter {
     this.selectedDeviceId = selectedTrack.getSettings().deviceId ?? deviceId ?? null;
     selectedTrack.addEventListener('ended', this.handleTrackEnded);
 
+    // Metadados de compatibilidade: nenhum áudio é codificado ou persistido.
     const recorderMimeType = selectMediaRecorderMimeType(this.options.mediaRecorderConstructor);
-    if (recorderMimeType && this.options.mediaRecorderConstructor) {
-      this.backend = 'media_recorder';
-      this.mimeType = recorderMimeType;
-    } else if (this.options.audioContextConstructor && typeof AudioWorkletNode !== 'undefined') {
-      this.backend = 'audio_worklet_wav';
-      this.mimeType = 'audio/wav';
-      try {
-        await this.prepareAudioWorklet();
-      } catch {
-        this.stopTracks();
-        throw new Error('audio_worklet_unavailable');
-      }
-    } else {
-      this.stopTracks();
-      throw new Error('supported_audio_capture_unavailable');
-    }
+    this.backend = recorderMimeType ? 'media_recorder' : 'audio_worklet_wav';
+    this.mimeType = AGENDA_MEETING_TEXT_SEGMENT_MIME_TYPE;
 
     await this.prepareInputMeter();
 
     this.transcription = new NativeMeetingTranscriptionAdapter({
       recognitionConstructor: this.options.speechRecognitionConstructor,
       onInterim: this.options.onInterimTranscript,
+      onFinal: this.options.onFinalTranscript,
+      onStateChange: this.options.onTranscriptionState,
       onFatalError: (code) => {
         void this.interrupt('capture_error', new Error(code));
       },
@@ -269,8 +253,9 @@ export class CaptureSegmenter {
     this.mode = 'paused';
     this.clearTimers();
     await this.enqueue(async () => {
-      const cycle = await this.finishCycle();
-      if (cycle) await this.emitCompletedCycle(cycle);
+      this.transcription?.pause();
+      const cycle = this.closeCycle();
+      await this.emitCompletedCycle(cycle);
       this.options.onDuration?.(this.activeDurationMs);
     });
   }
@@ -292,12 +277,16 @@ export class CaptureSegmenter {
   async stop(): Promise<void> {
     if (!['recording', 'paused', 'prepared'].includes(this.mode)) return;
     if (this.mode === 'recording') this.commitActiveInterval();
+    const wasCapturing = this.mode !== 'prepared';
     this.mode = 'stopped';
     this.clearTimers();
     await this.enqueue(async () => {
       try {
-        const cycle = await this.finishCycle();
-        if (cycle) await this.emitCompletedCycle(cycle);
+        // Consome o último resultado final antes de desmontar o reconhecimento.
+        if (wasCapturing) await this.transcription?.stopAndFlush();
+        else this.transcription?.stop();
+        const cycle = this.closeCycle();
+        if (wasCapturing) await this.emitCompletedCycle(cycle);
       } finally {
         await this.releaseCaptureResources();
         this.options.onDuration?.(this.activeDurationMs);
@@ -312,7 +301,8 @@ export class CaptureSegmenter {
     this.clearTimers();
     await this.enqueue(async () => {
       try {
-        await this.finishCycle();
+        this.transcription?.stop();
+        this.closeCycle();
       } finally {
         await this.releaseCaptureResources();
         this.options.onDuration?.(this.activeDurationMs);
@@ -328,8 +318,9 @@ export class CaptureSegmenter {
     this.clearTimers();
     await this.enqueue(async () => {
       try {
-        const cycle = await this.finishCycle();
-        if (cycle) await this.emitCompletedCycle(cycle);
+        this.transcription?.stop();
+        const cycle = this.closeCycle();
+        await this.emitCompletedCycle(cycle);
         if (wasRecording && reason !== 'max_duration' && reason !== 'backpressure') {
           await this.emitGapMarker(reason);
         }
@@ -355,23 +346,22 @@ export class CaptureSegmenter {
     return next;
   }
 
-  private async rotate(): Promise<void> {
+  /**
+   * Flush periódico: persiste o texto já finalizado SEM parar o reconhecimento.
+   */
+  private async flush(): Promise<void> {
     if (this.mode !== 'recording') return;
     await this.enqueue(async () => {
       if (this.mode !== 'recording') return;
-      const cycle = await this.finishCycle();
-      if (cycle) {
-        try {
-          await this.emitCompletedCycle(cycle);
-        } catch (error) {
-          void this.interrupt('capture_error', error instanceof Error ? error : new Error('segment_emit_failed'));
-          return;
-        }
+      const cycle = this.closeCycle();
+      try {
+        await this.emitCompletedCycle(cycle);
+      } catch (error) {
+        void this.interrupt(
+          'capture_error',
+          error instanceof Error ? error : new Error('segment_emit_failed'),
+        );
       }
-      // Persist/enqueue the completed segment before opening the next recorder.
-      // This lets backpressure pause the capture at the exact boundary instead
-      // of producing one extra segment beyond the encrypted spool limit.
-      if (this.mode === 'recording') await this.startCycle();
     });
   }
 
@@ -379,92 +369,20 @@ export class CaptureSegmenter {
     if (!this.stream || !this.backend) throw new Error('capture_stream_unavailable');
     this.transcription?.start();
     this.cycleStartActiveMs = this.activeDurationMs;
-    this.scheduleSegmentRotation();
-    if (this.backend === 'media_recorder') {
-      const Recorder = this.options.mediaRecorderConstructor;
-      if (!Recorder || !this.mimeType) throw new Error('media_recorder_unavailable');
-      this.recorderChunks = [];
-      this.recorder = new Recorder(this.stream, {
-        mimeType: this.mimeType,
-        audioBitsPerSecond: 64_000,
-      });
-      this.recorder.addEventListener('dataavailable', this.handleRecorderData);
-      this.recorder.start();
-      if (this.audioContext?.state === 'suspended') await this.audioContext.resume();
-      return;
-    }
-    this.workletChunks = [];
+    this.scheduleSegmentFlush();
     if (this.audioContext?.state === 'suspended') await this.audioContext.resume();
   }
 
-  private readonly handleRecorderData = (event: BlobEvent) => {
-    if (event.data.size > 0) this.recorderChunks.push(event.data);
-  };
-
-  private async finishCycle(): Promise<CompletedRecorderCycle | null> {
-    if (!this.backend) return null;
-    this.transcription?.stop();
-    if (this.segmentTimer) {
-      clearTimeout(this.segmentTimer);
-      this.segmentTimer = null;
-    }
+  private closeCycle(): CompletedCycle {
     const captureEndMs = Math.max(this.cycleStartActiveMs, this.activeDurationMs);
-
-    if (this.backend === 'audio_worklet_wav') {
-      if (!this.audioContext) return null;
-      const chunks = this.workletChunks;
-      this.workletChunks = [];
-      return {
-        blob: encodePcm16Wav(chunks, this.audioContext.sampleRate),
-        captureStartMs: this.cycleStartActiveMs,
-        captureEndMs,
-      };
-    }
-
-    const recorder = this.recorder;
-    if (!recorder) {
-      return { blob: new Blob(), captureStartMs: this.cycleStartActiveMs, captureEndMs };
-    }
-    const chunks = this.recorderChunks;
-    this.recorder = null;
-    this.recorderChunks = [];
-    recorder.removeEventListener('dataavailable', this.handleRecorderData);
-
-    if (recorder.state !== 'inactive') {
-      await new Promise<void>((resolve, reject) => {
-        const onData = (event: BlobEvent) => {
-          if (event.data.size > 0) chunks.push(event.data);
-        };
-        const cleanup = () => {
-          recorder.removeEventListener('dataavailable', onData);
-          recorder.removeEventListener('stop', onStop);
-          recorder.removeEventListener('error', onError);
-        };
-        const onStop = () => {
-          cleanup();
-          resolve();
-        };
-        const onError = () => {
-          cleanup();
-          reject(new Error('media_recorder_stop_failed'));
-        };
-        recorder.addEventListener('dataavailable', onData);
-        recorder.addEventListener('stop', onStop, { once: true });
-        recorder.addEventListener('error', onError, { once: true });
-        recorder.stop();
-      });
-    }
-    return {
-      blob: new Blob(chunks, { type: this.mimeType ?? chunks[0]?.type ?? 'application/octet-stream' }),
-      captureStartMs: this.cycleStartActiveMs,
-      captureEndMs,
-    };
+    const cycle = { captureStartMs: this.cycleStartActiveMs, captureEndMs };
+    this.cycleStartActiveMs = captureEndMs;
+    return cycle;
   }
 
-  private async emitCompletedCycle(cycle: CompletedRecorderCycle): Promise<void> {
+  private async emitCompletedCycle(cycle: CompletedCycle): Promise<void> {
     if (!this.sessionId || !this.backend) return;
-    // O áudio do ciclo nunca é persistido nem enviado: apenas o texto
-    // reconhecido localmente pela Web Speech API vira segmento.
+    // Somente o texto reconhecido localmente vira segmento; áudio nunca é persistido.
     const { transcript } = this.transcription?.drain() ?? { transcript: '' };
     if (!transcript) return;
     const payload = new Blob([transcript], { type: AGENDA_MEETING_TEXT_SEGMENT_MIME_TYPE });
@@ -487,7 +405,6 @@ export class CaptureSegmenter {
     await this.options.onSegment({ metadata, audio: payload });
   }
 
-
   private async emitGapMarker(
     reason: Exclude<CaptureInterruptionReason, 'max_duration' | 'backpressure'>,
   ): Promise<void> {
@@ -508,9 +425,9 @@ export class CaptureSegmenter {
     await this.options.onGap(gap);
   }
 
-  private scheduleSegmentRotation(): void {
-    if (this.segmentTimer) clearTimeout(this.segmentTimer);
-    this.segmentTimer = setTimeout(() => void this.rotate(), this.options.segmentDurationMs);
+  private scheduleSegmentFlush(): void {
+    if (this.segmentTimer) clearInterval(this.segmentTimer);
+    this.segmentTimer = setInterval(() => void this.flush(), this.options.segmentDurationMs);
   }
 
   private startDurationTimer(): void {
@@ -523,7 +440,7 @@ export class CaptureSegmenter {
   }
 
   private clearTimers(): void {
-    if (this.segmentTimer) clearTimeout(this.segmentTimer);
+    if (this.segmentTimer) clearInterval(this.segmentTimer);
     if (this.durationTimer) clearInterval(this.durationTimer);
     this.segmentTimer = null;
     this.durationTimer = null;
@@ -539,42 +456,21 @@ export class CaptureSegmenter {
     this.activeStartedAtMonotonic = null;
   }
 
-  private async prepareAudioWorklet(): Promise<void> {
-    const Context = this.options.audioContextConstructor;
-    if (!Context || !this.stream) throw new Error('audio_worklet_unavailable');
-    this.audioContext = new Context({ sampleRate: 48_000, latencyHint: 'interactive' });
-    const moduleUrl = URL.createObjectURL(new Blob([WORKLET_SOURCE], { type: 'text/javascript' }));
-    try {
-      await this.audioContext.audioWorklet.addModule(moduleUrl);
-    } finally {
-      URL.revokeObjectURL(moduleUrl);
-    }
-    this.workletSource = this.audioContext.createMediaStreamSource(this.stream);
-    this.workletNode = new AudioWorkletNode(this.audioContext, WORKLET_PROCESSOR_NAME, {
-      numberOfInputs: 1,
-      numberOfOutputs: 1,
-      outputChannelCount: [1],
-    });
-    this.silentGain = this.audioContext.createGain();
-    this.silentGain.gain.value = 0;
-    this.workletNode.port.onmessage = (event: MessageEvent<Float32Array>) => {
-      if (this.mode === 'recording') this.workletChunks.push(new Float32Array(event.data));
-    };
-    this.workletSource.connect(this.workletNode);
-    this.workletNode.connect(this.silentGain);
-    this.silentGain.connect(this.audioContext.destination);
-  }
-
   private async prepareInputMeter(): Promise<void> {
     if (!this.stream) return;
     const Context = this.options.audioContextConstructor;
-    if (!this.audioContext && Context) this.audioContext = new Context({ latencyHint: 'interactive' });
-    if (!this.audioContext) return;
-    if (!this.workletSource) this.workletSource = this.audioContext.createMediaStreamSource(this.stream);
-    this.analyser = this.audioContext.createAnalyser();
-    this.analyser.fftSize = 256;
-    this.analyser.smoothingTimeConstant = 0.75;
-    this.workletSource.connect(this.analyser);
+    if (!Context) return;
+    try {
+      if (!this.audioContext) this.audioContext = new Context({ latencyHint: 'interactive' });
+      this.meterSource = this.audioContext.createMediaStreamSource(this.stream);
+      this.analyser = this.audioContext.createAnalyser();
+      this.analyser.fftSize = 256;
+      this.analyser.smoothingTimeConstant = 0.75;
+      this.meterSource.connect(this.analyser);
+    } catch {
+      // O medidor é acessório: sua ausência nunca impede a transcrição.
+      this.analyser = null;
+    }
   }
 
   private attachLifecycleListeners(): void {
@@ -605,16 +501,14 @@ export class CaptureSegmenter {
   private async releaseCaptureResources(): Promise<void> {
     this.transcription?.stop();
     this.transcription = null;
-    this.workletNode?.disconnect();
-    this.workletSource?.disconnect();
-    this.silentGain?.disconnect();
+    this.meterSource?.disconnect();
     this.analyser?.disconnect();
-    this.workletNode = null;
-    this.workletSource = null;
-    this.silentGain = null;
+    this.meterSource = null;
     this.analyser = null;
     this.analyserBuffer = null;
-    if (this.audioContext && this.audioContext.state !== 'closed') await this.audioContext.close();
+    if (this.audioContext && this.audioContext.state !== 'closed') {
+      await this.audioContext.close().catch(() => undefined);
+    }
     this.audioContext = null;
     this.stopTracks();
     this.detachLifecycleListeners();

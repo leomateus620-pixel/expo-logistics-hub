@@ -105,6 +105,18 @@ const SESSION_STATE_LABELS: Record<AgendaMeetingSessionSummary['state'], string>
   deleted: 'Excluída',
 };
 
+const LIVE_RECOGNITION_LABELS: Record<string, string> = {
+  idle: 'Aguardando',
+  initializing: 'Iniciando',
+  listening: 'Ouvindo',
+  speech_detected: 'Reconhecendo fala',
+  recovering: 'Reconectando o reconhecimento',
+  paused: 'Pausada',
+  stopping: 'Encerrando',
+  completed: 'Concluída',
+  error: 'Indisponível',
+};
+
 type ConfirmIntent = 'cancel-capture' | 'delete-session' | 'submit-revision' | 'analyze-partial' | null;
 type DetailTab = 'summary' | 'decisions' | 'actions' | 'transcript';
 
@@ -783,9 +795,22 @@ function PersistedMeetingWorkspace({
             <div className="agenda-meeting__metric"><span>Backlog</span><strong>{capture.state.backlog.segments} seg. · {(capture.state.backlog.bytes / 1_048_576).toFixed(1)} MB</strong></div>
             <div className="agenda-meeting__metric"><span>Rede</span><strong>{online ? 'Conectada' : 'Offline protegido'}</strong></div>
           </div>
+          <div className="agenda-meeting__live" data-state={capture.liveTranscript.recognition}>
+            <div className="agenda-meeting__live-head">
+              <span>Transcrição ao vivo</span>
+              <strong>{LIVE_RECOGNITION_LABELS[capture.liveTranscript.recognition]}</strong>
+            </div>
+            <p className="agenda-meeting__live-text">
+              {capture.liveTranscript.canonical || (capture.liveTranscript.interim ? '' : 'Aguardando a primeira fala reconhecida…')}
+              {capture.liveTranscript.interim && (
+                <em className="agenda-meeting__live-interim"> {capture.liveTranscript.interim}</em>
+              )}
+            </p>
+          </div>
           {!online && <div className="agenda-meeting__notice" data-tone="gold"><WifiOff className="mr-2 inline h-4 w-4" />A captura será pausada ao atingir 20 minutos ou 64 MB pendentes. Mantenha esta tela aberta.</div>}
-          {awaitingCanonicalReceipt && <div className="agenda-meeting__notice">O áudio temporário só será apagado após o recibo canônico de cada segmento.</div>}
+          {awaitingCanonicalReceipt && <div className="agenda-meeting__notice">Os trechos já reconhecidos só saem da fila local após o recibo canônico do servidor.</div>}
           {(capture.state.interruption || capture.state.phase === 'capture_interrupted') && <div className="agenda-meeting__notice" data-tone="gold">Uma interrupção do dispositivo foi registrada. O intervalo não capturado será preservado como lacuna explícita.</div>}
+
           <label className="agenda-meeting__consent-check agenda-meeting__partial-check">
             <input checked={partialAccepted} onChange={(event) => setPartialAccepted(event.target.checked)} type="checkbox" />
             <span>Se houver lacunas, autorizo finalizar com cobertura incompleta para revisão humana.</span>

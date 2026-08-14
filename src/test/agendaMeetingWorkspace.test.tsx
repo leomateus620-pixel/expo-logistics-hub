@@ -55,7 +55,8 @@ function createCaptureController(
   phase: AgendaMeetingCaptureController['state']['phase'] = 'idle',
 ): AgendaMeetingCaptureController {
   return {
-    state: {
+    liveTranscript: { recognition: 'listening', canonical: '', interim: '', finalSegmentCount: 0 },
+  state: {
       phase,
       sessionId: phase === 'idle' ? null : SESSION_ID,
       sessionVersion: phase === 'idle' ? null : 2,

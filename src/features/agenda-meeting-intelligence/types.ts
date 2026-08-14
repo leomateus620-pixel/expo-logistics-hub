@@ -164,8 +164,30 @@ export interface AgendaMeetingMicrophoneTelemetry {
   inputLevel: number | null;
 }
 
+export type AgendaMeetingLiveTranscriptionState =
+  | 'idle'
+  | 'initializing'
+  | 'listening'
+  | 'speech_detected'
+  | 'recovering'
+  | 'paused'
+  | 'stopping'
+  | 'completed'
+  | 'error';
+
+export interface AgendaMeetingLiveTranscript {
+  /** Estado do reconhecimento nativo (reinícios internos aparecem como `recovering`). */
+  recognition: AgendaMeetingLiveTranscriptionState;
+  /** Texto consolidado de todos os resultados finais da sessão. */
+  canonical: string;
+  /** Texto provisório (volátil) exibido enquanto o navegador ainda não confirmou. */
+  interim: string;
+  finalSegmentCount: number;
+}
+
 export interface AgendaMeetingCaptureController {
   state: AgendaMeetingCaptureState;
+  liveTranscript: AgendaMeetingLiveTranscript;
   capabilities: AgendaMeetingCaptureCapabilities;
   mic: AgendaMeetingMicrophoneTelemetry;
   refreshDevices(): Promise<void>;

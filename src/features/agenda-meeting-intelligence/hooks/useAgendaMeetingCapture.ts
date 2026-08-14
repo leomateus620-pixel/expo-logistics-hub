@@ -23,6 +23,7 @@ import {
   type AgendaMeetingStartInput,
   type AgendaMeetingStartResult,
   type AgendaMeetingStateResult,
+  type AgendaMeetingLiveTranscript,
   AGENDA_MEETING_MAX_SEGMENT_BYTES,
   AGENDA_MEETING_SEGMENT_DURATION_MS,
   AGENDA_MEETING_SPOOL_TTL_MS,
@@ -259,6 +260,12 @@ export function useAgendaMeetingCapture(
   const [devices, setDevices] = useState<MediaDeviceInfo[]>([]);
   const [inputLevel, setInputLevel] = useState<number | null>(null);
   const [preferredDeviceId, setPreferredDeviceId] = useState<string | null>(null);
+  const [liveTranscript, setLiveTranscript] = useState<AgendaMeetingLiveTranscript>({
+    recognition: 'idle',
+    canonical: '',
+    interim: '',
+    finalSegmentCount: 0,
+  });
   const capabilities = useMemo(detectCaptureCapabilities, []);
   const client = useMemo(() => options.client ?? new AgendaMeetingEdgeClient(), [options.client]);
   const spoolRef = useRef<EncryptedSegmentSpool | null>(null);
@@ -497,6 +504,21 @@ export function useAgendaMeetingCapture(
             // interruption so a dropped pause request remains recoverable.
           });
         }
+      },
+      onInterimTranscript: (text) => {
+        if (mountedRef.current) setLiveTranscript((previous) => ({ ...previous, interim: text }));
+      },
+      onFinalTranscript: (_segmentText, canonical) => {
+        if (!mountedRef.current) return;
+        setLiveTranscript((previous) => ({
+          ...previous,
+          canonical,
+          interim: '',
+          finalSegmentCount: previous.finalSegmentCount + 1,
+        }));
+      },
+      onTranscriptionState: (recognition) => {
+        if (mountedRef.current) setLiveTranscript((previous) => ({ ...previous, recognition }));
       },
       onGap: registerGap,
       onLifecycleSignal: (reason) => {
@@ -871,6 +893,7 @@ export function useAgendaMeetingCapture(
     await coordinatorRef.current?.purgeSession();
     coordinatorRef.current = null;
     removeRecovery(storage, options.orgId, options.eventId);
+    setLiveTranscript({ recognition: 'idle', canonical: '', interim: '', finalSegmentCount: 0 });
     dispatch({ type: 'reset' });
   }, [client, options.eventId, options.orgId, storage]);
 
@@ -1149,6 +1172,7 @@ export function useAgendaMeetingCapture(
 
   return {
     state,
+    liveTranscript,
     capabilities,
     mic: {
       devices,

@@ -77,12 +77,15 @@ class FakeSpeechRecognition extends EventTarget {
   }
 
   start(): void {
-    const index = FakeSpeechRecognition.instances.indexOf(this);
+    this.emit(`fala-${FakeSpeechRecognition.instances.indexOf(this)}`);
+  }
+
+  emit(transcript: string): void {
     this.onresult?.({
       resultIndex: 0,
       results: {
         length: 1,
-        0: { isFinal: true, length: 1, 0: { transcript: `fala-${index}`, confidence: 0.9 } },
+        0: { isFinal: true, length: 1, 0: { transcript, confidence: 0.9 } },
       },
     });
   }
@@ -116,7 +119,7 @@ describe('CaptureSegmenter', () => {
     FakeSpeechRecognition.instances = [];
   });
 
-  it('rotates by stop/start and emits self-contained transcript segments with UUID IDs/hash', async () => {
+  it('keeps a single long-lived recognition and flushes text segments with UUID IDs/hash', async () => {
     const { devices } = mediaEnvironment();
     let monotonic = 0;
     const segments: CapturedAudioSegment[] = [];
@@ -142,7 +145,7 @@ describe('CaptureSegmenter', () => {
 
     expect(await segmenter.prepare()).toMatchObject({
       backend: 'media_recorder',
-      mimeType: 'audio/webm;codecs=opus',
+      mimeType: 'text/plain;charset=utf-8',
       selectedDeviceId: 'microphone-1',
     });
     await segmenter.start({ sessionId: SESSION_ID });
@@ -150,10 +153,11 @@ describe('CaptureSegmenter', () => {
     await firstSegmentPromise;
     await Promise.resolve();
     await Promise.resolve();
+    FakeSpeechRecognition.instances[0]?.emit('fala-1');
     monotonic = 45_000;
     await segmenter.stop();
 
-    expect(FakeMediaRecorder.instances).toHaveLength(2);
+    expect(FakeSpeechRecognition.instances).toHaveLength(1);
     expect(segments).toHaveLength(2);
     expect(segments.map((value) => value.metadata.sequence)).toEqual([0, 1]);
     expect(segments[0]?.metadata).toMatchObject({
