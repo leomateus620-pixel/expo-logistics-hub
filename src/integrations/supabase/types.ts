@@ -14,6 +14,956 @@ export type Database = {
   }
   public: {
     Tables: {
+      agenda_meeting_action_items: {
+        Row: {
+          confirmed_at: string | null
+          confirmed_by: string | null
+          confirmed_user_id: string | null
+          created_at: string
+          description: string
+          due_date: string | null
+          due_date_confirmed: boolean
+          due_date_text: string | null
+          event_id: string
+          evidence: Json
+          id: string
+          minutes_version_id: string
+          org_id: string
+          position: number
+          responsible_text: string | null
+          session_id: string
+          status: string
+          suggested_user_id: string | null
+          title: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          confirmed_at?: string | null
+          confirmed_by?: string | null
+          confirmed_user_id?: string | null
+          created_at?: string
+          description?: string
+          due_date?: string | null
+          due_date_confirmed?: boolean
+          due_date_text?: string | null
+          event_id: string
+          evidence?: Json
+          id?: string
+          minutes_version_id: string
+          org_id: string
+          position?: number
+          responsible_text?: string | null
+          session_id: string
+          status?: string
+          suggested_user_id?: string | null
+          title: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          confirmed_at?: string | null
+          confirmed_by?: string | null
+          confirmed_user_id?: string | null
+          created_at?: string
+          description?: string
+          due_date?: string | null
+          due_date_confirmed?: boolean
+          due_date_text?: string | null
+          event_id?: string
+          evidence?: Json
+          id?: string
+          minutes_version_id?: string
+          org_id?: string
+          position?: number
+          responsible_text?: string | null
+          session_id?: string
+          status?: string
+          suggested_user_id?: string | null
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agenda_meeting_action_items_minutes_version_id_fkey"
+            columns: ["minutes_version_id"]
+            isOneToOne: false
+            referencedRelation: "agenda_meeting_minutes_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agenda_meeting_actions_scope_fkey"
+            columns: ["session_id", "org_id", "event_id"]
+            isOneToOne: false
+            referencedRelation: "agenda_meeting_sessions"
+            referencedColumns: ["id", "org_id", "event_id"]
+          },
+        ]
+      }
+      agenda_meeting_administrative_tombstones: {
+        Row: {
+          actor_user_id: string | null
+          capture_state: string
+          deleted_at: string
+          deletion_scope: string
+          event_context_hash: string
+          event_id: string
+          id: string
+          latest_minutes_hash: string | null
+          latest_transcript_hash: string | null
+          minutes_version_count: number
+          org_id: string
+          processing_state: string
+          receipt_count: number
+          session_created_at: string
+          session_id: string
+          session_version: number
+          transcript_segment_count: number
+          transcript_version_count: number
+        }
+        Insert: {
+          actor_user_id?: string | null
+          capture_state: string
+          deleted_at?: string
+          deletion_scope: string
+          event_context_hash: string
+          event_id: string
+          id?: string
+          latest_minutes_hash?: string | null
+          latest_transcript_hash?: string | null
+          minutes_version_count?: number
+          org_id: string
+          processing_state: string
+          receipt_count?: number
+          session_created_at: string
+          session_id: string
+          session_version: number
+          transcript_segment_count?: number
+          transcript_version_count?: number
+        }
+        Update: {
+          actor_user_id?: string | null
+          capture_state?: string
+          deleted_at?: string
+          deletion_scope?: string
+          event_context_hash?: string
+          event_id?: string
+          id?: string
+          latest_minutes_hash?: string | null
+          latest_transcript_hash?: string | null
+          minutes_version_count?: number
+          org_id?: string
+          processing_state?: string
+          receipt_count?: number
+          session_created_at?: string
+          session_id?: string
+          session_version?: number
+          transcript_segment_count?: number
+          transcript_version_count?: number
+        }
+        Relationships: []
+      }
+      agenda_meeting_audit_events: {
+        Row: {
+          action: string
+          actor_kind: string
+          actor_user_id: string | null
+          created_at: string
+          entity_id: string | null
+          entity_type: string
+          event_id: string
+          id: string
+          metadata: Json
+          mutation_id: string | null
+          org_id: string
+          session_id: string
+        }
+        Insert: {
+          action: string
+          actor_kind: string
+          actor_user_id?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type: string
+          event_id: string
+          id?: string
+          metadata?: Json
+          mutation_id?: string | null
+          org_id: string
+          session_id: string
+        }
+        Update: {
+          action?: string
+          actor_kind?: string
+          actor_user_id?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string
+          event_id?: string
+          id?: string
+          metadata?: Json
+          mutation_id?: string | null
+          org_id?: string
+          session_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agenda_meeting_audit_session_scope_fkey"
+            columns: ["session_id", "org_id", "event_id"]
+            isOneToOne: false
+            referencedRelation: "agenda_meeting_sessions"
+            referencedColumns: ["id", "org_id", "event_id"]
+          },
+        ]
+      }
+      agenda_meeting_insights: {
+        Row: {
+          confidence: number | null
+          created_at: string
+          description: string
+          event_id: string
+          evidence: Json
+          id: string
+          insight_type: string
+          minutes_version_id: string
+          org_id: string
+          position: number
+          review_state: string
+          session_id: string
+          title: string
+        }
+        Insert: {
+          confidence?: number | null
+          created_at?: string
+          description: string
+          event_id: string
+          evidence?: Json
+          id?: string
+          insight_type: string
+          minutes_version_id: string
+          org_id: string
+          position?: number
+          review_state?: string
+          session_id: string
+          title: string
+        }
+        Update: {
+          confidence?: number | null
+          created_at?: string
+          description?: string
+          event_id?: string
+          evidence?: Json
+          id?: string
+          insight_type?: string
+          minutes_version_id?: string
+          org_id?: string
+          position?: number
+          review_state?: string
+          session_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agenda_meeting_insights_minutes_version_id_fkey"
+            columns: ["minutes_version_id"]
+            isOneToOne: false
+            referencedRelation: "agenda_meeting_minutes_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agenda_meeting_insights_scope_fkey"
+            columns: ["session_id", "org_id", "event_id"]
+            isOneToOne: false
+            referencedRelation: "agenda_meeting_sessions"
+            referencedColumns: ["id", "org_id", "event_id"]
+          },
+        ]
+      }
+      agenda_meeting_minutes_versions: {
+        Row: {
+          analysis_model: string
+          created_at: string
+          event_id: string
+          id: string
+          minutes_markdown: string
+          org_id: string
+          prompt_version: string
+          provider_response_id: string | null
+          provider_usage: Json
+          reasoning_effort: string
+          review_note: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          schema_version: string
+          session_id: string
+          status: string
+          summary: string
+          title: string
+          transcript_coverage: string
+          transcript_version_id: string
+          version: number
+        }
+        Insert: {
+          analysis_model?: string
+          created_at?: string
+          event_id: string
+          id?: string
+          minutes_markdown: string
+          org_id: string
+          prompt_version: string
+          provider_response_id?: string | null
+          provider_usage?: Json
+          reasoning_effort?: string
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          schema_version: string
+          session_id: string
+          status?: string
+          summary: string
+          title: string
+          transcript_coverage: string
+          transcript_version_id: string
+          version: number
+        }
+        Update: {
+          analysis_model?: string
+          created_at?: string
+          event_id?: string
+          id?: string
+          minutes_markdown?: string
+          org_id?: string
+          prompt_version?: string
+          provider_response_id?: string | null
+          provider_usage?: Json
+          reasoning_effort?: string
+          review_note?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          schema_version?: string
+          session_id?: string
+          status?: string
+          summary?: string
+          title?: string
+          transcript_coverage?: string
+          transcript_version_id?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agenda_meeting_minutes_scope_fkey"
+            columns: ["session_id", "org_id", "event_id"]
+            isOneToOne: false
+            referencedRelation: "agenda_meeting_sessions"
+            referencedColumns: ["id", "org_id", "event_id"]
+          },
+          {
+            foreignKeyName: "agenda_meeting_minutes_versions_transcript_version_id_fkey"
+            columns: ["transcript_version_id"]
+            isOneToOne: false
+            referencedRelation: "agenda_meeting_transcript_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agenda_meeting_mutation_receipts: {
+        Row: {
+          action: string
+          actor_user_id: string
+          created_at: string
+          event_id: string
+          id: string
+          mutation_id: string
+          org_id: string
+          response: Json
+          session_id: string | null
+        }
+        Insert: {
+          action: string
+          actor_user_id: string
+          created_at?: string
+          event_id: string
+          id?: string
+          mutation_id: string
+          org_id: string
+          response: Json
+          session_id?: string | null
+        }
+        Update: {
+          action?: string
+          actor_user_id?: string
+          created_at?: string
+          event_id?: string
+          id?: string
+          mutation_id?: string
+          org_id?: string
+          response?: Json
+          session_id?: string | null
+        }
+        Relationships: []
+      }
+      agenda_meeting_processing_jobs: {
+        Row: {
+          attempts: number
+          available_at: string
+          completed_at: string | null
+          created_at: string
+          dedupe_key: string
+          event_id: string
+          id: string
+          kind: string
+          last_error_code: string | null
+          lease_expires_at: string | null
+          lease_token: string | null
+          max_attempts: number
+          org_id: string
+          session_id: string
+          status: string
+          transcript_version_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          attempts?: number
+          available_at?: string
+          completed_at?: string | null
+          created_at?: string
+          dedupe_key: string
+          event_id: string
+          id?: string
+          kind: string
+          last_error_code?: string | null
+          lease_expires_at?: string | null
+          lease_token?: string | null
+          max_attempts?: number
+          org_id: string
+          session_id: string
+          status?: string
+          transcript_version_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          attempts?: number
+          available_at?: string
+          completed_at?: string | null
+          created_at?: string
+          dedupe_key?: string
+          event_id?: string
+          id?: string
+          kind?: string
+          last_error_code?: string | null
+          lease_expires_at?: string | null
+          lease_token?: string | null
+          max_attempts?: number
+          org_id?: string
+          session_id?: string
+          status?: string
+          transcript_version_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agenda_meeting_jobs_scope_fkey"
+            columns: ["session_id", "org_id", "event_id"]
+            isOneToOne: false
+            referencedRelation: "agenda_meeting_sessions"
+            referencedColumns: ["id", "org_id", "event_id"]
+          },
+          {
+            foreignKeyName: "agenda_meeting_processing_jobs_transcript_version_id_fkey"
+            columns: ["transcript_version_id"]
+            isOneToOne: false
+            referencedRelation: "agenda_meeting_transcript_versions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agenda_meeting_segment_receipts: {
+        Row: {
+          attempt_count: number
+          attempt_id: string
+          byte_size: number | null
+          callback_digest: string | null
+          callback_received_at: string | null
+          callback_token_expires_at: string | null
+          callback_token_hash: string | null
+          capture_end_ms: number
+          capture_start_ms: number
+          created_at: string
+          error_code: string | null
+          event_id: string
+          id: string
+          lost_at: string | null
+          mime_type: string | null
+          mutation_id: string
+          org_id: string
+          provider_accepted_at: string | null
+          provider_request_id: string | null
+          retry_after_ms: number | null
+          segment_id: string
+          sequence: number
+          session_id: string
+          sha256: string | null
+          status: string
+          transcribed_at: string | null
+          updated_at: string
+        }
+        Insert: {
+          attempt_count?: number
+          attempt_id?: string
+          byte_size?: number | null
+          callback_digest?: string | null
+          callback_received_at?: string | null
+          callback_token_expires_at?: string | null
+          callback_token_hash?: string | null
+          capture_end_ms: number
+          capture_start_ms: number
+          created_at?: string
+          error_code?: string | null
+          event_id: string
+          id?: string
+          lost_at?: string | null
+          mime_type?: string | null
+          mutation_id: string
+          org_id: string
+          provider_accepted_at?: string | null
+          provider_request_id?: string | null
+          retry_after_ms?: number | null
+          segment_id: string
+          sequence: number
+          session_id: string
+          sha256?: string | null
+          status?: string
+          transcribed_at?: string | null
+          updated_at?: string
+        }
+        Update: {
+          attempt_count?: number
+          attempt_id?: string
+          byte_size?: number | null
+          callback_digest?: string | null
+          callback_received_at?: string | null
+          callback_token_expires_at?: string | null
+          callback_token_hash?: string | null
+          capture_end_ms?: number
+          capture_start_ms?: number
+          created_at?: string
+          error_code?: string | null
+          event_id?: string
+          id?: string
+          lost_at?: string | null
+          mime_type?: string | null
+          mutation_id?: string
+          org_id?: string
+          provider_accepted_at?: string | null
+          provider_request_id?: string | null
+          retry_after_ms?: number | null
+          segment_id?: string
+          sequence?: number
+          session_id?: string
+          sha256?: string | null
+          status?: string
+          transcribed_at?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agenda_meeting_receipts_session_scope_fkey"
+            columns: ["session_id", "org_id", "event_id"]
+            isOneToOne: false
+            referencedRelation: "agenda_meeting_sessions"
+            referencedColumns: ["id", "org_id", "event_id"]
+          },
+        ]
+      }
+      agenda_meeting_sessions: {
+        Row: {
+          active_duration_ms: number
+          analysis_model: string
+          analysis_provider: string
+          analysis_reasoning_effort: string
+          capture_state: string
+          client_session_key: string
+          closed_sequence: number | null
+          completed_at: string | null
+          consent_confirmed: boolean
+          consent_confirmed_at: string | null
+          consent_policy_version: string | null
+          created_at: string
+          deleted_at: string | null
+          ended_at: string | null
+          event_context: Json
+          event_id: string
+          finalized_at: string | null
+          heartbeat_at: string | null
+          id: string
+          language: string
+          last_contiguous_sequence: number
+          last_error_at: string | null
+          last_error_code: string | null
+          last_received_sequence: number
+          missing_sequences: number[]
+          org_id: string
+          partial_analysis_confirmed: boolean
+          paused_at: string | null
+          processing_state: string
+          started_at: string | null
+          started_by: string
+          stt_model: string
+          stt_provider: string
+          unresolved_sequences: number[]
+          updated_at: string
+          version: number
+        }
+        Insert: {
+          active_duration_ms?: number
+          analysis_model?: string
+          analysis_provider?: string
+          analysis_reasoning_effort?: string
+          capture_state?: string
+          client_session_key: string
+          closed_sequence?: number | null
+          completed_at?: string | null
+          consent_confirmed?: boolean
+          consent_confirmed_at?: string | null
+          consent_policy_version?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          ended_at?: string | null
+          event_context?: Json
+          event_id: string
+          finalized_at?: string | null
+          heartbeat_at?: string | null
+          id?: string
+          language?: string
+          last_contiguous_sequence?: number
+          last_error_at?: string | null
+          last_error_code?: string | null
+          last_received_sequence?: number
+          missing_sequences?: number[]
+          org_id: string
+          partial_analysis_confirmed?: boolean
+          paused_at?: string | null
+          processing_state?: string
+          started_at?: string | null
+          started_by: string
+          stt_model?: string
+          stt_provider?: string
+          unresolved_sequences?: number[]
+          updated_at?: string
+          version?: number
+        }
+        Update: {
+          active_duration_ms?: number
+          analysis_model?: string
+          analysis_provider?: string
+          analysis_reasoning_effort?: string
+          capture_state?: string
+          client_session_key?: string
+          closed_sequence?: number | null
+          completed_at?: string | null
+          consent_confirmed?: boolean
+          consent_confirmed_at?: string | null
+          consent_policy_version?: string | null
+          created_at?: string
+          deleted_at?: string | null
+          ended_at?: string | null
+          event_context?: Json
+          event_id?: string
+          finalized_at?: string | null
+          heartbeat_at?: string | null
+          id?: string
+          language?: string
+          last_contiguous_sequence?: number
+          last_error_at?: string | null
+          last_error_code?: string | null
+          last_received_sequence?: number
+          missing_sequences?: number[]
+          org_id?: string
+          partial_analysis_confirmed?: boolean
+          paused_at?: string | null
+          processing_state?: string
+          started_at?: string | null
+          started_by?: string
+          stt_model?: string
+          stt_provider?: string
+          unresolved_sequences?: number[]
+          updated_at?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agenda_meeting_sessions_event_org_fkey"
+            columns: ["event_id", "org_id"]
+            isOneToOne: false
+            referencedRelation: "cronograma_eventos"
+            referencedColumns: ["id", "org_id"]
+          },
+          {
+            foreignKeyName: "agenda_meeting_sessions_event_org_fkey"
+            columns: ["event_id", "org_id"]
+            isOneToOne: false
+            referencedRelation: "cronograma_eventos_full"
+            referencedColumns: ["id", "org_id"]
+          },
+          {
+            foreignKeyName: "agenda_meeting_sessions_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agenda_meeting_transcript_revision_segments: {
+        Row: {
+          created_at: string
+          event_id: string
+          id: string
+          org_id: string
+          revised_content_hash: string
+          revised_text: string
+          sequence: number
+          session_id: string
+          source_content_hash: string
+          source_segment_id: string
+          transcript_version_id: string
+        }
+        Insert: {
+          created_at?: string
+          event_id: string
+          id?: string
+          org_id: string
+          revised_content_hash: string
+          revised_text: string
+          sequence: number
+          session_id: string
+          source_content_hash: string
+          source_segment_id: string
+          transcript_version_id: string
+        }
+        Update: {
+          created_at?: string
+          event_id?: string
+          id?: string
+          org_id?: string
+          revised_content_hash?: string
+          revised_text?: string
+          sequence?: number
+          session_id?: string
+          source_content_hash?: string
+          source_segment_id?: string
+          transcript_version_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agenda_meeting_revision_segments_scope_fkey"
+            columns: ["session_id", "org_id", "event_id"]
+            isOneToOne: false
+            referencedRelation: "agenda_meeting_sessions"
+            referencedColumns: ["id", "org_id", "event_id"]
+          },
+          {
+            foreignKeyName: "agenda_meeting_transcript_revision_s_transcript_version_id_fkey"
+            columns: ["transcript_version_id"]
+            isOneToOne: false
+            referencedRelation: "agenda_meeting_transcript_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agenda_meeting_transcript_revision_segme_source_segment_id_fkey"
+            columns: ["source_segment_id"]
+            isOneToOne: false
+            referencedRelation: "agenda_meeting_transcript_segments"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agenda_meeting_transcript_segments: {
+        Row: {
+          confidence: number | null
+          content_hash: string
+          created_at: string
+          duration_ms: number | null
+          event_id: string
+          id: string
+          org_id: string
+          provider_language: string
+          provider_model: string
+          provider_request_id: string
+          receipt_id: string
+          segment_id: string
+          sequence: number
+          session_id: string
+          transcript_text: string
+          words: Json
+        }
+        Insert: {
+          confidence?: number | null
+          content_hash: string
+          created_at?: string
+          duration_ms?: number | null
+          event_id: string
+          id?: string
+          org_id: string
+          provider_language?: string
+          provider_model?: string
+          provider_request_id: string
+          receipt_id: string
+          segment_id: string
+          sequence: number
+          session_id: string
+          transcript_text: string
+          words?: Json
+        }
+        Update: {
+          confidence?: number | null
+          content_hash?: string
+          created_at?: string
+          duration_ms?: number | null
+          event_id?: string
+          id?: string
+          org_id?: string
+          provider_language?: string
+          provider_model?: string
+          provider_request_id?: string
+          receipt_id?: string
+          segment_id?: string
+          sequence?: number
+          session_id?: string
+          transcript_text?: string
+          words?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agenda_meeting_segments_session_scope_fkey"
+            columns: ["session_id", "org_id", "event_id"]
+            isOneToOne: false
+            referencedRelation: "agenda_meeting_sessions"
+            referencedColumns: ["id", "org_id", "event_id"]
+          },
+          {
+            foreignKeyName: "agenda_meeting_transcript_segments_receipt_id_fkey"
+            columns: ["receipt_id"]
+            isOneToOne: true
+            referencedRelation: "agenda_meeting_segment_receipts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      agenda_meeting_transcript_versions: {
+        Row: {
+          content_hash: string
+          created_at: string
+          created_by: string | null
+          event_id: string
+          id: string
+          is_complete: boolean
+          kind: string
+          missing_sequences: number[]
+          org_id: string
+          parent_version_id: string | null
+          revision_reason: string | null
+          session_id: string
+          transcript_text: string
+          version: number
+        }
+        Insert: {
+          content_hash: string
+          created_at?: string
+          created_by?: string | null
+          event_id: string
+          id?: string
+          is_complete?: boolean
+          kind: string
+          missing_sequences?: number[]
+          org_id: string
+          parent_version_id?: string | null
+          revision_reason?: string | null
+          session_id: string
+          transcript_text: string
+          version: number
+        }
+        Update: {
+          content_hash?: string
+          created_at?: string
+          created_by?: string | null
+          event_id?: string
+          id?: string
+          is_complete?: boolean
+          kind?: string
+          missing_sequences?: number[]
+          org_id?: string
+          parent_version_id?: string | null
+          revision_reason?: string | null
+          session_id?: string
+          transcript_text?: string
+          version?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agenda_meeting_transcript_versions_parent_version_id_fkey"
+            columns: ["parent_version_id"]
+            isOneToOne: false
+            referencedRelation: "agenda_meeting_transcript_versions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "agenda_meeting_transcript_versions_scope_fkey"
+            columns: ["session_id", "org_id", "event_id"]
+            isOneToOne: false
+            referencedRelation: "agenda_meeting_sessions"
+            referencedColumns: ["id", "org_id", "event_id"]
+          },
+        ]
+      }
+      agenda_meeting_user_consents: {
+        Row: {
+          consent_version: number
+          decision: string
+          event_id: string
+          id: string
+          org_id: string
+          policy_version: string
+          recorded_at: string
+          recorded_by: string
+          session_id: string
+          user_id: string
+        }
+        Insert: {
+          consent_version: number
+          decision: string
+          event_id: string
+          id?: string
+          org_id: string
+          policy_version: string
+          recorded_at?: string
+          recorded_by: string
+          session_id: string
+          user_id: string
+        }
+        Update: {
+          consent_version?: number
+          decision?: string
+          event_id?: string
+          id?: string
+          org_id?: string
+          policy_version?: string
+          recorded_at?: string
+          recorded_by?: string
+          session_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "agenda_meeting_consents_scope_fkey"
+            columns: ["session_id", "org_id", "event_id"]
+            isOneToOne: false
+            referencedRelation: "agenda_meeting_sessions"
+            referencedColumns: ["id", "org_id", "event_id"]
+          },
+        ]
+      }
       audit_log: {
         Row: {
           action: Database["public"]["Enums"]["audit_action"]
@@ -6997,6 +7947,247 @@ export type Database = {
         Args: { _org_id: string }
         Returns: undefined
       }
+      agenda_meeting_accept_segment: {
+        Args: { p_provider_request_id: string; p_receipt_id: string }
+        Returns: Json
+      }
+      agenda_meeting_actor_allowed: {
+        Args: {
+          p_action: string
+          p_event_id: string
+          p_org_id: string
+          p_session_id?: string
+          p_user_id: string
+        }
+        Returns: boolean
+      }
+      agenda_meeting_analysis_evidence: {
+        Args: { p_segment_ids: Json; p_session_id: string }
+        Returns: Json
+      }
+      agenda_meeting_authorize: {
+        Args: {
+          p_action: string
+          p_event_id: string
+          p_org_id: string
+          p_session_id?: string
+        }
+        Returns: boolean
+      }
+      agenda_meeting_capture_tombstone: {
+        Args: {
+          p_actor_user_id?: string
+          p_deletion_scope: string
+          p_session_id: string
+        }
+        Returns: undefined
+      }
+      agenda_meeting_claim_jobs: {
+        Args: { p_batch_size?: number; p_lease_seconds?: number }
+        Returns: {
+          attempts: number
+          available_at: string
+          completed_at: string | null
+          created_at: string
+          dedupe_key: string
+          event_id: string
+          id: string
+          kind: string
+          last_error_code: string | null
+          lease_expires_at: string | null
+          lease_token: string | null
+          max_attempts: number
+          org_id: string
+          session_id: string
+          status: string
+          transcript_version_id: string | null
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "agenda_meeting_processing_jobs"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      agenda_meeting_complete_analysis_job: {
+        Args: {
+          p_job_id: string
+          p_lease_token: string
+          p_provider_response_id: string
+          p_result: Json
+          p_transcript_version_id: string
+          p_usage?: Json
+        }
+        Returns: Json
+      }
+      agenda_meeting_complete_assemble_job: {
+        Args: { p_job_id: string; p_lease_token: string }
+        Returns: Json
+      }
+      agenda_meeting_complete_segment: {
+        Args: {
+          p_attempt_id: string
+          p_callback_digest: string
+          p_callback_token_hash: string
+          p_confidence?: number
+          p_duration_ms?: number
+          p_provider_request_id: string
+          p_transcript: string
+          p_words?: Json
+        }
+        Returns: Json
+      }
+      agenda_meeting_control: {
+        Args: {
+          p_action: string
+          p_actor_user_id: string
+          p_event_id: string
+          p_expected_version?: number
+          p_mutation_id?: string
+          p_org_id: string
+          p_payload?: Json
+          p_session_id?: string
+        }
+        Returns: Json
+      }
+      agenda_meeting_detail_json: {
+        Args: { p_session_id: string }
+        Returns: Json
+      }
+      agenda_meeting_enqueue_job: {
+        Args: {
+          p_dedupe_key: string
+          p_kind: string
+          p_session_id: string
+          p_transcript_version_id?: string
+        }
+        Returns: string
+      }
+      agenda_meeting_event_accessible: {
+        Args: { p_event_id: string; p_org_id: string; p_user_id: string }
+        Returns: boolean
+      }
+      agenda_meeting_expire_stale_captures: {
+        Args: { p_stale_seconds?: number }
+        Returns: number
+      }
+      agenda_meeting_fail_job: {
+        Args: {
+          p_error_code: string
+          p_job_id: string
+          p_lease_token: string
+          p_retry_after_seconds?: number
+        }
+        Returns: Json
+      }
+      agenda_meeting_fail_segment: {
+        Args: {
+          p_error_code: string
+          p_receipt_id: string
+          p_retry_after_ms?: number
+          p_terminal: boolean
+        }
+        Returns: Json
+      }
+      agenda_meeting_has_explicit_capability: {
+        Args: { p_capability: string; p_org_id: string; p_user_id: string }
+        Returns: boolean
+      }
+      agenda_meeting_prepare_segment: {
+        Args: {
+          p_actor_user_id: string
+          p_byte_size: number
+          p_callback_token_expires_at: string
+          p_callback_token_hash: string
+          p_capture_end_ms: number
+          p_capture_start_ms: number
+          p_mime_type: string
+          p_mutation_id: string
+          p_segment_id: string
+          p_sequence: number
+          p_session_id: string
+          p_sha256: string
+        }
+        Returns: Json
+      }
+      agenda_meeting_refresh_sequence_state: {
+        Args: { p_session_id: string }
+        Returns: {
+          active_duration_ms: number
+          analysis_model: string
+          analysis_provider: string
+          analysis_reasoning_effort: string
+          capture_state: string
+          client_session_key: string
+          closed_sequence: number | null
+          completed_at: string | null
+          consent_confirmed: boolean
+          consent_confirmed_at: string | null
+          consent_policy_version: string | null
+          created_at: string
+          deleted_at: string | null
+          ended_at: string | null
+          event_context: Json
+          event_id: string
+          finalized_at: string | null
+          heartbeat_at: string | null
+          id: string
+          language: string
+          last_contiguous_sequence: number
+          last_error_at: string | null
+          last_error_code: string | null
+          last_received_sequence: number
+          missing_sequences: number[]
+          org_id: string
+          partial_analysis_confirmed: boolean
+          paused_at: string | null
+          processing_state: string
+          started_at: string | null
+          started_by: string
+          stt_model: string
+          stt_provider: string
+          unresolved_sequences: number[]
+          updated_at: string
+          version: number
+        }
+        SetofOptions: {
+          from: "*"
+          to: "agenda_meeting_sessions"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      agenda_meeting_session_readable: {
+        Args: {
+          p_event_id: string
+          p_org_id: string
+          p_session_id: string
+          p_user_id: string
+        }
+        Returns: boolean
+      }
+      agenda_meeting_session_summary_json: {
+        Args: { p_session_id: string }
+        Returns: Json
+      }
+      agenda_meeting_strip_text_overlap: {
+        Args: { p_current: string; p_previous: string }
+        Returns: string
+      }
+      agenda_meeting_write_audit: {
+        Args: {
+          p_action: string
+          p_actor_kind: string
+          p_actor_user_id: string
+          p_entity_id?: string
+          p_entity_type: string
+          p_metadata?: Json
+          p_mutation_id?: string
+          p_session_id: string
+        }
+        Returns: undefined
+      }
       apply_exporural_reference_2026: {
         Args: {
           p_entities: Json
@@ -7180,6 +8371,7 @@ export type Database = {
         Args: { _org_id: string; _user_id: string }
         Returns: boolean
       }
+      invoke_agenda_meeting_worker: { Args: never; Returns: number }
       invoke_google_sync_worker: { Args: never; Returns: number }
       is_org_member: {
         Args: { _org_id: string; _user_id: string }
