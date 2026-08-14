@@ -8,7 +8,10 @@ import {
 } from '../types';
 import { createCaptureSegmentId } from './identity';
 import { AGENDA_MEETING_TEXT_SEGMENT_MIME_TYPE, selectMediaRecorderMimeType } from './mime';
-import { NativeMeetingTranscriptionAdapter } from './NativeMeetingTranscriptionAdapter';
+import {
+  NativeMeetingTranscriptionAdapter,
+  type NativeMeetingTranscriptionOptions,
+} from './NativeMeetingTranscriptionAdapter';
 import { sha256Blob } from './sha256';
 import { encodePcm16Wav } from './wav';
 
@@ -58,6 +61,8 @@ export interface CaptureSegmenterOptions {
   onInterruption?: (reason: CaptureInterruptionReason, error?: Error) => void;
   onGap?: (gap: CaptureGapMarker) => Promise<void> | void;
   onLifecycleSignal?: (reason: Extract<CaptureInterruptionReason, 'page_hidden' | 'device_changed'>) => void;
+  speechRecognitionConstructor?: NativeMeetingTranscriptionOptions['recognitionConstructor'];
+  onInterimTranscript?: (text: string) => void;
 }
 
 interface CompletedRecorderCycle {
@@ -207,6 +212,8 @@ export class CaptureSegmenter {
     await this.prepareInputMeter();
 
     this.transcription = new NativeMeetingTranscriptionAdapter({
+      recognitionConstructor: this.options.speechRecognitionConstructor,
+      onInterim: this.options.onInterimTranscript,
       onFatalError: (code) => {
         void this.interrupt('capture_error', new Error(code));
       },
