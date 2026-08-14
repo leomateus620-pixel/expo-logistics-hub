@@ -149,6 +149,9 @@ function errorMessage(code: string | undefined): string {
       return 'O acesso ao microfone foi negado. Libere a permissão do navegador para continuar.';
     case 'capture_backend_unavailable':
       return 'Este navegador não oferece uma rota de captura validada para a reunião.';
+    case 'speech_recognition_unavailable':
+      return 'Este navegador não possui reconhecimento de fala nativo. Use o Google Chrome ou o Microsoft Edge para gravar a reunião.';
+
     case 'backlog_capacity_reached':
       return 'A captura foi pausada para proteger os segmentos ainda não confirmados.';
     case 'session_expired':

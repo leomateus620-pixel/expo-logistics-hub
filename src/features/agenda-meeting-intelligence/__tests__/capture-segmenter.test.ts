@@ -61,6 +61,40 @@ class FakeMediaRecorder extends EventTarget {
   requestData(): void {}
 }
 
+class FakeSpeechRecognition extends EventTarget {
+  static instances: FakeSpeechRecognition[] = [];
+  lang = '';
+  continuous = false;
+  interimResults = false;
+  maxAlternatives = 1;
+  onresult: ((event: unknown) => void) | null = null;
+  onerror: ((event: unknown) => void) | null = null;
+  onend: (() => void) | null = null;
+
+  constructor() {
+    super();
+    FakeSpeechRecognition.instances.push(this);
+  }
+
+  start(): void {
+    const index = FakeSpeechRecognition.instances.indexOf(this);
+    this.onresult?.({
+      resultIndex: 0,
+      results: {
+        length: 1,
+        0: { isFinal: true, length: 1, 0: { transcript: `fala-${index}`, confidence: 0.9 } },
+      },
+    });
+  }
+
+  stop(): void {}
+
+  abort(): void {}
+}
+
+const speechRecognitionConstructor =
+  FakeSpeechRecognition as unknown as new () => never;
+
 function mediaEnvironment() {
   const track = new FakeTrack();
   const stream = {
@@ -79,9 +113,10 @@ function mediaEnvironment() {
 describe('CaptureSegmenter', () => {
   beforeEach(() => {
     FakeMediaRecorder.instances = [];
+    FakeSpeechRecognition.instances = [];
   });
 
-  it('rotates by stop/start and emits independently self-contained 30s recordings with UUID IDs/hash', async () => {
+  it('rotates by stop/start and emits self-contained transcript segments with UUID IDs/hash', async () => {
     const { devices } = mediaEnvironment();
     let monotonic = 0;
     const segments: CapturedAudioSegment[] = [];
@@ -92,6 +127,7 @@ describe('CaptureSegmenter', () => {
     const segmenter = new CaptureSegmenter({
       mediaDevices: devices,
       mediaRecorderConstructor: FakeMediaRecorder as unknown as typeof MediaRecorder,
+      speechRecognitionConstructor,
       audioContextConstructor: undefined,
       crypto: cryptoApi,
       monotonicNow: () => monotonic,
@@ -125,13 +161,14 @@ describe('CaptureSegmenter', () => {
       captureEndMs: 30_000,
       durationMs: 30_000,
       backend: 'media_recorder',
+      mimeType: 'text/plain;charset=utf-8',
     });
     expect(segments[0]?.metadata.id).toMatch(
       /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/,
     );
     expect(segments[0]?.metadata.sha256).toMatch(/^[0-9a-f]{64}$/);
-    expect(await blobToText(segments[0]?.audio as Blob)).toBe('cycle-0');
-    expect(await blobToText(segments[1]?.audio as Blob)).toBe('cycle-1');
+    expect(await blobToText(segments[0]?.audio as Blob)).toBe('fala-0');
+    expect(await blobToText(segments[1]?.audio as Blob)).toBe('fala-1');
   });
 
   it('counts only active time across pause/resume', async () => {
@@ -140,6 +177,7 @@ describe('CaptureSegmenter', () => {
     const segmenter = new CaptureSegmenter({
       mediaDevices: devices,
       mediaRecorderConstructor: FakeMediaRecorder as unknown as typeof MediaRecorder,
+      speechRecognitionConstructor,
       audioContextConstructor: undefined,
       crypto: cryptoApi,
       monotonicNow: () => monotonic,
@@ -170,6 +208,7 @@ describe('CaptureSegmenter', () => {
     const segmenter = new CaptureSegmenter({
       mediaDevices: first.devices,
       mediaRecorderConstructor: FakeMediaRecorder as unknown as typeof MediaRecorder,
+      speechRecognitionConstructor,
       audioContextConstructor: undefined,
       crypto: cryptoApi,
       segmentDurationMs: 120_000,
@@ -197,6 +236,7 @@ describe('CaptureSegmenter', () => {
     const trackSegmenter = new CaptureSegmenter({
       mediaDevices: second.devices,
       mediaRecorderConstructor: FakeMediaRecorder as unknown as typeof MediaRecorder,
+      speechRecognitionConstructor,
       audioContextConstructor: undefined,
       crypto: cryptoApi,
       segmentDurationMs: 120_000,
@@ -231,6 +271,7 @@ describe('CaptureSegmenter', () => {
     const segmenter = new CaptureSegmenter({
       mediaDevices: devices,
       mediaRecorderConstructor: FakeMediaRecorder as unknown as typeof MediaRecorder,
+      speechRecognitionConstructor,
       audioContextConstructor: undefined,
       crypto: cryptoApi,
       monotonicNow: () => monotonic,

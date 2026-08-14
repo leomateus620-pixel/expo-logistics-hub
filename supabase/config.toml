@@ -7,8 +7,6 @@ project_id = "btfaumhroqtqzxomqorx"
     verify_jwt = true
   [functions.agenda-meeting-transcribe-segment]
     verify_jwt = true
-  [functions.agenda-meeting-stt-callback]
-    verify_jwt = false
   [functions.agenda-meeting-worker]
     verify_jwt = false
   [functions.event-reminders]

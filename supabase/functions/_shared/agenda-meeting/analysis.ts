@@ -685,6 +685,110 @@ async function parallelMap<T, R>(
   return output;
 }
 
+const DECISION_PATTERNS =
+  /\b(ficou decidido|decidimos|foi decidido|aprovado|aprovamos|definimos|fica definido|deliberad)/i;
+const ACTION_PATTERNS =
+  /\b(ação|acao|vai fazer|ficou de|fica responsável|fica responsavel|encaminhar|providenciar|enviar|preparar|verificar|agendar)/i;
+const PENDING_PATTERNS =
+  /\b(pendente|pendência|pendencia|em aberto|aguardando|falta)/i;
+const RISK_PATTERNS = /\b(risco|problema|atraso|dificuldade|impedimento)/i;
+const DEADLINE_PATTERNS = /\b(prazo|até|ate|amanhã|amanha|semana que vem|dia \d{1,2})/i;
+
+function splitSentences(segment: AnalysisTranscriptSegment) {
+  return segment.text
+    .split(/(?<=[.!?…])\s+|\n+/)
+    .map((sentence) => sentence.trim())
+    .filter((sentence) => sentence.length >= 12);
+}
+
+function deterministicInsights(
+  segments: AnalysisTranscriptSegment[],
+  pattern: RegExp,
+  fallbackTitle: string,
+  limit = 12,
+): AnalysisInsight[] {
+  const insights: AnalysisInsight[] = [];
+  for (const segment of segments) {
+    for (const sentence of splitSentences(segment)) {
+      if (!pattern.test(sentence)) continue;
+      insights.push({
+        title: sentence.slice(0, 120),
+        detail: sentence.slice(0, 1_200),
+        evidenceSegmentIds: [segment.id],
+      });
+      if (insights.length >= limit) return insights;
+    }
+  }
+  if (insights.length === 0 && fallbackTitle && segments.length > 0) return [];
+  return insights;
+}
+
+function deterministicMinutes(
+  input: MeetingAnalysisInput,
+  segments: AnalysisTranscriptSegment[],
+): MeetingAnalysisProviderResult {
+  const contextTitle = typeof input.eventContext.title === "string" &&
+      input.eventContext.title.trim()
+    ? input.eventContext.title.trim().slice(0, 160)
+    : "Reunião FENASOJA";
+  const fullText = segments.map((segment) => segment.text.trim()).filter(Boolean)
+    .join("\n\n");
+  const decisions = deterministicInsights(segments, DECISION_PATTERNS, "");
+  const pendingItems = deterministicInsights(segments, PENDING_PATTERNS, "");
+  const risks = deterministicInsights(segments, RISK_PATTERNS, "");
+  const nextSteps = deterministicInsights(segments, DEADLINE_PATTERNS, "");
+  const importantPoints = segments.slice(0, 12).map((segment) => ({
+    title: segment.text.trim().slice(0, 120) || "Trecho registrado",
+    detail: segment.text.trim().slice(0, 1_200) || "Trecho registrado",
+    evidenceSegmentIds: [segment.id],
+  })).filter((insight) => insight.title.length >= 12);
+
+  const actionItems = deterministicInsights(segments, ACTION_PATTERNS, "", 20)
+    .map((insight) => ({
+      title: insight.title,
+      description: insight.detail,
+      responsibleText: null,
+      dueDateText: null,
+      dueDate: null,
+      evidenceSegmentIds: insight.evidenceSegmentIds,
+      suggestedMemberId: null,
+    }));
+
+  const executiveSummary = (fullText.slice(0, 900) || "Transcrição registrada.")
+    .trim();
+  const minutesMarkdown = [
+    `# ${contextTitle}`,
+    "",
+    input.transcriptCoverage === "with_gaps"
+      ? `> Transcrição parcial: ${input.missingSequenceCount} trecho(s) não reconhecido(s).`
+      : "> Transcrição completa registrada pelo reconhecimento nativo do navegador.",
+    "",
+    "## Transcrição",
+    "",
+    fullText || "_Sem conteúdo reconhecido._",
+  ].join("\n");
+
+  return {
+    result: {
+      title: contextTitle,
+      executiveSummary,
+      minutesMarkdown,
+      decisions,
+      pendingItems,
+      risks,
+      importantPoints,
+      nextSteps,
+      nextMeetings: [],
+      actionItems,
+    },
+    providerResponseId: `native-local:${input.transcriptVersionId}`,
+    usage: { inputTokens: null, outputTokens: null, totalTokens: null },
+    model: "native-local-structuring",
+    promptVersion: MEETING_ANALYSIS_PROMPT_VERSION,
+    schemaVersion: MEETING_ANALYSIS_SCHEMA_VERSION,
+  };
+}
+
 export async function analyzeMeetingTranscript(
   input: MeetingAnalysisInput,
 ): Promise<MeetingAnalysisProviderResult> {
@@ -700,10 +804,16 @@ export async function analyzeMeetingTranscript(
     throw new AnalysisProviderError("analysis_transcript_missing", false, 0);
   }
   const normalizedInput = { ...input, transcriptSegments };
+  if (!Deno.env.get("OPENAI_API_KEY")?.trim()) {
+    // Sem IA generativa configurada a ata é montada localmente a partir do
+    // texto já reconhecido; a transcrição nunca depende de provedor externo.
+    return deterministicMinutes(normalizedInput, transcriptSegments);
+  }
   const model = Deno.env.get("AGENDA_MEETING_ANALYSIS_MODEL")?.trim() ||
     Deno.env.get("MEETING_ANALYSIS_MODEL")?.trim() ||
     "gpt-5.6-terra";
   const directLimit = 1_800_000;
+
   const common = {
     eventContext: input.eventContext,
     activeMembers: input.members.map((member) => ({

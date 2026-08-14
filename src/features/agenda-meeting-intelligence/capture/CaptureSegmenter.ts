@@ -7,7 +7,11 @@ import {
   type CaptureGapMarker,
 } from '../types';
 import { createCaptureSegmentId } from './identity';
-import { selectMediaRecorderMimeType } from './mime';
+import { AGENDA_MEETING_TEXT_SEGMENT_MIME_TYPE, selectMediaRecorderMimeType } from './mime';
+import {
+  NativeMeetingTranscriptionAdapter,
+  type NativeMeetingTranscriptionOptions,
+} from './NativeMeetingTranscriptionAdapter';
 import { sha256Blob } from './sha256';
 import { encodePcm16Wav } from './wav';
 
@@ -57,6 +61,8 @@ export interface CaptureSegmenterOptions {
   onInterruption?: (reason: CaptureInterruptionReason, error?: Error) => void;
   onGap?: (gap: CaptureGapMarker) => Promise<void> | void;
   onLifecycleSignal?: (reason: Extract<CaptureInterruptionReason, 'page_hidden' | 'device_changed'>) => void;
+  speechRecognitionConstructor?: NativeMeetingTranscriptionOptions['recognitionConstructor'];
+  onInterimTranscript?: (text: string) => void;
 }
 
 interface CompletedRecorderCycle {
@@ -100,6 +106,7 @@ export class CaptureSegmenter {
   private durationTimer: ReturnType<typeof setInterval> | null = null;
   private operation: Promise<void> = Promise.resolve();
   private lifecycleAttached = false;
+  private transcription: NativeMeetingTranscriptionAdapter | null = null;
 
   private readonly onVisibilityChange = () => {
     if (this.options.documentTarget?.visibilityState === 'hidden' && this.mode === 'recording') {
@@ -203,6 +210,19 @@ export class CaptureSegmenter {
     }
 
     await this.prepareInputMeter();
+
+    this.transcription = new NativeMeetingTranscriptionAdapter({
+      recognitionConstructor: this.options.speechRecognitionConstructor,
+      onInterim: this.options.onInterimTranscript,
+      onFatalError: (code) => {
+        void this.interrupt('capture_error', new Error(code));
+      },
+    });
+    if (!this.transcription.supported) {
+      this.transcription = null;
+      await this.releaseCaptureResources();
+      throw new Error('speech_recognition_unavailable');
+    }
 
     this.mode = 'prepared';
     this.attachLifecycleListeners();
@@ -357,6 +377,7 @@ export class CaptureSegmenter {
 
   private async startCycle(): Promise<void> {
     if (!this.stream || !this.backend) throw new Error('capture_stream_unavailable');
+    this.transcription?.start();
     this.cycleStartActiveMs = this.activeDurationMs;
     this.scheduleSegmentRotation();
     if (this.backend === 'media_recorder') {
@@ -382,6 +403,7 @@ export class CaptureSegmenter {
 
   private async finishCycle(): Promise<CompletedRecorderCycle | null> {
     if (!this.backend) return null;
+    this.transcription?.stop();
     if (this.segmentTimer) {
       clearTimeout(this.segmentTimer);
       this.segmentTimer = null;
@@ -389,7 +411,7 @@ export class CaptureSegmenter {
     const captureEndMs = Math.max(this.cycleStartActiveMs, this.activeDurationMs);
 
     if (this.backend === 'audio_worklet_wav') {
-      if (this.workletChunks.length === 0 || !this.audioContext) return null;
+      if (!this.audioContext) return null;
       const chunks = this.workletChunks;
       this.workletChunks = [];
       return {
@@ -400,7 +422,9 @@ export class CaptureSegmenter {
     }
 
     const recorder = this.recorder;
-    if (!recorder) return null;
+    if (!recorder) {
+      return { blob: new Blob(), captureStartMs: this.cycleStartActiveMs, captureEndMs };
+    }
     const chunks = this.recorderChunks;
     this.recorder = null;
     this.recorderChunks = [];
@@ -430,7 +454,6 @@ export class CaptureSegmenter {
         recorder.stop();
       });
     }
-    if (chunks.length === 0) return null;
     return {
       blob: new Blob(chunks, { type: this.mimeType ?? chunks[0]?.type ?? 'application/octet-stream' }),
       captureStartMs: this.cycleStartActiveMs,
@@ -439,7 +462,12 @@ export class CaptureSegmenter {
   }
 
   private async emitCompletedCycle(cycle: CompletedRecorderCycle): Promise<void> {
-    if (!this.sessionId || !this.backend || !this.mimeType || cycle.blob.size === 0) return;
+    if (!this.sessionId || !this.backend) return;
+    // O áudio do ciclo nunca é persistido nem enviado: apenas o texto
+    // reconhecido localmente pela Web Speech API vira segmento.
+    const { transcript } = this.transcription?.drain() ?? { transcript: '' };
+    if (!transcript) return;
+    const payload = new Blob([transcript], { type: AGENDA_MEETING_TEXT_SEGMENT_MIME_TYPE });
     const sequence = this.sequence;
     this.sequence += 1;
     const segmentId = createCaptureSegmentId(this.options.crypto);
@@ -448,16 +476,17 @@ export class CaptureSegmenter {
       sessionId: this.sessionId,
       sequence,
       captureStartMs: Math.round(cycle.captureStartMs),
-      captureEndMs: Math.round(cycle.captureEndMs),
+      captureEndMs: Math.max(Math.round(cycle.captureStartMs) + 1, Math.round(cycle.captureEndMs)),
       durationMs: Math.max(0, Math.round(cycle.captureEndMs - cycle.captureStartMs)),
       capturedAtIso: new Date(this.options.wallClockNow()).toISOString(),
-      mimeType: this.mimeType,
-      bytes: cycle.blob.size,
-      sha256: await sha256Blob(cycle.blob, this.options.crypto),
+      mimeType: AGENDA_MEETING_TEXT_SEGMENT_MIME_TYPE,
+      bytes: payload.size,
+      sha256: await sha256Blob(payload, this.options.crypto),
       backend: this.backend,
     } as const;
-    await this.options.onSegment({ metadata, audio: cycle.blob });
+    await this.options.onSegment({ metadata, audio: payload });
   }
+
 
   private async emitGapMarker(
     reason: Exclude<CaptureInterruptionReason, 'max_duration' | 'backpressure'>,
@@ -574,6 +603,8 @@ export class CaptureSegmenter {
   }
 
   private async releaseCaptureResources(): Promise<void> {
+    this.transcription?.stop();
+    this.transcription = null;
     this.workletNode?.disconnect();
     this.workletSource?.disconnect();
     this.silentGain?.disconnect();

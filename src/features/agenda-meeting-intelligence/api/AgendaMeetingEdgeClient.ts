@@ -146,6 +146,19 @@ function requireConfiguration(value: string | undefined, code: string): string {
   return value.replace(/\/+$/, '');
 }
 
+async function readBlobText(blob: Blob): Promise<string> {
+  if (typeof blob.text === 'function') return blob.text();
+  if (typeof blob.arrayBuffer === 'function') {
+    return new TextDecoder().decode(await blob.arrayBuffer());
+  }
+  return await new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result ?? ''));
+    reader.onerror = () => reject(new AgendaMeetingEdgeError('segment_read_failed', false));
+    reader.readAsText(blob);
+  });
+}
+
 export class AgendaMeetingEdgeClient {
   private readonly supabaseUrl: string;
   private readonly publishableKey: string;
@@ -208,15 +221,16 @@ export class AgendaMeetingEdgeClient {
 
   async uploadSegment(input: AgendaMeetingUploadInput): Promise<AgendaMeetingUploadResult> {
     const { metadata } = input.segment;
-    const mimeType = normalizeAudioMimeType(metadata.mimeType);
-    if (!isAllowedAudioMimeType(mimeType)) {
-      throw new AgendaMeetingEdgeError('unsupported_audio_mime_type', false);
-    }
     if (input.segment.audio.size !== metadata.bytes) {
       throw new AgendaMeetingEdgeError('segment_size_mismatch', false);
     }
     if (metadata.bytes <= 0 || metadata.bytes > AGENDA_MEETING_MAX_SEGMENT_BYTES) {
       throw new AgendaMeetingEdgeError('segment_size_out_of_bounds', false);
+    }
+    // Somente texto reconhecido localmente trafega para o backend.
+    const transcript = (await readBlobText(input.segment.audio)).trim();
+    if (!transcript) {
+      throw new AgendaMeetingEdgeError('empty_transcript_segment', false);
     }
 
     const token = await this.getAccessToken();
@@ -228,19 +242,22 @@ export class AgendaMeetingEdgeClient {
         headers: {
           Authorization: `Bearer ${token}`,
           apikey: this.publishableKey,
-          'Content-Type': mimeType,
-          'X-Meeting-Session-Id': metadata.sessionId,
-          'X-Meeting-Segment-Id': metadata.id,
-          'X-Meeting-Sequence': String(metadata.sequence),
-          'X-Meeting-Capture-Start-Ms': String(metadata.captureStartMs),
-          'X-Meeting-Capture-End-Ms': String(metadata.captureEndMs),
-          'X-Meeting-Sha256': metadata.sha256,
-          'X-Meeting-Mutation-Id': input.mutationId,
+          'Content-Type': 'application/json',
         },
-        body: input.segment.audio,
+        body: JSON.stringify({
+          sessionId: metadata.sessionId,
+          segmentId: metadata.id,
+          mutationId: input.mutationId,
+          sequence: metadata.sequence,
+          captureStartMs: metadata.captureStartMs,
+          captureEndMs: metadata.captureEndMs,
+          transcript,
+          confidence: null,
+        }),
       },
       SEGMENT_UPLOAD_TIMEOUT_MS,
     );
+
     const payload = await safeJson(response);
     if (!response.ok) throw classifyHttpError(response.status, payload);
     if (!isRecord(payload) || payload.ok !== true || !isSegmentReceiptStatus(payload.status)) {

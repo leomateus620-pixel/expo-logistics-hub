@@ -78,6 +78,7 @@ function createCaptureController(
     capabilities: {
       mediaRecorder: true,
       audioWorkletWav: true,
+    nativeSpeechRecognition: true,
       encryptedIndexedDb: true,
       supportedMimeTypes: ['audio/webm;codecs=opus'],
     },
