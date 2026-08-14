@@ -97,9 +97,16 @@ export function EventRelationList({
               className="cronograma-relation-item"
               data-primary={item.isPrimary || undefined}
             >
-              <span className="cronograma-relation-item-icon" aria-hidden="true">
-                <ItemIcon />
-              </span>
+              <PersonAvatar
+                name={item.label}
+                size="md"
+                className="cronograma-relation-item-icon"
+                fallback={(
+                  <span className="cronograma-relation-item-icon" aria-hidden="true">
+                    <ItemIcon />
+                  </span>
+                )}
+              />
               <span className="cronograma-relation-item-label" title={item.hint ?? undefined}>
                 {item.label}
               </span>
