@@ -38,13 +38,16 @@ interface SpeechRecognitionLike extends EventTarget {
   continuous: boolean;
   interimResults: boolean;
   maxAlternatives: number;
+  processLocally?: boolean;
   start(): void;
   stop(): void;
   abort(): void;
   onstart: (() => void) | null;
   onaudiostart: (() => void) | null;
+  onsoundstart: (() => void) | null;
   onspeechstart: (() => void) | null;
   onspeechend: (() => void) | null;
+  onsoundend: (() => void) | null;
   onaudioend: (() => void) | null;
   onresult: ((event: SpeechRecognitionEventLike) => void) | null;
   onerror: ((event: SpeechRecognitionErrorEventLike) => void) | null;
