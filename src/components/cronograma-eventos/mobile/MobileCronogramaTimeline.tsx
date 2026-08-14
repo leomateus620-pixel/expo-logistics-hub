@@ -528,6 +528,14 @@ function MobileTimelineEventCard({
 
         <strong className="cronograma-mobile-event-title">{event.title}</strong>
 
+        <EventPeopleAvatars
+          people={[
+            ...(responsible ? [{ key: responsible.key, label: responsible.label, isPrimary: true }] : []),
+            ...guests.map((guest) => ({ key: guest.key, label: guest.label })),
+          ]}
+          className="cronograma-mobile-event-avatars"
+        />
+
         {variant === 'completed' && (
           <span className="cronograma-mobile-archive-state">
             {event.status === 'completed' ? 'Concluído' : 'Encerrado por data'}
