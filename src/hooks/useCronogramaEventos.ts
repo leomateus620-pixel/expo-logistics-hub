@@ -692,7 +692,7 @@ export function useCronogramaEventos() {
 
   const seedOfficialData = useMutation({
     mutationFn: async (eventsToSeed: CronogramaEvent[] = officialSeedEvents) => {
-      if (!orgId || !isWritableRole(myRole)) return [];
+      if (!orgId || !isWritableRole(myRole) || hasScopedCronogramaView) return [];
       const user = (await cronogramaDb.auth.getUser()).data.user;
       if (eventsToSeed.length === 0) return [];
       const payload = eventsToSeed.map((event) => toDbPayload(event, orgId, user?.id));
