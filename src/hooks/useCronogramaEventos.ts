@@ -714,8 +714,9 @@ export function useCronogramaEventos() {
 
   useEffect(() => {
     const dbEvents = query.data ?? [];
-    setSessionEvents(mergeOfficialSeedWithDb(officialSeedEvents, dbEvents));
+    setSessionEvents(mergeOfficialSeedWithDb(localSeedEvents, dbEvents));
 
+    if (hasScopedCronogramaView) return;
     if (!orgId || !query.data || !isWritableRole(myRole) || isSeedingOfficialData) return;
 
     const dbSourceKeys = new Set(dbEvents.map((event) => event.sourceKey).filter(Boolean));
@@ -729,7 +730,8 @@ export function useCronogramaEventos() {
       seedAttemptedForOrg.current.add(orgId);
       seedMissingOfficialData(missingOfficialEvents);
     }
-  }, [isSeedingOfficialData, myRole, orgId, query.data, seedMissingOfficialData]);
+  }, [hasScopedCronogramaView, isSeedingOfficialData, localSeedEvents, myRole, orgId, query.data, seedMissingOfficialData]);
+
 
   const googleSyncEligibility = useRef<Record<string, boolean>>({});
   const triggerSyncWorker = useCallback(() => {
