@@ -86,6 +86,8 @@ function decorateEmbeddedSubevents(event: CronogramaEvent): CronogramaEvent {
 }
 
 const officialSeedEvents = normalizeCronogramaSeed(fenasoja2028CronogramaSeed).map(decorateEmbeddedSubevents);
+const EMPTY_SEED_EVENTS: CronogramaEvent[] = [];
+
 
 export function mergeOfficialSeedWithDb(seedEvents: CronogramaEvent[], dbEvents: CronogramaEvent[]): CronogramaEvent[] {
   const byKey = new Map<string, CronogramaEvent>();
@@ -636,9 +638,14 @@ export function useCronogramaEventos() {
   // Escrita liberada para papéis operacionais OU para quem recebeu a
   // capability explícita (ex.: presidente de comissão com visão restrita).
   const canWriteCronograma = isWritableRole(myRole) || capSet.has('cronograma_eventos_write');
+  // Visão restrita (ex.: presidente de comissão): a tela mostra exclusivamente o
+  // que o banco liberou por RLS — o catálogo oficial embutido no app nunca é mesclado.
+  const hasScopedCronogramaView = capSet.has('cronograma_scoped_access');
+  const localSeedEvents = hasScopedCronogramaView ? EMPTY_SEED_EVENTS : officialSeedEvents;
   const queryClient = useQueryClient();
   const isOnline = useOnlineStatus();
-  const [sessionEvents, setSessionEvents] = useState<CronogramaEvent[]>(officialSeedEvents);
+  const [sessionEvents, setSessionEvents] = useState<CronogramaEvent[]>(localSeedEvents);
+
   const [dbUnavailable, setDbUnavailable] = useState(false);
   const [relationshipsUnavailable, setRelationshipsUnavailable] = useState(false);
   const [queuedRelationships, setQueuedRelationships] = useState<QueuedCronogramaRelationship[]>(
@@ -685,7 +692,7 @@ export function useCronogramaEventos() {
 
   const seedOfficialData = useMutation({
     mutationFn: async (eventsToSeed: CronogramaEvent[] = officialSeedEvents) => {
-      if (!orgId || !isWritableRole(myRole)) return [];
+      if (!orgId || !isWritableRole(myRole) || hasScopedCronogramaView) return [];
       const user = (await cronogramaDb.auth.getUser()).data.user;
       if (eventsToSeed.length === 0) return [];
       const payload = eventsToSeed.map((event) => toDbPayload(event, orgId, user?.id));
@@ -707,8 +714,9 @@ export function useCronogramaEventos() {
 
   useEffect(() => {
     const dbEvents = query.data ?? [];
-    setSessionEvents(mergeOfficialSeedWithDb(officialSeedEvents, dbEvents));
+    setSessionEvents(mergeOfficialSeedWithDb(localSeedEvents, dbEvents));
 
+    if (hasScopedCronogramaView) return;
     if (!orgId || !query.data || !isWritableRole(myRole) || isSeedingOfficialData) return;
 
     const dbSourceKeys = new Set(dbEvents.map((event) => event.sourceKey).filter(Boolean));
@@ -722,7 +730,8 @@ export function useCronogramaEventos() {
       seedAttemptedForOrg.current.add(orgId);
       seedMissingOfficialData(missingOfficialEvents);
     }
-  }, [isSeedingOfficialData, myRole, orgId, query.data, seedMissingOfficialData]);
+  }, [hasScopedCronogramaView, isSeedingOfficialData, localSeedEvents, myRole, orgId, query.data, seedMissingOfficialData]);
+
 
   const googleSyncEligibility = useRef<Record<string, boolean>>({});
   const triggerSyncWorker = useCallback(() => {
