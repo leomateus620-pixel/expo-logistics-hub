@@ -31,7 +31,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AgendaMeetingEdgeClient } from '@/features/agenda-meeting-intelligence/api/AgendaMeetingEdgeClient';
+import { AgendaMeetingEdgeClient, AgendaMeetingEdgeError } from '@/features/agenda-meeting-intelligence/api/AgendaMeetingEdgeClient';
 import { createMeetingMutationId } from '@/features/agenda-meeting-intelligence/capture/identity';
 import { useAgendaMeetingCapture } from '@/features/agenda-meeting-intelligence/hooks/useAgendaMeetingCapture';
 import {
