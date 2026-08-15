@@ -31,7 +31,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { AgendaMeetingEdgeClient } from '@/features/agenda-meeting-intelligence/api/AgendaMeetingEdgeClient';
+import { AgendaMeetingEdgeClient, AgendaMeetingEdgeError } from '@/features/agenda-meeting-intelligence/api/AgendaMeetingEdgeClient';
 import { createMeetingMutationId } from '@/features/agenda-meeting-intelligence/capture/identity';
 import { useAgendaMeetingCapture } from '@/features/agenda-meeting-intelligence/hooks/useAgendaMeetingCapture';
 import {
@@ -183,10 +183,19 @@ function errorMessage(code: string | undefined): string {
       return 'O contrato de captura enviado pelo navegador não foi aceito pelo servidor.';
     case 'meeting_persistence_failed':
       return 'O serviço de reuniões está temporariamente indisponível. Tente novamente em instantes.';
+    case 'version_conflict':
+      return 'A sessão foi atualizada por outro dispositivo. Atualize o histórico e repita a ação.';
+    case 'invalid_meeting_state':
+      return 'Esta sessão já foi encerrada ou cancelada. Atualize o histórico para ver o resultado.';
+    case 'meeting_not_found':
+      return 'A sessão desta reunião não foi encontrada. Atualize o histórico.';
+    case 'invalid_request':
+      return 'Os dados enviados para encerrar a reunião não foram aceitos. Atualize a página e tente novamente.';
     default:
       return 'Não foi possível concluir esta etapa. Nenhum conteúdo foi inventado ou descartado silenciosamente.';
   }
 }
+
 
 
 function evidenceLabel(count: number): string {
@@ -712,15 +721,23 @@ function PersistedMeetingWorkspace({
     try {
       if (action === 'pause') await capture.pause();
       if (action === 'resume') await capture.resume();
-      if (action === 'finish') await capture.finish({ allowPartial: partialAccepted });
+      if (action === 'finish') {
+        await capture.finish({ allowPartial: partialAccepted });
+        await queryClient.invalidateQueries({ queryKey: agendaMeetingQueryKeys.all });
+        toast.success('Reunião encerrada. A transcrição está sendo consolidada e a ata será gerada em seguida.');
+      }
       if (action === 'cancel') {
         await capture.cancel();
         await queryClient.invalidateQueries({ queryKey: agendaMeetingQueryKeys.all });
       }
-    } catch {
-      toast.error(errorMessage(capture.state.error?.code));
+    } catch (error) {
+      const code = error instanceof AgendaMeetingEdgeError
+        ? error.code
+        : capture.state.error?.code;
+      toast.error(errorMessage(code));
     }
   };
+
 
   const submitRevision = () => {
     if (!currentTranscript) return;

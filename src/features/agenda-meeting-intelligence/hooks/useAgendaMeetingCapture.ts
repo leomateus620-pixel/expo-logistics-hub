@@ -34,6 +34,12 @@ import {
 
 const INPUT_LEVEL_INTERVAL_MS = 100;
 const HEARTBEAT_INTERVAL_MS = 15_000;
+const HEARTBEAT_PHASES = new Set([
+  'recording',
+  'paused',
+  'backpressure_paused',
+  'capture_interrupted',
+]);
 const PROCESSING_POLL_INTERVAL_MS = 3_000;
 const RECOVERY_STORAGE_PREFIX = 'fenasoja:agenda-meeting:recovery:v1';
 const NAVIGATION_GUARDED_PHASES = new Set([
@@ -833,23 +839,22 @@ export function useAgendaMeetingCapture(
           recovery?.activeDurationMs ?? 0,
           ...knownSegments.map((segment) => segment.captureEndMs),
         );
-        let result: AgendaMeetingStateResult;
-        try {
-          result = await client.control<AgendaMeetingJson, AgendaMeetingStateResult>({
+        const finalizePayload = { allowPartial, lastSequence, activeDurationMs };
+        const requestFinalize = () =>
+          client.control<AgendaMeetingJson, AgendaMeetingStateResult>({
             action: 'finalize',
             mutationId: createMeetingMutationId(),
             eventId: options.eventId,
             orgId: options.orgId,
-            sessionId: current.sessionId,
-            expectedVersion: ['capture_interrupted', 'recoverable_error'].includes(current.phase)
-              ? undefined
-              : sessionVersionRef.current ?? undefined,
-            payload: {
-              allowPartial,
-              lastSequence,
-              activeDurationMs,
-            },
+            sessionId: current.sessionId as string,
+            // Encerramento é a última operação da sessão e já é serializado por
+            // bloqueio no banco: não enviamos versão esperada para evitar
+            // conflitos causados por marcações automáticas do servidor.
+            payload: finalizePayload,
           });
+        let result: AgendaMeetingStateResult;
+        try {
+          result = await requestFinalize();
         } catch (controlError) {
           const detail = await client.detail({
             mutationId: createMeetingMutationId(),
@@ -857,9 +862,19 @@ export function useAgendaMeetingCapture(
             orgId: options.orgId,
             sessionId: current.sessionId,
           }).catch(() => null);
-          if (!detail || detail.session.captureState !== 'ended') throw controlError;
-          result = { session: detail.session };
+          if (detail && detail.session.captureState === 'ended') {
+            result = { session: detail.session };
+          } else if (detail) {
+            sessionVersionRef.current = detail.session.version;
+            meetingDiagnostics.record('FINALIZE_RETRY', {
+              message: controlError instanceof Error ? controlError.message : 'unknown',
+            });
+            result = await requestFinalize();
+          } else {
+            throw controlError;
+          }
         }
+
         sessionVersionRef.current = result.session.version;
         dispatch({ type: 'session_version', version: result.session.version });
         dispatch({ type: 'phase', phase: 'awaiting_transcripts' });
@@ -1130,9 +1145,11 @@ export function useAgendaMeetingCapture(
   }, [state.phase]);
 
   useEffect(() => {
-    if (state.phase !== 'recording' || !state.sessionId) return;
-    const timer = setInterval(() => {
-      if (heartbeatRunningRef.current) return;
+    if (!HEARTBEAT_PHASES.has(state.phase) || !state.sessionId) return;
+    let cancelled = false;
+
+    const beat = () => {
+      if (cancelled || heartbeatRunningRef.current) return;
       heartbeatRunningRef.current = true;
       const current = stateRef.current;
       void client
@@ -1142,20 +1159,51 @@ export function useAgendaMeetingCapture(
           eventId: options.eventId,
           orgId: options.orgId,
           sessionId: current.sessionId ?? undefined,
-          expectedVersion: sessionVersionRef.current ?? undefined,
+          // Sem versão esperada: heartbeat não altera versão e não pode falhar
+          // por desatualização depois de uma marcação automática de interrupção.
           payload: { activeDurationMs: current.activeDurationMs },
         })
-        .then((result) => {
+        .then(async (result) => {
           sessionVersionRef.current = result.session.version;
           if (mountedRef.current) dispatch({ type: 'session_version', version: result.session.version });
+          if (
+            result.session.captureState === 'interrupted' &&
+            stateRef.current.phase === 'recording' &&
+            current.sessionId
+          ) {
+            meetingDiagnostics.record('HEARTBEAT_SERVER_INTERRUPTED', {
+              sessionId: current.sessionId,
+            });
+            const revived = await client.control<AgendaMeetingJson, AgendaMeetingStateResult>({
+              action: 'resume',
+              mutationId: createMeetingMutationId(),
+              eventId: options.eventId,
+              orgId: options.orgId,
+              sessionId: current.sessionId,
+              payload: { resumedAfterInterruption: true },
+            });
+            sessionVersionRef.current = revived.session.version;
+            if (mountedRef.current) dispatch({ type: 'session_version', version: revived.session.version });
+          }
         })
-        .catch(() => undefined)
+        .catch((error) => {
+          meetingDiagnostics.record('HEARTBEAT_FAILED', {
+            message: error instanceof Error ? error.message : 'unknown',
+          });
+        })
         .finally(() => {
           heartbeatRunningRef.current = false;
         });
-    }, HEARTBEAT_INTERVAL_MS);
-    return () => clearInterval(timer);
+    };
+
+    beat();
+    const timer = setInterval(beat, HEARTBEAT_INTERVAL_MS);
+    return () => {
+      cancelled = true;
+      clearInterval(timer);
+    };
   }, [client, options.eventId, options.orgId, state.phase, state.sessionId]);
+
 
   useEffect(() => {
     const { data } = supabase.auth.onAuthStateChange((event) => {

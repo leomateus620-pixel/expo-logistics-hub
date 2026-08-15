@@ -694,12 +694,112 @@ const PENDING_PATTERNS =
 const RISK_PATTERNS = /\b(risco|problema|atraso|dificuldade|impedimento)/i;
 const DEADLINE_PATTERNS = /\b(prazo|até|ate|amanhã|amanha|semana que vem|dia \d{1,2})/i;
 
+const SUMMARY_STOPWORDS = new Set([
+  "a","o","as","os","de","da","do","das","dos","em","no","na","nos","nas","um","uma","uns","umas",
+  "e","é"," é","que","para","por","com","se","não","nao","sim","tá","ta","aí","ai","lá","la","aqui",
+  "ele","ela","eles","elas","eu","tu","você","voce","nós","nos","isso","isto","aquilo","já","ja",
+  "mas","ou","como","mais","menos","muito","pouco","então","entao","tem","ter","foi","ser","está",
+  "esta","estão","estao","vai","vamos","fica","ficou","assim","agora","também","tambem","só","so",
+]);
+
+/**
+ * Quebra o texto em frases utilizáveis. A transcrição nativa do navegador não
+ * pontua de forma confiável, então blocos longos são fatiados por limite de
+ * caracteres respeitando a fronteira de palavras.
+ */
 function splitSentences(segment: AnalysisTranscriptSegment) {
-  return segment.text
+  const raw = segment.text
     .split(/(?<=[.!?…])\s+|\n+/)
     .map((sentence) => sentence.trim())
-    .filter((sentence) => sentence.length >= 12);
+    .filter(Boolean);
+  const output: string[] = [];
+  for (const sentence of raw) {
+    if (sentence.length <= 220) {
+      output.push(sentence);
+      continue;
+    }
+    const words = sentence.split(/\s+/);
+    let buffer = "";
+    for (const word of words) {
+      if ((buffer + " " + word).trim().length > 200) {
+        output.push(buffer.trim());
+        buffer = word;
+      } else {
+        buffer = `${buffer} ${word}`.trim();
+      }
+    }
+    if (buffer.trim()) output.push(buffer.trim());
+  }
+  return output.filter((sentence) => sentence.length >= 12);
 }
+
+function normalizeForDedupe(sentence: string) {
+  return sentence
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\s]/g, " ")
+    .split(/\s+/)
+    .filter(Boolean)
+    .join(" ");
+}
+
+interface ScoredSentence {
+  segmentId: string;
+  order: number;
+  text: string;
+  score: number;
+}
+
+/**
+ * Sumarização extrativa determinística: pontua frases por frequência de termos
+ * relevantes, remove repetições e devolve as mais informativas na ordem
+ * cronológica. Nenhum conteúdo é inventado — todas as frases vêm da transcrição.
+ */
+function rankSentences(segments: AnalysisTranscriptSegment[]) {
+  const sentences: ScoredSentence[] = [];
+  const frequency = new Map<string, number>();
+  let order = 0;
+  const seen = new Set<string>();
+
+  for (const segment of segments) {
+    for (const sentence of splitSentences(segment)) {
+      const normalized = normalizeForDedupe(sentence);
+      if (!normalized || seen.has(normalized)) continue;
+      seen.add(normalized);
+      for (const token of normalized.split(" ")) {
+        if (token.length < 4 || SUMMARY_STOPWORDS.has(token)) continue;
+        frequency.set(token, (frequency.get(token) ?? 0) + 1);
+      }
+      sentences.push({ segmentId: segment.id, order: order++, text: sentence, score: 0 });
+    }
+  }
+
+  for (const sentence of sentences) {
+    const tokens = normalizeForDedupe(sentence.text).split(" ")
+      .filter((token) => token.length >= 4 && !SUMMARY_STOPWORDS.has(token));
+    const unique = new Set(tokens);
+    let score = 0;
+    for (const token of unique) score += frequency.get(token) ?? 0;
+    score = unique.size > 0 ? score / Math.sqrt(unique.size) : 0;
+    if (DECISION_PATTERNS.test(sentence.text)) score *= 1.6;
+    if (ACTION_PATTERNS.test(sentence.text)) score *= 1.4;
+    if (DEADLINE_PATTERNS.test(sentence.text)) score *= 1.25;
+    if (PENDING_PATTERNS.test(sentence.text) || RISK_PATTERNS.test(sentence.text)) score *= 1.2;
+    if (unique.size < 4) score *= 0.35;
+    sentence.score = score;
+  }
+
+  return sentences;
+}
+
+function topSentences(sentences: ScoredSentence[], limit: number) {
+  return [...sentences]
+    .sort((left, right) => right.score - left.score)
+    .slice(0, limit)
+    .sort((left, right) => left.order - right.order);
+}
+
 
 function deterministicInsights(
   segments: AnalysisTranscriptSegment[],
@@ -737,10 +837,20 @@ function deterministicMinutes(
   const pendingItems = deterministicInsights(segments, PENDING_PATTERNS, "");
   const risks = deterministicInsights(segments, RISK_PATTERNS, "");
   const nextSteps = deterministicInsights(segments, DEADLINE_PATTERNS, "");
-  const importantPoints = segments.slice(0, 12).map((segment) => ({
-    title: segment.text.trim().slice(0, 120) || "Trecho registrado",
-    detail: segment.text.trim().slice(0, 1_200) || "Trecho registrado",
-    evidenceSegmentIds: [segment.id],
+
+  const ranked = rankSentences(segments);
+  const summarySentences = topSentences(ranked, 6);
+  const alreadyUsed = new Set(
+    [...decisions, ...pendingItems, ...risks, ...nextSteps]
+      .map((insight) => normalizeForDedupe(insight.title)),
+  );
+  const importantPoints = topSentences(
+    ranked.filter((sentence) => !alreadyUsed.has(normalizeForDedupe(sentence.text))),
+    8,
+  ).map((sentence) => ({
+    title: sentence.text.slice(0, 120),
+    detail: sentence.text.slice(0, 1_200),
+    evidenceSegmentIds: [sentence.segmentId],
   })).filter((insight) => insight.title.length >= 12);
 
   const actionItems = deterministicInsights(segments, ACTION_PATTERNS, "", 20)
@@ -754,8 +864,14 @@ function deterministicMinutes(
       suggestedMemberId: null,
     }));
 
-  const executiveSummary = (fullText.slice(0, 900) || "Transcrição registrada.")
-    .trim();
+  const executiveSummary = (summarySentences.map((sentence) => sentence.text).join(" ")
+    .slice(0, 900) || fullText.slice(0, 900) || "Transcrição registrada.").trim();
+
+  const bulletList = (items: { title: string }[]) =>
+    items.length
+      ? items.map((item) => `- ${item.title}`).join("\n")
+      : "_Nada registrado nesta reunião._";
+
   const minutesMarkdown = [
     `# ${contextTitle}`,
     "",
@@ -763,10 +879,39 @@ function deterministicMinutes(
       ? `> Transcrição parcial: ${input.missingSequenceCount} trecho(s) não reconhecido(s).`
       : "> Transcrição completa registrada pelo reconhecimento nativo do navegador.",
     "",
-    "## Transcrição",
+    "## Resumo executivo",
+    "",
+    executiveSummary,
+    "",
+    "## Pontos abordados",
+    "",
+    bulletList(importantPoints),
+    "",
+    "## Decisões",
+    "",
+    bulletList(decisions),
+    "",
+    "## Pendências",
+    "",
+    bulletList(pendingItems),
+    "",
+    "## Riscos",
+    "",
+    bulletList(risks),
+    "",
+    "## Próximos passos",
+    "",
+    bulletList(nextSteps),
+    "",
+    "## Ações",
+    "",
+    bulletList(actionItems),
+    "",
+    "## Transcrição completa",
     "",
     fullText || "_Sem conteúdo reconhecido._",
   ].join("\n");
+
 
   return {
     result: {
