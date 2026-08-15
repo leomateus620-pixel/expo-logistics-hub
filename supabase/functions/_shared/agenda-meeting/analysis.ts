@@ -837,10 +837,20 @@ function deterministicMinutes(
   const pendingItems = deterministicInsights(segments, PENDING_PATTERNS, "");
   const risks = deterministicInsights(segments, RISK_PATTERNS, "");
   const nextSteps = deterministicInsights(segments, DEADLINE_PATTERNS, "");
-  const importantPoints = segments.slice(0, 12).map((segment) => ({
-    title: segment.text.trim().slice(0, 120) || "Trecho registrado",
-    detail: segment.text.trim().slice(0, 1_200) || "Trecho registrado",
-    evidenceSegmentIds: [segment.id],
+
+  const ranked = rankSentences(segments);
+  const summarySentences = topSentences(ranked, 6);
+  const alreadyUsed = new Set(
+    [...decisions, ...pendingItems, ...risks, ...nextSteps]
+      .map((insight) => normalizeForDedupe(insight.title)),
+  );
+  const importantPoints = topSentences(
+    ranked.filter((sentence) => !alreadyUsed.has(normalizeForDedupe(sentence.text))),
+    8,
+  ).map((sentence) => ({
+    title: sentence.text.slice(0, 120),
+    detail: sentence.text.slice(0, 1_200),
+    evidenceSegmentIds: [sentence.segmentId],
   })).filter((insight) => insight.title.length >= 12);
 
   const actionItems = deterministicInsights(segments, ACTION_PATTERNS, "", 20)
@@ -854,8 +864,14 @@ function deterministicMinutes(
       suggestedMemberId: null,
     }));
 
-  const executiveSummary = (fullText.slice(0, 900) || "Transcrição registrada.")
-    .trim();
+  const executiveSummary = (summarySentences.map((sentence) => sentence.text).join(" ")
+    .slice(0, 900) || fullText.slice(0, 900) || "Transcrição registrada.").trim();
+
+  const bulletList = (items: { title: string }[]) =>
+    items.length
+      ? items.map((item) => `- ${item.title}`).join("\n")
+      : "_Nada registrado nesta reunião._";
+
   const minutesMarkdown = [
     `# ${contextTitle}`,
     "",
@@ -863,10 +879,39 @@ function deterministicMinutes(
       ? `> Transcrição parcial: ${input.missingSequenceCount} trecho(s) não reconhecido(s).`
       : "> Transcrição completa registrada pelo reconhecimento nativo do navegador.",
     "",
-    "## Transcrição",
+    "## Resumo executivo",
+    "",
+    executiveSummary,
+    "",
+    "## Pontos abordados",
+    "",
+    bulletList(importantPoints),
+    "",
+    "## Decisões",
+    "",
+    bulletList(decisions),
+    "",
+    "## Pendências",
+    "",
+    bulletList(pendingItems),
+    "",
+    "## Riscos",
+    "",
+    bulletList(risks),
+    "",
+    "## Próximos passos",
+    "",
+    bulletList(nextSteps),
+    "",
+    "## Ações",
+    "",
+    bulletList(actionItems),
+    "",
+    "## Transcrição completa",
     "",
     fullText || "_Sem conteúdo reconhecido._",
   ].join("\n");
+
 
   return {
     result: {
