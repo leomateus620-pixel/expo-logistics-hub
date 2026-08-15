@@ -86,6 +86,8 @@ function decorateEmbeddedSubevents(event: CronogramaEvent): CronogramaEvent {
 }
 
 const officialSeedEvents = normalizeCronogramaSeed(fenasoja2028CronogramaSeed).map(decorateEmbeddedSubevents);
+const EMPTY_SEED_EVENTS: CronogramaEvent[] = [];
+
 
 export function mergeOfficialSeedWithDb(seedEvents: CronogramaEvent[], dbEvents: CronogramaEvent[]): CronogramaEvent[] {
   const byKey = new Map<string, CronogramaEvent>();
