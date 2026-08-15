@@ -721,15 +721,23 @@ function PersistedMeetingWorkspace({
     try {
       if (action === 'pause') await capture.pause();
       if (action === 'resume') await capture.resume();
-      if (action === 'finish') await capture.finish({ allowPartial: partialAccepted });
+      if (action === 'finish') {
+        await capture.finish({ allowPartial: partialAccepted });
+        await queryClient.invalidateQueries({ queryKey: agendaMeetingQueryKeys.all });
+        toast.success('Reunião encerrada. A transcrição está sendo consolidada e a ata será gerada em seguida.');
+      }
       if (action === 'cancel') {
         await capture.cancel();
         await queryClient.invalidateQueries({ queryKey: agendaMeetingQueryKeys.all });
       }
-    } catch {
-      toast.error(errorMessage(capture.state.error?.code));
+    } catch (error) {
+      const code = error instanceof AgendaMeetingEdgeError
+        ? error.code
+        : capture.state.error?.code;
+      toast.error(errorMessage(code));
     }
   };
+
 
   const submitRevision = () => {
     if (!currentTranscript) return;
