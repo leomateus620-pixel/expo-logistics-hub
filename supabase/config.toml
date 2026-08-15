@@ -3,6 +3,9 @@ project_id = "btfaumhroqtqzxomqorx"
 [functions]
   [functions.auth-email-hook]
     verify_jwt = false
+  [functions.provision-map-user]
+    verify_jwt = false
+
   [functions.agenda-meeting-control]
     verify_jwt = true
   [functions.agenda-meeting-transcribe-segment]
