@@ -34,6 +34,12 @@ import {
 
 const INPUT_LEVEL_INTERVAL_MS = 100;
 const HEARTBEAT_INTERVAL_MS = 15_000;
+const HEARTBEAT_PHASES = new Set([
+  'recording',
+  'paused',
+  'backpressure_paused',
+  'capture_interrupted',
+]);
 const PROCESSING_POLL_INTERVAL_MS = 3_000;
 const RECOVERY_STORAGE_PREFIX = 'fenasoja:agenda-meeting:recovery:v1';
 const NAVIGATION_GUARDED_PHASES = new Set([
