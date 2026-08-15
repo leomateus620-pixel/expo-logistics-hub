@@ -636,9 +636,14 @@ export function useCronogramaEventos() {
   // Escrita liberada para papéis operacionais OU para quem recebeu a
   // capability explícita (ex.: presidente de comissão com visão restrita).
   const canWriteCronograma = isWritableRole(myRole) || capSet.has('cronograma_eventos_write');
+  // Visão restrita (ex.: presidente de comissão): a tela mostra exclusivamente o
+  // que o banco liberou por RLS — o catálogo oficial embutido no app nunca é mesclado.
+  const hasScopedCronogramaView = capSet.has('cronograma_scoped_access');
+  const localSeedEvents = hasScopedCronogramaView ? EMPTY_SEED_EVENTS : officialSeedEvents;
   const queryClient = useQueryClient();
   const isOnline = useOnlineStatus();
-  const [sessionEvents, setSessionEvents] = useState<CronogramaEvent[]>(officialSeedEvents);
+  const [sessionEvents, setSessionEvents] = useState<CronogramaEvent[]>(localSeedEvents);
+
   const [dbUnavailable, setDbUnavailable] = useState(false);
   const [relationshipsUnavailable, setRelationshipsUnavailable] = useState(false);
   const [queuedRelationships, setQueuedRelationships] = useState<QueuedCronogramaRelationship[]>(
