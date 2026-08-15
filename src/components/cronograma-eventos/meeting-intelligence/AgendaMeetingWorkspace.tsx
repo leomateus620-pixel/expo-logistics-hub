@@ -183,10 +183,19 @@ function errorMessage(code: string | undefined): string {
       return 'O contrato de captura enviado pelo navegador não foi aceito pelo servidor.';
     case 'meeting_persistence_failed':
       return 'O serviço de reuniões está temporariamente indisponível. Tente novamente em instantes.';
+    case 'version_conflict':
+      return 'A sessão foi atualizada por outro dispositivo. Atualize o histórico e repita a ação.';
+    case 'invalid_meeting_state':
+      return 'Esta sessão já foi encerrada ou cancelada. Atualize o histórico para ver o resultado.';
+    case 'meeting_not_found':
+      return 'A sessão desta reunião não foi encontrada. Atualize o histórico.';
+    case 'invalid_request':
+      return 'Os dados enviados para encerrar a reunião não foram aceitos. Atualize a página e tente novamente.';
     default:
       return 'Não foi possível concluir esta etapa. Nenhum conteúdo foi inventado ou descartado silenciosamente.';
   }
 }
+
 
 
 function evidenceLabel(count: number): string {
