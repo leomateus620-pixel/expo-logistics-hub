@@ -1130,9 +1130,11 @@ export function useAgendaMeetingCapture(
   }, [state.phase]);
 
   useEffect(() => {
-    if (state.phase !== 'recording' || !state.sessionId) return;
-    const timer = setInterval(() => {
-      if (heartbeatRunningRef.current) return;
+    if (!HEARTBEAT_PHASES.has(state.phase) || !state.sessionId) return;
+    let cancelled = false;
+
+    const beat = () => {
+      if (cancelled || heartbeatRunningRef.current) return;
       heartbeatRunningRef.current = true;
       const current = stateRef.current;
       void client
@@ -1142,20 +1144,51 @@ export function useAgendaMeetingCapture(
           eventId: options.eventId,
           orgId: options.orgId,
           sessionId: current.sessionId ?? undefined,
-          expectedVersion: sessionVersionRef.current ?? undefined,
+          // Sem versão esperada: heartbeat não altera versão e não pode falhar
+          // por desatualização depois de uma marcação automática de interrupção.
           payload: { activeDurationMs: current.activeDurationMs },
         })
-        .then((result) => {
+        .then(async (result) => {
           sessionVersionRef.current = result.session.version;
           if (mountedRef.current) dispatch({ type: 'session_version', version: result.session.version });
+          if (
+            result.session.captureState === 'interrupted' &&
+            stateRef.current.phase === 'recording' &&
+            current.sessionId
+          ) {
+            meetingDiagnostics.record('HEARTBEAT_SERVER_INTERRUPTED', {
+              sessionId: current.sessionId,
+            });
+            const revived = await client.control<AgendaMeetingJson, AgendaMeetingStateResult>({
+              action: 'resume',
+              mutationId: createMeetingMutationId(),
+              eventId: options.eventId,
+              orgId: options.orgId,
+              sessionId: current.sessionId,
+              payload: { resumedAfterInterruption: true },
+            });
+            sessionVersionRef.current = revived.session.version;
+            if (mountedRef.current) dispatch({ type: 'session_version', version: revived.session.version });
+          }
         })
-        .catch(() => undefined)
+        .catch((error) => {
+          meetingDiagnostics.record('HEARTBEAT_FAILED', {
+            message: error instanceof Error ? error.message : 'unknown',
+          });
+        })
         .finally(() => {
           heartbeatRunningRef.current = false;
         });
-    }, HEARTBEAT_INTERVAL_MS);
-    return () => clearInterval(timer);
+    };
+
+    beat();
+    const timer = setInterval(beat, HEARTBEAT_INTERVAL_MS);
+    return () => {
+      cancelled = true;
+      clearInterval(timer);
+    };
   }, [client, options.eventId, options.orgId, state.phase, state.sessionId]);
+
 
   useEffect(() => {
     const { data } = supabase.auth.onAuthStateChange((event) => {
