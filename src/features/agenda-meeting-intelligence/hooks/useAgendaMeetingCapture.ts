@@ -839,23 +839,22 @@ export function useAgendaMeetingCapture(
           recovery?.activeDurationMs ?? 0,
           ...knownSegments.map((segment) => segment.captureEndMs),
         );
-        let result: AgendaMeetingStateResult;
-        try {
-          result = await client.control<AgendaMeetingJson, AgendaMeetingStateResult>({
+        const finalizePayload = { allowPartial, lastSequence, activeDurationMs };
+        const requestFinalize = () =>
+          client.control<AgendaMeetingJson, AgendaMeetingStateResult>({
             action: 'finalize',
             mutationId: createMeetingMutationId(),
             eventId: options.eventId,
             orgId: options.orgId,
-            sessionId: current.sessionId,
-            expectedVersion: ['capture_interrupted', 'recoverable_error'].includes(current.phase)
-              ? undefined
-              : sessionVersionRef.current ?? undefined,
-            payload: {
-              allowPartial,
-              lastSequence,
-              activeDurationMs,
-            },
+            sessionId: current.sessionId as string,
+            // Encerramento é a última operação da sessão e já é serializado por
+            // bloqueio no banco: não enviamos versão esperada para evitar
+            // conflitos causados por marcações automáticas do servidor.
+            payload: finalizePayload,
           });
+        let result: AgendaMeetingStateResult;
+        try {
+          result = await requestFinalize();
         } catch (controlError) {
           const detail = await client.detail({
             mutationId: createMeetingMutationId(),
@@ -863,9 +862,19 @@ export function useAgendaMeetingCapture(
             orgId: options.orgId,
             sessionId: current.sessionId,
           }).catch(() => null);
-          if (!detail || detail.session.captureState !== 'ended') throw controlError;
-          result = { session: detail.session };
+          if (detail && detail.session.captureState === 'ended') {
+            result = { session: detail.session };
+          } else if (detail) {
+            sessionVersionRef.current = detail.session.version;
+            meetingDiagnostics.record('FINALIZE_RETRY', {
+              message: controlError instanceof Error ? controlError.message : 'unknown',
+            });
+            result = await requestFinalize();
+          } else {
+            throw controlError;
+          }
         }
+
         sessionVersionRef.current = result.session.version;
         dispatch({ type: 'session_version', version: result.session.version });
         dispatch({ type: 'phase', phase: 'awaiting_transcripts' });
