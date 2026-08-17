@@ -71,8 +71,11 @@ function CronogramaCommandBar() {
 
       <div className="cronograma-command-layer__mobile md:hidden">
         <CronogramaHeaderSearch className="w-full" />
-        <div className="lg:hidden">
-          <WeeklySummaryPill presentation="mobile" />
+        <div className="flex items-center justify-between gap-2">
+          <div className="lg:hidden min-w-0 flex-1">
+            <WeeklySummaryPill presentation="mobile" />
+          </div>
+          <CronogramaTemporalControls data-presentation="mobile" />
         </div>
       </div>
     </header>
