@@ -972,11 +972,11 @@ export function AgendaMeetingWorkspace({
         <span className="agenda-meeting__launcher-copy">
           <span className="agenda-meeting__eyebrow">Ata inteligente</span>
           <span className="agenda-meeting__title">Fenasoja Meeting</span>
-          <span className="agenda-meeting__description">
-            {available
-              ? (captureActive ? null : 'Transcrição e ata do evento')
-              : 'Disponível apenas para eventos já salvos.'}
-          </span>
+          {(!available || !captureActive) && (
+            <span className="agenda-meeting__description">
+              {available ? 'Transcrição e ata do evento' : 'Disponível apenas para eventos já salvos.'}
+            </span>
+          )}
         </span>
         <span className="agenda-meeting__launcher-action">
           {available ? (
