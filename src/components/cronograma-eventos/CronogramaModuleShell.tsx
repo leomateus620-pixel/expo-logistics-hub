@@ -49,18 +49,11 @@ function CronogramaCommandBar() {
             <WeeklySummaryPill />
           </div>
           <CronogramaPreparationPill />
-          <CronogramaGoogleStatusButton />
+          <div className="cronograma-command-layer__google">
+            <CronogramaGoogleStatusButton />
+          </div>
 
-          {shell?.createAction && (
-            <button
-              type="button"
-              onClick={() => shell.createAction?.()}
-              className="cronograma-command-create focus-ring"
-            >
-              <Plus aria-hidden="true" />
-              <span className="hidden sm:inline">Novo evento</span>
-            </button>
-          )}
+
 
           <Button
             type="button"
