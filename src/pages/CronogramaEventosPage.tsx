@@ -5,11 +5,10 @@ import { toast } from 'sonner';
 import { CalendarMonthView } from '@/components/cronograma-eventos/CalendarMonthView';
 import { UndatedBoard } from '@/components/cronograma-eventos/CronogramaBoards';
 import { CronogramaCycleBar } from '@/components/cronograma-eventos/CronogramaCycleBar';
-import { CronogramaFiltersSlotProvider } from '@/components/cronograma-eventos/CronogramaFiltersSlot';
 import { CronogramaCycleSlotProvider, CronogramaCycleSlotTarget } from '@/components/cronograma-eventos/CronogramaCycleSlot';
 
 import { CronogramaFiltersTrigger } from '@/components/cronograma-eventos/CronogramaFiltersTrigger';
-import { CronogramaSecondaryNav } from '@/components/cronograma-eventos/CronogramaSecondaryNav';
+import { CronogramaSideNav } from '@/components/cronograma-eventos/CronogramaSideNav';
 import { useCronogramaSearch } from '@/components/cronograma-eventos/CronogramaSearchContext';
 import { useCronogramaShell } from '@/components/cronograma-eventos/CronogramaShellContext';
 
@@ -23,7 +22,7 @@ import { EventForm } from '@/components/cronograma-eventos/EventForm';
 import { MobileCreateEventScreen } from '@/components/cronograma-eventos/mobile/MobileCreateEventScreen';
 import { MobileCronogramaErrorBoundary } from '@/components/cronograma-eventos/mobile/MobileCronogramaErrorBoundary';
 import { MobileCronogramaFilters } from '@/components/cronograma-eventos/mobile/MobileCronogramaFilters';
-import { MobileCronogramaNavigation } from '@/components/cronograma-eventos/mobile/MobileCronogramaNavigation';
+import { MobileCronogramaNavDrawer } from '@/components/cronograma-eventos/mobile/MobileCronogramaNavDrawer';
 import { MobileCronogramaTimeline } from '@/components/cronograma-eventos/mobile/MobileCronogramaTimeline';
 
 import { MobileEventScreen } from '@/components/cronograma-eventos/mobile/MobileEventScreen';
