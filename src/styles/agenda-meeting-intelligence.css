@@ -911,3 +911,56 @@
   .agenda-meeting__consent .agenda-meeting__button--primary { width: 100%; min-width: 0; justify-self: stretch; }
   .agenda-meeting__live-text { max-height: 200px; }
 }
+
+/* ============================================================
+   Fenasoja Meeting — marca sóbria e tipografia editorial (v3)
+   ============================================================ */
+
+.agenda-meeting__mark-shell {
+  width: 40px;
+  height: 40px;
+  border-radius: 13px;
+}
+
+.agenda-meeting-mark { width: 24px; height: 24px; }
+
+.agenda-meeting-mark__seed {
+  fill: none;
+  stroke-width: 1.5;
+}
+
+.agenda-meeting-mark__mic { stroke-width: 1.5; fill: none; }
+.agenda-meeting-mark__stand { stroke-width: 1.5; }
+
+.agenda-meeting-mark__wave { stroke-width: 1.5; opacity: 0; transition: opacity 160ms ease; }
+.agenda-meeting-mark[data-state='recording'] .agenda-meeting-mark__wave { opacity: .75; }
+
+.agenda-meeting__launcher-copy { gap: 2px; }
+
+.agenda-meeting__launcher .agenda-meeting__eyebrow {
+  color: color-mix(in srgb, var(--meeting-green) 74%, var(--muted-foreground));
+  font-size: 9.5px;
+  font-weight: 700;
+  letter-spacing: .16em;
+  opacity: 1;
+}
+
+.agenda-meeting__launcher .agenda-meeting__title {
+  margin: 2px 0 0;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -.015em;
+  line-height: 1.2;
+}
+
+.agenda-meeting__launcher .agenda-meeting__description {
+  margin: 3px 0 0;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+@media (max-width: 639px) {
+  .agenda-meeting__mark-shell { width: 38px; height: 38px; }
+  .agenda-meeting__launcher .agenda-meeting__title { font-size: 15.5px; }
+}
