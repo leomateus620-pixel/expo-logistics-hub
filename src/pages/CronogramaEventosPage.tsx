@@ -1,29 +1,29 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { AlertTriangle, CalendarDays, Loader2, RefreshCw } from 'lucide-react';
+import { AlertTriangle, BadgeCheck, CalendarDays, Loader2, RefreshCw } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { CalendarMonthView } from '@/components/cronograma-eventos/CalendarMonthView';
 import { UndatedBoard } from '@/components/cronograma-eventos/CronogramaBoards';
-import { CronogramaCommandHeader } from '@/components/cronograma-eventos/CronogramaCommandHeader';
 import { CronogramaCycleBar } from '@/components/cronograma-eventos/CronogramaCycleBar';
 import { CronogramaFiltersSlotProvider } from '@/components/cronograma-eventos/CronogramaFiltersSlot';
 import { CronogramaFiltersTrigger } from '@/components/cronograma-eventos/CronogramaFiltersTrigger';
-import { CronogramaRegistrationAction } from '@/components/cronograma-eventos/CronogramaRegistrationAction';
+import { CronogramaSecondaryNav } from '@/components/cronograma-eventos/CronogramaSecondaryNav';
 import { useCronogramaSearch } from '@/components/cronograma-eventos/CronogramaSearchContext';
+import { useCronogramaShell } from '@/components/cronograma-eventos/CronogramaShellContext';
 
 import {
   CronogramaTimelineBoard,
   CronogramaTimelineSkeleton,
 } from '@/components/cronograma-eventos/CronogramaTimelineBoard';
-import { CronogramaViewTabs, ViewContentTransition } from '@/components/cronograma-eventos/CronogramaViewTabs';
+import { ViewContentTransition } from '@/components/cronograma-eventos/CronogramaViewTabs';
 import { EventDrawer } from '@/components/cronograma-eventos/EventDrawer';
 import { EventForm } from '@/components/cronograma-eventos/EventForm';
 import { MobileCreateEventScreen } from '@/components/cronograma-eventos/mobile/MobileCreateEventScreen';
 import { MobileCronogramaErrorBoundary } from '@/components/cronograma-eventos/mobile/MobileCronogramaErrorBoundary';
 import { MobileCronogramaFilters } from '@/components/cronograma-eventos/mobile/MobileCronogramaFilters';
-import { MobileCronogramaHeader } from '@/components/cronograma-eventos/mobile/MobileCronogramaHeader';
 import { MobileCronogramaNavigation } from '@/components/cronograma-eventos/mobile/MobileCronogramaNavigation';
 import { MobileCronogramaTimeline } from '@/components/cronograma-eventos/mobile/MobileCronogramaTimeline';
+
 import { MobileEventScreen } from '@/components/cronograma-eventos/mobile/MobileEventScreen';
 import { compareEventDates } from '@/components/cronograma-eventos/dateUtils';
 import {
@@ -530,6 +530,19 @@ export default function CronogramaEventosPage() {
     setCreateOpen(true);
   };
 
+  const shell = useCronogramaShell();
+  const registerCreateAction = shell?.registerCreateAction;
+  const canManageEvents = cronograma.canManage;
+  const openCreateRef = useRef(openCreate);
+  openCreateRef.current = openCreate;
+
+  useEffect(() => {
+    if (!registerCreateAction) return;
+    registerCreateAction(canManageEvents ? () => openCreateRef.current() : null);
+    return () => registerCreateAction(null);
+  }, [registerCreateAction, canManageEvents]);
+
+
   const handleCreateOpenChange = (open: boolean) => {
     overlayOpenRef.current.create = open;
     if (open) {
@@ -990,15 +1003,8 @@ export default function CronogramaEventosPage() {
           onRetry={() => cronograma.refetch()}
         >
           <div className="cronograma-mobile-experience mx-auto flex w-full max-w-3xl min-w-0 flex-col gap-3 overflow-x-clip px-3">
-            <MobileCronogramaHeader
-              availability={cronograma.isLoading ? 'loading' : cronograma.isSeedFallback ? 'offline' : 'ready'}
-            />
-            <CronogramaRegistrationAction
-              canManage={cronograma.canManage}
-              onCreate={openCreate}
-              presentation="mobile"
-            />
             <MobileCronogramaNavigation activeView={activeView} onChange={setActiveView} />
+
             <MobileCronogramaFilters
               filters={filters}
               events={events}
@@ -1026,18 +1032,18 @@ export default function CronogramaEventosPage() {
           )}
         >
           <div className="mx-auto flex w-full max-w-[1680px] flex-col gap-3 px-3 sm:px-5 2xl:px-8">
-            <CronogramaCommandHeader
-              availability={cronograma.isLoading ? 'loading' : cronograma.isSeedFallback ? 'offline' : 'ready'}
-            />
-
-            <CronogramaRegistrationAction
-              canManage={cronograma.canManage}
-              onCreate={openCreate}
-              presentation="desktop"
-            />
-
-            <div className="cronograma-command-dock sticky top-[84px] z-20 pb-2">
-              <CronogramaViewTabs activeView={activeView} onChange={setActiveView} />
+            <div className="cronograma-workbench-bar">
+              <CronogramaSecondaryNav activeView={activeView} onChange={setActiveView} />
+              <button
+                type="button"
+                onClick={() => setActiveView(activeView === 'completed' ? 'timeline' : 'completed')}
+                className="cronograma-history-toggle focus-ring"
+                data-active={activeView === 'completed' || undefined}
+                aria-pressed={activeView === 'completed'}
+              >
+                <BadgeCheck aria-hidden="true" />
+                <span>Histórico concluído</span>
+              </button>
             </div>
 
             {activeView !== 'timeline' && activeView !== 'completed' && (
@@ -1046,6 +1052,7 @@ export default function CronogramaEventosPage() {
                 title={CRONOGRAMA_VIEW_LABELS[activeView]}
               />
             )}
+
 
             {operationalContent}
           </div>

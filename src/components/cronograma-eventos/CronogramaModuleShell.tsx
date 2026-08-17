@@ -1,17 +1,23 @@
 import type { ReactNode } from 'react';
-import { CalendarRange, ChevronLeft, LogOut } from 'lucide-react';
+import { CalendarRange, ChevronLeft, LogOut, Plus } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
-import { AgendaWordmark } from '@/components/brand/AgendaWordmark';
-import { FenasojaBrand } from '@/components/brand/FenasojaBrand';
+import { CronogramaGoogleStatusButton } from '@/components/cronograma-eventos/CronogramaGoogleStatusButton';
 import { CronogramaHeaderSearch } from '@/components/cronograma-eventos/CronogramaHeaderSearch';
+import { CronogramaPreparationPill } from '@/components/cronograma-eventos/CronogramaPreparationPill';
 import { CronogramaSearchProvider } from '@/components/cronograma-eventos/CronogramaSearchContext';
+import {
+  CronogramaShellProvider,
+  useCronogramaShell,
+} from '@/components/cronograma-eventos/CronogramaShellContext';
 import { WeeklySummaryPill } from '@/components/cronograma-eventos/WeeklySummaryPill';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
+import '@/styles/cronograma-command-layer.css';
 
-export function CronogramaModuleShell({ children }: { children: ReactNode }) {
+function CronogramaCommandBar() {
   const { signOut } = useAuth();
   const navigate = useNavigate();
+  const shell = useCronogramaShell();
 
   const handleSignOut = async () => {
     await signOut();
@@ -19,69 +25,80 @@ export function CronogramaModuleShell({ children }: { children: ReactNode }) {
   };
 
   return (
-    <CronogramaSearchProvider>
-      <div className="cronograma-module-shell min-h-screen">
-        <a href="#cronograma-main" className="skip-to-content">
-          Ir para o conteúdo do cronograma
-        </a>
+    <header className="cronograma-module-bar" data-layout="command">
+      <div className="cronograma-command-layer">
+        <div className="cronograma-command-layer__left">
+          <Link
+            to="/portal"
+            className="cronograma-module-back focus-ring"
+            aria-label="Voltar ao portal de acesso"
+          >
+            <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+            <span className="hidden xl:inline">Portal</span>
+          </Link>
 
-        <header className="cronograma-module-bar">
-          <div className="mx-auto flex min-h-[68px] w-full max-w-[1760px] items-center justify-between gap-3 px-3 sm:px-5 2xl:px-8">
-            <div className="flex min-w-0 flex-1 items-center gap-3">
-              <Link
-                to="/portal"
-                className="cronograma-module-back focus-ring"
-                aria-label="Voltar ao portal de acesso"
-              >
-                <ChevronLeft className="h-4 w-4" aria-hidden="true" />
-                <span className="hidden sm:inline">Portal</span>
-              </Link>
+          <span className="cronograma-module-tile-3d" aria-hidden="true">
+            <CalendarRange className="h-4 w-4" />
+          </span>
 
-              <span className="h-8 w-px bg-white/14" aria-hidden="true" />
+          <CronogramaHeaderSearch className="cronograma-command-search hidden md:flex" />
+        </div>
 
-              <div className="flex min-w-0 items-center gap-3">
-                <FenasojaBrand compact markOnly tone="dark" className="hidden sm:inline-flex" />
-                <span className="cronograma-module-tile-3d" aria-hidden="true">
-                  <CalendarRange className="h-4 w-4" />
-                </span>
-                <p className="cronograma-module-title truncate text-base font-bold sm:text-lg">
-                  <AgendaWordmark variant="fenasoja" />
-                </p>
-              </div>
-
-              <CronogramaHeaderSearch className="hidden lg:flex" />
-            </div>
-
-            <div className="flex items-center gap-4">
-              <div className="hidden md:block">
-                <WeeklySummaryPill />
-              </div>
-              <span className="hidden h-8 w-px bg-white/12 md:block" aria-hidden="true" />
-              <Button
-                type="button"
-                variant="ghost"
-                size="sm"
-                onClick={handleSignOut}
-                className="cronograma-module-signout h-11 min-w-11 rounded-lg px-2.5 text-xs sm:h-9 sm:min-w-0"
-              >
-                <LogOut className="h-4 w-4" aria-hidden="true" />
-                <span className="hidden sm:inline">Sair</span>
-              </Button>
-            </div>
-
+        <div className="cronograma-command-layer__right">
+          <div className="hidden lg:block">
+            <WeeklySummaryPill />
           </div>
+          <CronogramaPreparationPill />
+          <CronogramaGoogleStatusButton />
 
-          <div className="mx-auto w-full max-w-[1760px] space-y-2 px-3 pb-2 lg:hidden sm:px-5">
-            <CronogramaHeaderSearch className="w-full" />
-            <div className="md:hidden">
-              <WeeklySummaryPill presentation="mobile" />
-            </div>
-          </div>
-        </header>
+          {shell?.createAction && (
+            <button
+              type="button"
+              onClick={() => shell.createAction?.()}
+              className="cronograma-command-create focus-ring"
+            >
+              <Plus aria-hidden="true" />
+              <span className="hidden sm:inline">Novo evento</span>
+            </button>
+          )}
 
-
-        {children}
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={handleSignOut}
+            className="cronograma-module-signout h-10 min-w-10 rounded-lg px-2.5 text-xs"
+            aria-label="Sair do sistema"
+          >
+            <LogOut className="h-4 w-4" aria-hidden="true" />
+          </Button>
+        </div>
       </div>
+
+      <div className="cronograma-command-layer__mobile md:hidden">
+        <CronogramaHeaderSearch className="w-full" />
+        <div className="lg:hidden">
+          <WeeklySummaryPill presentation="mobile" />
+        </div>
+      </div>
+    </header>
+  );
+}
+
+export function CronogramaModuleShell({ children }: { children: ReactNode }) {
+  return (
+    <CronogramaSearchProvider>
+      <CronogramaShellProvider>
+        <div className="cronograma-module-shell min-h-screen">
+          <a href="#cronograma-main" className="skip-to-content">
+            Ir para o conteúdo do cronograma
+          </a>
+
+          <CronogramaCommandBar />
+
+          {children}
+        </div>
+      </CronogramaShellProvider>
     </CronogramaSearchProvider>
   );
 }
