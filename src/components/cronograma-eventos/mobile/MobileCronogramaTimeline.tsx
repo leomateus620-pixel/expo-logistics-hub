@@ -45,6 +45,9 @@ import {
 import { statusLabels } from '../cronogramaData';
 import { compareEventDates, formatLongDate } from '../dateUtils';
 import { CycleYearMark } from '../CycleYearMark';
+import { CronogramaCycleChips } from '../CronogramaCycleChips';
+import { CronogramaCyclePortal } from '../CronogramaCycleSlot';
+
 import { EventHarvestAnimation } from '../EventHarvestAnimation';
 import { splitEventResponsibles } from '../EventRelationFields';
 import { EventPeopleAvatars } from '../PersonAvatar';
