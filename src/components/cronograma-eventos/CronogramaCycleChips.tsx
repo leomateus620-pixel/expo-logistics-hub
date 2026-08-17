@@ -7,6 +7,7 @@ interface CronogramaCycleChipsProps {
   selectedYear: CronogramaCycleYear;
   currentYear: CronogramaCycleYear | null;
   onSelectYear: (year: CronogramaCycleYear) => void;
+  className?: string;
 }
 
 /** Compact cycle selector that replaces the former vertical progress sidebar. */
@@ -15,9 +16,10 @@ export const CronogramaCycleChips = memo(function CronogramaCycleChips({
   selectedYear,
   currentYear,
   onSelectYear,
+  className,
 }: CronogramaCycleChipsProps) {
   return (
-    <div className="cronograma-cycle-chips" role="group" aria-label="Ciclo 2026–2028">
+    <div className={cn('cronograma-cycle-chips', className)} role="group" aria-label="Ciclo 2026–2028">
       {summaries.map((summary) => {
         const selected = summary.year === selectedYear;
         const showFiltered = summary.filtered !== summary.total;
@@ -36,6 +38,7 @@ export const CronogramaCycleChips = memo(function CronogramaCycleChips({
           >
             <strong>{summary.year}</strong>
             <span>{showFiltered ? `${summary.filtered}/${summary.total}` : summary.total}</span>
+            <i aria-hidden="true" className="cronograma-cycle-chip__glow" />
           </button>
         );
       })}
