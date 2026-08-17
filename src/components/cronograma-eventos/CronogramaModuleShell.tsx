@@ -49,6 +49,10 @@ function CronogramaCommandBar() {
             <CronogramaGoogleStatusButton />
           </div>
 
+          <CronogramaTemporalControls className="hidden sm:inline-flex" />
+
+
+
 
 
           <Button
