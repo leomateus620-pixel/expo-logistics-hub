@@ -990,14 +990,8 @@ export default function CronogramaEventosPage() {
           onRetry={() => cronograma.refetch()}
         >
           <div className="cronograma-mobile-experience mx-auto flex w-full max-w-3xl min-w-0 flex-col gap-3 overflow-x-clip px-3">
-            <MobileCronogramaHeader
-              availability={cronograma.isLoading ? 'loading' : cronograma.isSeedFallback ? 'offline' : 'ready'}
-            />
-            <CronogramaRegistrationAction
-              canManage={cronograma.canManage}
-              onCreate={openCreate}
-              presentation="mobile"
-            />
+            <MobileCronogramaNavigation activeView={activeView} onChange={setActiveView} />
+
             <MobileCronogramaNavigation activeView={activeView} onChange={setActiveView} />
             <MobileCronogramaFilters
               filters={filters}
