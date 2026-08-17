@@ -155,9 +155,6 @@ export function CronogramaTimelineBoard({
   });
   const currentYear = getCurrentCycleYear(todayKey);
   const selectedSummary = summaries.find((summary) => summary.year === navigation.selectedYear)!;
-  const focusedLabel = navigation.focusedMonth
-    ? monthLabel(navigation.focusedMonth)
-    : `${navigation.selectedYear} · ${selectedSummary.stage}`;
   const reflectEventMonth = navigation.reflectEventMonth;
 
   const openTimelineEvent = useCallback((event: CronogramaEvent) => {
