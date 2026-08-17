@@ -81,6 +81,8 @@ import '@/styles/cronograma-timeline-flagship.css';
 import '@/styles/cronograma-harvest-completion.css';
 import '@/styles/cronograma-dashboard.css';
 import '@/styles/agenda-meeting-intelligence.css';
+import '@/styles/cronograma-refino.css';
+
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
