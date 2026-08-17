@@ -6,6 +6,8 @@ import { CalendarMonthView } from '@/components/cronograma-eventos/CalendarMonth
 import { UndatedBoard } from '@/components/cronograma-eventos/CronogramaBoards';
 import { CronogramaCycleBar } from '@/components/cronograma-eventos/CronogramaCycleBar';
 import { CronogramaFiltersSlotProvider } from '@/components/cronograma-eventos/CronogramaFiltersSlot';
+import { CronogramaCycleSlotProvider, CronogramaCycleSlotTarget } from '@/components/cronograma-eventos/CronogramaCycleSlot';
+
 import { CronogramaFiltersTrigger } from '@/components/cronograma-eventos/CronogramaFiltersTrigger';
 import { CronogramaSecondaryNav } from '@/components/cronograma-eventos/CronogramaSecondaryNav';
 import { useCronogramaSearch } from '@/components/cronograma-eventos/CronogramaSearchContext';
