@@ -75,7 +75,7 @@ function CronogramaCommandBar() {
           <div className="lg:hidden min-w-0 flex-1">
             <WeeklySummaryPill presentation="mobile" />
           </div>
-          <CronogramaTemporalControls data-presentation="mobile" />
+          <CronogramaTemporalControls />
         </div>
       </div>
     </header>
