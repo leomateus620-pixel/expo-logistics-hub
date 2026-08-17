@@ -224,7 +224,7 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
     if (isVenueEventsLogin) return '/eventos-restaurante-arena';
     if (isCommercialMapLogin) return '/mapa-comercial';
     if (selectedModule) return getModuleRoute(selectedModule);
-    return '/comissoes/logistica/dashboard';
+    return '/portal';
   };
 
   useEffect(() => {
