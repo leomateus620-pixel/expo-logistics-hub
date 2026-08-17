@@ -165,21 +165,22 @@ export function CronogramaTimelineBoard({
       data-variant={variant}
       aria-label={variant === 'completed' ? 'Eventos concluídos por período' : 'Linha do tempo operacional'}
     >
-      <TimelineCycleNavigator
-        summaries={summaries}
-        selectedYear={navigation.selectedYear}
-        currentYear={currentYear}
-        onSelectYear={navigation.selectYear}
-      />
-
       <div className="cronograma-timeline-workspace">
         <nav
           className="cronograma-temporal-nav"
           aria-label={variant === 'completed' ? 'Navegação do histórico concluído' : 'Navegação entre períodos'}
         >
+          {filtersSlot && <div className="cronograma-temporal-nav__filters">{filtersSlot}</div>}
           <div className="min-w-0">
             <p className="truncate text-lg font-black tracking-tight text-foreground">{focusedLabel}</p>
           </div>
+          <CronogramaCycleChips
+            summaries={summaries}
+            selectedYear={navigation.selectedYear}
+            currentYear={currentYear}
+            onSelectYear={navigation.selectYear}
+          />
+
           <div className="ml-auto flex items-center gap-1.5">
             <Button
               type="button"
