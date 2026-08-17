@@ -3,7 +3,7 @@
 .cronograma-module-bar[data-layout='command'] .cronograma-command-layer {
   display: flex;
   width: 100%;
-  max-width: 1760px;
+  max-width: none;
   min-height: 56px;
   align-items: center;
   justify-content: space-between;
@@ -36,7 +36,7 @@
 .cronograma-command-layer__mobile {
   display: flex;
   width: 100%;
-  max-width: 1760px;
+  max-width: none;
   flex-direction: column;
   gap: 0.4rem;
   margin: 0 auto;
