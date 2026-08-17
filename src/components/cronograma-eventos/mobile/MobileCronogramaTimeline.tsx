@@ -45,8 +45,8 @@ import {
 import { statusLabels } from '../cronogramaData';
 import { compareEventDates, formatLongDate } from '../dateUtils';
 
-import { CronogramaCycleChips } from '../CronogramaCycleChips';
 import { CronogramaCyclePortal } from '../CronogramaCycleSlot';
+import { MobileCycleSwitcher } from './MobileCycleSwitcher';
 
 import { EventHarvestAnimation } from '../EventHarvestAnimation';
 import { splitEventResponsibles } from '../EventRelationFields';
@@ -302,15 +302,13 @@ export function MobileCronogramaTimeline({
       aria-label={variant === 'completed' ? 'Eventos concluídos por período' : 'Linha do tempo operacional móvel'}
     >
       <CronogramaCyclePortal>
-        <CronogramaCycleChips
+        <MobileCycleSwitcher
           summaries={summaries}
           selectedYear={position.year}
           currentYear={currentYear}
           onSelectYear={selectYear}
-          className="cronograma-cycle-chips--mobile"
         />
       </CronogramaCyclePortal>
-
 
       <nav className="cronograma-mobile-month-navigation" aria-label="Navegação entre meses">
         <button
@@ -324,7 +322,7 @@ export function MobileCronogramaTimeline({
         </button>
         <div className="cronograma-mobile-month-context">
           <h2>{mobileMonthLabel(position.month)}</h2>
-          <p className="cronograma-mobile-month-stage">{selectedSummary?.stage ?? 'Ciclo oficial'}</p>
+          <span className="cronograma-mobile-month-stage">{selectedSummary?.stage ?? 'Ciclo oficial'}</span>
         </div>
 
         <button
@@ -341,12 +339,13 @@ export function MobileCronogramaTimeline({
           onClick={goToToday}
           className="cronograma-mobile-today-button"
           data-current={isCurrentMonth || undefined}
-          aria-label={variant === 'completed' ? 'Ir para o mês atual no histórico' : undefined}
+          aria-label={variant === 'completed' ? 'Ir para o mês atual no histórico' : 'Ir para hoje'}
         >
           <CalendarDays aria-hidden="true" />
-          {variant === 'completed' ? 'Mês atual' : isCurrentMonth ? 'Mês atual' : 'Ir para hoje'}
+          {isCurrentMonth ? 'Atual' : 'Hoje'}
         </button>
       </nav>
+
 
       <p className="sr-only" aria-live="polite" aria-atomic="true">
         {mobileMonthLabel(position.month)}, {monthEvents.length} {monthEvents.length === 1 ? 'evento' : 'eventos'}.

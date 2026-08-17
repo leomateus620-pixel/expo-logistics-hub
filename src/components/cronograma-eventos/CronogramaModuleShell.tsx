@@ -8,6 +8,7 @@ import { CronogramaSearchProvider } from '@/components/cronograma-eventos/Cronog
 import { CronogramaTemporalControls } from '@/components/cronograma-eventos/CronogramaTemporalControls';
 import { CronogramaShellProvider } from '@/components/cronograma-eventos/CronogramaShellContext';
 import { WeeklySummaryPill } from '@/components/cronograma-eventos/WeeklySummaryPill';
+import { MobileSearchToggle } from '@/components/cronograma-eventos/mobile/MobileSearchToggle';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import '@/styles/cronograma-command-layer.css';
@@ -39,6 +40,7 @@ function CronogramaCommandBar() {
           </span>
 
           <CronogramaHeaderSearch className="cronograma-command-search hidden md:flex" />
+          <MobileSearchToggle className="md:hidden" />
         </div>
 
         <div className="cronograma-command-layer__right">
@@ -70,7 +72,6 @@ function CronogramaCommandBar() {
       </div>
 
       <div className="cronograma-command-layer__mobile md:hidden">
-        <CronogramaHeaderSearch className="w-full" />
         <div className="flex items-center justify-between gap-2">
           <div className="lg:hidden min-w-0 flex-1">
             <WeeklySummaryPill presentation="mobile" />

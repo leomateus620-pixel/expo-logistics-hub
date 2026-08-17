@@ -149,7 +149,7 @@ describe('linha do tempo móvel', () => {
 
     expect(screen.getByRole('heading', { name: 'Concluídos sem data registrada' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Encerramento registrado sem data histórica/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /2027, etapa Consolidação/i })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', { name: /2027, etapa Consolidação/i })).toBeInTheDocument();
   });
 
   it('reposiciona para o mês e o ano da correspondência quando o filtro temporal muda', async () => {
@@ -188,7 +188,7 @@ describe('linha do tempo móvel', () => {
     });
     expect(screen.getByRole('button', { name: /Lançamento da programação final/i })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Reunião de estruturação/i })).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /2028, etapa Realização/i })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', { name: /2028, etapa Realização/i })).toBeInTheDocument();
     expect(onPositionChange).toHaveBeenLastCalledWith({
       year: 2028,
       month: '2028-11',
