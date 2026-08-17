@@ -546,3 +546,32 @@
 .cronograma-mobile-nav-sheet .cronograma-sidenav__item {
   color: oklch(var(--brand-navy-900) / 0.72);
 }
+
+@media (max-width: 767px) {
+  .cronograma-page .cronograma-mobile-command .cronograma-mobile-cycle-slot {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .cronograma-page .cronograma-mobile-command .cronograma-mobile-cycle-slot::-webkit-scrollbar {
+    display: none;
+  }
+
+  .cronograma-page .cronograma-mobile-command .cronograma-cycle-chips {
+    width: max-content;
+    min-width: 100%;
+    gap: 0.2rem;
+    padding: 0.18rem;
+  }
+
+  .cronograma-page .cronograma-mobile-command .cronograma-cycle-chip {
+    flex: 0 0 auto;
+    gap: 0.35rem;
+    padding-inline: 0.55rem;
+    min-height: 2.35rem;
+  }
+
+  .cronograma-mobile-nav-trigger {
+    max-width: 9rem;
+  }
+}
