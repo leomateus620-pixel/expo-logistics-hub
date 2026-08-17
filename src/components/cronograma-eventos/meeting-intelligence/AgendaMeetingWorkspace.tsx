@@ -784,13 +784,9 @@ function PersistedMeetingWorkspace({
 
       {capture.state.phase === 'idle' && (
         <div className="agenda-meeting__consent">
-          <div className="agenda-meeting__notice">
-            <ShieldCheck className="mr-2 inline h-4 w-4" aria-hidden="true" />
-            A FENASOJA guarda apenas transcrição, atas e itens estruturados. Não existe áudio histórico, player, download ou retranscrição posterior.
-          </div>
           <label className="agenda-meeting__consent-check">
             <input checked={participantsInformed} onChange={(event) => setParticipantsInformed(event.target.checked)} type="checkbox" />
-            <span>Confirmo que todas as pessoas foram informadas sobre a transcrição e consentiram com esta sessão.</span>
+            <span>Confirmo que todos os participantes foram informados e consentiram com a transcrição.</span>
           </label>
           {capture.mic.devices.length > 0 && (
             <label className="agenda-meeting__device-field">
