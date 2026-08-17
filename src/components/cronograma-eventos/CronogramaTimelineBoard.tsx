@@ -162,6 +162,20 @@ export function CronogramaTimelineBoard({
     onOpen(event);
   }, [onOpen, reflectEventMonth]);
 
+  const shell = useCronogramaShell();
+  const registerTemporalNav = shell?.registerTemporalNav;
+  const { goToToday, goToMonth, previousMonth, nextMonth } = navigation;
+
+  useEffect(() => {
+    if (!registerTemporalNav) return;
+    registerTemporalNav({
+      goToToday,
+      goToPrevious: previousMonth ? () => goToMonth(previousMonth) : null,
+      goToNext: nextMonth ? () => goToMonth(nextMonth) : null,
+    });
+    return () => registerTemporalNav(null);
+  }, [registerTemporalNav, goToToday, goToMonth, previousMonth, nextMonth]);
+
   return (
     <section
       className="cronograma-timeline-shell"
