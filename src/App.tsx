@@ -178,13 +178,12 @@ function RootRoute() {
   }
 
   return (
-    <AuthenticatedLogisticsLayout>
-      <FullAccessRoute>
-        <Dashboard />
-      </FullAccessRoute>
-    </AuthenticatedLogisticsLayout>
+    <Suspended>
+      <CommissionPortalPage />
+    </Suspended>
   );
 }
+
 
 function CommercialMapRoute() {
   return (
