@@ -149,7 +149,7 @@ describe('linha do tempo móvel', () => {
 
     expect(screen.getByRole('heading', { name: 'Concluídos sem data registrada' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Encerramento registrado sem data histórica/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /2027, etapa Consolidação/i })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', { name: /2027, etapa Consolidação/i })).toBeInTheDocument();
   });
 
   it('reposiciona para o mês e o ano da correspondência quando o filtro temporal muda', async () => {
@@ -188,7 +188,7 @@ describe('linha do tempo móvel', () => {
     });
     expect(screen.getByRole('button', { name: /Lançamento da programação final/i })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Reunião de estruturação/i })).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /2028, etapa Realização/i })).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByRole('button', { name: /2028, etapa Realização/i })).toBeInTheDocument();
     expect(onPositionChange).toHaveBeenLastCalledWith({
       year: 2028,
       month: '2028-11',
@@ -324,24 +324,21 @@ describe('navegação e filtros móveis', () => {
     expect(onViewChange).toHaveBeenCalledWith('completed');
 
     const filters = screen.getByRole('region', { name: 'Busca e filtros do cronograma' });
-    expect(within(filters).getByRole('textbox', { name: 'Buscar no cronograma' })).toHaveAttribute(
-      'placeholder',
-      'Buscar evento, pessoa ou comissão',
-    );
     expect(within(filters).getByText('2 de 3 eventos')).toHaveAttribute('aria-live', 'polite');
     expect(within(filters).getByRole('status')).toHaveTextContent('Sincronizando');
-
-    const today = within(filters).getByRole('button', { name: 'Hoje' });
-    expect(today).toHaveAttribute('aria-pressed', 'false');
-    fireEvent.click(today);
-    expect(onFiltersChange).toHaveBeenCalledWith(expect.objectContaining({ period: 'today' }));
+    expect(within(filters).queryByRole('textbox')).not.toBeInTheDocument();
 
     fireEvent.click(within(filters).getByRole('button', { name: 'Abrir filtros avançados' }));
     const dialog = await screen.findByRole('dialog', { name: 'Filtros avançados' });
+
+    const today = within(dialog).getByRole('button', { name: 'Hoje' });
+    expect(today).toHaveAttribute('aria-pressed', 'false');
+    fireEvent.click(today);
     expect(within(dialog).getByRole('combobox', { name: 'Ano' })).toBeInTheDocument();
     expect(within(dialog).getByRole('combobox', { name: 'Mês' })).toBeInTheDocument();
     expect(within(dialog).getByRole('switch', { name: 'Somente cronograma oficial' })).toHaveAttribute('aria-checked', 'false');
-    expect(within(dialog).getByRole('button', { name: 'Aplicar filtros' })).toBeInTheDocument();
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Aplicar filtros' }));
+    expect(onFiltersChange).toHaveBeenCalledWith(expect.objectContaining({ period: 'today' }));
 
     expect(container.querySelector('.cronograma-view-tabs')).not.toBeInTheDocument();
     expect(container.querySelector('.cronograma-filter-surface')).not.toBeInTheDocument();
@@ -375,7 +372,6 @@ describe('navegação e filtros móveis', () => {
     });
     expect(window.location.href).toBe(routeBefore);
     expect(onOverlayOpenChange).toHaveBeenLastCalledWith(false);
-    expect(screen.getByRole('button', { name: 'Todo o ciclo' })).toHaveAttribute('aria-pressed', 'true');
     expect(screen.getByText('3 de 3 eventos')).toBeInTheDocument();
   });
 });

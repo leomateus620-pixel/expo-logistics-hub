@@ -22,7 +22,7 @@ import { EventForm } from '@/components/cronograma-eventos/EventForm';
 import { MobileCreateEventScreen } from '@/components/cronograma-eventos/mobile/MobileCreateEventScreen';
 import { MobileCronogramaErrorBoundary } from '@/components/cronograma-eventos/mobile/MobileCronogramaErrorBoundary';
 import { MobileCronogramaFilters } from '@/components/cronograma-eventos/mobile/MobileCronogramaFilters';
-import { MobileCronogramaNavDrawer } from '@/components/cronograma-eventos/mobile/MobileCronogramaNavDrawer';
+import { MobileViewSwitcher } from '@/components/cronograma-eventos/mobile/MobileViewSwitcher';
 import { MobileCronogramaTimeline } from '@/components/cronograma-eventos/mobile/MobileCronogramaTimeline';
 
 import { MobileEventScreen } from '@/components/cronograma-eventos/mobile/MobileEventScreen';
@@ -1007,12 +1007,13 @@ export default function CronogramaEventosPage() {
         >
           <CronogramaCycleSlotProvider>
             <div className="cronograma-mobile-experience mx-auto flex w-full min-w-0 flex-col gap-2.5 overflow-x-clip px-3">
-              <div className="cronograma-mobile-command">
-                <MobileCronogramaNavDrawer activeView={activeView} onChange={setActiveView} />
-                <CronogramaCycleSlotTarget className="cronograma-mobile-cycle-slot" />
-              </div>
-
               <MobileCronogramaFilters
+                leading={(
+                  <>
+                    <MobileViewSwitcher activeView={activeView} onChange={setActiveView} />
+                    <CronogramaCycleSlotTarget className="cronograma-mobile-cycle-slot" />
+                  </>
+                )}
                 filters={filters}
                 events={events}
                 onChange={applyFilters}

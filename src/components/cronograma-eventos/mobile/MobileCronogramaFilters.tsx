@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import {
   CalendarClock,
   CalendarDays,
@@ -46,6 +46,7 @@ interface MobileCronogramaFiltersProps {
   totalCount: number;
   syncing?: boolean;
   onOverlayOpenChange?: (open: boolean) => void;
+  leading?: ReactNode;
 }
 
 const quickPeriods: Array<{ value: CronogramaFilters['period']; label: string; icon: LucideIcon }> = [
@@ -128,6 +129,7 @@ export function MobileCronogramaFilters({
   totalCount,
   syncing = false,
   onOverlayOpenChange,
+  leading,
 }: MobileCronogramaFiltersProps) {
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [draftFilters, setDraftFilters] = useState(filters);
@@ -168,58 +170,53 @@ export function MobileCronogramaFilters({
   };
 
   return (
-    <section className="cronograma-mobile-filters" aria-label="Filtros do cronograma">
-      <div className="cronograma-mobile-search-row">
+    <section className="cronograma-mobile-filters" aria-label="Busca e filtros do cronograma">
+      <div className="cronograma-mobile-controls">
+        {leading}
         <button
           type="button"
           onClick={() => handleAdvancedOpenChange(true)}
-          className="cronograma-mobile-filter-trigger cronograma-mobile-filter-trigger--full"
+          className="cronograma-mobile-filter-pill focus-ring"
           data-open={advancedOpen || undefined}
           aria-label={advancedCount > 0
-            ? `Abrir filtros, ${advancedCount} ativos`
-            : 'Abrir filtros'}
+            ? `Abrir filtros avançados, ${advancedCount} ativos`
+            : 'Abrir filtros avançados'}
         >
           <SlidersHorizontal aria-hidden="true" />
-          <span>Filtros</span>
-          <em>{periodLabels[filters.period]}</em>
           {advancedCount > 0 && <strong>{advancedCount}</strong>}
         </button>
       </div>
 
-
-      <div className="cronograma-mobile-filter-summary">
+      <div className="cronograma-mobile-filter-strip">
         <span className="cronograma-mobile-result-count" aria-live="polite">
           {resultCount} de {totalCount} eventos
         </span>
+        <span className="cronograma-mobile-period-hint">{periodLabels[filters.period]}</span>
         {syncing && (
           <span className="cronograma-mobile-syncing" role="status">
             <Loader2 aria-hidden="true" />
             Sincronizando
           </span>
         )}
+        {activeChips.map((chip) => (
+          <button
+            key={chip.key}
+            type="button"
+            onClick={() => onChange(chip.clear(filters))}
+            className="cronograma-mobile-filter-chip"
+            aria-label={`Remover filtro ${chip.label}`}
+          >
+            <span>{chip.label}</span>
+            <X aria-hidden="true" />
+          </button>
+        ))}
         {activeChips.length > 0 && (
           <button type="button" onClick={onClear} className="cronograma-mobile-clear-all">
-            Limpar tudo
+            Limpar
           </button>
         )}
       </div>
 
-      {activeChips.length > 0 && (
-        <div className="cronograma-mobile-active-filters" aria-label="Filtros ativos">
-          {activeChips.map((chip) => (
-            <button
-              key={chip.key}
-              type="button"
-              onClick={() => onChange(chip.clear(filters))}
-              className="cronograma-mobile-filter-chip"
-              aria-label={`Remover filtro ${chip.label}`}
-            >
-              <span>{chip.label}</span>
-              <X aria-hidden="true" />
-            </button>
-          ))}
-        </div>
-      )}
 
       <Sheet open={advancedOpen} onOpenChange={handleAdvancedOpenChange}>
         <SheetContent
@@ -228,7 +225,7 @@ export function MobileCronogramaFilters({
           closeLabel="Fechar filtros avançados"
         >
           <SheetHeader className="cronograma-mobile-filter-sheet-header">
-            <SheetTitle>Filtros</SheetTitle>
+            <SheetTitle>Filtros avançados</SheetTitle>
             <SheetDescription className="sr-only">
               Selecione os critérios para filtrar os eventos.
             </SheetDescription>
