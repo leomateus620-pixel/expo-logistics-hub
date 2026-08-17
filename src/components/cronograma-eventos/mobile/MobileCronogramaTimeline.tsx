@@ -44,7 +44,7 @@ import {
 } from '../CronogramaBadges';
 import { statusLabels } from '../cronogramaData';
 import { compareEventDates, formatLongDate } from '../dateUtils';
-import { CycleYearMark } from '../CycleYearMark';
+
 import { CronogramaCycleChips } from '../CronogramaCycleChips';
 import { CronogramaCyclePortal } from '../CronogramaCycleSlot';
 
