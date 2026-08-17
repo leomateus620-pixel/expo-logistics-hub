@@ -6,6 +6,8 @@ import { CalendarMonthView } from '@/components/cronograma-eventos/CalendarMonth
 import { UndatedBoard } from '@/components/cronograma-eventos/CronogramaBoards';
 import { CronogramaCycleBar } from '@/components/cronograma-eventos/CronogramaCycleBar';
 import { CronogramaFiltersSlotProvider } from '@/components/cronograma-eventos/CronogramaFiltersSlot';
+import { CronogramaCycleSlotProvider, CronogramaCycleSlotTarget } from '@/components/cronograma-eventos/CronogramaCycleSlot';
+
 import { CronogramaFiltersTrigger } from '@/components/cronograma-eventos/CronogramaFiltersTrigger';
 import { CronogramaSecondaryNav } from '@/components/cronograma-eventos/CronogramaSecondaryNav';
 import { useCronogramaSearch } from '@/components/cronograma-eventos/CronogramaSearchContext';
@@ -79,6 +81,8 @@ import '@/styles/cronograma-timeline-flagship.css';
 import '@/styles/cronograma-harvest-completion.css';
 import '@/styles/cronograma-dashboard.css';
 import '@/styles/agenda-meeting-intelligence.css';
+import '@/styles/cronograma-refino.css';
+
 
 const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -1002,21 +1006,26 @@ export default function CronogramaEventosPage() {
           resetKey={`${activeView}:${events.length}:${cronograma.isLoading ? 'loading' : 'ready'}`}
           onRetry={() => cronograma.refetch()}
         >
-          <div className="cronograma-mobile-experience mx-auto flex w-full max-w-3xl min-w-0 flex-col gap-3 overflow-x-clip px-3">
-            <MobileCronogramaNavigation activeView={activeView} onChange={setActiveView} />
+          <CronogramaCycleSlotProvider>
+            <div className="cronograma-mobile-experience mx-auto flex w-full max-w-3xl min-w-0 flex-col gap-2.5 overflow-x-clip px-3">
+              <div className="cronograma-mobile-command">
+                <MobileCronogramaNavigation activeView={activeView} onChange={setActiveView} />
+                <CronogramaCycleSlotTarget className="cronograma-mobile-cycle-slot" />
+              </div>
 
-            <MobileCronogramaFilters
-              filters={filters}
-              events={events}
-              onChange={applyFilters}
-              onClear={clearFilters}
-              resultCount={filteredEvents.length}
-              totalCount={eventsForView.length}
-              syncing={cronograma.isRefreshing}
-              onOverlayOpenChange={handleMobileFiltersOpenChange}
-            />
-            {operationalContent}
-          </div>
+              <MobileCronogramaFilters
+                filters={filters}
+                events={events}
+                onChange={applyFilters}
+                onClear={clearFilters}
+                resultCount={filteredEvents.length}
+                totalCount={eventsForView.length}
+                syncing={cronograma.isRefreshing}
+                onOverlayOpenChange={handleMobileFiltersOpenChange}
+              />
+              {operationalContent}
+            </div>
+          </CronogramaCycleSlotProvider>
         </MobileCronogramaErrorBoundary>
       ) : (
         <CronogramaFiltersSlotProvider
@@ -1031,33 +1040,37 @@ export default function CronogramaEventosPage() {
             />
           )}
         >
-          <div className="mx-auto flex w-full max-w-[1680px] flex-col gap-3 px-3 sm:px-5 2xl:px-8">
-            <div className="cronograma-workbench-bar">
-              <CronogramaSecondaryNav activeView={activeView} onChange={setActiveView} />
-              <button
-                type="button"
-                onClick={() => setActiveView(activeView === 'completed' ? 'timeline' : 'completed')}
-                className="cronograma-history-toggle focus-ring"
-                data-active={activeView === 'completed' || undefined}
-                aria-pressed={activeView === 'completed'}
-              >
-                <BadgeCheck aria-hidden="true" />
-                <span>Histórico concluído</span>
-              </button>
+          <CronogramaCycleSlotProvider>
+            <div className="mx-auto flex w-full max-w-[1680px] flex-col gap-3 px-3 sm:px-5 2xl:px-8">
+              <div className="cronograma-workbench-bar">
+                <CronogramaSecondaryNav activeView={activeView} onChange={setActiveView} />
+                <button
+                  type="button"
+                  onClick={() => setActiveView(activeView === 'completed' ? 'timeline' : 'completed')}
+                  className="cronograma-history-toggle focus-ring"
+                  data-active={activeView === 'completed' || undefined}
+                  aria-pressed={activeView === 'completed'}
+                >
+                  <BadgeCheck aria-hidden="true" />
+                  <span>Histórico concluído</span>
+                </button>
+                <CronogramaCycleSlotTarget className="cronograma-workbench-cycle" />
+              </div>
+
+              {activeView !== 'timeline' && activeView !== 'completed' && (
+                <CronogramaCycleBar
+                  label="Visão operacional"
+                  title={CRONOGRAMA_VIEW_LABELS[activeView]}
+                />
+              )}
+
+
+              {operationalContent}
             </div>
-
-            {activeView !== 'timeline' && activeView !== 'completed' && (
-              <CronogramaCycleBar
-                label="Visão operacional"
-                title={CRONOGRAMA_VIEW_LABELS[activeView]}
-              />
-            )}
-
-
-            {operationalContent}
-          </div>
+          </CronogramaCycleSlotProvider>
         </CronogramaFiltersSlotProvider>
       )}
+
 
 
 

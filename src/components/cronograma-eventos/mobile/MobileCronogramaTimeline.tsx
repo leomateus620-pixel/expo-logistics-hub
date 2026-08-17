@@ -44,7 +44,10 @@ import {
 } from '../CronogramaBadges';
 import { statusLabels } from '../cronogramaData';
 import { compareEventDates, formatLongDate } from '../dateUtils';
-import { CycleYearMark } from '../CycleYearMark';
+
+import { CronogramaCycleChips } from '../CronogramaCycleChips';
+import { CronogramaCyclePortal } from '../CronogramaCycleSlot';
+
 import { EventHarvestAnimation } from '../EventHarvestAnimation';
 import { splitEventResponsibles } from '../EventRelationFields';
 import { EventPeopleAvatars } from '../PersonAvatar';
@@ -298,39 +301,16 @@ export function MobileCronogramaTimeline({
       data-variant={variant}
       aria-label={variant === 'completed' ? 'Eventos concluídos por período' : 'Linha do tempo operacional móvel'}
     >
-      <div className="cronograma-mobile-cycle" aria-labelledby="cronograma-mobile-cycle-title">
-        <div className="cronograma-mobile-cycle-heading">
-          <div>
-            <p>Progresso do ciclo</p>
-            <h2 id="cronograma-mobile-cycle-title">2026–2028</h2>
-          </div>
-          <span>{selectedSummary?.stage ?? 'Ciclo oficial'}</span>
-        </div>
+      <CronogramaCyclePortal>
+        <CronogramaCycleChips
+          summaries={summaries}
+          selectedYear={position.year}
+          currentYear={currentYear}
+          onSelectYear={selectYear}
+          className="cronograma-cycle-chips--mobile"
+        />
+      </CronogramaCyclePortal>
 
-        <div className="cronograma-mobile-years" role="group" aria-label="Anos do planejamento institucional">
-          {summaries.map((summary) => {
-            const selected = summary.year === position.year;
-            const current = summary.year === currentYear;
-            return (
-              <button
-                key={summary.year}
-                type="button"
-                disabled={!summary.available}
-                onClick={() => selectYear(summary.year)}
-                className="cronograma-mobile-year"
-                data-selected={selected || undefined}
-                data-current={current || undefined}
-                aria-pressed={selected}
-                aria-label={`${summary.year}, etapa ${summary.stage}, ${summary.filtered === summary.total ? summary.total : `${summary.filtered} de ${summary.total}`} eventos${current ? ', ano atual' : ''}`}
-              >
-                <strong><CycleYearMark year={summary.year} /></strong>
-                <span>{summary.stage}</span>
-                <small>{summary.filtered === summary.total ? summary.total : `${summary.filtered}/${summary.total}`} eventos</small>
-              </button>
-            );
-          })}
-        </div>
-      </div>
 
       <nav className="cronograma-mobile-month-navigation" aria-label="Navegação entre meses">
         <button
@@ -344,7 +324,9 @@ export function MobileCronogramaTimeline({
         </button>
         <div className="cronograma-mobile-month-context">
           <h2>{mobileMonthLabel(position.month)}</h2>
+          <p className="cronograma-mobile-month-stage">{selectedSummary?.stage ?? 'Ciclo oficial'}</p>
         </div>
+
         <button
           type="button"
           onClick={() => nextMonth && goToMonth(nextMonth)}
