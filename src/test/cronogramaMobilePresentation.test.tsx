@@ -334,12 +334,11 @@ describe('navegação e filtros móveis', () => {
     const today = within(dialog).getByRole('button', { name: 'Hoje' });
     expect(today).toHaveAttribute('aria-pressed', 'false');
     fireEvent.click(today);
-    fireEvent.click(within(dialog).getByRole('button', { name: 'Aplicar filtros' }));
-    expect(onFiltersChange).toHaveBeenCalledWith(expect.objectContaining({ period: 'today' }));
     expect(within(dialog).getByRole('combobox', { name: 'Ano' })).toBeInTheDocument();
     expect(within(dialog).getByRole('combobox', { name: 'Mês' })).toBeInTheDocument();
     expect(within(dialog).getByRole('switch', { name: 'Somente cronograma oficial' })).toHaveAttribute('aria-checked', 'false');
-    expect(within(dialog).getByRole('button', { name: 'Aplicar filtros' })).toBeInTheDocument();
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Aplicar filtros' }));
+    expect(onFiltersChange).toHaveBeenCalledWith(expect.objectContaining({ period: 'today' }));
 
     expect(container.querySelector('.cronograma-view-tabs')).not.toBeInTheDocument();
     expect(container.querySelector('.cronograma-filter-surface')).not.toBeInTheDocument();
