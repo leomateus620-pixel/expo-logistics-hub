@@ -1,29 +1,29 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { AlertTriangle, CalendarDays, Loader2, RefreshCw } from 'lucide-react';
+import { AlertTriangle, BadgeCheck, CalendarDays, Loader2, RefreshCw } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { CalendarMonthView } from '@/components/cronograma-eventos/CalendarMonthView';
 import { UndatedBoard } from '@/components/cronograma-eventos/CronogramaBoards';
-import { CronogramaCommandHeader } from '@/components/cronograma-eventos/CronogramaCommandHeader';
 import { CronogramaCycleBar } from '@/components/cronograma-eventos/CronogramaCycleBar';
 import { CronogramaFiltersSlotProvider } from '@/components/cronograma-eventos/CronogramaFiltersSlot';
 import { CronogramaFiltersTrigger } from '@/components/cronograma-eventos/CronogramaFiltersTrigger';
-import { CronogramaRegistrationAction } from '@/components/cronograma-eventos/CronogramaRegistrationAction';
+import { CronogramaSecondaryNav } from '@/components/cronograma-eventos/CronogramaSecondaryNav';
 import { useCronogramaSearch } from '@/components/cronograma-eventos/CronogramaSearchContext';
+import { useCronogramaShell } from '@/components/cronograma-eventos/CronogramaShellContext';
 
 import {
   CronogramaTimelineBoard,
   CronogramaTimelineSkeleton,
 } from '@/components/cronograma-eventos/CronogramaTimelineBoard';
-import { CronogramaViewTabs, ViewContentTransition } from '@/components/cronograma-eventos/CronogramaViewTabs';
+import { ViewContentTransition } from '@/components/cronograma-eventos/CronogramaViewTabs';
 import { EventDrawer } from '@/components/cronograma-eventos/EventDrawer';
 import { EventForm } from '@/components/cronograma-eventos/EventForm';
 import { MobileCreateEventScreen } from '@/components/cronograma-eventos/mobile/MobileCreateEventScreen';
 import { MobileCronogramaErrorBoundary } from '@/components/cronograma-eventos/mobile/MobileCronogramaErrorBoundary';
 import { MobileCronogramaFilters } from '@/components/cronograma-eventos/mobile/MobileCronogramaFilters';
-import { MobileCronogramaHeader } from '@/components/cronograma-eventos/mobile/MobileCronogramaHeader';
 import { MobileCronogramaNavigation } from '@/components/cronograma-eventos/mobile/MobileCronogramaNavigation';
 import { MobileCronogramaTimeline } from '@/components/cronograma-eventos/mobile/MobileCronogramaTimeline';
+
 import { MobileEventScreen } from '@/components/cronograma-eventos/mobile/MobileEventScreen';
 import { compareEventDates } from '@/components/cronograma-eventos/dateUtils';
 import {
