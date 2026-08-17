@@ -57,7 +57,6 @@ import { useAuth } from '@/hooks/useAuth';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import { cn } from '@/lib/utils';
 
-import { MeetingDiagnosticsPanel } from './MeetingDiagnosticsPanel';
 import { MeetingIntelligenceMark } from './MeetingIntelligenceMark';
 
 const CONSENT_VERSION = 'fenasoja-agenda-meeting-consent-v1';
