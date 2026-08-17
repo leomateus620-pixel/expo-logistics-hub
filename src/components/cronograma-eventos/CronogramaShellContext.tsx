@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
 
 type CreateAction = (() => void) | null;
 
@@ -11,13 +11,17 @@ const CronogramaShellContext = createContext<CronogramaShellContextValue | null>
 
 export function CronogramaShellProvider({ children }: { children: ReactNode }) {
   const [createAction, setCreateAction] = useState<CreateAction>(null);
-  const value = useMemo<CronogramaShellContextValue>(() => ({
-    createAction,
-    registerCreateAction: (action: CreateAction) => setCreateAction(() => action),
-  }), [createAction]);
+  const registerCreateAction = useCallback((action: CreateAction) => {
+    setCreateAction(() => action);
+  }, []);
+  const value = useMemo<CronogramaShellContextValue>(
+    () => ({ createAction, registerCreateAction }),
+    [createAction, registerCreateAction],
+  );
 
   return <CronogramaShellContext.Provider value={value}>{children}</CronogramaShellContext.Provider>;
 }
+
 
 /** Returns null when rendered outside the cronograma module shell. */
 export function useCronogramaShell() {
