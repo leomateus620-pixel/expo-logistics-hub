@@ -581,3 +581,13 @@
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
+
+@media (max-width: 430px) {
+  .cronograma-page[data-presentation='mobile'] .cronograma-mobile-month-stage {
+    display: none;
+  }
+
+  .cronograma-page[data-presentation='mobile'] .cronograma-mobile-month-context h2 {
+    font-size: 0.88rem;
+  }
+}
