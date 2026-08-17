@@ -739,3 +739,7 @@
     max-width: none;
   }
 }
+
+.cronograma-page {
+  overflow-x: clip;
+}
