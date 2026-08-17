@@ -15,22 +15,26 @@ export const CronogramaPreparationPill = memo(function CronogramaPreparationPill
       <PopoverTrigger asChild>
         <button
           type="button"
-          className="cronograma-command-chip cronograma-command-chip--preparation focus-ring"
+          className="cronograma-command-preparation focus-ring"
           aria-label={`Preparação 2026—2028: ${cycleProgress}% concluído`}
         >
-          <span
-            className="cronograma-command-ring"
-            style={{ '--ring-progress': `${cycleProgress}%` } as CSSProperties}
-            aria-hidden="true"
-          >
-            <strong>{cycleProgress}</strong>
+          <span className="cronograma-command-preparation__value" aria-hidden="true">
+            {cycleProgress}
+            <small>%</small>
           </span>
-          <span className="cronograma-command-chip__label" aria-hidden="true">
-            <small>Preparação</small>
-            <b>2026—2028</b>
+
+          <span className="cronograma-command-preparation__body" aria-hidden="true">
+            <span className="cronograma-command-preparation__head">
+              <small>Preparação</small>
+              <b>2026—2028</b>
+            </span>
+            <span className="cronograma-command-preparation__track">
+              <span style={{ '--preparation-progress': cycleProgress / 100 } as CSSProperties} />
+            </span>
           </span>
         </button>
       </PopoverTrigger>
+
 
       <PopoverContent align="end" sideOffset={10} className="cronograma-command-popover">
         <header className="cronograma-command-popover__head">
