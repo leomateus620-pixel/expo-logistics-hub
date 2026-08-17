@@ -225,7 +225,7 @@ export function MobileCronogramaFilters({
           closeLabel="Fechar filtros avançados"
         >
           <SheetHeader className="cronograma-mobile-filter-sheet-header">
-            <SheetTitle>Filtros</SheetTitle>
+            <SheetTitle>Filtros avançados</SheetTitle>
             <SheetDescription className="sr-only">
               Selecione os critérios para filtrar os eventos.
             </SheetDescription>
