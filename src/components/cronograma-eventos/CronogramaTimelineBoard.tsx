@@ -1,4 +1,4 @@
-import { useCallback, useMemo, type CSSProperties } from 'react';
+import { useCallback, useEffect, useMemo, type CSSProperties } from 'react';
 import {
   BadgeCheck,
   CalendarClock,
@@ -51,6 +51,7 @@ import { EventHarvestAnimation } from './EventHarvestAnimation';
 import { CronogramaCycleChips } from './CronogramaCycleChips';
 import { CronogramaCyclePortal } from './CronogramaCycleSlot';
 import { useCronogramaFiltersSlot } from './CronogramaFiltersSlot';
+import { useCronogramaShell } from './CronogramaShellContext';
 
 
 import { splitEventResponsibles } from './EventRelationFields';
