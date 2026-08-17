@@ -1,14 +1,11 @@
 import type { ReactNode } from 'react';
-import { CalendarRange, ChevronLeft, LogOut, Plus } from 'lucide-react';
+import { CalendarRange, ChevronLeft, LogOut } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { CronogramaGoogleStatusButton } from '@/components/cronograma-eventos/CronogramaGoogleStatusButton';
 import { CronogramaHeaderSearch } from '@/components/cronograma-eventos/CronogramaHeaderSearch';
 import { CronogramaPreparationPill } from '@/components/cronograma-eventos/CronogramaPreparationPill';
 import { CronogramaSearchProvider } from '@/components/cronograma-eventos/CronogramaSearchContext';
-import {
-  CronogramaShellProvider,
-  useCronogramaShell,
-} from '@/components/cronograma-eventos/CronogramaShellContext';
+import { CronogramaShellProvider } from '@/components/cronograma-eventos/CronogramaShellContext';
 import { WeeklySummaryPill } from '@/components/cronograma-eventos/WeeklySummaryPill';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
@@ -17,7 +14,6 @@ import '@/styles/cronograma-command-layer.css';
 function CronogramaCommandBar() {
   const { signOut } = useAuth();
   const navigate = useNavigate();
-  const shell = useCronogramaShell();
 
   const handleSignOut = async () => {
     await signOut();
