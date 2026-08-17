@@ -135,7 +135,9 @@ export function CronogramaTimelineBoard({
     () => monthKeys.length ? getInitialTimelineMonth(events, todayKey) : null,
     [events, monthKeys.length, todayKey],
   );
+  const filtersSlot = useCronogramaFiltersSlot();
   const snapshot = useMemo(() => getTimelineSnapshot(events, todayKey), [events, todayKey]);
+
   const undated = useMemo(() => events.filter((event) => !event.date), [events]);
   const navigation = useTimelineCycleNavigation({
     monthKeys,
