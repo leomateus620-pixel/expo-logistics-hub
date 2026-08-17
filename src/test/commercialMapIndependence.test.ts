@@ -63,4 +63,18 @@ describe('arquitetura independente do Mapa Comercial', () => {
     expect(toolbar).toContain('Filtros');
     expect(toolbar).not.toContain('Editar geometria');
   });
+
+  it('monta uma única camada de árvores instanciada nos dois contextos compartilhados', () => {
+    const canvas = read('src/features/commercial-map/components/canvas/CommercialMapCanvas.tsx');
+    const treeLayer = read('src/features/commercial-map/components/canvas/CommercialTreeLayer.tsx');
+    const commissionPage = read('src/pages/commissions/CommissionCommercialMapPage.tsx');
+
+    expect(canvas.match(/<CommercialTreeLayer/g)).toHaveLength(1);
+    expect(treeLayer.match(/<instancedMesh/g)).toHaveLength(4);
+    expect(treeLayer.match(/raycast=\{NO_RAYCAST\}/g)).toHaveLength(4);
+    expect(treeLayer).toContain('computeBoundingSphere()');
+    expect(treeLayer).toContain('gl.shadowMap.needsUpdate = true');
+    expect(commissionPage).toContain('<CommercialMapWorkspace scope={scope} />');
+    expect(commissionPage).not.toContain('CommercialTreeLayer');
+  });
 });

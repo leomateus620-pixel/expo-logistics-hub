@@ -27,6 +27,7 @@ describe('pipeline de seleção do mapa comercial', () => {
       workspaceMode: '3d',
       cameraNavigating: false,
       activeSegmentId: null,
+      treesVisible: true,
     });
   });
 
@@ -209,6 +210,21 @@ describe('pipeline de seleção do mapa comercial', () => {
       workspaceMode: 'list',
       cameraSequence: initialSequence,
     });
+  });
+
+  it('preserva a preferência ambiental ao alternar entre mapa geral e comissão', () => {
+    useCommercialMapStore.getState().setTreesVisible(false);
+    useCommercialMapStore.getState().activateScope('full', null);
+    useCommercialMapStore.getState().activateScope(
+      'commission:industria-comercio-servicos',
+      COMMERCIAL_MAP_SEGMENT_IDS.industry,
+    );
+
+    expect(useCommercialMapStore.getState().treesVisible).toBe(false);
+
+    useCommercialMapStore.getState().setTreesVisible(true);
+    useCommercialMapStore.getState().activateScope('full:retorno', null);
+    expect(useCommercialMapStore.getState().treesVisible).toBe(true);
   });
 });
 

@@ -19,6 +19,7 @@ import {
   selectionFocusProfile,
 } from '../../utils/interaction';
 import { normalizeMapEntityMetadata, type MapLabelVisibility } from '../../utils/mapMetadata';
+import { selectCommercialTreesForScene } from '../../utils/treeLayer';
 import {
   resolveStrategicLandmarkKind,
   strategicLandmarkFocusDirection,
@@ -40,6 +41,7 @@ import { LivestockPavilionInteriorScene } from './LivestockPavilionInteriorScene
 import { RoadInfrastructure } from './RoadInfrastructure';
 import { StrategicLandmarkMesh } from './StrategicLandmarks';
 import { TechnicalValidationOverlay } from './TechnicalValidationOverlay';
+import { CommercialTreeLayer } from './CommercialTreeLayer';
 import {
   buildCommercialMapSegmentIndex,
   getCommercialMapSegment,
@@ -1707,6 +1709,7 @@ function Scene({
   const focusSelection = useCommercialMapStore((state) => state.focusSelection);
   const enterInterior = useCommercialMapStore((state) => state.enterInterior);
   const labelsVisible = useCommercialMapStore((state) => state.labelsVisible);
+  const treesVisible = useCommercialMapStore((state) => state.treesVisible);
   const layerVisibility = useCommercialMapStore((state) => state.layerVisibility);
   const layerOpacity = useCommercialMapStore((state) => state.layerOpacity);
   const reducedGraphics = useCommercialMapStore((state) => state.reducedGraphics);
@@ -1761,6 +1764,10 @@ function Scene({
   const structuralEntities = useMemo(() => nonLotEntities.filter((entity) => (
     entity.classification !== 'ROAD' && entity.classification !== 'PEDESTRIAN_PATH'
   )), [nonLotEntities]);
+  const sceneTrees = useMemo(
+    () => selectCommercialTreesForScene(entities, lots),
+    [entities, lots],
+  );
   const activeSegmentEntities = useMemo(
     () => activeSegment
       ? renderedEntities.filter((entity) => segmentByEntity.get(entity.id)?.id === activeSegment.id)
@@ -1786,7 +1793,7 @@ function Scene({
     gl.shadowMap.needsUpdate = true;
     invalidate();
     return () => { gl.shadowMap.autoUpdate = true; };
-  }, [entities, gl, interiorEntityId, invalidate, reducedGraphics]);
+  }, [entities, gl, interiorEntityId, invalidate, reducedGraphics, sceneTrees, treesVisible]);
 
   useEffect(() => {
     if (!cameraNavigating) return;
@@ -1888,6 +1895,12 @@ function Scene({
           onCursor={setCanvasCursor}
         />
       ))}
+      <CommercialTreeLayer
+        trees={sceneTrees}
+        surfaceEntities={entities}
+        visible={treesVisible}
+        reducedGraphics={reducedGraphics}
+      />
       {renderedEntities.filter((entity) => labelVisibility.ids.has(entity.id)).map((entity) => (
         <EntityLabel
           key={`label:${entity.id}`}

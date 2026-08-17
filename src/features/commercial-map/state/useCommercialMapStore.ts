@@ -39,6 +39,7 @@ interface CommercialMapState {
   referenceVisible: boolean;
   referenceOpacity: number;
   labelsVisible: boolean;
+  treesVisible: boolean;
   technicalValidationVisible: boolean;
   reducedGraphics: boolean;
   cameraNavigating: boolean;
@@ -70,6 +71,7 @@ interface CommercialMapState {
   setReferenceVisible: (visible: boolean) => void;
   setReferenceOpacity: (opacity: number) => void;
   setLabelsVisible: (visible: boolean) => void;
+  setTreesVisible: (visible: boolean) => void;
   setTechnicalValidationVisible: (visible: boolean) => void;
   setReducedGraphics: (reduced: boolean) => void;
   setCameraNavigating: (navigating: boolean) => void;
@@ -98,6 +100,7 @@ export const useCommercialMapStore = create<CommercialMapState>((set) => ({
   referenceVisible: true,
   referenceOpacity: 0.18,
   labelsVisible: true,
+  treesVisible: true,
   technicalValidationVisible: false,
   reducedGraphics: false,
   cameraNavigating: false,
@@ -232,6 +235,7 @@ export const useCommercialMapStore = create<CommercialMapState>((set) => ({
   setReferenceVisible: (referenceVisible) => set({ referenceVisible }),
   setReferenceOpacity: (referenceOpacity) => set({ referenceOpacity }),
   setLabelsVisible: (labelsVisible) => set({ labelsVisible }),
+  setTreesVisible: (treesVisible) => set({ treesVisible }),
   setTechnicalValidationVisible: (technicalValidationVisible) => set({ technicalValidationVisible }),
   setReducedGraphics: (reducedGraphics) => set({ reducedGraphics }),
   setCameraNavigating: (cameraNavigating) => set({ cameraNavigating }),

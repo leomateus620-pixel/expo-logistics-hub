@@ -74,12 +74,14 @@ function entityId(publicIdentifier: string) {
   return `reference:2026:${slug(publicIdentifier)}`;
 }
 
-function pdfToLocal([x, y]: PdfPoint): Coordinate {
+export function officialPdfPointToLocal([x, y]: readonly [number, number]): Coordinate {
   return [
     ((x - CROP.x) / CROP.width) * MAP_REFERENCE_WIDTH - MAP_REFERENCE_WIDTH / 2,
     ((y - CROP.y) / CROP.height) * MAP_REFERENCE_HEIGHT - MAP_REFERENCE_HEIGHT / 2,
   ];
 }
+
+const pdfToLocal = officialPdfPointToLocal;
 
 function rectPdf([x1, y1, x2, y2]: PdfBounds, inset = 0): PdfPolygon {
   return [
