@@ -2,10 +2,7 @@ import { useCallback, useEffect, useMemo, type CSSProperties } from 'react';
 import {
   BadgeCheck,
   CalendarClock,
-  CalendarDays,
   ChevronDown,
-  ChevronLeft,
-  ChevronRight,
   CircleAlert,
   Layers3,
   ListChecks,
