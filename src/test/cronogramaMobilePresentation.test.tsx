@@ -324,20 +324,18 @@ describe('navegação e filtros móveis', () => {
     expect(onViewChange).toHaveBeenCalledWith('completed');
 
     const filters = screen.getByRole('region', { name: 'Busca e filtros do cronograma' });
-    expect(within(filters).getByRole('textbox', { name: 'Buscar no cronograma' })).toHaveAttribute(
-      'placeholder',
-      'Buscar evento, pessoa ou comissão',
-    );
     expect(within(filters).getByText('2 de 3 eventos')).toHaveAttribute('aria-live', 'polite');
     expect(within(filters).getByRole('status')).toHaveTextContent('Sincronizando');
-
-    const today = within(filters).getByRole('button', { name: 'Hoje' });
-    expect(today).toHaveAttribute('aria-pressed', 'false');
-    fireEvent.click(today);
-    expect(onFiltersChange).toHaveBeenCalledWith(expect.objectContaining({ period: 'today' }));
+    expect(within(filters).queryByRole('textbox')).not.toBeInTheDocument();
 
     fireEvent.click(within(filters).getByRole('button', { name: 'Abrir filtros avançados' }));
     const dialog = await screen.findByRole('dialog', { name: 'Filtros avançados' });
+
+    const today = within(dialog).getByRole('button', { name: 'Hoje' });
+    expect(today).toHaveAttribute('aria-pressed', 'false');
+    fireEvent.click(today);
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Aplicar filtros' }));
+    expect(onFiltersChange).toHaveBeenCalledWith(expect.objectContaining({ period: 'today' }));
     expect(within(dialog).getByRole('combobox', { name: 'Ano' })).toBeInTheDocument();
     expect(within(dialog).getByRole('combobox', { name: 'Mês' })).toBeInTheDocument();
     expect(within(dialog).getByRole('switch', { name: 'Somente cronograma oficial' })).toHaveAttribute('aria-checked', 'false');
@@ -375,7 +373,6 @@ describe('navegação e filtros móveis', () => {
     });
     expect(window.location.href).toBe(routeBefore);
     expect(onOverlayOpenChange).toHaveBeenLastCalledWith(false);
-    expect(screen.getByRole('button', { name: 'Todo o ciclo' })).toHaveAttribute('aria-pressed', 'true');
     expect(screen.getByText('3 de 3 eventos')).toBeInTheDocument();
   });
 });
