@@ -530,6 +530,19 @@ export default function CronogramaEventosPage() {
     setCreateOpen(true);
   };
 
+  const shell = useCronogramaShell();
+  const registerCreateAction = shell?.registerCreateAction;
+  const canManageEvents = cronograma.canManage;
+  const openCreateRef = useRef(openCreate);
+  openCreateRef.current = openCreate;
+
+  useEffect(() => {
+    if (!registerCreateAction) return;
+    registerCreateAction(canManageEvents ? () => openCreateRef.current() : null);
+    return () => registerCreateAction(null);
+  }, [registerCreateAction, canManageEvents]);
+
+
   const handleCreateOpenChange = (open: boolean) => {
     overlayOpenRef.current.create = open;
     if (open) {
