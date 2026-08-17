@@ -5,6 +5,7 @@ import { CronogramaGoogleStatusButton } from '@/components/cronograma-eventos/Cr
 import { CronogramaHeaderSearch } from '@/components/cronograma-eventos/CronogramaHeaderSearch';
 import { CronogramaPreparationPill } from '@/components/cronograma-eventos/CronogramaPreparationPill';
 import { CronogramaSearchProvider } from '@/components/cronograma-eventos/CronogramaSearchContext';
+import { CronogramaTemporalControls } from '@/components/cronograma-eventos/CronogramaTemporalControls';
 import { CronogramaShellProvider } from '@/components/cronograma-eventos/CronogramaShellContext';
 import { WeeklySummaryPill } from '@/components/cronograma-eventos/WeeklySummaryPill';
 import { Button } from '@/components/ui/button';
