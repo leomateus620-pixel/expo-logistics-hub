@@ -743,3 +743,15 @@
 .cronograma-page {
   overflow-x: clip;
 }
+
+/* Barra temporal enxuta (o cabeçalho do mês vive dentro da timeline). */
+.cronograma-page .cronograma-temporal-nav {
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding-block: 0.4rem;
+  min-height: 0;
+}
+
+.cronograma-page .cronograma-temporal-nav > .ml-auto {
+  margin-left: 0;
+}
