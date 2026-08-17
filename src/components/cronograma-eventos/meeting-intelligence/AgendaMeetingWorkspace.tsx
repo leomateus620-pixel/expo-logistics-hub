@@ -850,7 +850,6 @@ function PersistedMeetingWorkspace({
         </section>
       )}
 
-      <MeetingDiagnosticsPanel defaultOpen={capture.state.phase === 'fatal_error'} />
 
       <div className="agenda-meeting__history-heading">
         <div>
