@@ -16,7 +16,17 @@ import {
   type CommercialPavilionRect,
 } from '@/features/commercial-map/utils/commercialPavilions';
 
-const EXPECTED_IDENTIFIERS = ['B1', 'B2', 'B3', 'B4', 'B5', 'B6'] as const;
+const EXPECTED_IDENTIFIERS = [
+  'B1',
+  'B2',
+  'B3',
+  'B4',
+  'B5',
+  'B6',
+  'B8',
+  'B10',
+] as const;
+const EXTERIOR_FACING_IDENTIFIERS = ['B1', 'B2', 'B3', 'B4', 'B5', 'B6'] as const;
 const EXPECTED_PAVILION_NUMBERS = {
   B1: 1,
   B2: 14,
@@ -24,6 +34,8 @@ const EXPECTED_PAVILION_NUMBERS = {
   B4: 8,
   B5: 13,
   B6: 3,
+  B8: 5,
+  B10: 7,
 } as const;
 const EXPECTED_FACING_RADIANS = {
   B1: Math.PI / 2,
@@ -32,6 +44,8 @@ const EXPECTED_FACING_RADIANS = {
   B4: Math.PI,
   B5: Math.PI,
   B6: Math.PI,
+  B8: 0,
+  B10: 0,
 } as const satisfies Record<CommercialPavilionPublicIdentifier, number>;
 
 const officialPavilions = EXPECTED_IDENTIFIERS.map((publicIdentifier) => {
@@ -94,7 +108,9 @@ function closestLotInBlock(entity: MapEntity, block: 'I' | 'D'): MapEntity {
   return closest;
 }
 
-function targetFor(publicIdentifier: CommercialPavilionPublicIdentifier): MapEntity {
+function targetFor(
+  publicIdentifier: (typeof EXTERIOR_FACING_IDENTIFIERS)[number],
+): MapEntity {
   if (publicIdentifier === 'B1') {
     const lot = OFFICIAL_REFERENCE_ENTITIES.find((entity) => entity.publicIdentifier === 'Q-I-01');
     if (!lot) throw new Error('Missing official lot Q-I-01');
@@ -145,7 +161,7 @@ function expectRectInside(
 }
 
 describe('família arquitetônica dos pavilhões comerciais', () => {
-  it('registra exatamente B1–B6 e preserva o mapeamento oficial dos pavilhões', () => {
+  it('registra os oito pavilhões internos e preserva o mapeamento oficial', () => {
     expect(COMMERCIAL_PAVILION_PUBLIC_IDENTIFIERS).toEqual(EXPECTED_IDENTIFIERS);
     expect(Object.keys(COMMERCIAL_PAVILION_DEFINITIONS)).toEqual(EXPECTED_IDENTIFIERS);
     expect(officialPavilions).toHaveLength(EXPECTED_IDENTIFIERS.length);
@@ -164,9 +180,9 @@ describe('família arquitetônica dos pavilhões comerciais', () => {
   it('atribui variação, cobertura e hierarquia de foco únicas sem perder a orientação comum', () => {
     const definitions = Object.values(COMMERCIAL_PAVILION_DEFINITIONS);
 
-    expect(new Set(definitions.map((definition) => definition.variant)).size).toBe(6);
-    expect(new Set(definitions.map((definition) => definition.roofProfile)).size).toBe(6);
-    expect(new Set(definitions.map((definition) => definition.entrancePattern)).size).toBe(6);
+    expect(new Set(definitions.map((definition) => definition.variant)).size).toBe(8);
+    expect(new Set(definitions.map((definition) => definition.roofProfile)).size).toBe(8);
+    expect(new Set(definitions.map((definition) => definition.entrancePattern)).size).toBe(8);
 
     definitions.forEach((definition) => {
       expect(definition.facingRadians).toBe(EXPECTED_FACING_RADIANS[definition.publicIdentifier]);
@@ -178,8 +194,8 @@ describe('família arquitetônica dos pavilhões comerciais', () => {
   });
 
   it('orienta as fachadas para seus alvos físicos e posiciona a câmera no mesmo lado público', () => {
-    EXPECTED_IDENTIFIERS.forEach((publicIdentifier, index) => {
-      const pavilion = officialPavilions[index];
+    EXTERIOR_FACING_IDENTIFIERS.forEach((publicIdentifier) => {
+      const pavilion = officialPavilions[EXPECTED_IDENTIFIERS.indexOf(publicIdentifier)];
       const target = targetFor(publicIdentifier);
       const definition = COMMERCIAL_PAVILION_DEFINITIONS[publicIdentifier];
       const [pavilionX, pavilionZ] = centerFor(pavilion);
@@ -255,7 +271,8 @@ describe('família arquitetônica dos pavilhões comerciais', () => {
     expect(resolveCommercialPavilionDefinition({ publicIdentifier: 'B12' })).toBeNull();
     expect(commercialPavilionSupportsInterior({ publicIdentifier: 'B12' })).toBe(false);
     expect(commercialPavilionFocusDirection({ publicIdentifier: 'B12' })).toBeNull();
-    expect(resolveCommercialPavilionDefinition({ publicIdentifier: 'B10' })).toBeNull();
+    expect(resolveCommercialPavilionDefinition({ publicIdentifier: 'B10' })?.pavilionNumber).toBe(7);
+    expect(resolveCommercialPavilionDefinition({ publicIdentifier: 'B7' })).toBeNull();
   });
 
   it('troca os eixos somente em quartos de volta cardinais', () => {

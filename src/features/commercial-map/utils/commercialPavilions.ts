@@ -7,6 +7,8 @@ export const COMMERCIAL_PAVILION_PUBLIC_IDENTIFIERS = [
   'B4',
   'B5',
   'B6',
+  'B8',
+  'B10',
 ] as const;
 
 export type CommercialPavilionPublicIdentifier =
@@ -18,7 +20,9 @@ export type CommercialPavilionVariant =
   | 'sawtooth-industrial'
   | 'monitor-industrial'
   | 'stepped-market'
-  | 'triple-portal';
+  | 'triple-portal'
+  | 'garden-gallery'
+  | 'agroindustry-market';
 
 export type CommercialPavilionRoofProfile =
   | 'broad-gable'
@@ -26,7 +30,9 @@ export type CommercialPavilionRoofProfile =
   | 'northlight-sawtooth'
   | 'raised-monitor'
   | 'asymmetric-shed'
-  | 'triple-gable';
+  | 'triple-gable'
+  | 'clerestory-span'
+  | 'longitudinal-gable';
 
 export type CommercialPavilionEntrancePattern =
   | 'grand-central'
@@ -34,7 +40,9 @@ export type CommercialPavilionEntrancePattern =
   | 'paired-offset'
   | 'side-service'
   | 'recessed-central'
-  | 'triple-bays';
+  | 'triple-bays'
+  | 'paired-end-bays'
+  | 'paired-market-bays';
 
 export interface CommercialPavilionBoundsDimensions {
   width: number;
@@ -43,7 +51,7 @@ export interface CommercialPavilionBoundsDimensions {
 
 export interface CommercialPavilionDefinition {
   publicIdentifier: CommercialPavilionPublicIdentifier;
-  pavilionNumber: 1 | 3 | 8 | 12 | 13 | 14;
+  pavilionNumber: 1 | 3 | 5 | 7 | 8 | 12 | 13 | 14;
   officialName: string;
   activity: string;
   variant: CommercialPavilionVariant;
@@ -152,7 +160,7 @@ export interface CommercialPavilionLayout {
 }
 
 /**
- * Six official pavilion footprints, one architectural family and no prefix
+ * Eight official pavilion footprints, one architectural family and no prefix
  * matching. In particular, pavilion 12 is B3; B12 is the Fenasoja
  * headquarters and intentionally does not belong to this registry.
  */
@@ -265,6 +273,42 @@ export const COMMERCIAL_PAVILION_DEFINITIONS = {
       centralMassRatio: 0,
     },
   },
+  B8: {
+    publicIdentifier: 'B8',
+    pavilionNumber: 5,
+    officialName: 'Pavilhão 5 — Floriculturas',
+    activity: 'Floriculturas',
+    variant: 'garden-gallery',
+    roofProfile: 'clerestory-span',
+    entrancePattern: 'paired-end-bays',
+    entranceCount: 2,
+    facingRadians: 0,
+    focusDirection: [0.12, 0.84, 0.96],
+    visualHeight: { scale: 0.45, min: 2.2, max: 2.54 },
+    facade: {
+      entranceWidthRatio: 0.2,
+      entranceHeightRatio: 0.58,
+      centralMassRatio: 0,
+    },
+  },
+  B10: {
+    publicIdentifier: 'B10',
+    pavilionNumber: 7,
+    officialName: 'Pavilhão 7 — Agricultura familiar / soja e derivados',
+    activity: 'Agricultura familiar / agroindústrias',
+    variant: 'agroindustry-market',
+    roofProfile: 'longitudinal-gable',
+    entrancePattern: 'paired-market-bays',
+    entranceCount: 2,
+    facingRadians: 0,
+    focusDirection: [0.08, 0.8, 0.98],
+    visualHeight: { scale: 0.44, min: 2.22, max: 2.56 },
+    facade: {
+      entranceWidthRatio: 0.24,
+      entranceHeightRatio: 0.56,
+      centralMassRatio: 0,
+    },
+  },
 } as const satisfies Readonly<
   Record<CommercialPavilionPublicIdentifier, CommercialPavilionDefinition>
 >;
@@ -354,6 +398,8 @@ function roofRiseRatio(profile: CommercialPavilionRoofProfile): number {
   if (profile === 'raised-monitor') return 0.21;
   if (profile === 'asymmetric-shed') return 0.17;
   if (profile === 'triple-gable') return 0.25;
+  if (profile === 'clerestory-span') return 0.21;
+  if (profile === 'longitudinal-gable') return 0.19;
   return 0.2;
 }
 
@@ -362,6 +408,7 @@ function roofSectionCount(profile: CommercialPavilionRoofProfile): number {
   if (profile === 'northlight-sawtooth') return 4;
   if (profile === 'raised-monitor') return 2;
   if (profile === 'triple-gable') return 3;
+  if (profile === 'clerestory-span') return 2;
   return 1;
 }
 
@@ -394,6 +441,12 @@ function entranceCenters(
   }
   if (definition.entrancePattern === 'triple-bays') {
     return [-shellWidth * 0.3, 0, shellWidth * 0.3];
+  }
+  if (definition.entrancePattern === 'paired-end-bays') {
+    return [-shellWidth * 0.32, shellWidth * 0.32];
+  }
+  if (definition.entrancePattern === 'paired-market-bays') {
+    return [-shellWidth * 0.22, shellWidth * 0.22];
   }
   return [0];
 }

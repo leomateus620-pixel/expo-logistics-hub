@@ -123,7 +123,7 @@ describe('registro de segmentos do Mapa Comercial 3D', () => {
       'E-18', 'E-19', 'E-20', 'E-22', 'E-23', 'E-24',
     ]));
     expect(identifiers).not.toEqual(expect.arrayContaining([
-      'QUADRA-N', 'B7', 'B11', 'B15', 'C1', 'QUADRA-C', 'QUADRA-B', 'QUADRA-A',
+      'QUADRA-N', 'B7', 'B8', 'B10', 'B11', 'B15', 'C1', 'QUADRA-C', 'QUADRA-B', 'QUADRA-A',
     ]));
 
     const inventory = commercialMapSegmentInventory(OFFICIAL_REFERENCE_ENTITIES, OFFICIAL_REFERENCE_LOTS);

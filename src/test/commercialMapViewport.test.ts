@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import {
+  COMMERCIAL_MAP_MANUAL_NAVIGATION_REFIT_SUPPRESSION_MS,
   resolveCommercialMapPixelRatio,
   resolveCommercialMapSheetSnap,
+  shouldSuppressCommercialMapResizeRefit,
 } from '@/features/commercial-map/utils/viewport';
 
 describe('viewport mobile do Mapa Comercial', () => {
@@ -56,6 +58,40 @@ describe('viewport mobile do Mapa Comercial', () => {
       viewportHeight: 1440,
       reducedGraphics: false,
     })).toBe(1.5);
+  });
+
+  it('reduz o DPR somente durante a navegação e recupera a qualidade ao finalizar', () => {
+    const viewport = {
+      devicePixelRatio: 3,
+      viewportWidth: 393,
+      viewportHeight: 852,
+      reducedGraphics: false,
+    };
+
+    const idle = resolveCommercialMapPixelRatio(viewport);
+    const navigating = resolveCommercialMapPixelRatio({ ...viewport, cameraNavigating: true });
+    const recovered = resolveCommercialMapPixelRatio({ ...viewport, cameraNavigating: false });
+
+    expect(idle).toBe(2.25);
+    expect(navigating).toBe(1.35);
+    expect(navigating).toBeLessThan(idle);
+    expect(recovered).toBe(idle);
+    expect(resolveCommercialMapPixelRatio({
+      ...viewport,
+      reducedGraphics: true,
+      cameraNavigating: true,
+    })).toBe(1);
+  });
+
+  it('faz a navegação manual vencer refits residuais do painel', () => {
+    const navigationEndedAt = 10_000;
+    const suppressionEndsAt = navigationEndedAt
+      + COMMERCIAL_MAP_MANUAL_NAVIGATION_REFIT_SUPPRESSION_MS;
+
+    expect(shouldSuppressCommercialMapResizeRefit(navigationEndedAt, suppressionEndsAt)).toBe(true);
+    expect(shouldSuppressCommercialMapResizeRefit(suppressionEndsAt - 1, suppressionEndsAt)).toBe(true);
+    expect(shouldSuppressCommercialMapResizeRefit(suppressionEndsAt, suppressionEndsAt)).toBe(false);
+    expect(shouldSuppressCommercialMapResizeRefit(Number.NaN, suppressionEndsAt)).toBe(false);
   });
 
   it('resolve os três snaps do painel sem iniciar expandido', () => {

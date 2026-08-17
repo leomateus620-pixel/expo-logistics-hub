@@ -273,6 +273,43 @@
 .commercial-map-shell.is-livestock-interior .commercial-map-viewport { background: #d9ddd5; }
 .commercial-map-shell.is-mirante-interior .commercial-map-viewport { background: #dfe5df; }
 
+.commercial-pavilion-plan-legend {
+  --pavilion-plan-accent: #1f7d5c;
+  margin: 12px;
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--pavilion-plan-accent) 30%, #d7dfd8);
+  border-radius: 14px;
+  background: rgba(250,252,248,.98);
+  color: #213b2c;
+  box-shadow: 0 12px 30px rgba(26,56,36,.1);
+}
+.commercial-pavilion-plan-legend > header { display: grid; grid-template-columns: 5px minmax(0,1fr); gap: 10px; padding: 11px 12px 9px; border-bottom: 1px solid rgba(31,66,43,.08); }
+.commercial-pavilion-plan-legend > header > i { width: 5px; height: 100%; min-height: 38px; border-radius: 999px; background: var(--pavilion-plan-accent); box-shadow: 0 0 0 4px color-mix(in srgb, var(--pavilion-plan-accent) 12%, transparent); }
+.commercial-pavilion-plan-legend > header > div { display: flex; min-width: 0; flex-direction: column; gap: 1px; }
+.commercial-pavilion-plan-legend > header span { color: #718078; font-size: 10px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+.commercial-pavilion-plan-legend > header strong { color: #173d2a; font-size: 15px; line-height: 1.15; }
+.commercial-pavilion-plan-legend > header small { overflow: hidden; color: #55675d; font-size: 11px; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
+.commercial-pavilion-plan-overview { display: grid; grid-template-columns: 92px minmax(0,1fr); align-items: center; gap: 11px; padding: 10px 12px; }
+.commercial-pavilion-plan-overview svg { display: block; width: 92px; height: 74px; overflow: visible; border-radius: 9px; background: #edf1ec; box-shadow: inset 0 0 0 1px rgba(31,65,42,.08); }
+.commercial-pavilion-plan-boundary { fill: #f7f8f5; stroke: #78857d; stroke-width: 1.25; vector-effect: non-scaling-stroke; }
+.commercial-pavilion-plan-corridor { fill: #dce3dc; stroke: rgba(93,111,98,.24); stroke-width: .6; vector-effect: non-scaling-stroke; }
+.commercial-pavilion-plan-corridor.is-atrium { fill: #e6ebe4; }
+.commercial-pavilion-plan-zone { fill: color-mix(in srgb, var(--pavilion-plan-accent) 66%, #fff); stroke: color-mix(in srgb, var(--pavilion-plan-accent) 88%, #173d2a); stroke-width: .65; vector-effect: non-scaling-stroke; }
+.commercial-pavilion-plan-overview dl { display: grid; min-width: 0; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 6px; margin: 0; }
+.commercial-pavilion-plan-overview dl > div { min-width: 0; padding: 6px 7px; border: 1px solid rgba(28,65,40,.07); border-radius: 8px; background: #f3f6f1; }
+.commercial-pavilion-plan-overview dt { color: #718078; font-size: 10px; font-weight: 800; letter-spacing: .045em; text-transform: uppercase; }
+.commercial-pavilion-plan-overview dd { overflow: hidden; margin: 1px 0 0; color: #173d2a; font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 850; text-overflow: ellipsis; white-space: nowrap; }
+.commercial-pavilion-plan-groups { display: flex; flex-wrap: wrap; gap: 5px; padding: 0 12px 10px; }
+.commercial-pavilion-plan-groups > span { display: inline-flex; min-width: 0; align-items: baseline; gap: 4px; padding: 4px 6px; border: 1px solid color-mix(in srgb, var(--pavilion-plan-accent) 20%, #dfe5df); border-radius: 999px; background: color-mix(in srgb, var(--pavilion-plan-accent) 7%, #fff); }
+.commercial-pavilion-plan-groups b { color: #204832; font-family: 'JetBrains Mono', monospace; font-size: 10px; }
+.commercial-pavilion-plan-groups small { overflow: hidden; max-width: 80px; color: #66756c; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.commercial-pavilion-plan-legend > footer { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 8px 12px 9px; border-top: 1px solid rgba(31,66,43,.07); background: #f2f5f0; }
+.commercial-pavilion-plan-legend > footer > span { display: inline-flex; align-items: center; gap: 5px; color: #53665a; font-size: 10px; font-weight: 800; }
+.commercial-pavilion-plan-legend > footer > span > i { width: 8px; height: 8px; border-radius: 2px; background: var(--pavilion-plan-accent); }
+.commercial-pavilion-plan-legend > footer > span:nth-child(2) > i { border: 1px solid #aeb9b0; background: #dde4dd; }
+.commercial-pavilion-plan-legend > footer > small { flex: 1 1 100%; color: #77837c; font-size: 10px; }
+.commercial-pavilion-plan-legend.is-interior { position: absolute; z-index: 15; bottom: 14px; left: 14px; width: min(360px, calc(100% - 28px)); margin: 0; pointer-events: none; background: rgba(250,252,248,.92); box-shadow: 0 16px 44px rgba(28,47,35,.18); backdrop-filter: blur(16px) saturate(1.08); }
+
 .commercial-map-structure-preview { display: flex; min-height: 330px; flex-direction: column; overflow: hidden; border: 1px solid rgba(25,61,36,.12); border-radius: 16px; background: #edf2eb; }
 .commercial-map-structure-preview svg { width: 100%; min-height: 0; flex: 1; background: radial-gradient(circle at 50% 50%, #f7faf5, #e6ece3); }
 .commercial-map-structure-preview .source-polygon { fill: rgba(25,61,36,.08); stroke: #486653; stroke-width: .22; stroke-dasharray: .5 .35; }
@@ -583,25 +620,25 @@
 .commercial-map-empty span { font-size: 9px; }
 .commercial-map-empty.compact { min-height: 120px; }
 
-.commercial-map-label { position: relative; display: flex; min-width: 38px; max-width: 175px; flex-direction: column; align-items: center; gap: 2px; contain: layout paint style; padding: 4px 6px; transform: translateY(-4px); border: 1px solid rgba(28,61,38,.2); border-radius: 7px; background: rgba(253,254,251,.97); color: #1d3828; box-shadow: 0 4px 12px rgba(23,50,30,.16); font-size: 7px; line-height: 1.15; text-align: center; white-space: nowrap; pointer-events: none; user-select: none; transition: opacity .16s ease, transform .16s ease, box-shadow .16s ease; }
+.commercial-map-label { position: relative; display: flex; min-width: 42px; max-width: 198px; flex-direction: column; align-items: center; gap: 2px; contain: layout style; padding: 5px 7px; transform: translate3d(0,-5px,0); border: 1px solid rgba(28,61,38,.2); border-radius: 8px; background: rgba(253,254,251,.97); color: #1d3828; box-shadow: 0 4px 12px rgba(23,50,30,.16); font-size: 10px; line-height: 1.18; text-align: center; white-space: nowrap; pointer-events: none; user-select: none; transition: opacity .14s ease, box-shadow .14s ease; }
 .commercial-map-label::after { position: absolute; bottom: -4px; left: calc(50% - 3px); width: 6px; height: 6px; transform: rotate(45deg); border-right: 1px solid rgba(28,61,38,.14); border-bottom: 1px solid rgba(28,61,38,.14); background: rgba(253,254,251,.87); content: ''; }
 .commercial-map-label > span { position: relative; z-index: 1; font-family: 'JetBrains Mono', monospace; font-weight: 800; }
 .commercial-map-label strong { position: relative; z-index: 1; max-width: 150px; overflow: hidden; text-overflow: ellipsis; }
-.commercial-map-label small { position: relative; z-index: 1; color: #607067; font-size: 6px; }
-.commercial-map-label.is-lot { min-width: 22px; padding: 3px 5px; border-color: rgba(26,74,40,.2); border-radius: 6px; background: rgba(251,253,248,.92); box-shadow: 0 3px 9px rgba(23,50,30,.12); font-size: 7.5px; }
-.commercial-map-label.is-lot > span { color: #183f27; font-size: 8px; letter-spacing: -.035em; }
-.commercial-map-label.is-lot strong { color: #315c3d; font-size: 6.5px; letter-spacing: .025em; text-transform: uppercase; }
-.commercial-map-label.is-lot .commercial-map-label-area { color: #173f26; font-family: 'JetBrains Mono', monospace; font-size: 6px; font-weight: 750; }
+.commercial-map-label small { position: relative; z-index: 1; color: #607067; font-size: 8px; }
+.commercial-map-label.is-lot { min-width: 28px; padding: 4px 6px; border-color: rgba(26,74,40,.2); border-radius: 7px; background: rgba(251,253,248,.94); box-shadow: 0 3px 9px rgba(23,50,30,.12); font-size: 9px; }
+.commercial-map-label.is-lot > span { color: #183f27; font-size: 10px; letter-spacing: -.025em; }
+.commercial-map-label.is-lot strong { color: #315c3d; font-size: 8px; letter-spacing: .025em; text-transform: uppercase; }
+.commercial-map-label.is-lot .commercial-map-label-area { color: #173f26; font-family: 'JetBrains Mono', monospace; font-size: 8px; font-weight: 750; }
 .commercial-map-label.is-lot.is-dimmed { opacity: .18; }
-.commercial-map-label.is-road { min-width: auto; max-width: 130px; padding: 2px 6px; transform: translateY(-2px); border-color: rgba(69,78,84,.24); border-radius: 999px; background: rgba(246,247,245,.95); color: #384044; box-shadow: 0 2px 7px rgba(34,39,42,.14); font-size: 6px; letter-spacing: .055em; text-transform: uppercase; }
+.commercial-map-label.is-road { min-width: auto; max-width: 148px; padding: 3px 7px; transform: translate3d(0,-3px,0); border-color: rgba(69,78,84,.24); border-radius: 999px; background: rgba(246,247,245,.95); color: #384044; box-shadow: 0 2px 7px rgba(34,39,42,.14); font-size: 9px; letter-spacing: .055em; text-transform: uppercase; }
 .commercial-map-label.is-road::after { display: none; }
-.commercial-map-label.is-road > span { overflow: hidden; max-width: 120px; font-family: inherit; font-weight: 750; text-overflow: ellipsis; }
+.commercial-map-label.is-road > span { overflow: hidden; max-width: 134px; font-family: inherit; font-weight: 750; text-overflow: ellipsis; }
 .commercial-map-label.is-road.is-selected { border-color: rgba(221,176,67,.82); background: rgba(255,250,225,.98); color: #30373a; box-shadow: 0 4px 14px rgba(42,47,50,.2); }
-.commercial-map-label.is-quadra { min-width: auto; padding: 3px 7px; border-color: rgba(40,112,58,.24); border-radius: 999px; background: rgba(237,247,235,.82); color: #226338; box-shadow: 0 3px 10px rgba(24,78,36,.1); font-size: 6.5px; letter-spacing: .06em; text-transform: uppercase; }
+.commercial-map-label.is-quadra { min-width: auto; padding: 4px 8px; border-color: rgba(40,112,58,.24); border-radius: 999px; background: rgba(237,247,235,.9); color: #226338; box-shadow: 0 3px 10px rgba(24,78,36,.1); font-size: 9px; letter-spacing: .06em; text-transform: uppercase; }
 .commercial-map-label.is-quadra::after { border-color: rgba(40,112,58,.24); background: rgba(237,247,235,.82); }
-.commercial-map-label.is-structure { max-width: 160px; padding: 4px 7px; border-color: rgba(39,64,47,.16); background: rgba(250,252,248,.9); }
-.commercial-map-label.is-structure > span { overflow: hidden; max-width: 146px; font-family: inherit; font-size: 6.5px; font-weight: 800; text-overflow: ellipsis; text-transform: uppercase; letter-spacing: .035em; }
-.commercial-map-label .commercial-map-label-code { padding: 1px 4px; border-radius: 999px; background: #e2efe0; color: #1f6235; font-family: 'JetBrains Mono', monospace; font-size: 6px; line-height: 1.15; letter-spacing: .04em; }
+.commercial-map-label.is-structure { max-width: 190px; padding: 5px 8px; border-color: rgba(39,64,47,.16); background: rgba(250,252,248,.94); }
+.commercial-map-label.is-structure > span { overflow: hidden; max-width: 174px; font-family: inherit; font-size: 9px; font-weight: 800; text-overflow: ellipsis; text-transform: uppercase; letter-spacing: .035em; }
+.commercial-map-label .commercial-map-label-code { padding: 1px 5px; border-radius: 999px; background: #e2efe0; color: #1f6235; font-family: 'JetBrains Mono', monospace; font-size: 8px; line-height: 1.15; letter-spacing: .04em; }
 .commercial-map-label.is-access { border-color: rgba(224,185,55,.54); background: rgba(20,69,43,.96); color: #fffdf2; box-shadow: 0 5px 14px rgba(13,55,33,.24); }
 .commercial-map-label.is-access::after { border-color: rgba(224,185,55,.4); background: rgba(20,69,43,.96); }
 .commercial-map-label.is-access .commercial-map-label-code { background: #e7c64d; color: #173e29; }
@@ -610,13 +647,13 @@
 .commercial-map-label.is-restroom::after { border-color: rgba(35,112,158,.32); background: rgba(238,248,253,.97); }
 .commercial-map-label.is-restroom .commercial-map-label-code { background: #1d74aa; color: #fff; }
 .commercial-map-label.is-restroom > span { color: #155c88; letter-spacing: .08em; }
-.commercial-map-label.is-selected { z-index: 2; max-width: 190px; transform: translateY(-6px); border-color: rgba(23,91,43,.45); background: rgba(244,250,239,.98); box-shadow: 0 8px 20px rgba(17,75,32,.22); }
-.commercial-map-label.is-selected.is-structure > span { max-width: 172px; font-size: 7.5px; }
+.commercial-map-label.is-selected { z-index: 2; max-width: 198px; border-color: rgba(23,91,43,.45); background: rgba(244,250,239,.98); box-shadow: 0 8px 20px rgba(17,75,32,.22); }
+.commercial-map-label.is-selected.is-structure > span { max-width: 180px; font-size: 10px; }
 .commercial-map-label.is-architectural-landmark { border-color: rgba(18,91,52,.3); background: rgba(248,250,243,.96); box-shadow: 0 5px 16px rgba(15,66,36,.17); }
 .commercial-map-label.is-architectural-landmark .commercial-map-label-code { background: #175d38; color: #fff7cf; }
-.commercial-map-label.is-architectural-landmark.is-selected { max-width: 182px; padding: 4px 8px; transform: translateY(-7px); border-color: rgba(213,172,55,.7); background: rgba(20,75,45,.98); color: #fffdf3; box-shadow: 0 8px 20px rgba(11,58,31,.27), 0 0 0 2px rgba(244,207,92,.12); }
+.commercial-map-label.is-architectural-landmark.is-selected { max-width: 198px; padding: 5px 9px; border-color: rgba(213,172,55,.7); background: rgba(20,75,45,.98); color: #fffdf3; box-shadow: 0 8px 20px rgba(11,58,31,.27), 0 0 0 2px rgba(244,207,92,.12); }
 .commercial-map-label.is-architectural-landmark.is-selected::after { border-color: rgba(213,172,55,.58); background: rgba(20,75,45,.98); }
-.commercial-map-label.is-architectural-landmark.is-selected > span { max-width: 164px; color: #fffdf3; font-size: 7.5px; letter-spacing: .04em; }
+.commercial-map-label.is-architectural-landmark.is-selected > span { max-width: 180px; color: #fffdf3; font-size: 10px; letter-spacing: .04em; }
 .commercial-map-label.is-architectural-landmark.is-selected .commercial-map-label-code { background: #e2bd4e; color: #173b28; }
 .commercial-map-label.is-access.is-selected { border-color: rgba(224,185,55,.72); background: rgba(20,69,43,.98); box-shadow: 0 8px 22px rgba(13,55,33,.3); }
 .commercial-map-label.is-restroom.is-selected { border-color: rgba(29,116,170,.58); background: rgba(244,251,255,.99); box-shadow: 0 8px 20px rgba(23,86,125,.24); }

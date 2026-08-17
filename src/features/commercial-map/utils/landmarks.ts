@@ -64,6 +64,8 @@ const STRATEGIC_LANDMARKS: Readonly<Record<string, StrategicLandmarkDefinition>>
   B4: commercialPavilionLandmark('B4'),
   B5: commercialPavilionLandmark('B5'),
   B6: commercialPavilionLandmark('B6'),
+  B8: commercialPavilionLandmark('B8'),
+  B10: commercialPavilionLandmark('B10'),
   B9: {
     kind: 'livestock-pavilion',
     aliases: [

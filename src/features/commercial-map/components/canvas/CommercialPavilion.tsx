@@ -5,8 +5,10 @@ import {
   resolveCommercialPavilionDefinition,
   type CommercialPavilionLayout,
 } from '../../utils/commercialPavilions';
+import { resolveCommercialPavilionModulePlan } from '../../utils/commercialPavilionModules';
 import type { StrategicLandmarkBounds } from '../../utils/landmarks';
 import { createCommercialPavilionTexture } from './commercialPavilionTextures';
+import { CommercialPavilionModuleLayer } from './CommercialPavilionModuleLayer';
 
 const NO_RAYCAST = () => undefined;
 const UNIT_BOX = new THREE.BoxGeometry(1, 1, 1);
@@ -399,33 +401,48 @@ function PavilionShell({
   layout,
   materials,
   showDetail,
+  cutaway,
 }: {
   layout: CommercialPavilionLayout;
   materials: CommercialPavilionMaterials;
   showDetail: boolean;
+  cutaway: boolean;
 }) {
   const { slab, shell, facade, structure } = layout.exterior;
   const wallThickness = Math.max(0.08, structure.columnSize * 0.64);
-  const envelope = useMemo<InstanceTransform[]>(() => [
-    {
-      position: [0, shell.centerY, shell.backZ],
-      scale: [shell.width, shell.height, wallThickness],
-    },
-    {
-      position: [-shell.width / 2 + wallThickness / 2, shell.centerY, 0],
-      scale: [wallThickness, shell.height, shell.depth],
-    },
-    {
-      position: [shell.width / 2 - wallThickness / 2, shell.centerY, 0],
-      scale: [wallThickness, shell.height, shell.depth],
-    },
-    ...facadeWallSegments(layout),
-  ], [layout, shell, wallThickness]);
-  const doors = useMemo<InstanceTransform[]>(() => facade.entrances.map((entrance) => ({
+  const envelope = useMemo<InstanceTransform[]>(() => {
+    if (!cutaway) {
+      return [
+        {
+          position: [0, shell.centerY, shell.backZ],
+          scale: [shell.width, shell.height, wallThickness],
+        },
+        {
+          position: [-shell.width / 2 + wallThickness / 2, shell.centerY, 0],
+          scale: [wallThickness, shell.height, shell.depth],
+        },
+        {
+          position: [shell.width / 2 - wallThickness / 2, shell.centerY, 0],
+          scale: [wallThickness, shell.height, shell.depth],
+        },
+        ...facadeWallSegments(layout),
+      ];
+    }
+    const cutawayHeight = Math.min(0.5, shell.height * 0.22);
+    const centerY = slab.height + cutawayHeight / 2;
+    return [
+      { position: [0, centerY, shell.backZ], scale: [shell.width, cutawayHeight, wallThickness] },
+      { position: [0, centerY, facade.frontZ], scale: [shell.width, cutawayHeight, wallThickness] },
+      { position: [-shell.width / 2 + wallThickness / 2, centerY, 0], scale: [wallThickness, cutawayHeight, shell.depth] },
+      { position: [shell.width / 2 - wallThickness / 2, centerY, 0], scale: [wallThickness, cutawayHeight, shell.depth] },
+    ];
+  }, [cutaway, facade.frontZ, layout, shell, slab.height, wallThickness]);
+  const doors = useMemo<InstanceTransform[]>(() => cutaway ? [] : facade.entrances.map((entrance) => ({
     position: [entrance.centerX, entrance.centerY, entrance.centerZ - 0.065],
     scale: [entrance.width * 0.92, entrance.height * 0.94, entrance.depth],
-  })), [facade.entrances]);
+  })), [cutaway, facade.entrances]);
   const frontColumns = useMemo<InstanceTransform[]>(() => {
+    if (cutaway) return [];
     const columns = [
       -shell.width / 2 + structure.columnSize / 2,
       ...facade.dividerXs,
@@ -435,16 +452,16 @@ function PavilionShell({
       position: [x, structure.columnCenterY, facade.frontZ + 0.045],
       scale: [structure.columnSize, structure.columnHeight, structure.columnSize],
     }));
-  }, [facade.dividerXs, facade.frontZ, shell.width, structure]);
+  }, [cutaway, facade.dividerXs, facade.frontZ, shell.width, structure]);
   const sideColumns = useMemo<InstanceTransform[]>(() => {
-    if (!showDetail) return [];
+    if (!showDetail || cutaway) return [];
     const zValues = structure.columnZs.filter((_, index) => index > 0 && index < structure.columnZs.length - 1);
     return zValues.flatMap((z) => ([-1, 1] as const).map((side) => ({
       position: [side * (shell.width / 2 - structure.columnSize / 2), structure.columnCenterY, z],
       scale: [structure.columnSize, structure.columnHeight, structure.columnSize],
     })));
-  }, [shell.width, showDetail, structure]);
-  const canopies = useMemo<InstanceTransform[]>(() => facade.entrances.map((entrance) => ({
+  }, [cutaway, shell.width, showDetail, structure]);
+  const canopies = useMemo<InstanceTransform[]>(() => cutaway ? [] : facade.entrances.map((entrance) => ({
     position: [
       entrance.centerX,
       entrance.centerY + entrance.height / 2 + 0.08,
@@ -455,7 +472,7 @@ function PavilionShell({
       0.1,
       layout.publicIdentifier === 'B1' ? 0.62 : 0.42,
     ],
-  })), [facade.frontZ, facade.entrances, layout.publicIdentifier]);
+  })), [cutaway, facade.frontZ, facade.entrances, layout.publicIdentifier]);
 
   return (
     <>
@@ -473,7 +490,7 @@ function PavilionShell({
       <PavilionInstances material={materials.trim} items={frontColumns} castShadow receiveShadow />
       <PavilionInstances material={materials.trim} items={sideColumns} castShadow receiveShadow />
       <PavilionInstances material={materials.accent} items={canopies} castShadow receiveShadow />
-      {facade.centralMass && (
+      {!cutaway && facade.centralMass && (
         <mesh
           position={[facade.centralMass.centerX, facade.centralMass.centerY, facade.centralMass.centerZ]}
           material={materials.trim}
@@ -546,6 +563,7 @@ export const CommercialPavilion = memo(function CommercialPavilion({
   showFocusDetail: boolean;
 }) {
   const definition = resolveCommercialPavilionDefinition({ publicIdentifier });
+  const modulePlan = resolveCommercialPavilionModulePlan({ publicIdentifier });
   const layout = useMemo(() => definition
     ? createCommercialPavilionLayout(bounds, definition, height)
     : null, [bounds, definition, height]);
@@ -590,10 +608,22 @@ export const CommercialPavilion = memo(function CommercialPavilion({
 
   return (
     <group dispose={null}>
-      <PavilionShell layout={layout} materials={materials} showDetail={showDetail} />
-      <PavilionRoof layout={layout} materials={materials} showDetail={showDetail} />
-      {showDetail && <PavilionDetail layout={layout} materials={materials} />}
-      {(showDetail || showFocusDetail) && (
+      <PavilionShell
+        layout={layout}
+        materials={materials}
+        showDetail={showDetail}
+        cutaway={showFocusDetail}
+      />
+      {!showFocusDetail && <PavilionRoof layout={layout} materials={materials} showDetail={showDetail} />}
+      {showDetail && !showFocusDetail && <PavilionDetail layout={layout} materials={materials} />}
+      {showFocusDetail && modulePlan && (
+        <CommercialPavilionModuleLayer
+          layout={layout}
+          plan={modulePlan}
+          mode="cutaway"
+        />
+      )}
+      {showDetail && !showFocusDetail && (
         <PavilionIdentity
           number={definition.pavilionNumber}
           activity={definition.activity}

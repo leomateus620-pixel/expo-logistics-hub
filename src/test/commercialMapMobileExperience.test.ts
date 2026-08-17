@@ -44,7 +44,7 @@ describe('arquitetura mobile-first do Mapa Comercial', () => {
     expect(styles).toContain('data-sheet-state="expanded"');
   });
 
-  it('mantém DPR estável, antialias e gestos GIS no canvas compartilhado', () => {
+  it('mantém antialias, gestos GIS completos e DPR adaptativo no canvas compartilhado', () => {
     const canvas = read('src/features/commercial-map/components/canvas/CommercialMapCanvas.tsx');
     const styles = read('src/features/commercial-map/commercial-map-mobile.css');
 
@@ -52,11 +52,34 @@ describe('arquitetura mobile-first do Mapa Comercial', () => {
     expect(canvas).toContain('dpr={pixelRatio}');
     expect(canvas).not.toContain('AdaptiveDpr');
     expect(canvas).not.toMatch(/<OrbitControls[\s\S]*?\bregress\b/);
-    expect(canvas).toContain('touches={{ ONE: THREE.TOUCH.PAN, TWO: THREE.TOUCH.DOLLY_PAN }}');
+    expect(canvas).toContain('touches={{ ONE: THREE.TOUCH.PAN, TWO: THREE.TOUCH.DOLLY_ROTATE }}');
+    expect(canvas).toMatch(/<OrbitControls[\s\S]*?enablePan[\s\S]*?enableRotate[\s\S]*?enableZoom/);
+    expect(canvas).not.toContain('enablePan={!miranteSelected}');
     expect(canvas).toContain('screenSpacePanning={false}');
+    expect(canvas).toContain('cameraNavigating,');
+    expect(canvas).toContain('COMMERCIAL_MAP_RESIZE_REFIT_DEBOUNCE_MS');
+    expect(canvas).toContain('COMMERCIAL_MAP_MANUAL_NAVIGATION_REFIT_SUPPRESSION_MS');
+    expect(canvas).toContain('if (navigation.current.active) return;');
+    expect(canvas).toContain('if (pendingResizeRefit.current && !wasNavigating) scheduleResizeRefit();');
+    expect(canvas).toContain('pendingResizeRefit.current = false;');
     expect(canvas).toContain("gl={{ antialias: !reducedGraphics");
-    expect(styles).toContain('touch-action: none');
+    expect(styles).toContain('touch-action: none !important;');
     expect(styles).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.commercial-map-stage \{ transition-duration: 340ms !important; \}/);
+  });
+
+  it('mantém a referência raster textual fora do carregamento inicial', () => {
+    const canvas = read('src/features/commercial-map/components/canvas/CommercialMapCanvas.tsx');
+    const store = read('src/features/commercial-map/state/useCommercialMapStore.ts');
+    const wrapper = canvas.slice(
+      canvas.indexOf('function ReferenceUnderlay({'),
+      canvas.indexOf('function createEntityShape'),
+    );
+
+    expect(store).toContain('referenceVisible: false');
+    expect(canvas).toMatch(/function ReferenceUnderlaySurface[\s\S]*?useTexture\(imageUrl\)/);
+    expect(wrapper).toContain('if (!referenceVisible) return null;');
+    expect(wrapper).not.toContain('useTexture(');
+    expect(wrapper).toMatch(/<Suspense fallback=\{null\}>[\s\S]*?<ReferenceUnderlaySurface[\s\S]*?<\/Suspense>/);
   });
 
   it('remove apenas o chrome persistente do fluxo móvel principal', () => {

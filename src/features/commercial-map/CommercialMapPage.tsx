@@ -42,8 +42,10 @@ import {
 } from './components/panels/MapPanels';
 import { MapListView, ResultsPanel } from './components/panels/EntityExplorer';
 import { CalibrationPanel } from './components/panels/CalibrationPanel';
+import { PavilionPlanLegend } from './components/panels/PavilionPlanLegend';
 import { SegmentLegend } from './components/segments/SegmentLegend';
 import { resolveStrategicLandmarkKind } from './utils/landmarks';
+import { resolveCommercialPavilionModulePlan } from './utils/commercialPavilionModules';
 import { OFFICIAL_REFERENCE_REVISION } from './data/officialReference2026';
 import {
   COMMERCIAL_MAP_SEGMENT_IDS,
@@ -192,6 +194,9 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
   const selectedKind = selectedEntity ? resolveStrategicLandmarkKind(selectedEntity) : null;
   const interiorEntity = data?.entities.find((entity) => entity.id === interiorEntityId) ?? null;
   const interiorKind = interiorEntity ? resolveStrategicLandmarkKind(interiorEntity) : null;
+  const interiorPavilionPlan = interiorKind === 'commercial-pavilion' && interiorEntity
+    ? resolveCommercialPavilionModulePlan(interiorEntity)
+    : null;
 
   const setAreaScope = (nextScope: CommercialMapAreaScope) => {
     if (isCommissionScope) return;
@@ -536,35 +541,40 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
                 technicalValidationAllowed={technicalValidationAllowed}
               />
               {interiorEntity ? (
-                <div
-                  className="commercial-map-interior-navigation"
-                  role="navigation"
-                  aria-label={`Navegação do interior de ${interiorEntity.name}`}
-                >
-                  <Button
-                    ref={interiorBackButtonRef}
-                    variant="outline"
-                    onClick={exitInterior}
-                    aria-label={`Voltar ao mapa a partir de ${interiorEntity.name}`}
-                    aria-keyshortcuts="Escape"
+                <>
+                  <div
+                    className="commercial-map-interior-navigation"
+                    role="navigation"
+                    aria-label={`Navegação do interior de ${interiorEntity.name}`}
                   >
-                    <ArrowLeft />Voltar ao mapa
-                  </Button>
-                  <div>
-                    <span>{interiorKind === 'commercial-pavilion' ? 'Modelo interno provisório' : 'Inspeção interna'} · {interiorEntity.publicIdentifier}</span>
-                    <strong>{interiorEntity.name}</strong>
-                    <small>
-                      {interiorKind === 'commercial-pavilion'
-                        ? 'Vista superior ilustrativa · arraste para percorrer e role para aproximar'
-                        : interiorKind === 'livestock-pavilion'
-                        ? 'Arraste para percorrer o corredor e as baias · role para aproximar'
-                        : interiorKind === 'mirante-pavilion'
-                          ? 'Arraste para observar o salão e a vista da Arena · role para aproximar'
-                          : 'Arraste para observar os ambientes · role para aproximar'}
-                    </small>
+                    <Button
+                      ref={interiorBackButtonRef}
+                      variant="outline"
+                      onClick={exitInterior}
+                      aria-label={`Voltar ao mapa a partir de ${interiorEntity.name}`}
+                      aria-keyshortcuts="Escape"
+                    >
+                      <ArrowLeft />Voltar ao mapa
+                    </Button>
+                    <div>
+                      <span>{interiorKind === 'commercial-pavilion' ? 'Planta interna oficial' : 'Inspeção interna'} · {interiorEntity.publicIdentifier}</span>
+                      <strong>{interiorEntity.name}</strong>
+                      <small>
+                        {interiorKind === 'commercial-pavilion'
+                          ? 'Arraste para percorrer · use pinça ou roda para aproximar e girar'
+                          : interiorKind === 'livestock-pavilion'
+                          ? 'Arraste para percorrer o corredor e as baias · role para aproximar'
+                          : interiorKind === 'mirante-pavilion'
+                            ? 'Arraste para observar o salão e a vista da Arena · role para aproximar'
+                            : 'Arraste para observar os ambientes · role para aproximar'}
+                      </small>
+                    </div>
+                    <kbd>Esc</kbd>
                   </div>
-                  <kbd>Esc</kbd>
-                </div>
+                  {interiorPavilionPlan && (
+                    <PavilionPlanLegend plan={interiorPavilionPlan} variant="interior" />
+                  )}
+                </>
               ) : (
                 <>
                   <CommercialSummary
