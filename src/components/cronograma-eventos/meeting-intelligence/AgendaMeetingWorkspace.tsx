@@ -968,13 +968,15 @@ export function AgendaMeetingWorkspace({
         }}
         type="button"
       >
-        <span className="agenda-meeting__mark-shell"><MeetingIntelligenceMark state={available ? 'idle' : 'blocked'} /></span>
+        <span className="agenda-meeting__mark-shell"><MeetingIntelligenceMark state={available ? (captureActive ? 'recording' : 'idle') : 'blocked'} /></span>
         <span className="agenda-meeting__launcher-copy">
-          <span className="agenda-meeting__eyebrow">Inteligência de reunião</span>
+          <span className="agenda-meeting__eyebrow">Ata inteligente</span>
           <span className="agenda-meeting__title">Fenasoja Meeting</span>
-          {!available && (
-            <span className="agenda-meeting__description">Disponível apenas para eventos já salvos.</span>
-          )}
+          <span className="agenda-meeting__description">
+            {available
+              ? (captureActive ? null : 'Transcrição e ata do evento')
+              : 'Disponível apenas para eventos já salvos.'}
+          </span>
         </span>
         <span className="agenda-meeting__launcher-action">
           {available ? (
