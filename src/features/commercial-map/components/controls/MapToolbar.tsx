@@ -11,6 +11,7 @@ import {
   ScanSearch,
   SlidersHorizontal,
   SquareStack,
+  Trees,
   Warehouse,
   X,
 } from 'lucide-react';
@@ -18,6 +19,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { CAMERA_PRESETS } from '../../constants';
+import { COMMERCIAL_MAP_SEGMENT_IDS } from '../../data/commercialMapSegments';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import type { CameraPreset, MapPermissions } from '../../types';
 import type { CommercialMapAreaScope } from '../../utils/areaScope';
@@ -54,9 +56,12 @@ export function MapToolbar({
   const setWorkspaceMode = useCommercialMapStore((state) => state.setWorkspaceMode);
   const requestCameraPreset = useCommercialMapStore((state) => state.requestCameraPreset);
   const focusSelection = useCommercialMapStore((state) => state.focusSelection);
+  const treesVisible = useCommercialMapStore((state) => state.treesVisible);
+  const setTreesVisible = useCommercialMapStore((state) => state.setTreesVisible);
   const technicalValidationVisible = useCommercialMapStore((state) => state.technicalValidationVisible);
   const setTechnicalValidationVisible = useCommercialMapStore((state) => state.setTechnicalValidationVisible);
   const canUseTechnicalValidation = canUseTechnicalValidationOverlay(areaScope, permissions);
+  const hasTreeLayer = areaScope === 'park' || areaScope === COMMERCIAL_MAP_SEGMENT_IDS.industry;
   const presets: CameraPreset[] = areaScope === 'exporural'
     ? ['exporural', 'top', 'isometric', 'quadra-r', 'quadra-s', 'semear']
     : ['overview', 'top', 'isometric'];
@@ -119,6 +124,22 @@ export function MapToolbar({
           </TooltipTrigger>
           <TooltipContent>Camadas</TooltipContent>
         </Tooltip>
+        {hasTreeLayer && (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                className={treesVisible ? 'is-active' : ''}
+                onClick={() => setTreesVisible(!treesVisible)}
+                aria-label={treesVisible ? 'Ocultar árvores' : 'Exibir árvores'}
+                aria-pressed={treesVisible}
+              >
+                <Trees className="h-4 w-4" aria-hidden="true" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>{treesVisible ? 'Ocultar árvores' : 'Exibir árvores'}</TooltipContent>
+          </Tooltip>
+        )}
         {canUseTechnicalValidation && (
           <Tooltip>
             <TooltipTrigger asChild>

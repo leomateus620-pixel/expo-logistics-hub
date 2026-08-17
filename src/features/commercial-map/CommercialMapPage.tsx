@@ -581,7 +581,14 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
               </div>
             )}
 
-            {!interiorEntityId && activePanel === 'layers' && <LayersPanel layers={data.layers} entities={scopedData.entities} permissions={permissions} />}
+            {!interiorEntityId && activePanel === 'layers' && (
+              <LayersPanel
+                layers={data.layers}
+                entities={scopedData.entities}
+                lots={scopedData.lots}
+                permissions={permissions}
+              />
+            )}
             {!interiorEntityId && activePanel === 'results' && <ResultsPanel explorer={mapFilter} />}
             {!interiorEntityId && activePanel === 'details' && selectedEntity && <EntityDetailsPanel entity={selectedEntity} lot={selectedLot} entities={scopedData.entities} lots={scopedData.lots} permissions={permissions} />}
             {!interiorEntityId && activePanel === 'calibration' && <CalibrationPanel project={data.project} calibration={data.calibration} />}

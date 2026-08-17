@@ -34,6 +34,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { CLASSIFICATION_LABELS, STATUS_CONFIG } from '../../constants';
 import { useLotActivity, useLotContractVersions, useMapMutations } from '../../hooks/useCommercialMap';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
+import { selectCommercialTreesForScene } from '../../utils/treeLayer';
 import { polygonAreaMapUnits } from '../../utils/geometry';
 import {
   resolveStrategicLandmarkKind,
@@ -141,7 +142,17 @@ export function StatusLegend({ scope = 'park' }: { scope?: CommercialMapAreaScop
   );
 }
 
-export function LayersPanel({ layers, entities, permissions }: { layers: MapLayer[]; entities: MapEntity[]; permissions: MapPermissions }) {
+export function LayersPanel({
+  layers,
+  entities,
+  lots,
+  permissions,
+}: {
+  layers: MapLayer[];
+  entities: MapEntity[];
+  lots: CommercialLot[];
+  permissions: MapPermissions;
+}) {
   const { layerLock } = useMapMutations();
   const setActivePanel = useCommercialMapStore((state) => state.setActivePanel);
   const layerVisibility = useCommercialMapStore((state) => state.layerVisibility);
@@ -150,6 +161,8 @@ export function LayersPanel({ layers, entities, permissions }: { layers: MapLaye
   const setLayerOpacity = useCommercialMapStore((state) => state.setLayerOpacity);
   const labelsVisible = useCommercialMapStore((state) => state.labelsVisible);
   const setLabelsVisible = useCommercialMapStore((state) => state.setLabelsVisible);
+  const treesVisible = useCommercialMapStore((state) => state.treesVisible);
+  const setTreesVisible = useCommercialMapStore((state) => state.setTreesVisible);
   const referenceVisible = useCommercialMapStore((state) => state.referenceVisible);
   const referenceOpacity = useCommercialMapStore((state) => state.referenceOpacity);
   const setReferenceVisible = useCommercialMapStore((state) => state.setReferenceVisible);
@@ -160,6 +173,7 @@ export function LayersPanel({ layers, entities, permissions }: { layers: MapLaye
     acc[entity.layerId] = (acc[entity.layerId] ?? 0) + 1;
     return acc;
   }, {}), [entities]);
+  const treeCount = useMemo(() => selectCommercialTreesForScene(entities, lots).length, [entities, lots]);
 
   return (
     <aside className="commercial-map-panel commercial-map-layer-panel">
@@ -193,7 +207,13 @@ export function LayersPanel({ layers, entities, permissions }: { layers: MapLaye
           ))}
         </div>
         <div className="commercial-map-panel-section is-separated">
-          <h3>Referência e desempenho</h3>
+          <h3>Ambiente, referência e desempenho</h3>
+          {treeCount > 0 && (
+            <label className="commercial-map-setting-row">
+              <span><strong>Árvores</strong><small>{treeCount} posições interpretadas por satélite</small></span>
+              <Switch checked={treesVisible} onCheckedChange={setTreesVisible} aria-label="Árvores" />
+            </label>
+          )}
           <label className="commercial-map-setting-row">
             <span><strong>Mapa original</strong><small>Camada cartográfica temporária</small></span>
             <Switch checked={referenceVisible} onCheckedChange={setReferenceVisible} />
