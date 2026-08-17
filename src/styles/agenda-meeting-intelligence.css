@@ -856,3 +856,58 @@
   color: hsl(var(--muted-foreground));
   word-break: break-word;
 }
+
+/* ============================================================
+   Fenasoja Meeting — refino tipográfico e de layout (v2)
+   ============================================================ */
+
+.agenda-meeting__launcher-copy {
+  display: grid;
+  min-width: 0;
+  gap: 3px;
+}
+
+.agenda-meeting__launcher .agenda-meeting__title {
+  margin: 0;
+  font-size: 17px;
+  letter-spacing: -.02em;
+}
+
+.agenda-meeting__launcher .agenda-meeting__eyebrow {
+  font-size: 9.5px;
+  letter-spacing: .18em;
+  opacity: .85;
+}
+
+.agenda-meeting__launcher .agenda-meeting__description { margin: 2px 0 0; }
+
+.agenda-meeting__capture-heading .agenda-meeting__title {
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: -.01em;
+}
+
+.agenda-meeting__capture-heading .agenda-meeting__eyebrow {
+  font-size: 9px;
+  letter-spacing: .16em;
+  opacity: .8;
+}
+
+.agenda-meeting__consent .agenda-meeting__button--primary {
+  justify-self: start;
+  min-width: 210px;
+}
+
+.agenda-meeting__live-text { max-height: 260px; overflow-y: auto; overscroll-behavior: contain; }
+
+@media (max-width: 639px) {
+  .agenda-meeting__launcher .agenda-meeting__title { font-size: 15.5px; }
+  .agenda-meeting__capture-heading { flex-wrap: wrap; gap: 8px; }
+  .agenda-meeting__capture-heading .agenda-meeting__title { overflow-wrap: anywhere; }
+  .agenda-meeting__capture-grid { grid-template-columns: 1fr; }
+  .agenda-meeting__metric { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+  .agenda-meeting__metric strong { margin-top: 0; text-align: right; }
+  .agenda-meeting__controls .agenda-meeting__button { min-height: 44px; }
+  .agenda-meeting__consent .agenda-meeting__button--primary { width: 100%; min-width: 0; justify-self: stretch; }
+  .agenda-meeting__live-text { max-height: 200px; }
+}

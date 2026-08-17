@@ -57,7 +57,6 @@ import { useAuth } from '@/hooks/useAuth';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import { cn } from '@/lib/utils';
 
-import { MeetingDiagnosticsPanel } from './MeetingDiagnosticsPanel';
 import { MeetingIntelligenceMark } from './MeetingIntelligenceMark';
 
 const CONSENT_VERSION = 'fenasoja-agenda-meeting-consent-v1';
@@ -785,13 +784,9 @@ function PersistedMeetingWorkspace({
 
       {capture.state.phase === 'idle' && (
         <div className="agenda-meeting__consent">
-          <div className="agenda-meeting__notice">
-            <ShieldCheck className="mr-2 inline h-4 w-4" aria-hidden="true" />
-            A FENASOJA guarda apenas transcrição, atas e itens estruturados. Não existe áudio histórico, player, download ou retranscrição posterior.
-          </div>
           <label className="agenda-meeting__consent-check">
             <input checked={participantsInformed} onChange={(event) => setParticipantsInformed(event.target.checked)} type="checkbox" />
-            <span>Confirmo que todas as pessoas foram informadas sobre a transcrição e consentiram com esta sessão.</span>
+            <span>Confirmo que todos os participantes foram informados e consentiram com a transcrição.</span>
           </label>
           {capture.mic.devices.length > 0 && (
             <label className="agenda-meeting__device-field">
@@ -855,7 +850,6 @@ function PersistedMeetingWorkspace({
         </section>
       )}
 
-      <MeetingDiagnosticsPanel defaultOpen={capture.state.phase === 'fatal_error'} />
 
       <div className="agenda-meeting__history-heading">
         <div>
@@ -975,12 +969,12 @@ export function AgendaMeetingWorkspace({
         type="button"
       >
         <span className="agenda-meeting__mark-shell"><MeetingIntelligenceMark state={available ? 'idle' : 'blocked'} /></span>
-        <span>
+        <span className="agenda-meeting__launcher-copy">
           <span className="agenda-meeting__eyebrow">Inteligência de reunião</span>
-          <span className="agenda-meeting__title">Ata vinculada à Agenda FENASOJA</span>
-          <span className="agenda-meeting__description">
-            {available ? 'Capture, organize decisões e acompanhe responsabilidades com evidência.' : 'Disponível somente para eventos persistidos e sincronizados com UUID canônico.'}
-          </span>
+          <span className="agenda-meeting__title">Fenasoja Meeting</span>
+          {!available && (
+            <span className="agenda-meeting__description">Disponível apenas para eventos já salvos.</span>
+          )}
         </span>
         <span className="agenda-meeting__launcher-action">
           {available ? (
