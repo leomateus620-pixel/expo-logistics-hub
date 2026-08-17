@@ -1028,7 +1028,7 @@ export default function CronogramaEventosPage() {
         </MobileCronogramaErrorBoundary>
       ) : (
         <CronogramaCycleSlotProvider>
-          <div className="cronograma-workbench flex w-full gap-4 px-3 sm:px-4 xl:px-6 2xl:px-8">
+          <div className="cronograma-workbench flex w-full gap-4">
             <CronogramaSideNav
               activeView={activeView}
               onChange={setActiveView}

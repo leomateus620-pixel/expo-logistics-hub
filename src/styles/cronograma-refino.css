@@ -744,14 +744,78 @@
   overflow-x: clip;
 }
 
-/* Barra temporal enxuta (o cabeçalho do mês vive dentro da timeline). */
+/* A barra temporal foi removida: os controles vivem no topo executivo. */
 .cronograma-page .cronograma-temporal-nav {
-  justify-content: flex-end;
-  gap: 0.5rem;
-  padding-block: 0.4rem;
-  min-height: 0;
+  display: none !important;
 }
 
-.cronograma-page .cronograma-temporal-nav > .ml-auto {
-  margin-left: 0;
+/* Controles compactos de período no topo azul. */
+.cronograma-command-temporal {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.15rem;
+  border-radius: 0.7rem;
+  border: 1px solid rgb(255 255 255 / 0.18);
+  background: rgb(255 255 255 / 0.1);
+}
+
+.cronograma-command-temporal__today,
+.cronograma-command-temporal__step {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.28rem;
+  height: 1.7rem;
+  border-radius: 0.5rem;
+  color: rgb(255 255 255 / 0.92);
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.cronograma-command-temporal__today {
+  padding-inline: 0.45rem;
+}
+
+.cronograma-command-temporal__step {
+  width: 1.7rem;
+}
+
+.cronograma-command-temporal__today svg,
+.cronograma-command-temporal__step svg {
+  width: 0.85rem;
+  height: 0.85rem;
+}
+
+.cronograma-command-temporal__today:hover,
+.cronograma-command-temporal__step:hover:not(:disabled) {
+  background: rgb(255 255 255 / 0.16);
+}
+
+.cronograma-command-temporal__step:disabled {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+/* Gutter único entre topo, slide bar e conteúdo. */
+.cronograma-module-shell {
+  --cronograma-gutter: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .cronograma-module-shell {
+    --cronograma-gutter: 1.15rem;
+  }
+}
+
+.cronograma-module-bar[data-layout='command'] .cronograma-command-layer,
+.cronograma-module-bar[data-layout='command'] .cronograma-command-layer__mobile {
+  padding-inline: var(--cronograma-gutter, 0.75rem);
+}
+
+.cronograma-page .cronograma-workbench,
+.cronograma-page .cronograma-mobile-experience {
+  padding-inline: var(--cronograma-gutter, 0.75rem) !important;
 }

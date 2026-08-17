@@ -5,6 +5,7 @@ import { CronogramaGoogleStatusButton } from '@/components/cronograma-eventos/Cr
 import { CronogramaHeaderSearch } from '@/components/cronograma-eventos/CronogramaHeaderSearch';
 import { CronogramaPreparationPill } from '@/components/cronograma-eventos/CronogramaPreparationPill';
 import { CronogramaSearchProvider } from '@/components/cronograma-eventos/CronogramaSearchContext';
+import { CronogramaTemporalControls } from '@/components/cronograma-eventos/CronogramaTemporalControls';
 import { CronogramaShellProvider } from '@/components/cronograma-eventos/CronogramaShellContext';
 import { WeeklySummaryPill } from '@/components/cronograma-eventos/WeeklySummaryPill';
 import { Button } from '@/components/ui/button';
@@ -49,6 +50,10 @@ function CronogramaCommandBar() {
             <CronogramaGoogleStatusButton />
           </div>
 
+          <CronogramaTemporalControls className="hidden sm:inline-flex" />
+
+
+
 
 
           <Button
@@ -66,8 +71,11 @@ function CronogramaCommandBar() {
 
       <div className="cronograma-command-layer__mobile md:hidden">
         <CronogramaHeaderSearch className="w-full" />
-        <div className="lg:hidden">
-          <WeeklySummaryPill presentation="mobile" />
+        <div className="flex items-center justify-between gap-2">
+          <div className="lg:hidden min-w-0 flex-1">
+            <WeeklySummaryPill presentation="mobile" />
+          </div>
+          <CronogramaTemporalControls />
         </div>
       </div>
     </header>

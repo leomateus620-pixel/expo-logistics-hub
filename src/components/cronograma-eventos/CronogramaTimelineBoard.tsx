@@ -1,11 +1,8 @@
-import { useCallback, useMemo, type CSSProperties } from 'react';
+import { useCallback, useEffect, useMemo, type CSSProperties } from 'react';
 import {
   BadgeCheck,
   CalendarClock,
-  CalendarDays,
   ChevronDown,
-  ChevronLeft,
-  ChevronRight,
   CircleAlert,
   Layers3,
   ListChecks,
@@ -51,6 +48,7 @@ import { EventHarvestAnimation } from './EventHarvestAnimation';
 import { CronogramaCycleChips } from './CronogramaCycleChips';
 import { CronogramaCyclePortal } from './CronogramaCycleSlot';
 import { useCronogramaFiltersSlot } from './CronogramaFiltersSlot';
+import { useCronogramaShell } from './CronogramaShellContext';
 
 
 import { splitEventResponsibles } from './EventRelationFields';
@@ -162,6 +160,20 @@ export function CronogramaTimelineBoard({
     onOpen(event);
   }, [onOpen, reflectEventMonth]);
 
+  const shell = useCronogramaShell();
+  const registerTemporalNav = shell?.registerTemporalNav;
+  const { goToToday, goToMonth, previousMonth, nextMonth } = navigation;
+
+  useEffect(() => {
+    if (!registerTemporalNav) return;
+    registerTemporalNav({
+      goToToday,
+      goToPrevious: previousMonth ? () => goToMonth(previousMonth) : null,
+      goToNext: nextMonth ? () => goToMonth(nextMonth) : null,
+    });
+    return () => registerTemporalNav(null);
+  }, [registerTemporalNav, goToToday, goToMonth, previousMonth, nextMonth]);
+
   return (
     <section
       className="cronograma-timeline-shell"
@@ -169,59 +181,16 @@ export function CronogramaTimelineBoard({
       aria-label={variant === 'completed' ? 'Eventos concluídos por período' : 'Linha do tempo operacional'}
     >
       <div className="cronograma-timeline-workspace">
-        <nav
-          className="cronograma-temporal-nav"
-          aria-label={variant === 'completed' ? 'Navegação do histórico concluído' : 'Navegação entre períodos'}
-        >
-          {filtersSlot && <div className="cronograma-temporal-nav__filters">{filtersSlot}</div>}
-          <CronogramaCyclePortal>
-            <CronogramaCycleChips
-              summaries={summaries}
-              selectedYear={navigation.selectedYear}
-              currentYear={currentYear}
-              onSelectYear={navigation.selectYear}
-            />
-          </CronogramaCyclePortal>
+        {filtersSlot && <div className="cronograma-temporal-nav__filters">{filtersSlot}</div>}
+        <CronogramaCyclePortal>
+          <CronogramaCycleChips
+            summaries={summaries}
+            selectedYear={navigation.selectedYear}
+            currentYear={currentYear}
+            onSelectYear={navigation.selectYear}
+          />
+        </CronogramaCyclePortal>
 
-
-
-          <div className="ml-auto flex items-center gap-1.5">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={navigation.goToToday}
-              className="h-9 rounded-lg px-3 text-xs"
-              aria-label="Ir para o período de hoje"
-            >
-              <CalendarDays className="h-4 w-4" aria-hidden="true" />
-              <span className="hidden sm:inline">Ir para hoje</span>
-              <span className="sm:hidden">Hoje</span>
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              disabled={!navigation.previousMonth}
-              onClick={() => navigation.previousMonth && navigation.goToMonth(navigation.previousMonth)}
-              className="h-9 w-9 rounded-lg"
-              aria-label="Período anterior"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              disabled={!navigation.nextMonth}
-              onClick={() => navigation.nextMonth && navigation.goToMonth(navigation.nextMonth)}
-              className="h-9 w-9 rounded-lg"
-              aria-label="Próximo período"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </nav>
 
         <p className="sr-only" aria-live="polite" aria-atomic="true">
           Ano em foco {navigation.selectedYear}, etapa {selectedSummary.stage}.
