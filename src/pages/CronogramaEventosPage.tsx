@@ -1005,7 +1005,6 @@ export default function CronogramaEventosPage() {
           <div className="cronograma-mobile-experience mx-auto flex w-full max-w-3xl min-w-0 flex-col gap-3 overflow-x-clip px-3">
             <MobileCronogramaNavigation activeView={activeView} onChange={setActiveView} />
 
-            <MobileCronogramaNavigation activeView={activeView} onChange={setActiveView} />
             <MobileCronogramaFilters
               filters={filters}
               events={events}
