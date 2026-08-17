@@ -48,7 +48,9 @@ import {
 import { statusLabels } from './cronogramaData';
 import { formatLongDate } from './dateUtils';
 import { EventHarvestAnimation } from './EventHarvestAnimation';
-import { TimelineCycleNavigator } from './TimelineCycleNavigator';
+import { CronogramaCycleChips } from './CronogramaCycleChips';
+import { useCronogramaFiltersSlot } from './CronogramaFiltersSlot';
+
 import { splitEventResponsibles } from './EventRelationFields';
 import { EventPeopleAvatars } from './PersonAvatar';
 import type { CronogramaEvent } from './types';
