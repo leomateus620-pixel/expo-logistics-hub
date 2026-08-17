@@ -61,6 +61,7 @@ import {
 import { canUseTechnicalValidationOverlay } from './utils/technicalValidation';
 import type { CommercialMapData, CommercialMapQueryScope, MapPermissions } from './types';
 import './commercial-map.css';
+import './commercial-map-mobile.css';
 
 function supportsWebGL() {
   try {
@@ -274,12 +275,13 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
     const shortcut = (event: KeyboardEvent) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
         event.preventDefault();
-        const searchTarget = workspaceMode === 'list'
-          ? document.querySelector('.commercial-map-list-view [data-commercial-map-search]')
-          : activePanel === 'results'
-            ? document.querySelector('.commercial-map-results-panel [data-commercial-map-search]')
-            : document.querySelector('.commercial-map-search [data-commercial-map-search]');
-        (searchTarget as HTMLInputElement | null)?.focus();
+        const searchTarget = Array.from(
+          document.querySelectorAll<HTMLInputElement>('[data-commercial-map-search]'),
+        ).find((candidate) => candidate.offsetParent !== null);
+        if (searchTarget) searchTarget.focus();
+        else document.querySelector<HTMLButtonElement>(
+          '[data-commercial-map-shell-search-trigger], [data-commercial-map-commission-search-trigger]',
+        )?.click();
       }
       if (event.key === 'Escape' && !event.defaultPrevented) {
         if (interiorEntityId) exitInterior();
@@ -355,7 +357,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
 
   return (
     <section
-      className={`commercial-map-shell ${isCommissionScope ? 'is-commission-scope' : ''} ${isExporural ? 'is-exporural' : ''} ${areaScope === COMMERCIAL_MAP_SEGMENT_IDS.industry ? 'is-industry' : ''} ${interiorEntityId ? 'is-interior' : ''} ${interiorKind === 'commercial-pavilion' ? 'is-commercial-pavilion-interior' : ''} ${interiorKind === 'livestock-pavilion' ? 'is-livestock-interior' : ''} ${interiorKind === 'mirante-pavilion' ? 'is-mirante-interior' : ''} ${selectedKind === 'commercial-pavilion' || selectedKind === 'livestock-pavilion' || selectedKind === 'mirante-pavilion' ? 'has-architectural-selection' : ''}`}
+      className={`commercial-map-shell ${isCommissionScope ? 'is-commission-scope' : ''} ${isExporural ? 'is-exporural' : ''} ${areaScope === COMMERCIAL_MAP_SEGMENT_IDS.industry ? 'is-industry' : ''} ${interiorEntityId ? 'is-interior' : ''} ${interiorKind === 'commercial-pavilion' ? 'is-commercial-pavilion-interior' : ''} ${interiorKind === 'livestock-pavilion' ? 'is-livestock-interior' : ''} ${interiorKind === 'mirante-pavilion' ? 'is-mirante-interior' : ''} ${selectedEntity ? 'has-selection' : ''} ${selectedKind === 'commercial-pavilion' || selectedKind === 'livestock-pavilion' || selectedKind === 'mirante-pavilion' ? 'has-architectural-selection' : ''}`}
       aria-label="Plataforma de gestão do mapa comercial"
     >
       <header className="commercial-map-command-header">
@@ -521,65 +523,72 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
           <MapListView explorer={mapFilter} permissions={permissions} />
         ) : (
           <>
-            <CommercialMapCanvas
-              key={areaScope}
-              entities={scopedData.entities}
-              lots={scopedData.lots}
-              calibration={data.calibration}
-              matchingEntityIds={mapFilter.matchingEntityIds}
-              filtersActive={mapFilter.hasActiveCriteria}
-              isolatedArea={areaScope === 'park' ? null : areaScope}
-              segmentOverride={isCommissionScope ? scopedSegment : null}
-              technicalValidationAllowed={technicalValidationAllowed}
-            />
-            {interiorEntity ? (
-              <div
-                className="commercial-map-interior-navigation"
-                role="navigation"
-                aria-label={`Navegação do interior de ${interiorEntity.name}`}
-              >
-                <Button
-                  ref={interiorBackButtonRef}
-                  variant="outline"
-                  onClick={exitInterior}
-                  aria-label={`Voltar ao mapa a partir de ${interiorEntity.name}`}
-                  aria-keyshortcuts="Escape"
+            <div className="commercial-map-stage">
+              <CommercialMapCanvas
+                key={areaScope}
+                entities={scopedData.entities}
+                lots={scopedData.lots}
+                calibration={data.calibration}
+                matchingEntityIds={mapFilter.matchingEntityIds}
+                filtersActive={mapFilter.hasActiveCriteria}
+                isolatedArea={areaScope === 'park' ? null : areaScope}
+                segmentOverride={isCommissionScope ? scopedSegment : null}
+                technicalValidationAllowed={technicalValidationAllowed}
+              />
+              {interiorEntity ? (
+                <div
+                  className="commercial-map-interior-navigation"
+                  role="navigation"
+                  aria-label={`Navegação do interior de ${interiorEntity.name}`}
                 >
-                  <ArrowLeft />Voltar ao mapa
-                </Button>
-                <div>
-                  <span>{interiorKind === 'commercial-pavilion' ? 'Modelo interno provisório' : 'Inspeção interna'} · {interiorEntity.publicIdentifier}</span>
-                  <strong>{interiorEntity.name}</strong>
-                  <small>
-                    {interiorKind === 'commercial-pavilion'
-                      ? 'Vista superior ilustrativa · arraste para percorrer e role para aproximar'
-                      : interiorKind === 'livestock-pavilion'
-                      ? 'Arraste para percorrer o corredor e as baias · role para aproximar'
-                      : interiorKind === 'mirante-pavilion'
-                        ? 'Arraste para observar o salão e a vista da Arena · role para aproximar'
-                        : 'Arraste para observar os ambientes · role para aproximar'}
-                  </small>
+                  <Button
+                    ref={interiorBackButtonRef}
+                    variant="outline"
+                    onClick={exitInterior}
+                    aria-label={`Voltar ao mapa a partir de ${interiorEntity.name}`}
+                    aria-keyshortcuts="Escape"
+                  >
+                    <ArrowLeft />Voltar ao mapa
+                  </Button>
+                  <div>
+                    <span>{interiorKind === 'commercial-pavilion' ? 'Modelo interno provisório' : 'Inspeção interna'} · {interiorEntity.publicIdentifier}</span>
+                    <strong>{interiorEntity.name}</strong>
+                    <small>
+                      {interiorKind === 'commercial-pavilion'
+                        ? 'Vista superior ilustrativa · arraste para percorrer e role para aproximar'
+                        : interiorKind === 'livestock-pavilion'
+                        ? 'Arraste para percorrer o corredor e as baias · role para aproximar'
+                        : interiorKind === 'mirante-pavilion'
+                          ? 'Arraste para observar o salão e a vista da Arena · role para aproximar'
+                          : 'Arraste para observar os ambientes · role para aproximar'}
+                    </small>
+                  </div>
+                  <kbd>Esc</kbd>
                 </div>
-                <kbd>Esc</kbd>
-              </div>
-            ) : (
-              <>
-                <CommercialSummary
-                  lots={summaryLots}
-                  scope={areaScope}
-                  segmentName={activeSegment?.name ?? scopedSegment?.name}
-                />
-                <MapToolbar permissions={permissions} hasSelection={Boolean(selectedEntity)} areaScope={areaScope} />
-                <StatusLegend scope={areaScope} />
-              </>
-            )}
+              ) : (
+                <>
+                  <CommercialSummary
+                    lots={summaryLots}
+                    scope={areaScope}
+                    segmentName={activeSegment?.name ?? scopedSegment?.name}
+                  />
+                  <MapToolbar
+                    permissions={permissions}
+                    hasSelection={Boolean(selectedEntity)}
+                    areaScope={areaScope}
+                    isCommissionScope={isCommissionScope}
+                  />
+                  <StatusLegend scope={areaScope} />
+                </>
+              )}
 
-            {!interiorEntityId && scopedData.lots.length === 0 && (
-              <div className="commercial-map-onboarding-note">
-                <Sparkles />
-                <span><strong>Parque digitalizado, cadastro comercial protegido</strong>A base não contém lotes fictícios. Trace e valide cada unidade antes de ativar preços e vendas.</span>
-              </div>
-            )}
+              {!interiorEntityId && scopedData.lots.length === 0 && (
+                <div className="commercial-map-onboarding-note">
+                  <Sparkles />
+                  <span><strong>Parque digitalizado, cadastro comercial protegido</strong>A base não contém lotes fictícios. Trace e valide cada unidade antes de ativar preços e vendas.</span>
+                </div>
+              )}
+            </div>
 
             {!interiorEntityId && activePanel === 'layers' && (
               <LayersPanel
@@ -590,7 +599,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
               />
             )}
             {!interiorEntityId && activePanel === 'results' && <ResultsPanel explorer={mapFilter} />}
-            {!interiorEntityId && activePanel === 'details' && selectedEntity && <EntityDetailsPanel entity={selectedEntity} lot={selectedLot} entities={scopedData.entities} lots={scopedData.lots} permissions={permissions} />}
+            {!interiorEntityId && activePanel === 'details' && selectedEntity && <EntityDetailsPanel key={selectedEntity.id} entity={selectedEntity} lot={selectedLot} entities={scopedData.entities} lots={scopedData.lots} permissions={permissions} />}
             {!interiorEntityId && activePanel === 'calibration' && <CalibrationPanel project={data.project} calibration={data.calibration} />}
           </>
         )}

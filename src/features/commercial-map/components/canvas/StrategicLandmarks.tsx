@@ -2452,6 +2452,7 @@ export interface StrategicLandmarkMeshProps {
   isMatch: boolean;
   layerOpacity: number;
   cameraNavigating: boolean;
+  hoverEnabled: boolean;
   onSelect: (id: string) => void;
   onHover: (id: string | null) => void;
   onFocus: () => void;
@@ -2468,6 +2469,7 @@ export function StrategicLandmarkMesh({
   isMatch,
   layerOpacity,
   cameraNavigating,
+  hoverEnabled,
   onSelect,
   onHover,
   onFocus,
@@ -2569,16 +2571,18 @@ export function StrategicLandmarkMesh({
         material={SHARED_INVISIBLE_HIT_MATERIAL}
         onClick={handleClick}
         onDoubleClick={handleDoubleClick}
-        onPointerOver={(event) => {
-          event.stopPropagation();
-          if (cameraNavigating) return;
-          onCursor('pointer');
-          onHover(entity.id);
-        }}
-        onPointerOut={() => {
-          onCursor(cameraNavigating ? 'grabbing' : 'grab');
-          onHover(null);
-        }}
+        {...(hoverEnabled ? {
+          onPointerOver: (event: ThreeEvent<PointerEvent>) => {
+            event.stopPropagation();
+            if (cameraNavigating) return;
+            onCursor('pointer');
+            onHover(entity.id);
+          },
+          onPointerOut: () => {
+            onCursor(cameraNavigating ? 'grabbing' : 'grab');
+            onHover(null);
+          },
+        } : {})}
         dispose={null}
       />
       <group rotation={[0, facingRadians, 0]} dispose={null}>

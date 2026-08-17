@@ -188,8 +188,6 @@ function PavilionInteriorCameraRig({
   useEffect(() => {
     const compact = size.width < 720 || size.height < 540;
     const portrait = size.height > size.width * 1.12;
-    const reducedMotion = typeof window !== 'undefined'
-      && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
     const heightMultiplier = portrait ? 1.95 : compact ? 1.72 : 1.5;
     const destination = toWorld(
       0,
@@ -204,14 +202,14 @@ function PavilionInteriorCameraRig({
     const lookAt = toWorld(0, layout.interior.floorY, 0);
     targetPosition.current.copy(destination);
     targetLookAt.current.copy(lookAt);
-    camera.position.copy(reducedMotion || reducedGraphics ? destination : start);
+    camera.position.copy(reducedGraphics ? destination : start);
     camera.near = 0.035;
     camera.far = Math.max(120, maximumDimension * 12);
     if (camera instanceof THREE.PerspectiveCamera) camera.fov = portrait ? 47 : compact ? 44 : 40;
     camera.updateProjectionMatrix();
     controls.current?.target.copy(lookAt);
     controls.current?.update();
-    animating.current = !reducedMotion && !reducedGraphics;
+    animating.current = !reducedGraphics;
     gl.domElement.style.cursor = 'grab';
     invalidate();
     return () => {
@@ -243,7 +241,6 @@ function PavilionInteriorCameraRig({
     <OrbitControls
       ref={controls}
       makeDefault
-      regress
       enableDamping
       dampingFactor={0.075}
       enablePan

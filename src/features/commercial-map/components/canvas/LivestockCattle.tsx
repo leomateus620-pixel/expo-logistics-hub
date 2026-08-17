@@ -197,9 +197,7 @@ export const LivestockCattle = memo(function LivestockCattle({
 }) {
   const invalidate = useThree((state) => state.invalidate);
   const motionAllowed = useMemo(() => animate
-    && poses.some((pose) => pose.animated)
-    && (typeof window === 'undefined'
-      || !window.matchMedia?.('(prefers-reduced-motion: reduce)').matches), [animate, poses]);
+    && poses.some((pose) => pose.animated), [animate, poses]);
   const materials = useMemo(() => ({
     coat: new THREE.MeshStandardMaterial({
       color: '#ffffff',
