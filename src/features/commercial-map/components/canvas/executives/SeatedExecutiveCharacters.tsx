@@ -1,4 +1,4 @@
-import { memo, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useEffect, useMemo, useRef } from 'react';
 import { useAnimations, useGLTF } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -22,24 +22,6 @@ interface RiggedSeatedCharacterProps {
   clip: THREE.AnimationClip;
   reducedMotion: boolean;
   reducedGraphics: boolean;
-}
-
-function useReducedMotionPreference() {
-  const [reducedMotion, setReducedMotion] = useState(() => (
-    typeof window !== 'undefined'
-    && Boolean(window.matchMedia?.('(prefers-reduced-motion: reduce)').matches)
-  ));
-
-  useEffect(() => {
-    if (typeof window === 'undefined' || !window.matchMedia) return undefined;
-    const query = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const update = () => setReducedMotion(query.matches);
-    update();
-    query.addEventListener?.('change', update);
-    return () => query.removeEventListener?.('change', update);
-  }, []);
-
-  return reducedMotion;
 }
 
 function prepareModel(source: THREE.Object3D, targetHeight: number) {
@@ -164,7 +146,7 @@ export const SeatedExecutiveCharacters = memo(function SeatedExecutiveCharacters
   reducedGraphics,
 }: SeatedExecutiveCharactersProps) {
   const invalidate = useThree((state) => state.invalidate);
-  const reducedMotion = useReducedMotionPreference();
+  const reducedMotion = false;
 
   useEffect(() => {
     invalidate();

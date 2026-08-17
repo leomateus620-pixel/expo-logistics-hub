@@ -378,7 +378,6 @@ function InteriorCameraRig({ entity }: { entity: MapEntity }) {
     <OrbitControls
       ref={controls}
       makeDefault
-      regress
       enableDamping
       dampingFactor={0.085}
       enablePan={false}

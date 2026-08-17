@@ -1,6 +1,6 @@
 import { lazy, memo, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Canvas, type ThreeEvent, useFrame, useThree } from '@react-three/fiber';
-import { AdaptiveDpr, Html, OrbitControls, Preload, useTexture } from '@react-three/drei';
+import { Html, OrbitControls, Preload, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import {
@@ -35,6 +35,7 @@ import {
   resolveMapLabelMode,
 } from '../../utils/mapPresentation';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
+import { resolveCommercialMapPixelRatio } from '../../utils/viewport';
 import type { CameraPreset, CommercialLot, MapCalibration, MapEntity } from '../../types';
 import { HeadquartersInteriorScene } from './HeadquartersInteriorScene';
 import { LivestockPavilionInteriorScene } from './LivestockPavilionInteriorScene';
@@ -85,6 +86,9 @@ interface SceneExtent {
 }
 
 const NO_RAYCAST = () => undefined;
+const PRECISE_HOVER_CAPABLE = typeof window === 'undefined'
+  || !window.matchMedia
+  || window.matchMedia('(any-hover: hover) and (any-pointer: fine)').matches;
 const LABEL_LEVEL_RANK: Record<MapLabelVisibility, number> = { far: 0, medium: 1, near: 2 };
 const MAP_BACKGROUND_COLOR = new THREE.Color('#dfe8de');
 const AREA_NUMBER = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -304,6 +308,7 @@ function fitDistanceForDirection(
 }
 
 function ReferenceUnderlay({ calibration }: { calibration: MapCalibration | null }) {
+  const gl = useThree((state) => state.gl);
   const referenceVisible = useCommercialMapStore((state) => state.referenceVisible);
   const referenceOpacity = useCommercialMapStore((state) => state.referenceOpacity);
   const imageUrl = calibration?.referenceImageUrl || calibration?.referenceImagePath || OFFICIAL_REFERENCE_IMAGE;
@@ -311,9 +316,9 @@ function ReferenceUnderlay({ calibration }: { calibration: MapCalibration | null
 
   useEffect(() => {
     texture.colorSpace = THREE.SRGBColorSpace;
-    texture.anisotropy = 8;
+    texture.anisotropy = Math.min(16, gl.capabilities.getMaxAnisotropy());
     texture.needsUpdate = true;
-  }, [texture]);
+  }, [gl, texture]);
 
   if (!referenceVisible) return null;
   return (
@@ -497,7 +502,6 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
     const strength = THREE.MathUtils.clamp(layerOpacity * filterStrength, 0, 1);
     return `#${new THREE.Color(outlineColor).lerp(MAP_BACKGROUND_COLOR, (1 - strength) * 0.82).getHexString()}`;
   }, [filterStrength, hovered, layerOpacity, outlineColor, selected, solidRendering]);
-
   useEffect(() => () => {
     geometry?.dispose();
     hitSurface?.dispose();
@@ -518,16 +522,18 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
       onSelect(entity.id);
       onFocus();
     },
-    onPointerOver: (event: ThreeEvent<PointerEvent>) => {
-      event.stopPropagation();
-      if (cameraNavigating) return;
-      onCursor('pointer');
-      onHover(entity.id);
-    },
-    onPointerOut: () => {
-      onCursor(cameraNavigating ? 'grabbing' : 'grab');
-      onHover(null);
-    },
+    ...(PRECISE_HOVER_CAPABLE ? {
+      onPointerOver: (event: ThreeEvent<PointerEvent>) => {
+        event.stopPropagation();
+        if (cameraNavigating) return;
+        onCursor('pointer');
+        onHover(entity.id);
+      },
+      onPointerOut: () => {
+        onCursor(cameraNavigating ? 'grabbing' : 'grab');
+        onHover(null);
+      },
+    } : {}),
   } : { raycast: NO_RAYCAST };
 
   return (
@@ -679,6 +685,7 @@ const EntityMesh = memo(function EntityMesh(props: EntityMeshProps) {
         isMatch={props.isMatch}
         layerOpacity={props.layerOpacity}
         cameraNavigating={props.cameraNavigating}
+        hoverEnabled={PRECISE_HOVER_CAPABLE}
         onSelect={props.onSelect}
         onHover={props.onHover}
         onFocus={props.onFocus}
@@ -991,7 +998,6 @@ function BatchedLots({
 
   if (!batch) return null;
   const selectedEntity = entries.find((entry) => entry.entity.id === selectedEntityId)?.entity;
-
   const resolveEntityId = (event: ThreeEvent<MouseEvent | PointerEvent>) => {
     const batchId = eventBatchId(event);
     return batchId === null ? null : (batch.entityByBatchId.get(batchId) ?? null);
@@ -1023,20 +1029,22 @@ function BatchedLots({
           onSelect(entityId);
           onFocus();
         }}
-        onPointerMove={(event: ThreeEvent<PointerEvent>) => {
-          event.stopPropagation();
-          if (cameraNavigating) return;
-          const entityId = resolveEntityId(event);
-          if (entityId === hoveredRef.current) return;
-          hoveredRef.current = entityId;
-          onCursor(entityId ? 'pointer' : 'grab');
-          onHover(entityId);
-        }}
-        onPointerOut={() => {
-          hoveredRef.current = null;
-          onCursor(cameraNavigating ? 'grabbing' : 'grab');
-          onHover(null);
-        }}
+        {...(PRECISE_HOVER_CAPABLE ? {
+          onPointerMove: (event: ThreeEvent<PointerEvent>) => {
+            event.stopPropagation();
+            if (cameraNavigating) return;
+            const entityId = resolveEntityId(event);
+            if (entityId === hoveredRef.current) return;
+            hoveredRef.current = entityId;
+            onCursor(entityId ? 'pointer' : 'grab');
+            onHover(entityId);
+          },
+          onPointerOut: () => {
+            hoveredRef.current = null;
+            onCursor(cameraNavigating ? 'grabbing' : 'grab');
+            onHover(null);
+          },
+        } : {})}
       />
       <lineSegments geometry={batch.edgeGeometry} raycast={NO_RAYCAST}>
         <lineBasicMaterial
@@ -1250,7 +1258,10 @@ function CameraRig({
   activeSegmentEntities: MapEntity[];
 }) {
   const controlsRef = useRef<OrbitControlsImpl>(null);
-  const { camera, size, invalidate, gl } = useThree();
+  const camera = useThree((state) => state.camera);
+  const size = useThree((state) => state.size);
+  const invalidate = useThree((state) => state.invalidate);
+  const gl = useThree((state) => state.gl);
   const preset = useCommercialMapStore((state) => state.cameraPreset);
   const cameraSequence = useCommercialMapStore((state) => state.cameraSequence);
   const activePanel = useCommercialMapStore((state) => state.activePanel);
@@ -1269,33 +1280,13 @@ function CameraRig({
   const previousSequence = useRef(cameraSequence);
   const previousSelection = useRef<string | null>(selectedEntity?.id ?? null);
   const previousSegment = useRef(activeSegment?.id ?? null);
+  const previousDetailsLayout = useRef(activePanel === 'details');
   const returnView = useRef(useCommercialMapStore.getState().interiorReturnView);
   const previousViewportSize = useRef({ width: size.width, height: size.height });
-  const [reducedMotion, setReducedMotion] = useState(() => (
-    typeof window !== 'undefined'
-    && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-  ));
-
-  useEffect(() => {
-    if (typeof window === 'undefined' || !window.matchMedia) return undefined;
-    const query = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const update = () => setReducedMotion(query.matches);
-    update();
-    query.addEventListener?.('change', update);
-    return () => query.removeEventListener?.('change', update);
-  }, []);
-
   const startCameraMove = useCallback(() => {
-    if (reducedMotion) {
-      camera.position.copy(targetPosition.current);
-      controlsRef.current?.target.copy(targetLookAt.current);
-      controlsRef.current?.update();
-      animating.current = false;
-    } else {
-      animating.current = true;
-    }
+    animating.current = true;
     invalidate();
-  }, [camera, invalidate, reducedMotion]);
+  }, [invalidate]);
 
   const queuePreset = useCallback((nextPreset: CameraPreset) => {
     const perspective = camera as THREE.PerspectiveCamera;
@@ -1347,25 +1338,17 @@ function CameraRig({
     const focusProfile = focusProfileForEntity(entity);
     const landmarkKind = resolveStrategicLandmarkKind(entity);
     const hasDetailsPanel = activePanel === 'details';
-    const sidePanelLayout = hasDetailsPanel
-      && (typeof window === 'undefined' ? size.width > 900 : window.innerWidth > 900);
+    const sidePanelLayout = hasDetailsPanel && size.width > 900;
     const panelWidth = sidePanelLayout ? Math.min(380, size.width * 0.54) : 0;
-    const compactPanelRatio = landmarkKind === 'mirante-pavilion'
-      ? 0.68
-      : size.width <= 640 ? 0.74 : 0.68;
-    const panelHeight = hasDetailsPanel && !sidePanelLayout
-      ? Math.min(size.height * compactPanelRatio, 610)
-      : 0;
     const usableWidth = Math.max(size.width - panelWidth, size.width * 0.48);
-    const usableHeight = Math.max(size.height - panelHeight, size.height * 0.26);
+    const usableHeight = size.height;
     const aspect = usableWidth / Math.max(usableHeight, 1);
-    const mobileMiranteSelection = landmarkKind === 'mirante-pavilion' && panelHeight > 0;
     const compactSidePanelMirante = landmarkKind === 'mirante-pavilion'
       && panelWidth > 0
       && usableWidth < 420;
     const entityCenter = new THREE.Vector3(
       entityExtent.centerX,
-      entity.geometry.elevation + entityExtent.maxHeight * (mobileMiranteSelection ? -0.32 : 0.28),
+      entity.geometry.elevation + entityExtent.maxHeight * 0.28,
       entityExtent.centerZ,
     );
     const currentTarget = controlsRef.current?.target ?? targetLookAt.current;
@@ -1388,10 +1371,8 @@ function CameraRig({
       Math.max(10, extent.diagonal * focusProfile.minDistanceRatio),
       Math.max(36, extent.diagonal * focusProfile.maxDistanceRatio),
     );
-    const distance = mobileMiranteSelection
-      ? fittedSelectionDistance * 1.26
-      : compactSidePanelMirante
-        ? fittedSelectionDistance * 1.36
+    const distance = compactSidePanelMirante
+      ? fittedSelectionDistance * 1.36
       : fittedSelectionDistance;
     const viewDirection = direction.clone().negate();
     const right = new THREE.Vector3().crossVectors(viewDirection, new THREE.Vector3(0, 1, 0));
@@ -1402,22 +1383,6 @@ function CameraRig({
     if (panelWidth > 0) {
       const horizontalShift = distance * Math.tan(horizontalFov / 2) * (panelWidth / Math.max(size.width, 1));
       lookAt.addScaledVector(right, horizontalShift * (compactSidePanelMirante ? 1.04 : 0.72));
-    } else if (panelHeight > 0) {
-      const viewUp = new THREE.Vector3().crossVectors(right, viewDirection);
-      viewUp.y = 0;
-      if (viewUp.lengthSq() > 0.0001) {
-        viewUp.normalize();
-        const verticalShift = distance * Math.tan(THREE.MathUtils.degToRad(perspective.fov || 38) / 2) * (panelHeight / Math.max(size.height, 1));
-        // Keep the anchor and its label clear of the mobile details sheet. The
-        // sheet's rounded top edge and safe-area spacing need a little more
-        // clearance than its raw height alone suggests.
-        const mobilePanelClearance = landmarkKind === 'livestock-pavilion'
-          ? 1.72
-          : landmarkKind === 'mirante-pavilion'
-            ? 1.56
-            : 0.96;
-        lookAt.addScaledVector(viewUp, -verticalShift * mobilePanelClearance);
-      }
     }
     targetLookAt.current.copy(lookAt);
     targetPosition.current.copy(lookAt).add(direction.multiplyScalar(distance));
@@ -1475,6 +1440,7 @@ function CameraRig({
     const segmentChanged = segmentId !== previousSegment.current;
     const presetChanged = preset !== previousPreset.current;
     const sequenceChanged = cameraSequence !== previousSequence.current;
+    const detailsLayoutChanged = (activePanel === 'details') !== previousDetailsLayout.current;
 
     if (!initialized.current) {
       if (returnView.current) {
@@ -1510,7 +1476,7 @@ function CameraRig({
       queueSelection(selectedEntity);
     } else if (selectionChanged && !selectedEntity) {
       animating.current = false;
-    } else if (selectedEntity) {
+    } else if (detailsLayoutChanged && selectedEntity) {
       queueSelection(selectedEntity);
     }
 
@@ -1518,7 +1484,9 @@ function CameraRig({
     previousPreset.current = preset;
     previousSequence.current = cameraSequence;
     previousSegment.current = segmentId;
+    previousDetailsLayout.current = activePanel === 'details';
   }, [
+    activePanel,
     activeSegment,
     activeSegmentEntities,
     camera,
@@ -1536,9 +1504,9 @@ function CameraRig({
     const previous = previousViewportSize.current;
     const resized = Math.abs(previous.width - size.width) >= 2
       || Math.abs(previous.height - size.height) >= 2;
-    previousViewportSize.current = { width: size.width, height: size.height };
 
     if (!resized || !initialized.current) return undefined;
+    previousViewportSize.current = { width: size.width, height: size.height };
 
     const frame = window.requestAnimationFrame(() => {
       if (selectedEntity) queueSelection(selectedEntity);
@@ -1672,16 +1640,16 @@ function CameraRig({
     <OrbitControls
       ref={controlsRef}
       makeDefault
-      regress
-      enableDamping={!reducedMotion}
+      enableDamping
       dampingFactor={0.072}
       enablePan={!miranteSelected}
       minDistance={miranteMinimumDistance}
       maxDistance={miranteMaximumDistance}
       minPolarAngle={0.025}
       maxPolarAngle={Math.PI / 2.08}
-      screenSpacePanning
+      screenSpacePanning={false}
       zoomToCursor={!miranteSelected}
+      touches={{ ONE: THREE.TOUCH.PAN, TWO: THREE.TOUCH.DOLLY_PAN }}
       minAzimuthAngle={miranteSelected ? -2.65 : -Infinity}
       maxAzimuthAngle={miranteSelected ? -0.9 : Infinity}
       onStart={handleControlsStart}
@@ -1716,7 +1684,8 @@ function Scene({
   const cameraNavigating = useCommercialMapStore((state) => state.cameraNavigating);
   const technicalValidationVisible = useCommercialMapStore((state) => state.technicalValidationVisible);
   const activeSegmentId = useCommercialMapStore((state) => state.activeSegmentId);
-  const { gl, invalidate } = useThree();
+  const gl = useThree((state) => state.gl);
+  const invalidate = useThree((state) => state.invalidate);
   const setCanvasCursor = useCallback((cursor: 'grab' | 'grabbing' | 'pointer') => {
     gl.domElement.style.cursor = cursor;
   }, [gl]);
@@ -1929,7 +1898,6 @@ function Scene({
         activeSegment={activeSegment}
         activeSegmentEntities={activeSegmentEntities}
       />
-      <AdaptiveDpr pixelated={reducedGraphics} />
       <Preload all />
     </>
   );
@@ -1961,14 +1929,60 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
   const setSelectedEntityId = useCommercialMapStore((state) => state.setSelectedEntityId);
   const interiorEntityId = useCommercialMapStore((state) => state.interiorEntityId);
   const reducedGraphics = useCommercialMapStore((state) => state.reducedGraphics);
+  const [canvasElement, setCanvasElement] = useState<HTMLCanvasElement | null>(null);
+  const [viewportMetrics, setViewportMetrics] = useState(() => ({
+    width: typeof window === 'undefined' ? 1366 : window.innerWidth,
+    height: typeof window === 'undefined' ? 768 : window.innerHeight,
+    dpr: typeof window === 'undefined' ? 1 : window.devicePixelRatio,
+  }));
+
+  useEffect(() => {
+    const canvasHost = canvasElement?.parentElement;
+    if (!canvasHost) return undefined;
+    let frame = 0;
+    const update = () => {
+      window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(() => {
+        const bounds = canvasHost.getBoundingClientRect();
+        setViewportMetrics((current) => {
+          const next = {
+            width: Math.max(1, bounds.width),
+            height: Math.max(1, bounds.height),
+            dpr: window.devicePixelRatio,
+          };
+          return Math.abs(current.width - next.width) < 0.5
+            && Math.abs(current.height - next.height) < 0.5
+            && current.dpr === next.dpr
+            ? current
+            : next;
+        });
+      });
+    };
+    const resizeObserver = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(update);
+    resizeObserver?.observe(canvasHost);
+    window.addEventListener('resize', update, { passive: true });
+    window.visualViewport?.addEventListener('resize', update, { passive: true });
+    update();
+    return () => {
+      window.cancelAnimationFrame(frame);
+      resizeObserver?.disconnect();
+      window.removeEventListener('resize', update);
+      window.visualViewport?.removeEventListener('resize', update);
+    };
+  }, [canvasElement]);
+
+  const pixelRatio = useMemo(() => resolveCommercialMapPixelRatio({
+    devicePixelRatio: viewportMetrics.dpr,
+    viewportWidth: viewportMetrics.width,
+    viewportHeight: viewportMetrics.height,
+    reducedGraphics,
+  }), [reducedGraphics, viewportMetrics]);
   const extent = useMemo(() => getSceneExtent(entities), [entities]);
-  const viewportWidth = typeof window === 'undefined' ? 1366 : window.innerWidth;
-  const viewportHeight = typeof window === 'undefined' ? 768 : window.innerHeight;
   const initialDirection = new THREE.Vector3(0.04, 0.72, 0.69).normalize();
   const initialDistance = fitDistanceForDirection(
     extent,
     38,
-    viewportWidth / Math.max(viewportHeight, 1),
+    1,
     initialDirection,
     1.1,
   );
@@ -1977,6 +1991,7 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
 
   return (
     <Canvas
+      ref={setCanvasElement}
       className="commercial-map-canvas"
       frameloop="demand"
       camera={{
@@ -1985,7 +2000,7 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
         near: Math.max(0.05, initialDistance / 1600),
         far: Math.max(720, extent.diagonal * 9),
       }}
-      dpr={reducedGraphics ? [0.85, 1.2] : [1, 1.5]}
+      dpr={pixelRatio}
       shadows={!reducedGraphics}
       gl={{ antialias: !reducedGraphics, alpha: false, powerPreference: 'high-performance', preserveDrawingBuffer: false }}
         onCreated={({ gl }) => {

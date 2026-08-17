@@ -1,0 +1,80 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { describe, expect, it } from 'vitest';
+
+const read = (path: string) => readFileSync(resolve(path), 'utf8');
+
+describe('arquitetura mobile-first do Mapa Comercial', () => {
+  it('integra a busca no cabeçalho e mantém o mesmo estado comercial', () => {
+    const shell = read('src/features/commercial-map/components/shell/CommercialMapShell.tsx');
+    const toolbar = read('src/features/commercial-map/components/controls/MapToolbar.tsx');
+
+    expect(shell).toContain("useCommercialMapStore((state) => state.search)");
+    expect(shell).toContain('data-commercial-map-search');
+    expect(shell).toContain('data-commercial-map-shell-search-trigger');
+    expect(shell).toContain('searchTriggerRef.current?.focus()');
+    expect(shell).toContain('ID, nome, quadra, lote, rua ou empresa');
+    expect(toolbar).toContain('commercial-map-toolbar--desktop');
+    expect(toolbar).toContain('commercial-map-toolbar-mobile');
+    expect(toolbar).toContain('data-commercial-map-commission-search-trigger');
+    expect(toolbar).toContain('isCommissionScope');
+  });
+
+  it('substitui os cards permanentes por seletor móvel sem escalar o canvas', () => {
+    const segments = read('src/features/commercial-map/components/segments/SegmentLegend.tsx');
+    const styles = read('src/features/commercial-map/commercial-map-mobile.css');
+
+    expect(segments).toContain('commercial-map-segment-mobile-trigger');
+    expect(segments).toContain('shouldScaleBackground={false}');
+    expect(segments).toContain('commercialMapSegmentInventory(entities, lots)');
+    expect(styles).toMatch(/@container commercial-map \(max-width: 720px\)[\s\S]*?\.commercial-map-segment-legend \{ display: none; \}/);
+  });
+
+  it('usa split real em meia tela e só expande por ação explícita', () => {
+    const page = read('src/features/commercial-map/CommercialMapPage.tsx');
+    const panel = read('src/features/commercial-map/components/panels/MapPanels.tsx');
+    const styles = read('src/features/commercial-map/commercial-map-mobile.css');
+
+    expect(page).toContain('className="commercial-map-stage"');
+    expect(panel).toContain("useState<CommercialMapDetailSheetState>('half')");
+    expect(panel).toContain('data-sheet-state={sheetState}');
+    expect(styles).toContain('data-sheet-state="half"');
+    expect(styles).toContain('bottom: 50%');
+    expect(styles).toContain('data-sheet-state="collapsed"');
+    expect(styles).toContain('data-sheet-state="expanded"');
+  });
+
+  it('mantém DPR estável, antialias e gestos GIS no canvas compartilhado', () => {
+    const canvas = read('src/features/commercial-map/components/canvas/CommercialMapCanvas.tsx');
+    const styles = read('src/features/commercial-map/commercial-map-mobile.css');
+
+    expect(canvas).toContain('resolveCommercialMapPixelRatio');
+    expect(canvas).toContain('dpr={pixelRatio}');
+    expect(canvas).not.toContain('AdaptiveDpr');
+    expect(canvas).not.toMatch(/<OrbitControls[\s\S]*?\bregress\b/);
+    expect(canvas).toContain('touches={{ ONE: THREE.TOUCH.PAN, TWO: THREE.TOUCH.DOLLY_PAN }}');
+    expect(canvas).toContain('screenSpacePanning={false}');
+    expect(canvas).toContain("gl={{ antialias: !reducedGraphics");
+    expect(styles).toContain('touch-action: none');
+    expect(styles).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.commercial-map-stage \{ transition-duration: 340ms !important; \}/);
+  });
+
+  it('remove apenas o chrome persistente do fluxo móvel principal', () => {
+    const styles = read('src/features/commercial-map/commercial-map-mobile.css');
+
+    expect(styles).toContain('.commercial-map-source-notice.is-database { display: none; }');
+    expect(styles).toContain('.commercial-map-command-header');
+    expect(styles).toContain('.commercial-map-command-header > .commercial-map-view-selector');
+    expect(styles).toContain('.commercial-map-management');
+  });
+
+  it('preserva busca e ações em smartphones estreitos sem sobrepor a toolbar', () => {
+    const toolbar = read('src/features/commercial-map/components/controls/MapToolbar.tsx');
+    const styles = read('src/features/commercial-map/commercial-map-mobile.css');
+
+    expect(toolbar).toContain('commercial-map-toolbar-focus-selection');
+    expect(toolbar).toContain('commercial-map-toolbar-menu-focus-selection');
+    expect(styles).toMatch(/@media \(max-width: 350px\)[\s\S]*?\.commercial-map-toolbar-mobile > \.commercial-map-toolbar-focus-selection \{ display: none; \}/);
+    expect(styles).toContain('.commercial-map-toolbar-menu .commercial-map-toolbar-menu-focus-selection { display: flex; }');
+  });
+});

@@ -1043,10 +1043,6 @@
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .commercial-map-panel, .commercial-map-label, .commercial-map-toolbar button, .commercial-map-result-list > button, .commercial-map-interior-navigation, .commercial-map-segment-list > button { animation: none !important; transition: none !important; }
-}
-
 @media (prefers-contrast: more) {
   .commercial-map-search, .commercial-map-toolbar, .commercial-map-summary, .commercial-map-panel, .commercial-map-interior-navigation, .commercial-map-segment-legend { border-width: 2px; border-color: oklch(var(--brand-navy-900)); }
 }

@@ -1,4 +1,4 @@
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useMemo, useRef } from 'react';
 import { OrbitControls } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
@@ -19,24 +19,6 @@ import {
 
 const UP = new THREE.Vector3(0, 1, 0);
 
-function useReducedMotionPreference() {
-  const [reducedMotion, setReducedMotion] = useState(() => (
-    typeof window !== 'undefined'
-    && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
-  ));
-
-  useEffect(() => {
-    if (typeof window === 'undefined' || !window.matchMedia) return undefined;
-    const query = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const update = () => setReducedMotion(query.matches);
-    update();
-    query.addEventListener?.('change', update);
-    return () => query.removeEventListener?.('change', update);
-  }, []);
-
-  return reducedMotion;
-}
-
 function MiranteInteriorCameraRig({
   entity,
   reducedGraphics,
@@ -49,7 +31,6 @@ function MiranteInteriorCameraRig({
   const targetPosition = useRef(new THREE.Vector3());
   const targetLookAt = useRef(new THREE.Vector3());
   const { camera, gl, invalidate, size } = useThree();
-  const reducedMotion = useReducedMotionPreference();
   const bounds = useMemo(() => strategicLandmarkBounds(entity), [entity]);
   const height = Math.max(entity.geometry.extrusionHeight, miranteVisualHeight(bounds));
   const layout = useMemo(() => createMiranteLayout(bounds, height), [bounds, height]);
@@ -99,7 +80,7 @@ function MiranteInteriorCameraRig({
 
     targetPosition.current.copy(destination);
     targetLookAt.current.copy(lookAt);
-    camera.position.copy(reducedMotion || reducedGraphics ? destination : start);
+    camera.position.copy(reducedGraphics ? destination : start);
     camera.near = 0.04;
     camera.far = Math.max(150, layout.depth * 15);
     if (camera instanceof THREE.PerspectiveCamera) {
@@ -109,7 +90,7 @@ function MiranteInteriorCameraRig({
     controls.current?.target.copy(lookAt);
     clampTarget();
     controls.current?.update();
-    animating.current = !reducedMotion && !reducedGraphics;
+    animating.current = !reducedGraphics;
     gl.domElement.style.cursor = 'grab';
     invalidate();
     return () => {
@@ -125,7 +106,6 @@ function MiranteInteriorCameraRig({
     layout.platform.topY,
     layout.width,
     reducedGraphics,
-    reducedMotion,
     size.height,
     size.width,
     toWorld,
@@ -160,8 +140,7 @@ function MiranteInteriorCameraRig({
     <OrbitControls
       ref={controls}
       makeDefault
-      regress
-      enableDamping={!reducedMotion}
+      enableDamping
       dampingFactor={0.072}
       enablePan={false}
       screenSpacePanning

@@ -220,8 +220,6 @@ function LivestockInteriorCameraRig({
   useEffect(() => {
     const compact = size.width < 700 || size.height < 500;
     const portrait = size.height > size.width * 1.15;
-    const reducedMotion = typeof window !== 'undefined'
-      && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
     const start = portrait
       ? toWorld(-layout.width * 0.18, layout.height * 1.92, layout.depth * 10.5)
       : compact
@@ -240,7 +238,7 @@ function LivestockInteriorCameraRig({
 
     targetPosition.current.copy(destination);
     targetLookAt.current.copy(lookAt);
-    camera.position.copy(reducedMotion ? destination : start);
+    camera.position.copy(reducedGraphics ? destination : start);
     camera.near = 0.04;
     camera.far = Math.max(140, layout.width * 8);
     if (camera instanceof THREE.PerspectiveCamera) camera.fov = portrait ? 50 : compact ? 48 : 44;
@@ -248,7 +246,7 @@ function LivestockInteriorCameraRig({
     controls.current?.target.copy(lookAt);
     clampTarget();
     controls.current?.update();
-    animating.current = !reducedMotion && !reducedGraphics;
+    animating.current = !reducedGraphics;
     gl.domElement.style.cursor = 'grab';
     invalidate();
     return () => {
@@ -295,7 +293,6 @@ function LivestockInteriorCameraRig({
     <OrbitControls
       ref={controls}
       makeDefault
-      regress
       enableDamping
       dampingFactor={0.075}
       enablePan

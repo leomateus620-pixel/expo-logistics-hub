@@ -80,10 +80,17 @@ describe('contrato persistido dos mapas por comissão', () => {
   });
 
   it('preserva a cadeia Auth, organização e capability antes da rota interna', () => {
-    const routeStart = app.indexOf('if (mapPortal)');
-    const routeEnd = app.indexOf("if (module.slug === 'logistica')", routeStart);
-    const route = routeEnd > routeStart ? app.slice(routeStart, routeEnd) : app.slice(routeStart);
+    const commissionRoutesStart = app.indexOf('function CommissionModuleRoutes()');
+    const commissionRoutesEnd = app.indexOf('function AdminRoutes()', commissionRoutesStart);
+    const commissionRoutes = app.slice(commissionRoutesStart, commissionRoutesEnd);
+    const routeStart = commissionRoutes.indexOf('if (mapPortal)');
+    const routeEnd = commissionRoutes.indexOf("if (module.slug === 'logistica')", routeStart);
+    const route = routeEnd > routeStart
+      ? commissionRoutes.slice(routeStart, routeEnd)
+      : commissionRoutes.slice(routeStart);
 
+    expect(commissionRoutesStart).toBeGreaterThan(-1);
+    expect(commissionRoutesEnd).toBeGreaterThan(commissionRoutesStart);
     expect(routeStart).toBeGreaterThan(-1);
     expect(route).toContain('<AuthGuard>');
     expect(route).toContain('<OrgGuard>');

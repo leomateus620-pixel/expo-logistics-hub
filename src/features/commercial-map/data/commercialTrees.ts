@@ -122,7 +122,14 @@ function buildTrees(quadra: CommercialTreeQuadra, blueprints: readonly TreeBluep
   });
 }
 
-const QUADRA_D_TREES = buildTrees('D', [
+function recommendFieldReview(blueprints: readonly TreeBlueprint[]): readonly TreeBlueprint[] {
+  return blueprints.map((tree) => ({
+    ...tree,
+    verificationStatus: 'FIELD_REVIEW_RECOMMENDED',
+  }));
+}
+
+const QUADRA_D_TREES = buildTrees('D', recommendFieldReview([
   { sourcePosition: [3662, 3504], placement: 'LOT_EDGE', relatedLotId: 'Q-D-06', scale: 1.08, notes: 'Primeira copa real do corredor da Rua Uruguai; a mancha cinza para Quadra E foi excluída.' },
   { sourcePosition: [3685, 3520], placement: 'LOT_EDGE', relatedLotId: 'Q-D-06', speciesGroup: 'OPEN_CANOPY', scale: 1.02, notes: 'Centro claro do dossel, distinto da sombra alongada.' },
   { sourcePosition: [3712, 3536], placement: 'LOT_EDGE', relatedLotId: 'Q-D-08', scale: 1.17, notes: 'Copa madura na testada da Rua Uruguai.' },
@@ -132,9 +139,9 @@ const QUADRA_D_TREES = buildTrees('D', [
   { sourcePosition: [3827, 3532], placement: 'LOT_EDGE', relatedLotId: 'Q-D-10', scale: 1.22, notes: 'Copa confirmada no limite norte, sem árvore criada na projeção escura.' },
   { sourcePosition: [3863, 3507], placement: 'LOT_EDGE', relatedLotId: 'Q-D-12', scale: 1.08, notes: 'Árvore de transição para a Rua Brasília.' },
   { sourcePosition: [3900, 3525], placement: 'LOT_EDGE', relatedLotId: 'Q-D-12', speciesGroup: 'OPEN_CANOPY', scale: 1.0, notes: 'Última copa do alinhamento norte da Quadra D.' },
-].map((tree) => ({ ...tree, verificationStatus: 'FIELD_REVIEW_RECOMMENDED' as const })));
+]));
 
-const QUADRA_I_TREES = buildTrees('I', [
+const QUADRA_I_TREES = buildTrees('I', recommendFieldReview([
   { sourcePosition: [2780, 3470], placement: 'SIDEWALK_EDGE', scale: 1.18, notes: 'Copa externa ao lote no início da Calçada do Arvoredo.' },
   { sourcePosition: [2792, 3500], placement: 'SIDEWALK_EDGE', scale: 1.24, notes: 'Árvore do corredor arborizado, fora da malha comercial.' },
   { sourcePosition: [2804, 3530], placement: 'SIDEWALK_EDGE', speciesGroup: 'OPEN_CANOPY', scale: 1.08, notes: 'Copa aberta no alinhamento da calçada.' },
@@ -150,9 +157,9 @@ const QUADRA_I_TREES = buildTrees('I', [
   { sourcePosition: [3060, 3728], placement: 'STREET_EDGE', scale: 1.12, notes: 'Árvore da Rua Argentina mantida fora dos lotes.' },
   { sourcePosition: [3120, 3738], placement: 'STREET_EDGE', scale: 1.2, notes: 'Centro de copa externo na faixa sul.' },
   { sourcePosition: [3175, 3727], placement: 'STREET_EDGE', speciesGroup: 'OPEN_CANOPY', scale: 1.08, notes: 'Árvore externa da Rua Argentina; sombra não foi usada como tronco.' },
-].map((tree) => ({ ...tree, verificationStatus: 'FIELD_REVIEW_RECOMMENDED' as const })));
+]));
 
-const QUADRA_J_TREES = buildTrees('J', [
+const QUADRA_J_TREES = buildTrees('J', recommendFieldReview([
   { sourcePosition: [2740, 3210], placement: 'SIDEWALK_EDGE', speciesGroup: 'OPEN_CANOPY', scale: 1.04, notes: 'Primeira copa do corredor da Calçada do Arvoredo.' },
   { sourcePosition: [2750, 3240], placement: 'SIDEWALK_EDGE', scale: 1.2, notes: 'Centro de copa do maciço superior direito do anexo.' },
   { sourcePosition: [2762, 3272], placement: 'SIDEWALK_EDGE', scale: 1.26, notes: 'Árvore externa à quadra no alinhamento arborizado.' },
@@ -167,9 +174,9 @@ const QUADRA_J_TREES = buildTrees('J', [
   { sourcePosition: [3140, 3170], placement: 'STREET_EDGE', speciesGroup: 'ORNAMENTAL_COMPACT', scale: 0.9, notes: 'Árvore isolada na faixa da Rua Brasil.' },
   { sourcePosition: [3295, 3172], placement: 'STREET_EDGE', scale: 1.02, notes: 'Copa na divisão com a Rua Brasil, fora da malha comercial.' },
   { sourcePosition: [3395, 3176], placement: 'STREET_EDGE', speciesGroup: 'OPEN_CANOPY', scale: 1.06, notes: 'Árvore próxima à Rua Montevidéu, ainda no bordo viário.' },
-].map((tree) => ({ ...tree, verificationStatus: 'FIELD_REVIEW_RECOMMENDED' as const })));
+]));
 
-const QUADRA_E_TREES = buildTrees('E', [
+const QUADRA_E_TREES = buildTrees('E', recommendFieldReview([
   { sourcePosition: [3932, 3210], placement: 'LOT_EDGE', relatedLotId: 'Q-E-13', scale: 1.22, notes: 'Copa no limite leste do lote 13, diante do Centro de Eventos.' },
   { sourcePosition: [3925, 3240], placement: 'LOT_EDGE', relatedLotId: 'Q-E-13', speciesGroup: 'OPEN_CANOPY', scale: 1.16, notes: 'Tronco no gramado do lote 13; apenas a copa avança sobre a Rua Brasília.' },
   { sourcePosition: [3930, 3272], placement: 'LOT_EDGE', relatedLotId: 'Q-E-12', scale: 1.24, notes: 'Copa de borda associada somente ao lote 12.' },
@@ -184,7 +191,7 @@ const QUADRA_E_TREES = buildTrees('E', [
   { sourcePosition: [3760, 3172], placement: 'STREET_EDGE', speciesGroup: 'OPEN_CANOPY', scale: 1.08, notes: 'Árvore no bordo viário, sem atribuição ao lote.' },
   { sourcePosition: [3830, 3175], placement: 'STREET_EDGE', speciesGroup: 'ORNAMENTAL_COMPACT', scale: 0.98, notes: 'Árvore pequena junto à Rua Brasil.' },
   { sourcePosition: [3898, 3178], placement: 'QUADRA_BORDER', speciesGroup: 'OPEN_CANOPY', scale: 1.1, notes: 'Copa da esquina Rua Brasil/Rua Brasília, mantida no limite da quadra.' },
-].map((tree) => ({ ...tree, verificationStatus: 'FIELD_REVIEW_RECOMMENDED' as const })));
+]));
 
 export const COMMERCIAL_MAP_TREES: readonly CommercialMapTree[] = [
   ...QUADRA_D_TREES,
