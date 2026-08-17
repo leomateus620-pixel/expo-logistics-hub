@@ -324,7 +324,9 @@ export function MobileCronogramaTimeline({
         </button>
         <div className="cronograma-mobile-month-context">
           <h2>{mobileMonthLabel(position.month)}</h2>
+          <p className="cronograma-mobile-month-stage">{selectedSummary?.stage ?? 'Ciclo oficial'}</p>
         </div>
+
         <button
           type="button"
           onClick={() => nextMonth && goToMonth(nextMonth)}
