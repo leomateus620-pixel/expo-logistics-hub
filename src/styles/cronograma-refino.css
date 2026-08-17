@@ -800,12 +800,12 @@
 }
 
 /* Gutter único entre topo, slide bar e conteúdo. */
-.cronograma-page {
+.cronograma-module-shell {
   --cronograma-gutter: 0.75rem;
 }
 
 @media (min-width: 640px) {
-  .cronograma-page {
+  .cronograma-module-shell {
     --cronograma-gutter: 1.15rem;
   }
 }
