@@ -155,9 +155,6 @@ export function CronogramaTimelineBoard({
   });
   const currentYear = getCurrentCycleYear(todayKey);
   const selectedSummary = summaries.find((summary) => summary.year === navigation.selectedYear)!;
-  const focusedLabel = navigation.focusedMonth
-    ? monthLabel(navigation.focusedMonth)
-    : `${navigation.selectedYear} · ${selectedSummary.stage}`;
   const reflectEventMonth = navigation.reflectEventMonth;
 
   const openTimelineEvent = useCallback((event: CronogramaEvent) => {
@@ -177,10 +174,6 @@ export function CronogramaTimelineBoard({
           aria-label={variant === 'completed' ? 'Navegação do histórico concluído' : 'Navegação entre períodos'}
         >
           {filtersSlot && <div className="cronograma-temporal-nav__filters">{filtersSlot}</div>}
-          <div className="min-w-0">
-            <p className="truncate text-lg font-black tracking-tight text-foreground">{focusedLabel}</p>
-            <p className="cronograma-temporal-nav__stage">{selectedSummary.stage}</p>
-          </div>
           <CronogramaCyclePortal>
             <CronogramaCycleChips
               summaries={summaries}
