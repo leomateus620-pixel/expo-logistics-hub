@@ -1002,21 +1002,26 @@ export default function CronogramaEventosPage() {
           resetKey={`${activeView}:${events.length}:${cronograma.isLoading ? 'loading' : 'ready'}`}
           onRetry={() => cronograma.refetch()}
         >
-          <div className="cronograma-mobile-experience mx-auto flex w-full max-w-3xl min-w-0 flex-col gap-3 overflow-x-clip px-3">
-            <MobileCronogramaNavigation activeView={activeView} onChange={setActiveView} />
+          <CronogramaCycleSlotProvider>
+            <div className="cronograma-mobile-experience mx-auto flex w-full max-w-3xl min-w-0 flex-col gap-2.5 overflow-x-clip px-3">
+              <div className="cronograma-mobile-command">
+                <MobileCronogramaNavigation activeView={activeView} onChange={setActiveView} />
+                <CronogramaCycleSlotTarget className="cronograma-mobile-cycle-slot" />
+              </div>
 
-            <MobileCronogramaFilters
-              filters={filters}
-              events={events}
-              onChange={applyFilters}
-              onClear={clearFilters}
-              resultCount={filteredEvents.length}
-              totalCount={eventsForView.length}
-              syncing={cronograma.isRefreshing}
-              onOverlayOpenChange={handleMobileFiltersOpenChange}
-            />
-            {operationalContent}
-          </div>
+              <MobileCronogramaFilters
+                filters={filters}
+                events={events}
+                onChange={applyFilters}
+                onClear={clearFilters}
+                resultCount={filteredEvents.length}
+                totalCount={eventsForView.length}
+                syncing={cronograma.isRefreshing}
+                onOverlayOpenChange={handleMobileFiltersOpenChange}
+              />
+              {operationalContent}
+            </div>
+          </CronogramaCycleSlotProvider>
         </MobileCronogramaErrorBoundary>
       ) : (
         <CronogramaFiltersSlotProvider
@@ -1031,33 +1036,37 @@ export default function CronogramaEventosPage() {
             />
           )}
         >
-          <div className="mx-auto flex w-full max-w-[1680px] flex-col gap-3 px-3 sm:px-5 2xl:px-8">
-            <div className="cronograma-workbench-bar">
-              <CronogramaSecondaryNav activeView={activeView} onChange={setActiveView} />
-              <button
-                type="button"
-                onClick={() => setActiveView(activeView === 'completed' ? 'timeline' : 'completed')}
-                className="cronograma-history-toggle focus-ring"
-                data-active={activeView === 'completed' || undefined}
-                aria-pressed={activeView === 'completed'}
-              >
-                <BadgeCheck aria-hidden="true" />
-                <span>Histórico concluído</span>
-              </button>
+          <CronogramaCycleSlotProvider>
+            <div className="mx-auto flex w-full max-w-[1680px] flex-col gap-3 px-3 sm:px-5 2xl:px-8">
+              <div className="cronograma-workbench-bar">
+                <CronogramaSecondaryNav activeView={activeView} onChange={setActiveView} />
+                <button
+                  type="button"
+                  onClick={() => setActiveView(activeView === 'completed' ? 'timeline' : 'completed')}
+                  className="cronograma-history-toggle focus-ring"
+                  data-active={activeView === 'completed' || undefined}
+                  aria-pressed={activeView === 'completed'}
+                >
+                  <BadgeCheck aria-hidden="true" />
+                  <span>Histórico concluído</span>
+                </button>
+                <CronogramaCycleSlotTarget className="cronograma-workbench-cycle" />
+              </div>
+
+              {activeView !== 'timeline' && activeView !== 'completed' && (
+                <CronogramaCycleBar
+                  label="Visão operacional"
+                  title={CRONOGRAMA_VIEW_LABELS[activeView]}
+                />
+              )}
+
+
+              {operationalContent}
             </div>
-
-            {activeView !== 'timeline' && activeView !== 'completed' && (
-              <CronogramaCycleBar
-                label="Visão operacional"
-                title={CRONOGRAMA_VIEW_LABELS[activeView]}
-              />
-            )}
-
-
-            {operationalContent}
-          </div>
+          </CronogramaCycleSlotProvider>
         </CronogramaFiltersSlotProvider>
       )}
+
 
 
 
