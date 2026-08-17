@@ -1026,18 +1026,18 @@ export default function CronogramaEventosPage() {
           )}
         >
           <div className="mx-auto flex w-full max-w-[1680px] flex-col gap-3 px-3 sm:px-5 2xl:px-8">
-            <CronogramaCommandHeader
-              availability={cronograma.isLoading ? 'loading' : cronograma.isSeedFallback ? 'offline' : 'ready'}
-            />
-
-            <CronogramaRegistrationAction
-              canManage={cronograma.canManage}
-              onCreate={openCreate}
-              presentation="desktop"
-            />
-
-            <div className="cronograma-command-dock sticky top-[84px] z-20 pb-2">
-              <CronogramaViewTabs activeView={activeView} onChange={setActiveView} />
+            <div className="cronograma-workbench-bar">
+              <CronogramaSecondaryNav activeView={activeView} onChange={setActiveView} />
+              <button
+                type="button"
+                onClick={() => setActiveView(activeView === 'completed' ? 'timeline' : 'completed')}
+                className="cronograma-history-toggle focus-ring"
+                data-active={activeView === 'completed' || undefined}
+                aria-pressed={activeView === 'completed'}
+              >
+                <BadgeCheck aria-hidden="true" />
+                <span>Histórico concluído</span>
+              </button>
             </div>
 
             {activeView !== 'timeline' && activeView !== 'completed' && (
@@ -1046,6 +1046,7 @@ export default function CronogramaEventosPage() {
                 title={CRONOGRAMA_VIEW_LABELS[activeView]}
               />
             )}
+
 
             {operationalContent}
           </div>
