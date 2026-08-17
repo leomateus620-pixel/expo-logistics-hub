@@ -44,6 +44,7 @@ import {
   strategicLandmarkSupportsInterior,
 } from '../../utils/landmarks';
 import { normalizeMapEntityMetadata } from '../../utils/mapMetadata';
+import { resolveCommercialPavilionModulePlan } from '../../utils/commercialPavilionModules';
 import {
   resolveCommercialMapSheetSnap,
   type CommercialMapDetailSheetState,
@@ -54,6 +55,7 @@ import { LotWorkflowDialog, type LotWorkflow } from '../commercial/LotWorkflowDi
 import { LotStructureDialog, type LotStructureOperation } from '../commercial/LotStructureDialog';
 import { LotEditDialog } from '../commercial/LotEditDialog';
 import { EntityVerificationDialog } from '../commercial/EntityVerificationDialog';
+import { PavilionPlanLegend } from './PavilionPlanLegend';
 
 const currency = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 const number = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 });
@@ -223,8 +225,12 @@ export function LayersPanel({
             </label>
           )}
           <label className="commercial-map-setting-row">
-            <span><strong>Mapa original</strong><small>Camada cartográfica temporária</small></span>
-            <Switch checked={referenceVisible} onCheckedChange={setReferenceVisible} />
+            <span><strong>Referência oficial</strong><small>Calibração com textos incorporados</small></span>
+            <Switch
+              checked={referenceVisible}
+              onCheckedChange={setReferenceVisible}
+              aria-label="Referência oficial para calibração"
+            />
           </label>
           {referenceVisible && (
             <div className="commercial-map-setting-slider">
@@ -279,6 +285,9 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions }:
   const metadata = normalizeMapEntityMetadata(entity, lot);
   const structuralReady = lot ? ['AVAILABLE', 'BLOCKED', 'UNAVAILABLE'].includes(lot.status) : false;
   const landmarkKind = resolveStrategicLandmarkKind(entity);
+  const pavilionPlan = landmarkKind === 'commercial-pavilion'
+    ? resolveCommercialPavilionModulePlan(entity)
+    : null;
   const usesInspectionCopy = landmarkKind === 'commercial-pavilion'
     || landmarkKind === 'livestock-pavilion'
     || landmarkKind === 'mirante-pavilion';
@@ -419,6 +428,8 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions }:
             )}
             <p>{entity.description || 'Estrutura identificada na planta oficial da Fenasoja.'}</p>
           </div>
+
+          {pavilionPlan && <PavilionPlanLegend plan={pavilionPlan} />}
 
           <div className="commercial-map-detail-primary" aria-label="Informações principais do lote selecionado">
             {lot && <div><span>Quadra / lote</span><strong>{[lot.block, lot.lotNumber].filter(Boolean).join(' · ') || 'Não informado'}</strong></div>}

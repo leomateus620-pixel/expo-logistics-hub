@@ -14,7 +14,7 @@
   width: 100% !important;
   height: 100% !important;
   overscroll-behavior: contain;
-  touch-action: none;
+  touch-action: none !important;
   transform: none !important;
 }
 
@@ -261,6 +261,29 @@
   .commercial-map-detail-hero p { display: none; }
   .commercial-map-detail-code { font-size: 0.72rem; }
   .commercial-map-status-pill { min-height: 2rem; padding-inline: 0.65rem; font-size: 0.7rem; }
+
+  .commercial-pavilion-plan-legend { margin: 0.65rem 0.8rem; }
+  .commercial-pavilion-plan-legend.is-interior {
+    bottom: max(0.55rem, env(safe-area-inset-bottom));
+    left: max(0.55rem, env(safe-area-inset-left));
+    width: min(17.75rem, calc(100% - 1.1rem - env(safe-area-inset-left) - env(safe-area-inset-right)));
+    margin: 0;
+    border-radius: 0.85rem;
+  }
+  .commercial-pavilion-plan-legend.is-interior > header { gap: 0.5rem; padding: 0.55rem 0.65rem 0.45rem; }
+  .commercial-pavilion-plan-legend.is-interior > header > i { min-height: 2rem; }
+  .commercial-pavilion-plan-legend.is-interior > header strong { font-size: 0.875rem; }
+  .commercial-pavilion-plan-legend.is-interior > header small { font-size: 0.6875rem; }
+  .commercial-pavilion-plan-legend.is-interior .commercial-pavilion-plan-overview { grid-template-columns: 4rem minmax(0,1fr); gap: 0.45rem; padding: 0.45rem 0.65rem; }
+  .commercial-pavilion-plan-legend.is-interior .commercial-pavilion-plan-overview svg { width: 4rem; height: 3.35rem; }
+  .commercial-pavilion-plan-legend.is-interior .commercial-pavilion-plan-overview dl { gap: 0.25rem; }
+  .commercial-pavilion-plan-legend.is-interior .commercial-pavilion-plan-overview dl > div { padding: 0.27rem 0.35rem; border-radius: 0.4rem; }
+  .commercial-pavilion-plan-legend.is-interior .commercial-pavilion-plan-overview dt { font-size: 0.625rem; }
+  .commercial-pavilion-plan-legend.is-interior .commercial-pavilion-plan-overview dd { font-size: 0.6875rem; }
+  .commercial-pavilion-plan-legend.is-interior .commercial-pavilion-plan-groups { display: none; }
+  .commercial-pavilion-plan-legend.is-interior > footer { padding: 0.4rem 0.65rem 0.45rem; }
+  .commercial-pavilion-plan-legend.is-interior > footer > span { display: none; }
+  .commercial-pavilion-plan-legend.is-interior > footer > small { font-size: 0.625rem; }
 
   .commercial-map-detail-primary {
     display: grid;

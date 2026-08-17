@@ -3,8 +3,11 @@ import {
   labelBelongsToActiveMode,
   requiresSolidRendering,
   resolveGateAccessMode,
+  resolveMapLabelCollisionBox,
+  resolveMapLabelCollisionCenterY,
   resolveMarkerPresentationLift,
   resolveMapLabelMode,
+  resolveStableMapLabelVisibility,
 } from '@/features/commercial-map/utils/mapPresentation';
 
 describe('modelo de apresentação do mapa comercial', () => {
@@ -18,6 +21,34 @@ describe('modelo de apresentação do mapa comercial', () => {
     expect(focus).toEqual({ kind: 'focus', selectedEntityId: 'entity:selected' });
     expect(labelBelongsToActiveMode(focus, 'entity:selected')).toBe(true);
     expect(labelBelongsToActiveMode(focus, 'entity:neighbour')).toBe(false);
+  });
+
+  it('mantém histerese entre níveis de rótulo durante pequenos movimentos de zoom', () => {
+    expect(resolveStableMapLabelVisibility(29, 100, 'medium')).toBe('medium');
+    expect(resolveStableMapLabelVisibility(29, 100, 'near')).toBe('near');
+    expect(resolveStableMapLabelVisibility(35, 100, 'near')).toBe('medium');
+    expect(resolveStableMapLabelVisibility(80, 100, 'far')).toBe('far');
+    expect(resolveStableMapLabelVisibility(80, 100, 'medium')).toBe('medium');
+    expect(resolveStableMapLabelVisibility(90, 100, 'medium')).toBe('far');
+  });
+
+  it('mantém os limites exatos e normaliza entradas inválidas da histerese', () => {
+    expect(resolveStableMapLabelVisibility(27, 100, 'medium')).toBe('near');
+    expect(resolveStableMapLabelVisibility(34, 100, 'near')).toBe('near');
+    expect(resolveStableMapLabelVisibility(76, 100, 'far')).toBe('far');
+    expect(resolveStableMapLabelVisibility(88, 100, 'medium')).toBe('far');
+    expect(resolveStableMapLabelVisibility(Number.NaN, 0, 'medium')).toBe('far');
+    expect(resolveStableMapLabelVisibility(-1, 100, 'medium')).toBe('near');
+  });
+
+  it('reserva a caixa real do lote expandido e ancora colisões pelo rodapé', () => {
+    const compact = resolveMapLabelCollisionBox('lot', 3);
+    const expanded = resolveMapLabelCollisionBox('lot', 3, true);
+    expect(compact).toEqual({ width: 34, height: 26, anchorGap: 5 });
+    expect(expanded).toEqual({ width: 112, height: 60, anchorGap: 5 });
+    expect(resolveMapLabelCollisionCenterY(200, expanded)).toBe(165);
+    expect(resolveMapLabelCollisionBox('road', 100).width).toBe(148);
+    expect(resolveMapLabelCollisionBox('structure', Number.NaN).width).toBe(84);
   });
 
   it('deriva a iconografia de entrada e saída a partir da descrição oficial', () => {

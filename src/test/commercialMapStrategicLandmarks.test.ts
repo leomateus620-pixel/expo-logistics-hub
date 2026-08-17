@@ -46,10 +46,12 @@ const expectedCommercialPavilionFacing = [
   ['B4', Math.PI],
   ['B5', Math.PI],
   ['B6', Math.PI],
+  ['B8', 0],
+  ['B10', 0],
 ] as const satisfies ReadonlyArray<readonly [CommercialPavilionPublicIdentifier, number]>;
 
 describe('marcos arquitetônicos estratégicos', () => {
-  it('propaga orientação, foco e interior dos seis pavilhões comerciais ao canvas', () => {
+  it('propaga orientação, foco e interior dos oito pavilhões comerciais ao canvas', () => {
     expectedCommercialPavilionFacing.forEach(([publicIdentifier, facingRadians]) => {
       const entity = { publicIdentifier };
 
@@ -229,6 +231,8 @@ describe('marcos arquitetônicos estratégicos', () => {
   it('limita a inspeção interna aos marcos que possuem uma cena vinculada', () => {
     expect(strategicLandmarkSupportsInterior({ publicIdentifier: 'B1' })).toBe(true);
     expect(strategicLandmarkSupportsInterior({ publicIdentifier: 'B6' })).toBe(true);
+    expect(strategicLandmarkSupportsInterior({ publicIdentifier: 'B8' })).toBe(true);
+    expect(strategicLandmarkSupportsInterior({ publicIdentifier: 'B10' })).toBe(true);
     expect(strategicLandmarkSupportsInterior(targets.B9)).toBe(true);
     expect(strategicLandmarkSupportsInterior(targets.B12)).toBe(true);
     expect(strategicLandmarkSupportsInterior(targets.B11)).toBe(false);

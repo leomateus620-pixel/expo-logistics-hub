@@ -4,19 +4,20 @@ import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import type { MapEntity } from '../../types';
+import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import {
   createCommercialPavilionLayout,
   commercialPavilionModelBounds,
   resolveCommercialPavilionDefinition,
   type CommercialPavilionLayout,
-  type CommercialPavilionRect,
 } from '../../utils/commercialPavilions';
+import { resolveCommercialPavilionModulePlan } from '../../utils/commercialPavilionModules';
 import { strategicLandmarkBounds, strategicLandmarkFacingRadians } from '../../utils/landmarks';
 import { createCommercialPavilionTexture } from './commercialPavilionTextures';
+import { CommercialPavilionModuleLayer } from './CommercialPavilionModuleLayer';
 
 const NO_RAYCAST = () => undefined;
 const UP = new THREE.Vector3(0, 1, 0);
-const UNIT_BOX = new THREE.BoxGeometry(1, 1, 1);
 
 type Vector3Tuple = [number, number, number];
 
@@ -27,17 +28,24 @@ interface InstanceTransform {
 }
 
 function InteriorInstances({
+  geometry,
   material,
   items,
   castShadow = false,
   receiveShadow = false,
 }: {
+  geometry: THREE.BufferGeometry;
   material: THREE.Material;
   items: InstanceTransform[];
   castShadow?: boolean;
   receiveShadow?: boolean;
 }) {
   const mesh = useRef<THREE.InstancedMesh>(null);
+  const setMesh = useCallback((next: THREE.InstancedMesh | null) => {
+    const previous = mesh.current;
+    if (previous && previous !== next) previous.dispose();
+    mesh.current = next;
+  }, []);
 
   useLayoutEffect(() => {
     if (!mesh.current) return;
@@ -57,50 +65,14 @@ function InteriorInstances({
   if (!items.length) return null;
   return (
     <instancedMesh
-      ref={mesh}
-      args={[UNIT_BOX, material, items.length]}
+      ref={setMesh}
+      args={[geometry, material, items.length]}
       castShadow={castShadow}
       receiveShadow={receiveShadow}
       raycast={NO_RAYCAST}
       dispose={null}
     />
   );
-}
-
-function containsCrossAisle(centerZ: number, depth: number, aisles: CommercialPavilionRect[]) {
-  return aisles.some((aisle) => (
-    Math.abs(centerZ - aisle.centerZ) < depth / 2 + aisle.depth / 2 + 0.06
-  ));
-}
-
-function createExhibitModules(layout: CommercialPavilionLayout) {
-  const primary: InstanceTransform[] = [];
-  const secondary: InstanceTransform[] = [];
-  const partitions: InstanceTransform[] = [];
-
-  layout.interior.exhibitBands.forEach((band, bandIndex) => {
-    const moduleCount = THREE.MathUtils.clamp(Math.round(band.depth / 1.2), 2, 7);
-    const moduleDepth = band.depth / moduleCount;
-    for (let index = 0; index < moduleCount; index += 1) {
-      const centerZ = band.centerZ - band.depth / 2 + moduleDepth * (index + 0.5);
-      if (containsCrossAisle(centerZ, moduleDepth * 0.72, layout.interior.crossAisles)) continue;
-      const target = (index + bandIndex) % 2 === 0 ? primary : secondary;
-      target.push({
-        position: [band.centerX, layout.interior.floorY + 0.055, centerZ],
-        scale: [band.width * 0.82, 0.1, moduleDepth * 0.72],
-      });
-      partitions.push({
-        position: [
-          band.centerX + (bandIndex === 0 ? band.width * 0.34 : -band.width * 0.34),
-          layout.interior.floorY + 0.23,
-          centerZ,
-        ],
-        scale: [0.045, 0.36, moduleDepth * 0.7],
-      });
-    }
-  });
-
-  return { primary, secondary, partitions };
 }
 
 function createLowPerimeter(layout: CommercialPavilionLayout): InstanceTransform[] {
@@ -157,6 +129,7 @@ function PavilionInteriorCameraRig({
   const targetPosition = useRef(new THREE.Vector3());
   const targetLookAt = useRef(new THREE.Vector3());
   const { camera, gl, invalidate, size } = useThree();
+  const setCameraNavigating = useCommercialMapStore((state) => state.setCameraNavigating);
   const bounds = useMemo(() => strategicLandmarkBounds(entity), [entity]);
   const facing = strategicLandmarkFacingRadians(entity);
   const center = useMemo(
@@ -237,6 +210,8 @@ function PavilionInteriorCameraRig({
     }
   });
 
+  useEffect(() => () => setCameraNavigating(false), [setCameraNavigating]);
+
   return (
     <OrbitControls
       ref={controls}
@@ -246,16 +221,19 @@ function PavilionInteriorCameraRig({
       enablePan
       screenSpacePanning
       zoomToCursor
-      minDistance={maximumDimension * 0.55}
+      minDistance={maximumDimension * 0.2}
       maxDistance={maximumDimension * 3.3}
       minPolarAngle={0.025}
       maxPolarAngle={0.82}
+      touches={{ ONE: THREE.TOUCH.PAN, TWO: THREE.TOUCH.DOLLY_ROTATE }}
       target={toWorld(0, layout.interior.floorY, 0).toArray()}
       onStart={() => {
         animating.current = false;
+        setCameraNavigating(true);
         gl.domElement.style.cursor = 'grabbing';
       }}
       onEnd={() => {
+        setCameraNavigating(false);
         gl.domElement.style.cursor = 'grab';
       }}
       onChange={() => {
@@ -274,6 +252,7 @@ export const CommercialPavilionInteriorScene = memo(function CommercialPavilionI
   reducedGraphics: boolean;
 }) {
   const definition = resolveCommercialPavilionDefinition(entity);
+  const modulePlan = resolveCommercialPavilionModulePlan(entity);
   const bounds = useMemo(() => strategicLandmarkBounds(entity), [entity]);
   const facing = strategicLandmarkFacingRadians(entity);
   const modelBounds = useMemo(
@@ -293,10 +272,6 @@ export const CommercialPavilionInteriorScene = memo(function CommercialPavilionI
       roughness: 0.96,
     }),
     wall: new THREE.MeshStandardMaterial({ color: '#c7c5bd', roughness: 0.94 }),
-    aisle: new THREE.MeshStandardMaterial({ color: '#d4d2c9', roughness: 0.91 }),
-    primary: new THREE.MeshStandardMaterial({ color: '#3e7881', roughness: 0.82 }),
-    secondary: new THREE.MeshStandardMaterial({ color: '#c79b4a', roughness: 0.84 }),
-    divider: new THREE.MeshStandardMaterial({ color: '#e5e2d8', roughness: 0.9 }),
     structure: new THREE.MeshStandardMaterial({
       color: '#485556',
       roughness: 0.56,
@@ -304,14 +279,25 @@ export const CommercialPavilionInteriorScene = memo(function CommercialPavilionI
     }),
     threshold: new THREE.MeshStandardMaterial({ color: '#d6b347', roughness: 0.76 }),
   }), [floorTexture]);
+  const unitBoxGeometry = useMemo(() => new THREE.BoxGeometry(1, 1, 1), []);
+  const floorGeometry = useMemo(() => layout
+    ? new THREE.BoxGeometry(layout.width, layout.interior.floorY, layout.depth)
+    : null, [layout]);
 
   useEffect(() => () => {
     floorTexture?.dispose();
     Object.values(materials).forEach((material) => material.dispose());
   }, [floorTexture, materials]);
 
-  if (!definition || !layout) return null;
-  const exhibitModules = createExhibitModules(layout);
+  useEffect(() => () => {
+    unitBoxGeometry.dispose();
+  }, [unitBoxGeometry]);
+
+  useEffect(() => () => {
+    floorGeometry?.dispose();
+  }, [floorGeometry]);
+
+  if (!definition || !layout || !modulePlan || !floorGeometry) return null;
   const perimeter = createLowPerimeter(layout);
   const columns = layout.interior.columns.map((column) => ({
     position: [column.x, layout.interior.floorY + Math.min(0.66, column.height * 0.34) / 2, column.z] as Vector3Tuple,
@@ -351,48 +337,22 @@ export const CommercialPavilionInteriorScene = memo(function CommercialPavilionI
       >
         <mesh
           position={[0, layout.interior.floorY / 2, 0]}
+          geometry={floorGeometry}
           material={materials.floor}
           receiveShadow
           raycast={NO_RAYCAST}
-        >
-          <boxGeometry args={[layout.width, layout.interior.floorY, layout.depth]} />
-        </mesh>
-        <InteriorInstances material={materials.wall} items={perimeter} castShadow receiveShadow />
-        <mesh
-          position={[
-            layout.interior.mainAisle.centerX,
-            layout.interior.floorY + 0.012,
-            layout.interior.mainAisle.centerZ,
-          ]}
-          material={materials.aisle}
-          receiveShadow
-          raycast={NO_RAYCAST}
-        >
-          <boxGeometry args={[
-            layout.interior.mainAisle.width,
-            0.024,
-            layout.interior.mainAisle.depth,
-          ]} />
-        </mesh>
-        {layout.interior.crossAisles.map((aisle, index) => (
-          <mesh
-            key={`${aisle.centerZ}:${index}`}
-            position={[aisle.centerX, layout.interior.floorY + 0.014, aisle.centerZ]}
-            material={materials.aisle}
-            receiveShadow
-            raycast={NO_RAYCAST}
-          >
-            <boxGeometry args={[aisle.width, 0.028, aisle.depth]} />
-          </mesh>
-        ))}
-        <InteriorInstances material={materials.primary} items={exhibitModules.primary} receiveShadow />
-        <InteriorInstances material={materials.secondary} items={exhibitModules.secondary} receiveShadow />
-        {!reducedGraphics && (
-          <InteriorInstances material={materials.divider} items={exhibitModules.partitions} castShadow />
-        )}
-        <InteriorInstances material={materials.structure} items={columns} castShadow />
-        <InteriorInstances material={materials.structure} items={beams} castShadow />
-        <InteriorInstances material={materials.threshold} items={thresholds} />
+          dispose={null}
+        />
+        <InteriorInstances geometry={unitBoxGeometry} material={materials.wall} items={perimeter} castShadow receiveShadow />
+        <CommercialPavilionModuleLayer
+          layout={layout}
+          plan={modulePlan}
+          mode="interior"
+          reducedGraphics={reducedGraphics}
+        />
+        <InteriorInstances geometry={unitBoxGeometry} material={materials.structure} items={columns} castShadow />
+        <InteriorInstances geometry={unitBoxGeometry} material={materials.structure} items={beams} castShadow />
+        <InteriorInstances geometry={unitBoxGeometry} material={materials.threshold} items={thresholds} />
       </group>
       <PavilionInteriorCameraRig entity={entity} layout={layout} reducedGraphics={reducedGraphics} />
     </>

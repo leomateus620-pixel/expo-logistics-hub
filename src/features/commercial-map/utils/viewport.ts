@@ -5,16 +5,31 @@ interface PixelRatioInput {
   viewportWidth: number;
   viewportHeight: number;
   reducedGraphics: boolean;
+  cameraNavigating?: boolean;
 }
 
 const STANDARD_PIXEL_BUDGET = 4_800_000;
 const REDUCED_PIXEL_BUDGET = 900_000;
+const NAVIGATION_STANDARD_DPR_CAP = 1.35;
+const NAVIGATION_REDUCED_DPR_CAP = 1;
+
+export const COMMERCIAL_MAP_RESIZE_REFIT_DEBOUNCE_MS = 180;
+export const COMMERCIAL_MAP_MANUAL_NAVIGATION_REFIT_SUPPRESSION_MS = 650;
+
+export function shouldSuppressCommercialMapResizeRefit(
+  currentTime: number,
+  suppressionEndsAt: number,
+) {
+  if (!Number.isFinite(currentTime) || !Number.isFinite(suppressionEndsAt)) return false;
+  return currentTime < suppressionEndsAt;
+}
 
 export function resolveCommercialMapPixelRatio({
   devicePixelRatio,
   viewportWidth,
   viewportHeight,
   reducedGraphics,
+  cameraNavigating = false,
 }: PixelRatioInput) {
   const safeDpr = Number.isFinite(devicePixelRatio) && devicePixelRatio > 0 ? devicePixelRatio : 1;
   const safeWidth = Math.max(1, Number.isFinite(viewportWidth) ? viewportWidth : 1);
@@ -25,8 +40,14 @@ export function resolveCommercialMapPixelRatio({
   const qualityCap = reducedGraphics ? 1.35 : isPhoneViewport ? 2.25 : 1.75;
   const qualityFloor = reducedGraphics ? 1 : 1.5;
   const budgeted = Math.min(safeDpr, qualityCap, budgetCap);
+  const idlePixelRatio = Math.max(Math.min(safeDpr, qualityFloor), budgeted);
 
-  return Number(Math.max(Math.min(safeDpr, qualityFloor), budgeted).toFixed(2));
+  if (!cameraNavigating) return Number(idlePixelRatio.toFixed(2));
+
+  const navigationCap = reducedGraphics
+    ? NAVIGATION_REDUCED_DPR_CAP
+    : NAVIGATION_STANDARD_DPR_CAP;
+  return Number(Math.min(idlePixelRatio, navigationCap).toFixed(2));
 }
 
 export function resolveCommercialMapSheetSnap(

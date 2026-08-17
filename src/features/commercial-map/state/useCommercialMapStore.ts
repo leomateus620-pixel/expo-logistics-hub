@@ -97,7 +97,10 @@ export const useCommercialMapStore = create<CommercialMapState>((set) => ({
   cameraPreset: 'overview',
   cameraSequence: 0,
   activeSegmentId: null,
-  referenceVisible: true,
+  // The official raster contains baked-in labels. Keep it available for
+  // cartographic calibration, but do not mix those world-space words with the
+  // stable semantic annotation layer during normal navigation.
+  referenceVisible: false,
   referenceOpacity: 0.18,
   labelsVisible: true,
   treesVisible: true,

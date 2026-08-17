@@ -31,11 +31,19 @@ import {
   requiresSolidRendering,
   RESTROOM_PRESENTATION_LIFT,
   resolveGateAccessMode,
+  resolveMapLabelCollisionBox,
+  resolveMapLabelCollisionCenterY,
   resolveMarkerPresentationLift,
   resolveMapLabelMode,
+  resolveStableMapLabelVisibility,
 } from '../../utils/mapPresentation';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
-import { resolveCommercialMapPixelRatio } from '../../utils/viewport';
+import {
+  COMMERCIAL_MAP_MANUAL_NAVIGATION_REFIT_SUPPRESSION_MS,
+  COMMERCIAL_MAP_RESIZE_REFIT_DEBOUNCE_MS,
+  resolveCommercialMapPixelRatio,
+  shouldSuppressCommercialMapResizeRefit,
+} from '../../utils/viewport';
 import type { CameraPreset, CommercialLot, MapCalibration, MapEntity } from '../../types';
 import { HeadquartersInteriorScene } from './HeadquartersInteriorScene';
 import { LivestockPavilionInteriorScene } from './LivestockPavilionInteriorScene';
@@ -307,11 +315,16 @@ function fitDistanceForDirection(
   return Math.max(distance * padding, extent.maxHeight * 3 + 4);
 }
 
-function ReferenceUnderlay({ calibration }: { calibration: MapCalibration | null }) {
+function ReferenceUnderlaySurface({
+  calibration,
+  imageUrl,
+  opacity,
+}: {
+  calibration: MapCalibration | null;
+  imageUrl: string;
+  opacity: number;
+}) {
   const gl = useThree((state) => state.gl);
-  const referenceVisible = useCommercialMapStore((state) => state.referenceVisible);
-  const referenceOpacity = useCommercialMapStore((state) => state.referenceOpacity);
-  const imageUrl = calibration?.referenceImageUrl || calibration?.referenceImagePath || OFFICIAL_REFERENCE_IMAGE;
   const texture = useTexture(imageUrl);
 
   useEffect(() => {
@@ -320,7 +333,6 @@ function ReferenceUnderlay({ calibration }: { calibration: MapCalibration | null
     texture.needsUpdate = true;
   }, [gl, texture]);
 
-  if (!referenceVisible) return null;
   return (
     <mesh
       rotation={[-Math.PI / 2, 0, -THREE.MathUtils.degToRad(calibration?.imageRotationDegrees ?? 0)]}
@@ -330,8 +342,23 @@ function ReferenceUnderlay({ calibration }: { calibration: MapCalibration | null
       raycast={NO_RAYCAST}
     >
       <planeGeometry args={[MAP_REFERENCE_WIDTH, MAP_REFERENCE_HEIGHT]} />
-      <meshBasicMaterial map={texture} transparent opacity={referenceOpacity} depthWrite={false} toneMapped={false} />
+      <meshBasicMaterial map={texture} transparent opacity={opacity} depthWrite={false} toneMapped={false} />
     </mesh>
+  );
+}
+
+function ReferenceUnderlay({ calibration }: { calibration: MapCalibration | null }) {
+  const referenceVisible = useCommercialMapStore((state) => state.referenceVisible);
+  const referenceOpacity = useCommercialMapStore((state) => state.referenceOpacity);
+
+  // Keep the text-baked calibration raster out of the loading/rendering path
+  // until explicitly requested. Semantic navigation labels own the default view.
+  if (!referenceVisible) return null;
+  const imageUrl = calibration?.referenceImageUrl || calibration?.referenceImagePath || OFFICIAL_REFERENCE_IMAGE;
+  return (
+    <Suspense fallback={null}>
+      <ReferenceUnderlaySurface calibration={calibration} imageUrl={imageUrl} opacity={referenceOpacity} />
+    </Suspense>
   );
 }
 
@@ -1070,7 +1097,6 @@ const EntityLabel = memo(function EntityLabel({
   hovered,
   filtersActive,
   isMatch,
-  level,
 }: {
   entity: MapEntity;
   lot?: CommercialLot;
@@ -1078,7 +1104,6 @@ const EntityLabel = memo(function EntityLabel({
   hovered: boolean;
   filtersActive: boolean;
   isMatch: boolean;
-  level: MapLabelVisibility;
 }) {
   const metadata = useMemo(() => normalizeMapEntityMetadata(entity, lot), [entity, lot]);
   const classification = entity.classification;
@@ -1094,10 +1119,10 @@ const EntityLabel = memo(function EntityLabel({
   return (
     <Html
       position={[metadata.labelAnchor[0], entity.geometry.elevation + labelHeight, metadata.labelAnchor[1]]}
-      center
-      distanceFactor={selected ? isArchitecturalLandmark ? 11.5 : 18 : isArchitecturalLandmark ? 16 : lot ? 28 : level === 'far' ? 42 : 36}
+      transform={false}
+      eps={0.001}
       zIndexRange={[22, 2]}
-      style={{ pointerEvents: 'none' }}
+      style={{ pointerEvents: 'none', transform: 'translate3d(-50%, -100%, 0)' }}
     >
       {lot ? (
         <div data-map-entity-id={entity.id} data-map-label-mode={selected ? 'focus' : 'navigation'} className={`commercial-map-label is-lot ${selected ? 'is-selected' : ''} ${dimmed ? 'is-dimmed' : ''}`}>
@@ -1160,6 +1185,7 @@ function useSemanticLabelVisibility({
   }), [entities, lotByEntity]);
   const [visibility, setVisibility] = useState<{ ids: ReadonlySet<string>; level: MapLabelVisibility }>(() => ({ ids: new Set(), level: 'far' }));
   const previousSignature = useRef('');
+  const stableLevel = useRef<MapLabelVisibility>('far');
   const matchingSignature = useMemo(() => [...matchingEntityIds].sort().join('|'), [matchingEntityIds]);
   const labelMode = useMemo(() => resolveMapLabelMode(selectedEntityId), [selectedEntityId]);
   const focusedVisibility = useMemo(() => labelMode.kind === 'focus'
@@ -1176,11 +1202,8 @@ function useSemanticLabelVisibility({
     const controls = (state as unknown as { controls?: OrbitControlsImpl }).controls;
     const target = controls?.target ?? new THREE.Vector3(extent.centerX, 0, extent.centerZ);
     const cameraDistance = state.camera.position.distanceTo(target);
-    const level: MapLabelVisibility = cameraDistance <= extent.diagonal * 0.3
-      ? 'near'
-      : cameraDistance <= extent.diagonal * 0.82
-        ? 'medium'
-        : 'far';
+    const level = resolveStableMapLabelVisibility(cameraDistance, extent.diagonal, stableLevel.current);
+    stableLevel.current = level;
     const cameraSignature = [
       state.camera.position.x.toFixed(1), state.camera.position.y.toFixed(1), state.camera.position.z.toFixed(1),
       target.x.toFixed(1), target.z.toFixed(1), state.size.width, state.size.height,
@@ -1210,23 +1233,33 @@ function useSemanticLabelVisibility({
         const point = candidate.position.clone().project(state.camera);
         const isLot = candidate.entity.classification === 'SELLABLE_LOT';
         const isRoad = candidate.entity.classification === 'ROAD' || candidate.entity.classification === 'PEDESTRIAN_PATH';
-        const nameLength = candidate.metadata.officialDisplayName.length;
-        const width = isLot ? 28 : isRoad ? Math.min(126, Math.max(62, nameLength * 5.2)) : Math.min(180, Math.max(76, nameLength * 5.5));
-        const height = isLot ? 20 : 28;
         const forced = candidate.entity.id === selectedEntityId || candidate.entity.id === hoveredEntityId;
+        const expandedLot = isLot && forced;
+        const nameLength = candidate.metadata.officialDisplayName.length;
+        const collisionBox = resolveMapLabelCollisionBox(
+          isLot ? 'lot' : isRoad ? 'road' : 'structure',
+          nameLength,
+          expandedLot,
+        );
+        const anchorY = (-point.y * 0.5 + 0.5) * viewportHeight;
         return {
           ...candidate,
           forced,
           visible: point.z >= -1 && point.z <= 1 && Math.abs(point.x) <= 1.08 && Math.abs(point.y) <= 1.08,
           x: (point.x * 0.5 + 0.5) * viewportWidth,
-          y: (-point.y * 0.5 + 0.5) * viewportHeight,
-          width,
-          height,
-          priority: candidate.metadata.labelPriority + (forced ? 1000 : 0) + (matchingEntityIds.has(candidate.entity.id) ? 120 : 0),
+          y: resolveMapLabelCollisionCenterY(anchorY, collisionBox),
+          width: collisionBox.width,
+          height: collisionBox.height,
+          priority: candidate.metadata.labelPriority
+            + (forced ? 1000 : 0)
+            + (matchingEntityIds.has(candidate.entity.id) ? 120 : 0)
+            + (visibility.ids.has(candidate.entity.id) ? 12 : 0),
         };
       })
       .filter((candidate) => candidate.visible)
-      .sort((left, right) => right.priority - left.priority);
+      .sort((left, right) => (
+        right.priority - left.priority || left.entity.id.localeCompare(right.entity.id)
+      ));
 
     const accepted: typeof projected = [];
     for (const candidate of projected) {
@@ -1283,6 +1316,10 @@ function CameraRig({
   const previousDetailsLayout = useRef(activePanel === 'details');
   const returnView = useRef(useCommercialMapStore.getState().interiorReturnView);
   const previousViewportSize = useRef({ width: size.width, height: size.height });
+  const resizeRefitTimer = useRef<number | null>(null);
+  const pendingResizeRefit = useRef(false);
+  const resizeRefitSuppressedUntil = useRef(0);
+  const resizeRefitView = useRef<() => void>(() => undefined);
   const startCameraMove = useCallback(() => {
     animating.current = true;
     invalidate();
@@ -1433,6 +1470,57 @@ function CameraRig({
     startCameraMove();
   }, [camera, extent.diagonal, preset, queuePreset, size.height, size.width, startCameraMove]);
 
+  resizeRefitView.current = () => {
+    if (selectedEntity) queueSelection(selectedEntity);
+    else if (activeSegment) queueSegment(activeSegment, activeSegmentEntities);
+    else queuePreset(preset);
+  };
+
+  const cancelScheduledResizeRefit = useCallback(() => {
+    if (resizeRefitTimer.current === null) return;
+    window.clearTimeout(resizeRefitTimer.current);
+    resizeRefitTimer.current = null;
+  }, []);
+
+  const scheduleResizeRefit = useCallback(() => {
+    if (shouldSuppressCommercialMapResizeRefit(Date.now(), resizeRefitSuppressedUntil.current)) {
+      pendingResizeRefit.current = false;
+      cancelScheduledResizeRefit();
+      return;
+    }
+    pendingResizeRefit.current = true;
+    cancelScheduledResizeRefit();
+    if (navigation.current.active) return;
+
+    const runRefit = () => {
+      resizeRefitTimer.current = null;
+      if (navigation.current.active) return;
+      if (shouldSuppressCommercialMapResizeRefit(Date.now(), resizeRefitSuppressedUntil.current)) {
+        pendingResizeRefit.current = false;
+        return;
+      }
+
+      const detailSheetDragging = gl.domElement
+        .closest('.commercial-map-viewport')
+        ?.classList.contains('is-detail-sheet-dragging') ?? false;
+      if (detailSheetDragging) {
+        resizeRefitTimer.current = window.setTimeout(
+          runRefit,
+          COMMERCIAL_MAP_RESIZE_REFIT_DEBOUNCE_MS,
+        );
+        return;
+      }
+
+      pendingResizeRefit.current = false;
+      resizeRefitView.current();
+    };
+
+    resizeRefitTimer.current = window.setTimeout(
+      runRefit,
+      COMMERCIAL_MAP_RESIZE_REFIT_DEBOUNCE_MS,
+    );
+  }, [cancelScheduledResizeRefit, gl]);
+
   useEffect(() => {
     const selectedId = selectedEntity?.id ?? null;
     const selectionChanged = selectedId !== previousSelection.current;
@@ -1508,21 +1596,10 @@ function CameraRig({
     if (!resized || !initialized.current) return undefined;
     previousViewportSize.current = { width: size.width, height: size.height };
 
-    const frame = window.requestAnimationFrame(() => {
-      if (selectedEntity) queueSelection(selectedEntity);
-      else if (activeSegment) queueSegment(activeSegment, activeSegmentEntities);
-      else queuePreset(preset);
-    });
-
-    return () => window.cancelAnimationFrame(frame);
+    scheduleResizeRefit();
+    return undefined;
   }, [
-    activeSegment,
-    activeSegmentEntities,
-    preset,
-    queuePreset,
-    queueSegment,
-    queueSelection,
-    selectedEntity,
+    scheduleResizeRefit,
     size.height,
     size.width,
   ]);
@@ -1548,27 +1625,34 @@ function CameraRig({
 
   const handleControlsStart = useCallback(() => {
     const controls = controlsRef.current;
+    cancelScheduledResizeRefit();
     animating.current = false;
     navigation.current.active = true;
     navigation.current.navigating = false;
     navigation.current.startPosition.copy(camera.position);
     navigation.current.startTarget.copy(controls?.target ?? targetLookAt.current);
-  }, [camera]);
+  }, [camera, cancelScheduledResizeRefit]);
 
   const handleControlsChange = useCallback(() => {
     const controls = controlsRef.current;
     clampTarget();
-    if (controls && navigation.current.active && !navigation.current.navigating) {
+    if (controls && navigation.current.active) {
       const cameraDelta = camera.position.distanceTo(navigation.current.startPosition);
       const targetDelta = controls.target.distanceTo(navigation.current.startTarget);
       if (isCameraNavigationMovement(cameraDelta, targetDelta)) {
-        navigation.current.navigating = true;
-        setCameraNavigating(true);
-        gl.domElement.style.cursor = 'grabbing';
+        resizeRefitSuppressedUntil.current = Date.now()
+          + COMMERCIAL_MAP_MANUAL_NAVIGATION_REFIT_SUPPRESSION_MS;
+        pendingResizeRefit.current = false;
+        cancelScheduledResizeRefit();
+        if (!navigation.current.navigating) {
+          navigation.current.navigating = true;
+          setCameraNavigating(true);
+          gl.domElement.style.cursor = 'grabbing';
+        }
       }
     }
     invalidate();
-  }, [camera, clampTarget, gl, invalidate, setCameraNavigating]);
+  }, [camera, cancelScheduledResizeRefit, clampTarget, gl, invalidate, setCameraNavigating]);
 
   const handleControlsEnd = useCallback(() => {
     const wasNavigating = navigation.current.navigating;
@@ -1578,10 +1662,15 @@ function CameraRig({
       setCameraNavigating(false);
       gl.domElement.style.cursor = 'grab';
     }
+    if (pendingResizeRefit.current && !wasNavigating) scheduleResizeRefit();
+    else pendingResizeRefit.current = false;
     invalidate();
-  }, [gl, invalidate, setCameraNavigating]);
+  }, [gl, invalidate, scheduleResizeRefit, setCameraNavigating]);
 
   useEffect(() => () => {
+    cancelScheduledResizeRefit();
+    pendingResizeRefit.current = false;
+    resizeRefitSuppressedUntil.current = 0;
     const controls = controlsRef.current;
     const store = useCommercialMapStore.getState();
     if (store.interiorEntityId && controls) {
@@ -1592,7 +1681,7 @@ function CameraRig({
     }
     setCameraNavigating(false);
     gl.domElement.style.cursor = '';
-  }, [camera, gl, setCameraNavigating]);
+  }, [camera, cancelScheduledResizeRefit, gl, setCameraNavigating]);
 
   useFrame((_state, delta) => {
     if (animating.current) {
@@ -1642,14 +1731,16 @@ function CameraRig({
       makeDefault
       enableDamping
       dampingFactor={0.072}
-      enablePan={!miranteSelected}
+      enablePan
+      enableRotate
+      enableZoom
       minDistance={miranteMinimumDistance}
       maxDistance={miranteMaximumDistance}
       minPolarAngle={0.025}
       maxPolarAngle={Math.PI / 2.08}
       screenSpacePanning={false}
       zoomToCursor={!miranteSelected}
-      touches={{ ONE: THREE.TOUCH.PAN, TWO: THREE.TOUCH.DOLLY_PAN }}
+      touches={{ ONE: THREE.TOUCH.PAN, TWO: THREE.TOUCH.DOLLY_ROTATE }}
       minAzimuthAngle={miranteSelected ? -2.65 : -Infinity}
       maxAzimuthAngle={miranteSelected ? -0.9 : Infinity}
       onStart={handleControlsStart}
@@ -1879,7 +1970,6 @@ function Scene({
           hovered={hoveredEntityId === entity.id}
           filtersActive={filtersActive}
           isMatch={matchingEntityIds.has(entity.id)}
-          level={labelVisibility.level}
         />
       ))}
       {technicalValidationAllowed
@@ -1929,6 +2019,7 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
   const setSelectedEntityId = useCommercialMapStore((state) => state.setSelectedEntityId);
   const interiorEntityId = useCommercialMapStore((state) => state.interiorEntityId);
   const reducedGraphics = useCommercialMapStore((state) => state.reducedGraphics);
+  const cameraNavigating = useCommercialMapStore((state) => state.cameraNavigating);
   const [canvasElement, setCanvasElement] = useState<HTMLCanvasElement | null>(null);
   const [viewportMetrics, setViewportMetrics] = useState(() => ({
     width: typeof window === 'undefined' ? 1366 : window.innerWidth,
@@ -1976,7 +2067,8 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
     viewportWidth: viewportMetrics.width,
     viewportHeight: viewportMetrics.height,
     reducedGraphics,
-  }), [reducedGraphics, viewportMetrics]);
+    cameraNavigating,
+  }), [cameraNavigating, reducedGraphics, viewportMetrics]);
   const extent = useMemo(() => getSceneExtent(entities), [entities]);
   const initialDirection = new THREE.Vector3(0.04, 0.72, 0.69).normalize();
   const initialDistance = fitDistanceForDirection(
