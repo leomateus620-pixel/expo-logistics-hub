@@ -179,13 +179,18 @@ export function CronogramaTimelineBoard({
           {filtersSlot && <div className="cronograma-temporal-nav__filters">{filtersSlot}</div>}
           <div className="min-w-0">
             <p className="truncate text-lg font-black tracking-tight text-foreground">{focusedLabel}</p>
+            <p className="cronograma-temporal-nav__stage">{selectedSummary.stage}</p>
           </div>
-          <CronogramaCycleChips
-            summaries={summaries}
-            selectedYear={navigation.selectedYear}
-            currentYear={currentYear}
-            onSelectYear={navigation.selectYear}
-          />
+          <CronogramaCyclePortal>
+            <CronogramaCycleChips
+              summaries={summaries}
+              selectedYear={navigation.selectedYear}
+              currentYear={currentYear}
+              onSelectYear={navigation.selectYear}
+            />
+          </CronogramaCyclePortal>
+
+
 
           <div className="ml-auto flex items-center gap-1.5">
             <Button
