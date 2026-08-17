@@ -1,7 +1,8 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { PanelLeft } from 'lucide-react';
+import { PanelLeft, Plus } from 'lucide-react';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { useCronogramaSideNavItems } from '../CronogramaSideNav';
+import { useCronogramaShell } from '../CronogramaShellContext';
 import type { CronogramaView } from '../types';
 
 interface MobileCronogramaNavDrawerProps {
@@ -17,6 +18,7 @@ export function MobileCronogramaNavDrawer({
   children,
 }: MobileCronogramaNavDrawerProps) {
   const items = useCronogramaSideNavItems();
+  const shell = useCronogramaShell();
   const [open, setOpen] = useState(false);
   const active = items.find((item) => item.value === activeView);
 
@@ -42,6 +44,22 @@ export function MobileCronogramaNavDrawer({
           <SheetHeader className="px-4 pb-2 pt-4 text-left">
             <SheetTitle className="text-base font-black tracking-tight">Navegação</SheetTitle>
           </SheetHeader>
+
+          {shell?.createAction && (
+            <div className="cronograma-sidenav__primary px-3 pb-3">
+              <button
+                type="button"
+                onClick={() => {
+                  setOpen(false);
+                  shell.createAction?.();
+                }}
+                className="cronograma-sidenav__create focus-ring"
+              >
+                <Plus aria-hidden="true" />
+                <span>Novo evento</span>
+              </button>
+            </div>
+          )}
 
           <nav className="cronograma-sidenav__group px-3 pb-3" aria-label="Visões do cronograma">
             {items.map((item) => {

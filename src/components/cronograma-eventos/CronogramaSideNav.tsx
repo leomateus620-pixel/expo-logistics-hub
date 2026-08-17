@@ -1,8 +1,9 @@
 import { memo, useCallback, useEffect, useState, type ReactNode } from 'react';
-import { BadgeCheck, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import { BadgeCheck, PanelLeftClose, PanelLeftOpen, Plus } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { CronogramaCycleSlotTarget } from './CronogramaCycleSlot';
+import { useCronogramaShell } from './CronogramaShellContext';
 import { CRONOGRAMA_VIEW_DEFINITIONS } from './cronogramaViews';
 import type { CronogramaView } from './types';
 
@@ -36,6 +37,7 @@ export const CronogramaSideNav = memo(function CronogramaSideNav({
   filters,
 }: CronogramaSideNavProps) {
   const items = useCronogramaSideNavItems();
+  const shell = useCronogramaShell();
   const [collapsed, setCollapsed] = useState<boolean>(() => {
     if (typeof window === 'undefined') return false;
     return window.localStorage.getItem(STORAGE_KEY) === '1';
@@ -70,6 +72,35 @@ export const CronogramaSideNav = memo(function CronogramaSideNav({
             {collapsed ? <PanelLeftOpen aria-hidden="true" /> : <PanelLeftClose aria-hidden="true" />}
           </button>
         </div>
+
+        {shell?.createAction && (
+          <div className="cronograma-sidenav__primary">
+            {collapsed ? (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    onClick={() => shell.createAction?.()}
+                    className="cronograma-sidenav__create focus-ring"
+                    aria-label="Novo evento"
+                  >
+                    <Plus aria-hidden="true" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="right">Novo evento</TooltipContent>
+              </Tooltip>
+            ) : (
+              <button
+                type="button"
+                onClick={() => shell.createAction?.()}
+                className="cronograma-sidenav__create focus-ring"
+              >
+                <Plus aria-hidden="true" />
+                <span>Novo evento</span>
+              </button>
+            )}
+          </div>
+        )}
 
         <nav className="cronograma-sidenav__group" aria-label="Visões do cronograma">
           {items.map((item) => {

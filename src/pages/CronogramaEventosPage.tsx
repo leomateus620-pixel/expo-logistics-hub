@@ -1006,7 +1006,7 @@ export default function CronogramaEventosPage() {
           onRetry={() => cronograma.refetch()}
         >
           <CronogramaCycleSlotProvider>
-            <div className="cronograma-mobile-experience mx-auto flex w-full max-w-3xl min-w-0 flex-col gap-2.5 overflow-x-clip px-3">
+            <div className="cronograma-mobile-experience mx-auto flex w-full min-w-0 flex-col gap-2.5 overflow-x-clip px-3">
               <div className="cronograma-mobile-command">
                 <MobileCronogramaNavDrawer activeView={activeView} onChange={setActiveView} />
                 <CronogramaCycleSlotTarget className="cronograma-mobile-cycle-slot" />
@@ -1028,7 +1028,7 @@ export default function CronogramaEventosPage() {
         </MobileCronogramaErrorBoundary>
       ) : (
         <CronogramaCycleSlotProvider>
-          <div className="cronograma-workbench mx-auto flex w-full max-w-[1680px] gap-4 px-3 sm:px-5 2xl:px-8">
+          <div className="cronograma-workbench flex w-full gap-4 px-3 sm:px-4 xl:px-6 2xl:px-8">
             <CronogramaSideNav
               activeView={activeView}
               onChange={setActiveView}
