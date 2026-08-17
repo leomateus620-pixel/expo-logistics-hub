@@ -1,0 +1,1 @@
+UPDATE public.org_members SET is_core_team = true WHERE user_id = '3e7f410c-c14d-4841-8597-8a84f1b8c639' AND org_id = '985888b8-155f-4bbe-b6b9-6bef2893d99b';
