@@ -4,122 +4,215 @@
  * e o gatilho de filtros com a identidade navy / ouro / laranja.
  */
 
-/* ───────────────────────── Barra de trabalho superior ───────────────────────── */
+/* ───────────────────────── Slide bar lateral de navegação ─────────────────── */
 
-.cronograma-page .cronograma-workbench-bar {
+.cronograma-page .cronograma-workbench {
+  align-items: flex-start;
+}
+
+.cronograma-sidenav {
+  position: sticky;
+  top: 0.75rem;
   display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.cronograma-page .cronograma-workbench-cycle {
-  margin-left: auto;
-  display: flex;
-  align-items: center;
-  min-width: 0;
-}
-
-.cronograma-page .cronograma-workbench-cycle:empty {
-  display: none;
-}
-
-/* ───────────────────────── Navegação secundária (ícones) ───────────────────── */
-
-.cronograma-page .cronograma-secondary-nav {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.2rem;
-  padding: 0.25rem;
-  border-radius: 0.9rem;
+  width: 13.25rem;
+  flex: 0 0 13.25rem;
+  flex-direction: column;
+  gap: 0.85rem;
+  padding: 0.7rem 0.6rem 0.85rem;
+  border-radius: 1.1rem;
   border: 1px solid oklch(var(--brand-navy-900) / 0.1);
-  background: linear-gradient(150deg, rgb(255 255 255 / 0.94), oklch(var(--brand-soft-white) / 0.9));
-  box-shadow: 0 12px 28px -26px oklch(var(--brand-navy-900) / 0.8);
+  background: linear-gradient(165deg, rgb(255 255 255 / 0.96), oklch(var(--brand-soft-white) / 0.9));
+  box-shadow: 0 22px 44px -34px oklch(var(--brand-navy-900) / 0.95);
+  transition: width 220ms var(--ease-standard, cubic-bezier(0.22, 1, 0.36, 1)), flex-basis 220ms var(--ease-standard, cubic-bezier(0.22, 1, 0.36, 1));
 }
 
-.cronograma-page .cronograma-secondary-nav__item {
-  position: relative;
+.cronograma-sidenav[data-collapsed] {
+  width: 3.9rem;
+  flex-basis: 3.9rem;
+  align-items: stretch;
+  padding-inline: 0.45rem;
+}
+
+.cronograma-sidenav__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.4rem;
+  padding-inline: 0.25rem;
+}
+
+.cronograma-sidenav[data-collapsed] .cronograma-sidenav__head {
+  justify-content: center;
+  padding-inline: 0;
+}
+
+.cronograma-sidenav__eyebrow {
+  font-size: 0.58rem;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: oklch(var(--brand-navy-900) / 0.48);
+}
+
+.cronograma-sidenav__toggle {
   display: inline-flex;
+  height: 1.85rem;
+  width: 1.85rem;
   align-items: center;
   justify-content: center;
-  gap: 0.42rem;
-  min-height: 2.35rem;
-  padding-inline: 0.7rem;
-  border-radius: 0.7rem;
-  color: oklch(var(--brand-navy-900) / 0.62);
-  font-size: 0.74rem;
-  font-weight: 800;
-  letter-spacing: 0.005em;
-  white-space: nowrap;
-  transition:
-    background-color 180ms var(--ease-standard, ease),
-    color 180ms var(--ease-standard, ease),
-    box-shadow 180ms var(--ease-standard, ease);
+  border-radius: 0.6rem;
+  border: 1px solid oklch(var(--brand-navy-900) / 0.1);
+  background: rgb(255 255 255 / 0.85);
+  color: oklch(var(--brand-navy-900) / 0.68);
+  transition: color 160ms ease, border-color 160ms ease, background-color 160ms ease;
 }
 
-.cronograma-page .cronograma-secondary-nav__item svg {
-  width: 1.02rem;
-  height: 1.02rem;
+.cronograma-sidenav__toggle:hover {
+  border-color: oklch(var(--brand-gold-400) / 0.7);
+  color: oklch(var(--brand-navy-900));
+}
+
+.cronograma-sidenav__toggle svg {
+  width: 0.95rem;
+  height: 0.95rem;
+}
+
+.cronograma-sidenav__group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.cronograma-sidenav__item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 2.45rem;
+  width: 100%;
+  padding-inline: 0.65rem;
+  border-radius: 0.75rem;
+  color: oklch(var(--brand-navy-900) / 0.66);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.005em;
+  text-align: left;
+  transition: background-color 170ms ease, color 170ms ease, box-shadow 170ms ease;
+}
+
+.cronograma-sidenav[data-collapsed] .cronograma-sidenav__item {
+  justify-content: center;
+  padding-inline: 0;
+}
+
+.cronograma-sidenav__item svg {
+  width: 1.05rem;
+  height: 1.05rem;
   flex: none;
 }
 
-/* Regra única: ou todos com rótulo, ou todos só com ícone. */
-.cronograma-page .cronograma-secondary-nav__text {
-  display: none;
+.cronograma-sidenav__item span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-@media (min-width: 1100px) {
-  .cronograma-page .cronograma-secondary-nav__item .cronograma-secondary-nav__text,
-  .cronograma-page .cronograma-secondary-nav__item[data-active] .cronograma-secondary-nav__text {
-    display: inline;
-  }
-}
-
-@media (max-width: 1099px) {
-  .cronograma-page .cronograma-secondary-nav__item {
-    width: 2.5rem;
-    padding-inline: 0;
-  }
-}
-
-.cronograma-page .cronograma-secondary-nav__item:hover {
+.cronograma-sidenav__item:hover {
   background: oklch(var(--brand-navy-900) / 0.06);
   color: oklch(var(--brand-navy-900));
 }
 
-.cronograma-page .cronograma-secondary-nav__item[data-active] {
+.cronograma-sidenav__item[data-active] {
   background: linear-gradient(150deg, oklch(var(--brand-navy-900)), oklch(var(--brand-navy-900) / 0.86));
   color: rgb(255 255 255 / 0.98);
-  box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.16),
-    0 10px 22px -18px oklch(var(--brand-navy-900));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.16), 0 12px 24px -20px oklch(var(--brand-navy-900));
 }
 
-.cronograma-page .cronograma-secondary-nav__item[data-active] svg {
+.cronograma-sidenav__item[data-active]::before {
+  content: '';
+  position: absolute;
+  left: 0.28rem;
+  top: 0.6rem;
+  bottom: 0.6rem;
+  width: 3px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, oklch(var(--brand-gold-400)), oklch(var(--brand-orange-500)));
+}
+
+.cronograma-sidenav[data-collapsed] .cronograma-sidenav__item[data-active]::before {
+  left: 0.15rem;
+}
+
+.cronograma-sidenav__item[data-active] svg {
   color: oklch(var(--brand-gold-400));
 }
 
-.cronograma-page .cronograma-history-toggle {
-  min-height: 2.45rem;
+.cronograma-sidenav__section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding-top: 0.7rem;
+  border-top: 1px solid oklch(var(--brand-navy-900) / 0.08);
+}
+
+.cronograma-sidenav__section > .cronograma-sidenav__eyebrow {
+  padding-inline: 0.3rem;
+}
+
+.cronograma-sidenav__cycle:empty {
+  display: none;
+}
+
+/* Anos empilhados dentro da lateral. */
+.cronograma-page .cronograma-sidenav .cronograma-cycle-chips {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.2rem;
   border-radius: 0.85rem;
-  border-style: solid;
-  border-color: oklch(var(--brand-navy-900) / 0.12);
-  background: rgb(255 255 255 / 0.86);
-  color: oklch(var(--brand-navy-900) / 0.7);
-  font-size: 0.74rem;
-  font-weight: 800;
-  transition: border-color 180ms ease, background-color 180ms ease, color 180ms ease;
 }
 
-.cronograma-page .cronograma-history-toggle:hover {
-  border-color: oklch(var(--brand-gold-400) / 0.55);
-  color: oklch(var(--brand-navy-900));
+.cronograma-page .cronograma-sidenav .cronograma-cycle-chip {
+  width: 100%;
+  justify-content: space-between;
+  min-height: 2.25rem;
 }
 
-.cronograma-page .cronograma-history-toggle[data-active] {
-  border-color: oklch(var(--brand-gold-400) / 0.72);
-  background: linear-gradient(150deg, oklch(var(--brand-gold-400) / 0.24), oklch(var(--brand-orange-500) / 0.14));
-  color: oklch(var(--brand-navy-900));
+.cronograma-page .cronograma-sidenav[data-collapsed] .cronograma-cycle-chip {
+  justify-content: center;
+  padding-inline: 0.2rem;
+}
+
+.cronograma-page .cronograma-sidenav[data-collapsed] .cronograma-cycle-chip span {
+  display: none;
+}
+
+/* Filtros ocupam toda a largura da lateral. */
+.cronograma-page .cronograma-sidenav .cronograma-cycle-filter-trigger,
+.cronograma-page .cronograma-sidenav .cronograma-advanced-filter-trigger {
+  width: 100%;
+  justify-content: flex-start;
+  border-radius: 0.85rem;
+}
+
+.cronograma-page .cronograma-sidenav[data-collapsed] .cronograma-cycle-filter-trigger,
+.cronograma-page .cronograma-sidenav[data-collapsed] .cronograma-advanced-filter-trigger {
+  justify-content: center;
+  padding-inline: 0.35rem;
+}
+
+.cronograma-page .cronograma-sidenav[data-collapsed] .cronograma-filter-trigger-label,
+.cronograma-page .cronograma-sidenav[data-collapsed] .cronograma-filter-trigger-period {
+  display: none;
+}
+
+@media (max-width: 1180px) {
+  .cronograma-sidenav {
+    width: 12rem;
+    flex-basis: 12rem;
+  }
 }
 
 /* ───────────────────────── Seletor de anos (ciclo) ─────────────────────────── */
@@ -403,5 +496,82 @@
   .cronograma-page .cronograma-advanced-filter-trigger {
     transition: none;
     transform: none;
+  }
+}
+
+
+/* ───────────────────────── Navegação lateral no mobile ─────────────────────── */
+
+.cronograma-page .cronograma-mobile-command {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.cronograma-page .cronograma-mobile-command .cronograma-mobile-cycle-slot {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.cronograma-mobile-nav-trigger {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.4rem;
+  max-width: 10.5rem;
+  min-height: 2.6rem;
+  padding-inline: 0.7rem;
+  border-radius: 0.9rem;
+  border: 1px solid oklch(var(--brand-navy-900) / 0.14);
+  background: linear-gradient(150deg, oklch(var(--brand-navy-900)), oklch(var(--brand-navy-900) / 0.86));
+  color: rgb(255 255 255 / 0.98);
+  font-size: 0.72rem;
+  font-weight: 800;
+  box-shadow: 0 14px 28px -24px oklch(var(--brand-navy-900));
+}
+
+.cronograma-mobile-nav-trigger svg {
+  width: 1rem;
+  height: 1rem;
+  color: oklch(var(--brand-gold-400));
+  flex: none;
+}
+
+.cronograma-mobile-nav-trigger span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cronograma-mobile-nav-sheet .cronograma-sidenav__item {
+  color: oklch(var(--brand-navy-900) / 0.72);
+}
+
+@media (max-width: 767px) {
+  .cronograma-page .cronograma-mobile-command .cronograma-mobile-cycle-slot {
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .cronograma-page .cronograma-mobile-command .cronograma-mobile-cycle-slot::-webkit-scrollbar {
+    display: none;
+  }
+
+  .cronograma-page .cronograma-mobile-command .cronograma-cycle-chips {
+    width: max-content;
+    min-width: 100%;
+    gap: 0.2rem;
+    padding: 0.18rem;
+  }
+
+  .cronograma-page .cronograma-mobile-command .cronograma-cycle-chip {
+    flex: 0 0 auto;
+    gap: 0.35rem;
+    padding-inline: 0.55rem;
+    min-height: 2.35rem;
+  }
+
+  .cronograma-mobile-nav-trigger {
+    max-width: 9rem;
   }
 }

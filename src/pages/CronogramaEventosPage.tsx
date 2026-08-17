@@ -1,15 +1,14 @@
 import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { AlertTriangle, BadgeCheck, CalendarDays, Loader2, RefreshCw } from 'lucide-react';
+import { AlertTriangle, CalendarDays, Loader2, RefreshCw } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { CalendarMonthView } from '@/components/cronograma-eventos/CalendarMonthView';
 import { UndatedBoard } from '@/components/cronograma-eventos/CronogramaBoards';
 import { CronogramaCycleBar } from '@/components/cronograma-eventos/CronogramaCycleBar';
-import { CronogramaFiltersSlotProvider } from '@/components/cronograma-eventos/CronogramaFiltersSlot';
 import { CronogramaCycleSlotProvider, CronogramaCycleSlotTarget } from '@/components/cronograma-eventos/CronogramaCycleSlot';
 
 import { CronogramaFiltersTrigger } from '@/components/cronograma-eventos/CronogramaFiltersTrigger';
-import { CronogramaSecondaryNav } from '@/components/cronograma-eventos/CronogramaSecondaryNav';
+import { CronogramaSideNav } from '@/components/cronograma-eventos/CronogramaSideNav';
 import { useCronogramaSearch } from '@/components/cronograma-eventos/CronogramaSearchContext';
 import { useCronogramaShell } from '@/components/cronograma-eventos/CronogramaShellContext';
 
@@ -23,7 +22,7 @@ import { EventForm } from '@/components/cronograma-eventos/EventForm';
 import { MobileCreateEventScreen } from '@/components/cronograma-eventos/mobile/MobileCreateEventScreen';
 import { MobileCronogramaErrorBoundary } from '@/components/cronograma-eventos/mobile/MobileCronogramaErrorBoundary';
 import { MobileCronogramaFilters } from '@/components/cronograma-eventos/mobile/MobileCronogramaFilters';
-import { MobileCronogramaNavigation } from '@/components/cronograma-eventos/mobile/MobileCronogramaNavigation';
+import { MobileCronogramaNavDrawer } from '@/components/cronograma-eventos/mobile/MobileCronogramaNavDrawer';
 import { MobileCronogramaTimeline } from '@/components/cronograma-eventos/mobile/MobileCronogramaTimeline';
 
 import { MobileEventScreen } from '@/components/cronograma-eventos/mobile/MobileEventScreen';
@@ -1009,7 +1008,7 @@ export default function CronogramaEventosPage() {
           <CronogramaCycleSlotProvider>
             <div className="cronograma-mobile-experience mx-auto flex w-full max-w-3xl min-w-0 flex-col gap-2.5 overflow-x-clip px-3">
               <div className="cronograma-mobile-command">
-                <MobileCronogramaNavigation activeView={activeView} onChange={setActiveView} />
+                <MobileCronogramaNavDrawer activeView={activeView} onChange={setActiveView} />
                 <CronogramaCycleSlotTarget className="cronograma-mobile-cycle-slot" />
               </div>
 
@@ -1028,35 +1027,24 @@ export default function CronogramaEventosPage() {
           </CronogramaCycleSlotProvider>
         </MobileCronogramaErrorBoundary>
       ) : (
-        <CronogramaFiltersSlotProvider
-          slot={(
-            <CronogramaFiltersTrigger
-              filters={filters}
-              events={events}
-              onChange={applyFilters}
-              onClear={clearFilters}
-              resultCount={filteredEvents.length}
-              syncing={cronograma.isRefreshing}
+        <CronogramaCycleSlotProvider>
+          <div className="cronograma-workbench mx-auto flex w-full max-w-[1680px] gap-4 px-3 sm:px-5 2xl:px-8">
+            <CronogramaSideNav
+              activeView={activeView}
+              onChange={setActiveView}
+              filters={(
+                <CronogramaFiltersTrigger
+                  filters={filters}
+                  events={events}
+                  onChange={applyFilters}
+                  onClear={clearFilters}
+                  resultCount={filteredEvents.length}
+                  syncing={cronograma.isRefreshing}
+                />
+              )}
             />
-          )}
-        >
-          <CronogramaCycleSlotProvider>
-            <div className="mx-auto flex w-full max-w-[1680px] flex-col gap-3 px-3 sm:px-5 2xl:px-8">
-              <div className="cronograma-workbench-bar">
-                <CronogramaSecondaryNav activeView={activeView} onChange={setActiveView} />
-                <button
-                  type="button"
-                  onClick={() => setActiveView(activeView === 'completed' ? 'timeline' : 'completed')}
-                  className="cronograma-history-toggle focus-ring"
-                  data-active={activeView === 'completed' || undefined}
-                  aria-pressed={activeView === 'completed'}
-                >
-                  <BadgeCheck aria-hidden="true" />
-                  <span>Histórico concluído</span>
-                </button>
-                <CronogramaCycleSlotTarget className="cronograma-workbench-cycle" />
-              </div>
 
+            <div className="cronograma-workbench__content flex min-w-0 flex-1 flex-col gap-3">
               {activeView !== 'timeline' && activeView !== 'completed' && (
                 <CronogramaCycleBar
                   label="Visão operacional"
@@ -1064,12 +1052,12 @@ export default function CronogramaEventosPage() {
                 />
               )}
 
-
               {operationalContent}
             </div>
-          </CronogramaCycleSlotProvider>
-        </CronogramaFiltersSlotProvider>
+          </div>
+        </CronogramaCycleSlotProvider>
       )}
+
 
 
 
