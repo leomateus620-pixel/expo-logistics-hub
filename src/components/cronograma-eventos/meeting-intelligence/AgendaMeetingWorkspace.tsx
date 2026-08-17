@@ -969,12 +969,12 @@ export function AgendaMeetingWorkspace({
         type="button"
       >
         <span className="agenda-meeting__mark-shell"><MeetingIntelligenceMark state={available ? 'idle' : 'blocked'} /></span>
-        <span>
+        <span className="agenda-meeting__launcher-copy">
           <span className="agenda-meeting__eyebrow">Inteligência de reunião</span>
-          <span className="agenda-meeting__title">Ata vinculada à Agenda FENASOJA</span>
-          <span className="agenda-meeting__description">
-            {available ? 'Capture, organize decisões e acompanhe responsabilidades com evidência.' : 'Disponível somente para eventos persistidos e sincronizados com UUID canônico.'}
-          </span>
+          <span className="agenda-meeting__title">Fenasoja Meeting</span>
+          {!available && (
+            <span className="agenda-meeting__description">Disponível apenas para eventos já salvos.</span>
+          )}
         </span>
         <span className="agenda-meeting__launcher-action">
           {available ? (
