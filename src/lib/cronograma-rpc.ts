@@ -154,3 +154,53 @@ export async function cronogramaReorderSubevents(eventId: string, orderedIds: st
   if (error) throw normalize(error);
   return data;
 }
+
+export interface CronogramaSubeventPlanActionInput {
+  start_time?: string | null;
+  title: string;
+  notes?: string | null;
+  responsible_user_id?: string | null;
+  responsible_name?: string | null;
+  commission_slug?: string | null;
+  commission_name?: string | null;
+  is_done?: boolean;
+  sort_order?: number;
+}
+
+export interface CronogramaSubeventPlanProvisionInput {
+  description: string;
+  responsible_user_id?: string | null;
+  responsible_name?: string | null;
+  commission_slug?: string | null;
+  commission_name?: string | null;
+  note?: string | null;
+  is_done?: boolean;
+  sort_order?: number;
+}
+
+export interface CronogramaSubeventPlanGuestInput {
+  name: string;
+  category?: string | null;
+  sort_order?: number;
+}
+
+export interface CronogramaSubeventPlanItemInput extends Omit<CronogramaSaveSubeventPayload, 'parent_event_id' | 'request_id'> {
+  actions?: CronogramaSubeventPlanActionInput[];
+  provisions?: CronogramaSubeventPlanProvisionInput[];
+  guests?: CronogramaSubeventPlanGuestInput[];
+}
+
+export interface CronogramaSaveSubeventPlanPayload {
+  parent_event_id: string;
+  subevents: CronogramaSubeventPlanItemInput[];
+  request_id?: string;
+}
+
+/** Persists an entire event plan (subevents + ações + providências + convidados) in one transaction. */
+export async function cronogramaSaveSubeventPlan(payload: CronogramaSaveSubeventPlanPayload) {
+  const { data, error } = await supabase.rpc('cronograma_save_subevent_plan', {
+    payload: { request_id: newRequestId(), ...payload } as never,
+  });
+  if (error) throw normalize(error);
+  return data;
+}

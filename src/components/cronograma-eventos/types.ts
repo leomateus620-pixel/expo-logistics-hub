@@ -95,6 +95,38 @@ export interface CronogramaEventResponsibleLink {
   responsibleType?: 'member' | 'external';
 }
 
+export interface CronogramaSubeventAction {
+  id?: string;
+  startTime?: string | null;
+  title: string;
+  notes?: string | null;
+  responsibleUserId?: string | null;
+  responsibleName?: string | null;
+  commissionSlug?: string | null;
+  commissionName?: string | null;
+  isDone?: boolean;
+  sortOrder?: number;
+}
+
+export interface CronogramaSubeventProvision {
+  id?: string;
+  description: string;
+  responsibleUserId?: string | null;
+  responsibleName?: string | null;
+  commissionSlug?: string | null;
+  commissionName?: string | null;
+  note?: string | null;
+  isDone?: boolean;
+  sortOrder?: number;
+}
+
+export interface CronogramaSubeventGuest {
+  id?: string;
+  name: string;
+  category?: string | null;
+  sortOrder?: number;
+}
+
 export interface CronogramaSubevent {
   id?: string;
   title: string;
@@ -115,6 +147,9 @@ export interface CronogramaSubevent {
   createdAt?: string | null;
   updatedAt?: string | null;
   lockVersion?: number | null;
+  actions?: CronogramaSubeventAction[];
+  provisions?: CronogramaSubeventProvision[];
+  guests?: CronogramaSubeventGuest[];
 }
 
 export interface CronogramaSubeventInput {
@@ -127,6 +162,22 @@ export interface CronogramaSubeventInput {
   status: CronogramaStatus;
   responsible: string;
   commissionSlug: string;
+}
+
+/** One subevent inside the Event Planning Builder (plano operacional completo). */
+export interface CronogramaSubeventPlanDraft {
+  id?: string;
+  title: string;
+  description: string;
+  date: string | null;
+  startTime?: string;
+  endTime?: string;
+  status: CronogramaStatus;
+  responsible: string;
+  commissionSlug: string;
+  actions: CronogramaSubeventAction[];
+  provisions: CronogramaSubeventProvision[];
+  guests: CronogramaSubeventGuest[];
 }
 
 export interface CronogramaFilters {

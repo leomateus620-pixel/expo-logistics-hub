@@ -30,6 +30,38 @@ export interface CronogramaCommissionLink {
   name: string;
 }
 
+export interface CronogramaSubeventActionSeed {
+  id?: string;
+  startTime?: string | null;
+  title: string;
+  notes?: string | null;
+  responsibleUserId?: string | null;
+  responsibleName?: string | null;
+  commissionSlug?: string | null;
+  commissionName?: string | null;
+  isDone?: boolean;
+  sortOrder?: number;
+}
+
+export interface CronogramaSubeventProvisionSeed {
+  id?: string;
+  description: string;
+  responsibleUserId?: string | null;
+  responsibleName?: string | null;
+  commissionSlug?: string | null;
+  commissionName?: string | null;
+  note?: string | null;
+  isDone?: boolean;
+  sortOrder?: number;
+}
+
+export interface CronogramaSubeventGuestSeed {
+  id?: string;
+  name: string;
+  category?: string | null;
+  sortOrder?: number;
+}
+
 export interface CronogramaSubeventSeed {
   id?: string;
   title: string;
@@ -50,6 +82,9 @@ export interface CronogramaSubeventSeed {
   syncError?: string | null;
   createdAt?: string | null;
   updatedAt?: string | null;
+  actions?: CronogramaSubeventActionSeed[];
+  provisions?: CronogramaSubeventProvisionSeed[];
+  guests?: CronogramaSubeventGuestSeed[];
 }
 
 export interface CronogramaEventSeed {

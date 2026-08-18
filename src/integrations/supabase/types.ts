@@ -1840,6 +1840,65 @@ export type Database = {
           },
         ]
       }
+      cronograma_subevento_acoes: {
+        Row: {
+          commission_name: string | null
+          commission_slug: string | null
+          created_at: string
+          id: string
+          is_done: boolean
+          notes: string | null
+          org_id: string
+          responsible_name: string | null
+          responsible_user_id: string | null
+          sort_order: number
+          start_time: string | null
+          subevent_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          commission_name?: string | null
+          commission_slug?: string | null
+          created_at?: string
+          id?: string
+          is_done?: boolean
+          notes?: string | null
+          org_id: string
+          responsible_name?: string | null
+          responsible_user_id?: string | null
+          sort_order?: number
+          start_time?: string | null
+          subevent_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          commission_name?: string | null
+          commission_slug?: string | null
+          created_at?: string
+          id?: string
+          is_done?: boolean
+          notes?: string | null
+          org_id?: string
+          responsible_name?: string | null
+          responsible_user_id?: string | null
+          sort_order?: number
+          start_time?: string | null
+          subevent_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cronograma_subevento_acoes_subevent_id_fkey"
+            columns: ["subevent_id"]
+            isOneToOne: false
+            referencedRelation: "cronograma_subeventos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cronograma_subevento_comissoes: {
         Row: {
           commission_id: string | null
@@ -1877,6 +1936,100 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "cronograma_subevento_comissoes_subevent_id_fkey"
+            columns: ["subevent_id"]
+            isOneToOne: false
+            referencedRelation: "cronograma_subeventos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cronograma_subevento_convidados: {
+        Row: {
+          category: string | null
+          created_at: string
+          id: string
+          name: string
+          org_id: string
+          sort_order: number
+          subevent_id: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          org_id: string
+          sort_order?: number
+          subevent_id: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          org_id?: string
+          sort_order?: number
+          subevent_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cronograma_subevento_convidados_subevent_id_fkey"
+            columns: ["subevent_id"]
+            isOneToOne: false
+            referencedRelation: "cronograma_subeventos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cronograma_subevento_providencias: {
+        Row: {
+          commission_name: string | null
+          commission_slug: string | null
+          created_at: string
+          description: string
+          id: string
+          is_done: boolean
+          note: string | null
+          org_id: string
+          responsible_name: string | null
+          responsible_user_id: string | null
+          sort_order: number
+          subevent_id: string
+          updated_at: string
+        }
+        Insert: {
+          commission_name?: string | null
+          commission_slug?: string | null
+          created_at?: string
+          description: string
+          id?: string
+          is_done?: boolean
+          note?: string | null
+          org_id: string
+          responsible_name?: string | null
+          responsible_user_id?: string | null
+          sort_order?: number
+          subevent_id: string
+          updated_at?: string
+        }
+        Update: {
+          commission_name?: string | null
+          commission_slug?: string | null
+          created_at?: string
+          description?: string
+          id?: string
+          is_done?: boolean
+          note?: string | null
+          org_id?: string
+          responsible_name?: string | null
+          responsible_user_id?: string | null
+          sort_order?: number
+          subevent_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cronograma_subevento_providencias_subevent_id_fkey"
             columns: ["subevent_id"]
             isOneToOne: false
             referencedRelation: "cronograma_subeventos"
@@ -7923,7 +8076,19 @@ export type Database = {
         Args: { _event_id: string; _items: Json; _org_id: string }
         Returns: undefined
       }
+      _cronograma_apply_subevent_actions: {
+        Args: { _items: Json; _org_id: string; _subevent_id: string }
+        Returns: undefined
+      }
       _cronograma_apply_subevent_commissions: {
+        Args: { _items: Json; _org_id: string; _subevent_id: string }
+        Returns: undefined
+      }
+      _cronograma_apply_subevent_guests: {
+        Args: { _items: Json; _org_id: string; _subevent_id: string }
+        Returns: undefined
+      }
+      _cronograma_apply_subevent_provisions: {
         Args: { _items: Json; _org_id: string; _subevent_id: string }
         Returns: undefined
       }
@@ -8317,6 +8482,7 @@ export type Database = {
         Args: { expected_lock_version?: number; payload: Json }
         Returns: Json
       }
+      cronograma_save_subevent_plan: { Args: { payload: Json }; Returns: Json }
       cronograma_scoped_event_visible: {
         Args: { _event_id: string; _user_id: string }
         Returns: boolean

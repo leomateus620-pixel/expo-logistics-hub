@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from 'react';
+import { SubeventPlanRundown, subeventPlanSummary } from '@/components/cronograma-eventos/workspace/SubeventPlanRundown';
+import '@/styles/cronograma-plan-builder.css';
 import {
   AlertTriangle,
   CalendarClock,
@@ -367,7 +369,9 @@ export function EventDrawer({
                               <p className="mt-1 text-xs text-muted-foreground">
                                 {subevent.date ? formatLongDate(subevent.date) : 'Sem data'}
                                 {subevent.owner ? ` · ${subevent.owner}` : ''}
+                                {subeventPlanSummary(subevent) ? ` · ${subeventPlanSummary(subevent)}` : ''}
                               </p>
+                              <SubeventPlanRundown subevent={subevent} />
                             </div>
                             {subevent.status && <CronogramaStatusIndicator status={subevent.status} compact />}
                           </div>

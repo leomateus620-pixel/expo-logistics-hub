@@ -38,6 +38,7 @@ import type {
   CronogramaFilters,
   CronogramaSubevent,
   CronogramaSubeventInput,
+  CronogramaSubeventPlanDraft,
   CronogramaView,
 } from '@/components/cronograma-eventos/types';
 import {
@@ -740,6 +741,68 @@ export default function CronogramaEventosPage() {
     });
   };
 
+  const handleSaveSubeventPlan = async (items: CronogramaSubeventPlanDraft[]) => {
+    if (!workspaceEvent) throw new Error('Evento principal não encontrado. Atualize a página e tente novamente.');
+    const existingCount = workspaceEvent.subevents?.length ?? 0;
+    await cronograma.saveSubeventPlan.mutateAsync({
+      eventId: workspaceEvent.sourceKey ?? workspaceEvent.id,
+      subevents: items.map((item, index) => {
+        const draft = visualSubeventToSourceDraft({
+          id: item.id,
+          title: item.title,
+          description: item.description,
+          date: item.date,
+          endDate: item.date,
+          startTime: item.startTime,
+          endTime: item.endTime,
+          owner: item.responsible,
+          status: item.status,
+          priority: 'medium',
+          commissionSlug: item.commissionSlug || undefined,
+          storage: 'relational',
+        }, item.id ? index : existingCount + index);
+        return {
+          id: item.id,
+          title: draft.title,
+          description: draft.description,
+          start_date: draft.startDate,
+          end_date: draft.endDate,
+          start_time: draft.startTime,
+          end_time: draft.endTime,
+          status: draft.status,
+          priority: draft.priority,
+          commission_slug: draft.commissionSlug,
+          responsible_name: draft.responsibleName,
+          sort_order: draft.sortOrder,
+          actions: item.actions.map((action, position) => ({
+            title: action.title.trim(),
+            start_time: action.startTime || null,
+            notes: action.notes ?? null,
+            responsible_name: action.responsibleName?.trim() || null,
+            commission_slug: action.commissionSlug ?? null,
+            commission_name: action.commissionName ?? null,
+            is_done: action.isDone ?? false,
+            sort_order: position,
+          })),
+          provisions: item.provisions.map((provision, position) => ({
+            description: provision.description.trim(),
+            responsible_name: provision.responsibleName?.trim() || null,
+            commission_slug: provision.commissionSlug ?? null,
+            commission_name: provision.commissionName ?? null,
+            note: provision.note ?? null,
+            is_done: provision.isDone ?? false,
+            sort_order: position,
+          })),
+          guests: item.guests.map((guest, position) => ({
+            name: guest.name.trim(),
+            category: guest.category ?? null,
+            sort_order: position,
+          })),
+        };
+      }),
+    });
+  };
+
   const prepareNewEvent = (event: CronogramaEvent) => {
     const id = `custom-${Date.now()}`;
     return {
@@ -974,6 +1037,7 @@ export default function CronogramaEventosPage() {
               onCreateSubevent={handleCreateSubevent}
               onUpdateSubevent={handleUpdateSubevent}
               onRemoveSubevent={handleRemoveSubevent}
+              onSaveSubeventPlan={handleSaveSubeventPlan}
               canManage={cronograma.canManage}
               canDeleteSubevents={cronograma.canDeleteSubevents}
               relationshipsUnavailable={cronograma.relationshipSyncUnavailable}
