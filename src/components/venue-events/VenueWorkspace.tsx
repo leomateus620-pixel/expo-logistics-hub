@@ -101,7 +101,12 @@ import { VenueWorkspaceSwitcher } from "@/components/venue-events/VenueWorkspace
 import { VenueEventsFiltersTrigger } from "@/components/venue-events/VenueEventsFiltersTrigger";
 import { VenueEventsYearSelector } from "@/components/venue-events/VenueEventsYearSelector";
 import { VenueAgendaFiltersTrigger } from "@/components/venue-events/VenueAgendaFiltersTrigger";
-import { VenueCreateEventBar } from "@/components/venue-events/VenueCreateEventBar";
+import { VenueSideNav } from "@/components/venue-events/VenueSideNav";
+import { VenueMobileNavDrawer } from "@/components/venue-events/VenueMobileNavDrawer";
+import {
+  VENUE_NAV_ITEMS,
+  VENUE_VALID_VIEWS,
+} from "@/components/venue-events/venueNavigation";
 import { VenueAgreementCard } from "@/components/venue-events/VenueAgreementCard";
 import { useVenueSearch } from "@/components/venue-events/VenueSearchContext";
 import { countCommittedCounterpartEvents } from "@/lib/venue-counterparts";
@@ -119,77 +124,7 @@ import {
 } from "@/components/venue-events/venueWorkspaces";
 import "@/styles/venue-events.css";
 import "@/styles/venue-events-production.css";
-
-type NavGroupId = "planejamento" | "gestao" | "controle";
-
-interface NavItem {
-  id: VenueView;
-  label: string;
-  shortLabel: string;
-  icon: LucideIcon;
-  group: NavGroupId;
-  primary?: boolean;
-}
-
-const NAV_ITEMS: NavItem[] = [
-  {
-    id: "agenda",
-    label: "Agenda",
-    shortLabel: "Agenda",
-    icon: CalendarDays,
-    group: "planejamento",
-    primary: true,
-  },
-  {
-    id: "eventos",
-    label: "Eventos",
-    shortLabel: "Eventos",
-    icon: ListChecks,
-    group: "planejamento",
-    primary: true,
-  },
-  {
-    id: "contrapartidas",
-    label: "Contrapartidas",
-    shortLabel: "Contratos",
-    icon: FileKey2,
-    group: "gestao",
-  },
-  {
-    id: "patrocinadores",
-    label: "Patrocinadores",
-    shortLabel: "Parceiros",
-    icon: UsersRound,
-    group: "gestao",
-  },
-  {
-    id: "operacao",
-    label: "Operação",
-    shortLabel: "Operação",
-    icon: ClipboardCheck,
-    group: "gestao",
-  },
-  {
-    id: "historico",
-    label: "Histórico",
-    shortLabel: "Histórico",
-    icon: History,
-    group: "controle",
-  },
-  {
-    id: "relatorios",
-    label: "Relatórios",
-    shortLabel: "Relatórios",
-    icon: BarChart3,
-    group: "controle",
-  },
-];
-
-const NAV_GROUPS: Array<{ id: NavGroupId; label: string }> = [
-  { id: "planejamento", label: "Planejamento" },
-  { id: "gestao", label: "Gestão" },
-  { id: "controle", label: "Controle" },
-];
+import "@/styles/venue-events-navigation.css";
 
 const VIEW_CONTEXT: Record<
   VenueView,
@@ -286,7 +221,7 @@ function presentPendencyType(type: string) {
   return labels[type] || type.replaceAll("_", " ");
 }
 
-const VALID_VIEWS = new Set(NAV_ITEMS.map((item) => item.id));
+const VALID_VIEWS = VENUE_VALID_VIEWS;
 
 function localDateKey(value: string) {
   return new Intl.DateTimeFormat("en-CA", {
@@ -2742,7 +2677,7 @@ export function VenueWorkspace() {
                     </span>
                     <span>
                       <small>Próxima ação</small>
-                      <strong>Abrir {NAV_ITEMS.find((nav) => nav.id === item.actionView)?.label}</strong>
+                      <strong>Abrir {VENUE_NAV_ITEMS.find((nav) => nav.id === item.actionView)?.label}</strong>
                     </span>
                   </div>
                 </div>
@@ -2785,9 +2720,6 @@ export function VenueWorkspace() {
     relatorios: renderReports,
     pendencias: renderPendencies,
   };
-
-  const activeNav = NAV_ITEMS.find((item) => item.id === view)!;
-  const MobileMoreIcon = activeNav.primary ? MoreHorizontal : activeNav.icon;
 
   return (
     <div className="venue-workspace" data-venue={venueId}>
