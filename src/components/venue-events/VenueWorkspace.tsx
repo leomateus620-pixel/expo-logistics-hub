@@ -21,7 +21,6 @@ import {
   MapPin,
   UserRound,
   Handshake,
-  MoreHorizontal,
   Plus,
   RefreshCw,
   Search,
@@ -44,15 +43,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 import { useAuth } from "@/hooks/useAuth";
 import {
   useVenueAuditHistory,
