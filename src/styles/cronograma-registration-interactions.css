@@ -454,6 +454,17 @@
   fill: currentColor;
 }
 
+button.cronograma-relation-primary {
+  cursor: pointer;
+  transition: background 160ms ease, border-color 160ms ease;
+}
+
+button.cronograma-relation-primary:hover {
+  background: oklch(var(--brand-gold-400) / 0.3);
+  border-color: oklch(var(--brand-gold-500) / 0.7);
+}
+
+
 .cronograma-relation-mark-primary {
   border-color: oklch(var(--brand-indigo-200));
   background: oklch(var(--brand-indigo-50));
