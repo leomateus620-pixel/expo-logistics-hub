@@ -11,6 +11,34 @@ import type {
 } from '../types';
 import type { CommercialMapSegmentId } from '../data/commercialMapSegments';
 
+export type CommercialMapDockSection =
+  | 'search'
+  | 'area'
+  | 'segments'
+  | 'view'
+  | 'filters'
+  | 'management';
+
+const DOCK_EXPANDED_STORAGE_KEY = 'commercial-map:dock-expanded';
+
+function readPersistedDockExpanded() {
+  if (typeof window === 'undefined') return false;
+  try {
+    return window.localStorage.getItem(DOCK_EXPANDED_STORAGE_KEY) === 'true';
+  } catch {
+    return false;
+  }
+}
+
+function persistDockExpanded(expanded: boolean) {
+  if (typeof window === 'undefined') return;
+  try {
+    window.localStorage.setItem(DOCK_EXPANDED_STORAGE_KEY, String(expanded));
+  } catch {
+    /* storage unavailable: dock state stays in memory only */
+  }
+}
+
 export interface CommercialMapCameraView {
   position: [number, number, number];
   target: [number, number, number];
@@ -43,6 +71,10 @@ interface CommercialMapState {
   technicalValidationVisible: boolean;
   reducedGraphics: boolean;
   cameraNavigating: boolean;
+  dockExpanded: boolean;
+  dockSection: CommercialMapDockSection | null;
+  setDockExpanded: (expanded: boolean) => void;
+  setDockSection: (section: CommercialMapDockSection | null) => void;
   activateScope: (scopeKey: string, segmentId: CommercialMapSegmentId | null) => void;
   setSelectedEntityId: (id: string | null) => void;
   enterInterior: (id: string) => void;
@@ -77,7 +109,7 @@ interface CommercialMapState {
   setCameraNavigating: (navigating: boolean) => void;
 }
 
-export const useCommercialMapStore = create<CommercialMapState>((set) => ({
+export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
   activeScopeKey: null,
   selectedEntityId: null,
   interiorEntityId: null,
@@ -107,6 +139,15 @@ export const useCommercialMapStore = create<CommercialMapState>((set) => ({
   technicalValidationVisible: false,
   reducedGraphics: false,
   cameraNavigating: false,
+  dockExpanded: readPersistedDockExpanded(),
+  dockSection: null,
+  setDockExpanded: (dockExpanded) => {
+    persistDockExpanded(dockExpanded);
+    set({ dockExpanded, dockSection: dockExpanded ? get().dockSection : null });
+  },
+  setDockSection: (dockSection) => set((state) => (
+    state.dockSection === dockSection ? { dockSection: null } : { dockSection }
+  )),
   activateScope: (activeScopeKey, activeSegmentId) => set((state) => {
     if (state.activeScopeKey === activeScopeKey && state.activeSegmentId === activeSegmentId) return state;
     return {

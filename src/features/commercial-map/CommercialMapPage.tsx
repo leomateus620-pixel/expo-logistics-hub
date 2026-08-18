@@ -5,19 +5,14 @@ import {
   ArrowLeft,
   BadgeCheck,
   Box,
-  ChevronDown,
   DatabaseZap,
   Loader2,
-  MapPinned,
   MapPinPlus,
   MousePointer2,
   RefreshCw,
   Ruler,
   Send,
-  Settings2,
   Sparkles,
-  Tractor,
-  Trees,
 } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
@@ -32,6 +27,7 @@ import {
 import { useCommercialMapStore } from './state/useCommercialMapStore';
 import { CommercialMapCanvas } from './components/canvas/CommercialMapCanvas';
 import { MapToolbar } from './components/controls/MapToolbar';
+import { CommercialMapDock } from './components/dock/CommercialMapDock';
 import { GeometryEditor } from './components/editor/GeometryEditor';
 import { LotCreationWorkspace } from './components/editor/LotCreationWorkspace';
 import {
@@ -360,46 +356,8 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
     );
   }
 
-  return (
-    <section
-      className={`commercial-map-shell ${isCommissionScope ? 'is-commission-scope' : ''} ${isExporural ? 'is-exporural' : ''} ${areaScope === COMMERCIAL_MAP_SEGMENT_IDS.industry ? 'is-industry' : ''} ${interiorEntityId ? 'is-interior' : ''} ${interiorKind === 'commercial-pavilion' ? 'is-commercial-pavilion-interior' : ''} ${interiorKind === 'livestock-pavilion' ? 'is-livestock-interior' : ''} ${interiorKind === 'mirante-pavilion' ? 'is-mirante-interior' : ''} ${selectedEntity ? 'has-selection' : ''} ${selectedKind === 'commercial-pavilion' || selectedKind === 'livestock-pavilion' || selectedKind === 'mirante-pavilion' ? 'has-architectural-selection' : ''}`}
-      aria-label="Plataforma de gestão do mapa comercial"
-    >
-      <header className="commercial-map-command-header">
-        <div className="commercial-map-title-lockup">
-          <div className="commercial-map-title-icon"><MapPinned /></div>
-          <div>
-            <span>{scopedSegment ? 'Comissão · segmento comercial' : 'Parque Fenasoja · visão comercial'}</span>
-            <h1>{scopeTitle}</h1>
-            <p>{isCommissionScope ? `Vista isolada · ${scopeDescription}` : scopeDescription}</p>
-          </div>
-        </div>
-        {!isCommissionScope && <nav className="commercial-map-view-selector" aria-label="Área exibida no mapa">
-          <button
-            type="button"
-            className={!isExporural ? 'is-active' : ''}
-            onClick={() => setAreaScope('park')}
-            aria-pressed={!isExporural}
-          >
-            <Trees />Parque completo
-          </button>
-          <button
-            type="button"
-            className={isExporural ? 'is-active' : ''}
-            onClick={() => setAreaScope('exporural')}
-            aria-pressed={isExporural}
-          >
-            <Tractor />Exporural
-          </button>
-        </nav>}
-        {hasManagementActions && (
-          <details className="commercial-map-management">
-            <summary>
-              <Settings2 aria-hidden="true" />
-              <span>Gestão</span>
-              <ChevronDown className="commercial-map-management-chevron" aria-hidden="true" />
-            </summary>
-            <div className="commercial-map-header-actions" aria-label="Ferramentas administrativas do mapa">
+  const managementActions = hasManagementActions ? (
+    <>
               {permissions.canEditGeometry && (
                 <Button
                   size="sm"
@@ -488,27 +446,14 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
               </AlertDialogContent>
               </AlertDialog>
             )}
-            </div>
-          </details>
-        )}
-      </header>
+    </>
+  ) : null;
 
-      {data.sourceMessage && (
-        <div
-          className={`commercial-map-source-notice is-${data.source}`}
-          role="status"
-          title={data.sourceMessage}
-        >
-          <AlertTriangle aria-hidden="true" />
-          <strong>
-            {data.source === 'official-reference'
-              ? 'Referência oficial · somente leitura'
-              : 'Estado da base persistida'}
-          </strong>
-          <span>{data.sourceMessage}</span>
-        </div>
-      )}
-
+  return (
+    <section
+      className={`commercial-map-shell ${isCommissionScope ? 'is-commission-scope' : ''} ${isExporural ? 'is-exporural' : ''} ${areaScope === COMMERCIAL_MAP_SEGMENT_IDS.industry ? 'is-industry' : ''} ${interiorEntityId ? 'is-interior' : ''} ${interiorKind === 'commercial-pavilion' ? 'is-commercial-pavilion-interior' : ''} ${interiorKind === 'livestock-pavilion' ? 'is-livestock-interior' : ''} ${interiorKind === 'mirante-pavilion' ? 'is-mirante-interior' : ''} ${selectedEntity ? 'has-selection' : ''} ${selectedKind === 'commercial-pavilion' || selectedKind === 'livestock-pavilion' || selectedKind === 'mirante-pavilion' ? 'has-architectural-selection' : ''}`}
+      aria-label="Plataforma de gestão do mapa comercial"
+    >
       {!isCommissionScope && !interiorEntityId && workspaceMode !== 'edit' && workspaceMode !== 'create' && (
         <SegmentLegend
           entities={data.entities}
@@ -516,10 +461,27 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
           activeSegmentId={activeSegmentId}
           onSelect={handleSegmentSelect}
           onClear={handleSegmentClear}
+          variant="mobile"
         />
       )}
 
-      <div id="commercial-map-viewport" className="commercial-map-viewport">
+      <div className="commercial-map-body">
+        <CommercialMapDock
+          entities={data.entities}
+          lots={data.lots}
+          areaScope={areaScope}
+          onAreaScopeChange={setAreaScope}
+          activeSegmentId={activeSegmentId}
+          onSegmentSelect={handleSegmentSelect}
+          onSegmentClear={handleSegmentClear}
+          permissions={permissions}
+          hasSelection={Boolean(selectedEntity)}
+          isCommissionScope={isCommissionScope}
+          managementActions={managementActions}
+        />
+
+        <div id="commercial-map-viewport" className="commercial-map-viewport">
+
         {workspaceMode === 'create' ? (
           <LotCreationWorkspace project={data.project} calibration={data.calibration} layers={data.layers} entities={scopedData.entities} />
         ) : workspaceMode === 'edit' && selectedEntity ? (
@@ -617,6 +579,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
         {!webglAvailable && workspaceMode !== 'edit' && (
           <div className="commercial-map-webgl-note"><Box /><span><strong>Modo 2D acessível ativado</strong>O navegador não disponibilizou WebGL 2. A tabela permanece totalmente operacional.</span></div>
         )}
+        </div>
       </div>
     </section>
   );
