@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from 'react';
+import { SubeventPlanRundown, subeventPlanSummary } from '@/components/cronograma-eventos/workspace/SubeventPlanRundown';
+import '@/styles/cronograma-plan-builder.css';
 import {
   AlertTriangle,
   CalendarClock,
