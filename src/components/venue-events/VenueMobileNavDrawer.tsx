@@ -73,7 +73,10 @@ export function VenueMobileNavDrawer({
             className="venue-nav-drawer__create"
             onClick={onCreate}
           >
-            <Plus aria-hidden="true" />
+            <span className="venue-sidenav__create-icon">
+              <Plus aria-hidden="true" />
+            </span>
+
             <span>
               <strong>Novo evento</strong>
               <small>Cadastrar na {venueLabel}</small>
