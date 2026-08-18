@@ -755,10 +755,15 @@ export default function CronogramaEventosPage() {
           endDate: item.date,
           startTime: item.startTime,
           endTime: item.endTime,
-          owner: item.responsible,
+          owner: (item.responsiblesRel ?? []).find((link) => link.isPrimary)?.name
+            ?? (item.responsiblesRel ?? [])[0]?.name
+            ?? item.responsible,
           status: item.status,
           priority: 'medium',
-          commissionSlug: item.commissionSlug || undefined,
+          commissionSlug: (item.commissionsRel ?? []).find((link) => link.isPrimary)?.commissionSlug
+            ?? (item.commissionsRel ?? [])[0]?.commissionSlug
+            ?? item.commissionSlug
+            ?? undefined,
           storage: 'relational',
         }, item.id ? index : existingCount + index);
         return {
@@ -774,6 +779,19 @@ export default function CronogramaEventosPage() {
           commission_slug: draft.commissionSlug,
           responsible_name: draft.responsibleName,
           sort_order: draft.sortOrder,
+          commissions: (item.commissionsRel ?? []).map((link) => ({
+            commission_id: link.commissionId ?? null,
+            commission_slug: link.commissionSlug ?? null,
+            commission_name: link.commissionName ?? null,
+            relation_role: link.isPrimary ? ('principal' as const) : ('participante' as const),
+          })),
+          responsibles: (item.responsiblesRel ?? []).map((link) => ({
+            user_id: link.userId ?? null,
+            name: link.name ?? null,
+            role: link.role ?? null,
+            is_primary: link.isPrimary ?? false,
+            responsible_type: link.responsibleType ?? (link.userId ? ('member' as const) : ('external' as const)),
+          })),
           actions: item.actions.map((action, position) => ({
             title: action.title.trim(),
             start_time: action.startTime || null,

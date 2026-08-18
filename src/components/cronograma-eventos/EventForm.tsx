@@ -11,18 +11,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useOrgCommissions } from '@/hooks/useOrgCommissions';
 import { useAuth } from '@/hooks/useAuth';
-import { useOrgMembers } from '@/hooks/useOrgMembers';
 import { officialMemberLabel, resolveOfficialMembers } from '@/lib/memberIdentity';
+import { ORG_UNIT_SELECT_LABEL } from '@/lib/org-units';
 import {
-  ORG_UNIT_SELECT_LABEL,
-  normalizeSearchTerm,
-  orgUnitGroupLabel,
-  orgUnitHint,
-  responsibleRoleLabel,
-  selectableOrgUnits,
-} from '@/lib/org-units';
+  buildCommissionOptions,
+  commissionLinksToSelections,
+  reconcileResponsibleSelections,
+  responsibleLinksToSelections,
+  selectionsToCommissionLinks,
+  selectionsToResponsibleLinks,
+  useCronogramaRelationOptions,
+} from './useCronogramaRelationOptions';
 import { categoryLabels, priorityLabels, statusLabels } from './cronogramaData';
 import { CronogramaSubeventForm } from './CronogramaSubeventForm';
 import { RelationalMultiSelect, type RelationalSelection } from './RelationalMultiSelect';
@@ -92,52 +92,6 @@ const defaultForm: CronogramaEvent = {
   responsiblesRel: [],
 };
 
-function commissionLinksToSelections(links: CronogramaEventCommissionLink[] | undefined): RelationalSelection[] {
-  return (links ?? []).map((link) => ({
-    id: link.commissionId ?? `slug:${link.commissionSlug ?? link.commissionName ?? 'sem-vinculo'}`,
-    label: link.commissionName ?? link.commissionSlug ?? 'Comissão',
-    hint: link.commissionSlug ?? undefined,
-    isPrimary: link.isPrimary ?? false,
-  }));
-}
-
-function responsibleLinksToSelections(links: CronogramaEventResponsibleLink[] | undefined): RelationalSelection[] {
-  return (links ?? []).map((link) => ({
-    id: link.userId ?? `external:${(link.name ?? '').toLocaleLowerCase('pt-BR')}`,
-    label: link.name ?? 'Responsável',
-    hint: link.role ?? (link.responsibleType === 'external' ? 'Externo' : 'Membro'),
-    isPrimary: link.isPrimary ?? false,
-  }));
-}
-
-function selectionsToCommissionLinks(
-  selections: RelationalSelection[],
-  options: Array<{ id: string; nome: string; slug: string }>,
-): CronogramaEventCommissionLink[] {
-  return selections.map((selection) => {
-    const option = options.find((item) => item.id === selection.id);
-    return {
-      commissionId: option?.id ?? (selection.id.startsWith('slug:') ? null : selection.id),
-      commissionSlug: option?.slug ?? selection.hint ?? null,
-      commissionName: option?.nome ?? selection.label,
-      isPrimary: selection.isPrimary ?? false,
-    };
-  });
-}
-
-function selectionsToResponsibleLinks(selections: RelationalSelection[]): CronogramaEventResponsibleLink[] {
-  return selections.map((selection) => {
-    const isExternal = selection.id.startsWith('external:') || selection.id.startsWith('custom:');
-    return {
-      userId: isExternal ? null : selection.id,
-      name: selection.label,
-      role: selection.hint ?? null,
-      isPrimary: selection.isPrimary ?? false,
-      responsibleType: isExternal ? 'external' : 'member',
-    };
-  });
-}
-
 export function EventForm({
   event,
   onSubmit,
@@ -169,21 +123,18 @@ export function EventForm({
 }) {
   const formInstanceId = useId().replace(/:/g, '');
   const fieldId = (name: string) => `${formInstanceId}-${name}`;
+  const { user } = useAuth();
   const {
     units,
     commissions,
-    isLoading: commissionsLoading,
-    error: commissionsError,
-  } = useOrgCommissions();
-  const { user } = useAuth();
-  const {
     members,
     loginMembers,
-    isLoading: membersLoading,
-    isLoadingLoginMembers,
-    error: membersError,
-    loginMembersError,
-  } = useOrgMembers();
+    responsibleOptions,
+    commissionsLoading,
+    commissionsError,
+    membersLoading,
+    membersError,
+  } = useCronogramaRelationOptions();
   const officialMembersByUserId = useMemo(
     () => resolveOfficialMembers([...(loginMembers ?? []), ...(members ?? [])] as EventFormMember[]),
     [loginMembers, members],
@@ -283,114 +234,12 @@ export function EventForm({
     () => responsibleLinksToSelections(form.responsiblesRel),
     [form.responsiblesRel],
   );
-  const responsibleOptions = useMemo(() => {
-    const options: Array<{
-      id: string;
-      label: string;
-      hint?: string;
-      group?: string;
-      description?: string;
-      context?: string;
-      searchText?: string;
-    }> = [];
-    const seenUserIds = new Set<string>();
-    const seenExternalNames = new Set<string>();
-    const typedMembers = members as EventFormMember[];
-    const typedLoginMembers = loginMembers as EventFormMember[];
-    const memberByUserId = resolveOfficialMembers([...typedLoginMembers, ...typedMembers]);
-    const institutionalByName = new Map<string, {
-      label: string;
-      userId: string | null;
-      firstUnitName: string;
-      unitNames: Set<string>;
-      roles: Set<string>;
-    }>();
-
-    units.forEach((unit) => {
-      unit.responsibles.forEach((person) => {
-        const label = (person.displayName ?? '').trim();
-        if (!label) return;
-        const key = normalizeSearchTerm(label);
-        const existing = institutionalByName.get(key);
-        if (existing) {
-          existing.unitNames.add(unit.name);
-          existing.roles.add(responsibleRoleLabel(person.relationshipRole));
-          return;
-        }
-        institutionalByName.set(key, {
-          label,
-          userId: person.userId,
-          firstUnitName: unit.name,
-          unitNames: new Set([unit.name]),
-          roles: new Set([responsibleRoleLabel(person.relationshipRole)]),
-        });
-      });
-    });
-
-    Array.from(resolveOfficialMembers(typedLoginMembers).values())
-      .sort((a, b) => (a.nome_exibicao ?? '').localeCompare(b.nome_exibicao ?? '', 'pt-BR'))
-      .forEach((member) => {
-        const label = (member?.nome_exibicao ?? '').trim();
-        if (!label || !member?.user_id) return;
-        if (seenUserIds.has(member.user_id)) return;
-        seenUserIds.add(member.user_id);
-        const key = normalizeSearchTerm(label);
-        const memberProfile = memberByUserId.get(member.user_id);
-        const institutional = institutionalByName.get(key);
-        const persistedRole = member.cargo || undefined;
-        const displayRole = member.cargo || memberProfile?.cargo || member.role || undefined;
-        const contexts = new Set<string>();
-        if (memberProfile?.commission_nome) contexts.add(memberProfile.commission_nome);
-        institutional?.unitNames.forEach((unitName) => contexts.add(unitName));
-        options.push({
-          id: member.user_id as string,
-          label,
-          // `hint` is persisted as the event relationship role; keep the existing contract.
-          hint: persistedRole,
-          description: displayRole || 'Membro do sistema',
-          context: contexts.size > 0 ? Array.from(contexts).join(' · ') : 'Membro do sistema',
-          searchText: [member.role, memberProfile?.role, ...(institutional?.roles ?? [])].filter(Boolean).join(' '),
-          group: 'Membros do sistema',
-        });
-      });
-
-    institutionalByName.forEach((person, key) => {
-      if (person.userId && seenUserIds.has(person.userId)) return;
-      if (!person.userId && seenExternalNames.has(key)) return;
-      if (person.userId) seenUserIds.add(person.userId);
-      else seenExternalNames.add(key);
-      const unitNames = Array.from(person.unitNames);
-      const roles = Array.from(person.roles);
-      options.push({
-        id: person.userId ?? `custom:${person.label.toLocaleLowerCase('pt-BR')}`,
-        label: person.label,
-        // Preserve the existing persisted fallback role for institutional names.
-        hint: person.firstUnitName,
-        description: roles.join(' · ') || 'Responsável institucional',
-        context: unitNames.join(' · '),
-        searchText: [...unitNames, ...roles].join(' '),
-        group: 'Responsáveis institucionais',
-      });
-    });
-
-    return options;
-  }, [loginMembers, members, units]);
-
   const linkedUnitIds = useMemo(
     () => (form.commissionsRel ?? []).map((link) => link.commissionId).filter(Boolean) as string[],
     [form.commissionsRel],
   );
   const commissionOptions = useMemo(
-    () => selectableOrgUnits(units, linkedUnitIds).map((unit) => ({
-      id: unit.id,
-      label: unit.name,
-      // `hint` participates in the existing persistence fallback; preserve it byte-for-byte.
-      hint: orgUnitHint(unit),
-      description: orgUnitHint(unit),
-      context: unit.isLegacy ? 'Registro histórico' : 'Área institucional oficial',
-      searchText: unit.responsibles.map((person) => person.displayName).join(' '),
-      group: orgUnitGroupLabel(unit.type),
-    })),
+    () => buildCommissionOptions(units, linkedUnitIds),
     [units, linkedUnitIds],
   );
 
@@ -664,29 +513,14 @@ export function EventForm({
               options={responsibleOptions}
               value={responsibleSelections}
               onChange={(next) => {
-                const reconciled = next.map((selection) => {
-                  if (!selection.id.startsWith('custom:') && !selection.id.startsWith('external:')) return selection;
-                  const match = responsibleOptions.find(
-                    (option) => normalizeSearchTerm(option.label) === normalizeSearchTerm(selection.label),
-                  );
-                  return match ? { ...selection, id: match.id, hint: selection.hint ?? match.hint } : selection;
-                });
-                const seen = new Set<string>();
-                const unique = reconciled.filter((selection) => {
-                  const key = normalizeSearchTerm(selection.label);
-                  if (seen.has(key)) return false;
-                  seen.add(key);
-                  return true;
-                });
-                update('responsiblesRel', selectionsToResponsibleLinks(unique));
+                update(
+                  'responsiblesRel',
+                  selectionsToResponsibleLinks(reconcileResponsibleSelections(next, responsibleOptions)),
+                );
               }}
               allowCustom
-              isLoading={membersLoading || isLoadingLoginMembers}
-              errorMessage={
-                loginMembersError || membersError
-                  ? 'Tente novamente em instantes.'
-                  : null
-              }
+              isLoading={membersLoading}
+              errorMessage={membersError ? 'Tente novamente em instantes.' : null}
               primaryLabel="Responsável principal"
               presentation={presentation}
               variant="person"

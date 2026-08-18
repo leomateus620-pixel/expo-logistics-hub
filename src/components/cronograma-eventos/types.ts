@@ -150,6 +150,10 @@ export interface CronogramaSubevent {
   actions?: CronogramaSubeventAction[];
   provisions?: CronogramaSubeventProvision[];
   guests?: CronogramaSubeventGuest[];
+  /** Relational commission links, same contract used by the main event form. */
+  commissionsRel?: CronogramaEventCommissionLink[];
+  /** Relational responsible links, same contract used by the main event form. */
+  responsiblesRel?: CronogramaEventResponsibleLink[];
 }
 
 export interface CronogramaSubeventInput {
@@ -175,6 +179,8 @@ export interface CronogramaSubeventPlanDraft {
   status: CronogramaStatus;
   responsible: string;
   commissionSlug: string;
+  commissionsRel?: CronogramaEventCommissionLink[];
+  responsiblesRel?: CronogramaEventResponsibleLink[];
   actions: CronogramaSubeventAction[];
   provisions: CronogramaSubeventProvision[];
   guests: CronogramaSubeventGuest[];

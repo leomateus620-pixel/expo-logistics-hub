@@ -13,12 +13,22 @@ import {
   Users,
   X,
 } from 'lucide-react';
-import { cronogramaCommissionOptions } from '@/data/fenasoja2028CronogramaSeed';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { statusLabels } from '@/components/cronograma-eventos/cronogramaData';
+import { RelationalMultiSelect } from '@/components/cronograma-eventos/RelationalMultiSelect';
+import {
+  buildCommissionOptions,
+  commissionLinksToSelections,
+  reconcileResponsibleSelections,
+  responsibleLinksToSelections,
+  selectionsToCommissionLinks,
+  selectionsToResponsibleLinks,
+  useCronogramaRelationOptions,
+} from '@/components/cronograma-eventos/useCronogramaRelationOptions';
+import { ORG_UNIT_SELECT_LABEL } from '@/lib/org-units';
 import type {
   CronogramaStatus,
   CronogramaSubevent,
@@ -70,6 +80,8 @@ function emptyPlanItem(defaultDate: string | null): CronogramaSubeventPlanDraft 
     status: 'planned',
     responsible: '',
     commissionSlug: '',
+    commissionsRel: [],
+    responsiblesRel: [],
     actions: [],
     provisions: [],
     guests: [],
@@ -87,6 +99,27 @@ function planItemFromSubevent(subevent: CronogramaSubevent, defaultDate: string 
     status: subevent.status ?? 'planned',
     responsible: subevent.owner ?? '',
     commissionSlug: subevent.commissionSlug ?? '',
+    commissionsRel: subevent.commissionsRel?.length
+      ? subevent.commissionsRel.map((link) => ({ ...link }))
+      : (subevent.commissionSlug || subevent.commission
+        ? [{
+          commissionId: null,
+          commissionSlug: subevent.commissionSlug ?? null,
+          commissionName: subevent.commission ?? subevent.commissionSlug ?? null,
+          isPrimary: true,
+        }]
+        : []),
+    responsiblesRel: subevent.responsiblesRel?.length
+      ? subevent.responsiblesRel.map((link) => ({ ...link }))
+      : (subevent.owner?.trim()
+        ? [{
+          userId: null,
+          name: subevent.owner.trim(),
+          role: null,
+          isPrimary: true,
+          responsibleType: 'external' as const,
+        }]
+        : []),
     actions: (subevent.actions ?? []).map((action) => ({ ...action })),
     provisions: (subevent.provisions ?? []).map((provision) => ({ ...provision })),
     guests: (subevent.guests ?? []).map((guest) => ({ ...guest })),
@@ -109,6 +142,15 @@ export function SubeventPlanBuilder({
   onCancel: () => void;
 }) {
   const instanceId = useId().replace(/:/g, '');
+  const {
+    units,
+    commissions,
+    responsibleOptions,
+    commissionsLoading,
+    commissionsError,
+    membersLoading,
+    membersError,
+  } = useCronogramaRelationOptions();
   const initialItems = useMemo(() => {
     if (initialSubevents && initialSubevents.length > 0) {
       return initialSubevents.map((subevent) => planItemFromSubevent(subevent, defaultDate));
@@ -126,6 +168,19 @@ export function SubeventPlanBuilder({
     setOpenIndex(0);
     setError(null);
   }, [initialItems]);
+
+  const linkedUnitIds = useMemo(
+    () => Array.from(new Set(
+      items.flatMap((item) => (item.commissionsRel ?? [])
+        .map((link) => link.commissionId)
+        .filter((id): id is string => Boolean(id))),
+    )),
+    [items],
+  );
+  const commissionOptions = useMemo(
+    () => buildCommissionOptions(units, linkedUnitIds),
+    [units, linkedUnitIds],
+  );
 
   const fieldId = (name: string) => `${instanceId}-${name}`;
 
@@ -299,29 +354,55 @@ export function SubeventPlanBuilder({
                       </select>
                     </div>
 
-                    <div className="cronograma-thought-field">
-                      <Label htmlFor={fieldId(`responsible-${index}`)}>Responsável</Label>
-                      <Input
-                        id={fieldId(`responsible-${index}`)}
-                        value={item.responsible}
-                        onChange={(event) => patchItem(index, { responsible: event.target.value })}
-                        placeholder="Pessoa ou coordenação"
+                    <div className="cronograma-thought-field cronograma-plan-relations">
+                      <RelationalMultiSelect
+                        label={ORG_UNIT_SELECT_LABEL}
+                        placeholder="Buscar comissão, assessoria ou responsável"
+                        triggerLabel="Selecionar comissão ou assessoria"
+                        selectedTriggerLabel="Adicionar ou alterar áreas"
+                        emptyLabel="Nenhuma área vinculada."
+                        options={commissionOptions}
+                        value={commissionLinksToSelections(item.commissionsRel)}
+                        onChange={(next) => {
+                          const links = selectionsToCommissionLinks(next, commissions);
+                          const primary = links.find((link) => link.isPrimary) ?? links[0];
+                          patchItem(index, {
+                            commissionsRel: links,
+                            commissionSlug: primary?.commissionSlug ?? '',
+                          });
+                        }}
+                        isLoading={commissionsLoading}
+                        errorMessage={commissionsError ? 'Tente novamente em instantes.' : null}
+                        primaryLabel="Comissão principal"
+                        variant="organization"
                       />
                     </div>
 
-                    <div className="cronograma-thought-field">
-                      <Label htmlFor={fieldId(`commission-${index}`)}>Comissão ou assessoria</Label>
-                      <select
-                        id={fieldId(`commission-${index}`)}
-                        className="cronograma-thought-select focus-ring"
-                        value={item.commissionSlug}
-                        onChange={(event) => patchItem(index, { commissionSlug: event.target.value })}
-                      >
-                        <option value="">A definir</option>
-                        {cronogramaCommissionOptions.map((commission) => (
-                          <option key={commission.slug} value={commission.slug}>{commission.name}</option>
-                        ))}
-                      </select>
+                    <div className="cronograma-thought-field cronograma-plan-relations">
+                      <RelationalMultiSelect
+                        label="Responsáveis do subevento"
+                        placeholder="Buscar pessoa por nome ou função"
+                        triggerLabel="Selecionar responsáveis"
+                        selectedTriggerLabel="Adicionar ou alterar responsáveis"
+                        emptyLabel="Nenhum responsável vinculado."
+                        options={responsibleOptions}
+                        value={responsibleLinksToSelections(item.responsiblesRel)}
+                        onChange={(next) => {
+                          const links = selectionsToResponsibleLinks(
+                            reconcileResponsibleSelections(next, responsibleOptions),
+                          );
+                          const primary = links.find((link) => link.isPrimary) ?? links[0];
+                          patchItem(index, {
+                            responsiblesRel: links,
+                            responsible: primary?.name ?? '',
+                          });
+                        }}
+                        allowCustom
+                        isLoading={membersLoading}
+                        errorMessage={membersError ? 'Tente novamente em instantes.' : null}
+                        primaryLabel="Responsável principal"
+                        variant="person"
+                      />
                     </div>
                   </div>
 

@@ -341,6 +341,8 @@ function fromViewSubevent(item: unknown): CronogramaSubeventSeed {
     storage: 'relational',
     createdAt: readString(record, 'created_at'),
     updatedAt: readString(record, 'updated_at'),
+    commissionsRel: commissions,
+    responsiblesRel: responsibles,
   };
 }
 

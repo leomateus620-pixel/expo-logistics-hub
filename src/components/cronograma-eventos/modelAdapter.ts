@@ -217,6 +217,8 @@ export function adaptCronogramaSubevent(subevent: CronogramaSubeventSeed): Crono
     createdAt: subevent.createdAt,
     updatedAt: subevent.updatedAt,
     lockVersion: subevent.lockVersion,
+    commissionsRel: subevent.commissionsRel ?? [],
+    responsiblesRel: subevent.responsiblesRel ?? [],
     actions: subevent.actions ?? [],
     provisions: subevent.provisions ?? [],
     guests: subevent.guests ?? [],
