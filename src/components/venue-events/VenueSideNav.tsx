@@ -81,7 +81,9 @@ export function VenueSideNav({
                   onClick={onCreate}
                   aria-label={`Novo evento na ${venueLabel}`}
                 >
-                  <Plus aria-hidden="true" />
+                  <span className="venue-sidenav__create-icon">
+                    <Plus aria-hidden="true" />
+                  </span>
                 </button>
               </TooltipTrigger>
               <TooltipContent side="right">
@@ -94,10 +96,13 @@ export function VenueSideNav({
               className="venue-sidenav__create"
               onClick={onCreate}
             >
-              <Plus aria-hidden="true" />
+              <span className="venue-sidenav__create-icon">
+                <Plus aria-hidden="true" />
+              </span>
               <span>Novo evento</span>
             </button>
           ))}
+
 
         <nav className="venue-sidenav__group" aria-label="Áreas do módulo">
           {VENUE_NAV_ITEMS.map((item, index) => {
