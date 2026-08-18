@@ -32,7 +32,7 @@ import type { CommercialMapAreaScope } from '../../utils/areaScope';
 import { canUseTechnicalValidationOverlay } from '../../utils/technicalValidation';
 import './commercial-map-dock.css';
 
-const STATUS_ORDER: CommercialStatus[] = ['AVAILABLE', 'RESERVED', 'SOLD', 'BLOCKED', 'NOT_COMMERCIAL'];
+const STATUS_ORDER: CommercialStatus[] = ['AVAILABLE', 'RESERVED', 'SOLD', 'BLOCKED'];
 
 interface CommercialMapDockProps {
   entities: readonly MapEntity[];
