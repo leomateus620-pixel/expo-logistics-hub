@@ -1140,3 +1140,12 @@
   background: #eef0ff;
   box-shadow: none;
 }
+
+/* Active/selected labels stay stronger than the passive annotation layer. */
+.commercial-map-label.is-selected,
+.commercial-map-label.is-hovered {
+  border-color: rgba(198, 152, 46, .6);
+  background: rgba(255, 253, 244, .97);
+  color: #1d3828;
+  box-shadow: 0 6px 18px rgba(29, 56, 40, .2);
+}
