@@ -101,6 +101,23 @@ export function reconcileResponsibleSelections(
   });
 }
 
+/** Official commission/assessoria options, keeping already linked units selectable. */
+export function buildCommissionOptions(
+  units: ReturnType<typeof useOrgCommissions>['units'],
+  linkedUnitIds: string[] = [],
+): RelationalOption[] {
+  return selectableOrgUnits(units, linkedUnitIds).map((unit) => ({
+    id: unit.id,
+    label: unit.name,
+    // `hint` participates in the existing persistence fallback; preserve it byte-for-byte.
+    hint: orgUnitHint(unit),
+    description: orgUnitHint(unit),
+    context: unit.isLegacy ? 'Registro histórico' : 'Área institucional oficial',
+    searchText: unit.responsibles.map((person) => person.displayName).join(' '),
+    group: orgUnitGroupLabel(unit.type),
+  }));
+}
+
 /**
  * Single source of truth for the official commission/assessoria and responsible
  * option lists used by the event form and the subevent plan builder.
@@ -124,15 +141,7 @@ export function useCronogramaRelationOptions(linkedUnitIds: string[] = []) {
   const linkedSignature = linkedUnitIds.join('|');
 
   const commissionOptions = useMemo<RelationalOption[]>(
-    () => selectableOrgUnits(units, linkedSignature ? linkedSignature.split('|') : []).map((unit) => ({
-      id: unit.id,
-      label: unit.name,
-      hint: orgUnitHint(unit),
-      description: orgUnitHint(unit),
-      context: unit.isLegacy ? 'Registro histórico' : 'Área institucional oficial',
-      searchText: unit.responsibles.map((person) => person.displayName).join(' '),
-      group: orgUnitGroupLabel(unit.type),
-    })),
+    () => buildCommissionOptions(units, linkedSignature ? linkedSignature.split('|') : []),
     [units, linkedSignature],
   );
 
