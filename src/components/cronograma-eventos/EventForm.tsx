@@ -181,17 +181,25 @@ export function EventForm({
     error: membersError,
     loginMembersError,
   } = useOrgMembers();
+  /** Member row of the logged user; core-team rows win over homonym duplicates. */
+  const currentMember = useMemo(() => {
+    if (!user) return null;
+    const pool = ([...(loginMembers ?? []), ...(members ?? [])] as any[]).filter(
+      (item: any) => item.user_id === user.id,
+    );
+    return pool.find((item: any) => item.is_core_team) ?? pool[0] ?? null;
+  }, [loginMembers, members, user]);
   const currentUserName = useMemo(() => {
     if (!user) return '';
-    const member = ([...(loginMembers ?? []), ...(members ?? [])] as any[]).find((item: any) => item.user_id === user.id);
     return (
-      member?.nome_exibicao
+      currentMember?.nome_exibicao
       || (user.user_metadata as any)?.full_name
       || (user.user_metadata as any)?.name
       || user.email
       || ''
     );
-  }, [members, user]);
+  }, [currentMember, user]);
+
   const initialForm = useMemo<CronogramaEvent>(() => {
     const next = {
       ...defaultForm,
@@ -240,10 +248,22 @@ export function EventForm({
     if (autoOwnerAppliedRef.current) return;
     autoOwnerAppliedRef.current = true;
     setForm((current) => {
-      if (current.owner?.trim()) return current;
-      return { ...current, owner: currentUserName };
+      const next = { ...current };
+      if (!current.owner?.trim()) next.owner = currentUserName;
+      /** Whoever creates the event starts as the primary responsible. */
+      if (!(current.responsiblesRel ?? []).length) {
+        next.responsiblesRel = [{
+          userId: user?.id ?? null,
+          name: currentUserName,
+          role: currentMember?.cargo ?? null,
+          isPrimary: true,
+          responsibleType: user?.id ? 'member' : 'external',
+        }];
+      }
+      return next;
     });
-  }, [currentUserName, event, user?.id]);
+  }, [currentMember, currentUserName, event, user?.id]);
+
 
 
 

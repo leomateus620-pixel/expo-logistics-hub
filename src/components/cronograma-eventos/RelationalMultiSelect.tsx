@@ -334,13 +334,12 @@ export function RelationalMultiSelect({
 
   const removeAt = (selectionId: string) => {
     const removed = value.find((item) => item.id === selectionId);
+    /** No automatic promotion: the star only moves by explicit choice. */
     const filtered = value.filter((item) => item.id !== selectionId);
-    if (singlePrimary && filtered.length > 0 && !filtered.some((item) => item.isPrimary)) {
-      filtered[0] = { ...filtered[0], isPrimary: true };
-    }
     onChange(filtered);
     if (removed) setAnnouncement(`${removed.label} removido da seleção.`);
   };
+
 
   const addOption = (option: RelationalOption) => {
     const existing = findSelectionForOption(option);
@@ -414,15 +413,21 @@ export function RelationalMultiSelect({
   const togglePrimary = (selectionId: string) => {
     const selected = value.find((item) => item.id === selectionId);
     if (!selected) return;
-    if (singlePrimary) {
+    const demoting = Boolean(selected.isPrimary);
+    if (singlePrimary && !demoting) {
       onChange(value.map((item) => ({ ...item, isPrimary: item.id === selectionId })));
     } else {
       onChange(value.map((item) => (
         item.id === selectionId ? { ...item, isPrimary: !item.isPrimary } : item
       )));
     }
-    setAnnouncement(`${selected.label} definido como ${primaryLabel.toLocaleLowerCase('pt-BR')}.`);
+    setAnnouncement(
+      demoting
+        ? `${selected.label} agora é ${variant === 'person' ? 'convidado' : 'área institucional'}.`
+        : `${selected.label} definido como ${primaryLabel.toLocaleLowerCase('pt-BR')}.`,
+    );
   };
+
 
   const activateIndex = (index: number) => {
     if (index < navigableOptions.length) {
@@ -793,11 +798,19 @@ export function RelationalMultiSelect({
                   {context && context !== detail && <em>{context}</em>}
                 </span>
                 <span className="cronograma-relation-selected__actions">
-                  {item.isPrimary && singlePrimary ? (
-                    <span className="cronograma-relation-primary" title={primaryLabel}>
+                  {item.isPrimary ? (
+                    <button
+                      type="button"
+                      onClick={() => togglePrimary(item.id)}
+                      className="cronograma-relation-primary"
+                      title={primaryLabel}
+                      aria-label={variant === 'person'
+                        ? `Tornar ${item.label} convidado`
+                        : `Remover destaque de ${item.label}`}
+                    >
                       <Star aria-hidden="true" />
-                      <span>{primaryLabel}</span>
-                    </span>
+                      <span>{variant === 'person' ? 'Tornar convidado' : 'Remover destaque'}</span>
+                    </button>
                   ) : (
                     <button
                       type="button"
@@ -809,6 +822,7 @@ export function RelationalMultiSelect({
                       <span>{variant === 'person' ? 'Definir como responsável' : 'Definir como principal'}</span>
                     </button>
                   )}
+
 
                   <button
                     type="button"
