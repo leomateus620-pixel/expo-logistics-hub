@@ -32,6 +32,7 @@ import {
 import { useCommercialMapStore } from './state/useCommercialMapStore';
 import { CommercialMapCanvas } from './components/canvas/CommercialMapCanvas';
 import { MapToolbar } from './components/controls/MapToolbar';
+import { CommercialMapDock } from './components/dock/CommercialMapDock';
 import { GeometryEditor } from './components/editor/GeometryEditor';
 import { LotCreationWorkspace } from './components/editor/LotCreationWorkspace';
 import {
