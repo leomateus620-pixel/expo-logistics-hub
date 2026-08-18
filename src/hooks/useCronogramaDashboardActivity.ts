@@ -64,7 +64,7 @@ async function loadMemberLabels(userIds: string[], signal?: AbortSignal) {
   const labels = new Map<string, string>();
   for (const ids of chunk(userIds, LOG_QUERY_BATCH_SIZE)) {
     let request = dashboardDb
-      .from('org_members_safe')
+      .from('org_members')
       .select('user_id,nome_exibicao,is_active,is_core_team')
       .in('user_id', ids)
       .limit(LOG_QUERY_BATCH_SIZE);

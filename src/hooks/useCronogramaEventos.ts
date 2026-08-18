@@ -1275,7 +1275,7 @@ export function useCronogramaEventHistory(eventId: string | null | undefined) {
       const memberByUserId = new Map<string, MemberIdentityRecord>();
       if (userIds.length > 0) {
         const members = await cronogramaDb
-          .from('org_members_safe')
+          .from('org_members')
           .select('user_id,nome_exibicao,is_active,is_core_team')
           .in('user_id', userIds)
           .limit(50);

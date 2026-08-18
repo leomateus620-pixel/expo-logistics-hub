@@ -9,6 +9,21 @@ import { MobileCreateEventScreen } from '@/components/cronograma-eventos/mobile/
 import { MobileEventScreen } from '@/components/cronograma-eventos/mobile/MobileEventScreen';
 import type { CronogramaEvent } from '@/components/cronograma-eventos/types';
 
+vi.mock('@/hooks/useAuth', () => ({
+  useAuth: () => ({ user: null }),
+}));
+
+vi.mock('@/hooks/useOrgMembers', () => ({
+  useOrgMembers: () => ({
+    members: [],
+    loginMembers: [],
+    isLoading: false,
+    isLoadingLoginMembers: false,
+    error: null,
+    loginMembersError: null,
+  }),
+}));
+
 const HISTORY_KEY = '__cronogramaMobileOverlay';
 
 const baseEvent: CronogramaEvent = {
