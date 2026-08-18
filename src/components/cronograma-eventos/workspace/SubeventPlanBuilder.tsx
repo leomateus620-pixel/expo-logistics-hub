@@ -169,6 +169,19 @@ export function SubeventPlanBuilder({
     setError(null);
   }, [initialItems]);
 
+  const linkedUnitIds = useMemo(
+    () => Array.from(new Set(
+      items.flatMap((item) => (item.commissionsRel ?? [])
+        .map((link) => link.commissionId)
+        .filter((id): id is string => Boolean(id))),
+    )),
+    [items],
+  );
+  const commissionOptions = useMemo(
+    () => buildCommissionOptions(units, linkedUnitIds),
+    [units, linkedUnitIds],
+  );
+
   const fieldId = (name: string) => `${instanceId}-${name}`;
 
   const patchItem = (index: number, patch: Partial<CronogramaSubeventPlanDraft>) => {
