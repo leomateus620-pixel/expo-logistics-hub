@@ -53,11 +53,14 @@ export function MapToolbar({
   hasSelection,
   areaScope,
   isCommissionScope = false,
+  showDesktopControls = false,
 }: {
   permissions: MapPermissions;
   hasSelection: boolean;
   areaScope: CommercialMapAreaScope;
   isCommissionScope?: boolean;
+  /** Desktop search and camera rail now live in the left dock. */
+  showDesktopControls?: boolean;
 }) {
   const [isCompactSearchOpen, setIsCompactSearchOpen] = useState(false);
   const compactSearchInputRef = useRef<HTMLInputElement>(null);
@@ -106,7 +109,7 @@ export function MapToolbar({
 
   return (
     <>
-      <div className="commercial-map-search">
+      {showDesktopControls && <div className="commercial-map-search">
         <Search className="h-4 w-4" aria-hidden="true" />
         <Input
           data-commercial-map-search
@@ -129,9 +132,9 @@ export function MapToolbar({
         />
         {search && <button type="button" className="commercial-map-search-clear" onClick={() => setSearch('')} aria-label="Limpar busca"><X /></button>}
         <kbd aria-hidden="true">Ctrl K</kbd>
-      </div>
+      </div>}
 
-      <div className="commercial-map-toolbar commercial-map-toolbar--desktop" aria-label="Controles do mapa">
+      {showDesktopControls && <div className="commercial-map-toolbar commercial-map-toolbar--desktop" aria-label="Controles do mapa">
         {presets.map((preset) => {
           const Icon = presetIcons[preset];
           return (
@@ -204,7 +207,7 @@ export function MapToolbar({
           </TooltipTrigger>
           <TooltipContent>Lista e tabela</TooltipContent>
         </Tooltip>
-      </div>
+      </div>}
 
       <div className="commercial-map-toolbar-mobile" aria-label="Controles principais do mapa">
         <button

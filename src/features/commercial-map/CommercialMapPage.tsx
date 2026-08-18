@@ -5,19 +5,14 @@ import {
   ArrowLeft,
   BadgeCheck,
   Box,
-  ChevronDown,
   DatabaseZap,
   Loader2,
-  MapPinned,
   MapPinPlus,
   MousePointer2,
   RefreshCw,
   Ruler,
   Send,
-  Settings2,
   Sparkles,
-  Tractor,
-  Trees,
 } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
