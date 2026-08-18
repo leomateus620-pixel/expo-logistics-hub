@@ -550,9 +550,13 @@
 /* Desktop anchored selector */
 .cronograma-relation-popover {
   --popover-foreground: var(--brand-navy-900);
+  display: flex;
   width: min(29rem, calc(100vw - 2rem));
+  min-height: 0;
   max-height: min(34rem, var(--radix-popover-content-available-height, 34rem));
+  flex-direction: column;
   overflow: hidden;
+
   border: 1px solid oklch(var(--brand-indigo-200) / 0.78);
   border-radius: 0.92rem;
   background: oklch(var(--neutral-0) / 0.985);
