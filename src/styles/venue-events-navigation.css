@@ -439,3 +439,13 @@
 .venue-workspace__content {
   min-width: 0;
 }
+
+@media (max-width: 480px) {
+  .venue-nav-trigger span {
+    display: none;
+  }
+
+  .venue-nav-trigger {
+    padding: 0 0.5rem;
+  }
+}
