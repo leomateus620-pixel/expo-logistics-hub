@@ -126,7 +126,9 @@ export function adaptCronogramaEvent(
   const centralMeeting = isCentralMeeting(event);
   const sourceStatus = sourceToVisualStatus[event.status] ?? 'planned';
   const primaryCommission = event.commissionsRel?.find((link) => link.isPrimary) ?? event.commissionsRel?.[0];
-  const primaryResponsible = event.responsiblesRel?.find((link) => link.isPrimary) ?? event.responsiblesRel?.[0];
+  /** Only an explicitly starred link counts as the responsible person. */
+  const primaryResponsible = event.responsiblesRel?.find((link) => link.isPrimary);
+
 
   const adapted: CronogramaEvent = {
     id: event.id,
