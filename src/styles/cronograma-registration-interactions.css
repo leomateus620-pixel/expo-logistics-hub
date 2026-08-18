@@ -669,14 +669,15 @@
 }
 
 .cronograma-relation-results {
-  min-height: 0;
-  max-height: min(22rem, calc(var(--radix-popover-content-available-height, 34rem) - 7.5rem));
+  min-height: 6rem;
+  flex: 1 1 auto;
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
   padding: 0.36rem;
   scrollbar-gutter: stable;
 }
+
 
 .cronograma-relation-group + .cronograma-relation-group {
   border-top: 1px solid oklch(var(--border) / 0.55);
