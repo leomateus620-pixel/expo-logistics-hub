@@ -12,6 +12,11 @@ const PERSON_PHOTOS: Record<string, string> = {
   'djeison drey': djeisonDrey,
 };
 
+const PERSON_PHOTOS_BY_USER_ID: Record<string, string> = {
+  'b8fd1e36-b46c-4eff-bb75-372b676ce123': fabianoSoltis,
+  'e0ada2e5-4440-4d15-91bd-aa4160247113': djeisonDrey,
+};
+
 function normalize(value: string): string {
   return value
     .normalize('NFD')
@@ -22,7 +27,8 @@ function normalize(value: string): string {
 }
 
 /** Returns the portrait URL for a person name, or null when there is none. */
-export function getPersonPhoto(name?: string | null): string | null {
+export function getPersonPhoto(name?: string | null, userId?: string | null): string | null {
+  if (userId && PERSON_PHOTOS_BY_USER_ID[userId]) return PERSON_PHOTOS_BY_USER_ID[userId];
   if (!name) return null;
   const normalized = normalize(name);
   for (const [key, url] of Object.entries(PERSON_PHOTOS)) {

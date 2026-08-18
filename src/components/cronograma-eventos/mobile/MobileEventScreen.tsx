@@ -32,6 +32,7 @@ import { EventForm } from '../EventForm';
 import { splitEventResponsibles } from '../EventRelationFields';
 import type { CronogramaEvent, CronogramaHistoryEntry } from '../types';
 import { EventoAnexosSection } from '../EventoAnexosSection';
+import { PersonAvatar } from '../PersonAvatar';
 import {
   LazyAgendaMeetingWorkspace,
   type AgendaMeetingContext,
@@ -491,9 +492,15 @@ export function MobileEventScreen({
                           <p className="text-xs font-bold text-foreground">
                             {entry.changedFields.length > 0 ? `Alteração em ${entry.changedFields.join(', ')}` : 'Dados atualizados'}
                           </p>
-                          <p className="mt-1 text-[11px] text-muted-foreground">
-                            {entry.userLabel} · {new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(entry.createdAt))}
-                          </p>
+                          <div className="mt-1 flex items-center gap-2 text-[11px] text-muted-foreground">
+                            <PersonAvatar
+                              name={entry.userLabel}
+                              userId={entry.userId}
+                              size="xs"
+                              fallback={<span className="cronograma-person-avatar" data-size="xs" aria-hidden="true">{entry.userLabel.slice(0, 1)}</span>}
+                            />
+                            <span>{entry.userLabel} · {new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short' }).format(new Date(entry.createdAt))}</span>
+                          </div>
                         </li>
                       ))}
                     </ol>

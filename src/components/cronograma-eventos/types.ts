@@ -164,6 +164,7 @@ export interface CronogramaHistoryEntry {
   id: string;
   action: string;
   createdAt: string;
+  userId?: string | null;
   userLabel: string;
   changedFields: string[];
   /** Structured per-field diff (antes → depois) for readable history. */

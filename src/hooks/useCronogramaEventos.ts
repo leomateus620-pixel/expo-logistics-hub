@@ -26,6 +26,7 @@ import {
   type CronogramaEvent,
 } from '@/lib/cronograma-eventos';
 import type { CronogramaHistoryEntry } from '@/components/cronograma-eventos/types';
+import { officialMemberLabel, resolveOfficialMembers, type MemberIdentityRecord } from '@/lib/memberIdentity';
 import {
   attachQueuedCronogramaRelationships,
   enqueueCronogramaRelationship,
@@ -1271,19 +1272,15 @@ export function useCronogramaEventHistory(eventId: string | null | undefined) {
 
       const rows = (data ?? []) as Array<Record<string, unknown>>;
       const userIds = Array.from(new Set(rows.map((row) => readString(row, 'user_id')).filter(Boolean) as string[]));
-      const profileByUserId = new Map<string, string>();
+      const memberByUserId = new Map<string, MemberIdentityRecord>();
       if (userIds.length > 0) {
-        const profiles = await cronogramaDb
-          .from('profiles')
-          .select('user_id,full_name')
+        const members = await cronogramaDb
+          .from('org_members_safe')
+          .select('user_id,nome_exibicao,is_active,is_core_team')
           .in('user_id', userIds)
           .limit(50);
-        (profiles.data ?? []).forEach((profile) => {
-          const record = profile as Record<string, unknown>;
-          const userId = readString(record, 'user_id');
-          const fullName = readString(record, 'full_name');
-          if (userId && fullName) profileByUserId.set(userId, fullName);
-        });
+        const resolved = resolveOfficialMembers((members.data ?? []) as MemberIdentityRecord[]);
+        resolved.forEach((member, userId) => memberByUserId.set(userId, member));
       }
 
       return rows.map<CronogramaHistoryEntry>((row) => {
@@ -1294,7 +1291,8 @@ export function useCronogramaEventHistory(eventId: string | null | undefined) {
           id: readString(row, 'id') ?? `${readString(row, 'created_at')}-${userId}`,
           action: readString(row, 'action') ?? 'updated',
           createdAt: readString(row, 'created_at') ?? new Date().toISOString(),
-          userLabel: (userId && profileByUserId.get(userId)) || 'Usuário autenticado',
+          userId,
+          userLabel: officialMemberLabel(userId ? memberByUserId.get(userId) : null) || 'Usuário autenticado',
           changedFields: summarizeHistoryChange(previous, next),
           changes: diffHistoryChange(previous, next),
         };
