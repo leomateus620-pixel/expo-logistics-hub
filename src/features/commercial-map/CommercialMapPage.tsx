@@ -450,27 +450,14 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
               </AlertDialogContent>
               </AlertDialog>
             )}
-            </div>
-          </details>
-        )}
-      </header>
+    </>
+  ) : null;
 
-      {data.sourceMessage && (
-        <div
-          className={`commercial-map-source-notice is-${data.source}`}
-          role="status"
-          title={data.sourceMessage}
-        >
-          <AlertTriangle aria-hidden="true" />
-          <strong>
-            {data.source === 'official-reference'
-              ? 'Referência oficial · somente leitura'
-              : 'Estado da base persistida'}
-          </strong>
-          <span>{data.sourceMessage}</span>
-        </div>
-      )}
-
+  return (
+    <section
+      className={`commercial-map-shell ${isCommissionScope ? 'is-commission-scope' : ''} ${isExporural ? 'is-exporural' : ''} ${areaScope === COMMERCIAL_MAP_SEGMENT_IDS.industry ? 'is-industry' : ''} ${interiorEntityId ? 'is-interior' : ''} ${interiorKind === 'commercial-pavilion' ? 'is-commercial-pavilion-interior' : ''} ${interiorKind === 'livestock-pavilion' ? 'is-livestock-interior' : ''} ${interiorKind === 'mirante-pavilion' ? 'is-mirante-interior' : ''} ${selectedEntity ? 'has-selection' : ''} ${selectedKind === 'commercial-pavilion' || selectedKind === 'livestock-pavilion' || selectedKind === 'mirante-pavilion' ? 'has-architectural-selection' : ''}`}
+      aria-label="Plataforma de gestão do mapa comercial"
+    >
       {!isCommissionScope && !interiorEntityId && workspaceMode !== 'edit' && workspaceMode !== 'create' && (
         <SegmentLegend
           entities={data.entities}
@@ -478,10 +465,27 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
           activeSegmentId={activeSegmentId}
           onSelect={handleSegmentSelect}
           onClear={handleSegmentClear}
+          variant="mobile"
         />
       )}
 
-      <div id="commercial-map-viewport" className="commercial-map-viewport">
+      <div className="commercial-map-body">
+        <CommercialMapDock
+          entities={data.entities}
+          lots={data.lots}
+          areaScope={areaScope}
+          onAreaScopeChange={setAreaScope}
+          activeSegmentId={activeSegmentId}
+          onSegmentSelect={handleSegmentSelect}
+          onSegmentClear={handleSegmentClear}
+          permissions={permissions}
+          hasSelection={Boolean(selectedEntity)}
+          isCommissionScope={isCommissionScope}
+          managementActions={managementActions}
+        />
+
+        <div id="commercial-map-viewport" className="commercial-map-viewport">
+
         {workspaceMode === 'create' ? (
           <LotCreationWorkspace project={data.project} calibration={data.calibration} layers={data.layers} entities={scopedData.entities} />
         ) : workspaceMode === 'edit' && selectedEntity ? (
