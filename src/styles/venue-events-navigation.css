@@ -211,7 +211,7 @@
 .venue-workspace-switcher {
   display: inline-flex;
   min-width: 0;
-  flex: 1;
+  flex: 0 0 auto;
   align-items: center;
   gap: 0.2rem;
   padding: 0.2rem;
@@ -225,7 +225,7 @@
   display: inline-flex;
   min-width: 0;
   min-height: 2.15rem;
-  flex: 1;
+  flex: 0 1 auto;
   align-items: center;
   justify-content: center;
   gap: 0.4rem;
@@ -303,6 +303,16 @@
 .venue-nav-trigger svg {
   width: 1rem;
   height: 1rem;
+}
+
+@media (max-width: 1023px) {
+  .venue-workspace-switcher {
+    flex: 1 1 auto;
+  }
+
+  .venue-workspace-switcher__option {
+    flex: 1 1 0;
+  }
 }
 
 @media (min-width: 1024px) {
