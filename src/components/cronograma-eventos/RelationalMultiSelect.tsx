@@ -334,13 +334,12 @@ export function RelationalMultiSelect({
 
   const removeAt = (selectionId: string) => {
     const removed = value.find((item) => item.id === selectionId);
+    /** No automatic promotion: the star only moves by explicit choice. */
     const filtered = value.filter((item) => item.id !== selectionId);
-    if (singlePrimary && filtered.length > 0 && !filtered.some((item) => item.isPrimary)) {
-      filtered[0] = { ...filtered[0], isPrimary: true };
-    }
     onChange(filtered);
     if (removed) setAnnouncement(`${removed.label} removido da seleção.`);
   };
+
 
   const addOption = (option: RelationalOption) => {
     const existing = findSelectionForOption(option);
