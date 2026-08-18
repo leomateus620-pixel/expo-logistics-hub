@@ -1,0 +1,243 @@
+/*
+ * Camada visual exclusiva do painel de detalhe de eventos do módulo
+ * "Agenda Restaurante e Arena". Escopada em .venue-event-detail para não
+ * vazar para o restante do sistema.
+ */
+
+.venue-event-detail {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  background:
+    radial-gradient(
+      120% 80% at 0% 0%,
+      color-mix(in oklab, var(--venue-indigo) 12%, transparent),
+      transparent 62%
+    ),
+    var(--venue-surface);
+}
+
+.venue-event-detail__hero {
+  position: relative;
+  isolation: isolate;
+  border-bottom: 1px solid
+    color-mix(in oklab, var(--venue-border-strong) 60%, transparent);
+  backdrop-filter: blur(18px) saturate(140%);
+}
+
+.venue-event-detail__hero::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--venue-indigo),
+    var(--venue-orange),
+    transparent
+  );
+  opacity: 0.75;
+  z-index: 0;
+}
+
+.venue-event-detail__hero [data-slot="sheet-title"],
+.venue-event-detail__hero h2 {
+  font-size: clamp(1.15rem, 1.6vw, 1.5rem);
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  color: var(--venue-ink);
+}
+
+.venue-detail-hero__note {
+  margin-top: 0.6rem;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--venue-ink-soft);
+  max-width: 62ch;
+}
+
+/* Barra de ações fixa: Editar, ação principal e exclusão auditada. */
+.venue-detail-actionbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.9rem;
+  flex-wrap: wrap;
+  padding: 0.85rem 1.15rem calc(0.85rem + env(safe-area-inset-bottom));
+  border-top: 1px solid
+    color-mix(in oklab, var(--venue-border-strong) 55%, transparent);
+  background: color-mix(in oklab, var(--venue-surface) 92%, transparent);
+  backdrop-filter: blur(16px) saturate(150%);
+  box-shadow: var(--venue-shadow-raised);
+}
+
+.venue-detail-actionbar__meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.venue-detail-actionbar__meta small {
+  font-size: 0.66rem;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: var(--venue-ink-soft);
+}
+
+.venue-detail-actionbar__meta strong {
+  font-size: 0.86rem;
+  color: var(--venue-ink);
+}
+
+.venue-detail-actionbar__buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.venue-detail-actionbar__danger {
+  color: var(--venue-danger);
+}
+
+.venue-detail-actionbar__danger:hover {
+  background: color-mix(in oklab, var(--venue-danger) 12%, transparent);
+  color: var(--venue-danger);
+}
+
+/* Documentos: zona de arraste com estados explícitos. */
+.venue-dropzone {
+  display: grid;
+  gap: 0.85rem;
+  padding: 1.05rem;
+  border-radius: var(--venue-radius-lg);
+  border: 1.5px dashed
+    color-mix(in oklab, var(--venue-border-strong) 85%, transparent);
+  background: color-mix(in oklab, var(--venue-surface-subtle) 85%, transparent);
+  transition:
+    border-color 160ms ease,
+    background-color 160ms ease,
+    transform 160ms ease;
+}
+
+.venue-dropzone[data-active="true"] {
+  border-color: var(--venue-indigo);
+  background: color-mix(in oklab, var(--venue-indigo) 8%, transparent);
+  transform: translateY(-1px);
+}
+
+.venue-dropzone[data-busy="true"] {
+  opacity: 0.75;
+}
+
+.venue-dropzone__headline {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.venue-dropzone__headline > span {
+  display: grid;
+  place-items: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: var(--venue-radius-md);
+  background: color-mix(in oklab, var(--venue-indigo) 14%, transparent);
+  color: var(--venue-indigo-deep);
+}
+
+.venue-dropzone__headline svg {
+  width: 1.15rem;
+  height: 1.15rem;
+}
+
+.venue-dropzone__headline strong {
+  display: block;
+  font-size: 0.9rem;
+  color: var(--venue-ink);
+}
+
+.venue-dropzone__headline small {
+  font-size: 0.74rem;
+  color: var(--venue-ink-soft);
+}
+
+.venue-dropzone__controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* Histórico: leitura auditorial de "antes → depois". */
+.venue-audit-diff {
+  display: grid;
+  gap: 0.3rem;
+  margin-top: 0.5rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: var(--venue-radius-sm);
+  background: color-mix(in oklab, var(--venue-surface-muted) 70%, transparent);
+  list-style: none;
+}
+
+.venue-audit-diff li {
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+  font-size: 0.76rem;
+}
+
+.venue-audit-diff li > span {
+  min-width: 9rem;
+  font-weight: 600;
+  color: var(--venue-ink);
+}
+
+.venue-audit-diff em {
+  font-style: normal;
+  padding: 0.05rem 0.4rem;
+  border-radius: 0.4rem;
+}
+
+.venue-audit-diff em[data-tone="from"] {
+  background: color-mix(in oklab, var(--venue-danger) 12%, transparent);
+  color: var(--venue-danger);
+  text-decoration: line-through;
+}
+
+.venue-audit-diff em[data-tone="to"] {
+  background: color-mix(in oklab, var(--venue-success) 14%, transparent);
+  color: var(--venue-success);
+}
+
+.venue-audit-diff i {
+  color: var(--venue-ink-soft);
+}
+
+.venue-delete-dialog [data-slot="dialog-title"] {
+  color: var(--venue-danger);
+}
+
+@media (max-width: 640px) {
+  .venue-detail-actionbar {
+    justify-content: stretch;
+  }
+
+  .venue-detail-actionbar__buttons {
+    width: 100%;
+  }
+
+  .venue-detail-actionbar__buttons > button {
+    flex: 1 1 auto;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .venue-dropzone {
+    transition: none;
+  }
+
+  .venue-dropzone[data-active="true"] {
+    transform: none;
+  }
+}

@@ -12,13 +12,18 @@ import {
   Loader2,
   MapPin,
   Paperclip,
+  Link2,
   Play,
   RefreshCw,
   Send,
   ShieldCheck,
+  Trash2,
+  UploadCloud,
   Users,
   XCircle,
 } from "lucide-react";
+import "@/styles/venue-events-detail.css";
+
 import { toast } from "sonner";
 import {
   AlertDialog,
@@ -288,6 +293,84 @@ function formatIsoDate(value: string | null | undefined): string {
   }).format(new Date(iso));
 }
 
+const AUDIT_FIELD_LABELS: Record<string, string> = {
+  title: "Título",
+  status: "Situação",
+  event_type: "Tipo de evento",
+  start_at: "Início",
+  end_at: "Término",
+  setup_start_at: "Montagem",
+  teardown_end_at: "Desmontagem",
+  requester_name: "Solicitante",
+  contact_name: "Contato",
+  contact_phone: "Telefone",
+  estimated_audience: "Público estimado",
+  confirmed_audience: "Público confirmado",
+  fee_type: "Tipo de taxa",
+  fee_amount: "Valor da taxa",
+  cleaning_fee: "Taxa de limpeza",
+  cleaning_responsibility: "Responsável pela limpeza",
+  operational_notes: "Notas operacionais",
+  internal_notes: "Notas internas",
+  executive_description: "Descrição executiva",
+  shift: "Turno",
+  responsible_user_id: "Responsável Fenasoja",
+  sponsor_id: "Patrocinador",
+  responsible_organization_id: "Organização responsável",
+};
+
+const AUDIT_IGNORED_KEYS = new Set([
+  "id",
+  "org_id",
+  "version",
+  "updated_at",
+  "created_at",
+  "created_by",
+  "updated_by",
+  "search_vector",
+  "venue_action",
+  "reason",
+  "request_id",
+  "idempotency_key",
+  "review_reasons",
+  "requires_review",
+]);
+
+function formatAuditValue(value: unknown): string {
+  if (value === null || value === undefined || value === "") return "vazio";
+  if (typeof value === "boolean") return value ? "sim" : "não";
+  if (typeof value === "number") return value.toLocaleString("pt-BR");
+  if (typeof value === "string") {
+    if (/^\d{4}-\d{2}-\d{2}T/.test(value)) return formatVenueDateTime(value);
+    if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return formatIsoDate(value);
+    return value.length > 80 ? `${value.slice(0, 77)}…` : value;
+  }
+  return "—";
+}
+
+function buildAuditDiff(
+  before: Record<string, unknown> | null | undefined,
+  after: Record<string, unknown> | null | undefined,
+): Array<{ label: string; from: string; to: string }> {
+  if (!before || !after) return [];
+  return Object.keys(AUDIT_FIELD_LABELS)
+    .filter(
+      (key) =>
+        !AUDIT_IGNORED_KEYS.has(key) &&
+        key in before &&
+        key in after &&
+        JSON.stringify(before[key]) !== JSON.stringify(after[key]),
+    )
+    .slice(0, 8)
+    .map((key) => ({
+      label: AUDIT_FIELD_LABELS[key],
+      from: formatAuditValue(before[key]),
+      to: formatAuditValue(after[key]),
+    }));
+}
+
+
+
 function AgendaOperationalSection({
   event,
   showImport,
@@ -412,6 +495,8 @@ export function VenueEventDetail({
   onChecklistUpdate,
   onResourceUpdate,
   onDocumentUpload,
+  onDelete,
+
 }: {
   event: VenueEvent | null;
   open: boolean;
@@ -444,6 +529,11 @@ export function VenueEventDetail({
     documentType: string;
     sensitive: boolean;
   }) => Promise<unknown>;
+  onDelete?: (input: {
+    eventId: string;
+    expectedVersion: number;
+    reason: string;
+  }) => Promise<unknown>;
 }) {
   const { user } = useAuth();
   const detailQuery = useVenueEventDetail(
@@ -456,8 +546,12 @@ export function VenueEventDetail({
   const [audience, setAudience] = useState("");
   const [actionPending, setActionPending] = useState(false);
   const [uploadPending, setUploadPending] = useState(false);
+  const [dragActive, setDragActive] = useState(false);
   const [documentType, setDocumentType] = useState("contrato");
   const [sensitiveDocument, setSensitiveDocument] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [deleteReason, setDeleteReason] = useState("");
+  const [deletePending, setDeletePending] = useState(false);
   const [operationalNoteTarget, setOperationalNoteTarget] =
     useState<OperationalNoteTarget | null>(null);
   const [operationalNote, setOperationalNote] = useState("");
@@ -467,6 +561,7 @@ export function VenueEventDetail({
     "action" | "operational" | null
   >(null);
   const fileRef = useRef<HTMLInputElement>(null);
+
 
   const eventChecklist = useMemo(
     () => workspace.checklist.filter((item) => item.event_id === event?.id),
@@ -563,7 +658,7 @@ export function VenueEventDetail({
     permissions.venue_events_approve &&
     !event.pending_date
   )
-    possibleActions.push("approve", "reject");
+    possibleActions.push("approve");
   if (
     [
       "rascunho",
@@ -598,19 +693,48 @@ export function VenueEventDetail({
     new Date(event.start_at).getTime() <= Date.now()
   )
     possibleActions.push("mark_no_show");
-  if (
-    !["concluido", "cancelado", "recusado"].includes(event.status) &&
-    (["confirmado", "em_preparacao", "em_andamento"].includes(event.status)
-      ? permissions.venue_events_cancel || permissions.venue_events_manage
-      : isOwner || permissions.venue_events_manage)
-  )
-    possibleActions.push("cancel");
   if (usage && usage.excess_quantity > 0 && permissions.venue_excess_approve)
     possibleActions.push(
       "approve_excess",
       "mark_excess_paid",
       "request_contract_review",
     );
+
+  // Cancelar e Recusar saíram do painel: a decisão de encerrar um evento passa
+  // a ser a exclusão auditada, evitando dois caminhos concorrentes de baixa.
+  const primaryAction = possibleActions[0] ?? null;
+  const secondaryActions = possibleActions.slice(1);
+  const canDelete = Boolean(
+    permissions.venue_events_manage && typeof onDelete === "function",
+  );
+
+  const executeDelete = async () => {
+    if (!onDelete) return;
+    if (deleteReason.trim().length < 8) {
+      toast.error("Informe uma justificativa com pelo menos 8 caracteres.");
+      return;
+    }
+    setDeletePending(true);
+    try {
+      await onDelete({
+        eventId: event.id,
+        expectedVersion: event.version,
+        reason: deleteReason.trim(),
+      });
+      toast.success("Evento excluído e registrado na auditoria.");
+      setDeleteOpen(false);
+      setDeleteReason("");
+      onOpenChange(false);
+    } catch (error) {
+      toast.error("A exclusão não foi concluída.", {
+        description: mutationErrorDescription(error),
+      });
+    } finally {
+      setDeletePending(false);
+    }
+  };
+
+
 
   const executeAction = async () => {
     if (!action) return;
@@ -835,36 +959,21 @@ export function VenueEventDetail({
               </div>
               <SheetTitle>{event.title}</SheetTitle>
               <SheetDescription>
-                {event.executive_description ||
-                  "Sem descrição executiva registrada."}
+                {formatVenuePeriod(event.start_at, event.end_at)} ·{" "}
+                {getSpaceNames(
+                  event.id,
+                  workspace.allocations,
+                  workspace.spaces,
+                )}
               </SheetDescription>
             </SheetHeader>
-            <div className="venue-detail-actions">
-              {canEdit && (
-                <Button variant="outline" onClick={() => onEdit(event)}>
-                  <Edit3 /> Editar
-                </Button>
-              )}
-              {possibleActions.slice(0, 2).map((item) => (
-                <Button
-                  key={item}
-                  variant={
-                    ACTION_COPY[item].destructive ? "destructive" : "default"
-                  }
-                  onClick={() => setAction(item)}
-                >
-                  {item === "submit" ? (
-                    <Send />
-                  ) : item === "start" ? (
-                    <Play />
-                  ) : (
-                    <ShieldCheck />
-                  )}
-                  {ACTION_COPY[item].label}
-                </Button>
-              ))}
-            </div>
+            {event.executive_description && (
+              <p className="venue-detail-hero__note">
+                {event.executive_description}
+              </p>
+            )}
           </div>
+
 
           <Tabs defaultValue="resumo" className="venue-detail-tabs">
             <TabsList aria-label="Detalhes do evento">
@@ -984,7 +1093,7 @@ export function VenueEventDetail({
                     </article>
                   </div>
                 </section>
-                {possibleActions.length > 2 && (
+                {secondaryActions.length > 0 && (
                   <section className="venue-detail-section">
                     <header>
                       <div>
@@ -993,7 +1102,8 @@ export function VenueEventDetail({
                       </div>
                     </header>
                     <div className="venue-action-grid">
-                      {possibleActions.slice(2).map((item) => (
+                      {secondaryActions.map((item) => (
+
                         <Button
                           key={item}
                           variant={
@@ -1312,22 +1422,53 @@ export function VenueEventDetail({
                   <div className="venue-empty-state">
                     <FileText />
                     <h3>Sem contrapartida vinculada</h3>
-                    <p>Este evento não consome cota de patrocinador.</p>
+                    <p>
+                      Este evento ainda não consome cota de patrocinador.
+                      Vincule um contrato para reservar a franquia.
+                    </p>
+                    {canEdit && (
+                      <Button variant="outline" onClick={() => onEdit(event)}>
+                        <Link2 /> Vincular contrapartida
+                      </Button>
+                    )}
                   </div>
+
                 )}
               </TabsContent>
 
               <TabsContent value="documentos" className="venue-detail-content">
                 {canUploadDocument && (
-                  <section className="venue-document-upload">
-                    <div>
-                      <Paperclip />
+                  <section
+                    className="venue-dropzone"
+                    data-active={dragActive}
+                    data-busy={uploadPending}
+                    onDragOver={(dragEvent) => {
+                      dragEvent.preventDefault();
+                      setDragActive(true);
+                    }}
+                    onDragLeave={() => setDragActive(false)}
+                    onDrop={(dropEvent) => {
+                      dropEvent.preventDefault();
+                      setDragActive(false);
+                      void upload(dropEvent.dataTransfer.files?.[0]);
+                    }}
+                  >
+                    <div className="venue-dropzone__headline">
                       <span>
-                        <strong>Adicionar documento</strong>
-                        <small>PDF, imagens, Word ou Excel · até 20 MB</small>
+                        {uploadPending ? (
+                          <Loader2 className="animate-spin" />
+                        ) : (
+                          <UploadCloud />
+                        )}
                       </span>
+                      <div>
+                        <strong>Arraste um arquivo para anexar</strong>
+                        <small>
+                          PDF, imagens, Word ou Excel · até 20 MB por arquivo
+                        </small>
+                      </div>
                     </div>
-                    <div>
+                    <div className="venue-dropzone__controls">
                       <Label htmlFor="venue-document-type" className="sr-only">
                         Tipo de documento
                       </Label>
@@ -1362,19 +1503,28 @@ export function VenueEventDetail({
                           Sensível
                         </label>
                       )}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => fileRef.current?.click()}
+                        disabled={uploadPending}
+                      >
+                        <Paperclip /> Selecionar arquivo
+                      </Button>
                       <Input
                         id="venue-document-file"
                         ref={fileRef}
                         type="file"
+                        className="sr-only"
                         aria-label="Selecionar documento para anexar"
                         accept=".pdf,.jpg,.jpeg,.png,.webp,.docx,.xlsx"
                         onChange={(event) => upload(event.target.files?.[0])}
                         disabled={uploadPending}
                       />
-                      {uploadPending && <Loader2 className="animate-spin" />}
                     </div>
                   </section>
                 )}
+
                 {detailQuery.detailQuery.isError &&
                   detailQuery.detailQuery.data && (
                     <div className="venue-detail-query-error" role="alert">
@@ -1538,27 +1688,46 @@ export function VenueEventDetail({
                         </Button>
                       </div>
                     )}
-                    {detailQuery.auditQuery.data?.map((entry) => (
-                      <article key={entry.id}>
-                        <span>
-                          <History />
-                        </span>
-                        <div>
-                          <strong>
-                            {String(
-                              entry.after_data?.venue_action || entry.action,
-                            ).replaceAll("_", " ")}
-                          </strong>
-                          <small>
-                            {formatVenueDateTime(entry.created_at)} ·{" "}
-                            {memberName(entry.actor_user_id, members)}
-                          </small>
-                          {entry.after_data?.reason && (
-                            <p>{String(entry.after_data.reason)}</p>
-                          )}
-                        </div>
-                      </article>
-                    ))}
+                    {detailQuery.auditQuery.data?.map((entry) => {
+                      const diff = buildAuditDiff(
+                        entry.before_data,
+                        entry.after_data,
+                      );
+                      return (
+                        <article key={entry.id}>
+                          <span>
+                            <History />
+                          </span>
+                          <div>
+                            <strong>
+                              {String(
+                                entry.after_data?.venue_action || entry.action,
+                              ).replaceAll("_", " ")}
+                            </strong>
+                            <small>
+                              {formatVenueDateTime(entry.created_at)} ·{" "}
+                              {memberName(entry.actor_user_id, members)}
+                            </small>
+                            {entry.after_data?.reason && (
+                              <p>{String(entry.after_data.reason)}</p>
+                            )}
+                            {diff.length > 0 && (
+                              <ul className="venue-audit-diff">
+                                {diff.map((change) => (
+                                  <li key={change.label}>
+                                    <span>{change.label}</span>
+                                    <em data-tone="from">{change.from}</em>
+                                    <i aria-hidden="true">→</i>
+                                    <em data-tone="to">{change.to}</em>
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                          </div>
+                        </article>
+                      );
+                    })}
+
                     {!detailQuery.detailQuery.data?.approvals.length &&
                       !detailQuery.auditQuery.data?.length &&
                       !detailQuery.detailQuery.isError &&
@@ -1588,6 +1757,42 @@ export function VenueEventDetail({
               </TabsContent>
             </div>
           </Tabs>
+
+          <footer className="venue-detail-actionbar">
+            <div className="venue-detail-actionbar__meta">
+              <small>Versão {event.version}</small>
+              <strong>{EVENT_STATUS_LABELS[event.status]}</strong>
+            </div>
+            <div className="venue-detail-actionbar__buttons">
+              {canDelete && (
+                <Button
+                  variant="ghost"
+                  className="venue-detail-actionbar__danger"
+                  onClick={() => setDeleteOpen(true)}
+                >
+                  <Trash2 /> Excluir
+                </Button>
+              )}
+              {canEdit && (
+                <Button variant="outline" onClick={() => onEdit(event)}>
+                  <Edit3 /> Editar
+                </Button>
+              )}
+              {primaryAction && (
+                <Button onClick={() => setAction(primaryAction)}>
+                  {primaryAction === "submit" ? (
+                    <Send />
+                  ) : primaryAction === "start" ? (
+                    <Play />
+                  ) : (
+                    <ShieldCheck />
+                  )}
+                  {ACTION_COPY[primaryAction].label}
+                </Button>
+              )}
+            </div>
+          </footer>
+
         </SheetContent>
       </Sheet>
 
@@ -1732,7 +1937,64 @@ export function VenueEventDetail({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+      <Dialog
+        open={deleteOpen}
+        onOpenChange={(next) => {
+          if (!next && !deletePending) {
+            setDeleteOpen(false);
+            setDeleteReason("");
+          }
+        }}
+      >
+        <DialogContent className="venue-delete-dialog max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Excluir evento definitivamente</DialogTitle>
+            <DialogDescription>
+              A exclusão remove o evento, suas ocupações, recursos, checklists,
+              documentos e o consumo de contrapartida. A ação é irreversível e
+              fica registrada na auditoria com autor, data e justificativa.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="venue-field">
+            <Label htmlFor="venue-delete-reason">Justificativa</Label>
+            <Textarea
+              id="venue-delete-reason"
+              value={deleteReason}
+              rows={4}
+              autoFocus
+              placeholder="Descreva por que este evento precisa ser excluído."
+              onChange={(event) => setDeleteReason(event.target.value)}
+            />
+            <span className="venue-field__hint">Mínimo de 8 caracteres.</span>
+          </div>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => {
+                setDeleteOpen(false);
+                setDeleteReason("");
+              }}
+              disabled={deletePending}
+            >
+              Voltar
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={executeDelete}
+              disabled={deletePending}
+            >
+              {deletePending ? (
+                <Loader2 className="animate-spin" />
+              ) : (
+                <Trash2 />
+              )}
+              Excluir evento
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
       <AlertDialog
+
         open={Boolean(discardTarget)}
         onOpenChange={(next) => !next && setDiscardTarget(null)}
       >

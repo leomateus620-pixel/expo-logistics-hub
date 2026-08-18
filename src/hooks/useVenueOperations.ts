@@ -759,6 +759,48 @@ export function useVenueOperations() {
     onSuccess: invalidateWorkspace,
   });
 
+  type DeleteEventInput = {
+    eventId: string;
+    expectedVersion?: number | null;
+    reason: string;
+  };
+  const deleteEvent = useIdempotentMutation<
+    { event_id: string; storage_paths: string[] },
+    DeleteEventInput
+  >({
+    action: "delete-event",
+    scope: orgId,
+    mutationFn: async (input) => {
+      requireOnline(isOnline);
+      requireOrgId(orgId);
+      const { data, error } = await venueDb.rpc("venue_delete_event", {
+        _event_id: input.eventId,
+        _reason: input.reason,
+        _expected_version: input.expectedVersion ?? null,
+      });
+      if (error) throw error;
+      const result = (data ?? {}) as {
+        event_id: string;
+        storage_paths?: string[] | null;
+      };
+      const paths = Array.isArray(result.storage_paths)
+        ? result.storage_paths
+        : [];
+      if (paths.length > 0) {
+        // Storage cannot share the SQL transaction: the rows are already gone,
+        // so a failed cleanup only leaves orphan blobs, never a broken event.
+        await supabase.storage
+          .from(VENUE_DOCUMENT_BUCKET)
+          .remove(paths)
+          .catch(() => undefined);
+      }
+      return { event_id: result.event_id, storage_paths: paths };
+    },
+    onSuccess: invalidateWorkspace,
+  });
+
+
+
   const upsertStakeholder = useIdempotentMutation<
     { stakeholder_id: string; version: number },
     VenueStakeholderInput
@@ -1080,6 +1122,8 @@ export function useVenueOperations() {
     checkAvailability,
     saveEvent,
     transitionEvent,
+    deleteEvent,
+
     upsertStakeholder,
     upsertAgreement,
     upsertSpace,
