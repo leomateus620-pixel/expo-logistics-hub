@@ -552,8 +552,8 @@
   --popover-foreground: var(--brand-navy-900);
   display: flex;
   width: min(29rem, calc(100vw - 2rem));
-  min-height: min(30rem, calc(100dvh - 3rem));
-  max-height: min(38rem, calc(100dvh - 2rem));
+  min-height: min(23rem, calc(100dvh - 4rem));
+  max-height: min(38rem, max(23rem, var(--radix-popover-content-available-height, 38rem)));
   flex-direction: column;
   overflow: hidden;
 
@@ -605,7 +605,7 @@
 .cronograma-relation-search input {
   width: 100%;
   min-width: 0;
-  height: 2.65rem;
+  height: 2.4rem;
   border: 0;
   background: transparent;
   color: oklch(var(--brand-navy-900));
@@ -669,7 +669,7 @@
 }
 
 .cronograma-relation-results {
-  min-height: 20rem;
+  min-height: 13rem;
   flex: 1 1 auto;
   overflow-x: hidden;
   overflow-y: auto;
@@ -702,13 +702,13 @@
 .cronograma-relation-option {
   display: grid;
   width: 100%;
-  min-height: 3.45rem;
+  min-height: 3rem;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 0.62rem;
   border: 1px solid transparent;
   border-radius: 0.72rem;
-  padding: 0.5rem 0.58rem;
+  padding: 0.38rem 0.55rem;
   color: oklch(var(--brand-navy-900));
   text-align: left;
   transition:
