@@ -22,6 +22,7 @@ interface SegmentLegendProps {
   activeSegmentId: CommercialMapSegmentId | null;
   onSelect: (segmentId: CommercialMapSegmentId) => void;
   onClear: () => void;
+  variant?: 'full' | 'mobile';
 }
 
 export function SegmentLegend({
@@ -30,6 +31,7 @@ export function SegmentLegend({
   activeSegmentId,
   onSelect,
   onClear,
+  variant = 'full',
 }: SegmentLegendProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const inventory = commercialMapSegmentInventory(entities, lots).filter(({ segment }) => (
@@ -49,7 +51,7 @@ export function SegmentLegend({
 
   return (
     <>
-      <section className="commercial-map-segment-legend" aria-label="Segmentos comerciais do parque">
+      {variant === 'full' && <section className="commercial-map-segment-legend" aria-label="Segmentos comerciais do parque">
         <div className="commercial-map-segment-legend-heading">
           <span><Layers3 aria-hidden="true" />Segmentos</span>
           <small>{activeSegment ? `${activeSegment.name} em foco` : 'Selecione para filtrar e aproximar'}</small>
@@ -101,7 +103,7 @@ export function SegmentLegend({
             <span>Todos</span>
           </button>
         )}
-      </section>
+      </section>}
 
       <Drawer open={mobileOpen} onOpenChange={setMobileOpen} shouldScaleBackground={false}>
         <DrawerTrigger asChild>
