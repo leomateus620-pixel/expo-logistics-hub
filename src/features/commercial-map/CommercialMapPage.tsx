@@ -362,41 +362,6 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
 
   const managementActions = hasManagementActions ? (
     <>
-
-        <div className="commercial-map-title-lockup">
-          <div className="commercial-map-title-icon"><MapPinned /></div>
-          <div>
-            <span>{scopedSegment ? 'Comissão · segmento comercial' : 'Parque Fenasoja · visão comercial'}</span>
-            <h1>{scopeTitle}</h1>
-            <p>{isCommissionScope ? `Vista isolada · ${scopeDescription}` : scopeDescription}</p>
-          </div>
-        </div>
-        {!isCommissionScope && <nav className="commercial-map-view-selector" aria-label="Área exibida no mapa">
-          <button
-            type="button"
-            className={!isExporural ? 'is-active' : ''}
-            onClick={() => setAreaScope('park')}
-            aria-pressed={!isExporural}
-          >
-            <Trees />Parque completo
-          </button>
-          <button
-            type="button"
-            className={isExporural ? 'is-active' : ''}
-            onClick={() => setAreaScope('exporural')}
-            aria-pressed={isExporural}
-          >
-            <Tractor />Exporural
-          </button>
-        </nav>}
-        {hasManagementActions && (
-          <details className="commercial-map-management">
-            <summary>
-              <Settings2 aria-hidden="true" />
-              <span>Gestão</span>
-              <ChevronDown className="commercial-map-management-chevron" aria-hidden="true" />
-            </summary>
-            <div className="commercial-map-header-actions" aria-label="Ferramentas administrativas do mapa">
               {permissions.canEditGeometry && (
                 <Button
                   size="sm"
