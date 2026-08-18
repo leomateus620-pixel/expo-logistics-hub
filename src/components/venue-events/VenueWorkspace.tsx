@@ -2795,7 +2795,12 @@ export function VenueWorkspace() {
         onDocumentUpload={(input) =>
           safeMutation(operations.uploadDocument.mutateAsync(input))
         }
+        onDelete={async (input) => {
+          await safeMutation(operations.deleteEvent.mutateAsync(input));
+          closeEvent();
+        }}
       />
+
       <VenueStakeholderDialog
         open={stakeholderOpen}
         onOpenChange={setStakeholderOpen}

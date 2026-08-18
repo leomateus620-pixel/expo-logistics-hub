@@ -8742,6 +8742,14 @@ export type Database = {
         Args: { _reason: string; _request_id: string; _usage_id: string }
         Returns: undefined
       }
+      venue_delete_event: {
+        Args: {
+          _event_id: string
+          _expected_version?: number
+          _reason?: string
+        }
+        Returns: Json
+      }
       venue_finish_mutation: {
         Args: {
           _idempotency_key: string
