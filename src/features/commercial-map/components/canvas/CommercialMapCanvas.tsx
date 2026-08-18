@@ -97,7 +97,8 @@ const NO_RAYCAST = () => undefined;
 const PRECISE_HOVER_CAPABLE = typeof window === 'undefined'
   || !window.matchMedia
   || window.matchMedia('(any-hover: hover) and (any-pointer: fine)').matches;
-const LABEL_LEVEL_RANK: Record<MapLabelVisibility, number> = { far: 0, medium: 1, near: 2 };
+const LABEL_LEVEL_RANK: Record<MapLabelVisibility, number> = { far: 0, medium: 1, near: 2, detail: 3 };
+const FAR_LABEL_PRIORITY_FLOOR = 94;
 const MAP_BACKGROUND_COLOR = new THREE.Color('#dfe8de');
 const AREA_NUMBER = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const SEGMENT_LOT_SURFACE_WEIGHT = 0.94;
@@ -1212,7 +1213,13 @@ function useSemanticLabelVisibility({
     if (cameraSignature === previousSignature.current) return;
 
     const mobile = state.size.width < 720 || state.size.height < 430;
-    const cap = level === 'far' ? (mobile ? 6 : 14) : level === 'medium' ? (mobile ? 16 : 36) : (mobile ? 28 : 72);
+    const cap = level === 'far'
+      ? (mobile ? 3 : 4)
+      : level === 'medium'
+        ? (mobile ? 10 : 16)
+        : level === 'near'
+          ? (mobile ? 20 : 36)
+          : (mobile ? 28 : 72);
     const currentRank = LABEL_LEVEL_RANK[level];
     const viewportWidth = state.size.width;
     const viewportHeight = state.size.height;
@@ -1227,6 +1234,7 @@ function useSemanticLabelVisibility({
             || entity.classification === 'QUADRA';
           if (!keepsCartographicContext) return false;
         }
+        if (level === 'far' && metadata.labelPriority < FAR_LABEL_PRIORITY_FLOOR) return false;
         return LABEL_LEVEL_RANK[metadata.preferredLabelVisibility] <= currentRank;
       })
       .map((candidate) => {

@@ -3,7 +3,7 @@ import type { CommercialLot, Coordinate, MapClassification, MapEntity } from '..
 import { geometryCentroid } from './geometry';
 import { strategicLandmarkSearchAliases } from './landmarks';
 
-export type MapLabelVisibility = 'far' | 'medium' | 'near';
+export type MapLabelVisibility = 'far' | 'medium' | 'near' | 'detail';
 
 export interface NormalizedMapMetadata {
   stableId: string;
@@ -31,8 +31,6 @@ const FAR_CLASSIFICATIONS = new Set<MapClassification>([
 
 const MEDIUM_CLASSIFICATIONS = new Set<MapClassification>([
   'QUADRA',
-  'ROAD',
-  'PEDESTRIAN_PATH',
   'RESTAURANT',
   'FOOD_AREA',
   'ADMINISTRATION',
@@ -40,10 +38,6 @@ const MEDIUM_CLASSIFICATIONS = new Set<MapClassification>([
   'LIVESTOCK_AREA',
   'RURAL_EXHIBITION',
   'PARKING',
-  'GATE',
-  'EMERGENCY',
-  'SECURITY',
-  'SERVICE',
 ]);
 
 const OFFICIAL_DISPLAY_NAME_CORRECTIONS: Readonly<Record<string, string>> = {
@@ -82,8 +76,8 @@ function structureCode(entity: MapEntity): string | null {
 
 function preferredVisibility(entity: MapEntity): MapLabelVisibility {
   const declared = stringMetadata(entity, 'preferredLabelVisibility');
-  if (declared === 'far' || declared === 'medium' || declared === 'near') return declared;
-  if (entity.classification === 'SELLABLE_LOT' || entity.classification === 'INTERNAL_STAND') return 'near';
+  if (declared === 'far' || declared === 'medium' || declared === 'near' || declared === 'detail') return declared;
+  if (entity.classification === 'SELLABLE_LOT' || entity.classification === 'INTERNAL_STAND') return 'detail';
   if (stringMetadata(entity, 'labelPriority') === 'landmark' || FAR_CLASSIFICATIONS.has(entity.classification)) return 'far';
   if (MEDIUM_CLASSIFICATIONS.has(entity.classification)) return 'medium';
   return 'near';
@@ -99,6 +93,7 @@ function priorityFor(entity: MapEntity, level: MapLabelVisibility): number {
   if (entity.classification === 'RESTAURANT' || entity.classification === 'FOOD_AREA') return 68;
   if (entity.classification === 'GATE') return 64;
   if (level === 'medium') return 58;
+  if (level === 'near') return 50;
   return 42;
 }
 

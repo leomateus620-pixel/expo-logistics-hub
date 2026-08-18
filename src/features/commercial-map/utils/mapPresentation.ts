@@ -88,12 +88,13 @@ export function resolveStableMapLabelVisibility(
   const safeDiagonal = Number.isFinite(sceneDiagonal) && sceneDiagonal > 0 ? sceneDiagonal : 1;
   const ratio = Math.max(0, Number.isFinite(cameraDistance) ? cameraDistance : safeDiagonal) / safeDiagonal;
 
-  if (ratio <= 0.27) return 'near';
-  if (previous === 'near' && ratio <= 0.34) return 'near';
-  if (previous === 'far' && ratio >= 0.76) return 'far';
-  if (previous === 'medium' && ratio >= 0.88) return 'far';
-  if (ratio >= 0.88) return 'far';
-  return 'medium';
+  if (ratio <= 0.16) return 'detail';
+  if (previous === 'detail' && ratio <= 0.2) return 'detail';
+  if (ratio <= 0.32) return 'near';
+  if (previous === 'near' && ratio <= 0.4) return 'near';
+  if (ratio <= 0.66) return 'medium';
+  if (previous === 'medium' && ratio <= 0.78) return 'medium';
+  return 'far';
 }
 
 export function resolveGateAccessMode(name: string): GateAccessMode {
