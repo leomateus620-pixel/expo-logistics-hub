@@ -24,6 +24,14 @@ vi.mock('@/hooks/useOrgMembers', () => ({
   }),
 }));
 
+vi.mock('@/hooks/useOrgCommissions', () => ({
+  useOrgCommissions: () => ({ units: [], commissions: [], isLoading: false, error: null }),
+}));
+
+vi.mock('@/components/cronograma-eventos/EventoAnexosSection', () => ({
+  EventoAnexosSection: () => null,
+}));
+
 const HISTORY_KEY = '__cronogramaMobileOverlay';
 
 const baseEvent: CronogramaEvent = {
