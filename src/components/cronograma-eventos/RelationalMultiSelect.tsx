@@ -724,29 +724,27 @@ export function RelationalMultiSelect({
           </SheetContent>
         </Sheet>
       ) : (
-        <Popover open={open} onOpenChange={handleOpenChange}>
-          <PopoverTrigger asChild>{trigger}</PopoverTrigger>
-          <PopoverContent
-            align="start"
-            side="bottom"
-            avoidCollisions
-            sticky="always"
-            sideOffset={8}
-            collisionPadding={12}
-            className="cronograma-relation-popover z-[95] p-0"
+        <Dialog open={open} onOpenChange={handleOpenChange}>
+          <DialogTrigger asChild>{trigger}</DialogTrigger>
+          <DialogContent
+            className="cronograma-relation-popover z-[95] gap-0 p-0"
             onOpenAutoFocus={(event) => event.preventDefault()}
             onEscapeKeyDown={(event) => {
               event.preventDefault();
               requestClose();
             }}
           >
+            <DialogHeader className="cronograma-relation-dialog__header">
+              <DialogTitle>{label}</DialogTitle>
+              {description && <DialogDescription>{description}</DialogDescription>}
+            </DialogHeader>
             {selectorPanel}
             <div className="cronograma-relation-popover__footer">
               <span>{value.length > 0 ? `${value.length} selecionados` : 'Nenhum selecionado'}</span>
               <button type="button" onClick={requestClose}>Concluir</button>
             </div>
-          </PopoverContent>
-        </Popover>
+          </DialogContent>
+        </Dialog>
       )}
 
       {value.length === 0 ? (
