@@ -109,7 +109,7 @@ interface CommercialMapState {
   setCameraNavigating: (navigating: boolean) => void;
 }
 
-export const useCommercialMapStore = create<CommercialMapState>((set) => ({
+export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
   activeScopeKey: null,
   selectedEntityId: null,
   interiorEntityId: null,
