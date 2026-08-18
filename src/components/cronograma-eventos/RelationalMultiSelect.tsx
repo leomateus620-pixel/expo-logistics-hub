@@ -413,15 +413,21 @@ export function RelationalMultiSelect({
   const togglePrimary = (selectionId: string) => {
     const selected = value.find((item) => item.id === selectionId);
     if (!selected) return;
-    if (singlePrimary) {
+    const demoting = Boolean(selected.isPrimary);
+    if (singlePrimary && !demoting) {
       onChange(value.map((item) => ({ ...item, isPrimary: item.id === selectionId })));
     } else {
       onChange(value.map((item) => (
         item.id === selectionId ? { ...item, isPrimary: !item.isPrimary } : item
       )));
     }
-    setAnnouncement(`${selected.label} definido como ${primaryLabel.toLocaleLowerCase('pt-BR')}.`);
+    setAnnouncement(
+      demoting
+        ? `${selected.label} agora é ${variant === 'person' ? 'convidado' : 'área institucional'}.`
+        : `${selected.label} definido como ${primaryLabel.toLocaleLowerCase('pt-BR')}.`,
+    );
   };
+
 
   const activateIndex = (index: number) => {
     if (index < navigableOptions.length) {
