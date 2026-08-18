@@ -583,6 +583,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
         {!webglAvailable && workspaceMode !== 'edit' && (
           <div className="commercial-map-webgl-note"><Box /><span><strong>Modo 2D acessível ativado</strong>O navegador não disponibilizou WebGL 2. A tabela permanece totalmente operacional.</span></div>
         )}
+        </div>
       </div>
     </section>
   );
