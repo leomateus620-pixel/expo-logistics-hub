@@ -21,10 +21,13 @@ import {
   X,
 } from 'lucide-react';
 import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/components/ui/popover';
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import {
   Sheet,
   SheetContent,
@@ -239,6 +242,12 @@ export function RelationalMultiSelect({
     const frame = window.requestAnimationFrame(() => searchRef.current?.focus({ preventScroll: true }));
     return () => window.cancelAnimationFrame(frame);
   }, [open, presentation]);
+
+  /** Every new query starts the result list from the top. */
+  useEffect(() => {
+    if (!open) return;
+    if (listNode) listNode.scrollTop = 0;
+  }, [normalizedSearch, open, listNode]);
 
   useEffect(() => {
     setActiveIndex((current) => {
@@ -715,26 +724,27 @@ export function RelationalMultiSelect({
           </SheetContent>
         </Sheet>
       ) : (
-        <Popover open={open} onOpenChange={handleOpenChange}>
-          <PopoverTrigger asChild>{trigger}</PopoverTrigger>
-          <PopoverContent
-            align="start"
-            sideOffset={8}
-            collisionPadding={12}
-            className="cronograma-relation-popover z-[95] p-0"
+        <Dialog open={open} onOpenChange={handleOpenChange}>
+          <DialogTrigger asChild>{trigger}</DialogTrigger>
+          <DialogContent
+            className="cronograma-relation-popover z-[95] gap-0 p-0"
             onOpenAutoFocus={(event) => event.preventDefault()}
             onEscapeKeyDown={(event) => {
               event.preventDefault();
               requestClose();
             }}
           >
+            <DialogHeader className="cronograma-relation-dialog__header">
+              <DialogTitle>{label}</DialogTitle>
+              {description && <DialogDescription>{description}</DialogDescription>}
+            </DialogHeader>
             {selectorPanel}
             <div className="cronograma-relation-popover__footer">
               <span>{value.length > 0 ? `${value.length} selecionados` : 'Nenhum selecionado'}</span>
               <button type="button" onClick={requestClose}>Concluir</button>
             </div>
-          </PopoverContent>
-        </Popover>
+          </DialogContent>
+        </Dialog>
       )}
 
       {value.length === 0 ? (
