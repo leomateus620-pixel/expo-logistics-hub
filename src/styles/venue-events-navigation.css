@@ -1,0 +1,451 @@
+/*
+ * Arquitetura de navegação do módulo Agenda Restaurante e Arena.
+ * Sidebar compacta + switcher segmentado + área máxima para os eventos.
+ */
+
+.venue-workspace {
+  --venue-accent: oklch(0.72 0.19 48);
+  --venue-accent-ink: #2a1706;
+}
+
+.venue-workspace[data-venue="arena"] {
+  --venue-accent: oklch(0.55 0.17 262);
+  --venue-accent-ink: #f4f7ff;
+}
+
+.venue-shell-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.85rem;
+  align-items: start;
+}
+
+@media (min-width: 1024px) {
+  .venue-shell-grid {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 1rem;
+  }
+}
+
+.venue-shell-main {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.venue-shell-topline {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+/* ---------- Sidebar (desktop) ---------- */
+
+.venue-sidenav {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .venue-sidenav {
+    position: sticky;
+    top: 0.75rem;
+    display: flex;
+    width: 13.25rem;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 0.6rem;
+    border: 1px solid var(--venue-border-strong);
+    border-radius: var(--venue-radius-md);
+    background: rgb(255 255 255 / 0.97);
+    box-shadow: var(--venue-shadow-panel);
+    transition: width 180ms ease;
+  }
+
+  .venue-sidenav[data-collapsed] {
+    width: 3.6rem;
+    align-items: center;
+  }
+}
+
+.venue-sidenav__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.35rem;
+  min-height: 1.6rem;
+}
+
+.venue-sidenav__eyebrow {
+  padding-left: 0.3rem;
+  color: var(--venue-ink-soft);
+  font-size: 0.56rem;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.venue-sidenav__toggle {
+  display: inline-flex;
+  height: 1.85rem;
+  width: 1.85rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.55rem;
+  color: var(--venue-ink-soft);
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.venue-sidenav__toggle:hover {
+  background: var(--venue-surface-muted);
+  color: var(--venue-ink);
+}
+
+.venue-sidenav__toggle svg {
+  width: 0.95rem;
+  height: 0.95rem;
+}
+
+.venue-sidenav__create {
+  display: inline-flex;
+  width: 100%;
+  min-height: 2.4rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0 0.7rem;
+  border-radius: 0.7rem;
+  background: var(--venue-indigo-deep);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  box-shadow: 0 12px 26px -20px var(--venue-indigo-deep);
+  transition: transform 140ms ease, filter 160ms ease;
+}
+
+.venue-sidenav[data-collapsed] .venue-sidenav__create {
+  width: 2.4rem;
+  padding: 0;
+}
+
+.venue-sidenav__create:hover {
+  filter: brightness(1.08);
+}
+
+.venue-sidenav__create:active {
+  transform: translateY(1px);
+}
+
+.venue-sidenav__create svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.venue-sidenav__group {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.venue-sidenav__slot {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.venue-sidenav__divider {
+  display: block;
+  height: 1px;
+  margin: 0.4rem 0.25rem;
+  background: color-mix(in oklab, var(--venue-border-strong) 55%, white);
+}
+
+.venue-sidenav__item {
+  display: flex;
+  width: 100%;
+  min-height: 2.25rem;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0 0.55rem;
+  border-radius: 0.6rem;
+  color: var(--venue-ink-soft);
+  font-size: 0.79rem;
+  font-weight: 700;
+  letter-spacing: -0.008em;
+  text-align: left;
+  transition: background 150ms ease, color 150ms ease;
+}
+
+.venue-sidenav[data-collapsed] .venue-sidenav__item {
+  width: 2.4rem;
+  justify-content: center;
+  padding: 0;
+}
+
+.venue-sidenav__item svg {
+  width: 1rem;
+  height: 1rem;
+  flex-shrink: 0;
+}
+
+.venue-sidenav__item:hover {
+  background: var(--venue-surface-muted);
+  color: var(--venue-ink);
+}
+
+.venue-sidenav__item[data-active] {
+  background: var(--venue-indigo-deep);
+  color: #fff;
+  box-shadow: 0 10px 22px -18px var(--venue-indigo-deep);
+}
+
+.venue-sidenav__item[data-active] svg {
+  color: var(--venue-accent);
+}
+
+/* ---------- Switcher compacto ---------- */
+
+.venue-workspace-switcher {
+  display: inline-flex;
+  min-width: 0;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.2rem;
+  border: 1px solid var(--venue-border-strong);
+  border-radius: 0.8rem;
+  background: rgb(255 255 255 / 0.97);
+  box-shadow: var(--venue-shadow-panel);
+}
+
+.venue-workspace-switcher__option {
+  display: inline-flex;
+  min-width: 0;
+  min-height: 2.15rem;
+  flex: 0 1 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0 0.7rem;
+  border-radius: 0.62rem;
+  color: var(--venue-ink-soft);
+  font-size: 0.8rem;
+  font-weight: 780;
+  letter-spacing: -0.012em;
+  transition: background 180ms ease, color 180ms ease, box-shadow 180ms ease;
+}
+
+.venue-workspace-switcher__option svg {
+  width: 0.95rem;
+  height: 0.95rem;
+  flex-shrink: 0;
+}
+
+.venue-workspace-switcher__option span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.venue-workspace-switcher__option small {
+  padding: 0.1rem 0.4rem;
+  border-radius: 999px;
+  background: var(--venue-surface-muted);
+  font-size: 0.66rem;
+  font-weight: 850;
+  font-variant-numeric: tabular-nums;
+}
+
+.venue-workspace-switcher__option:hover {
+  background: var(--venue-surface-subtle);
+  color: var(--venue-ink);
+}
+
+.venue-workspace-switcher__option[data-active] {
+  background: var(--venue-indigo-deep);
+  color: #fff;
+  box-shadow: 0 10px 22px -18px var(--venue-indigo-deep);
+}
+
+.venue-workspace-switcher__option[data-active] small {
+  background: rgb(255 255 255 / 0.18);
+  color: #fff;
+}
+
+.venue-workspace-switcher__option[data-active][data-venue="restaurante"] svg {
+  color: oklch(0.78 0.16 62);
+}
+
+.venue-workspace-switcher__option[data-active][data-venue="arena"] svg {
+  color: oklch(0.8 0.11 245);
+}
+
+/* ---------- Trigger + drawer (mobile) ---------- */
+
+.venue-nav-trigger {
+  display: inline-flex;
+  min-height: 2.15rem;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0 0.6rem;
+  border: 1px solid var(--venue-border-strong);
+  border-radius: 0.7rem;
+  background: rgb(255 255 255 / 0.97);
+  color: var(--venue-ink);
+  font-size: 0.74rem;
+  font-weight: 800;
+  box-shadow: var(--venue-shadow-panel);
+}
+
+.venue-nav-trigger svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+@media (max-width: 1023px) {
+  .venue-workspace-switcher {
+    flex: 1 1 auto;
+  }
+
+  .venue-workspace-switcher__option {
+    flex: 1 1 0;
+  }
+}
+
+@media (min-width: 1024px) {
+  .venue-nav-trigger {
+    display: none;
+  }
+}
+
+.venue-nav-drawer {
+  display: flex;
+  width: min(19rem, 88vw);
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 0.9rem;
+  background: #fff;
+  color: oklch(0.25 0.065 257);
+}
+
+.venue-nav-drawer__header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0;
+  text-align: left;
+}
+
+.venue-nav-drawer__header h2 {
+  font-size: 0.72rem;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: oklch(0.42 0.045 257);
+}
+
+.venue-nav-drawer__header button {
+  border-radius: 0.55rem;
+  padding: 0.3rem 0.6rem;
+  background: oklch(0.95 0.02 255);
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.venue-nav-drawer__create {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 2.9rem;
+  padding: 0 0.75rem;
+  border-radius: 0.75rem;
+  background: oklch(0.29 0.14 272);
+  color: #fff;
+  text-align: left;
+}
+
+.venue-nav-drawer__create svg {
+  width: 1.05rem;
+  height: 1.05rem;
+}
+
+.venue-nav-drawer__create span {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.venue-nav-drawer__create strong {
+  font-size: 0.85rem;
+  font-weight: 820;
+}
+
+.venue-nav-drawer__create small {
+  font-size: 0.68rem;
+  opacity: 0.78;
+}
+
+.venue-nav-drawer__list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.venue-nav-drawer__list button {
+  display: flex;
+  min-height: 2.7rem;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0 0.6rem;
+  border-radius: 0.65rem;
+  color: oklch(0.42 0.045 257);
+  font-size: 0.85rem;
+  font-weight: 750;
+  text-align: left;
+}
+
+.venue-nav-drawer__list button svg:first-child {
+  width: 1rem;
+  height: 1rem;
+}
+
+.venue-nav-drawer__list button span {
+  flex: 1;
+  min-width: 0;
+}
+
+.venue-nav-drawer__list button svg:last-child {
+  width: 0.9rem;
+  height: 0.9rem;
+  opacity: 0.5;
+}
+
+.venue-nav-drawer__list button[data-active] {
+  background: oklch(0.29 0.14 272);
+  color: #fff;
+}
+
+/* ---------- Aproveitamento de largura ---------- */
+
+.venue-workspace {
+  padding-inline: clamp(0.65rem, 1.1vw, 1.15rem);
+}
+
+.venue-workspace__content {
+  min-width: 0;
+}
+
+@media (max-width: 480px) {
+  .venue-nav-trigger span {
+    display: none;
+  }
+
+  .venue-nav-trigger {
+    padding: 0 0.5rem;
+  }
+}

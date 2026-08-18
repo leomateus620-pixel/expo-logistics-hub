@@ -21,7 +21,6 @@ import {
   MapPin,
   UserRound,
   Handshake,
-  MoreHorizontal,
   Plus,
   RefreshCw,
   Search,
@@ -44,15 +43,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Sheet,
-  SheetClose,
-  SheetContent,
-  SheetDescription,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@/components/ui/sheet";
 import { useAuth } from "@/hooks/useAuth";
 import {
   useVenueAuditHistory,
@@ -101,7 +91,12 @@ import { VenueWorkspaceSwitcher } from "@/components/venue-events/VenueWorkspace
 import { VenueEventsFiltersTrigger } from "@/components/venue-events/VenueEventsFiltersTrigger";
 import { VenueEventsYearSelector } from "@/components/venue-events/VenueEventsYearSelector";
 import { VenueAgendaFiltersTrigger } from "@/components/venue-events/VenueAgendaFiltersTrigger";
-import { VenueCreateEventBar } from "@/components/venue-events/VenueCreateEventBar";
+import { VenueSideNav } from "@/components/venue-events/VenueSideNav";
+import { VenueMobileNavDrawer } from "@/components/venue-events/VenueMobileNavDrawer";
+import {
+  VENUE_NAV_ITEMS,
+  VENUE_VALID_VIEWS,
+} from "@/components/venue-events/venueNavigation";
 import { VenueAgreementCard } from "@/components/venue-events/VenueAgreementCard";
 import { useVenueSearch } from "@/components/venue-events/VenueSearchContext";
 import { countCommittedCounterpartEvents } from "@/lib/venue-counterparts";
@@ -119,77 +114,7 @@ import {
 } from "@/components/venue-events/venueWorkspaces";
 import "@/styles/venue-events.css";
 import "@/styles/venue-events-production.css";
-
-type NavGroupId = "planejamento" | "gestao" | "controle";
-
-interface NavItem {
-  id: VenueView;
-  label: string;
-  shortLabel: string;
-  icon: LucideIcon;
-  group: NavGroupId;
-  primary?: boolean;
-}
-
-const NAV_ITEMS: NavItem[] = [
-  {
-    id: "agenda",
-    label: "Agenda",
-    shortLabel: "Agenda",
-    icon: CalendarDays,
-    group: "planejamento",
-    primary: true,
-  },
-  {
-    id: "eventos",
-    label: "Eventos",
-    shortLabel: "Eventos",
-    icon: ListChecks,
-    group: "planejamento",
-    primary: true,
-  },
-  {
-    id: "contrapartidas",
-    label: "Contrapartidas",
-    shortLabel: "Contratos",
-    icon: FileKey2,
-    group: "gestao",
-  },
-  {
-    id: "patrocinadores",
-    label: "Patrocinadores",
-    shortLabel: "Parceiros",
-    icon: UsersRound,
-    group: "gestao",
-  },
-  {
-    id: "operacao",
-    label: "Operação",
-    shortLabel: "Operação",
-    icon: ClipboardCheck,
-    group: "gestao",
-  },
-  {
-    id: "historico",
-    label: "Histórico",
-    shortLabel: "Histórico",
-    icon: History,
-    group: "controle",
-  },
-  {
-    id: "relatorios",
-    label: "Relatórios",
-    shortLabel: "Relatórios",
-    icon: BarChart3,
-    group: "controle",
-  },
-];
-
-const NAV_GROUPS: Array<{ id: NavGroupId; label: string }> = [
-  { id: "planejamento", label: "Planejamento" },
-  { id: "gestao", label: "Gestão" },
-  { id: "controle", label: "Controle" },
-];
+import "@/styles/venue-events-navigation.css";
 
 const VIEW_CONTEXT: Record<
   VenueView,
@@ -286,7 +211,7 @@ function presentPendencyType(type: string) {
   return labels[type] || type.replaceAll("_", " ");
 }
 
-const VALID_VIEWS = new Set(NAV_ITEMS.map((item) => item.id));
+const VALID_VIEWS = VENUE_VALID_VIEWS;
 
 function localDateKey(value: string) {
   return new Intl.DateTimeFormat("en-CA", {
@@ -2742,7 +2667,7 @@ export function VenueWorkspace() {
                     </span>
                     <span>
                       <small>Próxima ação</small>
-                      <strong>Abrir {NAV_ITEMS.find((nav) => nav.id === item.actionView)?.label}</strong>
+                      <strong>Abrir {VENUE_NAV_ITEMS.find((nav) => nav.id === item.actionView)?.label}</strong>
                     </span>
                   </div>
                 </div>
@@ -2786,11 +2711,8 @@ export function VenueWorkspace() {
     pendencias: renderPendencies,
   };
 
-  const activeNav = NAV_ITEMS.find((item) => item.id === view)!;
-  const MobileMoreIcon = activeNav.primary ? MoreHorizontal : activeNav.icon;
-
   return (
-    <div className="venue-workspace">
+    <div className="venue-workspace" data-venue={venueId}>
       {!operations.isOnline && (
         <div className="venue-offline-banner" role="status">
           <WifiOff />
@@ -2800,130 +2722,44 @@ export function VenueWorkspace() {
           </span>
         </div>
       )}
-      <section
-        className="venue-command-hero"
-        data-variant="switcher"
-        data-venue={venueId}
-      >
-        <VenueWorkspaceSwitcher
-          active={venueId}
-          counts={venueEventCounts}
-          onSelect={setVenue}
-        />
-      </section>
 
-      {permissions.venue_events_create && (
-        <VenueCreateEventBar
+      <div className="venue-shell-grid">
+        <VenueSideNav
           venueId={venueId}
           venueLabel={venueDefinition.label}
+          view={view}
+          canCreate={permissions.venue_events_create}
+          onSelect={setView}
           onCreate={startNewEvent}
         />
-      )}
 
-      <nav className="venue-desktop-nav" aria-label="Navegação do módulo">
-        {NAV_GROUPS.map((group) => (
-          <div
-            className="venue-desktop-nav__group"
-            data-group={group.id}
-            key={group.id}
-          >
-            <span>{group.label}</span>
-            <div>
-              {NAV_ITEMS.filter((item) => item.group === group.id).map(
-                ({ id, icon: Icon, label }) => (
-                  <button
-                    type="button"
-                    key={id}
-                    data-active={view === id}
-                    aria-current={view === id ? "page" : undefined}
-                    onClick={() => setView(id)}
-                  >
-                    <Icon />
-                    <span>{label}</span>
-                    {id === "pendencias" && pendencies.length > 0 && (
-                      <small>{pendencies.length}</small>
-                    )}
-                  </button>
-                ),
-              )}
-            </div>
+        <div className="venue-shell-main">
+          <div className="venue-shell-topline">
+            <VenueMobileNavDrawer
+              open={mobileMoreOpen}
+              onOpenChange={setMobileMoreOpen}
+              venueId={venueId}
+              venueLabel={venueDefinition.label}
+              view={view}
+              canCreate={permissions.venue_events_create}
+              onSelect={setView}
+              onCreate={() => {
+                setMobileMoreOpen(false);
+                startNewEvent();
+              }}
+            />
+            <VenueWorkspaceSwitcher
+              active={venueId}
+              counts={venueEventCounts}
+              onSelect={setVenue}
+            />
           </div>
-        ))}
-      </nav>
 
-      <main className="venue-workspace__content" key={view}>
-        {viewContent[view]()}
-      </main>
-
-      <Sheet open={mobileMoreOpen} onOpenChange={setMobileMoreOpen}>
-        <nav
-          className="venue-mobile-nav"
-          aria-label="Navegação principal no celular"
-        >
-          {NAV_ITEMS.filter((item) => item.primary).map(
-            ({ id, icon: Icon, shortLabel }) => (
-              <button
-                key={id}
-                type="button"
-                data-active={view === id}
-                aria-current={view === id ? "page" : undefined}
-                onClick={() => setView(id)}
-              >
-                <Icon />
-                <span>{shortLabel}</span>
-              </button>
-            ),
-          )}
-          <SheetTrigger asChild>
-            <button
-              type="button"
-              data-active={!activeNav.primary}
-              aria-current={!activeNav.primary ? "page" : undefined}
-              aria-expanded={mobileMoreOpen}
-              aria-controls="venue-mobile-more"
-            >
-              <MobileMoreIcon />
-              <span>{activeNav.primary ? "Mais" : activeNav.shortLabel}</span>
-            </button>
-          </SheetTrigger>
-        </nav>
-        <SheetContent
-          id="venue-mobile-more"
-          side="bottom"
-          className="venue-mobile-more"
-          showCloseButton={false}
-        >
-          <SheetHeader className="venue-mobile-more__header">
-            <SheetTitle>Mais áreas</SheetTitle>
-            <SheetDescription className="sr-only">
-              Navegue para as demais áreas do módulo de eventos.
-            </SheetDescription>
-            <SheetClose asChild>
-              <button type="button" aria-label="Fechar menu">
-                Fechar
-              </button>
-            </SheetClose>
-          </SheetHeader>
-          {NAV_ITEMS.filter((item) => !item.primary).map(
-            ({ id, icon: Icon, label }) => (
-              <button
-                type="button"
-                key={id}
-                onClick={() => setView(id)}
-                data-active={view === id}
-                aria-current={view === id ? "page" : undefined}
-              >
-                <Icon />
-                <span>{label}</span>
-                {id === "pendencias" && pendencies.length > 0 && (
-                  <small>{pendencies.length}</small>
-                )}
-                <ChevronRight />
-              </button>
-            ),
-          )}
-        </SheetContent>
-      </Sheet>
+          <main className="venue-workspace__content" key={view}>
+            {viewContent[view]()}
+          </main>
+        </div>
+      </div>
 
       <VenueEventFormDialog
         open={formOpen}

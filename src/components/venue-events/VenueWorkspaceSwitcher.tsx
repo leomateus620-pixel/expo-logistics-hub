@@ -1,4 +1,3 @@
-import { CalendarDays } from "lucide-react";
 import {
   VENUE_WORKSPACES,
   type VenueWorkspaceId,
@@ -18,10 +17,11 @@ export function VenueWorkspaceSwitcher({
   return (
     <div
       className="venue-workspace-switcher"
+      data-venue={active}
       role="tablist"
       aria-label="Selecionar ambiente operacional"
     >
-      {VENUE_WORKSPACES.map(({ id, label, icon: Icon }) => {
+      {VENUE_WORKSPACES.map(({ id, shortLabel, icon: Icon }) => {
         const isActive = id === active;
         return (
           <button
@@ -30,20 +30,13 @@ export function VenueWorkspaceSwitcher({
             role="tab"
             aria-selected={isActive}
             data-venue={id}
-            data-active={isActive}
+            data-active={isActive || undefined}
             className="venue-workspace-switcher__option"
             onClick={() => onSelect(id)}
           >
-            <span className="venue-workspace-switcher__icon" aria-hidden="true">
-              <Icon />
-            </span>
-            <span className="venue-workspace-switcher__copy">
-              <strong>{label}</strong>
-            </span>
-            <span className="venue-workspace-switcher__count">
-              <CalendarDays aria-hidden="true" />
-              {counts[id]}
-            </span>
+            <Icon aria-hidden="true" />
+            <span>{shortLabel}</span>
+            <small>{counts[id]}</small>
           </button>
         );
       })}
