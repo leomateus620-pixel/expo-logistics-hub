@@ -4,10 +4,12 @@ import { supabase } from '@/integrations/supabase/client';
 import {
   cronogramaSaveEvent,
   cronogramaSaveSubevent,
+  cronogramaSaveSubeventPlan,
   cronogramaDeleteSubevent,
   cronogramaReorderSubevents,
   type CronogramaSaveEventPayload,
   type CronogramaSaveSubeventPayload,
+  type CronogramaSubeventPlanItemInput,
 } from '@/lib/cronograma-rpc';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import { useCapabilities } from '@/hooks/useCapabilities';
@@ -271,6 +273,47 @@ function mapResponsibleRel(item: unknown) {
   };
 }
 
+function mapPlanAction(item: unknown) {
+  const record = item as Record<string, unknown>;
+  return {
+    id: readString(record, 'id') ?? undefined,
+    startTime: normalizeTime(readString(record, 'start_time')),
+    title: readString(record, 'title') ?? '',
+    notes: readString(record, 'notes'),
+    responsibleUserId: readString(record, 'responsible_user_id'),
+    responsibleName: readString(record, 'responsible_name'),
+    commissionSlug: readString(record, 'commission_slug'),
+    commissionName: readString(record, 'commission_name'),
+    isDone: readBoolean(record, 'is_done') === true,
+    sortOrder: readNumber(record, 'sort_order') ?? 0,
+  };
+}
+
+function mapPlanProvision(item: unknown) {
+  const record = item as Record<string, unknown>;
+  return {
+    id: readString(record, 'id') ?? undefined,
+    description: readString(record, 'description') ?? '',
+    responsibleUserId: readString(record, 'responsible_user_id'),
+    responsibleName: readString(record, 'responsible_name'),
+    commissionSlug: readString(record, 'commission_slug'),
+    commissionName: readString(record, 'commission_name'),
+    note: readString(record, 'note'),
+    isDone: readBoolean(record, 'is_done') === true,
+    sortOrder: readNumber(record, 'sort_order') ?? 0,
+  };
+}
+
+function mapPlanGuest(item: unknown) {
+  const record = item as Record<string, unknown>;
+  return {
+    id: readString(record, 'id') ?? undefined,
+    name: readString(record, 'name') ?? '',
+    category: readString(record, 'category'),
+    sortOrder: readNumber(record, 'sort_order') ?? 0,
+  };
+}
+
 function fromViewSubevent(item: unknown): CronogramaSubeventSeed {
   const record = item as Record<string, unknown>;
   const commissions = parseJsonArray(record.commissions).map(mapCommissionRel);
@@ -278,6 +321,9 @@ function fromViewSubevent(item: unknown): CronogramaSubeventSeed {
   const primaryCommission = commissions.find((commission) => commission.isPrimary) ?? commissions[0];
   const primaryResponsible = responsibles.find((responsible) => responsible.isPrimary) ?? responsibles[0];
   return {
+    actions: parseJsonArray(record.actions).map(mapPlanAction),
+    provisions: parseJsonArray(record.provisions).map(mapPlanProvision),
+    guests: parseJsonArray(record.guests).map(mapPlanGuest),
     id: readString(record, 'id') ?? '',
     title: readString(record, 'title') ?? '',
     description: readString(record, 'description'),
@@ -1172,6 +1218,29 @@ export function useCronogramaEventos() {
     },
   });
 
+  /** Saves an entire event plan (subeventos + ações + providências + convidados) in one call. */
+  const saveSubeventPlan = useMutation({
+    mutationFn: async ({ eventId, subevents }: { eventId: string; subevents: CronogramaSubeventPlanItemInput[] }) => {
+      if (!canWriteCronograma) throw new Error('Seu perfil possui acesso somente para consulta.');
+      const current = findSessionEvent(eventId);
+      if (!current) throw new Error('Evento principal não encontrado. Atualize a página e tente novamente.');
+      if (dbUnavailable || relationshipsUnavailable || !isOnline) {
+        throw new Error('O planejamento só pode ser salvo com conexão ativa. Tente novamente em instantes.');
+      }
+      const parent = await ensurePersistedParent(current);
+      const data = await cronogramaSaveSubeventPlan({ parent_event_id: parent.id, subevents });
+      return fromDbRow(data);
+    },
+    onSuccess: (event) => {
+      if (!event) return;
+      replaceSessionEvent(event);
+      queryClient.invalidateQueries({ queryKey: ['cronograma-eventos'] });
+      queryClient.invalidateQueries({ queryKey: ['cronograma-event-history', event.id] });
+    },
+  });
+
+
+
   const retryRelationships = async () => {
     if (!isOnline) {
       throw new Error('Este dispositivo está offline. Os subeventos pendentes continuam salvos aqui e serão enviados quando a conexão voltar.');
@@ -1242,6 +1311,7 @@ export function useCronogramaEventos() {
     deleteEvent,
 
     createSubevent,
+    saveSubeventPlan,
     updateSubevent,
     deleteSubevent,
     seedOfficialData,

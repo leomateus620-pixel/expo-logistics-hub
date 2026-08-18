@@ -52,8 +52,12 @@ import type {
   CronogramaEvent,
   CronogramaSubevent,
   CronogramaSubeventInput,
+  CronogramaSubeventPlanDraft,
 } from '@/components/cronograma-eventos/types';
 import { SubeventComposer } from './SubeventComposer';
+import { SubeventPlanBuilder } from './SubeventPlanBuilder';
+import { SubeventPlanRundown, subeventPlanSummary } from './SubeventPlanRundown';
+import '@/styles/cronograma-plan-builder.css';
 
 type WorkspaceFilter = 'all' | 'open' | 'completed';
 
@@ -72,6 +76,7 @@ export function EventRelationshipWorkspace({
   onCreateSubevent,
   onUpdateSubevent,
   onRemoveSubevent,
+  onSaveSubeventPlan,
   canManage,
   canDeleteSubevents,
   relationshipsUnavailable = false,
@@ -86,6 +91,7 @@ export function EventRelationshipWorkspace({
   onCreateSubevent: (input: CronogramaSubeventInput) => Promise<'synced' | 'queued' | void> | 'synced' | 'queued' | void;
   onUpdateSubevent: (subevent: CronogramaSubevent, input: CronogramaSubeventInput) => Promise<void> | void;
   onRemoveSubevent: (subevent: CronogramaSubevent) => Promise<void> | void;
+  onSaveSubeventPlan?: (items: CronogramaSubeventPlanDraft[]) => Promise<void> | void;
   canManage: boolean;
   canDeleteSubevents: boolean;
   relationshipsUnavailable?: boolean;
@@ -418,14 +424,29 @@ export function EventRelationshipWorkspace({
                       onRemove={() => setRemovalTarget(subevent)}
                     />
                     {editing && (
-                      <SubeventComposer
-                        initialSubevent={subevent}
-                        connectedTo={event.title}
-                        mode="edit"
-                        defaultDate={event.date}
-                        onSubmit={(input) => handleUpdate(subevent, input)}
-                        onCancel={() => setEditingNodeId(null)}
-                      />
+                      onSaveSubeventPlan ? (
+                        <SubeventPlanBuilder
+                          connectedTo={event.title}
+                          mode="edit"
+                          defaultDate={event.date}
+                          initialSubevents={[subevent]}
+                          onSubmit={async (items) => {
+                            await onSaveSubeventPlan(items);
+                            setEditingNodeId(null);
+                            setAnnouncement(`O planejamento de ${subevent.title} foi atualizado.`);
+                          }}
+                          onCancel={() => setEditingNodeId(null)}
+                        />
+                      ) : (
+                        <SubeventComposer
+                          initialSubevent={subevent}
+                          connectedTo={event.title}
+                          mode="edit"
+                          defaultDate={event.date}
+                          onSubmit={(input) => handleUpdate(subevent, input)}
+                          onCancel={() => setEditingNodeId(null)}
+                        />
+                      )
                     )}
                   </div>
                 </li>
@@ -467,12 +488,30 @@ export function EventRelationshipWorkspace({
 
             {composerOpen && (
               <div id="cronograma-new-subevent-composer" className="cronograma-add-composer-wrap">
-                <SubeventComposer
-                  connectedTo={event.title}
-                  defaultDate={event.date}
-                  onSubmit={handleCreate}
-                  onCancel={() => setComposerOpen(false)}
-                />
+                {onSaveSubeventPlan ? (
+                  <SubeventPlanBuilder
+                    connectedTo={event.title}
+                    defaultDate={event.date}
+                    onSubmit={async (items) => {
+                      await onSaveSubeventPlan(items);
+                      setComposerOpen(false);
+                      setAnnouncement(
+                        items.length === 1
+                          ? `${items[0].title} foi adicionado ao evento.`
+                          : `${items.length} subeventos foram adicionados ao evento.`,
+                      );
+                      window.requestAnimationFrame(() => addBubbleRef.current?.focus({ preventScroll: true }));
+                    }}
+                    onCancel={() => setComposerOpen(false)}
+                  />
+                ) : (
+                  <SubeventComposer
+                    connectedTo={event.title}
+                    defaultDate={event.date}
+                    onSubmit={handleCreate}
+                    onCancel={() => setComposerOpen(false)}
+                  />
+                )}
               </div>
             )}
           </div>
@@ -530,6 +569,7 @@ function SubeventNode({
   onRemove: () => void;
 }) {
   const completed = isCompleted(subevent);
+  const planSummary = subeventPlanSummary(subevent);
   return (
     <article
       className="cronograma-subevent-node"
@@ -556,11 +596,13 @@ function SubeventNode({
         <span><CalendarDays aria-hidden="true" /> {subevent.date ? `${formatLongDate(subevent.date)}${subevent.startTime ? ` · ${subevent.startTime}` : ''}` : 'Prazo a definir'}</span>
         <span><UserRound aria-hidden="true" /> {subevent.owner || 'Responsável a definir'}</span>
         <span><Layers3 aria-hidden="true" /> {subevent.commission || 'Comissão a definir'}</span>
+        {planSummary && <span className="cronograma-plan-builder-summary">{planSummary}</span>}
       </div>
 
       {expanded && (
         <div className="cronograma-subevent-expanded" role="region" aria-label={`Detalhes de ${subevent.title}`}>
           <p>{subevent.description || 'Sem descrição.'}</p>
+          <SubeventPlanRundown subevent={subevent} />
           {subevent.storage === 'queued' && subevent.syncError && (
             <p className="cronograma-subevent-sync-error">Falha no último envio: {subevent.syncError}</p>
           )}
