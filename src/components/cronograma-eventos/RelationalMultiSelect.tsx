@@ -798,11 +798,19 @@ export function RelationalMultiSelect({
                   {context && context !== detail && <em>{context}</em>}
                 </span>
                 <span className="cronograma-relation-selected__actions">
-                  {item.isPrimary && singlePrimary ? (
-                    <span className="cronograma-relation-primary" title={primaryLabel}>
+                  {item.isPrimary ? (
+                    <button
+                      type="button"
+                      onClick={() => togglePrimary(item.id)}
+                      className="cronograma-relation-primary"
+                      title={primaryLabel}
+                      aria-label={variant === 'person'
+                        ? `Tornar ${item.label} convidado`
+                        : `Remover destaque de ${item.label}`}
+                    >
                       <Star aria-hidden="true" />
-                      <span>{primaryLabel}</span>
-                    </span>
+                      <span>{variant === 'person' ? 'Tornar convidado' : 'Remover destaque'}</span>
+                    </button>
                   ) : (
                     <button
                       type="button"
@@ -814,6 +822,7 @@ export function RelationalMultiSelect({
                       <span>{variant === 'person' ? 'Definir como responsável' : 'Definir como principal'}</span>
                     </button>
                   )}
+
 
                   <button
                     type="button"
