@@ -552,8 +552,8 @@
   --popover-foreground: var(--brand-navy-900);
   display: flex;
   width: min(29rem, calc(100vw - 2rem));
-  min-height: 0;
-  max-height: min(34rem, var(--radix-popover-content-available-height, 34rem));
+  min-height: min(30rem, calc(100dvh - 3rem));
+  max-height: min(38rem, calc(100dvh - 2rem));
   flex-direction: column;
   overflow: hidden;
 
@@ -669,7 +669,7 @@
 }
 
 .cronograma-relation-results {
-  min-height: 6rem;
+  min-height: 20rem;
   flex: 1 1 auto;
   overflow-x: hidden;
   overflow-y: auto;
@@ -963,7 +963,7 @@
   display: flex !important;
   width: 100%;
   max-width: none;
-  min-height: 17.5rem;
+  min-height: min(32rem, calc(100dvh - 2rem));
   max-height: calc(100dvh - 0.5rem);
   flex-direction: column;
   gap: 0 !important;

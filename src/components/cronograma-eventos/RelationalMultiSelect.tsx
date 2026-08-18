@@ -240,6 +240,12 @@ export function RelationalMultiSelect({
     return () => window.cancelAnimationFrame(frame);
   }, [open, presentation]);
 
+  /** Every new query starts the result list from the top. */
+  useEffect(() => {
+    if (!open) return;
+    if (listNode) listNode.scrollTop = 0;
+  }, [normalizedSearch, open, listNode]);
+
   useEffect(() => {
     setActiveIndex((current) => {
       if (navigableCount === 0) return -1;
@@ -719,6 +725,9 @@ export function RelationalMultiSelect({
           <PopoverTrigger asChild>{trigger}</PopoverTrigger>
           <PopoverContent
             align="start"
+            side="bottom"
+            avoidCollisions
+            sticky="always"
             sideOffset={8}
             collisionPadding={12}
             className="cronograma-relation-popover z-[95] p-0"
