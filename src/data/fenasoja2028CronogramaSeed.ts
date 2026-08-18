@@ -85,6 +85,19 @@ export interface CronogramaSubeventSeed {
   actions?: CronogramaSubeventActionSeed[];
   provisions?: CronogramaSubeventProvisionSeed[];
   guests?: CronogramaSubeventGuestSeed[];
+  commissionsRel?: Array<{
+    commissionId?: string | null;
+    commissionSlug?: string | null;
+    commissionName?: string | null;
+    isPrimary?: boolean;
+  }>;
+  responsiblesRel?: Array<{
+    userId?: string | null;
+    name?: string | null;
+    role?: string | null;
+    isPrimary?: boolean;
+    responsibleType?: 'member' | 'external';
+  }>;
 }
 
 export interface CronogramaEventSeed {
