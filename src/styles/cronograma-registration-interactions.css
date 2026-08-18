@@ -550,9 +550,13 @@
 /* Desktop anchored selector */
 .cronograma-relation-popover {
   --popover-foreground: var(--brand-navy-900);
+  display: flex;
   width: min(29rem, calc(100vw - 2rem));
+  min-height: 0;
   max-height: min(34rem, var(--radix-popover-content-available-height, 34rem));
+  flex-direction: column;
   overflow: hidden;
+
   border: 1px solid oklch(var(--brand-indigo-200) / 0.78);
   border-radius: 0.92rem;
   background: oklch(var(--neutral-0) / 0.985);
@@ -665,14 +669,15 @@
 }
 
 .cronograma-relation-results {
-  min-height: 0;
-  max-height: min(22rem, calc(var(--radix-popover-content-available-height, 34rem) - 7.5rem));
+  min-height: 6rem;
+  flex: 1 1 auto;
   overflow-x: hidden;
   overflow-y: auto;
   overscroll-behavior: contain;
   padding: 0.36rem;
   scrollbar-gutter: stable;
 }
+
 
 .cronograma-relation-group + .cronograma-relation-group {
   border-top: 1px solid oklch(var(--border) / 0.55);
@@ -893,14 +898,19 @@
 }
 
 .cronograma-relation-popover__footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.7rem;
+  flex: 0 0 auto;
   border-top: 1px solid oklch(var(--brand-indigo-100));
   padding: 0.52rem 0.62rem;
   background: oklch(var(--neutral-50));
 }
+
 
 .cronograma-relation-popover__footer > span {
   color: oklch(var(--muted-foreground));
