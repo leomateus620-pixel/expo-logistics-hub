@@ -14,6 +14,7 @@ import {
 import { useOrgCommissions } from '@/hooks/useOrgCommissions';
 import { useAuth } from '@/hooks/useAuth';
 import { useOrgMembers } from '@/hooks/useOrgMembers';
+import { officialMemberLabel, resolveOfficialMembers } from '@/lib/memberIdentity';
 import {
   ORG_UNIT_SELECT_LABEL,
   normalizeSearchTerm,
@@ -59,6 +60,8 @@ interface EventFormMember {
   cargo?: string | null;
   role?: string | null;
   commission_nome?: string | null;
+  is_active?: boolean | null;
+  is_core_team?: boolean | null;
 }
 
 function normalizeEditableStatus(status: CronogramaStatus): CronogramaStatus {
@@ -181,18 +184,19 @@ export function EventForm({
     error: membersError,
     loginMembersError,
   } = useOrgMembers();
-  /** Member row of the logged user; core-team rows win over homonym duplicates. */
+  const officialMembersByUserId = useMemo(
+    () => resolveOfficialMembers([...(loginMembers ?? []), ...(members ?? [])] as EventFormMember[]),
+    [loginMembers, members],
+  );
+  /** Member row of the logged user, resolved by immutable auth id. */
   const currentMember = useMemo(() => {
     if (!user) return null;
-    const pool = ([...(loginMembers ?? []), ...(members ?? [])] as any[]).filter(
-      (item: any) => item.user_id === user.id,
-    );
-    return pool.find((item: any) => item.is_core_team) ?? pool[0] ?? null;
-  }, [loginMembers, members, user]);
+    return officialMembersByUserId.get(user.id) ?? null;
+  }, [officialMembersByUserId, user]);
   const currentUserName = useMemo(() => {
     if (!user) return '';
     return (
-      currentMember?.nome_exibicao
+      officialMemberLabel(currentMember)
       || (user.user_metadata as any)?.full_name
       || (user.user_metadata as any)?.name
       || user.email
@@ -289,14 +293,11 @@ export function EventForm({
       context?: string;
       searchText?: string;
     }> = [];
-    const seenNames = new Set<string>();
+    const seenUserIds = new Set<string>();
+    const seenExternalNames = new Set<string>();
     const typedMembers = members as EventFormMember[];
     const typedLoginMembers = loginMembers as EventFormMember[];
-    const memberByUserId = new Map<string, EventFormMember>(
-      typedMembers.flatMap((member) => (
-        member.user_id ? [[member.user_id, member] as const] : []
-      )),
-    );
+    const memberByUserId = resolveOfficialMembers([...typedLoginMembers, ...typedMembers]);
     const institutionalByName = new Map<string, {
       label: string;
       userId: string | null;
@@ -326,14 +327,14 @@ export function EventForm({
       });
     });
 
-    [...typedLoginMembers]
+    Array.from(resolveOfficialMembers(typedLoginMembers).values())
       .sort((a, b) => (a.nome_exibicao ?? '').localeCompare(b.nome_exibicao ?? '', 'pt-BR'))
       .forEach((member) => {
         const label = (member?.nome_exibicao ?? '').trim();
         if (!label || !member?.user_id) return;
+        if (seenUserIds.has(member.user_id)) return;
+        seenUserIds.add(member.user_id);
         const key = normalizeSearchTerm(label);
-        if (seenNames.has(key)) return;
-        seenNames.add(key);
         const memberProfile = memberByUserId.get(member.user_id);
         const institutional = institutionalByName.get(key);
         const persistedRole = member.cargo || undefined;
@@ -354,8 +355,10 @@ export function EventForm({
       });
 
     institutionalByName.forEach((person, key) => {
-      if (seenNames.has(key)) return;
-      seenNames.add(key);
+      if (person.userId && seenUserIds.has(person.userId)) return;
+      if (!person.userId && seenExternalNames.has(key)) return;
+      if (person.userId) seenUserIds.add(person.userId);
+      else seenExternalNames.add(key);
       const unitNames = Array.from(person.unitNames);
       const roles = Array.from(person.roles);
       options.push({
@@ -427,6 +430,21 @@ export function EventForm({
       }))
       .filter((subevent) => subevent.title.length > 0);
 
+    const optionByUserId = new Map(responsibleOptions.map((option) => [option.id, option]));
+    let primarySeen = false;
+    const normalizedResponsibles = selectionsToResponsibleLinks(responsibleSelections).map((link) => {
+      const option = link.userId ? optionByUserId.get(link.userId) : null;
+      const isPrimary = Boolean(link.isPrimary) && !primarySeen;
+      if (isPrimary) primarySeen = true;
+      return {
+        ...link,
+        name: option?.label ?? link.name,
+        role: option?.hint ?? link.role,
+        isPrimary,
+      };
+    });
+    const primaryResponsible = normalizedResponsibles.find((link) => link.isPrimary);
+
     onSubmit({
       ...form,
       title: form.title.trim(),
@@ -436,13 +454,13 @@ export function EventForm({
       startTime: form.startTime?.trim() || undefined,
       endTime: form.endTime?.trim() || undefined,
       location: form.location?.trim() || undefined,
-      owner: form.owner?.trim() || undefined,
+      owner: primaryResponsible?.name?.trim() || currentUserName || form.owner?.trim() || undefined,
       commission: form.commission?.trim() || undefined,
       pendingReason: form.pendingReason?.trim() || undefined,
       decisionNeeded: form.decisionNeeded?.trim() || undefined,
       subevents: normalizedSubevents,
       commissionsRel: selectionsToCommissionLinks(commissionSelections, commissions),
-      responsiblesRel: selectionsToResponsibleLinks(responsibleSelections),
+      responsiblesRel: normalizedResponsibles,
     });
   };
 

@@ -37,7 +37,27 @@ Deno.serve(async (req) => {
       return new Response(JSON.stringify({ error: "Sem permissão de administrador" }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    const { email, password, full_name, org_id, role, cargo } = await req.json();
+    const { email, password, full_name, org_id, role, cargo, target_user_id, action } = await req.json();
+    if (action === "update_identity") {
+      if (!target_user_id || !full_name?.trim()) {
+        return new Response(JSON.stringify({ error: "Usuário e nome são obrigatórios" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+      const canonicalName = full_name.trim();
+      const { error: authError } = await adminClient.auth.admin.updateUserById(target_user_id, {
+        user_metadata: { full_name: canonicalName, name: canonicalName },
+      });
+      if (authError) {
+        return new Response(JSON.stringify({ error: authError.message }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+      const { error: profileError } = await adminClient
+        .from("profiles")
+        .update({ full_name: canonicalName })
+        .eq("user_id", target_user_id);
+      if (profileError) {
+        return new Response(JSON.stringify({ error: profileError.message }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+      return new Response(JSON.stringify({ ok: true }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
     if (!email || !password) {
       return new Response(JSON.stringify({ error: "Email e senha são obrigatórios" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }

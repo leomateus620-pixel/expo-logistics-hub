@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
+import { officialMemberLabel, resolveOfficialMembers, type MemberIdentityRecord } from '@/lib/memberIdentity';
 import type {
   CronogramaDashboardLog,
   DashboardLogStatus,
@@ -59,23 +60,21 @@ function chunk<T>(values: T[], size: number) {
   );
 }
 
-async function loadProfileLabels(userIds: string[], signal?: AbortSignal) {
+async function loadMemberLabels(userIds: string[], signal?: AbortSignal) {
   const labels = new Map<string, string>();
   for (const ids of chunk(userIds, LOG_QUERY_BATCH_SIZE)) {
     let request = dashboardDb
-      .from('profiles')
-      .select('user_id,full_name')
+      .from('org_members')
+      .select('user_id,nome_exibicao,is_active,is_core_team')
       .in('user_id', ids)
       .limit(LOG_QUERY_BATCH_SIZE);
     if (signal) request = request.abortSignal(signal);
     const { data, error } = await request;
     if (error) continue;
-    for (const value of data ?? []) {
-      const row = value as JsonRecord;
-      const userId = readString(row, 'user_id');
-      const fullName = readString(row, 'full_name');
-      if (userId && fullName) labels.set(userId, fullName);
-    }
+    resolveOfficialMembers((data ?? []) as MemberIdentityRecord[]).forEach((member, userId) => {
+      const label = officialMemberLabel(member);
+      if (label) labels.set(userId, label);
+    });
   }
   return labels;
 }
@@ -120,7 +119,7 @@ async function loadDashboardLogs(
         .filter((value): value is string => Boolean(value)),
     ),
   );
-  const profileLabels = await loadProfileLabels(userIds, signal);
+  const memberLabels = await loadMemberLabels(userIds, signal);
 
   return {
     partial,
@@ -136,7 +135,7 @@ async function loadDashboardLogs(
         previousValue: asRecord(row.previous_value),
         newValue: asRecord(row.new_value),
         userId,
-        userLabel: (userId && profileLabels.get(userId)) || 'Usuário autenticado',
+        userLabel: (userId && memberLabels.get(userId)) || 'Usuário autenticado',
         createdAt,
       };
     }),

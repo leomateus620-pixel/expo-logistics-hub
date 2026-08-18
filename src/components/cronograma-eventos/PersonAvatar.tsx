@@ -5,6 +5,7 @@ import '@/styles/cronograma-registration-interactions.css';
 
 interface PersonAvatarProps {
   name?: string | null;
+  userId?: string | null;
   /** Rendered when the person has no portrait or the image fails to load. */
   fallback: ReactNode;
   size?: 'xs' | 'sm' | 'md' | 'lg';
@@ -15,9 +16,9 @@ interface PersonAvatarProps {
  * Circular portrait for the members that have an official photo, with a safe
  * fallback to the module's existing initials/icon treatment.
  */
-export function PersonAvatar({ name, fallback, size = 'md', className }: PersonAvatarProps) {
+export function PersonAvatar({ name, userId, fallback, size = 'md', className }: PersonAvatarProps) {
   const [failed, setFailed] = useState(false);
-  const photo = getPersonPhoto(name);
+  const photo = getPersonPhoto(name, userId);
 
   if (!photo || failed) return <>{fallback}</>;
 
@@ -40,7 +41,7 @@ export { getPersonPhoto };
 
 interface EventPeopleAvatarsProps {
   /** Responsible first, guests after — only people with a portrait render. */
-  people: Array<{ key: string; label: string; isPrimary?: boolean }>;
+  people: Array<{ key: string; label: string; userId?: string | null; isPrimary?: boolean }>;
   className?: string;
   size?: 'xs' | 'sm' | 'md' | 'lg';
 }
@@ -50,7 +51,7 @@ interface EventPeopleAvatarsProps {
  * Renders nothing when none of the linked people has an official photo.
  */
 export function EventPeopleAvatars({ people, className, size = 'sm' }: EventPeopleAvatarsProps) {
-  const withPhoto = people.filter((person) => getPersonPhoto(person.label));
+  const withPhoto = people.filter((person) => getPersonPhoto(person.label, person.userId));
   if (withPhoto.length === 0) return null;
 
   return (
@@ -59,6 +60,7 @@ export function EventPeopleAvatars({ people, className, size = 'sm' }: EventPeop
         <PersonAvatar
           key={person.key}
           name={person.label}
+          userId={person.userId}
           size={size}
           className={index === 0 && person.isPrimary ? 'is-primary' : undefined}
           fallback={null}
