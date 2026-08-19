@@ -467,17 +467,10 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
 
       <div className="commercial-map-body">
         <CommercialMapDock
-          entities={data.entities}
-          lots={data.lots}
+          lots={summaryLots}
           areaScope={areaScope}
-          onAreaScopeChange={setAreaScope}
-          activeSegmentId={activeSegmentId}
-          onSegmentSelect={handleSegmentSelect}
-          onSegmentClear={handleSegmentClear}
-          permissions={permissions}
-          hasSelection={Boolean(selectedEntity)}
+          segmentName={activeSegment?.name ?? scopedSegment?.name}
           isCommissionScope={isCommissionScope}
-          managementActions={managementActions}
         />
 
         <div id="commercial-map-viewport" className="commercial-map-viewport">
