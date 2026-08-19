@@ -27,11 +27,11 @@ import {
 import { useCommercialMapStore } from './state/useCommercialMapStore';
 import { CommercialMapCanvas } from './components/canvas/CommercialMapCanvas';
 import { MapToolbar } from './components/controls/MapToolbar';
+import { CommercialMapTopBar } from './components/controls/CommercialMapTopBar';
 import { CommercialMapDock } from './components/dock/CommercialMapDock';
 import { GeometryEditor } from './components/editor/GeometryEditor';
 import { LotCreationWorkspace } from './components/editor/LotCreationWorkspace';
 import {
-  CommercialSummary,
   EntityDetailsPanel,
   LayersPanel,
   StatusLegend,
@@ -467,17 +467,10 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
 
       <div className="commercial-map-body">
         <CommercialMapDock
-          entities={data.entities}
-          lots={data.lots}
+          lots={summaryLots}
           areaScope={areaScope}
-          onAreaScopeChange={setAreaScope}
-          activeSegmentId={activeSegmentId}
-          onSegmentSelect={handleSegmentSelect}
-          onSegmentClear={handleSegmentClear}
-          permissions={permissions}
-          hasSelection={Boolean(selectedEntity)}
+          segmentName={activeSegment?.name ?? scopedSegment?.name}
           isCommissionScope={isCommissionScope}
-          managementActions={managementActions}
         />
 
         <div id="commercial-map-viewport" className="commercial-map-viewport">
@@ -539,10 +532,18 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
                 </>
               ) : (
                 <>
-                  <CommercialSummary
-                    lots={summaryLots}
-                    scope={areaScope}
-                    segmentName={activeSegment?.name ?? scopedSegment?.name}
+                  <CommercialMapTopBar
+                    entities={data.entities}
+                    lots={data.lots}
+                    areaScope={areaScope}
+                    onAreaScopeChange={setAreaScope}
+                    activeSegmentId={activeSegmentId}
+                    onSegmentSelect={handleSegmentSelect}
+                    onSegmentClear={handleSegmentClear}
+                    permissions={permissions}
+                    hasSelection={Boolean(selectedEntity)}
+                    isCommissionScope={isCommissionScope}
+                    managementActions={managementActions}
                   />
                   <MapToolbar
                     permissions={permissions}
