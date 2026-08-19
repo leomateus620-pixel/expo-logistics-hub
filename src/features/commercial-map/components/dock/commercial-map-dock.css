@@ -246,3 +246,60 @@
   .commercial-map-dock,
   .commercial-map-dock__section-chevron { transition: none; }
 }
+
+/* Commercial summary hosted inside the rail */
+.commercial-map-dock .commercial-map-summary.is-dock {
+  position: static;
+  display: flex;
+  width: 100%;
+  max-width: none;
+  flex-direction: column;
+  gap: 3px;
+  padding: 7px;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 10px 26px -22px oklch(var(--brand-navy-900) / .8);
+  backdrop-filter: none;
+}
+.commercial-map-dock .commercial-map-summary.is-dock > div,
+.commercial-map-dock .commercial-map-summary.is-dock > button {
+  min-width: 0;
+  padding: 7px 9px;
+}
+.commercial-map-dock .commercial-map-summary.is-dock > button {
+  display: grid;
+  grid-template-columns: 10px auto minmax(0, 1fr);
+  align-items: center;
+  gap: 9px;
+}
+.commercial-map-dock .commercial-map-summary.is-dock > button i { position: static; width: 9px; height: 9px; }
+.commercial-map-dock .commercial-map-summary.is-dock > button strong { font-size: 13px; }
+.commercial-map-dock .commercial-map-summary.is-dock span { font-size: 9.5px; white-space: normal; }
+.commercial-map-dock .commercial-map-summary.is-dock .commercial-map-summary-primary {
+  border-right: 0;
+  border-bottom: 1px solid rgba(25, 61, 36, .1);
+  border-radius: 10px 10px 0 0;
+  padding-bottom: 9px;
+}
+.commercial-map-dock .commercial-map-summary.is-dock .commercial-map-summary-value {
+  border-left: 0;
+  border-top: 1px solid rgba(25, 61, 36, .1);
+  margin-top: 3px;
+  padding-top: 9px;
+}
+
+.commercial-map-dock .commercial-map-summary.is-compact {
+  gap: 5px;
+  padding: 5px;
+  border-radius: 13px;
+}
+.commercial-map-dock .commercial-map-summary.is-compact > div,
+.commercial-map-dock .commercial-map-summary.is-compact > button {
+  align-items: center;
+  justify-content: center;
+  padding: 6px 2px;
+  text-align: center;
+}
+.commercial-map-dock .commercial-map-summary.is-compact > button { grid-template-columns: minmax(0, 1fr); gap: 3px; }
+.commercial-map-dock .commercial-map-summary.is-compact > button strong { font-size: 11px; }
+.commercial-map-dock .commercial-map-summary.is-compact .commercial-map-summary-primary strong { font-size: 15px; }
