@@ -24,14 +24,6 @@ export function CommercialMapShell({ children }: { children: ReactNode }) {
     return () => window.cancelAnimationFrame(frame);
   }, [isSearchOpen]);
 
-  useEffect(() => {
-    const compactViewport = window.matchMedia('(max-width: 720px), (max-width: 950px) and (max-height: 520px)');
-    const syncSearchMode = () => {
-      if (!compactViewport.matches) setIsSearchOpen(false);
-    };
-    compactViewport.addEventListener('change', syncSearchMode);
-    return () => compactViewport.removeEventListener('change', syncSearchMode);
-  }, []);
 
   const closeSearch = (clear = false) => {
     if (clear) setSearch('');
@@ -57,7 +49,7 @@ export function CommercialMapShell({ children }: { children: ReactNode }) {
         Ir para o mapa comercial
       </a>
 
-      <header className="commercial-map-module__bar">
+      <header className={`commercial-map-module__bar ${isSearchOpen ? 'is-search-open' : ''}`}>
         <div className="commercial-map-module__leading">
           <Link
             to="/portal"
@@ -68,7 +60,23 @@ export function CommercialMapShell({ children }: { children: ReactNode }) {
             <span>Portal</span>
           </Link>
 
-          {!isSearchOpen && <span className="commercial-map-module__divider" aria-hidden="true" />}
+          <span className="commercial-map-module__divider" aria-hidden="true" />
+
+          <div className="commercial-map-module__identity">
+            <FenasojaBrand
+              compact
+              markOnly
+              tone="dark"
+              className="commercial-map-module__brand"
+            />
+            <span className="commercial-map-module__icon" aria-hidden="true">
+              <MapPinned />
+            </span>
+            <span className="commercial-map-module__title-group">
+              <span className="commercial-map-module__eyebrow">Gestão territorial</span>
+              <strong>Mapa Comercial</strong>
+            </span>
+          </div>
 
           {isSearchOpen ? (
             <form
@@ -78,7 +86,6 @@ export function CommercialMapShell({ children }: { children: ReactNode }) {
               onSubmit={(event) => {
                 event.preventDefault();
                 setActivePanel('results');
-                closeSearch(false);
               }}
             >
               <Search aria-hidden="true" />
@@ -103,27 +110,6 @@ export function CommercialMapShell({ children }: { children: ReactNode }) {
               </button>
             </form>
           ) : (
-            <div className="commercial-map-module__identity">
-              <FenasojaBrand
-                compact
-                markOnly
-                tone="dark"
-                className="commercial-map-module__brand"
-              />
-              <span className="commercial-map-module__icon" aria-hidden="true">
-                <MapPinned />
-              </span>
-              <span className="commercial-map-module__title-group">
-                <span className="commercial-map-module__eyebrow">Gestão territorial</span>
-                <strong>Mapa Comercial</strong>
-              </span>
-            </div>
-          )}
-        </div>
-
-        <div className="commercial-map-module__actions">
-          <span className="commercial-map-module__edition">FENASOJA 2028</span>
-          {!isSearchOpen && (
             <button
               ref={searchTriggerRef}
               type="button"
@@ -135,8 +121,14 @@ export function CommercialMapShell({ children }: { children: ReactNode }) {
               data-commercial-map-shell-search-trigger
             >
               <Search aria-hidden="true" />
+              <span>Buscar no mapa</span>
             </button>
           )}
+        </div>
+
+
+        <div className="commercial-map-module__actions">
+          <span className="commercial-map-module__edition">FENASOJA 2028</span>
           <Button
             type="button"
             variant="ghost"
