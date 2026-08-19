@@ -1,4 +1,3 @@
-import type { ComponentType } from 'react';
 import {
   Box,
   Compass,
@@ -9,6 +8,7 @@ import {
   Signpost,
   Tractor,
   Trees,
+  type LucideIcon,
 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { CAMERA_PRESETS } from '../../constants';
@@ -19,7 +19,7 @@ import type { CommercialMapAreaScope } from '../../utils/areaScope';
 import { canUseTechnicalValidationOverlay } from '../../utils/technicalValidation';
 import './commercial-map-topbar.css';
 
-const PRESET_ICONS: Record<string, ComponentType<{ 'aria-hidden'?: boolean | 'true' }>> = {
+const PRESET_ICONS: Record<string, LucideIcon> = {
   overview: Compass,
   exporural: Tractor,
   top: Grid2x2,
@@ -62,7 +62,7 @@ export function CommercialMapTopBar({
 
   const renderAction = (
     key: string,
-    Icon: ComponentType<{ 'aria-hidden'?: boolean | 'true' }>,
+    Icon: LucideIcon,
     label: string,
     onClick: () => void,
     options: { active?: boolean; disabled?: boolean } = {},
