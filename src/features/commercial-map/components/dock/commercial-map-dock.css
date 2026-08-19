@@ -13,7 +13,7 @@
   transition: width .22s cubic-bezier(.16, 1, .3, 1);
 }
 
-.commercial-map-dock.is-expanded { width: 296px; }
+.commercial-map-dock.is-expanded { width: 232px; }
 
 .commercial-map-dock__head {
   display: flex;
@@ -232,7 +232,7 @@
     top: 0;
     bottom: 0;
     left: 0;
-    width: 288px;
+    width: 232px;
     border-radius: 0 16px 16px 0;
     box-shadow: 18px 0 44px -28px oklch(var(--brand-navy-900) / .85);
   }
@@ -306,3 +306,8 @@
 
 .commercial-map-dock.is-compact .commercial-map-dock__scroll { padding-inline: 6px; }
 .commercial-map-dock.is-compact .commercial-map-summary.is-compact { width: 46px; }
+
+.commercial-map-dock__summary-slot { margin-top: auto; width: 100%; padding-top: 10px; }
+.commercial-map-dock.is-compact .commercial-map-dock__summary-slot { display: flex; justify-content: center; }
+.commercial-map-dock__section-copy strong { font-size: 10.5px; letter-spacing: .01em; }
+.commercial-map-dock__section-copy small { font-size: 9px; }
