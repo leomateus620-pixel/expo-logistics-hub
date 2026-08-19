@@ -137,20 +137,6 @@ export function CommercialMapShell({ children }: { children: ReactNode }) {
 
         <div className="commercial-map-module__actions">
           <span className="commercial-map-module__edition">FENASOJA 2028</span>
-          {!isSearchOpen && (
-            <button
-              ref={searchTriggerRef}
-              type="button"
-              className={`commercial-map-module__search-trigger ${search ? 'has-query' : ''}`}
-              onClick={() => setIsSearchOpen(true)}
-              aria-label={search ? 'Abrir busca do mapa, filtro ativo' : 'Buscar no mapa comercial'}
-              aria-expanded={isSearchOpen}
-              aria-controls="commercial-map-mobile-search"
-              data-commercial-map-shell-search-trigger
-            >
-              <Search aria-hidden="true" />
-            </button>
-          )}
           <Button
             type="button"
             variant="ghost"
