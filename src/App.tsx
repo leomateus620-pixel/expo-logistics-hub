@@ -30,6 +30,7 @@ import {
   VenueRouteLoading,
 } from './components/venue-events/VenueRouteState';
 import LoginPage from './pages/LoginPage';
+import OAuthConsent from './pages/OAuthConsent';
 import {
   getCommissionModule,
 } from './modules/commissions/commissionRegistry';
@@ -411,6 +412,7 @@ const App = () => (
             <Routes>
               <Route path="/" element={<RootRoute />} />
               <Route path="/portal" element={<Suspended><CommissionPortalPage /></Suspended>} />
+              <Route path="/.lovable/oauth/consent" element={<OAuthConsent />} />
               <Route path="/unsubscribe" element={<Suspended><UnsubscribePage /></Suspended>} />
               <Route path="/login/admin" element={<LoginPage />} />
               <Route path="/login/:moduleSlug" element={<LoginPage />} />
