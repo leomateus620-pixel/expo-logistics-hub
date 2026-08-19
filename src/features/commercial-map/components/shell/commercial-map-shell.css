@@ -374,9 +374,11 @@
   .commercial-map-module__edition,
   .commercial-map-module__eyebrow { display: none; }
 
-  .commercial-map-module__search-trigger,
-  .commercial-map-module__search { display: flex; }
+  .commercial-map-module__search-trigger span { display: none; }
+  .commercial-map-module__search { width: auto; flex: 1; }
+  .commercial-map-module__bar.is-search-open .commercial-map-module__identity { display: none; }
   .commercial-map-module__search input { font-size: 16px; }
+
 
   .commercial-map-module__leading { min-width: 0; flex: 1; }
   .commercial-map-module__back,
