@@ -77,10 +77,15 @@ export function CommercialSummary({
   lots,
   scope = 'park',
   segmentName,
+  variant = 'floating',
+  compact = false,
 }: {
   lots: CommercialLot[];
   scope?: CommercialMapAreaScope;
   segmentName?: string;
+  /** `dock` renders the summary vertically inside the left rail. */
+  variant?: 'floating' | 'dock';
+  compact?: boolean;
 }) {
   const toggleStatus = useCommercialMapStore((state) => state.toggleStatus);
   const statusFilters = useCommercialMapStore((state) => state.statusFilters);
@@ -96,38 +101,58 @@ export function CommercialSummary({
     return { byStatus, availableArea, soldValue };
   }, [lots]);
 
+  const isDock = variant === 'dock';
+  const isCompact = isDock && compact;
+
   return (
     <div
-      className="commercial-map-summary"
+      className={`commercial-map-summary${isDock ? ' is-dock' : ''}${isCompact ? ' is-compact' : ''}`}
       aria-label={segmentName
         ? `Resumo comercial de ${segmentName}`
         : scope === 'exporural' ? 'Resumo comercial da Exporural' : 'Resumo comercial'}
     >
       <div className="commercial-map-summary-primary">
         <strong>{lots.length}</strong>
-        <span>{segmentName ? 'lotes no segmento' : scope === 'exporural' ? 'lotes Exporural' : 'lotes cadastrados'}</span>
+        {!isCompact && (
+          <span>{segmentName ? 'lotes no segmento' : scope === 'exporural' ? 'lotes Exporural' : 'lotes cadastrados'}</span>
+        )}
       </div>
-      {(['BLOCKED', 'AVAILABLE', 'RESERVED', 'IN_NEGOTIATION', 'SOLD'] as const).map((status) => (
-        <button
-          type="button"
-          key={status}
-          className={statusFilters.includes(status) ? 'is-active' : ''}
-          onClick={() => toggleStatus(status)}
-          aria-pressed={statusFilters.includes(status)}
-          aria-label={`${STATUS_CONFIG[status].label}: ${totals.byStatus[status]} ${totals.byStatus[status] === 1 ? 'lote' : 'lotes'}`}
-        >
-          <i style={{ background: STATUS_CONFIG[status].color }} />
-          <strong>{totals.byStatus[status]}</strong>
-          <span>{STATUS_CONFIG[status].shortLabel}</span>
-        </button>
-      ))}
-      <div className="commercial-map-summary-value">
-        <strong>{areaNumber.format(totals.availableArea)} m²</strong>
-        <span>área oficial disponível</span>
-      </div>
+      {(['BLOCKED', 'AVAILABLE', 'RESERVED', 'IN_NEGOTIATION', 'SOLD'] as const).map((status) => {
+        const button = (
+          <button
+            type="button"
+            key={status}
+            className={statusFilters.includes(status) ? 'is-active' : ''}
+            onClick={() => toggleStatus(status)}
+            aria-pressed={statusFilters.includes(status)}
+            aria-label={`${STATUS_CONFIG[status].label}: ${totals.byStatus[status]} ${totals.byStatus[status] === 1 ? 'lote' : 'lotes'}`}
+          >
+            <i style={{ background: STATUS_CONFIG[status].color }} />
+            <strong>{totals.byStatus[status]}</strong>
+            {!isCompact && <span>{STATUS_CONFIG[status].shortLabel}</span>}
+          </button>
+        );
+
+        if (!isCompact) return button;
+        return (
+          <Tooltip key={status}>
+            <TooltipTrigger asChild>{button}</TooltipTrigger>
+            <TooltipContent side="right">
+              {STATUS_CONFIG[status].label}: {totals.byStatus[status]}
+            </TooltipContent>
+          </Tooltip>
+        );
+      })}
+      {!isCompact && (
+        <div className="commercial-map-summary-value">
+          <strong>{areaNumber.format(totals.availableArea)} m²</strong>
+          <span>área oficial disponível</span>
+        </div>
+      )}
     </div>
   );
 }
+
 
 export function StatusLegend({ scope = 'park' }: { scope?: CommercialMapAreaScope }) {
   const [expanded, setExpanded] = useState(false);
