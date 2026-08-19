@@ -124,6 +124,7 @@ export function CommercialMapTopBar({
                 type="button"
                 className={`commercial-map-topbar__trigger ${open ? 'is-open' : ''}`}
                 aria-label={label}
+                {...(id === 'search' ? { 'data-commercial-map-shell-search-trigger': '' } : {})}
               >
                 {icon}
                 {flagged && <i aria-hidden="true" />}

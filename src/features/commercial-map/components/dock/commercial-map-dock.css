@@ -303,3 +303,6 @@
 .commercial-map-dock .commercial-map-summary.is-compact > button { grid-template-columns: minmax(0, 1fr); gap: 3px; }
 .commercial-map-dock .commercial-map-summary.is-compact > button strong { font-size: 11px; }
 .commercial-map-dock .commercial-map-summary.is-compact .commercial-map-summary-primary strong { font-size: 15px; }
+
+.commercial-map-dock.is-compact .commercial-map-dock__scroll { padding-inline: 6px; }
+.commercial-map-dock.is-compact .commercial-map-summary.is-compact { width: 46px; }
