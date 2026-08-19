@@ -24,14 +24,6 @@ export function CommercialMapShell({ children }: { children: ReactNode }) {
     return () => window.cancelAnimationFrame(frame);
   }, [isSearchOpen]);
 
-  useEffect(() => {
-    const compactViewport = window.matchMedia('(max-width: 720px), (max-width: 950px) and (max-height: 520px)');
-    const syncSearchMode = () => {
-      if (!compactViewport.matches) setIsSearchOpen(false);
-    };
-    compactViewport.addEventListener('change', syncSearchMode);
-    return () => compactViewport.removeEventListener('change', syncSearchMode);
-  }, []);
 
   const closeSearch = (clear = false) => {
     if (clear) setSearch('');
