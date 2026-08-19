@@ -1,0 +1,1 @@
+ALTER TABLE public.org_members ADD COLUMN IF NOT EXISTS data_nascimento date;
