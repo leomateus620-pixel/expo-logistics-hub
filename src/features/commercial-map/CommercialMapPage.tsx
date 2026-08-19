@@ -533,18 +533,12 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
               ) : (
                 <>
                   <CommercialMapTopBar
-                    entities={data.entities}
-                    lots={data.lots}
                     areaScope={areaScope}
-                    onAreaScopeChange={setAreaScope}
-                    activeSegmentId={activeSegmentId}
-                    onSegmentSelect={handleSegmentSelect}
-                    onSegmentClear={handleSegmentClear}
                     permissions={permissions}
                     hasSelection={Boolean(selectedEntity)}
                     isCommissionScope={isCommissionScope}
-                    managementActions={managementActions}
                   />
+
                   <MapToolbar
                     permissions={permissions}
                     hasSelection={Boolean(selectedEntity)}
