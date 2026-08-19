@@ -1,0 +1,180 @@
+{
+  "version": 1,
+  "sdk_version": "0.26.2",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://btfaumhroqtqzxomqorx.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "fenasoja-log",
+      "version": "0.1.0",
+      "title": "Fenasoja Log"
+    },
+    "tools": [
+      {
+        "name": "list_events",
+        "title": "Listar eventos do cronograma",
+        "description": "Lista eventos da Agenda Fenasoja (cronograma) visíveis para o usuário, com filtros de período, status e busca por título.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "from_date": {
+              "type": "string",
+              "description": "Data inicial (YYYY-MM-DD)."
+            },
+            "to_date": {
+              "type": "string",
+              "description": "Data final (YYYY-MM-DD)."
+            },
+            "status": {
+              "type": "string",
+              "description": "Status do evento, ex.: planejado, concluido, cancelado."
+            },
+            "search": {
+              "type": "string",
+              "description": "Texto buscado no título do evento."
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "description": "Quantidade máxima de eventos."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "get_event",
+        "title": "Detalhar evento",
+        "description": "Retorna todos os dados de um evento do cronograma, incluindo comissões vinculadas, responsáveis e subeventos.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "event_id": {
+              "type": "string",
+              "format": "uuid",
+              "description": "ID do evento."
+            }
+          },
+          "required": [
+            "event_id"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "create_event",
+        "title": "Criar evento no cronograma",
+        "description": "Cria um novo evento na Agenda Fenasoja para a organização do usuário autenticado.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "title": {
+              "type": "string",
+              "minLength": 1,
+              "description": "Título do evento."
+            },
+            "start_date": {
+              "type": "string",
+              "description": "Data de início (YYYY-MM-DD)."
+            },
+            "end_date": {
+              "type": "string",
+              "description": "Data de término (YYYY-MM-DD)."
+            },
+            "start_time": {
+              "type": "string",
+              "description": "Horário de início (HH:MM)."
+            },
+            "end_time": {
+              "type": "string",
+              "description": "Horário de término (HH:MM)."
+            },
+            "location": {
+              "type": "string",
+              "description": "Local do evento."
+            },
+            "description": {
+              "type": "string",
+              "description": "Descrição/observações."
+            },
+            "priority": {
+              "type": "string",
+              "description": "Prioridade do evento."
+            }
+          },
+          "required": [
+            "title",
+            "start_date"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_transports",
+        "title": "Listar transportes",
+        "description": "Lista transportes da logística Fenasoja visíveis para o usuário, com filtro por status e período de início.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "description": "Status do transporte: pendente, em_andamento, concluido ou cancelado."
+            },
+            "from_datetime": {
+              "type": "string",
+              "description": "Início mínimo (ISO 8601)."
+            },
+            "to_datetime": {
+              "type": "string",
+              "description": "Início máximo (ISO 8601)."
+            },
+            "limit": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20,
+              "description": "Quantidade máxima de registros."
+            }
+          },
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}
