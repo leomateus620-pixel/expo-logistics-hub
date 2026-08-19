@@ -4512,6 +4512,7 @@ export type Database = {
           cargo: string | null
           commission_id: string | null
           created_at: string
+          data_nascimento: string | null
           id: string
           is_active: boolean
           is_core_team: boolean
@@ -4528,6 +4529,7 @@ export type Database = {
           cargo?: string | null
           commission_id?: string | null
           created_at?: string
+          data_nascimento?: string | null
           id?: string
           is_active?: boolean
           is_core_team?: boolean
@@ -4544,6 +4546,7 @@ export type Database = {
           cargo?: string | null
           commission_id?: string | null
           created_at?: string
+          data_nascimento?: string | null
           id?: string
           is_active?: boolean
           is_core_team?: boolean
