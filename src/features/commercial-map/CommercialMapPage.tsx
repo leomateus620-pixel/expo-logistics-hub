@@ -38,6 +38,7 @@ import {
 } from './components/panels/MapPanels';
 import { MapListView, ResultsPanel } from './components/panels/EntityExplorer';
 import { CalibrationPanel } from './components/panels/CalibrationPanel';
+import { PavilionModuleCard } from './components/panels/PavilionModuleCard';
 import { PavilionPlanLegend } from './components/panels/PavilionPlanLegend';
 import { SegmentLegend } from './components/segments/SegmentLegend';
 import { resolveStrategicLandmarkKind } from './utils/landmarks';
@@ -535,7 +536,10 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
                     <kbd>Esc</kbd>
                   </div>
                   {interiorPavilionPlan && (
-                    <PavilionPlanLegend plan={interiorPavilionPlan} variant="interior" />
+                    <>
+                      <PavilionPlanLegend plan={interiorPavilionPlan} variant="interior" />
+                      <PavilionModuleCard plan={interiorPavilionPlan} />
+                    </>
                   )}
                 </>
               ) : (
