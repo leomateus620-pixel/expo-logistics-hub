@@ -98,12 +98,12 @@ function createTreeMaterials(shadowTexture: THREE.Texture) {
     }),
     crown: new THREE.MeshStandardMaterial({
       color: '#ffffff',
-      roughness: 0.9,
+      roughness: 0.94,
       metalness: 0,
       vertexColors: true,
       transparent: true,
-      emissive: '#315f38',
-      emissiveIntensity: 0.48,
+      emissive: '#2c5233',
+      emissiveIntensity: 0.16,
     }),
     shadow: new THREE.MeshBasicMaterial({
       color: '#ffffff',
@@ -120,24 +120,41 @@ function createTreeMaterials(shadowTexture: THREE.Texture) {
   };
 }
 
+/**
+ * Smaller, flattened lobes distributed over two tiers with deterministic
+ * jitter. The canopy reads as foliage instead of one opaque green mass, and it
+ * hides less of the lots and labels underneath.
+ */
 function crownLobeTransform(tree: CommercialMapTree, lobeIndex: number, lobeCount: number) {
-  const phase = tree.visualVariant * 0.83 + lobeIndex * 2.14;
+  const seed = tree.visualVariant + 1;
   const isCentral = lobeIndex === 0;
   const ringIndex = Math.max(0, lobeIndex - 1);
   const ringCount = Math.max(1, lobeCount - 1);
-  const ringPhase = tree.visualVariant * 0.44 + (ringIndex / ringCount) * Math.PI * 2;
-  const radius = isCentral ? tree.canopyRadius * 0.08 : tree.canopyRadius * (0.31 + (tree.visualVariant % 2) * 0.025);
-  const widthVariation = 0.88 + ((tree.visualVariant + lobeIndex * 2) % 5) * 0.035;
-  const depthVariation = 0.86 + ((tree.visualVariant * 2 + lobeIndex) % 4) * 0.04;
-  const verticalVariation = 0.88 + ((tree.visualVariant + lobeIndex) % 3) * 0.055;
+  const upperTier = !isCentral && ringIndex % 2 === 1;
+  const angleJitter = (lobeNoise(seed, lobeIndex * 3.1) - 0.5) * 0.72;
+  const ringPhase = seed * 0.44 + (ringIndex / ringCount) * Math.PI * 2 + angleJitter;
+  const radialJitter = 0.82 + lobeNoise(seed, lobeIndex * 5.7) * 0.46;
+  const radius = isCentral
+    ? tree.canopyRadius * 0.06
+    : tree.canopyRadius * (upperTier ? 0.26 : 0.42) * radialJitter;
+  const widthVariation = 0.82 + lobeNoise(seed, lobeIndex * 7.3) * 0.34;
+  const depthVariation = 0.8 + lobeNoise(seed, lobeIndex * 9.1) * 0.36;
+  const verticalVariation = 0.78 + lobeNoise(seed, lobeIndex * 11.5) * 0.32;
+  const tierHeight = isCentral
+    ? 0.16
+    : upperTier
+      ? 0.24 + lobeNoise(seed, lobeIndex * 2.3) * 0.1
+      : -0.06 + lobeNoise(seed, lobeIndex * 4.9) * 0.09;
+  const lobeSpread = isCentral ? 0.62 : upperTier ? 0.42 : 0.5;
+  const lobeHeight = isCentral ? 0.42 : upperTier ? 0.3 : 0.32;
   return {
     offsetX: Math.cos(ringPhase) * radius,
-    offsetY: tree.crownHeight * (isCentral ? 0.08 : -0.015 + (ringIndex % 2) * 0.065),
+    offsetY: tree.crownHeight * tierHeight,
     offsetZ: Math.sin(ringPhase) * radius,
-    rotation: phase,
-    scaleX: tree.canopyRadius * (isCentral ? 0.84 : 0.69) * widthVariation,
-    scaleY: tree.crownHeight * (isCentral ? 0.48 : 0.39) * verticalVariation,
-    scaleZ: tree.canopyRadius * (isCentral ? 0.82 : 0.68) * depthVariation,
+    rotation: seed * 0.83 + lobeIndex * 2.14,
+    scaleX: tree.canopyRadius * lobeSpread * widthVariation,
+    scaleY: tree.crownHeight * lobeHeight * verticalVariation,
+    scaleZ: tree.canopyRadius * lobeSpread * 0.96 * depthVariation,
   };
 }
 
