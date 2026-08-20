@@ -21,7 +21,11 @@ function useDisposableInstancedMeshRef() {
   const mesh = useRef<THREE.InstancedMesh | null>(null);
   const setMesh = useCallback((next: THREE.InstancedMesh | null) => {
     const previous = mesh.current;
-    if (previous && previous !== next) previous.dispose();
+    if (previous && previous !== next) {
+      // eslint-disable-next-line no-console
+      console.log('DEBUG previous', typeof previous, (previous as any)?.constructor?.name, Object.keys(previous as any).slice(0, 8));
+      previous.dispose();
+    }
     mesh.current = next;
   }, []);
   return [mesh, setMesh] as const;
