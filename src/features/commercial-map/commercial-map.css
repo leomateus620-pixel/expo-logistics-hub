@@ -1155,3 +1155,55 @@
 @media (min-width: 721px) {
   .commercial-map-actions { display: none; }
 }
+
+/* Detalhe do módulo selecionado dentro do pavilhão */
+.commercial-pavilion-module-card {
+  --pavilion-plan-accent: #1f7d5c;
+  position: absolute;
+  z-index: 16;
+  top: 84px;
+  right: 14px;
+  width: min(304px, calc(100% - 28px));
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--pavilion-plan-accent) 32%, #d7dfd8);
+  border-radius: 16px;
+  background: rgba(250, 252, 248, .95);
+  color: #213b2c;
+  box-shadow: 0 18px 46px rgba(26, 56, 36, .18);
+  backdrop-filter: blur(16px) saturate(1.08);
+}
+.commercial-pavilion-module-card > header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 8px;
+  border-bottom: 1px solid rgba(31, 66, 43, .08);
+  background: linear-gradient(180deg, color-mix(in srgb, var(--pavilion-plan-accent) 12%, transparent), transparent);
+  padding: 12px 12px 10px;
+}
+.commercial-pavilion-module-card > header > div { display: flex; min-width: 0; flex-direction: column; gap: 1px; }
+.commercial-pavilion-module-card header span { color: #718078; font-size: 10px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+.commercial-pavilion-module-card header strong { color: #173d2a; font-size: 19px; line-height: 1.1; letter-spacing: -.01em; }
+.commercial-pavilion-module-card header small { overflow: hidden; color: #55675d; font-size: 11px; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
+.commercial-pavilion-module-card header button {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid rgba(31, 66, 43, .14);
+  border-radius: 9px;
+  background: rgba(255, 255, 255, .8);
+  color: #46584d;
+  transition: background .18s ease, color .18s ease;
+}
+.commercial-pavilion-module-card header button:hover { background: #eef3ec; color: #173d2a; }
+.commercial-pavilion-module-card header button svg { width: 14px; height: 14px; }
+.commercial-pavilion-module-card dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 10px; padding: 12px; }
+.commercial-pavilion-module-card dt { color: #718078; font-size: 9.5px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+.commercial-pavilion-module-card dd { margin: 2px 0 0; color: #1d3a2a; font-size: 13px; font-weight: 700; line-height: 1.25; }
+.commercial-pavilion-module-card footer { border-top: 1px solid rgba(31, 66, 43, .08); padding: 8px 12px 10px; color: #718078; font-size: 10px; font-weight: 600; }
+
+@media (max-width: 720px) {
+  .commercial-pavilion-module-card { top: auto; right: 14px; bottom: 14px; left: 14px; width: auto; }
+  .commercial-pavilion-plan-legend.is-interior { display: none; }
+}
