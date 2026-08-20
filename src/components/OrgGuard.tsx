@@ -1,9 +1,10 @@
 import { ReactNode } from 'react';
-import { Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ShieldAlert } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
+import LoginPage from '@/pages/LoginPage';
 
 function OrgLoading() {
   return (
@@ -24,8 +25,9 @@ export default function OrgGuard({ children }: { children: ReactNode }) {
   }
 
   if (!user) {
-    return <Navigate to="/login" replace state={{ returnTo: location.pathname }} />;
+    return <LoginPage returnTo={`${location.pathname}${location.search}`} />;
   }
+
 
   if (!hasOrg) {
     return (
