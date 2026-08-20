@@ -24,8 +24,14 @@ vi.mock('recharts', () => {
     Tooltip: Element,
     XAxis: Element,
     YAxis: Element,
+    PieChart: Chart,
+    Pie: Element,
   };
 });
+
+vi.mock('@/hooks/useOrgCommissions', () => ({
+  useOrgCommissions: () => ({ units: [], isLoading: false, error: null }),
+}));
 
 const quality = {
   date: true,
@@ -107,11 +113,7 @@ describe('Dashboard executivo do cronograma', () => {
       filterPatch: expect.objectContaining({ period: 'overdue' }),
     }));
 
-    const majorProgress = screen.getByRole('progressbar', {
-      name: /Abertura da Fenasoja/,
-    });
-    fireEvent.click(majorProgress.closest('button')!);
-    expect(onOpenEvent).toHaveBeenCalledWith(main);
+    expect(screen.getByRole('heading', { name: 'Eventos por Comissão e Assessoria' })).toBeInTheDocument();
   });
 
   it('explicita fallback remoto e não fabrica gráficos quando não há eventos', () => {
