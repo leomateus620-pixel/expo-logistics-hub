@@ -15,9 +15,9 @@ const SHADOW_OPACITY = 0.12;
 const UNIT_Y = new THREE.Vector3(0, 1, 0);
 
 const FOLIAGE_PALETTES: Record<CommercialTreeSpeciesGroup, readonly [string, string, string, string]> = {
-  MATURE_BROADLEAF: ['#5c8757', '#6b9660', '#7aa46b', '#8ab079'],
-  OPEN_CANOPY: ['#688c5f', '#779a69', '#87a774', '#97b482'],
-  ORNAMENTAL_COMPACT: ['#5f7f53', '#6d8c5d', '#7d9a68', '#8ca875'],
+  MATURE_BROADLEAF: ['#79ab6d', '#88ba78', '#98c686', '#a8d294'],
+  OPEN_CANOPY: ['#85b174', '#94c07f', '#a3cc8d', '#b2d89b'],
+  ORNAMENTAL_COMPACT: ['#7ba46a', '#8ab276', '#99bf82', '#a9cc90'],
 };
 
 const TRUNK_PALETTES: Record<CommercialTreeSpeciesGroup, readonly [string, string]> = {
@@ -98,12 +98,12 @@ function createTreeMaterials(shadowTexture: THREE.Texture) {
     }),
     crown: new THREE.MeshStandardMaterial({
       color: '#ffffff',
-      roughness: 0.94,
+      roughness: 0.88,
       metalness: 0,
       vertexColors: true,
       transparent: true,
-      emissive: '#2c5233',
-      emissiveIntensity: 0.16,
+      emissive: '#4b7f4f',
+      emissiveIntensity: 0.42,
     }),
     shadow: new THREE.MeshBasicMaterial({
       color: '#ffffff',
