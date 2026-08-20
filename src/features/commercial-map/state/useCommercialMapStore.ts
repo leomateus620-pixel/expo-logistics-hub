@@ -50,6 +50,8 @@ interface CommercialMapState {
   interiorEntityId: string | null;
   interiorReturnView: CommercialMapCameraView | null;
   hoveredEntityId: string | null;
+  hoveredModuleId: string | null;
+  selectedModuleId: string | null;
   search: string;
   statusFilters: CommercialStatus[];
   classificationFilters: MapClassification[];
@@ -81,6 +83,8 @@ interface CommercialMapState {
   exitInterior: () => void;
   setInteriorReturnView: (view: CommercialMapCameraView | null) => void;
   setHoveredEntityId: (id: string | null) => void;
+  setHoveredModuleId: (id: string | null) => void;
+  setSelectedModuleId: (id: string | null) => void;
   setSearch: (search: string) => void;
   toggleStatus: (status: CommercialStatus) => void;
   clearStatuses: () => void;
@@ -115,6 +119,8 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
   interiorEntityId: null,
   interiorReturnView: null,
   hoveredEntityId: null,
+  hoveredModuleId: null,
+  selectedModuleId: null,
   search: '',
   statusFilters: [],
   classificationFilters: [],
@@ -157,6 +163,8 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
       interiorEntityId: null,
       interiorReturnView: null,
       hoveredEntityId: null,
+      hoveredModuleId: null,
+      selectedModuleId: null,
       search: '',
       statusFilters: [],
       classificationFilters: [],
@@ -182,6 +190,8 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
   enterInterior: (selectedEntityId) => set((state) => ({
     selectedEntityId,
     hoveredEntityId: null,
+    hoveredModuleId: null,
+    selectedModuleId: null,
     interiorEntityId: selectedEntityId,
     interiorReturnView: null,
     activePanel: null,
@@ -191,6 +201,8 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
   })),
   exitInterior: () => set((state) => ({
     interiorEntityId: null,
+    hoveredModuleId: null,
+    selectedModuleId: null,
     activePanel: state.selectedEntityId ? 'details' : null,
     workspaceMode: '3d',
     cameraNavigating: false,
@@ -198,6 +210,8 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
   })),
   setInteriorReturnView: (interiorReturnView) => set({ interiorReturnView }),
   setHoveredEntityId: (hoveredEntityId) => set({ hoveredEntityId }),
+  setHoveredModuleId: (hoveredModuleId) => set({ hoveredModuleId }),
+  setSelectedModuleId: (selectedModuleId) => set({ selectedModuleId }),
   setSearch: (search) => set({ search }),
   toggleStatus: (status) => set((state) => ({
     statusFilters: state.statusFilters.includes(status)
@@ -230,6 +244,8 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
   selectEntityFromExplorer: (selectedEntityId) => set((state) => ({
     selectedEntityId,
     hoveredEntityId: null,
+    hoveredModuleId: null,
+    selectedModuleId: null,
     interiorEntityId: null,
     interiorReturnView: null,
     activePanel: 'details',
@@ -255,6 +271,8 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
   })),
   requestCameraPreset: (cameraPreset) => set((state) => ({
     cameraPreset,
+    hoveredModuleId: null,
+    selectedModuleId: null,
     cameraSequence: state.cameraSequence + 1,
     workspaceMode: '3d',
     interiorEntityId: null,
@@ -264,6 +282,8 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
     activeSegmentId,
     selectedEntityId: null,
     hoveredEntityId: null,
+    hoveredModuleId: null,
+    selectedModuleId: null,
     activePanel: null,
     workspaceMode: state.workspaceMode === 'list' ? 'list' : '3d',
     interiorEntityId: null,
