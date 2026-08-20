@@ -53,7 +53,7 @@ export default function OrgGuard({ children }: { children: ReactNode }) {
               className="h-11 rounded-xl"
               onClick={async () => {
                 await signOut();
-                navigate('/login', { replace: true });
+                navigate("/portal", { replace: true });
               }}
             >
               Sair
