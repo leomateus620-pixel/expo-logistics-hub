@@ -24,13 +24,13 @@ describe('renderização compartilhada dos módulos internos', () => {
 
     expect(layer).toContain('unitBoxGeometry.dispose()');
     expect(layer).toContain('labelGeometry.dispose()');
-    expect(layer).toContain('previous.dispose()');
+    expect(layer).toContain('disposeInstancedMesh(previous)');
     expect(layer).toMatch(/numberTexture\?\.dispose\(\);[\s\S]*?labelMaterial\.dispose\(\);/);
     expect(layer).toMatch(/moduleMaterial\.dispose\(\);[\s\S]*?corridorMaterial\.dispose\(\);/);
     expect(layer).toContain('object.scale.set(corridor.projected.width, 0.008, corridor.projected.depth)');
     expect(interior).toContain('unitBoxGeometry.dispose()');
     expect(interior).toContain('floorGeometry?.dispose()');
-    expect(interior).toContain('previous.dispose()');
+    expect(interior).toContain('disposeInstancedMesh(previous)');
     expect(interior).not.toContain('const UNIT_BOX =');
   });
 

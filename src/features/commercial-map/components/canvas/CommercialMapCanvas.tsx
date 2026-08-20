@@ -2111,7 +2111,11 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
           gl.domElement.style.cursor = 'grab';
       }}
       onPointerMissed={() => {
-        if (!interiorEntityId) setSelectedEntityId(null);
+        if (interiorEntityId) {
+          useCommercialMapStore.getState().setSelectedModuleId(null);
+          return;
+        }
+        setSelectedEntityId(null);
       }}
     >
       <Suspense fallback={<CanvasLoader />}>

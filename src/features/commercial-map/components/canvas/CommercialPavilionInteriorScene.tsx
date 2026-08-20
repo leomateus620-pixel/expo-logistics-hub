@@ -13,6 +13,7 @@ import {
 } from '../../utils/commercialPavilions';
 import { resolveCommercialPavilionModulePlan } from '../../utils/commercialPavilionModules';
 import { strategicLandmarkBounds, strategicLandmarkFacingRadians } from '../../utils/landmarks';
+import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
 import { createCommercialPavilionTexture } from './commercialPavilionTextures';
 import { CommercialPavilionModuleLayer } from './CommercialPavilionModuleLayer';
 
@@ -43,7 +44,7 @@ function InteriorInstances({
   const mesh = useRef<THREE.InstancedMesh>(null);
   const setMesh = useCallback((next: THREE.InstancedMesh | null) => {
     const previous = mesh.current;
-    if (previous && previous !== next) previous.dispose();
+    if (previous && previous !== next) disposeInstancedMesh(previous);
     mesh.current = next;
   }, []);
 

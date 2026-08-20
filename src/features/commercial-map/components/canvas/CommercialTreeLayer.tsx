@@ -15,9 +15,9 @@ const SHADOW_OPACITY = 0.12;
 const UNIT_Y = new THREE.Vector3(0, 1, 0);
 
 const FOLIAGE_PALETTES: Record<CommercialTreeSpeciesGroup, readonly [string, string, string, string]> = {
-  MATURE_BROADLEAF: ['#579150', '#66a05a', '#77ae64', '#89ba70'],
-  OPEN_CANOPY: ['#638f5a', '#72a064', '#83ae6e', '#96bd7b'],
-  ORNAMENTAL_COMPACT: ['#59804c', '#6a9056', '#7da061', '#90ae6d'],
+  MATURE_BROADLEAF: ['#79ab6d', '#88ba78', '#98c686', '#a8d294'],
+  OPEN_CANOPY: ['#85b174', '#94c07f', '#a3cc8d', '#b2d89b'],
+  ORNAMENTAL_COMPACT: ['#7ba46a', '#8ab276', '#99bf82', '#a9cc90'],
 };
 
 const TRUNK_PALETTES: Record<CommercialTreeSpeciesGroup, readonly [string, string]> = {
@@ -26,21 +26,30 @@ const TRUNK_PALETTES: Record<CommercialTreeSpeciesGroup, readonly [string, strin
   ORNAMENTAL_COMPACT: ['#926d4d', '#a9825a'],
 };
 
+/** Deterministic 0..1 jitter so every tree keeps a stable, unique silhouette. */
+function lobeNoise(seed: number, salt: number) {
+  const value = Math.sin(seed * 12.9898 + salt * 78.233) * 43758.5453;
+  return value - Math.floor(value);
+}
+
 function createCrownGeometry(reducedGraphics: boolean) {
   const geometry = new THREE.IcosahedronGeometry(1, reducedGraphics ? 0 : 1);
   const positions = geometry.getAttribute('position') as THREE.BufferAttribute;
   const vector = new THREE.Vector3();
   for (let index = 0; index < positions.count; index += 1) {
     vector.fromBufferAttribute(positions, index);
+    // Stronger, multi-frequency perturbation breaks the "solid ball" reading
+    // and gives each lobe a leafy, irregular contour.
     const irregularity = 1
-      + Math.sin(vector.x * 6.7 + vector.y * 4.1) * 0.055
-      + Math.cos(vector.z * 7.9 - vector.y * 3.2) * 0.04;
-    const verticalTaper = 0.94 + Math.max(0, vector.y) * 0.08;
+      + Math.sin(vector.x * 6.7 + vector.y * 4.1) * 0.115
+      + Math.cos(vector.z * 7.9 - vector.y * 3.2) * 0.095
+      + Math.sin(vector.x * 13.4 + vector.z * 11.7) * 0.055;
+    const verticalTaper = 0.86 + Math.max(0, vector.y) * 0.12;
     positions.setXYZ(
       index,
       vector.x * irregularity,
       vector.y * irregularity * verticalTaper,
-      vector.z * (1 + (irregularity - 1) * 0.8),
+      vector.z * (1 + (irregularity - 1) * 0.86),
     );
   }
   positions.needsUpdate = true;
@@ -89,12 +98,12 @@ function createTreeMaterials(shadowTexture: THREE.Texture) {
     }),
     crown: new THREE.MeshStandardMaterial({
       color: '#ffffff',
-      roughness: 0.9,
+      roughness: 0.88,
       metalness: 0,
       vertexColors: true,
       transparent: true,
-      emissive: '#315f38',
-      emissiveIntensity: 0.48,
+      emissive: '#4b7f4f',
+      emissiveIntensity: 0.42,
     }),
     shadow: new THREE.MeshBasicMaterial({
       color: '#ffffff',
@@ -111,24 +120,41 @@ function createTreeMaterials(shadowTexture: THREE.Texture) {
   };
 }
 
+/**
+ * Smaller, flattened lobes distributed over two tiers with deterministic
+ * jitter. The canopy reads as foliage instead of one opaque green mass, and it
+ * hides less of the lots and labels underneath.
+ */
 function crownLobeTransform(tree: CommercialMapTree, lobeIndex: number, lobeCount: number) {
-  const phase = tree.visualVariant * 0.83 + lobeIndex * 2.14;
+  const seed = tree.visualVariant + 1;
   const isCentral = lobeIndex === 0;
   const ringIndex = Math.max(0, lobeIndex - 1);
   const ringCount = Math.max(1, lobeCount - 1);
-  const ringPhase = tree.visualVariant * 0.44 + (ringIndex / ringCount) * Math.PI * 2;
-  const radius = isCentral ? tree.canopyRadius * 0.08 : tree.canopyRadius * (0.31 + (tree.visualVariant % 2) * 0.025);
-  const widthVariation = 0.88 + ((tree.visualVariant + lobeIndex * 2) % 5) * 0.035;
-  const depthVariation = 0.86 + ((tree.visualVariant * 2 + lobeIndex) % 4) * 0.04;
-  const verticalVariation = 0.88 + ((tree.visualVariant + lobeIndex) % 3) * 0.055;
+  const upperTier = !isCentral && ringIndex % 2 === 1;
+  const angleJitter = (lobeNoise(seed, lobeIndex * 3.1) - 0.5) * 0.72;
+  const ringPhase = seed * 0.44 + (ringIndex / ringCount) * Math.PI * 2 + angleJitter;
+  const radialJitter = 0.82 + lobeNoise(seed, lobeIndex * 5.7) * 0.46;
+  const radius = isCentral
+    ? tree.canopyRadius * 0.06
+    : tree.canopyRadius * (upperTier ? 0.26 : 0.42) * radialJitter;
+  const widthVariation = 0.82 + lobeNoise(seed, lobeIndex * 7.3) * 0.34;
+  const depthVariation = 0.8 + lobeNoise(seed, lobeIndex * 9.1) * 0.36;
+  const verticalVariation = 0.78 + lobeNoise(seed, lobeIndex * 11.5) * 0.32;
+  const tierHeight = isCentral
+    ? 0.16
+    : upperTier
+      ? 0.24 + lobeNoise(seed, lobeIndex * 2.3) * 0.1
+      : -0.06 + lobeNoise(seed, lobeIndex * 4.9) * 0.09;
+  const lobeSpread = isCentral ? 0.62 : upperTier ? 0.42 : 0.5;
+  const lobeHeight = isCentral ? 0.42 : upperTier ? 0.3 : 0.32;
   return {
     offsetX: Math.cos(ringPhase) * radius,
-    offsetY: tree.crownHeight * (isCentral ? 0.08 : -0.015 + (ringIndex % 2) * 0.065),
+    offsetY: tree.crownHeight * tierHeight,
     offsetZ: Math.sin(ringPhase) * radius,
-    rotation: phase,
-    scaleX: tree.canopyRadius * (isCentral ? 0.84 : 0.69) * widthVariation,
-    scaleY: tree.crownHeight * (isCentral ? 0.48 : 0.39) * verticalVariation,
-    scaleZ: tree.canopyRadius * (isCentral ? 0.82 : 0.68) * depthVariation,
+    rotation: seed * 0.83 + lobeIndex * 2.14,
+    scaleX: tree.canopyRadius * lobeSpread * widthVariation,
+    scaleY: tree.crownHeight * lobeHeight * verticalVariation,
+    scaleZ: tree.canopyRadius * lobeSpread * 0.96 * depthVariation,
   };
 }
 
@@ -220,7 +246,7 @@ function CommercialTreeInstances({
         branchMesh.setColorAt(instanceIndex, trunkColor);
       }
 
-      const crownBaseY = groundY + tree.trunkHeight + tree.crownHeight * 0.43;
+      const crownBaseY = groundY + tree.trunkHeight + tree.crownHeight * 0.32;
       for (let lobeIndex = 0; lobeIndex < lobeCount; lobeIndex += 1) {
         const instanceIndex = treeIndex * lobeCount + lobeIndex;
         const lobe = crownLobeTransform(tree, lobeIndex, lobeCount);
@@ -291,7 +317,7 @@ function CommercialTreeInstances({
     const progress = visibilityProgress.current;
     group.position.y = (1 - progress) * -0.16;
     materials.trunk.opacity = progress;
-    materials.crown.opacity = progress;
+    materials.crown.opacity = progress * 0.95;
     materials.shadow.opacity = SHADOW_OPACITY * progress;
     if (settled) {
       group.visible = visible;
