@@ -246,7 +246,7 @@ function CommercialTreeInstances({
         branchMesh.setColorAt(instanceIndex, trunkColor);
       }
 
-      const crownBaseY = groundY + tree.trunkHeight + tree.crownHeight * 0.43;
+      const crownBaseY = groundY + tree.trunkHeight + tree.crownHeight * 0.32;
       for (let lobeIndex = 0; lobeIndex < lobeCount; lobeIndex += 1) {
         const instanceIndex = treeIndex * lobeCount + lobeIndex;
         const lobe = crownLobeTransform(tree, lobeIndex, lobeCount);
@@ -317,7 +317,7 @@ function CommercialTreeInstances({
     const progress = visibilityProgress.current;
     group.position.y = (1 - progress) * -0.16;
     materials.trunk.opacity = progress;
-    materials.crown.opacity = progress;
+    materials.crown.opacity = progress * 0.95;
     materials.shadow.opacity = SHADOW_OPACITY * progress;
     if (settled) {
       group.visible = visible;
