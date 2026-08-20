@@ -5,7 +5,7 @@ import {
   type CommercialTreeQuadra,
 } from '../data/commercialTrees';
 
-export const COMMERCIAL_TREE_CANOPY_LOBES = 4;
+export const COMMERCIAL_TREE_CANOPY_LOBES = 7;
 export const COMMERCIAL_TREE_BRANCHES = 2;
 /** Static ground shadow + trunk + branch + crown in the primary color pass. */
 export const COMMERCIAL_TREE_LAYER_DRAW_CALL_BUDGET = 4;
@@ -174,7 +174,7 @@ export function commercialTreeGroundElevationAtPosition(
 
 export function commercialTreeInstanceBudget(treeCount: number, reducedGraphics = false) {
   const normalizedCount = Math.max(0, Math.floor(treeCount));
-  const canopyLobes = reducedGraphics ? 3 : COMMERCIAL_TREE_CANOPY_LOBES;
+  const canopyLobes = reducedGraphics ? 4 : COMMERCIAL_TREE_CANOPY_LOBES;
   const drawCalls = normalizedCount > 0 ? COMMERCIAL_TREE_LAYER_DRAW_CALL_BUDGET : 0;
   const shadowDrawCalls = normalizedCount > 0 && !reducedGraphics
     ? COMMERCIAL_TREE_LAYER_SHADOW_DRAW_CALL_BUDGET
