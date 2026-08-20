@@ -15,9 +15,9 @@ const SHADOW_OPACITY = 0.12;
 const UNIT_Y = new THREE.Vector3(0, 1, 0);
 
 const FOLIAGE_PALETTES: Record<CommercialTreeSpeciesGroup, readonly [string, string, string, string]> = {
-  MATURE_BROADLEAF: ['#579150', '#66a05a', '#77ae64', '#89ba70'],
-  OPEN_CANOPY: ['#638f5a', '#72a064', '#83ae6e', '#96bd7b'],
-  ORNAMENTAL_COMPACT: ['#59804c', '#6a9056', '#7da061', '#90ae6d'],
+  MATURE_BROADLEAF: ['#5c8757', '#6b9660', '#7aa46b', '#8ab079'],
+  OPEN_CANOPY: ['#688c5f', '#779a69', '#87a774', '#97b482'],
+  ORNAMENTAL_COMPACT: ['#5f7f53', '#6d8c5d', '#7d9a68', '#8ca875'],
 };
 
 const TRUNK_PALETTES: Record<CommercialTreeSpeciesGroup, readonly [string, string]> = {
@@ -26,21 +26,30 @@ const TRUNK_PALETTES: Record<CommercialTreeSpeciesGroup, readonly [string, strin
   ORNAMENTAL_COMPACT: ['#926d4d', '#a9825a'],
 };
 
+/** Deterministic 0..1 jitter so every tree keeps a stable, unique silhouette. */
+function lobeNoise(seed: number, salt: number) {
+  const value = Math.sin(seed * 12.9898 + salt * 78.233) * 43758.5453;
+  return value - Math.floor(value);
+}
+
 function createCrownGeometry(reducedGraphics: boolean) {
   const geometry = new THREE.IcosahedronGeometry(1, reducedGraphics ? 0 : 1);
   const positions = geometry.getAttribute('position') as THREE.BufferAttribute;
   const vector = new THREE.Vector3();
   for (let index = 0; index < positions.count; index += 1) {
     vector.fromBufferAttribute(positions, index);
+    // Stronger, multi-frequency perturbation breaks the "solid ball" reading
+    // and gives each lobe a leafy, irregular contour.
     const irregularity = 1
-      + Math.sin(vector.x * 6.7 + vector.y * 4.1) * 0.055
-      + Math.cos(vector.z * 7.9 - vector.y * 3.2) * 0.04;
-    const verticalTaper = 0.94 + Math.max(0, vector.y) * 0.08;
+      + Math.sin(vector.x * 6.7 + vector.y * 4.1) * 0.115
+      + Math.cos(vector.z * 7.9 - vector.y * 3.2) * 0.095
+      + Math.sin(vector.x * 13.4 + vector.z * 11.7) * 0.055;
+    const verticalTaper = 0.86 + Math.max(0, vector.y) * 0.12;
     positions.setXYZ(
       index,
       vector.x * irregularity,
       vector.y * irregularity * verticalTaper,
-      vector.z * (1 + (irregularity - 1) * 0.8),
+      vector.z * (1 + (irregularity - 1) * 0.86),
     );
   }
   positions.needsUpdate = true;
