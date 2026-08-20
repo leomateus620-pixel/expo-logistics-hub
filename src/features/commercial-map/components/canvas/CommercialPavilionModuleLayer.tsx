@@ -184,7 +184,7 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
     projectedCells.forEach((cell, index) => {
       const isSelected = cell.id === activeSelectedId;
       const isHovered = !isSelected && cell.id === activeHoveredId;
-      const heightScale = isSelected ? 1.75 : isHovered ? 1.3 : 1;
+      const heightScale = isSelected ? 1.34 : isHovered ? 1.14 : 1;
       const cellHeight = moduleHeight * heightScale;
       object.position.set(
         cell.projected.centerX,
@@ -325,7 +325,7 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
       />
       {numberTexture && (
         <mesh
-          position={[0, floorY + moduleHeight + 0.018, 0]}
+          position={[0, floorY + moduleHeight * 1.42 + 0.018, 0]}
           rotation={[-Math.PI / 2, 0, 0]}
           geometry={labelGeometry}
           material={labelMaterial}
