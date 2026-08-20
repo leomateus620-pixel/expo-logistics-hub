@@ -284,3 +284,8 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
   setReducedGraphics: (reducedGraphics) => set({ reducedGraphics }),
   setCameraNavigating: (cameraNavigating) => set({ cameraNavigating }),
 }));
+
+if (import.meta.env.DEV && typeof window !== 'undefined') {
+  // Development-only handle used by automated interaction checks.
+  (window as unknown as Record<string, unknown>).__commercialMapStore = useCommercialMapStore;
+}
