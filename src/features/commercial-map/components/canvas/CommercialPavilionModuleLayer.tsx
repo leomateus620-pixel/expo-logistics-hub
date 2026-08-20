@@ -1,10 +1,13 @@
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+import { useThree, type ThreeEvent } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { CommercialPavilionLayout } from '../../utils/commercialPavilions';
 import {
   projectCommercialPavilionModuleRect,
   type CommercialPavilionModulePlan,
 } from '../../utils/commercialPavilionModules';
+import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
+import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 
 const NO_RAYCAST = () => undefined;
 
@@ -21,11 +24,7 @@ function useDisposableInstancedMeshRef() {
   const mesh = useRef<THREE.InstancedMesh | null>(null);
   const setMesh = useCallback((next: THREE.InstancedMesh | null) => {
     const previous = mesh.current;
-    if (previous && previous !== next) {
-      // eslint-disable-next-line no-console
-      console.log('DEBUG previous', typeof previous, (previous as any)?.constructor?.name, Object.keys(previous as any).slice(0, 8));
-      previous.dispose();
-    }
+    if (previous && previous !== next) disposeInstancedMesh(previous);
     mesh.current = next;
   }, []);
   return [mesh, setMesh] as const;
@@ -43,6 +42,9 @@ function zoneColor(colorCue: string, index: number, total: number) {
   );
   return color;
 }
+
+const HOVER_COLOR = new THREE.Color('#f3e6b2');
+const SELECTED_COLOR = new THREE.Color('#f2c94c');
 
 function createModuleNumberTexture(
   plan: CommercialPavilionModulePlan,
@@ -102,7 +104,8 @@ function createModuleNumberTexture(
 /**
  * One shared visual layer for the exterior cutaway and the dedicated interior.
  * Hundreds of modules remain one draw call; every identifier is baked into a
- * single transparent plan texture instead of becoming a DOM/text mesh.
+ * single transparent plan texture instead of becoming a DOM/text mesh. In the
+ * interior scene the same instanced mesh also carries hover and selection.
  */
 export const CommercialPavilionModuleLayer = memo(function CommercialPavilionModuleLayer({
   layout,
@@ -110,8 +113,15 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
   mode,
   reducedGraphics = false,
 }: CommercialPavilionModuleLayerProps) {
+  const interactive = mode === 'interior';
   const [moduleMesh, setModuleMesh] = useDisposableInstancedMeshRef();
   const [corridorMesh, setCorridorMesh] = useDisposableInstancedMeshRef();
+  const gl = useThree((state) => state.gl);
+  const invalidate = useThree((state) => state.invalidate);
+  const hoveredModuleId = useCommercialMapStore((state) => state.hoveredModuleId);
+  const selectedModuleId = useCommercialMapStore((state) => state.selectedModuleId);
+  const setHoveredModuleId = useCommercialMapStore((state) => state.setHoveredModuleId);
+  const setSelectedModuleId = useCommercialMapStore((state) => state.setSelectedModuleId);
   const unitBoxGeometry = useMemo(() => new THREE.BoxGeometry(1, 1, 1), []);
   const shortSide = Math.min(layout.interior.clearWidth, layout.interior.clearDepth);
   const moduleHeight = THREE.MathUtils.clamp(
@@ -164,34 +174,55 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
     [footprint.depth, footprint.width],
   );
 
+  const activeHoveredId = interactive ? hoveredModuleId : null;
+  const activeSelectedId = interactive ? selectedModuleId : null;
+
   useLayoutEffect(() => {
     if (!moduleMesh.current) return;
     const object = new THREE.Object3D();
+    const color = new THREE.Color();
     projectedCells.forEach((cell, index) => {
+      const isSelected = cell.id === activeSelectedId;
+      const isHovered = !isSelected && cell.id === activeHoveredId;
+      const heightScale = isSelected ? 1.75 : isHovered ? 1.3 : 1;
+      const cellHeight = moduleHeight * heightScale;
       object.position.set(
         cell.projected.centerX,
-        floorY + moduleHeight / 2 + 0.012,
+        floorY + cellHeight / 2 + 0.012,
         cell.projected.centerZ,
       );
       object.rotation.set(0, 0, 0);
       object.scale.set(
-        Math.max(0.012, cell.projected.width * 0.94),
-        moduleHeight,
-        Math.max(0.012, cell.projected.depth * 0.92),
+        Math.max(0.012, cell.projected.width * (isSelected || isHovered ? 0.97 : 0.94)),
+        cellHeight,
+        Math.max(0.012, cell.projected.depth * (isSelected || isHovered ? 0.95 : 0.92)),
       );
       object.updateMatrix();
       moduleMesh.current?.setMatrixAt(index, object.matrix);
-      moduleMesh.current?.setColorAt(
-        index,
-        zoneColor(plan.colorCue, zoneIndex.get(cell.zoneId) ?? 0, plan.zones.length),
-      );
+      color.copy(zoneColor(plan.colorCue, zoneIndex.get(cell.zoneId) ?? 0, plan.zones.length));
+      if (isSelected) color.lerp(SELECTED_COLOR, 0.82);
+      else if (isHovered) color.lerp(HOVER_COLOR, 0.55);
+      moduleMesh.current?.setColorAt(index, color);
     });
     moduleMesh.current.instanceMatrix.needsUpdate = true;
     if (moduleMesh.current.instanceColor) moduleMesh.current.instanceColor.needsUpdate = true;
     moduleMaterial.needsUpdate = true;
     moduleMesh.current.computeBoundingBox();
     moduleMesh.current.computeBoundingSphere();
-  }, [floorY, moduleHeight, moduleMaterial, moduleMesh, plan.colorCue, plan.zones.length, projectedCells, zoneIndex]);
+    invalidate();
+  }, [
+    activeHoveredId,
+    activeSelectedId,
+    floorY,
+    invalidate,
+    moduleHeight,
+    moduleMaterial,
+    moduleMesh,
+    plan.colorCue,
+    plan.zones.length,
+    projectedCells,
+    zoneIndex,
+  ]);
 
   useLayoutEffect(() => {
     if (!corridorMesh.current) return;
@@ -218,6 +249,31 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
     corridorMaterial.needsUpdate = true;
   }, [corridorMaterial, corridorMesh, floorY, projectedCorridors]);
 
+  const handlePointerMove = useCallback((event: ThreeEvent<PointerEvent>) => {
+    if (!interactive) return;
+    event.stopPropagation();
+    const cell = event.instanceId === undefined ? null : projectedCells[event.instanceId];
+    const nextId = cell?.id ?? null;
+    if (useCommercialMapStore.getState().hoveredModuleId === nextId) return;
+    setHoveredModuleId(nextId);
+    gl.domElement.style.cursor = nextId ? 'pointer' : 'grab';
+  }, [gl, interactive, projectedCells, setHoveredModuleId]);
+
+  const handlePointerOut = useCallback(() => {
+    if (!interactive) return;
+    setHoveredModuleId(null);
+    gl.domElement.style.cursor = 'grab';
+  }, [gl, interactive, setHoveredModuleId]);
+
+  const handleClick = useCallback((event: ThreeEvent<MouseEvent>) => {
+    if (!interactive) return;
+    event.stopPropagation();
+    const cell = event.instanceId === undefined ? null : projectedCells[event.instanceId];
+    if (!cell) return;
+    const current = useCommercialMapStore.getState().selectedModuleId;
+    setSelectedModuleId(current === cell.id ? null : cell.id);
+  }, [interactive, projectedCells, setSelectedModuleId]);
+
   useEffect(() => () => {
     moduleMaterial.dispose();
     corridorMaterial.dispose();
@@ -236,6 +292,12 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
     labelGeometry.dispose();
   }, [labelGeometry]);
 
+  useEffect(() => () => {
+    if (!interactive) return;
+    setHoveredModuleId(null);
+    gl.domElement.style.cursor = 'grab';
+  }, [gl, interactive, setHoveredModuleId]);
+
   return (
     <group raycast={NO_RAYCAST} dispose={null}>
       {projectedCorridors.length > 0 && (
@@ -252,7 +314,13 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
         args={[unitBoxGeometry, moduleMaterial, projectedCells.length]}
         castShadow={mode === 'interior' && !reducedGraphics}
         receiveShadow
-        raycast={NO_RAYCAST}
+        {...(interactive
+          ? {
+            onPointerMove: handlePointerMove,
+            onPointerOut: handlePointerOut,
+            onClick: handleClick,
+          }
+          : { raycast: NO_RAYCAST })}
         dispose={null}
       />
       {numberTexture && (
