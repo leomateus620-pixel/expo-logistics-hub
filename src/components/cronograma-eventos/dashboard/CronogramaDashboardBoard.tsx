@@ -32,6 +32,7 @@ import type { CronogramaEvent } from '../types';
 import { getTodayKey } from '@/lib/cronograma-timeline';
 import EventVolumePanel from './EventVolumePanel';
 import TimeDemandPanel from './TimeDemandPanel';
+import CommissionDistributionPanel from './CommissionDistributionPanel';
 
 import type {
   ActivityDetail,
@@ -183,150 +184,6 @@ function ExecutiveKpis({
 
 
 
-
-function MajorEventProgress({
-  model,
-  onOpenEvent,
-}: {
-  model: CronogramaDashboardModel;
-  onOpenEvent: (event: CronogramaEvent) => void;
-}) {
-  return (
-    <section className="cronograma-dashboard-panel cronograma-major-events">
-      <DashboardSectionHeader
-        eyebrow="Entregas institucionais"
-        title="Progresso dos grandes eventos"
-        description="Avanço dos subeventos operacionais, sem itens cancelados no denominador."
-      />
-      {model.majorEvents.length === 0 ? (
-        <EmptyDashboardPanel
-          title="Sem eventos principais no recorte"
-          description="Os eventos com subeventos ou prioridade elevada aparecerão aqui."
-        />
-      ) : (
-        <div className="cronograma-major-list">
-          {model.majorEvents.slice(0, 7).map((item) => (
-            <button key={item.event.id} type="button" onClick={() => onOpenEvent(item.event)}>
-              <header>
-                <div>
-                  <strong>{item.event.title}</strong>
-                  <span>{item.event.commission || 'Sem comissão'} · {formatDate(item.deadline)}</span>
-                </div>
-                <b data-risk={item.risk}>
-                  {item.progressPercentage === null ? '—' : `${item.progressPercentage}%`}
-                </b>
-              </header>
-              <div
-                className="cronograma-major-progress"
-                role="progressbar"
-                aria-valuemin={0}
-                aria-valuemax={100}
-                aria-valuenow={item.progressPercentage ?? undefined}
-                aria-label={`${item.event.title}: ${item.completedSubevents} de ${item.totalSubevents} subeventos concluídos`}
-              >
-                <span style={{ width: `${item.progressPercentage ?? 0}%` }} />
-              </div>
-              <footer>
-                <span>{item.completedSubevents}/{item.totalSubevents} subeventos</span>
-                <span>{item.overdueSubevents} atrasados</span>
-                <span>Responsável: {item.event.owner || 'não definido'}</span>
-              </footer>
-              {item.nextSubevent && <small>Próximo: {item.nextSubevent}</small>}
-            </button>
-          ))}
-        </div>
-      )}
-    </section>
-  );
-}
-
-function AttentionEvents({
-  model,
-  onOpenEvent,
-  onDrilldown,
-}: {
-  model: CronogramaDashboardModel;
-  onOpenEvent: (event: CronogramaEvent) => void;
-  onDrilldown: (drilldown: DashboardDrilldown) => void;
-}) {
-  const items = model.attentionEvents.slice(0, 8);
-  const allDrilldown: DashboardDrilldown = {
-    view: 'timeline',
-    label: 'Eventos que exigem atenção',
-    eventIds: model.attentionEvents.map(({ event }) => event.id),
-  };
-
-  return (
-    <section className="cronograma-dashboard-panel cronograma-attention-panel">
-      <DashboardSectionHeader
-        eyebrow="Controle de exceções"
-        title="Eventos que exigem atenção"
-        description="Atrasos, bloqueios e riscos críticos priorizados por urgência."
-        action={model.attentionEvents.length > 0 ? (
-          <Button type="button" variant="ghost" size="sm" onClick={() => onDrilldown(allDrilldown)}>
-            Ver todos <ArrowRight aria-hidden="true" />
-          </Button>
-        ) : undefined}
-      />
-      {items.length === 0 ? (
-        <EmptyDashboardPanel
-          title="Nenhuma exceção crítica"
-          description="O recorte atual não contém eventos atrasados, bloqueados ou críticos."
-        />
-      ) : (
-        <>
-          <div className="cronograma-attention-table-wrap">
-            <table className="cronograma-attention-table">
-              <thead>
-                <tr>
-                  <th>Evento</th>
-                  <th>Prazo</th>
-                  <th>Urgência</th>
-                  <th>Prioridade</th>
-                  <th>Responsável</th>
-                  <th>Comissão</th>
-                  <th>Status</th>
-                  <th><span className="sr-only">Ação</span></th>
-                </tr>
-              </thead>
-              <tbody>
-                {items.map((item) => (
-                  <tr key={item.event.id}>
-                    <td><strong>{item.event.title}</strong><small>{item.reasons.join(' · ')}</small></td>
-                    <td>{formatDate(item.deadline)}</td>
-                    <td><span data-severity={item.severity}>{daysLabel(item.days)}</span></td>
-                    <td>{priorityLabels[item.event.priority]}</td>
-                    <td>{item.event.owner || 'Não definido'}</td>
-                    <td>{item.event.commission || 'Não definida'}</td>
-                    <td>{statusLabels[item.event.status]}</td>
-                    <td>
-                      <Button type="button" variant="ghost" size="sm" onClick={() => onOpenEvent(item.event)}>
-                        Abrir
-                      </Button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <div className="cronograma-attention-cards">
-            {items.map((item) => (
-              <button key={item.event.id} type="button" onClick={() => onOpenEvent(item.event)}>
-                <header>
-                  <strong>{item.event.title}</strong>
-                  <span data-severity={item.severity}>{daysLabel(item.days)}</span>
-                </header>
-                <p>{formatDate(item.deadline)} · {statusLabels[item.event.status]}</p>
-                <p>{item.event.owner || 'Sem responsável'} · {item.event.commission || 'Sem comissão'}</p>
-                <small>{item.reasons.join(' · ')}</small>
-              </button>
-            ))}
-          </div>
-        </>
-      )}
-    </section>
-  );
-}
 
 function readChartLabel(value: unknown) {
   if (!value || typeof value !== 'object') return null;
@@ -730,14 +587,11 @@ export default function CronogramaDashboardBoard({
       />
 
 
-      <div className="cronograma-dashboard-operations">
-        <MajorEventProgress model={model} onOpenEvent={onOpenEvent} />
-        <AttentionEvents
-          model={model}
-          onOpenEvent={onOpenEvent}
-          onDrilldown={onDrilldown}
-        />
-      </div>
+      <CommissionDistributionPanel
+        events={model.eligibleEvents}
+        todayKey={getTodayKey()}
+        onDrilldown={onDrilldown}
+      />
 
       <ActivityAndReprogramming
         model={model}
