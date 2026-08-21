@@ -20,6 +20,7 @@ import {
 } from '../../utils/interaction';
 import { normalizeMapEntityMetadata, type MapLabelVisibility } from '../../utils/mapMetadata';
 import { selectCommercialTreesForScene } from '../../utils/treeLayer';
+import { shouldRenderArenaFrontInfrastructure } from '../../data/parkEnvironment';
 import {
   resolveStrategicLandmarkKind,
   strategicLandmarkFocusDirection,
@@ -51,6 +52,7 @@ import { RoadInfrastructure } from './RoadInfrastructure';
 import { StrategicLandmarkMesh } from './StrategicLandmarks';
 import { TechnicalValidationOverlay } from './TechnicalValidationOverlay';
 import { CommercialTreeLayer } from './CommercialTreeLayer';
+import { ArenaFrontInfrastructure } from './ArenaFrontInfrastructure';
 import {
   buildCommercialMapSegmentIndex,
   getCommercialMapSegment,
@@ -1836,6 +1838,17 @@ function Scene({
     () => selectCommercialTreesForScene(entities, lots),
     [entities, lots],
   );
+  const arenaFrontInfrastructurePresentation = useMemo(() => {
+    const arenaEntity = entities.find((entity) => entity.publicIdentifier === 'F');
+    if (
+      !arenaEntity
+      || !shouldRenderArenaFrontInfrastructure(entities)
+      || layerVisibility[arenaEntity.layerId] === false
+    ) return { visible: false, opacity: 0 };
+    const filterStrength = filtersActive && !matchingEntityIds.has(arenaEntity.id) ? 0.42 : 1;
+    const opacity = (layerOpacity[arenaEntity.layerId] ?? 1) * filterStrength;
+    return { visible: opacity > 0.015, opacity };
+  }, [entities, filtersActive, layerOpacity, layerVisibility, matchingEntityIds]);
   const activeSegmentEntities = useMemo(
     () => activeSegment
       ? renderedEntities.filter((entity) => segmentByEntity.get(entity.id)?.id === activeSegment.id)
@@ -1963,6 +1976,12 @@ function Scene({
           onCursor={setCanvasCursor}
         />
       ))}
+      {arenaFrontInfrastructurePresentation.visible && (
+        <ArenaFrontInfrastructure
+          reducedGraphics={reducedGraphics}
+          opacity={arenaFrontInfrastructurePresentation.opacity}
+        />
+      )}
       <CommercialTreeLayer
         trees={sceneTrees}
         surfaceEntities={entities}

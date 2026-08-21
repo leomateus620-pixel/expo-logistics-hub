@@ -1,11 +1,14 @@
 import type { CommercialLot, MapEntity } from '../types';
 import {
+  COMMERCIAL_TREE_AREA_SCENE_ANCHORS,
   COMMERCIAL_MAP_TREES,
   type CommercialMapTree,
+  type CommercialTreeArea,
   type CommercialTreeQuadra,
 } from '../data/commercialTrees';
 
 export const COMMERCIAL_TREE_CANOPY_LOBES = 7;
+export const COMMERCIAL_TREE_REDUCED_CANOPY_LOBES = 3;
 export const COMMERCIAL_TREE_BRANCHES = 2;
 /** Static ground shadow + trunk + branch + crown in the primary color pass. */
 export const COMMERCIAL_TREE_LAYER_DRAW_CALL_BUDGET = 4;
@@ -53,8 +56,23 @@ export function selectCommercialTreesForScene(
   entities: readonly MapEntity[],
   lots: readonly CommercialLot[],
 ) {
-  const blocks = commercialTreeBlocksForScene(entities, lots);
-  return COMMERCIAL_MAP_TREES.filter((tree) => tree.isVisible && blocks.has(tree.quadra));
+  const areas = commercialTreeAreasForScene(entities, lots);
+  return COMMERCIAL_MAP_TREES.filter((tree) => tree.isVisible && areas.has(tree.area));
+}
+
+export function commercialTreeAreasForScene(
+  entities: readonly MapEntity[],
+  lots: readonly CommercialLot[],
+) {
+  const areas = new Set<CommercialTreeArea>(commercialTreeBlocksForScene(entities, lots));
+  const identifiers = new Set(entities.map((entity) => entity.publicIdentifier));
+  (Object.keys(COMMERCIAL_TREE_AREA_SCENE_ANCHORS) as Array<Exclude<CommercialTreeArea, CommercialTreeQuadra>>)
+    .forEach((area) => {
+      if (COMMERCIAL_TREE_AREA_SCENE_ANCHORS[area].every((identifier) => identifiers.has(identifier))) {
+        areas.add(area);
+      }
+    });
+  return areas;
 }
 
 export function resolveCommercialTreeLot(tree: CommercialMapTree, lots: readonly CommercialLot[]) {
@@ -105,9 +123,14 @@ function distanceToEntity(point: readonly [number, number], entity: MapEntity) {
 }
 
 function surfacePriority(tree: CommercialMapTree, entity: MapEntity) {
+  if (entity.publicIdentifier === tree.surfaceEntityIdentifier) return 0;
   if (entity.publicIdentifier === tree.relatedLotId) return 0;
   if (tree.placement === 'SIDEWALK_EDGE' && entity.classification === 'PEDESTRIAN_PATH') return 0;
   if (tree.placement === 'STREET_EDGE' && entity.classification === 'ROAD') return 0;
+  if (
+    (tree.placement === 'PARKING_ISLAND' || tree.placement === 'PARKING_EDGE')
+    && entity.classification === 'PARKING'
+  ) return 0;
   if (
     tree.placement === 'QUADRA_BORDER'
     && entity.classification === 'QUADRA'
@@ -130,6 +153,20 @@ function commercialTreeSurfaceEntityAtPosition(
     .filter((entity) => pointInPolygon(point, entity.geometry.coordinates[0] ?? []))
     .sort((left, right) => surfacePriority(tree, left) - surfacePriority(tree, right));
   if (containing[0]) return containing[0];
+
+  const anchoredSurface = tree.surfaceEntityIdentifier
+    ? candidates.find((entity) => entity.publicIdentifier === tree.surfaceEntityIdentifier)
+    : null;
+  if (
+    anchoredSurface
+    && distanceToEntity(point, anchoredSurface) <= Math.max(0.75, tree.canopyRadius * 1.5)
+  ) return anchoredSurface;
+
+  if (
+    tree.placement === 'LANDSCAPE_MASS'
+    || tree.placement === 'BUILDING_EDGE'
+    || tree.placement === 'OUTSIDE_COMMERCIAL_LOT'
+  ) return null;
 
   return candidates.reduce<MapEntity | null>((nearest, candidate) => {
     if (!nearest) return candidate;
@@ -169,12 +206,13 @@ export function commercialTreeGroundElevationAtPosition(
   if (tree.placement === 'INSIDE_LOT' || tree.placement === 'LOT_EDGE') return 0.134;
   if (tree.placement === 'QUADRA_BORDER') return 0.029;
   if (tree.placement === 'SIDEWALK_EDGE') return 0.03;
+  if (tree.placement === 'PARKING_ISLAND' || tree.placement === 'PARKING_EDGE') return 0.064;
   return 0.036;
 }
 
 export function commercialTreeInstanceBudget(treeCount: number, reducedGraphics = false) {
   const normalizedCount = Math.max(0, Math.floor(treeCount));
-  const canopyLobes = reducedGraphics ? 4 : COMMERCIAL_TREE_CANOPY_LOBES;
+  const canopyLobes = reducedGraphics ? COMMERCIAL_TREE_REDUCED_CANOPY_LOBES : COMMERCIAL_TREE_CANOPY_LOBES;
   const drawCalls = normalizedCount > 0 ? COMMERCIAL_TREE_LAYER_DRAW_CALL_BUDGET : 0;
   const shadowDrawCalls = normalizedCount > 0 && !reducedGraphics
     ? COMMERCIAL_TREE_LAYER_SHADOW_DRAW_CALL_BUDGET
