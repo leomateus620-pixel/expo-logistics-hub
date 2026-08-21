@@ -146,6 +146,16 @@ export async function cronogramaDeleteSubevent(
   return data;
 }
 
+export async function cronogramaDeleteEvent(eventId: string | null, orgId: string, sourceKey: string) {
+  const { data, error } = await supabase.rpc('cronograma_delete_event', {
+    event_id: eventId,
+    event_org_id: orgId,
+    event_source_key: sourceKey,
+  });
+  if (error) throw normalize(error);
+  return data;
+}
+
 export async function cronogramaReorderSubevents(eventId: string, orderedIds: string[]) {
   const { data, error } = await supabase.rpc('cronograma_reorder_subevents', {
     event_id: eventId,

@@ -5,6 +5,7 @@ import {
   cronogramaSaveEvent,
   cronogramaSaveSubevent,
   cronogramaSaveSubeventPlan,
+  cronogramaDeleteEvent,
   cronogramaDeleteSubevent,
   cronogramaReorderSubevents,
   type CronogramaSaveEventPayload,
@@ -92,16 +93,22 @@ const officialSeedEvents = normalizeCronogramaSeed(fenasoja2028CronogramaSeed).m
 const EMPTY_SEED_EVENTS: CronogramaEvent[] = [];
 
 
-export function mergeOfficialSeedWithDb(seedEvents: CronogramaEvent[], dbEvents: CronogramaEvent[]): CronogramaEvent[] {
+export function mergeOfficialSeedWithDb(
+  seedEvents: CronogramaEvent[],
+  dbEvents: CronogramaEvent[],
+  deletedSourceKeys: ReadonlySet<string> = new Set(),
+): CronogramaEvent[] {
   const byKey = new Map<string, CronogramaEvent>();
 
   seedEvents.forEach((seedEvent) => {
     const key = seedEvent.sourceKey || seedEvent.id;
+    if (deletedSourceKeys.has(key)) return;
     byKey.set(key, seedEvent);
   });
 
   dbEvents.forEach((dbEvent) => {
     const key = dbEvent.sourceKey || dbEvent.id;
+    if (deletedSourceKeys.has(key)) return;
     const seedEvent = byKey.get(key);
     byKey.set(key, {
       ...(seedEvent ?? {}),
@@ -667,17 +674,29 @@ export function cronogramaEventsQueryKey(orgId: string | null | undefined) {
 
 /** Single source of truth for reading the module dataset, so every consumer
  *  (workspace and personal weekly summary) shares the same cache entry. */
-export async function fetchCronogramaEventsForOrg(orgId: string): Promise<CronogramaEvent[]> {
-  const { data, error } = await cronogramaDb
-    .from('cronograma_eventos_full')
-    .select('*')
-    .eq('org_id', orgId)
-    .order('start_date', { ascending: true, nullsFirst: false })
-    .order('title', { ascending: true })
-    .limit(1000);
+export interface CronogramaDataset {
+  events: CronogramaEvent[];
+  deletedSourceKeys: string[];
+}
 
-  if (error) throw error;
-  return (data ?? []).map(fromDbRow) as CronogramaEvent[];
+export async function fetchCronogramaDatasetForOrg(orgId: string): Promise<CronogramaDataset> {
+  const [eventsResult, tombstonesResult] = await Promise.all([
+    cronogramaDb.from('cronograma_eventos_full').select('*').eq('org_id', orgId)
+      .order('start_date', { ascending: true, nullsFirst: false }).order('title', { ascending: true }).limit(1000),
+    cronogramaDb.from('cronograma_evento_tombstones').select('source_key').eq('org_id', orgId).limit(1000),
+  ]);
+  if (eventsResult.error) throw eventsResult.error;
+  if (tombstonesResult.error) throw tombstonesResult.error;
+  return {
+    events: (eventsResult.data ?? []).map(fromDbRow) as CronogramaEvent[],
+    deletedSourceKeys: (tombstonesResult.data ?? [])
+      .map((row) => readString(row as Record<string, unknown>, 'source_key'))
+      .filter((key): key is string => Boolean(key)),
+  };
+}
+
+export async function fetchCronogramaEventsForOrg(orgId: string): Promise<CronogramaEvent[]> {
+  return (await fetchCronogramaDatasetForOrg(orgId)).events;
 }
 
 
@@ -720,17 +739,17 @@ export function useCronogramaEventos() {
   }, [orgId, refreshQueuedRelationships]);
 
 
-  const query = useQuery({
+  const query = useQuery<CronogramaDataset>({
     queryKey: cronogramaEventsQueryKey(orgId),
     enabled: !!orgId,
     staleTime: 30000,
     queryFn: async () => {
-      if (!orgId) return [];
+      if (!orgId) return { events: [], deletedSourceKeys: [] };
       try {
-        const events = await fetchCronogramaEventsForOrg(orgId);
+        const dataset = await fetchCronogramaDatasetForOrg(orgId);
         setDbUnavailable(false);
         setRelationshipsUnavailable(false);
-        return events;
+        return dataset;
       } catch (error) {
         setDbUnavailable(true);
         throw error;
@@ -762,14 +781,17 @@ export function useCronogramaEventos() {
   const { isPending: isSeedingOfficialData, mutate: seedMissingOfficialData } = seedOfficialData;
 
   useEffect(() => {
-    const dbEvents = query.data ?? [];
-    setSessionEvents(mergeOfficialSeedWithDb(localSeedEvents, dbEvents));
+    const dbEvents = query.data?.events ?? [];
+    const deletedSourceKeys = new Set(query.data?.deletedSourceKeys ?? []);
+    setSessionEvents(mergeOfficialSeedWithDb(localSeedEvents, dbEvents, deletedSourceKeys));
 
     if (hasScopedCronogramaView) return;
     if (!orgId || !query.data || !isWritableRole(myRole) || isSeedingOfficialData) return;
 
     const dbSourceKeys = new Set(dbEvents.map((event) => event.sourceKey).filter(Boolean));
-    const missingOfficialEvents = officialSeedEvents.filter((event) => event.sourceKey && !dbSourceKeys.has(event.sourceKey));
+    const missingOfficialEvents = officialSeedEvents.filter((event) => (
+      event.sourceKey && !dbSourceKeys.has(event.sourceKey) && !deletedSourceKeys.has(event.sourceKey)
+    ));
 
     if (
       missingOfficialEvents.length > 0 &&
@@ -921,32 +943,21 @@ export function useCronogramaEventos() {
       }
       if (!orgId) throw new Error('Não foi possível identificar a organização atual.');
 
-      // Non-persisted (seed/queued) — remove locally only.
-      if (!isUuid(current.id)) {
-        setSessionEvents((prev) => prev.filter((item) => item.id !== current.id && item.sourceKey !== current.sourceKey));
-        return { id: current.id, remote: false as const };
-      }
-
       if (dbUnavailable) {
         throw new Error('A sincronização está indisponível. A exclusão não foi realizada. Tente novamente em instantes.');
       }
 
-      const { error } = await cronogramaDb
-        .from('cronograma_eventos')
-        .delete()
-        .eq('id', current.id)
-        .eq('org_id', orgId);
-      if (error) throw new Error(error.message || 'Não foi possível excluir o evento.');
-
-      return { id: current.id, remote: true as const, sourceKey: current.sourceKey };
+      await cronogramaDeleteEvent(isUuid(current.id) ? current.id : null, orgId, current.sourceKey || current.id);
+      return { id: current.id, sourceKey: current.sourceKey || current.id };
     },
     onSuccess: (result) => {
-      setSessionEvents((prev) => prev.filter((item) => item.id !== result.id));
+      setSessionEvents((prev) => prev.filter((item) => item.id !== result.id && item.sourceKey !== result.sourceKey));
+      queryClient.setQueryData<CronogramaDataset>(cronogramaEventsQueryKey(orgId), (current) => current ? ({
+        events: current.events.filter((event) => event.id !== result.id && event.sourceKey !== result.sourceKey),
+        deletedSourceKeys: Array.from(new Set([...current.deletedSourceKeys, result.sourceKey])),
+      }) : current);
       queryClient.invalidateQueries({ queryKey: ['cronograma-eventos'] });
-      if (result.remote) {
-        // DB trigger enqueues delete for every connected user; push immediately.
-        triggerSyncWorker();
-      }
+      triggerSyncWorker();
     },
   });
 

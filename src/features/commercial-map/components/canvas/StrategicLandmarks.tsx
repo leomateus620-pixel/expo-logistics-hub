@@ -1752,10 +1752,10 @@ function FenasojaHeadquarters({
       scale: [0.023, annexHeight * 0.27, annexDepth * 0.17] as Vector3Tuple,
     })),
   ];
-  const roofBatch: BatchedTransform[] = [
+  const roofBatch: BatchedTransform[] = ([
     { position: [-bodyWidth * 0.25, wallHeight + roofRise * 0.52 + 0.09, bodyZ], scale: [roofLength, 0.095, bodyDepth + depth * 0.13], rotation: [0, 0, roofPitch] },
     { position: [bodyWidth * 0.25, wallHeight + roofRise * 0.52 + 0.09, bodyZ], scale: [roofLength, 0.095, bodyDepth + depth * 0.13], rotation: [0, 0, -roofPitch] },
-  ].map(translateMain);
+  ] satisfies InstanceTransform[]).map(translateMain);
   const trimBatch: BatchedTransform[] = [
     ...roofStructure.map(translateMain),
     ...(showDetail ? [
