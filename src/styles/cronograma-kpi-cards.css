@@ -30,7 +30,7 @@
   position: relative;
   display: flex;
   min-width: 0;
-  height: 10.75rem;
+  height: 11.6rem;
   flex-direction: column;
   padding: 0.85rem 0.9rem 1.35rem;
   border: 1px solid oklch(var(--border) / 0.7);
@@ -130,6 +130,11 @@
   justify-content: center;
   inset: 0;
   overflow: hidden;
+}
+
+.agenda-kpi-layer:has(.agenda-kpi-rank),
+.agenda-kpi-layer:has(.agenda-kpi-people) {
+  justify-content: flex-start;
   will-change: transform, opacity;
 }
 
@@ -185,7 +190,7 @@
 .agenda-kpi-rank-track {
   display: block;
   overflow: hidden;
-  height: 0.28rem;
+  height: 0.24rem;
   border-radius: 999px;
   background: oklch(var(--muted) / 0.75);
 }
@@ -218,8 +223,8 @@
   display: grid;
   width: 100%;
   align-items: center;
-  gap: 0.4rem;
-  grid-template-columns: 0.85rem minmax(0, 1fr) auto;
+  gap: 0.35rem;
+  grid-template-columns: 0.8rem minmax(0, 1fr) auto;
   border: 0;
   background: none;
   text-align: left;
@@ -248,8 +253,9 @@
   display: block;
   overflow: hidden;
   color: oklch(var(--foreground) / 0.88);
-  font-size: 0.68rem;
+  font-size: 0.66rem;
   font-weight: 650;
+  line-height: 1.15;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
