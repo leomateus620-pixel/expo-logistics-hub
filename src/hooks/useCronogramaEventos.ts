@@ -739,12 +739,12 @@ export function useCronogramaEventos() {
   }, [orgId, refreshQueuedRelationships]);
 
 
-  const query = useQuery({
+  const query = useQuery<CronogramaDataset>({
     queryKey: cronogramaEventsQueryKey(orgId),
     enabled: !!orgId,
     staleTime: 30000,
     queryFn: async () => {
-      if (!orgId) return [];
+      if (!orgId) return { events: [], deletedSourceKeys: [] };
       try {
         const dataset = await fetchCronogramaDatasetForOrg(orgId);
         setDbUnavailable(false);
