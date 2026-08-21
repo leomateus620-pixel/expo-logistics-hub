@@ -39,7 +39,6 @@ import type {
   ActivityDetail,
   CronogramaDashboardModel,
   DashboardDrilldown,
-  DashboardKpi,
   DashboardLogStatus,
 } from '@/lib/cronograma-dashboard-selectors';
 import '@/styles/cronograma-dashboard.css';
@@ -52,8 +51,6 @@ interface CronogramaDashboardBoardProps {
   onDrilldown: (drilldown: DashboardDrilldown) => void;
   onRetryActivity?: () => void;
 }
-
-const kpiIcons = [BarChart3, AlertTriangle, CalendarDays, UserRoundX, CalendarClock];
 
 const priorityLabels: Record<CronogramaEvent['priority'], string> = {
   low: 'Baixa',
