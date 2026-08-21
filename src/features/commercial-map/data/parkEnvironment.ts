@@ -39,7 +39,7 @@ export interface LocalBounds {
   centerZ: number;
 }
 
-export const PARK_ENVIRONMENT_REVISION = '2026.5-park-realism.1';
+export const PARK_ENVIRONMENT_REVISION = '2026.6-arena-quadra-r.1';
 
 export const PARK_ENVIRONMENT_CLASSIFICATION_LABELS: Readonly<Record<ParkEnvironmentClassification, string>> = {
   NON_COMMERCIAL_STRUCTURE: 'Estrutura não comercial',
@@ -53,15 +53,20 @@ export const ARENA_FRONT_SOURCE_REFERENCES = [
   'Anexo 1 — vazio atual entre Espaço Mirante, Arena Sicredi - Icatu e Centro de Eventos',
   'Anexo 4 — leitura conjunta das quadras, taludes, escadaria e praça cívica',
   'Anexo 5 — leitura frontal dos patamares, três setores de degraus e corrimãos',
+  'Satélite 2026-08-21 — escadaria oeste-leste e duas quadras junto à borda sul da Exporural',
 ] as const;
 
 /**
  * Bounds are traced in the same official 2026 PDF crop used by the map. The
  * annexes do not expose survey coordinates, so the fit is anchored to D3, F,
- * C1 and Rua Brasil and remains explicitly reviewable in the field.
+ * Quadra R, Exporural, Rua Brasília and Rua Brasil and remains explicitly
+ * reviewable in the field.
  */
 export const ARENA_FRONT_LAYOUT = {
-  sceneAnchors: ['F', 'C1', 'D3', 'RUA-BRASIL'] as const,
+  arenaStructureAnchors: ['F', 'D3', 'RUA-BRASIL'] as const,
+  arenaStructureOwners: ['F'] as const,
+  courtAnchors: ['QUADRA-R', 'EXPORURAL'] as const,
+  courtOwners: ['QUADRA-R', 'EXPORURAL'] as const,
   plaza: {
     sourcePolygon: [
       [4116, 2682],
@@ -73,7 +78,10 @@ export const ARENA_FRONT_LAYOUT = {
     elevation: 0.052,
   },
   stairs: {
-    sourceBounds: [4170, 2688, 4520, 2910] as SourceBounds,
+    sourceBounds: [4120, 2720, 4480, 3070] as SourceBounds,
+    runAxis: 'x' as const,
+    highEdge: 'west' as const,
+    lowEdge: 'east' as const,
     stepCount: 18,
     bankCount: 3,
     riserHeight: 0.085,
@@ -83,14 +91,17 @@ export const ARENA_FRONT_LAYOUT = {
     intermediateLandingSteps: [6, 12] as const,
     intermediateLandingDepth: 0.28,
   },
-  westBerm: {
-    sourceBounds: [4116, 2688, 4163, 2920] as SourceBounds,
+  northBerm: {
+    sourceBounds: [4120, 2682, 4480, 2720] as SourceBounds,
+    highEdge: 'west' as const,
   },
-  eastBerm: {
-    sourceBounds: [4528, 2688, 4888, 2835] as SourceBounds,
+  southBerm: {
+    sourceBounds: [4120, 3070, 4480, 3098] as SourceBounds,
+    highEdge: 'west' as const,
   },
   multiSportCourt: {
-    sourceBounds: [4142, 2930, 4480, 3088] as SourceBounds,
+    sourceBounds: [4675, 2480, 4765, 2640] as SourceBounds,
+    longAxis: 'z' as const,
     surfaceInset: 0.24,
     surfaceColor: '#b86f5c',
     apronColor: '#64796d',
@@ -98,7 +109,8 @@ export const ARENA_FRONT_LAYOUT = {
     supportsVolleyball: true,
   },
   sandVolleyballCourt: {
-    sourceBounds: [4540, 2850, 4860, 2990] as SourceBounds,
+    sourceBounds: [4525, 2480, 4615, 2640] as SourceBounds,
+    longAxis: 'z' as const,
     surfaceInset: 0.24,
     surfaceColor: '#d6bd84',
     apronColor: '#77836b',
@@ -117,7 +129,7 @@ export const PARK_ENVIRONMENT_FEATURES: readonly ParkEnvironmentFeature[] = [
     sourceBounds: [4116, 2682, 4888, 3100],
     sourceReferences: ARENA_FRONT_SOURCE_REFERENCES,
     verificationStatus: 'REFERENCE_INTERPRETED',
-    notes: 'Faixa cívica contínua entre D3, Arena, Centro de Eventos e Rua Brasil; nunca representa lote.',
+    notes: 'Faixa cívica contínua entre D3, Arena e Rua Brasil, preservando o apron livre diante do palco; nunca representa lote.',
   },
   {
     id: 'arena-front-concrete-stairs',
@@ -128,7 +140,7 @@ export const PARK_ENVIRONMENT_FEATURES: readonly ParkEnvironmentFeature[] = [
     sourceBounds: ARENA_FRONT_LAYOUT.stairs.sourceBounds,
     sourceReferences: ARENA_FRONT_SOURCE_REFERENCES,
     verificationStatus: 'FIELD_REVIEW_RECOMMENDED',
-    notes: 'Dezoito níveis em três setores, com patamares e corrimãos, interpretados da leitura frontal e aérea.',
+    notes: 'Dezoito níveis em três setores, altos a oeste e descendendo a leste em direção ao apron da Arena.',
   },
   {
     id: 'arena-front-multi-sport-court',
@@ -139,7 +151,7 @@ export const PARK_ENVIRONMENT_FEATURES: readonly ParkEnvironmentFeature[] = [
     sourceBounds: ARENA_FRONT_LAYOUT.multiSportCourt.sourceBounds,
     sourceReferences: ARENA_FRONT_SOURCE_REFERENCES,
     verificationStatus: 'FIELD_REVIEW_RECOMMENDED',
-    notes: 'Quadra de piso pigmentado com marcação de vôlei e estruturas leves de basquete.',
+    notes: 'Quadra pigmentada a leste, com eixo longo norte-sul e apoiada na borda sul da Quadra R.',
   },
   {
     id: 'arena-front-sand-volleyball-court',
@@ -150,7 +162,7 @@ export const PARK_ENVIRONMENT_FEATURES: readonly ParkEnvironmentFeature[] = [
     sourceBounds: ARENA_FRONT_LAYOUT.sandVolleyballCourt.sourceBounds,
     sourceReferences: ARENA_FRONT_SOURCE_REFERENCES,
     verificationStatus: 'FIELD_REVIEW_RECOMMENDED',
-    notes: 'Quadra adjacente de superfície clara, separada da circulação e alinhada à quadra poliesportiva.',
+    notes: 'Quadra clara a oeste, com eixo longo norte-sul e corredor preservado para o sanitário E-10.',
   },
   {
     id: 'arena-front-landscape-support',
@@ -158,10 +170,10 @@ export const PARK_ENVIRONMENT_FEATURES: readonly ParkEnvironmentFeature[] = [
     classification: 'LANDSCAPE_FEATURE',
     isSellable: false,
     contributesToCommercialMetrics: false,
-    sourceBounds: [4116, 2688, 4888, 2920],
+    sourceBounds: [4120, 2682, 4480, 3098],
     sourceReferences: ARENA_FRONT_SOURCE_REFERENCES,
     verificationStatus: 'FIELD_REVIEW_RECOMMENDED',
-    notes: 'Taludes gramados laterais preservam a leitura do desnível real sem ocupar a praça ou as quadras.',
+    notes: 'Taludes estreitos ao norte e ao sul acompanham o desnível oeste-leste sem ocupar o apron pavimentado.',
   },
 ];
 
@@ -188,11 +200,17 @@ export function sourcePolygonToLocal(points: readonly SourcePoint[]): readonly L
   return points.map((point) => officialPdfPointToLocal(point));
 }
 
-export function shouldRenderArenaFrontInfrastructure(entities: readonly MapEntity[]) {
+function hasEnvironmentAnchors(entities: readonly MapEntity[], anchors: readonly string[]) {
   const identifiers = new Set(entities.map((entity) => entity.publicIdentifier));
-  return identifiers.has('F')
-    && identifiers.has('RUA-BRASIL')
-    && (identifiers.has('C1') || identifiers.has('D3'));
+  return anchors.every((identifier) => identifiers.has(identifier));
+}
+
+export function shouldRenderArenaStructures(entities: readonly MapEntity[]) {
+  return hasEnvironmentAnchors(entities, ARENA_FRONT_LAYOUT.arenaStructureAnchors);
+}
+
+export function shouldRenderArenaCourts(entities: readonly MapEntity[]) {
+  return hasEnvironmentAnchors(entities, ARENA_FRONT_LAYOUT.courtAnchors);
 }
 
 export const ARENA_FRONT_PRIMARY_DRAW_CALL_BUDGET = 12;

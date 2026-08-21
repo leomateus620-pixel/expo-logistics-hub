@@ -8,6 +8,14 @@ import { isMapSelectionClick } from '../../utils/interaction';
 import { LIVESTOCK_PAVILION_RENDER_BUDGET } from '../../utils/livestockPavilion';
 import { MIRANTE_RENDER_BUDGET } from '../../utils/mirante';
 import { commercialPavilionModelBounds } from '../../utils/commercialPavilions';
+import { FENASOJA_HEADQUARTERS_LAYOUT } from '../../utils/headquarters';
+import {
+  APOLLO_XIV_FEATURE_METADATA,
+  APOLLO_XIV_LAYOUT,
+  APOLLO_XIV_RENDER_BUDGET,
+  LUNAR_MEMORIAL_HIT_SCALE,
+  apolloXivReplicaHeight,
+} from '../../utils/lunarMemorial';
 import {
   resolveStrategicLandmarkKind,
   strategicLandmarkBounds,
@@ -76,6 +84,19 @@ const SHARED_INTERIOR_LIGHT_MATERIAL = new THREE.MeshStandardMaterial({
   emissiveIntensity: 0.72,
   roughness: 0.66,
 });
+const SHARED_HEADQUARTERS_AMBER_MATERIAL = new THREE.MeshStandardMaterial({
+  color: FENASOJA_HEADQUARTERS_LAYOUT.palette.amber,
+  emissive: FENASOJA_HEADQUARTERS_LAYOUT.palette.amber,
+  emissiveIntensity: 0.58,
+  roughness: 0.58,
+  metalness: 0.08,
+});
+const SHARED_HEADQUARTERS_WARM_LIGHT_MATERIAL = new THREE.MeshStandardMaterial({
+  color: '#ffd9a0',
+  emissive: FENASOJA_HEADQUARTERS_LAYOUT.palette.warmLight,
+  emissiveIntensity: 0.86,
+  roughness: 0.72,
+});
 
 type Vector3Tuple = [number, number, number];
 
@@ -83,6 +104,10 @@ interface InstanceTransform {
   position: Vector3Tuple;
   scale: Vector3Tuple;
   rotation?: Vector3Tuple;
+}
+
+interface BatchedTransform extends InstanceTransform {
+  geometry?: THREE.BufferGeometry;
 }
 
 interface LandmarkMaterialSet {
@@ -114,16 +139,16 @@ const LANDMARK_PALETTES: Record<StrategicLandmarkKind, LandmarkPalette> = {
     metal: '#858985',
   },
   'fenasoja-headquarters': {
-    wall: '#353c3f',
-    accent: '#9a7254',
-    roof: '#aaa59d',
-    trim: '#b7aa96',
-    dark: '#171d1f',
-    glass: '#38535d',
-    green: '#386b48',
-    white: '#f3f3ee',
-    platform: '#77716a',
-    metal: '#626969',
+    wall: FENASOJA_HEADQUARTERS_LAYOUT.palette.navy,
+    accent: FENASOJA_HEADQUARTERS_LAYOUT.palette.amber,
+    roof: FENASOJA_HEADQUARTERS_LAYOUT.palette.roof,
+    trim: '#d7dde0',
+    dark: FENASOJA_HEADQUARTERS_LAYOUT.palette.navyDark,
+    glass: FENASOJA_HEADQUARTERS_LAYOUT.palette.glass,
+    green: '#1f6448',
+    white: FENASOJA_HEADQUARTERS_LAYOUT.palette.roof,
+    platform: '#85817a',
+    metal: '#69757b',
   },
   'commercial-pavilion': {
     wall: '#bbb9b1',
@@ -241,7 +266,7 @@ const LANDMARK_PALETTES: Record<StrategicLandmarkKind, LandmarkPalette> = {
     dark: '#34271e',
     glass: '#557a62',
     green: '#467748',
-    white: '#dce4cd',
+    white: '#f3f1e9',
     platform: '#665341',
     metal: '#6a7063',
   },
@@ -972,6 +997,120 @@ function ReferenceMuralPanel({
   );
 }
 
+function paintHeadquartersIdentity(
+  context: CanvasRenderingContext2D,
+  canvas: HTMLCanvasElement,
+  symbol?: CanvasImageSource,
+) {
+  const gradient = context.createLinearGradient(0, 0, canvas.width, canvas.height);
+  gradient.addColorStop(0, FENASOJA_HEADQUARTERS_LAYOUT.palette.navyDark);
+  gradient.addColorStop(0.58, FENASOJA_HEADQUARTERS_LAYOUT.palette.navy);
+  gradient.addColorStop(1, '#092847');
+  context.fillStyle = gradient;
+  context.fillRect(0, 0, canvas.width, canvas.height);
+
+  context.strokeStyle = FENASOJA_HEADQUARTERS_LAYOUT.palette.amber;
+  context.lineWidth = 8;
+  context.strokeRect(6, 6, canvas.width - 12, canvas.height - 12);
+
+  context.fillStyle = '#f9fafb';
+  context.shadowColor = 'rgba(0, 0, 0, .38)';
+  context.shadowBlur = 8;
+  context.shadowOffsetY = 4;
+  context.textBaseline = 'middle';
+  context.textAlign = 'center';
+  context.font = '900 78px Arial, sans-serif';
+  context.fillText(FENASOJA_HEADQUARTERS_LAYOUT.identity.wordmark, 254, 128);
+  context.shadowBlur = 0;
+  context.shadowOffsetY = 0;
+
+  if (symbol) {
+    context.drawImage(symbol, 506, 52, 152, 152);
+  } else {
+    context.fillStyle = FENASOJA_HEADQUARTERS_LAYOUT.palette.amber;
+    context.beginPath();
+    context.arc(582, 128, 62, 0, Math.PI * 2);
+    context.fill();
+  }
+
+  context.fillStyle = '#f9fafb';
+  context.textAlign = 'left';
+  context.font = '800 43px Arial, sans-serif';
+  context.fillText('Comissão', 704, 102);
+  context.fillText('Central', 704, 154);
+  context.fillStyle = FENASOJA_HEADQUARTERS_LAYOUT.palette.amber;
+  context.fillRect(684, 83, 6, 92);
+}
+
+/**
+ * Batches unlike static geometries that share one material into a single draw.
+ * This is intentionally reserved for composed landmarks: the source geometry is
+ * copied into BatchedMesh-owned buffers and the shared material remains under
+ * the landmark tint lifecycle.
+ */
+function BatchedTransforms({
+  items,
+  material,
+  castShadow = false,
+  receiveShadow = false,
+}: {
+  items: BatchedTransform[];
+  material: THREE.Material;
+  castShadow?: boolean;
+  receiveShadow?: boolean;
+}) {
+  const batch = useMemo(() => {
+    if (items.length === 0) return null;
+    const sources = new Map<THREE.BufferGeometry, THREE.BufferGeometry>();
+    items.forEach(({ geometry = UNIT_BOX }) => {
+      if (sources.has(geometry)) return;
+      const copy = geometry.index ? geometry.toNonIndexed() : geometry.clone();
+      if (!copy.getAttribute('normal')) copy.computeVertexNormals();
+      Object.keys(copy.attributes).forEach((attribute) => {
+        if (attribute !== 'position' && attribute !== 'normal') copy.deleteAttribute(attribute);
+      });
+      sources.set(geometry, copy);
+    });
+    const vertexCount = [...sources.values()].reduce(
+      (sum, geometry) => sum + geometry.getAttribute('position').count,
+      0,
+    );
+    const mesh = new THREE.BatchedMesh(items.length, vertexCount, 0, material);
+    const geometryIds = new Map<THREE.BufferGeometry, number>();
+    sources.forEach((geometry, source) => {
+      geometryIds.set(source, mesh.addGeometry(geometry));
+    });
+    const object = new THREE.Object3D();
+    items.forEach((item) => {
+      const source = item.geometry ?? UNIT_BOX;
+      const geometryId = geometryIds.get(source);
+      if (geometryId === undefined) return;
+      const batchId = mesh.addInstance(geometryId);
+      object.position.set(...item.position);
+      object.rotation.set(...(item.rotation ?? [0, 0, 0]));
+      object.scale.set(...item.scale);
+      object.updateMatrix();
+      mesh.setMatrixAt(batchId, object.matrix);
+    });
+    sources.forEach((geometry) => geometry.dispose());
+    mesh.castShadow = castShadow;
+    mesh.receiveShadow = receiveShadow;
+    mesh.raycast = NO_RAYCAST;
+    mesh.perObjectFrustumCulled = true;
+    mesh.sortObjects = false;
+    mesh.computeBoundingBox();
+    mesh.computeBoundingSphere();
+    return {
+      mesh,
+      dispose: mesh.dispose.bind(mesh),
+    };
+  }, [castShadow, items, material, receiveShadow]);
+
+  useEffect(() => () => batch?.dispose(), [batch]);
+
+  return batch ? <primitive object={batch.mesh} dispose={null} /> : null;
+}
+
 function HeadquartersIdentityPanel({
   position,
   width,
@@ -987,6 +1126,7 @@ function HeadquartersIdentityPanel({
   marqueeDepth: number;
   marqueeBulge: number;
 }) {
+  const invalidate = useThree((state) => state.invalidate);
   const identityGeometry = useMemo(
     () => createCurvedIdentityGeometry(
       width,
@@ -997,54 +1137,17 @@ function HeadquartersIdentityPanel({
     ),
     [height, marqueeBulge, marqueeDepth, marqueeWidth, width],
   );
-  const { texture, signMaterial } = useMemo(() => {
+  const { canvas, texture, signMaterial } = useMemo(() => {
+    let identityCanvas: HTMLCanvasElement | null = null;
     let canvasTexture: THREE.CanvasTexture | null = null;
     if (typeof document !== 'undefined') {
-      const canvas = document.createElement('canvas');
-      canvas.width = 768;
-      canvas.height = 192;
-      const context = canvas.getContext('2d');
+      identityCanvas = document.createElement('canvas');
+      identityCanvas.width = 1024;
+      identityCanvas.height = 256;
+      const context = identityCanvas.getContext('2d');
       if (context) {
-        context.fillStyle = '#f3f3ee';
-        context.fillRect(0, 0, canvas.width, canvas.height);
-        context.fillStyle = '#30383b';
-        context.textBaseline = 'middle';
-        context.textAlign = 'center';
-        context.font = '800 62px Arial, sans-serif';
-        context.fillText('FENASOJA', 194, 96);
-
-        context.save();
-        context.beginPath();
-        context.arc(390, 96, 58, 0, Math.PI * 2);
-        context.clip();
-        context.fillStyle = '#89c8df';
-        context.fillRect(328, 34, 124, 52);
-        context.fillStyle = '#df9736';
-        context.fillRect(328, 82, 124, 32);
-        context.fillStyle = '#4c935b';
-        context.fillRect(328, 110, 124, 54);
-        context.strokeStyle = '#f3f3ee';
-        context.lineWidth = 10;
-        context.lineCap = 'round';
-        [344, 372, 400, 428].forEach((x, index) => {
-          context.beginPath();
-          context.moveTo(x, 166);
-          context.quadraticCurveTo(x + index * 4, 116, x + 38, 82);
-          context.stroke();
-        });
-        context.restore();
-        context.strokeStyle = '#30383b';
-        context.lineWidth = 3;
-        context.beginPath();
-        context.arc(390, 96, 58, 0, Math.PI * 2);
-        context.stroke();
-
-        context.fillStyle = '#30383b';
-        context.textAlign = 'left';
-        context.font = '800 42px Arial, sans-serif';
-        context.fillText('Comissão', 486, 72);
-        context.fillText('Central', 486, 122);
-        canvasTexture = new THREE.CanvasTexture(canvas);
+        paintHeadquartersIdentity(context, identityCanvas);
+        canvasTexture = new THREE.CanvasTexture(identityCanvas);
         canvasTexture.colorSpace = THREE.SRGBColorSpace;
         canvasTexture.anisotropy = 4;
         canvasTexture.minFilter = THREE.LinearMipmapLinearFilter;
@@ -1052,14 +1155,32 @@ function HeadquartersIdentityPanel({
       }
     }
     return {
+      canvas: identityCanvas,
       texture: canvasTexture,
       signMaterial: new THREE.MeshBasicMaterial({
-        color: canvasTexture ? '#ffffff' : '#30383b',
+        color: canvasTexture ? '#ffffff' : FENASOJA_HEADQUARTERS_LAYOUT.palette.navy,
         map: canvasTexture,
         toneMapped: false,
       }),
     };
   }, []);
+
+  useEffect(() => {
+    if (!canvas || !texture || typeof Image === 'undefined') return undefined;
+    const context = canvas.getContext('2d');
+    if (!context) return undefined;
+    const symbol = new Image();
+    symbol.decoding = 'async';
+    symbol.onload = () => {
+      paintHeadquartersIdentity(context, canvas, symbol);
+      texture.needsUpdate = true;
+      invalidate();
+    };
+    symbol.src = FENASOJA_HEADQUARTERS_LAYOUT.identity.symbolAsset;
+    return () => {
+      symbol.onload = null;
+    };
+  }, [canvas, invalidate, texture]);
 
   useEffect(() => () => {
     identityGeometry.dispose();
@@ -1178,6 +1299,32 @@ function SoybeanMonument({
       };
     });
   }, [baseDiameter]);
+  const bronzeBatch = useMemo<BatchedTransform[]>(() => [
+    {
+      geometry: UNIT_CYLINDER,
+      position: [-baseDiameter * 0.02, 0.48, 0],
+      rotation: [0.08, 0, -0.16],
+      scale: [baseDiameter * 0.22, 0.62, baseDiameter * 0.2],
+    },
+    {
+      geometry: UNIT_SPHERE,
+      position: [baseDiameter * 0.04, 0.72, 0],
+      rotation: [0.12, 0.15, 0.34],
+      scale: [baseDiameter * 0.58, 0.18, baseDiameter * 0.3],
+    },
+    ...[-0.22, -0.07, 0.08, 0.23].map((offset, index) => ({
+      geometry: UNIT_CYLINDER,
+      position: [baseDiameter * (offset + 0.1), 0.82 + index * 0.018, podDepth * (index - 1.5) * 0.22] as Vector3Tuple,
+      scale: [baseDiameter * 0.075, baseDiameter * (0.58 - index * 0.035), baseDiameter * 0.065] as Vector3Tuple,
+      rotation: [0.08, 0.04 * index, 1.18 - index * 0.035] as Vector3Tuple,
+    })),
+    {
+      geometry: UNIT_CYLINDER,
+      position: [baseDiameter * 0.32, 0.73, podDepth * 0.5],
+      rotation: [0.48, 0.18, -0.68],
+      scale: [baseDiameter * 0.085, baseDiameter * 0.38, baseDiameter * 0.075],
+    },
+  ], [baseDiameter, podDepth]);
 
   useEffect(() => () => {
     podGeometry.dispose();
@@ -1192,14 +1339,7 @@ function SoybeanMonument({
       ]} />
       <mesh geometry={UNIT_CYLINDER} material={SHARED_SOIL_MATERIAL} position={[0, 0.205, 0]} scale={[baseDiameter * 0.77, 0.035, baseDiameter * 0.77]} receiveShadow raycast={NO_RAYCAST} dispose={null} />
 
-      <mesh geometry={UNIT_CYLINDER} material={SHARED_BRONZE_MATERIAL} position={[-baseDiameter * 0.02, 0.48, 0]} rotation={[0.08, 0, -0.16]} scale={[baseDiameter * 0.22, 0.62, baseDiameter * 0.2]} castShadow raycast={NO_RAYCAST} dispose={null} />
-      <mesh geometry={UNIT_SPHERE} material={SHARED_BRONZE_MATERIAL} position={[baseDiameter * 0.04, 0.72, 0]} rotation={[0.12, 0.15, 0.34]} scale={[baseDiameter * 0.58, 0.18, baseDiameter * 0.3]} castShadow raycast={NO_RAYCAST} dispose={null} />
-      <ScaledInstances geometry={UNIT_CYLINDER} material={SHARED_BRONZE_MATERIAL} castShadow items={[-0.22, -0.07, 0.08, 0.23].map((offset, index) => ({
-        position: [baseDiameter * (offset + 0.1), 0.82 + index * 0.018, podDepth * (index - 1.5) * 0.22] as Vector3Tuple,
-        scale: [baseDiameter * 0.075, baseDiameter * (0.58 - index * 0.035), baseDiameter * 0.065] as Vector3Tuple,
-        rotation: [0.08, 0.04 * index, 1.18 - index * 0.035] as Vector3Tuple,
-      }))} />
-      <mesh geometry={UNIT_CYLINDER} material={SHARED_BRONZE_MATERIAL} position={[baseDiameter * 0.32, 0.73, podDepth * 0.5]} rotation={[0.48, 0.18, -0.68]} scale={[baseDiameter * 0.085, baseDiameter * 0.38, baseDiameter * 0.075]} castShadow raycast={NO_RAYCAST} dispose={null} />
+      <BatchedTransforms items={bronzeBatch} material={SHARED_BRONZE_MATERIAL} castShadow />
 
       <group position={[0.04, 0.99, 0]} rotation={[0.06, -0.08, 0.18]} dispose={null}>
         <mesh geometry={podGeometry} material={SHARED_SOY_POD_MATERIAL} castShadow receiveShadow raycast={NO_RAYCAST} />
@@ -1401,8 +1541,8 @@ function FenasojaHeadquarters({
 }: LandmarkModelProps) {
   // A empena principal responde à Rua Argentina; a leve rotação revela a
   // esquina com a Rua Brasília sem ultrapassar o footprint cartográfico B12.
-  const width = bounds.width * 0.9;
-  const depth = bounds.depth * 0.76;
+  const width = bounds.width * FENASOJA_HEADQUARTERS_LAYOUT.envelope.widthRatio;
+  const depth = bounds.depth * FENASOJA_HEADQUARTERS_LAYOUT.envelope.depthRatio;
   const mainX = -width * 0.16;
   const bodyWidth = width * 0.65;
   const bodyDepth = depth * 0.84;
@@ -1451,8 +1591,8 @@ function FenasojaHeadquarters({
     [marqueeBulge, marqueeDepth, marqueeHeight, marqueeWidth],
   );
   const entranceGlass = useMemo(() => new THREE.MeshStandardMaterial({
-    color: '#4a6872',
-    roughness: 0.28,
+    color: FENASOJA_HEADQUARTERS_LAYOUT.palette.glass,
+    roughness: 0.22,
     metalness: 0.025,
     transparent: true,
     opacity: 0.42,
@@ -1460,7 +1600,7 @@ function FenasojaHeadquarters({
     depthWrite: false,
     side: THREE.FrontSide,
   }), []);
-  const upperWindows: InstanceTransform[] = [-0.36, -0.12, 0.12, 0.36].map((x) => ({
+  const upperWindows: InstanceTransform[] = [-0.34, -0.11, 0.11, 0.34].map((x) => ({
     position: [x * bodyWidth, wallHeight * 0.91, frontZ + 0.052] as Vector3Tuple,
     scale: [bodyWidth * 0.19, wallHeight * 0.19, 0.026] as Vector3Tuple,
   }));
@@ -1499,6 +1639,17 @@ function FenasojaHeadquarters({
     { position: [-bodyWidth * 0.18, wallHeight + roofRise * 0.31, frontZ + 0.059], scale: [bodyWidth * 0.35, 0.04, 0.04], rotation: [0, 0, 0.72] },
     { position: [bodyWidth * 0.18, wallHeight + roofRise * 0.31, frontZ + 0.059], scale: [bodyWidth * 0.35, 0.04, 0.04], rotation: [0, 0, -0.72] },
   ];
+  const facadeRibs = useMemo<InstanceTransform[]>(() => Array.from({ length: 13 }, (_, index) => ({
+    position: [(-0.42 + index / 12 * 0.25) * bodyWidth, wallHeight * 0.35, frontZ + 0.061] as Vector3Tuple,
+    scale: [0.017, wallHeight * 0.7, 0.035] as Vector3Tuple,
+  })), [bodyWidth, frontZ, wallHeight]);
+  const amberLines = useMemo<InstanceTransform[]>(() => [
+    { position: [-bodyWidth * 0.295, wallHeight * 0.69, frontZ + 0.082], scale: [bodyWidth * 0.27, 0.025, 0.022] },
+    { position: [-bodyWidth * 0.43, wallHeight * 0.35, frontZ + 0.082], scale: [0.025, wallHeight * 0.7, 0.022] },
+    { position: [-bodyWidth * 0.16, wallHeight * 0.35, frontZ + 0.082], scale: [0.025, wallHeight * 0.7, 0.022] },
+    { position: [0, marqueeY + marqueeHeight * 0.54, frontZ + marqueeDepth * 0.58], scale: [marqueeWidth * 0.94, 0.022, 0.022] },
+    { position: [0, marqueeY - marqueeHeight * 0.54, frontZ + marqueeDepth * 0.58], scale: [marqueeWidth * 0.94, 0.022, 0.022] },
+  ], [bodyWidth, frontZ, marqueeDepth, marqueeHeight, marqueeWidth, marqueeY, wallHeight]);
   const gablePosts = [-0.32, -0.16, 0, 0.16, 0.32].map((ratio) => {
     const x = ratio * bodyWidth;
     const postHeight = roofRise * Math.max(0.2, 0.74 - Math.abs(ratio) * 1.25);
@@ -1530,8 +1681,8 @@ function FenasojaHeadquarters({
     scale: [annexWidth * (0.82 + index * 0.04), 0.035, depth * 0.075] as Vector3Tuple,
   })), [annexFrontZ, annexWidth, annexX, depth]);
   const palmBases = useMemo(() => [
-    { x: -width * 0.38, z: depth * 0.32, height: height * 0.38 },
-    { x: width * 0.42, z: depth * 0.29, height: height * 0.32 },
+    { x: width * 0.42, z: depth * 0.28, height: height * 0.34 },
+    { x: width * 0.34, z: depth * 0.39, height: height * 0.27 },
   ], [depth, height, width]);
   const palmTrunks = useMemo<InstanceTransform[]>(() => palmBases.map((palm) => ({
     position: [palm.x, palm.height / 2 + 0.08, palm.z] as Vector3Tuple,
@@ -1546,6 +1697,153 @@ function FenasojaHeadquarters({
       rotation: [0, angle, index % 2 === 0 ? 1.12 : -1.08] as Vector3Tuple,
     };
   })), [palmBases, width]);
+  const flagMasts = useMemo<InstanceTransform[]>(() => [-0.41, -0.34, -0.27].map((ratio) => ({
+    position: [ratio * width, height * 0.29, depth * 0.39] as Vector3Tuple,
+    scale: [0.018, height * 0.58, 0.018] as Vector3Tuple,
+  })), [depth, height, width]);
+  const translateMain = (item: InstanceTransform): BatchedTransform => ({
+    ...item,
+    position: [item.position[0] + mainX, item.position[1], item.position[2]],
+  });
+  const platformBatch: BatchedTransform[] = [
+    { position: [0, 0.045, 0], scale: [width * 0.98, 0.09, depth * 0.98] },
+    ...paving.map(translateMain),
+    ...annexSteps,
+  ];
+  const wallBatch: BatchedTransform[] = [
+    { geometry: bodyGeometry, position: [mainX, 0.09, bodyZ], scale: [1, 1, 1] },
+    { geometry: marqueeGeometry, position: [mainX, marqueeY, frontZ + 0.035], scale: [1, 1, 1] },
+    {
+      position: [annexX, 0.09 + annexHeight / 2, annexZ],
+      scale: [annexWidth, annexHeight, annexDepth],
+    },
+    {
+      geometry: annexGableGeometry,
+      position: [annexX + annexWidth / 2 + 0.002, 0.09 + annexHeight, annexZ],
+      scale: [1, 1, 1],
+      rotation: [0, Math.PI / 2, 0],
+    },
+  ];
+  const darkBatch: BatchedTransform[] = [
+    {
+      position: [mainX - bodyWidth * 0.295, wallHeight * 0.35, frontZ + 0.025],
+      scale: [bodyWidth * 0.27, wallHeight * 0.7, 0.028],
+    },
+    ...[
+      { position: [-bodyWidth * 0.25, wallHeight + roofRise * 0.49 + 0.07, bodyZ] as Vector3Tuple, scale: [roofLength * 0.97, 0.045, bodyDepth + depth * 0.11] as Vector3Tuple, rotation: [0, 0, roofPitch] as Vector3Tuple },
+      { position: [bodyWidth * 0.25, wallHeight + roofRise * 0.49 + 0.07, bodyZ] as Vector3Tuple, scale: [roofLength * 0.97, 0.045, bodyDepth + depth * 0.11] as Vector3Tuple, rotation: [0, 0, -roofPitch] as Vector3Tuple },
+    ].map(translateMain),
+    ...(showDetail ? [
+      { geometry: UNIT_CYLINDER, position: [mainX - bodyWidth * 0.36, 0.17, depth * 0.34] as Vector3Tuple, scale: [bodyWidth * 0.12, 0.26, bodyWidth * 0.12] as Vector3Tuple },
+      { geometry: UNIT_CYLINDER, position: [mainX + bodyWidth * 0.2, 0.15, depth * 0.39] as Vector3Tuple, scale: [bodyWidth * 0.1, 0.22, bodyWidth * 0.1] as Vector3Tuple },
+    ] : []),
+  ];
+  const glassBatch: BatchedTransform[] = [
+    { geometry: gableRecess, position: [mainX, wallHeight + 0.09, frontZ + 0.026], scale: [1, 1, 1] },
+    ...upperWindows.map(translateMain),
+    ...sideWindows.map(translateMain),
+    {
+      position: [annexX - annexWidth * 0.06, 0.09 + annexHeight * 0.4, annexFrontZ + 0.026],
+      scale: [annexWidth * 0.78, annexHeight * 0.54, 0.026],
+    },
+    ...annexWindows,
+    ...[-0.22, 0.04, 0.28].map((ratio) => ({
+      position: [annexX + annexWidth / 2 + 0.017, annexHeight * 0.55, annexZ + ratio * annexDepth] as Vector3Tuple,
+      scale: [0.023, annexHeight * 0.27, annexDepth * 0.17] as Vector3Tuple,
+    })),
+  ];
+  const roofBatch: BatchedTransform[] = [
+    { position: [-bodyWidth * 0.25, wallHeight + roofRise * 0.52 + 0.09, bodyZ], scale: [roofLength, 0.095, bodyDepth + depth * 0.13], rotation: [0, 0, roofPitch] },
+    { position: [bodyWidth * 0.25, wallHeight + roofRise * 0.52 + 0.09, bodyZ], scale: [roofLength, 0.095, bodyDepth + depth * 0.13], rotation: [0, 0, -roofPitch] },
+  ].map(translateMain);
+  const trimBatch: BatchedTransform[] = [
+    ...roofStructure.map(translateMain),
+    ...(showDetail ? [
+      ...gablePosts.map(translateMain),
+      { position: [mainX - bodyWidth * 0.47, wallHeight * 0.46, frontZ + 0.11] as Vector3Tuple, scale: [0.045, wallHeight * 0.92, 0.045] as Vector3Tuple },
+      { position: [mainX + bodyWidth * 0.47, wallHeight * 0.46, frontZ + 0.11] as Vector3Tuple, scale: [0.045, wallHeight * 0.92, 0.045] as Vector3Tuple },
+    ] : []),
+  ];
+  const whiteBatch: BatchedTransform[] = [
+    ...facadeFrames.map(translateMain),
+    {
+      position: [annexX, 0.09 + annexHeight + annexRoofRise * 0.5, annexZ + annexDepth * 0.25],
+      scale: [annexWidth + width * 0.025, 0.065, annexRoofHalfDepth],
+      rotation: [annexRoofPitch, 0, 0],
+    },
+    {
+      position: [annexX, 0.09 + annexHeight + annexRoofRise * 0.5, annexZ - annexDepth * 0.25],
+      scale: [annexWidth + width * 0.025, 0.065, annexRoofHalfDepth],
+      rotation: [-annexRoofPitch, 0, 0],
+    },
+    ...annexFrames,
+    ...[-0.45, -0.15, 0.15, 0.45].map((ratio) => ({
+      position: [annexX - annexWidth * 0.06 + ratio * annexWidth * 0.78, 0.09 + annexHeight * 0.4, annexFrontZ + 0.046] as Vector3Tuple,
+      scale: [0.018, annexHeight * 0.56, 0.018] as Vector3Tuple,
+    })),
+    {
+      position: [annexX - annexWidth * 0.06, 0.09 + annexHeight * 0.58, annexFrontZ + 0.047],
+      scale: [annexWidth * 0.8, 0.018, 0.018],
+    },
+    {
+      position: [annexX + annexWidth * 0.29, 0.09 + annexHeight * 0.31, annexFrontZ + 0.058],
+      scale: [0.018, annexHeight * 0.51, 0.018],
+    },
+    {
+      position: [annexX + annexWidth * 0.47, 0.09 + annexHeight * 0.31, annexFrontZ + 0.058],
+      scale: [0.018, annexHeight * 0.51, 0.018],
+    },
+    {
+      position: [annexX + annexWidth * 0.38, 0.09 + annexHeight * 0.57, annexFrontZ + 0.058],
+      scale: [annexWidth * 0.2, 0.018, 0.018],
+    },
+    {
+      position: [mainX + bodyWidth / 2 + 0.015, 0.09 + annexHeight * 0.51, annexZ],
+      scale: [0.065, annexHeight * 0.95, annexDepth * 0.82],
+    },
+    ...(showDetail ? [
+      ...[-0.4, -0.2, 0, 0.2, 0.4].flatMap((ratio) => ([
+        { position: [mainX - bodyWidth * 0.25, wallHeight + roofRise * 0.535 + 0.09, bodyZ + ratio * bodyDepth] as Vector3Tuple, scale: [roofLength * 0.98, 0.014, 0.018] as Vector3Tuple, rotation: [0, 0, roofPitch] as Vector3Tuple },
+        { position: [mainX + bodyWidth * 0.25, wallHeight + roofRise * 0.535 + 0.09, bodyZ + ratio * bodyDepth] as Vector3Tuple, scale: [roofLength * 0.98, 0.014, 0.018] as Vector3Tuple, rotation: [0, 0, -roofPitch] as Vector3Tuple },
+      ])),
+      ...flagMasts.map((item) => ({ ...item, geometry: UNIT_CYLINDER })),
+    ] : []),
+  ];
+  const amberBatch: BatchedTransform[] = [
+    ...amberLines.map(translateMain),
+    ...(showFocusDetail ? [
+      { position: [mainX - bodyWidth * 0.41, doorY, frontZ + 0.064] as Vector3Tuple, scale: [0.022, doorHeight * 1.02, 0.022] as Vector3Tuple },
+      { position: [mainX + bodyWidth * 0.41, doorY, frontZ + 0.064] as Vector3Tuple, scale: [0.022, doorHeight * 1.02, 0.022] as Vector3Tuple },
+      { position: [mainX, doorHeight + 0.12, frontZ + 0.064] as Vector3Tuple, scale: [bodyWidth * 0.82, 0.022, 0.022] as Vector3Tuple },
+    ] : []),
+  ];
+  const entranceBatch: BatchedTransform[] = [
+    ...doorPanels.map((item) => ({ ...translateMain(item), geometry: UNIT_PLANE })),
+    {
+      geometry: UNIT_PLANE,
+      position: [annexX + annexWidth * 0.38, 0.09 + annexHeight * 0.31, annexFrontZ + 0.045],
+      scale: [annexWidth * 0.16, annexHeight * 0.49, 0.018],
+    },
+  ];
+  const metalBatch: BatchedTransform[] = showDetail ? [
+    ...facadeRibs.map(translateMain),
+    ...(showFocusDetail ? [
+      { position: [mainX - bodyWidth * 0.045, doorY, doorZ + 0.025] as Vector3Tuple, scale: [0.018, doorHeight * 0.32, 0.02] as Vector3Tuple },
+      { position: [mainX + bodyWidth * 0.045, doorY, doorZ + 0.025] as Vector3Tuple, scale: [0.018, doorHeight * 0.32, 0.02] as Vector3Tuple },
+    ] : []),
+  ] : [];
+  const greenBatch: BatchedTransform[] = showDetail ? [
+    { geometry: UNIT_SHRUB, position: [mainX - bodyWidth * 0.36, 0.34, depth * 0.34], scale: [bodyWidth * 0.13, 0.27, bodyWidth * 0.13] },
+    { geometry: UNIT_SHRUB, position: [mainX + bodyWidth * 0.2, 0.3, depth * 0.39], scale: [bodyWidth * 0.11, 0.24, bodyWidth * 0.11] },
+    { geometry: UNIT_CONE, position: [mainX - bodyWidth * 0.36, 0.45, depth * 0.34], scale: [bodyWidth * 0.07, 0.3, bodyWidth * 0.07] },
+    { geometry: UNIT_CONE, position: [mainX + bodyWidth * 0.2, 0.4, depth * 0.39], scale: [bodyWidth * 0.06, 0.25, bodyWidth * 0.06] },
+    ...palmFronds.map((item) => ({ ...item, geometry: UNIT_CONE })),
+    ...[-0.22, 0.05, 0.26].map((ratio, index) => ({
+      geometry: UNIT_SHRUB,
+      position: [annexX + ratio * annexWidth, 0.15 + (index % 2) * 0.025, annexFrontZ + depth * 0.17] as Vector3Tuple,
+      scale: [annexWidth * 0.12, annexHeight * (0.2 + index * 0.025), annexWidth * 0.11] as Vector3Tuple,
+    })),
+  ] : [];
 
   useEffect(() => () => {
     bodyGeometry.dispose();
@@ -1556,233 +1854,113 @@ function FenasojaHeadquarters({
   }, [annexGableGeometry, bodyGeometry, entranceGlass, gableRecess, marqueeGeometry]);
 
   useEffect(() => {
-    entranceGlass.opacity = showFocusDetail ? 0.28 : 0.42;
-    entranceGlass.emissive.set(showFocusDetail ? '#2e454a' : '#000000');
-    entranceGlass.emissiveIntensity = showFocusDetail ? 0.08 : 0;
+    entranceGlass.opacity = showFocusDetail ? 0.34 : 0.48;
+    entranceGlass.emissive.set(showFocusDetail ? FENASOJA_HEADQUARTERS_LAYOUT.palette.warmLight : '#000000');
+    entranceGlass.emissiveIntensity = showFocusDetail ? 0.18 : 0;
     entranceGlass.needsUpdate = true;
   }, [entranceGlass, showFocusDetail]);
 
   return (
-    <group dispose={null}>
-      <mesh geometry={UNIT_BOX} material={materials.platform} position={[0, 0.045, 0]} scale={[width * 0.98, 0.09, depth * 0.98]} receiveShadow raycast={NO_RAYCAST} dispose={null} />
-      <group position={[mainX, 0, 0]} dispose={null}>
-        <mesh geometry={bodyGeometry} material={materials.wall} position={[0, 0.09, bodyZ]} castShadow receiveShadow raycast={NO_RAYCAST} />
-        <mesh geometry={UNIT_BOX} material={materials.dark} position={[0, wallHeight * 0.32, frontZ + 0.025]} scale={[bodyWidth * 0.84, wallHeight * 0.62, 0.028]} raycast={NO_RAYCAST} dispose={null} />
-        <mesh geometry={gableRecess} material={materials.dark} position={[0, wallHeight + 0.09, frontZ + 0.026]} raycast={NO_RAYCAST} />
-        <ScaledInstances material={materials.roof} castShadow receiveShadow items={[
-          { position: [-bodyWidth * 0.25, wallHeight + roofRise * 0.52 + 0.09, bodyZ], scale: [roofLength, 0.095, bodyDepth + depth * 0.13], rotation: [0, 0, roofPitch] },
-          { position: [bodyWidth * 0.25, wallHeight + roofRise * 0.52 + 0.09, bodyZ], scale: [roofLength, 0.095, bodyDepth + depth * 0.13], rotation: [0, 0, -roofPitch] },
-        ]} />
-        <ScaledInstances material={materials.trim} items={roofStructure} />
-        <ScaledInstances material={materials.glass} items={upperWindows} />
-        <ScaledInstances material={materials.glass} items={sideWindows} />
-        <ScaledInstances material={materials.white} items={facadeFrames} />
-        <mesh geometry={marqueeGeometry} material={materials.white} position={[0, marqueeY, frontZ + 0.035]} castShadow receiveShadow raycast={NO_RAYCAST} />
-        <ScaledInstances geometry={UNIT_PLANE} material={entranceGlass} items={doorPanels} />
-        <ScaledInstances material={materials.platform} items={paving} receiveShadow />
+    <group
+      name="sede-fenasoja-comissao-central"
+      userData={{
+        classification: 'ADMINISTRATION',
+        isSellable: false,
+        primaryDrawCalls: showFocusDetail ? 30 : showDetail ? 25 : 9,
+      }}
+      dispose={null}
+    >
+      <BatchedTransforms items={platformBatch} material={materials.platform} receiveShadow />
+      <BatchedTransforms items={wallBatch} material={materials.wall} castShadow receiveShadow />
+      <BatchedTransforms items={darkBatch} material={materials.dark} castShadow />
+      <BatchedTransforms items={glassBatch} material={materials.glass} />
+      <BatchedTransforms items={roofBatch} material={materials.roof} castShadow receiveShadow />
+      <BatchedTransforms items={trimBatch} material={materials.trim} castShadow />
+      <BatchedTransforms items={whiteBatch} material={materials.white} castShadow receiveShadow />
+      <BatchedTransforms items={amberBatch} material={SHARED_HEADQUARTERS_AMBER_MATERIAL} />
+      <BatchedTransforms items={entranceBatch} material={entranceGlass} />
       {showDetail && (
         <>
-          <ScaledInstances material={materials.white} castShadow items={[-0.4, -0.2, 0, 0.2, 0.4].flatMap((ratio) => ([
-            {
-              position: [-bodyWidth * 0.25, wallHeight + roofRise * 0.535 + 0.09, bodyZ + ratio * bodyDepth] as Vector3Tuple,
-              scale: [roofLength * 0.98, 0.014, 0.018] as Vector3Tuple,
-              rotation: [0, 0, roofPitch] as Vector3Tuple,
-            },
-            {
-              position: [bodyWidth * 0.25, wallHeight + roofRise * 0.535 + 0.09, bodyZ + ratio * bodyDepth] as Vector3Tuple,
-              scale: [roofLength * 0.98, 0.014, 0.018] as Vector3Tuple,
-              rotation: [0, 0, -roofPitch] as Vector3Tuple,
-            },
-          ]))} />
-          <ScaledInstances material={materials.trim} items={gablePosts} />
+          <BatchedTransforms items={metalBatch} material={materials.metal} />
+          <BatchedTransforms items={greenBatch} material={materials.green} castShadow />
           <HeadquartersIdentityPanel
-            position={[0, marqueeY, frontZ + 0.035]}
+            position={[mainX, marqueeY, frontZ + 0.035]}
             width={marqueeWidth * 0.82}
             height={marqueeHeight * 0.76}
             marqueeWidth={marqueeWidth}
             marqueeDepth={marqueeDepth}
             marqueeBulge={marqueeBulge}
           />
-          <ScaledInstances geometry={UNIT_CYLINDER} material={SHARED_PLANTER_RED_MATERIAL} castShadow items={[
-            { position: [-bodyWidth * 0.36, 0.17, depth * 0.34], scale: [bodyWidth * 0.12, 0.26, bodyWidth * 0.12] },
-            { position: [bodyWidth * 0.2, 0.15, depth * 0.39], scale: [bodyWidth * 0.1, 0.22, bodyWidth * 0.1] },
-          ]} />
-          <ScaledInstances geometry={UNIT_SHRUB} material={materials.green} items={[
-            { position: [-bodyWidth * 0.36, 0.34, depth * 0.34], scale: [bodyWidth * 0.13, 0.27, bodyWidth * 0.13] },
-            { position: [bodyWidth * 0.2, 0.3, depth * 0.39], scale: [bodyWidth * 0.11, 0.24, bodyWidth * 0.11] },
-          ]} />
-          <ScaledInstances geometry={UNIT_CONE} material={materials.green} items={[
-            { position: [-bodyWidth * 0.36, 0.45, depth * 0.34], scale: [bodyWidth * 0.07, 0.3, bodyWidth * 0.07] },
-            { position: [bodyWidth * 0.2, 0.4, depth * 0.39], scale: [bodyWidth * 0.06, 0.25, bodyWidth * 0.06] },
-          ]} />
-          <ScaledInstances material={materials.trim} items={[
-            { position: [-bodyWidth * 0.47, wallHeight * 0.46, frontZ + 0.11], scale: [0.045, wallHeight * 0.92, 0.045] },
-            { position: [bodyWidth * 0.47, wallHeight * 0.46, frontZ + 0.11], scale: [0.045, wallHeight * 0.92, 0.045] },
-          ]} castShadow />
-        </>
-      )}
-
-      {showFocusDetail && (
-        <>
-          <mesh geometry={UNIT_BOX} material={materials.accent} position={[0, doorY, frontZ + 0.034]} scale={[bodyWidth * 0.78, doorHeight * 0.92, 0.018]} raycast={NO_RAYCAST} dispose={null} />
-          <mesh geometry={UNIT_BOX} material={SHARED_INTERIOR_LIGHT_MATERIAL} position={[0, doorY * 0.92, frontZ + 0.048]} scale={[bodyWidth * 0.46, doorHeight * 0.34, 0.008]} raycast={NO_RAYCAST} dispose={null} />
-          <mesh geometry={UNIT_BOX} material={materials.accent} position={[0, doorHeight * 0.22, frontZ + 0.058]} scale={[bodyWidth * 0.62, doorHeight * 0.15, 0.01]} raycast={NO_RAYCAST} dispose={null} />
-          <ScaledInstances material={materials.white} items={[
-            { position: [-bodyWidth * 0.23, doorY * 0.57, frontZ + 0.054], scale: [bodyWidth * 0.22, doorHeight * 0.24, 0.025] },
-            { position: [bodyWidth * 0.23, doorY * 0.57, frontZ + 0.054], scale: [bodyWidth * 0.22, doorHeight * 0.24, 0.025] },
-          ]} />
-          <ScaledInstances material={materials.trim} items={[
-            { position: [-bodyWidth * 0.23, doorY * 0.79, frontZ + 0.055], scale: [bodyWidth * 0.22, doorHeight * 0.22, 0.026] },
-            { position: [bodyWidth * 0.23, doorY * 0.79, frontZ + 0.055], scale: [bodyWidth * 0.22, doorHeight * 0.22, 0.026] },
-          ]} />
-          <ScaledInstances geometry={UNIT_CYLINDER} material={materials.accent} items={[
-            { position: [0, doorY * 0.48, frontZ + 0.061], scale: [bodyWidth * 0.2, 0.045, bodyWidth * 0.13] },
-          ]} />
-          <ScaledInstances material={materials.green} items={[-0.31, -0.2, -0.09].map((x, index) => ({
-            position: [x * bodyWidth, doorY * (1.28 + index * 0.04), frontZ + 0.057] as Vector3Tuple,
-            scale: [bodyWidth * 0.075, doorHeight * 0.2, 0.024] as Vector3Tuple,
-          }))} />
-          <ScaledInstances geometry={UNIT_PLANE} material={entranceGlass} items={[
-            { position: [bodyWidth * 0.34, doorY, frontZ + 0.057], scale: [bodyWidth * 0.12, doorHeight * 0.62, 0.022] },
-          ]} />
-          <ScaledInstances material={SHARED_INTERIOR_LIGHT_MATERIAL} items={[
-            { position: [-bodyWidth * 0.12, doorHeight * 0.93, frontZ + 0.059], scale: [bodyWidth * 0.17, 0.035, 0.024] },
-            { position: [bodyWidth * 0.12, doorHeight * 0.93, frontZ + 0.059], scale: [bodyWidth * 0.17, 0.035, 0.024] },
-          ]} />
-          <ScaledInstances material={materials.metal} items={[
-            { position: [-bodyWidth * 0.045, doorY, doorZ + 0.025], scale: [0.018, doorHeight * 0.32, 0.02] },
-            { position: [bodyWidth * 0.045, doorY, doorZ + 0.025], scale: [0.018, doorHeight * 0.32, 0.02] },
-          ]} />
-        </>
-      )}
-    </group>
-
-      <mesh
-        geometry={UNIT_BOX}
-        material={materials.white}
-        position={[annexX, 0.09 + annexHeight / 2, annexZ]}
-        scale={[annexWidth, annexHeight, annexDepth]}
-        castShadow
-        receiveShadow
-        raycast={NO_RAYCAST}
-        dispose={null}
-      />
-      <mesh
-        geometry={UNIT_BOX}
-        material={materials.glass}
-        position={[annexX - annexWidth * 0.06, 0.09 + annexHeight * 0.4, annexFrontZ + 0.026]}
-        scale={[annexWidth * 0.78, annexHeight * 0.54, 0.026]}
-        raycast={NO_RAYCAST}
-        dispose={null}
-      />
-      <ScaledInstances
-        material={materials.white}
-        castShadow
-        receiveShadow
-        items={[
-          {
-            position: [annexX, 0.09 + annexHeight + annexRoofRise * 0.5, annexZ + annexDepth * 0.25],
-            scale: [annexWidth + width * 0.025, 0.065, annexRoofHalfDepth],
-            rotation: [annexRoofPitch, 0, 0],
-          },
-          {
-            position: [annexX, 0.09 + annexHeight + annexRoofRise * 0.5, annexZ - annexDepth * 0.25],
-            scale: [annexWidth + width * 0.025, 0.065, annexRoofHalfDepth],
-            rotation: [-annexRoofPitch, 0, 0],
-          },
-        ]}
-      />
-      <ScaledInstances
-        geometry={annexGableGeometry}
-        material={materials.white}
-        items={[
-          {
-            position: [annexX + annexWidth / 2 + 0.002, 0.09 + annexHeight, annexZ],
-            scale: [1, 1, 1],
-            rotation: [0, Math.PI / 2, 0],
-          },
-        ]}
-      />
-      <ScaledInstances material={materials.glass} items={annexWindows} />
-      <ScaledInstances material={materials.white} items={annexFrames} />
-      <ScaledInstances material={materials.white} items={[
-        ...[-0.45, -0.15, 0.15, 0.45].map((ratio) => ({
-          position: [annexX - annexWidth * 0.06 + ratio * annexWidth * 0.78, 0.09 + annexHeight * 0.4, annexFrontZ + 0.046] as Vector3Tuple,
-          scale: [0.018, annexHeight * 0.56, 0.018] as Vector3Tuple,
-        })),
-        {
-          position: [annexX - annexWidth * 0.06, 0.09 + annexHeight * 0.58, annexFrontZ + 0.047] as Vector3Tuple,
-          scale: [annexWidth * 0.8, 0.018, 0.018] as Vector3Tuple,
-        },
-      ]} />
-      <ScaledInstances
-        material={materials.glass}
-        items={[-0.22, 0.04, 0.28].map((ratio) => ({
-          position: [annexX + annexWidth / 2 + 0.017, annexHeight * 0.55, annexZ + ratio * annexDepth] as Vector3Tuple,
-          scale: [0.023, annexHeight * 0.27, annexDepth * 0.17] as Vector3Tuple,
-        }))}
-      />
-      <ScaledInstances
-        geometry={UNIT_PLANE}
-        material={entranceGlass}
-        items={[
-          {
-            position: [annexX + annexWidth * 0.38, 0.09 + annexHeight * 0.31, annexFrontZ + 0.045],
-            scale: [annexWidth * 0.16, annexHeight * 0.49, 0.018],
-          },
-        ]}
-      />
-      <ScaledInstances
-        material={materials.white}
-        items={[
-          {
-            position: [annexX + annexWidth * 0.29, 0.09 + annexHeight * 0.31, annexFrontZ + 0.058],
-            scale: [0.018, annexHeight * 0.51, 0.018],
-          },
-          {
-            position: [annexX + annexWidth * 0.47, 0.09 + annexHeight * 0.31, annexFrontZ + 0.058],
-            scale: [0.018, annexHeight * 0.51, 0.018],
-          },
-          {
-            position: [annexX + annexWidth * 0.38, 0.09 + annexHeight * 0.57, annexFrontZ + 0.058],
-            scale: [annexWidth * 0.2, 0.018, 0.018],
-          },
-          {
-            position: [mainX + bodyWidth / 2 + 0.015, 0.09 + annexHeight * 0.51, annexZ],
-            scale: [0.065, annexHeight * 0.95, annexDepth * 0.82],
-          },
-        ]}
-      />
-      <ScaledInstances material={materials.platform} items={annexSteps} receiveShadow />
-
-      {showDetail && (
-        <>
           <ReferenceMuralPanel
             variant="meeting-room"
             position={[annexX - annexWidth * 0.06, 0.09 + annexHeight * 0.4, annexFrontZ + 0.043]}
             size={[annexWidth * 0.76, annexHeight * 0.5]}
           />
-          <ScaledInstances geometry={UNIT_CYLINDER} material={materials.accent} castShadow items={palmTrunks} />
-          <ScaledInstances geometry={UNIT_CONE} material={materials.green} items={palmFronds} />
           <ScaledInstances
-            geometry={UNIT_SHRUB}
-            material={materials.green}
-            items={[-0.22, 0.05, 0.26].map((ratio, index) => ({
-              position: [annexX + ratio * annexWidth, 0.15 + (index % 2) * 0.025, annexFrontZ + depth * 0.17] as Vector3Tuple,
-              scale: [annexWidth * 0.12, annexHeight * (0.2 + index * 0.025), annexWidth * 0.11] as Vector3Tuple,
+            geometry={UNIT_CYLINDER}
+            material={SHARED_BRONZE_MATERIAL}
+            castShadow
+            items={palmTrunks}
+          />
+          <ScaledInstances
+            geometry={UNIT_SPHERE}
+            material={SHARED_FLOWER_YELLOW_MATERIAL}
+            items={[-0.36, -0.28, 0.28, 0.37].map((ratio, index) => ({
+              position: [ratio * width, 0.13, depth * (0.42 + index % 2 * 0.035)] as Vector3Tuple,
+              scale: [width * 0.035, width * 0.026, width * 0.035] as Vector3Tuple,
             }))}
+          />
+          <ScaledInstances
+            geometry={UNIT_SPHERE}
+            material={SHARED_FLOWER_WHITE_MATERIAL}
+            items={[-0.32, 0.32].map((ratio) => ({
+              position: [ratio * width, 0.14, depth * 0.46] as Vector3Tuple,
+              scale: [width * 0.038, width * 0.028, width * 0.038] as Vector3Tuple,
+            }))}
+          />
+          <SoybeanMonument
+            width={width}
+            depth={depth}
+            materials={materials}
+            showDetail={showDetail}
+            showFocusDetail={showFocusDetail}
           />
         </>
       )}
 
       {showFocusDetail && (
-        <SignagePanel
-          title="FENASOJA"
-          position={[annexX + annexWidth * 0.35, 0.09 + annexHeight * 0.66, annexFrontZ + 0.061]}
-          size={[annexWidth * 0.26, annexHeight * 0.085]}
-          background="#f2f0e8"
-          foreground="#30383b"
-        />
+        <>
+          <mesh
+            geometry={UNIT_BOX}
+            material={SHARED_HEADQUARTERS_WARM_LIGHT_MATERIAL}
+            position={[mainX, doorY * 0.93, frontZ + 0.043]}
+            scale={[bodyWidth * 0.46, doorHeight * 0.34, 0.008]}
+            raycast={NO_RAYCAST}
+            dispose={null}
+          />
+          <SignagePanel
+            title="FENASOJA 2028"
+            position={[mainX - bodyWidth * 0.24, doorY * 0.72, frontZ + 0.061]}
+            size={[bodyWidth * 0.22, doorHeight * 0.3]}
+            background={FENASOJA_HEADQUARTERS_LAYOUT.palette.navy}
+            foreground="#f9fafb"
+          />
+          <SignagePanel
+            title="NOSSO OURO"
+            subtitle="VEM DO CAMPO"
+            position={[mainX + bodyWidth * 0.24, doorY * 0.72, frontZ + 0.061]}
+            size={[bodyWidth * 0.22, doorHeight * 0.3]}
+            background={FENASOJA_HEADQUARTERS_LAYOUT.palette.navy}
+            foreground={FENASOJA_HEADQUARTERS_LAYOUT.palette.warmLight}
+          />
+          <SignagePanel
+            title="FENASOJA"
+            position={[annexX + annexWidth * 0.35, 0.09 + annexHeight * 0.66, annexFrontZ + 0.061]}
+            size={[annexWidth * 0.26, annexHeight * 0.085]}
+            background={FENASOJA_HEADQUARTERS_LAYOUT.palette.navy}
+            foreground="#f9fafb"
+          />
+        </>
       )}
     </group>
   );
@@ -2449,6 +2627,322 @@ function SicrediArena({
   );
 }
 
+const APOLLO_ATLAS_BODY_U_MAX = 384 / APOLLO_XIV_RENDER_BUDGET.atlasWidth;
+const APOLLO_ATLAS_SIGN_RECT = { x: 388, y: 824, width: 120, height: 74 } as const;
+
+function paintBrazilFlag(context: CanvasRenderingContext2D, x: number, y: number) {
+  context.fillStyle = '#159447';
+  context.fillRect(x, y, 52, 34);
+  context.fillStyle = '#f0cd3e';
+  context.beginPath();
+  context.moveTo(x + 26, y + 4);
+  context.lineTo(x + 47, y + 17);
+  context.lineTo(x + 26, y + 30);
+  context.lineTo(x + 5, y + 17);
+  context.closePath();
+  context.fill();
+  context.fillStyle = '#275ca4';
+  context.beginPath();
+  context.arc(x + 26, y + 17, 7, 0, Math.PI * 2);
+  context.fill();
+}
+
+function paintUnitedStatesFlag(context: CanvasRenderingContext2D, x: number, y: number) {
+  context.fillStyle = '#f4f1e9';
+  context.fillRect(x, y, 52, 34);
+  context.fillStyle = '#bc3442';
+  for (let stripe = 0; stripe < 7; stripe += 1) context.fillRect(x, y + stripe * 5, 52, 3);
+  context.fillStyle = '#31528d';
+  context.fillRect(x, y, 23, 18);
+  context.fillStyle = '#f4f1e9';
+  for (let row = 0; row < 3; row += 1) {
+    for (let column = 0; column < 4; column += 1) {
+      context.fillRect(x + 3 + column * 5, y + 3 + row * 5, 1.5, 1.5);
+    }
+  }
+}
+
+function createApolloXivAtlas() {
+  const canvas = document.createElement('canvas');
+  canvas.width = APOLLO_XIV_RENDER_BUDGET.atlasWidth;
+  canvas.height = APOLLO_XIV_RENDER_BUDGET.atlasHeight;
+  const context = canvas.getContext('2d');
+
+  if (context) {
+    const bodyWidth = APOLLO_XIV_RENDER_BUDGET.atlasWidth * APOLLO_ATLAS_BODY_U_MAX;
+    const bodyShade = context.createLinearGradient(0, 0, bodyWidth, 0);
+    bodyShade.addColorStop(0, '#cfd2cd');
+    bodyShade.addColorStop(0.18, '#f1efe8');
+    bodyShade.addColorStop(0.5, '#fffef8');
+    bodyShade.addColorStop(0.82, '#e7e6df');
+    bodyShade.addColorStop(1, '#c8cbc7');
+    context.fillStyle = bodyShade;
+    context.fillRect(0, 0, bodyWidth, canvas.height);
+
+    context.strokeStyle = '#9da29f';
+    context.lineWidth = 4;
+    [168, 354, 520, 708, 866].forEach((y) => {
+      context.beginPath();
+      context.moveTo(0, y);
+      context.lineTo(bodyWidth, y);
+      context.stroke();
+    });
+    context.strokeStyle = '#d6d7d1';
+    context.lineWidth = 2;
+    [92, 260, 444, 620, 792, 944].forEach((y) => {
+      context.beginPath();
+      context.moveTo(0, y);
+      context.lineTo(bodyWidth, y);
+      context.stroke();
+    });
+
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+    context.fillStyle = '#1c4d91';
+    context.beginPath();
+    context.arc(192, 330, 43, 0, Math.PI * 2);
+    context.fill();
+    context.fillStyle = '#f8f6ee';
+    context.font = '700 27px Arial, sans-serif';
+    context.fillText('NASA', 192, 330);
+    context.strokeStyle = '#d9443f';
+    context.lineWidth = 5;
+    context.beginPath();
+    context.moveTo(152, 351);
+    context.lineTo(232, 307);
+    context.stroke();
+
+    context.fillStyle = '#202a2e';
+    context.font = '700 34px Arial, sans-serif';
+    context.fillText('APOLLO XIV', 192, 430);
+    context.fillStyle = '#14734b';
+    context.font = '700 25px Arial, sans-serif';
+    context.fillText('SANTA ROSA', 192, 488);
+
+    [160, 224].forEach((x) => {
+      context.fillStyle = '#263337';
+      context.fillRect(x - 26, 548, 52, 72);
+      context.fillStyle = '#d9c3ad';
+      context.beginPath();
+      context.arc(x, 568, 12, 0, Math.PI * 2);
+      context.fill();
+      context.fillStyle = '#e7e8e2';
+      context.beginPath();
+      context.moveTo(x - 19, 608);
+      context.quadraticCurveTo(x, 578, x + 19, 608);
+      context.closePath();
+      context.fill();
+    });
+    context.fillStyle = '#344247';
+    context.font = '700 14px Arial, sans-serif';
+    context.fillText('ASTRONAUTAS', 192, 640);
+    paintBrazilFlag(context, 132, 680);
+    paintUnitedStatesFlag(context, 200, 680);
+
+    const sign = APOLLO_ATLAS_SIGN_RECT;
+    context.fillStyle = '#173f32';
+    context.fillRect(sign.x, sign.y, sign.width, sign.height);
+    context.strokeStyle = '#d7d3bf';
+    context.lineWidth = 4;
+    context.strokeRect(sign.x + 2, sign.y + 2, sign.width - 4, sign.height - 4);
+    context.fillStyle = '#f4f0df';
+    context.font = '700 14px Arial, sans-serif';
+    context.fillText('ÁRVORE LUNAR', sign.x + sign.width / 2, sign.y + 22);
+    context.fillStyle = '#d9c886';
+    context.font = '700 12px Arial, sans-serif';
+    context.fillText('RÉPLICA APOLLO XIV', sign.x + sign.width / 2, sign.y + 43);
+    context.fillStyle = '#e8e5d8';
+    context.font = '10px Arial, sans-serif';
+    context.fillText('Memorial histórico de Santa Rosa', sign.x + sign.width / 2, sign.y + 61);
+  }
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.minFilter = THREE.LinearMipmapLinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+  texture.wrapS = THREE.ClampToEdgeWrapping;
+  texture.wrapT = THREE.ClampToEdgeWrapping;
+  texture.generateMipmaps = true;
+  texture.needsUpdate = true;
+  return texture;
+}
+
+function createApolloBodyGeometry(height: number, radius: number, radialSegments: number) {
+  const profile = [
+    new THREE.Vector2(radius * 0.82, 0),
+    new THREE.Vector2(radius, height * 0.035),
+    new THREE.Vector2(radius, height * 0.56),
+    new THREE.Vector2(radius * 0.9, height * 0.6),
+    new THREE.Vector2(radius * 0.9, height * 0.75),
+    new THREE.Vector2(radius * 0.68, height * 0.8),
+    new THREE.Vector2(radius * 0.55, height * 0.86),
+    new THREE.Vector2(radius * 0.22, height * 0.96),
+    new THREE.Vector2(0, height),
+  ];
+  const geometry = new THREE.LatheGeometry(profile, radialSegments);
+  const uv = geometry.getAttribute('uv');
+  for (let index = 0; index < uv.count; index += 1) uv.setX(index, uv.getX(index) * APOLLO_ATLAS_BODY_U_MAX);
+  uv.needsUpdate = true;
+  geometry.computeBoundingBox();
+  geometry.computeBoundingSphere();
+  return geometry;
+}
+
+function createApolloFinGeometry() {
+  const shape = new THREE.Shape();
+  const attachmentX = APOLLO_XIV_LAYOUT.bodyRadius * 0.78;
+  shape.moveTo(attachmentX, 0);
+  shape.lineTo(APOLLO_XIV_LAYOUT.finRadius, 0);
+  shape.lineTo(attachmentX + 0.055, APOLLO_XIV_LAYOUT.finHeight);
+  shape.lineTo(attachmentX, APOLLO_XIV_LAYOUT.finHeight * 0.76);
+  shape.closePath();
+  const geometry = new THREE.ExtrudeGeometry(shape, {
+    depth: 0.085,
+    bevelEnabled: false,
+    steps: 1,
+    curveSegments: 1,
+  });
+  geometry.translate(0, 0, -0.0425);
+  geometry.computeVertexNormals();
+  geometry.computeBoundingBox();
+  geometry.computeBoundingSphere();
+  return geometry;
+}
+
+function createApolloSignGeometry() {
+  const [width, height] = APOLLO_XIV_LAYOUT.signSize;
+  const geometry = new THREE.PlaneGeometry(width, height);
+  const uv = geometry.getAttribute('uv');
+  const rect = APOLLO_ATLAS_SIGN_RECT;
+  const uMin = rect.x / APOLLO_XIV_RENDER_BUDGET.atlasWidth;
+  const uMax = (rect.x + rect.width) / APOLLO_XIV_RENDER_BUDGET.atlasWidth;
+  const vMin = 1 - (rect.y + rect.height) / APOLLO_XIV_RENDER_BUDGET.atlasHeight;
+  const vMax = 1 - rect.y / APOLLO_XIV_RENDER_BUDGET.atlasHeight;
+  for (let index = 0; index < uv.count; index += 1) {
+    uv.setXY(
+      index,
+      THREE.MathUtils.lerp(uMin, uMax, uv.getX(index)),
+      THREE.MathUtils.lerp(vMin, vMax, uv.getY(index)),
+    );
+  }
+  uv.needsUpdate = true;
+  return geometry;
+}
+
+function ApolloXIVReplica({
+  height,
+  materials,
+  showDetail,
+}: Pick<LandmarkModelProps, 'height' | 'materials' | 'showDetail'>) {
+  const renderer = useThree((state) => state.gl);
+  const atlas = useMemo(() => {
+    const texture = createApolloXivAtlas();
+    texture.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy());
+    return texture;
+  }, [renderer]);
+  const replicaHeight = apolloXivReplicaHeight(height);
+  const bodyGeometry = useMemo(
+    () => createApolloBodyGeometry(replicaHeight, APOLLO_XIV_LAYOUT.bodyRadius, showDetail ? 12 : 8),
+    [replicaHeight, showDetail],
+  );
+  const finGeometry = useMemo(() => createApolloFinGeometry(), []);
+  const signGeometry = useMemo(() => createApolloSignGeometry(), []);
+  const atlasMaterial = useMemo(() => {
+    const result = new THREE.MeshStandardMaterial({
+      map: atlas,
+      roughness: 0.76,
+      metalness: 0.035,
+    });
+    // G owns this material set, so sharing its Color keeps filters and selection tint coherent.
+    result.color = materials.white.color;
+    return result;
+  }, [atlas, materials.white]);
+
+  useEffect(() => () => atlas.dispose(), [atlas]);
+  useEffect(() => () => bodyGeometry.dispose(), [bodyGeometry]);
+  useEffect(() => () => finGeometry.dispose(), [finGeometry]);
+  useEffect(() => () => signGeometry.dispose(), [signGeometry]);
+  useEffect(() => () => atlasMaterial.dispose(), [atlasMaterial]);
+
+  const finItems: InstanceTransform[] = [0, 1, 2, 3].map((quarter) => ({
+    position: [0, 0.085, 0],
+    rotation: [0, quarter * Math.PI / 2, 0],
+    scale: [1, 1, 1],
+  }));
+  const [baseWidth, baseDepth] = APOLLO_XIV_LAYOUT.baseSize;
+  // The tree and rocket form one memorial bed. Its north-west opening lets the
+  // historic trunk emerge naturally instead of being crossed by a rigid curb.
+  const curbItems: InstanceTransform[] = APOLLO_XIV_LAYOUT.rigidCurbSides.map((side) => (
+    side === 'south'
+      ? { position: [0, 0.085, -baseDepth / 2], scale: [baseWidth, 0.1, 0.075] }
+      : { position: [baseWidth / 2, 0.085, 0], scale: [0.075, 0.1, baseDepth] }
+  ));
+  const [signWidth, signHeight] = APOLLO_XIV_LAYOUT.signSize;
+  const signFrameItems: InstanceTransform[] = [
+    { position: [-signWidth * 0.47, APOLLO_XIV_LAYOUT.signCenterY, -0.018], scale: [0.035, signHeight * 1.13, 0.045] },
+    { position: [signWidth * 0.47, APOLLO_XIV_LAYOUT.signCenterY, -0.018], scale: [0.035, signHeight * 1.13, 0.045] },
+    { position: [0, APOLLO_XIV_LAYOUT.signCenterY + signHeight * 0.53, -0.018], scale: [signWidth, 0.035, 0.045] },
+    { position: [0, 0.23, -0.018], scale: [0.045, 0.46, 0.045] },
+  ];
+
+  return (
+    <group
+      name="replica-apollo-xiv"
+      userData={{
+        ...APOLLO_XIV_FEATURE_METADATA,
+        primaryDrawCalls: showDetail
+          ? APOLLO_XIV_RENDER_BUDGET.replicaDetailPrimaryDrawCalls
+          : APOLLO_XIV_RENDER_BUDGET.replicaFarPrimaryDrawCalls,
+      }}
+      dispose={null}
+    >
+      <group
+        position={[APOLLO_XIV_LAYOUT.replicaOffset[0], 0, APOLLO_XIV_LAYOUT.replicaOffset[1]]}
+        rotation={[0, APOLLO_XIV_LAYOUT.displayYaw, 0]}
+        dispose={null}
+      >
+        <mesh
+          name="corpo-replica-apollo-xiv"
+          geometry={bodyGeometry}
+          material={atlasMaterial}
+          position={[0, 0.1, 0]}
+          castShadow
+          raycast={NO_RAYCAST}
+        />
+        <ScaledInstances geometry={finGeometry} material={materials.white} items={finItems} castShadow />
+        <mesh
+          name="canteiro-compartilhado-arvore-lunar-apollo-xiv"
+          geometry={UNIT_BOX}
+          material={materials.platform}
+          position={[0, 0.045, 0]}
+          scale={[baseWidth * 0.94, 0.09, baseDepth * 0.92]}
+          receiveShadow
+          raycast={NO_RAYCAST}
+          dispose={null}
+        />
+        <ScaledInstances material={materials.white} items={curbItems} receiveShadow />
+      </group>
+      {showDetail && (
+        <group
+          name="placa-interpretativa-apollo-xiv"
+          position={[APOLLO_XIV_LAYOUT.signOffset[0], 0, APOLLO_XIV_LAYOUT.signOffset[1]]}
+          rotation={[0, APOLLO_XIV_LAYOUT.displayYaw, 0]}
+          dispose={null}
+        >
+          <mesh
+            geometry={signGeometry}
+            material={atlasMaterial}
+            position={[0, APOLLO_XIV_LAYOUT.signCenterY, 0]}
+            rotation={[-0.16, 0, 0]}
+            raycast={NO_RAYCAST}
+          />
+          <ScaledInstances material={materials.metal} items={signFrameItems} />
+        </group>
+      )}
+    </group>
+  );
+}
+
 function LunarTree({
   bounds,
   height,
@@ -2458,23 +2952,34 @@ function LunarTree({
   const footprint = Math.max(bounds.width, bounds.depth);
   const trunkHeight = height * 0.52;
   const crownBaseY = trunkHeight * 0.78;
+  // The asymmetric crown preserves the mature landmark while opening the real memorial clearing.
   const canopyItems: InstanceTransform[] = [
-    { position: [0, crownBaseY + height * 0.19, 0], scale: [footprint * 1.28, height * 0.46, footprint * 1.18], rotation: [0.08, 0.25, -0.04] },
-    { position: [-footprint * 0.34, crownBaseY + height * 0.12, -footprint * 0.08], scale: [footprint * 0.82, height * 0.34, footprint * 0.76], rotation: [-0.05, 0.8, 0.08] },
-    { position: [footprint * 0.32, crownBaseY + height * 0.13, -footprint * 0.12], scale: [footprint * 0.78, height * 0.36, footprint * 0.72], rotation: [0.06, 1.5, -0.04] },
-    { position: [-footprint * 0.24, crownBaseY + height * 0.21, footprint * 0.3], scale: [footprint * 0.72, height * 0.3, footprint * 0.74], rotation: [-0.08, 2.1, 0.06] },
-    { position: [footprint * 0.28, crownBaseY + height * 0.2, footprint * 0.26], scale: [footprint * 0.76, height * 0.32, footprint * 0.7], rotation: [0.04, 2.8, -0.06] },
-    { position: [0, crownBaseY + height * 0.31, -footprint * 0.06], scale: [footprint * 0.88, height * 0.32, footprint * 0.82], rotation: [0.06, 3.4, 0.04] },
+    { position: [-footprint * 0.3, crownBaseY + height * 0.19, -footprint * 0.08], scale: [footprint * 1.1, height * 0.46, footprint * 1.08], rotation: [0.08, 0.25, -0.04] },
+    { position: [-footprint * 0.56, crownBaseY + height * 0.12, -footprint * 0.06], scale: [footprint * 0.82, height * 0.34, footprint * 0.76], rotation: [-0.05, 0.8, 0.08] },
+    { position: [-footprint * 0.24, crownBaseY + height * 0.13, -footprint * 0.36], scale: [footprint * 0.72, height * 0.36, footprint * 0.7], rotation: [0.06, 1.5, -0.04] },
+    { position: [-footprint * 0.22, crownBaseY + height * 0.21, footprint * 0.31], scale: [footprint * 0.68, height * 0.3, footprint * 0.7], rotation: [-0.08, 2.1, 0.06] },
+    { position: [-footprint * 0.53, crownBaseY + height * 0.2, footprint * 0.25], scale: [footprint * 0.72, height * 0.32, footprint * 0.68], rotation: [0.04, 2.8, -0.06] },
+    { position: [-footprint * 0.28, crownBaseY + height * 0.31, -footprint * 0.04], scale: [footprint * 0.82, height * 0.32, footprint * 0.78], rotation: [0.06, 3.4, 0.04] },
   ];
   const branchItems: InstanceTransform[] = [
     { position: [-footprint * 0.12, trunkHeight * 0.72, 0], scale: [footprint * 0.13, trunkHeight * 0.52, footprint * 0.13], rotation: [0, 0, -0.52] },
-    { position: [footprint * 0.13, trunkHeight * 0.69, -footprint * 0.04], scale: [footprint * 0.12, trunkHeight * 0.47, footprint * 0.12], rotation: [0.2, 0, 0.55] },
-    { position: [0, trunkHeight * 0.74, footprint * 0.12], scale: [footprint * 0.11, trunkHeight * 0.42, footprint * 0.11], rotation: [0.52, 0.4, 0.08] },
+    { position: [-footprint * 0.2, trunkHeight * 0.69, -footprint * 0.04], scale: [footprint * 0.12, trunkHeight * 0.47, footprint * 0.12], rotation: [0.2, 0, 0.55] },
+    { position: [-footprint * 0.08, trunkHeight * 0.74, footprint * 0.12], scale: [footprint * 0.11, trunkHeight * 0.42, footprint * 0.11], rotation: [0.52, 0.4, 0.08] },
   ];
 
   return (
-    <group dispose={null}>
+    <group
+      name="memorial-arvore-lunar-apollo-xiv"
+      userData={{
+        classification: 'LANDMARK',
+        featureType: 'LUNAR_TREE_MEMORIAL',
+        isSellable: false,
+        contributesToCommercialMetrics: false,
+      }}
+      dispose={null}
+    >
       <mesh
+        name="base-arvore-lunar"
         geometry={UNIT_CYLINDER}
         material={materials.platform}
         position={[0, 0.035, 0]}
@@ -2484,6 +2989,7 @@ function LunarTree({
         dispose={null}
       />
       <mesh
+        name="tronco-arvore-lunar"
         geometry={UNIT_CYLINDER}
         material={materials.accent}
         position={[0, trunkHeight / 2, 0]}
@@ -2521,6 +3027,7 @@ function LunarTree({
           />
         </>
       )}
+      <ApolloXIVReplica height={height} materials={materials} showDetail={showDetail} />
     </group>
   );
 }
@@ -2571,7 +3078,12 @@ export function StrategicLandmarkMesh({
   const height = strategicLandmarkVisualHeight(entity) ?? entity.geometry.extrusionHeight;
   const footprint = useMemo(() => createLocalFootprintGeometry(entity, bounds), [bounds, entity]);
   const hitVolume = useMemo(
-    () => createLocalHitVolumeGeometry(entity, bounds, height, kind === 'lunar-tree' ? 1.65 : 1),
+    () => createLocalHitVolumeGeometry(
+      entity,
+      bounds,
+      height,
+      kind === 'lunar-tree' ? LUNAR_MEMORIAL_HIT_SCALE : 1,
+    ),
     [bounds, entity, height, kind],
   );
   const outline = useMemo(() => createLocalFootprintOutline(entity, bounds), [bounds, entity]);
