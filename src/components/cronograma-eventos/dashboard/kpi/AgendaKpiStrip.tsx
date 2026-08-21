@@ -1,4 +1,4 @@
-import { CalendarDays, CheckCircle2, Gauge, MapPin, TimerReset, TrendingUp, Users, Building2 } from 'lucide-react';
+import { Building2, CalendarDays, CheckCircle2, Gauge, Users } from 'lucide-react';
 import type { CronogramaEvent } from '../../types';
 import type { DashboardDrilldown } from '@/lib/cronograma-dashboard-selectors';
 import { useAgendaDashboardMetrics } from '@/hooks/useAgendaDashboardMetrics';
