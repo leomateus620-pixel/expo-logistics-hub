@@ -30,7 +30,7 @@
   position: relative;
   display: flex;
   min-width: 0;
-  height: 11.6rem;
+  height: 12.6rem;
   flex-direction: column;
   padding: 0.85rem 0.9rem 1.35rem;
   border: 1px solid oklch(var(--border) / 0.7);
@@ -207,8 +207,12 @@
 }
 
 .agenda-kpi-rank-title {
+  display: block;
+  overflow: hidden;
   color: oklch(var(--foreground) / 0.8);
-  font-size: 0.72rem;
+  font-size: 0.68rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   font-weight: 800;
   letter-spacing: 0.01em;
 }
