@@ -233,6 +233,18 @@ const LANDMARK_PALETTES: Record<StrategicLandmarkKind, LandmarkPalette> = {
     platform: '#797d75',
     metal: '#727b78',
   },
+  'lunar-tree': {
+    wall: '#6a4932',
+    accent: '#80583a',
+    roof: '#507d4f',
+    trim: '#8db477',
+    dark: '#34271e',
+    glass: '#557a62',
+    green: '#467748',
+    white: '#dce4cd',
+    platform: '#665341',
+    metal: '#6a7063',
+  },
 };
 
 function material(color: string, roughness: number, metalness = 0) {
@@ -419,6 +431,7 @@ function createLocalHitVolumeGeometry(
   entity: MapEntity,
   bounds: StrategicLandmarkBounds,
   height: number,
+  horizontalScale = 1,
 ) {
   const geometry = new THREE.ExtrudeGeometry(createLocalFootprintShape(entity, bounds), {
     depth: Math.max(0.2, height),
@@ -427,6 +440,7 @@ function createLocalHitVolumeGeometry(
     steps: 1,
   });
   geometry.rotateX(-Math.PI / 2);
+  if (horizontalScale !== 1) geometry.scale(horizontalScale, 1, horizontalScale);
   geometry.computeBoundingBox();
   geometry.computeBoundingSphere();
   return geometry;
@@ -2435,6 +2449,82 @@ function SicrediArena({
   );
 }
 
+function LunarTree({
+  bounds,
+  height,
+  materials,
+  showDetail,
+}: LandmarkModelProps) {
+  const footprint = Math.max(bounds.width, bounds.depth);
+  const trunkHeight = height * 0.52;
+  const crownBaseY = trunkHeight * 0.78;
+  const canopyItems: InstanceTransform[] = [
+    { position: [0, crownBaseY + height * 0.19, 0], scale: [footprint * 1.28, height * 0.46, footprint * 1.18], rotation: [0.08, 0.25, -0.04] },
+    { position: [-footprint * 0.34, crownBaseY + height * 0.12, -footprint * 0.08], scale: [footprint * 0.82, height * 0.34, footprint * 0.76], rotation: [-0.05, 0.8, 0.08] },
+    { position: [footprint * 0.32, crownBaseY + height * 0.13, -footprint * 0.12], scale: [footprint * 0.78, height * 0.36, footprint * 0.72], rotation: [0.06, 1.5, -0.04] },
+    { position: [-footprint * 0.24, crownBaseY + height * 0.21, footprint * 0.3], scale: [footprint * 0.72, height * 0.3, footprint * 0.74], rotation: [-0.08, 2.1, 0.06] },
+    { position: [footprint * 0.28, crownBaseY + height * 0.2, footprint * 0.26], scale: [footprint * 0.76, height * 0.32, footprint * 0.7], rotation: [0.04, 2.8, -0.06] },
+    { position: [0, crownBaseY + height * 0.31, -footprint * 0.06], scale: [footprint * 0.88, height * 0.32, footprint * 0.82], rotation: [0.06, 3.4, 0.04] },
+  ];
+  const branchItems: InstanceTransform[] = [
+    { position: [-footprint * 0.12, trunkHeight * 0.72, 0], scale: [footprint * 0.13, trunkHeight * 0.52, footprint * 0.13], rotation: [0, 0, -0.52] },
+    { position: [footprint * 0.13, trunkHeight * 0.69, -footprint * 0.04], scale: [footprint * 0.12, trunkHeight * 0.47, footprint * 0.12], rotation: [0.2, 0, 0.55] },
+    { position: [0, trunkHeight * 0.74, footprint * 0.12], scale: [footprint * 0.11, trunkHeight * 0.42, footprint * 0.11], rotation: [0.52, 0.4, 0.08] },
+  ];
+
+  return (
+    <group dispose={null}>
+      <mesh
+        geometry={UNIT_CYLINDER}
+        material={materials.platform}
+        position={[0, 0.035, 0]}
+        scale={[footprint * 0.42, 0.07, footprint * 0.42]}
+        receiveShadow
+        raycast={NO_RAYCAST}
+        dispose={null}
+      />
+      <mesh
+        geometry={UNIT_CYLINDER}
+        material={materials.accent}
+        position={[0, trunkHeight / 2, 0]}
+        scale={[footprint * 0.2, trunkHeight, footprint * 0.2]}
+        castShadow
+        receiveShadow
+        raycast={NO_RAYCAST}
+        dispose={null}
+      />
+      <ScaledInstances
+        geometry={UNIT_SHRUB}
+        material={materials.green}
+        items={canopyItems}
+        castShadow
+        receiveShadow
+      />
+      {showDetail && (
+        <>
+          <ScaledInstances
+            geometry={UNIT_CYLINDER}
+            material={materials.wall}
+            items={branchItems}
+            castShadow
+          />
+          <ScaledInstances
+            geometry={UNIT_SHRUB}
+            material={materials.trim}
+            items={canopyItems.slice(1).map((item, index) => ({
+              ...item,
+              position: [item.position[0] * 1.03, item.position[1] + height * 0.035, item.position[2] * 1.03],
+              scale: [item.scale[0] * 0.54, item.scale[1] * 0.46, item.scale[2] * 0.54],
+              rotation: [item.rotation?.[0] ?? 0, (item.rotation?.[1] ?? 0) + index * 0.42, item.rotation?.[2] ?? 0],
+            }))}
+            castShadow
+          />
+        </>
+      )}
+    </group>
+  );
+}
+
 interface LandmarkModelProps {
   bounds: StrategicLandmarkBounds;
   height: number;
@@ -2481,8 +2571,8 @@ export function StrategicLandmarkMesh({
   const height = strategicLandmarkVisualHeight(entity) ?? entity.geometry.extrusionHeight;
   const footprint = useMemo(() => createLocalFootprintGeometry(entity, bounds), [bounds, entity]);
   const hitVolume = useMemo(
-    () => createLocalHitVolumeGeometry(entity, bounds, height),
-    [bounds, entity, height],
+    () => createLocalHitVolumeGeometry(entity, bounds, height, kind === 'lunar-tree' ? 1.65 : 1),
+    [bounds, entity, height, kind],
   );
   const outline = useMemo(() => createLocalFootprintOutline(entity, bounds), [bounds, entity]);
   const filterStrength = filtersActive && !isMatch && !selected ? 0.42 : 1;
@@ -2599,6 +2689,7 @@ export function StrategicLandmarkMesh({
         {kind === 'german-pavilion' && <GermanPavilion {...modelProps} />}
         {kind === 'fenasoja-restaurant' && <FenasojaRestaurant {...modelProps} />}
         {kind === 'sicredi-arena' && <SicrediArena {...modelProps} />}
+        {kind === 'lunar-tree' && <LunarTree {...modelProps} />}
       </group>
       {segment && !selected && !hovered && (
         <lineSegments

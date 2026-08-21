@@ -6,6 +6,7 @@ import type { MapEntity } from '../../types';
 import {
   COMMERCIAL_TREE_BRANCHES,
   COMMERCIAL_TREE_CANOPY_LOBES,
+  COMMERCIAL_TREE_REDUCED_CANOPY_LOBES,
   commercialTreeGroundElevation,
   commercialTreeGroundElevationAtPosition,
 } from '../../utils/treeLayer';
@@ -185,7 +186,7 @@ function CommercialTreeInstances({
   const visibilityProgress = useRef(visible ? 1 : 0);
   const transitionPending = useRef(true);
   const { gl, invalidate } = useThree();
-  const lobeCount = reducedGraphics ? 3 : COMMERCIAL_TREE_CANOPY_LOBES;
+  const lobeCount = reducedGraphics ? COMMERCIAL_TREE_REDUCED_CANOPY_LOBES : COMMERCIAL_TREE_CANOPY_LOBES;
   const geometries = useMemo(() => ({
     trunk: new THREE.CylinderGeometry(0.62, 1, 1, reducedGraphics ? 6 : 8, 2),
     branch: new THREE.CylinderGeometry(0.42, 0.74, 1, 6, 1),

@@ -18,7 +18,8 @@ export type StrategicLandmarkKind =
   | 'nations-portico'
   | 'german-pavilion'
   | 'fenasoja-restaurant'
-  | 'sicredi-arena';
+  | 'sicredi-arena'
+  | 'lunar-tree';
 
 export interface StrategicLandmarkBounds {
   minX: number;
@@ -168,6 +169,13 @@ const STRATEGIC_LANDMARKS: Readonly<Record<string, StrategicLandmarkDefinition>>
     facingRadians: -Math.PI / 2,
     focusDirection: [-0.92, 0.56, 0.32],
     visualHeight: ({ width }) => Math.min(5.5, width * 0.5),
+  },
+  G: {
+    kind: 'lunar-tree',
+    aliases: ['Árvore Lunar', 'Bosque da Árvore Lunar', 'Árvore marco do parque'],
+    facingRadians: 0,
+    focusDirection: [-0.72, 0.58, 0.68],
+    visualHeight: ({ width, depth }) => Math.max(3.8, Math.min(4.8, Math.max(width, depth) * 2.25)),
   },
 };
 
