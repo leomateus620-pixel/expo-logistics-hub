@@ -1771,6 +1771,7 @@ export type Database = {
           month_label: string | null
           org_id: string
           pending_reason: string | null
+          planning_restricted: boolean
           priority: string
           responsible_name: string | null
           source_cell: string | null
@@ -1810,6 +1811,7 @@ export type Database = {
           month_label?: string | null
           org_id: string
           pending_reason?: string | null
+          planning_restricted?: boolean
           priority?: string
           responsible_name?: string | null
           source_cell?: string | null
@@ -1849,6 +1851,7 @@ export type Database = {
           month_label?: string | null
           org_id?: string
           pending_reason?: string | null
+          planning_restricted?: boolean
           priority?: string
           responsible_name?: string | null
           source_cell?: string | null
@@ -1874,6 +1877,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      cronograma_planning_viewers: {
+        Row: {
+          created_at: string
+          id: string
+          org_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          org_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          org_id?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       cronograma_subevento_acoes: {
         Row: {
@@ -8504,6 +8528,10 @@ export type Database = {
         Returns: string
       }
       create_org_with_member: { Args: { org_nome: string }; Returns: string }
+      cronograma_can_view_planning: {
+        Args: { _org_id: string; _user_id: string }
+        Returns: boolean
+      }
       cronograma_delete_event: {
         Args: {
           event_id: string
@@ -8515,6 +8543,14 @@ export type Database = {
       cronograma_delete_subevent: {
         Args: { expected_lock_version?: number; subevent_id: string }
         Returns: Json
+      }
+      cronograma_event_planning_allowed: {
+        Args: { _event_id: string }
+        Returns: boolean
+      }
+      cronograma_is_planning_sheet: {
+        Args: { _sheet: string }
+        Returns: boolean
       }
       cronograma_reorder_subevents: {
         Args: { event_id: string; ordered_ids: string[] }
