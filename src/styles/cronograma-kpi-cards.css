@@ -1,4 +1,5 @@
-/* Faixa superior de indicadores da Dashboard da Agenda Fenasoja. */
+/* Faixa superior de indicadores da Dashboard da Agenda Fenasoja.
+   Duas telas empilhadas verticalmente por card, com acabamento editorial. */
 
 .agenda-kpi-strip {
   display: grid;
@@ -26,28 +27,34 @@
   }
 }
 
+/* ---------------------------------------------------------------- superfície */
+
 .agenda-kpi-card {
+  --kpi-accent: oklch(var(--primary));
   position: relative;
   display: flex;
   min-width: 0;
-  height: 12.6rem;
+  height: 12.75rem;
   flex-direction: column;
-  padding: 0.85rem 0.9rem 1.35rem;
-  border: 1px solid oklch(var(--border) / 0.7);
-  border-radius: 1.1rem;
-  background:
-    linear-gradient(180deg, oklch(var(--card) / 0.98), oklch(var(--card) / 0.92));
+  padding: 0.8rem 0.9rem 0.85rem;
+  border: 1px solid oklch(var(--border) / 0.55);
+  border-radius: 1rem;
+  background: linear-gradient(178deg, oklch(var(--card)), oklch(var(--card) / 0.96));
   box-shadow:
-    inset 0 1px 0 oklch(1 0 0 / 0.55),
-    0 1px 1px oklch(var(--foreground) / 0.05),
-    0 14px 28px -22px oklch(var(--foreground) / 0.45);
+    inset 0 1px 0 oklch(1 0 0 / 0.5),
+    0 1px 1px oklch(var(--foreground) / 0.04),
+    0 10px 22px -20px oklch(var(--foreground) / 0.55);
   cursor: default;
   opacity: 0;
   outline: none;
   overflow: hidden;
   touch-action: pan-x;
-  transform: translate3d(0, 10px, 0);
-  transition: opacity 320ms ease, transform 320ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 220ms ease;
+  transform: translate3d(0, 8px, 0);
+  transition:
+    opacity 340ms ease,
+    transform 340ms cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 200ms ease,
+    box-shadow 220ms ease;
 }
 
 .agenda-kpi-card[data-mounted] {
@@ -57,92 +64,114 @@
 
 .agenda-kpi-card:hover,
 .agenda-kpi-card:focus-visible {
+  border-color: oklch(var(--border) / 0.85);
   box-shadow:
     inset 0 1px 0 oklch(1 0 0 / 0.65),
-    0 2px 2px oklch(var(--foreground) / 0.05),
-    0 20px 34px -22px oklch(var(--foreground) / 0.5);
+    0 2px 3px oklch(var(--foreground) / 0.05),
+    0 16px 28px -22px oklch(var(--foreground) / 0.55);
+  transform: translate3d(0, -1.5px, 0);
 }
 
 .agenda-kpi-card:focus-visible {
-  border-color: oklch(var(--primary) / 0.55);
+  border-color: oklch(var(--primary) / 0.5);
+  box-shadow:
+    inset 0 0 0 1px oklch(var(--primary) / 0.2),
+    0 16px 28px -22px oklch(var(--foreground) / 0.55);
 }
 
 .agenda-kpi-card[data-dragging] {
   cursor: grabbing;
+  transition: none;
 }
 
 @media (max-width: 560px) {
   .agenda-kpi-card {
-    height: 10.5rem;
+    height: 11.5rem;
   }
+}
+
+/* ------------------------------------------------------------------- ícones */
+
+.agenda-kpi-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .agenda-kpi-icon {
   display: grid;
-  width: 1.75rem;
-  height: 1.75rem;
+  width: 1.65rem;
+  height: 1.65rem;
   flex: none;
-  border-radius: 0.6rem;
-  background: oklch(var(--muted) / 0.65);
+  border: 1px solid oklch(var(--border) / 0.6);
+  border-radius: 0.55rem;
+  background: oklch(var(--muted) / 0.45);
   color: oklch(var(--muted-foreground));
   place-items: center;
+  transition: color 220ms ease, background 220ms ease, border-color 220ms ease, transform 220ms ease;
+}
+
+.agenda-kpi-card:hover .agenda-kpi-icon {
+  transform: translateY(-1px);
 }
 
 .agenda-kpi-icon svg {
-  width: 0.95rem;
-  height: 0.95rem;
+  width: 0.9rem;
+  height: 0.9rem;
+  stroke-width: 1.75;
 }
 
-.agenda-kpi-card[data-tone='healthy'] .agenda-kpi-icon {
-  background: oklch(var(--success) / 0.12);
-  color: oklch(var(--success));
+.agenda-kpi-card[data-tone='healthy'] {
+  --kpi-accent: oklch(var(--success));
 }
 
-.agenda-kpi-card[data-tone='attention'] .agenda-kpi-icon {
-  background: oklch(var(--gold) / 0.16);
-  color: oklch(var(--gold));
+.agenda-kpi-card[data-tone='attention'] {
+  --kpi-accent: oklch(var(--gold));
 }
 
-.agenda-kpi-card[data-tone='critical'] .agenda-kpi-icon {
-  background: oklch(var(--destructive) / 0.12);
-  color: oklch(var(--destructive));
+.agenda-kpi-card[data-tone='critical'] {
+  --kpi-accent: oklch(var(--destructive));
 }
 
+.agenda-kpi-card[data-tone='healthy'] .agenda-kpi-icon,
+.agenda-kpi-card[data-tone='attention'] .agenda-kpi-icon,
+.agenda-kpi-card[data-tone='critical'] .agenda-kpi-icon,
 .agenda-kpi-card[data-tone='informational'] .agenda-kpi-icon {
-  background: oklch(var(--primary) / 0.1);
-  color: oklch(var(--primary));
+  border-color: color-mix(in oklab, var(--kpi-accent) 28%, transparent);
+  background: color-mix(in oklab, var(--kpi-accent) 10%, transparent);
+  color: var(--kpi-accent);
 }
+
+/* ----------------------------------------------------------------- viewport */
 
 .agenda-kpi-viewport {
   position: relative;
   min-height: 0;
   flex: 1;
-  margin-top: 0.5rem;
+  margin-top: 0.55rem;
   overflow: hidden;
 }
 
-.agenda-kpi-layer {
-  position: absolute;
+.agenda-kpi-track {
   display: flex;
   width: 100%;
-  height: 100%;
+  height: 200%;
+  flex-direction: column;
+}
+
+.agenda-kpi-screen {
+  display: flex;
+  min-height: 0;
+  height: 50%;
+  flex: none;
   flex-direction: column;
   justify-content: center;
-  inset: 0;
   overflow: hidden;
+  transform-origin: center top;
 }
 
-.agenda-kpi-layer:has(.agenda-kpi-rank),
-.agenda-kpi-layer:has(.agenda-kpi-people) {
+.agenda-kpi-screen:has(.agenda-kpi-panel) {
   justify-content: flex-start;
-  will-change: transform, opacity;
-}
-
-.agenda-kpi-stack {
-  display: flex;
-  min-width: 0;
-  flex-direction: column;
-  gap: 0.4rem;
 }
 
 .agenda-kpi-plain {
@@ -157,78 +186,132 @@
   cursor: pointer;
 }
 
-.agenda-kpi-metric strong {
-  display: block;
+/* ----------------------------------------------------------------- métricas */
+
+.agenda-kpi-figure {
+  display: flex;
+  align-items: baseline;
+  gap: 0.08rem;
   color: oklch(var(--foreground));
-  font-size: clamp(1.6rem, 2.1vw, 2.1rem);
-  font-weight: 900;
-  letter-spacing: -0.03em;
-  line-height: 1;
+  font-size: clamp(2rem, 2.6vw, 2.6rem);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 0.92;
+  font-variant-numeric: tabular-nums lining-nums;
+  font-feature-settings: 'tnum' 1, 'lnum' 1;
 }
 
-.agenda-kpi-title {
-  display: block;
-  margin-top: 0.3rem;
-  color: oklch(var(--foreground) / 0.85);
-  font-size: 0.78rem;
-  font-weight: 750;
+.agenda-kpi-figure-suffix {
+  color: oklch(var(--foreground) / 0.55);
+  font-size: 0.46em;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  transform: translateY(-0.06em);
 }
 
-.agenda-kpi-context {
-  display: block;
+.agenda-kpi-metric-title {
+  margin-top: 0.5rem;
+  color: oklch(var(--foreground) / 0.92);
+  font-size: 0.775rem;
+  font-weight: 700;
+  letter-spacing: -0.012em;
+  line-height: 1.15;
+}
+
+.agenda-kpi-metric-context {
   overflow: hidden;
-  margin-top: 0.15rem;
-  color: oklch(var(--muted-foreground));
-  font-size: 0.68rem;
-  font-weight: 550;
+  margin-top: 0.2rem;
+  color: oklch(var(--muted-foreground) / 0.95);
+  font-size: 0.685rem;
+  font-weight: 500;
+  letter-spacing: 0.002em;
   line-height: 1.3;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 
-.agenda-kpi-progress-track,
-.agenda-kpi-rank-track {
+.agenda-kpi-range {
+  color: oklch(var(--foreground) / 0.7);
+  font-size: 0.7rem;
+  font-weight: 650;
+  letter-spacing: 0.09em;
+}
+
+.agenda-kpi-progress-track {
   display: block;
   overflow: hidden;
-  height: 0.24rem;
+  width: 100%;
+  height: 0.2rem;
+  margin-top: 0.7rem;
   border-radius: 999px;
-  background: oklch(var(--muted) / 0.75);
+  background: oklch(var(--muted) / 0.6);
 }
 
-.agenda-kpi-progress-fill,
-.agenda-kpi-rank-fill {
+.agenda-kpi-progress-fill {
   display: block;
   width: 100%;
   height: 100%;
   border-radius: 999px;
-  background: oklch(var(--primary) / 0.85);
+  background: linear-gradient(90deg, color-mix(in oklab, var(--kpi-accent) 55%, transparent), var(--kpi-accent));
   transform-origin: left center;
-  transition: transform 480ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 640ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.agenda-kpi-rank-title {
-  display: block;
-  overflow: hidden;
-  color: oklch(var(--foreground) / 0.8);
-  font-size: 0.68rem;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  font-weight: 800;
-  letter-spacing: 0.01em;
-}
+/* ------------------------------------------------------------------ painéis */
 
-.agenda-kpi-rank {
+.agenda-kpi-panel {
   display: flex;
+  min-height: 0;
+  height: 100%;
   flex-direction: column;
-  gap: 0.18rem;
+  gap: 0.4rem;
 }
+
+.agenda-kpi-section-title {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.4rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid oklch(var(--border) / 0.45);
+}
+
+.agenda-kpi-section-label {
+  color: oklch(var(--foreground) / 0.92);
+  font-size: 0.72rem;
+  font-weight: 750;
+  letter-spacing: -0.008em;
+}
+
+.agenda-kpi-section-context {
+  overflow: hidden;
+  color: oklch(var(--muted-foreground) / 0.85);
+  font-size: 0.575rem;
+  font-weight: 650;
+  letter-spacing: 0.1em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.agenda-kpi-list {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 0.1rem;
+}
+
+/* ---------------------------------------------------------- ranking simples */
 
 .agenda-kpi-rank-row {
   display: grid;
   width: 100%;
   align-items: center;
-  gap: 0.35rem;
-  grid-template-columns: 0.8rem minmax(0, 1fr) auto;
+  gap: 0.4rem;
+  grid-template-columns: 0.95rem minmax(0, 1fr) 1.35rem;
   border: 0;
   background: none;
   text-align: left;
@@ -239,13 +322,15 @@
 }
 
 .agenda-kpi-rank-row:not(:disabled):hover .agenda-kpi-rank-label {
-  color: oklch(var(--primary));
+  color: oklch(var(--foreground));
 }
 
 .agenda-kpi-rank-pos {
-  color: oklch(var(--muted-foreground));
-  font-size: 0.6rem;
-  font-weight: 800;
+  color: oklch(var(--muted-foreground) / 0.6);
+  font-size: 0.55rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  font-variant-numeric: tabular-nums;
 }
 
 .agenda-kpi-rank-body {
@@ -256,59 +341,106 @@
 .agenda-kpi-rank-label {
   display: block;
   overflow: hidden;
-  color: oklch(var(--foreground) / 0.88);
-  font-size: 0.66rem;
-  font-weight: 650;
-  line-height: 1.15;
+  color: oklch(var(--foreground) / 0.82);
+  font-size: 0.655rem;
+  font-weight: 600;
+  letter-spacing: -0.004em;
+  line-height: 1.2;
   text-overflow: ellipsis;
   white-space: nowrap;
+  transition: color 180ms ease;
+}
+
+.agenda-kpi-rank-row[data-lead] .agenda-kpi-rank-label {
+  color: oklch(var(--foreground));
+  font-weight: 750;
+}
+
+.agenda-kpi-rank-track {
+  display: block;
+  overflow: hidden;
+  height: 0.145rem;
+  margin-top: 0.16rem;
+  border-radius: 999px;
+  background: oklch(var(--muted) / 0.55);
+}
+
+.agenda-kpi-rank-fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--kpi-accent) 60%, transparent);
+  transform-origin: left center;
+  transition: transform 620ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.agenda-kpi-rank-row[data-lead] .agenda-kpi-rank-fill {
+  background: var(--kpi-accent);
 }
 
 .agenda-kpi-rank-count {
-  color: oklch(var(--foreground));
+  color: oklch(var(--foreground) / 0.9);
   font-size: 0.72rem;
-  font-weight: 850;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+  text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-.agenda-kpi-people {
-  display: flex;
-  flex-direction: column;
-  gap: 0.3rem;
+.agenda-kpi-rank-row[data-lead] .agenda-kpi-rank-count {
+  color: oklch(var(--foreground));
+  font-weight: 800;
 }
 
-.agenda-kpi-person {
+/* -------------------------------------------------------------- retratos */
+
+.agenda-kpi-portrait {
+  display: grid;
+  width: 1.55rem;
+  height: 1.55rem;
+  flex: none;
+  border-radius: 999px;
+  box-shadow: 0 0 0 1px oklch(var(--border) / 0.8), 0 1px 2px oklch(var(--foreground) / 0.12);
+  overflow: hidden;
+  place-items: center;
+}
+
+.agenda-kpi-portrait img {
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  object-fit: cover;
+  object-position: center 22%;
+}
+
+.agenda-kpi-portrait-initials {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  background: color-mix(in oklab, var(--kpi-accent) 12%, oklch(var(--muted)));
+  color: var(--kpi-accent);
+  font-size: 0.53rem;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  place-items: center;
+}
+
+/* ------------------------------------------------------ ranking de pessoas */
+
+.agenda-kpi-person-row {
   display: grid;
   width: 100%;
   align-items: center;
-  gap: 0.45rem;
-  grid-template-columns: 1.4rem minmax(0, 1fr);
+  gap: 0.5rem;
+  grid-template-columns: 1.55rem minmax(0, 1fr) auto;
   border: 0;
   background: none;
   text-align: left;
 }
 
-.agenda-kpi-person:not(:disabled) {
+.agenda-kpi-person-row:not(:disabled) {
   cursor: pointer;
-}
-
-.agenda-kpi-person img {
-  width: 1.4rem;
-  height: 1.4rem;
-  border-radius: 999px;
-  object-fit: cover;
-}
-
-.agenda-kpi-person-initials {
-  display: grid;
-  width: 1.4rem;
-  height: 1.4rem;
-  border-radius: 999px;
-  background: oklch(var(--primary) / 0.12);
-  color: oklch(var(--primary));
-  font-size: 0.55rem;
-  font-weight: 800;
-  place-items: center;
 }
 
 .agenda-kpi-person-body {
@@ -319,58 +451,178 @@
 .agenda-kpi-person-name {
   display: block;
   overflow: hidden;
-  color: oklch(var(--foreground) / 0.9);
-  font-size: 0.7rem;
-  font-weight: 700;
+  color: oklch(var(--foreground) / 0.92);
+  font-size: 0.68rem;
+  font-weight: 650;
+  letter-spacing: -0.006em;
+  line-height: 1.2;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
-.agenda-kpi-person-meta {
+.agenda-kpi-person-track {
   display: block;
   overflow: hidden;
-  color: oklch(var(--muted-foreground));
-  font-size: 0.62rem;
-  font-weight: 550;
+  height: 0.13rem;
+  margin-top: 0.2rem;
+  border-radius: 999px;
+  background: oklch(var(--muted) / 0.5);
+}
+
+.agenda-kpi-person-fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  background: color-mix(in oklab, var(--kpi-accent) 55%, transparent);
+  transform-origin: left center;
+  transition: transform 620ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.agenda-kpi-person-count {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  line-height: 1;
+}
+
+.agenda-kpi-person-count-value {
+  color: oklch(var(--foreground));
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  font-variant-numeric: tabular-nums;
+}
+
+.agenda-kpi-person-count-label {
+  margin-top: 0.12rem;
+  color: oklch(var(--muted-foreground) / 0.8);
+  font-size: 0.5rem;
+  font-weight: 650;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* --------------------------------------------------------- próximos eventos */
+
+.agenda-kpi-next-row {
+  display: grid;
+  width: 100%;
+  align-items: center;
+  gap: 0.5rem;
+  grid-template-columns: 1.55rem minmax(0, 1fr);
+  border: 0;
+  background: none;
+  text-align: left;
+}
+
+.agenda-kpi-next-row:not(:disabled) {
+  cursor: pointer;
+}
+
+.agenda-kpi-next-body {
+  display: block;
+  min-width: 0;
+}
+
+.agenda-kpi-next-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  justify-content: space-between;
+}
+
+.agenda-kpi-next-name {
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+  color: oklch(var(--foreground) / 0.9);
+  font-size: 0.655rem;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.agenda-kpi-next-when {
+  flex: none;
+  color: var(--kpi-accent);
+  font-size: 0.555rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.agenda-kpi-next-title {
+  display: block;
+  overflow: hidden;
+  margin-top: 0.08rem;
+  color: oklch(var(--muted-foreground) / 0.95);
+  font-size: 0.615rem;
+  font-weight: 500;
+  line-height: 1.2;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .agenda-kpi-empty {
-  color: oklch(var(--muted-foreground));
-  font-size: 0.68rem;
-  font-weight: 550;
+  display: flex;
+  flex: 1;
+  align-items: center;
+  color: oklch(var(--muted-foreground) / 0.85);
+  font-size: 0.665rem;
+  font-weight: 500;
 }
 
-.agenda-kpi-dots {
+/* ------------------------------------------------------- indicador vertical */
+
+.agenda-kpi-rail {
   position: absolute;
   display: flex;
-  bottom: 0.55rem;
-  left: 50%;
-  gap: 0.25rem;
-  transform: translateX(-50%);
+  top: 50%;
+  right: 0.42rem;
+  flex-direction: column;
+  gap: 0.28rem;
+  transform: translateY(-50%);
 }
 
-.agenda-kpi-dot {
-  width: 0.3rem;
-  height: 0.3rem;
+.agenda-kpi-rail-dot {
+  width: 0.26rem;
+  height: 0.26rem;
   padding: 0;
   border: 0;
   border-radius: 999px;
-  background: oklch(var(--muted-foreground) / 0.35);
+  background: oklch(var(--muted-foreground) / 0.28);
   cursor: pointer;
-  transition: background 200ms ease, width 200ms ease;
+  transition: background 200ms ease;
 }
 
-.agenda-kpi-dot[data-active] {
-  width: 0.75rem;
-  background: oklch(var(--primary) / 0.75);
+.agenda-kpi-card:hover .agenda-kpi-rail-dot {
+  background: oklch(var(--muted-foreground) / 0.45);
+}
+
+.agenda-kpi-rail-thumb {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 0.26rem;
+  height: 0.26rem;
+  border-radius: 999px;
+  background: var(--kpi-accent);
+  margin-left: -0.13rem;
+  pointer-events: none;
+}
+
+.agenda-kpi-rail-thumb {
+  --rail-step: 0.54rem;
+  transform: translate3d(0, 0, 0);
 }
 
 @media (prefers-reduced-motion: reduce) {
   .agenda-kpi-card,
   .agenda-kpi-progress-fill,
-  .agenda-kpi-rank-fill {
+  .agenda-kpi-rank-fill,
+  .agenda-kpi-person-fill,
+  .agenda-kpi-icon {
     transition-duration: 1ms;
   }
 }
