@@ -68,7 +68,7 @@ function LayeredKpiCard({
         <div
           className="agenda-kpi-track"
           style={{
-            transform: `translate3d(0, ${-p * 100}%, 0)`,
+            transform: `translate3d(0, ${(-p * 100) / layers.length}%, 0)`,
             willChange: isDragging || (p > 0.001 && p < 0.999) ? 'transform' : undefined,
           }}
         >
