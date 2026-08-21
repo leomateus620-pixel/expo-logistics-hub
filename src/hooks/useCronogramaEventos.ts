@@ -92,6 +92,29 @@ function decorateEmbeddedSubevents(event: CronogramaEvent): CronogramaEvent {
 const officialSeedEvents = normalizeCronogramaSeed(fenasoja2028CronogramaSeed).map(decorateEmbeddedSubevents);
 const EMPTY_SEED_EVENTS: CronogramaEvent[] = [];
 
+/** Planilhas anuais importadas: o conteúdo é material de planejamento restrito
+ *  (ver `cronograma_eventos.planning_restricted` no banco). Só entra na visão de
+ *  quem tem a capability `cronograma_planning_access`. */
+export const CRONOGRAMA_PLANNING_SHEETS: ReadonlySet<string> = new Set([
+  'CRONOGRAMA DE ATIVIDADES e EVENTOS FENASOJA 2026 - ano 2026.xls',
+  'CRONOGRAMA DE ATIVIDADES e EVENTOS FENASOJA 2027 - ano 2027.xls',
+  'CRONOGRAMA DE ATIVIDADES e EVENTOS FENASOJA 2028 - ano 2028.xls',
+]);
+
+export function isPlanningSeedEvent(event: { sourceSheet?: string | null }): boolean {
+  return CRONOGRAMA_PLANNING_SHEETS.has(event.sourceSheet ?? '');
+}
+
+/** Catálogo local visível para o usuário: sem os eventos de planilha quando ele
+ *  não faz parte do grupo de planejamento (Cléo e Zélia). */
+export function selectVisibleSeedEvents(
+  seedEvents: CronogramaEvent[],
+  canViewPlanning: boolean,
+): CronogramaEvent[] {
+  return canViewPlanning ? seedEvents : seedEvents.filter((event) => !isPlanningSeedEvent(event));
+}
+
+
 
 export function mergeOfficialSeedWithDb(
   seedEvents: CronogramaEvent[],
@@ -709,7 +732,14 @@ export function useCronogramaEventos() {
   // Visão restrita (ex.: presidente de comissão): a tela mostra exclusivamente o
   // que o banco liberou por RLS — o catálogo oficial embutido no app nunca é mesclado.
   const hasScopedCronogramaView = capSet.has('cronograma_scoped_access');
-  const localSeedEvents = hasScopedCronogramaView ? EMPTY_SEED_EVENTS : officialSeedEvents;
+  // Eventos importados das planilhas anuais são exclusivos do grupo de planejamento.
+  const canViewPlanningEvents = capSet.has('cronograma_planning_access');
+  const localSeedEvents = useMemo(
+    () => (hasScopedCronogramaView
+      ? EMPTY_SEED_EVENTS
+      : selectVisibleSeedEvents(officialSeedEvents, canViewPlanningEvents)),
+    [canViewPlanningEvents, hasScopedCronogramaView],
+  );
   const queryClient = useQueryClient();
   const isOnline = useOnlineStatus();
   const [sessionEvents, setSessionEvents] = useState<CronogramaEvent[]>(localSeedEvents);
@@ -759,11 +789,13 @@ export function useCronogramaEventos() {
   });
 
   const seedOfficialData = useMutation({
-    mutationFn: async (eventsToSeed: CronogramaEvent[] = officialSeedEvents) => {
+    mutationFn: async (eventsToSeed: CronogramaEvent[] = localSeedEvents) => {
       if (!orgId || !isWritableRole(myRole) || hasScopedCronogramaView) return [];
       const user = (await cronogramaDb.auth.getUser()).data.user;
-      if (eventsToSeed.length === 0) return [];
-      const payload = eventsToSeed.map((event) => toDbPayload(event, orgId, user?.id));
+      // Nunca reinserir eventos de planilha para quem não é do grupo de planejamento.
+      const allowed = selectVisibleSeedEvents(eventsToSeed, canViewPlanningEvents);
+      if (allowed.length === 0) return [];
+      const payload = allowed.map((event) => toDbPayload(event, orgId, user?.id));
       const { data, error } = await cronogramaDb
         .from('cronograma_eventos')
         .upsert(payload, { onConflict: 'org_id,source_key', ignoreDuplicates: true })
@@ -789,7 +821,7 @@ export function useCronogramaEventos() {
     if (!orgId || !query.data || !isWritableRole(myRole) || isSeedingOfficialData) return;
 
     const dbSourceKeys = new Set(dbEvents.map((event) => event.sourceKey).filter(Boolean));
-    const missingOfficialEvents = officialSeedEvents.filter((event) => (
+    const missingOfficialEvents = localSeedEvents.filter((event) => (
       event.sourceKey && !dbSourceKeys.has(event.sourceKey) && !deletedSourceKeys.has(event.sourceKey)
     ));
 
