@@ -1,6 +1,7 @@
 import type { MapEntity } from '../types';
 import { livestockPavilionVisualHeight } from './livestockPavilion';
 import { miranteVisualHeight } from './mirante';
+import { FENASOJA_HEADQUARTERS_LAYOUT } from './headquarters';
 import {
   commercialPavilionVisualHeight,
   resolveCommercialPavilionDefinition,
@@ -119,7 +120,7 @@ const STRATEGIC_LANDMARKS: Readonly<Record<string, StrategicLandmarkDefinition>>
     ],
     // A sede ocupa o canto sudoeste da Quadra B: a empena responde à Rua
     // Argentina, mas também se apresenta para a curva da Rua Brasília.
-    facingRadians: -Math.PI / 18,
+    facingRadians: FENASOJA_HEADQUARTERS_LAYOUT.facingRadians,
     focusDirection: [-0.42, 0.36, 0.94],
     visualHeight: ({ width, depth }) => Math.min(2.6, Math.max(width, depth) * 0.84),
   },
@@ -172,9 +173,20 @@ const STRATEGIC_LANDMARKS: Readonly<Record<string, StrategicLandmarkDefinition>>
   },
   G: {
     kind: 'lunar-tree',
-    aliases: ['Árvore Lunar', 'Bosque da Árvore Lunar', 'Árvore marco do parque'],
+    aliases: [
+      'Árvore Lunar',
+      'Bosque da Árvore Lunar',
+      'Árvore marco do parque',
+      'Memorial Árvore Lunar',
+      'Réplica Apollo XIV',
+      'Apollo XIV',
+      'Apollo 14',
+      'Foguete Apollo',
+      'Monumento Apollo',
+    ],
     facingRadians: 0,
-    focusDirection: [-0.72, 0.58, 0.68],
+    // Approach from the replica side so the historic tree does not occlude Apollo XIV.
+    focusDirection: [0.86, 0.58, 0.38],
     visualHeight: ({ width, depth }) => Math.max(3.8, Math.min(4.8, Math.max(width, depth) * 2.25)),
   },
 };

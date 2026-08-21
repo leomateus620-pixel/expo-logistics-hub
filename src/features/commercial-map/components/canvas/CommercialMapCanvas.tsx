@@ -20,13 +20,22 @@ import {
 } from '../../utils/interaction';
 import { normalizeMapEntityMetadata, type MapLabelVisibility } from '../../utils/mapMetadata';
 import { selectCommercialTreesForScene } from '../../utils/treeLayer';
-import { shouldRenderArenaFrontInfrastructure } from '../../data/parkEnvironment';
+import {
+  ARENA_FRONT_LAYOUT,
+  shouldRenderArenaCourts,
+  shouldRenderArenaStructures,
+} from '../../data/parkEnvironment';
 import {
   resolveStrategicLandmarkKind,
+  strategicLandmarkBounds,
   strategicLandmarkFocusDirection,
   strategicLandmarkSupportsInterior,
   strategicLandmarkVisualHeight,
 } from '../../utils/landmarks';
+import {
+  APOLLO_XIV_LAYOUT,
+  treeRemainsVisibleWithSelectedApollo,
+} from '../../utils/lunarMemorial';
 import {
   labelBelongsToActiveMode,
   requiresSolidRendering,
@@ -1838,16 +1847,45 @@ function Scene({
     () => selectCommercialTreesForScene(entities, lots),
     [entities, lots],
   );
+  const presentedSceneTrees = useMemo(() => {
+    if (!selectedEntity || resolveStrategicLandmarkKind(selectedEntity) !== 'lunar-tree') {
+      return sceneTrees;
+    }
+    const bounds = strategicLandmarkBounds(selectedEntity);
+    const memorialCenter = [
+      bounds.centerX + APOLLO_XIV_LAYOUT.replicaOffset[0],
+      bounds.centerZ + APOLLO_XIV_LAYOUT.replicaOffset[1],
+    ] as const;
+    return sceneTrees.filter((tree) => treeRemainsVisibleWithSelectedApollo(tree, memorialCenter));
+  }, [sceneTrees, selectedEntity]);
   const arenaFrontInfrastructurePresentation = useMemo(() => {
-    const arenaEntity = entities.find((entity) => entity.publicIdentifier === 'F');
-    if (
-      !arenaEntity
-      || !shouldRenderArenaFrontInfrastructure(entities)
-      || layerVisibility[arenaEntity.layerId] === false
-    ) return { visible: false, opacity: 0 };
-    const filterStrength = filtersActive && !matchingEntityIds.has(arenaEntity.id) ? 0.42 : 1;
-    const opacity = (layerOpacity[arenaEntity.layerId] ?? 1) * filterStrength;
-    return { visible: opacity > 0.015, opacity };
+    const entityByIdentifier = new Map(entities.map((entity) => [entity.publicIdentifier, entity]));
+    const resolvePresentation = (
+      canRender: boolean,
+      ownerIdentifiers: readonly string[],
+    ) => {
+      const owners = ownerIdentifiers
+        .map((identifier) => entityByIdentifier.get(identifier))
+        .filter((entity): entity is MapEntity => Boolean(entity));
+      if (
+        !canRender
+        || owners.length !== ownerIdentifiers.length
+        || owners.some((entity) => layerVisibility[entity.layerId] === false)
+      ) return { visible: false, opacity: 0 };
+      const filterStrength = filtersActive && !owners.some((entity) => matchingEntityIds.has(entity.id)) ? 0.42 : 1;
+      const opacity = Math.min(...owners.map((entity) => layerOpacity[entity.layerId] ?? 1)) * filterStrength;
+      return { visible: opacity > 0.015, opacity };
+    };
+    return {
+      arenaStructures: resolvePresentation(
+        shouldRenderArenaStructures(entities),
+        ARENA_FRONT_LAYOUT.arenaStructureOwners,
+      ),
+      courts: resolvePresentation(
+        shouldRenderArenaCourts(entities),
+        ARENA_FRONT_LAYOUT.courtOwners,
+      ),
+    };
   }, [entities, filtersActive, layerOpacity, layerVisibility, matchingEntityIds]);
   const activeSegmentEntities = useMemo(
     () => activeSegment
@@ -1874,7 +1912,7 @@ function Scene({
     gl.shadowMap.needsUpdate = true;
     invalidate();
     return () => { gl.shadowMap.autoUpdate = true; };
-  }, [entities, gl, interiorEntityId, invalidate, reducedGraphics, sceneTrees, treesVisible]);
+  }, [entities, gl, interiorEntityId, invalidate, presentedSceneTrees, reducedGraphics, treesVisible]);
 
   useEffect(() => {
     if (!cameraNavigating) return;
@@ -1976,14 +2014,18 @@ function Scene({
           onCursor={setCanvasCursor}
         />
       ))}
-      {arenaFrontInfrastructurePresentation.visible && (
+      {(arenaFrontInfrastructurePresentation.arenaStructures.visible
+        || arenaFrontInfrastructurePresentation.courts.visible) && (
         <ArenaFrontInfrastructure
           reducedGraphics={reducedGraphics}
-          opacity={arenaFrontInfrastructurePresentation.opacity}
+          showArenaStructures={arenaFrontInfrastructurePresentation.arenaStructures.visible}
+          showCourts={arenaFrontInfrastructurePresentation.courts.visible}
+          arenaStructuresOpacity={arenaFrontInfrastructurePresentation.arenaStructures.opacity}
+          courtsOpacity={arenaFrontInfrastructurePresentation.courts.opacity}
         />
       )}
       <CommercialTreeLayer
-        trees={sceneTrees}
+        trees={presentedSceneTrees}
         surfaceEntities={entities}
         visible={treesVisible}
         reducedGraphics={reducedGraphics}

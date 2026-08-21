@@ -7,7 +7,8 @@ import {
   PARK_ENVIRONMENT_CLASSIFICATION_LABELS,
   PARK_ENVIRONMENT_FEATURES,
   PARK_ENVIRONMENT_REVISION,
-  shouldRenderArenaFrontInfrastructure,
+  shouldRenderArenaCourts,
+  shouldRenderArenaStructures,
   sourceBoundsToLocal,
 } from '@/features/commercial-map/data/parkEnvironment';
 import { OFFICIAL_REFERENCE_DATA } from '@/features/commercial-map/data/officialReference2026';
@@ -20,20 +21,28 @@ import { scopeCommercialMapData } from '@/features/commercial-map/utils/areaScop
 
 const source = (path: string) => readFileSync(resolve(process.cwd(), path), 'utf8');
 
-function sourceBoundsForEntity(publicIdentifier: string) {
+type SourcePoint = readonly [number, number];
+type SourceBounds = readonly [number, number, number, number];
+
+function sourcePolygonForEntity(publicIdentifier: string) {
   const entity = OFFICIAL_REFERENCE_DATA.entities.find((candidate) => (
     candidate.publicIdentifier === publicIdentifier
   ));
-  const polygon = entity?.metadata.sourcePdfPolygon as readonly (readonly [number, number])[] | undefined;
+  const polygon = entity?.metadata.sourcePdfPolygon as readonly SourcePoint[] | undefined;
   if (!polygon?.length) throw new Error(`Polígono-fonte ausente para ${publicIdentifier}`);
+  return polygon;
+}
+
+function sourceBoundsForEntity(publicIdentifier: string) {
+  const polygon = sourcePolygonForEntity(publicIdentifier);
   const xs = polygon.map(([x]) => x);
   const zs = polygon.map(([, z]) => z);
   return [Math.min(...xs), Math.min(...zs), Math.max(...xs), Math.max(...zs)] as const;
 }
 
 function sourceBoundsOverlap(
-  first: readonly [number, number, number, number],
-  second: readonly [number, number, number, number],
+  first: SourceBounds,
+  second: SourceBounds,
 ) {
   return !(
     first[2] <= second[0]
@@ -43,9 +52,71 @@ function sourceBoundsOverlap(
   );
 }
 
+function pointInPolygon([x, z]: SourcePoint, polygon: readonly SourcePoint[]) {
+  let inside = false;
+  for (let index = 0, previous = polygon.length - 1; index < polygon.length; previous = index, index += 1) {
+    const [xi, zi] = polygon[index];
+    const [xj, zj] = polygon[previous];
+    if ((zi > z) !== (zj > z) && x < ((xj - xi) * (z - zi)) / (zj - zi) + xi) inside = !inside;
+  }
+  return inside;
+}
+
+function sourceBoundsOverlapPolygon(bounds: SourceBounds, polygon: readonly SourcePoint[]) {
+  const corners: SourcePoint[] = [
+    [bounds[0], bounds[1]],
+    [bounds[2], bounds[1]],
+    [bounds[2], bounds[3]],
+    [bounds[0], bounds[3]],
+  ];
+  if (corners.some((corner) => pointInPolygon(corner, polygon))) return true;
+  if (polygon.some(([x, z]) => (
+    x > bounds[0] && x < bounds[2] && z > bounds[1] && z < bounds[3]
+  ))) return true;
+
+  const cross = (start: SourcePoint, end: SourcePoint, point: SourcePoint) => (
+    (end[0] - start[0]) * (point[1] - start[1])
+    - (end[1] - start[1]) * (point[0] - start[0])
+  );
+  const onSegment = (start: SourcePoint, end: SourcePoint, point: SourcePoint) => (
+    Math.abs(cross(start, end, point)) < Number.EPSILON
+    && point[0] >= Math.min(start[0], end[0])
+    && point[0] <= Math.max(start[0], end[0])
+    && point[1] >= Math.min(start[1], end[1])
+    && point[1] <= Math.max(start[1], end[1])
+  );
+  const segmentsIntersect = (
+    firstStart: SourcePoint,
+    firstEnd: SourcePoint,
+    secondStart: SourcePoint,
+    secondEnd: SourcePoint,
+  ) => {
+    const firstA = cross(firstStart, firstEnd, secondStart);
+    const firstB = cross(firstStart, firstEnd, secondEnd);
+    const secondA = cross(secondStart, secondEnd, firstStart);
+    const secondB = cross(secondStart, secondEnd, firstEnd);
+    if (firstA * firstB < 0 && secondA * secondB < 0) return true;
+    return onSegment(firstStart, firstEnd, secondStart)
+      || onSegment(firstStart, firstEnd, secondEnd)
+      || onSegment(secondStart, secondEnd, firstStart)
+      || onSegment(secondStart, secondEnd, firstEnd);
+  };
+  const rectangleEdges = corners.map((corner, index) => (
+    [corner, corners[(index + 1) % corners.length]] as const
+  ));
+  const polygonEdges = polygon.map((point, index) => (
+    [point, polygon[(index + 1) % polygon.length]] as const
+  ));
+  return rectangleEdges.some(([rectangleStart, rectangleEnd]) => (
+    polygonEdges.some(([polygonStart, polygonEnd]) => (
+      segmentsIntersect(rectangleStart, rectangleEnd, polygonStart, polygonEnd)
+    ))
+  ));
+}
+
 describe('infraestrutura ambiental do parque', () => {
   it('mantém inventário ambiental versionado, explícito e fora das métricas comerciais', () => {
-    expect(PARK_ENVIRONMENT_REVISION).toBe('2026.5-park-realism.1');
+    expect(PARK_ENVIRONMENT_REVISION).toBe('2026.6-arena-quadra-r.1');
     expect(PARK_ENVIRONMENT_FEATURES).toHaveLength(5);
     expect(new Set(PARK_ENVIRONMENT_FEATURES.map((feature) => feature.id)).size)
       .toBe(PARK_ENVIRONMENT_FEATURES.length);
@@ -58,14 +129,14 @@ describe('infraestrutura ambiental do parque', () => {
     PARK_ENVIRONMENT_FEATURES.forEach((feature) => {
       expect(feature.isSellable, feature.id).toBe(false);
       expect(feature.contributesToCommercialMetrics, feature.id).toBe(false);
-      expect(feature.sourceReferences).toHaveLength(3);
+      expect(feature.sourceReferences).toHaveLength(4);
       expect(feature.notes.length, feature.id).toBeGreaterThan(40);
       expect(PARK_ENVIRONMENT_CLASSIFICATION_LABELS[feature.classification], feature.id).toBeTruthy();
       expect(OFFICIAL_REFERENCE_DATA.lots.some((lot) => lot.publicIdentifier === feature.id), feature.id).toBe(false);
     });
   });
 
-  it('ancora praça, escadaria e quadras entre D3, Arena, C1 e Rua Brasil', () => {
+  it('orienta a escadaria para a Arena e ancora as quadras junto à borda sul da Exporural', () => {
     const stairs = ARENA_FRONT_LAYOUT.stairs.sourceBounds;
     const multiSport = ARENA_FRONT_LAYOUT.multiSportCourt.sourceBounds;
     const volleyball = ARENA_FRONT_LAYOUT.sandVolleyballCourt.sourceBounds;
@@ -75,21 +146,31 @@ describe('infraestrutura ambiental do parque', () => {
 
     expect(ARENA_FRONT_LAYOUT.stairs.stepCount).toBe(18);
     expect(ARENA_FRONT_LAYOUT.stairs.bankCount).toBe(3);
+    expect(ARENA_FRONT_LAYOUT.stairs).toMatchObject({
+      runAxis: 'x',
+      highEdge: 'west',
+      lowEdge: 'east',
+    });
     expect(stairs[0]).toBeGreaterThan(4100); // fora de D3
     expect(stairs[2]).toBeLessThan(4900); // fora do footprint F
-    expect(multiSport[3]).toBeLessThan(3106); // termina antes da Rua Brasil
-    expect(volleyball[3]).toBeLessThan(3106);
+    expect(stairs[3]).toBeLessThan(3106); // termina antes da Rua Brasil
+    expect(multiSport[3]).toBeLessThan(2682); // quadras ficam ao norte da praça
+    expect(volleyball[3]).toBeLessThan(2682);
     expect(volleyball[2]).toBeLessThan(4900);
     expect(localStairs.width).toBeGreaterThan(localStairs.depth);
-    expect(localMultiSport.centerX).toBeLessThan(localVolleyball.centerX);
-    expect(localMultiSport.maxX).toBeLessThan(localVolleyball.minX);
-    expect(localStairs.maxZ).toBeLessThan(localMultiSport.minZ);
+    expect(localMultiSport.depth).toBeGreaterThan(localMultiSport.width);
+    expect(localVolleyball.depth).toBeGreaterThan(localVolleyball.width);
+    expect(ARENA_FRONT_LAYOUT.multiSportCourt.longAxis).toBe('z');
+    expect(ARENA_FRONT_LAYOUT.sandVolleyballCourt.longAxis).toBe('z');
+    expect(localVolleyball.centerX).toBeLessThan(localMultiSport.centerX);
+    expect(localVolleyball.maxX).toBeLessThan(localMultiSport.minX);
+    expect(localMultiSport.maxZ).toBeLessThan(localStairs.minZ);
 
-    const protectedIdentifiers = ['QUADRA-R', 'D3', 'F', 'C1', 'RUA-BRASIL', 'E-10', 'E-13'];
+    const protectedIdentifiers = ['D3', 'B16', 'B17', 'F', 'C1', 'RUA-BRASIL', 'E-10', 'E-13'];
     const infrastructureBounds = [
       ARENA_FRONT_LAYOUT.stairs.sourceBounds,
-      ARENA_FRONT_LAYOUT.westBerm.sourceBounds,
-      ARENA_FRONT_LAYOUT.eastBerm.sourceBounds,
+      ARENA_FRONT_LAYOUT.northBerm.sourceBounds,
+      ARENA_FRONT_LAYOUT.southBerm.sourceBounds,
       ARENA_FRONT_LAYOUT.multiSportCourt.sourceBounds,
       ARENA_FRONT_LAYOUT.sandVolleyballCourt.sourceBounds,
     ];
@@ -99,28 +180,54 @@ describe('infraestrutura ambiental do parque', () => {
           .toBe(false);
       });
     });
+    ['QUADRA-R', 'EXPORURAL'].forEach((identifier) => {
+      const polygon = sourcePolygonForEntity(identifier);
+      infrastructureBounds.forEach((bounds) => {
+        expect(sourceBoundsOverlapPolygon(bounds, polygon), `${identifier}: ${bounds.join(',')}`)
+          .toBe(false);
+      });
+    });
   });
 
   it('renderiza a infraestrutura no mapa persistido por âncoras, sem depender do seed oficial', () => {
-    expect(shouldRenderArenaFrontInfrastructure(OFFICIAL_REFERENCE_DATA.entities)).toBe(true);
+    expect(shouldRenderArenaStructures(OFFICIAL_REFERENCE_DATA.entities)).toBe(true);
+    expect(shouldRenderArenaCourts(OFFICIAL_REFERENCE_DATA.entities)).toBe(true);
+    const sceneAnchors = new Set<string>([
+      ...ARENA_FRONT_LAYOUT.arenaStructureAnchors,
+      ...ARENA_FRONT_LAYOUT.courtAnchors,
+    ]);
     const databaseShapedEntities = OFFICIAL_REFERENCE_DATA.entities
-      .filter((entity) => ARENA_FRONT_LAYOUT.sceneAnchors.includes(entity.publicIdentifier as never))
+      .filter((entity) => sceneAnchors.has(entity.publicIdentifier))
       .map((entity) => ({ ...entity, id: `database:${entity.publicIdentifier}`, projectId: 'database:project' }));
-    expect(shouldRenderArenaFrontInfrastructure(databaseShapedEntities)).toBe(true);
-    expect(shouldRenderArenaFrontInfrastructure(
+    expect(shouldRenderArenaStructures(databaseShapedEntities)).toBe(true);
+    expect(shouldRenderArenaCourts(databaseShapedEntities)).toBe(true);
+    expect(shouldRenderArenaStructures(
       databaseShapedEntities.filter((entity) => entity.publicIdentifier !== 'F'),
     )).toBe(false);
+    expect(shouldRenderArenaCourts(
+      databaseShapedEntities.filter((entity) => entity.publicIdentifier !== 'QUADRA-R'),
+    )).toBe(false);
+    expect(ARENA_FRONT_LAYOUT.arenaStructureOwners).toEqual(['F']);
+    expect(ARENA_FRONT_LAYOUT.courtOwners).toEqual(['QUADRA-R', 'EXPORURAL']);
+
+    const exporural = scopeCommercialMapData(OFFICIAL_REFERENCE_DATA, COMMERCIAL_MAP_SEGMENT_IDS.exporural);
+    expect(shouldRenderArenaStructures(exporural.entities)).toBe(false);
+    expect(shouldRenderArenaCourts(exporural.entities)).toBe(true);
     const industry = scopeCommercialMapData(OFFICIAL_REFERENCE_DATA, COMMERCIAL_MAP_SEGMENT_IDS.industry);
-    expect(shouldRenderArenaFrontInfrastructure(industry.entities)).toBe(false);
+    expect(shouldRenderArenaStructures(industry.entities)).toBe(false);
+    expect(shouldRenderArenaCourts(industry.entities)).toBe(false);
   });
 
   it('usa geometria estrutural e instancing dentro do orçamento, sem capturar interação do mapa', () => {
     const renderer = source('src/features/commercial-map/components/canvas/ArenaFrontInfrastructure.tsx');
     const canvas = source('src/features/commercial-map/components/canvas/CommercialMapCanvas.tsx');
     const primaryDrawCalls = (renderer.match(/<(?:mesh|instancedMesh|lineSegments)\b/g) ?? []).length;
+    const metalPasses = (renderer.match(/<MetalInfrastructure\b/g) ?? []).length;
+    const fullSceneDrawCalls = primaryDrawCalls + metalPasses - 1;
     expect(ARENA_FRONT_PRIMARY_DRAW_CALL_BUDGET).toBe(12);
     expect(primaryDrawCalls).toBe(10);
-    expect(primaryDrawCalls).toBeLessThanOrEqual(ARENA_FRONT_PRIMARY_DRAW_CALL_BUDGET);
+    expect(fullSceneDrawCalls).toBe(11);
+    expect(fullSceneDrawCalls).toBeLessThanOrEqual(ARENA_FRONT_PRIMARY_DRAW_CALL_BUDGET);
     expect(renderer.match(/<instancedMesh/g)?.length).toBeGreaterThanOrEqual(5);
     expect(renderer).toContain('degraus-concreto-arena');
     expect(renderer).toContain('redes-volei-arena');
@@ -129,9 +236,15 @@ describe('infraestrutura ambiental do parque', () => {
     expect(renderer).toContain('reducedGraphics');
     expect(renderer).toContain('userData={STAIRS_USER_DATA}');
     expect(renderer).toContain('intermediateLandingSteps');
+    expect(renderer).toContain('let cursorX = bounds.maxX - config.lowerLandingDepth');
+    expect(renderer).toContain('const railZs =');
+    expect(renderer).toContain('[x, bottomY, bounds.centerZ]');
     expect(canvas).toContain('<ArenaFrontInfrastructure');
-    expect(canvas).toContain('opacity={arenaFrontInfrastructurePresentation.opacity}');
-    expect(canvas).toContain('layerVisibility[arenaEntity.layerId] === false');
+    expect(canvas).toContain('showArenaStructures={arenaFrontInfrastructurePresentation.arenaStructures.visible}');
+    expect(canvas).toContain('showCourts={arenaFrontInfrastructurePresentation.courts.visible}');
+    expect(canvas).toContain('ARENA_FRONT_LAYOUT.arenaStructureOwners');
+    expect(canvas).toContain('ARENA_FRONT_LAYOUT.courtOwners');
+    expect(canvas).toContain('layerVisibility[entity.layerId] === false');
   });
 
   it('substitui o bloco genérico G por uma árvore-marco selecionável', () => {
@@ -141,6 +254,6 @@ describe('infraestrutura ambiental do parque', () => {
     expect(strategicLandmarkVisualHeight(lunarTree)).toBeGreaterThan(3.5);
     expect(renderer).toContain("kind === 'lunar-tree'");
     expect(renderer).toContain('<LunarTree {...modelProps} />');
-    expect(renderer).toContain("kind === 'lunar-tree' ? 1.65 : 1");
+    expect(renderer).toContain("kind === 'lunar-tree' ? LUNAR_MEMORIAL_HIT_SCALE : 1");
   });
 });
