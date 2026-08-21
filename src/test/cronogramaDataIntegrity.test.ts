@@ -48,4 +48,12 @@ describe('integridade do cronograma oficial', () => {
     expect(merged.find((event) => event.sourceKey === target.sourceKey)?.title).toBe('Título editado no banco');
     expect(merged.some((event) => event.sourceKey === 'manual-test-event')).toBe(true);
   });
+
+  it('não recria eventos oficiais que possuem marcador de exclusão', () => {
+    const official = normalizeCronogramaSeed(fenasoja2028CronogramaSeed);
+    const deleted = official[0];
+    const merged = mergeOfficialSeedWithDb(official, [], new Set([deleted.sourceKey]));
+    expect(merged).toHaveLength(144);
+    expect(merged.some((event) => event.sourceKey === deleted.sourceKey)).toBe(false);
+  });
 });
