@@ -1,0 +1,376 @@
+/* Faixa superior de indicadores da Dashboard da Agenda Fenasoja. */
+
+.agenda-kpi-strip {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+@media (max-width: 1140px) {
+  .agenda-kpi-strip {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 780px) {
+  .agenda-kpi-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.6rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .agenda-kpi-strip {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.agenda-kpi-card {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  height: 12.6rem;
+  flex-direction: column;
+  padding: 0.85rem 0.9rem 1.35rem;
+  border: 1px solid oklch(var(--border) / 0.7);
+  border-radius: 1.1rem;
+  background:
+    linear-gradient(180deg, oklch(var(--card) / 0.98), oklch(var(--card) / 0.92));
+  box-shadow:
+    inset 0 1px 0 oklch(1 0 0 / 0.55),
+    0 1px 1px oklch(var(--foreground) / 0.05),
+    0 14px 28px -22px oklch(var(--foreground) / 0.45);
+  cursor: default;
+  opacity: 0;
+  outline: none;
+  overflow: hidden;
+  touch-action: pan-x;
+  transform: translate3d(0, 10px, 0);
+  transition: opacity 320ms ease, transform 320ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 220ms ease;
+}
+
+.agenda-kpi-card[data-mounted] {
+  opacity: 1;
+  transform: none;
+}
+
+.agenda-kpi-card:hover,
+.agenda-kpi-card:focus-visible {
+  box-shadow:
+    inset 0 1px 0 oklch(1 0 0 / 0.65),
+    0 2px 2px oklch(var(--foreground) / 0.05),
+    0 20px 34px -22px oklch(var(--foreground) / 0.5);
+}
+
+.agenda-kpi-card:focus-visible {
+  border-color: oklch(var(--primary) / 0.55);
+}
+
+.agenda-kpi-card[data-dragging] {
+  cursor: grabbing;
+}
+
+@media (max-width: 560px) {
+  .agenda-kpi-card {
+    height: 10.5rem;
+  }
+}
+
+.agenda-kpi-icon {
+  display: grid;
+  width: 1.75rem;
+  height: 1.75rem;
+  flex: none;
+  border-radius: 0.6rem;
+  background: oklch(var(--muted) / 0.65);
+  color: oklch(var(--muted-foreground));
+  place-items: center;
+}
+
+.agenda-kpi-icon svg {
+  width: 0.95rem;
+  height: 0.95rem;
+}
+
+.agenda-kpi-card[data-tone='healthy'] .agenda-kpi-icon {
+  background: oklch(var(--success) / 0.12);
+  color: oklch(var(--success));
+}
+
+.agenda-kpi-card[data-tone='attention'] .agenda-kpi-icon {
+  background: oklch(var(--gold) / 0.16);
+  color: oklch(var(--gold));
+}
+
+.agenda-kpi-card[data-tone='critical'] .agenda-kpi-icon {
+  background: oklch(var(--destructive) / 0.12);
+  color: oklch(var(--destructive));
+}
+
+.agenda-kpi-card[data-tone='informational'] .agenda-kpi-icon {
+  background: oklch(var(--primary) / 0.1);
+  color: oklch(var(--primary));
+}
+
+.agenda-kpi-viewport {
+  position: relative;
+  min-height: 0;
+  flex: 1;
+  margin-top: 0.5rem;
+  overflow: hidden;
+}
+
+.agenda-kpi-layer {
+  position: absolute;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  justify-content: center;
+  inset: 0;
+  overflow: hidden;
+}
+
+.agenda-kpi-layer:has(.agenda-kpi-rank),
+.agenda-kpi-layer:has(.agenda-kpi-people) {
+  justify-content: flex-start;
+  will-change: transform, opacity;
+}
+
+.agenda-kpi-stack {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.agenda-kpi-plain {
+  display: block;
+  width: 100%;
+  border: 0;
+  background: none;
+  text-align: left;
+}
+
+.agenda-kpi-plain:not(:disabled) {
+  cursor: pointer;
+}
+
+.agenda-kpi-metric strong {
+  display: block;
+  color: oklch(var(--foreground));
+  font-size: clamp(1.6rem, 2.1vw, 2.1rem);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.agenda-kpi-title {
+  display: block;
+  margin-top: 0.3rem;
+  color: oklch(var(--foreground) / 0.85);
+  font-size: 0.78rem;
+  font-weight: 750;
+}
+
+.agenda-kpi-context {
+  display: block;
+  overflow: hidden;
+  margin-top: 0.15rem;
+  color: oklch(var(--muted-foreground));
+  font-size: 0.68rem;
+  font-weight: 550;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.agenda-kpi-progress-track,
+.agenda-kpi-rank-track {
+  display: block;
+  overflow: hidden;
+  height: 0.24rem;
+  border-radius: 999px;
+  background: oklch(var(--muted) / 0.75);
+}
+
+.agenda-kpi-progress-fill,
+.agenda-kpi-rank-fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  background: oklch(var(--primary) / 0.85);
+  transform-origin: left center;
+  transition: transform 480ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.agenda-kpi-rank-title {
+  display: block;
+  overflow: hidden;
+  color: oklch(var(--foreground) / 0.8);
+  font-size: 0.68rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
+.agenda-kpi-rank {
+  display: flex;
+  flex-direction: column;
+  gap: 0.18rem;
+}
+
+.agenda-kpi-rank-row {
+  display: grid;
+  width: 100%;
+  align-items: center;
+  gap: 0.35rem;
+  grid-template-columns: 0.8rem minmax(0, 1fr) auto;
+  border: 0;
+  background: none;
+  text-align: left;
+}
+
+.agenda-kpi-rank-row:not(:disabled) {
+  cursor: pointer;
+}
+
+.agenda-kpi-rank-row:not(:disabled):hover .agenda-kpi-rank-label {
+  color: oklch(var(--primary));
+}
+
+.agenda-kpi-rank-pos {
+  color: oklch(var(--muted-foreground));
+  font-size: 0.6rem;
+  font-weight: 800;
+}
+
+.agenda-kpi-rank-body {
+  display: block;
+  min-width: 0;
+}
+
+.agenda-kpi-rank-label {
+  display: block;
+  overflow: hidden;
+  color: oklch(var(--foreground) / 0.88);
+  font-size: 0.66rem;
+  font-weight: 650;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.agenda-kpi-rank-count {
+  color: oklch(var(--foreground));
+  font-size: 0.72rem;
+  font-weight: 850;
+  font-variant-numeric: tabular-nums;
+}
+
+.agenda-kpi-people {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.agenda-kpi-person {
+  display: grid;
+  width: 100%;
+  align-items: center;
+  gap: 0.45rem;
+  grid-template-columns: 1.4rem minmax(0, 1fr);
+  border: 0;
+  background: none;
+  text-align: left;
+}
+
+.agenda-kpi-person:not(:disabled) {
+  cursor: pointer;
+}
+
+.agenda-kpi-person img {
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 999px;
+  object-fit: cover;
+}
+
+.agenda-kpi-person-initials {
+  display: grid;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 999px;
+  background: oklch(var(--primary) / 0.12);
+  color: oklch(var(--primary));
+  font-size: 0.55rem;
+  font-weight: 800;
+  place-items: center;
+}
+
+.agenda-kpi-person-body {
+  display: block;
+  min-width: 0;
+}
+
+.agenda-kpi-person-name {
+  display: block;
+  overflow: hidden;
+  color: oklch(var(--foreground) / 0.9);
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.agenda-kpi-person-meta {
+  display: block;
+  overflow: hidden;
+  color: oklch(var(--muted-foreground));
+  font-size: 0.62rem;
+  font-weight: 550;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.agenda-kpi-empty {
+  color: oklch(var(--muted-foreground));
+  font-size: 0.68rem;
+  font-weight: 550;
+}
+
+.agenda-kpi-dots {
+  position: absolute;
+  display: flex;
+  bottom: 0.55rem;
+  left: 50%;
+  gap: 0.25rem;
+  transform: translateX(-50%);
+}
+
+.agenda-kpi-dot {
+  width: 0.3rem;
+  height: 0.3rem;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: oklch(var(--muted-foreground) / 0.35);
+  cursor: pointer;
+  transition: background 200ms ease, width 200ms ease;
+}
+
+.agenda-kpi-dot[data-active] {
+  width: 0.75rem;
+  background: oklch(var(--primary) / 0.75);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .agenda-kpi-card,
+  .agenda-kpi-progress-fill,
+  .agenda-kpi-rank-fill {
+    transition-duration: 1ms;
+  }
+}

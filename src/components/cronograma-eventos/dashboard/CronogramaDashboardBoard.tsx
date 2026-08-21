@@ -33,12 +33,12 @@ import { getTodayKey } from '@/lib/cronograma-timeline';
 import EventVolumePanel from './EventVolumePanel';
 import TimeDemandPanel from './TimeDemandPanel';
 import CommissionDistributionPanel from './CommissionDistributionPanel';
+import AgendaKpiStrip from './kpi/AgendaKpiStrip';
 
 import type {
   ActivityDetail,
   CronogramaDashboardModel,
   DashboardDrilldown,
-  DashboardKpi,
   DashboardLogStatus,
 } from '@/lib/cronograma-dashboard-selectors';
 import '@/styles/cronograma-dashboard.css';
@@ -51,8 +51,6 @@ interface CronogramaDashboardBoardProps {
   onDrilldown: (drilldown: DashboardDrilldown) => void;
   onRetryActivity?: () => void;
 }
-
-const kpiIcons = [BarChart3, AlertTriangle, CalendarDays, UserRoundX, CalendarClock];
 
 const priorityLabels: Record<CronogramaEvent['priority'], string> = {
   low: 'Baixa',
@@ -137,53 +135,6 @@ function EmptyDashboardPanel({
     </div>
   );
 }
-
-function ExecutiveKpis({
-  model,
-  onDrilldown,
-}: {
-  model: CronogramaDashboardModel;
-  onDrilldown: (drilldown: DashboardDrilldown) => void;
-}) {
-  const kpis: DashboardKpi[] = [
-    model.kpis.progress,
-    model.kpis.overdue,
-    model.kpis.next30Days,
-    model.kpis.missingResponsible,
-    model.kpis.undated,
-  ];
-
-  return (
-    <section className="cronograma-kpi-strip" aria-label="Indicadores executivos">
-      {kpis.map((kpi, index) => {
-        const Icon = kpiIcons[index];
-        return (
-          <button
-            key={kpi.label}
-            type="button"
-            className="cronograma-kpi"
-            data-tone={kpi.tone}
-            onClick={() => kpi.drilldown && onDrilldown(kpi.drilldown)}
-            disabled={!kpi.drilldown}
-            aria-label={`${kpi.label}: ${kpi.value === null ? 'indisponível' : `${kpi.value}${kpi.suffix ?? ''}`}. ${kpi.context}. Abrir eventos representados.`}
-          >
-            <span className="cronograma-kpi-icon"><Icon aria-hidden="true" /></span>
-            <span className="cronograma-kpi-value">
-              {kpi.value === null ? '—' : kpi.value.toLocaleString('pt-BR')}
-              {kpi.value !== null && kpi.suffix}
-            </span>
-            <span className="cronograma-kpi-label">{kpi.label}</span>
-            <span className="cronograma-kpi-context">{kpi.context}</span>
-            <ChevronRight className="cronograma-kpi-arrow" aria-hidden="true" />
-          </button>
-        );
-      })}
-    </section>
-  );
-}
-
-
-
 
 function readChartLabel(value: unknown) {
   if (!value || typeof value !== 'object') return null;
@@ -572,7 +523,11 @@ export default function CronogramaDashboardBoard({
         </div>
       )}
 
-      <ExecutiveKpis model={model} onDrilldown={onDrilldown} />
+      <AgendaKpiStrip
+        events={model.eligibleEvents}
+        todayKey={getTodayKey()}
+        onDrilldown={onDrilldown}
+      />
 
       <EventVolumePanel
         events={model.eligibleEvents}
