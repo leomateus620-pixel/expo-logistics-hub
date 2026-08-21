@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useAuth } from '@/hooks/useAuth';
 import { useCurrentOrg } from '@/hooks/useCurrentOrg';
-import { cronogramaEventsQueryKey, fetchCronogramaEventsForOrg } from '@/hooks/useCronogramaEventos';
+import { cronogramaEventsQueryKey, fetchCronogramaDatasetForOrg } from '@/hooks/useCronogramaEventos';
 import { buildWeeklySummary, type WeeklySummary } from '@/lib/cronograma-weekly-summary';
 
 export function useCronogramaWeeklySummary() {
@@ -14,7 +14,9 @@ export function useCronogramaWeeklySummary() {
     enabled: !!orgId,
     staleTime: 30000,
     retry: false,
-    queryFn: async () => (orgId ? fetchCronogramaEventsForOrg(orgId) : []),
+    queryFn: async () => (orgId
+      ? fetchCronogramaDatasetForOrg(orgId)
+      : { events: [], deletedSourceKeys: [] }),
   });
 
   const displayName = (membership as { nome_exibicao?: string | null } | null | undefined)?.nome_exibicao
@@ -22,7 +24,7 @@ export function useCronogramaWeeklySummary() {
     ?? null;
 
   const summary: WeeklySummary = useMemo(
-    () => buildWeeklySummary(query.data ?? [], { userId: user?.id ?? null, displayName }),
+    () => buildWeeklySummary(query.data?.events ?? [], { userId: user?.id ?? null, displayName }),
     [displayName, query.data, user?.id],
   );
 

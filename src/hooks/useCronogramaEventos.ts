@@ -674,7 +674,7 @@ export function cronogramaEventsQueryKey(orgId: string | null | undefined) {
 
 /** Single source of truth for reading the module dataset, so every consumer
  *  (workspace and personal weekly summary) shares the same cache entry. */
-interface CronogramaDataset {
+export interface CronogramaDataset {
   events: CronogramaEvent[];
   deletedSourceKeys: string[];
 }
