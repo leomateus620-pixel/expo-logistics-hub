@@ -1712,6 +1712,41 @@ export type Database = {
           },
         ]
       }
+      cronograma_evento_tombstones: {
+        Row: {
+          deleted_at: string
+          deleted_by_user_id: string
+          deleted_event_id: string | null
+          id: string
+          org_id: string
+          source_key: string
+        }
+        Insert: {
+          deleted_at?: string
+          deleted_by_user_id: string
+          deleted_event_id?: string | null
+          id?: string
+          org_id: string
+          source_key: string
+        }
+        Update: {
+          deleted_at?: string
+          deleted_by_user_id?: string
+          deleted_event_id?: string | null
+          id?: string
+          org_id?: string
+          source_key?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cronograma_evento_tombstones_org_id_fkey"
+            columns: ["org_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       cronograma_eventos: {
         Row: {
           category: string
@@ -8469,6 +8504,14 @@ export type Database = {
         Returns: string
       }
       create_org_with_member: { Args: { org_nome: string }; Returns: string }
+      cronograma_delete_event: {
+        Args: {
+          event_id: string
+          event_org_id: string
+          event_source_key: string
+        }
+        Returns: Json
+      }
       cronograma_delete_subevent: {
         Args: { expected_lock_version?: number; subevent_id: string }
         Returns: Json
