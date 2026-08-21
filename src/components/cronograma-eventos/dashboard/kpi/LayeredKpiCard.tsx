@@ -25,7 +25,7 @@ interface Props {
 export default function LayeredKpiCard({ layers, tone = 'neutral', icon, order = 0, className }: Props) {
   const { offset, index, isDragging, goTo, bind } = useCardLayerScroll({ layers: 2 });
   const [mounted, setMounted] = useState(false);
-  const shellRef = useRef<HTMLDivElement | null>(null);
+  const shellRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
     const id = window.setTimeout(() => setMounted(true), 20 + order * 40);
