@@ -533,6 +533,8 @@
 }
 
 .agenda-kpi-next-name {
+  min-width: 0;
+  flex: 1 1 auto;
   overflow: hidden;
   color: oklch(var(--foreground) / 0.9);
   font-size: 0.655rem;
@@ -544,9 +546,9 @@
 .agenda-kpi-next-when {
   flex: none;
   color: var(--kpi-accent);
-  font-size: 0.585rem;
+  font-size: 0.555rem;
   font-weight: 800;
-  letter-spacing: 0.045em;
+  letter-spacing: 0.03em;
   font-variant-numeric: tabular-nums;
 }
 
