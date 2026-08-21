@@ -53,7 +53,7 @@ describe('integridade do cronograma oficial', () => {
     const official = normalizeCronogramaSeed(fenasoja2028CronogramaSeed);
     const deleted = official[0];
     const merged = mergeOfficialSeedWithDb(official, [], new Set([deleted.sourceKey]));
-    expect(merged).toHaveLength(144);
+    expect(merged).toHaveLength(official.length - 1);
     expect(merged.some((event) => event.sourceKey === deleted.sourceKey)).toBe(false);
   });
 });
