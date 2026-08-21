@@ -110,7 +110,7 @@ function LayeredKpiCard({
         <span
           className="agenda-kpi-rail-thumb"
           aria-hidden="true"
-          style={{ transform: `translate3d(0, ${p * 100}%, 0)` }}
+          style={{ transform: `translate3d(0, calc(${p} * var(--rail-step)), 0)` }}
         />
       </div>
     </section>
