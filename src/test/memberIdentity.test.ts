@@ -26,7 +26,7 @@ describe('retratos oficiais das comissões', () => {
   it('resolve as novas fotos por nome e por user_id sem colisão entre homônimos', () => {
     const leonardo = getPersonPhoto('Cap. Leonardo Ruy Dambroz');
     expect(leonardo).toBeTruthy();
-    expect(getPersonPhoto('Leonardo Chitolina')).toBeNull();
+    expect(getPersonPhoto('Leonardo Chitolina')).not.toBe(leonardo);
     expect(getPersonPhoto('LEONARDO MATEUS STROSCHEIN')).toBeNull();
 
     const fernanda = getPersonPhoto('Fernanda Matarucco Meinertz');
@@ -38,5 +38,31 @@ describe('retratos oficiais das comissões', () => {
     expect(getPersonPhoto('Eduardo Kretschmer')).toBeNull();
     expect(getPersonPhoto(null, 'fae623bc-2149-47c9-a59b-1899f406227c')).toBeTruthy();
     expect(getPersonPhoto(null, '8dce325e-91b4-4ed5-ba7d-c52cecac1c29')).toBeTruthy();
+  });
+
+  it('resolve as 8 novas lideranças por nome e por user_id sem colisão', () => {
+    const chitolina = getPersonPhoto('Leonardo Chitolina');
+    const dambroz = getPersonPhoto('Cap. Leonardo Ruy Dambroz');
+    expect(chitolina).toBeTruthy();
+    expect(chitolina).not.toBe(dambroz);
+
+    expect(getPersonPhoto('Daniel U. Ribeiro da Silva')).toBeTruthy();
+    expect(getPersonPhoto('DANIEL DALLALBA')).toBeNull();
+    expect(getPersonPhoto('Rosa Zorzan de Paula')).toBeTruthy();
+    expect(getPersonPhoto('VLADIMIR ANTÔNIO MADALOSSO DA ROSA')).toBeNull();
+    expect(getPersonPhoto('Marcos Eduardo Servat')).toBeTruthy();
+    expect(getPersonPhoto('CARLA FREISLEBEN SERVAT')).toBeNull();
+    expect(getPersonPhoto('Josyane Cristina Heck')).toBeTruthy();
+    expect(getPersonPhoto('Germano Tessmer Büttow')).toBeTruthy();
+    expect(getPersonPhoto('Dário Júnior da Motta Germano')).toBeTruthy();
+    expect(getPersonPhoto('Cléo Antonio Rockenbach')).toBeTruthy();
+
+    // Registros legados resolvem pelo user_id
+    expect(getPersonPhoto(null, 'd3bd4c52-4ba9-4d64-bf45-3b43206fb9f4')).toBe(
+      getPersonPhoto(null, 'b431453a-322c-4f2f-b962-bc5d6f508ec1'),
+    );
+    expect(getPersonPhoto(null, '7e7b9e5f-d232-4090-a882-ed00d6b604ea')).toBe(
+      getPersonPhoto(null, 'f9ed4ab9-0ef3-4ee4-9707-36288dbc828f'),
+    );
   });
 });
