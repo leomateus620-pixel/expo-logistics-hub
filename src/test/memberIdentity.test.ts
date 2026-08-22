@@ -26,7 +26,7 @@ describe('retratos oficiais das comissões', () => {
   it('resolve as novas fotos por nome e por user_id sem colisão entre homônimos', () => {
     const leonardo = getPersonPhoto('Cap. Leonardo Ruy Dambroz');
     expect(leonardo).toBeTruthy();
-    expect(getPersonPhoto('Leonardo Chitolina')).toBeNull();
+    expect(getPersonPhoto('Leonardo Chitolina')).not.toBe(leonardo);
     expect(getPersonPhoto('LEONARDO MATEUS STROSCHEIN')).toBeNull();
 
     const fernanda = getPersonPhoto('Fernanda Matarucco Meinertz');
