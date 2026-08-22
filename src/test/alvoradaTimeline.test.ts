@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import {
+  ALVORADA_BRAND_HOLD_DURATION,
   ALVORADA_PHASES,
   ALVORADA_SEQUENCE_DURATION,
   bellCurve,
@@ -13,48 +14,42 @@ import {
 } from '@/features/alvorada/timeline';
 
 describe('timeline cinematográfica da Alvorada', () => {
-  it('mantém os sete movimentos até 12,4s e entra em hold final indefinido', () => {
-    expect(ALVORADA_SEQUENCE_DURATION).toBe(12.4);
-    expect(ALVORADA_PHASES.orbitalBrazil).toEqual({ start: 0, end: 2 });
-    expect(ALVORADA_PHASES.rioGrandeDoSul).toEqual({ start: 2, end: 4 });
-    expect(Object.values(ALVORADA_PHASES)).toContainEqual({ start: 4, end: 4.8 });
-    expect(ALVORADA_PHASES.santaRosaDescent).toEqual({ start: 4.8, end: 6.4 });
-    expect(ALVORADA_PHASES.cityFlight).toEqual({ start: 6.4, end: 8.8 });
-    expect(ALVORADA_PHASES.dawnRise).toEqual({ start: 8.8, end: 10.6 });
-    expect(ALVORADA_PHASES.titleReveal).toEqual({ start: 10.6, end: 12.4 });
-    expect(ALVORADA_PHASES.finalHold).toEqual({
-      start: ALVORADA_SEQUENCE_DURATION,
-      end: Number.POSITIVE_INFINITY,
+  it('define sete fases explícitas e um hold de marca de dois segundos', () => {
+    expect(ALVORADA_SEQUENCE_DURATION).toBe(11.4);
+    expect(ALVORADA_BRAND_HOLD_DURATION).toBe(2);
+    expect(ALVORADA_PHASES).toEqual({
+      dawn: { start: 0, end: 1.6 },
+      territory: { start: 1.6, end: 4.4 },
+      'santa-rosa': { start: 4.4, end: 5.8 },
+      'brand-reveal': { start: 5.8, end: 7.4 },
+      'brand-hold': { start: 7.4, end: 9.4 },
+      'org-transition': { start: 9.4, end: 11.4 },
+      'org-ready': { start: 11.4, end: Number.POSITIVE_INFINITY },
     });
-    expect(getAlvoradaPhase(60)).toBe('finalHold');
-    expect(getAlvoradaPhase(Number.MAX_SAFE_INTEGER)).toBe('finalHold');
+    expect(
+      ALVORADA_PHASES['brand-hold'].end - ALVORADA_PHASES['brand-hold'].start,
+    ).toBe(ALVORADA_BRAND_HOLD_DURATION);
+    expect(getAlvoradaPhase(60)).toBe('org-ready');
+    expect(getAlvoradaPhase(Number.MAX_SAFE_INTEGER)).toBe('org-ready');
   });
 
   it('seleciona cada fase narrativa nos limites definidos', () => {
-    const stabilizationPhase = Object.entries(ALVORADA_PHASES).find(([, interval]) => (
-      interval.start === 4 && interval.end === 4.8
-    ))?.[0];
-
-    expect(stabilizationPhase).toBeDefined();
-
     const phaseCases = [
-      [-1, 'orbitalBrazil'],
-      [0, 'orbitalBrazil'],
-      [1.999, 'orbitalBrazil'],
-      [2, 'rioGrandeDoSul'],
-      [3.999, 'rioGrandeDoSul'],
-      [4, stabilizationPhase],
-      [4.799, stabilizationPhase],
-      [4.8, 'santaRosaDescent'],
-      [6.399, 'santaRosaDescent'],
-      [6.4, 'cityFlight'],
-      [8.799, 'cityFlight'],
-      [8.8, 'dawnRise'],
-      [10.599, 'dawnRise'],
-      [10.6, 'titleReveal'],
-      [12.399, 'titleReveal'],
-      [12.4, 'finalHold'],
-      [ALVORADA_SEQUENCE_DURATION + 120, 'finalHold'],
+      [-1, 'dawn'],
+      [0, 'dawn'],
+      [1.599, 'dawn'],
+      [1.6, 'territory'],
+      [4.399, 'territory'],
+      [4.4, 'santa-rosa'],
+      [5.799, 'santa-rosa'],
+      [5.8, 'brand-reveal'],
+      [7.399, 'brand-reveal'],
+      [7.4, 'brand-hold'],
+      [9.399, 'brand-hold'],
+      [9.4, 'org-transition'],
+      [11.399, 'org-transition'],
+      [11.4, 'org-ready'],
+      [ALVORADA_SEQUENCE_DURATION + 120, 'org-ready'],
     ] as const;
 
     for (const [elapsed, expectedPhase] of phaseCases) {
@@ -62,13 +57,13 @@ describe('timeline cinematográfica da Alvorada', () => {
     }
   });
 
-  it('inicializa a câmera no Brasil orbital sem progresso residual', () => {
+  it('inicializa a câmera no amanhecer sem progresso residual', () => {
     expect(createInitialTimelineState()).toEqual({
       ambientElapsed: 0,
       elapsed: 0,
       delta: 0,
       progress: 0,
-      phase: 'orbitalBrazil',
+      phase: 'dawn',
     });
   });
 
@@ -79,12 +74,13 @@ describe('timeline cinematográfica da Alvorada', () => {
     expect(restored.ambientElapsed).toBe(8.25);
     expect(restored.delta).toBe(0);
     expect(restored.progress).toBeCloseTo(8.25 / ALVORADA_SEQUENCE_DURATION, 8);
-    expect(restored.phase).toBe('cityFlight');
+    expect(restored.phase).toBe('brand-hold');
     expect(createInitialTimelineState(-2).elapsed).toBe(0);
+    expect(createInitialTimelineState(Number.NaN).phase).toBe('dawn');
     expect(createInitialTimelineState(20).elapsed).toBe(ALVORADA_SEQUENCE_DURATION);
     expect(createInitialTimelineState(20).ambientElapsed).toBe(ALVORADA_SEQUENCE_DURATION);
     expect(createInitialTimelineState(20).progress).toBe(1);
-    expect(createInitialTimelineState(20).phase).toBe('finalHold');
+    expect(createInitialTimelineState(20).phase).toBe('org-ready');
   });
 
   it('limita e normaliza intervalos inclusive quando o intervalo é degenerado', () => {

@@ -14,15 +14,12 @@ function cinematicCurve(points: THREE.Vector3[]) {
   return new THREE.CatmullRomCurve3(points, false, 'catmullrom', 0.52);
 }
 
-function flowingRange(value: number, start: number, end: number) {
-  const linear = THREE.MathUtils.clamp((value - start) / (end - start), 0, 1);
-  return linear * linear * linear * (linear * (linear * 6 - 15) + 10);
-}
+const SANTA_ROSA_ATMOSPHERIC_CUT = 5.15;
 
 /**
- * Position and look-at travel on independent splines. The orbital and local
- * frames meet inside the spatial cloud corridor, with the same projected FOV
- * and almost no screen-space velocity at the hand-off.
+ * The authored camera preserves the Brazil -> Rio Grande do Sul -> Santa Rosa
+ * travel and then cuts, behind the cloud corridor, directly to the dawn brand
+ * frame. There is intentionally no local city-flight path.
  */
 export function CinematicCamera({ quality }: CinematicCameraProps) {
   const timeline = useAlvoradaTimeline();
@@ -45,81 +42,68 @@ export function CinematicCamera({ quality }: CinematicCameraProps) {
       .addScaledVector(stateTangent, 0.035);
 
     return {
-      orbitalPosition: cinematicCurve([
+      dawnPosition: cinematicCurve([
         brazil.clone().multiplyScalar(11.8).addScaledVector(brazilTangent, 2.25).add(new THREE.Vector3(0, 1.12, 0)),
         brazil.clone().multiplyScalar(9.75).addScaledVector(brazilTangent, 1.18).add(new THREE.Vector3(0, 0.62, 0)),
         brazil.clone().multiplyScalar(8.55).addScaledVector(brazilTangent, 0.52),
         brazilEnd,
       ]),
-      orbitalLook: cinematicCurve([
+      dawnLook: cinematicCurve([
         brazil.clone().multiplyScalar(0.72),
         brazil.clone().multiplyScalar(1.52),
         rioGrandeDoSul.clone().multiplyScalar(2.42),
       ]),
-      statePosition: cinematicCurve([
+      territoryPosition: cinematicCurve([
         brazilEnd,
         rioGrandeDoSul.clone().multiplyScalar(6.68).addScaledVector(stateTangent, 0.24),
         santaRosa.clone().multiplyScalar(5.46).addScaledVector(stateTangent, 0.11),
         stateEnd,
       ]),
-      stateLook: cinematicCurve([
+      territoryLook: cinematicCurve([
         rioGrandeDoSul.clone().multiplyScalar(2.42),
         rioGrandeDoSul.clone().multiplyScalar(3.22),
         santaRosa.clone().multiplyScalar(3.98),
       ]),
-      stabilizationPosition: cinematicCurve([
+      santaRosaPosition: cinematicCurve([
         stateEnd,
         santaRosa.clone().multiplyScalar(4.30).addScaledVector(stateTangent, 0.022),
         santaRosa.clone().multiplyScalar(4.26).addScaledVector(stateTangent, 0.01),
       ]),
-      stabilizationLook: cinematicCurve([
+      santaRosaLook: cinematicCurve([
         santaRosa.clone().multiplyScalar(3.98),
         santaRosa.clone().multiplyScalar(4.005),
         santaRosa.clone().multiplyScalar(4.02),
       ]),
-      localDescentPosition: cinematicCurve([
+      brandApproachPosition: cinematicCurve([
         new THREE.Vector3(7.5, 34, 52),
-        new THREE.Vector3(5.8, 24, 39),
-        new THREE.Vector3(4.1, 13, 27),
-        new THREE.Vector3(3, 6.6, 17),
+        new THREE.Vector3(5.2, 25, 40),
+        new THREE.Vector3(2.4, 14.5, 25),
+        new THREE.Vector3(0, 7.9, 11),
       ]),
-      localDescentLook: cinematicCurve([
+      brandApproachLook: cinematicCurve([
         new THREE.Vector3(-4, 0.4, -2),
-        new THREE.Vector3(-1, 0.85, -5),
-        new THREE.Vector3(0.4, 1.05, -10),
-      ]),
-      cityPosition: cinematicCurve([
-        new THREE.Vector3(3, 6.6, 17),
-        new THREE.Vector3(1.9, 5.7, 10),
-        new THREE.Vector3(-0.25, 4.8, 2.4),
-        new THREE.Vector3(-2.5, 4.35, -5.2),
-      ]),
-      cityLook: cinematicCurve([
-        new THREE.Vector3(0.4, 1.05, -10),
-        new THREE.Vector3(0.8, 0.82, -17),
-        new THREE.Vector3(0.2, 1.0, -24),
-      ]),
-      skyPosition: cinematicCurve([
-        new THREE.Vector3(-2.5, 4.35, -5.2),
-        new THREE.Vector3(-1.65, 5.45, -2.1),
-        new THREE.Vector3(-0.5, 6.55, 2.2),
-        new THREE.Vector3(0, 7.9, 11),
-      ]),
-      skyLook: cinematicCurve([
-        new THREE.Vector3(0.2, 1.0, -24),
-        new THREE.Vector3(0.1, 5.8, -30),
-        new THREE.Vector3(0, 12.2, -32),
+        new THREE.Vector3(-1.2, 6.6, -17),
         new THREE.Vector3(0, 17.2, -33),
       ]),
-      finalPosition: cinematicCurve([
+      brandHoldPosition: cinematicCurve([
         new THREE.Vector3(0, 7.9, 11),
-        new THREE.Vector3(0.1, 8.0, 11.15),
-        new THREE.Vector3(0.22, 8.05, 11.3),
+        new THREE.Vector3(0.06, 7.96, 11.12),
+        new THREE.Vector3(0.12, 8, 11.22),
       ]),
-      finalLook: cinematicCurve([
+      brandHoldLook: cinematicCurve([
         new THREE.Vector3(0, 17.2, -33),
-        new THREE.Vector3(0, 17.4, -33),
-        new THREE.Vector3(0, 17.5, -33),
+        new THREE.Vector3(0, 17.35, -33),
+        new THREE.Vector3(0, 17.45, -33),
+      ]),
+      orgTransitionPosition: cinematicCurve([
+        new THREE.Vector3(0.12, 8, 11.22),
+        new THREE.Vector3(0.18, 8.12, 12),
+        new THREE.Vector3(0.24, 8.28, 13.4),
+      ]),
+      orgTransitionLook: cinematicCurve([
+        new THREE.Vector3(0, 17.45, -33),
+        new THREE.Vector3(0, 17.55, -33),
+        new THREE.Vector3(0, 17.65, -33),
       ]),
     };
   }, []);
@@ -131,85 +115,70 @@ export function CinematicCamera({ quality }: CinematicCameraProps) {
     let bank = 0;
     let fov = quality.mobile ? 48 : 44;
 
-    if (elapsed < ALVORADA_PHASES.orbitalBrazil.end) {
+    if (elapsed < ALVORADA_PHASES.dawn.end) {
       const progress = smoothRange(
         elapsed,
-        ALVORADA_PHASES.orbitalBrazil.start,
-        ALVORADA_PHASES.orbitalBrazil.end,
+        ALVORADA_PHASES.dawn.start,
+        ALVORADA_PHASES.dawn.end,
       );
-      paths.orbitalPosition.getPointAt(progress, position);
-      paths.orbitalLook.getPointAt(progress, lookAt);
+      paths.dawnPosition.getPointAt(progress, position);
+      paths.dawnLook.getPointAt(progress, lookAt);
       fov = THREE.MathUtils.lerp(quality.mobile ? 52 : 46, quality.mobile ? 46 : 39, progress);
       bank = Math.sin(progress * Math.PI) * -0.022;
-    } else if (elapsed < ALVORADA_PHASES.rioGrandeDoSul.end) {
+    } else if (elapsed < ALVORADA_PHASES.territory.end) {
       const progress = smoothRange(
         elapsed,
-        ALVORADA_PHASES.rioGrandeDoSul.start,
-        ALVORADA_PHASES.rioGrandeDoSul.end,
+        ALVORADA_PHASES.territory.start,
+        ALVORADA_PHASES.territory.end,
       );
-      paths.statePosition.getPointAt(progress, position);
-      paths.stateLook.getPointAt(progress, lookAt);
+      paths.territoryPosition.getPointAt(progress, position);
+      paths.territoryLook.getPointAt(progress, lookAt);
       fov = THREE.MathUtils.lerp(quality.mobile ? 46 : 39, quality.mobile ? 50 : 46, progress);
       bank = Math.sin(progress * Math.PI) * 0.014;
-    } else if (elapsed < ALVORADA_PHASES.santaRosaStabilization.end) {
+    } else if (elapsed < SANTA_ROSA_ATMOSPHERIC_CUT) {
       const progress = smoothRange(
         elapsed,
-        ALVORADA_PHASES.santaRosaStabilization.start,
-        ALVORADA_PHASES.santaRosaStabilization.end,
+        ALVORADA_PHASES['santa-rosa'].start,
+        SANTA_ROSA_ATMOSPHERIC_CUT,
       );
-      paths.stabilizationPosition.getPointAt(progress, position);
-      paths.stabilizationLook.getPointAt(progress, lookAt);
+      paths.santaRosaPosition.getPointAt(progress, position);
+      paths.santaRosaLook.getPointAt(progress, lookAt);
       fov = quality.mobile ? 50 : 46;
       bank = Math.sin(progress * Math.PI) * 0.004;
-    } else if (elapsed < ALVORADA_PHASES.santaRosaDescent.end) {
-      const progress = flowingRange(
+    } else if (elapsed < ALVORADA_PHASES['brand-reveal'].end) {
+      const progress = smoothRange(
         elapsed,
-        ALVORADA_PHASES.santaRosaDescent.start,
-        ALVORADA_PHASES.santaRosaDescent.end,
+        SANTA_ROSA_ATMOSPHERIC_CUT,
+        ALVORADA_PHASES['brand-reveal'].end,
       );
-      paths.localDescentPosition.getPointAt(progress, position);
-      paths.localDescentLook.getPointAt(progress, lookAt);
+      paths.brandApproachPosition.getPointAt(progress, position);
+      paths.brandApproachLook.getPointAt(progress, lookAt);
       if (quality.mobile) {
-        position.y += THREE.MathUtils.lerp(1.35, 0.55, progress);
-        position.z += THREE.MathUtils.lerp(2.8, 1.8, progress);
+        position.y += THREE.MathUtils.lerp(1.2, 0, progress);
+        position.z += THREE.MathUtils.lerp(2.6, 2.8, progress);
       }
-      fov = THREE.MathUtils.lerp(quality.mobile ? 50 : 46, quality.mobile ? 46 : 42, progress);
-      bank = Math.sin(progress * Math.PI) * -0.006;
-    } else if (elapsed < ALVORADA_PHASES.cityFlight.end) {
-      const progress = flowingRange(
+      fov = THREE.MathUtils.lerp(quality.mobile ? 50 : 46, quality.mobile ? 48 : 44, progress);
+      bank = Math.sin(progress * Math.PI) * -0.004;
+    } else if (elapsed < ALVORADA_PHASES['org-transition'].start) {
+      const progress = smoothRange(
         elapsed,
-        ALVORADA_PHASES.cityFlight.start,
-        ALVORADA_PHASES.cityFlight.end,
+        ALVORADA_PHASES['brand-hold'].start,
+        ALVORADA_PHASES['brand-hold'].end,
       );
-      paths.cityPosition.getPointAt(progress, position);
-      paths.cityLook.getPointAt(progress, lookAt);
-      if (quality.mobile) {
-        position.y += THREE.MathUtils.lerp(0.55, 0, progress);
-        position.z += THREE.MathUtils.lerp(1.8, 1.05, progress);
-      }
-      fov = THREE.MathUtils.lerp(quality.mobile ? 46 : 42, quality.mobile ? 42 : 38, progress);
-      bank = Math.sin(progress * Math.PI) * -0.003;
-    } else if (elapsed < ALVORADA_PHASES.dawnRise.end) {
-      const progress = flowingRange(
-        elapsed,
-        ALVORADA_PHASES.dawnRise.start,
-        ALVORADA_PHASES.dawnRise.end,
-      );
-      paths.skyPosition.getPointAt(progress, position);
-      paths.skyLook.getPointAt(progress, lookAt);
-      if (quality.mobile) position.z += THREE.MathUtils.lerp(1.05, 2.8, progress);
-      fov = THREE.MathUtils.lerp(quality.mobile ? 42 : 38, quality.mobile ? 48 : 44, progress);
-      bank = Math.sin(progress * Math.PI) * 0.002;
+      paths.brandHoldPosition.getPointAt(progress, position);
+      paths.brandHoldLook.getPointAt(progress, lookAt);
+      if (quality.mobile) position.z += 2.8;
+      fov = quality.mobile ? 48 : 44;
     } else {
       const progress = smoothRange(
         elapsed,
-        ALVORADA_PHASES.titleReveal.start,
-        ALVORADA_PHASES.titleReveal.end,
+        ALVORADA_PHASES['org-transition'].start,
+        ALVORADA_PHASES['org-transition'].end,
       );
-      paths.finalPosition.getPointAt(progress, position);
-      paths.finalLook.getPointAt(progress, lookAt);
+      paths.orgTransitionPosition.getPointAt(progress, position);
+      paths.orgTransitionLook.getPointAt(progress, lookAt);
       if (quality.mobile) position.z += 2.8;
-      fov = quality.mobile ? 48 : 44;
+      fov = THREE.MathUtils.lerp(quality.mobile ? 48 : 44, quality.mobile ? 51 : 47, progress);
     }
 
     camera.position.copy(position);

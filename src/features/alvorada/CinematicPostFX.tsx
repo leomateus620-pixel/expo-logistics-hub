@@ -1,4 +1,4 @@
-import { Bloom, EffectComposer, N8AO, SMAA, Vignette } from '@react-three/postprocessing';
+import { Bloom, EffectComposer, SMAA, Vignette } from '@react-three/postprocessing';
 import type { AlvoradaQualityProfile } from './capabilities';
 
 export function CinematicPostFX({ quality }: { quality: AlvoradaQualityProfile }) {
@@ -7,13 +7,6 @@ export function CinematicPostFX({ quality }: { quality: AlvoradaQualityProfile }
   return (
     <EffectComposer multisampling={0} enableNormalPass={false}>
       <SMAA />
-      <N8AO
-        aoRadius={quality.mobile ? 0.48 : 0.68}
-        distanceFalloff={1.35}
-        intensity={quality.mobile ? 0.72 : 0.86}
-        quality={quality.level === 'high' ? 'medium' : 'performance'}
-        halfRes
-      />
       {quality.bloom && (
         <Bloom
           intensity={0.16}

@@ -9,7 +9,7 @@ import {
   SANTA_ROSA_COORDINATES,
 } from '../geo';
 import { useAlvoradaTimeline } from '../TimelineContext';
-import { bellCurve, smoothRange } from '../timeline';
+import { ALVORADA_PHASES, bellCurve, smoothRange } from '../timeline';
 
 interface GeographicBoundaryProps {
   color: string;
@@ -119,10 +119,18 @@ export function SantaRosaMarker() {
 
   useFrame(() => {
     const elapsed = timeline.current.elapsed;
-    const reveal = smoothRange(elapsed, 2.72, 3.12);
-    const fade = 1 - smoothRange(elapsed, 4.34, 4.82);
-    const pulse = bellCurve(elapsed, 3.05, 3.25, 3.62)
-      + bellCurve(elapsed, 4.02, 4.18, 4.45) * 0.18;
+    const reveal = smoothRange(
+      elapsed,
+      ALVORADA_PHASES.territory.end - 1.15,
+      ALVORADA_PHASES.territory.end - 0.65,
+    );
+    const fade = 1 - smoothRange(
+      elapsed,
+      ALVORADA_PHASES['santa-rosa'].end - 0.6,
+      ALVORADA_PHASES['santa-rosa'].end - 0.1,
+    );
+    const pulse = bellCurve(elapsed, 3.55, 3.78, 4.08)
+      + bellCurve(elapsed, 4.48, 4.72, 5.08) * 0.22;
     const visibility = reveal * fade;
 
     if (root.current) root.current.visible = visibility > 0.002;
@@ -183,10 +191,10 @@ export function BrazilLayer() {
   return (
     <GeographicBoundary
       color="#b9d9ff"
-      end={1.15}
+      end={ALVORADA_PHASES.dawn.end - 0.25}
       opacity={0.48}
       radius={EARTH_RADIUS + 0.022}
-      start={0.35}
+      start={ALVORADA_PHASES.dawn.start + 0.3}
       url="/alvorada/brazil-min.geojson"
     />
   );
@@ -196,10 +204,10 @@ export function RioGrandeDoSulLayer() {
   return (
     <GeographicBoundary
       color="#ffd08a"
-      end={2.95}
+      end={ALVORADA_PHASES.territory.start + 1.35}
       opacity={0.96}
       radius={EARTH_RADIUS + 0.045}
-      start={2.08}
+      start={ALVORADA_PHASES.territory.start + 0.35}
       url="/alvorada/rio-grande-do-sul-min.geojson"
     />
   );

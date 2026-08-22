@@ -29,15 +29,7 @@ const ALVORADA_CRITICAL_ASSETS = [
   '/alvorada/santa-rosa-min.geojson',
 ] as const;
 
-const ALVORADA_SECONDARY_ASSETS = [
-  '/alvorada/santa-rosa-roads.json',
-  '/alvorada/santa-rosa-city-v2.json',
-  '/alvorada/helvetiker-bold.typeface.json',
-  '/alvorada/fenasoja-symbol-official.png',
-] as const;
-
 let assetsWarmed = false;
-let secondaryAssetsStreaming = false;
 
 function streamAssets(sources: readonly string[]) {
   sources.forEach((source) => {
@@ -55,14 +47,12 @@ export function warmAlvoradaAssets() {
 }
 
 /**
- * Starts non-orbital downloads only after the experience is opened. It is
- * intentionally separate from hover/focus warming so mobile does not decode
- * or retain the city and title assets while the user remains on the portal.
+ * Compatibility hook retained for the existing Portal launcher. The city,
+ * typeface and 3D-symbol payloads were removed from the runtime; organizational
+ * data and portraits now own their loading lifecycle outside this WebGL intro.
  */
 export function streamAlvoradaSecondaryAssets() {
-  if (secondaryAssetsStreaming || typeof window === 'undefined') return;
-  secondaryAssetsStreaming = true;
-  streamAssets(ALVORADA_SECONDARY_ASSETS);
+  return undefined;
 }
 
 function canCreateWebGL2Context(attributes: WebGLContextAttributes) {

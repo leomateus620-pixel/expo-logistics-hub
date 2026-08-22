@@ -1,38 +1,47 @@
-/** End of the authored journey. The renderer remains alive in finalHold. */
-export const ALVORADA_SEQUENCE_DURATION = 12.4;
+/** The authored WebGL journey ends when the organizational ecosystem is ready. */
+export const ALVORADA_SEQUENCE_DURATION = 11.4;
 export const ALVORADA_EXIT_DURATION_MS = 400;
+export const ALVORADA_BRAND_HOLD_DURATION = 2;
 
+/**
+ * One explicit state machine shared by WebGL diagnostics and the DOM graph
+ * transition. Keeping the terminal phase open-ended lets the ecosystem remain
+ * interactive without extending the authored intro clock.
+ */
 export const ALVORADA_PHASES = {
-  orbitalBrazil: { start: 0, end: 2 },
-  rioGrandeDoSul: { start: 2, end: 4 },
-  santaRosaStabilization: { start: 4, end: 4.8 },
-  santaRosaDescent: { start: 4.8, end: 6.4 },
-  cityFlight: { start: 6.4, end: 8.8 },
-  dawnRise: { start: 8.8, end: 10.6 },
-  titleReveal: { start: 10.6, end: ALVORADA_SEQUENCE_DURATION },
-  finalHold: { start: ALVORADA_SEQUENCE_DURATION, end: Number.POSITIVE_INFINITY },
+  dawn: { start: 0, end: 1.6 },
+  territory: { start: 1.6, end: 4.4 },
+  'santa-rosa': { start: 4.4, end: 5.8 },
+  'brand-reveal': { start: 5.8, end: 7.4 },
+  'brand-hold': { start: 7.4, end: 9.4 },
+  'org-transition': { start: 9.4, end: ALVORADA_SEQUENCE_DURATION },
+  'org-ready': { start: ALVORADA_SEQUENCE_DURATION, end: Number.POSITIVE_INFINITY },
 } as const;
 
 export type AlvoradaPhase = keyof typeof ALVORADA_PHASES;
 
-export type AlvoradaDominantScene = 'orbital' | 'transition' | 'city' | 'dawn' | 'title';
+export type AlvoradaDominantScene =
+  | 'dawn'
+  | 'territory'
+  | 'santa-rosa'
+  | 'brand'
+  | 'organizational';
 
 export interface AlvoradaVisualState {
   dominantScene: AlvoradaDominantScene;
   earthOpacity: number;
-  cityVisible: boolean;
   skyOpacity: number;
   transitionOpacity: number;
-  titleProgress: number;
+  brandProgress: number;
+  brandOpacity: number;
+  orgTransitionProgress: number;
   earthResident: boolean;
-  cityResident: boolean;
-  titleResident: boolean;
 }
 
 export interface AlvoradaTimelineState {
-  /** Visible runtime, including the living final composition. */
+  /** Visible runtime, including the living organizational composition. */
   ambientElapsed: number;
-  /** Authored sequence time, clamped at the final brand frame. */
+  /** Authored intro time, clamped when the organizational graph is ready. */
   elapsed: number;
   delta: number;
   progress: number;
@@ -68,19 +77,14 @@ export function bellCurve(elapsed: number, start: number, peak: number, end: num
   return 1 - smoothRange(elapsed, peak, end);
 }
 
-const EARTH_FADE_START = 4.32;
-const EARTH_FADE_END = 4.79;
-const CITY_VISIBILITY_START = 4.82;
-const EARTH_RESIDENCY_END = 5.45;
-const CITY_RESIDENCY_START = 0.75;
-const CITY_VISIBILITY_END = ALVORADA_PHASES.titleReveal.start;
-const CITY_RESIDENCY_END = 11.2;
-const TITLE_RESIDENCY_START = 6.8;
-const SKY_REVEAL_START = 4.2;
-const SKY_REVEAL_END = 5.95;
-const TRANSITION_START = ALVORADA_PHASES.santaRosaStabilization.start;
-const TRANSITION_PEAK = 4.82;
-const TRANSITION_END = 6.25;
+const EARTH_FADE_START = 5.05;
+const EARTH_FADE_END = 5.68;
+const EARTH_RESIDENCY_END = 5.95;
+const SKY_REVEAL_START = ALVORADA_PHASES.dawn.start;
+const SKY_REVEAL_END = ALVORADA_PHASES.dawn.end;
+const TRANSITION_START = ALVORADA_PHASES['santa-rosa'].start;
+const TRANSITION_PEAK = 5.2;
+const TRANSITION_END = 6.35;
 const MAX_TRANSITION_OPACITY = 0.72;
 
 function normalizeElapsed(elapsed: number) {
@@ -89,69 +93,62 @@ function normalizeElapsed(elapsed: number) {
 }
 
 function getDominantScene(elapsed: number): AlvoradaDominantScene {
-  if (elapsed < ALVORADA_PHASES.santaRosaStabilization.start) return 'orbital';
-  if (elapsed < ALVORADA_PHASES.cityFlight.start) return 'transition';
-  if (elapsed < ALVORADA_PHASES.dawnRise.start) return 'city';
-  if (elapsed < ALVORADA_PHASES.titleReveal.start) return 'dawn';
-  return 'title';
+  if (elapsed < ALVORADA_PHASES.territory.start) return 'dawn';
+  if (elapsed < ALVORADA_PHASES['santa-rosa'].start) return 'territory';
+  if (elapsed < ALVORADA_PHASES['brand-reveal'].start) return 'santa-rosa';
+  if (elapsed < ALVORADA_PHASES['org-transition'].start) return 'brand';
+  return 'organizational';
 }
 
 /**
- * Single source of truth for scene ownership and lifecycle. Components consume
- * these values instead of defining independent visibility windows.
+ * Single source of truth for scene ownership and the DOM brand/graph hand-off.
+ * The removed city and 3D title have no visibility or residency state here, so
+ * they cannot accidentally return through a phase-only mount.
  */
 export function deriveAlvoradaVisualState(elapsed: number): AlvoradaVisualState {
   const authoredElapsed = normalizeElapsed(elapsed);
-  const earthOpacity = 1 - smoothRange(
+  const orgTransitionProgress = smoothRange(
     authoredElapsed,
-    EARTH_FADE_START,
-    EARTH_FADE_END,
+    ALVORADA_PHASES['org-transition'].start,
+    ALVORADA_PHASES['org-transition'].end,
   );
-  const cityVisible = authoredElapsed >= CITY_VISIBILITY_START
-    && authoredElapsed < CITY_VISIBILITY_END;
-  const skyOpacity = smoothRange(
+  const brandProgress = smoothRange(
     authoredElapsed,
-    SKY_REVEAL_START,
-    SKY_REVEAL_END,
-  );
-  const transitionOpacity = MAX_TRANSITION_OPACITY * bellCurve(
-    authoredElapsed,
-    TRANSITION_START,
-    TRANSITION_PEAK,
-    TRANSITION_END,
+    ALVORADA_PHASES['brand-reveal'].start,
+    ALVORADA_PHASES['brand-reveal'].end,
   );
 
   return {
     dominantScene: getDominantScene(authoredElapsed),
-    earthOpacity,
-    cityVisible,
-    skyOpacity,
-    transitionOpacity,
-    titleProgress: smoothRange(
+    earthOpacity: 1 - smoothRange(authoredElapsed, EARTH_FADE_START, EARTH_FADE_END),
+    skyOpacity: smoothRange(authoredElapsed, SKY_REVEAL_START, SKY_REVEAL_END)
+      * (1 - orgTransitionProgress),
+    transitionOpacity: MAX_TRANSITION_OPACITY * bellCurve(
       authoredElapsed,
-      ALVORADA_PHASES.titleReveal.start,
-      ALVORADA_PHASES.titleReveal.end,
+      TRANSITION_START,
+      TRANSITION_PEAK,
+      TRANSITION_END,
     ),
+    brandProgress,
+    brandOpacity: brandProgress * (1 - orgTransitionProgress),
+    orgTransitionProgress,
     earthResident: authoredElapsed < EARTH_RESIDENCY_END,
-    cityResident: authoredElapsed >= CITY_RESIDENCY_START
-      && authoredElapsed < CITY_RESIDENCY_END,
-    titleResident: authoredElapsed >= TITLE_RESIDENCY_START,
   };
 }
 
 export function getAlvoradaPhase(elapsed: number): AlvoradaPhase {
-  if (elapsed < ALVORADA_PHASES.rioGrandeDoSul.start) return 'orbitalBrazil';
-  if (elapsed < ALVORADA_PHASES.santaRosaStabilization.start) return 'rioGrandeDoSul';
-  if (elapsed < ALVORADA_PHASES.santaRosaDescent.start) return 'santaRosaStabilization';
-  if (elapsed < ALVORADA_PHASES.cityFlight.start) return 'santaRosaDescent';
-  if (elapsed < ALVORADA_PHASES.dawnRise.start) return 'cityFlight';
-  if (elapsed < ALVORADA_PHASES.titleReveal.start) return 'dawnRise';
-  if (elapsed < ALVORADA_PHASES.finalHold.start) return 'titleReveal';
-  return 'finalHold';
+  const authoredElapsed = normalizeElapsed(elapsed);
+  if (authoredElapsed < ALVORADA_PHASES.territory.start) return 'dawn';
+  if (authoredElapsed < ALVORADA_PHASES['santa-rosa'].start) return 'territory';
+  if (authoredElapsed < ALVORADA_PHASES['brand-reveal'].start) return 'santa-rosa';
+  if (authoredElapsed < ALVORADA_PHASES['brand-hold'].start) return 'brand-reveal';
+  if (authoredElapsed < ALVORADA_PHASES['org-transition'].start) return 'brand-hold';
+  if (authoredElapsed < ALVORADA_PHASES['org-ready'].start) return 'org-transition';
+  return 'org-ready';
 }
 
 export function createInitialTimelineState(initialElapsed = 0): AlvoradaTimelineState {
-  const elapsed = Math.min(ALVORADA_SEQUENCE_DURATION, Math.max(0, initialElapsed));
+  const elapsed = Math.min(ALVORADA_SEQUENCE_DURATION, normalizeElapsed(initialElapsed));
 
   return {
     ambientElapsed: elapsed,
