@@ -12,6 +12,14 @@ import leonardoDambroz from '@/assets/person-leonardo-dambroz.png.asset.json';
 import cassioFeltes from '@/assets/person-cassio-feltes.png.asset.json';
 import felipeCarpenedoGabriel from '@/assets/person-felipe-carpenedo-gabriel.png.asset.json';
 import fernandaMeinertz from '@/assets/person-fernanda-meinertz.png.asset.json';
+import danielRibeiro from '@/assets/person-daniel-ribeiro.png.asset.json';
+import josyaneHeck from '@/assets/person-josyane-heck.png.asset.json';
+import leonardoChitolina from '@/assets/person-leonardo-chitolina.png.asset.json';
+import rosaZorzan from '@/assets/person-rosa-zorzan.png.asset.json';
+import germanoButtow from '@/assets/person-germano-buttow.png.asset.json';
+import darioGermano from '@/assets/person-dario-germano.png.asset.json';
+import cleoRockenbach from '@/assets/person-cleo-rockenbach.png.asset.json';
+import marcosServat from '@/assets/person-marcos-servat.jpeg.asset.json';
 
 /**
  * Only these members have an official portrait. Everyone else keeps the
