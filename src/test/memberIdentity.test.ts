@@ -22,3 +22,21 @@ describe('identidade organizacional oficial', () => {
     expect(fabiano).not.toBe(djeison);
   });
 });
+describe('retratos oficiais das comissões', () => {
+  it('resolve as novas fotos por nome e por user_id sem colisão entre homônimos', () => {
+    const leonardo = getPersonPhoto('Cap. Leonardo Ruy Dambroz');
+    expect(leonardo).toBeTruthy();
+    expect(getPersonPhoto('Leonardo Chitolina')).toBeNull();
+    expect(getPersonPhoto('LEONARDO MATEUS STROSCHEIN')).toBeNull();
+
+    const fernanda = getPersonPhoto('Fernanda Matarucco Meinertz');
+    expect(fernanda).toBeTruthy();
+    expect(getPersonPhoto('FERNANDA SECKLER EICH')).toBeNull();
+    expect(fernanda).not.toBe(leonardo);
+
+    expect(getPersonPhoto('EDUARDO SANTOS')).toBeTruthy();
+    expect(getPersonPhoto('Eduardo Kretschmer')).toBeNull();
+    expect(getPersonPhoto(null, 'fae623bc-2149-47c9-a59b-1899f406227c')).toBeTruthy();
+    expect(getPersonPhoto(null, '8dce325e-91b4-4ed5-ba7d-c52cecac1c29')).toBeTruthy();
+  });
+});
