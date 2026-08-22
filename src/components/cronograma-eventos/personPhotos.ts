@@ -62,6 +62,18 @@ const PERSON_PHOTOS_BY_USER_ID: Record<string, string> = {
   '62fec475-8ad4-4db2-8464-c3863f2edb09': cassioFeltes.url,
   '8dce325e-91b4-4ed5-ba7d-c52cecac1c29': felipeCarpenedoGabriel.url,
   'a3b62599-3f3e-4e56-ab79-dbff4dca60e3': fernandaMeinertz.url,
+  'c44eb392-a0b1-4e26-a779-172dda834a93': danielRibeiro.url,
+  'f2eca357-8825-441e-99a0-5c4657553166': josyaneHeck.url,
+  '17a834e4-3ae6-4842-9306-b19dd0559a3c': leonardoChitolina.url,
+  'aafa8fd8-97cf-4e5b-8ade-3b4fe1e206a2': rosaZorzan.url,
+  'b431453a-322c-4f2f-b962-bc5d6f508ec1': germanoButtow.url,
+  'd3bd4c52-4ba9-4d64-bf45-3b43206fb9f4': germanoButtow.url,
+  '8a948030-5348-4e85-b81e-73025976aa08': darioGermano.url,
+  'f7b108d9-10a6-4b87-953b-783e7bfa05ff': darioGermano.url,
+  '557dacc6-7fcf-42de-ac23-d555d9072d07': cleoRockenbach.url,
+  'a3e893e1-a069-40f2-9f9e-5bbf80b21274': cleoRockenbach.url,
+  'f9ed4ab9-0ef3-4ee4-9707-36288dbc828f': marcosServat.url,
+  '7e7b9e5f-d232-4090-a882-ed00d6b604ea': marcosServat.url,
 };
 
 function normalize(value: string): string {
