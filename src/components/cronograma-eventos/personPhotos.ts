@@ -38,6 +38,14 @@ const PERSON_PHOTOS: Record<string, string> = {
   'cassio ricardo feltes': cassioFeltes.url,
   'felipe carpenedo gabriel': felipeCarpenedoGabriel.url,
   'fernanda matarucco meinertz': fernandaMeinertz.url,
+  'daniel u ribeiro da silva': danielRibeiro.url,
+  'josyane cristina heck': josyaneHeck.url,
+  'leonardo chitolina': leonardoChitolina.url,
+  'rosa zorzan de paula': rosaZorzan.url,
+  'germano tessmer buttow': germanoButtow.url,
+  'dario junior da motta germano': darioGermano.url,
+  'cleo antonio rockenbach': cleoRockenbach.url,
+  'marcos eduardo servat': marcosServat.url,
 };
 
 const PERSON_PHOTOS_BY_USER_ID: Record<string, string> = {
