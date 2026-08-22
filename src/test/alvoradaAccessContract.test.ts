@@ -72,7 +72,7 @@ describe('contrato de acesso exclusivo à Alvorada', () => {
     expect(experience).toContain('aria-modal="true"');
   });
 
-  it('carrega a cena sob demanda e não redistribui as imagens de referência', () => {
+  it('carrega a cena sob demanda e mantém o dataset urbano arquivado fora do runtime', () => {
     expect(portalPage).toContain(
       "const loadAlvoradaExperience = () => import('@/features/alvorada/FenasojaAlvoradaExperience')",
     );
@@ -81,7 +81,7 @@ describe('contrato de acesso exclusivo à Alvorada', () => {
 
     const shippedAssets = readdirSync(resolve('public/alvorada'));
     expect(shippedAssets).toContain('santa-rosa-city-v2.json');
-    expect(capabilities).toContain("'/alvorada/santa-rosa-city-v2.json'");
+    expect(capabilities).not.toContain("'/alvorada/santa-rosa-city-v2.json'");
     expect(shippedAssets).not.toContain('IMG_8957.jpeg');
     expect(shippedAssets).not.toContain('A13B1DEF-5041-4481-A578-F6CE0A44EAA7.png');
     expect(shippedAssets).not.toContain('39DA8852-B59F-4676-928D-EC0CD74917EE.png');

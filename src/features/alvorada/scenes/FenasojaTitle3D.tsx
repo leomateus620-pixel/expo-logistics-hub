@@ -171,8 +171,8 @@ export function FenasojaTitle3D({ quality }: FenasojaTitle3DProps) {
     const elapsed = timeline.current.elapsed;
     const ambientElapsed = timeline.current.ambientElapsed;
     const visualState = deriveAlvoradaVisualState(elapsed);
-    const revealStart = ALVORADA_PHASES.titleReveal.start;
-    const revealEnd = ALVORADA_PHASES.titleReveal.end;
+    const revealStart = ALVORADA_PHASES['brand-reveal'].start;
+    const revealEnd = ALVORADA_PHASES['brand-reveal'].end;
     const wordReveal = smoothRange(elapsed, revealStart + 0.08, revealStart + 1.15);
     const editionReveal = smoothRange(elapsed, revealStart + 0.24, revealStart + 1.34);
     const symbolReveal = smoothRange(elapsed, revealStart, revealStart + 0.98);
@@ -194,7 +194,7 @@ export function FenasojaTitle3D({ quality }: FenasojaTitle3DProps) {
     symbol.sweep.value = THREE.MathUtils.lerp(-0.2, 1.2, sweep);
 
     if (root.current) {
-      root.current.visible = visualState.titleProgress > 0.001;
+      root.current.visible = visualState.brandProgress > 0.001;
       const titleViewport = viewport.getCurrentViewport(camera, titlePosition);
       const targetWidth = titleViewport.width * (quality.mobile ? 0.56 : 0.58);
       const scale = targetWidth / TITLE_WIDTH;

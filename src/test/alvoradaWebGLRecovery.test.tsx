@@ -1,7 +1,11 @@
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import FenasojaAlvoradaExperience from '@/features/alvorada/FenasojaAlvoradaExperience';
-import { ALVORADA_SEQUENCE_DURATION } from '@/features/alvorada/timeline';
+import {
+  ALVORADA_PHASES,
+  ALVORADA_SEQUENCE_DURATION,
+} from '@/features/alvorada/timeline';
+import type { OrganizationalGraph } from '@/features/alvorada/organizational';
 
 interface MockCanvasProps {
   initialElapsed: number;
@@ -21,10 +25,99 @@ const runtime = vi.hoisted(() => ({
   canvasMounts: [] as CanvasMount[],
   canvasUnmounts: [] as number[],
   nextCanvasId: 0,
+  orgError: null as Error | null,
+  orgGraph: {
+    people: {},
+    nodes: [],
+    edges: [],
+    anomalies: [],
+    rootNodeId: 'org:ccp',
+    renderableNodeIds: [],
+  } as OrganizationalGraph,
+  orgLoading: false,
   reducedMotion: false,
   renderError: false,
   rendererTier: 'hardware' as 'hardware' | 'compatible' | 'unavailable',
 }));
+
+vi.mock('@/features/alvorada/organizational', () => ({
+  useOrganizationalEcosystemData: () => ({
+    graph: runtime.orgGraph,
+    isLoading: runtime.orgLoading,
+    error: runtime.orgError,
+    refetch: vi.fn(),
+  }),
+}));
+
+function emptyOrgGraph(): OrganizationalGraph {
+  return {
+    people: {},
+    nodes: [],
+    edges: [],
+    anomalies: [],
+    rootNodeId: 'org:ccp',
+    renderableNodeIds: [],
+  };
+}
+
+function interactiveOrgGraph(): OrganizationalGraph {
+  return {
+    people: {
+      'person:fabiano': {
+        id: 'person:fabiano',
+        userId: 'fabiano-user',
+        fullName: 'Fabiano Soltis',
+        avatarUrl: null,
+        roles: ['Presidente'],
+        highestAuthorityLevel: 2,
+        sourceIds: ['fabiano-user'],
+      },
+    },
+    nodes: [
+      {
+        id: 'org:ccp',
+        type: 'ccp',
+        authorityLevel: 1,
+        title: 'FENASOJA 2028',
+        subtitle: 'CCP',
+        personIds: [],
+        parentIds: [],
+        childIds: ['executive:fabiano'],
+        commissionId: null,
+        advisoryId: null,
+        sortOrder: 0,
+        isRenderable: true,
+        responsibilities: [],
+        metadata: {},
+      },
+      {
+        id: 'executive:fabiano',
+        type: 'executive',
+        authorityLevel: 2,
+        title: 'Fabiano Soltis',
+        subtitle: 'Presidente',
+        personIds: ['person:fabiano'],
+        parentIds: ['org:ccp'],
+        childIds: [],
+        commissionId: 'central-id',
+        advisoryId: null,
+        sortOrder: 0,
+        isRenderable: true,
+        responsibilities: [],
+        metadata: {},
+      },
+    ],
+    edges: [{
+      id: 'edge:ccp-fabiano',
+      sourceId: 'org:ccp',
+      targetId: 'executive:fabiano',
+      authorityLevel: 2,
+    }],
+    anomalies: [],
+    rootNodeId: 'org:ccp',
+    renderableNodeIds: ['org:ccp', 'executive:fabiano'],
+  };
+}
 
 vi.mock('@/features/alvorada/capabilities', () => ({
   degradeAlvoradaQualityProfile: (profile: unknown) => profile,
@@ -99,6 +192,9 @@ describe('recuperação WebGL da experiência Alvorada', () => {
     runtime.canvasMounts = [];
     runtime.canvasUnmounts = [];
     runtime.nextCanvasId = 0;
+    runtime.orgError = null;
+    runtime.orgGraph = emptyOrgGraph();
+    runtime.orgLoading = false;
     runtime.reducedMotion = false;
     runtime.renderError = false;
     runtime.rendererTier = 'hardware';
@@ -124,6 +220,13 @@ describe('recuperação WebGL da experiência Alvorada', () => {
     vi.stubGlobal('cancelAnimationFrame', vi.fn((handle: number) => {
       window.clearTimeout(handle);
     }));
+    vi.stubGlobal('ResizeObserver', class ResizeObserverMock {
+      disconnect() {}
+
+      observe() {}
+
+      unobserve() {}
+    });
   });
 
   afterEach(() => {
@@ -162,7 +265,10 @@ describe('recuperação WebGL da experiência Alvorada', () => {
 
     act(() => currentCanvas().props.onProgress(ALVORADA_SEQUENCE_DURATION));
     advance(60_000);
-    expect(screen.getByTestId('mock-alvorada-canvas')).toBeInTheDocument();
+    expect(screen.queryByTestId('mock-alvorada-canvas')).not.toBeInTheDocument();
+    expect(screen.getByTestId('alvorada-experience').querySelector(
+      '.alvorada-overlay__canvas',
+    )).toHaveAttribute('data-renderer', 'released');
     expect(onComplete).not.toHaveBeenCalled();
   });
 
@@ -192,10 +298,7 @@ describe('recuperação WebGL da experiência Alvorada', () => {
       'data-fallback-reason',
       'unsupported-webgl',
     );
-    expect(screen.getByTestId('alvorada-fallback').querySelector('img')).toHaveAttribute(
-      'src',
-      '/alvorada/fenasoja-symbol-official.png',
-    );
+    expect(screen.getByTestId('alvorada-fallback').querySelector('img')).toBeNull();
 
     advance(120_000);
     expect(onComplete).not.toHaveBeenCalled();
@@ -206,6 +309,80 @@ describe('recuperação WebGL da experiência Alvorada', () => {
     expect(onComplete).not.toHaveBeenCalled();
     advance(1);
     expect(onComplete).toHaveBeenCalledTimes(1);
+  });
+
+  it('avança o fallback pela mesma timeline e pausa enquanto a aba está oculta', () => {
+    runtime.rendererTier = 'unavailable';
+    render(<FenasojaAlvoradaExperience onComplete={vi.fn()} />);
+    const experience = screen.getByTestId('alvorada-experience');
+
+    expect(experience).toHaveAttribute('data-stage', 'dawn');
+    advance(1599);
+    setDocumentHidden(true);
+    advance(20_000);
+    expect(experience).toHaveAttribute('data-stage', 'dawn');
+
+    setDocumentHidden(false);
+    advance(1);
+    expect(experience).toHaveAttribute('data-stage', 'territory');
+    advance(2800);
+    expect(experience).toHaveAttribute('data-stage', 'santa-rosa');
+    advance(1400);
+    expect(experience).toHaveAttribute('data-stage', 'brand-reveal');
+    advance(1600);
+    expect(experience).toHaveAttribute('data-stage', 'brand-hold');
+    expect(screen.getByRole('img', { name: /Fenasoja 2028, Edição 2028/ })).toBeVisible();
+    advance(2000);
+    expect(experience).toHaveAttribute('data-stage', 'org-transition');
+    advance(2000);
+    expect(experience).toHaveAttribute('data-stage', 'org-ready');
+    expect(experience.querySelector('.alvorada-overlay__canvas')).toHaveAttribute(
+      'data-renderer',
+      'released',
+    );
+  });
+
+  it('transiciona a marca para o grafo quando os dados chegam após liberar o Canvas', () => {
+    runtime.orgLoading = true;
+    const onComplete = vi.fn();
+    const view = render(<FenasojaAlvoradaExperience onComplete={onComplete} />);
+    const canvas = currentCanvas();
+    const orgTransitionDurationMs =
+      (ALVORADA_PHASES['org-transition'].end - ALVORADA_PHASES['org-transition'].start) * 1000;
+
+    act(() => {
+      canvas.props.onReady();
+      canvas.props.onProgress(ALVORADA_SEQUENCE_DURATION);
+    });
+
+    const experience = screen.getByTestId('alvorada-experience');
+    expect(experience).toHaveAttribute('data-stage', 'brand-hold');
+    expect(screen.queryByTestId('mock-alvorada-canvas')).not.toBeInTheDocument();
+    expect(experience.querySelector('.alvorada-overlay__canvas')).toHaveAttribute(
+      'data-renderer',
+      'released',
+    );
+    expect(runtime.canvasMounts).toHaveLength(1);
+    expect(runtime.canvasUnmounts).toEqual([canvas.id]);
+    expect(screen.getByText('Sincronizando a estrutura organizacional registrada')).toBeVisible();
+    expect(screen.getByRole('img', { name: /Fenasoja 2028, Edição 2028/ })).toBeVisible();
+
+    runtime.orgLoading = false;
+    view.rerender(<FenasojaAlvoradaExperience onComplete={onComplete} />);
+    expect(experience).toHaveAttribute('data-stage', 'org-transition');
+    expect(experience.querySelector('.org-ecosystem')).toHaveAttribute('data-active', 'true');
+    expect(screen.queryByTestId('mock-alvorada-canvas')).not.toBeInTheDocument();
+    expect(runtime.canvasMounts).toHaveLength(1);
+    expect(runtime.canvasUnmounts).toEqual([canvas.id]);
+
+    advance(orgTransitionDurationMs - 1);
+    expect(experience).toHaveAttribute('data-stage', 'org-transition');
+    advance(1);
+    expect(experience).toHaveAttribute('data-stage', 'org-ready');
+    expect(screen.queryByTestId('mock-alvorada-canvas')).not.toBeInTheDocument();
+    expect(runtime.canvasMounts).toHaveLength(1);
+    expect(runtime.canvasUnmounts).toEqual([canvas.id]);
+    expect(screen.getByRole('status')).toHaveTextContent('Estrutura em preparação');
   });
 
   it('remove o loader no render-error e não fecha o fallback automaticamente', () => {
@@ -343,7 +520,7 @@ describe('recuperação WebGL da experiência Alvorada', () => {
     expect(screen.getByRole('dialog', { name: 'O Nascer da Alvorada' })).toBeInTheDocument();
   });
 
-  it('permanece no quadro final WebGL até fechamento explícito', () => {
+  it('libera o WebGL no quadro organizacional e permanece aberto até fechamento explícito', () => {
     const onComplete = vi.fn();
     render(<FenasojaAlvoradaExperience onComplete={onComplete} />);
     const canvas = currentCanvas();
@@ -358,7 +535,11 @@ describe('recuperação WebGL da experiência Alvorada', () => {
       'data-renderer-state',
       'webgl',
     );
-    expect(screen.getByTestId('mock-alvorada-canvas')).toBeInTheDocument();
+    expect(screen.queryByTestId('mock-alvorada-canvas')).not.toBeInTheDocument();
+    expect(screen.getByTestId('alvorada-experience').querySelector(
+      '.alvorada-overlay__canvas',
+    )).toHaveAttribute('data-renderer', 'released');
+    expect(screen.getByRole('status')).toHaveTextContent('Estrutura em preparação');
     expect(onComplete).not.toHaveBeenCalled();
 
     fireEvent.keyDown(window, { key: 'Escape' });
@@ -366,7 +547,7 @@ describe('recuperação WebGL da experiência Alvorada', () => {
     expect(onComplete).toHaveBeenCalledTimes(1);
   });
 
-  it('recupera uma perda no finalHold no mesmo quadro e permanece aberto', () => {
+  it('ignora context loss terminal, libera o Canvas uma vez e permanece aberto', () => {
     const onComplete = vi.fn();
     render(<FenasojaAlvoradaExperience onComplete={onComplete} />);
     const firstCanvas = currentCanvas();
@@ -376,26 +557,15 @@ describe('recuperação WebGL da experiência Alvorada', () => {
       firstCanvas.props.onProgress(ALVORADA_SEQUENCE_DURATION);
       firstCanvas.props.onContextLost(ALVORADA_SEQUENCE_DURATION);
     });
-    advance(516);
-
-    const retryCanvas = currentCanvas();
-    expect(retryCanvas.props.initialElapsed).toBe(ALVORADA_SEQUENCE_DURATION);
-    expect(screen.getByTestId('mock-alvorada-canvas')).toHaveAttribute(
-      'data-initial-elapsed',
-      String(ALVORADA_SEQUENCE_DURATION),
-    );
-
-    act(() => {
-      retryCanvas.props.onReady();
-      retryCanvas.props.onProgress(ALVORADA_SEQUENCE_DURATION);
-    });
     advance(120_000);
 
     expect(screen.getByTestId('alvorada-experience')).toHaveAttribute(
       'data-renderer-state',
       'webgl',
     );
-    expect(screen.getByTestId('mock-alvorada-canvas')).toBeInTheDocument();
+    expect(screen.queryByTestId('mock-alvorada-canvas')).not.toBeInTheDocument();
+    expect(runtime.canvasMounts).toHaveLength(1);
+    expect(runtime.canvasUnmounts).toEqual([firstCanvas.id]);
     expect(onComplete).not.toHaveBeenCalled();
   });
 
@@ -473,6 +643,45 @@ describe('recuperação WebGL da experiência Alvorada', () => {
 
     unmount();
     advance(10_000);
+    expect(onComplete).toHaveBeenCalledTimes(1);
+  });
+
+  it('inclui controles do grafo no ciclo de foco e prioriza Escape contextual', () => {
+    runtime.orgGraph = interactiveOrgGraph();
+    const onComplete = vi.fn();
+    render(<FenasojaAlvoradaExperience onComplete={onComplete} />);
+    const canvas = currentCanvas();
+
+    act(() => {
+      canvas.props.onReady();
+      canvas.props.onProgress(ALVORADA_SEQUENCE_DURATION);
+    });
+    advance(16);
+
+    const close = screen.getByRole('button', { name: 'Fechar O Nascer da Alvorada' });
+    const search = screen.getByRole('combobox', { name: 'Buscar pessoa, comissão ou assessoria' });
+    act(() => close.focus());
+    fireEvent.keyDown(close, { key: 'Tab' });
+    expect(search).toHaveFocus();
+    fireEvent.keyDown(search, { key: 'Tab', shiftKey: true });
+    expect(close).toHaveFocus();
+
+    const rootNode = screen.getByRole('button', { name: /Autoridade 01.*CCP/i });
+    act(() => rootNode.focus());
+    fireEvent.click(rootNode);
+    expect(screen.getByRole('complementary', { name: /Detalhes de FENASOJA 2028/i })).toBeVisible();
+    fireEvent.keyDown(rootNode, { key: 'Escape' });
+    expect(screen.queryByRole('complementary')).not.toBeInTheDocument();
+    expect(screen.getByRole('dialog', { name: 'O Nascer da Alvorada' })).toBeInTheDocument();
+
+    act(() => search.focus());
+    fireEvent.change(search, { target: { value: 'Fabiano' } });
+    fireEvent.keyDown(search, { key: 'Escape' });
+    expect(search).toHaveValue('');
+    expect(onComplete).not.toHaveBeenCalled();
+
+    fireEvent.keyDown(search, { key: 'Escape' });
+    advance(400);
     expect(onComplete).toHaveBeenCalledTimes(1);
   });
 

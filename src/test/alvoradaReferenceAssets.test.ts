@@ -98,21 +98,21 @@ describe('assets oficiais e panoramas da Alvorada', () => {
     expect(symbolSize).toEqual({ width: 512, height: 512 });
   });
 
-  it('mantém os panoramas fora do runtime e usa apenas o símbolo oficial', () => {
+  it('mantém cidade e título 3D fora do runtime da intro', () => {
     const controller = readFileSync(
       resolve('src/features/alvorada/SceneController.tsx'),
+      'utf8',
+    );
+    const camera = readFileSync(
+      resolve('src/features/alvorada/CinematicCamera.tsx'),
       'utf8',
     );
     const capabilities = readFileSync(
       resolve('src/features/alvorada/capabilities.ts'),
       'utf8',
     );
-    const title = readFileSync(
-      resolve('src/features/alvorada/scenes/FenasojaTitle3D.tsx'),
-      'utf8',
-    );
-    const experience = readFileSync(
-      resolve('src/features/alvorada/FenasojaAlvoradaExperience.tsx'),
+    const brandHero = readFileSync(
+      resolve('src/features/alvorada/AlvoradaBrandHero.tsx'),
       'utf8',
     );
 
@@ -121,16 +121,20 @@ describe('assets oficiais e panoramas da Alvorada', () => {
     ))).toBe(false);
     expect(controller).not.toContain('SantaRosaCinematicBackdrop');
     expect(controller).not.toContain('santa-rosa-horizon');
+    expect(controller).not.toContain('SantaRosaCity');
+    expect(controller).not.toContain('FenasojaTitle3D');
+    expect(camera).not.toContain('cityPosition');
+    expect(camera).not.toContain('cityLook');
     expect(capabilities).not.toContain('santa-rosa-horizon');
-
-    expect(title).toContain("const SYMBOL_URL = '/alvorada/fenasoja-symbol-official.png'");
-    expect(title).toContain('const symbolSource = useTexture(SYMBOL_URL)');
-    expect(title).toMatch(/<mesh[\s\S]*?material=\{symbol\.material\}[\s\S]*?<planeGeometry/);
-    expect(title).not.toContain('useTexture.preload(SYMBOL_URL)');
-    expect(experience).toContain('<img src="/alvorada/fenasoja-symbol-official.png" alt="" />');
+    expect(capabilities).not.toContain('/alvorada/santa-rosa-roads.json');
+    expect(capabilities).not.toContain('/alvorada/santa-rosa-city-v2.json');
+    expect(capabilities).not.toContain('/alvorada/helvetiker-bold.typeface.json');
+    expect(capabilities).not.toContain('/alvorada/fenasoja-symbol-official.png');
+    expect(brandHero).toContain("import { FenasojaBrand } from '@/components/brand/FenasojaBrand'");
+    expect(brandHero).toContain('<FenasojaBrand');
   });
 
-  it('separa assets orbitais críticos dos assets secundários da jornada', async () => {
+  it('aquece somente os assets geográficos ainda presentes na jornada', async () => {
     const fetchMock = vi.fn().mockResolvedValue({ ok: true });
     vi.stubGlobal('fetch', fetchMock);
     vi.resetModules();
@@ -163,14 +167,10 @@ describe('assets oficiais e panoramas da Alvorada', () => {
       '/alvorada/brazil-min.geojson',
       '/alvorada/rio-grande-do-sul-min.geojson',
       '/alvorada/santa-rosa-min.geojson',
-      '/alvorada/santa-rosa-roads.json',
-      '/alvorada/santa-rosa-city-v2.json',
-      '/alvorada/helvetiker-bold.typeface.json',
-      '/alvorada/fenasoja-symbol-official.png',
     ]);
 
     warmAlvoradaAssets();
     streamAlvoradaSecondaryAssets();
-    expect(fetchMock).toHaveBeenCalledTimes(11);
+    expect(fetchMock).toHaveBeenCalledTimes(7);
   });
 });

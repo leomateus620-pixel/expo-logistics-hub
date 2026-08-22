@@ -12,7 +12,7 @@ import {
   useSantaRosaCityData,
 } from '../cityData';
 import { useAlvoradaTimeline } from '../TimelineContext';
-import { deriveAlvoradaVisualState, smoothRange } from '../timeline';
+import { smoothRange } from '../timeline';
 import { seededRandom } from '../visualTextures';
 
 interface SantaRosaCityProps {
@@ -1147,8 +1147,9 @@ export function SantaRosaCity({ quality }: SantaRosaCityProps) {
 
   useFrame(() => {
     const elapsed = timeline.current.elapsed;
-    const visualState = deriveAlvoradaVisualState(elapsed);
-    if (root.current) root.current.visible = visualState.cityVisible;
+    // Kept buildable as an archived scene, but never made visible or imported
+    // by the authored Alvorada runtime.
+    if (root.current) root.current.visible = false;
     if (lightMaterial.current) {
       const dawn = smoothRange(elapsed, 6.1, 10.4);
       lightMaterial.current.opacity = (1 - dawn) * 0.78;

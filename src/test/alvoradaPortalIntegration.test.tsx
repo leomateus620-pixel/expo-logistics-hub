@@ -10,6 +10,22 @@ const integrationMocks = vi.hoisted(() => ({
   warmAssets: vi.fn(),
 }));
 
+vi.mock('@/features/alvorada/organizational', () => ({
+  useOrganizationalEcosystemData: () => ({
+    graph: {
+      people: {},
+      nodes: [],
+      edges: [],
+      anomalies: [],
+      rootNodeId: 'org:ccp',
+      renderableNodeIds: [],
+    },
+    isLoading: false,
+    error: null,
+    refetch: vi.fn(),
+  }),
+}));
+
 vi.mock('@/hooks/useAuth', () => ({
   useAuth: () => ({ loading: false, user: null }),
 }));
@@ -158,9 +174,7 @@ describe('integração do launcher da Alvorada no portal', () => {
     renderPortal();
     fireEvent.click(screen.getByRole('button', { name: 'Abrir O Nascer da Alvorada' }));
 
-    const fallback = await screen.findByRole('img', {
-      name: 'FENASOJA 2028 revelada na Alvorada de Santa Rosa',
-    });
+    const fallback = await screen.findByRole('img', { name: 'Alvorada de Santa Rosa' });
     const renderer = fallback.closest('.alvorada-overlay__canvas');
 
     await waitFor(() => expect(renderer).toHaveAttribute('data-renderer', 'fallback'));

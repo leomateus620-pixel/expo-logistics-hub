@@ -10,14 +10,20 @@ import {
 import { createPortal } from 'react-dom';
 import { X } from 'lucide-react';
 import { AlvoradaCanvas } from './AlvoradaCanvas';
+import { AlvoradaBrandHero } from './AlvoradaBrandHero';
 import {
   degradeAlvoradaQualityProfile,
   getAlvoradaQualityProfile,
   getAlvoradaWebGLTier,
 } from './capabilities';
+import { OrganizationalEcosystem } from './organizational/components/OrganizationalEcosystem';
+import { useOrganizationalEcosystemData } from './organizational';
 import {
   ALVORADA_EXIT_DURATION_MS,
+  ALVORADA_PHASES,
   ALVORADA_SEQUENCE_DURATION,
+  getAlvoradaPhase,
+  type AlvoradaPhase,
 } from './timeline';
 import type {
   AlvoradaFallbackReason,
@@ -41,8 +47,14 @@ interface AlvoradaErrorBoundaryState {
 
 const ALVORADA_CONTEXT_RECOVERY_DELAY_MS = 500;
 const ALVORADA_CONTEXT_RECOVERY_TIMEOUT_MS = 3000;
+const ALVORADA_LATE_ORG_TRANSITION_DURATION_MS =
+  (ALVORADA_PHASES['org-transition'].end - ALVORADA_PHASES['org-transition'].start) * 1000;
 
-type AlvoradaVisibleTimerKey = 'recovery-delay' | 'recovery-timeout';
+type AlvoradaVisibleTimerKey =
+  | 'fallback-progress'
+  | 'late-org-transition'
+  | 'recovery-delay'
+  | 'recovery-timeout';
 
 interface AlvoradaVisibleTimer {
   callback: (() => void) | null;
@@ -62,6 +74,8 @@ function createVisibleTimer(): AlvoradaVisibleTimer {
 
 function useAlvoradaVisibleTimeouts() {
   const timers = useRef<Record<AlvoradaVisibleTimerKey, AlvoradaVisibleTimer>>({
+    'fallback-progress': createVisibleTimer(),
+    'late-org-transition': createVisibleTimer(),
     'recovery-delay': createVisibleTimer(),
     'recovery-timeout': createVisibleTimer(),
   });
@@ -155,32 +169,45 @@ class AlvoradaErrorBoundary extends Component<
   }
 }
 
-function AlvoradaFallback({ showTitle = true }: { showTitle?: boolean }) {
+function AlvoradaFallback({ recovering = false }: { recovering?: boolean }) {
   return (
     <div
       className="alvorada-fallback"
       data-testid="alvorada-fallback"
       role="img"
-      aria-label={showTitle
-        ? 'FENASOJA 2028 revelada na Alvorada de Santa Rosa'
-        : 'Recuperando a Alvorada de Santa Rosa'}
+      aria-label={recovering
+        ? 'Recuperando a Alvorada de Santa Rosa'
+        : 'Alvorada de Santa Rosa'}
     >
       <div className="alvorada-fallback__sun" aria-hidden="true" />
       <div className="alvorada-fallback__cloud alvorada-fallback__cloud--one" aria-hidden="true" />
       <div className="alvorada-fallback__cloud alvorada-fallback__cloud--two" aria-hidden="true" />
       <div className="alvorada-fallback__horizon" aria-hidden="true" />
-      {showTitle && (
-        <div className="alvorada-fallback__title" aria-hidden="true">
-          <img src="/alvorada/fenasoja-symbol-official.png" alt="" />
-          <span>FENASOJA</span>
-          <strong>2028</strong>
-        </div>
-      )}
     </div>
   );
 }
 
+const PHASE_ANNOUNCEMENTS: Record<AlvoradaPhase, string> = {
+  dawn: 'O novo ciclo desperta na Alvorada.',
+  territory: 'A jornada percorre o território do Rio Grande do Sul.',
+  'santa-rosa': 'Santa Rosa é localizada como origem da FENASOJA 2028.',
+  'brand-reveal': 'A marca oficial FENASOJA 2028 é revelada.',
+  'brand-hold': 'FENASOJA 2028, edição de Santa Rosa.',
+  'org-transition': 'A marca se transforma no ecossistema organizacional.',
+  'org-ready': 'Ecossistema organizacional interativo disponível.',
+};
+
+const FOCUSABLE_SELECTOR = [
+  'a[href]',
+  'button:not([disabled])',
+  'input:not([disabled])',
+  'select:not([disabled])',
+  'textarea:not([disabled])',
+  '[tabindex]:not([tabindex="-1"])',
+].join(',');
+
 export default function FenasojaAlvoradaExperience({ onComplete }: FenasojaAlvoradaExperienceProps) {
+  const organizationalData = useOrganizationalEcosystemData();
   const [rendererTier] = useState(getAlvoradaWebGLTier);
   const [quality, setQuality] = useState(() => getAlvoradaQualityProfile(rendererTier));
   const [rendererState, setRendererState] = useState<AlvoradaRendererState>(
@@ -191,14 +218,20 @@ export default function FenasojaAlvoradaExperience({ onComplete }: FenasojaAlvor
   );
   const [canvasAttempt, setCanvasAttempt] = useState(0);
   const [initialElapsed, setInitialElapsed] = useState(0);
+  const [phase, setPhase] = useState<AlvoradaPhase>('dawn');
+  const [lateOrgTransitionActive, setLateOrgTransitionActive] = useState(false);
   const [ready, setReady] = useState(rendererTier === 'unavailable');
   const [leaving, setLeaving] = useState(false);
+  const dialog = useRef<HTMLElement>(null);
   const closeButton = useRef<HTMLButtonElement>(null);
   const rendererStateRef = useRef<AlvoradaRendererState>(
     rendererTier === 'unavailable' ? 'fallback' : 'loading',
   );
   const currentElapsed = useRef(0);
+  const phaseRef = useRef<AlvoradaPhase>('dawn');
   const recoveryAttempts = useRef(0);
+  const terminalDataWasPending = useRef(false);
+  const lateOrgTransitionStarted = useRef(false);
   const exitStarted = useRef(false);
   const exitTimer = useRef<number | null>(null);
   const recoveryFrame = useRef<number | null>(null);
@@ -250,17 +283,27 @@ export default function FenasojaAlvoradaExperience({ onComplete }: FenasojaAlvor
     setReady(true);
   }, [clearRuntimeTimers, transitionRenderer]);
 
+  const commitElapsed = useCallback((elapsed: number) => {
+    const nextElapsed = Math.min(
+      ALVORADA_SEQUENCE_DURATION,
+      Math.max(0, elapsed),
+    );
+    currentElapsed.current = nextElapsed;
+    const nextPhase = getAlvoradaPhase(nextElapsed);
+    if (nextPhase !== phaseRef.current) {
+      phaseRef.current = nextPhase;
+      setPhase(nextPhase);
+    }
+  }, []);
+
   const handleProgress = useCallback((elapsed: number) => {
     if (
       rendererStateRef.current !== 'loading'
       && rendererStateRef.current !== 'webgl'
     ) return;
 
-    currentElapsed.current = Math.min(
-      ALVORADA_SEQUENCE_DURATION,
-      Math.max(0, elapsed),
-    );
-  }, []);
+    commitElapsed(elapsed);
+  }, [commitElapsed]);
 
   const handleQualityDecline = useCallback(() => {
     setQuality((current) => degradeAlvoradaQualityProfile(current));
@@ -285,7 +328,14 @@ export default function FenasojaAlvoradaExperience({ onComplete }: FenasojaAlvor
       ALVORADA_SEQUENCE_DURATION,
       Math.max(0, elapsed),
     );
-    currentElapsed.current = elapsedSnapshot;
+    commitElapsed(elapsedSnapshot);
+
+    // The WebGL journey has already fulfilled its role at this boundary. React
+    // releases the canvas on the same render, so a recovery can no longer
+    // contribute to the experience.
+    if (elapsedSnapshot >= ALVORADA_SEQUENCE_DURATION) {
+      return;
+    }
 
     if (recoveryAttempts.current >= 1) {
       enterTerminalFallback('context-lost');
@@ -316,7 +366,31 @@ export default function FenasojaAlvoradaExperience({ onComplete }: FenasojaAlvor
         );
       });
     });
-  }, [armTimer, clearRuntimeTimers, enterTerminalFallback, transitionRenderer]);
+  }, [
+    armTimer,
+    clearRuntimeTimers,
+    commitElapsed,
+    enterTerminalFallback,
+    transitionRenderer,
+  ]);
+
+  useEffect(() => {
+    if (rendererState !== 'fallback' || phase === 'org-ready' || exitStarted.current) {
+      clearTimer('fallback-progress');
+      return;
+    }
+
+    const phaseEnd = ALVORADA_PHASES[phase].end;
+    if (!Number.isFinite(phaseEnd)) return;
+
+    armTimer(
+      'fallback-progress',
+      Math.max(0, phaseEnd - currentElapsed.current) * 1000,
+      () => commitElapsed(phaseEnd),
+    );
+
+    return () => clearTimer('fallback-progress');
+  }, [armTimer, clearTimer, commitElapsed, phase, rendererState]);
 
   useEffect(() => {
     const focusFrame = window.requestAnimationFrame(() => closeButton.current?.focus({
@@ -325,10 +399,43 @@ export default function FenasojaAlvoradaExperience({ onComplete }: FenasojaAlvor
 
     const containKeyboard = (event: KeyboardEvent) => {
       if (event.key === 'Tab') {
-        event.preventDefault();
-        closeButton.current?.focus({ preventScroll: true });
+        const activeDialog = dialog.current;
+        if (!activeDialog) return;
+        const focusable = Array.from(
+          activeDialog.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
+        ).filter((element) => (
+          element.getAttribute('aria-hidden') !== 'true'
+          && !element.closest('[aria-hidden="true"]')
+        ));
+        const first = focusable[0];
+        const last = focusable.at(-1);
+        const activeElement = document.activeElement;
+
+        if (!first || !last) {
+          event.preventDefault();
+          closeButton.current?.focus({ preventScroll: true });
+          return;
+        }
+
+        if (event.shiftKey && (activeElement === first || !activeDialog.contains(activeElement))) {
+          event.preventDefault();
+          last.focus({ preventScroll: true });
+        } else if (!event.shiftKey && (activeElement === last || !activeDialog.contains(activeElement))) {
+          event.preventDefault();
+          first.focus({ preventScroll: true });
+        }
       }
       if (event.key === 'Escape') {
+        const activeElement = document.activeElement;
+        if (
+          activeElement instanceof HTMLInputElement
+          && activeElement.closest('.org-search')
+          && activeElement.value
+        ) return;
+        const openDetail = dialog.current?.querySelector<HTMLElement>(
+          '.org-ecosystem__ready[data-org-detail-open="true"]',
+        );
+        if (openDetail?.contains(activeElement)) return;
         event.preventDefault();
         event.stopImmediatePropagation();
         finish();
@@ -344,19 +451,64 @@ export default function FenasojaAlvoradaExperience({ onComplete }: FenasojaAlvor
     };
   }, [clearRuntimeTimers, finish]);
 
+  const graphPhase = phase === 'org-transition' || phase === 'org-ready';
+  const graphActive = graphPhase && !organizationalData.isLoading;
+  const graphPreloaded = (phase === 'brand-hold' || graphPhase)
+    && !organizationalData.isLoading;
+  const lateOrgTransitionPending = phase === 'org-ready'
+    && !organizationalData.isLoading
+    && terminalDataWasPending.current
+    && !lateOrgTransitionStarted.current;
+  const displayPhase: AlvoradaPhase = lateOrgTransitionActive || lateOrgTransitionPending
+    ? 'org-transition'
+    : graphPhase && organizationalData.isLoading
+      ? 'brand-hold'
+      : phase;
+  const webglReleased = phase === 'org-ready';
   const fallback = <AlvoradaFallback />;
-  const recoveryFallback = <AlvoradaFallback showTitle={false} />;
+  const recoveryFallback = <AlvoradaFallback recovering />;
   const shouldRenderWebGL = rendererTier !== 'unavailable'
+    && !webglReleased
     && (rendererState === 'loading' || rendererState === 'webgl');
-  const dataRenderer = shouldRenderWebGL ? 'webgl' : rendererState;
+  const dataRenderer = webglReleased
+    ? 'released'
+    : shouldRenderWebGL
+      ? 'webgl'
+      : rendererState;
+
+  useEffect(() => {
+    if (webglReleased) clearRuntimeTimers();
+  }, [clearRuntimeTimers, webglReleased]);
+
+  useEffect(() => {
+    if (phase !== 'org-ready' || exitStarted.current) return;
+
+    if (organizationalData.isLoading) {
+      terminalDataWasPending.current = true;
+      return;
+    }
+
+    if (!terminalDataWasPending.current || lateOrgTransitionStarted.current) return;
+
+    terminalDataWasPending.current = false;
+    lateOrgTransitionStarted.current = true;
+    setLateOrgTransitionActive(true);
+    armTimer(
+      'late-org-transition',
+      ALVORADA_LATE_ORG_TRANSITION_DURATION_MS,
+      () => setLateOrgTransitionActive(false),
+    );
+  }, [armTimer, organizationalData.isLoading, phase]);
 
   return createPortal(
     <section
+      ref={dialog}
       className={`alvorada-overlay${ready ? ' alvorada-overlay--ready' : ''}${leaving ? ' alvorada-overlay--leaving' : ''}`}
       data-testid="alvorada-experience"
       data-renderer-state={rendererState}
       data-fallback-reason={fallbackReason ?? undefined}
       data-quality={quality.level}
+      data-stage={displayPhase}
       role="dialog"
       aria-modal="true"
       aria-label="O Nascer da Alvorada"
@@ -366,7 +518,7 @@ export default function FenasojaAlvoradaExperience({ onComplete }: FenasojaAlvor
         aria-hidden={shouldRenderWebGL ? true : undefined}
         data-renderer={dataRenderer}
       >
-        {shouldRenderWebGL ? (
+        {webglReleased ? null : shouldRenderWebGL ? (
           <AlvoradaErrorBoundary
             key={canvasAttempt}
             fallback={fallback}
@@ -384,6 +536,21 @@ export default function FenasojaAlvoradaExperience({ onComplete }: FenasojaAlvor
           </AlvoradaErrorBoundary>
         ) : rendererState === 'recovering' ? recoveryFallback : fallback}
       </div>
+
+      <AlvoradaBrandHero
+        dataPending={organizationalData.isLoading}
+        stage={displayPhase}
+      />
+
+      {graphPreloaded && (
+        <OrganizationalEcosystem
+          active={graphActive}
+          error={organizationalData.error}
+          graph={organizationalData.graph}
+          loading={organizationalData.isLoading}
+          onRetry={() => void organizationalData.refetch()}
+        />
+      )}
 
       {rendererState === 'loading' && (
         <div className="alvorada-overlay__loader" aria-live="polite" aria-atomic="true">
@@ -403,7 +570,7 @@ export default function FenasojaAlvoradaExperience({ onComplete }: FenasojaAlvor
       </button>
 
       <p className="sr-only" aria-live="polite">
-        Jornada de Brasil a Santa Rosa, culminando na Alvorada da FENASOJA 2028.
+        {PHASE_ANNOUNCEMENTS[displayPhase]}
       </p>
     </section>,
     document.body,

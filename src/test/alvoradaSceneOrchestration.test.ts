@@ -23,28 +23,25 @@ function sampleAuthoredJourney() {
 }
 
 describe('orquestração autoritativa das cenas da Alvorada', () => {
-  it('define os intervalos narrativos e o hold final de 12,4 segundos', () => {
-    expect(ALVORADA_SEQUENCE_DURATION).toBe(12.4);
+  it('define a jornada dawn → território → marca → organização', () => {
     expect(ALVORADA_PHASES).toEqual({
-      orbitalBrazil: { start: 0, end: 2 },
-      rioGrandeDoSul: { start: 2, end: 4 },
-      santaRosaStabilization: { start: 4, end: 4.8 },
-      santaRosaDescent: { start: 4.8, end: 6.4 },
-      cityFlight: { start: 6.4, end: 8.8 },
-      dawnRise: { start: 8.8, end: 10.6 },
-      titleReveal: { start: 10.6, end: 12.4 },
-      finalHold: { start: 12.4, end: Number.POSITIVE_INFINITY },
+      dawn: { start: 0, end: 1.6 },
+      territory: { start: 1.6, end: 4.4 },
+      'santa-rosa': { start: 4.4, end: 5.8 },
+      'brand-reveal': { start: 5.8, end: 7.4 },
+      'brand-hold': { start: 7.4, end: 9.4 },
+      'org-transition': { start: 9.4, end: 11.4 },
+      'org-ready': { start: 11.4, end: Number.POSITIVE_INFINITY },
     });
 
     const boundaries = [
-      [0, 'orbitalBrazil'],
-      [2, 'rioGrandeDoSul'],
-      [4, 'santaRosaStabilization'],
-      [4.8, 'santaRosaDescent'],
-      [6.4, 'cityFlight'],
-      [8.8, 'dawnRise'],
-      [10.6, 'titleReveal'],
-      [12.4, 'finalHold'],
+      [0, 'dawn'],
+      [1.6, 'territory'],
+      [4.4, 'santa-rosa'],
+      [5.8, 'brand-reveal'],
+      [7.4, 'brand-hold'],
+      [9.4, 'org-transition'],
+      [11.4, 'org-ready'],
     ] as const;
 
     boundaries.forEach(([elapsed, phase]) => {
@@ -58,7 +55,9 @@ describe('orquestração autoritativa das cenas da Alvorada', () => {
         state.earthOpacity,
         state.skyOpacity,
         state.transitionOpacity,
-        state.titleProgress,
+        state.brandProgress,
+        state.brandOpacity,
+        state.orgTransitionProgress,
       ];
 
       weights.forEach((weight) => {
@@ -70,29 +69,35 @@ describe('orquestração autoritativa das cenas da Alvorada', () => {
     });
   });
 
-  it('nunca torna a cidade visível enquanto a Terra ainda domina o quadro', () => {
-    sampleAuthoredJourney().forEach(({ state }) => {
-      if (state.cityVisible) {
-        expect(state.earthOpacity).toBeLessThanOrEqual(0.02);
-        expect(state.cityResident).toBe(true);
-      }
-      if (state.earthOpacity > 0.02) {
-        expect(state.cityVisible).toBe(false);
-      }
+  it('mantém a marca integral por dois segundos antes da transição organizacional', () => {
+    expect(deriveAlvoradaVisualState(7.4)).toMatchObject({
+      brandProgress: 1,
+      brandOpacity: 1,
+      orgTransitionProgress: 0,
     });
+    expect(deriveAlvoradaVisualState(8.4)).toMatchObject({
+      brandProgress: 1,
+      brandOpacity: 1,
+      orgTransitionProgress: 0,
+    });
+    expect(deriveAlvoradaVisualState(9.4)).toMatchObject({
+      brandProgress: 1,
+      brandOpacity: 1,
+      orgTransitionProgress: 0,
+    });
+    expect(deriveAlvoradaVisualState(10.4).brandOpacity).toBeLessThan(1);
   });
 
-  it('atribui exatamente uma cena dominante em cada fase narrativa', () => {
+  it('atribui exatamente uma cena dominante em cada momento narrativo', () => {
     const cases: Array<[number, AlvoradaDominantScene]> = [
-      [0, 'orbital'],
-      [2, 'orbital'],
-      [4, 'transition'],
-      [4.8, 'transition'],
-      [6.4, 'city'],
-      [8.8, 'dawn'],
-      [10.6, 'title'],
-      [12.4, 'title'],
-      [120, 'title'],
+      [0, 'dawn'],
+      [1.6, 'territory'],
+      [4.4, 'santa-rosa'],
+      [5.8, 'brand'],
+      [7.4, 'brand'],
+      [9.4, 'organizational'],
+      [11.4, 'organizational'],
+      [120, 'organizational'],
     ];
 
     cases.forEach(([elapsed, dominantScene]) => {
@@ -100,35 +105,31 @@ describe('orquestração autoritativa das cenas da Alvorada', () => {
     });
   });
 
-  it('encerra a residência GPU de cada cena depois da sua janela de saída', () => {
-    expect(deriveAlvoradaVisualState(0).cityResident).toBe(false);
-    expect(deriveAlvoradaVisualState(0.75).cityResident).toBe(true);
-    expect(deriveAlvoradaVisualState(6.1).earthResident).toBe(false);
-    expect(deriveAlvoradaVisualState(11.2).cityResident).toBe(false);
-    expect(deriveAlvoradaVisualState(6.79).titleResident).toBe(false);
-    expect(deriveAlvoradaVisualState(6.8).titleResident).toBe(true);
+  it('encerra a residência GPU da Terra e não expõe estado da cidade ou do título 3D', () => {
+    expect(deriveAlvoradaVisualState(0).earthResident).toBe(true);
+    expect(deriveAlvoradaVisualState(5.94).earthResident).toBe(true);
+    expect(deriveAlvoradaVisualState(5.95).earthResident).toBe(false);
 
     sampleAuthoredJourney().forEach(({ elapsed, state }) => {
-      if (elapsed >= 6.1) expect(state.earthResident).toBe(false);
-      if (elapsed >= 11.2) {
-        expect(state.cityResident).toBe(false);
-        expect(state.cityVisible).toBe(false);
-      }
+      expect(state).not.toHaveProperty('cityVisible');
+      expect(state).not.toHaveProperty('cityResident');
+      expect(state).not.toHaveProperty('titleResident');
+      expect(state).not.toHaveProperty('titleProgress');
+      if (elapsed >= 5.95) expect(state.earthResident).toBe(false);
     });
   });
 
-  it('resolve o quadro final sem Terra, cidade ou máscara de transição', () => {
-    [12.4, 30, Number.POSITIVE_INFINITY].forEach((elapsed) => {
+  it('resolve o quadro organizacional sem Terra ou efeitos WebGL residuais', () => {
+    [11.4, 30, Number.POSITIVE_INFINITY].forEach((elapsed) => {
       expect(deriveAlvoradaVisualState(elapsed)).toMatchObject({
-        dominantScene: 'title',
+        dominantScene: 'organizational',
         earthOpacity: 0,
-        cityVisible: false,
-        skyOpacity: 1,
+        skyOpacity: 0,
         transitionOpacity: 0,
-        titleProgress: 1,
+        brandProgress: 1,
+        brandOpacity: 0,
+        orgTransitionProgress: 1,
         earthResident: false,
-        cityResident: false,
-        titleResident: true,
       });
     });
   });

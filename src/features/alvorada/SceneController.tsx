@@ -14,6 +14,7 @@ import type { AlvoradaQualityProfile } from './capabilities';
 import { CinematicCamera } from './CinematicCamera';
 import { AlvoradaTimelineContext, useAlvoradaTimeline } from './TimelineContext';
 import {
+  ALVORADA_PHASES,
   ALVORADA_SEQUENCE_DURATION,
   createInitialTimelineState,
   deriveAlvoradaVisualState,
@@ -24,8 +25,6 @@ import {
 import { TransitionCloudLayer } from './TransitionCloudLayer';
 import { DawnEnvironment } from './scenes/DawnEnvironment';
 import { EarthScene } from './scenes/EarthScene';
-import { FenasojaTitle3D } from './scenes/FenasojaTitle3D';
-import { SantaRosaCity } from './scenes/SantaRosaCity';
 
 interface SceneControllerProps {
   initialElapsed: number;
@@ -48,6 +47,7 @@ function MasterTimeline({
   const hiddenAt = useRef<number | null>(null);
   const hiddenDuration = useRef(0);
   const ready = useRef(false);
+
   useEffect(() => {
     const handleVisibilityChange = () => {
       if (document.hidden) {
@@ -91,7 +91,7 @@ function MasterTimeline({
     const visualState = deriveAlvoradaVisualState(elapsed);
 
     // Lightweight diagnostics used by visual QA and field support. Keeping the
-    // values on the existing canvas avoids React updates inside the render loop.
+    // values on the canvas avoids React updates inside the render loop.
     gl.domElement.dataset.elapsed = elapsed.toFixed(3);
     gl.domElement.dataset.ambientElapsed = ambientElapsed.toFixed(3);
     gl.domElement.dataset.phase = timeline.current.phase;
@@ -103,30 +103,18 @@ function MasterTimeline({
   return null;
 }
 
-function SceneResidency({
-  setCityResident,
+function EarthResidency({
   setEarthResident,
-  setTitleResident,
 }: {
-  setCityResident: Dispatch<SetStateAction<boolean>>;
   setEarthResident: Dispatch<SetStateAction<boolean>>;
-  setTitleResident: Dispatch<SetStateAction<boolean>>;
 }) {
   const timeline = useAlvoradaTimeline();
-  const residency = useRef(deriveAlvoradaVisualState(timeline.current.elapsed));
+  const resident = useRef(deriveAlvoradaVisualState(timeline.current.elapsed).earthResident);
 
   useFrame(() => {
-    const visualState = deriveAlvoradaVisualState(timeline.current.elapsed);
-    if (visualState.earthResident !== residency.current.earthResident) {
-      setEarthResident(visualState.earthResident);
-    }
-    if (visualState.cityResident !== residency.current.cityResident) {
-      setCityResident(visualState.cityResident);
-    }
-    if (visualState.titleResident !== residency.current.titleResident) {
-      setTitleResident(visualState.titleResident);
-    }
-    residency.current = visualState;
+    const earthResident = deriveAlvoradaVisualState(timeline.current.elapsed).earthResident;
+    if (earthResident !== resident.current) setEarthResident(earthResident);
+    resident.current = earthResident;
   });
 
   return null;
@@ -153,30 +141,40 @@ function SceneAtmosphere() {
   useFrame(() => {
     const elapsed = timeline.current.elapsed;
     const visualState = deriveAlvoradaVisualState(elapsed);
-    const city = visualState.cityVisible ? 1 : 0;
-    const settled = smoothRange(elapsed, 5.4, 7.1);
-    const cloudBridge = visualState.transitionOpacity;
-    fog.color.setRGB(
-      THREE.MathUtils.lerp(0.38, 0.52, settled),
-      THREE.MathUtils.lerp(0.48, 0.63, settled),
-      THREE.MathUtils.lerp(0.62, 0.76, settled),
+    const atmosphericWarmth = smoothRange(
+      elapsed,
+      ALVORADA_PHASES.territory.start,
+      ALVORADA_PHASES['brand-reveal'].end,
     );
-    fog.density = cloudBridge * 0.0048
-      + city * THREE.MathUtils.lerp(0.0046, 0.00145, settled);
+    fog.color.setRGB(
+      THREE.MathUtils.lerp(0.38, 0.52, atmosphericWarmth),
+      THREE.MathUtils.lerp(0.48, 0.63, atmosphericWarmth),
+      THREE.MathUtils.lerp(0.62, 0.76, atmosphericWarmth),
+    );
+    fog.density = visualState.transitionOpacity * 0.0048;
+
     const orbitalExposure = THREE.MathUtils.lerp(
       0.68,
       0.77,
-      smoothRange(elapsed, 0.5, 3.8),
+      smoothRange(elapsed, 0.5, ALVORADA_PHASES.territory.end - 0.5),
     );
     const dawnExposure = THREE.MathUtils.lerp(
       0.78,
       0.96,
-      smoothRange(elapsed, 5.4, 11.7),
+      smoothRange(
+        elapsed,
+        ALVORADA_PHASES['santa-rosa'].start,
+        ALVORADA_PHASES['brand-hold'].start,
+      ),
     );
     gl.toneMappingExposure = THREE.MathUtils.lerp(
       orbitalExposure,
       dawnExposure,
-      smoothRange(elapsed, 4.3, 5.35),
+      smoothRange(
+        elapsed,
+        ALVORADA_PHASES['santa-rosa'].start,
+        ALVORADA_PHASES['brand-reveal'].start,
+      ),
     );
   });
 
@@ -192,10 +190,9 @@ export function SceneController({
   const timeline = useRef(
     createInitialTimelineState(initialElapsed),
   ) as MutableRefObject<AlvoradaTimelineState>;
-  const initialVisualState = deriveAlvoradaVisualState(initialElapsed);
-  const [earthResident, setEarthResident] = useState(initialVisualState.earthResident);
-  const [cityResident, setCityResident] = useState(initialVisualState.cityResident);
-  const [titleResident, setTitleResident] = useState(initialVisualState.titleResident);
+  const [earthResident, setEarthResident] = useState(
+    deriveAlvoradaVisualState(initialElapsed).earthResident,
+  );
 
   return (
     <AlvoradaTimelineContext.Provider value={timeline}>
@@ -204,11 +201,7 @@ export function SceneController({
         onProgress={onProgress}
         onReady={onReady}
       />
-      <SceneResidency
-        setCityResident={setCityResident}
-        setEarthResident={setEarthResident}
-        setTitleResident={setTitleResident}
-      />
+      <EarthResidency setEarthResident={setEarthResident} />
       <SceneAtmosphere />
       <CinematicCamera quality={quality} />
       {earthResident && (
@@ -217,16 +210,6 @@ export function SceneController({
         </Suspense>
       )}
       <DawnEnvironment quality={quality} />
-      {cityResident && (
-        <Suspense fallback={null}>
-          <SantaRosaCity quality={quality} />
-        </Suspense>
-      )}
-      {titleResident && (
-        <Suspense fallback={null}>
-          <FenasojaTitle3D quality={quality} />
-        </Suspense>
-      )}
       <TransitionCloudLayer />
     </AlvoradaTimelineContext.Provider>
   );
