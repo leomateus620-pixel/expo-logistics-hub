@@ -9,6 +9,7 @@ import { resolveCommercialPavilionModulePlan } from '../../utils/commercialPavil
 import type { StrategicLandmarkBounds } from '../../utils/landmarks';
 import { createCommercialPavilionTexture } from './commercialPavilionTextures';
 import { CommercialPavilionModuleLayer } from './CommercialPavilionModuleLayer';
+import type { CommercialPavilionModuleVisualState } from '../../utils/pavilionModuleCommercial';
 
 const NO_RAYCAST = () => undefined;
 const UNIT_BOX = new THREE.BoxGeometry(1, 1, 1);
@@ -554,6 +555,7 @@ export const CommercialPavilion = memo(function CommercialPavilion({
   materials,
   showDetail,
   showFocusDetail,
+  moduleStateById,
 }: {
   publicIdentifier: string;
   bounds: StrategicLandmarkBounds;
@@ -561,6 +563,7 @@ export const CommercialPavilion = memo(function CommercialPavilion({
   materials: CommercialPavilionMaterials;
   showDetail: boolean;
   showFocusDetail: boolean;
+  moduleStateById?: ReadonlyMap<string, CommercialPavilionModuleVisualState>;
 }) {
   const definition = resolveCommercialPavilionDefinition({ publicIdentifier });
   const modulePlan = resolveCommercialPavilionModulePlan({ publicIdentifier });
@@ -621,6 +624,7 @@ export const CommercialPavilion = memo(function CommercialPavilion({
           layout={layout}
           plan={modulePlan}
           mode="cutaway"
+          moduleStateById={moduleStateById}
         />
       )}
       {showDetail && !showFocusDetail && (

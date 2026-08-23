@@ -3,7 +3,7 @@ import { OrbitControls } from '@react-three/drei';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
-import type { MapEntity } from '../../types';
+import type { CommercialLot, MapEntity } from '../../types';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import {
   createCommercialPavilionLayout,
@@ -11,7 +11,16 @@ import {
   resolveCommercialPavilionDefinition,
   type CommercialPavilionLayout,
 } from '../../utils/commercialPavilions';
-import { resolveCommercialPavilionModulePlan } from '../../utils/commercialPavilionModules';
+import {
+  projectCommercialPavilionModuleRect,
+  resolveCommercialPavilionModulePlan,
+  type CommercialPavilionLocalRect,
+  type CommercialPavilionModulePlan,
+} from '../../utils/commercialPavilionModules';
+import {
+  buildCommercialPavilionModuleVisualStateIndex,
+  type CommercialPavilionModuleVisualState,
+} from '../../utils/pavilionModuleCommercial';
 import { strategicLandmarkBounds, strategicLandmarkFacingRadians } from '../../utils/landmarks';
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
 import { createCommercialPavilionTexture } from './commercialPavilionTextures';
@@ -26,6 +35,31 @@ interface InstanceTransform {
   position: Vector3Tuple;
   scale: Vector3Tuple;
   rotation?: Vector3Tuple;
+}
+
+function rectanglesOverlap(
+  first: CommercialPavilionLocalRect,
+  second: CommercialPavilionLocalRect,
+  clearance: number,
+) {
+  return Math.abs(first.centerX - second.centerX) * 2
+      < first.width + second.width + clearance * 2
+    && Math.abs(first.centerZ - second.centerZ) * 2
+      < first.depth + second.depth + clearance * 2;
+}
+
+function buildProtectedPlanRects(
+  plan: CommercialPavilionModulePlan,
+  layout: CommercialPavilionLayout,
+) {
+  const footprint = {
+    width: layout.interior.clearWidth,
+    depth: layout.interior.clearDepth,
+  };
+  return [
+    ...plan.cells.map((cell) => projectCommercialPavilionModuleRect(cell, footprint)),
+    ...plan.corridors.map((corridor) => projectCommercialPavilionModuleRect(corridor, footprint)),
+  ];
 }
 
 function InteriorInstances({
@@ -247,9 +281,13 @@ function PavilionInteriorCameraRig({
 
 export const CommercialPavilionInteriorScene = memo(function CommercialPavilionInteriorScene({
   entity,
+  entities,
+  lots,
   reducedGraphics,
 }: {
   entity: MapEntity;
+  entities: MapEntity[];
+  lots: CommercialLot[];
   reducedGraphics: boolean;
 }) {
   const definition = resolveCommercialPavilionDefinition(entity);
@@ -284,6 +322,19 @@ export const CommercialPavilionInteriorScene = memo(function CommercialPavilionI
   const floorGeometry = useMemo(() => layout
     ? new THREE.BoxGeometry(layout.width, layout.interior.floorY, layout.depth)
     : null, [layout]);
+  const moduleStateById = useMemo(
+    () => {
+      if (!modulePlan) return new Map<string, CommercialPavilionModuleVisualState>();
+      const validModuleKeys = new Set(modulePlan.cells.map((cell) => cell.id));
+      return buildCommercialPavilionModuleVisualStateIndex(
+        entity,
+        entities,
+        lots,
+        validModuleKeys,
+      );
+    },
+    [entities, entity, lots, modulePlan],
+  );
 
   useEffect(() => () => {
     floorTexture?.dispose();
@@ -300,12 +351,40 @@ export const CommercialPavilionInteriorScene = memo(function CommercialPavilionI
 
   if (!definition || !layout || !modulePlan || !floorGeometry) return null;
   const perimeter = createLowPerimeter(layout);
-  const columns = layout.interior.columns.map((column) => ({
-    position: [column.x, layout.interior.floorY + Math.min(0.66, column.height * 0.34) / 2, column.z] as Vector3Tuple,
-    scale: [column.size * 1.18, Math.min(0.66, column.height * 0.34), column.size * 1.18] as Vector3Tuple,
-  }));
+  const protectedPlanRects = modulePlan.publicIdentifier === 'B6'
+    ? buildProtectedPlanRects(modulePlan, layout)
+    : [];
+  const structureClearance = Math.max(
+    0.018,
+    Math.min(layout.interior.clearWidth, layout.interior.clearDepth) * 0.0035,
+  );
+  const columns = layout.interior.columns
+    .filter((column) => !protectedPlanRects.some((protectedRect) => rectanglesOverlap(
+      {
+        centerX: column.x,
+        centerZ: column.z,
+        width: column.size * 1.18,
+        depth: column.size * 1.18,
+      },
+      protectedRect,
+      structureClearance,
+    )))
+    .map((column) => ({
+      position: [column.x, layout.interior.floorY + Math.min(0.66, column.height * 0.34) / 2, column.z] as Vector3Tuple,
+      scale: [column.size * 1.18, Math.min(0.66, column.height * 0.34), column.size * 1.18] as Vector3Tuple,
+    }));
   const beams = reducedGraphics ? [] : layout.exterior.structure.columnZs
     .filter((_, index, items) => index > 0 && index < items.length - 1 && index % 2 === 0)
+    .filter((z) => !protectedPlanRects.some((protectedRect) => rectanglesOverlap(
+      {
+        centerX: 0,
+        centerZ: z,
+        width: layout.interior.clearWidth,
+        depth: 0.045,
+      },
+      protectedRect,
+      structureClearance,
+    )))
     .map((z) => ({
       position: [0, Math.min(0.72, layout.height * 0.3), z] as Vector3Tuple,
       scale: [layout.interior.clearWidth, 0.045, 0.045] as Vector3Tuple,
@@ -350,6 +429,7 @@ export const CommercialPavilionInteriorScene = memo(function CommercialPavilionI
           plan={modulePlan}
           mode="interior"
           reducedGraphics={reducedGraphics}
+          moduleStateById={moduleStateById}
         />
         <InteriorInstances geometry={unitBoxGeometry} material={materials.structure} items={columns} castShadow />
         <InteriorInstances geometry={unitBoxGeometry} material={materials.structure} items={beams} castShadow />

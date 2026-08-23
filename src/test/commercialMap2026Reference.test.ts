@@ -56,8 +56,12 @@ describe('referência cartográfica oficial Fenasoja 2026', () => {
   });
 
   it('preserva exatamente as 262 numerações visíveis por quadra', () => {
+    const entitiesById = new Map(OFFICIAL_REFERENCE_DATA.entities.map((entity) => [entity.id, entity]));
+    const externalLots = OFFICIAL_REFERENCE_DATA.lots.filter(
+      (lot) => entitiesById.get(lot.entityId)?.classification === 'SELLABLE_LOT',
+    );
     const lotsByBlock = new Map<string, number[]>();
-    OFFICIAL_REFERENCE_DATA.lots.forEach((lot) => {
+    externalLots.forEach((lot) => {
       const list = lotsByBlock.get(lot.block!) ?? [];
       list.push(Number(lot.lotNumber));
       lotsByBlock.set(lot.block!, list);
@@ -66,16 +70,54 @@ describe('referência cartográfica oficial Fenasoja 2026', () => {
       expect(lot.activeContractNumber).toBeNull();
     });
 
-    expect(OFFICIAL_REFERENCE_DATA.lots).toHaveLength(262);
+    expect(externalLots).toHaveLength(262);
     expect(Object.fromEntries([...lotsByBlock].map(([block, values]) => [block, values.sort((a, b) => a - b)])))
       .toEqual(expectedLots);
     expect(lotsByBlock.get('G')).not.toContain(3);
     expect(lotsByBlock.get('G')).not.toContain(4);
   });
 
+  it('incorpora os 214 módulos neutros do Pavilhão 3 sem inventar área, comprador ou contrato', () => {
+    const pavilion = OFFICIAL_REFERENCE_DATA.entities.find((entity) => entity.publicIdentifier === 'B6')!;
+    const modules = OFFICIAL_REFERENCE_DATA.entities.filter(
+      (entity) => entity.classification === 'INTERNAL_STAND' && entity.parentEntityId === pavilion.id,
+    );
+    const moduleEntityIds = new Set(modules.map((entity) => entity.id));
+    const moduleLots = OFFICIAL_REFERENCE_DATA.lots.filter((lot) => moduleEntityIds.has(lot.entityId));
+
+    expect(OFFICIAL_REFERENCE_DATA.lots).toHaveLength(476);
+    expect(modules).toHaveLength(214);
+    expect(moduleLots).toHaveLength(214);
+    expect(modules.map((entity) => entity.publicIdentifier)).toEqual(
+      Array.from({ length: 214 }, (_, index) => `B6-M${String(index + 1).padStart(3, '0')}`),
+    );
+    expect(modules.every((entity) => (
+      entity.parentEntityId === pavilion.id
+      && entity.segmentId === 'industria-comercio-servicos'
+      && entity.metadata.parentPublicIdentifier === 'B6'
+      && entity.metadata.pavilionPublicIdentifier === 'B6'
+      && entity.metadata.buyerDataImported === false
+    ))).toBe(true);
+    expect(moduleLots.every((lot) => (
+      lot.block === 'P3'
+      && lot.status === 'BLOCKED'
+      && lot.officialAreaSqm === null
+      && lot.calculatedAreaSqm === null
+      && lot.frontageMeters === null
+      && lot.depthMeters === null
+      && lot.pricingMode === 'NOT_FOR_SALE'
+      && lot.currentBuyer === null
+      && lot.activeContractNumber === null
+      && lot.reservationExpiresAt === null
+      && lot.saleDate === null
+    ))).toBe(true);
+  });
+
   it('não sobrepõe lotes comerciais e mantém cada unidade dentro de sua quadra', () => {
     const entitiesById = new Map(OFFICIAL_REFERENCE_DATA.entities.map((entity) => [entity.id, entity]));
-    const lotEntities = OFFICIAL_REFERENCE_DATA.lots.map((lot) => entitiesById.get(lot.entityId)!);
+    const lotEntities = OFFICIAL_REFERENCE_DATA.lots
+      .map((lot) => entitiesById.get(lot.entityId)!)
+      .filter((entity) => entity.classification === 'SELLABLE_LOT');
 
     lotEntities.forEach((entity) => {
       const parent = entitiesById.get(entity.parentEntityId!);
@@ -183,18 +225,27 @@ describe('referência cartográfica oficial Fenasoja 2026', () => {
     expect(restaurant?.searchKeywords).toEqual(expect.arrayContaining(['Restaurante Central', 'C2']));
 
     const lotS36 = normalized.find((metadata) => metadata.block === 'S' && metadata.lotNumber === '36');
-    expect(lotS36).toMatchObject({ preferredLabelVisibility: 'near', commercialStatus: 'BLOCKED' });
+    expect(lotS36).toMatchObject({ preferredLabelVisibility: 'detail', commercialStatus: 'BLOCKED' });
     expect(lotS36?.searchKeywords).toEqual(expect.arrayContaining(['Quadra S', 'Lote 36']));
   });
 
   it('usa identificadores compostos únicos e não associa ocupantes aos lotes', () => {
     const entityIdentifiers = OFFICIAL_REFERENCE_DATA.entities.map((entity) => entity.publicIdentifier);
     const lotIdentifiers = OFFICIAL_REFERENCE_DATA.lots.map((lot) => lot.publicIdentifier);
+    const externalLotIdentifiers = OFFICIAL_REFERENCE_DATA.entities
+      .filter((entity) => entity.classification === 'SELLABLE_LOT')
+      .map((entity) => entity.publicIdentifier);
+    const pavilionModuleIdentifiers = OFFICIAL_REFERENCE_DATA.entities
+      .filter((entity) => entity.classification === 'INTERNAL_STAND')
+      .map((entity) => entity.publicIdentifier);
     expect(new Set(entityIdentifiers).size).toBe(entityIdentifiers.length);
     expect(new Set(lotIdentifiers).size).toBe(lotIdentifiers.length);
-    expect(OFFICIAL_REFERENCE_DATA.lots.every((lot) => /^Q-[A-Z]-\d{2}$/.test(lot.publicIdentifier))).toBe(true);
+    expect(externalLotIdentifiers).toHaveLength(262);
+    expect(externalLotIdentifiers.every((identifier) => /^Q-[A-Z]-\d{2}$/.test(identifier))).toBe(true);
+    expect(pavilionModuleIdentifiers).toHaveLength(214);
+    expect(pavilionModuleIdentifiers.every((identifier) => /^B6-M\d{3}$/.test(identifier))).toBe(true);
     expect(OFFICIAL_REFERENCE_DATA.entities
-      .filter((entity) => entity.classification === 'SELLABLE_LOT')
+      .filter((entity) => entity.classification === 'SELLABLE_LOT' || entity.classification === 'INTERNAL_STAND')
       .every((entity) => entity.metadata.buyerDataImported === false)).toBe(true);
   });
 });

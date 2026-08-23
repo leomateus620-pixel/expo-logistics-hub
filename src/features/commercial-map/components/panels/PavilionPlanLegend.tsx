@@ -74,23 +74,22 @@ export const PavilionPlanLegend = memo(function PavilionPlanLegend({
           <div><dt>Módulos</dt><dd>{maximum}</dd></div>
           <div><dt>Identificação</dt><dd>{moduleLabel(1)}–{moduleLabel(maximum)}</dd></div>
           <div><dt>Área total</dt><dd>{area.format(plan.stats.totalAreaSquareMeters)} m²</dd></div>
-          <div><dt>Área modular</dt><dd>{area.format(plan.stats.moduleAreaSquareMeters)} m²</dd></div>
+          <div><dt>Área modular total</dt><dd>{area.format(plan.stats.moduleAreaSquareMeters)} m²</dd></div>
         </dl>
       </div>
 
-      <div className="commercial-pavilion-plan-groups" aria-label="Grupos de módulos">
+      <div className="commercial-pavilion-plan-groups" aria-label="Sequências de módulos">
         {plan.zones.map((zone) => (
-          <span key={zone.id} title={zone.label}>
+          <span key={zone.id} title={`Módulos ${moduleLabel(zone.numberRange[0])}–${moduleLabel(zone.numberRange[1])}`}>
             <b>{moduleLabel(zone.numberRange[0])}–{moduleLabel(zone.numberRange[1])}</b>
-            <small>{zone.label}</small>
           </span>
         ))}
       </div>
 
       <footer>
-        <span><i aria-hidden="true" />Blocos numerados</span>
-        <span><i aria-hidden="true" />Circulação</span>
-        <small>Somente identificadores · expositores não exibidos</small>
+        <span><i aria-hidden="true" />Módulos numerados</span>
+        <span><i aria-hidden="true" />Circulação livre</span>
+        <small>Área individual não atribuída · expositores não vinculados</small>
       </footer>
     </section>
   );

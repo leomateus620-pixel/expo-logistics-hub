@@ -58,12 +58,15 @@ interface GeometryRow {
 }
 interface PriceRow { is_active: boolean; pricing_mode: CommercialLot['pricingMode']; base_price: number | string | null; price_per_sqm: number | string | null; asking_price: number | string | null; minimum_price: number | string | null; }
 interface ReservationRow { status: string; company_name: string; expires_at: string; responsible_name: string | null; }
+interface NegotiationRow { status: string; company_name: string; contact_name: string | null; }
 interface SaleRow { status: string; buyer_name: string; sale_date: string; salesperson_name: string; contract_number: string | null; }
+interface ContractRow { is_active: boolean; contract_number: string | null; }
 interface LotRow {
   id: string; entity_id: string; public_identifier: string; block: string | null; lot_number: string | null; level_label: string | null; display_name: string;
   description: string | null; status: CommercialLot['status']; official_area_sqm: number | string | null; calculated_area_sqm: number | string | null;
   area_validation_status: CommercialLot['areaValidationStatus']; frontage_meters: number | string | null; depth_meters: number | string | null;
-  lot_prices: PriceRow[] | PriceRow | null; lot_reservations: ReservationRow[] | null; lot_sales: SaleRow[] | null;
+  lot_prices: PriceRow[] | PriceRow | null; lot_reservations: ReservationRow[] | null; lot_negotiations: NegotiationRow[] | null;
+  lot_sales: SaleRow[] | null; lot_contracts: ContractRow[] | null;
   infrastructure: string[] | null; has_electricity: boolean; has_water: boolean; has_internet: boolean; is_corner: boolean; is_covered: boolean;
   accessibility_notes: string | null; commercial_notes: string | null; internal_notes: string | null; archived_at: string | null;
   created_by: string | null; updated_by: string | null; created_at: string | null; updated_at: string | null;
@@ -240,7 +243,13 @@ function mapLot(row: LotRow): CommercialLot {
   const activeReservation = Array.isArray(row.lot_reservations)
     ? row.lot_reservations.find((candidate: ReservationRow) => candidate.status === 'ACTIVE')
     : null;
+  const activeNegotiation = Array.isArray(row.lot_negotiations)
+    ? row.lot_negotiations.find((candidate: NegotiationRow) => candidate.status === 'ACTIVE')
+    : null;
   const sale = Array.isArray(row.lot_sales) ? row.lot_sales.find((candidate: SaleRow) => candidate.status === 'CONFIRMED') : null;
+  const activeContract = Array.isArray(row.lot_contracts)
+    ? row.lot_contracts.find((candidate: ContractRow) => candidate.is_active)
+    : null;
   return {
     id: row.id,
     entityId: row.entity_id,
@@ -270,11 +279,11 @@ function mapLot(row: LotRow): CommercialLot {
     accessibilityNotes: row.accessibility_notes,
     commercialNotes: row.commercial_notes,
     internalNotes: row.internal_notes,
-    currentBuyer: sale?.buyer_name ?? activeReservation?.company_name ?? null,
+    currentBuyer: sale?.buyer_name ?? activeReservation?.company_name ?? activeNegotiation?.company_name ?? null,
     reservationExpiresAt: activeReservation?.expires_at ?? null,
     saleDate: sale?.sale_date ?? null,
     salespersonName: sale?.salesperson_name ?? activeReservation?.responsible_name ?? null,
-    activeContractNumber: sale?.contract_number ?? null,
+    activeContractNumber: activeContract?.contract_number ?? sale?.contract_number ?? null,
     archivedAt: row.archived_at,
     createdBy: row.created_by,
     updatedBy: row.updated_by,
@@ -407,7 +416,9 @@ async function fetchCommissionCommercialMap(
       *,
       lot_prices(is_active, pricing_mode, base_price, price_per_sqm, asking_price, minimum_price),
       lot_reservations(status, company_name, expires_at, responsible_name),
-      lot_sales(status, buyer_name, sale_date, salesperson_name, contract_number)
+      lot_negotiations(status, company_name, contact_name),
+      lot_sales(status, buyer_name, sale_date, salesperson_name, contract_number),
+      lot_contracts(is_active, contract_number)
     `).eq('project_id', project.id).is('archived_at', null).in('entity_id', entityIds),
   ]);
 
@@ -512,7 +523,7 @@ export async function fetchCommercialMap(
     db.from('map_entities').select('*').eq('project_id', project.id).eq('is_archived', false),
     db.from('map_entity_geometries').select('*').eq('project_id', project.id).eq('is_current', true),
     db.from('map_calibrations').select('*').eq('project_id', project.id).order('version', { ascending: false }).limit(1).maybeSingle(),
-    db.from('commercial_lots').select('*, lot_prices(*), lot_reservations(*), lot_sales(*)').eq('project_id', project.id).is('archived_at', null),
+    db.from('commercial_lots').select('*, lot_prices(*), lot_reservations(*), lot_negotiations(*), lot_sales(*), lot_contracts(*)').eq('project_id', project.id).is('archived_at', null),
     db.from('commercial_lots').select('id').eq('project_id', project.id).limit(1),
     db.from('map_segments').select('id, slug').eq('project_id', project.id).eq('is_active', true),
   ]);
@@ -853,6 +864,20 @@ export async function updateCommercialLot(params: {
     p_lot_id: params.lotId,
     p_expected_updated_at: params.expectedUpdatedAt,
     p_patch: params.patch,
+    p_reason: params.reason,
+  });
+  if (error) throw error;
+  return data;
+}
+
+export async function setCommercialLotAvailability(params: {
+  lotId: string;
+  status: Extract<CommercialLot['status'], 'AVAILABLE' | 'BLOCKED' | 'UNAVAILABLE'>;
+  reason: string;
+}) {
+  const { data, error } = await db.rpc('set_commercial_lot_availability', {
+    p_lot_id: params.lotId,
+    p_status: params.status,
     p_reason: params.reason,
   });
   if (error) throw error;

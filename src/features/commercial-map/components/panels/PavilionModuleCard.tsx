@@ -1,74 +1,200 @@
-import { memo } from 'react';
-import { X } from 'lucide-react';
-import type { CommercialPavilionModulePlan } from '../../utils/commercialPavilionModules';
+import { memo, useMemo, useState } from 'react';
+import {
+  CalendarClock,
+  FileLock2,
+  Handshake,
+  PencilLine,
+  RefreshCw,
+  ShieldCheck,
+  ShoppingBag,
+  X,
+} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { STATUS_CONFIG } from '../../constants';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
+import type {
+  CommercialLot,
+  MapEntity,
+  MapPermissions,
+  MapSource,
+} from '../../types';
+import type { CommercialPavilionModulePlan } from '../../utils/commercialPavilionModules';
+import { buildPavilionModuleCommercialIndex } from '../../utils/pavilionModuleCommercial';
+import { LotAvailabilityDialog } from '../commercial/LotAvailabilityDialog';
+import { LotEditDialog } from '../commercial/LotEditDialog';
+import { LotWorkflowDialog, type LotWorkflow } from '../commercial/LotWorkflowDialog';
 
-const area = new Intl.NumberFormat('pt-BR', {
-  minimumFractionDigits: 0,
-  maximumFractionDigits: 1,
-});
+const SEQUENCE_LABELS = {
+  'x-increasing': 'Sequência horizontal',
+  'z-increasing': 'Sequência vertical',
+  'z-decreasing': 'Sequência vertical inversa',
+} as const;
 
-const ZONE_ROLE_LABEL: Record<string, string> = {
-  perimeter: 'Faixa perimetral',
-  island: 'Ilha central',
-  gallery: 'Galeria',
-  'market-run': 'Corredor de mercado',
-};
+interface Props {
+  plan: CommercialPavilionModulePlan;
+  pavilion: MapEntity;
+  entities: MapEntity[];
+  lots: CommercialLot[];
+  permissions: MapPermissions;
+  source: MapSource;
+  onSynchronize?: () => void;
+  synchronizing?: boolean;
+}
 
-/** Detail card for the module selected inside a pavilion interior. */
+/** Operational detail card for the neutral module selected inside a pavilion. */
 export const PavilionModuleCard = memo(function PavilionModuleCard({
   plan,
-}: {
-  plan: CommercialPavilionModulePlan;
-}) {
+  pavilion,
+  entities,
+  lots,
+  permissions,
+  source,
+  onSynchronize,
+  synchronizing = false,
+}: Props) {
   const selectedModuleId = useCommercialMapStore((state) => state.selectedModuleId);
   const setSelectedModuleId = useCommercialMapStore((state) => state.setSelectedModuleId);
+  const [workflow, setWorkflow] = useState<LotWorkflow>(null);
+  const [editingLot, setEditingLot] = useState(false);
+  const [availabilityOpen, setAvailabilityOpen] = useState(false);
   const cell = plan.cells.find((candidate) => candidate.id === selectedModuleId) ?? null;
+  const zone = cell ? plan.zones.find((candidate) => candidate.id === cell.zoneId) ?? null : null;
+  const commercialIndex = useMemo(
+    () => buildPavilionModuleCommercialIndex(pavilion, entities, lots),
+    [entities, lots, pavilion],
+  );
+  const record = cell ? commercialIndex.get(cell.id) ?? null : null;
+  const lot = record?.lot ?? null;
+  const status = lot ? STATUS_CONFIG[lot.status] : null;
+  const persisted = source === 'database' && Boolean(lot && !lot.id.startsWith('reference:'));
+  const canSetAvailability = Boolean(
+    persisted
+    && lot
+    && ['AVAILABLE', 'BLOCKED', 'UNAVAILABLE'].includes(lot.status)
+    && (permissions.canManageLots || permissions.canManageSales),
+  );
+  const canReserve = Boolean(persisted && lot && permissions.canManageSales && ['AVAILABLE', 'IN_NEGOTIATION'].includes(lot.status));
+  const canNegotiate = Boolean(persisted && lot && permissions.canManageSales && ['AVAILABLE', 'RESERVED'].includes(lot.status));
+  const canSell = Boolean(persisted && lot && permissions.canManageSales && ['AVAILABLE', 'RESERVED', 'IN_NEGOTIATION'].includes(lot.status));
+
   if (!cell) return null;
-  const zone = plan.zones.find((candidate) => candidate.id === cell.zoneId) ?? null;
+
+  const individualArea = lot?.officialAreaSqm ?? cell.areaM2 ?? null;
+  const sequenceLabel = cell.sequenceOrientation
+    ? SEQUENCE_LABELS[cell.sequenceOrientation]
+    : 'Sequência do setor';
 
   return (
-    <aside
-      className="commercial-pavilion-module-card"
-      style={{ '--pavilion-plan-accent': plan.colorCue } as React.CSSProperties}
-      aria-label={`Módulo ${cell.label} do Pavilhão ${plan.stats.pavilionNumber}`}
-      data-commercial-pavilion-module={cell.id}
-    >
-      <header>
-        <div>
-          <span>Módulo selecionado</span>
-          <strong>Módulo {cell.label}</strong>
-          <small>Pavilhão {plan.stats.pavilionNumber} · {plan.stats.category}</small>
-        </div>
-        <button
-          type="button"
-          onClick={() => setSelectedModuleId(null)}
-          aria-label="Fechar detalhes do módulo"
-        >
-          <X aria-hidden="true" />
-        </button>
-      </header>
+    <>
+      <aside
+        className="commercial-pavilion-module-card"
+        style={{ '--pavilion-plan-accent': plan.colorCue } as React.CSSProperties}
+        aria-label={`Módulo ${cell.label} do Pavilhão ${plan.stats.pavilionNumber}`}
+        data-commercial-pavilion-module={cell.id}
+      >
+        <header>
+          <div>
+            <span>Módulo selecionado</span>
+            <strong>Módulo {cell.label}</strong>
+            <small>Pavilhão {plan.stats.pavilionNumber} · {plan.stats.category}</small>
+          </div>
+          <button
+            type="button"
+            onClick={() => setSelectedModuleId(null)}
+            aria-label="Fechar detalhes do módulo"
+          >
+            <X aria-hidden="true" />
+          </button>
+        </header>
 
-      <dl>
-        <div>
-          <dt>Setor</dt>
-          <dd>{zone?.label ?? 'Não informado'}</dd>
-        </div>
-        <div>
-          <dt>Disposição</dt>
-          <dd>{zone ? ZONE_ROLE_LABEL[zone.role] ?? zone.label : 'Não informado'}</dd>
-        </div>
-        <div>
-          <dt>Área modular</dt>
-          <dd>{area.format(plan.stats.moduleAreaSquareMeters)} m²</dd>
-        </div>
-        <div>
-          <dt>Numeração</dt>
-          <dd>{cell.number} de {plan.stats.moduleCount}</dd>
-        </div>
-      </dl>
+        {status && (
+          <div
+            className="commercial-pavilion-module-status"
+            style={{ color: status.border, background: status.surface, borderColor: status.color }}
+          >
+            <b aria-hidden="true">{status.symbol}</b>
+            <span><strong>{status.label}</strong><small>{status.description}</small></span>
+          </div>
+        )}
 
-      <footer>Identificação cartográfica oficial · expositores não exibidos</footer>
-    </aside>
+        <dl>
+          <div>
+            <dt>Localização</dt>
+            <dd>{zone?.label ?? 'Setor não informado'}</dd>
+          </div>
+          <div>
+            <dt>Disposição</dt>
+            <dd>{sequenceLabel}</dd>
+          </div>
+          <div>
+            <dt>Área individual</dt>
+            <dd>{individualArea == null ? 'Não informada' : `${individualArea.toLocaleString('pt-BR')} m²`}</dd>
+          </div>
+          <div>
+            <dt>Vínculo comercial</dt>
+            <dd>{lot?.currentBuyer || 'Sem vínculo'}</dd>
+          </div>
+          <div>
+            <dt>Contrato</dt>
+            <dd>{lot?.activeContractNumber || 'Não anexado'}</dd>
+          </div>
+          <div>
+            <dt>Cadastro</dt>
+            <dd>{persisted ? 'Persistido e auditável' : 'Referência em leitura'}</dd>
+          </div>
+        </dl>
+
+        {cell.source?.discrepancy && (
+          <p className="commercial-pavilion-module-note">
+            A sequência preserva este número, mas a faixa impressa no anexo requer confirmação oficial futura.
+          </p>
+        )}
+
+        {persisted && lot ? (
+          <div className="commercial-pavilion-module-actions" aria-label="Operações comerciais do módulo">
+            {permissions.canManageLots && (
+              <Button size="sm" variant="outline" onClick={() => setEditingLot(true)}><PencilLine />Editar</Button>
+            )}
+            {canSetAvailability && (
+              <Button size="sm" variant="outline" onClick={() => setAvailabilityOpen(true)}><ShieldCheck />Situação</Button>
+            )}
+            {canReserve && (
+              <Button size="sm" variant="outline" onClick={() => setWorkflow('reserve')}><CalendarClock />Reservar</Button>
+            )}
+            {canNegotiate && (
+              <Button size="sm" variant="outline" onClick={() => setWorkflow('negotiate')}><Handshake />Negociar</Button>
+            )}
+            {canSell && (
+              <Button size="sm" onClick={() => setWorkflow('sell')}><ShoppingBag />Vender</Button>
+            )}
+            {permissions.canManageContracts && (
+              <Button size="sm" variant="outline" onClick={() => setWorkflow('contract')}><FileLock2 />Contrato</Button>
+            )}
+          </div>
+        ) : permissions.isMapAdmin && onSynchronize ? (
+          <div className="commercial-pavilion-module-sync">
+            <p>Sincronize a revisão para editar situação, cadastro, venda e contrato deste módulo.</p>
+            <Button size="sm" onClick={onSynchronize} disabled={synchronizing}>
+              <RefreshCw className={synchronizing ? 'animate-spin' : ''} />
+              Sincronizar módulos
+            </Button>
+          </div>
+        ) : (
+          <p className="commercial-pavilion-module-readonly">Consulta neutra: nenhum expositor foi pré-vinculado.</p>
+        )}
+
+        <footer>
+          {persisted ? 'Operações protegidas por permissão e histórico' : 'Identificação oficial · área individual não atribuída'}
+        </footer>
+      </aside>
+
+      {lot && (
+        <>
+          <LotWorkflowDialog key={`workflow:${lot.id}`} lot={lot} workflow={workflow} onClose={() => setWorkflow(null)} />
+          <LotEditDialog key={`edit:${lot.id}`} lot={lot} open={editingLot} onClose={() => setEditingLot(false)} />
+          <LotAvailabilityDialog key={`availability:${lot.id}`} lot={lot} open={availabilityOpen} onClose={() => setAvailabilityOpen(false)} />
+        </>
+      )}
+    </>
   );
 });

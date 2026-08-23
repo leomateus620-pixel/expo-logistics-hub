@@ -47,9 +47,26 @@ import type {
   VerificationStatus,
 } from '../../types';
 import type { EntityExplorerItem, EntityLocationGroup, EntityLocationOption } from '../../utils/entityExplorer';
+import { resolveCommercialPavilionModuleNavigationTarget } from '../../utils/pavilionModuleCommercial';
 import { LotEditDialog } from '../commercial/LotEditDialog';
 
 const number = new Intl.NumberFormat('pt-BR', { maximumFractionDigits: 2 });
+
+function useOpenExplorerEntity() {
+  const selectEntityFromExplorer = useCommercialMapStore((state) => state.selectEntityFromExplorer);
+  const enterInterior = useCommercialMapStore((state) => state.enterInterior);
+  const setSelectedModuleId = useCommercialMapStore((state) => state.setSelectedModuleId);
+
+  return useCallback((item: EntityExplorerItem) => {
+    const moduleTarget = resolveCommercialPavilionModuleNavigationTarget(item.entity);
+    if (moduleTarget) {
+      enterInterior(moduleTarget.pavilionEntityId);
+      setSelectedModuleId(moduleTarget.moduleId);
+      return;
+    }
+    selectEntityFromExplorer(item.entity.id);
+  }, [enterInterior, selectEntityFromExplorer, setSelectedModuleId]);
+}
 
 const CLASSIFICATION_INITIALS: Partial<Record<MapClassification, string>> = {
   SELLABLE_LOT: 'LT',
@@ -403,7 +420,7 @@ function ResultCard({
 
 export const ResultsPanel = memo(function ResultsPanel({ explorer }: { explorer: MapEntityFilterResult }) {
   const setActivePanel = useCommercialMapStore((state) => state.setActivePanel);
-  const selectEntityFromExplorer = useCommercialMapStore((state) => state.selectEntityFromExplorer);
+  const openExplorerEntity = useOpenExplorerEntity();
   const selectedEntityId = useCommercialMapStore((state) => state.selectedEntityId);
   const setHoveredEntityId = useCommercialMapStore((state) => state.setHoveredEntityId);
   const clearExplorerFilters = useCommercialMapStore((state) => state.clearExplorerFilters);
@@ -429,15 +446,15 @@ export const ResultsPanel = memo(function ResultsPanel({ explorer }: { explorer:
       focusResult(explorer.items.length - 1);
     } else if (event.key === 'Enter' && explorer.items.length > 0) {
       event.preventDefault();
-      selectEntityFromExplorer(explorer.items[firstTabIndex]?.entity.id ?? explorer.items[0].entity.id);
+      openExplorerEntity(explorer.items[firstTabIndex] ?? explorer.items[0]);
     }
   };
 
   const handleResultKeyDown = (event: ReactKeyboardEvent<HTMLButtonElement>, index: number) => {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
-      const entityId = explorer.items[index]?.entity.id;
-      if (entityId) selectEntityFromExplorer(entityId);
+      const item = explorer.items[index];
+      if (item) openExplorerEntity(item);
     } else if (event.key === 'ArrowDown') {
       event.preventDefault();
       focusResult(index + 1);
@@ -484,7 +501,7 @@ export const ResultsPanel = memo(function ResultsPanel({ explorer }: { explorer:
               selected={item.entity.id === selectedEntityId}
               tabIndex={index === firstTabIndex ? 0 : -1}
               buttonRef={(element) => { resultRefs.current[index] = element; }}
-              onSelect={() => selectEntityFromExplorer(item.entity.id)}
+              onSelect={() => openExplorerEntity(item)}
               onHover={(hovered) => setHoveredEntityId(hovered ? item.entity.id : null)}
               onKeyDown={(event) => handleResultKeyDown(event, index)}
             />
@@ -500,7 +517,7 @@ interface EntityTableProps {
   selectedEntityId: string | null;
   density: 'compact' | 'comfortable';
   permissions: MapPermissions;
-  onOpen: (entityId: string) => void;
+  onOpen: (item: EntityExplorerItem) => void;
   onEdit: (lot: CommercialLot) => void;
 }
 
@@ -538,7 +555,7 @@ const EntityTable = memo(function EntityTable({ items, selectedEntityId, density
               aria-selected={selected}
               onClick={(event) => {
                 if ((event.target as HTMLElement).closest('button, a, [role="menuitem"]')) return;
-                onOpen(item.entity.id);
+                onOpen(item);
               }}
             >
               <td data-label="Entidade">
@@ -574,14 +591,14 @@ const EntityTable = memo(function EntityTable({ items, selectedEntityId, density
               </td>
               <td data-label="Ações">
                 <div className="commercial-map-table-actions">
-                  <Button size="sm" variant="ghost" onClick={() => onOpen(item.entity.id)}>Ver no mapa<ChevronRight className="h-4 w-4" /></Button>
+                  <Button size="sm" variant="ghost" onClick={() => onOpen(item)}>Ver no mapa<ChevronRight className="h-4 w-4" /></Button>
                   {item.lot && permissions.canManageLots && (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <button type="button" aria-label={`Mais ações para ${item.metadata.officialDisplayName}`}><MoreHorizontal /></button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onSelect={() => onOpen(item.entity.id)}><Eye />Abrir detalhes no mapa</DropdownMenuItem>
+                        <DropdownMenuItem onSelect={() => onOpen(item)}><Eye />Abrir detalhes no mapa</DropdownMenuItem>
                         <DropdownMenuItem onSelect={() => onEdit(item.lot!)}><PencilLine />Editar cadastro do lote</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -598,7 +615,7 @@ const EntityTable = memo(function EntityTable({ items, selectedEntityId, density
 
 export const MapListView = memo(function MapListView({ explorer, permissions }: { explorer: MapEntityFilterResult; permissions: MapPermissions }) {
   const selectedEntityId = useCommercialMapStore((state) => state.selectedEntityId);
-  const selectEntityFromExplorer = useCommercialMapStore((state) => state.selectEntityFromExplorer);
+  const openExplorerEntity = useOpenExplorerEntity();
   const setWorkspaceMode = useCommercialMapStore((state) => state.setWorkspaceMode);
   const tableDensity = useCommercialMapStore((state) => state.tableDensity);
   const [editingLot, setEditingLot] = useState<CommercialLot | null>(null);
@@ -610,7 +627,7 @@ export const MapListView = memo(function MapListView({ explorer, permissions }: 
     selectedRow?.scrollIntoView({ block: 'nearest' });
   }, [explorer.items, selectedEntityId]);
 
-  const handleOpen = useCallback((entityId: string) => selectEntityFromExplorer(entityId), [selectEntityFromExplorer]);
+  const handleOpen = useCallback((item: EntityExplorerItem) => openExplorerEntity(item), [openExplorerEntity]);
   const handleEdit = useCallback((lot: CommercialLot) => setEditingLot(lot), []);
 
   return (

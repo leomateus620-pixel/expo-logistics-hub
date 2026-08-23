@@ -437,7 +437,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
                   <div className="commercial-map-dialog-icon"><DatabaseZap /></div>
                   <AlertDialogTitle>Sincronizar a cartografia oficial 2026?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    A sincronização importa 21 quadras, 262 lotes numerados, vias e infraestrutura sem copiar a lista lateral de compradores. Lotes novos entram bloqueados e sem preço ou área oficial; registros comerciais existentes e geometrias já validadas são preservados.
+                      A sincronização importa 21 quadras, 262 lotes externos e os 214 módulos neutros do Pavilhão 3, além de vias e infraestrutura, sem copiar compradores. Os módulos entram bloqueados, sem preço e sem área individual; registros comerciais existentes e geometrias já validadas são preservados.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -521,7 +521,12 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
                       <ArrowLeft />Voltar ao mapa
                     </Button>
                     <div>
-                      <span>{interiorKind === 'commercial-pavilion' ? 'Planta interna oficial' : 'Inspeção interna'} · {interiorEntity.publicIdentifier}</span>
+                      <span>
+                        {interiorKind === 'commercial-pavilion' ? 'Planta interna oficial' : 'Inspeção interna'} · {' '}
+                        {interiorPavilionPlan
+                          ? `Pavilhão ${interiorPavilionPlan.stats.pavilionNumber}`
+                          : interiorEntity.publicIdentifier}
+                      </span>
                       <strong>{interiorEntity.name}</strong>
                       <small>
                         {interiorKind === 'commercial-pavilion'
@@ -538,7 +543,16 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
                   {interiorPavilionPlan && (
                     <>
                       <PavilionPlanLegend plan={interiorPavilionPlan} variant="interior" />
-                      <PavilionModuleCard plan={interiorPavilionPlan} />
+                      <PavilionModuleCard
+                        plan={interiorPavilionPlan}
+                        pavilion={interiorEntity}
+                        entities={data.entities}
+                        lots={data.lots}
+                        permissions={permissions}
+                        source={data.source}
+                        onSynchronize={() => bootstrap.mutate()}
+                        synchronizing={bootstrap.isPending}
+                      />
                     </>
                   )}
                 </>

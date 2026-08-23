@@ -96,17 +96,22 @@ describe('regras comerciais e segurança', () => {
     expect(validateContractFile(new File(['x'], 'contrato.exe', { type: 'application/octet-stream' }))).toContain('PDF ou DOCX');
   });
 
-  it('importa somente os lotes numerados pela planta e os mantém comercialmente bloqueados', () => {
+  it('importa somente os lotes e módulos numerados pela planta e os mantém comercialmente bloqueados', () => {
     const exporuralLots = OFFICIAL_REFERENCE_DATA.entities.filter(
       (entity) => entity.metadata.entityType === 'EXPORURAL_COMMERCIAL_LOT',
     );
+    const pavilion3Modules = OFFICIAL_REFERENCE_DATA.entities.filter(
+      (entity) => entity.classification === 'INTERNAL_STAND' && entity.metadata.pavilionPublicIdentifier === 'B6',
+    );
 
-    expect(OFFICIAL_REFERENCE_DATA.lots).toHaveLength(262);
+    expect(OFFICIAL_REFERENCE_DATA.lots).toHaveLength(476);
     expect(OFFICIAL_REFERENCE_DATA.lots.every((lot) => lot.status === 'BLOCKED')).toBe(true);
     expect(OFFICIAL_REFERENCE_DATA.lots.every((lot) => lot.pricingMode === 'NOT_FOR_SALE')).toBe(true);
     expect(OFFICIAL_REFERENCE_DATA.lots.every((lot) => lot.currentBuyer === null)).toBe(true);
     expect(exporuralLots).toHaveLength(95);
     expect(exporuralLots.every((entity) => entity.verificationStatus === 'VERIFIED')).toBe(true);
+    expect(pavilion3Modules).toHaveLength(214);
+    expect(pavilion3Modules.every((entity) => entity.verificationStatus === 'NEEDS_REVIEW')).toBe(true);
     expect(OFFICIAL_REFERENCE_DATA.entities.filter((entity) => !validateGeometry(entity.geometry).valid)).toEqual([]);
   });
 });

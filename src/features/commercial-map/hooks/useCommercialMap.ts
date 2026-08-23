@@ -17,6 +17,7 @@ import {
   reserveLot,
   saveMapCalibration,
   saveGeometryRevision,
+  setCommercialLotAvailability,
   setMapLayerLock,
   setMapEntityVerification,
   splitCommercialLot,
@@ -70,6 +71,9 @@ const MAP_ERROR_MESSAGES: Record<string, string> = {
   LOT_NOT_AVAILABLE: 'Este lote não está mais disponível para reserva.',
   LOT_NOT_NEGOTIABLE: 'A situação atual do lote não permite iniciar uma negociação.',
   LOT_CANNOT_BE_SOLD: 'A situação atual do lote não permite registrar a venda.',
+  LOT_STATUS_TRANSITION_FORBIDDEN: 'Conclua o fluxo comercial ativo antes de alterar a disponibilidade.',
+  LOT_ACTIVE_COMMERCIAL_FLOW_FORBIDS_AVAILABILITY_CHANGE: 'Conclua ou cancele a reserva, negociação ou venda antes de alterar a disponibilidade.',
+  INVALID_AVAILABILITY_STATUS: 'Selecione uma situação operacional válida para o módulo.',
   lot_reservations_one_active_per_lot: 'Outra reserva ativa já foi registrada para este lote.',
   lot_sales_one_confirmed_per_lot: 'Este lote já possui uma venda confirmada.',
   MAP_SEGMENT_CONFIGURATION_UNAVAILABLE: 'A configuração segura deste segmento ainda não está disponível.',
@@ -290,6 +294,14 @@ export function useMapMutations() {
     },
     onError: (error) => toast.error('O lote não foi atualizado', { description: errorMessage(error) }),
   });
+  const lotAvailability = useMutation({
+    mutationFn: setCommercialLotAvailability,
+    onSuccess: async () => {
+      await invalidate();
+      toast.success('Disponibilidade comercial do módulo atualizada.');
+    },
+    onError: (error) => toast.error('A disponibilidade não foi alterada', { description: errorMessage(error) }),
+  });
   const layerLock = useMutation({
     mutationFn: setMapLayerLock,
     onSuccess: async () => {
@@ -362,7 +374,7 @@ export function useMapMutations() {
     onError: (error) => toast.error('Falha no envio do contrato', { description: errorMessage(error) }),
   });
 
-  return { bootstrap, exporuralSync, geometry, lotCreation, lotUpdate, layerLock, verification, publish, calibration, split, merge, referenceUpload, reservation, negotiation, sale, contract };
+  return { bootstrap, exporuralSync, geometry, lotCreation, lotUpdate, lotAvailability, layerLock, verification, publish, calibration, split, merge, referenceUpload, reservation, negotiation, sale, contract };
 }
 
 export function useLotActivity(lotId: string | null) {

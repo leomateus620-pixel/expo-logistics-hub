@@ -16,8 +16,9 @@ describe('legenda inteligente das plantas internas', () => {
     expect(within(legend).getByText('189')).toBeInTheDocument();
     expect(within(legend).getByText('01–189')).toBeInTheDocument();
     expect(within(legend).getByText('1.201,5 m²')).toBeInTheDocument();
-    expect(within(legend).getByText('Somente identificadores · expositores não exibidos')).toBeInTheDocument();
+    expect(within(legend).getByText('Área individual não atribuída · expositores não vinculados')).toBeInTheDocument();
     expect(legend.textContent).not.toMatch(/CALÇADOS|BAZAR|EMPRESA|COMPRADOR/i);
+    expect(legend.textContent).not.toMatch(/ALA OESTE|RETORNO SUL|ALA NORTE|RETORNO OESTE/i);
   });
 
   it('oferece o mesmo contrato de leitura no interior dos pavilhões do mapa geral', () => {

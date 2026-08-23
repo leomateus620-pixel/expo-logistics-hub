@@ -69,6 +69,10 @@ import {
   type CommercialMapSegmentDefinition,
   type CommercialMapSegmentId,
 } from '../../data/commercialMapSegments';
+import {
+  buildCommercialPavilionModuleVisualStateIndex,
+  type CommercialPavilionModuleVisualState,
+} from '../../utils/pavilionModuleCommercial';
 
 const MiranteInteriorScene = lazy(async () => {
   const module = await import('./MiranteInteriorScene');
@@ -472,6 +476,7 @@ interface EntityMeshProps {
   onFocus: () => void;
   onEnterInterior: (id: string) => void;
   onCursor: (cursor: 'grab' | 'grabbing' | 'pointer') => void;
+  moduleStateById?: ReadonlyMap<string, CommercialPavilionModuleVisualState>;
 }
 
 const GenericEntityMesh = memo(function GenericEntityMesh({
@@ -730,6 +735,7 @@ const EntityMesh = memo(function EntityMesh(props: EntityMeshProps) {
         onFocus={props.onFocus}
         onEnterInterior={props.onEnterInterior}
         onCursor={props.onCursor}
+        moduleStateById={props.moduleStateById}
       />
     );
   }
@@ -1833,10 +1839,46 @@ function Scene({
   const renderedEntities = useMemo(() => selectedHiddenEntity
     ? [...visibleLayerEntities, selectedHiddenEntity]
     : visibleLayerEntities, [selectedHiddenEntity, visibleLayerEntities]);
-  const lotEntries = useMemo(() => renderedEntities
+  const commercialPavilionIdentity = useMemo(() => {
+    const pavilionEntities = entities.filter((entity) => (
+      resolveStrategicLandmarkKind(entity) === 'commercial-pavilion'
+    ));
+    return {
+      ids: new Set(pavilionEntities.map((entity) => entity.id)),
+      publicIdentifiers: new Set(pavilionEntities.map((entity) => (
+        entity.publicIdentifier.trim().toLocaleUpperCase('pt-BR')
+      ))),
+    };
+  }, [entities]);
+  const exteriorRenderedEntities = useMemo(() => renderedEntities.filter((entity) => {
+    if (entity.classification !== 'INTERNAL_STAND') return true;
+    if (entity.parentEntityId && commercialPavilionIdentity.ids.has(entity.parentEntityId)) {
+      return false;
+    }
+    const metadataPavilion = typeof entity.metadata.pavilionPublicIdentifier === 'string'
+      ? entity.metadata.pavilionPublicIdentifier.trim().toLocaleUpperCase('pt-BR')
+      : null;
+    if (metadataPavilion && commercialPavilionIdentity.publicIdentifiers.has(metadataPavilion)) {
+      return false;
+    }
+    const publicIdentifier = entity.publicIdentifier.trim().toLocaleUpperCase('pt-BR');
+    return ![...commercialPavilionIdentity.publicIdentifiers].some((pavilionIdentifier) => (
+      new RegExp(`^${pavilionIdentifier}-M\\d{3}$`).test(publicIdentifier)
+    ));
+  }), [commercialPavilionIdentity, renderedEntities]);
+  const selectedPavilionModuleState = useMemo(() => {
+    const pavilion = entities.find((entity) => entity.id === selectedEntityId);
+    if (!pavilion || resolveStrategicLandmarkKind(pavilion) !== 'commercial-pavilion') {
+      return new Map<string, CommercialPavilionModuleVisualState>();
+    }
+    return buildCommercialPavilionModuleVisualStateIndex(pavilion, entities, lots);
+  }, [entities, lots, selectedEntityId]);
+  const lotEntries = useMemo(() => exteriorRenderedEntities
     .map((entity) => ({ entity, lot: lotByEntity.get(entity.id) }))
-    .filter((entry): entry is LotEntry => Boolean(entry.lot)), [lotByEntity, renderedEntities]);
-  const nonLotEntities = useMemo(() => renderedEntities.filter((entity) => !lotByEntity.has(entity.id)), [lotByEntity, renderedEntities]);
+    .filter((entry): entry is LotEntry => Boolean(entry.lot)), [exteriorRenderedEntities, lotByEntity]);
+  const nonLotEntities = useMemo(() => exteriorRenderedEntities.filter((entity) => (
+    !lotByEntity.has(entity.id)
+  )), [exteriorRenderedEntities, lotByEntity]);
   const circulationEntities = useMemo(() => nonLotEntities.filter((entity) => (
     entity.classification === 'ROAD' || entity.classification === 'PEDESTRIAN_PATH'
   )), [nonLotEntities]);
@@ -1889,12 +1931,12 @@ function Scene({
   }, [entities, filtersActive, layerOpacity, layerVisibility, matchingEntityIds]);
   const activeSegmentEntities = useMemo(
     () => activeSegment
-      ? renderedEntities.filter((entity) => segmentByEntity.get(entity.id)?.id === activeSegment.id)
+      ? exteriorRenderedEntities.filter((entity) => segmentByEntity.get(entity.id)?.id === activeSegment.id)
       : [],
-    [activeSegment, renderedEntities, segmentByEntity],
+    [activeSegment, exteriorRenderedEntities, segmentByEntity],
   );
   const labelVisibility = useSemanticLabelVisibility({
-    entities: renderedEntities,
+    entities: exteriorRenderedEntities,
     lotByEntity,
     extent,
     labelsVisible,
@@ -1922,7 +1964,14 @@ function Scene({
   if (interiorEntity) {
     const interiorKind = resolveStrategicLandmarkKind(interiorEntity);
     if (interiorKind === 'commercial-pavilion') {
-      return <CommercialPavilionInteriorScene entity={interiorEntity} reducedGraphics={reducedGraphics} />;
+      return (
+        <CommercialPavilionInteriorScene
+          entity={interiorEntity}
+          entities={entities}
+          lots={lots}
+          reducedGraphics={reducedGraphics}
+        />
+      );
     }
     if (interiorKind === 'livestock-pavilion') {
       return <LivestockPavilionInteriorScene entity={interiorEntity} reducedGraphics={reducedGraphics} />;
@@ -2012,6 +2061,7 @@ function Scene({
           onFocus={focusSelection}
           onEnterInterior={enterInterior}
           onCursor={setCanvasCursor}
+          moduleStateById={selectedEntityId === entity.id ? selectedPavilionModuleState : undefined}
         />
       ))}
       {(arenaFrontInfrastructurePresentation.arenaStructures.visible
@@ -2026,11 +2076,11 @@ function Scene({
       )}
       <CommercialTreeLayer
         trees={presentedSceneTrees}
-        surfaceEntities={entities}
+        surfaceEntities={exteriorRenderedEntities}
         visible={treesVisible}
         reducedGraphics={reducedGraphics}
       />
-      {renderedEntities.filter((entity) => labelVisibility.ids.has(entity.id)).map((entity) => (
+      {exteriorRenderedEntities.filter((entity) => labelVisibility.ids.has(entity.id)).map((entity) => (
         <EntityLabel
           key={`label:${entity.id}`}
           entity={entity}
@@ -2046,7 +2096,7 @@ function Scene({
         && technicalValidationVisible
         && (
           <TechnicalValidationOverlay
-            entities={renderedEntities}
+            entities={exteriorRenderedEntities}
             lots={lots}
           />
         )}
