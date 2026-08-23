@@ -20,6 +20,7 @@ import {
 } from '../../utils/interaction';
 import { normalizeMapEntityMetadata, type MapLabelVisibility } from '../../utils/mapMetadata';
 import { selectCommercialTreesForScene } from '../../utils/treeLayer';
+import { selectCommercialElectricalInfrastructureForScene } from '../../utils/electricalInfrastructure';
 import {
   ARENA_FRONT_LAYOUT,
   shouldRenderArenaCourts,
@@ -61,6 +62,7 @@ import { RoadInfrastructure } from './RoadInfrastructure';
 import { StrategicLandmarkMesh } from './StrategicLandmarks';
 import { TechnicalValidationOverlay } from './TechnicalValidationOverlay';
 import { CommercialTreeLayer } from './CommercialTreeLayer';
+import { CommercialElectricalInfrastructureLayer } from './CommercialElectricalInfrastructureLayer';
 import { ArenaFrontInfrastructure } from './ArenaFrontInfrastructure';
 import {
   buildCommercialMapSegmentIndex,
@@ -186,11 +188,15 @@ function entityLabelHeight(entity: MapEntity) {
   );
 }
 
-function getSceneExtent(entities: MapEntity[]): SceneExtent {
-  let minX = entities.length > 0 ? Number.POSITIVE_INFINITY : -MAP_REFERENCE_WIDTH / 2;
-  let maxX = entities.length > 0 ? Number.NEGATIVE_INFINITY : MAP_REFERENCE_WIDTH / 2;
-  let minZ = entities.length > 0 ? Number.POSITIVE_INFINITY : -MAP_REFERENCE_HEIGHT / 2;
-  let maxZ = entities.length > 0 ? Number.NEGATIVE_INFINITY : MAP_REFERENCE_HEIGHT / 2;
+function getSceneExtent(
+  entities: MapEntity[],
+  supportPoints: readonly { position: readonly [number, number]; height?: number }[] = [],
+): SceneExtent {
+  const hasSpatialContent = entities.length > 0 || supportPoints.length > 0;
+  let minX = hasSpatialContent ? Number.POSITIVE_INFINITY : -MAP_REFERENCE_WIDTH / 2;
+  let maxX = hasSpatialContent ? Number.NEGATIVE_INFINITY : MAP_REFERENCE_WIDTH / 2;
+  let minZ = hasSpatialContent ? Number.POSITIVE_INFINITY : -MAP_REFERENCE_HEIGHT / 2;
+  let maxZ = hasSpatialContent ? Number.NEGATIVE_INFINITY : MAP_REFERENCE_HEIGHT / 2;
   let maxHeight = 1;
 
   entities.forEach((entity) => {
@@ -209,6 +215,15 @@ function getSceneExtent(entities: MapEntity[]): SceneExtent {
         + (strategicLandmarkVisualHeight(entity) ?? entity.geometry.extrusionHeight)
         + resolveMarkerPresentationLift(entity.classification),
     );
+  });
+
+  supportPoints.forEach(({ position: [x, z], height = 0 }) => {
+    if (!Number.isFinite(x) || !Number.isFinite(z)) return;
+    minX = Math.min(minX, x);
+    maxX = Math.max(maxX, x);
+    minZ = Math.min(minZ, z);
+    maxZ = Math.max(maxZ, z);
+    maxHeight = Math.max(maxHeight, height);
   });
 
   if (![minX, maxX, minZ, maxZ].every(Number.isFinite)) {
@@ -1805,7 +1820,14 @@ function Scene({
   const setCanvasCursor = useCallback((cursor: 'grab' | 'grabbing' | 'pointer') => {
     gl.domElement.style.cursor = cursor;
   }, [gl]);
-  const extent = useMemo(() => getSceneExtent(entities), [entities]);
+  const sceneElectricalInfrastructure = useMemo(
+    () => selectCommercialElectricalInfrastructureForScene(entities, lots),
+    [entities, lots],
+  );
+  const extent = useMemo(
+    () => getSceneExtent(entities, sceneElectricalInfrastructure.nodes),
+    [entities, sceneElectricalInfrastructure.nodes],
+  );
   const sceneCenter = useMemo(() => [extent.centerX, extent.centerZ] as const, [extent.centerX, extent.centerZ]);
   const lotByEntity = useMemo(() => new Map(lots.map((lot) => [lot.entityId, lot])), [lots]);
   const resolvedSegmentByEntity = useMemo(
@@ -2077,6 +2099,13 @@ function Scene({
       <CommercialTreeLayer
         trees={presentedSceneTrees}
         surfaceEntities={exteriorRenderedEntities}
+        visible={treesVisible}
+        reducedGraphics={reducedGraphics}
+      />
+      <CommercialElectricalInfrastructureLayer
+        nodes={sceneElectricalInfrastructure.nodes}
+        connections={sceneElectricalInfrastructure.connections}
+        surfaceEntities={entities}
         visible={treesVisible}
         reducedGraphics={reducedGraphics}
       />

@@ -38,6 +38,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { CLASSIFICATION_LABELS, STATUS_CONFIG } from '../../constants';
 import { useLotActivity, useLotContractVersions, useMapMutations } from '../../hooks/useCommercialMap';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
+import { selectCommercialElectricalInfrastructureForScene } from '../../utils/electricalInfrastructure';
 import { selectCommercialTreesForScene } from '../../utils/treeLayer';
 import { polygonAreaMapUnits } from '../../utils/geometry';
 import {
@@ -210,6 +211,22 @@ export function LayersPanel({
     return acc;
   }, {}), [entities]);
   const treeCount = useMemo(() => selectCommercialTreesForScene(entities, lots).length, [entities, lots]);
+  const electricalInfrastructure = useMemo(
+    () => selectCommercialElectricalInfrastructureForScene(entities, lots),
+    [entities, lots],
+  );
+  const poleCount = electricalInfrastructure.nodes.filter((node) => node.type === 'POLE').length;
+  const transformerCount = electricalInfrastructure.nodes.length - poleCount;
+  const environmentAssetSummary = [
+    treeCount > 0 ? `${treeCount} ${treeCount === 1 ? 'árvore' : 'árvores'}` : null,
+    poleCount > 0 ? `${poleCount} ${poleCount === 1 ? 'poste' : 'postes'}` : null,
+    transformerCount > 0
+      ? `${transformerCount} ${transformerCount === 1 ? 'transformador' : 'transformadores'}`
+      : null,
+    electricalInfrastructure.connections.length > 0
+      ? `${electricalInfrastructure.connections.length} ${electricalInfrastructure.connections.length === 1 ? 'trecho' : 'trechos'} de fiação aérea`
+      : null,
+  ].filter(Boolean).join(' · ');
 
   return (
     <aside className="commercial-map-panel commercial-map-layer-panel">
@@ -244,10 +261,17 @@ export function LayersPanel({
         </div>
         <div className="commercial-map-panel-section is-separated">
           <h3>Ambiente, referência e desempenho</h3>
-          {treeCount > 0 && (
+          {environmentAssetSummary && (
             <label className="commercial-map-setting-row">
-              <span><strong>Árvores</strong><small>{treeCount} posições interpretadas por satélite</small></span>
-              <Switch checked={treesVisible} onCheckedChange={setTreesVisible} aria-label="Árvores" />
+              <span>
+                <strong>Árvores e rede elétrica</strong>
+                <small>{environmentAssetSummary}</small>
+              </span>
+              <Switch
+                checked={treesVisible}
+                onCheckedChange={setTreesVisible}
+                aria-label="Árvores e rede elétrica"
+              />
             </label>
           )}
           <label className="commercial-map-setting-row">

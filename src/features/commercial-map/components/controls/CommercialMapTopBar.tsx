@@ -12,7 +12,6 @@ import {
 } from 'lucide-react';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { CAMERA_PRESETS } from '../../constants';
-import { COMMERCIAL_MAP_SEGMENT_IDS } from '../../data/commercialMapSegments';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import type { CameraPreset, MapPermissions } from '../../types';
 import type { CommercialMapAreaScope } from '../../utils/areaScope';
@@ -55,7 +54,6 @@ export function CommercialMapTopBar({
   const isExporural = areaScope === 'exporural';
   const canUseTechnicalValidation = !isCommissionScope
     && canUseTechnicalValidationOverlay(areaScope, permissions);
-  const hasTreeLayer = areaScope === 'park' || areaScope === COMMERCIAL_MAP_SEGMENT_IDS.industry;
   const presets: CameraPreset[] = isExporural
     ? ['exporural', 'top', 'isometric', 'quadra-r', 'quadra-s']
     : ['overview', 'top', 'isometric'];
@@ -106,10 +104,10 @@ export function CommercialMapTopBar({
         { active: activePanel === 'layers' },
       )}
 
-      {hasTreeLayer && renderAction(
-        'trees',
+      {renderAction(
+        'environment',
         Trees,
-        treesVisible ? 'Ocultar árvores' : 'Exibir árvores',
+        treesVisible ? 'Ocultar árvores e rede elétrica' : 'Exibir árvores e rede elétrica',
         () => setTreesVisible(!treesVisible),
         { active: treesVisible },
       )}
