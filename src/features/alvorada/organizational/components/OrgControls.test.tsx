@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import type { OrgNode } from '../types';
 import type { OrgSearchResult } from '../hooks/useOrgGraphInteraction';
-import { OrgSearch } from './OrgControls';
+import { OrgFilterBar, OrgSearch } from './OrgControls';
 
 function result(id: string, label: string, title: string): OrgSearchResult {
   const node: OrgNode = {
@@ -76,5 +76,49 @@ describe('OrgSearch combobox', () => {
     expect(combobox).toHaveAttribute('aria-expanded', 'false');
     expect(combobox).not.toHaveAttribute('aria-activedescendant');
     expect(screen.queryByRole('option')).not.toBeInTheDocument();
+  });
+
+  it('uses a decorative search icon without rendering a visual keyboard hint', () => {
+    const { container } = render(<SearchHarness onSelect={vi.fn()} />);
+    const search = container.querySelector('.org-search');
+
+    expect(search?.querySelectorAll('[data-org-search-icon]')).toHaveLength(1);
+    expect(search?.querySelector('kbd')).toBeNull();
+  });
+});
+
+describe('OrgFilterBar', () => {
+  it('presents uppercase CCPF filters with an icon and preserved accessible names', () => {
+    const onFilterChange = vi.fn();
+    const { container } = render(
+      <OrgFilterBar filter="ccp" onFilterChange={onFilterChange} />,
+    );
+    const filters = screen.getByRole('navigation', { name: /Filtrar níveis organizacionais/i });
+    const buttons = within(filters).getAllByRole('button');
+
+    expect(buttons.map((button) => button.getAttribute('aria-label'))).toEqual([
+      'TODO O ECOSSISTEMA',
+      'CCPF — CONSELHO CONSULTIVO PERMANENTE FENASOJA',
+      'PRESIDÊNCIA',
+      'COMISSÃO CENTRAL',
+      'COMISSÕES',
+      'ASSESSORIAS',
+    ]);
+    buttons.forEach((button) => {
+      expect(button.querySelectorAll('[data-org-filter-icon]')).toHaveLength(1);
+    });
+    expect(new Set(buttons.map((button) => (
+      button.querySelector('[data-org-filter-icon]')?.getAttribute('class')
+    ))).size).toBe(6);
+    expect(screen.getByRole('button', {
+      name: 'CCPF — CONSELHO CONSULTIVO PERMANENTE FENASOJA',
+    })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(container.querySelector('kbd')).toBeNull();
+
+    fireEvent.click(screen.getByRole('button', { name: 'ASSESSORIAS' }));
+    expect(onFilterChange).toHaveBeenCalledWith('advisory');
   });
 });

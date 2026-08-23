@@ -25,8 +25,8 @@ function createGraph(): OrganizationalGraph {
       id: 'root',
       type: 'ccp',
       authorityLevel: 1,
-      title: 'FENASOJA 2028',
-      subtitle: 'CCP',
+      title: 'CCPF',
+      subtitle: 'CCPF — CONSELHO CONSULTIVO PERMANENTE FENASOJA',
       childIds: ['president'],
     }),
     createNode({
@@ -34,6 +34,7 @@ function createGraph(): OrganizationalGraph {
       type: 'executive',
       authorityLevel: 2,
       title: 'Presidência',
+      subtitle: 'Presidente',
       personIds: ['person-ana'],
       parentIds: ['root'],
       childIds: ['central'],
@@ -193,6 +194,34 @@ function createGraph(): OrganizationalGraph {
   };
 }
 
+function createDenseGraph(): OrganizationalGraph {
+  const graph = createGraph();
+  const centralNode = graph.nodes.find((node) => node.id === 'central');
+  if (!centralNode) throw new Error('Central fixture missing');
+
+  Array.from({ length: 33 }, (_, index) => {
+    const id = `dense-operation-${index + 1}`;
+    graph.nodes.push(createNode({
+      id,
+      type: index % 6 === 0 ? 'advisory' : 'commission',
+      authorityLevel: 4,
+      title: `ESTRUTURA OPERACIONAL ${index + 1}`,
+      parentIds: ['central'],
+      sortOrder: index + 10,
+    }));
+    graph.renderableNodeIds.push(id);
+    centralNode.childIds.push(id);
+    graph.edges.push({
+      id: `central-${id}`,
+      sourceId: 'central',
+      targetId: id,
+      authorityLevel: 4,
+    });
+  });
+
+  return graph;
+}
+
 describe('OrganizationalEcosystem', () => {
   let resizeObserverCallback: ResizeObserverCallback;
 
@@ -231,6 +260,8 @@ describe('OrganizationalEcosystem', () => {
   });
 
   afterEach(() => {
+    vi.clearAllTimers();
+    vi.useRealTimers();
     vi.unstubAllGlobals();
   });
 
@@ -239,7 +270,7 @@ describe('OrganizationalEcosystem', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /Ana Silva/i }));
     const panel = screen.getByLabelText(/Detalhes de Ana Silva/i);
-    expect(within(panel).getByText('Presidente')).toBeInTheDocument();
+    expect(within(panel).getByText('PRESIDENTE', { selector: 'small' })).toBeInTheDocument();
 
     fireEvent.keyDown(within(panel).getByRole('button', { name: /Fechar detalhes/i }), {
       key: 'Escape',
@@ -304,15 +335,218 @@ describe('OrganizationalEcosystem', () => {
 
     const logisticsNode = screen.getByRole('button', { name: /Bruno Souza/i });
     const accessibleName = logisticsNode.getAttribute('aria-label') ?? '';
-    expect(accessibleName.match(/Bruno Souza/g)).toHaveLength(1);
-    expect(accessibleName.match(/Carla Ribeiro/g)).toHaveLength(1);
-    expect(accessibleName.match(/Equipe Operacional/g)).toHaveLength(1);
+    expect(accessibleName.match(/BRUNO SOUZA/g)).toHaveLength(1);
+    expect(accessibleName.match(/CARLA RIBEIRO/g)).toHaveLength(1);
+    expect(accessibleName.match(/EQUIPE OPERACIONAL/g)).toHaveLength(1);
 
     fireEvent.click(logisticsNode);
     const panel = screen.getByLabelText(/Detalhes de Comissão de Logística/i);
-    expect(within(panel).getByText('Corresponsável')).toBeInTheDocument();
-    expect(within(panel).getByText('Copresidência')).toBeInTheDocument();
-    expect(within(panel).getByText('Equipe de apoio')).toBeInTheDocument();
+    expect(within(panel).getByText('CORRESPONSÁVEL')).toBeInTheDocument();
+    expect(within(panel).getByText('COPRESIDÊNCIA')).toBeInTheDocument();
+    expect(within(panel).getByText('EQUIPE DE APOIO')).toBeInTheDocument();
+  });
+
+  it('uses the Fenasoja masthead and CCPF presentation without legacy labels or counters', () => {
+    const { container } = render(<OrganizationalEcosystem graph={createGraph()} active />);
+    const masthead = container.querySelector('.org-ecosystem__masthead');
+    if (!(masthead instanceof HTMLElement)) throw new Error('Masthead missing');
+
+    expect(within(masthead).getByRole('img', { name: 'Fenasoja 2028' })).toHaveClass(
+      'fenasoja-brand',
+      'org-ecosystem__brand',
+    );
+    expect(within(masthead).getByRole('heading', {
+      name: 'ECOSSISTEMA ORGANIZACIONAL',
+    })).toBeInTheDocument();
+    expect(masthead.querySelector('.org-ecosystem__title > p')).toBeNull();
+    expect(screen.getByRole('button', {
+      name: /^CCPF\. CCPF — CONSELHO CONSULTIVO PERMANENTE FENASOJA$/,
+    })).toBeInTheDocument();
+    expect(screen.getByText('01 CCPF')).toBeInTheDocument();
+    expect(screen.getByLabelText(
+      '01 CCPF — CONSELHO CONSULTIVO PERMANENTE FENASOJA',
+    )).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /BRUNO SOUZA/ }));
+    const presentationSurface = [
+      container.textContent ?? '',
+      ...Array.from(container.querySelectorAll('[aria-label]'), (element) => (
+        element.getAttribute('aria-label') ?? ''
+      )),
+    ].join(' ');
+    expect(presentationSurface).not.toMatch(/\b(?:AUTORIDADE|FLUXO|RESPONDE|CONECTA)\b/i);
+    expect(masthead.textContent).not.toMatch(/\d+\s+(?:ESTRUTURAS|CENTRAIS?|OPERACIONAIS)/i);
+  });
+
+  it('staggers nodes and connectors by hierarchy and stable order', () => {
+    const { container } = render(<OrganizationalEcosystem graph={createGraph()} active />);
+    const nodeDelays = (authorityLevel: number) => Array.from(
+      container.querySelectorAll<HTMLElement>(`.org-node[data-authority="${authorityLevel}"]`),
+      (element) => Number.parseInt(element.style.getPropertyValue('--org-node-delay'), 10),
+    );
+    const edgeDelays = (authorityLevel: number) => Array.from(
+      container.querySelectorAll<SVGGElement>(
+        `.org-relationship[data-target-authority="${authorityLevel}"]`,
+      ),
+      (element) => Number.parseInt(element.style.getPropertyValue('--org-edge-delay'), 10),
+    );
+
+    expect(nodeDelays(1)).toEqual([140]);
+    expect(nodeDelays(2)).toEqual([480]);
+    expect(nodeDelays(3)).toEqual([920]);
+    expect(nodeDelays(4).sort((left, right) => left - right)).toEqual([1120, 1142]);
+    expect(edgeDelays(2)).toEqual([360]);
+    expect(edgeDelays(3)).toEqual([760]);
+    expect(edgeDelays(4).sort((left, right) => left - right)).toEqual([980, 1002]);
+    expect(container.querySelectorAll('.org-relationship__reveal-glow')).toHaveLength(4);
+  });
+
+  it('performs the final fit after the complete cascade and keeps a dense graph above 45% at 1366x768', () => {
+    vi.useFakeTimers();
+    const view = render(
+      <OrganizationalEcosystem graph={createDenseGraph()} active />,
+    );
+
+    try {
+      act(() => {
+        resizeObserverCallback([{
+          contentRect: { width: 1366, height: 768 },
+        } as ResizeObserverEntry], {} as ResizeObserver);
+        vi.advanceTimersByTime(16);
+      });
+      const ready = view.container.querySelector('.org-ecosystem__ready');
+      if (!(ready instanceof HTMLElement)) throw new Error('Ready graph missing');
+      const narrativeScale = Number(ready.dataset.viewportScale);
+
+      expect(ready).toHaveAttribute('data-layout-width', '2192');
+      expect(ready).toHaveAttribute('data-layout-height', '1210');
+      expect(narrativeScale).toBeCloseTo(0.56, 3);
+      const denseEdgeDelays = Array.from(
+        view.container.querySelectorAll<SVGGElement>(
+          '.org-relationship[data-target-authority="4"]',
+        ),
+        (element) => Number.parseInt(element.style.getPropertyValue('--org-edge-delay'), 10),
+      );
+      expect(denseEdgeDelays).toHaveLength(35);
+      expect(Math.max(...denseEdgeDelays) + 760).toBeLessThan(2600);
+
+      act(() => vi.advanceTimersByTime(2583));
+      expect(Number(ready.dataset.viewportScale)).toBe(narrativeScale);
+
+      act(() => vi.advanceTimersByTime(1));
+      const finalScale = Number(ready.dataset.viewportScale);
+      expect(finalScale).toBeGreaterThan(0.45);
+      expect(finalScale).toBeLessThan(narrativeScale);
+      expect(ready).toHaveAttribute('data-camera-animating', 'true');
+    } finally {
+      act(() => {
+        view.unmount();
+        vi.clearAllTimers();
+      });
+      vi.useRealTimers();
+    }
+  });
+
+  it('cancels the pending final fit when focus enters the graph before 2600ms', () => {
+    vi.useFakeTimers();
+    const view = render(
+      <OrganizationalEcosystem graph={createDenseGraph()} active />,
+    );
+
+    try {
+      act(() => {
+        resizeObserverCallback([{
+          contentRect: { width: 1366, height: 768 },
+        } as ResizeObserverEntry], {} as ResizeObserver);
+        vi.advanceTimersByTime(16);
+      });
+      const ready = view.container.querySelector('.org-ecosystem__ready');
+      if (!(ready instanceof HTMLElement)) throw new Error('Ready graph missing');
+      const narrativeScale = Number(ready.dataset.viewportScale);
+
+      act(() => screen.getByRole('combobox', { name: /BUSCAR PESSOA/i }).focus());
+      act(() => vi.advanceTimersByTime(3000));
+
+      expect(Number(ready.dataset.viewportScale)).toBe(narrativeScale);
+      expect(ready).not.toHaveAttribute('data-camera-animating');
+    } finally {
+      view.unmount();
+    }
+  });
+
+  it('continues zoom from the rendered camera when a transition is interrupted', () => {
+    vi.useFakeTimers();
+    const view = render(
+      <OrganizationalEcosystem graph={createDenseGraph()} active />,
+    );
+
+    try {
+      act(() => {
+        resizeObserverCallback([{
+          contentRect: { width: 1366, height: 768 },
+        } as ResizeObserverEntry], {} as ResizeObserver);
+        vi.advanceTimersByTime(16);
+        vi.advanceTimersByTime(2584);
+      });
+      const ready = view.container.querySelector('.org-ecosystem__ready');
+      const world = view.container.querySelector('.org-viewport__world');
+      if (!(ready instanceof HTMLElement) || !(world instanceof HTMLElement)) {
+        throw new Error('Viewport fixture missing');
+      }
+      const originalGetComputedStyle = window.getComputedStyle;
+      const styleSpy = vi.spyOn(window, 'getComputedStyle').mockImplementation((element) => {
+        const style = originalGetComputedStyle(element);
+        if (element !== world) return style;
+        return new Proxy(style, {
+          get(target, property, receiver) {
+            if (property === 'transform') return 'matrix(0.5, 0, 0, 0.5, 100, 120)';
+            return Reflect.get(target, property, receiver);
+          },
+        });
+      });
+
+      try {
+        fireEvent.click(screen.getByRole('button', { name: /Aumentar zoom/i }));
+        expect(Number(ready.dataset.viewportScale)).toBeCloseTo(0.6, 3);
+      } finally {
+        styleSpy.mockRestore();
+      }
+    } finally {
+      view.unmount();
+    }
+  });
+
+  it('cancels the pending final fit when the user changes zoom before 2600ms', () => {
+    vi.useFakeTimers();
+    const view = render(
+      <OrganizationalEcosystem graph={createDenseGraph()} active />,
+    );
+
+    try {
+      act(() => {
+        resizeObserverCallback([{
+          contentRect: { width: 1366, height: 768 },
+        } as ResizeObserverEntry], {} as ResizeObserver);
+        vi.advanceTimersByTime(16);
+      });
+      const ready = view.container.querySelector('.org-ecosystem__ready');
+      if (!(ready instanceof HTMLElement)) throw new Error('Ready graph missing');
+      const narrativeScale = Number(ready.dataset.viewportScale);
+
+      fireEvent.click(screen.getByRole('button', { name: /Aumentar zoom/i }));
+      const interactedScale = Number(ready.dataset.viewportScale);
+      expect(interactedScale).toBeGreaterThan(narrativeScale);
+
+      act(() => vi.advanceTimersByTime(3000));
+      expect(Number(ready.dataset.viewportScale)).toBe(interactedScale);
+      expect(ready).not.toHaveAttribute('data-camera-animating');
+    } finally {
+      act(() => {
+        view.unmount();
+        vi.clearAllTimers();
+      });
+      vi.useRealTimers();
+    }
   });
 
   it('clears selection and keyboard eligibility when a filter hides the active node', () => {
@@ -329,7 +563,9 @@ describe('OrganizationalEcosystem', () => {
     fireEvent.click(logisticsNode);
     expect(screen.getByLabelText(/Detalhes de Comissão de Logística/i)).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: /^CCP$/i }));
+    fireEvent.click(screen.getByRole('button', {
+      name: /^CCPF — CONSELHO CONSULTIVO PERMANENTE FENASOJA$/i,
+    }));
 
     expect(screen.queryByLabelText(/Detalhes de Comissão de Logística/i)).not.toBeInTheDocument();
     expect(logisticsNode).toBeDisabled();
@@ -464,7 +700,8 @@ describe('OrganizationalEcosystem', () => {
       id: 'root',
       type: 'ccp',
       authorityLevel: 1,
-      title: 'FENASOJA 2028',
+      title: 'CCPF',
+      subtitle: 'CCPF — CONSELHO CONSULTIVO PERMANENTE FENASOJA',
     })];
     graph.edges = [];
     graph.renderableNodeIds = ['root'];

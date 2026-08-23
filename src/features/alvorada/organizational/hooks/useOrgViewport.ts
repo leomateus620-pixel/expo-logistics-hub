@@ -84,9 +84,9 @@ function pointerCenter(a: PointerSnapshot, b: PointerSnapshot): PointerSnapshot 
 
 function cameraForBounds(bounds: OrgLayoutBounds, size: ViewportSize): OrgViewportCamera {
   const isCompact = size.width <= 720;
-  const horizontalPadding = isCompact ? 28 : 86;
-  const topPadding = isCompact ? 172 : 170;
-  const bottomPadding = isCompact ? 70 : 66;
+  const horizontalPadding = isCompact ? 20 : 64;
+  const topPadding = isCompact ? 166 : 142;
+  const bottomPadding = isCompact ? 62 : 50;
   const usableWidth = Math.max(1, size.width - horizontalPadding * 2);
   const usableHeight = Math.max(1, size.height - topPadding - bottomPadding);
   const scale = clamp(
@@ -111,8 +111,8 @@ function cameraForInitialFocus(
   if (!focusPoint) return fitted;
 
   const compact = size.width <= 720;
-  const minimumNarrativeScale = compact ? 0.55 : size.width <= 1600 ? 0.58 : 0.62;
-  const scale = clamp(Math.max(fitted.scale, minimumNarrativeScale), MIN_SCALE, 0.82);
+  const minimumNarrativeScale = compact ? 0.54 : size.width <= 1600 ? 0.56 : 0.6;
+  const scale = clamp(Math.max(fitted.scale, minimumNarrativeScale), MIN_SCALE, 0.78);
   const focusY = compact
     ? clamp(size.height * 0.29, 235, 285)
     : clamp(size.height * 0.26, 230, 280);
@@ -151,6 +151,41 @@ function releasePointer(element: HTMLDivElement, pointerId: number): void {
   element.releasePointerCapture(pointerId);
 }
 
+function cameraFromRenderedTransform(
+  transform: string,
+  fallback: OrgViewportCamera,
+): OrgViewportCamera {
+  if (!transform || transform === 'none') return fallback;
+
+  const direct = transform.match(
+    /^translate3d\(\s*(-?[\d.]+)px,\s*(-?[\d.]+)px,\s*-?[\d.]+px\s*\)\s*scale\(\s*([\d.]+)\s*\)$/,
+  );
+  if (direct) {
+    const [, x, y, scale] = direct;
+    return { x: Number(x), y: Number(y), scale: Number(scale) };
+  }
+
+  const valueStart = transform.indexOf('(');
+  const values = valueStart >= 0
+    ? transform.slice(valueStart + 1, -1).split(',').map((value) => Number(value.trim()))
+    : [];
+  if (transform.startsWith('matrix3d(') && values.length === 16) {
+    return {
+      x: values[12],
+      y: values[13],
+      scale: Math.hypot(values[0], values[1]),
+    };
+  }
+  if (transform.startsWith('matrix(') && values.length === 6) {
+    return {
+      x: values[4],
+      y: values[5],
+      scale: Math.hypot(values[0], values[1]),
+    };
+  }
+  return fallback;
+}
+
 export function useOrgViewport({
   bounds,
   initialFocusPoint,
@@ -165,6 +200,7 @@ export function useOrgViewport({
   const pointers = useRef(new Map<number, PointerSnapshot>());
   const gesture = useRef<GestureSnapshot | null>(null);
   const transitionTimer = useRef<number | null>(null);
+  const animationActive = useRef(false);
   const cameraFrame = useRef<number | null>(null);
   const clickSuppressionFrame = useRef<number | null>(null);
   const pendingCamera = useRef<OrgViewportCamera | null>(null);
@@ -186,17 +222,29 @@ export function useOrgViewport({
   }, [commitCamera]);
 
   const stopAnimation = useCallback(() => {
+    if (animationActive.current) {
+      const world = viewportRef.current?.querySelector<HTMLElement>('.org-viewport__world');
+      if (world) {
+        commitCamera(cameraFromRenderedTransform(
+          window.getComputedStyle(world).transform,
+          cameraRef.current,
+        ));
+      }
+    }
     if (transitionTimer.current !== null) window.clearTimeout(transitionTimer.current);
     transitionTimer.current = null;
+    animationActive.current = false;
     setIsAnimating(false);
-  }, []);
+  }, [commitCamera]);
 
   const animateCamera = useCallback((next: OrgViewportCamera) => {
     stopAnimation();
+    animationActive.current = true;
     setIsAnimating(true);
     commitCamera(next);
     transitionTimer.current = window.setTimeout(() => {
       transitionTimer.current = null;
+      animationActive.current = false;
       setIsAnimating(false);
     }, CAMERA_TRANSITION_MS);
   }, [commitCamera, stopAnimation]);

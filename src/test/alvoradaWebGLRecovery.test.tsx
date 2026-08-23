@@ -66,9 +66,9 @@ function interactiveOrgGraph(): OrganizationalGraph {
       'person:fabiano': {
         id: 'person:fabiano',
         userId: 'fabiano-user',
-        fullName: 'Fabiano Soltis',
+        fullName: 'FABIANO SOLTIS',
         avatarUrl: null,
-        roles: ['Presidente'],
+        roles: ['PRESIDENTE'],
         highestAuthorityLevel: 2,
         sourceIds: ['fabiano-user'],
       },
@@ -78,8 +78,8 @@ function interactiveOrgGraph(): OrganizationalGraph {
         id: 'org:ccp',
         type: 'ccp',
         authorityLevel: 1,
-        title: 'FENASOJA 2028',
-        subtitle: 'CCP',
+        title: 'CCPF',
+        subtitle: 'CCPF — CONSELHO CONSULTIVO PERMANENTE FENASOJA',
         personIds: [],
         parentIds: [],
         childIds: ['executive:fabiano'],
@@ -94,8 +94,8 @@ function interactiveOrgGraph(): OrganizationalGraph {
         id: 'executive:fabiano',
         type: 'executive',
         authorityLevel: 2,
-        title: 'Fabiano Soltis',
-        subtitle: 'Presidente',
+        title: 'FABIANO SOLTIS',
+        subtitle: 'PRESIDENTE',
         personIds: ['person:fabiano'],
         parentIds: ['org:ccp'],
         childIds: [],
@@ -659,17 +659,20 @@ describe('recuperação WebGL da experiência Alvorada', () => {
     advance(16);
 
     const close = screen.getByRole('button', { name: 'Fechar O Nascer da Alvorada' });
-    const search = screen.getByRole('combobox', { name: 'Buscar pessoa, comissão ou assessoria' });
+    const search = screen.getByRole('combobox', { name: 'BUSCAR PESSOA, COMISSÃO OU ASSESSORIA' });
     act(() => close.focus());
     fireEvent.keyDown(close, { key: 'Tab' });
     expect(search).toHaveFocus();
     fireEvent.keyDown(search, { key: 'Tab', shiftKey: true });
     expect(close).toHaveFocus();
 
-    const rootNode = screen.getByRole('button', { name: /Autoridade 01.*CCP/i });
+    const rootNode = screen.getByRole('button', {
+      name: /^CCPF\. CCPF — CONSELHO CONSULTIVO PERMANENTE FENASOJA$/,
+    });
+    expect(rootNode).not.toHaveAccessibleName(/AUTORIDADE/i);
     act(() => rootNode.focus());
     fireEvent.click(rootNode);
-    expect(screen.getByRole('complementary', { name: /Detalhes de FENASOJA 2028/i })).toBeVisible();
+    expect(screen.getByRole('complementary', { name: /DETALHES DE CCPF/ })).toBeVisible();
     fireEvent.keyDown(rootNode, { key: 'Escape' });
     expect(screen.queryByRole('complementary')).not.toBeInTheDocument();
     expect(screen.getByRole('dialog', { name: 'O Nascer da Alvorada' })).toBeInTheDocument();

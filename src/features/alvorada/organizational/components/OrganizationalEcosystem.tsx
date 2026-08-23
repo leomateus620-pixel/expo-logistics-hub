@@ -6,7 +6,9 @@ import {
   type KeyboardEvent,
   type RefCallback,
 } from 'react';
-import { AlertTriangle, Network, Sparkles } from 'lucide-react';
+import { AlertTriangle, Network } from 'lucide-react';
+import { FenasojaBrand } from '@/components/brand/FenasojaBrand';
+import { CCPF_FULL_LABEL } from '../resolver';
 import type { OrganizationalGraph, OrgNode } from '../types';
 import {
   calculateOrganizationalLayout,
@@ -15,6 +17,7 @@ import {
 } from '../layout/organizationalLayout';
 import {
   useOrgGraphInteraction,
+  type OrgGraphFilter,
   type OrgSearchResult,
 } from '../hooks/useOrgGraphInteraction';
 import { useOrgPerformanceTelemetry } from '../hooks/useOrgPerformanceTelemetry';
@@ -47,6 +50,8 @@ const ARROW_DIRECTIONS: Partial<Record<string, OrgNavigationDirection>> = {
   ArrowDown: 'down',
   ArrowLeft: 'left',
 };
+
+const FINAL_FIT_DELAY_MS = 2600;
 
 function hasRenderableOrganization(graph: OrganizationalGraph | null): graph is OrganizationalGraph {
   if (!graph) return false;
@@ -87,6 +92,7 @@ function GraphReady({
     clearSelection,
     selectNode: commitSelection,
     selectedNodeId,
+    setFilter,
     setHoveredNodeId,
     setKeyboardNodeId,
     setQuery,
@@ -95,6 +101,12 @@ function GraphReady({
   const nodeElements = useRef(new Map<string, HTMLButtonElement>());
   const nodeRefCallbacks = useRef(new Map<string, RefCallback<HTMLButtonElement>>());
   const fitGraph = useRef<() => void>(() => undefined);
+  const finalFitTimer = useRef<number | null>(null);
+  const cancelFinalFit = useCallback(() => {
+    if (finalFitTimer.current === null) return;
+    window.clearTimeout(finalFitTimer.current);
+    finalFitTimer.current = null;
+  }, []);
   const handleBackgroundPress = useCallback(() => {
     clearSelection();
     fitGraph.current();
@@ -104,8 +116,18 @@ function GraphReady({
     initialFocusPoint: layout.nodeById.get(graph.rootNodeId),
     onBackgroundPress: handleBackgroundPress,
   });
-  const { camera, focusPoint } = viewport;
-  fitGraph.current = viewport.fit;
+  const { camera, fit: fitViewport, focusPoint } = viewport;
+  fitGraph.current = fitViewport;
+
+  useEffect(() => {
+    cancelFinalFit();
+    if (!active || layout.nodes.length === 0) return undefined;
+    finalFitTimer.current = window.setTimeout(() => {
+      finalFitTimer.current = null;
+      fitViewport();
+    }, FINAL_FIT_DELAY_MS);
+    return cancelFinalFit;
+  }, [active, cancelFinalFit, fitViewport, layout.nodes.length]);
 
   const getNodeRef = useCallback((nodeId: string): RefCallback<HTMLButtonElement> => {
     const known = nodeRefCallbacks.current.get(nodeId);
@@ -124,9 +146,10 @@ function GraphReady({
   }, [focusPoint, layout.nodeById]);
 
   const selectNode = useCallback((nodeId: string) => {
+    cancelFinalFit();
     commitSelection(nodeId);
     focusNode(nodeId);
-  }, [commitSelection, focusNode]);
+  }, [cancelFinalFit, commitSelection, focusNode]);
 
   const closeDetails = useCallback(() => {
     const nodeId = selectedNodeId;
@@ -138,9 +161,10 @@ function GraphReady({
   }, [clearSelection, selectedNodeId]);
 
   const handleNodeFocus = useCallback((nodeId: string) => {
+    cancelFinalFit();
     setKeyboardNodeId(nodeId);
     setHoveredNodeId(nodeId);
-  }, [setHoveredNodeId, setKeyboardNodeId]);
+  }, [cancelFinalFit, setHoveredNodeId, setKeyboardNodeId]);
 
   const handleNodeBlur = useCallback((nodeId: string) => {
     setHoveredNodeId((current) => current === nodeId ? null : current);
@@ -152,6 +176,7 @@ function GraphReady({
   ) => {
     const direction = ARROW_DIRECTIONS[event.key];
     if (direction) {
+      cancelFinalFit();
       event.preventDefault();
       let candidate = findDirectionalNode(layout, currentNodeId, direction);
       const visited = new Set<string>();
@@ -171,6 +196,7 @@ function GraphReady({
     }
 
     if (event.key === 'Home') {
+      cancelFinalFit();
       event.preventDefault();
       const rootId = graph.rootNodeId || layout.nodes[0]?.node.id;
       if (!rootId) return;
@@ -187,6 +213,7 @@ function GraphReady({
     }
   }, [
     closeDetails,
+    cancelFinalFit,
     focusNode,
     graph.rootNodeId,
     layout,
@@ -197,12 +224,23 @@ function GraphReady({
   ]);
 
   const handleSearchResult = useCallback((result: OrgSearchResult) => {
+    cancelFinalFit();
     setQuery('');
     commitSelection(result.id);
     setKeyboardNodeId(result.id);
     focusNode(result.id, 0.94);
     window.requestAnimationFrame(() => nodeElements.current.get(result.id)?.focus({ preventScroll: true }));
-  }, [commitSelection, focusNode, setKeyboardNodeId, setQuery]);
+  }, [cancelFinalFit, commitSelection, focusNode, setKeyboardNodeId, setQuery]);
+
+  const handleQueryChange = useCallback((value: string) => {
+    cancelFinalFit();
+    setQuery(value);
+  }, [cancelFinalFit, setQuery]);
+
+  const handleFilterChange = useCallback((filter: OrgGraphFilter) => {
+    cancelFinalFit();
+    setFilter(filter);
+  }, [cancelFinalFit, setFilter]);
 
   useEffect(() => {
     if (!active || layout.nodes.length === 0) return undefined;
@@ -210,11 +248,10 @@ function GraphReady({
     return () => window.cancelAnimationFrame(readyFrame);
   }, [active, layout.nodes.length, onReady]);
 
-  const authorityCounts = useMemo(() => ({
-    central: layout.nodes.filter((item) => item.node.authorityLevel === 3).length,
-    operational: layout.nodes.filter((item) => item.node.authorityLevel === 4).length,
-    warnings: graph.anomalies.filter((item) => item.severity === 'warning').length,
-  }), [graph.anomalies, layout.nodes]);
+  const integrityWarningCount = useMemo(
+    () => graph.anomalies.filter((item) => item.severity === 'warning').length,
+    [graph.anomalies],
+  );
 
   return (
     <div
@@ -223,11 +260,17 @@ function GraphReady({
       data-active={active || undefined}
       data-camera-animating={viewport.isAnimating || undefined}
       data-camera-interacting={viewport.isInteracting || undefined}
-      data-integrity-info-count={graph.anomalies.length - authorityCounts.warnings}
-      data-integrity-warning-count={authorityCounts.warnings}
+      data-integrity-info-count={graph.anomalies.length - integrityWarningCount}
+      data-integrity-warning-count={integrityWarningCount}
+      data-layout-height={layout.bounds.height}
+      data-layout-width={layout.bounds.width}
+      data-viewport-scale={camera.scale.toFixed(3)}
       data-org-detail-open={interaction.selectedNode ? 'true' : undefined}
       aria-hidden={!active}
+      onFocusCapture={cancelFinalFit}
+      onPointerDownCapture={cancelFinalFit}
       onKeyDownCapture={(event) => {
+        cancelFinalFit();
         if (event.key !== 'Escape' || !interaction.selectedNode) return;
         event.preventDefault();
         event.stopPropagation();
@@ -236,33 +279,40 @@ function GraphReady({
     >
       <header className="org-ecosystem__masthead" data-org-interactive>
         <div className="org-ecosystem__title">
-          <span><Sparkles aria-hidden="true" /> FENASOJA 2028</span>
-          <h1>Ecossistema organizacional</h1>
-          <p>
-            {layout.nodes.length} estruturas · {authorityCounts.central} {authorityCounts.central === 1 ? 'central' : 'centrais'} · {authorityCounts.operational} operacionais
-          </p>
+          <FenasojaBrand
+            className="org-ecosystem__brand"
+            compact
+            tone="dark"
+          />
+          <h1>ECOSSISTEMA ORGANIZACIONAL</h1>
         </div>
         <OrgSearch
           query={interaction.query}
           results={interaction.searchResults}
-          onQueryChange={interaction.setQuery}
+          onQueryChange={handleQueryChange}
           onResultSelect={handleSearchResult}
         />
       </header>
 
-      <OrgFilterBar filter={interaction.filter} onFilterChange={interaction.setFilter} />
+      <OrgFilterBar filter={interaction.filter} onFilterChange={handleFilterChange} />
 
       <div
         ref={viewport.viewportRef}
         className="org-viewport"
         role="group"
-        aria-label="Mapa interativo da organização FENASOJA 2028"
+        aria-label="MAPA INTERATIVO DA ORGANIZAÇÃO FENASOJA 2028"
         aria-describedby="org-viewport-instructions"
         onPointerCancel={viewport.onPointerCancel}
-        onPointerDown={viewport.onPointerDown}
+        onPointerDown={(event) => {
+          cancelFinalFit();
+          viewport.onPointerDown(event);
+        }}
         onPointerMove={viewport.onPointerMove}
         onPointerUp={viewport.onPointerUp}
-        onWheel={viewport.onWheel}
+        onWheel={(event) => {
+          cancelFinalFit();
+          viewport.onWheel(event);
+        }}
       >
         <div
           className="org-viewport__world"
@@ -308,25 +358,37 @@ function GraphReady({
 
       <p id="org-viewport-instructions" className="sr-only">
         Arraste para navegar, use a roda ou o gesto de pinça para ampliar. Com o teclado,
-        use as setas para percorrer as estruturas, Enter para selecionar e Home para retornar ao CCP.
+        use as setas para percorrer as estruturas, Enter para selecionar e Home para retornar ao CCPF.
       </p>
 
-      <div className="org-authority-legend" aria-label="Legenda de autoridade" data-org-interactive>
-        <span><i data-level="1" />01 CCP</span>
-        <span><i data-level="2" />02 Presidência</span>
-        <span><i data-level="3" />03 Central</span>
-        <span><i data-level="4" />04 Comissões e Assessorias</span>
+      <div className="org-level-legend" aria-label="LEGENDA DOS NÍVEIS ORGANIZACIONAIS" data-org-interactive>
+        <span aria-label={`01 ${CCPF_FULL_LABEL}`} title={CCPF_FULL_LABEL}>
+          <i data-level="1" />01 CCPF
+        </span>
+        <span><i data-level="2" />02 PRESIDÊNCIA</span>
+        <span><i data-level="3" />03 COMISSÃO CENTRAL</span>
+        <span><i data-level="4" />04 COMISSÕES E ASSESSORIAS</span>
       </div>
 
       <OrgViewportControls
         scale={viewport.camera.scale}
         selected={Boolean(interaction.selectedNode)}
-        onFit={viewport.fit}
+        onFit={() => {
+          cancelFinalFit();
+          fitViewport();
+        }}
         onFocusSelected={() => {
+          cancelFinalFit();
           if (selectedNodeId) focusNode(selectedNodeId);
         }}
-        onZoomIn={() => viewport.zoomBy(1.2)}
-        onZoomOut={() => viewport.zoomBy(1 / 1.2)}
+        onZoomIn={() => {
+          cancelFinalFit();
+          viewport.zoomBy(1.2);
+        }}
+        onZoomOut={() => {
+          cancelFinalFit();
+          viewport.zoomBy(1 / 1.2);
+        }}
       />
 
       {interaction.selectedNode && (
@@ -352,7 +414,7 @@ function LoadingState() {
       <span className="org-ecosystem__loading-network" aria-hidden="true">
         <i /><i /><i /><i /><i />
       </span>
-      <strong>Conectando o ecossistema</strong>
+      <strong>CARREGANDO O ECOSSISTEMA</strong>
       <span>Validando vínculos e retratos institucionais</span>
     </div>
   );

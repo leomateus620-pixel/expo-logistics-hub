@@ -32,12 +32,16 @@ type NodeStyle = CSSProperties & {
   '--org-node-y': string;
 };
 
-const AUTHORITY_LABELS: Record<number, string> = {
-  1: 'Autoridade 01 · CCP',
-  2: 'Autoridade 02 · Presidência',
-  3: 'Autoridade 03 · Comissão Central',
-  4: 'Autoridade 04',
-};
+function presentationText(value: string): string {
+  return value.toLocaleUpperCase('pt-BR');
+}
+
+function arrivalDelay(authorityLevel: number, levelOrder: number): number {
+  if (authorityLevel === 1) return 140;
+  if (authorityLevel === 2) return Math.min(680, 480 + levelOrder * 160);
+  if (authorityLevel === 3) return 920;
+  return Math.min(1880, 1120 + levelOrder * 22);
+}
 
 function normalizedIdentity(value: string): string {
   return value
@@ -106,7 +110,7 @@ function OrganizationalNodeComponent({
   onKeyDown,
   onSelect,
 }: OrganizationalNodeProps) {
-  const { node, order, x, y } = position;
+  const { node, levelOrder, x, y } = position;
   const peopleForNode = node.personIds
     .map((personId) => people[personId])
     .filter((person): person is OrgPerson => Boolean(person));
@@ -116,25 +120,36 @@ function OrganizationalNodeComponent({
   const names = uniqueNames([
     ...peopleForNode.map((person) => person.fullName),
     ...responsibilityNames,
-  ]);
+  ]).map(presentationText);
   const primaryName = names[0] ?? node.title;
   const isRoot = node.type === 'ccp';
-  const additionalCount = isRoot ? names.length : Math.max(0, names.length - 1);
+  const isCentral = node.type === 'central-commission';
+  const additionalCount = isRoot
+    ? names.length
+    : isCentral
+      ? 0
+      : Math.max(0, names.length - 1);
   const isCluster = node.type === 'central-commission' || peopleForNode.length > 1;
-  const primaryLabel = isRoot ? 'FENASOJA 2028' : primaryName;
+  const primaryLabel = presentationText(
+    isRoot || isCentral ? node.title : primaryName,
+  );
   const organizationLabel = isRoot
-    ? (node.subtitle ?? 'CCP')
+    ? (node.subtitle ?? 'CCPF')
     : node.type === 'executive'
-      ? (node.subtitle ?? 'Presidência')
-      : node.title;
+      ? (node.subtitle ?? 'PRESIDÊNCIA')
+      : isCentral
+        ? (node.subtitle ?? node.title)
+        : names.length > 0
+          ? node.title
+          : (node.subtitle ?? node.title);
+  const presentedOrganizationLabel = presentationText(organizationLabel);
   const ariaDescription = [
-    AUTHORITY_LABELS[node.authorityLevel] ?? `Autoridade ${node.authorityLevel}`,
     primaryLabel,
-    organizationLabel !== primaryLabel ? organizationLabel : null,
+    presentedOrganizationLabel !== primaryLabel ? presentedOrganizationLabel : null,
     names.filter((name) => name !== primaryLabel).join(', '),
   ].filter(Boolean).join('. ');
   const nodeStyle: NodeStyle = {
-    '--org-node-delay': `${Math.min(1760, 180 + order * 74)}ms`,
+    '--org-node-delay': `${arrivalDelay(node.authorityLevel, levelOrder)}ms`,
     '--org-node-x': `${x}px`,
     '--org-node-y': `${y}px`,
   };
@@ -209,16 +224,13 @@ function OrganizationalNodeComponent({
         </span>
 
         <span className="org-node__copy">
-          <span className="org-node__authority">
-            {AUTHORITY_LABELS[node.authorityLevel] ?? `Autoridade ${node.authorityLevel}`}
-          </span>
           <span className="org-node__name">{primaryLabel}</span>
           {additionalCount > 0 && (
             <span className="org-node__additional">
-              {isRoot ? `${additionalCount} integrantes` : `+${additionalCount} responsáveis`}
+              {isRoot ? `${additionalCount} INTEGRANTES` : `+${additionalCount} RESPONSÁVEIS`}
             </span>
           )}
-          <span className="org-node__organization">{organizationLabel}</span>
+          <span className="org-node__organization">{presentedOrganizationLabel}</span>
         </span>
       </button>
     </article>
