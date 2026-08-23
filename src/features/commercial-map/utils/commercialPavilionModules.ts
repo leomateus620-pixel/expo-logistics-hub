@@ -1,5 +1,11 @@
 import type { MapEntity } from '../types';
 import {
+  PAVILION3_COMMERCIAL_REFERENCE,
+  type Pavilion3CommercialModuleOrientation,
+  type Pavilion3CommercialModuleSource,
+  type Pavilion3CommercialSequenceOrientation,
+} from '../data/pavilion3CommercialReference';
+import {
   COMMERCIAL_PAVILION_PUBLIC_IDENTIFIERS,
   type CommercialPavilionPublicIdentifier,
 } from './commercialPavilions';
@@ -62,6 +68,17 @@ export interface CommercialPavilionModuleCell
   number: number;
   label: string;
   zoneId: string;
+  pavilionId?: CommercialPavilionPublicIdentifier;
+  lotNumber?: string;
+  orientation?: Pavilion3CommercialModuleOrientation;
+  sequenceOrientation?: Pavilion3CommercialSequenceOrientation;
+  labelAnchor?: readonly [x: number, z: number];
+  type?: 'commercial-lot';
+  areaM2?: number | null;
+  sortOrder?: number;
+  group?: string | null;
+  cluster?: string;
+  source?: Pavilion3CommercialModuleSource;
 }
 
 export interface CommercialPavilionModuleZone {
@@ -95,7 +112,7 @@ export interface CommercialPavilionModulePlan {
   source: {
     document: 'Fenasoja - Planta Pavilhões Internos.pdf';
     page: 1;
-    interpretation: 'normalized-module-grid';
+    interpretation: 'normalized-module-grid' | 'official-reference-runs';
   };
 }
 
@@ -274,8 +291,13 @@ function buildPlan(seed: CommercialPavilionModulePlanSeed): CommercialPavilionMo
   };
 }
 
+type GeneratedCommercialPavilionPublicIdentifier = Exclude<
+  CommercialPavilionPublicIdentifier,
+  'B6'
+>;
+
 const PLAN_SEEDS: Readonly<
-  Record<CommercialPavilionPublicIdentifier, CommercialPavilionModulePlanSeed>
+  Record<GeneratedCommercialPavilionPublicIdentifier, CommercialPavilionModulePlanSeed>
 > = {
   B1: {
     publicIdentifier: 'B1',
@@ -401,33 +423,6 @@ const PLAN_SEEDS: Readonly<
       corridor('south-crossing', 'Travessia sul', 'cross', rect(0.58, 0.88, 0.56, 0.06)),
     ],
   },
-  B6: {
-    publicIdentifier: 'B6',
-    topology: 'side-runs-twin-islands',
-    colorCue: '#13CFAC',
-    stats: {
-      pavilionNumber: 3,
-      category: 'Comércio',
-      moduleCount: 214,
-      totalAreaSquareMeters: 1423,
-      moduleAreaSquareMeters: 663,
-    },
-    boundary: OFFICIAL_BOUNDARY,
-    zones: [
-      zone('west-run', 'Ala oeste · 01–36', 'perimeter', rect(0.06, 0.48, 0.07, 0.84), 36, 1, 'column-major'),
-      zone('south-return', 'Retorno sul · 37–47', 'perimeter', rect(0.18, 0.92, 0.2, 0.09), 1, 11, 'row-major'),
-      zone('west-island', 'Ilha esquerda · 48–111', 'island', rect(0.36, 0.5, 0.26, 0.68), 8, 8),
-      zone('east-island', 'Ilha direita · 112–175', 'island', rect(0.67, 0.5, 0.26, 0.68), 8, 8),
-      zone('east-run', 'Ala leste · 176–214', 'perimeter', rect(0.94, 0.48, 0.07, 0.84), 39, 1, 'column-major'),
-    ],
-    corridors: [
-      corridor('west-spine', 'Eixo oeste', 'main', rect(0.18, 0.455, 0.08, 0.79)),
-      corridor('central-spine', 'Eixo central', 'main', rect(0.515, 0.5, 0.05, 0.68)),
-      corridor('east-spine', 'Eixo leste', 'main', rect(0.84, 0.48, 0.08, 0.84)),
-      corridor('north-crossing', 'Travessia norte', 'cross', rect(0.52, 0.12, 0.58, 0.08)),
-      corridor('south-crossing', 'Travessia sul', 'cross', rect(0.58, 0.88, 0.5, 0.06)),
-    ],
-  },
   B8: {
     publicIdentifier: 'B8',
     topology: 'horticulture-u-gallery',
@@ -481,10 +476,53 @@ const PLAN_SEEDS: Readonly<
   },
 };
 
+function buildPavilion3CommercialPlan(): CommercialPavilionModulePlan {
+  const zones = PAVILION3_COMMERCIAL_REFERENCE.runs.map((run) => {
+    const moduleCount = run.numberRange[1] - run.numberRange[0] + 1;
+    const horizontalSequence = run.sequenceOrientation === 'x-increasing';
+    return {
+      id: run.id,
+      label: run.label,
+      role: run.role,
+      bounds: run.bounds,
+      rows: horizontalSequence ? 1 : moduleCount,
+      columns: horizontalSequence ? moduleCount : 1,
+      numbering: horizontalSequence ? 'row-major' : 'column-major',
+      moduleCount,
+      numberRange: run.numberRange,
+    } satisfies CommercialPavilionModuleZone;
+  });
+
+  return {
+    publicIdentifier: 'B6',
+    topology: 'side-runs-twin-islands',
+    colorCue: '#13CFAC',
+    stats: {
+      pavilionNumber: PAVILION3_COMMERCIAL_REFERENCE.pavilionNumber,
+      category: PAVILION3_COMMERCIAL_REFERENCE.category,
+      moduleCount: PAVILION3_COMMERCIAL_REFERENCE.moduleCount,
+      totalAreaSquareMeters: PAVILION3_COMMERCIAL_REFERENCE.totalAreaM2,
+      // The annex defines 663 m² for the full modular inventory, not per cell.
+      moduleAreaSquareMeters: PAVILION3_COMMERCIAL_REFERENCE.modularAreaM2,
+    },
+    boundary: OFFICIAL_BOUNDARY,
+    zones,
+    corridors: PAVILION3_COMMERCIAL_REFERENCE.corridors,
+    cells: PAVILION3_COMMERCIAL_REFERENCE.cells,
+    source: {
+      document: 'Fenasoja - Planta Pavilhões Internos.pdf',
+      page: 1,
+      interpretation: 'official-reference-runs',
+    },
+  };
+}
+
 export const COMMERCIAL_PAVILION_MODULE_PLANS = Object.fromEntries(
   COMMERCIAL_PAVILION_PUBLIC_IDENTIFIERS.map((publicIdentifier) => [
     publicIdentifier,
-    buildPlan(PLAN_SEEDS[publicIdentifier]),
+    publicIdentifier === 'B6'
+      ? buildPavilion3CommercialPlan()
+      : buildPlan(PLAN_SEEDS[publicIdentifier]),
   ]),
 ) as Readonly<
   Record<CommercialPavilionPublicIdentifier, CommercialPavilionModulePlan>

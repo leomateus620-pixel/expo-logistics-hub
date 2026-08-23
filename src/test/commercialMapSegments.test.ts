@@ -104,6 +104,7 @@ describe('registro de segmentos do Mapa Comercial 3D', () => {
     const identifiers = publicIdentifiersForSegment(COMMERCIAL_MAP_SEGMENT_IDS.industry);
     const blockIdentifiers = identifiers.filter((identifier) => identifier.startsWith('QUADRA-'));
     const lotIdentifiers = identifiers.filter((identifier) => identifier.startsWith('Q-'));
+    const pavilion3ModuleIdentifiers = identifiers.filter((identifier) => identifier.startsWith('B6-M'));
 
     expect(blockIdentifiers).toEqual(expect.arrayContaining([
       'QUADRA-M', 'QUADRA-G', 'QUADRA-L', 'QUADRA-F',
@@ -111,7 +112,9 @@ describe('registro de segmentos do Mapa Comercial 3D', () => {
     ]));
     expect(blockIdentifiers).toHaveLength(8);
     expect(lotIdentifiers).toHaveLength(103);
-    expect(identifiers).toHaveLength(140);
+    expect(pavilion3ModuleIdentifiers).toHaveLength(214);
+    expect(pavilion3ModuleIdentifiers).toEqual(expect.arrayContaining(['B6-M001', 'B6-M214']));
+    expect(identifiers).toHaveLength(354);
     expect(lotIdentifiers).toEqual(expect.arrayContaining([
       'Q-G-01', 'Q-G-02', 'Q-G-05', 'Q-G-06', 'Q-G-07', 'Q-G-08',
     ]));
@@ -128,7 +131,7 @@ describe('registro de segmentos do Mapa Comercial 3D', () => {
 
     const inventory = commercialMapSegmentInventory(OFFICIAL_REFERENCE_ENTITIES, OFFICIAL_REFERENCE_LOTS);
     expect(inventory.find(({ segment }) => segment.id === COMMERCIAL_MAP_SEGMENT_IDS.industry))
-      .toMatchObject({ entityCount: 140, lotCount: 103 });
+      .toMatchObject({ entityCount: 354, lotCount: 317 });
   });
 
   it('não aceita sobreposição silenciosa entre segmentos', () => {
@@ -209,6 +212,7 @@ describe('registro de segmentos do Mapa Comercial 3D', () => {
 
   it('mantém equipamentos funcionais neutros e colore unidades comerciais', () => {
     expect(isSegmentTintClassification('SELLABLE_LOT')).toBe(true);
+    expect(isSegmentTintClassification('INTERNAL_STAND')).toBe(true);
     expect(isSegmentTintClassification('PAVILION')).toBe(true);
     expect(isSegmentTintClassification('RESTAURANT')).toBe(true);
     expect(isSegmentTintClassification('SECURITY')).toBe(false);

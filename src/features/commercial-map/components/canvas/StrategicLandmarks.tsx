@@ -28,6 +28,7 @@ import { LivestockPavilion } from './LivestockPavilion';
 import { MirantePavilion } from './MirantePavilion';
 import { CommercialPavilion } from './CommercialPavilion';
 import type { CommercialMapSegmentDefinition } from '../../data/commercialMapSegments';
+import type { CommercialPavilionModuleVisualState } from '../../utils/pavilionModuleCommercial';
 
 const NO_RAYCAST = () => undefined;
 const MAP_BACKGROUND_COLOR = new THREE.Color('#dfe8de');
@@ -3055,6 +3056,7 @@ export interface StrategicLandmarkMeshProps {
   onFocus: () => void;
   onEnterInterior: (id: string) => void;
   onCursor: (cursor: 'grab' | 'grabbing' | 'pointer') => void;
+  moduleStateById?: ReadonlyMap<string, CommercialPavilionModuleVisualState>;
 }
 
 export function StrategicLandmarkMesh({
@@ -3072,6 +3074,7 @@ export function StrategicLandmarkMesh({
   onFocus,
   onEnterInterior,
   onCursor,
+  moduleStateById,
 }: StrategicLandmarkMeshProps) {
   const kind = resolveStrategicLandmarkKind(entity);
   const bounds = useMemo(() => strategicLandmarkBounds(entity), [entity]);
@@ -3191,7 +3194,11 @@ export function StrategicLandmarkMesh({
         {kind === 'administrative-center' && <AdministrativeCenter {...modelProps} />}
         {kind === 'fenasoja-headquarters' && <FenasojaHeadquarters {...modelProps} />}
         {kind === 'commercial-pavilion' && (
-          <CommercialPavilion publicIdentifier={entity.publicIdentifier} {...modelProps} />
+          <CommercialPavilion
+            publicIdentifier={entity.publicIdentifier}
+            moduleStateById={moduleStateById}
+            {...modelProps}
+          />
         )}
         {kind === 'livestock-pavilion' && <LivestockPavilion {...modelProps} />}
         {kind === 'mirante-pavilion' && <MirantePavilion {...modelProps} />}

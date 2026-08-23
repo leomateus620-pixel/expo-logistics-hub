@@ -25,7 +25,7 @@ describe('legenda acessível dos segmentos comerciais', () => {
     expect(within(legend).getByText('Indústria, Comércio e Serviços')).toBeInTheDocument();
     expect(within(legend).getByText('Espaço do Automóvel')).toBeInTheDocument();
     expect(within(legend).getByRole('button', { name: /Focar Exporural\. 95 lotes/i })).toHaveAttribute('aria-pressed', 'false');
-    expect(within(legend).getByRole('button', { name: /Focar Indústria, Comércio e Serviços\. 103 lotes/i })).toHaveAttribute('aria-pressed', 'false');
+    expect(within(legend).getByRole('button', { name: /Focar Indústria, Comércio e Serviços\. 317 lotes/i })).toHaveAttribute('aria-pressed', 'false');
     expect(within(legend).getByRole('button', { name: /Focar Espaço do Automóvel\. 52 lotes/i })).toHaveAttribute('aria-pressed', 'false');
 
     fireEvent.click(within(legend).getByRole('button', { name: /Focar Espaço do Automóvel/i }));

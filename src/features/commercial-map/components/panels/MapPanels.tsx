@@ -551,12 +551,14 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions }:
                     <Button variant="outline" onClick={() => setStructureOperation('merge')}><Combine className="h-4 w-4" />Mesclar</Button>
                   </>
                 )}
-                {lot && permissions.canManageSales && lot.status !== 'SOLD' && (
-                  <>
-                    <Button variant="outline" onClick={() => setWorkflow('reserve')}><CalendarClock className="h-4 w-4" />Reservar</Button>
-                    <Button variant="outline" onClick={() => setWorkflow('negotiate')}><Clock3 className="h-4 w-4" />Negociar</Button>
-                    <Button onClick={() => setWorkflow('sell')}><ShoppingBag className="h-4 w-4" />Marcar vendido</Button>
-                  </>
+                {lot && permissions.canManageSales && ['AVAILABLE', 'IN_NEGOTIATION'].includes(lot.status) && (
+                  <Button variant="outline" onClick={() => setWorkflow('reserve')}><CalendarClock className="h-4 w-4" />Reservar</Button>
+                )}
+                {lot && permissions.canManageSales && ['AVAILABLE', 'RESERVED'].includes(lot.status) && (
+                  <Button variant="outline" onClick={() => setWorkflow('negotiate')}><Clock3 className="h-4 w-4" />Negociar</Button>
+                )}
+                {lot && permissions.canManageSales && ['AVAILABLE', 'RESERVED', 'IN_NEGOTIATION'].includes(lot.status) && (
+                  <Button onClick={() => setWorkflow('sell')}><ShoppingBag className="h-4 w-4" />Marcar vendido</Button>
                 )}
                 {lot && permissions.canManageContracts && <Button variant="outline" onClick={() => setWorkflow('contract')}><FileLock2 className="h-4 w-4" />Anexar contrato</Button>}
               </div>
