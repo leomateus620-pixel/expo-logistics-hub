@@ -102,19 +102,39 @@ describe('organizationalResolver', () => {
     const centralNode = graph.nodes.find((node) => node.type === 'central-commission');
     const commission = graph.nodes.find((node) => node.id === 'unit:logistica-id');
 
+    expect(ccp).toMatchObject({
+      id: 'org:ccp',
+      title: 'CCPF',
+      subtitle: 'CCPF — CONSELHO CONSULTIVO PERMANENTE FENASOJA',
+      metadata: { presentationCode: 'CCPF' },
+    });
     expect(ccp?.personIds).toHaveLength(1);
-    expect(graph.people[ccp!.personIds[0]].fullName).toBe('Marcos Eduardo Servat');
+    expect(graph.people[ccp!.personIds[0]].fullName).toBe('MARCOS EDUARDO SERVAT');
     expect(graph.people[ccp!.personIds[0]].highestAuthorityLevel).toBe(1);
-    expect(executives.map((node) => node.subtitle)).toEqual(['Presidente', 'Vice-Presidente']);
+    expect(executives.map((node) => node.subtitle)).toEqual(['PRESIDENTE', 'VICE-PRESIDENTE']);
     expect(executives.every((node) => graph.people[node.personIds[0]].highestAuthorityLevel === 2)).toBe(true);
     expect(centralNode?.personIds).toHaveLength(1);
-    expect(graph.people[centralNode!.personIds[0]].fullName).toBe('Roque Vanderlei Lugoch');
+    expect(graph.people[centralNode!.personIds[0]].fullName).toBe('ROQUE VANDERLEI LUGOCH');
     expect(graph.people[centralNode!.personIds[0]].highestAuthorityLevel).toBe(3);
     expect(commission?.authorityLevel).toBe(4);
     expect(graph.people[commission!.personIds[0]].highestAuthorityLevel).toBe(4);
     expect(centralNode?.personIds).not.toContain(ccp?.personIds[0]);
     expect(centralNode?.personIds).not.toContain(executives[0].personIds[0]);
     expect(centralNode?.personIds).not.toContain(executives[1].personIds[0]);
+    const presentationValues = [
+      ...graph.nodes.flatMap((node) => [
+        node.title,
+        node.subtitle,
+        ...node.responsibilities.flatMap((responsibility) => [
+          responsibility.displayName,
+          responsibility.relationshipRole,
+        ]),
+      ]),
+      ...Object.values(graph.people).flatMap((person) => [person.fullName, ...person.roles]),
+    ].filter((value): value is string => Boolean(value));
+    expect(presentationValues.every((value) => (
+      value === value.toLocaleUpperCase('pt-BR')
+    ))).toBe(true);
   });
 
   it('não inventa os aliases CCP ausentes no registro de membros', () => {
@@ -197,8 +217,127 @@ describe('organizationalResolver', () => {
     expect(ccp?.personIds).toHaveLength(1);
     expect(centralNode?.personIds).toEqual([]);
     expect(graph.people[ccp!.personIds[0]].roles).toEqual(
-      expect.arrayContaining(['PRESIDENTE CCPF', 'Membro da Comissão Central', 'Comissão Central']),
+      expect.arrayContaining(['PRESIDENTE CCPF', 'MEMBRO DA COMISSÃO CENTRAL', 'COMISSÃO CENTRAL']),
     );
+  });
+
+  it('remove Ivan somente da Comissão Central e do papel CENTRAL, preservando seu vínculo oficial', () => {
+    const tecnologia = unit({
+      id: 'tecnologia-id',
+      name: 'Comissão de Tecnologia',
+      responsibles: [{
+        id: 'ivan-tecnologia-responsible',
+        displayName: 'Ivan Squinzani',
+        responsibleType: 'pessoa',
+        relationshipRole: 'principal',
+        isPrimary: true,
+        userId: 'ivan-user',
+      }],
+    });
+    const graph = buildOrganizationalGraph({
+      members: [member({
+        nome_exibicao: 'IVAN SQUINZANI',
+        user_id: 'ivan-user',
+        cargo: 'MEMBRO DA COMISSÃO CENTRAL',
+        commission_id: central.id,
+        commission_nome: central.name,
+      })],
+      units: [central, tecnologia],
+    });
+    const personId = 'person:user:ivan-user';
+    const centralNode = graph.nodes.find((node) => node.type === 'central-commission');
+    const tecnologiaNode = graph.nodes.find((node) => node.id === 'unit:tecnologia-id');
+
+    expect(graph.people[personId]).toMatchObject({
+      fullName: 'IVAN SQUINZANI',
+      highestAuthorityLevel: 4,
+    });
+    expect(centralNode?.personIds).not.toContain(personId);
+    expect(tecnologiaNode?.personIds).toContain(personId);
+    expect(graph.people[personId].roles).not.toContain('CENTRAL');
+    expect(graph.people[personId].roles.join(' ')).not.toMatch(/COMISSÃO CENTRAL/);
+    expect(graph.people[personId].roles).toContain('COMISSÃO DE TECNOLOGIA');
+  });
+
+  it('remove Jardel, seus vínculos e a unidade associada mesmo sem responsáveis carregados', () => {
+    const unidadePorResponsavel = unit({
+      id: 'captacao-jardel-id',
+      name: 'Assessoria de Captação Institucional',
+      type: 'assessoria',
+      responsibles: [{
+        id: 'jardel-responsible',
+        displayName: 'Jardel Hillesheim',
+        responsibleType: 'pessoa',
+        relationshipRole: 'principal',
+        isPrimary: true,
+        userId: 'jardel-user',
+      }],
+    });
+    const unidadeSemResponsaveis = unit({
+      id: 'projetos-captacoes-id',
+      name: 'Assessoria de Projetos e Captações',
+      type: 'assessoria',
+      responsibles: [],
+    });
+    const unidadeAliasSemResponsaveis = unit({
+      id: 'projetos-captacoes-institucionais-id',
+      name: 'Assessoria Projetos Captações Institucionais',
+      type: 'assessoria',
+      responsibles: [],
+    });
+    const unidadeDerivadaDoMembro = unit({
+      id: 'nucleo-projetos-jardel-id',
+      name: 'Núcleo de Projetos Especiais',
+      type: 'assessoria',
+      responsibles: [],
+    });
+    const unidadePreservada = unit({
+      id: 'juridica-preservada-id',
+      name: 'Assessoria Jurídica',
+      type: 'assessoria',
+    });
+    const graph = buildOrganizationalGraph({
+      members: [member({
+        nome_exibicao: 'JARDEL HILLESHEIM',
+        user_id: 'jardel-user',
+        commission_id: unidadeDerivadaDoMembro.id,
+        commission_nome: unidadeDerivadaDoMembro.name,
+      })],
+      units: [
+        central,
+        unidadePorResponsavel,
+        unidadeSemResponsaveis,
+        unidadeAliasSemResponsaveis,
+        unidadeDerivadaDoMembro,
+        unidadePreservada,
+      ],
+      volunteers: [{
+        id: 'jardel-volunteer',
+        fullName: 'Jardel Hillesheim',
+        parentCommissionId: unidadePreservada.id,
+        userId: 'jardel-user',
+        roles: ['voluntariado'],
+      }],
+    });
+    const excludedNodeIds = [
+      'unit:captacao-jardel-id',
+      'unit:projetos-captacoes-id',
+      'unit:projetos-captacoes-institucionais-id',
+      'unit:nucleo-projetos-jardel-id',
+    ];
+
+    expect(Object.values(graph.people).some((person) => person.fullName.includes('JARDEL'))).toBe(false);
+    expect(graph.nodes.some((node) => node.title.includes('JARDEL'))).toBe(false);
+    expect(graph.nodes.flatMap((node) => node.responsibilities).some((responsibility) => (
+      responsibility.displayName.includes('JARDEL')
+    ))).toBe(false);
+    expect(graph.nodes.some((node) => node.id === 'volunteer:jardel-volunteer')).toBe(false);
+    excludedNodeIds.forEach((nodeId) => {
+      expect(graph.nodes.some((node) => node.id === nodeId)).toBe(false);
+      expect(graph.renderableNodeIds).not.toContain(nodeId);
+      expect(graph.edges.some((edge) => edge.sourceId === nodeId || edge.targetId === nodeId)).toBe(false);
+    });
+    expect(graph.nodes.some((node) => node.id === 'unit:juridica-preservada-id')).toBe(true);
   });
 
   it('mantém contas distintas separadas mesmo quando compartilham o mesmo nome', () => {
@@ -275,7 +414,7 @@ describe('organizationalResolver', () => {
 
     expect(executives).toHaveLength(2);
     expect(fabianoNodes).toHaveLength(1);
-    expect(fabianoNode).toMatchObject({ subtitle: 'Presidente' });
+    expect(fabianoNode).toMatchObject({ subtitle: 'PRESIDENTE' });
     expect(fabianoNode.metadata.executiveRole).toEqual([
       'president',
       'vice-president',
@@ -419,8 +558,8 @@ describe('organizationalResolver', () => {
       expect.arrayContaining([
         'PRESIDENTE CCPF',
         'CENTRAL',
-        'corresponsavel',
-        'Assessoria Jurídica',
+        'CORRESPONSAVEL',
+        'ASSESSORIA JURÍDICA',
       ]),
     );
     expect(person.roles).not.toContain('admin');
@@ -590,7 +729,7 @@ describe('organizationalResolver', () => {
     expect(node?.personIds).toHaveLength(2);
     expect(node?.responsibilities).toHaveLength(3);
     expect(node?.responsibilities.find((item) => item.responsibleType === 'equipe')?.personId).toBeNull();
-    expect(node?.metadata.teamLabels).toEqual(['Equipe do EP']);
+    expect(node?.metadata.teamLabels).toEqual(['EQUIPE DO EP']);
     expect(graph.nodes.some((item) => item.id === 'unit:legado-id')).toBe(false);
   });
 

@@ -14,6 +14,8 @@ export interface OrgLayoutBounds {
 
 export interface PositionedOrgNode extends OrgLayoutPoint {
   node: OrgNode;
+  /** Stable order inside the node's own hierarchy level. */
+  levelOrder: number;
   order: number;
   radius: number;
 }
@@ -35,18 +37,19 @@ export interface OrganizationalLayout {
 export type OrgNavigationDirection = 'up' | 'right' | 'down' | 'left';
 
 const LEVEL_RADII: Record<1 | 2 | 3 | 4, number> = {
-  1: 92,
-  2: 70,
-  3: 56,
-  4: 48,
+  1: 80,
+  2: 62,
+  3: 52,
+  4: 42,
 };
 
-const TOP_PADDING = 210;
-const LEVEL_2_Y = 535;
-const LEVEL_3_Y = 855;
-const LEVEL_4_Y = 1210;
-const LEVEL_4_ROW_GAP = 250;
-const SIDE_PADDING = 250;
+const TOP_PADDING = 100;
+const LEVEL_2_Y = 310;
+const LEVEL_3_Y = 490;
+const LEVEL_4_Y = 700;
+const LEVEL_4_ROW_GAP = 170;
+const LEVEL_4_COLUMN_GAP = 172;
+const SIDE_PADDING = 150;
 
 function clamp(value: number, minimum: number, maximum: number): number {
   return Math.min(maximum, Math.max(minimum, value));
@@ -78,6 +81,7 @@ function distributeAcrossSpan(
     node,
     x: startX + gap * index,
     y,
+    levelOrder: index,
     order: orderOffset + index,
     radius: LEVEL_RADII[node.authorityLevel as 1 | 2 | 3 | 4] ?? LEVEL_RADII[4],
   }));
@@ -133,16 +137,16 @@ export function calculateOrganizationalLayout(
   const level3 = byLevel.get(3) ?? [];
   const level4Columns = level4.length === 0
     ? 1
-    : clamp(Math.ceil(Math.sqrt(level4.length * 2.2)), 4, 10);
+    : clamp(Math.ceil(level4.length / 3), 1, 12);
   const level4Rows = Math.max(1, Math.ceil(level4.length / level4Columns));
   const worldWidth = Math.max(
-    1780,
-    level4Columns * 224 + SIDE_PADDING * 2,
-    Math.min(10, Math.max(1, level3.length)) * 212 + SIDE_PADDING * 2,
+    1640,
+    (level4Columns - 1) * LEVEL_4_COLUMN_GAP + SIDE_PADDING * 2,
+    (Math.min(10, Math.max(1, level3.length)) - 1) * 188 + SIDE_PADDING * 2,
   );
   const worldHeight = level4.length > 0
-    ? LEVEL_4_Y + (level4Rows - 1) * LEVEL_4_ROW_GAP + 310
-    : LEVEL_3_Y + 380;
+    ? LEVEL_4_Y + (level4Rows - 1) * LEVEL_4_ROW_GAP + 170
+    : LEVEL_3_Y + 240;
   const centerX = worldWidth / 2;
   const maximumTopSpan = worldWidth - SIDE_PADDING * 2;
 
@@ -197,7 +201,8 @@ export function calculateOrganizationalLayout(
     || a.id.localeCompare(b.id)
   ));
 
-  const columnGap = (worldWidth - SIDE_PADDING * 2) / Math.max(1, level4Columns - 1);
+  const columnGap = LEVEL_4_COLUMN_GAP;
+  const gridStartX = centerX - ((level4Columns - 1) * columnGap) / 2;
   const availableSlots = Array.from({ length: level4Rows * level4Columns }, (_, slotIndex) => {
     const row = Math.floor(slotIndex / level4Columns);
     const column = slotIndex % level4Columns;
@@ -207,8 +212,8 @@ export function calculateOrganizationalLayout(
     return {
       row,
       column,
-      x: SIDE_PADDING + columnGap * column + organicOffset,
-      y: LEVEL_4_Y + row * LEVEL_4_ROW_GAP + (column % 2 === 0 ? 0 : 42),
+      x: gridStartX + columnGap * column + organicOffset,
+      y: LEVEL_4_Y + row * LEVEL_4_ROW_GAP + (column % 2 === 0 ? 0 : 4),
     };
   });
 
@@ -233,6 +238,7 @@ export function calculateOrganizationalLayout(
       node,
       x: slot.x,
       y: slot.y,
+      levelOrder: index,
       order: order + index,
       radius: LEVEL_RADII[4],
     };

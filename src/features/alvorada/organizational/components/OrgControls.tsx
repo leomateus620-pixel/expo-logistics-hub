@@ -1,11 +1,18 @@
 import { useEffect, useId, useState, type ChangeEvent, type KeyboardEvent } from 'react';
 import {
+  Badge,
+  BriefcaseBusiness,
+  Crown,
+  Landmark,
+  Layers3,
   LocateFixed,
   Minus,
+  PanelsTopLeft,
   Plus,
   RotateCcw,
   Search,
 } from 'lucide-react';
+import { CCPF_FULL_LABEL } from '../resolver';
 import type { OrgGraphFilter, OrgSearchResult } from '../hooks/useOrgGraphInteraction';
 
 interface OrgSearchProps {
@@ -29,14 +36,26 @@ interface OrgViewportControlsProps {
   onZoomOut: () => void;
 }
 
-const FILTERS: Array<{ id: OrgGraphFilter; label: string; shortLabel: string }> = [
-  { id: 'all', label: 'Todo o ecossistema', shortLabel: 'Todos' },
-  { id: 'ccp', label: 'CCP', shortLabel: 'CCP' },
-  { id: 'executive', label: 'Presidência', shortLabel: 'Presidência' },
-  { id: 'central-commission', label: 'Comissão Central', shortLabel: 'Central' },
-  { id: 'commission', label: 'Comissões', shortLabel: 'Comissões' },
-  { id: 'advisory', label: 'Assessorias', shortLabel: 'Assessorias' },
-];
+const FILTERS = [
+  { id: 'all', label: 'TODO O ECOSSISTEMA', shortLabel: 'TODOS', icon: Layers3 },
+  {
+    id: 'ccp',
+    label: 'CCPF',
+    shortLabel: 'CCPF',
+    accessibleLabel: CCPF_FULL_LABEL,
+    icon: Badge,
+  },
+  { id: 'executive', label: 'PRESIDÊNCIA', shortLabel: 'PRESIDÊNCIA', icon: Crown },
+  { id: 'central-commission', label: 'COMISSÃO CENTRAL', shortLabel: 'CENTRAL', icon: Landmark },
+  { id: 'commission', label: 'COMISSÕES', shortLabel: 'COMISSÕES', icon: BriefcaseBusiness },
+  { id: 'advisory', label: 'ASSESSORIAS', shortLabel: 'ASSESSORIAS', icon: PanelsTopLeft },
+] satisfies Array<{
+  id: OrgGraphFilter;
+  label: string;
+  shortLabel: string;
+  accessibleLabel?: string;
+  icon: typeof Search;
+}>;
 
 export function OrgSearch({
   query,
@@ -94,12 +113,12 @@ export function OrgSearch({
   return (
     <div className="org-search" data-org-interactive>
       <label className="org-search__field">
-        <span className="sr-only">Buscar pessoa, comissão ou assessoria</span>
-        <Search aria-hidden="true" />
+        <span className="sr-only">BUSCAR PESSOA, COMISSÃO OU ASSESSORIA</span>
+        <Search aria-hidden="true" data-org-search-icon />
         <input
           type="search"
           value={query}
-          placeholder="Buscar pessoa ou área"
+          placeholder="BUSCAR PESSOA OU ÁREA"
           autoComplete="off"
           role="combobox"
           aria-autocomplete="list"
@@ -110,7 +129,6 @@ export function OrgSearch({
           onChange={handleChange}
           onKeyDown={handleKeyDown}
         />
-        <kbd aria-hidden="true">↵</kbd>
       </label>
 
       {expanded && (
@@ -118,22 +136,22 @@ export function OrgSearch({
           {results.map((result, index) => {
             const active = index === boundedActiveIndex;
             return (
-            <button
-              key={result.id}
-              id={`${listId}-option-${index}`}
-              type="button"
-              role="option"
-              className={active ? 'org-search__result--active' : undefined}
-              aria-selected={active}
-              onClick={() => {
-                setActiveIndex(index);
-                onResultSelect(result);
-              }}
-              onMouseEnter={() => setActiveIndex(index)}
-            >
-              <span>{result.label}</span>
-              <small>{result.meta}</small>
-            </button>
+              <button
+                key={result.id}
+                id={`${listId}-option-${index}`}
+                type="button"
+                role="option"
+                className={active ? 'org-search__result--active' : undefined}
+                aria-selected={active}
+                onClick={() => {
+                  setActiveIndex(index);
+                  onResultSelect(result);
+                }}
+                onMouseEnter={() => setActiveIndex(index)}
+              >
+                <span>{result.label.toLocaleUpperCase('pt-BR')}</span>
+                <small>{result.meta.toLocaleUpperCase('pt-BR')}</small>
+              </button>
             );
           })}
         </div>
@@ -145,18 +163,23 @@ export function OrgSearch({
 export function OrgFilterBar({ filter, onFilterChange }: OrgFilterBarProps) {
   return (
     <nav className="org-filters" aria-label="Filtrar níveis organizacionais" data-org-interactive>
-      {FILTERS.map((item) => (
-        <button
-          key={item.id}
-          type="button"
-          aria-label={item.label}
-          aria-pressed={filter === item.id}
-          onClick={() => onFilterChange(item.id)}
-        >
-          <span className="org-filters__long">{item.label}</span>
-          <span className="org-filters__short">{item.shortLabel}</span>
-        </button>
-      ))}
+      {FILTERS.map((item) => {
+        const FilterIcon = item.icon;
+        return (
+          <button
+            key={item.id}
+            type="button"
+            aria-label={item.accessibleLabel ?? item.label}
+            aria-pressed={filter === item.id}
+            title={item.accessibleLabel}
+            onClick={() => onFilterChange(item.id)}
+          >
+            <FilterIcon aria-hidden="true" data-org-filter-icon />
+            <span className="org-filters__long">{item.label}</span>
+            <span className="org-filters__short">{item.shortLabel}</span>
+          </button>
+        );
+      })}
     </nav>
   );
 }

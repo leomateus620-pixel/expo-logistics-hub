@@ -60,9 +60,10 @@ const RAW_RESPONSIBLE_ROLES = new Set<OrgUnitResponsibleRole>([
 
 function presentRelationshipRole(role: string): string {
   const normalized = role.toLocaleLowerCase('pt-BR').replace(/[\s-]+/g, '_');
-  return RAW_RESPONSIBLE_ROLES.has(normalized as OrgUnitResponsibleRole)
+  const presented = RAW_RESPONSIBLE_ROLES.has(normalized as OrgUnitResponsibleRole)
     ? responsibleRoleLabel(normalized as OrgUnitResponsibleRole)
     : role;
+  return presented.toLocaleUpperCase('pt-BR');
 }
 
 function createSearchResult(

@@ -13,6 +13,15 @@ import type {
 } from './types';
 
 export const ORGANIZATIONAL_ROOT_NODE_ID = 'org:ccp';
+export const CCPF_SHORT_LABEL = 'CCPF';
+export const CCPF_FULL_LABEL = 'CCPF — CONSELHO CONSULTIVO PERMANENTE FENASOJA';
+
+const CENTRAL_COMMISSION_EXCLUDED_NAME = 'ivan squinzani';
+const GLOBALLY_EXCLUDED_NAME = 'jardel hillesheim';
+const GLOBALLY_EXCLUDED_UNIT_NAMES = new Set([
+  'assessoria de projetos e captacoes',
+  'assessoria projetos captacoes institucionais',
+]);
 
 /**
  * Authority aliases supplied by the institutional brief. They only promote an
@@ -70,6 +79,29 @@ export function normalizeOrganizationalText(value: string | null | undefined): s
     .toLocaleLowerCase('pt-BR')
     .replace(/[^a-z0-9]+/g, ' ')
     .trim();
+}
+
+export function toOrganizationalPresentationText(
+  value: string | null | undefined,
+): string {
+  return (value ?? '').trim().toLocaleUpperCase('pt-BR');
+}
+
+function isExactNormalizedName(
+  value: string | null | undefined,
+  expected: string,
+): boolean {
+  return normalizeOrganizationalText(value) === expected;
+}
+
+function isGloballyExcludedName(value: string | null | undefined): boolean {
+  return isExactNormalizedName(value, GLOBALLY_EXCLUDED_NAME);
+}
+
+function isCentralCommissionRole(value: string | null | undefined): boolean {
+  const normalized = normalizeOrganizationalText(value);
+  return isCentralCommissionName(value)
+    || normalized.includes('comissao central');
 }
 
 function stablePersonId(userId: string | null, normalizedName: string): string {
@@ -626,6 +658,15 @@ function node(
 ): OrgNode {
   return {
     ...value,
+    title: toOrganizationalPresentationText(value.title),
+    subtitle: value.subtitle
+      ? toOrganizationalPresentationText(value.subtitle)
+      : null,
+    responsibilities: value.responsibilities.map((responsibility) => ({
+      ...responsibility,
+      displayName: toOrganizationalPresentationText(responsibility.displayName),
+      relationshipRole: toOrganizationalPresentationText(responsibility.relationshipRole),
+    })),
     childIds: [],
     isRenderable: value.isRenderable ?? value.authorityLevel <= 4,
   };
@@ -658,12 +699,18 @@ function appendEdgesAndChildren(nodes: OrgNode[]): OrgEdge[] {
 }
 
 function finalizePerson(person: PersonAccumulator): OrgPerson {
+  const visibleRoles = [...person.roleSet].filter((role) => (
+    !isExactNormalizedName(person.fullName, CENTRAL_COMMISSION_EXCLUDED_NAME)
+    || !isCentralCommissionRole(role)
+  ));
   return {
     id: person.id,
     userId: person.userId,
-    fullName: person.fullName,
+    fullName: toOrganizationalPresentationText(person.fullName),
     avatarUrl: person.avatarUrl,
-    roles: uniqueSorted(person.roleSet),
+    roles: uniqueSorted(
+      visibleRoles.map(toOrganizationalPresentationText),
+    ),
     highestAuthorityLevel: person.highestAuthorityLevel,
     sourceIds: uniqueSorted(person.sourceIdSet),
   };
@@ -689,8 +736,45 @@ function errorForMissingAuthority(
 export function buildOrganizationalGraph(raw: OrganizationalRawData): OrganizationalGraph {
   const anomalies: OrgDataAnomaly[] = [];
   const registry = createPersonRegistry();
-  const members = sortedMembers(raw.members);
-  const units = sortedUnits(raw.units);
+  const allMembers = sortedMembers(raw.members);
+  const globallyExcludedMembers = allMembers.filter((member) => (
+    isGloballyExcludedName(member.nome_exibicao)
+  ));
+  const globallyExcludedUserIds = new Set(
+    globallyExcludedMembers
+      .map((member) => nonEmpty(member.user_id))
+      .filter((userId): userId is string => Boolean(userId)),
+  );
+  const globallyExcludedUnitIds = new Set(
+    globallyExcludedMembers
+      .map((member) => nonEmpty(member.commission_id))
+      .filter((unitId): unitId is string => Boolean(unitId)),
+  );
+  const globallyExcludedUnitNames = new Set([
+    ...GLOBALLY_EXCLUDED_UNIT_NAMES,
+    ...globallyExcludedMembers
+      .map((member) => normalizeOrganizationalText(member.commission_nome))
+      .filter(Boolean),
+  ]);
+  const members = allMembers.filter(
+    (member) => !isGloballyExcludedName(member.nome_exibicao),
+  );
+  const units = sortedUnits(raw.units).filter((unit) => (
+    isCentralCommissionUnit(unit)
+    || (
+      !globallyExcludedUnitIds.has(unit.id)
+      && !globallyExcludedUnitNames.has(normalizeOrganizationalText(unit.name))
+      && !globallyExcludedUnitNames.has(normalizeOrganizationalText(unit.slug))
+      && !unit.responsibles.some((responsible) => (
+        isGloballyExcludedName(responsible.displayName)
+        || Boolean(responsible.userId && globallyExcludedUserIds.has(responsible.userId))
+      ))
+    )
+  ));
+  const volunteers = raw.volunteers?.filter((volunteer) => (
+    !isGloballyExcludedName(volunteer.fullName)
+    && !(volunteer.userId && globallyExcludedUserIds.has(volunteer.userId))
+  )) ?? [];
   const centralUnits = findCentralUnits(units);
   const centralUnitIds = new Set(centralUnits.map((unit) => unit.id));
   const hasCentralMembership = members.some((member) =>
@@ -747,7 +831,7 @@ export function buildOrganizationalGraph(raw: OrganizationalRawData): Organizati
     });
   });
 
-  raw.volunteers?.forEach((volunteer) => {
+  volunteers.forEach((volunteer) => {
     upsertPerson(
       registry,
       {
@@ -777,7 +861,7 @@ export function buildOrganizationalGraph(raw: OrganizationalRawData): Organizati
       addAnomaly(anomalies, {
         code: 'missing-ccp-member',
         severity: 'info',
-        message: `${alias} não foi incluído no CCP porque não existe nos membros ativos carregados.`,
+        message: `${alias} não foi incluído no CCPF porque não existe nos membros ativos carregados.`,
         entityIds: [],
       });
     }
@@ -836,6 +920,10 @@ export function buildOrganizationalGraph(raw: OrganizationalRawData): Organizati
       if (!isCentralMember(member, centralUnitIds)) return [];
       const personId = personIdForMember(registry, member);
       if (!personId || ccpPersonIds.includes(personId) || executivePersonIds.has(personId)) return [];
+      if (isExactNormalizedName(
+        registry.people.get(personId)?.fullName,
+        CENTRAL_COMMISSION_EXCLUDED_NAME,
+      )) return [];
       return [personId];
     }),
   );
@@ -857,15 +945,15 @@ export function buildOrganizationalGraph(raw: OrganizationalRawData): Organizati
       id: ORGANIZATIONAL_ROOT_NODE_ID,
       type: 'ccp',
       authorityLevel: 1,
-      title: 'FENASOJA 2028',
-      subtitle: 'CCP',
+      title: CCPF_SHORT_LABEL,
+      subtitle: CCPF_FULL_LABEL,
       personIds: ccpPersonIds,
       parentIds: [],
       commissionId: null,
       advisoryId: null,
       sortOrder: 0,
       responsibilities: [],
-      metadata: { authorityLabel: 'Autoridade 01' },
+      metadata: { presentationCode: CCPF_SHORT_LABEL },
     }),
   ];
 
@@ -894,7 +982,7 @@ export function buildOrganizationalGraph(raw: OrganizationalRawData): Organizati
         advisoryId: null,
         sortOrder: index,
         responsibilities: [],
-        metadata: { authorityLabel: 'Autoridade 02', executiveRole: uniqueSorted(roles) },
+        metadata: { executiveRole: uniqueSorted(roles) },
       });
     });
   nodes.push(...executiveNodes);
@@ -920,7 +1008,6 @@ export function buildOrganizationalGraph(raw: OrganizationalRawData): Organizati
         sortOrder: 0,
         responsibilities: [],
         metadata: {
-          authorityLabel: 'Autoridade 03',
           sourceUnitIds: centralUnits.map((unit) => unit.id),
           resolvedFromMembership: centralUnits.length === 0,
         },
@@ -970,18 +1057,19 @@ export function buildOrganizationalGraph(raw: OrganizationalRawData): Organizati
         sortOrder: unit.displayOrder,
         responsibilities,
         metadata: {
-          authorityLabel: 'Autoridade 04',
           unitSlug: unit.slug,
           unitType: unit.type,
           teamLabels: responsibilities
             .filter((responsibility) => responsibility.responsibleType === 'equipe')
-            .map((responsibility) => responsibility.displayName),
+            .map((responsibility) => (
+              toOrganizationalPresentationText(responsibility.displayName)
+            )),
         },
       }),
     );
   });
 
-  raw.volunteers?.forEach((volunteer, index) => {
+  volunteers.forEach((volunteer, index) => {
     const personId = personIdForIdentity(registry, volunteer.fullName, volunteer.userId);
     if (!personId) return;
     addAuthority(registry.people.get(personId), 5);
@@ -1008,7 +1096,7 @@ export function buildOrganizationalGraph(raw: OrganizationalRawData): Organizati
         sortOrder: index,
         isRenderable: false,
         responsibilities: [],
-        metadata: { authorityLabel: 'Autoridade 05' },
+        metadata: {},
       }),
     );
   });

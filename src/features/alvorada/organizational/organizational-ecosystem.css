@@ -13,6 +13,7 @@
   inset: 0;
   isolation: isolate;
   overflow: hidden;
+  overflow: clip;
   opacity: 0;
   visibility: hidden;
   background:
@@ -96,48 +97,34 @@
   top: calc(env(safe-area-inset-top, 0px) + 24px);
   left: calc(env(safe-area-inset-left, 0px) + 28px);
   display: flex;
-  max-width: min(920px, calc(100vw - 180px));
+  max-width: min(940px, calc(100vw - 180px));
   align-items: flex-start;
   gap: clamp(22px, 4vw, 62px);
   pointer-events: auto;
 }
 
 .org-ecosystem__title {
-  min-width: 260px;
+  display: grid;
+  min-width: 280px;
+  gap: 4px;
   text-shadow: 0 3px 20px rgb(0 4 15 / 62%);
 }
 
-.org-ecosystem__title > span {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  color: var(--org-gold);
-  font-size: 0.66rem;
-  font-weight: 820;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
+.org-ecosystem__brand {
+  width: max-content;
 }
 
-.org-ecosystem__title > span svg {
-  width: 13px;
-  height: 13px;
+.org-ecosystem__brand .fenasoja-brand__copy {
+  filter: drop-shadow(0 3px 16px rgb(0 4 15 / 52%));
 }
 
 .org-ecosystem__title h1 {
-  margin: 5px 0 2px;
-  color: var(--org-white);
-  font-size: clamp(1.25rem, 2vw, 1.8rem);
-  font-weight: 880;
-  letter-spacing: -0.035em;
-  line-height: 1.05;
-}
-
-.org-ecosystem__title p {
   margin: 0;
-  color: rgb(214 227 243 / 62%);
-  font-size: 0.66rem;
-  font-weight: 650;
-  letter-spacing: 0.04em;
+  color: rgb(224 235 247 / 78%);
+  font-size: 0.7rem;
+  font-weight: 780;
+  letter-spacing: 0.15em;
+  line-height: 1.15;
 }
 
 .org-search {
@@ -148,7 +135,7 @@
 .org-search__field {
   display: grid;
   min-height: 46px;
-  grid-template-columns: auto 1fr auto;
+  grid-template-columns: auto 1fr;
   align-items: center;
   gap: 10px;
   padding: 0 12px 0 15px;
@@ -188,19 +175,6 @@
 
 .org-search__field input::placeholder {
   color: rgb(203 219 237 / 48%);
-}
-
-.org-search__field kbd {
-  display: grid;
-  width: 24px;
-  height: 23px;
-  place-items: center;
-  border: 1px solid rgb(188 213 240 / 17%);
-  border-radius: 6px;
-  background: rgb(255 255 255 / 5%);
-  color: rgb(223 234 247 / 48%);
-  font: inherit;
-  font-size: 0.68rem;
 }
 
 .org-search__results {
@@ -277,8 +251,11 @@
 }
 
 .org-filters button {
+  display: flex;
   min-height: 34px;
   flex: 0 0 auto;
+  align-items: center;
+  gap: 7px;
   padding: 0 12px;
   border: 0;
   border-radius: 4px 10px 4px 10px;
@@ -291,6 +268,13 @@
   text-transform: uppercase;
   cursor: pointer;
   transition: background-color 180ms ease, color 180ms ease, box-shadow 180ms ease;
+}
+
+.org-filters button > svg {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  stroke-width: 1.8;
 }
 
 .org-filters button:hover {
@@ -361,6 +345,7 @@
 }
 
 .org-relationship__path,
+.org-relationship__reveal-glow,
 .org-relationship__glow {
   fill: none;
   stroke-linecap: round;
@@ -369,11 +354,24 @@
 }
 
 .org-relationship__path {
-  stroke-width: 1.15;
+  stroke-width: 1.8;
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
-  opacity: 0.58;
+  opacity: 0.84;
   transition: stroke-width 220ms ease, opacity 220ms ease;
+}
+
+.org-relationship__reveal-glow {
+  stroke: var(--org-gold);
+  stroke-width: 3.4;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  opacity: 0;
+  filter: url(#org-connector-glow);
+}
+
+.org-relationships[data-active="true"] .org-relationship__reveal-glow {
+  animation: org-connector-glow-reveal 760ms ease var(--org-edge-delay) both;
 }
 
 .org-relationships[data-active="true"] .org-relationship__path {
@@ -382,22 +380,26 @@
 
 .org-relationship__glow {
   stroke: var(--org-gold);
-  stroke-width: 5;
-  opacity: 0.26;
+  stroke-width: 4;
+  opacity: 0.2;
   filter: url(#org-connector-glow);
 }
 
 .org-relationship[data-highlighted="true"] .org-relationship__path {
   stroke: var(--org-gold);
-  stroke-width: 2.25;
+  stroke-width: 2.6;
   opacity: 1;
   filter: drop-shadow(0 0 5px rgb(249 193 33 / 55%));
 }
 
 .org-relationship__terminal {
   fill: #b5d2ee;
-  opacity: 0.46;
+  opacity: 0.64;
   vector-effect: non-scaling-stroke;
+}
+
+.org-relationships[data-active="true"] .org-relationship__terminal {
+  animation: org-terminal-reveal 360ms ease calc(var(--org-edge-delay) + 480ms) backwards;
 }
 
 .org-relationship[data-highlighted="true"] .org-relationship__terminal {
@@ -407,17 +409,17 @@
 }
 
 .org-node {
-  --org-node-size: 96px;
-  --org-node-width: 190px;
+  --org-node-size: 84px;
+  --org-node-width: 160px;
   --org-node-accent: #76ace8;
   --org-node-accent-rgb: 118 172 232;
   position: absolute;
   z-index: 2;
-  top: var(--org-node-y);
+  top: calc(var(--org-node-y) - var(--org-node-size) / 2);
   left: var(--org-node-x);
   width: var(--org-node-width);
   opacity: 0;
-  transform: translate(-50%, calc(-50% + 18px)) scale(0.93);
+  transform: translate(-50%, 18px) scale(0.93);
   transition: opacity 220ms ease, filter 220ms ease;
   will-change: transform, opacity;
 }
@@ -427,24 +429,24 @@
 }
 
 .org-node[data-authority="1"] {
-  --org-node-size: 184px;
-  --org-node-width: 310px;
+  --org-node-size: 160px;
+  --org-node-width: 286px;
   --org-node-accent: var(--org-gold);
   --org-node-accent-rgb: 249 193 33;
   z-index: 6;
 }
 
 .org-node[data-authority="2"] {
-  --org-node-size: 140px;
-  --org-node-width: 250px;
+  --org-node-size: 124px;
+  --org-node-width: 224px;
   --org-node-accent: #f7a54c;
   --org-node-accent-rgb: 247 165 76;
   z-index: 5;
 }
 
 .org-node[data-authority="3"] {
-  --org-node-size: 112px;
-  --org-node-width: 210px;
+  --org-node-size: 104px;
+  --org-node-width: 196px;
   --org-node-accent: #8ebce9;
   --org-node-accent-rgb: 142 188 233;
   z-index: 4;
@@ -694,24 +696,15 @@
   width: 100%;
   align-items: center;
   flex-direction: column;
-  margin-top: 16px;
+  margin-top: 12px;
   text-shadow: 0 2px 10px rgb(0 4 16 / 82%);
-}
-
-.org-node__authority {
-  color: var(--org-node-accent);
-  font-size: 0.55rem;
-  font-weight: 850;
-  letter-spacing: 0.16em;
-  line-height: 1.1;
-  text-transform: uppercase;
 }
 
 .org-node__name {
   display: -webkit-box;
   overflow: hidden;
   max-width: 100%;
-  margin-top: 5px;
+  margin-top: 0;
   color: var(--org-white);
   font-size: 0.82rem;
   font-weight: 880;
@@ -725,12 +718,12 @@
 
 .org-node[data-authority="1"] .org-node__name {
   color: var(--org-cream);
-  font-size: 1.12rem;
+  font-size: 1.08rem;
   letter-spacing: 0.055em;
 }
 
 .org-node[data-authority="2"] .org-node__name {
-  font-size: 1rem;
+  font-size: 0.92rem;
 }
 
 .org-node__organization,
@@ -740,7 +733,7 @@
   max-width: 100%;
   margin-top: 4px;
   color: rgb(211 226 242 / 64%);
-  font-size: 0.63rem;
+  font-size: 0.66rem;
   font-weight: 620;
   letter-spacing: 0.02em;
   line-height: 1.25;
@@ -755,7 +748,7 @@
   font-weight: 720;
 }
 
-.org-authority-legend {
+.org-level-legend {
   position: absolute;
   z-index: 40;
   bottom: calc(env(safe-area-inset-bottom, 0px) + 24px);
@@ -771,13 +764,13 @@
   pointer-events: auto;
 }
 
-.org-authority-legend span {
+.org-level-legend span {
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
-.org-authority-legend i {
+.org-level-legend i {
   display: block;
   width: 8px;
   height: 8px;
@@ -787,9 +780,9 @@
   box-shadow: 0 0 8px rgb(119 172 232 / 36%);
 }
 
-.org-authority-legend i[data-level="1"] { background: var(--org-gold); }
-.org-authority-legend i[data-level="2"] { background: var(--org-orange); }
-.org-authority-legend i[data-level="4"] { background: var(--org-mint); }
+.org-level-legend i[data-level="1"] { background: var(--org-gold); }
+.org-level-legend i[data-level="2"] { background: var(--org-orange); }
+.org-level-legend i[data-level="4"] { background: var(--org-mint); }
 
 .org-viewport-controls {
   position: absolute;
@@ -893,14 +886,6 @@
   gap: 14px;
   padding-bottom: 17px;
   border-bottom: 1px solid rgb(159 192 227 / 13%);
-}
-
-.org-detail__authority {
-  color: var(--org-gold);
-  font-size: 0.56rem;
-  font-weight: 850;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
 }
 
 .org-detail__header h2 {
@@ -1053,26 +1038,6 @@
   margin: 0;
 }
 
-.org-detail__relationships {
-  display: grid;
-  gap: 11px;
-}
-
-.org-detail__relationships .org-detail__section-title {
-  margin-bottom: 0;
-}
-
-.org-detail__relationships div:not(.org-detail__section-title) small {
-  display: block;
-  margin-bottom: 3px;
-  color: var(--org-orange);
-  font-size: 0.55rem;
-  font-weight: 780;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-}
-
-.org-detail__relationships p,
 .org-detail__empty {
   margin: 0;
   color: rgb(220 232 245 / 70%);
@@ -1198,11 +1163,11 @@
     width: min(340px, 38vw);
   }
 
-  .org-authority-legend {
+  .org-level-legend {
     gap: 10px;
   }
 
-  .org-authority-legend span:last-child {
+  .org-level-legend span:last-child {
     display: none;
   }
 }
@@ -1225,17 +1190,9 @@
     min-width: 0;
   }
 
-  .org-ecosystem__title > span {
-    font-size: 0.53rem;
-  }
-
   .org-ecosystem__title h1 {
     margin-top: 3px;
-    font-size: 1.05rem;
-  }
-
-  .org-ecosystem__title p {
-    display: none;
+    font-size: 0.72rem;
   }
 
   .org-search {
@@ -1269,7 +1226,7 @@
     display: inline;
   }
 
-  .org-authority-legend {
+  .org-level-legend {
     display: none;
   }
 
@@ -1336,10 +1293,6 @@
 }
 
 @media (max-width: 430px) {
-  .org-search__field kbd {
-    display: none;
-  }
-
   .org-search__field {
     grid-template-columns: auto 1fr;
   }
@@ -1398,7 +1351,6 @@
 
   .org-node__organization,
   .org-node__additional,
-  .org-ecosystem__title p,
   .org-detail__header p {
     color: var(--org-white);
   }
@@ -1479,14 +1431,25 @@
 }
 
 @keyframes org-node-arrival {
-  0% { opacity: 0; transform: translate(-50%, calc(-50% + 18px)) scale(0.93); }
+  0% { opacity: 0; transform: translate(-50%, 18px) scale(0.93); }
   62% { opacity: 1; }
-  100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 1; transform: translate(-50%, 0) scale(1); }
 }
 
 @keyframes org-connector-reveal {
   from { stroke-dashoffset: 1; }
   to { stroke-dashoffset: 0; }
+}
+
+@keyframes org-connector-glow-reveal {
+  0% { stroke-dashoffset: 1; opacity: 0; }
+  42% { opacity: 0.24; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
+}
+
+@keyframes org-terminal-reveal {
+  from { opacity: 0; }
+  to { opacity: 0.64; }
 }
 
 @keyframes org-root-ring {
