@@ -33,6 +33,7 @@ import {
   shouldRenderArenaCourts,
   shouldRenderArenaStructures,
 } from '../../data/parkEnvironment';
+import { COMMERCIAL_MAP_ENVIRONMENT_CONFIG } from '../../data/commercialMapEnvironment';
 import {
   resolveStrategicLandmarkKind,
   strategicLandmarkBounds,
@@ -77,6 +78,7 @@ import { TechnicalValidationOverlay } from './TechnicalValidationOverlay';
 import { CommercialTreeLayer } from './CommercialTreeLayer';
 import { CommercialElectricalInfrastructureLayer } from './CommercialElectricalInfrastructureLayer';
 import { ArenaFrontInfrastructure } from './ArenaFrontInfrastructure';
+import { CommercialMapEnvironment } from './CommercialMapEnvironment';
 import {
   buildCommercialMapSegmentIndex,
   getCommercialMapSegment,
@@ -2077,9 +2079,6 @@ function Scene({
     matchingEntityIds: presentedMatchingEntityIds,
     filtersActive: entityFiltersActive,
   });
-  const groundMargin = Math.max(8, extent.diagonal * 0.08);
-  const shadowSpan = Math.max(extent.width, extent.depth) * 0.58;
-
   useEffect(() => {
     gl.shadowMap.autoUpdate = false;
     gl.shadowMap.needsUpdate = true;
@@ -2127,51 +2126,11 @@ function Scene({
 
   return (
     <>
-      <color attach="background" args={[hydrologicalModeActive ? '#cbdcda' : '#dfe8de']} />
-      <fog
-        attach="fog"
-        args={[
-          hydrologicalModeActive ? '#cbdcda' : '#dfe8de',
-          extent.diagonal * (hydrologicalModeActive ? 3.8 : 3.2),
-          extent.diagonal * 7.4,
-        ]}
+      <CommercialMapEnvironment
+        extent={extent}
+        hydrologicalModeActive={hydrologicalModeActive}
+        reducedGraphics={reducedGraphics}
       />
-      <ambientLight intensity={hydrologicalModeActive ? 0.82 : 0.68} />
-      <hemisphereLight args={['#fffdf5', hydrologicalModeActive ? '#365b60' : '#48634e', 0.9]} />
-      <directionalLight
-        position={[extent.centerX - extent.width * 0.3, Math.max(54, extent.diagonal * 0.55), extent.centerZ + extent.depth * 0.35]}
-        intensity={2.15}
-        color="#fff4d8"
-        castShadow={!reducedGraphics}
-        shadow-mapSize-width={reducedGraphics ? 512 : 2048}
-        shadow-mapSize-height={reducedGraphics ? 512 : 2048}
-        shadow-camera-left={-shadowSpan}
-        shadow-camera-right={shadowSpan}
-        shadow-camera-top={shadowSpan}
-        shadow-camera-bottom={-shadowSpan}
-        shadow-camera-near={0.5}
-        shadow-camera-far={Math.max(180, extent.diagonal * 2.2)}
-        shadow-bias={-0.00006}
-        shadow-normalBias={0.035}
-      />
-      <directionalLight
-        position={[extent.centerX + extent.width * 0.4, Math.max(24, extent.diagonal * 0.22), extent.centerZ - extent.depth * 0.3]}
-        intensity={0.38}
-        color="#d8e9ff"
-      />
-      <mesh
-        rotation={[-Math.PI / 2, 0, 0]}
-        position={[extent.centerX, -0.08, extent.centerZ]}
-        receiveShadow
-        raycast={NO_RAYCAST}
-      >
-        <planeGeometry args={[extent.width + groundMargin, extent.depth + groundMargin]} />
-        <meshStandardMaterial
-          color={hydrologicalModeActive ? '#b9cbc6' : '#cfdccc'}
-          roughness={1}
-          metalness={0}
-        />
-      </mesh>
       {!isolatedArea && !hydrologicalModeActive && <ReferenceUnderlay calibration={calibration} />}
       <RoadInfrastructure
         entities={circulationEntities}
@@ -2395,7 +2354,7 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
         onCreated={({ gl }) => {
           gl.outputColorSpace = THREE.SRGBColorSpace;
           gl.toneMapping = THREE.ACESFilmicToneMapping;
-          gl.toneMappingExposure = 0.96;
+          gl.toneMappingExposure = COMMERCIAL_MAP_ENVIRONMENT_CONFIG.toneMappingExposure;
           gl.shadowMap.type = THREE.PCFSoftShadowMap;
           gl.domElement.style.cursor = 'grab';
       }}
