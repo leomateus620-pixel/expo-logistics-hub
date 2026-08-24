@@ -44,6 +44,7 @@ export function LotWorkflowDialog({ lot, workflow, onClose }: Props) {
   const today = new Date().toISOString().slice(0, 10);
   const [saleDate, setSaleDate] = useState(today);
   const pending = reservation.isPending || negotiation.isPending || sale.isPending || contract.isPending;
+  const contractUploadUnavailable = workflow === 'contract' && !orgId;
 
   const content = useMemo(() => {
     if (workflow === 'reserve') return {
@@ -91,7 +92,8 @@ export function LotWorkflowDialog({ lot, workflow, onClose }: Props) {
           paymentStatus,
           notes,
         });
-      } else if (workflow === 'contract' && file && orgId) {
+      } else if (workflow === 'contract') {
+        if (!file || !orgId) return;
         await contract.mutateAsync({ orgId, lotId: lot.id, file, contractNumber });
       }
       onClose();
@@ -123,6 +125,11 @@ export function LotWorkflowDialog({ lot, workflow, onClose }: Props) {
                   <Input id="contract-file" type="file" accept=".pdf,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document" required onChange={(event) => setFile(event.target.files?.[0] ?? null)} />
                 </Field>
                 <p className="sm:col-span-2 text-xs text-muted-foreground">Tamanho máximo: 15 MB. O endereço do arquivo nunca será público.</p>
+                {contractUploadUnavailable && (
+                  <p className="sm:col-span-2 text-xs font-medium text-destructive" role="alert">
+                    Selecione uma organização ativa para enviar o contrato com segurança.
+                  </p>
+                )}
               </>
             ) : (
               <>
@@ -192,7 +199,10 @@ export function LotWorkflowDialog({ lot, workflow, onClose }: Props) {
 
           <DialogFooter>
             <Button type="button" variant="ghost" onClick={onClose} disabled={pending}>Cancelar</Button>
-            <Button type="submit" disabled={pending || (workflow === 'contract' && !file)}>
+            <Button
+              type="submit"
+              disabled={pending || (workflow === 'contract' && (!file || contractUploadUnavailable))}
+            >
               {pending && <Loader2 className="h-4 w-4 animate-spin" />}
               {content.submit}
             </Button>

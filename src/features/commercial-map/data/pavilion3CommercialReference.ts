@@ -1,73 +1,27 @@
-export type Pavilion3CommercialModuleOrientation = 'east-west' | 'north-south';
+import {
+  buildCommercialPavilionReferenceCells,
+  commercialPavilionReferenceRect as rect,
+  type CommercialPavilionModuleSource,
+  type CommercialPavilionReferenceCell,
+  type CommercialPavilionReferenceCorridor,
+  type CommercialPavilionReferenceModuleOrientation,
+  type CommercialPavilionReferenceRect,
+  type CommercialPavilionReferenceRun,
+  type CommercialPavilionReferenceSequenceOrientation,
+  type CommercialPavilionReferenceSourceDiscrepancy,
+} from './commercialPavilionReference';
 
+export type Pavilion3CommercialModuleOrientation =
+  CommercialPavilionReferenceModuleOrientation;
 export type Pavilion3CommercialSequenceOrientation =
-  | 'x-increasing'
-  | 'z-increasing'
-  | 'z-decreasing';
-
+  CommercialPavilionReferenceSequenceOrientation;
 export type Pavilion3CommercialModuleSourceDiscrepancy =
-  | 'official-range-omission'
-  | null;
-
-export interface Pavilion3CommercialReferenceRect {
-  centerX: number;
-  centerZ: number;
-  width: number;
-  depth: number;
-}
-
-export interface Pavilion3CommercialReferenceRun {
-  id: string;
-  label: string;
-  role: 'perimeter' | 'island';
-  bounds: Pavilion3CommercialReferenceRect;
-  numberRange: readonly [start: number, end: number];
-  orientation: Pavilion3CommercialModuleOrientation;
-  sequenceOrientation: Pavilion3CommercialSequenceOrientation;
-  group: string;
-  cluster: string;
-}
-
-export interface Pavilion3CommercialReferenceCorridor
-  extends Pavilion3CommercialReferenceRect {
-  id: string;
-  kind: 'main' | 'cross';
-  label: string;
-}
-
-export interface Pavilion3CommercialModuleSource {
-  document: 'Anexos oficiais 1 e 2 · Pavilhão 3 — Comércio';
-  referenceYear: 2026;
-  discrepancy: Pavilion3CommercialModuleSourceDiscrepancy;
-}
-
-export interface Pavilion3CommercialReferenceCell
-  extends Pavilion3CommercialReferenceRect {
-  id: string;
-  number: number;
-  label: string;
-  zoneId: string;
-  pavilionId: 'B6';
-  lotNumber: string;
-  orientation: Pavilion3CommercialModuleOrientation;
-  sequenceOrientation: Pavilion3CommercialSequenceOrientation;
-  labelAnchor: readonly [x: number, z: number];
-  type: 'commercial-lot';
-  areaM2: null;
-  sortOrder: number;
-  group: string;
-  cluster: string;
-  source: Pavilion3CommercialModuleSource;
-}
-
-function rect(
-  centerX: number,
-  centerZ: number,
-  width: number,
-  depth: number,
-): Pavilion3CommercialReferenceRect {
-  return { centerX, centerZ, width, depth };
-}
+  CommercialPavilionReferenceSourceDiscrepancy;
+export type Pavilion3CommercialReferenceRect = CommercialPavilionReferenceRect;
+export type Pavilion3CommercialReferenceRun = CommercialPavilionReferenceRun;
+export type Pavilion3CommercialReferenceCorridor = CommercialPavilionReferenceCorridor;
+export type Pavilion3CommercialModuleSource = CommercialPavilionModuleSource;
+export type Pavilion3CommercialReferenceCell = CommercialPavilionReferenceCell<'B6'>;
 
 /** Equal normalized clearance between adjacent modules in every official run. */
 export const PAVILION3_COMMERCIAL_MODULE_GAP = 0.0015;
@@ -121,7 +75,7 @@ export const PAVILION3_COMMERCIAL_REFERENCE_RUNS = [
     id: 'island-1-west-leg',
     label: 'Ilha 1 · 48–75',
     role: 'island',
-    bounds: rect(0.3275, 0.48, 0.095, 0.56),
+    bounds: rect(0.3275, 0.435, 0.095, 0.47),
     numberRange: [48, 75],
     orientation: 'east-west',
     sequenceOrientation: 'z-increasing',
@@ -129,21 +83,21 @@ export const PAVILION3_COMMERCIAL_REFERENCE_RUNS = [
     cluster: 'island-1-west-leg',
   },
   {
-    id: 'island-1-south-cap',
+    id: 'island-1-vertical-extension',
     label: 'Ilha 1 · 76–83',
     role: 'island',
-    bounds: rect(0.38, 0.81, 0.2, 0.08),
+    bounds: rect(0.3275, 0.738107142857, 0.095, 0.133214285714),
     numberRange: [76, 83],
-    orientation: 'north-south',
-    sequenceOrientation: 'x-increasing',
+    orientation: 'east-west',
+    sequenceOrientation: 'z-increasing',
     group: 'island-1',
-    cluster: 'island-1-south-cap',
+    cluster: 'island-1-vertical-extension',
   },
   {
     id: 'island-1-east-leg',
     label: 'Ilha 1 · 84–111',
     role: 'island',
-    bounds: rect(0.4325, 0.48, 0.095, 0.56),
+    bounds: rect(0.4325, 0.435, 0.095, 0.47),
     numberRange: [84, 111],
     orientation: 'east-west',
     sequenceOrientation: 'z-decreasing',
@@ -154,7 +108,7 @@ export const PAVILION3_COMMERCIAL_REFERENCE_RUNS = [
     id: 'island-2-west-leg',
     label: 'Ilha 2 · 112–139',
     role: 'island',
-    bounds: rect(0.5975, 0.48, 0.095, 0.56),
+    bounds: rect(0.5975, 0.435, 0.095, 0.47),
     numberRange: [112, 139],
     orientation: 'east-west',
     sequenceOrientation: 'z-increasing',
@@ -162,21 +116,21 @@ export const PAVILION3_COMMERCIAL_REFERENCE_RUNS = [
     cluster: 'island-2-west-leg',
   },
   {
-    id: 'island-2-south-cap',
+    id: 'island-2-vertical-extension',
     label: 'Ilha 2 · 140–147',
     role: 'island',
-    bounds: rect(0.65, 0.81, 0.2, 0.08),
+    bounds: rect(0.5975, 0.738107142857, 0.095, 0.133214285714),
     numberRange: [140, 147],
-    orientation: 'north-south',
-    sequenceOrientation: 'x-increasing',
+    orientation: 'east-west',
+    sequenceOrientation: 'z-increasing',
     group: 'island-2',
-    cluster: 'island-2-south-cap',
+    cluster: 'island-2-vertical-extension',
   },
   {
     id: 'island-2-east-leg',
     label: 'Ilha 2 · 148–175',
     role: 'island',
-    bounds: rect(0.7025, 0.48, 0.095, 0.56),
+    bounds: rect(0.7025, 0.435, 0.095, 0.47),
     numberRange: [148, 175],
     orientation: 'east-west',
     sequenceOrientation: 'z-decreasing',
@@ -243,68 +197,19 @@ export const PAVILION3_COMMERCIAL_REFERENCE_CORRIDORS = [
 
 const SOURCE_DOCUMENT = 'Anexos oficiais 1 e 2 · Pavilhão 3 — Comércio' as const;
 
-function sourceFor(number: number): Pavilion3CommercialModuleSource {
-  return {
-    document: SOURCE_DOCUMENT,
-    referenceYear: 2026,
-    discrepancy: number === 6 || (number >= 156 && number <= 159)
-      ? 'official-range-omission'
-      : null,
-  };
-}
-
-function expandRun(
-  run: Pavilion3CommercialReferenceRun,
-): Pavilion3CommercialReferenceCell[] {
-  const [start, end] = run.numberRange;
-  const moduleCount = end - start + 1;
-  const horizontalSequence = run.sequenceOrientation === 'x-increasing';
-  const sequenceLength = horizontalSequence ? run.bounds.width : run.bounds.depth;
-  const cellLength = (
-    sequenceLength - PAVILION3_COMMERCIAL_MODULE_GAP * (moduleCount - 1)
-  ) / moduleCount;
-  const left = run.bounds.centerX - run.bounds.width / 2;
-  const top = run.bounds.centerZ - run.bounds.depth / 2;
-
-  return Array.from({ length: moduleCount }, (_, index) => {
-    const number = start + index;
-    const spatialIndex = run.sequenceOrientation === 'z-decreasing'
-      ? moduleCount - index - 1
-      : index;
-    const centerX = horizontalSequence
-      ? left + spatialIndex * (cellLength + PAVILION3_COMMERCIAL_MODULE_GAP) + cellLength / 2
-      : run.bounds.centerX;
-    const centerZ = horizontalSequence
-      ? run.bounds.centerZ
-      : top + spatialIndex * (cellLength + PAVILION3_COMMERCIAL_MODULE_GAP) + cellLength / 2;
-    const label = String(number).padStart(2, '0');
-
-    return {
-      id: `B6:module:${String(number).padStart(3, '0')}`,
-      number,
-      label,
-      zoneId: run.id,
-      centerX,
-      centerZ,
-      width: horizontalSequence ? cellLength : run.bounds.width,
-      depth: horizontalSequence ? run.bounds.depth : cellLength,
-      pavilionId: 'B6',
-      lotNumber: label,
-      orientation: run.orientation,
-      sequenceOrientation: run.sequenceOrientation,
-      labelAnchor: [centerX, centerZ],
-      type: 'commercial-lot',
-      areaM2: null,
-      sortOrder: number,
-      group: run.group,
-      cluster: run.cluster,
-      source: sourceFor(number),
-    };
-  });
-}
-
 export const PAVILION3_COMMERCIAL_REFERENCE_CELLS =
-  PAVILION3_COMMERCIAL_REFERENCE_RUNS.flatMap(expandRun);
+  buildCommercialPavilionReferenceCells({
+    pavilionId: 'B6',
+    runs: PAVILION3_COMMERCIAL_REFERENCE_RUNS,
+    moduleGap: PAVILION3_COMMERCIAL_MODULE_GAP,
+    sourceDocument: SOURCE_DOCUMENT,
+    referenceYear: 2026,
+    discrepancyForNumber: (number) => (
+      number === 6 || (number >= 156 && number <= 159)
+        ? 'official-range-omission'
+        : null
+    ),
+  });
 
 if (PAVILION3_COMMERCIAL_REFERENCE_CELLS.length !== 214) {
   throw new Error(

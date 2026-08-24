@@ -351,7 +351,7 @@ export const CommercialPavilionInteriorScene = memo(function CommercialPavilionI
 
   if (!definition || !layout || !modulePlan || !floorGeometry) return null;
   const perimeter = createLowPerimeter(layout);
-  const protectedPlanRects = modulePlan.publicIdentifier === 'B6'
+  const protectedPlanRects = ['B2', 'B3', 'B6'].includes(modulePlan.publicIdentifier)
     ? buildProtectedPlanRects(modulePlan, layout)
     : [];
   const structureClearance = Math.max(

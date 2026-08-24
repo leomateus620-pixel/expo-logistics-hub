@@ -26,10 +26,13 @@ import {
   sourcePolygonAreaSqm,
 } from './exporuralReference2026';
 import { withCommercialMapSegmentMetadata } from './commercialMapSegments';
+import type { CommercialPavilionReferenceCell } from './commercialPavilionReference';
+import { PAVILION12_COMMERCIAL_REFERENCE_CELLS } from './pavilion12CommercialReference';
+import { PAVILION14_COMMERCIAL_REFERENCE_CELLS } from './pavilion14CommercialReference';
 import {
   PAVILION3_COMMERCIAL_REFERENCE_CELLS,
-  type Pavilion3CommercialReferenceCell,
 } from './pavilion3CommercialReference';
+import { commercialPavilionModelBounds } from '../utils/commercialPavilions';
 
 type PdfPoint = [number, number];
 type PdfPolygon = PdfPoint[];
@@ -473,8 +476,8 @@ function addStructure(
 // Pavilions and infrastructure B1–B42, following the official lower legend.
 const bStructures: Array<[string, string, MapClassification, string, PdfBounds | PdfPoint, Parameters<typeof addStructure>[5]?]> = [
   ['B1', 'Pavilhão 1 — Comércio e serviços', 'PAVILION', 'pavilions', [2298, 3600, 2655, 3759]],
-  ['B2', 'Pavilhão 14 — Artesanato e comércio', 'PAVILION', 'pavilions', [2418, 3833, 2658, 4074]],
-  ['B3', 'Pavilhão 12 — Indústria e comércio', 'PAVILION', 'pavilions', [2792, 3827, 3147, 4089]],
+  ['B2', 'Pavilhão 14 — Comércio e Artesanato', 'PAVILION', 'pavilions', [2418, 3833, 2658, 4074]],
+  ['B3', 'Pavilhão 12 — Indústria, Comércio e Serviços', 'PAVILION', 'pavilions', [2792, 3827, 3147, 4089]],
   ['B4', 'Pavilhão 8 — Indústria e comércio', 'PAVILION', 'pavilions', [3172, 3788, 3296, 4100]],
   ['B5', 'Pavilhão 13 — Comércio', 'PAVILION', 'pavilions', [3307, 3788, 3445, 4051]],
   ['B6', 'Pavilhão 3 — Comércio', 'PAVILION', 'pavilions', [3460, 3786, 3670, 4098]],
@@ -637,7 +640,8 @@ function toEntity(input: ReferenceEntityInput): MapEntity {
 
 function pavilionModuleGeometry(
   pavilion: MapEntity,
-  cell: Pavilion3CommercialReferenceCell,
+  cell: CommercialPavilionReferenceCell,
+  facingRadians: number,
 ): PolygonGeometry {
   const ring = pavilion.geometry.coordinates[0];
   const xs = ring.map(([x]) => x);
@@ -648,12 +652,13 @@ function pavilionModuleGeometry(
   const maxZ = Math.max(...zs);
   const centerX = (minX + maxX) / 2;
   const centerZ = (minZ + maxZ) / 2;
-  const width = maxX - minX;
-  const depth = maxZ - minZ;
-  const shortSide = Math.min(width, depth);
-  const clearWidth = width - 2 * shortSide * 0.025 - 2 * shortSide * 0.065;
-  const clearDepth = depth - 2 * shortSide * 0.025 - 2 * shortSide * 0.065;
-  const facingRadians = Math.PI;
+  const modelBounds = commercialPavilionModelBounds({
+    width: maxX - minX,
+    depth: maxZ - minZ,
+  }, facingRadians);
+  const shortSide = Math.min(modelBounds.width, modelBounds.depth);
+  const clearWidth = modelBounds.width - 2 * shortSide * 0.025 - 2 * shortSide * 0.065;
+  const clearDepth = modelBounds.depth - 2 * shortSide * 0.025 - 2 * shortSide * 0.065;
   const cosine = Math.cos(facingRadians);
   const sine = Math.sin(facingRadians);
   const corners: Coordinate[] = [
@@ -684,9 +689,10 @@ function pavilionModuleGeometry(
 
 function pavilionModuleLabelAnchor(
   pavilion: MapEntity,
-  cell: Pavilion3CommercialReferenceCell,
+  cell: CommercialPavilionReferenceCell,
+  facingRadians: number,
 ): Coordinate {
-  const geometry = pavilionModuleGeometry(pavilion, cell);
+  const geometry = pavilionModuleGeometry(pavilion, cell, facingRadians);
   const ring = geometry.coordinates[0].slice(0, -1);
   return [
     ring.reduce((total, [x]) => total + x, 0) / ring.length,
@@ -695,57 +701,99 @@ function pavilionModuleLabelAnchor(
 }
 
 const officialBaseEntities = entityInputs.map(toEntity);
-const pavilion3Entity = officialBaseEntities.find((entity) => entity.publicIdentifier === 'B6');
-if (!pavilion3Entity) throw new Error('B6: pavilhão oficial não encontrado para projetar os módulos internos.');
 
-const pavilion3ModuleEntities: MapEntity[] = PAVILION3_COMMERCIAL_REFERENCE_CELLS.map((cell) => ({
-  id: entityId(`B6-M${String(cell.number).padStart(3, '0')}`),
-  projectId: pavilion3Entity.projectId,
-  layerId: 'reference:commercial',
-  parentEntityId: pavilion3Entity.id,
-  segmentId: 'industria-comercio-servicos',
-  segmentSource: 'derived',
-  publicIdentifier: `B6-M${String(cell.number).padStart(3, '0')}`,
-  name: `Módulo ${cell.label}`,
-  description: 'Módulo comercial neutro do Pavilhão 3, sem expositor vinculado.',
-  classification: 'INTERNAL_STAND',
-  verificationStatus: 'NEEDS_REVIEW',
-  isSellable: true,
-  isArchived: false,
-  geometry: pavilionModuleGeometry(pavilion3Entity, cell),
-  metadata: {
-    seedManaged: true,
-    sourceRevision: OFFICIAL_REFERENCE_REVISION,
-    layoutRevision: '2026.4-p3.1',
-    source: 'Anexos oficiais 1 e 2 — Pavilhão 3 — Comércio',
-    cartographicConfidence: 'official_visual_reference',
-    officialMeasurements: false,
-    buyerDataImported: false,
-    parentPublicIdentifier: 'B6',
-    pavilionModuleKey: cell.id,
-    pavilionPublicIdentifier: 'B6',
-    pavilionNumber: 3,
-    moduleNumber: cell.number,
-    lotNumber: cell.lotNumber,
-    moduleType: cell.type,
-    areaM2: null,
-    areaAssignment: 'unassigned',
-    orientation: cell.orientation,
-    sequenceOrientation: cell.sequenceOrientation,
-    labelAnchor: pavilionModuleLabelAnchor(pavilion3Entity, cell),
-    sortOrder: cell.sortOrder,
-    group: cell.group,
-    cluster: cell.cluster,
-    sourceDiscrepancy: cell.source.discrepancy,
-    segmentId: 'industria-comercio-servicos',
-    segmentCode: 'INDUSTRIA_COMERCIO_SERVICOS',
-    segmentName: 'Indústria, Comércio e Serviços',
+const pavilionModuleReferences = [
+  {
+    publicIdentifier: 'B2',
+    pavilionNumber: 14,
+    block: 'P14',
+    layoutRevision: '2026.4-p14.1',
+    source: 'Anexo 2 e Anexo 6 — Pavilhão 14 — Comércio e Artesanato',
+    facingRadians: Math.PI / 2,
+    cells: PAVILION14_COMMERCIAL_REFERENCE_CELLS,
   },
-}));
+  {
+    publicIdentifier: 'B3',
+    pavilionNumber: 12,
+    block: 'P12',
+    layoutRevision: '2026.4-p12.1',
+    source: 'Anexo 1 e Anexo 6 — Pavilhão 12 — Indústria, Comércio e Serviços',
+    facingRadians: Math.PI,
+    cells: PAVILION12_COMMERCIAL_REFERENCE_CELLS,
+  },
+  {
+    publicIdentifier: 'B6',
+    pavilionNumber: 3,
+    block: 'P3',
+    layoutRevision: '2026.4-p3.2',
+    source: 'Anexo 3 e Anexo 6 — Pavilhão 3 — Comércio',
+    facingRadians: Math.PI,
+    cells: PAVILION3_COMMERCIAL_REFERENCE_CELLS,
+  },
+] as const;
+
+const pavilionModuleEntities: MapEntity[] = pavilionModuleReferences.flatMap((reference) => {
+  const pavilion = officialBaseEntities.find(
+    (entity) => entity.publicIdentifier === reference.publicIdentifier,
+  );
+  if (!pavilion) {
+    throw new Error(
+      `${reference.publicIdentifier}: pavilhão oficial não encontrado para projetar os módulos internos.`,
+    );
+  }
+  return reference.cells.map((cell) => {
+    const publicIdentifier = `${reference.publicIdentifier}-M${String(cell.number).padStart(3, '0')}`;
+    return {
+      id: entityId(publicIdentifier),
+      projectId: pavilion.projectId,
+      layerId: 'reference:commercial',
+      parentEntityId: pavilion.id,
+      segmentId: 'industria-comercio-servicos',
+      segmentSource: 'derived',
+      publicIdentifier,
+      name: `Módulo ${cell.label}`,
+      description: `Módulo comercial neutro do Pavilhão ${reference.pavilionNumber}, sem expositor vinculado.`,
+      classification: 'INTERNAL_STAND',
+      verificationStatus: 'NEEDS_REVIEW',
+      isSellable: true,
+      isArchived: false,
+      geometry: pavilionModuleGeometry(pavilion, cell, reference.facingRadians),
+      metadata: {
+        seedManaged: true,
+        sourceRevision: OFFICIAL_REFERENCE_REVISION,
+        layoutRevision: reference.layoutRevision,
+        source: reference.source,
+        cartographicConfidence: 'official_visual_reference',
+        officialMeasurements: false,
+        buyerDataImported: false,
+        parentPublicIdentifier: reference.publicIdentifier,
+        pavilionModuleKey: cell.id,
+        pavilionPublicIdentifier: reference.publicIdentifier,
+        pavilionNumber: reference.pavilionNumber,
+        commercialBlock: reference.block,
+        moduleNumber: cell.number,
+        lotNumber: cell.lotNumber,
+        moduleType: cell.type,
+        areaM2: null,
+        areaAssignment: 'unassigned',
+        orientation: cell.orientation,
+        sequenceOrientation: cell.sequenceOrientation,
+        labelAnchor: pavilionModuleLabelAnchor(pavilion, cell, reference.facingRadians),
+        sortOrder: cell.sortOrder,
+        group: cell.group,
+        cluster: cell.cluster,
+        sourceDiscrepancy: cell.source.discrepancy,
+        segmentId: 'industria-comercio-servicos',
+        segmentCode: 'INDUSTRIA_COMERCIO_SERVICOS',
+        segmentName: 'Indústria, Comércio e Serviços',
+      },
+    } satisfies MapEntity;
+  });
+});
 
 export const OFFICIAL_REFERENCE_ENTITIES = [
   ...officialBaseEntities,
-  ...pavilion3ModuleEntities,
+  ...pavilionModuleEntities,
 ].map(withCommercialMapSegmentMetadata);
 
 const officialLotEntities = OFFICIAL_REFERENCE_ENTITIES.filter((entity) => (
@@ -754,7 +802,9 @@ const officialLotEntities = OFFICIAL_REFERENCE_ENTITIES.filter((entity) => (
 
 export const OFFICIAL_REFERENCE_LOTS: CommercialLot[] = officialLotEntities.map((entity) => {
   const isPavilionModule = entity.classification === 'INTERNAL_STAND';
-  const block = isPavilionModule ? 'P3' : String(entity.metadata.block);
+  const block = isPavilionModule
+    ? String(entity.metadata.commercialBlock)
+    : String(entity.metadata.block);
   const number = String(entity.metadata.lotNumber);
   const exporuralReference = getExporuralReference(block, number);
   const officialAreaSqm = exporuralReference?.officialAreaSqm ?? null;
@@ -772,7 +822,7 @@ export const OFFICIAL_REFERENCE_LOTS: CommercialLot[] = officialLotEntities.map(
     levelLabel: null,
     displayName: isPavilionModule ? `Módulo ${number}` : `Lote ${number}`,
     description: isPavilionModule
-      ? 'Módulo comercial neutro do Pavilhão 3, sem expositor vinculado.'
+      ? `Módulo comercial neutro do Pavilhão ${String(entity.metadata.pavilionNumber)}, sem expositor vinculado.`
       : `Unidade numerada da Quadra ${block} conforme a planta oficial Fenasoja 2026.`,
     status: 'BLOCKED',
     officialAreaSqm,
@@ -809,7 +859,7 @@ export const OFFICIAL_REFERENCE_LOTS: CommercialLot[] = officialLotEntities.map(
 
 export const OFFICIAL_REFERENCE_DATA: CommercialMapData = {
   source: 'official-reference',
-  sourceMessage: 'Planta oficial 2026 digitalizada sem importar compradores. Os 95 lotes da Exporural possuem áreas cadastrais validadas; os 214 módulos do Pavilhão 3 permanecem sem área individual e todos os 476 lotes/módulos ficam bloqueados até liberação comercial.',
+  sourceMessage: 'Planta oficial 2026 digitalizada sem importar compradores. Os 95 lotes da Exporural possuem áreas cadastrais validadas; os 657 módulos dos Pavilhões 3, 12 e 14 permanecem sem área individual e todos os 919 lotes/módulos ficam bloqueados até liberação comercial.',
   project: {
     id: 'reference:fenasoja-2026',
     orgId: null,

@@ -45,6 +45,48 @@ function lot(overrides: Partial<CommercialLot> = {}): CommercialLot {
 describe('pavilion module commercial identity', () => {
   const pavilion = { id: 'pavilion-b6', publicIdentifier: 'B6' };
 
+  it.each([
+    { pavilionIdentifier: 'B2', moduleNumber: 73 },
+    { pavilionIdentifier: 'B3', moduleNumber: 41 },
+    { pavilionIdentifier: 'B6', moduleNumber: 48 },
+  ])('mantém identidade, situação e navegação estáveis em $pavilionIdentifier', ({
+    pavilionIdentifier,
+    moduleNumber,
+  }) => {
+    const parentEntityId = `pavilion-${pavilionIdentifier.toLowerCase()}`;
+    const moduleId = `module-${pavilionIdentifier.toLowerCase()}-${moduleNumber}`;
+    const publicIdentifier = `${pavilionIdentifier}-M${String(moduleNumber).padStart(3, '0')}`;
+    const moduleKey = `${pavilionIdentifier}:module:${String(moduleNumber).padStart(3, '0')}`;
+    const moduleEntity = entity({
+      id: moduleId,
+      parentEntityId,
+      publicIdentifier,
+      metadata: {
+        pavilionPublicIdentifier: pavilionIdentifier,
+        pavilionModuleKey: moduleKey,
+        moduleNumber,
+      },
+    });
+    const moduleLot = lot({
+      id: `lot-${pavilionIdentifier.toLowerCase()}-${moduleNumber}`,
+      entityId: moduleId,
+      publicIdentifier,
+      lotNumber: String(moduleNumber),
+      status: 'IN_NEGOTIATION',
+    });
+    const candidatePavilion = { id: parentEntityId, publicIdentifier: pavilionIdentifier };
+
+    expect(buildPavilionModuleCommercialIndex(
+      candidatePavilion,
+      [moduleEntity],
+      [moduleLot],
+    ).get(moduleKey)?.lot.status).toBe('IN_NEGOTIATION');
+    expect(resolveCommercialPavilionModuleNavigationTarget(moduleEntity)).toEqual({
+      pavilionEntityId: parentEntityId,
+      moduleId: moduleKey,
+    });
+  });
+
   it('maps a persisted lot to the same stable key used by the official plan', () => {
     const index = buildPavilionModuleCommercialIndex(pavilion, [entity()], [lot()]);
     expect(commercialPavilionModuleKey('B6', 48)).toBe('B6:module:048');

@@ -75,8 +75,8 @@ describe('portais comerciais por comissão', () => {
 
     expect(rural.entities).toHaveLength(111);
     expect(rural.lots).toHaveLength(95);
-    expect(industry.entities).toHaveLength(354);
-    expect(industry.lots).toHaveLength(317);
+    expect(industry.entities).toHaveLength(797);
+    expect(industry.lots).toHaveLength(760);
 
     const ruralIds = new Set(rural.entities.map((entity) => entity.id));
     expect(industry.entities.some((entity) => ruralIds.has(entity.id))).toBe(false);

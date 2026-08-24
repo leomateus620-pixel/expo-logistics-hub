@@ -2,11 +2,13 @@ import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef } from '
 import { useThree, type ThreeEvent } from '@react-three/fiber';
 import * as THREE from 'three';
 import type { CommercialPavilionLayout } from '../../utils/commercialPavilions';
+import { STATUS_CONFIG } from '../../constants';
 import {
   projectCommercialPavilionModuleRect,
   type CommercialPavilionModulePlan,
 } from '../../utils/commercialPavilionModules';
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
+import { isMapSelectionClick } from '../../utils/interaction';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import type { CommercialStatus } from '../../types';
 import type { CommercialPavilionModuleVisualState } from '../../utils/pavilionModuleCommercial';
@@ -51,18 +53,18 @@ function zoneColor(colorCue: string, index: number, total: number) {
 const HOVER_COLOR = new THREE.Color('#f3e6b2');
 const SELECTED_COLOR = new THREE.Color('#f2c94c');
 const MODULE_STATUS_COLORS: Readonly<Record<CommercialStatus, THREE.Color>> = {
-  AVAILABLE: new THREE.Color('#45a873'),
-  RESERVED: new THREE.Color('#d7a73f'),
-  IN_NEGOTIATION: new THREE.Color('#4e8fbd'),
-  SOLD: new THREE.Color('#8068a9'),
-  BLOCKED: new THREE.Color('#b5635f'),
-  UNAVAILABLE: new THREE.Color('#78827d'),
+  AVAILABLE: new THREE.Color(STATUS_CONFIG.AVAILABLE.color),
+  RESERVED: new THREE.Color(STATUS_CONFIG.RESERVED.color),
+  IN_NEGOTIATION: new THREE.Color(STATUS_CONFIG.IN_NEGOTIATION.color),
+  SOLD: new THREE.Color(STATUS_CONFIG.SOLD.color),
+  BLOCKED: new THREE.Color(STATUS_CONFIG.BLOCKED.color),
+  UNAVAILABLE: new THREE.Color(STATUS_CONFIG.UNAVAILABLE.color),
 };
 
 type OrientedModuleCell = CommercialPavilionModulePlan['cells'][number] & {
   labelAnchor?: readonly [number, number];
   orientation?: 'east-west' | 'north-south';
-  sequenceOrientation?: 'x-increasing' | 'z-increasing' | 'z-decreasing';
+  sequenceOrientation?: 'x-increasing' | 'x-decreasing' | 'z-increasing' | 'z-decreasing';
 };
 
 function createModuleNumberTexture(
@@ -346,7 +348,7 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
   }, [gl, interactive, setHoveredModuleId]);
 
   const handleClick = useCallback((event: ThreeEvent<MouseEvent>) => {
-    if (!interactive) return;
+    if (!interactive || !isMapSelectionClick(event.delta)) return;
     event.stopPropagation();
     const cell = event.instanceId === undefined ? null : projectedCells[event.instanceId];
     if (!cell) return;

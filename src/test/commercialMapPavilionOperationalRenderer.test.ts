@@ -17,16 +17,29 @@ describe('renderer operacional do interior comercial', () => {
     expect(`${layer}\n${interior}`).not.toMatch(/currentBuyer|exhibitorName|companyName/);
   });
 
-  it('mantém circulação fora do picking e protege a planta B6 da estrutura genérica', () => {
+  it('mantém circulação fora do picking e protege as plantas oficiais da estrutura genérica', () => {
     const layer = read('src/features/commercial-map/components/canvas/CommercialPavilionModuleLayer.tsx');
     const interior = read('src/features/commercial-map/components/canvas/CommercialPavilionInteriorScene.tsx');
 
     expect(layer).toContain('ref={setModuleBaseMesh}');
     expect(layer).toMatch(/ref=\{setCorridorMesh\}[\s\S]*?raycast=\{NO_RAYCAST\}/);
-    expect(interior).toContain("modulePlan.publicIdentifier === 'B6'");
+    expect(layer).toContain('isMapSelectionClick(event.delta)');
+    expect(interior).toContain("['B2', 'B3', 'B6'].includes(modulePlan.publicIdentifier)");
     expect(interior).toContain('buildProtectedPlanRects(modulePlan, layout)');
     expect(interior).toMatch(/layout\.interior\.columns[\s\S]*?rectanglesOverlap/);
     expect(interior).toMatch(/layout\.exterior\.structure\.columnZs[\s\S]*?rectanglesOverlap/);
+  });
+
+  it('expõe a legenda de situações comerciais também no interior', () => {
+    const page = read('src/features/commercial-map/CommercialMapPage.tsx');
+    const interiorBranch = page.slice(
+      page.indexOf('{interiorPavilionPlan && ('),
+      page.indexOf(') : (', page.indexOf('{interiorPavilionPlan && (')),
+    );
+
+    expect(interiorBranch).toContain('<PavilionPlanLegend');
+    expect(interiorBranch).toContain('<StatusLegend />');
+    expect(interiorBranch).toContain('<PavilionModuleCard');
   });
 
   it('não desenha os filhos INTERNAL_STAND na cena externa compartilhada', () => {

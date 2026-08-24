@@ -100,18 +100,21 @@ describe('regras comerciais e segurança', () => {
     const exporuralLots = OFFICIAL_REFERENCE_DATA.entities.filter(
       (entity) => entity.metadata.entityType === 'EXPORURAL_COMMERCIAL_LOT',
     );
-    const pavilion3Modules = OFFICIAL_REFERENCE_DATA.entities.filter(
-      (entity) => entity.classification === 'INTERNAL_STAND' && entity.metadata.pavilionPublicIdentifier === 'B6',
+    const pavilionModules = OFFICIAL_REFERENCE_DATA.entities.filter(
+      (entity) => entity.classification === 'INTERNAL_STAND',
     );
 
-    expect(OFFICIAL_REFERENCE_DATA.lots).toHaveLength(476);
+    expect(OFFICIAL_REFERENCE_DATA.lots).toHaveLength(919);
     expect(OFFICIAL_REFERENCE_DATA.lots.every((lot) => lot.status === 'BLOCKED')).toBe(true);
     expect(OFFICIAL_REFERENCE_DATA.lots.every((lot) => lot.pricingMode === 'NOT_FOR_SALE')).toBe(true);
     expect(OFFICIAL_REFERENCE_DATA.lots.every((lot) => lot.currentBuyer === null)).toBe(true);
     expect(exporuralLots).toHaveLength(95);
     expect(exporuralLots.every((entity) => entity.verificationStatus === 'VERIFIED')).toBe(true);
-    expect(pavilion3Modules).toHaveLength(214);
-    expect(pavilion3Modules.every((entity) => entity.verificationStatus === 'NEEDS_REVIEW')).toBe(true);
+    expect(pavilionModules).toHaveLength(657);
+    expect(pavilionModules.every((entity) => entity.verificationStatus === 'NEEDS_REVIEW')).toBe(true);
+    expect(new Set(pavilionModules.map((entity) => entity.metadata.pavilionPublicIdentifier))).toEqual(
+      new Set(['B2', 'B3', 'B6']),
+    );
     expect(OFFICIAL_REFERENCE_DATA.entities.filter((entity) => !validateGeometry(entity.geometry).valid)).toEqual([]);
   });
 });
