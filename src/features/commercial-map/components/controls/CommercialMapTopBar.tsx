@@ -1,6 +1,7 @@
 import {
   Box,
   Compass,
+  Droplets,
   Grid2x2,
   Layers3,
   Maximize2,
@@ -48,6 +49,8 @@ export function CommercialMapTopBar({
   const focusSelection = useCommercialMapStore((state) => state.focusSelection);
   const treesVisible = useCommercialMapStore((state) => state.treesVisible);
   const setTreesVisible = useCommercialMapStore((state) => state.setTreesVisible);
+  const hydrologicalModeActive = useCommercialMapStore((state) => state.hydrologicalModeActive);
+  const toggleHydrologicalMode = useCommercialMapStore((state) => state.toggleHydrologicalMode);
   const technicalValidationVisible = useCommercialMapStore((state) => state.technicalValidationVisible);
   const setTechnicalValidationVisible = useCommercialMapStore((state) => state.setTechnicalValidationVisible);
 
@@ -63,13 +66,13 @@ export function CommercialMapTopBar({
     Icon: LucideIcon,
     label: string,
     onClick: () => void,
-    options: { active?: boolean; disabled?: boolean } = {},
+    options: { active?: boolean; disabled?: boolean; hydrological?: boolean } = {},
   ) => (
     <Tooltip key={key}>
       <TooltipTrigger asChild>
         <button
           type="button"
-          className={`commercial-map-topbar__trigger ${options.active ? 'is-open' : ''}`}
+          className={`commercial-map-topbar__trigger ${options.active ? 'is-open' : ''} ${options.hydrological ? 'is-hydrological' : ''}`}
           onClick={onClick}
           disabled={options.disabled}
           aria-label={label}
@@ -95,6 +98,14 @@ export function CommercialMapTopBar({
       <span className="commercial-map-topbar__divider" aria-hidden="true" />
 
       {renderAction('focus', Maximize2, 'Centralizar seleção', focusSelection, { disabled: !hasSelection })}
+
+      {renderAction(
+        'hydrological-network',
+        Droplets,
+        hydrologicalModeActive ? 'Sair do modo Rede Hidrológica' : 'Ativar modo Rede Hidrológica',
+        toggleHydrologicalMode,
+        { active: hydrologicalModeActive, hydrological: true },
+      )}
 
       {renderAction(
         'layers',

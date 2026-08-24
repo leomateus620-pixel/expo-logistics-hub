@@ -2,6 +2,7 @@ import {
   Box,
   Building2,
   CarFront,
+  Droplets,
   Layers3,
   List,
   Map,
@@ -75,6 +76,8 @@ export function MapToolbar({
   const focusSelection = useCommercialMapStore((state) => state.focusSelection);
   const treesVisible = useCommercialMapStore((state) => state.treesVisible);
   const setTreesVisible = useCommercialMapStore((state) => state.setTreesVisible);
+  const hydrologicalModeActive = useCommercialMapStore((state) => state.hydrologicalModeActive);
+  const toggleHydrologicalMode = useCommercialMapStore((state) => state.toggleHydrologicalMode);
   const technicalValidationVisible = useCommercialMapStore((state) => state.technicalValidationVisible);
   const setTechnicalValidationVisible = useCommercialMapStore((state) => state.setTechnicalValidationVisible);
   const canUseTechnicalValidation = canUseTechnicalValidationOverlay(areaScope, permissions);
@@ -157,6 +160,22 @@ export function MapToolbar({
         </Tooltip>
         <Tooltip>
           <TooltipTrigger asChild>
+            <button
+              type="button"
+              className={`commercial-map-hydrological-toggle ${hydrologicalModeActive ? 'is-active' : ''}`}
+              onClick={toggleHydrologicalMode}
+              aria-label={hydrologicalModeActive ? 'Sair do modo Rede Hidrológica' : 'Ativar modo Rede Hidrológica'}
+              aria-pressed={hydrologicalModeActive}
+            >
+              <Droplets className="h-4 w-4" aria-hidden="true" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>
+            {hydrologicalModeActive ? 'Sair da Rede Hidrológica' : 'Visualizar Rede Hidrológica'}
+          </TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
             <button type="button" className={activePanel === 'layers' ? 'is-active' : ''} onClick={() => setActivePanel(activePanel === 'layers' ? null : 'layers')} aria-label="Camadas do mapa">
               <Layers3 className="h-4 w-4" />
             </button>
@@ -223,6 +242,15 @@ export function MapToolbar({
           aria-label={CAMERA_PRESETS.top.label}
         >
           <SquareStack aria-hidden="true" />
+        </button>
+        <button
+          type="button"
+          className={`commercial-map-hydrological-toggle ${hydrologicalModeActive ? 'is-active' : ''}`}
+          onClick={toggleHydrologicalMode}
+          aria-label={hydrologicalModeActive ? 'Sair do modo Rede Hidrológica' : 'Ativar modo Rede Hidrológica'}
+          aria-pressed={hydrologicalModeActive}
+        >
+          <Droplets aria-hidden="true" />
         </button>
         <button
           type="button"

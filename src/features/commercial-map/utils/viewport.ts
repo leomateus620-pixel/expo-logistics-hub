@@ -15,6 +15,48 @@ const NAVIGATION_REDUCED_DPR_CAP = 1;
 
 export const COMMERCIAL_MAP_RESIZE_REFIT_DEBOUNCE_MS = 180;
 export const COMMERCIAL_MAP_MANUAL_NAVIGATION_REFIT_SUPPRESSION_MS = 650;
+export const COMMERCIAL_MAP_MIN_POLAR_ANGLE = 0.025;
+export const COMMERCIAL_MAP_HYDROLOGICAL_PORTRAIT_MAX_WIDTH = 640;
+export const COMMERCIAL_MAP_HYDROLOGICAL_PORTRAIT_MIN_RATIO = 1.35;
+export const COMMERCIAL_MAP_HYDROLOGICAL_PORTRAIT_TARGET_SHIFT_RATIO = 0.22;
+export const COMMERCIAL_MAP_HYDROLOGICAL_PORTRAIT_FIT_PADDING = 1.04;
+/**
+ * Portrait infrastructure mode rotates the park's long east-west axis into
+ * the available vertical canvas instead of shrinking it behind the legend.
+ * Azimuth 15 degrees / elevation 72 degrees keeps the whole official extent
+ * visible while making the technical network readable on a 390px viewport.
+ */
+export const COMMERCIAL_MAP_HYDROLOGICAL_PORTRAIT_DIRECTION = [
+  0.29848749562898547,
+  0.9510565162951535,
+  0.07997948340457492,
+] as const;
+/**
+ * OrbitControls clamps polar angles below COMMERCIAL_MAP_MIN_POLAR_ANGLE.
+ * Keeping the top preset exactly on that boundary prevents controls.update()
+ * from moving the camera away from its animation target indefinitely.
+ */
+export const COMMERCIAL_MAP_TOP_DIRECTION = [
+  0,
+  Math.cos(COMMERCIAL_MAP_MIN_POLAR_ANGLE),
+  Math.sin(COMMERCIAL_MAP_MIN_POLAR_ANGLE),
+] as const;
+
+export function isCommercialMapHydrologicalPortraitViewport(
+  viewportWidth: number,
+  viewportHeight: number,
+) {
+  const width = Number.isFinite(viewportWidth) ? Math.max(0, viewportWidth) : 0;
+  const height = Number.isFinite(viewportHeight) ? Math.max(0, viewportHeight) : 0;
+  return width > 0
+    && width <= COMMERCIAL_MAP_HYDROLOGICAL_PORTRAIT_MAX_WIDTH
+    && height / width >= COMMERCIAL_MAP_HYDROLOGICAL_PORTRAIT_MIN_RATIO;
+}
+
+export function resolveCommercialMapHydrologicalPortraitTargetShift(sceneDiagonal: number) {
+  const diagonal = Number.isFinite(sceneDiagonal) ? Math.max(0, sceneDiagonal) : 0;
+  return diagonal * COMMERCIAL_MAP_HYDROLOGICAL_PORTRAIT_TARGET_SHIFT_RATIO;
+}
 
 export function shouldSuppressCommercialMapResizeRefit(
   currentTime: number,

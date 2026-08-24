@@ -40,6 +40,7 @@ import { MapListView, ResultsPanel } from './components/panels/EntityExplorer';
 import { CalibrationPanel } from './components/panels/CalibrationPanel';
 import { PavilionModuleCard } from './components/panels/PavilionModuleCard';
 import { PavilionPlanLegend } from './components/panels/PavilionPlanLegend';
+import { HydrologicalNetworkLegend } from './components/panels/HydrologicalNetworkLegend';
 import { SegmentLegend } from './components/segments/SegmentLegend';
 import { resolveStrategicLandmarkKind } from './utils/landmarks';
 import { resolveCommercialPavilionModulePlan } from './utils/commercialPavilionModules';
@@ -135,6 +136,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
   const setWorkspaceMode = useCommercialMapStore((state) => state.setWorkspaceMode);
   const clearExplorerFilters = useCommercialMapStore((state) => state.clearExplorerFilters);
   const setTechnicalValidationVisible = useCommercialMapStore((state) => state.setTechnicalValidationVisible);
+  const hydrologicalModeActive = useCommercialMapStore((state) => state.hydrologicalModeActive);
   const requestCameraPreset = useCommercialMapStore((state) => state.requestCameraPreset);
   const activeSegmentId = useCommercialMapStore((state) => state.activeSegmentId);
   const requestSegmentFocus = useCommercialMapStore((state) => state.requestSegmentFocus);
@@ -452,7 +454,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
 
   return (
     <section
-      className={`commercial-map-shell ${isCommissionScope ? 'is-commission-scope' : ''} ${isExporural ? 'is-exporural' : ''} ${areaScope === COMMERCIAL_MAP_SEGMENT_IDS.industry ? 'is-industry' : ''} ${interiorEntityId ? 'is-interior' : ''} ${interiorKind === 'commercial-pavilion' ? 'is-commercial-pavilion-interior' : ''} ${interiorKind === 'livestock-pavilion' ? 'is-livestock-interior' : ''} ${interiorKind === 'mirante-pavilion' ? 'is-mirante-interior' : ''} ${selectedEntity ? 'has-selection' : ''} ${selectedKind === 'commercial-pavilion' || selectedKind === 'livestock-pavilion' || selectedKind === 'mirante-pavilion' ? 'has-architectural-selection' : ''}`}
+      className={`commercial-map-shell ${isCommissionScope ? 'is-commission-scope' : ''} ${isExporural ? 'is-exporural' : ''} ${areaScope === COMMERCIAL_MAP_SEGMENT_IDS.industry ? 'is-industry' : ''} ${hydrologicalModeActive ? 'is-hydrological-mode' : ''} ${interiorEntityId ? 'is-interior' : ''} ${interiorKind === 'commercial-pavilion' ? 'is-commercial-pavilion-interior' : ''} ${interiorKind === 'livestock-pavilion' ? 'is-livestock-interior' : ''} ${interiorKind === 'mirante-pavilion' ? 'is-mirante-interior' : ''} ${selectedEntity ? 'has-selection' : ''} ${selectedKind === 'commercial-pavilion' || selectedKind === 'livestock-pavilion' || selectedKind === 'mirante-pavilion' ? 'has-architectural-selection' : ''}`}
       aria-label="Plataforma de gestão do mapa comercial"
     >
       {!isCommissionScope && !interiorEntityId && workspaceMode !== 'edit' && workspaceMode !== 'create' && (
@@ -571,7 +573,9 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
                     areaScope={areaScope}
                     isCommissionScope={isCommissionScope}
                   />
-                  <StatusLegend scope={areaScope} />
+                  {hydrologicalModeActive
+                    ? <HydrologicalNetworkLegend />
+                    : <StatusLegend scope={areaScope} />}
                 </>
               )}
 
