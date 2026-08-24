@@ -1453,6 +1453,15 @@
 .commercial-pavilion-module-card dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 10px; padding: 12px; }
 .commercial-pavilion-module-card dt { color: #718078; font-size: 9.5px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
 .commercial-pavilion-module-card dd { margin: 2px 0 0; color: #1d3a2a; font-size: 13px; font-weight: 700; line-height: 1.25; }
+.commercial-pavilion-module-contracts { display: grid; gap: 7px; margin: 0 12px 10px; border: 1px solid rgba(31, 66, 43, .09); border-radius: 11px; background: rgba(242, 247, 241, .72); padding: 9px; }
+.commercial-pavilion-module-contracts > strong { color: #315141; font-size: 10px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+.commercial-pavilion-module-contracts > p { margin: 0; color: #69786f; font-size: 10px; line-height: 1.35; }
+.commercial-pavilion-module-contracts > a { display: grid; grid-template-columns: 15px minmax(0, 1fr) 14px; align-items: center; gap: 7px; border-radius: 8px; background: #fff; padding: 7px; color: #244735; transition: background .18s ease, color .18s ease; }
+.commercial-pavilion-module-contracts > a:hover { background: #eaf3e9; color: #173d2a; }
+.commercial-pavilion-module-contracts > a > svg { width: 14px; height: 14px; }
+.commercial-pavilion-module-contracts > a > span { display: flex; min-width: 0; flex-direction: column; }
+.commercial-pavilion-module-contracts > a b { overflow: hidden; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.commercial-pavilion-module-contracts > a small { color: #758079; font-size: 9px; }
 .commercial-pavilion-module-note,
 .commercial-pavilion-module-readonly {
   margin: 0 12px 10px;

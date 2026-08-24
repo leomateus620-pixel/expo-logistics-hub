@@ -7,8 +7,20 @@ import type { MapPermissions } from '@/features/commercial-map/types';
 import { COMMERCIAL_PAVILION_MODULE_PLANS } from '@/features/commercial-map/utils/commercialPavilionModules';
 
 const mutation = { isPending: false, mutate: vi.fn(), mutateAsync: vi.fn() };
+const contractsQuery: {
+  isLoading: boolean;
+  isError: boolean;
+  data: Array<{
+    id: string;
+    signedUrl: string;
+    originalName: string;
+    version: number;
+    supersededAt: string | null;
+  }>;
+} = { isLoading: false, isError: false, data: [] };
 
 vi.mock('@/features/commercial-map/hooks/useCommercialMap', () => ({
+  useLotContractVersions: () => contractsQuery,
   useMapMutations: () => ({
     lotUpdate: mutation,
     lotAvailability: mutation,
@@ -41,6 +53,49 @@ const referenceLot = OFFICIAL_REFERENCE_LOTS.find((lot) => lot.entityId === refe
 describe('cartão operacional do módulo interno', () => {
   beforeEach(() => {
     useCommercialMapStore.getState().setSelectedModuleId('B6:module:048');
+    contractsQuery.isLoading = false;
+    contractsQuery.isError = false;
+    contractsQuery.data = [];
+  });
+
+  it.each([
+    { pavilionIdentifier: 'B2' as const, moduleNumber: 73, pavilionNumber: 14 },
+    { pavilionIdentifier: 'B3' as const, moduleNumber: 41, pavilionNumber: 12 },
+  ])('mantém o módulo $pavilionIdentifier neutro e sem área individual inventada', ({
+    pavilionIdentifier,
+    moduleNumber,
+    pavilionNumber,
+  }) => {
+    const candidatePavilion = OFFICIAL_REFERENCE_ENTITIES.find(
+      (entity) => entity.publicIdentifier === pavilionIdentifier,
+    )!;
+    const publicIdentifier = `${pavilionIdentifier}-M${String(moduleNumber).padStart(3, '0')}`;
+    const candidateEntity = OFFICIAL_REFERENCE_ENTITIES.find(
+      (entity) => entity.publicIdentifier === publicIdentifier,
+    )!;
+    const candidateLot = OFFICIAL_REFERENCE_LOTS.find((lot) => lot.entityId === candidateEntity.id)!;
+    useCommercialMapStore.getState().setSelectedModuleId(
+      `${pavilionIdentifier}:module:${String(moduleNumber).padStart(3, '0')}`,
+    );
+
+    render(
+      <PavilionModuleCard
+        plan={COMMERCIAL_PAVILION_MODULE_PLANS[pavilionIdentifier]}
+        pavilion={candidatePavilion}
+        entities={[candidatePavilion, candidateEntity]}
+        lots={[candidateLot]}
+        permissions={permissions}
+        source="official-reference"
+        onSynchronize={vi.fn()}
+      />,
+    );
+
+    const card = screen.getByRole('complementary', {
+      name: new RegExp(`Módulo ${moduleNumber} do Pavilhão ${pavilionNumber}`, 'i'),
+    });
+    expect(within(card).getByText('Não informada')).toBeInTheDocument();
+    expect(within(card).getByText('Sem vínculo')).toBeInTheDocument();
+    expect(card).not.toHaveTextContent(`${COMMERCIAL_PAVILION_MODULE_PLANS[pavilionIdentifier].stats.moduleAreaSquareMeters} m²`);
   });
 
   it('não converte a área modular total em medida individual', () => {
@@ -92,6 +147,40 @@ describe('cartão operacional do módulo interno', () => {
     expect(within(actions).getByRole('button', { name: /Negociar/i })).toBeInTheDocument();
     expect(within(actions).getByRole('button', { name: /Vender/i })).toBeInTheDocument();
     expect(within(actions).getByRole('button', { name: /Contrato/i })).toBeInTheDocument();
+    expect(screen.getByLabelText('Documentos privados do módulo')).toHaveTextContent('Nenhum contrato anexado.');
+  });
+
+  it('expõe versões privadas de contrato no próprio cartão do módulo', () => {
+    contractsQuery.data = [{
+      id: 'contract-version-1',
+      signedUrl: 'https://storage.example.test/signed-contract',
+      originalName: 'contrato-modulo-048.pdf',
+      version: 1,
+      supersededAt: null,
+    }];
+    const persistedEntity = { ...referenceEntity, id: '00000000-0000-0000-0000-000000000248' };
+    const persistedLot = {
+      ...referenceLot,
+      id: '10000000-0000-0000-0000-000000000248',
+      entityId: persistedEntity.id,
+      status: 'AVAILABLE' as const,
+    };
+
+    render(
+      <PavilionModuleCard
+        plan={COMMERCIAL_PAVILION_MODULE_PLANS.B6}
+        pavilion={pavilion}
+        entities={[pavilion, persistedEntity]}
+        lots={[persistedLot]}
+        permissions={permissions}
+        source="database"
+      />,
+    );
+
+    const link = screen.getByRole('link', { name: /contrato-modulo-048\.pdf/i });
+    expect(link).toHaveAttribute('href', 'https://storage.example.test/signed-contract');
+    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveTextContent('Versão 1 · ativo');
   });
 
   it('não oferece venda direta enquanto o módulo permanece bloqueado', () => {

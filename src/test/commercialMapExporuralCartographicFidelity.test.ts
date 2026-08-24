@@ -117,7 +117,7 @@ describe('fidelidade cartográfica dourada da Exporural 2026.4', () => {
     ));
 
     expect(scoped.lots).toHaveLength(95);
-    expect(OFFICIAL_REFERENCE_DATA.lots).toHaveLength(476);
+    expect(OFFICIAL_REFERENCE_DATA.lots).toHaveLength(919);
     scoped.lots.forEach((lot) => {
       const entity = entitiesById.get(lot.entityId)!;
       sampledBoundary(sourcePolygon(entity)).forEach((point) => {

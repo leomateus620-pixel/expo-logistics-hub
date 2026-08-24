@@ -186,8 +186,8 @@ export const COMMERCIAL_PAVILION_DEFINITIONS = {
   B2: {
     publicIdentifier: 'B2',
     pavilionNumber: 14,
-    officialName: 'Pavilhão 14 — Artesanato e comércio',
-    activity: 'Artesanato e comércio',
+    officialName: 'Pavilhão 14 — Comércio e Artesanato',
+    activity: 'Comércio e Artesanato',
     variant: 'dual-craft-hall',
     roofProfile: 'twin-offset-gables',
     entrancePattern: 'split-central-mass',
@@ -204,8 +204,8 @@ export const COMMERCIAL_PAVILION_DEFINITIONS = {
   B3: {
     publicIdentifier: 'B3',
     pavilionNumber: 12,
-    officialName: 'Pavilhão 12 — Indústria e comércio',
-    activity: 'Indústria e comércio',
+    officialName: 'Pavilhão 12 — Indústria, Comércio e Serviços',
+    activity: 'Indústria, Comércio e Serviços',
     variant: 'sawtooth-industrial',
     roofProfile: 'northlight-sawtooth',
     entrancePattern: 'paired-offset',

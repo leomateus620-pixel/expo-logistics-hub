@@ -12,6 +12,14 @@ import {
   PAVILION3_COMMERCIAL_REFERENCE_CELLS,
 } from '@/features/commercial-map/data/pavilion3CommercialReference';
 import {
+  PAVILION12_COMMERCIAL_REFERENCE,
+  PAVILION12_COMMERCIAL_REFERENCE_CELLS,
+} from '@/features/commercial-map/data/pavilion12CommercialReference';
+import {
+  PAVILION14_COMMERCIAL_REFERENCE,
+  PAVILION14_COMMERCIAL_REFERENCE_CELLS,
+} from '@/features/commercial-map/data/pavilion14CommercialReference';
+import {
   COMMERCIAL_PAVILION_PUBLIC_IDENTIFIERS,
   type CommercialPavilionPublicIdentifier,
 } from '@/features/commercial-map/utils/commercialPavilions';
@@ -31,7 +39,7 @@ const EXPECTED_PLANS = {
     moduleCount: 186,
     totalAreaSquareMeters: 1155,
     moduleAreaSquareMeters: 616,
-    ranges: [[1, 35], [36, 93], [94, 151], [152, 186]],
+    ranges: [[1, 35], [36, 64], [65, 93], [94, 122], [123, 151], [152, 186]],
   },
   B3: {
     pavilionNumber: 12,
@@ -39,7 +47,7 @@ const EXPECTED_PLANS = {
     moduleCount: 257,
     totalAreaSquareMeters: 1650,
     moduleAreaSquareMeters: 771,
-    ranges: [[1, 22], [23, 40], [41, 124], [125, 208], [209, 257]],
+    ranges: [[1, 22], [23, 40], [41, 82], [83, 124], [125, 166], [167, 208], [209, 257]],
   },
   B4: {
     pavilionNumber: 8,
@@ -163,6 +171,12 @@ function pavilion3Cell(number: number) {
   return cell!;
 }
 
+const OFFICIAL_REFERENCE_PAVILIONS = new Set<CommercialPavilionPublicIdentifier>([
+  'B2',
+  'B3',
+  'B6',
+]);
+
 function expectStrictlyIncreasing(values: readonly number[]): void {
   values.slice(1).forEach((value, index) => {
     expect(value).toBeGreaterThan(values[index]);
@@ -217,7 +231,7 @@ describe('planos visuais dos módulos internos dos pavilhões', () => {
           'width',
           'zoneId',
         ];
-        const pavilion3Keys = [
+        const officialReferenceKeys = [
           'areaM2',
           'centerX',
           'centerZ',
@@ -239,7 +253,7 @@ describe('planos visuais dos módulos internos dos pavilhões', () => {
           'zoneId',
         ];
         expect(Object.keys(cell).sort()).toEqual(
-          publicIdentifier === 'B6' ? pavilion3Keys : coreKeys,
+          OFFICIAL_REFERENCE_PAVILIONS.has(publicIdentifier) ? officialReferenceKeys : coreKeys,
         );
         expect(cell.label).toBe(String(cell.number).padStart(2, '0'));
         expect(cell).not.toHaveProperty('exhibitorName');
@@ -247,15 +261,16 @@ describe('planos visuais dos módulos internos dos pavilhões', () => {
         expect(cell).not.toHaveProperty('classification');
         expect(cell).not.toHaveProperty('geometry');
 
-        if (publicIdentifier === 'B6') {
-          expect(cell.pavilionId).toBe('B6');
+        if (OFFICIAL_REFERENCE_PAVILIONS.has(publicIdentifier)) {
+          expect(cell.pavilionId).toBe(publicIdentifier);
           expect(cell.lotNumber).toBe(cell.label);
           expect(cell.type).toBe('commercial-lot');
           expect(cell.areaM2).toBeNull();
           expect(cell.sortOrder).toBe(cell.number);
           expect(cell.labelAnchor).toEqual([cell.centerX, cell.centerZ]);
           expect(cell.group).toBeTruthy();
-          expect(cell.cluster).toBe(cell.zoneId);
+          expect(cell.cluster).toBeTruthy();
+          expect(cell.source?.referenceYear).toBe(2026);
         }
       });
     });
@@ -318,34 +333,109 @@ describe('planos visuais dos módulos internos dos pavilhões', () => {
     expect(cell('B10', 20).centerX).toBeGreaterThan(cell('B10', 33).centerX);
   });
 
-  it('usa as 214 células da referência única e reconstrói as duas ilhas em U', () => {
+  it('usa as 214 células da referência única e corrige as extensões verticais das duas ilhas', () => {
     const plan = COMMERCIAL_PAVILION_MODULE_PLANS.B6;
     expect(plan.cells).toBe(PAVILION3_COMMERCIAL_REFERENCE_CELLS);
     expect(plan.cells).toBe(PAVILION3_COMMERCIAL_REFERENCE.cells);
     expect(plan.source.interpretation).toBe('official-reference-runs');
 
     const firstWestLeg = Array.from({ length: 28 }, (_, index) => pavilion3Cell(48 + index));
-    const firstSouthCap = Array.from({ length: 8 }, (_, index) => pavilion3Cell(76 + index));
+    const firstVerticalExtension = Array.from({ length: 8 }, (_, index) => pavilion3Cell(76 + index));
     const firstEastLeg = Array.from({ length: 28 }, (_, index) => pavilion3Cell(84 + index));
     expectStrictlyIncreasing(firstWestLeg.map((cell) => cell.centerZ));
-    expectStrictlyIncreasing(firstSouthCap.map((cell) => cell.centerX));
+    expectStrictlyIncreasing(firstVerticalExtension.map((cell) => cell.centerZ));
     expectStrictlyDecreasing(firstEastLeg.map((cell) => cell.centerZ));
     expect(new Set(firstWestLeg.map((cell) => cell.centerX)).size).toBe(1);
-    expect(new Set(firstSouthCap.map((cell) => cell.centerZ)).size).toBe(1);
+    expect(new Set(firstVerticalExtension.map((cell) => cell.centerX)).size).toBe(1);
     expect(new Set(firstEastLeg.map((cell) => cell.centerX)).size).toBe(1);
     expect(firstWestLeg.every((cell) => cell.orientation === 'east-west')).toBe(true);
-    expect(firstSouthCap.every((cell) => cell.orientation === 'north-south')).toBe(true);
+    expect(firstVerticalExtension.every((cell) => cell.orientation === 'east-west')).toBe(true);
     expect(firstEastLeg.every((cell) => cell.orientation === 'east-west')).toBe(true);
+    expect(firstVerticalExtension.every((cell) => cell.centerX === firstWestLeg[0].centerX)).toBe(true);
+    expect(firstVerticalExtension.every((cell) => cell.width === firstWestLeg[0].width)).toBe(true);
+    firstVerticalExtension.forEach((cell) => {
+      expect(cell.depth).toBeCloseTo(firstWestLeg[0].depth, 12);
+    });
 
     const secondWestLeg = Array.from({ length: 28 }, (_, index) => pavilion3Cell(112 + index));
-    const secondSouthCap = Array.from({ length: 8 }, (_, index) => pavilion3Cell(140 + index));
+    const secondVerticalExtension = Array.from({ length: 8 }, (_, index) => pavilion3Cell(140 + index));
     const secondEastLeg = Array.from({ length: 28 }, (_, index) => pavilion3Cell(148 + index));
     expectStrictlyIncreasing(secondWestLeg.map((cell) => cell.centerZ));
-    expectStrictlyIncreasing(secondSouthCap.map((cell) => cell.centerX));
+    expectStrictlyIncreasing(secondVerticalExtension.map((cell) => cell.centerZ));
     expectStrictlyDecreasing(secondEastLeg.map((cell) => cell.centerZ));
     expect(new Set(secondWestLeg.map((cell) => cell.centerX)).size).toBe(1);
-    expect(new Set(secondSouthCap.map((cell) => cell.centerZ)).size).toBe(1);
+    expect(new Set(secondVerticalExtension.map((cell) => cell.centerX)).size).toBe(1);
     expect(new Set(secondEastLeg.map((cell) => cell.centerX)).size).toBe(1);
+    expect(secondVerticalExtension.every((cell) => cell.centerX === secondWestLeg[0].centerX)).toBe(true);
+    expect(secondVerticalExtension.every((cell) => cell.width === secondWestLeg[0].width)).toBe(true);
+    secondVerticalExtension.forEach((cell) => {
+      expect(cell.depth).toBeCloseTo(secondWestLeg[0].depth, 12);
+    });
+  });
+
+  it('reproduz o Pavilhão 12 em sete sequências, 257 módulos de 1 × 3 m e três eixos de circulação', () => {
+    const plan = COMMERCIAL_PAVILION_MODULE_PLANS.B3;
+    expect(plan.cells).toBe(PAVILION12_COMMERCIAL_REFERENCE_CELLS);
+    expect(plan.cells).toBe(PAVILION12_COMMERCIAL_REFERENCE.cells);
+    expect(plan.source.interpretation).toBe('official-reference-runs');
+
+    const expectedCellWidth = 0.96 / 50;
+    const expectedCellDepth = (3 / 33) * 0.96;
+    plan.cells.forEach((cell) => {
+      expect(cell.width).toBeCloseTo(expectedCellWidth, 12);
+      expect(cell.depth).toBeCloseTo(expectedCellDepth, 12);
+    });
+    const physicalArea = plan.cells.reduce((total, cell) => (
+      total + (cell.width / 0.96) * 50 * (cell.depth / 0.96) * 33
+    ), 0);
+    expect(physicalArea).toBeCloseTo(771, 9);
+
+    const cell = (number: number) => plan.cells[number - 1];
+    expect(cell(1).centerX).toBeGreaterThan(cell(22).centerX);
+    expect(cell(23).centerX).toBeGreaterThan(cell(40).centerX);
+    expect(cell(41).centerX).toBeLessThan(cell(82).centerX);
+    expect(cell(83).centerX).toBeGreaterThan(cell(124).centerX);
+    expect(cell(125).centerX).toBeLessThan(cell(166).centerX);
+    expect(cell(167).centerX).toBeGreaterThan(cell(208).centerX);
+    expect(cell(209).centerX).toBeLessThan(cell(257).centerX);
+    expect(cell(41).cluster).toBe(cell(124).cluster);
+    expect(cell(125).cluster).toBe(cell(208).cluster);
+    expect(plan.corridors.map((corridor) => corridor.id)).toEqual(expect.arrayContaining([
+      'north-distribution',
+      'central-distribution',
+      'south-distribution',
+    ]));
+  });
+
+  it('reproduz o Pavilhão 14 em seis sequências e preserva a divergência 73–74 para confirmação', () => {
+    const plan = COMMERCIAL_PAVILION_MODULE_PLANS.B2;
+    expect(plan.cells).toBe(PAVILION14_COMMERCIAL_REFERENCE_CELLS);
+    expect(plan.cells).toBe(PAVILION14_COMMERCIAL_REFERENCE.cells);
+    expect(plan.source.interpretation).toBe('official-reference-runs');
+
+    const expectedCellWidth = 0.96 / 35;
+    plan.cells.forEach((cell) => {
+      expect(cell.width).toBeCloseTo(expectedCellWidth, 12);
+      const depthMeters = cell.number <= 35 || cell.number >= 152 ? 3 : 3.5;
+      expect(cell.depth).toBeCloseTo((depthMeters / 33) * 0.96, 12);
+    });
+    const physicalArea = plan.cells.reduce((total, cell) => (
+      total + (cell.width / 0.96) * 35 * (cell.depth / 0.96) * 33
+    ), 0);
+    expect(physicalArea).toBeCloseTo(616, 9);
+
+    const cell = (number: number) => plan.cells[number - 1];
+    expect(cell(1).centerX).toBeLessThan(cell(35).centerX);
+    expect(cell(36).centerX).toBeGreaterThan(cell(64).centerX);
+    expect(cell(65).centerX).toBeLessThan(cell(93).centerX);
+    expect(cell(94).centerX).toBeGreaterThan(cell(122).centerX);
+    expect(cell(123).centerX).toBeLessThan(cell(151).centerX);
+    expect(cell(152).centerX).toBeGreaterThan(cell(186).centerX);
+    expect(plan.cells
+      .filter((candidate) => candidate.source?.discrepancy === 'manual-confirmation-required')
+      .map((candidate) => candidate.number)).toEqual([73, 74]);
+    expect(cell(36).centerZ).toBeGreaterThan(cell(65).centerZ);
+    expect(cell(94).centerZ).toBeGreaterThan(cell(123).centerZ);
   });
 
   it('posiciona 48–52 verticalmente e 108–111 na coluna adjacente', () => {

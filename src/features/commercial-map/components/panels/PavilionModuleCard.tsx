@@ -2,6 +2,7 @@ import { memo, useMemo, useState } from 'react';
 import {
   CalendarClock,
   FileLock2,
+  FileText,
   Handshake,
   PencilLine,
   RefreshCw,
@@ -11,6 +12,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { STATUS_CONFIG } from '../../constants';
+import { useLotContractVersions } from '../../hooks/useCommercialMap';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import type {
   CommercialLot,
@@ -26,6 +28,7 @@ import { LotWorkflowDialog, type LotWorkflow } from '../commercial/LotWorkflowDi
 
 const SEQUENCE_LABELS = {
   'x-increasing': 'Sequência horizontal',
+  'x-decreasing': 'Sequência horizontal inversa',
   'z-increasing': 'Sequência vertical',
   'z-decreasing': 'Sequência vertical inversa',
 } as const;
@@ -76,6 +79,10 @@ export const PavilionModuleCard = memo(function PavilionModuleCard({
   const canReserve = Boolean(persisted && lot && permissions.canManageSales && ['AVAILABLE', 'IN_NEGOTIATION'].includes(lot.status));
   const canNegotiate = Boolean(persisted && lot && permissions.canManageSales && ['AVAILABLE', 'RESERVED'].includes(lot.status));
   const canSell = Boolean(persisted && lot && permissions.canManageSales && ['AVAILABLE', 'RESERVED', 'IN_NEGOTIATION'].includes(lot.status));
+  const contracts = useLotContractVersions(
+    persisted ? lot?.id ?? null : null,
+    persisted && permissions.canManageContracts,
+  );
 
   if (!cell) return null;
 
@@ -143,6 +150,36 @@ export const PavilionModuleCard = memo(function PavilionModuleCard({
             <dd>{persisted ? 'Persistido e auditável' : 'Referência em leitura'}</dd>
           </div>
         </dl>
+
+        {persisted && permissions.canManageContracts && (
+          <section
+            className="commercial-pavilion-module-contracts"
+            aria-label="Documentos privados do módulo"
+          >
+            <strong>Documentos privados</strong>
+            {contracts.isLoading && <p>Carregando contratos autorizados…</p>}
+            {contracts.isError && <p>Não foi possível gerar o acesso temporário aos contratos.</p>}
+            {contracts.data?.length === 0 && <p>Nenhum contrato anexado.</p>}
+            {contracts.data?.map((contractVersion) => (
+              <a
+                href={contractVersion.signedUrl}
+                target="_blank"
+                rel="noreferrer"
+                key={contractVersion.id}
+              >
+                <FileText aria-hidden="true" />
+                <span>
+                  <b>{contractVersion.originalName}</b>
+                  <small>
+                    Versão {contractVersion.version}
+                    {contractVersion.supersededAt ? ' · substituído' : ' · ativo'}
+                  </small>
+                </span>
+                <FileLock2 aria-hidden="true" />
+              </a>
+            ))}
+          </section>
+        )}
 
         {cell.source?.discrepancy && (
           <p className="commercial-pavilion-module-note">
