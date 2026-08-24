@@ -441,18 +441,6 @@
   transition: opacity 360ms ease, filter 360ms ease;
 }
 
-.commercial-map-shell.is-hydrological-mode .commercial-map-stage::after {
-  position: absolute;
-  z-index: 8;
-  inset: 0;
-  background:
-    linear-gradient(105deg, transparent 22%, rgba(152, 224, 247, .22) 46%, rgba(235, 251, 255, .4) 50%, rgba(93, 194, 228, .2) 54%, transparent 78%);
-  content: '';
-  pointer-events: none;
-  transform: translateX(-120%);
-  animation: hydrological-mode-scan 1.15s cubic-bezier(.2, .78, .22, 1) forwards;
-}
-
 .commercial-hydrological-world-label {
   position: relative;
   display: grid;
@@ -494,13 +482,6 @@
   letter-spacing: .02em;
   line-height: 1.2;
   white-space: nowrap;
-}
-
-@keyframes hydrological-mode-scan {
-  0% { opacity: 0; transform: translateX(-120%); }
-  20% { opacity: 1; }
-  82% { opacity: .82; }
-  100% { opacity: 0; transform: translateX(120%); }
 }
 
 .commercial-map-hydrological-toggle { color: #2377a8 !important; }
@@ -615,8 +596,16 @@
   content: '';
   opacity: .16;
 }
-.hydrological-network-swatch.is-distribution { background: #20a9dc; color: #20a9dc; box-shadow: 0 0 10px rgba(32, 169, 220, .38); }
-.hydrological-network-swatch.is-hydrant-supply { background: #d94945; color: #d94945; box-shadow: 0 0 10px rgba(217, 73, 69, .3); }
+.hydrological-network-swatch.is-distribution {
+  background: var(--hydro-pipe-distribution);
+  color: var(--hydro-pipe-distribution);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--hydro-pipe-distribution) 38%, transparent);
+}
+.hydrological-network-swatch.is-hydrant-supply {
+  background: var(--hydro-pipe-hydrant-supply);
+  color: var(--hydro-pipe-hydrant-supply);
+  box-shadow: 0 0 10px color-mix(in srgb, var(--hydro-pipe-hydrant-supply) 30%, transparent);
+}
 
 .hydrological-network-legend__symbols {
   display: grid;
@@ -626,15 +615,23 @@
 }
 .hydrological-network-legend__symbols > span { display: flex; min-width: 0; align-items: center; gap: 7px; color: #506f80; font-size: 8.5px; font-weight: 750; }
 .hydrological-node-symbol { position: relative; display: inline-block; width: 13px; height: 13px; flex: 0 0 13px; border: 2px solid #fff; box-shadow: 0 0 0 1px rgba(29, 83, 112, .22); }
-.hydrological-node-symbol.is-tap { border-radius: 50%; background: #20a9dc; }
-.hydrological-node-symbol.is-hydrant { border-radius: 4px 4px 3px 3px; background: #2a9b61; }
-.hydrological-node-symbol.is-hydrant::after { position: absolute; top: -4px; left: 1px; width: 7px; height: 3px; border-radius: 2px 2px 0 0; background: #dc433f; content: ''; }
-.hydrological-node-symbol.is-reservoir { border-radius: 3px; background: #7698aa; }
-.hydrological-node-symbol.is-well { border-radius: 50%; background: #fff; box-shadow: 0 0 0 2px #3294bd, inset 0 0 0 2px #d5f0f8; }
-.hydrological-node-symbol.is-register { border-radius: 2px; background: #f0a33b; transform: rotate(45deg) scale(.8); }
-.hydrological-node-symbol.is-technical { display: grid; place-items: center; border-color: #7a8f9b; border-radius: 3px; background: #eef3f5; }
-.hydrological-node-symbol.is-technical::after { color: #55717e; content: 'TL'; font-size: 5px; font-style: normal; font-weight: 900; }
-.hydrological-node-symbol.is-corsan { border-radius: 4px; background: linear-gradient(135deg, #0f6497 0 45%, #e8f7fb 45% 55%, #d64a46 55%); }
+.hydrological-node-symbol.is-tap { border-radius: 50%; background: var(--hydro-tap-body); }
+.hydrological-node-symbol.is-hydrant { border-radius: 4px 4px 3px 3px; background: var(--hydro-hydrant-body); }
+.hydrological-node-symbol.is-hydrant::after { position: absolute; top: -4px; left: 1px; width: 7px; height: 3px; border-radius: 2px 2px 0 0; background: var(--hydro-hydrant-top); content: ''; }
+.hydrological-node-symbol.is-reservoir { border-radius: 3px; background: var(--hydro-reservoir-body); }
+.hydrological-node-symbol.is-well { border-radius: 50%; background: var(--hydro-well-body); box-shadow: 0 0 0 2px var(--hydro-well-ring), inset 0 0 0 2px var(--hydro-well-top); }
+.hydrological-node-symbol.is-register { border-radius: 2px; background: var(--hydro-register-body); transform: rotate(45deg) scale(.8); }
+.hydrological-node-symbol.is-technical { display: grid; place-items: center; border-color: var(--hydro-tl-top); border-radius: 3px; background: var(--hydro-tl-body); }
+.hydrological-node-symbol.is-technical::after { color: var(--hydro-tl-accessory); content: 'TL'; font-size: 5px; font-style: normal; font-weight: 900; }
+.hydrological-node-symbol.is-corsan {
+  border-radius: 4px;
+  background: linear-gradient(
+    135deg,
+    var(--hydro-corsan-body) 0 45%,
+    var(--hydro-corsan-accessory) 45% 55%,
+    var(--hydro-corsan-top) 55%
+  );
+}
 
 .hydrological-network-inspector {
   margin: 0 10px 9px;

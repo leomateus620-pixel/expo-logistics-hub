@@ -25,6 +25,8 @@ import { selectCommercialHydrologicalInfrastructureForScene } from '../../utils/
 import {
   HYDROLOGICAL_NODES,
   HYDROLOGICAL_PIPE_SEGMENTS,
+  type CommercialHydrologicalNode,
+  type CommercialHydrologicalPipeSegment,
 } from '../../data/hydrologicalInfrastructure';
 import {
   ARENA_FRONT_LAYOUT,
@@ -1928,6 +1930,11 @@ function Scene({
   const handleEntityFocus = useCallback(() => {
     if (!hydrologicalModeActive) focusSelection();
   }, [focusSelection, hydrologicalModeActive]);
+  const handleHydrologicalSelect = useCallback((
+    element: CommercialHydrologicalNode | CommercialHydrologicalPipeSegment,
+  ) => {
+    setSelectedHydrologicalElementId(element.id);
+  }, [setSelectedHydrologicalElementId]);
   const lotByEntity = useMemo(() => new Map(lots.map((lot) => [lot.entityId, lot])), [lots]);
   const resolvedSegmentByEntity = useMemo(
     () => buildCommercialMapSegmentIndex(entities, lots),
@@ -2241,7 +2248,7 @@ function Scene({
             surfaceEntities={exteriorRenderedEntities}
             active
             reducedGraphics={reducedGraphics}
-            onSelect={(element) => setSelectedHydrologicalElementId(element.id)}
+            onSelect={handleHydrologicalSelect}
           />
         </Suspense>
       ) : null}

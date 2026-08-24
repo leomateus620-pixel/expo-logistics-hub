@@ -9,6 +9,7 @@ import {
   HYDROLOGICAL_NODES,
   HYDROLOGICAL_PIPE_SEGMENTS,
 } from '@/features/commercial-map/data/hydrologicalInfrastructure';
+import { HYDROLOGICAL_PRESENTATION_PALETTE } from '@/features/commercial-map/data/hydrologicalPresentation';
 import { OFFICIAL_REFERENCE_DATA } from '@/features/commercial-map/data/officialReference2026';
 import type { Coordinate, MapClassification, MapEntity } from '@/features/commercial-map/types';
 import {
@@ -227,21 +228,146 @@ describe('renderer e utilitários da infraestrutura hidrológica', () => {
     });
   });
 
-  it('mantém montagem lazy, reveal finito, descarte e seleção batched de tubos/nós', () => {
+  it('mantém renderer estático, montagem lazy, descarte e seleção batched de tubos/nós', () => {
     const renderer = readFileSync(resolve(
       'src/features/commercial-map/components/canvas/CommercialHydrologicalInfrastructureLayer.tsx',
     ), 'utf8');
+    const canvas = readFileSync(resolve(
+      'src/features/commercial-map/components/canvas/CommercialMapCanvas.tsx',
+    ), 'utf8');
 
     expect(renderer).toContain('if (!props.active');
-    expect(renderer).toContain('revealSettled.current = true');
-    expect(renderer).toContain('if (revealSettled.current) return');
+    expect(renderer).not.toContain('useFrame');
+    expect(renderer).not.toContain('revealElapsed');
+    expect(renderer).not.toContain('revealSettled');
+    expect(renderer).not.toContain('PIPE_EPSILON_SCALE');
+    expect(renderer).not.toMatch(/applyReveal\s*\(\s*0\s*\)/);
+    expect(renderer).not.toContain('vertexColors');
+    expect(renderer).not.toMatch(/opacity:\s*0,(?:\r?\n\s*)toneMapped: false/);
+    expect(renderer).toContain('instanceColor');
+    expect(renderer).toContain('setColorAt');
     expect(renderer).toContain('computeBoundingBox()');
     expect(renderer).toContain('computeBoundingSphere()');
     expect(renderer).toContain('geometry.dispose()');
     expect(renderer).toContain('material.dispose()');
     expect(renderer).toContain('THREE.InstancedMesh.prototype.raycast');
     expect(renderer).toContain('spans[event.instanceId]?.segment');
+    expect(renderer.match(/isMapSelectionClick\(event\.delta\)/g)).toHaveLength(2);
     expect(renderer).not.toContain('castShadow={true}');
+    expect(canvas).toMatch(/const handleHydrologicalSelect = useCallback\(/);
+    expect(canvas).toContain('onSelect={handleHydrologicalSelect}');
+    expect(canvas).not.toMatch(/onSelect=\{\(element\)\s*=>/);
+  });
+
+  it('compartilha uma paleta sRGB única entre renderer e legenda sem scan recorrente', () => {
+    const renderer = readFileSync(resolve(
+      'src/features/commercial-map/components/canvas/CommercialHydrologicalInfrastructureLayer.tsx',
+    ), 'utf8');
+    const legend = readFileSync(resolve(
+      'src/features/commercial-map/components/panels/HydrologicalNetworkLegend.tsx',
+    ), 'utf8');
+    const styles = [
+      'src/features/commercial-map/commercial-map.css',
+      'src/features/commercial-map/commercial-map-mobile.css',
+    ].map((path) => readFileSync(resolve(path), 'utf8')).join('\n');
+
+    expect(Object.keys(HYDROLOGICAL_PRESENTATION_PALETTE.pipes)).toEqual([
+      'distribution',
+      'hydrantSupply',
+    ]);
+    expect(HYDROLOGICAL_PRESENTATION_PALETTE.pipes).toEqual({
+      distribution: '#20A9DC',
+      hydrantSupply: '#D94945',
+    });
+    expect(HYDROLOGICAL_PRESENTATION_PALETTE.nodes).toEqual({
+      TAP: {
+        body: '#20A9DC',
+        top: '#D5F0F8',
+        accessory: '#E8F7FB',
+        ring: '#20A9DC',
+      },
+      HYDRANT: {
+        body: '#2A9B61',
+        top: '#DC433F',
+        accessory: '#E8F7FB',
+        ring: '#DC433F',
+      },
+      RESERVOIR: {
+        body: '#7698AA',
+        top: '#EEF3F5',
+        accessory: '#D5F0F8',
+        ring: '#7698AA',
+      },
+      WELL: {
+        body: '#FFFFFF',
+        top: '#D5F0F8',
+        accessory: '#3294BD',
+        ring: '#3294BD',
+      },
+      VALVE: {
+        body: '#F0A33B',
+        top: '#FFE4A6',
+        accessory: '#FFF2D5',
+        ring: '#F0A33B',
+      },
+      TECHNICAL_MARKER: {
+        body: '#EEF3F5',
+        top: '#7A8F9B',
+        accessory: '#55717E',
+        ring: '#7A8F9B',
+      },
+      JUNCTION: {
+        body: '#56727A',
+        top: '#8CA4AA',
+        accessory: '#8CA4AA',
+        ring: '#8CA4AA',
+      },
+      SUPPLY_ENTRY: {
+        body: '#0F6497',
+        top: '#D64A46',
+        accessory: '#E8F7FB',
+        ring: '#0F6497',
+      },
+    });
+    const visibleNodeKinds = [
+      'TAP',
+      'HYDRANT',
+      'RESERVOIR',
+      'WELL',
+      'VALVE',
+      'TECHNICAL_MARKER',
+      'SUPPLY_ENTRY',
+    ] as const;
+    expect(new Set(Object.keys(HYDROLOGICAL_PRESENTATION_PALETTE.nodes))).toEqual(new Set([
+      ...visibleNodeKinds,
+      'JUNCTION',
+    ]));
+
+    const paletteColors = [
+      ...Object.values(HYDROLOGICAL_PRESENTATION_PALETTE.pipes),
+      ...Object.values(HYDROLOGICAL_PRESENTATION_PALETTE.nodes)
+        .flatMap((colors) => Object.values(colors)),
+    ];
+    expect(paletteColors).toHaveLength(34);
+    expect(paletteColors.every((color) => /^#[\da-f]{6}$/i.test(color))).toBe(true);
+
+    expect(renderer).toContain('HYDROLOGICAL_PRESENTATION_PALETTE');
+    expect(legend).toContain('HYDROLOGICAL_PRESENTATION_PALETTE');
+    expect(legend).toMatch(/HYDROLOGICAL_PRESENTATION_PALETTE\.(pipes|nodes)/);
+    visibleNodeKinds.forEach((kind) => {
+      expect(legend, kind).toContain(`HYDROLOGICAL_PRESENTATION_PALETTE.nodes.${kind}.`);
+    });
+    expect(legend.match(/hydrological-node-symbol is-/g)).toHaveLength(7);
+    const legendVariables = new Set(
+      [...legend.matchAll(/--hydro-[a-z-]+/g)].map(([variable]) => variable),
+    );
+    const styleVariables = new Set(
+      [...styles.matchAll(/var\((--hydro-[a-z-]+)\)/g)].map(([, variable]) => variable),
+    );
+    expect(legendVariables.size).toBeGreaterThanOrEqual(9);
+    legendVariables.forEach((variable) => expect(styleVariables.has(variable), variable).toBe(true));
+    expect(styles).toContain('var(--hydro-');
+    expect(styles).not.toContain('hydrological-mode-scan');
   });
 
   it('fecha topologia, elevação e orçamento sobre o inventário oficial completo', () => {

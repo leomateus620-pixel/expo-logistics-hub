@@ -6,13 +6,14 @@ import {
   useMemo,
   useRef,
 } from 'react';
-import { type ThreeEvent, useFrame, useThree } from '@react-three/fiber';
+import { type ThreeEvent, useThree } from '@react-three/fiber';
 import { Html } from '@react-three/drei';
 import * as THREE from 'three';
 import type {
   CommercialHydrologicalNode,
   CommercialHydrologicalPipeSegment,
 } from '../../data/hydrologicalInfrastructure';
+import { HYDROLOGICAL_PRESENTATION_PALETTE } from '../../data/hydrologicalPresentation';
 import type { MapEntity } from '../../types';
 import {
   buildHydrologicalPipeSpans,
@@ -22,11 +23,12 @@ import {
   type HydrologicalPipeSpan,
   type ResolvedHydrologicalNodePlacement,
 } from '../../utils/hydrologicalInfrastructure';
+import { isMapSelectionClick } from '../../utils/interaction';
 
 const NO_RAYCAST = () => undefined;
 const UNIT_Y = new THREE.Vector3(0, 1, 0);
-const PIPE_EPSILON_SCALE = 1e-5;
-const NODE_REVEAL_WINDOW_MINIMUM = 0.42;
+const NODE_RING_TUBE_RADIUS = 0.12;
+const NODE_RING_SURFACE_CLEARANCE = 0.006;
 const FULL_OPACITY = {
   distributionPipe: 0.96,
   hydrantPipe: 0.98,
@@ -44,6 +46,7 @@ interface NodeVisualStyle {
   bodyColor: string;
   topColor: string;
   accessoryColor: string;
+  ringColor: string;
   accessoryScale: readonly [number, number, number];
   accessoryOffset: readonly [number, number, number];
   ringRadius: number;
@@ -55,7 +58,6 @@ interface HydrologicalNodeVisual {
   kind: HydrologicalNodeRenderKind;
   style: NodeVisualStyle;
   heading: number;
-  activationDistance: number;
 }
 
 function stableHeading(value: string) {
@@ -68,6 +70,7 @@ function stableHeading(value: string) {
 }
 
 function nodeVisualStyle(kind: HydrologicalNodeRenderKind): NodeVisualStyle {
+  const colors = HYDROLOGICAL_PRESENTATION_PALETTE.nodes[kind];
   switch (kind) {
     case 'HYDRANT':
       return {
@@ -75,9 +78,10 @@ function nodeVisualStyle(kind: HydrologicalNodeRenderKind): NodeVisualStyle {
         bodyHeight: 0.27,
         topRadius: 0.115,
         topHeight: 0.075,
-        bodyColor: '#2f9b66',
-        topColor: '#ef4b4f',
-        accessoryColor: '#dce7df',
+        bodyColor: colors.body,
+        topColor: colors.top,
+        accessoryColor: colors.accessory,
+        ringColor: colors.ring,
         accessoryScale: [0.17, 0.065, 0.065],
         accessoryOffset: [0.11, 0.17, 0],
         ringRadius: 0.145,
@@ -89,9 +93,10 @@ function nodeVisualStyle(kind: HydrologicalNodeRenderKind): NodeVisualStyle {
         bodyHeight: 0.38,
         topRadius: 0.225,
         topHeight: 0.07,
-        bodyColor: '#a9c9d1',
-        topColor: '#e7f4f6',
-        accessoryColor: '#6d929d',
+        bodyColor: colors.body,
+        topColor: colors.top,
+        accessoryColor: colors.accessory,
+        ringColor: colors.ring,
         accessoryScale: [0, 0, 0],
         accessoryOffset: [0, 0, 0],
         ringRadius: 0.245,
@@ -103,9 +108,10 @@ function nodeVisualStyle(kind: HydrologicalNodeRenderKind): NodeVisualStyle {
         bodyHeight: 0.12,
         topRadius: 0.135,
         topHeight: 0.045,
-        bodyColor: '#357f92',
-        topColor: '#65d5eb',
-        accessoryColor: '#d8f6fa',
+        bodyColor: colors.body,
+        topColor: colors.top,
+        accessoryColor: colors.accessory,
+        ringColor: colors.ring,
         accessoryScale: [0.055, 0.16, 0.055],
         accessoryOffset: [0, 0.14, 0],
         ringRadius: 0.205,
@@ -117,9 +123,10 @@ function nodeVisualStyle(kind: HydrologicalNodeRenderKind): NodeVisualStyle {
         bodyHeight: 0.12,
         topRadius: 0.075,
         topHeight: 0.035,
-        bodyColor: '#d3a434',
-        topColor: '#ffe17e',
-        accessoryColor: '#f7eac1',
+        bodyColor: colors.body,
+        topColor: colors.top,
+        accessoryColor: colors.accessory,
+        ringColor: colors.ring,
         accessoryScale: [0.17, 0.025, 0.035],
         accessoryOffset: [0, 0.16, 0],
         ringRadius: 0,
@@ -131,9 +138,10 @@ function nodeVisualStyle(kind: HydrologicalNodeRenderKind): NodeVisualStyle {
         bodyHeight: 0.105,
         topRadius: 0.07,
         topHeight: 0.035,
-        bodyColor: '#73858c',
-        topColor: '#c5d5d9',
-        accessoryColor: '#e0edf0',
+        bodyColor: colors.body,
+        topColor: colors.top,
+        accessoryColor: colors.accessory,
+        ringColor: colors.ring,
         accessoryScale: [0.12, 0.025, 0.03],
         accessoryOffset: [0, 0.135, 0],
         ringRadius: 0,
@@ -145,9 +153,10 @@ function nodeVisualStyle(kind: HydrologicalNodeRenderKind): NodeVisualStyle {
         bodyHeight: 0,
         topRadius: 0,
         topHeight: 0,
-        bodyColor: '#56727a',
-        topColor: '#8ca4aa',
-        accessoryColor: '#8ca4aa',
+        bodyColor: colors.body,
+        topColor: colors.top,
+        accessoryColor: colors.accessory,
+        ringColor: colors.ring,
         accessoryScale: [0, 0, 0],
         accessoryOffset: [0, 0, 0],
         ringRadius: 0,
@@ -159,9 +168,10 @@ function nodeVisualStyle(kind: HydrologicalNodeRenderKind): NodeVisualStyle {
         bodyHeight: 0.34,
         topRadius: 0.155,
         topHeight: 0.085,
-        bodyColor: '#087fa8',
-        topColor: '#54ddf5',
-        accessoryColor: '#e8fbff',
+        bodyColor: colors.body,
+        topColor: colors.top,
+        accessoryColor: colors.accessory,
+        ringColor: colors.ring,
         accessoryScale: [0.34, 0.055, 0.065],
         accessoryOffset: [0, 0.36, 0],
         ringRadius: 0.23,
@@ -174,9 +184,10 @@ function nodeVisualStyle(kind: HydrologicalNodeRenderKind): NodeVisualStyle {
         bodyHeight: 0.14,
         topRadius: 0.06,
         topHeight: 0.035,
-        bodyColor: '#12aeda',
-        topColor: '#80eaff',
-        accessoryColor: '#d9f8ff',
+        bodyColor: colors.body,
+        topColor: colors.top,
+        accessoryColor: colors.accessory,
+        ringColor: colors.ring,
         accessoryScale: [0.14, 0.035, 0.04],
         accessoryOffset: [0.085, 0.115, 0],
         ringRadius: 0,
@@ -196,58 +207,47 @@ function createMaterials() {
   selection.colorWrite = false;
   return {
     distributionPipe: new THREE.MeshStandardMaterial({
-      color: '#08c9f4',
+      color: HYDROLOGICAL_PRESENTATION_PALETTE.pipes.distribution,
       roughness: 0.32,
       metalness: 0.12,
-      emissive: '#087899',
-      emissiveIntensity: 0.88,
+      emissive: HYDROLOGICAL_PRESENTATION_PALETTE.pipes.distribution,
+      emissiveIntensity: 0.42,
       transparent: true,
-      opacity: 0,
+      opacity: FULL_OPACITY.distributionPipe,
       toneMapped: false,
     }),
     hydrantPipe: new THREE.MeshStandardMaterial({
-      color: '#ff4050',
+      color: HYDROLOGICAL_PRESENTATION_PALETTE.pipes.hydrantSupply,
       roughness: 0.34,
       metalness: 0.11,
-      emissive: '#98202c',
-      emissiveIntensity: 0.82,
+      emissive: HYDROLOGICAL_PRESENTATION_PALETTE.pipes.hydrantSupply,
+      emissiveIntensity: 0.42,
       transparent: true,
-      opacity: 0,
+      opacity: FULL_OPACITY.hydrantPipe,
       toneMapped: false,
     }),
-    nodeBody: new THREE.MeshStandardMaterial({
+    nodeBody: new THREE.MeshBasicMaterial({
       color: '#ffffff',
-      roughness: 0.48,
-      metalness: 0.18,
-      emissive: '#163b44',
-      emissiveIntensity: 0.2,
-      vertexColors: true,
       transparent: true,
-      opacity: 0,
+      opacity: FULL_OPACITY.nodeBody,
+      toneMapped: false,
     }),
-    nodeTop: new THREE.MeshStandardMaterial({
+    nodeTop: new THREE.MeshBasicMaterial({
       color: '#ffffff',
-      roughness: 0.34,
-      metalness: 0.16,
-      emissive: '#24464d',
-      emissiveIntensity: 0.24,
-      vertexColors: true,
       transparent: true,
-      opacity: 0,
+      opacity: FULL_OPACITY.nodeTop,
+      toneMapped: false,
     }),
-    nodeAccessory: new THREE.MeshStandardMaterial({
+    nodeAccessory: new THREE.MeshBasicMaterial({
       color: '#ffffff',
-      roughness: 0.4,
-      metalness: 0.24,
-      vertexColors: true,
       transparent: true,
-      opacity: 0,
+      opacity: FULL_OPACITY.nodeAccessory,
+      toneMapped: false,
     }),
     nodeRing: new THREE.MeshBasicMaterial({
       color: '#ffffff',
-      vertexColors: true,
       transparent: true,
-      opacity: 0,
+      opacity: FULL_OPACITY.nodeRing,
       depthWrite: false,
       toneMapped: false,
     }),
@@ -261,22 +261,6 @@ function refreshInstanceBounds(mesh: THREE.InstancedMesh | null) {
   if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
   mesh.computeBoundingBox();
   mesh.computeBoundingSphere();
-}
-
-function nodeActivationDistance(
-  node: CommercialHydrologicalNode,
-  segments: readonly CommercialHydrologicalPipeSegment[],
-) {
-  const linkedIds = new Set(node.linkedSegmentIds ?? []);
-  const incident = segments.filter((segment) => (
-    linkedIds.has(segment.id)
-    || segment.sourceNodeId === node.id
-    || segment.targetNodeId === node.id
-  ));
-  if (incident.length === 0) return 0;
-  return Math.min(...incident.map((segment) => (
-    Number.isFinite(segment.activationDistance) ? Math.max(0, segment.activationDistance) : 0
-  )));
 }
 
 function CommercialHydrologicalInfrastructureInstances({
@@ -301,9 +285,8 @@ function CommercialHydrologicalInfrastructureInstances({
   const nodeAccessoryRef = useRef<THREE.InstancedMesh>(null);
   const nodeRingRef = useRef<THREE.InstancedMesh>(null);
   const selectionRef = useRef<THREE.InstancedMesh>(null);
-  const revealElapsed = useRef(0);
-  const revealSettled = useRef(false);
   const { invalidate } = useThree();
+  const selectionEnabled = Boolean(onSelect);
 
   const pipeSpans = useMemo(() => buildHydrologicalPipeSpans(
     segments,
@@ -328,34 +311,32 @@ function CommercialHydrologicalInfrastructureInstances({
       kind,
       style: nodeVisualStyle(kind),
       heading: stableHeading(placement.node.id),
-      activationDistance: nodeActivationDistance(placement.node, segments),
     }];
-  }), [placements, segments]);
+  }), [placements]);
   const accessoryVisuals = useMemo(() => nodeVisuals.filter((visual) => (
     visual.style.accessoryScale.some((scale) => scale > 0)
   )), [nodeVisuals]);
   const ringVisuals = useMemo(() => reducedGraphics ? [] : nodeVisuals.filter((visual) => (
     visual.style.ringRadius > 0
   )), [nodeVisuals, reducedGraphics]);
-  const selectableVisuals = useMemo(() => onSelect
-    ? nodeVisuals.filter((visual) => visual.placement.node.selectable)
-    : [], [nodeVisuals, onSelect]);
+  const selectableVisuals = useMemo(() => nodeVisuals.filter((visual) => (
+    visual.placement.node.selectable
+  )), [nodeVisuals]);
   const supplyEntryVisuals = useMemo(() => nodeVisuals.filter((visual) => (
     visual.kind === 'SUPPLY_ENTRY'
   )), [nodeVisuals]);
-  const activationBounds = useMemo(() => {
-    if (pipeSpans.length === 0) return { minimum: 0, maximum: 1, range: 1 };
-    const minimum = Math.min(...pipeSpans.map((span) => span.activationStart));
-    const maximum = Math.max(...pipeSpans.map((span) => span.activationEnd));
-    return { minimum, maximum, range: Math.max(maximum - minimum, Number.EPSILON) };
-  }, [pipeSpans]);
   const geometries = useMemo(() => {
     const created = {
       pipe: new THREE.CylinderGeometry(1, 1, 1, reducedGraphics ? 6 : 10, 1, false),
       nodeBody: new THREE.CylinderGeometry(1, 1, 1, reducedGraphics ? 7 : 12, 1, false),
       nodeTop: new THREE.SphereGeometry(1, reducedGraphics ? 7 : 12, reducedGraphics ? 4 : 7),
       nodeAccessory: new THREE.BoxGeometry(1, 1, 1),
-      nodeRing: new THREE.TorusGeometry(1, 0.12, reducedGraphics ? 4 : 7, reducedGraphics ? 10 : 18),
+      nodeRing: new THREE.TorusGeometry(
+        1,
+        NODE_RING_TUBE_RADIUS,
+        reducedGraphics ? 4 : 7,
+        reducedGraphics ? 10 : 18,
+      ),
       selection: new THREE.SphereGeometry(1, 6, 4),
     };
     Object.values(created).forEach((geometry) => {
@@ -369,40 +350,29 @@ function CommercialHydrologicalInfrastructureInstances({
   const applyPipeBatch = useCallback((
     mesh: THREE.InstancedMesh | null,
     spans: readonly HydrologicalPipeSpan[],
-    revealedDistance: number,
   ) => {
     if (!mesh) return;
     const transform = new THREE.Object3D();
     const start = new THREE.Vector3();
     const end = new THREE.Vector3();
-    const currentEnd = new THREE.Vector3();
     const direction = new THREE.Vector3();
     const midpoint = new THREE.Vector3();
     const quaternion = new THREE.Quaternion();
     spans.forEach((span, index) => {
-      const revealFraction = THREE.MathUtils.clamp(
-        (revealedDistance - span.activationStart)
-          / Math.max(span.activationEnd - span.activationStart, Number.EPSILON),
-        0,
-        1,
-      );
-      if (revealFraction <= 0) {
-        transform.position.set(...span.start);
-        transform.rotation.set(0, 0, 0);
-        transform.scale.setScalar(PIPE_EPSILON_SCALE);
-        transform.updateMatrix();
-        mesh.setMatrixAt(index, transform.matrix);
-        return;
-      }
       start.set(...span.start);
       end.set(...span.end);
-      currentEnd.lerpVectors(start, end, revealFraction);
-      direction.subVectors(currentEnd, start);
-      midpoint.addVectors(start, currentEnd).multiplyScalar(0.5);
-      quaternion.setFromUnitVectors(UNIT_Y, direction.clone().normalize());
+      direction.subVectors(end, start);
+      const length = direction.length();
+      midpoint.addVectors(start, end).multiplyScalar(0.5);
       transform.position.copy(midpoint);
-      transform.quaternion.copy(quaternion);
-      transform.scale.set(span.renderRadius, direction.length(), span.renderRadius);
+      if (length === 0) {
+        transform.quaternion.identity();
+        transform.scale.set(0, 0, 0);
+      } else {
+        quaternion.setFromUnitVectors(UNIT_Y, direction.normalize());
+        transform.quaternion.copy(quaternion);
+        transform.scale.set(span.renderRadius, length, span.renderRadius);
+      }
       transform.updateMatrix();
       mesh.setMatrixAt(index, transform.matrix);
     });
@@ -412,104 +382,65 @@ function CommercialHydrologicalInfrastructureInstances({
   const applyNodeBatch = useCallback((
     mesh: THREE.InstancedMesh | null,
     visuals: readonly HydrologicalNodeVisual[],
-    revealedDistance: number,
     part: 'body' | 'top' | 'accessory' | 'ring' | 'selection',
   ) => {
     if (!mesh) return;
     const transform = new THREE.Object3D();
-    const revealWindow = Math.max(
-      NODE_REVEAL_WINDOW_MINIMUM,
-      activationBounds.range * 0.045,
-    );
     visuals.forEach((visual, index) => {
       const { placement, style, heading } = visual;
-      const progress = THREE.MathUtils.smoothstep(
-        revealedDistance,
-        visual.activationDistance,
-        visual.activationDistance + revealWindow,
-      );
       const [x, z] = placement.renderPosition;
       const ground = placement.groundElevation;
       transform.rotation.set(0, heading, 0);
       if (part === 'body') {
-        transform.position.set(x, ground + style.bodyHeight * progress / 2, z);
+        transform.position.set(x, ground + style.bodyHeight / 2, z);
         transform.scale.set(
-          style.bodyRadius * progress,
-          style.bodyHeight * progress,
-          style.bodyRadius * progress,
+          style.bodyRadius,
+          style.bodyHeight,
+          style.bodyRadius,
         );
       } else if (part === 'top') {
         transform.position.set(
           x,
-          ground + style.bodyHeight * progress + style.topHeight * progress * 0.55,
+          ground + style.bodyHeight + style.topHeight * 0.55,
           z,
         );
         transform.scale.set(
-          style.topRadius * progress,
-          style.topHeight * progress,
-          style.topRadius * progress,
+          style.topRadius,
+          style.topHeight,
+          style.topRadius,
         );
       } else if (part === 'accessory') {
         const cos = Math.cos(heading);
         const sin = Math.sin(heading);
         transform.position.set(
-          x + (style.accessoryOffset[0] * cos + style.accessoryOffset[2] * sin) * progress,
-          ground + style.accessoryOffset[1] * progress,
-          z + (-style.accessoryOffset[0] * sin + style.accessoryOffset[2] * cos) * progress,
+          x + style.accessoryOffset[0] * cos + style.accessoryOffset[2] * sin,
+          ground + style.accessoryOffset[1],
+          z - style.accessoryOffset[0] * sin + style.accessoryOffset[2] * cos,
         );
-        transform.scale.set(
-          style.accessoryScale[0] * progress,
-          style.accessoryScale[1] * progress,
-          style.accessoryScale[2] * progress,
-        );
+        transform.scale.set(...style.accessoryScale);
       } else if (part === 'ring') {
-        transform.position.set(x, ground + 0.016, z);
+        transform.position.set(
+          x,
+          ground
+            + NODE_RING_TUBE_RADIUS * style.ringRadius
+            + NODE_RING_SURFACE_CLEARANCE,
+          z,
+        );
         transform.rotation.set(Math.PI / 2, heading, 0);
-        transform.scale.setScalar(style.ringRadius * progress);
+        transform.scale.setScalar(style.ringRadius);
       } else {
         transform.position.set(
           x,
-          ground + Math.max(style.bodyHeight, style.colliderRadius) * progress * 0.58,
+          ground + Math.max(style.bodyHeight, style.colliderRadius) * 0.58,
           z,
         );
-        transform.scale.setScalar(style.colliderRadius * progress);
+        transform.scale.setScalar(style.colliderRadius);
       }
-      if (progress <= 0) transform.scale.setScalar(PIPE_EPSILON_SCALE);
       transform.updateMatrix();
       mesh.setMatrixAt(index, transform.matrix);
     });
     mesh.instanceMatrix.needsUpdate = true;
-  }, [activationBounds.range]);
-
-  const applyReveal = useCallback((progress: number) => {
-    const revealedDistance = activationBounds.minimum + activationBounds.range * progress;
-    applyPipeBatch(distributionPipeRef.current, distributionSpans, revealedDistance);
-    applyPipeBatch(hydrantPipeRef.current, hydrantSpans, revealedDistance);
-    applyNodeBatch(nodeBodyRef.current, nodeVisuals, revealedDistance, 'body');
-    applyNodeBatch(nodeTopRef.current, nodeVisuals, revealedDistance, 'top');
-    applyNodeBatch(nodeAccessoryRef.current, accessoryVisuals, revealedDistance, 'accessory');
-    applyNodeBatch(nodeRingRef.current, ringVisuals, revealedDistance, 'ring');
-    applyNodeBatch(selectionRef.current, selectableVisuals, revealedDistance, 'selection');
-    const opacityProgress = THREE.MathUtils.smoothstep(progress, 0, 0.18);
-    materials.distributionPipe.opacity = FULL_OPACITY.distributionPipe * opacityProgress;
-    materials.hydrantPipe.opacity = FULL_OPACITY.hydrantPipe * opacityProgress;
-    materials.nodeBody.opacity = FULL_OPACITY.nodeBody * opacityProgress;
-    materials.nodeTop.opacity = FULL_OPACITY.nodeTop * opacityProgress;
-    materials.nodeAccessory.opacity = FULL_OPACITY.nodeAccessory * opacityProgress;
-    materials.nodeRing.opacity = FULL_OPACITY.nodeRing * opacityProgress;
-  }, [
-    accessoryVisuals,
-    activationBounds.minimum,
-    activationBounds.range,
-    applyNodeBatch,
-    applyPipeBatch,
-    distributionSpans,
-    hydrantSpans,
-    materials,
-    nodeVisuals,
-    ringVisuals,
-    selectableVisuals,
-  ]);
+  }, []);
 
   useLayoutEffect(() => {
     const body = nodeBodyRef.current;
@@ -531,15 +462,18 @@ function CommercialHydrologicalInfrastructureInstances({
       accessory?.setColorAt(index, accessoryColor);
     });
     ringVisuals.forEach((visual, index) => {
-      ringColor.set(visual.style.topColor);
+      ringColor.set(visual.style.ringColor);
       ring?.setColorAt(index, ringColor);
     });
 
-    revealElapsed.current = 0;
-    revealSettled.current = false;
-    // Establish conservative, final-state culling bounds before collapsing the
-    // instances for the finite activation reveal.
-    applyReveal(1);
+    applyPipeBatch(distributionPipeRef.current, distributionSpans);
+    applyPipeBatch(hydrantPipeRef.current, hydrantSpans);
+    applyNodeBatch(nodeBodyRef.current, nodeVisuals, 'body');
+    applyNodeBatch(nodeTopRef.current, nodeVisuals, 'top');
+    applyNodeBatch(nodeAccessoryRef.current, accessoryVisuals, 'accessory');
+    applyNodeBatch(nodeRingRef.current, ringVisuals, 'ring');
+    applyNodeBatch(selectionRef.current, selectableVisuals, 'selection');
+
     [
       distributionPipeRef.current,
       hydrantPipeRef.current,
@@ -549,9 +483,19 @@ function CommercialHydrologicalInfrastructureInstances({
       ring,
       selectionRef.current,
     ].forEach(refreshInstanceBounds);
-    applyReveal(0);
     invalidate();
-  }, [applyReveal, accessoryVisuals, invalidate, nodeVisuals, ringVisuals]);
+  }, [
+    accessoryVisuals,
+    applyNodeBatch,
+    applyPipeBatch,
+    distributionSpans,
+    hydrantSpans,
+    invalidate,
+    materials,
+    nodeVisuals,
+    ringVisuals,
+    selectableVisuals,
+  ]);
 
   useEffect(() => () => {
     Object.values(geometries).forEach((geometry) => geometry.dispose());
@@ -561,31 +505,8 @@ function CommercialHydrologicalInfrastructureInstances({
     Object.values(materials).forEach((material) => material.dispose());
   }, [materials]);
 
-  useFrame((_state, delta) => {
-    if (revealSettled.current) return;
-    revealElapsed.current += Math.min(delta, 0.05);
-    const duration = reducedGraphics ? 1.25 : 1.85;
-    const linearProgress = Math.min(1, revealElapsed.current / duration);
-    const easedProgress = 1 - (1 - linearProgress) ** 3;
-    applyReveal(easedProgress);
-    if (linearProgress >= 1) {
-      revealSettled.current = true;
-      [
-        distributionPipeRef.current,
-        hydrantPipeRef.current,
-        nodeBodyRef.current,
-        nodeTopRef.current,
-        nodeAccessoryRef.current,
-        nodeRingRef.current,
-        selectionRef.current,
-      ].forEach(refreshInstanceBounds);
-      return;
-    }
-    invalidate();
-  });
-
   const handleSelection = useCallback((event: ThreeEvent<MouseEvent>) => {
-    if (!onSelect || event.instanceId === undefined) return;
+    if (!onSelect || event.instanceId === undefined || !isMapSelectionClick(event.delta)) return;
     const selected = selectableVisuals[event.instanceId]?.placement.node;
     if (!selected) return;
     event.stopPropagation();
@@ -596,7 +517,7 @@ function CommercialHydrologicalInfrastructureInstances({
     event: ThreeEvent<MouseEvent>,
     spans: readonly HydrologicalPipeSpan[],
   ) => {
-    if (!onSelect || event.instanceId === undefined) return;
+    if (!onSelect || event.instanceId === undefined || !isMapSelectionClick(event.delta)) return;
     const selected = spans[event.instanceId]?.segment;
     if (!selected?.selectable) return;
     event.stopPropagation();
@@ -693,7 +614,7 @@ function CommercialHydrologicalInfrastructureInstances({
           raycast={NO_RAYCAST}
         />
       ) : null}
-      {selectableVisuals.length > 0 ? (
+      {selectionEnabled && selectableVisuals.length > 0 ? (
         <instancedMesh
           ref={selectionRef}
           name="selecao-pontos-hidrologicos"
