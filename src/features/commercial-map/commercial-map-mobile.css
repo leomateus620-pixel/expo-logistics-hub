@@ -705,10 +705,6 @@
     animation-iteration-count: infinite !important;
   }
 
-  .commercial-map-shell.is-hydrological-mode .commercial-map-stage::after {
-    animation-duration: 1.15s !important;
-  }
-
   .hydrological-network-legend { animation-duration: 480ms !important; }
   .hydrological-network-legend__content { animation-duration: 300ms !important; }
 }

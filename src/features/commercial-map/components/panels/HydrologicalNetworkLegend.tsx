@@ -1,14 +1,53 @@
 import { ChevronDown, Droplets, Gauge, X } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type CSSProperties } from 'react';
 import {
   HYDROLOGICAL_INFRASTRUCTURE_REFERENCE,
   HYDROLOGICAL_NODES,
   HYDROLOGICAL_PIPE_SEGMENTS,
 } from '../../data/hydrologicalInfrastructure';
+import { HYDROLOGICAL_PRESENTATION_PALETTE } from '../../data/hydrologicalPresentation';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 
 type HydrologicalPipeSegment = (typeof HYDROLOGICAL_PIPE_SEGMENTS)[number];
 type HydrologicalNode = (typeof HYDROLOGICAL_NODES)[number];
+
+type HydrologicalLegendStyle = CSSProperties & {
+  '--hydro-pipe-distribution': string;
+  '--hydro-pipe-hydrant-supply': string;
+  '--hydro-tap-body': string;
+  '--hydro-hydrant-body': string;
+  '--hydro-hydrant-top': string;
+  '--hydro-reservoir-body': string;
+  '--hydro-well-body': string;
+  '--hydro-well-top': string;
+  '--hydro-well-ring': string;
+  '--hydro-register-body': string;
+  '--hydro-tl-body': string;
+  '--hydro-tl-top': string;
+  '--hydro-tl-accessory': string;
+  '--hydro-corsan-body': string;
+  '--hydro-corsan-top': string;
+  '--hydro-corsan-accessory': string;
+};
+
+const HYDROLOGICAL_LEGEND_STYLE: HydrologicalLegendStyle = {
+  '--hydro-pipe-distribution': HYDROLOGICAL_PRESENTATION_PALETTE.pipes.distribution,
+  '--hydro-pipe-hydrant-supply': HYDROLOGICAL_PRESENTATION_PALETTE.pipes.hydrantSupply,
+  '--hydro-tap-body': HYDROLOGICAL_PRESENTATION_PALETTE.nodes.TAP.body,
+  '--hydro-hydrant-body': HYDROLOGICAL_PRESENTATION_PALETTE.nodes.HYDRANT.body,
+  '--hydro-hydrant-top': HYDROLOGICAL_PRESENTATION_PALETTE.nodes.HYDRANT.top,
+  '--hydro-reservoir-body': HYDROLOGICAL_PRESENTATION_PALETTE.nodes.RESERVOIR.body,
+  '--hydro-well-body': HYDROLOGICAL_PRESENTATION_PALETTE.nodes.WELL.body,
+  '--hydro-well-top': HYDROLOGICAL_PRESENTATION_PALETTE.nodes.WELL.top,
+  '--hydro-well-ring': HYDROLOGICAL_PRESENTATION_PALETTE.nodes.WELL.ring,
+  '--hydro-register-body': HYDROLOGICAL_PRESENTATION_PALETTE.nodes.VALVE.body,
+  '--hydro-tl-body': HYDROLOGICAL_PRESENTATION_PALETTE.nodes.TECHNICAL_MARKER.body,
+  '--hydro-tl-top': HYDROLOGICAL_PRESENTATION_PALETTE.nodes.TECHNICAL_MARKER.top,
+  '--hydro-tl-accessory': HYDROLOGICAL_PRESENTATION_PALETTE.nodes.TECHNICAL_MARKER.accessory,
+  '--hydro-corsan-body': HYDROLOGICAL_PRESENTATION_PALETTE.nodes.SUPPLY_ENTRY.body,
+  '--hydro-corsan-top': HYDROLOGICAL_PRESENTATION_PALETTE.nodes.SUPPLY_ENTRY.top,
+  '--hydro-corsan-accessory': HYDROLOGICAL_PRESENTATION_PALETTE.nodes.SUPPLY_ENTRY.accessory,
+};
 
 const NODE_TYPE_LABELS: Record<HydrologicalNode['type'], string> = {
   tap: 'Torneira',
@@ -174,6 +213,7 @@ export function HydrologicalNetworkLegend() {
     <aside
       className={`hydrological-network-legend ${expanded ? 'is-expanded' : ''} ${selectedNode || selectedSegment ? 'has-selection' : ''}`}
       aria-label="Legenda técnica da Rede Hidrológica"
+      style={HYDROLOGICAL_LEGEND_STYLE}
     >
       <header className="hydrological-network-legend__header">
         <span className="hydrological-network-legend__icon" aria-hidden="true">
