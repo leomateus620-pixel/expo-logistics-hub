@@ -70,6 +70,8 @@ interface CommercialMapState {
   referenceOpacity: number;
   labelsVisible: boolean;
   treesVisible: boolean;
+  hydrologicalModeActive: boolean;
+  selectedHydrologicalElementId: string | null;
   technicalValidationVisible: boolean;
   reducedGraphics: boolean;
   cameraNavigating: boolean;
@@ -108,6 +110,9 @@ interface CommercialMapState {
   setReferenceOpacity: (opacity: number) => void;
   setLabelsVisible: (visible: boolean) => void;
   setTreesVisible: (visible: boolean) => void;
+  setHydrologicalModeActive: (active: boolean) => void;
+  toggleHydrologicalMode: () => void;
+  setSelectedHydrologicalElementId: (id: string | null) => void;
   setTechnicalValidationVisible: (visible: boolean) => void;
   setReducedGraphics: (reduced: boolean) => void;
   setCameraNavigating: (navigating: boolean) => void;
@@ -142,6 +147,8 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
   referenceOpacity: 0.18,
   labelsVisible: true,
   treesVisible: true,
+  hydrologicalModeActive: false,
+  selectedHydrologicalElementId: null,
   technicalValidationVisible: false,
   reducedGraphics: false,
   cameraNavigating: false,
@@ -177,6 +184,8 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
       workspaceMode: '3d',
       cameraPreset: activeSegmentId === 'exporural' ? 'exporural' : 'overview',
       cameraSequence: state.cameraSequence + 1,
+      hydrologicalModeActive: false,
+      selectedHydrologicalElementId: null,
       technicalValidationVisible: false,
       cameraNavigating: false,
     };
@@ -300,6 +309,37 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
   setReferenceOpacity: (referenceOpacity) => set({ referenceOpacity }),
   setLabelsVisible: (labelsVisible) => set({ labelsVisible }),
   setTreesVisible: (treesVisible) => set({ treesVisible }),
+  setHydrologicalModeActive: (hydrologicalModeActive) => set((state) => {
+    if (state.hydrologicalModeActive === hydrologicalModeActive) return state;
+    if (!hydrologicalModeActive) {
+      return {
+        hydrologicalModeActive: false,
+        selectedHydrologicalElementId: null,
+        cameraSequence: state.cameraSequence + 1,
+        cameraNavigating: false,
+      };
+    }
+
+    return {
+      hydrologicalModeActive: true,
+      selectedHydrologicalElementId: null,
+      selectedEntityId: null,
+      interiorEntityId: null,
+      interiorReturnView: null,
+      hoveredEntityId: null,
+      hoveredModuleId: null,
+      selectedModuleId: null,
+      activePanel: null,
+      workspaceMode: '3d',
+      cameraPreset: state.activeSegmentId === 'exporural' ? 'exporural' : 'overview',
+      cameraSequence: state.cameraSequence + 1,
+      cameraNavigating: false,
+    };
+  }),
+  toggleHydrologicalMode: () => get().setHydrologicalModeActive(!get().hydrologicalModeActive),
+  setSelectedHydrologicalElementId: (selectedHydrologicalElementId) => set({
+    selectedHydrologicalElementId,
+  }),
   setTechnicalValidationVisible: (technicalValidationVisible) => set({ technicalValidationVisible }),
   setReducedGraphics: (reducedGraphics) => set({ reducedGraphics }),
   setCameraNavigating: (cameraNavigating) => set({ cameraNavigating }),

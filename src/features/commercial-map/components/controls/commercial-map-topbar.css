@@ -27,6 +27,16 @@
 }
 .commercial-map-topbar__trigger:hover { background: rgba(24, 94, 43, .08); color: var(--map-forest-dark); }
 .commercial-map-topbar__trigger.is-open { background: rgba(24, 94, 43, .12); color: var(--map-forest-dark); }
+.commercial-map-topbar__trigger.is-hydrological { color: #2576a8; }
+.commercial-map-topbar__trigger.is-hydrological:hover {
+  background: rgba(31, 139, 195, .1);
+  color: #0c5e90;
+}
+.commercial-map-topbar__trigger.is-hydrological.is-open {
+  background: linear-gradient(145deg, #1776ad, #21a7cf);
+  color: #fff;
+  box-shadow: 0 8px 20px -10px rgba(13, 104, 155, .9), inset 0 1px rgba(255, 255, 255, .28);
+}
 .commercial-map-topbar__trigger svg { width: 18px; height: 18px; }
 .commercial-map-topbar__trigger i {
   position: absolute;

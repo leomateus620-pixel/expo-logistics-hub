@@ -21,6 +21,11 @@ import {
 import { normalizeMapEntityMetadata, type MapLabelVisibility } from '../../utils/mapMetadata';
 import { selectCommercialTreesForScene } from '../../utils/treeLayer';
 import { selectCommercialElectricalInfrastructureForScene } from '../../utils/electricalInfrastructure';
+import { selectCommercialHydrologicalInfrastructureForScene } from '../../utils/hydrologicalInfrastructure';
+import {
+  HYDROLOGICAL_NODES,
+  HYDROLOGICAL_PIPE_SEGMENTS,
+} from '../../data/hydrologicalInfrastructure';
 import {
   ARENA_FRONT_LAYOUT,
   shouldRenderArenaCourts,
@@ -50,8 +55,14 @@ import {
 } from '../../utils/mapPresentation';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import {
+  COMMERCIAL_MAP_HYDROLOGICAL_PORTRAIT_DIRECTION,
+  COMMERCIAL_MAP_HYDROLOGICAL_PORTRAIT_FIT_PADDING,
   COMMERCIAL_MAP_MANUAL_NAVIGATION_REFIT_SUPPRESSION_MS,
+  COMMERCIAL_MAP_MIN_POLAR_ANGLE,
   COMMERCIAL_MAP_RESIZE_REFIT_DEBOUNCE_MS,
+  COMMERCIAL_MAP_TOP_DIRECTION,
+  isCommercialMapHydrologicalPortraitViewport,
+  resolveCommercialMapHydrologicalPortraitTargetShift,
   resolveCommercialMapPixelRatio,
   shouldSuppressCommercialMapResizeRefit,
 } from '../../utils/viewport';
@@ -84,6 +95,11 @@ const MiranteInteriorScene = lazy(async () => {
 const CommercialPavilionInteriorScene = lazy(async () => {
   const module = await import('./CommercialPavilionInteriorScene');
   return { default: module.CommercialPavilionInteriorScene };
+});
+
+const CommercialHydrologicalInfrastructureLayer = lazy(async () => {
+  const module = await import('./CommercialHydrologicalInfrastructureLayer');
+  return { default: module.CommercialHydrologicalInfrastructureLayer };
 });
 
 interface CommercialMapCanvasProps {
@@ -482,6 +498,7 @@ interface EntityMeshProps {
   selected: boolean;
   hovered: boolean;
   filtersActive: boolean;
+  infrastructureMode: boolean;
   isMatch: boolean;
   layerOpacity: number;
   sceneCenter: readonly [number, number];
@@ -500,6 +517,7 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
   selected,
   hovered,
   filtersActive,
+  infrastructureMode,
   isMatch,
   layerOpacity,
   sceneCenter,
@@ -533,7 +551,11 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
     ? segment.palette.surface
     : CLASSIFICATION_COLORS[entity.classification] ?? '#78907d';
   const matched = Boolean(filtersActive && isMatch);
-  const filterStrength = filtersActive && !isMatch && !selected ? 0.42 : 1;
+  const filterStrength = infrastructureMode
+    ? 0.26
+    : filtersActive && !isMatch && !selected
+      ? 0.42
+      : 1;
   const visualOpacity = selected ? Math.max(0.94, layerOpacity) : layerOpacity * filterStrength;
   const presentationLift = resolveMarkerPresentationLift(classification);
   const selectedLift = selected ? (isFlat ? 0.055 : 0.11) : 0;
@@ -542,8 +564,18 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
     const strength = THREE.MathUtils.clamp(layerOpacity * filterStrength, 0, 1);
     return `#${new THREE.Color(baseColor).lerp(MAP_BACKGROUND_COLOR, (1 - strength) * 0.82).getHexString()}`;
   }, [baseColor, filterStrength, layerOpacity, selected, solidRendering]);
-  const gateBaseColor = selected ? '#e7bd37' : hovered ? '#256b43' : '#174c31';
-  const gateAccentColor = selected ? '#174c31' : '#e9c84b';
+  const gateBaseColor = infrastructureMode
+    ? '#607b7b'
+    : selected
+      ? '#e7bd37'
+      : hovered
+        ? '#256b43'
+        : '#174c31';
+  const gateAccentColor = infrastructureMode
+    ? '#a7b9b5'
+    : selected
+      ? '#174c31'
+      : '#e9c84b';
   const outlineGeometry = isPavilion ? roofOutline : isRoad || isQuadra ? footprint : edges;
   const outlineColor = selected
     ? '#fff1a8'
@@ -769,12 +801,14 @@ function lotColor(
   isMatch: boolean,
   selected: boolean,
   hovered: boolean,
+  infrastructureMode = false,
 ) {
   const status = STATUS_CONFIG[entry.lot.status];
   const color = segment
     ? new THREE.Color(status.color).lerp(new THREE.Color(segment.palette.surface), SEGMENT_LOT_SURFACE_WEIGHT)
     : new THREE.Color(status.color);
-  if (filtersActive && !isMatch && !selected) color.lerp(new THREE.Color('#c7d1c9'), 0.76);
+  if (infrastructureMode) color.lerp(new THREE.Color('#c7d1cf'), 0.98);
+  else if (filtersActive && !isMatch && !selected) color.lerp(new THREE.Color('#c7d1c9'), 0.76);
   if (hovered) color.lerp(new THREE.Color('#ffffff'), 0.1);
   if (selected) color.lerp(new THREE.Color('#fff4b8'), 0.14);
   return color;
@@ -903,6 +937,7 @@ function BatchedLots({
   hoveredEntityId,
   matchingEntityIds,
   filtersActive,
+  infrastructureMode,
   layerOpacity,
   segmentByEntity,
   onSelect,
@@ -916,6 +951,7 @@ function BatchedLots({
   hoveredEntityId: string | null;
   matchingEntityIds: ReadonlySet<string>;
   filtersActive: boolean;
+  infrastructureMode: boolean;
   layerOpacity: Record<string, number>;
   segmentByEntity: ReadonlyMap<string, CommercialMapSegmentDefinition>;
   onSelect: (id: string) => void;
@@ -1011,10 +1047,11 @@ function BatchedLots({
       matchingEntityIds.has(entityId),
       selected,
       hovered,
+      infrastructureMode,
     ));
     matrix.makeTranslation(0, entry.entity.geometry.elevation + (selected ? 0.055 : hovered ? 0.035 : 0), 0);
     batch.mesh.setMatrixAt(batchId, matrix);
-  }, [batch, entryByEntity, filtersActive, matchingEntityIds, segmentByEntity]);
+  }, [batch, entryByEntity, filtersActive, infrastructureMode, matchingEntityIds, segmentByEntity]);
 
   useEffect(() => {
     if (!batch) return;
@@ -1065,13 +1102,15 @@ function BatchedLots({
 
   return (
     <>
-      <SegmentLotAccents
-        entries={entries}
-        segmentByEntity={segmentByEntity}
-        matchingEntityIds={matchingEntityIds}
-        filtersActive={filtersActive}
-        layerOpacity={layerOpacity}
-      />
+      {!infrastructureMode ? (
+        <SegmentLotAccents
+          entries={entries}
+          segmentByEntity={segmentByEntity}
+          matchingEntityIds={matchingEntityIds}
+          filtersActive={filtersActive}
+          layerOpacity={layerOpacity}
+        />
+      ) : null}
       <primitive
         object={batch.mesh}
         raycast={batch.raycast}
@@ -1111,9 +1150,9 @@ function BatchedLots({
           vertexColors
           transparent
           opacity={Math.min(
-            0.7,
+            infrastructureMode ? 0.06 : 0.7,
             (entries.length > 0 ? layerOpacity[entries[0].entity.layerId] ?? 1 : 1)
-              * (filtersActive ? 0.46 : 0.7),
+              * (infrastructureMode ? 0.06 : filtersActive ? 0.46 : 0.7),
           )}
           toneMapped={false}
         />
@@ -1323,12 +1362,14 @@ function CameraRig({
   isolatedArea,
   activeSegment,
   activeSegmentEntities,
+  hydrologicalModeActive,
 }: {
   selectedEntity: MapEntity | null;
   extent: SceneExtent;
   isolatedArea?: CommercialMapSegmentId | null;
   activeSegment: CommercialMapSegmentDefinition | null;
   activeSegmentEntities: MapEntity[];
+  hydrologicalModeActive: boolean;
 }) {
   const controlsRef = useRef<OrbitControlsImpl>(null);
   const camera = useThree((state) => state.camera);
@@ -1369,6 +1410,9 @@ function CameraRig({
     const perspective = camera as THREE.PerspectiveCamera;
     const aspect = size.width / Math.max(size.height, 1);
     const config = CAMERA_PRESETS[nextPreset];
+    const hydrologicalPortraitOverview = hydrologicalModeActive
+      && nextPreset === 'overview'
+      && isCommercialMapHydrologicalPortraitViewport(size.width, size.height);
     const useFullExtent = nextPreset === 'overview'
       || nextPreset === 'top'
       || nextPreset === 'isometric'
@@ -1378,9 +1422,13 @@ function CameraRig({
       : new THREE.Vector3(...config.target);
     const configuredDirection = new THREE.Vector3(...config.position).sub(new THREE.Vector3(...config.target));
     const direction = nextPreset === 'overview'
-      ? new THREE.Vector3(0.04, 0.72, 0.69)
+      ? new THREE.Vector3(...(
+          hydrologicalPortraitOverview
+            ? COMMERCIAL_MAP_HYDROLOGICAL_PORTRAIT_DIRECTION
+            : [0.04, 0.72, 0.69] as const
+        ))
       : nextPreset === 'top'
-        ? new THREE.Vector3(0, 1, 0.001)
+        ? new THREE.Vector3(...COMMERCIAL_MAP_TOP_DIRECTION)
         : nextPreset === 'isometric'
           ? new THREE.Vector3(0.64, 0.58, 0.64)
           : configuredDirection;
@@ -1390,7 +1438,15 @@ function CameraRig({
       perspective.fov || 38,
       aspect,
       direction,
-      nextPreset === 'top' ? 1.08 : nextPreset === 'isometric' ? 0.92 : nextPreset === 'exporural' ? 1.02 : 1.1,
+      nextPreset === 'top'
+        ? 1.08
+        : nextPreset === 'isometric'
+          ? 0.92
+          : nextPreset === 'exporural'
+            ? 1.02
+            : hydrologicalPortraitOverview
+              ? COMMERCIAL_MAP_HYDROLOGICAL_PORTRAIT_FIT_PADDING
+              : 1.1,
     );
     const focusScale = nextPreset === 'quadra-r'
       ? 0.62
@@ -1400,6 +1456,13 @@ function CameraRig({
           ? 0.28
           : 1;
     const distance = Math.max(11, fullDistance * focusScale);
+    if (hydrologicalPortraitOverview) {
+      const horizontalDirection = new THREE.Vector3(direction.x, 0, direction.z).normalize();
+      lookAt.addScaledVector(
+        horizontalDirection,
+        resolveCommercialMapHydrologicalPortraitTargetShift(extent.diagonal),
+      );
+    }
     targetLookAt.current.copy(lookAt);
     targetPosition.current.copy(lookAt).add(direction.multiplyScalar(distance));
     perspective.fov = 38;
@@ -1407,7 +1470,7 @@ function CameraRig({
     perspective.far = Math.max(720, extent.diagonal * 9, distance * 4);
     perspective.updateProjectionMatrix();
     startCameraMove();
-  }, [camera, extent, size.height, size.width, startCameraMove]);
+  }, [camera, extent, hydrologicalModeActive, size.height, size.width, startCameraMove]);
 
   const queueSelection = useCallback((entity: MapEntity) => {
     const perspective = camera as THREE.PerspectiveCamera;
@@ -1479,7 +1542,7 @@ function CameraRig({
     const segmentExtent = getSceneExtent(segmentEntities);
     const aspect = size.width / Math.max(size.height, 1);
     const direction = preset === 'top'
-      ? new THREE.Vector3(0, 1, 0.001)
+      ? new THREE.Vector3(...COMMERCIAL_MAP_TOP_DIRECTION)
       : preset === 'isometric'
         ? new THREE.Vector3(0.64, 0.58, 0.64)
         : new THREE.Vector3(...segment.camera.direction);
@@ -1776,7 +1839,7 @@ function CameraRig({
       enableZoom
       minDistance={miranteMinimumDistance}
       maxDistance={miranteMaximumDistance}
-      minPolarAngle={0.025}
+      minPolarAngle={COMMERCIAL_MAP_MIN_POLAR_ANGLE}
       maxPolarAngle={Math.PI / 2.08}
       screenSpacePanning={false}
       zoomToCursor={!miranteSelected}
@@ -1809,6 +1872,10 @@ function Scene({
   const enterInterior = useCommercialMapStore((state) => state.enterInterior);
   const labelsVisible = useCommercialMapStore((state) => state.labelsVisible);
   const treesVisible = useCommercialMapStore((state) => state.treesVisible);
+  const hydrologicalModeActive = useCommercialMapStore((state) => state.hydrologicalModeActive);
+  const setSelectedHydrologicalElementId = useCommercialMapStore(
+    (state) => state.setSelectedHydrologicalElementId,
+  );
   const layerVisibility = useCommercialMapStore((state) => state.layerVisibility);
   const layerOpacity = useCommercialMapStore((state) => state.layerOpacity);
   const reducedGraphics = useCommercialMapStore((state) => state.reducedGraphics);
@@ -1824,11 +1891,43 @@ function Scene({
     () => selectCommercialElectricalInfrastructureForScene(entities, lots),
     [entities, lots],
   );
+  const sceneHydrologicalInfrastructure = useMemo(
+    () => selectCommercialHydrologicalInfrastructureForScene(
+      HYDROLOGICAL_NODES,
+      HYDROLOGICAL_PIPE_SEGMENTS,
+      entities,
+    ),
+    [entities],
+  );
   const extent = useMemo(
-    () => getSceneExtent(entities, sceneElectricalInfrastructure.nodes),
-    [entities, sceneElectricalInfrastructure.nodes],
+    () => getSceneExtent(
+      entities,
+      hydrologicalModeActive
+        ? [...sceneElectricalInfrastructure.nodes, ...sceneHydrologicalInfrastructure.nodes]
+        : sceneElectricalInfrastructure.nodes,
+    ),
+    [
+      entities,
+      hydrologicalModeActive,
+      sceneElectricalInfrastructure.nodes,
+      sceneHydrologicalInfrastructure.nodes,
+    ],
   );
   const sceneCenter = useMemo(() => [extent.centerX, extent.centerZ] as const, [extent.centerX, extent.centerZ]);
+  const presentedMatchingEntityIds = useMemo(
+    () => hydrologicalModeActive ? new Set<string>() : matchingEntityIds,
+    [hydrologicalModeActive, matchingEntityIds],
+  );
+  const entityFiltersActive = filtersActive || hydrologicalModeActive;
+  const handleEntitySelect = useCallback((entityId: string) => {
+    if (!hydrologicalModeActive) setSelectedEntityId(entityId);
+  }, [hydrologicalModeActive, setSelectedEntityId]);
+  const handleEntityHover = useCallback((entityId: string | null) => {
+    if (!hydrologicalModeActive) setHoveredEntityId(entityId);
+  }, [hydrologicalModeActive, setHoveredEntityId]);
+  const handleEntityFocus = useCallback(() => {
+    if (!hydrologicalModeActive) focusSelection();
+  }, [focusSelection, hydrologicalModeActive]);
   const lotByEntity = useMemo(() => new Map(lots.map((lot) => [lot.entityId, lot])), [lots]);
   const resolvedSegmentByEntity = useMemo(
     () => buildCommercialMapSegmentIndex(entities, lots),
@@ -1936,7 +2035,10 @@ function Scene({
         || owners.length !== ownerIdentifiers.length
         || owners.some((entity) => layerVisibility[entity.layerId] === false)
       ) return { visible: false, opacity: 0 };
-      const filterStrength = filtersActive && !owners.some((entity) => matchingEntityIds.has(entity.id)) ? 0.42 : 1;
+      const filterStrength = entityFiltersActive
+        && !owners.some((entity) => presentedMatchingEntityIds.has(entity.id))
+        ? 0.28
+        : 1;
       const opacity = Math.min(...owners.map((entity) => layerOpacity[entity.layerId] ?? 1)) * filterStrength;
       return { visible: opacity > 0.015, opacity };
     };
@@ -1950,7 +2052,7 @@ function Scene({
         ARENA_FRONT_LAYOUT.courtOwners,
       ),
     };
-  }, [entities, filtersActive, layerOpacity, layerVisibility, matchingEntityIds]);
+  }, [entities, entityFiltersActive, layerOpacity, layerVisibility, presentedMatchingEntityIds]);
   const activeSegmentEntities = useMemo(
     () => activeSegment
       ? exteriorRenderedEntities.filter((entity) => segmentByEntity.get(entity.id)?.id === activeSegment.id)
@@ -1961,12 +2063,12 @@ function Scene({
     entities: exteriorRenderedEntities,
     lotByEntity,
     extent,
-    labelsVisible,
+    labelsVisible: labelsVisible && !hydrologicalModeActive,
     reducedGraphics,
     selectedEntityId,
     hoveredEntityId,
-    matchingEntityIds,
-    filtersActive,
+    matchingEntityIds: presentedMatchingEntityIds,
+    filtersActive: entityFiltersActive,
   });
   const groundMargin = Math.max(8, extent.diagonal * 0.08);
   const shadowSpan = Math.max(extent.width, extent.depth) * 0.58;
@@ -1976,7 +2078,16 @@ function Scene({
     gl.shadowMap.needsUpdate = true;
     invalidate();
     return () => { gl.shadowMap.autoUpdate = true; };
-  }, [entities, gl, interiorEntityId, invalidate, presentedSceneTrees, reducedGraphics, treesVisible]);
+  }, [
+    entities,
+    gl,
+    hydrologicalModeActive,
+    interiorEntityId,
+    invalidate,
+    presentedSceneTrees,
+    reducedGraphics,
+    treesVisible,
+  ]);
 
   useEffect(() => {
     if (!cameraNavigating) return;
@@ -2009,10 +2120,17 @@ function Scene({
 
   return (
     <>
-      <color attach="background" args={['#dfe8de']} />
-      <fog attach="fog" args={['#dfe8de', extent.diagonal * 3.2, extent.diagonal * 7.4]} />
-      <ambientLight intensity={0.68} />
-      <hemisphereLight args={['#fffdf5', '#48634e', 0.9]} />
+      <color attach="background" args={[hydrologicalModeActive ? '#cbdcda' : '#dfe8de']} />
+      <fog
+        attach="fog"
+        args={[
+          hydrologicalModeActive ? '#cbdcda' : '#dfe8de',
+          extent.diagonal * (hydrologicalModeActive ? 3.8 : 3.2),
+          extent.diagonal * 7.4,
+        ]}
+      />
+      <ambientLight intensity={hydrologicalModeActive ? 0.82 : 0.68} />
+      <hemisphereLight args={['#fffdf5', hydrologicalModeActive ? '#365b60' : '#48634e', 0.9]} />
       <directionalLight
         position={[extent.centerX - extent.width * 0.3, Math.max(54, extent.diagonal * 0.55), extent.centerZ + extent.depth * 0.35]}
         intensity={2.15}
@@ -2041,9 +2159,13 @@ function Scene({
         raycast={NO_RAYCAST}
       >
         <planeGeometry args={[extent.width + groundMargin, extent.depth + groundMargin]} />
-        <meshStandardMaterial color="#cfdccc" roughness={1} metalness={0} />
+        <meshStandardMaterial
+          color={hydrologicalModeActive ? '#b9cbc6' : '#cfdccc'}
+          roughness={1}
+          metalness={0}
+        />
       </mesh>
-      {!isolatedArea && <ReferenceUnderlay calibration={calibration} />}
+      {!isolatedArea && !hydrologicalModeActive && <ReferenceUnderlay calibration={calibration} />}
       <RoadInfrastructure
         entities={circulationEntities}
         selectedEntityId={selectedEntityId}
@@ -2056,13 +2178,14 @@ function Scene({
         entries={lotEntries}
         selectedEntityId={selectedEntityId}
         hoveredEntityId={hoveredEntityId}
-        matchingEntityIds={matchingEntityIds}
-        filtersActive={filtersActive}
+        matchingEntityIds={presentedMatchingEntityIds}
+        filtersActive={entityFiltersActive}
+        infrastructureMode={hydrologicalModeActive}
         layerOpacity={layerOpacity}
         segmentByEntity={segmentByEntity}
-        onSelect={setSelectedEntityId}
-        onHover={setHoveredEntityId}
-        onFocus={focusSelection}
+        onSelect={handleEntitySelect}
+        onHover={handleEntityHover}
+        onFocus={handleEntityFocus}
         cameraNavigating={cameraNavigating}
         onCursor={setCanvasCursor}
       />
@@ -2073,14 +2196,15 @@ function Scene({
           segment={segmentByEntity.get(entity.id) ?? null}
           selected={selectedEntityId === entity.id}
           hovered={hoveredEntityId === entity.id}
-          filtersActive={filtersActive}
-          isMatch={matchingEntityIds.has(entity.id)}
+          filtersActive={entityFiltersActive}
+          infrastructureMode={hydrologicalModeActive}
+          isMatch={presentedMatchingEntityIds.has(entity.id)}
           layerOpacity={layerOpacity[entity.layerId] ?? 1}
           sceneCenter={sceneCenter}
           cameraNavigating={cameraNavigating}
-          onSelect={setSelectedEntityId}
-          onHover={setHoveredEntityId}
-          onFocus={focusSelection}
+          onSelect={handleEntitySelect}
+          onHover={handleEntityHover}
+          onFocus={handleEntityFocus}
           onEnterInterior={enterInterior}
           onCursor={setCanvasCursor}
           moduleStateById={selectedEntityId === entity.id ? selectedPavilionModuleState : undefined}
@@ -2099,16 +2223,28 @@ function Scene({
       <CommercialTreeLayer
         trees={presentedSceneTrees}
         surfaceEntities={exteriorRenderedEntities}
-        visible={treesVisible}
+        visible={treesVisible && !hydrologicalModeActive}
         reducedGraphics={reducedGraphics}
       />
       <CommercialElectricalInfrastructureLayer
         nodes={sceneElectricalInfrastructure.nodes}
         connections={sceneElectricalInfrastructure.connections}
         surfaceEntities={entities}
-        visible={treesVisible}
+        visible={treesVisible && !hydrologicalModeActive}
         reducedGraphics={reducedGraphics}
       />
+      {hydrologicalModeActive ? (
+        <Suspense fallback={null}>
+          <CommercialHydrologicalInfrastructureLayer
+            nodes={sceneHydrologicalInfrastructure.nodes}
+            segments={sceneHydrologicalInfrastructure.segments}
+            surfaceEntities={exteriorRenderedEntities}
+            active
+            reducedGraphics={reducedGraphics}
+            onSelect={(element) => setSelectedHydrologicalElementId(element.id)}
+          />
+        </Suspense>
+      ) : null}
       {exteriorRenderedEntities.filter((entity) => labelVisibility.ids.has(entity.id)).map((entity) => (
         <EntityLabel
           key={`label:${entity.id}`}
@@ -2116,13 +2252,14 @@ function Scene({
           lot={lotByEntity.get(entity.id)}
           selected={selectedEntityId === entity.id}
           hovered={hoveredEntityId === entity.id}
-          filtersActive={filtersActive}
-          isMatch={matchingEntityIds.has(entity.id)}
+          filtersActive={entityFiltersActive}
+          isMatch={presentedMatchingEntityIds.has(entity.id)}
         />
       ))}
       {technicalValidationAllowed
         && isolatedArea === 'exporural'
         && technicalValidationVisible
+        && !hydrologicalModeActive
         && (
           <TechnicalValidationOverlay
             entities={exteriorRenderedEntities}
@@ -2135,6 +2272,7 @@ function Scene({
         isolatedArea={isolatedArea}
         activeSegment={activeSegment}
         activeSegmentEntities={activeSegmentEntities}
+        hydrologicalModeActive={hydrologicalModeActive}
       />
       <Preload all />
     </>
@@ -2165,6 +2303,10 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
     technicalValidationAllowed,
   } = props;
   const setSelectedEntityId = useCommercialMapStore((state) => state.setSelectedEntityId);
+  const hydrologicalModeActive = useCommercialMapStore((state) => state.hydrologicalModeActive);
+  const setSelectedHydrologicalElementId = useCommercialMapStore(
+    (state) => state.setSelectedHydrologicalElementId,
+  );
   const interiorEntityId = useCommercialMapStore((state) => state.interiorEntityId);
   const reducedGraphics = useCommercialMapStore((state) => state.reducedGraphics);
   const cameraNavigating = useCommercialMapStore((state) => state.cameraNavigating);
@@ -2251,6 +2393,10 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
           gl.domElement.style.cursor = 'grab';
       }}
       onPointerMissed={() => {
+        if (hydrologicalModeActive) {
+          setSelectedHydrologicalElementId(null);
+          return;
+        }
         if (interiorEntityId) {
           useCommercialMapStore.getState().setSelectedModuleId(null);
           return;

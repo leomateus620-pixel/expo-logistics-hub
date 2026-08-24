@@ -1,12 +1,46 @@
 import { describe, expect, it } from 'vitest';
 import {
+  COMMERCIAL_MAP_HYDROLOGICAL_PORTRAIT_DIRECTION,
+  COMMERCIAL_MAP_HYDROLOGICAL_PORTRAIT_TARGET_SHIFT_RATIO,
   COMMERCIAL_MAP_MANUAL_NAVIGATION_REFIT_SUPPRESSION_MS,
+  COMMERCIAL_MAP_MIN_POLAR_ANGLE,
+  COMMERCIAL_MAP_TOP_DIRECTION,
+  isCommercialMapHydrologicalPortraitViewport,
+  resolveCommercialMapHydrologicalPortraitTargetShift,
   resolveCommercialMapPixelRatio,
   resolveCommercialMapSheetSnap,
   shouldSuppressCommercialMapResizeRefit,
 } from '@/features/commercial-map/utils/viewport';
 
 describe('viewport mobile do Mapa Comercial', () => {
+  it('compõe a visão hídrica portrait sem reduzir o parque a uma faixa horizontal', () => {
+    const [x, y, z] = COMMERCIAL_MAP_HYDROLOGICAL_PORTRAIT_DIRECTION;
+
+    expect(Math.hypot(x, y, z)).toBeCloseTo(1, 12);
+    expect(y).toBeGreaterThan(0.9);
+    expect(Math.abs(x)).toBeGreaterThan(Math.abs(z) * 3);
+    expect(isCommercialMapHydrologicalPortraitViewport(390, 844)).toBe(true);
+    expect(isCommercialMapHydrologicalPortraitViewport(430, 932)).toBe(true);
+    expect(isCommercialMapHydrologicalPortraitViewport(844, 390)).toBe(false);
+    expect(isCommercialMapHydrologicalPortraitViewport(720, 1280)).toBe(false);
+    expect(resolveCommercialMapHydrologicalPortraitTargetShift(100)).toBe(
+      100 * COMMERCIAL_MAP_HYDROLOGICAL_PORTRAIT_TARGET_SHIFT_RATIO,
+    );
+  });
+
+  it('mantém a câmera superior exatamente no clamp polar do OrbitControls', () => {
+    const [x, y, z] = COMMERCIAL_MAP_TOP_DIRECTION;
+    const length = Math.hypot(x, y, z);
+    const polarAngle = Math.acos(y / length);
+    const orbitClampedAngle = Math.max(COMMERCIAL_MAP_MIN_POLAR_ANGLE, polarAngle);
+    const legacyDirectionPolarAngle = Math.acos(1 / Math.hypot(1, 0.001));
+
+    expect(length).toBeCloseTo(1, 12);
+    expect(polarAngle).toBeCloseTo(COMMERCIAL_MAP_MIN_POLAR_ANGLE, 12);
+    expect(orbitClampedAngle).toBeCloseTo(polarAngle, 12);
+    expect(legacyDirectionPolarAngle).toBeLessThan(COMMERCIAL_MAP_MIN_POLAR_ANGLE);
+  });
+
   it.each([
     [390, 844],
     [393, 852],
