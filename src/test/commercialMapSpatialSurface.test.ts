@@ -38,7 +38,7 @@ function entity(
     geometry: {
       id: null,
       type: 'Polygon',
-      coordinates: [[...SQUARE]],
+      coordinates: [SQUARE.map(([x, y]) => [x, y] as [number, number])],
       elevation,
       extrusionHeight,
       rotation: 0,
