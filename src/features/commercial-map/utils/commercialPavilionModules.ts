@@ -442,7 +442,7 @@ interface OfficialCommercialPavilionReference {
   modularAreaM2: number;
   runs: readonly CommercialPavilionReferenceRun[];
   corridors: readonly CommercialPavilionReferenceCorridor[];
-  cells: readonly CommercialPavilionReferenceCell[];
+  cells: readonly CommercialPavilionReferenceCell<CommercialPavilionPublicIdentifier>[];
   source: {
     document: string;
   };

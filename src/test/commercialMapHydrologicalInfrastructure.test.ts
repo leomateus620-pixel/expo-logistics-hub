@@ -93,7 +93,7 @@ describe('Rede Hidrológica cartográfica do Mapa Comercial', () => {
         expect(segmentIds.has(segmentId), `${node.id}:${segmentId}`).toBe(true);
       });
     });
-    expect(HYDROLOGICAL_PIPE_SEGMENTS.some((segment) => segment.diameterMm === 30)).toBe(false);
+    expect(HYDROLOGICAL_PIPE_SEGMENTS.some((segment) => (segment.diameterMm as number) === 30)).toBe(false);
     expect(HYDROLOGICAL_INFRASTRUCTURE_REFERENCE.classification.absentDiameterNote)
       .toContain('não foi inferido');
     const hydrants = selectableNodes.filter(({ type }) => type === 'hydrant');
