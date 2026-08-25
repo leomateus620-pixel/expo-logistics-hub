@@ -4,6 +4,7 @@ import * as THREE from 'three';
 import type { CommercialPavilionLayout } from '../../utils/commercialPavilions';
 import { STATUS_CONFIG } from '../../constants';
 import {
+  createCommercialPavilionModuleProjectionFrame,
   projectCommercialPavilionModuleRect,
   type CommercialPavilionModulePlan,
 } from '../../utils/commercialPavilionModules';
@@ -11,6 +12,10 @@ import type {
   CommercialPavilionReferenceCellShape,
   CommercialPavilionReferenceRect,
   CommercialPavilionReferenceSupportSpace,
+} from '../../data/commercialPavilionReference';
+import {
+  projectCommercialPavilionReferencePoint,
+  transformCommercialPavilionReferenceSequenceOrientation,
 } from '../../data/commercialPavilionReference';
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
 import { isMapSelectionClick } from '../../utils/interaction';
@@ -119,6 +124,27 @@ function createModuleNumberTexture(
   canvas.height = height;
   const context = canvas.getContext('2d');
   if (!context) return null;
+  const footprint = {
+    width: layout.interior.clearWidth,
+    depth: layout.interior.clearDepth,
+  };
+  const projectionFrame = createCommercialPavilionModuleProjectionFrame(plan, footprint);
+  const canvasPoint = (point: readonly [number, number]) => {
+    const [localX, localZ] = projectCommercialPavilionReferencePoint(point, projectionFrame);
+    return [
+      (localX / footprint.width + 0.5) * width,
+      (localZ / footprint.depth + 0.5) * height,
+    ] as const;
+  };
+  const canvasRect = (rect: CommercialPavilionReferenceRect) => {
+    const projected = projectCommercialPavilionModuleRect(rect, projectionFrame);
+    return {
+      centerX: (projected.centerX / footprint.width + 0.5) * width,
+      centerY: (projected.centerZ / footprint.depth + 0.5) * height,
+      width: (projected.width / footprint.width) * width,
+      height: (projected.depth / footprint.depth) * height,
+    };
+  };
 
   context.clearRect(0, 0, width, height);
   context.textAlign = 'center';
@@ -127,17 +153,23 @@ function createModuleNumberTexture(
 
   plan.cells.forEach((cell) => {
     const orientedCell = cell as OrientedModuleCell;
-    const left = (cell.centerX - cell.width / 2) * width;
-    const top = (cell.centerZ - cell.depth / 2) * height;
-    const cellWidth = cell.width * width;
-    const cellHeight = cell.depth * height;
+    const projectedCell = canvasRect(cell);
+    const left = projectedCell.centerX - projectedCell.width / 2;
+    const top = projectedCell.centerY - projectedCell.height / 2;
+    const cellWidth = projectedCell.width;
+    const cellHeight = projectedCell.height;
     const labelAnchor = orientedCell.labelAnchor ?? [cell.centerX, cell.centerZ];
-    const labelX = labelAnchor[0] * width;
-    const labelY = labelAnchor[1] * height;
-    const isDepthOriented = cell.depth > cell.width * 1.18
+    const [labelX, labelY] = canvasPoint(labelAnchor);
+    const visualSequenceOrientation = orientedCell.sequenceOrientation
+      ? transformCommercialPavilionReferenceSequenceOrientation(
+          orientedCell.sequenceOrientation,
+          projectionFrame.coordinateTransform,
+        )
+      : null;
+    const isDepthOriented = cellHeight > cellWidth * 1.18
       || (
-        orientedCell.orientation === 'north-south'
-        && cell.depth > cell.width * 0.86
+        visualSequenceOrientation?.startsWith('z-')
+        && cellHeight > cellWidth * 0.86
       );
     const usableWidth = isDepthOriented ? cellHeight : cellWidth;
     const usableHeight = isDepthOriented ? cellWidth : cellHeight;
@@ -152,8 +184,7 @@ function createModuleNumberTexture(
     if (orientedCell.shape?.footprint.length) {
       context.beginPath();
       orientedCell.shape.footprint.forEach(([x, z], index) => {
-        const pointX = x * width;
-        const pointY = z * height;
+        const [pointX, pointY] = canvasPoint([x, z]);
         if (index === 0) context.moveTo(pointX, pointY);
         else context.lineTo(pointX, pointY);
       });
@@ -170,7 +201,7 @@ function createModuleNumberTexture(
     context.save();
     context.translate(labelX, labelY);
     if (isDepthOriented) {
-      context.rotate(orientedCell.sequenceOrientation === 'z-decreasing' ? -Math.PI / 2 : Math.PI / 2);
+      context.rotate(visualSequenceOrientation === 'z-decreasing' ? -Math.PI / 2 : Math.PI / 2);
     }
     context.strokeText(cell.label, 0, 0);
     context.fillStyle = '#173b2b';
@@ -179,10 +210,11 @@ function createModuleNumberTexture(
   });
 
   plan.supportSpaces.forEach((supportSpace) => {
-    const left = (supportSpace.centerX - supportSpace.width / 2) * width;
-    const top = (supportSpace.centerZ - supportSpace.depth / 2) * height;
-    const supportWidth = supportSpace.width * width;
-    const supportHeight = supportSpace.depth * height;
+    const projectedSupport = canvasRect(supportSpace);
+    const left = projectedSupport.centerX - projectedSupport.width / 2;
+    const top = projectedSupport.centerY - projectedSupport.height / 2;
+    const supportWidth = projectedSupport.width;
+    const supportHeight = projectedSupport.height;
     const lines = compactSupportLabelLines(supportSpace.label);
     const longestLine = Math.max(1, ...lines.map((line) => line.length));
     const fontSize = Math.floor(THREE.MathUtils.clamp(
@@ -207,7 +239,7 @@ function createModuleNumberTexture(
     context.setLineDash([]);
 
     if (fontSize >= 7 && lines.length > 0) {
-      context.translate(supportSpace.centerX * width, supportSpace.centerZ * height);
+      context.translate(projectedSupport.centerX, projectedSupport.centerY);
       context.font = `800 ${fontSize}px Inter, Arial, sans-serif`;
       context.lineWidth = Math.max(1.5, fontSize * 0.16);
       context.strokeStyle = 'rgba(247, 250, 245, 0.94)';
@@ -270,23 +302,27 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
     width: layout.interior.clearWidth,
     depth: layout.interior.clearDepth,
   }), [layout.interior.clearDepth, layout.interior.clearWidth]);
+  const projectionFrame = useMemo(
+    () => createCommercialPavilionModuleProjectionFrame(plan, footprint),
+    [footprint, plan],
+  );
   const projectedModuleParts = useMemo(() => plan.cells.flatMap((cell) => {
     const orientedCell = cell as OrientedModuleCell;
     const shaped = Boolean(orientedCell.shape);
     return moduleRenderParts(orientedCell).map((part) => ({
       cell: orientedCell,
       shaped,
-      projected: projectCommercialPavilionModuleRect(part, footprint),
+      projected: projectCommercialPavilionModuleRect(part, projectionFrame),
     }));
-  }), [footprint, plan.cells]);
+  }), [plan.cells, projectionFrame]);
   const projectedCorridors = useMemo(() => plan.corridors.map((corridor) => ({
     ...corridor,
-    projected: projectCommercialPavilionModuleRect(corridor, footprint),
-  })), [footprint, plan.corridors]);
+    projected: projectCommercialPavilionModuleRect(corridor, projectionFrame),
+  })), [plan.corridors, projectionFrame]);
   const projectedSupportSpaces = useMemo(() => plan.supportSpaces.map((supportSpace) => ({
     ...supportSpace,
-    projected: projectCommercialPavilionModuleRect(supportSpace, footprint),
-  })), [footprint, plan.supportSpaces]);
+    projected: projectCommercialPavilionModuleRect(supportSpace, projectionFrame),
+  })), [plan.supportSpaces, projectionFrame]);
   const zoneIndex = useMemo(() => new Map(
     plan.zones.map((zone, index) => [zone.id, index]),
   ), [plan.zones]);

@@ -4,6 +4,7 @@ import {
   type CommercialPavilionReferenceCell,
   type CommercialPavilionReferenceCellShape,
   type CommercialPavilionReferenceCorridor,
+  type CommercialPavilionReferenceProjection,
   type CommercialPavilionReferenceRun,
 } from './commercialPavilionReference';
 
@@ -19,6 +20,13 @@ const SOURCE_DOCUMENT = 'Croqui Pavilhão 1 - Fenasoja 2026.pdf' as const;
 
 /** Official metric divisions are contiguous; the renderer adds its own visual joint. */
 export const PAVILION1_COMMERCIAL_MODULE_GAP = 0;
+
+export const PAVILION1_COMMERCIAL_REFERENCE_PROJECTION = {
+  coordinateTransform: 'quarter-turn-clockwise',
+  fit: 'metric-contain',
+  metricWidthM: 52.7,
+  metricDepthM: 22.84,
+} as const satisfies CommercialPavilionReferenceProjection;
 
 export const PAVILION1_COMMERCIAL_REFERENCE_RUNS = [
   {
@@ -179,6 +187,7 @@ export const PAVILION1_COMMERCIAL_REFERENCE = {
   modularAreaM2: 587.85,
   individualAreaM2: null,
   moduleGap: PAVILION1_COMMERCIAL_MODULE_GAP,
+  projection: PAVILION1_COMMERCIAL_REFERENCE_PROJECTION,
   runs: PAVILION1_COMMERCIAL_REFERENCE_RUNS,
   corridors: PAVILION1_COMMERCIAL_REFERENCE_CORRIDORS,
   supportSpaces: [],

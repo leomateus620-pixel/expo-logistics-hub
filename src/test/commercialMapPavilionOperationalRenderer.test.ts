@@ -32,6 +32,21 @@ describe('renderer operacional do interior comercial', () => {
     expect(interior).toMatch(/layout\.exterior\.structure\.columnZs[\s\S]*?rectanglesOverlap/);
   });
 
+  it('usa o mesmo frame orientado nos módulos, números, corredores e proteção estrutural', () => {
+    const layer = read('src/features/commercial-map/components/canvas/CommercialPavilionModuleLayer.tsx');
+    const interior = read('src/features/commercial-map/components/canvas/CommercialPavilionInteriorScene.tsx');
+    const legend = read('src/features/commercial-map/components/panels/PavilionPlanLegend.tsx');
+
+    expect(layer).toContain('createCommercialPavilionModuleProjectionFrame(plan, footprint)');
+    expect(layer).toContain('projectCommercialPavilionReferencePoint(point, projectionFrame)');
+    expect(layer).toContain('projectCommercialPavilionModuleRect(part, projectionFrame)');
+    expect(layer).toContain('projectCommercialPavilionModuleRect(corridor, projectionFrame)');
+    expect(layer).toContain('transformCommercialPavilionReferenceSequenceOrientation');
+    expect(interior).toContain('createCommercialPavilionModuleProjectionFrame(plan, footprint)');
+    expect(interior).toContain('projectCommercialPavilionModuleRect(part, projectionFrame)');
+    expect(legend).not.toContain('createCommercialPavilionModuleProjectionFrame');
+  });
+
   it('renderiza apoios permanentes fora da seleção e mantém partes compostas no mesmo módulo', () => {
     const layer = read('src/features/commercial-map/components/canvas/CommercialPavilionModuleLayer.tsx');
 

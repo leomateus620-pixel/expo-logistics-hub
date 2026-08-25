@@ -26,8 +26,17 @@ import {
   sourcePolygonAreaSqm,
 } from './exporuralReference2026';
 import { withCommercialMapSegmentMetadata } from './commercialMapSegments';
-import type { CommercialPavilionReferenceCell } from './commercialPavilionReference';
-import { PAVILION1_COMMERCIAL_REFERENCE_CELLS } from './pavilion1CommercialReference';
+import {
+  createCommercialPavilionReferenceProjectionFrame,
+  DEFAULT_COMMERCIAL_PAVILION_REFERENCE_PROJECTION,
+  projectCommercialPavilionReferencePoint,
+  type CommercialPavilionReferenceCell,
+  type CommercialPavilionReferenceProjection,
+} from './commercialPavilionReference';
+import {
+  PAVILION1_COMMERCIAL_REFERENCE_CELLS,
+  PAVILION1_COMMERCIAL_REFERENCE_PROJECTION,
+} from './pavilion1CommercialReference';
 import { PAVILION12_COMMERCIAL_REFERENCE_CELLS } from './pavilion12CommercialReference';
 import { PAVILION14_COMMERCIAL_REFERENCE_CELLS } from './pavilion14CommercialReference';
 import {
@@ -644,8 +653,9 @@ function pavilionModuleGeometry(
   pavilion: MapEntity,
   cell: CommercialPavilionReferenceCell,
   facingRadians: number,
+  projection: CommercialPavilionReferenceProjection,
 ): PolygonGeometry {
-  const projectPoint = pavilionModulePointProjector(pavilion, facingRadians);
+  const projectPoint = pavilionModulePointProjector(pavilion, facingRadians, projection);
   const normalizedFootprint = cell.shape?.footprint ?? [
     [cell.centerX - cell.width / 2, cell.centerZ - cell.depth / 2],
     [cell.centerX + cell.width / 2, cell.centerZ - cell.depth / 2],
@@ -669,6 +679,7 @@ function pavilionModuleGeometry(
 function pavilionModulePointProjector(
   pavilion: MapEntity,
   facingRadians: number,
+  projection: CommercialPavilionReferenceProjection,
 ): (point: readonly [number, number]) => Coordinate {
   const ring = pavilion.geometry.coordinates[0];
   const xs = ring.map(([x]) => x);
@@ -686,11 +697,17 @@ function pavilionModulePointProjector(
   const shortSide = Math.min(modelBounds.width, modelBounds.depth);
   const clearWidth = modelBounds.width - 2 * shortSide * 0.025 - 2 * shortSide * 0.065;
   const clearDepth = modelBounds.depth - 2 * shortSide * 0.025 - 2 * shortSide * 0.065;
+  const projectionFrame = createCommercialPavilionReferenceProjectionFrame(
+    projection,
+    { width: clearWidth, depth: clearDepth },
+  );
   const cosine = Math.cos(facingRadians);
   const sine = Math.sin(facingRadians);
-  return ([normalizedX, normalizedZ]) => {
-    const localX = (normalizedX - 0.5) * clearWidth;
-    const localZ = (normalizedZ - 0.5) * clearDepth;
+  return (point) => {
+    const [localX, localZ] = projectCommercialPavilionReferencePoint(
+      point,
+      projectionFrame,
+    );
     return [
       centerX + localX * cosine + localZ * sine,
       centerZ - localX * sine + localZ * cosine,
@@ -702,22 +719,40 @@ function pavilionModuleLabelAnchor(
   pavilion: MapEntity,
   cell: CommercialPavilionReferenceCell,
   facingRadians: number,
+  projection: CommercialPavilionReferenceProjection,
 ): Coordinate {
-  return pavilionModulePointProjector(pavilion, facingRadians)(cell.labelAnchor);
+  return pavilionModulePointProjector(
+    pavilion,
+    facingRadians,
+    projection,
+  )(cell.labelAnchor);
 }
 
 const officialBaseEntities = entityInputs.map(toEntity);
 
-const pavilionModuleReferences = [
+interface PavilionModuleReference {
+  publicIdentifier: string;
+  pavilionNumber: number;
+  block: string;
+  layoutRevision: string;
+  source: string;
+  facingRadians: number;
+  segmentId: string | null;
+  cells: readonly CommercialPavilionReferenceCell[];
+  projection?: CommercialPavilionReferenceProjection;
+}
+
+const pavilionModuleReferences: readonly PavilionModuleReference[] = [
   {
     publicIdentifier: 'B1',
     pavilionNumber: 1,
     block: 'P1',
-    layoutRevision: '2026.4-p1.1',
+    layoutRevision: '2026.4-p1.2',
     source: 'Croqui Pavilhão 1 - Fenasoja 2026.pdf',
     facingRadians: Math.PI / 2,
     segmentId: 'industria-comercio-servicos',
     cells: PAVILION1_COMMERCIAL_REFERENCE_CELLS,
+    projection: PAVILION1_COMMERCIAL_REFERENCE_PROJECTION,
   },
   {
     publicIdentifier: 'B2',
@@ -759,7 +794,7 @@ const pavilionModuleReferences = [
     segmentId: null,
     cells: PAVILION5_COMMERCIAL_REFERENCE_CELLS,
   },
-] as const;
+];
 
 const pavilionModuleEntities: MapEntity[] = pavilionModuleReferences.flatMap((reference) => {
   const pavilion = officialBaseEntities.find(
@@ -770,6 +805,8 @@ const pavilionModuleEntities: MapEntity[] = pavilionModuleReferences.flatMap((re
       `${reference.publicIdentifier}: pavilhão oficial não encontrado para projetar os módulos internos.`,
     );
   }
+  const projection = reference.projection
+    ?? DEFAULT_COMMERCIAL_PAVILION_REFERENCE_PROJECTION;
   return reference.cells.map((cell) => {
     const publicIdentifier = `${reference.publicIdentifier}-M${String(cell.number).padStart(3, '0')}`;
     return {
@@ -786,11 +823,26 @@ const pavilionModuleEntities: MapEntity[] = pavilionModuleReferences.flatMap((re
       verificationStatus: 'NEEDS_REVIEW',
       isSellable: true,
       isArchived: false,
-      geometry: pavilionModuleGeometry(pavilion, cell, reference.facingRadians),
+      geometry: pavilionModuleGeometry(
+        pavilion,
+        cell,
+        reference.facingRadians,
+        projection,
+      ),
       metadata: {
         seedManaged: true,
         sourceRevision: OFFICIAL_REFERENCE_REVISION,
         layoutRevision: reference.layoutRevision,
+        ...(reference.projection ? {
+          planCoordinateTransform: projection.coordinateTransform,
+          projectionFit: projection.fit,
+          ...(projection.metricWidthM && projection.metricDepthM ? {
+            metricReference: {
+              widthM: projection.metricWidthM,
+              depthM: projection.metricDepthM,
+            },
+          } : {}),
+        } : {}),
         source: reference.source,
         cartographicConfidence: 'official_visual_reference',
         officialMeasurements: false,
@@ -807,7 +859,12 @@ const pavilionModuleEntities: MapEntity[] = pavilionModuleReferences.flatMap((re
         areaAssignment: 'unassigned',
         orientation: cell.orientation,
         sequenceOrientation: cell.sequenceOrientation,
-        labelAnchor: pavilionModuleLabelAnchor(pavilion, cell, reference.facingRadians),
+        labelAnchor: pavilionModuleLabelAnchor(
+          pavilion,
+          cell,
+          reference.facingRadians,
+          projection,
+        ),
         sortOrder: cell.sortOrder,
         group: cell.group,
         cluster: cell.cluster,

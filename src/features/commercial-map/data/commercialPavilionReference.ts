@@ -8,6 +8,34 @@ export type CommercialPavilionReferenceSequenceOrientation =
   | 'z-increasing'
   | 'z-decreasing';
 
+export type CommercialPavilionReferenceCoordinateTransform =
+  | 'identity'
+  | 'quarter-turn-clockwise';
+
+export type CommercialPavilionReferenceProjectionFit =
+  | 'stretch'
+  | 'metric-contain';
+
+export interface CommercialPavilionReferenceProjection {
+  coordinateTransform: CommercialPavilionReferenceCoordinateTransform;
+  fit: CommercialPavilionReferenceProjectionFit;
+  metricWidthM?: number;
+  metricDepthM?: number;
+}
+
+export interface CommercialPavilionReferenceProjectionFrame {
+  centerX: number;
+  centerZ: number;
+  width: number;
+  depth: number;
+  coordinateTransform: CommercialPavilionReferenceCoordinateTransform;
+}
+
+export const DEFAULT_COMMERCIAL_PAVILION_REFERENCE_PROJECTION = {
+  coordinateTransform: 'identity',
+  fit: 'stretch',
+} as const satisfies CommercialPavilionReferenceProjection;
+
 export type CommercialPavilionReferenceSourceDiscrepancy =
   | 'official-range-omission'
   | 'manual-confirmation-required'
@@ -28,6 +56,159 @@ export interface CommercialPavilionReferenceCellShape {
   /** Non-overlapping rectangles used by the lightweight instanced renderer. */
   renderParts: readonly CommercialPavilionReferenceRect[];
   labelAnchor?: CommercialPavilionReferencePoint;
+}
+
+function assertProjectionDimensions(
+  projection: CommercialPavilionReferenceProjection,
+): asserts projection is CommercialPavilionReferenceProjection & {
+  metricWidthM: number;
+  metricDepthM: number;
+} {
+  if (
+    projection.fit !== 'metric-contain'
+    || !Number.isFinite(projection.metricWidthM)
+    || !Number.isFinite(projection.metricDepthM)
+    || (projection.metricWidthM ?? 0) <= 0
+    || (projection.metricDepthM ?? 0) <= 0
+  ) {
+    throw new Error('A projecao metric-contain exige largura e profundidade metricas validas.');
+  }
+}
+
+export function transformCommercialPavilionReferencePoint(
+  point: CommercialPavilionReferencePoint,
+  transform: CommercialPavilionReferenceCoordinateTransform,
+): CommercialPavilionReferencePoint {
+  if (transform === 'quarter-turn-clockwise') {
+    return [1 - point[1], point[0]];
+  }
+  return point;
+}
+
+export function transformCommercialPavilionReferenceRect(
+  rect: CommercialPavilionReferenceRect,
+  transform: CommercialPavilionReferenceCoordinateTransform,
+): CommercialPavilionReferenceRect {
+  if (transform === 'quarter-turn-clockwise') {
+    return {
+      centerX: 1 - rect.centerZ,
+      centerZ: rect.centerX,
+      width: rect.depth,
+      depth: rect.width,
+    };
+  }
+  return rect;
+}
+
+export function transformCommercialPavilionReferenceSequenceOrientation(
+  orientation: CommercialPavilionReferenceSequenceOrientation,
+  transform: CommercialPavilionReferenceCoordinateTransform,
+): CommercialPavilionReferenceSequenceOrientation {
+  if (transform !== 'quarter-turn-clockwise') return orientation;
+  const transformed = {
+    'x-increasing': 'z-increasing',
+    'x-decreasing': 'z-decreasing',
+    'z-increasing': 'x-decreasing',
+    'z-decreasing': 'x-increasing',
+  } as const satisfies Record<
+    CommercialPavilionReferenceSequenceOrientation,
+    CommercialPavilionReferenceSequenceOrientation
+  >;
+  return transformed[orientation];
+}
+
+export function transformCommercialPavilionReferenceShape(
+  shape: CommercialPavilionReferenceCellShape,
+  transform: CommercialPavilionReferenceCoordinateTransform,
+): CommercialPavilionReferenceCellShape {
+  if (transform === 'identity') return shape;
+  return {
+    footprint: shape.footprint.map((point) => (
+      transformCommercialPavilionReferencePoint(point, transform)
+    )),
+    renderParts: shape.renderParts.map((part) => (
+      transformCommercialPavilionReferenceRect(part, transform)
+    )),
+    ...(shape.labelAnchor ? {
+      labelAnchor: transformCommercialPavilionReferencePoint(shape.labelAnchor, transform),
+    } : {}),
+  };
+}
+
+export function createCommercialPavilionReferenceProjectionFrame(
+  projection: CommercialPavilionReferenceProjection,
+  available: {
+    centerX?: number;
+    centerZ?: number;
+    width: number;
+    depth: number;
+  },
+): CommercialPavilionReferenceProjectionFrame {
+  if (
+    !Number.isFinite(available.width)
+    || !Number.isFinite(available.depth)
+    || available.width <= 0
+    || available.depth <= 0
+  ) {
+    throw new Error('A area disponivel da projecao do pavilhao e invalida.');
+  }
+
+  let width = available.width;
+  let depth = available.depth;
+  if (projection.fit === 'metric-contain') {
+    assertProjectionDimensions(projection);
+    const rotated = projection.coordinateTransform === 'quarter-turn-clockwise';
+    const orientedMetricWidth = rotated
+      ? projection.metricDepthM
+      : projection.metricWidthM;
+    const orientedMetricDepth = rotated
+      ? projection.metricWidthM
+      : projection.metricDepthM;
+    const scale = Math.min(
+      available.width / orientedMetricWidth,
+      available.depth / orientedMetricDepth,
+    );
+    width = orientedMetricWidth * scale;
+    depth = orientedMetricDepth * scale;
+  }
+
+  return {
+    centerX: available.centerX ?? 0,
+    centerZ: available.centerZ ?? 0,
+    width,
+    depth,
+    coordinateTransform: projection.coordinateTransform,
+  };
+}
+
+export function projectCommercialPavilionReferencePoint(
+  point: CommercialPavilionReferencePoint,
+  frame: CommercialPavilionReferenceProjectionFrame,
+): CommercialPavilionReferencePoint {
+  const [normalizedX, normalizedZ] = transformCommercialPavilionReferencePoint(
+    point,
+    frame.coordinateTransform,
+  );
+  return [
+    frame.centerX + (normalizedX - 0.5) * frame.width,
+    frame.centerZ + (normalizedZ - 0.5) * frame.depth,
+  ];
+}
+
+export function projectCommercialPavilionReferenceRect(
+  rect: CommercialPavilionReferenceRect,
+  frame: CommercialPavilionReferenceProjectionFrame,
+): CommercialPavilionReferenceRect {
+  const transformed = transformCommercialPavilionReferenceRect(
+    rect,
+    frame.coordinateTransform,
+  );
+  return {
+    centerX: frame.centerX + (transformed.centerX - 0.5) * frame.width,
+    centerZ: frame.centerZ + (transformed.centerZ - 0.5) * frame.depth,
+    width: transformed.width * frame.width,
+    depth: transformed.depth * frame.depth,
+  };
 }
 
 export interface CommercialPavilionReferenceCluster {
