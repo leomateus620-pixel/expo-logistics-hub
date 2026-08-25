@@ -1582,7 +1582,6 @@ REVOKE ALL ON FUNCTION public.ensure_commission_map_segments(uuid) FROM anon;
 REVOKE ALL ON FUNCTION public.ensure_commission_map_segments(uuid) FROM authenticated;
 GRANT EXECUTE ON FUNCTION public.ensure_commission_map_segments(uuid) TO service_role;
 
-
 -- Validacao final: inventario, identidade, geometrias versionadas, neutralidade
 -- dos novos lotes e preservacao byte-a-byte dos registros comerciais antigos.
 DO $$

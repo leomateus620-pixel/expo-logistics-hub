@@ -339,11 +339,11 @@ SELECT
   cell_width,
   cell_depth,
   jsonb_build_array(
-    jsonb_build_array(cell_center_x - cell_width / 2, cell_center_z - cell_depth / 2),
-    jsonb_build_array(cell_center_x + cell_width / 2, cell_center_z - cell_depth / 2),
-    jsonb_build_array(cell_center_x + cell_width / 2, cell_center_z + cell_depth / 2),
-    jsonb_build_array(cell_center_x - cell_width / 2, cell_center_z + cell_depth / 2),
-    jsonb_build_array(cell_center_x - cell_width / 2, cell_center_z - cell_depth / 2)
+    jsonb_build_array(greatest(least(cell_center_x - cell_width / 2, 1), 0), greatest(least(cell_center_z - cell_depth / 2, 1), 0)),
+    jsonb_build_array(greatest(least(cell_center_x + cell_width / 2, 1), 0), greatest(least(cell_center_z - cell_depth / 2, 1), 0)),
+    jsonb_build_array(greatest(least(cell_center_x + cell_width / 2, 1), 0), greatest(least(cell_center_z + cell_depth / 2, 1), 0)),
+    jsonb_build_array(greatest(least(cell_center_x - cell_width / 2, 1), 0), greatest(least(cell_center_z + cell_depth / 2, 1), 0)),
+    jsonb_build_array(greatest(least(cell_center_x - cell_width / 2, 1), 0), greatest(least(cell_center_z - cell_depth / 2, 1), 0))
   ),
   jsonb_build_array(cell_center_x, cell_center_z),
   jsonb_build_array(jsonb_build_object(
@@ -611,7 +611,7 @@ WITH projected AS (
     cell.sequence_orientation,
     cell.module_orientation,
     cell.source_precision,
-    cell.source_discrepancy,
+    cell.source_discrepancy AS module_source_discrepancy,
     cell.center_x,
     cell.center_z,
     cell.width,
@@ -719,8 +719,8 @@ SELECT
     'renderParts', render_parts,
     'labelAnchor', jsonb_build_array(world_label_x, world_label_z)
   )
-  || CASE WHEN source_discrepancy IS NULL THEN '{}'::jsonb
-    ELSE jsonb_build_object('sourceDiscrepancy', source_discrepancy) END
+  || CASE WHEN module_source_discrepancy IS NULL THEN '{}'::jsonb
+    ELSE jsonb_build_object('sourceDiscrepancy', module_source_discrepancy) END
   || CASE WHEN segment_slug IS NULL THEN '{}'::jsonb
     ELSE jsonb_build_object(
       'segmentId', 'industria-comercio-servicos',
