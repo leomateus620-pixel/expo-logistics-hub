@@ -35,6 +35,7 @@ describe('renderização compartilhada dos módulos internos', () => {
   });
 
   it('reutiliza a mesma camada no cutaway exterior e na cena interna', () => {
+    const layer = read('src/features/commercial-map/components/canvas/CommercialPavilionModuleLayer.tsx');
     const exterior = read('src/features/commercial-map/components/canvas/CommercialPavilion.tsx');
     const interior = read('src/features/commercial-map/components/canvas/CommercialPavilionInteriorScene.tsx');
     const page = read('src/features/commercial-map/CommercialMapPage.tsx');
@@ -47,6 +48,12 @@ describe('renderização compartilhada dos módulos internos', () => {
     expect(interior).toContain('setCameraNavigating(true)');
     expect(interior).toContain('setCameraNavigating(false)');
     expect(interior).toContain('mode="interior"');
+    expect(interior).toContain('const cameraFacing = facing + interiorViewRotation');
+    expect(interior).toContain('labelRotationRadians={interiorViewRotation}');
+    expect(interior).toContain('interiorViewRotation={interiorViewRotation}');
+    expect(interior).toContain('applyAxisAngle(UP, cameraFacing)');
+    expect(exterior).not.toContain('labelRotationRadians=');
+    expect(layer).toContain('context.rotate(labelRotationRadians)');
     expect(interior).toContain('minDistance={maximumDimension * 0.2}');
     expect(page).toContain('<PavilionPlanLegend plan={interiorPavilionPlan} variant="interior" />');
     expect(panels).toContain('<PavilionPlanLegend plan={pavilionPlan} />');

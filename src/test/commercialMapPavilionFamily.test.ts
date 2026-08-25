@@ -6,6 +6,7 @@ import {
   COMMERCIAL_PAVILION_PUBLIC_IDENTIFIERS,
   commercialPavilionFacingRadians,
   commercialPavilionFocusDirection,
+  commercialPavilionInteriorViewRotationRadians,
   commercialPavilionModelBounds,
   commercialPavilionSupportsInterior,
   commercialPavilionVisualHeight,
@@ -43,6 +44,16 @@ const EXPECTED_FACING_RADIANS = {
   B3: Math.PI,
   B4: Math.PI,
   B5: Math.PI,
+  B6: Math.PI,
+  B8: 0,
+  B10: 0,
+} as const satisfies Record<CommercialPavilionPublicIdentifier, number>;
+const EXPECTED_INTERIOR_VIEW_ROTATIONS = {
+  B1: Math.PI,
+  B2: 0,
+  B3: Math.PI,
+  B4: 0,
+  B5: 0,
   B6: Math.PI,
   B8: 0,
   B10: 0,
@@ -186,6 +197,9 @@ describe('família arquitetônica dos pavilhões comerciais', () => {
 
     definitions.forEach((definition) => {
       expect(definition.facingRadians).toBe(EXPECTED_FACING_RADIANS[definition.publicIdentifier]);
+      expect(definition.interiorViewRotationRadians).toBe(
+        EXPECTED_INTERIOR_VIEW_ROTATIONS[definition.publicIdentifier],
+      );
       expect(definition.focusDirection).toHaveLength(3);
       expect(definition.focusDirection.every(Number.isFinite)).toBe(true);
       expect(definition.focusDirection[1]).toBeGreaterThan(0);
@@ -216,6 +230,27 @@ describe('família arquitetônica dos pavilhões comerciais', () => {
     expect(
       pavilionOneFocus[1] / Math.hypot(pavilionOneFocus[0], pavilionOneFocus[2]),
     ).toBeGreaterThan(1);
+  });
+
+  it('abre somente Pavilhões 1, 3 e 12 pelo lado oposto sem alterar a fachada física', () => {
+    EXPECTED_IDENTIFIERS.forEach((publicIdentifier) => {
+      const definition = COMMERCIAL_PAVILION_DEFINITIONS[publicIdentifier];
+      const facadeDirection = [
+        Math.sin(definition.facingRadians),
+        Math.cos(definition.facingRadians),
+      ] as const;
+      const interiorCameraDirection = [
+        Math.sin(definition.facingRadians + definition.interiorViewRotationRadians),
+        Math.cos(definition.facingRadians + definition.interiorViewRotationRadians),
+      ] as const;
+      const expectedDot = ['B1', 'B3', 'B6'].includes(publicIdentifier) ? -1 : 1;
+
+      expect(horizontalDot(facadeDirection, interiorCameraDirection)).toBeCloseTo(
+        expectedDot,
+        12,
+      );
+      expect(definition.facingRadians).toBe(EXPECTED_FACING_RADIANS[publicIdentifier]);
+    });
   });
 
   it('materializa as entradas solicitadas e os elementos de separação das fachadas', () => {
@@ -262,6 +297,9 @@ describe('família arquitetônica dos pavilhões comerciais', () => {
       expect(resolveCommercialPavilionDefinition(entity)?.publicIdentifier).toBe(publicIdentifier);
       expect(commercialPavilionSupportsInterior(entity)).toBe(true);
       expect(commercialPavilionFacingRadians(entity)).toBe(EXPECTED_FACING_RADIANS[publicIdentifier]);
+      expect(commercialPavilionInteriorViewRotationRadians(entity)).toBe(
+        EXPECTED_INTERIOR_VIEW_ROTATIONS[publicIdentifier],
+      );
       expect(commercialPavilionFocusDirection(entity)).toEqual(
         COMMERCIAL_PAVILION_DEFINITIONS[publicIdentifier].focusDirection,
       );
@@ -271,6 +309,7 @@ describe('família arquitetônica dos pavilhões comerciais', () => {
     expect(resolveCommercialPavilionDefinition({ publicIdentifier: 'B12' })).toBeNull();
     expect(commercialPavilionSupportsInterior({ publicIdentifier: 'B12' })).toBe(false);
     expect(commercialPavilionFocusDirection({ publicIdentifier: 'B12' })).toBeNull();
+    expect(commercialPavilionInteriorViewRotationRadians({ publicIdentifier: 'B12' })).toBe(0);
     expect(resolveCommercialPavilionDefinition({ publicIdentifier: 'B10' })?.pavilionNumber).toBe(7);
     expect(resolveCommercialPavilionDefinition({ publicIdentifier: 'B7' })).toBeNull();
   });
