@@ -3,6 +3,7 @@ import {
   createCommercialPavilionMetricProjector,
   type CommercialPavilionReferenceCell,
   type CommercialPavilionReferenceCorridor,
+  type CommercialPavilionReferenceProjection,
   type CommercialPavilionReferenceRun,
   type CommercialPavilionReferenceSupportSpace,
 } from './commercialPavilionReference';
@@ -11,11 +12,20 @@ export type Pavilion5CommercialReferenceCell =
   CommercialPavilionReferenceCell<'B8'>;
 
 /** Full official footprint, including the permanent support wing: 25.50 x 43.50 m. */
-const PROJECT = createCommercialPavilionMetricProjector(25.5, 43.5);
+const PROJECT = createCommercialPavilionMetricProjector(25.5, 43.5, 0);
 const SOURCE_DOCUMENT = 'Croqui Pavilhão 5 - Fenasoja 2026.pdf' as const;
 
 /** Official metric divisions are contiguous; the renderer adds its own visual joint. */
 export const PAVILION5_COMMERCIAL_MODULE_GAP = 0;
+
+export const PAVILION5_COMMERCIAL_REFERENCE_PROJECTION = {
+  coordinateTransform: 'identity',
+  fit: 'metric-contain',
+  metricWidthM: 25.5,
+  metricDepthM: 43.5,
+  alignX: 'center',
+  alignZ: 'end',
+} as const satisfies CommercialPavilionReferenceProjection;
 
 export const PAVILION5_COMMERCIAL_REFERENCE_RUNS = [
   {
@@ -97,6 +107,7 @@ export const PAVILION5_COMMERCIAL_SUPPORT_SPACES = [
     label: 'Depósito Fenasoja',
     kind: 'storage',
     type: 'permanent-non-commercial',
+    sourcePrecision: 'official-metric',
     ...PROJECT.rect(11.7, 8, 7.8, 15.4),
   },
   {
@@ -104,6 +115,7 @@ export const PAVILION5_COMMERCIAL_SUPPORT_SPACES = [
     label: 'Depósito Hortigranjeiros',
     kind: 'storage',
     type: 'permanent-non-commercial',
+    sourcePrecision: 'official-metric',
     ...PROJECT.rect(11.7, 23.4, 7.8, 8.7),
   },
   {
@@ -111,6 +123,7 @@ export const PAVILION5_COMMERCIAL_SUPPORT_SPACES = [
     label: 'Alojamento Peões',
     kind: 'accommodation',
     type: 'permanent-non-commercial',
+    sourcePrecision: 'official-metric',
     ...PROJECT.rect(19.5, 8, 6, 14.1),
   },
   {
@@ -118,6 +131,7 @@ export const PAVILION5_COMMERCIAL_SUPPORT_SPACES = [
     label: 'Alojamento Peoas',
     kind: 'accommodation',
     type: 'permanent-non-commercial',
+    sourcePrecision: 'official-metric',
     ...PROJECT.rect(19.5, 22.1, 6, 10),
   },
 ] as const satisfies readonly CommercialPavilionReferenceSupportSpace[];
@@ -129,6 +143,11 @@ export const PAVILION5_COMMERCIAL_REFERENCE_CELLS =
     moduleGap: PAVILION5_COMMERCIAL_MODULE_GAP,
     sourceDocument: SOURCE_DOCUMENT,
     referenceYear: 2026,
+    // O sombreado impresso no módulo 28 não possui legenda comercial. Ele é
+    // preservado somente como incerteza documental, nunca como status do lote.
+    discrepancyForNumber: (number) => (
+      number === 28 ? 'manual-confirmation-required' : null
+    ),
   });
 
 if (PAVILION5_COMMERCIAL_REFERENCE_CELLS.length !== 81) {
@@ -143,9 +162,12 @@ export const PAVILION5_COMMERCIAL_REFERENCE = {
   category: 'Veterinária, Pequenos Animais e Rações',
   moduleCount: 81,
   totalAreaM2: 841.53,
+  exhibitionAreaM2: 508.95,
   modularAreaM2: 244.5,
   individualAreaM2: null,
   moduleGap: PAVILION5_COMMERCIAL_MODULE_GAP,
+  boundary: { centerX: 0.5, centerZ: 0.5, width: 1, depth: 1 },
+  projection: PAVILION5_COMMERCIAL_REFERENCE_PROJECTION,
   runs: PAVILION5_COMMERCIAL_REFERENCE_RUNS,
   corridors: PAVILION5_COMMERCIAL_REFERENCE_CORRIDORS,
   supportSpaces: PAVILION5_COMMERCIAL_SUPPORT_SPACES,

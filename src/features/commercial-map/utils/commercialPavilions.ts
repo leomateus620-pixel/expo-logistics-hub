@@ -1,4 +1,15 @@
 import type { MapEntity } from '../types';
+import {
+  createCommercialPavilionReferenceProjectionFrame,
+  projectCommercialPavilionReferencePoint,
+  projectCommercialPavilionReferenceRect,
+  transformCommercialPavilionReferenceWallEdge,
+  type CommercialPavilionReferenceCorridor,
+  type CommercialPavilionReferenceProjection,
+  type CommercialPavilionReferenceWallAccess,
+  type CommercialPavilionReferenceWallEdge,
+  type CommercialPavilionReferenceSourcePrecision,
+} from '../data/commercialPavilionReference';
 
 export const COMMERCIAL_PAVILION_PUBLIC_IDENTIFIERS = [
   'B1',
@@ -100,6 +111,16 @@ export interface CommercialPavilionVolume extends CommercialPavilionRect {
 export interface CommercialPavilionEntrance extends CommercialPavilionVolume {
   id: string;
   index: number;
+  edge: CommercialPavilionReferenceWallEdge;
+  kind?: 'entrance' | 'exit' | 'gate' | 'emergency' | 'service';
+  sourcePrecision?: CommercialPavilionReferenceSourcePrecision;
+  connectsTo?: string;
+}
+
+export interface CommercialPavilionOfficialAccessPlan {
+  projection: CommercialPavilionReferenceProjection;
+  corridors: readonly CommercialPavilionReferenceCorridor[];
+  wallAccesses: readonly CommercialPavilionReferenceWallAccess[];
 }
 
 export interface CommercialPavilionColumnPose {
@@ -149,6 +170,8 @@ export interface CommercialPavilionLayout {
       centralMass: CommercialPavilionVolume | null;
       entrances: CommercialPavilionEntrance[];
       rearEntrances: CommercialPavilionEntrance[];
+      leftEntrances: CommercialPavilionEntrance[];
+      rightEntrances: CommercialPavilionEntrance[];
     };
     structure: {
       columnSize: number;
@@ -200,20 +223,20 @@ export const COMMERCIAL_PAVILION_DEFINITIONS = {
   B2: {
     publicIdentifier: 'B2',
     pavilionNumber: 14,
-    officialName: 'Pavilhão 14 — Comércio e Artesanato',
-    activity: 'Comércio e Artesanato',
+    officialName: 'Pavilhão 14 — Artesanato e Comércio',
+    activity: 'Artesanato e Comércio',
     variant: 'dual-craft-hall',
     roofProfile: 'twin-offset-gables',
     entrancePattern: 'split-central-mass',
     entranceCount: 2,
     facingRadians: Math.PI / 2,
-    interiorViewRotationRadians: 0,
+    interiorViewRotationRadians: -Math.PI / 2,
     focusDirection: [0.94, 0.76, 0.12],
     visualHeight: { scale: 0.47, min: 2.25, max: 2.58 },
     facade: {
       entranceWidthRatio: 0.22,
       entranceHeightRatio: 0.56,
-      centralMassRatio: 0.26,
+      centralMassRatio: 0,
     },
   },
   B3: {
@@ -324,8 +347,8 @@ export const COMMERCIAL_PAVILION_DEFINITIONS = {
   B10: {
     publicIdentifier: 'B10',
     pavilionNumber: 7,
-    officialName: 'Pavilhão 7 — Agricultura familiar / soja e derivados',
-    activity: 'Agricultura familiar / agroindústrias',
+    officialName: 'Pavilhão 7 — Agroindústrias',
+    activity: 'Agroindústrias / Agricultura Familiar',
     variant: 'agroindustry-market',
     roofProfile: 'longitudinal-gable',
     entrancePattern: 'paired-market-bays',
@@ -488,6 +511,113 @@ function entranceCenters(
   return [0];
 }
 
+function createOfficialWallEntrances(
+  plan: CommercialPavilionOfficialAccessPlan,
+  dimensions: {
+    clearWidth: number;
+    clearDepth: number;
+    shellWidth: number;
+    shellDepth: number;
+    shellHeight: number;
+    slabTopY: number;
+    entranceDepth: number;
+  },
+): CommercialPavilionEntrance[] {
+  if (plan.wallAccesses.length === 0) return [];
+  const frame = createCommercialPavilionReferenceProjectionFrame(plan.projection, {
+    width: dimensions.clearWidth,
+    depth: dimensions.clearDepth,
+  });
+  const corridorById = new Map(plan.corridors.map((corridor) => [corridor.id, corridor]));
+  const metricWidthM = plan.projection.metricWidthM;
+  const metricDepthM = plan.projection.metricDepthM;
+
+  return plan.wallAccesses.flatMap((access, accessIndex) => {
+    if ('corridorId' in access) {
+      const corridor = corridorById.get(access.corridorId);
+      if (!corridor) {
+        throw new Error(`Acesso oficial ${access.id} referencia corredor inexistente.`);
+      }
+      const projected = projectCommercialPavilionReferenceRect(corridor, frame);
+      return access.edges.map((edge, edgeIndex): CommercialPavilionEntrance => {
+        const frontOrRear = edge === 'front' || edge === 'rear';
+        const height = dimensions.shellHeight * 0.62;
+        return {
+          id: `${access.id}:${edge}`,
+          index: accessIndex * 4 + edgeIndex,
+          edge,
+          kind: access.kind ?? 'entrance',
+          sourcePrecision: access.sourcePrecision,
+          ...(access.connectsTo ? { connectsTo: access.connectsTo } : {}),
+          centerX: frontOrRear
+            ? projected.centerX
+            : edge === 'left' ? -dimensions.shellWidth / 2 : dimensions.shellWidth / 2,
+          centerY: dimensions.slabTopY + height / 2,
+          centerZ: frontOrRear
+            ? edge === 'front' ? dimensions.shellDepth / 2 : -dimensions.shellDepth / 2
+            : projected.centerZ,
+          width: frontOrRear ? projected.width : dimensions.entranceDepth,
+          depth: frontOrRear ? dimensions.entranceDepth : projected.depth,
+          height,
+        };
+      });
+    }
+
+    if (!metricWidthM || !metricDepthM) {
+      throw new Error(`Acesso métrico ${access.id} exige dimensões oficiais no plano.`);
+    }
+    const sourcePoint = access.wall === 'front'
+      ? [access.centerAlongWallM / metricWidthM, 1] as const
+      : access.wall === 'rear'
+        ? [access.centerAlongWallM / metricWidthM, 0] as const
+        : access.wall === 'left'
+          ? [0, access.centerAlongWallM / metricDepthM] as const
+          : [1, access.centerAlongWallM / metricDepthM] as const;
+    const sourceSpanRect = access.wall === 'front' || access.wall === 'rear'
+      ? {
+          centerX: sourcePoint[0],
+          centerZ: sourcePoint[1],
+          width: access.openingWidthM / metricWidthM,
+          depth: 0,
+        }
+      : {
+          centerX: sourcePoint[0],
+          centerZ: sourcePoint[1],
+          width: 0,
+          depth: access.openingWidthM / metricDepthM,
+        };
+    const [projectedX, projectedZ] = projectCommercialPavilionReferencePoint(sourcePoint, frame);
+    const projectedSpan = projectCommercialPavilionReferenceRect(sourceSpanRect, frame);
+    const edge = transformCommercialPavilionReferenceWallEdge(
+      access.wall,
+      plan.projection.coordinateTransform,
+    );
+    const frontOrRear = edge === 'front' || edge === 'rear';
+    const heightRatio = access.openingHeightM
+      ? clamp(access.openingHeightM / 3.7, 0.48, 0.92)
+      : 0.62;
+    const height = dimensions.shellHeight * heightRatio;
+    return [{
+      id: access.id,
+      index: accessIndex,
+      edge,
+      kind: access.kind ?? 'entrance',
+      sourcePrecision: access.sourcePrecision,
+      ...(access.connectsTo ? { connectsTo: access.connectsTo } : {}),
+      centerX: frontOrRear
+        ? projectedX
+        : edge === 'left' ? -dimensions.shellWidth / 2 : dimensions.shellWidth / 2,
+      centerY: dimensions.slabTopY + height / 2,
+      centerZ: frontOrRear
+        ? edge === 'front' ? dimensions.shellDepth / 2 : -dimensions.shellDepth / 2
+        : projectedZ,
+      width: frontOrRear ? projectedSpan.width : dimensions.entranceDepth,
+      depth: frontOrRear ? dimensions.entranceDepth : projectedSpan.depth,
+      height,
+    } satisfies CommercialPavilionEntrance];
+  });
+}
+
 /**
  * A deterministic exterior/interior plan in pavilion-local coordinates.
  * Every X/Z extent is inset from, or equal to, the supplied official bounds;
@@ -497,6 +627,7 @@ export function createCommercialPavilionLayout(
   bounds: CommercialPavilionBoundsDimensions,
   definition: CommercialPavilionDefinition,
   requestedHeight = commercialPavilionVisualHeight(bounds, definition),
+  officialAccessPlan?: CommercialPavilionOfficialAccessPlan | null,
 ): CommercialPavilionLayout {
   const width = finitePositive(bounds.width, 1);
   const depth = finitePositive(bounds.depth, 1);
@@ -525,9 +656,10 @@ export function createCommercialPavilionLayout(
     centralMassWidth,
   );
   const entranceDepth = Math.max(facadeDepth, shortSide * 0.018);
-  const entrances = entranceCenterXs.map((centerX, index): CommercialPavilionEntrance => ({
+  const genericEntrances = entranceCenterXs.map((centerX, index): CommercialPavilionEntrance => ({
     id: `${definition.publicIdentifier}:entrance:${index + 1}`,
     index,
+    edge: 'front',
     centerX,
     centerY: slabTopY + entranceHeight / 2,
     centerZ: frontZ - entranceDepth / 2,
@@ -547,6 +679,7 @@ export function createCommercialPavilionLayout(
       ).map((centerX, index): CommercialPavilionEntrance => ({
         id: `${definition.publicIdentifier}:rear-entrance:${index + 1}`,
         index,
+        edge: 'rear',
         centerX,
         centerY: slabTopY + rearEntranceHeight / 2,
         centerZ: backZ + entranceDepth / 2,
@@ -556,8 +689,8 @@ export function createCommercialPavilionLayout(
       }))
     : [];
   const dividerXs = definition.entrancePattern === 'triple-bays'
-    ? entrances.slice(0, -1).map((entrance, index) => (
-      (entrance.centerX + entrances[index + 1].centerX) / 2
+    ? genericEntrances.slice(0, -1).map((entrance, index) => (
+      (entrance.centerX + genericEntrances[index + 1].centerX) / 2
     ))
     : definition.entrancePattern === 'paired-offset'
       ? [0]
@@ -613,6 +746,26 @@ export function createCommercialPavilionLayout(
     width: exhibitBandWidth,
     depth: clearDepth,
   }));
+  const officialEntrances = officialAccessPlan
+    ? createOfficialWallEntrances(officialAccessPlan, {
+        clearWidth,
+        clearDepth,
+        shellWidth,
+        shellDepth,
+        shellHeight,
+        slabTopY,
+        entranceDepth,
+      })
+    : [];
+  const usesOfficialEntrances = officialEntrances.length > 0;
+  const entrances = usesOfficialEntrances
+    ? officialEntrances.filter((entrance) => entrance.edge === 'front')
+    : genericEntrances;
+  const resolvedRearEntrances = usesOfficialEntrances
+    ? officialEntrances.filter((entrance) => entrance.edge === 'rear')
+    : rearEntrances;
+  const leftEntrances = officialEntrances.filter((entrance) => entrance.edge === 'left');
+  const rightEntrances = officialEntrances.filter((entrance) => entrance.edge === 'right');
   const columnClearance = structureColumnSize * 0.8;
   const columns = columnXs.flatMap((x, xIndex) => columnZs.flatMap((z, zIndex) => {
     const insideMainAisle = Math.abs(x) < mainAisle.width / 2 + columnClearance;
@@ -667,7 +820,9 @@ export function createCommercialPavilionLayout(
         dividerXs,
         centralMass,
         entrances,
-        rearEntrances,
+        rearEntrances: resolvedRearEntrances,
+        leftEntrances,
+        rightEntrances,
       },
       structure: {
         columnSize: structureColumnSize,

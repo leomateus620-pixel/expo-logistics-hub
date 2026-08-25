@@ -10,7 +10,12 @@ const migration = readFileSync(
   resolve('supabase/migrations/20260824120000_rebuild_pavilions_12_14_and_correct_pavilion_3.sql'),
   'utf8',
 );
+const supersedingMigration = readFileSync(
+  resolve('supabase/migrations/20260825030000_rebuild_pavilions_5_7_and_14_official_layouts.sql'),
+  'utf8',
+);
 const sql = migration.replace(/\s+/g, ' ').toLowerCase();
+const supersedingSql = supersedingMigration.replace(/\s+/g, ' ').toLowerCase();
 const resolver = sql.slice(
   sql.indexOf('create or replace function public.resolve_commission_map_segment_slug'),
   sql.indexOf('select public.ensure_commission_map_segments'),
@@ -102,25 +107,50 @@ describe('contrato persistido dos Pavilhões 12, 14 e correção do Pavilhão 3'
     expect(backfill).toContain('commercial_pavilion_parent_label_invalid');
   });
 
-  it('mantém os 24 runs históricos e Pavilhões 12/14 em paridade com a referência cliente', () => {
+  it('mantém os 24 runs históricos, P12 em paridade e marca P14 como supersedido por p14.2', () => {
     expect(parsedRuns).toHaveLength(24);
+
+    const pavilion12Runs = parsedRuns.filter((run) => run.pavilionIdentifier === 'B3');
+    expect(pavilion12Runs).toHaveLength(PAVILION12_COMMERCIAL_REFERENCE.runs.length);
+    PAVILION12_COMMERCIAL_REFERENCE.runs.forEach((expectedRun) => {
+      const run = pavilion12Runs.find((candidate) => candidate.id === expectedRun.id);
+      expect(run).toBeDefined();
+      expect([run!.start, run!.end]).toEqual([...expectedRun.numberRange]);
+      expect(run!.centerX).toBeCloseTo(expectedRun.bounds.centerX, 9);
+      expect(run!.centerZ).toBeCloseTo(expectedRun.bounds.centerZ, 9);
+      expect(run!.width).toBeCloseTo(expectedRun.bounds.width, 9);
+      expect(run!.depth).toBeCloseTo(expectedRun.bounds.depth, 9);
+      expect(run!.sequenceOrientation).toBe(expectedSqlDirection(expectedRun.sequenceOrientation));
+      expect(run!.moduleOrientation).toBe(expectedRun.orientation);
+      expect(run!.group).toBe(expectedRun.group);
+    });
+
+    const historicalPavilion14Runs = parsedRuns.filter(
+      (run) => run.pavilionIdentifier === 'B2',
+    );
+    expect(historicalPavilion14Runs).toHaveLength(PAVILION14_COMMERCIAL_REFERENCE.runs.length);
+    PAVILION14_COMMERCIAL_REFERENCE.runs.forEach((currentRun) => {
+      const historicalRun = historicalPavilion14Runs.find(
+        (candidate) => candidate.id === currentRun.id,
+      );
+      expect(historicalRun).toBeDefined();
+      expect([historicalRun!.start, historicalRun!.end]).toEqual([...currentRun.numberRange]);
+      expect(historicalRun!.sequenceOrientation).toBe(
+        expectedSqlDirection(currentRun.sequenceOrientation),
+      );
+      expect(historicalRun!.moduleOrientation).toBe(currentRun.orientation);
+      expect(historicalRun!.group).toBe(currentRun.group);
+    });
+
+    expect(historicalPavilion14Runs[0].centerZ).not.toBeCloseTo(
+      PAVILION14_COMMERCIAL_REFERENCE.runs[0].bounds.centerZ,
+      9,
+    );
+    expect(supersedingSql).toContain("'2026.4-p14.2', '2026.4-p14.1'");
+    expect(supersedingSql).toContain("('b2', 'south-perimeter-01-35'");
 
     for (const [pavilionIdentifier, reference] of Object.entries(references)) {
       const runs = parsedRuns.filter((run) => run.pavilionIdentifier === pavilionIdentifier);
-      expect(runs).toHaveLength(reference.runs.length);
-      reference.runs.forEach((expectedRun) => {
-        const run = runs.find((candidate) => candidate.id === expectedRun.id);
-        expect(run).toBeDefined();
-        expect([run!.start, run!.end]).toEqual([...expectedRun.numberRange]);
-        expect(run!.centerX).toBeCloseTo(expectedRun.bounds.centerX, 9);
-        expect(run!.centerZ).toBeCloseTo(expectedRun.bounds.centerZ, 9);
-        expect(run!.width).toBeCloseTo(expectedRun.bounds.width, 9);
-        expect(run!.depth).toBeCloseTo(expectedRun.bounds.depth, 9);
-        expect(run!.sequenceOrientation).toBe(expectedSqlDirection(expectedRun.sequenceOrientation));
-        expect(run!.moduleOrientation).toBe(expectedRun.orientation);
-        expect(run!.group).toBe(expectedRun.group);
-      });
-
       const expanded = runs.flatMap((run) => (
         Array.from({ length: run.end - run.start + 1 }, (_, index) => run.start + index)
       )).sort((first, second) => first - second);
@@ -142,20 +172,31 @@ describe('contrato persistido dos Pavilhões 12, 14 e correção do Pavilhão 3'
     expect(backfill).toContain('cell_center_z + cell_depth / 2 > 1');
   });
 
-  it('persiste os agrupamentos neutros detalhados de B2 e B3 iguais aos anexos', () => {
+  it('preserva clusters históricos de B2, clusters atuais de B3 e a supersessão oficial de B2', () => {
     expect(parsedClusterRanges.length).toBeGreaterThan(70);
-    for (const pavilionIdentifier of ['B2', 'B3'] as const) {
-      const reference = references[pavilionIdentifier];
-      reference.cells.forEach((cell) => {
-        const matches = parsedClusterRanges.filter((range) => (
-          range.pavilionIdentifier === pavilionIdentifier
-          && cell.number >= range.start
-          && cell.number <= range.end
-        ));
-        expect(matches, `${pavilionIdentifier}-M${cell.number}`).toHaveLength(1);
-        expect(matches[0].cluster).toBe(cell.cluster);
-      });
-    }
+    PAVILION12_COMMERCIAL_REFERENCE.cells.forEach((cell) => {
+      const matches = parsedClusterRanges.filter((range) => (
+        range.pavilionIdentifier === 'B3'
+        && cell.number >= range.start
+        && cell.number <= range.end
+      ));
+      expect(matches, `B3-M${cell.number}`).toHaveLength(1);
+      expect(matches[0].cluster).toBe(cell.cluster);
+    });
+
+    Array.from({ length: 186 }, (_, index) => index + 1).forEach((number) => {
+      const matches = parsedClusterRanges.filter((range) => (
+        range.pavilionIdentifier === 'B2'
+        && number >= range.start
+        && number <= range.end
+      ));
+      expect(matches, `B2-M${number}`).toHaveLength(1);
+    });
+    expect(parsedClusterRanges.find((range) => (
+      range.pavilionIdentifier === 'B2' && range.start === 1
+    ))?.cluster).toBe('south-01-05');
+    expect(PAVILION14_COMMERCIAL_REFERENCE.cells[0].cluster).toBe('south-perimeter-01-35');
+    expect(supersedingSql).toContain("('b2', 'south-perimeter-01-35'");
     expect(backfill).toContain('coalesce(cluster.cluster_key, run.cluster_key) as cluster_key');
     expect(backfill).not.toMatch(/sareli|leocam|glamurosa|boutique|calçados|modas/);
   });

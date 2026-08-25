@@ -38,11 +38,21 @@ import {
   PAVILION1_COMMERCIAL_REFERENCE_PROJECTION,
 } from './pavilion1CommercialReference';
 import { PAVILION12_COMMERCIAL_REFERENCE_CELLS } from './pavilion12CommercialReference';
-import { PAVILION14_COMMERCIAL_REFERENCE_CELLS } from './pavilion14CommercialReference';
+import {
+  PAVILION14_COMMERCIAL_REFERENCE_CELLS,
+  PAVILION14_COMMERCIAL_REFERENCE_PROJECTION,
+} from './pavilion14CommercialReference';
 import {
   PAVILION3_COMMERCIAL_REFERENCE_CELLS,
 } from './pavilion3CommercialReference';
-import { PAVILION5_COMMERCIAL_REFERENCE_CELLS } from './pavilion5CommercialReference';
+import {
+  PAVILION5_COMMERCIAL_REFERENCE_CELLS,
+  PAVILION5_COMMERCIAL_REFERENCE_PROJECTION,
+} from './pavilion5CommercialReference';
+import {
+  PAVILION7_COMMERCIAL_REFERENCE_CELLS,
+  PAVILION7_COMMERCIAL_REFERENCE_PROJECTION,
+} from './pavilion7CommercialReference';
 import {
   PAVILION8_COMMERCIAL_REFERENCE_CELLS,
   PAVILION8_COMMERCIAL_REFERENCE_PROJECTION,
@@ -495,7 +505,9 @@ function addStructure(
 // Pavilions and infrastructure B1–B42, following the official lower legend.
 const bStructures: Array<[string, string, MapClassification, string, PdfBounds | PdfPoint, Parameters<typeof addStructure>[5]?]> = [
   ['B1', 'Pavilhão 1 — Indústria, Comércio e Serviços', 'PAVILION', 'pavilions', [2298, 3600, 2655, 3759]],
-  ['B2', 'Pavilhão 14 — Comércio e Artesanato', 'PAVILION', 'pavilions', [2418, 3833, 2658, 4074]],
+  ['B2', 'Pavilhão 14 — Artesanato e Comércio', 'PAVILION', 'pavilions', [2418, 3833, 2658, 4074], {
+    metadata: { aliases: ['Pavilhão 14 — Comércio e Artesanato'] },
+  }],
   ['B3', 'Pavilhão 12 — Indústria, Comércio e Serviços', 'PAVILION', 'pavilions', [2792, 3827, 3147, 4089]],
   ['B4', 'Pavilhão 8 — Indústria e Comércio', 'PAVILION', 'pavilions', [3172, 3788, 3296, 4100]],
   ['B5', 'Pavilhão 13 — Indústria e Comércio', 'PAVILION', 'pavilions', [3307, 3788, 3445, 4051]],
@@ -503,7 +515,14 @@ const bStructures: Array<[string, string, MapClassification, string, PdfBounds |
   ['B7', 'Pavilhão 4 — Cozinha da Soja', 'PAVILION', 'pavilions', [3495, 2497, 3666, 2568], { parent: 'N' }],
   ['B8', 'Pavilhão 5 — Veterinária, Pequenos Animais e Rações', 'PAVILION', 'pavilions', [3198, 2203, 3411, 2390]],
   ['B9', 'Pavilhões 6, 10 e 11 — Pecuária', 'PAVILION', 'pavilions', [2319, 2256, 3179, 2389]],
-  ['B10', 'Pavilhão 7 — Agricultura familiar / soja e derivados', 'PAVILION', 'pavilions', [1973, 2252, 2309, 2379]],
+  ['B10', 'Pavilhão 7 — Agroindústrias', 'PAVILION', 'pavilions', [1973, 2252, 2309, 2379], {
+    metadata: {
+      aliases: [
+        'Pavilhão 7 — Agricultura Familiar',
+        'Pavilhão 7 — Agricultura familiar / soja e derivados',
+      ],
+    },
+  }],
   ['B11', 'Centro administrativo / auditório', 'ADMINISTRATION', 'structures', [3735, 3850, 3860, 4150]],
   ['B12', 'Sede Fenasoja / Comissão Central', 'ADMINISTRATION', 'structures', [4105, 3681], { parent: 'B', width: 135, depth: 104 }],
   ['B13', 'Palco Cultural Lactalis', 'EVENT_VENUE', 'structures', [4092, 3575], { parent: 'B', width: 126, depth: 112, height: 1.05 }],
@@ -766,11 +785,12 @@ const pavilionModuleReferences: readonly PavilionModuleReference[] = [
     publicIdentifier: 'B2',
     pavilionNumber: 14,
     block: 'P14',
-    layoutRevision: '2026.4-p14.1',
-    source: 'Anexo 2 e Anexo 6 — Pavilhão 14 — Comércio e Artesanato',
+    layoutRevision: '2026.4-p14.2',
+    source: 'WhatsApp Image 2026-08-25 at 03.11.58.jpeg',
     facingRadians: Math.PI / 2,
     segmentId: 'industria-comercio-servicos',
     cells: PAVILION14_COMMERCIAL_REFERENCE_CELLS,
+    projection: PAVILION14_COMMERCIAL_REFERENCE_PROJECTION,
   },
   {
     publicIdentifier: 'B3',
@@ -818,11 +838,23 @@ const pavilionModuleReferences: readonly PavilionModuleReference[] = [
     publicIdentifier: 'B8',
     pavilionNumber: 5,
     block: 'P5',
-    layoutRevision: '2026.4-p5.1',
+    layoutRevision: '2026.4-p5.2',
     source: 'Croqui Pavilhão 5 - Fenasoja 2026.pdf',
     facingRadians: 0,
     segmentId: null,
     cells: PAVILION5_COMMERCIAL_REFERENCE_CELLS,
+    projection: PAVILION5_COMMERCIAL_REFERENCE_PROJECTION,
+  },
+  {
+    publicIdentifier: 'B10',
+    pavilionNumber: 7,
+    block: 'P7',
+    layoutRevision: '2026.4-p7.1',
+    source: 'Croqui Pavilhão 7 - Fenasoja 2026_page-0001.jpg',
+    facingRadians: 0,
+    segmentId: null,
+    cells: PAVILION7_COMMERCIAL_REFERENCE_CELLS,
+    projection: PAVILION7_COMMERCIAL_REFERENCE_PROJECTION,
   },
 ];
 
@@ -1003,7 +1035,7 @@ export const OFFICIAL_REFERENCE_LOTS: CommercialLot[] = officialLotEntities.map(
 
 export const OFFICIAL_REFERENCE_DATA: CommercialMapData = {
   source: 'official-reference',
-  sourceMessage: 'Planta oficial 2026 digitalizada sem importar compradores. Os 95 lotes da Exporural possuem áreas cadastrais validadas; os 1.144 módulos dos Pavilhões 1, 3, 5, 8, 12, 13 e 14 permanecem sem área individual e todos os 1.406 lotes/módulos ficam bloqueados até liberação comercial.',
+  sourceMessage: 'Planta oficial 2026 digitalizada sem importar compradores. Os 95 lotes da Exporural possuem áreas cadastrais validadas; os 1.315 módulos dos Pavilhões 1, 3, 5, 7, 8, 12, 13 e 14 permanecem sem área individual e todos os 1.577 lotes/módulos ficam bloqueados até liberação comercial.',
   project: {
     id: 'reference:fenasoja-2026',
     orgId: null,

@@ -408,6 +408,47 @@ function wallSegmentsAroundEntrances(
   return pieces;
 }
 
+function wallSegmentsAroundSideEntrances(
+  layout: CommercialPavilionLayout,
+  entrances: CommercialPavilionLayout['exterior']['facade']['leftEntrances'],
+  wallX: number,
+  visibleHeight = layout.exterior.shell.height,
+): InstanceTransform[] {
+  const { shell, slab } = layout.exterior;
+  const wallHeight = Math.min(
+    visibleHeight,
+    Math.max(0.2, entrances[0]?.height ?? visibleHeight),
+  );
+  const ranges = entrances
+    .map((entrance) => [entrance.centerZ - entrance.depth / 2, entrance.centerZ + entrance.depth / 2] as const)
+    .sort(([near], [far]) => near - far);
+  const pieces: InstanceTransform[] = [];
+  let cursor = -shell.depth / 2;
+  ranges.forEach(([near, far]) => {
+    if (near - cursor > 0.045) {
+      pieces.push({
+        position: [wallX, slab.height + wallHeight / 2, (cursor + near) / 2],
+        scale: [0.1, wallHeight, near - cursor],
+      });
+    }
+    cursor = far;
+  });
+  if (shell.depth / 2 - cursor > 0.045) {
+    pieces.push({
+      position: [wallX, slab.height + wallHeight / 2, (cursor + shell.depth / 2) / 2],
+      scale: [0.1, wallHeight, shell.depth / 2 - cursor],
+    });
+  }
+  const upperHeight = visibleHeight - wallHeight;
+  if (upperHeight > 0.045) {
+    pieces.push({
+      position: [wallX, slab.height + wallHeight + upperHeight / 2, 0],
+      scale: [0.1, upperHeight, shell.depth],
+    });
+  }
+  return pieces;
+}
+
 function facadeWallSegments(layout: CommercialPavilionLayout): InstanceTransform[] {
   return wallSegmentsAroundEntrances(
     layout,
@@ -445,19 +486,20 @@ function PavilionShell({
     if (!cutaway) {
       return [
         ...rearWallSegments(layout),
-        {
-          position: [-shell.width / 2 + wallThickness / 2, shell.centerY, 0],
-          scale: [wallThickness, shell.height, shell.depth],
-        },
-        {
-          position: [shell.width / 2 - wallThickness / 2, shell.centerY, 0],
-          scale: [wallThickness, shell.height, shell.depth],
-        },
+        ...wallSegmentsAroundSideEntrances(
+          layout,
+          facade.leftEntrances,
+          -shell.width / 2 + wallThickness / 2,
+        ),
+        ...wallSegmentsAroundSideEntrances(
+          layout,
+          facade.rightEntrances,
+          shell.width / 2 - wallThickness / 2,
+        ),
         ...facadeWallSegments(layout),
       ];
     }
     const cutawayHeight = Math.min(0.5, shell.height * 0.22);
-    const centerY = slab.height + cutawayHeight / 2;
     return [
       ...wallSegmentsAroundEntrances(
         layout,
@@ -471,30 +513,57 @@ function PavilionShell({
         facade.frontZ,
         cutawayHeight,
       ),
-      { position: [-shell.width / 2 + wallThickness / 2, centerY, 0], scale: [wallThickness, cutawayHeight, shell.depth] },
-      { position: [shell.width / 2 - wallThickness / 2, centerY, 0], scale: [wallThickness, cutawayHeight, shell.depth] },
+      ...wallSegmentsAroundSideEntrances(
+        layout,
+        facade.leftEntrances,
+        -shell.width / 2 + wallThickness / 2,
+        cutawayHeight,
+      ),
+      ...wallSegmentsAroundSideEntrances(
+        layout,
+        facade.rightEntrances,
+        shell.width / 2 - wallThickness / 2,
+        cutawayHeight,
+      ),
     ];
   }, [
     cutaway,
     facade.entrances,
     facade.frontZ,
+    facade.leftEntrances,
     facade.rearEntrances,
+    facade.rightEntrances,
     layout,
     shell,
-    slab.height,
     wallThickness,
   ]);
   const doors = useMemo<InstanceTransform[]>(() => cutaway ? [] : [
     ...facade.entrances,
     ...facade.rearEntrances,
+    ...facade.leftEntrances,
+    ...facade.rightEntrances,
   ].map((entrance) => ({
-    position: [
-      entrance.centerX,
-      entrance.centerY,
-      entrance.centerZ + (entrance.centerZ < 0 ? 0.065 : -0.065),
-    ],
-    scale: [entrance.width * 0.92, entrance.height * 0.94, entrance.depth],
-  })), [cutaway, facade.entrances, facade.rearEntrances]);
+    position: entrance.edge === 'front' || entrance.edge === 'rear'
+      ? [
+          entrance.centerX,
+          entrance.centerY,
+          entrance.centerZ + (entrance.edge === 'rear' ? 0.065 : -0.065),
+        ]
+      : [
+          entrance.centerX + (entrance.edge === 'left' ? 0.065 : -0.065),
+          entrance.centerY,
+          entrance.centerZ,
+        ],
+    scale: entrance.edge === 'front' || entrance.edge === 'rear'
+      ? [entrance.width * 0.92, entrance.height * 0.94, entrance.depth]
+      : [entrance.width, entrance.height * 0.94, entrance.depth * 0.92],
+  })), [
+    cutaway,
+    facade.entrances,
+    facade.leftEntrances,
+    facade.rearEntrances,
+    facade.rightEntrances,
+  ]);
   const frontColumns = useMemo<InstanceTransform[]>(() => {
     if (cutaway) return [];
     const columns = [
@@ -510,11 +579,24 @@ function PavilionShell({
   const sideColumns = useMemo<InstanceTransform[]>(() => {
     if (!showDetail || cutaway) return [];
     const zValues = structure.columnZs.filter((_, index) => index > 0 && index < structure.columnZs.length - 1);
-    return zValues.flatMap((z) => ([-1, 1] as const).map((side) => ({
-      position: [side * (shell.width / 2 - structure.columnSize / 2), structure.columnCenterY, z],
-      scale: [structure.columnSize, structure.columnHeight, structure.columnSize],
-    })));
-  }, [cutaway, shell.width, showDetail, structure]);
+    return zValues.flatMap((z) => ([-1, 1] as const).flatMap((side) => {
+      const sideEntrances = side < 0 ? facade.leftEntrances : facade.rightEntrances;
+      if (sideEntrances.some((entrance) => (
+        Math.abs(z - entrance.centerZ) < entrance.depth / 2 + structure.columnSize
+      ))) return [];
+      return [{
+        position: [side * (shell.width / 2 - structure.columnSize / 2), structure.columnCenterY, z],
+        scale: [structure.columnSize, structure.columnHeight, structure.columnSize],
+      }];
+    }));
+  }, [
+    cutaway,
+    facade.leftEntrances,
+    facade.rightEntrances,
+    shell.width,
+    showDetail,
+    structure,
+  ]);
   const canopies = useMemo<InstanceTransform[]>(() => cutaway ? [] : facade.entrances.map((entrance) => ({
     position: [
       entrance.centerX,
@@ -621,8 +703,8 @@ export const CommercialPavilion = memo(function CommercialPavilion({
   const definition = resolveCommercialPavilionDefinition({ publicIdentifier });
   const modulePlan = resolveCommercialPavilionModulePlan({ publicIdentifier });
   const layout = useMemo(() => definition
-    ? createCommercialPavilionLayout(bounds, definition, height)
-    : null, [bounds, definition, height]);
+    ? createCommercialPavilionLayout(bounds, definition, height, modulePlan)
+    : null, [bounds, definition, height, modulePlan]);
   const textures = useMemo(() => ({
     concrete: createCommercialPavilionTexture('concrete'),
     zinc: createCommercialPavilionTexture('zinc'),

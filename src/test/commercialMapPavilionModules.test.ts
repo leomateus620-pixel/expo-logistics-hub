@@ -39,6 +39,10 @@ import {
   PAVILION14_COMMERCIAL_REFERENCE_CELLS,
 } from '@/features/commercial-map/data/pavilion14CommercialReference';
 import {
+  PAVILION7_COMMERCIAL_REFERENCE,
+  PAVILION7_COMMERCIAL_REFERENCE_CELLS,
+} from '@/features/commercial-map/data/pavilion7CommercialReference';
+import {
   COMMERCIAL_PAVILION_PUBLIC_IDENTIFIERS,
   type CommercialPavilionPublicIdentifier,
 } from '@/features/commercial-map/utils/commercialPavilions';
@@ -54,10 +58,10 @@ const EXPECTED_PLANS = {
   },
   B2: {
     pavilionNumber: 14,
-    category: 'Comércio e Artesanato',
+    category: 'Artesanato e Comércio',
     moduleCount: 186,
     totalAreaSquareMeters: 1155,
-    moduleAreaSquareMeters: 616,
+    moduleAreaSquareMeters: 616.16,
     ranges: [[1, 35], [36, 64], [65, 93], [94, 122], [123, 151], [152, 186]],
   },
   B3: {
@@ -112,11 +116,11 @@ const EXPECTED_PLANS = {
   },
   B10: {
     pavilionNumber: 7,
-    category: 'Agricultura Familiar / Agroindústrias',
-    moduleCount: 57,
-    totalAreaSquareMeters: 917,
+    category: 'Agroindústrias',
+    moduleCount: 171,
+    totalAreaSquareMeters: 918.66,
     moduleAreaSquareMeters: 427.5,
-    ranges: [[1, 8], [9, 19], [20, 33], [34, 47], [48, 50], [51, 57]],
+    ranges: [[1, 42], [43, 126], [127, 171]],
   },
 } as const satisfies Readonly<Record<CommercialPavilionPublicIdentifier, {
   pavilionNumber: number;
@@ -207,7 +211,7 @@ function expectOfficialPlan(
 ): void {
   const expected = EXPECTED_PLANS[publicIdentifier];
   expect(plan.publicIdentifier).toBe(publicIdentifier);
-  expect(plan.stats).toEqual({
+  expect(plan.stats).toMatchObject({
     pavilionNumber: expected.pavilionNumber,
     category: expected.category,
     moduleCount: expected.moduleCount,
@@ -234,6 +238,7 @@ const OFFICIAL_REFERENCE_PAVILIONS = new Set<CommercialPavilionPublicIdentifier>
   'B5',
   'B6',
   'B8',
+  'B10',
 ]);
 
 function expectStrictlyIncreasing(values: readonly number[]): void {
@@ -399,7 +404,11 @@ describe('planos visuais dos módulos internos dos pavilhões', () => {
     expect(cell('B4', 90).centerZ).toBeLessThan(cell('B4', 114).centerZ);
     expect(cell('B8', 1).centerX).toBe(cell('B8', 43).centerX);
     expect(cell('B8', 1).centerZ).toBeGreaterThan(cell('B8', 43).centerZ);
-    expect(cell('B10', 20).centerX).toBeGreaterThan(cell('B10', 33).centerX);
+    expect(cell('B10', 1).centerX).toBeLessThan(cell('B10', 21).centerX);
+    expect(cell('B10', 22).centerX).toBeLessThan(cell('B10', 42).centerX);
+    expect(cell('B10', 43).centerX).toBeLessThan(cell('B10', 84).centerX);
+    expect(cell('B10', 85).centerX).toBeGreaterThan(cell('B10', 126).centerX);
+    expect(cell('B10', 127).centerX).toBeLessThan(cell('B10', 171).centerX);
   });
 
   it('usa as 214 células da referência única e forma duas ilhas com pares de 32 sem tails', () => {
@@ -676,20 +685,35 @@ describe('planos visuais dos módulos internos dos pavilhões', () => {
     ]));
   });
 
-  it('reproduz o Pavilhão 14 em seis sequências e preserva a divergência 73–74 para confirmação', () => {
+  it('reconstrói o Pavilhão 7 com 171 lotes e preserva a contagem documental de 57', () => {
+    const plan = COMMERCIAL_PAVILION_MODULE_PLANS.B10;
+    expect(plan.cells).toBe(PAVILION7_COMMERCIAL_REFERENCE_CELLS);
+    expect(plan.cells).toBe(PAVILION7_COMMERCIAL_REFERENCE.cells);
+    expect(plan.stats.sourceDeclaredModuleCount).toBe(57);
+    expect(plan.stats.moduleCount).toBe(171);
+    expect(plan.stats.moduleAreaSquareMeters).toBe(427.5);
+    expect(plan.documentDiscrepancies).toHaveLength(1);
+    expect(plan.supportSpaces.map((space) => space.type))
+      .toEqual(['permanent-non-commercial', 'permanent-non-commercial']);
+    expect(plan.wallAccesses).toHaveLength(4);
+    expect(metricAreaForPlan(plan, 49.9, 18.3)).toBeCloseTo(427.5, 9);
+    expectNoModuleRenderPartOverlaps(plan);
+  });
+
+  it('reproduz o Pavilhão 14 em seis sequências sem preservar divergências obsoletas', () => {
     const plan = COMMERCIAL_PAVILION_MODULE_PLANS.B2;
     expect(plan.cells).toBe(PAVILION14_COMMERCIAL_REFERENCE_CELLS);
     expect(plan.cells).toBe(PAVILION14_COMMERCIAL_REFERENCE.cells);
     expect(plan.source.interpretation).toBe('official-reference-runs');
 
-    const expectedCellWidth = 0.96 / 35;
+    const expectedCellWidth = 1 / 35;
     plan.cells.forEach((cell) => {
       expect(cell.width).toBeCloseTo(expectedCellWidth, 12);
       const depthMeters = cell.number <= 35 || cell.number >= 152 ? 3 : 3.5;
-      expect(cell.depth).toBeCloseTo((depthMeters / 33) * 0.96, 12);
+      expect(cell.depth).toBeCloseTo(depthMeters / 33, 12);
     });
     const physicalArea = plan.cells.reduce((total, cell) => (
-      total + (cell.width / 0.96) * 35 * (cell.depth / 0.96) * 33
+      total + cell.width * 35 * cell.depth * 33
     ), 0);
     expect(physicalArea).toBeCloseTo(616, 9);
 
@@ -702,7 +726,7 @@ describe('planos visuais dos módulos internos dos pavilhões', () => {
     expect(cell(152).centerX).toBeGreaterThan(cell(186).centerX);
     expect(plan.cells
       .filter((candidate) => candidate.source?.discrepancy === 'manual-confirmation-required')
-      .map((candidate) => candidate.number)).toEqual([73, 74]);
+      .map((candidate) => candidate.number)).toEqual([]);
     expect(cell(36).centerZ).toBeGreaterThan(cell(65).centerZ);
     expect(cell(94).centerZ).toBeGreaterThan(cell(123).centerZ);
   });

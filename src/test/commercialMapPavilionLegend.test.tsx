@@ -108,7 +108,7 @@ describe('legenda inteligente das plantas internas', () => {
     expect(pavilion13Path?.getAttribute('d')?.match(/M/g)).toHaveLength(4);
   });
 
-  it('oferece o mesmo contrato de leitura no interior dos pavilhões do mapa geral', () => {
+  it('expõe os 171 lotes do Pavilhão 7 e contextualiza a divergência do croqui', () => {
     render(
       <PavilionPlanLegend
         plan={COMMERCIAL_PAVILION_MODULE_PLANS.B10}
@@ -121,8 +121,22 @@ describe('legenda inteligente das plantas internas', () => {
     });
     expect(legend).toHaveClass('is-interior');
     expect(legend).toHaveAttribute('data-commercial-pavilion-plan', 'B10');
-    expect(within(legend).getByText('Agricultura Familiar / Agroindústrias')).toBeInTheDocument();
-    expect(within(legend).getByText('01–57')).toBeInTheDocument();
+    expect(within(legend).getByText('Agroindústrias')).toBeInTheDocument();
+    expect(within(legend).getAllByText('Lotes numerados')).toHaveLength(2);
+    expect(within(legend).getByText('171')).toBeInTheDocument();
+    expect(within(legend).getByText('Módulos no croqui')).toBeInTheDocument();
+    expect(within(legend).getByText('57')).toBeInTheDocument();
+    expect(within(legend).getByText('Identificação')).toBeInTheDocument();
+    expect(within(legend).getByText('01–171')).toBeInTheDocument();
+    expect(legend.querySelector('.commercial-pavilion-plan-source-note'))
+      .toHaveTextContent(
+        'Divergência documental: O croqui declara 57 módulos no quadro técnico, mas desenha e numera 171 lotes independentes.',
+      );
+    expect(within(legend).getByText('Apoio permanente')).toBeInTheDocument();
+    [
+      'Cozinha do Pavilhão 7 · apoio permanente não comercial',
+      'Banheiros do Pavilhão 7 · apoio permanente não comercial',
+    ].forEach((label) => expect(within(legend).getByText(label)).toBeInTheDocument());
     expect(within(legend).getByRole('img', {
       name: 'Diagrama simplificado dos setores e corredores',
     })).toBeInTheDocument();

@@ -160,12 +160,36 @@ export const PavilionPlanLegend = memo(function PavilionPlanLegend({
         </svg>
 
         <dl>
-          <div><dt>Módulos</dt><dd>{maximum}</dd></div>
+          <div>
+            <dt>{plan.stats.sourceDeclaredModuleCount ? 'Lotes numerados' : 'Módulos'}</dt>
+            <dd>{maximum}</dd>
+          </div>
+          {plan.stats.sourceDeclaredModuleCount !== undefined && (
+            <div><dt>Módulos no croqui</dt><dd>{plan.stats.sourceDeclaredModuleCount}</dd></div>
+          )}
           <div><dt>Identificação</dt><dd>{moduleLabel(1)}–{moduleLabel(maximum)}</dd></div>
           <div><dt>Área total</dt><dd>{area.format(plan.stats.totalAreaSquareMeters)} m²</dd></div>
           <div><dt>Área modular total</dt><dd>{area.format(plan.stats.moduleAreaSquareMeters)} m²</dd></div>
+          {plan.stats.nominalModuleAreaSquareMeters !== undefined && (
+            <div>
+              <dt>Soma geométrica nominal</dt>
+              <dd>{area.format(plan.stats.nominalModuleAreaSquareMeters)} m²</dd>
+            </div>
+          )}
+          {plan.stats.exhibitionAreaSquareMeters !== undefined && (
+            <div>
+              <dt>Área de exposição</dt>
+              <dd>{area.format(plan.stats.exhibitionAreaSquareMeters)} m²</dd>
+            </div>
+          )}
         </dl>
       </div>
+
+      {plan.documentDiscrepancies.map((discrepancy) => (
+        <p className="commercial-pavilion-plan-source-note" key={discrepancy}>
+          <b>Divergência documental:</b> {discrepancy}
+        </p>
+      ))}
 
       <div className="commercial-pavilion-plan-groups" aria-label="Sequências de módulos">
         {plan.legendNumberRanges.map((range) => (
@@ -194,7 +218,7 @@ export const PavilionPlanLegend = memo(function PavilionPlanLegend({
       )}
 
       <footer>
-        <span className="is-modules"><i aria-hidden="true" />Módulos numerados</span>
+        <span className="is-modules"><i aria-hidden="true" />Lotes numerados</span>
         <span className="is-circulation"><i aria-hidden="true" />Circulação livre</span>
         {supportSpaces.length > 0 && (
           <span className="is-support"><i aria-hidden="true" />Apoio permanente</span>

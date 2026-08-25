@@ -258,6 +258,63 @@ export interface CommercialPavilionReferenceSupportSpace
   sourcePrecision?: 'official-metric' | 'plan-traced';
 }
 
+export type CommercialPavilionReferenceSourcePrecision =
+  | 'official-metric'
+  | 'plan-traced';
+
+export type CommercialPavilionReferenceWallEdge =
+  | 'front'
+  | 'rear'
+  | 'left'
+  | 'right';
+
+/**
+ * An opening dimensioned directly on the official plan. `centerAlongWallM`
+ * follows the source-plan axis: X on front/rear walls and Z on side walls.
+ */
+export interface CommercialPavilionReferenceMetricWallAccess {
+  id: string;
+  label: string;
+  wall: CommercialPavilionReferenceWallEdge;
+  centerAlongWallM: number;
+  openingWidthM: number;
+  openingHeightM?: number;
+  kind?: 'entrance' | 'exit' | 'gate' | 'emergency' | 'service';
+  sourcePrecision: CommercialPavilionReferenceSourcePrecision;
+  connectsTo?: string;
+}
+
+/**
+ * An opening whose position and span are already represented by a corridor.
+ * Edges refer to the final projected pavilion frame.
+ */
+export interface CommercialPavilionReferenceCorridorWallAccess {
+  id: string;
+  label?: string;
+  corridorId: string;
+  edges: readonly CommercialPavilionReferenceWallEdge[];
+  kind?: 'entrance' | 'exit' | 'gate' | 'emergency' | 'service';
+  sourcePrecision: CommercialPavilionReferenceSourcePrecision;
+  connectsTo?: string;
+}
+
+export type CommercialPavilionReferenceWallAccess =
+  | CommercialPavilionReferenceMetricWallAccess
+  | CommercialPavilionReferenceCorridorWallAccess;
+
+export function transformCommercialPavilionReferenceWallEdge(
+  edge: CommercialPavilionReferenceWallEdge,
+  transform: CommercialPavilionReferenceCoordinateTransform,
+): CommercialPavilionReferenceWallEdge {
+  if (transform !== 'quarter-turn-clockwise') return edge;
+  return ({
+    front: 'left',
+    rear: 'right',
+    left: 'rear',
+    right: 'front',
+  } as const)[edge];
+}
+
 export interface CommercialPavilionModuleSource {
   document: string;
   referenceYear: number;

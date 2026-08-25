@@ -13,6 +13,7 @@ import {
   type CommercialPavilionReferenceRun,
   type CommercialPavilionReferenceSequenceOrientation,
   type CommercialPavilionReferenceSupportSpace,
+  type CommercialPavilionReferenceWallAccess,
 } from '../data/commercialPavilionReference';
 import { PAVILION1_COMMERCIAL_REFERENCE } from '../data/pavilion1CommercialReference';
 import { PAVILION12_COMMERCIAL_REFERENCE } from '../data/pavilion12CommercialReference';
@@ -23,6 +24,7 @@ import {
 import { PAVILION5_COMMERCIAL_REFERENCE } from '../data/pavilion5CommercialReference';
 import { PAVILION8_COMMERCIAL_REFERENCE } from '../data/pavilion8CommercialReference';
 import { PAVILION13_COMMERCIAL_REFERENCE } from '../data/pavilion13CommercialReference';
+import { PAVILION7_COMMERCIAL_REFERENCE } from '../data/pavilion7CommercialReference';
 import {
   COMMERCIAL_PAVILION_PUBLIC_IDENTIFIERS,
   type CommercialPavilionPublicIdentifier,
@@ -79,6 +81,12 @@ export interface CommercialPavilionModuleStats {
   moduleCount: number;
   totalAreaSquareMeters: number;
   moduleAreaSquareMeters: number;
+  /** Number printed in the title block when it conflicts with the drawn lots. */
+  sourceDeclaredModuleCount?: number;
+  /** Nominal sum derived from repeated official module dimensions. */
+  nominalModuleAreaSquareMeters?: number;
+  /** Aggregate exhibition area; never an individual-lot area. */
+  exhibitionAreaSquareMeters?: number;
 }
 
 export interface CommercialPavilionModuleCell
@@ -131,34 +139,14 @@ export interface CommercialPavilionModulePlan {
   legendNumberRanges: readonly (readonly [start: number, end: number])[];
   corridors: readonly CommercialPavilionCorridor[];
   supportSpaces: readonly CommercialPavilionReferenceSupportSpace[];
+  wallAccesses: readonly CommercialPavilionReferenceWallAccess[];
   cells: readonly CommercialPavilionModuleCell[];
+  documentDiscrepancies: readonly string[];
   source: {
     document: string;
     page: 1;
     interpretation: 'normalized-module-grid' | 'official-reference-runs';
   };
-}
-
-interface CommercialPavilionModuleZoneSeed {
-  id: string;
-  label: string;
-  role: CommercialPavilionModuleZoneRole;
-  bounds: NormalizedCommercialPavilionRect;
-  rows: number;
-  columns: number;
-  numbering: CommercialPavilionModuleNumbering;
-  flipX?: boolean;
-  flipZ?: boolean;
-}
-
-interface CommercialPavilionModulePlanSeed {
-  publicIdentifier: CommercialPavilionPublicIdentifier;
-  topology: CommercialPavilionModuleTopology;
-  colorCue: string;
-  stats: CommercialPavilionModuleStats;
-  boundary: NormalizedCommercialPavilionRect;
-  zones: readonly CommercialPavilionModuleZoneSeed[];
-  corridors: readonly CommercialPavilionCorridor[];
 }
 
 const OFFICIAL_BOUNDARY: NormalizedCommercialPavilionRect = {
@@ -168,192 +156,6 @@ const OFFICIAL_BOUNDARY: NormalizedCommercialPavilionRect = {
   depth: 0.96,
 };
 
-function rect(
-  centerX: number,
-  centerZ: number,
-  width: number,
-  depth: number,
-): NormalizedCommercialPavilionRect {
-  return { centerX, centerZ, width, depth };
-}
-
-function corridor(
-  id: string,
-  label: string,
-  kind: CommercialPavilionCorridorKind,
-  bounds: NormalizedCommercialPavilionRect,
-): CommercialPavilionCorridor {
-  return { id, label, kind, ...bounds };
-}
-
-function zone(
-  id: string,
-  label: string,
-  role: CommercialPavilionModuleZoneRole,
-  bounds: NormalizedCommercialPavilionRect,
-  rows: number,
-  columns: number,
-  numbering: CommercialPavilionModuleNumbering = 'row-snake',
-  orientation: { flipX?: boolean; flipZ?: boolean } = {},
-): CommercialPavilionModuleZoneSeed {
-  return { id, label, role, bounds, rows, columns, numbering, ...orientation };
-}
-
-function positionForSequence(
-  sequence: number,
-  rows: number,
-  columns: number,
-  numbering: CommercialPavilionModuleNumbering,
-): { row: number; column: number } {
-  if (numbering === 'column-major' || numbering === 'column-snake') {
-    const column = Math.floor(sequence / rows);
-    const positionInColumn = sequence % rows;
-    const row = numbering === 'column-snake' && column % 2 === 1
-      ? rows - positionInColumn - 1
-      : positionInColumn;
-    return { row, column };
-  }
-
-  const row = Math.floor(sequence / columns);
-  const positionInRow = sequence % columns;
-  const column = numbering === 'row-snake' && row % 2 === 1
-    ? columns - positionInRow - 1
-    : positionInRow;
-  return { row, column };
-}
-
-function expandZone(
-  publicIdentifier: CommercialPavilionPublicIdentifier,
-  seed: CommercialPavilionModuleZoneSeed,
-  startNumber: number,
-): {
-  zone: CommercialPavilionModuleZone;
-  cells: CommercialPavilionModuleCell[];
-} {
-  const moduleCount = seed.rows * seed.columns;
-  const endNumber = startNumber + moduleCount - 1;
-  const maximumGapX = seed.bounds.width / Math.max(1, seed.columns * 4);
-  const maximumGapZ = seed.bounds.depth / Math.max(1, seed.rows * 4);
-  const gapX = Math.min(0.004, maximumGapX);
-  const gapZ = Math.min(0.004, maximumGapZ);
-  const cellWidth = (
-    seed.bounds.width - gapX * Math.max(0, seed.columns - 1)
-  ) / seed.columns;
-  const cellDepth = (
-    seed.bounds.depth - gapZ * Math.max(0, seed.rows - 1)
-  ) / seed.rows;
-  const left = seed.bounds.centerX - seed.bounds.width / 2;
-  const top = seed.bounds.centerZ - seed.bounds.depth / 2;
-
-  const cells = Array.from({ length: moduleCount }, (_, sequence) => {
-    const number = startNumber + sequence;
-    const position = positionForSequence(
-      sequence,
-      seed.rows,
-      seed.columns,
-      seed.numbering,
-    );
-    const row = seed.flipZ ? seed.rows - position.row - 1 : position.row;
-    const column = seed.flipX ? seed.columns - position.column - 1 : position.column;
-    return {
-      id: `${publicIdentifier}:module:${String(number).padStart(3, '0')}`,
-      number,
-      label: String(number).padStart(2, '0'),
-      zoneId: seed.id,
-      centerX: left + column * (cellWidth + gapX) + cellWidth / 2,
-      centerZ: top + row * (cellDepth + gapZ) + cellDepth / 2,
-      width: cellWidth,
-      depth: cellDepth,
-    } satisfies CommercialPavilionModuleCell;
-  });
-
-  return {
-    zone: {
-      id: seed.id,
-      label: seed.label,
-      role: seed.role,
-      bounds: seed.bounds,
-      rows: seed.rows,
-      columns: seed.columns,
-      numbering: seed.numbering,
-      moduleCount,
-      numberRange: [startNumber, endNumber],
-    },
-    cells,
-  };
-}
-
-function buildPlan(seed: CommercialPavilionModulePlanSeed): CommercialPavilionModulePlan {
-  let nextNumber = 1;
-  const zones: CommercialPavilionModuleZone[] = [];
-  const cells: CommercialPavilionModuleCell[] = [];
-
-  seed.zones.forEach((zoneSeed) => {
-    const expanded = expandZone(seed.publicIdentifier, zoneSeed, nextNumber);
-    zones.push(expanded.zone);
-    cells.push(...expanded.cells);
-    nextNumber += expanded.cells.length;
-  });
-
-  if (cells.length !== seed.stats.moduleCount) {
-    throw new Error(
-      `${seed.publicIdentifier}: plano visual gerou ${cells.length} módulos; `
-      + `a referência oficial exige ${seed.stats.moduleCount}.`,
-    );
-  }
-
-  return {
-    ...seed,
-    projection: DEFAULT_COMMERCIAL_PAVILION_REFERENCE_PROJECTION,
-    zones,
-    legendNumberRanges: zones.map((zone) => zone.numberRange),
-    supportSpaces: [],
-    cells,
-    source: {
-      document: 'Fenasoja - Planta Pavilhões Internos.pdf',
-      page: 1,
-      interpretation: 'normalized-module-grid',
-    },
-  };
-}
-
-type GeneratedCommercialPavilionPublicIdentifier = Exclude<
-  CommercialPavilionPublicIdentifier,
-  'B1' | 'B2' | 'B3' | 'B4' | 'B5' | 'B6' | 'B8'
->;
-
-const PLAN_SEEDS: Readonly<
-  Record<GeneratedCommercialPavilionPublicIdentifier, CommercialPavilionModulePlanSeed>
-> = {
-  B10: {
-    publicIdentifier: 'B10',
-    topology: 'agroindustry-six-runs',
-    colorCue: '#E653DE',
-    stats: {
-      pavilionNumber: 7,
-      category: 'Agricultura Familiar / Agroindústrias',
-      moduleCount: 57,
-      totalAreaSquareMeters: 917,
-      moduleAreaSquareMeters: 427.5,
-    },
-    boundary: OFFICIAL_BOUNDARY,
-    zones: [
-      zone('south-right', 'Ala sul direita · 01–08', 'market-run', rect(0.76, 0.88, 0.34, 0.12), 1, 8, 'row-major'),
-      zone('lower-right-island', 'Ilha inferior direita · 09–19', 'island', rect(0.7, 0.64, 0.42, 0.13), 1, 11, 'row-major'),
-      zone('upper-island', 'Ilha superior · 20–33', 'island', rect(0.5, 0.37, 0.68, 0.13), 1, 14, 'row-major', { flipX: true }),
-      zone('north-run', 'Ala norte · 34–47', 'perimeter', rect(0.5, 0.12, 0.68, 0.12), 1, 14, 'row-major'),
-      zone('lower-left-island', 'Ilha inferior esquerda · 48–50', 'island', rect(0.36, 0.64, 0.14, 0.13), 1, 3, 'row-major'),
-      zone('south-left', 'Ala sul esquerda · 51–57', 'market-run', rect(0.22, 0.88, 0.28, 0.12), 1, 7, 'row-major'),
-    ],
-    corridors: [
-      corridor('north-market-aisle', 'Corredor norte', 'main', rect(0.5, 0.245, 0.76, 0.09)),
-      corridor('central-market-aisle', 'Corredor central', 'main', rect(0.5, 0.505, 0.8, 0.1)),
-      corridor('south-market-aisle', 'Corredor sul', 'main', rect(0.5, 0.76, 0.8, 0.08)),
-      corridor('market-access', 'Acesso transversal', 'cross', rect(0.46, 0.76, 0.055, 0.36)),
-    ],
-  },
-};
-
 interface OfficialCommercialPavilionReference {
   publicIdentifier: CommercialPavilionPublicIdentifier;
   pavilionNumber: CommercialPavilionModuleStats['pavilionNumber'];
@@ -361,15 +163,20 @@ interface OfficialCommercialPavilionReference {
   moduleCount: number;
   totalAreaM2: number;
   modularAreaM2: number;
+  sourceDeclaredModuleCount?: number;
+  nominalGeometricAreaM2?: number;
+  exhibitionAreaM2?: number;
   projection?: CommercialPavilionReferenceProjection;
   boundary?: CommercialPavilionReferenceRect;
   runs: readonly CommercialPavilionReferenceRun[];
   corridors: readonly CommercialPavilionReferenceCorridor[];
   supportSpaces?: readonly CommercialPavilionReferenceSupportSpace[];
+  wallAccesses?: readonly CommercialPavilionReferenceWallAccess[];
   legendNumberRanges?: readonly (readonly [start: number, end: number])[];
   cells: readonly CommercialPavilionReferenceCell<CommercialPavilionPublicIdentifier>[];
   source: {
     document: string;
+    discrepancy?: unknown;
   };
 }
 
@@ -406,6 +213,15 @@ function buildOfficialCommercialPavilionPlan(
       totalAreaSquareMeters: reference.totalAreaM2,
       // Annex values describe the complete modular inventory, never one cell.
       moduleAreaSquareMeters: reference.modularAreaM2,
+      ...(reference.sourceDeclaredModuleCount !== undefined
+        ? { sourceDeclaredModuleCount: reference.sourceDeclaredModuleCount }
+        : {}),
+      ...(reference.nominalGeometricAreaM2 !== undefined
+        ? { nominalModuleAreaSquareMeters: reference.nominalGeometricAreaM2 }
+        : {}),
+      ...(reference.exhibitionAreaM2 !== undefined
+        ? { exhibitionAreaSquareMeters: reference.exhibitionAreaM2 }
+        : {}),
     },
     boundary: reference.boundary ?? OFFICIAL_BOUNDARY,
     projection: reference.projection ?? DEFAULT_COMMERCIAL_PAVILION_REFERENCE_PROJECTION,
@@ -414,7 +230,15 @@ function buildOfficialCommercialPavilionPlan(
       ?? zones.map((zone) => zone.numberRange),
     corridors: reference.corridors,
     supportSpaces: reference.supportSpaces ?? [],
+    wallAccesses: reference.wallAccesses ?? [],
     cells: reference.cells,
+    documentDiscrepancies: reference.sourceDeclaredModuleCount !== undefined
+      && reference.sourceDeclaredModuleCount !== reference.moduleCount
+      ? [
+          `O croqui declara ${reference.sourceDeclaredModuleCount} módulos no quadro técnico, `
+          + `mas desenha e numera ${reference.moduleCount} lotes independentes.`,
+        ]
+      : [],
     source: {
       document: reference.source.document,
       page: 1,
@@ -468,7 +292,11 @@ export const COMMERCIAL_PAVILION_MODULE_PLANS = Object.fromEntries(
               'horticulture-u-gallery',
               '#1F9BF0',
             )
-          : buildPlan(PLAN_SEEDS[publicIdentifier]),
+            : buildOfficialCommercialPavilionPlan(
+              PAVILION7_COMMERCIAL_REFERENCE,
+              'agroindustry-six-runs',
+              '#E653DE',
+            ),
   ]),
 ) as Readonly<
   Record<CommercialPavilionPublicIdentifier, CommercialPavilionModulePlan>
