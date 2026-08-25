@@ -33,6 +33,8 @@ interface CommercialPavilionModuleLayerProps {
   mode: ModuleLayerMode;
   reducedGraphics?: boolean;
   moduleStateById?: ReadonlyMap<string, CommercialPavilionModuleVisualState>;
+  /** Keeps plan labels upright for the pavilion's canonical interior viewpoint. */
+  labelRotationRadians?: number;
 }
 
 const EMPTY_MODULE_STATE = new Map<string, CommercialPavilionModuleVisualState>();
@@ -113,6 +115,7 @@ function createModuleNumberTexture(
   plan: CommercialPavilionModulePlan,
   layout: CommercialPavilionLayout,
   reducedGraphics: boolean,
+  labelRotationRadians: number,
 ) {
   if (typeof document === 'undefined') return null;
   const aspect = Math.max(0.25, layout.interior.clearWidth / layout.interior.clearDepth);
@@ -203,6 +206,7 @@ function createModuleNumberTexture(
     if (isDepthOriented) {
       context.rotate(visualSequenceOrientation === 'z-decreasing' ? -Math.PI / 2 : Math.PI / 2);
     }
+    context.rotate(labelRotationRadians);
     context.strokeText(cell.label, 0, 0);
     context.fillStyle = '#173b2b';
     context.fillText(cell.label, 0, 0);
@@ -240,6 +244,7 @@ function createModuleNumberTexture(
 
     if (fontSize >= 7 && lines.length > 0) {
       context.translate(projectedSupport.centerX, projectedSupport.centerY);
+      context.rotate(labelRotationRadians);
       context.font = `800 ${fontSize}px Inter, Arial, sans-serif`;
       context.lineWidth = Math.max(1.5, fontSize * 0.16);
       context.strokeStyle = 'rgba(247, 250, 245, 0.94)';
@@ -277,6 +282,7 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
   mode,
   reducedGraphics = false,
   moduleStateById = EMPTY_MODULE_STATE,
+  labelRotationRadians = 0,
 }: CommercialPavilionModuleLayerProps) {
   const interactive = mode === 'interior';
   const [moduleBaseMesh, setModuleBaseMesh] = useDisposableInstancedMeshRef();
@@ -327,8 +333,8 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
     plan.zones.map((zone, index) => [zone.id, index]),
   ), [plan.zones]);
   const numberTexture = useMemo(
-    () => createModuleNumberTexture(plan, layout, reducedGraphics),
-    [layout, plan, reducedGraphics],
+    () => createModuleNumberTexture(plan, layout, reducedGraphics, labelRotationRadians),
+    [labelRotationRadians, layout, plan, reducedGraphics],
   );
   const moduleMaterial = useMemo(() => new THREE.MeshStandardMaterial({
     color: '#ffffff',

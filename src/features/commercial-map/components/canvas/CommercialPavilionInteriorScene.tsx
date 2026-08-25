@@ -8,6 +8,7 @@ import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import {
   createCommercialPavilionLayout,
   commercialPavilionModelBounds,
+  commercialPavilionInteriorViewRotationRadians,
   resolveCommercialPavilionDefinition,
   type CommercialPavilionLayout,
 } from '../../utils/commercialPavilions';
@@ -172,10 +173,12 @@ function PavilionInteriorCameraRig({
   entity,
   layout,
   reducedGraphics,
+  interiorViewRotation,
 }: {
   entity: MapEntity;
   layout: CommercialPavilionLayout;
   reducedGraphics: boolean;
+  interiorViewRotation: number;
 }) {
   const controls = useRef<OrbitControlsImpl | null>(null);
   const animating = useRef(true);
@@ -185,14 +188,15 @@ function PavilionInteriorCameraRig({
   const setCameraNavigating = useCommercialMapStore((state) => state.setCameraNavigating);
   const bounds = useMemo(() => strategicLandmarkBounds(entity), [entity]);
   const facing = strategicLandmarkFacingRadians(entity);
+  const cameraFacing = facing + interiorViewRotation;
   const center = useMemo(
     () => new THREE.Vector3(bounds.centerX, entity.geometry.elevation, bounds.centerZ),
     [bounds.centerX, bounds.centerZ, entity.geometry.elevation],
   );
   const maximumDimension = Math.max(layout.width, layout.depth);
   const toWorld = useCallback((x: number, y: number, z: number) => (
-    new THREE.Vector3(x, y, z).applyAxisAngle(UP, facing).add(center)
-  ), [center, facing]);
+    new THREE.Vector3(x, y, z).applyAxisAngle(UP, cameraFacing).add(center)
+  ), [cameraFacing, center]);
   const clampTarget = useCallback(() => {
     const target = controls.current?.target;
     if (!target) return;
@@ -313,6 +317,7 @@ export const CommercialPavilionInteriorScene = memo(function CommercialPavilionI
   const modulePlan = resolveCommercialPavilionModulePlan(entity);
   const bounds = useMemo(() => strategicLandmarkBounds(entity), [entity]);
   const facing = strategicLandmarkFacingRadians(entity);
+  const interiorViewRotation = commercialPavilionInteriorViewRotationRadians(entity);
   const modelBounds = useMemo(
     () => commercialPavilionModelBounds(bounds, facing),
     [bounds, facing],
@@ -452,12 +457,18 @@ export const CommercialPavilionInteriorScene = memo(function CommercialPavilionI
           mode="interior"
           reducedGraphics={reducedGraphics}
           moduleStateById={moduleStateById}
+          labelRotationRadians={interiorViewRotation}
         />
         <InteriorInstances geometry={unitBoxGeometry} material={materials.structure} items={columns} castShadow />
         <InteriorInstances geometry={unitBoxGeometry} material={materials.structure} items={beams} castShadow />
         <InteriorInstances geometry={unitBoxGeometry} material={materials.threshold} items={thresholds} />
       </group>
-      <PavilionInteriorCameraRig entity={entity} layout={layout} reducedGraphics={reducedGraphics} />
+      <PavilionInteriorCameraRig
+        entity={entity}
+        layout={layout}
+        reducedGraphics={reducedGraphics}
+        interiorViewRotation={interiorViewRotation}
+      />
     </>
   );
 });
