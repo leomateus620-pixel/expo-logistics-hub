@@ -159,16 +159,36 @@ function createLowPerimeter(layout: CommercialPavilionLayout): InstanceTransform
     }
     return segments;
   };
+  const sideWallSegments = (
+    wallX: number,
+    entrances: CommercialPavilionLayout['exterior']['facade']['leftEntrances'],
+  ): InstanceTransform[] => {
+    const ranges = entrances
+      .map((entry) => [entry.centerZ - entry.depth / 2, entry.centerZ + entry.depth / 2] as const)
+      .sort(([near], [far]) => near - far);
+    const segments: InstanceTransform[] = [];
+    let cursor = -shell.depth / 2;
+    ranges.forEach(([near, far]) => {
+      if (near - cursor > 0.05) {
+        segments.push({
+          position: [wallX, wallHeight / 2, (cursor + near) / 2],
+          scale: [thickness, wallHeight, near - cursor],
+        });
+      }
+      cursor = far;
+    });
+    if (shell.depth / 2 - cursor > 0.05) {
+      segments.push({
+        position: [wallX, wallHeight / 2, (cursor + shell.depth / 2) / 2],
+        scale: [thickness, wallHeight, shell.depth / 2 - cursor],
+      });
+    }
+    return segments;
+  };
   return [
     ...wallSegments(shell.backZ, facade.rearEntrances),
-    {
-      position: [-shell.width / 2, wallHeight / 2, 0],
-      scale: [thickness, wallHeight, shell.depth],
-    },
-    {
-      position: [shell.width / 2, wallHeight / 2, 0],
-      scale: [thickness, wallHeight, shell.depth],
-    },
+    ...sideWallSegments(-shell.width / 2, facade.leftEntrances),
+    ...sideWallSegments(shell.width / 2, facade.rightEntrances),
     ...wallSegments(facade.frontZ, facade.entrances),
   ];
 }
@@ -327,8 +347,8 @@ export const CommercialPavilionInteriorScene = memo(function CommercialPavilionI
     [bounds, facing],
   );
   const layout = useMemo(() => definition
-    ? createCommercialPavilionLayout(modelBounds, definition)
-    : null, [definition, modelBounds]);
+    ? createCommercialPavilionLayout(modelBounds, definition, undefined, modulePlan)
+    : null, [definition, modelBounds, modulePlan]);
   const floorTexture = useMemo(() => createCommercialPavilionTexture('floor'), []);
   const materials = useMemo(() => ({
     floor: new THREE.MeshStandardMaterial({
@@ -423,9 +443,13 @@ export const CommercialPavilionInteriorScene = memo(function CommercialPavilionI
   const thresholds = [
     ...layout.exterior.facade.entrances,
     ...layout.exterior.facade.rearEntrances,
+    ...layout.exterior.facade.leftEntrances,
+    ...layout.exterior.facade.rightEntrances,
   ].map((entrance) => ({
     position: [entrance.centerX, layout.interior.floorY + 0.018, entrance.centerZ] as Vector3Tuple,
-    scale: [entrance.width * 0.9, 0.035, Math.max(0.14, entrance.depth * 2.2)] as Vector3Tuple,
+    scale: entrance.edge === 'front' || entrance.edge === 'rear'
+      ? [entrance.width * 0.9, 0.035, Math.max(0.14, entrance.depth * 2.2)] as Vector3Tuple
+      : [Math.max(0.14, entrance.width * 2.2), 0.035, entrance.depth * 0.9] as Vector3Tuple,
   }));
 
   return (

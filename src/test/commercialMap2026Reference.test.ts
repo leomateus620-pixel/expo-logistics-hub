@@ -77,7 +77,7 @@ describe('referência cartográfica oficial Fenasoja 2026', () => {
     expect(lotsByBlock.get('G')).not.toContain(4);
   });
 
-  it('incorpora os 1.144 módulos neutros dos sete pavilhões oficiais sem inventar área, comprador ou contrato', () => {
+  it('incorpora os 1.315 módulos neutros dos oito pavilhões oficiais sem inventar área, comprador ou contrato', () => {
     const pavilionReferences = [
       { publicIdentifier: 'B1', block: 'P1', moduleCount: 189, segmentId: 'industria-comercio-servicos' },
       { publicIdentifier: 'B2', block: 'P14', moduleCount: 186, segmentId: 'industria-comercio-servicos' },
@@ -86,9 +86,10 @@ describe('referência cartográfica oficial Fenasoja 2026', () => {
       { publicIdentifier: 'B5', block: 'P13', moduleCount: 103, segmentId: 'industria-comercio-servicos' },
       { publicIdentifier: 'B6', block: 'P3', moduleCount: 214, segmentId: 'industria-comercio-servicos' },
       { publicIdentifier: 'B8', block: 'P5', moduleCount: 81, segmentId: null },
+      { publicIdentifier: 'B10', block: 'P7', moduleCount: 171, segmentId: null },
     ] as const;
 
-    expect(OFFICIAL_REFERENCE_DATA.lots).toHaveLength(1406);
+    expect(OFFICIAL_REFERENCE_DATA.lots).toHaveLength(1577);
     pavilionReferences.forEach((reference) => {
       const pavilion = OFFICIAL_REFERENCE_DATA.entities.find(
         (entity) => entity.publicIdentifier === reference.publicIdentifier,
@@ -128,6 +129,47 @@ describe('referência cartográfica oficial Fenasoja 2026', () => {
         && lot.reservationExpiresAt === null
         && lot.saleDate === null
       ))).toBe(true);
+    });
+  });
+
+  it('aplica revisões, projeções métricas e aliases oficiais nos Pavilhões 14, 5 e 7', () => {
+    const pavilion14 = OFFICIAL_REFERENCE_DATA.entities.find((entity) => entity.publicIdentifier === 'B2')!;
+    const pavilion5 = OFFICIAL_REFERENCE_DATA.entities.find((entity) => entity.publicIdentifier === 'B8')!;
+    const pavilion7 = OFFICIAL_REFERENCE_DATA.entities.find((entity) => entity.publicIdentifier === 'B10')!;
+    const moduleFor = (pavilion: MapEntity) => OFFICIAL_REFERENCE_DATA.entities.find(
+      (entity) => entity.parentEntityId === pavilion.id && entity.classification === 'INTERNAL_STAND',
+    )!;
+
+    expect(pavilion14).toMatchObject({ name: 'Pavilhão 14 — Artesanato e Comércio' });
+    expect(pavilion14.metadata.aliases).toEqual(expect.arrayContaining([
+      'Pavilhão 14 — Comércio e Artesanato',
+    ]));
+    expect(pavilion7).toMatchObject({ name: 'Pavilhão 7 — Agroindústrias' });
+    expect(pavilion7.metadata.aliases).toEqual(expect.arrayContaining([
+      'Pavilhão 7 — Agricultura Familiar',
+      'Pavilhão 7 — Agricultura familiar / soja e derivados',
+    ]));
+
+    expect(moduleFor(pavilion14).metadata).toMatchObject({
+      layoutRevision: '2026.4-p14.2',
+      planCoordinateTransform: 'quarter-turn-clockwise',
+      projectionFit: 'metric-contain',
+      metricReference: { widthM: 35, depthM: 33 },
+      areaM2: null,
+    });
+    expect(moduleFor(pavilion5).metadata).toMatchObject({
+      layoutRevision: '2026.4-p5.2',
+      planCoordinateTransform: 'identity',
+      projectionFit: 'metric-contain',
+      metricReference: { widthM: 25.5, depthM: 43.5 },
+      areaM2: null,
+    });
+    expect(moduleFor(pavilion7).metadata).toMatchObject({
+      layoutRevision: '2026.4-p7.1',
+      planCoordinateTransform: 'identity',
+      projectionFit: 'metric-contain',
+      metricReference: { widthM: 49.9, depthM: 18.3 },
+      areaM2: null,
     });
   });
 
@@ -260,8 +302,8 @@ describe('referência cartográfica oficial Fenasoja 2026', () => {
     expect(new Set(lotIdentifiers).size).toBe(lotIdentifiers.length);
     expect(externalLotIdentifiers).toHaveLength(262);
     expect(externalLotIdentifiers.every((identifier) => /^Q-[A-Z]-\d{2}$/.test(identifier))).toBe(true);
-    expect(pavilionModuleIdentifiers).toHaveLength(1144);
-    expect(pavilionModuleIdentifiers.every((identifier) => /^B(?:1|2|3|4|5|6|8)-M\d{3}$/.test(identifier))).toBe(true);
+    expect(pavilionModuleIdentifiers).toHaveLength(1315);
+    expect(pavilionModuleIdentifiers.every((identifier) => /^B(?:1|2|3|4|5|6|8|10)-M\d{3}$/.test(identifier))).toBe(true);
     expect(OFFICIAL_REFERENCE_DATA.entities
       .filter((entity) => entity.classification === 'SELLABLE_LOT' || entity.classification === 'INTERNAL_STAND')
       .every((entity) => entity.metadata.buyerDataImported === false)).toBe(true);

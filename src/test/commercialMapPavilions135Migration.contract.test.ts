@@ -14,7 +14,12 @@ const migration = readFileSync(
   resolve('supabase/migrations/20260824210000_rebuild_pavilions_1_5_and_correct_pavilion_3.sql'),
   'utf8',
 );
+const supersedingMigration = readFileSync(
+  resolve('supabase/migrations/20260825030000_rebuild_pavilions_5_7_and_14_official_layouts.sql'),
+  'utf8',
+);
 const sql = migration.replace(/\s+/g, ' ').toLowerCase();
+const supersedingSql = supersedingMigration.replace(/\s+/g, ' ').toLowerCase();
 const runSection = migration.slice(
   migration.indexOf('CREATE TEMP TABLE _p135_runs'),
   migration.indexOf('CREATE TEMP TABLE _p135_cells'),
@@ -159,7 +164,7 @@ describe('contrato persistido dos Pavilhões 1, 3 e 5', () => {
     expect(sql).not.toMatch(/\bselect\s+public\.ensure_commission_map_segments\s*\(/);
   });
 
-  it('mantém IDs, ranges, sentidos e bounds SQL em paridade com as referências cliente', () => {
+  it('mantém IDs e sequências; trata o frame p5.1 como snapshot supersedido por p5.2', () => {
     expect(parsedRuns).toHaveLength(20);
 
     for (const [pavilionIdentifier, reference] of Object.entries(references)) {
@@ -181,11 +186,25 @@ describe('contrato persistido dos Pavilhões 1, 3 e 5', () => {
         expect(run!.cluster).toBe(expectedRun.cluster);
         expect(run!.moduleGap).toBeCloseTo(reference.moduleGap, 12);
 
-        const bounds = normalizedBounds(run!);
-        expect(bounds.centerX).toBeCloseTo(expectedRun.bounds.centerX, 12);
-        expect(bounds.centerZ).toBeCloseTo(expectedRun.bounds.centerZ, 12);
-        expect(bounds.width).toBeCloseTo(expectedRun.bounds.width, 12);
-        expect(bounds.depth).toBeCloseTo(expectedRun.bounds.depth, 12);
+        const historicalBounds = normalizedBounds(run!);
+        if (pavilionIdentifier === 'B8') {
+          const currentBounds = {
+            centerX: (run!.left + run!.width / 2) / 25.5,
+            centerZ: (run!.top + run!.depth / 2) / 43.5,
+            width: run!.width / 25.5,
+            depth: run!.depth / 43.5,
+          };
+          expect(currentBounds.centerX).toBeCloseTo(expectedRun.bounds.centerX, 12);
+          expect(currentBounds.centerZ).toBeCloseTo(expectedRun.bounds.centerZ, 12);
+          expect(currentBounds.width).toBeCloseTo(expectedRun.bounds.width, 12);
+          expect(currentBounds.depth).toBeCloseTo(expectedRun.bounds.depth, 12);
+          expect(historicalBounds.width).not.toBeCloseTo(expectedRun.bounds.width, 12);
+        } else {
+          expect(historicalBounds.centerX).toBeCloseTo(expectedRun.bounds.centerX, 12);
+          expect(historicalBounds.centerZ).toBeCloseTo(expectedRun.bounds.centerZ, 12);
+          expect(historicalBounds.width).toBeCloseTo(expectedRun.bounds.width, 12);
+          expect(historicalBounds.depth).toBeCloseTo(expectedRun.bounds.depth, 12);
+        }
       });
 
       const inventoryRuns = pavilionIdentifier === 'B1'
@@ -207,6 +226,8 @@ describe('contrato persistido dos Pavilhões 1, 3 e 5', () => {
     expect(sql).toContain("pavilion_identifier || '-m' || lpad(module_number::text, 3, '0')");
     expect(sql).toContain("pavilion_identifier || ':module:' || lpad(module_number::text, 3, '0')");
     expect(sql).toContain('(select count(*) from _p135_cells) <> 484');
+    expect(supersedingSql).toContain("'2026.4-p5.2', '2026.4-p5.1'");
+    expect(supersedingSql).toContain("('b8', 'east-bottom-01'");
   });
 
   it('persiste P3 com quatro colunas pareadas de 32 módulos e sem tails', () => {
@@ -264,7 +285,7 @@ describe('contrato persistido dos Pavilhões 1, 3 e 5', () => {
     expect(finalValidation).toContain(') is not null then');
   });
 
-  it('persiste quatro apoios permanentes de B8 como metadata, nunca como lotes', () => {
+  it('preserva os quatro apoios do snapshot p5.1 e valida o frame oficial p5.2', () => {
     const supportTable = migration.slice(
       migration.indexOf('CREATE TEMP TABLE _p135_b8_support_spaces'),
       migration.indexOf('DO $$', migration.indexOf('CREATE TEMP TABLE _p135_b8_support_spaces')),
@@ -288,13 +309,16 @@ describe('contrato persistido dos Pavilhões 1, 3 e 5', () => {
       expect(expected, support.id).toBeDefined();
       expect(support.label).toBe(expected!.label);
       expect(support.kind).toBe(expected!.kind);
-      expect(0.02 + ((support.left + support.width / 2) / 25.5) * 0.96)
-        .toBeCloseTo(expected!.centerX, 12);
-      expect(0.02 + ((support.top + support.depth / 2) / 43.5) * 0.96)
-        .toBeCloseTo(expected!.centerZ, 12);
-      expect((support.width / 25.5) * 0.96).toBeCloseTo(expected!.width, 12);
-      expect((support.depth / 43.5) * 0.96).toBeCloseTo(expected!.depth, 12);
+      const historicalWidth = (support.width / 25.5) * 0.96;
+      expect((support.left + support.width / 2) / 25.5).toBeCloseTo(expected!.centerX, 12);
+      expect((support.top + support.depth / 2) / 43.5).toBeCloseTo(expected!.centerZ, 12);
+      expect(support.width / 25.5).toBeCloseTo(expected!.width, 12);
+      expect(support.depth / 43.5).toBeCloseTo(expected!.depth, 12);
+      expect(historicalWidth).not.toBeCloseTo(expected!.width, 12);
     });
+    expect(supportPersistence).toContain('0.02 + ((support.left_m + support.width_m / 2) / 25.5) * 0.96');
+    expect(supersedingSql).toContain("'2026.4-p5.2', '2026.4-p5.1'");
+    expect(supersedingSql).toContain("('b8', 'deposito-fenasoja'");
     expect(supportPersistence).toContain("'type', 'permanent-non-commercial'");
     expect(supportPersistence).toContain("jsonb_build_object('internalsupportspaces', support_payload.payload)");
     expect(supportPersistence).not.toContain('insert into public.map_entities');

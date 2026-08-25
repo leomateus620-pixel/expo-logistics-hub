@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { OFFICIAL_REFERENCE_ENTITIES } from '@/features/commercial-map/data/officialReference2026';
 import type { MapEntity } from '@/features/commercial-map/types';
+import { resolveCommercialPavilionModulePlan } from '@/features/commercial-map/utils/commercialPavilionModules';
 import {
   COMMERCIAL_PAVILION_DEFINITIONS,
   COMMERCIAL_PAVILION_PUBLIC_IDENTIFIERS,
@@ -50,7 +51,7 @@ const EXPECTED_FACING_RADIANS = {
 } as const satisfies Record<CommercialPavilionPublicIdentifier, number>;
 const EXPECTED_INTERIOR_VIEW_ROTATIONS = {
   B1: Math.PI,
-  B2: 0,
+  B2: -Math.PI / 2,
   B3: Math.PI,
   B4: 0,
   B5: 0,
@@ -233,7 +234,7 @@ describe('família arquitetônica dos pavilhões comerciais', () => {
     ).toBeGreaterThan(1);
   });
 
-  it('abre somente Pavilhões 1, 3 e 12 pelo lado oposto sem alterar a fachada física', () => {
+  it('aplica a apresentação interna oficial sem alterar a fachada física', () => {
     EXPECTED_IDENTIFIERS.forEach((publicIdentifier) => {
       const definition = COMMERCIAL_PAVILION_DEFINITIONS[publicIdentifier];
       const facadeDirection = [
@@ -244,7 +245,9 @@ describe('família arquitetônica dos pavilhões comerciais', () => {
         Math.sin(definition.facingRadians + definition.interiorViewRotationRadians),
         Math.cos(definition.facingRadians + definition.interiorViewRotationRadians),
       ] as const;
-      const expectedDot = ['B1', 'B3', 'B6'].includes(publicIdentifier) ? -1 : 1;
+      const expectedDot = ['B1', 'B3', 'B6'].includes(publicIdentifier)
+        ? -1
+        : publicIdentifier === 'B2' ? 0 : 1;
 
       expect(horizontalDot(facadeDirection, interiorCameraDirection)).toBeCloseTo(
         expectedDot,
@@ -257,20 +260,24 @@ describe('família arquitetônica dos pavilhões comerciais', () => {
   it('materializa as entradas solicitadas e os elementos de separação das fachadas', () => {
     const layouts = Object.fromEntries(officialPavilions.map((entity) => {
       const definition = resolveCommercialPavilionDefinition(entity)!;
+      const modulePlan = resolveCommercialPavilionModulePlan(entity);
       return [
         entity.publicIdentifier,
         createCommercialPavilionLayout(
           commercialPavilionModelBounds(boundsFor(entity), definition.facingRadians),
           definition,
+          undefined,
+          modulePlan,
         ),
       ];
     })) as Record<CommercialPavilionPublicIdentifier, ReturnType<typeof createCommercialPavilionLayout>>;
 
-    EXPECTED_IDENTIFIERS.forEach((publicIdentifier) => {
+    EXPECTED_IDENTIFIERS.filter((publicIdentifier) => !['B2', 'B10'].includes(publicIdentifier))
+      .forEach((publicIdentifier) => {
       expect(layouts[publicIdentifier].exterior.facade.entrances).toHaveLength(
         COMMERCIAL_PAVILION_DEFINITIONS[publicIdentifier].entranceCount,
       );
-    });
+      });
 
     expect(layouts.B1.exterior.facade.entrances).toHaveLength(1);
     expect(layouts.B1.exterior.facade.entrances[0].centerX).toBe(0);
@@ -278,13 +285,26 @@ describe('família arquitetônica dos pavilhões comerciais', () => {
       layouts.B1.exterior.shell.width * 0.45,
     );
 
-    expect(layouts.B2.exterior.facade.entrances).toHaveLength(2);
-    expect(layouts.B2.exterior.facade.entrances[0].centerX).toBeLessThan(0);
-    expect(layouts.B2.exterior.facade.entrances[1].centerX).toBeGreaterThan(0);
-    expect(layouts.B2.exterior.facade.centralMass).not.toBeNull();
-    expect(layouts.B2.exterior.facade.centralMass!.width).toBeGreaterThan(
-      layouts.B2.exterior.facade.entrances[0].width,
-    );
+    expect(layouts.B2.exterior.facade.entrances).toHaveLength(3);
+    expect(layouts.B2.exterior.facade.rearEntrances).toHaveLength(3);
+    expect(layouts.B2.exterior.facade.centralMass).toBeNull();
+    const pavilion14Front = layouts.B2.exterior.facade.entrances;
+    expect(pavilion14Front[0].centerX).toBeGreaterThan(pavilion14Front[1].centerX);
+    expect(pavilion14Front[1].centerX).toBeGreaterThan(pavilion14Front[2].centerX);
+    expect(pavilion14Front[0].width).toBeCloseTo(pavilion14Front[2].width, 12);
+    expect(pavilion14Front[1].width / pavilion14Front[0].width).toBeCloseTo(5 / 4, 12);
+
+    expect(layouts.B10.exterior.facade.entrances).toHaveLength(1);
+    expect(layouts.B10.exterior.facade.rearEntrances).toHaveLength(1);
+    expect(layouts.B10.exterior.facade.leftEntrances).toHaveLength(0);
+    expect(layouts.B10.exterior.facade.rightEntrances).toHaveLength(2);
+    expect(layouts.B10.exterior.facade.rightEntrances.every((entrance) => (
+      entrance.kind === 'gate' && entrance.connectsTo === 'PAVILION_11_SHEET_02'
+    ))).toBe(true);
+    expect(
+      layouts.B10.exterior.facade.rightEntrances[0].depth
+      / layouts.B10.exterior.facade.entrances[0].width,
+    ).toBeCloseTo(3.5 / 3, 12);
 
     expect(layouts.B4.exterior.facade.entrances).toHaveLength(2);
     expect(layouts.B4.exterior.facade.rearEntrances).toHaveLength(1);

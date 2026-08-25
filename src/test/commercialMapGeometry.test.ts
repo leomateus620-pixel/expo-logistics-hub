@@ -104,16 +104,16 @@ describe('regras comerciais e segurança', () => {
       (entity) => entity.classification === 'INTERNAL_STAND',
     );
 
-    expect(OFFICIAL_REFERENCE_DATA.lots).toHaveLength(1406);
+    expect(OFFICIAL_REFERENCE_DATA.lots).toHaveLength(1577);
     expect(OFFICIAL_REFERENCE_DATA.lots.every((lot) => lot.status === 'BLOCKED')).toBe(true);
     expect(OFFICIAL_REFERENCE_DATA.lots.every((lot) => lot.pricingMode === 'NOT_FOR_SALE')).toBe(true);
     expect(OFFICIAL_REFERENCE_DATA.lots.every((lot) => lot.currentBuyer === null)).toBe(true);
     expect(exporuralLots).toHaveLength(95);
     expect(exporuralLots.every((entity) => entity.verificationStatus === 'VERIFIED')).toBe(true);
-    expect(pavilionModules).toHaveLength(1144);
+    expect(pavilionModules).toHaveLength(1315);
     expect(pavilionModules.every((entity) => entity.verificationStatus === 'NEEDS_REVIEW')).toBe(true);
     expect(new Set(pavilionModules.map((entity) => entity.metadata.pavilionPublicIdentifier))).toEqual(
-      new Set(['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B8']),
+      new Set(['B1', 'B2', 'B3', 'B4', 'B5', 'B6', 'B8', 'B10']),
     );
     expect(OFFICIAL_REFERENCE_DATA.entities.filter((entity) => !validateGeometry(entity.geometry).valid)).toEqual([]);
   });
