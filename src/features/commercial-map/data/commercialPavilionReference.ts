@@ -40,10 +40,10 @@ export interface CommercialPavilionReferenceProjectionFrame {
   coordinateTransform: CommercialPavilionReferenceCoordinateTransform;
 }
 
-export const DEFAULT_COMMERCIAL_PAVILION_REFERENCE_PROJECTION = {
+export const DEFAULT_COMMERCIAL_PAVILION_REFERENCE_PROJECTION: CommercialPavilionReferenceProjection = {
   coordinateTransform: 'identity',
   fit: 'stretch',
-} as const satisfies CommercialPavilionReferenceProjection;
+};
 
 export type CommercialPavilionReferenceSourceDiscrepancy =
   | 'official-range-omission'

@@ -11,6 +11,7 @@ import {
   type CommercialPavilionReferenceModuleOrientation,
   type CommercialPavilionReferenceProjection,
   type CommercialPavilionReferenceProjectionFrame,
+  type CommercialPavilionReferenceRect,
   type CommercialPavilionReferenceRun,
   type CommercialPavilionReferenceSequenceOrientation,
   type CommercialPavilionReferenceSupportSpace,
