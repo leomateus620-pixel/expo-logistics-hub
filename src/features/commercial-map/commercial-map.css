@@ -304,6 +304,10 @@
 .commercial-pavilion-plan-corridor { fill: #dce3dc; stroke: rgba(93,111,98,.24); stroke-width: .6; vector-effect: non-scaling-stroke; }
 .commercial-pavilion-plan-corridor.is-atrium { fill: #e6ebe4; }
 .commercial-pavilion-plan-zone { fill: color-mix(in srgb, var(--pavilion-plan-accent) 66%, #fff); stroke: color-mix(in srgb, var(--pavilion-plan-accent) 88%, #173d2a); stroke-width: .65; vector-effect: non-scaling-stroke; }
+.commercial-pavilion-plan-irregular-modules { fill: color-mix(in srgb, var(--pavilion-plan-accent) 16%, transparent); stroke: color-mix(in srgb, var(--pavilion-plan-accent) 92%, #173d2a); stroke-width: .9; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.commercial-pavilion-plan-support-space { fill: #7a817b; stroke: #46514b; stroke-width: .8; stroke-dasharray: 1.4 1; vector-effect: non-scaling-stroke; }
+.commercial-pavilion-plan-support-space.is-accommodation { fill: #87918a; }
+.commercial-pavilion-plan-support-space.is-service { fill: #68736d; }
 .commercial-pavilion-plan-overview dl { display: grid; min-width: 0; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 6px; margin: 0; }
 .commercial-pavilion-plan-overview dl > div { min-width: 0; padding: 6px 7px; border: 1px solid rgba(28,65,40,.07); border-radius: 8px; background: #f3f6f1; }
 .commercial-pavilion-plan-overview dt { color: #718078; font-size: 10px; font-weight: 800; letter-spacing: .045em; text-transform: uppercase; }
@@ -312,10 +316,18 @@
 .commercial-pavilion-plan-groups > span { display: inline-flex; min-width: 0; align-items: baseline; gap: 4px; padding: 4px 6px; border: 1px solid color-mix(in srgb, var(--pavilion-plan-accent) 20%, #dfe5df); border-radius: 999px; background: color-mix(in srgb, var(--pavilion-plan-accent) 7%, #fff); }
 .commercial-pavilion-plan-groups b { color: #204832; font-family: 'JetBrains Mono', monospace; font-size: 10px; }
 .commercial-pavilion-plan-groups small { overflow: hidden; max-width: 80px; color: #66756c; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.commercial-pavilion-plan-support-spaces { display: grid; gap: 5px; padding: 0 12px 10px; }
+.commercial-pavilion-plan-support-spaces > span { display: grid; grid-template-columns: 8px minmax(0,1fr) auto; align-items: center; gap: 6px; min-width: 0; border: 1px solid rgba(70,81,75,.14); border-radius: 7px; background: #f4f6f3; padding: 5px 7px; }
+.commercial-pavilion-plan-support-spaces i { width: 8px; height: 8px; border: 1px dashed #46514b; border-radius: 2px; background: #7a817b; }
+.commercial-pavilion-plan-support-spaces i.is-accommodation { background: #87918a; }
+.commercial-pavilion-plan-support-spaces i.is-service { background: #68736d; }
+.commercial-pavilion-plan-support-spaces b { overflow: hidden; color: #344b3e; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
+.commercial-pavilion-plan-support-spaces small { color: #78847d; font-size: 9px; font-weight: 750; }
 .commercial-pavilion-plan-legend > footer { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; padding: 8px 12px 9px; border-top: 1px solid rgba(31,66,43,.07); background: #f2f5f0; }
 .commercial-pavilion-plan-legend > footer > span { display: inline-flex; align-items: center; gap: 5px; color: #53665a; font-size: 10px; font-weight: 800; }
 .commercial-pavilion-plan-legend > footer > span > i { width: 8px; height: 8px; border-radius: 2px; background: var(--pavilion-plan-accent); }
 .commercial-pavilion-plan-legend > footer > span:nth-child(2) > i { border: 1px solid #aeb9b0; background: #dde4dd; }
+.commercial-pavilion-plan-legend > footer > span.is-support > i { border: 1px dashed #46514b; background: #7a817b; }
 .commercial-pavilion-plan-legend > footer > small { flex: 1 1 100%; color: #77837c; font-size: 10px; }
 .commercial-pavilion-plan-legend.is-interior { position: absolute; z-index: 15; bottom: 14px; left: 14px; width: min(360px, calc(100% - 28px)); margin: 0; pointer-events: none; background: rgba(250,252,248,.92); box-shadow: 0 16px 44px rgba(28,47,35,.18); backdrop-filter: blur(16px) saturate(1.08); }
 

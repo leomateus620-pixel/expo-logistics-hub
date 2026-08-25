@@ -281,6 +281,7 @@
   .commercial-pavilion-plan-legend.is-interior .commercial-pavilion-plan-overview dt { font-size: 0.625rem; }
   .commercial-pavilion-plan-legend.is-interior .commercial-pavilion-plan-overview dd { font-size: 0.6875rem; }
   .commercial-pavilion-plan-legend.is-interior .commercial-pavilion-plan-groups { display: none; }
+  .commercial-pavilion-plan-legend.is-interior .commercial-pavilion-plan-support-spaces { display: none; }
   .commercial-pavilion-plan-legend.is-interior > footer { padding: 0.4rem 0.65rem 0.45rem; }
   .commercial-pavilion-plan-legend.is-interior > footer > span { display: none; }
   .commercial-pavilion-plan-legend.is-interior > footer > small { font-size: 0.625rem; }

@@ -24,10 +24,23 @@ describe('renderer operacional do interior comercial', () => {
     expect(layer).toContain('ref={setModuleBaseMesh}');
     expect(layer).toMatch(/ref=\{setCorridorMesh\}[\s\S]*?raycast=\{NO_RAYCAST\}/);
     expect(layer).toContain('isMapSelectionClick(event.delta)');
-    expect(interior).toContain("['B2', 'B3', 'B6'].includes(modulePlan.publicIdentifier)");
+    expect(interior).toContain("modulePlan.source.interpretation === 'official-reference-runs'");
+    expect(interior).toContain('modulePlan.supportSpaces');
+    expect(interior).toContain('moduleRenderParts(cell)');
     expect(interior).toContain('buildProtectedPlanRects(modulePlan, layout)');
     expect(interior).toMatch(/layout\.interior\.columns[\s\S]*?rectanglesOverlap/);
     expect(interior).toMatch(/layout\.exterior\.structure\.columnZs[\s\S]*?rectanglesOverlap/);
+  });
+
+  it('renderiza apoios permanentes fora da seleção e mantém partes compostas no mesmo módulo', () => {
+    const layer = read('src/features/commercial-map/components/canvas/CommercialPavilionModuleLayer.tsx');
+
+    expect(layer).toContain('projectedModuleParts');
+    expect(layer).toContain('part.cell.id');
+    expect(layer).toContain('projectedSupportSpaces');
+    expect(layer).toContain('ref={setSupportSpaceMesh}');
+    expect(layer).toMatch(/ref=\{setSupportSpaceMesh\}[\s\S]*?raycast=\{NO_RAYCAST\}/);
+    expect(layer).not.toMatch(/setSelectedModuleId\(supportSpace/);
   });
 
   it('expõe a legenda de situações comerciais também no interior', () => {

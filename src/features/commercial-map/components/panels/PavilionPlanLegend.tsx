@@ -1,5 +1,8 @@
 import { memo, type CSSProperties } from 'react';
 import type { CommercialPavilionModulePlan } from '../../utils/commercialPavilionModules';
+import type {
+  CommercialPavilionReferenceCellShape,
+} from '../../data/commercialPavilionReference';
 
 const area = new Intl.NumberFormat('pt-BR', {
   minimumFractionDigits: 0,
@@ -8,6 +11,25 @@ const area = new Intl.NumberFormat('pt-BR', {
 
 function moduleLabel(value: number) {
   return String(value).padStart(2, '0');
+}
+
+function moduleRangeLabel(range: readonly [number, number]) {
+  return range[0] === range[1]
+    ? moduleLabel(range[0])
+    : `${moduleLabel(range[0])}–${moduleLabel(range[1])}`;
+}
+
+function irregularShapePath(shape: CommercialPavilionReferenceCellShape): string {
+  if (shape.footprint.length < 3) return '';
+  return `${shape.footprint.map(([x, z], index) => (
+    `${index === 0 ? 'M' : 'L'}${x * 100} ${z * 100}`
+  )).join(' ')} Z`;
+}
+
+function referenceShapeForCell(
+  cell: CommercialPavilionModulePlan['cells'][number],
+): CommercialPavilionReferenceCellShape | undefined {
+  return cell.shape;
 }
 
 export const PavilionPlanLegend = memo(function PavilionPlanLegend({
@@ -19,6 +41,14 @@ export const PavilionPlanLegend = memo(function PavilionPlanLegend({
 }) {
   const maximum = plan.stats.moduleCount;
   const accentStyle = { '--pavilion-plan-accent': plan.colorCue } as CSSProperties;
+  const supportSpaces = plan.supportSpaces;
+  const irregularModulePath = plan.cells
+    .map((cell) => {
+      const shape = referenceShapeForCell(cell);
+      return shape ? irregularShapePath(shape) : '';
+    })
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <section
@@ -68,6 +98,29 @@ export const PavilionPlanLegend = memo(function PavilionPlanLegend({
               rx="1"
             />
           ))}
+          {irregularModulePath && (
+            <path
+              className="commercial-pavilion-plan-irregular-modules"
+              d={irregularModulePath}
+            />
+          )}
+          {supportSpaces.length > 0 && (
+            <g aria-label="Áreas permanentes de apoio não comercial">
+              {supportSpaces.map((supportSpace) => (
+                <rect
+                  key={supportSpace.id}
+                  className={`commercial-pavilion-plan-support-space is-${supportSpace.kind}`}
+                  x={(supportSpace.centerX - supportSpace.width / 2) * 100}
+                  y={(supportSpace.centerZ - supportSpace.depth / 2) * 100}
+                  width={supportSpace.width * 100}
+                  height={supportSpace.depth * 100}
+                  rx="0.8"
+                >
+                  <title>{supportSpace.label} · apoio permanente não comercial</title>
+                </rect>
+              ))}
+            </g>
+          )}
         </svg>
 
         <dl>
@@ -80,15 +133,36 @@ export const PavilionPlanLegend = memo(function PavilionPlanLegend({
 
       <div className="commercial-pavilion-plan-groups" aria-label="Sequências de módulos">
         {plan.zones.map((zone) => (
-          <span key={zone.id} title={`Módulos ${moduleLabel(zone.numberRange[0])}–${moduleLabel(zone.numberRange[1])}`}>
-            <b>{moduleLabel(zone.numberRange[0])}–{moduleLabel(zone.numberRange[1])}</b>
+          <span
+            key={zone.id}
+            title={`${zone.numberRange[0] === zone.numberRange[1] ? 'Módulo' : 'Módulos'} ${moduleRangeLabel(zone.numberRange)}`}
+          >
+            <b>{moduleRangeLabel(zone.numberRange)}</b>
           </span>
         ))}
       </div>
 
+      {supportSpaces.length > 0 && (
+        <div
+          className="commercial-pavilion-plan-support-spaces"
+          aria-label="Áreas permanentes de apoio não comercial"
+        >
+          {supportSpaces.map((supportSpace) => (
+            <span key={supportSpace.id}>
+              <i className={`is-${supportSpace.kind}`} aria-hidden="true" />
+              <b>{supportSpace.label}</b>
+              <small>Não comercial</small>
+            </span>
+          ))}
+        </div>
+      )}
+
       <footer>
-        <span><i aria-hidden="true" />Módulos numerados</span>
-        <span><i aria-hidden="true" />Circulação livre</span>
+        <span className="is-modules"><i aria-hidden="true" />Módulos numerados</span>
+        <span className="is-circulation"><i aria-hidden="true" />Circulação livre</span>
+        {supportSpaces.length > 0 && (
+          <span className="is-support"><i aria-hidden="true" />Apoio permanente</span>
+        )}
         <small>Área individual não atribuída · expositores não vinculados</small>
       </footer>
     </section>

@@ -2,16 +2,20 @@ import type { MapEntity } from '../types';
 import {
   type CommercialPavilionModuleSource,
   type CommercialPavilionReferenceCell,
+  type CommercialPavilionReferenceCellShape,
   type CommercialPavilionReferenceCorridor,
   type CommercialPavilionReferenceModuleOrientation,
   type CommercialPavilionReferenceRun,
   type CommercialPavilionReferenceSequenceOrientation,
+  type CommercialPavilionReferenceSupportSpace,
 } from '../data/commercialPavilionReference';
+import { PAVILION1_COMMERCIAL_REFERENCE } from '../data/pavilion1CommercialReference';
 import { PAVILION12_COMMERCIAL_REFERENCE } from '../data/pavilion12CommercialReference';
 import { PAVILION14_COMMERCIAL_REFERENCE } from '../data/pavilion14CommercialReference';
 import {
   PAVILION3_COMMERCIAL_REFERENCE,
 } from '../data/pavilion3CommercialReference';
+import { PAVILION5_COMMERCIAL_REFERENCE } from '../data/pavilion5CommercialReference';
 import {
   COMMERCIAL_PAVILION_PUBLIC_IDENTIFIERS,
   type CommercialPavilionPublicIdentifier,
@@ -43,7 +47,8 @@ export type CommercialPavilionCorridorKind =
   | 'main'
   | 'cross'
   | 'perimeter'
-  | 'atrium';
+  | 'atrium'
+  | 'access';
 
 /** Pavilion-local X/Z rectangle normalized to the official footprint. */
 export interface NormalizedCommercialPavilionRect {
@@ -85,6 +90,7 @@ export interface CommercialPavilionModuleCell
   sortOrder?: number;
   group?: string | null;
   cluster?: string;
+  shape?: CommercialPavilionReferenceCellShape;
   source?: CommercialPavilionModuleSource;
 }
 
@@ -115,6 +121,7 @@ export interface CommercialPavilionModulePlan {
   boundary: NormalizedCommercialPavilionRect;
   zones: readonly CommercialPavilionModuleZone[];
   corridors: readonly CommercialPavilionCorridor[];
+  supportSpaces: readonly CommercialPavilionReferenceSupportSpace[];
   cells: readonly CommercialPavilionModuleCell[];
   source: {
     document: string;
@@ -289,6 +296,7 @@ function buildPlan(seed: CommercialPavilionModulePlanSeed): CommercialPavilionMo
   return {
     ...seed,
     zones,
+    supportSpaces: [],
     cells,
     source: {
       document: 'Fenasoja - Planta Pavilhões Internos.pdf',
@@ -300,36 +308,12 @@ function buildPlan(seed: CommercialPavilionModulePlanSeed): CommercialPavilionMo
 
 type GeneratedCommercialPavilionPublicIdentifier = Exclude<
   CommercialPavilionPublicIdentifier,
-  'B2' | 'B3' | 'B6'
+  'B1' | 'B2' | 'B3' | 'B6' | 'B8'
 >;
 
 const PLAN_SEEDS: Readonly<
   Record<GeneratedCommercialPavilionPublicIdentifier, CommercialPavilionModulePlanSeed>
 > = {
-  B1: {
-    publicIdentifier: 'B1',
-    topology: 'perimeter-central-island',
-    colorCue: '#D97706',
-    stats: {
-      pavilionNumber: 1,
-      category: 'Comércio e Serviços',
-      moduleCount: 189,
-      totalAreaSquareMeters: 1201.5,
-      moduleAreaSquareMeters: 587,
-    },
-    boundary: OFFICIAL_BOUNDARY,
-    zones: [
-      zone('north-run', 'Ala norte · 01–61', 'perimeter', rect(0.52, 0.1, 0.84, 0.12), 1, 61, 'row-major', { flipX: true }),
-      zone('west-return', 'Retorno oeste · 62–64', 'perimeter', rect(0.08, 0.25, 0.08, 0.2), 3, 1, 'column-major'),
-      zone('central-island', 'Ilha central · 65–140', 'island', rect(0.54, 0.48, 0.68, 0.2), 2, 38),
-      zone('south-run', 'Ala sul · 141–189', 'perimeter', rect(0.5, 0.88, 0.84, 0.12), 1, 49, 'row-major'),
-    ],
-    corridors: [
-      corridor('north-crossing', 'Travessia norte', 'cross', rect(0.53, 0.27, 0.82, 0.1)),
-      corridor('central-loop', 'Circulação da ilha', 'main', rect(0.53, 0.66, 0.82, 0.16)),
-      corridor('south-approach', 'Acesso sul', 'cross', rect(0.5, 0.77, 0.84, 0.06)),
-    ],
-  },
   B4: {
     publicIdentifier: 'B4',
     topology: 'side-runs-central-island',
@@ -380,30 +364,6 @@ const PLAN_SEEDS: Readonly<
       corridor('south-crossing', 'Travessia sul', 'cross', rect(0.58, 0.88, 0.56, 0.06)),
     ],
   },
-  B8: {
-    publicIdentifier: 'B8',
-    topology: 'horticulture-u-gallery',
-    colorCue: '#1F9BF0',
-    stats: {
-      pavilionNumber: 5,
-      category: 'Floriculturas',
-      moduleCount: 81,
-      totalAreaSquareMeters: 841.5,
-      moduleAreaSquareMeters: 244.5,
-    },
-    boundary: OFFICIAL_BOUNDARY,
-    zones: [
-      zone('north-greenhouse', 'Ala norte · 01–43', 'gallery', rect(0.5, 0.12, 0.88, 0.15), 1, 43, 'row-major', { flipX: true }),
-      zone('southwest-greenhouse', 'Ala sudoeste · 44–62', 'gallery', rect(0.27, 0.82, 0.4, 0.15), 1, 19, 'row-major'),
-      zone('southeast-greenhouse', 'Ala sudeste · 63–81', 'gallery', rect(0.73, 0.82, 0.4, 0.15), 1, 19, 'row-major'),
-    ],
-    corridors: [
-      corridor('garden-court', 'Praça de floricultura', 'atrium', rect(0.5, 0.48, 0.76, 0.5)),
-      corridor('garden-axis', 'Eixo ajardinado', 'main', rect(0.5, 0.61, 0.055, 0.35)),
-      corridor('garden-crossing', 'Travessia norte', 'cross', rect(0.5, 0.24, 0.82, 0.08)),
-      corridor('south-entrance', 'Acesso sul', 'cross', rect(0.5, 0.82, 0.05, 0.15)),
-    ],
-  },
   B10: {
     publicIdentifier: 'B10',
     topology: 'agroindustry-six-runs',
@@ -442,6 +402,7 @@ interface OfficialCommercialPavilionReference {
   modularAreaM2: number;
   runs: readonly CommercialPavilionReferenceRun[];
   corridors: readonly CommercialPavilionReferenceCorridor[];
+  supportSpaces?: readonly CommercialPavilionReferenceSupportSpace[];
   cells: readonly CommercialPavilionReferenceCell<CommercialPavilionPublicIdentifier>[];
   source: {
     document: string;
@@ -485,6 +446,7 @@ function buildOfficialCommercialPavilionPlan(
     boundary: OFFICIAL_BOUNDARY,
     zones,
     corridors: reference.corridors,
+    supportSpaces: reference.supportSpaces ?? [],
     cells: reference.cells,
     source: {
       document: reference.source.document,
@@ -497,7 +459,13 @@ function buildOfficialCommercialPavilionPlan(
 export const COMMERCIAL_PAVILION_MODULE_PLANS = Object.fromEntries(
   COMMERCIAL_PAVILION_PUBLIC_IDENTIFIERS.map((publicIdentifier) => [
     publicIdentifier,
-    publicIdentifier === 'B2'
+    publicIdentifier === 'B1'
+      ? buildOfficialCommercialPavilionPlan(
+        PAVILION1_COMMERCIAL_REFERENCE,
+        'perimeter-central-island',
+        '#D97706',
+      )
+      : publicIdentifier === 'B2'
       ? buildOfficialCommercialPavilionPlan(
         PAVILION14_COMMERCIAL_REFERENCE,
         'parallel-double-island',
@@ -515,6 +483,12 @@ export const COMMERCIAL_PAVILION_MODULE_PLANS = Object.fromEntries(
             'side-runs-twin-islands',
             '#13CFAC',
           )
+          : publicIdentifier === 'B8'
+            ? buildOfficialCommercialPavilionPlan(
+              PAVILION5_COMMERCIAL_REFERENCE,
+              'horticulture-u-gallery',
+              '#1F9BF0',
+            )
           : buildPlan(PLAN_SEEDS[publicIdentifier]),
   ]),
 ) as Readonly<

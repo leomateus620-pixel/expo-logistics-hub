@@ -27,11 +27,13 @@ import {
 } from './exporuralReference2026';
 import { withCommercialMapSegmentMetadata } from './commercialMapSegments';
 import type { CommercialPavilionReferenceCell } from './commercialPavilionReference';
+import { PAVILION1_COMMERCIAL_REFERENCE_CELLS } from './pavilion1CommercialReference';
 import { PAVILION12_COMMERCIAL_REFERENCE_CELLS } from './pavilion12CommercialReference';
 import { PAVILION14_COMMERCIAL_REFERENCE_CELLS } from './pavilion14CommercialReference';
 import {
   PAVILION3_COMMERCIAL_REFERENCE_CELLS,
 } from './pavilion3CommercialReference';
+import { PAVILION5_COMMERCIAL_REFERENCE_CELLS } from './pavilion5CommercialReference';
 import { commercialPavilionModelBounds } from '../utils/commercialPavilions';
 
 type PdfPoint = [number, number];
@@ -475,14 +477,14 @@ function addStructure(
 
 // Pavilions and infrastructure B1–B42, following the official lower legend.
 const bStructures: Array<[string, string, MapClassification, string, PdfBounds | PdfPoint, Parameters<typeof addStructure>[5]?]> = [
-  ['B1', 'Pavilhão 1 — Comércio e serviços', 'PAVILION', 'pavilions', [2298, 3600, 2655, 3759]],
+  ['B1', 'Pavilhão 1 — Indústria, Comércio e Serviços', 'PAVILION', 'pavilions', [2298, 3600, 2655, 3759]],
   ['B2', 'Pavilhão 14 — Comércio e Artesanato', 'PAVILION', 'pavilions', [2418, 3833, 2658, 4074]],
   ['B3', 'Pavilhão 12 — Indústria, Comércio e Serviços', 'PAVILION', 'pavilions', [2792, 3827, 3147, 4089]],
   ['B4', 'Pavilhão 8 — Indústria e comércio', 'PAVILION', 'pavilions', [3172, 3788, 3296, 4100]],
   ['B5', 'Pavilhão 13 — Comércio', 'PAVILION', 'pavilions', [3307, 3788, 3445, 4051]],
-  ['B6', 'Pavilhão 3 — Comércio', 'PAVILION', 'pavilions', [3460, 3786, 3670, 4098]],
+  ['B6', 'Pavilhão 3 — Indústria e Comércio', 'PAVILION', 'pavilions', [3460, 3786, 3670, 4098]],
   ['B7', 'Pavilhão 4 — Cozinha da Soja', 'PAVILION', 'pavilions', [3495, 2497, 3666, 2568], { parent: 'N' }],
-  ['B8', 'Pavilhão 5 — Floriculturas', 'PAVILION', 'pavilions', [3198, 2203, 3411, 2390]],
+  ['B8', 'Pavilhão 5 — Veterinária, Pequenos Animais e Rações', 'PAVILION', 'pavilions', [3198, 2203, 3411, 2390]],
   ['B9', 'Pavilhões 6, 10 e 11 — Pecuária', 'PAVILION', 'pavilions', [2319, 2256, 3179, 2389]],
   ['B10', 'Pavilhão 7 — Agricultura familiar / soja e derivados', 'PAVILION', 'pavilions', [1973, 2252, 2309, 2379]],
   ['B11', 'Centro administrativo / auditório', 'ADMINISTRATION', 'structures', [3735, 3850, 3860, 4150]],
@@ -643,6 +645,31 @@ function pavilionModuleGeometry(
   cell: CommercialPavilionReferenceCell,
   facingRadians: number,
 ): PolygonGeometry {
+  const projectPoint = pavilionModulePointProjector(pavilion, facingRadians);
+  const normalizedFootprint = cell.shape?.footprint ?? [
+    [cell.centerX - cell.width / 2, cell.centerZ - cell.depth / 2],
+    [cell.centerX + cell.width / 2, cell.centerZ - cell.depth / 2],
+    [cell.centerX + cell.width / 2, cell.centerZ + cell.depth / 2],
+    [cell.centerX - cell.width / 2, cell.centerZ + cell.depth / 2],
+  ];
+  const corners = normalizedFootprint.map(projectPoint);
+  corners.push([...corners[0]] as Coordinate);
+  return {
+    id: null,
+    type: 'Polygon',
+    coordinates: [corners],
+    elevation: pavilion.geometry.elevation,
+    extrusionHeight: 0,
+    rotation: facingRadians,
+    geometryVersion: 1,
+    calibrationVersion: null,
+  };
+}
+
+function pavilionModulePointProjector(
+  pavilion: MapEntity,
+  facingRadians: number,
+): (point: readonly [number, number]) => Coordinate {
   const ring = pavilion.geometry.coordinates[0];
   const xs = ring.map(([x]) => x);
   const zs = ring.map(([, z]) => z);
@@ -661,29 +688,13 @@ function pavilionModuleGeometry(
   const clearDepth = modelBounds.depth - 2 * shortSide * 0.025 - 2 * shortSide * 0.065;
   const cosine = Math.cos(facingRadians);
   const sine = Math.sin(facingRadians);
-  const corners: Coordinate[] = [
-    [cell.centerX - cell.width / 2, cell.centerZ - cell.depth / 2],
-    [cell.centerX + cell.width / 2, cell.centerZ - cell.depth / 2],
-    [cell.centerX + cell.width / 2, cell.centerZ + cell.depth / 2],
-    [cell.centerX - cell.width / 2, cell.centerZ + cell.depth / 2],
-  ].map(([normalizedX, normalizedZ]) => {
+  return ([normalizedX, normalizedZ]) => {
     const localX = (normalizedX - 0.5) * clearWidth;
     const localZ = (normalizedZ - 0.5) * clearDepth;
     return [
       centerX + localX * cosine + localZ * sine,
       centerZ - localX * sine + localZ * cosine,
     ];
-  });
-  corners.push([...corners[0]] as Coordinate);
-  return {
-    id: null,
-    type: 'Polygon',
-    coordinates: [corners],
-    elevation: pavilion.geometry.elevation,
-    extrusionHeight: 0,
-    rotation: facingRadians,
-    geometryVersion: 1,
-    calibrationVersion: null,
   };
 }
 
@@ -692,17 +703,22 @@ function pavilionModuleLabelAnchor(
   cell: CommercialPavilionReferenceCell,
   facingRadians: number,
 ): Coordinate {
-  const geometry = pavilionModuleGeometry(pavilion, cell, facingRadians);
-  const ring = geometry.coordinates[0].slice(0, -1);
-  return [
-    ring.reduce((total, [x]) => total + x, 0) / ring.length,
-    ring.reduce((total, [, z]) => total + z, 0) / ring.length,
-  ];
+  return pavilionModulePointProjector(pavilion, facingRadians)(cell.labelAnchor);
 }
 
 const officialBaseEntities = entityInputs.map(toEntity);
 
 const pavilionModuleReferences = [
+  {
+    publicIdentifier: 'B1',
+    pavilionNumber: 1,
+    block: 'P1',
+    layoutRevision: '2026.4-p1.1',
+    source: 'Croqui Pavilhão 1 - Fenasoja 2026.pdf',
+    facingRadians: Math.PI / 2,
+    segmentId: 'industria-comercio-servicos',
+    cells: PAVILION1_COMMERCIAL_REFERENCE_CELLS,
+  },
   {
     publicIdentifier: 'B2',
     pavilionNumber: 14,
@@ -710,6 +726,7 @@ const pavilionModuleReferences = [
     layoutRevision: '2026.4-p14.1',
     source: 'Anexo 2 e Anexo 6 — Pavilhão 14 — Comércio e Artesanato',
     facingRadians: Math.PI / 2,
+    segmentId: 'industria-comercio-servicos',
     cells: PAVILION14_COMMERCIAL_REFERENCE_CELLS,
   },
   {
@@ -719,16 +736,28 @@ const pavilionModuleReferences = [
     layoutRevision: '2026.4-p12.1',
     source: 'Anexo 1 e Anexo 6 — Pavilhão 12 — Indústria, Comércio e Serviços',
     facingRadians: Math.PI,
+    segmentId: 'industria-comercio-servicos',
     cells: PAVILION12_COMMERCIAL_REFERENCE_CELLS,
   },
   {
     publicIdentifier: 'B6',
     pavilionNumber: 3,
     block: 'P3',
-    layoutRevision: '2026.4-p3.2',
-    source: 'Anexo 3 e Anexo 6 — Pavilhão 3 — Comércio',
+    layoutRevision: '2026.4-p3.3',
+    source: 'Croqui Pavilhão 3 - Fenasoja 2026.pdf',
     facingRadians: Math.PI,
+    segmentId: 'industria-comercio-servicos',
     cells: PAVILION3_COMMERCIAL_REFERENCE_CELLS,
+  },
+  {
+    publicIdentifier: 'B8',
+    pavilionNumber: 5,
+    block: 'P5',
+    layoutRevision: '2026.4-p5.1',
+    source: 'Croqui Pavilhão 5 - Fenasoja 2026.pdf',
+    facingRadians: 0,
+    segmentId: null,
+    cells: PAVILION5_COMMERCIAL_REFERENCE_CELLS,
   },
 ] as const;
 
@@ -748,8 +777,8 @@ const pavilionModuleEntities: MapEntity[] = pavilionModuleReferences.flatMap((re
       projectId: pavilion.projectId,
       layerId: 'reference:commercial',
       parentEntityId: pavilion.id,
-      segmentId: 'industria-comercio-servicos',
-      segmentSource: 'derived',
+      segmentId: reference.segmentId,
+      ...(reference.segmentId ? { segmentSource: 'derived' as const } : {}),
       publicIdentifier,
       name: `Módulo ${cell.label}`,
       description: `Módulo comercial neutro do Pavilhão ${reference.pavilionNumber}, sem expositor vinculado.`,
@@ -783,9 +812,11 @@ const pavilionModuleEntities: MapEntity[] = pavilionModuleReferences.flatMap((re
         group: cell.group,
         cluster: cell.cluster,
         sourceDiscrepancy: cell.source.discrepancy,
-        segmentId: 'industria-comercio-servicos',
-        segmentCode: 'INDUSTRIA_COMERCIO_SERVICOS',
-        segmentName: 'Indústria, Comércio e Serviços',
+        ...(reference.segmentId ? {
+          segmentId: reference.segmentId,
+          segmentCode: 'INDUSTRIA_COMERCIO_SERVICOS',
+          segmentName: 'Indústria, Comércio e Serviços',
+        } : {}),
       },
     } satisfies MapEntity;
   });
@@ -859,7 +890,7 @@ export const OFFICIAL_REFERENCE_LOTS: CommercialLot[] = officialLotEntities.map(
 
 export const OFFICIAL_REFERENCE_DATA: CommercialMapData = {
   source: 'official-reference',
-  sourceMessage: 'Planta oficial 2026 digitalizada sem importar compradores. Os 95 lotes da Exporural possuem áreas cadastrais validadas; os 657 módulos dos Pavilhões 3, 12 e 14 permanecem sem área individual e todos os 919 lotes/módulos ficam bloqueados até liberação comercial.',
+  sourceMessage: 'Planta oficial 2026 digitalizada sem importar compradores. Os 95 lotes da Exporural possuem áreas cadastrais validadas; os 927 módulos dos Pavilhões 1, 3, 5, 12 e 14 permanecem sem área individual e todos os 1.189 lotes/módulos ficam bloqueados até liberação comercial.',
   project: {
     id: 'reference:fenasoja-2026',
     orgId: null,

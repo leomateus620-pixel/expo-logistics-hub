@@ -46,9 +46,11 @@ describe('pavilion module commercial identity', () => {
   const pavilion = { id: 'pavilion-b6', publicIdentifier: 'B6' };
 
   it.each([
+    { pavilionIdentifier: 'B1', moduleNumber: 58 },
     { pavilionIdentifier: 'B2', moduleNumber: 73 },
     { pavilionIdentifier: 'B3', moduleNumber: 41 },
     { pavilionIdentifier: 'B6', moduleNumber: 48 },
+    { pavilionIdentifier: 'B8', moduleNumber: 81 },
   ])('mantém identidade, situação e navegação estáveis em $pavilionIdentifier', ({
     pavilionIdentifier,
     moduleNumber,

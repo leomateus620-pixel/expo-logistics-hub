@@ -17,6 +17,9 @@ import {
   type CommercialPavilionLocalRect,
   type CommercialPavilionModulePlan,
 } from '../../utils/commercialPavilionModules';
+import type {
+  CommercialPavilionReferenceRect,
+} from '../../data/commercialPavilionReference';
 import {
   buildCommercialPavilionModuleVisualStateIndex,
   type CommercialPavilionModuleVisualState,
@@ -35,6 +38,12 @@ interface InstanceTransform {
   position: Vector3Tuple;
   scale: Vector3Tuple;
   rotation?: Vector3Tuple;
+}
+
+function moduleRenderParts(
+  cell: CommercialPavilionModulePlan['cells'][number],
+): readonly CommercialPavilionReferenceRect[] {
+  return cell.shape?.renderParts.length ? cell.shape.renderParts : [cell];
 }
 
 function rectanglesOverlap(
@@ -57,8 +66,13 @@ function buildProtectedPlanRects(
     depth: layout.interior.clearDepth,
   };
   return [
-    ...plan.cells.map((cell) => projectCommercialPavilionModuleRect(cell, footprint)),
+    ...plan.cells.flatMap((cell) => moduleRenderParts(cell).map((part) => (
+      projectCommercialPavilionModuleRect(part, footprint)
+    ))),
     ...plan.corridors.map((corridor) => projectCommercialPavilionModuleRect(corridor, footprint)),
+    ...plan.supportSpaces.map((supportSpace) => (
+      projectCommercialPavilionModuleRect(supportSpace, footprint)
+    )),
   ];
 }
 
@@ -211,6 +225,7 @@ function PavilionInteriorCameraRig({
     targetPosition.current.copy(destination);
     targetLookAt.current.copy(lookAt);
     camera.position.copy(reducedGraphics ? destination : start);
+    camera.lookAt(lookAt);
     camera.near = 0.035;
     camera.far = Math.max(120, maximumDimension * 12);
     if (camera instanceof THREE.PerspectiveCamera) camera.fov = portrait ? 47 : compact ? 44 : 40;
@@ -351,7 +366,10 @@ export const CommercialPavilionInteriorScene = memo(function CommercialPavilionI
 
   if (!definition || !layout || !modulePlan || !floorGeometry) return null;
   const perimeter = createLowPerimeter(layout);
-  const protectedPlanRects = ['B2', 'B3', 'B6'].includes(modulePlan.publicIdentifier)
+  const hasReferenceGeometry = modulePlan.source.interpretation === 'official-reference-runs'
+    || modulePlan.supportSpaces.length > 0
+    || modulePlan.cells.some((cell) => Boolean(cell.shape));
+  const protectedPlanRects = hasReferenceGeometry
     ? buildProtectedPlanRects(modulePlan, layout)
     : [];
   const structureClearance = Math.max(
