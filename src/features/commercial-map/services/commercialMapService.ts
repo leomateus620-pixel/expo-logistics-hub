@@ -80,6 +80,27 @@ interface ActivityRow {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const db = supabase as any;
 
+// PostgREST caps every response at 1000 rows. The park already exceeds that
+// (1.7k+ entities/geometries), so unpaginated queries silently truncate whole
+// pavilions out of the map. Page through with a stable ordering until a short
+// page signals the end.
+const MAP_PAGE_SIZE = 1000;
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function fetchAllRows(buildQuery: () => any): Promise<{ data: any[] | null; error: any }> {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const all: any[] = [];
+  for (let from = 0; ; from += MAP_PAGE_SIZE) {
+    const { data, error } = await buildQuery()
+      .order('id')
+      .range(from, from + MAP_PAGE_SIZE - 1);
+    if (error) return { data: null, error };
+    const rows = data ?? [];
+    all.push(...rows);
+    if (rows.length < MAP_PAGE_SIZE) return { data: all, error: null };
+  }
+}
+
 function isMissingMapInfrastructure(error: { code?: string; message?: string }): boolean {
   return error.code === '42P01'
     || error.code === 'PGRST205'
@@ -390,12 +411,12 @@ async function fetchCommissionCommercialMap(
     throw maintenanceResult.error;
   }
 
-  const entitiesResult = await db
+  const entitiesResult = await fetchAllRows(() => db
     .from('map_entities')
     .select('*')
     .eq('project_id', project.id)
     .eq('segment_id', segment.id)
-    .eq('is_archived', false);
+    .eq('is_archived', false));
 
   if (entitiesResult.error) {
     if (isMissingMapSegmentInfrastructure(entitiesResult.error)) {
@@ -411,15 +432,15 @@ async function fetchCommissionCommercialMap(
   const layerIds = [...new Set(entityRows.map((entity) => entity.layer_id))];
   const [layersResult, geometriesResult, lotsResult] = await Promise.all([
     db.from('map_layers').select('*').eq('project_id', project.id).in('id', layerIds).order('sort_order'),
-    db.from('map_entity_geometries').select('*').eq('project_id', project.id).eq('is_current', true).in('entity_id', entityIds),
-    db.from('commercial_lots').select(`
+    fetchAllRows(() => db.from('map_entity_geometries').select('*').eq('project_id', project.id).eq('is_current', true).in('entity_id', entityIds)),
+    fetchAllRows(() => db.from('commercial_lots').select(`
       *,
       lot_prices(is_active, pricing_mode, base_price, price_per_sqm, asking_price, minimum_price),
       lot_reservations(status, company_name, expires_at, responsible_name),
       lot_negotiations(status, company_name, contact_name),
       lot_sales(status, buyer_name, sale_date, salesperson_name, contract_number),
       lot_contracts(is_active, contract_number)
-    `).eq('project_id', project.id).is('archived_at', null).in('entity_id', entityIds),
+    `).eq('project_id', project.id).is('archived_at', null).in('entity_id', entityIds)),
   ]);
 
   const firstError = [layersResult, geometriesResult, lotsResult]
@@ -520,10 +541,10 @@ export async function fetchCommercialMap(
     segmentsResult,
   ] = await Promise.all([
     db.from('map_layers').select('*').eq('project_id', project.id).order('sort_order'),
-    db.from('map_entities').select('*').eq('project_id', project.id).eq('is_archived', false),
-    db.from('map_entity_geometries').select('*').eq('project_id', project.id).eq('is_current', true),
+    fetchAllRows(() => db.from('map_entities').select('*').eq('project_id', project.id).eq('is_archived', false)),
+    fetchAllRows(() => db.from('map_entity_geometries').select('*').eq('project_id', project.id).eq('is_current', true)),
     db.from('map_calibrations').select('*').eq('project_id', project.id).order('version', { ascending: false }).limit(1).maybeSingle(),
-    db.from('commercial_lots').select('*, lot_prices(*), lot_reservations(*), lot_negotiations(*), lot_sales(*), lot_contracts(*)').eq('project_id', project.id).is('archived_at', null),
+    fetchAllRows(() => db.from('commercial_lots').select('*, lot_prices(*), lot_reservations(*), lot_negotiations(*), lot_sales(*), lot_contracts(*)').eq('project_id', project.id).is('archived_at', null)),
     db.from('commercial_lots').select('id').eq('project_id', project.id).limit(1),
     db.from('map_segments').select('id, slug').eq('project_id', project.id).eq('is_active', true),
   ]);
