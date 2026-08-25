@@ -77,6 +77,12 @@ export interface CommercialPavilionDefinition {
     entranceHeightRatio: number;
     centralMassRatio: number;
   };
+  /** Optional official accesses on the wall opposite the public facade. */
+  rearFacade?: {
+    entrancePattern: CommercialPavilionEntrancePattern;
+    entranceWidthRatio: number;
+    entranceHeightRatio: number;
+  };
 }
 
 export interface CommercialPavilionRect {
@@ -142,6 +148,7 @@ export interface CommercialPavilionLayout {
       dividerXs: number[];
       centralMass: CommercialPavilionVolume | null;
       entrances: CommercialPavilionEntrance[];
+      rearEntrances: CommercialPavilionEntrance[];
     };
     structure: {
       columnSize: number;
@@ -231,39 +238,49 @@ export const COMMERCIAL_PAVILION_DEFINITIONS = {
   B4: {
     publicIdentifier: 'B4',
     pavilionNumber: 8,
-    officialName: 'Pavilhão 8 — Indústria e comércio',
-    activity: 'Indústria e comércio',
+    officialName: 'Pavilhão 8 — Indústria e Comércio',
+    activity: 'Indústria e Comércio',
     variant: 'monitor-industrial',
     roofProfile: 'raised-monitor',
-    entrancePattern: 'side-service',
-    entranceCount: 1,
+    entrancePattern: 'paired-offset',
+    entranceCount: 2,
     facingRadians: Math.PI,
     interiorViewRotationRadians: 0,
     focusDirection: [-0.06, 0.8, -0.95],
     visualHeight: { scale: 0.53, min: 2.1, max: 2.42 },
     facade: {
-      entranceWidthRatio: 0.34,
+      entranceWidthRatio: 0.2,
       entranceHeightRatio: 0.58,
       centralMassRatio: 0,
+    },
+    rearFacade: {
+      entrancePattern: 'side-service',
+      entranceWidthRatio: 0.14,
+      entranceHeightRatio: 0.5,
     },
   },
   B5: {
     publicIdentifier: 'B5',
     pavilionNumber: 13,
-    officialName: 'Pavilhão 13 — Comércio',
-    activity: 'Comércio',
+    officialName: 'Pavilhão 13 — Indústria e Comércio',
+    activity: 'Indústria e Comércio',
     variant: 'stepped-market',
     roofProfile: 'asymmetric-shed',
-    entrancePattern: 'recessed-central',
-    entranceCount: 1,
+    entrancePattern: 'paired-offset',
+    entranceCount: 2,
     facingRadians: Math.PI,
     interiorViewRotationRadians: 0,
     focusDirection: [-0.14, 0.78, -0.94],
     visualHeight: { scale: 0.5, min: 2.08, max: 2.38 },
     facade: {
-      entranceWidthRatio: 0.36,
+      entranceWidthRatio: 0.18,
       entranceHeightRatio: 0.52,
       centralMassRatio: 0,
+    },
+    rearFacade: {
+      entrancePattern: 'paired-offset',
+      entranceWidthRatio: 0.14,
+      entranceHeightRatio: 0.5,
     },
   },
   B6: {
@@ -442,30 +459,30 @@ function evenlySpacedPositions(span: number, bayCount: number, inset: number): n
 }
 
 function entranceCenters(
-  definition: CommercialPavilionDefinition,
+  entrancePattern: CommercialPavilionEntrancePattern,
   shellWidth: number,
   centralMassWidth: number,
 ): number[] {
-  if (definition.entrancePattern === 'split-central-mass') {
+  if (entrancePattern === 'split-central-mass') {
     const sideWidth = (shellWidth - centralMassWidth) / 2;
     return [
       -centralMassWidth / 2 - sideWidth / 2,
       centralMassWidth / 2 + sideWidth / 2,
     ];
   }
-  if (definition.entrancePattern === 'paired-offset') {
+  if (entrancePattern === 'paired-offset') {
     return [-shellWidth * 0.25, shellWidth * 0.25];
   }
-  if (definition.entrancePattern === 'side-service') {
+  if (entrancePattern === 'side-service') {
     return [shellWidth * 0.22];
   }
-  if (definition.entrancePattern === 'triple-bays') {
+  if (entrancePattern === 'triple-bays') {
     return [-shellWidth * 0.3, 0, shellWidth * 0.3];
   }
-  if (definition.entrancePattern === 'paired-end-bays') {
+  if (entrancePattern === 'paired-end-bays') {
     return [-shellWidth * 0.32, shellWidth * 0.32];
   }
-  if (definition.entrancePattern === 'paired-market-bays') {
+  if (entrancePattern === 'paired-market-bays') {
     return [-shellWidth * 0.22, shellWidth * 0.22];
   }
   return [0];
@@ -502,7 +519,11 @@ export function createCommercialPavilionLayout(
   const centralMassWidth = shellWidth * definition.facade.centralMassRatio;
   const entranceWidth = shellWidth * definition.facade.entranceWidthRatio;
   const entranceHeight = shellHeight * definition.facade.entranceHeightRatio;
-  const entranceCenterXs = entranceCenters(definition, shellWidth, centralMassWidth);
+  const entranceCenterXs = entranceCenters(
+    definition.entrancePattern,
+    shellWidth,
+    centralMassWidth,
+  );
   const entranceDepth = Math.max(facadeDepth, shortSide * 0.018);
   const entrances = entranceCenterXs.map((centerX, index): CommercialPavilionEntrance => ({
     id: `${definition.publicIdentifier}:entrance:${index + 1}`,
@@ -514,6 +535,26 @@ export function createCommercialPavilionLayout(
     height: entranceHeight,
     depth: entranceDepth,
   }));
+  const rearEntranceWidth = shellWidth
+    * (definition.rearFacade?.entranceWidthRatio ?? 0);
+  const rearEntranceHeight = shellHeight
+    * (definition.rearFacade?.entranceHeightRatio ?? 0);
+  const rearEntrances = definition.rearFacade
+    ? entranceCenters(
+        definition.rearFacade.entrancePattern,
+        shellWidth,
+        0,
+      ).map((centerX, index): CommercialPavilionEntrance => ({
+        id: `${definition.publicIdentifier}:rear-entrance:${index + 1}`,
+        index,
+        centerX,
+        centerY: slabTopY + rearEntranceHeight / 2,
+        centerZ: backZ + entranceDepth / 2,
+        width: rearEntranceWidth,
+        height: rearEntranceHeight,
+        depth: entranceDepth,
+      }))
+    : [];
   const dividerXs = definition.entrancePattern === 'triple-bays'
     ? entrances.slice(0, -1).map((entrance, index) => (
       (entrance.centerX + entrances[index + 1].centerX) / 2
@@ -626,6 +667,7 @@ export function createCommercialPavilionLayout(
         dividerXs,
         centralMass,
         entrances,
+        rearEntrances,
       },
       structure: {
         columnSize: structureColumnSize,

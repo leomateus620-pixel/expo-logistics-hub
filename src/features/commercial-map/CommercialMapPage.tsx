@@ -439,7 +439,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
                   <div className="commercial-map-dialog-icon"><DatabaseZap /></div>
                   <AlertDialogTitle>Sincronizar a cartografia oficial 2026?</AlertDialogTitle>
                   <AlertDialogDescription>
-                      A sincronização importa 21 quadras, 262 lotes externos e 927 módulos neutros dos Pavilhões 1, 3, 5, 12 e 14, além de vias e infraestrutura, sem copiar compradores. Os módulos entram bloqueados, sem preço e sem área individual; registros comerciais existentes e geometrias já validadas são preservados.
+                      A sincronização importa 21 quadras, 262 lotes externos e 1.144 módulos neutros dos Pavilhões 1, 3, 5, 8, 12, 13 e 14, além de vias e infraestrutura, sem copiar compradores. Os módulos entram bloqueados, sem preço e sem área individual; registros comerciais existentes e geometrias já validadas são preservados.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>

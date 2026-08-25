@@ -6,7 +6,7 @@ import type {
 
 const area = new Intl.NumberFormat('pt-BR', {
   minimumFractionDigits: 0,
-  maximumFractionDigits: 1,
+  maximumFractionDigits: 2,
 });
 
 function moduleLabel(value: number) {
@@ -42,6 +42,25 @@ export const PavilionPlanLegend = memo(function PavilionPlanLegend({
   const maximum = plan.stats.moduleCount;
   const accentStyle = { '--pavilion-plan-accent': plan.colorCue } as CSSProperties;
   const supportSpaces = plan.supportSpaces;
+  const overviewRects = [
+    plan.boundary,
+    ...plan.corridors,
+    ...plan.zones.map((zone) => zone.bounds),
+    ...supportSpaces,
+  ];
+  const overviewExtent = overviewRects.reduce((extent, rect) => ({
+    minX: Math.min(extent.minX, rect.centerX - rect.width / 2),
+    minZ: Math.min(extent.minZ, rect.centerZ - rect.depth / 2),
+    maxX: Math.max(extent.maxX, rect.centerX + rect.width / 2),
+    maxZ: Math.max(extent.maxZ, rect.centerZ + rect.depth / 2),
+  }), { minX: 0, minZ: 0, maxX: 1, maxZ: 1 });
+  const overviewPadding = 0.015;
+  const overviewViewBox = [
+    (overviewExtent.minX - overviewPadding) * 100,
+    (overviewExtent.minZ - overviewPadding) * 100,
+    (overviewExtent.maxX - overviewExtent.minX + overviewPadding * 2) * 100,
+    (overviewExtent.maxZ - overviewExtent.minZ + overviewPadding * 2) * 100,
+  ].join(' ');
   const irregularModulePath = plan.cells
     .map((cell) => {
       const shape = referenceShapeForCell(cell);
@@ -49,6 +68,12 @@ export const PavilionPlanLegend = memo(function PavilionPlanLegend({
     })
     .filter(Boolean)
     .join(' ');
+  const preciseZoneIds = new Set(
+    plan.cells.filter((cell) => Boolean(cell.shape)).map((cell) => cell.zoneId),
+  );
+  const preciseRegularCells = plan.cells.filter((cell) => (
+    preciseZoneIds.has(cell.zoneId) && !cell.shape
+  ));
 
   return (
     <section
@@ -67,7 +92,7 @@ export const PavilionPlanLegend = memo(function PavilionPlanLegend({
       </header>
 
       <div className="commercial-pavilion-plan-overview">
-        <svg viewBox="0 0 100 100" role="img" aria-label="Diagrama simplificado dos setores e corredores">
+        <svg viewBox={overviewViewBox} role="img" aria-label="Diagrama simplificado dos setores e corredores">
           <rect
             className="commercial-pavilion-plan-boundary"
             x={(plan.boundary.centerX - plan.boundary.width / 2) * 100}
@@ -87,7 +112,7 @@ export const PavilionPlanLegend = memo(function PavilionPlanLegend({
               rx="1"
             />
           ))}
-          {plan.zones.map((zone) => (
+          {plan.zones.filter((zone) => !preciseZoneIds.has(zone.id)).map((zone) => (
             <rect
               key={zone.id}
               className="commercial-pavilion-plan-zone"
@@ -95,6 +120,17 @@ export const PavilionPlanLegend = memo(function PavilionPlanLegend({
               y={(zone.bounds.centerZ - zone.bounds.depth / 2) * 100}
               width={zone.bounds.width * 100}
               height={zone.bounds.depth * 100}
+              rx="1"
+            />
+          ))}
+          {preciseRegularCells.map((cell) => (
+            <rect
+              key={cell.id}
+              className="commercial-pavilion-plan-zone"
+              x={(cell.centerX - cell.width / 2) * 100}
+              y={(cell.centerZ - cell.depth / 2) * 100}
+              width={cell.width * 100}
+              height={cell.depth * 100}
               rx="1"
             />
           ))}
@@ -132,12 +168,12 @@ export const PavilionPlanLegend = memo(function PavilionPlanLegend({
       </div>
 
       <div className="commercial-pavilion-plan-groups" aria-label="Sequências de módulos">
-        {plan.zones.map((zone) => (
+        {plan.legendNumberRanges.map((range) => (
           <span
-            key={zone.id}
-            title={`${zone.numberRange[0] === zone.numberRange[1] ? 'Módulo' : 'Módulos'} ${moduleRangeLabel(zone.numberRange)}`}
+            key={`${range[0]}-${range[1]}`}
+            title={`${range[0] === range[1] ? 'Módulo' : 'Módulos'} ${moduleRangeLabel(range)}`}
           >
-            <b>{moduleRangeLabel(zone.numberRange)}</b>
+            <b>{moduleRangeLabel(range)}</b>
           </span>
         ))}
       </div>

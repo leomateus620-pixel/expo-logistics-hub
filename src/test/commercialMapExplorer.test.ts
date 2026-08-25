@@ -123,9 +123,9 @@ describe('explorador compartilhado de entidades do mapa comercial', () => {
   it('expõe somente facetas derivadas dos metadados existentes', () => {
     const facets = buildEntityExplorerFacets(officialIndex);
     expect(facets.classifications.find((option) => option.value === 'SELLABLE_LOT')?.count).toBe(262);
-    expect(facets.classifications.find((option) => option.value === 'INTERNAL_STAND')?.count).toBe(927);
+    expect(facets.classifications.find((option) => option.value === 'INTERNAL_STAND')?.count).toBe(1144);
     expect(facets.locations.find((option) => option.value === 'block:S')?.count).toBeGreaterThanOrEqual(37);
     expect(facets.locations.find((option) => option.label === 'Rua Chile')).toMatchObject({ group: 'Vias', count: 1 });
-    expect(facets.statusCounts.BLOCKED).toBe(1189);
+    expect(facets.statusCounts.BLOCKED).toBe(1406);
   });
 });

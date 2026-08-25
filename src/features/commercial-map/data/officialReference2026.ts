@@ -43,6 +43,14 @@ import {
   PAVILION3_COMMERCIAL_REFERENCE_CELLS,
 } from './pavilion3CommercialReference';
 import { PAVILION5_COMMERCIAL_REFERENCE_CELLS } from './pavilion5CommercialReference';
+import {
+  PAVILION8_COMMERCIAL_REFERENCE_CELLS,
+  PAVILION8_COMMERCIAL_REFERENCE_PROJECTION,
+} from './pavilion8CommercialReference';
+import {
+  PAVILION13_COMMERCIAL_REFERENCE_CELLS,
+  PAVILION13_COMMERCIAL_REFERENCE_PROJECTION,
+} from './pavilion13CommercialReference';
 import { commercialPavilionModelBounds } from '../utils/commercialPavilions';
 
 type PdfPoint = [number, number];
@@ -489,8 +497,8 @@ const bStructures: Array<[string, string, MapClassification, string, PdfBounds |
   ['B1', 'Pavilhão 1 — Indústria, Comércio e Serviços', 'PAVILION', 'pavilions', [2298, 3600, 2655, 3759]],
   ['B2', 'Pavilhão 14 — Comércio e Artesanato', 'PAVILION', 'pavilions', [2418, 3833, 2658, 4074]],
   ['B3', 'Pavilhão 12 — Indústria, Comércio e Serviços', 'PAVILION', 'pavilions', [2792, 3827, 3147, 4089]],
-  ['B4', 'Pavilhão 8 — Indústria e comércio', 'PAVILION', 'pavilions', [3172, 3788, 3296, 4100]],
-  ['B5', 'Pavilhão 13 — Comércio', 'PAVILION', 'pavilions', [3307, 3788, 3445, 4051]],
+  ['B4', 'Pavilhão 8 — Indústria e Comércio', 'PAVILION', 'pavilions', [3172, 3788, 3296, 4100]],
+  ['B5', 'Pavilhão 13 — Indústria e Comércio', 'PAVILION', 'pavilions', [3307, 3788, 3445, 4051]],
   ['B6', 'Pavilhão 3 — Indústria e Comércio', 'PAVILION', 'pavilions', [3460, 3786, 3670, 4098]],
   ['B7', 'Pavilhão 4 — Cozinha da Soja', 'PAVILION', 'pavilions', [3495, 2497, 3666, 2568], { parent: 'N' }],
   ['B8', 'Pavilhão 5 — Veterinária, Pequenos Animais e Rações', 'PAVILION', 'pavilions', [3198, 2203, 3411, 2390]],
@@ -775,6 +783,28 @@ const pavilionModuleReferences: readonly PavilionModuleReference[] = [
     cells: PAVILION12_COMMERCIAL_REFERENCE_CELLS,
   },
   {
+    publicIdentifier: 'B4',
+    pavilionNumber: 8,
+    block: 'P8',
+    layoutRevision: '2026.4-p8.1',
+    source: 'Croqui Pavilhão 8- Fenasoja 2026 com cozinha_page-0001 (2).jpg',
+    facingRadians: Math.PI,
+    segmentId: 'industria-comercio-servicos',
+    cells: PAVILION8_COMMERCIAL_REFERENCE_CELLS,
+    projection: PAVILION8_COMMERCIAL_REFERENCE_PROJECTION,
+  },
+  {
+    publicIdentifier: 'B5',
+    pavilionNumber: 13,
+    block: 'P13',
+    layoutRevision: '2026.4-p13.1',
+    source: 'Croqui Pavilhão 13 - Fenasoja 2026_page-0001.jpg',
+    facingRadians: Math.PI,
+    segmentId: 'industria-comercio-servicos',
+    cells: PAVILION13_COMMERCIAL_REFERENCE_CELLS,
+    projection: PAVILION13_COMMERCIAL_REFERENCE_PROJECTION,
+  },
+  {
     publicIdentifier: 'B6',
     pavilionNumber: 3,
     block: 'P3',
@@ -809,6 +839,14 @@ const pavilionModuleEntities: MapEntity[] = pavilionModuleReferences.flatMap((re
     ?? DEFAULT_COMMERCIAL_PAVILION_REFERENCE_PROJECTION;
   return reference.cells.map((cell) => {
     const publicIdentifier = `${reference.publicIdentifier}-M${String(cell.number).padStart(3, '0')}`;
+    const normalizedFootprint = cell.shape?.footprint ?? [
+      [cell.centerX - cell.width / 2, cell.centerZ - cell.depth / 2],
+      [cell.centerX + cell.width / 2, cell.centerZ - cell.depth / 2],
+      [cell.centerX + cell.width / 2, cell.centerZ + cell.depth / 2],
+      [cell.centerX - cell.width / 2, cell.centerZ + cell.depth / 2],
+      [cell.centerX - cell.width / 2, cell.centerZ - cell.depth / 2],
+    ] as const;
+    const renderParts = cell.shape?.renderParts ?? [cell];
     return {
       id: entityId(publicIdentifier),
       projectId: pavilion.projectId,
@@ -836,6 +874,10 @@ const pavilionModuleEntities: MapEntity[] = pavilionModuleReferences.flatMap((re
         ...(reference.projection ? {
           planCoordinateTransform: projection.coordinateTransform,
           projectionFit: projection.fit,
+          projectionAlignment: {
+            x: projection.alignX ?? 'center',
+            z: projection.alignZ ?? 'center',
+          },
           ...(projection.metricWidthM && projection.metricDepthM ? {
             metricReference: {
               widthM: projection.metricWidthM,
@@ -857,6 +899,20 @@ const pavilionModuleEntities: MapEntity[] = pavilionModuleReferences.flatMap((re
         moduleType: cell.type,
         areaM2: null,
         areaAssignment: 'unassigned',
+        normalizedFootprint: {
+          centerX: cell.centerX,
+          centerZ: cell.centerZ,
+          width: cell.width,
+          depth: cell.depth,
+        },
+        normalizedFootprintPolygon: normalizedFootprint,
+        renderParts: renderParts.map((part) => ({
+          centerX: part.centerX,
+          centerZ: part.centerZ,
+          width: part.width,
+          depth: part.depth,
+        })),
+        normalizedLabelAnchor: cell.labelAnchor,
         orientation: cell.orientation,
         sequenceOrientation: cell.sequenceOrientation,
         labelAnchor: pavilionModuleLabelAnchor(
@@ -947,7 +1003,7 @@ export const OFFICIAL_REFERENCE_LOTS: CommercialLot[] = officialLotEntities.map(
 
 export const OFFICIAL_REFERENCE_DATA: CommercialMapData = {
   source: 'official-reference',
-  sourceMessage: 'Planta oficial 2026 digitalizada sem importar compradores. Os 95 lotes da Exporural possuem áreas cadastrais validadas; os 927 módulos dos Pavilhões 1, 3, 5, 12 e 14 permanecem sem área individual e todos os 1.189 lotes/módulos ficam bloqueados até liberação comercial.',
+  sourceMessage: 'Planta oficial 2026 digitalizada sem importar compradores. Os 95 lotes da Exporural possuem áreas cadastrais validadas; os 1.144 módulos dos Pavilhões 1, 3, 5, 8, 12, 13 e 14 permanecem sem área individual e todos os 1.406 lotes/módulos ficam bloqueados até liberação comercial.',
   project: {
     id: 'reference:fenasoja-2026',
     orgId: null,

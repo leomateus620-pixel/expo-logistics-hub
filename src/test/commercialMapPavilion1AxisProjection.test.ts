@@ -189,6 +189,22 @@ describe('projeção oficial do Pavilhão 1', () => {
     expect(point).toEqual([0, 0]);
   });
 
+  it('alinha um plano métrico contido à fachada sem alterar sua escala uniforme', () => {
+    const frame = createCommercialPavilionReferenceProjectionFrame({
+      coordinateTransform: 'identity',
+      fit: 'metric-contain',
+      metricWidthM: 10,
+      metricDepthM: 10,
+      alignZ: 'end',
+    }, { width: 20, depth: 30 });
+
+    expect(frame.width).toBe(20);
+    expect(frame.depth).toBe(20);
+    expect(frame.centerX).toBe(0);
+    expect(frame.centerZ).toBe(5);
+    expect(projectCommercialPavilionReferencePoint([0.5, 1], frame)).toEqual([0, 15]);
+  });
+
   it('mantém as cotas, afastamentos, corredores e área modular do anexo oficial', () => {
     const west = metricRect('west-01-06');
     const south = metricRect('south-07-57');

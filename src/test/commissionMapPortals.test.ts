@@ -75,8 +75,8 @@ describe('portais comerciais por comissão', () => {
 
     expect(rural.entities).toHaveLength(111);
     expect(rural.lots).toHaveLength(95);
-    expect(industry.entities).toHaveLength(986);
-    expect(industry.lots).toHaveLength(949);
+    expect(industry.entities).toHaveLength(1203);
+    expect(industry.lots).toHaveLength(1166);
 
     const ruralIds = new Set(rural.entities.map((entity) => entity.id));
     expect(industry.entities.some((entity) => ruralIds.has(entity.id))).toBe(false);
@@ -84,6 +84,8 @@ describe('portais comerciais por comissão', () => {
     expect(industry.entities.some((entity) => entity.publicIdentifier === 'Q-R-55')).toBe(false);
     expect(industry.entities.some((entity) => entity.publicIdentifier === 'B3')).toBe(true);
     expect(industry.entities.some((entity) => entity.publicIdentifier === 'B1-M189')).toBe(true);
+    expect(industry.entities.some((entity) => entity.publicIdentifier === 'B4-M114')).toBe(true);
+    expect(industry.entities.some((entity) => entity.publicIdentifier === 'B5-M103')).toBe(true);
     expect(industry.entities.some((entity) => /^B8-M/.test(entity.publicIdentifier))).toBe(false);
 
     const industryExplorer = buildEntityExplorerIndex(industry.entities, industry.lots);

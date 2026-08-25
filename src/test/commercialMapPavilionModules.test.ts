@@ -21,6 +21,16 @@ import {
   PAVILION5_COMMERCIAL_SUPPORT_SPACES,
 } from '@/features/commercial-map/data/pavilion5CommercialReference';
 import {
+  PAVILION8_COMMERCIAL_GEOMETRIC_AREA_M2,
+  PAVILION8_COMMERCIAL_REFERENCE,
+  PAVILION8_COMMERCIAL_REFERENCE_CELLS,
+  PAVILION8_COMMERCIAL_SUPPORT_SPACES,
+} from '@/features/commercial-map/data/pavilion8CommercialReference';
+import {
+  PAVILION13_COMMERCIAL_REFERENCE,
+  PAVILION13_COMMERCIAL_REFERENCE_CELLS,
+} from '@/features/commercial-map/data/pavilion13CommercialReference';
+import {
   PAVILION12_COMMERCIAL_REFERENCE,
   PAVILION12_COMMERCIAL_REFERENCE_CELLS,
 } from '@/features/commercial-map/data/pavilion12CommercialReference';
@@ -60,18 +70,18 @@ const EXPECTED_PLANS = {
   },
   B4: {
     pavilionNumber: 8,
-    category: 'Indústria, Comércio e Serviços',
+    category: 'Indústria e Comércio',
     moduleCount: 114,
-    totalAreaSquareMeters: 760,
-    moduleAreaSquareMeters: 434,
+    totalAreaSquareMeters: 760.2,
+    moduleAreaSquareMeters: 438.5,
     ranges: [[1, 20], [21, 37], [38, 89], [90, 114]],
   },
   B5: {
     pavilionNumber: 13,
-    category: 'Comércio',
+    category: 'Indústria e Comércio',
     moduleCount: 103,
-    totalAreaSquareMeters: 709,
-    moduleAreaSquareMeters: 351,
+    totalAreaSquareMeters: 709.05,
+    moduleAreaSquareMeters: 351.3,
     ranges: [[1, 26], [27, 29], [30, 77], [78, 103]],
   },
   B6: {
@@ -153,6 +163,44 @@ function rectsOverlap(
     && a.bottom > b.top + epsilon;
 }
 
+function polygonArea(points: readonly (readonly [number, number])[]): number {
+  return Math.abs(points.reduce((total, [x, z], index) => {
+    const [nextX, nextZ] = points[(index + 1) % points.length];
+    return total + x * nextZ - nextX * z;
+  }, 0)) / 2;
+}
+
+function metricAreaForPlan(
+  plan: CommercialPavilionModulePlan,
+  metricWidthM: number,
+  metricDepthM: number,
+): number {
+  const normalizedSpan = 1;
+  return plan.cells.reduce((total, cell) => {
+    const normalizedArea = cell.shape
+      ? polygonArea(cell.shape.footprint)
+      : cell.width * cell.depth;
+    return total + normalizedArea
+      * metricWidthM * metricDepthM
+      / (normalizedSpan * normalizedSpan);
+  }, 0);
+}
+
+function expectNoModuleRenderPartOverlaps(plan: CommercialPavilionModulePlan): void {
+  const parts = plan.cells.flatMap((cell) => (
+    (cell.shape?.renderParts ?? [cell]).map((part) => ({ cell, part }))
+  ));
+  const conflicts: string[] = [];
+  parts.forEach(({ cell, part }, index) => {
+    parts.slice(index + 1).forEach(({ cell: otherCell, part: otherPart }) => {
+      if (cell.id !== otherCell.id && rectsOverlap(part, otherPart)) {
+        conflicts.push(`${cell.id} invade ${otherCell.id}`);
+      }
+    });
+  });
+  expect(conflicts).toEqual([]);
+}
+
 function expectOfficialPlan(
   publicIdentifier: CommercialPavilionPublicIdentifier,
   plan: CommercialPavilionModulePlan,
@@ -166,7 +214,7 @@ function expectOfficialPlan(
     totalAreaSquareMeters: expected.totalAreaSquareMeters,
     moduleAreaSquareMeters: expected.moduleAreaSquareMeters,
   });
-  expect(plan.zones.map((zone) => zone.numberRange)).toEqual(expected.ranges);
+  expect(plan.legendNumberRanges).toEqual(expected.ranges);
   expect(plan.cells).toHaveLength(expected.moduleCount);
 }
 
@@ -182,6 +230,8 @@ const OFFICIAL_REFERENCE_PAVILIONS = new Set<CommercialPavilionPublicIdentifier>
   'B1',
   'B2',
   'B3',
+  'B4',
+  'B5',
   'B6',
   'B8',
 ]);
@@ -346,7 +396,7 @@ describe('planos visuais dos módulos internos dos pavilhões', () => {
     expect(cell('B2', 36).centerX).toBeGreaterThan(cell('B2', 64).centerX);
     expect(cell('B2', 36).centerZ).toBeGreaterThan(cell('B2', 65).centerZ);
     expect(cell('B3', 1).centerX).toBeGreaterThan(cell('B3', 22).centerX);
-    expect(cell('B4', 90).centerZ).toBeGreaterThan(cell('B4', 114).centerZ);
+    expect(cell('B4', 90).centerZ).toBeLessThan(cell('B4', 114).centerZ);
     expect(cell('B8', 1).centerX).toBe(cell('B8', 43).centerX);
     expect(cell('B8', 1).centerZ).toBeGreaterThan(cell('B8', 43).centerZ);
     expect(cell('B10', 20).centerX).toBeGreaterThan(cell('B10', 33).centerX);
@@ -457,6 +507,139 @@ describe('planos visuais dos módulos internos dos pavilhões', () => {
       expect(space).not.toHaveProperty('number');
       expect(space).not.toHaveProperty('lotNumber');
     });
+  });
+
+  it('reconstrói o Pavilhão 8 em oito runs oficiais, com o módulo 90 irregular e sem sobreposições', () => {
+    const plan = COMMERCIAL_PAVILION_MODULE_PLANS.B4;
+    expect(plan.cells).toBe(PAVILION8_COMMERCIAL_REFERENCE_CELLS);
+    expect(plan.cells).toBe(PAVILION8_COMMERCIAL_REFERENCE.cells);
+    expect(plan.source.interpretation).toBe('official-reference-runs');
+    expect(plan.projection).toEqual({
+      coordinateTransform: 'identity',
+      fit: 'metric-contain',
+      metricWidthM: 21.7,
+      metricDepthM: 35.4,
+      alignX: 'center',
+      alignZ: 'end',
+    });
+    expect(plan.zones.map((zone) => zone.numberRange)).toEqual([
+      [1, 20],
+      [21, 25],
+      [26, 37],
+      [38, 63],
+      [64, 89],
+      [90, 90],
+      [91, 100],
+      [101, 114],
+    ]);
+
+    const cell = (number: number) => plan.cells[number - 1];
+    expectStrictlyDecreasing(Array.from({ length: 20 }, (_, index) => cell(index + 1).centerZ));
+    expectStrictlyDecreasing(Array.from({ length: 5 }, (_, index) => cell(index + 21).centerZ));
+    expectStrictlyDecreasing(Array.from({ length: 12 }, (_, index) => cell(index + 26).centerX));
+    expectStrictlyIncreasing(Array.from({ length: 26 }, (_, index) => cell(index + 38).centerZ));
+    expectStrictlyDecreasing(Array.from({ length: 26 }, (_, index) => cell(index + 64).centerZ));
+    expectStrictlyIncreasing(Array.from({ length: 10 }, (_, index) => cell(index + 91).centerZ));
+    expectStrictlyIncreasing(Array.from({ length: 14 }, (_, index) => cell(index + 101).centerZ));
+    expect(cell(1).centerX).toBe(cell(20).centerX);
+    expect(cell(38).centerX).toBeGreaterThan(cell(64).centerX);
+
+    const eastUpper = plan.zones.find((zone) => zone.id === 'east-upper-21-25')!;
+    const eastLower = plan.zones.find((zone) => zone.id === 'east-lower-01-20')!;
+    const westUpper = plan.zones.find((zone) => zone.id === 'west-upper-91-100')!;
+    const westLower = plan.zones.find((zone) => zone.id === 'west-lower-101-114')!;
+    expect((edges(eastLower.bounds).top - edges(eastUpper.bounds).bottom) * 35.4)
+      .toBeCloseTo(4, 12);
+    expect((edges(westLower.bounds).top - edges(westUpper.bounds).bottom) * 35.4)
+      .toBeCloseTo(4, 12);
+    ['west-cross-access', 'east-cross-access'].forEach((corridorId) => {
+      const access = plan.corridors.find((corridor) => corridor.id === corridorId)!;
+      expect(access.depth * 35.4).toBeCloseTo(4, 12);
+    });
+
+    const irregular = cell(90);
+    expect(plan.cells.filter((candidate) => candidate.shape)).toEqual([irregular]);
+    expect(irregular.shape?.footprint).toHaveLength(6);
+    expect(irregular.shape?.renderParts).toHaveLength(2);
+    expect(irregular.areaM2).toBeNull();
+    expect(PAVILION8_COMMERCIAL_GEOMETRIC_AREA_M2).toBe(438.5);
+    expect(metricAreaForPlan(plan, 21.7, 35.4)).toBeCloseTo(438.5, 9);
+    expectNoModuleRenderPartOverlaps(plan);
+  });
+
+  it('mantém cozinha, sanitários e apoio do Pavilhão 8 fora do inventário comercial', () => {
+    const plan = COMMERCIAL_PAVILION_MODULE_PLANS.B4;
+    expect(plan.supportSpaces).toBe(PAVILION8_COMMERCIAL_SUPPORT_SPACES);
+    expect(plan.supportSpaces).toHaveLength(3);
+    expect(plan.supportSpaces.map((space) => space.label)).toEqual([
+      'Sanitários',
+      'Cozinha',
+      'Apoio de serviço',
+    ]);
+    plan.supportSpaces.forEach((space) => {
+      expect(space.type).toBe('permanent-non-commercial');
+      expect(space.sourcePrecision).toBe('plan-traced');
+      expect(edges(space).top).toBeLessThan(edges(plan.boundary).top);
+      expect(plan.cells.some((candidate) => (
+        (candidate.shape?.renderParts ?? [candidate]).some((part) => rectsOverlap(part, space))
+      ))).toBe(false);
+      expect(space).not.toHaveProperty('number');
+      expect(space).not.toHaveProperty('lotNumber');
+      expect(space).not.toHaveProperty('status');
+    });
+  });
+
+  it('reconstrói o Pavilhão 13 no referencial da planta com quatro módulos poligonais', () => {
+    const plan = COMMERCIAL_PAVILION_MODULE_PLANS.B5;
+    expect(plan.cells).toBe(PAVILION13_COMMERCIAL_REFERENCE_CELLS);
+    expect(plan.cells).toBe(PAVILION13_COMMERCIAL_REFERENCE.cells);
+    expect(plan.source.interpretation).toBe('official-reference-runs');
+    expect(plan.projection).toEqual({
+      coordinateTransform: 'identity',
+      fit: 'metric-contain',
+      metricWidthM: 21,
+      metricDepthM: 35.35,
+      alignX: 'center',
+      alignZ: 'end',
+    });
+    expect(plan.zones.map((zone) => zone.numberRange)).toEqual([
+      [1, 15],
+      [16, 24],
+      [25, 25],
+      [26, 26],
+      [27, 29],
+      [30, 53],
+      [54, 77],
+      [78, 78],
+      [79, 79],
+      [80, 88],
+      [89, 103],
+    ]);
+
+    const cell = (number: number) => plan.cells[number - 1];
+    expectStrictlyDecreasing(Array.from({ length: 15 }, (_, index) => cell(index + 1).centerZ));
+    expectStrictlyDecreasing(Array.from({ length: 9 }, (_, index) => cell(index + 16).centerZ));
+    expectStrictlyDecreasing(Array.from({ length: 3 }, (_, index) => cell(index + 27).centerX));
+    expectStrictlyIncreasing(Array.from({ length: 24 }, (_, index) => cell(index + 30).centerZ));
+    expectStrictlyDecreasing(Array.from({ length: 24 }, (_, index) => cell(index + 54).centerZ));
+    expectStrictlyIncreasing(Array.from({ length: 9 }, (_, index) => cell(index + 80).centerZ));
+    expectStrictlyIncreasing(Array.from({ length: 15 }, (_, index) => cell(index + 89).centerZ));
+    expect(cell(30).centerX).toBeGreaterThan(cell(77).centerX);
+    expect(cell(30).centerZ).toBeCloseTo(cell(77).centerZ, 12);
+    expect(cell(53).centerZ).toBeCloseTo(cell(54).centerZ, 12);
+
+    expect(plan.cells.filter((candidate) => candidate.shape).map((candidate) => candidate.number))
+      .toEqual([25, 26, 78, 79]);
+    [25, 26, 78, 79].forEach((number) => {
+      expect(cell(number).shape?.footprint).toHaveLength(4);
+      expect(cell(number).shape?.renderParts.length).toBeGreaterThanOrEqual(12);
+      expect(cell(number).areaM2).toBeNull();
+    });
+    expect(metricAreaForPlan(plan, 21, 35.35)).toBeCloseTo(351.3, 9);
+    expect(PAVILION13_COMMERCIAL_REFERENCE.source.geometricModuleAreaM2)
+      .toBeCloseTo(351.3, 9);
+    expectNoModuleRenderPartOverlaps(plan);
+    expect(plan.supportSpaces).toEqual([]);
   });
 
   it('reproduz o Pavilhão 12 em sete sequências, 257 módulos de 1 × 3 m e três eixos de circulação', () => {

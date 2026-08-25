@@ -193,7 +193,8 @@ describe('família arquitetônica dos pavilhões comerciais', () => {
 
     expect(new Set(definitions.map((definition) => definition.variant)).size).toBe(8);
     expect(new Set(definitions.map((definition) => definition.roofProfile)).size).toBe(8);
-    expect(new Set(definitions.map((definition) => definition.entrancePattern)).size).toBe(8);
+    expect(new Set(definitions.map((definition) => definition.entrancePattern)).size)
+      .toBeGreaterThanOrEqual(6);
 
     definitions.forEach((definition) => {
       expect(definition.facingRadians).toBe(EXPECTED_FACING_RADIANS[definition.publicIdentifier]);
@@ -285,6 +286,14 @@ describe('família arquitetônica dos pavilhões comerciais', () => {
       layouts.B2.exterior.facade.entrances[0].width,
     );
 
+    expect(layouts.B4.exterior.facade.entrances).toHaveLength(2);
+    expect(layouts.B4.exterior.facade.rearEntrances).toHaveLength(1);
+    expect(layouts.B4.exterior.facade.rearEntrances[0].centerX).toBeGreaterThan(0);
+    expect(layouts.B5.exterior.facade.entrances).toHaveLength(2);
+    expect(layouts.B5.exterior.facade.rearEntrances).toHaveLength(2);
+    expect(layouts.B5.exterior.facade.rearEntrances[0].centerX).toBeLessThan(0);
+    expect(layouts.B5.exterior.facade.rearEntrances[1].centerX).toBeGreaterThan(0);
+
     expect(layouts.B6.exterior.facade.entrances).toHaveLength(3);
     expect(layouts.B6.exterior.facade.dividerXs).toHaveLength(2);
     expect(layouts.B6.exterior.facade.dividerXs[0]).toBeLessThan(0);
@@ -360,6 +369,16 @@ describe('família arquitetônica dos pavilhões comerciais', () => {
 
       layout.exterior.facade.entrances.forEach((entrance) => {
         expectRectInside(entrance, layout.width, layout.depth);
+        expect(entrance.centerY - entrance.height / 2).toBeGreaterThanOrEqual(
+          layout.exterior.slab.height - 1e-10,
+        );
+        expect(entrance.centerY + entrance.height / 2).toBeLessThanOrEqual(
+          layout.exterior.roof.eaveY + 1e-10,
+        );
+      });
+      layout.exterior.facade.rearEntrances.forEach((entrance) => {
+        expectRectInside(entrance, layout.width, layout.depth);
+        expect(entrance.centerZ).toBeLessThan(0);
         expect(entrance.centerY - entrance.height / 2).toBeGreaterThanOrEqual(
           layout.exterior.slab.height - 1e-10,
         );
