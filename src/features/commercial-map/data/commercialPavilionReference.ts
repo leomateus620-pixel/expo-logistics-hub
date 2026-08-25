@@ -21,6 +21,10 @@ export interface CommercialPavilionReferenceProjection {
   fit: CommercialPavilionReferenceProjectionFit;
   metricWidthM?: number;
   metricDepthM?: number;
+  /** Places a contained official plan inside the available pavilion frame. */
+  alignX?: 'start' | 'center' | 'end';
+  /** `end` anchors the source plan to the public +Z facade/entrances. */
+  alignZ?: 'start' | 'center' | 'end';
 }
 
 export interface CommercialPavilionReferenceProjectionFrame {
@@ -172,9 +176,18 @@ export function createCommercialPavilionReferenceProjectionFrame(
     depth = orientedMetricDepth * scale;
   }
 
+  const availableCenterX = available.centerX ?? 0;
+  const availableCenterZ = available.centerZ ?? 0;
+  const horizontalSlack = available.width - width;
+  const depthSlack = available.depth - depth;
+  const alignmentOffset = (
+    alignment: 'start' | 'center' | 'end' | undefined,
+    slack: number,
+  ) => alignment === 'start' ? -slack / 2 : alignment === 'end' ? slack / 2 : 0;
+
   return {
-    centerX: available.centerX ?? 0,
-    centerZ: available.centerZ ?? 0,
+    centerX: availableCenterX + alignmentOffset(projection.alignX, horizontalSlack),
+    centerZ: availableCenterZ + alignmentOffset(projection.alignZ, depthSlack),
     width,
     depth,
     coordinateTransform: projection.coordinateTransform,
@@ -240,8 +253,9 @@ export interface CommercialPavilionReferenceSupportSpace
   extends CommercialPavilionReferenceRect {
   id: string;
   label: string;
-  kind: 'storage' | 'accommodation' | 'service';
+  kind: 'storage' | 'accommodation' | 'service' | 'kitchen' | 'sanitary';
   type: 'permanent-non-commercial';
+  sourcePrecision?: 'official-metric' | 'plan-traced';
 }
 
 export interface CommercialPavilionModuleSource {

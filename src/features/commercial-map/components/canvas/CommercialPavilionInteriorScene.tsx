@@ -133,11 +133,34 @@ function createLowPerimeter(layout: CommercialPavilionLayout): InstanceTransform
   const { shell, facade } = layout.exterior;
   const wallHeight = Math.min(0.52, layout.height * 0.2);
   const thickness = Math.max(0.07, facade.columnSize * 0.68);
-  const walls: InstanceTransform[] = [
-    {
-      position: [0, wallHeight / 2, shell.backZ],
-      scale: [shell.width, wallHeight, thickness],
-    },
+  const wallSegments = (
+    wallZ: number,
+    entrances: CommercialPavilionLayout['exterior']['facade']['entrances'],
+  ): InstanceTransform[] => {
+    const ranges = entrances
+      .map((entry) => [entry.centerX - entry.width / 2, entry.centerX + entry.width / 2] as const)
+      .sort(([left], [right]) => left - right);
+    const segments: InstanceTransform[] = [];
+    let cursor = -shell.width / 2;
+    ranges.forEach(([left, right]) => {
+      if (left - cursor > 0.05) {
+        segments.push({
+          position: [(cursor + left) / 2, wallHeight / 2, wallZ],
+          scale: [left - cursor, wallHeight, thickness],
+        });
+      }
+      cursor = right;
+    });
+    if (shell.width / 2 - cursor > 0.05) {
+      segments.push({
+        position: [(cursor + shell.width / 2) / 2, wallHeight / 2, wallZ],
+        scale: [shell.width / 2 - cursor, wallHeight, thickness],
+      });
+    }
+    return segments;
+  };
+  return [
+    ...wallSegments(shell.backZ, facade.rearEntrances),
     {
       position: [-shell.width / 2, wallHeight / 2, 0],
       scale: [thickness, wallHeight, shell.depth],
@@ -146,27 +169,8 @@ function createLowPerimeter(layout: CommercialPavilionLayout): InstanceTransform
       position: [shell.width / 2, wallHeight / 2, 0],
       scale: [thickness, wallHeight, shell.depth],
     },
+    ...wallSegments(facade.frontZ, facade.entrances),
   ];
-  const ranges = facade.entrances
-    .map((entry) => [entry.centerX - entry.width / 2, entry.centerX + entry.width / 2] as const)
-    .sort(([left], [right]) => left - right);
-  let cursor = -shell.width / 2;
-  ranges.forEach(([left, right]) => {
-    if (left - cursor > 0.05) {
-      walls.push({
-        position: [(cursor + left) / 2, wallHeight / 2, facade.frontZ],
-        scale: [left - cursor, wallHeight, thickness],
-      });
-    }
-    cursor = right;
-  });
-  if (shell.width / 2 - cursor > 0.05) {
-    walls.push({
-      position: [(cursor + shell.width / 2) / 2, wallHeight / 2, facade.frontZ],
-      scale: [shell.width / 2 - cursor, wallHeight, thickness],
-    });
-  }
-  return walls;
 }
 
 function PavilionInteriorCameraRig({
@@ -416,7 +420,10 @@ export const CommercialPavilionInteriorScene = memo(function CommercialPavilionI
       position: [0, Math.min(0.72, layout.height * 0.3), z] as Vector3Tuple,
       scale: [layout.interior.clearWidth, 0.045, 0.045] as Vector3Tuple,
     }));
-  const thresholds = layout.exterior.facade.entrances.map((entrance) => ({
+  const thresholds = [
+    ...layout.exterior.facade.entrances,
+    ...layout.exterior.facade.rearEntrances,
+  ].map((entrance) => ({
     position: [entrance.centerX, layout.interior.floorY + 0.018, entrance.centerZ] as Vector3Tuple,
     scale: [entrance.width * 0.9, 0.035, Math.max(0.14, entrance.depth * 2.2)] as Vector3Tuple,
   }));

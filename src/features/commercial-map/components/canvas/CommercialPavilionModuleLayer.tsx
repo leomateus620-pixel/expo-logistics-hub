@@ -79,6 +79,8 @@ const SUPPORT_SPACE_COLORS: Readonly<
   storage: new THREE.Color('#7a817b'),
   accommodation: new THREE.Color('#87918a'),
   service: new THREE.Color('#68736d'),
+  kitchen: new THREE.Color('#8d7658'),
+  sanitary: new THREE.Color('#68828b'),
 };
 
 type OrientedModuleCell = CommercialPavilionModulePlan['cells'][number] & {
@@ -88,8 +90,119 @@ type OrientedModuleCell = CommercialPavilionModulePlan['cells'][number] & {
   shape?: CommercialPavilionReferenceCellShape;
 };
 
+interface ProjectedIrregularModule {
+  cell: OrientedModuleCell;
+  center: readonly [x: number, z: number];
+  footprint: readonly (readonly [x: number, z: number])[];
+}
+
 function moduleRenderParts(cell: OrientedModuleCell): readonly CommercialPavilionReferenceRect[] {
   return cell.shape?.renderParts.length ? cell.shape.renderParts : [cell];
+}
+
+function IrregularModuleMesh({
+  module,
+  floorY,
+  moduleHeight,
+  moduleBaseHeight,
+  color,
+  borderColor,
+  heightScale,
+  interactive,
+  castShadow,
+  onPointerMove,
+  onPointerOut,
+  onClick,
+}: {
+  module: ProjectedIrregularModule;
+  floorY: number;
+  moduleHeight: number;
+  moduleBaseHeight: number;
+  color: THREE.Color;
+  borderColor: THREE.Color;
+  heightScale: number;
+  interactive: boolean;
+  castShadow: boolean;
+  onPointerMove: (moduleId: string, event: ThreeEvent<PointerEvent>) => void;
+  onPointerOut: () => void;
+  onClick: (moduleId: string, event: ThreeEvent<MouseEvent>) => void;
+}) {
+  const geometry = useMemo(() => {
+    const shape = new THREE.Shape();
+    module.footprint.forEach(([x, z], index) => {
+      const localX = x - module.center[0];
+      const localShapeY = -(z - module.center[1]);
+      if (index === 0) shape.moveTo(localX, localShapeY);
+      else shape.lineTo(localX, localShapeY);
+    });
+    shape.closePath();
+    const nextGeometry = new THREE.ExtrudeGeometry(shape, {
+      depth: 1,
+      bevelEnabled: false,
+      curveSegments: 1,
+    });
+    nextGeometry.rotateX(-Math.PI / 2);
+    nextGeometry.computeBoundingBox();
+    nextGeometry.computeBoundingSphere();
+    return nextGeometry;
+  }, [module.center, module.footprint]);
+  const moduleMaterial = useMemo(() => new THREE.MeshStandardMaterial({
+    color: '#ffffff',
+    roughness: 0.68,
+    metalness: 0.025,
+  }), []);
+  const baseMaterial = useMemo(() => new THREE.MeshStandardMaterial({
+    color: '#ffffff',
+    roughness: 0.78,
+    metalness: 0.08,
+  }), []);
+  const footprintScale = heightScale > 1 ? 0.97 : 0.94;
+  const cellHeight = moduleHeight * heightScale;
+
+  useLayoutEffect(() => {
+    moduleMaterial.color.copy(color);
+    baseMaterial.color.copy(borderColor);
+    moduleMaterial.needsUpdate = true;
+    baseMaterial.needsUpdate = true;
+  }, [baseMaterial, borderColor, color, moduleMaterial]);
+
+  useEffect(() => () => {
+    geometry.dispose();
+    moduleMaterial.dispose();
+    baseMaterial.dispose();
+  }, [baseMaterial, geometry, moduleMaterial]);
+
+  return (
+    <group position={[module.center[0], 0, module.center[1]]} dispose={null}>
+      <mesh
+        position={[0, floorY + 0.006, 0]}
+        scale={[1, moduleBaseHeight, 1]}
+        geometry={geometry}
+        material={baseMaterial}
+        receiveShadow
+        {...(interactive ? {
+          onPointerMove: (event: ThreeEvent<PointerEvent>) => onPointerMove(module.cell.id, event),
+          onPointerOut,
+          onClick: (event: ThreeEvent<MouseEvent>) => onClick(module.cell.id, event),
+        } : { raycast: NO_RAYCAST })}
+        dispose={null}
+      />
+      <mesh
+        position={[0, floorY + moduleBaseHeight + 0.008, 0]}
+        scale={[footprintScale, cellHeight, footprintScale]}
+        geometry={geometry}
+        material={moduleMaterial}
+        castShadow={castShadow}
+        receiveShadow
+        {...(interactive ? {
+          onPointerMove: (event: ThreeEvent<PointerEvent>) => onPointerMove(module.cell.id, event),
+          onPointerOut,
+          onClick: (event: ThreeEvent<MouseEvent>) => onClick(module.cell.id, event),
+        } : { raycast: NO_RAYCAST })}
+        dispose={null}
+      />
+    </group>
+  );
 }
 
 function compactSupportLabelLines(label: string): readonly string[] {
@@ -314,12 +427,26 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
   );
   const projectedModuleParts = useMemo(() => plan.cells.flatMap((cell) => {
     const orientedCell = cell as OrientedModuleCell;
-    const shaped = Boolean(orientedCell.shape);
+    if (orientedCell.shape?.footprint.length) return [];
     return moduleRenderParts(orientedCell).map((part) => ({
       cell: orientedCell,
-      shaped,
+      shaped: false,
       projected: projectCommercialPavilionModuleRect(part, projectionFrame),
     }));
+  }), [plan.cells, projectionFrame]);
+  const projectedIrregularModules = useMemo(() => plan.cells.flatMap((cell) => {
+    const orientedCell = cell as OrientedModuleCell;
+    if (!orientedCell.shape?.footprint.length) return [];
+    return [{
+      cell: orientedCell,
+      center: projectCommercialPavilionReferencePoint(
+        [orientedCell.centerX, orientedCell.centerZ],
+        projectionFrame,
+      ),
+      footprint: orientedCell.shape.footprint.map((point) => (
+        projectCommercialPavilionReferencePoint(point, projectionFrame)
+      )),
+    } satisfies ProjectedIrregularModule];
   }), [plan.cells, projectionFrame]);
   const projectedCorridors = useMemo(() => plan.corridors.map((corridor) => ({
     ...corridor,
@@ -532,6 +659,17 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
     gl.domElement.style.cursor = 'grab';
   }, [gl, interactive, setHoveredModuleId]);
 
+  const handleIrregularPointerMove = useCallback((
+    moduleId: string,
+    event: ThreeEvent<PointerEvent>,
+  ) => {
+    if (!interactive) return;
+    event.stopPropagation();
+    if (useCommercialMapStore.getState().hoveredModuleId === moduleId) return;
+    setHoveredModuleId(moduleId);
+    gl.domElement.style.cursor = 'pointer';
+  }, [gl, interactive, setHoveredModuleId]);
+
   const handleClick = useCallback((event: ThreeEvent<MouseEvent>) => {
     if (!interactive || !isMapSelectionClick(event.delta)) return;
     event.stopPropagation();
@@ -540,6 +678,16 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
     const current = useCommercialMapStore.getState().selectedModuleId;
     setSelectedModuleId(current === part.cell.id ? null : part.cell.id);
   }, [interactive, projectedModuleParts, setSelectedModuleId]);
+
+  const handleIrregularClick = useCallback((
+    moduleId: string,
+    event: ThreeEvent<MouseEvent>,
+  ) => {
+    if (!interactive || !isMapSelectionClick(event.delta)) return;
+    event.stopPropagation();
+    const current = useCommercialMapStore.getState().selectedModuleId;
+    setSelectedModuleId(current === moduleId ? null : moduleId);
+  }, [interactive, setSelectedModuleId]);
 
   useEffect(() => () => {
     moduleMaterial.dispose();
@@ -609,6 +757,42 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
           : { raycast: NO_RAYCAST })}
         dispose={null}
       />
+      {projectedIrregularModules.map((module) => {
+        const isSelected = module.cell.id === activeSelectedId;
+        const isHovered = !isSelected && module.cell.id === activeHoveredId;
+        const persistedStatus = moduleStateById.get(module.cell.id)?.status ?? null;
+        const zoneBaseColor = zoneColor(
+          plan.colorCue,
+          zoneIndex.get(module.cell.zoneId) ?? 0,
+          plan.zones.length,
+        );
+        const color = persistedStatus
+          ? MODULE_STATUS_COLORS[persistedStatus].clone().lerp(zoneBaseColor, 0.12)
+          : zoneBaseColor;
+        if (isSelected) color.lerp(SELECTED_COLOR, 0.82);
+        else if (isHovered) color.lerp(HOVER_COLOR, 0.55);
+        const borderColor = color.clone().multiplyScalar(
+          isSelected ? 0.68 : isHovered ? 0.56 : 0.43,
+        );
+        if (isSelected) borderColor.lerp(SELECTED_COLOR, 0.34);
+        return (
+          <IrregularModuleMesh
+            key={module.cell.id}
+            module={module}
+            floorY={floorY}
+            moduleHeight={moduleHeight}
+            moduleBaseHeight={moduleBaseHeight}
+            color={color}
+            borderColor={borderColor}
+            heightScale={isSelected ? 1.34 : isHovered ? 1.14 : 1}
+            interactive={interactive}
+            castShadow={mode === 'interior' && !reducedGraphics}
+            onPointerMove={handleIrregularPointerMove}
+            onPointerOut={handlePointerOut}
+            onClick={handleIrregularClick}
+          />
+        );
+      })}
       {numberTexture && (
         <mesh
           position={[0, floorY + moduleBaseHeight + moduleHeight * 1.42 + 0.018, 0]}

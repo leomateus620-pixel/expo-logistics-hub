@@ -77,16 +77,18 @@ describe('referência cartográfica oficial Fenasoja 2026', () => {
     expect(lotsByBlock.get('G')).not.toContain(4);
   });
 
-  it('incorpora os 927 módulos neutros dos Pavilhões 1, 14, 12, 3 e 5 sem inventar área, comprador ou contrato', () => {
+  it('incorpora os 1.144 módulos neutros dos sete pavilhões oficiais sem inventar área, comprador ou contrato', () => {
     const pavilionReferences = [
       { publicIdentifier: 'B1', block: 'P1', moduleCount: 189, segmentId: 'industria-comercio-servicos' },
       { publicIdentifier: 'B2', block: 'P14', moduleCount: 186, segmentId: 'industria-comercio-servicos' },
       { publicIdentifier: 'B3', block: 'P12', moduleCount: 257, segmentId: 'industria-comercio-servicos' },
+      { publicIdentifier: 'B4', block: 'P8', moduleCount: 114, segmentId: 'industria-comercio-servicos' },
+      { publicIdentifier: 'B5', block: 'P13', moduleCount: 103, segmentId: 'industria-comercio-servicos' },
       { publicIdentifier: 'B6', block: 'P3', moduleCount: 214, segmentId: 'industria-comercio-servicos' },
       { publicIdentifier: 'B8', block: 'P5', moduleCount: 81, segmentId: null },
     ] as const;
 
-    expect(OFFICIAL_REFERENCE_DATA.lots).toHaveLength(1189);
+    expect(OFFICIAL_REFERENCE_DATA.lots).toHaveLength(1406);
     pavilionReferences.forEach((reference) => {
       const pavilion = OFFICIAL_REFERENCE_DATA.entities.find(
         (entity) => entity.publicIdentifier === reference.publicIdentifier,
@@ -258,8 +260,8 @@ describe('referência cartográfica oficial Fenasoja 2026', () => {
     expect(new Set(lotIdentifiers).size).toBe(lotIdentifiers.length);
     expect(externalLotIdentifiers).toHaveLength(262);
     expect(externalLotIdentifiers.every((identifier) => /^Q-[A-Z]-\d{2}$/.test(identifier))).toBe(true);
-    expect(pavilionModuleIdentifiers).toHaveLength(927);
-    expect(pavilionModuleIdentifiers.every((identifier) => /^B(?:1|2|3|6|8)-M\d{3}$/.test(identifier))).toBe(true);
+    expect(pavilionModuleIdentifiers).toHaveLength(1144);
+    expect(pavilionModuleIdentifiers.every((identifier) => /^B(?:1|2|3|4|5|6|8)-M\d{3}$/.test(identifier))).toBe(true);
     expect(OFFICIAL_REFERENCE_DATA.entities
       .filter((entity) => entity.classification === 'SELLABLE_LOT' || entity.classification === 'INTERNAL_STAND')
       .every((entity) => entity.metadata.buyerDataImported === false)).toBe(true);
