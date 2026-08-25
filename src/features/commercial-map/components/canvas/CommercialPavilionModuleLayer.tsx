@@ -7,6 +7,11 @@ import {
   projectCommercialPavilionModuleRect,
   type CommercialPavilionModulePlan,
 } from '../../utils/commercialPavilionModules';
+import type {
+  CommercialPavilionReferenceCellShape,
+  CommercialPavilionReferenceRect,
+  CommercialPavilionReferenceSupportSpace,
+} from '../../data/commercialPavilionReference';
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
 import { isMapSelectionClick } from '../../utils/interaction';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
@@ -61,11 +66,43 @@ const MODULE_STATUS_COLORS: Readonly<Record<CommercialStatus, THREE.Color>> = {
   UNAVAILABLE: new THREE.Color(STATUS_CONFIG.UNAVAILABLE.color),
 };
 
+const SUPPORT_SPACE_COLORS: Readonly<
+  Record<CommercialPavilionReferenceSupportSpace['kind'], THREE.Color>
+> = {
+  storage: new THREE.Color('#7a817b'),
+  accommodation: new THREE.Color('#87918a'),
+  service: new THREE.Color('#68736d'),
+};
+
 type OrientedModuleCell = CommercialPavilionModulePlan['cells'][number] & {
   labelAnchor?: readonly [number, number];
   orientation?: 'east-west' | 'north-south';
   sequenceOrientation?: 'x-increasing' | 'x-decreasing' | 'z-increasing' | 'z-decreasing';
+  shape?: CommercialPavilionReferenceCellShape;
 };
+
+function moduleRenderParts(cell: OrientedModuleCell): readonly CommercialPavilionReferenceRect[] {
+  return cell.shape?.renderParts.length ? cell.shape.renderParts : [cell];
+}
+
+function compactSupportLabelLines(label: string): readonly string[] {
+  const words = label.trim().split(/\s+/).filter(Boolean);
+  if (words.length <= 1) return words;
+  if (words.length === 2) return words;
+
+  let splitIndex = 1;
+  let smallestDifference = Number.POSITIVE_INFINITY;
+  for (let index = 1; index < words.length; index += 1) {
+    const firstLength = words.slice(0, index).join(' ').length;
+    const secondLength = words.slice(index).join(' ').length;
+    const difference = Math.abs(firstLength - secondLength);
+    if (difference < smallestDifference) {
+      splitIndex = index;
+      smallestDifference = difference;
+    }
+  }
+  return [words.slice(0, splitIndex).join(' '), words.slice(splitIndex).join(' ')];
+}
 
 function createModuleNumberTexture(
   plan: CommercialPavilionModulePlan,
@@ -112,7 +149,19 @@ function createModuleNumberTexture(
 
     context.strokeStyle = 'rgba(248, 252, 246, 0.72)';
     context.lineWidth = Math.max(1, Math.min(2.5, Math.min(cellWidth, cellHeight) * 0.055));
-    context.strokeRect(left + 0.75, top + 0.75, Math.max(0, cellWidth - 1.5), Math.max(0, cellHeight - 1.5));
+    if (orientedCell.shape?.footprint.length) {
+      context.beginPath();
+      orientedCell.shape.footprint.forEach(([x, z], index) => {
+        const pointX = x * width;
+        const pointY = z * height;
+        if (index === 0) context.moveTo(pointX, pointY);
+        else context.lineTo(pointX, pointY);
+      });
+      context.closePath();
+      context.stroke();
+    } else {
+      context.strokeRect(left + 0.75, top + 0.75, Math.max(0, cellWidth - 1.5), Math.max(0, cellHeight - 1.5));
+    }
 
     if (fontSize < 7) return;
     context.font = `800 ${fontSize}px Inter, Arial, sans-serif`;
@@ -126,6 +175,51 @@ function createModuleNumberTexture(
     context.strokeText(cell.label, 0, 0);
     context.fillStyle = '#173b2b';
     context.fillText(cell.label, 0, 0);
+    context.restore();
+  });
+
+  plan.supportSpaces.forEach((supportSpace) => {
+    const left = (supportSpace.centerX - supportSpace.width / 2) * width;
+    const top = (supportSpace.centerZ - supportSpace.depth / 2) * height;
+    const supportWidth = supportSpace.width * width;
+    const supportHeight = supportSpace.depth * height;
+    const lines = compactSupportLabelLines(supportSpace.label);
+    const longestLine = Math.max(1, ...lines.map((line) => line.length));
+    const fontSize = Math.floor(THREE.MathUtils.clamp(
+      Math.min(
+        supportWidth / (longestLine * 0.62),
+        supportHeight / Math.max(1, lines.length * 1.38),
+      ),
+      7,
+      reducedGraphics ? 19 : 25,
+    ));
+
+    context.save();
+    context.strokeStyle = 'rgba(54, 68, 59, 0.7)';
+    context.lineWidth = Math.max(1.2, Math.min(3, Math.min(supportWidth, supportHeight) * 0.025));
+    context.setLineDash([Math.max(3, fontSize * 0.35), Math.max(2, fontSize * 0.24)]);
+    context.strokeRect(
+      left + 0.75,
+      top + 0.75,
+      Math.max(0, supportWidth - 1.5),
+      Math.max(0, supportHeight - 1.5),
+    );
+    context.setLineDash([]);
+
+    if (fontSize >= 7 && lines.length > 0) {
+      context.translate(supportSpace.centerX * width, supportSpace.centerZ * height);
+      context.font = `800 ${fontSize}px Inter, Arial, sans-serif`;
+      context.lineWidth = Math.max(1.5, fontSize * 0.16);
+      context.strokeStyle = 'rgba(247, 250, 245, 0.94)';
+      context.fillStyle = '#314039';
+      const lineHeight = fontSize * 1.08;
+      const firstLineY = -((lines.length - 1) * lineHeight) / 2;
+      lines.forEach((line, index) => {
+        const y = firstLineY + index * lineHeight;
+        context.strokeText(line, 0, y);
+        context.fillText(line, 0, y);
+      });
+    }
     context.restore();
   });
 
@@ -156,6 +250,7 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
   const [moduleBaseMesh, setModuleBaseMesh] = useDisposableInstancedMeshRef();
   const [moduleMesh, setModuleMesh] = useDisposableInstancedMeshRef();
   const [corridorMesh, setCorridorMesh] = useDisposableInstancedMeshRef();
+  const [supportSpaceMesh, setSupportSpaceMesh] = useDisposableInstancedMeshRef();
   const gl = useThree((state) => state.gl);
   const invalidate = useThree((state) => state.invalidate);
   const hoveredModuleId = useCommercialMapStore((state) => state.hoveredModuleId);
@@ -175,14 +270,23 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
     width: layout.interior.clearWidth,
     depth: layout.interior.clearDepth,
   }), [layout.interior.clearDepth, layout.interior.clearWidth]);
-  const projectedCells = useMemo(() => plan.cells.map((cell) => ({
-    ...cell,
-    projected: projectCommercialPavilionModuleRect(cell, footprint),
-  })), [footprint, plan.cells]);
+  const projectedModuleParts = useMemo(() => plan.cells.flatMap((cell) => {
+    const orientedCell = cell as OrientedModuleCell;
+    const shaped = Boolean(orientedCell.shape);
+    return moduleRenderParts(orientedCell).map((part) => ({
+      cell: orientedCell,
+      shaped,
+      projected: projectCommercialPavilionModuleRect(part, footprint),
+    }));
+  }), [footprint, plan.cells]);
   const projectedCorridors = useMemo(() => plan.corridors.map((corridor) => ({
     ...corridor,
     projected: projectCommercialPavilionModuleRect(corridor, footprint),
   })), [footprint, plan.corridors]);
+  const projectedSupportSpaces = useMemo(() => plan.supportSpaces.map((supportSpace) => ({
+    ...supportSpace,
+    projected: projectCommercialPavilionModuleRect(supportSpace, footprint),
+  })), [footprint, plan.supportSpaces]);
   const zoneIndex = useMemo(() => new Map(
     plan.zones.map((zone, index) => [zone.id, index]),
   ), [plan.zones]);
@@ -204,6 +308,11 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
     color: '#ffffff',
     roughness: 0.96,
     metalness: 0,
+  }), []);
+  const supportSpaceMaterial = useMemo(() => new THREE.MeshStandardMaterial({
+    color: '#ffffff',
+    roughness: 0.9,
+    metalness: 0.035,
   }), []);
   const labelMaterial = useMemo(() => new THREE.MeshBasicMaterial({
     map: numberTexture,
@@ -228,7 +337,7 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
     const object = new THREE.Object3D();
     const color = new THREE.Color();
     const borderColor = new THREE.Color();
-    projectedCells.forEach((cell, index) => {
+    projectedModuleParts.forEach(({ cell, projected, shaped }, index) => {
       const isSelected = cell.id === activeSelectedId;
       const isHovered = !isSelected && cell.id === activeHoveredId;
       const persistedStatus = moduleStateById.get(cell.id)?.status ?? null;
@@ -236,29 +345,35 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
       const cellHeight = moduleHeight * heightScale;
 
       object.position.set(
-        cell.projected.centerX,
+        projected.centerX,
         floorY + moduleBaseHeight / 2 + 0.006,
-        cell.projected.centerZ,
+        projected.centerZ,
       );
       object.rotation.set(0, 0, 0);
       object.scale.set(
-        Math.max(0.014, cell.projected.width * 0.985),
+        Math.max(0.014, projected.width * (shaped ? 1 : 0.985)),
         moduleBaseHeight,
-        Math.max(0.014, cell.projected.depth * 0.985),
+        Math.max(0.014, projected.depth * (shaped ? 1 : 0.985)),
       );
       object.updateMatrix();
       moduleBaseMesh.current?.setMatrixAt(index, object.matrix);
 
       object.position.set(
-        cell.projected.centerX,
+        projected.centerX,
         floorY + moduleBaseHeight + cellHeight / 2 + 0.008,
-        cell.projected.centerZ,
+        projected.centerZ,
       );
       object.rotation.set(0, 0, 0);
       object.scale.set(
-        Math.max(0.012, cell.projected.width * (isSelected || isHovered ? 0.955 : 0.91)),
+        Math.max(
+          0.012,
+          projected.width * (shaped ? 1 : isSelected || isHovered ? 0.955 : 0.91),
+        ),
         cellHeight,
-        Math.max(0.012, cell.projected.depth * (isSelected || isHovered ? 0.945 : 0.9)),
+        Math.max(
+          0.012,
+          projected.depth * (shaped ? 1 : isSelected || isHovered ? 0.945 : 0.9),
+        ),
       );
       object.updateMatrix();
       moduleMesh.current?.setMatrixAt(index, object.matrix);
@@ -302,7 +417,7 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
     moduleStateById,
     plan.colorCue,
     plan.zones.length,
-    projectedCells,
+    projectedModuleParts,
     zoneIndex,
   ]);
 
@@ -331,15 +446,43 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
     corridorMaterial.needsUpdate = true;
   }, [corridorMaterial, corridorMesh, floorY, projectedCorridors]);
 
+  useLayoutEffect(() => {
+    if (!supportSpaceMesh.current) return;
+    const object = new THREE.Object3D();
+    const supportHeight = THREE.MathUtils.clamp(moduleHeight * 0.72, 0.055, 0.13);
+    projectedSupportSpaces.forEach((supportSpace, index) => {
+      object.position.set(
+        supportSpace.projected.centerX,
+        floorY + supportHeight / 2 + 0.007,
+        supportSpace.projected.centerZ,
+      );
+      object.rotation.set(0, 0, 0);
+      object.scale.set(
+        Math.max(0.014, supportSpace.projected.width * 0.985),
+        supportHeight,
+        Math.max(0.014, supportSpace.projected.depth * 0.985),
+      );
+      object.updateMatrix();
+      supportSpaceMesh.current?.setMatrixAt(index, object.matrix);
+      supportSpaceMesh.current?.setColorAt(index, SUPPORT_SPACE_COLORS[supportSpace.kind]);
+    });
+    supportSpaceMesh.current.instanceMatrix.needsUpdate = true;
+    if (supportSpaceMesh.current.instanceColor) supportSpaceMesh.current.instanceColor.needsUpdate = true;
+    supportSpaceMesh.current.computeBoundingBox();
+    supportSpaceMesh.current.computeBoundingSphere();
+    supportSpaceMaterial.needsUpdate = true;
+    invalidate();
+  }, [floorY, invalidate, moduleHeight, projectedSupportSpaces, supportSpaceMaterial, supportSpaceMesh]);
+
   const handlePointerMove = useCallback((event: ThreeEvent<PointerEvent>) => {
     if (!interactive) return;
     event.stopPropagation();
-    const cell = event.instanceId === undefined ? null : projectedCells[event.instanceId];
-    const nextId = cell?.id ?? null;
+    const part = event.instanceId === undefined ? null : projectedModuleParts[event.instanceId];
+    const nextId = part?.cell.id ?? null;
     if (useCommercialMapStore.getState().hoveredModuleId === nextId) return;
     setHoveredModuleId(nextId);
     gl.domElement.style.cursor = nextId ? 'pointer' : 'grab';
-  }, [gl, interactive, projectedCells, setHoveredModuleId]);
+  }, [gl, interactive, projectedModuleParts, setHoveredModuleId]);
 
   const handlePointerOut = useCallback(() => {
     if (!interactive) return;
@@ -350,17 +493,18 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
   const handleClick = useCallback((event: ThreeEvent<MouseEvent>) => {
     if (!interactive || !isMapSelectionClick(event.delta)) return;
     event.stopPropagation();
-    const cell = event.instanceId === undefined ? null : projectedCells[event.instanceId];
-    if (!cell) return;
+    const part = event.instanceId === undefined ? null : projectedModuleParts[event.instanceId];
+    if (!part) return;
     const current = useCommercialMapStore.getState().selectedModuleId;
-    setSelectedModuleId(current === cell.id ? null : cell.id);
-  }, [interactive, projectedCells, setSelectedModuleId]);
+    setSelectedModuleId(current === part.cell.id ? null : part.cell.id);
+  }, [interactive, projectedModuleParts, setSelectedModuleId]);
 
   useEffect(() => () => {
     moduleMaterial.dispose();
     moduleBaseMaterial.dispose();
     corridorMaterial.dispose();
-  }, [corridorMaterial, moduleBaseMaterial, moduleMaterial]);
+    supportSpaceMaterial.dispose();
+  }, [corridorMaterial, moduleBaseMaterial, moduleMaterial, supportSpaceMaterial]);
 
   useEffect(() => () => {
     numberTexture?.dispose();
@@ -392,16 +536,26 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
           dispose={null}
         />
       )}
+      {projectedSupportSpaces.length > 0 && (
+        <instancedMesh
+          ref={setSupportSpaceMesh}
+          args={[unitBoxGeometry, supportSpaceMaterial, projectedSupportSpaces.length]}
+          castShadow={mode === 'interior' && !reducedGraphics}
+          receiveShadow
+          raycast={NO_RAYCAST}
+          dispose={null}
+        />
+      )}
       <instancedMesh
         ref={setModuleBaseMesh}
-        args={[unitBoxGeometry, moduleBaseMaterial, projectedCells.length]}
+        args={[unitBoxGeometry, moduleBaseMaterial, projectedModuleParts.length]}
         receiveShadow
         raycast={NO_RAYCAST}
         dispose={null}
       />
       <instancedMesh
         ref={setModuleMesh}
-        args={[unitBoxGeometry, moduleMaterial, projectedCells.length]}
+        args={[unitBoxGeometry, moduleMaterial, projectedModuleParts.length]}
         castShadow={mode === 'interior' && !reducedGraphics}
         receiveShadow
         {...(interactive

@@ -5,7 +5,6 @@ import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { PAVILION12_COMMERCIAL_REFERENCE } from '@/features/commercial-map/data/pavilion12CommercialReference';
 import { PAVILION14_COMMERCIAL_REFERENCE } from '@/features/commercial-map/data/pavilion14CommercialReference';
-import { PAVILION3_COMMERCIAL_REFERENCE } from '@/features/commercial-map/data/pavilion3CommercialReference';
 
 const migration = readFileSync(
   resolve('supabase/migrations/20260824120000_rebuild_pavilions_12_14_and_correct_pavilion_3.sql'),
@@ -75,7 +74,6 @@ const parsedClusterRanges = [...clusterSection.matchAll(clusterPattern)].map((ma
 const references = {
   B2: PAVILION14_COMMERCIAL_REFERENCE,
   B3: PAVILION12_COMMERCIAL_REFERENCE,
-  B6: PAVILION3_COMMERCIAL_REFERENCE,
 } as const;
 
 function expectedSqlDirection(sequence: string): ParsedRun['sequenceOrientation'] {
@@ -104,7 +102,7 @@ describe('contrato persistido dos Pavilhões 12, 14 e correção do Pavilhão 3'
     expect(backfill).toContain('commercial_pavilion_parent_label_invalid');
   });
 
-  it('mantém os 24 runs do banco em paridade geométrica com a referência cliente', () => {
+  it('mantém os 24 runs históricos e Pavilhões 12/14 em paridade com a referência cliente', () => {
     expect(parsedRuns).toHaveLength(24);
 
     for (const [pavilionIdentifier, reference] of Object.entries(references)) {
@@ -130,6 +128,14 @@ describe('contrato persistido dos Pavilhões 12, 14 e correção do Pavilhão 3'
         Array.from({ length: reference.moduleCount }, (_, index) => index + 1),
       );
     }
+
+    const historicalPavilion3Runs = parsedRuns.filter((run) => run.pavilionIdentifier === 'B6');
+    expect(historicalPavilion3Runs).toHaveLength(11);
+    expect(historicalPavilion3Runs.flatMap((run) => (
+      Array.from({ length: run.end - run.start + 1 }, (_, index) => run.start + index)
+    )).sort((first, second) => first - second)).toEqual(
+      Array.from({ length: 214 }, (_, index) => index + 1),
+    );
 
     expect(backfill).toContain('cross join lateral generate_series(1, spec.module_count) expected(module_number)');
     expect(backfill).toContain('cell_center_x - cell_width / 2 < 0');

@@ -104,7 +104,7 @@ describe('registro de segmentos do Mapa Comercial 3D', () => {
     const identifiers = publicIdentifiersForSegment(COMMERCIAL_MAP_SEGMENT_IDS.industry);
     const blockIdentifiers = identifiers.filter((identifier) => identifier.startsWith('QUADRA-'));
     const lotIdentifiers = identifiers.filter((identifier) => identifier.startsWith('Q-'));
-    const pavilionModuleIdentifiers = identifiers.filter((identifier) => /^B(?:2|3|6)-M/.test(identifier));
+    const pavilionModuleIdentifiers = identifiers.filter((identifier) => /^B(?:1|2|3|6)-M/.test(identifier));
 
     expect(blockIdentifiers).toEqual(expect.arrayContaining([
       'QUADRA-M', 'QUADRA-G', 'QUADRA-L', 'QUADRA-F',
@@ -112,13 +112,14 @@ describe('registro de segmentos do Mapa Comercial 3D', () => {
     ]));
     expect(blockIdentifiers).toHaveLength(8);
     expect(lotIdentifiers).toHaveLength(103);
-    expect(pavilionModuleIdentifiers).toHaveLength(657);
+    expect(pavilionModuleIdentifiers).toHaveLength(846);
     expect(pavilionModuleIdentifiers).toEqual(expect.arrayContaining([
+      'B1-M001', 'B1-M189',
       'B2-M001', 'B2-M186',
       'B3-M001', 'B3-M257',
       'B6-M001', 'B6-M214',
     ]));
-    expect(identifiers).toHaveLength(797);
+    expect(identifiers).toHaveLength(986);
     expect(lotIdentifiers).toEqual(expect.arrayContaining([
       'Q-G-01', 'Q-G-02', 'Q-G-05', 'Q-G-06', 'Q-G-07', 'Q-G-08',
     ]));
@@ -132,10 +133,11 @@ describe('registro de segmentos do Mapa Comercial 3D', () => {
     expect(identifiers).not.toEqual(expect.arrayContaining([
       'QUADRA-N', 'B7', 'B8', 'B10', 'B11', 'B15', 'C1', 'QUADRA-C', 'QUADRA-B', 'QUADRA-A',
     ]));
+    expect(identifiers.some((identifier) => /^B8-M/.test(identifier))).toBe(false);
 
     const inventory = commercialMapSegmentInventory(OFFICIAL_REFERENCE_ENTITIES, OFFICIAL_REFERENCE_LOTS);
     expect(inventory.find(({ segment }) => segment.id === COMMERCIAL_MAP_SEGMENT_IDS.industry))
-      .toMatchObject({ entityCount: 797, lotCount: 760 });
+      .toMatchObject({ entityCount: 986, lotCount: 949 });
   });
 
   it('não aceita sobreposição silenciosa entre segmentos', () => {

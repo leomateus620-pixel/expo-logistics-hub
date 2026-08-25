@@ -168,8 +168,8 @@ export const COMMERCIAL_PAVILION_DEFINITIONS = {
   B1: {
     publicIdentifier: 'B1',
     pavilionNumber: 1,
-    officialName: 'Pavilhão 1 — Comércio e serviços',
-    activity: 'Comércio e serviços',
+    officialName: 'Pavilhão 1 — Indústria, Comércio e Serviços',
+    activity: 'Indústria, Comércio e Serviços',
     variant: 'grand-portal',
     roofProfile: 'broad-gable',
     entrancePattern: 'grand-central',
@@ -258,8 +258,8 @@ export const COMMERCIAL_PAVILION_DEFINITIONS = {
   B6: {
     publicIdentifier: 'B6',
     pavilionNumber: 3,
-    officialName: 'Pavilhão 3 — Comércio',
-    activity: 'Comércio',
+    officialName: 'Pavilhão 3 — Indústria e Comércio',
+    activity: 'Indústria e Comércio',
     variant: 'triple-portal',
     roofProfile: 'triple-gable',
     entrancePattern: 'triple-bays',
@@ -276,8 +276,8 @@ export const COMMERCIAL_PAVILION_DEFINITIONS = {
   B8: {
     publicIdentifier: 'B8',
     pavilionNumber: 5,
-    officialName: 'Pavilhão 5 — Floriculturas',
-    activity: 'Floriculturas',
+    officialName: 'Pavilhão 5 — Veterinária, Pequenos Animais e Rações',
+    activity: 'Veterinária, Pequenos Animais e Rações',
     variant: 'garden-gallery',
     roofProfile: 'clerestory-span',
     entrancePattern: 'paired-end-bays',

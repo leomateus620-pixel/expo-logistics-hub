@@ -59,8 +59,10 @@ describe('cartão operacional do módulo interno', () => {
   });
 
   it.each([
+    { pavilionIdentifier: 'B1' as const, moduleNumber: 58, pavilionNumber: 1 },
     { pavilionIdentifier: 'B2' as const, moduleNumber: 73, pavilionNumber: 14 },
     { pavilionIdentifier: 'B3' as const, moduleNumber: 41, pavilionNumber: 12 },
+    { pavilionIdentifier: 'B8' as const, moduleNumber: 81, pavilionNumber: 5 },
   ])('mantém o módulo $pavilionIdentifier neutro e sem área individual inventada', ({
     pavilionIdentifier,
     moduleNumber,

@@ -20,6 +20,16 @@ export interface CommercialPavilionReferenceRect {
   depth: number;
 }
 
+export type CommercialPavilionReferencePoint = readonly [x: number, z: number];
+
+export interface CommercialPavilionReferenceCellShape {
+  /** Closed or open pavilion-local polygon used by the persisted geometry. */
+  footprint: readonly CommercialPavilionReferencePoint[];
+  /** Non-overlapping rectangles used by the lightweight instanced renderer. */
+  renderParts: readonly CommercialPavilionReferenceRect[];
+  labelAnchor?: CommercialPavilionReferencePoint;
+}
+
 export interface CommercialPavilionReferenceCluster {
   id: string;
   numberRanges: readonly (readonly [start: number, end: number])[];
@@ -28,7 +38,7 @@ export interface CommercialPavilionReferenceCluster {
 export interface CommercialPavilionReferenceRun {
   id: string;
   label: string;
-  role: 'perimeter' | 'island';
+  role: 'perimeter' | 'island' | 'gallery' | 'market-run';
   bounds: CommercialPavilionReferenceRect;
   numberRange: readonly [start: number, end: number];
   orientation: CommercialPavilionReferenceModuleOrientation;
@@ -41,8 +51,16 @@ export interface CommercialPavilionReferenceRun {
 export interface CommercialPavilionReferenceCorridor
   extends CommercialPavilionReferenceRect {
   id: string;
-  kind: 'main' | 'cross' | 'perimeter';
+  kind: 'main' | 'cross' | 'perimeter' | 'atrium' | 'access';
   label: string;
+}
+
+export interface CommercialPavilionReferenceSupportSpace
+  extends CommercialPavilionReferenceRect {
+  id: string;
+  label: string;
+  kind: 'storage' | 'accommodation' | 'service';
+  type: 'permanent-non-commercial';
 }
 
 export interface CommercialPavilionModuleSource {
@@ -67,6 +85,7 @@ export interface CommercialPavilionReferenceCell<PavilionId extends string = str
   sortOrder: number;
   group: string;
   cluster: string;
+  shape?: CommercialPavilionReferenceCellShape;
   source: CommercialPavilionModuleSource;
 }
 
@@ -81,6 +100,25 @@ export interface BuildCommercialPavilionReferenceCellsInput<
   discrepancyForNumber?: (
     moduleNumber: number,
   ) => CommercialPavilionReferenceSourceDiscrepancy;
+  shapeForNumber?: (
+    moduleNumber: number,
+  ) => CommercialPavilionReferenceCellShape | null;
+}
+
+export interface CommercialPavilionMetricProjector {
+  readonly widthMeters: number;
+  readonly depthMeters: number;
+  readonly inset: number;
+  point(xMeters: number, zMeters: number): CommercialPavilionReferencePoint;
+  rect(
+    leftMeters: number,
+    topMeters: number,
+    widthMeters: number,
+    depthMeters: number,
+  ): CommercialPavilionReferenceRect;
+  polygon(
+    points: readonly CommercialPavilionReferencePoint[],
+  ): readonly CommercialPavilionReferencePoint[];
 }
 
 export function commercialPavilionReferenceRect(
@@ -90,6 +128,47 @@ export function commercialPavilionReferenceRect(
   depth: number,
 ): CommercialPavilionReferenceRect {
   return { centerX, centerZ, width, depth };
+}
+
+/**
+ * Projects measurements from an official metric plan into the normalized
+ * pavilion footprint. One deterministic transform keeps every repeated
+ * 1 m / 3 m division aligned without accumulating per-cell rounding drift.
+ */
+export function createCommercialPavilionMetricProjector(
+  widthMeters: number,
+  depthMeters: number,
+  inset = 0.02,
+): CommercialPavilionMetricProjector {
+  if (widthMeters <= 0 || depthMeters <= 0 || inset < 0 || inset >= 0.5) {
+    throw new Error('Dimensoes metricas invalidas para a referencia do pavilhao.');
+  }
+  const usable = 1 - inset * 2;
+  const point = (xMeters: number, zMeters: number) => [
+    inset + (xMeters / widthMeters) * usable,
+    inset + (zMeters / depthMeters) * usable,
+  ] as const;
+
+  return {
+    widthMeters,
+    depthMeters,
+    inset,
+    point,
+    rect: (leftMeters, topMeters, rectWidthMeters, rectDepthMeters) => {
+      const [left, top] = point(leftMeters, topMeters);
+      const [right, bottom] = point(
+        leftMeters + rectWidthMeters,
+        topMeters + rectDepthMeters,
+      );
+      return commercialPavilionReferenceRect(
+        (left + right) / 2,
+        (top + bottom) / 2,
+        right - left,
+        bottom - top,
+      );
+    },
+    polygon: (points) => points.map(([x, z]) => point(x, z)),
+  };
 }
 
 export function formatCommercialPavilionModuleNumber(number: number): string {
@@ -137,6 +216,8 @@ function expandRun<PavilionId extends string>(
       ? run.bounds.centerZ
       : top + spatialIndex * (cellLength + input.moduleGap) + cellLength / 2;
     const label = formatCommercialPavilionModuleNumber(number);
+    const shape = input.shapeForNumber?.(number) ?? null;
+    const labelAnchor = shape?.labelAnchor ?? [centerX, centerZ] as const;
 
     return {
       id: `${input.pavilionId}:module:${String(number).padStart(3, '0')}`,
@@ -151,12 +232,13 @@ function expandRun<PavilionId extends string>(
       lotNumber: label,
       orientation: run.orientation,
       sequenceOrientation: run.sequenceOrientation,
-      labelAnchor: [centerX, centerZ],
+      labelAnchor,
       type: 'commercial-lot',
       areaM2: null,
       sortOrder: number,
       group: run.group,
       cluster: clusterForNumber(run, number),
+      ...(shape ? { shape } : {}),
       source: {
         document: input.sourceDocument,
         referenceYear: input.referenceYear,
