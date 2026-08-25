@@ -312,10 +312,22 @@ describe('projeção oficial do Pavilhão 1', () => {
     expect(module141.metadata.areaM2).toBeNull();
   });
 
-  it('preserva os frames legados e reconhece as projeções oficiais posteriores de B2/B8', () => {
+  it('preserva os frames stretch legados e reconhece as projeções oficiais posteriores', () => {
     ['B3', 'B6'].forEach((identifier) => {
       const plan = COMMERCIAL_PAVILION_MODULE_PLANS[identifier as 'B3' | 'B6'];
-      expect(plan.projection).toEqual({ coordinateTransform: 'identity', fit: 'stretch' });
+      expect(plan.projection).toMatchObject({ coordinateTransform: 'identity', fit: 'stretch' });
+      expect(createCommercialPavilionModuleProjectionFrame(plan, { width: 12, depth: 7 }))
+        .toEqual({
+          centerX: 0,
+          centerZ: 0,
+          width: 12,
+          depth: 7,
+          coordinateTransform: 'identity',
+        });
+    });
+    expect(COMMERCIAL_PAVILION_MODULE_PLANS.B6.projection).toMatchObject({
+      metricWidthM: 32,
+      metricDepthM: 44.48,
     });
 
     expect(COMMERCIAL_PAVILION_MODULE_PLANS.B2.projection).toEqual({

@@ -7,6 +7,7 @@ import {
   type CommercialPavilionReferenceProjection,
   type CommercialPavilionReferenceRect,
   type CommercialPavilionReferenceRun,
+  type CommercialPavilionReferenceWallAccess,
 } from './commercialPavilionReference';
 
 export type Pavilion13CommercialReferenceCell =
@@ -206,6 +207,19 @@ export const PAVILION13_COMMERCIAL_REFERENCE_CORRIDORS = [
   },
 ] as const satisfies readonly CommercialPavilionReferenceCorridor[];
 
+export const PAVILION13_COMMERCIAL_WALL_ACCESSES = [
+  {
+    id: 'pavilion-3-connection',
+    label: 'Acesso para o Pavilhão 3',
+    corridorId: 'east-cross-access',
+    edges: ['right'],
+    kind: 'gate',
+    sourcePrecision: 'official-metric',
+    connectsTo: 'B6',
+    structuralOpening: false,
+  },
+] as const satisfies readonly CommercialPavilionReferenceWallAccess[];
+
 const DIAGONAL_RENDER_SLICES = 12;
 
 const MODULE_METRIC_FOOTPRINTS = {
@@ -350,6 +364,7 @@ export const PAVILION13_COMMERCIAL_REFERENCE = {
   runs: PAVILION13_COMMERCIAL_REFERENCE_RUNS,
   corridors: PAVILION13_COMMERCIAL_REFERENCE_CORRIDORS,
   supportSpaces: [],
+  wallAccesses: PAVILION13_COMMERCIAL_WALL_ACCESSES,
   cells: PAVILION13_COMMERCIAL_REFERENCE_CELLS,
   source: {
     document: SOURCE_DOCUMENT,

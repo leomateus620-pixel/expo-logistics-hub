@@ -6,6 +6,7 @@ import {
   type CommercialPavilionReferenceCorridor,
   type CommercialPavilionReferenceProjection,
   type CommercialPavilionReferenceRun,
+  type CommercialPavilionReferenceWallAccess,
 } from './commercialPavilionReference';
 
 export type Pavilion1CommercialReferenceCell =
@@ -146,6 +147,49 @@ export const PAVILION1_COMMERCIAL_REFERENCE_CORRIDORS = [
   },
 ] as const satisfies readonly CommercialPavilionReferenceCorridor[];
 
+export const PAVILION1_COMMERCIAL_WALL_ACCESSES = [
+  {
+    id: 'west-upper-exit',
+    label: 'Saída',
+    wall: 'left',
+    centerAlongWallM: 5.5,
+    openingWidthM: 3,
+    kind: 'exit',
+    sourcePrecision: 'plan-traced',
+    structuralOpening: false,
+  },
+  {
+    id: 'west-main-entrance',
+    label: 'Entrada',
+    wall: 'left',
+    centerAlongWallM: 11.13,
+    openingWidthM: 5.42,
+    kind: 'entrance',
+    sourcePrecision: 'official-metric',
+    structuralOpening: false,
+  },
+  {
+    id: 'east-upper-exit',
+    label: 'Saída',
+    wall: 'right',
+    centerAlongWallM: 5.5,
+    openingWidthM: 3,
+    kind: 'exit',
+    sourcePrecision: 'plan-traced',
+    structuralOpening: false,
+  },
+  {
+    id: 'east-lower-exit',
+    label: 'Saída',
+    wall: 'right',
+    centerAlongWallM: 11.1,
+    openingWidthM: 3,
+    kind: 'exit',
+    sourcePrecision: 'plan-traced',
+    structuralOpening: false,
+  },
+] as const satisfies readonly CommercialPavilionReferenceWallAccess[];
+
 const MODULE_141_SHAPE: CommercialPavilionReferenceCellShape = {
   footprint: PROJECT.polygon([
     [48, 0],
@@ -191,6 +235,7 @@ export const PAVILION1_COMMERCIAL_REFERENCE = {
   runs: PAVILION1_COMMERCIAL_REFERENCE_RUNS,
   corridors: PAVILION1_COMMERCIAL_REFERENCE_CORRIDORS,
   supportSpaces: [],
+  wallAccesses: PAVILION1_COMMERCIAL_WALL_ACCESSES,
   cells: PAVILION1_COMMERCIAL_REFERENCE_CELLS,
   source: {
     document: SOURCE_DOCUMENT,

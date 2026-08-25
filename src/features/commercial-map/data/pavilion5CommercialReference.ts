@@ -6,6 +6,7 @@ import {
   type CommercialPavilionReferenceProjection,
   type CommercialPavilionReferenceRun,
   type CommercialPavilionReferenceSupportSpace,
+  type CommercialPavilionReferenceWallAccess,
 } from './commercialPavilionReference';
 
 export type Pavilion5CommercialReferenceCell =
@@ -101,6 +102,36 @@ export const PAVILION5_COMMERCIAL_REFERENCE_CORRIDORS = [
   },
 ] as const satisfies readonly CommercialPavilionReferenceCorridor[];
 
+export const PAVILION5_COMMERCIAL_WALL_ACCESSES = [
+  {
+    id: 'north-central-exit',
+    label: 'Saída',
+    corridorId: 'central-commercial-aisle',
+    edges: ['rear'],
+    kind: 'exit',
+    sourcePrecision: 'official-metric',
+    structuralOpening: false,
+  },
+  {
+    id: 'west-central-entrance',
+    label: 'Entrada',
+    corridorId: 'west-cross-access',
+    edges: ['left'],
+    kind: 'entrance',
+    sourcePrecision: 'official-metric',
+    structuralOpening: false,
+  },
+  {
+    id: 'south-central-exit',
+    label: 'Saída',
+    corridorId: 'central-commercial-aisle',
+    edges: ['front'],
+    kind: 'exit',
+    sourcePrecision: 'official-metric',
+    structuralOpening: false,
+  },
+] as const satisfies readonly CommercialPavilionReferenceWallAccess[];
+
 export const PAVILION5_COMMERCIAL_SUPPORT_SPACES = [
   {
     id: 'deposito-fenasoja',
@@ -172,6 +203,7 @@ export const PAVILION5_COMMERCIAL_REFERENCE = {
   runs: PAVILION5_COMMERCIAL_REFERENCE_RUNS,
   corridors: PAVILION5_COMMERCIAL_REFERENCE_CORRIDORS,
   supportSpaces: PAVILION5_COMMERCIAL_SUPPORT_SPACES,
+  wallAccesses: PAVILION5_COMMERCIAL_WALL_ACCESSES,
   cells: PAVILION5_COMMERCIAL_REFERENCE_CELLS,
   source: {
     document: SOURCE_DOCUMENT,

@@ -921,6 +921,87 @@
 .commercial-map-label.is-architectural-landmark.is-selected .commercial-map-label-code { background: #e2bd4e; color: #173b28; }
 .commercial-map-label.is-access.is-selected { border-color: rgba(224,185,55,.72); background: rgba(20,69,43,.98); box-shadow: 0 8px 22px rgba(13,55,33,.3); }
 .commercial-map-label.is-restroom.is-selected { border-color: rgba(29,116,170,.58); background: rgba(244,251,255,.99); box-shadow: 0 8px 20px rgba(23,86,125,.24); }
+.commercial-pavilion-wayfinding-label {
+  --wayfinding-accent: #1c7757;
+  --wayfinding-bg: rgba(248, 251, 246, .96);
+  --wayfinding-border: rgba(24, 78, 54, .28);
+  display: inline-flex;
+  min-height: 28px;
+  max-width: 168px;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 4px 9px 4px 5px;
+  border: 1px solid var(--wayfinding-border);
+  border-radius: 999px;
+  background: var(--wayfinding-bg);
+  color: #183b2a;
+  box-shadow: 0 5px 14px rgba(20, 49, 34, .16), inset 0 1px rgba(255, 255, 255, .72);
+  backdrop-filter: blur(5px);
+  font: inherit;
+  font-size: 9px;
+  font-weight: 850;
+  line-height: 1.15;
+  letter-spacing: .025em;
+  text-align: left;
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+}
+.commercial-pavilion-wayfinding-label strong { overflow: hidden; text-overflow: ellipsis; }
+.commercial-pavilion-wayfinding-icon {
+  display: grid;
+  width: 19px;
+  height: 19px;
+  flex: 0 0 19px;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--wayfinding-accent);
+  color: #fff;
+  box-shadow: 0 2px 7px color-mix(in srgb, var(--wayfinding-accent) 35%, transparent);
+}
+.commercial-pavilion-wayfinding-icon svg { width: 11px; height: 11px; stroke-width: 2.5; }
+.commercial-pavilion-wayfinding-label.is-entrance {
+  --wayfinding-accent: #16815c;
+  --wayfinding-bg: rgba(241, 251, 246, .97);
+  --wayfinding-border: rgba(22, 129, 92, .36);
+}
+.commercial-pavilion-wayfinding-label.is-exit {
+  --wayfinding-accent: #b67a17;
+  --wayfinding-bg: rgba(255, 249, 232, .97);
+  --wayfinding-border: rgba(182, 122, 23, .38);
+  color: #5d410f;
+}
+.commercial-pavilion-wayfinding-label.is-emergency {
+  --wayfinding-accent: #bd4045;
+  --wayfinding-bg: rgba(255, 244, 243, .98);
+  --wayfinding-border: rgba(189, 64, 69, .4);
+  color: #792b2e;
+}
+.commercial-pavilion-wayfinding-label.is-connection {
+  --wayfinding-accent: #dfbd4d;
+  --wayfinding-bg: rgba(35, 44, 99, .97);
+  --wayfinding-border: rgba(223, 189, 77, .72);
+  min-height: 34px;
+  max-width: 194px;
+  padding: 5px 11px 5px 6px;
+  color: #fffdf2;
+  box-shadow: 0 8px 22px rgba(29, 33, 81, .28), 0 0 0 2px rgba(223, 189, 77, .1);
+  cursor: pointer;
+  pointer-events: auto;
+  transition: transform .16s ease, border-color .16s ease, box-shadow .16s ease, background .16s ease;
+}
+.commercial-pavilion-wayfinding-label.is-connection:hover {
+  transform: translateY(-2px);
+  border-color: rgba(244, 213, 107, .94);
+  background: rgba(43, 53, 119, .99);
+  box-shadow: 0 10px 26px rgba(29, 33, 81, .34), 0 0 0 3px rgba(223, 189, 77, .13);
+}
+.commercial-pavilion-wayfinding-label.is-connection:focus-visible {
+  outline: 3px solid rgba(255, 224, 112, .72);
+  outline-offset: 3px;
+}
+.commercial-pavilion-wayfinding-label.is-connection:disabled { cursor: not-allowed; opacity: .62; }
 .commercial-map-validation-label { display: grid; min-width: 84px; gap: 1px; contain: layout paint style; padding: 4px 6px; transform: translateY(-5px); border: 1px solid rgba(26,213,245,.78); border-radius: 6px; background: rgba(8,25,31,.91); color: #f3fbfd; box-shadow: 0 4px 14px rgba(2,15,20,.32); font-family: 'JetBrains Mono', monospace; font-size: 5.5px; line-height: 1.2; text-align: left; white-space: nowrap; pointer-events: none; user-select: none; }
 .commercial-map-validation-label strong { color: #8feeff; font-size: 7px; letter-spacing: .025em; }
 .commercial-map-validation-label span { color: #d9e7e9; }
@@ -1511,4 +1592,23 @@
 @media (max-width: 720px) {
   .commercial-pavilion-module-card { top: auto; right: 14px; bottom: 14px; left: 14px; width: auto; max-height: min(66dvh, 590px); }
   .commercial-pavilion-plan-legend.is-interior { display: none; }
+  .commercial-pavilion-wayfinding-label {
+    min-height: 25px;
+    max-width: 132px;
+    gap: 4px;
+    padding: 3px 7px 3px 4px;
+    font-size: 8px;
+  }
+  .commercial-pavilion-wayfinding-icon { width: 17px; height: 17px; flex-basis: 17px; }
+  .commercial-pavilion-wayfinding-icon svg { width: 10px; height: 10px; }
+  .commercial-pavilion-wayfinding-label.is-connection {
+    min-height: 44px;
+    max-width: 158px;
+    padding: 4px 8px 4px 5px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .commercial-pavilion-wayfinding-label.is-connection { transition: none; }
+  .commercial-pavilion-wayfinding-label.is-connection:hover { transform: none; }
 }
