@@ -32,6 +32,7 @@ import { strategicLandmarkBounds, strategicLandmarkFacingRadians } from '../../u
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
 import { createCommercialPavilionTexture } from './commercialPavilionTextures';
 import { CommercialPavilionModuleLayer } from './CommercialPavilionModuleLayer';
+import { CommercialPavilionWayfindingLayer } from './CommercialPavilionWayfindingLayer';
 
 const NO_RAYCAST = () => undefined;
 const UP = new THREE.Vector3(0, 1, 0);
@@ -341,6 +342,7 @@ export const CommercialPavilionInteriorScene = memo(function CommercialPavilionI
 }) {
   const definition = resolveCommercialPavilionDefinition(entity);
   const modulePlan = resolveCommercialPavilionModulePlan(entity);
+  const enterInterior = useCommercialMapStore((state) => state.enterInterior);
   const bounds = useMemo(() => strategicLandmarkBounds(entity), [entity]);
   const facing = strategicLandmarkFacingRadians(entity);
   const interiorViewRotation = commercialPavilionInteriorViewRotationRadians(entity);
@@ -516,6 +518,12 @@ export const CommercialPavilionInteriorScene = memo(function CommercialPavilionI
           reducedGraphics={reducedGraphics}
           moduleStateById={moduleStateById}
           labelRotationRadians={interiorViewRotation}
+        />
+        <CommercialPavilionWayfindingLayer
+          layout={layout}
+          plan={modulePlan}
+          entities={entities}
+          onNavigate={enterInterior}
         />
         <InteriorInstances geometry={unitBoxGeometry} material={materials.structure} items={columns} castShadow />
         <InteriorInstances geometry={unitBoxGeometry} material={materials.structure} items={beams} castShadow />

@@ -6,9 +6,11 @@ import {
   type CommercialPavilionReferenceCorridor,
   type CommercialPavilionReferenceModuleOrientation,
   type CommercialPavilionReferenceRect,
+  type CommercialPavilionReferenceProjection,
   type CommercialPavilionReferenceRun,
   type CommercialPavilionReferenceSequenceOrientation,
   type CommercialPavilionReferenceSourceDiscrepancy,
+  type CommercialPavilionReferenceWallAccess,
 } from './commercialPavilionReference';
 
 export type Pavilion3CommercialModuleOrientation =
@@ -25,6 +27,17 @@ export type Pavilion3CommercialReferenceCell = CommercialPavilionReferenceCell<'
 
 /** Equal normalized clearance between adjacent modules in every official run. */
 export const PAVILION3_COMMERCIAL_MODULE_GAP = 0.0015;
+
+/**
+ * The current stretch projection is intentionally preserved. Metric dimensions
+ * only anchor wayfinding openings to the official 32.00 m x 44.48 m envelope.
+ */
+export const PAVILION3_COMMERCIAL_REFERENCE_PROJECTION = {
+  coordinateTransform: 'identity',
+  fit: 'stretch',
+  metricWidthM: 32,
+  metricDepthM: 44.48,
+} as const satisfies CommercialPavilionReferenceProjection;
 
 // The official plan shows two equal 32-module paired columns. Preserve the
 // established 28-cell modular pitch and extend the run mathematically, instead
@@ -184,6 +197,68 @@ export const PAVILION3_COMMERCIAL_REFERENCE_CORRIDORS = [
   },
 ] as const satisfies readonly Pavilion3CommercialReferenceCorridor[];
 
+export const PAVILION3_COMMERCIAL_WALL_ACCESSES = [
+  {
+    id: 'rear-west-entrance',
+    label: 'Entrada',
+    wall: 'rear',
+    centerAlongWallM: 19.7,
+    openingWidthM: 3,
+    kind: 'entrance',
+    sourcePrecision: 'plan-traced',
+    structuralOpening: false,
+  },
+  {
+    id: 'rear-east-entrance',
+    label: 'Entrada',
+    wall: 'rear',
+    centerAlongWallM: 12.3,
+    openingWidthM: 3,
+    kind: 'entrance',
+    sourcePrecision: 'plan-traced',
+    structuralOpening: false,
+  },
+  {
+    id: 'front-west-exit',
+    label: 'Saída',
+    wall: 'front',
+    centerAlongWallM: 27.08,
+    openingWidthM: 3.6,
+    kind: 'exit',
+    sourcePrecision: 'plan-traced',
+    structuralOpening: false,
+  },
+  {
+    id: 'front-emergency-exit',
+    label: 'Saída de emergência',
+    corridorId: 'south-access',
+    edges: ['front'],
+    kind: 'emergency',
+    sourcePrecision: 'official-metric',
+    structuralOpening: false,
+  },
+  {
+    id: 'front-east-exit',
+    label: 'Saída',
+    wall: 'front',
+    centerAlongWallM: 4.76,
+    openingWidthM: 2.96,
+    kind: 'exit',
+    sourcePrecision: 'plan-traced',
+    structuralOpening: false,
+  },
+  {
+    id: 'pavilion-13-connection',
+    label: 'Acesso para o Pavilhão 13',
+    corridorId: 'west-lateral-access',
+    edges: ['left'],
+    kind: 'gate',
+    sourcePrecision: 'official-metric',
+    connectsTo: 'B5',
+    structuralOpening: false,
+  },
+] as const satisfies readonly CommercialPavilionReferenceWallAccess[];
+
 const SOURCE_DOCUMENT = 'Croqui Pavilhão 3 - Fenasoja 2026.pdf' as const;
 
 export const PAVILION3_COMMERCIAL_REFERENCE_CELLS =
@@ -210,8 +285,10 @@ export const PAVILION3_COMMERCIAL_REFERENCE = {
   modularAreaM2: 663,
   individualAreaM2: null,
   moduleGap: PAVILION3_COMMERCIAL_MODULE_GAP,
+  projection: PAVILION3_COMMERCIAL_REFERENCE_PROJECTION,
   runs: PAVILION3_COMMERCIAL_REFERENCE_RUNS,
   corridors: PAVILION3_COMMERCIAL_REFERENCE_CORRIDORS,
+  wallAccesses: PAVILION3_COMMERCIAL_WALL_ACCESSES,
   cells: PAVILION3_COMMERCIAL_REFERENCE_CELLS,
   source: {
     document: SOURCE_DOCUMENT,

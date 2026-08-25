@@ -576,6 +576,7 @@ function createOfficialWallEntrances(
   const metricDepthM = plan.projection.metricDepthM;
 
   return plan.wallAccesses.flatMap((access, accessIndex) => {
+    if (access.structuralOpening === false) return [];
     if ('corridorId' in access) {
       const corridor = corridorById.get(access.corridorId);
       if (!corridor) {
@@ -800,12 +801,15 @@ export function createCommercialPavilionLayout(
         entranceDepth,
       })
     : [];
-  const usesOfficialEntrances = officialEntrances.length > 0;
-  const entrances = usesOfficialEntrances
-    ? officialEntrances.filter((entrance) => entrance.edge === 'front')
+  const officialFrontEntrances = officialEntrances.filter((entrance) => entrance.edge === 'front');
+  const officialRearEntrances = officialEntrances.filter((entrance) => entrance.edge === 'rear');
+  // Official accesses replace only the edge they describe. This preserves the
+  // established simplified facade on every untouched edge of a partial plan.
+  const entrances = officialFrontEntrances.length > 0
+    ? officialFrontEntrances
     : genericEntrances;
-  const resolvedRearEntrances = usesOfficialEntrances
-    ? officialEntrances.filter((entrance) => entrance.edge === 'rear')
+  const resolvedRearEntrances = officialRearEntrances.length > 0
+    ? officialRearEntrances
     : rearEntrances;
   const leftEntrances = officialEntrances.filter((entrance) => entrance.edge === 'left');
   const rightEntrances = officialEntrances.filter((entrance) => entrance.edge === 'right');

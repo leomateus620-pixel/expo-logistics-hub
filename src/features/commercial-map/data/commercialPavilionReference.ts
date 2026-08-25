@@ -287,6 +287,8 @@ export interface CommercialPavilionReferenceMetricWallAccess {
   kind?: 'entrance' | 'exit' | 'gate' | 'emergency' | 'service';
   sourcePrecision: CommercialPavilionReferenceSourcePrecision;
   connectsTo?: string;
+  /** False keeps the current simplified shell intact and renders wayfinding only. */
+  structuralOpening?: boolean;
 }
 
 /**
@@ -301,6 +303,8 @@ export interface CommercialPavilionReferenceCorridorWallAccess {
   kind?: 'entrance' | 'exit' | 'gate' | 'emergency' | 'service';
   sourcePrecision: CommercialPavilionReferenceSourcePrecision;
   connectsTo?: string;
+  /** False keeps the current simplified shell intact and renders wayfinding only. */
+  structuralOpening?: boolean;
 }
 
 export type CommercialPavilionReferenceWallAccess =
