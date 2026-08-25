@@ -12,6 +12,7 @@ import {
   type CommercialPavilionLayout,
 } from '../../utils/commercialPavilions';
 import {
+  createCommercialPavilionModuleProjectionFrame,
   projectCommercialPavilionModuleRect,
   resolveCommercialPavilionModulePlan,
   type CommercialPavilionLocalRect,
@@ -65,13 +66,16 @@ function buildProtectedPlanRects(
     width: layout.interior.clearWidth,
     depth: layout.interior.clearDepth,
   };
+  const projectionFrame = createCommercialPavilionModuleProjectionFrame(plan, footprint);
   return [
     ...plan.cells.flatMap((cell) => moduleRenderParts(cell).map((part) => (
-      projectCommercialPavilionModuleRect(part, footprint)
+      projectCommercialPavilionModuleRect(part, projectionFrame)
     ))),
-    ...plan.corridors.map((corridor) => projectCommercialPavilionModuleRect(corridor, footprint)),
+    ...plan.corridors.map((corridor) => (
+      projectCommercialPavilionModuleRect(corridor, projectionFrame)
+    )),
     ...plan.supportSpaces.map((supportSpace) => (
-      projectCommercialPavilionModuleRect(supportSpace, footprint)
+      projectCommercialPavilionModuleRect(supportSpace, projectionFrame)
     )),
   ];
 }

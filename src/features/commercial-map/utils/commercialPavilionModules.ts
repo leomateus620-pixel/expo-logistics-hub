@@ -1,10 +1,15 @@
 import type { MapEntity } from '../types';
 import {
+  createCommercialPavilionReferenceProjectionFrame,
+  DEFAULT_COMMERCIAL_PAVILION_REFERENCE_PROJECTION,
+  projectCommercialPavilionReferenceRect,
   type CommercialPavilionModuleSource,
   type CommercialPavilionReferenceCell,
   type CommercialPavilionReferenceCellShape,
   type CommercialPavilionReferenceCorridor,
   type CommercialPavilionReferenceModuleOrientation,
+  type CommercialPavilionReferenceProjection,
+  type CommercialPavilionReferenceProjectionFrame,
   type CommercialPavilionReferenceRun,
   type CommercialPavilionReferenceSequenceOrientation,
   type CommercialPavilionReferenceSupportSpace,
@@ -119,6 +124,7 @@ export interface CommercialPavilionModulePlan {
   colorCue: string;
   stats: CommercialPavilionModuleStats;
   boundary: NormalizedCommercialPavilionRect;
+  projection: CommercialPavilionReferenceProjection;
   zones: readonly CommercialPavilionModuleZone[];
   corridors: readonly CommercialPavilionCorridor[];
   supportSpaces: readonly CommercialPavilionReferenceSupportSpace[];
@@ -295,6 +301,7 @@ function buildPlan(seed: CommercialPavilionModulePlanSeed): CommercialPavilionMo
 
   return {
     ...seed,
+    projection: DEFAULT_COMMERCIAL_PAVILION_REFERENCE_PROJECTION,
     zones,
     supportSpaces: [],
     cells,
@@ -400,6 +407,7 @@ interface OfficialCommercialPavilionReference {
   moduleCount: number;
   totalAreaM2: number;
   modularAreaM2: number;
+  projection?: CommercialPavilionReferenceProjection;
   runs: readonly CommercialPavilionReferenceRun[];
   corridors: readonly CommercialPavilionReferenceCorridor[];
   supportSpaces?: readonly CommercialPavilionReferenceSupportSpace[];
@@ -444,6 +452,7 @@ function buildOfficialCommercialPavilionPlan(
       moduleAreaSquareMeters: reference.modularAreaM2,
     },
     boundary: OFFICIAL_BOUNDARY,
+    projection: reference.projection ?? DEFAULT_COMMERCIAL_PAVILION_REFERENCE_PROJECTION,
     zones,
     corridors: reference.corridors,
     supportSpaces: reference.supportSpaces ?? [],
@@ -511,12 +520,20 @@ export function resolveCommercialPavilionModulePlan(
 
 export function projectCommercialPavilionModuleRect(
   normalized: NormalizedCommercialPavilionRect,
-  footprint: { width: number; depth: number },
+  target: { width: number; depth: number } | CommercialPavilionReferenceProjectionFrame,
 ): CommercialPavilionLocalRect {
-  return {
-    centerX: (normalized.centerX - 0.5) * footprint.width,
-    centerZ: (normalized.centerZ - 0.5) * footprint.depth,
-    width: normalized.width * footprint.width,
-    depth: normalized.depth * footprint.depth,
-  };
+  const frame = 'coordinateTransform' in target
+    ? target
+    : createCommercialPavilionReferenceProjectionFrame(
+        DEFAULT_COMMERCIAL_PAVILION_REFERENCE_PROJECTION,
+        target,
+      );
+  return projectCommercialPavilionReferenceRect(normalized, frame);
+}
+
+export function createCommercialPavilionModuleProjectionFrame(
+  plan: Pick<CommercialPavilionModulePlan, 'projection'>,
+  footprint: { width: number; depth: number },
+): CommercialPavilionReferenceProjectionFrame {
+  return createCommercialPavilionReferenceProjectionFrame(plan.projection, footprint);
 }
