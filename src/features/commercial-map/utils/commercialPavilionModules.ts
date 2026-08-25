@@ -4,6 +4,7 @@ import {
   DEFAULT_COMMERCIAL_PAVILION_REFERENCE_PROJECTION,
   projectCommercialPavilionReferenceRect,
   type CommercialPavilionModuleSource,
+  type CommercialPavilionInteriorPresentation,
   type CommercialPavilionReferenceCell,
   type CommercialPavilionReferenceCellShape,
   type CommercialPavilionReferenceCorridor,
@@ -135,6 +136,7 @@ export interface CommercialPavilionModulePlan {
   stats: CommercialPavilionModuleStats;
   boundary: NormalizedCommercialPavilionRect;
   projection: CommercialPavilionReferenceProjection;
+  interiorPresentation?: CommercialPavilionInteriorPresentation;
   zones: readonly CommercialPavilionModuleZone[];
   legendNumberRanges: readonly (readonly [start: number, end: number])[];
   corridors: readonly CommercialPavilionCorridor[];
@@ -167,6 +169,7 @@ interface OfficialCommercialPavilionReference {
   nominalGeometricAreaM2?: number;
   exhibitionAreaM2?: number;
   projection?: CommercialPavilionReferenceProjection;
+  interiorPresentation?: CommercialPavilionInteriorPresentation;
   boundary?: CommercialPavilionReferenceRect;
   runs: readonly CommercialPavilionReferenceRun[];
   corridors: readonly CommercialPavilionReferenceCorridor[];
@@ -225,6 +228,9 @@ function buildOfficialCommercialPavilionPlan(
     },
     boundary: reference.boundary ?? OFFICIAL_BOUNDARY,
     projection: reference.projection ?? DEFAULT_COMMERCIAL_PAVILION_REFERENCE_PROJECTION,
+    ...(reference.interiorPresentation
+      ? { interiorPresentation: reference.interiorPresentation }
+      : {}),
     zones,
     legendNumberRanges: reference.legendNumberRanges
       ?? zones.map((zone) => zone.numberRange),
@@ -334,4 +340,107 @@ export function createCommercialPavilionModuleProjectionFrame(
   footprint: { width: number; depth: number },
 ): CommercialPavilionReferenceProjectionFrame {
   return createCommercialPavilionReferenceProjectionFrame(plan.projection, footprint);
+}
+
+function rectEdges(rect: CommercialPavilionReferenceRect) {
+  return {
+    minX: rect.centerX - rect.width / 2,
+    minZ: rect.centerZ - rect.depth / 2,
+    maxX: rect.centerX + rect.width / 2,
+    maxZ: rect.centerZ + rect.depth / 2,
+  };
+}
+
+/**
+ * Source-space envelope used only by the dedicated pavilion interior. The
+ * official boundary remains authoritative, while traced support wings may
+ * legitimately extend outside its normalized 0..1 range.
+ */
+export function deriveCommercialPavilionOfficialContentEnvelope(
+  plan: Pick<
+    CommercialPavilionModulePlan,
+    'boundary' | 'cells' | 'corridors' | 'supportSpaces' | 'interiorPresentation'
+  >,
+): NormalizedCommercialPavilionRect | null {
+  if (plan.interiorPresentation?.fit !== 'official-content') return null;
+
+  const rectangles: CommercialPavilionReferenceRect[] = [
+    plan.boundary,
+    ...plan.cells,
+    ...plan.cells.flatMap((cell) => cell.shape?.renderParts ?? []),
+    ...plan.corridors,
+    ...plan.supportSpaces,
+  ];
+  const points = plan.cells.flatMap((cell) => cell.shape?.footprint ?? []);
+  const initial = rectEdges(rectangles[0]);
+  const bounds = rectangles.slice(1).reduce((current, rect) => {
+    const edges = rectEdges(rect);
+    return {
+      minX: Math.min(current.minX, edges.minX),
+      minZ: Math.min(current.minZ, edges.minZ),
+      maxX: Math.max(current.maxX, edges.maxX),
+      maxZ: Math.max(current.maxZ, edges.maxZ),
+    };
+  }, initial);
+  points.forEach(([x, z]) => {
+    bounds.minX = Math.min(bounds.minX, x);
+    bounds.minZ = Math.min(bounds.minZ, z);
+    bounds.maxX = Math.max(bounds.maxX, x);
+    bounds.maxZ = Math.max(bounds.maxZ, z);
+  });
+
+  const width = bounds.maxX - bounds.minX;
+  const depth = bounds.maxZ - bounds.minZ;
+  if (!Number.isFinite(width) || !Number.isFinite(depth) || width <= 0 || depth <= 0) {
+    throw new Error('O envelope oficial do interior do pavilhao e invalido.');
+  }
+  return {
+    centerX: (bounds.minX + bounds.maxX) / 2,
+    centerZ: (bounds.minZ + bounds.maxZ) / 2,
+    width,
+    depth,
+  };
+}
+
+/** Width/depth ratio after metric scale and the plan's orientation transform. */
+export function commercialPavilionOfficialContentAspect(
+  plan: Pick<
+    CommercialPavilionModulePlan,
+    'boundary' | 'cells' | 'corridors' | 'supportSpaces' | 'projection' | 'interiorPresentation'
+  >,
+): number | null {
+  const envelope = deriveCommercialPavilionOfficialContentEnvelope(plan);
+  if (!envelope) return null;
+  const { metricWidthM, metricDepthM, coordinateTransform, fit } = plan.projection;
+  if (
+    fit !== 'metric-contain'
+    || !metricWidthM
+    || !metricDepthM
+    || !Number.isFinite(metricWidthM)
+    || !Number.isFinite(metricDepthM)
+    || metricWidthM <= 0
+    || metricDepthM <= 0
+  ) {
+    throw new Error('O enquadramento official-content exige uma projecao metric-contain.');
+  }
+  const sourceWidthM = envelope.width * metricWidthM;
+  const sourceDepthM = envelope.depth * metricDepthM;
+  return coordinateTransform === 'quarter-turn-clockwise'
+    ? sourceDepthM / sourceWidthM
+    : sourceWidthM / sourceDepthM;
+}
+
+export function projectCommercialPavilionOfficialContentEnvelope(
+  plan: Pick<
+    CommercialPavilionModulePlan,
+    'boundary' | 'cells' | 'corridors' | 'supportSpaces' | 'projection' | 'interiorPresentation'
+  >,
+  footprint: { width: number; depth: number },
+): CommercialPavilionLocalRect | null {
+  const envelope = deriveCommercialPavilionOfficialContentEnvelope(plan);
+  if (!envelope) return null;
+  return projectCommercialPavilionReferenceRect(
+    envelope,
+    createCommercialPavilionReferenceProjectionFrame(plan.projection, footprint),
+  );
 }

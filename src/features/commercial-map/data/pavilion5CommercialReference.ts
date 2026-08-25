@@ -168,6 +168,7 @@ export const PAVILION5_COMMERCIAL_REFERENCE = {
   moduleGap: PAVILION5_COMMERCIAL_MODULE_GAP,
   boundary: { centerX: 0.5, centerZ: 0.5, width: 1, depth: 1 },
   projection: PAVILION5_COMMERCIAL_REFERENCE_PROJECTION,
+  interiorPresentation: { fit: 'official-content' },
   runs: PAVILION5_COMMERCIAL_REFERENCE_RUNS,
   corridors: PAVILION5_COMMERCIAL_REFERENCE_CORRIDORS,
   supportSpaces: PAVILION5_COMMERCIAL_SUPPORT_SPACES,

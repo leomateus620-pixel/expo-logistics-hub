@@ -345,6 +345,7 @@ export const PAVILION13_COMMERCIAL_REFERENCE = {
   moduleGap: PAVILION13_COMMERCIAL_MODULE_GAP,
   boundary: { centerX: 0.5, centerZ: 0.5, width: 1, depth: 1 },
   projection: PAVILION13_COMMERCIAL_REFERENCE_PROJECTION,
+  interiorPresentation: { fit: 'official-content' },
   legendNumberRanges: [[1, 26], [27, 29], [30, 77], [78, 103]],
   runs: PAVILION13_COMMERCIAL_REFERENCE_RUNS,
   corridors: PAVILION13_COMMERCIAL_REFERENCE_CORRIDORS,

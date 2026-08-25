@@ -16,6 +16,11 @@ export type CommercialPavilionReferenceProjectionFit =
   | 'stretch'
   | 'metric-contain';
 
+export interface CommercialPavilionInteriorPresentation {
+  /** Fits the dedicated interior shell to the complete official-plan content. */
+  fit: 'official-content';
+}
+
 export interface CommercialPavilionReferenceProjection {
   coordinateTransform: CommercialPavilionReferenceCoordinateTransform;
   fit: CommercialPavilionReferenceProjectionFit;
