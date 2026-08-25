@@ -240,6 +240,7 @@ export const PAVILION8_COMMERCIAL_REFERENCE = {
   moduleGap: PAVILION8_COMMERCIAL_MODULE_GAP,
   boundary: { centerX: 0.5, centerZ: 0.5, width: 1, depth: 1 },
   projection: PAVILION8_COMMERCIAL_REFERENCE_PROJECTION,
+  interiorPresentation: { fit: 'official-content' },
   legendNumberRanges: [[1, 20], [21, 37], [38, 89], [90, 114]],
   runs: PAVILION8_COMMERCIAL_REFERENCE_RUNS,
   corridors: PAVILION8_COMMERCIAL_REFERENCE_CORRIDORS,

@@ -7,6 +7,7 @@ import type { CommercialLot, MapEntity } from '../../types';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import {
   createCommercialPavilionLayout,
+  commercialPavilionInteriorPresentationBounds,
   commercialPavilionModelBounds,
   commercialPavilionInteriorViewRotationRadians,
   resolveCommercialPavilionDefinition,
@@ -14,6 +15,7 @@ import {
 } from '../../utils/commercialPavilions';
 import {
   createCommercialPavilionModuleProjectionFrame,
+  projectCommercialPavilionOfficialContentEnvelope,
   projectCommercialPavilionModuleRect,
   resolveCommercialPavilionModulePlan,
   type CommercialPavilionLocalRect,
@@ -342,13 +344,38 @@ export const CommercialPavilionInteriorScene = memo(function CommercialPavilionI
   const bounds = useMemo(() => strategicLandmarkBounds(entity), [entity]);
   const facing = strategicLandmarkFacingRadians(entity);
   const interiorViewRotation = commercialPavilionInteriorViewRotationRadians(entity);
-  const modelBounds = useMemo(
+  const physicalModelBounds = useMemo(
     () => commercialPavilionModelBounds(bounds, facing),
     [bounds, facing],
   );
-  const layout = useMemo(() => definition
-    ? createCommercialPavilionLayout(modelBounds, definition, undefined, modulePlan)
-    : null, [definition, modelBounds, modulePlan]);
+  const layout = useMemo(() => {
+    if (!definition) return null;
+    const physicalLayout = createCommercialPavilionLayout(
+      physicalModelBounds,
+      definition,
+      undefined,
+      modulePlan,
+    );
+    if (!modulePlan) return physicalLayout;
+    const contentEnvelope = projectCommercialPavilionOfficialContentEnvelope(
+      modulePlan,
+      {
+        width: physicalLayout.interior.clearWidth,
+        depth: physicalLayout.interior.clearDepth,
+      },
+    );
+    if (!contentEnvelope) return physicalLayout;
+    const presentationBounds = commercialPavilionInteriorPresentationBounds(
+      physicalModelBounds,
+      contentEnvelope,
+    );
+    return createCommercialPavilionLayout(
+      presentationBounds,
+      definition,
+      physicalLayout.height,
+      modulePlan,
+    );
+  }, [definition, modulePlan, physicalModelBounds]);
   const floorTexture = useMemo(() => createCommercialPavilionTexture('floor'), []);
   const materials = useMemo(() => ({
     floor: new THREE.MeshStandardMaterial({

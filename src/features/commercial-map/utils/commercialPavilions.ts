@@ -430,6 +430,49 @@ export function commercialPavilionModelBounds<
   };
 }
 
+const COMMERCIAL_PAVILION_WALL_INSET_RATIO = 0.025;
+const COMMERCIAL_PAVILION_INTERIOR_PERIMETER_INSET_RATIO = 0.065;
+const COMMERCIAL_PAVILION_TOTAL_CLEAR_INSET_RATIO = 2 * (
+  COMMERCIAL_PAVILION_WALL_INSET_RATIO
+  + COMMERCIAL_PAVILION_INTERIOR_PERIMETER_INSET_RATIO
+);
+
+/**
+ * Builds a view-only model frame whose eventual clear floor matches the
+ * projected content dimensions. The precomputed module scale is preserved;
+ * only the dedicated interior shell changes.
+ */
+export function commercialPavilionInteriorPresentationBounds<
+  Bounds extends CommercialPavilionBoundsDimensions,
+>(
+  bounds: Bounds,
+  clearFrame: CommercialPavilionBoundsDimensions,
+): Bounds {
+  if (
+    !Number.isFinite(clearFrame.width)
+    || !Number.isFinite(clearFrame.depth)
+    || clearFrame.width <= 0
+    || clearFrame.depth <= 0
+  ) {
+    throw new Error('O frame do enquadramento interno do pavilhao e invalido.');
+  }
+  const clearShortSideRatio = 1 - COMMERCIAL_PAVILION_TOTAL_CLEAR_INSET_RATIO;
+  const widthIsShorter = clearFrame.width <= clearFrame.depth;
+  const width = widthIsShorter
+    ? clearFrame.width / clearShortSideRatio
+    : clearFrame.width
+      + COMMERCIAL_PAVILION_TOTAL_CLEAR_INSET_RATIO
+        * (clearFrame.depth / clearShortSideRatio);
+  const depth = widthIsShorter
+    ? clearFrame.depth + COMMERCIAL_PAVILION_TOTAL_CLEAR_INSET_RATIO * width
+    : clearFrame.depth / clearShortSideRatio;
+  return {
+    ...bounds,
+    width,
+    depth,
+  };
+}
+
 function finitePositive(value: number, fallback: number): number {
   return Number.isFinite(value) && value > 0 ? value : fallback;
 }
@@ -636,7 +679,7 @@ export function createCommercialPavilionLayout(
   const shortSide = Math.min(width, depth);
   const slabHeight = height * 0.038;
   const slabTopY = slabHeight;
-  const wallInset = shortSide * 0.025;
+  const wallInset = shortSide * COMMERCIAL_PAVILION_WALL_INSET_RATIO;
   const shellWidth = width - wallInset * 2;
   const shellDepth = depth - wallInset * 2;
   const rise = height * roofRiseRatio(definition.roofProfile);
@@ -715,7 +758,7 @@ export function createCommercialPavilionLayout(
   const structureColumnHeight = shellHeight * 0.96;
   const structureColumnCenterY = slabTopY + structureColumnHeight / 2;
 
-  const perimeterInset = shortSide * 0.065;
+  const perimeterInset = shortSide * COMMERCIAL_PAVILION_INTERIOR_PERIMETER_INSET_RATIO;
   const clearWidth = shellWidth - perimeterInset * 2;
   const clearDepth = shellDepth - perimeterInset * 2;
   const mainAisle: CommercialPavilionRect = {
