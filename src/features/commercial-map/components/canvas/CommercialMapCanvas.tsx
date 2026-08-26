@@ -130,6 +130,40 @@ interface SceneExtent {
   diagonal: number;
 }
 
+const PAVILION_INTERIOR_TRANSITION_COVER_MS = 180;
+const PAVILION_INTERIOR_TRANSITION_REVEAL_MS = 240;
+
+interface PavilionInteriorTransitionState {
+  phase: 'covering' | 'revealing';
+  targetLabel: string;
+}
+
+function PavilionInteriorTransitionOverlay({
+  transition,
+}: {
+  transition: PavilionInteriorTransitionState | null;
+}) {
+  if (!transition) return null;
+  return (
+    <Html
+      fullscreen
+      zIndexRange={[60, 40]}
+      style={{ pointerEvents: 'auto' }}
+    >
+      <div
+        className={`commercial-pavilion-view-transition is-${transition.phase}`}
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+      >
+        <span aria-hidden="true" />
+        <small>Conexão interna</small>
+        <strong>{transition.targetLabel}</strong>
+      </div>
+    </Html>
+  );
+}
+
 const NO_RAYCAST = () => undefined;
 const PRECISE_HOVER_CAPABLE = typeof window === 'undefined'
   || !window.matchMedia
@@ -1874,6 +1908,7 @@ function Scene({
   const setHoveredEntityId = useCommercialMapStore((state) => state.setHoveredEntityId);
   const focusSelection = useCommercialMapStore((state) => state.focusSelection);
   const enterInterior = useCommercialMapStore((state) => state.enterInterior);
+  const switchInterior = useCommercialMapStore((state) => state.switchInterior);
   const labelsVisible = useCommercialMapStore((state) => state.labelsVisible);
   const treesVisible = useCommercialMapStore((state) => state.treesVisible);
   const hydrologicalModeActive = useCommercialMapStore((state) => state.hydrologicalModeActive);
@@ -1886,6 +1921,12 @@ function Scene({
   const cameraNavigating = useCommercialMapStore((state) => state.cameraNavigating);
   const technicalValidationVisible = useCommercialMapStore((state) => state.technicalValidationVisible);
   const activeSegmentId = useCommercialMapStore((state) => state.activeSegmentId);
+  const [pavilionInteriorTransition, setPavilionInteriorTransition] = useState<
+    PavilionInteriorTransitionState | null
+  >(null);
+  const pavilionTransitionTimer = useRef<number | null>(null);
+  const pavilionTransitionFrame = useRef<number | null>(null);
+  const pavilionTransitionActive = useRef(false);
   const gl = useThree((state) => state.gl);
   const invalidate = useThree((state) => state.invalidate);
   const setCanvasCursor = useCallback((cursor: 'grab' | 'grabbing' | 'pointer') => {
@@ -1932,6 +1973,66 @@ function Scene({
   const handleEntityFocus = useCallback(() => {
     if (!hydrologicalModeActive) focusSelection();
   }, [focusSelection, hydrologicalModeActive]);
+  const clearPavilionTransitionSchedule = useCallback(() => {
+    if (pavilionTransitionTimer.current !== null) {
+      window.clearTimeout(pavilionTransitionTimer.current);
+      pavilionTransitionTimer.current = null;
+    }
+    if (pavilionTransitionFrame.current !== null) {
+      window.cancelAnimationFrame(pavilionTransitionFrame.current);
+      pavilionTransitionFrame.current = null;
+    }
+    pavilionTransitionActive.current = false;
+  }, []);
+  const handlePavilionInteriorNavigate = useCallback((targetEntityId: string) => {
+    if (pavilionTransitionActive.current || targetEntityId === interiorEntityId) return;
+    const sourceInteriorEntityId = interiorEntityId;
+    if (!sourceInteriorEntityId) return;
+    const targetEntity = entities.find((candidate) => (
+      candidate.id === targetEntityId
+      && resolveStrategicLandmarkKind(candidate) === 'commercial-pavilion'
+    ));
+    if (!targetEntity) return;
+
+    const prefersReducedMotion = typeof window !== 'undefined'
+      && typeof window.matchMedia === 'function'
+      && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reducedGraphics || prefersReducedMotion) {
+      switchInterior(targetEntityId);
+      return;
+    }
+
+    const targetLabel = targetEntity.name.match(/^Pavilhão\s+\d+/i)?.[0]
+      ?? targetEntity.name;
+    pavilionTransitionActive.current = true;
+    setPavilionInteriorTransition({ phase: 'covering', targetLabel });
+    pavilionTransitionTimer.current = window.setTimeout(() => {
+      if (
+        !pavilionTransitionActive.current
+        || useCommercialMapStore.getState().interiorEntityId !== sourceInteriorEntityId
+      ) {
+        clearPavilionTransitionSchedule();
+        setPavilionInteriorTransition(null);
+        return;
+      }
+      switchInterior(targetEntityId);
+      pavilionTransitionTimer.current = null;
+      pavilionTransitionFrame.current = window.requestAnimationFrame(() => {
+        if (useCommercialMapStore.getState().interiorEntityId !== targetEntityId) {
+          clearPavilionTransitionSchedule();
+          setPavilionInteriorTransition(null);
+          return;
+        }
+        pavilionTransitionFrame.current = null;
+        setPavilionInteriorTransition({ phase: 'revealing', targetLabel });
+        pavilionTransitionTimer.current = window.setTimeout(() => {
+          pavilionTransitionTimer.current = null;
+          pavilionTransitionActive.current = false;
+          setPavilionInteriorTransition(null);
+        }, PAVILION_INTERIOR_TRANSITION_REVEAL_MS);
+      });
+    }, PAVILION_INTERIOR_TRANSITION_COVER_MS);
+  }, [clearPavilionTransitionSchedule, entities, interiorEntityId, reducedGraphics, switchInterior]);
   const handleHydrologicalSelect = useCallback((
     element: CommercialHydrologicalNode | CommercialHydrologicalPipeSegment,
   ) => {
@@ -2100,16 +2201,28 @@ function Scene({
     setHoveredEntityId(null);
   }, [cameraNavigating, setHoveredEntityId]);
 
+  useEffect(() => () => clearPavilionTransitionSchedule(), [clearPavilionTransitionSchedule]);
+
+  useEffect(() => {
+    if (interiorEntityId || !pavilionTransitionActive.current) return;
+    clearPavilionTransitionSchedule();
+    setPavilionInteriorTransition(null);
+  }, [clearPavilionTransitionSchedule, interiorEntityId]);
+
   if (interiorEntity) {
     const interiorKind = resolveStrategicLandmarkKind(interiorEntity);
     if (interiorKind === 'commercial-pavilion') {
       return (
-        <CommercialPavilionInteriorScene
-          entity={interiorEntity}
-          entities={entities}
-          lots={lots}
-          reducedGraphics={reducedGraphics}
-        />
+        <>
+          <CommercialPavilionInteriorScene
+            entity={interiorEntity}
+            entities={entities}
+            lots={lots}
+            reducedGraphics={reducedGraphics}
+            onNavigate={handlePavilionInteriorNavigate}
+          />
+          <PavilionInteriorTransitionOverlay transition={pavilionInteriorTransition} />
+        </>
       );
     }
     if (interiorKind === 'livestock-pavilion') {

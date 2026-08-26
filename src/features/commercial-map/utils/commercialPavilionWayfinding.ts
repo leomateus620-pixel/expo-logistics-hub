@@ -14,6 +14,7 @@ import type {
 export type CommercialPavilionWayfindingMarkerKind =
   | 'entrance'
   | 'exit'
+  | 'bidirectional'
   | 'emergency'
   | 'connection';
 
@@ -34,6 +35,7 @@ function markerKind(
   if (access.connectsTo) return 'connection';
   if (access.kind === 'entrance') return 'entrance';
   if (access.kind === 'exit') return 'exit';
+  if (access.kind === 'gate') return 'bidirectional';
   if (access.kind === 'emergency') return 'emergency';
   return null;
 }
@@ -45,6 +47,7 @@ function markerLabel(
   if (access.label) return access.label;
   if (kind === 'entrance') return 'Entrada';
   if (kind === 'exit') return 'Saída';
+  if (kind === 'bidirectional') return 'Entrada e saída';
   if (kind === 'emergency') return 'Saída de emergência';
   return 'Acesso entre pavilhões';
 }

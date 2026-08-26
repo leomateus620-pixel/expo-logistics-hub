@@ -82,6 +82,7 @@ interface CommercialMapState {
   activateScope: (scopeKey: string, segmentId: CommercialMapSegmentId | null) => void;
   setSelectedEntityId: (id: string | null) => void;
   enterInterior: (id: string) => void;
+  switchInterior: (id: string) => void;
   exitInterior: () => void;
   setInteriorReturnView: (view: CommercialMapCameraView | null) => void;
   setHoveredEntityId: (id: string | null) => void;
@@ -203,6 +204,20 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
     selectedModuleId: null,
     interiorEntityId: selectedEntityId,
     interiorReturnView: null,
+    activePanel: null,
+    workspaceMode: '3d',
+    cameraNavigating: false,
+    cameraSequence: state.cameraSequence + 1,
+  })),
+  switchInterior: (selectedEntityId) => set((state) => ({
+    selectedEntityId,
+    hoveredEntityId: null,
+    hoveredModuleId: null,
+    selectedModuleId: null,
+    interiorEntityId: selectedEntityId,
+    // Keep the camera captured on the first interior entry so a chain such as
+    // P13 -> P8 -> P12 still returns to the exact same map view.
+    interiorReturnView: state.interiorReturnView,
     activePanel: null,
     workspaceMode: '3d',
     cameraNavigating: false,

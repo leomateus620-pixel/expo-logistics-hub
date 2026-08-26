@@ -334,15 +334,16 @@ export const CommercialPavilionInteriorScene = memo(function CommercialPavilionI
   entities,
   lots,
   reducedGraphics,
+  onNavigate,
 }: {
   entity: MapEntity;
   entities: MapEntity[];
   lots: CommercialLot[];
   reducedGraphics: boolean;
+  onNavigate: (targetEntityId: string) => void;
 }) {
   const definition = resolveCommercialPavilionDefinition(entity);
   const modulePlan = resolveCommercialPavilionModulePlan(entity);
-  const enterInterior = useCommercialMapStore((state) => state.enterInterior);
   const bounds = useMemo(() => strategicLandmarkBounds(entity), [entity]);
   const facing = strategicLandmarkFacingRadians(entity);
   const interiorViewRotation = commercialPavilionInteriorViewRotationRadians(entity);
@@ -523,7 +524,7 @@ export const CommercialPavilionInteriorScene = memo(function CommercialPavilionI
           layout={layout}
           plan={modulePlan}
           entities={entities}
-          onNavigate={enterInterior}
+          onNavigate={onNavigate}
         />
         <InteriorInstances geometry={unitBoxGeometry} material={materials.structure} items={columns} castShadow />
         <InteriorInstances geometry={unitBoxGeometry} material={materials.structure} items={beams} castShadow />

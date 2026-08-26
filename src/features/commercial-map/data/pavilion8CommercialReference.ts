@@ -7,6 +7,7 @@ import {
   type CommercialPavilionReferenceProjection,
   type CommercialPavilionReferenceRun,
   type CommercialPavilionReferenceSupportSpace,
+  type CommercialPavilionReferenceWallAccess,
 } from './commercialPavilionReference';
 
 export type Pavilion8CommercialReferenceCell =
@@ -163,6 +164,59 @@ export const PAVILION8_COMMERCIAL_REFERENCE_CORRIDORS = [
   },
 ] as const satisfies readonly CommercialPavilionReferenceCorridor[];
 
+export const PAVILION8_COMMERCIAL_WALL_ACCESSES = [
+  {
+    id: 'rear-emergency-exit',
+    label: 'Saída de emergência',
+    wall: 'rear',
+    centerAlongWallM: 19.6,
+    openingWidthM: 4.2,
+    kind: 'emergency',
+    sourcePrecision: 'official-metric',
+    structuralOpening: false,
+  },
+  {
+    id: 'southwest-entry-exit',
+    label: 'Entrada e saída',
+    wall: 'front',
+    centerAlongWallM: 5.675,
+    openingWidthM: 3.35,
+    kind: 'gate',
+    sourcePrecision: 'official-metric',
+    structuralOpening: false,
+  },
+  {
+    id: 'southeast-entry-exit',
+    label: 'Entrada e saída',
+    wall: 'front',
+    centerAlongWallM: 16.025,
+    openingWidthM: 3.35,
+    kind: 'gate',
+    sourcePrecision: 'official-metric',
+    structuralOpening: false,
+  },
+  {
+    id: 'pavilion-13-connection',
+    label: 'Acesso para o Pavilhão 13',
+    corridorId: 'west-cross-access',
+    edges: ['left'],
+    kind: 'gate',
+    sourcePrecision: 'official-metric',
+    connectsTo: 'B5',
+    structuralOpening: false,
+  },
+  {
+    id: 'pavilion-12-connection',
+    label: 'Acesso para o Pavilhão 12',
+    corridorId: 'east-cross-access',
+    edges: ['right'],
+    kind: 'gate',
+    sourcePrecision: 'official-metric',
+    connectsTo: 'B3',
+    structuralOpening: false,
+  },
+] as const satisfies readonly CommercialPavilionReferenceWallAccess[];
+
 export const PAVILION8_COMMERCIAL_SUPPORT_SPACES = [
   {
     id: 'sanitarios',
@@ -245,6 +299,7 @@ export const PAVILION8_COMMERCIAL_REFERENCE = {
   runs: PAVILION8_COMMERCIAL_REFERENCE_RUNS,
   corridors: PAVILION8_COMMERCIAL_REFERENCE_CORRIDORS,
   supportSpaces: PAVILION8_COMMERCIAL_SUPPORT_SPACES,
+  wallAccesses: PAVILION8_COMMERCIAL_WALL_ACCESSES,
   cells: PAVILION8_COMMERCIAL_REFERENCE_CELLS,
   source: {
     document: SOURCE_DOCUMENT,
