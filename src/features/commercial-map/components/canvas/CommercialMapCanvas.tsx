@@ -85,7 +85,12 @@ import { CommercialElectricalInfrastructureLayer } from './CommercialElectricalI
 import { ArenaFrontInfrastructure } from './ArenaFrontInfrastructure';
 import { NationsDistrict } from './NationsDistrict';
 import { CommercialMapEnvironment } from './CommercialMapEnvironment';
+import { ParkAccessEnvironmentLayer } from './ParkAccessEnvironmentLayer';
+import { ParkAccessInfrastructure } from './ParkAccessInfrastructure';
+import { selectParkAccessCompatibleTreesForPresentation } from '../../data/parkAccessEnvironment';
+import { PARK_ACCESS_SPATIAL_PLAN } from '../../data/parkAccessSpatialPlan';
 import {
+  COMMERCIAL_MAP_SEGMENT_IDS,
   buildCommercialMapSegmentIndex,
   getCommercialMapSegment,
   isSegmentTintClassification,
@@ -181,6 +186,28 @@ const AREA_NUMBER = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, m
 const SEGMENT_LOT_SURFACE_WEIGHT = 0.94;
 const STATUS_MARK_LONG_RATIO = 0.34;
 const STATUS_MARK_SHORT_RATIO = 0.09;
+const DETAILED_PARK_ACCESS_GATE_HIT_AREAS = new Map<string, {
+  width: number;
+  depth: number;
+  height: number;
+  rotationRadians: number;
+}>(
+  Object.values(PARK_ACCESS_SPATIAL_PLAN.gates).map((gate) => [
+    gate.officialEntityIdentifier,
+    {
+      width: gate.width * 1.08,
+      depth: gate.depth * 1.7,
+      height: 1.35,
+      rotationRadians: Math.PI / 2 - gate.approachHeadingRadians,
+    },
+  ]),
+);
+const PARK_ACCESS_SURFACE_OWNER_IDENTIFIERS = [
+  'AV-BENVENUTO-CONTI',
+  'AV-TUPARENDI',
+  'CALCADA-ARVOREDO',
+] as const;
+const PARK_ACCESS_ARCHITECTURE_OWNER_IDENTIFIERS = ['A1', 'A2', 'A3'] as const;
 
 function createGateArrowGeometry() {
   const shape = new THREE.Shape();
@@ -587,6 +614,10 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
   const isQuadra = classification === 'QUADRA' || entity.metadata.renderMode === 'outline';
   const isPavilion = classification === 'PAVILION';
   const isGate = classification === 'GATE';
+  const detailedParkAccessHitArea = isGate
+    ? DETAILED_PARK_ACCESS_GATE_HIT_AREAS.get(entity.publicIdentifier)
+    : undefined;
+  const usesDetailedParkAccessArchitecture = Boolean(detailedParkAccessHitArea);
   const isNationsPresentationSurface = nationsDistrictPresentationAvailable
     && isNationsDistrictPresentationSurface(entity);
   const isRestroom = classification === 'RESTROOM' || classification === 'CHEMICAL_RESTROOM';
@@ -727,60 +758,77 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
 
       {isGate && (
         <group position={[markerCenter[0], 0, markerCenter[1]]} rotation={[0, gateRotation, 0]}>
-          <mesh position={[0, 0.55, 0]} {...interactionProps}>
-            <cylinderGeometry args={[0.72, 0.72, 1.18, 10]} />
-            <meshBasicMaterial visible={false} />
-          </mesh>
-          <mesh position={[0, 0.035, 0]} raycast={NO_RAYCAST} receiveShadow>
-            <cylinderGeometry args={[0.66, 0.72, 0.07, 10]} />
-            <meshStandardMaterial color={gateAccentColor} roughness={0.78} metalness={0.04} />
-          </mesh>
-          <mesh position={[0, 0.14, 0]} raycast={NO_RAYCAST} castShadow receiveShadow>
-            <cylinderGeometry args={[0.59, 0.63, 0.2, 10]} />
-            <meshStandardMaterial color={gateBaseColor} roughness={0.72} metalness={0.02} />
-          </mesh>
-          {gateAccessMode === 'bidirectional' ? (
-            <>
-              <mesh
-                geometry={SHARED_GATE_ARROW_GEOMETRY}
-                material={SHARED_WHITE_ICON_MATERIAL}
-                position={[-0.18, 0.252, 0]}
-                scale={[0.72, 0.72, 0.72]}
-                raycast={NO_RAYCAST}
-                dispose={null}
-              />
-              <mesh
-                geometry={SHARED_GATE_ARROW_GEOMETRY}
-                material={SHARED_WHITE_ICON_MATERIAL}
-                position={[0.18, 0.253, 0]}
-                rotation={[0, Math.PI, 0]}
-                scale={[0.72, 0.72, 0.72]}
-                raycast={NO_RAYCAST}
-                dispose={null}
-              />
-            </>
-          ) : (
+          {detailedParkAccessHitArea ? (
             <mesh
-              geometry={SHARED_GATE_ARROW_GEOMETRY}
-              material={SHARED_WHITE_ICON_MATERIAL}
-              position={[0, 0.252, 0]}
-              rotation={[0, gateAccessMode === 'exit' ? Math.PI : 0, 0]}
-              raycast={NO_RAYCAST}
-              dispose={null}
-            />
+              position={[0, detailedParkAccessHitArea.height / 2, 0]}
+              rotation={[0, detailedParkAccessHitArea.rotationRadians - gateRotation, 0]}
+              {...interactionProps}
+            >
+              <boxGeometry args={[
+                detailedParkAccessHitArea.width,
+                detailedParkAccessHitArea.height,
+                detailedParkAccessHitArea.depth,
+              ]} />
+              <meshBasicMaterial visible={false} />
+            </mesh>
+          ) : (
+            <mesh position={[0, 0.55, 0]} {...interactionProps}>
+              <cylinderGeometry args={[0.72, 0.72, 1.18, 10]} />
+              <meshBasicMaterial visible={false} />
+            </mesh>
           )}
-          <mesh position={[-0.42, 0.59, 0.08]} raycast={NO_RAYCAST} castShadow>
-            <boxGeometry args={[0.13, 0.72, 0.13]} />
-            <meshStandardMaterial color={gateBaseColor} roughness={0.74} />
-          </mesh>
-          <mesh position={[0.42, 0.59, 0.08]} raycast={NO_RAYCAST} castShadow>
-            <boxGeometry args={[0.13, 0.72, 0.13]} />
-            <meshStandardMaterial color={gateBaseColor} roughness={0.74} />
-          </mesh>
-          <mesh position={[0, 0.94, 0.08]} raycast={NO_RAYCAST} castShadow>
-            <boxGeometry args={[0.97, 0.16, 0.17]} />
-            <meshStandardMaterial color={gateAccentColor} roughness={0.7} metalness={0.03} />
-          </mesh>
+          <group visible={!usesDetailedParkAccessArchitecture}>
+            <mesh position={[0, 0.035, 0]} raycast={NO_RAYCAST} receiveShadow>
+              <cylinderGeometry args={[0.66, 0.72, 0.07, 10]} />
+              <meshStandardMaterial color={gateAccentColor} roughness={0.78} metalness={0.04} />
+            </mesh>
+            <mesh position={[0, 0.14, 0]} raycast={NO_RAYCAST} castShadow receiveShadow>
+              <cylinderGeometry args={[0.59, 0.63, 0.2, 10]} />
+              <meshStandardMaterial color={gateBaseColor} roughness={0.72} metalness={0.02} />
+            </mesh>
+            {gateAccessMode === 'bidirectional' ? (
+              <>
+                <mesh
+                  geometry={SHARED_GATE_ARROW_GEOMETRY}
+                  material={SHARED_WHITE_ICON_MATERIAL}
+                  position={[-0.18, 0.252, 0]}
+                  scale={[0.72, 0.72, 0.72]}
+                  raycast={NO_RAYCAST}
+                  dispose={null}
+                />
+                <mesh
+                  geometry={SHARED_GATE_ARROW_GEOMETRY}
+                  material={SHARED_WHITE_ICON_MATERIAL}
+                  position={[0.18, 0.253, 0]}
+                  rotation={[0, Math.PI, 0]}
+                  scale={[0.72, 0.72, 0.72]}
+                  raycast={NO_RAYCAST}
+                  dispose={null}
+                />
+              </>
+            ) : (
+              <mesh
+                geometry={SHARED_GATE_ARROW_GEOMETRY}
+                material={SHARED_WHITE_ICON_MATERIAL}
+                position={[0, 0.252, 0]}
+                rotation={[0, gateAccessMode === 'exit' ? Math.PI : 0, 0]}
+                raycast={NO_RAYCAST}
+                dispose={null}
+              />
+            )}
+            <mesh position={[-0.42, 0.59, 0.08]} raycast={NO_RAYCAST} castShadow>
+              <boxGeometry args={[0.13, 0.72, 0.13]} />
+              <meshStandardMaterial color={gateBaseColor} roughness={0.74} />
+            </mesh>
+            <mesh position={[0.42, 0.59, 0.08]} raycast={NO_RAYCAST} castShadow>
+              <boxGeometry args={[0.13, 0.72, 0.13]} />
+              <meshStandardMaterial color={gateBaseColor} roughness={0.74} />
+            </mesh>
+            <mesh position={[0, 0.94, 0.08]} raycast={NO_RAYCAST} castShadow>
+              <boxGeometry args={[0.97, 0.16, 0.17]} />
+              <meshStandardMaterial color={gateAccentColor} roughness={0.7} metalness={0.03} />
+            </mesh>
+          </group>
         </group>
       )}
 
@@ -2151,16 +2199,54 @@ function Scene({
     [entities, lots],
   );
   const presentedSceneTrees = useMemo(() => {
+    const parkAccessCompatibleTrees = (!isolatedArea
+      || isolatedArea === COMMERCIAL_MAP_SEGMENT_IDS.industry)
+      ? selectParkAccessCompatibleTreesForPresentation(sceneTrees)
+      : sceneTrees;
     if (!selectedEntity || resolveStrategicLandmarkKind(selectedEntity) !== 'lunar-tree') {
-      return sceneTrees;
+      return parkAccessCompatibleTrees;
     }
     const bounds = strategicLandmarkBounds(selectedEntity);
     const memorialCenter = [
       bounds.centerX + APOLLO_XIV_LAYOUT.replicaOffset[0],
       bounds.centerZ + APOLLO_XIV_LAYOUT.replicaOffset[1],
     ] as const;
-    return sceneTrees.filter((tree) => treeRemainsVisibleWithSelectedApollo(tree, memorialCenter));
-  }, [sceneTrees, selectedEntity]);
+    return parkAccessCompatibleTrees.filter((tree) => (
+      treeRemainsVisibleWithSelectedApollo(tree, memorialCenter)
+    ));
+  }, [isolatedArea, sceneTrees, selectedEntity]);
+  const parkAccessPresentation = useMemo(() => {
+    const enabledForScope = !isolatedArea
+      || isolatedArea === COMMERCIAL_MAP_SEGMENT_IDS.industry;
+    const resolveOwners = (identifiers: readonly string[]) => {
+      if (!enabledForScope) return { visible: false, opacity: 0 };
+      const identifierSet = new Set<string>(identifiers);
+      const owners = entities.filter((entity) => identifierSet.has(entity.publicIdentifier));
+      if (owners.some((entity) => layerVisibility[entity.layerId] === false)) {
+        return { visible: false, opacity: 0 };
+      }
+      const filterStrength = entityFiltersActive
+        && owners.length > 0
+        && !owners.some((entity) => presentedMatchingEntityIds.has(entity.id))
+        ? 0.28
+        : 1;
+      const opacity = owners.length > 0
+        ? Math.min(...owners.map((entity) => layerOpacity[entity.layerId] ?? 1)) * filterStrength
+        : 1;
+      return { visible: opacity > 0.015, opacity };
+    };
+    return {
+      surfaces: resolveOwners(PARK_ACCESS_SURFACE_OWNER_IDENTIFIERS),
+      architecture: resolveOwners(PARK_ACCESS_ARCHITECTURE_OWNER_IDENTIFIERS),
+    };
+  }, [
+    entities,
+    entityFiltersActive,
+    isolatedArea,
+    layerOpacity,
+    layerVisibility,
+    presentedMatchingEntityIds,
+  ]);
   const arenaFrontInfrastructurePresentation = useMemo(() => {
     const entityByIdentifier = new Map(entities.map((entity) => [entity.publicIdentifier, entity]));
     const resolvePresentation = (
@@ -2314,6 +2400,23 @@ function Scene({
         layerOpacity={layerOpacity}
         reducedGraphics={reducedGraphics}
       />
+      {(!isolatedArea || isolatedArea === COMMERCIAL_MAP_SEGMENT_IDS.industry)
+        && !hydrologicalModeActive && (
+          <>
+            <ParkAccessEnvironmentLayer
+              reducedGraphics={reducedGraphics}
+              surfacesVisible
+              vegetationVisible={treesVisible}
+            />
+            <ParkAccessInfrastructure
+              reducedGraphics={reducedGraphics}
+              surfacesVisible={parkAccessPresentation.surfaces.visible}
+              surfaceOpacity={parkAccessPresentation.surfaces.opacity}
+              architectureVisible={parkAccessPresentation.architecture.visible}
+              architectureOpacity={parkAccessPresentation.architecture.opacity}
+            />
+          </>
+        )}
       <BatchedLots
         entries={lotEntries}
         selectedEntityId={selectedEntityId}
