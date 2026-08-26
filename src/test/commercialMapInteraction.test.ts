@@ -109,13 +109,28 @@ describe('pipeline de seleção do mapa comercial', () => {
       target: [-4, 1, -9] as [number, number, number],
     };
     useCommercialMapStore.getState().setInteriorReturnView(returnView);
+    useCommercialMapStore.getState().switchInterior('reference:2026:b4');
+    expect(useCommercialMapStore.getState()).toMatchObject({
+      selectedEntityId: 'reference:2026:b4',
+      interiorEntityId: 'reference:2026:b4',
+      interiorReturnView: returnView,
+      activePanel: null,
+      cameraSequence: initialSequence + 2,
+    });
+    useCommercialMapStore.getState().switchInterior('reference:2026:b3');
+    expect(useCommercialMapStore.getState()).toMatchObject({
+      selectedEntityId: 'reference:2026:b3',
+      interiorEntityId: 'reference:2026:b3',
+      interiorReturnView: returnView,
+      cameraSequence: initialSequence + 3,
+    });
     useCommercialMapStore.getState().exitInterior();
     expect(useCommercialMapStore.getState()).toMatchObject({
-      selectedEntityId: 'reference:2026:b12',
+      selectedEntityId: 'reference:2026:b3',
       interiorEntityId: null,
       activePanel: 'details',
       workspaceMode: '3d',
-      cameraSequence: initialSequence + 2,
+      cameraSequence: initialSequence + 4,
       interiorReturnView: returnView,
     });
 

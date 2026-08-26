@@ -4,6 +4,7 @@ import {
   type CommercialPavilionReferenceCluster,
   type CommercialPavilionReferenceCorridor,
   type CommercialPavilionReferenceRun,
+  type CommercialPavilionReferenceWallAccess,
 } from './commercialPavilionReference';
 
 const SOURCE_DOCUMENT = 'Anexo 1 e Anexo 6 · Pavilhão 12 — Indústria, Comércio e Serviços';
@@ -174,6 +175,41 @@ export const PAVILION12_COMMERCIAL_REFERENCE_CORRIDORS = [
   { id: 'south-east-access', label: 'Acesso sudeste', kind: 'cross', ...metricRect(49, 30, 1, 3) },
 ] as const satisfies readonly CommercialPavilionReferenceCorridor[];
 
+/**
+ * B3 is presented with a 180-degree interior camera rotation. These local
+ * edges intentionally invert left/right so the visible plan matches Annex 5.
+ */
+export const PAVILION12_COMMERCIAL_WALL_ACCESSES = [
+  {
+    id: 'right-central-entry-exit',
+    label: 'Entrada e saída',
+    corridorId: 'central-distribution',
+    edges: ['left'],
+    kind: 'gate',
+    sourcePrecision: 'official-metric',
+    structuralOpening: false,
+  },
+  {
+    id: 'bottom-central-entry-exit',
+    label: 'Entrada e saída',
+    corridorId: 'north-entry',
+    edges: ['rear'],
+    kind: 'gate',
+    sourcePrecision: 'official-metric',
+    structuralOpening: false,
+  },
+  {
+    id: 'pavilion-8-connection',
+    label: 'Acesso para o Pavilhão 8',
+    corridorId: 'central-distribution',
+    edges: ['right'],
+    kind: 'gate',
+    sourcePrecision: 'official-metric',
+    connectsTo: 'B4',
+    structuralOpening: false,
+  },
+] as const satisfies readonly CommercialPavilionReferenceWallAccess[];
+
 export const PAVILION12_COMMERCIAL_REFERENCE_CELLS =
   buildCommercialPavilionReferenceCells({
     pavilionId: 'B3',
@@ -200,6 +236,7 @@ export const PAVILION12_COMMERCIAL_REFERENCE = {
   moduleGap: PAVILION12_COMMERCIAL_MODULE_GAP,
   runs: PAVILION12_COMMERCIAL_REFERENCE_RUNS,
   corridors: PAVILION12_COMMERCIAL_REFERENCE_CORRIDORS,
+  wallAccesses: PAVILION12_COMMERCIAL_WALL_ACCESSES,
   cells: PAVILION12_COMMERCIAL_REFERENCE_CELLS,
   source: {
     document: SOURCE_DOCUMENT,

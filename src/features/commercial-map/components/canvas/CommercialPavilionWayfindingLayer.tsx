@@ -1,6 +1,6 @@
 import { memo, useEffect, useMemo } from 'react';
 import { Html } from '@react-three/drei';
-import { ArrowRightLeft, LogIn, LogOut, ShieldAlert } from 'lucide-react';
+import { ArrowRightLeft, ArrowUpDown, LogIn, LogOut, ShieldAlert } from 'lucide-react';
 import * as THREE from 'three';
 import type { MapEntity } from '../../types';
 import type { CommercialPavilionLayout } from '../../utils/commercialPavilions';
@@ -11,10 +11,40 @@ import {
 } from '../../utils/commercialPavilionWayfinding';
 
 const NO_RAYCAST = () => undefined;
+const WAYFINDING_SCREEN_POINT = new THREE.Vector3();
+
+function calculateWayfindingScreenPosition(
+  object: THREE.Object3D,
+  camera: THREE.Camera,
+  size: { width: number; height: number },
+  horizontalMargin: number,
+): [number, number] {
+  WAYFINDING_SCREEN_POINT.setFromMatrixPosition(object.matrixWorld).project(camera);
+  const x = WAYFINDING_SCREEN_POINT.x * size.width / 2 + size.width / 2;
+  const y = -WAYFINDING_SCREEN_POINT.y * size.height / 2 + size.height / 2;
+  const safeMargin = Math.min(horizontalMargin, size.width * 0.24);
+  return [
+    THREE.MathUtils.clamp(x, safeMargin, size.width - safeMargin),
+    y,
+  ];
+}
+
+const calculateWayfindingNotePosition = (
+  object: THREE.Object3D,
+  camera: THREE.Camera,
+  size: { width: number; height: number },
+) => calculateWayfindingScreenPosition(object, camera, size, 84);
+
+const calculateWayfindingConnectionPosition = (
+  object: THREE.Object3D,
+  camera: THREE.Camera,
+  size: { width: number; height: number },
+) => calculateWayfindingScreenPosition(object, camera, size, 102);
 
 const MARKER_COLORS = {
   entrance: '#16815c',
   exit: '#c58a24',
+  bidirectional: '#247b78',
   emergency: '#c64747',
   connection: '#5247a8',
 } as const;
@@ -30,6 +60,7 @@ type WayfindingMaterials = Readonly<Record<
 function WayfindingIcon({ kind }: Pick<CommercialPavilionWayfindingMarker, 'kind'>) {
   if (kind === 'entrance') return <LogIn aria-hidden="true" />;
   if (kind === 'exit') return <LogOut aria-hidden="true" />;
+  if (kind === 'bidirectional') return <ArrowUpDown aria-hidden="true" />;
   if (kind === 'emergency') return <ShieldAlert aria-hidden="true" />;
   return <ArrowRightLeft aria-hidden="true" />;
 }
@@ -110,6 +141,9 @@ function WayfindingMarker({
         center
         eps={0.001}
         zIndexRange={[14, 4]}
+        calculatePosition={canNavigate
+          ? calculateWayfindingConnectionPosition
+          : calculateWayfindingNotePosition}
         style={{ pointerEvents: canNavigate ? 'auto' : 'none' }}
       >
         {marker.kind === 'connection' ? (
@@ -118,6 +152,7 @@ function WayfindingMarker({
             className="commercial-pavilion-wayfinding-label is-connection"
             data-wayfinding-id={marker.id}
             data-wayfinding-kind={marker.kind}
+            data-wayfinding-edge={marker.edge}
             data-wayfinding-target={marker.targetPublicIdentifier}
             aria-label={`Abrir vista interna: ${marker.label}`}
             disabled={!targetEntityId}
@@ -138,6 +173,7 @@ function WayfindingMarker({
             className={`commercial-pavilion-wayfinding-label is-${marker.kind}`}
             data-wayfinding-id={marker.id}
             data-wayfinding-kind={marker.kind}
+            data-wayfinding-edge={marker.edge}
             role="note"
             aria-label={marker.label}
           >
