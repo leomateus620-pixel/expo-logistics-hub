@@ -37,14 +37,15 @@ from mathutils import Euler, Vector
 
 FPS = 30
 TAU = math.tau
-# The curved reference-face layer complements explicit facial geometry at the
-# Commercial Map camera distance. It is not a substitute for a scan-grade
-# texture/displacement capture.
+# Identity is carried by one repository-owned official portrait projected on a
+# curved low-poly face surface.  Explicit eyes, nose, mouth and embedded glasses
+# are omitted whenever this layer is present, preventing the doubled-feature
+# "photo mask" defect of the previous release.
 USE_REFERENCE_FACE_TEXTURE = True
 ROOT_DIR = Path(__file__).resolve().parents[2]
 DEFAULT_OUTPUT_DIR = ROOT_DIR / "public" / "models" / "executives"
-DEFAULT_FABIANO_TURNAROUND = ROOT_DIR / "docs" / "character-reference" / "fabiano-soltis-turnaround.png"
-DEFAULT_DJEISON_TURNAROUND = ROOT_DIR / "docs" / "character-reference" / "djeison-drey-turnaround.png"
+DEFAULT_FABIANO_TURNAROUND = ROOT_DIR / "src" / "assets" / "person-fabiano-soltis.jpg"
+DEFAULT_DJEISON_TURNAROUND = ROOT_DIR / "src" / "assets" / "person-djeison-drey.jpg"
 
 
 PROFILES = {
@@ -54,36 +55,37 @@ PROFILES = {
         "display_name": "Fabiano Soltis",
         "role": "Presidente da FENASOJA",
         "height": 1.78,
-        "shoulder_width": 0.475,
-        "waist_width": 0.345,
+        "shoulder_width": 0.452,
+        "waist_width": 0.338,
         "build": "atlético, ombros definidos e postura executiva ereta",
-        "skin": (0.70, 0.47, 0.34, 1.0),
+        "skin": (0.68, 0.47, 0.34, 1.0),
         "skin_style": "warm",
-        "hair": (0.020, 0.014, 0.012, 1.0),
+        "hair": (0.010, 0.007, 0.006, 1.0),
         "beard": (0.055, 0.038, 0.029, 1.0),
         "eyes": (0.16, 0.105, 0.066, 1.0),
-        "suit": (0.025, 0.065, 0.145, 1.0),
-        "suit_edge": (0.040, 0.090, 0.185, 1.0),
+        "suit": (0.040, 0.052, 0.068, 1.0),
+        "suit_edge": (0.070, 0.082, 0.098, 1.0),
         "tie": (0.018, 0.185, 0.105, 1.0),
         "shoe": (0.095, 0.042, 0.022, 1.0),
-        "metal": (0.22, 0.24, 0.26, 1.0),
-        "head": (0.202, 0.218, 0.278),
-        "jaw_width": 0.154,
-        "eye_spacing": 0.072,
-        "nose_length": 0.050,
-        "nose_width": 0.030,
-        "mouth_width": 0.074,
+        "metal": (0.055, 0.065, 0.075, 1.0),
+        "head": (0.192, 0.214, 0.258),
+        "jaw_width": 0.145,
+        "eye_spacing": 0.063,
+        "nose_length": 0.044,
+        "nose_width": 0.027,
+        "mouth_width": 0.064,
         "glasses": "rectangular",
+        "face_texture_has_glasses": False,
         "hair_style": "dark_swept",
         "beard_style": "short_stubble",
         "carries_mate": False,
-        "turnaround_crop": (0.690, 0.070, 0.250, 0.600),
+        "turnaround_crop": (0.280, 0.120, 0.440, 0.580),
         "profile_summary": {
             "face": "rosto oval anguloso, mandíbula limpa, olhos castanhos próximos, nariz reto e sorriso discreto",
             "hair": "cabelo castanho-escuro curto, volumoso no topo e penteado lateralmente",
             "accessories": "óculos executivos finos prateados",
-            "clothing": "terno azul-marinho ajustado, camisa branca, gravata verde e sapatos marrons",
-            "animation": "postura sentada madura, respiração discreta e mãos em repouso sem atravessar o sofá",
+            "clothing": "terno grafite de alfaiataria ajustada, camisa branca, gravata verde e sapatos marrons",
+            "animation": "postura sentada madura, respiração discreta, mãos apoiadas nas coxas e pés firmes no piso",
         },
     },
     "djeison-drey": {
@@ -92,36 +94,37 @@ PROFILES = {
         "display_name": "Djeison Drey",
         "role": "Vice-Presidente da FENASOJA",
         "height": 1.84,
-        "shoulder_width": 0.515,
-        "waist_width": 0.395,
+        "shoulder_width": 0.482,
+        "waist_width": 0.375,
         "build": "porte alto e robusto, tórax amplo e postura cordial",
-        "skin": (0.80, 0.57, 0.43, 1.0),
+        "skin": (0.79, 0.57, 0.43, 1.0),
         "skin_style": "freckled",
-        "hair": (0.28, 0.13, 0.045, 1.0),
+        "hair": (0.16, 0.075, 0.026, 1.0),
         "beard": (0.33, 0.10, 0.035, 1.0),
         "eyes": (0.18, 0.34, 0.44, 1.0),
-        "suit": (0.145, 0.155, 0.165, 1.0),
-        "suit_edge": (0.205, 0.215, 0.225, 1.0),
+        "suit": (0.024, 0.075, 0.158, 1.0),
+        "suit_edge": (0.045, 0.105, 0.205, 1.0),
         "tie": (0.018, 0.185, 0.105, 1.0),
         "shoe": (0.22, 0.095, 0.035, 1.0),
         "metal": (0.42, 0.25, 0.08, 1.0),
-        "head": (0.222, 0.228, 0.286),
-        "jaw_width": 0.184,
-        "eye_spacing": 0.080,
-        "nose_length": 0.054,
-        "nose_width": 0.034,
-        "mouth_width": 0.082,
+        "head": (0.204, 0.224, 0.265),
+        "jaw_width": 0.166,
+        "eye_spacing": 0.069,
+        "nose_length": 0.049,
+        "nose_width": 0.031,
+        "mouth_width": 0.071,
         "glasses": "rounded",
+        "face_texture_has_glasses": True,
         "hair_style": "ginger_tousled",
         "beard_style": "full_ginger",
         "carries_mate": True,
-        "turnaround_crop": (0.680, 0.040, 0.270, 0.620),
+        "turnaround_crop": (0.275, 0.105, 0.450, 0.610),
         "profile_summary": {
             "face": "rosto quadrado-oval amplo, olhos azulados, nariz definido e assimetria cordial no sorriso",
             "hair": "cabelo ruivo-claro curto, texturizado e levemente despenteado",
             "accessories": "óculos grandes arredondados em metal dourado e chimarrão na mão esquerda",
-            "clothing": "terno cinza de alfaiataria, camisa branca, gravata verde e sapatos conhaque",
-            "animation": "postura sentada cordial, respiração fora de fase e braço esquerdo estável no chimarrão",
+            "clothing": "terno azul profundo de alfaiataria, camisa branca, gravata verde e sapatos conhaque",
+            "animation": "postura sentada cordial, respiração fora de fase, mão direita na coxa e chimarrão estabilizado à esquerda",
         },
     },
 }
@@ -250,11 +253,11 @@ def make_material(
 
 
 def extract_face_texture(source_path: Path, target_path: Path, crop: Sequence[float], size: tuple[int, int] = (512, 512)) -> Path:
-    """Extract a feathered front-face texture from an approved turnaround.
+    """Extract a feathered front-face texture from a repository-owned portrait.
 
     Crop coordinates are top-left normalized values. Blender's pixel buffer is
     bottom-up, so the y conversion is kept explicit here. The emitted TGA is an
-    intermediate source artifact; Blender embeds it as PNG inside each GLB.
+    intermediate source artifact; Blender embeds it inside each GLB.
     """
     source = bpy.data.images.load(str(source_path), check_existing=False)
     source_width, source_height = source.size
@@ -284,8 +287,8 @@ def extract_face_texture(source_path: Path, target_path: Path, crop: Sequence[fl
             red, green, blue, _ = source_pixels[source_index : source_index + 4]
             # The face silhouette is slightly wider above the jaw.  A soft
             # superellipse avoids a rectangular photo-card edge on the head.
-            nx = abs((u - 0.5) / 0.49)
-            ny = abs((v - 0.50) / 0.47)
+            nx = abs((u - 0.5) / 0.44)
+            ny = abs((v - 0.50) / 0.46)
             if v < 0.33:
                 allowed_x = 1.0
             elif v > 0.72:
@@ -293,9 +296,11 @@ def extract_face_texture(source_path: Path, target_path: Path, crop: Sequence[fl
             else:
                 allowed_x = 0.98
             distance = (nx / allowed_x) ** 2.4 + ny**2.25
-            # Feather broadly enough that the portrait melts into the
-            # underlying sculpt instead of reading as a square photo card.
-            alpha = clamp((0.84 - distance) / 0.42)
+            # Keep the identity-bearing center opaque but make the transition
+            # wide enough to dissolve into the procedural cheeks. The crop is
+            # now tight to the official portrait, so this broader feather no
+            # longer pulls the pale photo background onto the head.
+            alpha = clamp((0.88 - distance) / 0.30)
             target_index = (ty * target_width + tx) * 4
             target_pixels[target_index] = red
             target_pixels[target_index + 1] = green
@@ -354,6 +359,8 @@ def make_face_material(profile: dict, texture_path: Path) -> bpy.types.Material:
     principled.inputs["Roughness"].default_value = 0.48
     principled.inputs["Metallic"].default_value = 0.0
     principled.inputs["Alpha"].default_value = 1.0
+    if "Specular IOR Level" in principled.inputs:
+        principled.inputs["Specular IOR Level"].default_value = 0.16
     texture = nodes.new("ShaderNodeTexImage")
     texture.name = f"{profile['object_name']}_FaceTexture"
     texture.image = bpy.data.images.load(str(texture_path), check_existing=False)
@@ -369,7 +376,8 @@ def make_face_material(profile: dict, texture_path: Path) -> bpy.types.Material:
     tint.name = f"{profile['object_name']}_FaceExposure"
     tint.blend_type = "MULTIPLY"
     tint.inputs[0].default_value = 1.0
-    tint.inputs[2].default_value = (0.64, 0.64, 0.64, 1.0)
+    face_exposure = 0.48 if profile["slug"] == "fabiano-soltis" else 0.40
+    tint.inputs[2].default_value = (face_exposure, face_exposure, face_exposure, 1.0)
     links.new(texture.outputs["Color"], tint.inputs[1])
     links.new(tint.outputs["Color"], principled.inputs["Base Color"])
     links.new(texture.outputs["Alpha"], principled.inputs["Alpha"])
@@ -384,6 +392,11 @@ def make_materials(profile: dict) -> dict[str, bpy.types.Material]:
             tuple(min(1.0, c * 0.93 + 0.035) for c in profile["skin"][:3]) + (1.0,),
             roughness=0.62,
         ),
+        "skin_shadow": make_material(
+            f"{profile['object_name']}_SkinShadow",
+            tuple(max(0.0, c * 0.72) for c in profile["skin"][:3]) + (1.0,),
+            roughness=0.68,
+        ),
         "hair": make_material(f"{profile['object_name']}_Hair", profile["hair"], roughness=0.74, texture_style="hair"),
         "beard": make_material(
             f"{profile['object_name']}_Beard",
@@ -392,19 +405,19 @@ def make_materials(profile: dict) -> dict[str, bpy.types.Material]:
             alpha=0.58 if profile["beard_style"] == "short_stubble" else 1.0,
             texture_style="hair",
         ),
-        "eye_white": make_material(f"{profile['object_name']}_Sclera", (0.82, 0.80, 0.75, 1.0), roughness=0.26, coat=0.3),
+        "eye_white": make_material(f"{profile['object_name']}_Sclera", (0.58, 0.55, 0.50, 1.0), roughness=0.38, coat=0.18),
         "iris": make_material(f"{profile['object_name']}_Iris", profile["eyes"], roughness=0.23, coat=0.45),
         "pupil": make_material(f"{profile['object_name']}_Pupil", (0.005, 0.004, 0.003, 1.0), roughness=0.18, coat=0.5),
-        "lip": make_material(f"{profile['object_name']}_Lips", (0.42, 0.17, 0.14, 1.0), roughness=0.52),
+        "lip": make_material(f"{profile['object_name']}_Lips", (0.34, 0.125, 0.105, 1.0), roughness=0.58),
+        "mouth_shadow": make_material(f"{profile['object_name']}_MouthShadow", (0.070, 0.020, 0.018, 1.0), roughness=0.74),
+        "teeth": make_material(f"{profile['object_name']}_Teeth", (0.78, 0.75, 0.68, 1.0), roughness=0.50),
         "suit": make_material(f"{profile['object_name']}_Suit", profile["suit"], roughness=0.72, texture_style="fabric"),
         "suit_edge": make_material(f"{profile['object_name']}_SuitEdge", profile["suit_edge"], roughness=0.68, texture_style="fabric"),
         "shirt": make_material(f"{profile['object_name']}_Shirt", (0.88, 0.89, 0.89, 1.0), roughness=0.67, texture_style="shirt"),
         "tie": make_material(f"{profile['object_name']}_Tie", profile["tie"], roughness=0.47, texture_style="fabric", coat=0.06),
         "shoe": make_material(f"{profile['object_name']}_Leather", profile["shoe"], roughness=0.34, texture_style="leather", coat=0.22),
-        "sole": make_material(f"{profile['object_name']}_Sole", (0.025, 0.020, 0.018, 1.0), roughness=0.8),
         "metal": make_material(f"{profile['object_name']}_GlassesMetal", profile["metal"], roughness=0.24, metallic=0.88),
         "lens": make_material(f"{profile['object_name']}_Lens", (0.55, 0.70, 0.75, 1.0), roughness=0.06, alpha=0.14, coat=0.85),
-        "button": make_material(f"{profile['object_name']}_Buttons", (0.025, 0.028, 0.030, 1.0), roughness=0.32, coat=0.15),
         "mate_wood": make_material("Chimarrao_CuiaWood", (0.065, 0.033, 0.018, 1.0), roughness=0.38, texture_style="leather", coat=0.14),
         "mate_rim": make_material("Chimarrao_Rim", (0.34, 0.19, 0.065, 1.0), roughness=0.34, metallic=0.15),
         "mate_metal": make_material("Chimarrao_BombaMetal", (0.58, 0.62, 0.64, 1.0), roughness=0.18, metallic=0.92, coat=0.25),
@@ -413,6 +426,11 @@ def make_materials(profile: dict) -> dict[str, bpy.types.Material]:
     face_texture_path = profile.get("face_texture_path")
     if USE_REFERENCE_FACE_TEXTURE and face_texture_path and Path(face_texture_path).exists():
         materials["face_photo"] = make_face_material(profile, Path(face_texture_path))
+    # These small parts do not justify standalone glTF primitives at map scale.
+    # Reusing the closest existing PBR material removes four draw calls across
+    # the pair without changing silhouettes or animation.
+    materials["sole"] = materials["shoe"]
+    materials["button"] = materials["metal"]
     return materials
 
 
@@ -782,18 +800,73 @@ def rig_mesh(obj: bpy.types.Object, armature: bpy.types.Object, bone_name: str) 
     return obj
 
 
+def consolidate_character_meshes(profile: dict, armature: bpy.types.Object) -> bpy.types.Object:
+    """Join the rigged body into one skinned mesh and deduplicate material slots.
+
+    glTF renders one primitive per material. Keeping every anatomical piece as
+    a separate object multiplied the same material into dozens of primitives
+    even though all pieces share one rig. The UV-sensitive face surface and
+    cultural chimarrão nodes stay separate so identity and stable prop names
+    remain intact.
+    """
+    preserved_nodes = {"Chimarrao_Cuia", "Chimarrao_ErvaMate", "Chimarrao_Bomba"}
+    body_meshes = [
+        obj
+        for obj in bpy.context.scene.objects
+        if obj.type == "MESH"
+        and obj.parent == armature
+        and obj.name not in preserved_nodes
+        and not obj.name.endswith("_ReferenceFace")
+    ]
+    if not body_meshes:
+        raise RuntimeError(f"{profile['slug']}: no rigged meshes available for consolidation")
+
+    bpy.ops.object.select_all(action="DESELECT")
+    for obj in body_meshes:
+        obj.select_set(True)
+    bpy.context.view_layer.objects.active = body_meshes[0]
+    bpy.ops.object.join()
+    joined = bpy.context.object
+    joined.name = f"{profile['object_name']}_SkinnedCharacter"
+    joined.data.name = f"{profile['object_name']}_SkinnedCharacter_Mesh"
+
+    old_materials = list(joined.data.materials)
+    unique_materials: list[bpy.types.Material] = []
+    pointer_to_index: dict[int, int] = {}
+    slot_remap: dict[int, int] = {}
+    for slot_index, material in enumerate(old_materials):
+        pointer = material.as_pointer() if material else 0
+        if pointer not in pointer_to_index:
+            pointer_to_index[pointer] = len(unique_materials)
+            unique_materials.append(material)
+        slot_remap[slot_index] = pointer_to_index[pointer]
+    polygon_materials = [slot_remap.get(polygon.material_index, 0) for polygon in joined.data.polygons]
+    joined.data.materials.clear()
+    for material in unique_materials:
+        joined.data.materials.append(material)
+    for polygon, material_index in zip(joined.data.polygons, polygon_materials):
+        polygon.material_index = material_index
+
+    joined["mesh_consolidation"] = "single skinned body; face surface and named chimarrao nodes preserved"
+    joined["material_slots_deduplicated"] = len(old_materials) - len(unique_materials)
+    bpy.ops.object.select_all(action="DESELECT")
+    return joined
+
+
 def create_armature(profile: dict) -> tuple[bpy.types.Object, dict[str, tuple[Vector, Vector]]]:
     h = profile["height"]
     factor = h / 1.80
-    shoulder = profile["shoulder_width"] / 2
+    shoulder_inset = (0.040 if profile["slug"] == "djeison-drey" else 0.036) * factor
+    shoulder = profile["shoulder_width"] / 2 - shoulder_inset
     hip_x = profile["waist_width"] * 0.30
-    ankle_x = profile["waist_width"] * 0.25
+    knee_x = profile["waist_width"] * 0.335
+    ankle_x = profile["waist_width"] * 0.30
     z_ankle = 0.105 * factor
     z_knee = 0.515 * factor
     z_hip = 0.955 * factor
     z_chest = 1.335 * factor
     z_shoulder = 1.455 * factor
-    z_neck = 1.515 * factor
+    z_neck = 1.495 * factor
     z_head_top = h - 0.015
 
     endpoints: dict[str, tuple[Vector, Vector]] = {
@@ -807,7 +880,7 @@ def create_armature(profile: dict) -> tuple[bpy.types.Object, dict[str, tuple[Ve
     for side, sign in (("L", 1.0), ("R", -1.0)):
         endpoints[f"UpperLeg.{side}"] = (
             Vector((sign * hip_x, 0, z_hip)),
-            Vector((sign * ankle_x * 1.06, 0.006, z_knee)),
+            Vector((sign * knee_x, 0.006, z_knee)),
         )
         endpoints[f"LowerLeg.{side}"] = (
             endpoints[f"UpperLeg.{side}"][1],
@@ -815,17 +888,21 @@ def create_armature(profile: dict) -> tuple[bpy.types.Object, dict[str, tuple[Ve
         )
         endpoints[f"Foot.{side}"] = (
             endpoints[f"LowerLeg.{side}"][1],
-            Vector((sign * ankle_x, -0.205 * factor, 0.070 * factor)),
+            Vector((sign * ankle_x, -0.185 * factor, 0.070 * factor)),
         )
-        upper_start = Vector((sign * shoulder, 0, z_shoulder))
+        upper_start = Vector((sign * (shoulder - 0.010 * factor), 0, z_shoulder))
         if profile["carries_mate"] and side == "L":
-            elbow = Vector((sign * (shoulder + 0.060 * factor), -0.025, 1.205 * factor))
-            wrist = Vector((0.205 * factor, -0.235 * factor, 1.135 * factor))
-            hand_end = Vector((0.125 * factor, -0.305 * factor, 1.120 * factor))
+            elbow = Vector((sign * (shoulder + 0.040 * factor), -0.035, 1.215 * factor))
+            wrist = Vector((0.195 * factor, -0.250 * factor, 1.150 * factor))
+            hand_end = Vector((0.125 * factor, -0.318 * factor, 1.135 * factor))
         else:
-            elbow = Vector((sign * (shoulder + 0.060 * factor), 0.0, 1.165 * factor))
-            wrist = Vector((sign * (shoulder + 0.070 * factor), -0.012, 0.905 * factor))
-            hand_end = Vector((sign * (shoulder + 0.064 * factor), -0.030, 0.790 * factor))
+            # The map only consumes the seated clip, so the neutral arm bend is
+            # authored close to a lap-resting pose.  This avoids forcing almost
+            # straight standing limbs through extreme rotations at runtime and
+            # keeps elbows, cuffs and hands connected in the sofa view.
+            elbow = Vector((sign * shoulder, -0.090 * factor, 1.190 * factor))
+            wrist = Vector((sign * profile["waist_width"] * 0.37, -0.295 * factor, 1.045 * factor))
+            hand_end = Vector((sign * profile["waist_width"] * 0.32, -0.365 * factor, 0.955 * factor))
         endpoints[f"UpperArm.{side}"] = (upper_start, elbow)
         endpoints[f"Forearm.{side}"] = (elbow, wrist)
         endpoints[f"Hand.{side}"] = (wrist, hand_end)
@@ -978,38 +1055,46 @@ def create_lower_body(profile: dict, materials: dict, armature: bpy.types.Object
 
         sign = 1 if side == "L" else -1
         ankle = lower_end
+        sole_start = Vector((ankle.x, 0.035 * h_factor, 0.027 * h_factor))
+        sole_end = Vector((ankle.x, -0.195 * h_factor, 0.026 * h_factor))
         shoe_parts = [
-            add_rounded_cube(
+            add_oriented_loft(
                 f"{profile['object_name']}_Sole.{side}",
-                (ankle.x, -0.080 * h_factor, 0.030 * h_factor),
-                (0.125 * h_factor, 0.285 * h_factor, 0.030 * h_factor),
+                sole_start,
+                sole_end,
+                [
+                    (0.0, 0.043 * h_factor, 0.011 * h_factor),
+                    (0.24, 0.050 * h_factor, 0.012 * h_factor),
+                    (0.72, 0.055 * h_factor, 0.012 * h_factor),
+                    (1.0, 0.045 * h_factor, 0.010 * h_factor),
+                ],
                 materials["sole"],
-                bevel=0.012,
+                segments=18,
             ),
             add_uv_sphere(
                 f"{profile['object_name']}_ShoeUpper.{side}",
-                (ankle.x, -0.073 * h_factor, 0.069 * h_factor),
-                (0.061 * h_factor, 0.130 * h_factor, 0.047 * h_factor),
+                (ankle.x, -0.060 * h_factor, 0.064 * h_factor),
+                (0.055 * h_factor, 0.112 * h_factor, 0.043 * h_factor),
                 materials["shoe"],
                 segments=20,
                 rings=12,
             ),
             add_rounded_cube(
                 f"{profile['object_name']}_Heel.{side}",
-                (ankle.x, 0.034 * h_factor, 0.052 * h_factor),
-                (0.102 * h_factor, 0.065 * h_factor, 0.060 * h_factor),
+                (ankle.x, 0.032 * h_factor, 0.047 * h_factor),
+                (0.090 * h_factor, 0.056 * h_factor, 0.050 * h_factor),
                 materials["shoe"],
                 bevel=0.010,
             ),
         ]
         for lace_index in range(3):
-            y = -0.055 - lace_index * 0.025
+            y = -0.040 - lace_index * 0.020
             shoe_parts.append(
                 make_poly_curve(
                     f"{profile['object_name']}_Lace{lace_index}.{side}",
                     [
-                        (ankle.x - 0.035 * h_factor, y, 0.106 * h_factor),
-                        (ankle.x + 0.035 * h_factor, y, 0.106 * h_factor),
+                        (ankle.x - 0.030 * h_factor, y, 0.097 * h_factor),
+                        (ankle.x + 0.030 * h_factor, y, 0.097 * h_factor),
                     ],
                     materials["sole"],
                     bevel_depth=0.0018,
@@ -1023,7 +1108,7 @@ def create_upper_body(profile: dict, materials: dict, armature: bpy.types.Object
     factor = profile["height"] / 1.80
     shoulder_width = profile["shoulder_width"]
     waist_width = profile["waist_width"]
-    torso_depth = 0.225 if profile["slug"] == "fabiano-soltis" else 0.250
+    torso_depth = 0.205 if profile["slug"] == "fabiano-soltis" else 0.225
     front_y = -torso_depth * 0.505
     upper_parts: list[bpy.types.Object] = [
         add_elliptical_loft(
@@ -1045,30 +1130,6 @@ def create_upper_body(profile: dict, materials: dict, armature: bpy.types.Object
             front_y - 0.010,
             0.012,
             materials["shirt"],
-        ),
-        add_prism(
-            f"{profile['object_name']}_JacketFrontLeft",
-            [
-                (-shoulder_width * 0.49, 1.430 * factor),
-                (-0.072, 1.415 * factor),
-                (-0.020, 1.090 * factor),
-                (-waist_width * 0.49, 1.060 * factor),
-            ],
-            front_y - 0.016,
-            0.018,
-            materials["suit"],
-        ),
-        add_prism(
-            f"{profile['object_name']}_JacketFrontRight",
-            [
-                (0.072, 1.415 * factor),
-                (shoulder_width * 0.49, 1.430 * factor),
-                (waist_width * 0.49, 1.060 * factor),
-                (0.020, 1.090 * factor),
-            ],
-            front_y - 0.016,
-            0.018,
-            materials["suit"],
         ),
         add_prism(
             f"{profile['object_name']}_LapelLeft",
@@ -1123,29 +1184,29 @@ def create_upper_body(profile: dict, materials: dict, armature: bpy.types.Object
         )
     upper_body = rig_mesh(join_meshes(upper_parts, f"{profile['object_name']}_TailoredUpperBody"), armature, "Chest")
 
-    neck_start = Vector((0, 0.008, 1.435 * factor))
-    neck_end = Vector((0, 0.004, 1.575 * factor))
+    neck_start = Vector((0, 0.008, 1.480 * factor))
+    neck_end = Vector((0, 0.004, 1.512 * factor))
     neck_parts = [
         add_tapered_segment(
             f"{profile['object_name']}_NeckSkin",
             neck_start,
             neck_end,
-            0.058 * factor if profile["slug"] == "djeison-drey" else 0.052 * factor,
-            0.050 * factor if profile["slug"] == "djeison-drey" else 0.046 * factor,
+            0.063 * factor if profile["slug"] == "djeison-drey" else 0.058 * factor,
+            0.058 * factor if profile["slug"] == "djeison-drey" else 0.054 * factor,
             materials["skin"],
             vertices=22,
             bevel=0.004,
         ),
         add_prism(
             f"{profile['object_name']}_ShirtCollarLeft",
-            [(-0.078, 1.475 * factor), (-0.006, 1.425 * factor), (-0.047, 1.392 * factor), (-0.108, 1.445 * factor)],
+            [(-0.063, 1.472 * factor), (-0.005, 1.428 * factor), (-0.038, 1.400 * factor), (-0.088, 1.444 * factor)],
             front_y - 0.061,
             0.010,
             materials["shirt"],
         ),
         add_prism(
             f"{profile['object_name']}_ShirtCollarRight",
-            [(0.078, 1.475 * factor), (0.108, 1.445 * factor), (0.047, 1.392 * factor), (0.006, 1.425 * factor)],
+            [(0.063, 1.472 * factor), (0.088, 1.444 * factor), (0.038, 1.400 * factor), (0.005, 1.428 * factor)],
             front_y - 0.061,
             0.010,
             materials["shirt"],
@@ -1155,17 +1216,19 @@ def create_upper_body(profile: dict, materials: dict, armature: bpy.types.Object
 
     objects = [upper_body, neck]
     for side in ("L", "R"):
+        side_sign = 1 if side == "L" else -1
         upper_start, upper_end = endpoints[f"UpperArm.{side}"]
         lower_start, lower_end = endpoints[f"Forearm.{side}"]
-        upper_radius = 0.065 * factor if profile["slug"] == "djeison-drey" else 0.059 * factor
+        upper_radius = 0.052 * factor if profile["slug"] == "djeison-drey" else 0.048 * factor
+        sleeve_start = upper_start + Vector((-side_sign * 0.010 * factor, 0.0, -0.015 * factor))
         upper_sleeve = add_oriented_loft(
             f"{profile['object_name']}_JacketUpperSleeve.{side}",
-            upper_start,
+            sleeve_start,
             upper_end,
             [
-                (0.0, upper_radius * 0.82, upper_radius * 0.78),
-                (0.12, upper_radius * 0.94, upper_radius * 0.89),
-                (0.26, upper_radius * 1.00, upper_radius * 0.94),
+                (0.0, upper_radius * 0.96, upper_radius * 0.60),
+                (0.12, upper_radius * 1.02, upper_radius * 0.76),
+                (0.26, upper_radius * 0.97, upper_radius * 0.91),
                 (0.48, upper_radius * 0.91, upper_radius * 0.88),
                 (0.82, upper_radius * 0.79, upper_radius * 0.77),
                 (1.0, upper_radius * 0.75, upper_radius * 0.73),
@@ -1173,18 +1236,24 @@ def create_upper_body(profile: dict, materials: dict, armature: bpy.types.Object
             materials["suit"],
             segments=24,
         )
-        objects.append(rig_mesh(join_meshes([upper_sleeve], f"{profile['object_name']}_UpperArm.{side}"), armature, f"UpperArm.{side}"))
+        objects.append(
+            rig_mesh(
+                upper_sleeve,
+                armature,
+                f"UpperArm.{side}",
+            )
+        )
 
         forearm_sleeve = add_oriented_loft(
             f"{profile['object_name']}_JacketForearmSleeve.{side}",
             lower_start,
             lower_end,
             [
-                (0.0, upper_radius * 0.78, upper_radius * 0.75),
-                (0.18, upper_radius * 0.78, upper_radius * 0.74),
-                (0.52, upper_radius * 0.71, upper_radius * 0.68),
-                (0.84, upper_radius * 0.63, upper_radius * 0.60),
-                (1.0, upper_radius * 0.60, upper_radius * 0.57),
+                (0.0, upper_radius * 0.74, upper_radius * 0.72),
+                (0.18, upper_radius * 0.82, upper_radius * 0.77),
+                (0.48, upper_radius * 0.86, upper_radius * 0.78),
+                (0.80, upper_radius * 0.66, upper_radius * 0.61),
+                (1.0, upper_radius * 0.52, upper_radius * 0.49),
             ],
             materials["suit"],
             segments=24,
@@ -1192,7 +1261,7 @@ def create_upper_body(profile: dict, materials: dict, armature: bpy.types.Object
         elbow_cover = add_uv_sphere(
             f"{profile['object_name']}_TailoredElbow.{side}",
             lower_start,
-            (upper_radius * 0.82, upper_radius * 0.78, upper_radius * 0.82),
+            (upper_radius * 0.69, upper_radius * 0.64, upper_radius * 0.69),
             materials["suit"],
             segments=18,
             rings=10,
@@ -1219,20 +1288,31 @@ def create_hand(profile: dict, materials: dict, armature: bpy.types.Object, endp
     center = start + vector * 0.50
     parts: list[bpy.types.Object] = []
     if profile["carries_mate"] and side == "L":
-        parts.append(add_uv_sphere(f"{profile['object_name']}_Palm.{side}", center, (0.050, 0.033, 0.066), materials["skin"], segments=20, rings=12))
+        palm = add_uv_sphere(
+            f"{profile['object_name']}_Palm.{side}",
+            center,
+            (0.040, 0.026, 0.052),
+            materials["skin"],
+            segments=20,
+            rings=12,
+        )
+        palm.rotation_mode = "QUATERNION"
+        palm.rotation_quaternion = Vector((0, 0, 1)).rotation_difference(vector.normalized())
+        parts.append(palm)
         cup_center = Vector((0.105 * factor, -0.320 * factor, 1.145 * factor))
-        for index, z_offset in enumerate((-0.036, -0.012, 0.014, 0.038)):
-            radius = 0.0068 - index * 0.00025
-            angle_start = math.radians(-68)
-            angle_end = math.radians(58)
-            points = []
+        angle_spans = ((54, -58), (51, -55), (48, -51), (45, -47))
+        for index, (z_offset, angle_span) in enumerate(zip((-0.034, -0.011, 0.013, 0.035), angle_spans)):
+            radius = 0.0058 - index * 0.00022
+            angle_start = math.radians(angle_span[0])
+            angle_end = math.radians(angle_span[1])
+            points = [center + Vector((-0.008, -0.004, z_offset * 0.55))]
             for step in range(7):
                 angle = angle_start + (angle_end - angle_start) * step / 6
                 points.append(
                     (
-                        cup_center.x + math.cos(angle) * (0.061 + index * 0.001),
-                        cup_center.y + math.sin(angle) * (0.061 + index * 0.001),
-                        cup_center.z + z_offset,
+                        cup_center.x + math.cos(angle) * (0.060 + index * 0.0007),
+                        cup_center.y + math.sin(angle) * (0.060 + index * 0.0007),
+                        cup_center.z + z_offset + 0.010 - 0.020 * step / 6,
                     )
                 )
             parts.append(make_poly_curve(f"{profile['object_name']}_GripFinger{index}.{side}", points, materials["skin"], bevel_depth=radius, resolution=2))
@@ -1241,32 +1321,58 @@ def create_hand(profile: dict, materials: dict, armature: bpy.types.Object, endp
             cup_center + Vector((0.045, -0.030, 0.038)),
             cup_center + Vector((0.015, -0.050, 0.035)),
         ]
-        parts.append(make_poly_curve(f"{profile['object_name']}_GripThumb.{side}", thumb_points, materials["skin"], bevel_depth=0.008, resolution=2))
+        parts.append(make_poly_curve(f"{profile['object_name']}_GripThumb.{side}", thumb_points, materials["skin"], bevel_depth=0.0072, resolution=2))
     else:
-        palm = add_uv_sphere(f"{profile['object_name']}_Palm.{side}", center, (0.043 * factor, 0.026 * factor, 0.061 * factor), materials["skin"], segments=20, rings=12)
+        direction = vector.normalized()
+        palm_center = start + vector * 0.44
+        palm = add_uv_sphere(
+            f"{profile['object_name']}_Palm.{side}",
+            palm_center,
+            (0.043 * factor, 0.026 * factor, 0.053 * factor),
+            materials["skin"],
+            segments=20,
+            rings=12,
+        )
         palm.rotation_mode = "QUATERNION"
-        palm.rotation_quaternion = Vector((0, 0, 1)).rotation_difference(vector.normalized())
+        palm.rotation_quaternion = Vector((0, 0, 1)).rotation_difference(direction)
         parts.append(palm)
         sign = 1 if side == "L" else -1
+        finger_base = start + vector * 0.66
+        finger_lengths = (0.046, 0.050, 0.047, 0.039)
         for finger_index in range(4):
-            x_offset = sign * (finger_index - 1.5) * 0.011
-            finger_start = end + Vector((x_offset, -0.004 * finger_index, 0.028))
-            finger_end = finger_start + vector.normalized() * 0.050
+            x_offset = sign * (finger_index - 1.5) * 0.0102
+            finger_start = finger_base + Vector((x_offset, -0.003 * finger_index, 0.004))
+            finger_length = finger_lengths[finger_index] * factor
+            knuckle_end = finger_start + direction * (finger_length * 0.56)
+            finger_end = knuckle_end + direction * (finger_length * 0.44) + Vector((0, -0.006 * factor, -0.010 * factor))
             parts.append(
                 add_tapered_segment(
-                    f"{profile['object_name']}_Finger{finger_index}.{side}",
+                    f"{profile['object_name']}_FingerProximal{finger_index}.{side}",
                     finger_start,
-                    finger_end,
-                    0.0065,
-                    0.0050,
+                    knuckle_end,
+                    0.0062,
+                    0.0053,
                     materials["skin"],
                     vertices=10,
                     bevel=0.002,
                 )
             )
-        thumb_start = center + Vector((-sign * 0.034, -0.008, 0.010))
-        thumb_end = thumb_start + Vector((-sign * 0.020, -0.014, -0.032))
-        parts.append(add_tapered_segment(f"{profile['object_name']}_Thumb.{side}", thumb_start, thumb_end, 0.008, 0.006, materials["skin"], vertices=10, bevel=0.002))
+            parts.append(
+                add_tapered_segment(
+                    f"{profile['object_name']}_FingerDistal{finger_index}.{side}",
+                    knuckle_end,
+                    finger_end,
+                    0.0053,
+                    0.0042,
+                    materials["skin"],
+                    vertices=10,
+                    bevel=0.0018,
+                )
+            )
+        thumb_start = palm_center + Vector((-sign * 0.030, -0.008, 0.006))
+        thumb_mid = thumb_start + Vector((-sign * 0.015, -0.008, -0.012))
+        thumb_end = thumb_mid + Vector((-sign * 0.012, -0.010, -0.018))
+        parts.append(make_poly_curve(f"{profile['object_name']}_Thumb.{side}", [thumb_start, thumb_mid, thumb_end], materials["skin"], bevel_depth=0.0068, resolution=2))
     return rig_mesh(join_meshes(parts, f"{profile['object_name']}_Hand.{side}"), armature, f"Hand.{side}")
 
 
@@ -1309,6 +1415,12 @@ def create_spherical_cap(
     mesh = bpy.data.meshes.new(f"{name}_Mesh")
     mesh.from_pydata(verts, [], faces)
     mesh.update()
+    uv_layer = mesh.uv_layers.new(name="CapUV")
+    for loop in mesh.loops:
+        vertex_index = loop.vertex_index
+        ring = vertex_index // segments
+        segment = vertex_index % segments
+        uv_layer.data[loop.index].uv = (segment / segments, ring / rings)
     obj = bpy.data.objects.new(name, mesh)
     bpy.context.collection.objects.link(obj)
     set_material(obj, material)
@@ -1337,9 +1449,9 @@ def create_reference_face_surface(
     ellipsoid, retaining useful parallax around cheeks, forehead and jaw.
     """
     head_width, head_depth, head_height = profile["head"]
-    radius_x = head_width * 0.492
+    radius_x = head_width * 0.455
     radius_y = head_depth * 0.515
-    radius_z = head_height * 0.492
+    radius_z = head_height * 0.435
     vertices: list[tuple[float, float, float]] = []
     vertex_uvs: list[tuple[float, float]] = []
     for row in range(rows + 1):
@@ -1347,7 +1459,7 @@ def create_reference_face_surface(
         normalized_z = (v - 0.5) * 1.90
         for column in range(columns + 1):
             u = column / columns
-            normalized_x = (u - 0.5) * 1.92
+            normalized_x = (u - 0.5) * 1.88
             radial = normalized_x * normalized_x + normalized_z * normalized_z
             front_factor = math.sqrt(max(0.04, 1.0 - min(0.96, radial)))
             # A slightly flatter mid-face gives the portrait room without
@@ -1375,7 +1487,7 @@ def create_reference_face_surface(
     bpy.context.collection.objects.link(obj)
     set_material(obj, material)
     smooth_mesh(obj)
-    obj["likeness_surface"] = "approved turnaround crop mapped to curved face geometry"
+    obj["likeness_surface"] = "versioned official portrait crop mapped once to curved face geometry"
     return obj
 
 
@@ -1460,7 +1572,7 @@ def rounded_rectangle_points(cx: float, y: float, cz: float, width: float, heigh
 def create_head(profile: dict, materials: dict, armature: bpy.types.Object, endpoints: dict) -> list[bpy.types.Object]:
     factor = profile["height"] / 1.80
     head_width, head_depth, head_height = profile["head"]
-    head_top = profile["height"] - 0.015
+    head_top = profile["height"] - 0.050
     center_z = head_top - head_height / 2
     center = Vector((0, 0, center_z))
     chin_width = profile["jaw_width"] * (0.36 if profile["slug"] == "fabiano-soltis" else 0.42)
@@ -1468,8 +1580,8 @@ def create_head(profile: dict, materials: dict, armature: bpy.types.Object, endp
         add_elliptical_loft(
             f"{profile['object_name']}_ContinuousHead",
             [
-                (center_z - head_height * 0.50, 0.002, 0.002, 0.007),
-                (center_z - head_height * 0.47, chin_width * 0.72, head_depth * 0.17, 0.0065),
+                (center_z - head_height * 0.50, chin_width * 0.30, head_depth * 0.12, 0.007),
+                (center_z - head_height * 0.47, chin_width * 0.68, head_depth * 0.22, 0.0065),
                 (center_z - head_height * 0.39, profile["jaw_width"] * 0.43, head_depth * 0.405, 0.003),
                 (center_z - head_height * 0.30, profile["jaw_width"] * 0.48, head_depth * 0.455, 0.000),
                 (center_z - head_height * 0.19, head_width * 0.465, head_depth * 0.49, -0.002),
@@ -1484,18 +1596,10 @@ def create_head(profile: dict, materials: dict, armature: bpy.types.Object, endp
             front_fullness=1.055,
         ),
     ]
-    cheek_z = center_z - 0.010 * factor
-    for side_sign, asymmetry in ((-1, -0.002), (1, 0.0025)):
-        skin_parts.append(
-            add_uv_sphere(
-                f"{profile['object_name']}_Cheek{side_sign}",
-                (side_sign * head_width * 0.255, -head_depth * 0.480 - asymmetry, cheek_z + asymmetry),
-                (head_width * 0.165, head_depth * 0.040, head_height * 0.105),
-                materials["skin_warm"],
-                segments=20,
-                rings=12,
-            )
-        )
+    # The loft carries the cheek planes.  Separate cheek discs were visible as
+    # pale circles in the former close-up and are intentionally not layered on
+    # top of the face anymore.
+    for side_sign in (-1, 1):
         skin_parts.append(
             add_uv_sphere(
                 f"{profile['object_name']}_Ear{side_sign}",
@@ -1506,30 +1610,31 @@ def create_head(profile: dict, materials: dict, armature: bpy.types.Object, endp
                 rings=12,
             )
         )
-    nose_bridge_start = Vector((0, -head_depth * 0.49, center_z + head_height * 0.145))
-    nose_tip = Vector((0, -head_depth * 0.49 - profile["nose_length"], center_z - head_height * 0.005))
-    skin_parts.append(
-        add_tapered_segment(
-            f"{profile['object_name']}_NoseBridge",
-            nose_bridge_start,
-            nose_tip,
-            profile["nose_width"] * 0.34,
-            profile["nose_width"] * 0.47,
-            materials["skin"],
-            vertices=18,
-            bevel=0.003,
+    if "face_photo" not in materials:
+        nose_bridge_start = Vector((0, -head_depth * 0.505, center_z + head_height * 0.145))
+        nose_tip = Vector((0, -head_depth * 0.505 - profile["nose_length"], center_z - head_height * 0.005))
+        skin_parts.append(
+            add_tapered_segment(
+                f"{profile['object_name']}_NoseBridge",
+                nose_bridge_start,
+                nose_tip,
+                profile["nose_width"] * 0.34,
+                profile["nose_width"] * 0.47,
+                materials["skin"],
+                vertices=18,
+                bevel=0.003,
+            )
         )
-    )
-    skin_parts.append(
-        add_uv_sphere(
-            f"{profile['object_name']}_NoseTip",
-            nose_tip,
-            (profile["nose_width"] * 0.55, profile["nose_width"] * 0.43, profile["nose_width"] * 0.43),
-            materials["skin_warm"],
-            segments=20,
-            rings=12,
+        skin_parts.append(
+            add_uv_sphere(
+                f"{profile['object_name']}_NoseTip",
+                nose_tip,
+                (profile["nose_width"] * 0.50, profile["nose_width"] * 0.37, profile["nose_width"] * 0.39),
+                materials["skin"],
+                segments=20,
+                rings=12,
+            )
         )
-    )
     head_skin = rig_mesh(join_meshes(skin_parts, f"{profile['object_name']}_HeadSkin"), armature, "Head")
 
     reference_face = None
@@ -1542,8 +1647,8 @@ def create_head(profile: dict, materials: dict, armature: bpy.types.Object, endp
 
     eye_parts: list[bpy.types.Object] = []
     eye_z = center_z + head_height * 0.105
-    eye_y = -head_depth * 0.505
-    iris_radius = 0.0064 if profile["slug"] == "fabiano-soltis" else 0.0068
+    eye_y = -head_depth * 0.545
+    iris_radius = 0.0054 if profile["slug"] == "fabiano-soltis" else 0.0058
     for side_sign in (-1, 1):
         eye_x = side_sign * profile["eye_spacing"] / 2
         eye_parts.extend(
@@ -1551,7 +1656,7 @@ def create_head(profile: dict, materials: dict, armature: bpy.types.Object, endp
                 add_uv_sphere(
                     f"{profile['object_name']}_EyeWhite{side_sign}",
                     (eye_x, eye_y, eye_z + side_sign * 0.001),
-                    (0.0185, 0.0065, 0.0088),
+                    (0.0165, 0.0058, 0.0074),
                     materials["eye_white"],
                     segments=20,
                     rings=12,
@@ -1559,7 +1664,7 @@ def create_head(profile: dict, materials: dict, armature: bpy.types.Object, endp
                 add_uv_sphere(
                     f"{profile['object_name']}_Iris{side_sign}",
                     (eye_x, eye_y - 0.0082, eye_z + side_sign * 0.001),
-                    (iris_radius, 0.0018, iris_radius),
+                    (iris_radius, 0.0017, iris_radius),
                     materials["iris"],
                     segments=18,
                     rings=10,
@@ -1589,12 +1694,49 @@ def create_head(profile: dict, materials: dict, armature: bpy.types.Object, endp
                 resolution=2,
             )
         )
+        eye_parts.extend(
+            [
+                make_poly_curve(
+                    f"{profile['object_name']}_UpperLid{side_sign}",
+                    [
+                        (eye_x - 0.016, eye_y - 0.0072, eye_z + 0.001),
+                        (eye_x, eye_y - 0.0090, eye_z + 0.007),
+                        (eye_x + 0.016, eye_y - 0.0072, eye_z + 0.001),
+                    ],
+                    materials["skin_shadow"],
+                    bevel_depth=0.0014,
+                    resolution=2,
+                ),
+                make_poly_curve(
+                    f"{profile['object_name']}_LowerLid{side_sign}",
+                    [
+                        (eye_x - 0.014, eye_y - 0.0068, eye_z - 0.001),
+                        (eye_x, eye_y - 0.0076, eye_z - 0.005),
+                        (eye_x + 0.014, eye_y - 0.0068, eye_z - 0.001),
+                    ],
+                    materials["skin_shadow"],
+                    bevel_depth=0.0009,
+                    resolution=2,
+                ),
+            ]
+        )
     eyes = rig_mesh(join_meshes(eye_parts, f"{profile['object_name']}_EyesAndBrows"), armature, "Head")
 
     mouth_z = center_z - head_height * 0.205
-    mouth_y = -head_depth * 0.515
+    mouth_y = -head_depth * 0.548
     smile_lift = 0.004 if profile["slug"] == "fabiano-soltis" else 0.006
     mouth_parts = [
+        make_poly_curve(
+            f"{profile['object_name']}_MouthLine",
+            [
+                (-profile["mouth_width"] * 0.47, mouth_y + 0.001, mouth_z + smile_lift * 0.78),
+                (0, mouth_y - 0.0030, mouth_z),
+                (profile["mouth_width"] * 0.47, mouth_y + 0.001, mouth_z + smile_lift),
+            ],
+            materials["mouth_shadow"],
+            bevel_depth=0.0017,
+            resolution=2,
+        ),
         make_poly_curve(
             f"{profile['object_name']}_UpperLip",
             [
@@ -1605,7 +1747,7 @@ def create_head(profile: dict, materials: dict, armature: bpy.types.Object, endp
                 (profile["mouth_width"] / 2, mouth_y, mouth_z + smile_lift * 1.12),
             ],
             materials["lip"],
-            bevel_depth=0.0034,
+            bevel_depth=0.0020,
             resolution=2,
         ),
         make_poly_curve(
@@ -1616,7 +1758,7 @@ def create_head(profile: dict, materials: dict, armature: bpy.types.Object, endp
                 (profile["mouth_width"] * 0.43, mouth_y, mouth_z - 0.001),
             ],
             materials["lip"],
-            bevel_depth=0.0038,
+            bevel_depth=0.0022,
             resolution=2,
         ),
     ]
@@ -1635,40 +1777,38 @@ def create_head(profile: dict, materials: dict, armature: bpy.types.Object, endp
 
     hair_parts: list[bpy.types.Object] = [
         create_spherical_cap(
-            f"{profile['object_name']}_HairCap",
-            (0, 0.006, center_z + 0.010),
-            (head_width * 0.515, head_depth * 0.515, head_height * 0.51),
+            f"{profile['object_name']}_HairVolume",
+            (0, 0.004, center_z + head_height * 0.22),
+            (head_width * 0.51, head_depth * 0.50, head_height * 0.30),
             materials["hair"],
-            front_drop=0.055 if profile["slug"] == "fabiano-soltis" else 0.028,
-            max_theta=math.pi * 0.39,
-            rings=12,
-            segments=40,
+            rings=7,
+            segments=28,
+            front_drop=0.16 if profile["hair_style"] == "dark_swept" else 0.10,
+            max_theta=math.pi * 0.58,
         )
     ]
-    rng = random.Random(2704 if profile["slug"] == "fabiano-soltis" else 1308)
-    clump_count = 48 if profile["slug"] == "fabiano-soltis" else 56
-    for index in range(clump_count):
-        angle = TAU * (index / clump_count) + rng.uniform(-0.09, 0.09)
-        radial = rng.uniform(0.18, 0.86)
-        x = math.cos(angle) * head_width * 0.42 * radial
-        y = math.sin(angle) * head_depth * 0.42 * radial
-        surface_z = center_z + head_height * (0.505 - 0.17 * radial * radial)
-        if profile["hair_style"] == "dark_swept":
-            end_offset = Vector((0.020 + 0.020 * radial, 0.007, 0.013 + 0.010 * (1 - radial)))
-        else:
-            end_offset = Vector((rng.uniform(-0.013, 0.018), rng.uniform(-0.006, 0.013), rng.uniform(0.012, 0.028)))
-        start = Vector((x, y, surface_z - 0.012))
-        mid = start + end_offset * 0.55 + Vector((0, 0, 0.006))
-        end = start + end_offset
-        hair_parts.append(
-            make_poly_curve(
-                f"{profile['object_name']}_HairClump{index}",
-                [start, mid, end],
-                materials["hair"],
-                bevel_depth=0.0027 if profile["slug"] == "djeison-drey" else 0.0023,
-                resolution=2,
-            )
+    # Small, overlapping flattened masses create an irregular swept hairline
+    # while remaining visually continuous with the main cap. They avoid both
+    # the old blocky lobes and the saw-tooth silhouette of exposed curve locks.
+    lock_offsets = (
+        (-0.14, 0.425, 0.22, 0.045),
+        (0.18, 0.405, 0.18, 0.040),
+    ) if profile["hair_style"] == "dark_swept" else (
+        (-0.20, 0.420, 0.17, 0.045),
+        (0.02, 0.455, 0.20, 0.050),
+        (0.22, 0.405, 0.15, 0.040),
+    )
+    for index, (x_factor, z_factor, width_factor, height_factor) in enumerate(lock_offsets):
+        lock = add_uv_sphere(
+            f"{profile['object_name']}_SweptHairLock{index}",
+            (x_factor * head_width, -head_depth * (0.215 + index * 0.006), center_z + head_height * z_factor),
+            (head_width * width_factor, head_depth * 0.10, head_height * height_factor),
+            materials["hair"],
+            segments=16,
+            rings=8,
         )
+        lock.rotation_euler = (0.02 * (index - 2), 0.10 * x_factor, -0.10 * x_factor)
+        hair_parts.append(lock)
     hair = rig_mesh(join_meshes(hair_parts, f"{profile['object_name']}_Hair"), armature, "Head")
 
     beard_parts: list[bpy.types.Object] = []
@@ -1679,12 +1819,24 @@ def create_head(profile: dict, materials: dict, armature: bpy.types.Object, endp
     elif profile["beard_style"] == "short_stubble":
         beard_parts.extend(
             [
-                create_lower_face_hair_surface(profile, center_z, materials["beard"], full_beard=False),
+                make_poly_curve(
+                    f"{profile['object_name']}_StubbleJaw",
+                    [
+                        (-head_width * 0.37, mouth_y + head_depth * 0.12, center_z - head_height * 0.13),
+                        (-head_width * 0.25, mouth_y - 0.001, center_z - head_height * 0.34),
+                        (0, mouth_y - 0.004, center_z - head_height * 0.43),
+                        (head_width * 0.25, mouth_y - 0.001, center_z - head_height * 0.34),
+                        (head_width * 0.37, mouth_y + head_depth * 0.12, center_z - head_height * 0.13),
+                    ],
+                    materials["beard"],
+                    bevel_depth=0.0032,
+                    resolution=2,
+                ),
                 make_poly_curve(
                     f"{profile['object_name']}_StubbleMoustache",
-                    [(-0.030, mouth_y - 0.002, mouth_z + 0.015), (0, mouth_y - 0.004, mouth_z + 0.011), (0.030, mouth_y - 0.002, mouth_z + 0.015)],
+                    [(-0.026, mouth_y - 0.002, mouth_z + 0.014), (0, mouth_y - 0.004, mouth_z + 0.010), (0.026, mouth_y - 0.002, mouth_z + 0.014)],
                     materials["beard"],
-                    bevel_depth=0.0028,
+                    bevel_depth=0.0024,
                     resolution=2,
                 ),
             ]
@@ -1692,7 +1844,34 @@ def create_head(profile: dict, materials: dict, armature: bpy.types.Object, endp
     else:
         beard_parts.extend(
             [
-                create_lower_face_hair_surface(profile, center_z, materials["beard"], full_beard=True),
+                make_poly_curve(
+                    f"{profile['object_name']}_FullBeardJaw",
+                    [
+                        (-head_width * 0.43, mouth_y + head_depth * 0.13, center_z - head_height * 0.10),
+                        (-head_width * 0.34, mouth_y - 0.001, center_z - head_height * 0.31),
+                        (-head_width * 0.18, mouth_y - 0.006, center_z - head_height * 0.43),
+                        (0, mouth_y - 0.008, center_z - head_height * 0.47),
+                        (head_width * 0.18, mouth_y - 0.006, center_z - head_height * 0.43),
+                        (head_width * 0.34, mouth_y - 0.001, center_z - head_height * 0.31),
+                        (head_width * 0.43, mouth_y + head_depth * 0.13, center_z - head_height * 0.10),
+                    ],
+                    materials["beard"],
+                    bevel_depth=0.0072,
+                    resolution=2,
+                ),
+                make_poly_curve(
+                    f"{profile['object_name']}_BeardContour",
+                    [
+                        (-head_width * 0.34, mouth_y - 0.002, center_z - head_height * 0.20),
+                        (-head_width * 0.19, mouth_y - 0.008, center_z - head_height * 0.36),
+                        (0, mouth_y - 0.010, center_z - head_height * 0.40),
+                        (head_width * 0.19, mouth_y - 0.008, center_z - head_height * 0.36),
+                        (head_width * 0.34, mouth_y - 0.002, center_z - head_height * 0.20),
+                    ],
+                    materials["beard"],
+                    bevel_depth=0.0050,
+                    resolution=2,
+                ),
                 make_poly_curve(
                     f"{profile['object_name']}_MoustacheLeft",
                     [(-0.002, mouth_y - 0.006, mouth_z + 0.018), (-0.018, mouth_y - 0.008, mouth_z + 0.021), (-0.040, mouth_y - 0.003, mouth_z + 0.016)],
@@ -1759,6 +1938,9 @@ def create_head(profile: dict, materials: dict, armature: bpy.types.Object, endp
             )
         )
     glasses = rig_mesh(join_meshes(glasses_parts, f"{profile['object_name']}_Glasses"), armature, "Head")
+    if reference_face is not None and profile.get("face_texture_has_glasses"):
+        bpy.data.objects.remove(glasses, do_unlink=True)
+        glasses = None
     return [part for part in (head_skin, reference_face, eyes, mouth, hair, beard, glasses) if part is not None]
 
 
@@ -2034,26 +2216,26 @@ def create_seated_idle_action(profile: dict, armature: bpy.types.Object) -> None
 
         # Small asymmetries prevent a mirrored mannequin pose. In authoring
         # space -Y is forward; negative upper-leg X rotation moves knees there.
-        key_bone(armature, "UpperLeg.L", frame, rotation=(-1.405 + 0.004 * breath, 0.012, -0.075))
-        key_bone(armature, "UpperLeg.R", frame, rotation=(-1.365 - 0.004 * breath, -0.010, 0.065))
-        key_bone(armature, "LowerLeg.L", frame, rotation=(1.395 - 0.003 * breath, -0.010, 0.012))
-        key_bone(armature, "LowerLeg.R", frame, rotation=(1.355 + 0.003 * breath, 0.012, -0.010))
-        key_bone(armature, "Foot.L", frame, rotation=(0.0, -0.012, -0.012), location=(0.0, 0.0, -0.105 * factor))
-        key_bone(armature, "Foot.R", frame, rotation=(0.0, 0.012, 0.010), location=(0.0, 0.0, -0.105 * factor))
+        key_bone(armature, "UpperLeg.L", frame, rotation=(-1.370 + 0.004 * breath, 0.020, -0.115))
+        key_bone(armature, "UpperLeg.R", frame, rotation=(-1.330 - 0.004 * breath, -0.018, 0.105))
+        key_bone(armature, "LowerLeg.L", frame, rotation=(1.240 - 0.003 * breath, -0.018, 0.020))
+        key_bone(armature, "LowerLeg.R", frame, rotation=(1.210 + 0.003 * breath, 0.020, -0.018))
+        key_bone(armature, "Foot.L", frame, rotation=(0.130, -0.018, -0.018), location=(0.014 * factor, 0.0, -0.110 * factor))
+        key_bone(armature, "Foot.R", frame, rotation=(0.120, 0.018, 0.016), location=(-0.014 * factor, 0.0, -0.110 * factor))
 
         # Fabiano rests both hands toward his thighs. Djeison preserves the
         # authored left-hand chimarrao grip while his right hand rests forward.
-        key_bone(armature, "UpperArm.R", frame, rotation=(0.035 + 0.005 * breath, -0.018, -0.035))
-        key_bone(armature, "Forearm.R", frame, rotation=(-0.53 + 0.006 * breath, 0.025, 0.015))
-        key_bone(armature, "Hand.R", frame, rotation=(0.06, -0.035 + 0.008 * breath, 0.02))
+        key_bone(armature, "UpperArm.R", frame, rotation=(-0.055 + 0.005 * breath, -0.018, -0.035))
+        key_bone(armature, "Forearm.R", frame, rotation=(-0.12 + 0.006 * breath, 0.020, 0.018))
+        key_bone(armature, "Hand.R", frame, rotation=(0.080, -0.115 + 0.004 * breath, 0.055))
         if profile["carries_mate"]:
             key_bone(armature, "UpperArm.L", frame, rotation=(0.015 + 0.003 * breath, 0.008, 0.012))
             key_bone(armature, "Forearm.L", frame, rotation=(-0.035, -0.008, 0.010))
-            key_bone(armature, "Hand.L", frame, rotation=(0.008, 0.0, -0.008 * breath))
+            key_bone(armature, "Hand.L", frame, rotation=(0.040, -0.025, -0.035 - 0.004 * breath))
         else:
-            key_bone(armature, "UpperArm.L", frame, rotation=(0.025 - 0.004 * breath, 0.018, 0.032))
-            key_bone(armature, "Forearm.L", frame, rotation=(-0.49 - 0.005 * breath, -0.025, -0.012))
-            key_bone(armature, "Hand.L", frame, rotation=(0.055, 0.030 - 0.006 * breath, -0.018))
+            key_bone(armature, "UpperArm.L", frame, rotation=(-0.050 - 0.004 * breath, 0.018, 0.035))
+            key_bone(armature, "Forearm.L", frame, rotation=(-0.11 - 0.006 * breath, -0.020, -0.018))
+            key_bone(armature, "Hand.L", frame, rotation=(0.080, 0.115 - 0.004 * breath, -0.055))
     finalize_action(armature, action, 120, loop=True)
 
 
@@ -2158,12 +2340,14 @@ def build_character(profile: dict) -> bpy.types.Object:
         create_chimarrao(profile, materials, armature)
     create_animations(profile, armature)
     profile["seated_pose_metrics"] = validate_seated_pose(profile, armature)
+    consolidated = consolidate_character_meshes(profile, armature)
     armature["profile_summary"] = json.dumps(profile["profile_summary"], ensure_ascii=False)
     armature["animation_clips"] = "Idle, Walk, Wave, SeatedIdle"
     armature["seated_contract"] = "Root fixed at floor; Hips back 0.435x height factor and down 0.455x; target cushion top 0.50 m"
     armature["seated_pose_metrics"] = json.dumps(profile["seated_pose_metrics"], ensure_ascii=False)
     armature["modeling_method"] = "deterministic procedural geometry with identity-specific proportions"
-    armature["garment_construction"] = "separate jacket shell, front panels, lapels, shirt, tie, cuffs and trousers"
+    armature["garment_construction"] = "anatomical jacket shell, lapels, shirt, tie, cuffs and tailored trousers"
+    armature["render_mesh"] = consolidated.name
     return armature
 
 
@@ -2216,8 +2400,11 @@ def flatten_exported_glb(output_path: Path) -> None:
 
     Blender 4.5 needs the mesh->armature parenting while exporting NLA actions,
     but Khronos recommends skinned mesh nodes at the scene root.  glTF-Transform
-    performs that hierarchy-only normalization without joining/simplifying
-    meshes, changing textures, compressing buffers, or altering clip names.
+    performs that hierarchy-only normalization without a *post-export* mesh
+    join/simplification, changing textures, compressing buffers, or altering
+    clip names.  The rigged body geometry is deliberately consolidated inside
+    Blender before export; the curved reference face and semantic chimarrao
+    prop nodes stay separate.
     The npm command is optional for local regeneration: when unavailable the
     GLB remains valid and the R3F integration still transforms its outer scene
     wrapper.  CI/release builds should provide `npx.cmd` or `npx`.
@@ -2292,8 +2479,14 @@ def summarize_glb(path: Path, profile: dict) -> dict:
     accessors = gltf.get("accessors", [])
     min_values = [float("inf"), float("inf"), float("inf")]
     max_values = [float("-inf"), float("-inf"), float("-inf")]
+    primitive_count = 0
+    triangle_count = 0
     for mesh in gltf.get("meshes", []):
         for primitive in mesh.get("primitives", []):
+            primitive_count += 1
+            indices_accessor_index = primitive.get("indices")
+            if indices_accessor_index is not None:
+                triangle_count += int(accessors[indices_accessor_index].get("count", 0)) // 3
             accessor_index = primitive.get("attributes", {}).get("POSITION")
             if accessor_index is None:
                 continue
@@ -2342,6 +2535,8 @@ def summarize_glb(path: Path, profile: dict) -> dict:
         "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
         "nodes": len(nodes),
         "meshes": len(gltf.get("meshes", [])),
+        "primitives": primitive_count,
+        "triangles": triangle_count,
         "materials": len(gltf.get("materials", [])),
         "skins": len(gltf.get("skins", [])),
         "animations": animation_names,
@@ -2377,7 +2572,8 @@ def build_manifest(output_dir: Path, summaries: Sequence[dict]) -> Path:
         "units": "meters",
         "origin": "grounded between the feet",
         "animation_fps": FPS,
-        "post_export": "glTF-Transform 4.2.1 hierarchy flatten plus unused attribute pruning; no mesh join, simplification, texture recompression, or geometry compression",
+        "geometry_strategy": "Pre-export Blender consolidation joins the rigged body into one skinned mesh while keeping the curved reference face and semantic chimarrao prop nodes separate.",
+        "post_export": "glTF-Transform 4.2.1 hierarchy flatten plus unused attribute pruning; no post-export mesh join, simplification, texture recompression, or geometry compression",
         "clips": {
             "Idle": {"duration_seconds": 4.0, "loop": True},
             "Walk": {"duration_seconds": 1.0, "loop": True},
@@ -2387,6 +2583,7 @@ def build_manifest(output_dir: Path, summaries: Sequence[dict]) -> Path:
         "characters": [by_slug[slug] for slug in sorted(by_slug)],
         "limitations": [
             "Procedural likeness is identity-specific but is not a photogrammetry or FACS facial scan.",
+            "A single curved projection from each versioned official portrait carries the frontal facial identity; extreme profile and cinematic close-up fidelity remain outside this map asset contract.",
             "Garments are layered rigid-weight meshes with modeled thickness and tailoring; real-time cloth simulation is intentionally omitted.",
             "Hair and beard use lightweight geometric clumps rather than strand-hair simulation.",
             "Visual QA is calibrated for the Commercial Map camera; the assets are not scan-grade cinematic close-up humans.",
@@ -2514,11 +2711,11 @@ def main() -> None:
         texture_path = output_dir / "textures" / f"{profile['slug']}-face.tga"
         source_path = turnaround_sources[profile["slug"]]
         crop = profile["turnaround_crop"]
-        if source_path:
+        if USE_REFERENCE_FACE_TEXTURE and source_path:
             if not source_path.exists():
                 raise FileNotFoundError(f"Turnaround does not exist: {source_path}")
             texture_path = extract_face_texture(source_path, texture_path, crop)
-        if texture_path.exists():
+        if USE_REFERENCE_FACE_TEXTURE and texture_path.exists():
             profile["face_texture_path"] = texture_path
         print(f"[executives] Building {profile['display_name']}...")
         armature = build_character(profile)
@@ -2530,7 +2727,8 @@ def main() -> None:
             print(
                 f"[executives] Validated {output_path.name}: "
                 f"{summary['bytes'] / 1024:.1f} KiB, {summary['nodes']} nodes, "
-                f"{summary['meshes']} meshes, clips={summary['animations']}"
+                f"{summary['meshes']} meshes, {summary['primitives']} primitives, "
+                f"{summary['triangles']} triangles, clips={summary['animations']}"
             )
         if args.preview_dir:
             render_preview(profile, armature, args.preview_dir.resolve() / f"{profile['slug']}-seated-preview.png")

@@ -9,10 +9,17 @@ export const HEADQUARTERS_SOFA_LAYOUT = {
 } as const;
 
 export const HEADQUARTERS_EXECUTIVE_CAMERA = {
-  desktopPosition: [1.25, 1.42, 1.86] as const,
-  compactPosition: [1.25, 1.48, 2.84] as const,
-  target: [1.27, 0.98, -1.53] as const,
+  desktopPosition: [1.25, 1.46, 2.75] as const,
+  compactPosition: [1.25, 1.56, 3.18] as const,
+  target: [1.27, 0.78, -1.53] as const,
 } as const;
+
+export const HEADQUARTERS_EXECUTIVE_COMPACT_WIDTH = 820;
+
+export function shouldUseCompactExecutiveCamera(width: number, height: number) {
+  const safeHeight = Math.max(1, height);
+  return width <= HEADQUARTERS_EXECUTIVE_COMPACT_WIDTH || width / safeHeight < 0.92;
+}
 
 export function interiorSupportsSeatedExecutives(
   entity: Pick<MapEntity, 'publicIdentifier'>,

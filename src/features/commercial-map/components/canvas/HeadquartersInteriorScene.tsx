@@ -9,6 +9,7 @@ import {
   HEADQUARTERS_EXECUTIVE_CAMERA,
   HEADQUARTERS_SOFA_LAYOUT,
   interiorSupportsSeatedExecutives,
+  shouldUseCompactExecutiveCamera,
 } from '../../utils/seatedExecutiveExperience';
 
 const NO_RAYCAST = () => undefined;
@@ -336,8 +337,8 @@ function InteriorCameraRig({ entity }: { entity: MapEntity }) {
   ), [center, facing]);
 
   useEffect(() => {
-    const compactViewport = size.width <= 640;
-    const start = toWorld(1.25, compactViewport ? 1.56 : 1.48, compactViewport ? 4.25 : 3.82);
+    const compactViewport = shouldUseCompactExecutiveCamera(size.width, size.height);
+    const start = toWorld(1.25, compactViewport ? 1.66 : 1.58, compactViewport ? 4.35 : 3.92);
     const cameraPosition = compactViewport
       ? HEADQUARTERS_EXECUTIVE_CAMERA.compactPosition
       : HEADQUARTERS_EXECUTIVE_CAMERA.desktopPosition;
@@ -354,7 +355,7 @@ function InteriorCameraRig({ entity }: { entity: MapEntity }) {
     return () => {
       gl.domElement.style.cursor = 'grab';
     };
-  }, [camera, gl, invalidate, size.width, toWorld]);
+  }, [camera, gl, invalidate, size.height, size.width, toWorld]);
 
   useFrame((_state, delta) => {
     if (!animating.current) return;
@@ -409,7 +410,7 @@ export const HeadquartersInteriorScene = memo(function HeadquartersInteriorScene
       <hemisphereLight args={['#fff7e6', '#624c37', 0.78]} />
       <directionalLight position={[bounds.centerX - 5, 8, bounds.centerZ + 6]} intensity={1.25} color="#fff2d1" castShadow={!reducedGraphics} shadow-mapSize-width={reducedGraphics ? 256 : 1024} shadow-mapSize-height={reducedGraphics ? 256 : 1024} shadow-bias={-0.00015} shadow-normalBias={0.035} />
       <pointLight position={[bounds.centerX, 2.62, bounds.centerZ - 0.5]} intensity={1.25} distance={8} decay={1.7} color="#ffe8b4" />
-      <group position={[bounds.centerX, entity.geometry.elevation, bounds.centerZ]} rotation={[0, facing, 0]} dispose={null}>
+      <group position={[bounds.centerX, entity.geometry.elevation, bounds.centerZ]} rotation={[0, facing, 0]}>
         <mesh position={[0, 0.015, 0]} rotation={[-Math.PI / 2, 0, 0]} receiveShadow raycast={NO_RAYCAST}>
           <planeGeometry args={[5.8, 7.1]} />
           <meshStandardMaterial color={floorTexture ? '#ffffff' : '#8b5738'} map={floorTexture} roughness={0.78} />

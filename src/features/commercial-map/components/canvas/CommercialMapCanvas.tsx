@@ -347,6 +347,9 @@ function focusProfileForEntity(entity: MapEntity) {
   if (landmark === 'fenasoja-headquarters') {
     return { ...profile, contextRatio: 0.055, fitPadding: 1.16, minDistanceRatio: 0.05, maxDistanceRatio: 0.3, minimumDirectionY: 0.32 };
   }
+  if (landmark === 'fenasoja-event-center') {
+    return { ...profile, contextRatio: 0.085, fitPadding: 1.32, minDistanceRatio: 0.06, maxDistanceRatio: 0.4, minimumDirectionY: 0.48 };
+  }
   if (landmark === 'commercial-pavilion') {
     return { ...profile, contextRatio: 0.075, fitPadding: 1.24, minDistanceRatio: 0.06, maxDistanceRatio: 0.4, minimumDirectionY: 0.48 };
   }

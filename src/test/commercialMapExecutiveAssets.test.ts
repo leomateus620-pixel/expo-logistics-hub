@@ -23,6 +23,9 @@ interface ExecutiveAssetManifest {
     file: string;
     bytes: number;
     sha256: string;
+    primitives: number;
+    triangles: number;
+    materials: number;
     skins: number;
     animations: string[];
     root_translation_range: number;
@@ -60,6 +63,13 @@ function triangleCount(json: GltfJson) {
   ), 0);
 }
 
+function primitiveCount(json: GltfJson) {
+  return (json.meshes ?? []).reduce(
+    (total, mesh) => total + (mesh.primitives?.length ?? 0),
+    0,
+  );
+}
+
 describe('assets dos personagens executivos', () => {
   it('mantem o contrato comum de rig, clips, origem e payload', () => {
     expect(manifest.units).toBe('meters');
@@ -73,19 +83,38 @@ describe('assets dos personagens executivos', () => {
     ]);
 
     let combinedBytes = 0;
+    let combinedPrimitives = 0;
+    let combinedTriangles = 0;
+    let combinedMaterials = 0;
     manifest.characters.forEach((character) => {
       const path = resolve(ASSET_ROOT, character.file);
       const bytes = statSync(path).size;
+      const { json } = readGlb(character.file);
+      const primitives = primitiveCount(json);
+      const triangles = triangleCount(json);
+      const materials = json.materials?.length ?? 0;
       combinedBytes += bytes;
+      combinedPrimitives += primitives;
+      combinedTriangles += triangles;
+      combinedMaterials += materials;
       expect(bytes).toBe(character.bytes);
       expect(bytes).toBeGreaterThan(250_000);
       expect(createHash('sha256').update(readFileSync(path)).digest('hex')).toBe(character.sha256);
+      expect(primitives).toBe(character.primitives);
+      expect(triangles).toBe(character.triangles);
+      expect(materials).toBe(character.materials);
+      expect(primitives).toBeLessThanOrEqual(13);
+      expect(triangles).toBeLessThanOrEqual(45_000);
+      expect(materials).toBeLessThanOrEqual(14);
       expect(character.skins).toBeGreaterThan(0);
       expect(character.animations).toEqual(expect.arrayContaining(['Idle', 'Walk', 'Wave', 'SeatedIdle']));
       expect(character.root_translation_range).toBe(0);
       expect(character.forward_axis).toBe('+Z');
     });
-    expect(combinedBytes).toBeLessThanOrEqual(12 * 1024 * 1024);
+    expect(combinedPrimitives).toBeLessThanOrEqual(24);
+    expect(combinedTriangles).toBeLessThanOrEqual(45_000);
+    expect(combinedMaterials).toBeLessThanOrEqual(24);
+    expect(combinedBytes).toBeLessThanOrEqual(6 * 1024 * 1024);
   });
 
   it.each([
@@ -104,6 +133,9 @@ describe('assets dos personagens executivos', () => {
     expect(animationNames).toEqual(expect.arrayContaining(['Idle', 'Walk', 'Wave', 'SeatedIdle']));
     expect(searchableNames).toMatch(skinPattern);
     expect(searchableNames).toMatch(identityPattern);
+    expect(searchableNames).toMatch(/_ReferenceFace/);
+    expect(searchableNames).toMatch(/_SkinnedCharacter/);
+    expect(searchableNames).not.toMatch(/_(EyesAndBrows|Mouth|Nose)(?:_|")/);
     expect(json.nodes?.some((node) => node.extras?.forward_axis?.startsWith('+Z'))).toBe(true);
     expect(triangleCount(json)).toBeGreaterThan(8_000);
     expect(triangleCount(json)).toBeLessThan(100_000);
