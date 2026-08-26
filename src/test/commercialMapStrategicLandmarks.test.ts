@@ -103,7 +103,7 @@ describe('marcos arquitetônicos estratégicos', () => {
     expect(strategicLandmarkFocusDirection(persistedLivestockPavilion)?.[2]).toBeGreaterThan(0);
     expect(strategicLandmarkFocusDirection(persistedPolish)?.[0]).toBeGreaterThan(0);
     expect(strategicLandmarkFocusDirection(persistedItalian)?.[0]).toBeLessThan(0);
-    expect(strategicLandmarkFocusDirection(persistedPortico)?.[2]).toBeGreaterThan(0);
+    expect(strategicLandmarkFocusDirection(persistedPortico)?.[2]).toBeLessThan(0);
     expect(strategicLandmarkFocusDirection(persistedEtnia)?.[0]).toBeGreaterThan(0);
     expect(strategicLandmarkFocusDirection(persistedRestaurant)?.[2]).toBeLessThan(0);
     expect(strategicLandmarkFocusDirection(persistedArena)?.[0]).toBeLessThan(0);

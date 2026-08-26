@@ -77,7 +77,7 @@ function distanceToEntitySurface(point: readonly [number, number], entity: MapEn
 
 describe('camada cartográfica de árvores do mapa comercial', () => {
   it('mantém inventário versionado por quadra e por área ambiental', () => {
-    expect(COMMERCIAL_TREE_LAYER_REVISION).toBe('2026.5-park-environment.1');
+    expect(COMMERCIAL_TREE_LAYER_REVISION).toBe('2026.5-park-environment.2');
     expect(COMMERCIAL_TREE_COUNTS_BY_QUADRA).toEqual({ D: 9, I: 15, J: 14, E: 14 });
     expect(COMMERCIAL_TREE_COUNTS_BY_AREA).toEqual({
       D: 9,
@@ -89,8 +89,9 @@ describe('camada cartográfica de árvores do mapa comercial', () => {
       PAVILIONS_1_14_GROVE: 63,
       RUA_BRASIL_GROVE: 12,
       TERCEIRA_IDADE_EDGE: 9,
+      NATIONS_DISTRICT: 25,
     });
-    expect(COMMERCIAL_MAP_TREES).toHaveLength(205);
+    expect(COMMERCIAL_MAP_TREES).toHaveLength(230);
     expect(new Set(COMMERCIAL_MAP_TREES.map((tree) => tree.id)).size).toBe(COMMERCIAL_MAP_TREES.length);
     expect(new Set(COMMERCIAL_MAP_TREES.map((tree) => tree.area))).toEqual(new Set(Object.keys(COMMERCIAL_TREE_COUNTS_BY_AREA)));
     expect(new Set(COMMERCIAL_MAP_TREES.map((tree) => tree.speciesGroup)).size).toBe(3);

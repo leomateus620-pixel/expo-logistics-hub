@@ -1,4 +1,5 @@
 import { officialPdfPointToLocal } from './officialReference2026';
+import { NATIONS_DISTRICT_LAYOUT } from './nationsDistrict';
 
 export type CommercialTreeQuadra = 'D' | 'I' | 'J' | 'E';
 
@@ -7,7 +8,8 @@ export type CommercialTreeArea = CommercialTreeQuadra
   | 'PARKING_VISITORS'
   | 'PAVILIONS_1_14_GROVE'
   | 'RUA_BRASIL_GROVE'
-  | 'TERCEIRA_IDADE_EDGE';
+  | 'TERCEIRA_IDADE_EDGE'
+  | 'NATIONS_DISTRICT';
 
 export type CommercialTreePlacement =
   | 'INSIDE_LOT'
@@ -62,7 +64,7 @@ export interface CommercialMapTree {
   verificationStatus: CommercialTreeVerificationStatus;
 }
 
-export const COMMERCIAL_TREE_LAYER_REVISION = '2026.5-park-environment.1';
+export const COMMERCIAL_TREE_LAYER_REVISION = '2026.5-park-environment.2';
 
 export const COMMERCIAL_TREE_SOURCE_REFERENCES = {
   D: 'Anexo 1 — satélite da Quadra D (088fa39a-75de-4768-b7fb-7017886f84ab.png)',
@@ -74,6 +76,7 @@ export const COMMERCIAL_TREE_SOURCE_REFERENCES = {
   PAVILIONS_1_14_GROVE: 'Anexos 3 e 7 — maciço da Árvore Lunar atrás dos Pavilhões 1 e 14',
   RUA_BRASIL_GROVE: 'Anexos 3 e 7 — árvores limítrofes da Rua Brasil',
   TERCEIRA_IDADE_EDGE: 'Anexos 3 e 7 — árvores próximas ao Pavilhão Terceira Idade',
+  NATIONS_DISTRICT: 'Anexos oficiais IMG_9670 (1).jpeg e IMG_9671.jpeg — massas periféricas da Praça das Nações',
 } as const satisfies Record<CommercialTreeArea, string>;
 
 export const COMMERCIAL_TREE_AREA_SCENE_ANCHORS: Readonly<Record<Exclude<CommercialTreeArea, CommercialTreeQuadra>, readonly string[]>> = {
@@ -82,6 +85,7 @@ export const COMMERCIAL_TREE_AREA_SCENE_ANCHORS: Readonly<Record<Exclude<Commerc
   PAVILIONS_1_14_GROVE: ['B1', 'B2', 'G'],
   RUA_BRASIL_GROVE: ['RUA-BRASIL', 'B1', 'B2', 'G'],
   TERCEIRA_IDADE_EDGE: ['B22'],
+  NATIONS_DISTRICT: ['B20', 'B29', 'C5', 'C6', 'C7', 'C8', 'PORTICO-NACOES'],
 };
 
 // The D annex shows the long projected mass toward Quadra E (-z), with a mild
@@ -134,6 +138,7 @@ const TREE_AREA_ID_PREFIX: Readonly<Record<CommercialTreeArea, string>> = {
   PAVILIONS_1_14_GROVE: 'pavilions-1-14',
   RUA_BRASIL_GROVE: 'rua-brasil',
   TERCEIRA_IDADE_EDGE: 'terceira-idade',
+  NATIONS_DISTRICT: 'nations',
 };
 
 function buildTrees(area: CommercialTreeArea, blueprints: readonly TreeBlueprint[]): CommercialMapTree[] {
@@ -360,6 +365,17 @@ const TERCEIRA_IDADE_EDGE_TREES = buildTrees('TERCEIRA_IDADE_EDGE', [
   }),
 ]);
 
+const NATIONS_DISTRICT_TREES = buildTrees('NATIONS_DISTRICT', recommendFieldReview(
+  NATIONS_DISTRICT_LAYOUT.trees.map((tree, index) => ({
+    sourcePosition: tree.sourcePosition,
+    placement: 'LANDSCAPE_MASS' as const,
+    speciesGroup: index % 5 === 2 ? 'OPEN_CANOPY' as const : 'MATURE_BROADLEAF' as const,
+    scale: tree.scale,
+    shadowRotation: -0.78 + Math.sin(tree.rotation) * 0.04,
+    notes: 'Copa interpretada na massa periférica real da Praça das Nações; eixo cívico, acessos e footprints construídos permanecem livres.',
+  })),
+));
+
 export const COMMERCIAL_MAP_TREES: readonly CommercialMapTree[] = [
   ...QUADRA_D_TREES,
   ...QUADRA_I_TREES,
@@ -370,6 +386,7 @@ export const COMMERCIAL_MAP_TREES: readonly CommercialMapTree[] = [
   ...PAVILIONS_1_14_GROVE_TREES,
   ...RUA_BRASIL_GROVE_TREES,
   ...TERCEIRA_IDADE_EDGE_TREES,
+  ...NATIONS_DISTRICT_TREES,
 ];
 
 export const COMMERCIAL_TREE_COUNTS_BY_QUADRA: Readonly<Record<CommercialTreeQuadra, number>> = {
@@ -386,4 +403,5 @@ export const COMMERCIAL_TREE_COUNTS_BY_AREA: Readonly<Record<CommercialTreeArea,
   PAVILIONS_1_14_GROVE: PAVILIONS_1_14_GROVE_TREES.length,
   RUA_BRASIL_GROVE: RUA_BRASIL_GROVE_TREES.length,
   TERCEIRA_IDADE_EDGE: TERCEIRA_IDADE_EDGE_TREES.length,
+  NATIONS_DISTRICT: NATIONS_DISTRICT_TREES.length,
 };

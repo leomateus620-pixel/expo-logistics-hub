@@ -33,6 +33,11 @@ import {
   shouldRenderArenaCourts,
   shouldRenderArenaStructures,
 } from '../../data/parkEnvironment';
+import {
+  NATIONS_DISTRICT_REQUIRED_IDENTIFIERS,
+  isNationsDistrictPresentationSurface,
+  shouldRenderNationsDistrict,
+} from '../../data/nationsDistrict';
 import { COMMERCIAL_MAP_ENVIRONMENT_CONFIG } from '../../data/commercialMapEnvironment';
 import {
   resolveStrategicLandmarkKind,
@@ -78,6 +83,7 @@ import { TechnicalValidationOverlay } from './TechnicalValidationOverlay';
 import { CommercialTreeLayer } from './CommercialTreeLayer';
 import { CommercialElectricalInfrastructureLayer } from './CommercialElectricalInfrastructureLayer';
 import { ArenaFrontInfrastructure } from './ArenaFrontInfrastructure';
+import { NationsDistrict } from './NationsDistrict';
 import { CommercialMapEnvironment } from './CommercialMapEnvironment';
 import {
   buildCommercialMapSegmentIndex,
@@ -319,6 +325,12 @@ function focusProfileForEntity(entity: MapEntity) {
   if (landmark === 'polish-pavilion' || landmark === 'italian-pavilion') {
     return { ...profile, contextRatio: 0.058, fitPadding: 1.18, minDistanceRatio: 0.05, maxDistanceRatio: 0.32, minimumDirectionY: 0.34 };
   }
+  if (landmark === 'african-pavilion' || landmark === 'rotary-house') {
+    return { ...profile, contextRatio: 0.06, fitPadding: 1.22, minDistanceRatio: 0.05, maxDistanceRatio: 0.34, minimumDirectionY: 0.34 };
+  }
+  if (landmark === 'nations-square') {
+    return { ...profile, contextRatio: 0.22, fitPadding: 1.4, minDistanceRatio: 0.16, maxDistanceRatio: 0.62, minimumDirectionY: 0.86 };
+  }
   if (landmark === 'nations-portico') {
     return { ...profile, contextRatio: 0.052, fitPadding: 1.12, minDistanceRatio: 0.045, maxDistanceRatio: 0.3, minimumDirectionY: 0.32 };
   }
@@ -503,6 +515,7 @@ interface EntityMeshProps {
   hovered: boolean;
   filtersActive: boolean;
   infrastructureMode: boolean;
+  nationsDistrictPresentationAvailable: boolean;
   isMatch: boolean;
   layerOpacity: number;
   sceneCenter: readonly [number, number];
@@ -522,6 +535,7 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
   hovered,
   filtersActive,
   infrastructureMode,
+  nationsDistrictPresentationAvailable,
   isMatch,
   layerOpacity,
   sceneCenter,
@@ -536,15 +550,26 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
   const isQuadra = classification === 'QUADRA' || entity.metadata.renderMode === 'outline';
   const isPavilion = classification === 'PAVILION';
   const isGate = classification === 'GATE';
+  const isNationsPresentationSurface = nationsDistrictPresentationAvailable
+    && isNationsDistrictPresentationSurface(entity);
   const isRestroom = classification === 'RESTROOM' || classification === 'CHEMICAL_RESTROOM';
-  const isFlat = entity.geometry.extrusionHeight < 0.3 || isRoad || isQuadra;
+  const isFlat = entity.geometry.extrusionHeight < 0.3 || isRoad || isQuadra || isNationsPresentationSurface;
   const isInteractive = isSelectableMapClassification(entity.classification);
   const solidRendering = requiresSolidRendering(entity.classification);
-  const geometry = useMemo(() => isQuadra || isGate ? null : createEntityGeometry(entity), [entity, isGate, isQuadra]);
-  const hitSurface = useMemo(() => isQuadra ? createHitSurfaceGeometry(entity) : null, [entity, isQuadra]);
+  const geometry = useMemo(
+    () => isQuadra || isGate || isNationsPresentationSurface ? null : createEntityGeometry(entity),
+    [entity, isGate, isNationsPresentationSurface, isQuadra],
+  );
+  const hitSurface = useMemo(
+    () => isQuadra || isNationsPresentationSurface ? createHitSurfaceGeometry(entity) : null,
+    [entity, isNationsPresentationSurface, isQuadra],
+  );
   const edges = useMemo(() => geometry && !isRoad && !isPavilion ? new THREE.EdgesGeometry(geometry, 28) : null, [geometry, isPavilion, isRoad]);
   const roofOutline = useMemo(() => isPavilion ? createRoofOutlineGeometry(entity) : null, [entity, isPavilion]);
-  const footprint = useMemo(() => isRoad || isQuadra ? createFootprintGeometry(entity) : null, [entity, isQuadra, isRoad]);
+  const footprint = useMemo(
+    () => isRoad || isQuadra || isNationsPresentationSurface ? createFootprintGeometry(entity) : null,
+    [entity, isNationsPresentationSurface, isQuadra, isRoad],
+  );
   const markerCenter = useMemo(() => geometryCentroid(entity.geometry), [entity.geometry]);
   const gateRotation = useMemo(() => Math.atan2(
     sceneCenter[0] - markerCenter[0],
@@ -580,7 +605,9 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
     : selected
       ? '#174c31'
       : '#e9c84b';
-  const outlineGeometry = isPavilion ? roofOutline : isRoad || isQuadra ? footprint : edges;
+  const outlineGeometry = isNationsPresentationSurface
+    ? selected || hovered ? footprint : null
+    : isPavilion ? roofOutline : isRoad || isQuadra ? footprint : edges;
   const outlineColor = selected
     ? '#fff1a8'
     : hovered && isInteractive
@@ -636,7 +663,7 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
       position={[0, entity.geometry.elevation + selectedLift + presentationLift, 0]}
       visible={!solidRendering || selected || layerOpacity > 0.015}
     >
-      {!isQuadra && !isGate && (
+      {!isQuadra && !isGate && !isNationsPresentationSurface && (
         <mesh
           geometry={geometry!}
           castShadow={!isFlat && (solidRendering || visualOpacity > 0.45)}
@@ -720,7 +747,7 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
         </group>
       )}
 
-      {isQuadra && hitSurface && (
+      {(isQuadra || isNationsPresentationSurface) && hitSurface && (
         <mesh geometry={hitSurface} position={[0, 0.003, 0]} {...interactionProps}>
           <meshBasicMaterial visible={false} />
         </mesh>
@@ -729,7 +756,7 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
       {outlineGeometry && (
         <lineSegments
           geometry={outlineGeometry}
-          position={[0, isRoad || isQuadra ? 0.004 : isPavilion ? 0 : 0.012, 0]}
+          position={[0, isRoad || isQuadra || isNationsPresentationSurface ? 0.004 : isPavilion ? 0 : 0.012, 0]}
           raycast={NO_RAYCAST}
           renderOrder={selected ? 4 : solidRendering ? 2 : 1}
         >
@@ -2062,6 +2089,37 @@ function Scene({
       ),
     };
   }, [entities, entityFiltersActive, layerOpacity, layerVisibility, presentedMatchingEntityIds]);
+  const nationsDistrictPresentationAvailable = useMemo(
+    () => shouldRenderNationsDistrict(entities),
+    [entities],
+  );
+  const nationsDistrictPresentation = useMemo(() => {
+    const entityByIdentifier = new Map(entities.map((entity) => [
+      entity.publicIdentifier.trim().toLocaleUpperCase('pt-BR'),
+      entity,
+    ]));
+    const owners = NATIONS_DISTRICT_REQUIRED_IDENTIFIERS
+      .map((identifier) => entityByIdentifier.get(identifier))
+      .filter((entity): entity is MapEntity => Boolean(entity));
+    if (
+      !nationsDistrictPresentationAvailable
+      || owners.length !== NATIONS_DISTRICT_REQUIRED_IDENTIFIERS.length
+      || owners.some((entity) => layerVisibility[entity.layerId] === false)
+    ) return { visible: false, opacity: 0 };
+    const filterStrength = entityFiltersActive
+      && !owners.some((entity) => presentedMatchingEntityIds.has(entity.id))
+      ? 0.28
+      : 1;
+    const opacity = Math.min(...owners.map((entity) => layerOpacity[entity.layerId] ?? 1)) * filterStrength;
+    return { visible: opacity > 0.015, opacity };
+  }, [
+    entities,
+    entityFiltersActive,
+    layerOpacity,
+    layerVisibility,
+    nationsDistrictPresentationAvailable,
+    presentedMatchingEntityIds,
+  ]);
   const activeSegmentEntities = useMemo(
     () => activeSegment
       ? exteriorRenderedEntities.filter((entity) => segmentByEntity.get(entity.id)?.id === activeSegment.id)
@@ -2164,6 +2222,7 @@ function Scene({
           hovered={hoveredEntityId === entity.id}
           filtersActive={entityFiltersActive}
           infrastructureMode={hydrologicalModeActive}
+          nationsDistrictPresentationAvailable={nationsDistrictPresentationAvailable}
           isMatch={presentedMatchingEntityIds.has(entity.id)}
           layerOpacity={layerOpacity[entity.layerId] ?? 1}
           sceneCenter={sceneCenter}
@@ -2176,6 +2235,11 @@ function Scene({
           moduleStateById={selectedEntityId === entity.id ? selectedPavilionModuleState : undefined}
         />
       ))}
+      <NationsDistrict
+        visible={nationsDistrictPresentation.visible}
+        opacity={nationsDistrictPresentation.opacity}
+        reducedGraphics={reducedGraphics}
+      />
       {(arenaFrontInfrastructurePresentation.arenaStructures.visible
         || arenaFrontInfrastructurePresentation.courts.visible) && (
         <ArenaFrontInfrastructure
