@@ -27,6 +27,7 @@ import {
 import { LivestockPavilion } from './LivestockPavilion';
 import { MirantePavilion } from './MirantePavilion';
 import { CommercialPavilion } from './CommercialPavilion';
+import { AfricanPavilion, RotaryHouse } from './NationsDistrict';
 import type { CommercialMapSegmentDefinition } from '../../data/commercialMapSegments';
 import type { CommercialPavilionModuleVisualState } from '../../utils/pavilionModuleCommercial';
 
@@ -211,6 +212,18 @@ const LANDMARK_PALETTES: Record<StrategicLandmarkKind, LandmarkPalette> = {
     platform: '#9c9282',
     metal: '#70736e',
   },
+  'nations-square': {
+    wall: '#d5d0c4',
+    accent: '#9d6c58',
+    roof: '#5d5249',
+    trim: '#e2ddd1',
+    dark: '#303532',
+    glass: '#50676a',
+    green: '#55794f',
+    white: '#f0ede5',
+    platform: '#8d8981',
+    metal: '#747b78',
+  },
   'nations-portico': {
     wall: '#d7c9ae',
     accent: '#a89572',
@@ -234,6 +247,30 @@ const LANDMARK_PALETTES: Record<StrategicLandmarkKind, LandmarkPalette> = {
     white: '#f5f1e6',
     platform: '#9b8b74',
     metal: '#424a47',
+  },
+  'african-pavilion': {
+    wall: '#d7c5a7',
+    accent: '#9e5d42',
+    roof: '#8b4f38',
+    trim: '#e7d5b4',
+    dark: '#352a25',
+    glass: '#47595a',
+    green: '#4a6e43',
+    white: '#e9e2d2',
+    platform: '#92877a',
+    metal: '#87827a',
+  },
+  'rotary-house': {
+    wall: '#d6d2c4',
+    accent: '#a17b45',
+    roof: '#767a78',
+    trim: '#ece8dc',
+    dark: '#343b3a',
+    glass: '#526a70',
+    green: '#506f4b',
+    white: '#f1eee5',
+    platform: '#97928a',
+    metal: '#8a908e',
   },
   'fenasoja-restaurant': {
     wall: '#ded2bc',
@@ -3204,6 +3241,8 @@ export function StrategicLandmarkMesh({
         {kind === 'mirante-pavilion' && <MirantePavilion {...modelProps} />}
         {kind === 'polish-pavilion' && <PolishPavilion {...modelProps} />}
         {kind === 'italian-pavilion' && <ItalianPavilion {...modelProps} />}
+        {kind === 'african-pavilion' && <AfricanPavilion {...modelProps} />}
+        {kind === 'rotary-house' && <RotaryHouse {...modelProps} />}
         {kind === 'nations-portico' && <NationsPortico {...modelProps} />}
         {kind === 'german-pavilion' && <GermanPavilion {...modelProps} />}
         {kind === 'fenasoja-restaurant' && <FenasojaRestaurant {...modelProps} />}

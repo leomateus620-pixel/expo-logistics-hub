@@ -16,8 +16,11 @@ export type StrategicLandmarkKind =
   | 'mirante-pavilion'
   | 'polish-pavilion'
   | 'italian-pavilion'
+  | 'nations-square'
   | 'nations-portico'
   | 'german-pavilion'
+  | 'african-pavilion'
+  | 'rotary-house'
   | 'fenasoja-restaurant'
   | 'sicredi-arena'
   | 'lunar-tree';
@@ -140,12 +143,28 @@ const STRATEGIC_LANDMARKS: Readonly<Record<string, StrategicLandmarkDefinition>>
     focusDirection: [-0.96, 0.42, 0.28],
     visualHeight: ({ width, depth }) => Math.min(2.3, Math.max(width, depth) * 0.84),
   },
+  B20: {
+    kind: 'nations-square',
+    aliases: [
+      'Praça das Nações',
+      'Praça das Etnias',
+      'Eixo cívico das Etnias',
+      'Nations Square',
+    ],
+    // O eixo cívico corre norte-sul entre o pórtico (norte) e o palco (sul).
+    // O renderer distrital assume a apresentação; B20 preserva seleção e busca.
+    facingRadians: 0,
+    focusDirection: [0.18, 1.4, 0.36],
+    // Mantém B20 como superfície cívica baixa também nos contratos de folga
+    // elétrica; o palco é uma apresentação separada, ao sul do footprint.
+    visualHeight: () => 0.18,
+  },
   'PORTICO-NACOES': {
     kind: 'nations-portico',
     aliases: ['Pórtico das Nações', 'Portal das Nações', 'Praça das Nações', 'Nations Gateway'],
-    // O portal marca a chegada pelo lado sul do conjunto das etnias.
+    // O portal ocupa a borda norte e abre o enquadramento para o eixo da praça.
     facingRadians: 0,
-    focusDirection: [0.48, 0.4, 0.94],
+    focusDirection: [0.48, 0.42, -0.94],
     visualHeight: ({ width }) => Math.min(2.75, width * 0.94),
   },
   C8: {
@@ -155,6 +174,34 @@ const STRATEGIC_LANDMARKS: Readonly<Record<string, StrategicLandmarkDefinition>>
     facingRadians: Math.PI / 2,
     focusDirection: [0.96, 0.36, 0.24],
     visualHeight: ({ width, depth }) => Math.min(2.15, Math.max(width, depth) * 0.78),
+  },
+  C7: {
+    kind: 'african-pavilion',
+    aliases: [
+      'Etnia Africana',
+      'Etnia Afro',
+      'Casa da Etnia Afro',
+      'Casa Africana',
+      'Pavilhão Africano',
+    ],
+    // A varanda se volta ao vazio central, a oeste do footprint C7.
+    facingRadians: -Math.PI / 2,
+    focusDirection: [-0.96, 0.42, 0.28],
+    visualHeight: ({ width, depth }) => Math.min(2.25, Math.max(width, depth) * 0.82),
+  },
+  B29: {
+    kind: 'rotary-house',
+    aliases: [
+      'Casa Rotária',
+      'Casa Rotaria',
+      'Casa Rotary',
+      'Rotary Club',
+      'Rotary House',
+    ],
+    // O conjunto baixo e composto apresenta sua fachada para a praça, a leste.
+    facingRadians: Math.PI / 2,
+    focusDirection: [0.96, 0.4, 0.25],
+    visualHeight: ({ width, depth }) => Math.min(2.1, Math.max(width, depth) * 0.68),
   },
   C2: {
     kind: 'fenasoja-restaurant',
