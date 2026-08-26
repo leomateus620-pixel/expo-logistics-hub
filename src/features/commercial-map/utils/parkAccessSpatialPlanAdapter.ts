@@ -2,10 +2,41 @@ import {
   PARK_ACCESS_SPATIAL_PLAN,
   type ParkAccessPoint,
 } from '../data/parkAccessSpatialPlan';
+import { OFFICIAL_REFERENCE_DATA } from '../data/officialReference2026';
 import type { ParkAccessGateKey } from './parkAccessArchitecture';
-import type { ParkAccessInfrastructureInput } from './parkAccessInfrastructure';
+import type {
+  ParkAccessFlatSupportSurface,
+  ParkAccessInfrastructureInput,
+  ParkAccessRoadMaterial,
+} from './parkAccessInfrastructure';
+import { roadSurfaceHeight } from './roadInfrastructure';
+import { entitySurfaceElevation } from './spatialSurface';
 
 type SpatialPlan = typeof PARK_ACCESS_SPATIAL_PLAN;
+
+const SUPPORTED_FLAT_CLASSIFICATIONS = new Set([
+  'ROAD',
+  'PARKING',
+  'PEDESTRIAN_PATH',
+]);
+
+export const PARK_ACCESS_OFFICIAL_FLAT_SUPPORT_SURFACES: readonly ParkAccessFlatSupportSurface[] = (
+  OFFICIAL_REFERENCE_DATA.entities
+    .filter((entity) => SUPPORTED_FLAT_CLASSIFICATIONS.has(entity.classification))
+    .map((entity) => ({
+      id: entity.publicIdentifier,
+      polygon: entity.geometry.coordinates[0],
+      topElevation: entity.classification === 'ROAD' || entity.classification === 'PEDESTRIAN_PATH'
+        ? entity.geometry.elevation + roadSurfaceHeight(entity)
+        : entitySurfaceElevation(entity),
+    }))
+);
+
+function roadMaterial(kind: string): ParkAccessRoadMaterial {
+  if (kind === 'COBBLESTONE_ACCESS_ROAD') return 'cobblestone';
+  if (kind === 'COMPACTED_SERVICE_ROAD') return 'gravel';
+  return 'asphalt';
+}
 
 function openPolygon(points: readonly ParkAccessPoint[]) {
   if (points.length < 2) return points;
@@ -50,9 +81,13 @@ export function adaptParkAccessSpatialPlan(
     roadSurfaces: plan.roadSurfaces.map((surface) => ({
       id: surface.id,
       polygon: surface.polygon,
+      centerline: surface.centerline,
+      width: surface.widthMeters * mapUnitsPerMeter,
       elevation: surface.elevation,
-      material: surface.kind === 'COMPACTED_SERVICE_ROAD' ? 'gravel' : 'asphalt',
+      material: roadMaterial(surface.kind),
+      supportAware: roadMaterial(surface.kind) === 'cobblestone',
     })),
+    supportSurfaces: PARK_ACCESS_OFFICIAL_FLAT_SUPPORT_SURFACES,
     sidewalkSurfaces: plan.sidewalkSurfaces.map((surface) => ({
       id: surface.id,
       polygon: surface.polygon,

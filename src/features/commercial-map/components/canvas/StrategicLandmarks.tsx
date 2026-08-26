@@ -7,6 +7,7 @@ import { withoutClosingPoint } from '../../utils/geometry';
 import { isMapSelectionClick } from '../../utils/interaction';
 import { LIVESTOCK_PAVILION_RENDER_BUDGET } from '../../utils/livestockPavilion';
 import { MIRANTE_RENDER_BUDGET } from '../../utils/mirante';
+import { THIRD_AGE_PAVILION_LAYOUT } from '../../utils/thirdAgePavilion';
 import { commercialPavilionModelBounds } from '../../utils/commercialPavilions';
 import { FENASOJA_HEADQUARTERS_LAYOUT } from '../../utils/headquarters';
 import {
@@ -33,6 +34,7 @@ import {
 import { LivestockPavilion } from './LivestockPavilion';
 import { MirantePavilion } from './MirantePavilion';
 import { CommercialPavilion } from './CommercialPavilion';
+import { ThirdAgePavilion } from './ThirdAgePavilion';
 import { AfricanPavilion, RotaryHouse } from './NationsDistrict';
 import type { CommercialMapSegmentDefinition } from '../../data/commercialMapSegments';
 import type { CommercialPavilionModuleVisualState } from '../../utils/pavilionModuleCommercial';
@@ -182,6 +184,7 @@ const LANDMARK_PALETTES: Record<StrategicLandmarkKind, LandmarkPalette> = {
     platform: '#898b86',
     metal: '#596568',
   },
+  'third-age-pavilion': THIRD_AGE_PAVILION_LAYOUT.palette,
   'livestock-pavilion': {
     wall: '#557d88',
     accent: '#c3925b',
@@ -361,7 +364,12 @@ function useLandmarkMaterials(
       metal: material(palette.metal, 0.62, 0.16),
     };
     result.white.side = THREE.DoubleSide;
-    if (kind === 'commercial-pavilion' || kind === 'livestock-pavilion' || kind === 'mirante-pavilion') {
+    if (
+      kind === 'commercial-pavilion'
+      || kind === 'third-age-pavilion'
+      || kind === 'livestock-pavilion'
+      || kind === 'mirante-pavilion'
+    ) {
       result.roof.roughness = 0.6;
       result.roof.metalness = 0.16;
       result.metal.roughness = 0.5;
@@ -1435,6 +1443,8 @@ function useArchitecturalDetail(
           MIRANTE_RENDER_BUDGET.detailDistanceMinimum,
           Math.max(bounds.width, bounds.depth) * MIRANTE_RENDER_BUDGET.detailDistanceMultiplier,
         )
+      : kind === 'third-age-pavilion'
+        ? Math.max(18, Math.max(bounds.width, bounds.depth) * 3.4)
       : kind === 'commercial-pavilion'
         ? Math.max(24, Math.max(bounds.width, bounds.depth) * 4.4)
       : kind === 'fenasoja-restaurant'
@@ -3674,6 +3684,7 @@ export function StrategicLandmarkMesh({
             {...modelProps}
           />
         )}
+        {kind === 'third-age-pavilion' && <ThirdAgePavilion {...modelProps} />}
         {kind === 'livestock-pavilion' && <LivestockPavilion {...modelProps} />}
         {kind === 'mirante-pavilion' && <MirantePavilion {...modelProps} />}
         {kind === 'polish-pavilion' && <PolishPavilion {...modelProps} />}

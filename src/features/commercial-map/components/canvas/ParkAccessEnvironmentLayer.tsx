@@ -138,9 +138,8 @@ function createGroundMaterial(texture: THREE.Texture) {
     vertexColors: true,
     roughness: 0.98,
     metalness: 0,
-    polygonOffset: true,
-    polygonOffsetFactor: -1,
-    polygonOffsetUnits: -1,
+    depthTest: true,
+    depthWrite: true,
   });
 }
 
@@ -297,21 +296,23 @@ export const ParkAccessEnvironmentLayer = memo(function ParkAccessEnvironmentLay
           name="solos-transicoes-acessos"
           geometry={geometries.environment}
           material={materials.environment}
-          renderOrder={2}
+          renderOrder={0}
           frustumCulled
           castShadow={false}
           receiveShadow={false}
           raycast={NO_RAYCAST}
+          dispose={null}
         />
         <mesh
           name="caminho-do-bosque"
           geometry={geometries.trail}
           material={materials.trail}
-          renderOrder={3}
+          renderOrder={0}
           frustumCulled
           castShadow={false}
           receiveShadow={false}
           raycast={NO_RAYCAST}
+          dispose={null}
         />
       </group>
       <group name="vegetacao-ambiental-acessos" visible={vegetationVisible} userData={VEGETATION_USER_DATA}>
@@ -325,6 +326,7 @@ export const ParkAccessEnvironmentLayer = memo(function ParkAccessEnvironmentLay
             castShadow={false}
             receiveShadow={false}
             raycast={NO_RAYCAST}
+            dispose={null}
           />
         )}
         {presentation.understory.length > 0 && (
@@ -337,6 +339,7 @@ export const ParkAccessEnvironmentLayer = memo(function ParkAccessEnvironmentLay
             castShadow={false}
             receiveShadow={false}
             raycast={NO_RAYCAST}
+            dispose={null}
           />
         )}
       </group>

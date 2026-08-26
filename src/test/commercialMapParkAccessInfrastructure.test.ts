@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { PARK_ACCESS_SPATIAL_PLAN } from '@/features/commercial-map/data/parkAccessSpatialPlan';
 import {
@@ -6,12 +8,16 @@ import {
   buildParkAccessArchitectureModel,
 } from '@/features/commercial-map/utils/parkAccessArchitecture';
 import {
+  PARK_ACCESS_INFRASTRUCTURE_PROFILE,
   PARK_ACCESS_RENDER_BUDGET,
   buildParkAccessRenderModel,
   disposeParkAccessRenderModel,
   type ParkAccessInfrastructureInput,
 } from '@/features/commercial-map/utils/parkAccessInfrastructure';
-import { adaptParkAccessSpatialPlan } from '@/features/commercial-map/utils/parkAccessSpatialPlanAdapter';
+import {
+  PARK_ACCESS_OFFICIAL_FLAT_SUPPORT_SURFACES,
+  adaptParkAccessSpatialPlan,
+} from '@/features/commercial-map/utils/parkAccessSpatialPlanAdapter';
 
 const fixtures: ParkAccessInfrastructureInput = {
   roadSurfaces: [
@@ -24,6 +30,22 @@ const fixtures: ParkAccessInfrastructureInput = {
       id: 'costeiros-service-road',
       polygon: [[-5, -4], [-1, -4], [-1, -3.35], [-5, -3.35]],
       material: 'gravel',
+    },
+    {
+      id: 'support-aware-cobblestone',
+      polygon: [[-5, 1.65], [5, 1.65], [5, 2.35], [-5, 2.35]],
+      centerline: [[-5, 2], [0, 2], [5, 2]],
+      width: 0.7,
+      elevation: 0.039,
+      material: 'cobblestone',
+      supportAware: true,
+    },
+  ],
+  supportSurfaces: [
+    {
+      id: 'test-drive-support',
+      polygon: [[-1.5, 1], [1.5, 1], [1.5, 3], [-1.5, 3]],
+      topElevation: 0.055,
     },
   ],
   sidewalkSurfaces: [
@@ -159,6 +181,7 @@ describe('infraestrutura externa parametrizada do mapa comercial', () => {
 
     try {
       expect(detailed.geometries.asphalt).not.toBeNull();
+      expect(detailed.geometries.cobblestone).not.toBeNull();
       expect(detailed.geometries.gravel).not.toBeNull();
       expect(detailed.geometries.sidewalks).not.toBeNull();
       expect(detailed.geometries.curbs).not.toBeNull();
@@ -167,7 +190,7 @@ describe('infraestrutura externa parametrizada do mapa comercial', () => {
       expect(detailed.geometries.landscape).not.toBeNull();
       expect(detailed.geometries.roundaboutCurb).not.toBeNull();
       expect(detailed.diagnostics).toMatchObject({
-        roadSurfaceCount: 2,
+        roadSurfaceCount: 3,
         sidewalkSurfaceCount: 1,
         parkingBayCount: 8,
         markingSegmentCount: 3,
@@ -189,6 +212,25 @@ describe('infraestrutura externa parametrizada do mapa comercial', () => {
     }
   });
 
+  it('eleva o ribbon cobblestone sobre suportes planos, com UV longitudinal e saia integrada', () => {
+    const detailed = buildParkAccessRenderModel(fixtures);
+    try {
+      const cobblestone = detailed.geometries.cobblestone!;
+      const positions = cobblestone.getAttribute('position');
+      const uvs = cobblestone.getAttribute('uv');
+      const elevations = Array.from({ length: positions.count }, (_, index) => positions.getY(index));
+      expect(Math.max(...elevations)).toBeGreaterThanOrEqual(
+        0.055 + PARK_ACCESS_INFRASTRUCTURE_PROFILE.supportClearance - 1e-6,
+      );
+      expect(Math.min(...elevations)).toBeLessThan(0.039);
+      expect(uvs.count).toBe(positions.count);
+      expect(Math.max(...Array.from({ length: uvs.count }, (_, index) => uvs.getX(index))))
+        .toBeGreaterThan(1);
+    } finally {
+      disposeParkAccessRenderModel(detailed);
+    }
+  });
+
   it('consome o contrato GIS por referência sem copiar ou mutar coordenadas', () => {
     const snapshot = JSON.stringify(PARK_ACCESS_SPATIAL_PLAN);
     const input = adaptParkAccessSpatialPlan(PARK_ACCESS_SPATIAL_PLAN);
@@ -203,7 +245,25 @@ describe('infraestrutura externa parametrizada do mapa comercial', () => {
     expect(input.gates[1].anchor).toBe(PARK_ACCESS_SPATIAL_PLAN.gates.gate2.anchor);
     expect(input.gates[2].anchor).toBe(PARK_ACCESS_SPATIAL_PLAN.gates.gate3.anchor);
     expect(input.roadSurfaces.filter((surface) => surface.material === 'gravel').map((surface) => surface.id))
-      .toEqual(['costeiros-service-road', 'costeiros-field-spur']);
+      .toEqual(['costeiros-service-road']);
+    expect(input.roadSurfaces.filter((surface) => surface.material === 'cobblestone').map((surface) => surface.id))
+      .toEqual([
+        'gate-1-gate-10-rua-brasil-cobblestone',
+        'third-age-pavilion-access',
+      ]);
+    input.roadSurfaces.filter((surface) => surface.material === 'cobblestone').forEach((surface) => {
+      const canonical = PARK_ACCESS_SPATIAL_PLAN.roadSurfaces.find((road) => road.id === surface.id)!;
+      expect(surface.centerline).toBe(canonical.centerline);
+      expect(surface.width).toBeCloseTo(
+        canonical.widthMeters * PARK_ACCESS_SPATIAL_PLAN.coordinateFrame.workingMapUnitsPerMeter,
+      );
+      expect(surface.supportAware).toBe(true);
+    });
+    expect(input.supportSurfaces).toBe(PARK_ACCESS_OFFICIAL_FLAT_SUPPORT_SURFACES);
+    expect(input.supportSurfaces.find((surface) => surface.id === 'TEST-DRIVE')?.topElevation)
+      .toBeCloseTo(0.055);
+    expect(input.supportSurfaces.some((surface) => surface.id === 'B22')).toBe(false);
+    expect(input.supportSurfaces.some((surface) => surface.id === 'A1')).toBe(false);
     expect(input.roundabout?.splitterIslands).toHaveLength(2);
     expect(input.costeiros).not.toBeNull();
     expect(JSON.stringify(PARK_ACCESS_SPATIAL_PLAN)).toBe(snapshot);
@@ -216,7 +276,7 @@ describe('infraestrutura externa parametrizada do mapa comercial', () => {
 
     try {
       expect(detailed.diagnostics).toMatchObject({
-        roadSurfaceCount: 7,
+        roadSurfaceCount: PARK_ACCESS_SPATIAL_PLAN.roadSurfaces.length,
         sidewalkSurfaceCount: 5,
         parkingBayCount: 43,
         markingSegmentCount: 5,
@@ -226,6 +286,16 @@ describe('infraestrutura externa parametrizada do mapa comercial', () => {
         .toBeLessThanOrEqual(PARK_ACCESS_RENDER_BUDGET.maximumPrimaryDrawCalls);
       expect(detailed.diagnostics.surfaceTriangleCount + detailed.diagnostics.instancedTriangleCount)
         .toBeLessThanOrEqual(PARK_ACCESS_RENDER_BUDGET.maximumRenderedTriangles);
+      const cobblestonePositions = detailed.geometries.cobblestone!.getAttribute('position');
+      const maximumCobblestoneElevation = Math.max(...Array.from(
+        { length: cobblestonePositions.count },
+        (_, index) => cobblestonePositions.getY(index),
+      ));
+      expect(input.roadSurfaces.filter((surface) => surface.material === 'cobblestone'))
+        .toHaveLength(2);
+      expect(maximumCobblestoneElevation).toBeGreaterThanOrEqual(
+        0.055 + PARK_ACCESS_INFRASTRUCTURE_PROFILE.supportClearance - 1e-6,
+      );
       expect(reduced.diagnostics.withinBudget).toBe(true);
       expect(reduced.diagnostics.surfaceTriangleCount).toBeLessThan(detailed.diagnostics.surfaceTriangleCount);
       expect(reduced.diagnostics.instancedTriangleCount).toBeLessThan(detailed.diagnostics.instancedTriangleCount);
@@ -233,5 +303,24 @@ describe('infraestrutura externa parametrizada do mapa comercial', () => {
       disposeParkAccessRenderModel(detailed);
       disposeParkAccessRenderModel(reduced);
     }
+  });
+
+  it('mantém material e hierarquia de profundidade sem custo por pedra', () => {
+    const renderer = readFileSync(resolve(
+      'src/features/commercial-map/components/canvas/ParkAccessInfrastructure.tsx',
+    ), 'utf8');
+
+    expect(renderer).toContain('function createCobblestoneTexture()');
+    expect(renderer).toContain('const size = 64;');
+    expect(renderer).toContain('horizontalJointJitter');
+    expect(renderer).toContain('verticalJointJitter');
+    expect(renderer).toContain('const COBBLESTONE_ROUGHNESS');
+    expect(renderer).toContain("if (kind === 'cobblestone')");
+    expect(renderer).toContain('map={reducedGraphics ? undefined : COBBLESTONE_TEXTURE}');
+    expect(renderer).toContain('depthTest');
+    expect(renderer).toContain('depthWrite');
+    expect(renderer).toContain("kind === 'whiteMarkings' || kind === 'yellowMarkings'");
+    expect(renderer).toContain("kind === 'curbs'");
+    expect(renderer).not.toContain('<instancedMesh name="cobblestone');
   });
 });
