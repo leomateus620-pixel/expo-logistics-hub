@@ -3,6 +3,10 @@ import { livestockPavilionVisualHeight } from './livestockPavilion';
 import { miranteVisualHeight } from './mirante';
 import { FENASOJA_HEADQUARTERS_LAYOUT } from './headquarters';
 import {
+  FENASOJA_EVENT_CENTER_LAYOUT,
+  eventCenterVisualHeight,
+} from './eventCenter';
+import {
   commercialPavilionVisualHeight,
   resolveCommercialPavilionDefinition,
   type CommercialPavilionPublicIdentifier,
@@ -11,6 +15,7 @@ import {
 export type StrategicLandmarkKind =
   | 'administrative-center'
   | 'fenasoja-headquarters'
+  | 'fenasoja-event-center'
   | 'commercial-pavilion'
   | 'livestock-pavilion'
   | 'mirante-pavilion'
@@ -126,6 +131,20 @@ const STRATEGIC_LANDMARKS: Readonly<Record<string, StrategicLandmarkDefinition>>
     facingRadians: FENASOJA_HEADQUARTERS_LAYOUT.facingRadians,
     focusDirection: [-0.42, 0.36, 0.94],
     visualHeight: ({ width, depth }) => Math.min(2.6, Math.max(width, depth) * 0.84),
+  },
+  C1: {
+    kind: 'fenasoja-event-center',
+    aliases: [
+      'Centro de Eventos Fenasoja',
+      'Centro de Eventos da Fenasoja',
+      'Pavilhão Centro de Eventos',
+      'Fenasoja Event Center',
+    ],
+    // O eixo longitudinal permanece no footprint oficial C1. A fachada
+    // fotografada abre para o sul (+Z), em direção à circulação interna.
+    facingRadians: FENASOJA_EVENT_CENTER_LAYOUT.facingRadians,
+    focusDirection: FENASOJA_EVENT_CENTER_LAYOUT.focusDirection,
+    visualHeight: eventCenterVisualHeight,
   },
   C5: {
     kind: 'polish-pavilion',

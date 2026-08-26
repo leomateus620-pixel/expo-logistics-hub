@@ -5,7 +5,8 @@
   "units": "meters",
   "origin": "grounded between the feet",
   "animation_fps": 30,
-  "post_export": "glTF-Transform 4.2.1 hierarchy flatten plus unused attribute pruning; no mesh join, simplification, texture recompression, or geometry compression",
+  "geometry_strategy": "Pre-export Blender consolidation joins the rigged body into one skinned mesh while keeping the curved reference face and semantic chimarrao prop nodes separate.",
+  "post_export": "glTF-Transform 4.2.1 hierarchy flatten plus unused attribute pruning; no post-export mesh join, simplification, texture recompression, or geometry compression",
   "clips": {
     "Idle": {
       "duration_seconds": 4.0,
@@ -27,11 +28,13 @@
   "characters": [
     {
       "file": "djeison-drey.glb",
-      "bytes": 1497872,
-      "sha256": "afbfed4bd3dc82d9458d53cafc2cbccf9cec054206a7584737385fb143567d25",
-      "nodes": 40,
-      "meshes": 22,
-      "materials": 16,
+      "bytes": 1040452,
+      "sha256": "6367adc180c7ddd0da55b617835cc0b6ff8b599d7634b7687d71a831442a2df8",
+      "nodes": 23,
+      "meshes": 5,
+      "primitives": 13,
+      "triangles": 20200,
+      "materials": 13,
       "skins": 1,
       "animations": [
         "Idle",
@@ -42,13 +45,13 @@
       "root_translation_range": 0.0,
       "accessor_bounds": {
         "min": [
-          -0.3724900186061859,
-          0.015333333052694798,
+          -0.23985080420970917,
+          0.014783806167542934,
           -0.13697195053100586
         ],
         "max": [
-          0.3724900186061859,
-          1.8398528099060059,
+          0.2796514332294464,
+          1.7972913980484009,
           0.39311113953590393
         ]
       },
@@ -58,8 +61,8 @@
         "face": "rosto quadrado-oval amplo, olhos azulados, nariz definido e assimetria cordial no sorriso",
         "hair": "cabelo ruivo-claro curto, texturizado e levemente despenteado",
         "accessories": "óculos grandes arredondados em metal dourado e chimarrão na mão esquerda",
-        "clothing": "terno cinza de alfaiataria, camisa branca, gravata verde e sapatos conhaque",
-        "animation": "postura sentada cordial, respiração fora de fase e braço esquerdo estável no chimarrão"
+        "clothing": "terno azul profundo de alfaiataria, camisa branca, gravata verde e sapatos conhaque",
+        "animation": "postura sentada cordial, respiração fora de fase, mão direita na coxa e chimarrão estabilizado à esquerda"
       },
       "seated_pose": {
         "frame": 30,
@@ -76,30 +79,32 @@
         "seat_height_m": 0.5135,
         "hip_back_offset_m": 0.4447,
         "shoe_vertical_bounds_m": [
-          0.0022,
-          0.1215
+          -0.0042,
+          0.1059
         ],
         "deformed_aabb_gltf_m": {
           "min": [
-            -0.3647,
-            0.0022,
+            -0.2358,
+            -0.0113,
             -0.5805
           ],
           "max": [
-            0.371,
-            1.3746,
-            0.2454
+            0.278,
+            1.3321,
+            0.2561
           ]
         }
       }
     },
     {
       "file": "fabiano-soltis.glb",
-      "bytes": 1316816,
-      "sha256": "48cd8072f32f808d2d94d40fa4fb7049a6996c24b3fb182170b84635ac326ab2",
-      "nodes": 37,
-      "meshes": 19,
-      "materials": 12,
+      "bytes": 959596,
+      "sha256": "f4d27f4354e7a9b35add09698eb457d4a48da38ed7644c96cd1d28d7ea3b710c",
+      "nodes": 20,
+      "meshes": 2,
+      "primitives": 9,
+      "triangles": 18440,
+      "materials": 9,
       "skins": 1,
       "animations": [
         "Idle",
@@ -110,14 +115,14 @@
       "root_translation_range": 0.0,
       "accessor_bounds": {
         "min": [
-          -0.3440883755683899,
-          0.014833332970738411,
+          -0.22588662803173065,
+          0.01430172473192215,
           -0.136954203248024
         ],
         "max": [
-          0.3440883755683899,
-          1.7797726392745972,
-          0.22002777457237244
+          0.22588662803173065,
+          1.7371511459350586,
+          0.3803155720233917
         ]
       },
       "height_m": 1.78,
@@ -126,8 +131,8 @@
         "face": "rosto oval anguloso, mandíbula limpa, olhos castanhos próximos, nariz reto e sorriso discreto",
         "hair": "cabelo castanho-escuro curto, volumoso no topo e penteado lateralmente",
         "accessories": "óculos executivos finos prateados",
-        "clothing": "terno azul-marinho ajustado, camisa branca, gravata verde e sapatos marrons",
-        "animation": "postura sentada madura, respiração discreta e mãos em repouso sem atravessar o sofá"
+        "clothing": "terno grafite de alfaiataria ajustada, camisa branca, gravata verde e sapatos marrons",
+        "animation": "postura sentada madura, respiração discreta, mãos apoiadas nas coxas e pés firmes no piso"
       },
       "seated_pose": {
         "frame": 30,
@@ -144,19 +149,19 @@
         "seat_height_m": 0.4969,
         "hip_back_offset_m": 0.4302,
         "shoe_vertical_bounds_m": [
-          0.0022,
-          0.1175
+          -0.0038,
+          0.1025
         ],
         "deformed_aabb_gltf_m": {
           "min": [
-            -0.3364,
-            0.0022,
+            -0.221,
+            -0.0104,
             -0.5659
           ],
           "max": [
-            0.3365,
-            1.3299,
-            0.2375
+            0.2183,
+            1.2873,
+            0.2479
           ]
         }
       }
@@ -164,6 +169,7 @@
   ],
   "limitations": [
     "Procedural likeness is identity-specific but is not a photogrammetry or FACS facial scan.",
+    "A single curved projection from each versioned official portrait carries the frontal facial identity; extreme profile and cinematic close-up fidelity remain outside this map asset contract.",
     "Garments are layered rigid-weight meshes with modeled thickness and tailoring; real-time cloth simulation is intentionally omitted.",
     "Hair and beard use lightweight geometric clumps rather than strand-hair simulation.",
     "Visual QA is calibrated for the Commercial Map camera; the assets are not scan-grade cinematic close-up humans."

@@ -1,6 +1,6 @@
-import { memo, useEffect, useMemo, useRef } from 'react';
+import { memo, useEffect, useMemo, useRef, useState } from 'react';
 import { useAnimations, useGLTF } from '@react-three/drei';
-import { useFrame, useThree } from '@react-three/fiber';
+import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { SkeletonUtils } from 'three-stdlib';
 import {
@@ -22,6 +22,27 @@ interface RiggedSeatedCharacterProps {
   clip: THREE.AnimationClip;
   reducedMotion: boolean;
   reducedGraphics: boolean;
+}
+
+function usePrefersReducedMotion() {
+  const [reducedMotion, setReducedMotion] = useState(() => (
+    typeof window !== 'undefined'
+    && typeof window.matchMedia === 'function'
+    && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  ));
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') {
+      return undefined;
+    }
+    const query = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const updatePreference = (event: MediaQueryListEvent) => setReducedMotion(event.matches);
+    setReducedMotion(query.matches);
+    query.addEventListener?.('change', updatePreference);
+    return () => query.removeEventListener?.('change', updatePreference);
+  }, []);
+
+  return reducedMotion;
 }
 
 function prepareModel(source: THREE.Object3D, targetHeight: number) {
@@ -66,19 +87,16 @@ const RiggedSeatedCharacter = memo(function RiggedSeatedCharacter({
     action.enabled = true;
     action.setLoop(THREE.LoopRepeat, Number.POSITIVE_INFINITY);
     action.time = clip.duration * profile.seated.idlePhase;
+    action.paused = reducedMotion;
+    mixer.timeScale = reducedMotion ? 0 : 1;
     action.play();
     if (reducedMotion) {
-      action.paused = true;
       mixer.update(0);
     }
     return () => {
       action.stop();
     };
   }, [actions, clip.duration, mixer, profile.seated.idlePhase, reducedMotion]);
-
-  useFrame(() => {
-    mixer.timeScale = reducedMotion ? 0 : 1;
-  });
 
   return (
     <group
@@ -146,7 +164,7 @@ export const SeatedExecutiveCharacters = memo(function SeatedExecutiveCharacters
   reducedGraphics,
 }: SeatedExecutiveCharactersProps) {
   const invalidate = useThree((state) => state.invalidate);
-  const reducedMotion = false;
+  const reducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
     invalidate();

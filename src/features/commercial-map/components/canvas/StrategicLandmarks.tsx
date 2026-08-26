@@ -10,6 +10,12 @@ import { MIRANTE_RENDER_BUDGET } from '../../utils/mirante';
 import { commercialPavilionModelBounds } from '../../utils/commercialPavilions';
 import { FENASOJA_HEADQUARTERS_LAYOUT } from '../../utils/headquarters';
 import {
+  FENASOJA_EVENT_CENTER_LAYOUT,
+  FENASOJA_EVENT_CENTER_RENDER_BUDGET,
+  FENASOJA_EVENT_CENTER_REVISION,
+  eventCenterEnvelope,
+} from '../../utils/eventCenter';
+import {
   APOLLO_XIV_FEATURE_METADATA,
   APOLLO_XIV_LAYOUT,
   APOLLO_XIV_RENDER_BUDGET,
@@ -151,6 +157,18 @@ const LANDMARK_PALETTES: Record<StrategicLandmarkKind, LandmarkPalette> = {
     white: FENASOJA_HEADQUARTERS_LAYOUT.palette.roof,
     platform: '#85817a',
     metal: '#69757b',
+  },
+  'fenasoja-event-center': {
+    wall: FENASOJA_EVENT_CENTER_LAYOUT.palette.wall,
+    accent: FENASOJA_EVENT_CENTER_LAYOUT.palette.wallLight,
+    roof: FENASOJA_EVENT_CENTER_LAYOUT.palette.roof,
+    trim: FENASOJA_EVENT_CENTER_LAYOUT.palette.roofEdge,
+    dark: FENASOJA_EVENT_CENTER_LAYOUT.palette.fronton,
+    glass: FENASOJA_EVENT_CENTER_LAYOUT.palette.glass,
+    green: FENASOJA_EVENT_CENTER_LAYOUT.palette.landscape,
+    white: '#f1f1eb',
+    platform: FENASOJA_EVENT_CENTER_LAYOUT.palette.concrete,
+    metal: FENASOJA_EVENT_CENTER_LAYOUT.palette.metal,
   },
   'commercial-pavilion': {
     wall: '#bbb9b1',
@@ -359,6 +377,19 @@ function useLandmarkMaterials(
       result.wall.roughness = 0.94;
       result.accent.roughness = 0.8;
       result.accent.metalness = 0.02;
+    }
+    if (kind === 'fenasoja-event-center') {
+      result.wall.roughness = 0.9;
+      result.roof.roughness = 0.64;
+      result.roof.metalness = 0.2;
+      result.trim.roughness = 0.68;
+      result.trim.metalness = 0.12;
+      result.dark.roughness = 0.72;
+      result.dark.metalness = 0.08;
+      result.glass.roughness = 0.24;
+      result.glass.metalness = 0.06;
+      result.metal.roughness = 0.48;
+      result.metal.metalness = 0.28;
     }
     return result;
   }, [kind]);
@@ -678,6 +709,35 @@ function createHipRoofGeometry(width: number, depth: number, rise: number) {
   ].flat();
   const geometry = new THREE.BufferGeometry();
   geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+  geometry.computeVertexNormals();
+  geometry.computeBoundingBox();
+  geometry.computeBoundingSphere();
+  return geometry;
+}
+
+function createGableRoofGeometry(
+  width: number,
+  depth: number,
+  rise: number,
+  ridgeAxis: 'x' | 'z' = 'x',
+) {
+  const vertices = [
+    -width / 2, 0, depth / 2,
+    width / 2, 0, depth / 2,
+    width / 2, rise, 0,
+    -width / 2, 0, depth / 2,
+    width / 2, rise, 0,
+    -width / 2, rise, 0,
+    -width / 2, rise, 0,
+    width / 2, rise, 0,
+    width / 2, 0, -depth / 2,
+    -width / 2, rise, 0,
+    width / 2, 0, -depth / 2,
+    -width / 2, 0, -depth / 2,
+  ];
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+  if (ridgeAxis === 'z') geometry.rotateY(Math.PI / 2);
   geometry.computeVertexNormals();
   geometry.computeBoundingBox();
   geometry.computeBoundingSphere();
@@ -1237,6 +1297,112 @@ function HeadquartersIdentityPanel({
   );
 }
 
+function paintEventCenterIdentity(
+  context: CanvasRenderingContext2D,
+  canvas: HTMLCanvasElement,
+  symbol?: CanvasImageSource,
+) {
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  context.textAlign = 'center';
+  context.textBaseline = 'middle';
+  context.shadowColor = 'rgba(0, 0, 0, .52)';
+  context.shadowBlur = 10;
+  context.shadowOffsetY = 4;
+
+  if (symbol) {
+    const symbolSize = 238;
+    context.drawImage(symbol, (canvas.width - symbolSize) / 2, 8, symbolSize, symbolSize);
+  } else {
+    context.fillStyle = '#f0b227';
+    context.beginPath();
+    context.arc(canvas.width / 2, 126, 82, 0, Math.PI * 2);
+    context.fill();
+  }
+
+  context.fillStyle = '#f8f8f3';
+  context.font = '900 132px Arial, sans-serif';
+  context.fillText(FENASOJA_EVENT_CENTER_LAYOUT.identity.wordmark, canvas.width / 2, 382);
+  context.shadowBlur = 0;
+  context.shadowOffsetY = 0;
+}
+
+function EventCenterIdentityPanel({
+  position,
+  size,
+}: {
+  position: Vector3Tuple;
+  size: readonly [number, number];
+}) {
+  const invalidate = useThree((state) => state.invalidate);
+  const { canvas, texture, signMaterial } = useMemo(() => {
+    let identityCanvas: HTMLCanvasElement | null = null;
+    let canvasTexture: THREE.CanvasTexture | null = null;
+    if (typeof document !== 'undefined') {
+      identityCanvas = document.createElement('canvas');
+      identityCanvas.width = 1024;
+      identityCanvas.height = 512;
+      const context = identityCanvas.getContext('2d');
+      if (context) {
+        paintEventCenterIdentity(context, identityCanvas);
+        canvasTexture = new THREE.CanvasTexture(identityCanvas);
+        canvasTexture.colorSpace = THREE.SRGBColorSpace;
+        canvasTexture.anisotropy = 4;
+        canvasTexture.minFilter = THREE.LinearMipmapLinearFilter;
+        canvasTexture.magFilter = THREE.LinearFilter;
+      }
+    }
+    return {
+      canvas: identityCanvas,
+      texture: canvasTexture,
+      signMaterial: new THREE.MeshBasicMaterial({
+        color: canvasTexture ? '#ffffff' : '#f8f8f3',
+        map: canvasTexture,
+        transparent: true,
+        alphaTest: 0.06,
+        depthWrite: false,
+        toneMapped: false,
+        polygonOffset: true,
+        polygonOffsetFactor: -2,
+        polygonOffsetUnits: -2,
+      }),
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!canvas || !texture || typeof Image === 'undefined') return undefined;
+    const context = canvas.getContext('2d');
+    if (!context) return undefined;
+    const symbol = new Image();
+    symbol.decoding = 'async';
+    symbol.onload = () => {
+      paintEventCenterIdentity(context, canvas, symbol);
+      texture.needsUpdate = true;
+      invalidate();
+    };
+    symbol.src = FENASOJA_EVENT_CENTER_LAYOUT.identity.symbolAsset;
+    return () => {
+      symbol.onload = null;
+    };
+  }, [canvas, invalidate, texture]);
+
+  useEffect(() => () => {
+    texture?.dispose();
+    signMaterial.dispose();
+  }, [signMaterial, texture]);
+
+  return (
+    <mesh
+      name="marca-oficial-centro-eventos-fenasoja"
+      geometry={UNIT_PLANE}
+      material={signMaterial}
+      position={position}
+      scale={[size[0], size[1], 1]}
+      raycast={NO_RAYCAST}
+      dispose={null}
+    />
+  );
+}
+
 function useArchitecturalDetail(
   kind: StrategicLandmarkKind,
   bounds: StrategicLandmarkBounds,
@@ -1273,7 +1439,9 @@ function useArchitecturalDetail(
         ? Math.max(24, Math.max(bounds.width, bounds.depth) * 4.4)
       : kind === 'fenasoja-restaurant'
         ? Math.max(20, bounds.width * 5)
-        : kind === 'administrative-center'
+      : kind === 'fenasoja-event-center'
+        ? Math.max(28, Math.max(bounds.width, bounds.depth) * 3.8)
+      : kind === 'administrative-center'
           ? Math.max(24, Math.max(bounds.width, bounds.depth) * 4)
         : kind === 'fenasoja-headquarters'
           ? Math.max(19, bounds.width * 6.4)
@@ -2466,6 +2634,275 @@ function NationsPortico({
   );
 }
 
+function FenasojaEventCenter({
+  bounds,
+  height,
+  materials,
+  showDetail,
+  showFocusDetail,
+}: LandmarkModelProps) {
+  const envelope = eventCenterEnvelope(bounds);
+  const width = envelope.width;
+  const depth = envelope.depth;
+  const hallWidth = width * 0.94;
+  const hallDepth = envelope.hallDepth;
+  const hallZ = envelope.hallRearOffset;
+  const baseY = 0.085;
+  const wallHeight = height * 0.48;
+  const roofRise = height * 0.2;
+  const roofDepth = hallDepth * 1.08;
+  const hallFrontZ = hallZ + hallDepth / 2;
+  const entranceWidth = envelope.entranceWidth;
+  const entranceDepth = hallDepth * 0.7;
+  const entranceFrontZ = Math.min(depth * 0.44, hallFrontZ + depth * 0.105);
+  const entranceZ = entranceFrontZ - entranceDepth / 2;
+  const entranceWallHeight = wallHeight * 0.95;
+  const entranceRise = height * 0.43;
+  const canopyY = baseY + wallHeight * 0.82;
+
+  const mainRoofGeometry = useMemo(
+    () => createGableRoofGeometry(width * 0.99, roofDepth, roofRise),
+    [roofDepth, roofRise, width],
+  );
+  const crossGableRoofGeometry = useMemo(
+    () => createGableRoofGeometry(
+      entranceDepth * 1.1,
+      entranceWidth * 1.1,
+      entranceRise * 1.02,
+      'z',
+    ),
+    [entranceDepth, entranceRise, entranceWidth],
+  );
+  const entranceGableGeometry = useMemo(
+    () => createGableBodyGeometry(
+      entranceWidth,
+      entranceDepth,
+      entranceWallHeight,
+      entranceRise,
+    ),
+    [entranceDepth, entranceRise, entranceWallHeight, entranceWidth],
+  );
+  const endGableGeometry = useMemo(
+    () => createGableFacadeGeometry(roofDepth * 0.92, roofRise),
+    [roofDepth, roofRise],
+  );
+
+  useEffect(() => () => {
+    mainRoofGeometry.dispose();
+    crossGableRoofGeometry.dispose();
+    entranceGableGeometry.dispose();
+    endGableGeometry.dispose();
+  }, [crossGableRoofGeometry, endGableGeometry, entranceGableGeometry, mainRoofGeometry]);
+
+  const platformBatch = useMemo<BatchedTransform[]>(() => [
+    {
+      position: [0, 0.045, 0],
+      scale: [width, 0.09, depth],
+    },
+    {
+      position: [0, 0.1, depth * 0.35],
+      scale: [width * 0.88, 0.035, depth * 0.2],
+    },
+    {
+      position: [0, 0.135, depth * 0.445],
+      scale: [entranceWidth * 0.72, 0.07, depth * 0.08],
+    },
+  ], [depth, entranceWidth, width]);
+  const wallBatch = useMemo<BatchedTransform[]>(() => [
+    {
+      position: [0, baseY + wallHeight / 2, hallZ],
+      scale: [hallWidth, wallHeight, hallDepth],
+    },
+    {
+      position: [-hallWidth * 0.42, baseY + wallHeight * 0.41, hallFrontZ + depth * 0.018],
+      scale: [hallWidth * 0.13, wallHeight * 0.82, depth * 0.045],
+    },
+    {
+      position: [hallWidth * 0.42, baseY + wallHeight * 0.41, hallFrontZ + depth * 0.018],
+      scale: [hallWidth * 0.13, wallHeight * 0.82, depth * 0.045],
+    },
+  ], [baseY, depth, hallDepth, hallFrontZ, hallWidth, hallZ, wallHeight]);
+  const darkBatch = useMemo<BatchedTransform[]>(() => [
+    {
+      geometry: entranceGableGeometry,
+      position: [0, baseY, entranceZ],
+      scale: [1, 1, 1],
+    },
+    {
+      geometry: endGableGeometry,
+      position: [-hallWidth / 2, baseY + wallHeight, hallZ],
+      rotation: [0, -Math.PI / 2, 0],
+      scale: [1, 1, 1],
+    },
+    {
+      geometry: endGableGeometry,
+      position: [hallWidth / 2, baseY + wallHeight, hallZ],
+      rotation: [0, Math.PI / 2, 0],
+      scale: [1, 1, 1],
+    },
+    {
+      position: [0, baseY + wallHeight * 0.08, hallFrontZ + depth * 0.027],
+      scale: [hallWidth * 0.94, wallHeight * 0.16, depth * 0.04],
+    },
+  ], [baseY, depth, endGableGeometry, entranceGableGeometry, entranceZ, hallFrontZ, hallWidth, hallZ, wallHeight]);
+  const roofBatch = useMemo<BatchedTransform[]>(() => [
+    {
+      geometry: mainRoofGeometry,
+      position: [0, baseY + wallHeight, hallZ],
+      scale: [1, 1, 1],
+    },
+    {
+      geometry: crossGableRoofGeometry,
+      position: [0, baseY + entranceWallHeight, entranceZ],
+      scale: [1, 1, 1],
+    },
+    {
+      position: [0, canopyY, hallFrontZ + depth * 0.105],
+      rotation: [0.035, 0, 0],
+      scale: [width * 0.88, 0.06, depth * 0.17],
+    },
+  ], [baseY, canopyY, crossGableRoofGeometry, depth, entranceWallHeight, entranceZ, hallFrontZ, hallZ, mainRoofGeometry, width, wallHeight]);
+
+  const windowCenters = useMemo(
+    () => [-0.41, -0.32, -0.23, -0.14, 0.14, 0.23, 0.32, 0.41],
+    [],
+  );
+  const glazingItems = useMemo<InstanceTransform[]>(() => [
+    ...windowCenters.map((ratio) => ({
+      position: [ratio * hallWidth, baseY + wallHeight * 0.49, hallFrontZ + depth * 0.04] as Vector3Tuple,
+      scale: [hallWidth * 0.072, wallHeight * 0.54, depth * 0.025] as Vector3Tuple,
+    })),
+    {
+      position: [-entranceWidth * 0.105, baseY + entranceWallHeight * 0.39, entranceFrontZ + 0.022],
+      scale: [entranceWidth * 0.19, entranceWallHeight * 0.65, depth * 0.025],
+    },
+    {
+      position: [entranceWidth * 0.105, baseY + entranceWallHeight * 0.39, entranceFrontZ + 0.022],
+      scale: [entranceWidth * 0.19, entranceWallHeight * 0.65, depth * 0.025],
+    },
+  ], [baseY, depth, entranceFrontZ, entranceWallHeight, entranceWidth, hallFrontZ, hallWidth, wallHeight, windowCenters]);
+  const trimItems = useMemo<InstanceTransform[]>(() => {
+    const facadePosts = [-0.46, -0.365, -0.275, -0.185, 0.185, 0.275, 0.365, 0.46].map((ratio) => ({
+      position: [ratio * hallWidth, baseY + wallHeight * 0.5, hallFrontZ + depth * 0.048] as Vector3Tuple,
+      scale: [0.026, wallHeight * 0.72, 0.026] as Vector3Tuple,
+    }));
+    const canopyPosts = [-0.44, -0.29, -0.14, 0.14, 0.29, 0.44].map((ratio) => ({
+      position: [ratio * width, baseY + canopyY * 0.45, hallFrontZ + depth * 0.18] as Vector3Tuple,
+      scale: [0.03, canopyY * 0.9, 0.03] as Vector3Tuple,
+    }));
+    return [
+      ...facadePosts,
+      ...canopyPosts,
+      { position: [-hallWidth * 0.275, baseY + wallHeight * 0.24, hallFrontZ + depth * 0.052], scale: [hallWidth * 0.29, 0.026, 0.03] },
+      { position: [hallWidth * 0.275, baseY + wallHeight * 0.24, hallFrontZ + depth * 0.052], scale: [hallWidth * 0.29, 0.026, 0.03] },
+      { position: [0, canopyY + 0.035, hallFrontZ + depth * 0.195], scale: [width * 0.9, 0.035, 0.035] },
+      { position: [0, baseY + entranceWallHeight * 0.39, entranceFrontZ + 0.046], scale: [0.028, entranceWallHeight * 0.67, 0.028] },
+    ];
+  }, [baseY, canopyY, depth, entranceFrontZ, entranceWallHeight, hallFrontZ, hallWidth, wallHeight, width]);
+
+  const detailDarkItems = useMemo<InstanceTransform[]>(() => {
+    const ribs = Array.from({ length: 9 }, (_, index) => {
+      const ratio = index / 8 * 2 - 1;
+      const ribHeight = entranceWallHeight + entranceRise * (1 - Math.abs(ratio));
+      const startsAboveEntrance = Math.abs(ratio) < 0.48;
+      const ribStartY = startsAboveEntrance
+        ? baseY + entranceWallHeight * 0.74
+        : baseY;
+      const ribEndY = baseY + ribHeight;
+      const visibleRibHeight = ribEndY - ribStartY;
+      return {
+        position: [ratio * entranceWidth * 0.47, (ribStartY + ribEndY) / 2, entranceFrontZ + 0.036] as Vector3Tuple,
+        scale: [0.018, visibleRibHeight * 0.96, 0.022] as Vector3Tuple,
+      };
+    });
+    const benches = [-0.34, -0.22, 0.22, 0.34].flatMap((ratio) => {
+      const x = ratio * hallWidth;
+      return [
+        { position: [x, 0.22, hallFrontZ + depth * 0.205] as Vector3Tuple, scale: [hallWidth * 0.09, 0.055, depth * 0.055] as Vector3Tuple },
+        { position: [x, 0.39, hallFrontZ + depth * 0.235] as Vector3Tuple, scale: [hallWidth * 0.09, 0.24, 0.035] as Vector3Tuple },
+        { position: [x - hallWidth * 0.035, 0.12, hallFrontZ + depth * 0.205] as Vector3Tuple, scale: [0.035, 0.2, 0.035] as Vector3Tuple },
+      ];
+    });
+    return [...ribs, ...benches];
+  }, [baseY, depth, entranceFrontZ, entranceRise, entranceWallHeight, entranceWidth, hallFrontZ, hallWidth]);
+  const planterItems = useMemo<InstanceTransform[]>(() => (
+    [-0.39, -0.29, 0.29, 0.39].map((ratio) => ({
+      position: [ratio * hallWidth, 0.17, hallFrontZ + depth * 0.16] as Vector3Tuple,
+      scale: [hallWidth * 0.13, 0.24, depth * 0.075] as Vector3Tuple,
+    }))
+  ), [depth, hallFrontZ, hallWidth]);
+  const shrubItems = useMemo<InstanceTransform[]>(() => (
+    [-0.43, -0.37, -0.31, -0.25, 0.25, 0.31, 0.37, 0.43].map((ratio, index) => ({
+      position: [ratio * hallWidth, 0.39 + (index % 2) * 0.025, hallFrontZ + depth * 0.16] as Vector3Tuple,
+      scale: [hallWidth * 0.055, 0.34 + (index % 3) * 0.025, depth * 0.06] as Vector3Tuple,
+      rotation: [0, index * 0.71, 0] as Vector3Tuple,
+    }))
+  ), [depth, hallFrontZ, hallWidth]);
+  const roofSeams = useMemo<InstanceTransform[]>(() => {
+    const halfDepth = roofDepth / 2;
+    const angle = Math.atan2(roofRise, halfDepth);
+    const slopeLength = Math.hypot(halfDepth, roofRise) * 0.97;
+    return Array.from({ length: 8 }, (_, index) => {
+      const x = THREE.MathUtils.lerp(-width * 0.43, width * 0.43, index / 7);
+      return [
+        {
+          position: [x, baseY + wallHeight + roofRise * 0.5 + 0.012, hallZ + halfDepth * 0.5] as Vector3Tuple,
+          rotation: [angle, 0, 0] as Vector3Tuple,
+          scale: [0.016, 0.018, slopeLength] as Vector3Tuple,
+        },
+        {
+          position: [x, baseY + wallHeight + roofRise * 0.5 + 0.012, hallZ - halfDepth * 0.5] as Vector3Tuple,
+          rotation: [-angle, 0, 0] as Vector3Tuple,
+          scale: [0.016, 0.018, slopeLength] as Vector3Tuple,
+        },
+      ];
+    }).flat();
+  }, [baseY, hallZ, roofDepth, roofRise, wallHeight, width]);
+
+  return (
+    <group
+      name="centro-eventos-fenasoja-c1"
+      userData={{
+        classification: 'EVENT_VENUE',
+        featureType: 'FENASOJA_EVENT_CENTER',
+        referenceRevision: FENASOJA_EVENT_CENTER_REVISION,
+        primaryDrawCalls: showFocusDetail
+          ? FENASOJA_EVENT_CENTER_RENDER_BUDGET.measuredModelFocusPrimaryDrawCalls
+          : showDetail
+            ? FENASOJA_EVENT_CENTER_RENDER_BUDGET.measuredModelDetailPrimaryDrawCalls
+            : FENASOJA_EVENT_CENTER_RENDER_BUDGET.measuredModelBasePrimaryDrawCalls,
+      }}
+      dispose={null}
+    >
+      <BatchedTransforms items={platformBatch} material={materials.platform} receiveShadow />
+      <BatchedTransforms items={wallBatch} material={materials.wall} castShadow receiveShadow />
+      <BatchedTransforms items={darkBatch} material={materials.dark} castShadow receiveShadow />
+      <BatchedTransforms items={roofBatch} material={materials.roof} castShadow receiveShadow />
+      <ScaledInstances material={materials.glass} items={glazingItems} />
+      <ScaledInstances material={materials.trim} items={trimItems} castShadow />
+      <EventCenterIdentityPanel
+        position={[
+          0,
+          baseY + entranceWallHeight + entranceRise * 0.43,
+          entranceFrontZ + 0.052,
+        ]}
+        size={[entranceWidth * 0.72, entranceWidth * 0.36]}
+      />
+
+      {showDetail && (
+        <>
+          <ScaledInstances material={materials.dark} items={detailDarkItems} castShadow />
+          <ScaledInstances material={materials.platform} items={planterItems} receiveShadow />
+          <ScaledInstances geometry={UNIT_SHRUB} material={materials.green} items={shrubItems} castShadow />
+        </>
+      )}
+      {showFocusDetail && (
+        <ScaledInstances material={materials.metal} items={roofSeams} />
+      )}
+    </group>
+  );
+}
+
 function FenasojaRestaurant({
   bounds,
   height,
@@ -3245,6 +3682,7 @@ export function StrategicLandmarkMesh({
         {kind === 'rotary-house' && <RotaryHouse {...modelProps} />}
         {kind === 'nations-portico' && <NationsPortico {...modelProps} />}
         {kind === 'german-pavilion' && <GermanPavilion {...modelProps} />}
+        {kind === 'fenasoja-event-center' && <FenasojaEventCenter {...modelProps} />}
         {kind === 'fenasoja-restaurant' && <FenasojaRestaurant {...modelProps} />}
         {kind === 'sicredi-arena' && <SicrediArena {...modelProps} />}
         {kind === 'lunar-tree' && <LunarTree {...modelProps} />}
