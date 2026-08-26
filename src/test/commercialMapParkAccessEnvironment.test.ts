@@ -12,6 +12,7 @@ import {
 } from '@/features/commercial-map/data/parkAccessEnvironment';
 import {
   PARK_ACCESS_SPATIAL_PLAN,
+  parkAccessMetersToLocal,
   type ParkAccessPolygon,
 } from '@/features/commercial-map/data/parkAccessSpatialPlan';
 import { COMMERCIAL_MAP_TREES } from '@/features/commercial-map/data/commercialTrees';
@@ -137,23 +138,91 @@ describe('ambientação dos acessos, Caminho do Bosque e Sede Costeiros', () => 
     const presentedTreeIds = new Set(presentedTrees.map((tree) => tree.id));
     const excludedTrees = COMMERCIAL_MAP_TREES.filter((tree) => !presentedTreeIds.has(tree.id));
 
-    expect(excludedTrees.map((tree) => tree.id)).toEqual([
+    expect(excludedTrees.map((tree) => tree.id)).toEqual(expect.arrayContaining([
       'tree-pavilions-1-14-50',
       'tree-pavilions-1-14-52',
-    ]);
+    ]));
     excludedTrees.forEach((tree) => {
-      expect(pointInPolygon(
-        tree.position,
-        PARK_ACCESS_SPATIAL_PLAN.woodlandPath.clearancePolygon,
-      )).toBe(true);
+      expect(
+        pointInPolygon(tree.position, PARK_ACCESS_SPATIAL_PLAN.woodlandPath.clearancePolygon)
+        || pointInPolygon(
+          tree.position,
+          PARK_ACCESS_SPATIAL_PLAN.thirdAgePavilionSetting.accessClearancePolygon,
+        ),
+      ).toBe(true);
     });
     presentedTrees.forEach((tree) => {
       expect(pointInPolygon(
         tree.position,
         PARK_ACCESS_SPATIAL_PLAN.woodlandPath.clearancePolygon,
       )).toBe(false);
+      expect(pointInPolygon(
+        tree.position,
+        PARK_ACCESS_SPATIAL_PLAN.thirdAgePavilionSetting.accessClearancePolygon,
+      )).toBe(false);
+      PARK_ACCESS_SPATIAL_PLAN.roadSurfaces
+        .filter((surface) => surface.kind === 'COBBLESTONE_ACCESS_ROAD')
+        .forEach((surface) => {
+          const clearanceMeters = surface.id === PARK_ACCESS_SPATIAL_PLAN.thirdAgePavilionSetting.accessRoadId
+            ? PARK_ACCESS_SPATIAL_PLAN.thirdAgePavilionSetting.clearances.pavilionAccessTreeTrunkMeters
+            : PARK_ACCESS_SPATIAL_PLAN.thirdAgePavilionSetting.clearances.roadTreeTrunkMeters;
+          expect(pointInPolygon(tree.position, surface.polygon)).toBe(false);
+          expect(distanceToPolygon(tree.position, surface.polygon)).toBeGreaterThanOrEqual(
+            parkAccessMetersToLocal(clearanceMeters) - 1e-6,
+          );
+        });
     });
     expect(JSON.stringify(COMMERCIAL_MAP_TREES)).toBe(inventorySnapshot);
+  });
+
+  it('enquadra o acesso de B22 com vegetação assimétrica e clearances sem mutar árvores oficiais', () => {
+    const full = resolveParkAccessEnvironmentPresentation(false);
+    const reduced = resolveParkAccessEnvironmentPresentation(true);
+    const setting = PARK_ACCESS_SPATIAL_PLAN.thirdAgePavilionSetting;
+    const protectedFootprints = protectedCommercialFootprints();
+    const canopyClearance = parkAccessMetersToLocal(setting.clearances.canopyMeters);
+    const denseTrees = full.ambientTrees.filter(
+      (placement) => placement.sourceZoneId === 'third-age-access-dense-tree-band',
+    );
+    const sparseTrees = full.ambientTrees.filter(
+      (placement) => placement.sourceZoneId === 'third-age-access-sparse-tree-band',
+    );
+    const denseUnderstory = full.understory.filter(
+      (placement) => placement.sourceZoneId === 'third-age-access-dense-understory',
+    );
+    const sparseUnderstory = full.understory.filter(
+      (placement) => placement.sourceZoneId === 'third-age-access-sparse-understory',
+    );
+
+    expect(denseTrees.length).toBeGreaterThan(sparseTrees.length);
+    expect(sparseTrees.length).toBeGreaterThan(0);
+    expect(denseUnderstory.length).toBeGreaterThan(sparseUnderstory.length);
+    expect(sparseUnderstory.length).toBeGreaterThan(0);
+    [...denseTrees, ...sparseTrees].forEach((placement) => {
+      expect(pointInPolygon(placement.position, setting.accessClearancePolygon)).toBe(false);
+      expect(distanceToPolygon(placement.position, setting.accessClearancePolygon))
+        .toBeGreaterThanOrEqual(canopyClearance - 1e-6);
+      protectedFootprints.forEach((footprint) => {
+        expect(pointInPolygon(placement.position, footprint)).toBe(false);
+      });
+      PARK_ACCESS_SPATIAL_PLAN.roadSurfaces
+        .filter((surface) => surface.kind === 'COBBLESTONE_ACCESS_ROAD')
+        .forEach((surface) => {
+          expect(pointInPolygon(placement.position, surface.polygon)).toBe(false);
+          expect(distanceToPolygon(placement.position, surface.polygon))
+            .toBeGreaterThanOrEqual(canopyClearance - 1e-6);
+        });
+    });
+    [...denseUnderstory, ...sparseUnderstory].forEach((placement) => {
+      expect(pointInPolygon(placement.position, setting.accessClearancePolygon)).toBe(false);
+      protectedFootprints.forEach((footprint) => {
+        expect(pointInPolygon(placement.position, footprint)).toBe(false);
+      });
+    });
+    expect(reduced.ambientTrees.filter((placement) => placement.sourceZoneId.startsWith('third-age-access-')).length)
+      .toBeLessThan(denseTrees.length + sparseTrees.length);
+    expect(reduced.understory.filter((placement) => placement.sourceZoneId.startsWith('third-age-access-')).length)
+      .toBeLessThan(denseUnderstory.length + sparseUnderstory.length);
   });
 
   it('mantém somente a faixa sul segura de B5 fora dos footprints e do estacionamento', () => {
@@ -273,6 +342,9 @@ describe('ambientação dos acessos, Caminho do Bosque e Sede Costeiros', () => 
     expect(renderer).toContain('geometry.dispose()');
     expect(renderer).toContain('material.dispose()');
     expect(renderer).toContain('texture.dispose()');
+    expect(renderer.match(/renderOrder=\{0\}/g)).toHaveLength(2);
+    expect(renderer).toContain('dispose={null}');
+    expect(renderer).not.toContain('polygonOffset');
     expect(renderer).not.toContain('TextureLoader');
     expect(renderer).not.toContain('useFrame');
     expect(renderer).not.toContain('commercialTrees');

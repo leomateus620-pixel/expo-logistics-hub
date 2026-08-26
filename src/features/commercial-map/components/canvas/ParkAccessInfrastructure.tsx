@@ -84,8 +84,59 @@ function roughnessTexture(colorTexture: THREE.DataTexture) {
   return texture;
 }
 
+function createCobblestoneTexture() {
+  const size = 64;
+  const data = new Uint8Array(size * size * 4);
+  const stoneWidth = 16;
+  const stoneHeight = 10;
+  for (let y = 0; y < size; y += 1) {
+    const row = Math.floor(y / stoneHeight);
+    for (let x = 0; x < size; x += 1) {
+      const staggeredX = x + (row % 2) * stoneWidth * 0.5;
+      const stoneX = Math.floor(staggeredX / stoneWidth);
+      const horizontalJoint = [row, row + 1].some((boundaryRow) => {
+        const segment = Math.floor(x / 7);
+        const horizontalJointJitter = (textureNoise(boundaryRow, segment, 9127) - 0.5) * 3.2
+          + Math.sin((x + boundaryRow * 11) * 0.19) * 0.65;
+        return Math.abs(y - (boundaryRow * stoneHeight + horizontalJointJitter)) <= 1.15;
+      });
+      const verticalJoint = [stoneX, stoneX + 1].some((boundaryStone) => {
+        const verticalJointJitter = (textureNoise(row, boundaryStone, 4813) - 0.5) * 4.6
+          + Math.sin((y + row * 5 + boundaryStone * 3) * 0.31) * 0.75;
+        const boundaryX = boundaryStone * stoneWidth
+          - (row % 2) * stoneWidth * 0.5
+          + verticalJointJitter;
+        return Math.abs(x - boundaryX) <= 1.1;
+      });
+      const joint = horizontalJoint || verticalJoint;
+      const stoneNoise = (textureNoise(stoneX, row, 4813) - 0.5) * 20;
+      const fineNoise = (textureNoise(x, y, 7349) - 0.5) * 10;
+      const base = joint ? [66, 61, 55] : [155, 146, 132];
+      const noise = joint ? fineNoise * 0.28 : stoneNoise + fineNoise;
+      const offset = (y * size + x) * 4;
+      data[offset] = THREE.MathUtils.clamp(Math.round(base[0] + noise), 0, 255);
+      data[offset + 1] = THREE.MathUtils.clamp(Math.round(base[1] + noise), 0, 255);
+      data[offset + 2] = THREE.MathUtils.clamp(Math.round(base[2] + noise), 0, 255);
+      data[offset + 3] = 255;
+    }
+  }
+  const texture = new THREE.DataTexture(data, size, size, THREE.RGBAFormat, THREE.UnsignedByteType);
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(0.56, 0.56);
+  texture.minFilter = THREE.LinearMipmapLinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+  texture.generateMipmaps = true;
+  texture.anisotropy = 4;
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.needsUpdate = true;
+  return texture;
+}
+
 const ASPHALT_TEXTURE = createInfrastructureTexture(3107, [178, 181, 181], 16);
 const ASPHALT_ROUGHNESS = roughnessTexture(ASPHALT_TEXTURE);
+const COBBLESTONE_TEXTURE = createCobblestoneTexture();
+const COBBLESTONE_ROUGHNESS = roughnessTexture(COBBLESTONE_TEXTURE);
 const GRAVEL_TEXTURE = createInfrastructureTexture(851, [176, 156, 126], 34);
 const GRAVEL_ROUGHNESS = roughnessTexture(GRAVEL_TEXTURE);
 const PAVER_TEXTURE = createInfrastructureTexture(1947, [210, 205, 194], 13, 16);
@@ -195,7 +246,6 @@ function SurfaceMaterial({
   reducedGraphics: boolean;
 }) {
   const transparent = opacity < 0.995;
-  const depthWrite = opacity > 0.42;
   if (kind === 'asphalt') return (
     <meshStandardMaterial
       color="#555b5d"
@@ -207,7 +257,23 @@ function SurfaceMaterial({
       metalness={0}
       transparent={transparent}
       opacity={opacity}
-      depthWrite={depthWrite}
+      depthTest
+      depthWrite
+    />
+  );
+  if (kind === 'cobblestone') return (
+    <meshStandardMaterial
+      color="#9b9284"
+      map={reducedGraphics ? undefined : COBBLESTONE_TEXTURE}
+      roughnessMap={reducedGraphics ? undefined : COBBLESTONE_ROUGHNESS}
+      bumpMap={reducedGraphics ? undefined : COBBLESTONE_ROUGHNESS}
+      bumpScale={0.008}
+      roughness={0.99}
+      metalness={0}
+      transparent={transparent}
+      opacity={opacity}
+      depthTest
+      depthWrite
     />
   );
   if (kind === 'gravel') return (
@@ -221,7 +287,8 @@ function SurfaceMaterial({
       metalness={0}
       transparent={transparent}
       opacity={opacity}
-      depthWrite={depthWrite}
+      depthTest
+      depthWrite
     />
   );
   if (kind === 'sidewalks') return (
@@ -235,7 +302,8 @@ function SurfaceMaterial({
       metalness={0}
       transparent={transparent}
       opacity={opacity}
-      depthWrite={depthWrite}
+      depthTest
+      depthWrite
     />
   );
   if (kind === 'curbs' || kind === 'roundaboutCurb') return (
@@ -245,7 +313,8 @@ function SurfaceMaterial({
       metalness={0}
       transparent={transparent}
       opacity={opacity}
-      depthWrite={depthWrite}
+      depthTest
+      depthWrite
     />
   );
   if (kind === 'landscape') return (
@@ -255,7 +324,8 @@ function SurfaceMaterial({
       metalness={0}
       transparent={transparent}
       opacity={opacity}
-      depthWrite={depthWrite}
+      depthTest
+      depthWrite
     />
   );
   return (
@@ -265,12 +335,26 @@ function SurfaceMaterial({
       metalness={0}
       transparent={transparent}
       opacity={opacity}
-      depthWrite={depthWrite}
+      depthTest
+      depthWrite
       polygonOffset
       polygonOffsetFactor={-2}
       polygonOffsetUnits={-2}
     />
   );
+}
+
+function surfaceRenderOrder(
+  kind: keyof ReturnType<typeof buildParkAccessRenderModel>['geometries'],
+) {
+  if (kind === 'whiteMarkings' || kind === 'yellowMarkings') return 3;
+  if (
+    kind === 'sidewalks'
+    || kind === 'curbs'
+    || kind === 'roundaboutCurb'
+    || kind === 'landscape'
+  ) return 2;
+  return 1;
 }
 
 export const ParkAccessInfrastructure = memo(function ParkAccessInfrastructure({
@@ -327,7 +411,7 @@ export const ParkAccessInfrastructure = memo(function ParkAccessInfrastructure({
           geometry={geometry}
           receiveShadow={kind !== 'whiteMarkings' && kind !== 'yellowMarkings'}
           raycast={NO_RAYCAST}
-          renderOrder={kind === 'whiteMarkings' || kind === 'yellowMarkings' ? 3 : 1}
+          renderOrder={surfaceRenderOrder(kind)}
           userData={FEATURE_USER_DATA}
           dispose={null}
         >

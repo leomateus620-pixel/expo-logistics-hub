@@ -161,6 +161,8 @@ describe('park access spatial plan', () => {
   it('reuses the official isotropic PDF-to-local transformation', () => {
     const samples = [
       [684, 3306],
+      [1214, 3137],
+      [1640, 3143.5],
       [1274, 4040],
       [3935, 4219],
       [2418, 3833],
@@ -179,7 +181,7 @@ describe('park access spatial plan', () => {
     expect(PARK_ACCESS_SPATIAL_PLAN.coordinateFrame.calibrationScope).toContain('field-reviewable');
   });
 
-  it('preserves A1, A2 and A3 as official anchors without swapping gates 2 and 3', () => {
+  it('preserves A1, A2, A3 and A10 as official anchors without swapping gates 2 and 3', () => {
     expect(PARK_ACCESS_SPATIAL_PLAN.anchors.gate1).toMatchObject({
       officialEntityIdentifier: 'A1',
       sourcePdfPoint: [684, 3306],
@@ -193,6 +195,11 @@ describe('park access spatial plan', () => {
     expect(PARK_ACCESS_SPATIAL_PLAN.anchors.gate3).toMatchObject({
       officialEntityIdentifier: 'A3',
       sourcePdfPoint: [3935, 4219],
+      confidence: 'OFFICIAL_ANCHOR',
+    });
+    expect(PARK_ACCESS_SPATIAL_PLAN.anchors.gate10).toMatchObject({
+      officialEntityIdentifier: 'A10',
+      sourcePdfPoint: [1214, 3137],
       confidence: 'OFFICIAL_ANCHOR',
     });
 
@@ -212,7 +219,7 @@ describe('park access spatial plan', () => {
 
     const officialEntities = new Map(OFFICIAL_REFERENCE_DATA.entities
       .map((entity) => [entity.publicIdentifier, entity]));
-    (['gate1', 'gate2', 'gate3'] as const).forEach((key) => {
+    (['gate1', 'gate2', 'gate3', 'gate10'] as const).forEach((key) => {
       const anchor = PARK_ACCESS_SPATIAL_PLAN.anchors[key];
       const entity = officialEntities.get(anchor.officialEntityIdentifier!);
       expect(entity?.classification).toBe('GATE');
@@ -230,6 +237,22 @@ describe('park access spatial plan', () => {
       .toBeCloseTo(officialNorthWest[0], 4);
     expect(PARK_ACCESS_SPATIAL_PLAN.anchors.pavilion14NorthWest.point[1])
       .toBeCloseTo(officialNorthWest[1], 4);
+
+    const thirdAgePavilion = officialEntities.get('B22')!;
+    expect(PARK_ACCESS_SPATIAL_PLAN.anchors.thirdAgePavilion).toMatchObject({
+      officialEntityIdentifier: 'B22',
+      sourcePdfPoint: [836.5, 3686],
+      confidence: 'OFFICIAL_ANCHOR',
+    });
+    expect(distance(
+      PARK_ACCESS_SPATIAL_PLAN.anchors.thirdAgePavilion.point,
+      ringBoundsCenter(thirdAgePavilion.geometry.coordinates[0]),
+    )).toBeLessThan(0.0002);
+    expect(PARK_ACCESS_SPATIAL_PLAN.anchors.ruaBrasilSeam).toMatchObject({
+      officialEntityIdentifier: 'RUA-BRASIL',
+      sourcePdfPoint: [1640, 3143.5],
+      confidence: 'OFFICIAL_ANCHOR',
+    });
   });
 
   it('defines the Benvenuto axis as four coherent 3.5 m lanes ending at A3', () => {
@@ -314,32 +337,147 @@ describe('park access spatial plan', () => {
       .toEqual(expect.arrayContaining(['B1', 'B2', 'B22', 'C2', 'C3', 'G']));
   });
 
-  it('makes A1 the seam between Tupareendi arrival and the Costeiros service road', () => {
+  it('replaces the detached field spur with one exact A1-A10-Rua Brasil cobblestone axis', () => {
+    const roads = new Map(PARK_ACCESS_SPATIAL_PLAN.roadSurfaces
+      .map((surface) => [surface.id, surface]));
+    const road = roads.get('gate-1-gate-10-rua-brasil-cobblestone')!;
+
+    expect(roads.has('costeiros-field-spur')).toBe(false);
+    expect(road).toBeDefined();
+    expect(road.kind).toBe('COBBLESTONE_ACCESS_ROAD');
+    expect(road.widthMeters).toBe(6);
+    expect(road.widthReviewRangeMeters).toEqual([5.5, 7]);
+    expect(road.elevation).toBe(0.039);
+    expect(road.connects).toEqual(['A1', 'A10', 'RUA-BRASIL']);
+    expect(road.sourcePdfCenterline).toEqual([
+      [684, 3306],
+      [760, 3260],
+      [910, 3198],
+      [1060, 3154],
+      [1214, 3137],
+      [1395, 3138],
+      [1545, 3141],
+      [1640, 3143.5],
+      [1650, 3143.5],
+    ]);
+    expect(road.centerline[0]).toEqual(PARK_ACCESS_SPATIAL_PLAN.anchors.gate1.point);
+    expect(road.centerline[4]).toEqual(PARK_ACCESS_SPATIAL_PLAN.anchors.gate10.point);
+    expect(road.centerline[7]).toEqual(PARK_ACCESS_SPATIAL_PLAN.anchors.ruaBrasilSeam.point);
+
+    const [thirdAgeFootprint] = officialFootprints(['B22']);
+    const [ruaBrasil] = officialFootprints(['RUA-BRASIL']);
+    const [testDrive] = officialFootprints(['TEST-DRIVE']);
+    expect(polygonsIntersect(road.polygon, thirdAgeFootprint.polygon)).toBe(false);
+    expect(polygonsIntersect(road.polygon, ruaBrasil.polygon)).toBe(true);
+    expect(polygonsIntersect(road.polygon, testDrive.polygon)).toBe(true);
+
+    const serviceRoad = roads.get('costeiros-service-road')!;
+    expect(serviceRoad.kind).toBe('COMPACTED_SERVICE_ROAD');
+    expect(serviceRoad.sourcePdfCenterline[0]).toEqual([684, 3306]);
+    expect(serviceRoad.sourcePdfCenterline).not.toEqual(road.sourcePdfCenterline);
+  });
+
+  it('shares the protected B22 footprint, clipped access and vegetation clearances', () => {
+    const setting = PARK_ACCESS_SPATIAL_PLAN.thirdAgePavilionSetting;
+    const access = PARK_ACCESS_SPATIAL_PLAN.roadSurfaces
+      .find((surface) => surface.id === setting.accessRoadId)!;
+    const [officialB22] = officialFootprints(['B22']);
+
+    expect(setting).toMatchObject({
+      officialEntityIdentifier: 'B22',
+      sourcePdfCenter: [836.5, 3686],
+      accessRoadId: 'third-age-pavilion-access',
+      sourcePdfThreshold: [742, 3568],
+      widthMeters: 4,
+      protectedFootprintIdentifiers: ['B22'],
+      clearances: {
+        footprintMeters: 0,
+        roadTreeTrunkMeters: 2,
+        pavilionAccessTreeTrunkMeters: 1.5,
+        canopyMeters: 0.45,
+      },
+    });
+    expect(setting.sourcePdfFootprint).toEqual([
+      [742, 3538],
+      [931, 3538],
+      [931, 3834],
+      [742, 3834],
+      [742, 3538],
+    ]);
+    expect(setting.sourcePdfAccessCenterline).toEqual([
+      [651, 3450],
+      [700, 3485],
+      [735, 3530],
+      [742, 3568],
+    ]);
+    expect(access.kind).toBe('COBBLESTONE_ACCESS_ROAD');
+    expect(access.widthMeters).toBe(4);
+    expect(access.elevation).toBe(0.039);
+    expect(access.sourcePdfPolygon).toEqual(setting.sourcePdfAccessPolygon);
+    expect(access.polygon).toEqual(setting.accessPolygon);
+    expect(setting.accessCenterline.at(-1)).toEqual(setting.threshold);
+    expect(Math.max(...setting.sourcePdfAccessPolygon.map(([x]) => x))).toBe(742);
+    expect(Math.max(...setting.sourcePdfAccessClearancePolygon.map(([x]) => x))).toBe(742);
+    expect(Math.max(...setting.accessPolygon.map(([x]) => x)))
+      .toBeLessThanOrEqual(Math.min(...officialB22.polygon.map(([x]) => x)) + 0.0001);
+    expectClosedFinitePolygon(setting.footprint);
+    expectClosedFinitePolygon(setting.accessPolygon);
+    expectClosedFinitePolygon(setting.accessClearancePolygon);
+    setting.footprint.forEach((point, index) => {
+      expect(point[0]).toBeCloseTo(officialB22.polygon[index][0], 4);
+      expect(point[1]).toBeCloseTo(officialB22.polygon[index][1], 4);
+    });
+
+    const approach = PARK_ACCESS_SPATIAL_PLAN.roadSurfaces
+      .find((surface) => surface.id === 'gate-1-approach')!;
+    expect(approach.sourcePdfCenterline).toContainEqual(setting.sourcePdfAccessCenterline[0]);
+  });
+
+  it('makes A1 the shared seam while keeping the Costeiros branch distinct', () => {
     const approach = PARK_ACCESS_SPATIAL_PLAN.roadSurfaces
       .find((surface) => surface.id === 'gate-1-approach')!;
     const service = PARK_ACCESS_SPATIAL_PLAN.roadSurfaces
       .find((surface) => surface.id === 'costeiros-service-road')!;
+    const gate10Axis = PARK_ACCESS_SPATIAL_PLAN.roadSurfaces
+      .find((surface) => surface.id === 'gate-1-gate-10-rua-brasil-cobblestone')!;
     const gate1 = PARK_ACCESS_SPATIAL_PLAN.anchors.gate1.point;
 
     expect(approach.centerline.at(-1)).toEqual(gate1);
+    expect(approach.sourcePdfCenterline.slice(0, 3)).toEqual([
+      [1056, 4074],
+      [945, 4020],
+      [820, 3950],
+    ]);
     expect(service.centerline[0]).toEqual(gate1);
-    expect(approach.connects).toContain('AV-TUPARENDI');
+    expect(gate10Axis.centerline[0]).toEqual(gate1);
+    expect(approach.connects).toEqual(expect.arrayContaining([
+      'roundabout-tupareendi',
+      'AV-TUPARENDI',
+      'gate-1-gate-10-rua-brasil-cobblestone',
+    ]));
     expect(service.connects).toContain('sede-costeiros');
 
     const buildingXs = PARK_ACCESS_SPATIAL_PLAN.costeirosSetting.buildingPolygon.map(([x]) => x);
     const roadNearBuildingXs = service.centerline.slice(1, 5).map(([x]) => x);
     expect(Math.min(...buildingXs)).toBeGreaterThan(Math.max(...roadNearBuildingXs));
     expect(PARK_ACCESS_SPATIAL_PLAN.costeirosSetting.serviceRoadIds)
-      .toEqual(['costeiros-service-road', 'costeiros-field-spur']);
+      .toEqual(['costeiros-service-road']);
   });
 
   it('provides a dimensionally consistent, explicitly reviewable roundabout', () => {
     const roundabout = PARK_ACCESS_SPATIAL_PLAN.roundabout;
+    const gate1Approach = PARK_ACCESS_SPATIAL_PLAN.roadSurfaces
+      .find((surface) => surface.id === 'gate-1-approach')!;
     expect(roundabout.outerRadius).toBe(parkAccessMetersToLocal(18));
     expect(roundabout.islandRadius).toBe(parkAccessMetersToLocal(10.5));
     expect(roundabout.circulatingWidth)
       .toBeCloseTo(roundabout.outerRadius - roundabout.islandRadius, 4);
     expect(roundabout.confidence).toBe('DIMENSIONALLY_INFERRED');
+    expect(gate1Approach.sourcePdfCenterline[0]).toEqual([1056, 4074]);
+    expect(distance(gate1Approach.centerline[0], roundabout.center))
+      .toBeLessThanOrEqual(roundabout.outerRadius + 0.01);
+    expect(distance(gate1Approach.centerline[0], roundabout.center))
+      .toBeGreaterThan(roundabout.islandRadius);
     expect(PARK_ACCESS_SPATIAL_PLAN.openQuestions.some((question) => question.includes('raio externo')))
       .toBe(true);
   });
@@ -361,6 +499,9 @@ describe('park access spatial plan', () => {
     expectClosedFinitePolygon(PARK_ACCESS_SPATIAL_PLAN.woodlandMass.polygon);
     expectClosedFinitePolygon(PARK_ACCESS_SPATIAL_PLAN.costeirosSetting.buildingPolygon);
     expectClosedFinitePolygon(PARK_ACCESS_SPATIAL_PLAN.costeirosSetting.yardPolygon);
+    expectClosedFinitePolygon(PARK_ACCESS_SPATIAL_PLAN.thirdAgePavilionSetting.footprint);
+    expectClosedFinitePolygon(PARK_ACCESS_SPATIAL_PLAN.thirdAgePavilionSetting.accessPolygon);
+    expectClosedFinitePolygon(PARK_ACCESS_SPATIAL_PLAN.thirdAgePavilionSetting.accessClearancePolygon);
     expectClosedFinitePolygon(PARK_ACCESS_SPATIAL_PLAN.benvenutoPavilionEdge.parkingCutout);
   });
 
@@ -488,12 +629,37 @@ describe('park access spatial plan', () => {
       .not.toBe(roadById.get('benvenuto-four-lane-axis')!.elevation);
   });
 
+  it('registers all seven new annexes without leaking local filesystem paths', () => {
+    expect(PARK_ACCESS_SPATIAL_PLAN.revision).toBe('2026.8-park-access-annexes.3');
+    const stageSourceIds = PARK_ACCESS_SOURCE_MANIFEST
+      .map((source) => source.id)
+      .filter((id) => /^annex-1[0-6]-/.test(id));
+    expect(stageSourceIds).toEqual([
+      'annex-10-current-map-overview-east',
+      'annex-11-current-map-overview-west',
+      'annex-12-current-map-a10-context',
+      'annex-13-a1-a10-blue-trace',
+      'annex-14-satellite-a1-a10-b22',
+      'annex-15-current-map-upper-connection',
+      'annex-16-site-plan-a1-a10',
+    ]);
+    expect(PARK_ACCESS_SOURCE_MANIFEST
+      .filter((source) => stageSourceIds.includes(source.id))
+      .every((source) => source.file.startsWith('attachment:'))).toBe(true);
+  });
+
   it('keeps protected commercial geometry read-only and uncertainty visible', () => {
     expect(PARK_ACCESS_SPATIAL_PLAN.protectedCommercialGeometry.policy)
       .toContain('no lot, pavilion, commercial module');
     expect(PARK_ACCESS_SPATIAL_PLAN.protectedCommercialGeometry.identifiers)
       .toEqual(['B1', 'B2', 'B3', 'B4', 'B5', 'B6']);
-    expect(PARK_ACCESS_SPATIAL_PLAN.openQuestions.length).toBeGreaterThanOrEqual(6);
+    expect(PARK_ACCESS_SPATIAL_PLAN.thirdAgePavilionSetting.protectedFootprintIdentifiers)
+      .toEqual(['B22']);
+    expect(PARK_ACCESS_SPATIAL_PLAN.openQuestions.length).toBeGreaterThanOrEqual(10);
+    expect(PARK_ACCESS_SPATIAL_PLAN.openQuestions.some((question) => question.includes('5,5 m e 7 m')))
+      .toBe(true);
+    expect(PARK_ACCESS_SPATIAL_PLAN.openQuestions.some((question) => question.includes('B22')))
+      .toBe(true);
     expect(PARK_ACCESS_SOURCE_MANIFEST.every((source) => source.metricUse !== undefined)).toBe(true);
     PARK_ACCESS_SOURCE_MANIFEST.forEach((source) => {
       expect(source.file).not.toMatch(/^[a-z]:[\\/]/i);

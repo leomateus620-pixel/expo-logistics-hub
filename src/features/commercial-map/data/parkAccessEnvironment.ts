@@ -50,7 +50,7 @@ export interface ParkAccessEnvironmentPresentation {
   };
 }
 
-export const PARK_ACCESS_ENVIRONMENT_REVISION = '2026.8-park-access-environment.r1';
+export const PARK_ACCESS_ENVIRONMENT_REVISION = '2026.8-park-access-environment.r2';
 export const PARK_ACCESS_AMBIENT_TREE_FOOTPRINT_CLEARANCE = {
   annexRelative: 0.3,
   narrowFieldReview: 0.08,
@@ -80,6 +80,19 @@ const TRAIL_SOURCE_IDS = PARK_ACCESS_SPATIAL_PLAN.woodlandPath.sourceIds;
 const WOODLAND_SOURCE_IDS = PARK_ACCESS_SPATIAL_PLAN.woodlandMass.sourceIds;
 const COSTEIROS_SOURCE_IDS = PARK_ACCESS_SPATIAL_PLAN.costeirosSetting.sourceIds;
 const BENVENUTO_SOURCE_IDS = PARK_ACCESS_SPATIAL_PLAN.benvenutoPavilionEdge.sourceIds;
+const THIRD_AGE_SETTING = PARK_ACCESS_SPATIAL_PLAN.thirdAgePavilionSetting;
+const COBBLESTONE_ACCESS_ROADS = PARK_ACCESS_SPATIAL_PLAN.roadSurfaces.filter(
+  (surface) => surface.kind === 'COBBLESTONE_ACCESS_ROAD',
+);
+const COBBLESTONE_ACCESS_POLYGONS = COBBLESTONE_ACCESS_ROADS.map((surface) => surface.polygon);
+const COBBLESTONE_TREE_CLEARANCES = COBBLESTONE_ACCESS_ROADS.map((surface) => ({
+  polygon: surface.polygon,
+  clearance: parkAccessMetersToLocal(
+    surface.id === THIRD_AGE_SETTING.accessRoadId
+      ? THIRD_AGE_SETTING.clearances.pavilionAccessTreeTrunkMeters
+      : THIRD_AGE_SETTING.clearances.roadTreeTrunkMeters,
+  ),
+}));
 
 function officialFootprints(identifiers: readonly string[]) {
   return identifiers
@@ -162,9 +175,13 @@ export function isParkAccessPolygonFullyContained(
 export function selectParkAccessCompatibleTreesForPresentation<
   Tree extends { position: ParkAccessPoint },
 >(trees: readonly Tree[]) {
-  return trees.filter((tree) => !pointInPolygon(
-    tree.position,
-    PARK_ACCESS_SPATIAL_PLAN.woodlandPath.clearancePolygon,
+  return trees.filter((tree) => (
+    !pointInPolygon(tree.position, PARK_ACCESS_SPATIAL_PLAN.woodlandPath.clearancePolygon)
+    && !pointInPolygon(tree.position, THIRD_AGE_SETTING.accessClearancePolygon)
+    && COBBLESTONE_TREE_CLEARANCES.every(({ polygon, clearance }) => (
+      !pointInPolygon(tree.position, polygon)
+      && distanceToPolygon(tree.position, polygon) >= clearance
+    ))
   ));
 }
 
@@ -173,6 +190,24 @@ function polylineLength(points: readonly ParkAccessPoint[]) {
     const next = points[index + 1];
     return sum + Math.hypot(next[0] - point[0], next[1] - point[1]);
   }, 0);
+}
+
+function offsetPolyline(
+  points: readonly ParkAccessPoint[],
+  lateralOffset: number,
+): readonly ParkAccessPoint[] {
+  return points.map((point, index) => {
+    const previous = points[Math.max(0, index - 1)] ?? point;
+    const next = points[Math.min(points.length - 1, index + 1)] ?? point;
+    const deltaX = next[0] - previous[0];
+    const deltaZ = next[1] - previous[1];
+    const length = Math.hypot(deltaX, deltaZ);
+    if (length <= 1e-6) return point;
+    return [
+      point[0] - deltaZ / length * lateralOffset,
+      point[1] + deltaX / length * lateralOffset,
+    ] as const;
+  });
 }
 
 function transitionSurfaceKind(surface: string): ParkAccessEnvironmentSurfaceKind {
@@ -302,7 +337,54 @@ function createAmbientTrees(reducedGraphics: boolean) {
     PARK_ACCESS_SPATIAL_PLAN.costeirosSetting.buildingPolygon,
     PARK_ACCESS_SPATIAL_PLAN.costeirosSetting.yardPolygon,
     PARK_ACCESS_SPATIAL_PLAN.costeirosSetting.serviceRoadPolygon,
+    THIRD_AGE_SETTING.accessClearancePolygon,
+    ...COBBLESTONE_ACCESS_POLYGONS,
   ];
+  const thirdAgeAccessLength = polylineLength(THIRD_AGE_SETTING.accessCenterline);
+  const thirdAgeCanopyClearance = parkAccessMetersToLocal(
+    THIRD_AGE_SETTING.clearances.canopyMeters,
+  );
+  const thirdAgeBandOffset = THIRD_AGE_SETTING.width * 0.5
+    + parkAccessMetersToLocal(THIRD_AGE_SETTING.clearances.pavilionAccessTreeTrunkMeters)
+    + thirdAgeCanopyClearance
+    + 0.03;
+  const thirdAgeTreeExclusions = [
+    THIRD_AGE_SETTING.accessClearancePolygon,
+    ...COBBLESTONE_ACCESS_POLYGONS,
+    ...PROTECTED_COMMERCIAL_FOOTPRINTS,
+  ];
+  const thirdAgeDenseBudget = reducedGraphics ? 2 : 4;
+  const thirdAgeSparseBudget = reducedGraphics ? 1 : 2;
+  const thirdAgeDenseTrees = sampleParkAccessPolylinePlacements(
+    offsetPolyline(THIRD_AGE_SETTING.accessCenterline, thirdAgeBandOffset),
+    {
+      sourceZoneId: 'third-age-access-dense-tree-band',
+      spacing: thirdAgeAccessLength / (thirdAgeDenseBudget + 1),
+      endpointInset: thirdAgeAccessLength / (thirdAgeDenseBudget + 1),
+      seed: 127,
+      maximumCount: thirdAgeDenseBudget,
+      minimumScale: 0.7,
+      maximumScale: 0.94,
+      verticalScale: 1.02,
+      exclusions: thirdAgeTreeExclusions,
+      exclusionClearance: thirdAgeCanopyClearance,
+    },
+  );
+  const thirdAgeSparseTrees = sampleParkAccessPolylinePlacements(
+    offsetPolyline(THIRD_AGE_SETTING.accessCenterline, -thirdAgeBandOffset),
+    {
+      sourceZoneId: 'third-age-access-sparse-tree-band',
+      spacing: thirdAgeAccessLength / (thirdAgeSparseBudget + 1),
+      endpointInset: thirdAgeAccessLength / (thirdAgeSparseBudget + 1),
+      seed: 139,
+      maximumCount: thirdAgeSparseBudget,
+      minimumScale: 0.64,
+      maximumScale: 0.84,
+      verticalScale: 0.96,
+      exclusions: thirdAgeTreeExclusions,
+      exclusionClearance: thirdAgeCanopyClearance,
+    },
+  );
 
   const northSidewalk = PARK_ACCESS_SPATIAL_PLAN.sidewalkSurfaces.find(
     (surface) => surface.id === 'benvenuto-north-sidewalk',
@@ -353,11 +435,17 @@ function createAmbientTrees(reducedGraphics: boolean) {
         PARK_ACCESS_SPATIAL_PLAN.benvenutoPavilionEdge.parkingCutout,
       )
       && !pointInPolygon(placement.position, northSidewalk)
+      && COBBLESTONE_TREE_CLEARANCES.every(({ polygon, clearance }) => (
+        !pointInPolygon(placement.position, polygon)
+        && distanceToPolygon(placement.position, polygon) >= clearance - 1e-6
+      ))
     ));
   });
 
   return [
     ...pavilionTrees,
+    ...thirdAgeDenseTrees,
+    ...thirdAgeSparseTrees,
     ...sampleParkAccessPolylinePlacements(PARK_ACCESS_SPATIAL_PLAN.costeirosSetting.forestEdge, {
       sourceZoneId: 'costeiros-forest-edge-screening',
       spacing: polylineLength(PARK_ACCESS_SPATIAL_PLAN.costeirosSetting.forestEdge) / (costeirosForestBudget + 1),
@@ -402,9 +490,52 @@ function createUnderstory(reducedGraphics: boolean) {
     PARK_ACCESS_SPATIAL_PLAN.costeirosSetting.buildingPolygon,
     PARK_ACCESS_SPATIAL_PLAN.costeirosSetting.serviceRoadPolygon,
     PARK_ACCESS_SPATIAL_PLAN.benvenutoPavilionEdge.parkingCutout,
+    THIRD_AGE_SETTING.accessClearancePolygon,
+    ...COBBLESTONE_ACCESS_POLYGONS,
   ];
+  const thirdAgeAccessLength = polylineLength(THIRD_AGE_SETTING.accessCenterline);
+  const thirdAgeUnderstoryOffset = THIRD_AGE_SETTING.width * 0.5
+    + parkAccessMetersToLocal(THIRD_AGE_SETTING.clearances.pavilionAccessTreeTrunkMeters)
+    + 0.08;
+  const thirdAgeUnderstoryExclusions = [
+    THIRD_AGE_SETTING.accessClearancePolygon,
+    ...COBBLESTONE_ACCESS_POLYGONS,
+    ...PROTECTED_COMMERCIAL_FOOTPRINTS,
+  ];
+  const thirdAgeDenseUnderstoryBudget = reducedGraphics ? 4 : 8;
+  const thirdAgeSparseUnderstoryBudget = reducedGraphics ? 2 : 4;
 
   return [
+    ...sampleParkAccessPolylinePlacements(
+      offsetPolyline(THIRD_AGE_SETTING.accessCenterline, thirdAgeUnderstoryOffset),
+      {
+        sourceZoneId: 'third-age-access-dense-understory',
+        spacing: thirdAgeAccessLength / (thirdAgeDenseUnderstoryBudget + 1),
+        endpointInset: thirdAgeAccessLength / (thirdAgeDenseUnderstoryBudget + 1),
+        seed: 151,
+        maximumCount: thirdAgeDenseUnderstoryBudget,
+        minimumScale: 0.52,
+        maximumScale: 0.78,
+        verticalScale: 0.58,
+        exclusions: thirdAgeUnderstoryExclusions,
+        exclusionClearance: 0.03,
+      },
+    ),
+    ...sampleParkAccessPolylinePlacements(
+      offsetPolyline(THIRD_AGE_SETTING.accessCenterline, -thirdAgeUnderstoryOffset),
+      {
+        sourceZoneId: 'third-age-access-sparse-understory',
+        spacing: thirdAgeAccessLength / (thirdAgeSparseUnderstoryBudget + 1),
+        endpointInset: thirdAgeAccessLength / (thirdAgeSparseUnderstoryBudget + 1),
+        seed: 163,
+        maximumCount: thirdAgeSparseUnderstoryBudget,
+        minimumScale: 0.48,
+        maximumScale: 0.7,
+        verticalScale: 0.54,
+        exclusions: thirdAgeUnderstoryExclusions,
+        exclusionClearance: 0.03,
+      },
+    ),
     ...sampleParkAccessPolygonPlacements(naturalEdge, {
       sourceZoneId: 'woodland-path-understory',
       spacing: reducedGraphics ? 2.05 : 1.45,

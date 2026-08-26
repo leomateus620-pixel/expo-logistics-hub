@@ -11,12 +11,17 @@ import {
   resolveCommercialPavilionDefinition,
   type CommercialPavilionPublicIdentifier,
 } from './commercialPavilions';
+import {
+  THIRD_AGE_PAVILION_LAYOUT,
+  thirdAgePavilionVisualHeight,
+} from './thirdAgePavilion';
 
 export type StrategicLandmarkKind =
   | 'administrative-center'
   | 'fenasoja-headquarters'
   | 'fenasoja-event-center'
   | 'commercial-pavilion'
+  | 'third-age-pavilion'
   | 'livestock-pavilion'
   | 'mirante-pavilion'
   | 'polish-pavilion'
@@ -76,6 +81,18 @@ const STRATEGIC_LANDMARKS: Readonly<Record<string, StrategicLandmarkDefinition>>
   B6: commercialPavilionLandmark('B6'),
   B8: commercialPavilionLandmark('B8'),
   B10: commercialPavilionLandmark('B10'),
+  B22: {
+    kind: 'third-age-pavilion',
+    aliases: [
+      'Pavilhão da Terceira Idade',
+      'Terceira Idade',
+      'Centro da Terceira Idade',
+    ],
+    // A fachada de acesso abre para oeste, em direção ao ramal abaixo de A1.
+    facingRadians: THIRD_AGE_PAVILION_LAYOUT.facingRadians,
+    focusDirection: THIRD_AGE_PAVILION_LAYOUT.focusDirection,
+    visualHeight: thirdAgePavilionVisualHeight,
+  },
   B9: {
     kind: 'livestock-pavilion',
     aliases: [
@@ -323,5 +340,9 @@ export function strategicLandmarkBounds(
 export function strategicLandmarkVisualHeight(entity: MapEntity): number | null {
   const definition = STRATEGIC_LANDMARKS[normalizedIdentifier(entity)];
   if (!definition) return null;
-  return Math.max(entity.geometry.extrusionHeight, definition.visualHeight(strategicLandmarkBounds(entity)));
+  const visualHeight = definition.visualHeight(strategicLandmarkBounds(entity));
+  if (definition.kind === 'third-age-pavilion') {
+    return Math.min(THIRD_AGE_PAVILION_LAYOUT.maximumVisualHeight, visualHeight);
+  }
+  return Math.max(entity.geometry.extrusionHeight, visualHeight);
 }
