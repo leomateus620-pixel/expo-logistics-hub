@@ -780,19 +780,21 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
         >
           <meshStandardMaterial
             color={displayColor}
-            roughness={isPavilion ? 0.82 : isFlat ? 0.9 : 0.72}
+            map={openGroundTexture}
+            roughness={openGroundProfile ? openGroundProfile.roughness : isPavilion ? 0.82 : isFlat ? 0.9 : 0.72}
             metalness={0}
             transparent={!solidRendering && visualOpacity < 0.995}
             opacity={solidRendering ? 1 : visualOpacity}
             depthTest
             depthWrite={solidRendering || visualOpacity > 0.42}
-            emissive={selected || hovered || matched ? baseColor : '#000000'}
+            emissive={selected || hovered || matched ? (openGroundProfile ? '#e7d489' : baseColor) : '#000000'}
             emissiveIntensity={selected ? 0.13 : hovered ? 0.055 : matched ? 0.03 : 0}
             flatShading={isPavilion}
             polygonOffset
-            polygonOffsetFactor={isFlat ? -2 : 0}
-            polygonOffsetUnits={isFlat ? -2 : 0}
+            polygonOffsetFactor={openGroundProfile ? 2 : isFlat ? -2 : 0}
+            polygonOffsetUnits={openGroundProfile ? 2 : isFlat ? -2 : 0}
           />
+
         </mesh>
       )}
 
