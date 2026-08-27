@@ -643,9 +643,22 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
   const isFlat = entity.geometry.extrusionHeight < 0.3 || isRoad || isQuadra || isNationsPresentationSurface;
   const isInteractive = isSelectableMapClassification(entity.classification);
   const solidRendering = requiresSolidRendering(entity.classification);
+  // Presentation-only ground dressing for the large open fields (motor home
+  // and test drive). The official geometry and support elevations are
+  // untouched: only the rendered slab and its material change.
+  const openGroundProfile = useMemo(
+    () => resolveOpenGroundProfile(entity.publicIdentifier),
+    [entity.publicIdentifier],
+  );
+  const openGroundTexture = useMemo(
+    () => (openGroundProfile ? openGroundTextureForEntity(openGroundProfile) : null),
+    [openGroundProfile],
+  );
   const geometry = useMemo(
-    () => isQuadra || isGate || isNationsPresentationSurface ? null : createEntityGeometry(entity),
-    [entity, isGate, isNationsPresentationSurface, isQuadra],
+    () => isQuadra || isGate || isNationsPresentationSurface
+      ? null
+      : createEntityGeometry(entity, openGroundProfile ? OPEN_GROUND_PRESENTATION_HEIGHT : undefined),
+    [entity, isGate, isNationsPresentationSurface, isQuadra, openGroundProfile],
   );
   const hitSurface = useMemo(
     () => isQuadra || isNationsPresentationSurface ? createHitSurfaceGeometry(entity) : null,
