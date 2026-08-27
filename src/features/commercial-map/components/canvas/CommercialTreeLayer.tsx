@@ -8,7 +8,7 @@ import {
   COMMERCIAL_TREE_CANOPY_LOBES,
   COMMERCIAL_TREE_REDUCED_CANOPY_LOBES,
   commercialTreeGroundElevation,
-  commercialTreeGroundElevationAtPosition,
+  commercialTreeShadowElevationAtPosition,
 } from '../../utils/treeLayer';
 
 const NO_RAYCAST = () => undefined;
@@ -19,12 +19,14 @@ const FOLIAGE_PALETTES: Record<CommercialTreeSpeciesGroup, readonly [string, str
   MATURE_BROADLEAF: ['#79ab6d', '#88ba78', '#98c686', '#a8d294'],
   OPEN_CANOPY: ['#85b174', '#94c07f', '#a3cc8d', '#b2d89b'],
   ORNAMENTAL_COMPACT: ['#7ba46a', '#8ab276', '#99bf82', '#a9cc90'],
+  FLOWERING_ORNAMENTAL: ['#7fa06f', '#bd7890', '#d28aa0', '#e0a1af'],
 };
 
 const TRUNK_PALETTES: Record<CommercialTreeSpeciesGroup, readonly [string, string]> = {
   MATURE_BROADLEAF: ['#98704d', '#ad8359'],
   OPEN_CANOPY: ['#9f7854', '#b48c61'],
   ORNAMENTAL_COMPACT: ['#926d4d', '#a9825a'],
+  FLOWERING_ORNAMENTAL: ['#8d684b', '#a17b55'],
 };
 
 /** Deterministic 0..1 jitter so every tree keeps a stable, unique silhouette. */
@@ -265,14 +267,14 @@ function CommercialTreeInstances({
         x + tree.shadowDirection[0] * shadowOffset,
         z + tree.shadowDirection[1] * shadowOffset,
       ] as const;
-      const shadowGroundY = commercialTreeGroundElevationAtPosition(
+      const shadowGroundY = commercialTreeShadowElevationAtPosition(
         tree,
         shadowPosition,
         surfaceEntities,
       );
       transform.position.set(
         shadowPosition[0],
-        shadowGroundY + 0.008,
+        shadowGroundY,
         shadowPosition[1],
       );
       transform.rotation.set(-Math.PI / 2, 0, tree.shadowRotation);

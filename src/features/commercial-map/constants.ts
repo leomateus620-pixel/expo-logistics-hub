@@ -5,6 +5,9 @@ export const MAP_REFERENCE_WIDTH = 120;
 export const MAP_REFERENCE_HEIGHT = 90.545455;
 export const OFFICIAL_REFERENCE_IMAGE = '/maps/fenasoja-oficial-2026-park.webp';
 
+/** Shared visible top of the textured open-ground presentation, never cadastral height. */
+export const OPEN_GROUND_PRESENTATION_HEIGHT = 0.026;
+
 export const ROAD_MATERIAL_COLORS = {
   asphalt: '#4b5054',
   pedestrian: '#b8ad99',

@@ -15,11 +15,15 @@ import {
   COMMERCIAL_TREE_REDUCED_CANOPY_LOBES,
   commercialTreeGroundElevation,
   commercialTreeGroundElevationAtPosition,
+  commercialTreeShadowElevationAtPosition,
   commercialTreeInstanceBudget,
   resolveCommercialTreeLot,
   selectCommercialTreesForScene,
 } from '@/features/commercial-map/utils/treeLayer';
 import { COMMERCIAL_MAP_SEGMENT_IDS } from '@/features/commercial-map/data/commercialMapSegments';
+import { OPEN_GROUND_PRESENTATION_HEIGHT } from '@/features/commercial-map/constants';
+import { OPEN_GROUND_PRESENTATION_HEIGHT as RENDERED_OPEN_GROUND_HEIGHT } from '@/features/commercial-map/components/canvas/openGroundTextures';
+import { withGateFourDistrictPresentationEntities } from '@/features/commercial-map/data/gateFourDistrict';
 import { scopeCommercialMapData } from '@/features/commercial-map/utils/areaScope';
 import type { Coordinate, MapEntity } from '@/features/commercial-map/types';
 
@@ -77,7 +81,7 @@ function distanceToEntitySurface(point: readonly [number, number], entity: MapEn
 
 describe('camada cartográfica de árvores do mapa comercial', () => {
   it('mantém inventário versionado por quadra e por área ambiental', () => {
-    expect(COMMERCIAL_TREE_LAYER_REVISION).toBe('2026.5-park-environment.2');
+    expect(COMMERCIAL_TREE_LAYER_REVISION).toBe('2026.8-gate-four-district.1');
     expect(COMMERCIAL_TREE_COUNTS_BY_QUADRA).toEqual({ D: 9, I: 15, J: 14, E: 14 });
     expect(COMMERCIAL_TREE_COUNTS_BY_AREA).toEqual({
       D: 9,
@@ -89,12 +93,13 @@ describe('camada cartográfica de árvores do mapa comercial', () => {
       PAVILIONS_1_14_GROVE: 63,
       RUA_BRASIL_GROVE: 12,
       TERCEIRA_IDADE_EDGE: 9,
+      GATE_FOUR_DISTRICT: 10,
       NATIONS_DISTRICT: 25,
     });
-    expect(COMMERCIAL_MAP_TREES).toHaveLength(230);
+    expect(COMMERCIAL_MAP_TREES).toHaveLength(240);
     expect(new Set(COMMERCIAL_MAP_TREES.map((tree) => tree.id)).size).toBe(COMMERCIAL_MAP_TREES.length);
     expect(new Set(COMMERCIAL_MAP_TREES.map((tree) => tree.area))).toEqual(new Set(Object.keys(COMMERCIAL_TREE_COUNTS_BY_AREA)));
-    expect(new Set(COMMERCIAL_MAP_TREES.map((tree) => tree.speciesGroup)).size).toBe(3);
+    expect(new Set(COMMERCIAL_MAP_TREES.map((tree) => tree.speciesGroup)).size).toBe(4);
   });
 
   it('expõe dimensões, origem, sombra e estado de revisão para cada árvore', () => {
@@ -138,10 +143,19 @@ describe('camada cartográfica de árvores do mapa comercial', () => {
           .toBeCloseTo(0.064, 6);
       });
     COMMERCIAL_MAP_TREES
-      .filter((candidate) => candidate.placement === 'LANDSCAPE_MASS' || candidate.placement === 'BUILDING_EDGE')
+      .filter((candidate) => (
+        (candidate.placement === 'LANDSCAPE_MASS' || candidate.placement === 'BUILDING_EDGE')
+        && candidate.area !== 'GATE_FOUR_DISTRICT'
+      ))
       .forEach((candidate) => {
         expect(commercialTreeGroundElevation(candidate, OFFICIAL_REFERENCE_DATA.entities), candidate.id)
           .toBeCloseTo(0.036, 6);
+      });
+    COMMERCIAL_MAP_TREES
+      .filter((candidate) => candidate.area === 'GATE_FOUR_DISTRICT')
+      .forEach((candidate) => {
+        expect(commercialTreeGroundElevation(candidate, OFFICIAL_REFERENCE_DATA.entities), candidate.id)
+          .toBeCloseTo(OPEN_GROUND_PRESENTATION_HEIGHT + 0.004, 6);
       });
 
     const d01 = tree('tree-d-01');
@@ -152,6 +166,79 @@ describe('camada cartográfica de árvores do mapa comercial', () => {
     ] as const;
     expect(commercialTreeGroundElevationAtPosition(d01, shadowPosition, OFFICIAL_REFERENCE_DATA.entities))
       .toBeCloseTo(0.036, 6);
+    expect(commercialTreeShadowElevationAtPosition(d01, shadowPosition, OFFICIAL_REFERENCE_DATA.entities))
+      .toBeCloseTo(0.044, 6);
+  });
+
+  it('apoia os dez troncos e sombras do Portão 4 no topo visível sem alterar a extrusão canônica', () => {
+    const districtTrees = COMMERCIAL_MAP_TREES.filter((tree) => tree.area === 'GATE_FOUR_DISTRICT');
+    const motorhome = OFFICIAL_REFERENCE_DATA.entities.find((entity) => (
+      entity.publicIdentifier === 'AREA-MOTORHOME'
+    ))!;
+    const canonicalGeometry = JSON.parse(JSON.stringify(motorhome.geometry));
+    const presentedEntities = withGateFourDistrictPresentationEntities(OFFICIAL_REFERENCE_DATA.entities);
+    const raisedMotorhome = {
+      ...motorhome,
+      geometry: { ...motorhome.geometry, elevation: 0.3 },
+    };
+    const raisedEntities = presentedEntities.map((entity) => (
+      entity.id === motorhome.id ? raisedMotorhome : entity
+    ));
+
+    expect(districtTrees).toHaveLength(10);
+    expect(OPEN_GROUND_PRESENTATION_HEIGHT).toBe(RENDERED_OPEN_GROUND_HEIGHT);
+    expect(motorhome.geometry.extrusionHeight).toBe(0.055);
+
+    districtTrees.forEach((tree) => {
+      const shadowOffset = tree.canopyRadius * 0.55;
+      const shadowPosition = [
+        tree.position[0] + tree.shadowDirection[0] * shadowOffset,
+        tree.position[1] + tree.shadowDirection[1] * shadowOffset,
+      ] as const;
+      expect(tree.surfaceEntityIdentifier, tree.id).toBe('AREA-MOTORHOME');
+      expect(pointInPolygon(tree.position, motorhome.geometry.coordinates[0]), tree.id).toBe(true);
+      expect(pointInPolygon(shadowPosition, motorhome.geometry.coordinates[0]), tree.id).toBe(true);
+      [OFFICIAL_REFERENCE_DATA.entities, presentedEntities].forEach((entities) => {
+        expect(commercialTreeGroundElevation(tree, entities), tree.id)
+          .toBeCloseTo(motorhome.geometry.elevation + OPEN_GROUND_PRESENTATION_HEIGHT + 0.004, 6);
+        expect(commercialTreeShadowElevationAtPosition(tree, shadowPosition, entities), tree.id)
+          .toBeCloseTo(motorhome.geometry.elevation + OPEN_GROUND_PRESENTATION_HEIGHT + 0.002, 6);
+      });
+      expect(commercialTreeGroundElevation(tree, raisedEntities), tree.id)
+        .toBeCloseTo(0.3 + OPEN_GROUND_PRESENTATION_HEIGHT + 0.004, 6);
+      expect(commercialTreeShadowElevationAtPosition(tree, shadowPosition, raisedEntities), tree.id)
+        .toBeCloseTo(0.3 + OPEN_GROUND_PRESENTATION_HEIGHT + 0.002, 6);
+    });
+
+    expect(motorhome.geometry).toEqual(canonicalGeometry);
+    expect(motorhome.geometry.extrusionHeight).toBe(0.055);
+    expect(presentedEntities.find((entity) => entity.id === motorhome.id)).toBe(motorhome);
+  });
+
+  it('resolve sombras na via por posição e preserva os demais suportes fora do motorhome', () => {
+    const districtTree = COMMERCIAL_MAP_TREES.find((tree) => tree.area === 'GATE_FOUR_DISTRICT')!;
+    const presentedEntities = withGateFourDistrictPresentationEntities(OFFICIAL_REFERENCE_DATA.entities);
+    const road = presentedEntities.find((entity) => entity.publicIdentifier === 'RUA-BUENOS-AIRES')!;
+    const roadPoint = officialPdfPointToLocal([1624, 2360]);
+    const roadHeight = road.geometry.elevation + road.geometry.extrusionHeight;
+
+    expect(commercialTreeGroundElevationAtPosition(districtTree, roadPoint, presentedEntities))
+      .toBeCloseTo(roadHeight + 0.004, 6);
+    expect(commercialTreeShadowElevationAtPosition(districtTree, roadPoint, presentedEntities))
+      .toBeCloseTo(roadHeight + 0.012, 6);
+    expect(commercialTreeGroundElevation(districtTree, [])).toBeCloseTo(0.036, 6);
+    expect(commercialTreeShadowElevationAtPosition(districtTree, districtTree.position, []))
+      .toBeCloseTo(0.044, 6);
+
+    COMMERCIAL_MAP_TREES.filter((tree) => tree.area !== 'GATE_FOUR_DISTRICT').forEach((tree) => {
+      const shadowOffset = tree.canopyRadius * 0.55;
+      const shadowPosition = [
+        tree.position[0] + tree.shadowDirection[0] * shadowOffset,
+        tree.position[1] + tree.shadowDirection[1] * shadowOffset,
+      ] as const;
+      expect(commercialTreeShadowElevationAtPosition(tree, shadowPosition, presentedEntities), tree.id)
+        .toBeCloseTo(commercialTreeGroundElevationAtPosition(tree, shadowPosition, presentedEntities) + 0.008, 6);
+    });
   });
 
   it('associa apenas árvores de lote ao identificador cadastral correto e tolera a copa na borda', () => {

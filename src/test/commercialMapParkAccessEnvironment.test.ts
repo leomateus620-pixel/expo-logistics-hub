@@ -17,6 +17,7 @@ import {
 } from '@/features/commercial-map/data/parkAccessSpatialPlan';
 import { COMMERCIAL_MAP_TREES } from '@/features/commercial-map/data/commercialTrees';
 import { OFFICIAL_REFERENCE_DATA } from '@/features/commercial-map/data/officialReference2026';
+import { OPEN_GROUND_PRESENTATION_HEIGHT } from '@/features/commercial-map/components/canvas/openGroundTextures';
 import {
   PARK_ACCESS_ENVIRONMENT_PRIMARY_DRAW_CALL_BUDGET,
   createParkAccessPolylineRibbon,
@@ -93,6 +94,20 @@ function appendShapePath(path: THREE.Shape | THREE.Path, polygon: ParkAccessPoly
 }
 
 describe('ambientação dos acessos, Caminho do Bosque e Sede Costeiros', () => {
+  it('mantém as transições interpretadas abaixo das superfícies oficiais texturizadas', () => {
+    const surfaces = resolveParkAccessEnvironmentPresentation(false).environmentalSurfaces;
+    const overlappingDressing = [
+      'costeiros-yard-exposed-soil',
+      'costeiros-field-transition',
+      'costeiros-forest-transition',
+    ].map((id) => surfaces.find((surface) => surface.id === id)!);
+
+    overlappingDressing.forEach((surface) => {
+      expect(surface, surface.id).toBeDefined();
+      expect(surface.elevation, surface.id).toBeLessThan(OPEN_GROUND_PRESENTATION_HEIGHT);
+    });
+  });
+
   it('deriva superfícies somente do contrato GIS e recorta clareira e footprints protegidos', () => {
     const presentation = resolveParkAccessEnvironmentPresentation(false);
     const woodlandFloor = presentation.environmentalSurfaces.find(
