@@ -239,7 +239,12 @@ export function getOpenGroundTexture(surface: OpenGroundSurface): THREE.CanvasTe
   texture.wrapS = THREE.RepeatWrapping;
   texture.wrapT = THREE.RepeatWrapping;
   texture.colorSpace = THREE.SRGBColorSpace;
-  texture.anisotropy = 8;
+  // Trilinear mipmapping plus anisotropy is what keeps the surface readable at
+  // shallow, distant camera angles instead of collapsing to a flat tone.
+  texture.generateMipmaps = true;
+  texture.minFilter = THREE.LinearMipmapLinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+  texture.anisotropy = 16;
   texture.needsUpdate = true;
   TEXTURE_CACHE.set(surface, texture);
   return texture;
@@ -249,14 +254,20 @@ export function getOpenGroundTexture(surface: OpenGroundSurface): THREE.CanvasTe
  * ExtrudeGeometry emits world-unit UVs on the top face, so the repeat factor is
  * simply the inverse of the tile size in world units.
  */
-export function openGroundTextureForEntity(profile: OpenGroundSurfaceProfile) {
+export function openGroundTextureForEntity(
+  profile: OpenGroundSurfaceProfile,
+  maxAnisotropy = 16,
+) {
   const shared = getOpenGroundTexture(profile.surface);
   if (!shared) return null;
   const texture = shared.clone();
   texture.wrapS = THREE.RepeatWrapping;
   texture.wrapT = THREE.RepeatWrapping;
   texture.colorSpace = THREE.SRGBColorSpace;
-  texture.anisotropy = shared.anisotropy;
+  texture.generateMipmaps = true;
+  texture.minFilter = THREE.LinearMipmapLinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+  texture.anisotropy = Math.max(1, Math.min(16, maxAnisotropy));
   texture.repeat.set(1 / profile.tileWorldSize, 1 / profile.tileWorldSize);
   texture.needsUpdate = true;
   return texture;
@@ -264,3 +275,4 @@ export function openGroundTextureForEntity(profile: OpenGroundSurfaceProfile) {
 
 /** Presentation height keeps these fields under the drivable road ribbons. */
 export const OPEN_GROUND_PRESENTATION_HEIGHT = 0.026;
+
