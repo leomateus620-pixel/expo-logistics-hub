@@ -18,17 +18,20 @@ export interface OpenGroundSurfaceProfile {
 export const TEXTURED_OPEN_GROUND: Readonly<Record<string, OpenGroundSurfaceProfile>> = {
   'AREA-MOTORHOME': {
     surface: 'grass',
-    tileWorldSize: 3.2,
-    baseColor: '#ffffff',
+    // Larger tiles keep the pattern above one screen pixel at park-wide zoom,
+    // which is what prevents the mipmap chain from flattening it out.
+    tileWorldSize: 7.5,
+    baseColor: '#8aa465',
     roughness: 0.97,
   },
   'TEST-DRIVE': {
     surface: 'compactedGravel',
-    tileWorldSize: 3.8,
-    baseColor: '#ffffff',
+    tileWorldSize: 9,
+    baseColor: '#b39a78',
     roughness: 0.94,
   },
 };
+
 
 export function resolveOpenGroundProfile(publicIdentifier: string) {
   return TEXTURED_OPEN_GROUND[publicIdentifier] ?? null;
