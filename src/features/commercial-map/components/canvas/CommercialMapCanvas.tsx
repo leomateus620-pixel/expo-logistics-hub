@@ -40,6 +40,11 @@ import {
 } from '../../data/nationsDistrict';
 import { COMMERCIAL_MAP_ENVIRONMENT_CONFIG } from '../../data/commercialMapEnvironment';
 import {
+  OPEN_GROUND_PRESENTATION_HEIGHT,
+  openGroundTextureForEntity,
+  resolveOpenGroundProfile,
+} from './openGroundTextures';
+import {
   resolveStrategicLandmarkKind,
   strategicLandmarkBounds,
   strategicLandmarkFocusDirection,
