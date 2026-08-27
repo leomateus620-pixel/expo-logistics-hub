@@ -655,10 +655,13 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
     () => resolveOpenGroundProfile(entity.publicIdentifier),
     [entity.publicIdentifier],
   );
+  const renderer = useThree((state) => state.gl);
+  const maxAnisotropy = openGroundProfile ? renderer.capabilities.getMaxAnisotropy() : 1;
   const openGroundTexture = useMemo(
-    () => (openGroundProfile ? openGroundTextureForEntity(openGroundProfile) : null),
-    [openGroundProfile],
+    () => (openGroundProfile ? openGroundTextureForEntity(openGroundProfile, maxAnisotropy) : null),
+    [maxAnisotropy, openGroundProfile],
   );
+
   const geometry = useMemo(
     () => isQuadra || isGate || isNationsPresentationSurface
       ? null
