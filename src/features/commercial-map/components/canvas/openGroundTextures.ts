@@ -142,16 +142,21 @@ function paintGrass(context: CanvasRenderingContext2D) {
 
 function paintCompactedGravel(context: CanvasRenderingContext2D) {
   const image = context.createImageData(TEXTURE_SIZE, TEXTURE_SIZE);
-  const base = [166, 148, 118];
-  const dark = [118, 103, 82];
-  const pale = [200, 186, 158];
+  const base = [206, 198, 182];
+  const dark = [150, 142, 128];
+  const pale = [242, 236, 222];
 
   for (let y = 0; y < TEXTURE_SIZE; y += 1) {
     for (let x = 0; x < TEXTURE_SIZE; x += 1) {
       const offset = (y * TEXTURE_SIZE + x) * 4;
+      const macro = fractalNoise(x / 190, y / 190, 6.4, 2);
       const patch = fractalNoise(x / 52, y / 52, 11.9, 4);
       const grain = seededNoise(x, y, 17.3) - 0.5;
-      const blend = THREE.MathUtils.clamp(patch * 1.2 - 0.1 + grain * 0.42, 0, 1);
+      const blend = THREE.MathUtils.clamp(
+        patch * 0.6 + (macro - 0.5) * 0.95 + 0.24 + grain * 0.32,
+        0,
+        1,
+      );
       const toneA = dark[0] + (base[0] - dark[0]) * blend;
       const toneB = dark[1] + (base[1] - dark[1]) * blend;
       const toneC = dark[2] + (base[2] - dark[2]) * blend;
@@ -171,31 +176,32 @@ function paintCompactedGravel(context: CanvasRenderingContext2D) {
     const radius = 0.5 + seededNoise(index, 5.5, 2.8) * 1.5;
     const tone = seededNoise(index, 1.3, 7.7);
     context.fillStyle = tone > 0.66
-      ? 'rgba(226,215,190,.4)'
+      ? 'rgba(250,246,236,.4)'
       : tone > 0.33
-        ? 'rgba(126,110,88,.34)'
-        : 'rgba(88,76,60,.3)';
+        ? 'rgba(164,154,138,.34)'
+        : 'rgba(126,118,104,.3)';
     context.beginPath();
     context.arc(x, y, radius, 0, Math.PI * 2);
     context.fill();
   }
 
-  // Compacted wheel tracks read as manoeuvring lanes on the apron.
-  for (let lane = 40; lane < TEXTURE_SIZE; lane += 148) {
-    const gradient = context.createLinearGradient(0, lane, 0, lane + 46);
-    gradient.addColorStop(0, 'rgba(96,84,66,0)');
-    gradient.addColorStop(0.5, 'rgba(96,84,66,.2)');
-    gradient.addColorStop(1, 'rgba(96,84,66,0)');
+  // Wide compacted wheel tracks: low frequency so the apron still reads as a
+  // manoeuvring yard from a park-wide camera.
+  for (let lane = 30; lane < TEXTURE_SIZE; lane += 170) {
+    const gradient = context.createLinearGradient(0, lane, 0, lane + 96);
+    gradient.addColorStop(0, 'rgba(132,122,106,0)');
+    gradient.addColorStop(0.5, 'rgba(132,122,106,.3)');
+    gradient.addColorStop(1, 'rgba(132,122,106,0)');
     context.fillStyle = gradient;
-    context.fillRect(0, lane, TEXTURE_SIZE, 46);
+    context.fillRect(0, lane, TEXTURE_SIZE, 96);
   }
 
   // Grass creeping in from unused stretches.
-  for (let index = 0; index < 900; index += 1) {
+  for (let index = 0; index < 1400; index += 1) {
     const x = seededNoise(index, 7.9, 12.4) * TEXTURE_SIZE;
     const y = seededNoise(index, 2.6, 15.8) * TEXTURE_SIZE;
-    if (fractalNoise(x / 96, y / 96, 33.5, 3) < 0.62) continue;
-    context.strokeStyle = 'rgba(96,124,72,.42)';
+    if (fractalNoise(x / 96, y / 96, 33.5, 3) < 0.6) continue;
+    context.strokeStyle = 'rgba(148,168,124,.5)';
     context.lineWidth = 1;
     context.beginPath();
     context.moveTo(x, y);
@@ -203,6 +209,7 @@ function paintCompactedGravel(context: CanvasRenderingContext2D) {
     context.stroke();
   }
 }
+
 
 const TEXTURE_CACHE = new Map<OpenGroundSurface, THREE.CanvasTexture | null>();
 
