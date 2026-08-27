@@ -11,6 +11,7 @@ export type CommercialTreeArea = CommercialTreeQuadra
   | 'RUA_BRASIL_GROVE'
   | 'TERCEIRA_IDADE_EDGE'
   | 'GATE_FOUR_DISTRICT'
+  | 'REAR_PARKING'
   | 'NATIONS_DISTRICT';
 
 export type CommercialTreePlacement =
@@ -80,6 +81,7 @@ export const COMMERCIAL_TREE_SOURCE_REFERENCES = {
   RUA_BRASIL_GROVE: 'Anexos 3 e 7 — árvores limítrofes da Rua Brasil',
   TERCEIRA_IDADE_EDGE: 'Anexos 3 e 7 — árvores próximas ao Pavilhão Terceira Idade',
   GATE_FOUR_DISTRICT: 'Anexos 5 a 7 — árvores maduras e floração ornamental no entorno do Núcleo Crioulo e da Rua Buenos Aires',
+  REAR_PARKING: 'Anexo 7 — satélite IMG_9816 (1).jpeg, 1179 × 861 pixels; copas das bordas do estacionamento posterior',
   NATIONS_DISTRICT: 'Anexos oficiais IMG_9670 (1).jpeg e IMG_9671.jpeg — massas periféricas da Praça das Nações',
 } as const satisfies Record<CommercialTreeArea, string>;
 
@@ -90,6 +92,7 @@ export const COMMERCIAL_TREE_AREA_SCENE_ANCHORS: Readonly<Record<Exclude<Commerc
   RUA_BRASIL_GROVE: ['RUA-BRASIL', 'B1', 'B2', 'G'],
   TERCEIRA_IDADE_EDGE: ['B22'],
   GATE_FOUR_DISTRICT: ['A4', 'D5', 'PAVILHAO-09', 'AREA-MOTORHOME'],
+  REAR_PARKING: ['PAVILHAO-09', 'PISTA-CAMPEIRA'],
   NATIONS_DISTRICT: ['B20', 'B29', 'C5', 'C6', 'C7', 'C8', 'PORTICO-NACOES'],
 };
 
@@ -145,6 +148,7 @@ const TREE_AREA_ID_PREFIX: Readonly<Record<CommercialTreeArea, string>> = {
   RUA_BRASIL_GROVE: 'rua-brasil',
   TERCEIRA_IDADE_EDGE: 'terceira-idade',
   GATE_FOUR_DISTRICT: 'gate-four',
+  REAR_PARKING: 'rear-parking',
   NATIONS_DISTRICT: 'nations',
 };
 
@@ -428,7 +432,9 @@ export const COMMERCIAL_TREE_COUNTS_BY_QUADRA: Readonly<Record<CommercialTreeQua
   E: QUADRA_E_TREES.length,
 };
 
-export const COMMERCIAL_TREE_COUNTS_BY_AREA: Readonly<Record<CommercialTreeArea, number>> = {
+// Rear parking is projected and reconciled by its sector layer; it must not
+// silently change the existing canonical inventory or be counted twice here.
+export const COMMERCIAL_TREE_COUNTS_BY_AREA: Readonly<Record<Exclude<CommercialTreeArea, 'REAR_PARKING'>, number>> = {
   ...COMMERCIAL_TREE_COUNTS_BY_QUADRA,
   PARKING_EXHIBITORS_VISITORS: PARKING_EXHIBITORS_VISITORS_TREES.length,
   PARKING_VISITORS: PARKING_VISITORS_TREES.length,
