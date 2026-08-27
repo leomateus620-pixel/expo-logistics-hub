@@ -526,11 +526,11 @@ function createEntityShape(entity: MapEntity) {
   return shape;
 }
 
-function createEntityGeometry(entity: MapEntity) {
+function createEntityGeometry(entity: MapEntity, heightOverride?: number) {
   const shape = createEntityShape(entity);
   const classification = String(entity.classification);
   const surface = ['ROAD', 'PEDESTRIAN_PATH', 'GREEN_AREA', 'PARKING', 'WATER', 'QUADRA'].includes(classification);
-  const height = surface ? Math.max(0.018, Math.min(entity.geometry.extrusionHeight, 0.08)) : Math.max(0.025, entity.geometry.extrusionHeight);
+  const height = heightOverride ?? (surface ? Math.max(0.018, Math.min(entity.geometry.extrusionHeight, 0.08)) : Math.max(0.025, entity.geometry.extrusionHeight));
   // Pavilion footprints follow the official fill exactly. A bevel expands the
   // silhouette beyond that footprint and made neighbouring buildings appear
   // stacked even when their cartographic bounds only touched.
