@@ -18,17 +18,20 @@ export interface OpenGroundSurfaceProfile {
 export const TEXTURED_OPEN_GROUND: Readonly<Record<string, OpenGroundSurfaceProfile>> = {
   'AREA-MOTORHOME': {
     surface: 'grass',
-    tileWorldSize: 3.2,
-    baseColor: '#ffffff',
+    // Larger tiles keep the pattern above one screen pixel at park-wide zoom,
+    // which is what prevents the mipmap chain from flattening it out.
+    tileWorldSize: 7.5,
+    baseColor: '#8aa465',
     roughness: 0.97,
   },
   'TEST-DRIVE': {
     surface: 'compactedGravel',
-    tileWorldSize: 3.8,
-    baseColor: '#ffffff',
+    tileWorldSize: 9,
+    baseColor: '#b39a78',
     roughness: 0.94,
   },
 };
+
 
 export function resolveOpenGroundProfile(publicIdentifier: string) {
   return TEXTURED_OPEN_GROUND[publicIdentifier] ?? null;
@@ -71,25 +74,38 @@ function fractalNoise(x: number, y: number, seed: number, octaves = 4) {
   return total / normalization;
 }
 
+/**
+ * Palettes are authored as *modulation* around a bright neutral (mean ≈ 200) so
+ * the material `color` supplies the hue. That way the fully mip-averaged tile —
+ * what the GPU shows at park-wide zoom — still resolves to the field's real
+ * colour instead of a washed out grey.
+ */
 function paintGrass(context: CanvasRenderingContext2D) {
   const image = context.createImageData(TEXTURE_SIZE, TEXTURE_SIZE);
-  const deep = [58, 96, 52];
-  const light = [126, 158, 82];
-  const dry = [156, 152, 96];
+  const deep = [128, 152, 118];
+  const light = [226, 238, 208];
+  const dry = [238, 226, 186];
 
   for (let y = 0; y < TEXTURE_SIZE; y += 1) {
     for (let x = 0; x < TEXTURE_SIZE; x += 1) {
       const offset = (y * TEXTURE_SIZE + x) * 4;
+      // Macro patches (low frequency) survive mipmapping and carry the terrain
+      // reading at distance; the fine grain only matters up close.
+      const macro = fractalNoise(x / 210, y / 210, 4.1, 2);
       const patch = fractalNoise(x / 64, y / 64, 7.3, 4);
-      const dryness = THREE.MathUtils.clamp((fractalNoise(x / 128, y / 128, 21.1, 3) - 0.52) * 3.1, 0, 1);
+      const dryness = THREE.MathUtils.clamp((fractalNoise(x / 150, y / 150, 21.1, 3) - 0.5) * 3.4, 0, 1);
       const grain = seededNoise(x, y, 3.4) - 0.5;
-      const blend = THREE.MathUtils.clamp(patch * 1.15 - 0.08 + grain * 0.24, 0, 1);
+      const blend = THREE.MathUtils.clamp(
+        patch * 0.62 + (macro - 0.5) * 0.85 + 0.2 + grain * 0.18,
+        0,
+        1,
+      );
       const r = deep[0] + (light[0] - deep[0]) * blend;
       const g = deep[1] + (light[1] - deep[1]) * blend;
       const b = deep[2] + (light[2] - deep[2]) * blend;
-      image.data[offset] = THREE.MathUtils.clamp(r + (dry[0] - r) * dryness * 0.72, 0, 255);
-      image.data[offset + 1] = THREE.MathUtils.clamp(g + (dry[1] - g) * dryness * 0.72, 0, 255);
-      image.data[offset + 2] = THREE.MathUtils.clamp(b + (dry[2] - b) * dryness * 0.72, 0, 255);
+      image.data[offset] = THREE.MathUtils.clamp(r + (dry[0] - r) * dryness * 0.6, 0, 255);
+      image.data[offset + 1] = THREE.MathUtils.clamp(g + (dry[1] - g) * dryness * 0.6, 0, 255);
+      image.data[offset + 2] = THREE.MathUtils.clamp(b + (dry[2] - b) * dryness * 0.6, 0, 255);
       image.data[offset + 3] = 255;
     }
   }
@@ -104,35 +120,43 @@ function paintGrass(context: CanvasRenderingContext2D) {
     const lean = (seededNoise(index, 6.6, 1.1) - 0.5) * 2.2;
     const bright = seededNoise(index, 2.2, 6.4);
     context.strokeStyle = bright > 0.62
-      ? 'rgba(168,196,110,.34)'
+      ? 'rgba(244,252,224,.3)'
       : bright > 0.3
-        ? 'rgba(74,112,60,.32)'
-        : 'rgba(44,74,44,.3)';
+        ? 'rgba(150,176,138,.3)'
+        : 'rgba(116,140,108,.28)';
     context.beginPath();
     context.moveTo(x, y);
     context.lineTo(x + lean, y - length);
     context.stroke();
   }
 
-  // Sparse mowing bands keep the large field from reading as flat noise.
-  for (let band = 0; band < TEXTURE_SIZE; band += 128) {
-    context.fillStyle = 'rgba(255,255,255,.032)';
-    context.fillRect(0, band, TEXTURE_SIZE, 64);
+  // Wide mowing bands: low frequency, so they stay legible when zoomed out.
+  for (let band = 0; band < TEXTURE_SIZE; band += 170) {
+    context.fillStyle = 'rgba(255,255,255,.075)';
+    context.fillRect(0, band, TEXTURE_SIZE, 85);
+    context.fillStyle = 'rgba(96,116,92,.075)';
+    context.fillRect(0, band + 85, TEXTURE_SIZE, 85);
   }
 }
 
+
 function paintCompactedGravel(context: CanvasRenderingContext2D) {
   const image = context.createImageData(TEXTURE_SIZE, TEXTURE_SIZE);
-  const base = [166, 148, 118];
-  const dark = [118, 103, 82];
-  const pale = [200, 186, 158];
+  const base = [206, 198, 182];
+  const dark = [150, 142, 128];
+  const pale = [242, 236, 222];
 
   for (let y = 0; y < TEXTURE_SIZE; y += 1) {
     for (let x = 0; x < TEXTURE_SIZE; x += 1) {
       const offset = (y * TEXTURE_SIZE + x) * 4;
+      const macro = fractalNoise(x / 190, y / 190, 6.4, 2);
       const patch = fractalNoise(x / 52, y / 52, 11.9, 4);
       const grain = seededNoise(x, y, 17.3) - 0.5;
-      const blend = THREE.MathUtils.clamp(patch * 1.2 - 0.1 + grain * 0.42, 0, 1);
+      const blend = THREE.MathUtils.clamp(
+        patch * 0.6 + (macro - 0.5) * 0.95 + 0.24 + grain * 0.32,
+        0,
+        1,
+      );
       const toneA = dark[0] + (base[0] - dark[0]) * blend;
       const toneB = dark[1] + (base[1] - dark[1]) * blend;
       const toneC = dark[2] + (base[2] - dark[2]) * blend;
@@ -152,31 +176,32 @@ function paintCompactedGravel(context: CanvasRenderingContext2D) {
     const radius = 0.5 + seededNoise(index, 5.5, 2.8) * 1.5;
     const tone = seededNoise(index, 1.3, 7.7);
     context.fillStyle = tone > 0.66
-      ? 'rgba(226,215,190,.4)'
+      ? 'rgba(250,246,236,.4)'
       : tone > 0.33
-        ? 'rgba(126,110,88,.34)'
-        : 'rgba(88,76,60,.3)';
+        ? 'rgba(164,154,138,.34)'
+        : 'rgba(126,118,104,.3)';
     context.beginPath();
     context.arc(x, y, radius, 0, Math.PI * 2);
     context.fill();
   }
 
-  // Compacted wheel tracks read as manoeuvring lanes on the apron.
-  for (let lane = 40; lane < TEXTURE_SIZE; lane += 148) {
-    const gradient = context.createLinearGradient(0, lane, 0, lane + 46);
-    gradient.addColorStop(0, 'rgba(96,84,66,0)');
-    gradient.addColorStop(0.5, 'rgba(96,84,66,.2)');
-    gradient.addColorStop(1, 'rgba(96,84,66,0)');
+  // Wide compacted wheel tracks: low frequency so the apron still reads as a
+  // manoeuvring yard from a park-wide camera.
+  for (let lane = 30; lane < TEXTURE_SIZE; lane += 170) {
+    const gradient = context.createLinearGradient(0, lane, 0, lane + 96);
+    gradient.addColorStop(0, 'rgba(132,122,106,0)');
+    gradient.addColorStop(0.5, 'rgba(132,122,106,.3)');
+    gradient.addColorStop(1, 'rgba(132,122,106,0)');
     context.fillStyle = gradient;
-    context.fillRect(0, lane, TEXTURE_SIZE, 46);
+    context.fillRect(0, lane, TEXTURE_SIZE, 96);
   }
 
   // Grass creeping in from unused stretches.
-  for (let index = 0; index < 900; index += 1) {
+  for (let index = 0; index < 1400; index += 1) {
     const x = seededNoise(index, 7.9, 12.4) * TEXTURE_SIZE;
     const y = seededNoise(index, 2.6, 15.8) * TEXTURE_SIZE;
-    if (fractalNoise(x / 96, y / 96, 33.5, 3) < 0.62) continue;
-    context.strokeStyle = 'rgba(96,124,72,.42)';
+    if (fractalNoise(x / 96, y / 96, 33.5, 3) < 0.6) continue;
+    context.strokeStyle = 'rgba(148,168,124,.5)';
     context.lineWidth = 1;
     context.beginPath();
     context.moveTo(x, y);
@@ -184,6 +209,7 @@ function paintCompactedGravel(context: CanvasRenderingContext2D) {
     context.stroke();
   }
 }
+
 
 const TEXTURE_CACHE = new Map<OpenGroundSurface, THREE.CanvasTexture | null>();
 
@@ -213,7 +239,12 @@ export function getOpenGroundTexture(surface: OpenGroundSurface): THREE.CanvasTe
   texture.wrapS = THREE.RepeatWrapping;
   texture.wrapT = THREE.RepeatWrapping;
   texture.colorSpace = THREE.SRGBColorSpace;
-  texture.anisotropy = 8;
+  // Trilinear mipmapping plus anisotropy is what keeps the surface readable at
+  // shallow, distant camera angles instead of collapsing to a flat tone.
+  texture.generateMipmaps = true;
+  texture.minFilter = THREE.LinearMipmapLinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+  texture.anisotropy = 16;
   texture.needsUpdate = true;
   TEXTURE_CACHE.set(surface, texture);
   return texture;
@@ -223,14 +254,20 @@ export function getOpenGroundTexture(surface: OpenGroundSurface): THREE.CanvasTe
  * ExtrudeGeometry emits world-unit UVs on the top face, so the repeat factor is
  * simply the inverse of the tile size in world units.
  */
-export function openGroundTextureForEntity(profile: OpenGroundSurfaceProfile) {
+export function openGroundTextureForEntity(
+  profile: OpenGroundSurfaceProfile,
+  maxAnisotropy = 16,
+) {
   const shared = getOpenGroundTexture(profile.surface);
   if (!shared) return null;
   const texture = shared.clone();
   texture.wrapS = THREE.RepeatWrapping;
   texture.wrapT = THREE.RepeatWrapping;
   texture.colorSpace = THREE.SRGBColorSpace;
-  texture.anisotropy = shared.anisotropy;
+  texture.generateMipmaps = true;
+  texture.minFilter = THREE.LinearMipmapLinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+  texture.anisotropy = Math.max(1, Math.min(16, maxAnisotropy));
   texture.repeat.set(1 / profile.tileWorldSize, 1 / profile.tileWorldSize);
   texture.needsUpdate = true;
   return texture;
@@ -238,3 +275,4 @@ export function openGroundTextureForEntity(profile: OpenGroundSurfaceProfile) {
 
 /** Presentation height keeps these fields under the drivable road ribbons. */
 export const OPEN_GROUND_PRESENTATION_HEIGHT = 0.026;
+
