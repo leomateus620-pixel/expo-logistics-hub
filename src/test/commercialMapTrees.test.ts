@@ -24,10 +24,57 @@ import { COMMERCIAL_MAP_SEGMENT_IDS } from '@/features/commercial-map/data/comme
 import { OPEN_GROUND_PRESENTATION_HEIGHT } from '@/features/commercial-map/constants';
 import { OPEN_GROUND_PRESENTATION_HEIGHT as RENDERED_OPEN_GROUND_HEIGHT } from '@/features/commercial-map/components/canvas/openGroundTextures';
 import { withGateFourDistrictPresentationEntities } from '@/features/commercial-map/data/gateFourDistrict';
+import {
+  buildRearParkingTrees,
+  REAR_PARKING_CANOPY_OBSERVATIONS,
+  type RearParkingSatelliteProjection,
+} from '@/features/commercial-map/data/rearParkingVegetation';
 import { scopeCommercialMapData } from '@/features/commercial-map/utils/areaScope';
 import type { Coordinate, MapEntity } from '@/features/commercial-map/types';
 
 const EPSILON = 1e-6;
+
+describe('projeção das copas do estacionamento posterior', () => {
+  const project: RearParkingSatelliteProjection = ([x, y]) => [35 - x * 0.052 + y * 0.006, -67 + x * 0.011 + y * 0.049];
+
+  it('preserva a área das elipses sob rotação/reflexão e mantém a origem PDF canônica', () => {
+    const trees = buildRearParkingTrees(project);
+    const determinant = Math.abs(-0.052 * 0.049 - 0.006 * 0.011);
+
+    trees.forEach((tree, index) => {
+      const observation = REAR_PARKING_CANOPY_OBSERVATIONS[index];
+      const expectedPosition = project(observation.satellitePosition);
+      const expectedRadius = Math.sqrt(determinant * observation.canopyRadiiPixels[0] * observation.canopyRadiiPixels[1]);
+      const canonicalPosition = officialPdfPointToLocal(tree.sourcePosition);
+      expect(tree.position[0], tree.id).toBeCloseTo(expectedPosition[0], 4);
+      expect(tree.position[1], tree.id).toBeCloseTo(expectedPosition[1], 4);
+      expect(tree.canopyRadius, tree.id).toBeCloseTo(expectedRadius, 4);
+      expect(canonicalPosition[0], tree.id).toBeCloseTo(tree.position[0], 4);
+      expect(canonicalPosition[1], tree.id).toBeCloseTo(tree.position[1], 4);
+      expect(tree.satelliteObservation, tree.id).toBe(observation);
+    });
+  });
+
+  it('mantém IDs e variantes estáveis ao recalibrar sem misturar candidatos no inventário anterior', () => {
+    const first = buildRearParkingTrees(project);
+    const shifted = buildRearParkingTrees((pixel) => {
+      const [x, z] = project(pixel);
+      return [x + 10, z - 7];
+    });
+    const identity = (trees: typeof first) => trees.map(({ id, visualVariant, satelliteObservation }) => ({ id, visualVariant, satelliteObservation }));
+    expect(identity(shifted)).toEqual(identity(first));
+    expect(new Set(first.map((tree) => tree.id)).size).toBe(first.length);
+    expect(first.every((tree) => !COMMERCIAL_MAP_TREES.some((existing) => existing.id === tree.id))).toBe(true);
+    expect(shifted[0].position[0]).toBeCloseTo(first[0].position[0] + 10, 4);
+    expect(shifted[0].position[1]).toBeCloseTo(first[0].position[1] - 7, 4);
+    expect(shifted[0].canopyRadius).toBe(first[0].canopyRadius);
+  });
+
+  it('rejeita calibrações inválidas em vez de gerar copas invisíveis ou coordenadas NaN', () => {
+    expect(() => buildRearParkingTrees(() => [Number.NaN, 0])).toThrow(/finite world coordinates/);
+    expect(() => buildRearParkingTrees(() => [0, 0])).toThrow(/projection collapsed/);
+  });
+});
 
 function pointOnSegment(point: readonly [number, number], start: Coordinate, end: Coordinate) {
   const cross = (end[0] - start[0]) * (point[1] - start[1])

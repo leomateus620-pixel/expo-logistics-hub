@@ -69,6 +69,12 @@ import {
 } from '../../utils/mapPresentation';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import {
+  getRearParkingFocusBounds, rearParkingVisibleInArea, rearParkingLayerPresentation,
+  REAR_PARKING_SCENE_SUPPORT_POINTS, REAR_PARKING_GROUND_SUPPORTS, reconcileRearParkingTrees, rearParkingEntityForPresentation,
+} from '../../data/rearParking';
+import { RearParkingLayer } from './RearParkingLayer';
+import { resolveParkingCameraFrame, resolveParkingViewportInsets } from '../../utils/parkingViewport';
+import {
   COMMERCIAL_MAP_HYDROLOGICAL_PORTRAIT_DIRECTION,
   COMMERCIAL_MAP_HYDROLOGICAL_PORTRAIT_FIT_PADDING,
   COMMERCIAL_MAP_MANUAL_NAVIGATION_REFIT_SUPPRESSION_MS,
@@ -125,6 +131,7 @@ const CommercialHydrologicalInfrastructureLayer = lazy(async () => {
 
 interface CommercialMapCanvasProps {
   entities: MapEntity[];
+  parkingOwnerEntities?: readonly MapEntity[];
   lots: CommercialLot[];
   calibration: MapCalibration | null;
   matchingEntityIds: ReadonlySet<string>;
@@ -1554,8 +1561,22 @@ function CameraRig({
   const gl = useThree((state) => state.gl);
   const preset = useCommercialMapStore((state) => state.cameraPreset);
   const cameraSequence = useCommercialMapStore((state) => state.cameraSequence);
+  const parkingInspectionOpen = useCommercialMapStore((state) => state.parkingInspectionOpen);
+  const parkingCameraSequence = useCommercialMapStore((state) => state.parkingCameraSequence);
+  const parkingCameraView = useCommercialMapStore((state) => state.parkingCameraView);
+  const selectedParkingBlockId = useCommercialMapStore((state) => state.selectedParkingBlockId);
+  const selectedParkingSpaceId = useCommercialMapStore((state) => state.selectedParkingSpaceId);
   const activePanel = useCommercialMapStore((state) => state.activePanel);
   const setCameraNavigating = useCommercialMapStore((state) => state.setCameraNavigating);
+  const parkingActive = parkingInspectionOpen
+    && rearParkingVisibleInArea(isolatedArea)
+    && !hydrologicalModeActive;
+  // Retain the close-range clamp when the inspector closes. Restoring the
+  // global minimum immediately would move the camera without a navigation action.
+  const [parkingControlLimits, setParkingControlLimits] = useState<{
+    minDistance: number;
+    maxDistance: number;
+  } | null>(null);
   const targetPosition = useRef(new THREE.Vector3());
   const targetLookAt = useRef(new THREE.Vector3(extent.centerX, 0, extent.centerZ));
   const animating = useRef(true);
@@ -1571,6 +1592,13 @@ function CameraRig({
   const previousSelection = useRef<string | null>(selectedEntity?.id ?? null);
   const previousSegment = useRef(activeSegment?.id ?? null);
   const previousDetailsLayout = useRef(activePanel === 'details');
+  const previousParking = useRef({
+    active: parkingActive,
+    sequence: parkingCameraSequence,
+    blockId: selectedParkingBlockId,
+    spaceId: selectedParkingSpaceId,
+    view: parkingCameraView,
+  });
   const returnView = useRef(useCommercialMapStore.getState().interiorReturnView);
   const previousViewportSize = useRef({ width: size.width, height: size.height });
   const resizeRefitTimer = useRef<number | null>(null);
@@ -1583,6 +1611,7 @@ function CameraRig({
   }, [invalidate]);
 
   const queuePreset = useCallback((nextPreset: CameraPreset) => {
+    setParkingControlLimits(null);
     const perspective = camera as THREE.PerspectiveCamera;
     const aspect = size.width / Math.max(size.height, 1);
     const config = CAMERA_PRESETS[nextPreset];
@@ -1649,6 +1678,7 @@ function CameraRig({
   }, [camera, extent, hydrologicalModeActive, size.height, size.width, startCameraMove]);
 
   const queueSelection = useCallback((entity: MapEntity) => {
+    setParkingControlLimits(null);
     const perspective = camera as THREE.PerspectiveCamera;
     const entityExtent = getEntityExtent(entity);
     const focusProfile = focusProfileForEntity(entity);
@@ -1710,6 +1740,7 @@ function CameraRig({
   }, [activePanel, camera, extent, size.height, size.width, startCameraMove]);
 
   const queueSegment = useCallback((segment: CommercialMapSegmentDefinition, segmentEntities: MapEntity[]) => {
+    setParkingControlLimits(null);
     if (segmentEntities.length === 0) {
       queuePreset(preset);
       return;
@@ -1749,8 +1780,66 @@ function CameraRig({
     startCameraMove();
   }, [camera, extent.diagonal, preset, queuePreset, size.height, size.width, startCameraMove]);
 
+  const queueParking = useCallback(() => {
+    const bounds = getRearParkingFocusBounds(
+      selectedParkingBlockId,
+      parkingCameraView === 'detail' ? selectedParkingSpaceId : null,
+      parkingCameraView,
+    );
+    const insets = resolveParkingViewportInsets(size.width, size.height);
+    const canvasRect = gl.domElement.getBoundingClientRect();
+    const panelRect = gl.domElement.closest('.commercial-map-viewport')
+      ?.querySelector<HTMLElement>('[data-parking-inspector]')
+      ?.getBoundingClientRect();
+    if (panelRect && panelRect.width > 0 && panelRect.height > 0 && canvasRect.height > 0) {
+      const useSideClearance = size.width >= 740 && size.height <= 540 && size.width > size.height;
+      if (useSideClearance) insets.left = Math.max(insets.left, panelRect.right - canvasRect.left + 12);
+      else insets.bottom = Math.max(insets.bottom, canvasRect.bottom - panelRect.top + 12);
+    }
+    const frame = resolveParkingCameraFrame({
+      bounds,
+      view: parkingCameraView,
+      viewportWidth: size.width,
+      viewportHeight: size.height,
+      insets,
+    });
+    const limits = {
+      minDistance: frame.minDistance,
+      maxDistance: Math.max(frame.maxDistance, extent.diagonal * 4.5, 260),
+    };
+    setParkingControlLimits((previous) => (
+      previous?.minDistance === limits.minDistance && previous.maxDistance === limits.maxDistance
+        ? previous
+        : limits
+    ));
+    const controls = controlsRef.current;
+    if (controls) {
+      controls.minDistance = limits.minDistance;
+      controls.maxDistance = limits.maxDistance;
+    }
+    targetPosition.current.set(...frame.position);
+    targetLookAt.current.set(...frame.target);
+    const perspective = camera as THREE.PerspectiveCamera;
+    perspective.fov = frame.fov;
+    perspective.near = frame.near;
+    perspective.far = Math.max(frame.far, extent.diagonal * 9);
+    perspective.updateProjectionMatrix();
+    startCameraMove();
+  }, [
+    camera,
+    extent.diagonal,
+    gl,
+    parkingCameraView,
+    selectedParkingBlockId,
+    selectedParkingSpaceId,
+    size.height,
+    size.width,
+    startCameraMove,
+  ]);
+
   resizeRefitView.current = () => {
-    if (selectedEntity) queueSelection(selectedEntity);
+    if (parkingActive) queueParking();
+    else if (selectedEntity) queueSelection(selectedEntity);
     else if (activeSegment) queueSegment(activeSegment, activeSegmentEntities);
     else queuePreset(preset);
   };
@@ -1808,9 +1897,18 @@ function CameraRig({
     const presetChanged = preset !== previousPreset.current;
     const sequenceChanged = cameraSequence !== previousSequence.current;
     const detailsLayoutChanged = (activePanel === 'details') !== previousDetailsLayout.current;
+    const parkingChanged = parkingActive && (
+      !previousParking.current.active
+      || previousParking.current.sequence !== parkingCameraSequence
+      || previousParking.current.blockId !== selectedParkingBlockId
+      || previousParking.current.spaceId !== selectedParkingSpaceId
+      || previousParking.current.view !== parkingCameraView
+    );
+    const parkingClosed = previousParking.current.active && !parkingActive;
 
     if (!initialized.current) {
-      if (returnView.current) {
+      if (parkingActive) queueParking();
+      else if (returnView.current) {
         const perspective = camera as THREE.PerspectiveCamera;
         targetPosition.current.set(...returnView.current.position);
         targetLookAt.current.set(...returnView.current.target);
@@ -1829,6 +1927,14 @@ function CameraRig({
       else if (activeSegment) queueSegment(activeSegment, activeSegmentEntities);
       else queuePreset(preset);
       initialized.current = true;
+    } else if (parkingActive) {
+      // Opening parking clears the ordinary selection in the same store update;
+      // do not let selectionChanged cancel the newly requested parking frame.
+      if (parkingChanged) {
+        cancelScheduledResizeRefit();
+        pendingResizeRefit.current = false;
+        queueParking();
+      }
     } else if (presetChanged) {
       if (activeSegment) queueSegment(activeSegment, activeSegmentEntities);
       else queuePreset(preset);
@@ -1841,6 +1947,12 @@ function CameraRig({
       else queuePreset(preset);
     } else if (selectionChanged && selectedEntity) {
       queueSelection(selectedEntity);
+    } else if (parkingClosed) {
+      cancelScheduledResizeRefit();
+      pendingResizeRefit.current = false;
+      animating.current = false;
+      targetPosition.current.copy(camera.position);
+      targetLookAt.current.copy(controlsRef.current?.target ?? targetLookAt.current);
     } else if (selectionChanged && !selectedEntity) {
       animating.current = false;
     } else if (detailsLayoutChanged && selectedEntity) {
@@ -1852,19 +1964,33 @@ function CameraRig({
     previousSequence.current = cameraSequence;
     previousSegment.current = segmentId;
     previousDetailsLayout.current = activePanel === 'details';
+    previousParking.current = {
+      active: parkingActive,
+      sequence: parkingCameraSequence,
+      blockId: selectedParkingBlockId,
+      spaceId: selectedParkingSpaceId,
+      view: parkingCameraView,
+    };
   }, [
     activePanel,
     activeSegment,
     activeSegmentEntities,
     camera,
     cameraSequence,
+    cancelScheduledResizeRefit,
     extent.diagonal,
     invalidate,
+    parkingActive,
+    parkingCameraSequence,
+    parkingCameraView,
     preset,
+    queueParking,
     queuePreset,
     queueSegment,
     queueSelection,
     selectedEntity,
+    selectedParkingBlockId,
+    selectedParkingSpaceId,
   ]);
 
   useEffect(() => {
@@ -2013,8 +2139,8 @@ function CameraRig({
       enablePan
       enableRotate
       enableZoom
-      minDistance={miranteMinimumDistance}
-      maxDistance={miranteMaximumDistance}
+      minDistance={parkingControlLimits?.minDistance ?? miranteMinimumDistance}
+      maxDistance={parkingControlLimits?.maxDistance ?? miranteMaximumDistance}
       minPolarAngle={COMMERCIAL_MAP_MIN_POLAR_ANGLE}
       maxPolarAngle={Math.PI / 2.08}
       screenSpacePanning={false}
@@ -2031,6 +2157,7 @@ function CameraRig({
 
 function Scene({
   entities,
+  parkingOwnerEntities = entities,
   lots,
   calibration,
   matchingEntityIds,
@@ -2055,6 +2182,12 @@ function Scene({
   );
   const layerVisibility = useCommercialMapStore((state) => state.layerVisibility);
   const layerOpacity = useCommercialMapStore((state) => state.layerOpacity);
+  const parkingInspectionOpen = useCommercialMapStore((state) => state.parkingInspectionOpen);
+  const parkingPresentation = useMemo(
+    () => rearParkingLayerPresentation(parkingOwnerEntities, layerVisibility, layerOpacity),
+    [layerOpacity, layerVisibility, parkingOwnerEntities],
+  );
+  const rearParkingEnabled = rearParkingVisibleInArea(isolatedArea) && !hydrologicalModeActive && parkingPresentation.visible;
   const reducedGraphics = useCommercialMapStore((state) => state.reducedGraphics);
   const cameraNavigating = useCommercialMapStore((state) => state.cameraNavigating);
   const technicalValidationVisible = useCommercialMapStore((state) => state.technicalValidationVisible);
@@ -2087,6 +2220,7 @@ function Scene({
       entities,
       [
         ...(parkAccessVisibleInArea(isolatedArea) ? PARK_ACCESS_SCENE_SUPPORT_POINTS : []),
+        ...(rearParkingVisibleInArea(isolatedArea) ? REAR_PARKING_SCENE_SUPPORT_POINTS : []),
         ...(hydrologicalModeActive
           ? [...sceneElectricalInfrastructure.nodes, ...sceneHydrologicalInfrastructure.nodes]
           : sceneElectricalInfrastructure.nodes),
@@ -2259,16 +2393,19 @@ function Scene({
   ), [nonLotEntities]);
   const structuralEntities = useMemo(() => nonLotEntities.filter((entity) => (
     entity.classification !== 'ROAD' && entity.classification !== 'PEDESTRIAN_PATH'
-  )), [nonLotEntities]);
+  )).map((entity) => rearParkingEnabled ? rearParkingEntityForPresentation(entity) : entity), [nonLotEntities, rearParkingEnabled]);
   const sceneTrees = useMemo(
     () => selectCommercialTreesForScene(entities, lots),
     [entities, lots],
   );
   const presentedSceneTrees = useMemo(() => {
-    const parkAccessCompatibleTrees = (!isolatedArea
+    const baseTrees = (!isolatedArea
       || isolatedArea === COMMERCIAL_MAP_SEGMENT_IDS.industry)
       ? selectParkAccessCompatibleTreesForPresentation(sceneTrees)
       : sceneTrees;
+    const parkAccessCompatibleTrees = rearParkingEnabled
+      ? [...baseTrees, ...reconcileRearParkingTrees(baseTrees, entities)]
+      : baseTrees;
     if (!selectedEntity || resolveStrategicLandmarkKind(selectedEntity) !== 'lunar-tree') {
       return parkAccessCompatibleTrees;
     }
@@ -2280,7 +2417,10 @@ function Scene({
     return parkAccessCompatibleTrees.filter((tree) => (
       treeRemainsVisibleWithSelectedApollo(tree, memorialCenter)
     ));
-  }, [isolatedArea, sceneTrees, selectedEntity]);
+  }, [entities, isolatedArea, rearParkingEnabled, sceneTrees, selectedEntity]);
+  const treeSurfaceEntities = useMemo(() => rearParkingEnabled
+    ? [...exteriorRenderedEntities, ...REAR_PARKING_GROUND_SUPPORTS]
+    : exteriorRenderedEntities, [exteriorRenderedEntities, rearParkingEnabled]);
   const parkAccessPresentation = useMemo(() => {
     const enabledForScope = !isolatedArea
       || isolatedArea === COMMERCIAL_MAP_SEGMENT_IDS.industry;
@@ -2466,6 +2606,9 @@ function Scene({
         layerOpacity={layerOpacity}
         reducedGraphics={reducedGraphics}
       />
+      {rearParkingEnabled && (
+        <RearParkingLayer reducedGraphics={reducedGraphics} labelsVisible={labelsVisible} opacity={parkingPresentation.opacity} />
+      )}
       {(!isolatedArea || isolatedArea === COMMERCIAL_MAP_SEGMENT_IDS.industry)
         && !hydrologicalModeActive && (
           <>
@@ -2537,7 +2680,7 @@ function Scene({
       )}
       <CommercialTreeLayer
         trees={presentedSceneTrees}
-        surfaceEntities={exteriorRenderedEntities}
+        surfaceEntities={treeSurfaceEntities}
         visible={treesVisible && !hydrologicalModeActive}
         reducedGraphics={reducedGraphics}
       />
@@ -2560,7 +2703,8 @@ function Scene({
           />
         </Suspense>
       ) : null}
-      {exteriorRenderedEntities.filter((entity) => labelVisibility.ids.has(entity.id)).map((entity) => (
+      {exteriorRenderedEntities.filter((entity) => labelVisibility.ids.has(entity.id)
+        && (!parkingInspectionOpen || ['PAVILHAO-09', 'D5', 'PISTA-CAMPEIRA', 'J'].includes(entity.publicIdentifier))).map((entity) => (
         <EntityLabel
           key={`label:${entity.id}`}
           entity={entity}
@@ -2609,6 +2753,7 @@ function CanvasLoader() {
 export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: CommercialMapCanvasProps) {
   const {
     entities,
+    parkingOwnerEntities,
     lots,
     calibration,
     matchingEntityIds,
@@ -2677,7 +2822,10 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
   const extent = useMemo(
     () => getSceneExtent(
       entities,
-      parkAccessVisibleInArea(isolatedArea) ? PARK_ACCESS_SCENE_SUPPORT_POINTS : [],
+      [
+        ...(parkAccessVisibleInArea(isolatedArea) ? PARK_ACCESS_SCENE_SUPPORT_POINTS : []),
+        ...(rearParkingVisibleInArea(isolatedArea) ? REAR_PARKING_SCENE_SUPPORT_POINTS : []),
+      ],
     ),
     [entities, isolatedArea],
   );
@@ -2714,6 +2862,8 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
           gl.domElement.style.cursor = 'grab';
       }}
       onPointerMissed={() => {
+        // Empty-ground orbit/pan must not close parking or reset a close-up camera.
+        if (useCommercialMapStore.getState().parkingInspectionOpen || cameraNavigating) return;
         if (hydrologicalModeActive) {
           setSelectedHydrologicalElementId(null);
           return;
@@ -2728,6 +2878,7 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
       <Suspense fallback={<CanvasLoader />}>
         <Scene
           entities={entities}
+          parkingOwnerEntities={parkingOwnerEntities}
           lots={lots}
           calibration={calibration}
           matchingEntityIds={matchingEntityIds}

@@ -10,6 +10,7 @@ import type {
   VerificationStatus,
 } from '../types';
 import type { CommercialMapSegmentId } from '../data/commercialMapSegments';
+import type { ParkingCameraView } from '../utils/parkingViewport';
 
 export type CommercialMapDockSection =
   | 'search'
@@ -44,6 +45,28 @@ export interface CommercialMapCameraView {
   target: [number, number, number];
 }
 
+// Parking is a cartographic inspection, never a persisted commercial entity.
+const CLEARED_PARKING_INSPECTION = {
+  selectedParkingBlockId: null,
+  selectedParkingSpaceId: null,
+  parkingInspectionOpen: false,
+} as const;
+
+const PARKING_INSPECTION_MODE = {
+  parkingInspectionOpen: true,
+  selectedEntityId: null,
+  hoveredEntityId: null,
+  hoveredModuleId: null,
+  selectedModuleId: null,
+  interiorEntityId: null,
+  interiorReturnView: null,
+  selectedHydrologicalElementId: null,
+  hydrologicalModeActive: false,
+  activePanel: null,
+  workspaceMode: '3d',
+  cameraNavigating: false,
+} as const;
+
 interface CommercialMapState {
   activeScopeKey: string | null;
   selectedEntityId: string | null;
@@ -72,6 +95,11 @@ interface CommercialMapState {
   treesVisible: boolean;
   hydrologicalModeActive: boolean;
   selectedHydrologicalElementId: string | null;
+  selectedParkingBlockId: string | null;
+  selectedParkingSpaceId: string | null;
+  parkingInspectionOpen: boolean;
+  parkingCameraView: ParkingCameraView;
+  parkingCameraSequence: number;
   technicalValidationVisible: boolean;
   reducedGraphics: boolean;
   cameraNavigating: boolean;
@@ -114,6 +142,11 @@ interface CommercialMapState {
   setHydrologicalModeActive: (active: boolean) => void;
   toggleHydrologicalMode: () => void;
   setSelectedHydrologicalElementId: (id: string | null) => void;
+  inspectParkingBlock: (blockId: string | null) => void;
+  inspectParkingSpace: (blockId: string, spaceId: string) => void;
+  requestParkingView: (view: ParkingCameraView) => void;
+  closeParkingInspection: () => void;
+  setParkingInspectionOpen: (open: boolean) => void;
   setTechnicalValidationVisible: (visible: boolean) => void;
   setReducedGraphics: (reduced: boolean) => void;
   setCameraNavigating: (navigating: boolean) => void;
@@ -150,6 +183,9 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
   treesVisible: true,
   hydrologicalModeActive: false,
   selectedHydrologicalElementId: null,
+  ...CLEARED_PARKING_INSPECTION,
+  parkingCameraView: 'overview',
+  parkingCameraSequence: 0,
   technicalValidationVisible: false,
   reducedGraphics: false,
   cameraNavigating: false,
@@ -165,6 +201,7 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
   activateScope: (activeScopeKey, activeSegmentId) => set((state) => {
     if (state.activeScopeKey === activeScopeKey && state.activeSegmentId === activeSegmentId) return state;
     return {
+      ...CLEARED_PARKING_INSPECTION,
       activeScopeKey,
       activeSegmentId,
       selectedEntityId: null,
@@ -192,12 +229,14 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
     };
   }),
   setSelectedEntityId: (selectedEntityId) => set((state) => ({
+    ...CLEARED_PARKING_INSPECTION,
     selectedEntityId,
     interiorEntityId: state.interiorEntityId === selectedEntityId ? state.interiorEntityId : null,
     interiorReturnView: state.interiorEntityId === selectedEntityId ? state.interiorReturnView : null,
     activePanel: selectedEntityId ? 'details' : null,
   })),
   enterInterior: (selectedEntityId) => set((state) => ({
+    ...CLEARED_PARKING_INSPECTION,
     selectedEntityId,
     hoveredEntityId: null,
     hoveredModuleId: null,
@@ -210,6 +249,7 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
     cameraSequence: state.cameraSequence + 1,
   })),
   switchInterior: (selectedEntityId) => set((state) => ({
+    ...CLEARED_PARKING_INSPECTION,
     selectedEntityId,
     hoveredEntityId: null,
     hoveredModuleId: null,
@@ -224,6 +264,7 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
     cameraSequence: state.cameraSequence + 1,
   })),
   exitInterior: () => set((state) => ({
+    ...CLEARED_PARKING_INSPECTION,
     interiorEntityId: null,
     hoveredModuleId: null,
     selectedModuleId: null,
@@ -257,6 +298,7 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
   setSortOrder: (sortOrder) => set({ sortOrder }),
   setTableDensity: (tableDensity) => set({ tableDensity }),
   clearExplorerFilters: () => set({
+    ...CLEARED_PARKING_INSPECTION,
     search: '',
     statusFilters: [],
     classificationFilters: [],
@@ -266,6 +308,7 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
     activeSegmentId: null,
   }),
   selectEntityFromExplorer: (selectedEntityId) => set((state) => ({
+    ...CLEARED_PARKING_INSPECTION,
     selectedEntityId,
     hoveredEntityId: null,
     hoveredModuleId: null,
@@ -287,13 +330,18 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
     });
     return { layerVisibility: visibility, layerOpacity: opacity };
   }),
-  setActivePanel: (activePanel) => set({ activePanel }),
+  setActivePanel: (activePanel) => set({
+    ...(activePanel ? CLEARED_PARKING_INSPECTION : {}),
+    activePanel,
+  }),
   setWorkspaceMode: (workspaceMode) => set((state) => ({
+    ...(workspaceMode === '3d' ? {} : CLEARED_PARKING_INSPECTION),
     workspaceMode,
     interiorEntityId: workspaceMode === '3d' ? state.interiorEntityId : null,
     interiorReturnView: workspaceMode === '3d' ? state.interiorReturnView : null,
   })),
   requestCameraPreset: (cameraPreset) => set((state) => ({
+    ...CLEARED_PARKING_INSPECTION,
     cameraPreset,
     hoveredModuleId: null,
     selectedModuleId: null,
@@ -303,6 +351,7 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
     interiorReturnView: null,
   })),
   requestSegmentFocus: (activeSegmentId) => set((state) => ({
+    ...CLEARED_PARKING_INSPECTION,
     activeSegmentId,
     selectedEntityId: null,
     hoveredEntityId: null,
@@ -316,10 +365,15 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
     cameraSequence: state.workspaceMode === 'list' ? state.cameraSequence : state.cameraSequence + 1,
   })),
   clearSegmentFocus: () => set((state) => ({
+    ...CLEARED_PARKING_INSPECTION,
     activeSegmentId: null,
     cameraSequence: state.workspaceMode === 'list' ? state.cameraSequence : state.cameraSequence + 1,
   })),
-  focusSelection: () => set((state) => ({ cameraSequence: state.cameraSequence + 1, workspaceMode: '3d' })),
+  focusSelection: () => set((state) => ({
+    ...CLEARED_PARKING_INSPECTION,
+    cameraSequence: state.cameraSequence + 1,
+    workspaceMode: '3d',
+  })),
   setReferenceVisible: (referenceVisible) => set({ referenceVisible }),
   setReferenceOpacity: (referenceOpacity) => set({ referenceOpacity }),
   setLabelsVisible: (labelsVisible) => set({ labelsVisible }),
@@ -328,6 +382,7 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
     if (state.hydrologicalModeActive === hydrologicalModeActive) return state;
     if (!hydrologicalModeActive) {
       return {
+        ...CLEARED_PARKING_INSPECTION,
         hydrologicalModeActive: false,
         selectedHydrologicalElementId: null,
         cameraSequence: state.cameraSequence + 1,
@@ -336,6 +391,7 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
     }
 
     return {
+      ...CLEARED_PARKING_INSPECTION,
       hydrologicalModeActive: true,
       selectedHydrologicalElementId: null,
       selectedEntityId: null,
@@ -353,8 +409,38 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
   }),
   toggleHydrologicalMode: () => get().setHydrologicalModeActive(!get().hydrologicalModeActive),
   setSelectedHydrologicalElementId: (selectedHydrologicalElementId) => set({
+    ...CLEARED_PARKING_INSPECTION,
     selectedHydrologicalElementId,
   }),
+  inspectParkingBlock: (selectedParkingBlockId) => set((state) => ({
+    ...PARKING_INSPECTION_MODE,
+    selectedParkingBlockId,
+    selectedParkingSpaceId: null,
+    parkingCameraView: selectedParkingBlockId ? 'detail' : 'overview',
+    parkingCameraSequence: state.parkingCameraSequence + 1,
+  })),
+  inspectParkingSpace: (selectedParkingBlockId, selectedParkingSpaceId) => {
+    // One atomic update avoids an intermediate block camera movement.
+    set((state) => ({
+      ...PARKING_INSPECTION_MODE,
+      selectedParkingBlockId,
+      selectedParkingSpaceId,
+      parkingCameraView: 'detail',
+      parkingCameraSequence: state.parkingCameraSequence + 1,
+    }));
+  },
+  requestParkingView: (parkingCameraView) => set((state) => ({
+    ...PARKING_INSPECTION_MODE,
+    parkingCameraView,
+    parkingCameraSequence: state.parkingCameraSequence + 1,
+    selectedParkingBlockId: parkingCameraView === 'overview' ? null : state.selectedParkingBlockId,
+    selectedParkingSpaceId: parkingCameraView === 'overview' ? null : state.selectedParkingSpaceId,
+  })),
+  closeParkingInspection: () => set(CLEARED_PARKING_INSPECTION),
+  setParkingInspectionOpen: (open) => {
+    if (!open) get().closeParkingInspection();
+    else if (!get().parkingInspectionOpen) get().inspectParkingBlock(get().selectedParkingBlockId);
+  },
   setTechnicalValidationVisible: (technicalValidationVisible) => set({ technicalValidationVisible }),
   setReducedGraphics: (reducedGraphics) => set({ reducedGraphics }),
   setCameraNavigating: (cameraNavigating) => set({ cameraNavigating }),

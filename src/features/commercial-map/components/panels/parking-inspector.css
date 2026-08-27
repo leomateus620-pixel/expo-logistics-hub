@@ -1,0 +1,180 @@
+.parking-inspector,
+.parking-inspector-launcher {
+  position: absolute;
+  z-index: 14;
+  left: max(14px, env(safe-area-inset-left));
+  bottom: max(14px, env(safe-area-inset-bottom));
+  border: 1px solid #bdc9be;
+  border-radius: 14px;
+  background: rgb(250 250 245 / 97%);
+  color: #254337;
+  box-shadow: 0 6px 24px rgb(27 53 39 / 12%);
+  touch-action: manipulation;
+}
+
+.parking-inspector-launcher {
+  display: flex;
+  min-height: 44px;
+  max-width: calc(100% - 28px);
+  align-items: center;
+  gap: 8px;
+  padding: 0 14px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.parking-inspector-launcher > svg { width: 20px; height: 20px; flex: 0 0 auto; }
+.parking-inspector-launcher:hover { border-color: #789683; background: #f1f4eb; }
+
+.parking-inspector {
+  width: 370px;
+  max-width: calc(100% - 28px);
+  height: 128px;
+  max-height: 128px;
+  padding: 7px 8px 5px;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.parking-inspector__header {
+  display: grid;
+  height: 44px;
+  grid-template-columns: minmax(0, 1fr) 116px 44px 44px;
+  align-items: center;
+  gap: 3px;
+}
+
+.parking-inspector__title { display: flex; min-width: 0; flex-direction: column; padding-left: 4px; }
+.parking-inspector__title > span { overflow: hidden; color: #627565; font-size: 9px; font-weight: 650; letter-spacing: .025em; text-overflow: ellipsis; white-space: nowrap; }
+.parking-inspector__title > strong { font-size: 15px; font-weight: 800; line-height: 1.2; }
+
+.parking-inspector__block-select {
+  width: 100%;
+  min-width: 0;
+  height: 44px;
+  border: 1px solid #d2dacf;
+  border-radius: 9px;
+  background: #f3f5ee;
+  padding: 0 6px;
+  color: #2e493a;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+
+.parking-inspector__icon-button {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 9px;
+  color: #58705d;
+}
+
+.parking-inspector__icon-button > svg { width: 18px; height: 18px; }
+.parking-inspector__icon-button:hover { background: #e7ede2; color: #224632; }
+
+.parking-inspector__views {
+  display: grid;
+  height: 44px;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 4px;
+  margin-top: 5px;
+}
+
+.parking-inspector__views > button {
+  display: flex;
+  min-width: 44px;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  border: 1px solid transparent;
+  border-radius: 9px;
+  color: #536556;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.parking-inspector__views > button > svg { width: 15px; height: 15px; flex: 0 0 auto; }
+.parking-inspector__views > button[aria-pressed="true"] { border-color: #c1d0bc; background: #e4ecdc; color: #244d2f; }
+.parking-inspector__views > button:hover:not(:disabled) { background: #ebf0e6; }
+.parking-inspector__views > button:disabled { color: #939d91; cursor: default; }
+
+.parking-inspector__status {
+  overflow: hidden;
+  margin: 5px 4px 0;
+  color: #657366;
+  font-size: 10px;
+  line-height: 15px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Notes replace the view row, never grow a sheet over the selected geometry. */
+.parking-inspector__details {
+  max-height: 66px;
+  margin-top: 5px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 0 4px 3px;
+  overscroll-behavior: contain;
+  touch-action: pan-y;
+  scrollbar-width: thin;
+}
+
+.parking-inspector__details dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-bottom: 5px; }
+.parking-inspector__details dl > div { display: flex; min-width: 0; align-items: baseline; gap: 5px; }
+.parking-inspector__details dt { color: #647463; font-size: 9px; }
+.parking-inspector__details dd { color: #294b34; font-size: 12px; font-weight: 800; }
+.parking-inspector__details p { margin: 3px 0; color: #526450; font-size: 10px; line-height: 1.35; overflow-wrap: anywhere; }
+
+.parking-inspector-launcher:focus-visible,
+.parking-inspector button:focus-visible,
+.parking-inspector select:focus-visible,
+.parking-inspector__details:focus-visible {
+  outline: 2px solid #296c75;
+  outline-offset: -2px;
+}
+
+.commercial-map-shell.is-parking-inspection .commercial-map-legend { display: none; }
+
+@media (max-width: 720px) {
+  .parking-inspector,
+  .parking-inspector-launcher {
+    left: max(8px, env(safe-area-inset-left));
+    bottom: max(8px, env(safe-area-inset-bottom));
+    max-width: calc(100% - max(8px, env(safe-area-inset-left)) - max(8px, env(safe-area-inset-right)));
+    border-radius: 12px;
+  }
+
+  .parking-inspector { right: max(8px, env(safe-area-inset-right)); width: auto; }
+  .parking-inspector__header { grid-template-columns: minmax(0, 1fr) 108px 44px 44px; }
+  .parking-inspector__views > button { flex-direction: column; gap: 1px; font-size: 10px; line-height: 13px; }
+  .parking-inspector__block-select { font-size: 16px; }
+  .parking-inspector__block-select option,
+  .parking-inspector__block-select optgroup { font-size: 16px; }
+}
+
+@media (max-width: 360px) {
+  .parking-inspector__header { grid-template-columns: minmax(0, 1fr) 92px 44px 44px; }
+  .parking-inspector__title > strong { font-size: 13px; }
+  .parking-inspector__title > span { font-size: 8px; }
+  .parking-inspector__details dl { gap: 4px; }
+}
+
+@media (max-height: 540px) and (orientation: landscape) {
+  .parking-inspector { width: 352px; right: auto; }
+  .parking-inspector__views > button { flex-direction: row; font-size: 9px; }
+}
+
+@media (prefers-contrast: more) {
+  .parking-inspector,
+  .parking-inspector-launcher,
+  .parking-inspector__block-select { border-width: 2px; border-color: #274a34; background: #fff; }
+  .parking-inspector__status,
+  .parking-inspector__details p { color: #274a34; }
+}

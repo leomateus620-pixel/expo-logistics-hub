@@ -41,10 +41,12 @@ import { CalibrationPanel } from './components/panels/CalibrationPanel';
 import { PavilionModuleCard } from './components/panels/PavilionModuleCard';
 import { PavilionPlanLegend } from './components/panels/PavilionPlanLegend';
 import { HydrologicalNetworkLegend } from './components/panels/HydrologicalNetworkLegend';
+import { ParkingInspector } from './components/panels/ParkingInspector';
 import { SegmentLegend } from './components/segments/SegmentLegend';
 import { resolveStrategicLandmarkKind } from './utils/landmarks';
 import { resolveCommercialPavilionModulePlan } from './utils/commercialPavilionModules';
 import { OFFICIAL_REFERENCE_REVISION } from './data/officialReference2026';
+import { REAR_PARKING_BLOCKS, rearParkingVisibleInArea, rearParkingLayerPresentation } from './data/rearParking';
 import {
   COMMERCIAL_MAP_SEGMENT_IDS,
   buildCommercialMapSegmentIndex,
@@ -137,6 +139,10 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
   const clearExplorerFilters = useCommercialMapStore((state) => state.clearExplorerFilters);
   const setTechnicalValidationVisible = useCommercialMapStore((state) => state.setTechnicalValidationVisible);
   const hydrologicalModeActive = useCommercialMapStore((state) => state.hydrologicalModeActive);
+  const parkingInspectionOpen = useCommercialMapStore((state) => state.parkingInspectionOpen);
+  const closeParkingInspection = useCommercialMapStore((state) => state.closeParkingInspection);
+  const layerVisibility = useCommercialMapStore((state) => state.layerVisibility);
+  const layerOpacity = useCommercialMapStore((state) => state.layerOpacity);
   const requestCameraPreset = useCommercialMapStore((state) => state.requestCameraPreset);
   const activeSegmentId = useCommercialMapStore((state) => state.activeSegmentId);
   const requestSegmentFocus = useCommercialMapStore((state) => state.requestSegmentFocus);
@@ -181,6 +187,11 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
     () => buildCommercialMapSegmentIndex(scopedData.entities, scopedData.lots),
     [scopedData.entities, scopedData.lots],
   );
+  const parkingAvailable = rearParkingVisibleInArea(areaScope) && !hydrologicalModeActive
+    && rearParkingLayerPresentation(data?.entities ?? [], layerVisibility, layerOpacity).visible;
+  useEffect(() => {
+    if (!parkingAvailable && parkingInspectionOpen) closeParkingInspection();
+  }, [closeParkingInspection, parkingAvailable, parkingInspectionOpen]);
   const activeSegment = getCommercialMapSegment(activeSegmentId);
   const summaryLots = useMemo(() => (
     activeSegment?.behavior.interaction === 'filter-and-focus' && activeSegmentId
@@ -289,6 +300,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
       }
       if (event.key === 'Escape' && !event.defaultPrevented) {
         if (interiorEntityId) exitInterior();
+        else if (parkingInspectionOpen) closeParkingInspection();
         else setActivePanel(null);
       }
     };
@@ -296,8 +308,10 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
     return () => window.removeEventListener('keydown', shortcut);
   }, [
     activePanel,
+    closeParkingInspection,
     exitInterior,
     interiorEntityId,
+    parkingInspectionOpen,
     setActivePanel,
     workspaceMode,
   ]);
@@ -454,7 +468,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
 
   return (
     <section
-      className={`commercial-map-shell ${isCommissionScope ? 'is-commission-scope' : ''} ${isExporural ? 'is-exporural' : ''} ${areaScope === COMMERCIAL_MAP_SEGMENT_IDS.industry ? 'is-industry' : ''} ${hydrologicalModeActive ? 'is-hydrological-mode' : ''} ${interiorEntityId ? 'is-interior' : ''} ${interiorKind === 'commercial-pavilion' ? 'is-commercial-pavilion-interior' : ''} ${interiorKind === 'livestock-pavilion' ? 'is-livestock-interior' : ''} ${interiorKind === 'mirante-pavilion' ? 'is-mirante-interior' : ''} ${selectedEntity ? 'has-selection' : ''} ${selectedKind === 'commercial-pavilion' || selectedKind === 'livestock-pavilion' || selectedKind === 'mirante-pavilion' ? 'has-architectural-selection' : ''}`}
+      className={`commercial-map-shell ${isCommissionScope ? 'is-commission-scope' : ''} ${isExporural ? 'is-exporural' : ''} ${areaScope === COMMERCIAL_MAP_SEGMENT_IDS.industry ? 'is-industry' : ''} ${hydrologicalModeActive ? 'is-hydrological-mode' : ''} ${parkingInspectionOpen ? 'is-parking-inspection' : ''} ${interiorEntityId ? 'is-interior' : ''} ${interiorKind === 'commercial-pavilion' ? 'is-commercial-pavilion-interior' : ''} ${interiorKind === 'livestock-pavilion' ? 'is-livestock-interior' : ''} ${interiorKind === 'mirante-pavilion' ? 'is-mirante-interior' : ''} ${selectedEntity ? 'has-selection' : ''} ${selectedKind === 'commercial-pavilion' || selectedKind === 'livestock-pavilion' || selectedKind === 'mirante-pavilion' ? 'has-architectural-selection' : ''}`}
       aria-label="Plataforma de gestão do mapa comercial"
     >
       {!isCommissionScope && !interiorEntityId && workspaceMode !== 'edit' && workspaceMode !== 'create' && (
@@ -498,6 +512,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
               <CommercialMapCanvas
                 key={areaScope}
                 entities={scopedData.entities}
+                parkingOwnerEntities={data.entities}
                 lots={scopedData.lots}
                 calibration={data.calibration}
                 matchingEntityIds={mapFilter.matchingEntityIds}
@@ -577,6 +592,9 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
                   {hydrologicalModeActive
                     ? <HydrologicalNetworkLegend />
                     : <StatusLegend scope={areaScope} />}
+                  {parkingAvailable && (
+                    <ParkingInspector blocks={REAR_PARKING_BLOCKS} />
+                  )}
                 </>
               )}
 
