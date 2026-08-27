@@ -74,25 +74,38 @@ function fractalNoise(x: number, y: number, seed: number, octaves = 4) {
   return total / normalization;
 }
 
+/**
+ * Palettes are authored as *modulation* around a bright neutral (mean ≈ 200) so
+ * the material `color` supplies the hue. That way the fully mip-averaged tile —
+ * what the GPU shows at park-wide zoom — still resolves to the field's real
+ * colour instead of a washed out grey.
+ */
 function paintGrass(context: CanvasRenderingContext2D) {
   const image = context.createImageData(TEXTURE_SIZE, TEXTURE_SIZE);
-  const deep = [58, 96, 52];
-  const light = [126, 158, 82];
-  const dry = [156, 152, 96];
+  const deep = [128, 152, 118];
+  const light = [226, 238, 208];
+  const dry = [238, 226, 186];
 
   for (let y = 0; y < TEXTURE_SIZE; y += 1) {
     for (let x = 0; x < TEXTURE_SIZE; x += 1) {
       const offset = (y * TEXTURE_SIZE + x) * 4;
+      // Macro patches (low frequency) survive mipmapping and carry the terrain
+      // reading at distance; the fine grain only matters up close.
+      const macro = fractalNoise(x / 210, y / 210, 4.1, 2);
       const patch = fractalNoise(x / 64, y / 64, 7.3, 4);
-      const dryness = THREE.MathUtils.clamp((fractalNoise(x / 128, y / 128, 21.1, 3) - 0.52) * 3.1, 0, 1);
+      const dryness = THREE.MathUtils.clamp((fractalNoise(x / 150, y / 150, 21.1, 3) - 0.5) * 3.4, 0, 1);
       const grain = seededNoise(x, y, 3.4) - 0.5;
-      const blend = THREE.MathUtils.clamp(patch * 1.15 - 0.08 + grain * 0.24, 0, 1);
+      const blend = THREE.MathUtils.clamp(
+        patch * 0.62 + (macro - 0.5) * 0.85 + 0.2 + grain * 0.18,
+        0,
+        1,
+      );
       const r = deep[0] + (light[0] - deep[0]) * blend;
       const g = deep[1] + (light[1] - deep[1]) * blend;
       const b = deep[2] + (light[2] - deep[2]) * blend;
-      image.data[offset] = THREE.MathUtils.clamp(r + (dry[0] - r) * dryness * 0.72, 0, 255);
-      image.data[offset + 1] = THREE.MathUtils.clamp(g + (dry[1] - g) * dryness * 0.72, 0, 255);
-      image.data[offset + 2] = THREE.MathUtils.clamp(b + (dry[2] - b) * dryness * 0.72, 0, 255);
+      image.data[offset] = THREE.MathUtils.clamp(r + (dry[0] - r) * dryness * 0.6, 0, 255);
+      image.data[offset + 1] = THREE.MathUtils.clamp(g + (dry[1] - g) * dryness * 0.6, 0, 255);
+      image.data[offset + 2] = THREE.MathUtils.clamp(b + (dry[2] - b) * dryness * 0.6, 0, 255);
       image.data[offset + 3] = 255;
     }
   }
@@ -107,22 +120,25 @@ function paintGrass(context: CanvasRenderingContext2D) {
     const lean = (seededNoise(index, 6.6, 1.1) - 0.5) * 2.2;
     const bright = seededNoise(index, 2.2, 6.4);
     context.strokeStyle = bright > 0.62
-      ? 'rgba(168,196,110,.34)'
+      ? 'rgba(244,252,224,.3)'
       : bright > 0.3
-        ? 'rgba(74,112,60,.32)'
-        : 'rgba(44,74,44,.3)';
+        ? 'rgba(150,176,138,.3)'
+        : 'rgba(116,140,108,.28)';
     context.beginPath();
     context.moveTo(x, y);
     context.lineTo(x + lean, y - length);
     context.stroke();
   }
 
-  // Sparse mowing bands keep the large field from reading as flat noise.
-  for (let band = 0; band < TEXTURE_SIZE; band += 128) {
-    context.fillStyle = 'rgba(255,255,255,.032)';
-    context.fillRect(0, band, TEXTURE_SIZE, 64);
+  // Wide mowing bands: low frequency, so they stay legible when zoomed out.
+  for (let band = 0; band < TEXTURE_SIZE; band += 170) {
+    context.fillStyle = 'rgba(255,255,255,.075)';
+    context.fillRect(0, band, TEXTURE_SIZE, 85);
+    context.fillStyle = 'rgba(96,116,92,.075)';
+    context.fillRect(0, band + 85, TEXTURE_SIZE, 85);
   }
 }
+
 
 function paintCompactedGravel(context: CanvasRenderingContext2D) {
   const image = context.createImageData(TEXTURE_SIZE, TEXTURE_SIZE);
