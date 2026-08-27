@@ -40,6 +40,11 @@ import {
 } from '../../data/nationsDistrict';
 import { COMMERCIAL_MAP_ENVIRONMENT_CONFIG } from '../../data/commercialMapEnvironment';
 import {
+  OPEN_GROUND_PRESENTATION_HEIGHT,
+  openGroundTextureForEntity,
+  resolveOpenGroundProfile,
+} from './openGroundTextures';
+import {
   resolveStrategicLandmarkKind,
   strategicLandmarkBounds,
   strategicLandmarkFocusDirection,
@@ -526,11 +531,11 @@ function createEntityShape(entity: MapEntity) {
   return shape;
 }
 
-function createEntityGeometry(entity: MapEntity) {
+function createEntityGeometry(entity: MapEntity, heightOverride?: number) {
   const shape = createEntityShape(entity);
   const classification = String(entity.classification);
   const surface = ['ROAD', 'PEDESTRIAN_PATH', 'GREEN_AREA', 'PARKING', 'WATER', 'QUADRA'].includes(classification);
-  const height = surface ? Math.max(0.018, Math.min(entity.geometry.extrusionHeight, 0.08)) : Math.max(0.025, entity.geometry.extrusionHeight);
+  const height = heightOverride ?? (surface ? Math.max(0.018, Math.min(entity.geometry.extrusionHeight, 0.08)) : Math.max(0.025, entity.geometry.extrusionHeight));
   // Pavilion footprints follow the official fill exactly. A bevel expands the
   // silhouette beyond that footprint and made neighbouring buildings appear
   // stacked even when their cartographic bounds only touched.
@@ -643,9 +648,22 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
   const isFlat = entity.geometry.extrusionHeight < 0.3 || isRoad || isQuadra || isNationsPresentationSurface;
   const isInteractive = isSelectableMapClassification(entity.classification);
   const solidRendering = requiresSolidRendering(entity.classification);
+  // Presentation-only ground dressing for the large open fields (motor home
+  // and test drive). The official geometry and support elevations are
+  // untouched: only the rendered slab and its material change.
+  const openGroundProfile = useMemo(
+    () => resolveOpenGroundProfile(entity.publicIdentifier),
+    [entity.publicIdentifier],
+  );
+  const openGroundTexture = useMemo(
+    () => (openGroundProfile ? openGroundTextureForEntity(openGroundProfile) : null),
+    [openGroundProfile],
+  );
   const geometry = useMemo(
-    () => isQuadra || isGate || isNationsPresentationSurface ? null : createEntityGeometry(entity),
-    [entity, isGate, isNationsPresentationSurface, isQuadra],
+    () => isQuadra || isGate || isNationsPresentationSurface
+      ? null
+      : createEntityGeometry(entity, openGroundProfile ? OPEN_GROUND_PRESENTATION_HEIGHT : undefined),
+    [entity, isGate, isNationsPresentationSurface, isQuadra, openGroundProfile],
   );
   const hitSurface = useMemo(
     () => isQuadra || isNationsPresentationSurface ? createHitSurfaceGeometry(entity) : null,
@@ -663,9 +681,11 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
     sceneCenter[1] - markerCenter[1],
   ), [markerCenter, sceneCenter]);
   const gateAccessMode = useMemo(() => resolveGateAccessMode(entity.name), [entity.name]);
-  const baseColor = segment && isSegmentTintClassification(entity.classification)
-    ? segment.palette.surface
-    : CLASSIFICATION_COLORS[entity.classification] ?? '#78907d';
+  const baseColor = openGroundProfile
+    ? openGroundProfile.baseColor
+    : segment && isSegmentTintClassification(entity.classification)
+      ? segment.palette.surface
+      : CLASSIFICATION_COLORS[entity.classification] ?? '#78907d';
   const matched = Boolean(filtersActive && isMatch);
   const filterStrength = infrastructureMode
     ? 0.26
@@ -717,7 +737,8 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
     edges?.dispose();
     roofOutline?.dispose();
     footprint?.dispose();
-  }, [edges, footprint, geometry, hitSurface, roofOutline]);
+    openGroundTexture?.dispose();
+  }, [edges, footprint, geometry, hitSurface, openGroundTexture, roofOutline]);
 
   const interactionProps = isInteractive ? {
     onClick: (event: ThreeEvent<MouseEvent>) => {
@@ -759,19 +780,21 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
         >
           <meshStandardMaterial
             color={displayColor}
-            roughness={isPavilion ? 0.82 : isFlat ? 0.9 : 0.72}
+            map={openGroundTexture}
+            roughness={openGroundProfile ? openGroundProfile.roughness : isPavilion ? 0.82 : isFlat ? 0.9 : 0.72}
             metalness={0}
             transparent={!solidRendering && visualOpacity < 0.995}
             opacity={solidRendering ? 1 : visualOpacity}
             depthTest
             depthWrite={solidRendering || visualOpacity > 0.42}
-            emissive={selected || hovered || matched ? baseColor : '#000000'}
+            emissive={selected || hovered || matched ? (openGroundProfile ? '#e7d489' : baseColor) : '#000000'}
             emissiveIntensity={selected ? 0.13 : hovered ? 0.055 : matched ? 0.03 : 0}
             flatShading={isPavilion}
             polygonOffset
-            polygonOffsetFactor={isFlat ? -2 : 0}
-            polygonOffsetUnits={isFlat ? -2 : 0}
+            polygonOffsetFactor={openGroundProfile ? 2 : isFlat ? -2 : 0}
+            polygonOffsetUnits={openGroundProfile ? 2 : isFlat ? -2 : 0}
           />
+
         </mesh>
       )}
 
