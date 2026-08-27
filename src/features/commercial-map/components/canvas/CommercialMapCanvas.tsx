@@ -737,7 +737,8 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
     edges?.dispose();
     roofOutline?.dispose();
     footprint?.dispose();
-  }, [edges, footprint, geometry, hitSurface, roofOutline]);
+    openGroundTexture?.dispose();
+  }, [edges, footprint, geometry, hitSurface, openGroundTexture, roofOutline]);
 
   const interactionProps = isInteractive ? {
     onClick: (event: ThreeEvent<MouseEvent>) => {
