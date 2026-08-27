@@ -38,6 +38,44 @@ function protectedCommercialFootprints() {
   return officialFootprints(PARK_ACCESS_SPATIAL_PLAN.protectedCommercialGeometry.identifiers);
 }
 
+const DRIVABLE_ROADS = PARK_ACCESS_SPATIAL_PLAN.roadSurfaces;
+
+function expectCanopyOutsideEveryDrivableRoad(
+  position: readonly [number, number],
+  canopyRadius: number,
+  label: string,
+) {
+  DRIVABLE_ROADS.forEach((road) => {
+    expect(pointInPolygon(position, road.polygon), `${label}/${road.id}/trunk`).toBe(false);
+    expect(distanceToPolygon(position, road.polygon), `${label}/${road.id}/canopy`)
+      .toBeGreaterThanOrEqual(canopyRadius - 1e-6);
+  });
+}
+
+function sideOfNearestSegment(
+  point: readonly [number, number],
+  centerline: readonly (readonly [number, number])[],
+) {
+  let nearestDistance = Number.POSITIVE_INFINITY;
+  let nearestSide = 0;
+  centerline.slice(0, -1).forEach((from, index) => {
+    const to = centerline[index + 1];
+    const dx = to[0] - from[0];
+    const dz = to[1] - from[1];
+    const lengthSquared = dx * dx + dz * dz;
+    const progress = lengthSquared === 0 ? 0 : Math.max(0, Math.min(1,
+      ((point[0] - from[0]) * dx + (point[1] - from[1]) * dz) / lengthSquared,
+    ));
+    const nearest = [from[0] + dx * progress, from[1] + dz * progress] as const;
+    const candidateDistance = Math.hypot(point[0] - nearest[0], point[1] - nearest[1]);
+    if (candidateDistance < nearestDistance) {
+      nearestDistance = candidateDistance;
+      nearestSide = dx * (point[1] - nearest[1]) - dz * (point[0] - nearest[0]);
+    }
+  });
+  return nearestSide;
+}
+
 function openPolygon(polygon: ParkAccessPolygon) {
   const first = polygon[0];
   const last = polygon.at(-1);
@@ -68,7 +106,9 @@ describe('ambientação dos acessos, Caminho do Bosque e Sede Costeiros', () => 
     )!;
 
     expect(presentation.revision).toBe(PARK_ACCESS_ENVIRONMENT_REVISION);
+    expect(PARK_ACCESS_ENVIRONMENT_REVISION).toBe('2026.8-park-access-environment.r3');
     expect(presentation.diagnostics.sourceSpatialRevision).toBe(PARK_ACCESS_SPATIAL_PLAN.revision);
+    expect(presentation.diagnostics.sourceSpatialRevision).toBe('2026.8-park-access-annexes.4');
     expect(woodlandFloor.polygon).toBe(PARK_ACCESS_SPATIAL_PLAN.woodlandMass.polygon);
     const candidateHoles = [
       PARK_ACCESS_SPATIAL_PLAN.woodlandMass.pathClearancePolygon,
@@ -94,6 +134,9 @@ describe('ambientação dos acessos, Caminho do Bosque e Sede Costeiros', () => 
     expect(PARK_ACCESS_ENVIRONMENT_SOURCE_REFERENCES.join(' ')).toMatch(/Anexo 3/);
     expect(PARK_ACCESS_ENVIRONMENT_SOURCE_REFERENCES.join(' ')).toMatch(/Anexo 5/);
     expect(PARK_ACCESS_ENVIRONMENT_SOURCE_REFERENCES.join(' ')).toMatch(/Anexo 6/);
+    expect(PARK_ACCESS_ENVIRONMENT_SOURCE_REFERENCES.join(' ')).toMatch(/Anexo 20/);
+    expect(PARK_ACCESS_ENVIRONMENT_SOURCE_REFERENCES.join(' ')).toMatch(/Anexo 21/);
+    expect(PARK_ACCESS_ENVIRONMENT_SOURCE_REFERENCES.join(' ')).toMatch(/Anexo 22/);
   });
 
   it('triangula o piso do bosque sem lançar faces fora do envelope ou dentro dos holes', () => {
@@ -148,7 +191,15 @@ describe('ambientação dos acessos, Caminho do Bosque e Sede Costeiros', () => 
         || pointInPolygon(
           tree.position,
           PARK_ACCESS_SPATIAL_PLAN.thirdAgePavilionSetting.accessClearancePolygon,
-        ),
+        )
+        || Math.hypot(
+          tree.position[0] - PARK_ACCESS_SPATIAL_PLAN.gate1Roundabout.center[0],
+          tree.position[1] - PARK_ACCESS_SPATIAL_PLAN.gate1Roundabout.center[1],
+        ) < PARK_ACCESS_SPATIAL_PLAN.gate1Roundabout.outerRadius + tree.canopyRadius
+        || DRIVABLE_ROADS.some((road) => (
+          pointInPolygon(tree.position, road.polygon)
+          || distanceToPolygon(tree.position, road.polygon) < tree.canopyRadius
+        )),
       ).toBe(true);
     });
     presentedTrees.forEach((tree) => {
@@ -160,17 +211,13 @@ describe('ambientação dos acessos, Caminho do Bosque e Sede Costeiros', () => 
         tree.position,
         PARK_ACCESS_SPATIAL_PLAN.thirdAgePavilionSetting.accessClearancePolygon,
       )).toBe(false);
-      PARK_ACCESS_SPATIAL_PLAN.roadSurfaces
-        .filter((surface) => surface.kind === 'COBBLESTONE_ACCESS_ROAD')
-        .forEach((surface) => {
-          const clearanceMeters = surface.id === PARK_ACCESS_SPATIAL_PLAN.thirdAgePavilionSetting.accessRoadId
-            ? PARK_ACCESS_SPATIAL_PLAN.thirdAgePavilionSetting.clearances.pavilionAccessTreeTrunkMeters
-            : PARK_ACCESS_SPATIAL_PLAN.thirdAgePavilionSetting.clearances.roadTreeTrunkMeters;
-          expect(pointInPolygon(tree.position, surface.polygon)).toBe(false);
-          expect(distanceToPolygon(tree.position, surface.polygon)).toBeGreaterThanOrEqual(
-            parkAccessMetersToLocal(clearanceMeters) - 1e-6,
-          );
-        });
+      expect(Math.hypot(
+        tree.position[0] - PARK_ACCESS_SPATIAL_PLAN.gate1Roundabout.center[0],
+        tree.position[1] - PARK_ACCESS_SPATIAL_PLAN.gate1Roundabout.center[1],
+      )).toBeGreaterThanOrEqual(
+        PARK_ACCESS_SPATIAL_PLAN.gate1Roundabout.outerRadius + tree.canopyRadius - 1e-6,
+      );
+      expectCanopyOutsideEveryDrivableRoad(tree.position, tree.canopyRadius, tree.id);
     });
     expect(JSON.stringify(COMMERCIAL_MAP_TREES)).toBe(inventorySnapshot);
   });
@@ -205,13 +252,11 @@ describe('ambientação dos acessos, Caminho do Bosque e Sede Costeiros', () => 
       protectedFootprints.forEach((footprint) => {
         expect(pointInPolygon(placement.position, footprint)).toBe(false);
       });
-      PARK_ACCESS_SPATIAL_PLAN.roadSurfaces
-        .filter((surface) => surface.kind === 'COBBLESTONE_ACCESS_ROAD')
-        .forEach((surface) => {
-          expect(pointInPolygon(placement.position, surface.polygon)).toBe(false);
-          expect(distanceToPolygon(placement.position, surface.polygon))
-            .toBeGreaterThanOrEqual(canopyClearance - 1e-6);
-        });
+      expectCanopyOutsideEveryDrivableRoad(
+        placement.position,
+        canopyClearance,
+        placement.sourceZoneId,
+      );
     });
     [...denseUnderstory, ...sparseUnderstory].forEach((placement) => {
       expect(pointInPolygon(placement.position, setting.accessClearancePolygon)).toBe(false);
@@ -223,6 +268,51 @@ describe('ambientação dos acessos, Caminho do Bosque e Sede Costeiros', () => 
       .toBeLessThan(denseTrees.length + sparseTrees.length);
     expect(reduced.understory.filter((placement) => placement.sourceZoneId.startsWith('third-age-access-')).length)
       .toBeLessThan(denseUnderstory.length + sparseUnderstory.length);
+  });
+
+  it('builds bilateral natural tree bands along the motorhome road without invading any road', () => {
+    const full = resolveParkAccessEnvironmentPresentation(false);
+    const reduced = resolveParkAccessEnvironmentPresentation(true);
+    const setting = PARK_ACCESS_SPATIAL_PLAN.motorhomeSetting;
+    const canopyClearance = parkAccessMetersToLocal(setting.clearances.canopyMeters);
+    const forestTrees = full.ambientTrees.filter(
+      (placement) => placement.sourceZoneId === 'motorhome-road-forest-side-trees',
+    );
+    const fieldTrees = full.ambientTrees.filter(
+      (placement) => placement.sourceZoneId === 'motorhome-road-field-side-trees',
+    );
+    const reducedForestTrees = reduced.ambientTrees.filter(
+      (placement) => placement.sourceZoneId === 'motorhome-road-forest-side-trees',
+    );
+    const reducedFieldTrees = reduced.ambientTrees.filter(
+      (placement) => placement.sourceZoneId === 'motorhome-road-field-side-trees',
+    );
+
+    expect(forestTrees.length).toBeGreaterThan(fieldTrees.length);
+    expect(fieldTrees.length).toBeGreaterThan(0);
+    expect(forestTrees.length).toBeLessThanOrEqual(12);
+    expect(fieldTrees.length).toBeLessThanOrEqual(7);
+    expect(reducedForestTrees.length).toBeGreaterThan(0);
+    expect(reducedFieldTrees.length).toBeGreaterThan(0);
+    expect(reducedForestTrees.length).toBeLessThan(forestTrees.length);
+    expect(reducedFieldTrees.length).toBeLessThan(fieldTrees.length);
+    expect(forestTrees.reduce((sum, tree) => sum + tree.scale[0], 0) / forestTrees.length)
+      .toBeGreaterThan(fieldTrees.reduce((sum, tree) => sum + tree.scale[0], 0) / fieldTrees.length);
+
+    forestTrees.forEach((tree) => {
+      expect(sideOfNearestSegment(tree.position, setting.accessCenterline), tree.sourceZoneId)
+        .toBeLessThan(0);
+    });
+    fieldTrees.forEach((tree) => {
+      expect(sideOfNearestSegment(tree.position, setting.accessCenterline), tree.sourceZoneId)
+        .toBeGreaterThan(0);
+    });
+    [...forestTrees, ...fieldTrees].forEach((tree) => {
+      expectCanopyOutsideEveryDrivableRoad(tree.position, canopyClearance, tree.sourceZoneId);
+      expect(pointInPolygon(tree.position, setting.footprint), tree.sourceZoneId).toBe(false);
+      expect(distanceToPolygon(tree.position, setting.footprint), tree.sourceZoneId)
+        .toBeGreaterThanOrEqual(canopyClearance - 1e-6);
+    });
   });
 
   it('mantém somente a faixa sul segura de B5 fora dos footprints e do estacionamento', () => {
@@ -286,6 +376,10 @@ describe('ambientação dos acessos, Caminho do Bosque e Sede Costeiros', () => 
   it('respeita o orçamento estático de quatro draw calls e zero passe de sombra', () => {
     const full = resolveParkAccessEnvironmentPresentation(false);
     const reduced = resolveParkAccessEnvironmentPresentation(true);
+    const minimumCanopyClearance = parkAccessMetersToLocal(Math.min(
+      PARK_ACCESS_SPATIAL_PLAN.thirdAgePavilionSetting.clearances.canopyMeters,
+      PARK_ACCESS_SPATIAL_PLAN.motorhomeSetting.clearances.canopyMeters,
+    ));
 
     [full, reduced].forEach((presentation) => {
       expect(presentation.diagnostics.primaryDrawCalls)
@@ -298,6 +392,13 @@ describe('ambientação dos acessos, Caminho do Bosque e Sede Costeiros', () => 
         expect(placement.position.every(Number.isFinite), placement.sourceZoneId).toBe(true);
         expect(placement.scale.every((value) => Number.isFinite(value) && value > 0), placement.sourceZoneId)
           .toBe(true);
+      });
+      presentation.ambientTrees.forEach((tree) => {
+        expectCanopyOutsideEveryDrivableRoad(
+          tree.position,
+          minimumCanopyClearance,
+          tree.sourceZoneId,
+        );
       });
     });
   });

@@ -34,7 +34,7 @@ export const PARK_ACCESS_OFFICIAL_FLAT_SUPPORT_SURFACES: readonly ParkAccessFlat
 
 function roadMaterial(kind: string): ParkAccessRoadMaterial {
   if (kind === 'COBBLESTONE_ACCESS_ROAD') return 'cobblestone';
-  if (kind === 'COMPACTED_SERVICE_ROAD') return 'gravel';
+  if (kind === 'STONE_GRAVEL_ACCESS_ROAD' || kind === 'COMPACTED_SERVICE_ROAD') return 'gravel';
   return 'asphalt';
 }
 
@@ -85,7 +85,7 @@ export function adaptParkAccessSpatialPlan(
       width: surface.widthMeters * mapUnitsPerMeter,
       elevation: surface.elevation,
       material: roadMaterial(surface.kind),
-      supportAware: roadMaterial(surface.kind) === 'cobblestone',
+      supportAware: surface.supportAware === true,
     })),
     supportSurfaces: PARK_ACCESS_OFFICIAL_FLAT_SUPPORT_SURFACES,
     sidewalkSurfaces: plan.sidewalkSurfaces.map((surface) => ({
@@ -110,14 +110,14 @@ export function adaptParkAccessSpatialPlan(
         ? [marking.dashMeters[0] * mapUnitsPerMeter, marking.dashMeters[1] * mapUnitsPerMeter]
         : null,
     })),
-    roundabout: {
-      center: plan.roundabout.center,
-      outerRadius: plan.roundabout.outerRadius,
-      islandRadius: plan.roundabout.islandRadius,
+    roundabouts: plan.roundabouts.map((roundabout) => ({
+      center: roundabout.center,
+      outerRadius: roundabout.outerRadius,
+      islandRadius: roundabout.islandRadius,
       curbWidth: plan.dimensions.curbMeters * mapUnitsPerMeter,
-      elevation: plan.roundabout.elevation,
-      splitterIslands: plan.roundabout.splitterIslands.map((island) => island.polygon),
-    },
+      elevation: roundabout.elevation,
+      splitterIslands: roundabout.splitterIslands.map((island) => island.polygon),
+    })),
     gates: gateKeys.map((key) => {
       const gate = plan.gates[key];
       return {

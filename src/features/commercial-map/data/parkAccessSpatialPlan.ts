@@ -36,7 +36,13 @@ export type ParkAccessSourceId =
   | 'annex-13-a1-a10-blue-trace'
   | 'annex-14-satellite-a1-a10-b22'
   | 'annex-15-current-map-upper-connection'
-  | 'annex-16-site-plan-a1-a10';
+  | 'annex-16-site-plan-a1-a10'
+  | 'annex-17-current-map-overview'
+  | 'annex-18-current-map-gate-1'
+  | 'annex-19-current-map-gate-10'
+  | 'annex-20-satellite-gate-1-roundabout'
+  | 'annex-21-site-plan-gate-1-motorhome'
+  | 'annex-22-aerial-motorhome-road';
 
 export interface ParkAccessEvidence {
   sourceIds: readonly ParkAccessSourceId[];
@@ -57,7 +63,9 @@ export type ParkAccessRoadKind =
   | 'VEHICLE_ACCESS'
   | 'GATE_APRON'
   | 'COMPACTED_SERVICE_ROAD'
-  | 'COBBLESTONE_ACCESS_ROAD';
+  | 'COBBLESTONE_ACCESS_ROAD'
+  | 'ASPHALT_ACCESS_ROAD'
+  | 'STONE_GRAVEL_ACCESS_ROAD';
 
 export interface ParkAccessRoadSurface extends ParkAccessEvidence {
   id: string;
@@ -71,6 +79,8 @@ export interface ParkAccessRoadSurface extends ParkAccessEvidence {
   polygon: ParkAccessPolygon;
   connects: readonly string[];
   mergedApronIds?: readonly string[];
+  /** Raise the rendered ribbon above intersecting official support surfaces. */
+  supportAware?: boolean;
 }
 
 export interface ThirdAgePavilionSetting extends ParkAccessEvidence {
@@ -97,6 +107,24 @@ export interface ThirdAgePavilionSetting extends ParkAccessEvidence {
     footprintMeters: number;
     roadTreeTrunkMeters: number;
     pavilionAccessTreeTrunkMeters: number;
+    canopyMeters: number;
+  };
+}
+
+export interface MotorhomeSetting extends ParkAccessEvidence {
+  id: 'motorhome-setting';
+  officialEntityIdentifier: 'AREA-MOTORHOME';
+  sourcePdfFootprint: ParkAccessSourcePolygon;
+  footprint: ParkAccessPolygon;
+  accessRoadId: 'costeiros-service-road';
+  sourcePdfAccessCenterline: readonly ParkAccessSourcePoint[];
+  accessCenterline: readonly ParkAccessPoint[];
+  sourcePdfAccessPolygon: ParkAccessSourcePolygon;
+  accessPolygon: ParkAccessPolygon;
+  protectedFootprintIdentifiers: readonly ['AREA-MOTORHOME'];
+  clearances: {
+    footprintMeters: number;
+    roadTreeTrunkMeters: number;
     canopyMeters: number;
   };
 }
@@ -338,20 +366,29 @@ const A3_SOURCE = [3935, 4219] as const;
 const A10_SOURCE = [1214, 3137] as const;
 const RUA_BRASIL_SEAM_SOURCE = [1640, 3143.5] as const;
 const ROUNDABOUT_SOURCE = [1110, 4185] as const;
+const GATE_1_MINI_ROUNDABOUT_SOURCE = [341, 3718] as const;
 const COSTEIROS_CENTER_SOURCE = [917.5, 2972.5] as const;
 const B22_SOURCE_BOUNDS = [742, 3538, 931, 3834] as const;
 const B22_CENTER_SOURCE = [836.5, 3686] as const;
 const B22_FOOTPRINT_SOURCE = sourceRectangle(...B22_SOURCE_BOUNDS);
+const MOTORHOME_SOURCE_BOUNDS = [760, 1780, 1630, 2400] as const;
+const MOTORHOME_FOOTPRINT_SOURCE = sourceRectangle(...MOTORHOME_SOURCE_BOUNDS);
 
-const GATE_1_APPROACH_SOURCE = [
-  [1056, 4074],
-  [945, 4020],
-  [820, 3950],
-  [696, 3890],
-  [662, 3790],
-  [642, 3620],
-  [651, 3450],
+const GATE_1_LOCAL_ACCESS_SOURCE = [
+  [350, 3690],
+  [393, 3620],
+  [471, 3512],
+  [562, 3404],
+  [629, 3332],
   A1_SOURCE,
+] as const satisfies readonly ParkAccessSourcePoint[];
+
+const GATE_1_ROUNDABOUT_TUPARENDI_LINK_SOURCE = [
+  GATE_1_MINI_ROUNDABOUT_SOURCE,
+  [390, 3760],
+  [470, 3815],
+  [540, 3865],
+  [600, 3890],
 ] as const satisfies readonly ParkAccessSourcePoint[];
 
 const BENVENUTO_FOUR_LANE_SOURCE = [
@@ -390,6 +427,7 @@ const GATE_1_GATE_10_RUA_BRASIL_SOURCE = [
 ] as const satisfies readonly ParkAccessSourcePoint[];
 
 const THIRD_AGE_PAVILION_ACCESS_SOURCE = [
+  [629, 3332],
   [651, 3450],
   [700, 3485],
   [735, 3530],
@@ -399,7 +437,7 @@ const THIRD_AGE_PAVILION_THRESHOLD_SOURCE = THIRD_AGE_PAVILION_ACCESS_SOURCE[
   THIRD_AGE_PAVILION_ACCESS_SOURCE.length - 1
 ];
 const THIRD_AGE_PAVILION_ACCESS_TREE_CLEARANCE_METERS = 1.5;
-const MAIN_COBBLESTONE_ROAD_TREE_CLEARANCE_METERS = 2;
+const MAIN_ACCESS_ROAD_TREE_CLEARANCE_METERS = 2;
 const THIRD_AGE_PAVILION_ACCESS_SURFACE_SOURCE = clipSourcePolygonAtMaximumX(
   strokeSourcePath(THIRD_AGE_PAVILION_ACCESS_SOURCE, 4),
   B22_SOURCE_BOUNDS[0],
@@ -491,8 +529,11 @@ function makeRoadSurface(
     GATE_APRON: 0.056,
     COMPACTED_SERVICE_ROAD: 0.038,
     COBBLESTONE_ACCESS_ROAD: 0.039,
+    ASPHALT_ACCESS_ROAD: 0.044,
+    STONE_GRAVEL_ACCESS_ROAD: 0.041,
   };
   const overlapSafeElevationById: Readonly<Record<string, number>> = {
+    'gate-1-local-access': 0.046,
     'gate-1-apron': 0.056,
     'gate-2-apron': 0.057,
     'gate-3-arrival': 0.058,
@@ -513,21 +554,36 @@ function makeRoadSurface(
 
 const ROAD_SURFACES = [
   makeRoadSurface(
-    'gate-1-approach',
-    'VEHICLE_ACCESS',
-    GATE_1_APPROACH_SOURCE,
-    8,
-    ['roundabout-tupareendi', 'AV-TUPARENDI', 'A1', 'costeiros-service-road', 'gate-1-gate-10-rua-brasil-cobblestone'],
+    'gate-1-local-access',
+    'ASPHALT_ACCESS_ROAD',
+    GATE_1_LOCAL_ACCESS_SOURCE,
+    7,
+    ['gate-1-mini-roundabout', 'A1', 'third-age-pavilion-access'],
     {
       sourceIds: [
         'official-2026-park-map',
-        'annex-1-implantation',
-        'annex-2-satellite',
-        'annex-13-a1-a10-blue-trace',
-        'annex-14-satellite-a1-a10-b22',
+        'annex-18-current-map-gate-1',
+        'annex-20-satellite-gate-1-roundabout',
+        'annex-21-site-plan-gate-1-motorhome',
       ],
-      confidence: 'ANNEX_REGISTERED_TRACE',
-      notes: 'Eixo preserva A1 e alcança por tangência a rotatória da Avenida Tupareendi; curvas intermediárias seguem a leitura conjunta de implantação, traçado anotado e satélite, sem alegação de levantamento viário.',
+      confidence: 'FIELD_REVIEW_REQUIRED',
+      notes: 'Acesso asfaltado independente termina exatamente em A1 e tangencia a mini-rotatória; os controles intermediários vêm do registro do Anexo 21 e não constituem levantamento as-built.',
+    },
+  ),
+  makeRoadSurface(
+    'gate-1-roundabout-tupareendi-link',
+    'ASPHALT_ACCESS_ROAD',
+    GATE_1_ROUNDABOUT_TUPARENDI_LINK_SOURCE,
+    7,
+    ['gate-1-mini-roundabout', 'AV-TUPARENDI'],
+    {
+      sourceIds: [
+        'official-2026-park-map',
+        'annex-20-satellite-gate-1-roundabout',
+        'annex-21-site-plan-gate-1-motorhome',
+      ],
+      confidence: 'FIELD_REVIEW_REQUIRED',
+      notes: 'Ligação asfaltada curta conecta somente a mini-rotatória do Portão 1 ao corredor oficial da Avenida Tupareendi; a curva é registrada nos anexos e permanece sujeita à conferência de campo.',
     },
   ),
   {
@@ -551,11 +607,17 @@ const ROAD_SURFACES = [
     'GATE_APRON',
     [[684, 3306], [684, 3332]],
     10,
-    ['gate-1-approach', 'A1', 'costeiros-service-road', 'gate-1-gate-10-rua-brasil-cobblestone'],
+    ['gate-1-local-access', 'A1', 'costeiros-service-road', 'gate-1-gate-10-rua-brasil-asphalt'],
     {
-      sourceIds: ['official-2026-park-map', 'annex-1-implantation', 'annex-6-costeiros'],
+      sourceIds: [
+        'official-2026-park-map',
+        'annex-1-implantation',
+        'annex-6-costeiros',
+        'annex-18-current-map-gate-1',
+        'annex-21-site-plan-gate-1-motorhome',
+      ],
       confidence: 'ANNEX_REGISTERED_TRACE',
-      notes: 'Envelope do encontro do pórtico com os dois segmentos viários; a posição A1 é oficial e a largura do apron permanece interpretativa.',
+      notes: 'Envelope do encontro do pórtico com o acesso local asfaltado, o eixo A1/A10 e a via de saibro; a posição A1 é oficial e a largura do apron permanece interpretativa.',
     },
     GATE_1_APRON_SOURCE,
   ),
@@ -585,22 +647,31 @@ const ROAD_SURFACES = [
     },
     GATE_3_APRON_SOURCE,
   ),
-  makeRoadSurface(
-    'costeiros-service-road',
-    'COMPACTED_SERVICE_ROAD',
-    COSTEIROS_SERVICE_ROAD_SOURCE,
-    7,
-    ['A1', 'sede-costeiros', 'costeiros-field-edge'],
-    {
-      sourceIds: ['annex-1-implantation', 'annex-6-costeiros'],
-      confidence: 'ANNEX_REGISTERED_TRACE',
-      notes: 'Via de serviço acompanha o limite oeste do bosque, passa a oeste da Sede Costeiros e curva para o campo; posição intermediária é traçada sobre o anexo, não levantada em campo.',
-    },
-  ),
   {
     ...makeRoadSurface(
-      'gate-1-gate-10-rua-brasil-cobblestone',
-      'COBBLESTONE_ACCESS_ROAD',
+      'costeiros-service-road',
+      'STONE_GRAVEL_ACCESS_ROAD',
+      COSTEIROS_SERVICE_ROAD_SOURCE,
+      7,
+      ['A1', 'AREA-MOTORHOME', 'sede-costeiros', 'costeiros-field-edge'],
+      {
+        sourceIds: [
+          'annex-1-implantation',
+          'annex-6-costeiros',
+          'annex-17-current-map-overview',
+          'annex-21-site-plan-gate-1-motorhome',
+          'annex-22-aerial-motorhome-road',
+        ],
+        confidence: 'ANNEX_REGISTERED_TRACE',
+        notes: 'Via de pedra e saibro preserva o eixo registrado entre A1, a borda oeste da Área Motor Home e a curva superior; sua posição intermediária não é um levantamento as-built.',
+      },
+    ),
+    supportAware: true,
+  },
+  {
+    ...makeRoadSurface(
+      'gate-1-gate-10-rua-brasil-asphalt',
+      'ASPHALT_ACCESS_ROAD',
       GATE_1_GATE_10_RUA_BRASIL_SOURCE,
       6,
       ['A1', 'A10', 'RUA-BRASIL'],
@@ -614,32 +685,45 @@ const ROAD_SURFACES = [
           'annex-14-satellite-a1-a10-b22',
           'annex-15-current-map-upper-connection',
           'annex-16-site-plan-a1-a10',
+          'annex-17-current-map-overview',
+          'annex-18-current-map-gate-1',
+          'annex-19-current-map-gate-10',
+          'annex-20-satellite-gate-1-roundabout',
+          'annex-21-site-plan-gate-1-motorhome',
         ],
         confidence: 'ANNEX_REGISTERED_TRACE',
-        notes: 'Eixo único de calçamento em pedra grande começa exatamente em A1, atravessa exatamente A10 e termina com sobreposição curta dentro da borda oeste oficial da Rua Brasil; controles intermediários permanecem interpretativos.',
+        notes: 'Eixo asfaltado começa exatamente em A1, atravessa exatamente A10 e termina com sobreposição curta dentro da borda oeste oficial da Rua Brasil; controles intermediários permanecem interpretativos e não são as-built.',
       },
     ),
+    elevation: 0.044,
     widthReviewRangeMeters: [5.5, 7] as const,
+    supportAware: true,
   },
-  makeRoadSurface(
-    'third-age-pavilion-access',
-    'COBBLESTONE_ACCESS_ROAD',
-    THIRD_AGE_PAVILION_ACCESS_SOURCE,
-    4,
-    ['gate-1-approach', 'B22'],
-    {
-      sourceIds: [
-        'official-2026-park-map',
-        'annex-10-current-map-overview-east',
-        'annex-13-a1-a10-blue-trace',
-        'annex-14-satellite-a1-a10-b22',
-        'annex-16-site-plan-a1-a10',
-      ],
-      confidence: 'FIELD_REVIEW_REQUIRED',
-      notes: 'Acesso de quatro metros ramifica abaixo de A1 e termina no threshold interpretado da fachada oeste de B22; o polígono é recortado na borda oficial para nunca avançar sob o pavilhão.',
-    },
-    THIRD_AGE_PAVILION_ACCESS_SURFACE_SOURCE,
-  ),
+  {
+    ...makeRoadSurface(
+      'third-age-pavilion-access',
+      'COBBLESTONE_ACCESS_ROAD',
+      THIRD_AGE_PAVILION_ACCESS_SOURCE,
+      4,
+      ['gate-1-local-access', 'B22'],
+      {
+        sourceIds: [
+          'official-2026-park-map',
+          'annex-10-current-map-overview-east',
+          'annex-13-a1-a10-blue-trace',
+          'annex-14-satellite-a1-a10-b22',
+          'annex-16-site-plan-a1-a10',
+          'annex-18-current-map-gate-1',
+          'annex-20-satellite-gate-1-roundabout',
+          'annex-21-site-plan-gate-1-motorhome',
+        ],
+        confidence: 'FIELD_REVIEW_REQUIRED',
+        notes: 'Acesso de quatro metros parte do controle [629,3332] compartilhado com o acesso local do Portão 1 e termina no threshold interpretado da fachada oeste de B22; o recorte preserva integralmente o footprint oficial.',
+      },
+      THIRD_AGE_PAVILION_ACCESS_SURFACE_SOURCE,
+    ),
+    supportAware: true,
+  },
 ] as const satisfies readonly ParkAccessRoadSurface[];
 
 function makeSidewalk(
@@ -715,13 +799,16 @@ const SIDEWALK_SURFACES = [
   ),
   makeSidewalk(
     'gate-1-west-sidewalk',
-    GATE_1_APPROACH_SOURCE.map(([x, z]) => [x - 40, z] as const),
+    GATE_1_LOCAL_ACCESS_SOURCE.map(([x, z]) => [x - 40, z] as const),
     1.6,
     'CONCRETE',
     {
-      sourceIds: ['annex-1-implantation', 'annex-2-satellite', 'annex-14-satellite-a1-a10-b22'],
+      sourceIds: [
+        'annex-20-satellite-gate-1-roundabout',
+        'annex-21-site-plan-gate-1-motorhome',
+      ],
       confidence: 'FIELD_REVIEW_REQUIRED',
-      notes: 'Faixa pedonal lateral garante leitura de chegada, mas posição exata de meio-fio e drenagem requer conferência local.',
+      notes: 'Faixa pedonal acompanha somente o acesso local entre a mini-rotatória e A1; posição exata de meio-fio, continuidade e drenagem requerem conferência local.',
     },
   ),
 ] as const satisfies readonly ParkAccessSidewalkSurface[];
@@ -846,6 +933,59 @@ const SPLITTER_ISLAND_SOURCES = [
   },
 ] as const;
 
+const ROUNDABOUTS = [
+  {
+    id: 'roundabout-tupareendi',
+    center: parkAccessSourcePointToLocal(ROUNDABOUT_SOURCE),
+    sourcePdfCenter: ROUNDABOUT_SOURCE,
+    outerRadius: parkAccessMetersToLocal(18),
+    outerRadiusMeters: 18,
+    islandRadius: parkAccessMetersToLocal(10.5),
+    islandRadiusMeters: 10.5,
+    circulatingWidth: parkAccessMetersToLocal(7.5),
+    circulatingWidthMeters: 7.5,
+    elevation: 0.05,
+    splitterIslands: SPLITTER_ISLAND_SOURCES.map((island) => ({
+      id: island.id,
+      sourcePdfPolygon: island.sourcePdfPolygon,
+      polygon: polygonToLocal(island.sourcePdfPolygon),
+    })),
+    approachRoadIds: ['benvenuto-four-lane-axis'] as const,
+    connects: ['benvenuto-four-lane-axis', 'AV-TUPARENDI'] as const,
+    sourceIds: ['annex-1-implantation', 'annex-2-satellite', 'annex-14-satellite-a1-a10-b22'] as const,
+    confidence: 'DIMENSIONALLY_INFERRED' as const,
+    notes: 'Rotatória principal permanece restrita à Avenida Benvenuto de Conti e ao corredor oficial da Avenida Tupareendi; os raios não são dados as-built.',
+  },
+  {
+    id: 'gate-1-mini-roundabout',
+    center: parkAccessSourcePointToLocal(GATE_1_MINI_ROUNDABOUT_SOURCE),
+    sourcePdfCenter: GATE_1_MINI_ROUNDABOUT_SOURCE,
+    outerRadius: parkAccessMetersToLocal(14),
+    outerRadiusMeters: 14,
+    islandRadius: parkAccessMetersToLocal(7.5),
+    islandRadiusMeters: 7.5,
+    circulatingWidth: parkAccessMetersToLocal(6.5),
+    circulatingWidthMeters: 6.5,
+    elevation: 0.048,
+    splitterIslands: [] as const,
+    approachRoadIds: [
+      'gate-1-local-access',
+      'gate-1-roundabout-tupareendi-link',
+    ] as const,
+    connects: [
+      'gate-1-local-access',
+      'gate-1-roundabout-tupareendi-link',
+    ] as const,
+    sourceIds: [
+      'official-2026-park-map',
+      'annex-20-satellite-gate-1-roundabout',
+      'annex-21-site-plan-gate-1-motorhome',
+    ] as const,
+    confidence: 'FIELD_REVIEW_REQUIRED' as const,
+    notes: 'Mini-rotatória independente registrada como candidato cartográfico, com centro [341,3718] e dimensões de trabalho; centro, raios, meio-fios e altimetria exigem vistoria antes de uso executivo.',
+  },
+] as const;
+
 export const PARK_ACCESS_SOURCE_MANIFEST: readonly ParkAccessSourceManifestEntry[] = [
   {
     id: 'official-2026-park-map',
@@ -963,10 +1103,52 @@ export const PARK_ACCESS_SOURCE_MANIFEST: readonly ParkAccessSourceManifestEntry
     metricUse: 'REGISTERED_TO_OFFICIAL_MAP',
     interpretation: 'A planta ancora a continuidade e os lados do corredor; o mapa oficial 2026 continua soberano para IDs e coordenadas.',
   },
+  {
+    id: 'annex-17-current-map-overview',
+    file: 'attachment:1351704b-b70f-45ae-ac54-064b870b8ad0.png',
+    role: 'Diagnóstico geral do estado atual entre A1, A10, B22, Área Motor Home e a rotatória de chegada.',
+    metricUse: 'VISUAL_ONLY',
+    interpretation: 'Evidencia material, continuidade e oclusões incorretas; não fornece coordenadas nem dimensões executivas.',
+  },
+  {
+    id: 'annex-18-current-map-gate-1',
+    file: 'attachment:454bebad-04cc-4e38-a60c-01191a4b69f2.png',
+    role: 'Diagnóstico aproximado do Portão 1, do acesso atual e da relação visual com B22 e a rotatória grande.',
+    metricUse: 'VISUAL_ONLY',
+    interpretation: 'Comprova a ligação visual equivocada e orienta a comparação posterior, sem uso métrico.',
+  },
+  {
+    id: 'annex-19-current-map-gate-10',
+    file: 'attachment:c5c5f3ad-8d14-4090-8270-f07b9ccbde30.png',
+    role: 'Diagnóstico do eixo atual junto a A10, Rua Brasil, estacionamento e borda arborizada.',
+    metricUse: 'VISUAL_ONLY',
+    interpretation: 'Expõe material incorreto e trechos ocultos; A10 e Rua Brasil continuam ancorados somente no mapa oficial.',
+  },
+  {
+    id: 'annex-20-satellite-gate-1-roundabout',
+    file: 'attachment:WhatsApp Image 2026-08-26 at 17.31.03 (1).jpeg',
+    role: 'Satélite anotado para a separação entre A1, A10, B22 e a mini-rotatória própria do Portão 1.',
+    metricUse: 'RELATIVE_ONLY',
+    interpretation: 'Confirma a topologia independente da mini-rotatória; traços manuais, interface e rotação não permitem leitura as-built.',
+  },
+  {
+    id: 'annex-21-site-plan-gate-1-motorhome',
+    file: 'attachment:Imagem do Codex 26 de ago. de 2026, 19_41_35 (1).png',
+    role: 'Planta de implantação para A1, A10, mini-rotatória e via longitudinal até a Área Motor Home.',
+    metricUse: 'REGISTERED_TO_OFFICIAL_MAP',
+    interpretation: 'Registro cruzado por A1, A10 e referências oficiais; os controles novos são candidatos cartográficos sujeitos à vistoria.',
+  },
+  {
+    id: 'annex-22-aerial-motorhome-road',
+    file: 'attachment:WhatsApp Image 2026-08-26 at 19.41.21 (1).jpeg',
+    role: 'Leitura aérea complementar da estrada de pedra/saibro, da Área Motor Home, da Sede Costeiros e das bordas vegetadas.',
+    metricUse: 'RELATIVE_ONLY',
+    interpretation: 'Confirma continuidade, material e gradiente de vegetação; não individualiza árvores, cotas ou limites topográficos.',
+  },
 ];
 
 export const PARK_ACCESS_SPATIAL_PLAN = {
-  revision: '2026.8-park-access-annexes.3',
+  revision: '2026.8-park-access-annexes.4',
   coordinateFrame: {
     id: 'official-2026-pdf-crop-local-xz',
     sourceCropPdf: OFFICIAL_2026_SOURCE_MANIFEST.parkCropPdf,
@@ -986,6 +1168,9 @@ export const PARK_ACCESS_SPATIAL_PLAN = {
     woodlandPathMeters: 3,
     woodlandPathClearanceMeters: 6.4,
     serviceRoadMeters: 7,
+    gate1LocalAccessMeters: 7,
+    gate1MiniRoundaboutOuterRadiusMeters: 14,
+    gate1MiniRoundaboutIslandRadiusMeters: 7.5,
     gate1Gate10RoadMeters: 6,
     gate1Gate10RoadReviewRangeMeters: [5.5, 7] as const,
     thirdAgePavilionAccessMeters: 4,
@@ -998,7 +1183,14 @@ export const PARK_ACCESS_SPATIAL_PLAN = {
       sourcePdfPoint: A1_SOURCE,
       point: parkAccessSourcePointToLocal(A1_SOURCE),
       officialEntityIdentifier: 'A1',
-      sourceIds: ['official-2026-park-map', 'annex-1-implantation', 'annex-6-costeiros'],
+      sourceIds: [
+        'official-2026-park-map',
+        'annex-1-implantation',
+        'annex-6-costeiros',
+        'annex-18-current-map-gate-1',
+        'annex-20-satellite-gate-1-roundabout',
+        'annex-21-site-plan-gate-1-motorhome',
+      ],
       confidence: 'OFFICIAL_ANCHOR',
       notes: 'Centro oficial A1 preservado; anexos determinam apenas continuidade e implantação do entorno.',
     },
@@ -1034,9 +1226,12 @@ export const PARK_ACCESS_SPATIAL_PLAN = {
         'annex-13-a1-a10-blue-trace',
         'annex-14-satellite-a1-a10-b22',
         'annex-16-site-plan-a1-a10',
+        'annex-19-current-map-gate-10',
+        'annex-20-satellite-gate-1-roundabout',
+        'annex-21-site-plan-gate-1-motorhome',
       ],
       confidence: 'OFFICIAL_ANCHOR',
-      notes: 'Centro oficial A10 preservado como ponto obrigatório do mesmo eixo de calçamento que parte de A1 e alcança Rua Brasil.',
+      notes: 'Centro oficial A10 preservado como ponto obrigatório do eixo asfaltado que parte de A1 e alcança Rua Brasil.',
     },
     roundabout: {
       id: 'anchor-roundabout-tupareendi',
@@ -1046,7 +1241,21 @@ export const PARK_ACCESS_SPATIAL_PLAN = {
       officialEntityIdentifier: null,
       sourceIds: ['annex-1-implantation', 'annex-2-satellite', 'annex-14-satellite-a1-a10-b22'],
       confidence: 'ANNEX_REGISTERED_TRACE',
-      notes: 'Centro registrado pela ilha circular visível; raios e ilhas separadoras não são dados de engenharia.',
+      notes: 'Centro da rotatória principal registrado pela ilha circular visível; ela permanece distinta da mini-rotatória do Portão 1 e seus raios não são dados de engenharia.',
+    },
+    gate1Roundabout: {
+      id: 'anchor-gate-1-mini-roundabout',
+      name: 'Mini-rotatória própria do Portão 1',
+      sourcePdfPoint: GATE_1_MINI_ROUNDABOUT_SOURCE,
+      point: parkAccessSourcePointToLocal(GATE_1_MINI_ROUNDABOUT_SOURCE),
+      officialEntityIdentifier: null,
+      sourceIds: [
+        'official-2026-park-map',
+        'annex-20-satellite-gate-1-roundabout',
+        'annex-21-site-plan-gate-1-motorhome',
+      ],
+      confidence: 'FIELD_REVIEW_REQUIRED',
+      notes: 'Centro candidato derivado do registro cruzado dos anexos; não equivale a coordenada topográfica ou as-built.',
     },
     pavilion14NorthWest: {
       id: 'anchor-pavilion-14-north-west',
@@ -1096,45 +1305,30 @@ export const PARK_ACCESS_SPATIAL_PLAN = {
     },
     tupareendiJoin: {
       id: 'anchor-tupareendi-gate-1-join',
-      name: 'Encaixe Av. Tupareendi → acesso do Portão 1',
-      sourcePdfPoint: GATE_1_APPROACH_SOURCE[0],
-      point: parkAccessSourcePointToLocal(GATE_1_APPROACH_SOURCE[0]),
+      name: 'Encaixe Av. Tupareendi → mini-rotatória do Portão 1',
+      sourcePdfPoint: GATE_1_ROUNDABOUT_TUPARENDI_LINK_SOURCE[
+        GATE_1_ROUNDABOUT_TUPARENDI_LINK_SOURCE.length - 1
+      ],
+      point: parkAccessSourcePointToLocal(GATE_1_ROUNDABOUT_TUPARENDI_LINK_SOURCE[
+        GATE_1_ROUNDABOUT_TUPARENDI_LINK_SOURCE.length - 1
+      ]),
       officialEntityIdentifier: 'AV-TUPARENDI',
       sourceIds: [
         'official-2026-park-map',
-        'annex-1-implantation',
-        'annex-2-satellite',
-        'annex-14-satellite-a1-a10-b22',
+        'annex-20-satellite-gate-1-roundabout',
+        'annex-21-site-plan-gate-1-motorhome',
       ],
-      confidence: 'ANNEX_REGISTERED_TRACE',
-      notes: 'Ponto de tangência conservador dentro do corredor oficial da Tupareendi; meio-fio exato requer conferência em campo.',
+      confidence: 'FIELD_REVIEW_REQUIRED',
+      notes: 'Controle conservador [600,3890] encerra a ligação curta no corredor oficial da Tupareendi; tangência, meio-fio e cota exatos requerem conferência em campo.',
     },
   } satisfies Record<string, ParkAccessAnchor>,
   roadSurfaces: ROAD_SURFACES,
   sidewalkSurfaces: SIDEWALK_SURFACES,
   markingSegments: MARKING_SEGMENTS,
   parkingBays: PARKING_BAYS,
-  roundabout: {
-    id: 'roundabout-tupareendi',
-    center: parkAccessSourcePointToLocal(ROUNDABOUT_SOURCE),
-    sourcePdfCenter: ROUNDABOUT_SOURCE,
-    outerRadius: parkAccessMetersToLocal(18),
-    outerRadiusMeters: 18,
-    islandRadius: parkAccessMetersToLocal(10.5),
-    islandRadiusMeters: 10.5,
-    circulatingWidth: parkAccessMetersToLocal(7.5),
-    circulatingWidthMeters: 7.5,
-    elevation: 0.05,
-    splitterIslands: SPLITTER_ISLAND_SOURCES.map((island) => ({
-      id: island.id,
-      sourcePdfPolygon: island.sourcePdfPolygon,
-      polygon: polygonToLocal(island.sourcePdfPolygon),
-    })),
-    approachRoadIds: ['benvenuto-four-lane-axis', 'gate-1-approach'] as const,
-    sourceIds: ['annex-1-implantation', 'annex-2-satellite', 'annex-14-satellite-a1-a10-b22'] as const,
-    confidence: 'DIMENSIONALLY_INFERRED' as const,
-    notes: 'Ilha circular e conexão são visíveis; raios foram arredondados a parâmetros urbanos plausíveis e não devem ser publicados como as-built.',
-  },
+  roundabouts: ROUNDABOUTS,
+  roundabout: ROUNDABOUTS[0],
+  gate1Roundabout: ROUNDABOUTS[1],
   gates: {
     gate1: {
       id: 'gate-1',
@@ -1142,7 +1336,7 @@ export const PARK_ACCESS_SPATIAL_PLAN = {
       anchor: parkAccessSourcePointToLocal(A1_SOURCE),
       sourcePdfAnchor: A1_SOURCE,
       approachHeadingRadians: parkAccessHeadingBetween(
-        GATE_1_APPROACH_SOURCE[GATE_1_APPROACH_SOURCE.length - 2],
+        GATE_1_LOCAL_ACCESS_SOURCE[GATE_1_LOCAL_ACCESS_SOURCE.length - 2],
         A1_SOURCE,
       ),
       width: parkAccessMetersToLocal(16),
@@ -1154,9 +1348,9 @@ export const PARK_ACCESS_SPATIAL_PLAN = {
       pedestrianPortalCount: 1,
       architecture: 'MIXED_ACCESS_GATEHOUSE',
       approachRoadIds: [
-        'gate-1-approach',
+        'gate-1-local-access',
         'costeiros-service-road',
-        'gate-1-gate-10-rua-brasil-cobblestone',
+        'gate-1-gate-10-rua-brasil-asphalt',
       ],
       sourceIds: [
         'official-2026-park-map',
@@ -1164,9 +1358,12 @@ export const PARK_ACCESS_SPATIAL_PLAN = {
         'annex-6-costeiros',
         'annex-13-a1-a10-blue-trace',
         'annex-14-satellite-a1-a10-b22',
+        'annex-18-current-map-gate-1',
+        'annex-20-satellite-gate-1-roundabout',
+        'annex-21-site-plan-gate-1-motorhome',
       ],
-      confidence: 'DIMENSIONALLY_INFERRED',
-      notes: 'Footprint é pequeno e legível nos anexos aéreos; elevação e número de vãos não possuem fotografia frontal dedicada.',
+      confidence: 'FIELD_REVIEW_REQUIRED',
+      notes: 'A1 permanece na âncora oficial e agora recebe o acesso asfaltado da mini-rotatória, o eixo asfaltado A1/A10 e a via de saibro; rotação e dimensões arquitetônicas não são levantamento as-built.',
     },
     gate2: {
       id: 'gate-2',
@@ -1269,10 +1466,45 @@ export const PARK_ACCESS_SPATIAL_PLAN = {
     fieldEdge: pathToLocal([[960, 2840], [1180, 2835], [1430, 2850], [1700, 2880]]),
     sourcePdfForestEdge: [[720, 3150], [770, 3030], [790, 2820], [810, 2520], [850, 2180]] as const,
     forestEdge: pathToLocal([[720, 3150], [770, 3030], [790, 2820], [810, 2520], [850, 2180]]),
-    sourceIds: ['annex-1-implantation', 'annex-6-costeiros'],
+    sourceIds: [
+      'annex-1-implantation',
+      'annex-6-costeiros',
+      'annex-17-current-map-overview',
+      'annex-21-site-plan-gate-1-motorhome',
+      'annex-22-aerial-motorhome-road',
+    ],
     confidence: 'ANNEX_REGISTERED_TRACE' as const,
-    notes: 'Sede fica a leste da via principal e ao norte do bosque; sua via permanece um ramal distinto do eixo oficial A1/A10/Rua Brasil. Nenhum vínculo cadastral ou comercial é criado.',
+    notes: 'Sede fica a leste da via de pedra/saibro e ao norte do bosque; o eixo permanece distinto do acesso asfaltado A1/A10/Rua Brasil. Nenhum vínculo cadastral ou comercial é criado.',
   },
+  motorhomeSetting: {
+    id: 'motorhome-setting',
+    officialEntityIdentifier: 'AREA-MOTORHOME',
+    sourcePdfFootprint: MOTORHOME_FOOTPRINT_SOURCE,
+    footprint: polygonToLocal(MOTORHOME_FOOTPRINT_SOURCE),
+    accessRoadId: 'costeiros-service-road',
+    sourcePdfAccessCenterline: COSTEIROS_SERVICE_ROAD_SOURCE,
+    accessCenterline: pathToLocal(COSTEIROS_SERVICE_ROAD_SOURCE),
+    sourcePdfAccessPolygon: ROAD_SURFACES.find(
+      (road) => road.id === 'costeiros-service-road',
+    )!.sourcePdfPolygon,
+    accessPolygon: ROAD_SURFACES.find(
+      (road) => road.id === 'costeiros-service-road',
+    )!.polygon,
+    protectedFootprintIdentifiers: ['AREA-MOTORHOME'],
+    clearances: {
+      footprintMeters: 0,
+      roadTreeTrunkMeters: MAIN_ACCESS_ROAD_TREE_CLEARANCE_METERS,
+      canopyMeters: 0.75,
+    },
+    sourceIds: [
+      'official-2026-park-map',
+      'annex-17-current-map-overview',
+      'annex-21-site-plan-gate-1-motorhome',
+      'annex-22-aerial-motorhome-road',
+    ],
+    confidence: 'FIELD_REVIEW_REQUIRED',
+    notes: 'Footprint [760,1780,1630,2400] é o limite oficial AREA-MOTORHOME; a via de pedra/saibro cruza esse suporte como acesso físico e os clearances são regras de apresentação, não afastamentos topográficos.',
+  } satisfies MotorhomeSetting,
   thirdAgePavilionSetting: {
     id: 'third-age-pavilion-setting',
     officialEntityIdentifier: 'B22',
@@ -1295,7 +1527,7 @@ export const PARK_ACCESS_SPATIAL_PLAN = {
     protectedFootprintIdentifiers: ['B22'],
     clearances: {
       footprintMeters: 0,
-      roadTreeTrunkMeters: MAIN_COBBLESTONE_ROAD_TREE_CLEARANCE_METERS,
+      roadTreeTrunkMeters: MAIN_ACCESS_ROAD_TREE_CLEARANCE_METERS,
       pavilionAccessTreeTrunkMeters: THIRD_AGE_PAVILION_ACCESS_TREE_CLEARANCE_METERS,
       canopyMeters: 0.45,
     },
@@ -1305,9 +1537,12 @@ export const PARK_ACCESS_SPATIAL_PLAN = {
       'annex-13-a1-a10-blue-trace',
       'annex-14-satellite-a1-a10-b22',
       'annex-16-site-plan-a1-a10',
+      'annex-18-current-map-gate-1',
+      'annex-20-satellite-gate-1-roundabout',
+      'annex-21-site-plan-gate-1-motorhome',
     ],
     confidence: 'FIELD_REVIEW_REQUIRED',
-    notes: 'B22 conserva integralmente seu footprint oficial; o acesso e seu clearance terminam no threshold da fachada oeste e são recortados para não avançar sob a edificação.',
+    notes: 'B22 conserva integralmente seu footprint oficial; o acesso começa no controle compartilhado [629,3332], termina no threshold da fachada oeste e é recortado para não avançar sob a edificação. Controles e clearances não são as-built.',
   } satisfies ThirdAgePavilionSetting,
   benvenutoPavilionEdge: {
     id: 'benvenuto-pavilion-edge',
@@ -1388,13 +1623,15 @@ export const PARK_ACCESS_SPATIAL_PLAN = {
     policy: 'read-only anchors; no lot, pavilion, commercial module, segment, route, persistence or business-rule mutation' as const,
   },
   openQuestions: [
-    'Confirmar em vistoria o raio externo, o raio da ilha e as ilhas separadoras da rotatória.',
-    'Confirmar larguras as-built, drenagem e cotas de meio-fio do acesso A1 e da Avenida Benvenuto de Conti.',
-    'Confirmar a largura as-built entre 5,5 m e 7 m, drenagem lateral e padrão dimensional das pedras do eixo A1/A10/Rua Brasil.',
+    'Confirmar separadamente em vistoria o raio externo, o raio da ilha, o centro e a altimetria da mini-rotatória do Portão 1; [341,3718], 14 m e 7,5 m são parâmetros cartográficos de trabalho.',
+    'Confirmar em vistoria os raios e ilhas separadoras da rotatória principal Tupareendi/Benvenuto, sem reintroduzir ligação viária direta com A1.',
+    'Confirmar larguras as-built, drenagem e cotas de meio-fio do acesso asfaltado local A1 e da Avenida Benvenuto de Conti.',
+    'Confirmar a largura as-built entre 5,5 m e 7 m, drenagem lateral e composição do asfalto no eixo A1/A10/Rua Brasil.',
     'Confirmar o threshold, a largura livre do acesso e a solução de acessibilidade na fachada oeste do Pavilhão Terceira Idade B22.',
     'Confirmar altura, inclinação de cobertura, beirais e materiais de fachada de B22; os novos anexos fornecem somente leitura aérea e relativa.',
-    'Confirmar em campo as árvores junto ao calçamento e ao acesso B22 antes de alterar posições do inventário cartográfico.',
-    'Confirmar dimensões, elevação e materiais da Sede Costeiros e a continuidade extrema norte da via de serviço.',
+    'Confirmar em campo as árvores junto às vias asfaltadas, à estrada de saibro e ao acesso B22 antes de alterar posições do inventário cartográfico.',
+    'Confirmar granulometria, largura, drenagem e continuidade extrema norte da estrada de pedra/saibro junto à Área Motor Home.',
+    'Confirmar dimensões, elevação e materiais da Sede Costeiros; os anexos sustentam apenas sua relação espacial com a estrada.',
     'Confirmar quantidade útil de vãos/portais dos Portões 1, 2 e 3; os anexos fotográficos não são elevações ortográficas.',
     'Confirmar ângulo, quantidade e acessibilidade das vagas laterais antes de tratá-las como sinalização executiva.',
     'Não há bearing de norte verdadeiro nem altimetria nos anexos; orientação permanece no frame local do mapa oficial.',

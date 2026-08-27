@@ -67,7 +67,7 @@ export interface ParkAccessInfrastructureInput {
   sidewalkSurfaces: readonly ParkAccessSurfaceVisual[];
   parkingBays: readonly ParkAccessParkingBayVisual[];
   markingSegments: readonly ParkAccessMarkingVisual[];
-  roundabout: ParkAccessRoundaboutVisual | null;
+  roundabouts: readonly ParkAccessRoundaboutVisual[];
   gates: readonly ParkAccessGatePlacement[];
   costeiros: CosteirosBuildingPlacement | null;
 }
@@ -92,6 +92,7 @@ export interface ParkAccessRenderModel {
     sidewalkSurfaceCount: number;
     parkingBayCount: number;
     markingSegmentCount: number;
+    roundaboutCount: number;
     surfaceTriangleCount: number;
     instancedTriangleCount: number;
     estimatedPrimaryDrawCalls: number;
@@ -100,7 +101,7 @@ export interface ParkAccessRenderModel {
   };
 }
 
-export const PARK_ACCESS_INFRASTRUCTURE_REVISION = '2026.8-park-access-infrastructure.r2';
+export const PARK_ACCESS_INFRASTRUCTURE_REVISION = '2026.8-park-access-infrastructure.r3';
 
 export const PARK_ACCESS_INFRASTRUCTURE_PROFILE = {
   asphaltElevation: 0.044,
@@ -295,7 +296,11 @@ function createSupportAwareRibbonGeometry(
   const width = surface.width ?? 0;
   if (centerline.length < 2 || width <= EPSILON) return null;
   const canonicalElevation = surface.elevation
-    ?? PARK_ACCESS_INFRASTRUCTURE_PROFILE.cobblestoneElevation;
+    ?? (surface.material === 'gravel'
+      ? PARK_ACCESS_INFRASTRUCTURE_PROFILE.gravelElevation
+      : surface.material === 'cobblestone'
+        ? PARK_ACCESS_INFRASTRUCTURE_PROFILE.cobblestoneElevation
+        : PARK_ACCESS_INFRASTRUCTURE_PROFILE.asphaltElevation);
   const samples = densifyCenterline(
     centerline,
     reducedGraphics
@@ -689,32 +694,32 @@ export function buildParkAccessRenderModel(
 
   const landscapeParts: Array<THREE.BufferGeometry | null> = [];
   const roundaboutCurbParts: Array<THREE.BufferGeometry | null> = [];
-  if (input.roundabout) {
-    const roundaboutElevation = input.roundabout.elevation
+  input.roundabouts.forEach((roundabout) => {
+    const roundaboutElevation = roundabout.elevation
       ?? PARK_ACCESS_INFRASTRUCTURE_PROFILE.asphaltElevation;
-    const outerRadius = Math.max(0.2, input.roundabout.outerRadius);
+    const outerRadius = Math.max(0.2, roundabout.outerRadius);
     const islandRadius = Math.min(
-      Math.max(0.08, input.roundabout.islandRadius),
+      Math.max(0.08, roundabout.islandRadius),
       outerRadius * 0.78,
     );
     const curbWidth = Math.min(
-      Math.max(0.035, input.roundabout.curbWidth),
+      Math.max(0.035, roundabout.curbWidth),
       (outerRadius - islandRadius) * 0.4,
     );
     asphaltParts.push(ringGeometry(
       islandRadius + curbWidth,
       outerRadius,
       circleSegments,
-      input.roundabout.center,
+      roundabout.center,
       roundaboutElevation + 0.003,
     ));
     landscapeParts.push(circleGeometry(
       islandRadius,
       circleSegments,
-      input.roundabout.center,
+      roundabout.center,
       roundaboutElevation + PARK_ACCESS_INFRASTRUCTURE_PROFILE.curbRise + 0.005,
     ));
-    input.roundabout.splitterIslands?.forEach((polygon) => {
+    roundabout.splitterIslands?.forEach((polygon) => {
       landscapeParts.push(createHorizontalPolygonGeometry(
         polygon,
         roundaboutElevation + PARK_ACCESS_INFRASTRUCTURE_PROFILE.curbRise + 0.005,
@@ -731,7 +736,7 @@ export function buildParkAccessRenderModel(
       islandRadius + curbWidth,
       PARK_ACCESS_INFRASTRUCTURE_PROFILE.curbRise,
       circleSegments,
-      input.roundabout.center,
+      roundabout.center,
       roundaboutElevation,
     ));
     const dividerRadius = islandRadius + curbWidth + (outerRadius - islandRadius - curbWidth) * 0.5;
@@ -739,10 +744,10 @@ export function buildParkAccessRenderModel(
       dividerRadius - 0.018,
       dividerRadius + 0.018,
       circleSegments,
-      input.roundabout.center,
+      roundabout.center,
       roundaboutElevation + 0.008,
     ));
-  }
+  });
 
   const geometries: ParkAccessGeometrySet = {
     asphalt: mergeAndDispose(asphaltParts),
@@ -782,6 +787,7 @@ export function buildParkAccessRenderModel(
       sidewalkSurfaceCount: input.sidewalkSurfaces.length,
       parkingBayCount: input.parkingBays.length,
       markingSegmentCount: input.markingSegments.length,
+      roundaboutCount: input.roundabouts.length,
       surfaceTriangleCount,
       instancedTriangleCount,
       estimatedPrimaryDrawCalls,

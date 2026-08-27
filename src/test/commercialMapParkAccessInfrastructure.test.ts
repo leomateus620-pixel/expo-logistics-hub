@@ -24,27 +24,39 @@ const fixtures: ParkAccessInfrastructureInput = {
     {
       id: 'four-lane-axis',
       polygon: [[-7, -1.2], [7, -1.2], [7, 1.2], [-7, 1.2]],
+      centerline: [[-7, 0], [0, 0], [7, 0]],
+      width: 2.4,
+      elevation: 0.044,
       material: 'asphalt',
+      supportAware: true,
     },
     {
       id: 'costeiros-service-road',
       polygon: [[-5, -4], [-1, -4], [-1, -3.35], [-5, -3.35]],
+      centerline: [[-5, -3.675], [-3, -3.675], [-1, -3.675]],
+      width: 0.65,
+      elevation: 0.041,
       material: 'gravel',
+      supportAware: true,
     },
     {
-      id: 'support-aware-cobblestone',
+      id: 'third-age-pavilion-access',
       polygon: [[-5, 1.65], [5, 1.65], [5, 2.35], [-5, 2.35]],
       centerline: [[-5, 2], [0, 2], [5, 2]],
       width: 0.7,
       elevation: 0.039,
       material: 'cobblestone',
-      supportAware: true,
     },
   ],
   supportSurfaces: [
     {
       id: 'test-drive-support',
-      polygon: [[-1.5, 1], [1.5, 1], [1.5, 3], [-1.5, 3]],
+      polygon: [[-1.5, -0.5], [1.5, -0.5], [1.5, 0.5], [-1.5, 0.5]],
+      topElevation: 0.055,
+    },
+    {
+      id: 'motorhome-support',
+      polygon: [[-4, -4.2], [-2, -4.2], [-2, -3.1], [-4, -3.1]],
       topElevation: 0.055,
     },
   ],
@@ -86,15 +98,24 @@ const fixtures: ParkAccessInfrastructureInput = {
       color: 'white',
     },
   ],
-  roundabout: {
-    center: [-6, 3.4],
-    outerRadius: 1.18,
-    islandRadius: 0.44,
-    curbWidth: 0.08,
-    splitterIslands: [
-      [[-4.4, 3.25], [-3.9, 3.4], [-4.4, 3.55]],
-    ],
-  },
+  roundabouts: [
+    {
+      center: [-6, 3.4],
+      outerRadius: 1.18,
+      islandRadius: 0.44,
+      curbWidth: 0.08,
+      splitterIslands: [
+        [[-4.4, 3.25], [-3.9, 3.4], [-4.4, 3.55]],
+      ],
+    },
+    {
+      center: [4.8, 3.4],
+      outerRadius: 0.82,
+      islandRadius: 0.38,
+      curbWidth: 0.06,
+      splitterIslands: [],
+    },
+  ],
   gates: [
     { key: 'gate1', anchor: [-6.2, -0.4], rotationRadians: 0.2, width: 2.4, depth: 0.78 },
     { key: 'gate2', anchor: [-1.8, -1.5], rotationRadians: 0, width: 2.8, depth: 0.74 },
@@ -194,6 +215,7 @@ describe('infraestrutura externa parametrizada do mapa comercial', () => {
         sidewalkSurfaceCount: 1,
         parkingBayCount: 8,
         markingSegmentCount: 3,
+        roundaboutCount: 2,
         withinBudget: true,
       });
       expect(detailed.diagnostics.estimatedPrimaryDrawCalls)
@@ -212,20 +234,24 @@ describe('infraestrutura externa parametrizada do mapa comercial', () => {
     }
   });
 
-  it('eleva o ribbon cobblestone sobre suportes planos, com UV longitudinal e saia integrada', () => {
+  it('elevates support-aware asphalt and gravel above supports with longitudinal UVs and skirts', () => {
     const detailed = buildParkAccessRenderModel(fixtures);
     try {
-      const cobblestone = detailed.geometries.cobblestone!;
-      const positions = cobblestone.getAttribute('position');
-      const uvs = cobblestone.getAttribute('uv');
-      const elevations = Array.from({ length: positions.count }, (_, index) => positions.getY(index));
-      expect(Math.max(...elevations)).toBeGreaterThanOrEqual(
-        0.055 + PARK_ACCESS_INFRASTRUCTURE_PROFILE.supportClearance - 1e-6,
-      );
-      expect(Math.min(...elevations)).toBeLessThan(0.039);
-      expect(uvs.count).toBe(positions.count);
-      expect(Math.max(...Array.from({ length: uvs.count }, (_, index) => uvs.getX(index))))
-        .toBeGreaterThan(1);
+      [
+        { geometry: detailed.geometries.asphalt!, baseElevation: 0.044 },
+        { geometry: detailed.geometries.gravel!, baseElevation: 0.041 },
+      ].forEach(({ geometry, baseElevation }) => {
+        const positions = geometry.getAttribute('position');
+        const uvs = geometry.getAttribute('uv');
+        const elevations = Array.from({ length: positions.count }, (_, index) => positions.getY(index));
+        expect(Math.max(...elevations)).toBeGreaterThanOrEqual(
+          0.055 + PARK_ACCESS_INFRASTRUCTURE_PROFILE.supportClearance - 1e-6,
+        );
+        expect(Math.min(...elevations)).toBeLessThan(baseElevation);
+        expect(uvs.count).toBe(positions.count);
+        expect(Math.max(...Array.from({ length: uvs.count }, (_, index) => uvs.getX(index))))
+          .toBeGreaterThan(1);
+      });
     } finally {
       disposeParkAccessRenderModel(detailed);
     }
@@ -247,24 +273,39 @@ describe('infraestrutura externa parametrizada do mapa comercial', () => {
     expect(input.roadSurfaces.filter((surface) => surface.material === 'gravel').map((surface) => surface.id))
       .toEqual(['costeiros-service-road']);
     expect(input.roadSurfaces.filter((surface) => surface.material === 'cobblestone').map((surface) => surface.id))
-      .toEqual([
-        'gate-1-gate-10-rua-brasil-cobblestone',
-        'third-age-pavilion-access',
-      ]);
-    input.roadSurfaces.filter((surface) => surface.material === 'cobblestone').forEach((surface) => {
+      .toEqual(['third-age-pavilion-access']);
+    const surfaceContract = [
+      ['gate-1-gate-10-rua-brasil-asphalt', 'asphalt'],
+      ['costeiros-service-road', 'gravel'],
+      ['third-age-pavilion-access', 'cobblestone'],
+    ] as const;
+    surfaceContract.forEach(([id, material]) => {
+      const surface = input.roadSurfaces.find((candidate) => candidate.id === id)!;
       const canonical = PARK_ACCESS_SPATIAL_PLAN.roadSurfaces.find((road) => road.id === surface.id)!;
+      expect(surface.material).toBe(material);
       expect(surface.centerline).toBe(canonical.centerline);
       expect(surface.width).toBeCloseTo(
         canonical.widthMeters * PARK_ACCESS_SPATIAL_PLAN.coordinateFrame.workingMapUnitsPerMeter,
       );
+      expect(canonical.supportAware).toBe(true);
       expect(surface.supportAware).toBe(true);
     });
+    expect(input.roadSurfaces.find((surface) => surface.id === 'gate-1-local-access'))
+      .toMatchObject({ material: 'asphalt', supportAware: false });
+    expect(input.roadSurfaces.find((surface) => surface.id === 'gate-1-roundabout-tupareendi-link'))
+      .toMatchObject({ material: 'asphalt', supportAware: false });
     expect(input.supportSurfaces).toBe(PARK_ACCESS_OFFICIAL_FLAT_SUPPORT_SURFACES);
     expect(input.supportSurfaces.find((surface) => surface.id === 'TEST-DRIVE')?.topElevation)
       .toBeCloseTo(0.055);
+    expect(input.supportSurfaces.find((surface) => surface.id === 'AREA-MOTORHOME')?.topElevation)
+      .toBeCloseTo(0.055);
     expect(input.supportSurfaces.some((surface) => surface.id === 'B22')).toBe(false);
     expect(input.supportSurfaces.some((surface) => surface.id === 'A1')).toBe(false);
-    expect(input.roundabout?.splitterIslands).toHaveLength(2);
+    expect(input.roundabouts).toHaveLength(2);
+    expect(input.roundabouts[0].center).toBe(PARK_ACCESS_SPATIAL_PLAN.roundabouts[0].center);
+    expect(input.roundabouts[0].splitterIslands).toHaveLength(2);
+    expect(input.roundabouts[1].center).toBe(PARK_ACCESS_SPATIAL_PLAN.roundabouts[1].center);
+    expect(input.roundabouts[1].splitterIslands).toHaveLength(0);
     expect(input.costeiros).not.toBeNull();
     expect(JSON.stringify(PARK_ACCESS_SPATIAL_PLAN)).toBe(snapshot);
   });
@@ -280,20 +321,26 @@ describe('infraestrutura externa parametrizada do mapa comercial', () => {
         sidewalkSurfaceCount: 5,
         parkingBayCount: 43,
         markingSegmentCount: 5,
+        roundaboutCount: 2,
         withinBudget: true,
       });
       expect(detailed.diagnostics.estimatedPrimaryDrawCalls)
         .toBeLessThanOrEqual(PARK_ACCESS_RENDER_BUDGET.maximumPrimaryDrawCalls);
       expect(detailed.diagnostics.surfaceTriangleCount + detailed.diagnostics.instancedTriangleCount)
         .toBeLessThanOrEqual(PARK_ACCESS_RENDER_BUDGET.maximumRenderedTriangles);
-      const cobblestonePositions = detailed.geometries.cobblestone!.getAttribute('position');
-      const maximumCobblestoneElevation = Math.max(...Array.from(
-        { length: cobblestonePositions.count },
-        (_, index) => cobblestonePositions.getY(index),
-      ));
+      const maximumElevation = (material: 'asphalt' | 'gravel') => {
+        const positions = detailed.geometries[material]!.getAttribute('position');
+        return Math.max(...Array.from(
+          { length: positions.count },
+          (_, index) => positions.getY(index),
+        ));
+      };
       expect(input.roadSurfaces.filter((surface) => surface.material === 'cobblestone'))
-        .toHaveLength(2);
-      expect(maximumCobblestoneElevation).toBeGreaterThanOrEqual(
+        .toHaveLength(1);
+      expect(maximumElevation('asphalt')).toBeGreaterThanOrEqual(
+        0.055 + PARK_ACCESS_INFRASTRUCTURE_PROFILE.supportClearance - 1e-6,
+      );
+      expect(maximumElevation('gravel')).toBeGreaterThanOrEqual(
         0.055 + PARK_ACCESS_INFRASTRUCTURE_PROFILE.supportClearance - 1e-6,
       );
       expect(reduced.diagnostics.withinBudget).toBe(true);
@@ -310,15 +357,23 @@ describe('infraestrutura externa parametrizada do mapa comercial', () => {
       'src/features/commercial-map/components/canvas/ParkAccessInfrastructure.tsx',
     ), 'utf8');
 
+    expect(renderer).toContain('function createAsphaltTexture()');
+    expect(renderer).toContain('function createGravelTexture()');
     expect(renderer).toContain('function createCobblestoneTexture()');
     expect(renderer).toContain('const size = 64;');
     expect(renderer).toContain('horizontalJointJitter');
     expect(renderer).toContain('verticalJointJitter');
     expect(renderer).toContain('const COBBLESTONE_ROUGHNESS');
+    expect(renderer).toContain("if (kind === 'asphalt')");
+    expect(renderer).toContain('map={reducedGraphics ? undefined : ASPHALT_TEXTURE}');
+    expect(renderer).toContain("if (kind === 'gravel')");
+    expect(renderer).toContain('map={reducedGraphics ? undefined : GRAVEL_TEXTURE}');
     expect(renderer).toContain("if (kind === 'cobblestone')");
     expect(renderer).toContain('map={reducedGraphics ? undefined : COBBLESTONE_TEXTURE}');
     expect(renderer).toContain('depthTest');
     expect(renderer).toContain('depthWrite');
+    expect(renderer).toContain('polygonOffsetFactor={-1}');
+    expect(renderer).toContain('polygonOffsetUnits={-1}');
     expect(renderer).toContain("kind === 'whiteMarkings' || kind === 'yellowMarkings'");
     expect(renderer).toContain("kind === 'curbs'");
     expect(renderer).not.toContain('<instancedMesh name="cobblestone');

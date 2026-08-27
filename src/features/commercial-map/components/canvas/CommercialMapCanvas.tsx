@@ -208,6 +208,25 @@ const PARK_ACCESS_SURFACE_OWNER_IDENTIFIERS = [
   'CALCADA-ARVOREDO',
 ] as const;
 const PARK_ACCESS_ARCHITECTURE_OWNER_IDENTIFIERS = ['A1', 'A2', 'A3'] as const;
+const PARK_ACCESS_SCENE_SUPPORT_POINTS = [
+  ...PARK_ACCESS_SPATIAL_PLAN.roadSurfaces.flatMap((surface) => (
+    surface.polygon.map((position) => ({ position }))
+  )),
+  ...PARK_ACCESS_SPATIAL_PLAN.roundabouts.flatMap((roundabout) => {
+    const [x, z] = roundabout.center;
+    const radius = roundabout.outerRadius;
+    return [
+      { position: [x - radius, z] as const },
+      { position: [x + radius, z] as const },
+      { position: [x, z - radius] as const },
+      { position: [x, z + radius] as const },
+    ];
+  }),
+] as const;
+
+function parkAccessVisibleInArea(isolatedArea?: string | null) {
+  return !isolatedArea || isolatedArea === COMMERCIAL_MAP_SEGMENT_IDS.industry;
+}
 
 function createGateArrowGeometry() {
   const shape = new THREE.Shape();
@@ -2025,13 +2044,17 @@ function Scene({
   const extent = useMemo(
     () => getSceneExtent(
       entities,
-      hydrologicalModeActive
-        ? [...sceneElectricalInfrastructure.nodes, ...sceneHydrologicalInfrastructure.nodes]
-        : sceneElectricalInfrastructure.nodes,
+      [
+        ...(parkAccessVisibleInArea(isolatedArea) ? PARK_ACCESS_SCENE_SUPPORT_POINTS : []),
+        ...(hydrologicalModeActive
+          ? [...sceneElectricalInfrastructure.nodes, ...sceneHydrologicalInfrastructure.nodes]
+          : sceneElectricalInfrastructure.nodes),
+      ],
     ),
     [
       entities,
       hydrologicalModeActive,
+      isolatedArea,
       sceneElectricalInfrastructure.nodes,
       sceneHydrologicalInfrastructure.nodes,
     ],
@@ -2608,7 +2631,13 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
     reducedGraphics,
     cameraNavigating,
   }), [cameraNavigating, reducedGraphics, viewportMetrics]);
-  const extent = useMemo(() => getSceneExtent(entities), [entities]);
+  const extent = useMemo(
+    () => getSceneExtent(
+      entities,
+      parkAccessVisibleInArea(isolatedArea) ? PARK_ACCESS_SCENE_SUPPORT_POINTS : [],
+    ),
+    [entities, isolatedArea],
+  );
   const initialDirection = new THREE.Vector3(0.04, 0.72, 0.69).normalize();
   const initialDistance = fitDistanceForDirection(
     extent,

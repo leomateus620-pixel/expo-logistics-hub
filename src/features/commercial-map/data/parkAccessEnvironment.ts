@@ -50,7 +50,7 @@ export interface ParkAccessEnvironmentPresentation {
   };
 }
 
-export const PARK_ACCESS_ENVIRONMENT_REVISION = '2026.8-park-access-environment.r2';
+export const PARK_ACCESS_ENVIRONMENT_REVISION = '2026.8-park-access-environment.r3';
 export const PARK_ACCESS_AMBIENT_TREE_FOOTPRINT_CLEARANCE = {
   annexRelative: 0.3,
   narrowFieldReview: 0.08,
@@ -81,18 +81,13 @@ const WOODLAND_SOURCE_IDS = PARK_ACCESS_SPATIAL_PLAN.woodlandMass.sourceIds;
 const COSTEIROS_SOURCE_IDS = PARK_ACCESS_SPATIAL_PLAN.costeirosSetting.sourceIds;
 const BENVENUTO_SOURCE_IDS = PARK_ACCESS_SPATIAL_PLAN.benvenutoPavilionEdge.sourceIds;
 const THIRD_AGE_SETTING = PARK_ACCESS_SPATIAL_PLAN.thirdAgePavilionSetting;
-const COBBLESTONE_ACCESS_ROADS = PARK_ACCESS_SPATIAL_PLAN.roadSurfaces.filter(
-  (surface) => surface.kind === 'COBBLESTONE_ACCESS_ROAD',
-);
-const COBBLESTONE_ACCESS_POLYGONS = COBBLESTONE_ACCESS_ROADS.map((surface) => surface.polygon);
-const COBBLESTONE_TREE_CLEARANCES = COBBLESTONE_ACCESS_ROADS.map((surface) => ({
-  polygon: surface.polygon,
-  clearance: parkAccessMetersToLocal(
-    surface.id === THIRD_AGE_SETTING.accessRoadId
-      ? THIRD_AGE_SETTING.clearances.pavilionAccessTreeTrunkMeters
-      : THIRD_AGE_SETTING.clearances.roadTreeTrunkMeters,
-  ),
-}));
+const MOTORHOME_SETTING = PARK_ACCESS_SPATIAL_PLAN.motorhomeSetting;
+// This plan contains only the purpose-built access network. Keeping the whole
+// collection here covers vehicle corridors and gate aprons without leaking the
+// presentation clearance into distant official roads rendered by the generic
+// road layer.
+const PARK_ACCESS_DRIVABLE_ROADS = PARK_ACCESS_SPATIAL_PLAN.roadSurfaces;
+const PARK_ACCESS_DRIVABLE_POLYGONS = PARK_ACCESS_DRIVABLE_ROADS.map((surface) => surface.polygon);
 
 function officialFootprints(identifiers: readonly string[]) {
   return identifiers
@@ -104,6 +99,36 @@ function officialFootprints(identifiers: readonly string[]) {
 
 const PROTECTED_COMMERCIAL_FOOTPRINTS = officialFootprints(
   PARK_ACCESS_SPATIAL_PLAN.protectedCommercialGeometry.identifiers,
+);
+const PARK_ACCESS_REGION_FOOTPRINTS = [
+  MOTORHOME_SETTING.footprint,
+  THIRD_AGE_SETTING.footprint,
+  ...officialFootprints(['TEST-DRIVE']),
+];
+
+function circularClearancePolygon(
+  center: ParkAccessPoint,
+  radius: number,
+  segmentCount = 24,
+): ParkAccessPolygon {
+  return Array.from({ length: segmentCount + 1 }, (_, index) => {
+    const angle = index / segmentCount * Math.PI * 2;
+    return [
+      center[0] + Math.cos(angle) * radius,
+      center[1] + Math.sin(angle) * radius,
+    ] as const;
+  });
+}
+
+const GATE_1_ROUNDABOUT_TREE_CLEARANCE = circularClearancePolygon(
+  PARK_ACCESS_SPATIAL_PLAN.gate1Roundabout.center,
+  PARK_ACCESS_SPATIAL_PLAN.gate1Roundabout.outerRadius
+    + parkAccessMetersToLocal(Math.max(
+      THIRD_AGE_SETTING.clearances.roadTreeTrunkMeters
+        + THIRD_AGE_SETTING.clearances.canopyMeters,
+      MOTORHOME_SETTING.clearances.roadTreeTrunkMeters
+        + MOTORHOME_SETTING.clearances.canopyMeters,
+    )),
 );
 
 function openPolygon(polygon: ParkAccessPolygon) {
@@ -173,16 +198,23 @@ export function isParkAccessPolygonFullyContained(
  * remain untouched and can still be used by inventories and other consumers.
  */
 export function selectParkAccessCompatibleTreesForPresentation<
-  Tree extends { position: ParkAccessPoint },
+  Tree extends { position: ParkAccessPoint; canopyRadius: number },
 >(trees: readonly Tree[]) {
-  return trees.filter((tree) => (
-    !pointInPolygon(tree.position, PARK_ACCESS_SPATIAL_PLAN.woodlandPath.clearancePolygon)
-    && !pointInPolygon(tree.position, THIRD_AGE_SETTING.accessClearancePolygon)
-    && COBBLESTONE_TREE_CLEARANCES.every(({ polygon, clearance }) => (
-      !pointInPolygon(tree.position, polygon)
-      && distanceToPolygon(tree.position, polygon) >= clearance
-    ))
-  ));
+  return trees.filter((tree) => {
+    const canopyRadius = Math.max(0, tree.canopyRadius);
+    const gate1RoundaboutDistance = Math.hypot(
+      tree.position[0] - PARK_ACCESS_SPATIAL_PLAN.gate1Roundabout.center[0],
+      tree.position[1] - PARK_ACCESS_SPATIAL_PLAN.gate1Roundabout.center[1],
+    );
+    return !pointInPolygon(tree.position, PARK_ACCESS_SPATIAL_PLAN.woodlandPath.clearancePolygon)
+      && !pointInPolygon(tree.position, THIRD_AGE_SETTING.accessClearancePolygon)
+      && gate1RoundaboutDistance
+        >= PARK_ACCESS_SPATIAL_PLAN.gate1Roundabout.outerRadius + canopyRadius
+      && PARK_ACCESS_DRIVABLE_ROADS.every((surface) => (
+        !pointInPolygon(tree.position, surface.polygon)
+        && distanceToPolygon(tree.position, surface.polygon) >= canopyRadius
+      ));
+  });
 }
 
 function polylineLength(points: readonly ParkAccessPoint[]) {
@@ -331,14 +363,34 @@ function createTrailSurfaces(): readonly ParkAccessEnvironmentSurface[] {
 
 function createAmbientTrees(reducedGraphics: boolean) {
   const treeBand = PARK_ACCESS_SPATIAL_PLAN.benvenutoPavilionEdge.treeBand;
-  const costeirosForestBudget = reducedGraphics ? 4 : 7;
-  const costeirosFieldBudget = reducedGraphics ? 2 : 4;
+  const motorhomeForestBudget = reducedGraphics ? 7 : 12;
+  const motorhomeFieldBudget = reducedGraphics ? 4 : 7;
+  const motorhomeRoad = PARK_ACCESS_DRIVABLE_ROADS.find(
+    (surface) => surface.id === MOTORHOME_SETTING.accessRoadId,
+  )!;
+  const motorhomeCorridorLength = polylineLength(MOTORHOME_SETTING.accessCenterline);
+  const motorhomeCanopyClearance = parkAccessMetersToLocal(
+    MOTORHOME_SETTING.clearances.roadTreeTrunkMeters
+      + MOTORHOME_SETTING.clearances.canopyMeters,
+  );
+  const motorhomeRoadHalfWidth = parkAccessMetersToLocal(motorhomeRoad.widthMeters) * 0.5;
+  const motorhomeForestAxis = offsetPolyline(
+    MOTORHOME_SETTING.accessCenterline,
+    -(motorhomeRoadHalfWidth + motorhomeCanopyClearance + parkAccessMetersToLocal(1.1)),
+  );
+  const motorhomeFieldAxis = offsetPolyline(
+    MOTORHOME_SETTING.accessCenterline,
+    motorhomeRoadHalfWidth + motorhomeCanopyClearance + parkAccessMetersToLocal(1.8),
+  );
   const commonExclusions = [
     PARK_ACCESS_SPATIAL_PLAN.costeirosSetting.buildingPolygon,
     PARK_ACCESS_SPATIAL_PLAN.costeirosSetting.yardPolygon,
     PARK_ACCESS_SPATIAL_PLAN.costeirosSetting.serviceRoadPolygon,
     THIRD_AGE_SETTING.accessClearancePolygon,
-    ...COBBLESTONE_ACCESS_POLYGONS,
+    GATE_1_ROUNDABOUT_TREE_CLEARANCE,
+    ...PARK_ACCESS_DRIVABLE_POLYGONS,
+    ...PARK_ACCESS_REGION_FOOTPRINTS,
+    ...PROTECTED_COMMERCIAL_FOOTPRINTS,
   ];
   const thirdAgeAccessLength = polylineLength(THIRD_AGE_SETTING.accessCenterline);
   const thirdAgeCanopyClearance = parkAccessMetersToLocal(
@@ -350,7 +402,9 @@ function createAmbientTrees(reducedGraphics: boolean) {
     + 0.03;
   const thirdAgeTreeExclusions = [
     THIRD_AGE_SETTING.accessClearancePolygon,
-    ...COBBLESTONE_ACCESS_POLYGONS,
+    GATE_1_ROUNDABOUT_TREE_CLEARANCE,
+    ...PARK_ACCESS_DRIVABLE_POLYGONS,
+    ...PARK_ACCESS_REGION_FOOTPRINTS,
     ...PROTECTED_COMMERCIAL_FOOTPRINTS,
   ];
   const thirdAgeDenseBudget = reducedGraphics ? 2 : 4;
@@ -435,9 +489,10 @@ function createAmbientTrees(reducedGraphics: boolean) {
         PARK_ACCESS_SPATIAL_PLAN.benvenutoPavilionEdge.parkingCutout,
       )
       && !pointInPolygon(placement.position, northSidewalk)
-      && COBBLESTONE_TREE_CLEARANCES.every(({ polygon, clearance }) => (
-        !pointInPolygon(placement.position, polygon)
-        && distanceToPolygon(placement.position, polygon) >= clearance - 1e-6
+      && PARK_ACCESS_DRIVABLE_ROADS.every((surface) => (
+        !pointInPolygon(placement.position, surface.polygon)
+        && distanceToPolygon(placement.position, surface.polygon)
+          >= PARK_ACCESS_AMBIENT_TREE_FOOTPRINT_CLEARANCE.narrowFieldReview - 1e-6
       ))
     ));
   });
@@ -446,52 +501,65 @@ function createAmbientTrees(reducedGraphics: boolean) {
     ...pavilionTrees,
     ...thirdAgeDenseTrees,
     ...thirdAgeSparseTrees,
-    ...sampleParkAccessPolylinePlacements(PARK_ACCESS_SPATIAL_PLAN.costeirosSetting.forestEdge, {
-      sourceZoneId: 'costeiros-forest-edge-screening',
-      spacing: polylineLength(PARK_ACCESS_SPATIAL_PLAN.costeirosSetting.forestEdge) / (costeirosForestBudget + 1),
-      seed: 43,
-      maximumCount: costeirosForestBudget,
-      minimumScale: 0.84,
-      maximumScale: 1.12,
-      verticalScale: 1.08,
-      lateralOffset: parkAccessMetersToLocal(1.1),
+    ...sampleParkAccessPolylinePlacements(motorhomeForestAxis, {
+      sourceZoneId: 'motorhome-road-forest-side-trees',
+      spacing: motorhomeCorridorLength / (motorhomeForestBudget + 1),
+      endpointInset: motorhomeCorridorLength / (motorhomeForestBudget + 1) * 0.72,
+      seed: 181,
+      maximumCount: motorhomeForestBudget,
+      minimumScale: 0.82,
+      maximumScale: 1.2,
+      verticalScale: 1.1,
+      lateralOffset: parkAccessMetersToLocal(0.55),
       exclusions: commonExclusions,
-      exclusionClearance: 0.35,
+      exclusionClearance: motorhomeCanopyClearance,
     }),
-    ...sampleParkAccessPolylinePlacements(PARK_ACCESS_SPATIAL_PLAN.costeirosSetting.fieldEdge, {
-      sourceZoneId: 'costeiros-field-edge-screening',
-      spacing: polylineLength(PARK_ACCESS_SPATIAL_PLAN.costeirosSetting.fieldEdge) / (costeirosFieldBudget + 1),
-      seed: 59,
-      maximumCount: costeirosFieldBudget,
-      minimumScale: 0.72,
-      maximumScale: 0.94,
-      verticalScale: 0.96,
-      lateralOffset: parkAccessMetersToLocal(0.8),
+    ...sampleParkAccessPolylinePlacements(motorhomeFieldAxis, {
+      sourceZoneId: 'motorhome-road-field-side-trees',
+      spacing: motorhomeCorridorLength / (motorhomeFieldBudget + 1),
+      endpointInset: motorhomeCorridorLength / (motorhomeFieldBudget + 1) * 0.88,
+      seed: 223,
+      maximumCount: motorhomeFieldBudget,
+      minimumScale: 0.66,
+      maximumScale: 0.96,
+      verticalScale: 0.94,
+      lateralOffset: parkAccessMetersToLocal(0.42),
       exclusions: commonExclusions,
-      exclusionClearance: 0.35,
+      exclusionClearance: motorhomeCanopyClearance,
     }),
   ];
 }
 
 function createUnderstory(reducedGraphics: boolean) {
   const naturalEdge = PARK_ACCESS_SPATIAL_PLAN.woodlandPath.edgeBands[0].polygon;
-  const forestEdgePolygon = createParkAccessPolylineRibbon(
-    PARK_ACCESS_SPATIAL_PLAN.costeirosSetting.forestEdge,
-    parkAccessMetersToLocal(4.8),
-  );
-  const fieldEdgePolygon = createParkAccessPolylineRibbon(
-    PARK_ACCESS_SPATIAL_PLAN.costeirosSetting.fieldEdge,
-    parkAccessMetersToLocal(5.4),
-  );
   const benvenutoGrass = PARK_ACCESS_SPATIAL_PLAN.benvenutoPavilionEdge.transitionBands
     .find((band) => band.surface === 'LIGHT_GRASS')!.polygon;
+  const motorhomeRoad = PARK_ACCESS_DRIVABLE_ROADS.find(
+    (surface) => surface.id === MOTORHOME_SETTING.accessRoadId,
+  )!;
+  const motorhomeCorridorLength = polylineLength(MOTORHOME_SETTING.accessCenterline);
+  const motorhomeRoadHalfWidth = parkAccessMetersToLocal(motorhomeRoad.widthMeters) * 0.5;
+  const motorhomeUnderstoryClearance = parkAccessMetersToLocal(
+    MOTORHOME_SETTING.clearances.roadTreeTrunkMeters,
+  );
+  const motorhomeForestUnderstoryAxis = offsetPolyline(
+    MOTORHOME_SETTING.accessCenterline,
+    -(motorhomeRoadHalfWidth + motorhomeUnderstoryClearance + parkAccessMetersToLocal(0.55)),
+  );
+  const motorhomeFieldUnderstoryAxis = offsetPolyline(
+    MOTORHOME_SETTING.accessCenterline,
+    motorhomeRoadHalfWidth + motorhomeUnderstoryClearance + parkAccessMetersToLocal(1.1),
+  );
   const exclusions = [
     PARK_ACCESS_SPATIAL_PLAN.woodlandPath.surfacePolygon,
     PARK_ACCESS_SPATIAL_PLAN.costeirosSetting.buildingPolygon,
     PARK_ACCESS_SPATIAL_PLAN.costeirosSetting.serviceRoadPolygon,
     PARK_ACCESS_SPATIAL_PLAN.benvenutoPavilionEdge.parkingCutout,
     THIRD_AGE_SETTING.accessClearancePolygon,
-    ...COBBLESTONE_ACCESS_POLYGONS,
+    GATE_1_ROUNDABOUT_TREE_CLEARANCE,
+    ...PARK_ACCESS_DRIVABLE_POLYGONS,
+    ...PARK_ACCESS_REGION_FOOTPRINTS,
+    ...PROTECTED_COMMERCIAL_FOOTPRINTS,
   ];
   const thirdAgeAccessLength = polylineLength(THIRD_AGE_SETTING.accessCenterline);
   const thirdAgeUnderstoryOffset = THIRD_AGE_SETTING.width * 0.5
@@ -499,7 +567,9 @@ function createUnderstory(reducedGraphics: boolean) {
     + 0.08;
   const thirdAgeUnderstoryExclusions = [
     THIRD_AGE_SETTING.accessClearancePolygon,
-    ...COBBLESTONE_ACCESS_POLYGONS,
+    GATE_1_ROUNDABOUT_TREE_CLEARANCE,
+    ...PARK_ACCESS_DRIVABLE_POLYGONS,
+    ...PARK_ACCESS_REGION_FOOTPRINTS,
     ...PROTECTED_COMMERCIAL_FOOTPRINTS,
   ];
   const thirdAgeDenseUnderstoryBudget = reducedGraphics ? 4 : 8;
@@ -548,29 +618,31 @@ function createUnderstory(reducedGraphics: boolean) {
       exclusions,
       exclusionClearance: 0.16,
     }),
-    ...sampleParkAccessPolygonPlacements(forestEdgePolygon, {
-      sourceZoneId: 'costeiros-forest-understory',
-      spacing: reducedGraphics ? 2.4 : 1.72,
-      jitter: 0.42,
-      seed: 83,
+    ...sampleParkAccessPolylinePlacements(motorhomeForestUnderstoryAxis, {
+      sourceZoneId: 'motorhome-road-forest-side-understory',
+      spacing: motorhomeCorridorLength / ((reducedGraphics ? 10 : 18) + 1),
+      endpointInset: parkAccessMetersToLocal(2.4),
+      seed: 239,
       maximumCount: reducedGraphics ? 10 : 18,
       minimumScale: 0.7,
       maximumScale: 1,
       verticalScale: 0.7,
+      lateralOffset: parkAccessMetersToLocal(0.42),
       exclusions,
-      exclusionClearance: 0.18,
+      exclusionClearance: parkAccessMetersToLocal(0.35),
     }),
-    ...sampleParkAccessPolygonPlacements(fieldEdgePolygon, {
-      sourceZoneId: 'costeiros-field-understory',
-      spacing: reducedGraphics ? 2.6 : 1.9,
-      jitter: 0.4,
-      seed: 97,
-      maximumCount: reducedGraphics ? 7 : 12,
+    ...sampleParkAccessPolylinePlacements(motorhomeFieldUnderstoryAxis, {
+      sourceZoneId: 'motorhome-road-field-side-understory',
+      spacing: motorhomeCorridorLength / ((reducedGraphics ? 5 : 10) + 1),
+      endpointInset: parkAccessMetersToLocal(3.1),
+      seed: 251,
+      maximumCount: reducedGraphics ? 5 : 10,
       minimumScale: 0.62,
       maximumScale: 0.9,
       verticalScale: 0.62,
+      lateralOffset: parkAccessMetersToLocal(0.32),
       exclusions,
-      exclusionClearance: 0.18,
+      exclusionClearance: parkAccessMetersToLocal(0.3),
     }),
     ...sampleParkAccessPolygonPlacements(benvenutoGrass, {
       sourceZoneId: 'benvenuto-verge-understory',
@@ -619,4 +691,7 @@ export const PARK_ACCESS_ENVIRONMENT_SOURCE_REFERENCES = [
   'Anexo 3 — arborização linear e seção visual da Av. Benvenuto de Conti',
   'Anexo 5 — Caminho do Bosque entre Portão 2 e lateral superior/oeste do Pavilhão 14',
   'Anexo 6 — via, pátio, campo e borda florestal da Sede Costeiros',
+  'Anexo 20 — leitura relativa da mini-rotatória independente e do acesso local do Portão 1',
+  'Anexo 21 — implantação registrada dos eixos A1/A10 e da via até a Área Motor Home',
+  'Anexo 22 — leitura aérea complementar das bordas arborizadas da via de pedra/saibro',
 ] as const;
