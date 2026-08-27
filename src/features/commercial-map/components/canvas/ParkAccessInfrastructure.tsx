@@ -84,6 +84,75 @@ function roughnessTexture(colorTexture: THREE.DataTexture) {
   return texture;
 }
 
+function createAsphaltTexture() {
+  const size = 64;
+  const data = new Uint8Array(size * size * 4);
+  for (let y = 0; y < size; y += 1) {
+    for (let x = 0; x < size; x += 1) {
+      const fine = (textureNoise(x, y, 3107) - 0.5) * 18;
+      const aggregateNoise = textureNoise(Math.floor(x / 2), Math.floor(y / 2), 7739);
+      const aggregate = aggregateNoise > 0.88
+        ? 24 + (aggregateNoise - 0.88) * 70
+        : aggregateNoise < 0.09 ? -18 : 0;
+      const wear = Math.sin(x * 0.15 + y * 0.08) * 2.4
+        + Math.cos(y * 0.19 - x * 0.05) * 1.8;
+      const offset = (y * size + x) * 4;
+      data[offset] = THREE.MathUtils.clamp(Math.round(176 + fine + aggregate + wear), 0, 255);
+      data[offset + 1] = THREE.MathUtils.clamp(Math.round(179 + fine + aggregate + wear), 0, 255);
+      data[offset + 2] = THREE.MathUtils.clamp(Math.round(179 + fine + aggregate + wear * 0.8), 0, 255);
+      data[offset + 3] = 255;
+    }
+  }
+  const texture = new THREE.DataTexture(data, size, size, THREE.RGBAFormat, THREE.UnsignedByteType);
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(0.5, 0.5);
+  texture.minFilter = THREE.LinearMipmapLinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+  texture.generateMipmaps = true;
+  texture.anisotropy = 4;
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.needsUpdate = true;
+  return texture;
+}
+
+function createGravelTexture() {
+  const size = 64;
+  const data = new Uint8Array(size * size * 4);
+  const cellSize = 4;
+  for (let y = 0; y < size; y += 1) {
+    for (let x = 0; x < size; x += 1) {
+      const cellX = Math.floor(x / cellSize);
+      const cellY = Math.floor(y / cellSize);
+      const centerX = (cellX + 0.22 + textureNoise(cellX, cellY, 851) * 0.56) * cellSize;
+      const centerY = (cellY + 0.22 + textureNoise(cellX, cellY, 1291) * 0.56) * cellSize;
+      const distance = Math.hypot(x - centerX, (y - centerY) * 1.18);
+      const stone = distance < 1.35;
+      const stoneTone = (textureNoise(cellX, cellY, 4211) - 0.5) * 42;
+      const dust = (textureNoise(x, y, 6907) - 0.5) * 20;
+      const rut = Math.sin((x + y * 0.18) * 0.21) * 3.2;
+      const base = stone ? [181, 165, 139] : [157, 139, 113];
+      const shade = dust + rut + (stone ? stoneTone : 0);
+      const offset = (y * size + x) * 4;
+      data[offset] = THREE.MathUtils.clamp(Math.round(base[0] + shade), 0, 255);
+      data[offset + 1] = THREE.MathUtils.clamp(Math.round(base[1] + shade * 0.9), 0, 255);
+      data[offset + 2] = THREE.MathUtils.clamp(Math.round(base[2] + shade * 0.72), 0, 255);
+      data[offset + 3] = 255;
+    }
+  }
+  const texture = new THREE.DataTexture(data, size, size, THREE.RGBAFormat, THREE.UnsignedByteType);
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.repeat.set(0.62, 0.62);
+  texture.minFilter = THREE.LinearMipmapLinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+  texture.generateMipmaps = true;
+  texture.anisotropy = 4;
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.needsUpdate = true;
+  return texture;
+}
+
 function createCobblestoneTexture() {
   const size = 64;
   const data = new Uint8Array(size * size * 4);
@@ -133,11 +202,11 @@ function createCobblestoneTexture() {
   return texture;
 }
 
-const ASPHALT_TEXTURE = createInfrastructureTexture(3107, [178, 181, 181], 16);
+const ASPHALT_TEXTURE = createAsphaltTexture();
 const ASPHALT_ROUGHNESS = roughnessTexture(ASPHALT_TEXTURE);
 const COBBLESTONE_TEXTURE = createCobblestoneTexture();
 const COBBLESTONE_ROUGHNESS = roughnessTexture(COBBLESTONE_TEXTURE);
-const GRAVEL_TEXTURE = createInfrastructureTexture(851, [176, 156, 126], 34);
+const GRAVEL_TEXTURE = createGravelTexture();
 const GRAVEL_ROUGHNESS = roughnessTexture(GRAVEL_TEXTURE);
 const PAVER_TEXTURE = createInfrastructureTexture(1947, [210, 205, 194], 13, 16);
 const PAVER_ROUGHNESS = roughnessTexture(PAVER_TEXTURE);
@@ -259,6 +328,9 @@ function SurfaceMaterial({
       opacity={opacity}
       depthTest
       depthWrite
+      polygonOffset
+      polygonOffsetFactor={-1}
+      polygonOffsetUnits={-1}
     />
   );
   if (kind === 'cobblestone') return (
@@ -274,6 +346,9 @@ function SurfaceMaterial({
       opacity={opacity}
       depthTest
       depthWrite
+      polygonOffset
+      polygonOffsetFactor={-1}
+      polygonOffsetUnits={-1}
     />
   );
   if (kind === 'gravel') return (
@@ -289,6 +364,9 @@ function SurfaceMaterial({
       opacity={opacity}
       depthTest
       depthWrite
+      polygonOffset
+      polygonOffsetFactor={-1}
+      polygonOffsetUnits={-1}
     />
   );
   if (kind === 'sidewalks') return (
