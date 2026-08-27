@@ -4,6 +4,7 @@ import {
   type CommercialElectricalConnection,
   type CommercialElectricalNode,
 } from '../data/electricalInfrastructure';
+import { resolveElectricalArchitectureClearancePosition } from '../data/electricalPresentation';
 import type { CommercialLot, Coordinate, MapClassification, MapEntity } from '../types';
 import {
   closestPointOnSegment,
@@ -68,7 +69,7 @@ export interface ResolvedElectricalNodePlacement {
   groundElevation: number;
   rotationRadians: number;
   sourceAnchorPreserved: true;
-  placementStatus: 'DIRECT' | 'PROJECTED_FREE' | 'PROJECTED_FALLBACK';
+  placementStatus: 'DIRECT' | 'PROJECTED_FREE' | 'PROJECTED_FALLBACK' | 'PROJECTED_CLEARANCE';
 }
 
 export interface ElectricalPoleCrossarmLayout {
@@ -240,14 +241,17 @@ export function resolveElectricalNodePlacements(
   ));
   return nodes.map((node) => {
     const facade = resolveFacadePresentation(node, entityByIdentifier, obstacles);
-    const renderPosition = facade?.renderPosition ?? node.position;
+    const architectureClearance = facade
+      ? null
+      : resolveElectricalArchitectureClearancePosition(node, entityByIdentifier);
+    const renderPosition = facade?.renderPosition ?? architectureClearance ?? node.position;
     return {
       node,
       renderPosition,
       groundElevation: groundElevationAtPosition(node, renderPosition, surfaces),
       rotationRadians: facade?.rotationRadians ?? node.rotationRadians,
       sourceAnchorPreserved: true,
-      placementStatus: facade?.placementStatus ?? 'DIRECT',
+      placementStatus: facade?.placementStatus ?? (architectureClearance ? 'PROJECTED_CLEARANCE' : 'DIRECT'),
     };
   });
 }

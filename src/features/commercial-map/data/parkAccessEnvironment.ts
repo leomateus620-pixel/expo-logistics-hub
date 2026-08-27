@@ -293,7 +293,10 @@ function createEnvironmentalSurfaces(): readonly ParkAccessEnvironmentSurface[] 
       kind: 'EXPOSED_SOIL',
       polygon: PARK_ACCESS_SPATIAL_PLAN.costeirosSetting.yardPolygon,
       holes: [PARK_ACCESS_SPATIAL_PLAN.costeirosSetting.buildingPolygon],
-      elevation: 0.029,
+      // This interpreted yard overlaps the official TEST-DRIVE footprint in
+      // the source plans. Keep it as sub-surface dressing so the canonical
+      // parking material remains authoritative at every camera angle.
+      elevation: 0.017,
       sourceIds: COSTEIROS_SOURCE_IDS,
       confidence: PARK_ACCESS_SPATIAL_PLAN.costeirosSetting.confidence,
       notes: 'Pátio de solo compactado da Sede Costeiros, sempre abaixo da edificação e das vias de serviço.',
@@ -303,7 +306,9 @@ function createEnvironmentalSurfaces(): readonly ParkAccessEnvironmentSurface[] 
       kind: 'FIELD_TRANSITION',
       polygon: fieldEdgePolygon,
       holes: [],
-      elevation: 0.026,
+      // Below the 0.026 presentation cap used by TEST-DRIVE and MOTORHOME;
+      // coplanar ribbons caused distant mip levels to flash pale/textureless.
+      elevation: 0.016,
       sourceIds: COSTEIROS_SOURCE_IDS,
       confidence: PARK_ACCESS_SPATIAL_PLAN.costeirosSetting.confidence,
       notes: 'Faixa visual derivada simetricamente do fieldEdge do GIS; não desloca o limite interpretado do campo.',
@@ -313,7 +318,7 @@ function createEnvironmentalSurfaces(): readonly ParkAccessEnvironmentSurface[] 
       kind: 'WOODLAND_FLOOR',
       polygon: forestEdgePolygon,
       holes: [],
-      elevation: 0.027,
+      elevation: 0.017,
       sourceIds: COSTEIROS_SOURCE_IDS,
       confidence: PARK_ACCESS_SPATIAL_PLAN.costeirosSetting.confidence,
       notes: 'Transição leve bosque/via derivada do forestEdge registrado no Anexo 6.',

@@ -1,4 +1,5 @@
 import type { MapEntity } from '../types';
+import { resolveCrioulosArchitectureEnvelope } from '../data/gateFourDistrict';
 import { livestockPavilionVisualHeight } from './livestockPavilion';
 import { miranteVisualHeight } from './mirante';
 import { FENASOJA_HEADQUARTERS_LAYOUT } from './headquarters';
@@ -20,6 +21,9 @@ export type StrategicLandmarkKind =
   | 'administrative-center'
   | 'fenasoja-headquarters'
   | 'fenasoja-event-center'
+  | 'pavilion-nine'
+  | 'crioulos-center'
+  | 'gate-four'
   | 'commercial-pavilion'
   | 'third-age-pavilion'
   | 'livestock-pavilion'
@@ -73,6 +77,49 @@ function commercialPavilionLandmark(
 }
 
 const STRATEGIC_LANDMARKS: Readonly<Record<string, StrategicLandmarkDefinition>> = {
+  A4: {
+    kind: 'gate-four',
+    aliases: [
+      'Portão 4',
+      'Acesso Portão 4',
+      'Entrada e saída de visitantes',
+      'Acesso Pavilhão 09',
+    ],
+    // O portal cruza a continuação norte-sul da Rua Buenos Aires. A câmera
+    // permanece do lado externo do parque para revelar o vão e o corredor.
+    facingRadians: 0,
+    focusDirection: [-0.34, 0.5, -0.96],
+    visualHeight: () => 2.45,
+  },
+  D5: {
+    kind: 'crioulos-center',
+    aliases: [
+      'Núcleo dos Criadores de Cavalos Crioulos',
+      'Núcleo Crioulo',
+      'CCCNG',
+      'Casa dos Criadores de Cavalos Crioulos',
+    ],
+    // O corpo fotografado é longitudinal e fica a oeste da Rua Buenos Aires.
+    // A fachada cívica com mastros é lida melhor pelo quadrante sudeste.
+    facingRadians: 0,
+    focusDirection: [0.82, 0.52, 0.58],
+    // Inclui os mastros, que são mais altos do que o telhado/chaminé.
+    visualHeight: () => resolveCrioulosArchitectureEnvelope().visualHeight,
+  },
+  'PAVILHAO-09': {
+    kind: 'pavilion-nine',
+    aliases: [
+      'Pavilhão 9',
+      'Pavilhão 09',
+      'Galpão Pavilhão 09',
+      'Pavilhão do Portão 4',
+    ],
+    // O eixo longo acompanha a via. O foco oeste/norte apresenta simultaneamente
+    // a fachada modular, a empena de acesso e o corredor do Portão 4.
+    facingRadians: 0,
+    focusDirection: [-0.92, 0.5, -0.38],
+    visualHeight: ({ depth }) => Math.min(3.05, Math.max(2.5, depth * 0.25)),
+  },
   B1: commercialPavilionLandmark('B1'),
   B2: commercialPavilionLandmark('B2'),
   B3: commercialPavilionLandmark('B3'),

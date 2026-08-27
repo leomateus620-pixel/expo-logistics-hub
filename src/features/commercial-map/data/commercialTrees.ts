@@ -1,5 +1,6 @@
 import { officialPdfPointToLocal } from './officialReference2026';
 import { NATIONS_DISTRICT_LAYOUT } from './nationsDistrict';
+import { GATE_FOUR_DISTRICT_LAYOUT } from './gateFourDistrict';
 
 export type CommercialTreeQuadra = 'D' | 'I' | 'J' | 'E';
 
@@ -9,6 +10,7 @@ export type CommercialTreeArea = CommercialTreeQuadra
   | 'PAVILIONS_1_14_GROVE'
   | 'RUA_BRASIL_GROVE'
   | 'TERCEIRA_IDADE_EDGE'
+  | 'GATE_FOUR_DISTRICT'
   | 'NATIONS_DISTRICT';
 
 export type CommercialTreePlacement =
@@ -26,7 +28,8 @@ export type CommercialTreePlacement =
 export type CommercialTreeSpeciesGroup =
   | 'MATURE_BROADLEAF'
   | 'OPEN_CANOPY'
-  | 'ORNAMENTAL_COMPACT';
+  | 'ORNAMENTAL_COMPACT'
+  | 'FLOWERING_ORNAMENTAL';
 
 export type CommercialTreeVerificationStatus =
   | 'SATELLITE_CONFIRMED'
@@ -64,7 +67,7 @@ export interface CommercialMapTree {
   verificationStatus: CommercialTreeVerificationStatus;
 }
 
-export const COMMERCIAL_TREE_LAYER_REVISION = '2026.5-park-environment.2';
+export const COMMERCIAL_TREE_LAYER_REVISION = '2026.8-gate-four-district.1';
 
 export const COMMERCIAL_TREE_SOURCE_REFERENCES = {
   D: 'Anexo 1 — satélite da Quadra D (088fa39a-75de-4768-b7fb-7017886f84ab.png)',
@@ -76,6 +79,7 @@ export const COMMERCIAL_TREE_SOURCE_REFERENCES = {
   PAVILIONS_1_14_GROVE: 'Anexos 3 e 7 — maciço da Árvore Lunar atrás dos Pavilhões 1 e 14',
   RUA_BRASIL_GROVE: 'Anexos 3 e 7 — árvores limítrofes da Rua Brasil',
   TERCEIRA_IDADE_EDGE: 'Anexos 3 e 7 — árvores próximas ao Pavilhão Terceira Idade',
+  GATE_FOUR_DISTRICT: 'Anexos 5 a 7 — árvores maduras e floração ornamental no entorno do Núcleo Crioulo e da Rua Buenos Aires',
   NATIONS_DISTRICT: 'Anexos oficiais IMG_9670 (1).jpeg e IMG_9671.jpeg — massas periféricas da Praça das Nações',
 } as const satisfies Record<CommercialTreeArea, string>;
 
@@ -85,6 +89,7 @@ export const COMMERCIAL_TREE_AREA_SCENE_ANCHORS: Readonly<Record<Exclude<Commerc
   PAVILIONS_1_14_GROVE: ['B1', 'B2', 'G'],
   RUA_BRASIL_GROVE: ['RUA-BRASIL', 'B1', 'B2', 'G'],
   TERCEIRA_IDADE_EDGE: ['B22'],
+  GATE_FOUR_DISTRICT: ['A4', 'D5', 'PAVILHAO-09', 'AREA-MOTORHOME'],
   NATIONS_DISTRICT: ['B20', 'B29', 'C5', 'C6', 'C7', 'C8', 'PORTICO-NACOES'],
 };
 
@@ -101,6 +106,7 @@ const SPECIES_DIMENSIONS: Record<CommercialTreeSpeciesGroup, {
   MATURE_BROADLEAF: { canopyRadius: 1.02, trunkRadius: 0.16, trunkHeight: 1.55, crownHeight: 2.35 },
   OPEN_CANOPY: { canopyRadius: 0.88, trunkRadius: 0.14, trunkHeight: 1.72, crownHeight: 2.05 },
   ORNAMENTAL_COMPACT: { canopyRadius: 0.62, trunkRadius: 0.11, trunkHeight: 1.08, crownHeight: 1.42 },
+  FLOWERING_ORNAMENTAL: { canopyRadius: 0.9, trunkRadius: 0.145, trunkHeight: 1.58, crownHeight: 2.08 },
 };
 
 interface TreeBlueprint {
@@ -138,6 +144,7 @@ const TREE_AREA_ID_PREFIX: Readonly<Record<CommercialTreeArea, string>> = {
   PAVILIONS_1_14_GROVE: 'pavilions-1-14',
   RUA_BRASIL_GROVE: 'rua-brasil',
   TERCEIRA_IDADE_EDGE: 'terceira-idade',
+  GATE_FOUR_DISTRICT: 'gate-four',
   NATIONS_DISTRICT: 'nations',
 };
 
@@ -365,6 +372,30 @@ const TERCEIRA_IDADE_EDGE_TREES = buildTrees('TERCEIRA_IDADE_EDGE', [
   }),
 ]);
 
+/**
+ * The satellite establishes D5 west of Rua Buenos Aires and the photographs
+ * establish a mature, irregular tree setting around the brick house. These
+ * points deliberately stay outside D5, Pavilhão 09 and the road corridor.
+ * They are cartographic composition anchors, not surveyed trunks.
+ */
+const GATE_FOUR_DISTRICT_TREES = buildTrees('GATE_FOUR_DISTRICT', recommendFieldReview(
+  GATE_FOUR_DISTRICT_LAYOUT.landscape.trees.map((tree, index) => ({
+    sourcePosition: tree.sourcePosition,
+    placement: 'LANDSCAPE_MASS' as const,
+    surfaceEntityIdentifier: 'AREA-MOTORHOME',
+    speciesGroup: index === 1 || index === 5
+      ? 'FLOWERING_ORNAMENTAL' as const
+      : index === 2 || index === 6 || index === 9
+        ? 'OPEN_CANOPY' as const
+        : 'MATURE_BROADLEAF' as const,
+    scale: tree.scale * (index === 4 ? 1.14 : 1.04),
+    shadowRotation: tree.rotation * 0.018 - 0.82,
+    notes: index === 1 || index === 5
+      ? 'Árvore ornamental florida inspirada nas copas rosadas das fotos reais; posição exata sujeita à conferência de campo.'
+      : 'Copa madura interpretada do conjunto fotográfico e da vista de satélite, fora de D5, Pavilhão 09 e do corredor viário.',
+  })),
+));
+
 const NATIONS_DISTRICT_TREES = buildTrees('NATIONS_DISTRICT', recommendFieldReview(
   NATIONS_DISTRICT_LAYOUT.trees.map((tree, index) => ({
     sourcePosition: tree.sourcePosition,
@@ -386,6 +417,7 @@ export const COMMERCIAL_MAP_TREES: readonly CommercialMapTree[] = [
   ...PAVILIONS_1_14_GROVE_TREES,
   ...RUA_BRASIL_GROVE_TREES,
   ...TERCEIRA_IDADE_EDGE_TREES,
+  ...GATE_FOUR_DISTRICT_TREES,
   ...NATIONS_DISTRICT_TREES,
 ];
 
@@ -403,5 +435,6 @@ export const COMMERCIAL_TREE_COUNTS_BY_AREA: Readonly<Record<CommercialTreeArea,
   PAVILIONS_1_14_GROVE: PAVILIONS_1_14_GROVE_TREES.length,
   RUA_BRASIL_GROVE: RUA_BRASIL_GROVE_TREES.length,
   TERCEIRA_IDADE_EDGE: TERCEIRA_IDADE_EDGE_TREES.length,
+  GATE_FOUR_DISTRICT: GATE_FOUR_DISTRICT_TREES.length,
   NATIONS_DISTRICT: NATIONS_DISTRICT_TREES.length,
 };

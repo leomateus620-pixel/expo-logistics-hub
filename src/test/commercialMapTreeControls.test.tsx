@@ -101,7 +101,7 @@ describe('controle de visibilidade do ambiente e da rede elétrica', () => {
 
     expect(screen.getByText('Árvores e rede elétrica')).toBeInTheDocument();
     expect(screen.getByText(
-      /230 árvores · 408 postes · 20 transformadores · 325 trechos de fiação aérea/,
+      /240 árvores · 408 postes · 20 transformadores · 325 trechos de fiação aérea/,
     )).toBeInTheDocument();
     const toggle = screen.getByRole('switch', { name: 'Árvores e rede elétrica' });
     expect(toggle).toBeChecked();

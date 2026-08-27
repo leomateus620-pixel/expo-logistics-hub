@@ -11,6 +11,11 @@ import {
   electricalPlanPointToOfficialPdf,
   electricalPlanPointToWorldXZ,
 } from '@/features/commercial-map/data/electricalInfrastructure';
+import { ELECTRICAL_ARCHITECTURE_CLEARANCE_PRESENTATION } from '@/features/commercial-map/data/electricalPresentation';
+import {
+  GATE_FOUR_DISTRICT_LAYOUT,
+  resolveGateFourInteractionFootprint,
+} from '@/features/commercial-map/data/gateFourDistrict';
 import { COMMERCIAL_MAP_SEGMENT_IDS } from '@/features/commercial-map/data/commercialMapSegments';
 import {
   OFFICIAL_REFERENCE_DATA,
@@ -27,7 +32,7 @@ import {
   selectCommercialElectricalInfrastructureForScene,
 } from '@/features/commercial-map/utils/electricalInfrastructure';
 import { scopeCommercialMapData } from '@/features/commercial-map/utils/areaScope';
-import { strategicLandmarkVisualHeight } from '@/features/commercial-map/utils/landmarks';
+import { strategicLandmarkBounds, strategicLandmarkVisualHeight } from '@/features/commercial-map/utils/landmarks';
 import {
   distanceToEntity,
   pointInPolygon,
@@ -496,6 +501,63 @@ describe('infraestrutura elétrica cartográfica do Mapa Comercial', () => {
       });
     });
     expect([...new Set(clearanceViolations)]).toEqual([]);
+  });
+
+  it('afasta apenas a apresentação dos seis postes junto aos novos volumes, sem mudar âncoras ou topologia', () => {
+    const nodesBefore = JSON.stringify(COMMERCIAL_ELECTRICAL_NODES);
+    const connectionsBefore = JSON.stringify(COMMERCIAL_ELECTRICAL_CONNECTIONS);
+    const placements = resolveElectricalNodePlacements(
+      COMMERCIAL_ELECTRICAL_NODES,
+      OFFICIAL_REFERENCE_DATA.entities,
+    );
+    const shifted = placements.filter((placement) => placement.placementStatus === 'PROJECTED_CLEARANCE');
+    expect(shifted).toHaveLength(6);
+    ELECTRICAL_ARCHITECTURE_CLEARANCE_PRESENTATION.groups.forEach((group) => {
+      group.sourceMarkerIds.forEach((sourceMarkerId) => {
+        const placement = shifted.find((candidate) => candidate.node.sourceMarkerId === sourceMarkerId)!;
+        expect(placement.node).toBe(COMMERCIAL_ELECTRICAL_NODES.find((node) => node.sourceMarkerId === sourceMarkerId));
+        expect(placement.sourceAnchorPreserved).toBe(true);
+        expect(placement.node.position).toEqual(electricalPlanPointToWorldXZ(placement.node.sourcePagePosition));
+        expect(placement.renderPosition[0]).toBeCloseTo(placement.node.position[0] + group.offset[0], 8);
+        expect(placement.renderPosition[1]).toBeCloseTo(placement.node.position[1] + group.offset[1], 8);
+      });
+      const withoutOwner = OFFICIAL_REFERENCE_DATA.entities.filter((entity) => entity.publicIdentifier !== group.ownerIdentifier);
+      const unshifted = resolveElectricalNodePlacements(
+        COMMERCIAL_ELECTRICAL_NODES.filter((node) => group.sourceMarkerIds.some((id) => id === node.sourceMarkerId)),
+        withoutOwner,
+      );
+      unshifted.forEach((placement) => {
+        expect(placement.placementStatus).toBe('DIRECT');
+        expect(placement.renderPosition).toEqual(placement.node.position);
+      });
+    });
+    expect(JSON.stringify(COMMERCIAL_ELECTRICAL_NODES)).toBe(nodesBefore);
+    expect(JSON.stringify(COMMERCIAL_ELECTRICAL_CONNECTIONS)).toBe(connectionsBefore);
+    expect(ELECTRICAL_ARCHITECTURE_CLEARANCE_PRESENTATION.verificationStatus).toBe('FIELD_REVIEW_REQUIRED');
+  });
+
+  it('preserva a folga também no envelope visual do portal e da guarita A4, maior que o marcador oficial', () => {
+    const gate = OFFICIAL_REFERENCE_DATA.entities.find((entity) => entity.publicIdentifier === 'A4')!;
+    const bounds = strategicLandmarkBounds(gate);
+    const offset = GATE_FOUR_DISTRICT_LAYOUT.gate4.visualOffset;
+    const visualGate = {
+      ...gate,
+      geometry: {
+        ...gate.geometry,
+        coordinates: [resolveGateFourInteractionFootprint(bounds).map(([x, z]) => (
+          [bounds.centerX + offset[0] + x, bounds.centerZ + offset[1] + z] as [number, number]
+        ))],
+      },
+    };
+    const wires = buildElectricalWirePositions(
+      COMMERCIAL_ELECTRICAL_NODES,
+      COMMERCIAL_ELECTRICAL_CONNECTIONS.filter((connection) => connection.sourceAlignmentChainId === 'AH-010'),
+      OFFICIAL_REFERENCE_DATA.entities,
+    );
+    for (let index = 0; index < wires.length; index += 3) {
+      expect(distanceToEntity([wires[index], wires[index + 2]], visualGate))
+        .toBeGreaterThanOrEqual(ELECTRICAL_WIRE_STRUCTURE_CLEARANCE);
+    }
   });
 
   it('compartilha o mesmo dataset no parque e nos três recortes sem deixar conexões órfãs', () => {

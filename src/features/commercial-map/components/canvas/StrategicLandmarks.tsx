@@ -36,6 +36,15 @@ import { MirantePavilion } from './MirantePavilion';
 import { CommercialPavilion } from './CommercialPavilion';
 import { ThirdAgePavilion } from './ThirdAgePavilion';
 import { AfricanPavilion, RotaryHouse } from './NationsDistrict';
+import {
+  CrioulosCenterLandmark,
+  GateFourLandmark,
+  PavilionNineLandmark,
+} from './GateFourLandmarks';
+import {
+  GATE_FOUR_DISTRICT_LAYOUT,
+  resolveGateFourInteractionFootprint,
+} from '../../data/gateFourDistrict';
 import type { CommercialMapSegmentDefinition } from '../../data/commercialMapSegments';
 import type { CommercialPavilionModuleVisualState } from '../../utils/pavilionModuleCommercial';
 
@@ -171,6 +180,42 @@ const LANDMARK_PALETTES: Record<StrategicLandmarkKind, LandmarkPalette> = {
     white: '#f1f1eb',
     platform: FENASOJA_EVENT_CENTER_LAYOUT.palette.concrete,
     metal: FENASOJA_EVENT_CENTER_LAYOUT.palette.metal,
+  },
+  'pavilion-nine': {
+    wall: '#c5c7c1',
+    accent: '#315f59',
+    roof: '#aab5b3',
+    trim: '#e1dfd5',
+    dark: '#2d3939',
+    glass: '#5f7d80',
+    green: '#315f45',
+    white: '#f1efe7',
+    platform: '#858982',
+    metal: '#687477',
+  },
+  'crioulos-center': {
+    wall: '#a85f3f',
+    accent: '#60402f',
+    roof: '#984830',
+    trim: '#d6b58e',
+    dark: '#2f2722',
+    glass: '#39484a',
+    green: '#4f7045',
+    white: '#eee5d7',
+    platform: '#9a6952',
+    metal: '#656a67',
+  },
+  'gate-four': {
+    wall: '#174c31',
+    accent: '#e7c54a',
+    roof: '#234f3b',
+    trim: '#f2e7ba',
+    dark: '#17302a',
+    glass: '#477478',
+    green: '#174c31',
+    white: '#f7f5eb',
+    platform: '#8d928b',
+    metal: '#66716f',
   },
   'commercial-pavilion': {
     wall: '#bbb9b1',
@@ -366,6 +411,7 @@ function useLandmarkMaterials(
     result.white.side = THREE.DoubleSide;
     if (
       kind === 'commercial-pavilion'
+      || kind === 'pavilion-nine'
       || kind === 'third-age-pavilion'
       || kind === 'livestock-pavilion'
       || kind === 'mirante-pavilion'
@@ -378,6 +424,22 @@ function useLandmarkMaterials(
       result.dark.metalness = 0.28;
       result.wall.roughness = 0.82;
       result.platform.roughness = 0.96;
+    }
+    if (kind === 'crioulos-center') {
+      result.wall.roughness = 0.97;
+      result.roof.roughness = 0.94;
+      result.roof.metalness = 0;
+      result.accent.roughness = 0.92;
+      result.platform.roughness = 0.98;
+      result.metal.roughness = 0.58;
+      result.metal.metalness = 0.2;
+    }
+    if (kind === 'gate-four') {
+      result.wall.roughness = 0.84;
+      result.accent.roughness = 0.7;
+      result.accent.metalness = 0.05;
+      result.metal.roughness = 0.5;
+      result.metal.metalness = 0.3;
     }
     if (kind === 'mirante-pavilion') {
       result.roof.roughness = 0.68;
@@ -1445,6 +1507,12 @@ function useArchitecturalDetail(
         )
       : kind === 'third-age-pavilion'
         ? Math.max(18, Math.max(bounds.width, bounds.depth) * 3.4)
+      : kind === 'pavilion-nine'
+        ? Math.max(28, Math.max(bounds.width, bounds.depth) * 3.6)
+      : kind === 'crioulos-center'
+        ? Math.max(22, Math.max(bounds.width, bounds.depth) * 7.4)
+      : kind === 'gate-four'
+        ? Math.max(20, Math.max(bounds.width, bounds.depth) * 8)
       : kind === 'commercial-pavilion'
         ? Math.max(24, Math.max(bounds.width, bounds.depth) * 4.4)
       : kind === 'fenasoja-restaurant'
@@ -3563,17 +3631,40 @@ export function StrategicLandmarkMesh({
   const kind = resolveStrategicLandmarkKind(entity);
   const bounds = useMemo(() => strategicLandmarkBounds(entity), [entity]);
   const height = strategicLandmarkVisualHeight(entity) ?? entity.geometry.extrusionHeight;
-  const footprint = useMemo(() => createLocalFootprintGeometry(entity, bounds), [bounds, entity]);
+  // The official A4 marker is smaller than the architectural portal. Share one
+  // transient envelope across picking, hover and selection without moving its ID/label.
+  const interactionEntity = useMemo<MapEntity>(() => {
+    if (kind !== 'gate-four') return entity;
+    const [offsetX, offsetZ] = GATE_FOUR_DISTRICT_LAYOUT.gate4.visualOffset;
+    return {
+      ...entity,
+      geometry: {
+        ...entity.geometry,
+        coordinates: [resolveGateFourInteractionFootprint(bounds).map(([x, z]) => (
+          [x + bounds.centerX + offsetX, z + bounds.centerZ + offsetZ]
+        ))],
+      },
+    };
+  }, [bounds, entity, kind]);
+  const footprint = useMemo(
+    () => createLocalFootprintGeometry(interactionEntity, bounds),
+    [bounds, interactionEntity],
+  );
+  const baseHitVolumeScale = kind === 'lunar-tree' ? LUNAR_MEMORIAL_HIT_SCALE : 1;
+  const hitVolumeScale = kind === 'crioulos-center' ? 1.35 : baseHitVolumeScale;
   const hitVolume = useMemo(
     () => createLocalHitVolumeGeometry(
-      entity,
+      interactionEntity,
       bounds,
       height,
-      kind === 'lunar-tree' ? LUNAR_MEMORIAL_HIT_SCALE : 1,
+      hitVolumeScale,
     ),
-    [bounds, entity, height, kind],
+    [bounds, height, hitVolumeScale, interactionEntity],
   );
-  const outline = useMemo(() => createLocalFootprintOutline(entity, bounds), [bounds, entity]);
+  const outline = useMemo(
+    () => createLocalFootprintOutline(interactionEntity, bounds),
+    [bounds, interactionEntity],
+  );
   const filterStrength = filtersActive && !isMatch && !selected ? 0.42 : 1;
   const toneDown = 1 - THREE.MathUtils.clamp(layerOpacity * filterStrength, 0, 1);
   const materials = useLandmarkMaterials(kind ?? 'german-pavilion', toneDown, selected, hovered, segment);
@@ -3677,6 +3768,9 @@ export function StrategicLandmarkMesh({
       <group rotation={[0, facingRadians, 0]} dispose={null}>
         {kind === 'administrative-center' && <AdministrativeCenter {...modelProps} />}
         {kind === 'fenasoja-headquarters' && <FenasojaHeadquarters {...modelProps} />}
+        {kind === 'pavilion-nine' && <PavilionNineLandmark {...modelProps} />}
+        {kind === 'crioulos-center' && <CrioulosCenterLandmark {...modelProps} />}
+        {kind === 'gate-four' && <GateFourLandmark {...modelProps} />}
         {kind === 'commercial-pavilion' && (
           <CommercialPavilion
             publicIdentifier={entity.publicIdentifier}

@@ -38,6 +38,7 @@ import {
   isNationsDistrictPresentationSurface,
   shouldRenderNationsDistrict,
 } from '../../data/nationsDistrict';
+import { withGateFourDistrictPresentationEntities } from '../../data/gateFourDistrict';
 import { COMMERCIAL_MAP_ENVIRONMENT_CONFIG } from '../../data/commercialMapEnvironment';
 import {
   OPEN_GROUND_PRESENTATION_HEIGHT,
@@ -401,6 +402,15 @@ function focusProfileForEntity(entity: MapEntity) {
   if (landmark === 'fenasoja-event-center') {
     return { ...profile, contextRatio: 0.085, fitPadding: 1.32, minDistanceRatio: 0.06, maxDistanceRatio: 0.4, minimumDirectionY: 0.48 };
   }
+  if (landmark === 'pavilion-nine') {
+    return { ...profile, contextRatio: 0.09, fitPadding: 1.28, minDistanceRatio: 0.065, maxDistanceRatio: 0.42, minimumDirectionY: 0.48 };
+  }
+  if (landmark === 'crioulos-center') {
+    return { ...profile, contextRatio: 0.08, fitPadding: 1.34, minDistanceRatio: 0.06, maxDistanceRatio: 0.4, minimumDirectionY: 0.42 };
+  }
+  if (landmark === 'gate-four') {
+    return { ...profile, contextRatio: 0.07, fitPadding: 1.24, minDistanceRatio: 0.055, maxDistanceRatio: 0.36, minimumDirectionY: 0.4 };
+  }
   if (landmark === 'commercial-pavilion') {
     return { ...profile, contextRatio: 0.075, fitPadding: 1.24, minDistanceRatio: 0.06, maxDistanceRatio: 0.4, minimumDirectionY: 0.48 };
   }
@@ -697,7 +707,12 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
       : 1;
   const visualOpacity = selected ? Math.max(0.94, layerOpacity) : layerOpacity * filterStrength;
   const presentationLift = resolveMarkerPresentationLift(classification);
-  const selectedLift = selected ? (isFlat ? 0.055 : 0.11) : 0;
+  // Large textured ground fields must remain below their circulation ribbons
+  // even while selected. Selection is already conveyed by emissive tint and
+  // outline; lifting the whole slab made it overtake roads at oblique angles.
+  const selectedLift = selected
+    ? openGroundProfile ? 0 : isFlat ? 0.055 : 0.11
+    : 0;
   const displayColor = useMemo(() => {
     if (!solidRendering || selected) return baseColor;
     const strength = THREE.MathUtils.clamp(layerOpacity * filterStrength, 0, 1);
@@ -2237,9 +2252,11 @@ function Scene({
   const nonLotEntities = useMemo(() => exteriorRenderedEntities.filter((entity) => (
     !lotByEntity.has(entity.id)
   )), [exteriorRenderedEntities, lotByEntity]);
-  const circulationEntities = useMemo(() => nonLotEntities.filter((entity) => (
-    entity.classification === 'ROAD' || entity.classification === 'PEDESTRIAN_PATH'
-  )), [nonLotEntities]);
+  const circulationEntities = useMemo(() => (
+    withGateFourDistrictPresentationEntities(nonLotEntities).filter((entity) => (
+      entity.classification === 'ROAD' || entity.classification === 'PEDESTRIAN_PATH'
+    ))
+  ), [nonLotEntities]);
   const structuralEntities = useMemo(() => nonLotEntities.filter((entity) => (
     entity.classification !== 'ROAD' && entity.classification !== 'PEDESTRIAN_PATH'
   )), [nonLotEntities]);

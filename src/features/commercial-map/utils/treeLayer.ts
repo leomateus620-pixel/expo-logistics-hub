@@ -1,4 +1,5 @@
 import type { CommercialLot, MapEntity } from '../types';
+import { OPEN_GROUND_PRESENTATION_HEIGHT } from '../constants';
 import {
   COMMERCIAL_TREE_AREA_SCENE_ANCHORS,
   COMMERCIAL_MAP_TREES,
@@ -22,6 +23,8 @@ export const COMMERCIAL_TREE_LAYER_DRAW_CALL_BUDGET = 4;
 /** Trunk + branch + crown in the shadow-map pass when full graphics are enabled. */
 export const COMMERCIAL_TREE_LAYER_SHADOW_DRAW_CALL_BUDGET = 3;
 const TREE_SURFACE_CLEARANCE = 0.004;
+const TREE_SHADOW_CLEARANCE = TREE_SURFACE_CLEARANCE + 0.008;
+const OPEN_GROUND_TREE_SHADOW_CLEARANCE = 0.002;
 const TREE_SURFACE_CLASSIFICATIONS = new Set([
   'SELLABLE_LOT',
   ...DEFAULT_FLAT_SURFACE_CLASSIFICATIONS,
@@ -80,6 +83,13 @@ export function resolveCommercialTreeLot(tree: CommercialMapTree, lots: readonly
 }
 
 function surfacePriority(tree: CommercialMapTree, entity: MapEntity) {
+  // The presentation road overlaps the motorhome's canonical eastern edge.
+  // Its visible asphalt is the receiver there, not the lower grass underneath.
+  if (
+    tree.area === 'GATE_FOUR_DISTRICT'
+    && entity.publicIdentifier === 'RUA-BUENOS-AIRES'
+    && entity.classification === 'ROAD'
+  ) return -1;
   if (entity.publicIdentifier === tree.surfaceEntityIdentifier) return 0;
   if (entity.publicIdentifier === tree.relatedLotId) return 0;
   if (tree.placement === 'SIDEWALK_EDGE' && entity.classification === 'PEDESTRIAN_PATH') return 0;
@@ -150,13 +160,50 @@ export function commercialTreeGroundElevationAtPosition(
   point: readonly [number, number],
   entities: readonly MapEntity[] = [],
 ) {
+  return commercialTreeSupportElevationAtPosition(tree, point, entities, false);
+}
+
+/** Resolve the receiving surface independently; a projected shadow can cross a road. */
+export function commercialTreeShadowElevationAtPosition(
+  tree: CommercialMapTree,
+  point: readonly [number, number],
+  entities: readonly MapEntity[] = [],
+) {
+  return commercialTreeSupportElevationAtPosition(tree, point, entities, true);
+}
+
+function commercialTreeSupportElevationAtPosition(
+  tree: CommercialMapTree,
+  point: readonly [number, number],
+  entities: readonly MapEntity[],
+  shadow: boolean,
+) {
   const surfaceEntity = commercialTreeSurfaceEntityAtPosition(tree, point, entities);
-  if (surfaceEntity) return entitySurfaceElevation(surfaceEntity, { clearance: TREE_SURFACE_CLEARANCE });
-  if (tree.placement === 'INSIDE_LOT' || tree.placement === 'LOT_EDGE') return 0.134;
-  if (tree.placement === 'QUADRA_BORDER') return 0.029;
-  if (tree.placement === 'SIDEWALK_EDGE') return 0.03;
-  if (tree.placement === 'PARKING_ISLAND' || tree.placement === 'PARKING_EDGE') return 0.064;
-  return 0.036;
+  const motorhomePresentation = tree.area === 'GATE_FOUR_DISTRICT'
+    && surfaceEntity?.publicIdentifier === 'AREA-MOTORHOME'
+    && surfaceEntity.classification === 'PARKING';
+  if (surfaceEntity) {
+    return entitySurfaceElevation(surfaceEntity, {
+      // The canonical motorhome extrusion is .055, while EntityMesh renders
+      // .026. Match that presentation without changing the source geometry or
+      // incorrectly lowering a road that receives the displaced shadow.
+      ...(motorhomePresentation ? {
+        flatMinimumHeight: OPEN_GROUND_PRESENTATION_HEIGHT,
+        flatMaximumHeight: OPEN_GROUND_PRESENTATION_HEIGHT,
+      } : {}),
+      clearance: shadow
+        ? motorhomePresentation ? OPEN_GROUND_TREE_SHADOW_CLEARANCE : TREE_SHADOW_CLEARANCE
+        : TREE_SURFACE_CLEARANCE,
+    });
+  }
+
+  // Preserve established fallback heights and the shadow bias outside this district.
+  const shadowOffset = shadow ? TREE_SHADOW_CLEARANCE - TREE_SURFACE_CLEARANCE : 0;
+  if (tree.placement === 'INSIDE_LOT' || tree.placement === 'LOT_EDGE') return 0.134 + shadowOffset;
+  if (tree.placement === 'QUADRA_BORDER') return 0.029 + shadowOffset;
+  if (tree.placement === 'SIDEWALK_EDGE') return 0.03 + shadowOffset;
+  if (tree.placement === 'PARKING_ISLAND' || tree.placement === 'PARKING_EDGE') return 0.064 + shadowOffset;
+  return 0.036 + shadowOffset;
 }
 
 export function commercialTreeInstanceBudget(treeCount: number, reducedGraphics = false) {
