@@ -681,9 +681,11 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
     sceneCenter[1] - markerCenter[1],
   ), [markerCenter, sceneCenter]);
   const gateAccessMode = useMemo(() => resolveGateAccessMode(entity.name), [entity.name]);
-  const baseColor = segment && isSegmentTintClassification(entity.classification)
-    ? segment.palette.surface
-    : CLASSIFICATION_COLORS[entity.classification] ?? '#78907d';
+  const baseColor = openGroundProfile
+    ? openGroundProfile.baseColor
+    : segment && isSegmentTintClassification(entity.classification)
+      ? segment.palette.surface
+      : CLASSIFICATION_COLORS[entity.classification] ?? '#78907d';
   const matched = Boolean(filtersActive && isMatch);
   const filterStrength = infrastructureMode
     ? 0.26
