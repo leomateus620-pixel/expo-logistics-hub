@@ -94,7 +94,7 @@ export const statusClasses: Record<CommissionStatus, string> = {
   restricted: 'border-red-500/25 bg-red-500/10 text-red-700 dark:text-red-300',
 };
 
-const visualThemes: Record<CommissionTone, CommissionVisualTheme> = {
+export const visualThemes: Record<CommissionTone, CommissionVisualTheme> = {
   emerald: {
     tone: 'emerald',
     accentColor: 'hsl(145 70% 30%)',
