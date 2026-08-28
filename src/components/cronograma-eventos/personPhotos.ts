@@ -31,6 +31,10 @@ import roqueLugoch from '@/assets/person-roque-lugoch.png.asset.json';
 import estelaZamberlam from '@/assets/person-estela-zamberlam.png.asset.json';
 import rodrigoCalixto from '@/assets/person-rodrigo-calixto.png.asset.json';
 import eltonWalker from '@/assets/person-elton-walker.png.asset.json';
+import deiseFroelich from '@/assets/person-deise-froelich.png.asset.json';
+import vanessaGnoatto from '@/assets/person-vanessa-gnoatto.png.asset.json';
+import joseMauroBarbieri from '@/assets/person-jose-mauro-barbieri.png.asset.json';
+import sandraLameira from '@/assets/person-sandra-lameira.png.asset.json';
 
 /**
  * Only these members have an official portrait. Everyone else keeps the
