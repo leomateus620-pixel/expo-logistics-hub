@@ -35,6 +35,9 @@ import deiseFroelich from '@/assets/person-deise-froelich.png.asset.json';
 import vanessaGnoatto from '@/assets/person-vanessa-gnoatto.png.asset.json';
 import joseMauroBarbieri from '@/assets/person-jose-mauro-barbieri.png.asset.json';
 import sandraLameira from '@/assets/person-sandra-lameira.png.asset.json';
+import julioBravo from '@/assets/person-julio-bravo.png.asset.json';
+import elemarLenz from '@/assets/person-elemar-lenz.png.asset.json';
+import cristinaScheuermann from '@/assets/person-cristina-scheuermann.png.asset.json';
 
 /**
  * Only these members have an official portrait. Everyone else keeps the
@@ -79,6 +82,11 @@ const PERSON_PHOTOS: Record<string, string> = {
   'vanessa gnoatto': vanessaGnoatto.url,
   'jose mauro barbieri': joseMauroBarbieri.url,
   'sandra lameira': sandraLameira.url,
+  'julio bravo': julioBravo.url,
+  'elemar antonio lenz': elemarLenz.url,
+  'elemar lenz': elemarLenz.url,
+  'cristina beatriz manjabosco scheuermann': cristinaScheuermann.url,
+  'cristina scheuermann': cristinaScheuermann.url,
 };
 
 const PERSON_PHOTOS_BY_USER_ID: Record<string, string> = {
@@ -126,6 +134,9 @@ const PERSON_PHOTOS_BY_USER_ID: Record<string, string> = {
   '1538ad1e-a9da-458e-8057-d3477e25f973': vanessaGnoatto.url,
   '88093b7d-6133-44a3-bb03-5a01e9285eb2': joseMauroBarbieri.url,
   'b4960db1-9ca3-46fb-8a07-67c5efec8173': sandraLameira.url,
+  '628ab8aa-ba36-42ce-906c-77d496be2090': julioBravo.url,
+  '823f010b-c4b1-4d9f-a8c7-6d66d58f4670': elemarLenz.url,
+  'c3e01950-00ba-497a-b2b0-e13debce41e2': cristinaScheuermann.url,
 };
 
 function normalize(value: string): string {
