@@ -1391,7 +1391,7 @@ const EntityLabel = memo(function EntityLabel({
   const labelHeight = entityLabelHeight(entity);
 
   const mode = selected ? 'focus' : 'hover';
-  const variant = `is-contextual ${selected ? 'is-selected' : 'is-hovered'}`;
+  const variant = `is-contextual ${selected ? 'is-selected' : hovered ? 'is-hovered' : 'is-transient'}`;
 
   return (
     <Html
