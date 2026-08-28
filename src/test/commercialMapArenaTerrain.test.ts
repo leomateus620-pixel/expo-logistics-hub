@@ -14,6 +14,10 @@ import {
   arenaTerrainElevation,
   arenaTerrainPlateauElevation,
 } from '@/features/commercial-map/data/arenaTerrain';
+import {
+  isArenaTerrainExcluded,
+  resolveArenaSurfaceOwner,
+} from '@/features/commercial-map/data/arenaSectorZoning';
 
 const STAIRS = sourceBoundsToLocal(ARENA_FRONT_LAYOUT.stairs.sourceBounds);
 
@@ -72,7 +76,10 @@ describe('terreno reconstruído do entorno da Arena', () => {
       // Quadras seguem no trecho plano, junto ao apron.
       expect(arenaTerrainPlateauElevation(court)).toBeCloseTo(ARENA_TERRAIN_BASE_ELEVATION, 2);
     });
-    expect(field.maxZ).toBeLessThan(STAIRS.minZ);
+    // Zoneamento corrigido: o campo fica atrás/ao lado da Arena, nunca junto aos lotes da Exporural.
+    const arena = sourceBoundsToLocal([4900, 2690, 5385, 3130]);
+    expect(field.minX).toBeGreaterThan(arena.maxX);
+    expect(field.centerZ).toBeGreaterThan(multi.maxZ);
   });
 
   it('registra terreno, campo e caminhos como apresentação não comercial', () => {
@@ -85,5 +92,20 @@ describe('terreno reconstruído do entorno da Arena', () => {
       });
     expect(ARENA_FRONT_LAYOUT.walkways.length).toBeGreaterThanOrEqual(3);
     expect(ARENA_FRONT_LAYOUT.treeClusters.length).toBeGreaterThanOrEqual(10);
+  });
+
+  it('impede que o terreno natural invada concreto, quadras, vias ou estacionamento', () => {
+    const plaza = sourceBoundsToLocal([4200, 2750, 4800, 3050]);
+    const arena = sourceBoundsToLocal([4900, 2690, 5385, 3130]);
+    const multi = sourceBoundsToLocal(ARENA_FRONT_LAYOUT.multiSportCourt.sourceBounds);
+    const parking = sourceBoundsToLocal([4600, 3300, 5200, 3900]);
+    [plaza, arena, multi, parking].forEach((zone) => {
+      expect(isArenaTerrainExcluded(zone.centerX, zone.centerZ)).toBe(true);
+    });
+    expect(resolveArenaSurfaceOwner(arena.centerX, arena.centerZ)).toBe('ARENA_STRUCTURE');
+
+    // O entorno leste/sudeste segue sendo terreno natural, sem plano branco genérico.
+    const rear = sourceBoundsToLocal([5900, 2500, 5960, 2560]);
+    expect(isArenaTerrainExcluded(rear.centerX, rear.centerZ)).toBe(false);
   });
 });
