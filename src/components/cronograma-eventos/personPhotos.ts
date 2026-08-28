@@ -26,6 +26,11 @@ import valtairDornelles from '@/assets/person-valtair-dornelles.png.asset.json';
 import elisandraSimaoReis from '@/assets/person-elisandra-simao-reis.png.asset.json';
 import alexandreDallagnese from '@/assets/person-alexandre-dallagnese.png.asset.json';
 import zeliaSavoldi from '@/assets/person-zelia-savoldi.png.asset.json';
+import fernandaSeckler from '@/assets/person-fernanda-seckler.png.asset.json';
+import roqueLugoch from '@/assets/person-roque-lugoch.png.asset.json';
+import estelaZamberlam from '@/assets/person-estela-zamberlam.png.asset.json';
+import rodrigoCalixto from '@/assets/person-rodrigo-calixto.png.asset.json';
+import eltonWalker from '@/assets/person-elton-walker.png.asset.json';
 
 /**
  * Only these members have an official portrait. Everyone else keeps the
@@ -58,6 +63,12 @@ const PERSON_PHOTOS: Record<string, string> = {
   'elisandra simao reis': elisandraSimaoReis.url,
   'alexandre dall agnese': alexandreDallagnese.url,
   'zelia savoldi': zeliaSavoldi.url,
+  'fernanda seckler eich': fernandaSeckler.url,
+  'fernanda secklereich': fernandaSeckler.url,
+  'roque vanderlei lugoch': roqueLugoch.url,
+  'estela zamberlam schwerz': estelaZamberlam.url,
+  'rodrigo calixto': rodrigoCalixto.url,
+  'elton luis walker': eltonWalker.url,
 };
 
 const PERSON_PHOTOS_BY_USER_ID: Record<string, string> = {
@@ -94,6 +105,13 @@ const PERSON_PHOTOS_BY_USER_ID: Record<string, string> = {
   '3832dcf4-f7f7-4a7e-93fd-71261b5742a9': alexandreDallagnese.url,
   '74a71a9f-c2a6-4ae1-baed-1e2d7b8bc07f': zeliaSavoldi.url,
   '38e7e8d3-4c66-4279-92ea-961b70ee4e80': zeliaSavoldi.url,
+  '0c320692-cab1-4b35-982e-74a85ca0fddb': fernandaSeckler.url,
+  'c00d04b3-6b33-48f7-80c8-14c28bf7c90a': fernandaSeckler.url,
+  'cc1fe83d-41f1-4df2-8604-9bb8b2f9abda': roqueLugoch.url,
+  '00b790ae-5612-4ab3-83fe-a270bf658cfc': roqueLugoch.url,
+  '008d7233-5b75-4547-ae2c-8e885d918294': estelaZamberlam.url,
+  '742319f2-448c-48e9-8688-65cb84911768': rodrigoCalixto.url,
+  '308e4b27-d361-40af-ac2d-36d95a043279': eltonWalker.url,
 };
 
 function normalize(value: string): string {
