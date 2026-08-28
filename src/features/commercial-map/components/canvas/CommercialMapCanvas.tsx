@@ -1390,12 +1390,16 @@ const EntityLabel = memo(function EntityLabel({
   const status = lot ? STATUS_CONFIG[lot.status] : null;
   const labelHeight = entityLabelHeight(entity);
 
+  const mode = selected ? 'focus' : 'hover';
+  const variant = `is-contextual ${selected ? 'is-selected' : 'is-hovered'}`;
+
   return (
     <Html
       position={[metadata.labelAnchor[0], entity.geometry.elevation + labelHeight, metadata.labelAnchor[1]]}
       transform={false}
       eps={0.001}
       zIndexRange={[22, 2]}
+      calculatePosition={calculateContextualLabelPosition}
       style={{
         pointerEvents: 'none',
         transform: 'translate3d(-50%, -100%, 0)',
@@ -1403,30 +1407,31 @@ const EntityLabel = memo(function EntityLabel({
       }}
     >
       {lot ? (
-        <div data-map-entity-id={entity.id} data-map-label-mode={selected ? 'focus' : 'navigation'} className={`commercial-map-label is-lot ${selected ? 'is-selected' : ''} ${dimmed ? 'is-dimmed' : ''}`}>
+        <div data-map-entity-id={entity.id} data-map-label-mode={mode} className={`commercial-map-label is-lot ${variant} ${dimmed ? 'is-dimmed' : ''}`}>
           <span aria-label={`Lote ${metadata.lotNumber ?? ''}`}>{metadata.lotNumber}</span>
-          {(selected || hovered) && metadata.block && <strong>{quadraLabel(metadata.block)}</strong>}
-          {(selected || hovered) && lot.officialAreaSqm && (
+          {metadata.block && <strong>{quadraLabel(metadata.block)}</strong>}
+          {lot.officialAreaSqm && (
             <small className="commercial-map-label-area">{AREA_NUMBER.format(lot.officialAreaSqm)} m²</small>
           )}
-          {(selected || hovered) && status && <small><b aria-hidden="true">{status.symbol}</b> {status.label}</small>}
+          {status && <small><b aria-hidden="true">{status.symbol}</b> {status.label}</small>}
         </div>
       ) : isRoad ? (
-        <div data-map-entity-id={entity.id} data-map-label-mode={selected ? 'focus' : 'navigation'} className={`commercial-map-label is-road ${selected ? 'is-selected' : ''}`}><span>{metadata.officialDisplayName}</span></div>
+        <div data-map-entity-id={entity.id} data-map-label-mode={mode} className={`commercial-map-label is-road ${variant}`}><span>{metadata.officialDisplayName}</span></div>
       ) : isQuadra ? (
-        <div data-map-entity-id={entity.id} data-map-label-mode={selected ? 'focus' : 'navigation'} className={`commercial-map-label is-quadra ${selected ? 'is-selected' : ''}`}>
+        <div data-map-entity-id={entity.id} data-map-label-mode={mode} className={`commercial-map-label is-quadra ${variant}`}>
           <span>{quadraLabel(metadata.officialDisplayName || entity.publicIdentifier)}</span>
         </div>
       ) : (
         <div
           data-map-entity-id={entity.id}
-          data-map-label-mode={selected ? 'focus' : 'navigation'}
-          className={`commercial-map-label is-structure ${isGate ? 'is-access' : ''} ${isRestroom ? 'is-restroom' : ''} ${isArchitecturalLandmark ? 'is-architectural-landmark' : ''} ${selected ? 'is-selected' : ''}`}
+          data-map-label-mode={mode}
+          className={`commercial-map-label is-structure ${isGate ? 'is-access' : ''} ${isRestroom ? 'is-restroom' : ''} ${isArchitecturalLandmark ? 'is-architectural-landmark' : ''} ${variant}`}
         >
           {metadata.structureCode && <strong className="commercial-map-label-code">{isRestroom ? 'E' : metadata.structureCode}</strong>}
-          <span>{isRestroom && !selected ? 'WC' : metadata.officialDisplayName}</span>
+          <span>{metadata.officialDisplayName}</span>
         </div>
       )}
+
     </Html>
   );
 });
