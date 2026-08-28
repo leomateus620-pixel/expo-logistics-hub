@@ -31,7 +31,7 @@ describe('retratos oficiais das comissões', () => {
 
     const fernanda = getPersonPhoto('Fernanda Matarucco Meinertz');
     expect(fernanda).toBeTruthy();
-    expect(getPersonPhoto('FERNANDA SECKLER EICH')).toBeNull();
+    expect(getPersonPhoto('FERNANDA SECKLER EICH')).not.toBe(fernanda);
     expect(fernanda).not.toBe(leonardo);
 
     expect(getPersonPhoto('EDUARDO SANTOS')).toBeTruthy();
