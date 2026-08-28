@@ -230,30 +230,151 @@
 .cronograma-plan-chips svg { width: 0.75rem; height: 0.75rem; }
 
 /* Rundown de leitura (detalhe do subevento) */
-.cronograma-plan-rundown { display: flex; flex-direction: column; gap: 0.7rem; margin-top: 0.6rem; }
-.cronograma-plan-rundown-group { display: flex; flex-direction: column; gap: 0.3rem; }
-.cronograma-plan-rundown-group > strong {
-  font-size: 0.7rem;
-  font-weight: 800;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  color: hsl(var(--muted-foreground));
+.cronograma-plan-rundown { display: flex; flex-direction: column; gap: 0.7rem; margin-top: 0.7rem; }
+
+.cronograma-plan-block {
+  border: 1px solid hsl(var(--border) / 0.75);
+  border-radius: 0.9rem;
+  background: hsl(var(--card) / 0.85);
+  padding: 0.7rem 0.8rem 0.75rem;
+  box-shadow: 0 1px 2px hsl(var(--foreground) / 0.04);
 }
-.cronograma-plan-rundown-item {
+.cronograma-plan-block + .cronograma-plan-block { margin-top: 0; }
+
+.cronograma-plan-block-head {
   display: flex;
-  align-items: baseline;
+  align-items: center;
+  flex-wrap: wrap;
   gap: 0.45rem;
-  font-size: 0.78rem;
+  margin-bottom: 0.55rem;
+}
+.cronograma-plan-block-head h5 {
+  margin: 0;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
   color: hsl(var(--foreground));
 }
-.cronograma-plan-rundown-item time {
-  min-width: 3.2rem;
-  font-variant-numeric: tabular-nums;
-  font-weight: 800;
+.cronograma-plan-block-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 0.5rem;
+  background: hsl(var(--primary) / 0.12);
   color: hsl(var(--primary));
 }
-.cronograma-plan-rundown-item span { color: hsl(var(--muted-foreground)); }
-.cronograma-plan-rundown-item[data-done='true'] { opacity: 0.6; text-decoration: line-through; }
+.cronograma-plan-block-icon svg { width: 0.8rem; height: 0.8rem; }
+.cronograma-plan-block[data-kind='provisions'] .cronograma-plan-block-icon {
+  background: hsl(var(--gold, var(--primary)) / 0.16);
+  color: hsl(var(--gold, var(--primary)));
+}
+.cronograma-plan-block-count {
+  margin-left: auto;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: hsl(var(--muted-foreground));
+  font-variant-numeric: tabular-nums;
+}
+.cronograma-plan-progress {
+  flex: 1 0 100%;
+  height: 3px;
+  border-radius: 999px;
+  background: hsl(var(--muted) / 0.6);
+  overflow: hidden;
+}
+.cronograma-plan-progress > span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: hsl(var(--primary));
+  transition: width 240ms ease;
+}
+
+/* Ações programadas — trilha vertical */
+.cronograma-plan-track { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.cronograma-plan-track-item {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1rem 3.3rem minmax(0, 1fr) auto;
+  align-items: start;
+  gap: 0.5rem;
+  padding: 0.32rem 0;
+}
+.cronograma-plan-track-item::before {
+  content: '';
+  position: absolute;
+  left: 0.44rem;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: hsl(var(--border) / 0.9);
+}
+.cronograma-plan-track-item:first-child::before { top: 0.7rem; }
+.cronograma-plan-track-item:last-child::before { bottom: calc(100% - 0.7rem); }
+.cronograma-plan-track-marker {
+  position: relative;
+  z-index: 1;
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-top: 0.42rem;
+  border-radius: 999px;
+  border: 2px solid hsl(var(--primary));
+  background: hsl(var(--card));
+}
+.cronograma-plan-track-item[data-done='true'] .cronograma-plan-track-marker {
+  background: hsl(var(--primary));
+}
+.cronograma-plan-track-time {
+  font-size: 0.76rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: hsl(var(--primary));
+  padding-top: 0.05rem;
+}
+.cronograma-plan-track-body { min-width: 0; }
+.cronograma-plan-track-title {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1.3;
+  color: hsl(var(--foreground));
+}
+.cronograma-plan-track-meta {
+  margin: 0.1rem 0 0;
+  font-size: 0.7rem;
+  line-height: 1.3;
+  color: hsl(var(--muted-foreground));
+}
+.cronograma-plan-track-state { color: hsl(var(--primary)); }
+.cronograma-plan-track-state svg { width: 0.85rem; height: 0.85rem; margin-top: 0.25rem; }
+.cronograma-plan-track-item[data-done='true'] .cronograma-plan-track-title { color: hsl(var(--muted-foreground)); }
+
+/* Estrutura e providências — checklist */
+.cronograma-plan-checklist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.28rem; }
+.cronograma-plan-checklist-item {
+  display: grid;
+  grid-template-columns: 1.05rem minmax(0, 1fr);
+  gap: 0.5rem;
+  align-items: start;
+}
+.cronograma-plan-checklist-mark { color: hsl(var(--muted-foreground) / 0.7); }
+.cronograma-plan-checklist-mark svg { width: 0.9rem; height: 0.9rem; margin-top: 0.2rem; }
+.cronograma-plan-checklist-item[data-done='true'] .cronograma-plan-checklist-mark { color: hsl(var(--primary)); }
+.cronograma-plan-checklist-item[data-done='true'] .cronograma-plan-track-title { color: hsl(var(--muted-foreground)); }
+
+@media (max-width: 640px) {
+  .cronograma-plan-track-item {
+    grid-template-columns: 1rem minmax(0, 1fr) auto;
+  }
+  .cronograma-plan-track-time { grid-column: 2; font-size: 0.72rem; }
+  .cronograma-plan-track-body { grid-column: 2; }
+}
+
 
 /* Seletores relacionais oficiais dentro do construtor de planejamento */
 .cronograma-thought-field.cronograma-plan-relations {
