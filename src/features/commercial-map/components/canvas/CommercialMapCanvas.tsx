@@ -209,8 +209,6 @@ const NO_RAYCAST = () => undefined;
 const PRECISE_HOVER_CAPABLE = typeof window === 'undefined'
   || !window.matchMedia
   || window.matchMedia('(any-hover: hover) and (any-pointer: fine)').matches;
-const LABEL_LEVEL_RANK: Record<MapLabelVisibility, number> = { far: 0, medium: 1, near: 2, detail: 3 };
-const FAR_LABEL_PRIORITY_FLOOR = 94;
 const MAP_BACKGROUND_COLOR = new THREE.Color('#dfe8de');
 const AREA_NUMBER = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const SEGMENT_LOT_SURFACE_WEIGHT = 0.94;
