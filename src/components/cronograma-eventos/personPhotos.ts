@@ -73,6 +73,12 @@ const PERSON_PHOTOS: Record<string, string> = {
   'estela zamberlam schwerz': estelaZamberlam.url,
   'rodrigo calixto': rodrigoCalixto.url,
   'elton luis walker': eltonWalker.url,
+  'deise anelise froelich': deiseFroelich.url,
+  'deise froelich': deiseFroelich.url,
+  'vanessa matraszek gnoatto': vanessaGnoatto.url,
+  'vanessa gnoatto': vanessaGnoatto.url,
+  'jose mauro barbieri': joseMauroBarbieri.url,
+  'sandra lameira': sandraLameira.url,
 };
 
 const PERSON_PHOTOS_BY_USER_ID: Record<string, string> = {
