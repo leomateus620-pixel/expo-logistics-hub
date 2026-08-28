@@ -315,7 +315,7 @@ describe('CommissionPortalPage', () => {
       name: 'Entrar para acessar: Indústria, Comércio e Serviços',
     })).toHaveAttribute('href', '/login/industria-comercio-servicos');
 
-    const logisticsCard = screen.getByRole('link', { name: 'Entrar para acessar: Logística' });
+    const logisticsCard = screen.getByRole('link', { name: 'Entrar para acessar: Logística, Hotelaria e Turismo' });
     expect(logisticsCard).not.toHaveTextContent('Ativo');
     expect(screen.getByRole('link', {
       name: /Entrar para acessar: Gastronomia\. Em estruturação/,
@@ -480,7 +480,7 @@ describe('CommissionPortalPage', () => {
       'href',
       '/mapa-comercial',
     );
-    expect(screen.getByRole('link', { name: 'Abrir frente: Logística' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Abrir frente: Logística, Hotelaria e Turismo' })).toHaveAttribute(
       'href',
       '/comissoes/logistica/dashboard',
     );
