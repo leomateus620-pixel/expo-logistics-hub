@@ -381,7 +381,8 @@ const baseCommissionModules: CommissionModule[] = [
     adminOnly: false,
     basePath: '/comissoes/limpeza',
     order: 8,
-    publicPortal: true,
+    // Fora da lista oficial Fenasoja 2028: mantido apenas como histórico, sem card no portal.
+    publicPortal: false,
     menus: [
       dashboardMenu,
       { label: 'Rotinas', path: 'rotinas', description: 'Rotinas e ciclos de limpeza.', icon: CheckSquare },
