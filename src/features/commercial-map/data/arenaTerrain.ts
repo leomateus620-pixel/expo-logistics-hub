@@ -51,7 +51,7 @@ function gentleUndulation(x: number, z: number) {
 
 const FIELD = sourceBoundsToLocal(ARENA_FRONT_LAYOUT.footballField.sourceBounds);
 /** Blend, em unidades locais, entre o patamar do campo e o terreno em volta. */
-const FIELD_BLEND = 1.4;
+const FIELD_BLEND = 0.8;
 
 function distanceToRectangle(
   x: number,

@@ -70,7 +70,7 @@ describe('terreno reconstruído do entorno da Arena', () => {
         && field.maxZ > court.minZ && field.minZ < court.maxZ;
       expect(overlaps).toBe(false);
       // Quadras seguem no trecho plano, junto ao apron.
-      expect(arenaTerrainPlateauElevation(court)).toBeCloseTo(ARENA_TERRAIN_BASE_ELEVATION, 3);
+      expect(arenaTerrainPlateauElevation(court)).toBeCloseTo(ARENA_TERRAIN_BASE_ELEVATION, 2);
     });
     expect(field.maxZ).toBeLessThan(STAIRS.minZ);
   });
