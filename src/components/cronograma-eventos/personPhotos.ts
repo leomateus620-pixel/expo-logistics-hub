@@ -122,6 +122,10 @@ const PERSON_PHOTOS_BY_USER_ID: Record<string, string> = {
   '008d7233-5b75-4547-ae2c-8e885d918294': estelaZamberlam.url,
   '742319f2-448c-48e9-8688-65cb84911768': rodrigoCalixto.url,
   '308e4b27-d361-40af-ac2d-36d95a043279': eltonWalker.url,
+  'be5eee02-5e1a-4c75-93d9-b6400746cca4': deiseFroelich.url,
+  '1538ad1e-a9da-458e-8057-d3477e25f973': vanessaGnoatto.url,
+  '88093b7d-6133-44a3-bb03-5a01e9285eb2': joseMauroBarbieri.url,
+  'b4960db1-9ca3-46fb-8a07-67c5efec8173': sandraLameira.url,
 };
 
 function normalize(value: string): string {
