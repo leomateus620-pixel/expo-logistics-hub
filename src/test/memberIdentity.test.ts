@@ -65,4 +65,22 @@ describe('retratos oficiais das comissões', () => {
       getPersonPhoto(null, 'f9ed4ab9-0ef3-4ee4-9707-36288dbc828f'),
     );
   });
+
+  it('resolve as 5 novas lideranças (Fernanda Seckler, Roque, Estela, Rodrigo, Elton)', () => {
+    const seckler = getPersonPhoto('FERNANDA SECKLER EICH');
+    expect(seckler).toBeTruthy();
+    expect(getPersonPhoto('Fernanda Secklereich')).toBe(seckler);
+    expect(getPersonPhoto('Fernanda Matarucco Meinertz')).not.toBe(seckler);
+
+    const roque = getPersonPhoto('Roque Vanderlei Lugoch');
+    expect(roque).toBeTruthy();
+    expect(getPersonPhoto(null, '00b790ae-5612-4ab3-83fe-a270bf658cfc')).toBe(roque);
+
+    expect(getPersonPhoto('Estela Zamberlam Schwerz')).toBeTruthy();
+    expect(getPersonPhoto('Rodrigo Calixto')).toBeTruthy();
+    expect(getPersonPhoto('Elton Luis Walker')).toBeTruthy();
+    expect(getPersonPhoto(null, '308e4b27-d361-40af-ac2d-36d95a043279')).toBe(
+      getPersonPhoto('Elton Luis Walker'),
+    );
+  });
 });
