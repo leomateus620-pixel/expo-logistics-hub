@@ -42,7 +42,7 @@ export interface LocalBounds {
   centerZ: number;
 }
 
-export const PARK_ENVIRONMENT_REVISION = '2026.7-arena-terreno-natural.1';
+export const PARK_ENVIRONMENT_REVISION = '2026.8-arena-zoneamento.1';
 
 export const PARK_ENVIRONMENT_CLASSIFICATION_LABELS: Readonly<Record<ParkEnvironmentClassification, string>> = {
   NON_COMMERCIAL_STRUCTURE: 'Estrutura não comercial',
