@@ -26,6 +26,11 @@ import valtairDornelles from '@/assets/person-valtair-dornelles.png.asset.json';
 import elisandraSimaoReis from '@/assets/person-elisandra-simao-reis.png.asset.json';
 import alexandreDallagnese from '@/assets/person-alexandre-dallagnese.png.asset.json';
 import zeliaSavoldi from '@/assets/person-zelia-savoldi.png.asset.json';
+import fernandaSeckler from '@/assets/person-fernanda-seckler.png.asset.json';
+import roqueLugoch from '@/assets/person-roque-lugoch.png.asset.json';
+import estelaZamberlam from '@/assets/person-estela-zamberlam.png.asset.json';
+import rodrigoCalixto from '@/assets/person-rodrigo-calixto.png.asset.json';
+import eltonWalker from '@/assets/person-elton-walker.png.asset.json';
 
 /**
  * Only these members have an official portrait. Everyone else keeps the
