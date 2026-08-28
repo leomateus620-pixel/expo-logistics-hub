@@ -32,7 +32,7 @@ describe('arquitetura de acesso do portal', () => {
 
     expect(groups.map((group) => group.label)).toEqual(['Comissões', 'Assessorias']);
     expect(comissoes.items).toHaveLength(26);
-    expect(assessorias.items).toHaveLength(7);
+    expect(assessorias.items).toHaveLength(6);
 
     const slugs = getPortalCommissionModules().map((module) => module.slug);
     expect(slugs).not.toContain('limpeza');
