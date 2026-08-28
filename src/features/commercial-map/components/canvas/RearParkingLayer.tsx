@@ -183,6 +183,7 @@ export const RearParkingLayer = memo(function RearParkingLayer({
 }: { reducedGraphics: boolean; labelsVisible: boolean; opacity?: number }) {
   const { gl, size, invalidate } = useThree();
   const [hovered, setHovered] = useState(false);
+  const [hoveredBlockId, setHoveredBlockId] = useState<string | null>(null);
   const materials = useMemo(() => createParkingMaterialSet(gl.capabilities.getMaxAnisotropy(), reducedGraphics), [gl, reducedGraphics]);
   const resources = useMemo(() => {
     const surfaces = SECTOR_CODES.flatMap((group) => MATERIAL_KINDS.flatMap((kind) => {
@@ -264,7 +265,13 @@ export const RearParkingLayer = memo(function RearParkingLayer({
       {resources.surfaces.map(({ id, kind, geometry, feather }) => (
         <group key={id}>
           <mesh geometry={geometry} material={materials.solid[kind]} receiveShadow onClick={select}
-            onPointerOver={() => setHovered(true)} onPointerOut={() => setHovered(false)} />
+            onPointerOver={() => setHovered(true)}
+            onPointerMove={(event: ThreeEvent<PointerEvent>) => {
+              if (useCommercialMapStore.getState().cameraNavigating) { setHoveredBlockId(null); return; }
+              const block = pickRearParkingBlock([event.point.x, event.point.z]);
+              setHoveredBlockId((current) => (block?.id ?? null) === current ? current : block?.id ?? null);
+            }}
+            onPointerOut={() => { setHovered(false); setHoveredBlockId(null); }} />
           <mesh geometry={feather} material={materials.feather[kind]} receiveShadow raycast={NO_RAYCAST} />
         </group>
       ))}
@@ -277,7 +284,7 @@ export const RearParkingLayer = memo(function RearParkingLayer({
       <primitive object={resources.elderly.object} />
       <ParkingSelection />
       <ParkingOperations labelsVisible={labelsVisible} />
-      <ParkingLabels visible={labelsVisible} />
+      <ParkingLabels visible={labelsVisible} hoveredBlockId={hoveredBlockId} />
     </group>
   );
 });
