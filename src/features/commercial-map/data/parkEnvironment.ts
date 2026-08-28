@@ -6,7 +6,10 @@ export type ParkEnvironmentClassification =
   | 'SPORTS_COURT'
   | 'CONCRETE_STAIRS'
   | 'PAVED_PUBLIC_AREA'
-  | 'LANDSCAPE_FEATURE';
+  | 'LANDSCAPE_FEATURE'
+  | 'NATURAL_TERRAIN'
+  | 'SPORTS_FIELD'
+  | 'PEDESTRIAN_PATH';
 
 export type ParkEnvironmentVerificationStatus =
   | 'REFERENCE_INTERPRETED'
@@ -39,7 +42,7 @@ export interface LocalBounds {
   centerZ: number;
 }
 
-export const PARK_ENVIRONMENT_REVISION = '2026.6-arena-quadra-r.1';
+export const PARK_ENVIRONMENT_REVISION = '2026.7-arena-terreno-natural.1';
 
 export const PARK_ENVIRONMENT_CLASSIFICATION_LABELS: Readonly<Record<ParkEnvironmentClassification, string>> = {
   NON_COMMERCIAL_STRUCTURE: 'Estrutura não comercial',
@@ -47,6 +50,9 @@ export const PARK_ENVIRONMENT_CLASSIFICATION_LABELS: Readonly<Record<ParkEnviron
   CONCRETE_STAIRS: 'Escadaria de concreto',
   PAVED_PUBLIC_AREA: 'Área pública pavimentada',
   LANDSCAPE_FEATURE: 'Elemento paisagístico',
+  NATURAL_TERRAIN: 'Terreno natural',
+  SPORTS_FIELD: 'Campo esportivo',
+  PEDESTRIAN_PATH: 'Caminho de pedestres',
 };
 
 export const ARENA_FRONT_SOURCE_REFERENCES = [
@@ -229,6 +235,39 @@ export const PARK_ENVIRONMENT_FEATURES: readonly ParkEnvironmentFeature[] = [
     sourceReferences: ARENA_FRONT_SOURCE_REFERENCES,
     verificationStatus: 'FIELD_REVIEW_RECOMMENDED',
     notes: 'Taludes estreitos ao norte e ao sul acompanham o desnível oeste-leste sem ocupar o apron pavimentado.',
+  },
+  {
+    id: 'arena-front-natural-terrain',
+    name: 'Terreno natural do entorno da Arena',
+    classification: 'NATURAL_TERRAIN',
+    isSellable: false,
+    contributesToCommercialMetrics: false,
+    sourceBounds: ARENA_FRONT_LAYOUT.terrain.sourceBounds,
+    sourceReferences: ARENA_FRONT_SOURCE_REFERENCES,
+    verificationStatus: 'FIELD_REVIEW_RECOMMENDED',
+    notes: 'Malha contínua com descida oeste-leste; substitui a antiga superfície branca plana sem alterar lotes, ruas ou a Arena.',
+  },
+  {
+    id: 'arena-front-football-field',
+    name: 'Campo de futebol da Arena',
+    classification: 'SPORTS_FIELD',
+    isSellable: false,
+    contributesToCommercialMetrics: false,
+    sourceBounds: ARENA_FRONT_LAYOUT.footballField.sourceBounds,
+    sourceReferences: ARENA_FRONT_SOURCE_REFERENCES,
+    verificationStatus: 'FIELD_REVIEW_RECOMMENDED',
+    notes: 'Campo de grama natural a noroeste da praça, com bordas desgastadas; apresentação, nunca lote comercial.',
+  },
+  {
+    id: 'arena-front-pedestrian-paths',
+    name: 'Caminhos de pedestres da Arena',
+    classification: 'PEDESTRIAN_PATH',
+    isSellable: false,
+    contributesToCommercialMetrics: false,
+    sourceBounds: [4270, 2420, 4890, 3130],
+    sourceReferences: ARENA_FRONT_SOURCE_REFERENCES,
+    verificationStatus: 'FIELD_REVIEW_RECOMMENDED',
+    notes: 'Ligações entre escadaria, quadras, campo e apron da Arena conforme os anexos.',
   },
 ];
 
