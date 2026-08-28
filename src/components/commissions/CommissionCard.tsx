@@ -49,7 +49,7 @@ function getCommissionVisualActionLabel(access: PortalAccessPresentation) {
   return access.label;
 }
 
-function CommissionCard({ access, module, onSelect }: CommissionCardProps) {
+function CommissionCard({ access, module, onSelect, responsible, members = [] }: CommissionCardProps) {
   const Icon = module.icon;
   const status = module.status as CommissionStatus;
   const actionLabel = getCommissionActionLabel(access);
@@ -75,6 +75,16 @@ function CommissionCard({ access, module, onSelect }: CommissionCardProps) {
             </span>
           )}
         </span>
+        {responsible && (
+          <span className="commission-access-card__people">
+            <CommissionPersonAvatar person={responsible} variant="lead" />
+            <span className="commission-access-card__lead">
+              <span className="commission-access-card__lead-name">{responsible.name}</span>
+              <span className="commission-access-card__lead-role">{responsible.role ?? 'Responsável'}</span>
+            </span>
+            <CommissionPeopleStack people={members} />
+          </span>
+        )}
         <span className="commission-access-card__footer">
           <span className="commission-access-card__action" data-state={access.state} aria-hidden="true">
             <span>{visualActionLabel}</span>
@@ -92,6 +102,7 @@ function CommissionCard({ access, module, onSelect }: CommissionCardProps) {
       </span>
     </>
   );
+
 
   if (access.target) {
     return (
