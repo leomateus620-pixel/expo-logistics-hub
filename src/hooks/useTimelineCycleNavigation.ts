@@ -29,7 +29,7 @@ interface TimelineNavigationState {
 }
 
 type TimelineNavigationAction =
-  | { type: 'focus'; year: CronogramaCycleYear; month: string | null; expand?: boolean }
+  | { type: 'focus'; year: CronogramaCycleYear; month: string | null; expand?: boolean; expandMonths?: string[] }
   | { type: 'observe'; year: CronogramaCycleYear; month: string | null }
   | { type: 'toggle-month'; month: string };
 
@@ -69,8 +69,11 @@ function reducer(state: TimelineNavigationState, action: TimelineNavigationActio
     focusedMonth: action.month,
   };
 
-  if (action.type === 'focus' && action.expand && action.month) {
-    next.expandedMonths = { ...state.expandedMonths, [action.month]: true };
+  if (action.type === 'focus' && (action.expand || action.expandMonths?.length)) {
+    const expanded = { ...state.expandedMonths };
+    if (action.expand && action.month) expanded[action.month] = true;
+    action.expandMonths?.forEach((month) => { expanded[month] = true; });
+    next.expandedMonths = expanded;
   }
 
   if (
@@ -110,6 +113,22 @@ function resolveFocusYear(
   return resolveAvailableYear(preferred, availableYears);
 }
 
+function resolveDesiredMonth(options: TimelineNavigationOptions, selectedYear: CronogramaCycleYear) {
+  const requestedMonthYear = yearFromMonth(options.requestedMonth);
+  const requestedMonth = requestedMonthYear === selectedYear ? options.requestedMonth : null;
+  const initialMonth = yearFromMonth(options.initialMonth) === selectedYear ? options.initialMonth : null;
+  return requestedMonth ?? initialMonth ?? options.firstMonthByYear[selectedYear] ?? null;
+}
+
+/** Meses que devem nascer expandidos: o mês em foco e sempre o mês corrente (quando tem eventos). */
+function resolveExpandedMonths(options: TimelineNavigationOptions, month: string | null) {
+  const expanded: Record<string, boolean> = {};
+  if (month && options.monthKeys.includes(month)) expanded[month] = true;
+  const currentMonth = options.todayKey.slice(0, 7);
+  if (options.monthKeys.includes(currentMonth)) expanded[currentMonth] = true;
+  return expanded;
+}
+
 function resolveInitialState(options: TimelineNavigationOptions): TimelineNavigationState {
   const requestedMonthYear = yearFromMonth(options.requestedMonth);
   let selectedYear = options.requestedYear
@@ -119,15 +138,12 @@ function resolveInitialState(options: TimelineNavigationOptions): TimelineNaviga
 
   selectedYear = resolveFocusYear(selectedYear, options.availableYears);
 
-
-  const requestedMonth = requestedMonthYear === selectedYear ? options.requestedMonth : null;
-  const initialMonth = yearFromMonth(options.initialMonth) === selectedYear ? options.initialMonth : null;
-  const month = requestedMonth ?? initialMonth ?? options.firstMonthByYear[selectedYear] ?? null;
+  const month = resolveDesiredMonth(options, selectedYear);
 
   return {
     selectedYear,
     focusedMonth: month,
-    expandedMonths: month && options.monthKeys.includes(month) ? { [month]: true } : {},
+    expandedMonths: resolveExpandedMonths(options, month),
   };
 }
 
@@ -140,6 +156,11 @@ export function useTimelineCycleNavigation(options: TimelineNavigationOptions) {
   const frameIds = useRef<number[]>([]);
   const token = useRef(0);
   const positionedInitially = useRef(false);
+  // Enquanto o usuário não navegar, o foco acompanha o mês inicial calculado
+  // (que prioriza o mês corrente) — os dados chegam de forma assíncrona e o
+  // primeiro foco pode ter sido definido com a lista ainda incompleta.
+  const userNavigated = useRef(false);
+  const initialMonthRef = useRef(options.initialMonth);
   const onPositionChangeRef = useRef(options.onPositionChange);
   const requestedSignatureRef = useRef('');
   const contextRef = useRef({
@@ -147,6 +168,7 @@ export function useTimelineCycleNavigation(options: TimelineNavigationOptions) {
     available: options.availableYears.join('|'),
     temporal: options.temporalFocusKey,
   });
+
 
   useEffect(() => {
     onPositionChangeRef.current = options.onPositionChange;
@@ -210,18 +232,27 @@ export function useTimelineCycleNavigation(options: TimelineNavigationOptions) {
     reason: TimelinePositionReason,
     { notify = true, replace = true, immediate = false }: { notify?: boolean; replace?: boolean; immediate?: boolean } = {},
   ) => {
-    dispatch({ type: 'focus', year, month, expand: Boolean(month && options.monthKeys.includes(month)) });
+    const currentMonth = options.todayKey.slice(0, 7);
+    dispatch({
+      type: 'focus',
+      year,
+      month,
+      expand: Boolean(month && options.monthKeys.includes(month)),
+      expandMonths: options.monthKeys.includes(currentMonth) ? [currentMonth] : undefined,
+    });
     if (notify) onPositionChangeRef.current?.({ year, month, reason, replace });
     scrollToFocus(year, month, immediate);
-  }, [options.monthKeys, scrollToFocus]);
+  }, [options.monthKeys, options.todayKey, scrollToFocus]);
 
   const selectYear = useCallback((year: CronogramaCycleYear) => {
+    userNavigated.current = true;
     commitFocus(year, options.firstMonthByYear[year], 'year-select', { replace: false });
   }, [commitFocus, options.firstMonthByYear]);
 
   const goToMonth = useCallback((month: string, reason: TimelinePositionReason = 'period-control') => {
     const year = yearFromMonth(month);
     if (!year) return;
+    userNavigated.current = true;
     commitFocus(year, month, reason, { replace: false });
   }, [commitFocus]);
 
@@ -229,17 +260,20 @@ export function useTimelineCycleNavigation(options: TimelineNavigationOptions) {
     const year = getClosestCycleYear(options.todayKey);
     const currentYear = yearFromMonth(options.todayKey.slice(0, 7));
     const month = currentYear === year ? options.todayKey.slice(0, 7) : options.firstMonthByYear[year];
+    userNavigated.current = true;
     commitFocus(year, month, 'today', { replace: false });
   }, [commitFocus, options.firstMonthByYear, options.todayKey]);
 
   const reflectEventMonth = useCallback((month: string) => {
     const year = yearFromMonth(month);
     if (!year) return;
+    userNavigated.current = true;
     dispatch({ type: 'focus', year, month, expand: true });
     onPositionChangeRef.current?.({ year, month, reason: 'event-open', replace: true });
   }, []);
 
   const adjacentMonths = useMemo(() => {
+
     if (!options.monthKeys.length) return { previous: null, next: null };
     if (state.focusedMonth && options.monthKeys.includes(state.focusedMonth)) {
       const index = options.monthKeys.indexOf(state.focusedMonth);
@@ -309,6 +343,7 @@ export function useTimelineCycleNavigation(options: TimelineNavigationOptions) {
       // Anti-loop: se o foco visível já corresponde ao estado atual, não redespachar
       // (evita cadeia observer → URL → effect de deep-link → commitFocus a cada frame).
       if (year === state.selectedYear && month === state.focusedMonth) return;
+      userNavigated.current = true;
       dispatch({ type: 'observe', year, month });
       onPositionChangeRef.current?.({ year, month, reason: 'observer', replace: true });
     }, {
@@ -337,6 +372,7 @@ export function useTimelineCycleNavigation(options: TimelineNavigationOptions) {
     const requestedMonthYear = yearFromMonth(options.requestedMonth);
     const requestedYear = options.requestedYear ?? requestedMonthYear;
     if (!requestedYear) return;
+    userNavigated.current = true;
     const year = resolveFocusYear(requestedYear, options.availableYears);
     const month = requestedMonthYear === year
       ? options.requestedMonth
@@ -375,6 +411,25 @@ export function useTimelineCycleNavigation(options: TimelineNavigationOptions) {
       available: availableSignature,
     };
 
+    // Os eventos chegam de forma assíncrona: enquanto o usuário não navegar,
+    // o foco acompanha o mês inicial recalculado (que prioriza o mês corrente).
+    const initialMonthChanged = initialMonthRef.current !== options.initialMonth;
+    initialMonthRef.current = options.initialMonth;
+    if (initialMonthChanged && !userNavigated.current && options.initialMonth) {
+      const year = resolveFocusYear(
+        yearFromMonth(options.initialMonth) ?? getClosestCycleYear(options.todayKey),
+        options.availableYears,
+      );
+      const month = resolveDesiredMonth(options, year);
+      if (year !== state.selectedYear || month !== state.focusedMonth) {
+        commitFocus(year, month, 'reconcile', { notify: false, immediate: true });
+        return;
+      }
+    }
+
+
+
+
     if (temporalChanged) {
       const year = options.preferredTemporalYear ?? yearFromMonth(options.initialMonth);
       if (year) {
@@ -402,6 +457,7 @@ export function useTimelineCycleNavigation(options: TimelineNavigationOptions) {
     availableSignature,
     commitFocus,
     monthSignature,
+    options,
     options.availableYears,
     options.firstMonthByYear,
     options.initialMonth,
