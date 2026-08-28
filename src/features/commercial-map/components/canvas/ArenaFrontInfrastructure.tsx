@@ -15,6 +15,7 @@ import {
   arenaTerrainElevation,
   arenaTerrainPlateauElevation,
 } from '../../data/arenaTerrain';
+import { isArenaTerrainExcluded } from '../../data/arenaSectorZoning';
 import { getOpenGroundTexture, type OpenGroundSurface } from './openGroundTextures';
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
 
@@ -134,7 +135,12 @@ function createPolygonOutlineGeometry(points: readonly (readonly [number, number
   return geometry;
 }
 
-/** Malha de terreno amostrada na única função de cota do setor. */
+/**
+ * Malha de terreno amostrada na única função de cota do setor e recortada
+ * contra as zonas de outras camadas (Arena, praça/escadaria de concreto,
+ * quadras, vias, estacionamento e campo). Sem esse recorte a grama volta a
+ * cobrir o acesso e os degraus da Arena.
+ */
 function createTerrainGeometry() {
   const bounds = sourceBoundsToLocal(ARENA_FRONT_LAYOUT.terrain.sourceBounds);
   const { segmentsX, segmentsZ } = ARENA_FRONT_LAYOUT.terrain;
@@ -167,6 +173,23 @@ function createTerrainGeometry() {
   }
   position.needsUpdate = true;
   geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+  // Recorte real: triângulos cujo baricentro cai em zona de outra camada saem.
+  const sourceIndex = geometry.getIndex();
+  if (sourceIndex) {
+    const kept: number[] = [];
+    for (let triangle = 0; triangle < sourceIndex.count; triangle += 3) {
+      const a = sourceIndex.getX(triangle);
+      const b = sourceIndex.getX(triangle + 1);
+      const c = sourceIndex.getX(triangle + 2);
+      const centroidX = (position.getX(a) + position.getX(b) + position.getX(c)) / 3;
+      const centroidZ = (position.getZ(a) + position.getZ(b) + position.getZ(c)) / 3;
+      if (isArenaTerrainExcluded(centroidX, centroidZ)) continue;
+      kept.push(a, b, c);
+    }
+    geometry.setIndex(kept);
+  }
+
   geometry.computeVertexNormals();
   geometry.computeBoundingBox();
   geometry.computeBoundingSphere();
