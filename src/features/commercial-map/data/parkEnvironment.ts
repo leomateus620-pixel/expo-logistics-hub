@@ -107,30 +107,35 @@ export const ARENA_FRONT_LAYOUT = {
     intermediateLandingDepth: 0.42,
   },
   /**
-   * Malha de terreno do setor: alta a oeste (topo da escadaria) e descendo de
-   * forma contínua até o apron pavimentado da Arena, a leste.
+   * Malha de terreno do setor: alta a oeste (topo da escadaria), descendo até o
+   * apron da Arena e seguindo pelas laterais e pelo fundo (leste/sudeste) até as
+   * bordas dos estacionamentos oficiais. É recortada contra as zonas de concreto,
+   * quadras, vias, estacionamento e campo (ver `arenaSectorZoning.ts`).
    */
   terrain: {
-    sourceBounds: [4106, 2400, 4912, 3110] as SourceBounds,
-    segmentsX: 56,
-    segmentsZ: 44,
+    sourceBounds: [4106, 2400, 5980, 3300] as SourceBounds,
+    segmentsX: 108,
+    segmentsZ: 58,
     /** Faixa de transição, em unidades locais, entre talude e piso pavimentado. */
     blendDistance: 1.15,
   },
-  /** Campo de futebol de grama natural a noroeste da praça, entre a Quadra R e a escadaria. */
+  /**
+   * Campo de futebol de grama natural atrás/ao lado da Arena, a leste do volume
+   * construído e junto à borda norte do estacionamento de expositores.
+   */
   footballField: {
-    sourceBounds: [4138, 2425, 4477, 2636] as SourceBounds,
+    sourceBounds: [5430, 2760, 5820, 3150] as SourceBounds,
     turfInset: 0.18,
     markingInset: 0.34,
     turfColor: '#7f9a5c',
     wornColor: '#98a074',
   },
-  /** Caminhos de circulação entre escadaria, quadras, campo e apron da Arena. */
+  /** Caminhos de circulação entre escadaria, quadras, Arena, campo e estacionamento. */
   walkways: [
     { id: 'arena-walkway-stairs-apron', sourcePath: [[4480, 2895], [4680, 2895], [4880, 2860]] as readonly SourcePoint[], width: 0.34 },
     { id: 'arena-walkway-courts-plaza', sourcePath: [[4620, 2682], [4620, 2560], [4620, 2480]] as readonly SourcePoint[], width: 0.26 },
-    { id: 'arena-walkway-field-courts', sourcePath: [[4300, 2530], [4470, 2530], [4520, 2560]] as readonly SourcePoint[], width: 0.24 },
-    { id: 'arena-walkway-field-stairs', sourcePath: [[4300, 2636], [4300, 2700], [4270, 2760]] as readonly SourcePoint[], width: 0.22 },
+    { id: 'arena-walkway-arena-field', sourcePath: [[5395, 3180], [5620, 3190], [5850, 3196]] as readonly SourcePoint[], width: 0.26 },
+    { id: 'arena-walkway-arena-parking', sourcePath: [[5140, 3140], [5150, 3200], [5160, 3250]] as readonly SourcePoint[], width: 0.24 },
   ] as const,
   /** Massas arbóreas do setor, lidas nos anexos 3 e 4 (conferência de campo recomendada). */
   treeClusters: [
@@ -140,16 +145,21 @@ export const ARENA_FRONT_LAYOUT = {
     { sourcePosition: [4112, 2790] as SourcePoint, scale: 0.98 },
     { sourcePosition: [4108, 2930] as SourcePoint, scale: 1.08 },
     { sourcePosition: [4132, 3090] as SourcePoint, scale: 0.94 },
-    { sourcePosition: [4250, 3120] as SourcePoint, scale: 1.02 },
-    { sourcePosition: [4390, 3126] as SourcePoint, scale: 0.9 },
-    { sourcePosition: [4520, 3120] as SourcePoint, scale: 1.06 },
-    { sourcePosition: [4660, 3110] as SourcePoint, scale: 0.96 },
-    { sourcePosition: [4800, 3104] as SourcePoint, scale: 1.1 },
-    { sourcePosition: [4500, 2660] as SourcePoint, scale: 0.9 },
-    { sourcePosition: [4700, 2645] as SourcePoint, scale: 1.04 },
-    { sourcePosition: [4840, 2650] as SourcePoint, scale: 0.98 },
     { sourcePosition: [4160, 2470] as SourcePoint, scale: 1.0 },
     { sourcePosition: [4520, 2420] as SourcePoint, scale: 1.07 },
+    { sourcePosition: [4700, 2645] as SourcePoint, scale: 1.04 },
+    { sourcePosition: [4840, 2650] as SourcePoint, scale: 0.98 },
+    // Entorno leste/sudeste: fundo e lateral da Arena, moldura do campo.
+    { sourcePosition: [5440, 2660] as SourcePoint, scale: 1.02 },
+    { sourcePosition: [5580, 2645] as SourcePoint, scale: 0.94 },
+    { sourcePosition: [5720, 2655] as SourcePoint, scale: 1.08 },
+    { sourcePosition: [5860, 2690] as SourcePoint, scale: 0.96 },
+    { sourcePosition: [5920, 2870] as SourcePoint, scale: 1.06 },
+    { sourcePosition: [5930, 3050] as SourcePoint, scale: 0.92 },
+    { sourcePosition: [5900, 3215] as SourcePoint, scale: 1.04 },
+    { sourcePosition: [5700, 3230] as SourcePoint, scale: 0.98 },
+    { sourcePosition: [5480, 3225] as SourcePoint, scale: 1.1 },
+    { sourcePosition: [5230, 3210] as SourcePoint, scale: 0.9 },
   ] as const,
   northBerm: {
     sourceBounds: [4120, 2682, 4480, 2720] as SourceBounds,
