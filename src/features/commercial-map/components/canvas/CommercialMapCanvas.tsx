@@ -3142,17 +3142,20 @@ function Scene({
       : [],
     [activeSegment, exteriorRenderedEntities, segmentByEntity],
   );
-  const labelVisibility = useSemanticLabelVisibility({
-    entities: exteriorRenderedEntities,
-    lotByEntity,
-    extent,
-    labelsVisible: labelsVisible && !hydrologicalModeActive && !lunarCinematicActive,
-    reducedGraphics,
+  const contextualLabel = useContextualMapLabel({
     selectedEntityId,
     hoveredEntityId,
-    matchingEntityIds: presentedMatchingEntityIds,
-    filtersActive: entityFiltersActive,
+    cameraNavigating,
+    enabled: labelsVisible && !hydrologicalModeActive && !lunarCinematicActive,
   });
+  const contextualLabelEntities = useMemo(() => {
+    const ids = [contextualLabel.selectedId, contextualLabel.hoveredId].filter(
+      (id): id is string => Boolean(id),
+    );
+    if (ids.length === 0) return [];
+    return exteriorRenderedEntities.filter((entity) => ids.includes(entity.id));
+  }, [contextualLabel.hoveredId, contextualLabel.selectedId, exteriorRenderedEntities]);
+
   useEffect(() => {
     gl.shadowMap.autoUpdate = false;
     gl.shadowMap.needsUpdate = true;
