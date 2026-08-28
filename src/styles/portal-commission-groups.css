@@ -1,0 +1,190 @@
+/**
+ * Agrupamento oficial (Comissões e Assessorias) do portal Fenasoja.
+ * Refinamento leve sobre o card já existente: mais compacto, com o responsável
+ * em destaque e os demais integrantes em avatares sobrepostos.
+ */
+
+.portal-commissions-panel {
+  display: grid;
+  gap: 14px;
+}
+
+.portal-commission-group {
+  display: grid;
+  gap: 10px;
+}
+
+.portal-commission-group__header {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid rgb(224 191 126 / 22%);
+  border-radius: 12px;
+  padding: 9px 12px;
+  background: rgb(224 191 126 / 6%);
+  color: #f2d69d;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+
+.portal-commission-group__header:focus-visible {
+  outline: 2px solid #f2d69d;
+  outline-offset: 2px;
+}
+
+.portal-commission-group__title {
+  font-size: 0.86rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.portal-commission-group__count {
+  border: 1px solid rgb(224 191 126 / 26%);
+  border-radius: 999px;
+  padding: 1px 8px;
+  color: #f6e6c2;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.portal-commission-group__chevron {
+  width: 16px;
+  height: 16px;
+  margin-left: auto;
+  transition: transform 180ms ease;
+}
+
+.portal-commission-group[data-open='false'] .portal-commission-group__chevron {
+  transform: rotate(-90deg);
+}
+
+.portal-commissions-grid {
+  grid-template-columns: repeat(auto-fill, minmax(258px, 1fr));
+}
+
+/* Card mais baixo e melhor aproveitado. */
+.commission-access-card {
+  min-height: 0;
+  gap: 10px;
+  padding: 12px;
+}
+
+.commission-access-card__copy {
+  grid-template-rows: auto auto auto;
+  gap: 9px;
+}
+
+.commission-access-card__people {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 9px;
+}
+
+.commission-access-card__lead {
+  display: grid;
+  min-width: 0;
+  gap: 1px;
+}
+
+.commission-access-card__lead-name {
+  overflow: hidden;
+  color: #eaf2fa;
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.commission-access-card__lead-role {
+  overflow: hidden;
+  color: #a9bdd0;
+  font-size: 0.7rem;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.commission-person-avatar {
+  display: grid;
+  overflow: hidden;
+  width: 30px;
+  height: 30px;
+  flex: none;
+  border: 1px solid rgb(224 191 126 / 38%);
+  border-radius: 999px;
+  background: #14283a;
+  place-items: center;
+}
+
+.commission-person-avatar[data-variant='lead'] {
+  width: 38px;
+  height: 38px;
+  border-color: rgb(224 191 126 / 62%);
+  box-shadow: 0 8px 18px -12px rgb(0 6 16 / 90%);
+}
+
+.commission-person-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 18%;
+}
+
+.commission-person-avatar__initials {
+  color: #f2d69d;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.commission-people-stack {
+  display: flex;
+  margin-left: auto;
+  padding-left: 6px;
+}
+
+.commission-people-stack > * + * {
+  margin-left: -10px;
+}
+
+.commission-people-stack .commission-person-avatar {
+  width: 26px;
+  height: 26px;
+}
+
+.commission-people-stack__more {
+  display: grid;
+  width: 26px;
+  height: 26px;
+  flex: none;
+  margin-left: -10px;
+  border: 1px solid rgb(224 191 126 / 32%);
+  border-radius: 999px;
+  background: #16293c;
+  color: #f2d69d;
+  font-size: 0.64rem;
+  font-weight: 800;
+  place-items: center;
+}
+
+@media (max-width: 900px) {
+  .portal-commissions-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .portal-commissions-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .commission-access-card {
+    min-height: 108px;
+    padding: 13px;
+  }
+}
