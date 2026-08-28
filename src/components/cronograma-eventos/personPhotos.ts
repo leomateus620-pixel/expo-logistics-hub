@@ -86,6 +86,14 @@ const PERSON_PHOTOS_BY_USER_ID: Record<string, string> = {
   'a3e893e1-a069-40f2-9f9e-5bbf80b21274': cleoRockenbach.url,
   'f9ed4ab9-0ef3-4ee4-9707-36288dbc828f': marcosServat.url,
   '7e7b9e5f-d232-4090-a882-ed00d6b604ea': marcosServat.url,
+  '92596009-b530-4e31-b21f-fa3cbcbc8350': robertoSteffen.url,
+  '6dde1d6f-ee4a-4d49-ad4d-d20986d73515': felipeBortoli.url,
+  'b416c96a-bc67-4db6-94ea-9c204cab7535': valtairDornelles.url,
+  'fde6a374-cb22-4ac9-999f-d04229cd1517': valtairDornelles.url,
+  'cea6a057-6eaf-4778-97a5-78982f7058d4': elisandraSimaoReis.url,
+  '3832dcf4-f7f7-4a7e-93fd-71261b5742a9': alexandreDallagnese.url,
+  '74a71a9f-c2a6-4ae1-baed-1e2d7b8bc07f': zeliaSavoldi.url,
+  '38e7e8d3-4c66-4279-92ea-961b70ee4e80': zeliaSavoldi.url,
 };
 
 function normalize(value: string): string {
