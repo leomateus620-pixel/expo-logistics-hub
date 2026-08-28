@@ -11,6 +11,7 @@ import type {
 } from '../types';
 import type { CommercialMapSegmentId } from '../data/commercialMapSegments';
 import type { ParkingCameraView } from '../utils/parkingViewport';
+import type { LunarLaunchPhase } from '../utils/lunarLaunch';
 
 export type CommercialMapDockSection =
   | 'search'
@@ -103,6 +104,15 @@ interface CommercialMapState {
   technicalValidationVisible: boolean;
   reducedGraphics: boolean;
   cameraNavigating: boolean;
+  lunarLaunchPhase: LunarLaunchPhase;
+  lunarLaunchSequence: number;
+  lunarLaunchStartedAt: number | null;
+  lunarLaunchSkipSequence: number;
+  lunarLaunchSkipRequested: boolean;
+  lunarLaunchReturnSequence: number;
+  lunarLaunchReturnAvailable: boolean;
+  lunarLaunchReturning: boolean;
+  lunarLaunchPreviousPanel: MapPanel;
   dockExpanded: boolean;
   dockSection: CommercialMapDockSection | null;
   setDockExpanded: (expanded: boolean) => void;
@@ -150,6 +160,17 @@ interface CommercialMapState {
   setTechnicalValidationVisible: (visible: boolean) => void;
   setReducedGraphics: (reduced: boolean) => void;
   setCameraNavigating: (navigating: boolean) => void;
+  requestLunarLaunch: () => void;
+  setLunarLaunchPhase: (phase: LunarLaunchPhase, sequence: number) => void;
+  requestLunarLaunchSkip: () => void;
+  completeLunarLaunch: (skipped: boolean) => void;
+  requestLunarLaunchReturn: () => void;
+  completeLunarLaunchReturn: () => void;
+  resetLunarLaunch: () => void;
+}
+
+function monotonicNow() {
+  return typeof performance === 'undefined' ? Date.now() : performance.now();
 }
 
 export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
@@ -189,6 +210,15 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
   technicalValidationVisible: false,
   reducedGraphics: false,
   cameraNavigating: false,
+  lunarLaunchPhase: 'idle',
+  lunarLaunchSequence: 0,
+  lunarLaunchStartedAt: null,
+  lunarLaunchSkipSequence: 0,
+  lunarLaunchSkipRequested: false,
+  lunarLaunchReturnSequence: 0,
+  lunarLaunchReturnAvailable: false,
+  lunarLaunchReturning: false,
+  lunarLaunchPreviousPanel: null,
   dockExpanded: readPersistedDockExpanded(),
   dockSection: null,
   setDockExpanded: (dockExpanded) => {
@@ -226,28 +256,42 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
       selectedHydrologicalElementId: null,
       technicalValidationVisible: false,
       cameraNavigating: false,
+      lunarLaunchPhase: 'idle',
+      lunarLaunchStartedAt: null,
+      lunarLaunchSkipRequested: false,
+      lunarLaunchReturnAvailable: false,
+      lunarLaunchReturning: false,
+      lunarLaunchPreviousPanel: null,
     };
   }),
-  setSelectedEntityId: (selectedEntityId) => set((state) => ({
-    ...CLEARED_PARKING_INSPECTION,
-    selectedEntityId,
-    interiorEntityId: state.interiorEntityId === selectedEntityId ? state.interiorEntityId : null,
-    interiorReturnView: state.interiorEntityId === selectedEntityId ? state.interiorReturnView : null,
-    activePanel: selectedEntityId ? 'details' : null,
-  })),
-  enterInterior: (selectedEntityId) => set((state) => ({
-    ...CLEARED_PARKING_INSPECTION,
-    selectedEntityId,
-    hoveredEntityId: null,
-    hoveredModuleId: null,
-    selectedModuleId: null,
-    interiorEntityId: selectedEntityId,
-    interiorReturnView: null,
-    activePanel: null,
-    workspaceMode: '3d',
-    cameraNavigating: false,
-    cameraSequence: state.cameraSequence + 1,
-  })),
+  setSelectedEntityId: (selectedEntityId) => set((state) => (
+    state.lunarLaunchPhase !== 'idle' || state.lunarLaunchReturning
+      ? state
+      : {
+          ...CLEARED_PARKING_INSPECTION,
+          selectedEntityId,
+          interiorEntityId: state.interiorEntityId === selectedEntityId ? state.interiorEntityId : null,
+          interiorReturnView: state.interiorEntityId === selectedEntityId ? state.interiorReturnView : null,
+          activePanel: selectedEntityId ? 'details' : null,
+        }
+  )),
+  enterInterior: (selectedEntityId) => set((state) => (
+    state.lunarLaunchPhase !== 'idle' || state.lunarLaunchReturning
+      ? state
+      : {
+          ...CLEARED_PARKING_INSPECTION,
+          selectedEntityId,
+          hoveredEntityId: null,
+          hoveredModuleId: null,
+          selectedModuleId: null,
+          interiorEntityId: selectedEntityId,
+          interiorReturnView: null,
+          activePanel: null,
+          workspaceMode: '3d',
+          cameraNavigating: false,
+          cameraSequence: state.cameraSequence + 1,
+        }
+  )),
   switchInterior: (selectedEntityId) => set((state) => ({
     ...CLEARED_PARKING_INSPECTION,
     selectedEntityId,
@@ -274,7 +318,9 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
     cameraSequence: state.cameraSequence + 1,
   })),
   setInteriorReturnView: (interiorReturnView) => set({ interiorReturnView }),
-  setHoveredEntityId: (hoveredEntityId) => set({ hoveredEntityId }),
+  setHoveredEntityId: (hoveredEntityId) => set((state) => (
+    state.lunarLaunchPhase !== 'idle' || state.lunarLaunchReturning ? state : { hoveredEntityId }
+  )),
   setHoveredModuleId: (hoveredModuleId) => set({ hoveredModuleId }),
   setSelectedModuleId: (selectedModuleId) => set({ selectedModuleId }),
   setSearch: (search) => set({ search }),
@@ -330,10 +376,14 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
     });
     return { layerVisibility: visibility, layerOpacity: opacity };
   }),
-  setActivePanel: (activePanel) => set({
-    ...(activePanel ? CLEARED_PARKING_INSPECTION : {}),
-    activePanel,
-  }),
+  setActivePanel: (activePanel) => set((state) => (
+    state.lunarLaunchPhase !== 'idle' || state.lunarLaunchReturning
+      ? state
+      : {
+          ...(activePanel ? CLEARED_PARKING_INSPECTION : {}),
+          activePanel,
+        }
+  )),
   setWorkspaceMode: (workspaceMode) => set((state) => ({
     ...(workspaceMode === '3d' ? {} : CLEARED_PARKING_INSPECTION),
     workspaceMode,
@@ -412,38 +462,122 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
     ...CLEARED_PARKING_INSPECTION,
     selectedHydrologicalElementId,
   }),
-  inspectParkingBlock: (selectedParkingBlockId) => set((state) => ({
-    ...PARKING_INSPECTION_MODE,
-    selectedParkingBlockId,
-    selectedParkingSpaceId: null,
-    parkingCameraView: selectedParkingBlockId ? 'detail' : 'overview',
-    parkingCameraSequence: state.parkingCameraSequence + 1,
-  })),
+  inspectParkingBlock: (selectedParkingBlockId) => set((state) => (
+    state.lunarLaunchPhase !== 'idle' || state.lunarLaunchReturning
+      ? state
+      : {
+          ...PARKING_INSPECTION_MODE,
+          selectedParkingBlockId,
+          selectedParkingSpaceId: null,
+          parkingCameraView: selectedParkingBlockId ? 'detail' : 'overview',
+          parkingCameraSequence: state.parkingCameraSequence + 1,
+        }
+  )),
   inspectParkingSpace: (selectedParkingBlockId, selectedParkingSpaceId) => {
     // One atomic update avoids an intermediate block camera movement.
-    set((state) => ({
-      ...PARKING_INSPECTION_MODE,
-      selectedParkingBlockId,
-      selectedParkingSpaceId,
-      parkingCameraView: 'detail',
-      parkingCameraSequence: state.parkingCameraSequence + 1,
-    }));
+    set((state) => (
+      state.lunarLaunchPhase !== 'idle' || state.lunarLaunchReturning
+        ? state
+        : {
+            ...PARKING_INSPECTION_MODE,
+            selectedParkingBlockId,
+            selectedParkingSpaceId,
+            parkingCameraView: 'detail',
+            parkingCameraSequence: state.parkingCameraSequence + 1,
+          }
+    ));
   },
-  requestParkingView: (parkingCameraView) => set((state) => ({
-    ...PARKING_INSPECTION_MODE,
-    parkingCameraView,
-    parkingCameraSequence: state.parkingCameraSequence + 1,
-    selectedParkingBlockId: parkingCameraView === 'overview' ? null : state.selectedParkingBlockId,
-    selectedParkingSpaceId: parkingCameraView === 'overview' ? null : state.selectedParkingSpaceId,
-  })),
+  requestParkingView: (parkingCameraView) => set((state) => (
+    state.lunarLaunchPhase !== 'idle' || state.lunarLaunchReturning
+      ? state
+      : {
+          ...PARKING_INSPECTION_MODE,
+          parkingCameraView,
+          parkingCameraSequence: state.parkingCameraSequence + 1,
+          selectedParkingBlockId: parkingCameraView === 'overview' ? null : state.selectedParkingBlockId,
+          selectedParkingSpaceId: parkingCameraView === 'overview' ? null : state.selectedParkingSpaceId,
+        }
+  )),
   closeParkingInspection: () => set(CLEARED_PARKING_INSPECTION),
   setParkingInspectionOpen: (open) => {
     if (!open) get().closeParkingInspection();
-    else if (!get().parkingInspectionOpen) get().inspectParkingBlock(get().selectedParkingBlockId);
+    else if (
+      get().lunarLaunchPhase === 'idle'
+      && !get().lunarLaunchReturning
+      && !get().parkingInspectionOpen
+    ) get().inspectParkingBlock(get().selectedParkingBlockId);
   },
   setTechnicalValidationVisible: (technicalValidationVisible) => set({ technicalValidationVisible }),
   setReducedGraphics: (reducedGraphics) => set({ reducedGraphics }),
   setCameraNavigating: (cameraNavigating) => set({ cameraNavigating }),
+  requestLunarLaunch: () => set((state) => {
+    if (state.lunarLaunchPhase !== 'idle' || state.lunarLaunchReturning) return state;
+    return {
+      ...CLEARED_PARKING_INSPECTION,
+      lunarLaunchPhase: 'ignition',
+      lunarLaunchSequence: state.lunarLaunchSequence + 1,
+      lunarLaunchStartedAt: monotonicNow(),
+      lunarLaunchSkipRequested: false,
+      lunarLaunchReturnAvailable: false,
+      lunarLaunchPreviousPanel: state.activePanel,
+      activePanel: null,
+      hoveredEntityId: null,
+      cameraNavigating: true,
+    };
+  }),
+  setLunarLaunchPhase: (lunarLaunchPhase, sequence) => set((state) => (
+    state.lunarLaunchSequence === sequence
+      && state.lunarLaunchPhase !== 'idle'
+      && state.lunarLaunchPhase !== lunarLaunchPhase
+      ? { lunarLaunchPhase }
+      : state
+  )),
+  requestLunarLaunchSkip: () => set((state) => {
+    if (state.lunarLaunchPhase === 'idle' || state.lunarLaunchSkipRequested) return state;
+    return {
+      lunarLaunchPhase: 'cleanup',
+      lunarLaunchSkipSequence: state.lunarLaunchSkipSequence + 1,
+      lunarLaunchSkipRequested: true,
+      cameraNavigating: true,
+    };
+  }),
+  completeLunarLaunch: (skipped) => set((state) => ({
+    lunarLaunchPhase: 'idle',
+    lunarLaunchStartedAt: null,
+    lunarLaunchSkipRequested: false,
+    lunarLaunchReturnAvailable: !skipped,
+    lunarLaunchReturning: false,
+    activePanel: skipped ? state.lunarLaunchPreviousPanel : null,
+    lunarLaunchPreviousPanel: skipped ? null : state.lunarLaunchPreviousPanel,
+    cameraNavigating: false,
+  })),
+  requestLunarLaunchReturn: () => set((state) => {
+    if (!state.lunarLaunchReturnAvailable || state.lunarLaunchPhase !== 'idle') return state;
+    return {
+      ...CLEARED_PARKING_INSPECTION,
+      lunarLaunchReturnAvailable: false,
+      lunarLaunchReturning: true,
+      lunarLaunchReturnSequence: state.lunarLaunchReturnSequence + 1,
+      activePanel: null,
+      cameraNavigating: true,
+    };
+  }),
+  completeLunarLaunchReturn: () => set((state) => ({
+    lunarLaunchReturning: false,
+    lunarLaunchReturnAvailable: false,
+    activePanel: state.lunarLaunchPreviousPanel,
+    lunarLaunchPreviousPanel: null,
+    cameraNavigating: false,
+  })),
+  resetLunarLaunch: () => set({
+    lunarLaunchPhase: 'idle',
+    lunarLaunchStartedAt: null,
+    lunarLaunchSkipRequested: false,
+    lunarLaunchReturnAvailable: false,
+    lunarLaunchReturning: false,
+    lunarLaunchPreviousPanel: null,
+    cameraNavigating: false,
+  }),
 }));
 
 if (import.meta.env.DEV && typeof window !== 'undefined') {

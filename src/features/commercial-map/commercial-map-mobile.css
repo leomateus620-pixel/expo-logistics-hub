@@ -708,4 +708,48 @@
 
   .hydrological-network-legend { animation-duration: 480ms !important; }
   .hydrological-network-legend__content { animation-duration: 300ms !important; }
+
+  /* This opt-in easter egg intentionally keeps its requested full timeline. */
+  .commercial-map-shell .commercial-map-lunar-launch-progress > i {
+    animation-duration: 7.5s !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .commercial-map-shell.is-lunar-launch-active .commercial-map-dock { visibility: hidden; }
+  .commercial-map-lunar-launch-hud {
+    top: max(.65rem, env(safe-area-inset-top));
+    width: min(25rem, calc(100% - max(1rem, env(safe-area-inset-left) + env(safe-area-inset-right))));
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: .45rem .6rem;
+    padding: .45rem;
+    border-radius: .9rem;
+  }
+  .commercial-map-lunar-launch-mark { width: 2rem; height: 2rem; border-radius: .65rem; }
+  .commercial-map-lunar-launch-mark svg { width: 1rem; height: 1rem; }
+  .commercial-map-lunar-launch-status { gap: .5rem; }
+  .commercial-map-lunar-launch-status small { max-width: 12rem; font-size: .43rem; }
+  .commercial-map-lunar-launch-status strong { font-size: .72rem; }
+  .commercial-map-lunar-launch-skip { width: 2.75rem; min-width: 2.75rem; min-height: 2.75rem; padding: 0; }
+  .commercial-map-lunar-launch-skip span,
+  .commercial-map-lunar-launch-skip kbd { display: none; }
+  .commercial-map-lunar-launch-skip svg { width: 1.05rem; height: 1.05rem; }
+  .commercial-map-lunar-return,
+  .commercial-map-lunar-return-status { bottom: max(.65rem, env(safe-area-inset-bottom)); white-space: nowrap; }
+  .commercial-map-lunar-return { min-height: 2.65rem; padding: 0 .8rem; font-size: .67rem; }
+}
+
+@media (max-width: 950px) and (max-height: 520px) {
+  .commercial-map-lunar-launch-hud {
+    top: max(.5rem, env(safe-area-inset-top));
+    right: auto;
+    left: max(.5rem, env(safe-area-inset-left));
+    width: min(21rem, calc(100% - max(1rem, env(safe-area-inset-left) + env(safe-area-inset-right))));
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding: .36rem .42rem;
+    transform: none;
+  }
+  .commercial-map-lunar-launch-mark { width: 1.8rem; height: 1.8rem; }
+  .commercial-map-lunar-launch-status small { display: none; }
+  .commercial-map-lunar-launch-skip { min-height: 2.75rem; }
 }

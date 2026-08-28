@@ -1,4 +1,13 @@
-import { lazy, memo, Suspense, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  lazy,
+  memo,
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { Canvas, type ThreeEvent, useFrame, useThree } from '@react-three/fiber';
 import { Html, OrbitControls, Preload, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
@@ -48,14 +57,25 @@ import {
 import {
   resolveStrategicLandmarkKind,
   strategicLandmarkBounds,
+  strategicLandmarkFacingRadians,
   strategicLandmarkFocusDirection,
   strategicLandmarkSupportsInterior,
   strategicLandmarkVisualHeight,
 } from '../../utils/landmarks';
 import {
   APOLLO_XIV_LAYOUT,
+  apolloXivReplicaHeight,
   treeRemainsVisibleWithSelectedApollo,
 } from '../../utils/lunarMemorial';
+import {
+  LUNAR_LAUNCH_TIMELINE,
+  lunarLaunchAltitudeAt,
+  lunarLaunchPhaseAt,
+  rangeProgress,
+  sampleLunarLaunchMotion,
+  smootherstep,
+  type LunarLaunchMotionSample,
+} from '../../utils/lunarLaunch';
 import {
   labelBelongsToActiveMode,
   requiresSolidRendering,
@@ -624,6 +644,7 @@ interface EntityMeshProps {
   isMatch: boolean;
   layerOpacity: number;
   sceneCenter: readonly [number, number];
+  sceneDiagonal: number;
   cameraNavigating: boolean;
   onSelect: (id: string) => void;
   onHover: (id: string | null) => void;
@@ -959,6 +980,7 @@ const EntityMesh = memo(function EntityMesh(props: EntityMeshProps) {
         isMatch={props.isMatch}
         layerOpacity={props.layerOpacity}
         cameraNavigating={props.cameraNavigating}
+        sceneDiagonal={props.sceneDiagonal}
         hoverEnabled={PRECISE_HOVER_CAPABLE}
         onSelect={props.onSelect}
         onHover={props.onHover}
@@ -1352,6 +1374,7 @@ const EntityLabel = memo(function EntityLabel({
   hovered,
   filtersActive,
   isMatch,
+  cinematicHidden,
 }: {
   entity: MapEntity;
   lot?: CommercialLot;
@@ -1359,6 +1382,7 @@ const EntityLabel = memo(function EntityLabel({
   hovered: boolean;
   filtersActive: boolean;
   isMatch: boolean;
+  cinematicHidden: boolean;
 }) {
   const metadata = useMemo(() => normalizeMapEntityMetadata(entity, lot), [entity, lot]);
   const classification = entity.classification;
@@ -1377,7 +1401,11 @@ const EntityLabel = memo(function EntityLabel({
       transform={false}
       eps={0.001}
       zIndexRange={[22, 2]}
-      style={{ pointerEvents: 'none', transform: 'translate3d(-50%, -100%, 0)' }}
+      style={{
+        pointerEvents: 'none',
+        transform: 'translate3d(-50%, -100%, 0)',
+        visibility: cinematicHidden ? 'hidden' : 'visible',
+      }}
     >
       {lot ? (
         <div data-map-entity-id={entity.id} data-map-label-mode={selected ? 'focus' : 'navigation'} className={`commercial-map-label is-lot ${selected ? 'is-selected' : ''} ${dimmed ? 'is-dimmed' : ''}`}>
@@ -1539,9 +1567,116 @@ function useSemanticLabelVisibility({
   return focusedVisibility ?? visibility;
 }
 
+interface LunarCameraControlSnapshot {
+  enabled: boolean;
+  enableDamping: boolean;
+  dampingFactor: number;
+  enablePan: boolean;
+  enableRotate: boolean;
+  enableZoom: boolean;
+  zoomToCursor: boolean;
+  autoRotate: boolean;
+}
+
+interface LunarCameraSnapshot {
+  position: THREE.Vector3;
+  target: THREE.Vector3;
+  quaternion: THREE.Quaternion;
+  fov: number;
+  near: number;
+  far: number;
+  zoom: number;
+  exposure: number;
+  controls: LunarCameraControlSnapshot;
+}
+
+interface LunarCameraPathState {
+  active: boolean;
+  returning: boolean;
+  sequence: number;
+  returnSequence: number;
+  startedAt: number;
+  returnStartedAt: number;
+  lastPhase: ReturnType<typeof lunarLaunchPhaseAt>;
+  snapshot: LunarCameraSnapshot | null;
+  anchor: THREE.Vector3;
+  mapTarget: THREE.Vector3;
+  outward: THREE.Vector3;
+  side: THREE.Vector3;
+  exteriorPosition: THREE.Vector3;
+  exteriorTarget: THREE.Vector3;
+  chasePosition: THREE.Vector3;
+  chaseTarget: THREE.Vector3;
+  completionPosition: THREE.Vector3;
+  completionTarget: THREE.Vector3;
+  finalPosition: THREE.Vector3;
+  finalTarget: THREE.Vector3;
+  returnPosition: THREE.Vector3;
+  returnTarget: THREE.Vector3;
+  returnQuaternion: THREE.Quaternion;
+  returnFov: number;
+  returnNear: number;
+  returnFar: number;
+  returnZoom: number;
+  returnExposure: number;
+  rocketHeight: number;
+  exteriorDistance: number;
+  exteriorSideOffset: number;
+  exteriorHeightRatio: number;
+  exteriorTargetHeightRatio: number;
+  chaseDistance: number;
+  chaseSideOffset: number;
+  exteriorFov: number;
+  chaseFov: number;
+  finalFov: number;
+}
+
+const LUNAR_CAMERA_INITIAL_SETTLE_END = 0.88;
+const LUNAR_CAMERA_RETURN_DURATION = 1.18;
+
+function writeLunarExteriorPose(
+  path: LunarCameraPathState,
+  altitude: number,
+  position: THREE.Vector3,
+  target: THREE.Vector3,
+) {
+  position.copy(path.anchor)
+    .addScaledVector(path.outward, path.exteriorDistance)
+    .addScaledVector(path.side, path.exteriorSideOffset);
+  position.y = path.anchor.y + path.rocketHeight * path.exteriorHeightRatio + altitude;
+  target.copy(path.anchor);
+  target.y = path.anchor.y + path.rocketHeight * path.exteriorTargetHeightRatio + altitude;
+}
+
+function writeLunarChasePose(
+  path: LunarCameraPathState,
+  altitude: number,
+  position: THREE.Vector3,
+  target: THREE.Vector3,
+) {
+  position.copy(path.anchor)
+    .addScaledVector(path.outward, path.chaseDistance)
+    .addScaledVector(path.side, path.chaseSideOffset);
+  position.y = path.anchor.y + altitude + path.rocketHeight * 0.7;
+  target.lerpVectors(path.anchor, path.mapTarget, 0.72);
+  target.y = Math.max(path.mapTarget.y, path.anchor.y + altitude * 0.075);
+}
+
+function setLunarLookQuaternion(
+  quaternion: THREE.Quaternion,
+  matrix: THREE.Matrix4,
+  position: THREE.Vector3,
+  target: THREE.Vector3,
+  up: THREE.Vector3,
+) {
+  matrix.lookAt(position, target, up);
+  quaternion.setFromRotationMatrix(matrix);
+}
+
 function CameraRig({
   selectedEntity,
   extent,
+  lunarTreeEntity,
   isolatedArea,
   activeSegment,
   activeSegmentEntities,
@@ -1549,6 +1684,7 @@ function CameraRig({
 }: {
   selectedEntity: MapEntity | null;
   extent: SceneExtent;
+  lunarTreeEntity: MapEntity | null;
   isolatedArea?: CommercialMapSegmentId | null;
   activeSegment: CommercialMapSegmentDefinition | null;
   activeSegmentEntities: MapEntity[];
@@ -1577,6 +1713,15 @@ function CameraRig({
     minDistance: number;
     maxDistance: number;
   } | null>(null);
+  const lunarLaunchPhase = useCommercialMapStore((state) => state.lunarLaunchPhase);
+  const lunarLaunchSequence = useCommercialMapStore((state) => state.lunarLaunchSequence);
+  const lunarLaunchStartedAt = useCommercialMapStore((state) => state.lunarLaunchStartedAt);
+  const lunarLaunchSkipRequested = useCommercialMapStore((state) => state.lunarLaunchSkipRequested);
+  const lunarLaunchReturnSequence = useCommercialMapStore((state) => state.lunarLaunchReturnSequence);
+  const lunarLaunchReturning = useCommercialMapStore((state) => state.lunarLaunchReturning);
+  const lunarCameraLocked = lunarLaunchPhase !== 'idle' || lunarLaunchReturning;
+  const lunarCameraLockedRef = useRef(lunarCameraLocked);
+  lunarCameraLockedRef.current = lunarCameraLocked;
   const targetPosition = useRef(new THREE.Vector3());
   const targetLookAt = useRef(new THREE.Vector3(extent.centerX, 0, extent.centerZ));
   const animating = useRef(true);
@@ -1605,6 +1750,66 @@ function CameraRig({
   const pendingResizeRefit = useRef(false);
   const resizeRefitSuppressedUntil = useRef(0);
   const resizeRefitView = useRef<() => void>(() => undefined);
+  const suppressNextDetailsRefit = useRef(false);
+  const lunarPath = useRef<LunarCameraPathState>({
+    active: false,
+    returning: false,
+    sequence: -1,
+    returnSequence: -1,
+    startedAt: 0,
+    returnStartedAt: 0,
+    lastPhase: 'idle',
+    snapshot: null,
+    anchor: new THREE.Vector3(),
+    mapTarget: new THREE.Vector3(),
+    outward: new THREE.Vector3(0, 0, 1),
+    side: new THREE.Vector3(1, 0, 0),
+    exteriorPosition: new THREE.Vector3(),
+    exteriorTarget: new THREE.Vector3(),
+    chasePosition: new THREE.Vector3(),
+    chaseTarget: new THREE.Vector3(),
+    completionPosition: new THREE.Vector3(),
+    completionTarget: new THREE.Vector3(),
+    finalPosition: new THREE.Vector3(),
+    finalTarget: new THREE.Vector3(),
+    returnPosition: new THREE.Vector3(),
+    returnTarget: new THREE.Vector3(),
+    returnQuaternion: new THREE.Quaternion(),
+    returnFov: 38,
+    returnNear: 0.05,
+    returnFar: 720,
+    returnZoom: 1,
+    returnExposure: COMMERCIAL_MAP_ENVIRONMENT_CONFIG.toneMappingExposure,
+    rocketHeight: APOLLO_XIV_LAYOUT.minimumHeight,
+    exteriorDistance: 6,
+    exteriorSideOffset: 2,
+    exteriorHeightRatio: 1.35,
+    exteriorTargetHeightRatio: 0.5,
+    chaseDistance: 4,
+    chaseSideOffset: 1.5,
+    exteriorFov: 38,
+    chaseFov: 40,
+    finalFov: 38,
+  });
+  const lunarScratch = useRef({
+    position: new THREE.Vector3(),
+    target: new THREE.Vector3(),
+    fromPosition: new THREE.Vector3(),
+    fromTarget: new THREE.Vector3(),
+    quaternion: new THREE.Quaternion(),
+    fromQuaternion: new THREE.Quaternion(),
+    toQuaternion: new THREE.Quaternion(),
+    matrix: new THREE.Matrix4(),
+    up: new THREE.Vector3(0, 1, 0),
+    motion: {
+      phase: 'idle',
+      altitude: 0,
+      thrust: 0,
+      groundLight: 0,
+      vibration: 0,
+      ascentProgress: 0,
+    } as LunarLaunchMotionSample,
+  });
   const startCameraMove = useCallback(() => {
     animating.current = true;
     invalidate();
@@ -1850,8 +2055,166 @@ function CameraRig({
     resizeRefitTimer.current = null;
   }, []);
 
+  const captureLunarCamera = useCallback((): LunarCameraSnapshot | null => {
+    const controls = controlsRef.current;
+    if (!controls || !(camera instanceof THREE.PerspectiveCamera)) return null;
+    return {
+      position: camera.position.clone(),
+      target: controls.target.clone(),
+      quaternion: camera.quaternion.clone(),
+      fov: camera.fov,
+      near: camera.near,
+      far: camera.far,
+      zoom: camera.zoom,
+      exposure: gl.toneMappingExposure,
+      controls: {
+        enabled: controls.enabled,
+        enableDamping: controls.enableDamping,
+        dampingFactor: controls.dampingFactor,
+        enablePan: controls.enablePan,
+        enableRotate: controls.enableRotate,
+        enableZoom: controls.enableZoom,
+        zoomToCursor: controls.zoomToCursor,
+        autoRotate: controls.autoRotate,
+      },
+    };
+  }, [camera, gl]);
+
+  const lockLunarCamera = useCallback(() => {
+    const controls = controlsRef.current;
+    if (!controls) return;
+    controls.enabled = false;
+    controls.enableDamping = false;
+    controls.enablePan = false;
+    controls.enableRotate = false;
+    controls.enableZoom = false;
+    controls.autoRotate = false;
+    navigation.current.active = false;
+    navigation.current.navigating = false;
+    gl.domElement.style.cursor = 'default';
+  }, [gl]);
+
+  const restoreLunarControlState = useCallback((snapshot: LunarCameraSnapshot) => {
+    const controls = controlsRef.current;
+    if (!controls) return;
+    controls.enabled = snapshot.controls.enabled;
+    controls.enableDamping = snapshot.controls.enableDamping;
+    controls.dampingFactor = snapshot.controls.dampingFactor;
+    controls.enablePan = snapshot.controls.enablePan;
+    controls.enableRotate = snapshot.controls.enableRotate;
+    controls.enableZoom = snapshot.controls.enableZoom;
+    controls.zoomToCursor = snapshot.controls.zoomToCursor;
+    controls.autoRotate = snapshot.controls.autoRotate;
+    gl.domElement.style.cursor = snapshot.controls.enabled ? 'grab' : '';
+  }, [gl]);
+
+  const restoreLunarCamera = useCallback((snapshot: LunarCameraSnapshot) => {
+    if (!(camera instanceof THREE.PerspectiveCamera)) return;
+    const controls = controlsRef.current;
+    animating.current = false;
+    camera.position.copy(snapshot.position);
+    camera.quaternion.copy(snapshot.quaternion);
+    camera.fov = snapshot.fov;
+    camera.near = snapshot.near;
+    camera.far = snapshot.far;
+    camera.zoom = snapshot.zoom;
+    camera.updateProjectionMatrix();
+    if (controls) {
+      controls.target.copy(snapshot.target);
+      restoreLunarControlState(snapshot);
+      controls.update();
+      // Preserve any deliberate camera roll even though OrbitControls normally has none.
+      camera.quaternion.copy(snapshot.quaternion);
+    }
+    gl.toneMappingExposure = snapshot.exposure;
+    invalidate();
+  }, [camera, gl, invalidate, restoreLunarControlState]);
+
+  const configureLunarPath = useCallback(() => {
+    if (!lunarTreeEntity || !(camera instanceof THREE.PerspectiveCamera)) return false;
+    const path = lunarPath.current;
+    const scratch = lunarScratch.current;
+    const bounds = strategicLandmarkBounds(lunarTreeEntity);
+    const facing = strategicLandmarkFacingRadians(lunarTreeEntity);
+    const offsetX = APOLLO_XIV_LAYOUT.replicaOffset[0];
+    const offsetZ = APOLLO_XIV_LAYOUT.replicaOffset[1];
+    const cosine = Math.cos(facing);
+    const sine = Math.sin(facing);
+    path.anchor.set(
+      bounds.centerX + cosine * offsetX + sine * offsetZ,
+      lunarTreeEntity.geometry.elevation,
+      bounds.centerZ - sine * offsetX + cosine * offsetZ,
+    );
+    path.rocketHeight = apolloXivReplicaHeight(
+      strategicLandmarkVisualHeight(lunarTreeEntity) ?? lunarTreeEntity.geometry.extrusionHeight,
+    );
+    path.mapTarget.set(
+      extent.centerX,
+      Math.min(1.6, extent.maxHeight * 0.1),
+      extent.centerZ,
+    );
+    const clearViewPosition = path.active && path.snapshot
+      ? path.snapshot.position
+      : camera.position;
+    path.outward.copy(clearViewPosition).sub(path.anchor);
+    path.outward.y = 0;
+    if (path.outward.lengthSq() < 0.001) {
+      const fallbackYaw = facing + APOLLO_XIV_LAYOUT.displayYaw;
+      path.outward.set(Math.sin(fallbackYaw), 0, Math.cos(fallbackYaw));
+    } else path.outward.normalize();
+    path.side.set(-path.outward.z, 0, path.outward.x).normalize();
+
+    const mobile = Math.min(size.width, size.height) <= 720;
+    const portrait = size.height > size.width * 1.04;
+    path.exteriorDistance = Math.max(
+      mobile ? 8.4 : 11.5,
+      path.rocketHeight * (portrait ? 2.4 : mobile ? 2.55 : 3.2),
+    );
+    path.exteriorSideOffset = mobile
+      ? path.rocketHeight * (portrait ? 1.18 : 1.42)
+      : 0;
+    path.exteriorHeightRatio = mobile ? (portrait ? 1.54 : 1.62) : 1.35;
+    path.exteriorTargetHeightRatio = mobile ? (portrait ? 0.58 : 0.62) : 0.5;
+    path.chaseDistance = path.rocketHeight * (portrait ? 1.04 : mobile ? 1.18 : 1.3);
+    path.chaseSideOffset = path.rocketHeight * (portrait ? 0.38 : mobile ? 0.48 : 0.58);
+    path.exteriorFov = portrait ? 43 : mobile ? 40 : 36;
+    path.chaseFov = portrait ? 45 : mobile ? 42 : 39;
+    path.finalFov = portrait ? 42 : mobile ? 40 : 38;
+
+    writeLunarExteriorPose(path, 0, path.exteriorPosition, path.exteriorTarget);
+    writeLunarChasePose(
+      path,
+      lunarLaunchAltitudeAt(
+        LUNAR_LAUNCH_TIMELINE.completionStart,
+        extent.diagonal,
+        path.rocketHeight,
+      ),
+      path.completionPosition,
+      path.completionTarget,
+    );
+
+    path.finalTarget.copy(path.mapTarget);
+    scratch.fromPosition.set(
+      portrait ? 0.06 : 0.22,
+      portrait ? 0.93 : mobile ? 0.88 : 0.84,
+      portrait ? 0.37 : 0.48,
+    ).normalize();
+    const finalDistance = fitDistanceForDirection(
+      extent,
+      path.finalFov,
+      size.width / Math.max(size.height, 1),
+      scratch.fromPosition,
+      portrait ? 0.94 : mobile ? 0.98 : 1.04,
+    );
+    path.finalPosition.copy(path.finalTarget).addScaledVector(scratch.fromPosition, finalDistance);
+    return true;
+  }, [camera, extent, lunarTreeEntity, size.height, size.width]);
+
   const scheduleResizeRefit = useCallback(() => {
-    if (shouldSuppressCommercialMapResizeRefit(Date.now(), resizeRefitSuppressedUntil.current)) {
+    if (
+      lunarCameraLockedRef.current
+      || shouldSuppressCommercialMapResizeRefit(Date.now(), resizeRefitSuppressedUntil.current)
+    ) {
       pendingResizeRefit.current = false;
       cancelScheduledResizeRefit();
       return;
@@ -1862,7 +2225,7 @@ function CameraRig({
 
     const runRefit = () => {
       resizeRefitTimer.current = null;
-      if (navigation.current.active) return;
+      if (navigation.current.active || lunarCameraLockedRef.current) return;
       if (shouldSuppressCommercialMapResizeRefit(Date.now(), resizeRefitSuppressedUntil.current)) {
         pendingResizeRefit.current = false;
         return;
@@ -1905,6 +2268,17 @@ function CameraRig({
       || previousParking.current.view !== parkingCameraView
     );
     const parkingClosed = previousParking.current.active && !parkingActive;
+    const suppressDetailsRefit = detailsLayoutChanged && suppressNextDetailsRefit.current;
+
+    if (lunarCameraLocked) {
+      previousSelection.current = selectedId;
+      previousPreset.current = preset;
+      previousSequence.current = cameraSequence;
+      previousSegment.current = segmentId;
+      previousDetailsLayout.current = activePanel === 'details';
+      return;
+    }
+    if (suppressDetailsRefit) suppressNextDetailsRefit.current = false;
 
     if (!initialized.current) {
       if (parkingActive) queueParking();
@@ -1955,7 +2329,7 @@ function CameraRig({
       targetLookAt.current.copy(controlsRef.current?.target ?? targetLookAt.current);
     } else if (selectionChanged && !selectedEntity) {
       animating.current = false;
-    } else if (detailsLayoutChanged && selectedEntity) {
+    } else if (detailsLayoutChanged && selectedEntity && !suppressDetailsRefit) {
       queueSelection(selectedEntity);
     }
 
@@ -1983,6 +2357,7 @@ function CameraRig({
     parkingActive,
     parkingCameraSequence,
     parkingCameraView,
+    lunarCameraLocked,
     preset,
     queueParking,
     queuePreset,
@@ -2001,12 +2376,15 @@ function CameraRig({
     if (!resized || !initialized.current) return undefined;
     previousViewportSize.current = { width: size.width, height: size.height };
 
+    if (lunarCameraLocked) return undefined;
+
     scheduleResizeRefit();
     return undefined;
   }, [
     scheduleResizeRefit,
     size.height,
     size.width,
+    lunarCameraLocked,
   ]);
 
   const clampTarget = useCallback(() => {
@@ -2029,6 +2407,7 @@ function CameraRig({
   }, [extent, isolatedArea, selectedEntity]);
 
   const handleControlsStart = useCallback(() => {
+    if (lunarCameraLockedRef.current) return;
     const controls = controlsRef.current;
     cancelScheduledResizeRefit();
     animating.current = false;
@@ -2039,6 +2418,7 @@ function CameraRig({
   }, [camera, cancelScheduledResizeRefit]);
 
   const handleControlsChange = useCallback(() => {
+    if (lunarCameraLockedRef.current) return;
     const controls = controlsRef.current;
     clampTarget();
     if (controls && navigation.current.active) {
@@ -2060,6 +2440,7 @@ function CameraRig({
   }, [camera, cancelScheduledResizeRefit, clampTarget, gl, invalidate, setCameraNavigating]);
 
   const handleControlsEnd = useCallback(() => {
+    if (lunarCameraLockedRef.current) return;
     const wasNavigating = navigation.current.navigating;
     navigation.current.active = false;
     navigation.current.navigating = false;
@@ -2072,12 +2453,139 @@ function CameraRig({
     invalidate();
   }, [gl, invalidate, scheduleResizeRefit, setCameraNavigating]);
 
+  useEffect(() => {
+    if (
+      lunarLaunchPhase === 'idle'
+      || lunarLaunchSequence === lunarPath.current.sequence
+    ) return;
+    const snapshot = captureLunarCamera();
+    if (!snapshot || !configureLunarPath()) {
+      useCommercialMapStore.getState().completeLunarLaunch(true);
+      return;
+    }
+
+    const path = lunarPath.current;
+    path.snapshot = snapshot;
+    path.active = true;
+    path.returning = false;
+    path.sequence = lunarLaunchSequence;
+    path.startedAt = lunarLaunchStartedAt
+      ?? (typeof performance === 'undefined' ? Date.now() : performance.now());
+    path.lastPhase = 'ignition';
+    animating.current = false;
+    pendingResizeRefit.current = false;
+    cancelScheduledResizeRefit();
+    resizeRefitSuppressedUntil.current = Date.now()
+      + (LUNAR_LAUNCH_TIMELINE.end + 1) * 1000;
+    lockLunarCamera();
+    invalidate();
+  }, [
+    cancelScheduledResizeRefit,
+    captureLunarCamera,
+    configureLunarPath,
+    invalidate,
+    lockLunarCamera,
+    lunarLaunchPhase,
+    lunarLaunchSequence,
+    lunarLaunchStartedAt,
+  ]);
+
+  useEffect(() => {
+    if (!lunarPath.current.active) return;
+    configureLunarPath();
+    invalidate();
+  }, [configureLunarPath, invalidate, size.height, size.width]);
+
+  useEffect(() => {
+    const path = lunarPath.current;
+    if (!lunarLaunchSkipRequested || !path.active || !path.snapshot) return;
+    path.active = false;
+    path.returning = false;
+    suppressNextDetailsRefit.current = true;
+    pendingResizeRefit.current = false;
+    cancelScheduledResizeRefit();
+    resizeRefitSuppressedUntil.current = 0;
+    restoreLunarCamera(path.snapshot);
+    useCommercialMapStore.getState().completeLunarLaunch(true);
+  }, [cancelScheduledResizeRefit, lunarLaunchSkipRequested, restoreLunarCamera]);
+
+  useEffect(() => {
+    const path = lunarPath.current;
+    if (
+      lunarLaunchPhase !== 'idle'
+      || (!path.active && !path.returning)
+      || !path.snapshot
+    ) return;
+    path.active = false;
+    path.returning = false;
+    suppressNextDetailsRefit.current = true;
+    pendingResizeRefit.current = false;
+    cancelScheduledResizeRefit();
+    resizeRefitSuppressedUntil.current = 0;
+    restoreLunarCamera(path.snapshot);
+    setCameraNavigating(false);
+  }, [
+    cancelScheduledResizeRefit,
+    lunarLaunchPhase,
+    restoreLunarCamera,
+    setCameraNavigating,
+  ]);
+
+  useEffect(() => {
+    const path = lunarPath.current;
+    if (
+      !lunarLaunchReturning
+      || lunarLaunchReturnSequence === path.returnSequence
+    ) return;
+    if (!path.snapshot || !(camera instanceof THREE.PerspectiveCamera)) {
+      useCommercialMapStore.getState().completeLunarLaunchReturn();
+      return;
+    }
+    const controls = controlsRef.current;
+    path.returnSequence = lunarLaunchReturnSequence;
+    path.returning = true;
+    path.active = false;
+    path.returnStartedAt = typeof performance === 'undefined' ? Date.now() : performance.now();
+    path.returnPosition.copy(camera.position);
+    path.returnTarget.copy(controls?.target ?? targetLookAt.current);
+    path.returnQuaternion.copy(camera.quaternion);
+    path.returnFov = camera.fov;
+    path.returnNear = camera.near;
+    path.returnFar = camera.far;
+    path.returnZoom = camera.zoom;
+    path.returnExposure = gl.toneMappingExposure;
+    animating.current = false;
+    pendingResizeRefit.current = false;
+    cancelScheduledResizeRefit();
+    resizeRefitSuppressedUntil.current = Date.now()
+      + (LUNAR_CAMERA_RETURN_DURATION + 0.8) * 1000;
+    lockLunarCamera();
+    invalidate();
+  }, [
+    camera,
+    cancelScheduledResizeRefit,
+    gl,
+    invalidate,
+    lockLunarCamera,
+    lunarLaunchReturnSequence,
+    lunarLaunchReturning,
+  ]);
+
   useEffect(() => () => {
     cancelScheduledResizeRefit();
     pendingResizeRefit.current = false;
     resizeRefitSuppressedUntil.current = 0;
     const controls = controlsRef.current;
     const store = useCommercialMapStore.getState();
+    const path = lunarPath.current;
+    if ((path.active || path.returning) && path.snapshot) {
+      restoreLunarCamera(path.snapshot);
+    }
+    if (store.lunarLaunchPhase !== 'idle') store.completeLunarLaunch(true);
+    else if (store.lunarLaunchReturning) store.completeLunarLaunchReturn();
+    else if (store.lunarLaunchReturnAvailable) store.resetLunarLaunch();
+    path.active = false;
+    path.returning = false;
     if (store.interiorEntityId && controls) {
       store.setInteriorReturnView({
         position: camera.position.toArray() as [number, number, number],
@@ -2086,9 +2594,246 @@ function CameraRig({
     }
     setCameraNavigating(false);
     gl.domElement.style.cursor = '';
-  }, [camera, cancelScheduledResizeRefit, gl, setCameraNavigating]);
+  }, [camera, cancelScheduledResizeRefit, gl, restoreLunarCamera, setCameraNavigating]);
 
   useFrame((_state, delta) => {
+    const path = lunarPath.current;
+    const snapshot = path.snapshot;
+    const perspective = camera instanceof THREE.PerspectiveCamera ? camera : null;
+    const controls = controlsRef.current;
+    const now = typeof performance === 'undefined' ? Date.now() : performance.now();
+
+    if (path.returning && snapshot && perspective) {
+      const progress = smootherstep(rangeProgress(
+        (now - path.returnStartedAt) / 1000,
+        0,
+        LUNAR_CAMERA_RETURN_DURATION,
+      ));
+      const scratch = lunarScratch.current;
+      scratch.position.lerpVectors(path.returnPosition, snapshot.position, progress);
+      scratch.target.lerpVectors(path.returnTarget, snapshot.target, progress);
+      scratch.quaternion.slerpQuaternions(path.returnQuaternion, snapshot.quaternion, progress);
+      perspective.position.copy(scratch.position);
+      perspective.quaternion.copy(scratch.quaternion);
+      perspective.fov = THREE.MathUtils.lerp(path.returnFov, snapshot.fov, progress);
+      perspective.near = THREE.MathUtils.lerp(path.returnNear, snapshot.near, progress);
+      perspective.far = THREE.MathUtils.lerp(path.returnFar, snapshot.far, progress);
+      perspective.zoom = THREE.MathUtils.lerp(path.returnZoom, snapshot.zoom, progress);
+      perspective.updateProjectionMatrix();
+      controls?.target.copy(scratch.target);
+      gl.toneMappingExposure = THREE.MathUtils.lerp(
+        path.returnExposure,
+        snapshot.exposure,
+        progress,
+      );
+
+      if (progress >= 0.99999) {
+        path.returning = false;
+        suppressNextDetailsRefit.current = true;
+        restoreLunarCamera(snapshot);
+        useCommercialMapStore.getState().completeLunarLaunchReturn();
+      } else invalidate();
+      return;
+    }
+
+    if (path.active && snapshot && perspective) {
+      // Read the store synchronously as well as through the React subscription.
+      // A skip requested during the 260 ms cleanup window must win over the
+      // natural completion frame even if React has not committed the effect yet.
+      const liveLaunchState = useCommercialMapStore.getState();
+      if (liveLaunchState.lunarLaunchSkipRequested) {
+        path.active = false;
+        path.returning = false;
+        suppressNextDetailsRefit.current = true;
+        pendingResizeRefit.current = false;
+        cancelScheduledResizeRefit();
+        resizeRefitSuppressedUntil.current = 0;
+        restoreLunarCamera(snapshot);
+        liveLaunchState.completeLunarLaunch(true);
+        return;
+      }
+      try {
+        const elapsed = Math.max(0, (now - path.startedAt) / 1000);
+        const sample = sampleLunarLaunchMotion(
+          elapsed,
+          extent.diagonal,
+          path.rocketHeight,
+          lunarScratch.current.motion,
+        );
+        const phase = sample.phase;
+        const scratch = lunarScratch.current;
+        let nextFov = path.exteriorFov;
+        let nextZoom = 1;
+
+        if (phase !== 'idle' && phase !== path.lastPhase) {
+          path.lastPhase = phase;
+          useCommercialMapStore.getState().setLunarLaunchPhase(phase, path.sequence);
+        }
+
+        if (elapsed < LUNAR_CAMERA_INITIAL_SETTLE_END) {
+          const progress = smootherstep(rangeProgress(
+            elapsed,
+            0,
+            LUNAR_CAMERA_INITIAL_SETTLE_END,
+          ));
+          writeLunarExteriorPose(path, 0, path.exteriorPosition, path.exteriorTarget);
+          scratch.position.lerpVectors(snapshot.position, path.exteriorPosition, progress);
+          scratch.target.lerpVectors(snapshot.target, path.exteriorTarget, progress);
+          setLunarLookQuaternion(
+            scratch.toQuaternion,
+            scratch.matrix,
+            path.exteriorPosition,
+            path.exteriorTarget,
+            scratch.up,
+          );
+          scratch.quaternion.slerpQuaternions(
+            snapshot.quaternion,
+            scratch.toQuaternion,
+            progress,
+          );
+          nextFov = THREE.MathUtils.lerp(snapshot.fov, path.exteriorFov, progress);
+          nextZoom = THREE.MathUtils.lerp(snapshot.zoom, 1, progress);
+        } else if (elapsed < LUNAR_LAUNCH_TIMELINE.cameraTransitionStart) {
+          writeLunarExteriorPose(path, sample.altitude, scratch.position, scratch.target);
+          setLunarLookQuaternion(
+            scratch.quaternion,
+            scratch.matrix,
+            scratch.position,
+            scratch.target,
+            scratch.up,
+          );
+        } else if (elapsed < LUNAR_LAUNCH_TIMELINE.cinematicAscentStart) {
+          const progress = smootherstep(rangeProgress(
+            elapsed,
+            LUNAR_LAUNCH_TIMELINE.cameraTransitionStart,
+            LUNAR_LAUNCH_TIMELINE.cinematicAscentStart,
+          ));
+          writeLunarExteriorPose(path, sample.altitude, scratch.fromPosition, scratch.fromTarget);
+          writeLunarChasePose(path, sample.altitude, scratch.position, scratch.target);
+          setLunarLookQuaternion(
+            scratch.fromQuaternion,
+            scratch.matrix,
+            scratch.fromPosition,
+            scratch.fromTarget,
+            scratch.up,
+          );
+          setLunarLookQuaternion(
+            scratch.toQuaternion,
+            scratch.matrix,
+            scratch.position,
+            scratch.target,
+            scratch.up,
+          );
+          const lookProgress = progress * progress;
+          scratch.position.lerpVectors(scratch.fromPosition, scratch.position, progress);
+          scratch.target.lerpVectors(scratch.fromTarget, scratch.target, lookProgress);
+          scratch.quaternion.slerpQuaternions(
+            scratch.fromQuaternion,
+            scratch.toQuaternion,
+            lookProgress,
+          );
+          nextFov = THREE.MathUtils.lerp(path.exteriorFov, path.chaseFov, progress);
+        } else if (elapsed < LUNAR_LAUNCH_TIMELINE.completionStart) {
+          writeLunarChasePose(path, sample.altitude, scratch.position, scratch.target);
+          setLunarLookQuaternion(
+            scratch.quaternion,
+            scratch.matrix,
+            scratch.position,
+            scratch.target,
+            scratch.up,
+          );
+          nextFov = path.chaseFov;
+        } else {
+          const progress = smootherstep(rangeProgress(
+            elapsed,
+            LUNAR_LAUNCH_TIMELINE.completionStart,
+            LUNAR_LAUNCH_TIMELINE.cleanupStart,
+          ));
+          scratch.position.lerpVectors(path.completionPosition, path.finalPosition, progress);
+          scratch.target.lerpVectors(path.completionTarget, path.finalTarget, progress);
+          setLunarLookQuaternion(
+            scratch.fromQuaternion,
+            scratch.matrix,
+            path.completionPosition,
+            path.completionTarget,
+            scratch.up,
+          );
+          setLunarLookQuaternion(
+            scratch.toQuaternion,
+            scratch.matrix,
+            path.finalPosition,
+            path.finalTarget,
+            scratch.up,
+          );
+          scratch.quaternion.slerpQuaternions(
+            scratch.fromQuaternion,
+            scratch.toQuaternion,
+            progress,
+          );
+          nextFov = THREE.MathUtils.lerp(path.chaseFov, path.finalFov, progress);
+        }
+
+        const shake = sample.vibration * path.rocketHeight * 0.0032;
+        const lateralShake = Math.sin(elapsed * 47.3) * shake;
+        const verticalShake = Math.sin(elapsed * 39.1 + 0.72) * shake * 0.55;
+        scratch.position.addScaledVector(path.side, lateralShake);
+        scratch.position.y += verticalShake;
+        scratch.target.addScaledVector(path.side, lateralShake);
+        scratch.target.y += verticalShake;
+
+        perspective.position.copy(scratch.position);
+        perspective.quaternion.copy(scratch.quaternion);
+        perspective.fov = nextFov;
+        perspective.near = Math.min(snapshot.near, 0.04);
+        perspective.far = Math.max(snapshot.far, 900, extent.diagonal * 12);
+        perspective.zoom = nextZoom;
+        perspective.updateProjectionMatrix();
+        controls?.target.copy(scratch.target);
+        targetPosition.current.copy(scratch.position);
+        targetLookAt.current.copy(scratch.target);
+        const revealProgress = smootherstep(rangeProgress(
+          elapsed,
+          LUNAR_LAUNCH_TIMELINE.completionStart,
+          LUNAR_LAUNCH_TIMELINE.cleanupStart,
+        ));
+        gl.toneMappingExposure = snapshot.exposure * (
+          1
+          + sample.groundLight * 0.055
+          - sample.ascentProgress * (1 - revealProgress) * 0.018
+        );
+
+        if (elapsed >= LUNAR_LAUNCH_TIMELINE.end) {
+          path.active = false;
+          path.lastPhase = 'idle';
+          perspective.position.copy(path.finalPosition);
+          controls?.target.copy(path.finalTarget);
+          setLunarLookQuaternion(
+            perspective.quaternion,
+            scratch.matrix,
+            path.finalPosition,
+            path.finalTarget,
+            scratch.up,
+          );
+          perspective.fov = path.finalFov;
+          perspective.updateProjectionMatrix();
+          gl.toneMappingExposure = snapshot.exposure;
+          restoreLunarControlState(snapshot);
+          controls?.update();
+          animating.current = false;
+          lunarCameraLockedRef.current = false;
+          useCommercialMapStore.getState().completeLunarLaunch(false);
+        } else invalidate();
+      } catch (error) {
+        path.active = false;
+        suppressNextDetailsRefit.current = true;
+        restoreLunarCamera(snapshot);
+        useCommercialMapStore.getState().completeLunarLaunch(true);
+        if (import.meta.env.DEV) console.error('[CommercialMap] lunar camera cleanup after runtime failure', error);
+      }
+      return;
+    }
+
+    if (lunarCameraLockedRef.current) return;
     if (animating.current) {
       const factor = 1 - Math.exp(-delta * 5.4);
       camera.position.lerp(targetPosition.current, factor);
@@ -2134,17 +2879,18 @@ function CameraRig({
     <OrbitControls
       ref={controlsRef}
       makeDefault
-      enableDamping
+      enabled={!lunarCameraLocked}
+      enableDamping={!lunarCameraLocked}
       dampingFactor={0.072}
-      enablePan
-      enableRotate
-      enableZoom
+      enablePan={!lunarCameraLocked}
+      enableRotate={!lunarCameraLocked}
+      enableZoom={!lunarCameraLocked}
       minDistance={parkingControlLimits?.minDistance ?? miranteMinimumDistance}
       maxDistance={parkingControlLimits?.maxDistance ?? miranteMaximumDistance}
       minPolarAngle={COMMERCIAL_MAP_MIN_POLAR_ANGLE}
       maxPolarAngle={Math.PI / 2.08}
       screenSpacePanning={false}
-      zoomToCursor={!miranteSelected}
+      zoomToCursor={!miranteSelected && !lunarCameraLocked}
       touches={{ ONE: THREE.TOUCH.PAN, TWO: THREE.TOUCH.DOLLY_ROTATE }}
       minAzimuthAngle={miranteSelected ? -2.65 : -Infinity}
       maxAzimuthAngle={miranteSelected ? -0.9 : Infinity}
@@ -2190,6 +2936,9 @@ function Scene({
   const rearParkingEnabled = rearParkingVisibleInArea(isolatedArea) && !hydrologicalModeActive && parkingPresentation.visible;
   const reducedGraphics = useCommercialMapStore((state) => state.reducedGraphics);
   const cameraNavigating = useCommercialMapStore((state) => state.cameraNavigating);
+  const lunarLaunchPhase = useCommercialMapStore((state) => state.lunarLaunchPhase);
+  const lunarLaunchReturning = useCommercialMapStore((state) => state.lunarLaunchReturning);
+  const lunarCinematicActive = lunarLaunchPhase !== 'idle' || lunarLaunchReturning;
   const technicalValidationVisible = useCommercialMapStore((state) => state.technicalValidationVisible);
   const activeSegmentId = useCommercialMapStore((state) => state.activeSegmentId);
   const [pavilionInteriorTransition, setPavilionInteriorTransition] = useState<
@@ -2336,6 +3085,10 @@ function Scene({
     );
   }, [activeSegmentId, resolvedSegmentByEntity]);
   const selectedEntity = entities.find((entity) => entity.id === selectedEntityId) ?? null;
+  const lunarTreeEntity = useMemo(
+    () => entities.find((entity) => resolveStrategicLandmarkKind(entity) === 'lunar-tree') ?? null,
+    [entities],
+  );
   const interiorEntity = entities.find((entity) => (
     entity.id === interiorEntityId && strategicLandmarkSupportsInterior(entity)
   )) ?? null;
@@ -2526,7 +3279,7 @@ function Scene({
     entities: exteriorRenderedEntities,
     lotByEntity,
     extent,
-    labelsVisible: labelsVisible && !hydrologicalModeActive,
+    labelsVisible: labelsVisible && !hydrologicalModeActive && !lunarCinematicActive,
     reducedGraphics,
     selectedEntityId,
     hoveredEntityId,
@@ -2654,6 +3407,7 @@ function Scene({
           isMatch={presentedMatchingEntityIds.has(entity.id)}
           layerOpacity={layerOpacity[entity.layerId] ?? 1}
           sceneCenter={sceneCenter}
+          sceneDiagonal={extent.diagonal}
           cameraNavigating={cameraNavigating}
           onSelect={handleEntitySelect}
           onHover={handleEntityHover}
@@ -2713,6 +3467,7 @@ function Scene({
           hovered={hoveredEntityId === entity.id}
           filtersActive={entityFiltersActive}
           isMatch={presentedMatchingEntityIds.has(entity.id)}
+          cinematicHidden={lunarCinematicActive}
         />
       ))}
       {technicalValidationAllowed
@@ -2728,6 +3483,7 @@ function Scene({
       <CameraRig
         selectedEntity={selectedEntity}
         extent={extent}
+        lunarTreeEntity={lunarTreeEntity}
         isolatedArea={isolatedArea}
         activeSegment={activeSegment}
         activeSegmentEntities={activeSegmentEntities}
