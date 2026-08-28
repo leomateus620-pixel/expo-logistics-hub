@@ -52,6 +52,12 @@ const PERSON_PHOTOS: Record<string, string> = {
   'dario junior da motta germano': darioGermano.url,
   'cleo antonio rockenbach': cleoRockenbach.url,
   'marcos eduardo servat': marcosServat.url,
+  'roberto steffen': robertoSteffen.url,
+  'felipe bortoli': felipeBortoli.url,
+  'valtair dornelles': valtairDornelles.url,
+  'elisandra simao reis': elisandraSimaoReis.url,
+  'alexandre dall agnese': alexandreDallagnese.url,
+  'zelia savoldi': zeliaSavoldi.url,
 };
 
 const PERSON_PHOTOS_BY_USER_ID: Record<string, string> = {
