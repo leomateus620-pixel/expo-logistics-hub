@@ -84,13 +84,67 @@ export const ARENA_FRONT_LAYOUT = {
     lowEdge: 'east' as const,
     stepCount: 18,
     bankCount: 3,
-    riserHeight: 0.085,
+    /**
+     * Perfil recalculado em 2026.7: o desnível total (18 × 0,032 ≈ 0,58) passa a
+     * acompanhar a descida natural do terreno lida nos anexos 3 e 4, no lugar do
+     * bloco de 1,53 que flutuava sobre a antiga praça plana.
+     */
+    riserHeight: 0.032,
     lowerLandingDepth: 0.62,
     upperLandingDepth: 0.74,
+    /** Laje fina de topo: o patamar superior deixa de ser um maciço de concreto. */
+    upperLandingThickness: 0.07,
+    retainingWallWidth: 0.11,
+    handrailHeight: 0.34,
     bankGap: 0,
     intermediateLandingSteps: [6, 12] as const,
-    intermediateLandingDepth: 0.28,
+    intermediateLandingDepth: 0.42,
   },
+  /**
+   * Malha de terreno do setor: alta a oeste (topo da escadaria) e descendo de
+   * forma contínua até o apron pavimentado da Arena, a leste.
+   */
+  terrain: {
+    sourceBounds: [4106, 2400, 4912, 3110] as SourceBounds,
+    segmentsX: 56,
+    segmentsZ: 44,
+    /** Faixa de transição, em unidades locais, entre talude e piso pavimentado. */
+    blendDistance: 1.15,
+  },
+  /** Campo de futebol de grama natural a noroeste da praça, entre a Quadra R e a escadaria. */
+  footballField: {
+    sourceBounds: [4138, 2425, 4477, 2636] as SourceBounds,
+    turfInset: 0.18,
+    markingInset: 0.34,
+    turfColor: '#7f9a5c',
+    wornColor: '#98a074',
+  },
+  /** Caminhos de circulação entre escadaria, quadras, campo e apron da Arena. */
+  walkways: [
+    { id: 'arena-walkway-stairs-apron', sourcePath: [[4480, 2895], [4680, 2895], [4880, 2860]] as readonly SourcePoint[], width: 0.34 },
+    { id: 'arena-walkway-courts-plaza', sourcePath: [[4620, 2682], [4620, 2560], [4620, 2480]] as readonly SourcePoint[], width: 0.26 },
+    { id: 'arena-walkway-field-courts', sourcePath: [[4300, 2530], [4470, 2530], [4520, 2560]] as readonly SourcePoint[], width: 0.24 },
+    { id: 'arena-walkway-field-stairs', sourcePath: [[4300, 2636], [4300, 2700], [4270, 2760]] as readonly SourcePoint[], width: 0.22 },
+  ] as const,
+  /** Massas arbóreas do setor, lidas nos anexos 3 e 4 (conferência de campo recomendada). */
+  treeClusters: [
+    { sourcePosition: [4128, 2660] as SourcePoint, scale: 1.05 },
+    { sourcePosition: [4180, 2620] as SourcePoint, scale: 0.92 },
+    { sourcePosition: [4238, 2648] as SourcePoint, scale: 1.12 },
+    { sourcePosition: [4112, 2790] as SourcePoint, scale: 0.98 },
+    { sourcePosition: [4108, 2930] as SourcePoint, scale: 1.08 },
+    { sourcePosition: [4132, 3090] as SourcePoint, scale: 0.94 },
+    { sourcePosition: [4250, 3120] as SourcePoint, scale: 1.02 },
+    { sourcePosition: [4390, 3126] as SourcePoint, scale: 0.9 },
+    { sourcePosition: [4520, 3120] as SourcePoint, scale: 1.06 },
+    { sourcePosition: [4660, 3110] as SourcePoint, scale: 0.96 },
+    { sourcePosition: [4800, 3104] as SourcePoint, scale: 1.1 },
+    { sourcePosition: [4500, 2660] as SourcePoint, scale: 0.9 },
+    { sourcePosition: [4700, 2645] as SourcePoint, scale: 1.04 },
+    { sourcePosition: [4840, 2650] as SourcePoint, scale: 0.98 },
+    { sourcePosition: [4160, 2470] as SourcePoint, scale: 1.0 },
+    { sourcePosition: [4520, 2420] as SourcePoint, scale: 1.07 },
+  ] as const,
   northBerm: {
     sourceBounds: [4120, 2682, 4480, 2720] as SourceBounds,
     highEdge: 'west' as const,
@@ -99,6 +153,7 @@ export const ARENA_FRONT_LAYOUT = {
     sourceBounds: [4120, 3070, 4480, 3098] as SourceBounds,
     highEdge: 'west' as const,
   },
+
   multiSportCourt: {
     sourceBounds: [4675, 2480, 4765, 2640] as SourceBounds,
     longAxis: 'z' as const,
