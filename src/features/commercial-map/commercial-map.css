@@ -1803,3 +1803,11 @@
   .commercial-pavilion-view-transition.is-covering { opacity: 1; }
   .commercial-pavilion-view-transition.is-revealing { opacity: 0; }
 }
+
+/* Contextual labels: nothing is permanent on the map — only hover/selection. */
+@keyframes commercial-map-label-enter { from { opacity: 0; transform: translate3d(0,1px,0) scale(.96); } to { opacity: 1; transform: translate3d(0,-5px,0) scale(1); } }
+.commercial-map-label.is-contextual { animation: commercial-map-label-enter .14s ease-out both; }
+.commercial-map-label.is-contextual.is-hovered { border-color: rgba(23,91,43,.3); background: rgba(248,252,246,.96); box-shadow: 0 6px 16px rgba(17,75,32,.18); }
+@media (prefers-reduced-motion: reduce) { .commercial-map-label.is-contextual { animation: none; } }
+.commercial-map-label.is-road.is-contextual { animation-name: commercial-map-label-fade; }
+@keyframes commercial-map-label-fade { from { opacity: 0; } to { opacity: 1; } }

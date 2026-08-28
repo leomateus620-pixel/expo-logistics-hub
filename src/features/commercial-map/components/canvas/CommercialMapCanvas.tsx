@@ -27,7 +27,7 @@ import {
   isSelectableMapClassification,
   selectionFocusProfile,
 } from '../../utils/interaction';
-import { normalizeMapEntityMetadata, type MapLabelVisibility } from '../../utils/mapMetadata';
+import { normalizeMapEntityMetadata } from '../../utils/mapMetadata';
 import { selectCommercialTreesForScene } from '../../utils/treeLayer';
 import { selectCommercialElectricalInfrastructureForScene } from '../../utils/electricalInfrastructure';
 import { selectCommercialHydrologicalInfrastructureForScene } from '../../utils/hydrologicalInfrastructure';
@@ -77,16 +77,13 @@ import {
   type LunarLaunchMotionSample,
 } from '../../utils/lunarLaunch';
 import {
-  labelBelongsToActiveMode,
   requiresSolidRendering,
   RESTROOM_PRESENTATION_LIFT,
   resolveGateAccessMode,
-  resolveMapLabelCollisionBox,
-  resolveMapLabelCollisionCenterY,
   resolveMarkerPresentationLift,
-  resolveMapLabelMode,
-  resolveStableMapLabelVisibility,
 } from '../../utils/mapPresentation';
+import { useContextualMapLabel } from '../../hooks/useContextualMapLabel';
+
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import {
   getRearParkingFocusBounds, rearParkingVisibleInArea, rearParkingLayerPresentation,
@@ -209,11 +206,25 @@ function PavilionInteriorTransitionOverlay({
 }
 
 const NO_RAYCAST = () => undefined;
+const CONTEXTUAL_LABEL_POINT = new THREE.Vector3();
+/** Keeps the single contextual label anchored, but never clipped by the viewport edges. */
+function calculateContextualLabelPosition(
+  object: THREE.Object3D,
+  camera: THREE.Camera,
+  size: { width: number; height: number },
+): [number, number] {
+  CONTEXTUAL_LABEL_POINT.setFromMatrixPosition(object.matrixWorld).project(camera);
+  const x = CONTEXTUAL_LABEL_POINT.x * size.width / 2 + size.width / 2;
+  const y = -CONTEXTUAL_LABEL_POINT.y * size.height / 2 + size.height / 2;
+  const horizontalMargin = Math.min(112, size.width * 0.26);
+  return [
+    THREE.MathUtils.clamp(x, horizontalMargin, size.width - horizontalMargin),
+    THREE.MathUtils.clamp(y, 46, size.height - 12),
+  ];
+}
 const PRECISE_HOVER_CAPABLE = typeof window === 'undefined'
   || !window.matchMedia
   || window.matchMedia('(any-hover: hover) and (any-pointer: fine)').matches;
-const LABEL_LEVEL_RANK: Record<MapLabelVisibility, number> = { far: 0, medium: 1, near: 2, detail: 3 };
-const FAR_LABEL_PRIORITY_FLOOR = 94;
 const MAP_BACKGROUND_COLOR = new THREE.Color('#dfe8de');
 const AREA_NUMBER = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const SEGMENT_LOT_SURFACE_WEIGHT = 0.94;
@@ -1395,12 +1406,16 @@ const EntityLabel = memo(function EntityLabel({
   const status = lot ? STATUS_CONFIG[lot.status] : null;
   const labelHeight = entityLabelHeight(entity);
 
+  const mode = selected ? 'focus' : 'hover';
+  const variant = `is-contextual ${selected ? 'is-selected' : hovered ? 'is-hovered' : 'is-transient'}`;
+
   return (
     <Html
       position={[metadata.labelAnchor[0], entity.geometry.elevation + labelHeight, metadata.labelAnchor[1]]}
       transform={false}
       eps={0.001}
       zIndexRange={[22, 2]}
+      calculatePosition={calculateContextualLabelPosition}
       style={{
         pointerEvents: 'none',
         transform: 'translate3d(-50%, -100%, 0)',
@@ -1408,164 +1423,35 @@ const EntityLabel = memo(function EntityLabel({
       }}
     >
       {lot ? (
-        <div data-map-entity-id={entity.id} data-map-label-mode={selected ? 'focus' : 'navigation'} className={`commercial-map-label is-lot ${selected ? 'is-selected' : ''} ${dimmed ? 'is-dimmed' : ''}`}>
+        <div data-map-entity-id={entity.id} data-map-label-mode={mode} className={`commercial-map-label is-lot ${variant} ${dimmed ? 'is-dimmed' : ''}`}>
           <span aria-label={`Lote ${metadata.lotNumber ?? ''}`}>{metadata.lotNumber}</span>
-          {(selected || hovered) && metadata.block && <strong>{quadraLabel(metadata.block)}</strong>}
-          {(selected || hovered) && lot.officialAreaSqm && (
+          {metadata.block && <strong>{quadraLabel(metadata.block)}</strong>}
+          {lot.officialAreaSqm && (
             <small className="commercial-map-label-area">{AREA_NUMBER.format(lot.officialAreaSqm)} m²</small>
           )}
-          {(selected || hovered) && status && <small><b aria-hidden="true">{status.symbol}</b> {status.label}</small>}
+          {status && <small><b aria-hidden="true">{status.symbol}</b> {status.label}</small>}
         </div>
       ) : isRoad ? (
-        <div data-map-entity-id={entity.id} data-map-label-mode={selected ? 'focus' : 'navigation'} className={`commercial-map-label is-road ${selected ? 'is-selected' : ''}`}><span>{metadata.officialDisplayName}</span></div>
+        <div data-map-entity-id={entity.id} data-map-label-mode={mode} className={`commercial-map-label is-road ${variant}`}><span>{metadata.officialDisplayName}</span></div>
       ) : isQuadra ? (
-        <div data-map-entity-id={entity.id} data-map-label-mode={selected ? 'focus' : 'navigation'} className={`commercial-map-label is-quadra ${selected ? 'is-selected' : ''}`}>
+        <div data-map-entity-id={entity.id} data-map-label-mode={mode} className={`commercial-map-label is-quadra ${variant}`}>
           <span>{quadraLabel(metadata.officialDisplayName || entity.publicIdentifier)}</span>
         </div>
       ) : (
         <div
           data-map-entity-id={entity.id}
-          data-map-label-mode={selected ? 'focus' : 'navigation'}
-          className={`commercial-map-label is-structure ${isGate ? 'is-access' : ''} ${isRestroom ? 'is-restroom' : ''} ${isArchitecturalLandmark ? 'is-architectural-landmark' : ''} ${selected ? 'is-selected' : ''}`}
+          data-map-label-mode={mode}
+          className={`commercial-map-label is-structure ${isGate ? 'is-access' : ''} ${isRestroom ? 'is-restroom' : ''} ${isArchitecturalLandmark ? 'is-architectural-landmark' : ''} ${variant}`}
         >
           {metadata.structureCode && <strong className="commercial-map-label-code">{isRestroom ? 'E' : metadata.structureCode}</strong>}
-          <span>{isRestroom && !selected ? 'WC' : metadata.officialDisplayName}</span>
+          <span>{metadata.officialDisplayName}</span>
         </div>
       )}
+
     </Html>
   );
 });
 
-function useSemanticLabelVisibility({
-  entities,
-  lotByEntity,
-  extent,
-  labelsVisible,
-  reducedGraphics,
-  selectedEntityId,
-  hoveredEntityId,
-  matchingEntityIds,
-  filtersActive,
-}: {
-  entities: MapEntity[];
-  lotByEntity: Map<string, CommercialLot>;
-  extent: SceneExtent;
-  labelsVisible: boolean;
-  reducedGraphics: boolean;
-  selectedEntityId: string | null;
-  hoveredEntityId: string | null;
-  matchingEntityIds: ReadonlySet<string>;
-  filtersActive: boolean;
-}) {
-  const candidates = useMemo(() => entities.map((entity) => {
-    const metadata = normalizeMapEntityMetadata(entity, lotByEntity.get(entity.id));
-    const labelHeight = entityLabelHeight(entity);
-    return {
-      entity,
-      metadata,
-      position: new THREE.Vector3(metadata.labelAnchor[0], entity.geometry.elevation + labelHeight, metadata.labelAnchor[1]),
-    };
-  }), [entities, lotByEntity]);
-  const [visibility, setVisibility] = useState<{ ids: ReadonlySet<string>; level: MapLabelVisibility }>(() => ({ ids: new Set(), level: 'far' }));
-  const previousSignature = useRef('');
-  const stableLevel = useRef<MapLabelVisibility>('far');
-  const matchingSignature = useMemo(() => [...matchingEntityIds].sort().join('|'), [matchingEntityIds]);
-  const labelMode = useMemo(() => resolveMapLabelMode(selectedEntityId), [selectedEntityId]);
-  const focusedVisibility = useMemo(() => labelMode.kind === 'focus'
-    ? { ids: new Set([labelMode.selectedEntityId]) as ReadonlySet<string>, level: 'near' as MapLabelVisibility }
-    : null, [labelMode]);
-
-  useFrame((state) => {
-    if (labelMode.kind === 'focus') {
-      // Focus is a semantic label mode, not another collision priority. Skip
-      // the map-wide projection pass and keep exactly one stable identifier.
-      previousSignature.current = '';
-      return;
-    }
-    const controls = (state as unknown as { controls?: OrbitControlsImpl }).controls;
-    const target = controls?.target ?? new THREE.Vector3(extent.centerX, 0, extent.centerZ);
-    const cameraDistance = state.camera.position.distanceTo(target);
-    const level = resolveStableMapLabelVisibility(cameraDistance, extent.diagonal, stableLevel.current);
-    stableLevel.current = level;
-    const cameraSignature = [
-      state.camera.position.x.toFixed(1), state.camera.position.y.toFixed(1), state.camera.position.z.toFixed(1),
-      target.x.toFixed(1), target.z.toFixed(1), state.size.width, state.size.height,
-      level, selectedEntityId, hoveredEntityId, labelsVisible, reducedGraphics, filtersActive, matchingSignature,
-    ].join(':');
-    if (cameraSignature === previousSignature.current) return;
-
-    const mobile = state.size.width < 720 || state.size.height < 430;
-    const cap = level === 'far'
-      ? (mobile ? 3 : 4)
-      : level === 'medium'
-        ? (mobile ? 10 : 16)
-        : level === 'near'
-          ? (mobile ? 20 : 36)
-          : (mobile ? 28 : 72);
-    const currentRank = LABEL_LEVEL_RANK[level];
-    const viewportWidth = state.size.width;
-    const viewportHeight = state.size.height;
-    const projected = candidates
-      .filter(({ entity, metadata }) => {
-        if (!labelBelongsToActiveMode(labelMode, entity.id)) return false;
-        if (entity.id === selectedEntityId || entity.id === hoveredEntityId) return true;
-        if (!labelsVisible || reducedGraphics && mobile) return false;
-        if (filtersActive && !matchingEntityIds.has(entity.id)) {
-          const keepsCartographicContext = entity.classification === 'ROAD'
-            || entity.classification === 'PEDESTRIAN_PATH'
-            || entity.classification === 'QUADRA';
-          if (!keepsCartographicContext) return false;
-        }
-        if (level === 'far' && metadata.labelPriority < FAR_LABEL_PRIORITY_FLOOR) return false;
-        return LABEL_LEVEL_RANK[metadata.preferredLabelVisibility] <= currentRank;
-      })
-      .map((candidate) => {
-        const point = candidate.position.clone().project(state.camera);
-        const isLot = candidate.entity.classification === 'SELLABLE_LOT';
-        const isRoad = candidate.entity.classification === 'ROAD' || candidate.entity.classification === 'PEDESTRIAN_PATH';
-        const forced = candidate.entity.id === selectedEntityId || candidate.entity.id === hoveredEntityId;
-        const expandedLot = isLot && forced;
-        const nameLength = candidate.metadata.officialDisplayName.length;
-        const collisionBox = resolveMapLabelCollisionBox(
-          isLot ? 'lot' : isRoad ? 'road' : 'structure',
-          nameLength,
-          expandedLot,
-        );
-        const anchorY = (-point.y * 0.5 + 0.5) * viewportHeight;
-        return {
-          ...candidate,
-          forced,
-          visible: point.z >= -1 && point.z <= 1 && Math.abs(point.x) <= 1.08 && Math.abs(point.y) <= 1.08,
-          x: (point.x * 0.5 + 0.5) * viewportWidth,
-          y: resolveMapLabelCollisionCenterY(anchorY, collisionBox),
-          width: collisionBox.width,
-          height: collisionBox.height,
-          priority: candidate.metadata.labelPriority
-            + (forced ? 1000 : 0)
-            + (matchingEntityIds.has(candidate.entity.id) ? 120 : 0)
-            + (visibility.ids.has(candidate.entity.id) ? 12 : 0),
-        };
-      })
-      .filter((candidate) => candidate.visible)
-      .sort((left, right) => (
-        right.priority - left.priority || left.entity.id.localeCompare(right.entity.id)
-      ));
-
-    const accepted: typeof projected = [];
-    for (const candidate of projected) {
-      if (!candidate.forced && accepted.length >= cap) continue;
-      const overlaps = accepted.some((existing) => Math.abs(candidate.x - existing.x) < (candidate.width + existing.width) / 2 + 7
-        && Math.abs(candidate.y - existing.y) < (candidate.height + existing.height) / 2 + 6);
-      if (!overlaps || candidate.forced) accepted.push(candidate);
-    }
-    const ids = accepted.map((candidate) => candidate.entity.id).sort();
-    previousSignature.current = cameraSignature;
-    if (`${visibility.level}|${[...visibility.ids].sort().join('|')}` === `${level}|${ids.join('|')}`) return;
-    setVisibility({ ids: new Set(ids), level });
-  });
-
-  return focusedVisibility ?? visibility;
-}
 
 interface LunarCameraControlSnapshot {
   enabled: boolean;
@@ -3275,17 +3161,20 @@ function Scene({
       : [],
     [activeSegment, exteriorRenderedEntities, segmentByEntity],
   );
-  const labelVisibility = useSemanticLabelVisibility({
-    entities: exteriorRenderedEntities,
-    lotByEntity,
-    extent,
-    labelsVisible: labelsVisible && !hydrologicalModeActive && !lunarCinematicActive,
-    reducedGraphics,
+  const contextualLabel = useContextualMapLabel({
     selectedEntityId,
     hoveredEntityId,
-    matchingEntityIds: presentedMatchingEntityIds,
-    filtersActive: entityFiltersActive,
+    cameraNavigating,
+    enabled: labelsVisible && !hydrologicalModeActive && !lunarCinematicActive,
   });
+  const contextualLabelEntities = useMemo(() => {
+    const ids = [contextualLabel.selectedId, contextualLabel.hoveredId].filter(
+      (id): id is string => Boolean(id),
+    );
+    if (ids.length === 0) return [];
+    return exteriorRenderedEntities.filter((entity) => ids.includes(entity.id));
+  }, [contextualLabel.hoveredId, contextualLabel.selectedId, exteriorRenderedEntities]);
+
   useEffect(() => {
     gl.shadowMap.autoUpdate = false;
     gl.shadowMap.needsUpdate = true;
@@ -3457,14 +3346,15 @@ function Scene({
           />
         </Suspense>
       ) : null}
-      {exteriorRenderedEntities.filter((entity) => labelVisibility.ids.has(entity.id)
-        && (!parkingInspectionOpen || ['PAVILHAO-09', 'D5', 'PISTA-CAMPEIRA', 'J'].includes(entity.publicIdentifier))).map((entity) => (
+      {contextualLabelEntities.filter((entity) => (
+        !parkingInspectionOpen || ['PAVILHAO-09', 'D5', 'PISTA-CAMPEIRA', 'J'].includes(entity.publicIdentifier)
+      )).map((entity) => (
         <EntityLabel
           key={`label:${entity.id}`}
           entity={entity}
           lot={lotByEntity.get(entity.id)}
-          selected={selectedEntityId === entity.id}
-          hovered={hoveredEntityId === entity.id}
+          selected={contextualLabel.selectedId === entity.id}
+          hovered={contextualLabel.hoveredId === entity.id}
           filtersActive={entityFiltersActive}
           isMatch={presentedMatchingEntityIds.has(entity.id)}
           cinematicHidden={lunarCinematicActive}
