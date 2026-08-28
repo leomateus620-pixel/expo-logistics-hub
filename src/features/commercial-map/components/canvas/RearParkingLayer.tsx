@@ -52,47 +52,30 @@ function ParkingSelection() {
   );
 }
 
-function ParkingLabels({ visible }: { visible: boolean }) {
-  const { camera, size } = useThree();
+/**
+ * Contextual only: the parking sectors and blocks never carry a permanent
+ * label. At most one hover tooltip plus the selected block/space stay visible.
+ */
+function ParkingLabels({ visible, hoveredBlockId }: { visible: boolean; hoveredBlockId: string | null }) {
   const selectedBlockId = useCommercialMapStore((state) => state.selectedParkingBlockId);
   const selectedSpaceId = useCommercialMapStore((state) => state.selectedParkingSpaceId);
   const inspectBlock = useCommercialMapStore((state) => state.inspectParkingBlock);
-  const open = useCommercialMapStore((state) => state.parkingInspectionOpen);
   const navigating = useCommercialMapStore((state) => state.cameraNavigating);
-  const [visibleIds, setVisibleIds] = useState<string[]>([]);
-  const vector = useMemo(() => new THREE.Vector3(), []);
   const selectedSpace = selectedSpaceId ? REAR_PARKING_SPACE_BY_ID.get(selectedSpaceId) : null;
   const candidates = useMemo(() => [
     ...REAR_PARKING_GROUPS.map((group) => ({ id: group.id, code: group.code, center: group.center, isGroup: true })),
     ...REAR_PARKING_BLOCKS.map((block) => ({ id: block.id, code: block.code, center: block.center, isGroup: false })),
   ], []);
-  useFrame(() => {
-    const ranked = candidates.flatMap((item) => {
-      const distance = camera.position.distanceTo(vector.set(item.center[0], 0.2, item.center[1]));
-      const detail = distance < (size.width < 640 ? 48 : 76);
-      if (item.isGroup === detail && item.id !== selectedBlockId) return [];
-      if (selectedSpace && item.id !== selectedBlockId) return [];
-      vector.project(camera);
-      if (vector.z < -1 || vector.z > 1) return [];
-      const x = (vector.x + 1) * size.width / 2;
-      const y = (1 - vector.y) * size.height / 2;
-      const bottom = open ? 156 : 40;
-      if (x < 62 || x > size.width - 62 || y < 76 || y > size.height - bottom) return [];
-      return [{ ...item, x, y, distance }];
-    }).sort((a, b) => Number(b.id === selectedBlockId) - Number(a.id === selectedBlockId) || a.distance - b.distance);
-    const accepted: typeof ranked = [];
-    for (const item of ranked) {
-      if (accepted.some((other) => Math.abs(item.x - other.x) < 100 && Math.abs(item.y - other.y) < 38)) continue;
-      accepted.push(item);
-      if (accepted.length >= (size.width < 640 ? 3 : 6)) break;
-    }
-    const ids = visible ? accepted.map((item) => item.id) : [];
-    setVisibleIds((current) => current.join('|') === ids.join('|') ? current : ids);
-  });
+  const activeIds = useMemo(() => {
+    const ids = new Set<string>();
+    if (selectedBlockId) ids.add(selectedBlockId);
+    if (!navigating && hoveredBlockId && hoveredBlockId !== selectedBlockId) ids.add(hoveredBlockId);
+    return ids;
+  }, [hoveredBlockId, navigating, selectedBlockId]);
   if (!visible) return null;
   return (
     <group name="rear-parking-screen-aligned-labels">
-      {candidates.filter((item) => visibleIds.includes(item.id)).map((item) => (
+      {candidates.filter((item) => activeIds.has(item.id)).map((item) => (
         <Html key={item.id} position={[item.center[0], 0.2, item.center[1]]} center zIndexRange={[18, 8]}>
           <button
             type="button"
@@ -120,6 +103,7 @@ function ParkingLabels({ visible }: { visible: boolean }) {
     </group>
   );
 }
+
 
 function ParkingOperations({ labelsVisible }: { labelsVisible: boolean }) {
   const { size } = useThree();
