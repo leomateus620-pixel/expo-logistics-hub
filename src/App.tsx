@@ -31,6 +31,7 @@ import {
 } from './components/venue-events/VenueRouteState';
 import LoginPage from './pages/LoginPage';
 import OAuthConsent from './pages/OAuthConsent';
+import { resolveCommissionRouteModule } from '@/modules/commissions/officialCommissionCatalog';
 import {
   getCommissionModule,
 } from './modules/commissions/commissionRegistry';
@@ -233,7 +234,7 @@ function LogisticaModuleRoutes() {
 
 function CommissionModuleRoutes() {
   const { moduleSlug } = useParams();
-  const module = getCommissionModule(moduleSlug);
+  const module = resolveCommissionRouteModule(moduleSlug);
   const mapPortal = getCommissionMapPortal(moduleSlug);
 
   if (!module) {
