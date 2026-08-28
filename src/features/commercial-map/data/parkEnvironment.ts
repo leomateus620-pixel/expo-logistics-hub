@@ -124,7 +124,7 @@ export const ARENA_FRONT_LAYOUT = {
    * construído e junto à borda norte do estacionamento de expositores.
    */
   footballField: {
-    sourceBounds: [5430, 2760, 5820, 3150] as SourceBounds,
+    sourceBounds: [5410, 2800, 5900, 3120] as SourceBounds,
     turfInset: 0.18,
     markingInset: 0.34,
     turfColor: '#7f9a5c',

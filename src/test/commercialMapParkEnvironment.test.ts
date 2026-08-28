@@ -116,7 +116,7 @@ function sourceBoundsOverlapPolygon(bounds: SourceBounds, polygon: readonly Sour
 
 describe('infraestrutura ambiental do parque', () => {
   it('mantém inventário ambiental versionado, explícito e fora das métricas comerciais', () => {
-    expect(PARK_ENVIRONMENT_REVISION).toBe('2026.7-arena-terreno-natural.1');
+    expect(PARK_ENVIRONMENT_REVISION).toBe('2026.8-arena-zoneamento.1');
     expect(PARK_ENVIRONMENT_FEATURES).toHaveLength(8);
     expect(new Set(PARK_ENVIRONMENT_FEATURES.map((feature) => feature.id)).size)
       .toBe(PARK_ENVIRONMENT_FEATURES.length);
