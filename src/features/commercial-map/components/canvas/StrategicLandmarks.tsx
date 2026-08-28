@@ -5,6 +5,7 @@ import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import type { MapEntity } from '../../types';
 import { withoutClosingPoint } from '../../utils/geometry';
 import { isMapSelectionClick } from '../../utils/interaction';
+import { LUNAR_LAUNCH_HIT_TARGET } from '../../utils/lunarLaunch';
 import { LIVESTOCK_PAVILION_RENDER_BUDGET } from '../../utils/livestockPavilion';
 import { MIRANTE_RENDER_BUDGET } from '../../utils/mirante';
 import { THIRD_AGE_PAVILION_LAYOUT } from '../../utils/thirdAgePavilion';
@@ -45,6 +46,7 @@ import {
   GATE_FOUR_DISTRICT_LAYOUT,
   resolveGateFourInteractionFootprint,
 } from '../../data/gateFourDistrict';
+import { LunarRocketLaunchRig } from './LunarRocketLaunchEffects';
 import type { CommercialMapSegmentDefinition } from '../../data/commercialMapSegments';
 import type { CommercialPavilionModuleVisualState } from '../../utils/pavilionModuleCommercial';
 
@@ -597,7 +599,8 @@ function createLocalHitVolumeGeometry(
   height: number,
   horizontalScale = 1,
 ) {
-  const geometry = new THREE.ExtrudeGeometry(createLocalFootprintShape(entity, bounds), {
+  const shape = createLocalFootprintShape(entity, bounds);
+  const geometry = new THREE.ExtrudeGeometry(shape, {
     depth: Math.max(0.2, height),
     bevelEnabled: false,
     curveSegments: 1,
@@ -3386,7 +3389,9 @@ function ApolloXIVReplica({
   height,
   materials,
   showDetail,
-}: Pick<LandmarkModelProps, 'height' | 'materials' | 'showDetail'>) {
+  sceneDiagonal,
+  onRocketSelect,
+}: Pick<LandmarkModelProps, 'height' | 'materials' | 'showDetail' | 'sceneDiagonal' | 'onRocketSelect'>) {
   const renderer = useThree((state) => state.gl);
   const atlas = useMemo(() => {
     const texture = createApolloXivAtlas();
@@ -3454,15 +3459,21 @@ function ApolloXIVReplica({
         rotation={[0, APOLLO_XIV_LAYOUT.displayYaw, 0]}
         dispose={null}
       >
-        <mesh
-          name="corpo-replica-apollo-xiv"
-          geometry={bodyGeometry}
-          material={atlasMaterial}
-          position={[0, 0.1, 0]}
-          castShadow
-          raycast={NO_RAYCAST}
-        />
-        <ScaledInstances geometry={finGeometry} material={materials.white} items={finItems} castShadow />
+        <LunarRocketLaunchRig
+          rocketHeight={replicaHeight}
+          sceneDiagonal={sceneDiagonal}
+          onSelect={onRocketSelect}
+        >
+          <mesh
+            name="corpo-replica-apollo-xiv"
+            geometry={bodyGeometry}
+            material={atlasMaterial}
+            position={[0, 0.1, 0]}
+            castShadow
+            raycast={NO_RAYCAST}
+          />
+          <ScaledInstances geometry={finGeometry} material={materials.white} items={finItems} castShadow />
+        </LunarRocketLaunchRig>
         <mesh
           name="canteiro-compartilhado-arvore-lunar-apollo-xiv"
           geometry={UNIT_BOX}
@@ -3501,6 +3512,8 @@ function LunarTree({
   height,
   materials,
   showDetail,
+  sceneDiagonal,
+  onRocketSelect,
 }: LandmarkModelProps) {
   const footprint = Math.max(bounds.width, bounds.depth);
   const trunkHeight = height * 0.52;
@@ -3580,7 +3593,13 @@ function LunarTree({
           />
         </>
       )}
-      <ApolloXIVReplica height={height} materials={materials} showDetail={showDetail} />
+      <ApolloXIVReplica
+        height={height}
+        materials={materials}
+        showDetail={showDetail}
+        sceneDiagonal={sceneDiagonal}
+        onRocketSelect={onRocketSelect}
+      />
     </group>
   );
 }
@@ -3591,6 +3610,8 @@ interface LandmarkModelProps {
   materials: LandmarkMaterialSet;
   showDetail: boolean;
   showFocusDetail: boolean;
+  sceneDiagonal: number;
+  onRocketSelect: () => void;
 }
 
 export interface StrategicLandmarkMeshProps {
@@ -3602,6 +3623,7 @@ export interface StrategicLandmarkMeshProps {
   isMatch: boolean;
   layerOpacity: number;
   cameraNavigating: boolean;
+  sceneDiagonal: number;
   hoverEnabled: boolean;
   onSelect: (id: string) => void;
   onHover: (id: string | null) => void;
@@ -3620,6 +3642,7 @@ export function StrategicLandmarkMesh({
   isMatch,
   layerOpacity,
   cameraNavigating,
+  sceneDiagonal,
   hoverEnabled,
   onSelect,
   onHover,
@@ -3631,6 +3654,7 @@ export function StrategicLandmarkMesh({
   const kind = resolveStrategicLandmarkKind(entity);
   const bounds = useMemo(() => strategicLandmarkBounds(entity), [entity]);
   const height = strategicLandmarkVisualHeight(entity) ?? entity.geometry.extrusionHeight;
+  const facingRadians = strategicLandmarkFacingRadians(entity);
   // The official A4 marker is smaller than the architectural portal. Share one
   // transient envelope across picking, hover and selection without moving its ID/label.
   const interactionEntity = useMemo<MapEntity>(() => {
@@ -3684,7 +3708,6 @@ export function StrategicLandmarkMesh({
     bounds,
     selected,
   );
-  const facingRadians = strategicLandmarkFacingRadians(entity);
   const modelBounds = useMemo(
     () => commercialPavilionModelBounds(bounds, facingRadians),
     [bounds, facingRadians],
@@ -3715,12 +3738,20 @@ export function StrategicLandmarkMesh({
 
   if (!kind) return null;
 
+  const eventIntersectsLunarRocket = (
+    event: ThreeEvent<MouseEvent | PointerEvent>,
+  ) => kind === 'lunar-tree' && event.intersections.some(
+    ({ object }) => object.name === LUNAR_LAUNCH_HIT_TARGET.objectName,
+  );
+
   const handleClick = (event: ThreeEvent<MouseEvent>) => {
+    if (eventIntersectsLunarRocket(event)) return;
     event.stopPropagation();
     if (!isMapSelectionClick(event.delta)) return;
     onSelect(entity.id);
   };
   const handleDoubleClick = (event: ThreeEvent<MouseEvent>) => {
+    if (eventIntersectsLunarRocket(event)) return;
     event.stopPropagation();
     if (!isMapSelectionClick(event.delta)) return;
     onSelect(entity.id);
@@ -3738,6 +3769,8 @@ export function StrategicLandmarkMesh({
     materials,
     showDetail,
     showFocusDetail,
+    sceneDiagonal,
+    onRocketSelect: () => onSelect(entity.id),
   };
 
   return (
@@ -3753,6 +3786,7 @@ export function StrategicLandmarkMesh({
         onDoubleClick={handleDoubleClick}
         {...(hoverEnabled ? {
           onPointerOver: (event: ThreeEvent<PointerEvent>) => {
+            if (eventIntersectsLunarRocket(event)) return;
             event.stopPropagation();
             if (cameraNavigating) return;
             onCursor('pointer');

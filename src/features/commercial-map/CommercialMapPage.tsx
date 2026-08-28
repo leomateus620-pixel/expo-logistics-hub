@@ -10,8 +10,10 @@ import {
   MapPinPlus,
   MousePointer2,
   RefreshCw,
+  Rocket,
   Ruler,
   Send,
+  SkipForward,
   Sparkles,
 } from 'lucide-react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
@@ -61,6 +63,7 @@ import {
   type CommercialMapAreaScope,
 } from './utils/areaScope';
 import { canUseTechnicalValidationOverlay } from './utils/technicalValidation';
+import { lunarLaunchPhaseLabel } from './utils/lunarLaunch';
 import type { CommercialMapData, CommercialMapQueryScope, MapPermissions } from './types';
 import './commercial-map.css';
 import './commercial-map-mobile.css';
@@ -149,6 +152,12 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
   const clearSegmentFocus = useCommercialMapStore((state) => state.clearSegmentFocus);
   const setSelectedEntityId = useCommercialMapStore((state) => state.setSelectedEntityId);
   const activateScope = useCommercialMapStore((state) => state.activateScope);
+  const lunarLaunchPhase = useCommercialMapStore((state) => state.lunarLaunchPhase);
+  const lunarLaunchReturning = useCommercialMapStore((state) => state.lunarLaunchReturning);
+  const lunarLaunchReturnAvailable = useCommercialMapStore((state) => state.lunarLaunchReturnAvailable);
+  const lunarLaunchPreviousPanel = useCommercialMapStore((state) => state.lunarLaunchPreviousPanel);
+  const requestLunarLaunchSkip = useCommercialMapStore((state) => state.requestLunarLaunchSkip);
+  const requestLunarLaunchReturn = useCommercialMapStore((state) => state.requestLunarLaunchReturn);
   const interiorBackButtonRef = useRef<HTMLButtonElement>(null);
   const lastInteriorEntityId = useRef<string | null>(null);
   const previousAreaScope = useRef<CommercialMapAreaScope>(areaScope);
@@ -160,6 +169,8 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
   const mapScopeKey = scope.mode === 'commission'
     ? `commission:${scope.commissionId}:${scope.segmentId}`
     : 'full-map';
+  const lunarLaunchActive = lunarLaunchPhase !== 'idle';
+  const lunarCinematicUiActive = lunarLaunchActive || lunarLaunchReturning;
 
   useEffect(() => {
     activateScope(mapScopeKey, lockedSegmentId);
@@ -288,7 +299,11 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
 
   useEffect(() => {
     const shortcut = (event: KeyboardEvent) => {
-      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+      if (
+        !lunarCinematicUiActive
+        && (event.metaKey || event.ctrlKey)
+        && event.key.toLowerCase() === 'k'
+      ) {
         event.preventDefault();
         const searchTarget = Array.from(
           document.querySelectorAll<HTMLInputElement>('[data-commercial-map-search]'),
@@ -299,7 +314,11 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
         )?.click();
       }
       if (event.key === 'Escape' && !event.defaultPrevented) {
-        if (interiorEntityId) exitInterior();
+        if (lunarLaunchActive) {
+          event.preventDefault();
+          event.stopPropagation();
+          requestLunarLaunchSkip();
+        } else if (interiorEntityId) exitInterior();
         else if (parkingInspectionOpen) closeParkingInspection();
         else setActivePanel(null);
       }
@@ -312,6 +331,9 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
     exitInterior,
     interiorEntityId,
     parkingInspectionOpen,
+    lunarLaunchActive,
+    lunarCinematicUiActive,
+    requestLunarLaunchSkip,
     setActivePanel,
     workspaceMode,
   ]);
@@ -468,10 +490,10 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
 
   return (
     <section
-      className={`commercial-map-shell ${isCommissionScope ? 'is-commission-scope' : ''} ${isExporural ? 'is-exporural' : ''} ${areaScope === COMMERCIAL_MAP_SEGMENT_IDS.industry ? 'is-industry' : ''} ${hydrologicalModeActive ? 'is-hydrological-mode' : ''} ${parkingInspectionOpen ? 'is-parking-inspection' : ''} ${interiorEntityId ? 'is-interior' : ''} ${interiorKind === 'commercial-pavilion' ? 'is-commercial-pavilion-interior' : ''} ${interiorKind === 'livestock-pavilion' ? 'is-livestock-interior' : ''} ${interiorKind === 'mirante-pavilion' ? 'is-mirante-interior' : ''} ${selectedEntity ? 'has-selection' : ''} ${selectedKind === 'commercial-pavilion' || selectedKind === 'livestock-pavilion' || selectedKind === 'mirante-pavilion' ? 'has-architectural-selection' : ''}`}
+      className={`commercial-map-shell ${isCommissionScope ? 'is-commission-scope' : ''} ${isExporural ? 'is-exporural' : ''} ${areaScope === COMMERCIAL_MAP_SEGMENT_IDS.industry ? 'is-industry' : ''} ${hydrologicalModeActive ? 'is-hydrological-mode' : ''} ${parkingInspectionOpen ? 'is-parking-inspection' : ''} ${interiorEntityId ? 'is-interior' : ''} ${interiorKind === 'commercial-pavilion' ? 'is-commercial-pavilion-interior' : ''} ${interiorKind === 'livestock-pavilion' ? 'is-livestock-interior' : ''} ${interiorKind === 'mirante-pavilion' ? 'is-mirante-interior' : ''} ${selectedEntity ? 'has-selection' : ''} ${selectedKind === 'commercial-pavilion' || selectedKind === 'livestock-pavilion' || selectedKind === 'mirante-pavilion' ? 'has-architectural-selection' : ''} ${lunarCinematicUiActive ? 'is-lunar-launch-active' : ''} ${lunarLaunchReturnAvailable ? 'has-lunar-launch-return' : ''}`}
       aria-label="Plataforma de gestão do mapa comercial"
     >
-      {!isCommissionScope && !interiorEntityId && workspaceMode !== 'edit' && workspaceMode !== 'create' && (
+      {!lunarCinematicUiActive && !isCommissionScope && !interiorEntityId && workspaceMode !== 'edit' && workspaceMode !== 'create' && (
         <SegmentLegend
           entities={data.entities}
           lots={data.lots}
@@ -521,6 +543,50 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
                 segmentOverride={isCommissionScope ? scopedSegment : null}
                 technicalValidationAllowed={technicalValidationAllowed}
               />
+              <div
+                className="commercial-map-lunar-launch-hud"
+                data-phase={lunarLaunchPhase}
+                aria-label={`Lançamento do Foguete Lunar: ${lunarLaunchPhaseLabel(lunarLaunchPhase)}`}
+                hidden={!lunarLaunchActive}
+              >
+                  <div className="commercial-map-lunar-launch-status" role="status" aria-live="polite">
+                    <span className="commercial-map-lunar-launch-mark" aria-hidden="true"><Rocket /></span>
+                    <span>
+                      <small>Foguete Lunar · experiência histórica</small>
+                      <strong>{lunarLaunchPhaseLabel(lunarLaunchPhase)}</strong>
+                    </span>
+                  </div>
+                  <div className="commercial-map-lunar-launch-progress" aria-hidden="true">
+                    <i />
+                  </div>
+                  <button
+                    type="button"
+                    className="commercial-map-lunar-launch-skip"
+                    onClick={requestLunarLaunchSkip}
+                    aria-label="Pular animação e restaurar a vista anterior"
+                    data-lunar-launch-skip
+                  >
+                    <SkipForward aria-hidden="true" />
+                    <span>Pular animação</span>
+                    <kbd>Esc</kbd>
+                  </button>
+              </div>
+              {lunarLaunchReturning && (
+                <div className="commercial-map-lunar-return-status" role="status" aria-live="polite">
+                  Restaurando a vista anterior…
+                </div>
+              )}
+              {lunarLaunchReturnAvailable && !lunarCinematicUiActive && (
+                <button
+                  type="button"
+                  className="commercial-map-lunar-return"
+                  onClick={requestLunarLaunchReturn}
+                  data-lunar-launch-return
+                >
+                  <ArrowLeft aria-hidden="true" />
+                  Voltar à vista anterior
+                </button>
+              )}
               {interiorEntity ? (
                 <>
                   <div
@@ -576,23 +642,25 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
                 </>
               ) : (
                 <>
-                  <CommercialMapTopBar
+                  {!lunarCinematicUiActive && <CommercialMapTopBar
                     areaScope={areaScope}
                     permissions={permissions}
                     hasSelection={Boolean(selectedEntity)}
                     isCommissionScope={isCommissionScope}
-                  />
+                  />}
 
-                  <MapToolbar
+                  {!lunarCinematicUiActive && <MapToolbar
                     permissions={permissions}
                     hasSelection={Boolean(selectedEntity)}
                     areaScope={areaScope}
                     isCommissionScope={isCommissionScope}
-                  />
-                  {hydrologicalModeActive
-                    ? <HydrologicalNetworkLegend />
-                    : <StatusLegend scope={areaScope} />}
-                  {parkingAvailable && (
+                  />}
+                  <div className="commercial-map-cinematic-legend">
+                    {hydrologicalModeActive
+                      ? <HydrologicalNetworkLegend />
+                      : <StatusLegend scope={areaScope} />}
+                  </div>
+                  {parkingAvailable && !lunarCinematicUiActive && (
                     <ParkingInspector blocks={REAR_PARKING_BLOCKS} />
                   )}
                 </>
@@ -615,7 +683,17 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
               />
             )}
             {!interiorEntityId && activePanel === 'results' && <ResultsPanel explorer={mapFilter} />}
-            {!interiorEntityId && activePanel === 'details' && selectedEntity && <EntityDetailsPanel key={selectedEntity.id} entity={selectedEntity} lot={selectedLot} entities={scopedData.entities} lots={scopedData.lots} permissions={permissions} />}
+            {!interiorEntityId
+              && selectedEntity
+              && (activePanel === 'details' || lunarLaunchPreviousPanel === 'details')
+              && (
+                <div
+                  className="commercial-map-details-panel-presence"
+                  hidden={activePanel !== 'details' || lunarCinematicUiActive}
+                >
+                  <EntityDetailsPanel key={selectedEntity.id} entity={selectedEntity} lot={selectedLot} entities={scopedData.entities} lots={scopedData.lots} permissions={permissions} />
+                </div>
+              )}
             {!interiorEntityId && activePanel === 'calibration' && <CalibrationPanel project={data.project} calibration={data.calibration} />}
           </>
         )}
