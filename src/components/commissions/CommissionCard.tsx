@@ -7,12 +7,21 @@ import {
   type CommissionStatus,
 } from '@/modules/commissions/commissionRegistry';
 import type { PortalAccessPresentation } from '@/components/portal/portalTypes';
+import CommissionPeopleStack, {
+  CommissionPersonAvatar,
+  type CommissionPerson,
+} from '@/components/commissions/CommissionPeopleStack';
 
 interface CommissionCardProps {
   access: PortalAccessPresentation;
   module: CommissionModule;
   onSelect: (moduleSlug: string) => void;
+  /** Responsável oficial da frente (fonte: Agenda Fenasoja). */
+  responsible?: CommissionPerson;
+  /** Demais integrantes vinculados à frente. */
+  members?: CommissionPerson[];
 }
+
 
 function AccessIcon({ state }: Pick<PortalAccessPresentation, 'state'>) {
   if (state === 'loading') return <Loader2 className="portal-access-icon--loading" aria-hidden="true" />;
@@ -40,7 +49,7 @@ function getCommissionVisualActionLabel(access: PortalAccessPresentation) {
   return access.label;
 }
 
-function CommissionCard({ access, module, onSelect }: CommissionCardProps) {
+function CommissionCard({ access, module, onSelect, responsible, members = [] }: CommissionCardProps) {
   const Icon = module.icon;
   const status = module.status as CommissionStatus;
   const actionLabel = getCommissionActionLabel(access);
@@ -66,6 +75,16 @@ function CommissionCard({ access, module, onSelect }: CommissionCardProps) {
             </span>
           )}
         </span>
+        {responsible && (
+          <span className="commission-access-card__people">
+            <CommissionPersonAvatar person={responsible} variant="lead" />
+            <span className="commission-access-card__lead">
+              <span className="commission-access-card__lead-name">{responsible.name}</span>
+              <span className="commission-access-card__lead-role">{responsible.role ?? 'Responsável'}</span>
+            </span>
+            <CommissionPeopleStack people={members} />
+          </span>
+        )}
         <span className="commission-access-card__footer">
           <span className="commission-access-card__action" data-state={access.state} aria-hidden="true">
             <span>{visualActionLabel}</span>
@@ -83,6 +102,7 @@ function CommissionCard({ access, module, onSelect }: CommissionCardProps) {
       </span>
     </>
   );
+
 
   if (access.target) {
     return (
@@ -122,6 +142,8 @@ export default memo(
   (previous, next) => (
     previous.module === next.module
     && previous.onSelect === next.onSelect
+    && previous.responsible === next.responsible
+    && previous.members === next.members
     && previous.access.state === next.access.state
     && previous.access.label === next.access.label
     && previous.access.detail === next.access.detail

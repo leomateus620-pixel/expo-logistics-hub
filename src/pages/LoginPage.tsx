@@ -38,6 +38,7 @@ import {
   getModuleRoute,
 } from '@/modules/commissions/commissionRegistry';
 import { getCommissionMapPortal } from '@/modules/commissions/commissionMapPortalRegistry';
+import { resolveCommissionRouteModule } from '@/modules/commissions/officialCommissionCatalog';
 import '@/styles/login-experience.css';
 import '@/styles/financial-login.css';
 
@@ -135,7 +136,7 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
     selectedSlug === 'eventos-restaurante-arena' || returnTo?.startsWith('/eventos-restaurante-arena');
   const isCommercialMapLogin = selectedSlug === 'mapa-comercial' || returnTo?.startsWith('/mapa-comercial');
   const isFinancialLogin = selectedSlug === 'financeiro-gerencial';
-  const selectedModule = getCommissionModule(selectedSlug);
+  const selectedModule = resolveCommissionRouteModule(selectedSlug) ?? getCommissionModule(selectedSlug);
   const commissionMapPortal = getCommissionMapPortal(selectedSlug);
   const isCommissionMapLogin = Boolean(commissionMapPortal);
   const isKnownSpecialLogin = isCronogramaLogin || isVenueEventsLogin || isCommercialMapLogin;

@@ -39,6 +39,14 @@ vi.mock('@/hooks/useCurrentOrg', () => ({
   useCurrentOrg: () => portalMocks.org,
 }));
 
+vi.mock('@/hooks/useCommissionPeople', () => ({
+  useCommissionPeople: () => ({
+    byUnit: new Map(),
+    memberUnitSlugs: new Set<string>(),
+    isLoading: false,
+  }),
+}));
+
 function PortalHarness() {
   const location = useLocation();
 
@@ -283,19 +291,13 @@ describe('CommissionPortalPage', () => {
     fireEvent.click(screen.getByRole('button', { name: /Comissões/ }));
 
     const commissionCards = container.querySelectorAll('[data-module]');
-    expect(commissionCards).toHaveLength(10);
-    expect(Array.from(commissionCards, (card) => card.getAttribute('data-module'))).toEqual([
-      'logistica',
-      'exporural',
-      'industria-comercio-servicos',
-      'gastronomia',
-      'infraestrutura',
-      'servicos',
-      'arte-cultura',
-      'novas-geracoes',
-      'seguranca',
-      'limpeza',
-    ]);
+    expect(commissionCards).toHaveLength(32);
+    const slugs = Array.from(commissionCards, (card) => card.getAttribute('data-module'));
+    expect(slugs).toContain('pecuaria');
+    expect(slugs).toContain('assessoria-juridica');
+    expect(slugs).not.toContain('limpeza');
+    expect(new Set(slugs).size).toBe(slugs.length);
+
     expect(container.querySelector('[data-module="logistica"]')).toBeInTheDocument();
     expect(container.querySelector('[data-module="gastronomia"]')).toBeInTheDocument();
     expect(container.querySelector('[data-module="exporural"]')).toBeInTheDocument();
@@ -313,7 +315,7 @@ describe('CommissionPortalPage', () => {
       name: 'Entrar para acessar: Indústria, Comércio e Serviços',
     })).toHaveAttribute('href', '/login/industria-comercio-servicos');
 
-    const logisticsCard = screen.getByRole('link', { name: 'Entrar para acessar: Logística' });
+    const logisticsCard = screen.getByRole('link', { name: 'Entrar para acessar: Logística, Hotelaria e Turismo' });
     expect(logisticsCard).not.toHaveTextContent('Ativo');
     expect(screen.getByRole('link', {
       name: /Entrar para acessar: Gastronomia\. Em estruturação/,
@@ -478,7 +480,7 @@ describe('CommissionPortalPage', () => {
       'href',
       '/mapa-comercial',
     );
-    expect(screen.getByRole('link', { name: 'Abrir frente: Logística' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Abrir frente: Logística, Hotelaria e Turismo' })).toHaveAttribute(
       'href',
       '/comissoes/logistica/dashboard',
     );

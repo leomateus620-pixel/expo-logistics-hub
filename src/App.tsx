@@ -31,6 +31,7 @@ import {
 } from './components/venue-events/VenueRouteState';
 import LoginPage from './pages/LoginPage';
 import OAuthConsent from './pages/OAuthConsent';
+import { resolveCommissionRouteModule, resolveOfficialUnit } from '@/modules/commissions/officialCommissionCatalog';
 import {
   getCommissionModule,
 } from './modules/commissions/commissionRegistry';
@@ -64,6 +65,7 @@ const NotFound = lazyWithRetry(() => import('./pages/NotFound'));
 const UnsubscribePage = lazyWithRetry(() => import('./pages/UnsubscribePage'));
 const CommissionPortalPage = lazyWithRetry(() => import('./pages/commissions/CommissionPortalPage'));
 const CommissionDashboardPlaceholder = lazyWithRetry(() => import('./pages/commissions/CommissionDashboardPlaceholder'));
+const CommissionFrontPage = lazyWithRetry(() => import('./pages/commissions/CommissionFrontPage'));
 const FinancialManagementPage = lazyWithRetry(() => import('./pages/commissions/FinancialManagementPage'));
 const CommissionCommercialMapPage = lazyWithRetry(() => import('./pages/commissions/CommissionCommercialMapPage'));
 const AdminPortalPage = lazyWithRetry(() => import('./pages/admin/AdminPortalPage'));
@@ -233,7 +235,9 @@ function LogisticaModuleRoutes() {
 
 function CommissionModuleRoutes() {
   const { moduleSlug } = useParams();
-  const module = getCommissionModule(moduleSlug);
+  const module = resolveCommissionRouteModule(moduleSlug);
+  const officialUnit = resolveOfficialUnit(moduleSlug);
+  const isDerivedFront = Boolean(officialUnit && !officialUnit.reusesExistingModule);
   const mapPortal = getCommissionMapPortal(moduleSlug);
 
   if (!module) {
@@ -279,6 +283,8 @@ function CommissionModuleRoutes() {
             <Suspended>
               {module.slug === 'financeiro-gerencial' ? (
                 <FinancialManagementPage module={module} />
+              ) : isDerivedFront && officialUnit ? (
+                <CommissionFrontPage module={module} entry={officialUnit.entry} />
               ) : (
                 <CommissionDashboardPlaceholder module={module} />
               )}

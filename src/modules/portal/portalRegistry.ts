@@ -9,9 +9,9 @@ import {
 import {
   getCommissionModule,
   getModuleRoute,
-  getPublicCommissionModules,
   type CommissionModule,
 } from '@/modules/commissions/commissionRegistry';
+import { getOfficialUnitGroups } from '@/modules/commissions/officialCommissionCatalog';
 
 export type PortalEntryId =
   | 'agenda-fenasoja'
@@ -88,12 +88,6 @@ if (!financeModule) {
 
 export const financePortalModule: CommissionModule = financeModule;
 
-const highlightedCommissionOrder = new Map([
-  ['logistica', 0],
-  ['exporural', 1],
-  ['industria-comercio-servicos', 2],
-]);
-
 export const portalPrimaryEntries: PortalPrimaryEntry[] = [
   {
     id: 'agenda-fenasoja',
@@ -133,21 +127,14 @@ export const portalPrimaryEntries: PortalPrimaryEntry[] = [
   },
 ];
 
-export function getPortalCommissionModules() {
-  return getPublicCommissionModules()
-    .filter((module) => module.slug !== financePortalModule.slug)
-    .sort((first, second) => {
-      const firstPosition = highlightedCommissionOrder.get(first.slug);
-      const secondPosition = highlightedCommissionOrder.get(second.slug);
-
-      if (firstPosition !== undefined || secondPosition !== undefined) {
-        return (firstPosition ?? Number.POSITIVE_INFINITY)
-          - (secondPosition ?? Number.POSITIVE_INFINITY);
-      }
-
-      return first.order - second.order;
-    });
+export function getPortalCommissionGroups() {
+  return getOfficialUnitGroups();
 }
+
+export function getPortalCommissionModules() {
+  return getOfficialUnitGroups().flatMap((group) => group.items.map((item) => item.module));
+}
+
 
 export function getCommissionLoginPath(module: CommissionModule) {
   return `/login/${module.slug}`;

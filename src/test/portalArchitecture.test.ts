@@ -3,6 +3,7 @@ import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
   financePortalModule,
+  getPortalCommissionGroups,
   getPortalCommissionModules,
   agendaFenasojaDestination,
   agendaVenueDestination,
@@ -25,9 +26,18 @@ describe('arquitetura de acesso do portal', () => {
     expect(financePortalModule.basePath).toBe('/comissoes/financeiro-gerencial');
   });
 
-  it('mantém Financeiro no registry e fora da lista visual de Comissões', () => {
-    const modules = getPortalCommissionModules();
-    expect(modules.map((module) => module.slug)).toEqual([
+  it('mantém Financeiro fora da lista visual e cobre as frentes oficiais 2028', () => {
+    const groups = getPortalCommissionGroups();
+    const [comissoes, assessorias] = groups;
+
+    expect(groups.map((group) => group.label)).toEqual(['Comissões', 'Assessorias']);
+    expect(comissoes.items).toHaveLength(26);
+    expect(assessorias.items).toHaveLength(6);
+
+    const slugs = getPortalCommissionModules().map((module) => module.slug);
+    expect(slugs).not.toContain('limpeza');
+    expect(slugs).not.toContain('financeiro-gerencial');
+    expect(slugs).toEqual(expect.arrayContaining([
       'logistica',
       'exporural',
       'industria-comercio-servicos',
@@ -37,9 +47,15 @@ describe('arquitetura de acesso do portal', () => {
       'arte-cultura',
       'novas-geracoes',
       'seguranca',
-      'limpeza',
-    ]);
-    expect(modules).not.toContain(financePortalModule);
+      'pecuaria',
+      'bilheteria',
+      'assessoria-juridica',
+      'assessoria-de-marketing',
+    ]));
+    // Nenhuma Assessoria Financeira é criada.
+    expect(slugs.some((slug) => slug.includes('financ'))).toBe(false);
+    // Sem duplicidade por nome abreviado.
+    expect(new Set(slugs).size).toBe(slugs.length);
   });
 
   it('preserva o destino e o guard do Mapa Comercial fora da apresentação de Logística', () => {
