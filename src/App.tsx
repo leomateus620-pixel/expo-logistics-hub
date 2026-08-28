@@ -65,6 +65,7 @@ const NotFound = lazyWithRetry(() => import('./pages/NotFound'));
 const UnsubscribePage = lazyWithRetry(() => import('./pages/UnsubscribePage'));
 const CommissionPortalPage = lazyWithRetry(() => import('./pages/commissions/CommissionPortalPage'));
 const CommissionDashboardPlaceholder = lazyWithRetry(() => import('./pages/commissions/CommissionDashboardPlaceholder'));
+const CommissionFrontPage = lazyWithRetry(() => import('./pages/commissions/CommissionFrontPage'));
 const FinancialManagementPage = lazyWithRetry(() => import('./pages/commissions/FinancialManagementPage'));
 const CommissionCommercialMapPage = lazyWithRetry(() => import('./pages/commissions/CommissionCommercialMapPage'));
 const AdminPortalPage = lazyWithRetry(() => import('./pages/admin/AdminPortalPage'));
