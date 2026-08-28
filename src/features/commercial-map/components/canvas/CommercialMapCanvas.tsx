@@ -77,16 +77,13 @@ import {
   type LunarLaunchMotionSample,
 } from '../../utils/lunarLaunch';
 import {
-  labelBelongsToActiveMode,
   requiresSolidRendering,
   RESTROOM_PRESENTATION_LIFT,
   resolveGateAccessMode,
-  resolveMapLabelCollisionBox,
-  resolveMapLabelCollisionCenterY,
   resolveMarkerPresentationLift,
-  resolveMapLabelMode,
-  resolveStableMapLabelVisibility,
 } from '../../utils/mapPresentation';
+import { useContextualMapLabel } from '../../hooks/useContextualMapLabel';
+
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import {
   getRearParkingFocusBounds, rearParkingVisibleInArea, rearParkingLayerPresentation,
