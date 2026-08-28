@@ -916,15 +916,15 @@ export function useCronogramaEventos() {
 
   /** Concluir o evento conclui, em cascata, os subeventos e seus itens de plano. */
   const cascadeCompletion = (event: CronogramaEvent): CronogramaEvent => {
-    if (event.status !== 'completed' || !event.subevents?.length) return event;
+    if (event.status !== 'concluido' || !event.subevents?.length) return event;
     return {
       ...event,
       subevents: event.subevents.map((subevent) => (
-        subevent.status === 'cancelled'
+        subevent.status === 'cancelado'
           ? subevent
           : {
             ...subevent,
-            status: 'completed' as const,
+            status: 'concluido' as const,
             actions: subevent.actions?.map((action) => ({ ...action, isDone: true })),
             provisions: subevent.provisions?.map((provision) => ({ ...provision, isDone: true })),
           }
