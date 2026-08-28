@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { resolveOfficialUnit } from '@/modules/commissions/officialCommissionCatalog';
 import { Link, NavLink } from 'react-router-dom';
 import { ChevronLeft, LogOut, Menu, X } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
