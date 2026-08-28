@@ -914,6 +914,24 @@ export function useCronogramaEventos() {
     });
   };
 
+  /** Concluir o evento conclui, em cascata, os subeventos e seus itens de plano. */
+  const cascadeCompletion = (event: CronogramaEvent): CronogramaEvent => {
+    if (event.status !== 'completed' || !event.subevents?.length) return event;
+    return {
+      ...event,
+      subevents: event.subevents.map((subevent) => (
+        subevent.status === 'cancelled'
+          ? subevent
+          : {
+            ...subevent,
+            status: 'completed' as const,
+            actions: subevent.actions?.map((action) => ({ ...action, isDone: true })),
+            provisions: subevent.provisions?.map((provision) => ({ ...provision, isDone: true })),
+          }
+      )),
+    };
+  };
+
   const saveEventRecord = async (
     current: CronogramaEvent,
     next: CronogramaEvent,
@@ -925,10 +943,12 @@ export function useCronogramaEventos() {
       throw new Error('A sincronização está indisponível. As alterações não foram salvas para evitar perda de dados. Tente novamente mais tarde.');
     }
 
-    const payload = toRpcEventPayload(next, orgId);
+    const target = cascadeCompletion(next);
+    const payload = toRpcEventPayload(target, orgId);
     const data = await cronogramaSaveEvent(payload, current.lockVersion ?? null);
-    return fromDbRow(data);
+    return cascadeCompletion(fromDbRow(data));
   };
+
 
   const ensurePersistedParent = async (current: CronogramaEvent, allowUnavailable = false) => {
     if (isUuid(current.id)) return current;
