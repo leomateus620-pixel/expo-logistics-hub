@@ -307,4 +307,4 @@ export function shouldRenderArenaCourts(entities: readonly MapEntity[]) {
   return hasEnvironmentAnchors(entities, ARENA_FRONT_LAYOUT.courtAnchors);
 }
 
-export const ARENA_FRONT_PRIMARY_DRAW_CALL_BUDGET = 12;
+export const ARENA_FRONT_PRIMARY_DRAW_CALL_BUDGET = 18;
