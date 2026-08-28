@@ -38,6 +38,7 @@ import {
   getModuleRoute,
 } from '@/modules/commissions/commissionRegistry';
 import { getCommissionMapPortal } from '@/modules/commissions/commissionMapPortalRegistry';
+import { resolveCommissionRouteModule } from '@/modules/commissions/officialCommissionCatalog';
 import '@/styles/login-experience.css';
 import '@/styles/financial-login.css';
 
