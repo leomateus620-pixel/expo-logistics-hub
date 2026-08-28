@@ -39,13 +39,17 @@ import {
   financePortalModule,
   getCommissionDestination,
   getCommissionLoginPath,
-  getPortalCommissionModules,
+  getPortalCommissionGroups,
   portalPrimaryEntries,
   type PortalDestination,
   type PortalEntryId,
 } from '@/modules/portal/portalRegistry';
+import { useCommissionPeople } from '@/hooks/useCommissionPeople';
+import type { OfficialUnitEntry } from '@/modules/commissions/officialCommissionCatalog';
+import { ChevronDown } from 'lucide-react';
 import '@/styles/commission-portal.css';
 import '@/styles/portal-access-navigation.css';
+import '@/styles/portal-commission-groups.css';
 
 const loadAlvoradaExperience = () => import('@/features/alvorada/FenasojaAlvoradaExperience');
 const FenasojaAlvoradaExperience = lazy(loadAlvoradaExperience);
@@ -116,9 +120,20 @@ export default function CommissionPortalPage() {
   const alvoradaSuspenseCloseRef = useRef<HTMLButtonElement>(null);
   const entryButtonRefs = useRef<Partial<Record<PortalEntryId, HTMLButtonElement | null>>>({});
   const pendingEntryPosition = useRef<{ entryId: PortalEntryId; top: number } | null>(null);
-  const commissionModules = useMemo(() => getPortalCommissionModules(), []);
+  const commissionGroups = useMemo(() => getPortalCommissionGroups(), []);
+  const { byUnit, memberUnitSlugs } = useCommissionPeople();
+  const [collapsedGroups, setCollapsedGroups] = useState<Record<string, boolean>>({});
   const accessLoading = authLoading || capabilitiesLoading || orgLoading;
-  const moduleAccessContext = { capSet, hasFullAccess, myRole };
+  const moduleAccessContext = { capSet, hasFullAccess, myRole, memberUnitSlugs };
+
+  const fallbackPeople = (entry: OfficialUnitEntry) => ({
+    responsible: {
+      id: `${entry.id}-fallback`,
+      name: entry.responsible,
+      role: entry.responsibleRole ?? 'Responsável',
+    },
+    members: [],
+  });
 
   const resolveCapabilityAccess = (destination: PortalDestination): PortalAccessPresentation => {
     if (authLoading) return loadingAccess();
@@ -430,16 +445,48 @@ export default function CommissionPortalPage() {
             >
               {entry.id === 'comissoes' && (
                 <div className="portal-commissions-panel">
-                  <div className="portal-commissions-grid" aria-label="Comissões disponíveis no portal">
-                    {commissionModules.map((module) => (
-                      <CommissionCard
-                        key={module.slug}
-                        module={module}
-                        access={resolveCommissionAccess(module)}
-                        onSelect={saveSelectedModule}
-                      />
-                    ))}
-                  </div>
+                  {commissionGroups.map((group) => {
+                    const open = !collapsedGroups[group.type];
+                    return (
+                      <section
+                        key={group.type}
+                        className="portal-commission-group"
+                        data-open={open}
+                        aria-label={group.label}
+                      >
+                        <button
+                          type="button"
+                          className="portal-commission-group__header"
+                          aria-expanded={open}
+                          onClick={() => setCollapsedGroups((current) => ({
+                            ...current,
+                            [group.type]: open,
+                          }))}
+                        >
+                          <span className="portal-commission-group__title">{group.label}</span>
+                          <span className="portal-commission-group__count">{group.items.length}</span>
+                          <ChevronDown className="portal-commission-group__chevron" aria-hidden="true" />
+                        </button>
+                        {open && (
+                          <div className="portal-commissions-grid" aria-label={`${group.label} disponíveis no portal`}>
+                            {group.items.map(({ entry: unit, module }) => {
+                              const people = byUnit.get(unit.id) ?? fallbackPeople(unit);
+                              return (
+                                <CommissionCard
+                                  key={unit.id}
+                                  module={module}
+                                  access={resolveCommissionAccess(module)}
+                                  onSelect={saveSelectedModule}
+                                  responsible={people.responsible ?? fallbackPeople(unit).responsible}
+                                  members={people.members}
+                                />
+                              );
+                            })}
+                          </div>
+                        )}
+                      </section>
+                    );
+                  })}
                 </div>
               )}
             </PortalPrimaryEntry>
