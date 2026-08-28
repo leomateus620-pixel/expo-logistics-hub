@@ -123,10 +123,6 @@ function ParkingOperations({ labelsVisible }: { labelsVisible: boolean }) {
       .slice(0, 2)
       .map((note) => note.id);
   }, [inspectionOpen, labelsVisible, operationNotes, selectedBlockId]);
-
-    const ids = accepted.map((note) => note.id);
-    setVisibleOperationIds((previous) => previous.join('|') === ids.join('|') ? previous : ids);
-  });
   const resources = useMemo(() => {
     const geometry = createParkingArrowGeometry();
     const material = new THREE.MeshStandardMaterial({ color: WHITE, roughness: 0.96, metalness: 0, polygonOffset: true, polygonOffsetFactor: -2 });
