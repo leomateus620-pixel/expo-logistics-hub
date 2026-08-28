@@ -89,7 +89,7 @@ export default function CommissionSidebar({ module, mobileOpen, onMobileOpen, on
         <FenasojaBrand compact markOnly tone="dark" />
         <div className="min-w-0 flex-1">
           <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-sidebar-foreground/50">
-            Comissão
+            {resolveOfficialUnit(module.slug)?.entry.type === 'assessoria' ? 'Assessoria' : 'Comissão'}
           </p>
           <h2 className="truncate text-base font-bold text-sidebar-foreground">{module.shortName}</h2>
         </div>
