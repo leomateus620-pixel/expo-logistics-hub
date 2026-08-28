@@ -15,6 +15,7 @@ import {
   arenaTerrainElevation,
   arenaTerrainPlateauElevation,
 } from '../../data/arenaTerrain';
+import { isArenaTerrainExcluded } from '../../data/arenaSectorZoning';
 import { getOpenGroundTexture, type OpenGroundSurface } from './openGroundTextures';
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
 
