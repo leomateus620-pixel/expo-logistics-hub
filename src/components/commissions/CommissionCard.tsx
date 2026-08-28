@@ -7,12 +7,21 @@ import {
   type CommissionStatus,
 } from '@/modules/commissions/commissionRegistry';
 import type { PortalAccessPresentation } from '@/components/portal/portalTypes';
+import CommissionPeopleStack, {
+  CommissionPersonAvatar,
+  type CommissionPerson,
+} from '@/components/commissions/CommissionPeopleStack';
 
 interface CommissionCardProps {
   access: PortalAccessPresentation;
   module: CommissionModule;
   onSelect: (moduleSlug: string) => void;
+  /** Responsável oficial da frente (fonte: Agenda Fenasoja). */
+  responsible?: CommissionPerson;
+  /** Demais integrantes vinculados à frente. */
+  members?: CommissionPerson[];
 }
+
 
 function AccessIcon({ state }: Pick<PortalAccessPresentation, 'state'>) {
   if (state === 'loading') return <Loader2 className="portal-access-icon--loading" aria-hidden="true" />;
