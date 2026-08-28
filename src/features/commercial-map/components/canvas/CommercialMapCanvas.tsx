@@ -27,7 +27,7 @@ import {
   isSelectableMapClassification,
   selectionFocusProfile,
 } from '../../utils/interaction';
-import { normalizeMapEntityMetadata, type MapLabelVisibility } from '../../utils/mapMetadata';
+import { normalizeMapEntityMetadata } from '../../utils/mapMetadata';
 import { selectCommercialTreesForScene } from '../../utils/treeLayer';
 import { selectCommercialElectricalInfrastructureForScene } from '../../utils/electricalInfrastructure';
 import { selectCommercialHydrologicalInfrastructureForScene } from '../../utils/hydrologicalInfrastructure';
