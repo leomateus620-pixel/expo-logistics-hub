@@ -206,6 +206,22 @@ function PavilionInteriorTransitionOverlay({
 }
 
 const NO_RAYCAST = () => undefined;
+const CONTEXTUAL_LABEL_POINT = new THREE.Vector3();
+/** Keeps the single contextual label anchored, but never clipped by the viewport edges. */
+function calculateContextualLabelPosition(
+  object: THREE.Object3D,
+  camera: THREE.Camera,
+  size: { width: number; height: number },
+): [number, number] {
+  CONTEXTUAL_LABEL_POINT.setFromMatrixPosition(object.matrixWorld).project(camera);
+  const x = CONTEXTUAL_LABEL_POINT.x * size.width / 2 + size.width / 2;
+  const y = -CONTEXTUAL_LABEL_POINT.y * size.height / 2 + size.height / 2;
+  const horizontalMargin = Math.min(112, size.width * 0.26);
+  return [
+    THREE.MathUtils.clamp(x, horizontalMargin, size.width - horizontalMargin),
+    THREE.MathUtils.clamp(y, 46, size.height - 12),
+  ];
+}
 const PRECISE_HOVER_CAPABLE = typeof window === 'undefined'
   || !window.matchMedia
   || window.matchMedia('(any-hover: hover) and (any-pointer: fine)').matches;
