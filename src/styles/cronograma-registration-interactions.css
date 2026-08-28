@@ -1339,7 +1339,10 @@ button.cronograma-relation-primary:hover {
   height: 2.25rem;
   border-radius: 9999px;
   object-fit: cover;
-  object-position: center 22%;
+  /* Enquadra o terço superior do retrato: rosto centralizado, sem cortar testa/queixo. */
+  object-position: 50% 18%;
+  overflow: hidden;
+  aspect-ratio: 1 / 1;
   background: hsl(var(--muted));
   border: 1px solid hsl(var(--border));
   box-shadow: 0 1px 3px rgb(15 23 42 / 0.18), inset 0 0 0 1px rgb(255 255 255 / 0.55);
