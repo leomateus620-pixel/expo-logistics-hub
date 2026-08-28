@@ -134,6 +134,9 @@ const PERSON_PHOTOS_BY_USER_ID: Record<string, string> = {
   '1538ad1e-a9da-458e-8057-d3477e25f973': vanessaGnoatto.url,
   '88093b7d-6133-44a3-bb03-5a01e9285eb2': joseMauroBarbieri.url,
   'b4960db1-9ca3-46fb-8a07-67c5efec8173': sandraLameira.url,
+  '628ab8aa-ba36-42ce-906c-77d496be2090': julioBravo.url,
+  '823f010b-c4b1-4d9f-a8c7-6d66d58f4670': elemarLenz.url,
+  'c3e01950-00ba-497a-b2b0-e13debce41e2': cristinaScheuermann.url,
 };
 
 function normalize(value: string): string {
