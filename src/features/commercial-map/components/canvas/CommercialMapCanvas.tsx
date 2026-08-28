@@ -3327,14 +3327,15 @@ function Scene({
           />
         </Suspense>
       ) : null}
-      {exteriorRenderedEntities.filter((entity) => labelVisibility.ids.has(entity.id)
-        && (!parkingInspectionOpen || ['PAVILHAO-09', 'D5', 'PISTA-CAMPEIRA', 'J'].includes(entity.publicIdentifier))).map((entity) => (
+      {contextualLabelEntities.filter((entity) => (
+        !parkingInspectionOpen || ['PAVILHAO-09', 'D5', 'PISTA-CAMPEIRA', 'J'].includes(entity.publicIdentifier)
+      )).map((entity) => (
         <EntityLabel
           key={`label:${entity.id}`}
           entity={entity}
           lot={lotByEntity.get(entity.id)}
-          selected={selectedEntityId === entity.id}
-          hovered={hoveredEntityId === entity.id}
+          selected={contextualLabel.selectedId === entity.id}
+          hovered={contextualLabel.hoveredId === entity.id}
           filtersActive={entityFiltersActive}
           isMatch={presentedMatchingEntityIds.has(entity.id)}
           cinematicHidden={lunarCinematicActive}
