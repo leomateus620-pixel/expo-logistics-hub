@@ -108,26 +108,22 @@ function ParkingLabels({ visible, hoveredBlockId }: { visible: boolean; hoveredB
 function ParkingOperations({ labelsVisible }: { labelsVisible: boolean }) {
   const { size } = useThree();
   const inspectionOpen = useCommercialMapStore((state) => state.parkingInspectionOpen);
-  const [visibleOperationIds, setVisibleOperationIds] = useState<string[]>([]);
-  const operationPosition = useMemo(() => new THREE.Vector3(), []);
+  const selectedBlockId = useCommercialMapStore((state) => state.selectedParkingBlockId);
   const operationNotes = useMemo(() => REAR_PARKING_OPERATIONS.filter((operation) => ['NO_RIGHT_TURN', 'GATE', 'BARRIER'].includes(operation.kind)), []);
-  useFrame(({ camera }) => {
-    const screenNotes = labelsVisible && inspectionOpen ? operationNotes.flatMap((operation) => {
-      operationPosition.set(operation.position[0], 0.2, operation.position[1]);
-      const distance = camera.position.distanceTo(operationPosition);
-      if (distance > 65) return [];
-      operationPosition.project(camera);
-      const x = (operationPosition.x + 1) * size.width / 2;
-      const y = (1 - operationPosition.y) * size.height / 2;
-      if (Math.abs(operationPosition.z) > 1 || x < 125 || x > size.width - 125 || y < 85 || y > size.height - 156) return [];
-      return [{ id: operation.id, x, y, distance }];
-    }).sort((a, b) => a.distance - b.distance) : [];
-    const accepted: typeof screenNotes = [];
-    for (const note of screenNotes) {
-      if (accepted.some((other) => Math.abs(note.x - other.x) < 245 && Math.abs(note.y - other.y) < 35)) continue;
-      accepted.push(note);
-      if (accepted.length === 2) break;
-    }
+  /** Operation notes are contextual: only the two closest to the inspected block. */
+  const visibleOperationIds = useMemo(() => {
+    const block = selectedBlockId ? REAR_PARKING_BLOCK_BY_ID.get(selectedBlockId) : null;
+    if (!labelsVisible || !inspectionOpen || !block) return [] as string[];
+    return operationNotes
+      .map((operation) => ({
+        id: operation.id,
+        distance: Math.hypot(operation.position[0] - block.center[0], operation.position[1] - block.center[1]),
+      }))
+      .sort((a, b) => a.distance - b.distance)
+      .slice(0, 2)
+      .map((note) => note.id);
+  }, [inspectionOpen, labelsVisible, operationNotes, selectedBlockId]);
+
     const ids = accepted.map((note) => note.id);
     setVisibleOperationIds((previous) => previous.join('|') === ids.join('|') ? previous : ids);
   });
