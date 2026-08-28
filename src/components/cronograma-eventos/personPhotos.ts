@@ -35,6 +35,9 @@ import deiseFroelich from '@/assets/person-deise-froelich.png.asset.json';
 import vanessaGnoatto from '@/assets/person-vanessa-gnoatto.png.asset.json';
 import joseMauroBarbieri from '@/assets/person-jose-mauro-barbieri.png.asset.json';
 import sandraLameira from '@/assets/person-sandra-lameira.png.asset.json';
+import julioBravo from '@/assets/person-julio-bravo.png.asset.json';
+import elemarLenz from '@/assets/person-elemar-lenz.png.asset.json';
+import cristinaScheuermann from '@/assets/person-cristina-scheuermann.png.asset.json';
 
 /**
  * Only these members have an official portrait. Everyone else keeps the
