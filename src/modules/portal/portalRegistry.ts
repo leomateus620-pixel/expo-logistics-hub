@@ -133,21 +133,14 @@ export const portalPrimaryEntries: PortalPrimaryEntry[] = [
   },
 ];
 
-export function getPortalCommissionModules() {
-  return getPublicCommissionModules()
-    .filter((module) => module.slug !== financePortalModule.slug)
-    .sort((first, second) => {
-      const firstPosition = highlightedCommissionOrder.get(first.slug);
-      const secondPosition = highlightedCommissionOrder.get(second.slug);
-
-      if (firstPosition !== undefined || secondPosition !== undefined) {
-        return (firstPosition ?? Number.POSITIVE_INFINITY)
-          - (secondPosition ?? Number.POSITIVE_INFINITY);
-      }
-
-      return first.order - second.order;
-    });
+export function getPortalCommissionGroups() {
+  return getOfficialUnitGroups();
 }
+
+export function getPortalCommissionModules() {
+  return getOfficialUnitGroups().flatMap((group) => group.items.map((item) => item.module));
+}
+
 
 export function getCommissionLoginPath(module: CommissionModule) {
   return `/login/${module.slug}`;
