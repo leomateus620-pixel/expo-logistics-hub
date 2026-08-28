@@ -9,7 +9,6 @@ import {
 import {
   getCommissionModule,
   getModuleRoute,
-  getPublicCommissionModules,
   type CommissionModule,
 } from '@/modules/commissions/commissionRegistry';
 import { getOfficialUnitGroups } from '@/modules/commissions/officialCommissionCatalog';
@@ -88,12 +87,6 @@ if (!financeModule) {
 }
 
 export const financePortalModule: CommissionModule = financeModule;
-
-const highlightedCommissionOrder = new Map([
-  ['logistica', 0],
-  ['exporural', 1],
-  ['industria-comercio-servicos', 2],
-]);
 
 export const portalPrimaryEntries: PortalPrimaryEntry[] = [
   {
