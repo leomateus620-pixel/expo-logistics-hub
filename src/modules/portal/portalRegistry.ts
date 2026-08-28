@@ -12,6 +12,7 @@ import {
   getPublicCommissionModules,
   type CommissionModule,
 } from '@/modules/commissions/commissionRegistry';
+import { getOfficialUnitGroups } from '@/modules/commissions/officialCommissionCatalog';
 
 export type PortalEntryId =
   | 'agenda-fenasoja'
