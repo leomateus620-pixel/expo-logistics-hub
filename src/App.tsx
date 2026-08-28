@@ -31,7 +31,7 @@ import {
 } from './components/venue-events/VenueRouteState';
 import LoginPage from './pages/LoginPage';
 import OAuthConsent from './pages/OAuthConsent';
-import { resolveCommissionRouteModule } from '@/modules/commissions/officialCommissionCatalog';
+import { resolveCommissionRouteModule, resolveOfficialUnit } from '@/modules/commissions/officialCommissionCatalog';
 import {
   getCommissionModule,
 } from './modules/commissions/commissionRegistry';
@@ -235,6 +235,8 @@ function LogisticaModuleRoutes() {
 function CommissionModuleRoutes() {
   const { moduleSlug } = useParams();
   const module = resolveCommissionRouteModule(moduleSlug);
+  const officialUnit = resolveOfficialUnit(moduleSlug);
+  const isDerivedFront = Boolean(officialUnit && !officialUnit.reusesExistingModule);
   const mapPortal = getCommissionMapPortal(moduleSlug);
 
   if (!module) {
@@ -280,6 +282,8 @@ function CommissionModuleRoutes() {
             <Suspended>
               {module.slug === 'financeiro-gerencial' ? (
                 <FinancialManagementPage module={module} />
+              ) : isDerivedFront && officialUnit ? (
+                <CommissionFrontPage module={module} entry={officialUnit.entry} />
               ) : (
                 <CommissionDashboardPlaceholder module={module} />
               )}
