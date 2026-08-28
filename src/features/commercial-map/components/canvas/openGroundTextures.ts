@@ -5,7 +5,12 @@ import * as THREE from 'three';
  * test drive apron). Presentation only: no official geometry, elevation or
  * commercial data is derived from here.
  */
-export type OpenGroundSurface = 'grass' | 'compactedGravel';
+export type OpenGroundSurface =
+  | 'grass'
+  | 'compactedGravel'
+  | 'pitchTurf'
+  | 'compactedSoil'
+  | 'concrete';
 
 export interface OpenGroundSurfaceProfile {
   surface: OpenGroundSurface;
@@ -268,6 +273,86 @@ function paintCompactedGravel(context: CanvasRenderingContext2D) {
 }
 
 
+
+/**
+ * Superfícies adicionais do setor da Arena. Mesmo contrato de amostragem das
+ * texturas existentes: modulação em torno de um neutro claro, macro variação de
+ * baixa frequência (sobrevive ao mipmap) e grão fino só para o zoom próximo.
+ */
+function paintPitchTurf(context: CanvasRenderingContext2D) {
+  paintGrass(context);
+  // Faixas de corte mais marcadas: leitura imediata de campo de futebol.
+  const bandWidth = Math.round(TEXTURE_SIZE / 8);
+  for (let band = 0; band < TEXTURE_SIZE; band += bandWidth * 2) {
+    context.fillStyle = 'rgba(255,255,255,.11)';
+    context.fillRect(0, band, TEXTURE_SIZE, bandWidth);
+    context.fillStyle = 'rgba(74,102,64,.12)';
+    context.fillRect(0, band + bandWidth, TEXTURE_SIZE, bandWidth);
+  }
+}
+
+function paintCompactedSoil(context: CanvasRenderingContext2D) {
+  const image = context.createImageData(TEXTURE_SIZE, TEXTURE_SIZE);
+  const dark = [150, 112, 86];
+  const light = [226, 190, 156];
+  for (let y = 0; y < TEXTURE_SIZE; y += 1) {
+    for (let x = 0; x < TEXTURE_SIZE; x += 1) {
+      const offset = (y * TEXTURE_SIZE + x) * 4;
+      const macro = fractalNoise(x / (TEXTURE_SIZE * 0.39), y / (TEXTURE_SIZE * 0.39), 12.7, 2);
+      const patch = fractalNoise(x / (TEXTURE_SIZE * 0.118), y / (TEXTURE_SIZE * 0.118), 29.3, 3);
+      const grain = seededNoise(x, y, 8.8) - 0.5;
+      const blend = THREE.MathUtils.clamp(patch * 0.58 + (macro - 0.5) * 0.9 + 0.26 + grain * 0.24, 0, 1);
+      image.data[offset] = dark[0] + (light[0] - dark[0]) * blend;
+      image.data[offset + 1] = dark[1] + (light[1] - dark[1]) * blend;
+      image.data[offset + 2] = dark[2] + (light[2] - dark[2]) * blend;
+      image.data[offset + 3] = 255;
+    }
+  }
+  context.putImageData(image, 0, 0);
+  for (let index = 0; index < 420; index += 1) {
+    const x = seededNoise(index, 5.2, 14.1) * TEXTURE_SIZE;
+    const y = seededNoise(index, 11.4, 2.9) * TEXTURE_SIZE;
+    if (fractalNoise(x / (TEXTURE_SIZE * 0.21), y / (TEXTURE_SIZE * 0.21), 41.9, 2) < 0.58) continue;
+    context.strokeStyle = 'rgba(140,162,116,.42)';
+    context.lineWidth = 1;
+    context.beginPath();
+    context.moveTo(x, y);
+    context.lineTo(x + (seededNoise(index, 3.7, 6.1) - 0.5) * 2.2, y - 2 - seededNoise(index, 9.3, 4.7) * 3.2);
+    context.stroke();
+  }
+}
+
+function paintConcrete(context: CanvasRenderingContext2D) {
+  const image = context.createImageData(TEXTURE_SIZE, TEXTURE_SIZE);
+  const dark = [168, 166, 160];
+  const light = [232, 230, 222];
+  for (let y = 0; y < TEXTURE_SIZE; y += 1) {
+    for (let x = 0; x < TEXTURE_SIZE; x += 1) {
+      const offset = (y * TEXTURE_SIZE + x) * 4;
+      const macro = fractalNoise(x / (TEXTURE_SIZE * 0.44), y / (TEXTURE_SIZE * 0.44), 3.9, 2);
+      const grain = seededNoise(x, y, 19.6) - 0.5;
+      const blend = THREE.MathUtils.clamp((macro - 0.5) * 1.05 + 0.5 + grain * 0.2, 0, 1);
+      image.data[offset] = dark[0] + (light[0] - dark[0]) * blend;
+      image.data[offset + 1] = dark[1] + (light[1] - dark[1]) * blend;
+      image.data[offset + 2] = dark[2] + (light[2] - dark[2]) * blend;
+      image.data[offset + 3] = 255;
+    }
+  }
+  context.putImageData(image, 0, 0);
+  // Juntas de dilatação: baixa frequência, legíveis de longe sem cintilar.
+  context.strokeStyle = 'rgba(126,124,118,.45)';
+  context.lineWidth = 1.4;
+  const jointSpacing = Math.round(TEXTURE_SIZE / 4);
+  for (let position = jointSpacing; position < TEXTURE_SIZE; position += jointSpacing) {
+    context.beginPath();
+    context.moveTo(position, 0);
+    context.lineTo(position, TEXTURE_SIZE);
+    context.moveTo(0, position);
+    context.lineTo(TEXTURE_SIZE, position);
+    context.stroke();
+  }
+}
+
 const TEXTURE_CACHE = new Map<OpenGroundSurface, THREE.CanvasTexture | null>();
 
 /**
@@ -290,6 +375,9 @@ export function getOpenGroundTexture(surface: OpenGroundSurface): THREE.CanvasTe
     return null;
   }
   if (surface === 'grass') paintGrass(context);
+  else if (surface === 'pitchTurf') paintPitchTurf(context);
+  else if (surface === 'compactedSoil') paintCompactedSoil(context);
+  else if (surface === 'concrete') paintConcrete(context);
   else paintCompactedGravel(context);
 
   const texture = new THREE.CanvasTexture(canvas);

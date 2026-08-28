@@ -116,8 +116,8 @@ function sourceBoundsOverlapPolygon(bounds: SourceBounds, polygon: readonly Sour
 
 describe('infraestrutura ambiental do parque', () => {
   it('mantém inventário ambiental versionado, explícito e fora das métricas comerciais', () => {
-    expect(PARK_ENVIRONMENT_REVISION).toBe('2026.6-arena-quadra-r.1');
-    expect(PARK_ENVIRONMENT_FEATURES).toHaveLength(5);
+    expect(PARK_ENVIRONMENT_REVISION).toBe('2026.7-arena-terreno-natural.1');
+    expect(PARK_ENVIRONMENT_FEATURES).toHaveLength(8);
     expect(new Set(PARK_ENVIRONMENT_FEATURES.map((feature) => feature.id)).size)
       .toBe(PARK_ENVIRONMENT_FEATURES.length);
     expect(new Set(PARK_ENVIRONMENT_FEATURES.map((feature) => feature.classification))).toEqual(new Set([
@@ -125,6 +125,9 @@ describe('infraestrutura ambiental do parque', () => {
       'CONCRETE_STAIRS',
       'SPORTS_COURT',
       'LANDSCAPE_FEATURE',
+      'NATURAL_TERRAIN',
+      'SPORTS_FIELD',
+      'PEDESTRIAN_PATH',
     ]));
     PARK_ENVIRONMENT_FEATURES.forEach((feature) => {
       expect(feature.isSellable, feature.id).toBe(false);
@@ -224,9 +227,9 @@ describe('infraestrutura ambiental do parque', () => {
     const primaryDrawCalls = (renderer.match(/<(?:mesh|instancedMesh|lineSegments)\b/g) ?? []).length;
     const metalPasses = (renderer.match(/<MetalInfrastructure\b/g) ?? []).length;
     const fullSceneDrawCalls = primaryDrawCalls + metalPasses - 1;
-    expect(ARENA_FRONT_PRIMARY_DRAW_CALL_BUDGET).toBe(12);
-    expect(primaryDrawCalls).toBe(10);
-    expect(fullSceneDrawCalls).toBe(11);
+    expect(ARENA_FRONT_PRIMARY_DRAW_CALL_BUDGET).toBe(18);
+    expect(primaryDrawCalls).toBe(16);
+    expect(fullSceneDrawCalls).toBe(17);
     expect(fullSceneDrawCalls).toBeLessThanOrEqual(ARENA_FRONT_PRIMARY_DRAW_CALL_BUDGET);
     expect(renderer.match(/<instancedMesh/g)?.length).toBeGreaterThanOrEqual(5);
     expect(renderer).toContain('degraus-concreto-arena');
