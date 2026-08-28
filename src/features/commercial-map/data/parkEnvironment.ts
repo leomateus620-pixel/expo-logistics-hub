@@ -255,7 +255,7 @@ export const PARK_ENVIRONMENT_FEATURES: readonly ParkEnvironmentFeature[] = [
     sourceBounds: ARENA_FRONT_LAYOUT.terrain.sourceBounds,
     sourceReferences: ARENA_FRONT_SOURCE_REFERENCES,
     verificationStatus: 'FIELD_REVIEW_RECOMMENDED',
-    notes: 'Malha contínua com descida oeste-leste; substitui a antiga superfície branca plana sem alterar lotes, ruas ou a Arena.',
+    notes: 'Malha contínua com descida oeste-leste, estendida às laterais e ao fundo da Arena; recortada contra concreto, quadras, vias, estacionamento e campo, sem alterar lotes, ruas ou a Arena.',
   },
   {
     id: 'arena-front-football-field',
@@ -266,7 +266,7 @@ export const PARK_ENVIRONMENT_FEATURES: readonly ParkEnvironmentFeature[] = [
     sourceBounds: ARENA_FRONT_LAYOUT.footballField.sourceBounds,
     sourceReferences: ARENA_FRONT_SOURCE_REFERENCES,
     verificationStatus: 'FIELD_REVIEW_RECOMMENDED',
-    notes: 'Campo de grama natural a noroeste da praça, com bordas desgastadas; apresentação, nunca lote comercial.',
+    notes: 'Campo de grama natural atrás/ao lado da Arena, junto à borda norte do estacionamento de expositores; apresentação, nunca lote comercial.',
   },
   {
     id: 'arena-front-pedestrian-paths',
@@ -274,10 +274,10 @@ export const PARK_ENVIRONMENT_FEATURES: readonly ParkEnvironmentFeature[] = [
     classification: 'PEDESTRIAN_PATH',
     isSellable: false,
     contributesToCommercialMetrics: false,
-    sourceBounds: [4270, 2420, 4890, 3130],
+    sourceBounds: [4480, 2480, 5860, 3260],
     sourceReferences: ARENA_FRONT_SOURCE_REFERENCES,
     verificationStatus: 'FIELD_REVIEW_RECOMMENDED',
-    notes: 'Ligações entre escadaria, quadras, campo e apron da Arena conforme os anexos.',
+    notes: 'Ligações entre escadaria, quadras, apron da Arena, campo e estacionamento conforme os anexos.',
   },
 ];
 
