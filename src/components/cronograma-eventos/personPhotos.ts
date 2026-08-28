@@ -20,6 +20,12 @@ import germanoButtow from '@/assets/person-germano-buttow.png.asset.json';
 import darioGermano from '@/assets/person-dario-germano.png.asset.json';
 import cleoRockenbach from '@/assets/person-cleo-rockenbach.png.asset.json';
 import marcosServat from '@/assets/person-marcos-servat.jpeg.asset.json';
+import robertoSteffen from '@/assets/person-roberto-steffen.png.asset.json';
+import felipeBortoli from '@/assets/person-felipe-bortoli.png.asset.json';
+import valtairDornelles from '@/assets/person-valtair-dornelles.png.asset.json';
+import elisandraSimaoReis from '@/assets/person-elisandra-simao-reis.png.asset.json';
+import alexandreDallagnese from '@/assets/person-alexandre-dallagnese.png.asset.json';
+import zeliaSavoldi from '@/assets/person-zelia-savoldi.png.asset.json';
 
 /**
  * Only these members have an official portrait. Everyone else keeps the
