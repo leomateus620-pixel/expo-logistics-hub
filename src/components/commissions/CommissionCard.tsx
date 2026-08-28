@@ -142,6 +142,8 @@ export default memo(
   (previous, next) => (
     previous.module === next.module
     && previous.onSelect === next.onSelect
+    && previous.responsible === next.responsible
+    && previous.members === next.members
     && previous.access.state === next.access.state
     && previous.access.label === next.access.label
     && previous.access.detail === next.access.detail
