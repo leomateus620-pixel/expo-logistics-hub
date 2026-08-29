@@ -176,6 +176,20 @@ export function buildRearTreeInstances(reducedGraphics = false): RearTreeInstanc
         continue;
       }
 
+      // Bordas suavizadas: a densidade cai perto do limite da mancha, para a
+      // vegetação acompanhar o relevo e as margens em vez de formar um bloco
+      // verde retangular.
+      const featherX = Math.min(
+        (sourceX - cluster.sourceBounds[0]) / 260,
+        (cluster.sourceBounds[2] - sourceX) / 260,
+      );
+      const featherY = Math.min(
+        (sourceY - cluster.sourceBounds[1]) / 200,
+        (cluster.sourceBounds[3] - sourceY) / 200,
+      );
+      const feather = Math.max(0.12, Math.min(1, Math.min(featherX, featherY)));
+      if (random() > feather) continue;
+
       const local = officialPdfPointToLocal([sourceX, sourceY]);
       const clear = corridors.every(
         (corridor) => distanceToPath(local, corridor.path) > corridor.halfWidth + 0.55,
