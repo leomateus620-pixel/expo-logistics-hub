@@ -3257,6 +3257,7 @@ function Scene({
             vegetationVisible={treesVisible}
           />
           <RearParkRoadNetwork reducedGraphics={reducedGraphics} />
+          <RearParkGate5 reducedGraphics={reducedGraphics} />
         </>
       )}
       {rearParkingEnabled && (
