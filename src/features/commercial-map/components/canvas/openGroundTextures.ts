@@ -7,6 +7,8 @@ import * as THREE from 'three';
  */
 export type OpenGroundSurface =
   | 'grass'
+  | 'landscapeGrass'
+  | 'parkingGrassDryMix'
   | 'compactedGravel'
   | 'pitchTurf'
   | 'compactedSoil'
@@ -22,6 +24,8 @@ export interface OpenGroundSurfaceProfile {
   /** Stable material fallback while the procedural map is unavailable. */
   baseColor: string;
   roughness: number;
+  /** Optional visible top used by presentation-only ground treatments. */
+  presentationHeight?: number;
 }
 
 export const TEXTURED_OPEN_GROUND: Readonly<Record<string, OpenGroundSurfaceProfile>> = Object.freeze({
@@ -38,6 +42,20 @@ export const TEXTURED_OPEN_GROUND: Readonly<Record<string, OpenGroundSurfaceProf
     tileWorldSize: 9,
     baseColor: '#b39a78',
     roughness: 0.94,
+  }),
+  'EST-EXP-VIS': Object.freeze({
+    surface: 'parkingGrassDryMix',
+    tileWorldSize: 8.5,
+    baseColor: '#899761',
+    roughness: 0.98,
+    presentationHeight: 0.06,
+  }),
+  'EST-VIS': Object.freeze({
+    surface: 'parkingGrassDryMix',
+    tileWorldSize: 8.5,
+    baseColor: '#899761',
+    roughness: 0.98,
+    presentationHeight: 0.06,
   }),
 });
 
@@ -62,6 +80,9 @@ export const OPEN_GROUND_TEXTURE_SAMPLING_POLICY = Object.freeze({
   minFilter: THREE.LinearMipmapLinearFilter,
   magFilter: THREE.LinearFilter,
   maxAnisotropy: 16,
+  /** Data maps need less oblique filtering than the visible albedo. */
+  maxDataAnisotropy: 8,
+  dataColorSpace: THREE.NoColorSpace,
 });
 
 export function resolveOpenGroundTextureSampling(
@@ -140,7 +161,7 @@ function fractalNoise(x: number, y: number, seed: number, octaves = 3) {
  * what the GPU shows at park-wide zoom — still resolves to the field's real
  * colour instead of a washed out grey.
  */
-function paintGrass(context: CanvasRenderingContext2D) {
+function paintGrass(context: CanvasRenderingContext2D, mowingBands = true) {
   const image = context.createImageData(TEXTURE_SIZE, TEXTURE_SIZE);
   const deep = [128, 152, 118];
   const light = [226, 238, 208];
@@ -192,13 +213,98 @@ function paintGrass(context: CanvasRenderingContext2D) {
     context.stroke();
   }
 
-  // Wide mowing bands: low frequency, so they stay legible when zoomed out.
-  const mowingBandWidth = Math.round(TEXTURE_SIZE / 6);
-  for (let band = 0; band < TEXTURE_SIZE; band += mowingBandWidth * 2) {
-    context.fillStyle = 'rgba(255,255,255,.075)';
-    context.fillRect(0, band, TEXTURE_SIZE, mowingBandWidth);
-    context.fillStyle = 'rgba(96,116,92,.075)';
-    context.fillRect(0, band + mowingBandWidth, TEXTURE_SIZE, mowingBandWidth);
+  if (mowingBands) {
+    // Wide mowing bands are meaningful on maintained fields, but are omitted
+    // from the park-wide landscape surface to avoid a repeated striped plane.
+    const mowingBandWidth = Math.round(TEXTURE_SIZE / 6);
+    for (let band = 0; band < TEXTURE_SIZE; band += mowingBandWidth * 2) {
+      context.fillStyle = 'rgba(255,255,255,.075)';
+      context.fillRect(0, band, TEXTURE_SIZE, mowingBandWidth);
+      context.fillStyle = 'rgba(96,116,92,.075)';
+      context.fillRect(0, band + mowingBandWidth, TEXTURE_SIZE, mowingBandWidth);
+    }
+  }
+}
+
+function paintLandscapeGrass(context: CanvasRenderingContext2D) {
+  paintGrass(context, false);
+
+  // Large, soft variation breaks tiling at overview distance without turning
+  // the terrain into decorative patches or introducing directional stripes.
+  for (let index = 0; index < 12; index += 1) {
+    const x = seededNoise(index, 5.7, 18.2) * TEXTURE_SIZE;
+    const y = seededNoise(index, 2.4, 41.6) * TEXTURE_SIZE;
+    const radius = TEXTURE_SIZE * (0.08 + seededNoise(index, 8.1, 13.9) * 0.14);
+    const patch = context.createRadialGradient(x, y, 0, x, y, radius);
+    patch.addColorStop(0, index % 3 === 0
+      ? 'rgba(220,211,166,.065)'
+      : 'rgba(92,126,88,.055)');
+    patch.addColorStop(1, 'rgba(128,150,112,0)');
+    context.fillStyle = patch;
+    context.fillRect(x - radius, y - radius, radius * 2, radius * 2);
+  }
+}
+
+/**
+ * Estacionamentos oficiais gramados: a leitura predominante continua verde,
+ * mas faixas compactadas e pequenas regiões secas registram o uso por veículos
+ * sem transformar as vagas em uma placa de asfalto ou em um gramado ornamental.
+ */
+function paintParkingGrassDryMix(context: CanvasRenderingContext2D) {
+  const image = context.createImageData(TEXTURE_SIZE, TEXTURE_SIZE);
+  const green = [164, 184, 126];
+  const deep = [113, 137, 91];
+  const dry = [218, 202, 151];
+  const soil = [174, 151, 112];
+
+  for (let y = 0; y < TEXTURE_SIZE; y += 1) {
+    for (let x = 0; x < TEXTURE_SIZE; x += 1) {
+      const offset = (y * TEXTURE_SIZE + x) * 4;
+      const macro = fractalNoise(x / (TEXTURE_SIZE * 0.36), y / (TEXTURE_SIZE * 0.36), 52.7, 2);
+      const patch = fractalNoise(x / (TEXTURE_SIZE * 0.11), y / (TEXTURE_SIZE * 0.11), 17.6, 3);
+      const dryPatch = THREE.MathUtils.smoothstep(
+        fractalNoise(x / (TEXTURE_SIZE * 0.27), y / (TEXTURE_SIZE * 0.27), 71.4, 2),
+        0.54,
+        0.78,
+      );
+      const trackPhase = Math.abs(((y / TEXTURE_SIZE) * 3.15) % 1 - 0.5) * 2;
+      const compaction = THREE.MathUtils.smoothstep(1 - trackPhase, 0.45, 0.86)
+        * (0.18 + macro * 0.2);
+      const grain = seededNoise(x, y, 37.2) - 0.5;
+      const greenBlend = THREE.MathUtils.clamp(
+        0.28 + patch * 0.58 + (macro - 0.5) * 0.48 + grain * 0.12,
+        0,
+        1,
+      );
+      const baseR = deep[0] + (green[0] - deep[0]) * greenBlend;
+      const baseG = deep[1] + (green[1] - deep[1]) * greenBlend;
+      const baseB = deep[2] + (green[2] - deep[2]) * greenBlend;
+      const dryMix = dryPatch * 0.5;
+      const compactMix = THREE.MathUtils.clamp(compaction + dryPatch * 0.09, 0, 0.48);
+      const dryR = baseR + (dry[0] - baseR) * dryMix;
+      const dryG = baseG + (dry[1] - baseG) * dryMix;
+      const dryB = baseB + (dry[2] - baseB) * dryMix;
+      image.data[offset] = THREE.MathUtils.clamp(dryR + (soil[0] - dryR) * compactMix, 0, 255);
+      image.data[offset + 1] = THREE.MathUtils.clamp(dryG + (soil[1] - dryG) * compactMix, 0, 255);
+      image.data[offset + 2] = THREE.MathUtils.clamp(dryB + (soil[2] - dryB) * compactMix, 0, 255);
+      image.data[offset + 3] = 255;
+    }
+  }
+  context.putImageData(image, 0, 0);
+
+  // Poucas fibras curtas dão escala no zoom próximo e desaparecem nos mipmaps.
+  context.lineWidth = 1;
+  for (let index = 0; index < 620; index += 1) {
+    const x = seededNoise(index, 8.3, 19.7) * TEXTURE_SIZE;
+    const y = seededNoise(index, 1.9, 46.2) * TEXTURE_SIZE;
+    const length = 1.8 + seededNoise(index, 6.7, 12.5) * 3.2;
+    context.strokeStyle = seededNoise(index, 4.4, 31.9) > 0.48
+      ? 'rgba(226,232,190,.24)'
+      : 'rgba(100,126,82,.26)';
+    context.beginPath();
+    context.moveTo(x, y);
+    context.lineTo(x + (seededNoise(index, 2.1, 8.6) - 0.5) * 1.8, y - length);
+    context.stroke();
   }
 }
 
@@ -356,7 +462,189 @@ function paintConcrete(context: CanvasRenderingContext2D) {
   }
 }
 
-const TEXTURE_CACHE = new Map<OpenGroundSurface, THREE.CanvasTexture | null>();
+function surfaceDetailSample(surface: OpenGroundSurface, x: number, y: number) {
+  const macro = fractalNoise(
+    x / (TEXTURE_SIZE * 0.18),
+    y / (TEXTURE_SIZE * 0.18),
+    61.3 + surface.length,
+    2,
+  );
+  const grain = seededNoise(x, y, 23.8 + surface.length);
+  const fine = seededNoise(x * 3.7, y * 3.7, 91.2 - surface.length);
+
+  if (surface === 'concrete') {
+    return { height: macro * 0.28 + grain * 0.12, roughness: 0.82 + fine * 0.1, strength: 1.2 };
+  }
+  if (surface === 'highwayAsphalt') {
+    return { height: macro * 0.2 + grain * 0.22, roughness: 0.82 + fine * 0.12, strength: 1.45 };
+  }
+  if (surface === 'parkAsphalt') {
+    return { height: macro * 0.24 + grain * 0.25, roughness: 0.84 + fine * 0.12, strength: 1.55 };
+  }
+  if (surface === 'pitchTurf') {
+    return { height: macro * 0.45 + grain * 0.31, roughness: 0.9 + fine * 0.08, strength: 2.25 };
+  }
+  if (surface === 'grass' || surface === 'landscapeGrass') {
+    return { height: macro * 0.5 + grain * 0.35, roughness: 0.91 + fine * 0.075, strength: 2.4 };
+  }
+  if (surface === 'parkingGrassDryMix') {
+    const track = Math.abs(((y / TEXTURE_SIZE) * 3.15) % 1 - 0.5) * 2;
+    const compacted = THREE.MathUtils.smoothstep(1 - track, 0.45, 0.86);
+    return {
+      height: macro * (0.49 - compacted * 0.13) + grain * (0.31 - compacted * 0.08),
+      roughness: 0.91 + fine * 0.07 + compacted * 0.012,
+      strength: 2.15,
+    };
+  }
+  if (surface === 'compactedSoil') {
+    return { height: macro * 0.38 + grain * 0.3, roughness: 0.9 + fine * 0.085, strength: 2 };
+  }
+  if (surface === 'roadShoulder') {
+    return { height: macro * 0.4 + grain * 0.4, roughness: 0.92 + fine * 0.07, strength: 2.35 };
+  }
+  return { height: macro * 0.42 + grain * 0.42, roughness: 0.91 + fine * 0.08, strength: 2.55 };
+}
+
+function paintSurfaceDetailMaps(
+  surface: OpenGroundSurface,
+  normalContext: CanvasRenderingContext2D,
+  roughnessContext: CanvasRenderingContext2D,
+) {
+  const pixelCount = TEXTURE_SIZE * TEXTURE_SIZE;
+  const heights = new Float32Array(pixelCount);
+  const roughnessValues = new Float32Array(pixelCount);
+  let normalStrength = 1;
+
+  for (let y = 0; y < TEXTURE_SIZE; y += 1) {
+    for (let x = 0; x < TEXTURE_SIZE; x += 1) {
+      const index = y * TEXTURE_SIZE + x;
+      const detail = surfaceDetailSample(surface, x, y);
+      heights[index] = detail.height;
+      roughnessValues[index] = detail.roughness;
+      normalStrength = detail.strength;
+    }
+  }
+
+  const normalImage = normalContext.createImageData(TEXTURE_SIZE, TEXTURE_SIZE);
+  const roughnessImage = roughnessContext.createImageData(TEXTURE_SIZE, TEXTURE_SIZE);
+  const wrappedIndex = (x: number, y: number) => (
+    ((y + TEXTURE_SIZE) % TEXTURE_SIZE) * TEXTURE_SIZE
+    + ((x + TEXTURE_SIZE) % TEXTURE_SIZE)
+  );
+
+  for (let y = 0; y < TEXTURE_SIZE; y += 1) {
+    for (let x = 0; x < TEXTURE_SIZE; x += 1) {
+      const index = y * TEXTURE_SIZE + x;
+      const offset = index * 4;
+      const dx = (heights[wrappedIndex(x - 1, y)] - heights[wrappedIndex(x + 1, y)])
+        * normalStrength;
+      const dy = (heights[wrappedIndex(x, y - 1)] - heights[wrappedIndex(x, y + 1)])
+        * normalStrength;
+      const inverseLength = 1 / Math.hypot(dx, dy, 1);
+      normalImage.data[offset] = THREE.MathUtils.clamp((dx * inverseLength * 0.5 + 0.5) * 255, 0, 255);
+      normalImage.data[offset + 1] = THREE.MathUtils.clamp((dy * inverseLength * 0.5 + 0.5) * 255, 0, 255);
+      normalImage.data[offset + 2] = THREE.MathUtils.clamp((inverseLength * 0.5 + 0.5) * 255, 0, 255);
+      normalImage.data[offset + 3] = 255;
+
+      const roughness = THREE.MathUtils.clamp(roughnessValues[index], 0, 1) * 255;
+      roughnessImage.data[offset] = roughness;
+      roughnessImage.data[offset + 1] = roughness;
+      roughnessImage.data[offset + 2] = roughness;
+      roughnessImage.data[offset + 3] = 255;
+    }
+  }
+
+  normalContext.putImageData(normalImage, 0, 0);
+  roughnessContext.putImageData(roughnessImage, 0, 0);
+}
+
+export interface OpenGroundTextureBundle {
+  /** Base-color map; this is the compatibility map returned by the old API. */
+  readonly map: THREE.CanvasTexture;
+  readonly normalMap: THREE.CanvasTexture;
+  readonly roughnessMap: THREE.CanvasTexture;
+  /** Idempotently releases only this entity's clones, never the shared source. */
+  dispose: () => void;
+}
+
+interface OpenGroundTextureSources {
+  readonly map: THREE.CanvasTexture;
+  readonly normalMap: THREE.CanvasTexture;
+  readonly roughnessMap: THREE.CanvasTexture;
+}
+
+const TEXTURE_CACHE = new Map<OpenGroundSurface, OpenGroundTextureSources | null>();
+
+function configureSharedTexture(
+  texture: THREE.CanvasTexture,
+  colorSpace: THREE.ColorSpace,
+  anisotropy: number,
+) {
+  texture.wrapS = OPEN_GROUND_TEXTURE_SAMPLING_POLICY.wrapS;
+  texture.wrapT = OPEN_GROUND_TEXTURE_SAMPLING_POLICY.wrapT;
+  texture.colorSpace = colorSpace;
+  texture.generateMipmaps = OPEN_GROUND_TEXTURE_SAMPLING_POLICY.generateMipmaps;
+  texture.minFilter = OPEN_GROUND_TEXTURE_SAMPLING_POLICY.minFilter;
+  texture.magFilter = OPEN_GROUND_TEXTURE_SAMPLING_POLICY.magFilter;
+  texture.anisotropy = anisotropy;
+  texture.needsUpdate = true;
+  return texture;
+}
+
+function getOpenGroundTextureSources(surface: OpenGroundSurface): OpenGroundTextureSources | null {
+  if (TEXTURE_CACHE.has(surface)) return TEXTURE_CACHE.get(surface) ?? null;
+  if (typeof document === 'undefined') {
+    TEXTURE_CACHE.set(surface, null);
+    return null;
+  }
+
+  const canvases = Array.from({ length: 3 }, () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = TEXTURE_SIZE;
+    canvas.height = TEXTURE_SIZE;
+    return canvas;
+  });
+  const [albedoCanvas, normalCanvas, roughnessCanvas] = canvases;
+  const albedoContext = albedoCanvas.getContext('2d');
+  const normalContext = normalCanvas.getContext('2d');
+  const roughnessContext = roughnessCanvas.getContext('2d');
+  if (!albedoContext || !normalContext || !roughnessContext) {
+    TEXTURE_CACHE.set(surface, null);
+    return null;
+  }
+
+  if (surface === 'grass') paintGrass(albedoContext);
+  else if (surface === 'landscapeGrass') paintLandscapeGrass(albedoContext);
+  else if (surface === 'parkingGrassDryMix') paintParkingGrassDryMix(albedoContext);
+  else if (surface === 'pitchTurf') paintPitchTurf(albedoContext);
+  else if (surface === 'compactedSoil') paintCompactedSoil(albedoContext);
+  else if (surface === 'concrete') paintConcrete(albedoContext);
+  else if (surface === 'highwayAsphalt') paintAsphalt(albedoContext, 'highway');
+  else if (surface === 'parkAsphalt') paintAsphalt(albedoContext, 'park');
+  else if (surface === 'roadShoulder') paintRoadShoulder(albedoContext);
+  else paintCompactedGravel(albedoContext);
+  paintSurfaceDetailMaps(surface, normalContext, roughnessContext);
+
+  const sources = Object.freeze({
+    map: configureSharedTexture(
+      new THREE.CanvasTexture(albedoCanvas),
+      OPEN_GROUND_TEXTURE_SAMPLING_POLICY.colorSpace,
+      OPEN_GROUND_TEXTURE_SAMPLING_POLICY.maxAnisotropy,
+    ),
+    normalMap: configureSharedTexture(
+      new THREE.CanvasTexture(normalCanvas),
+      OPEN_GROUND_TEXTURE_SAMPLING_POLICY.dataColorSpace,
+      OPEN_GROUND_TEXTURE_SAMPLING_POLICY.maxDataAnisotropy,
+    ),
+    roughnessMap: configureSharedTexture(
+      new THREE.CanvasTexture(roughnessCanvas),
+      OPEN_GROUND_TEXTURE_SAMPLING_POLICY.dataColorSpace,
+      OPEN_GROUND_TEXTURE_SAMPLING_POLICY.maxDataAnisotropy,
+    ),
+  });
+  TEXTURE_CACHE.set(surface, sources);
+  return sources;
+}
 
 /**
  * Cached and shared across meshes: these fields are static presentation
@@ -364,47 +652,32 @@ const TEXTURE_CACHE = new Map<OpenGroundSurface, THREE.CanvasTexture | null>();
  * consumers.
  */
 export function getOpenGroundTexture(surface: OpenGroundSurface): THREE.CanvasTexture | null {
-  if (TEXTURE_CACHE.has(surface)) return TEXTURE_CACHE.get(surface) ?? null;
-  if (typeof document === 'undefined') {
-    TEXTURE_CACHE.set(surface, null);
-    return null;
-  }
-  const canvas = document.createElement('canvas');
-  canvas.width = TEXTURE_SIZE;
-  canvas.height = TEXTURE_SIZE;
-  const context = canvas.getContext('2d');
-  if (!context) {
-    TEXTURE_CACHE.set(surface, null);
-    return null;
-  }
-  if (surface === 'grass') paintGrass(context);
-  else if (surface === 'pitchTurf') paintPitchTurf(context);
-  else if (surface === 'compactedSoil') paintCompactedSoil(context);
-  else if (surface === 'concrete') paintConcrete(context);
-  else if (surface === 'highwayAsphalt') paintAsphalt(context, 'highway');
-  else if (surface === 'parkAsphalt') paintAsphalt(context, 'park');
-  else if (surface === 'roadShoulder') paintRoadShoulder(context);
-  else paintCompactedGravel(context);
-
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.wrapS = OPEN_GROUND_TEXTURE_SAMPLING_POLICY.wrapS;
-  texture.wrapT = OPEN_GROUND_TEXTURE_SAMPLING_POLICY.wrapT;
-  texture.colorSpace = OPEN_GROUND_TEXTURE_SAMPLING_POLICY.colorSpace;
-  // Trilinear mipmapping plus anisotropy is what keeps the surface readable at
-  // shallow, distant camera angles instead of collapsing to a flat tone.
-  texture.generateMipmaps = OPEN_GROUND_TEXTURE_SAMPLING_POLICY.generateMipmaps;
-  texture.minFilter = OPEN_GROUND_TEXTURE_SAMPLING_POLICY.minFilter;
-  texture.magFilter = OPEN_GROUND_TEXTURE_SAMPLING_POLICY.magFilter;
-  texture.anisotropy = OPEN_GROUND_TEXTURE_SAMPLING_POLICY.maxAnisotropy;
-  texture.needsUpdate = true;
-  TEXTURE_CACHE.set(surface, texture);
-  return texture;
+  return getOpenGroundTextureSources(surface)?.map ?? null;
 }
 
 /**
  * ExtrudeGeometry emits world-unit UVs on the top face, so the repeat factor is
  * simply the inverse of the tile size in world units.
  */
+function cloneOpenGroundTexture(
+  shared: THREE.CanvasTexture,
+  sampling: ReturnType<typeof resolveOpenGroundTextureSampling>,
+  colorSpace: THREE.ColorSpace,
+  anisotropy: number,
+) {
+  const texture = shared.clone();
+  texture.wrapS = sampling.wrapS;
+  texture.wrapT = sampling.wrapT;
+  texture.colorSpace = colorSpace;
+  texture.generateMipmaps = sampling.generateMipmaps;
+  texture.minFilter = sampling.minFilter;
+  texture.magFilter = sampling.magFilter;
+  texture.anisotropy = anisotropy;
+  texture.repeat.set(...sampling.repeat);
+  texture.needsUpdate = true;
+  return texture;
+}
+
 export function openGroundTextureForEntity(
   profile: OpenGroundSurfaceProfile,
   maxAnisotropy: number = OPEN_GROUND_TEXTURE_SAMPLING_POLICY.maxAnisotropy,
@@ -412,17 +685,62 @@ export function openGroundTextureForEntity(
   const shared = getOpenGroundTexture(profile.surface);
   if (!shared) return null;
   const sampling = resolveOpenGroundTextureSampling(profile, maxAnisotropy);
-  const texture = shared.clone();
-  texture.wrapS = sampling.wrapS;
-  texture.wrapT = sampling.wrapT;
-  texture.colorSpace = sampling.colorSpace;
-  texture.generateMipmaps = sampling.generateMipmaps;
-  texture.minFilter = sampling.minFilter;
-  texture.magFilter = sampling.magFilter;
-  texture.anisotropy = sampling.anisotropy;
-  texture.repeat.set(...sampling.repeat);
-  texture.needsUpdate = true;
-  return texture;
+  return cloneOpenGroundTexture(
+    shared,
+    sampling,
+    sampling.colorSpace,
+    sampling.anisotropy,
+  );
+}
+
+/**
+ * Complete PBR map set for one rendered entity. Every texture is a lightweight
+ * clone with its own UV transform; their canvas pixels remain shared by surface
+ * kind. Consumers own the clones and release all three through `dispose()`.
+ */
+export function openGroundTextureBundleForEntity(
+  profile: OpenGroundSurfaceProfile,
+  maxAnisotropy: number = OPEN_GROUND_TEXTURE_SAMPLING_POLICY.maxAnisotropy,
+): OpenGroundTextureBundle | null {
+  const shared = getOpenGroundTextureSources(profile.surface);
+  if (!shared) return null;
+  const sampling = resolveOpenGroundTextureSampling(profile, maxAnisotropy);
+  const dataAnisotropy = Math.min(
+    sampling.anisotropy,
+    OPEN_GROUND_TEXTURE_SAMPLING_POLICY.maxDataAnisotropy,
+  );
+  const map = cloneOpenGroundTexture(
+    shared.map,
+    sampling,
+    OPEN_GROUND_TEXTURE_SAMPLING_POLICY.colorSpace,
+    sampling.anisotropy,
+  );
+  const normalMap = cloneOpenGroundTexture(
+    shared.normalMap,
+    sampling,
+    OPEN_GROUND_TEXTURE_SAMPLING_POLICY.dataColorSpace,
+    dataAnisotropy,
+  );
+  const roughnessMap = cloneOpenGroundTexture(
+    shared.roughnessMap,
+    sampling,
+    OPEN_GROUND_TEXTURE_SAMPLING_POLICY.dataColorSpace,
+    dataAnisotropy,
+  );
+  let disposed = false;
+
+  return Object.freeze({
+    map,
+    normalMap,
+    roughnessMap,
+    dispose: () => {
+      if (disposed) return;
+      disposed = true;
+      map.dispose();
+      normalMap.dispose();
+      roughnessMap.dispose();
+    },
+  });
 }
 
 /** Compatibility export: rendering and spatial support share the same visible top. */

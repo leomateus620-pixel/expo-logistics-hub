@@ -29,6 +29,7 @@ import {
 } from '../../utils/interaction';
 import { normalizeMapEntityMetadata } from '../../utils/mapMetadata';
 import { selectCommercialTreesForScene } from '../../utils/treeLayer';
+import { selectRearRoadCompatibleTreesForPresentation } from '../../utils/rearRoadTreeClearance';
 import { selectCommercialElectricalInfrastructureForScene } from '../../utils/electricalInfrastructure';
 import { selectCommercialHydrologicalInfrastructureForScene } from '../../utils/hydrologicalInfrastructure';
 import {
@@ -51,7 +52,7 @@ import { withGateFourDistrictPresentationEntities } from '../../data/gateFourDis
 import { COMMERCIAL_MAP_ENVIRONMENT_CONFIG } from '../../data/commercialMapEnvironment';
 import {
   OPEN_GROUND_PRESENTATION_HEIGHT,
-  openGroundTextureForEntity,
+  openGroundTextureBundleForEntity,
   resolveOpenGroundProfile,
 } from './openGroundTextures';
 import {
@@ -117,7 +118,13 @@ import { CommercialMapEnvironment } from './CommercialMapEnvironment';
 import { ParkAccessEnvironmentLayer } from './ParkAccessEnvironmentLayer';
 import { RearParkRoadNetwork } from './RearParkRoadNetwork';
 import { RearParkEnvironmentLayer } from './RearParkEnvironmentLayer';
-import { REPLACED_OFFICIAL_ROAD_IDENTIFIERS } from '../../data/rearParkRoadNetwork';
+import { CommercialSiteEnvironmentLayer } from './CommercialSiteEnvironmentLayer';
+import { rearRoadLayerPresentation } from '../../utils/commercialLayerPresentation';
+import {
+  REAR_ROAD_SCENE_SUPPORT_POINTS,
+  REPLACED_OFFICIAL_ROAD_IDENTIFIERS,
+  rearContextualLabelForOfficialOwner,
+} from '../../data/rearParkRoadNetwork';
 import { ParkAccessInfrastructure } from './ParkAccessInfrastructure';
 import { selectParkAccessCompatibleTreesForPresentation } from '../../data/parkAccessEnvironment';
 import { PARK_ACCESS_SPATIAL_PLAN } from '../../data/parkAccessSpatialPlan';
@@ -152,6 +159,7 @@ const CommercialHydrologicalInfrastructureLayer = lazy(async () => {
 interface CommercialMapCanvasProps {
   entities: MapEntity[];
   parkingOwnerEntities?: readonly MapEntity[];
+  siteEnvironmentEntities?: readonly MapEntity[];
   lots: CommercialLot[];
   calibration: MapCalibration | null;
   matchingEntityIds: ReadonlySet<string>;
@@ -329,6 +337,7 @@ const SHARED_RESTROOM_POLE_MATERIAL = new THREE.MeshStandardMaterial({
   roughness: 0.76,
   metalness: 0.04,
 });
+const OPEN_GROUND_NORMAL_SCALE = new THREE.Vector2(0.22, 0.22);
 
 function entityLabelHeight(entity: MapEntity) {
   const classification = entity.classification;
@@ -709,15 +718,20 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
   );
   const renderer = useThree((state) => state.gl);
   const maxAnisotropy = openGroundProfile ? renderer.capabilities.getMaxAnisotropy() : 1;
-  const openGroundTexture = useMemo(
-    () => (openGroundProfile ? openGroundTextureForEntity(openGroundProfile, maxAnisotropy) : null),
+  const openGroundTextures = useMemo(
+    () => (openGroundProfile ? openGroundTextureBundleForEntity(openGroundProfile, maxAnisotropy) : null),
     [maxAnisotropy, openGroundProfile],
   );
 
   const geometry = useMemo(
     () => isQuadra || isGate || isNationsPresentationSurface
       ? null
-      : createEntityGeometry(entity, openGroundProfile ? OPEN_GROUND_PRESENTATION_HEIGHT : undefined),
+      : createEntityGeometry(
+        entity,
+        openGroundProfile
+          ? openGroundProfile.presentationHeight ?? OPEN_GROUND_PRESENTATION_HEIGHT
+          : undefined,
+      ),
     [entity, isGate, isNationsPresentationSurface, isQuadra, openGroundProfile],
   );
   const hitSurface = useMemo(
@@ -797,8 +811,8 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
     edges?.dispose();
     roofOutline?.dispose();
     footprint?.dispose();
-    openGroundTexture?.dispose();
-  }, [edges, footprint, geometry, hitSurface, openGroundTexture, roofOutline]);
+    openGroundTextures?.dispose();
+  }, [edges, footprint, geometry, hitSurface, openGroundTextures, roofOutline]);
 
   const interactionProps = isInteractive ? {
     onClick: (event: ThreeEvent<MouseEvent>) => {
@@ -840,7 +854,10 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
         >
           <meshStandardMaterial
             color={displayColor}
-            map={openGroundTexture}
+            map={openGroundTextures?.map}
+            normalMap={openGroundTextures?.normalMap}
+            normalScale={openGroundTextures ? OPEN_GROUND_NORMAL_SCALE : undefined}
+            roughnessMap={openGroundTextures?.roughnessMap}
             roughness={openGroundProfile ? openGroundProfile.roughness : isPavilion ? 0.82 : isFlat ? 0.9 : 0.72}
             metalness={0}
             transparent={!solidRendering && visualOpacity < 0.995}
@@ -1405,6 +1422,8 @@ const EntityLabel = memo(function EntityLabel({
   const isGate = classification === 'GATE';
   const isRestroom = classification === 'RESTROOM' || classification === 'CHEMICAL_RESTROOM';
   const isArchitecturalLandmark = Boolean(resolveStrategicLandmarkKind(entity));
+  const contextualDisplayName = rearContextualLabelForOfficialOwner(entity.publicIdentifier)
+    ?? metadata.officialDisplayName;
   const dimmed = Boolean(lot && filtersActive && !isMatch && !selected);
   const status = lot ? STATUS_CONFIG[lot.status] : null;
   const labelHeight = entityLabelHeight(entity);
@@ -1435,7 +1454,7 @@ const EntityLabel = memo(function EntityLabel({
           {status && <small><b aria-hidden="true">{status.symbol}</b> {status.label}</small>}
         </div>
       ) : isRoad ? (
-        <div data-map-entity-id={entity.id} data-map-label-mode={mode} className={`commercial-map-label is-road ${variant}`}><span>{metadata.officialDisplayName}</span></div>
+        <div data-map-entity-id={entity.id} data-map-label-mode={mode} className={`commercial-map-label is-road ${variant}`}><span>{contextualDisplayName}</span></div>
       ) : isQuadra ? (
         <div data-map-entity-id={entity.id} data-map-label-mode={mode} className={`commercial-map-label is-quadra ${variant}`}>
           <span>{quadraLabel(metadata.officialDisplayName || entity.publicIdentifier)}</span>
@@ -1447,7 +1466,7 @@ const EntityLabel = memo(function EntityLabel({
           className={`commercial-map-label is-structure ${isGate ? 'is-access' : ''} ${isRestroom ? 'is-restroom' : ''} ${isArchitecturalLandmark ? 'is-architectural-landmark' : ''} ${variant}`}
         >
           {metadata.structureCode && <strong className="commercial-map-label-code">{isRestroom ? 'E' : metadata.structureCode}</strong>}
-          <span>{metadata.officialDisplayName}</span>
+          <span>{contextualDisplayName}</span>
         </div>
       )}
 
@@ -2793,6 +2812,7 @@ function CameraRig({
 function Scene({
   entities,
   parkingOwnerEntities = entities,
+  siteEnvironmentEntities = entities,
   lots,
   calibration,
   matchingEntityIds,
@@ -2859,6 +2879,7 @@ function Scene({
       [
         ...(parkAccessVisibleInArea(isolatedArea) ? PARK_ACCESS_SCENE_SUPPORT_POINTS : []),
         ...(rearParkingVisibleInArea(isolatedArea) ? REAR_PARKING_SCENE_SUPPORT_POINTS : []),
+        ...(!isolatedArea && !hydrologicalModeActive ? REAR_ROAD_SCENE_SUPPORT_POINTS : []),
         ...(hydrologicalModeActive
           ? [...sceneElectricalInfrastructure.nodes, ...sceneHydrologicalInfrastructure.nodes]
           : sceneElectricalInfrastructure.nodes),
@@ -2878,6 +2899,20 @@ function Scene({
     [hydrologicalModeActive, matchingEntityIds],
   );
   const entityFiltersActive = filtersActive || hydrologicalModeActive;
+  const rearRoadPresentation = useMemo(
+    () => rearRoadLayerPresentation(
+      entities,
+      layerVisibility,
+      layerOpacity,
+      entityFiltersActive,
+    ),
+    [entities, entityFiltersActive, layerOpacity, layerVisibility],
+  );
+  const activeSiteEnvironmentOwnerIdentifiers = useMemo(() => (
+    isolatedArea
+      ? new Set(entities.map((entity) => entity.publicIdentifier))
+      : null
+  ), [entities, isolatedArea]);
   const handleEntitySelect = useCallback((entityId: string) => {
     if (!hydrologicalModeActive) setSelectedEntityId(entityId);
   }, [hydrologicalModeActive, setSelectedEntityId]);
@@ -3050,18 +3085,21 @@ function Scene({
     const parkAccessCompatibleTrees = rearParkingEnabled
       ? [...baseTrees, ...reconcileRearParkingTrees(baseTrees, entities)]
       : baseTrees;
+    const rearRoadCompatibleTrees = !isolatedArea && !hydrologicalModeActive
+      ? selectRearRoadCompatibleTreesForPresentation(parkAccessCompatibleTrees)
+      : parkAccessCompatibleTrees;
     if (!selectedEntity || resolveStrategicLandmarkKind(selectedEntity) !== 'lunar-tree') {
-      return parkAccessCompatibleTrees;
+      return rearRoadCompatibleTrees;
     }
     const bounds = strategicLandmarkBounds(selectedEntity);
     const memorialCenter = [
       bounds.centerX + APOLLO_XIV_LAYOUT.replicaOffset[0],
       bounds.centerZ + APOLLO_XIV_LAYOUT.replicaOffset[1],
     ] as const;
-    return parkAccessCompatibleTrees.filter((tree) => (
+    return rearRoadCompatibleTrees.filter((tree) => (
       treeRemainsVisibleWithSelectedApollo(tree, memorialCenter)
     ));
-  }, [entities, isolatedArea, rearParkingEnabled, sceneTrees, selectedEntity]);
+  }, [entities, hydrologicalModeActive, isolatedArea, rearParkingEnabled, sceneTrees, selectedEntity]);
   const treeSurfaceEntities = useMemo(() => rearParkingEnabled
     ? [...exteriorRenderedEntities, ...REAR_PARKING_GROUND_SUPPORTS]
     : exteriorRenderedEntities, [exteriorRenderedEntities, rearParkingEnabled]);
@@ -3253,13 +3291,25 @@ function Scene({
         layerOpacity={layerOpacity}
         reducedGraphics={reducedGraphics}
       />
+      {(!isolatedArea || isolatedArea === COMMERCIAL_MAP_SEGMENT_IDS.industry)
+        && !hydrologicalModeActive && (
+        <CommercialSiteEnvironmentLayer
+          entities={siteEnvironmentEntities}
+          activeOwnerIdentifiers={activeSiteEnvironmentOwnerIdentifiers}
+          reducedGraphics={reducedGraphics}
+        />
+      )}
       {!isolatedArea && !hydrologicalModeActive && (
         <>
           <RearParkEnvironmentLayer
             reducedGraphics={reducedGraphics}
             vegetationVisible={treesVisible}
           />
-          <RearParkRoadNetwork reducedGraphics={reducedGraphics} />
+          <RearParkRoadNetwork
+            reducedGraphics={reducedGraphics}
+            visible={rearRoadPresentation.visible}
+            opacity={rearRoadPresentation.opacity}
+          />
         </>
       )}
       {rearParkingEnabled && (
@@ -3361,7 +3411,7 @@ function Scene({
         </Suspense>
       ) : null}
       {contextualLabelEntities.filter((entity) => (
-        !parkingInspectionOpen || ['PAVILHAO-09', 'D5', 'PISTA-CAMPEIRA', 'J'].includes(entity.publicIdentifier)
+        (!parkingInspectionOpen || ['PAVILHAO-09', 'D5', 'PISTA-CAMPEIRA', 'J'].includes(entity.publicIdentifier))
       )).map((entity) => (
         <EntityLabel
           key={`label:${entity.id}`}
@@ -3414,6 +3464,7 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
   const {
     entities,
     parkingOwnerEntities,
+    siteEnvironmentEntities,
     lots,
     calibration,
     matchingEntityIds,
@@ -3485,9 +3536,10 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
       [
         ...(parkAccessVisibleInArea(isolatedArea) ? PARK_ACCESS_SCENE_SUPPORT_POINTS : []),
         ...(rearParkingVisibleInArea(isolatedArea) ? REAR_PARKING_SCENE_SUPPORT_POINTS : []),
+        ...(!isolatedArea && !hydrologicalModeActive ? REAR_ROAD_SCENE_SUPPORT_POINTS : []),
       ],
     ),
-    [entities, isolatedArea],
+    [entities, hydrologicalModeActive, isolatedArea],
   );
   const initialDirection = new THREE.Vector3(0.04, 0.72, 0.69).normalize();
   const initialDistance = fitDistanceForDirection(
@@ -3539,6 +3591,7 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
         <Scene
           entities={entities}
           parkingOwnerEntities={parkingOwnerEntities}
+          siteEnvironmentEntities={siteEnvironmentEntities}
           lots={lots}
           calibration={calibration}
           matchingEntityIds={matchingEntityIds}

@@ -1,4 +1,5 @@
 import { memo, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import {
   REAR_TERRAIN_PATCHES,
@@ -6,7 +7,10 @@ import {
   buildRearTreeInstances,
   sourcePolygonToLocal,
 } from '../../data/rearParkEnvironment';
-import { getOpenGroundTexture } from './openGroundTextures';
+import {
+  openGroundTextureBundleForEntity,
+  type OpenGroundSurfaceProfile,
+} from './openGroundTextures';
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
 import { rearRoadTerrainElevationAt } from '../../utils/rearRoadNetwork';
 
@@ -17,6 +21,13 @@ interface RearParkEnvironmentLayerProps {
 }
 
 const NO_RAYCAST = () => undefined;
+const REAR_TERRAIN_SURFACE_PROFILE = Object.freeze({
+  surface: 'grass',
+  tileWorldSize: 9,
+  baseColor: '#8aa465',
+  roughness: 0.97,
+} satisfies OpenGroundSurfaceProfile);
+const REAR_TERRAIN_NORMAL_SCALE = new THREE.Vector2(0.18, 0.18);
 
 /**
  * Extensão irregular e contínua do terreno até além da BR-472, com vegetação
@@ -27,6 +38,7 @@ export const RearParkEnvironmentLayer = memo(function RearParkEnvironmentLayer({
   visible = true,
   vegetationVisible = true,
 }: RearParkEnvironmentLayerProps) {
+  const maximumAnisotropy = useThree((state) => state.gl.capabilities.getMaxAnisotropy());
   const canopyRef = useRef<THREE.InstancedMesh>(null);
   const trunkRef = useRef<THREE.InstancedMesh>(null);
   const poleRef = useRef<THREE.InstancedMesh>(null);
@@ -49,18 +61,12 @@ export const RearParkEnvironmentLayer = memo(function RearParkEnvironmentLayer({
 
   useEffect(() => () => terrain.forEach((entry) => entry.geometry.dispose()), [terrain]);
 
-  const grassTexture = useMemo(() => {
-    const shared = getOpenGroundTexture('grass');
-    if (!shared) return null;
-    const texture = shared.clone();
-    texture.wrapS = THREE.RepeatWrapping;
-    texture.wrapT = THREE.RepeatWrapping;
-    texture.repeat.set(9, 9);
-    texture.needsUpdate = true;
-    return texture;
-  }, []);
+  const grassTextures = useMemo(
+    () => openGroundTextureBundleForEntity(REAR_TERRAIN_SURFACE_PROFILE, maximumAnisotropy),
+    [maximumAnisotropy],
+  );
 
-  useEffect(() => () => grassTexture?.dispose(), [grassTexture]);
+  useEffect(() => () => grassTextures?.dispose(), [grassTextures]);
 
   const trees = useMemo(
     () => (vegetationVisible ? buildRearTreeInstances(reducedGraphics) : []),
@@ -139,9 +145,12 @@ export const RearParkEnvironmentLayer = memo(function RearParkEnvironmentLayer({
           dispose={null}
         >
           <meshStandardMaterial
-            map={grassTexture ?? undefined}
-            color="#8aa465"
-            roughness={0.97}
+            map={grassTextures?.map}
+            normalMap={grassTextures?.normalMap}
+            normalScale={grassTextures ? REAR_TERRAIN_NORMAL_SCALE : undefined}
+            roughnessMap={grassTextures?.roughnessMap}
+            color={REAR_TERRAIN_SURFACE_PROFILE.baseColor}
+            roughness={REAR_TERRAIN_SURFACE_PROFILE.roughness}
             metalness={0}
           />
         </mesh>

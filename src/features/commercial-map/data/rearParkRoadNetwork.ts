@@ -6,24 +6,30 @@ import {
 import { REAR_CALIBRATED_AXES } from '../utils/rearSpatialCalibration';
 
 /**
- * Rede viária posterior — reconstrução corretiva 2026.9.3.
+ * Rede viária posterior — reconstrução corretiva 2026.9.5.
  *
- * A entidade oficial `A5` e as vias oficiais continuam sendo as proprietárias
- * dos seus dados e interações. Esta configuração descreve uma única topologia
- * de apresentação, centralizada e tipada, sem criar entidades cartográficas.
- * Os trechos `official-surface` existem no grafo para provar continuidade, mas
- * não geram uma segunda malha sobre a Rua Brasília/Avenida dos Imigrantes.
+ * Rua Exporural, Rua Brasília e BR-472 são identidades independentes. A Rua
+ * Exporural continua pertencendo à superfície oficial `RUA-UBIRETAMA`; A5
+ * continua sendo a única entidade selecionável do Portão 5. Esta configuração
+ * acrescenta somente trechos físicos ausentes, substitui a apresentação
+ * contraditória da Rua Brasília e da rodovia e não renomeia nem duplica
+ * entidades cadastrais.
  */
 
+export type CanonicalRearRoadId = 'RUA-EXPORURAL' | 'RUA-BRASILIA' | 'RODOVIA-RS-472';
+export type RearRoadFeatureId = CanonicalRearRoadId | 'ACESSO-A5-BR472';
+
 export type RoadNodeId =
+  | 'exporural-reference-1'
+  | 'exporural-official-north'
+  | 'exporural-official-south'
+  | 'exporural-brasilia-junction'
+  | 'brasilia-official-north'
+  | 'brasilia-reference-3'
+  | 'gate-5'
+  | 'a5-br-junction'
   | 'br472-west'
-  | 'br472-east'
-  | 'brasilia-br-junction'
-  | 'brasilia-perimeter'
-  | 'brasilia-official-south'
-  | 'brasilia-event-center'
-  | 'brasilia-arena'
-  | 'gate-5';
+  | 'br472-east';
 
 export type RoadCategory = 'federal-highway' | 'park-avenue' | 'internal-access';
 export type RoadMarkings = 'highway' | 'internal' | 'none';
@@ -34,14 +40,17 @@ export type WorldRoadPoint = readonly [number, number, number];
 
 export interface RoadNode {
   id: RoadNodeId;
-  position: WorldRoadPoint;
+  /** Centro cadastral do nó. Para A5, é o centro oficial do losango. */
   sourcePoint: SourcePoint;
+  /** Posição física da ribbon. Para A5, é a passagem veicular na borda. */
+  roadAccessSourcePoint: SourcePoint;
+  position: WorldRoadPoint;
   officialEntityIdentifier?: string;
 }
 
 export interface RoadSegment {
   id: string;
-  roadId: 'RODOVIA-RS-472' | 'RUA-BRASILIA' | 'ACESSO-A5-BR472';
+  roadId: RearRoadFeatureId;
   name: string;
   from: RoadNodeId;
   to: RoadNodeId;
@@ -58,7 +67,16 @@ export interface RoadSegment {
   notes: string;
 }
 
-export const REAR_PARK_ROAD_REVISION = '2026.9-area-posterior.3';
+export interface RearRoadIdentity {
+  id: CanonicalRearRoadId;
+  name: 'Rua Exporural' | 'Rua Brasília' | 'BR-472';
+  label: 'RUA EXPORURAL' | 'RUA BRASÍLIA' | 'BR-472';
+  officialOwnerIdentifier: 'RUA-UBIRETAMA' | 'RUA-BRASILIA' | 'RODOVIA-RS-472';
+}
+
+export type RearContextualLabelOwner = 'RUA-UBIRETAMA' | 'RUA-BRASILIA' | 'RODOVIA-RS-472' | 'A5';
+
+export const REAR_PARK_ROAD_REVISION = '2026.9-area-posterior.5';
 
 /** Escala uniforme do recorte oficial, usada apenas para larguras físicas. */
 export const SOURCE_POINTS_PER_LOCAL_UNIT = 5500 / 120;
@@ -85,14 +103,48 @@ export const REMOVED_REAR_ROAD_IDENTIFIERS: readonly string[] = Object.freeze([
   'RS-472-CONTINUACAO',
 ]);
 
-/** A apresentação detalhada substitui somente a superfície genérica desta via. */
+/**
+ * A apresentação detalhada substitui somente as superfícies esquemáticas
+ * contraditórias. Os registros oficiais permanecem íntegros e selecionáveis.
+ */
 export const REPLACED_OFFICIAL_ROAD_IDENTIFIERS: readonly string[] = Object.freeze([
+  'RUA-BRASILIA',
   'RODOVIA-RS-472',
 ]);
 
 export const ETHNIC_QUARTER_SOURCE_BOUNDS = Object.freeze([4500, 4340, 5340, 5100] as const);
 
-function sourceToWorld([sourceX, sourceZ]: SourcePoint, elevation = 0): WorldRoadPoint {
+export const REAR_ROAD_IDENTITIES: readonly RearRoadIdentity[] = Object.freeze([
+  Object.freeze({ id: 'RUA-EXPORURAL', name: 'Rua Exporural', label: 'RUA EXPORURAL', officialOwnerIdentifier: 'RUA-UBIRETAMA' }),
+  Object.freeze({ id: 'RUA-BRASILIA', name: 'Rua Brasília', label: 'RUA BRASÍLIA', officialOwnerIdentifier: 'RUA-BRASILIA' }),
+  Object.freeze({ id: 'RODOVIA-RS-472', name: 'BR-472', label: 'BR-472', officialOwnerIdentifier: 'RODOVIA-RS-472' }),
+]);
+
+/**
+ * Texto exato consumido pelo `EntityLabel` existente. Não cria Html permanente,
+ * objeto selecionável, resultado de busca nem segunda identidade cartográfica.
+ */
+export const REAR_CONTEXTUAL_LABELS: Readonly<Record<RearContextualLabelOwner, string>> = Object.freeze({
+  'RUA-UBIRETAMA': 'RUA EXPORURAL',
+  'RUA-BRASILIA': 'RUA BRASÍLIA',
+  'RODOVIA-RS-472': 'BR-472',
+  A5: 'PORTÃO 5',
+});
+
+export function rearContextualLabelForOfficialOwner(publicIdentifier: string) {
+  const normalized = publicIdentifier.trim().toLocaleUpperCase('pt-BR') as RearContextualLabelOwner;
+  return REAR_CONTEXTUAL_LABELS[normalized] ?? null;
+}
+
+export function rearRoadIdentityCountByName(name: string) {
+  const normalized = name.trim().toLocaleUpperCase('pt-BR');
+  return REAR_ROAD_IDENTITIES.filter((identity) => (
+    identity.name.toLocaleUpperCase('pt-BR') === normalized
+    || identity.label.toLocaleUpperCase('pt-BR') === normalized
+  )).length;
+}
+
+export function rearRoadSourcePointToWorld([sourceX, sourceZ]: SourcePoint, elevation = 0): WorldRoadPoint {
   const [x, z] = officialPdfPointToLocal([sourceX, sourceZ]);
   return [x, elevation, z];
 }
@@ -101,14 +153,18 @@ function worldToLocal([x, , z]: WorldRoadPoint): LocalPoint {
   return [x, z];
 }
 
-function entityCenter(identifier: string): LocalPoint {
+function officialEntity(identifier: string) {
   const matches = OFFICIAL_REFERENCE_DATA.entities.filter(
     (entity) => entity.publicIdentifier.trim().toLocaleUpperCase('pt-BR') === identifier,
   );
   if (matches.length !== 1) {
     throw new Error(`A rede posterior exige exatamente uma entidade oficial ${identifier}; recebidas ${matches.length}.`);
   }
-  const ring = matches[0].geometry.coordinates[0] ?? [];
+  return matches[0];
+}
+
+function entityCenter(identifier: string): LocalPoint {
+  const ring = officialEntity(identifier).geometry.coordinates[0] ?? [];
   const unique = ring.length > 1
     && ring[0][0] === ring[ring.length - 1][0]
     && ring[0][1] === ring[ring.length - 1][1]
@@ -120,132 +176,161 @@ function entityCenter(identifier: string): LocalPoint {
   ];
 }
 
-/**
- * O losango oficial é um símbolo cartográfico simplificado. O acesso veicular
- * é o ponto de sua borda mais próximo do eixo da rodovia, não o centro do ícone.
- */
-function officialGate5RoadEdge(): LocalPoint {
-  const gate = OFFICIAL_REFERENCE_DATA.entities.find(
-    (entity) => entity.publicIdentifier.trim().toLocaleUpperCase('pt-BR') === 'A5',
-  );
-  if (!gate) throw new Error('Entidade oficial A5 ausente da referência 2026.');
-  const ring = gate.geometry.coordinates[0] ?? [];
-  if (ring.length < 3) throw new Error('A entidade oficial A5 não possui geometria válida.');
-  return ring.reduce<LocalPoint>((closest, point) => (
-    point[0] > closest[0] ? [point[0], point[1]] : closest
-  ), [ring[0][0], ring[0][1]]);
-}
+const officialGate5 = officialEntity('A5');
+const officialGate5SourcePoint = Object.freeze([5974, 3678] as const);
+const gate5VehicleAccessSourcePoint = Object.freeze(REAR_CALIBRATED_AXES.brasiliaContinuation.at(-1)!);
 
 export const OFFICIAL_GATE_5_CENTER = Object.freeze(entityCenter('A5'));
-export const OFFICIAL_GATE_5_ACCESS_POINT = Object.freeze(officialGate5RoadEdge());
+export const OFFICIAL_GATE_5_ACCESS_POINT = Object.freeze(officialPdfPointToLocal(gate5VehicleAccessSourcePoint));
+export const OFFICIAL_GATE_5_ENTITY_ID = officialGate5.id;
 
-const gate5SourcePoint: SourcePoint = [5996, 3678];
+const exporuralJunction = REAR_CALIBRATED_AXES.exporuralSouthExtension.at(-1)!;
+const brasiliaJunctionIndex = REAR_CALIBRATED_AXES.brasiliaContinuation.findIndex((point) => (
+  Math.abs(point[0] - exporuralJunction[0]) < 0.01
+  && Math.abs(point[1] - exporuralJunction[1]) < 0.01
+));
+if (brasiliaJunctionIndex < 1) {
+  throw new Error('O eixo calibrado da Rua Brasília não contém o entroncamento da Rua Exporural.');
+}
+
+const brasiliaReference3 = REAR_CALIBRATED_AXES.brasiliaContinuation[0];
 
 const nodeSources: Readonly<Record<RoadNodeId, SourcePoint>> = Object.freeze({
-  'br472-west': REAR_CALIBRATED_AXES.br472WestToJunction[0],
-  'br472-east': REAR_CALIBRATED_AXES.br472JunctionToEast.at(-1)!,
-  'brasilia-br-junction': REAR_CALIBRATED_AXES.br472WestToJunction.at(-1)!,
-  'brasilia-perimeter': REAR_CALIBRATED_AXES.brasiliaA5Perimeter.at(-1)!,
-  'brasilia-official-south': REAR_CALIBRATED_AXES.brasiliaPerimeterOfficial.at(-1)!,
-  'brasilia-event-center': REAR_CALIBRATED_AXES.brasiliaOfficialEventCenter.at(-1)!,
-  'brasilia-arena': REAR_CALIBRATED_AXES.brasiliaEventCenterArena.at(-1)!,
-  'gate-5': gate5SourcePoint,
+  'exporural-reference-1': REAR_CALIBRATED_AXES.exporuralNorthExtension[0],
+  'exporural-official-north': REAR_CALIBRATED_AXES.exporuralOfficial[0],
+  'exporural-official-south': REAR_CALIBRATED_AXES.exporuralOfficial.at(-1)!,
+  'exporural-brasilia-junction': exporuralJunction,
+  'brasilia-official-north': REAR_CALIBRATED_AXES.brasiliaOfficialToP3[0],
+  'brasilia-reference-3': brasiliaReference3,
+  'gate-5': officialGate5SourcePoint,
+  'a5-br-junction': REAR_CALIBRATED_AXES.a5ExternalAccess.at(-1)!,
+  'br472-west': REAR_CALIBRATED_AXES.br472JunctionToWest.at(-1)!,
+  'br472-east': REAR_CALIBRATED_AXES.br472EastToJunction[0],
+});
+
+const nodeRoadAccessSources: Readonly<Partial<Record<RoadNodeId, SourcePoint>>> = Object.freeze({
+  'gate-5': gate5VehicleAccessSourcePoint,
 });
 
 export const REAR_ROAD_NODES: Readonly<Record<RoadNodeId, RoadNode>> = Object.freeze(
   Object.fromEntries((Object.keys(nodeSources) as RoadNodeId[]).map((id) => {
     const sourcePoint = nodeSources[id];
-    const position = id === 'gate-5'
-      ? [OFFICIAL_GATE_5_ACCESS_POINT[0], 0, OFFICIAL_GATE_5_ACCESS_POINT[1]] as WorldRoadPoint
-      : sourceToWorld(sourcePoint);
+    const roadAccessSourcePoint = nodeRoadAccessSources[id] ?? sourcePoint;
     return [id, Object.freeze({
       id,
       sourcePoint,
-      position,
+      roadAccessSourcePoint,
+      position: rearRoadSourcePointToWorld(roadAccessSourcePoint),
       ...(id === 'gate-5' ? { officialEntityIdentifier: 'A5' } : {}),
     })];
   })) as Record<RoadNodeId, RoadNode>,
 );
 
 function segment(definition: Omit<RoadSegment, 'controlPoints'>): RoadSegment {
-  const controlPoints = definition.sourceControlPoints.map((point) => sourceToWorld(point));
+  const controlPoints = definition.sourceControlPoints.map((point) => rearRoadSourcePointToWorld(point));
   controlPoints[0] = REAR_ROAD_NODES[definition.from].position;
   controlPoints[controlPoints.length - 1] = REAR_ROAD_NODES[definition.to].position;
   return Object.freeze({ ...definition, controlPoints: [...controlPoints] });
 }
 
-/**
- * Eixos consolidados após a calibração dos anexos 4 e 5. Todos permanecem
- * dentro da página oficial (7152,61 × 5735,29); não há plataformas extrapoladas.
- */
+const brasiliaToExporural = REAR_CALIBRATED_AXES.brasiliaContinuation.slice(0, brasiliaJunctionIndex + 1);
+const brasiliaToGate5 = REAR_CALIBRATED_AXES.brasiliaContinuation.slice(brasiliaJunctionIndex);
+
+/** Somente `generated-surface` produz ribbon; vias oficiais ficam intactas. */
 export const REAR_PARK_ROAD_NETWORK: readonly RoadSegment[] = Object.freeze([
   segment({
-    id: 'br472-west-junction', roadId: 'RODOVIA-RS-472', name: 'BR-472',
-    from: 'br472-west', to: 'brasilia-br-junction', category: 'federal-highway',
-    sourceControlPoints: REAR_CALIBRATED_AXES.br472WestToJunction,
-    width: rearRoadSourceToLocalLength(132), shoulderWidth: rearRoadSourceToLocalLength(42),
-    elevationOffset: 0.034, materialId: 'highway-asphalt', markings: 'highway',
-    presentation: 'generated-surface', officialOwnerIdentifier: 'RODOVIA-RS-472',
-    notes: 'Eixo longitudinal da rodovia oficial, refinado como ribbon contínua sem duplicar a entidade cadastral.',
+    id: 'exporural-reference-1-official-north', roadId: 'RUA-EXPORURAL', name: 'Rua Exporural',
+    from: 'exporural-reference-1', to: 'exporural-official-north', category: 'park-avenue',
+    sourceControlPoints: REAR_CALIBRATED_AXES.exporuralNorthExtension,
+    width: rearRoadSourceToLocalLength(42), shoulderWidth: 0,
+    elevationOffset: 0.032, materialId: 'park-asphalt', markings: 'none',
+    presentation: 'generated-surface', officialOwnerIdentifier: 'RUA-UBIRETAMA',
+    notes: 'Completa P1 até a borda norte da Rua Exporural oficial, sem cobrir sua superfície cadastral.',
   }),
   segment({
-    id: 'br472-junction-east', roadId: 'RODOVIA-RS-472', name: 'BR-472',
-    from: 'brasilia-br-junction', to: 'br472-east', category: 'federal-highway',
-    sourceControlPoints: REAR_CALIBRATED_AXES.br472JunctionToEast,
-    width: rearRoadSourceToLocalLength(132), shoulderWidth: rearRoadSourceToLocalLength(42),
-    elevationOffset: 0.034, materialId: 'highway-asphalt', markings: 'highway',
-    presentation: 'generated-surface', officialOwnerIdentifier: 'RODOVIA-RS-472',
-    notes: 'Continuidade do mesmo eixo da BR-472 além do acesso A5, sem segunda rodovia paralela.',
+    id: 'exporural-official-axis', roadId: 'RUA-EXPORURAL', name: 'Rua Exporural',
+    from: 'exporural-official-north', to: 'exporural-official-south', category: 'park-avenue',
+    sourceControlPoints: REAR_CALIBRATED_AXES.exporuralOfficial,
+    width: rearRoadSourceToLocalLength(42), shoulderWidth: 0,
+    elevationOffset: 0.032, materialId: 'park-asphalt', markings: 'none',
+    presentation: 'official-surface', officialOwnerIdentifier: 'RUA-UBIRETAMA',
+    notes: 'Centerline real da superfície oficial RUA-UBIRETAMA, preservada integralmente.',
+  }),
+  segment({
+    id: 'exporural-official-south-junction', roadId: 'RUA-EXPORURAL', name: 'Rua Exporural',
+    from: 'exporural-official-south', to: 'exporural-brasilia-junction', category: 'park-avenue',
+    sourceControlPoints: REAR_CALIBRATED_AXES.exporuralSouthExtension,
+    width: rearRoadSourceToLocalLength(42), shoulderWidth: 0,
+    elevationOffset: 0.032, materialId: 'park-asphalt', markings: 'none',
+    presentation: 'generated-surface', officialOwnerIdentifier: 'RUA-UBIRETAMA',
+    notes: 'Completa a borda sul oficial pelos Pontos 10 e 5 até o entroncamento físico com a Rua Brasília.',
+  }),
+  segment({
+    id: 'brasilia-official-north-reference-3', roadId: 'RUA-BRASILIA', name: 'Rua Brasília',
+    from: 'brasilia-official-north', to: 'brasilia-reference-3', category: 'park-avenue',
+    sourceControlPoints: REAR_CALIBRATED_AXES.brasiliaOfficialToP3,
+    width: rearRoadSourceToLocalLength(54), shoulderWidth: rearRoadSourceToLocalLength(8),
+    elevationOffset: 0.032, materialId: 'park-asphalt', markings: 'internal',
+    presentation: 'generated-surface', officialOwnerIdentifier: 'RUA-BRASILIA',
+    notes: 'Apresentação corretiva única do extremo cadastral ao Ponto 3, contornando C1 e sem ramo para A3.',
+  }),
+  segment({
+    id: 'brasilia-reference-3-exporural', roadId: 'RUA-BRASILIA', name: 'Rua Brasília',
+    from: 'brasilia-reference-3', to: 'exporural-brasilia-junction', category: 'park-avenue',
+    sourceControlPoints: brasiliaToExporural,
+    width: rearRoadSourceToLocalLength(54), shoulderWidth: rearRoadSourceToLocalLength(8),
+    elevationOffset: 0.032, materialId: 'park-asphalt', markings: 'internal',
+    presentation: 'generated-surface', officialOwnerIdentifier: 'RUA-BRASILIA',
+    notes: 'Rua Brasília contínua pelos Pontos 3 e 4 até o entroncamento 5 da Rua Exporural.',
+  }),
+  segment({
+    id: 'brasilia-exporural-a5', roadId: 'RUA-BRASILIA', name: 'Rua Brasília',
+    from: 'exporural-brasilia-junction', to: 'gate-5', category: 'park-avenue',
+    sourceControlPoints: brasiliaToGate5,
+    width: rearRoadSourceToLocalLength(54), shoulderWidth: 0,
+    elevationOffset: 0.032, materialId: 'park-asphalt', markings: 'internal',
+    presentation: 'generated-surface', officialOwnerIdentifier: 'RUA-BRASILIA',
+    notes: 'Continuação única da Rua Brasília do Ponto 5 à passagem veicular do A5 oficial; a borda integrada substitui o acostamento junto ao estacionamento protegido.',
   }),
   segment({
     id: 'a5-br472-access', roadId: 'ACESSO-A5-BR472', name: 'Acesso viário A5 — BR-472',
-    from: 'brasilia-br-junction', to: 'gate-5', category: 'internal-access',
-    sourceControlPoints: REAR_CALIBRATED_AXES.a5Access,
-    width: rearRoadSourceToLocalLength(68), shoulderWidth: rearRoadSourceToLocalLength(12),
-    elevationOffset: 0.036, materialId: 'park-asphalt', markings: 'none',
+    from: 'gate-5', to: 'a5-br-junction', category: 'internal-access',
+    sourceControlPoints: REAR_CALIBRATED_AXES.a5ExternalAccess,
+    width: rearRoadSourceToLocalLength(36), shoulderWidth: rearRoadSourceToLocalLength(5),
+    elevationOffset: 0.034, materialId: 'park-asphalt', markings: 'none',
     presentation: 'generated-surface', officialOwnerIdentifier: 'A5',
-    notes: 'Transição curta até a borda rodoviária do losango oficial A5; o endpoint nunca usa o centro visual do ícone.',
+    notes: 'Acesso externo estreito e funcional após o A5, sem usar o estacionamento oficial como pavimento; o Portão 5 continua sendo endpoint da via dentro do parque.',
   }),
   segment({
-    id: 'brasilia-a5-perimeter', roadId: 'RUA-BRASILIA', name: 'Rua Brasília',
-    from: 'gate-5', to: 'brasilia-perimeter', category: 'park-avenue',
-    sourceControlPoints: REAR_CALIBRATED_AXES.brasiliaA5Perimeter,
-    width: rearRoadSourceToLocalLength(54), shoulderWidth: rearRoadSourceToLocalLength(16),
-    elevationOffset: 0.032, materialId: 'park-asphalt', markings: 'internal',
-    presentation: 'generated-surface', officialOwnerIdentifier: 'A5',
-    notes: 'Trecho novo contorna externamente o estacionamento, mantém distância das Etnias e termina no acesso físico do A5.',
+    id: 'br472-east-junction', roadId: 'RODOVIA-RS-472', name: 'BR-472',
+    from: 'br472-east', to: 'a5-br-junction', category: 'federal-highway',
+    sourceControlPoints: REAR_CALIBRATED_AXES.br472EastToJunction,
+    width: rearRoadSourceToLocalLength(132), shoulderWidth: rearRoadSourceToLocalLength(42),
+    elevationOffset: 0.034, materialId: 'highway-asphalt', markings: 'highway',
+    presentation: 'generated-surface', officialOwnerIdentifier: 'RODOVIA-RS-472',
+    notes: 'Corredor externo Ponto 2 (leste)–junção A5, separado fisicamente da Rua Exporural.',
   }),
   segment({
-    id: 'brasilia-perimeter-official', roadId: 'RUA-BRASILIA', name: 'Rua Brasília',
-    from: 'brasilia-perimeter', to: 'brasilia-official-south', category: 'park-avenue',
-    sourceControlPoints: REAR_CALIBRATED_AXES.brasiliaPerimeterOfficial,
-    width: rearRoadSourceToLocalLength(48), shoulderWidth: 0,
-    elevationOffset: 0.032, materialId: 'park-asphalt', markings: 'none',
-    presentation: 'official-surface', officialOwnerIdentifier: 'AV-IMIGRANTES',
-    notes: 'Conectividade sobre a Avenida dos Imigrantes existente; não produz ribbon duplicada.',
-  }),
-  segment({
-    id: 'brasilia-official-event-center', roadId: 'RUA-BRASILIA', name: 'Rua Brasília',
-    from: 'brasilia-official-south', to: 'brasilia-event-center', category: 'park-avenue',
-    sourceControlPoints: REAR_CALIBRATED_AXES.brasiliaOfficialEventCenter,
-    width: rearRoadSourceToLocalLength(48), shoulderWidth: 0,
-    elevationOffset: 0.032, materialId: 'park-asphalt', markings: 'none',
-    presentation: 'official-surface', officialOwnerIdentifier: 'RUA-BRASILIA',
-    notes: 'Eixo oficial junto ao Centro de Eventos, preservado e não redesenhado.',
-  }),
-  segment({
-    id: 'brasilia-official-arena', roadId: 'RUA-BRASILIA', name: 'Rua Brasília',
-    from: 'brasilia-event-center', to: 'brasilia-arena', category: 'park-avenue',
-    sourceControlPoints: REAR_CALIBRATED_AXES.brasiliaEventCenterArena,
-    width: rearRoadSourceToLocalLength(48), shoulderWidth: 0,
-    elevationOffset: 0.032, materialId: 'park-asphalt', markings: 'none',
-    presentation: 'official-surface', officialOwnerIdentifier: 'RUA-BRASILIA',
-    notes: 'Eixo oficial lateral à Arena, preservado e não redesenhado.',
+    id: 'br472-junction-west', roadId: 'RODOVIA-RS-472', name: 'BR-472',
+    from: 'a5-br-junction', to: 'br472-west', category: 'federal-highway',
+    sourceControlPoints: REAR_CALIBRATED_AXES.br472JunctionToWest,
+    width: rearRoadSourceToLocalLength(132), shoulderWidth: rearRoadSourceToLocalLength(42),
+    elevationOffset: 0.034, materialId: 'highway-asphalt', markings: 'highway',
+    presentation: 'generated-surface', officialOwnerIdentifier: 'RODOVIA-RS-472',
+    notes: 'Corredor externo junção–Ponto 7 (oeste); é a mesma e única BR-472.',
   }),
 ]);
 
 export const GENERATED_REAR_ROAD_SEGMENTS = Object.freeze(
   REAR_PARK_ROAD_NETWORK.filter((road) => road.presentation === 'generated-surface'),
+);
+
+/** Mantém câmera/fog/solo externo cobrindo toda a expansão viária corrigida. */
+export const REAR_ROAD_SCENE_SUPPORT_POINTS = Object.freeze(
+  GENERATED_REAR_ROAD_SEGMENTS.flatMap((road) => road.controlPoints.map((point) => Object.freeze({
+    position: Object.freeze([point[0], point[2]] as const),
+    height: Math.max(0.8, point[1] + 0.4),
+  }))),
 );
 
 export function rearRoadLocalPath(definition: RoadSegment): LocalPoint[] {
@@ -281,29 +366,42 @@ function roadAdjacency() {
   return graph;
 }
 
-export type RoadGraphEndpoint = RoadNodeId | 'br472' | 'brasilia' | 'A5';
+export type RoadGraphEndpoint = RoadNodeId | 'br472' | 'brasilia' | 'exporural' | 'A5';
 
 function resolveRoadGraphEndpoint(endpoint: RoadGraphEndpoint): RoadNodeId {
   if (endpoint === 'br472') return 'br472-west';
-  if (endpoint === 'brasilia') return 'brasilia-arena';
+  if (endpoint === 'brasilia') return 'brasilia-official-north';
+  if (endpoint === 'exporural') return 'exporural-reference-1';
   if (endpoint === 'A5') return 'gate-5';
   return endpoint;
 }
 
-export function roadGraphHasPath(from: RoadGraphEndpoint, to: RoadGraphEndpoint) {
+export function roadGraphPath(from: RoadGraphEndpoint, to: RoadGraphEndpoint): RoadNodeId[] {
   const start = resolveRoadGraphEndpoint(from);
   const target = resolveRoadGraphEndpoint(to);
   const graph = roadAdjacency();
   const queue: RoadNodeId[] = [start];
-  const visited = new Set<RoadNodeId>();
+  const previous = new Map<RoadNodeId, RoadNodeId | null>([[start, null]]);
   while (queue.length > 0) {
     const current = queue.shift()!;
-    if (current === target) return true;
-    if (visited.has(current)) continue;
-    visited.add(current);
+    if (current === target) {
+      const path: RoadNodeId[] = [];
+      let cursor: RoadNodeId | null = current;
+      while (cursor) {
+        path.unshift(cursor);
+        cursor = previous.get(cursor) ?? null;
+      }
+      return path;
+    }
     graph.get(current)?.forEach((next) => {
-      if (!visited.has(next)) queue.push(next);
+      if (previous.has(next)) return;
+      previous.set(next, current);
+      queue.push(next);
     });
   }
-  return false;
+  return [];
+}
+
+export function roadGraphHasPath(from: RoadGraphEndpoint, to: RoadGraphEndpoint) {
+  return roadGraphPath(from, to).length > 0;
 }

@@ -5,15 +5,17 @@ import {
   rearRoadSourceToLocalLength,
 } from './rearParkRoadNetwork';
 import { distanceToPath } from '../utils/rearRoadNetwork';
+import { projectRearNormalizedReferencePointToOfficialSource } from '../utils/rearSpatialCalibration';
 
 /**
- * Ambientação georreferenciada da faixa A5 / BR-472.
+ * Ambientação georreferenciada entre a Rua Exporural (Rua Ubiretama) e a
+ * BR-472 externa.
  *
- * Esta camada não cria uma segunda base cartográfica. Ela prolonga somente o
- * terreno necessário para sustentar a rodovia no limite leste do recorte
- * oficial e mantém todas as entidades existentes como volumes de exclusão.
+ * Esta camada não cria uma segunda base cartográfica. Ela prolonga o terreno
+ * oficial por uma única faixa irregular e mantém livres os três corredores:
+ * Rua Exporural, ambiente intermediário e BR-472.
  */
-export const REAR_PARK_ENVIRONMENT_REVISION = '2026.9-area-posterior-ambiente.3';
+export const REAR_PARK_ENVIRONMENT_REVISION = '2026.9-area-posterior-ambiente.4';
 
 export type SourcePoint = readonly [number, number];
 export type SourceBounds = readonly [number, number, number, number];
@@ -26,27 +28,45 @@ export interface RearTerrainPatch {
 }
 
 /**
+ * P8 e P9 do anexo 6 são evidências ambientais, nunca nós viários. As
+ * coordenadas já estão reconciliadas com a fonte cartográfica oficial.
+ */
+export const REAR_ENVIRONMENT_REFERENCE_POINTS = Object.freeze({
+  point8: Object.freeze(projectRearNormalizedReferencePointToOfficialSource(8)),
+  point9: Object.freeze(projectRearNormalizedReferencePointToOfficialSource(9)),
+});
+
+/**
  * Polígono único e irregular. A borda interna acompanha o limite do parque e a
  * externa acompanha a continuidade simplificada do terreno além da BR-472;
  * não há placas retangulares ou ilhas desconectadas.
  */
 export const REAR_TERRAIN_PATCHES: readonly RearTerrainPatch[] = Object.freeze([
   Object.freeze({
-    id: 'br472-east-terrain-continuity',
+    id: 'exporural-br472-environmental-continuity',
     sourcePolygon: Object.freeze([
-      [5850, 1120],
-      [6240, 1045],
-      [6550, 1110],
-      [6810, 1440],
-      [6775, 2200],
-      [6900, 3070],
-      [6815, 3910],
-      [6570, 4580],
-      [6120, 4690],
-      [5925, 4410],
-      [5870, 3600],
-      [5885, 2620],
-      [5860, 1780],
+      // Costura interna: acompanha a Rua Exporural sem cobri-la visualmente.
+      [5720, 820],
+      [6120, 790],
+      [6580, 890],
+      // Borda externa: continuidade simplificada além da BR-472.
+      [6800, 1120],
+      [6870, 1650],
+      [6820, 2150],
+      [6740, 2650],
+      [6635, 3150],
+      [6500, 3600],
+      [6300, 4070],
+      [6140, 4400],
+      [5800, 4340],
+      // Retorno irregular pela borda externa do parque/Rua Exporural.
+      [5540, 3960],
+      [5375, 3525],
+      [5460, 3160],
+      [5540, 2710],
+      [5610, 2150],
+      [5685, 1500],
+      [5720, 1050],
     ] as const),
     baseElevation: 0,
     surface: 'grass' as const,
@@ -78,12 +98,18 @@ export interface RearVegetationCluster {
  * floresta uniforme.
  */
 export const REAR_VEGETATION_CLUSTERS: readonly RearVegetationCluster[] = Object.freeze([
-  { id: 'outer-br-north', sourceBounds: [6130, 1360, 6660, 2420], density: 116, species: 'canopy', seed: 29 },
-  { id: 'outer-br-middle', sourceBounds: [6140, 2490, 6740, 3540], density: 108, species: 'canopy', seed: 53 },
-  { id: 'outer-br-south', sourceBounds: [6150, 3630, 6580, 4390], density: 104, species: 'grove', seed: 79 },
-  { id: 'inner-br-north', sourceBounds: [5690, 1420, 5940, 2520], density: 92, species: 'grove', seed: 101 },
-  { id: 'inner-br-middle', sourceBounds: [5700, 2580, 5950, 3460], density: 76, species: 'scrub', seed: 127 },
-  { id: 'inner-br-south', sourceBounds: [5530, 3770, 5910, 4270], density: 72, species: 'scrub', seed: 151 },
+  // Manchas além da BR: densas, porém descontínuas e afastadas do acostamento.
+  { id: 'outer-br-north', sourceBounds: [6610, 1120, 6810, 1660], density: 110, species: 'canopy', seed: 29 },
+  { id: 'outer-br-p8', sourceBounds: [6510, 1770, 6760, 2350], density: 110, species: 'canopy', seed: 53 },
+  { id: 'outer-br-middle', sourceBounds: [6400, 2440, 6630, 3020], density: 100, species: 'canopy', seed: 79 },
+  { id: 'outer-br-south', sourceBounds: [6270, 3100, 6480, 3690], density: 88, species: 'grove', seed: 101 },
+  { id: 'outer-br-terminal', sourceBounds: [6110, 3740, 6270, 4200], density: 78, species: 'grove', seed: 127 },
+  // Corredor intermediário: alterna mata, clareiras e vegetação baixa.
+  { id: 'intermediate-north', sourceBounds: [5940, 1050, 6380, 1580], density: 80, species: 'grove', seed: 151 },
+  { id: 'intermediate-p9', sourceBounds: [5870, 1660, 6270, 2260], density: 92, species: 'canopy', seed: 179 },
+  { id: 'intermediate-middle', sourceBounds: [5750, 2330, 6160, 2920], density: 78, species: 'grove', seed: 211 },
+  { id: 'intermediate-south', sourceBounds: [5580, 2970, 6030, 3470], density: 62, species: 'scrub', seed: 239 },
+  { id: 'gate-approach-low', sourceBounds: [5520, 3540, 5960, 4000], density: 48, species: 'scrub', seed: 269 },
 ]);
 
 export const REAR_ENVIRONMENT_BUDGET = Object.freeze({
@@ -148,9 +174,20 @@ function distanceToPolygon(point: readonly [number, number], polygon: readonly (
 }
 
 const terrainPolygons = REAR_TERRAIN_PATCHES.map((patch) => sourcePolygonToLocal(patch.sourcePolygon));
-const protectedOfficialPolygons = OFFICIAL_REFERENCE_DATA.entities.map(
-  (entity) => entity.geometry.coordinates[0] as Array<[number, number]>,
-);
+const protectedOfficialPolygons = OFFICIAL_REFERENCE_DATA.entities
+  // A antiga geometria cadastral da rodovia é justamente a superfície
+  // substituída. Mantê-la como exclusão conservaria vazio o corredor errado.
+  .filter((entity) => entity.publicIdentifier !== 'RODOVIA-RS-472')
+  .map((entity) => entity.geometry.coordinates[0] as Array<[number, number]>);
+const protectedStructurePolygons = REAR_STRUCTURE_EXCLUSIONS.map((bounds) => {
+  const local = sourceBoundsToLocal(bounds);
+  return [
+    [local.minX, local.minZ],
+    [local.maxX, local.minZ],
+    [local.maxX, local.maxZ],
+    [local.minX, local.maxZ],
+  ] as const;
+});
 
 export interface RearTreeInstance {
   x: number;
@@ -174,8 +211,9 @@ export function buildRearTreeInstances(reducedGraphics = false): RearTreeInstanc
     const area = (cluster.sourceBounds[2] - cluster.sourceBounds[0])
       * (cluster.sourceBounds[3] - cluster.sourceBounds[1]);
     const target = Math.round((area / 1_000_000) * cluster.density * (reducedGraphics ? 0.44 : 1));
+    let clusterInstances = 0;
 
-    for (let attempt = 0; attempt < target * 12 && instances.length < budget; attempt += 1) {
+    for (let attempt = 0; attempt < target * 16 && instances.length < budget; attempt += 1) {
       const sourceX = cluster.sourceBounds[0]
         + random() * (cluster.sourceBounds[2] - cluster.sourceBounds[0]);
       const sourceZ = cluster.sourceBounds[1]
@@ -192,9 +230,11 @@ export function buildRearTreeInstances(reducedGraphics = false): RearTreeInstanc
       );
       if (random() > Math.max(0.08, feather)) continue;
       if (corridors.some((corridor) => (
-        distanceToPath(local, corridor.path) <= corridor.halfWidth + 0.5
+        distanceToPath(local, corridor.path) <= corridor.halfWidth
+          + (corridor.roadId === 'RODOVIA-RS-472' ? 0.72 : 0.5)
       ))) continue;
       if (protectedOfficialPolygons.some((polygon) => distanceToPolygon(local, polygon) <= 0.32)) continue;
+      if (protectedStructurePolygons.some((polygon) => distanceToPolygon(local, polygon) <= 0.32)) continue;
 
       const baseScale = cluster.species === 'scrub' ? 0.34 : cluster.species === 'grove' ? 0.68 : 0.94;
       instances.push({
@@ -205,7 +245,8 @@ export function buildRearTreeInstances(reducedGraphics = false): RearTreeInstanc
         tint: random(),
         species: cluster.species,
       });
-      if (instances.length >= budget) break;
+      clusterInstances += 1;
+      if (instances.length >= budget || clusterInstances >= target) break;
     }
   }
 
@@ -218,14 +259,14 @@ export interface RearPoleInstance {
   rotation: number;
 }
 
-/** Postes apenas no acesso local; a BR-472 não vira corredor urbano. */
+/** Postes apenas no acesso A5–BR; nenhuma das três vias vira corredor urbano. */
 export function buildRearPoleInstances(reducedGraphics = false): RearPoleInstance[] {
   if (reducedGraphics) return [];
-  const spacing = rearRoadSourceToLocalLength(360);
+  const spacing = rearRoadSourceToLocalLength(90);
   const poles: RearPoleInstance[] = [];
 
   rearRoadCorridors()
-    .filter((corridor) => corridor.roadId !== 'RODOVIA-RS-472')
+    .filter((corridor) => corridor.roadId === 'ACESSO-A5-BR472')
     .forEach((corridor) => {
       let carried = spacing * 0.5;
       for (let index = 0; index < corridor.path.length - 1; index += 1) {
@@ -237,9 +278,17 @@ export function buildRearPoleInstances(reducedGraphics = false): RearPoleInstanc
           const t = cursor / (length || 1);
           const dirX = (bx - ax) / (length || 1);
           const dirZ = (bz - az) / (length || 1);
+          const position = [
+            ax + (bx - ax) * t - dirZ * (corridor.halfWidth + 0.22),
+            az + (bz - az) * t + dirX * (corridor.halfWidth + 0.22),
+          ] as const;
+          if (protectedOfficialPolygons.some((polygon) => distanceToPolygon(position, polygon) <= 0.18)) {
+            cursor += spacing;
+            continue;
+          }
           poles.push({
-            x: ax + (bx - ax) * t - dirZ * (corridor.halfWidth + 0.22),
-            z: az + (bz - az) * t + dirX * (corridor.halfWidth + 0.22),
+            x: position[0],
+            z: position[1],
             rotation: Math.atan2(dirZ, dirX),
           });
           cursor += spacing;
