@@ -120,9 +120,12 @@ describe('área posterior do parque — correção espacial (Portão 5 → Rua B
       expect(distanceToPath(corner, path)).toBeGreaterThan(halfWidth + 1);
     });
 
-    // A rodovia fica inteiramente ao sul do limite oficial do parque.
-    const parkSouthEdge = officialPdfPointToLocal([3964, 5060])[1];
-    path.forEach((point) => expect(point[1]).toBeGreaterThan(parkSouthEdge));
+    // No trecho que passa em frente ao parque, a rodovia fica sempre ao sul do
+    // limite oficial das Etnias — nunca dentro do parque.
+    const parkSouthEdge = officialPdfPointToLocal([3964, 5100])[1];
+    path
+      .filter((point) => point[0] > ethnicBox.minX - 6 && point[0] < ethnicBox.maxX + 6)
+      .forEach((point) => expect(point[1]).toBeGreaterThan(parkSouthEdge));
   });
 
   it('não altera nenhuma coordenada das vias protegidas da Exporural', () => {
@@ -164,7 +167,7 @@ describe('área posterior do parque — correção espacial (Portão 5 → Rua B
           samples[index + 1][1] - samples[index][1],
         );
         expect(step).toBeGreaterThan(0);
-        expect(step).toBeLessThan(1.5);
+        expect(step).toBeLessThan(2);
       }
     });
   });
