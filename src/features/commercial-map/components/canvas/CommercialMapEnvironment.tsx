@@ -10,6 +10,10 @@ import {
   type CommercialMapEnvironmentExtent,
   type CommercialMapEnvironmentMode,
 } from '../../data/commercialMapEnvironment';
+import {
+  openGroundTextureBundleForEntity,
+  type OpenGroundSurfaceProfile,
+} from './openGroundTextures';
 
 interface CommercialMapEnvironmentProps {
   extent: CommercialMapEnvironmentExtent;
@@ -21,6 +25,13 @@ type EnvironmentPalette = typeof COMMERCIAL_MAP_ENVIRONMENT_CONFIG.palettes.norm
   | typeof COMMERCIAL_MAP_ENVIRONMENT_CONFIG.palettes.hydrological;
 
 const NO_RAYCAST = () => undefined;
+const ACTIVE_GROUND_PROFILE: Readonly<OpenGroundSurfaceProfile> = Object.freeze({
+  surface: 'landscapeGrass',
+  tileWorldSize: 18,
+  baseColor: '#b8c9b0',
+  roughness: 0.99,
+});
+const ACTIVE_GROUND_NORMAL_SCALE = new THREE.Vector2(0.12, 0.12);
 
 function colorWithAlpha(hex: string, alpha: number) {
   const color = new THREE.Color(hex);
@@ -289,6 +300,7 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
 }: CommercialMapEnvironmentProps) {
   const scene = useThree((state) => state.scene);
   const invalidate = useThree((state) => state.invalidate);
+  const maximumAnisotropy = useThree((state) => state.gl.capabilities.getMaxAnisotropy());
   const mode: CommercialMapEnvironmentMode = hydrologicalModeActive ? 'hydrological' : 'normal';
   const palette = COMMERCIAL_MAP_ENVIRONMENT_CONFIG.palettes[mode];
   const layout = useMemo(
@@ -344,6 +356,18 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
     () => createOuterGroundTexture(groundTextureSize, palette),
     [groundTextureSize, palette],
   );
+  const activeGroundTextures = useMemo(() => {
+    if (hydrologicalModeActive) return null;
+    const bundle = openGroundTextureBundleForEntity(ACTIVE_GROUND_PROFILE, maximumAnisotropy);
+    if (!bundle) return null;
+    const repeatX = layout.activeGroundWidth / ACTIVE_GROUND_PROFILE.tileWorldSize;
+    const repeatY = layout.activeGroundDepth / ACTIVE_GROUND_PROFILE.tileWorldSize;
+    [bundle.map, bundle.normalMap, bundle.roughnessMap].forEach((texture) => {
+      texture.repeat.set(repeatX, repeatY);
+      texture.needsUpdate = true;
+    });
+    return bundle;
+  }, [hydrologicalModeActive, layout.activeGroundDepth, layout.activeGroundWidth, maximumAnisotropy]);
   const reflectionTextureWidth = reducedGraphics
     ? COMMERCIAL_MAP_ENVIRONMENT_CONFIG.reflections.reducedTextureWidth
     : COMMERCIAL_MAP_ENVIRONMENT_CONFIG.reflections.fullTextureWidth;
@@ -383,6 +407,10 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
   useEffect(() => () => {
     outerGroundTexture.dispose();
   }, [outerGroundTexture]);
+
+  useEffect(() => () => {
+    activeGroundTextures?.dispose();
+  }, [activeGroundTextures]);
 
   return (
     <>
@@ -460,6 +488,10 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
         <planeGeometry args={[layout.activeGroundWidth, layout.activeGroundDepth]} />
         <meshStandardMaterial
           color={palette.activeGround}
+          map={activeGroundTextures?.map}
+          normalMap={activeGroundTextures?.normalMap}
+          normalScale={activeGroundTextures ? ACTIVE_GROUND_NORMAL_SCALE : undefined}
+          roughnessMap={activeGroundTextures?.roughnessMap}
           roughness={0.98}
           metalness={0}
           envMapIntensity={0.12}

@@ -535,6 +535,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
                 key={areaScope}
                 entities={scopedData.entities}
                 parkingOwnerEntities={data.entities}
+                siteEnvironmentEntities={data.entities}
                 lots={scopedData.lots}
                 calibration={data.calibration}
                 matchingEntityIds={mapFilter.matchingEntityIds}

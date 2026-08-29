@@ -37,10 +37,39 @@ export interface RearRoadNetworkGeometries {
   };
 }
 
+export interface RearRoadCorridorOptions {
+  /** Inclui o acostamento no volume testado. O padrão representa toda a faixa viária. */
+  includeShoulders?: boolean;
+  /** Densidade da aproximação da Catmull-Rom usada pelo renderer. */
+  samplesPerWorldUnit?: number;
+  /** Folga numérica para considerar pontos e arestas sobre a borda como interseção. */
+  tolerance?: number;
+}
+
+/**
+ * Representação 2D verificável da mesma faixa gerada pelo renderer. O polígono
+ * é útil em overlays de inspeção; `centerline` + `halfWidth` preservam a
+ * semântica de corredor e são usados nas validações sem depender da
+ * triangulação da malha Three.js.
+ */
+export interface RearRoadCorridorFootprint {
+  segmentId: string;
+  roadId: RoadSegment['roadId'];
+  centerline: readonly LocalPoint[];
+  polygon: readonly LocalPoint[];
+  pavementHalfWidth: number;
+  shoulderWidth: number;
+  halfWidth: number;
+  includesShoulders: boolean;
+}
+
 export const REAR_ROAD_BUDGET = Object.freeze({
   maximumBaseDrawCalls: 4,
   maximumTriangles: 24_000,
 });
+
+const DEFAULT_CORRIDOR_SAMPLES_PER_WORLD_UNIT = 8;
+const DEFAULT_GEOMETRY_TOLERANCE = 1e-6;
 
 /**
  * Amostragem por comprimento acumulado. `getPointAt` usa o mapeamento de arco
@@ -58,6 +87,15 @@ export function sampleRearRoadCenterline(
     'centripetal',
     0.5,
   );
+  // Three.js defaults to only 200 divisions for its arc-length lookup table.
+  // Long park/highway splines need a denser table or `getPointAt` still yields
+  // visibly uneven chord lengths despite using normalized arc distance.
+  const approximateLength = curve.getLength();
+  curve.arcLengthDivisions = Math.max(
+    200,
+    Math.ceil(approximateLength * Math.max(4, samplesPerWorldUnit * 2)),
+  );
+  curve.updateArcLengths();
   const divisions = Math.max(
     path.length - 1,
     Math.ceil(curve.getLength() * Math.max(1, samplesPerWorldUnit)),
@@ -271,10 +309,10 @@ export function buildRearRoadNetworkGeometries(
     if (roads.length < 2) return;
     const node = REAR_ROAD_NODES[nodeId];
     const center: LocalPoint = [node.position[0], node.position[2]];
-    const parkRoad = roads.find((road) => road.materialId === 'park-asphalt');
+    const hasHighway = roads.some((road) => road.materialId === 'highway-asphalt');
     const radius = Math.max(...roads.map((road) => road.width / 2));
     const elevation = Math.max(...roads.map((road) => road.elevationOffset));
-    pushRoundJunction(parkRoad ? parkAsphalt : highway, center, radius, elevation, reducedGraphics ? 8 : 16);
+    pushRoundJunction(hasHighway ? highway : parkAsphalt, center, radius, elevation, reducedGraphics ? 8 : 16);
     junctionCount += 1;
   });
 
@@ -313,6 +351,8 @@ export function disposeRearRoadNetworkGeometries(network: RearRoadNetworkGeometr
 
 /** Distância planar de um ponto ao eixo amostrado — usado nas exclusões. */
 export function distanceToPath(point: LocalPoint, path: readonly LocalPoint[]) {
+  if (path.length === 0) return Number.POSITIVE_INFINITY;
+  if (path.length === 1) return Math.hypot(point[0] - path[0][0], point[1] - path[0][1]);
   let best = Number.POSITIVE_INFINITY;
   for (let index = 0; index < path.length - 1; index += 1) {
     const [ax, az] = path[index];
@@ -326,4 +366,269 @@ export function distanceToPath(point: LocalPoint, path: readonly LocalPoint[]) {
     best = Math.min(best, Math.hypot(point[0] - (ax + dx * t), point[1] - (az + dz * t)));
   }
   return best;
+}
+
+function pointToSegmentDistance(point: LocalPoint, start: LocalPoint, end: LocalPoint) {
+  const deltaX = end[0] - start[0];
+  const deltaZ = end[1] - start[1];
+  const lengthSquared = deltaX * deltaX + deltaZ * deltaZ;
+  if (lengthSquared === 0) return Math.hypot(point[0] - start[0], point[1] - start[1]);
+  const projection = Math.min(1, Math.max(
+    0,
+    ((point[0] - start[0]) * deltaX + (point[1] - start[1]) * deltaZ) / lengthSquared,
+  ));
+  return Math.hypot(
+    point[0] - (start[0] + deltaX * projection),
+    point[1] - (start[1] + deltaZ * projection),
+  );
+}
+
+function polygonRing(polygon: readonly LocalPoint[], tolerance: number): readonly LocalPoint[] {
+  if (polygon.length < 2) return polygon;
+  const first = polygon[0];
+  const last = polygon[polygon.length - 1];
+  return Math.hypot(first[0] - last[0], first[1] - last[1]) <= tolerance
+    ? polygon.slice(0, -1)
+    : polygon;
+}
+
+/** Teste inclusivo: um ponto sobre a borda pertence ao polígono. */
+export function pointIsInsidePolygon(
+  point: LocalPoint,
+  polygon: readonly LocalPoint[],
+  tolerance = DEFAULT_GEOMETRY_TOLERANCE,
+) {
+  const ring = polygonRing(polygon, tolerance);
+  if (ring.length < 3) return false;
+
+  for (let index = 0; index < ring.length; index += 1) {
+    const nextIndex = (index + 1) % ring.length;
+    if (pointToSegmentDistance(point, ring[index], ring[nextIndex]) <= tolerance) return true;
+  }
+
+  let inside = false;
+  for (let index = 0, previousIndex = ring.length - 1; index < ring.length; previousIndex = index, index += 1) {
+    const [currentX, currentZ] = ring[index];
+    const [previousX, previousZ] = ring[previousIndex];
+    const crossesRay = (currentZ > point[1]) !== (previousZ > point[1]);
+    if (!crossesRay) continue;
+    const crossingX = ((previousX - currentX) * (point[1] - currentZ))
+      / (previousZ - currentZ) + currentX;
+    if (point[0] < crossingX) inside = !inside;
+  }
+  return inside;
+}
+
+function crossProduct(origin: LocalPoint, first: LocalPoint, second: LocalPoint) {
+  return (first[0] - origin[0]) * (second[1] - origin[1])
+    - (first[1] - origin[1]) * (second[0] - origin[0]);
+}
+
+function segmentsIntersect(
+  aStart: LocalPoint,
+  aEnd: LocalPoint,
+  bStart: LocalPoint,
+  bEnd: LocalPoint,
+  tolerance: number,
+) {
+  const aSideStart = crossProduct(aStart, aEnd, bStart);
+  const aSideEnd = crossProduct(aStart, aEnd, bEnd);
+  const bSideStart = crossProduct(bStart, bEnd, aStart);
+  const bSideEnd = crossProduct(bStart, bEnd, aEnd);
+  const crossesA = (aSideStart > tolerance && aSideEnd < -tolerance)
+    || (aSideStart < -tolerance && aSideEnd > tolerance);
+  const crossesB = (bSideStart > tolerance && bSideEnd < -tolerance)
+    || (bSideStart < -tolerance && bSideEnd > tolerance);
+  if (crossesA && crossesB) return true;
+
+  return (
+    (Math.abs(aSideStart) <= tolerance && pointToSegmentDistance(bStart, aStart, aEnd) <= tolerance)
+    || (Math.abs(aSideEnd) <= tolerance && pointToSegmentDistance(bEnd, aStart, aEnd) <= tolerance)
+    || (Math.abs(bSideStart) <= tolerance && pointToSegmentDistance(aStart, bStart, bEnd) <= tolerance)
+    || (Math.abs(bSideEnd) <= tolerance && pointToSegmentDistance(aEnd, bStart, bEnd) <= tolerance)
+  );
+}
+
+function segmentToSegmentDistance(
+  aStart: LocalPoint,
+  aEnd: LocalPoint,
+  bStart: LocalPoint,
+  bEnd: LocalPoint,
+  tolerance: number,
+) {
+  if (segmentsIntersect(aStart, aEnd, bStart, bEnd, tolerance)) return 0;
+  return Math.min(
+    pointToSegmentDistance(aStart, bStart, bEnd),
+    pointToSegmentDistance(aEnd, bStart, bEnd),
+    pointToSegmentDistance(bStart, aStart, aEnd),
+    pointToSegmentDistance(bEnd, aStart, aEnd),
+  );
+}
+
+function centerlineNormal(samples: readonly LocalPoint[], index: number): LocalPoint {
+  const current = samples[index];
+  let previousIndex = index;
+  while (previousIndex > 0) {
+    previousIndex -= 1;
+    if (samples[previousIndex][0] !== current[0] || samples[previousIndex][1] !== current[1]) break;
+  }
+  let nextIndex = index;
+  while (nextIndex < samples.length - 1) {
+    nextIndex += 1;
+    if (samples[nextIndex][0] !== current[0] || samples[nextIndex][1] !== current[1]) break;
+  }
+  const directionX = samples[nextIndex][0] - samples[previousIndex][0];
+  const directionZ = samples[nextIndex][1] - samples[previousIndex][1];
+  const length = Math.hypot(directionX, directionZ);
+  return length === 0 ? [0, 1] : [-directionZ / length, directionX / length];
+}
+
+function footprintPolygon(centerline: readonly LocalPoint[], halfWidth: number): LocalPoint[] {
+  if (centerline.length === 0) return [];
+  if (centerline.length === 1) {
+    const segments = 16;
+    const circle = Array.from({ length: segments }, (_, index) => {
+      const angle = (index / segments) * Math.PI * 2;
+      return [
+        centerline[0][0] + Math.cos(angle) * halfWidth,
+        centerline[0][1] + Math.sin(angle) * halfWidth,
+      ] as LocalPoint;
+    });
+    return [...circle, circle[0]];
+  }
+
+  const left: LocalPoint[] = [];
+  const right: LocalPoint[] = [];
+  centerline.forEach((point, index) => {
+    const normal = centerlineNormal(centerline, index);
+    left.push([point[0] + normal[0] * halfWidth, point[1] + normal[1] * halfWidth]);
+    right.push([point[0] - normal[0] * halfWidth, point[1] - normal[1] * halfWidth]);
+  });
+  const polygon = [...left, ...right.reverse()];
+  return polygon.length > 0 ? [...polygon, polygon[0]] : polygon;
+}
+
+/**
+ * Constrói o footprint 2D da pista ou da faixa completa (pista + acostamento)
+ * com a mesma curva e as mesmas larguras usadas na malha renderizada.
+ */
+export function buildRearRoadCorridorFootprint(
+  definition: RoadSegment,
+  {
+    includeShoulders = true,
+    samplesPerWorldUnit = DEFAULT_CORRIDOR_SAMPLES_PER_WORLD_UNIT,
+  }: RearRoadCorridorOptions = {},
+): RearRoadCorridorFootprint {
+  const pavementHalfWidth = rearRoadLocalWidth(definition) / 2;
+  const shoulderWidth = includeShoulders ? rearRoadLocalShoulderWidth(definition) : 0;
+  const halfWidth = pavementHalfWidth + shoulderWidth;
+  const centerline = sampleRearRoadCenterline(
+    rearRoadLocalPath(definition),
+    Math.max(1, samplesPerWorldUnit),
+  );
+  return {
+    segmentId: definition.id,
+    roadId: definition.roadId,
+    centerline,
+    polygon: footprintPolygon(centerline, halfWidth),
+    pavementHalfWidth,
+    shoulderWidth,
+    halfWidth,
+    includesShoulders: includeShoulders,
+  };
+}
+
+export function buildRearRoadCorridorFootprints(
+  definitions: readonly RoadSegment[] = GENERATED_REAR_ROAD_SEGMENTS,
+  options: RearRoadCorridorOptions = {},
+) {
+  return definitions.map((definition) => buildRearRoadCorridorFootprint(definition, options));
+}
+
+export function pointIsInsideRearRoadCorridor(
+  point: LocalPoint,
+  definition: RoadSegment,
+  options: RearRoadCorridorOptions = {},
+) {
+  const footprint = buildRearRoadCorridorFootprint(definition, options);
+  return pointIsInsideRearRoadFootprint(
+    point,
+    footprint,
+    options.tolerance ?? DEFAULT_GEOMETRY_TOLERANCE,
+  );
+}
+
+export function pointIsInsideRearRoadFootprint(
+  point: LocalPoint,
+  footprint: RearRoadCorridorFootprint,
+  tolerance = DEFAULT_GEOMETRY_TOLERANCE,
+) {
+  return distanceToPath(point, footprint.centerline) <= footprint.halfWidth + tolerance;
+}
+
+export function pointIsInsideAnyRearRoadCorridor(
+  point: LocalPoint,
+  definitions: readonly RoadSegment[] = GENERATED_REAR_ROAD_SEGMENTS,
+  options: RearRoadCorridorOptions = {},
+) {
+  return definitions.some((definition) => pointIsInsideRearRoadCorridor(point, definition, options));
+}
+
+export function pointIsInsideAnyRearRoadFootprint(
+  point: LocalPoint,
+  footprints: readonly RearRoadCorridorFootprint[],
+  tolerance = DEFAULT_GEOMETRY_TOLERANCE,
+) {
+  return footprints.some((footprint) => pointIsInsideRearRoadFootprint(point, footprint, tolerance));
+}
+
+/**
+ * Interseção do corredor com um polígono oficial. A verificação trabalha com o
+ * eixo suavizado e a largura física real: cobre eixo dentro do polígono,
+ * vértices do polígono dentro da faixa e aproximação entre todas as arestas.
+ * Assim ela detecta cruzamentos mesmo quando nenhuma amostra cai exatamente
+ * dentro do polígono e evita depender de bounding boxes ou da triangulação.
+ */
+export function rearRoadFootprintIntersectsPolygon(
+  footprint: RearRoadCorridorFootprint,
+  polygon: readonly LocalPoint[],
+  tolerance = DEFAULT_GEOMETRY_TOLERANCE,
+) {
+  const ring = polygonRing(polygon, tolerance);
+  if (ring.length < 3 || footprint.centerline.length === 0) return false;
+
+  if (footprint.centerline.some((point) => pointIsInsidePolygon(point, ring, tolerance))) return true;
+  if (ring.some((point) => distanceToPath(point, footprint.centerline) <= footprint.halfWidth + tolerance)) {
+    return true;
+  }
+
+  for (let centerlineIndex = 0; centerlineIndex < footprint.centerline.length - 1; centerlineIndex += 1) {
+    const centerlineStart = footprint.centerline[centerlineIndex];
+    const centerlineEnd = footprint.centerline[centerlineIndex + 1];
+    for (let polygonIndex = 0; polygonIndex < ring.length; polygonIndex += 1) {
+      const polygonStart = ring[polygonIndex];
+      const polygonEnd = ring[(polygonIndex + 1) % ring.length];
+      if (segmentToSegmentDistance(
+        centerlineStart,
+        centerlineEnd,
+        polygonStart,
+        polygonEnd,
+        tolerance,
+      ) <= footprint.halfWidth + tolerance) return true;
+    }
+  }
+  return false;
+}
+
+export function rearRoadCorridorIntersectsPolygon(
+  definition: RoadSegment,
+  polygon: readonly LocalPoint[],
+  options: RearRoadCorridorOptions = {},
+) {
+  const footprint = buildRearRoadCorridorFootprint(definition, options);
+  return rearRoadFootprintIntersectsPolygon(
+    footprint,
+    polygon,
+    options.tolerance ?? DEFAULT_GEOMETRY_TOLERANCE,
+  );
 }
