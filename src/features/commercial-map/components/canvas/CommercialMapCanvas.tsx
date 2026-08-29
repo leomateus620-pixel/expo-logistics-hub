@@ -115,6 +115,8 @@ import { ArenaFrontInfrastructure } from './ArenaFrontInfrastructure';
 import { NationsDistrict } from './NationsDistrict';
 import { CommercialMapEnvironment } from './CommercialMapEnvironment';
 import { ParkAccessEnvironmentLayer } from './ParkAccessEnvironmentLayer';
+import { RearParkRoadNetwork } from './RearParkRoadNetwork';
+import { RearParkEnvironmentLayer } from './RearParkEnvironmentLayer';
 import { ParkAccessInfrastructure } from './ParkAccessInfrastructure';
 import { selectParkAccessCompatibleTreesForPresentation } from '../../data/parkAccessEnvironment';
 import { PARK_ACCESS_SPATIAL_PLAN } from '../../data/parkAccessSpatialPlan';
@@ -3248,6 +3250,15 @@ function Scene({
         layerOpacity={layerOpacity}
         reducedGraphics={reducedGraphics}
       />
+      {!isolatedArea && !hydrologicalModeActive && (
+        <>
+          <RearParkEnvironmentLayer
+            reducedGraphics={reducedGraphics}
+            vegetationVisible={treesVisible}
+          />
+          <RearParkRoadNetwork reducedGraphics={reducedGraphics} />
+        </>
+      )}
       {rearParkingEnabled && (
         <RearParkingLayer reducedGraphics={reducedGraphics} labelsVisible={labelsVisible} opacity={parkingPresentation.opacity} />
       )}

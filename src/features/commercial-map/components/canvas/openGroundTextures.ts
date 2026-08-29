@@ -10,7 +10,10 @@ export type OpenGroundSurface =
   | 'compactedGravel'
   | 'pitchTurf'
   | 'compactedSoil'
-  | 'concrete';
+  | 'concrete'
+  | 'highwayAsphalt'
+  | 'parkAsphalt'
+  | 'roadShoulder';
 
 export interface OpenGroundSurfaceProfile {
   surface: OpenGroundSurface;
@@ -378,6 +381,9 @@ export function getOpenGroundTexture(surface: OpenGroundSurface): THREE.CanvasTe
   else if (surface === 'pitchTurf') paintPitchTurf(context);
   else if (surface === 'compactedSoil') paintCompactedSoil(context);
   else if (surface === 'concrete') paintConcrete(context);
+  else if (surface === 'highwayAsphalt') paintAsphalt(context, 'highway');
+  else if (surface === 'parkAsphalt') paintAsphalt(context, 'park');
+  else if (surface === 'roadShoulder') paintRoadShoulder(context);
   else paintCompactedGravel(context);
 
   const texture = new THREE.CanvasTexture(canvas);
@@ -422,3 +428,78 @@ export function openGroundTextureForEntity(
 /** Compatibility export: rendering and spatial support share the same visible top. */
 export { OPEN_GROUND_PRESENTATION_HEIGHT } from '../../constants';
 
+
+/**
+ * Asfalto procedural das vias da área posterior. Duas variantes: rodovia
+ * (BR-472, mais escura e mais uniforme) e via interna do parque (levemente mais
+ * clara e desgastada). Modulação em torno de um neutro médio para que o `color`
+ * do material continue governando o tom mesmo depois do mipmapping.
+ */
+function paintAsphalt(context: CanvasRenderingContext2D, variant: 'highway' | 'park') {
+  const image = context.createImageData(TEXTURE_SIZE, TEXTURE_SIZE);
+  const dark = variant === 'highway' ? [150, 154, 158] : [158, 160, 156];
+  const light = variant === 'highway' ? [214, 218, 222] : [222, 222, 214];
+
+  for (let y = 0; y < TEXTURE_SIZE; y += 1) {
+    for (let x = 0; x < TEXTURE_SIZE; x += 1) {
+      const offset = (y * TEXTURE_SIZE + x) * 4;
+      const macro = fractalNoise(x / (TEXTURE_SIZE * 0.45), y / (TEXTURE_SIZE * 0.45), 12.3, 2);
+      const grit = fractalNoise(x / 3.1, y / 3.1, 27.7, 2);
+      const grain = seededNoise(x, y, 8.2) - 0.5;
+      const blend = THREE.MathUtils.clamp(
+        0.42 + (macro - 0.5) * 0.55 + (grit - 0.5) * 0.5 + grain * 0.22,
+        0,
+        1,
+      );
+      image.data[offset] = dark[0] + (light[0] - dark[0]) * blend;
+      image.data[offset + 1] = dark[1] + (light[1] - dark[1]) * blend;
+      image.data[offset + 2] = dark[2] + (light[2] - dark[2]) * blend;
+      image.data[offset + 3] = 255;
+    }
+  }
+  context.putImageData(image, 0, 0);
+
+  // Emendas longitudinais discretas: leitura de pavimento sem sinalização falsa.
+  context.strokeStyle = variant === 'highway' ? 'rgba(140,144,148,.28)' : 'rgba(146,146,140,.24)';
+  context.lineWidth = 1.2;
+  const seamSpacing = Math.round(TEXTURE_SIZE / (variant === 'highway' ? 2 : 3));
+  for (let position = seamSpacing; position < TEXTURE_SIZE; position += seamSpacing) {
+    context.beginPath();
+    context.moveTo(position, 0);
+    context.lineTo(position, TEXTURE_SIZE);
+    context.stroke();
+  }
+
+  // Remendos amplos, de baixa frequência, para evitar asfalto uniforme.
+  for (let index = 0; index < 8; index += 1) {
+    const x = seededNoise(index, 3.3, 19.4) * TEXTURE_SIZE;
+    const y = seededNoise(index, 7.7, 5.1) * TEXTURE_SIZE;
+    const radius = TEXTURE_SIZE * (0.05 + seededNoise(index, 2.9, 11.2) * 0.12);
+    const patch = context.createRadialGradient(x, y, 0, x, y, radius);
+    patch.addColorStop(0, 'rgba(168,172,176,.16)');
+    patch.addColorStop(1, 'rgba(168,172,176,0)');
+    context.fillStyle = patch;
+    context.fillRect(x - radius, y - radius, radius * 2, radius * 2);
+  }
+}
+
+/** Acostamento: brita fina compactada, transição entre asfalto e gramado. */
+function paintRoadShoulder(context: CanvasRenderingContext2D) {
+  const image = context.createImageData(TEXTURE_SIZE, TEXTURE_SIZE);
+  const dark = [168, 158, 142];
+  const light = [230, 222, 202];
+
+  for (let y = 0; y < TEXTURE_SIZE; y += 1) {
+    for (let x = 0; x < TEXTURE_SIZE; x += 1) {
+      const offset = (y * TEXTURE_SIZE + x) * 4;
+      const macro = fractalNoise(x / (TEXTURE_SIZE * 0.38), y / (TEXTURE_SIZE * 0.38), 31.5, 2);
+      const grit = seededNoise(x, y, 14.8);
+      const blend = THREE.MathUtils.clamp(0.45 + (macro - 0.5) * 0.7 + (grit - 0.5) * 0.55, 0, 1);
+      image.data[offset] = dark[0] + (light[0] - dark[0]) * blend;
+      image.data[offset + 1] = dark[1] + (light[1] - dark[1]) * blend;
+      image.data[offset + 2] = dark[2] + (light[2] - dark[2]) * blend;
+      image.data[offset + 3] = 255;
+    }
+  }
+  context.putImageData(image, 0, 0);
+}
