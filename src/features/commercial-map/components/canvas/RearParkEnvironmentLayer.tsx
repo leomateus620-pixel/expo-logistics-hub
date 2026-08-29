@@ -1,14 +1,14 @@
 import { memo, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import * as THREE from 'three';
 import {
-  REAR_CONTEXT_BLOCKS,
   REAR_TERRAIN_PATCHES,
   buildRearPoleInstances,
   buildRearTreeInstances,
-  sourceBoundsToLocal,
+  sourcePolygonToLocal,
 } from '../../data/rearParkEnvironment';
 import { getOpenGroundTexture } from './openGroundTextures';
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
+import { rearRoadTerrainElevationAt } from '../../utils/rearRoadNetwork';
 
 interface RearParkEnvironmentLayerProps {
   reducedGraphics: boolean;
@@ -18,16 +18,9 @@ interface RearParkEnvironmentLayerProps {
 
 const NO_RAYCAST = () => undefined;
 
-function reliefAt(x: number, z: number, amplitude: number) {
-  return (
-    Math.sin(x * 0.21 + z * 0.13) * 0.55
-    + Math.sin(x * 0.07 - z * 0.31) * 0.45
-  ) * amplitude;
-}
-
 /**
- * Terreno ampliado até além da BR-472, vegetação instanciada, iluminação viária
- * e contexto externo simplificado. Nenhuma geometria oficial é lida ou alterada.
+ * Extensão irregular e contínua do terreno até além da BR-472, com vegetação
+ * instanciada e iluminação localizada. Nenhuma geometria oficial é alterada.
  */
 export const RearParkEnvironmentLayer = memo(function RearParkEnvironmentLayer({
   reducedGraphics,
@@ -39,26 +32,20 @@ export const RearParkEnvironmentLayer = memo(function RearParkEnvironmentLayer({
   const poleRef = useRef<THREE.InstancedMesh>(null);
 
   const terrain = useMemo(() => REAR_TERRAIN_PATCHES.map((patch) => {
-    const bounds = sourceBoundsToLocal(patch.sourceBounds);
-    const segments = Math.max(6, Math.round(patch.segments * (reducedGraphics ? 0.4 : 1)));
-    const geometry = new THREE.PlaneGeometry(
-      bounds.width,
-      bounds.depth,
-      segments,
-      Math.max(4, Math.round(segments * (bounds.depth / Math.max(bounds.width, 0.001)))),
-    );
-    geometry.rotateX(-Math.PI / 2);
+    const outline = sourcePolygonToLocal(patch.sourcePolygon);
+    const shape = new THREE.Shape(outline.map(([x, z]) => new THREE.Vector2(x, z)));
+    const geometry = new THREE.ShapeGeometry(shape);
     const position = geometry.getAttribute('position') as THREE.BufferAttribute;
     for (let index = 0; index < position.count; index += 1) {
-      const x = position.getX(index) + bounds.centerX;
-      const z = position.getZ(index) + bounds.centerZ;
-      position.setY(index, patch.baseElevation + reliefAt(x, z, patch.relief));
+      const x = position.getX(index);
+      const z = position.getY(index);
+      position.setXYZ(index, x, patch.baseElevation + rearRoadTerrainElevationAt(x, z), z);
     }
     position.needsUpdate = true;
     geometry.computeVertexNormals();
     geometry.computeBoundingSphere();
-    return { patch, bounds, geometry };
-  }), [reducedGraphics]);
+    return { patch, geometry };
+  }), []);
 
   useEffect(() => () => terrain.forEach((entry) => entry.geometry.dispose()), [terrain]);
 
@@ -147,7 +134,6 @@ export const RearParkEnvironmentLayer = memo(function RearParkEnvironmentLayer({
         <mesh
           key={entry.patch.id}
           geometry={entry.geometry}
-          position={[entry.bounds.centerX, 0, entry.bounds.centerZ]}
           raycast={NO_RAYCAST}
           receiveShadow={!reducedGraphics}
           dispose={null}
@@ -160,36 +146,6 @@ export const RearParkEnvironmentLayer = memo(function RearParkEnvironmentLayer({
           />
         </mesh>
       ))}
-
-      {REAR_CONTEXT_BLOCKS.map((block) => {
-        const bounds = sourceBoundsToLocal(block.sourceBounds);
-        if (block.kind === 'farmland') {
-          return (
-            <mesh
-              key={block.id}
-              position={[bounds.centerX, 0.008, bounds.centerZ]}
-              rotation={[-Math.PI / 2, 0, 0]}
-              raycast={NO_RAYCAST}
-              dispose={null}
-            >
-              <planeGeometry args={[bounds.width, bounds.depth]} />
-              <meshStandardMaterial color={block.tone} roughness={0.98} metalness={0} />
-            </mesh>
-          );
-        }
-        return (
-          <mesh
-            key={block.id}
-            position={[bounds.centerX, block.height / 2, bounds.centerZ]}
-            raycast={NO_RAYCAST}
-            castShadow={!reducedGraphics}
-            dispose={null}
-          >
-            <boxGeometry args={[bounds.width, block.height, bounds.depth]} />
-            <meshStandardMaterial color={block.tone} roughness={0.86} metalness={0} />
-          </mesh>
-        );
-      })}
 
       {trees.length > 0 && (
         <>
