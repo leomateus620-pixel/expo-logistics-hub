@@ -117,6 +117,7 @@ import { CommercialMapEnvironment } from './CommercialMapEnvironment';
 import { ParkAccessEnvironmentLayer } from './ParkAccessEnvironmentLayer';
 import { RearParkRoadNetwork } from './RearParkRoadNetwork';
 import { RearParkEnvironmentLayer } from './RearParkEnvironmentLayer';
+import { RearParkGate5 } from './RearParkGate5';
 import { ParkAccessInfrastructure } from './ParkAccessInfrastructure';
 import { selectParkAccessCompatibleTreesForPresentation } from '../../data/parkAccessEnvironment';
 import { PARK_ACCESS_SPATIAL_PLAN } from '../../data/parkAccessSpatialPlan';
