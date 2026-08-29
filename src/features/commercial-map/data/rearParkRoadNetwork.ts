@@ -2,18 +2,22 @@ import { officialPdfPointToLocal } from './officialReference2026';
 import { EXPORURAL_ROAD_IDENTIFIERS } from './exporuralReference2026';
 
 /**
- * Rede viária da área posterior do parque (transição Parque de Exposições →
- * BR-472). Camada de apresentação: nenhuma entidade comercial, lote, métrica ou
- * geometria oficial é derivada daqui.
+ * Rede viária da área posterior do parque — revisão corretiva 2026.9.2.
  *
- * Todos os eixos são descritos em pontos do PDF oficial 2026 e convertidos pela
- * mesma função usada pelo restante do mapa (`officialPdfPointToLocal`), de modo
- * que escala e origem sejam idênticas às das estruturas já posicionadas.
+ * A implantação anterior criou vias inventadas atrás das Etnias
+ * (`RUA-POSTERIOR-ETNIAS`, `RUA-ETNIAS-TRANSVERSAL`), alças de conversão,
+ * retaguarda da Arena e circulação de lotes que não existem nos satélites de
+ * referência. Todas foram REMOVIDAS: nada daquela geometria é reaproveitado.
  *
- * Âncoras usadas na leitura conjunta dos anexos 1 e 2 (satélite, ângulos
- * opostos): Arena Sicredi - Icatu (`F`), Avenida dos Imigrantes, Rua Brasília,
- * Casa da Etnia Polonesa (`C5`), Casa da Etnia Italiana (`C6`) e a Rodovia
- * RS-472 já existente na borda leste do recorte.
+ * A rede correta é mínima e comprovada pelas referências:
+ *   Portão 5 → lateral do Centro de Eventos (C1) → Rua Brasília (via oficial,
+ *   intocada) → continuação única → acesso → BR-472.
+ *
+ * Calibração espacial por marcos fixos (ver `utils/rearSpatialCalibration.ts`):
+ * Arena Sicredi - Icatu `F [4900,2690,5385,3130]`, Centro de Eventos Fenasoja
+ * `C1 [4020,3180,4490,3435]`, Rua Brasília oficial `[3940,2440,3988,4210]`,
+ * conjunto das Etnias `C5/C6/C7/C8` (y ≥ 4422) e borda da Exporural.
+ * Nenhuma referência é feita por lado da tela.
  */
 
 export type RearRoadCategory = 'HIGHWAY' | 'PARK_ACCESS' | 'INTERNAL';
@@ -41,10 +45,12 @@ export interface RearRoadDefinition {
   elevation: number;
   /** Vias (deste arquivo ou oficiais) às quais o traçado se conecta. */
   connections: readonly string[];
+  /** Área protegida cuja borda o traçado apenas tangencia, quando houver. */
+  protectedArea?: string;
   notes: string;
 }
 
-export const REAR_PARK_ROAD_REVISION = '2026.9-area-posterior.1';
+export const REAR_PARK_ROAD_REVISION = '2026.9-area-posterior.2';
 
 /** Escala do recorte oficial: pontos de PDF por unidade local. */
 export const SOURCE_POINTS_PER_LOCAL_UNIT = 5500 / 120;
@@ -54,9 +60,8 @@ export function rearRoadSourceToLocalLength(sourceLength: number) {
 }
 
 /**
- * Geometria congelada: nenhuma via da Exporural pode ser removida, deslocada ou
- * redimensionada por esta camada. A ligação nova encosta na extremidade sul da
- * Rua Brasília e é geometria independente.
+ * Geometria congelada: nenhuma via da Exporural — nem a Rua Brasília oficial —
+ * pode ser removida, deslocada ou redimensionada por esta camada.
  */
 export const PROTECTED_ROAD_IDENTIFIERS: readonly string[] = Object.freeze([
   ...EXPORURAL_ROAD_IDENTIFIERS,
@@ -67,11 +72,27 @@ export const PROTECTED_ROAD_IDENTIFIERS: readonly string[] = Object.freeze([
 ]);
 
 /**
- * Extremidade sul da Rua Brasília oficial (`rectPdf([3940, 2440, 3988, 4210])`).
- * O trecho novo parte exatamente deste ponto — é continuação do mesmo eixo, e
- * não uma segunda Rua Brasília.
+ * Traçados retirados na correção. Mantidos apenas como registro para impedir a
+ * reintrodução acidental de vias atrás das Etnias.
+ */
+export const REMOVED_REAR_ROAD_IDENTIFIERS: readonly string[] = Object.freeze([
+  'RUA-POSTERIOR-ETNIAS',
+  'RUA-ETNIAS-TRANSVERSAL',
+  'RUA-RETAGUARDA-ARENA',
+  'RUA-CIRCULACAO-LOTES',
+  'ACESSO-ALCA-LESTE',
+  'RS-472-CONTINUACAO',
+]);
+
+/**
+ * Extremidade da Rua Brasília oficial (`rectPdf([3940, 2440, 3988, 4210])`) no
+ * limite do parque. O trecho novo parte exatamente deste ponto — é continuação
+ * do mesmo eixo, e nunca uma segunda pista paralela.
  */
 export const RUA_BRASILIA_JOIN_POINT: SourcePoint = [3964, 4205];
+
+/** Polígono das Etnias: nenhum eixo novo pode entrar nesta faixa. */
+export const ETHNIC_QUARTER_SOURCE_BOUNDS = Object.freeze([4500, 4340, 5340, 5100] as const);
 
 export const REAR_PARK_ROAD_NETWORK: readonly RearRoadDefinition[] = Object.freeze([
   {
@@ -79,182 +100,63 @@ export const REAR_PARK_ROAD_NETWORK: readonly RearRoadDefinition[] = Object.free
     name: 'BR-472',
     category: 'HIGHWAY',
     sourcePath: [
-      [2960, 5560],
-      [3620, 5460],
-      [4260, 5312],
-      [4880, 5160],
-      [5460, 4972],
-      [5920, 4720],
-      [6220, 4470],
-      [6520, 4270],
-      [6980, 4110],
+      [2500, 5980],
+      [3200, 5850],
+      [3900, 5700],
+      [4600, 5545],
+      [5300, 5390],
+      [6000, 5230],
+      [6700, 5070],
+      [7300, 4940],
     ],
-    sourceWidth: 168,
+    sourceWidth: 172,
     surface: 'HIGHWAY_ASPHALT',
     shoulder: 'PAVED',
-    sourceShoulderWidth: 46,
+    sourceShoulderWidth: 48,
     marking: 'HIGHWAY',
-    elevation: 0.038,
-    connections: ['ACESSO-BR-472', 'RODOVIA-RS-472'],
-    notes: 'Rodovia contínua ao sul do parque, lida nos dois anexos; segue além do recorte oficial para não terminar no vazio.',
-  },
-  {
-    id: 'RS-472-CONTINUACAO',
-    name: 'Continuação da RS-472',
-    category: 'HIGHWAY',
-    sourcePath: [
-      [6068, 4180],
-      [6120, 4290],
-      [6210, 4420],
-      [6330, 4500],
-    ],
-    sourceWidth: 150,
-    surface: 'HIGHWAY_ASPHALT',
-    shoulder: 'PAVED',
-    sourceShoulderWidth: 40,
-    marking: 'HIGHWAY',
-    elevation: 0.038,
-    connections: ['RODOVIA-RS-472', 'BR-472'],
-    notes: 'Emenda entre a faixa oficial da RS-472 (que morre na borda leste do recorte) e o tronco da BR-472.',
+    elevation: 0.03,
+    connections: ['ACESSO-BR-472'],
+    notes: 'Rodovia contínua bem ao sul do parque, com curvatura longitudinal única. Passa longe do quarteirão das Etnias e não entra no parque; segue além do recorte para não terminar no vazio.',
   },
   {
     id: 'ACESSO-BR-472',
-    name: 'Acesso ao Parque de Exposições',
+    name: 'Acesso à BR-472',
     category: 'PARK_ACCESS',
     sourcePath: [
-      [4306, 5300],
-      [4288, 5090],
-      [4238, 4880],
-      [4160, 4700],
-      [4092, 4520],
-      [4040, 4360],
+      [3968, 5250],
+      [3975, 5400],
+      [3984, 5545],
+      [3990, 5666],
     ],
-    sourceWidth: 92,
+    sourceWidth: 88,
     surface: 'PARK_ASPHALT',
     shoulder: 'GRAVEL',
     sourceShoulderWidth: 30,
     marking: 'CENTER_DASH',
-    elevation: 0.034,
-    connections: ['BR-472', 'RUA-BRASILIA-CONTINUACAO'],
-    notes: 'Ligação real entre a rodovia e o parque, com geometria de entrada compatível com os anexos.',
-  },
-  {
-    id: 'ACESSO-ALCA-LESTE',
-    name: 'Alça de conversão leste',
-    category: 'PARK_ACCESS',
-    sourcePath: [
-      [4520, 5238],
-      [4420, 5290],
-      [4344, 5312],
-      [4306, 5300],
-    ],
-    sourceWidth: 58,
-    surface: 'HIGHWAY_ASPHALT',
-    shoulder: 'GRAVEL',
-    sourceShoulderWidth: 22,
-    marking: 'NONE',
-    elevation: 0.036,
-    connections: ['BR-472', 'ACESSO-BR-472'],
-    notes: 'Abertura de conversão visível no anexo 2; modelada como elemento viário próprio, nunca como segunda Rua Brasília.',
+    elevation: 0.026,
+    connections: ['RUA-BRASILIA-CONTINUACAO', 'BR-472'],
+    notes: 'Boca de entroncamento entre a continuação da Rua Brasília e a rodovia; largura intermediária entre a via interna e a BR-472, sem virar avenida.',
   },
   {
     id: 'RUA-BRASILIA-CONTINUACAO',
-    name: 'Rua Brasília (continuação sul)',
+    name: 'Rua Brasília (continuação até a BR-472)',
     category: 'INTERNAL',
     sourcePath: [
       RUA_BRASILIA_JOIN_POINT,
-      [3972, 4300],
-      [4000, 4400],
-      [4040, 4360],
+      [3970, 4400],
+      [3986, 4680],
+      [3996, 4960],
+      [3968, 5250],
     ],
-    sourceWidth: 48,
-    surface: 'PARK_ASPHALT',
-    shoulder: 'NONE',
-    sourceShoulderWidth: 0,
-    marking: 'NONE',
-    elevation: 0.032,
-    connections: ['RUA-BRASILIA', 'ACESSO-BR-472', 'AV-IMIGRANTES'],
-    notes: 'Continuação do eixo único da Rua Brasília até o entroncamento do acesso — mesma largura e material da via oficial.',
-  },
-  {
-    id: 'RUA-POSTERIOR-ETNIAS',
-    name: 'Rua posterior das Etnias',
-    category: 'INTERNAL',
-    sourcePath: [
-      [4058, 4470],
-      [4420, 4640],
-      [4900, 4820],
-      [5340, 4980],
-      [5720, 5120],
-      [6010, 5230],
-    ],
-    sourceWidth: 46,
+    sourceWidth: 52,
     surface: 'PARK_ASPHALT',
     shoulder: 'GRAVEL',
-    sourceShoulderWidth: 18,
+    sourceShoulderWidth: 14,
     marking: 'NONE',
-    elevation: 0.032,
-    connections: ['ACESSO-BR-472', 'RUA-ETNIAS-TRANSVERSAL', 'BR-472'],
-    notes: 'Via transversal atrás dos espaços das Etnias, ao sul das casas C5/C6 e dos espaços Russo/Árabe/Português.',
-  },
-  {
-    id: 'RUA-ETNIAS-TRANSVERSAL',
-    name: 'Acesso das Etnias',
-    category: 'INTERNAL',
-    sourcePath: [
-      [4920, 4260],
-      [4922, 4520],
-      [4918, 4760],
-      [4900, 4820],
-    ],
-    sourceWidth: 42,
-    surface: 'PARK_ASPHALT',
-    shoulder: 'NONE',
-    sourceShoulderWidth: 0,
-    marking: 'NONE',
-    elevation: 0.032,
-    connections: ['AV-IMIGRANTES', 'RUA-POSTERIOR-ETNIAS'],
-    notes: 'Corredor entre a Casa da Etnia Polonesa e a Casa da Etnia Italiana, sem tocar nas edificações.',
-  },
-  {
-    id: 'RUA-RETAGUARDA-ARENA',
-    name: 'Rua de retaguarda da Arena',
-    category: 'INTERNAL',
-    sourcePath: [
-      [5430, 3170],
-      [5620, 3420],
-      [5760, 3700],
-      [5850, 3980],
-      [5940, 4230],
-      [6060, 4420],
-    ],
-    sourceWidth: 50,
-    surface: 'PARK_ASPHALT',
-    shoulder: 'GRAVEL',
-    sourceShoulderWidth: 18,
-    marking: 'NONE',
-    elevation: 0.032,
-    connections: ['RS-472-CONTINUACAO', 'RUA-CIRCULACAO-LOTES'],
-    notes: 'Rua lateral/posterior à Arena, contornando a estrutura sem atravessá-la, até a rodovia.',
-  },
-  {
-    id: 'RUA-CIRCULACAO-LOTES',
-    name: 'Circulação dos estacionamentos posteriores',
-    category: 'INTERNAL',
-    sourcePath: [
-      [5760, 3700],
-      [5560, 3860],
-      [5320, 4020],
-      [5100, 4150],
-    ],
-    sourceWidth: 42,
-    surface: 'PARK_ASPHALT',
-    shoulder: 'GRAVEL',
-    sourceShoulderWidth: 16,
-    marking: 'NONE',
-    elevation: 0.032,
-    connections: ['RUA-RETAGUARDA-ARENA', 'AV-IMIGRANTES'],
-    notes: 'Anel de circulação dos lotes e estacionamentos posteriores, encostando na Avenida dos Imigrantes.',
+    elevation: 0.024,
+    connections: ['RUA-BRASILIA', 'PORTAO-5', 'ACESSO-BR-472'],
+    protectedArea: 'AV-IMIGRANTES',
+    notes: 'Eixo único: sai do Portão 5, na lateral do Centro de Eventos, e segue sem ramificações até o acesso à rodovia. Não desvia para trás das Etnias e mantém a mesma largura/material da via oficial.',
   },
 ]);
 
