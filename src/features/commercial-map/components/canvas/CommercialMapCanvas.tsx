@@ -117,7 +117,7 @@ import { CommercialMapEnvironment } from './CommercialMapEnvironment';
 import { ParkAccessEnvironmentLayer } from './ParkAccessEnvironmentLayer';
 import { RearParkRoadNetwork } from './RearParkRoadNetwork';
 import { RearParkEnvironmentLayer } from './RearParkEnvironmentLayer';
-import { RearParkGate5 } from './RearParkGate5';
+import { REPLACED_OFFICIAL_ROAD_IDENTIFIERS } from '../../data/rearParkRoadNetwork';
 import { ParkAccessInfrastructure } from './ParkAccessInfrastructure';
 import { selectParkAccessCompatibleTreesForPresentation } from '../../data/parkAccessEnvironment';
 import { PARK_ACCESS_SPATIAL_PLAN } from '../../data/parkAccessSpatialPlan';
@@ -3030,9 +3030,11 @@ function Scene({
   )), [exteriorRenderedEntities, lotByEntity]);
   const circulationEntities = useMemo(() => (
     withGateFourDistrictPresentationEntities(nonLotEntities).filter((entity) => (
-      entity.classification === 'ROAD' || entity.classification === 'PEDESTRIAN_PATH'
+      (entity.classification === 'ROAD' || entity.classification === 'PEDESTRIAN_PATH')
+      && (isolatedArea || hydrologicalModeActive
+        || !REPLACED_OFFICIAL_ROAD_IDENTIFIERS.includes(entity.publicIdentifier))
     ))
-  ), [nonLotEntities]);
+  ), [hydrologicalModeActive, isolatedArea, nonLotEntities]);
   const structuralEntities = useMemo(() => nonLotEntities.filter((entity) => (
     entity.classification !== 'ROAD' && entity.classification !== 'PEDESTRIAN_PATH'
   )).map((entity) => rearParkingEnabled ? rearParkingEntityForPresentation(entity) : entity), [nonLotEntities, rearParkingEnabled]);
@@ -3258,7 +3260,6 @@ function Scene({
             vegetationVisible={treesVisible}
           />
           <RearParkRoadNetwork reducedGraphics={reducedGraphics} />
-          <RearParkGate5 reducedGraphics={reducedGraphics} />
         </>
       )}
       {rearParkingEnabled && (
