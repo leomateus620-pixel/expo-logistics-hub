@@ -68,6 +68,7 @@ export const RearParkRoadNetwork = memo(function RearParkRoadNetwork({
             color="#5a6064"
             roughness={0.97}
             metalness={0}
+            side={THREE.DoubleSide}
             transparent={transparent}
             opacity={opacity}
             polygonOffset
@@ -83,6 +84,7 @@ export const RearParkRoadNetwork = memo(function RearParkRoadNetwork({
             color="#5f635f"
             roughness={0.98}
             metalness={0}
+            side={THREE.DoubleSide}
             transparent={transparent}
             opacity={opacity}
             polygonOffset
@@ -98,6 +100,7 @@ export const RearParkRoadNetwork = memo(function RearParkRoadNetwork({
             color="#a8977a"
             roughness={0.99}
             metalness={0}
+            side={THREE.DoubleSide}
             transparent={transparent}
             opacity={opacity}
           />
@@ -109,6 +112,7 @@ export const RearParkRoadNetwork = memo(function RearParkRoadNetwork({
             color="#d9d6c8"
             roughness={0.85}
             metalness={0}
+            side={THREE.DoubleSide}
             transparent
             opacity={opacity * 0.82}
             polygonOffset
