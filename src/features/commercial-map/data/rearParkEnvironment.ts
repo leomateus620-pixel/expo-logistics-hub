@@ -1,14 +1,22 @@
 import { officialPdfPointToLocal } from './officialReference2026';
-import { rearRoadCorridors, rearRoadSourceToLocalLength } from './rearParkRoadNetwork';
+import {
+  ETHNIC_QUARTER_SOURCE_BOUNDS,
+  rearRoadCorridors,
+  rearRoadSourceToLocalLength,
+} from './rearParkRoadNetwork';
 import { distanceToPath } from '../utils/rearRoadNetwork';
 
 /**
- * Ambientação da área posterior: terreno ampliado até (e além) da BR-472,
- * vegetação, drenagem, iluminação e contexto externo. Camada de apresentação,
- * sem qualquer relação com inventário comercial, lotes ou métricas.
+ * Ambientação da área posterior — revisão corretiva 2026.9.2.
+ *
+ * A ambientação anterior (mata atrás das Etnias, retaguarda da Arena, contexto
+ * a leste do recorte) foi REMOVIDA junto com as vias inventadas. O que existe
+ * aqui acompanha somente a faixa entre o Portão 5, a continuação da Rua
+ * Brasília e a BR-472: mata onde as referências mostram mata, campo aberto onde
+ * mostram campo aberto.
  */
 
-export const REAR_PARK_ENVIRONMENT_REVISION = '2026.9-area-posterior-ambiente.1';
+export const REAR_PARK_ENVIRONMENT_REVISION = '2026.9-area-posterior-ambiente.2';
 
 export type SourceBounds = readonly [number, number, number, number];
 
@@ -25,38 +33,32 @@ export interface RearTerrainPatch {
 }
 
 /**
- * Duas manchas: a faixa sul (transição parque → rodovia) e a faixa leste (atrás
- * da Arena, além do recorte oficial). Ambas ficam fora dos polígonos oficiais
- * para não cobrir lotes, quadras ou edificações existentes.
+ * Uma única mancha de terreno, ao sul do parque, cobrindo a descida até a
+ * rodovia e um trecho além dela. Sem plataforma retangular a leste, sem borda
+ * dura contra as Etnias.
  */
 export const REAR_TERRAIN_PATCHES: readonly RearTerrainPatch[] = Object.freeze([
   {
     id: 'rear-south-transition',
-    sourceBounds: [3050, 4250, 6100, 6100],
-    segments: 48,
-    relief: 0.018,
-    baseElevation: -0.004,
-    surface: 'grass',
-  },
-  {
-    id: 'rear-east-context',
-    sourceBounds: [6100, 1100, 7250, 6100],
-    segments: 40,
-    relief: 0.02,
-    baseElevation: -0.004,
+    sourceBounds: [2350, 4260, 7400, 6420],
+    segments: 56,
+    relief: 0.022,
+    baseElevation: -0.006,
     surface: 'grass',
   },
 ]);
 
-/** Estruturas oficiais que a vegetação e o contexto externo não podem invadir. */
+/**
+ * Estruturas e áreas protegidas que a nova ambientação não pode invadir:
+ * quarteirão das Etnias, corredor da Avenida dos Imigrantes, entorno da Arena,
+ * apron do Portão 5 e a própria faixa da Exporural.
+ */
 export const REAR_STRUCTURE_EXCLUSIONS: readonly SourceBounds[] = Object.freeze([
-  [4550, 4380, 4780, 4780],
-  [4620, 4360, 4760, 4500],
-  [5110, 4360, 5250, 4500],
-  [5060, 4380, 5300, 4780],
-  [5060, 4740, 5300, 5090],
+  ETHNIC_QUARTER_SOURCE_BOUNDS,
   [3900, 4130, 5560, 4270],
-  [4860, 3060, 5430, 4180],
+  [4860, 2650, 5430, 3180],
+  [3840, 4180, 4090, 4360],
+  [4020, 3780, 4510, 4180],
 ]);
 
 export interface RearVegetationCluster {
@@ -68,14 +70,17 @@ export interface RearVegetationCluster {
   seed: number;
 }
 
+/**
+ * Distribuição conforme as referências: mata fechada a oeste da continuação da
+ * Rua Brasília, faixas de mata acompanhando a rodovia e vegetação baixa nas
+ * margens. As áreas que o satélite mostra abertas continuam abertas.
+ */
 export const REAR_VEGETATION_CLUSTERS: readonly RearVegetationCluster[] = Object.freeze([
-  { id: 'mata-sudoeste', sourceBounds: [3080, 4320, 4020, 5240], density: 46, species: 'canopy', seed: 17 },
-  { id: 'faixa-rodovia', sourceBounds: [3200, 5000, 6000, 5320], density: 16, species: 'grove', seed: 41 },
-  { id: 'margem-sul-br472', sourceBounds: [3100, 5620, 6800, 6050], density: 20, species: 'grove', seed: 73 },
-  { id: 'entorno-etnias', sourceBounds: [4100, 4300, 5900, 4900], density: 12, species: 'grove', seed: 109 },
-  { id: 'retaguarda-arena', sourceBounds: [5480, 3120, 6100, 4300], density: 18, species: 'canopy', seed: 151 },
-  { id: 'mata-leste', sourceBounds: [6180, 1400, 7200, 4100], density: 24, species: 'canopy', seed: 197 },
-  { id: 'baixa-vegetacao-acesso', sourceBounds: [4060, 4700, 4700, 5300], density: 22, species: 'scrub', seed: 233 },
+  { id: 'mata-oeste-brasilia', sourceBounds: [2600, 4380, 3820, 5480], density: 44, species: 'canopy', seed: 17 },
+  { id: 'margem-norte-br472', sourceBounds: [2500, 5320, 6900, 5620], density: 18, species: 'grove', seed: 41 },
+  { id: 'margem-sul-br472', sourceBounds: [2500, 5900, 7200, 6320], density: 15, species: 'grove', seed: 73 },
+  { id: 'margem-continuacao', sourceBounds: [4060, 4380, 4460, 5240], density: 20, species: 'scrub', seed: 109 },
+  { id: 'bordadura-oeste', sourceBounds: [3700, 4300, 3900, 5300], density: 16, species: 'scrub', seed: 151 },
 ]);
 
 export interface RearContextBlock {
@@ -89,19 +94,17 @@ export interface RearContextBlock {
 
 /** Contexto mínimo além da rodovia, para que a BR-472 não fique solta no vazio. */
 export const REAR_CONTEXT_BLOCKS: readonly RearContextBlock[] = Object.freeze([
-  { id: 'lavoura-sul-1', sourceBounds: [3080, 5720, 4460, 6080], kind: 'farmland', height: 0, tone: '#c3b676' },
-  { id: 'lavoura-sul-2', sourceBounds: [4520, 5620, 5880, 6060], kind: 'farmland', height: 0, tone: '#a9b878' },
-  { id: 'lavoura-leste', sourceBounds: [6420, 4400, 7220, 5700], kind: 'farmland', height: 0, tone: '#b8b271' },
-  { id: 'lavoura-nordeste', sourceBounds: [6320, 1300, 7200, 3200], kind: 'farmland', height: 0, tone: '#adba7d' },
-  { id: 'galpao-sul', sourceBounds: [4700, 5780, 4960, 5920], kind: 'building', height: 0.55, tone: '#cbd0cc' },
-  { id: 'casa-sul', sourceBounds: [5300, 5760, 5450, 5860], kind: 'building', height: 0.4, tone: '#d8cdbd' },
-  { id: 'galpao-leste', sourceBounds: [6700, 3700, 6980, 3900], kind: 'building', height: 0.5, tone: '#c9cec9' },
+  { id: 'lavoura-sul-1', sourceBounds: [2600, 6040, 4200, 6380], kind: 'farmland', height: 0, tone: '#c3b676' },
+  { id: 'lavoura-sul-2', sourceBounds: [4360, 5940, 6200, 6320], kind: 'farmland', height: 0, tone: '#a9b878' },
+  { id: 'lavoura-sudeste', sourceBounds: [6360, 5300, 7350, 6200], kind: 'farmland', height: 0, tone: '#b8b271' },
+  { id: 'galpao-sul', sourceBounds: [4520, 6060, 4790, 6200], kind: 'building', height: 0.5, tone: '#cbd0cc' },
+  { id: 'casa-sul', sourceBounds: [5260, 6020, 5410, 6120], kind: 'building', height: 0.36, tone: '#d8cdbd' },
 ]);
 
 export const REAR_ENVIRONMENT_BUDGET = Object.freeze({
-  maximumTreeInstances: 620,
-  reducedTreeInstances: 240,
-  maximumPoleInstances: 48,
+  maximumTreeInstances: 520,
+  reducedTreeInstances: 210,
+  maximumPoleInstances: 32,
 });
 
 function seededRandom(seed: number) {
@@ -145,7 +148,7 @@ export interface RearTreeInstance {
 
 /**
  * Distribuição determinística: mesma cena a cada renderização, sem árvores sobre
- * o asfalto, sobre estruturas oficiais ou fora do terreno ampliado.
+ * o asfalto, sobre o Portão 5, sobre as Etnias ou sobre estruturas oficiais.
  */
 export function buildRearTreeInstances(reducedGraphics = false): RearTreeInstance[] {
   const corridors = rearRoadCorridors();
@@ -179,11 +182,11 @@ export function buildRearTreeInstances(reducedGraphics = false): RearTreeInstanc
       );
       if (!clear) continue;
 
-      const base = cluster.species === 'scrub' ? 0.36 : cluster.species === 'grove' ? 0.68 : 0.95;
+      const base = cluster.species === 'scrub' ? 0.34 : cluster.species === 'grove' ? 0.66 : 0.94;
       instances.push({
         x: local[0],
         z: local[1],
-        scale: base * (0.7 + random() * 0.75),
+        scale: base * (0.7 + random() * 0.78),
         rotation: random() * Math.PI * 2,
         tint: random(),
         species: cluster.species,
@@ -201,14 +204,14 @@ export interface RearPoleInstance {
   rotation: number;
 }
 
-/** Iluminação controlada apenas nas vias internas e no acesso. */
+/** Iluminação controlada apenas na via interna e no acesso — nunca na rodovia. */
 export function buildRearPoleInstances(reducedGraphics = false): RearPoleInstance[] {
   if (reducedGraphics) return [];
   const spacing = rearRoadSourceToLocalLength(420);
   const poles: RearPoleInstance[] = [];
 
   rearRoadCorridors()
-    .filter((corridor) => corridor.id !== 'BR-472' && corridor.id !== 'RS-472-CONTINUACAO')
+    .filter((corridor) => corridor.id !== 'BR-472')
     .forEach((corridor) => {
       let carried = spacing * 0.5;
       for (let index = 0; index < corridor.path.length - 1; index += 1) {
