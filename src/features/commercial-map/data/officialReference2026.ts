@@ -980,10 +980,40 @@ const pavilionModuleEntities: MapEntity[] = pavilionModuleReferences.flatMap((re
   });
 });
 
+/**
+ * Blocos não permanentes retirados da infraestrutura oficial 2026.4.
+ * São estruturas temporárias de edição (apoios institucionais, comissões,
+ * segurança/emergência montada e toda a série sanitária E) que não compõem a
+ * infraestrutura permanente do parque.
+ *
+ * Só o payload renderizado (`OFFICIAL_REFERENCE_DATA.entities`) perde esses
+ * volumes: o inventário cartográfico completo continua disponível em
+ * `OFFICIAL_REFERENCE_ENTITIES` para planejamento espacial (máscaras de
+ * ambientação, calçadas, estacionamento), garantindo que o solo liberado
+ * permaneça base verde e nunca receba pavimentação nova por engano.
+ */
+export const NON_PERMANENT_REMOVED_IDENTIFIERS_2026: readonly string[] = [
+  'B14', 'B16', 'B17', 'B21', 'B23', 'B24', 'B25', 'B26', 'B27',
+  'B31', 'B32', 'B33', 'B34', 'B39', 'B40',
+  ...OFFICIAL_RESTROOM_CENTERS_2026.map((_, index) => `E-${String(index + 1).padStart(2, '0')}`),
+];
+
+const nonPermanentRemovedIdentifiers = new Set(NON_PERMANENT_REMOVED_IDENTIFIERS_2026);
+
+export function isNonPermanentRemovedIdentifier(publicIdentifier: string) {
+  return nonPermanentRemovedIdentifiers.has(publicIdentifier);
+}
+
 export const OFFICIAL_REFERENCE_ENTITIES = [
   ...officialBaseEntities,
   ...pavilionModuleEntities,
 ].map(withCommercialMapSegmentMetadata);
+
+export const OFFICIAL_RENDERED_ENTITIES = OFFICIAL_REFERENCE_ENTITIES.filter((entity) => (
+  !nonPermanentRemovedIdentifiers.has(entity.publicIdentifier)
+));
+
+
 
 const officialLotEntities = OFFICIAL_REFERENCE_ENTITIES.filter((entity) => (
   entity.classification === 'SELLABLE_LOT' || entity.classification === 'INTERNAL_STAND'
@@ -1081,6 +1111,6 @@ export const OFFICIAL_REFERENCE_DATA: CommercialMapData = {
     version: 5,
   },
   layers: DEFAULT_REFERENCE_LAYERS,
-  entities: OFFICIAL_REFERENCE_ENTITIES,
+  entities: OFFICIAL_RENDERED_ENTITIES,
   lots: OFFICIAL_REFERENCE_LOTS,
 };

@@ -294,7 +294,7 @@ describe('infraestrutura elétrica cartográfica do Mapa Comercial', () => {
     });
   });
 
-  it('preserva as 18 âncoras conflitantes e projeta só sua apresentação à fachada livre', () => {
+  it('preserva as 14 âncoras conflitantes e projeta só sua apresentação à fachada livre', () => {
     const placements = resolveElectricalNodePlacements(
       COMMERCIAL_ELECTRICAL_NODES,
       OFFICIAL_REFERENCE_DATA.entities,
@@ -357,11 +357,11 @@ describe('infraestrutura elétrica cartográfica do Mapa Comercial', () => {
         ).toBeGreaterThanOrEqual(placement.node.radius + 0.012 - 1e-6);
       });
     });
-    expect(ELECTRICAL_INFRASTRUCTURE_REFERENCE.placement.facadeMountedMarkers).toHaveLength(18);
+    expect(ELECTRICAL_INFRASTRUCTURE_REFERENCE.placement.facadeMountedMarkers).toHaveLength(14);
     expect(placements.filter((placement) => placement.node.mountMode === 'FACADE_POLE'))
-      .toHaveLength(12);
+      .toHaveLength(9);
     expect(placements.filter((placement) => placement.node.mountMode === 'FACADE_RECEPTION'))
-      .toHaveLength(6);
+      .toHaveLength(5);
     expect(placements.filter((placement) => placement.placementStatus === 'PROJECTED_FALLBACK'))
       .toHaveLength(0);
   });

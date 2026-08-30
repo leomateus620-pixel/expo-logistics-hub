@@ -11,7 +11,7 @@ import {
   shouldRenderArenaStructures,
   sourceBoundsToLocal,
 } from '@/features/commercial-map/data/parkEnvironment';
-import { OFFICIAL_REFERENCE_DATA } from '@/features/commercial-map/data/officialReference2026';
+import { OFFICIAL_REFERENCE_DATA, OFFICIAL_REFERENCE_ENTITIES } from '@/features/commercial-map/data/officialReference2026';
 import {
   resolveStrategicLandmarkKind,
   strategicLandmarkVisualHeight,
@@ -25,7 +25,8 @@ type SourcePoint = readonly [number, number];
 type SourceBounds = readonly [number, number, number, number];
 
 function sourcePolygonForEntity(publicIdentifier: string) {
-  const entity = OFFICIAL_REFERENCE_DATA.entities.find((candidate) => (
+  // Inventário cartográfico completo, inclusive pegadas não permanentes.
+  const entity = OFFICIAL_REFERENCE_ENTITIES.find((candidate) => (
     candidate.publicIdentifier === publicIdentifier
   ));
   const polygon = entity?.metadata.sourcePdfPolygon as readonly SourcePoint[] | undefined;
