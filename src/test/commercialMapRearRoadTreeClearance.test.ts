@@ -8,7 +8,12 @@ import {
   REAR_PARKING_TREE_CANDIDATES,
   reconcileRearParkingTrees,
 } from '@/features/commercial-map/data/rearParking';
-import { buildRearTreeInstances } from '@/features/commercial-map/data/rearParkEnvironment';
+import { buildRearPoleInstances, buildRearTreeInstances } from '@/features/commercial-map/data/rearParkEnvironment';
+import {
+  COMMERCIAL_ELECTRICAL_CONNECTIONS,
+  COMMERCIAL_ELECTRICAL_NODES,
+} from '@/features/commercial-map/data/electricalInfrastructure';
+import { resolveElectricalNodePlacements } from '@/features/commercial-map/utils/electricalInfrastructure';
 import { GENERATED_REAR_ROAD_SEGMENTS } from '@/features/commercial-map/data/rearParkRoadNetwork';
 import { selectParkAccessCompatibleTreesForPresentation } from '@/features/commercial-map/data/parkAccessEnvironment';
 import {
@@ -22,7 +27,6 @@ import {
 import { selectCommercialTreesForScene } from '@/features/commercial-map/utils/treeLayer';
 
 const EXPECTED_PRESENTATION_ONLY_REMOVALS = [
-  'tree-d-09',
   'tree-e-01',
   'tree-e-02',
   'tree-e-03',
@@ -31,16 +35,12 @@ const EXPECTED_PRESENTATION_ONLY_REMOVALS = [
   'tree-e-06',
   'tree-e-07',
   'tree-e-08',
-  'tree-e-14',
-  'tree-nations-01',
-  'tree-nations-02',
-  'tree-nations-03',
-  'tree-nations-05',
-  'tree-nations-06',
-  'tree-nations-07',
-  'tree-parking-east-10',
-  'tree-parking-east-14',
-  'tree-parking-east-15',
+  'tree-parking-west-23',
+  'tree-parking-west-24',
+  'tree-parking-west-25',
+  'tree-rear-parking-west-01',
+  'tree-rear-parking-west-02',
+  'tree-rear-parking-west-03',
 ] as const;
 
 describe('rear-road rendered vegetation clearance', () => {
@@ -63,13 +63,22 @@ describe('rear-road rendered vegetation clearance', () => {
     expect(JSON.stringify(COMMERCIAL_MAP_TREES)).toBe(inventorySnapshot);
   });
 
-  it('preserves every reconciled rear-parking canopy because none intersects the new road corridor', () => {
+  it('filters only the three reconciled parking canopies inside the corrected corridor', () => {
     const parkingTrees = reconcileRearParkingTrees(COMMERCIAL_MAP_TREES, OFFICIAL_REFERENCE_ENTITIES);
+    const collidingIds = parkingTrees
+      .filter((tree) => treeIntersectsGeneratedRearRoadCorridor(tree))
+      .map((tree) => tree.id);
+    const presented = selectRearRoadCompatibleTreesForPresentation(parkingTrees);
 
     expect(parkingTrees).toHaveLength(26);
     expect(REAR_PARKING_TREE_CANDIDATES).toHaveLength(32);
-    expect(parkingTrees.every((tree) => !treeIntersectsGeneratedRearRoadCorridor(tree))).toBe(true);
-    expect(selectRearRoadCompatibleTreesForPresentation(parkingTrees)).toEqual(parkingTrees);
+    expect(collidingIds).toEqual([
+      'tree-rear-parking-west-01',
+      'tree-rear-parking-west-02',
+      'tree-rear-parking-west-03',
+    ]);
+    expect(presented).toHaveLength(parkingTrees.length - collidingIds.length);
+    expect(presented.every((tree) => !treeIntersectsGeneratedRearRoadCorridor(tree))).toBe(true);
   });
 
   it('keeps every instanced rear-environment canopy outside all generated pavement and shoulder footprints', () => {
@@ -84,7 +93,39 @@ describe('rear-road rendered vegetation clearance', () => {
         : []
     )));
 
-    expect(trees).toHaveLength(128);
+    expect(trees).toHaveLength(132);
     expect(collisions).toEqual([]);
+  });
+
+  it('retains all six ambient poles outside every pavement and shoulder, including adjacent junction arms', () => {
+    const footprints = buildRearRoadCorridorFootprints(undefined, { includeShoulders: true });
+    const poles = buildRearPoleInstances();
+    expect(poles).toHaveLength(6);
+    expect(buildRearPoleInstances()).toEqual(poles);
+    expect(poles.flatMap((pole, index) => footprints.flatMap((footprint) => (
+      distanceToPath([pole.x, pole.z], footprint.centerline) <= footprint.halfWidth + 0.08
+        ? [`${index}:${footprint.segmentId}`] : []
+    )))).toEqual([]);
+  });
+
+  it('clears five official poles and one facade receiver only in the corrected road presentation, without changing electrical records or links', () => {
+    const inventory = JSON.stringify([COMMERCIAL_ELECTRICAL_NODES, COMMERCIAL_ELECTRICAL_CONNECTIONS]);
+    const baseline = resolveElectricalNodePlacements(COMMERCIAL_ELECTRICAL_NODES, OFFICIAL_REFERENCE_ENTITIES);
+    const corrected = resolveElectricalNodePlacements(COMMERCIAL_ELECTRICAL_NODES, OFFICIAL_REFERENCE_ENTITIES, true);
+    const changed = corrected.filter((placement, index) => (
+      placement.renderPosition.some((coordinate, axis) => coordinate !== baseline[index].renderPosition[axis])
+    )).map(({ node }) => node.sourceMarkerId);
+    expect(changed).toEqual([
+      'pole-ref-145', 'pole-ref-225', 'pole-ref-295', 'pole-ref-296', 'pole-ref-297',
+      'transformer-ref-011',
+    ]);
+    expect(corrected).toHaveLength(428);
+    const footprints = buildRearRoadCorridorFootprints(undefined, { includeShoulders: true });
+    expect(corrected.flatMap(({ node, renderPosition }) => footprints.flatMap((footprint) => (
+      distanceToPath(renderPosition, footprint.centerline) <= footprint.halfWidth + node.radius + 0.05
+        ? [`${node.sourceMarkerId}:${footprint.segmentId}`] : []
+    )))).toEqual([]);
+    expect(JSON.stringify([COMMERCIAL_ELECTRICAL_NODES, COMMERCIAL_ELECTRICAL_CONNECTIONS])).toBe(inventory);
+    expect(resolveElectricalNodePlacements(COMMERCIAL_ELECTRICAL_NODES, OFFICIAL_REFERENCE_ENTITIES)).toEqual(baseline);
   });
 });

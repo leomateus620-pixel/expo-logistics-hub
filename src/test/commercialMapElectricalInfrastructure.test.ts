@@ -649,7 +649,8 @@ describe('infraestrutura elétrica cartográfica do Mapa Comercial', () => {
     expect(renderer).toContain('<lineSegments');
     expect(renderer).toContain('computeBoundingSphere()');
     expect(renderer).toContain('dispose()');
-    expect(renderer).toContain('resolveElectricalNodePlacements(nodes, surfaceEntities)');
+    expect(renderer).toContain('resolveElectricalNodePlacements(nodes, surfaceEntities, rearRoadsActive)');
+    expect(canvas).toContain('rearRoadsActive={!isolatedArea && !hydrologicalModeActive}');
     expect(renderer).not.toContain('electricalInfrastructureGroundElevation(');
     expect(canvas.match(/<CommercialElectricalInfrastructureLayer/g)).toHaveLength(1);
     expect(canvas).toContain('visible={treesVisible && !hydrologicalModeActive}');

@@ -12,7 +12,7 @@ import {
   type OpenGroundSurfaceProfile,
 } from './openGroundTextures';
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
-import { rearRoadTerrainElevationAt } from '../../utils/rearRoadNetwork';
+import { buildRearTerrainPatchGeometry } from '../../utils/rearTerrainGeometry';
 
 interface RearParkEnvironmentLayerProps {
   reducedGraphics: boolean;
@@ -45,17 +45,7 @@ export const RearParkEnvironmentLayer = memo(function RearParkEnvironmentLayer({
 
   const terrain = useMemo(() => REAR_TERRAIN_PATCHES.map((patch) => {
     const outline = sourcePolygonToLocal(patch.sourcePolygon);
-    const shape = new THREE.Shape(outline.map(([x, z]) => new THREE.Vector2(x, z)));
-    const geometry = new THREE.ShapeGeometry(shape);
-    const position = geometry.getAttribute('position') as THREE.BufferAttribute;
-    for (let index = 0; index < position.count; index += 1) {
-      const x = position.getX(index);
-      const z = position.getY(index);
-      position.setXYZ(index, x, patch.baseElevation + rearRoadTerrainElevationAt(x, z), z);
-    }
-    position.needsUpdate = true;
-    geometry.computeVertexNormals();
-    geometry.computeBoundingSphere();
+    const geometry = buildRearTerrainPatchGeometry(outline, patch.baseElevation);
     return { patch, geometry };
   }), []);
 
