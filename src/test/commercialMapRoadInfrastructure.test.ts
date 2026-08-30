@@ -30,10 +30,96 @@ describe('infraestrutura viária do Mapa Comercial', () => {
   const roads = circulation.filter((entity) => entity.classification === 'ROAD');
 
   it('preserva o inventário cartográfico oficial sem criar vias artificiais', () => {
-    expect(roads).toHaveLength(21);
+    expect(roads).toHaveLength(25);
     expect(circulation.filter((entity) => entity.classification === 'PEDESTRIAN_PATH')).toHaveLength(1);
     expect(circulation.every((entity) => entity.geometry.elevation === 0)).toBe(true);
     expect(roads.every((entity) => entity.geometry.extrusionHeight === ROAD_INFRASTRUCTURE.asphaltHeight)).toBe(true);
+  });
+
+  it('não deixa nenhum corredor livre entre quadras vizinhas sem via', () => {
+    const bounds = (entity: (typeof OFFICIAL_REFERENCE_DATA)['entities'][number]) => {
+      const ring = entity.geometry.coordinates[0];
+      return {
+        minX: Math.min(...ring.map(([x]) => x)),
+        maxX: Math.max(...ring.map(([x]) => x)),
+        minZ: Math.min(...ring.map(([, z]) => z)),
+        maxZ: Math.max(...ring.map(([, z]) => z)),
+      };
+    };
+    const roadBoxes = OFFICIAL_REFERENCE_DATA.entities.filter(isRoadInfrastructureEntity).map(bounds);
+    const quadras = OFFICIAL_REFERENCE_DATA.entities
+      .filter((entity) => entity.classification === 'QUADRA')
+      .map((entity) => ({ id: entity.publicIdentifier, ...bounds(entity) }));
+    const covered = (x: number, z: number) => roadBoxes.some((box) => (
+      box.minX <= x && box.maxX >= x && box.minZ <= z && box.maxZ >= z
+    ));
+    const uncovered: string[] = [];
+
+    quadras.forEach((first, index) => {
+      quadras.slice(index + 1).forEach((second) => {
+        const overlapX = Math.min(first.maxX, second.maxX) - Math.max(first.minX, second.minX);
+        const overlapZ = Math.min(first.maxZ, second.maxZ) - Math.max(first.minZ, second.minZ);
+        const check = (samples: Array<[number, number]>) => {
+          const hits = samples.filter(([x, z]) => covered(x, z)).length;
+          if (hits / samples.length < 0.95) uncovered.push(`${first.id} | ${second.id}`);
+        };
+
+        if (overlapX >= 1) {
+          const gap = second.minZ > first.maxZ
+            ? [first.maxZ, second.minZ]
+            : first.minZ > second.maxZ ? [second.maxZ, first.minZ] : null;
+          if (!gap || gap[1] - gap[0] < 0.3 || gap[1] - gap[0] > 4) return;
+          const z = (gap[0] + gap[1]) / 2;
+          const x0 = Math.max(first.minX, second.minX);
+          const x1 = Math.min(first.maxX, second.maxX);
+          check(Array.from({ length: 41 }, (_, step) => [x0 + ((x1 - x0) * step) / 40, z]));
+          return;
+        }
+
+        if (overlapZ >= 1) {
+          const gap = second.minX > first.maxX
+            ? [first.maxX, second.minX]
+            : first.minX > second.maxX ? [second.maxX, first.minX] : null;
+          if (!gap || gap[1] - gap[0] < 0.3 || gap[1] - gap[0] > 4) return;
+          const x = (gap[0] + gap[1]) / 2;
+          const z0 = Math.max(first.minZ, second.minZ);
+          const z1 = Math.min(first.maxZ, second.maxZ);
+          check(Array.from({ length: 41 }, (_, step) => [x, z0 + ((z1 - z0) * step) / 40]));
+        }
+      });
+    });
+
+    expect(uncovered).toEqual([]);
+  });
+
+  it('mantém os novos corredores dentro das faixas reservadas, sem invadir lotes', () => {
+    const newCorridors = ['RUA-URUGUAI-LESTE', 'RUA-ARGENTINA-LESTE', 'RUA-MONTEVIDEU-SUL', 'RUA-INTERNA-OESTE'];
+    const box = (ring: readonly (readonly [number, number])[] | number[][]) => {
+      const points = ring as number[][];
+      return {
+        minX: Math.min(...points.map(([x]) => x)),
+        maxX: Math.max(...points.map(([x]) => x)),
+        minZ: Math.min(...points.map(([, z]) => z)),
+        maxZ: Math.max(...points.map(([, z]) => z)),
+      };
+    };
+    const lots = OFFICIAL_REFERENCE_DATA.entities
+      .filter((entity) => entity.classification === 'SELLABLE_LOT')
+      .map((entity) => box(entity.geometry.coordinates[0]));
+
+    newCorridors.forEach((identifier) => {
+      const entity = OFFICIAL_REFERENCE_DATA.entities.find((item) => item.publicIdentifier === identifier);
+      expect(entity, identifier).toBeDefined();
+      expect(entity!.classification).toBe('ROAD');
+      expect(entity!.geometry.elevation).toBe(0);
+      expect(entity!.geometry.extrusionHeight).toBe(ROAD_INFRASTRUCTURE.asphaltHeight);
+      const corridor = box(entity!.geometry.coordinates[0]);
+      const invades = lots.some((lot) => (
+        corridor.minX < lot.maxX - 0.01 && corridor.maxX > lot.minX + 0.01
+        && corridor.minZ < lot.maxZ - 0.01 && corridor.maxZ > lot.minZ + 0.01
+      ));
+      expect(invades, `${identifier} não pode invadir lotes`).toBe(false);
+    });
   });
 
   it('usa asfalto cinza-escuro neutro e uma textura otimizada', () => {
@@ -106,7 +192,7 @@ describe('infraestrutura viária do Mapa Comercial', () => {
       expect(detailed.gutters).not.toBeNull();
       expect(detailed.curbs).not.toBeNull();
       expect(detailed.diagnostics).toMatchObject({
-        roadCount: 21,
+        roadCount: 25,
         pedestrianPathCount: 1,
         microGapCount: 1,
       });

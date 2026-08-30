@@ -6,7 +6,20 @@ O sistema mantém a cartografia oficial 2026 como fonte geométrica. As fotograf
 
 Na recalibração cromática, a pista visível na parte superior da referência apresentou amostras próximas de RGB `70/73/80` a `75/83/86`, enquanto a versão anterior do mapa chegava a RGB `53/42/35`. A diferença confirmou excesso de vermelho e falta de azul no material anterior; o trecho marrom visto através do para-brisa não foi usado como referência de pavimento.
 
-A malha validada contém 21 entidades `ROAD` e uma `PEDESTRIAN_PATH`. Todas permanecem no layer `circulation`, na elevação `0`, com as extrusões oficiais de `0,032` e `0,026`, respectivamente. Ruas, avenidas, alameda e rodovia continuam sendo as mesmas entidades pesquisáveis, selecionáveis e editáveis do sistema anterior.
+A malha validada contém 25 entidades `ROAD` e uma `PEDESTRIAN_PATH`. Todas permanecem no layer `circulation`, na elevação `0`, com as extrusões oficiais de `0,032` e `0,026`, respectivamente. Ruas, avenidas, alameda e rodovia continuam sendo as mesmas entidades pesquisáveis, selecionáveis e editáveis do sistema anterior.
+
+## Continuidade do grafo viário
+
+Quatro corredores já reservados entre quadras existiam como faixa livre, mas sem entidade viária, o que fazia a rua desaparecer visualmente no meio da quadra. Eles foram materializados como vias reais, nas mesmas bandas das ruas homônimas e com pequena sobreposição sobre as vias vizinhas para que o detector de conexões gere as interseções sem costura:
+
+| Corredor | Faixa | Origem |
+| --- | --- | --- |
+| `RUA-URUGUAI-LESTE` | x `13,31 → 25,31`, z `10,10 → 11,32` | continuação leste da Rua Uruguai |
+| `RUA-ARGENTINA-LESTE` | x `13,31 → 25,31`, z `16,17 → 17,56` | continuação leste da Rua Argentina |
+| `RUA-MONTEVIDEU-SUL` | x `1,99 → 2,88`, z `-8,18 → 3,38` | continuação sul da Rua Montevidéu |
+| `RUA-INTERNA-OESTE` | x `-24,61 → -24,20`, z `-11,45 → 3,27` | eixo entre as quadras V/Q, U/P e T/O |
+
+A regra permanente é verificada em teste: nenhum vão livre entre quadras vizinhas (`0,3` a `4` unidades) pode ficar sem cobertura viária, e nenhum corredor pode invadir lote comercial.
 
 ## Construção geométrica
 
