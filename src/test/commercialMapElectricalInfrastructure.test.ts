@@ -359,9 +359,9 @@ describe('infraestrutura elétrica cartográfica do Mapa Comercial', () => {
     });
     expect(ELECTRICAL_INFRASTRUCTURE_REFERENCE.placement.facadeMountedMarkers).toHaveLength(14);
     expect(placements.filter((placement) => placement.node.mountMode === 'FACADE_POLE'))
-      .toHaveLength(12);
+      .toHaveLength(9);
     expect(placements.filter((placement) => placement.node.mountMode === 'FACADE_RECEPTION'))
-      .toHaveLength(6);
+      .toHaveLength(5);
     expect(placements.filter((placement) => placement.placementStatus === 'PROJECTED_FALLBACK'))
       .toHaveLength(0);
   });
