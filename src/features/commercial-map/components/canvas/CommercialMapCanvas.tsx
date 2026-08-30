@@ -3528,8 +3528,7 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
     viewportWidth: viewportMetrics.width,
     viewportHeight: viewportMetrics.height,
     reducedGraphics,
-    cameraNavigating,
-  }), [cameraNavigating, reducedGraphics, viewportMetrics]);
+  }), [reducedGraphics, viewportMetrics]);
   const extent = useMemo(
     () => getSceneExtent(
       entities,

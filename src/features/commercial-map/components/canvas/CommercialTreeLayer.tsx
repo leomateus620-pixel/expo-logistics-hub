@@ -1,6 +1,10 @@
 import { memo, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
+import {
+  projectedCommercialMapShadowDirection,
+  projectedCommercialMapShadowRotation,
+} from '../../data/commercialMapEnvironment';
 import type { CommercialMapTree, CommercialTreeSpeciesGroup } from '../../data/commercialTrees';
 import type { MapEntity } from '../../types';
 import {
@@ -15,6 +19,8 @@ const NO_RAYCAST = () => undefined;
 const SHADOW_OPACITY = 0.105;
 const CONTACT_PATCH_OPACITY = 0.38;
 const UNIT_Y = new THREE.Vector3(0, 1, 0);
+const SUNRISE_SHADOW_DIRECTION = projectedCommercialMapShadowDirection();
+const SUNRISE_SHADOW_ROTATION = projectedCommercialMapShadowRotation();
 
 // Renderer-free QA imports these pure presentation contracts without mounting WebGL.
 // eslint-disable-next-line react-refresh/only-export-components
@@ -408,8 +414,8 @@ function CommercialTreeInstances({
 
       const shadowOffset = tree.canopyRadius * 0.55;
       const shadowPosition = [
-        x + tree.shadowDirection[0] * shadowOffset,
-        z + tree.shadowDirection[1] * shadowOffset,
+        x + SUNRISE_SHADOW_DIRECTION[0] * shadowOffset,
+        z + SUNRISE_SHADOW_DIRECTION[1] * shadowOffset,
       ] as const;
       const shadowGroundY = commercialTreeShadowElevationAtPosition(
         tree,
@@ -421,7 +427,7 @@ function CommercialTreeInstances({
         shadowGroundY,
         shadowPosition[1],
       );
-      transform.rotation.set(-Math.PI / 2, 0, tree.shadowRotation);
+      transform.rotation.set(-Math.PI / 2, 0, SUNRISE_SHADOW_ROTATION);
       transform.scale.set(tree.shadowSize[0], tree.shadowSize[1], 1);
       transform.updateMatrix();
       shadowMesh.setMatrixAt(treeIndex, transform.matrix);

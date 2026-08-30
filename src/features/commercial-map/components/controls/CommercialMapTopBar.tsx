@@ -7,6 +7,7 @@ import {
   Maximize2,
   ScanSearch,
   Signpost,
+  Sunrise,
   Tractor,
   Trees,
   type LucideIcon,
@@ -51,6 +52,8 @@ export function CommercialMapTopBar({
   const setTreesVisible = useCommercialMapStore((state) => state.setTreesVisible);
   const hydrologicalModeActive = useCommercialMapStore((state) => state.hydrologicalModeActive);
   const toggleHydrologicalMode = useCommercialMapStore((state) => state.toggleHydrologicalMode);
+  const sunrisePhase = useCommercialMapStore((state) => state.sunrisePhase);
+  const requestSunrise = useCommercialMapStore((state) => state.requestSunrise);
   const technicalValidationVisible = useCommercialMapStore((state) => state.technicalValidationVisible);
   const setTechnicalValidationVisible = useCommercialMapStore((state) => state.setTechnicalValidationVisible);
 
@@ -105,6 +108,18 @@ export function CommercialMapTopBar({
         hydrologicalModeActive ? 'Sair do modo Rede Hidrológica' : 'Ativar modo Rede Hidrológica',
         toggleHydrologicalMode,
         { active: hydrologicalModeActive, hydrological: true },
+      )}
+
+      {renderAction(
+        'sunrise',
+        Sunrise,
+        sunrisePhase === 'running'
+          ? 'Reiniciar Amanhecer'
+          : sunrisePhase === 'complete'
+            ? 'Rever Amanhecer'
+            : 'Amanhecer',
+        requestSunrise,
+        { active: sunrisePhase === 'running' },
       )}
 
       {renderAction(

@@ -71,6 +71,27 @@ describe('viewport mobile do Mapa Comercial', () => {
     })).toBe(1.35);
   });
 
+  it('mantém piso de 1x quando o navegador informa DPR fracionário ou inválido', () => {
+    expect(resolveCommercialMapPixelRatio({
+      devicePixelRatio: 0.75,
+      viewportWidth: 393,
+      viewportHeight: 852,
+      reducedGraphics: false,
+    })).toBe(1);
+    expect(resolveCommercialMapPixelRatio({
+      devicePixelRatio: 0.5,
+      viewportWidth: 7680,
+      viewportHeight: 4320,
+      reducedGraphics: true,
+    })).toBe(1);
+    expect(resolveCommercialMapPixelRatio({
+      devicePixelRatio: Number.NaN,
+      viewportWidth: 1920,
+      viewportHeight: 1080,
+      reducedGraphics: false,
+    })).toBe(1);
+  });
+
   it('limita o orçamento em desktop retina sem afetar monitores 1x', () => {
     const retina = resolveCommercialMapPixelRatio({
       devicePixelRatio: 2,
@@ -94,7 +115,7 @@ describe('viewport mobile do Mapa Comercial', () => {
     })).toBe(1.5);
   });
 
-  it('reduz o DPR somente durante a navegação e recupera a qualidade ao finalizar', () => {
+  it('mantém o DPR estável antes, durante e depois da navegação', () => {
     const viewport = {
       devicePixelRatio: 3,
       viewportWidth: 393,
@@ -102,19 +123,17 @@ describe('viewport mobile do Mapa Comercial', () => {
       reducedGraphics: false,
     };
 
-    const idle = resolveCommercialMapPixelRatio(viewport);
-    const navigating = resolveCommercialMapPixelRatio({ ...viewport, cameraNavigating: true });
-    const recovered = resolveCommercialMapPixelRatio({ ...viewport, cameraNavigating: false });
+    const navigationSamples = [false, true, false].map((cameraNavigating) => {
+      const sample = { ...viewport, cameraNavigating };
+      return resolveCommercialMapPixelRatio(sample);
+    });
+    const reducedNavigationSamples = [false, true, false].map((cameraNavigating) => {
+      const sample = { ...viewport, reducedGraphics: true, cameraNavigating };
+      return resolveCommercialMapPixelRatio(sample);
+    });
 
-    expect(idle).toBe(2.25);
-    expect(navigating).toBe(1.35);
-    expect(navigating).toBeLessThan(idle);
-    expect(recovered).toBe(idle);
-    expect(resolveCommercialMapPixelRatio({
-      ...viewport,
-      reducedGraphics: true,
-      cameraNavigating: true,
-    })).toBe(1);
+    expect(navigationSamples).toEqual([2.25, 2.25, 2.25]);
+    expect(reducedNavigationSamples).toEqual([1.35, 1.35, 1.35]);
   });
 
   it('faz a navegação manual vencer refits residuais do painel', () => {

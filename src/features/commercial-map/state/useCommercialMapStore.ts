@@ -104,6 +104,9 @@ interface CommercialMapState {
   technicalValidationVisible: boolean;
   reducedGraphics: boolean;
   cameraNavigating: boolean;
+  sunrisePhase: 'idle' | 'running' | 'complete';
+  sunriseSequence: number;
+  sunriseStartedAt: number | null;
   lunarLaunchPhase: LunarLaunchPhase;
   lunarLaunchSequence: number;
   lunarLaunchStartedAt: number | null;
@@ -160,6 +163,9 @@ interface CommercialMapState {
   setTechnicalValidationVisible: (visible: boolean) => void;
   setReducedGraphics: (reduced: boolean) => void;
   setCameraNavigating: (navigating: boolean) => void;
+  requestSunrise: () => void;
+  completeSunrise: (sequence: number) => void;
+  resetSunrise: () => void;
   requestLunarLaunch: () => void;
   setLunarLaunchPhase: (phase: LunarLaunchPhase, sequence: number) => void;
   requestLunarLaunchSkip: () => void;
@@ -210,6 +216,9 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
   technicalValidationVisible: false,
   reducedGraphics: false,
   cameraNavigating: false,
+  sunrisePhase: 'idle',
+  sunriseSequence: 0,
+  sunriseStartedAt: null,
   lunarLaunchPhase: 'idle',
   lunarLaunchSequence: 0,
   lunarLaunchStartedAt: null,
@@ -256,6 +265,8 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
       selectedHydrologicalElementId: null,
       technicalValidationVisible: false,
       cameraNavigating: false,
+      sunrisePhase: 'idle',
+      sunriseStartedAt: null,
       lunarLaunchPhase: 'idle',
       lunarLaunchStartedAt: null,
       lunarLaunchSkipRequested: false,
@@ -510,6 +521,21 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
   setTechnicalValidationVisible: (technicalValidationVisible) => set({ technicalValidationVisible }),
   setReducedGraphics: (reducedGraphics) => set({ reducedGraphics }),
   setCameraNavigating: (cameraNavigating) => set({ cameraNavigating }),
+  requestSunrise: () => set((state) => ({
+    sunrisePhase: 'running',
+    sunriseSequence: state.sunriseSequence + 1,
+    sunriseStartedAt: monotonicNow(),
+  })),
+  completeSunrise: (sequence) => set((state) => (
+    state.sunrisePhase === 'running' && state.sunriseSequence === sequence
+      ? { sunrisePhase: 'complete', sunriseStartedAt: null }
+      : state
+  )),
+  resetSunrise: () => set((state) => ({
+    sunrisePhase: 'idle',
+    sunriseSequence: state.sunriseSequence + 1,
+    sunriseStartedAt: null,
+  })),
   requestLunarLaunch: () => set((state) => {
     if (state.lunarLaunchPhase !== 'idle' || state.lunarLaunchReturning) return state;
     return {
