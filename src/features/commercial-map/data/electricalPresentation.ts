@@ -46,3 +46,26 @@ export function resolveElectricalArchitectureClearancePosition(
 
   return [node.position[0] + group.offset[0], node.position[1] + group.offset[1]];
 }
+
+/** Ground-level rear-road QA: source markers and electrical topology stay intact.
+ * These bounded display offsets apply only while the corrected rear roads render.
+ * They are clearance decisions, not a revision of the official electrical survey. */
+export const REAR_ROAD_ELECTRICAL_CLEARANCE_PRESENTATION = Object.freeze({
+  revision: '2026.08.29-rear-road-clearance.1',
+  verificationStatus: 'FIELD_REVIEW_REQUIRED',
+  offsets: Object.freeze({
+    'pole-ref-145': [0.5, 0], // Ubiretama: east verge, beyond pavement.
+    'pole-ref-225': [-1, 0], // BR-472: park-side verge, beyond shoulder.
+    'pole-ref-295': [0, -0.2],
+    'pole-ref-296': [0, -0.2],
+    'pole-ref-297': [0, -0.2], // Preserve the three-pole Brasília alignment.
+  } satisfies Readonly<Record<string, readonly [number, number]>>),
+});
+
+export function resolveRearRoadElectricalClearancePosition(node: CommercialElectricalNode): Coordinate | null {
+  if (node.mountMode !== 'GROUND_POLE') return null;
+  const offsets: Readonly<Record<string, readonly [number, number]>>
+    = REAR_ROAD_ELECTRICAL_CLEARANCE_PRESENTATION.offsets;
+  const offset = offsets[node.sourceMarkerId];
+  return offset ? [node.position[0] + offset[0], node.position[1] + offset[1]] : null;
+}

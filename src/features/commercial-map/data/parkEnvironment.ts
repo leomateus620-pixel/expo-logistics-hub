@@ -156,10 +156,12 @@ export const ARENA_FRONT_LAYOUT = {
     { sourcePosition: [5860, 2690] as SourcePoint, scale: 0.96 },
     { sourcePosition: [5920, 2870] as SourcePoint, scale: 1.06 },
     { sourcePosition: [5930, 3050] as SourcePoint, scale: 0.92 },
-    { sourcePosition: [5900, 3215] as SourcePoint, scale: 1.04 },
-    { sourcePosition: [5700, 3230] as SourcePoint, scale: 0.98 },
-    { sourcePosition: [5480, 3225] as SourcePoint, scale: 1.1 },
-    { sourcePosition: [5230, 3210] as SourcePoint, scale: 0.9 },
+    // Same four landscape trees, shifted to the grass shoulder of corrected
+    // Rua Brasília. Keep canopies as well as trunks out of its carriageway.
+    { sourcePosition: [5920, 3265] as SourcePoint, scale: 1.04 },
+    { sourcePosition: [5700, 3265] as SourcePoint, scale: 0.98 },
+    { sourcePosition: [5480, 3260] as SourcePoint, scale: 1.1 },
+    { sourcePosition: [5230, 3260] as SourcePoint, scale: 0.9 },
   ] as const,
   northBerm: {
     sourceBounds: [4120, 2682, 4480, 2720] as SourceBounds,

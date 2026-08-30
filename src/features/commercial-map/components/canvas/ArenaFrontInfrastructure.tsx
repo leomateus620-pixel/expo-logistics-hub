@@ -18,6 +18,7 @@ import {
 import { isArenaTerrainExcluded } from '../../data/arenaSectorZoning';
 import { getOpenGroundTexture, type OpenGroundSurface } from './openGroundTextures';
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
+import { integrateGroundGeometryWithRearRoads } from '../../utils/rearRoadGroundIntegration';
 
 const NO_RAYCAST = () => undefined;
 const UNIT_Y = new THREE.Vector3(0, 1, 0);
@@ -193,7 +194,7 @@ function createTerrainGeometry() {
   geometry.computeVertexNormals();
   geometry.computeBoundingBox();
   geometry.computeBoundingSphere();
-  return { geometry, bounds };
+  return { geometry: integrateGroundGeometryWithRearRoads(geometry), bounds };
 }
 
 /** Fita horizontal seguindo o terreno, usada nos caminhos de pedestres. */
@@ -224,7 +225,7 @@ function createWalkwayGeometry(path: readonly (readonly [number, number])[], wid
     uvs.push(0, travelled, 1, travelled);
     if (index > 0) {
       const base = (index - 1) * 2;
-      indices.push(base, base + 1, base + 2, base + 1, base + 3, base + 2);
+      indices.push(base, base + 2, base + 1, base + 1, base + 2, base + 3);
     }
   });
 
@@ -235,7 +236,7 @@ function createWalkwayGeometry(path: readonly (readonly [number, number])[], wid
   geometry.computeVertexNormals();
   geometry.computeBoundingBox();
   geometry.computeBoundingSphere();
-  return geometry;
+  return integrateGroundGeometryWithRearRoads(geometry);
 }
 
 function courtLineGeometry() {

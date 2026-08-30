@@ -12,6 +12,7 @@ import {
   buildCommercialMapSegmentIndex,
   type CommercialMapSegmentDefinition,
 } from '../data/commercialMapSegments';
+import { rearRoadSearchNamesForOfficialOwner } from '../data/rearParkRoadNetwork';
 
 const collator = new Intl.Collator('pt-BR', { numeric: true, sensitivity: 'base' });
 
@@ -172,6 +173,7 @@ export function buildEntityExplorerIndex(entities: MapEntity[], lots: Commercial
       metadata.officialDisplayName,
       entity.name,
       lot?.displayName,
+      ...rearRoadSearchNamesForOfficialOwner(entity.publicIdentifier),
     ]);
     const locations = normalizedValues([
       location.locationLabel,

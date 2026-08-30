@@ -8,11 +8,25 @@ import {
   isCommercialMapHydrologicalPortraitViewport,
   resolveCommercialMapHydrologicalPortraitTargetShift,
   resolveCommercialMapPixelRatio,
+  resolveCommercialMapCameraNearPlane,
   resolveCommercialMapSheetSnap,
   shouldSuppressCommercialMapResizeRefit,
 } from '@/features/commercial-map/utils/viewport';
 
 describe('viewport mobile do Mapa Comercial', () => {
+  it('recupera precisão de profundidade ao afastar de um close, sem cortar vistas baixas', () => {
+    expect(resolveCommercialMapCameraNearPlane(8, 0.5)).toBe(0.035);
+    expect(resolveCommercialMapCameraNearPlane(720, 390)).toBe(3);
+    expect(resolveCommercialMapCameraNearPlane(720, 0.8)).toBe(0.2);
+    expect(resolveCommercialMapCameraNearPlane(Number.NaN, Number.NaN)).toBe(0.035);
+    for (const distance of [12, 30, 90, 260, 720]) {
+      const near = resolveCommercialMapCameraNearPlane(distance, distance * 0.54);
+      const far = 1446;
+      const depthResolution = (distance * distance * (far - near)) / (far * near * (2 ** 24 - 1));
+      expect(depthResolution).toBeLessThan(0.012);
+    }
+  });
+
   it('compõe a visão hídrica portrait sem reduzir o parque a uma faixa horizontal', () => {
     const [x, y, z] = COMMERCIAL_MAP_HYDROLOGICAL_PORTRAIT_DIRECTION;
 
@@ -94,7 +108,7 @@ describe('viewport mobile do Mapa Comercial', () => {
     })).toBe(1.5);
   });
 
-  it('reduz o DPR somente durante a navegação e recupera a qualidade ao finalizar', () => {
+  it('mantém o DPR estável durante a navegação para não redimensionar o drawing buffer', () => {
     const viewport = {
       devicePixelRatio: 3,
       viewportWidth: 393,
@@ -107,14 +121,13 @@ describe('viewport mobile do Mapa Comercial', () => {
     const recovered = resolveCommercialMapPixelRatio({ ...viewport, cameraNavigating: false });
 
     expect(idle).toBe(2.25);
-    expect(navigating).toBe(1.35);
-    expect(navigating).toBeLessThan(idle);
+    expect(navigating).toBe(idle);
     expect(recovered).toBe(idle);
     expect(resolveCommercialMapPixelRatio({
       ...viewport,
       reducedGraphics: true,
       cameraNavigating: true,
-    })).toBe(1);
+    })).toBe(1.35);
   });
 
   it('faz a navegação manual vencer refits residuais do painel', () => {

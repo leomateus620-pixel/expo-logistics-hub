@@ -21,6 +21,18 @@ const FULL_MAP_EXTENT: CommercialMapEnvironmentExtent = {
 };
 
 describe('atmosfera premium compartilhada do Mapa Comercial', () => {
+  it('mantém o feather externo atrás do terreno sem desligar sombras ou depth testing', () => {
+    const source = readFileSync(resolve(process.cwd(),
+      'src/features/commercial-map/components/canvas/CommercialMapEnvironment.tsx'), 'utf8');
+    const outer = source.slice(source.indexOf('layout.outerGroundSize, layout.outerGroundSize'),
+      source.indexOf('layout.activeGroundWidth, layout.activeGroundDepth'));
+    expect(outer).toContain('polygonOffsetFactor={1}');
+    expect(outer).toContain('polygonOffsetUnits={2}');
+    expect(outer).toContain('depthWrite={false}');
+    expect(outer).not.toContain('depthTest={false}');
+    expect(source).toContain('receiveShadow');
+  });
+
   it('mantém o sol configurável alinhado à direção de sombras já observada', () => {
     const sun = normalizedCommercialMapSunDirection();
     const shadow = projectedCommercialMapShadowDirection();

@@ -140,7 +140,7 @@ export const CommercialSiteEnvironmentLayer = memo(function CommercialSiteEnviro
     () => selectCommercialSiteEnvironmentCells(plan, activeOwnerIdentifiers),
     [activeOwnerIdentifiers, plan],
   );
-  const activeCellsByMaterial = useMemo(() => Object.freeze(Object.fromEntries(
+  const activeCellsByMaterial = useMemo(() => Object.freeze(Object.fromEntries<readonly CommercialSiteEnvironmentCell[]>(
     (Object.keys(SITE_MATERIAL_PROFILES) as CommercialSiteEnvironmentMaterialId[]).map((materialId) => [
       materialId,
       activeCells.filter((cell) => cell.materialId === materialId),

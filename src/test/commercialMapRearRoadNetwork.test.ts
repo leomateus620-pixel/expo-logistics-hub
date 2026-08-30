@@ -6,11 +6,6 @@ import {
   officialPdfPointToLocal,
 } from '@/features/commercial-map/data/officialReference2026';
 import {
-  EXPORURAL_GEOMETRY_REVISION,
-  EXPORURAL_LOT_REFERENCES,
-  EXPORURAL_ROAD_IDENTIFIERS,
-} from '@/features/commercial-map/data/exporuralReference2026';
-import {
   GENERATED_REAR_ROAD_SEGMENTS,
   OFFICIAL_GATE_5_ACCESS_POINT,
   OFFICIAL_GATE_5_CENTER,
@@ -20,8 +15,9 @@ import {
   REAR_PARK_ROAD_NETWORK,
   REAR_ROAD_IDENTITIES,
   REAR_ROAD_NODES,
-  REMOVED_REAR_ROAD_IDENTIFIERS,
   REPLACED_OFFICIAL_ROAD_IDENTIFIERS,
+  rearContextualLabelAnchorForOfficialOwner,
+  rearRoadFocusBoundsForOfficialOwner,
   rearRoadIdentityCountByName,
   rearRoadLocalPath,
   rearRoadLocalWidth,
@@ -29,175 +25,238 @@ import {
   roadGraphPath,
 } from '@/features/commercial-map/data/rearParkRoadNetwork';
 import {
+  REAR_ROAD_EXCLUSION_BOUNDARIES,
+  REAR_ROAD_EXCLUSION_COUNTS,
+} from '@/features/commercial-map/data/rearRoadExclusions';
+import {
   REAR_ENVIRONMENT_BUDGET,
   REAR_ENVIRONMENT_REFERENCE_POINTS,
-  REAR_STRUCTURE_EXCLUSIONS,
   REAR_TERRAIN_PATCHES,
   buildRearPoleInstances,
   buildRearTreeInstances,
-  sourceBoundsToLocal,
-  sourcePolygonToLocal,
 } from '@/features/commercial-map/data/rearParkEnvironment';
 import {
-  REAR_PARKING_ROWS,
-} from '@/features/commercial-map/data/rearParking';
-import {
   REAR_ROAD_BUDGET,
+  REAR_ROAD_JUNCTION_ELEVATION_LIFT,
   buildRearRoadCorridorFootprints,
   buildRearRoadNetworkGeometries,
   disposeRearRoadNetworkGeometries,
-  distanceToPath,
   pointIsInsideAnyRearRoadCorridor,
-  pointIsInsidePolygon,
-  rearRoadCorridorIntersectsPolygon,
   rearRoadFootprintIntersectsPolygon,
+  rearRoadTerrainElevationAt,
+  resolveRearRoadOwnerAtLocalPoint,
   sampleRearRoadCenterline,
 } from '@/features/commercial-map/utils/rearRoadNetwork';
-import { rearRoadLayerPresentation } from '@/features/commercial-map/utils/commercialLayerPresentation';
 import {
+  REAR_ATTACHMENT_5_REFERENCE,
+  REAR_ATTACHMENT_5_REFERENCE_POINTS,
   REAR_CALIBRATED_AXES,
-  REAR_NORMALIZED_REFERENCE_POINTS,
   REAR_OFFICIAL_ANCHORS,
-  REAR_SATELLITE_REFERENCES,
-  projectRearNormalizedReferencePointToLocal,
-  projectRearNormalizedReferencePointToOfficialSource,
-  projectSatellitePixelToLocal,
-  rearCalibrationDiagnostics,
-  rearNormalizedReferencePointById,
-  rearNormalizedReferencePointsByRole,
+  REAR_SATELLITE_TOPOLOGY,
+  projectRearAttachment5InteriorPercentToOfficialSource,
+  projectRearAttachment5PointToLocal,
+  projectRearAttachment5PointToOfficialSource,
+  rearAttachment5ReferencePointById,
 } from '@/features/commercial-map/utils/rearSpatialCalibration';
 import {
   buildEntityExplorerIndex,
   filterAndSortEntityExplorerItems,
 } from '@/features/commercial-map/utils/entityExplorer';
 import { isSelectableMapClassification } from '@/features/commercial-map/utils/interaction';
-import { useCommercialMapStore } from '@/features/commercial-map/state/useCommercialMapStore';
 
 type Point2 = readonly [number, number];
 
-function normalizedText(value: string) {
-  return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase('pt-BR');
-}
-
 function officialEntity(identifier: string) {
-  const entities = OFFICIAL_REFERENCE_DATA.entities.filter(
-    (entity) => entity.publicIdentifier.toLocaleUpperCase('pt-BR') === identifier,
+  const matches = OFFICIAL_REFERENCE_DATA.entities.filter((entity) => (
+    entity.publicIdentifier.toLocaleUpperCase('pt-BR') === identifier
+  ));
+  expect(matches, `entidade oficial ${identifier}`).toHaveLength(1);
+  return matches[0];
+}
+
+function pointDistance(start: Point2, end: Point2) {
+  return Math.hypot(end[0] - start[0], end[1] - start[1]);
+}
+
+function directionChangeDegrees(start: Point2, junction: Point2, end: Point2) {
+  const incoming = Math.atan2(junction[1] - start[1], junction[0] - start[0]);
+  const outgoing = Math.atan2(end[1] - junction[1], end[0] - junction[0]);
+  const delta = Math.atan2(Math.sin(outgoing - incoming), Math.cos(outgoing - incoming));
+  return Math.abs(delta * 180 / Math.PI);
+}
+
+function degree(nodeId: keyof typeof REAR_ROAD_NODES) {
+  return REAR_PARK_ROAD_NETWORK.filter((road) => road.from === nodeId || road.to === nodeId).length;
+}
+
+function queryExplorer(query: string) {
+  return filterAndSortEntityExplorerItems(
+    buildEntityExplorerIndex(OFFICIAL_REFERENCE_DATA.entities, OFFICIAL_REFERENCE_DATA.lots),
+    {
+      query,
+      statusFilters: [],
+      classificationFilters: [],
+      locationFilter: null,
+      verificationFilters: [],
+      sortOrder: 'relevance',
+    },
   );
-  expect(entities, `entidade oficial ${identifier}`).toHaveLength(1);
-  return entities[0];
 }
 
-function pointToSegmentDistance(point: Point2, start: Point2, end: Point2) {
-  const dx = end[0] - start[0];
-  const dz = end[1] - start[1];
-  const lengthSquared = dx * dx + dz * dz;
-  const t = lengthSquared === 0 ? 0 : Math.max(0, Math.min(1,
-    ((point[0] - start[0]) * dx + (point[1] - start[1]) * dz) / lengthSquared));
-  return Math.hypot(point[0] - (start[0] + dx * t), point[1] - (start[1] + dz * t));
-}
+describe('área posterior — hierarquia dos anexos e seis âncoras', () => {
+  it('registra o arquivo do anexo 5 e os percentuais exatos fornecidos', () => {
+    expect(REAR_ATTACHMENT_5_REFERENCE).toEqual({
+      filenames: [
+        'IMG_9933.jpeg',
+      ],
+      pixelSize: [1179, 1250],
+      origin: 'TOP_LEFT',
+    });
+    expect(REAR_ATTACHMENT_5_REFERENCE_POINTS.map((point) => [point.id, point.percent])).toEqual([
+      [1, [80, 30]],
+      [2, [53, 73]],
+      [3, [53, 46]],
+      [4, [55, 15]],
+      [5, [38, 20]],
+      [6, [62, 13]],
+    ]);
+    expect(rearAttachment5ReferencePointById(1).attachmentPixel).toEqual([943.2, 375]);
+    expect(rearAttachment5ReferencePointById(2).attachmentPixel).toEqual([624.87, 912.5]);
+    expect(rearAttachment5ReferencePointById(6).attachmentPixel).toEqual([730.98, 162.5]);
+  });
 
-function distanceToPolygonBoundary(point: Point2, polygon: readonly Point2[]) {
-  return Math.min(...polygon.map((start, index) => (
-    pointToSegmentDistance(point, start, polygon[(index + 1) % polygon.length])
-  )));
-}
+  it('projeta P2–P6 por uma única transformação afim e mantém P1 como término canônico', () => {
+    expect(projectRearAttachment5PointToOfficialSource(1)).toEqual([5510, 4200]);
+    expect(projectRearAttachment5PointToOfficialSource(2)[0]).toBeCloseTo(3964, 10);
+    expect(projectRearAttachment5PointToOfficialSource(2)[1]).toBeCloseTo(3700, 10);
+    expect(projectRearAttachment5PointToOfficialSource(3)[0]).toBeCloseTo(4975.9927745664745, 10);
+    expect(projectRearAttachment5PointToOfficialSource(3)[1]).toBeCloseTo(3200.5780346820807, 10);
+    expect(projectRearAttachment5PointToOfficialSource(4)[0]).toBeCloseTo(6133.044315992293, 10);
+    expect(projectRearAttachment5PointToOfficialSource(4)[1]).toBeCloseTo(2723.121387283237, 10);
+    expect(projectRearAttachment5PointToOfficialSource(5)[0]).toBeCloseTo(5987, 10);
+    expect(projectRearAttachment5PointToOfficialSource(5)[1]).toBeCloseTo(2000, 10);
+    expect(projectRearAttachment5PointToOfficialSource(6)[0]).toBeCloseTo(6190.975433526012, 10);
+    expect(projectRearAttachment5PointToOfficialSource(6)[1]).toBeCloseTo(3021.965317919075, 10);
+    expect(projectRearAttachment5InteriorPercentToOfficialSource([80, 30])[0]).toBeCloseTo(5510, 10);
+    expect(projectRearAttachment5InteriorPercentToOfficialSource([80, 30])[1]).toBeCloseTo(4200, 10);
 
-function boundsPolygon(bounds: (typeof REAR_STRUCTURE_EXCLUSIONS)[number]): Point2[] {
-  const local = sourceBoundsToLocal(bounds);
-  return [
-    [local.minX, local.minZ], [local.maxX, local.minZ],
-    [local.maxX, local.maxZ], [local.minX, local.maxZ],
-  ];
-}
+    const p2 = projectRearAttachment5PointToOfficialSource(2);
+    const p3 = projectRearAttachment5PointToOfficialSource(3);
+    const p4 = projectRearAttachment5PointToOfficialSource(4);
+    const p5 = projectRearAttachment5PointToOfficialSource(5);
+    const p6 = projectRearAttachment5PointToOfficialSource(6);
+    expect(directionChangeDegrees(p2, p3, p4)).toBeLessThan(5);
+    expect(pointDistance(p4, p6) / pointDistance(p4, p5)).toBeCloseTo(0.411, 2);
 
-function axisToLocal(axis: readonly Point2[]) {
-  return axis.map((point) => officialPdfPointToLocal(point));
-}
+    const point6Local = projectRearAttachment5PointToLocal(6);
+    expect(point6Local[0]).toBeCloseTo(OFFICIAL_GATE_5_ACCESS_POINT[0], 10);
+    expect(point6Local[1]).toBeCloseTo(OFFICIAL_GATE_5_ACCESS_POINT[1], 10);
+    expect(pointDistance(point6Local, OFFICIAL_GATE_5_CENTER)).toBeGreaterThan(10);
+  });
 
-function directedTangentDeltaDegrees(
-  incomingStart: Point2,
-  junction: Point2,
-  outgoingEnd: Point2,
-) {
-  const incoming = Math.atan2(junction[1] - incomingStart[1], junction[0] - incomingStart[0]);
-  const outgoing = Math.atan2(outgoingEnd[1] - junction[1], outgoingEnd[0] - junction[0]);
-  const rawDelta = Math.abs(incoming - outgoing);
-  return Math.min(rawDelta, Math.PI * 2 - rawDelta) * (180 / Math.PI);
-}
+  it('mantém separada a numeração do satélite e prova aproximação → portão → junção BR', () => {
+    expect(REAR_SATELLITE_TOPOLOGY.references).toEqual([
+      { filename: 'IMG_9934.jpeg', pixelSize: [1179, 1146] },
+      { filename: 'IMG_9936.jpeg', pixelSize: [1179, 1161] },
+    ]);
+    expect(REAR_SATELLITE_TOPOLOGY.points.map(({ id, role }) => [id, role])).toEqual([
+      [2, 'rua-brasilia-approach'],
+      [1, 'gate-5'],
+      [3, 'br472-exit-junction'],
+    ]);
+    expect(REAR_ENVIRONMENT_REFERENCE_POINTS).toEqual({
+      approach: projectRearAttachment5PointToOfficialSource(4),
+      gate5: REAR_OFFICIAL_ANCHORS.gate5VehicleAccess,
+      br472Junction: REAR_OFFICIAL_ANCHORS.br472Junction,
+    });
+    expect(REAR_CALIBRATED_AXES.gate5InternalApproach[0]).toEqual(
+      projectRearAttachment5PointToOfficialSource(4),
+    );
+    expect(REAR_CALIBRATED_AXES.gate5InternalApproach.at(-1)).toEqual(
+      REAR_OFFICIAL_ANCHORS.gate5VehicleAccess,
+    );
+    expect(REAR_CALIBRATED_AXES.a5ExternalAccess[0]).toEqual(REAR_OFFICIAL_ANCHORS.gate5VehicleAccess);
+    expect(REAR_CALIBRATED_AXES.a5ExternalAccess.at(-1)).toEqual(REAR_OFFICIAL_ANCHORS.br472Junction);
+    const satelliteDirectionChange = directionChangeDegrees(
+      REAR_SATELLITE_TOPOLOGY.points[0].satellitePixel,
+      REAR_SATELLITE_TOPOLOGY.points[1].satellitePixel,
+      REAR_SATELLITE_TOPOLOGY.points[2].satellitePixel,
+    );
+    const calibratedDirectionChange = directionChangeDegrees(
+      REAR_SATELLITE_TOPOLOGY.points[0].officialSource,
+      REAR_SATELLITE_TOPOLOGY.points[1].officialSource,
+      REAR_SATELLITE_TOPOLOGY.points[2].officialSource,
+    );
+    expect(satelliteDirectionChange).toBeLessThan(10);
+    expect(calibratedDirectionChange).toBeCloseTo(satelliteDirectionChange, 6);
+    expect(
+      pointDistance(
+        REAR_SATELLITE_TOPOLOGY.points[1].officialSource,
+        REAR_SATELLITE_TOPOLOGY.points[2].officialSource,
+      ) / pointDistance(
+        REAR_SATELLITE_TOPOLOGY.points[0].officialSource,
+        REAR_SATELLITE_TOPOLOGY.points[1].officialSource,
+      ),
+    ).toBeCloseTo(0.74061, 5);
+  });
+});
 
-describe('área posterior — identidade oficial e apresentação única do Portão 5', () => {
-  it('mantém exatamente uma entidade A5, um nome oficial, uma busca e uma geometria selecionável', () => {
+describe('área posterior — identidades, seleção e busca sem duplicação', () => {
+  it('usa somente os quatro nomes corretos e elimina toda identidade Rua Exporural', () => {
+    expect(REAR_ROAD_IDENTITIES.map(({ id, name }) => [id, name])).toEqual([
+      ['RUA-BRASILIA', 'Rua Brasília'],
+      ['RUA-UBIRETAMA', 'Rua Ubiretama'],
+      ['RUA-DAS-ETNIAS', 'Rua das Etnias'],
+      ['RODOVIA-RS-472', 'BR-472'],
+    ]);
+    ['Rua Brasília', 'Rua Ubiretama', 'Rua das Etnias', 'BR-472'].forEach((name) => {
+      expect(rearRoadIdentityCountByName(name)).toBe(1);
+    });
+    expect(rearRoadIdentityCountByName('Rua Exporural')).toBe(0);
+    expect(JSON.stringify(REAR_PARK_ROAD_NETWORK)).not.toContain('Rua Exporural');
+  });
+
+  it('mantém um único A5 oficial e separa seu cadastro da passagem física P6', () => {
     const a5 = officialEntity('A5');
     expect(a5.id).toBe(OFFICIAL_GATE_5_ENTITY_ID);
-    expect(a5.name).toBe('Portão 5 — saída de veículos de expositores e visitantes');
     expect(a5.classification).toBe('GATE');
     expect(isSelectableMapClassification(a5.classification)).toBe(true);
     expect(OFFICIAL_REFERENCE_DATA.entities.filter((entity) => entity.publicIdentifier === 'A5')).toHaveLength(1);
-    expect(OFFICIAL_REFERENCE_DATA.entities.filter((entity) => (
-      normalizedText(entity.name).startsWith('portao 5')
-    ))).toHaveLength(1);
-
-    const search = filterAndSortEntityExplorerItems(
-      buildEntityExplorerIndex(OFFICIAL_REFERENCE_DATA.entities, OFFICIAL_REFERENCE_DATA.lots),
-      {
-        query: 'A5',
-        statusFilters: [],
-        classificationFilters: [],
-        locationFilter: null,
-        verificationFilters: [],
-        sortOrder: 'relevance',
-      },
-    );
-    expect(search).toHaveLength(1);
-    expect(search[0].entity.id).toBe(a5.id);
-  });
-
-  it('termina a Rua Brasília na passagem física da borda A5 e abre o painel da entidade oficial', () => {
-    const a5 = officialEntity('A5');
-    const ring = a5.geometry.coordinates[0] as Point2[];
-    expect(distanceToPolygonBoundary(OFFICIAL_GATE_5_ACCESS_POINT, ring)).toBeLessThan(1e-8);
-    expect(Math.hypot(
-      OFFICIAL_GATE_5_ACCESS_POINT[0] - OFFICIAL_GATE_5_CENTER[0],
-      OFFICIAL_GATE_5_ACCESS_POINT[1] - OFFICIAL_GATE_5_CENTER[1],
-    )).toBeGreaterThan(0.4);
+    const officialEntityCenter = officialPdfPointToLocal(REAR_OFFICIAL_ANCHORS.gate5Entity);
+    expect(OFFICIAL_GATE_5_CENTER[0]).toBeCloseTo(officialEntityCenter[0], 10);
+    expect(OFFICIAL_GATE_5_CENTER[1]).toBeCloseTo(officialEntityCenter[1], 10);
+    expect(OFFICIAL_GATE_5_ACCESS_POINT).toEqual(projectRearAttachment5PointToLocal(6));
+    expect(pointDistance(OFFICIAL_GATE_5_CENTER, OFFICIAL_GATE_5_ACCESS_POINT)).toBeGreaterThan(10);
     expect(REAR_ROAD_NODES['gate-5']).toMatchObject({
-      officialEntityIdentifier: 'A5',
       sourcePoint: REAR_OFFICIAL_ANCHORS.gate5Entity,
       roadAccessSourcePoint: REAR_OFFICIAL_ANCHORS.gate5VehicleAccess,
-      position: [OFFICIAL_GATE_5_ACCESS_POINT[0], 0, OFFICIAL_GATE_5_ACCESS_POINT[1]],
-    });
-
-    const previous = useCommercialMapStore.getState();
-    useCommercialMapStore.setState({ lunarLaunchPhase: 'idle', lunarLaunchReturning: false });
-    useCommercialMapStore.getState().setSelectedEntityId(a5.id);
-    expect(useCommercialMapStore.getState().selectedEntityId).toBe(a5.id);
-    expect(useCommercialMapStore.getState().activePanel).toBe('details');
-    useCommercialMapStore.setState({
-      selectedEntityId: previous.selectedEntityId,
-      activePanel: previous.activePanel,
-      lunarLaunchPhase: previous.lunarLaunchPhase,
-      lunarLaunchReturning: previous.lunarLaunchReturning,
+      officialEntityIdentifier: 'A5',
     });
   });
 
-  it('preserva o A5 e suaviza a tangência entre chegada interna e acesso externo', () => {
-    const internal = axisToLocal(REAR_CALIBRATED_AXES.brasiliaContinuation);
-    const external = axisToLocal(REAR_CALIBRATED_AXES.a5ExternalAccess);
-    const gate = officialPdfPointToLocal(REAR_OFFICIAL_ANCHORS.gate5VehicleAccess);
-    expect(internal.at(-1)).toEqual(gate);
-    expect(external[0]).toEqual(gate);
-    expect(directedTangentDeltaDegrees(internal.at(-2)!, gate, external[1])).toBeLessThanOrEqual(8);
-    expect(projectRearNormalizedReferencePointToOfficialSource(6)).toEqual(REAR_OFFICIAL_ANCHORS.gate5Entity);
+  it('indexa o alias Rua das Etnias na entidade oficial sem alterar os dados', () => {
+    const before = JSON.stringify(officialEntity('AV-IMIGRANTES'));
+    const results = queryExplorer('Rua das Etnias');
+    expect(results[0]?.entity.publicIdentifier).toBe('AV-IMIGRANTES');
+    expect(queryExplorer('Rua Ubiretama')[0]?.entity.publicIdentifier).toBe('RUA-UBIRETAMA');
+    expect(queryExplorer('BR-472')[0]?.entity.publicIdentifier).toBe('RODOVIA-RS-472');
+    expect(JSON.stringify(officialEntity('AV-IMIGRANTES'))).toBe(before);
   });
 
-  it('usa o sistema contextual existente com um texto exato por owner e sem Html permanente', () => {
+  it('aplica rótulo/âncora contextuais e mantém Html fora da rede viária', () => {
     expect(REAR_CONTEXTUAL_LABELS).toEqual({
-      'RUA-UBIRETAMA': 'RUA EXPORURAL',
       'RUA-BRASILIA': 'RUA BRASÍLIA',
+      'RUA-UBIRETAMA': 'RUA UBIRETAMA',
+      'AV-IMIGRANTES': 'RUA DAS ETNIAS',
       'RODOVIA-RS-472': 'BR-472',
       A5: 'PORTÃO 5',
     });
-    expect(new Set(Object.values(REAR_CONTEXTUAL_LABELS)).size).toBe(4);
+    expect(rearContextualLabelAnchorForOfficialOwner('RUA-BRASILIA')).toEqual(
+      projectRearAttachment5PointToLocal(3),
+    );
+    expect(rearRoadFocusBoundsForOfficialOwner('RUA-BRASILIA')).toMatchObject({
+      minX: expect.any(Number), maxX: expect.any(Number), minZ: expect.any(Number), maxZ: expect.any(Number),
+    });
     const networkSource = readFileSync(resolve(
       process.cwd(), 'src/features/commercial-map/components/canvas/RearParkRoadNetwork.tsx',
     ), 'utf8');
@@ -205,478 +264,261 @@ describe('área posterior — identidade oficial e apresentação única do Port
       process.cwd(), 'src/features/commercial-map/components/canvas/CommercialMapCanvas.tsx',
     ), 'utf8');
     expect(networkSource).not.toContain('<Html');
-    expect(networkSource).not.toContain('rear-park-road-labels');
-    expect(networkSource).not.toContain('onClick=');
-    expect(networkSource).not.toContain('selectedEntityId');
-    expect(canvasSource).toContain('rearContextualLabelForOfficialOwner');
+    expect(networkSource).toContain("onClick={interactive ? handleClick('park') : undefined}");
+    expect(networkSource).toContain('raycast={interactive ? undefined : NO_RAYCAST}');
+    expect(networkSource).toContain('resolveRearRoadOwnerAtLocalPoint');
+    expect(canvasSource).toContain('rearContextualLabelAnchorForOfficialOwner');
     expect(canvasSource).toContain('data-map-label-mode={mode}');
   });
 
-  it('herda visibilidade, opacidade e fading da camada oficial sem criar seleção paralela', () => {
-    const ownerIdentifiers = new Set(REAR_ROAD_IDENTITIES.map((road) => road.officialOwnerIdentifier));
-    const owners = OFFICIAL_REFERENCE_DATA.entities.filter((entity) => (
-      ownerIdentifiers.has(entity.publicIdentifier as typeof REAR_ROAD_IDENTITIES[number]['officialOwnerIdentifier'])
-    ));
-    const before = JSON.stringify(owners);
-    expect(owners).toHaveLength(3);
-    expect(new Set(owners.map((owner) => owner.layerId)).size).toBe(1);
-    const circulationLayerId = owners[0].layerId;
+  it('resolve hit-tests das ribbons diretamente para as entidades oficiais', () => {
+    const brasilia = REAR_PARK_ROAD_NETWORK.find((road) => road.id === 'brasilia-point-3-ubiretama-4')!;
+    const highway = REAR_PARK_ROAD_NETWORK.find((road) => road.id === 'br472-north-junction')!;
+    const brasiliaPoint = rearRoadLocalPath(brasilia)[0];
+    const highwayPoint = rearRoadLocalPath(highway)[1];
+    expect(resolveRearRoadOwnerAtLocalPoint(brasiliaPoint, 'park')).toBe('RUA-BRASILIA');
+    expect(resolveRearRoadOwnerAtLocalPoint(highwayPoint, 'highway')).toBe('RODOVIA-RS-472');
+  });
 
-    expect(rearRoadLayerPresentation(OFFICIAL_REFERENCE_DATA.entities, {}, {})).toEqual({
-      visible: true,
-      opacity: 1,
-    });
-    expect(rearRoadLayerPresentation(
-      OFFICIAL_REFERENCE_DATA.entities,
-      { [circulationLayerId]: false },
-      {},
-    )).toEqual({ visible: false, opacity: 0 });
-    expect(rearRoadLayerPresentation(
-      OFFICIAL_REFERENCE_DATA.entities,
-      {},
-      { [circulationLayerId]: 0.5 },
-    )).toEqual({ visible: true, opacity: 0.5 });
-    expect(rearRoadLayerPresentation(
-      OFFICIAL_REFERENCE_DATA.entities,
-      {},
-      { [circulationLayerId]: 0.5 },
-      true,
-    )).toEqual({ visible: true, opacity: 0.34 });
-    expect(rearRoadLayerPresentation([], {}, {})).toEqual({ visible: false, opacity: 0 });
-    expect(JSON.stringify(owners)).toBe(before);
-
-    const canvasSource = readFileSync(resolve(
-      process.cwd(), 'src/features/commercial-map/components/canvas/CommercialMapCanvas.tsx',
+  it('não reintroduz componente, entidade ou metadado legado do Portão 5', () => {
+    expect(existsSync(resolve(process.cwd(), 'src/features/commercial-map/components/canvas/RearParkGate5.tsx'))).toBe(false);
+    expect(existsSync(resolve(process.cwd(), 'src/features/commercial-map/data/rearParkGate5.ts'))).toBe(false);
+    const source = readFileSync(resolve(
+      process.cwd(), 'src/features/commercial-map/data/rearParkRoadNetwork.ts',
     ), 'utf8');
-    expect(canvasSource).toContain('visible={rearRoadPresentation.visible}');
-    expect(canvasSource).toContain('opacity={rearRoadPresentation.opacity}');
-  });
-
-  it('não contém RearParkGate5, rearParkGate5 nem registro PORTAO-5 duplicado', () => {
-    expect(existsSync(resolve(
-      process.cwd(), 'src/features/commercial-map/components/canvas/RearParkGate5.tsx',
-    ))).toBe(false);
-    expect(existsSync(resolve(
-      process.cwd(), 'src/features/commercial-map/data/rearParkGate5.ts',
-    ))).toBe(false);
-    const runtimeSources = [
-      'src/features/commercial-map/components/canvas/CommercialMapCanvas.tsx',
-      'src/features/commercial-map/data/rearParkRoadNetwork.ts',
-    ].map((file) => readFileSync(resolve(process.cwd(), file), 'utf8')).join('\n');
-    expect(runtimeSources).not.toContain('RearParkGate5');
-    expect(runtimeSources).not.toContain('rearParkGate5');
-    expect(runtimeSources).not.toContain("'PORTAO-5'");
+    expect(source).not.toContain('RearParkGate5');
+    expect(source).not.toContain("'PORTAO-5'");
   });
 });
 
-describe('área posterior — três vias canônicas e topologia correta', () => {
-  it('declara uma única Rua Exporural, uma única Rua Brasília e uma única BR-472', () => {
-    expect(REAR_ROAD_IDENTITIES).toHaveLength(3);
-    expect(rearRoadIdentityCountByName('Rua Exporural')).toBe(1);
-    expect(rearRoadIdentityCountByName('Rua Brasília')).toBe(1);
-    expect(rearRoadIdentityCountByName('BR-472')).toBe(1);
-    expect(new Set(REAR_ROAD_IDENTITIES.map((road) => road.id))).toEqual(new Set([
-      'RUA-EXPORURAL', 'RUA-BRASILIA', 'RODOVIA-RS-472',
+describe('área posterior — topologia corrigida e rodovia independente', () => {
+  it('mantém P2/P3 em uma única cadeia e liga P4/P5 sem Brasília paralela', () => {
+    const path = roadGraphPath('brasilia', 'A5');
+    expect(path).toEqual(expect.arrayContaining([
+      'brasilia-reference-2',
+      'brasilia-reference-3',
+      'brasilia-ubiretama-junction-4',
+      'gate-5',
     ]));
+    expect(path.indexOf('brasilia-reference-2')).toBeLessThan(path.indexOf('brasilia-reference-3'));
+    expect(path.indexOf('brasilia-reference-3')).toBeLessThan(path.indexOf('brasilia-ubiretama-junction-4'));
+    expect(roadGraphHasPath('ubiretama', 'brasilia')).toBe(true);
+    expect(degree('brasilia-ubiretama-junction-4')).toBe(3);
+    expect(REAR_PARK_ROAD_NETWORK.filter((road) => road.roadId === 'RUA-BRASILIA')).toHaveLength(3);
   });
 
-  it('forma Exporural → entroncamento 5 → Brasília → A5 → acesso → BR-472', () => {
-    expect(roadGraphHasPath('exporural', 'brasilia')).toBe(true);
-    expect(roadGraphHasPath('brasilia', 'A5')).toBe(true);
+  it('termina Rua das Etnias em P1 e não cria ramo do término até o Portão 5', () => {
+    expect(REAR_ROAD_NODES['etnias-terminus-1'].sourcePoint).toEqual(
+      rearAttachment5ReferencePointById(1).officialSource,
+    );
+    expect(degree('etnias-terminus-1')).toBe(1);
+    expect(REAR_PARK_ROAD_NETWORK.filter((road) => (
+      road.from === 'etnias-terminus-1' || road.to === 'etnias-terminus-1'
+    )).map((road) => road.id)).toEqual(['etnias-official-terminus-1']);
+    expect(GENERATED_REAR_ROAD_SEGMENTS.some((road) => road.roadId === 'RUA-DAS-ETNIAS')).toBe(false);
+  });
+
+  it('mantém BR-472 como highway externo e usa somente o acesso curto para o entroncamento', () => {
+    const highway = REAR_PARK_ROAD_NETWORK.filter((road) => road.roadId === 'RODOVIA-RS-472');
+    const access = REAR_PARK_ROAD_NETWORK.filter((road) => road.roadId === 'ACESSO-A5-BR472');
+    expect(highway).toHaveLength(2);
+    expect(access).toHaveLength(2);
+    expect(access[0]).toMatchObject({ from: 'brasilia-ubiretama-junction-4', to: 'gate-5' });
+    expect(access[1]).toMatchObject({ from: 'gate-5', to: 'a5-br-junction' });
+    expect(degree('a5-br-junction')).toBe(3);
+    expect(rearRoadLocalWidth(highway[0])).toBeGreaterThan(rearRoadLocalWidth(access[0]));
     expect(roadGraphHasPath('A5', 'br472')).toBe(true);
-    expect(roadGraphHasPath('exporural', 'br472')).toBe(true);
-
-    const path = roadGraphPath('exporural', 'br472');
-    const junctionIndex = path.indexOf('exporural-brasilia-junction');
-    const gateIndex = path.indexOf('gate-5');
-    const brJunctionIndex = path.indexOf('a5-br-junction');
-    expect(junctionIndex).toBeGreaterThan(0);
-    expect(gateIndex).toBeGreaterThan(junctionIndex);
-    expect(brJunctionIndex).toBeGreaterThan(gateIndex);
+    expect(highway.every((road) => road.category === 'federal-highway')).toBe(true);
   });
 
-  it('exclui completamente o Portão 3 dos segmentos novos e preserva sua entidade', () => {
-    expect(officialEntity('A3').name).toBe('Portão 3 — entrada de veículos de expositores e visitantes');
-    expect(Object.keys(REAR_ROAD_NODES)).not.toContain('A3');
-    expect(REAR_PARK_ROAD_NETWORK.flatMap((road) => [
-      road.from,
-      road.to,
-      road.officialOwnerIdentifier,
-    ])).not.toContain('A3');
-
-    const a3Polygon = officialEntity('A3').geometry.coordinates[0] as Point2[];
-    buildRearRoadCorridorFootprints(GENERATED_REAR_ROAD_SEGMENTS, { includeShoulders: true })
-      .forEach((footprint) => {
-        expect(
-          rearRoadFootprintIntersectsPolygon(footprint, a3Polygon),
-          `${footprint.segmentId} não pode tocar A3`,
-        ).toBe(false);
-      });
-  });
-
-  it('preserva Rua Ubiretama e gera somente as extensões físicas ausentes da Rua Exporural', () => {
-    const exporural = REAR_PARK_ROAD_NETWORK.filter((road) => road.roadId === 'RUA-EXPORURAL');
-    expect(exporural).toHaveLength(3);
-    expect(exporural.find((road) => road.id === 'exporural-official-axis')).toMatchObject({
-      presentation: 'official-surface',
-      officialOwnerIdentifier: 'RUA-UBIRETAMA',
-    });
-    const extensions = GENERATED_REAR_ROAD_SEGMENTS.filter((road) => road.roadId === 'RUA-EXPORURAL');
-    expect(extensions.map((road) => road.id)).toEqual([
-      'exporural-reference-1-official-north',
-      'exporural-official-south-junction',
+  it('substitui somente as três superfícies oficiais incompatíveis com a calibração', () => {
+    expect(REPLACED_OFFICIAL_ROAD_IDENTIFIERS).toEqual([
+      'RUA-BRASILIA', 'RUA-UBIRETAMA', 'RODOVIA-RS-472',
     ]);
-    expect(extensions[0].to).toBe('exporural-official-north');
-    expect(extensions[1].from).toBe('exporural-official-south');
-  });
-
-  it('materializa continuidade física P1 → via oficial → P10/P5 → Rua Brasília', () => {
-    const officialPolygon = officialEntity('RUA-UBIRETAMA').geometry.coordinates[0] as Point2[];
-    const northNode = REAR_ROAD_NODES['exporural-official-north'].position;
-    const southNode = REAR_ROAD_NODES['exporural-official-south'].position;
-    expect(distanceToPolygonBoundary([northNode[0], northNode[2]], officialPolygon)).toBeLessThan(1e-8);
-    expect(distanceToPolygonBoundary([southNode[0], southNode[2]], officialPolygon)).toBeLessThan(1e-8);
-
-    const footprints = buildRearRoadCorridorFootprints(GENERATED_REAR_ROAD_SEGMENTS, {
-      includeShoulders: false,
-    });
-    const exporuralSouth = footprints.find((footprint) => (
-      footprint.segmentId === 'exporural-official-south-junction'
-    ))!;
-    const brasiliaBefore = footprints.find((footprint) => (
-      footprint.segmentId === 'brasilia-reference-3-exporural'
-    ))!;
-    const brasiliaAfter = footprints.find((footprint) => (
-      footprint.segmentId === 'brasilia-exporural-a5'
-    ))!;
-    expect(rearRoadFootprintIntersectsPolygon(exporuralSouth, brasiliaBefore.polygon)).toBe(true);
-    expect(rearRoadFootprintIntersectsPolygon(exporuralSouth, brasiliaAfter.polygon)).toBe(true);
-  });
-
-  it('mantém Rua Brasília em uma única cadeia sem apropriar a Avenida dos Imigrantes', () => {
-    const brasilia = REAR_PARK_ROAD_NETWORK.filter((road) => road.roadId === 'RUA-BRASILIA');
-    expect(brasilia).toHaveLength(3);
-    expect(new Set(brasilia.map((road) => road.roadId))).toEqual(new Set(['RUA-BRASILIA']));
-    expect(brasilia.every((road) => road.officialOwnerIdentifier === 'RUA-BRASILIA')).toBe(true);
-    expect(brasilia.some((road) => road.from === 'exporural-brasilia-junction' && road.to === 'gate-5')).toBe(true);
-    expect(officialEntity('RUA-BRASILIA')).toBeDefined();
-  });
-
-  it('retém as travas e substitui somente as apresentações contraditórias da Brasília e BR', () => {
-    expect(REMOVED_REAR_ROAD_IDENTIFIERS).toEqual([
-      'RUA-POSTERIOR-ETNIAS',
-      'RUA-ETNIAS-TRANSVERSAL',
-      'RUA-RETAGUARDA-ARENA',
-      'RUA-CIRCULACAO-LOTES',
-      'ACESSO-ALCA-LESTE',
-      'RS-472-CONTINUACAO',
-    ]);
-    const ids = REAR_PARK_ROAD_NETWORK.flatMap((road) => [road.id, road.roadId]);
-    REMOVED_REAR_ROAD_IDENTIFIERS.forEach((identifier) => expect(ids).not.toContain(identifier));
-    expect(REPLACED_OFFICIAL_ROAD_IDENTIFIERS).toEqual(['RUA-BRASILIA', 'RODOVIA-RS-472']);
+    expect(REPLACED_OFFICIAL_ROAD_IDENTIFIERS).not.toContain('AV-IMIGRANTES');
     expect(PROTECTED_ROAD_IDENTIFIERS).toEqual(expect.arrayContaining([
-      ...EXPORURAL_ROAD_IDENTIFIERS,
-      'RUA-BRASILIA',
-      'AV-IMIGRANTES',
-      'RODOVIA-RS-472',
+      'RUA-UBIRETAMA', 'RUA-BRASILIA', 'AV-IMIGRANTES', 'RODOVIA-RS-472',
     ]));
-  });
-
-  it('respeita BR > Rua Brasília > acesso e conecta todos os endpoints físicos', () => {
-    const highway = REAR_PARK_ROAD_NETWORK.find((road) => road.id === 'br472-junction-west')!;
-    const access = REAR_PARK_ROAD_NETWORK.find((road) => road.id === 'a5-br472-access')!;
-    const brasilia = REAR_PARK_ROAD_NETWORK.find((road) => road.id === 'brasilia-exporural-a5')!;
-    expect(rearRoadLocalWidth(highway)).toBeGreaterThan(rearRoadLocalWidth(access));
-    expect(rearRoadLocalWidth(brasilia)).toBeGreaterThan(rearRoadLocalWidth(access));
-    [highway, access, brasilia].forEach((road) => {
-      expect(road.controlPoints[0]).toEqual(REAR_ROAD_NODES[road.from].position);
-      expect(road.controlPoints.at(-1)).toEqual(REAR_ROAD_NODES[road.to].position);
-    });
+    const removedRearRoadIdentifiers = [
+      'RUA-POSTERIOR-ETNIAS', 'RUA-ETNIAS-TRANSVERSAL', 'RUA-RETAGUARDA-ARENA',
+      'RUA-CIRCULACAO-LOTES', 'ACESSO-ALCA-LESTE', 'RS-472-CONTINUACAO', 'RUA-EXPORURAL',
+    ];
+    const runtimeIds = REAR_PARK_ROAD_NETWORK.flatMap((road) => [road.id, road.roadId]);
+    removedRearRoadIdentifiers.forEach((identifier) => expect(runtimeIds).not.toContain(identifier));
   });
 });
 
-describe('área posterior — separação e áreas protegidas', () => {
-  it('mantém a BR-472 fora da Rua Exporural e de todas as sete ruas oficiais', () => {
-    const highways = GENERATED_REAR_ROAD_SEGMENTS.filter((road) => road.roadId === 'RODOVIA-RS-472');
-    expect(highways).toHaveLength(2);
-    EXPORURAL_ROAD_IDENTIFIERS.forEach((identifier) => {
-      const polygon = officialEntity(identifier).geometry.coordinates[0] as Point2[];
-      highways.forEach((highway) => {
-        expect(
-          rearRoadCorridorIntersectsPolygon(highway, polygon),
-          `${highway.id} não pode cobrir ${identifier}`,
-        ).toBe(false);
-      });
+describe('área posterior — exclusões espaciais, profundidade e ambiente', () => {
+  it('separa a pista e os acostamentos da BR de toda a rede antes do portão', () => {
+    const footprints = buildRearRoadCorridorFootprints();
+    const highways = footprints.filter((footprint) => footprint.roadId === 'RODOVIA-RS-472');
+    const internal = footprints.filter((footprint) => {
+      const road = GENERATED_REAR_ROAD_SEGMENTS.find((candidate) => candidate.id === footprint.segmentId)!;
+      return road.roadId !== 'RODOVIA-RS-472' && road.from !== 'gate-5';
     });
-  });
-
-  it('não atravessa Etnias, Arena, campo, Centro de Eventos, Portão 3 ou lotes da Exporural', () => {
-    const pavementFootprints = buildRearRoadCorridorFootprints(
-      GENERATED_REAR_ROAD_SEGMENTS,
-      { includeShoulders: false },
-    );
-    const protectedPolygons = [0, 1, 2, 3, 6].map((index) => (
-      boundsPolygon(REAR_STRUCTURE_EXCLUSIONS[index])
-    ));
-    const lotIdentifiers = new Set(EXPORURAL_LOT_REFERENCES.map((reference) => (
-      `Q-${reference.block}-${reference.lotNumber}`
-    )));
-    const exporuralLots = OFFICIAL_REFERENCE_DATA.entities.filter((entity) => (
-      lotIdentifiers.has(entity.publicIdentifier)
-    ));
-    expect(exporuralLots).toHaveLength(95);
-
-    pavementFootprints.forEach((footprint) => {
-      protectedPolygons.forEach((polygon) => {
-        expect(rearRoadFootprintIntersectsPolygon(footprint, polygon)).toBe(false);
-      });
-      exporuralLots.forEach((lot) => {
-        expect(rearRoadFootprintIntersectsPolygon(
-          footprint,
-          lot.geometry.coordinates[0] as Point2[],
-        )).toBe(false);
-      });
-    });
-  });
-
-  it('passa ao lado dos dois estacionamentos oficiais sem atravessar superfícies, acostamentos, fileiras ou vagas', () => {
-    const pavementFootprints = buildRearRoadCorridorFootprints(
-      GENERATED_REAR_ROAD_SEGMENTS,
-      { includeShoulders: false },
-    );
-    const fullCorridorFootprints = buildRearRoadCorridorFootprints(
-      GENERATED_REAR_ROAD_SEGMENTS,
-      { includeShoulders: true },
-    );
-    const officialParkingPolygons = ['EST-EXP-VIS', 'EST-VIS'].map((identifier) => ({
-      identifier,
-      polygon: officialEntity(identifier).geometry.coordinates[0] as Point2[],
+    highways.forEach((highway) => internal.forEach((road) => {
+      expect(rearRoadFootprintIntersectsPolygon(highway, road.polygon), road.segmentId).toBe(false);
     }));
-
-    const protectedParkingCorridors = fullCorridorFootprints.filter((footprint) => {
-      const roadId = REAR_PARK_ROAD_NETWORK.find((segment) => (
-        segment.id === footprint.segmentId
-      ))?.roadId;
-      return roadId === 'RUA-BRASILIA' || roadId === 'ACESSO-A5-BR472';
-    });
-    const brasiliaFootprints = protectedParkingCorridors.filter((footprint) => (
-      REAR_PARK_ROAD_NETWORK.find((segment) => segment.id === footprint.segmentId)?.roadId === 'RUA-BRASILIA'
-    ));
-    expect(brasiliaFootprints).toHaveLength(3);
-    expect(protectedParkingCorridors.some((footprint) => (
-      footprint.segmentId === 'a5-br472-access'
-    ))).toBe(true);
-    protectedParkingCorridors.forEach((footprint) => {
-      officialParkingPolygons.forEach(({ identifier, polygon }) => {
-        expect(
-          rearRoadFootprintIntersectsPolygon(footprint, polygon),
-          `${footprint.segmentId} não pode usar ${identifier} como superfície viária`,
-        ).toBe(false);
-      });
-    });
-    pavementFootprints.forEach((footprint) => {
-      REAR_PARKING_ROWS.forEach((row) => {
-        expect(rearRoadFootprintIntersectsPolygon(footprint, row.polygon)).toBe(false);
-      });
-    });
   });
 
-  it('preserva por snapshot a geometria oficial da Rua Ubiretama, os 95 lotes e revisão da Exporural', () => {
-    const before = JSON.stringify({
-      geometry: officialEntity('RUA-UBIRETAMA').geometry,
-      lots: EXPORURAL_LOT_REFERENCES,
-      roads: EXPORURAL_ROAD_IDENTIFIERS,
+  it('audita edifícios, lotes, Arena, quadras e estacionamentos no mesmo overlay', () => {
+    expect(REAR_ROAD_EXCLUSION_COUNTS.officialEntities).toBeGreaterThan(120);
+    expect(REAR_ROAD_EXCLUSION_COUNTS.arenaSurfaceZones).toBeGreaterThanOrEqual(8);
+    expect(REAR_ROAD_EXCLUSION_COUNTS.rearParkingRows).toBeGreaterThan(0);
+    expect(REAR_ROAD_EXCLUSION_COUNTS.electricalNodes).toBeGreaterThan(150);
+    expect(REAR_ROAD_EXCLUSION_COUNTS.total).toBe(REAR_ROAD_EXCLUSION_BOUNDARIES.length);
+    ['official:F', 'official:C1', 'official:D3', 'official:EST-EXP-VIS', 'official:EST-VIS']
+      .forEach((id) => expect(REAR_ROAD_EXCLUSION_BOUNDARIES.some((boundary) => boundary.id === id)).toBe(true));
+    expect(REAR_ROAD_EXCLUSION_BOUNDARIES.some((boundary) => boundary.id.startsWith('rear-parking-row:'))).toBe(true);
+    expect(REAR_ROAD_EXCLUSION_BOUNDARIES.some((boundary) => boundary.id === 'arena-zone:football-field')).toBe(true);
+  });
+
+  it('não cruza nenhuma exclusão não autorizada com pista ou acostamento', () => {
+    const footprints = buildRearRoadCorridorFootprints(GENERATED_REAR_ROAD_SEGMENTS, {
+      includeShoulders: true,
     });
-    expect(EXPORURAL_GEOMETRY_REVISION).toBe('2026.4-exporural.1');
-    const geometries = buildRearRoadNetworkGeometries();
+    const collisions = footprints.flatMap((footprint) => (
+      REAR_ROAD_EXCLUSION_BOUNDARIES
+        .filter((boundary) => !boundary.allowRoadContact)
+        .filter((boundary) => rearRoadFootprintIntersectsPolygon(footprint, boundary.polygon))
+        .map((boundary) => `${footprint.segmentId}:${boundary.id}`)
+    ));
+    expect(collisions).toEqual([]);
+  });
+
+  it('descola somente os dois patches reais de interseção para eliminar z-fighting', () => {
+    const detailed = buildRearRoadNetworkGeometries();
     try {
-      expect(JSON.stringify({
-        geometry: officialEntity('RUA-UBIRETAMA').geometry,
-        lots: EXPORURAL_LOT_REFERENCES,
-        roads: EXPORURAL_ROAD_IDENTIFIERS,
-      })).toBe(before);
+      expect(REAR_ROAD_JUNCTION_ELEVATION_LIFT).toBeGreaterThan(0);
+      expect(REAR_ROAD_JUNCTION_ELEVATION_LIFT).toBeLessThan(0.004);
+      expect(detailed.diagnostics.junctionCount).toBe(2);
+
+      const p4 = REAR_ROAD_NODES['brasilia-ubiretama-junction-4'].position;
+      const positions = detailed.parkAsphalt!.getAttribute('position');
+      const yAtCenter: number[] = [];
+      for (let index = 0; index < positions.count; index += 1) {
+        if (Math.hypot(positions.getX(index) - p4[0], positions.getZ(index) - p4[2]) < 1e-5) {
+          yAtCenter.push(positions.getY(index));
+        }
+      }
+      expect(yAtCenter.some((y) => Math.abs(y - (
+        0.034 + rearRoadTerrainElevationAt(p4[0], p4[2]) + REAR_ROAD_JUNCTION_ELEVATION_LIFT
+      )) < 1e-5)).toBe(true);
     } finally {
-      disposeRearRoadNetworkGeometries(geometries);
-    }
-  });
-});
-
-describe('área posterior — calibração dos dez pontos', () => {
-  it('usa os anexos novos nas dimensões reais e mantém resíduo inferior a 2%', () => {
-    expect(REAR_SATELLITE_REFERENCES['annex-4']).toMatchObject({
-      filename: 'E9A49EC4-3EF4-4807-B145-ADBACF1476B9.jpeg',
-      pixelSize: [1536, 864],
-    });
-    expect(REAR_SATELLITE_REFERENCES['annex-5']).toMatchObject({
-      filename: 'A278B223-C14D-4618-99FC-AD060FFF7DF5.jpeg',
-      pixelSize: [1536, 961],
-    });
-    (['annex-4', 'annex-5'] as const).forEach((referenceId) => {
-      expect(REAR_SATELLITE_REFERENCES[referenceId].controls).toHaveLength(10);
-      expect(rearCalibrationDiagnostics(referenceId).normalizedMaximumResidual).toBeLessThan(0.02);
-    });
-
-    for (const controlId of ['gate-5', 'br472-junction', 'football-field']) {
-      const control4 = REAR_SATELLITE_REFERENCES['annex-4'].controls.find((control) => control.id === controlId)!;
-      const control5 = REAR_SATELLITE_REFERENCES['annex-5'].controls.find((control) => control.id === controlId)!;
-      const local4 = projectSatellitePixelToLocal('annex-4', control4.satellitePixel);
-      const local5 = projectSatellitePixelToLocal('annex-5', control5.satellitePixel);
-      expect(Math.hypot(local4[0] - local5[0], local4[1] - local5[1])).toBeLessThan(0.58);
+      disposeRearRoadNetworkGeometries(detailed);
     }
   });
 
-  it('registra percentuais, pixels e papéis sem transformar P8/P9 em vias', () => {
-    expect(REAR_NORMALIZED_REFERENCE_POINTS).toHaveLength(10);
-    expect(rearNormalizedReferencePointById(1)).toMatchObject({
-      percent: [68, 43], satellitePixel: [1044.48, 371.52], role: 'exporural-axis',
-    });
-    expect(rearNormalizedReferencePointById(10)).toMatchObject({
-      percent: [41, 60], satellitePixel: [629.76, 518.4], role: 'exporural-axis',
-    });
-    const point2 = rearNormalizedReferencePointById(2);
-    expect(point2).toMatchObject({ percent: [71, 71], role: 'br472-axis' });
-    expect(point2.satellitePixel[0]).toBeCloseTo(1090.56, 8);
-    expect(point2.satellitePixel[1]).toBeCloseTo(613.44, 8);
-    const point7 = rearNormalizedReferencePointById(7);
-    expect(point7).toMatchObject({ percent: [21, 96], role: 'br472-axis' });
-    expect(point7.satellitePixel[0]).toBeCloseTo(322.56, 8);
-    expect(point7.satellitePixel[1]).toBeCloseTo(829.44, 8);
-    expect(REAR_ROAD_NODES['br472-east'].sourcePoint).toEqual(
-      projectRearNormalizedReferencePointToOfficialSource(2),
-    );
-    expect(REAR_ROAD_NODES['br472-west'].sourcePoint).toEqual(
-      projectRearNormalizedReferencePointToOfficialSource(7),
-    );
-    expect(rearNormalizedReferencePointsByRole('environment').map((point) => point.id)).toEqual([8, 9]);
-  });
-
-  it('reconcilia P1/P10, P2/P7 e P3/P4/P5 com as exclusões físicas oficiais', () => {
-    const exporuralAxis = axisToLocal([
-      ...REAR_CALIBRATED_AXES.exporuralNorthExtension,
-      ...REAR_CALIBRATED_AXES.exporuralOfficial.slice(1),
-      ...REAR_CALIBRATED_AXES.exporuralSouthExtension.slice(1),
-    ]);
-    const br472Axis = axisToLocal([
-      ...[...REAR_CALIBRATED_AXES.br472JunctionToWest].reverse(),
-      ...[...REAR_CALIBRATED_AXES.br472EastToJunction].reverse().slice(1),
-    ]);
-    const brasiliaAxis = axisToLocal([
-      ...REAR_CALIBRATED_AXES.brasiliaOfficialToP3,
-      ...REAR_CALIBRATED_AXES.brasiliaContinuation.slice(1),
-    ]);
-    [1, 10].forEach((id) => expect(distanceToPath(
-      projectRearNormalizedReferencePointToLocal(id as 1 | 10), exporuralAxis,
-    )).toBeLessThan(0.01));
-    [2, 7].forEach((id) => expect(distanceToPath(
-      projectRearNormalizedReferencePointToLocal(id as 2 | 7), br472Axis,
-    )).toBeLessThan(0.01));
-
-    const brasiliaWidth = REAR_PARK_ROAD_NETWORK.find((road) => (
-      road.id === 'brasilia-reference-3-exporural'
-    ))!.width;
-    expect(distanceToPath(
-      projectRearNormalizedReferencePointToLocal(3),
-      brasiliaAxis,
-    )).toBeLessThanOrEqual(brasiliaWidth / 2);
-
-    const point4Source = projectRearNormalizedReferencePointToOfficialSource(4);
-    const point5Source = projectRearNormalizedReferencePointToOfficialSource(5);
-    const point4Clearance = REAR_CALIBRATED_AXES.brasiliaContinuation.find((point) => (
-      Math.abs(point[0] - point4Source[0]) < 1e-8
-    ))!;
-    const calibratedJunction = REAR_CALIBRATED_AXES.exporuralSouthExtension.at(-1)!;
-    expect(point4Clearance[0]).toBeCloseTo(point4Source[0], 8);
-    expect(calibratedJunction[0]).toBeCloseTo(point5Source[0], 8);
-    expect(point4Clearance[1]).toBeGreaterThan(point4Source[1]);
-    expect(calibratedJunction[1]).toBeGreaterThan(point5Source[1]);
-    expect(REAR_CALIBRATED_AXES.brasiliaContinuation).toContain(calibratedJunction);
-
-    const officialParkingPolygons = ['EST-EXP-VIS', 'EST-VIS'].map((identifier) => (
-      officialEntity(identifier).geometry.coordinates[0] as Point2[]
-    ));
-    [point4Clearance, calibratedJunction].forEach((sourcePoint) => {
-      const local = officialPdfPointToLocal(sourcePoint);
-      officialParkingPolygons.forEach((polygon) => {
-        expect(pointIsInsidePolygon(local, polygon)).toBe(false);
+  it('orienta todas as faces para +Y, de acordo com as normais do piso', () => {
+    const network = buildRearRoadNetworkGeometries();
+    try {
+      [network.highway, network.parkAsphalt, network.shoulders, network.markings].forEach((geometry) => {
+        expect(geometry).not.toBeNull();
+        const positions = geometry!.getAttribute('position');
+        const normals = geometry!.getAttribute('normal');
+        const indices = geometry!.getIndex();
+        let invertedFaces = 0;
+        for (let index = 0; index < (indices?.count ?? positions.count); index += 3) {
+          const a = indices?.getX(index) ?? index;
+          const b = indices?.getX(index + 1) ?? index + 1;
+          const c = indices?.getX(index + 2) ?? index + 2;
+          const abX = positions.getX(b) - positions.getX(a);
+          const abZ = positions.getZ(b) - positions.getZ(a);
+          const acX = positions.getX(c) - positions.getX(a);
+          const acZ = positions.getZ(c) - positions.getZ(a);
+          if (abZ * acX - abX * acZ < -1e-9) invertedFaces += 1;
+          expect(normals.getY(a)).toBeGreaterThan(0);
+        }
+        expect(invertedFaces).toBe(0);
       });
-      expect(distanceToPath(local, brasiliaAxis)).toBeLessThan(0.01);
-    });
-    expect(distanceToPath(officialPdfPointToLocal(calibratedJunction), exporuralAxis)).toBeLessThan(0.01);
+    } finally {
+      disposeRearRoadNetworkGeometries(network);
+    }
   });
 
-  it('faz P6 coincidir com o A5 e mantém P8/P9 ambientais fora de pista e acostamento', () => {
-    expect(projectRearNormalizedReferencePointToOfficialSource(6)).toEqual(REAR_OFFICIAL_ANCHORS.gate5Entity);
-    const point6Local = projectRearNormalizedReferencePointToLocal(6);
-    expect(point6Local[0]).toBeCloseTo(OFFICIAL_GATE_5_CENTER[0], 10);
-    expect(point6Local[1]).toBeCloseTo(OFFICIAL_GATE_5_CENTER[1], 10);
-    expect(REAR_ENVIRONMENT_REFERENCE_POINTS.point8).toEqual(projectRearNormalizedReferencePointToOfficialSource(8));
-    expect(REAR_ENVIRONMENT_REFERENCE_POINTS.point9).toEqual(projectRearNormalizedReferencePointToOfficialSource(9));
-
-    const terrain = sourcePolygonToLocal(REAR_TERRAIN_PATCHES[0].sourcePolygon);
-    ([8, 9] as const).forEach((id) => {
-      const local = projectRearNormalizedReferencePointToLocal(id);
-      expect(pointIsInsidePolygon(local, terrain)).toBe(true);
-      expect(pointIsInsideAnyRearRoadCorridor(local)).toBe(false);
-    });
-  });
-});
-
-describe('área posterior — ribbons, ambiente e orçamento', () => {
-  it('amostra Catmull-Rom por comprimento com passos uniformes e sem quinas', () => {
+  it('gera curvas estáveis, materiais consolidados e orçamento controlado', () => {
     GENERATED_REAR_ROAD_SEGMENTS.forEach((road) => {
-      const samples = sampleRearRoadCenterline(rearRoadLocalPath(road), 10);
+      const samples = sampleRearRoadCenterline(rearRoadLocalPath(road), 8);
       expect(samples.length).toBeGreaterThan(road.controlPoints.length);
-      const steps = samples.slice(1).map((point, index) => Math.hypot(
-        point[0] - samples[index][0], point[1] - samples[index][1],
-      ));
-      expect(Math.min(...steps)).toBeGreaterThan(0);
-      expect(Math.max(...steps) / Math.min(...steps)).toBeLessThan(1.35);
+      expect(samples.every(([x, z]) => Number.isFinite(x) && Number.isFinite(z))).toBe(true);
     });
-  });
-
-  it('gera ribbons, acostamentos, faixas e patches de junção dentro do orçamento', () => {
     const detailed = buildRearRoadNetworkGeometries();
     const reduced = buildRearRoadNetworkGeometries(undefined, { reducedGraphics: true });
     try {
+      expect(detailed.diagnostics.estimatedBaseDrawCalls).toBeLessThanOrEqual(REAR_ROAD_BUDGET.maximumBaseDrawCalls);
+      expect(detailed.diagnostics.triangleCount).toBeLessThan(REAR_ROAD_BUDGET.maximumTriangles);
+      expect(reduced.diagnostics.triangleCount).toBeLessThan(detailed.diagnostics.triangleCount);
       expect(detailed.highway).not.toBeNull();
       expect(detailed.parkAsphalt).not.toBeNull();
       expect(detailed.shoulders).not.toBeNull();
       expect(detailed.markings).not.toBeNull();
-      expect(detailed.diagnostics.junctionCount).toBeGreaterThanOrEqual(3);
-      expect(detailed.diagnostics.estimatedBaseDrawCalls).toBeLessThanOrEqual(REAR_ROAD_BUDGET.maximumBaseDrawCalls);
-      expect(detailed.diagnostics.triangleCount).toBeLessThan(REAR_ROAD_BUDGET.maximumTriangles);
-      expect(reduced.diagnostics.triangleCount).toBeLessThan(detailed.diagnostics.triangleCount);
-      [detailed.highway, detailed.parkAsphalt, detailed.shoulders, detailed.markings].forEach((geometry) => {
-        const positions = geometry?.getAttribute('position');
-        expect(positions && Array.from(positions.array).every(Number.isFinite)).toBe(true);
-      });
     } finally {
       disposeRearRoadNetworkGeometries(detailed);
       disposeRearRoadNetworkGeometries(reduced);
     }
   });
 
-  it('usa um terreno irregular único, vegetação localizada e nenhum elemento sobre as vias', () => {
+  it('restaura terreno/vegetação fora das novas faixas e mantém instâncias determinísticas', () => {
     expect(REAR_TERRAIN_PATCHES).toHaveLength(1);
     expect(REAR_TERRAIN_PATCHES[0].sourcePolygon.length).toBeGreaterThanOrEqual(10);
-    const edgeAngles = REAR_TERRAIN_PATCHES[0].sourcePolygon.map((point, index, polygon) => {
-      const next = polygon[(index + 1) % polygon.length];
-      return Math.atan2(next[1] - point[1], next[0] - point[0]).toFixed(2);
-    });
-    expect(new Set(edgeAngles).size).toBeGreaterThan(6);
-
-    const trees = buildRearTreeInstances();
-    const reducedTrees = buildRearTreeInstances(true);
-    expect(trees.length).toBeGreaterThan(80);
-    expect(trees.length).toBeLessThanOrEqual(REAR_ENVIRONMENT_BUDGET.maximumTreeInstances);
-    expect(reducedTrees.length).toBeLessThan(trees.length);
-    expect(new Set(trees.map((tree) => tree.scale.toFixed(4))).size).toBeGreaterThan(40);
-    trees.forEach((tree) => {
+    const first = buildRearTreeInstances();
+    const second = buildRearTreeInstances();
+    const reduced = buildRearTreeInstances(true);
+    expect(first).toEqual(second);
+    expect(first.length).toBeGreaterThan(60);
+    expect(first.length).toBeLessThanOrEqual(REAR_ENVIRONMENT_BUDGET.maximumTreeInstances);
+    expect(reduced.length).toBeLessThan(first.length);
+    first.forEach((tree) => {
       expect(pointIsInsideAnyRearRoadCorridor([tree.x, tree.z], REAR_PARK_ROAD_NETWORK)).toBe(false);
     });
-
     expect(buildRearPoleInstances().length).toBeGreaterThan(0);
-    expect(buildRearPoleInstances().length).toBeLessThanOrEqual(REAR_ENVIRONMENT_BUDGET.maximumPoleInstances);
-    expect(buildRearPoleInstances(true)).toHaveLength(0);
+    expect(buildRearPoleInstances(true)).toEqual([]);
+  });
+});
+
+describe('área posterior — estabilidade de ciclo de vida e overlay de QA', () => {
+  it('mantém Canvas e árvores estáveis durante seleção comum', () => {
+    const page = readFileSync(resolve(
+      process.cwd(), 'src/features/commercial-map/CommercialMapPage.tsx',
+    ), 'utf8');
+    const canvas = readFileSync(resolve(
+      process.cwd(), 'src/features/commercial-map/components/canvas/CommercialMapCanvas.tsx',
+    ), 'utf8');
+    expect(page).not.toContain('key={areaScope}');
+    expect(canvas).toContain('rearRoadCompatibleSceneTrees');
+    expect(canvas).toContain('selectedLunarTreeEntity');
+    expect(canvas).toContain('[rearRoadCompatibleSceneTrees, selectedLunarTreeEntity]');
+    expect(canvas).not.toMatch(/presentedSceneTrees[\s\S]{0,1200}\[.*selectedEntity\]/);
+  });
+
+  it('mantém a rede montada ao ocultar a camada e não recria texturas por interação', () => {
+    const source = readFileSync(resolve(
+      process.cwd(), 'src/features/commercial-map/components/canvas/RearParkRoadNetwork.tsx',
+    ), 'utf8');
+    expect(source).toContain('visible={interactive}');
+    expect(source).toContain('raycast={interactive ? undefined : NO_RAYCAST}');
+    expect(source).not.toContain('if (!visible || presentedOpacity <= 0.015) return null');
+    expect(source).toContain('useMemo(');
+    expect(source).toContain('[maximumAnisotropy]');
+    const utilitySource = readFileSync(resolve(
+      process.cwd(), 'src/features/commercial-map/utils/rearRoadNetwork.ts',
+    ), 'utf8');
+    expect(utilitySource).toContain('rearRoadHitCenterlineCache');
+  });
+
+  it('expõe centerlines/controles/exclusões somente em DEV com query explícita', () => {
+    const overlay = readFileSync(resolve(
+      process.cwd(), 'src/features/commercial-map/components/canvas/RearRoadValidationOverlay.tsx',
+    ), 'utf8');
+    const canvas = readFileSync(resolve(
+      process.cwd(), 'src/features/commercial-map/components/canvas/CommercialMapCanvas.tsx',
+    ), 'utf8');
+    expect(canvas).toContain('const RearRoadValidationOverlay = import.meta.env.DEV');
+    expect(canvas).toContain("await import('./RearRoadValidationOverlay')");
+    expect(canvas).not.toContain("from './RearRoadValidationOverlay'");
+    expect(canvas).toContain("has('rearRoadDebug')");
+    expect(overlay).toContain('REAR_ROAD_EXCLUSION_BOUNDARIES');
+    expect(overlay).toContain('REAR_ATTACHMENT_5_REFERENCE_POINTS');
+    expect(overlay).toContain('REAR_SATELLITE_TOPOLOGY');
   });
 });

@@ -100,12 +100,14 @@ function CommercialElectricalInfrastructureInstances({
   surfaceEntities,
   visible,
   reducedGraphics,
+  rearRoadsActive = false,
 }: {
   nodes: readonly CommercialElectricalNode[];
   connections: readonly CommercialElectricalConnection[];
   surfaceEntities: readonly MapEntity[];
   visible: boolean;
   reducedGraphics: boolean;
+  rearRoadsActive?: boolean;
 }) {
   const groupRef = useRef<THREE.Group>(null);
   const poleRef = useRef<THREE.InstancedMesh>(null);
@@ -122,8 +124,8 @@ function CommercialElectricalInfrastructureInstances({
   const poles = useMemo(() => nodes.filter((node) => node.type === 'POLE'), [nodes]);
   const transformers = useMemo(() => nodes.filter((node) => node.type === 'TRANSFORMER'), [nodes]);
   const resolvedPlacements = useMemo(
-    () => resolveElectricalNodePlacements(nodes, surfaceEntities),
-    [nodes, surfaceEntities],
+    () => resolveElectricalNodePlacements(nodes, surfaceEntities, rearRoadsActive),
+    [nodes, rearRoadsActive, surfaceEntities],
   );
   const placementByNodeId = useMemo(() => new Map(
     resolvedPlacements.map((placement) => [placement.node.id, placement]),
@@ -448,6 +450,7 @@ export const CommercialElectricalInfrastructureLayer = memo(function CommercialE
   surfaceEntities: readonly MapEntity[];
   visible: boolean;
   reducedGraphics: boolean;
+  rearRoadsActive?: boolean;
 }) {
   if (props.nodes.length === 0) return null;
   return (
