@@ -425,16 +425,23 @@ const roadInputs: Array<[string, string, PdfPolygon, MapClassification?]> = [
   ['RUA-INTERNA-OESTE', 'Rua Interna Oeste', rectPdf([2222, 2450, 2241, 3125])],
   // Conexões cartográficas 2026.4: faixas livres entre quadras que permaneciam
   // sem pavimento, todas ancoradas nas vias existentes para gerar interseções.
-  ['PRACA-ACESSO-EXPORURAL', 'Praça de Acesso à Exporural', rectPdf([3760, 2444, 3988, 2624])],
+  // A antiga "Praça de Acesso à Exporural" foi retirada: o acesso ao lado do
+  // Espaço Mirante é feito pela própria Rua Brasília, que já desce da lateral
+  // do Q-E-13 até a Rua Pastor Albert Lehenbauer, ao lado do Q-R-02.
   ['RUA-INTERNA-QUADRA-G', 'Rua Interna da Quadra G', rectPdf([3552, 2624, 3622, 2836])],
   ['RUA-INTERNA-QUADRA-T', 'Rua Interna das Quadras V, U e T', rectPdf([1749, 2444, 1811, 3108])],
   ['RUA-LESTE-EXPORURAL', 'Rua Leste da Exporural', rectPdf([5942, 1265, 5966, 1762])],
+  // Faixa da Rua Ubiretama que passa rente ao lado leste do Q-R-55 e encontra
+  // a Rua Gustavo Bessel, à frente da quadra.
+  ['RUA-UBIRETAMA-LATERAL-R55', 'Rua Ubiretama (lateral do Q-R-55)', rectPdf([5965, 1755, 6008, 2085])],
   ['ALAMEDA-MERCOSUL', 'Alameda Mercosul', rectPdf([2786, 2410, 2828, 3780])],
   ['CALCADA-ARVOREDO', 'Calçada do Arvoredo', rectPdf([2630, 3110, 2782, 3565]), 'PEDESTRIAN_PATH'],
   ['AV-BENVENUTO-CONTI', 'Avenida Benvenuto de Conti', rectPdf([1050, 4165, 3940, 4235])],
   ['AV-IMIGRANTES', 'Avenida dos Imigrantes', rectPdf([3940, 4165, 5510, 4235])],
   ['AV-TUPARENDI', 'Avenida Tuparendi', [[600, 3850], [1300, 4190], [1268, 4260], [600, 3930]]],
-  ['RODOVIA-RS-472', 'Rodovia RS 472', [[5935, 1280], [5995, 1290], [6100, 4300], [6035, 4300]]],
+  // A rodovia foi recuada para leste da faixa da Ubiretama: antes o plano da
+  // RS 472 cobria a via urbana ao lado do Q-R-55, que ficava invisível.
+  ['RODOVIA-RS-472', 'Rodovia RS 472', [[6012, 1280], [6072, 1290], [6172, 4300], [6107, 4300]]],
 ];
 
 const exporuralRoadIdentifiers = new Set<string>(EXPORURAL_ROAD_IDENTIFIERS);
