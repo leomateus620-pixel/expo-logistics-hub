@@ -1,17 +1,30 @@
 import { describe, expect, it } from 'vitest';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import {
   COMMERCIAL_MAP_HYDROLOGICAL_PORTRAIT_DIRECTION,
   COMMERCIAL_MAP_HYDROLOGICAL_PORTRAIT_TARGET_SHIFT_RATIO,
   COMMERCIAL_MAP_MANUAL_NAVIGATION_REFIT_SUPPRESSION_MS,
+  COMMERCIAL_MAP_MAX_DISTANCE_FRAMING_MARGIN,
   COMMERCIAL_MAP_MIN_POLAR_ANGLE,
   COMMERCIAL_MAP_TOP_DIRECTION,
+  clampCommercialMapCameraPosition,
   isCommercialMapHydrologicalPortraitViewport,
+  resolveCommercialMapBoundingSphereRadius,
+  resolveCommercialMapCameraDistanceBounds,
+  resolveCommercialMapCameraFarPlane,
   resolveCommercialMapHydrologicalPortraitTargetShift,
   resolveCommercialMapPixelRatio,
   resolveCommercialMapCameraNearPlane,
   resolveCommercialMapSheetSnap,
   shouldSuppressCommercialMapResizeRefit,
 } from '@/features/commercial-map/utils/viewport';
+
+const FULL_MAP_BOUNDS = {
+  width: 120,
+  depth: 90.545455,
+  maxHeight: 24,
+} as const;
 
 describe('viewport mobile do Mapa Comercial', () => {
   it('recupera precisão de profundidade ao afastar de um close, sem cortar vistas baixas', () => {
@@ -53,6 +66,129 @@ describe('viewport mobile do Mapa Comercial', () => {
     expect(polarAngle).toBeCloseTo(COMMERCIAL_MAP_MIN_POLAR_ANGLE, 12);
     expect(orbitClampedAngle).toBeCloseTo(polarAngle, 12);
     expect(legacyDirectionPolarAngle).toBeLessThan(COMMERCIAL_MAP_MIN_POLAR_ANGLE);
+  });
+
+  it.each([
+    ['mobile portrait', 393, 852],
+    ['mobile landscape', 852, 393],
+    ['tablet portrait', 768, 1024],
+    ['desktop', 1440, 900],
+    ['ultrawide', 2560, 1080],
+  ])('calcula o enquadramento responsivo do mapa completo em %s', (_label, width, height) => {
+    const aspect = width / height;
+    const result = resolveCommercialMapCameraDistanceBounds({
+      bounds: FULL_MAP_BOUNDS,
+      verticalFovDegrees: 38,
+      aspect,
+    });
+    const expectedRadius = Math.hypot(
+      FULL_MAP_BOUNDS.width / 2,
+      FULL_MAP_BOUNDS.depth / 2,
+      FULL_MAP_BOUNDS.maxHeight / 2,
+    );
+    const verticalHalfFov = 38 * Math.PI / 360;
+    const horizontalHalfFov = Math.atan(Math.tan(verticalHalfFov) * aspect);
+    const limitingHalfFov = Math.min(verticalHalfFov, horizontalHalfFov);
+    const expectedFittedDistance = expectedRadius / Math.sin(limitingHalfFov);
+
+    expect(result.boundingSphereRadius).toBeCloseTo(expectedRadius, 12);
+    expect(result.limitingHalfFovRadians).toBeCloseTo(limitingHalfFov, 12);
+    expect(result.fittedDistance).toBeCloseTo(expectedFittedDistance, 12);
+    expect(result.maxDistance).toBeCloseTo(
+      expectedFittedDistance * COMMERCIAL_MAP_MAX_DISTANCE_FRAMING_MARGIN,
+      12,
+    );
+    expect(result.minDistance).toBeGreaterThanOrEqual(8);
+    expect(result.minDistance).toBeLessThan(result.maxDistance);
+    expect(resolveCommercialMapCameraFarPlane(FULL_MAP_BOUNDS, result.maxDistance))
+      .toBe(Math.max(1_200, (result.maxDistance + expectedRadius) * 3));
+  });
+
+  it('aumenta o limite em portrait pela abertura horizontal sem usar valor fixo de tela', () => {
+    const portrait = resolveCommercialMapCameraDistanceBounds({
+      bounds: FULL_MAP_BOUNDS,
+      verticalFovDegrees: 38,
+      aspect: 393 / 852,
+    });
+    const landscape = resolveCommercialMapCameraDistanceBounds({
+      bounds: FULL_MAP_BOUNDS,
+      verticalFovDegrees: 38,
+      aspect: 852 / 393,
+    });
+    const ultrawide = resolveCommercialMapCameraDistanceBounds({
+      bounds: FULL_MAP_BOUNDS,
+      verticalFovDegrees: 38,
+      aspect: 2560 / 1080,
+    });
+
+    expect(portrait.maxDistance).toBeGreaterThan(landscape.maxDistance);
+    expect(landscape.maxDistance).toBeCloseTo(ultrawide.maxDistance, 12);
+    expect(resolveCommercialMapBoundingSphereRadius(FULL_MAP_BOUNDS)).toBe(
+      portrait.boundingSphereRadius,
+    );
+  });
+
+  it('clampa poses programáticas antes da animação e preserva direção e target', () => {
+    const maximum = clampCommercialMapCameraPosition({
+      position: [30, 40, 500],
+      target: [10, 20, 0],
+      minDistance: 20,
+      maxDistance: 100,
+    });
+    const originalDirection = [20, 20, 500];
+    const originalLength = Math.hypot(...originalDirection);
+
+    expect(maximum.distance).toBe(100);
+    expect(maximum.wasClamped).toBe(true);
+    maximum.position.forEach((coordinate, index) => {
+      const target = [10, 20, 0][index];
+      expect((coordinate - target) / 100).toBeCloseTo(
+        originalDirection[index] / originalLength,
+        12,
+      );
+    });
+
+    const minimum = clampCommercialMapCameraPosition({
+      position: [0, 0, 1],
+      target: [0, 0, 0],
+      minDistance: 12,
+      maxDistance: 100,
+    });
+    expect(minimum).toMatchObject({ position: [0, 0, 12], distance: 12, wasClamped: true });
+
+    const coincident = clampCommercialMapCameraPosition({
+      position: [4, 5, 6],
+      target: [4, 5, 6],
+      minDistance: 8,
+      maxDistance: 100,
+    });
+    expect(coincident).toMatchObject({ position: [4, 13, 6], distance: 8, wasClamped: true });
+
+    const sanitized = clampCommercialMapCameraPosition({
+      position: [Number.NaN, Number.POSITIVE_INFINITY, Number.NEGATIVE_INFINITY],
+      target: [1, 2, 3],
+      minDistance: 10,
+      maxDistance: 30,
+    });
+    expect(sanitized.position.every(Number.isFinite)).toBe(true);
+    expect(sanitized.distance).toBe(10);
+  });
+
+  it('integra o mesmo limite em OrbitControls e em todas as poses enfileiradas', () => {
+    const canvas = readFileSync(resolve(
+      'src/features/commercial-map/components/canvas/CommercialMapCanvas.tsx',
+    ), 'utf8');
+    const clampCalls = canvas.match(/clampCommercialMapCameraPosition\(\{/g) ?? [];
+
+    expect(canvas).toContain('const cameraDistanceBounds = useMemo(');
+    expect(canvas).toContain('const clampQueuedCameraPose = useCallback(');
+    expect(canvas).toContain('clampQueuedCameraPose(minDistance, maxDistance, clampTarget);');
+    expect(canvas).toContain('maxDistance={appliedControlLimits.maxDistance}');
+    expect(canvas).toContain('desiredMaxDistance');
+    expect(canvas).toContain('maxDistance: cameraDistanceBounds.maxDistance');
+    expect(canvas).toContain('calculatedMaxDistance');
+    expect(clampCalls.length).toBeGreaterThanOrEqual(4);
+    expect(canvas).not.toContain('Math.max(260, extent.diagonal * 4.5)');
   });
 
   it.each([

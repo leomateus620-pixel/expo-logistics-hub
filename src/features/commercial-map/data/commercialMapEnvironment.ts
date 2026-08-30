@@ -6,12 +6,7 @@ export interface CommercialMapEnvironmentExtent {
   width: number;
   depth: number;
   diagonal: number;
-}
-
-export interface CommercialMapCloudPlacement {
-  position: readonly [number, number, number];
-  rotationY: number;
-  scale: readonly [number, number, number];
+  maxHeight?: number;
 }
 
 export type CommercialMapSunriseQualityTier = 'full' | 'balanced' | 'reduced';
@@ -32,18 +27,9 @@ export interface CommercialMapSunriseFrame {
   shadowRadius: number;
 }
 
-interface CommercialMapCloudBlueprint {
-  angle: number;
-  distance: number;
-  height: number;
-  rotation: number;
-  width: number;
-  depth: number;
-}
-
 /** Presentation-only atmosphere for the shared Commercial Map canvas. */
 export const COMMERCIAL_MAP_ENVIRONMENT_CONFIG = {
-  revision: '2026.8-premium-sunrise.1',
+  revision: '2026.8-premium-sunrise.2-camera-safe',
   sunrise: {
     durationMs: 12_000,
     // Attachments 1-2 face the top/rear of the official plan. The plan is
@@ -83,21 +69,18 @@ export const COMMERCIAL_MAP_ENVIRONMENT_CONFIG = {
         shadowMapSize: 2048,
         shadowRefreshIntervalMs: 66,
         bloomLevels: 7,
-        cloudCount: 7,
         bloomEnabled: true,
       },
       balanced: {
         shadowMapSize: 1536,
         shadowRefreshIntervalMs: 92,
         bloomLevels: 5,
-        cloudCount: 5,
         bloomEnabled: true,
       },
       reduced: {
         shadowMapSize: 512,
         shadowRefreshIntervalMs: 140,
         bloomLevels: 0,
-        cloudCount: 4,
         bloomEnabled: false,
       },
     },
@@ -152,26 +135,19 @@ export const COMMERCIAL_MAP_ENVIRONMENT_CONFIG = {
     mieDirectionalG: 0.84,
   },
   clouds: {
-    fullCount: 7,
-    balancedCount: 5,
-    reducedCount: 4,
-    fullTextureSize: 384,
-    reducedTextureSize: 192,
-    opacity: 0.72,
-    hydrologicalOpacity: 0.5,
-    seed: 4317202,
+    opacity: 0.34,
+    hydrologicalOpacity: 0.22,
   },
   ground: {
-    minimumWorldSize: 300,
-    worldSizeRatio: 2,
-    fullTextureSize: 256,
-    reducedTextureSize: 128,
+    minimumWorldSize: 1_600,
+    worldSizeRatio: 12,
   },
   fog: {
-    nearRatio: 1.12,
-    farRatio: 3.8,
-    hydrologicalNearRatio: 1.45,
-    hydrologicalFarRatio: 4.2,
+    minimumNearRatio: 4.4,
+    depthRatio: 5.6,
+    hydrologicalMinimumNearRatio: 4.8,
+    hydrologicalDepthRatio: 6,
+    mapClearanceRatio: 1.15,
   },
   reflections: {
     fullTextureWidth: 128,
@@ -210,19 +186,6 @@ export const COMMERCIAL_MAP_ENVIRONMENT_CONFIG = {
   },
 } as const;
 
-const CLOUD_BLUEPRINTS: readonly CommercialMapCloudBlueprint[] = [
-  { angle: -2.72, distance: 0.74, height: 0.2, rotation: -0.22, width: 0.34, depth: 0.15 },
-  { angle: -1.98, distance: 0.94, height: 0.29, rotation: 0.18, width: 0.46, depth: 0.19 },
-  { angle: -1.12, distance: 0.72, height: 0.18, rotation: -0.1, width: 0.32, depth: 0.14 },
-  { angle: -0.24, distance: 0.98, height: 0.32, rotation: 0.28, width: 0.48, depth: 0.2 },
-  { angle: 0.74, distance: 0.76, height: 0.22, rotation: -0.16, width: 0.36, depth: 0.15 },
-  { angle: 1.68, distance: 0.92, height: 0.3, rotation: 0.12, width: 0.44, depth: 0.18 },
-  { angle: 2.56, distance: 0.73, height: 0.19, rotation: -0.3, width: 0.33, depth: 0.14 },
-];
-
-const BALANCED_CLOUD_INDICES = new Set([0, 1, 2, 4, 6]);
-const REDUCED_CLOUD_INDICES = new Set([0, 2, 4, 6]);
-
 function clampUnit(value: number) {
   if (!Number.isFinite(value)) return 0;
   return Math.min(1, Math.max(0, value));
@@ -239,8 +202,8 @@ function rangeProgress(value: number, start: number, end: number) {
 }
 
 export function commercialMapSunriseDirection(
-  elevationDegrees = COMMERCIAL_MAP_ENVIRONMENT_CONFIG.sunrise.endElevationDegrees,
-  azimuthMapDegrees = COMMERCIAL_MAP_ENVIRONMENT_CONFIG.sunrise.azimuthMapDegrees,
+  elevationDegrees: number = COMMERCIAL_MAP_ENVIRONMENT_CONFIG.sunrise.endElevationDegrees,
+  azimuthMapDegrees: number = COMMERCIAL_MAP_ENVIRONMENT_CONFIG.sunrise.azimuthMapDegrees,
 ) {
   const elevation = elevationDegrees * Math.PI / 180;
   const azimuth = azimuthMapDegrees * Math.PI / 180;
@@ -347,27 +310,45 @@ export function projectedCommercialMapShadowRotation() {
 export function resolveCommercialMapEnvironmentLayout(
   extent: CommercialMapEnvironmentExtent,
   mode: CommercialMapEnvironmentMode,
-  qualityTier: CommercialMapSunriseQualityTier,
+  _qualityTier: CommercialMapSunriseQualityTier,
+  safeCameraMaxDistance = Math.max(1, extent.diagonal),
 ) {
   const diagonal = Math.max(1, extent.diagonal);
-  const groundMargin = Math.max(8, diagonal * 0.08);
   const fog = COMMERCIAL_MAP_ENVIRONMENT_CONFIG.fog;
-  const fogNearRatio = mode === 'hydrological' ? fog.hydrologicalNearRatio : fog.nearRatio;
-  const fogFarRatio = mode === 'hydrological' ? fog.hydrologicalFarRatio : fog.farRatio;
+  const fogNearRatio = mode === 'hydrological'
+    ? fog.hydrologicalMinimumNearRatio
+    : fog.minimumNearRatio;
+  const fogDepthRatio = mode === 'hydrological'
+    ? fog.hydrologicalDepthRatio
+    : fog.depthRatio;
+  const boundingSphereRadius = Math.hypot(
+    Math.max(1, extent.width) / 2,
+    Math.max(1, extent.depth) / 2,
+    Math.max(0, extent.maxHeight ?? 0) / 2,
+  );
+  const safeMaximumDistance = Number.isFinite(safeCameraMaxDistance)
+    ? Math.max(1, safeCameraMaxDistance)
+    : diagonal;
+  const fogNear = Math.max(
+    diagonal * fogNearRatio,
+    safeMaximumDistance + boundingSphereRadius * fog.mapClearanceRatio,
+  );
 
   return {
-    activeGroundWidth: extent.width + groundMargin,
-    activeGroundDepth: extent.depth + groundMargin,
     outerGroundSize: Math.max(
       COMMERCIAL_MAP_ENVIRONMENT_CONFIG.ground.minimumWorldSize,
       diagonal * COMMERCIAL_MAP_ENVIRONMENT_CONFIG.ground.worldSizeRatio,
+      // Keep the single opaque ground boundary beyond the derived camera far
+      // plane at every supported aspect ratio. The fog remains atmospheric;
+      // it is not responsible for concealing a finite plane edge.
+      (safeMaximumDistance + boundingSphereRadius) * 12,
     ),
     skyScale: Math.max(
       COMMERCIAL_MAP_ENVIRONMENT_CONFIG.sky.minimumScale,
       diagonal * COMMERCIAL_MAP_ENVIRONMENT_CONFIG.sky.scaleRatio,
     ),
-    fogNear: diagonal * fogNearRatio,
-    fogFar: diagonal * fogFarRatio,
+    fogNear,
+    fogFar: fogNear + diagonal * fogDepthRatio,
     sunDistance: Math.max(
       COMMERCIAL_MAP_ENVIRONMENT_CONFIG.solar.minimumDistance,
       diagonal * COMMERCIAL_MAP_ENVIRONMENT_CONFIG.solar.distanceRatio,
@@ -377,34 +358,7 @@ export function resolveCommercialMapEnvironmentLayout(
       diagonal * COMMERCIAL_MAP_ENVIRONMENT_CONFIG.sunrise.celestialDistanceRatio,
     ),
     shadowSpan: Math.max(extent.width, extent.depth) * COMMERCIAL_MAP_ENVIRONMENT_CONFIG.solar.shadowCoverageRatio,
-    cloudCount: COMMERCIAL_MAP_ENVIRONMENT_CONFIG.sunrise.quality[qualityTier].cloudCount,
   };
-}
-
-export function resolveCommercialMapCloudPlacements(
-  extent: CommercialMapEnvironmentExtent,
-  qualityTier: CommercialMapSunriseQualityTier,
-): readonly CommercialMapCloudPlacement[] {
-  const diagonal = Math.max(1, extent.diagonal);
-  const blueprints = qualityTier === 'reduced'
-    ? CLOUD_BLUEPRINTS.filter((_cloud, index) => REDUCED_CLOUD_INDICES.has(index))
-    : qualityTier === 'balanced'
-      ? CLOUD_BLUEPRINTS.filter((_cloud, index) => BALANCED_CLOUD_INDICES.has(index))
-      : CLOUD_BLUEPRINTS;
-
-  return blueprints.map((cloud) => ({
-    position: [
-      extent.centerX + Math.cos(cloud.angle) * diagonal * cloud.distance,
-      Math.max(24, diagonal * cloud.height),
-      extent.centerZ + Math.sin(cloud.angle) * diagonal * cloud.distance,
-    ] as const,
-    rotationY: cloud.angle + cloud.rotation,
-    scale: [
-      diagonal * cloud.width,
-      diagonal * cloud.depth,
-      1,
-    ] as const,
-  }));
 }
 
 export function commercialMapEnvironmentBudget(
@@ -412,14 +366,15 @@ export function commercialMapEnvironmentBudget(
 ) {
   const quality = COMMERCIAL_MAP_ENVIRONMENT_CONFIG.sunrise.quality[qualityTier];
   return {
-    primaryDrawCalls: 5,
+    primaryDrawCalls: 3,
     skyDrawCalls: 1,
     sunDrawCalls: 1,
     sunIntegratedInSky: false,
-    groundDrawCalls: 2,
-    cloudDrawCalls: 1,
-    cloudInstances: quality.cloudCount,
-    animatedLayers: 5,
+    groundDrawCalls: 1,
+    cloudDrawCalls: 0,
+    cloudInstances: 0,
+    cloudsIntegratedInSky: true,
+    animatedLayers: 4,
     postProcessingPasses: quality.bloomEnabled ? 2 : 0,
     shadowMapSize: quality.shadowMapSize,
   } as const;

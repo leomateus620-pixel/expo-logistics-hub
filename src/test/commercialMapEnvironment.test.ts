@@ -9,7 +9,6 @@ import {
   normalizedCommercialMapSunDirection,
   projectedCommercialMapShadowDirection,
   projectedCommercialMapShadowRotation,
-  resolveCommercialMapCloudPlacements,
   resolveCommercialMapEnvironmentLayout,
   resolveCommercialMapSunriseFrame,
   resolveCommercialMapSunriseProgress,
@@ -17,6 +16,10 @@ import {
   type CommercialMapEnvironmentExtent,
   type CommercialMapSunriseQualityTier,
 } from '@/features/commercial-map/data/commercialMapEnvironment';
+import {
+  resolveCommercialMapBoundingSphereRadius,
+  resolveCommercialMapCameraDistanceBounds,
+} from '@/features/commercial-map/utils/viewport';
 
 const FULL_MAP_EXTENT: CommercialMapEnvironmentExtent = {
   centerX: 0,
@@ -24,25 +27,33 @@ const FULL_MAP_EXTENT: CommercialMapEnvironmentExtent = {
   width: 120,
   depth: 90.545455,
   diagonal: Math.hypot(120, 90.545455),
+  maxHeight: 24,
 };
 
 const source = (path: string) => readFileSync(resolve(path), 'utf8');
 
 describe('amanhecer premium compartilhado do Mapa Comercial', () => {
-  it('mantém o feather externo atrás do terreno sem desligar sombras ou depth testing', () => {
+  it('mantém o terreno externo opaco atrás do mapa, sem borda alfa circular', () => {
     const environment = source(
       'src/features/commercial-map/components/canvas/CommercialMapEnvironment.tsx',
     );
-    const outer = environment.slice(
-      environment.indexOf('layout.outerGroundSize, layout.outerGroundSize'),
-      environment.indexOf('layout.activeGroundWidth, layout.activeGroundDepth'),
+    const ground = environment.slice(
+      environment.indexOf('<mesh\n        rotation={[-Math.PI / 2, 0, 0]}'),
+      environment.indexOf('<SunrisePostProcessing'),
     );
 
-    expect(outer).toContain('polygonOffsetFactor={1}');
-    expect(outer).toContain('polygonOffsetUnits={2}');
-    expect(outer).toContain('depthWrite={false}');
-    expect(outer).not.toContain('depthTest={false}');
-    expect(environment).toContain('receiveShadow');
+    expect(ground).toContain('layout.outerGroundSize, layout.outerGroundSize');
+    expect(ground).toContain('position={[extent.centerX, -0.08, extent.centerZ]}');
+    expect(ground).toContain('receiveShadow');
+    expect(ground).not.toContain('polygonOffset');
+    expect(ground).not.toContain('transparent');
+    expect(ground).not.toContain('depthWrite={false}');
+    expect(ground).not.toContain('depthTest={false}');
+    expect(environment).toContain('THREE.MirroredRepeatWrapping');
+    expect(environment).not.toContain("context.globalCompositeOperation = 'destination-in'");
+    expect(environment).not.toContain('const edgeMask = context.createRadialGradient');
+    expect(environment).not.toContain('createOuterGroundTexture');
+    expect(environment).not.toContain('CommercialMapOuterGroundTexture');
   });
 
   it('ancora o sol no horizonte -Z definido pelas referências, sem reutilizar o sol diurno', () => {
@@ -117,7 +128,7 @@ describe('amanhecer premium compartilhado do Mapa Comercial', () => {
     );
   });
 
-  it('seleciona um tier fixo por capacidade inicial e mantém layouts determinísticos', () => {
+  it('seleciona um tier fixo e mantém o fog além de toda câmera e do mapa', () => {
     expect(resolveCommercialMapSunriseQualityTier({
       reducedGraphics: false,
       viewportWidth: 1440,
@@ -148,66 +159,91 @@ describe('amanhecer premium compartilhado do Mapa Comercial', () => {
     })).toBe('reduced');
 
     const tiers: readonly CommercialMapSunriseQualityTier[] = ['full', 'balanced', 'reduced'];
-    const expectedCloudCounts = [7, 5, 4];
-    tiers.forEach((tier, index) => {
-      const firstLayout = resolveCommercialMapEnvironmentLayout(FULL_MAP_EXTENT, 'normal', tier);
-      const secondLayout = resolveCommercialMapEnvironmentLayout(FULL_MAP_EXTENT, 'normal', tier);
-      const clouds = resolveCommercialMapCloudPlacements(FULL_MAP_EXTENT, tier);
+    const desktopCameraBounds = resolveCommercialMapCameraDistanceBounds({
+      bounds: FULL_MAP_EXTENT,
+      verticalFovDegrees: 38,
+      aspect: 1440 / 900,
+    });
+    tiers.forEach((tier) => {
+      const firstLayout = resolveCommercialMapEnvironmentLayout(
+        FULL_MAP_EXTENT,
+        'normal',
+        tier,
+        desktopCameraBounds.maxDistance,
+      );
+      const secondLayout = resolveCommercialMapEnvironmentLayout(
+        FULL_MAP_EXTENT,
+        'normal',
+        tier,
+        desktopCameraBounds.maxDistance,
+      );
 
       expect(firstLayout).toEqual(secondLayout);
-      expect(firstLayout.cloudCount).toBe(expectedCloudCounts[index]);
-      expect(clouds).toHaveLength(expectedCloudCounts[index]);
+      expect(firstLayout).not.toHaveProperty('cloudCount');
       expect(firstLayout.visualSunDistance).toBeGreaterThanOrEqual(50_000);
       expect(firstLayout.visualSunDistance).toBeGreaterThan(FULL_MAP_EXTENT.diagonal * 250);
       expect(firstLayout).not.toHaveProperty('horizonOriginY');
       expect(firstLayout).not.toHaveProperty('horizonDistance');
-      clouds.forEach((cloud) => {
-        expect(cloud.position[1]).toBeGreaterThan(0);
-        expect(cloud.scale.every((value) => Number.isFinite(value) && value > 0)).toBe(true);
-      });
     });
 
-    const normal = resolveCommercialMapEnvironmentLayout(FULL_MAP_EXTENT, 'normal', 'full');
+    const normal = resolveCommercialMapEnvironmentLayout(
+      FULL_MAP_EXTENT,
+      'normal',
+      'full',
+      desktopCameraBounds.maxDistance,
+    );
     const technical = resolveCommercialMapEnvironmentLayout(
       FULL_MAP_EXTENT,
       'hydrological',
       'full',
+      desktopCameraBounds.maxDistance,
     );
-    expect(normal.fogNear).toBeGreaterThan(FULL_MAP_EXTENT.diagonal);
-    expect(normal.fogNear).toBeLessThan(normal.outerGroundSize);
-    expect(normal.fogFar).toBeGreaterThan(normal.outerGroundSize);
+    const boundingSphereRadius = resolveCommercialMapBoundingSphereRadius(FULL_MAP_EXTENT);
+    const minimumFogClearance = desktopCameraBounds.maxDistance
+      + boundingSphereRadius * COMMERCIAL_MAP_ENVIRONMENT_CONFIG.fog.mapClearanceRatio;
+    expect(normal.fogNear).toBeGreaterThanOrEqual(minimumFogClearance);
+    expect(normal.fogNear).toBeGreaterThan(desktopCameraBounds.maxDistance + boundingSphereRadius);
+    expect(normal.outerGroundSize).toBeGreaterThanOrEqual(
+      (desktopCameraBounds.maxDistance + boundingSphereRadius) * 12,
+    );
+    expect(normal.fogFar).toBeGreaterThan(normal.fogNear);
     expect(technical.fogNear).toBeGreaterThan(normal.fogNear);
     expect(technical.fogFar).toBeGreaterThan(technical.fogNear);
   });
 
   it('explicita o orçamento visual e degrada somente as camadas caras por tier', () => {
     expect(commercialMapEnvironmentBudget('full')).toEqual({
-      primaryDrawCalls: 5,
+      primaryDrawCalls: 3,
       skyDrawCalls: 1,
       sunDrawCalls: 1,
       sunIntegratedInSky: false,
-      groundDrawCalls: 2,
-      cloudDrawCalls: 1,
-      cloudInstances: 7,
-      animatedLayers: 5,
+      groundDrawCalls: 1,
+      cloudDrawCalls: 0,
+      cloudInstances: 0,
+      cloudsIntegratedInSky: true,
+      animatedLayers: 4,
       postProcessingPasses: 2,
       shadowMapSize: 2048,
     });
     expect(commercialMapEnvironmentBudget('balanced')).toMatchObject({
-      primaryDrawCalls: 5,
+      primaryDrawCalls: 3,
       sunDrawCalls: 1,
       sunIntegratedInSky: false,
-      cloudInstances: 5,
-      animatedLayers: 5,
+      cloudDrawCalls: 0,
+      cloudInstances: 0,
+      cloudsIntegratedInSky: true,
+      animatedLayers: 4,
       postProcessingPasses: 2,
       shadowMapSize: 1536,
     });
     expect(commercialMapEnvironmentBudget('reduced')).toMatchObject({
-      primaryDrawCalls: 5,
+      primaryDrawCalls: 3,
       sunDrawCalls: 1,
       sunIntegratedInSky: false,
-      cloudInstances: 4,
-      animatedLayers: 5,
+      cloudDrawCalls: 0,
+      cloudInstances: 0,
+      cloudsIntegratedInSky: true,
+      animatedLayers: 4,
       postProcessingPasses: 0,
       shadowMapSize: 512,
     });
@@ -241,7 +277,16 @@ describe('amanhecer premium compartilhado do Mapa Comercial', () => {
     expect(environment).toContain('const sky = useMemo(');
     expect(environment).toContain('const celestialSun = useMemo(');
     expect(environment).toContain('const sunLight = useMemo(');
-    expect(environment).toContain('const cloudLayer = useMemo(');
+    expect(environment).not.toContain('const cloudLayer = useMemo(');
+    expect(environment).not.toContain('createCloudLayer');
+    expect(environment).not.toContain('createCloudTexture');
+    expect(environment).not.toContain('new THREE.InstancedMesh');
+    expect(environment).not.toContain('<primitive object={cloudLayer}');
+    expect(environment).toContain('material.uniforms.authoredCloudOpacity');
+    expect(environment).toContain('float cloudBand = smoothstep');
+    expect(environment).toContain('float cloudDensity = smoothstep');
+    expect(environment).toContain('composedSky = mix(composedSky, cloudColor, cloudDensity)');
+    expect(environment).toContain('commercial-map-camera-safe-sunrise-sky-${mode}-v4');
     expect(environment).toContain('new THREE.ShaderMaterial');
     expect(environment).toContain('<EffectComposer');
     expect(environment).toContain('multisampling={0}');
@@ -268,7 +313,7 @@ describe('amanhecer premium compartilhado do Mapa Comercial', () => {
     expect(environment).not.toContain('new THREE.WebGLCubeRenderTarget');
   });
 
-  it('usa um único vetor entre horizonTarget, céu, esfera solar, nuvens e iluminação', () => {
+  it('usa um único vetor entre horizonTarget, céu integrado, esfera solar e iluminação', () => {
     const environment = source(
       'src/features/commercial-map/components/canvas/CommercialMapEnvironment.tsx',
     );
@@ -306,9 +351,10 @@ describe('amanhecer premium compartilhado do Mapa Comercial', () => {
     expect(environment).toContain(
       'sun.position.copy(sceneAnchor).addScaledVector(direction, celestialDistance)',
     );
-    expect(environment).toContain(
-      '(cloudMaterial.uniforms.uSunDirection.value as THREE.Vector3).copy(frameDirection)',
-    );
+    expect(environment).toContain('vec2 solarDirection = normalize(vSunDirection.xz');
+    expect(environment).toContain('vec3 lowerHorizon = mix(');
+    expect(environment).toContain('float belowHorizon = 1.0 - smoothstep(-0.075, 0.008, altitude)');
+    expect(environment).not.toContain('cloudMaterial.uniforms');
     expect(environment).toContain(
       'sunLight.position.copy(sceneAnchor).addScaledVector(frameDirection, layout.sunDistance)',
     );
@@ -337,8 +383,10 @@ describe('amanhecer premium compartilhado do Mapa Comercial', () => {
       'src/features/commercial-map/components/canvas/CommercialMapEnvironment.tsx',
     );
 
-    expect(environment).toContain('mesh.raycast = NO_RAYCAST');
-    expect(environment).toContain('depthWrite={false}');
+    expect(environment).toContain('raycast={NO_RAYCAST}');
+    expect(environment).toContain('material.depthWrite = false');
+    expect(environment).toContain('depthWrite: false');
+    expect(environment).not.toContain('CommercialMapSparseSunriseClouds');
     expect(environment).not.toContain('CommercialLot');
     expect(environment).not.toContain('MapEntity');
     expect(environment).not.toContain('officialReference2026');
