@@ -60,3 +60,27 @@ A rede inteira é consolidada por material e layer em no máximo cinco draw call
 - entidade selecionada: destaque integrado sem ocultar o asfalto adjacente;
 - desktop e mobile: controles, busca, explorador e navegação sem sobreposição;
 - build, TypeScript, lint e Vitest: estabilidade funcional e orçamento geométrico.
+
+## Conexões viárias 2026.4 — publicação no banco
+
+O canvas 3D lê exclusivamente `map_entities` + `map_entity_geometries`; o arquivo
+`officialReference2026.ts` é apenas semente e nunca é projetado sobre o banco
+(`reconcileExporuralReference`). Por isso corredores criados só no código não
+aparecem em nenhum ângulo. Os oito trechos abaixo foram publicados no projeto
+cartográfico ativo (revisão 2026.4), camada `circulation`, elevação 0 e
+espessura 0.032:
+
+| Identificador | Faixa local (x / z) | Função |
+| --- | --- | --- |
+| `RUA-URUGUAI-LESTE` | 13.31→25.31 / 10.10→11.32 | continuidade leste da Rua Uruguai |
+| `RUA-ARGENTINA-LESTE` | 13.31→25.31 / 16.17→17.56 | continuidade leste da Rua Argentina |
+| `RUA-MONTEVIDEU-SUL` | 1.99→2.88 / -8.18→3.38 | faixa oeste das Quadras F e G |
+| `RUA-INTERNA-OESTE` | -24.61→-24.20 / -11.45→3.27 | corredor entre V/U/T e Q/P/O |
+| `PRACA-ACESSO-EXPORURAL` | 8.95→13.92 / -11.59→-7.66 | conexão ao lado do Espaço Mirante com o início da Exporural |
+| `RUA-INTERNA-QUADRA-G` | 4.41→5.93 / -7.66→-3.03 | corredor vago da Quadra G (Bolívia ↔ Chile) |
+| `RUA-INTERNA-QUADRA-T` | -34.93→-33.58 / -11.59→2.90 | Q-V-06 até Q-T-12 (Paraguai ↔ Brasil) |
+| `RUA-LESTE-EXPORURAL` | 56.55→57.08 / -37.31→-26.47 | Q-R-55 até Q-S-19 (Johan Muller ↔ Bruno Schwartz ↔ Ubiretama) |
+
+Nenhuma faixa invade lotes: a checagem de colisão contra `SELLABLE_LOT`,
+`INTERNAL_STAND`, pavilhões e atrações retorna zero interseções, e o teste
+`commercialMapRoadInfrastructure` cobre continuidade e não invasão.

@@ -30,7 +30,7 @@ describe('infraestrutura viária do Mapa Comercial', () => {
   const roads = circulation.filter((entity) => entity.classification === 'ROAD');
 
   it('preserva o inventário cartográfico oficial sem criar vias artificiais', () => {
-    expect(roads).toHaveLength(25);
+    expect(roads).toHaveLength(29);
     expect(circulation.filter((entity) => entity.classification === 'PEDESTRIAN_PATH')).toHaveLength(1);
     expect(circulation.every((entity) => entity.geometry.elevation === 0)).toBe(true);
     expect(roads.every((entity) => entity.geometry.extrusionHeight === ROAD_INFRASTRUCTURE.asphaltHeight)).toBe(true);
@@ -93,7 +93,7 @@ describe('infraestrutura viária do Mapa Comercial', () => {
   });
 
   it('mantém os novos corredores dentro das faixas reservadas, sem invadir lotes', () => {
-    const newCorridors = ['RUA-URUGUAI-LESTE', 'RUA-ARGENTINA-LESTE', 'RUA-MONTEVIDEU-SUL', 'RUA-INTERNA-OESTE'];
+    const newCorridors = ['RUA-URUGUAI-LESTE', 'RUA-ARGENTINA-LESTE', 'RUA-MONTEVIDEU-SUL', 'RUA-INTERNA-OESTE', 'PRACA-ACESSO-EXPORURAL', 'RUA-INTERNA-QUADRA-G', 'RUA-INTERNA-QUADRA-T', 'RUA-LESTE-EXPORURAL'];
     const box = (ring: readonly (readonly [number, number])[] | number[][]) => {
       const points = ring as number[][];
       return {
@@ -121,6 +121,33 @@ describe('infraestrutura viária do Mapa Comercial', () => {
       expect(invades, `${identifier} não pode invadir lotes`).toBe(false);
     });
   });
+
+  it('pavimenta as cinco conexões reportadas sem pavimento', () => {
+    const roadBoxes = circulation.map((entity) => {
+      const ring = entity.geometry.coordinates[0] as unknown as number[][];
+      return {
+        minX: Math.min(...ring.map(([x]) => x)),
+        maxX: Math.max(...ring.map(([x]) => x)),
+        minZ: Math.min(...ring.map(([, z]) => z)),
+        maxZ: Math.max(...ring.map(([, z]) => z)),
+      };
+    });
+    const covered = (x: number, z: number) => roadBoxes.some((box) => (
+      box.minX <= x && box.maxX >= x && box.minZ <= z && box.maxZ >= z
+    ));
+
+    ([
+      ['conexão Espaço Mirante → Exporural', 11.4, -9.6],
+      ['corredor oeste das Quadras F e G', 2.4, -2.0],
+      ['corredor interno da Quadra G', 5.1, -5.3],
+      ['corredor Q-V-06 → Q-T-12', -34.2, -4.5],
+      ['faixa leste Q-R-55 → Q-S-19', 56.8, -30.0],
+    ] as const).forEach(([label, x, z]) => {
+      expect(covered(x, z), label).toBe(true);
+    });
+  });
+
+
 
   it('usa asfalto cinza-escuro neutro e uma textura otimizada', () => {
     const [red, green, blue] = rgb(ROAD_MATERIAL_COLORS.asphalt);
@@ -192,7 +219,7 @@ describe('infraestrutura viária do Mapa Comercial', () => {
       expect(detailed.gutters).not.toBeNull();
       expect(detailed.curbs).not.toBeNull();
       expect(detailed.diagnostics).toMatchObject({
-        roadCount: 25,
+        roadCount: 29,
         pedestrianPathCount: 1,
         microGapCount: 1,
       });
