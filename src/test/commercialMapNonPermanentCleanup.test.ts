@@ -50,7 +50,8 @@ describe('limpeza estrutural dos blocos não permanentes', () => {
     const count = (predicate: (classification: string) => boolean) => (
       OFFICIAL_REFERENCE_ENTITIES.filter((entity) => predicate(entity.classification)).length
     );
-    expect(count((c) => c === 'ROAD' || c === 'PEDESTRIAN_PATH')).toBe(29);
+    expect(count((c) => c === 'ROAD')).toBe(29);
+    expect(count((c) => c === 'PEDESTRIAN_PATH')).toBe(1);
     expect(count((c) => c === 'QUADRA')).toBe(21);
     expect(count((c) => c === 'SELLABLE_LOT')).toBe(262);
     expect(count((c) => c === 'PAVILION')).toBe(12);
