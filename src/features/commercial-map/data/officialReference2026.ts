@@ -1111,6 +1111,6 @@ export const OFFICIAL_REFERENCE_DATA: CommercialMapData = {
     version: 5,
   },
   layers: DEFAULT_REFERENCE_LAYERS,
-  entities: OFFICIAL_REFERENCE_ENTITIES,
+  entities: OFFICIAL_RENDERED_ENTITIES,
   lots: OFFICIAL_REFERENCE_LOTS,
 };
