@@ -331,10 +331,11 @@ describe('área posterior — topologia corrigida e rodovia independente', () =>
     expect(highway.every((road) => road.category === 'federal-highway')).toBe(true);
   });
 
-  it('substitui somente as três superfícies oficiais incompatíveis com a calibração', () => {
+  it('mantém a Brasília oficial e substitui somente Ubiretama e RS-472', () => {
     expect(REPLACED_OFFICIAL_ROAD_IDENTIFIERS).toEqual([
-      'RUA-BRASILIA', 'RUA-UBIRETAMA', 'RODOVIA-RS-472',
+      'RUA-UBIRETAMA', 'RODOVIA-RS-472',
     ]);
+    expect(REPLACED_OFFICIAL_ROAD_IDENTIFIERS).not.toContain('RUA-BRASILIA');
     expect(REPLACED_OFFICIAL_ROAD_IDENTIFIERS).not.toContain('AV-IMIGRANTES');
     expect(PROTECTED_ROAD_IDENTIFIERS).toEqual(expect.arrayContaining([
       'RUA-UBIRETAMA', 'RUA-BRASILIA', 'AV-IMIGRANTES', 'RODOVIA-RS-472',

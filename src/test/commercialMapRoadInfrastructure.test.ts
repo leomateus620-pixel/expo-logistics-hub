@@ -7,6 +7,7 @@ import {
   ROAD_SURFACE_PROFILE,
 } from '@/features/commercial-map/constants';
 import { OFFICIAL_REFERENCE_DATA } from '@/features/commercial-map/data/officialReference2026';
+import { REPLACED_OFFICIAL_ROAD_IDENTIFIERS } from '@/features/commercial-map/data/rearParkRoadNetwork';
 import {
   ROAD_INFRASTRUCTURE,
   buildRoadBoundaryRuns,
@@ -147,6 +148,33 @@ describe('infraestrutura viária do Mapa Comercial', () => {
       ['encontro da Ubiretama com a Rua Gustavo Bessel', 57.5, -19.9],
     ] as const).forEach(([label, x, z]) => {
       expect(covered(x, z), label).toBe(true);
+    });
+  });
+
+  it('mantém o eixo interno da Rua Brasília no conjunto realmente renderizado', () => {
+    const renderedCirculation = circulation.filter((entity) => (
+      !REPLACED_OFFICIAL_ROAD_IDENTIFIERS.includes(entity.publicIdentifier)
+    ));
+    const brasilia = renderedCirculation.find((entity) => entity.publicIdentifier === 'RUA-BRASILIA');
+    expect(brasilia).toBeDefined();
+
+    const ring = brasilia?.geometry.coordinates[0] ?? [];
+    const covers = (x: number, z: number) => {
+      const minX = Math.min(...ring.map(([pointX]) => pointX));
+      const maxX = Math.max(...ring.map(([pointX]) => pointX));
+      const minZ = Math.min(...ring.map(([, pointZ]) => pointZ));
+      const maxZ = Math.max(...ring.map(([, pointZ]) => pointZ));
+      return x >= minX && x <= maxX && z >= minZ && z <= maxZ;
+    };
+
+    ([
+      ['lateral da Quadra E', 13.4, 5.4],
+      ['frente da Alameda Gastronômica', 13.4, 0.2],
+      ['lateral da Via Expressa', 13.4, -5.2],
+      ['frente do Espaço Mirante', 13.4, -9.6],
+      ['encontro junto ao Q-R-02', 13.4, -11.6],
+    ] as const).forEach(([label, x, z]) => {
+      expect(covers(x, z), label).toBe(true);
     });
   });
 

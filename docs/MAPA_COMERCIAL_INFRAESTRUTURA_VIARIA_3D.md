@@ -85,3 +85,13 @@ espessura 0.032:
 Nenhuma faixa invade lotes: a checagem de colisão contra `SELLABLE_LOT`,
 `INTERNAL_STAND`, pavilhões e atrações retorna zero interseções, e o teste
 `commercialMapRoadInfrastructure` cobre continuidade e não invasão.
+
+### Correção de apresentação da Rua Brasília
+
+A entidade persistida `RUA-BRASILIA` não pode ser removida integralmente da
+infraestrutura oficial no mapa geral. Ela contém a superfície interna contínua
+entre a lateral da Quadra E, Alameda Gastronômica, Via Expressa, Espaço Mirante
+e o encontro junto ao `Q-R-02`. A rede procedural posterior apenas complementa
+essa entidade fora do núcleo; somente `RUA-UBIRETAMA` e `RODOVIA-RS-472` têm a
+apresentação oficial integralmente substituída nessa camada. Essa separação
+impede que o cadastro correto exista no banco, mas desapareça da cena renderizada.

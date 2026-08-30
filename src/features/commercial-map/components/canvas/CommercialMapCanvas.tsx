@@ -4105,6 +4105,9 @@ function Scene({
   const circulationEntities = useMemo(() => (
     withGateFourDistrictPresentationEntities(nonLotEntities).filter((entity) => (
       (entity.classification === 'ROAD' || entity.classification === 'PEDESTRIAN_PATH')
+      // Rua Brasília is intentionally retained here: its persisted surface is
+      // the only canonical pavement from Quadra E through D1/D2/D3 to Q-R-02.
+      // The rear-road layer complements it beyond this internal axis.
       && (isolatedArea || hydrologicalModeActive
         || !REPLACED_OFFICIAL_ROAD_IDENTIFIERS.includes(entity.publicIdentifier))
     ))

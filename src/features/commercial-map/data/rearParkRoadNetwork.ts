@@ -10,9 +10,10 @@ import {
  * Rede viária posterior — correção topológica 2026.9.8.
  *
  * As entidades cadastrais continuam sendo as únicas donas de busca, seleção e
- * metadados. A camada substitui somente as três apresentações incompatíveis:
- * Brasília, Ubiretama e a faixa esquemática da RS-472. Rua das Etnias conserva
- * sua superfície oficial e termina em P1. Nenhum eixo fecha uma alça pela mata.
+ * metadados. A camada complementa a Rua Brasília além do núcleo interno e
+ * substitui somente as duas apresentações incompatíveis: Ubiretama e a faixa
+ * esquemática da RS-472. Rua das Etnias conserva sua superfície oficial e
+ * termina em P1. Nenhum eixo fecha uma alça pela mata.
  */
 
 export type CanonicalRearRoadId =
@@ -98,11 +99,11 @@ export const PROTECTED_ROAD_IDENTIFIERS: readonly string[] = Object.freeze([
 ]);
 
 /**
- * As geometrias oficiais permanecem no cadastro; somente a apresentação das
- * três vias incompatíveis é trocada pelos eixos calibrados desta camada.
+ * As geometrias oficiais permanecem no cadastro. A Rua Brasília oficial também
+ * permanece visível porque contém o eixo interno entre a Quadra E e o Q-R-02;
+ * os segmentos procedurais apenas prolongam sua apresentação no setor traseiro.
  */
 export const REPLACED_OFFICIAL_ROAD_IDENTIFIERS: readonly string[] = Object.freeze([
-  'RUA-BRASILIA',
   'RUA-UBIRETAMA',
   'RODOVIA-RS-472',
 ]);
