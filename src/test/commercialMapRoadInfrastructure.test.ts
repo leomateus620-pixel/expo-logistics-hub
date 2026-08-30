@@ -122,7 +122,7 @@ describe('infraestrutura viária do Mapa Comercial', () => {
     });
   });
 
-  it('pavimenta as cinco conexões reportadas sem pavimento', () => {
+  it('pavimenta as conexões reportadas sem pavimento', () => {
     const roadBoxes = circulation.map((entity) => {
       const ring = entity.geometry.coordinates[0] as unknown as number[][];
       return {
