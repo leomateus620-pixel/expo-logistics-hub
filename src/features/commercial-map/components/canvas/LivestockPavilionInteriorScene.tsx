@@ -1,8 +1,7 @@
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
-import { OrbitControls } from '@react-three/drei';
-import { useFrame, useThree } from '@react-three/fiber';
+import { useThree } from '@react-three/fiber';
+import { useInteriorCameraRequest, type InteriorCameraRequest } from '../../hooks/useInteriorCameraRequest';
 import * as THREE from 'three';
-import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import type { MapEntity } from '../../types';
 import {
   createLivestockCattlePlan,
@@ -184,138 +183,48 @@ function InteriorIdentity({
   );
 }
 
-function LivestockInteriorCameraRig({
-  entity,
-  reducedGraphics,
-}: {
-  entity: MapEntity;
-  reducedGraphics: boolean;
-}) {
-  const controls = useRef<OrbitControlsImpl | null>(null);
-  const animating = useRef(true);
-  const targetPosition = useRef(new THREE.Vector3());
-  const targetLookAt = useRef(new THREE.Vector3());
-  const { camera, gl, invalidate, size } = useThree();
-  const bounds = useMemo(() => strategicLandmarkBounds(entity), [entity]);
-  const height = Math.max(entity.geometry.extrusionHeight, livestockPavilionVisualHeight(bounds));
-  const layout = useMemo(() => createLivestockPavilionLayout(bounds, height), [bounds, height]);
-  const facing = strategicLandmarkFacingRadians(entity);
-  const center = useMemo(
-    () => new THREE.Vector3(bounds.centerX, entity.geometry.elevation, bounds.centerZ),
-    [bounds.centerX, bounds.centerZ, entity.geometry.elevation],
-  );
-  const toWorld = useCallback((x: number, y: number, z: number) => (
-    new THREE.Vector3(x, y, z).applyAxisAngle(UP, facing).add(center)
-  ), [center, facing]);
-  const clampTarget = useCallback(() => {
-    const target = controls.current?.target;
-    if (!target) return;
-    const local = target.clone().sub(center).applyAxisAngle(UP, -facing);
-    local.x = THREE.MathUtils.clamp(local.x, -layout.width * 0.62, layout.width * 0.62);
-    local.y = THREE.MathUtils.clamp(local.y, 0.12, layout.height * 1.08);
-    local.z = THREE.MathUtils.clamp(local.z, -layout.depth * 1.45, layout.depth * 1.45);
-    target.copy(local.applyAxisAngle(UP, facing).add(center));
-  }, [center, facing, layout.depth, layout.height, layout.width]);
-
-  useEffect(() => {
+function LivestockInteriorCameraRig({ entity }: { entity: MapEntity; reducedGraphics: boolean }) {
+  const size = useThree((state) => state.size);
+  const request = useMemo<InteriorCameraRequest>(() => {
+    const bounds = strategicLandmarkBounds(entity);
+    const height = Math.max(entity.geometry.extrusionHeight, livestockPavilionVisualHeight(bounds));
+    const layout = createLivestockPavilionLayout(bounds, height);
+    const facing = strategicLandmarkFacingRadians(entity);
+    const center = new THREE.Vector3(bounds.centerX, entity.geometry.elevation, bounds.centerZ);
+    const toWorld = (x: number, y: number, z: number) => (
+      new THREE.Vector3(x, y, z).applyAxisAngle(UP, facing).add(center)
+    );
     const compact = size.width < 700 || size.height < 500;
     const portrait = size.height > size.width * 1.15;
-    const start = portrait
-      ? toWorld(-layout.width * 0.18, layout.height * 1.92, layout.depth * 10.5)
-      : compact
-      ? toWorld(-layout.width * 0.42, layout.height * 2.02, layout.depth * 6.5)
-      : toWorld(-layout.width * 0.48, layout.height * 1.72, layout.depth * 5);
-    const destination = portrait
-      ? toWorld(-layout.width * 0.16, layout.height * 1.48, layout.depth * 8.8)
-      : compact
-      ? toWorld(-layout.width * 0.32, layout.height * 1.62, layout.depth * 5.5)
-      : toWorld(-layout.width * 0.38, layout.height * 1.26, layout.depth * 4.1);
-    const lookAt = portrait
-      ? toWorld(-layout.width * 0.16, layout.height * 0.46, 0)
-      : compact
-      ? toWorld(-layout.width * 0.12, layout.height * 0.48, 0)
-      : toWorld(-layout.width * 0.16, layout.height * 0.42, -layout.depth * 0.04);
-
-    targetPosition.current.copy(destination);
-    targetLookAt.current.copy(lookAt);
-    camera.position.copy(reducedGraphics ? destination : start);
-    camera.near = 0.04;
-    camera.far = Math.max(140, layout.width * 8);
-    if (camera instanceof THREE.PerspectiveCamera) camera.fov = portrait ? 50 : compact ? 48 : 44;
-    camera.updateProjectionMatrix();
-    controls.current?.target.copy(lookAt);
-    clampTarget();
-    controls.current?.update();
-    animating.current = !reducedGraphics;
-    gl.domElement.style.cursor = 'grab';
-    invalidate();
-    return () => {
-      gl.domElement.style.cursor = 'grab';
+    return {
+      entityId: entity.id,
+      position: portrait
+        ? toWorld(-layout.width * 0.16, layout.height * 1.48, layout.depth * 8.8)
+        : compact
+          ? toWorld(-layout.width * 0.32, layout.height * 1.62, layout.depth * 5.5)
+          : toWorld(-layout.width * 0.38, layout.height * 1.26, layout.depth * 4.1),
+      target: portrait
+        ? toWorld(-layout.width * 0.16, layout.height * 0.46, 0)
+        : compact
+          ? toWorld(-layout.width * 0.12, layout.height * 0.48, 0)
+          : toWorld(-layout.width * 0.16, layout.height * 0.42, -layout.depth * 0.04),
+      fov: portrait ? 50 : compact ? 48 : 44,
+      near: 0.04,
+      far: Math.max(140, layout.width * 8),
+      minDistance: Math.max(2.6, layout.depth * 0.9),
+      maxDistance: Math.max(26, layout.width * 1.55),
+      minPolarAngle: 0.18,
+      maxPolarAngle: Math.PI / 2.02,
+      panBounds: {
+        center,
+        facing,
+        min: [-layout.width * 0.62, 0.12, -layout.depth * 1.45],
+        max: [layout.width * 0.62, layout.height * 1.08, layout.depth * 1.45],
+      },
     };
-  }, [
-    camera,
-    clampTarget,
-    gl,
-    invalidate,
-    layout.depth,
-    layout.eaveHeight,
-    layout.height,
-    layout.sideWallHeight,
-    layout.width,
-    reducedGraphics,
-    size.height,
-    size.width,
-    toWorld,
-  ]);
-
-  useFrame((_state, delta) => {
-    if (!animating.current) return;
-    const factor = 1 - Math.exp(-delta * 4.6);
-    camera.position.lerp(targetPosition.current, factor);
-    if (controls.current) {
-      controls.current.target.lerp(targetLookAt.current, factor);
-      controls.current.update();
-    }
-    if (
-      camera.position.distanceTo(targetPosition.current) < 0.035
-      && (!controls.current || controls.current.target.distanceTo(targetLookAt.current) < 0.025)
-    ) {
-      camera.position.copy(targetPosition.current);
-      controls.current?.target.copy(targetLookAt.current);
-      controls.current?.update();
-      animating.current = false;
-    } else {
-      invalidate();
-    }
-  });
-
-  return (
-    <OrbitControls
-      ref={controls}
-      makeDefault
-      enableDamping
-      dampingFactor={0.075}
-      enablePan
-      screenSpacePanning
-      zoomToCursor
-      minDistance={Math.max(2.6, layout.depth * 0.9)}
-      maxDistance={Math.max(26, layout.width * 1.55)}
-      minPolarAngle={0.18}
-      maxPolarAngle={Math.PI / 2.02}
-      target={toWorld(0, layout.sideWallHeight * 1.1, 0).toArray()}
-      onStart={() => {
-        animating.current = false;
-        gl.domElement.style.cursor = 'grabbing';
-      }}
-      onEnd={() => {
-        gl.domElement.style.cursor = 'grab';
-      }}
-      onChange={() => {
-        clampTarget();
-        invalidate();
-      }}
-    />
-  );
+  }, [entity, size.height, size.width]);
+  useInteriorCameraRequest(request);
+  return null;
 }
 
 export const LivestockPavilionInteriorScene = memo(function LivestockPavilionInteriorScene({

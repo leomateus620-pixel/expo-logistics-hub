@@ -247,7 +247,7 @@ export const RearParkingLayer = memo(function RearParkingLayer({
   const select = (event: ThreeEvent<MouseEvent>) => {
     event.stopPropagation();
     const state = useCommercialMapStore.getState();
-    if (!isMapSelectionClick(event.delta) || state.cameraNavigating) return;
+    if (!isMapSelectionClick(event.delta, event.nativeEvent) || state.cameraNavigating) return;
     const point = [event.point.x, event.point.z] as const;
     const space = pickRearParkingSpace(point);
     if (space) state.inspectParkingSpace(space.blockId, space.id);

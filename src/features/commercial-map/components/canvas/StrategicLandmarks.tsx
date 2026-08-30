@@ -83,6 +83,45 @@ const SHARED_HOVERED_SURFACE_MATERIAL = new THREE.MeshBasicMaterial({
 });
 const SHARED_SELECTED_LINE_MATERIAL = new THREE.LineBasicMaterial({ color: '#ffe797', toneMapped: false });
 const SHARED_HOVERED_LINE_MATERIAL = new THREE.LineBasicMaterial({ color: '#f0d36a', toneMapped: false });
+
+/** Keep conditional highlight materials present for initial shader compilation. */
+export function StrategicLandmarkSelectionShaderWarmup() {
+  const geometry = useMemo(() => new THREE.PlaneGeometry(0.001, 0.001), []);
+
+  // This component owns only its tiny geometry; highlight materials are shared
+  // by every landmark and must survive selection, hover and helper cleanup.
+  useEffect(() => () => geometry.dispose(), [geometry]);
+
+  return (
+    <group name="commercial-map-selection-shader-warmup" visible={false} dispose={null}>
+      <mesh
+        geometry={geometry}
+        material={SHARED_SELECTED_SURFACE_MATERIAL}
+        raycast={NO_RAYCAST}
+        dispose={null}
+      />
+      <mesh
+        geometry={geometry}
+        material={SHARED_HOVERED_SURFACE_MATERIAL}
+        raycast={NO_RAYCAST}
+        dispose={null}
+      />
+      <lineSegments
+        geometry={geometry}
+        material={SHARED_SELECTED_LINE_MATERIAL}
+        raycast={NO_RAYCAST}
+        dispose={null}
+      />
+      <lineSegments
+        geometry={geometry}
+        material={SHARED_HOVERED_LINE_MATERIAL}
+        raycast={NO_RAYCAST}
+        dispose={null}
+      />
+    </group>
+  );
+}
+
 const SHARED_GERMAN_RED_MATERIAL = new THREE.MeshStandardMaterial({ color: '#ba2c35', roughness: 0.8 });
 const SHARED_GERMAN_GOLD_MATERIAL = new THREE.MeshStandardMaterial({ color: '#e5b82f', roughness: 0.82 });
 const SHARED_POLISH_RED_MATERIAL = new THREE.MeshStandardMaterial({ color: '#c72f42', roughness: 0.78 });
@@ -3747,13 +3786,13 @@ export function StrategicLandmarkMesh({
   const handleClick = (event: ThreeEvent<MouseEvent>) => {
     if (eventIntersectsLunarRocket(event)) return;
     event.stopPropagation();
-    if (!isMapSelectionClick(event.delta)) return;
+    if (!isMapSelectionClick(event.delta, event.nativeEvent)) return;
     onSelect(entity.id);
   };
   const handleDoubleClick = (event: ThreeEvent<MouseEvent>) => {
     if (eventIntersectsLunarRocket(event)) return;
     event.stopPropagation();
-    if (!isMapSelectionClick(event.delta)) return;
+    if (!isMapSelectionClick(event.delta, event.nativeEvent)) return;
     onSelect(entity.id);
     if (
       kind === 'fenasoja-headquarters'

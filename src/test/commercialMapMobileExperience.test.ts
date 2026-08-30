@@ -40,7 +40,7 @@ describe('arquitetura mobile-first do Mapa Comercial', () => {
     const panel = read('src/features/commercial-map/components/panels/MapPanels.tsx');
     const styles = read('src/features/commercial-map/commercial-map-mobile.css');
 
-    expect(page).toContain('className="commercial-map-stage"');
+    expect(page).toContain('data-canvas-lifecycle="persistent"');
     expect(panel).toContain("useState<CommercialMapDetailSheetState>('half')");
     expect(panel).toContain('data-sheet-state={sheetState}');
     expect(styles).toContain('data-sheet-state="half"');
@@ -60,7 +60,7 @@ describe('arquitetura mobile-first do Mapa Comercial', () => {
     expect(canvas).toContain('touches={{ ONE: THREE.TOUCH.PAN, TWO: THREE.TOUCH.DOLLY_ROTATE }}');
     expect(canvas).toMatch(/<OrbitControls[\s\S]*?enablePan[\s\S]*?enableRotate[\s\S]*?enableZoom/);
     expect(canvas).not.toContain('enablePan={!miranteSelected}');
-    expect(canvas).toContain('screenSpacePanning={false}');
+    expect(canvas).toContain('screenSpacePanning={Boolean(interiorEntity)}');
     expect(canvas).toContain('cameraNavigating,');
     expect(canvas).toContain('COMMERCIAL_MAP_RESIZE_REFIT_DEBOUNCE_MS');
     expect(canvas).toContain('COMMERCIAL_MAP_MANUAL_NAVIGATION_REFIT_SUPPRESSION_MS');
@@ -69,7 +69,8 @@ describe('arquitetura mobile-first do Mapa Comercial', () => {
     expect(canvas).toContain('pendingResizeRefit.current = false;');
     expect(canvas).toContain('if (preserveManualView.current) return;');
     expect(canvas).toMatch(/selectionChanged && !selectedEntity[\s\S]*?preserveManualView.current = true;[\s\S]*?cancelScheduledResizeRefit\(\);/);
-    expect(canvas).toContain("gl={{ antialias: !reducedGraphics");
+    expect(canvas).toContain('antialias: !reducedGraphics');
+    expect(canvas).toContain('gl={initialRenderConfig.current.renderer}');
     expect(styles).toContain('touch-action: none !important;');
     expect(styles).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.commercial-map-stage \{ transition-duration: 340ms !important; \}/);
   });

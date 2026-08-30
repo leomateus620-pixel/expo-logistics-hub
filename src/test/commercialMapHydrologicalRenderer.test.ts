@@ -252,7 +252,7 @@ describe('renderer e utilitários da infraestrutura hidrológica', () => {
     expect(renderer).toContain('material.dispose()');
     expect(renderer).toContain('THREE.InstancedMesh.prototype.raycast');
     expect(renderer).toContain('spans[event.instanceId]?.segment');
-    expect(renderer.match(/isMapSelectionClick\(event\.delta\)/g)).toHaveLength(2);
+    expect(renderer.match(/isMapSelectionClick\(event\.delta, event\.nativeEvent\)/g)).toHaveLength(2);
     expect(renderer).not.toContain('castShadow={true}');
     expect(canvas).toMatch(/const handleHydrologicalSelect = useCallback\(/);
     expect(canvas).toContain('onSelect={handleHydrologicalSelect}');

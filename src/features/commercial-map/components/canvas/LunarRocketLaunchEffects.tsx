@@ -1,5 +1,6 @@
 import {
   type ReactNode,
+  useCallback,
   useEffect,
   useLayoutEffect,
   useMemo,
@@ -9,6 +10,7 @@ import { type ThreeEvent, useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import { isMapSelectionClick } from '../../utils/interaction';
+import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
 import {
   LUNAR_LAUNCH_GESTURE,
   LUNAR_LAUNCH_HIT_TARGET,
@@ -22,6 +24,16 @@ import {
 } from '../../utils/lunarLaunch';
 
 const NO_RAYCAST = () => undefined;
+
+function useDisposableInstancedMeshRef() {
+  const mesh = useRef<THREE.InstancedMesh | null>(null);
+  const setMesh = useCallback((next: THREE.InstancedMesh | null) => {
+    const previous = mesh.current;
+    if (previous && previous !== next) disposeInstancedMesh(previous);
+    mesh.current = next;
+  }, []);
+  return [mesh, setMesh] as const;
+}
 
 function trySetPointerCapture(target: EventTarget, pointerId: number) {
   if (!(target instanceof Element)) return;
@@ -476,7 +488,7 @@ export function LunarRocketLaunchRig({
   const requestLaunch = useCommercialMapStore((state) => state.requestLunarLaunch);
   const launchRoot = useRef<THREE.Group>(null);
   const worldEffects = useRef<THREE.Group>(null);
-  const plume = useRef<THREE.InstancedMesh>(null);
+  const [plume, setPlume] = useDisposableInstancedMeshRef();
   const plumeScale = useRef<THREE.Group>(null);
   const engineCore = useRef<THREE.Mesh>(null);
   const groundGlow = useRef<THREE.Mesh>(null);
@@ -571,11 +583,17 @@ export function LunarRocketLaunchRig({
     }
     plume.current.instanceMatrix.needsUpdate = true;
     plume.current.computeBoundingSphere();
-  }, []);
+  }, [plume]);
+
+  useEffect(() => () => hitGeometry.dispose(), [hitGeometry]);
+  // A responsive tier can replace one pool without retiring the other pools or
+  // any of the stable plume/engine materials that are still attached and shared.
+  useEffect(() => () => hotPool.geometry.dispose(), [hotPool]);
+  useEffect(() => () => sparkPool.geometry.dispose(), [sparkPool]);
+  useEffect(() => () => dustPool.geometry.dispose(), [dustPool]);
+  useEffect(() => () => smokePool.geometry.dispose(), [smokePool]);
 
   useEffect(() => () => {
-    plume.current?.dispose();
-    hitGeometry.dispose();
     hitMaterial.dispose();
     plumeGeometry.dispose();
     plumeMaterial.dispose();
@@ -583,25 +601,19 @@ export function LunarRocketLaunchRig({
     engineCoreMaterial.dispose();
     glowGeometry.dispose();
     glowMaterial.dispose();
-    [hotPool, sparkPool, dustPool, smokePool].forEach((pool) => pool.geometry.dispose());
     [hotMaterial, sparkMaterial, dustMaterial, smokeMaterial].forEach((material) => material.dispose());
   }, [
     dustMaterial,
-    dustPool,
     engineCoreGeometry,
     engineCoreMaterial,
     glowGeometry,
     glowMaterial,
-    hitGeometry,
     hitMaterial,
     hotMaterial,
-    hotPool,
     plumeGeometry,
     plumeMaterial,
     smokeMaterial,
-    smokePool,
     sparkMaterial,
-    sparkPool,
   ]);
 
   useEffect(() => {
@@ -801,7 +813,7 @@ export function LunarRocketLaunchRig({
     event.stopPropagation();
     if (event.nativeEvent.timeStamp - lastTouchInteractionAt.current < 800) return;
     if (launchPhase !== 'idle') return;
-    if (!isMapSelectionClick(event.delta)) return;
+    if (!isMapSelectionClick(event.delta, event.nativeEvent)) return;
     const clickedAt = event.nativeEvent.timeStamp;
     const previousClickAt = firstDesktopClickAt.current;
     if (previousClickAt !== null
@@ -828,7 +840,7 @@ export function LunarRocketLaunchRig({
         {children}
         <group ref={plumeScale} name="pluma-turbulenta-apollo-xiv">
           <instancedMesh
-            ref={plume}
+            ref={setPlume}
             args={[plumeGeometry, plumeMaterial, 3]}
             count={3}
             frustumCulled={false}

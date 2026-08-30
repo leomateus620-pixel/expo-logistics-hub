@@ -284,6 +284,14 @@ export const useCommercialMapStore = create<CommercialMapState>((set, get) => ({
           interiorEntityId: state.interiorEntityId === selectedEntityId ? state.interiorEntityId : null,
           interiorReturnView: state.interiorEntityId === selectedEntityId ? state.interiorReturnView : null,
           activePanel: selectedEntityId ? 'details' : null,
+          // A new tap cancels the running flight before its click is handled.
+          // Repeating an exterior selection must explicitly request that focus
+          // again; interior selection keeps its existing view/return contract.
+          cameraSequence: selectedEntityId !== null
+            && selectedEntityId === state.selectedEntityId
+            && state.interiorEntityId === null
+            ? state.cameraSequence + 1
+            : state.cameraSequence,
         }
   )),
   enterInterior: (selectedEntityId) => set((state) => (

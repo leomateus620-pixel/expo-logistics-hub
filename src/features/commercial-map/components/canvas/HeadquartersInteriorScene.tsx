@@ -1,8 +1,7 @@
 import { lazy, memo, Suspense, useCallback, useEffect, useMemo, useRef } from 'react';
-import { OrbitControls } from '@react-three/drei';
-import { useFrame, useThree } from '@react-three/fiber';
+import { useThree } from '@react-three/fiber';
+import { useInteriorCameraRequest, type InteriorCameraRequest } from '../../hooks/useInteriorCameraRequest';
 import * as THREE from 'three';
-import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import type { MapEntity } from '../../types';
 import { strategicLandmarkBounds, strategicLandmarkFacingRadians } from '../../utils/landmarks';
 import {
@@ -324,73 +323,34 @@ function TrackLighting() {
 }
 
 function InteriorCameraRig({ entity }: { entity: MapEntity }) {
-  const controls = useRef<OrbitControlsImpl | null>(null);
-  const animating = useRef(true);
-  const targetPosition = useRef(new THREE.Vector3());
-  const targetLookAt = useRef(new THREE.Vector3());
-  const { camera, gl, invalidate, size } = useThree();
-  const bounds = useMemo(() => strategicLandmarkBounds(entity), [entity]);
-  const facing = strategicLandmarkFacingRadians(entity);
-  const center = useMemo(() => new THREE.Vector3(bounds.centerX, entity.geometry.elevation, bounds.centerZ), [bounds.centerX, bounds.centerZ, entity.geometry.elevation]);
-  const toWorld = useCallback((x: number, y: number, z: number) => (
-    new THREE.Vector3(x, y, z).applyAxisAngle(UP, facing).add(center)
-  ), [center, facing]);
-
-  useEffect(() => {
-    const compactViewport = shouldUseCompactExecutiveCamera(size.width, size.height);
-    const start = toWorld(1.25, compactViewport ? 1.66 : 1.58, compactViewport ? 4.35 : 3.92);
-    const cameraPosition = compactViewport
-      ? HEADQUARTERS_EXECUTIVE_CAMERA.compactPosition
-      : HEADQUARTERS_EXECUTIVE_CAMERA.desktopPosition;
-    targetPosition.current.copy(toWorld(cameraPosition[0], cameraPosition[1], cameraPosition[2]));
-    targetLookAt.current.copy(toWorld(...HEADQUARTERS_EXECUTIVE_CAMERA.target));
-    camera.position.copy(start);
-    camera.near = 0.045;
-    camera.updateProjectionMatrix();
-    controls.current?.target.copy(toWorld(...HEADQUARTERS_EXECUTIVE_CAMERA.target));
-    controls.current?.update();
-    animating.current = true;
-    gl.domElement.style.cursor = 'grab';
-    invalidate();
-    return () => {
-      gl.domElement.style.cursor = 'grab';
+  const size = useThree((state) => state.size);
+  const request = useMemo<InteriorCameraRequest>(() => {
+    const bounds = strategicLandmarkBounds(entity);
+    const facing = strategicLandmarkFacingRadians(entity);
+    const center = new THREE.Vector3(bounds.centerX, entity.geometry.elevation, bounds.centerZ);
+    const toWorld = (point: readonly [number, number, number]) => (
+      new THREE.Vector3(...point).applyAxisAngle(UP, facing).add(center)
+    );
+    return {
+      entityId: entity.id,
+      position: toWorld(shouldUseCompactExecutiveCamera(size.width, size.height)
+        ? HEADQUARTERS_EXECUTIVE_CAMERA.compactPosition
+        : HEADQUARTERS_EXECUTIVE_CAMERA.desktopPosition),
+      target: toWorld(HEADQUARTERS_EXECUTIVE_CAMERA.target),
+      fov: 38,
+      near: 0.045,
+      far: 1200,
+      minDistance: 1.35,
+      maxDistance: 5.3,
+      minPolarAngle: 0.38,
+      maxPolarAngle: Math.PI / 2.02,
+      dampingFactor: 0.085,
+      enablePan: false,
+      zoomToCursor: false,
     };
-  }, [camera, gl, invalidate, size.height, size.width, toWorld]);
-
-  useFrame((_state, delta) => {
-    if (!animating.current) return;
-    const factor = 1 - Math.exp(-delta * 4.9);
-    camera.position.lerp(targetPosition.current, factor);
-    if (controls.current) {
-      controls.current.target.lerp(targetLookAt.current, factor);
-      controls.current.update();
-    }
-    if (camera.position.distanceTo(targetPosition.current) < 0.025) {
-      camera.position.copy(targetPosition.current);
-      controls.current?.target.copy(targetLookAt.current);
-      controls.current?.update();
-      animating.current = false;
-    } else {
-      invalidate();
-    }
-  });
-
-  return (
-    <OrbitControls
-      ref={controls}
-      makeDefault
-      enableDamping
-      dampingFactor={0.085}
-      enablePan={false}
-      minDistance={1.35}
-      maxDistance={5.3}
-      minPolarAngle={0.38}
-      maxPolarAngle={Math.PI / 2.02}
-      target={toWorld(...HEADQUARTERS_EXECUTIVE_CAMERA.target).toArray()}
-      onStart={() => { animating.current = false; }}
-      onChange={() => invalidate()}
-    />
-  );
+  }, [entity, size.height, size.width]);
+  useInteriorCameraRequest(request);
+  return null;
 }
 
 export const HeadquartersInteriorScene = memo(function HeadquartersInteriorScene({ entity, reducedGraphics }: {

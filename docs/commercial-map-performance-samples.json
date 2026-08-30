@@ -1,0 +1,573 @@
+{
+  "environment": {
+    "build": "Vite development, HMR disabled",
+    "os": "Windows 10",
+    "browser": "Chromium 151",
+    "cpu": "Intel Core i5-1035G1",
+    "gpu": "ANGLE Intel UHD Graphics Direct3D11",
+    "browserDpr": 0.5,
+    "rendererDpr": 1,
+    "physicalMobile": false
+  },
+  "samples": [
+    {
+      "buffer": [
+        480,
+        783
+      ],
+      "cameraMs": 75.29999995231628,
+      "cameraStart": [
+        14.15201650290594,
+        284.8747606886705,
+        272.0133426292553
+      ],
+      "contextLost": 0,
+      "controlsCreates": 1,
+      "frames": 53,
+      "identities": {
+        "camera": true,
+        "canvas": true,
+        "controls": true,
+        "renderer": true,
+        "scene": true
+      },
+      "longTasks": [],
+      "maxFrameMs": 28.7,
+      "meanFrameMs": 16.70754716981133,
+      "mounts": 1,
+      "name": "final-portrait-C6-first-selection",
+      "reactMaxMs": 17.5,
+      "resources": {
+        "at": 33528,
+        "calls": 335,
+        "dpr": 1,
+        "geometries": 471,
+        "heapBytes": 889159157,
+        "height": 783,
+        "programs": 138,
+        "textures": 110,
+        "triangles": 483243,
+        "width": 480
+      },
+      "selectionMs": [
+        0.4000000953674317
+      ],
+      "start": 20961.599999904633,
+      "transition": {
+        "completedAt": 21900.5,
+        "durationMs": 900,
+        "elapsedMs": 907.7,
+        "sequence": 2,
+        "source": "selection:9ada0ab9-c467-468b-a83b-464b78f15f08",
+        "startedAt": 20992.8,
+        "status": "completed"
+      },
+      "viewport": [
+        480,
+        844
+      ],
+      "visualMs": 75.29999995231628
+    },
+    {
+      "buffer": [
+        480,
+        783
+      ],
+      "cameraMs": 100,
+      "cameraStart": [
+        30.522417286587636,
+        5.383349819620757,
+        35.01585224979157
+      ],
+      "contextLost": 0,
+      "controlsCreates": 1,
+      "frames": 45,
+      "identities": {
+        "camera": true,
+        "canvas": true,
+        "controls": true,
+        "renderer": true,
+        "scene": true
+      },
+      "longTasks": [
+        {
+          "at": 33612,
+          "attribution": [
+            {
+              "containerName": "",
+              "containerType": "window",
+              "name": "unknown"
+            }
+          ],
+          "duration": 50,
+          "type": "long-task"
+        }
+      ],
+      "maxFrameMs": 18.2,
+      "meanFrameMs": 16.25555555555556,
+      "mounts": 1,
+      "name": "final-portrait-B1-selection",
+      "reactMaxMs": 23.4,
+      "resources": {
+        "at": 46964.29999995232,
+        "calls": 108,
+        "dpr": 1,
+        "geometries": 477,
+        "heapBytes": 894357505,
+        "height": 783,
+        "programs": 137,
+        "textures": 103,
+        "triangles": 306716,
+        "width": 480
+      },
+      "selectionMs": [
+        0.2999999523162842
+      ],
+      "start": 33572.89999985695,
+      "transition": {
+        "completedAt": 34399.8,
+        "durationMs": 756.86,
+        "elapsedMs": 759.8,
+        "sequence": 3,
+        "source": "selection:79613909-7b3b-4935-bb7b-106f32ba925f",
+        "startedAt": 33640,
+        "status": "completed"
+      },
+      "viewport": [
+        480,
+        844
+      ],
+      "visualMs": 100
+    },
+    {
+      "background": true,
+      "buffer": [
+        480,
+        783
+      ],
+      "cameraMs": 134.59999990463257,
+      "cameraStart": [
+        -7.930478558615313,
+        22.384612491321732,
+        2.9335323973520904
+      ],
+      "contextLost": 0,
+      "controlsCreates": 1,
+      "fog": true,
+      "frames": 30,
+      "identities": {
+        "camera": true,
+        "canvas": true,
+        "controls": true,
+        "renderer": true,
+        "scene": true
+      },
+      "longTasks": [
+        {
+          "at": 47036.09999990463,
+          "attribution": [
+            {
+              "containerName": "",
+              "containerType": "window",
+              "name": "unknown"
+            }
+          ],
+          "duration": 52,
+          "type": "long-task"
+        },
+        {
+          "at": 47093.59999990463,
+          "attribution": [
+            {
+              "containerName": "",
+              "containerType": "window",
+              "name": "unknown"
+            }
+          ],
+          "duration": 59,
+          "type": "long-task"
+        }
+      ],
+      "maxFrameMs": 73.1,
+      "meanFrameMs": 18.513333333333335,
+      "mounts": 1,
+      "name": "final-portrait-B1-interior-first",
+      "newPrograms": [],
+      "reactMaxMs": 24.2,
+      "resources": {
+        "at": 57539.59999990463,
+        "calls": 18,
+        "dpr": 1,
+        "geometries": 482,
+        "heapBytes": 900310663,
+        "height": 783,
+        "programs": 137,
+        "textures": 106,
+        "triangles": 4878,
+        "width": 480
+      },
+      "selectionMs": [],
+      "start": 47013.5,
+      "transition": {
+        "completedAt": 47649.3,
+        "durationMs": 574.39,
+        "elapsedMs": 582.6,
+        "sequence": 4,
+        "source": "interior:79613909-7b3b-4935-bb7b-106f32ba925f",
+        "startedAt": 47066.7,
+        "status": "completed"
+      },
+      "viewport": [
+        480,
+        844
+      ],
+      "visualMs": 134.59999990463257
+    },
+    {
+      "background": true,
+      "buffer": [
+        480,
+        783
+      ],
+      "cameraMs": 119.29999995231628,
+      "cameraStart": [
+        -20.46021818181819,
+        15.188727272727272,
+        15.370909168072291
+      ],
+      "contextLost": 0,
+      "controlsCreates": 1,
+      "fog": true,
+      "frames": 31,
+      "identities": {
+        "camera": true,
+        "canvas": true,
+        "controls": true,
+        "renderer": true,
+        "scene": true
+      },
+      "longTasks": [
+        {
+          "at": 57663.199999809265,
+          "attribution": [
+            {
+              "containerName": "",
+              "containerType": "window",
+              "name": "unknown"
+            }
+          ],
+          "duration": 51,
+          "type": "long-task"
+        }
+      ],
+      "maxFrameMs": 55.3,
+      "meanFrameMs": 17.806451612903228,
+      "mounts": 1,
+      "name": "final-portrait-interior-return",
+      "reactMaxMs": 26.6,
+      "resources": {
+        "at": 70090.89999985695,
+        "calls": 108,
+        "dpr": 1,
+        "geometries": 477,
+        "heapBytes": 906133978,
+        "height": 783,
+        "programs": 146,
+        "textures": 103,
+        "triangles": 306716,
+        "width": 480
+      },
+      "selectionMs": [],
+      "start": 57587.09999990463,
+      "transition": {
+        "completedAt": 58215.8,
+        "durationMs": 574.39,
+        "elapsedMs": 586.1,
+        "sequence": 5,
+        "source": "interior-return",
+        "startedAt": 57629.7,
+        "status": "completed"
+      },
+      "viewport": [
+        480,
+        844
+      ],
+      "visualMs": 119.29999995231628
+    },
+    {
+      "buffer": [
+        480,
+        783
+      ],
+      "cameraMs": 103.29999995231628,
+      "cameraStart": [
+        -7.930478558615313,
+        22.384612491321732,
+        2.9335323973520904
+      ],
+      "contextLost": 0,
+      "controlsCreates": 1,
+      "frames": 48,
+      "identities": {
+        "camera": true,
+        "canvas": true,
+        "controls": true,
+        "renderer": true,
+        "scene": true
+      },
+      "longTasks": [],
+      "maxFrameMs": 41.4,
+      "meanFrameMs": 16.697916666666668,
+      "mounts": 1,
+      "name": "final-rapid-replacement",
+      "reactMaxMs": 21.5,
+      "resources": {
+        "at": 146307.79999995232,
+        "calls": 220,
+        "dpr": 1,
+        "geometries": 471,
+        "heapBytes": 921111855,
+        "height": 783,
+        "programs": 147,
+        "textures": 100,
+        "triangles": 280854,
+        "width": 480
+      },
+      "selectionMs": [
+        0.20000004768371585,
+        108.70000004768372
+      ],
+      "start": 70141.89999985695,
+      "transition": {
+        "completedAt": 71031.7,
+        "durationMs": 749.69,
+        "elapsedMs": 748.4,
+        "sequence": 7,
+        "source": "selection:484f2446-3536-422c-9e8b-6f02492bf654",
+        "startedAt": 70283.3,
+        "status": "completed"
+      },
+      "viewport": [
+        480,
+        844
+      ],
+      "visualMs": 103.29999995231628
+    }
+  ],
+  "stress": {
+    "selectionBatches": [
+      {
+        "after": {
+          "at": 392458.09999990463,
+          "calls": 230,
+          "dpr": 1,
+          "geometries": 471,
+          "heapBytes": 933081447,
+          "height": 783,
+          "programs": 147,
+          "textures": 102,
+          "triangles": 316706,
+          "width": 480
+        },
+        "background": true,
+        "before": {
+          "at": 386282.19999980927,
+          "calls": 220,
+          "dpr": 1,
+          "geometries": 471,
+          "heapBytes": 921174571,
+          "height": 783,
+          "programs": 147,
+          "textures": 100,
+          "triangles": 280854,
+          "width": 480
+        },
+        "contextLost": 0,
+        "controls": 1,
+        "count": 10,
+        "fog": true,
+        "interiors": false,
+        "longTasks": [
+          113,
+          156,
+          84
+        ],
+        "mounts": 1
+      },
+      {
+        "after": {
+          "at": 410175.2999999523,
+          "calls": 230,
+          "dpr": 1,
+          "geometries": 471,
+          "heapBytes": 916563245,
+          "height": 783,
+          "programs": 147,
+          "textures": 102,
+          "triangles": 316706,
+          "width": 480
+        },
+        "background": true,
+        "before": {
+          "at": 403538,
+          "calls": 273,
+          "dpr": 1,
+          "geometries": 471,
+          "heapBytes": 949320607,
+          "height": 783,
+          "programs": 147,
+          "textures": 102,
+          "triangles": 317994,
+          "width": 480
+        },
+        "contextLost": 0,
+        "controls": 1,
+        "count": 10,
+        "fog": true,
+        "interiors": false,
+        "longTasks": [
+          322,
+          236,
+          172
+        ],
+        "mounts": 1
+      },
+      {
+        "after": {
+          "at": 431707.09999990463,
+          "calls": 230,
+          "dpr": 1,
+          "geometries": 471,
+          "heapBytes": 938624399,
+          "height": 783,
+          "programs": 147,
+          "textures": 102,
+          "triangles": 316706,
+          "width": 480
+        },
+        "background": true,
+        "before": {
+          "at": 425579.5,
+          "calls": 273,
+          "dpr": 1,
+          "geometries": 471,
+          "heapBytes": 911228843,
+          "height": 783,
+          "programs": 147,
+          "textures": 102,
+          "triangles": 317994,
+          "width": 480
+        },
+        "contextLost": 0,
+        "controls": 1,
+        "count": 10,
+        "fog": true,
+        "interiors": false,
+        "longTasks": [],
+        "mounts": 1
+      }
+    ],
+    "interiorBatches": [
+      {
+        "after": {
+          "at": 456290.2999999523,
+          "calls": 101,
+          "dpr": 1,
+          "geometries": 480,
+          "heapBytes": 906045353,
+          "height": 783,
+          "programs": 146,
+          "textures": 103,
+          "triangles": 272510,
+          "width": 480
+        },
+        "background": true,
+        "before": {
+          "at": 446795.59999990463,
+          "calls": 273,
+          "dpr": 1,
+          "geometries": 471,
+          "heapBytes": 931298127,
+          "height": 783,
+          "programs": 147,
+          "textures": 102,
+          "triangles": 317994,
+          "width": 480
+        },
+        "contextLost": 0,
+        "controls": 1,
+        "count": 5,
+        "fog": true,
+        "interiors": true,
+        "longTasks": [
+          52,
+          54,
+          57,
+          171,
+          59
+        ],
+        "mounts": 1
+      },
+      {
+        "after": {
+          "at": 479802.39999985695,
+          "calls": 101,
+          "dpr": 1,
+          "geometries": 480,
+          "heapBytes": 930627348,
+          "height": 783,
+          "programs": 146,
+          "textures": 103,
+          "triangles": 272510,
+          "width": 480
+        },
+        "background": true,
+        "before": {
+          "at": 471034.2999999523,
+          "calls": 101,
+          "dpr": 1,
+          "geometries": 480,
+          "heapBytes": 918613601,
+          "height": 783,
+          "programs": 146,
+          "textures": 103,
+          "triangles": 272510,
+          "width": 480
+        },
+        "contextLost": 0,
+        "controls": 1,
+        "count": 5,
+        "fog": true,
+        "interiors": true,
+        "longTasks": [],
+        "mounts": 1
+      }
+    ]
+  },
+  "workspaces": [
+    {
+      "canvases": 1,
+      "mode": "list",
+      "mounts": 1,
+      "sameCanvas": true
+    },
+    {
+      "canvases": 1,
+      "mode": "create",
+      "mounts": 1,
+      "sameCanvas": true
+    },
+    {
+      "canvases": 1,
+      "mode": "edit",
+      "mounts": 1,
+      "sameCanvas": true
+    },
+    {
+      "canvases": 1,
+      "mode": "3d",
+      "mounts": 1,
+      "sameCanvas": true
+    }
+  ]
+}

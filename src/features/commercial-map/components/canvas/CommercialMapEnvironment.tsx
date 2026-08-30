@@ -1,8 +1,15 @@
-import { memo, useEffect, useMemo, useRef } from 'react';
-import { Bloom, EffectComposer, ToneMapping } from '@react-three/postprocessing';
+import { memo, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import { Sky } from 'three/examples/jsm/objects/Sky.js';
-import { ToneMappingMode } from 'postprocessing';
+import {
+  BlendFunction,
+  BloomEffect,
+  EffectComposer,
+  EffectPass,
+  RenderPass,
+  ToneMappingEffect,
+  ToneMappingMode,
+} from 'postprocessing';
 import * as THREE from 'three';
 import {
   COMMERCIAL_MAP_ENVIRONMENT_CONFIG,
@@ -23,6 +30,7 @@ import {
 } from './openGroundTextures';
 
 interface CommercialMapEnvironmentProps {
+  active?: boolean;
   extent: CommercialMapEnvironmentExtent;
   hydrologicalModeActive: boolean;
   reducedGraphics: boolean;
@@ -367,31 +375,192 @@ function updateSkyFrame(sky: SunriseSky, frame: CommercialMapSunriseFrame) {
   material.uniforms.sunriseProgress.value = frame.easedProgress;
 }
 
-function SunrisePostProcessing({
+/** The installed React wrapper removes, but does not dispose, EffectPasses when
+ * its JSX children change. Own this fixed stack so active-scene changes never
+ * recreate passes, attach duplicate effect listeners, or retire render targets.
+ */
+function createCommercialMapPostProcessing(
+  gl: THREE.WebGLRenderer,
+  scene: THREE.Scene,
+  camera: THREE.Camera,
+  bloomLevels: number,
+) {
+  const previousAutoClear = gl.autoClear;
+  const composer = new EffectComposer(gl, {
+    multisampling: 0,
+    frameBufferType: THREE.HalfFloatType,
+  });
+  // EffectComposer's constructor changes this global renderer setting. It is
+  // needed only during our render pass, never while the interior renders direct.
+  gl.autoClear = previousAutoClear;
+  const bloom = new BloomEffect({
+    blendFunction: BlendFunction.ADD,
+    intensity: 0.58,
+    luminanceThreshold: 3.2,
+    luminanceSmoothing: 0.16,
+    mipmapBlur: true,
+    levels: bloomLevels,
+  });
+  const toneMapping = new ToneMappingEffect({ mode: ToneMappingMode.ACES_FILMIC });
+  const renderPass = new RenderPass(scene, camera);
+  // Both effects have EffectAttribute.NONE in the installed dependency and the
+  // React wrapper combined them in this exact order into a single EffectPass.
+  const effectPass = new EffectPass(camera, bloom, toneMapping);
+  composer.addPass(renderPass);
+  composer.addPass(effectPass);
+  let disposed = false;
+  let selectionShadersPrepared = false;
+  return {
+    composer,
+    bloom,
+    toneMapping,
+    prepareSelectionShaders: () => {
+      if (selectionShadersPrepared) return;
+      const highlights = scene.getObjectByName('commercial-map-selection-shader-warmup');
+      if (!highlights) return;
+      selectionShadersPrepared = true;
+      const previousTarget = gl.getRenderTarget();
+      const previousFace = gl.getActiveCubeFace();
+      const previousLevel = gl.getActiveMipmapLevel();
+      try {
+        // Preload's default-framebuffer compile uses sRGB output, whereas the
+        // exterior RenderPass writes linear HDR into this actual shared target.
+        // Compile only the four highlight probes with the live scene's lights
+        // and fog, without rendering a frame or changing shared materials.
+        gl.setRenderTarget(composer.inputBuffer);
+        gl.compile(highlights, camera, scene);
+      } catch (error) {
+        // Optional precompilation must never take the persistent map down.
+        if (import.meta.env.DEV) {
+          gl.domElement.dataset.commercialMapSelectionShaderWarmupError = error instanceof Error
+            ? error.message
+            : String(error);
+        }
+      } finally {
+        gl.setRenderTarget(previousTarget, previousFace, previousLevel);
+      }
+    },
+    dispose: () => {
+      if (disposed) return;
+      disposed = true;
+      // This stack exclusively owns its effects, passes, and render targets.
+      // There are no R3F effect children that can dispose them a second time.
+      composer.dispose();
+    },
+  };
+}
+
+export function SunrisePostProcessing({
   qualityTier,
+  enabled,
 }: {
   qualityTier: CommercialMapSunriseQualityTier;
+  enabled: boolean;
 }) {
+  const gl = useThree((state) => state.gl);
+  const scene = useThree((state) => state.scene);
+  const camera = useThree((state) => state.camera);
+  const size = useThree((state) => state.size);
+  const invalidate = useThree((state) => state.invalidate);
   const quality = COMMERCIAL_MAP_ENVIRONMENT_CONFIG.sunrise.quality[qualityTier];
-  if (!quality.bloomEnabled) return null;
-  return (
-    <EffectComposer
-      multisampling={0}
-      enableNormalPass={false}
-    >
-      <Bloom
-        intensity={0.58}
-        luminanceThreshold={3.2}
-        luminanceSmoothing={0.16}
-        mipmapBlur
-        levels={quality.bloomLevels}
-      />
-      <ToneMapping mode={ToneMappingMode.ACES_FILMIC} />
-    </EffectComposer>
-  );
+  const pipeline = useRef<ReturnType<typeof createCommercialMapPostProcessing> | null>(null);
+  const rendererState = useRef({ autoClear: gl.autoClear, toneMapping: gl.toneMapping });
+
+  useLayoutEffect(() => {
+    const previous = { autoClear: gl.autoClear, toneMapping: gl.toneMapping };
+    rendererState.current = previous;
+    return () => {
+      gl.autoClear = previous.autoClear;
+      gl.toneMapping = previous.toneMapping;
+    };
+  }, [gl]);
+
+  useLayoutEffect(() => {
+    if (!quality.bloomEnabled) return;
+    const next = createCommercialMapPostProcessing(gl, scene, camera, quality.bloomLevels);
+    pipeline.current = next;
+    invalidate();
+    return () => {
+      if (pipeline.current === next) pipeline.current = null;
+      next.dispose();
+    };
+  }, [camera, gl, invalidate, quality.bloomEnabled, quality.bloomLevels, scene]);
+
+  useLayoutEffect(() => {
+    pipeline.current?.composer.setSize(size.width, size.height);
+  }, [quality.bloomEnabled, quality.bloomLevels, size.height, size.width]);
+
+  useLayoutEffect(() => {
+    // A disabled composer no longer owns output encoding. Restore the same
+    // renderer ACES pipeline the interiors used before exterior caching.
+    gl.toneMapping = enabled && quality.bloomEnabled
+      ? THREE.NoToneMapping
+      : rendererState.current.toneMapping;
+    gl.autoClear = rendererState.current.autoClear;
+    if (enabled) pipeline.current?.prepareSelectionShaders();
+    invalidate();
+  }, [enabled, gl, invalidate, quality.bloomEnabled]);
+
+  useFrame((_state, delta) => {
+    if (!enabled || !pipeline.current) return;
+    const previousAutoClear = gl.autoClear;
+    gl.autoClear = true;
+    try {
+      pipeline.current.composer.render(delta);
+    } finally {
+      gl.autoClear = previousAutoClear;
+    }
+  }, enabled && quality.bloomEnabled ? 1 : 0);
+
+  return null;
+}
+
+/** Acquire scene globals after all R3F attach/detach mutations have finished. */
+export function CommercialMapSceneEnvironment({
+  active,
+  background,
+  fog,
+  reflectionTexture,
+  environmentIntensity,
+}: {
+  active: boolean;
+  background: THREE.Color;
+  fog: THREE.Fog;
+  reflectionTexture: THREE.Texture;
+  environmentIntensity: number;
+}) {
+  const scene = useThree((state) => state.scene);
+  const invalidate = useThree((state) => state.invalidate);
+
+  useLayoutEffect(() => {
+    if (!active) return;
+    const previousBackground = scene.background;
+    const previousFog = scene.fog;
+    const previousEnvironment = scene.environment;
+    const previousEnvironmentIntensity = scene.environmentIntensity;
+    scene.background = background;
+    scene.fog = fog;
+    scene.environment = reflectionTexture;
+    scene.environmentIntensity = environmentIntensity;
+    invalidate();
+
+    return () => {
+      // An interior may already own a field when this layout cleanup runs.
+      // Never let the departing exterior overwrite the new scene owner.
+      if (scene.background === background) scene.background = previousBackground;
+      if (scene.fog === fog) scene.fog = previousFog;
+      if (scene.environment === reflectionTexture) {
+        scene.environment = previousEnvironment;
+        scene.environmentIntensity = previousEnvironmentIntensity;
+      }
+    };
+  }, [active, background, environmentIntensity, fog, invalidate, reflectionTexture, scene]);
+
+  return null;
 }
 
 export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
+  active = true,
   extent,
   hydrologicalModeActive,
   reducedGraphics,
@@ -516,7 +685,6 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
   );
   const ambientRef = useRef<THREE.AmbientLight>(null);
   const hemisphereRef = useRef<THREE.HemisphereLight>(null);
-  const fogRef = useRef<THREE.Fog>(null);
   const timeline = useRef({
     sequence: -1,
     lastAppliedProgress: -1,
@@ -540,21 +708,15 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
       : COMMERCIAL_MAP_ENVIRONMENT_CONFIG.sunrise.colors.finalHorizonCool),
     [mode, palette.horizon],
   );
+  const background = useMemo(() => new THREE.Color(palette.fallback), [palette.fallback]);
+  const fog = useMemo(() => new THREE.Fog(preSunriseFog, 0, 1), [preSunriseFog]);
 
-  useEffect(() => {
-    const previousEnvironment = scene.environment;
-    const previousEnvironmentIntensity = scene.environmentIntensity;
-    scene.environment = reflectionTexture;
-    scene.environmentIntensity = initialFrame.environmentIntensity;
-    invalidate();
-    return () => {
-      if (scene.environment === reflectionTexture) {
-        scene.environment = previousEnvironment;
-        scene.environmentIntensity = previousEnvironmentIntensity;
-      }
-      reflectionTexture.dispose();
-    };
-  }, [initialFrame.environmentIntensity, invalidate, reflectionTexture, scene]);
+  useLayoutEffect(() => {
+    fog.near = layout.fogNear;
+    fog.far = layout.fogFar;
+  }, [fog, layout.fogFar, layout.fogNear]);
+
+  useEffect(() => () => reflectionTexture.dispose(), [reflectionTexture]);
 
   useEffect(() => {
     timeline.current.sequence = sunriseSequence;
@@ -564,6 +726,7 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
     timeline.current.lastCameraSignature = '';
     invalidate();
   }, [
+    active,
     celestialSun,
     invalidate,
     layout.fogFar,
@@ -580,7 +743,20 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
   useEffect(() => {
     // The first demand-render compiles the persistent post stack. Compile the
     // scene once more before starting so a replay never allocates or flashes.
+    const compileStartedAt = typeof performance === 'undefined' ? Date.now() : performance.now();
+    const programsBefore = gl.info.programs?.length ?? 0;
     gl.compile(scene, camera);
+    if (import.meta.env.DEV) {
+      const compileCompletedAt = typeof performance === 'undefined' ? Date.now() : performance.now();
+      gl.domElement.dataset.commercialMapShaderCompilation = JSON.stringify({
+        startedAt: Number(compileStartedAt.toFixed(2)),
+        durationMs: Number((compileCompletedAt - compileStartedAt).toFixed(2)),
+        programsBefore,
+        programsAfter: gl.info.programs?.length ?? 0,
+        geometries: gl.info.memory.geometries,
+        textures: gl.info.memory.textures,
+      });
+    }
     if (useCommercialMapStore.getState().sunrisePhase === 'idle') requestSunrise();
     else invalidate();
   }, [camera, gl, invalidate, requestSunrise, scene]);
@@ -604,6 +780,7 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
   }, [activeGroundTextures]);
 
   useFrame(() => {
+    if (!active) return;
     const liveState = useCommercialMapStore.getState();
     const now = typeof performance === 'undefined' ? Date.now() : performance.now();
     const isRunning = liveState.sunrisePhase === 'running';
@@ -648,10 +825,8 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
       sunLight.updateMatrixWorld();
       if (ambientRef.current) ambientRef.current.intensity = frame.ambientIntensity;
       if (hemisphereRef.current) hemisphereRef.current.intensity = frame.hemisphereIntensity;
-      if (fogRef.current) {
-        fogColor.lerpColors(preSunriseFog, finalSunriseFog, frame.cloudWarmth);
-        fogRef.current.color.copy(fogColor);
-      }
+      fogColor.lerpColors(preSunriseFog, finalSunriseFog, frame.cloudWarmth);
+      fog.color.copy(fogColor);
       scene.environmentIntensity = frame.environmentIntensity;
     }
 
@@ -717,8 +892,14 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
 
   return (
     <>
-      <color attach="background" args={[palette.fallback]} />
-      <fog ref={fogRef} attach="fog" args={[preSunriseFog, layout.fogNear, layout.fogFar]} />
+      <CommercialMapSceneEnvironment
+        active={active}
+        background={background}
+        fog={fog}
+        reflectionTexture={reflectionTexture}
+        environmentIntensity={initialFrame.environmentIntensity}
+      />
+      <group visible={active}>
       <primitive object={sky} dispose={null} />
       <primitive object={celestialSun} dispose={null} />
       <primitive object={sunTarget} dispose={null} />
@@ -746,7 +927,8 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
           envMapIntensity={0.12}
         />
       </mesh>
-      <SunrisePostProcessing qualityTier={qualityTier} />
+      </group>
+      <SunrisePostProcessing qualityTier={qualityTier} enabled={active} />
     </>
   );
 });

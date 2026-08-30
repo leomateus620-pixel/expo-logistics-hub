@@ -40,21 +40,22 @@ describe('renderização compartilhada dos módulos internos', () => {
     const interior = read('src/features/commercial-map/components/canvas/CommercialPavilionInteriorScene.tsx');
     const page = read('src/features/commercial-map/CommercialMapPage.tsx');
     const panels = read('src/features/commercial-map/components/panels/MapPanels.tsx');
+    const canvas = read('src/features/commercial-map/components/canvas/CommercialMapCanvas.tsx');
 
     expect(exterior).toContain('<CommercialPavilionModuleLayer');
     expect(exterior).toContain('mode="cutaway"');
     expect(interior).toContain('<CommercialPavilionModuleLayer');
-    expect(interior).toContain('touches={{ ONE: THREE.TOUCH.PAN, TWO: THREE.TOUCH.DOLLY_ROTATE }}');
-    expect(interior).toContain('setCameraNavigating(true)');
-    expect(interior).toContain('setCameraNavigating(false)');
+    expect(canvas).toContain('touches={{ ONE: THREE.TOUCH.PAN, TWO: THREE.TOUCH.DOLLY_ROTATE }}');
+    expect(canvas).toContain('setCameraNavigating(true)');
+    expect(canvas).toContain('setCameraNavigating(false)');
+    expect(interior).toContain('useInteriorCameraRequest(request)');
     expect(interior).toContain('mode="interior"');
-    expect(interior).toContain('const cameraFacing = facing + interiorViewRotation');
     expect(interior).toContain('labelRotationRadians={interiorViewRotation}');
     expect(interior).toContain('interiorViewRotation={interiorViewRotation}');
-    expect(interior).toContain('applyAxisAngle(UP, cameraFacing)');
+    expect(interior).toContain('applyAxisAngle(UP, facing + interiorViewRotation)');
     expect(exterior).not.toContain('labelRotationRadians=');
     expect(layer).toContain('context.rotate(labelRotationRadians)');
-    expect(interior).toContain('minDistance={maximumDimension * 0.2}');
+    expect(interior).toContain('minDistance: maximumDimension * 0.2');
     expect(page).toContain('<PavilionPlanLegend plan={interiorPavilionPlan} variant="interior" />');
     expect(panels).toContain('<PavilionPlanLegend plan={pavilionPlan} />');
   });

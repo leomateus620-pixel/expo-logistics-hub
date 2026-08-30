@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { Profiler, Suspense, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import {
   AlertTriangle,
@@ -44,6 +44,7 @@ import { PavilionModuleCard } from './components/panels/PavilionModuleCard';
 import { PavilionPlanLegend } from './components/panels/PavilionPlanLegend';
 import { HydrologicalNetworkLegend } from './components/panels/HydrologicalNetworkLegend';
 import { ParkingInspector } from './components/panels/ParkingInspector';
+import { MapPanelBoundary } from './components/panels/MapPanelBoundary';
 import { SegmentLegend } from './components/segments/SegmentLegend';
 import { resolveStrategicLandmarkKind } from './utils/landmarks';
 import { resolveCommercialPavilionModulePlan } from './utils/commercialPavilionModules';
@@ -64,6 +65,7 @@ import {
 } from './utils/areaScope';
 import { canUseTechnicalValidationOverlay } from './utils/technicalValidation';
 import { lunarLaunchPhaseLabel } from './utils/lunarLaunch';
+import { recordCommercialMapProfiler } from './utils/runtimeDiagnostics';
 import type { CommercialMapData, CommercialMapQueryScope, MapPermissions } from './types';
 import './commercial-map.css';
 import './commercial-map-mobile.css';
@@ -82,6 +84,28 @@ function MapPageSkeleton() {
     <div className="commercial-map-shell is-loading">
       <div className="commercial-map-page-loader"><Loader2 /><strong>Carregando mapa comercial</strong><span>Sincronizando projeto, camadas e situação dos lotes…</span></div>
     </div>
+  );
+}
+
+function EntityDetailsPanelSkeleton() {
+  return (
+    <aside
+      className="commercial-map-panel commercial-map-details-panel commercial-map-details-skeleton"
+      aria-label="Carregando detalhes da estrutura"
+      aria-live="polite"
+    >
+      <div className="commercial-map-panel-header">
+        <div>
+          <span>Estrutura selecionada</span>
+          <h2>Carregando detalhes…</h2>
+        </div>
+      </div>
+      <div className="commercial-map-details-skeleton__content" aria-hidden="true">
+        <i />
+        <i />
+        <i />
+      </div>
+    </aside>
   );
 }
 
@@ -378,7 +402,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
     : `Referência cartográfica: ${data?.project.name ?? 'Fenasoja 2028'}`;
 
   if (mapQuery.isLoading) return <MapPageSkeleton />;
-  if (mapQuery.isError || !data) {
+  if (!data) {
     return (
       <section className="commercial-map-shell" aria-label="Falha ao carregar o mapa comercial">
         <div className="commercial-map-page-error" role="alert">
@@ -522,27 +546,27 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
 
         <div id="commercial-map-viewport" className="commercial-map-viewport">
 
-        {workspaceMode === 'create' ? (
-          <LotCreationWorkspace project={data.project} calibration={data.calibration} layers={data.layers} entities={scopedData.entities} />
-        ) : workspaceMode === 'edit' && selectedEntity ? (
-          <GeometryEditor entity={selectedEntity} calibration={data.calibration} />
-        ) : workspaceMode === 'list' || !webglAvailable ? (
-          <MapListView explorer={mapFilter} permissions={permissions} />
-        ) : (
+        {webglAvailable && (
           <>
-            <div className="commercial-map-stage">
-              <CommercialMapCanvas
-                entities={scopedData.entities}
-                parkingOwnerEntities={data.entities}
-                siteEnvironmentEntities={data.entities}
-                lots={scopedData.lots}
-                calibration={data.calibration}
-                matchingEntityIds={mapFilter.matchingEntityIds}
-                filtersActive={mapFilter.hasActiveCriteria}
-                isolatedArea={areaScope === 'park' ? null : areaScope}
-                segmentOverride={isCommissionScope ? scopedSegment : null}
-                technicalValidationAllowed={technicalValidationAllowed}
-              />
+            <div
+              className={`commercial-map-stage ${workspaceMode === '3d' ? '' : 'is-inactive'}`}
+              aria-hidden={workspaceMode !== '3d'}
+              data-canvas-lifecycle="persistent"
+            >
+              <Profiler id="CommercialMapCanvas" onRender={recordCommercialMapProfiler}>
+                <CommercialMapCanvas
+                  entities={scopedData.entities}
+                  parkingOwnerEntities={data.entities}
+                  siteEnvironmentEntities={data.entities}
+                  lots={scopedData.lots}
+                  calibration={data.calibration}
+                  matchingEntityIds={mapFilter.matchingEntityIds}
+                  filtersActive={mapFilter.hasActiveCriteria}
+                  isolatedArea={areaScope === 'park' ? null : areaScope}
+                  segmentOverride={isCommissionScope ? scopedSegment : null}
+                  technicalValidationAllowed={technicalValidationAllowed}
+                />
+              </Profiler>
               <div
                 className="commercial-map-lunar-launch-hud"
                 data-phase={lunarLaunchPhase}
@@ -674,16 +698,18 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
               )}
             </div>
 
-            {!interiorEntityId && activePanel === 'layers' && (
+            {workspaceMode === '3d' && !interiorEntityId && activePanel === 'layers' && (
+              <Suspense fallback={null}>
               <LayersPanel
                 layers={data.layers}
                 entities={scopedData.entities}
                 lots={scopedData.lots}
                 permissions={permissions}
               />
+              </Suspense>
             )}
-            {!interiorEntityId && activePanel === 'results' && <ResultsPanel explorer={mapFilter} />}
-            {!interiorEntityId
+            {workspaceMode === '3d' && !interiorEntityId && activePanel === 'results' && <Suspense fallback={null}><ResultsPanel explorer={mapFilter} /></Suspense>}
+            {workspaceMode === '3d' && !interiorEntityId
               && selectedEntity
               && (activePanel === 'details' || lunarLaunchPreviousPanel === 'details')
               && (
@@ -691,11 +717,42 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
                   className="commercial-map-details-panel-presence"
                   hidden={activePanel !== 'details' || lunarCinematicUiActive}
                 >
-                  <EntityDetailsPanel key={selectedEntity.id} entity={selectedEntity} lot={selectedLot} entities={scopedData.entities} lots={scopedData.lots} permissions={permissions} />
+                  <MapPanelBoundary resetKey={selectedEntity.id}>
+                    <Suspense fallback={<EntityDetailsPanelSkeleton />}>
+                      <EntityDetailsPanel entity={selectedEntity} lot={selectedLot} entities={scopedData.entities} lots={scopedData.lots} permissions={permissions} />
+                    </Suspense>
+                  </MapPanelBoundary>
                 </div>
               )}
-            {!interiorEntityId && activePanel === 'calibration' && <CalibrationPanel project={data.project} calibration={data.calibration} />}
+            {workspaceMode === '3d' && !interiorEntityId && activePanel === 'calibration' && <CalibrationPanel project={data.project} calibration={data.calibration} />}
           </>
+        )}
+
+        {mapQuery.isError && (
+          <div className="commercial-map-sync-warning" role="status">
+            <AlertTriangle />
+            <span><strong>Atualização temporariamente indisponível</strong>O último mapa válido permanece ativo.</span>
+            <Button size="sm" variant="outline" onClick={() => mapQuery.refetch()} disabled={mapQuery.isFetching}>
+              <RefreshCw className={mapQuery.isFetching ? 'animate-spin' : ''} />
+              Tentar novamente
+            </Button>
+          </div>
+        )}
+
+        {workspaceMode === 'create' && (
+          <div className="commercial-map-workspace-layer">
+            <LotCreationWorkspace project={data.project} calibration={data.calibration} layers={data.layers} entities={scopedData.entities} />
+          </div>
+        )}
+        {workspaceMode === 'edit' && selectedEntity && (
+          <div className="commercial-map-workspace-layer">
+            <GeometryEditor entity={selectedEntity} calibration={data.calibration} />
+          </div>
+        )}
+        {(workspaceMode === 'list' || (!webglAvailable && workspaceMode === '3d')) && (
+          <div className="commercial-map-workspace-layer is-list-view">
+            <MapListView explorer={mapFilter} permissions={permissions} />
+          </div>
         )}
 
         {!webglAvailable && workspaceMode !== 'edit' && (

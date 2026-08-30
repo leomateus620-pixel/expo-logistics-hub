@@ -23,7 +23,7 @@ describe('renderer operacional do interior comercial', () => {
 
     expect(layer).toContain('ref={setModuleBaseMesh}');
     expect(layer).toMatch(/ref=\{setCorridorMesh\}[\s\S]*?raycast=\{NO_RAYCAST\}/);
-    expect(layer).toContain('isMapSelectionClick(event.delta)');
+    expect(layer).toContain('isMapSelectionClick(event.delta, event.nativeEvent)');
     expect(interior).toContain("modulePlan.source.interpretation === 'official-reference-runs'");
     expect(interior).toContain('modulePlan.supportSpaces');
     expect(interior).toContain('moduleRenderParts(cell)');
@@ -78,7 +78,7 @@ describe('renderer operacional do interior comercial', () => {
     expect(canvas).toContain('const exteriorRenderedEntities');
     expect(canvas).toContain('entities={entities}');
     expect(canvas).toContain('lots={lots}');
-    expect(canvas).toContain('entities: exteriorRenderedEntities');
+    expect(canvas).toContain('surfaceEntities={exteriorRenderedEntities}');
   });
 
   it('reutiliza a situação persistida também no recorte externo do pavilhão', () => {
