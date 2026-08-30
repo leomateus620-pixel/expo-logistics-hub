@@ -11,7 +11,7 @@ import {
   shouldRenderArenaStructures,
   sourceBoundsToLocal,
 } from '@/features/commercial-map/data/parkEnvironment';
-import { OFFICIAL_REFERENCE_DATA } from '@/features/commercial-map/data/officialReference2026';
+import { OFFICIAL_REFERENCE_DATA, OFFICIAL_REFERENCE_ENTITIES } from '@/features/commercial-map/data/officialReference2026';
 import {
   resolveStrategicLandmarkKind,
   strategicLandmarkVisualHeight,
