@@ -102,6 +102,9 @@ import {
   isCommercialMapHydrologicalPortraitViewport,
   resolveCommercialMapHydrologicalPortraitTargetShift,
   resolveCommercialMapPixelRatio,
+  clampCommercialMapCameraPosition,
+  resolveCommercialMapCameraDistanceBounds,
+  resolveCommercialMapCameraFarPlane,
   resolveCommercialMapCameraNearPlane,
   shouldSuppressCommercialMapResizeRefit,
 } from '../../utils/viewport';
@@ -1657,8 +1660,33 @@ function CameraRig({
   const parkingActive = parkingInspectionOpen
     && rearParkingVisibleInArea(isolatedArea)
     && !hydrologicalModeActive;
-  // Retain the close-range clamp when the inspector closes. Restoring the
-  // global minimum immediately would move the camera without a navigation action.
+  const parkingFocusBounds = useMemo(
+    () => getRearParkingFocusBounds(
+      selectedParkingBlockId,
+      parkingCameraView === 'detail' ? selectedParkingSpaceId : null,
+      parkingCameraView,
+    ),
+    [
+      parkingCameraView,
+      selectedParkingBlockId,
+      selectedParkingSpaceId,
+    ],
+  );
+  const parkingFramingExtent = useMemo<SceneExtent>(() => {
+    const width = Math.max(1, parkingFocusBounds.maxX - parkingFocusBounds.minX);
+    const depth = Math.max(1, parkingFocusBounds.maxZ - parkingFocusBounds.minZ);
+    return {
+      ...parkingFocusBounds,
+      width,
+      depth,
+      centerX: (parkingFocusBounds.minX + parkingFocusBounds.maxX) / 2,
+      centerZ: (parkingFocusBounds.minZ + parkingFocusBounds.maxZ) / 2,
+      maxHeight: 1,
+      diagonal: Math.hypot(width, depth),
+    };
+  }, [parkingFocusBounds]);
+  // Parking may temporarily use a closer minimum; closing it transitions back
+  // to the exterior safety envelope through the same damped camera path.
   const [parkingControlLimits, setParkingControlLimits] = useState<{
     minDistance: number;
     maxDistance: number;
@@ -1672,14 +1700,84 @@ function CameraRig({
   const lunarCameraLocked = lunarLaunchPhase !== 'idle' || lunarLaunchReturning;
   const lunarCameraLockedRef = useRef(lunarCameraLocked);
   lunarCameraLockedRef.current = lunarCameraLocked;
+  const cameraDistanceBounds = useMemo(
+    () => resolveCommercialMapCameraDistanceBounds({
+      bounds: extent,
+      verticalFovDegrees: 38,
+      aspect: size.width / Math.max(size.height, 1),
+    }),
+    [extent, size.height, size.width],
+  );
+  const cameraFarPlane = useMemo(
+    () => resolveCommercialMapCameraFarPlane(extent, cameraDistanceBounds.maxDistance),
+    [cameraDistanceBounds.maxDistance, extent],
+  );
+  const selectedKind = selectedEntity ? resolveStrategicLandmarkKind(selectedEntity) : null;
+  const miranteSelected = selectedKind === 'mirante-pavilion';
+  const miranteExtent = useMemo(
+    () => (miranteSelected && selectedEntity ? getEntityExtent(selectedEntity) : null),
+    [miranteSelected, selectedEntity],
+  );
+  const segmentExtent = useMemo(
+    () => (activeSegment && activeSegmentEntities.length > 0
+      ? getSceneExtent(activeSegmentEntities)
+      : null),
+    [activeSegment, activeSegmentEntities],
+  );
+  const focusedCameraDistanceBounds = useMemo(
+    () => resolveCommercialMapCameraDistanceBounds({
+      bounds: miranteExtent ?? segmentExtent ?? extent,
+      verticalFovDegrees: 38,
+      aspect: size.width / Math.max(size.height, 1),
+    }),
+    [extent, miranteExtent, segmentExtent, size.height, size.width],
+  );
+  const requestedMinimumDistance = miranteExtent
+    ? Math.max(7.5, miranteExtent.diagonal * 0.8)
+    : segmentExtent && activeSegment
+      ? Math.max(6.5, segmentExtent.diagonal * activeSegment.camera.minDistanceRatio)
+      : isolatedArea
+        ? Math.max(6.5, extent.diagonal * 0.12)
+        : cameraDistanceBounds.minDistance;
+  const requestedMaximumDistance = miranteExtent
+    ? Math.max(30, miranteExtent.diagonal * 4, focusedCameraDistanceBounds.maxDistance)
+    : segmentExtent && activeSegment
+      ? Math.max(
+          96,
+          segmentExtent.diagonal * activeSegment.camera.maxDistanceRatio,
+          focusedCameraDistanceBounds.maxDistance,
+        )
+      : isolatedArea
+        ? Math.max(96, extent.diagonal * 2.15, focusedCameraDistanceBounds.maxDistance)
+        : cameraDistanceBounds.maxDistance;
+  const controlsMinimumDistance = Math.min(
+    requestedMinimumDistance,
+    cameraDistanceBounds.maxDistance,
+  );
+  const controlsMaximumDistance = Math.max(
+    controlsMinimumDistance,
+    Math.min(requestedMaximumDistance, cameraDistanceBounds.maxDistance),
+  );
+  const effectiveControlsMinimumDistance = parkingControlLimits?.minDistance
+    ?? controlsMinimumDistance;
+  const effectiveControlsMaximumDistance = parkingControlLimits?.maxDistance
+    ?? controlsMaximumDistance;
+  const [appliedControlLimits, setAppliedControlLimits] = useState(() => ({
+    minDistance: effectiveControlsMinimumDistance,
+    maxDistance: effectiveControlsMaximumDistance,
+  }));
   const targetPosition = useRef(new THREE.Vector3());
   const targetLookAt = useRef(new THREE.Vector3(extent.centerX, 0, extent.centerZ));
   const animating = useRef(true);
   const navigation = useRef({
     active: false,
     navigating: false,
+    settling: false,
+    stableFrames: 0,
     startPosition: new THREE.Vector3(),
     startTarget: new THREE.Vector3(),
+    lastPosition: new THREE.Vector3(),
+    lastTarget: new THREE.Vector3(),
   });
   const initialized = useRef(false);
   const previousPreset = useRef<CameraPreset>(preset);
@@ -1702,6 +1800,7 @@ function CameraRig({
   const resizeRefitSuppressedUntil = useRef(0);
   const resizeRefitView = useRef<() => void>(() => undefined);
   const suppressNextDetailsRefit = useRef(false);
+  const lunarReturnBoundsSignature = useRef('');
   const lunarPath = useRef<LunarCameraPathState>({
     active: false,
     returning: false,
@@ -1761,11 +1860,301 @@ function CameraRig({
       ascentProgress: 0,
     } as LunarLaunchMotionSample,
   });
-  const startCameraMove = useCallback(() => {
+  const cameraScratch = useRef({
+    targetBeforeClamp: new THREE.Vector3(),
+    targetShift: new THREE.Vector3(),
+  });
+  const cameraDiagnosticsAt = useRef(0);
+  const clampCameraTarget = useCallback((
+    target: THREE.Vector3,
+    position: THREE.Vector3,
+    distance: number,
+    maximumDistance: number,
+  ) => {
+    const framingExtent = parkingActive
+      ? parkingFramingExtent
+      : miranteExtent ?? segmentExtent ?? extent;
+    const margin = isolatedArea
+      ? Math.max(1.6, framingExtent.diagonal * 0.035)
+      : Math.max(3, framingExtent.diagonal * 0.08);
+    const boundaryStart = maximumDistance * 0.72;
+    const boundaryRange = Math.max(0.001, maximumDistance - boundaryStart);
+    const rawBoundaryProgress = THREE.MathUtils.clamp(
+      (distance - boundaryStart) / boundaryRange,
+      0,
+      1,
+    );
+    const boundaryProgress = rawBoundaryProgress * rawBoundaryProgress
+      * (3 - 2 * rawBoundaryProgress);
+    const targetSlack = Math.max(
+      1.5,
+      Math.hypot(framingExtent.width, framingExtent.depth) * 0.018,
+    );
+    const minimumX = THREE.MathUtils.lerp(
+      framingExtent.minX - margin,
+      framingExtent.centerX - targetSlack,
+      boundaryProgress,
+    );
+    const maximumX = THREE.MathUtils.lerp(
+      framingExtent.maxX + margin,
+      framingExtent.centerX + targetSlack,
+      boundaryProgress,
+    );
+    const minimumZ = THREE.MathUtils.lerp(
+      framingExtent.minZ - margin,
+      framingExtent.centerZ - targetSlack,
+      boundaryProgress,
+    );
+    const maximumZ = THREE.MathUtils.lerp(
+      framingExtent.maxZ + margin,
+      framingExtent.centerZ + targetSlack,
+      boundaryProgress,
+    );
+    const targetMinimumY = miranteSelected ? -framingExtent.maxHeight * 1.2 : 0;
+    const targetMaximumY = THREE.MathUtils.lerp(
+      framingExtent.maxHeight * 2 + 4,
+      Math.max(1, framingExtent.maxHeight * 0.55),
+      boundaryProgress,
+    );
+    const scratch = cameraScratch.current;
+    scratch.targetBeforeClamp.copy(target);
+    target.set(
+      THREE.MathUtils.clamp(target.x, minimumX, maximumX),
+      THREE.MathUtils.clamp(target.y, targetMinimumY, targetMaximumY),
+      THREE.MathUtils.clamp(target.z, minimumZ, maximumZ),
+    );
+    scratch.targetShift.subVectors(target, scratch.targetBeforeClamp);
+    if (scratch.targetShift.lengthSq() > 0) position.add(scratch.targetShift);
+  }, [
+    extent,
+    isolatedArea,
+    miranteExtent,
+    miranteSelected,
+    parkingActive,
+    parkingFramingExtent,
+    segmentExtent,
+  ]);
+  const clampQueuedCameraPose = useCallback((
+    minDistance = controlsMinimumDistance,
+    maxDistance = controlsMaximumDistance,
+    clampTarget = true,
+  ) => {
+    if (clampTarget) {
+      clampCameraTarget(
+        targetLookAt.current,
+        targetPosition.current,
+        targetPosition.current.distanceTo(targetLookAt.current),
+        maxDistance,
+      );
+    }
+    const clamped = clampCommercialMapCameraPosition({
+      position: targetPosition.current.toArray() as [number, number, number],
+      target: targetLookAt.current.toArray() as [number, number, number],
+      minDistance,
+      maxDistance,
+    });
+    targetPosition.current.set(...clamped.position);
+    return clamped.distance;
+  }, [
+    clampCameraTarget,
+    controlsMaximumDistance,
+    controlsMinimumDistance,
+  ]);
+  const clampLunarSnapshot = useCallback((snapshot: LunarCameraSnapshot) => {
+    const position = snapshot.position.clone();
+    const target = snapshot.target.clone();
+    clampCameraTarget(
+      target,
+      position,
+      position.distanceTo(target),
+      controlsMaximumDistance,
+    );
+    const clamped = clampCommercialMapCameraPosition({
+      position: position.toArray() as [number, number, number],
+      target: target.toArray() as [number, number, number],
+      minDistance: controlsMinimumDistance,
+      maxDistance: controlsMaximumDistance,
+    });
+    snapshot.position.set(...clamped.position);
+    snapshot.target.copy(target);
+    snapshot.near = resolveCommercialMapCameraNearPlane(
+      clamped.distance,
+      snapshot.position.y,
+    );
+    snapshot.far = cameraFarPlane;
+    return snapshot;
+  }, [
+    cameraFarPlane,
+    clampCameraTarget,
+    controlsMaximumDistance,
+    controlsMinimumDistance,
+  ]);
+  const writeCameraDiagnostics = useCallback((force = false) => {
+    if (!import.meta.env.DEV || !(camera instanceof THREE.PerspectiveCamera)) return;
+    const now = typeof performance === 'undefined' ? Date.now() : performance.now();
+    if (!force && now - cameraDiagnosticsAt.current < 90) return;
+    cameraDiagnosticsAt.current = now;
+    const target = controlsRef.current?.target ?? targetLookAt.current;
+    gl.domElement.dataset.commercialMapCameraDiagnostics = JSON.stringify({
+      position: camera.position.toArray().map((value) => Number(value.toFixed(4))),
+      target: target.toArray().map((value) => Number(value.toFixed(4))),
+      quaternion: camera.quaternion.toArray().map((value) => Number(value.toFixed(6))),
+      fov: camera.fov,
+      near: Number(camera.near.toFixed(5)),
+      far: Number(camera.far.toFixed(3)),
+      distance: Number(camera.position.distanceTo(target).toFixed(4)),
+      minDistance: Number(appliedControlLimits.minDistance.toFixed(4)),
+      maxDistance: Number(appliedControlLimits.maxDistance.toFixed(4)),
+      desiredMinDistance: Number(effectiveControlsMinimumDistance.toFixed(4)),
+      desiredMaxDistance: Number(effectiveControlsMaximumDistance.toFixed(4)),
+      calculatedMaxDistance: Number(cameraDistanceBounds.maxDistance.toFixed(4)),
+      boundingSphereRadius: Number(cameraDistanceBounds.boundingSphereRadius.toFixed(4)),
+      viewport: {
+        width: size.width,
+        height: size.height,
+        aspect: Number((size.width / Math.max(size.height, 1)).toFixed(5)),
+        dpr: gl.getPixelRatio(),
+      },
+    });
+  }, [
+    appliedControlLimits.maxDistance,
+    appliedControlLimits.minDistance,
+    camera,
+    cameraDistanceBounds.boundingSphereRadius,
+    cameraDistanceBounds.maxDistance,
+    effectiveControlsMaximumDistance,
+    effectiveControlsMinimumDistance,
+    gl,
+    size.height,
+    size.width,
+  ]);
+  const startCameraMove = useCallback((
+    minDistance = controlsMinimumDistance,
+    maxDistance = controlsMaximumDistance,
+    clampTarget = true,
+  ) => {
+    clampQueuedCameraPose(minDistance, maxDistance, clampTarget);
+    const currentTarget = controlsRef.current?.target ?? targetLookAt.current;
+    const currentDistance = camera.position.distanceTo(currentTarget);
+    setAppliedControlLimits((previous) => ({
+      minDistance: Math.min(previous.minDistance, minDistance, currentDistance),
+      maxDistance: Math.max(previous.maxDistance, maxDistance, currentDistance),
+    }));
     preserveManualView.current = false;
     animating.current = true;
     invalidate();
-  }, [invalidate]);
+  }, [
+    camera,
+    clampQueuedCameraPose,
+    controlsMaximumDistance,
+    controlsMinimumDistance,
+    invalidate,
+  ]);
+  const enforceDesiredCameraLimits = useCallback(() => {
+    const controls = controlsRef.current;
+    const currentTarget = controls?.target ?? targetLookAt.current;
+    targetPosition.current.copy(camera.position);
+    targetLookAt.current.copy(currentTarget);
+    clampQueuedCameraPose(
+      effectiveControlsMinimumDistance,
+      effectiveControlsMaximumDistance,
+    );
+    const needsMotion = camera.position.distanceTo(targetPosition.current) > 0.0001
+      || currentTarget.distanceTo(targetLookAt.current) > 0.0001;
+    if (needsMotion) {
+      preserveManualView.current = true;
+      animating.current = true;
+      invalidate();
+      return true;
+    }
+    setAppliedControlLimits({
+      minDistance: effectiveControlsMinimumDistance,
+      maxDistance: effectiveControlsMaximumDistance,
+    });
+    return false;
+  }, [
+    camera,
+    clampQueuedCameraPose,
+    effectiveControlsMaximumDistance,
+    effectiveControlsMinimumDistance,
+    invalidate,
+  ]);
+
+  useEffect(() => {
+    if (lunarCameraLockedRef.current || !(camera instanceof THREE.PerspectiveCamera)) return;
+    camera.far = cameraFarPlane;
+    camera.updateProjectionMatrix();
+    if (navigation.current.active || navigation.current.settling) {
+      const activeTarget = controlsRef.current?.target ?? targetLookAt.current;
+      const currentDistance = camera.position.distanceTo(activeTarget);
+      setAppliedControlLimits((previous) => ({
+        minDistance: Math.min(
+          previous.minDistance,
+          effectiveControlsMinimumDistance,
+          currentDistance,
+        ),
+        maxDistance: Math.max(
+          previous.maxDistance,
+          effectiveControlsMaximumDistance,
+          currentDistance,
+        ),
+      }));
+      invalidate();
+      return;
+    }
+    if (animating.current) {
+      invalidate();
+      return;
+    }
+    const activeTarget = controlsRef.current?.target ?? targetLookAt.current;
+    const desiredTarget = activeTarget.clone();
+    const desiredPosition = camera.position.clone();
+    clampCameraTarget(
+      desiredTarget,
+      desiredPosition,
+      desiredPosition.distanceTo(desiredTarget),
+      effectiveControlsMaximumDistance,
+    );
+    const clamped = clampCommercialMapCameraPosition({
+      position: desiredPosition.toArray() as [number, number, number],
+      target: desiredTarget.toArray() as [number, number, number],
+      minDistance: effectiveControlsMinimumDistance,
+      maxDistance: effectiveControlsMaximumDistance,
+    });
+    const targetWasClamped = desiredTarget.distanceTo(activeTarget) > 0.0001;
+    if (clamped.wasClamped || targetWasClamped) {
+      const currentDistance = camera.position.distanceTo(activeTarget);
+      setAppliedControlLimits((previous) => ({
+        minDistance: Math.min(
+          previous.minDistance,
+          effectiveControlsMinimumDistance,
+          currentDistance,
+        ),
+        maxDistance: Math.max(
+          previous.maxDistance,
+          effectiveControlsMaximumDistance,
+          currentDistance,
+        ),
+      }));
+      targetPosition.current.set(...clamped.position);
+      targetLookAt.current.copy(desiredTarget);
+      preserveManualView.current = false;
+      animating.current = true;
+    } else if (!animating.current) {
+      setAppliedControlLimits({
+        minDistance: effectiveControlsMinimumDistance,
+        maxDistance: effectiveControlsMaximumDistance,
+      });
+    }
+    invalidate();
+  }, [
+    camera,
+    cameraFarPlane,
+    clampCameraTarget,
+    effectiveControlsMaximumDistance,
+    effectiveControlsMinimumDistance,
+    invalidate,
+  ]);
 
   const queuePreset = useCallback((nextPreset: CameraPreset) => {
     setParkingControlLimits(null);
@@ -1829,10 +2218,20 @@ function CameraRig({
     targetPosition.current.copy(lookAt).add(direction.multiplyScalar(distance));
     perspective.fov = 38;
     perspective.near = Math.max(0.05, distance / 1600);
-    perspective.far = Math.max(720, extent.diagonal * 9, distance * 4);
+    perspective.far = cameraFarPlane;
     perspective.updateProjectionMatrix();
-    startCameraMove();
-  }, [camera, extent, hydrologicalModeActive, size.height, size.width, startCameraMove]);
+    startCameraMove(cameraDistanceBounds.minDistance, cameraDistanceBounds.maxDistance);
+  }, [
+    camera,
+    cameraDistanceBounds.maxDistance,
+    cameraDistanceBounds.minDistance,
+    cameraFarPlane,
+    extent,
+    hydrologicalModeActive,
+    size.height,
+    size.width,
+    startCameraMove,
+  ]);
 
   const queueSelection = useCallback((entity: MapEntity) => {
     setParkingControlLimits(null);
@@ -1872,7 +2271,7 @@ function CameraRig({
     const fittedSelectionDistance = THREE.MathUtils.clamp(
       Math.max(fittedDistance, extent.diagonal * focusProfile.contextRatio),
       Math.max(10, extent.diagonal * focusProfile.minDistanceRatio),
-      Math.max(36, extent.diagonal * focusProfile.maxDistanceRatio),
+      controlsMaximumDistance,
     );
     const distance = compactSidePanelMirante
       ? fittedSelectionDistance * 1.36
@@ -1891,10 +2290,20 @@ function CameraRig({
     targetPosition.current.copy(lookAt).add(direction.multiplyScalar(distance));
     perspective.fov = 38;
     perspective.near = Math.max(0.035, distance / 1600);
-    perspective.far = Math.max(720, extent.diagonal * 9);
+    perspective.far = cameraFarPlane;
     perspective.updateProjectionMatrix();
-    startCameraMove();
-  }, [activePanel, camera, extent, size.height, size.width, startCameraMove]);
+    startCameraMove(controlsMinimumDistance, controlsMaximumDistance);
+  }, [
+    activePanel,
+    camera,
+    cameraFarPlane,
+    controlsMaximumDistance,
+    controlsMinimumDistance,
+    extent,
+    size.height,
+    size.width,
+    startCameraMove,
+  ]);
 
   const queueSegment = useCallback((segment: CommercialMapSegmentDefinition, segmentEntities: MapEntity[]) => {
     setParkingControlLimits(null);
@@ -1926,23 +2335,28 @@ function CameraRig({
     const distance = THREE.MathUtils.clamp(
       fittedDistance,
       Math.max(10, segmentExtent.diagonal * segment.camera.minDistanceRatio),
-      Math.max(72, segmentExtent.diagonal * segment.camera.maxDistanceRatio),
+      controlsMaximumDistance,
     );
     targetLookAt.current.copy(lookAt);
     targetPosition.current.copy(lookAt).add(direction.multiplyScalar(distance));
     perspective.fov = 38;
     perspective.near = Math.max(0.04, distance / 1600);
-    perspective.far = Math.max(720, extent.diagonal * 9, distance * 4);
+    perspective.far = cameraFarPlane;
     perspective.updateProjectionMatrix();
-    startCameraMove();
-  }, [camera, extent.diagonal, preset, queuePreset, size.height, size.width, startCameraMove]);
+    startCameraMove(controlsMinimumDistance, controlsMaximumDistance);
+  }, [
+    camera,
+    cameraFarPlane,
+    controlsMaximumDistance,
+    controlsMinimumDistance,
+    preset,
+    queuePreset,
+    size.height,
+    size.width,
+    startCameraMove,
+  ]);
 
   const queueParking = useCallback(() => {
-    const bounds = getRearParkingFocusBounds(
-      selectedParkingBlockId,
-      parkingCameraView === 'detail' ? selectedParkingSpaceId : null,
-      parkingCameraView,
-    );
     const insets = resolveParkingViewportInsets(size.width, size.height);
     const canvasRect = gl.domElement.getBoundingClientRect();
     const panelRect = gl.domElement.closest('.commercial-map-viewport')
@@ -1954,15 +2368,15 @@ function CameraRig({
       else insets.bottom = Math.max(insets.bottom, canvasRect.bottom - panelRect.top + 12);
     }
     const frame = resolveParkingCameraFrame({
-      bounds,
+      bounds: parkingFocusBounds,
       view: parkingCameraView,
       viewportWidth: size.width,
       viewportHeight: size.height,
       insets,
     });
     const limits = {
-      minDistance: frame.minDistance,
-      maxDistance: Math.max(frame.maxDistance, extent.diagonal * 4.5, 260),
+      minDistance: Math.min(frame.minDistance, cameraDistanceBounds.maxDistance),
+      maxDistance: cameraDistanceBounds.maxDistance,
     };
     setParkingControlLimits((previous) => (
       previous?.minDistance === limits.minDistance && previous.maxDistance === limits.maxDistance
@@ -1979,16 +2393,16 @@ function CameraRig({
     const perspective = camera as THREE.PerspectiveCamera;
     perspective.fov = frame.fov;
     perspective.near = frame.near;
-    perspective.far = Math.max(frame.far, extent.diagonal * 9);
+    perspective.far = Math.max(frame.far, cameraFarPlane);
     perspective.updateProjectionMatrix();
-    startCameraMove();
+    startCameraMove(limits.minDistance, limits.maxDistance, false);
   }, [
     camera,
-    extent.diagonal,
+    cameraDistanceBounds.maxDistance,
+    cameraFarPlane,
     gl,
     parkingCameraView,
-    selectedParkingBlockId,
-    selectedParkingSpaceId,
+    parkingFocusBounds,
     size.height,
     size.width,
     startCameraMove,
@@ -2066,24 +2480,44 @@ function CameraRig({
   const restoreLunarCamera = useCallback((snapshot: LunarCameraSnapshot) => {
     if (!(camera instanceof THREE.PerspectiveCamera)) return;
     const controls = controlsRef.current;
+    const safeSnapshot = clampLunarSnapshot(snapshot);
     animating.current = false;
-    camera.position.copy(snapshot.position);
-    camera.quaternion.copy(snapshot.quaternion);
-    camera.fov = snapshot.fov;
-    camera.near = snapshot.near;
-    camera.far = snapshot.far;
-    camera.zoom = snapshot.zoom;
+    camera.position.copy(safeSnapshot.position);
+    camera.quaternion.copy(safeSnapshot.quaternion);
+    camera.fov = safeSnapshot.fov;
+    camera.near = safeSnapshot.near;
+    camera.far = cameraFarPlane;
+    camera.zoom = safeSnapshot.zoom;
     camera.updateProjectionMatrix();
     if (controls) {
-      controls.target.copy(snapshot.target);
-      restoreLunarControlState(snapshot);
+      controls.target.copy(safeSnapshot.target);
+      restoreLunarControlState(safeSnapshot);
+      controls.minDistance = controlsMinimumDistance;
+      controls.maxDistance = controlsMaximumDistance;
       controls.update();
       // Preserve any deliberate camera roll even though OrbitControls normally has none.
-      camera.quaternion.copy(snapshot.quaternion);
+      camera.quaternion.copy(safeSnapshot.quaternion);
     }
-    gl.toneMappingExposure = snapshot.exposure;
+    setAppliedControlLimits({
+      minDistance: controlsMinimumDistance,
+      maxDistance: controlsMaximumDistance,
+    });
+    gl.toneMappingExposure = safeSnapshot.exposure;
     invalidate();
-  }, [camera, gl, invalidate, restoreLunarControlState]);
+  }, [
+    camera,
+    cameraFarPlane,
+    clampLunarSnapshot,
+    controlsMaximumDistance,
+    controlsMinimumDistance,
+    gl,
+    invalidate,
+    restoreLunarControlState,
+  ]);
+  const restoreLunarCameraRef = useRef(restoreLunarCamera);
+  useEffect(() => {
+    restoreLunarCameraRef.current = restoreLunarCamera;
+  }, [restoreLunarCamera]);
 
   const configureLunarPath = useCallback(() => {
     if (!lunarTreeEntity || !(camera instanceof THREE.PerspectiveCamera)) return false;
@@ -2162,8 +2596,23 @@ function CameraRig({
       portrait ? 0.94 : mobile ? 0.98 : 1.04,
     );
     path.finalPosition.copy(path.finalTarget).addScaledVector(scratch.fromPosition, finalDistance);
+    const clampedFinal = clampCommercialMapCameraPosition({
+      position: path.finalPosition.toArray() as [number, number, number],
+      target: path.finalTarget.toArray() as [number, number, number],
+      minDistance: controlsMinimumDistance,
+      maxDistance: controlsMaximumDistance,
+    });
+    path.finalPosition.set(...clampedFinal.position);
     return true;
-  }, [camera, extent, lunarTreeEntity, size.height, size.width]);
+  }, [
+    camera,
+    controlsMaximumDistance,
+    controlsMinimumDistance,
+    extent,
+    lunarTreeEntity,
+    size.height,
+    size.width,
+  ]);
 
   const scheduleResizeRefit = useCallback(() => {
     if (
@@ -2241,12 +2690,16 @@ function CameraRig({
         const perspective = camera as THREE.PerspectiveCamera;
         targetPosition.current.set(...returnView.current.position);
         targetLookAt.current.set(...returnView.current.target);
+        clampQueuedCameraPose(
+          cameraDistanceBounds.minDistance,
+          cameraDistanceBounds.maxDistance,
+        );
         camera.position.copy(targetPosition.current);
         controlsRef.current?.target.copy(targetLookAt.current);
         controlsRef.current?.update();
         perspective.fov = 38;
         perspective.near = Math.max(0.035, camera.position.distanceTo(targetLookAt.current) / 1600);
-        perspective.far = Math.max(720, extent.diagonal * 9);
+        perspective.far = cameraFarPlane;
         perspective.updateProjectionMatrix();
         animating.current = false;
         returnView.current = null;
@@ -2280,9 +2733,29 @@ function CameraRig({
       preserveManualView.current = true;
       cancelScheduledResizeRefit();
       pendingResizeRefit.current = false;
-      animating.current = false;
       targetPosition.current.copy(camera.position);
       targetLookAt.current.copy(controlsRef.current?.target ?? targetLookAt.current);
+      clampQueuedCameraPose(controlsMinimumDistance, controlsMaximumDistance);
+      const needsSafetyTransition = camera.position.distanceTo(targetPosition.current) > 0.0001
+        || (controlsRef.current?.target.distanceTo(targetLookAt.current) ?? 0) > 0.0001;
+      setParkingControlLimits(null);
+      if (needsSafetyTransition) {
+        const currentDistance = camera.position.distanceTo(
+          controlsRef.current?.target ?? targetLookAt.current,
+        );
+        setAppliedControlLimits({
+          minDistance: Math.min(controlsMinimumDistance, currentDistance),
+          maxDistance: Math.max(controlsMaximumDistance, currentDistance),
+        });
+        animating.current = true;
+        invalidate();
+      } else {
+        animating.current = false;
+        setAppliedControlLimits({
+          minDistance: controlsMinimumDistance,
+          maxDistance: controlsMaximumDistance,
+        });
+      }
     } else if (selectionChanged && !selectedEntity) {
       preserveManualView.current = true;
       cancelScheduledResizeRefit();
@@ -2309,9 +2782,14 @@ function CameraRig({
     activeSegment,
     activeSegmentEntities,
     camera,
+    cameraDistanceBounds.maxDistance,
+    cameraDistanceBounds.minDistance,
+    cameraFarPlane,
     cameraSequence,
     cancelScheduledResizeRefit,
-    extent.diagonal,
+    clampQueuedCameraPose,
+    controlsMaximumDistance,
+    controlsMinimumDistance,
     invalidate,
     parkingActive,
     parkingCameraSequence,
@@ -2349,32 +2827,39 @@ function CameraRig({
   const clampTarget = useCallback(() => {
     const controls = controlsRef.current;
     if (!controls) return;
-    const margin = isolatedArea
-      ? Math.max(1.6, extent.diagonal * 0.035)
-      : Math.max(3, extent.diagonal * 0.08);
-    const targetMinimumY = selectedEntity
-      && resolveStrategicLandmarkKind(selectedEntity) === 'mirante-pavilion'
-      ? -extent.maxHeight * 1.2
-      : 0;
-    controls.target.x = THREE.MathUtils.clamp(controls.target.x, extent.minX - margin, extent.maxX + margin);
-    controls.target.y = THREE.MathUtils.clamp(
-      controls.target.y,
-      targetMinimumY,
-      extent.maxHeight * 2 + 4,
+    clampCameraTarget(
+      controls.target,
+      camera.position,
+      camera.position.distanceTo(controls.target),
+      effectiveControlsMaximumDistance,
     );
-    controls.target.z = THREE.MathUtils.clamp(controls.target.z, extent.minZ - margin, extent.maxZ + margin);
-  }, [extent, isolatedArea, selectedEntity]);
+  }, [camera, clampCameraTarget, effectiveControlsMaximumDistance]);
 
   const handleControlsStart = useCallback(() => {
     if (lunarCameraLockedRef.current) return;
     const controls = controlsRef.current;
+    const alreadyNavigating = navigation.current.navigating
+      || navigation.current.settling;
+    const currentTarget = controls?.target ?? targetLookAt.current;
+    const currentDistance = camera.position.distanceTo(currentTarget);
     cancelScheduledResizeRefit();
     animating.current = false;
+    setAppliedControlLimits({
+      minDistance: Math.min(effectiveControlsMinimumDistance, currentDistance),
+      maxDistance: Math.max(effectiveControlsMaximumDistance, currentDistance),
+    });
     navigation.current.active = true;
-    navigation.current.navigating = false;
+    navigation.current.navigating = alreadyNavigating;
+    navigation.current.settling = false;
+    navigation.current.stableFrames = 0;
     navigation.current.startPosition.copy(camera.position);
     navigation.current.startTarget.copy(controls?.target ?? targetLookAt.current);
-  }, [camera, cancelScheduledResizeRefit]);
+  }, [
+    camera,
+    cancelScheduledResizeRefit,
+    effectiveControlsMaximumDistance,
+    effectiveControlsMinimumDistance,
+  ]);
 
   const handleControlsChange = useCallback(() => {
     if (lunarCameraLockedRef.current) return;
@@ -2396,22 +2881,37 @@ function CameraRig({
         }
       }
     }
+    writeCameraDiagnostics();
     invalidate();
-  }, [camera, cancelScheduledResizeRefit, clampTarget, gl, invalidate, setCameraNavigating]);
+  }, [
+    camera,
+    cancelScheduledResizeRefit,
+    clampTarget,
+    gl,
+    invalidate,
+    setCameraNavigating,
+    writeCameraDiagnostics,
+  ]);
 
   const handleControlsEnd = useCallback(() => {
     if (lunarCameraLockedRef.current) return;
     const wasNavigating = navigation.current.navigating;
     navigation.current.active = false;
-    navigation.current.navigating = false;
     if (wasNavigating) {
-      setCameraNavigating(false);
-      gl.domElement.style.cursor = 'grab';
+      navigation.current.settling = true;
+      navigation.current.stableFrames = 0;
+      navigation.current.lastPosition.copy(camera.position);
+      navigation.current.lastTarget.copy(controlsRef.current?.target ?? targetLookAt.current);
+      gl.domElement.style.cursor = 'grabbing';
+    } else {
+      navigation.current.navigating = false;
+      navigation.current.settling = false;
+      enforceDesiredCameraLimits();
     }
     if (pendingResizeRefit.current && !wasNavigating) scheduleResizeRefit();
     else pendingResizeRefit.current = false;
     invalidate();
-  }, [gl, invalidate, scheduleResizeRefit, setCameraNavigating]);
+  }, [camera, enforceDesiredCameraLimits, gl, invalidate, scheduleResizeRefit]);
 
   useEffect(() => {
     if (
@@ -2502,6 +3002,7 @@ function CameraRig({
       return;
     }
     const controls = controlsRef.current;
+    clampLunarSnapshot(path.snapshot);
     path.returnSequence = lunarLaunchReturnSequence;
     path.returning = true;
     path.active = false;
@@ -2524,11 +3025,49 @@ function CameraRig({
   }, [
     camera,
     cancelScheduledResizeRefit,
+    clampLunarSnapshot,
     gl,
     invalidate,
     lockLunarCamera,
     lunarLaunchReturnSequence,
     lunarLaunchReturning,
+  ]);
+
+  useEffect(() => {
+    const path = lunarPath.current;
+    if (!path.returning || !path.snapshot || !(camera instanceof THREE.PerspectiveCamera)) {
+      lunarReturnBoundsSignature.current = '';
+      return;
+    }
+    const signature = [
+      controlsMinimumDistance.toFixed(4),
+      controlsMaximumDistance.toFixed(4),
+      size.width.toFixed(2),
+      size.height.toFixed(2),
+    ].join(':');
+    if (signature === lunarReturnBoundsSignature.current) return;
+    lunarReturnBoundsSignature.current = signature;
+    clampLunarSnapshot(path.snapshot);
+    const controls = controlsRef.current;
+    path.returnStartedAt = typeof performance === 'undefined' ? Date.now() : performance.now();
+    path.returnPosition.copy(camera.position);
+    path.returnTarget.copy(controls?.target ?? targetLookAt.current);
+    path.returnQuaternion.copy(camera.quaternion);
+    path.returnFov = camera.fov;
+    path.returnNear = camera.near;
+    path.returnFar = camera.far;
+    path.returnZoom = camera.zoom;
+    path.returnExposure = gl.toneMappingExposure;
+    invalidate();
+  }, [
+    camera,
+    clampLunarSnapshot,
+    controlsMaximumDistance,
+    controlsMinimumDistance,
+    gl,
+    invalidate,
+    size.height,
+    size.width,
   ]);
 
   useEffect(() => () => {
@@ -2539,7 +3078,7 @@ function CameraRig({
     const store = useCommercialMapStore.getState();
     const path = lunarPath.current;
     if ((path.active || path.returning) && path.snapshot) {
-      restoreLunarCamera(path.snapshot);
+      restoreLunarCameraRef.current(path.snapshot);
     }
     if (store.lunarLaunchPhase !== 'idle') store.completeLunarLaunch(true);
     else if (store.lunarLaunchReturning) store.completeLunarLaunchReturn();
@@ -2554,7 +3093,7 @@ function CameraRig({
     }
     setCameraNavigating(false);
     gl.domElement.style.cursor = '';
-  }, [camera, cancelScheduledResizeRefit, gl, restoreLunarCamera, setCameraNavigating]);
+  }, [camera, cancelScheduledResizeRefit, gl, setCameraNavigating]);
 
   useFrame((_state, delta) => {
     const path = lunarPath.current;
@@ -2740,12 +3279,18 @@ function CameraRig({
         scratch.position.y += verticalShake;
         scratch.target.addScaledVector(path.side, lateralShake);
         scratch.target.y += verticalShake;
+        const cinematicDistance = scratch.position.distanceTo(scratch.target);
+        if (cinematicDistance > controlsMaximumDistance) {
+          scratch.position.sub(scratch.target)
+            .setLength(controlsMaximumDistance)
+            .add(scratch.target);
+        }
 
         perspective.position.copy(scratch.position);
         perspective.quaternion.copy(scratch.quaternion);
         perspective.fov = nextFov;
         perspective.near = Math.min(snapshot.near, 0.04);
-        perspective.far = Math.max(snapshot.far, 900, extent.diagonal * 12);
+        perspective.far = Math.max(cameraFarPlane, 900, extent.diagonal * 12);
         perspective.zoom = nextZoom;
         perspective.updateProjectionMatrix();
         controls?.target.copy(scratch.target);
@@ -2778,7 +3323,15 @@ function CameraRig({
           perspective.updateProjectionMatrix();
           gl.toneMappingExposure = snapshot.exposure;
           restoreLunarControlState(snapshot);
+          if (controls) {
+            controls.minDistance = controlsMinimumDistance;
+            controls.maxDistance = controlsMaximumDistance;
+          }
           controls?.update();
+          setAppliedControlLimits({
+            minDistance: controlsMinimumDistance,
+            maxDistance: controlsMaximumDistance,
+          });
           animating.current = false;
           lunarCameraLockedRef.current = false;
           useCommercialMapStore.getState().completeLunarLaunch(false);
@@ -2808,7 +3361,13 @@ function CameraRig({
         controlsRef.current?.target.copy(targetLookAt.current);
         controlsRef.current?.update();
         animating.current = false;
+        setAppliedControlLimits({
+          minDistance: effectiveControlsMinimumDistance,
+          maxDistance: effectiveControlsMaximumDistance,
+        });
+        writeCameraDiagnostics(true);
       } else {
+        writeCameraDiagnostics();
         invalidate();
       }
     }
@@ -2821,28 +3380,28 @@ function CameraRig({
         invalidate();
       }
     }
+    if (navigation.current.settling && controls) {
+      const cameraDelta = camera.position.distanceTo(navigation.current.lastPosition);
+      const targetDelta = controls.target.distanceTo(navigation.current.lastTarget);
+      navigation.current.lastPosition.copy(camera.position);
+      navigation.current.lastTarget.copy(controls.target);
+      if (cameraDelta < 0.00008 && targetDelta < 0.00008) {
+        navigation.current.stableFrames += 1;
+      } else {
+        navigation.current.stableFrames = 0;
+      }
+      if (navigation.current.stableFrames >= 3) {
+        navigation.current.settling = false;
+        navigation.current.navigating = false;
+        setCameraNavigating(false);
+        gl.domElement.style.cursor = 'grab';
+        enforceDesiredCameraLimits();
+        writeCameraDiagnostics(true);
+      } else {
+        invalidate();
+      }
+    }
   });
-
-  const selectedKind = selectedEntity ? resolveStrategicLandmarkKind(selectedEntity) : null;
-  const miranteSelected = selectedKind === 'mirante-pavilion';
-  const miranteExtent = miranteSelected && selectedEntity ? getEntityExtent(selectedEntity) : null;
-  const segmentExtent = activeSegment && activeSegmentEntities.length > 0
-    ? getSceneExtent(activeSegmentEntities)
-    : null;
-  const miranteMinimumDistance = miranteExtent
-    ? Math.max(7.5, miranteExtent.diagonal * 0.8)
-    : segmentExtent && activeSegment
-      ? Math.max(6.5, segmentExtent.diagonal * activeSegment.camera.minDistanceRatio)
-    : isolatedArea
-      ? Math.max(6.5, extent.diagonal * 0.12)
-      : Math.max(8, extent.diagonal * 0.055);
-  const miranteMaximumDistance = miranteExtent
-    ? Math.max(30, miranteExtent.diagonal * 4)
-    : segmentExtent && activeSegment
-      ? Math.max(96, segmentExtent.diagonal * activeSegment.camera.maxDistanceRatio)
-    : isolatedArea
-      ? Math.max(96, extent.diagonal * 2.15)
-      : Math.max(260, extent.diagonal * 4.5);
 
   return (
     <OrbitControls
@@ -2854,8 +3413,8 @@ function CameraRig({
       enablePan={!lunarCameraLocked}
       enableRotate={!lunarCameraLocked}
       enableZoom={!lunarCameraLocked}
-      minDistance={parkingControlLimits?.minDistance ?? miranteMinimumDistance}
-      maxDistance={parkingControlLimits?.maxDistance ?? miranteMaximumDistance}
+      minDistance={appliedControlLimits.minDistance}
+      maxDistance={appliedControlLimits.maxDistance}
       minPolarAngle={COMMERCIAL_MAP_MIN_POLAR_ANGLE}
       maxPolarAngle={Math.PI / 2.08}
       screenSpacePanning={false}
@@ -3625,15 +4184,28 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
     [entities, hydrologicalModeActive, isolatedArea],
   );
   const initialDirection = new THREE.Vector3(0.04, 0.72, 0.69).normalize();
-  const initialDistance = fitDistanceForDirection(
+  const initialAspect = viewportMetrics.width / Math.max(viewportMetrics.height, 1);
+  const initialCameraBounds = resolveCommercialMapCameraDistanceBounds({
+    bounds: extent,
+    verticalFovDegrees: 38,
+    aspect: initialAspect,
+  });
+  const requestedInitialDistance = fitDistanceForDirection(
     extent,
     38,
-    1,
+    initialAspect,
     initialDirection,
     1.1,
   );
   const initialTarget = new THREE.Vector3(extent.centerX, 0, extent.centerZ);
-  const initialCameraPosition = initialTarget.clone().add(initialDirection.multiplyScalar(initialDistance));
+  const initialDistance = THREE.MathUtils.clamp(
+    requestedInitialDistance,
+    initialCameraBounds.minDistance,
+    initialCameraBounds.maxDistance,
+  );
+  const initialCameraPosition = initialTarget.clone().add(
+    initialDirection.multiplyScalar(initialDistance),
+  );
 
   return (
     <Canvas
@@ -3644,7 +4216,7 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
         position: initialCameraPosition.toArray(),
         fov: 38,
         near: Math.max(0.05, initialDistance / 1600),
-        far: Math.max(720, extent.diagonal * 9),
+        far: resolveCommercialMapCameraFarPlane(extent, initialCameraBounds.maxDistance),
       }}
       dpr={pixelRatio}
       shadows={!reducedGraphics}

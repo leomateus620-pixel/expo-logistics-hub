@@ -6,7 +6,6 @@ import { ToneMappingMode } from 'postprocessing';
 import * as THREE from 'three';
 import {
   COMMERCIAL_MAP_ENVIRONMENT_CONFIG,
-  resolveCommercialMapCloudPlacements,
   resolveCommercialMapEnvironmentLayout,
   resolveCommercialMapSunriseFrame,
   resolveCommercialMapSunriseProgress,
@@ -16,6 +15,7 @@ import {
   type CommercialMapSunriseFrame,
   type CommercialMapSunriseQualityTier,
 } from '../../data/commercialMapEnvironment';
+import { resolveCommercialMapCameraDistanceBounds } from '../../utils/viewport';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import {
   openGroundTextureBundleForEntity,
@@ -43,7 +43,9 @@ const NO_RAYCAST = () => undefined;
 const CELESTIAL_SUN_PLANE_NORMAL = new THREE.Vector3(0, 0, 1);
 const ACTIVE_GROUND_PROFILE: Readonly<OpenGroundSurfaceProfile> = Object.freeze({
   surface: 'landscapeGrass',
-  tileWorldSize: 18,
+  // A broader camera-safe tile keeps the 256px source detailed near the park
+  // while avoiding a visible checkerboard at the responsive zoom-out limit.
+  tileWorldSize: 48,
   baseColor: '#b8c9b0',
   roughness: 0.99,
 });
@@ -52,113 +54,6 @@ const ACTIVE_GROUND_NORMAL_SCALE = new THREE.Vector2(0.12, 0.12);
 function colorWithAlpha(hex: string, alpha: number) {
   const color = new THREE.Color(hex);
   return color.getStyle().replace('rgb(', 'rgba(').replace(')', `,${alpha})`);
-}
-
-function seededRandom(seed: number) {
-  let state = seed >>> 0;
-  return () => {
-    state = (state * 1664525 + 1013904223) >>> 0;
-    return state / 4294967296;
-  };
-}
-
-function createOuterGroundTexture(size: number, palette: EnvironmentPalette) {
-  const canvas = document.createElement('canvas');
-  canvas.width = size;
-  canvas.height = size;
-  const context = canvas.getContext('2d');
-  if (!context) return new THREE.CanvasTexture(canvas);
-
-  const radius = size * 0.7;
-  const groundGradient = context.createRadialGradient(
-    size / 2,
-    size / 2,
-    size * 0.025,
-    size / 2,
-    size / 2,
-    radius,
-  );
-  groundGradient.addColorStop(0, palette.activeGround);
-  groundGradient.addColorStop(0.16, palette.outerGroundNear);
-  groundGradient.addColorStop(0.54, palette.outerGroundNear);
-  groundGradient.addColorStop(1, palette.outerGroundFar);
-  context.fillStyle = groundGradient;
-  context.fillRect(0, 0, size, size);
-
-  const random = seededRandom(COMMERCIAL_MAP_ENVIRONMENT_CONFIG.clouds.seed + 91);
-  for (let index = 0; index < 24; index += 1) {
-    const x = random() * size;
-    const y = random() * size;
-    const patchRadius = size * (0.04 + random() * 0.1);
-    const patch = context.createRadialGradient(x, y, 0, x, y, patchRadius);
-    patch.addColorStop(0, colorWithAlpha(index % 2 === 0 ? '#789174' : '#d5ddcc', 0.045));
-    patch.addColorStop(1, colorWithAlpha(palette.outerGroundFar, 0));
-    context.fillStyle = patch;
-    context.fillRect(x - patchRadius, y - patchRadius, patchRadius * 2, patchRadius * 2);
-  }
-
-  const edgeMask = context.createRadialGradient(
-    size / 2,
-    size / 2,
-    size * 0.34,
-    size / 2,
-    size / 2,
-    size * 0.5,
-  );
-  edgeMask.addColorStop(0, 'rgba(255,255,255,1)');
-  edgeMask.addColorStop(0.62, 'rgba(255,255,255,1)');
-  edgeMask.addColorStop(0.84, 'rgba(255,255,255,.68)');
-  edgeMask.addColorStop(1, 'rgba(255,255,255,0)');
-  context.globalCompositeOperation = 'destination-in';
-  context.fillStyle = edgeMask;
-  context.fillRect(0, 0, size, size);
-  context.globalCompositeOperation = 'source-over';
-
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.name = 'CommercialMapOuterGroundTexture';
-  texture.colorSpace = THREE.SRGBColorSpace;
-  texture.minFilter = THREE.LinearFilter;
-  texture.magFilter = THREE.LinearFilter;
-  texture.generateMipmaps = false;
-  return texture;
-}
-
-function createCloudTexture(size: number) {
-  const canvas = document.createElement('canvas');
-  canvas.width = size;
-  canvas.height = size;
-  const context = canvas.getContext('2d');
-  if (!context) return new THREE.CanvasTexture(canvas);
-
-  const random = seededRandom(COMMERCIAL_MAP_ENVIRONMENT_CONFIG.clouds.seed);
-  context.clearRect(0, 0, size, size);
-
-  for (let index = 0; index < 54; index += 1) {
-    const x = size * (0.08 + random() * 0.84);
-    const y = size * (0.31 + random() * 0.38);
-    const radiusX = size * (0.045 + random() * 0.14);
-    const radiusY = radiusX * (0.2 + random() * 0.3);
-    const density = 0.13 + random() * 0.2;
-    const gradient = context.createRadialGradient(0, 0, 0, 0, 0, 1);
-    gradient.addColorStop(0, `rgba(255,255,255,${density})`);
-    gradient.addColorStop(0.56, `rgba(255,255,255,${density * 0.42})`);
-    gradient.addColorStop(1, 'rgba(255,255,255,0)');
-    context.save();
-    context.translate(x, y);
-    context.rotate((random() - 0.5) * 0.2);
-    context.scale(radiusX, radiusY);
-    context.fillStyle = gradient;
-    context.fillRect(-1, -1, 2, 2);
-    context.restore();
-  }
-
-  const texture = new THREE.CanvasTexture(canvas);
-  texture.name = 'CommercialMapSunriseCloudTexture';
-  texture.colorSpace = THREE.SRGBColorSpace;
-  texture.minFilter = THREE.LinearFilter;
-  texture.magFilter = THREE.LinearFilter;
-  texture.generateMipmaps = false;
-  return texture;
 }
 
 function createReflectionTexture(
@@ -212,6 +107,8 @@ function createSky(
   centerZ: number,
   initialFrame: CommercialMapSunriseFrame,
   mode: CommercialMapEnvironmentMode,
+  palette: EnvironmentPalette,
+  cloudOpacity: number,
 ) {
   const sky = new Sky() as SunriseSky;
   const material = sky.material;
@@ -237,6 +134,13 @@ function createSky(
   material.uniforms.finalSunriseUpper = { value: new THREE.Color(sunrise.colors.finalUpper) };
   material.uniforms.finalSunriseHorizon = { value: new THREE.Color(sunrise.colors.finalHorizon) };
   material.uniforms.finalSunriseHorizonCool = { value: new THREE.Color(sunrise.colors.finalHorizonCool) };
+  material.uniforms.authoredCloudCool = { value: new THREE.Color(palette.cloud) };
+  material.uniforms.authoredCloudShade = { value: new THREE.Color(palette.cloudShade) };
+  material.uniforms.authoredCloudWarm = { value: new THREE.Color(sunrise.colors.warmCloud) };
+  material.uniforms.authoredCloudOpacity = { value: cloudOpacity };
+  material.uniforms.authoredGroundFar = {
+    value: new THREE.Color(mode === 'hydrological' ? palette.activeGround : palette.outerGroundFar),
+  };
   material.fragmentShader = material.fragmentShader
     .replace(
       'uniform vec3 up;',
@@ -248,7 +152,12 @@ function createSky(
       uniform vec3 finalSunriseZenith;
       uniform vec3 finalSunriseUpper;
       uniform vec3 finalSunriseHorizon;
-      uniform vec3 finalSunriseHorizonCool;`,
+      uniform vec3 finalSunriseHorizonCool;
+      uniform vec3 authoredCloudCool;
+      uniform vec3 authoredCloudShade;
+      uniform vec3 authoredCloudWarm;
+      uniform float authoredCloudOpacity;
+      uniform vec3 authoredGroundFar;`,
     )
     .replace(
       'gl_FragColor = vec4( retColor, 1.0 );',
@@ -283,10 +192,37 @@ function createSky(
       vec3 balancedPhysicalSky = retColor
         / (vec3(1.0) + max(retColor, vec3(0.0)) * 0.48);
       vec3 composedSky = mix(balancedPhysicalSky, authoredSky, 0.92);
+      float cloudBand = smoothstep(0.018, 0.055, altitude)
+        * (1.0 - smoothstep(0.22, 0.39, altitude));
+      float cloudAzimuth = atan(direction.z, direction.x);
+      float cloudStreakA = sin(cloudAzimuth * 7.0 + altitude * 31.0);
+      float cloudStreakB = sin(cloudAzimuth * 13.0 - altitude * 47.0 + 1.7);
+      float cloudStreakC = sin(cloudAzimuth * 3.0 + altitude * 19.0 - 0.8);
+      float cloudField = cloudStreakA * 0.46 + cloudStreakB * 0.34 + cloudStreakC * 0.2;
+      float cloudDensity = smoothstep(0.28, 0.72, cloudField)
+        * cloudBand
+        * authoredCloudOpacity;
+      vec2 horizonDirection = normalize(direction.xz + vec2(0.0001));
+      vec2 solarDirection = normalize(vSunDirection.xz + vec2(0.0001));
+      float solarAlignment = pow(max(dot(horizonDirection, solarDirection), 0.0), 5.0);
+      vec3 cloudColor = mix(authoredCloudShade, authoredCloudCool, 0.68 + altitude * 0.55);
+      cloudColor = mix(
+        cloudColor,
+        authoredCloudWarm,
+        sunriseProgress * solarAlignment * 0.72
+      );
+      composedSky = mix(composedSky, cloudColor, cloudDensity);
+      vec3 lowerHorizon = mix(
+        authoredGroundFar,
+        authoredSky,
+        smoothstep(-0.14, 0.012, altitude)
+      );
+      float belowHorizon = 1.0 - smoothstep(-0.075, 0.008, altitude);
+      composedSky = mix(composedSky, lowerHorizon, belowHorizon);
       float dither = fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233))) * 43758.5453) - 0.5;
       gl_FragColor = vec4(max(composedSky + dither / 720.0, vec3(0.0)), 1.0);`,
     );
-  material.customProgramCacheKey = () => `commercial-map-premium-sunrise-sky-${mode}-v2`;
+  material.customProgramCacheKey = () => `commercial-map-camera-safe-sunrise-sky-${mode}-v4`;
   material.needsUpdate = true;
   return sky;
 }
@@ -401,97 +337,6 @@ function updateCelestialSun(
   sun.material.uniforms.uRayStrength.value = frame.rayStrength;
 }
 
-function createCloudLayer(
-  placements: ReturnType<typeof resolveCommercialMapCloudPlacements>,
-  texture: THREE.Texture,
-  palette: EnvironmentPalette,
-  opacity: number,
-  centerX: number,
-  centerZ: number,
-  initialFrame: CommercialMapSunriseFrame,
-) {
-  const geometry = new THREE.PlaneGeometry(1, 1);
-  const sunrise = COMMERCIAL_MAP_ENVIRONMENT_CONFIG.sunrise;
-  const material = new THREE.ShaderMaterial({
-    uniforms: {
-      uMap: { value: texture },
-      uOpacity: { value: opacity },
-      uSunDirection: { value: new THREE.Vector3(...initialFrame.direction) },
-      uSunriseProgress: { value: initialFrame.easedProgress },
-      uWarmth: { value: initialFrame.cloudWarmth },
-      uCenter: { value: new THREE.Vector2(centerX, centerZ) },
-      uCloudCool: { value: new THREE.Color(palette.cloud) },
-      uCloudShade: { value: new THREE.Color(palette.cloudShade) },
-      uCloudWarm: { value: new THREE.Color(sunrise.colors.warmCloud) },
-    },
-    vertexShader: `
-      varying vec2 vUv;
-      varying vec3 vWorldPosition;
-      void main() {
-        vUv = uv;
-        mat4 instanceTransform = mat4(1.0);
-        #ifdef USE_INSTANCING
-          instanceTransform = instanceMatrix;
-        #endif
-        vec4 worldPosition = modelMatrix * instanceTransform * vec4(position, 1.0);
-        vWorldPosition = worldPosition.xyz;
-        gl_Position = projectionMatrix * viewMatrix * worldPosition;
-      }
-    `,
-    fragmentShader: `
-      uniform sampler2D uMap;
-      uniform float uOpacity;
-      uniform vec3 uSunDirection;
-      uniform float uSunriseProgress;
-      uniform float uWarmth;
-      uniform vec2 uCenter;
-      uniform vec3 uCloudCool;
-      uniform vec3 uCloudShade;
-      uniform vec3 uCloudWarm;
-      varying vec2 vUv;
-      varying vec3 vWorldPosition;
-
-      void main() {
-        vec2 driftUv = vec2(vUv.x + uSunriseProgress * 0.008, vUv.y);
-        float density = texture2D(uMap, driftUv).a;
-        if (density < 0.006) discard;
-        vec2 radial = normalize(vWorldPosition.xz - uCenter + vec2(0.0001));
-        vec2 solar = normalize(uSunDirection.xz + vec2(0.0001));
-        float alignment = pow(max(dot(radial, solar), 0.0), 4.0);
-        float illuminatedEdge = smoothstep(0.05, 0.45, density)
-          - smoothstep(0.5, 0.92, density);
-        float warmAmount = uWarmth * alignment * (0.34 + illuminatedEdge * 0.66);
-        vec3 cloudColor = mix(uCloudShade, uCloudCool, smoothstep(0.05, 0.42, density));
-        cloudColor = mix(cloudColor, uCloudWarm, warmAmount);
-        gl_FragColor = vec4(cloudColor, density * uOpacity);
-      }
-    `,
-    depthTest: true,
-    depthWrite: false,
-    side: THREE.DoubleSide,
-    transparent: true,
-    toneMapped: true,
-  });
-  material.name = 'CommercialMapSunriseCloudMaterial';
-  const mesh = new THREE.InstancedMesh(geometry, material, placements.length);
-  const transform = new THREE.Object3D();
-  transform.rotation.order = 'YXZ';
-  placements.forEach((cloud, index) => {
-    transform.position.set(...cloud.position);
-    transform.rotation.set(-Math.PI / 2, cloud.rotationY, 0);
-    transform.scale.set(...cloud.scale);
-    transform.updateMatrix();
-    mesh.setMatrixAt(index, transform.matrix);
-  });
-  mesh.name = 'CommercialMapSparseSunriseClouds';
-  mesh.instanceMatrix.setUsage(THREE.StaticDrawUsage);
-  mesh.instanceMatrix.needsUpdate = true;
-  mesh.frustumCulled = false;
-  mesh.renderOrder = -40;
-  mesh.raycast = NO_RAYCAST;
-  return mesh;
-}
-
 function configureSunLight(
   target: THREE.Object3D,
   shadowSpan: number,
@@ -580,10 +425,26 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
     ? 'reduced'
     : initialQualityTier.current ?? 'balanced';
   const quality = COMMERCIAL_MAP_ENVIRONMENT_CONFIG.sunrise.quality[qualityTier];
-  const layout = useMemo(
-    () => resolveCommercialMapEnvironmentLayout(extent, mode, qualityTier),
-    [extent, mode, qualityTier],
+  const cameraDistanceBounds = useMemo(
+    () => resolveCommercialMapCameraDistanceBounds({
+      bounds: extent,
+      verticalFovDegrees: camera instanceof THREE.PerspectiveCamera ? camera.fov : 38,
+      aspect: size.width / Math.max(size.height, 1),
+    }),
+    [camera, extent, size.height, size.width],
   );
+  const layout = useMemo(
+    () => resolveCommercialMapEnvironmentLayout(
+      extent,
+      mode,
+      qualityTier,
+      cameraDistanceBounds.maxDistance,
+    ),
+    [cameraDistanceBounds.maxDistance, extent, mode, qualityTier],
+  );
+  const cloudOpacity = hydrologicalModeActive
+    ? COMMERCIAL_MAP_ENVIRONMENT_CONFIG.clouds.hydrologicalOpacity
+    : COMMERCIAL_MAP_ENVIRONMENT_CONFIG.clouds.opacity;
   const initialSunriseProgress = useRef(sunrisePhase === 'complete' ? 1 : 0);
   const initialFrame = useMemo(
     () => resolveCommercialMapSunriseFrame(initialSunriseProgress.current, mode),
@@ -607,8 +468,16 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
     return target;
   }, [sceneAnchor]);
   const sky = useMemo(
-    () => createSky(layout.skyScale, extent.centerX, extent.centerZ, initialFrame, mode),
-    [extent.centerX, extent.centerZ, initialFrame, layout.skyScale, mode],
+    () => createSky(
+      layout.skyScale,
+      extent.centerX,
+      extent.centerZ,
+      initialFrame,
+      mode,
+      palette,
+      cloudOpacity,
+    ),
+    [cloudOpacity, extent.centerX, extent.centerZ, initialFrame, layout.skyScale, mode, palette],
   );
   const celestialSun = useMemo(
     () => createCelestialSun(sceneAnchor, layout.visualSunDistance, initialFrame),
@@ -618,48 +487,22 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
     () => configureSunLight(sunTarget, layout.shadowSpan, layout.sunDistance, qualityTier),
     [layout.shadowSpan, layout.sunDistance, qualityTier, sunTarget],
   );
-  const cloudPlacements = useMemo(
-    () => resolveCommercialMapCloudPlacements(extent, qualityTier),
-    [extent, qualityTier],
-  );
-  const cloudTextureSize = qualityTier === 'full'
-    ? COMMERCIAL_MAP_ENVIRONMENT_CONFIG.clouds.fullTextureSize
-    : COMMERCIAL_MAP_ENVIRONMENT_CONFIG.clouds.reducedTextureSize;
-  const cloudTexture = useMemo(() => createCloudTexture(cloudTextureSize), [cloudTextureSize]);
-  const cloudOpacity = hydrologicalModeActive
-    ? COMMERCIAL_MAP_ENVIRONMENT_CONFIG.clouds.hydrologicalOpacity
-    : COMMERCIAL_MAP_ENVIRONMENT_CONFIG.clouds.opacity;
-  const cloudLayer = useMemo(
-    () => createCloudLayer(
-      cloudPlacements,
-      cloudTexture,
-      palette,
-      cloudOpacity,
-      extent.centerX,
-      extent.centerZ,
-      initialFrame,
-    ),
-    [cloudOpacity, cloudPlacements, cloudTexture, extent.centerX, extent.centerZ, initialFrame, palette],
-  );
-  const groundTextureSize = qualityTier === 'reduced'
-    ? COMMERCIAL_MAP_ENVIRONMENT_CONFIG.ground.reducedTextureSize
-    : COMMERCIAL_MAP_ENVIRONMENT_CONFIG.ground.fullTextureSize;
-  const outerGroundTexture = useMemo(
-    () => createOuterGroundTexture(groundTextureSize, palette),
-    [groundTextureSize, palette],
-  );
   const activeGroundTextures = useMemo(() => {
     if (hydrologicalModeActive) return null;
     const bundle = openGroundTextureBundleForEntity(ACTIVE_GROUND_PROFILE, maximumAnisotropy);
     if (!bundle) return null;
-    const repeatX = layout.activeGroundWidth / ACTIVE_GROUND_PROFILE.tileWorldSize;
-    const repeatY = layout.activeGroundDepth / ACTIVE_GROUND_PROFILE.tileWorldSize;
+    const repeatX = layout.outerGroundSize / ACTIVE_GROUND_PROFILE.tileWorldSize;
+    const repeatY = layout.outerGroundSize / ACTIVE_GROUND_PROFILE.tileWorldSize;
     [bundle.map, bundle.normalMap, bundle.roughnessMap].forEach((texture) => {
+      // Mirrored repetition joins identical edge texels. This keeps the
+      // procedural grass continuous without another transparent macro layer.
+      texture.wrapS = THREE.MirroredRepeatWrapping;
+      texture.wrapT = THREE.MirroredRepeatWrapping;
       texture.repeat.set(repeatX, repeatY);
       texture.needsUpdate = true;
     });
     return bundle;
-  }, [hydrologicalModeActive, layout.activeGroundDepth, layout.activeGroundWidth, maximumAnisotropy]);
+  }, [hydrologicalModeActive, layout.outerGroundSize, maximumAnisotropy]);
   const reflectionTextureWidth = qualityTier === 'reduced'
     ? COMMERCIAL_MAP_ENVIRONMENT_CONFIG.reflections.reducedTextureWidth
     : COMMERCIAL_MAP_ENVIRONMENT_CONFIG.reflections.fullTextureWidth;
@@ -720,7 +563,19 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
     timeline.current.lastDiagnosticBucket = -1;
     timeline.current.lastCameraSignature = '';
     invalidate();
-  }, [invalidate, sunrisePhase, sunriseSequence, sunriseStartedAt]);
+  }, [
+    celestialSun,
+    invalidate,
+    layout.fogFar,
+    layout.fogNear,
+    mode,
+    qualityTier,
+    sky,
+    sunLight,
+    sunrisePhase,
+    sunriseSequence,
+    sunriseStartedAt,
+  ]);
 
   useEffect(() => {
     // The first demand-render compiles the persistent post stack. Compile the
@@ -741,18 +596,8 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
   }, [celestialSun]);
 
   useEffect(() => () => {
-    cloudLayer.geometry.dispose();
-    cloudLayer.material.dispose();
-    cloudTexture.dispose();
-  }, [cloudLayer, cloudTexture]);
-
-  useEffect(() => () => {
     sunLight.shadow.map?.dispose();
   }, [sunLight]);
-
-  useEffect(() => () => {
-    outerGroundTexture.dispose();
-  }, [outerGroundTexture]);
 
   useEffect(() => () => {
     activeGroundTextures?.dispose();
@@ -767,48 +612,54 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
       : isRunning && liveState.sunriseStartedAt !== null
         ? resolveCommercialMapSunriseProgress(liveState.sunriseStartedAt, now)
         : 0;
-    const cameraSignature = [
-      ...camera.matrixWorld.elements,
-      ...camera.projectionMatrix.elements,
-    ].map((value) => value.toFixed(4)).join(':');
-    const diagnosticsStale = cameraSignature !== timeline.current.lastCameraSignature;
-    const shouldApply = progress !== timeline.current.lastAppliedProgress
-      || liveState.sunriseSequence !== timeline.current.sequence
-      || diagnosticsStale;
-    if (!shouldApply) return;
+    const frameChanged = progress !== timeline.current.lastAppliedProgress
+      || liveState.sunriseSequence !== timeline.current.sequence;
+    const cameraSignature = import.meta.env.DEV
+      ? [
+          ...camera.matrixWorld.elements,
+          ...camera.projectionMatrix.elements,
+        ].map((value) => value.toFixed(4)).join(':')
+      : '';
+    const diagnosticsStale = import.meta.env.DEV
+      && cameraSignature !== timeline.current.lastCameraSignature;
+    if (!frameChanged && !diagnosticsStale) return;
 
     const frame = resolveCommercialMapSunriseFrame(progress, mode);
-    timeline.current.sequence = liveState.sunriseSequence;
-    timeline.current.lastAppliedProgress = progress;
-    frameDirection.set(...frame.direction);
-    updateSkyFrame(sky, frame);
-    updateCelestialSun(
-      celestialSun,
-      sceneAnchor,
-      layout.visualSunDistance,
-      frameDirection,
-      sunFacingDirection,
-      frame,
-    );
-    const cloudMaterial = cloudLayer.material as THREE.ShaderMaterial;
-    (cloudMaterial.uniforms.uSunDirection.value as THREE.Vector3).copy(frameDirection);
-    cloudMaterial.uniforms.uSunriseProgress.value = frame.easedProgress;
-    cloudMaterial.uniforms.uWarmth.value = frame.cloudWarmth;
-    sunLight.position.copy(sceneAnchor).addScaledVector(frameDirection, layout.sunDistance);
-    sunLight.intensity = frame.sunlightIntensity;
-    sunLight.shadow.radius = frame.shadowRadius;
-    sunTarget.updateMatrixWorld();
-    sunLight.updateMatrixWorld();
-    if (ambientRef.current) ambientRef.current.intensity = frame.ambientIntensity;
-    if (hemisphereRef.current) hemisphereRef.current.intensity = frame.hemisphereIntensity;
-    if (fogRef.current) {
-      fogColor.lerpColors(preSunriseFog, finalSunriseFog, frame.cloudWarmth);
-      fogRef.current.color.copy(fogColor);
+    const completedNow = frameChanged
+      && progress >= 1
+      && timeline.current.lastAppliedProgress < 1;
+    if (frameChanged) {
+      timeline.current.sequence = liveState.sunriseSequence;
+      timeline.current.lastAppliedProgress = progress;
+      frameDirection.set(...frame.direction);
+      updateSkyFrame(sky, frame);
+      updateCelestialSun(
+        celestialSun,
+        sceneAnchor,
+        layout.visualSunDistance,
+        frameDirection,
+        sunFacingDirection,
+        frame,
+      );
+      sunLight.position.copy(sceneAnchor).addScaledVector(frameDirection, layout.sunDistance);
+      sunLight.intensity = frame.sunlightIntensity;
+      sunLight.shadow.radius = frame.shadowRadius;
+      sunTarget.updateMatrixWorld();
+      sunLight.updateMatrixWorld();
+      if (ambientRef.current) ambientRef.current.intensity = frame.ambientIntensity;
+      if (hemisphereRef.current) hemisphereRef.current.intensity = frame.hemisphereIntensity;
+      if (fogRef.current) {
+        fogColor.lerpColors(preSunriseFog, finalSunriseFog, frame.cloudWarmth);
+        fogRef.current.color.copy(fogColor);
+      }
+      scene.environmentIntensity = frame.environmentIntensity;
     }
-    scene.environmentIntensity = frame.environmentIntensity;
 
     const diagnosticBucket = progress >= 1 ? 2 : progress >= 0.45 ? 1 : 0;
-    if (diagnosticBucket !== timeline.current.lastDiagnosticBucket || diagnosticsStale) {
+    if (
+      import.meta.env.DEV
+      && (diagnosticBucket !== timeline.current.lastDiagnosticBucket || diagnosticsStale)
+    ) {
       timeline.current.lastDiagnosticBucket = diagnosticBucket;
       timeline.current.lastCameraSignature = cameraSignature;
       camera.getWorldPosition(cameraWorldPosition);
@@ -833,6 +684,9 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
         cameraForward: cameraForward.toArray().map((value) => Number(value.toFixed(5))),
         sunViewDot: Number(cameraForward.dot(frameDirection).toFixed(5)),
         cameraFar: camera instanceof THREE.PerspectiveCamera ? camera.far : null,
+        safeCameraMaxDistance: Number(cameraDistanceBounds.maxDistance.toFixed(3)),
+        fogNear: Number(layout.fogNear.toFixed(3)),
+        fogFar: Number(layout.fogFar.toFixed(3)),
         azimuthMapDegrees: COMMERCIAL_MAP_ENVIRONMENT_CONFIG.sunrise.azimuthMapDegrees,
         elevationDegrees: Number(frame.elevationDegrees.toFixed(3)),
         renderer: {
@@ -847,9 +701,10 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
 
     if (
       sunLight.castShadow
+      && frameChanged
       && (
         now - timeline.current.lastShadowUpdateAt >= quality.shadowRefreshIntervalMs
-        || progress >= 1
+        || completedNow
       )
     ) {
       gl.shadowMap.needsUpdate = true;
@@ -866,7 +721,6 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
       <fog ref={fogRef} attach="fog" args={[preSunriseFog, layout.fogNear, layout.fogFar]} />
       <primitive object={sky} dispose={null} />
       <primitive object={celestialSun} dispose={null} />
-      <primitive object={cloudLayer} dispose={null} />
       <primitive object={sunTarget} dispose={null} />
       <primitive object={sunLight} dispose={null} />
       <ambientLight ref={ambientRef} color="#dbeaf2" intensity={initialFrame.ambientIntensity} />
@@ -876,35 +730,11 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
       />
       <mesh
         rotation={[-Math.PI / 2, 0, 0]}
-        position={[extent.centerX, -0.105, extent.centerZ]}
-        raycast={NO_RAYCAST}
-        renderOrder={-80}
-      >
-        <planeGeometry args={[layout.outerGroundSize, layout.outerGroundSize]} />
-        <meshStandardMaterial
-          color="#ffffff"
-          map={outerGroundTexture}
-          roughness={1}
-          metalness={0}
-          envMapIntensity={0.08}
-          transparent
-          depthWrite={false}
-          // The outer feather is only 0.025 below the active ground. At low
-          // camera near planes its transparent pass can share the same depth
-          // bin and draw stripes over the opaque ground. Bias this background
-          // away, without moving roads, disabling shadows or hiding terrain.
-          polygonOffset
-          polygonOffsetFactor={1}
-          polygonOffsetUnits={2}
-        />
-      </mesh>
-      <mesh
-        rotation={[-Math.PI / 2, 0, 0]}
         position={[extent.centerX, -0.08, extent.centerZ]}
         receiveShadow
         raycast={NO_RAYCAST}
       >
-        <planeGeometry args={[layout.activeGroundWidth, layout.activeGroundDepth]} />
+        <planeGeometry args={[layout.outerGroundSize, layout.outerGroundSize]} />
         <meshStandardMaterial
           color={palette.activeGround}
           map={activeGroundTextures?.map}
