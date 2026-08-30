@@ -9,6 +9,7 @@ import {
 } from '@/features/commercial-map/data/parkAccessSpatialPlan';
 import {
   OFFICIAL_REFERENCE_DATA,
+  OFFICIAL_REFERENCE_ENTITIES,
   officialPdfPointToLocal,
 } from '@/features/commercial-map/data/officialReference2026';
 
