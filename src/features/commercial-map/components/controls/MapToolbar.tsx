@@ -13,6 +13,7 @@ import {
   ScanSearch,
   SlidersHorizontal,
   SquareStack,
+  Sunrise,
   Trees,
   Warehouse,
   X,
@@ -78,6 +79,8 @@ export function MapToolbar({
   const setTreesVisible = useCommercialMapStore((state) => state.setTreesVisible);
   const hydrologicalModeActive = useCommercialMapStore((state) => state.hydrologicalModeActive);
   const toggleHydrologicalMode = useCommercialMapStore((state) => state.toggleHydrologicalMode);
+  const sunrisePhase = useCommercialMapStore((state) => state.sunrisePhase);
+  const requestSunrise = useCommercialMapStore((state) => state.requestSunrise);
   const technicalValidationVisible = useCommercialMapStore((state) => state.technicalValidationVisible);
   const setTechnicalValidationVisible = useCommercialMapStore((state) => state.setTechnicalValidationVisible);
   const canUseTechnicalValidation = canUseTechnicalValidationOverlay(areaScope, permissions);
@@ -86,6 +89,11 @@ export function MapToolbar({
     : ['overview', 'top', 'isometric'];
   const mobileResetPreset: CameraPreset = areaScope === 'exporural' ? 'exporural' : 'overview';
   const mobileSecondaryPresets = presets.filter((preset) => ![mobileResetPreset, 'top'].includes(preset));
+  const sunriseControlLabel = sunrisePhase === 'running'
+    ? 'Reiniciar Amanhecer'
+    : sunrisePhase === 'complete'
+      ? 'Rever Amanhecer'
+      : 'Amanhecer';
 
   useEffect(() => {
     if (!isCompactSearchOpen) return undefined;
@@ -173,6 +181,20 @@ export function MapToolbar({
           <TooltipContent>
             {hydrologicalModeActive ? 'Sair da Rede Hidrológica' : 'Visualizar Rede Hidrológica'}
           </TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type="button"
+              className={sunrisePhase === 'running' ? 'is-active' : ''}
+              onClick={requestSunrise}
+              aria-label={sunriseControlLabel}
+              aria-pressed={sunrisePhase === 'running'}
+            >
+              <Sunrise className="h-4 w-4" aria-hidden="true" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent>Amanhecer</TooltipContent>
         </Tooltip>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -279,6 +301,10 @@ export function MapToolbar({
               );
             })}
             <DropdownMenuSeparator />
+            <DropdownMenuItem onSelect={requestSunrise}>
+              <Sunrise aria-hidden="true" />
+              <span>{sunriseControlLabel}</span>
+            </DropdownMenuItem>
             <DropdownMenuItem
               className="commercial-map-toolbar-menu-focus-selection"
               disabled={!hasSelection}

@@ -5,7 +5,6 @@ interface PixelRatioInput {
   viewportWidth: number;
   viewportHeight: number;
   reducedGraphics: boolean;
-  cameraNavigating?: boolean;
 }
 
 const STANDARD_PIXEL_BUDGET = 4_800_000;
@@ -82,7 +81,9 @@ export function resolveCommercialMapPixelRatio({
   viewportHeight,
   reducedGraphics,
 }: PixelRatioInput) {
-  const safeDpr = Number.isFinite(devicePixelRatio) && devicePixelRatio > 0 ? devicePixelRatio : 1;
+  const safeDpr = Number.isFinite(devicePixelRatio) && devicePixelRatio > 0
+    ? Math.max(1, devicePixelRatio)
+    : 1;
   const safeWidth = Math.max(1, Number.isFinite(viewportWidth) ? viewportWidth : 1);
   const safeHeight = Math.max(1, Number.isFinite(viewportHeight) ? viewportHeight : 1);
   const isPhoneViewport = Math.min(safeWidth, safeHeight) <= 600;
