@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   NON_PERMANENT_REMOVED_IDENTIFIERS_2026,
-  OFFICIAL_REFERENCE_ENTITIES,
+  OFFICIAL_RENDERED_ENTITIES,
 } from '@/features/commercial-map/data/officialReference2026';
 
 const REMOVED = new Set(NON_PERMANENT_REMOVED_IDENTIFIERS_2026);
@@ -30,25 +30,25 @@ describe('limpeza estrutural dos blocos não permanentes', () => {
   });
 
   it('não deixa nenhuma entidade removida na referência renderizada', () => {
-    const remaining = OFFICIAL_REFERENCE_ENTITIES.filter((entity) => REMOVED.has(entity.publicIdentifier));
+    const remaining = OFFICIAL_RENDERED_ENTITIES.filter((entity) => REMOVED.has(entity.publicIdentifier));
     expect(remaining).toEqual([]);
   });
 
   it('não sobra nenhum sanitário no inventário oficial', () => {
-    const restrooms = OFFICIAL_REFERENCE_ENTITIES.filter((entity) => (
+    const restrooms = OFFICIAL_RENDERED_ENTITIES.filter((entity) => (
       entity.classification === 'RESTROOM' || entity.classification === 'CHEMICAL_RESTROOM'
     ));
     expect(restrooms).toEqual([]);
   });
 
   it('preserva integralmente a infraestrutura permanente', () => {
-    const identifiers = new Set(OFFICIAL_REFERENCE_ENTITIES.map((entity) => entity.publicIdentifier));
+    const identifiers = new Set(OFFICIAL_RENDERED_ENTITIES.map((entity) => entity.publicIdentifier));
     PERMANENT_SAMPLE.forEach((identifier) => expect(identifiers.has(identifier)).toBe(true));
   });
 
   it('mantém ruas, quadras, lotes e pavilhões intocados', () => {
     const count = (predicate: (classification: string) => boolean) => (
-      OFFICIAL_REFERENCE_ENTITIES.filter((entity) => predicate(entity.classification)).length
+      OFFICIAL_RENDERED_ENTITIES.filter((entity) => predicate(entity.classification)).length
     );
     expect(count((c) => c === 'ROAD')).toBe(29);
     expect(count((c) => c === 'PEDESTRIAN_PATH')).toBe(1);
