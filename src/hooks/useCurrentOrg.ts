@@ -86,9 +86,12 @@ export function useCurrentOrg() {
   const orgName = (membership?.organizations as any)?.nome || '';
   const myRole = membership?.role || null;
 
-  // Enquanto a sessão hidrata (Safari é mais lento) ou a consulta está em voo,
-  // consideramos o estado indeterminado — nunca "sem organização".
-  const isResolving = authLoading || (!!user && (isLoading || isFetching)) || isError;
+  // A chave inclui user.id: uma revalidação com vínculo já confirmado pertence
+  // à mesma sessão e não deve desmontar a rota protegida. A hidratação inicial,
+  // a ausência de vínculo e os erros continuam indeterminados/fail-closed.
+  const isResolving = authLoading
+    || (!!user && (isLoading || (isFetching && !membership)))
+    || isError;
 
   return {
     orgId,

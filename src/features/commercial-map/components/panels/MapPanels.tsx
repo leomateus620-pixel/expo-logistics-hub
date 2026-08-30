@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import {
   BadgeCheck,
   Building2,
@@ -342,6 +342,22 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions }:
     || landmarkKind === 'livestock-pavilion'
     || landmarkKind === 'mirante-pavilion';
 
+  // The panel is persistent, but commercial drafts belong to one entity only.
+  // Close them before paint when selection changes; only the small forms below
+  // are keyed, never the panel, scene or Canvas.
+  useLayoutEffect(() => {
+    setWorkflow(null);
+    setStructureOperation(null);
+    setEditingLot(false);
+    setVerificationOpen(false);
+    setSheetState('half');
+    dragRef.current.pointerId = -1;
+    suppressHandleClickRef.current = false;
+    const viewport = panelRef.current?.closest('.commercial-map-viewport') as HTMLElement | null;
+    viewport?.classList.remove('is-detail-sheet-dragging');
+    viewport?.style.removeProperty('--commercial-map-detail-sheet-height');
+  }, [entity.id]);
+
   useEffect(() => {
     const viewport = panelRef.current?.closest('.commercial-map-viewport') as HTMLElement | null;
     return () => {
@@ -603,10 +619,10 @@ export function EntityDetailsPanel({ entity, lot, entities, lots, permissions }:
           </Tabs>
         </ScrollArea>
       </aside>
-      {lot && <LotWorkflowDialog lot={lot} workflow={workflow} onClose={() => setWorkflow(null)} />}
-      {lot && <LotStructureDialog operation={structureOperation} lot={lot} entity={entity} entities={entities} lots={lots} onClose={() => setStructureOperation(null)} />}
-      {lot && <LotEditDialog lot={lot} open={editingLot} onClose={() => setEditingLot(false)} />}
-      <EntityVerificationDialog entity={entity} open={verificationOpen} onClose={() => setVerificationOpen(false)} />
+      {lot && <LotWorkflowDialog key={`workflow:${lot.id}`} lot={lot} workflow={workflow} onClose={() => setWorkflow(null)} />}
+      {lot && <LotStructureDialog key={`structure:${lot.id}`} operation={structureOperation} lot={lot} entity={entity} entities={entities} lots={lots} onClose={() => setStructureOperation(null)} />}
+      {lot && <LotEditDialog key={`edit:${lot.id}`} lot={lot} open={editingLot} onClose={() => setEditingLot(false)} />}
+      <EntityVerificationDialog key={`verification:${entity.id}`} entity={entity} open={verificationOpen} onClose={() => setVerificationOpen(false)} />
     </>
   );
 }

@@ -30,7 +30,7 @@ const FULL_MAP_EXTENT: CommercialMapEnvironmentExtent = {
   maxHeight: 24,
 };
 
-const source = (path: string) => readFileSync(resolve(path), 'utf8');
+const source = (path: string) => readFileSync(resolve(path), 'utf8').replace(/\r\n/g, '\n');
 
 describe('amanhecer premium compartilhado do Mapa Comercial', () => {
   it('mantém o terreno externo opaco atrás do mapa, sem borda alfa circular', () => {
@@ -273,7 +273,8 @@ describe('amanhecer premium compartilhado do Mapa Comercial', () => {
     expect(canvas).toContain('frameloop="demand"');
     expect(canvas).toContain('THREE.SRGBColorSpace');
     expect(canvas).toContain('THREE.ACESFilmicToneMapping');
-    expect(environment.match(/\buseFrame\(/g)).toHaveLength(1);
+    // One timeline subscriber plus the explicit persistent composer render pass.
+    expect(environment.match(/\buseFrame\(/g)).toHaveLength(2);
     expect(environment).toContain('const sky = useMemo(');
     expect(environment).toContain('const celestialSun = useMemo(');
     expect(environment).toContain('const sunLight = useMemo(');
@@ -288,11 +289,12 @@ describe('amanhecer premium compartilhado do Mapa Comercial', () => {
     expect(environment).toContain('composedSky = mix(composedSky, cloudColor, cloudDensity)');
     expect(environment).toContain('commercial-map-camera-safe-sunrise-sky-${mode}-v4');
     expect(environment).toContain('new THREE.ShaderMaterial');
-    expect(environment).toContain('<EffectComposer');
-    expect(environment).toContain('multisampling={0}');
-    expect(environment).toContain('<Bloom');
-    expect(environment).toContain('luminanceThreshold={3.2}');
-    expect(environment).toContain('levels={quality.bloomLevels}');
+    expect(environment).toContain('new EffectComposer(gl');
+    expect(environment).toContain('multisampling: 0');
+    expect(environment).toContain('frameBufferType: THREE.HalfFloatType');
+    expect(environment).toContain('new BloomEffect(');
+    expect(environment).toContain('luminanceThreshold: 3.2');
+    expect(environment).toContain('levels: bloomLevels');
     expect(environment).not.toContain('SelectiveBloom');
     expect(environment).not.toContain('selection=');
     expect(environment).toContain('createCelestialSun');
@@ -301,7 +303,7 @@ describe('amanhecer premium compartilhado do Mapa Comercial', () => {
     expect(environment).toContain('<primitive object={celestialSun}');
     expect(environment).not.toContain('bloomResolutionScale');
     expect(environment).not.toContain('resolutionScale=');
-    expect(environment).toContain('<ToneMapping mode={ToneMappingMode.ACES_FILMIC} />');
+    expect(environment).toContain('new ToneMappingEffect({ mode: ToneMappingMode.ACES_FILMIC })');
     expect(environment).toContain('gl.compile(scene, camera)');
     expect(environment).toContain('scene.environment = reflectionTexture');
     expect(environment).toContain('scene.environment = previousEnvironment');

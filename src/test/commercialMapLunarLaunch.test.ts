@@ -1,6 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import * as THREE from 'three';
+import { disposeInstancedMesh } from '@/features/commercial-map/utils/instancedMeshDisposal';
 import { useCommercialMapStore } from '@/features/commercial-map/state/useCommercialMapStore';
 import {
   LUNAR_LAUNCH_GESTURE,
@@ -18,7 +20,7 @@ import {
 const effectsSource = readFileSync(resolve(
   process.cwd(),
   'src/features/commercial-map/components/canvas/LunarRocketLaunchEffects.tsx',
-), 'utf8');
+), 'utf8').replace(/\r\n/g, '\n');
 const landmarkSource = readFileSync(resolve(
   process.cwd(),
   'src/features/commercial-map/components/canvas/StrategicLandmarks.tsx',
@@ -205,7 +207,7 @@ describe('experiência cinematográfica do Foguete Lunar', () => {
     expect(effectsSource).toContain('<instancedMesh');
     expect(effectsSource).toContain('worldEffects.current.visible = false');
     expect(effectsSource).toContain('geometry.dispose()');
-    expect(effectsSource).toContain('plume.current?.dispose()');
+    expect(effectsSource).toContain('disposeInstancedMesh(previous)');
     expect(effectsSource).toContain('lastShadowRefresh.current = 0');
     expect(effectsSource).toContain("canvas.addEventListener('pointerdown', handleCanvasPointerDown, true)");
     expect(effectsSource).toContain('trySetPointerCapture(event.target, event.nativeEvent.pointerId)');
@@ -225,7 +227,7 @@ describe('experiência cinematográfica do Foguete Lunar', () => {
     expect(pageSource).toContain('lunarLaunchPreviousPanel === \'details\'');
     expect(canvasSource).toContain('interface LunarCameraSnapshot');
     expect(canvasSource).toContain('scratch.quaternion.slerpQuaternions(');
-    expect(canvasSource).toContain('enabled={!lunarCameraLocked}');
+    expect(canvasSource).toContain('enabled={!lunarCameraLocked && !transitionControlsLocked}');
     expect(canvasSource).toContain('completeLunarLaunch(false)');
     expect(canvasSource).toContain('const liveLaunchState = useCommercialMapStore.getState()');
     expect(canvasSource).toContain('liveLaunchState.lunarLaunchSkipRequested');
@@ -242,5 +244,52 @@ describe('experiência cinematográfica do Foguete Lunar', () => {
     expect(mobileStylesSource).toContain('min-height: 2.75rem');
     expect(packageSource).not.toContain('"gsap"');
     expect(packageSource).not.toContain('"three.quarks"');
+  });
+
+  it('libera a instância capturada no detach antes de zerar a ref, sem descartar recursos compartilhados', () => {
+    const helper = effectsSource.slice(
+      effectsSource.indexOf('function useDisposableInstancedMeshRef()'),
+      effectsSource.indexOf('function trySetPointerCapture'),
+    );
+    expect(helper).toContain('const previous = mesh.current;');
+    expect(helper).toContain('if (previous && previous !== next) disposeInstancedMesh(previous);');
+    expect(helper.indexOf('disposeInstancedMesh(previous)')).toBeLessThan(helper.indexOf('mesh.current = next;'));
+    expect(effectsSource).toContain('const [plume, setPlume] = useDisposableInstancedMeshRef();');
+    expect(effectsSource).toContain('ref={setPlume}');
+    expect(effectsSource).not.toContain('disposeInstancedMesh(plume.current)');
+
+    const geometry = new THREE.PlaneGeometry(1, 1);
+    const material = new THREE.MeshBasicMaterial();
+    const geometryDispose = vi.spyOn(geometry, 'dispose');
+    const materialDispose = vi.spyOn(material, 'dispose');
+    for (let index = 0; index < 20; index += 1) {
+      const mesh = new THREE.InstancedMesh(geometry, material, 3);
+      const released = vi.fn();
+      mesh.addEventListener('dispose', released);
+      // R3F's dispose={null} overrides this instance member.
+      Object.defineProperty(mesh, 'dispose', { value: null });
+      disposeInstancedMesh(mesh);
+      expect(released).toHaveBeenCalledTimes(1);
+    }
+    expect(geometryDispose).not.toHaveBeenCalled();
+    expect(materialDispose).not.toHaveBeenCalled();
+    geometry.dispose();
+    material.dispose();
+  });
+
+  it('descarta somente o pool substituído no resize, mantendo o tier e os materiais visuais', () => {
+    for (const pool of ['hotPool', 'sparkPool', 'dustPool', 'smokePool']) {
+      expect(effectsSource).toContain(`useEffect(() => () => ${pool}.geometry.dispose(), [${pool}]);`);
+    }
+    const stableCleanup = effectsSource.slice(
+      effectsSource.indexOf('useEffect(() => () => {\n    hitMaterial.dispose();'),
+      effectsSource.indexOf('  useEffect(() => {\n    const canvas = gl.domElement;'),
+    );
+    expect(stableCleanup).toContain('plumeMaterial.dispose();');
+    expect(stableCleanup).toContain('engineCoreGeometry.dispose();');
+    expect(stableCleanup).not.toMatch(/\b(?:hotPool|sparkPool|dustPool|smokePool)\b/);
+    expect(effectsSource).toContain('useEffect(() => () => hitGeometry.dispose(), [hitGeometry]);');
+    expect(effectsSource).toContain('resolveLunarLaunchQuality({');
+    expect(effectsSource).toContain('[navigatorCapabilities, reducedGraphics, size.height, size.width]');
   });
 });

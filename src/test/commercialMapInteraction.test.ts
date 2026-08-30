@@ -1,10 +1,16 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import {
   CAMERA_NAVIGATION_MIN_DELTA,
+  CAMERA_TRANSITION_MAX_DURATION_MS,
+  CAMERA_TRANSITION_MIN_DURATION_MS,
   MAP_CLICK_MAX_DELTA,
+  MAP_TOUCH_MAX_MOVEMENT_PX,
   isCameraNavigationMovement,
   isMapSelectionClick,
   isSelectableMapClassification,
+  registerMapGestureGuard,
+  resolveCameraTransitionDuration,
+  resolveCameraTransitionProgress,
   selectionFocusProfile,
 } from '@/features/commercial-map/utils/interaction';
 import { useCommercialMapStore } from '@/features/commercial-map/state/useCommercialMapStore';
@@ -37,10 +43,60 @@ describe('pipeline de seleção do mapa comercial', () => {
     expect(isMapSelectionClick(MAP_CLICK_MAX_DELTA + 0.01)).toBe(false);
   });
 
+  it('distingue toque de arraste e pinça antes do raycast selecionar', () => {
+    const canvas = document.createElement('canvas');
+    document.body.appendChild(canvas);
+    const dispose = registerMapGestureGuard(canvas);
+    const dispatchPointer = (type: string, pointerId: number, x: number, y: number) => {
+      const event = new MouseEvent(type, { bubbles: true, clientX: x, clientY: y });
+      Object.defineProperties(event, {
+        pointerId: { value: pointerId },
+        pointerType: { value: 'touch' },
+      });
+      canvas.dispatchEvent(event);
+    };
+    const clickAccepted = () => {
+      let accepted = false;
+      canvas.addEventListener('click', (event) => {
+        accepted = isMapSelectionClick(0, event);
+      }, { once: true });
+      canvas.dispatchEvent(new MouseEvent('click', { bubbles: true }));
+      return accepted;
+    };
+
+    dispatchPointer('pointerdown', 1, 20, 20);
+    dispatchPointer('pointerup', 1, 23, 22);
+    expect(clickAccepted()).toBe(true);
+
+    dispatchPointer('pointerdown', 2, 20, 20);
+    dispatchPointer('pointermove', 2, 20 + MAP_TOUCH_MAX_MOVEMENT_PX + 1, 20);
+    dispatchPointer('pointerup', 2, 20 + MAP_TOUCH_MAX_MOVEMENT_PX + 1, 20);
+    expect(clickAccepted()).toBe(false);
+
+    dispatchPointer('pointerdown', 3, 20, 20);
+    dispatchPointer('pointerdown', 4, 32, 20);
+    dispatchPointer('pointerup', 3, 20, 20);
+    dispatchPointer('pointerup', 4, 32, 20);
+    expect(clickAccepted()).toBe(false);
+
+    dispose();
+    canvas.remove();
+  });
+
   it('só suspende hover depois que a câmera realmente se move', () => {
     expect(isCameraNavigationMovement(CAMERA_NAVIGATION_MIN_DELTA / 2, 0)).toBe(false);
     expect(isCameraNavigationMovement(CAMERA_NAVIGATION_MIN_DELTA, 0)).toBe(true);
     expect(isCameraNavigationMovement(0, CAMERA_NAVIGATION_MIN_DELTA * 2)).toBe(true);
+  });
+
+  it('mantém a transição de câmera determinística, limitada e monotônica', () => {
+    expect(resolveCameraTransitionDuration(0)).toBe(CAMERA_TRANSITION_MIN_DURATION_MS);
+    expect(resolveCameraTransitionDuration(10_000)).toBe(CAMERA_TRANSITION_MAX_DURATION_MS);
+    const duration = resolveCameraTransitionDuration(64);
+    expect(resolveCameraTransitionProgress(0, duration)).toBe(0);
+    expect(resolveCameraTransitionProgress(duration / 2, duration)).toBeCloseTo(0.5, 6);
+    expect(resolveCameraTransitionProgress(duration, duration)).toBe(1);
+    expect(resolveCameraTransitionProgress(duration * 2, duration)).toBe(1);
   });
 
   it('mantém quadras e estruturas selecionáveis sem transformar vias em alvos', () => {
@@ -72,6 +128,47 @@ describe('pipeline de seleção do mapa comercial', () => {
       cameraNavigating: true,
       selectedEntityId: 'entity:quadra-n',
       activePanel: 'details',
+    });
+  });
+
+  it('solicita novo foco ao repetir a seleção exterior depois de cancelar um voo', () => {
+    const store = useCommercialMapStore.getState();
+    const initialSequence = store.cameraSequence;
+    store.setSelectedEntityId('entity:pavilion-1');
+    store.setCameraNavigating(false);
+    store.setSelectedEntityId('entity:pavilion-1');
+
+    expect(useCommercialMapStore.getState()).toMatchObject({
+      selectedEntityId: 'entity:pavilion-1',
+      activePanel: 'details',
+      cameraSequence: initialSequence + 1,
+    });
+
+    store.setSelectedEntityId('entity:pavilion-1');
+    expect(useCommercialMapStore.getState().cameraSequence).toBe(initialSequence + 2);
+    store.setSelectedEntityId('entity:pavilion-2');
+    store.setSelectedEntityId(null);
+    store.setSelectedEntityId(null);
+    expect(useCommercialMapStore.getState().cameraSequence).toBe(initialSequence + 2);
+  });
+
+  it('não refaz o enquadramento nem perde o retorno ao repetir seleção no interior', () => {
+    const store = useCommercialMapStore.getState();
+    store.enterInterior('reference:2026:b4');
+    const returnView = {
+      position: [12, 8, 19] as [number, number, number],
+      target: [-4, 1, -9] as [number, number, number],
+    };
+    store.setInteriorReturnView(returnView);
+    const interiorSequence = useCommercialMapStore.getState().cameraSequence;
+
+    store.setSelectedEntityId('reference:2026:b4');
+
+    expect(useCommercialMapStore.getState()).toMatchObject({
+      selectedEntityId: 'reference:2026:b4',
+      interiorEntityId: 'reference:2026:b4',
+      interiorReturnView: returnView,
+      cameraSequence: interiorSequence,
     });
   });
 

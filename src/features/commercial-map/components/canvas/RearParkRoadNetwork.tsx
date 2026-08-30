@@ -114,7 +114,7 @@ export const RearParkRoadNetwork = memo(function RearParkRoadNetwork({
 
   const handleClick = useCallback((surface: RearRoadHitSurface) => (event: ThreeEvent<MouseEvent>) => {
     event.stopPropagation();
-    if (cameraNavigating || !isMapSelectionClick(event.delta)) return;
+    if (cameraNavigating || !isMapSelectionClick(event.delta, event.nativeEvent)) return;
     const entityId = resolveEntityId(event, surface);
     if (!entityId) return;
     onSelect(entityId);

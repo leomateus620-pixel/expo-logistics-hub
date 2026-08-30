@@ -671,7 +671,7 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
   }, [gl, interactive, setHoveredModuleId]);
 
   const handleClick = useCallback((event: ThreeEvent<MouseEvent>) => {
-    if (!interactive || !isMapSelectionClick(event.delta)) return;
+    if (!interactive || !isMapSelectionClick(event.delta, event.nativeEvent)) return;
     event.stopPropagation();
     const part = event.instanceId === undefined ? null : projectedModuleParts[event.instanceId];
     if (!part) return;
@@ -683,7 +683,7 @@ export const CommercialPavilionModuleLayer = memo(function CommercialPavilionMod
     moduleId: string,
     event: ThreeEvent<MouseEvent>,
   ) => {
-    if (!interactive || !isMapSelectionClick(event.delta)) return;
+    if (!interactive || !isMapSelectionClick(event.delta, event.nativeEvent)) return;
     event.stopPropagation();
     const current = useCommercialMapStore.getState().selectedModuleId;
     setSelectedModuleId(current === moduleId ? null : moduleId);

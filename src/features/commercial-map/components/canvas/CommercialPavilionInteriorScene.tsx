@@ -1,8 +1,7 @@
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
-import { OrbitControls } from '@react-three/drei';
-import { useFrame, useThree } from '@react-three/fiber';
+import { useThree } from '@react-three/fiber';
+import { useInteriorCameraRequest, type InteriorCameraRequest } from '../../hooks/useInteriorCameraRequest';
 import * as THREE from 'three';
-import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib';
 import type { CommercialLot, MapEntity } from '../../types';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import {
@@ -199,7 +198,6 @@ function createLowPerimeter(layout: CommercialPavilionLayout): InstanceTransform
 function PavilionInteriorCameraRig({
   entity,
   layout,
-  reducedGraphics,
   interiorViewRotation,
 }: {
   entity: MapEntity;
@@ -207,126 +205,38 @@ function PavilionInteriorCameraRig({
   reducedGraphics: boolean;
   interiorViewRotation: number;
 }) {
-  const controls = useRef<OrbitControlsImpl | null>(null);
-  const animating = useRef(true);
-  const targetPosition = useRef(new THREE.Vector3());
-  const targetLookAt = useRef(new THREE.Vector3());
-  const { camera, gl, invalidate, size } = useThree();
-  const setCameraNavigating = useCommercialMapStore((state) => state.setCameraNavigating);
-  const bounds = useMemo(() => strategicLandmarkBounds(entity), [entity]);
-  const facing = strategicLandmarkFacingRadians(entity);
-  const cameraFacing = facing + interiorViewRotation;
-  const center = useMemo(
-    () => new THREE.Vector3(bounds.centerX, entity.geometry.elevation, bounds.centerZ),
-    [bounds.centerX, bounds.centerZ, entity.geometry.elevation],
-  );
-  const maximumDimension = Math.max(layout.width, layout.depth);
-  const toWorld = useCallback((x: number, y: number, z: number) => (
-    new THREE.Vector3(x, y, z).applyAxisAngle(UP, cameraFacing).add(center)
-  ), [cameraFacing, center]);
-  const clampTarget = useCallback(() => {
-    const target = controls.current?.target;
-    if (!target) return;
-    const local = target.clone().sub(center).applyAxisAngle(UP, -facing);
-    local.x = THREE.MathUtils.clamp(
-      local.x,
-      -layout.interior.clearWidth * 0.62,
-      layout.interior.clearWidth * 0.62,
+  const size = useThree((state) => state.size);
+  const request = useMemo<InteriorCameraRequest>(() => {
+    const bounds = strategicLandmarkBounds(entity);
+    const facing = strategicLandmarkFacingRadians(entity);
+    const center = new THREE.Vector3(bounds.centerX, entity.geometry.elevation, bounds.centerZ);
+    const toWorld = (x: number, y: number, z: number) => (
+      new THREE.Vector3(x, y, z).applyAxisAngle(UP, facing + interiorViewRotation).add(center)
     );
-    local.z = THREE.MathUtils.clamp(
-      local.z,
-      -layout.interior.clearDepth * 0.62,
-      layout.interior.clearDepth * 0.62,
-    );
-    local.y = THREE.MathUtils.clamp(local.y, 0, layout.height * 0.32);
-    target.copy(local.applyAxisAngle(UP, facing).add(center));
-  }, [center, facing, layout.height, layout.interior.clearDepth, layout.interior.clearWidth]);
-
-  useEffect(() => {
+    const maximumDimension = Math.max(layout.width, layout.depth);
     const compact = size.width < 720 || size.height < 540;
     const portrait = size.height > size.width * 1.12;
-    const heightMultiplier = portrait ? 1.95 : compact ? 1.72 : 1.5;
-    const destination = toWorld(
-      0,
-      maximumDimension * heightMultiplier,
-      maximumDimension * (portrait ? 0.18 : 0.24),
-    );
-    const start = toWorld(
-      -layout.width * 0.12,
-      maximumDimension * (heightMultiplier + 0.52),
-      maximumDimension * 0.56,
-    );
-    const lookAt = toWorld(0, layout.interior.floorY, 0);
-    targetPosition.current.copy(destination);
-    targetLookAt.current.copy(lookAt);
-    camera.position.copy(reducedGraphics ? destination : start);
-    camera.lookAt(lookAt);
-    camera.near = 0.035;
-    camera.far = Math.max(120, maximumDimension * 12);
-    if (camera instanceof THREE.PerspectiveCamera) camera.fov = portrait ? 47 : compact ? 44 : 40;
-    camera.updateProjectionMatrix();
-    controls.current?.target.copy(lookAt);
-    controls.current?.update();
-    animating.current = !reducedGraphics;
-    gl.domElement.style.cursor = 'grab';
-    invalidate();
-    return () => {
-      gl.domElement.style.cursor = 'grab';
+    return {
+      entityId: entity.id,
+      position: toWorld(0, maximumDimension * (portrait ? 1.95 : compact ? 1.72 : 1.5), maximumDimension * (portrait ? 0.18 : 0.24)),
+      target: toWorld(0, layout.interior.floorY, 0),
+      fov: portrait ? 47 : compact ? 44 : 40,
+      near: 0.035,
+      far: Math.max(120, maximumDimension * 12),
+      minDistance: maximumDimension * 0.2,
+      maxDistance: maximumDimension * 3.3,
+      minPolarAngle: 0.025,
+      maxPolarAngle: 0.82,
+      panBounds: {
+        center,
+        facing,
+        min: [-layout.interior.clearWidth * 0.62, 0, -layout.interior.clearDepth * 0.62],
+        max: [layout.interior.clearWidth * 0.62, layout.height * 0.32, layout.interior.clearDepth * 0.62],
+      },
     };
-  }, [camera, gl, invalidate, layout.interior.floorY, layout.width, maximumDimension, reducedGraphics, size.height, size.width, toWorld]);
-
-  useFrame((_state, delta) => {
-    if (!animating.current) return;
-    const factor = 1 - Math.exp(-delta * 5.2);
-    camera.position.lerp(targetPosition.current, factor);
-    if (controls.current) {
-      controls.current.target.lerp(targetLookAt.current, factor);
-      clampTarget();
-      controls.current.update();
-    }
-    if (camera.position.distanceTo(targetPosition.current) < 0.035
-      && (!controls.current || controls.current.target.distanceTo(targetLookAt.current) < 0.025)) {
-      camera.position.copy(targetPosition.current);
-      controls.current?.target.copy(targetLookAt.current);
-      controls.current?.update();
-      animating.current = false;
-    } else {
-      invalidate();
-    }
-  });
-
-  useEffect(() => () => setCameraNavigating(false), [setCameraNavigating]);
-
-  return (
-    <OrbitControls
-      ref={controls}
-      makeDefault
-      enableDamping
-      dampingFactor={0.075}
-      enablePan
-      screenSpacePanning
-      zoomToCursor
-      minDistance={maximumDimension * 0.2}
-      maxDistance={maximumDimension * 3.3}
-      minPolarAngle={0.025}
-      maxPolarAngle={0.82}
-      touches={{ ONE: THREE.TOUCH.PAN, TWO: THREE.TOUCH.DOLLY_ROTATE }}
-      target={toWorld(0, layout.interior.floorY, 0).toArray()}
-      onStart={() => {
-        animating.current = false;
-        setCameraNavigating(true);
-        gl.domElement.style.cursor = 'grabbing';
-      }}
-      onEnd={() => {
-        setCameraNavigating(false);
-        gl.domElement.style.cursor = 'grab';
-      }}
-      onChange={() => {
-        clampTarget();
-        invalidate();
-      }}
-    />
-  );
+  }, [entity, interiorViewRotation, layout, size.height, size.width]);
+  useInteriorCameraRequest(request);
+  return null;
 }
 
 export const CommercialPavilionInteriorScene = memo(function CommercialPavilionInteriorScene({

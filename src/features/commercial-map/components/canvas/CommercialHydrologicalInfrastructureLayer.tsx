@@ -506,7 +506,7 @@ function CommercialHydrologicalInfrastructureInstances({
   }, [materials]);
 
   const handleSelection = useCallback((event: ThreeEvent<MouseEvent>) => {
-    if (!onSelect || event.instanceId === undefined || !isMapSelectionClick(event.delta)) return;
+    if (!onSelect || event.instanceId === undefined || !isMapSelectionClick(event.delta, event.nativeEvent)) return;
     const selected = selectableVisuals[event.instanceId]?.placement.node;
     if (!selected) return;
     event.stopPropagation();
@@ -517,7 +517,7 @@ function CommercialHydrologicalInfrastructureInstances({
     event: ThreeEvent<MouseEvent>,
     spans: readonly HydrologicalPipeSpan[],
   ) => {
-    if (!onSelect || event.instanceId === undefined || !isMapSelectionClick(event.delta)) return;
+    if (!onSelect || event.instanceId === undefined || !isMapSelectionClick(event.delta, event.nativeEvent)) return;
     const selected = spans[event.instanceId]?.segment;
     if (!selected?.selectable) return;
     event.stopPropagation();
