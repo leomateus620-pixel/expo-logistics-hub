@@ -416,6 +416,13 @@ const roadInputs: Array<[string, string, PdfPolygon, MapClassification?]> = [
   ['RUA-ARGENTINA', 'Rua Argentina', rectPdf([2820, 3716, 3940, 3780])],
   ['RUA-BRASILIA', 'Rua Brasília', rectPdf([3940, 2440, 3988, 4210])],
   ['RUA-MONTEVIDEU', 'Rua Montevidéu', rectPdf([3441, 3106, 3482, 3715])],
+  // Corredores já reservados entre as quadras que faltavam na malha viária.
+  // As bandas repetem as faixas das vias homônimas e avançam alguns pontos
+  // sobre as vias vizinhas para que as interseções sejam geradas sem costura.
+  ['RUA-URUGUAI-LESTE', 'Rua Uruguai (trecho leste)', rectPdf([3960, 3438, 4510, 3494])],
+  ['RUA-ARGENTINA-LESTE', 'Rua Argentina (trecho leste)', rectPdf([3960, 3716, 4510, 3780])],
+  ['RUA-MONTEVIDEU-SUL', 'Rua Montevidéu (trecho sul)', rectPdf([3441, 2600, 3482, 3130])],
+  ['RUA-INTERNA-OESTE', 'Rua Interna Oeste', rectPdf([2222, 2450, 2241, 3125])],
   ['ALAMEDA-MERCOSUL', 'Alameda Mercosul', rectPdf([2786, 2410, 2828, 3780])],
   ['CALCADA-ARVOREDO', 'Calçada do Arvoredo', rectPdf([2630, 3110, 2782, 3565]), 'PEDESTRIAN_PATH'],
   ['AV-BENVENUTO-CONTI', 'Avenida Benvenuto de Conti', rectPdf([1050, 4165, 3940, 4235])],
