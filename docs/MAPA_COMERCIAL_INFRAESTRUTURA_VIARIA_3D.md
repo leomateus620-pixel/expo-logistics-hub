@@ -76,7 +76,8 @@ espessura 0.032:
 | `RUA-ARGENTINA-LESTE` | 13.31→25.31 / 16.17→17.56 | continuidade leste da Rua Argentina |
 | `RUA-MONTEVIDEU-SUL` | 1.99→2.88 / -8.18→3.38 | faixa oeste das Quadras F e G |
 | `RUA-INTERNA-OESTE` | -24.61→-24.20 / -11.45→3.27 | corredor entre V/U/T e Q/P/O |
-| `PRACA-ACESSO-EXPORURAL` | 8.95→13.92 / -11.59→-7.66 | conexão ao lado do Espaço Mirante com o início da Exporural |
+| ~~`PRACA-ACESSO-EXPORURAL`~~ | arquivada | a laje ao lado do Espaço Mirante foi removida; o acesso é feito pela própria `RUA-BRASILIA`, contínua da lateral do `Q-E-13` até a `RUA-PASTOR-ALBERT-LEHENBAUER`, ao lado do `Q-R-02` |
+| `RUA-UBIRETAMA-LATERAL-R55` | 57.05→57.99 / -26.62→-19.42 | faixa da Ubiretama rente ao `Q-R-55` até a `RUA-GUSTAVO-BESSEL`; a `RODOVIA-RS-472` foi recuada para leste (x ≥ 58.03) porque cobria essa via |
 | `RUA-INTERNA-QUADRA-G` | 4.41→5.93 / -7.66→-3.03 | corredor vago da Quadra G (Bolívia ↔ Chile) |
 | `RUA-INTERNA-QUADRA-T` | -34.93→-33.58 / -11.59→2.90 | Q-V-06 até Q-T-12 (Paraguai ↔ Brasil) |
 | `RUA-LESTE-EXPORURAL` | 56.55→57.08 / -37.31→-26.47 | Q-R-55 até Q-S-19 (Johan Muller ↔ Bruno Schwartz ↔ Ubiretama) |
