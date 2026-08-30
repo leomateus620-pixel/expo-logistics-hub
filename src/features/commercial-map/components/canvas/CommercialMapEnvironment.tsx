@@ -889,6 +889,13 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
           envMapIntensity={0.08}
           transparent
           depthWrite={false}
+          // The outer feather is only 0.025 below the active ground. At low
+          // camera near planes its transparent pass can share the same depth
+          // bin and draw stripes over the opaque ground. Bias this background
+          // away, without moving roads, disabling shadows or hiding terrain.
+          polygonOffset
+          polygonOffsetFactor={1}
+          polygonOffsetUnits={2}
         />
       </mesh>
       <mesh

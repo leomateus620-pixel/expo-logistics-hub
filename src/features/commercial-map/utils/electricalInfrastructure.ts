@@ -4,7 +4,10 @@ import {
   type CommercialElectricalConnection,
   type CommercialElectricalNode,
 } from '../data/electricalInfrastructure';
-import { resolveElectricalArchitectureClearancePosition } from '../data/electricalPresentation';
+import {
+  resolveElectricalArchitectureClearancePosition,
+  resolveRearRoadElectricalClearancePosition,
+} from '../data/electricalPresentation';
 import type { CommercialLot, Coordinate, MapClassification, MapEntity } from '../types';
 import {
   closestPointOnSegment,
@@ -13,6 +16,11 @@ import {
   entitySurfaceElevation,
   pointInPolygon,
 } from './spatialSurface';
+import {
+  buildRearRoadCorridorFootprints,
+  distanceToPath,
+  type RearRoadCorridorFootprint,
+} from './rearRoadNetwork';
 
 export const ELECTRICAL_INFRASTRUCTURE_PRIMARY_DRAW_CALL_BUDGET = 9;
 export const ELECTRICAL_INFRASTRUCTURE_SHADOW_DRAW_CALL_BUDGET = 4;
@@ -168,6 +176,7 @@ function resolveFacadePresentation(
   node: CommercialElectricalNode,
   entityByIdentifier: ReadonlyMap<string, MapEntity>,
   obstacles: readonly MapEntity[],
+  rearRoadFootprints: readonly RearRoadCorridorFootprint[],
 ) {
   if (
     (node.mountMode !== 'FACADE_RECEPTION' && node.mountMode !== 'FACADE_POLE')
@@ -212,6 +221,8 @@ function resolveFacadePresentation(
         outsideHost: !pointInPolygon(renderPosition, polygon),
         blocked: obstacles.some((obstacle) => (
           distanceToEntity(renderPosition, obstacle) < envelopeRadius - 1e-6
+        )) || rearRoadFootprints.some((footprint) => (
+          distanceToPath(renderPosition, footprint.centerline) <= footprint.halfWidth + envelopeRadius + 0.05
         )),
       };
     });
@@ -233,25 +244,33 @@ function resolveFacadePresentation(
 export function resolveElectricalNodePlacements(
   nodes: readonly CommercialElectricalNode[],
   entities: readonly MapEntity[] = [],
+  rearRoadsActive = false,
 ): readonly ResolvedElectricalNodePlacement[] {
   const surfaces = indexElectricalSurfaces(entities);
   const entityByIdentifier = new Map(entities.map((entity) => [entity.publicIdentifier, entity]));
   const obstacles = entities.filter((entity) => (
     ELECTRICAL_OBSTACLE_CLASSIFICATIONS.has(entity.classification)
   ));
+  const rearRoadFootprints = rearRoadsActive
+    ? buildRearRoadCorridorFootprints(undefined, { includeShoulders: true })
+    : [];
   return nodes.map((node) => {
-    const facade = resolveFacadePresentation(node, entityByIdentifier, obstacles);
+    const facade = resolveFacadePresentation(node, entityByIdentifier, obstacles, rearRoadFootprints);
     const architectureClearance = facade
       ? null
       : resolveElectricalArchitectureClearancePosition(node, entityByIdentifier);
-    const renderPosition = facade?.renderPosition ?? architectureClearance ?? node.position;
+    const rearRoadClearance = rearRoadsActive && !facade
+      ? resolveRearRoadElectricalClearancePosition(node)
+      : null;
+    const renderPosition = facade?.renderPosition ?? rearRoadClearance ?? architectureClearance ?? node.position;
     return {
       node,
       renderPosition,
       groundElevation: groundElevationAtPosition(node, renderPosition, surfaces),
       rotationRadians: facade?.rotationRadians ?? node.rotationRadians,
       sourceAnchorPreserved: true,
-      placementStatus: facade?.placementStatus ?? (architectureClearance ? 'PROJECTED_CLEARANCE' : 'DIRECT'),
+      placementStatus: facade?.placementStatus
+        ?? (rearRoadClearance || architectureClearance ? 'PROJECTED_CLEARANCE' : 'DIRECT'),
     };
   });
 }

@@ -1,15 +1,15 @@
 import { REAR_ROAD_IDENTITIES } from '../data/rearParkRoadNetwork';
 import type { MapEntity } from '../types';
 
-const REAR_ROAD_OWNER_IDENTIFIERS = new Set(
+const REAR_ROAD_OWNER_IDENTIFIERS = new Set<string>(
   REAR_ROAD_IDENTITIES.map((identity) => identity.officialOwnerIdentifier),
 );
 
 /**
  * Resolves the generated ribbons from the same persisted circulation layers as
- * their three official owners. Filter fading mirrors `RoadInfrastructure`; the
- * batch deliberately stays non-raycast and does not manufacture a second
- * selected/highlightable road identity.
+ * their official owners. Filter fading mirrors `RoadInfrastructure`; hit-tests
+ * on the batch resolve back to those owners and never manufacture a second
+ * selected road identity.
  */
 export function rearRoadLayerPresentation(
   entities: readonly MapEntity[],

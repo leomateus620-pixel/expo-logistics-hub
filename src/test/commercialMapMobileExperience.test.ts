@@ -5,6 +5,11 @@ import { describe, expect, it } from 'vitest';
 const read = (path: string) => readFileSync(resolve(path), 'utf8');
 
 describe('arquitetura mobile-first do Mapa Comercial', () => {
+  it('usa apenas a barra compacta até 950px, incluindo o telefone em paisagem', () => {
+    const topbar = read('src/features/commercial-map/components/controls/commercial-map-topbar.css');
+    expect(topbar).toMatch(/@media \(max-width: 950px\)\s*\{\s*\.commercial-map-topbar \{ display: none; \}/);
+  });
+
   it('integra a busca no cabeçalho e mantém o mesmo estado comercial', () => {
     const shell = read('src/features/commercial-map/components/shell/CommercialMapShell.tsx');
     const toolbar = read('src/features/commercial-map/components/controls/MapToolbar.tsx');
@@ -62,6 +67,8 @@ describe('arquitetura mobile-first do Mapa Comercial', () => {
     expect(canvas).toContain('if (navigation.current.active) return;');
     expect(canvas).toContain('if (pendingResizeRefit.current && !wasNavigating) scheduleResizeRefit();');
     expect(canvas).toContain('pendingResizeRefit.current = false;');
+    expect(canvas).toContain('if (preserveManualView.current) return;');
+    expect(canvas).toMatch(/selectionChanged && !selectedEntity[\s\S]*?preserveManualView.current = true;[\s\S]*?cancelScheduledResizeRefit\(\);/);
     expect(canvas).toContain("gl={{ antialias: !reducedGraphics");
     expect(styles).toContain('touch-action: none !important;');
     expect(styles).toMatch(/@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.commercial-map-stage \{ transition-duration: 340ms !important; \}/);

@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { clipPlanarSurfaceGeometry, type PlanarSurfaceCut } from './planarSurfaceGeometry';
 import {
   GENERATED_REAR_ROAD_SEGMENTS,
   REAR_ROAD_NODES,
@@ -67,6 +68,9 @@ export const REAR_ROAD_BUDGET = Object.freeze({
   maximumBaseDrawCalls: 4,
   maximumTriangles: 24_000,
 });
+
+/** Descola apenas o patch da interseção; ribbons e terreno mantêm sua cota. */
+export const REAR_ROAD_JUNCTION_ELEVATION_LIFT = 0.0015;
 
 const DEFAULT_CORRIDOR_SAMPLES_PER_WORLD_UNIT = 8;
 const DEFAULT_GEOMETRY_TOLERANCE = 1e-6;
@@ -171,7 +175,10 @@ function pushRibbon(
     const b = a + 1;
     const c = a + 2;
     const d = a + 3;
-    target.indices.push(a, c, b, b, c, d);
+    // The ribbon lives in XZ: +Z cross +X points upward. Keep the winding
+    // consistent with the +Y normals; DoubleSide previously hid the reversed
+    // faces while the shader flipped their normals and shadow receiver bias.
+    target.indices.push(a, b, c, b, d, c);
   }
 }
 
@@ -194,8 +201,17 @@ function pushRoundJunction(
     target.positions.push(center[0] + cos * radius, y, center[1] + sin * radius);
     target.normals.push(0, 1, 0);
     target.uvs.push(0.5 + cos * 0.5, 0.5 + sin * 0.5);
-    if (index > 0) target.indices.push(baseIndex, baseIndex + index, baseIndex + index + 1);
+    if (index > 0) target.indices.push(baseIndex, baseIndex + index + 1, baseIndex + index);
   }
+}
+
+function requiresJunctionPatch(roads: readonly RoadSegment[]) {
+  if (roads.length >= 3) return true;
+  if (roads.length < 2) return false;
+  const owners = new Set(roads.map((road) => road.officialOwnerIdentifier ?? road.roadId));
+  const materials = new Set(roads.map((road) => road.materialId));
+  const widths = new Set(roads.map((road) => road.width.toFixed(6)));
+  return owners.size > 1 || materials.size > 1 || widths.size > 1;
 }
 
 function pushDashedLine(
@@ -306,13 +322,19 @@ export function buildRearRoadNetworkGeometries(
   });
   let junctionCount = 0;
   incident.forEach((roads, nodeId) => {
-    if (roads.length < 2) return;
+    if (!requiresJunctionPatch(roads)) return;
     const node = REAR_ROAD_NODES[nodeId];
     const center: LocalPoint = [node.position[0], node.position[2]];
     const hasHighway = roads.some((road) => road.materialId === 'highway-asphalt');
     const radius = Math.max(...roads.map((road) => road.width / 2));
     const elevation = Math.max(...roads.map((road) => road.elevationOffset));
-    pushRoundJunction(hasHighway ? highway : parkAsphalt, center, radius, elevation, reducedGraphics ? 8 : 16);
+    pushRoundJunction(
+      hasHighway ? highway : parkAsphalt,
+      center,
+      radius,
+      elevation + REAR_ROAD_JUNCTION_ELEVATION_LIFT,
+      reducedGraphics ? 8 : 16,
+    );
     junctionCount += 1;
   });
 
@@ -323,8 +345,27 @@ export function buildRearRoadNetworkGeometries(
     markings: toGeometry(markings),
   };
 
-  const triangleCount = [highway, parkAsphalt, shoulders, markings]
-    .reduce((total, accumulator) => total + accumulator.indices.length / 3, 0);
+  // The highway owns the junction surface. Trim the access and shoulders at
+  // its actual triangles instead of stacking coplanar asphalt under a decal.
+  // Independent meshes/materials and canonical hit-test ownership remain intact.
+  if (geometries.highway) {
+    const cuts: PlanarSurfaceCut[] = [];
+    for (let index = 0; index < highway.indices.length; index += 3) {
+      const polygon = highway.indices.slice(index, index + 3).map((vertex) => (
+        [highway.positions[vertex * 3], highway.positions[vertex * 3 + 2]] as LocalPoint
+      ));
+      cuts.push({
+        polygon,
+        minX: Math.min(...polygon.map(([x]) => x)), maxX: Math.max(...polygon.map(([x]) => x)),
+        minZ: Math.min(...polygon.map(([, z]) => z)), maxZ: Math.max(...polygon.map(([, z]) => z)),
+      });
+    }
+    if (geometries.parkAsphalt) clipPlanarSurfaceGeometry(geometries.parkAsphalt, cuts);
+    if (geometries.shoulders) clipPlanarSurfaceGeometry(geometries.shoulders, cuts);
+  }
+
+  const triangleCount = Object.values(geometries).reduce((total, geometry) => total + (geometry
+    ? (geometry.getIndex()?.count ?? geometry.getAttribute('position').count) / 3 : 0), 0);
 
   return {
     ...geometries,
@@ -366,6 +407,47 @@ export function distanceToPath(point: LocalPoint, path: readonly LocalPoint[]) {
     best = Math.min(best, Math.hypot(point[0] - (ax + dx * t), point[1] - (az + dz * t)));
   }
   return best;
+}
+
+export type RearRoadHitSurface = 'highway' | 'park';
+
+const rearRoadHitCenterlineCache = new WeakMap<RoadSegment, readonly LocalPoint[]>();
+
+function rearRoadHitCenterline(definition: RoadSegment) {
+  const cached = rearRoadHitCenterlineCache.get(definition);
+  if (cached) return cached;
+  const sampled = Object.freeze(sampleRearRoadCenterline(
+    rearRoadLocalPath(definition),
+    DEFAULT_CORRIDOR_SAMPLES_PER_WORLD_UNIT,
+  ));
+  rearRoadHitCenterlineCache.set(definition, sampled);
+  return sampled;
+}
+
+/**
+ * Resolve a entidade oficial mais próxima sob o ponto da malha consolidada.
+ * A seleção continua apontando para o cadastro existente; nenhuma ribbon vira
+ * uma entidade paralela ou mantém metadados próprios.
+ */
+export function resolveRearRoadOwnerAtLocalPoint(
+  point: LocalPoint,
+  surface: RearRoadHitSurface,
+  definitions: readonly RoadSegment[] = GENERATED_REAR_ROAD_SEGMENTS,
+) {
+  let match: { owner: string; normalizedDistance: number } | null = null;
+  definitions.forEach((definition) => {
+    const isHighway = definition.materialId === 'highway-asphalt';
+    if ((surface === 'highway') !== isHighway) return;
+    if (!definition.officialOwnerIdentifier) return;
+    const halfWidth = rearRoadLocalWidth(definition) / 2;
+    const distance = distanceToPath(point, rearRoadHitCenterline(definition));
+    if (distance > halfWidth + 0.16) return;
+    const normalizedDistance = distance / Math.max(halfWidth, 0.01);
+    if (!match || normalizedDistance < match.normalizedDistance) {
+      match = { owner: definition.officialOwnerIdentifier, normalizedDistance };
+    }
+  });
+  return match?.owner ?? null;
 }
 
 function pointToSegmentDistance(point: LocalPoint, start: LocalPoint, end: LocalPoint) {

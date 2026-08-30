@@ -39,6 +39,18 @@ export const COMMERCIAL_MAP_TOP_DIRECTION = [
   Math.sin(COMMERCIAL_MAP_MIN_POLAR_ANGLE),
 ] as const;
 
+/**
+ * A close-up near plane must not remain at 0.035 after dollying hundreds of
+ * units away: the resulting depth bins collapse the grass/road separation.
+ * Keep it proportional to range, capped below the camera's ground clearance.
+ * This changes depth precision only; it never moves the camera or lowers DPR.
+ */
+export function resolveCommercialMapCameraNearPlane(distance: number, cameraHeight: number) {
+  const range = Number.isFinite(distance) ? Math.max(0, distance) : 0;
+  const clearance = Number.isFinite(cameraHeight) ? Math.max(0, cameraHeight) : 0;
+  return Math.max(0.035, Math.min(range / 240, clearance * 0.25));
+}
+
 export function isCommercialMapHydrologicalPortraitViewport(
   viewportWidth: number,
   viewportHeight: number,
@@ -80,9 +92,11 @@ export function resolveCommercialMapPixelRatio({
   const qualityCap = reducedGraphics ? 1.35 : isPhoneViewport ? 2.25 : 1.75;
   const qualityFloor = reducedGraphics ? 1 : 1.5;
   const budgeted = Math.min(safeDpr, qualityCap, budgetCap);
-  // Select once from viewport/device constraints. Camera gestures must not
-  // resize render targets or oscillate DPR while the sunrise is animating.
-  return Number(Math.max(Math.min(safeDpr, qualityFloor), budgeted).toFixed(2));
+  const stablePixelRatio = Math.max(Math.min(safeDpr, qualityFloor), budgeted);
+  // Alterar DPR em onStart/onEnd redimensiona o drawing buffer durante o gesto.
+  // O orçamento é calculado por viewport e
+  // permanece estável durante órbita, pan, pinça e animações da câmera.
+  return Number(stablePixelRatio.toFixed(2));
 }
 
 export function resolveCommercialMapSheetSnap(

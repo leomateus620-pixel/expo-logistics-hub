@@ -532,7 +532,6 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
           <>
             <div className="commercial-map-stage">
               <CommercialMapCanvas
-                key={areaScope}
                 entities={scopedData.entities}
                 parkingOwnerEntities={data.entities}
                 siteEnvironmentEntities={data.entities}

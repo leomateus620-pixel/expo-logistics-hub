@@ -29,6 +29,22 @@ const FULL_MAP_EXTENT: CommercialMapEnvironmentExtent = {
 const source = (path: string) => readFileSync(resolve(path), 'utf8');
 
 describe('amanhecer premium compartilhado do Mapa Comercial', () => {
+  it('mantém o feather externo atrás do terreno sem desligar sombras ou depth testing', () => {
+    const environment = source(
+      'src/features/commercial-map/components/canvas/CommercialMapEnvironment.tsx',
+    );
+    const outer = environment.slice(
+      environment.indexOf('layout.outerGroundSize, layout.outerGroundSize'),
+      environment.indexOf('layout.activeGroundWidth, layout.activeGroundDepth'),
+    );
+
+    expect(outer).toContain('polygonOffsetFactor={1}');
+    expect(outer).toContain('polygonOffsetUnits={2}');
+    expect(outer).toContain('depthWrite={false}');
+    expect(outer).not.toContain('depthTest={false}');
+    expect(environment).toContain('receiveShadow');
+  });
+
   it('ancora o sol no horizonte -Z definido pelas referências, sem reutilizar o sol diurno', () => {
     const sunrise = COMMERCIAL_MAP_ENVIRONMENT_CONFIG.sunrise;
     const horizon = commercialMapSunriseDirection(0);

@@ -8,11 +8,25 @@ import {
   isCommercialMapHydrologicalPortraitViewport,
   resolveCommercialMapHydrologicalPortraitTargetShift,
   resolveCommercialMapPixelRatio,
+  resolveCommercialMapCameraNearPlane,
   resolveCommercialMapSheetSnap,
   shouldSuppressCommercialMapResizeRefit,
 } from '@/features/commercial-map/utils/viewport';
 
 describe('viewport mobile do Mapa Comercial', () => {
+  it('recupera precisão de profundidade ao afastar de um close, sem cortar vistas baixas', () => {
+    expect(resolveCommercialMapCameraNearPlane(8, 0.5)).toBe(0.035);
+    expect(resolveCommercialMapCameraNearPlane(720, 390)).toBe(3);
+    expect(resolveCommercialMapCameraNearPlane(720, 0.8)).toBe(0.2);
+    expect(resolveCommercialMapCameraNearPlane(Number.NaN, Number.NaN)).toBe(0.035);
+    for (const distance of [12, 30, 90, 260, 720]) {
+      const near = resolveCommercialMapCameraNearPlane(distance, distance * 0.54);
+      const far = 1446;
+      const depthResolution = (distance * distance * (far - near)) / (far * near * (2 ** 24 - 1));
+      expect(depthResolution).toBeLessThan(0.012);
+    }
+  });
+
   it('compõe a visão hídrica portrait sem reduzir o parque a uma faixa horizontal', () => {
     const [x, y, z] = COMMERCIAL_MAP_HYDROLOGICAL_PORTRAIT_DIRECTION;
 

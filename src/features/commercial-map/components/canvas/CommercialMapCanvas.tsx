@@ -102,6 +102,7 @@ import {
   isCommercialMapHydrologicalPortraitViewport,
   resolveCommercialMapHydrologicalPortraitTargetShift,
   resolveCommercialMapPixelRatio,
+  resolveCommercialMapCameraNearPlane,
   shouldSuppressCommercialMapResizeRefit,
 } from '../../utils/viewport';
 import type { CameraPreset, CommercialLot, MapCalibration, MapEntity } from '../../types';
@@ -122,9 +123,13 @@ import { CommercialSiteEnvironmentLayer } from './CommercialSiteEnvironmentLayer
 import { rearRoadLayerPresentation } from '../../utils/commercialLayerPresentation';
 import {
   REAR_ROAD_SCENE_SUPPORT_POINTS,
+  REAR_GATE_5_PRESENTATION,
   REPLACED_OFFICIAL_ROAD_IDENTIFIERS,
+  rearContextualLabelAnchorForOfficialOwner,
   rearContextualLabelForOfficialOwner,
+  rearRoadFocusBoundsForOfficialOwner,
 } from '../../data/rearParkRoadNetwork';
+import { rearRoadTerrainElevationAt } from '../../utils/rearRoadNetwork';
 import { ParkAccessInfrastructure } from './ParkAccessInfrastructure';
 import { selectParkAccessCompatibleTreesForPresentation } from '../../data/parkAccessEnvironment';
 import { PARK_ACCESS_SPATIAL_PLAN } from '../../data/parkAccessSpatialPlan';
@@ -140,6 +145,11 @@ import {
   buildCommercialPavilionModuleVisualStateIndex,
   type CommercialPavilionModuleVisualState,
 } from '../../utils/pavilionModuleCommercial';
+
+// Never import the exclusion audit or debug textures in the production bundle.
+const RearRoadValidationOverlay = import.meta.env.DEV
+  ? lazy(async () => ({ default: (await import('./RearRoadValidationOverlay')).RearRoadValidationOverlay }))
+  : null;
 
 const MiranteInteriorScene = lazy(async () => {
   const module = await import('./MiranteInteriorScene');
@@ -411,9 +421,16 @@ function getSceneExtent(
 }
 
 function getEntityExtent(entity: MapEntity): SceneExtent {
+  const correctedRoadBounds = entity.classification === 'ROAD' || entity.publicIdentifier === 'A5'
+    ? rearRoadFocusBoundsForOfficialOwner(entity.publicIdentifier)
+    : null;
   const coordinates = entity.geometry.coordinates.flat();
-  const xs = coordinates.map(([x]) => x).filter(Number.isFinite);
-  const zs = coordinates.map(([, z]) => z).filter(Number.isFinite);
+  const xs = correctedRoadBounds
+    ? [correctedRoadBounds.minX, correctedRoadBounds.maxX]
+    : coordinates.map(([x]) => x).filter(Number.isFinite);
+  const zs = correctedRoadBounds
+    ? [correctedRoadBounds.minZ, correctedRoadBounds.maxZ]
+    : coordinates.map(([, z]) => z).filter(Number.isFinite);
   const [centroidX, centroidZ] = geometryCentroid(entity.geometry);
   const minX = xs.length ? Math.min(...xs) : centroidX - 1;
   const maxX = xs.length ? Math.max(...xs) : centroidX + 1;
@@ -699,6 +716,7 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
   const isQuadra = classification === 'QUADRA' || entity.metadata.renderMode === 'outline';
   const isPavilion = classification === 'PAVILION';
   const isGate = classification === 'GATE';
+  const isRearGate5 = isGate && entity.publicIdentifier === 'A5';
   const detailedParkAccessHitArea = isGate
     ? DETAILED_PARK_ACCESS_GATE_HIT_AREAS.get(entity.publicIdentifier)
     : undefined;
@@ -744,11 +762,13 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
     () => isRoad || isQuadra || isNationsPresentationSurface ? createFootprintGeometry(entity) : null,
     [entity, isNationsPresentationSurface, isQuadra, isRoad],
   );
-  const markerCenter = useMemo(() => geometryCentroid(entity.geometry), [entity.geometry]);
-  const gateRotation = useMemo(() => Math.atan2(
+  const markerCenter = useMemo(() => isRearGate5
+    ? REAR_GATE_5_PRESENTATION.center
+    : geometryCentroid(entity.geometry), [entity.geometry, isRearGate5]);
+  const gateRotation = useMemo(() => isRearGate5 ? REAR_GATE_5_PRESENTATION.rotation : Math.atan2(
     sceneCenter[0] - markerCenter[0],
     sceneCenter[1] - markerCenter[1],
-  ), [markerCenter, sceneCenter]);
+  ), [isRearGate5, markerCenter, sceneCenter]);
   const gateAccessMode = useMemo(() => resolveGateAccessMode(entity.name), [entity.name]);
   const baseColor = openGroundProfile
     ? openGroundProfile.baseColor
@@ -842,7 +862,9 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
 
   return (
     <group
-      position={[0, entity.geometry.elevation + selectedLift + presentationLift, 0]}
+      position={[0, isRearGate5
+        ? REAR_GATE_5_PRESENTATION.baseElevation + rearRoadTerrainElevationAt(markerCenter[0], markerCenter[1])
+        : entity.geometry.elevation + selectedLift + presentationLift, 0]}
       visible={!solidRendering || selected || layerOpacity > 0.015}
     >
       {!isQuadra && !isGate && !isNationsPresentationSurface && (
@@ -896,7 +918,22 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
               <meshBasicMaterial visible={false} />
             </mesh>
           )}
-          <group visible={!usesDetailedParkAccessArchitecture}>
+          {isRearGate5 ? (
+            <group name="gate-5-physical-access">
+              {[-1, 1].map((side) => (
+                <mesh key={side} position={[side * (REAR_GATE_5_PRESENTATION.clearWidth / 2 + 0.055), 0.44, 0]}
+                  raycast={NO_RAYCAST} castShadow receiveShadow>
+                  <boxGeometry args={[0.11, 0.88, 0.16]} />
+                  <meshStandardMaterial color={gateBaseColor} roughness={0.74} />
+                </mesh>
+              ))}
+              <mesh position={[0, REAR_GATE_5_PRESENTATION.clearHeight + 0.06, 0]}
+                raycast={NO_RAYCAST} castShadow>
+                <boxGeometry args={[REAR_GATE_5_PRESENTATION.clearWidth + 0.22, 0.12, 0.18]} />
+                <meshStandardMaterial color={gateAccentColor} roughness={0.7} metalness={0.03} />
+              </mesh>
+            </group>
+          ) : <group visible={!usesDetailedParkAccessArchitecture}>
             <mesh position={[0, 0.035, 0]} raycast={NO_RAYCAST} receiveShadow>
               <cylinderGeometry args={[0.66, 0.72, 0.07, 10]} />
               <meshStandardMaterial color={gateAccentColor} roughness={0.78} metalness={0.04} />
@@ -947,7 +984,7 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
               <boxGeometry args={[0.97, 0.16, 0.17]} />
               <meshStandardMaterial color={gateAccentColor} roughness={0.7} metalness={0.03} />
             </mesh>
-          </group>
+          </group>}
         </group>
       )}
 
@@ -1424,6 +1461,7 @@ const EntityLabel = memo(function EntityLabel({
   const isArchitecturalLandmark = Boolean(resolveStrategicLandmarkKind(entity));
   const contextualDisplayName = rearContextualLabelForOfficialOwner(entity.publicIdentifier)
     ?? metadata.officialDisplayName;
+  const contextualRoadAnchor = rearContextualLabelAnchorForOfficialOwner(entity.publicIdentifier);
   const dimmed = Boolean(lot && filtersActive && !isMatch && !selected);
   const status = lot ? STATUS_CONFIG[lot.status] : null;
   const labelHeight = entityLabelHeight(entity);
@@ -1433,7 +1471,11 @@ const EntityLabel = memo(function EntityLabel({
 
   return (
     <Html
-      position={[metadata.labelAnchor[0], entity.geometry.elevation + labelHeight, metadata.labelAnchor[1]]}
+      position={[
+        contextualRoadAnchor?.[0] ?? metadata.labelAnchor[0],
+        entity.geometry.elevation + labelHeight,
+        contextualRoadAnchor?.[1] ?? metadata.labelAnchor[1],
+      ]}
       transform={false}
       eps={0.001}
       zIndexRange={[22, 2]}
@@ -1656,6 +1698,7 @@ function CameraRig({
   const previousViewportSize = useRef({ width: size.width, height: size.height });
   const resizeRefitTimer = useRef<number | null>(null);
   const pendingResizeRefit = useRef(false);
+  const preserveManualView = useRef(false);
   const resizeRefitSuppressedUntil = useRef(0);
   const resizeRefitView = useRef<() => void>(() => undefined);
   const suppressNextDetailsRefit = useRef(false);
@@ -1719,6 +1762,7 @@ function CameraRig({
     } as LunarLaunchMotionSample,
   });
   const startCameraMove = useCallback(() => {
+    preserveManualView.current = false;
     animating.current = true;
     invalidate();
   }, [invalidate]);
@@ -1951,6 +1995,9 @@ function CameraRig({
   ]);
 
   resizeRefitView.current = () => {
+    // Panel/viewport resizing must not undo a manual orbit, zoom or a close-up
+    // just deselected. R3F updates the aspect; only an explicit focus resets it.
+    if (preserveManualView.current) return;
     if (parkingActive) queueParking();
     else if (selectedEntity) queueSelection(selectedEntity);
     else if (activeSegment) queueSegment(activeSegment, activeSegmentEntities);
@@ -2230,12 +2277,16 @@ function CameraRig({
     } else if (selectionChanged && selectedEntity) {
       queueSelection(selectedEntity);
     } else if (parkingClosed) {
+      preserveManualView.current = true;
       cancelScheduledResizeRefit();
       pendingResizeRefit.current = false;
       animating.current = false;
       targetPosition.current.copy(camera.position);
       targetLookAt.current.copy(controlsRef.current?.target ?? targetLookAt.current);
     } else if (selectionChanged && !selectedEntity) {
+      preserveManualView.current = true;
+      cancelScheduledResizeRefit();
+      pendingResizeRefit.current = false;
       animating.current = false;
     } else if (detailsLayoutChanged && selectedEntity && !suppressDetailsRefit) {
       queueSelection(selectedEntity);
@@ -2333,6 +2384,7 @@ function CameraRig({
       const cameraDelta = camera.position.distanceTo(navigation.current.startPosition);
       const targetDelta = controls.target.distanceTo(navigation.current.startTarget);
       if (isCameraNavigationMovement(cameraDelta, targetDelta)) {
+        preserveManualView.current = true;
         resizeRefitSuppressedUntil.current = Date.now()
           + COMMERCIAL_MAP_MANUAL_NAVIGATION_REFIT_SUPPRESSION_MS;
         pendingResizeRefit.current = false;
@@ -2760,6 +2812,15 @@ function CameraRig({
         invalidate();
       }
     }
+    if (camera instanceof THREE.PerspectiveCamera) {
+      const range = camera.position.distanceTo(controlsRef.current?.target ?? targetLookAt.current);
+      const near = resolveCommercialMapCameraNearPlane(range, camera.position.y);
+      if (Math.abs(camera.near - near) > 0.00001) {
+        camera.near = near;
+        camera.updateProjectionMatrix();
+        invalidate();
+      }
+    }
   });
 
   const selectedKind = selectedEntity ? resolveStrategicLandmarkKind(selectedEntity) : null;
@@ -2908,6 +2969,9 @@ function Scene({
     ),
     [entities, entityFiltersActive, layerOpacity, layerVisibility],
   );
+  const rearRoadDebugVisible = useMemo(() => import.meta.env.DEV
+    && typeof window !== 'undefined'
+    && new URLSearchParams(window.location.search).has('rearRoadDebug'), []);
   const activeSiteEnvironmentOwnerIdentifiers = useMemo(() => (
     isolatedArea
       ? new Set(entities.map((entity) => entity.publicIdentifier))
@@ -3077,7 +3141,7 @@ function Scene({
     () => selectCommercialTreesForScene(entities, lots),
     [entities, lots],
   );
-  const presentedSceneTrees = useMemo(() => {
+  const rearRoadCompatibleSceneTrees = useMemo(() => {
     const baseTrees = (!isolatedArea
       || isolatedArea === COMMERCIAL_MAP_SEGMENT_IDS.industry)
       ? selectParkAccessCompatibleTreesForPresentation(sceneTrees)
@@ -3088,18 +3152,23 @@ function Scene({
     const rearRoadCompatibleTrees = !isolatedArea && !hydrologicalModeActive
       ? selectRearRoadCompatibleTreesForPresentation(parkAccessCompatibleTrees)
       : parkAccessCompatibleTrees;
-    if (!selectedEntity || resolveStrategicLandmarkKind(selectedEntity) !== 'lunar-tree') {
-      return rearRoadCompatibleTrees;
-    }
-    const bounds = strategicLandmarkBounds(selectedEntity);
+    return rearRoadCompatibleTrees;
+  }, [entities, hydrologicalModeActive, isolatedArea, rearParkingEnabled, sceneTrees]);
+  const selectedLunarTreeEntity = selectedEntity
+    && resolveStrategicLandmarkKind(selectedEntity) === 'lunar-tree'
+    ? selectedEntity
+    : null;
+  const presentedSceneTrees = useMemo(() => {
+    if (!selectedLunarTreeEntity) return rearRoadCompatibleSceneTrees;
+    const bounds = strategicLandmarkBounds(selectedLunarTreeEntity);
     const memorialCenter = [
       bounds.centerX + APOLLO_XIV_LAYOUT.replicaOffset[0],
       bounds.centerZ + APOLLO_XIV_LAYOUT.replicaOffset[1],
     ] as const;
-    return rearRoadCompatibleTrees.filter((tree) => (
+    return rearRoadCompatibleSceneTrees.filter((tree) => (
       treeRemainsVisibleWithSelectedApollo(tree, memorialCenter)
     ));
-  }, [entities, hydrologicalModeActive, isolatedArea, rearParkingEnabled, sceneTrees, selectedEntity]);
+  }, [rearRoadCompatibleSceneTrees, selectedLunarTreeEntity]);
   const treeSurfaceEntities = useMemo(() => rearParkingEnabled
     ? [...exteriorRenderedEntities, ...REAR_PARKING_GROUND_SUPPORTS]
     : exteriorRenderedEntities, [exteriorRenderedEntities, rearParkingEnabled]);
@@ -3217,6 +3286,9 @@ function Scene({
     if (ids.length === 0) return [];
     return exteriorRenderedEntities.filter((entity) => ids.includes(entity.id));
   }, [contextualLabel.hoveredId, contextualLabel.selectedId, exteriorRenderedEntities]);
+  const rearRoadOwnerEntityIds = useMemo(() => new Map(
+    entities.map((entity) => [entity.publicIdentifier, entity.id] as const),
+  ), [entities]);
 
   useEffect(() => {
     gl.shadowMap.autoUpdate = false;
@@ -3309,6 +3381,13 @@ function Scene({
             reducedGraphics={reducedGraphics}
             visible={rearRoadPresentation.visible}
             opacity={rearRoadPresentation.opacity}
+            ownerEntityIdByIdentifier={rearRoadOwnerEntityIds}
+            cameraNavigating={cameraNavigating}
+            hoverEnabled={PRECISE_HOVER_CAPABLE}
+            onSelect={handleEntitySelect}
+            onHover={handleEntityHover}
+            onFocus={handleEntityFocus}
+            onCursor={setCanvasCursor}
           />
         </>
       )}
@@ -3395,6 +3474,7 @@ function Scene({
         nodes={sceneElectricalInfrastructure.nodes}
         connections={sceneElectricalInfrastructure.connections}
         surfaceEntities={entities}
+        rearRoadsActive={!isolatedArea && !hydrologicalModeActive}
         visible={treesVisible && !hydrologicalModeActive}
         reducedGraphics={reducedGraphics}
       />
@@ -3434,6 +3514,11 @@ function Scene({
             lots={lots}
           />
         )}
+      {!isolatedArea && !hydrologicalModeActive && rearRoadDebugVisible && RearRoadValidationOverlay && (
+        <Suspense fallback={null}>
+          <RearRoadValidationOverlay />
+        </Suspense>
+      )}
       <CameraRig
         selectedEntity={selectedEntity}
         extent={extent}
@@ -3480,7 +3565,6 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
   );
   const interiorEntityId = useCommercialMapStore((state) => state.interiorEntityId);
   const reducedGraphics = useCommercialMapStore((state) => state.reducedGraphics);
-  const cameraNavigating = useCommercialMapStore((state) => state.cameraNavigating);
   const [canvasElement, setCanvasElement] = useState<HTMLCanvasElement | null>(null);
   const [viewportMetrics, setViewportMetrics] = useState(() => ({
     width: typeof window === 'undefined' ? 1366 : window.innerWidth,
@@ -3574,7 +3658,8 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
       }}
       onPointerMissed={() => {
         // Empty-ground orbit/pan must not close parking or reset a close-up camera.
-        if (useCommercialMapStore.getState().parkingInspectionOpen || cameraNavigating) return;
+        const interactionState = useCommercialMapStore.getState();
+        if (interactionState.parkingInspectionOpen || interactionState.cameraNavigating) return;
         if (hydrologicalModeActive) {
           setSelectedHydrologicalElementId(null);
           return;

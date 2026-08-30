@@ -4,18 +4,18 @@ import {
   rearRoadCorridors,
   rearRoadSourceToLocalLength,
 } from './rearParkRoadNetwork';
-import { distanceToPath } from '../utils/rearRoadNetwork';
-import { projectRearNormalizedReferencePointToOfficialSource } from '../utils/rearSpatialCalibration';
+import { buildRearRoadCorridorFootprints, distanceToPath } from '../utils/rearRoadNetwork';
+import { REAR_SATELLITE_TOPOLOGY } from '../utils/rearSpatialCalibration';
 
 /**
- * Ambientação georreferenciada entre a Rua Exporural (Rua Ubiretama) e a
- * BR-472 externa.
+ * Ambientação georreferenciada entre a borda leste do parque e a BR-472
+ * externa.
  *
  * Esta camada não cria uma segunda base cartográfica. Ela prolonga o terreno
  * oficial por uma única faixa irregular e mantém livres os três corredores:
- * Rua Exporural, ambiente intermediário e BR-472.
+ * Rua Brasília, acesso do Portão 5 e BR-472.
  */
-export const REAR_PARK_ENVIRONMENT_REVISION = '2026.9-area-posterior-ambiente.4';
+export const REAR_PARK_ENVIRONMENT_REVISION = '2026.9-area-posterior-ambiente.6';
 
 export type SourcePoint = readonly [number, number];
 export type SourceBounds = readonly [number, number, number, number];
@@ -28,12 +28,13 @@ export interface RearTerrainPatch {
 }
 
 /**
- * P8 e P9 do anexo 6 são evidências ambientais, nunca nós viários. As
- * coordenadas já estão reconciliadas com a fonte cartográfica oficial.
+ * Correspondências do IMG_9936. A numeração do satélite é deliberadamente
+ * separada dos seis pontos do IMG_9933.
  */
 export const REAR_ENVIRONMENT_REFERENCE_POINTS = Object.freeze({
-  point8: Object.freeze(projectRearNormalizedReferencePointToOfficialSource(8)),
-  point9: Object.freeze(projectRearNormalizedReferencePointToOfficialSource(9)),
+  approach: Object.freeze(REAR_SATELLITE_TOPOLOGY.points[0].officialSource),
+  gate5: Object.freeze(REAR_SATELLITE_TOPOLOGY.points[1].officialSource),
+  br472Junction: Object.freeze(REAR_SATELLITE_TOPOLOGY.points[2].officialSource),
 });
 
 /**
@@ -43,9 +44,9 @@ export const REAR_ENVIRONMENT_REFERENCE_POINTS = Object.freeze({
  */
 export const REAR_TERRAIN_PATCHES: readonly RearTerrainPatch[] = Object.freeze([
   Object.freeze({
-    id: 'exporural-br472-environmental-continuity',
+    id: 'gate5-br472-environmental-continuity',
     sourcePolygon: Object.freeze([
-      // Costura interna: acompanha a Rua Exporural sem cobri-la visualmente.
+      // Costura interna: acompanha o limite leste sem cobrir as vias.
       [5720, 820],
       [6120, 790],
       [6580, 890],
@@ -59,7 +60,7 @@ export const REAR_TERRAIN_PATCHES: readonly RearTerrainPatch[] = Object.freeze([
       [6300, 4070],
       [6140, 4400],
       [5800, 4340],
-      // Retorno irregular pela borda externa do parque/Rua Exporural.
+      // Retorno irregular pela borda externa do parque.
       [5540, 3960],
       [5375, 3525],
       [5460, 3160],
@@ -79,8 +80,9 @@ export const REAR_STRUCTURE_EXCLUSIONS: readonly SourceBounds[] = Object.freeze(
   [4860, 2650, 5430, 3180], // Arena Shows (F)
   [5410, 2800, 5900, 3120], // campo de futebol
   [3980, 3140, 4530, 3480], // Centro de Eventos (C1)
+  [3970, 2420, 4120, 2850], // Espaço Mirante (D3)
+  [4960, 2350, 5120, 2500], // Churrascaria Exporural (C4)
   [5310, 3360, 6020, 4290], // estacionamento oficial de visitantes
-  [5928, 3630, 6020, 3726], // símbolo oficial A5 e margem de acesso
   [3888, 4170, 3990, 4270], // Portão 3 (A3), fora da intervenção
 ]);
 
@@ -175,9 +177,9 @@ function distanceToPolygon(point: readonly [number, number], polygon: readonly (
 
 const terrainPolygons = REAR_TERRAIN_PATCHES.map((patch) => sourcePolygonToLocal(patch.sourcePolygon));
 const protectedOfficialPolygons = OFFICIAL_REFERENCE_DATA.entities
-  // A antiga geometria cadastral da rodovia é justamente a superfície
-  // substituída. Mantê-la como exclusão conservaria vazio o corredor errado.
-  .filter((entity) => entity.publicIdentifier !== 'RODOVIA-RS-472')
+  // Estas três superfícies são substituídas pela apresentação calibrada.
+  .filter((entity) => !['RUA-BRASILIA', 'RUA-UBIRETAMA', 'RODOVIA-RS-472']
+    .includes(entity.publicIdentifier))
   .map((entity) => entity.geometry.coordinates[0] as Array<[number, number]>);
 const protectedStructurePolygons = REAR_STRUCTURE_EXCLUSIONS.map((bounds) => {
   const local = sourceBoundsToLocal(bounds);
@@ -231,7 +233,8 @@ export function buildRearTreeInstances(reducedGraphics = false): RearTreeInstanc
       if (random() > Math.max(0.08, feather)) continue;
       if (corridors.some((corridor) => (
         distanceToPath(local, corridor.path) <= corridor.halfWidth
-          + (corridor.roadId === 'RODOVIA-RS-472' ? 0.72 : 0.5)
+          // Folga inclui a copa, não apenas o tronco/base instanciada.
+          + (corridor.roadId === 'RODOVIA-RS-472' ? 0.9 : 0.8)
       ))) continue;
       if (protectedOfficialPolygons.some((polygon) => distanceToPolygon(local, polygon) <= 0.32)) continue;
       if (protectedStructurePolygons.some((polygon) => distanceToPolygon(local, polygon) <= 0.32)) continue;
@@ -264,6 +267,7 @@ export function buildRearPoleInstances(reducedGraphics = false): RearPoleInstanc
   if (reducedGraphics) return [];
   const spacing = rearRoadSourceToLocalLength(90);
   const poles: RearPoleInstance[] = [];
+  const footprints = buildRearRoadCorridorFootprints(undefined, { includeShoulders: true });
 
   rearRoadCorridors()
     .filter((corridor) => corridor.roadId === 'ACESSO-A5-BR472')
@@ -278,11 +282,19 @@ export function buildRearPoleInstances(reducedGraphics = false): RearPoleInstanc
           const t = cursor / (length || 1);
           const dirX = (bx - ax) / (length || 1);
           const dirZ = (bz - az) / (length || 1);
-          const position = [
-            ax + (bx - ax) * t - dirZ * (corridor.halfWidth + 0.22),
-            az + (bz - az) * t + dirX * (corridor.halfWidth + 0.22),
-          ] as const;
-          if (protectedOfficialPolygons.some((polygon) => distanceToPolygon(position, polygon) <= 0.18)) {
+          // At P4/J a verge of one segment may be another road's pavement.
+          // Try both verges deterministically and retain the same pole budget.
+          const position = [0.22, 0.45, 0.75, 1.1, 1.5, 2].flatMap((clearance) => [1, -1].map((side) => [
+            ax + (bx - ax) * t - dirZ * (corridor.halfWidth + clearance) * side,
+            az + (bz - az) * t + dirX * (corridor.halfWidth + clearance) * side,
+          ] as const)).find((candidate) => (
+            !protectedOfficialPolygons.some((polygon) => distanceToPolygon(candidate, polygon) <= 0.18)
+            && !footprints.some((footprint) => (
+              distanceToPath(candidate, footprint.centerline) <= footprint.halfWidth + 0.08
+            ))
+            && !poles.some((pole) => Math.hypot(candidate[0] - pole.x, candidate[1] - pole.z) < 0.3)
+          ));
+          if (!position) {
             cursor += spacing;
             continue;
           }
