@@ -110,7 +110,7 @@ describe('referência cadastral e vista dedicada da Exporural', () => {
     expect(rTotal).toBeCloseTo(EXPORURAL_TOTALS.R.officialAreaSqm, 2);
     expect(sTotal).toBeCloseTo(EXPORURAL_TOTALS.S.officialAreaSqm, 2);
     expect(rTotal + sTotal).toBeCloseTo(EXPORURAL_TOTALS.all.officialAreaSqm, 2);
-    expect(scoped.entities).toHaveLength(111);
+    expect(scoped.entities).toHaveLength(108); // 3 sanitários não permanentes removidos
     expect(scoped.lots).toHaveLength(EXPORURAL_TOTALS.all.lotCount);
     expect(scoped.lots.every((lot) => lot.officialAreaSqm !== null)).toBe(true);
     expect(scoped.lots.every((lot) => lot.calculatedAreaSqm !== null)).toBe(true);

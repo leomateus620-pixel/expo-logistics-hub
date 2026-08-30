@@ -159,7 +159,7 @@ describe('fidelidade cartográfica dourada da Exporural 2026.4', () => {
     });
   });
 
-  it('remove exatamente os cinco overlays e conserva lotes, apoios e sanitários válidos', () => {
+  it('remove exatamente os cinco overlays e conserva lotes e apoios válidos sem blocos não permanentes', () => {
     const scoped = scopeCommercialMapData(OFFICIAL_REFERENCE_DATA, 'exporural');
     const fullIdentifiers = new Set(OFFICIAL_REFERENCE_DATA.entities.map((entity) => entity.publicIdentifier));
     const scopedIdentifiers = new Set(scoped.entities.map((entity) => entity.publicIdentifier));
@@ -170,9 +170,12 @@ describe('fidelidade cartográfica dourada da Exporural 2026.4', () => {
       expect(scopedIdentifiers.has(identifier), `${identifier} no segmento`).toBe(false);
       expect(EXPORURAL_SUPPORT_IDENTIFIERS).not.toContain(identifier);
     });
-    ['Q-S-17', 'Q-R-52', 'Q-R-53', 'Q-R-54', 'Q-R-55', 'B37', 'B38', 'E-01', 'E-02', 'E-06']
+    ['Q-S-17', 'Q-R-52', 'Q-R-53', 'Q-R-54', 'Q-R-55', 'B37', 'B38']
       .forEach((identifier) => expect(scopedIdentifiers.has(identifier), identifier).toBe(true));
-    expect(scoped.entities).toHaveLength(111);
+    // Sanitários são estruturas não permanentes e saíram do mapa renderizado.
+    ['E-01', 'E-02', 'E-06']
+      .forEach((identifier) => expect(scopedIdentifiers.has(identifier), identifier).toBe(false));
+    expect(scoped.entities).toHaveLength(108);
   });
 
   it('fixa vértices dourados para A7, ilhas centrais e leque R-56–R-59', () => {

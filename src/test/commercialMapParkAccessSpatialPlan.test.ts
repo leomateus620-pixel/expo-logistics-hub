@@ -147,7 +147,9 @@ function polygonFullyInside(
 
 function officialFootprints(identifiers: readonly string[]) {
   return identifiers.map((identifier) => {
-    const entity = OFFICIAL_REFERENCE_DATA.entities
+    // Inventário cartográfico completo: pegadas de blocos não permanentes
+    // continuam reservadas para que o solo liberado não seja pavimentado.
+    const entity = OFFICIAL_REFERENCE_ENTITIES
       .find((candidate) => candidate.publicIdentifier === identifier);
     expect(entity, identifier).toBeDefined();
     return {
