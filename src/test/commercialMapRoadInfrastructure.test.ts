@@ -93,7 +93,7 @@ describe('infraestrutura viária do Mapa Comercial', () => {
   });
 
   it('mantém os novos corredores dentro das faixas reservadas, sem invadir lotes', () => {
-    const newCorridors = ['RUA-URUGUAI-LESTE', 'RUA-ARGENTINA-LESTE', 'RUA-MONTEVIDEU-SUL', 'RUA-INTERNA-OESTE', 'PRACA-ACESSO-EXPORURAL', 'RUA-INTERNA-QUADRA-G', 'RUA-INTERNA-QUADRA-T', 'RUA-LESTE-EXPORURAL'];
+    const newCorridors = ['RUA-URUGUAI-LESTE', 'RUA-ARGENTINA-LESTE', 'RUA-MONTEVIDEU-SUL', 'RUA-INTERNA-OESTE', 'RUA-INTERNA-QUADRA-G', 'RUA-INTERNA-QUADRA-T', 'RUA-LESTE-EXPORURAL', 'RUA-UBIRETAMA-LATERAL-R55'];
     const box = (ring: readonly (readonly [number, number])[] | number[][]) => {
       const points = ring as number[][];
       return {
@@ -122,7 +122,7 @@ describe('infraestrutura viária do Mapa Comercial', () => {
     });
   });
 
-  it('pavimenta as cinco conexões reportadas sem pavimento', () => {
+  it('pavimenta as conexões reportadas sem pavimento', () => {
     const roadBoxes = circulation.map((entity) => {
       const ring = entity.geometry.coordinates[0] as unknown as number[][];
       return {
@@ -137,11 +137,14 @@ describe('infraestrutura viária do Mapa Comercial', () => {
     ));
 
     ([
-      ['conexão Espaço Mirante → Exporural', 11.4, -9.6],
+      ['eixo Q-E-13 → Q-R-02 ao lado do Mirante', 13.4, -9.6],
+      ['eixo Q-E-13 → Q-R-02 na altura da Quadra E', 13.4, 5.4],
       ['corredor oeste das Quadras F e G', 2.4, -2.0],
       ['corredor interno da Quadra G', 5.1, -5.3],
       ['corredor Q-V-06 → Q-T-12', -34.2, -4.5],
       ['faixa leste Q-R-55 → Q-S-19', 56.8, -30.0],
+      ['Rua Ubiretama ao lado do Q-R-55', 57.5, -23.0],
+      ['encontro da Ubiretama com a Rua Gustavo Bessel', 57.5, -19.9],
     ] as const).forEach(([label, x, z]) => {
       expect(covered(x, z), label).toBe(true);
     });
