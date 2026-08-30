@@ -237,7 +237,7 @@ describe('referência cartográfica oficial Fenasoja 2026', () => {
     expect(gates.get('A11')).toBe('Portão 11 — entrada e saída de visitantes e expositores');
   });
 
-  it('mantém os 26 sanitários nos centros vetoriais oficiais sem marcadores fantasmas', () => {
+  it('mantém os 26 centros sanitários vetoriais oficiais e nenhum volume renderizado', () => {
     expect(OFFICIAL_RESTROOM_CENTERS_2026).toHaveLength(26);
     expect(OFFICIAL_RESTROOM_CENTERS_2026).toEqual(expect.arrayContaining([
       [2156, 2240],
@@ -248,11 +248,9 @@ describe('referência cartográfica oficial Fenasoja 2026', () => {
     expect(OFFICIAL_RESTROOM_CENTERS_2026).not.toContainEqual([3632, 3157]);
     expect(OFFICIAL_RESTROOM_CENTERS_2026).not.toContainEqual([4968, 3764]);
 
+    // A série sanitária E é infraestrutura temporária e foi removida do mapa renderizado.
     const restrooms = OFFICIAL_REFERENCE_DATA.entities.filter((entity) => entity.classification === 'RESTROOM');
-    expect(restrooms).toHaveLength(26);
-    expect(restrooms.map((entity) => entity.publicIdentifier)).toEqual(
-      Array.from({ length: 26 }, (_, index) => `E-${String(index + 1).padStart(2, '0')}`),
-    );
+    expect(restrooms).toEqual([]);
   });
 
   it('mantém pavilhões oficiais separados em vez de geometrias sobrepostas', () => {
