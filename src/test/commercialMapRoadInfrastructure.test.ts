@@ -192,7 +192,7 @@ describe('infraestrutura viária do Mapa Comercial', () => {
       expect(detailed.gutters).not.toBeNull();
       expect(detailed.curbs).not.toBeNull();
       expect(detailed.diagnostics).toMatchObject({
-        roadCount: 21,
+        roadCount: 25,
         pedestrianPathCount: 1,
         microGapCount: 1,
       });
