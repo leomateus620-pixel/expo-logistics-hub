@@ -194,7 +194,38 @@ async function scheduleReminders(supa: ReturnType<typeof db>) {
         if (member.user_id && member.org_id) {
           recipients.set(member.user_id, { user_id: member.user_id, org_id: member.org_id });
         }
+    }
+
+    // Vínculo individual: responsáveis/participantes ligados diretamente ao evento
+    // recebem o lembrete mesmo sem vínculo por comissão. O Map deduplica quando
+    // a pessoa está relacionada pelas duas formas.
+    const { data: directLinks, error: directError } = await supa
+      .from("cronograma_evento_responsaveis")
+      .select("org_member_user_id, org_id, responsible_type")
+      .eq("event_id", event.id)
+      .eq("responsible_type", "member")
+      .not("org_member_user_id", "is", null);
+    if (directError) {
+      console.error("event_reminder_direct_links_query_failed", { eventId: event.id });
+    }
+    const directUserIds = [...new Set(
+      ((directLinks ?? []) as Array<{ org_member_user_id: string | null }>)
+        .map((link) => link.org_member_user_id)
+        .filter((id): id is string => Boolean(id)),
+    )];
+    if (directUserIds.length) {
+      const { data: activeDirect } = await supa
+        .from("org_members")
+        .select("user_id, org_id, is_active")
+        .eq("org_id", event.org_id)
+        .eq("is_active", true)
+        .in("user_id", directUserIds);
+      for (const member of (activeDirect ?? []) as OrgMemberRow[]) {
+        if (member.user_id && member.org_id) {
+          recipients.set(member.user_id, { user_id: member.user_id, org_id: member.org_id });
+        }
       }
+    }
     }
 
     for (const globalRecipient of globalByOrg.get(event.org_id) ?? []) {
