@@ -8548,6 +8548,10 @@ export type Database = {
         Args: { _event_id: string }
         Returns: boolean
       }
+      cronograma_event_related: {
+        Args: { _event_id: string; _org_id: string; _user_id: string }
+        Returns: boolean
+      }
       cronograma_is_planning_sheet: {
         Args: { _sheet: string }
         Returns: boolean
