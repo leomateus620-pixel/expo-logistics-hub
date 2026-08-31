@@ -31,3 +31,6 @@ project_id = "btfaumhroqtqzxomqorx"
 
   [functions.mcp]
     verify_jwt = false
+
+  [functions.fix-jonas-email]
+    verify_jwt = false
