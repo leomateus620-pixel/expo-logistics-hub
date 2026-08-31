@@ -76,6 +76,7 @@ import {
   apolloXivReplicaHeight,
   treeRemainsVisibleWithSelectedApollo,
 } from '../../utils/lunarMemorial';
+import { LACTALIS_STAGE_LAYOUT } from '../../utils/lactalisStage';
 import {
   LUNAR_LAUNCH_TIMELINE,
   lunarLaunchAltitudeAt,
@@ -148,6 +149,7 @@ import { ParkAccessEnvironmentLayer } from './ParkAccessEnvironmentLayer';
 import { RearParkRoadNetwork } from './RearParkRoadNetwork';
 import { RearParkEnvironmentLayer } from './RearParkEnvironmentLayer';
 import { CommercialSiteEnvironmentLayer } from './CommercialSiteEnvironmentLayer';
+import { QuadrasABEnvironmentLayer } from './QuadrasABEnvironmentLayer';
 import { rearRoadLayerPresentation } from '../../utils/commercialLayerPresentation';
 import {
   REAR_ROAD_SCENE_SUPPORT_POINTS,
@@ -177,6 +179,9 @@ import {
 // Never import the exclusion audit or debug textures in the production bundle.
 const RearRoadValidationOverlay = import.meta.env.DEV
   ? lazy(async () => ({ default: (await import('./RearRoadValidationOverlay')).RearRoadValidationOverlay }))
+  : null;
+const QuadrasABValidationOverlay = import.meta.env.DEV
+  ? lazy(async () => ({ default: (await import('./QuadrasABValidationOverlay')).QuadrasABValidationOverlay }))
   : null;
 
 interface CommercialMapCanvasProps {
@@ -474,6 +479,9 @@ function focusProfileForEntity(entity: MapEntity) {
   if (landmark === 'fenasoja-headquarters') {
     return { ...profile, contextRatio: 0.055, fitPadding: 1.16, minDistanceRatio: 0.05, maxDistanceRatio: 0.3, minimumDirectionY: 0.32 };
   }
+  if (landmark === 'lactalis-cultural-stage') {
+    return { ...profile, contextRatio: 0.03, fitPadding: 1.22, minDistanceRatio: 0.02, maxDistanceRatio: 0.34, minimumDirectionY: LACTALIS_STAGE_LAYOUT.camera.focusMinimumDirectionY };
+  }
   if (landmark === 'fenasoja-event-center') {
     return { ...profile, contextRatio: 0.085, fitPadding: 1.32, minDistanceRatio: 0.06, maxDistanceRatio: 0.4, minimumDirectionY: 0.48 };
   }
@@ -525,6 +533,7 @@ function fitDistanceForDirection(
   aspect: number,
   direction: THREE.Vector3,
   padding = 1.1,
+  minimumDistance?: number,
 ) {
   const verticalFov = THREE.MathUtils.degToRad(fov);
   const horizontalFov = 2 * Math.atan(Math.tan(verticalFov / 2) * Math.max(aspect, 0.35));
@@ -548,7 +557,7 @@ function fitDistanceForDirection(
     }
   }
 
-  return Math.max(distance * padding, extent.maxHeight * 3 + 4);
+  return Math.max(distance * padding, minimumDistance ?? extent.maxHeight * 3 + 4);
 }
 
 function ReferenceUnderlaySurface({
@@ -1798,6 +1807,7 @@ function CameraRig({
     [cameraDistanceBounds.maxDistance, extent],
   );
   const selectedKind = selectedEntity ? resolveStrategicLandmarkKind(selectedEntity) : null;
+  const lactalisSelected = !interiorEntity && selectedKind === 'lactalis-cultural-stage';
   const miranteSelected = !interiorEntity && selectedKind === 'mirante-pavilion';
   const miranteExtent = useMemo(
     () => (miranteSelected && selectedEntity ? getEntityExtent(selectedEntity) : null),
@@ -1817,7 +1827,12 @@ function CameraRig({
     }),
     [extent, miranteExtent, segmentExtent, size.height, size.width],
   );
-  const requestedMinimumDistance = miranteExtent
+  // B13 is a compact open stage. Its own close-view range keeps the camera
+  // between the audience apron and the existing D canopies, without changing
+  // the exterior limits or the camera behavior of any neighboring structure.
+  const requestedMinimumDistance = lactalisSelected
+    ? LACTALIS_STAGE_LAYOUT.camera.minimumDistance
+    : miranteExtent
     ? Math.max(7.5, miranteExtent.diagonal * 0.8)
     : segmentExtent && activeSegment
       ? Math.max(6.5, segmentExtent.diagonal * activeSegment.camera.minDistanceRatio)
@@ -2574,15 +2589,26 @@ function CameraRig({
       // Preserve a small amount of spatial continuity while making the public
       // facade deterministic after rapid switches or a lateral manual view.
       const deterministicDirection = new THREE.Vector3(...landmarkFocusDirection).normalize();
-      if (landmarkKind === 'mirante-pavilion') direction.copy(deterministicDirection);
+      if (landmarkKind === 'mirante-pavilion' || landmarkKind === 'lactalis-cultural-stage') direction.copy(deterministicDirection);
       else direction.lerp(deterministicDirection, 0.92).normalize();
     }
-    direction.y = Math.max(direction.y, focusProfile.minimumDirectionY);
+    const compactStage = landmarkKind === 'lactalis-cultural-stage';
+    const minimumDirectionY = compactStage && aspect < 0.72
+      ? LACTALIS_STAGE_LAYOUT.camera.focusPortraitMinimumDirectionY
+      : focusProfile.minimumDirectionY;
+    direction.y = Math.max(direction.y, minimumDirectionY);
     direction.normalize();
-    const fittedDistance = fitDistanceForDirection(entityExtent, perspective.fov || 38, aspect, direction, focusProfile.fitPadding);
+    const fittedDistance = fitDistanceForDirection(
+      entityExtent,
+      perspective.fov || 38,
+      aspect,
+      direction,
+      focusProfile.fitPadding,
+      compactStage ? LACTALIS_STAGE_LAYOUT.camera.minimumDistance : undefined,
+    );
     const fittedSelectionDistance = THREE.MathUtils.clamp(
-      Math.max(fittedDistance, extent.diagonal * focusProfile.contextRatio),
-      Math.max(10, extent.diagonal * focusProfile.minDistanceRatio),
+      Math.max(fittedDistance, compactStage ? LACTALIS_STAGE_LAYOUT.camera.focusedDistance : extent.diagonal * focusProfile.contextRatio),
+      compactStage ? LACTALIS_STAGE_LAYOUT.camera.minimumDistance : Math.max(10, extent.diagonal * focusProfile.minDistanceRatio),
       controlsMaximumDistance,
     );
     const distance = compactSidePanelMirante
@@ -3996,6 +4022,9 @@ function Scene({
   const rearRoadDebugVisible = useMemo(() => import.meta.env.DEV
     && typeof window !== 'undefined'
     && new URLSearchParams(window.location.search).has('rearRoadDebug'), []);
+  const quadrasABDebugVisible = useMemo(() => import.meta.env.DEV
+    && typeof window !== 'undefined'
+    && new URLSearchParams(window.location.search).has('quadrasABDebug'), []);
   const activeSiteEnvironmentOwnerIdentifiers = useMemo(() => (
     isolatedArea
       ? new Set(entities.map((entity) => entity.publicIdentifier))
@@ -4343,6 +4372,12 @@ function Scene({
         />
       )}
       {!isolatedArea && !hydrologicalModeActive && (
+        <QuadrasABEnvironmentLayer
+          entities={siteEnvironmentEntities}
+          reducedGraphics={reducedGraphics}
+        />
+      )}
+      {!isolatedArea && !hydrologicalModeActive && (
         <>
           <RearParkEnvironmentLayer
             reducedGraphics={reducedGraphics}
@@ -4488,6 +4523,11 @@ function Scene({
       {!isolatedArea && !hydrologicalModeActive && rearRoadDebugVisible && RearRoadValidationOverlay && (
         <Suspense fallback={null}>
           <RearRoadValidationOverlay />
+        </Suspense>
+      )}
+      {!isolatedArea && !hydrologicalModeActive && quadrasABDebugVisible && QuadrasABValidationOverlay && (
+        <Suspense fallback={null}>
+          <QuadrasABValidationOverlay />
         </Suspense>
       )}
         </group>

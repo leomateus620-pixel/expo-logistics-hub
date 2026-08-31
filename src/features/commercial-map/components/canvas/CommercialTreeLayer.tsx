@@ -1,6 +1,7 @@
 import { memo, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { useFrame, useThree } from '@react-three/fiber';
 import * as THREE from 'three';
+import { mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import {
   projectedCommercialMapShadowDirection,
   projectedCommercialMapShadowRotation,
@@ -30,6 +31,30 @@ export const COMMERCIAL_TREE_PRESENTATION_DRAW_CALLS = {
   fullGraphicsShadowPass: 3,
   reducedGraphicsShadowPass: 0,
 } as const;
+
+// The reference-driven A/B inventory is one additional instanced batch set;
+// legacy trees keep their existing meshes, palette and presentation unchanged.
+// eslint-disable-next-line react-refresh/only-export-components
+export const QUADRAS_AB_TREE_PRESENTATION_DRAW_CALLS = {
+  fullGraphics: 5,
+  reducedGraphics: 4,
+  fullGraphicsShadowPass: 3,
+  reducedGraphicsShadowPass: 0,
+} as const;
+
+const QUADRAS_AB_FOLIAGE_PALETTES: Readonly<Record<CommercialTreeSpeciesGroup, readonly [string, string, string, string]>> = {
+  MATURE_BROADLEAF: ['#3e603c', '#4c6c42', '#597849', '#678553'],
+  OPEN_CANOPY: ['#46653e', '#547347', '#62804e', '#718d58'],
+  ORNAMENTAL_COMPACT: ['#405f3a', '#4c6c42', '#587849', '#668451'],
+  FLOWERING_ORNAMENTAL: ['#4b613f', '#825d70', '#96697c', '#a67586'],
+};
+
+const QUADRAS_AB_TRUNK_PALETTES: Record<CommercialTreeSpeciesGroup, readonly [string, string]> = {
+  MATURE_BROADLEAF: ['#4b392b', '#5d4533'],
+  OPEN_CANOPY: ['#503c2d', '#654b37'],
+  ORNAMENTAL_COMPACT: ['#483529', '#594130'],
+  FLOWERING_ORNAMENTAL: ['#49362a', '#5b4332'],
+};
 
 // eslint-disable-next-line react-refresh/only-export-components
 export const COMMERCIAL_TREE_FOLIAGE_PALETTES: Readonly<Record<CommercialTreeSpeciesGroup, readonly [string, string, string, string]>> = {
@@ -100,18 +125,31 @@ export function commercialTreePresentationProfile(
   } as const;
 }
 
-function createCrownGeometry(reducedGraphics: boolean) {
-  const geometry = new THREE.IcosahedronGeometry(1, reducedGraphics ? 0 : 1);
+function createCrownGeometry(reducedGraphics: boolean, referenceQuadras = false) {
+  const sourceGeometry = new THREE.IcosahedronGeometry(1, referenceQuadras ? 2 : reducedGraphics ? 0 : 1);
+  // IcosahedronGeometry is non-indexed. Welding positions before recomputing
+  // normals gives A/B smooth, coherent foliage instead of faceted dark solids.
+  if (referenceQuadras) {
+    sourceGeometry.deleteAttribute('normal');
+    sourceGeometry.deleteAttribute('uv');
+  }
+  const geometry = referenceQuadras ? mergeVertices(sourceGeometry, 1e-5) : sourceGeometry;
+  if (referenceQuadras) sourceGeometry.dispose();
   const positions = geometry.getAttribute('position') as THREE.BufferAttribute;
   const vector = new THREE.Vector3();
   for (let index = 0; index < positions.count; index += 1) {
     vector.fromBufferAttribute(positions, index);
     // Stronger, multi-frequency perturbation breaks the "solid ball" reading
     // and gives each lobe a leafy, irregular contour.
-    const irregularity = 1
-      + Math.sin(vector.x * 6.7 + vector.y * 4.1) * 0.115
-      + Math.cos(vector.z * 7.9 - vector.y * 3.2) * 0.095
-      + Math.sin(vector.x * 13.4 + vector.z * 11.7) * 0.055;
+    const irregularity = referenceQuadras
+      ? 1
+        + Math.sin(vector.x * 7.3 + vector.y * 4.1) * 0.085
+        + Math.cos(vector.z * 8.9 - vector.y * 5.2) * 0.075
+        + Math.sin(vector.x * 17.4 + vector.z * 13.7) * 0.038
+      : 1
+        + Math.sin(vector.x * 6.7 + vector.y * 4.1) * 0.115
+        + Math.cos(vector.z * 7.9 - vector.y * 3.2) * 0.095
+        + Math.sin(vector.x * 13.4 + vector.z * 11.7) * 0.055;
     const verticalTaper = 0.86 + Math.max(0, vector.y) * 0.12;
     positions.setXYZ(
       index,
@@ -119,6 +157,15 @@ function createCrownGeometry(reducedGraphics: boolean) {
       vector.y * irregularity * verticalTaper,
       vector.z * (1 + (irregularity - 1) * 0.86),
     );
+  }
+  if (referenceQuadras) {
+    let maximumHorizontalRadius = 0;
+    for (let index = 0; index < positions.count; index += 1) {
+      maximumHorizontalRadius = Math.max(maximumHorizontalRadius, Math.hypot(positions.getX(index), positions.getZ(index)));
+    }
+    for (let index = 0; index < positions.count; index += 1) {
+      positions.setXYZ(index, positions.getX(index) / maximumHorizontalRadius, positions.getY(index), positions.getZ(index) / maximumHorizontalRadius);
+    }
   }
   positions.needsUpdate = true;
   geometry.computeVertexNormals();
@@ -183,13 +230,16 @@ function createIrregularContactPatchGeometry() {
   return geometry;
 }
 
-function createTreeMaterials(shadowTexture: THREE.Texture) {
+function createTreeMaterials(shadowTexture: THREE.Texture, referenceQuadras = false) {
   return {
     trunk: new THREE.MeshStandardMaterial({
       color: '#ffffff',
       roughness: 0.96,
       metalness: 0,
-      vertexColors: true,
+      // InstancedMesh instanceColor is independent of geometry vertex colors.
+      // A/B geometries have no color attribute, so enabling vertexColors would
+      // multiply every PBR albedo by the missing attribute's default black.
+      vertexColors: !referenceQuadras,
       transparent: true,
       emissive: '#261b13',
       emissiveIntensity: 0.08,
@@ -198,18 +248,18 @@ function createTreeMaterials(shadowTexture: THREE.Texture) {
       color: '#ffffff',
       roughness: 0.94,
       metalness: 0,
-      vertexColors: true,
+      vertexColors: !referenceQuadras,
       transparent: true,
       // A small green bounce keeps shaded crowns readable without flattening
       // the directional-light response or making the foliage self-lit.
-      emissive: '#416946',
-      emissiveIntensity: 0.3,
+      emissive: referenceQuadras ? '#354629' : '#416946',
+      emissiveIntensity: referenceQuadras ? 0.075 : 0.3,
     }),
     contactPatch: new THREE.MeshStandardMaterial({
       color: '#ffffff',
       roughness: 1,
       metalness: 0,
-      vertexColors: true,
+      vertexColors: !referenceQuadras,
       transparent: true,
       opacity: CONTACT_PATCH_OPACITY,
       depthWrite: false,
@@ -237,7 +287,7 @@ function createTreeMaterials(shadowTexture: THREE.Texture) {
  * jitter. The canopy reads as foliage instead of one opaque green mass, and it
  * hides less of the lots and labels underneath.
  */
-function crownLobeTransform(tree: CommercialMapTree, lobeIndex: number, lobeCount: number) {
+function crownLobeTransform(tree: CommercialMapTree, lobeIndex: number, lobeCount: number, referenceQuadras = false) {
   const profile = commercialTreePresentationProfile(tree);
   const seed = profile.seed * 997 + tree.visualVariant * 13.7 + 1;
   const isCentral = lobeIndex === 0;
@@ -260,7 +310,7 @@ function crownLobeTransform(tree: CommercialMapTree, lobeIndex: number, lobeCoun
       : -0.06 + lobeNoise(seed, lobeIndex * 4.9) * 0.09;
   const lobeSpread = isCentral ? 0.62 : upperTier ? 0.42 : 0.5;
   const lobeHeight = isCentral ? 0.42 : upperTier ? 0.3 : 0.32;
-  return {
+  const transform = {
     offsetX: Math.cos(ringPhase) * radius,
     offsetY: tree.crownHeight * tierHeight,
     offsetZ: Math.sin(ringPhase) * radius,
@@ -270,6 +320,15 @@ function crownLobeTransform(tree: CommercialMapTree, lobeIndex: number, lobeCoun
     scaleZ: tree.canopyRadius * lobeSpread * 0.96 * depthVariation * profile.crownScaleZ,
     lift: profile.crownLift,
   };
+  if (referenceQuadras) {
+    // Keep the real canopy envelope used by road/building exclusion checks;
+    // irregular lobe placement must not silently enlarge that footprint.
+    const availableRadius = tree.canopyRadius * 0.98 - Math.hypot(transform.offsetX, transform.offsetZ);
+    const horizontalScale = Math.min(1, availableRadius / Math.max(transform.scaleX, transform.scaleZ));
+    transform.scaleX *= horizontalScale;
+    transform.scaleZ *= horizontalScale;
+  }
+  return transform;
 }
 
 function refreshInstanceBounds(mesh: THREE.InstancedMesh | null) {
@@ -285,11 +344,13 @@ function CommercialTreeInstances({
   surfaceEntities,
   visible,
   reducedGraphics,
+  referenceQuadras = false,
 }: {
   trees: readonly CommercialMapTree[];
   surfaceEntities: readonly MapEntity[];
   visible: boolean;
   reducedGraphics: boolean;
+  referenceQuadras?: boolean;
 }) {
   const groupRef = useRef<THREE.Group>(null);
   const trunkRef = useRef<THREE.InstancedMesh>(null);
@@ -302,14 +363,14 @@ function CommercialTreeInstances({
   const { gl, invalidate } = useThree();
   const lobeCount = reducedGraphics ? COMMERCIAL_TREE_REDUCED_CANOPY_LOBES : COMMERCIAL_TREE_CANOPY_LOBES;
   const geometries = useMemo(() => ({
-    trunk: new THREE.CylinderGeometry(0.62, 1, 1, reducedGraphics ? 6 : 8, 2),
+    trunk: new THREE.CylinderGeometry(0.62, 1, 1, referenceQuadras ? 12 : reducedGraphics ? 6 : 8, 2),
     branch: new THREE.CylinderGeometry(0.42, 0.74, 1, 6, 1),
-    crown: createCrownGeometry(reducedGraphics),
+    crown: createCrownGeometry(reducedGraphics, referenceQuadras),
     shadow: new THREE.PlaneGeometry(2, 2, 1, 1),
     contactPatch: createIrregularContactPatchGeometry(),
-  }), [reducedGraphics]);
+  }), [reducedGraphics, referenceQuadras]);
   const shadowTexture = useMemo(createSoftShadowTexture, []);
-  const materials = useMemo(() => createTreeMaterials(shadowTexture), [shadowTexture]);
+  const materials = useMemo(() => createTreeMaterials(shadowTexture, referenceQuadras), [shadowTexture, referenceQuadras]);
 
   useLayoutEffect(() => {
     const trunkMesh = trunkRef.current;
@@ -338,8 +399,8 @@ function CommercialTreeInstances({
     trees.forEach((tree, treeIndex) => {
       const [x, z] = tree.position;
       const groundY = commercialTreeGroundElevation(tree, surfaceEntities);
-      const trunkPalette = TRUNK_PALETTES[tree.speciesGroup];
-      const foliagePalette = COMMERCIAL_TREE_FOLIAGE_PALETTES[tree.speciesGroup];
+      const trunkPalette = (referenceQuadras ? QUADRAS_AB_TRUNK_PALETTES : TRUNK_PALETTES)[tree.speciesGroup];
+      const foliagePalette = (referenceQuadras ? QUADRAS_AB_FOLIAGE_PALETTES : COMMERCIAL_TREE_FOLIAGE_PALETTES)[tree.speciesGroup];
       const profile = commercialTreePresentationProfile(tree);
 
       transform.position.set(x, groundY + tree.trunkHeight / 2, z);
@@ -378,13 +439,13 @@ function CommercialTreeInstances({
       const crownBaseY = groundY + tree.trunkHeight + tree.crownHeight * 0.32;
       for (let lobeIndex = 0; lobeIndex < lobeCount; lobeIndex += 1) {
         const instanceIndex = treeIndex * lobeCount + lobeIndex;
-        const lobe = crownLobeTransform(tree, lobeIndex, lobeCount);
+        const lobe = crownLobeTransform(tree, lobeIndex, lobeCount, referenceQuadras);
         transform.position.set(
           x + lobe.offsetX,
           crownBaseY + lobe.offsetY + lobe.lift,
           z + lobe.offsetZ,
         );
-        transform.rotation.set(lobe.rotation * 0.08, lobe.rotation, -lobe.rotation * 0.045);
+        transform.rotation.set(referenceQuadras ? 0 : lobe.rotation * 0.08, lobe.rotation, referenceQuadras ? 0 : -lobe.rotation * 0.045);
         transform.scale.set(lobe.scaleX, lobe.scaleY, lobe.scaleZ);
         transform.updateMatrix();
         crownMesh.setMatrixAt(instanceIndex, transform.matrix);
@@ -403,7 +464,7 @@ function CommercialTreeInstances({
       }
 
       if (contactPatchMesh) {
-        transform.position.set(x, groundY - 0.001, z);
+        transform.position.set(x, referenceQuadras ? Math.max(groundY - 0.001, 0.0325) : groundY - 0.001, z);
         transform.rotation.set(-Math.PI / 2, 0, profile.contactRotation);
         transform.scale.set(profile.contactScaleX, profile.contactScaleZ, 1);
         transform.updateMatrix();
@@ -436,7 +497,7 @@ function CommercialTreeInstances({
     [trunkMesh, branchMesh, crownMesh, shadowMesh, contactPatchMesh].forEach(refreshInstanceBounds);
     gl.shadowMap.needsUpdate = true;
     invalidate();
-  }, [gl, invalidate, lobeCount, reducedGraphics, surfaceEntities, trees]);
+  }, [gl, invalidate, lobeCount, reducedGraphics, referenceQuadras, surfaceEntities, trees]);
 
   useLayoutEffect(() => {
     const group = groupRef.current;
@@ -470,7 +531,7 @@ function CommercialTreeInstances({
     const progress = visibilityProgress.current;
     group.position.y = (1 - progress) * -0.16;
     materials.trunk.opacity = progress;
-    materials.crown.opacity = progress * 0.95;
+    materials.crown.opacity = progress * (referenceQuadras ? 1 : 0.95);
     materials.shadow.opacity = SHADOW_OPACITY * progress;
     materials.contactPatch.opacity = CONTACT_PATCH_OPACITY * progress;
     if (settled) {
@@ -491,7 +552,16 @@ function CommercialTreeInstances({
   const castsInitialShadow = visible && !reducedGraphics && visibilityProgress.current >= 0.998;
 
   return (
-    <group ref={groupRef} name="camada-arvores-comerciais" visible={visible || visibilityProgress.current > 0.002}>
+    <group
+      ref={groupRef}
+      name={referenceQuadras ? 'camada-arvores-quadras-ab' : 'camada-arvores-comerciais'}
+      visible={visible || visibilityProgress.current > 0.002}
+      userData={{
+        presentationVariant: referenceQuadras ? 'quadras-ab-reference' : 'legacy',
+        treeCount: trees.length,
+        colorPassDrawCalls: reducedGraphics ? 4 : 5,
+      }}
+    >
       <instancedMesh
         ref={shadowRef}
         name="sombras-arvores-comerciais"
@@ -549,6 +619,17 @@ export const CommercialTreeLayer = memo(function CommercialTreeLayer(props: {
   visible: boolean;
   reducedGraphics: boolean;
 }) {
+  const treeGroups = useMemo(() => ({
+    referenceQuadras: props.trees.filter((tree) => tree.area === 'QUADRA_A' || tree.area === 'QUADRA_B'),
+    legacy: props.trees.filter((tree) => tree.area !== 'QUADRA_A' && tree.area !== 'QUADRA_B'),
+  }), [props.trees]);
   if (props.trees.length === 0) return null;
-  return <CommercialTreeInstances {...props} />;
+  return (
+    <>
+      {treeGroups.legacy.length > 0 && <CommercialTreeInstances {...props} trees={treeGroups.legacy} />}
+      {treeGroups.referenceQuadras.length > 0 && (
+        <CommercialTreeInstances {...props} trees={treeGroups.referenceQuadras} referenceQuadras />
+      )}
+    </>
+  );
 });

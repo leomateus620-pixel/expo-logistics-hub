@@ -414,9 +414,12 @@ function planSignature(cells: readonly CommercialSiteEnvironmentCell[]) {
 export function buildCommercialSiteEnvironmentPlan({
   entities = OFFICIAL_REFERENCE_ENTITIES,
   reducedGraphics = false,
+  treatmentOwnerIdentifiers,
 }: {
   entities?: readonly MapEntity[];
   reducedGraphics?: boolean;
+  /** Optional presentation-only scope; omitted preserves the complete shared plan. */
+  treatmentOwnerIdentifiers?: readonly string[];
 } = {}): CommercialSiteEnvironmentPlan {
   const hardSurfaceMasks = buildCommercialSiteHardSurfaceMasks(entities);
   const entitiesByIdentifier = new Map<string, MapEntity[]>();
@@ -432,7 +435,13 @@ export function buildCommercialSiteEnvironmentPlan({
   let rejectedByHardMask = 0;
   let activeTreatmentCount = 0;
 
-  COMMERCIAL_SITE_ENVIRONMENT_TREATMENTS.forEach((definition) => {
+  const treatments = treatmentOwnerIdentifiers
+    ? COMMERCIAL_SITE_ENVIRONMENT_TREATMENTS.filter((definition) => (
+      definition.officialOwnerIdentifiers.some((identifier) => treatmentOwnerIdentifiers.includes(identifier))
+    ))
+    : COMMERCIAL_SITE_ENVIRONMENT_TREATMENTS;
+
+  treatments.forEach((definition) => {
     definition.officialOwnerIdentifiers.forEach((identifier) => {
       if (!entitiesByIdentifier.has(identifier)) missingOwnerIdentifiers.add(identifier);
     });
@@ -513,7 +522,7 @@ export function buildCommercialSiteEnvironmentPlan({
     hardSurfaceMasks.filter((mask) => mask.role === role).length,
   ])) as Record<CommercialSiteHardMaskRole, number>);
   const diagnostics = Object.freeze({
-    treatmentCount: COMMERCIAL_SITE_ENVIRONMENT_TREATMENTS.length,
+    treatmentCount: treatments.length,
     activeTreatmentCount,
     maskCount: hardSurfaceMasks.length,
     maskCountByRole,

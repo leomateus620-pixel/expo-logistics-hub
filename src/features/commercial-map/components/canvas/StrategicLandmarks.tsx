@@ -11,6 +11,7 @@ import { MIRANTE_RENDER_BUDGET } from '../../utils/mirante';
 import { THIRD_AGE_PAVILION_LAYOUT } from '../../utils/thirdAgePavilion';
 import { commercialPavilionModelBounds } from '../../utils/commercialPavilions';
 import { FENASOJA_HEADQUARTERS_LAYOUT } from '../../utils/headquarters';
+import { LACTALIS_STAGE_LAYOUT, lactalisStagePresentationFootprint } from '../../utils/lactalisStage';
 import {
   FENASOJA_EVENT_CENTER_LAYOUT,
   FENASOJA_EVENT_CENTER_RENDER_BUDGET,
@@ -36,6 +37,7 @@ import { LivestockPavilion } from './LivestockPavilion';
 import { MirantePavilion } from './MirantePavilion';
 import { CommercialPavilion } from './CommercialPavilion';
 import { ThirdAgePavilion } from './ThirdAgePavilion';
+import { LactalisCulturalStage } from './LactalisCulturalStage';
 import { AfricanPavilion, RotaryHouse } from './NationsDistrict';
 import {
   CrioulosCenterLandmark,
@@ -209,6 +211,18 @@ const LANDMARK_PALETTES: Record<StrategicLandmarkKind, LandmarkPalette> = {
     white: FENASOJA_HEADQUARTERS_LAYOUT.palette.roof,
     platform: '#85817a',
     metal: '#69757b',
+  },
+  'lactalis-cultural-stage': {
+    wall: LACTALIS_STAGE_LAYOUT.palette.cladding,
+    accent: LACTALIS_STAGE_LAYOUT.palette.concrete,
+    roof: LACTALIS_STAGE_LAYOUT.palette.roof,
+    trim: LACTALIS_STAGE_LAYOUT.palette.frame,
+    dark: LACTALIS_STAGE_LAYOUT.palette.interior,
+    glass: '#44575b',
+    green: LACTALIS_STAGE_LAYOUT.palette.light,
+    white: LACTALIS_STAGE_LAYOUT.palette.claddingLight,
+    platform: LACTALIS_STAGE_LAYOUT.palette.platform,
+    metal: LACTALIS_STAGE_LAYOUT.palette.roofEdge,
   },
   'fenasoja-event-center': {
     wall: FENASOJA_EVENT_CENTER_LAYOUT.palette.wall,
@@ -456,6 +470,7 @@ function useLandmarkMaterials(
       || kind === 'third-age-pavilion'
       || kind === 'livestock-pavilion'
       || kind === 'mirante-pavilion'
+      || kind === 'lactalis-cultural-stage'
     ) {
       result.roof.roughness = 0.6;
       result.roof.metalness = 0.16;
@@ -465,6 +480,19 @@ function useLandmarkMaterials(
       result.dark.metalness = 0.28;
       result.wall.roughness = 0.82;
       result.platform.roughness = 0.96;
+    }
+    if (kind === 'lactalis-cultural-stage') {
+      result.roof.roughness = 0.72;
+      result.roof.metalness = 0.18;
+      result.wall.roughness = 0.83;
+      result.wall.metalness = 0.1;
+      result.metal.roughness = 0.58;
+      result.metal.metalness = 0.38;
+      result.trim.roughness = 0.64;
+      result.trim.metalness = 0.3;
+      result.dark.roughness = 0.76;
+      result.platform.roughness = 0.92;
+      result.accent.roughness = 0.95;
     }
     if (kind === 'crioulos-center') {
       result.wall.roughness = 0.97;
@@ -1563,8 +1591,10 @@ function useArchitecturalDetail(
         ? Math.max(28, Math.max(bounds.width, bounds.depth) * 3.8)
       : kind === 'administrative-center'
           ? Math.max(24, Math.max(bounds.width, bounds.depth) * 4)
-        : kind === 'fenasoja-headquarters'
+      : kind === 'fenasoja-headquarters'
           ? Math.max(19, bounds.width * 6.4)
+        : kind === 'lactalis-cultural-stage'
+          ? Math.max(18, Math.max(bounds.width, bounds.depth) * 6.2)
         : Math.max(18, bounds.width * 6.2);
     const distance = camera.position.distanceTo(center);
     const nextNear = distance <= threshold * (nearRef.current ? 1.12 : 1);
@@ -3697,6 +3727,19 @@ export function StrategicLandmarkMesh({
   // The official A4 marker is smaller than the architectural portal. Share one
   // transient envelope across picking, hover and selection without moving its ID/label.
   const interactionEntity = useMemo<MapEntity>(() => {
+    if (kind === 'lactalis-cultural-stage') {
+      return {
+        ...entity,
+        geometry: {
+          ...entity.geometry,
+          coordinates: [lactalisStagePresentationFootprint(
+            bounds.width,
+            bounds.depth,
+            [bounds.centerX, bounds.centerZ],
+          ).map(([x, z]) => [x, z])],
+        },
+      };
+    }
     if (kind !== 'gate-four') return entity;
     const [offsetX, offsetZ] = GATE_FOUR_DISTRICT_LAYOUT.gate4.visualOffset;
     return {
@@ -3841,6 +3884,14 @@ export function StrategicLandmarkMesh({
       <group rotation={[0, facingRadians, 0]} dispose={null}>
         {kind === 'administrative-center' && <AdministrativeCenter {...modelProps} />}
         {kind === 'fenasoja-headquarters' && <FenasojaHeadquarters {...modelProps} />}
+        {kind === 'lactalis-cultural-stage' && (
+          <LactalisCulturalStage
+            bounds={modelProps.bounds}
+            materials={modelProps.materials}
+            showDetail={modelProps.showDetail}
+            showFocusDetail={modelProps.showFocusDetail}
+          />
+        )}
         {kind === 'pavilion-nine' && <PavilionNineLandmark {...modelProps} />}
         {kind === 'crioulos-center' && <CrioulosCenterLandmark {...modelProps} />}
         {kind === 'gate-four' && <GateFourLandmark {...modelProps} />}
