@@ -58,6 +58,20 @@ Deno.serve(async (req) => {
       }
       return new Response(JSON.stringify({ ok: true }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
+    if (action === "update_email") {
+      const newEmail = typeof email === "string" ? email.trim().toLowerCase() : "";
+      if (!target_user_id || !newEmail) {
+        return new Response(JSON.stringify({ error: "Usuário e e-mail são obrigatórios" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+      const { error: emailError } = await adminClient.auth.admin.updateUserById(target_user_id, {
+        email: newEmail,
+        email_confirm: true,
+      });
+      if (emailError) {
+        return new Response(JSON.stringify({ error: emailError.message }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+      return new Response(JSON.stringify({ ok: true }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
     if (!email || !password) {
       return new Response(JSON.stringify({ error: "Email e senha são obrigatórios" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
