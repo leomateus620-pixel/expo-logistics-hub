@@ -338,8 +338,8 @@ export function LactalisCulturalStage({
     return [
       { position: [0, trussY, trussZ], scale: [width * 0.76, column * 0.42, column * 0.42] },
       { position: [0, trussY - column * 2.3, trussZ], scale: [width * 0.76, column * 0.42, column * 0.42] },
-      ...[-0.36, -0.18, 0, 0.18, 0.36].flatMap((ratio, index) => ([
-        { position: [ratio * width, trussY - column * 1.15, trussZ], scale: [column * 0.34, column * 2.6, column * 0.34] },
+      ...[-0.36, -0.18, 0, 0.18, 0.36].flatMap((ratio, index): InstanceTransform[] => ([
+        { position: [ratio * width, trussY - column * 1.15, trussZ] as Vector3Tuple, scale: [column * 0.34, column * 2.6, column * 0.34] as Vector3Tuple },
         diagonalBrace(
           [ratio * width - width * 0.075, trussY - column * 2.15],
           [ratio * width + width * 0.075, trussY - column * 0.15],
