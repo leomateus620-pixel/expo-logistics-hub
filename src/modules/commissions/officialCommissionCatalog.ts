@@ -439,16 +439,23 @@ export const OFFICIAL_COMMISSION_UNITS: readonly OfficialUnitEntry[] = [
   },
   {
     id: 'assessoria-de-marketing',
-    name: 'Assessoria de Marketing e Comunicação',
-    shortName: 'Marketing e Comunicação',
+    name: 'Assessoria de Marketing/Comunicação',
+    shortName: 'Marketing/Comunicação',
     type: 'assessoria',
     order: 6,
-    aliases: ['marketing', 'marketing e comunicacao', 'assessoria de marketing e comunicacao'],
+    aliases: [
+      'marketing',
+      'marketing e comunicacao',
+      'marketing comunicacao',
+      'assessoria de marketing',
+      'assessoria de marketing e comunicacao',
+      'assessoria de marketing comunicacao',
+    ],
     icon: Camera,
     tone: 'rose',
     responsible: 'Zélia Savoldi',
     responsibleRole: 'Diretora de Marketing e Comunicação',
-    description: 'Marca, campanhas, conteúdo e comunicação institucional da Fenasoja.',
+    description: 'Marca, campanhas, conteúdo, fotografia e comunicação institucional da Fenasoja.',
   },
 ];
 
