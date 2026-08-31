@@ -128,13 +128,15 @@ function distanceToEntitySurface(point: readonly [number, number], entity: MapEn
 
 describe('camada cartográfica de árvores do mapa comercial', () => {
   it('mantém inventário versionado por quadra e por área ambiental', () => {
-    expect(COMMERCIAL_TREE_LAYER_REVISION).toBe('2026.8-gate-four-district.1');
+    expect(COMMERCIAL_TREE_LAYER_REVISION).toBe('2026.8-quadras-ab.1');
     expect(COMMERCIAL_TREE_COUNTS_BY_QUADRA).toEqual({ D: 9, I: 15, J: 14, E: 14 });
     expect(COMMERCIAL_TREE_COUNTS_BY_AREA).toEqual({
       D: 9,
       I: 15,
       J: 14,
       E: 14,
+      QUADRA_A: 22,
+      QUADRA_B: 12,
       PARKING_EXHIBITORS_VISITORS: 40,
       PARKING_VISITORS: 29,
       PAVILIONS_1_14_GROVE: 63,
@@ -143,7 +145,7 @@ describe('camada cartográfica de árvores do mapa comercial', () => {
       GATE_FOUR_DISTRICT: 10,
       NATIONS_DISTRICT: 25,
     });
-    expect(COMMERCIAL_MAP_TREES).toHaveLength(240);
+    expect(COMMERCIAL_MAP_TREES).toHaveLength(274);
     expect(new Set(COMMERCIAL_MAP_TREES.map((tree) => tree.id)).size).toBe(COMMERCIAL_MAP_TREES.length);
     expect(new Set(COMMERCIAL_MAP_TREES.map((tree) => tree.area))).toEqual(new Set(Object.keys(COMMERCIAL_TREE_COUNTS_BY_AREA)));
     expect(new Set(COMMERCIAL_MAP_TREES.map((tree) => tree.speciesGroup)).size).toBe(4);
@@ -193,10 +195,18 @@ describe('camada cartográfica de árvores do mapa comercial', () => {
       .filter((candidate) => (
         (candidate.placement === 'LANDSCAPE_MASS' || candidate.placement === 'BUILDING_EDGE')
         && candidate.area !== 'GATE_FOUR_DISTRICT'
+        && candidate.area !== 'QUADRA_A'
+        && candidate.area !== 'QUADRA_B'
       ))
       .forEach((candidate) => {
         expect(commercialTreeGroundElevation(candidate, OFFICIAL_REFERENCE_DATA.entities), candidate.id)
           .toBeCloseTo(0.036, 6);
+      });
+    COMMERCIAL_MAP_TREES
+      .filter((candidate) => candidate.area === 'QUADRA_A' || candidate.area === 'QUADRA_B')
+      .forEach((candidate) => {
+        expect(commercialTreeGroundElevation(candidate, OFFICIAL_REFERENCE_DATA.entities), candidate.id)
+          .toBeCloseTo(0.029, 6);
       });
     COMMERCIAL_MAP_TREES
       .filter((candidate) => candidate.area === 'GATE_FOUR_DISTRICT')

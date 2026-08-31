@@ -16,10 +16,15 @@ import {
   THIRD_AGE_PAVILION_LAYOUT,
   thirdAgePavilionVisualHeight,
 } from './thirdAgePavilion';
+import {
+  LACTALIS_STAGE_LAYOUT,
+  lactalisStageVisualHeight,
+} from './lactalisStage';
 
 export type StrategicLandmarkKind =
   | 'administrative-center'
   | 'fenasoja-headquarters'
+  | 'lactalis-cultural-stage'
   | 'fenasoja-event-center'
   | 'pavilion-nine'
   | 'crioulos-center'
@@ -195,6 +200,27 @@ const STRATEGIC_LANDMARKS: Readonly<Record<string, StrategicLandmarkDefinition>>
     facingRadians: FENASOJA_HEADQUARTERS_LAYOUT.facingRadians,
     focusDirection: [-0.42, 0.36, 0.94],
     visualHeight: ({ width, depth }) => Math.min(2.6, Math.max(width, depth) * 0.84),
+  },
+  B13: {
+    kind: 'lactalis-cultural-stage',
+    aliases: [
+      'Palco Cultural',
+      'Palco Lactalis',
+      'Palco Cultural Lactalis',
+      'Lactalis Cultural Stage',
+    ],
+    // O eixo de frente é calculado no espaço do mundo a partir do centro B13
+    // até o centro oficial de Q-D-12. A câmera permanece no mesmo lado da
+    // plateia; nenhuma rotação depende do preset ou do viewport.
+    facingRadians: LACTALIS_STAGE_LAYOUT.facingRadians,
+    focusDirection: [
+      // Stay on the D-12 audience side while shifting south of the mature
+      // canopy that otherwise occludes the opening in the default close view.
+      LACTALIS_STAGE_LAYOUT.frontVector[0] + LACTALIS_STAGE_LAYOUT.frontVector[1] * 0.36,
+      LACTALIS_STAGE_LAYOUT.camera.focusMinimumDirectionY,
+      LACTALIS_STAGE_LAYOUT.frontVector[1] - LACTALIS_STAGE_LAYOUT.frontVector[0] * 0.36,
+    ],
+    visualHeight: lactalisStageVisualHeight,
   },
   C1: {
     kind: 'fenasoja-event-center',

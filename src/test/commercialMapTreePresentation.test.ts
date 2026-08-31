@@ -6,6 +6,7 @@ import { COMMERCIAL_MAP_TREES } from '@/features/commercial-map/data/commercialT
 import {
   COMMERCIAL_TREE_FOLIAGE_PALETTES,
   COMMERCIAL_TREE_PRESENTATION_DRAW_CALLS,
+  QUADRAS_AB_TREE_PRESENTATION_DRAW_CALLS,
   commercialTreePresentationProfile,
   commercialTreePresentationSeed,
 } from '@/features/commercial-map/components/canvas/CommercialTreeLayer';
@@ -18,8 +19,33 @@ const rendererSource = readFileSync(rendererPath, 'utf8');
 
 describe('apresentação profissional e instanciada das árvores comerciais', () => {
   it('preserva o inventário canônico e produz identidades visuais determinísticas por árvore', () => {
-    expect(COMMERCIAL_MAP_TREES).toHaveLength(240);
-    expect(new Set(COMMERCIAL_MAP_TREES.map((tree) => tree.id)).size).toBe(240);
+    const previousAreas = COMMERCIAL_MAP_TREES.filter((tree) => (
+      tree.area !== 'QUADRA_A' && tree.area !== 'QUADRA_B'
+    ));
+    const quadrasAB = COMMERCIAL_MAP_TREES.filter((tree) => (
+      tree.area === 'QUADRA_A' || tree.area === 'QUADRA_B'
+    ));
+
+    expect(COMMERCIAL_MAP_TREES).toHaveLength(274);
+    expect(previousAreas).toHaveLength(240);
+    expect(quadrasAB).toHaveLength(34);
+    expect(previousAreas.reduce<Record<string, number>>((counts, tree) => {
+      counts[tree.area] = (counts[tree.area] ?? 0) + 1;
+      return counts;
+    }, {})).toEqual({
+      D: 9,
+      I: 15,
+      J: 14,
+      E: 14,
+      PARKING_EXHIBITORS_VISITORS: 40,
+      PARKING_VISITORS: 29,
+      PAVILIONS_1_14_GROVE: 63,
+      RUA_BRASIL_GROVE: 12,
+      TERCEIRA_IDADE_EDGE: 9,
+      GATE_FOUR_DISTRICT: 10,
+      NATIONS_DISTRICT: 25,
+    });
+    expect(new Set(COMMERCIAL_MAP_TREES.map((tree) => tree.id)).size).toBe(274);
     expect(new Set(COMMERCIAL_MAP_TREES.map((tree) => tree.speciesGroup)).size).toBe(4);
     expect([...new Set(COMMERCIAL_MAP_TREES.map((tree) => tree.visualVariant))].sort()).toEqual([
       0, 1, 2, 3, 4, 5,
@@ -77,13 +103,21 @@ describe('apresentação profissional e instanciada das árvores comerciais', ()
     expect(rendererSource).not.toContain("emissiveIntensity: 0.42");
   });
 
-  it('mantém um único lote de instâncias por categoria e respeita o orçamento full/reduced', () => {
+  it('mantém um lote de instâncias por categoria em cada grupo e respeita o orçamento full/reduced', () => {
     expect(COMMERCIAL_TREE_PRESENTATION_DRAW_CALLS).toEqual({
       fullGraphics: 5,
       reducedGraphics: 4,
       fullGraphicsShadowPass: 3,
       reducedGraphicsShadowPass: 0,
     });
+    expect(QUADRAS_AB_TREE_PRESENTATION_DRAW_CALLS).toEqual({
+      fullGraphics: 5,
+      reducedGraphics: 4,
+      fullGraphicsShadowPass: 3,
+      reducedGraphicsShadowPass: 0,
+    });
+    expect(COMMERCIAL_TREE_PRESENTATION_DRAW_CALLS.fullGraphics + QUADRAS_AB_TREE_PRESENTATION_DRAW_CALLS.fullGraphics).toBe(10);
+    expect(COMMERCIAL_TREE_PRESENTATION_DRAW_CALLS.reducedGraphics + QUADRAS_AB_TREE_PRESENTATION_DRAW_CALLS.reducedGraphics).toBe(8);
     expect(rendererSource.match(/<instancedMesh/g)).toHaveLength(5);
     expect(rendererSource.match(/raycast=\{NO_RAYCAST\}/g)).toHaveLength(5);
     expect(rendererSource).not.toMatch(/<mesh(?:\s|>)/);
@@ -92,6 +126,18 @@ describe('apresentação profissional e instanciada das árvores comerciais', ()
     expect(rendererSource).toContain('name="contato-solo-arvores-comerciais"');
     expect(rendererSource).toContain('trees.forEach((tree, treeIndex) => {');
     expect(rendererSource).not.toContain('trees.map((tree');
+  });
+
+  it('aplica a copa e os materiais refinados somente ao grupo A/B sem duplicar o inventário legado', () => {
+    expect(rendererSource).toContain("referenceQuadras: props.trees.filter((tree) => tree.area === 'QUADRA_A' || tree.area === 'QUADRA_B')");
+    expect(rendererSource).toContain("legacy: props.trees.filter((tree) => tree.area !== 'QUADRA_A' && tree.area !== 'QUADRA_B')");
+    expect(rendererSource).toContain('trees={treeGroups.legacy} />');
+    expect(rendererSource).toContain('trees={treeGroups.referenceQuadras} referenceQuadras />');
+    expect(rendererSource.match(/<CommercialTreeInstances\b/g)).toHaveLength(2);
+    expect(rendererSource).toContain('vertexColors: !referenceQuadras');
+    expect(rendererSource).toContain('referenceQuadras ? mergeVertices(sourceGeometry, 1e-5) : sourceGeometry');
+    expect(rendererSource).toContain('if (referenceQuadras) sourceGeometry.dispose()');
+    expect(rendererSource).toContain('availableRadius / Math.max(transform.scaleX, transform.scaleZ)');
   });
 
   it('faz contato e sombra irregulares sem comprometer lifecycle ou raycast', () => {

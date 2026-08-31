@@ -5,6 +5,8 @@ import { GATE_FOUR_DISTRICT_LAYOUT } from './gateFourDistrict';
 export type CommercialTreeQuadra = 'D' | 'I' | 'J' | 'E';
 
 export type CommercialTreeArea = CommercialTreeQuadra
+  | 'QUADRA_A'
+  | 'QUADRA_B'
   | 'PARKING_EXHIBITORS_VISITORS'
   | 'PARKING_VISITORS'
   | 'PAVILIONS_1_14_GROVE'
@@ -68,13 +70,15 @@ export interface CommercialMapTree {
   verificationStatus: CommercialTreeVerificationStatus;
 }
 
-export const COMMERCIAL_TREE_LAYER_REVISION = '2026.8-gate-four-district.1';
+export const COMMERCIAL_TREE_LAYER_REVISION = '2026.8-quadras-ab.1';
 
 export const COMMERCIAL_TREE_SOURCE_REFERENCES = {
   D: 'Anexo 1 — satélite da Quadra D (088fa39a-75de-4768-b7fb-7017886f84ab.png)',
   I: 'Anexo 2 — satélite da Quadra I (895825ad-1254-45fe-bb9d-0c17ab7311e9.png)',
   J: 'Anexo 3 — satélite da Quadra J (b325a535-e734-4b8a-afbf-067195b949c6.png)',
   E: 'Anexo 4 — satélite da Quadra E (b3b360dc-bf11-4cf6-808b-7c45475ef446.png)',
+  QUADRA_A: 'Anexo principal — satélite das Quadras A/B (WhatsApp Image 2026-08-30 at 23.40.19.jpeg)',
+  QUADRA_B: 'Anexo principal — satélite das Quadras A/B (WhatsApp Image 2026-08-30 at 23.40.19.jpeg)',
   PARKING_EXHIBITORS_VISITORS: 'Anexos 2 e 6 — estacionamento de expositores/visitantes e leitura aérea entre Arena e Praça das Nações',
   PARKING_VISITORS: 'Anexos 2 e 6 — estacionamento de visitantes e bordas arborizadas da Rua Brasil',
   PAVILIONS_1_14_GROVE: 'Anexos 3 e 7 — maciço da Árvore Lunar atrás dos Pavilhões 1 e 14',
@@ -86,6 +90,8 @@ export const COMMERCIAL_TREE_SOURCE_REFERENCES = {
 } as const satisfies Record<CommercialTreeArea, string>;
 
 export const COMMERCIAL_TREE_AREA_SCENE_ANCHORS: Readonly<Record<Exclude<CommercialTreeArea, CommercialTreeQuadra>, readonly string[]>> = {
+  QUADRA_A: ['QUADRA-A'],
+  QUADRA_B: ['QUADRA-B', 'B12', 'B13'],
   PARKING_EXHIBITORS_VISITORS: ['EST-EXP-VIS'],
   PARKING_VISITORS: ['EST-VIS'],
   PAVILIONS_1_14_GROVE: ['B1', 'B2', 'G'],
@@ -142,6 +148,8 @@ const TREE_AREA_ID_PREFIX: Readonly<Record<CommercialTreeArea, string>> = {
   I: 'i',
   J: 'j',
   E: 'e',
+  QUADRA_A: 'quadra-a',
+  QUADRA_B: 'quadra-b',
   PARKING_EXHIBITORS_VISITORS: 'parking-west',
   PARKING_VISITORS: 'parking-east',
   PAVILIONS_1_14_GROVE: 'pavilions-1-14',
@@ -275,6 +283,64 @@ const QUADRA_E_TREES = buildTrees('E', recommendFieldReview([
   { sourcePosition: [3830, 3175], placement: 'STREET_EDGE', speciesGroup: 'ORNAMENTAL_COMPACT', scale: 0.98, notes: 'Árvore pequena junto à Rua Brasil.' },
   { sourcePosition: [3898, 3178], placement: 'QUADRA_BORDER', speciesGroup: 'OPEN_CANOPY', scale: 1.1, notes: 'Copa da esquina Rua Brasil/Rua Brasília, mantida no limite da quadra.' },
 ]));
+
+const QUADRA_A_TREES = buildTrees('QUADRA_A', [
+  ...tracedTreeBand([
+    [4076, 3836], [4160, 3834], [4252, 3838], [4350, 3836], [4458, 3838],
+  ], 'LANDSCAPE_MASS', 'Faixa norte irregular da Quadra A, mantida atrás da Rua Argentina e fora da pista.', {
+    surfaceEntityIdentifier: 'QUADRA-A',
+    verificationStatus: 'CLUSTER_INTERPRETED',
+    scale: 0.86,
+  }),
+  ...tracedTreeBand([
+    [4074, 3900], [4084, 3970], [4072, 4040],
+  ], 'LANDSCAPE_MASS', 'Massa madura oeste observada junto à Rua Brasília, com o tronco recuado para não cruzar a via.', {
+    surfaceEntityIdentifier: 'QUADRA-A',
+    verificationStatus: 'CLUSTER_INTERPRETED',
+    scale: 0.94,
+  }),
+  ...tracedTreeBand([
+    [4460, 3892], [4450, 3972], [4462, 4050], [4452, 4104],
+  ], 'LANDSCAPE_MASS', 'Borda arborizada leste da Quadra A, preservando a clareira e a circulação longitudinal.', {
+    surfaceEntityIdentifier: 'QUADRA-A',
+    verificationStatus: 'CLUSTER_INTERPRETED',
+    scale: 0.92,
+  }),
+  ...tracedTreeBand([
+    [4308, 4106], [4382, 4102],
+  ], 'LANDSCAPE_MASS', 'Massa sul descontínua antes da Avenida dos Imigrantes; os vazios de acesso permanecem legíveis.', {
+    surfaceEntityIdentifier: 'QUADRA-A',
+    verificationStatus: 'CLUSTER_INTERPRETED',
+    scale: 0.84,
+  }),
+  { sourcePosition: [4132, 3908], placement: 'LANDSCAPE_MASS', surfaceEntityIdentifier: 'QUADRA-A', speciesGroup: 'OPEN_CANOPY', scale: 0.88, verificationStatus: 'CLUSTER_INTERPRETED', notes: 'Copa aberta no agrupamento noroeste, afastada do eixo central de circulação.' },
+  { sourcePosition: [4200, 3872], placement: 'LANDSCAPE_MASS', surfaceEntityIdentifier: 'QUADRA-A', scale: 0.8, verificationStatus: 'CLUSTER_INTERPRETED', notes: 'Árvore intermediária do agrupamento norte; rotação e escala diferem do alinhamento de borda.' },
+  { sourcePosition: [4282, 3896], placement: 'LANDSCAPE_MASS', surfaceEntityIdentifier: 'QUADRA-A', speciesGroup: 'OPEN_CANOPY', scale: 0.9, verificationStatus: 'CLUSTER_INTERPRETED', notes: 'Copa isolada ao norte da clareira principal, sem preencher o vazio central.' },
+  { sourcePosition: [4386, 3920], placement: 'LANDSCAPE_MASS', surfaceEntityIdentifier: 'QUADRA-A', scale: 0.86, verificationStatus: 'CLUSTER_INTERPRETED', notes: 'Copa do agrupamento nordeste, recuada das bordas viárias.' },
+  { sourcePosition: [4150, 3982], placement: 'LANDSCAPE_MASS', surfaceEntityIdentifier: 'QUADRA-A', scale: 0.96, verificationStatus: 'CLUSTER_INTERPRETED', notes: 'Árvore madura a oeste da clareira, mantendo o corredor central livre.' },
+  { sourcePosition: [4190, 4058], placement: 'LANDSCAPE_MASS', surfaceEntityIdentifier: 'QUADRA-A', speciesGroup: 'OPEN_CANOPY', scale: 0.82, verificationStatus: 'CLUSTER_INTERPRETED', notes: 'Copa aberta do agrupamento sudoeste, afastada das estruturas oficiais B18 e B30.' },
+  { sourcePosition: [4260, 4050], placement: 'LANDSCAPE_MASS', surfaceEntityIdentifier: 'QUADRA-A', scale: 0.78, verificationStatus: 'CLUSTER_INTERPRETED', notes: 'Árvore de transição ao sul da clareira, com folga para circulação e estruturas.' },
+  { sourcePosition: [4330, 4032], placement: 'LANDSCAPE_MASS', surfaceEntityIdentifier: 'QUADRA-A', speciesGroup: 'OPEN_CANOPY', scale: 0.88, verificationStatus: 'CLUSTER_INTERPRETED', notes: 'Copa aberta no agrupamento sudeste, deixando solo visível entre massas.' },
+]);
+
+const QUADRA_B_TREES = buildTrees('QUADRA_B', [
+  ...tracedTreeBand([
+    [4228, 3540], [4310, 3538], [4394, 3542], [4470, 3540],
+  ], 'LANDSCAPE_MASS', 'Borda norte arborizada da Quadra B, afastada da Rua Uruguai e do footprint B13.', {
+    surfaceEntityIdentifier: 'QUADRA-B',
+    verificationStatus: 'CLUSTER_INTERPRETED',
+    speciesGroup: 'OPEN_CANOPY',
+    scale: 0.72,
+  }),
+  { sourcePosition: [4235, 3610], placement: 'LANDSCAPE_MASS', surfaceEntityIdentifier: 'QUADRA-B', scale: 0.78, verificationStatus: 'CLUSTER_INTERPRETED', notes: 'Primeira copa do maciço oriental, com folga conjunta para B13 e B12.' },
+  { sourcePosition: [4350, 3574], placement: 'LANDSCAPE_MASS', surfaceEntityIdentifier: 'QUADRA-B', speciesGroup: 'OPEN_CANOPY', scale: 0.76, verificationStatus: 'CLUSTER_INTERPRETED', notes: 'Copa aberta menor retraçada para a massa ao norte da clareira observada, mantendo seu centro livre e intervalo distinto dos troncos vizinhos.' },
+  { sourcePosition: [4390, 3616], placement: 'LANDSCAPE_MASS', surfaceEntityIdentifier: 'QUADRA-B', scale: 0.94, verificationStatus: 'CLUSTER_INTERPRETED', notes: 'Árvore madura no agrupamento leste, preservando solo aberto ao redor.' },
+  { sourcePosition: [4470, 3612], placement: 'LANDSCAPE_MASS', surfaceEntityIdentifier: 'QUADRA-B', scale: 0.76, verificationStatus: 'CLUSTER_INTERPRETED', notes: 'Copa periférica leste com tronco recuado da borda viária.' },
+  { sourcePosition: [4245, 3680], placement: 'LANDSCAPE_MASS', surfaceEntityIdentifier: 'QUADRA-B', speciesGroup: 'OPEN_CANOPY', scale: 0.74, verificationStatus: 'CLUSTER_INTERPRETED', notes: 'Árvore da borda sul, fora da Sede B12 e da Rua Argentina.' },
+  { sourcePosition: [4330, 3666], placement: 'LANDSCAPE_MASS', surfaceEntityIdentifier: 'QUADRA-B', scale: 0.86, verificationStatus: 'CLUSTER_INTERPRETED', notes: 'Copa madura ao sul da clareira oriental, preservando a transição A/B.' },
+  { sourcePosition: [4410, 3668], placement: 'LANDSCAPE_MASS', surfaceEntityIdentifier: 'QUADRA-B', speciesGroup: 'OPEN_CANOPY', scale: 0.8, verificationStatus: 'CLUSTER_INTERPRETED', notes: 'Copa aberta na aproximação da Rua Argentina, mantida dentro da Quadra B.' },
+  { sourcePosition: [4472, 3675], placement: 'LANDSCAPE_MASS', surfaceEntityIdentifier: 'QUADRA-B', scale: 0.7, verificationStatus: 'CLUSTER_INTERPRETED', notes: 'Última copa periférica do maciço leste, com folga do cruzamento.' },
+]);
 
 const PARKING_EXHIBITORS_VISITORS_TREES = buildTrees('PARKING_EXHIBITORS_VISITORS', [
   ...tracedTreeBand([
@@ -416,6 +482,8 @@ export const COMMERCIAL_MAP_TREES: readonly CommercialMapTree[] = [
   ...QUADRA_I_TREES,
   ...QUADRA_J_TREES,
   ...QUADRA_E_TREES,
+  ...QUADRA_A_TREES,
+  ...QUADRA_B_TREES,
   ...PARKING_EXHIBITORS_VISITORS_TREES,
   ...PARKING_VISITORS_TREES,
   ...PAVILIONS_1_14_GROVE_TREES,
@@ -436,6 +504,8 @@ export const COMMERCIAL_TREE_COUNTS_BY_QUADRA: Readonly<Record<CommercialTreeQua
 // silently change the existing canonical inventory or be counted twice here.
 export const COMMERCIAL_TREE_COUNTS_BY_AREA: Readonly<Record<Exclude<CommercialTreeArea, 'REAR_PARKING'>, number>> = {
   ...COMMERCIAL_TREE_COUNTS_BY_QUADRA,
+  QUADRA_A: QUADRA_A_TREES.length,
+  QUADRA_B: QUADRA_B_TREES.length,
   PARKING_EXHIBITORS_VISITORS: PARKING_EXHIBITORS_VISITORS_TREES.length,
   PARKING_VISITORS: PARKING_VISITORS_TREES.length,
   PAVILIONS_1_14_GROVE: PAVILIONS_1_14_GROVE_TREES.length,
