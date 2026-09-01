@@ -92,15 +92,12 @@ export function resolveParkAccessElectricalClearancePosition(
  * These bounded display offsets apply only while the corrected rear roads render.
  * They are clearance decisions, not a revision of the official electrical survey. */
 export const REAR_ROAD_ELECTRICAL_CLEARANCE_PRESENTATION = Object.freeze({
-  revision: '2026.08.29-rear-road-clearance.2',
+  revision: '2026.09.01-arena-br472-clearance.3',
   verificationStatus: 'FIELD_REVIEW_REQUIRED',
   offsets: Object.freeze({
-    'pole-ref-145': [0.5, 0], // Ubiretama: east verge, beyond pavement.
     'pole-ref-225': [-1, 0], // BR-472: park-side verge, beyond shoulder.
-    'pole-ref-295': [0, -0.2],
-    'pole-ref-296': [0, -0.2],
-    'pole-ref-297': [0, -0.2], // Preserve the three-pole Brasília alignment.
-    'pole-ref-301': [0, -0.55], // Ubiretama: north verge beside the parking approach.
+    'pole-ref-342': [0, 0.25], // Ubiretama: margem sul junto ao acesso A5.
+    'pole-ref-363': [0, 0.5], // Cruzamento Brasília–Ubiretama: margem sul.
   } satisfies Readonly<Record<string, readonly [number, number]>>),
 });
 
