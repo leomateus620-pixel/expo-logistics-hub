@@ -147,15 +147,15 @@ export const ARENA_FRONT_LAYOUT = {
     blendDistance: 1.15,
   },
   /**
-   * Campo de grama natural não demarcado imediatamente a oeste da Arena. A
-   * proporção longitudinal e o deslocamento para sul seguem o satélite.
+   * O antigo campo gramado a oeste da Arena não existe em campo: a área é uma
+   * continuação do piso pavimentado do pátio. A laje mantém o mesmo retângulo,
+   * agora com acabamento de concreto e junta discreta, sem aparência de remendo.
    */
-  footballField: {
+  westApron: {
     sourceBounds: [4660, 2860, 4880, 3200] as SourceBounds,
-    turfInset: 0.18,
-    markingInset: 0,
-    turfColor: '#7f9a5c',
-    wornColor: '#98a074',
+    jointInset: 0.18,
+    slabColor: '#c6c7c2',
+    borderColor: '#b0b2ad',
     markings: false,
   },
   /** Caminhos de circulação entre escadaria, quadras, Arena, campo e estacionamento. */
@@ -298,15 +298,15 @@ export const PARK_ENVIRONMENT_FEATURES: readonly ParkEnvironmentFeature[] = [
     notes: 'Malha contínua com descida oeste-leste, estendida às laterais e ao fundo da Arena; recortada contra concreto, quadras, vias, estacionamento e campo, sem alterar lotes, ruas ou a Arena.',
   },
   {
-    id: 'arena-front-football-field',
-    name: 'Campo gramado sem marcações da Arena',
-    classification: 'SPORTS_FIELD',
+    id: 'arena-front-west-apron',
+    name: 'Laje pavimentada a oeste da Arena',
+    classification: 'PAVED_PUBLIC_AREA',
     isSellable: false,
     contributesToCommercialMetrics: false,
-    sourceBounds: ARENA_FRONT_LAYOUT.footballField.sourceBounds,
+    sourceBounds: ARENA_FRONT_LAYOUT.westApron.sourceBounds,
     sourceReferences: ARENA_FRONT_SOURCE_REFERENCES,
     verificationStatus: 'FIELD_REVIEW_RECOMMENDED',
-    notes: 'Pequeno campo de grama natural sem linhas, traves ou redes, a oeste da Arena e separado da escadaria; apresentação, nunca lote comercial.',
+    notes: 'Continuação do piso de concreto do pátio a oeste da Arena, no lugar do antigo campo gramado inexistente; apresentação, nunca lote comercial.',
   },
   {
     id: 'arena-front-pedestrian-paths',

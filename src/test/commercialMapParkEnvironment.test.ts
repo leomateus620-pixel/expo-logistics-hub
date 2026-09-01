@@ -127,7 +127,6 @@ describe('infraestrutura ambiental do parque', () => {
       'SPORTS_COURT',
       'LANDSCAPE_FEATURE',
       'NATURAL_TERRAIN',
-      'SPORTS_FIELD',
       'PEDESTRIAN_PATH',
       'NON_COMMERCIAL_STRUCTURE',
     ]));
@@ -145,7 +144,7 @@ describe('infraestrutura ambiental do parque', () => {
 
   it('orienta a escadaria para a Arena e ancora as quadras junto à borda sul da Exporural', () => {
     const stairs = ARENA_FRONT_LAYOUT.stairs.sourceBounds;
-    const footballField = ARENA_FRONT_LAYOUT.footballField.sourceBounds;
+    const footballField = ARENA_FRONT_LAYOUT.westApron.sourceBounds;
     const multiSport = ARENA_FRONT_LAYOUT.multiSportCourt.sourceBounds;
     const volleyball = ARENA_FRONT_LAYOUT.sandVolleyballCourt.sourceBounds;
     const localStairs = sourceBoundsToLocal(stairs);
@@ -177,9 +176,10 @@ describe('infraestrutura ambiental do parque', () => {
     expect(footballField[2]).toBeLessThan(4900);
     expect(footballField[0]).toBeGreaterThan(stairs[2]);
     expect(footballField[3] - footballField[1]).toBeGreaterThan(footballField[2] - footballField[0]);
-    expect(ARENA_FRONT_LAYOUT.footballField.markings).toBe(false);
+    expect(ARENA_FRONT_LAYOUT.westApron.markings).toBe(false);
+    expect(ARENA_FRONT_LAYOUT.westApron.slabColor).toBe('#c6c7c2');
     expect(PARK_ENVIRONMENT_FEATURES.filter((feature) => feature.classification === 'SPORTS_FIELD'))
-      .toHaveLength(1);
+      .toHaveLength(0);
     expect(sourceBoundsOverlapPolygon(footballField, ARENA_FRONT_LAYOUT.plaza.sourcePolygon)).toBe(false);
     expect(ARENA_FRONT_LAYOUT.walkways.some((walkway) => (
       walkway.sourcePath.some(([x, z]) => (

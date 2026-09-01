@@ -332,7 +332,7 @@ describe('área posterior — topologia de satélite e rodovia independente', ()
       brasiliaAxis[0], brasiliaAxis.at(-1)!,
     ) * 1.01);
 
-    const field = ARENA_FRONT_LAYOUT.footballField.sourceBounds;
+    const field = ARENA_FRONT_LAYOUT.westApron.sourceBounds;
     expect(junction[0]).toBeLessThan(field[0]);
     expect(junction[1]).toBeGreaterThan(field[3]);
 
@@ -435,7 +435,7 @@ describe('área posterior — exclusões espaciais, profundidade e ambiente', ()
     ['official:F', 'official:C1', 'official:D3', 'official:EST-EXP-VIS', 'official:EST-VIS']
       .forEach((id) => expect(REAR_ROAD_EXCLUSION_BOUNDARIES.some((boundary) => boundary.id === id)).toBe(true));
     expect(REAR_ROAD_EXCLUSION_BOUNDARIES.some((boundary) => boundary.id.startsWith('rear-parking-row:'))).toBe(true);
-    expect(REAR_ROAD_EXCLUSION_BOUNDARIES.some((boundary) => boundary.id === 'arena-zone:football-field')).toBe(true);
+    expect(REAR_ROAD_EXCLUSION_BOUNDARIES.some((boundary) => boundary.id === 'arena-zone:arena-west-apron')).toBe(true);
   });
 
   it('não cruza nenhuma exclusão não autorizada com pista ou acostamento', () => {
