@@ -15,7 +15,7 @@ import { officialPdfPointToLocal } from '../data/officialReference2026';
  * É um registro cartográfico de apresentação, não um levantamento geodésico:
  * os anexos não fornecem CRS, escala métrica certificada ou pontos de campo.
  */
-export const REAR_SPATIAL_CALIBRATION_REVISION = '2026.10-lateral-ubiretama-gate5.2';
+export const REAR_SPATIAL_CALIBRATION_REVISION = '2026.11-brasilia-lateral-gate5-y';
 
 export type Point2 = readonly [number, number];
 export type RearAttachment5PointId = 1 | 2 | 3 | 4 | 5 | 6;
