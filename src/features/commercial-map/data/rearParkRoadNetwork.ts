@@ -27,16 +27,17 @@ export type RearRoadFeatureId = CanonicalRearRoadId | 'ACESSO-A5-BR472';
 export type RoadNodeId =
   | 'etnias-west'
   | 'etnias-terminus-1'
-  | 'brasilia-reference-3'
+  | 'brasilia-brasil-street'
+  | 'brasilia-parking-curve'
+  | 'brasilia-ubiretama-junction'
   | 'ubiretama-north'
-  | 'ubiretama-gate-junction'
-  | 'ubiretama-uruguai-join'
   | 'gate-5'
+  | 'a5-trevo-fork'
   | 'br472-north-ramp-junction'
-  | 'a5-br-junction'
   | 'br472-south-ramp-junction'
   | 'br472-north'
   | 'br472-south';
+
 
 export type RoadCategory = 'federal-highway' | 'park-avenue' | 'internal-access';
 export type RoadMarkings = 'highway' | 'internal' | 'none';
@@ -193,21 +194,20 @@ export const OFFICIAL_GATE_5_ENTITY_ID = officialGate5.id;
 const nodeSources: Readonly<Record<RoadNodeId, SourcePoint>> = Object.freeze({
   'etnias-west': REAR_CALIBRATED_AXES.ruaDasEtniasOfficial[0],
   'etnias-terminus-1': rearAttachment5ReferencePointById(1).officialSource,
-  'brasilia-reference-3': rearAttachment5ReferencePointById(3).officialSource,
-  'ubiretama-north': REAR_CALIBRATED_AXES.ubiretamaPoint5ToGateJunction[0],
-  'ubiretama-gate-junction': REAR_OFFICIAL_ANCHORS.gate5ParkEdge,
-  'ubiretama-uruguai-join': REAR_CALIBRATED_AXES.ubiretamaGateJunctionToUruguai[
-    REAR_CALIBRATED_AXES.ubiretamaGateJunctionToUruguai.length - 1
-  ],
+  'brasilia-brasil-street': rearAttachment5ReferencePointById(3).officialSource,
+  'brasilia-parking-curve': rearAttachment5ReferencePointById(2).officialSource,
+  'brasilia-ubiretama-junction': REAR_OFFICIAL_ANCHORS.gate5ParkEdge,
+  'ubiretama-north': REAR_CALIBRATED_AXES.ubiretamaNorthToJunction[0],
   'gate-5': officialGate5SourcePoint,
+  'a5-trevo-fork': REAR_OFFICIAL_ANCHORS.trevoFork,
   'br472-north-ramp-junction': REAR_OFFICIAL_ANCHORS.br472NorthRampJunction,
-  'a5-br-junction': REAR_OFFICIAL_ANCHORS.br472Junction,
   'br472-south-ramp-junction': REAR_OFFICIAL_ANCHORS.br472SouthRampJunction,
   'br472-north': REAR_CALIBRATED_AXES.br472NorthToNorthRamp[0],
   'br472-south': REAR_CALIBRATED_AXES.br472SouthRampToSouth[
     REAR_CALIBRATED_AXES.br472SouthRampToSouth.length - 1
   ],
 });
+
 
 const nodeRoadAccessSources: Readonly<Partial<Record<RoadNodeId, SourcePoint>>> = Object.freeze({
   'gate-5': gate5VehicleAccessSourcePoint,
@@ -253,33 +253,35 @@ export const REAR_PARK_ROAD_NETWORK: readonly RoadSegment[] = Object.freeze([
     notes: 'Superfície oficial termina no Ponto 1; não há continuação pela mata nem ligação gerada ao A5.',
   }),
   segment({
-    id: 'ubiretama-point-5-gate', roadId: 'RUA-UBIRETAMA', name: 'Rua Ubiretama',
-    from: 'ubiretama-north', to: 'ubiretama-gate-junction', category: 'park-avenue',
-    sourceControlPoints: REAR_CALIBRATED_AXES.ubiretamaPoint5ToGateJunction,
+    id: 'brasilia-brasil-parking', roadId: 'RUA-BRASILIA', name: 'Rua Brasília',
+    from: 'brasilia-brasil-street', to: 'brasilia-parking-curve', category: 'park-avenue',
+    sourceControlPoints: REAR_CALIBRATED_AXES.brasiliaStreetToParkingCurve,
     width: rearRoadSourceToLocalLength(36), shoulderWidth: 0,
     elevationOffset: 0.032, materialId: 'park-asphalt', markings: 'none',
-    presentation: 'generated-surface', officialOwnerIdentifier: 'RUA-UBIRETAMA',
-    notes: 'Trecho norte da Ubiretama até a interseção compartilhada com o acesso do Portão 5.',
+    presentation: 'generated-surface', officialOwnerIdentifier: 'RUA-BRASILIA',
+    notes: 'Nasce na Rua Brasil, à direita do Centro de Eventos, desce e curva para dentro do estacionamento.',
   }),
   segment({
-    id: 'ubiretama-gate-uruguai', roadId: 'RUA-UBIRETAMA', name: 'Rua Ubiretama',
-    from: 'ubiretama-gate-junction', to: 'ubiretama-uruguai-join', category: 'park-avenue',
-    sourceControlPoints: REAR_CALIBRATED_AXES.ubiretamaGateJunctionToUruguai,
+    id: 'brasilia-parking-gate', roadId: 'RUA-BRASILIA', name: 'Rua Brasília',
+    from: 'brasilia-parking-curve', to: 'brasilia-ubiretama-junction', category: 'park-avenue',
+    sourceControlPoints: REAR_CALIBRATED_AXES.brasiliaParkingToUbiretamaJunction,
     width: rearRoadSourceToLocalLength(36), shoulderWidth: 0,
     elevationOffset: 0.032, materialId: 'park-asphalt', markings: 'none',
-    presentation: 'generated-surface', officialOwnerIdentifier: 'RUA-UBIRETAMA',
-    notes: 'Curva contínua pela circulação lateral e pelos estacionamentos até a Rua Uruguai Leste.',
+    presentation: 'generated-surface', officialOwnerIdentifier: 'RUA-BRASILIA',
+    notes: 'Trecho reto pelo estacionamento posterior até a entrada da Ubiretama, pouco antes do Portão 5.',
   }),
   segment({
-    id: 'ubiretama-uruguai-leste-t', roadId: 'RUA-BRASILIA', name: 'Rua Brasília',
-    from: 'ubiretama-uruguai-join', to: 'brasilia-reference-3', ...officialRoadDefaults,
-    sourceControlPoints: [[4558, 3466], rearAttachment5ReferencePointById(3).officialSource],
-    officialOwnerIdentifier: 'RUA-BRASILIA',
-    notes: 'Ligação topológica sobre a Rua Uruguai Leste; não gera segunda superfície de asfalto.',
+    id: 'ubiretama-north-junction', roadId: 'RUA-UBIRETAMA', name: 'Rua Ubiretama',
+    from: 'ubiretama-north', to: 'brasilia-ubiretama-junction', category: 'park-avenue',
+    sourceControlPoints: REAR_CALIBRATED_AXES.ubiretamaNorthToJunction,
+    width: rearRoadSourceToLocalLength(32), shoulderWidth: 0,
+    elevationOffset: 0.03, materialId: 'park-asphalt', markings: 'none',
+    presentation: 'generated-surface', officialOwnerIdentifier: 'RUA-UBIRETAMA',
+    notes: 'Via transversal secundária: desce do cadastro norte e entra na Rua Brasília antes do portão.',
   }),
   segment({
     id: 'gate5-internal-approach', roadId: 'ACESSO-A5-BR472', name: 'Acesso Portão 5 — rede interna',
-    from: 'ubiretama-gate-junction', to: 'gate-5', category: 'internal-access',
+    from: 'brasilia-ubiretama-junction', to: 'gate-5', category: 'internal-access',
     sourceControlPoints: REAR_CALIBRATED_AXES.gate5InternalApproach,
     width: rearRoadSourceToLocalLength(36), shoulderWidth: rearRoadSourceToLocalLength(5),
     elevationOffset: 0.034, materialId: 'park-asphalt', markings: 'none',
@@ -287,31 +289,31 @@ export const REAR_PARK_ROAD_NETWORK: readonly RoadSegment[] = Object.freeze([
     notes: 'Aproximação curta entre o cadastro A5 e a passagem veicular do Portão 5.',
   }),
   segment({
-    id: 'a5-br472-center', roadId: 'ACESSO-A5-BR472', name: 'Acesso Portão 5 — eixo central',
-    from: 'gate-5', to: 'a5-br-junction', category: 'internal-access',
-    sourceControlPoints: REAR_CALIBRATED_AXES.a5CenterAccess,
+    id: 'a5-trevo-trunk', roadId: 'ACESSO-A5-BR472', name: 'Acesso Portão 5 — tronco do trevo',
+    from: 'gate-5', to: 'a5-trevo-fork', category: 'internal-access',
+    sourceControlPoints: REAR_CALIBRATED_AXES.a5TrevoTrunk,
     width: rearRoadSourceToLocalLength(36), shoulderWidth: rearRoadSourceToLocalLength(5),
     elevationOffset: 0.034, materialId: 'park-asphalt', markings: 'none',
     presentation: 'generated-surface', officialOwnerIdentifier: 'A5',
-    notes: 'Eixo central do trevo, independente das rampas norte e sul.',
+    notes: 'Tronco único do trevo em Y, entre a cancela do portão e a bifurcação.',
   }),
   segment({
     id: 'a5-br472-north-ramp', roadId: 'ACESSO-A5-BR472', name: 'Acesso Portão 5 — rampa norte',
-    from: 'gate-5', to: 'br472-north-ramp-junction', category: 'internal-access',
+    from: 'a5-trevo-fork', to: 'br472-north-ramp-junction', category: 'internal-access',
     sourceControlPoints: REAR_CALIBRATED_AXES.a5NorthRamp,
     width: rearRoadSourceToLocalLength(36), shoulderWidth: rearRoadSourceToLocalLength(5),
     elevationOffset: 0.034, materialId: 'park-asphalt', markings: 'none',
     presentation: 'generated-surface', officialOwnerIdentifier: 'A5',
-    notes: 'Rampa norte: segue o eixo e descola em curva ampla até a BR-472, sem formar Y.',
+    notes: 'Rampa norte do Y: sai da bifurcação e converge suavemente para a BR-472.',
   }),
   segment({
     id: 'a5-br472-south-ramp', roadId: 'ACESSO-A5-BR472', name: 'Acesso Portão 5 — rampa sul',
-    from: 'gate-5', to: 'br472-south-ramp-junction', category: 'internal-access',
+    from: 'a5-trevo-fork', to: 'br472-south-ramp-junction', category: 'internal-access',
     sourceControlPoints: REAR_CALIBRATED_AXES.a5SouthRamp,
     width: rearRoadSourceToLocalLength(36), shoulderWidth: rearRoadSourceToLocalLength(5),
     elevationOffset: 0.034, materialId: 'park-asphalt', markings: 'none',
     presentation: 'generated-surface', officialOwnerIdentifier: 'A5',
-    notes: 'Rampa sul: segue o eixo e descola em curva ampla até a BR-472, sem formar Y.',
+    notes: 'Rampa sul do Y: sai da bifurcação e converge suavemente para a BR-472.',
   }),
   segment({
     id: 'br472-north-ramp', roadId: 'RODOVIA-RS-472', name: 'BR-472',
@@ -323,23 +325,15 @@ export const REAR_PARK_ROAD_NETWORK: readonly RoadSegment[] = Object.freeze([
     notes: 'BR-472 externa e independente até a rampa norte.',
   }),
   segment({
-    id: 'br472-north-ramp-center', roadId: 'RODOVIA-RS-472', name: 'BR-472',
-    from: 'br472-north-ramp-junction', to: 'a5-br-junction', category: 'federal-highway',
-    sourceControlPoints: REAR_CALIBRATED_AXES.br472NorthRampToJunction,
+    id: 'br472-ramps-link', roadId: 'RODOVIA-RS-472', name: 'BR-472',
+    from: 'br472-north-ramp-junction', to: 'br472-south-ramp-junction', category: 'federal-highway',
+    sourceControlPoints: REAR_CALIBRATED_AXES.br472NorthRampToSouthRamp,
     width: rearRoadSourceToLocalLength(70), shoulderWidth: rearRoadSourceToLocalLength(12),
     elevationOffset: 0.034, materialId: 'highway-asphalt', markings: 'highway',
     presentation: 'generated-surface', officialOwnerIdentifier: 'RODOVIA-RS-472',
-    notes: 'Continuidade da BR-472 entre a rampa norte e o eixo central.',
+    notes: 'Trecho da BR-472 entre as duas rampas do trevo em Y.',
   }),
-  segment({
-    id: 'br472-center-south-ramp', roadId: 'RODOVIA-RS-472', name: 'BR-472',
-    from: 'a5-br-junction', to: 'br472-south-ramp-junction', category: 'federal-highway',
-    sourceControlPoints: REAR_CALIBRATED_AXES.br472JunctionToSouthRamp,
-    width: rearRoadSourceToLocalLength(70), shoulderWidth: rearRoadSourceToLocalLength(12),
-    elevationOffset: 0.034, materialId: 'highway-asphalt', markings: 'highway',
-    presentation: 'generated-surface', officialOwnerIdentifier: 'RODOVIA-RS-472',
-    notes: 'Continuidade da BR-472 entre o eixo central e a rampa sul.',
-  }),
+
   segment({
     id: 'br472-south-ramp-south', roadId: 'RODOVIA-RS-472', name: 'BR-472',
     from: 'br472-south-ramp-junction', to: 'br472-south', category: 'federal-highway',
@@ -400,7 +394,7 @@ export function rearRoadCorridors(includeOfficialSurfaces = false) {
 
 const OWNER_LABEL_SOURCE_ANCHORS: Readonly<Record<RearContextualLabelOwner, SourcePoint>> = Object.freeze({
   'RUA-BRASILIA': rearAttachment5ReferencePointById(3).officialSource,
-  'RUA-UBIRETAMA': REAR_CALIBRATED_AXES.ubiretamaGateJunctionToUruguai[3],
+  'RUA-UBIRETAMA': REAR_CALIBRATED_AXES.ubiretamaNorthToJunction[5],
   'AV-IMIGRANTES': [5200, 4200],
   'RODOVIA-RS-472': REAR_CALIBRATED_AXES.br472NorthToNorthRamp[2],
   A5: REAR_OFFICIAL_ANCHORS.gate5VehicleAccess,
@@ -452,7 +446,7 @@ export type RoadGraphEndpoint = RoadNodeId | 'br472' | 'brasilia' | 'ubiretama' 
 
 function resolveRoadGraphEndpoint(endpoint: RoadGraphEndpoint): RoadNodeId {
   if (endpoint === 'br472') return 'br472-north';
-  if (endpoint === 'brasilia') return 'brasilia-reference-3';
+  if (endpoint === 'brasilia') return 'brasilia-brasil-street';
   if (endpoint === 'ubiretama') return 'ubiretama-north';
   if (endpoint === 'etnias') return 'etnias-terminus-1';
   if (endpoint === 'A5') return 'gate-5';
