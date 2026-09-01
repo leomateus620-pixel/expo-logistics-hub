@@ -48,6 +48,7 @@ import {
 } from '../../data/hydrologicalInfrastructure';
 import {
   ARENA_FRONT_LAYOUT,
+  shouldRenderArenaAccess,
   shouldRenderArenaCourts,
   shouldRenderArenaStructures,
 } from '../../data/parkEnvironment';
@@ -4233,6 +4234,10 @@ function Scene({
       return { visible: opacity > 0.015, opacity };
     };
     return {
+      arenaAccess: resolvePresentation(
+        shouldRenderArenaAccess(entities),
+        ARENA_FRONT_LAYOUT.arenaAccessOwners,
+      ),
       arenaStructures: resolvePresentation(
         shouldRenderArenaStructures(entities),
         ARENA_FRONT_LAYOUT.arenaStructureOwners,
@@ -4461,12 +4466,15 @@ function Scene({
         reducedGraphics={reducedGraphics}
       />
       {(arenaFrontInfrastructurePresentation.arenaStructures.visible
+        || arenaFrontInfrastructurePresentation.arenaAccess.visible
         || arenaFrontInfrastructurePresentation.courts.visible) && (
         <ArenaFrontInfrastructure
           reducedGraphics={reducedGraphics}
           showArenaStructures={arenaFrontInfrastructurePresentation.arenaStructures.visible}
+          showArenaAccess={arenaFrontInfrastructurePresentation.arenaAccess.visible}
           showCourts={arenaFrontInfrastructurePresentation.courts.visible}
           arenaStructuresOpacity={arenaFrontInfrastructurePresentation.arenaStructures.opacity}
+          arenaAccessOpacity={arenaFrontInfrastructurePresentation.arenaAccess.opacity}
           courtsOpacity={arenaFrontInfrastructurePresentation.courts.opacity}
         />
       )}

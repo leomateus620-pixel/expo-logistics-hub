@@ -35,6 +35,12 @@ import {
 } from '../../utils/landmarks';
 import { LivestockPavilion } from './LivestockPavilion';
 import { MirantePavilion } from './MirantePavilion';
+import {
+  CooperativismSpace,
+  GastronomicAlameda,
+} from './FenasojaReferenceStructures';
+import { fitRotatedStructureBounds } from '../../utils/fenasojaReferenceStructures';
+import { CampeiraTrack } from './CampeiraTrack';
 import { CommercialPavilion } from './CommercialPavilion';
 import { ThirdAgePavilion } from './ThirdAgePavilion';
 import { LactalisCulturalStage } from './LactalisCulturalStage';
@@ -309,6 +315,42 @@ const LANDMARK_PALETTES: Record<StrategicLandmarkKind, LandmarkPalette> = {
     platform: '#9a978f',
     metal: '#5f696b',
   },
+  'cooperativism-space': {
+    wall: '#a85f42',
+    accent: '#88624d',
+    roof: '#aaa8a0',
+    trim: '#d6d0c2',
+    dark: '#303434',
+    glass: '#34585a',
+    green: '#287247',
+    white: '#ece9df',
+    platform: '#8d877d',
+    metal: '#5b6060',
+  },
+  'gastronomic-alameda': {
+    wall: '#393936',
+    accent: '#324f6b',
+    roof: '#aaa9a4',
+    trim: '#c6c5bd',
+    dark: '#202625',
+    glass: '#2d3838',
+    green: '#465f49',
+    white: '#e8e7df',
+    platform: '#74736e',
+    metal: '#878c8b',
+  },
+  'campeira-track': {
+    wall: '#806348',
+    accent: '#ffffff',
+    roof: '#aaa8a0',
+    trim: '#796044',
+    dark: '#2f332c',
+    glass: '#596b62',
+    green: '#ffffff',
+    white: '#e7e3d6',
+    platform: '#70533d',
+    metal: '#414941',
+  },
   'polish-pavilion': {
     wall: '#97633f',
     accent: '#766c61',
@@ -470,6 +512,9 @@ function useLandmarkMaterials(
       || kind === 'third-age-pavilion'
       || kind === 'livestock-pavilion'
       || kind === 'mirante-pavilion'
+      || kind === 'cooperativism-space'
+      || kind === 'gastronomic-alameda'
+      || kind === 'campeira-track'
       || kind === 'lactalis-cultural-stage'
     ) {
       result.roof.roughness = 0.6;
@@ -516,6 +561,36 @@ function useLandmarkMaterials(
       result.wall.roughness = 0.94;
       result.accent.roughness = 0.8;
       result.accent.metalness = 0.02;
+    }
+    if (kind === 'cooperativism-space') {
+      result.roof.roughness = 0.9;
+      result.roof.metalness = 0.02;
+      result.wall.roughness = 0.96;
+      result.accent.roughness = 0.9;
+      result.glass.roughness = 0.3;
+      result.metal.roughness = 0.62;
+      result.metal.metalness = 0.24;
+    }
+    if (kind === 'gastronomic-alameda') {
+      result.roof.roughness = 0.86;
+      result.roof.metalness = 0.06;
+      result.wall.roughness = 0.94;
+      result.dark.roughness = 0.83;
+      result.platform.roughness = 0.98;
+      result.metal.roughness = 0.5;
+      result.metal.metalness = 0.38;
+    }
+    if (kind === 'campeira-track') {
+      result.green.vertexColors = true;
+      result.green.roughness = 1;
+      result.green.metalness = 0;
+      result.accent.vertexColors = true;
+      result.accent.roughness = 0.94;
+      result.accent.metalness = 0;
+      result.roof.roughness = 0.9;
+      result.roof.metalness = 0.06;
+      result.dark.roughness = 0.78;
+      result.dark.metalness = 0.16;
     }
     if (kind === 'fenasoja-event-center') {
       result.wall.roughness = 0.9;
@@ -1575,6 +1650,10 @@ function useArchitecturalDetail(
           MIRANTE_RENDER_BUDGET.detailDistanceMinimum,
           Math.max(bounds.width, bounds.depth) * MIRANTE_RENDER_BUDGET.detailDistanceMultiplier,
         )
+      : kind === 'cooperativism-space' || kind === 'gastronomic-alameda'
+        ? Math.max(22, Math.max(bounds.width, bounds.depth) * 5.2)
+      : kind === 'campeira-track'
+        ? Math.max(34, Math.max(bounds.width, bounds.depth) * 2.2)
       : kind === 'third-age-pavilion'
         ? Math.max(18, Math.max(bounds.width, bounds.depth) * 3.4)
       : kind === 'pavilion-nine'
@@ -1607,6 +1686,7 @@ function useArchitecturalDetail(
   return {
     showDetail: selected || near && !reducedGraphics,
     showFocusDetail: selected && !reducedGraphics,
+    reducedGraphics,
   };
 }
 
@@ -3679,6 +3759,7 @@ interface LandmarkModelProps {
   materials: LandmarkMaterialSet;
   showDetail: boolean;
   showFocusDetail: boolean;
+  reducedGraphics: boolean;
   sceneDiagonal: number;
   onRocketSelect: () => void;
 }
@@ -3785,14 +3866,16 @@ export function StrategicLandmarkMesh({
     opacity: 0.86,
     toneMapped: false,
   }) : null, [segment]);
-  const { showDetail, showFocusDetail } = useArchitecturalDetail(
+  const { showDetail, showFocusDetail, reducedGraphics } = useArchitecturalDetail(
     kind ?? 'german-pavilion',
     bounds,
     selected,
   );
   const modelBounds = useMemo(
-    () => commercialPavilionModelBounds(bounds, facingRadians),
-    [bounds, facingRadians],
+    () => kind === 'gastronomic-alameda'
+      ? fitRotatedStructureBounds(bounds, facingRadians)
+      : commercialPavilionModelBounds(bounds, facingRadians),
+    [bounds, facingRadians, kind],
   );
   const gl = useThree((state) => state.gl);
   const invalidate = useThree((state) => state.invalidate);
@@ -3851,6 +3934,7 @@ export function StrategicLandmarkMesh({
     materials,
     showDetail,
     showFocusDetail,
+    reducedGraphics,
     sceneDiagonal,
     onRocketSelect: () => onSelect(entity.id),
   };
@@ -3905,6 +3989,9 @@ export function StrategicLandmarkMesh({
         {kind === 'third-age-pavilion' && <ThirdAgePavilion {...modelProps} />}
         {kind === 'livestock-pavilion' && <LivestockPavilion {...modelProps} />}
         {kind === 'mirante-pavilion' && <MirantePavilion {...modelProps} />}
+        {kind === 'cooperativism-space' && <CooperativismSpace {...modelProps} />}
+        {kind === 'gastronomic-alameda' && <GastronomicAlameda {...modelProps} />}
+        {kind === 'campeira-track' && <CampeiraTrack {...modelProps} />}
         {kind === 'polish-pavilion' && <PolishPavilion {...modelProps} />}
         {kind === 'italian-pavilion' && <ItalianPavilion {...modelProps} />}
         {kind === 'african-pavilion' && <AfricanPavilion {...modelProps} />}

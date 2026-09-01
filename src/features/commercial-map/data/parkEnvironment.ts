@@ -42,7 +42,7 @@ export interface LocalBounds {
   centerZ: number;
 }
 
-export const PARK_ENVIRONMENT_REVISION = '2026.8-arena-zoneamento.1';
+export const PARK_ENVIRONMENT_REVISION = '2028.1-arena-access-reference.2';
 
 export const PARK_ENVIRONMENT_CLASSIFICATION_LABELS: Readonly<Record<ParkEnvironmentClassification, string>> = {
   NON_COMMERCIAL_STRUCTURE: 'Estrutura não comercial',
@@ -71,6 +71,11 @@ export const ARENA_FRONT_SOURCE_REFERENCES = [
 export const ARENA_FRONT_LAYOUT = {
   arenaStructureAnchors: ['F', 'D3', 'RUA-BRASIL'] as const,
   arenaStructureOwners: ['F'] as const,
+  // The covered connection is visually paired with D1 and must be present
+  // whenever D1 is present. D3 remains a placement reference, not a second
+  // visibility dependency that can accidentally suppress the structure.
+  arenaAccessAnchors: ['D1'] as const,
+  arenaAccessOwners: ['D1'] as const,
   courtAnchors: ['QUADRA-R', 'EXPORURAL'] as const,
   courtOwners: ['QUADRA-R', 'EXPORURAL'] as const,
   plaza: {
@@ -105,6 +110,25 @@ export const ARENA_FRONT_LAYOUT = {
     bankGap: 0,
     intermediateLandingSteps: [6, 12] as const,
     intermediateLandingDepth: 0.42,
+  },
+  /**
+   * Plataforma coberta fotografada entre Rua Brasília e a escadaria, ao sul
+   * de D3. O retângulo fica integralmente fora do footprint dos degraus e das
+   * vias canônicas. A posição é interpretação cartográfica conservadora a ser
+   * conferida em campo; não cria entidade comercial nem altera D3/F.
+   */
+  accessCanopy: {
+    sourceBounds: [4005, 2840, 4110, 3068] as SourceBounds,
+    verificationStatus: 'FIELD_REVIEW_RECOMMENDED' as const,
+    sourceReferences: [
+      'IMG_9692.jpeg — vista pelo vão em direção à Arena',
+      'IMG_9693.jpeg — fachada viária, parede lateral e apoios em V',
+    ] as const,
+    longAxis: 'z' as const,
+    arenaSide: 'east' as const,
+    roadSide: 'west' as const,
+    sideWallEnd: 'south' as const,
+    bayCount: 5,
   },
   /**
    * Malha de terreno do setor: alta a oeste (topo da escadaria), descendo até o
@@ -193,6 +217,17 @@ export const ARENA_FRONT_LAYOUT = {
 } as const;
 
 export const PARK_ENVIRONMENT_FEATURES: readonly ParkEnvironmentFeature[] = [
+  {
+    id: 'arena-front-covered-access',
+    name: 'Conexão coberta da escadaria da Arena',
+    classification: 'NON_COMMERCIAL_STRUCTURE',
+    isSellable: false,
+    contributesToCommercialMetrics: false,
+    sourceBounds: ARENA_FRONT_LAYOUT.accessCanopy.sourceBounds,
+    sourceReferences: ARENA_FRONT_LAYOUT.accessCanopy.sourceReferences,
+    verificationStatus: ARENA_FRONT_LAYOUT.accessCanopy.verificationStatus,
+    notes: 'Plataforma aberta entre Rua Brasília, D3 e a escadaria, com fascia clara, treliças e apoios pretos em V; apresentação associada, nunca entidade selecionável.',
+  },
   {
     id: 'arena-front-public-plaza',
     name: 'Praça pavimentada da Arena',
@@ -313,6 +348,10 @@ function hasEnvironmentAnchors(entities: readonly MapEntity[], anchors: readonly
 
 export function shouldRenderArenaStructures(entities: readonly MapEntity[]) {
   return hasEnvironmentAnchors(entities, ARENA_FRONT_LAYOUT.arenaStructureAnchors);
+}
+
+export function shouldRenderArenaAccess(entities: readonly MapEntity[]) {
+  return hasEnvironmentAnchors(entities, ARENA_FRONT_LAYOUT.arenaAccessAnchors);
 }
 
 export function shouldRenderArenaCourts(entities: readonly MapEntity[]) {

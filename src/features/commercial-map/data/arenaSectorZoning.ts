@@ -67,6 +67,7 @@ export const ARENA_SECTOR_SURFACE_ZONES: readonly ArenaSurfaceZone[] = [
   // Praça cívica pavimentada + escadaria de concreto: acesso da Arena.
   zone('arena-plaza-concrete', 'CONCRETE_ACCESS', ARENA_FRONT_LAYOUT.plaza.sourcePolygon),
   zone('arena-stairs-concrete', 'CONCRETE_ACCESS', rect(inflate(ARENA_FRONT_LAYOUT.stairs.sourceBounds))),
+  zone('arena-covered-access', 'CONCRETE_ACCESS', rect(inflate(ARENA_FRONT_LAYOUT.accessCanopy.sourceBounds))),
   // Quadras existentes: geometria preservada, apenas protegida do terreno.
   zone('multi-sport-court', 'SPORTS_COURT', rect(inflate(ARENA_FRONT_LAYOUT.multiSportCourt.sourceBounds))),
   zone('sand-volleyball-court', 'SPORTS_COURT', rect(inflate(ARENA_FRONT_LAYOUT.sandVolleyballCourt.sourceBounds))),
@@ -114,4 +115,4 @@ export function isArenaTerrainExcluded(x: number, z: number) {
   return resolveArenaSurfaceOwner(x, z) !== null;
 }
 
-export const ARENA_SECTOR_ZONING_REVISION = '2026.8-arena-zoneamento.1';
+export const ARENA_SECTOR_ZONING_REVISION = '2028.1-arena-access-reference.1';
