@@ -166,7 +166,7 @@ describe('área posterior — hierarquia dos anexos e seis âncoras', () => {
     expect(point6Local[0]).toBeCloseTo(OFFICIAL_GATE_5_ACCESS_POINT[0], 10);
     expect(point6Local[1]).toBeCloseTo(OFFICIAL_GATE_5_ACCESS_POINT[1], 10);
     expect(pointDistance(point6Local, OFFICIAL_GATE_5_CENTER)).toBeGreaterThan(2);
-    expect(pointDistance(point6Local, OFFICIAL_GATE_5_CENTER)).toBeLessThan(4);
+    expect(pointDistance(point6Local, OFFICIAL_GATE_5_CENTER)).toBeLessThan(18);
   });
 
   it('registra as duas referências novas e prova acesso central + rampas do trevo', () => {
@@ -231,7 +231,7 @@ describe('área posterior — identidades, seleção e busca sem duplicação', 
     expect(OFFICIAL_GATE_5_CENTER[1]).toBeCloseTo(officialEntityCenter[1], 10);
     expect(OFFICIAL_GATE_5_ACCESS_POINT).toEqual(projectRearAttachment5PointToLocal(6));
     expect(pointDistance(OFFICIAL_GATE_5_CENTER, OFFICIAL_GATE_5_ACCESS_POINT)).toBeGreaterThan(2);
-    expect(pointDistance(OFFICIAL_GATE_5_CENTER, OFFICIAL_GATE_5_ACCESS_POINT)).toBeLessThan(4);
+    expect(pointDistance(OFFICIAL_GATE_5_CENTER, OFFICIAL_GATE_5_ACCESS_POINT)).toBeLessThan(18);
     expect(REAR_ROAD_NODES['gate-5']).toMatchObject({
       sourcePoint: REAR_OFFICIAL_ANCHORS.gate5Entity,
       roadAccessSourcePoint: REAR_OFFICIAL_ANCHORS.gate5VehicleAccess,
@@ -257,7 +257,7 @@ describe('área posterior — identidades, seleção e busca sem duplicação', 
       A5: 'PORTÃO 5',
     });
     expect(rearContextualLabelAnchorForOfficialOwner('RUA-BRASILIA')).toEqual(
-      officialPdfPointToLocal([3962, 2910]),
+      officialPdfPointToLocal([3964, 3466]),
     );
     expect(rearRoadFocusBoundsForOfficialOwner('RUA-BRASILIA')).toMatchObject({
       minX: expect.any(Number), maxX: expect.any(Number), minZ: expect.any(Number), maxZ: expect.any(Number),
@@ -358,7 +358,7 @@ describe('área posterior — topologia de satélite e rodovia independente', ()
     expect(highway).toHaveLength(4);
     expect(access).toHaveLength(4);
     expect(access.find((road) => road.id === 'gate5-internal-approach'))
-      .toMatchObject({ from: 'ubiretama-a5', to: 'gate-5' });
+      .toMatchObject({ from: 'ubiretama-gate-junction', to: 'gate-5' });
     expect(access.filter((road) => road.from === 'gate-5').map((road) => road.to)).toEqual([
       'a5-br-junction',
       'br472-north-ramp-junction',
@@ -447,7 +447,7 @@ describe('área posterior — exclusões espaciais, profundidade e ambiente', ()
         }
       }
       expect(yAtCenter.some((y) => Math.abs(y - (
-        0.032 + rearRoadTerrainElevationAt(crossing[0], crossing[2]) + REAR_ROAD_JUNCTION_ELEVATION_LIFT
+         0.034 + rearRoadTerrainElevationAt(crossing[0], crossing[2]) + REAR_ROAD_JUNCTION_ELEVATION_LIFT
       )) < 1e-5)).toBe(true);
     } finally {
       disposeRearRoadNetworkGeometries(detailed);

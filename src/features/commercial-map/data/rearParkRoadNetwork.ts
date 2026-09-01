@@ -273,7 +273,7 @@ export const REAR_PARK_ROAD_NETWORK: readonly RoadSegment[] = Object.freeze([
   segment({
     id: 'ubiretama-uruguai-leste-t', roadId: 'RUA-BRASILIA', name: 'Rua Brasília',
     from: 'ubiretama-uruguai-join', to: 'brasilia-reference-3', ...officialRoadDefaults,
-    sourceControlPoints: [[4492, 3466], rearAttachment5ReferencePointById(3).officialSource],
+    sourceControlPoints: [[4558, 3466], rearAttachment5ReferencePointById(3).officialSource],
     officialOwnerIdentifier: 'RUA-BRASILIA',
     notes: 'Ligação topológica sobre a Rua Uruguai Leste; não gera segunda superfície de asfalto.',
   }),
