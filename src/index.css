@@ -1332,6 +1332,17 @@ input, textarea, select, [role="combobox"] {
   text-transform: uppercase;
 }
 
+/* Credenciais nunca em caixa alta: o usuário precisa enxergar exatamente o que digitou */
+input[type="password"],
+input[type="email"],
+input[autocomplete="email"],
+input[autocomplete="username"],
+input[autocomplete="current-password"],
+input[autocomplete="new-password"],
+input.auth-input-control {
+  text-transform: none !important;
+}
+
 input::placeholder, textarea::placeholder {
   text-transform: none;
 }
