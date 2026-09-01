@@ -173,6 +173,7 @@ describe('infraestrutura ambiental do parque', () => {
     expect(localVolleyball.centerX).toBeLessThan(localMultiSport.centerX);
     expect(localVolleyball.maxX).toBeLessThan(localMultiSport.minX);
     expect(localMultiSport.maxZ).toBeLessThan(localStairs.minZ);
+    expect(footballField).toEqual([4560, 2708, 4884, 2948]);
     expect(footballField[2]).toBeLessThan(4900);
     expect(footballField[0]).toBeGreaterThan(stairs[2]);
     expect(ARENA_FRONT_LAYOUT.footballField.markings).toBe(false);
@@ -256,7 +257,9 @@ describe('infraestrutura ambiental do parque', () => {
     expect(renderer).toContain('redes-volei-arena');
     expect(renderer).toContain('tabelas-basquete-arena');
     expect(renderer).toContain('gramado-sem-marcacoes-arena');
+    expect(renderer).not.toContain('footballFieldLineGeometry');
     expect(renderer).not.toContain('marcacoes-campo-arena');
+    expect(renderer).not.toContain("'pitchTurf'");
     expect(renderer).toContain('raycast={NO_RAYCAST}');
     expect(renderer).toContain('reducedGraphics');
     expect(renderer).toContain('userData={STAIRS_USER_DATA}');

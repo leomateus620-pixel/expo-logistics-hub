@@ -343,6 +343,26 @@ describe('área posterior — topologia corrigida e rodovia independente', () =>
       expect(point[0]).toBeCloseTo(expectedUbiretamaAxis[index][0], 10);
       expect(point[1]).toBeCloseTo(expectedUbiretamaAxis[index][1], 10);
     });
+
+    const generatedBrasiliaPoints = GENERATED_REAR_ROAD_SEGMENTS
+      .filter((road) => road.roadId === 'RUA-BRASILIA')
+      .flatMap((road) => road.sourceControlPoints);
+    expect(generatedBrasiliaPoints.every(([x]) => x >= 3940 && x <= 3988)).toBe(true);
+
+    const removedRedXPoints: readonly Point2[] = [
+      [3977, 3155], [4400, 3155], [4800, 3155], [4860, 3190],
+      [4975.9927745664745, 3200.5780346820807],
+      [5500, 3200], [5900, 3200], [6030, 3180], [6090, 3000],
+      [6133.044315992293, 2723.121387283237],
+    ];
+    const renderedSourcePoints = GENERATED_REAR_ROAD_SEGMENTS.flatMap(
+      (road) => road.sourceControlPoints,
+    );
+    removedRedXPoints.forEach((removed) => {
+      expect(renderedSourcePoints.some(
+        (point) => pointDistance(point, removed) < 1e-6,
+      ), `ponto removido ${removed.join(',')}`).toBe(false);
+    });
   });
 
   it('termina Rua das Etnias em P1 e não cria ramo do término até o Portão 5', () => {
