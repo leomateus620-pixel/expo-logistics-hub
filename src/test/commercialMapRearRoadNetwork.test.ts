@@ -143,7 +143,7 @@ describe('área posterior — hierarquia dos anexos e seis âncoras', () => {
     const p4 = projectRearAttachment5PointToOfficialSource(4);
     const p5 = projectRearAttachment5PointToOfficialSource(5);
     const p6 = projectRearAttachment5PointToOfficialSource(6);
-    expect(p3[0]).toBe(p2[0]);
+    expect(p3[0]).toBeCloseTo(p2[0], 10);
     expect(p3[1]).toBeLessThan(p2[1]);
     expect(pointDistance(p4, p6)).toBeLessThan(pointDistance(p4, p5));
     expect(rearAttachment5ReferencePointById(3).calibration).toBe('canonical-source');

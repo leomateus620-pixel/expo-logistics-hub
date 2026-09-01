@@ -639,7 +639,7 @@ addEntity({
   classification: 'PARKING',
   layer: 'parking',
   polygon: [[4510, 3220], [5350, 3260], [5270, 4140], [4510, 4140]],
-  height: 0.06,
+  height: 0.026,
 });
 addEntity({
   publicIdentifier: 'EST-VIS',
@@ -647,7 +647,7 @@ addEntity({
   classification: 'PARKING',
   layer: 'parking',
   polygon: [[5350, 3400], [5980, 3480], [5900, 4250], [5350, 4140]],
-  height: 0.06,
+  height: 0.026,
 });
 addStructure('PORTICO-NACOES', 'Pórtico das Nações', 'LANDMARK', 'structures', [4935, 4285], { width: 128, depth: 48, height: 1.15 });
 addStructure('ESPACO-ETNIA-RUSSA', 'Espaço destinado à Etnia Russa', 'ATTRACTION', 'structures', [4550, 4430, 4760, 4740], { height: 0.08 });

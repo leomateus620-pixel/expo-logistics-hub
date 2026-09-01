@@ -183,7 +183,7 @@ export const ARENA_FRONT_LAYOUT = {
     { sourcePosition: [5580, 2645] as SourcePoint, scale: 0.94 },
     { sourcePosition: [5720, 2655] as SourcePoint, scale: 1.08 },
     { sourcePosition: [5860, 2690] as SourcePoint, scale: 0.96 },
-    { sourcePosition: [5920, 2870] as SourcePoint, scale: 1.06 },
+    { sourcePosition: [5800, 2860] as SourcePoint, scale: 1.06 },
     { sourcePosition: [5930, 3050] as SourcePoint, scale: 0.92 },
     // Same four landscape trees, shifted north onto the grass shoulder of
     // corrected Rua Ubiretama. Keep canopies and trunks out of its carriageway.

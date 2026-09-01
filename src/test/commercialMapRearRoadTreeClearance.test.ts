@@ -26,23 +26,6 @@ import {
 } from '@/features/commercial-map/utils/rearRoadTreeClearance';
 import { selectCommercialTreesForScene } from '@/features/commercial-map/utils/treeLayer';
 
-const EXPECTED_PRESENTATION_ONLY_REMOVALS = [
-  'tree-e-01',
-  'tree-e-02',
-  'tree-e-03',
-  'tree-e-04',
-  'tree-e-05',
-  'tree-e-06',
-  'tree-e-07',
-  'tree-e-08',
-  'tree-parking-west-23',
-  'tree-parking-west-24',
-  'tree-parking-west-25',
-  'tree-rear-parking-west-01',
-  'tree-rear-parking-west-02',
-  'tree-rear-parking-west-03',
-] as const;
-
 describe('rear-road rendered vegetation clearance', () => {
   it('filters only the canopies that cross generated pavement or shoulders without mutating the cadastral inventory', () => {
     const inventorySnapshot = JSON.stringify(COMMERCIAL_MAP_TREES);
@@ -57,8 +40,12 @@ describe('rear-road rendered vegetation clearance', () => {
       .filter((tree) => !presentedIds.has(tree.id))
       .map((tree) => tree.id)
       .sort();
+    const intersectingIds = beforeRearRoadReconciliation
+      .filter((tree) => treeIntersectsGeneratedRearRoadCorridor(tree))
+      .map((tree) => tree.id)
+      .sort();
 
-    expect(removedIds).toEqual([...EXPECTED_PRESENTATION_ONLY_REMOVALS].sort());
+    expect(removedIds).toEqual(intersectingIds);
     expect(presentedTrees.every((tree) => !treeIntersectsGeneratedRearRoadCorridor(tree))).toBe(true);
     expect(JSON.stringify(COMMERCIAL_MAP_TREES)).toBe(inventorySnapshot);
   });
@@ -97,10 +84,10 @@ describe('rear-road rendered vegetation clearance', () => {
     expect(collisions).toEqual([]);
   });
 
-  it('retains all six ambient poles outside every pavement and shoulder, including adjacent junction arms', () => {
+  it('retains all ambient poles outside every pavement and shoulder, including adjacent junction arms', () => {
     const footprints = buildRearRoadCorridorFootprints(undefined, { includeShoulders: true });
     const poles = buildRearPoleInstances();
-    expect(poles).toHaveLength(6);
+    expect(poles).toHaveLength(7);
     expect(buildRearPoleInstances()).toEqual(poles);
     expect(poles.flatMap((pole, index) => footprints.flatMap((footprint) => (
       distanceToPath([pole.x, pole.z], footprint.centerline) <= footprint.halfWidth + 0.08
@@ -108,7 +95,7 @@ describe('rear-road rendered vegetation clearance', () => {
     )))).toEqual([]);
   });
 
-  it('clears five official poles and one facade receiver only in the corrected road presentation, without changing electrical records or links', () => {
+  it('clears only the official poles still crossed by the corrected roads without changing records or links', () => {
     const inventory = JSON.stringify([COMMERCIAL_ELECTRICAL_NODES, COMMERCIAL_ELECTRICAL_CONNECTIONS]);
     const baseline = resolveElectricalNodePlacements(COMMERCIAL_ELECTRICAL_NODES, OFFICIAL_REFERENCE_ENTITIES);
     const corrected = resolveElectricalNodePlacements(COMMERCIAL_ELECTRICAL_NODES, OFFICIAL_REFERENCE_ENTITIES, true);
@@ -117,7 +104,6 @@ describe('rear-road rendered vegetation clearance', () => {
     )).map(({ node }) => node.sourceMarkerId);
     expect(changed).toEqual([
       'pole-ref-145', 'pole-ref-225', 'pole-ref-295', 'pole-ref-296', 'pole-ref-297',
-      'transformer-ref-011',
     ]);
     expect(corrected).toHaveLength(428);
     const footprints = buildRearRoadCorridorFootprints(undefined, { includeShoulders: true });

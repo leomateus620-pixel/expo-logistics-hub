@@ -16,7 +16,7 @@ export interface RearRoadExclusionBoundary {
   label: string;
   kind: RearRoadExclusionKind;
   polygon: readonly LocalPoint[];
-  /** A5 é o único polígono que a pista pode tocar, somente no endpoint físico. */
+  /** Contato autorizado apenas com o portão ou com estacionamento atravessado pela via real. */
   allowRoadContact: boolean;
 }
 
@@ -59,6 +59,11 @@ const NON_OBSTACLE_CLASSIFICATIONS = new Set([
   'WATER',
   'RURAL_EXHIBITION',
 ]);
+const ROAD_COMPATIBLE_OFFICIAL_IDENTIFIERS = new Set([
+  'A5',
+  'EST-EXP-VIS',
+  'EST-VIS',
+]);
 
 const officialBoundaries: RearRoadExclusionBoundary[] = OFFICIAL_REFERENCE_DATA.entities
   .filter((entity) => !NON_OBSTACLE_CLASSIFICATIONS.has(entity.classification))
@@ -67,7 +72,7 @@ const officialBoundaries: RearRoadExclusionBoundary[] = OFFICIAL_REFERENCE_DATA.
     label: `${entity.publicIdentifier} · ${entity.name}`,
     kind: 'official-entity' as const,
     polygon: entity.geometry.coordinates[0] as readonly LocalPoint[],
-    allowRoadContact: entity.publicIdentifier === 'A5',
+    allowRoadContact: ROAD_COMPATIBLE_OFFICIAL_IDENTIFIERS.has(entity.publicIdentifier),
   }))
   .filter((boundary) => boundary.polygon.length >= 3 && intersectsIntervention(boundary.polygon));
 
@@ -78,7 +83,7 @@ const arenaBoundaries: RearRoadExclusionBoundary[] = ARENA_SECTOR_SURFACE_ZONES
     label: zone.id,
     kind: 'arena-surface-zone' as const,
     polygon: zone.sourcePolygon.map((point) => officialPdfPointToLocal(point)),
-    allowRoadContact: false,
+    allowRoadContact: zone.owner === 'PARKING',
   }));
 
 const parkingBoundaries: RearRoadExclusionBoundary[] = REAR_PARKING_ROWS.map((row) => ({
