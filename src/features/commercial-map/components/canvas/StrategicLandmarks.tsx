@@ -48,6 +48,7 @@ import { ThirdAgePavilion } from './ThirdAgePavilion';
 import { LactalisCulturalStage } from './LactalisCulturalStage';
 import { ExporuralSteakhouse } from './ExporuralSteakhouse';
 import { PavilionFourSoyKitchen } from './PavilionFourSoyKitchen';
+import { AmusementPark } from './AmusementPark';
 import { AfricanPavilion, RotaryHouse } from './NationsDistrict';
 import {
   CrioulosCenterLandmark,
@@ -464,6 +465,18 @@ const LANDMARK_PALETTES: Record<StrategicLandmarkKind, LandmarkPalette> = {
     white: '#f5f5ee',
     platform: '#797d75',
     metal: '#727b78',
+  },
+  'amusement-park': {
+    wall: '#e2d7bf',
+    accent: '#e2434d',
+    roof: '#26669f',
+    trim: '#f2bd32',
+    dark: '#252a31',
+    glass: '#4b9fbd',
+    green: '#506b3b',
+    white: '#f2eee1',
+    platform: '#75664d',
+    metal: '#8a9292',
   },
   'lunar-tree': {
     wall: '#6a4932',
@@ -4045,6 +4058,13 @@ export function StrategicLandmarkMesh({
         )}
         {kind === 'fenasoja-restaurant' && <FenasojaRestaurant {...modelProps} />}
         {kind === 'sicredi-arena' && <SicrediArena {...modelProps} />}
+        {kind === 'amusement-park' && (
+          <AmusementPark
+            bounds={modelProps.bounds}
+            parkActive={selected}
+            reducedGraphics={reducedGraphics}
+          />
+        )}
         {kind === 'lunar-tree' && <LunarTree {...modelProps} />}
       </group>
       {segment && !selected && !hovered && (

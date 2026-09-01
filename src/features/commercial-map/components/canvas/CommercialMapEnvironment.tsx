@@ -34,6 +34,7 @@ interface CommercialMapEnvironmentProps {
   extent: CommercialMapEnvironmentExtent;
   hydrologicalModeActive: boolean;
   reducedGraphics: boolean;
+  nightMode?: boolean;
 }
 
 type EnvironmentPalette = typeof COMMERCIAL_MAP_ENVIRONMENT_CONFIG.palettes.normal
@@ -564,6 +565,7 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
   extent,
   hydrologicalModeActive,
   reducedGraphics,
+  nightMode = false,
 }: CommercialMapEnvironmentProps) {
   const scene = useThree((state) => state.scene);
   const camera = useThree((state) => state.camera);
@@ -708,8 +710,12 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
       : COMMERCIAL_MAP_ENVIRONMENT_CONFIG.sunrise.colors.finalHorizonCool),
     [mode, palette.horizon],
   );
-  const background = useMemo(() => new THREE.Color(palette.fallback), [palette.fallback]);
+  const background = useMemo(
+    () => new THREE.Color(nightMode ? '#050916' : palette.fallback),
+    [nightMode, palette.fallback],
+  );
   const fog = useMemo(() => new THREE.Fog(preSunriseFog, 0, 1), [preSunriseFog]);
+  const nightFog = useMemo(() => new THREE.Color('#0b1421'), []);
 
   useLayoutEffect(() => {
     fog.near = layout.fogNear;
@@ -732,6 +738,7 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
     layout.fogFar,
     layout.fogNear,
     mode,
+    nightMode,
     qualityTier,
     sky,
     sunLight,
@@ -819,15 +826,20 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
         frame,
       );
       sunLight.position.copy(sceneAnchor).addScaledVector(frameDirection, layout.sunDistance);
-      sunLight.intensity = frame.sunlightIntensity;
+      sunLight.intensity = nightMode ? 0 : frame.sunlightIntensity;
       sunLight.shadow.radius = frame.shadowRadius;
       sunTarget.updateMatrixWorld();
       sunLight.updateMatrixWorld();
-      if (ambientRef.current) ambientRef.current.intensity = frame.ambientIntensity;
-      if (hemisphereRef.current) hemisphereRef.current.intensity = frame.hemisphereIntensity;
-      fogColor.lerpColors(preSunriseFog, finalSunriseFog, frame.cloudWarmth);
+      if (ambientRef.current) {
+        ambientRef.current.intensity = nightMode ? 0.24 : frame.ambientIntensity;
+      }
+      if (hemisphereRef.current) {
+        hemisphereRef.current.intensity = nightMode ? 0.3 : frame.hemisphereIntensity;
+      }
+      if (nightMode) fogColor.copy(nightFog);
+      else fogColor.lerpColors(preSunriseFog, finalSunriseFog, frame.cloudWarmth);
       fog.color.copy(fogColor);
-      scene.environmentIntensity = frame.environmentIntensity;
+      scene.environmentIntensity = nightMode ? 0.16 : frame.environmentIntensity;
     }
 
     const diagnosticBucket = progress >= 1 ? 2 : progress >= 0.45 ? 1 : 0;
@@ -900,14 +912,22 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
         environmentIntensity={initialFrame.environmentIntensity}
       />
       <group visible={active}>
-      <primitive object={sky} dispose={null} />
-      <primitive object={celestialSun} dispose={null} />
+      <primitive object={sky} visible={!nightMode} dispose={null} />
+      <primitive object={celestialSun} visible={!nightMode} dispose={null} />
       <primitive object={sunTarget} dispose={null} />
-      <primitive object={sunLight} dispose={null} />
-      <ambientLight ref={ambientRef} color="#dbeaf2" intensity={initialFrame.ambientIntensity} />
+      <primitive object={sunLight} visible={!nightMode} dispose={null} />
+      <ambientLight
+        ref={ambientRef}
+        color={nightMode ? '#6d84b5' : '#dbeaf2'}
+        intensity={nightMode ? 0.24 : initialFrame.ambientIntensity}
+      />
       <hemisphereLight
         ref={hemisphereRef}
-        args={[palette.horizon, palette.hemisphereGround, initialFrame.hemisphereIntensity]}
+        args={[
+          nightMode ? '#263a67' : palette.horizon,
+          nightMode ? '#101713' : palette.hemisphereGround,
+          nightMode ? 0.3 : initialFrame.hemisphereIntensity,
+        ]}
       />
       <mesh
         rotation={[-Math.PI / 2, 0, 0]}

@@ -28,6 +28,7 @@ const targetIdentifiers = [
   'C8',
   'C2',
   'F',
+  'J',
   'PORTICO-NACOES',
   'A4',
   'D5',
@@ -77,6 +78,7 @@ describe('marcos arquitetônicos estratégicos', () => {
     const persistedEtnia = { ...targets.C8, id: 'db:uuid:etnia' };
     const persistedRestaurant = { ...targets.C2, id: 'db:uuid:restaurante' };
     const persistedArena = { ...targets.F, id: 'db:uuid:arena' };
+    const persistedAmusementPark = { ...targets.J, id: 'db:uuid:amusement-park' };
     const persistedGateFour = { ...targets.A4, id: 'db:uuid:portao-4' };
     const persistedCrioulos = { ...targets.D5, id: 'db:uuid:crioulos' };
     const persistedPavilionNine = { ...targets['PAVILHAO-09'], id: 'db:uuid:pavilhao-09' };
@@ -90,6 +92,7 @@ describe('marcos arquitetônicos estratégicos', () => {
     expect(resolveStrategicLandmarkKind(persistedEtnia)).toBe('german-pavilion');
     expect(resolveStrategicLandmarkKind(persistedRestaurant)).toBe('fenasoja-restaurant');
     expect(resolveStrategicLandmarkKind(persistedArena)).toBe('sicredi-arena');
+    expect(resolveStrategicLandmarkKind(persistedAmusementPark)).toBe('amusement-park');
     expect(resolveStrategicLandmarkKind(persistedGateFour)).toBe('gate-four');
     expect(resolveStrategicLandmarkKind(persistedCrioulos)).toBe('crioulos-center');
     expect(resolveStrategicLandmarkKind(persistedPavilionNine)).toBe('pavilion-nine');
@@ -105,6 +108,7 @@ describe('marcos arquitetônicos estratégicos', () => {
     expect(strategicLandmarkFacingRadians(persistedEtnia)).toBeCloseTo(Math.PI / 2);
     expect(strategicLandmarkFacingRadians(persistedRestaurant)).toBe(Math.PI);
     expect(strategicLandmarkFacingRadians(persistedArena)).toBeCloseTo(-Math.PI / 2);
+    expect(strategicLandmarkFacingRadians(persistedAmusementPark)).toBe(0);
     expect(strategicLandmarkFacingRadians(persistedGateFour)).toBe(0);
     expect(strategicLandmarkFacingRadians(persistedCrioulos)).toBe(0);
     expect(strategicLandmarkFacingRadians(persistedPavilionNine)).toBe(0);
@@ -119,6 +123,7 @@ describe('marcos arquitetônicos estratégicos', () => {
     expect(strategicLandmarkFocusDirection(persistedEtnia)?.[0]).toBeGreaterThan(0);
     expect(strategicLandmarkFocusDirection(persistedRestaurant)?.[2]).toBeLessThan(0);
     expect(strategicLandmarkFocusDirection(persistedArena)?.[0]).toBeLessThan(0);
+    expect(strategicLandmarkFocusDirection(persistedAmusementPark)?.[2]).toBeGreaterThan(0);
     expect(strategicLandmarkFocusDirection(persistedGateFour)?.[2]).toBeLessThan(0);
     expect(strategicLandmarkFocusDirection(persistedCrioulos)?.[0]).toBeGreaterThan(0);
     expect(strategicLandmarkFocusDirection(persistedCrioulos)?.[2]).toBeGreaterThan(0);
@@ -136,6 +141,7 @@ describe('marcos arquitetônicos estratégicos', () => {
     const etniaBounds = strategicLandmarkBounds(targets.C8);
     const restaurantBounds = strategicLandmarkBounds(targets.C2);
     const arenaBounds = strategicLandmarkBounds(targets.F);
+    const amusementParkBounds = strategicLandmarkBounds(targets.J);
     const gateFourBounds = strategicLandmarkBounds(targets.A4);
     const crioulosBounds = strategicLandmarkBounds(targets.D5);
     const pavilionNineBounds = strategicLandmarkBounds(targets['PAVILHAO-09']);
@@ -160,6 +166,9 @@ describe('marcos arquitetônicos estratégicos', () => {
     expect(restaurantBounds.depth).toBeCloseTo(3.2727, 4);
     expect(arenaBounds.width).toBeCloseTo(10.5818, 4);
     expect(arenaBounds.depth).toBeCloseTo(9.6, 4);
+    // Source bounds remain exactly [930, 2450, 1600, 3000].
+    expect(amusementParkBounds.width).toBeCloseTo(14.6182, 4);
+    expect(amusementParkBounds.depth).toBeCloseTo(12, 4);
     expect(gateFourBounds.width).toBeCloseTo(0.96, 4);
     expect(gateFourBounds.depth).toBeCloseTo(0.96, 4);
     expect(crioulosBounds.width).toBeCloseTo(2.4, 4);
@@ -167,7 +176,7 @@ describe('marcos arquitetônicos estratégicos', () => {
     expect(pavilionNineBounds.width).toBeCloseTo(4.7127, 4);
     expect(pavilionNineBounds.depth).toBeCloseTo(11.1709, 4);
 
-    [targets.B11, targets.B12, targets.B9, targets.C5, targets.C6, targets.C8, targets.C2, targets.F, targets['PORTICO-NACOES'], targets.A4, targets.D5, targets['PAVILHAO-09']]
+    [targets.B11, targets.B12, targets.B9, targets.C5, targets.C6, targets.C8, targets.C2, targets.F, targets.J, targets['PORTICO-NACOES'], targets.A4, targets.D5, targets['PAVILHAO-09']]
       .forEach((entity) => {
         const before = JSON.stringify(entity);
         expect(strategicLandmarkVisualHeight(entity)).toBeGreaterThan(entity.geometry.extrusionHeight);
@@ -205,6 +214,7 @@ describe('marcos arquitetônicos estratégicos', () => {
     expect(strategicLandmarkSearchAliases(targets.C8)).toContain('Etnia Alemã');
     expect(strategicLandmarkSearchAliases(targets.C2)).toContain('Restaurante Fenasoja');
     expect(strategicLandmarkSearchAliases(targets.F)).toContain('Arena Sicredi Icatu');
+    expect(strategicLandmarkSearchAliases(targets.J)).toContain('Kamikaze');
     expect(strategicLandmarkSearchAliases(targets.A4)).toContain('Acesso Portão 4');
     expect(strategicLandmarkSearchAliases(targets.D5)).toContain('CCCNG');
     expect(strategicLandmarkSearchAliases(targets['PAVILHAO-09'])).toContain('Pavilhão 9');
