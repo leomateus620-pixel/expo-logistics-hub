@@ -242,7 +242,10 @@ describe('experiência cinematográfica do Foguete Lunar', () => {
     expect(canvasSource).not.toContain('<EffectComposer');
     expect(desktopStylesSource).toMatch(/is-lunar-launch-active \.commercial-map-dock \{[\s\S]*?visibility: hidden;/);
     expect(mobileStylesSource).toContain('min-height: 2.75rem');
-    expect(packageSource).not.toContain('"gsap"');
+    // GSAP is now an explicit dependency of the separate amusement-park
+    // landmark; the Lunar launch itself must remain dependency-free.
+    expect(effectsSource).not.toContain('gsap');
+    expect(canvasSource).not.toContain('gsap');
     expect(packageSource).not.toContain('"three.quarks"');
   });
 
