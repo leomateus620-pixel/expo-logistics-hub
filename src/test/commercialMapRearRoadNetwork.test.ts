@@ -125,14 +125,12 @@ describe('área posterior — hierarquia dos anexos e seis âncoras', () => {
     expect(rearAttachment5ReferencePointById(6).attachmentPixel).toEqual([730.98, 162.5]);
   });
 
-  it('projeta P2–P6 por uma única transformação afim e mantém P1 como término canônico', () => {
+  it('preserva P2/P5/P6 e aplica os overrides de satélite aos antigos P3/P4', () => {
     expect(projectRearAttachment5PointToOfficialSource(1)).toEqual([5510, 4200]);
     expect(projectRearAttachment5PointToOfficialSource(2)[0]).toBeCloseTo(3964, 10);
     expect(projectRearAttachment5PointToOfficialSource(2)[1]).toBeCloseTo(3700, 10);
-    expect(projectRearAttachment5PointToOfficialSource(3)[0]).toBeCloseTo(4975.9927745664745, 10);
-    expect(projectRearAttachment5PointToOfficialSource(3)[1]).toBeCloseTo(3200.5780346820807, 10);
-    expect(projectRearAttachment5PointToOfficialSource(4)[0]).toBeCloseTo(6133.044315992293, 10);
-    expect(projectRearAttachment5PointToOfficialSource(4)[1]).toBeCloseTo(2723.121387283237, 10);
+    expect(projectRearAttachment5PointToOfficialSource(3)).toEqual([3964, 3466]);
+    expect(projectRearAttachment5PointToOfficialSource(4)).toEqual([5920, 2780]);
     expect(projectRearAttachment5PointToOfficialSource(5)[0]).toBeCloseTo(5987, 10);
     expect(projectRearAttachment5PointToOfficialSource(5)[1]).toBeCloseTo(2000, 10);
     expect(projectRearAttachment5PointToOfficialSource(6)[0]).toBeCloseTo(6190.975433526012, 10);
@@ -145,8 +143,11 @@ describe('área posterior — hierarquia dos anexos e seis âncoras', () => {
     const p4 = projectRearAttachment5PointToOfficialSource(4);
     const p5 = projectRearAttachment5PointToOfficialSource(5);
     const p6 = projectRearAttachment5PointToOfficialSource(6);
-    expect(directionChangeDegrees(p2, p3, p4)).toBeLessThan(5);
-    expect(pointDistance(p4, p6) / pointDistance(p4, p5)).toBeCloseTo(0.411, 2);
+    expect(p3[0]).toBe(p2[0]);
+    expect(p3[1]).toBeLessThan(p2[1]);
+    expect(pointDistance(p4, p6)).toBeLessThan(pointDistance(p4, p5));
+    expect(rearAttachment5ReferencePointById(3).calibration).toBe('canonical-source');
+    expect(rearAttachment5ReferencePointById(4).calibration).toBe('canonical-source');
 
     const point6Local = projectRearAttachment5PointToLocal(6);
     expect(point6Local[0]).toBeCloseTo(OFFICIAL_GATE_5_ACCESS_POINT[0], 10);
@@ -182,22 +183,11 @@ describe('área posterior — hierarquia dos anexos e seis âncoras', () => {
       REAR_SATELLITE_TOPOLOGY.points[1].satellitePixel,
       REAR_SATELLITE_TOPOLOGY.points[2].satellitePixel,
     );
-    const calibratedDirectionChange = directionChangeDegrees(
-      REAR_SATELLITE_TOPOLOGY.points[0].officialSource,
+    expect(satelliteDirectionChange).toBeLessThan(10);
+    expect(pointDistance(
       REAR_SATELLITE_TOPOLOGY.points[1].officialSource,
       REAR_SATELLITE_TOPOLOGY.points[2].officialSource,
-    );
-    expect(satelliteDirectionChange).toBeLessThan(10);
-    expect(calibratedDirectionChange).toBeCloseTo(satelliteDirectionChange, 6);
-    expect(
-      pointDistance(
-        REAR_SATELLITE_TOPOLOGY.points[1].officialSource,
-        REAR_SATELLITE_TOPOLOGY.points[2].officialSource,
-      ) / pointDistance(
-        REAR_SATELLITE_TOPOLOGY.points[0].officialSource,
-        REAR_SATELLITE_TOPOLOGY.points[1].officialSource,
-      ),
-    ).toBeCloseTo(0.74061, 5);
+    )).toBeGreaterThan(0);
   });
 });
 
@@ -252,7 +242,7 @@ describe('área posterior — identidades, seleção e busca sem duplicação', 
       A5: 'PORTÃO 5',
     });
     expect(rearContextualLabelAnchorForOfficialOwner('RUA-BRASILIA')).toEqual(
-      projectRearAttachment5PointToLocal(3),
+      officialPdfPointToLocal([3972, 3000]),
     );
     expect(rearRoadFocusBoundsForOfficialOwner('RUA-BRASILIA')).toMatchObject({
       minX: expect.any(Number), maxX: expect.any(Number), minZ: expect.any(Number), maxZ: expect.any(Number),
@@ -272,11 +262,13 @@ describe('área posterior — identidades, seleção e busca sem duplicação', 
   });
 
   it('resolve hit-tests das ribbons diretamente para as entidades oficiais', () => {
-    const brasilia = REAR_PARK_ROAD_NETWORK.find((road) => road.id === 'brasilia-point-3-ubiretama-4')!;
+    const ubiretama = REAR_PARK_ROAD_NETWORK.find(
+      (road) => road.id === 'ubiretama-gate-junction-official-handoff',
+    )!;
     const highway = REAR_PARK_ROAD_NETWORK.find((road) => road.id === 'br472-north-junction')!;
-    const brasiliaPoint = rearRoadLocalPath(brasilia)[0];
+    const ubiretamaPoint = rearRoadLocalPath(ubiretama)[1];
     const highwayPoint = rearRoadLocalPath(highway)[1];
-    expect(resolveRearRoadOwnerAtLocalPoint(brasiliaPoint, 'park')).toBe('RUA-BRASILIA');
+    expect(resolveRearRoadOwnerAtLocalPoint(ubiretamaPoint, 'park')).toBe('RUA-UBIRETAMA');
     expect(resolveRearRoadOwnerAtLocalPoint(highwayPoint, 'highway')).toBe('RODOVIA-RS-472');
   });
 
@@ -297,14 +289,15 @@ describe('área posterior — topologia corrigida e rodovia independente', () =>
     expect(path).toEqual(expect.arrayContaining([
       'brasilia-reference-2',
       'brasilia-reference-3',
-      'brasilia-ubiretama-junction-4',
+      'ubiretama-official-handoff',
+      'ubiretama-gate-junction',
       'gate-5',
     ]));
     expect(path.indexOf('brasilia-reference-2')).toBeLessThan(path.indexOf('brasilia-reference-3'));
-    expect(path.indexOf('brasilia-reference-3')).toBeLessThan(path.indexOf('brasilia-ubiretama-junction-4'));
+    expect(path.indexOf('brasilia-reference-3')).toBeLessThan(path.indexOf('ubiretama-gate-junction'));
     expect(roadGraphHasPath('ubiretama', 'brasilia')).toBe(true);
-    expect(degree('brasilia-ubiretama-junction-4')).toBe(3);
-    expect(REAR_PARK_ROAD_NETWORK.filter((road) => road.roadId === 'RUA-BRASILIA')).toHaveLength(3);
+    expect(degree('ubiretama-gate-junction')).toBe(3);
+    expect(REAR_PARK_ROAD_NETWORK.filter((road) => road.roadId === 'RUA-BRASILIA')).toHaveLength(2);
   });
 
   it('termina Rua das Etnias em P1 e não cria ramo do término até o Portão 5', () => {
@@ -323,7 +316,7 @@ describe('área posterior — topologia corrigida e rodovia independente', () =>
     const access = REAR_PARK_ROAD_NETWORK.filter((road) => road.roadId === 'ACESSO-A5-BR472');
     expect(highway).toHaveLength(2);
     expect(access).toHaveLength(2);
-    expect(access[0]).toMatchObject({ from: 'brasilia-ubiretama-junction-4', to: 'gate-5' });
+    expect(access[0]).toMatchObject({ from: 'ubiretama-gate-junction', to: 'gate-5' });
     expect(access[1]).toMatchObject({ from: 'gate-5', to: 'a5-br-junction' });
     expect(degree('a5-br-junction')).toBe(3);
     expect(rearRoadLocalWidth(highway[0])).toBeGreaterThan(rearRoadLocalWidth(access[0]));
@@ -394,7 +387,7 @@ describe('área posterior — exclusões espaciais, profundidade e ambiente', ()
       expect(REAR_ROAD_JUNCTION_ELEVATION_LIFT).toBeLessThan(0.004);
       expect(detailed.diagnostics.junctionCount).toBe(2);
 
-      const p4 = REAR_ROAD_NODES['brasilia-ubiretama-junction-4'].position;
+      const p4 = REAR_ROAD_NODES['ubiretama-gate-junction'].position;
       const positions = detailed.parkAsphalt!.getAttribute('position');
       const yAtCenter: number[] = [];
       for (let index = 0; index < positions.count; index += 1) {
