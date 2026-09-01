@@ -55,7 +55,7 @@ describe('terreno reconstruído do entorno da Arena', () => {
 
   it('reserva um patamar plano para o campo não demarcado a oeste da Arena', () => {
     const field = ARENA_FOOTBALL_FIELD_BOUNDS;
-    expect(field.width).toBeGreaterThan(field.depth);
+    expect(field.depth).toBeGreaterThan(field.width);
     expect(ARENA_FRONT_LAYOUT.footballField.markings).toBe(false);
     const corners: [number, number][] = [
       [field.minX + 0.2, field.minZ + 0.2],
@@ -82,6 +82,7 @@ describe('terreno reconstruído do entorno da Arena', () => {
     expect(field.maxX).toBeLessThan(arena.minX);
     expect(field.minX).toBeGreaterThan(STAIRS.maxX);
     expect(field.centerZ).toBeGreaterThan(multi.maxZ);
+    expect(field.centerZ).toBeGreaterThan(arena.centerZ);
 
     // A antiga área a leste volta a seguir o terreno natural, sem patamar ou recorte esportivo.
     const oldFieldCenter = sourceBoundsToLocal([5410, 2800, 5900, 3120]);
@@ -112,12 +113,21 @@ describe('terreno reconstruído do entorno da Arena', () => {
     });
     expect(resolveArenaSurfaceOwner(arena.centerX, arena.centerZ)).toBe('ARENA_STRUCTURE');
 
+    // O centro do campo largo/norte rejeitado volta a pertencer à laje.
+    const rejectedField = sourceBoundsToLocal([4560, 2708, 4884, 2948]);
+    expect(resolveArenaSurfaceOwner(rejectedField.centerX, rejectedField.centerZ))
+      .toBe('CONCRETE_ACCESS');
+
     // O entorno leste/sudeste segue sendo terreno natural, sem plano branco genérico.
     const rear = sourceBoundsToLocal([5900, 2500, 5960, 2560]);
     expect(isArenaTerrainExcluded(rear.centerX, rear.centerZ)).toBe(false);
 
     const field = ARENA_FOOTBALL_FIELD_BOUNDS;
-    expect(resolveArenaSurfaceOwner(field.centerX, field.centerZ)).toBe('SPORTS_FIELD');
+    for (const x of [field.minX + 0.1, field.centerX, field.maxX - 0.1]) {
+      for (const z of [field.minZ + 0.1, field.centerZ, field.maxZ - 0.1]) {
+        expect(resolveArenaSurfaceOwner(x, z)).toBe('SPORTS_FIELD');
+      }
+    }
     const removedEastField = sourceBoundsToLocal([5410, 2800, 5900, 3120]);
     expect(isArenaTerrainExcluded(removedEastField.centerX, removedEastField.centerZ)).toBe(false);
   });

@@ -117,7 +117,7 @@ function sourceBoundsOverlapPolygon(bounds: SourceBounds, polygon: readonly Sour
 
 describe('infraestrutura ambiental do parque', () => {
   it('mantém inventário ambiental versionado, explícito e fora das métricas comerciais', () => {
-    expect(PARK_ENVIRONMENT_REVISION).toBe('2028.1-arena-br472-satellite.1');
+    expect(PARK_ENVIRONMENT_REVISION).toBe('2028.2-arena-west-field-satellite.1');
     expect(PARK_ENVIRONMENT_FEATURES).toHaveLength(9);
     expect(new Set(PARK_ENVIRONMENT_FEATURES.map((feature) => feature.id)).size)
       .toBe(PARK_ENVIRONMENT_FEATURES.length);
@@ -173,10 +173,20 @@ describe('infraestrutura ambiental do parque', () => {
     expect(localVolleyball.centerX).toBeLessThan(localMultiSport.centerX);
     expect(localVolleyball.maxX).toBeLessThan(localMultiSport.minX);
     expect(localMultiSport.maxZ).toBeLessThan(localStairs.minZ);
-    expect(footballField).toEqual([4560, 2708, 4884, 2948]);
+    expect(footballField).toEqual([4660, 2860, 4880, 3200]);
     expect(footballField[2]).toBeLessThan(4900);
     expect(footballField[0]).toBeGreaterThan(stairs[2]);
+    expect(footballField[3] - footballField[1]).toBeGreaterThan(footballField[2] - footballField[0]);
     expect(ARENA_FRONT_LAYOUT.footballField.markings).toBe(false);
+    expect(PARK_ENVIRONMENT_FEATURES.filter((feature) => feature.classification === 'SPORTS_FIELD'))
+      .toHaveLength(1);
+    expect(sourceBoundsOverlapPolygon(footballField, ARENA_FRONT_LAYOUT.plaza.sourcePolygon)).toBe(false);
+    expect(ARENA_FRONT_LAYOUT.walkways.some((walkway) => (
+      walkway.sourcePath.some(([x, z]) => (
+        x > footballField[0] && x < footballField[2]
+        && z > footballField[1] && z < footballField[3]
+      ))
+    ))).toBe(false);
 
     const protectedIdentifiers = ['D3', 'B16', 'B17', 'F', 'C1', 'RUA-BRASIL', 'E-10', 'E-13'];
     const infrastructureBounds = [
