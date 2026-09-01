@@ -87,7 +87,7 @@ describe('rear-road rendered vegetation clearance', () => {
   it('retains all ambient poles outside every pavement and shoulder, including adjacent junction arms', () => {
     const footprints = buildRearRoadCorridorFootprints(undefined, { includeShoulders: true });
     const poles = buildRearPoleInstances();
-    expect(poles).toHaveLength(7);
+    expect(poles).toHaveLength(8);
     expect(buildRearPoleInstances()).toEqual(poles);
     expect(poles.flatMap((pole, index) => footprints.flatMap((footprint) => (
       distanceToPath([pole.x, pole.z], footprint.centerline) <= footprint.halfWidth + 0.08
@@ -103,8 +103,9 @@ describe('rear-road rendered vegetation clearance', () => {
       placement.renderPosition.some((coordinate, axis) => coordinate !== baseline[index].renderPosition[axis])
     )).map(({ node }) => node.sourceMarkerId);
     expect(changed).toEqual([
-      'pole-ref-145', 'pole-ref-225', 'pole-ref-295', 'pole-ref-296', 'pole-ref-297',
-      'pole-ref-301',
+      'pole-ref-199', 'pole-ref-222', 'pole-ref-225', 'pole-ref-234',
+      'pole-ref-321', 'pole-ref-322', 'pole-ref-323', 'pole-ref-324',
+      'pole-ref-330', 'pole-ref-336', 'pole-ref-341',
     ]);
     expect(corrected).toHaveLength(428);
     const footprints = buildRearRoadCorridorFootprints(undefined, { includeShoulders: true });

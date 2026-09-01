@@ -7,13 +7,14 @@ import {
 } from '../utils/rearSpatialCalibration';
 
 /**
- * Rede viária posterior — correção topológica 2026.9.8.
+ * Rede viária posterior — correção satélite 2026.9.3.
  *
  * As entidades cadastrais continuam sendo as únicas donas de busca, seleção e
  * metadados. A camada complementa a Rua Brasília além do núcleo interno e
  * substitui somente as duas apresentações incompatíveis: Ubiretama e a faixa
- * esquemática da RS-472. Rua das Etnias conserva sua superfície oficial e
- * termina em P1. Nenhum eixo fecha uma alça pela mata.
+ * esquemática da RS-472. Brasília permanece N–S a oeste, com curva suave a
+ * leste no pátio e cruzamento de quatro pontas ao sul do campo. O Portão 5
+ * entrega três ramais independentes à BR-472. Nenhum eixo fecha uma alça pela mata.
  */
 
 export type CanonicalRearRoadId =
@@ -83,7 +84,7 @@ export interface RearRoadIdentity {
 
 export type RearContextualLabelOwner = RearRoadIdentity['officialOwnerIdentifier'] | 'A5';
 
-export const REAR_PARK_ROAD_REVISION = '2026.9-arena-br472-satellite.2';
+export const REAR_PARK_ROAD_REVISION = '2026.9-arena-br472-satellite.3';
 
 /** Escala uniforme do recorte oficial, usada apenas para larguras físicas. */
 export const SOURCE_POINTS_PER_LOCAL_UNIT = 5500 / 120;
@@ -255,7 +256,7 @@ export const REAR_PARK_ROAD_NETWORK: readonly RoadSegment[] = Object.freeze([
     width: rearRoadSourceToLocalLength(37), shoulderWidth: 0,
     elevationOffset: 0.032, materialId: 'park-asphalt', markings: 'internal',
     presentation: 'generated-surface', officialOwnerIdentifier: 'RUA-BRASILIA',
-    notes: 'Eixo norte-sul monotônico, com uma única inflexão suave a leste antes do campo.',
+    notes: 'Eixo norte-sul a oeste do complexo: curva suave a leste na altura do pátio, depois quase reta ao lado do campo.',
   }),
   segment({
     id: 'brasilia-junction-south', roadId: 'RUA-BRASILIA', name: 'Rua Brasília',
@@ -272,7 +273,7 @@ export const REAR_PARK_ROAD_NETWORK: readonly RoadSegment[] = Object.freeze([
     sourceControlPoints: REAR_CALIBRATED_AXES.ubiretamaWestToJunction,
     ...officialRoadDefaults,
     officialOwnerIdentifier: 'RUA-UBIRETAMA',
-    notes: 'Braço oeste materializado pelo pavimento oficial adjacente, sem ribbon duplicada.',
+    notes: 'Braço oeste do cruzamento de quatro pontas, materializado pela Rua Uruguai oficial.',
   }),
   segment({
     id: 'ubiretama-junction-a5', roadId: 'RUA-UBIRETAMA', name: 'Rua Ubiretama',
@@ -281,7 +282,7 @@ export const REAR_PARK_ROAD_NETWORK: readonly RoadSegment[] = Object.freeze([
     width: rearRoadSourceToLocalLength(36), shoulderWidth: 0,
     elevationOffset: 0.032, materialId: 'park-asphalt', markings: 'none',
     presentation: 'generated-surface', officialOwnerIdentifier: 'RUA-UBIRETAMA',
-    notes: 'Eixo leste-oeste quase retilíneo ao sul da Arena, do cruzamento até A5.',
+    notes: 'Eixo leste-oeste ao sul do campo: segue a Uruguai Leste até livrar o C1 e desce suavemente até o A5.',
   }),
   segment({
     id: 'gate5-internal-approach', roadId: 'ACESSO-A5-BR472', name: 'Acesso Portão 5 — rede interna',
@@ -299,7 +300,7 @@ export const REAR_PARK_ROAD_NETWORK: readonly RoadSegment[] = Object.freeze([
     width: rearRoadSourceToLocalLength(36), shoulderWidth: rearRoadSourceToLocalLength(5),
     elevationOffset: 0.034, materialId: 'park-asphalt', markings: 'none',
     presentation: 'generated-surface', officialOwnerIdentifier: 'A5',
-    notes: 'Eixo central independente entre o portão e a BR-472.',
+    notes: 'Eixo central do trevo, independente das rampas norte e sul.',
   }),
   segment({
     id: 'a5-br472-north-ramp', roadId: 'ACESSO-A5-BR472', name: 'Acesso Portão 5 — rampa norte',
@@ -308,7 +309,7 @@ export const REAR_PARK_ROAD_NETWORK: readonly RoadSegment[] = Object.freeze([
     width: rearRoadSourceToLocalLength(36), shoulderWidth: rearRoadSourceToLocalLength(5),
     elevationOffset: 0.034, materialId: 'park-asphalt', markings: 'none',
     presentation: 'generated-surface', officialOwnerIdentifier: 'A5',
-    notes: 'Rampa norte do trevo, separada do eixo central.',
+    notes: 'Rampa norte: segue o eixo e descola em curva ampla até a BR-472, sem formar Y.',
   }),
   segment({
     id: 'a5-br472-south-ramp', roadId: 'ACESSO-A5-BR472', name: 'Acesso Portão 5 — rampa sul',
@@ -317,7 +318,7 @@ export const REAR_PARK_ROAD_NETWORK: readonly RoadSegment[] = Object.freeze([
     width: rearRoadSourceToLocalLength(36), shoulderWidth: rearRoadSourceToLocalLength(5),
     elevationOffset: 0.034, materialId: 'park-asphalt', markings: 'none',
     presentation: 'generated-surface', officialOwnerIdentifier: 'A5',
-    notes: 'Rampa sul do trevo, separada do eixo central.',
+    notes: 'Rampa sul: segue o eixo e descola em curva ampla até a BR-472, sem formar Y.',
   }),
   segment({
     id: 'br472-north-ramp', roadId: 'RODOVIA-RS-472', name: 'BR-472',

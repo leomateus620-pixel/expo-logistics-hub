@@ -141,8 +141,8 @@ describe('área posterior — hierarquia dos anexos e seis âncoras', () => {
 
   it('mantém os marcos rastreáveis e usa o satélite para P3/P4/P6', () => {
     expect(projectRearAttachment5PointToOfficialSource(1)).toEqual([5510, 4200]);
-    expect(projectRearAttachment5PointToOfficialSource(2)).toEqual([3964, 3800]);
-    expect(projectRearAttachment5PointToOfficialSource(3)).toEqual([3948, 2910]);
+    expect(projectRearAttachment5PointToOfficialSource(2)).toEqual([3964, 3466]);
+    expect(projectRearAttachment5PointToOfficialSource(3)).toEqual([3962, 2910]);
     expect(projectRearAttachment5PointToOfficialSource(4)).toEqual([5974, 3678]);
     expect(projectRearAttachment5PointToOfficialSource(5)[0]).toBeCloseTo(5987, 10);
     expect(projectRearAttachment5PointToOfficialSource(5)[1]).toBeCloseTo(2000, 10);
@@ -258,7 +258,7 @@ describe('área posterior — identidades, seleção e busca sem duplicação', 
       A5: 'PORTÃO 5',
     });
     expect(rearContextualLabelAnchorForOfficialOwner('RUA-BRASILIA')).toEqual(
-      officialPdfPointToLocal([3948, 2910]),
+      officialPdfPointToLocal([3962, 2910]),
     );
     expect(rearRoadFocusBoundsForOfficialOwner('RUA-BRASILIA')).toMatchObject({
       minX: expect.any(Number), maxX: expect.any(Number), minZ: expect.any(Number), maxZ: expect.any(Number),
@@ -314,7 +314,7 @@ describe('área posterior — topologia de satélite e rodovia independente', ()
     ]);
     const junction = REAR_ROAD_NODES['brasilia-ubiretama-junction'].sourcePoint;
     expect(junction[0]).toBeCloseTo(3964, 10);
-    expect(junction[1]).toBeCloseTo(3800, 10);
+    expect(junction[1]).toBeCloseTo(3466, 10);
     expect(roadGraphHasPath('ubiretama', 'brasilia')).toBe(true);
     expect(degree('brasilia-ubiretama-junction')).toBe(4);
     expect(GENERATED_REAR_ROAD_SEGMENTS.filter((road) => road.roadId === 'RUA-BRASILIA')).toHaveLength(2);
@@ -340,10 +340,10 @@ describe('área posterior — topologia de satélite e rodovia independente', ()
     const ubiretamaSpan = sourceSpan(ubiretamaAxis);
     expect(ubiretamaAxis[0]).toEqual(junction);
     expect(isNonDecreasing(ubiretamaAxis.map(([x]) => x))).toBe(true);
-    expect(ubiretamaSpan.x).toBeGreaterThan(ubiretamaSpan.y * 15);
+    expect(ubiretamaSpan.x).toBeGreaterThan(ubiretamaSpan.y * 8);
     expect(polylineDistance(ubiretamaAxis)).toBeLessThan(pointDistance(
       ubiretamaAxis[0], ubiretamaAxis.at(-1)!,
-    ) * 1.001);
+    ) * 1.01);
 
     const removedWrongPoints: readonly Point2[] = [
       [4522, 3218], [4535, 3280], [4535, 3455], [4492, 3466],
