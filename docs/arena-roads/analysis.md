@@ -5,7 +5,15 @@ Analyst revision: `2026.9-arena-br472-analyst.1`
 Base commit at analysis: `6d2bbb10` (`main`)
 Coordinate space: official 2026 PDF points (`officialPdfPointToLocal`), crop `{ x: 600, y: 900, width: 5500, height: 4150 }`.
 
-This file is the implementer spec. It records **exact deletions and replacement polylines**. It does **not** change runtime geometry.
+This file records deletions and satellite diagnosis. **Copy-paste polylines, P3/P4, plaza clip and field bounds for the implementer are in `arena-roads/ANALYSIS.md` §§3 and 7** (same branch). Where this file and that file disagree, **`arena-roads/ANALYSIS.md` wins**, except the sketch rule in §0 here still applies.
+
+Withdrawn after reconciliation (do not implement from this file):
+
+- Ubiretama as a straight `[3964, 3700] → [5974, 3678]` through EST-EXP-VIS — hits C1 / parking worse than the south-of-C1 jog onto `RUA-URUGUAI-LESTE` in ANALYSIS.md §3.2.
+- Moving P6 / `br472Junction` to A5 latitude `[…, 3678]` — keep P6 `[6190.98, 3021.97]` and J `[6266.93, 3234.23]`; only flare the trevo.
+- Field `[4708, 2772, 4880, 3048]` — use ANALYSIS.md `[4560, 2708, 4884, 2948]` unless visual QA vs `03-sat-detail.jpg` needs a smaller wall-hugging rect (then shrink toward 4708–4880 without crossing stairs `x=4480` or F `x=4900`).
+
+Agreed deletions (both docs): east marked pitch `[5410, 2800, 5900, 3120]`; Brasília dogleg from `[4400, 3155]` through old P3/P4; pitch-line meshes; walkway `arena-walkway-arena-field` old path. Cadastral `F`, `A5`, `RUA-BRASILIA` rect stay.
 
 ## 0. Critical: green / red markings are not geometry
 

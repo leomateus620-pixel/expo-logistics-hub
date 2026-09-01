@@ -414,6 +414,11 @@ const roadInputs: Array<[string, string, PdfPolygon, MapClassification?]> = [
   ['RUA-BRASIL', 'Rua Brasil', rectPdf([1640, 3106, 4510, 3181])],
   ['RUA-URUGUAI', 'Rua Uruguai', rectPdf([2820, 3438, 3940, 3494])],
   ['RUA-ARGENTINA', 'Rua Argentina', rectPdf([2820, 3716, 3940, 3780])],
+  // ANALYST 2026.9-arena-br472-analyst.1 — do not move this cadastral strip.
+  // It is already the correct N–S corridor WEST of Arena F. The red-X road in
+  // the 3D view is the generated overlay in rearSpatialCalibration.ts that
+  // leaves this rectangle at y=3155. Spec: docs/arena-roads/analysis.md
+  // NEVER extrude the green/red sketch from 02-map-annotated.jpg.
   ['RUA-BRASILIA', 'Rua Brasília', rectPdf([3940, 2440, 3988, 4210])],
   ['RUA-MONTEVIDEU', 'Rua Montevidéu', rectPdf([3441, 3106, 3482, 3715])],
   // Corredores já reservados entre as quadras que faltavam na malha viária.
@@ -505,6 +510,7 @@ function addStructure(
   ['A2', 'Portão 2 — entrada e saída de visitantes', [1274, 4040]],
   ['A3', 'Portão 3 — entrada de veículos de expositores e visitantes', [3935, 4219]],
   ['A4', 'Portão 4 — entrada e saída de visitantes', [1656, 1744]],
+  // ANALYST: keep A5 at [5974, 3678]. Move only gate5VehicleAccess (§4.4).
   ['A5', 'Portão 5 — saída de veículos de expositores e visitantes', [5974, 3678]],
   ['A6', 'Portão 6 — entrada e saída de veículos de visitantes e expositores', [3276, 941]],
   ['A7', 'Portão 7 — entrada de visitantes e expositores', [3267, 1703]],
@@ -598,6 +604,7 @@ const namedStructures: Array<[string, string, MapClassification, string, PdfBoun
   ['D3', 'Espaço Mirante', 'ATTRACTION', 'structures', [3990, 2440, 4100, 2830], { height: 0.92 }],
   ['D4', 'Tenda da Pecuária', 'LIVESTOCK_AREA', 'exporural', [2925, 2525], { parent: 'N', width: 125, depth: 100, height: 0.74 }],
   ['D5', 'Núcleo dos Criadores de Cavalos Crioulos', 'LIVESTOCK_AREA', 'exporural', [1545, 2241], { width: 110, depth: 110, height: 0.7 }],
+  // ANALYST: keep F [4900, 2690, 5385, 3130]. Do not rotate or translate.
   ['F', 'Arena Sicredi - Icatu', 'EVENT_VENUE', 'structures', [4900, 2690, 5385, 3130], { height: 1.35, metadata: { explicitNotWater: true, labelPriority: 'landmark' } }],
   ['G', 'Árvore Lunar', 'LANDMARK', 'structures', [2152, 3334], { width: 92, depth: 92, height: 1.1 }],
   ['J', 'Parque de Diversões', 'ATTRACTION', 'structures', [930, 2450, 1600, 3000], { parent: 'X', height: 0.12, verificationStatus: 'NEEDS_REVIEW', metadata: { sourceDiscrepancy: 'Marcador J visível no mapa e ausente na legenda inferior.' } }],

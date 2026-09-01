@@ -262,6 +262,7 @@ export const REAR_PARK_ROAD_NETWORK: readonly RoadSegment[] = Object.freeze([
     presentation: 'generated-surface', officialOwnerIdentifier: 'RUA-BRASILIA',
     notes: 'P2 e P3 pertencem ao mesmo eixo calibrado, sem uma segunda Brasília.',
   }),
+  // ANALYST: delete this segment. ANALYSIS.md §3.1 / §4.1. Not the green sketch.
   segment({
     id: 'brasilia-point-3-ubiretama-4', roadId: 'RUA-BRASILIA', name: 'Rua Brasília',
     from: 'brasilia-reference-3', to: 'brasilia-ubiretama-junction-4', category: 'park-avenue',

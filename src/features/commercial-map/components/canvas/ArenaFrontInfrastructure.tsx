@@ -297,7 +297,8 @@ function courtLineGeometry() {
   return geometry;
 }
 
-/** Marcação discreta do campo: linha de fundo, laterais, meio e círculo central. */
+/** ANALYST: delete this helper with the east marked pitch. Replacement west
+ * field is UNMARKED — no lines, no pitchTurf. docs/arena-roads/analysis.md §4.1 */
 function footballFieldLineGeometry() {
   const bounds = ARENA_FOOTBALL_FIELD_BOUNDS;
   const inset = ARENA_FRONT_LAYOUT.footballField.markingInset;
@@ -516,6 +517,8 @@ function ArenaTerrain({ opacity }: { opacity: number }) {
   );
 }
 
+/** ANALYST: move off [5410, 2800, 5900, 3120] (east of F). New unmarked grass
+ * `[4560, 2708, 4884, 2948]` west of F (ANALYSIS.md §3.3). No 02-map green box. */
 function FootballField({ opacity }: { opacity: number }) {
   const { invalidate } = useThree();
   const bounds = ARENA_FOOTBALL_FIELD_BOUNDS;

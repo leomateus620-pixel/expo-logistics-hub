@@ -129,9 +129,11 @@ const gate5PresentationSource = rearAttachment5ReferencePointById(6).officialSou
 export const REAR_OFFICIAL_ANCHORS = Object.freeze({
   /** Cadastro preservado; busca, seleção e persistência continuam na entidade A5. */
   gate5Entity: [5974, 3678] as Point2,
-  /** Passagem física corrigida no P6 do anexo. */
+  /** ANALYST: P6 stays `[6190.98, 3021.97]`. Do not move to A5 Y.
+   * Flare trevo only. arena-roads/ANALYSIS.md §3.2 / §7. */
   gate5VehicleAccess: gate5PresentationSource,
-  /** Acesso com a deflexão de 8,72° e a proporção observada no IMG_9936. */
+  /** ANALYST: keep J `[6266.93, 3234.23]`; add flare samples, do not digitise
+   * the green BR-472 highlighter. */
   br472Junction: [6266.926335827044, 3234.233541884527] as Point2,
 });
 
@@ -177,6 +179,10 @@ export const REAR_CALIBRATED_AXES = Object.freeze({
   brasiliaSouthToPoint2: Object.freeze([
     [3964, 3950], [3964, 3800], rearAttachment5ReferencePointById(2).officialSource,
   ] as readonly Point2[]),
+  // ANALYST 2026.9-arena-br472-analyst.1 — RED-X Brasília.
+  // Keep points on x≈3964. DELETE from [4400, 3155] through old P3.
+  // Replacement: P3_NEW [3964, 3466], drop brasiliaPoint3ToUbiretama.
+  // arena-roads/ANALYSIS.md §3.1. GREEN sketch is NOT a polyline to extrude.
   brasiliaPoint2ToPoint3: Object.freeze([
     rearAttachment5ReferencePointById(2).officialSource,
     [3964, 3500],
@@ -187,6 +193,8 @@ export const REAR_CALIBRATED_AXES = Object.freeze({
     [4860, 3190],
     rearAttachment5ReferencePointById(3).officialSource,
   ] as readonly Point2[]),
+  // ANALYST: DELETE this entire array / segment brasilia-point-3-ubiretama-4.
+  // ANALYSIS.md §3.1. East of F is Ubiretama, not Brasília.
   brasiliaPoint3ToUbiretama: Object.freeze([
     rearAttachment5ReferencePointById(3).officialSource,
     [5500, 3200],
@@ -195,6 +203,8 @@ export const REAR_CALIBRATED_AXES = Object.freeze({
     [6090, 3000],
     rearAttachment5ReferencePointById(4).officialSource,
   ] as readonly Point2[]),
+  // ANALYST: REPLACE with ANALYSIS.md §3.2 polyline (P5 → south of Arena →
+  // south of C1 → [4492, 3466] onto RUA-URUGUAI-LESTE). P4_NEW = [5920, 2780].
   ubiretamaPoint5ToBrasilia: Object.freeze([
     rearAttachment5ReferencePointById(5).officialSource,
     [5987, 2100],

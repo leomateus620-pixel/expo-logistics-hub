@@ -3,6 +3,7 @@
 Status: analyst deliverable only. **Do not treat the green/red strokes on `02-map-annotated.jpg` as geometry.** They are draft hints. Green = where a real cadastral/generated centerline should sit after the edit. Red X = current wrong mesh to delete or move. Never extrude, stroke, or re-digitize those sketch marks.
 
 Reference stills (same folder): `01-current-3d.png`, `02-map-annotated.jpg`, `03-sat-detail.jpg`, `04-sat-br472.jpg`.
+Additional copies and satellite overview: `docs/arena-roads/`. Sketch rule restated in `docs/arena-roads/analysis.md` §0 — green/red marks are never geometry.
 
 ---
 

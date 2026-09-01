@@ -79,6 +79,8 @@ export const ARENA_FRONT_LAYOUT = {
   courtAnchors: ['QUADRA-R', 'EXPORURAL'] as const,
   courtOwners: ['QUADRA-R', 'EXPORURAL'] as const,
   plaza: {
+    // ANALYST: east edge 4888 covers the new west field. Notch per
+    // arena-roads/ANALYSIS.md §3.3 (not docs/arena-roads/analysis.md withdrawn clip).
     sourcePolygon: [
       [4116, 2682],
       [4888, 2682],
@@ -144,8 +146,10 @@ export const ARENA_FRONT_LAYOUT = {
     blendDistance: 1.15,
   },
   /**
-   * Campo de futebol de grama natural atrás/ao lado da Arena, a leste do volume
-   * construído e junto à borda norte do estacionamento de expositores.
+   * ANALYST 2026.9-arena-br472-analyst.1 — DELETE these bounds.
+   * `[5410, 2800, 5900, 3120]` is the MARKED pitch EAST of F (red X).
+   * Implementer rect: `[4560, 2708, 4884, 2948]` west of F, unmarked
+   * (`arena-roads/ANALYSIS.md` §3.3). Do not digitise the 02-map green box.
    */
   footballField: {
     sourceBounds: [5410, 2800, 5900, 3120] as SourceBounds,
@@ -158,6 +162,7 @@ export const ARENA_FRONT_LAYOUT = {
   walkways: [
     { id: 'arena-walkway-stairs-apron', sourcePath: [[4480, 2895], [4680, 2895], [4880, 2860]] as readonly SourcePoint[], width: 0.34 },
     { id: 'arena-walkway-courts-plaza', sourcePath: [[4620, 2682], [4620, 2560], [4620, 2480]] as readonly SourcePoint[], width: 0.26 },
+    // ANALYST: delete this walkway with the east marked pitch (§4.1).
     { id: 'arena-walkway-arena-field', sourcePath: [[5395, 3180], [5620, 3190], [5850, 3196]] as readonly SourcePoint[], width: 0.26 },
     { id: 'arena-walkway-arena-parking', sourcePath: [[5140, 3140], [5150, 3200], [5160, 3250]] as readonly SourcePoint[], width: 0.24 },
   ] as const,

@@ -76,7 +76,8 @@ export const ARENA_SECTOR_SURFACE_ZONES: readonly ArenaSurfaceZone[] = [
   zone('parking-visitantes', 'PARKING', [[5350, 3400], [5980, 3480], [5900, 4250], [5350, 4140]]),
   // Rua Brasil, chegando pelo oeste.
   zone('rua-brasil', 'ROAD', rect([4106, 3096, 4520, 3191])),
-  // Campo de futebol: superfície própria, também recortada do terreno.
+  // ANALYST: currently wraps the EAST marked pitch. After the move, wrap
+  // `[4560, 2708, 4884, 2948]` west of F and clip the plaza (ANALYSIS.md §3.3).
   zone('football-field', 'SPORTS_FIELD', rect(inflate(ARENA_FRONT_LAYOUT.footballField.sourceBounds))),
 ];
 
