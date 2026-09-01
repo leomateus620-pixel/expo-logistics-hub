@@ -268,15 +268,6 @@ export const REAR_PARK_ROAD_NETWORK: readonly RoadSegment[] = Object.freeze([
     notes: 'Braço sul do cruzamento real, sem reconectar o Portão 3.',
   }),
   segment({
-    id: 'longitudinal-south-gate5', roadId: 'RUA-BRASILIA', name: 'Rua Brasília',
-    from: 'brasilia-south', to: 'ubiretama-a5', category: 'park-avenue',
-    sourceControlPoints: REAR_CALIBRATED_AXES.longitudinalSouthToGate5,
-    width: rearRoadSourceToLocalLength(37), shoulderWidth: rearRoadSourceToLocalLength(4),
-    elevationOffset: 0.032, materialId: 'park-asphalt', markings: 'internal',
-    presentation: 'generated-surface', officialOwnerIdentifier: 'RUA-BRASILIA',
-    notes: 'Trecho inferior do eixo correto: acompanha a borda dos estacionamentos e entrega o fluxo na aproximação do Portão 5.',
-  }),
-  segment({
     id: 'ubiretama-west-junction', roadId: 'RUA-UBIRETAMA', name: 'Rua Ubiretama',
     from: 'ubiretama-west', to: 'brasilia-ubiretama-junction', category: 'park-avenue',
     sourceControlPoints: REAR_CALIBRATED_AXES.ubiretamaWestToJunction,
