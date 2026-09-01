@@ -42,7 +42,7 @@ export interface LocalBounds {
   centerZ: number;
 }
 
-export const PARK_ENVIRONMENT_REVISION = '2028.1-arena-br472-satellite.1';
+export const PARK_ENVIRONMENT_REVISION = '2028.2-arena-west-field-satellite.1';
 
 export const PARK_ENVIRONMENT_CLASSIFICATION_LABELS: Readonly<Record<ParkEnvironmentClassification, string>> = {
   NON_COMMERCIAL_STRUCTURE: 'Estrutura não comercial',
@@ -79,15 +79,14 @@ export const ARENA_FRONT_LAYOUT = {
   courtAnchors: ['QUADRA-R', 'EXPORURAL'] as const,
   courtOwners: ['QUADRA-R', 'EXPORURAL'] as const,
   plaza: {
-    // A praça conserva o setor cívico e o apron sul, com um recorte real para
-    // o pequeno campo gramado observado a oeste da Arena.
+    // O pátio permanece concreto ao norte da Arena. O campo fica separado no
+    // gramado a sudoeste, em vez de ser encaixado como uma ilha dentro da laje.
     sourcePolygon: [
       [4116, 2682],
-      [4560, 2682],
-      [4560, 2948],
-      [4888, 2948],
-      [4888, 3096],
-      [4498, 3100],
+      [4888, 2682],
+      [4888, 2832],
+      [4620, 2832],
+      [4620, 3098],
       [4116, 3098],
     ] as readonly SourcePoint[],
     elevation: 0.052,
@@ -148,11 +147,11 @@ export const ARENA_FRONT_LAYOUT = {
     blendDistance: 1.15,
   },
   /**
-   * Campo de grama natural não demarcado a oeste da Arena, entre o volume
-   * construído e a faixa cívica da escadaria/praça.
+   * Campo de grama natural não demarcado imediatamente a oeste da Arena. A
+   * proporção longitudinal e o deslocamento para sul seguem o satélite.
    */
   footballField: {
-    sourceBounds: [4560, 2708, 4884, 2948] as SourceBounds,
+    sourceBounds: [4660, 2860, 4880, 3200] as SourceBounds,
     turfInset: 0.18,
     markingInset: 0,
     turfColor: '#7f9a5c',
@@ -161,9 +160,8 @@ export const ARENA_FRONT_LAYOUT = {
   },
   /** Caminhos de circulação entre escadaria, quadras, Arena, campo e estacionamento. */
   walkways: [
-    { id: 'arena-walkway-stairs-apron', sourcePath: [[4480, 2895], [4680, 2895], [4880, 2860]] as readonly SourcePoint[], width: 0.34 },
+    { id: 'arena-walkway-stairs-apron', sourcePath: [[4480, 2895], [4540, 2895], [4600, 2888]] as readonly SourcePoint[], width: 0.34 },
     { id: 'arena-walkway-courts-plaza', sourcePath: [[4620, 2682], [4620, 2560], [4620, 2480]] as readonly SourcePoint[], width: 0.26 },
-    { id: 'arena-walkway-arena-field', sourcePath: [[4520, 2880], [4560, 2830], [4700, 2828]] as readonly SourcePoint[], width: 0.26 },
     { id: 'arena-walkway-arena-parking', sourcePath: [[5140, 3140], [5150, 3200], [5160, 3250]] as readonly SourcePoint[], width: 0.24 },
   ] as const,
   /** Massas arbóreas do setor, lidas nos anexos 3 e 4 (conferência de campo recomendada). */
@@ -242,7 +240,7 @@ export const PARK_ENVIRONMENT_FEATURES: readonly ParkEnvironmentFeature[] = [
     sourceBounds: [4116, 2682, 4888, 3100],
     sourceReferences: ARENA_FRONT_SOURCE_REFERENCES,
     verificationStatus: 'REFERENCE_INTERPRETED',
-    notes: 'Faixa cívica contínua entre D3, Arena e Rua Brasil, preservando o apron livre diante do palco; nunca representa lote.',
+    notes: 'Pátio cívico de concreto ao norte e a oeste da Arena, separado do campo gramado e preservando o apron livre diante do palco; nunca representa lote.',
   },
   {
     id: 'arena-front-concrete-stairs',
@@ -319,7 +317,7 @@ export const PARK_ENVIRONMENT_FEATURES: readonly ParkEnvironmentFeature[] = [
     sourceBounds: [4480, 2480, 5860, 3260],
     sourceReferences: ARENA_FRONT_SOURCE_REFERENCES,
     verificationStatus: 'FIELD_REVIEW_RECOMMENDED',
-    notes: 'Ligações entre escadaria, quadras, apron da Arena, campo e estacionamento conforme os anexos.',
+    notes: 'Ligações entre escadaria, quadras, apron da Arena e estacionamento, encerradas antes do campo gramado conforme o satélite.',
   },
 ];
 

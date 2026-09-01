@@ -9,7 +9,7 @@ import { ARENA_FRONT_LAYOUT, sourceBoundsToLocal } from './parkEnvironment';
  * alimenta lote, métrica comercial ou geometria oficial.
  */
 
-export const ARENA_TERRAIN_REVISION = '2026.9-arena-campo-oeste.1';
+export const ARENA_TERRAIN_REVISION = '2026.9-arena-campo-oeste-sul.2';
 
 /** Cota do apron pavimentado diante da Arena (leste). */
 export const ARENA_TERRAIN_BASE_ELEVATION = ARENA_FRONT_LAYOUT.plaza.elevation;
@@ -49,8 +49,8 @@ function gentleUndulation(x: number, z: number) {
   return wave * 0.018 * apronFade;
 }
 
-// ANALYST: follows footballField — move WEST of F with
-// `[4560, 2708, 4884, 2948]` (arena-roads/ANALYSIS.md §3.3). FIELD_BLEND → 0.45.
+// O patamar segue o campo estreito a oeste/sudoeste de F. A laje ao norte
+// permanece na cota de concreto e não participa deste blend.
 const FIELD = sourceBoundsToLocal(ARENA_FRONT_LAYOUT.footballField.sourceBounds);
 /** Blend, em unidades locais, entre o patamar do campo e o terreno em volta. */
 const FIELD_BLEND = 0.45;
