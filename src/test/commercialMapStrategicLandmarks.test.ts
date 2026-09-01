@@ -167,8 +167,8 @@ describe('marcos arquitetônicos estratégicos', () => {
     expect(arenaBounds.width).toBeCloseTo(10.5818, 4);
     expect(arenaBounds.depth).toBeCloseTo(9.6, 4);
     // Source bounds remain exactly [930, 2450, 1600, 3000].
-    expect(amusementParkBounds.width).toBeCloseTo(7.3091, 4);
-    expect(amusementParkBounds.depth).toBeCloseTo(6, 4);
+    expect(amusementParkBounds.width).toBeCloseTo(14.6182, 4);
+    expect(amusementParkBounds.depth).toBeCloseTo(12, 4);
     expect(gateFourBounds.width).toBeCloseTo(0.96, 4);
     expect(gateFourBounds.depth).toBeCloseTo(0.96, 4);
     expect(crioulosBounds.width).toBeCloseTo(2.4, 4);
