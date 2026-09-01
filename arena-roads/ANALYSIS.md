@@ -1,5 +1,7 @@
 # Arena Sicredi / Rua Brasília / Ubiretama / BR-472 — implementation plan
 
+**Sol: apply `arena-roads/SOL-EDITS.md` now.** Numbers below are the spec; SOL-EDITS is the file-by-file patch order.
+
 Status: analyst deliverable only. **Do not treat the green/red strokes on `02-map-annotated.jpg` as geometry.** They are draft hints. Green = where a real cadastral/generated centerline should sit after the edit. Red X = current wrong mesh to delete or move. Never extrude, stroke, or re-digitize those sketch marks.
 
 Reference stills (same folder): `01-current-3d.png`, `02-map-annotated.jpg`, `03-sat-detail.jpg`, `04-sat-br472.jpg`.

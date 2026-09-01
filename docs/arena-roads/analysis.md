@@ -5,7 +5,7 @@ Analyst revision: `2026.9-arena-br472-analyst.1`
 Base commit at analysis: `6d2bbb10` (`main`)
 Coordinate space: official 2026 PDF points (`officialPdfPointToLocal`), crop `{ x: 600, y: 900, width: 5500, height: 4150 }`.
 
-This file records deletions and satellite diagnosis. **Copy-paste polylines, P3/P4, plaza clip and field bounds for the implementer are in `arena-roads/ANALYSIS.md` §§3 and 7** (same branch). Where this file and that file disagree, **`arena-roads/ANALYSIS.md` wins**, except the sketch rule in §0 here still applies.
+**Sol apply-now list:** `arena-roads/SOL-EDITS.md`. Copy-paste polylines remain in `arena-roads/ANALYSIS.md` §§3 and 7.
 
 Withdrawn after reconciliation (do not implement from this file):
 
