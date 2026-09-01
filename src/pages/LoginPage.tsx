@@ -536,6 +536,10 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
                   id="login-password"
                   className="auth-input-control"
                   type={showPassword ? 'text' : 'password'}
+                  style={{ textTransform: 'none' }}
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
                   placeholder="Digite sua senha"
                   value={password}
                   onChange={(event) => updatePassword(event.target.value)}
