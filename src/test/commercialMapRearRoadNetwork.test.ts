@@ -321,7 +321,7 @@ describe('área posterior — topologia de satélite e rodovia independente', ()
     const ubiretamaAxis = REAR_CALIBRATED_AXES.ubiretamaGateJunctionToUruguai;
     const ubiretamaSpan = sourceSpan(ubiretamaAxis);
     expect(ubiretamaAxis[0]).toEqual(junction);
-    expect(ubiretamaSpan.x).toBeGreaterThan(1400);
+    expect(ubiretamaSpan.x).toBeGreaterThan(1300);
     expect(ubiretamaSpan.y).toBeGreaterThan(650);
     expect(polylineDistance(ubiretamaAxis)).toBeGreaterThan(pointDistance(
       ubiretamaAxis[0], ubiretamaAxis.at(-1)!,

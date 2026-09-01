@@ -199,8 +199,8 @@ export const REAR_CALIBRATED_AXES = Object.freeze({
    */
   ubiretamaPoint5ToGateJunction: Object.freeze([
     rearAttachment5ReferencePointById(5).officialSource,
-    [5987, 2300],
-    [5968, 2550],
+    [5960, 2300],
+    [5945, 2550],
     rearAttachment5ReferencePointById(4).officialSource,
   ] as readonly Point2[]),
   ubiretamaGateJunctionToUruguai: Object.freeze([
@@ -209,7 +209,7 @@ export const REAR_CALIBRATED_AXES = Object.freeze({
     [5750, 3250],
     [5350, 3265],
     [5000, 3255],
-    [4700, 3248],
+    [4700, 3270],
     [4558, 3245],
     [4558, 3310],
     [4558, 3445],
