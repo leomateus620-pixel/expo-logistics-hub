@@ -332,7 +332,7 @@ describe('área posterior — topologia corrigida e rodovia independente', () =>
     const expectedUbiretamaAxis: readonly Point2[] = [
       [5987, 2000], [5987, 2300], [5968, 2550], [5920, 2780], [5885, 3000],
       [5750, 3235], [5350, 3252], [5000, 3240], [4700, 3228],
-      [4522, 3218], [4488, 3280], [4488, 3455], [4492, 3466],
+      [4522, 3218], [4535, 3280], [4535, 3455], [4492, 3466],
     ];
     const renderedUbiretamaAxis = [
       ...REAR_CALIBRATED_AXES.ubiretamaPoint5ToGateJunction,

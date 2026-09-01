@@ -203,8 +203,8 @@ export const REAR_CALIBRATED_AXES = Object.freeze({
     [5000, 3240],
     [4700, 3228],
     [4522, 3218],
-    [4488, 3280],
-    [4488, 3455],
+    [4535, 3280],
+    [4535, 3455],
     [4492, 3466],
   ] as readonly Point2[]),
   // A faixa oficial RUA-URUGUAI-LESTE completa o T sem asfalto duplicado.
