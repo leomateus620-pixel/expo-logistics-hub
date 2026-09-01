@@ -62,6 +62,7 @@ export type StrategicLandmarkKind =
   | 'exporural-restaurant'
   | 'fenasoja-restaurant'
   | 'sicredi-arena'
+  | 'amusement-park'
   | 'lunar-tree';
 
 export interface StrategicLandmarkBounds {
@@ -411,6 +412,21 @@ const STRATEGIC_LANDMARKS: Readonly<Record<string, StrategicLandmarkDefinition>>
     facingRadians: -Math.PI / 2,
     focusDirection: [-0.92, 0.56, 0.32],
     visualHeight: ({ width }) => Math.min(5.5, width * 0.5),
+  },
+  J: {
+    kind: 'amusement-park',
+    aliases: [
+      'Parque de Diversões',
+      'Parque de Diversoes',
+      'Roda-gigante',
+      'Kamikaze',
+      'Carrinho de bate-bate',
+    ],
+    // The south-east approach keeps the three rides legible while preserving
+    // the exact official J footprint as the interaction and terrain boundary.
+    facingRadians: 0,
+    focusDirection: [0.72, 0.74, 0.88],
+    visualHeight: ({ width, depth }) => Math.min(6.2, Math.min(width, depth) * 0.86),
   },
   G: {
     kind: 'lunar-tree',
