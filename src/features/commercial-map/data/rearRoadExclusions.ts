@@ -52,6 +52,9 @@ function intersectsIntervention(polygon: readonly LocalPoint[]) {
 }
 
 const NON_OBSTACLE_CLASSIFICATIONS = new Set([
+  // Quadra envelopes are hierarchy/label outlines; their contained lots and
+  // structures remain independent collision boundaries.
+  'QUADRA',
   'ROAD',
   'PEDESTRIAN_PATH',
   'GREEN_AREA',

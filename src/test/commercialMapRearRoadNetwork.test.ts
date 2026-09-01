@@ -329,14 +329,20 @@ describe('área posterior — topologia corrigida e rodovia independente', () =>
     expect(degree('ubiretama-gate-junction')).toBe(3);
     expect(GENERATED_REAR_ROAD_SEGMENTS.filter((road) => road.roadId === 'RUA-BRASILIA')).toHaveLength(2);
     expect(REAR_PARK_ROAD_NETWORK.some((road) => road.id === 'brasilia-point-3-ubiretama-4')).toBe(false);
-    expect(REAR_CALIBRATED_AXES.ubiretamaPoint5ToGateJunction.slice(1)).toEqual([
-      [5987, 2300], [6030, 2550], [6035, 2660], [6015, 2720], [5920, 2780],
-    ]);
-    expect(REAR_CALIBRATED_AXES.ubiretamaGateJunctionToOfficialHandoff).toEqual([
-      [5920, 2780], [5885, 3000], [5750, 3235], [5350, 3225],
-      [5000, 3210], [4700, 3188], [4535, 3188], [4535, 3300],
-      [4535, 3460], [4518, 3466], [4492, 3466],
-    ]);
+    const expectedUbiretamaAxis: readonly Point2[] = [
+      [5987, 2000], [5987, 2300], [5968, 2550], [5920, 2780], [5885, 3000],
+      [5750, 3235], [5350, 3252], [5000, 3240], [4700, 3228],
+      [4522, 3218], [4488, 3280], [4488, 3455], [4492, 3466],
+    ];
+    const renderedUbiretamaAxis = [
+      ...REAR_CALIBRATED_AXES.ubiretamaPoint5ToGateJunction,
+      ...REAR_CALIBRATED_AXES.ubiretamaGateJunctionToOfficialHandoff.slice(1),
+    ];
+    expect(renderedUbiretamaAxis).toHaveLength(expectedUbiretamaAxis.length);
+    renderedUbiretamaAxis.forEach((point, index) => {
+      expect(point[0]).toBeCloseTo(expectedUbiretamaAxis[index][0], 10);
+      expect(point[1]).toBeCloseTo(expectedUbiretamaAxis[index][1], 10);
+    });
   });
 
   it('termina Rua das Etnias em P1 e não cria ramo do término até o Portão 5', () => {
