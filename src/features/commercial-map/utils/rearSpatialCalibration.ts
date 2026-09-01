@@ -192,8 +192,9 @@ export const REAR_CALIBRATED_AXES = Object.freeze({
   ubiretamaPoint5ToGateJunction: Object.freeze([
     rearAttachment5ReferencePointById(5).officialSource,
     [5987, 2300],
-    [6005, 2550],
-    [5980, 2680],
+    [6030, 2550],
+    [6035, 2660],
+    [6015, 2720],
     rearAttachment5ReferencePointById(4).officialSource,
   ] as readonly Point2[]),
   ubiretamaGateJunctionToOfficialHandoff: Object.freeze([
@@ -205,7 +206,8 @@ export const REAR_CALIBRATED_AXES = Object.freeze({
     [4700, 3188],
     [4535, 3188],
     [4535, 3300],
-    [4535, 3450],
+    [4535, 3460],
+    [4518, 3466],
     [4492, 3466],
   ] as readonly Point2[]),
   // A faixa oficial RUA-URUGUAI-LESTE completa o T sem asfalto duplicado.
