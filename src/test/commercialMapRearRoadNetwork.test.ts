@@ -139,27 +139,26 @@ describe('área posterior — hierarquia dos anexos e seis âncoras', () => {
     expect(rearAttachment5ReferencePointById(6).attachmentPixel).toEqual([730.98, 162.5]);
   });
 
-  it('mantém os marcos rastreáveis e usa o satélite para P3/P4/P6', () => {
+  it('mantém os marcos rastreáveis e usa os pontos canônicos do traçado corrigido', () => {
     expect(projectRearAttachment5PointToOfficialSource(1)).toEqual([5510, 4200]);
-    expect(projectRearAttachment5PointToOfficialSource(2)).toEqual([3964, 3466]);
-    expect(projectRearAttachment5PointToOfficialSource(3)).toEqual([3962, 2910]);
-    expect(projectRearAttachment5PointToOfficialSource(4)).toEqual([5974, 3678]);
+    expect(projectRearAttachment5PointToOfficialSource(2)).toEqual([3964, 3700]);
+    expect(projectRearAttachment5PointToOfficialSource(3)).toEqual([3964, 3466]);
+    expect(projectRearAttachment5PointToOfficialSource(4)).toEqual([5920, 2780]);
     expect(projectRearAttachment5PointToOfficialSource(5)[0]).toBeCloseTo(5987, 10);
     expect(projectRearAttachment5PointToOfficialSource(5)[1]).toBeCloseTo(2000, 10);
-    expect(projectRearAttachment5PointToOfficialSource(6)).toEqual([6108, 3678]);
-    expect(rearAttachment5ReferencePointById(2).calibration).toBe('satellite-override');
-    expect(rearAttachment5ReferencePointById(3).calibration).toBe('satellite-override');
-    expect(rearAttachment5ReferencePointById(4).calibration).toBe('satellite-override');
+    expect(projectRearAttachment5PointToOfficialSource(6)).toEqual([6190.975433526012, 3021.965317919075]);
+    expect(rearAttachment5ReferencePointById(2).calibration).toBe('canonical-source');
+    expect(rearAttachment5ReferencePointById(3).calibration).toBe('canonical-source');
+    expect(rearAttachment5ReferencePointById(4).calibration).toBe('canonical-source');
     expect(rearAttachment5ReferencePointById(5).calibration).toBe('interior-affine');
-    expect(rearAttachment5ReferencePointById(6).calibration).toBe('satellite-override');
+    expect(rearAttachment5ReferencePointById(6).calibration).toBe('canonical-source');
     expect(projectRearAttachment5InteriorPercentToOfficialSource([80, 30])[0]).toBeCloseTo(5510, 10);
     expect(projectRearAttachment5InteriorPercentToOfficialSource([80, 30])[1]).toBeCloseTo(4200, 10);
 
-    const junction = projectRearAttachment5PointToOfficialSource(2);
     const approach = projectRearAttachment5PointToOfficialSource(4);
     const gate = projectRearAttachment5PointToOfficialSource(6);
-    expect(REAR_CALIBRATED_AXES.brasiliaNorthToJunction.at(-1)).toEqual(junction);
-    expect(REAR_CALIBRATED_AXES.brasiliaNorthToJunction[0][0]).toBeLessThan(junction[0]);
+    expect(REAR_CALIBRATED_AXES.ubiretamaPoint5ToGateJunction.at(-1)).toEqual(approach);
+    expect(REAR_CALIBRATED_AXES.ubiretamaGateJunctionToUruguai[0]).toEqual(approach);
     expect(REAR_CALIBRATED_AXES.gate5InternalApproach[0]).toEqual(approach);
     expect(REAR_CALIBRATED_AXES.gate5InternalApproach.at(-1)).toEqual(gate);
 
@@ -278,15 +277,13 @@ describe('área posterior — identidades, seleção e busca sem duplicação', 
   });
 
   it('resolve hit-tests das ribbons diretamente para as entidades oficiais', () => {
-    const brasilia = REAR_PARK_ROAD_NETWORK.find((road) => road.id === 'brasilia-north-junction')!;
     const ubiretama = REAR_PARK_ROAD_NETWORK.find(
-      (road) => road.id === 'ubiretama-junction-a5',
+      (road) => road.id === 'ubiretama-gate-uruguai',
     )!;
     const highway = REAR_PARK_ROAD_NETWORK.find((road) => road.id === 'br472-north-ramp')!;
-    const brasiliaPoint = rearRoadLocalPath(brasilia)[0];
-    const ubiretamaPoint = officialPdfPointToLocal(REAR_CALIBRATED_AXES.ubiretamaJunctionToA5[3]);
+    const ubiretamaPoint = officialPdfPointToLocal(REAR_CALIBRATED_AXES.ubiretamaGateJunctionToUruguai[3]);
     const highwayPoint = rearRoadLocalPath(highway)[1];
-    expect(resolveRearRoadOwnerAtLocalPoint(brasiliaPoint, 'park')).toBe('RUA-BRASILIA');
+    expect(GENERATED_REAR_ROAD_SEGMENTS.some((road) => road.roadId === 'RUA-BRASILIA')).toBe(false);
     expect(ubiretama.officialOwnerIdentifier).toBe('RUA-UBIRETAMA');
     expect(resolveRearRoadOwnerAtLocalPoint(ubiretamaPoint, 'park')).toBe('RUA-UBIRETAMA');
     expect(resolveRearRoadOwnerAtLocalPoint(highwayPoint, 'highway')).toBe('RODOVIA-RS-472');
@@ -304,51 +301,35 @@ describe('área posterior — identidades, seleção e busca sem duplicação', 
 });
 
 describe('área posterior — topologia de satélite e rodovia independente', () => {
-  it('materializa o cruzamento de quatro braços ao sul do campo, sem S ou dogleg', () => {
+  it('materializa a curva lateral da Ubiretama até o Portão 5 sem a pista longitudinal antiga', () => {
     const path = roadGraphPath('brasilia', 'A5');
     expect(path).toEqual([
-      'brasilia-north',
-      'brasilia-ubiretama-junction',
-      'ubiretama-a5',
+      'brasilia-reference-3',
+      'ubiretama-uruguai-join',
+      'ubiretama-gate-junction',
       'gate-5',
     ]);
-    const junction = REAR_ROAD_NODES['brasilia-ubiretama-junction'].sourcePoint;
-    expect(junction[0]).toBeCloseTo(3964, 10);
-    expect(junction[1]).toBeCloseTo(3466, 10);
+    const junction = REAR_ROAD_NODES['ubiretama-gate-junction'].sourcePoint;
+    expect(junction).toEqual([5920, 2780]);
     expect(roadGraphHasPath('ubiretama', 'brasilia')).toBe(true);
-    expect(degree('brasilia-ubiretama-junction')).toBe(4);
-    expect(GENERATED_REAR_ROAD_SEGMENTS.filter((road) => road.roadId === 'RUA-BRASILIA')).toHaveLength(2);
+    expect(degree('ubiretama-gate-junction')).toBe(3);
+    expect(GENERATED_REAR_ROAD_SEGMENTS.filter((road) => road.roadId === 'RUA-BRASILIA')).toHaveLength(0);
     expect(GENERATED_REAR_ROAD_SEGMENTS.filter((road) => road.roadId === 'RUA-UBIRETAMA')).toHaveLength(2);
-    expect(REAR_PARK_ROAD_NETWORK.some((road) => road.id === 'brasilia-point-3-ubiretama-4')).toBe(false);
-    const brasiliaAxis = [
-      ...REAR_CALIBRATED_AXES.brasiliaNorthToJunction,
-      ...REAR_CALIBRATED_AXES.brasiliaJunctionToSouth.slice(1),
-    ];
-    const brasiliaSpan = sourceSpan(brasiliaAxis);
-    expect(isNonDecreasing(brasiliaAxis.map(([, y]) => y))).toBe(true);
-    expect(isNonDecreasing(brasiliaAxis.map(([x]) => x))).toBe(true);
-    expect(brasiliaSpan.y).toBeGreaterThan(brasiliaSpan.x * 50);
-    expect(polylineDistance(brasiliaAxis)).toBeLessThan(pointDistance(
-      brasiliaAxis[0], brasiliaAxis.at(-1)!,
-    ) * 1.01);
+    expect(REAR_PARK_ROAD_NETWORK.some((road) => road.id === 'brasilia-north-junction')).toBe(false);
+    expect(REAR_PARK_ROAD_NETWORK.some((road) => road.id === 'brasilia-junction-south')).toBe(false);
 
-    const field = ARENA_FRONT_LAYOUT.westApron.sourceBounds;
-    expect(junction[0]).toBeLessThan(field[0]);
-    expect(junction[1]).toBeGreaterThan(field[3]);
-
-    const ubiretamaAxis = REAR_CALIBRATED_AXES.ubiretamaJunctionToA5;
+    const ubiretamaAxis = REAR_CALIBRATED_AXES.ubiretamaGateJunctionToUruguai;
     const ubiretamaSpan = sourceSpan(ubiretamaAxis);
     expect(ubiretamaAxis[0]).toEqual(junction);
-    expect(isNonDecreasing(ubiretamaAxis.map(([x]) => x))).toBe(true);
-    expect(ubiretamaSpan.x).toBeGreaterThan(ubiretamaSpan.y * 8);
-    expect(polylineDistance(ubiretamaAxis)).toBeLessThan(pointDistance(
+    expect(ubiretamaSpan.x).toBeGreaterThan(1400);
+    expect(ubiretamaSpan.y).toBeGreaterThan(650);
+    expect(polylineDistance(ubiretamaAxis)).toBeGreaterThan(pointDistance(
       ubiretamaAxis[0], ubiretamaAxis.at(-1)!,
-    ) * 1.01);
+    ));
 
     const removedWrongPoints: readonly Point2[] = [
-      [4522, 3218], [4535, 3280], [4535, 3455], [4492, 3466],
-      [5920, 2780], [5885, 3000], [5750, 3235], [5350, 3252], [5000, 3240],
-      [6190.975433526012, 3021.965317919075], [6266.926335827044, 3234.233541884527],
+      [3950, 2445], [3954, 2580], [3958, 2720], [3962, 2910],
+      [3963, 3180], [3963, 3330], [3964, 3980],
     ];
     const renderedSourcePoints = GENERATED_REAR_ROAD_SEGMENTS.flatMap(
       (road) => road.sourceControlPoints,
@@ -395,11 +376,10 @@ describe('área posterior — topologia de satélite e rodovia independente', ()
     expect(JSON.stringify({ nodes: REAR_ROAD_NODES, roads: REAR_PARK_ROAD_NETWORK })).not.toContain('A3');
   });
 
-  it('mantém a Brasília oficial e substitui somente Ubiretama e RS-472', () => {
+  it('preserva os cadastros e substitui as três apresentações posteriores incompatíveis', () => {
     expect(REPLACED_OFFICIAL_ROAD_IDENTIFIERS).toEqual([
-      'RUA-UBIRETAMA', 'RODOVIA-RS-472',
+      'RUA-BRASILIA', 'RUA-UBIRETAMA', 'RODOVIA-RS-472',
     ]);
-    expect(REPLACED_OFFICIAL_ROAD_IDENTIFIERS).not.toContain('RUA-BRASILIA');
     expect(REPLACED_OFFICIAL_ROAD_IDENTIFIERS).not.toContain('AV-IMIGRANTES');
     expect(PROTECTED_ROAD_IDENTIFIERS).toEqual(expect.arrayContaining([
       'RUA-UBIRETAMA', 'RUA-BRASILIA', 'AV-IMIGRANTES', 'RODOVIA-RS-472',
@@ -458,7 +438,7 @@ describe('área posterior — exclusões espaciais, profundidade e ambiente', ()
       expect(REAR_ROAD_JUNCTION_ELEVATION_LIFT).toBeLessThan(0.004);
       expect(detailed.diagnostics.junctionCount).toBeGreaterThanOrEqual(5);
 
-      const crossing = REAR_ROAD_NODES['brasilia-ubiretama-junction'].position;
+      const crossing = REAR_ROAD_NODES['ubiretama-gate-junction'].position;
       const positions = detailed.parkAsphalt!.getAttribute('position');
       const yAtCenter: number[] = [];
       for (let index = 0; index < positions.count; index += 1) {
