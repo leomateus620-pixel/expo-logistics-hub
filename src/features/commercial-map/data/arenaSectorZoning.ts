@@ -76,7 +76,7 @@ export const ARENA_SECTOR_SURFACE_ZONES: readonly ArenaSurfaceZone[] = [
   zone('parking-visitantes', 'PARKING', [[5350, 3400], [5980, 3480], [5900, 4250], [5350, 4140]]),
   // Rua Brasil, chegando pelo oeste.
   zone('rua-brasil', 'ROAD', rect([4106, 3096, 4520, 3191])),
-  // Campo de futebol: superfície própria, também recortada do terreno.
+  // Campo gramado sem marcações: superfície própria a oeste da Arena.
   zone('football-field', 'SPORTS_FIELD', rect(inflate(ARENA_FRONT_LAYOUT.footballField.sourceBounds))),
 ];
 
@@ -115,4 +115,4 @@ export function isArenaTerrainExcluded(x: number, z: number) {
   return resolveArenaSurfaceOwner(x, z) !== null;
 }
 
-export const ARENA_SECTOR_ZONING_REVISION = '2028.1-arena-access-reference.1';
+export const ARENA_SECTOR_ZONING_REVISION = '2028.1-arena-br472-satellite.1';

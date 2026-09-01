@@ -42,7 +42,7 @@ export interface LocalBounds {
   centerZ: number;
 }
 
-export const PARK_ENVIRONMENT_REVISION = '2028.1-arena-access-reference.2';
+export const PARK_ENVIRONMENT_REVISION = '2028.1-arena-br472-satellite.1';
 
 export const PARK_ENVIRONMENT_CLASSIFICATION_LABELS: Readonly<Record<ParkEnvironmentClassification, string>> = {
   NON_COMMERCIAL_STRUCTURE: 'Estrutura não comercial',
@@ -58,8 +58,8 @@ export const PARK_ENVIRONMENT_CLASSIFICATION_LABELS: Readonly<Record<ParkEnviron
 export const ARENA_FRONT_SOURCE_REFERENCES = [
   'Anexo 1 — vazio atual entre Espaço Mirante, Arena Sicredi - Icatu e Centro de Eventos',
   'Anexo 4 — leitura conjunta das quadras, taludes, escadaria e praça cívica',
-  'Anexo 5 — leitura frontal dos patamares, três setores de degraus e corrimãos',
-  'Satélite 2026-08-21 — escadaria oeste-leste e duas quadras junto à borda sul da Exporural',
+  '03-sat-detail.jpg — Rua Brasília a oeste da Arena, Rua Ubiretama ao sul e campo gramado sem marcações',
+  '04-sat-br472.jpg — acesso do Portão 5 e entroncamento com a BR-472',
 ] as const;
 
 /**
@@ -79,9 +79,13 @@ export const ARENA_FRONT_LAYOUT = {
   courtAnchors: ['QUADRA-R', 'EXPORURAL'] as const,
   courtOwners: ['QUADRA-R', 'EXPORURAL'] as const,
   plaza: {
+    // A praça conserva o setor cívico e o apron sul, com um recorte real para
+    // o pequeno campo gramado observado a oeste da Arena.
     sourcePolygon: [
       [4116, 2682],
-      [4888, 2682],
+      [4560, 2682],
+      [4560, 2948],
+      [4888, 2948],
       [4888, 3096],
       [4498, 3100],
       [4116, 3098],
@@ -144,21 +148,22 @@ export const ARENA_FRONT_LAYOUT = {
     blendDistance: 1.15,
   },
   /**
-   * Campo de futebol de grama natural atrás/ao lado da Arena, a leste do volume
-   * construído e junto à borda norte do estacionamento de expositores.
+   * Campo de grama natural não demarcado a oeste da Arena, entre o volume
+   * construído e a faixa cívica da escadaria/praça.
    */
   footballField: {
-    sourceBounds: [5410, 2800, 5900, 3120] as SourceBounds,
+    sourceBounds: [4560, 2708, 4884, 2948] as SourceBounds,
     turfInset: 0.18,
-    markingInset: 0.34,
+    markingInset: 0,
     turfColor: '#7f9a5c',
     wornColor: '#98a074',
+    markings: false,
   },
   /** Caminhos de circulação entre escadaria, quadras, Arena, campo e estacionamento. */
   walkways: [
     { id: 'arena-walkway-stairs-apron', sourcePath: [[4480, 2895], [4680, 2895], [4880, 2860]] as readonly SourcePoint[], width: 0.34 },
     { id: 'arena-walkway-courts-plaza', sourcePath: [[4620, 2682], [4620, 2560], [4620, 2480]] as readonly SourcePoint[], width: 0.26 },
-    { id: 'arena-walkway-arena-field', sourcePath: [[5395, 3180], [5620, 3190], [5850, 3196]] as readonly SourcePoint[], width: 0.26 },
+    { id: 'arena-walkway-arena-field', sourcePath: [[4520, 2880], [4560, 2830], [4700, 2828]] as readonly SourcePoint[], width: 0.26 },
     { id: 'arena-walkway-arena-parking', sourcePath: [[5140, 3140], [5150, 3200], [5160, 3250]] as readonly SourcePoint[], width: 0.24 },
   ] as const,
   /** Massas arbóreas do setor, lidas nos anexos 3 e 4 (conferência de campo recomendada). */
@@ -178,14 +183,14 @@ export const ARENA_FRONT_LAYOUT = {
     { sourcePosition: [5580, 2645] as SourcePoint, scale: 0.94 },
     { sourcePosition: [5720, 2655] as SourcePoint, scale: 1.08 },
     { sourcePosition: [5860, 2690] as SourcePoint, scale: 0.96 },
-    { sourcePosition: [5920, 2870] as SourcePoint, scale: 1.06 },
+    { sourcePosition: [5800, 2860] as SourcePoint, scale: 1.06 },
     { sourcePosition: [5930, 3050] as SourcePoint, scale: 0.92 },
-    // Same four landscape trees, shifted to the grass shoulder of corrected
-    // Rua Brasília. Keep canopies as well as trunks out of its carriageway.
-    { sourcePosition: [5920, 3265] as SourcePoint, scale: 1.04 },
-    { sourcePosition: [5700, 3265] as SourcePoint, scale: 0.98 },
-    { sourcePosition: [5480, 3260] as SourcePoint, scale: 1.1 },
-    { sourcePosition: [5230, 3260] as SourcePoint, scale: 0.9 },
+    // Same four landscape trees, shifted north onto the grass shoulder of
+    // corrected Rua Ubiretama. Keep canopies and trunks out of its carriageway.
+    { sourcePosition: [5920, 3188] as SourcePoint, scale: 1.04 },
+    { sourcePosition: [5700, 3184] as SourcePoint, scale: 0.98 },
+    { sourcePosition: [5480, 3178] as SourcePoint, scale: 1.1 },
+    { sourcePosition: [5230, 3172] as SourcePoint, scale: 0.9 },
   ] as const,
   northBerm: {
     sourceBounds: [4120, 2682, 4480, 2720] as SourceBounds,
@@ -296,14 +301,14 @@ export const PARK_ENVIRONMENT_FEATURES: readonly ParkEnvironmentFeature[] = [
   },
   {
     id: 'arena-front-football-field',
-    name: 'Campo de futebol da Arena',
+    name: 'Campo gramado sem marcações da Arena',
     classification: 'SPORTS_FIELD',
     isSellable: false,
     contributesToCommercialMetrics: false,
     sourceBounds: ARENA_FRONT_LAYOUT.footballField.sourceBounds,
     sourceReferences: ARENA_FRONT_SOURCE_REFERENCES,
     verificationStatus: 'FIELD_REVIEW_RECOMMENDED',
-    notes: 'Campo de grama natural atrás/ao lado da Arena, junto à borda norte do estacionamento de expositores; apresentação, nunca lote comercial.',
+    notes: 'Pequeno campo de grama natural sem linhas, traves ou redes, a oeste da Arena e separado da escadaria; apresentação, nunca lote comercial.',
   },
   {
     id: 'arena-front-pedestrian-paths',

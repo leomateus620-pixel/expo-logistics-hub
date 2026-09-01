@@ -189,13 +189,42 @@ export function rearParkingLayerPresentation(entities: readonly MapEntity[], vis
   return { visible: layerIds.every((id) => visibility[id] !== false) && strength > 0.015, opacity: strength };
 }
 
+function arenaRoadParkingPresentation(entity: MapEntity): MapEntity | null {
+  if (entity.publicIdentifier !== 'EST-EXP-VIS' || entity.classification !== 'PARKING') return null;
+  const ring = openParkingPolygon(entity.geometry.coordinates[0] ?? []);
+  if (ring.length !== 4 || entity.geometry.coordinates.length !== 1) return null;
+  const sourcePolygon = [
+    [4558, 3242],
+    [4700, 3250],
+    [5000, 3262],
+    [5350, 3274],
+    [5270, 4140],
+    [4510, 4140],
+    [4510, 3488],
+    [4558, 3488],
+    [4558, 3222],
+  ] as const;
+  return {
+    ...entity,
+    geometry: {
+      ...entity.geometry,
+      coordinates: [sourcePolygon.map((point) => officialPdfPointToLocal(point))],
+    },
+    metadata: {
+      ...entity.metadata,
+      parkingPresentationCut: 'RUA_UBIRETAMA_WEST_EDGE_CANONICAL_UNCHANGED',
+    },
+  };
+}
+
 /**
- * J was a coarse rectangular fill (already NEEDS_REVIEW), not a ride/building
- * model. Its western strip intersects 36 drawn stall polygons (19 A3:E and
- * 17 A2:W; only the A3 centres are inside). Trim ONLY that fill along the drawn
- * A inner boundary. Never change the canonical entity or custom polygons.
+ * Presentation-only cuts keep real circulation visible without changing the
+ * cadastral entities. The Arena parking loses only the narrow west-edge channel
+ * occupied by Rua Ubiretama; J keeps its Annex 5 inner-boundary correction.
  */
 export function rearParkingEntityForPresentation(entity: MapEntity): MapEntity {
+  const arenaParking = arenaRoadParkingPresentation(entity);
+  if (arenaParking) return arenaParking;
   if (entity.publicIdentifier !== 'J' || entity.classification !== 'ATTRACTION') return entity;
   const ring = openParkingPolygon(entity.geometry.coordinates[0] ?? []);
   const bounds = parkingBounds(ring);

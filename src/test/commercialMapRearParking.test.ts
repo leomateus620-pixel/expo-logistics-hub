@@ -9,7 +9,11 @@ import {
   rearParkingVisibleInArea, rearParkingLayerPresentation, reconcileRearParkingTrees, rearParkingEntityForPresentation,
 } from '@/features/commercial-map/data/rearParking';
 import { REAR_PARKING_SOURCE_ROWS } from '@/features/commercial-map/data/rearParkingSource';
-import { OFFICIAL_REFERENCE_DATA, OFFICIAL_REFERENCE_ENTITIES } from '@/features/commercial-map/data/officialReference2026';
+import {
+  OFFICIAL_REFERENCE_DATA,
+  OFFICIAL_REFERENCE_ENTITIES,
+  officialPdfPointToLocal,
+} from '@/features/commercial-map/data/officialReference2026';
 import { COMMERCIAL_MAP_TREES } from '@/features/commercial-map/data/commercialTrees';
 import { parkingBoundsPolygon, parkingContainsPoint, parkingCorridorPolygon, parkingPolygonArea } from '@/features/commercial-map/utils/parkingGeometry';
 import { scopeCommercialMapData } from '@/features/commercial-map/utils/areaScope';
@@ -84,6 +88,29 @@ describe('rear parking annex registration and identity', () => {
     expect(rearParkingEntityForPresentation(pavilion)).toBe(pavilion);
     const custom = { ...original, geometry: { ...original.geometry, coordinates: [[[0, 0], [2, 0], [1, 1], [0, 0]]] as [number, number][][] } };
     expect(rearParkingEntityForPresentation(custom)).toBe(custom);
+  });
+
+  it('recorta somente a apresentação do estacionamento onde a Ubiretama cruza sua borda oeste', () => {
+    const parking = OFFICIAL_REFERENCE_ENTITIES.find(
+      (entity) => entity.publicIdentifier === 'EST-EXP-VIS',
+    )!;
+    const before = JSON.stringify(parking);
+    const presented = rearParkingEntityForPresentation(parking);
+    expect(presented.id).toBe(parking.id);
+    expect(presented).not.toBe(parking);
+    expect(parkingContainsPoint(
+      officialPdfPointToLocal([4535, 3350]),
+      presented.geometry.coordinates[0],
+    )).toBe(false);
+    expect(parkingContainsPoint(
+      officialPdfPointToLocal([5000, 3250]),
+      presented.geometry.coordinates[0],
+    )).toBe(false);
+    expect(parkingContainsPoint(
+      officialPdfPointToLocal([5000, 3600]),
+      presented.geometry.coordinates[0],
+    )).toBe(true);
+    expect(JSON.stringify(parking)).toBe(before);
   });
 
   it('retains the B concavity instead of replacing it with its bounding rectangle', () => {

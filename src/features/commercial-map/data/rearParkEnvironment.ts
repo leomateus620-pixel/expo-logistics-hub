@@ -15,7 +15,7 @@ import { REAR_SATELLITE_TOPOLOGY } from '../utils/rearSpatialCalibration';
  * oficial por uma única faixa irregular e mantém livres os três corredores:
  * Rua Brasília, acesso do Portão 5 e BR-472.
  */
-export const REAR_PARK_ENVIRONMENT_REVISION = '2026.9-area-posterior-ambiente.6';
+export const REAR_PARK_ENVIRONMENT_REVISION = '2026.9-arena-br472-satellite.1';
 
 export type SourcePoint = readonly [number, number];
 export type SourceBounds = readonly [number, number, number, number];
@@ -78,7 +78,7 @@ export const REAR_TERRAIN_PATCHES: readonly RearTerrainPatch[] = Object.freeze([
 export const REAR_STRUCTURE_EXCLUSIONS: readonly SourceBounds[] = Object.freeze([
   ETHNIC_QUARTER_SOURCE_BOUNDS,
   [4860, 2650, 5430, 3180], // Arena Shows (F)
-  [5410, 2800, 5900, 3120], // campo de futebol
+  [4560, 2708, 4884, 2948], // pequeno campo gramado sem marcações a oeste da Arena
   [3980, 3140, 4530, 3480], // Centro de Eventos (C1)
   [3970, 2420, 4120, 2850], // Espaço Mirante (D3)
   [4960, 2350, 5120, 2500], // Churrascaria Exporural (C4)

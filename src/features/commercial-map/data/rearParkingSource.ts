@@ -27,6 +27,12 @@ export interface RearParkingSourceRow {
   headings?: readonly number[];
 }
 
+/**
+ * ANALYST 2026.9-arena-br472-analyst.1 — this Annex 5 stall inventory is the
+ * WEST park parking (Pavilhão 09), not EST-EXP-VIS behind Arena F. Do not
+ * delete rows to “open” Rua Brasília. The parking Brasília/Ubiretama cross is
+ * cadastral EST-EXP-VIS / EST-VIS. Spec: docs/arena-roads/analysis.md §4.5.
+ */
 /** Uniform registration keeps proportions: PDF = offset - 1.35 * sourcePixel. */
 export const REAR_PARKING_PLAN_TRANSFORM = {
   scale: 1.35,

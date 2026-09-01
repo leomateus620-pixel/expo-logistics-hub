@@ -117,7 +117,7 @@ function sourceBoundsOverlapPolygon(bounds: SourceBounds, polygon: readonly Sour
 
 describe('infraestrutura ambiental do parque', () => {
   it('mantém inventário ambiental versionado, explícito e fora das métricas comerciais', () => {
-    expect(PARK_ENVIRONMENT_REVISION).toBe('2028.1-arena-access-reference.2');
+    expect(PARK_ENVIRONMENT_REVISION).toBe('2028.1-arena-br472-satellite.1');
     expect(PARK_ENVIRONMENT_FEATURES).toHaveLength(9);
     expect(new Set(PARK_ENVIRONMENT_FEATURES.map((feature) => feature.id)).size)
       .toBe(PARK_ENVIRONMENT_FEATURES.length);
@@ -145,6 +145,7 @@ describe('infraestrutura ambiental do parque', () => {
 
   it('orienta a escadaria para a Arena e ancora as quadras junto à borda sul da Exporural', () => {
     const stairs = ARENA_FRONT_LAYOUT.stairs.sourceBounds;
+    const footballField = ARENA_FRONT_LAYOUT.footballField.sourceBounds;
     const multiSport = ARENA_FRONT_LAYOUT.multiSportCourt.sourceBounds;
     const volleyball = ARENA_FRONT_LAYOUT.sandVolleyballCourt.sourceBounds;
     const localStairs = sourceBoundsToLocal(stairs);
@@ -172,6 +173,10 @@ describe('infraestrutura ambiental do parque', () => {
     expect(localVolleyball.centerX).toBeLessThan(localMultiSport.centerX);
     expect(localVolleyball.maxX).toBeLessThan(localMultiSport.minX);
     expect(localMultiSport.maxZ).toBeLessThan(localStairs.minZ);
+    expect(footballField).toEqual([4560, 2708, 4884, 2948]);
+    expect(footballField[2]).toBeLessThan(4900);
+    expect(footballField[0]).toBeGreaterThan(stairs[2]);
+    expect(ARENA_FRONT_LAYOUT.footballField.markings).toBe(false);
 
     const protectedIdentifiers = ['D3', 'B16', 'B17', 'F', 'C1', 'RUA-BRASIL', 'E-10', 'E-13'];
     const infrastructureBounds = [
@@ -193,6 +198,18 @@ describe('infraestrutura ambiental do parque', () => {
         expect(sourceBoundsOverlapPolygon(bounds, polygon), `${identifier}: ${bounds.join(',')}`)
           .toBe(false);
       });
+    });
+
+    [
+      'F', 'D3', 'D1', 'C1', 'RUA-BRASILIA', 'RUA-BRASIL',
+    ].forEach((identifier) => {
+      expect(
+        sourceBoundsOverlap(footballField, sourceBoundsForEntity(identifier)),
+        `${identifier}: ${footballField.join(',')}`,
+      ).toBe(false);
+    });
+    [stairs, multiSport, volleyball].forEach((bounds) => {
+      expect(sourceBoundsOverlap(footballField, bounds), `campo: ${bounds.join(',')}`).toBe(false);
     });
   });
 
@@ -232,13 +249,17 @@ describe('infraestrutura ambiental do parque', () => {
     const metalPasses = (renderer.match(/<MetalInfrastructure\b/g) ?? []).length;
     const fullSceneDrawCalls = primaryDrawCalls + metalPasses - 1;
     expect(ARENA_FRONT_PRIMARY_DRAW_CALL_BUDGET).toBe(18);
-    expect(primaryDrawCalls).toBe(16);
-    expect(fullSceneDrawCalls).toBe(17);
+    expect(primaryDrawCalls).toBe(15);
+    expect(fullSceneDrawCalls).toBe(16);
     expect(fullSceneDrawCalls).toBeLessThanOrEqual(ARENA_FRONT_PRIMARY_DRAW_CALL_BUDGET);
     expect(renderer.match(/<instancedMesh/g)?.length).toBeGreaterThanOrEqual(5);
     expect(renderer).toContain('degraus-concreto-arena');
     expect(renderer).toContain('redes-volei-arena');
     expect(renderer).toContain('tabelas-basquete-arena');
+    expect(renderer).toContain('gramado-sem-marcacoes-arena');
+    expect(renderer).not.toContain('footballFieldLineGeometry');
+    expect(renderer).not.toContain('marcacoes-campo-arena');
+    expect(renderer).not.toContain("'pitchTurf'");
     expect(renderer).toContain('raycast={NO_RAYCAST}');
     expect(renderer).toContain('reducedGraphics');
     expect(renderer).toContain('userData={STAIRS_USER_DATA}');

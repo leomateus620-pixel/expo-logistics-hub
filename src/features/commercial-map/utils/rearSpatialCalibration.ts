@@ -6,8 +6,9 @@ import { officialPdfPointToLocal } from '../data/officialReference2026';
  * Os seis percentuais pertencem ao mesmo plano do anexo e são projetados por
  * uma única transformação afim rotacionada. A matriz é fixada por três marcos
  * rastreáveis: o término oficial da Rua das Etnias (P1), a aproximação livre da
- * Rua Brasília (P2) e o corredor oficial da Rua Ubiretama (P5). P3, P4 e P6
- * são resultados da mesma matriz; não recebem ajustes independentes.
+ * Rua Brasília (P2) e o corredor oficial da Rua Ubiretama (P5). O satélite
+ * substitui os antigos despejos afins P3/P4, que criavam o desvio vermelho ao
+ * sul/leste da Arena; P6 continua sendo a passagem física já calibrada.
  *
  * A rotação é necessária porque o enquadramento do anexo 5 está girado em
  * relação ao recorte oficial do parque. Os três marcos foram escolhidos depois
@@ -15,14 +16,14 @@ import { officialPdfPointToLocal } from '../data/officialReference2026';
  * É um registro cartográfico de apresentação, não um levantamento geodésico:
  * os anexos não fornecem CRS, escala métrica certificada ou pontos de campo.
  */
-export const REAR_SPATIAL_CALIBRATION_REVISION = '2026.9-rear-attachment-5-satellite-8';
+export const REAR_SPATIAL_CALIBRATION_REVISION = '2026.9-arena-br472-satellite.1';
 
 export type Point2 = readonly [number, number];
 export type RearAttachment5PointId = 1 | 2 | 3 | 4 | 5 | 6;
 export type RearAttachment5PointRole =
   | 'etnias-terminus'
   | 'brasilia-axis'
-  | 'brasilia-ubiretama-junction'
+  | 'ubiretama-gate-junction'
   | 'ubiretama-axis'
   | 'gate-5';
 
@@ -33,7 +34,7 @@ export interface RearAttachment5ReferencePoint {
   percent: Point2;
   attachmentPixel: Point2;
   officialSource: Point2;
-  calibration: 'canonical-terminus' | 'interior-affine';
+  calibration: 'canonical-source' | 'interior-affine';
 }
 
 /** Dimensões reais do IMG_9933, incluindo sua borda inferior. Percentuais não
@@ -95,7 +96,7 @@ function attachment5Point(
       REAR_ATTACHMENT_5_REFERENCE.pixelSize[1] * (percent[1] / 100),
     ] as Point2,
     officialSource,
-    calibration: options.canonicalSource ? 'canonical-terminus' : 'interior-affine',
+    calibration: options.canonicalSource ? 'canonical-source' : 'interior-affine',
   });
 }
 
@@ -104,8 +105,12 @@ export const REAR_ATTACHMENT_5_REFERENCE_POINTS = Object.freeze([
     canonicalSource: [5510, 4200],
   }),
   attachment5Point(2, 'Rua Brasília — aproximação sul', 'brasilia-axis', [53, 73]),
-  attachment5Point(3, 'Rua Brasília — mesmo eixo contínuo', 'brasilia-axis', [53, 46]),
-  attachment5Point(4, 'Entroncamento Rua Brasília / Rua Ubiretama', 'brasilia-ubiretama-junction', [55, 15]),
+  attachment5Point(3, 'Rua Brasília — entroncamento oeste com Rua Ubiretama', 'brasilia-axis', [53, 46], {
+    canonicalSource: [3964, 3466],
+  }),
+  attachment5Point(4, 'Bifurcação Rua Ubiretama / acesso ao Portão 5', 'ubiretama-gate-junction', [55, 15], {
+    canonicalSource: [5920, 2780],
+  }),
   attachment5Point(5, 'Rua Ubiretama — trajetória oeste', 'ubiretama-axis', [38, 20]),
   attachment5Point(6, 'Portão 5 — apresentação da entidade oficial A5', 'gate-5', [62, 13]),
 ] as const satisfies readonly RearAttachment5ReferencePoint[]);
@@ -129,15 +134,17 @@ const gate5PresentationSource = rearAttachment5ReferencePointById(6).officialSou
 export const REAR_OFFICIAL_ANCHORS = Object.freeze({
   /** Cadastro preservado; busca, seleção e persistência continuam na entidade A5. */
   gate5Entity: [5974, 3678] as Point2,
-  /** Passagem física corrigida no P6 do anexo. */
+  /** ANALYST: P6 stays `[6190.98, 3021.97]`. Do not move to A5 Y.
+   * Flare trevo only. arena-roads/ANALYSIS.md §3.2 / §7. */
   gate5VehicleAccess: gate5PresentationSource,
-  /** Acesso com a deflexão de 8,72° e a proporção observada no IMG_9936. */
+  /** ANALYST: keep J `[6266.93, 3234.23]`; add flare samples, do not digitise
+   * the green BR-472 highlighter. */
   br472Junction: [6266.926335827044, 3234.233541884527] as Point2,
 });
 
 /**
  * A numeração do IMG_9936 é independente da numeração P1–P6 do quadro:
- * P2 = aproximação interna, P1 = portão, P3 = entroncamento da BR.
+ * P2 = entroncamento Ubiretama/A5, P1 = portão, P3 = entroncamento da BR.
  */
 export const REAR_SATELLITE_TOPOLOGY = Object.freeze({
   references: Object.freeze([
@@ -147,7 +154,7 @@ export const REAR_SATELLITE_TOPOLOGY = Object.freeze({
   points: Object.freeze([
     Object.freeze({
       id: 2 as const,
-      role: 'rua-brasilia-approach' as const,
+      role: 'ubiretama-gate-junction' as const,
       satellitePixel: [590, 1000] as Point2,
       officialSource: rearAttachment5ReferencePointById(4).officialSource,
     }),
@@ -179,46 +186,57 @@ export const REAR_CALIBRATED_AXES = Object.freeze({
   ] as readonly Point2[]),
   brasiliaPoint2ToPoint3: Object.freeze([
     rearAttachment5ReferencePointById(2).officialSource,
-    [3964, 3500],
-    [3977, 3350],
-    [3977, 3155],
-    [4400, 3155],
-    [4800, 3155],
-    [4860, 3190],
+    [3964, 3600],
     rearAttachment5ReferencePointById(3).officialSource,
   ] as readonly Point2[]),
-  brasiliaPoint3ToUbiretama: Object.freeze([
-    rearAttachment5ReferencePointById(3).officialSource,
-    [5500, 3200],
-    [5900, 3200],
-    [6030, 3180],
-    [6090, 3000],
-    rearAttachment5ReferencePointById(4).officialSource,
-  ] as readonly Point2[]),
-  ubiretamaPoint5ToBrasilia: Object.freeze([
+  ubiretamaPoint5ToGateJunction: Object.freeze([
     rearAttachment5ReferencePointById(5).officialSource,
-    [5987, 2100],
     [5987, 2300],
-    [6010, 2450],
-    [6070, 2600],
+    [5968, 2550],
     rearAttachment5ReferencePointById(4).officialSource,
+  ] as readonly Point2[]),
+  ubiretamaGateJunctionToOfficialHandoff: Object.freeze([
+    rearAttachment5ReferencePointById(4).officialSource,
+    [5885, 3000],
+    [5750, 3235],
+    [5350, 3252],
+    [5000, 3240],
+    [4700, 3228],
+    [4522, 3218],
+    [4535, 3280],
+    [4535, 3455],
+    [4492, 3466],
+  ] as readonly Point2[]),
+  // A faixa oficial RUA-URUGUAI-LESTE completa o T sem asfalto duplicado.
+  ubiretamaOfficialHandoffToBrasilia: Object.freeze([
+    [4492, 3466],
+    rearAttachment5ReferencePointById(3).officialSource,
   ] as readonly Point2[]),
   gate5InternalApproach: Object.freeze([
     rearAttachment5ReferencePointById(4).officialSource,
-    [6142, 2800],
-    [6160, 2920],
+    [6040, 2860],
+    [6120, 2940],
     REAR_OFFICIAL_ANCHORS.gate5VehicleAccess,
   ] as readonly Point2[]),
   a5ExternalAccess: Object.freeze([
     REAR_OFFICIAL_ANCHORS.gate5VehicleAccess,
-    [6195, 3130],
-    [6210, 3227],
+    [6218, 3105],
+    [6244, 3188],
+    [6260, 3226],
     REAR_OFFICIAL_ANCHORS.br472Junction,
   ] as readonly Point2[]),
   br472NorthToJunction: Object.freeze([
-    [6255, 1100], [6258, 1900], [6262, 2600], REAR_OFFICIAL_ANCHORS.br472Junction,
+    [6255, 1100],
+    [6258, 1900],
+    [6262, 2600],
+    [6258, 3100],
+    [6262, 3195],
+    REAR_OFFICIAL_ANCHORS.br472Junction,
   ] as readonly Point2[]),
   br472JunctionToSouth: Object.freeze([
-    REAR_OFFICIAL_ANCHORS.br472Junction, [6285, 3900], [6305, 4400],
+    REAR_OFFICIAL_ANCHORS.br472Junction,
+    [6274, 3380],
+    [6285, 3900],
+    [6305, 4400],
   ] as readonly Point2[]),
 });
