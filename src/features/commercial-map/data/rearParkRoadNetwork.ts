@@ -84,7 +84,7 @@ export interface RearRoadIdentity {
 
 export type RearContextualLabelOwner = RearRoadIdentity['officialOwnerIdentifier'] | 'A5';
 
-export const REAR_PARK_ROAD_REVISION = '2026.9-arena-br472-satellite.3';
+export const REAR_PARK_ROAD_REVISION = '2026.10-longitudinal-ubiretama-gate5.1';
 
 /** Escala uniforme do recorte oficial, usada apenas para larguras físicas. */
 export const SOURCE_POINTS_PER_LOCAL_UNIT = 5500 / 120;
@@ -269,11 +269,12 @@ export const REAR_PARK_ROAD_NETWORK: readonly RoadSegment[] = Object.freeze([
   }),
   segment({
     id: 'ubiretama-west-junction', roadId: 'RUA-UBIRETAMA', name: 'Rua Ubiretama',
-    from: 'ubiretama-west', to: 'brasilia-ubiretama-junction',
+    from: 'ubiretama-west', to: 'brasilia-ubiretama-junction', category: 'park-avenue',
     sourceControlPoints: REAR_CALIBRATED_AXES.ubiretamaWestToJunction,
-    ...officialRoadDefaults,
-    officialOwnerIdentifier: 'RUA-UBIRETAMA',
-    notes: 'Braço oeste do cruzamento de quatro pontas, materializado pela Rua Uruguai oficial.',
+    width: rearRoadSourceToLocalLength(36), shoulderWidth: 0,
+    elevationOffset: 0.032, materialId: 'park-asphalt', markings: 'none',
+    presentation: 'generated-surface', officialOwnerIdentifier: 'RUA-UBIRETAMA',
+    notes: 'Braço oeste contínuo: do acesso da Exporural até o cruzamento com o eixo longitudinal.',
   }),
   segment({
     id: 'ubiretama-junction-a5', roadId: 'RUA-UBIRETAMA', name: 'Rua Ubiretama',
@@ -282,7 +283,7 @@ export const REAR_PARK_ROAD_NETWORK: readonly RoadSegment[] = Object.freeze([
     width: rearRoadSourceToLocalLength(36), shoulderWidth: 0,
     elevationOffset: 0.032, materialId: 'park-asphalt', markings: 'none',
     presentation: 'generated-surface', officialOwnerIdentifier: 'RUA-UBIRETAMA',
-    notes: 'Eixo leste-oeste ao sul do campo: segue a Uruguai Leste até livrar o C1 e desce suavemente até o A5.',
+    notes: 'Eixo leste-oeste contínuo até o encontro com o acesso do Portão 5.',
   }),
   segment({
     id: 'gate5-internal-approach', roadId: 'ACESSO-A5-BR472', name: 'Acesso Portão 5 — rede interna',

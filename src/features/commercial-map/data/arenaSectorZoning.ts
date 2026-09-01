@@ -77,7 +77,7 @@ export const ARENA_SECTOR_SURFACE_ZONES: readonly ArenaSurfaceZone[] = [
   // Rua Brasil, chegando pelo oeste.
   zone('rua-brasil', 'ROAD', rect([4106, 3096, 4520, 3191])),
   // Campo gramado sem marcações: superfície própria a oeste da Arena.
-  zone('football-field', 'SPORTS_FIELD', rect(inflate(ARENA_FRONT_LAYOUT.footballField.sourceBounds))),
+  zone('arena-west-apron', 'CONCRETE_ACCESS', rect(inflate(ARENA_FRONT_LAYOUT.westApron.sourceBounds))),
 ];
 
 const LOCAL_ZONES = ARENA_SECTOR_SURFACE_ZONES.map((item) => ({

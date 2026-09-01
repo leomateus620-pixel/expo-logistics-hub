@@ -15,7 +15,7 @@ import { officialPdfPointToLocal } from '../data/officialReference2026';
  * É um registro cartográfico de apresentação, não um levantamento geodésico:
  * os anexos não fornecem CRS, escala métrica certificada ou pontos de campo.
  */
-export const REAR_SPATIAL_CALIBRATION_REVISION = '2026.9-arena-br472-satellite.3';
+export const REAR_SPATIAL_CALIBRATION_REVISION = '2026.10-longitudinal-ubiretama-gate5.1';
 
 export type Point2 = readonly [number, number];
 export type RearAttachment5PointId = 1 | 2 | 3 | 4 | 5 | 6;
@@ -192,30 +192,36 @@ export const REAR_CALIBRATED_AXES = Object.freeze({
   ruaDasEtniasOfficial: Object.freeze([
     [3940, 4200], [4500, 4200], [5000, 4200], rearAttachment5ReferencePointById(1).officialSource,
   ] as readonly Point2[]),
+  /**
+   * Eixo longitudinal do parque: única faixa livre entre o bosque a oeste e as
+   * edificações oficiais D3/C1/Q-R-04 a leste, auditada pelas exclusões espaciais.
+   */
   brasiliaNorthToJunction: Object.freeze([
-    [3948, 2445],
-    [3952, 2580],
+    [3950, 2445],
+    [3954, 2580],
     [3958, 2720],
     rearAttachment5ReferencePointById(3).officialSource,
-    [3964, 3180],
-    [3964, 3330],
+    [3963, 3180],
+    [3963, 3330],
     rearAttachment5ReferencePointById(2).officialSource,
   ] as readonly Point2[]),
   brasiliaJunctionToSouth: Object.freeze([
     rearAttachment5ReferencePointById(2).officialSource,
-    [3964, 3720],
-    [3964, 3950],
+    [3964, 3700],
+    [3964, 3860],
+    [3964, 3980],
   ] as readonly Point2[]),
-  /** A Rua Uruguai existente materializa o braço oeste do cruzamento de quatro pontas. */
+  /** Braço oeste contínuo da Ubiretama, do acesso da Exporural até o cruzamento. */
   ubiretamaWestToJunction: Object.freeze([
-    [3600, 3466],
+    [3560, 3466],
+    [3760, 3466],
     [3940, 3466],
     rearAttachment5ReferencePointById(2).officialSource,
   ] as readonly Point2[]),
   ubiretamaJunctionToA5: Object.freeze([
     rearAttachment5ReferencePointById(2).officialSource,
-    [4200, 3466],
-    [4510, 3466],
+    [4260, 3470],
+    [4560, 3486],
     [5000, 3538],
     [5400, 3605],
     [5700, 3648],

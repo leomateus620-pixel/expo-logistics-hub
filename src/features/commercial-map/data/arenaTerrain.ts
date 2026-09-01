@@ -51,7 +51,7 @@ function gentleUndulation(x: number, z: number) {
 
 // O patamar segue o campo estreito a oeste/sudoeste de F. A laje ao norte
 // permanece na cota de concreto e não participa deste blend.
-const FIELD = sourceBoundsToLocal(ARENA_FRONT_LAYOUT.footballField.sourceBounds);
+const FIELD = sourceBoundsToLocal(ARENA_FRONT_LAYOUT.westApron.sourceBounds);
 /** Blend, em unidades locais, entre o patamar do campo e o terreno em volta. */
 const FIELD_BLEND = 0.45;
 
@@ -71,7 +71,7 @@ function slopeElevation(x: number, z: number) {
 }
 
 /** Patamar plano que recebe o campo de futebol, tirado da cota central da encosta. */
-export const ARENA_FIELD_PLATEAU_ELEVATION = ARENA_TERRAIN_BASE_ELEVATION
+export const ARENA_WEST_APRON_ELEVATION = ARENA_TERRAIN_BASE_ELEVATION
   + ARENA_TERRAIN_RISE * arenaTerrainSlopeFactor((FIELD.minX + FIELD.maxX) / 2);
 
 export function arenaTerrainElevation(x: number, z: number) {
@@ -79,10 +79,10 @@ export function arenaTerrainElevation(x: number, z: number) {
   const distance = distanceToRectangle(x, z, FIELD);
   if (distance >= FIELD_BLEND) return natural;
   const weight = 1 - smoothstep(0, FIELD_BLEND, distance);
-  return natural + (ARENA_FIELD_PLATEAU_ELEVATION - natural) * weight;
+  return natural + (ARENA_WEST_APRON_ELEVATION - natural) * weight;
 }
 
-export const ARENA_FOOTBALL_FIELD_BOUNDS = FIELD;
+export const ARENA_WEST_APRON_BOUNDS = FIELD;
 
 /** Maior cota amostrada em um retângulo — usada para assentar superfícies planas. */
 export function arenaTerrainPlateauElevation(
