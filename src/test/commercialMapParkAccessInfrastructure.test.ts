@@ -1,7 +1,10 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { PARK_ACCESS_SPATIAL_PLAN } from '@/features/commercial-map/data/parkAccessSpatialPlan';
+import {
+  EXPORURAL_GATE_ACCESS_ROAD_SURFACE_IDS,
+  PARK_ACCESS_SPATIAL_PLAN,
+} from '@/features/commercial-map/data/parkAccessSpatialPlan';
 import {
   PARK_ACCESS_GATE_ARCHITECTURE,
   PARK_ACCESS_ARCHITECTURE_VERTICAL_PROFILE,
@@ -15,8 +18,10 @@ import {
   type ParkAccessInfrastructureInput,
 } from '@/features/commercial-map/utils/parkAccessInfrastructure';
 import {
+  EXPORURAL_PARK_ACCESS_INFRASTRUCTURE_INPUT,
   PARK_ACCESS_OFFICIAL_FLAT_SUPPORT_SURFACES,
   adaptParkAccessSpatialPlan,
+  selectParkAccessRoadInfrastructure,
 } from '@/features/commercial-map/utils/parkAccessSpatialPlanAdapter';
 
 const fixtures: ParkAccessInfrastructureInput = {
@@ -213,6 +218,7 @@ describe('infraestrutura externa parametrizada do mapa comercial', () => {
       expect(detailed.diagnostics).toMatchObject({
         roadSurfaceCount: 3,
         sidewalkSurfaceCount: 1,
+        curbSegmentCount: 0,
         parkingBayCount: 8,
         markingSegmentCount: 3,
         roundaboutCount: 2,
@@ -263,6 +269,9 @@ describe('infraestrutura externa parametrizada do mapa comercial', () => {
 
     expect(input.roadSurfaces).toHaveLength(PARK_ACCESS_SPATIAL_PLAN.roadSurfaces.length);
     expect(input.sidewalkSurfaces).toHaveLength(PARK_ACCESS_SPATIAL_PLAN.sidewalkSurfaces.length);
+    expect(input.curbSegments).toHaveLength(20);
+    expect(new Set(input.curbSegments?.map((segment) => segment.id)).size).toBe(20);
+    expect(input.curbSegments?.every((segment) => segment.id.includes(':curb-'))).toBe(true);
     expect(input.parkingBays).toHaveLength(43);
     expect(input.markingSegments).toHaveLength(5);
     expect(input.gates).toHaveLength(3);
@@ -276,6 +285,9 @@ describe('infraestrutura externa parametrizada do mapa comercial', () => {
       .toEqual(['third-age-pavilion-access']);
     const surfaceContract = [
       ['gate-1-gate-10-rua-brasil-asphalt', 'asphalt'],
+      ['gate-6-gate-7-asphalt', 'asphalt'],
+      ['gate-7-johan-muller-link', 'asphalt'],
+      ['gate-7-gustavo-bessel-link', 'asphalt'],
       ['costeiros-service-road', 'gravel'],
       ['third-age-pavilion-access', 'cobblestone'],
     ] as const;
@@ -310,6 +322,49 @@ describe('infraestrutura externa parametrizada do mapa comercial', () => {
     expect(JSON.stringify(PARK_ACCESS_SPATIAL_PLAN)).toBe(snapshot);
   });
 
+  it('isola somente as vias e meios-fios A6/A7 para a vista Exporural', () => {
+    const selected = selectParkAccessRoadInfrastructure(
+      adaptParkAccessSpatialPlan(),
+      EXPORURAL_GATE_ACCESS_ROAD_SURFACE_IDS,
+    );
+
+    expect(selected).toEqual(EXPORURAL_PARK_ACCESS_INFRASTRUCTURE_INPUT);
+    expect(selected.roadSurfaces.map((surface) => surface.id)).toEqual(
+      EXPORURAL_GATE_ACCESS_ROAD_SURFACE_IDS,
+    );
+    expect(selected.curbSegments).toHaveLength(20);
+    expect(selected.curbSegments?.every((segment) => (
+      EXPORURAL_GATE_ACCESS_ROAD_SURFACE_IDS.some((surfaceId) => (
+        segment.id.startsWith(`${surfaceId}:curb-`)
+      ))
+    ))).toBe(true);
+    expect(selected.supportSurfaces).toBe(PARK_ACCESS_OFFICIAL_FLAT_SUPPORT_SURFACES);
+    expect(selected.sidewalkSurfaces).toEqual([]);
+    expect(selected.parkingBays).toEqual([]);
+    expect(selected.markingSegments).toEqual([]);
+    expect(selected.roundabouts).toEqual([]);
+    expect(selected.gates).toEqual([]);
+    expect(selected.costeiros).toBeNull();
+
+    const model = buildParkAccessRenderModel(selected);
+    try {
+      expect(PARK_ACCESS_INFRASTRUCTURE_PROFILE.curbWidth).toBeCloseTo(0.075, 8);
+      expect(model.geometries.asphalt).not.toBeNull();
+      expect(model.geometries.curbs).not.toBeNull();
+      expect(model.geometries.cobblestone).toBeNull();
+      expect(model.geometries.gravel).toBeNull();
+      expect(model.diagnostics).toMatchObject({
+        roadSurfaceCount: 3,
+        curbSegmentCount: 20,
+        estimatedPrimaryDrawCalls: 2,
+        estimatedShadowDrawCalls: 0,
+        withinBudget: true,
+      });
+    } finally {
+      disposeParkAccessRenderModel(model);
+    }
+  });
+
   it('mantém a implantação GIS completa dentro do budget de desktop e mobile', () => {
     const input = adaptParkAccessSpatialPlan();
     const detailed = buildParkAccessRenderModel(input);
@@ -319,6 +374,7 @@ describe('infraestrutura externa parametrizada do mapa comercial', () => {
       expect(detailed.diagnostics).toMatchObject({
         roadSurfaceCount: PARK_ACCESS_SPATIAL_PLAN.roadSurfaces.length,
         sidewalkSurfaceCount: 5,
+        curbSegmentCount: 20,
         parkingBayCount: 43,
         markingSegmentCount: 5,
         roundaboutCount: 2,
@@ -365,6 +421,8 @@ describe('infraestrutura externa parametrizada do mapa comercial', () => {
     expect(renderer).toContain('verticalJointJitter');
     expect(renderer).toContain('const COBBLESTONE_ROUGHNESS');
     expect(renderer).toContain("if (kind === 'asphalt')");
+    expect(renderer).toContain('color={ROAD_MATERIAL_COLORS.asphalt}');
+    expect(renderer).toContain('bumpScale={ROAD_SURFACE_PROFILE.asphaltBumpScale}');
     expect(renderer).toContain('map={reducedGraphics ? undefined : ASPHALT_TEXTURE}');
     expect(renderer).toContain("if (kind === 'gravel')");
     expect(renderer).toContain('map={reducedGraphics ? undefined : GRAVEL_TEXTURE}');
@@ -376,6 +434,7 @@ describe('infraestrutura externa parametrizada do mapa comercial', () => {
     expect(renderer).toContain('polygonOffsetUnits={-1}');
     expect(renderer).toContain("kind === 'whiteMarkings' || kind === 'yellowMarkings'");
     expect(renderer).toContain("kind === 'curbs'");
+    expect(renderer).toContain('ROAD_MATERIAL_COLORS.curb');
     expect(renderer).not.toContain('<instancedMesh name="cobblestone');
   });
 });

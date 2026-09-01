@@ -1,16 +1,23 @@
 import { memo, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
+import { ROAD_MATERIAL_COLORS, ROAD_SURFACE_PROFILE } from '../../constants';
 import { PARK_ACCESS_SPATIAL_PLAN } from '../../data/parkAccessSpatialPlan';
 import type { ParkAccessArchitectureInstance } from '../../utils/parkAccessArchitecture';
 import {
   buildParkAccessRenderModel,
   disposeParkAccessRenderModel,
 } from '../../utils/parkAccessInfrastructure';
-import { PARK_ACCESS_INFRASTRUCTURE_INPUT } from '../../utils/parkAccessSpatialPlanAdapter';
+import {
+  EXPORURAL_PARK_ACCESS_INFRASTRUCTURE_INPUT,
+  PARK_ACCESS_INFRASTRUCTURE_INPUT,
+} from '../../utils/parkAccessSpatialPlanAdapter';
+
+export type ParkAccessInfrastructureScope = 'all' | 'exporural';
 
 interface ParkAccessInfrastructureProps {
   reducedGraphics: boolean;
+  scope?: ParkAccessInfrastructureScope;
   opacity?: number;
   visible?: boolean;
   surfaceOpacity?: number;
@@ -317,12 +324,12 @@ function SurfaceMaterial({
   const transparent = opacity < 0.995;
   if (kind === 'asphalt') return (
     <meshStandardMaterial
-      color="#555b5d"
+      color={ROAD_MATERIAL_COLORS.asphalt}
       map={reducedGraphics ? undefined : ASPHALT_TEXTURE}
       roughnessMap={reducedGraphics ? undefined : ASPHALT_ROUGHNESS}
       bumpMap={reducedGraphics ? undefined : ASPHALT_ROUGHNESS}
-      bumpScale={0.0045}
-      roughness={0.98}
+      bumpScale={ROAD_SURFACE_PROFILE.asphaltBumpScale}
+      roughness={ROAD_SURFACE_PROFILE.asphaltRoughness}
       metalness={0}
       transparent={transparent}
       opacity={opacity}
@@ -386,7 +393,7 @@ function SurfaceMaterial({
   );
   if (kind === 'curbs' || kind === 'roundaboutCurb') return (
     <meshStandardMaterial
-      color={kind === 'roundaboutCurb' ? '#dad6cb' : '#d3d4cf'}
+      color={kind === 'roundaboutCurb' ? '#dad6cb' : ROAD_MATERIAL_COLORS.curb}
       roughness={0.92}
       metalness={0}
       transparent={transparent}
@@ -437,6 +444,7 @@ function surfaceRenderOrder(
 
 export const ParkAccessInfrastructure = memo(function ParkAccessInfrastructure({
   reducedGraphics,
+  scope = 'all',
   opacity = 1,
   visible = true,
   surfaceOpacity = opacity,
@@ -451,12 +459,15 @@ export const ParkAccessInfrastructure = memo(function ParkAccessInfrastructure({
   const resolvedArchitectureVisible = visible
     && architectureVisible
     && normalizedArchitectureOpacity > 0.015;
+  const input = scope === 'exporural'
+    ? EXPORURAL_PARK_ACCESS_INFRASTRUCTURE_INPUT
+    : PARK_ACCESS_INFRASTRUCTURE_INPUT;
   const model = useMemo(
     () => buildParkAccessRenderModel(
-      PARK_ACCESS_INFRASTRUCTURE_INPUT,
+      input,
       { reducedGraphics },
     ),
-    [reducedGraphics],
+    [input, reducedGraphics],
   );
 
   useEffect(() => {

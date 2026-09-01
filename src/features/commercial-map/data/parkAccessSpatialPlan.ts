@@ -42,7 +42,8 @@ export type ParkAccessSourceId =
   | 'annex-19-current-map-gate-10'
   | 'annex-20-satellite-gate-1-roundabout'
   | 'annex-21-site-plan-gate-1-motorhome'
-  | 'annex-22-aerial-motorhome-road';
+  | 'annex-22-aerial-motorhome-road'
+  | 'annex-23-satellite-gates-6-7';
 
 export interface ParkAccessEvidence {
   sourceIds: readonly ParkAccessSourceId[];
@@ -79,6 +80,9 @@ export interface ParkAccessRoadSurface extends ParkAccessEvidence {
   polygon: ParkAccessPolygon;
   connects: readonly string[];
   mergedApronIds?: readonly string[];
+  /** Explicit curb runs leave junction mouths open instead of boxing the road. */
+  sourcePdfCurbCenterlines?: readonly (readonly ParkAccessSourcePoint[])[];
+  curbCenterlines?: readonly (readonly ParkAccessPoint[])[];
   /** Raise the rendered ribbon above intersecting official support surfaces. */
   supportAware?: boolean;
 }
@@ -212,6 +216,8 @@ const SOURCE_TO_LOCAL_Z = MAP_REFERENCE_HEIGHT / OFFICIAL_2026_SOURCE_MANIFEST.p
 export const PARK_ACCESS_WORKING_MAP_UNITS_PER_METER = EXPORURAL_MAP_UNITS_PER_METER;
 export const PARK_ACCESS_SOURCE_POINTS_PER_METER =
   PARK_ACCESS_WORKING_MAP_UNITS_PER_METER / SOURCE_TO_LOCAL_X;
+/** Physical width of the explicit straight-road curb prisms. */
+export const PARK_ACCESS_ROAD_CURB_WIDTH_METERS = 0.5;
 
 function round(value: number, digits = 4) {
   const factor = 10 ** digits;
@@ -297,13 +303,13 @@ function rotatedSourceRectangle(
 /**
  * Produces a conservative mitered envelope around an annex-traced centerline.
  * It is intentionally deterministic and contains no smoothing that could move
- * an official endpoint such as A1, A2 or A3.
+ * an official endpoint such as A1, A2, A3, A6 or A7.
  */
-function strokeSourcePath(
+function sourcePathEdges(
   points: readonly ParkAccessSourcePoint[],
   widthMeters: number,
-): ParkAccessSourcePolygon {
-  if (points.length < 2) return closeSourcePolygon(points);
+): { left: ParkAccessSourcePoint[]; right: ParkAccessSourcePoint[] } {
+  if (points.length < 2) return { left: [...points], right: [...points] };
   const halfWidth = parkAccessMetersToSourcePdf(widthMeters) / 2;
   const left: ParkAccessSourcePoint[] = [];
   const right: ParkAccessSourcePoint[] = [];
@@ -320,7 +326,17 @@ function strokeSourcePath(
     right.push([round(point[0] - offsetX, 3), round(point[1] - offsetZ, 3)]);
   });
 
-  return closeSourcePolygon([...left, ...right.reverse()]);
+  return { left, right };
+}
+
+function strokeSourcePath(
+  points: readonly ParkAccessSourcePoint[],
+  widthMeters: number,
+): ParkAccessSourcePolygon {
+  if (points.length < 2) return closeSourcePolygon(points);
+  const { left, right } = sourcePathEdges(points, widthMeters);
+
+  return closeSourcePolygon([...left, ...right.slice().reverse()]);
 }
 
 /**
@@ -363,6 +379,8 @@ function clipSourcePolygonAtMaximumX(
 const A1_SOURCE = [684, 3306] as const;
 const A2_SOURCE = [1274, 4040] as const;
 const A3_SOURCE = [3935, 4219] as const;
+const A6_SOURCE = [3276, 941] as const;
+const A7_SOURCE = [3267, 1703] as const;
 const A10_SOURCE = [1214, 3137] as const;
 const RUA_BRASIL_SEAM_SOURCE = [1640, 3143.5] as const;
 const ROUNDABOUT_SOURCE = [1110, 4185] as const;
@@ -373,6 +391,57 @@ const B22_CENTER_SOURCE = [836.5, 3686] as const;
 const B22_FOOTPRINT_SOURCE = sourceRectangle(...B22_SOURCE_BOUNDS);
 const MOTORHOME_SOURCE_BOUNDS = [760, 1780, 1630, 2400] as const;
 const MOTORHOME_FOOTPRINT_SOURCE = sourceRectangle(...MOTORHOME_SOURCE_BOUNDS);
+
+const GATE_7_JUNCTION_SOURCE = [3267, 1720] as const;
+const GATE_7_JOHAN_MULLER_SEAM_SOURCE = [3994, 1744] as const;
+const GATE_7_GUSTAVO_BESSEL_SEAM_SOURCE = [3263.5, 2069] as const;
+
+export const EXPORURAL_GATE_ACCESS_ROAD_SURFACE_IDS = [
+  'gate-6-gate-7-asphalt',
+  'gate-7-johan-muller-link',
+  'gate-7-gustavo-bessel-link',
+] as const;
+
+const GATE_6_GATE_7_SOURCE = [
+  A6_SOURCE,
+  [3278, 1050],
+  [3268, 1175],
+  [3244, 1305],
+  [3222, 1435],
+  [3218, 1545],
+  [3234, 1635],
+  A7_SOURCE,
+] as const satisfies readonly ParkAccessSourcePoint[];
+
+const GATE_7_JOHAN_MULLER_LINK_SOURCE = [
+  [3244, 1720],
+  GATE_7_JUNCTION_SOURCE,
+  [3410, 1736],
+  [3650, 1742],
+  GATE_7_JOHAN_MULLER_SEAM_SOURCE,
+] as const satisfies readonly ParkAccessSourcePoint[];
+
+const GATE_7_GUSTAVO_BESSEL_LINK_SOURCE = [
+  A7_SOURCE,
+  GATE_7_JUNCTION_SOURCE,
+  [3265, 1805],
+  [3263.5, 1935],
+  [3263.5, 2040],
+  GATE_7_GUSTAVO_BESSEL_SEAM_SOURCE,
+] as const satisfies readonly ParkAccessSourcePoint[];
+
+const GATE_6_GATE_7_CURB_SOURCES = Object.values(sourcePathEdges(
+  GATE_6_GATE_7_SOURCE.slice(0, -1),
+  6 - PARK_ACCESS_ROAD_CURB_WIDTH_METERS,
+));
+const GATE_7_JOHAN_MULLER_CURB_SOURCES = Object.values(sourcePathEdges(
+  GATE_7_JOHAN_MULLER_LINK_SOURCE.slice(2),
+  5.2 - PARK_ACCESS_ROAD_CURB_WIDTH_METERS,
+));
+const GATE_7_GUSTAVO_BESSEL_CURB_SOURCES = Object.values(sourcePathEdges(
+  GATE_7_GUSTAVO_BESSEL_LINK_SOURCE.slice(2, -1),
+  6 - PARK_ACCESS_ROAD_CURB_WIDTH_METERS,
+));
 
 const GATE_1_LOCAL_ACCESS_SOURCE = [
   [350, 3690],
@@ -522,6 +591,7 @@ function makeRoadSurface(
   connects: readonly string[],
   evidence: ParkAccessEvidence,
   sourcePdfPolygon = strokeSourcePath(centerline, widthMeters),
+  sourcePdfCurbCenterlines: readonly (readonly ParkAccessSourcePoint[])[] = [],
 ): ParkAccessRoadSurface {
   const baseElevationByKind: Record<ParkAccessRoadKind, number> = {
     ARTERIAL_FOUR_LANE: 0.044,
@@ -537,6 +607,8 @@ function makeRoadSurface(
     'gate-1-apron': 0.056,
     'gate-2-apron': 0.057,
     'gate-3-arrival': 0.058,
+    'gate-7-johan-muller-link': 0.045,
+    'gate-7-gustavo-bessel-link': 0.046,
   };
   return {
     id,
@@ -548,6 +620,8 @@ function makeRoadSurface(
     sourcePdfPolygon,
     polygon: polygonToLocal(sourcePdfPolygon),
     connects,
+    sourcePdfCurbCenterlines,
+    curbCenterlines: sourcePdfCurbCenterlines.map(pathToLocal),
     ...evidence,
   };
 }
@@ -647,6 +721,60 @@ const ROAD_SURFACES = [
     },
     GATE_3_APRON_SOURCE,
   ),
+  {
+    ...makeRoadSurface(
+      'gate-6-gate-7-asphalt',
+      'ASPHALT_ACCESS_ROAD',
+      GATE_6_GATE_7_SOURCE,
+      6,
+      ['A6', 'A7', 'gate-7-junction'],
+      {
+        sourceIds: ['official-2026-park-map', 'annex-23-satellite-gates-6-7'],
+        confidence: 'ANNEX_REGISTERED_TRACE',
+        notes: 'Eixo asfaltado contínuo preserva as âncoras oficiais A6 e A7; os controles intermediários registram a curva suave visível no satélite e permanecem sujeitos a conferência de campo.',
+      },
+      undefined,
+      GATE_6_GATE_7_CURB_SOURCES,
+    ),
+    widthReviewRangeMeters: [5.5, 6.5] as const,
+    supportAware: true,
+  },
+  {
+    ...makeRoadSurface(
+      'gate-7-johan-muller-link',
+      'ASPHALT_ACCESS_ROAD',
+      GATE_7_JOHAN_MULLER_LINK_SOURCE,
+      5.2,
+      ['A7', 'gate-6-gate-7-asphalt', 'gate-7-junction', 'RUA-JOHAN-MULLER'],
+      {
+        sourceIds: ['official-2026-park-map', 'annex-23-satellite-gates-6-7'],
+        confidence: 'ANNEX_REGISTERED_TRACE',
+        notes: 'Braço leste-oeste forma o T de A7 e termina dentro da faixa oficial da Rua Johan Muller; o pequeno prolongamento oeste conserva a leitura do entroncamento sem ocupar a Pista Campeira.',
+      },
+      undefined,
+      GATE_7_JOHAN_MULLER_CURB_SOURCES,
+    ),
+    widthReviewRangeMeters: [5, 6] as const,
+    supportAware: true,
+  },
+  {
+    ...makeRoadSurface(
+      'gate-7-gustavo-bessel-link',
+      'ASPHALT_ACCESS_ROAD',
+      GATE_7_GUSTAVO_BESSEL_LINK_SOURCE,
+      6,
+      ['A7', 'gate-6-gate-7-asphalt', 'gate-7-junction', 'RUA-GUSTAVO-BESSEL'],
+      {
+        sourceIds: ['official-2026-park-map', 'annex-23-satellite-gates-6-7'],
+        confidence: 'ANNEX_REGISTERED_TRACE',
+        notes: 'Ramal sul usa somente a faixa livre entre a Pista Campeira e os lotes R, alcançando a superfície oficial da Rua Gustavo Bessel sem deslocar footprints ou criar novo portão.',
+      },
+      undefined,
+      GATE_7_GUSTAVO_BESSEL_CURB_SOURCES,
+    ),
+    widthReviewRangeMeters: [5.5, 6.5] as const,
+    supportAware: true,
+  },
   {
     ...makeRoadSurface(
       'costeiros-service-road',
@@ -1145,10 +1273,17 @@ export const PARK_ACCESS_SOURCE_MANIFEST: readonly ParkAccessSourceManifestEntry
     metricUse: 'RELATIVE_ONLY',
     interpretation: 'Confirma continuidade, material e gradiente de vegetação; não individualiza árvores, cotas ou limites topográficos.',
   },
+  {
+    id: 'annex-23-satellite-gates-6-7',
+    file: 'docs/refs-portoes-6-7.jpeg',
+    role: 'Satélite anotado da ligação A6/A7, do entroncamento leste-oeste e do ramal até a frente da Exporural.',
+    metricUse: 'RELATIVE_ONLY',
+    interpretation: 'As linhas verdes confirmam continuidade e curva relativa; A6, A7, Rua Johan Muller e Rua Gustavo Bessel fornecem as âncoras reproduzíveis no mapa oficial.',
+  },
 ];
 
 export const PARK_ACCESS_SPATIAL_PLAN = {
-  revision: '2026.8-park-access-annexes.4',
+  revision: '2026.8-park-access-annexes.5',
   coordinateFrame: {
     id: 'official-2026-pdf-crop-local-xz',
     sourceCropPdf: OFFICIAL_2026_SOURCE_MANIFEST.parkCropPdf,
@@ -1173,6 +1308,9 @@ export const PARK_ACCESS_SPATIAL_PLAN = {
     gate1MiniRoundaboutIslandRadiusMeters: 7.5,
     gate1Gate10RoadMeters: 6,
     gate1Gate10RoadReviewRangeMeters: [5.5, 7] as const,
+    gate6Gate7RoadMeters: 6,
+    gate7JohanMullerLinkMeters: 5.2,
+    gate7GustavoBesselLinkMeters: 6,
     thirdAgePavilionAccessMeters: 4,
     parkingBayMeters: [2.7, 5.2] as const,
   },
@@ -1213,6 +1351,56 @@ export const PARK_ACCESS_SPATIAL_PLAN = {
       sourceIds: ['official-2026-park-map', 'gate-composite-upper-gate-3'],
       confidence: 'OFFICIAL_ANCHOR',
       notes: 'A3 encerra o eixo Benvenuto de quatro faixas. O painel superior da composição fotográfica é exclusivamente Portão 3.',
+    },
+    gate6: {
+      id: 'anchor-gate-6',
+      name: 'Portão 6',
+      sourcePdfPoint: A6_SOURCE,
+      point: parkAccessSourcePointToLocal(A6_SOURCE),
+      officialEntityIdentifier: 'A6',
+      sourceIds: ['official-2026-park-map', 'annex-23-satellite-gates-6-7'],
+      confidence: 'OFFICIAL_ANCHOR',
+      notes: 'Centro oficial A6 preservado como extremo norte do acesso asfaltado; o satélite orienta somente a curva e a continuidade relativa.',
+    },
+    gate7: {
+      id: 'anchor-gate-7',
+      name: 'Portão 7',
+      sourcePdfPoint: A7_SOURCE,
+      point: parkAccessSourcePointToLocal(A7_SOURCE),
+      officialEntityIdentifier: 'A7',
+      sourceIds: ['official-2026-park-map', 'annex-23-satellite-gates-6-7'],
+      confidence: 'OFFICIAL_ANCHOR',
+      notes: 'Centro oficial A7 preservado no encontro entre o eixo A6/A7, o braço leste-oeste e o ramal sul da Exporural.',
+    },
+    gate7Junction: {
+      id: 'anchor-gate-7-junction',
+      name: 'Entroncamento do Portão 7',
+      sourcePdfPoint: GATE_7_JUNCTION_SOURCE,
+      point: parkAccessSourcePointToLocal(GATE_7_JUNCTION_SOURCE),
+      officialEntityIdentifier: null,
+      sourceIds: ['official-2026-park-map', 'annex-23-satellite-gates-6-7'],
+      confidence: 'ANNEX_REGISTERED_TRACE',
+      notes: 'Controle de junção imediatamente ao sul de A7, registrado pelo gate oficial e pelas faixas livres do mapa; não é coordenada as-built.',
+    },
+    gate7JohanMullerSeam: {
+      id: 'anchor-gate-7-johan-muller-seam',
+      name: 'Encaixe A7 / Rua Johan Muller',
+      sourcePdfPoint: GATE_7_JOHAN_MULLER_SEAM_SOURCE,
+      point: parkAccessSourcePointToLocal(GATE_7_JOHAN_MULLER_SEAM_SOURCE),
+      officialEntityIdentifier: 'RUA-JOHAN-MULLER',
+      sourceIds: ['official-2026-park-map', 'annex-23-satellite-gates-6-7'],
+      confidence: 'OFFICIAL_ANCHOR',
+      notes: 'Ponto interno à faixa oficial da Rua Johan Muller, usado apenas para eliminar a fresta visual da extensão que parte de A7.',
+    },
+    gate7GustavoBesselSeam: {
+      id: 'anchor-gate-7-gustavo-bessel-seam',
+      name: 'Encaixe A7 / Rua Gustavo Bessel',
+      sourcePdfPoint: GATE_7_GUSTAVO_BESSEL_SEAM_SOURCE,
+      point: parkAccessSourcePointToLocal(GATE_7_GUSTAVO_BESSEL_SEAM_SOURCE),
+      officialEntityIdentifier: 'RUA-GUSTAVO-BESSEL',
+      sourceIds: ['official-2026-park-map', 'annex-23-satellite-gates-6-7'],
+      confidence: 'OFFICIAL_ANCHOR',
+      notes: 'Ponto interno à faixa oficial da Rua Gustavo Bessel, no fim do corredor livre entre a Pista Campeira e a Quadra R.',
     },
     gate10: {
       id: 'anchor-gate-10',
@@ -1631,6 +1819,7 @@ export const PARK_ACCESS_SPATIAL_PLAN = {
     'Confirmar altura, inclinação de cobertura, beirais e materiais de fachada de B22; os novos anexos fornecem somente leitura aérea e relativa.',
     'Confirmar em campo as árvores junto às vias asfaltadas, à estrada de saibro e ao acesso B22 antes de alterar posições do inventário cartográfico.',
     'Confirmar granulometria, largura, drenagem e continuidade extrema norte da estrada de pedra/saibro junto à Área Motor Home.',
+    'Confirmar em campo larguras, drenagem, cotas e meios-fios do eixo A6/A7 e dos encaixes com as ruas Johan Muller e Gustavo Bessel.',
     'Confirmar dimensões, elevação e materiais da Sede Costeiros; os anexos sustentam apenas sua relação espacial com a estrada.',
     'Confirmar quantidade útil de vãos/portais dos Portões 1, 2 e 3; os anexos fotográficos não são elevações ortográficas.',
     'Confirmar ângulo, quantidade e acessibilidade das vagas laterais antes de tratá-las como sinalização executiva.',

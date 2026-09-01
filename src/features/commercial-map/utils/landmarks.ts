@@ -27,6 +27,14 @@ import {
   gastronomicAlamedaVisualHeight,
 } from './fenasojaReferenceStructures';
 import { campeiraTrackVisualHeight } from './campeiraTrack';
+import {
+  EXPORURAL_STEAKHOUSE_LAYOUT,
+  exporuralSteakhouseVisualHeight,
+} from './exporuralSteakhouse';
+import {
+  PAVILION_FOUR_SOY_KITCHEN_LAYOUT,
+  pavilionFourSoyKitchenVisualHeight,
+} from './pavilionFourSoyKitchen';
 
 export type StrategicLandmarkKind =
   | 'administrative-center'
@@ -37,6 +45,7 @@ export type StrategicLandmarkKind =
   | 'crioulos-center'
   | 'gate-four'
   | 'commercial-pavilion'
+  | 'pavilion-four-soy-kitchen'
   | 'third-age-pavilion'
   | 'livestock-pavilion'
   | 'mirante-pavilion'
@@ -50,6 +59,7 @@ export type StrategicLandmarkKind =
   | 'german-pavilion'
   | 'african-pavilion'
   | 'rotary-house'
+  | 'exporural-restaurant'
   | 'fenasoja-restaurant'
   | 'sicredi-arena'
   | 'lunar-tree';
@@ -141,6 +151,19 @@ const STRATEGIC_LANDMARKS: Readonly<Record<string, StrategicLandmarkDefinition>>
   B4: commercialPavilionLandmark('B4'),
   B5: commercialPavilionLandmark('B5'),
   B6: commercialPavilionLandmark('B6'),
+  B7: {
+    kind: 'pavilion-four-soy-kitchen',
+    aliases: [
+      'Pavilhão 4',
+      'Cozinha da Soja',
+      'Pavilhão Cozinha da Soja',
+      'P4 Cozinha da Soja',
+    ],
+    // A fachada fotografada abre ao sul (+Z local), diante da Quadra G.
+    facingRadians: PAVILION_FOUR_SOY_KITCHEN_LAYOUT.facingRadians,
+    focusDirection: PAVILION_FOUR_SOY_KITCHEN_LAYOUT.focusDirection,
+    visualHeight: pavilionFourSoyKitchenVisualHeight,
+  },
   B8: commercialPavilionLandmark('B8'),
   B10: commercialPavilionLandmark('B10'),
   B22: {
@@ -285,6 +308,18 @@ const STRATEGIC_LANDMARKS: Readonly<Record<string, StrategicLandmarkDefinition>>
     facingRadians: FENASOJA_EVENT_CENTER_LAYOUT.facingRadians,
     focusDirection: FENASOJA_EVENT_CENTER_LAYOUT.focusDirection,
     visualHeight: eventCenterVisualHeight,
+  },
+  C4: {
+    kind: 'exporural-restaurant',
+    aliases: [
+      'Churrascaria Exporural',
+      'Churrascaria da Expo Rural',
+      'Restaurante Exporural',
+      'Catavento da Exporural',
+    ],
+    facingRadians: EXPORURAL_STEAKHOUSE_LAYOUT.facingRadians,
+    focusDirection: EXPORURAL_STEAKHOUSE_LAYOUT.focusDirection,
+    visualHeight: exporuralSteakhouseVisualHeight,
   },
   C5: {
     kind: 'polish-pavilion',

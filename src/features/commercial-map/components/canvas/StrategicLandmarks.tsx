@@ -9,6 +9,8 @@ import { LUNAR_LAUNCH_HIT_TARGET } from '../../utils/lunarLaunch';
 import { LIVESTOCK_PAVILION_RENDER_BUDGET } from '../../utils/livestockPavilion';
 import { MIRANTE_RENDER_BUDGET } from '../../utils/mirante';
 import { THIRD_AGE_PAVILION_LAYOUT } from '../../utils/thirdAgePavilion';
+import { EXPORURAL_STEAKHOUSE_LAYOUT } from '../../utils/exporuralSteakhouse';
+import { PAVILION_FOUR_SOY_KITCHEN_LAYOUT } from '../../utils/pavilionFourSoyKitchen';
 import { commercialPavilionModelBounds } from '../../utils/commercialPavilions';
 import { FENASOJA_HEADQUARTERS_LAYOUT } from '../../utils/headquarters';
 import { LACTALIS_STAGE_LAYOUT, lactalisStagePresentationFootprint } from '../../utils/lactalisStage';
@@ -44,6 +46,8 @@ import { CampeiraTrack } from './CampeiraTrack';
 import { CommercialPavilion } from './CommercialPavilion';
 import { ThirdAgePavilion } from './ThirdAgePavilion';
 import { LactalisCulturalStage } from './LactalisCulturalStage';
+import { ExporuralSteakhouse } from './ExporuralSteakhouse';
+import { PavilionFourSoyKitchen } from './PavilionFourSoyKitchen';
 import { AfricanPavilion, RotaryHouse } from './NationsDistrict';
 import {
   CrioulosCenterLandmark,
@@ -290,6 +294,7 @@ const LANDMARK_PALETTES: Record<StrategicLandmarkKind, LandmarkPalette> = {
     platform: '#898b86',
     metal: '#596568',
   },
+  'pavilion-four-soy-kitchen': PAVILION_FOUR_SOY_KITCHEN_LAYOUT.palette,
   'third-age-pavilion': THIRD_AGE_PAVILION_LAYOUT.palette,
   'livestock-pavilion': {
     wall: '#557d88',
@@ -435,6 +440,7 @@ const LANDMARK_PALETTES: Record<StrategicLandmarkKind, LandmarkPalette> = {
     platform: '#97928a',
     metal: '#8a908e',
   },
+  'exporural-restaurant': EXPORURAL_STEAKHOUSE_LAYOUT.palette,
   'fenasoja-restaurant': {
     wall: '#ded2bc',
     accent: '#aa916e',
@@ -508,6 +514,7 @@ function useLandmarkMaterials(
     result.white.side = THREE.DoubleSide;
     if (
       kind === 'commercial-pavilion'
+      || kind === 'pavilion-four-soy-kitchen'
       || kind === 'pavilion-nine'
       || kind === 'third-age-pavilion'
       || kind === 'livestock-pavilion'
@@ -591,6 +598,29 @@ function useLandmarkMaterials(
       result.roof.metalness = 0.06;
       result.dark.roughness = 0.78;
       result.dark.metalness = 0.16;
+    }
+    if (kind === 'pavilion-four-soy-kitchen') {
+      result.wall.roughness = 0.96;
+      result.roof.roughness = 0.62;
+      result.roof.metalness = 0.2;
+      result.accent.roughness = 0.9;
+      result.accent.metalness = 0.01;
+      result.platform.roughness = 1;
+      result.metal.roughness = 0.56;
+      result.metal.metalness = 0.28;
+    }
+    if (kind === 'exporural-restaurant') {
+      result.wall.roughness = 0.86;
+      result.roof.roughness = 0.56;
+      result.roof.metalness = 0.24;
+      result.trim.roughness = 0.64;
+      result.trim.metalness = 0.12;
+      result.dark.roughness = 0.64;
+      result.glass.roughness = 0.28;
+      result.white.roughness = 0.58;
+      result.white.metalness = 0.1;
+      result.metal.roughness = 0.42;
+      result.metal.metalness = 0.48;
     }
     if (kind === 'fenasoja-event-center') {
       result.wall.roughness = 0.9;
@@ -1664,8 +1694,12 @@ function useArchitecturalDetail(
         ? Math.max(20, Math.max(bounds.width, bounds.depth) * 8)
       : kind === 'commercial-pavilion'
         ? Math.max(24, Math.max(bounds.width, bounds.depth) * 4.4)
+      : kind === 'pavilion-four-soy-kitchen'
+        ? Math.max(20, Math.max(bounds.width, bounds.depth) * 5.2)
       : kind === 'fenasoja-restaurant'
         ? Math.max(20, bounds.width * 5)
+      : kind === 'exporural-restaurant'
+        ? Math.max(22, Math.max(bounds.width, bounds.depth) * 7.4)
       : kind === 'fenasoja-event-center'
         ? Math.max(28, Math.max(bounds.width, bounds.depth) * 3.8)
       : kind === 'administrative-center'
@@ -3986,6 +4020,9 @@ export function StrategicLandmarkMesh({
             {...modelProps}
           />
         )}
+        {kind === 'pavilion-four-soy-kitchen' && (
+          <PavilionFourSoyKitchen {...modelProps} />
+        )}
         {kind === 'third-age-pavilion' && <ThirdAgePavilion {...modelProps} />}
         {kind === 'livestock-pavilion' && <LivestockPavilion {...modelProps} />}
         {kind === 'mirante-pavilion' && <MirantePavilion {...modelProps} />}
@@ -3999,6 +4036,13 @@ export function StrategicLandmarkMesh({
         {kind === 'nations-portico' && <NationsPortico {...modelProps} />}
         {kind === 'german-pavilion' && <GermanPavilion {...modelProps} />}
         {kind === 'fenasoja-event-center' && <FenasojaEventCenter {...modelProps} />}
+        {kind === 'exporural-restaurant' && (
+          <ExporuralSteakhouse
+            compoundOnClick={handleClick}
+            compoundOnDoubleClick={handleDoubleClick}
+            {...modelProps}
+          />
+        )}
         {kind === 'fenasoja-restaurant' && <FenasojaRestaurant {...modelProps} />}
         {kind === 'sicredi-arena' && <SicrediArena {...modelProps} />}
         {kind === 'lunar-tree' && <LunarTree {...modelProps} />}
