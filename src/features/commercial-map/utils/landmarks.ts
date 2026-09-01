@@ -20,6 +20,13 @@ import {
   LACTALIS_STAGE_LAYOUT,
   lactalisStageVisualHeight,
 } from './lactalisStage';
+import {
+  COOPERATIVISM_FACING_RADIANS,
+  GASTRONOMIC_ALAMEDA_FACING_RADIANS,
+  cooperativismVisualHeight,
+  gastronomicAlamedaVisualHeight,
+} from './fenasojaReferenceStructures';
+import { campeiraTrackVisualHeight } from './campeiraTrack';
 
 export type StrategicLandmarkKind =
   | 'administrative-center'
@@ -33,6 +40,9 @@ export type StrategicLandmarkKind =
   | 'third-age-pavilion'
   | 'livestock-pavilion'
   | 'mirante-pavilion'
+  | 'cooperativism-space'
+  | 'gastronomic-alameda'
+  | 'campeira-track'
   | 'polish-pavilion'
   | 'italian-pavilion'
   | 'nations-square'
@@ -159,6 +169,32 @@ const STRATEGIC_LANDMARKS: Readonly<Record<string, StrategicLandmarkDefinition>>
     focusDirection: [0.26, 0.31, 0.96],
     visualHeight: livestockPavilionVisualHeight,
   },
+  B28: {
+    kind: 'cooperativism-space',
+    aliases: [
+      'Espaço do Cooperativismo',
+      'Cooperativismo',
+      'Casa do Cooperativismo',
+    ],
+    // O frontão fotografado olha para o lote canônico Q-M-08, ao sul (+Z).
+    // A orientação decorre desse vetor e não do melhor ângulo de câmera.
+    facingRadians: COOPERATIVISM_FACING_RADIANS,
+    focusDirection: [0.14, 0.5, 0.96],
+    visualHeight: cooperativismVisualHeight,
+  },
+  D1: {
+    kind: 'gastronomic-alameda',
+    aliases: [
+      'Alameda Gastronômica',
+      'Alameda Gastronomica',
+      'Espaço Gastronômico',
+    ],
+    // A fachada longa olha exatamente para leste (+X), enquanto o eixo do
+    // edifício permanece reto em Z dentro do lote; sem rotação diagonal.
+    facingRadians: GASTRONOMIC_ALAMEDA_FACING_RADIANS,
+    focusDirection: [0.96, 0.48, 0.14],
+    visualHeight: gastronomicAlamedaVisualHeight,
+  },
   D3: {
     kind: 'mirante-pavilion',
     aliases: [
@@ -172,6 +208,20 @@ const STRATEGIC_LANDMARKS: Readonly<Record<string, StrategicLandmarkDefinition>>
     facingRadians: 0,
     focusDirection: [-0.94, 0.38, -0.22],
     visualHeight: miranteVisualHeight,
+  },
+  'PISTA-CAMPEIRA': {
+    kind: 'campeira-track',
+    aliases: [
+      'Pista Campeira',
+      'Área Campeira',
+      'Arena Campeira',
+      'Pista rural',
+    ],
+    // O footprint oficial permanece sem rotação; a leitura elevada revela
+    // simultaneamente a superfície viva, a cerca perimetral e o único brete.
+    facingRadians: 0,
+    focusDirection: [0.28, 1.18, 0.92],
+    visualHeight: campeiraTrackVisualHeight,
   },
   B11: {
     kind: 'administrative-center',

@@ -19,6 +19,7 @@ import { isArenaTerrainExcluded } from '../../data/arenaSectorZoning';
 import { getOpenGroundTexture, type OpenGroundSurface } from './openGroundTextures';
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
 import { integrateGroundGeometryWithRearRoads } from '../../utils/rearRoadGroundIntegration';
+import { ArenaAccessStructure } from './ArenaAccessStructure';
 
 const NO_RAYCAST = () => undefined;
 const UNIT_Y = new THREE.Vector3(0, 1, 0);
@@ -1174,21 +1175,28 @@ function ArenaCourts({
 export const ArenaFrontInfrastructure = memo(function ArenaFrontInfrastructure({
   reducedGraphics,
   showArenaStructures,
+  showArenaAccess,
   showCourts,
   arenaStructuresOpacity,
+  arenaAccessOpacity,
   courtsOpacity,
 }: {
   reducedGraphics: boolean;
   showArenaStructures: boolean;
+  showArenaAccess: boolean;
   showCourts: boolean;
   arenaStructuresOpacity: number;
+  arenaAccessOpacity: number;
   courtsOpacity: number;
 }) {
-  if (!showArenaStructures && !showCourts) return null;
+  if (!showArenaStructures && !showArenaAccess && !showCourts) return null;
   return (
     <group name="infraestrutura-publica-frente-arena" userData={INFRASTRUCTURE_USER_DATA}>
       {showArenaStructures && (
         <ArenaStructures reducedGraphics={reducedGraphics} opacity={arenaStructuresOpacity} />
+      )}
+      {showArenaAccess && (
+        <ArenaAccessStructure reducedGraphics={reducedGraphics} opacity={arenaAccessOpacity} />
       )}
       {showCourts && <ArenaCourts reducedGraphics={reducedGraphics} opacity={courtsOpacity} />}
     </group>

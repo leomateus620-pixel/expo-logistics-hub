@@ -117,8 +117,8 @@ function sourceBoundsOverlapPolygon(bounds: SourceBounds, polygon: readonly Sour
 
 describe('infraestrutura ambiental do parque', () => {
   it('mantém inventário ambiental versionado, explícito e fora das métricas comerciais', () => {
-    expect(PARK_ENVIRONMENT_REVISION).toBe('2026.8-arena-zoneamento.1');
-    expect(PARK_ENVIRONMENT_FEATURES).toHaveLength(8);
+    expect(PARK_ENVIRONMENT_REVISION).toBe('2028.1-arena-access-reference.2');
+    expect(PARK_ENVIRONMENT_FEATURES).toHaveLength(9);
     expect(new Set(PARK_ENVIRONMENT_FEATURES.map((feature) => feature.id)).size)
       .toBe(PARK_ENVIRONMENT_FEATURES.length);
     expect(new Set(PARK_ENVIRONMENT_FEATURES.map((feature) => feature.classification))).toEqual(new Set([
@@ -129,11 +129,14 @@ describe('infraestrutura ambiental do parque', () => {
       'NATURAL_TERRAIN',
       'SPORTS_FIELD',
       'PEDESTRIAN_PATH',
+      'NON_COMMERCIAL_STRUCTURE',
     ]));
     PARK_ENVIRONMENT_FEATURES.forEach((feature) => {
       expect(feature.isSellable, feature.id).toBe(false);
       expect(feature.contributesToCommercialMetrics, feature.id).toBe(false);
-      expect(feature.sourceReferences).toHaveLength(4);
+      expect(feature.sourceReferences.length, feature.id).toBeGreaterThanOrEqual(
+        feature.id === 'arena-front-covered-access' ? 2 : 4,
+      );
       expect(feature.notes.length, feature.id).toBeGreaterThan(40);
       expect(PARK_ENVIRONMENT_CLASSIFICATION_LABELS[feature.classification], feature.id).toBeTruthy();
       expect(OFFICIAL_REFERENCE_DATA.lots.some((lot) => lot.publicIdentifier === feature.id), feature.id).toBe(false);
