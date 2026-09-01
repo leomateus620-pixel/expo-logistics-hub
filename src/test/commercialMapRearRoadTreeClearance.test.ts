@@ -104,6 +104,7 @@ describe('rear-road rendered vegetation clearance', () => {
     )).map(({ node }) => node.sourceMarkerId);
     expect(changed).toEqual([
       'pole-ref-145', 'pole-ref-225', 'pole-ref-295', 'pole-ref-296', 'pole-ref-297',
+      'pole-ref-301',
     ]);
     expect(corrected).toHaveLength(428);
     const footprints = buildRearRoadCorridorFootprints(undefined, { includeShoulders: true });
