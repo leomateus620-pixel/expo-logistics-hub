@@ -183,13 +183,13 @@ describe('camada cartográfica de árvores do mapa comercial', () => {
     expect(commercialTreeGroundElevation(tree('tree-i-05'), OFFICIAL_REFERENCE_DATA.entities)).toBeCloseTo(0.036, 6);
     expect(commercialTreeGroundElevation(tree('tree-i-06'), OFFICIAL_REFERENCE_DATA.entities)).toBeCloseTo(0.036, 6);
     expect(commercialTreeGroundElevation(tree('tree-e-08'), OFFICIAL_REFERENCE_DATA.entities)).toBeCloseTo(0.029, 6);
-    expect(commercialTreeGroundElevation(tree('tree-parking-west-01'), OFFICIAL_REFERENCE_DATA.entities)).toBeCloseTo(0.064, 6);
-    expect(commercialTreeGroundElevation(tree('tree-parking-east-01'), OFFICIAL_REFERENCE_DATA.entities)).toBeCloseTo(0.064, 6);
+    expect(commercialTreeGroundElevation(tree('tree-parking-west-01'), OFFICIAL_REFERENCE_DATA.entities)).toBeCloseTo(0.03, 6);
+    expect(commercialTreeGroundElevation(tree('tree-parking-east-01'), OFFICIAL_REFERENCE_DATA.entities)).toBeCloseTo(0.03, 6);
     COMMERCIAL_MAP_TREES
       .filter((candidate) => candidate.placement === 'PARKING_ISLAND' || candidate.placement === 'PARKING_EDGE')
       .forEach((candidate) => {
         expect(commercialTreeGroundElevation(candidate, OFFICIAL_REFERENCE_DATA.entities), candidate.id)
-          .toBeCloseTo(0.064, 6);
+          .toBeCloseTo(0.03, 6);
       });
     COMMERCIAL_MAP_TREES
       .filter((candidate) => (
