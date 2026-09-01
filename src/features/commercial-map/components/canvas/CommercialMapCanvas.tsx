@@ -4426,6 +4426,7 @@ function Scene({
         active={!interiorEntity}
         hydrologicalModeActive={hydrologicalModeActive}
         reducedGraphics={reducedGraphics}
+        nightMode={resolveStrategicLandmarkKind(selectedEntity ?? { publicIdentifier: '' }) === 'amusement-park'}
       />
       <InteriorCameraRequestContext.Provider value={setInteriorCameraRequest}>
         {interiorContent}
