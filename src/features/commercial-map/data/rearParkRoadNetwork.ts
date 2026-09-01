@@ -27,11 +27,10 @@ export type RearRoadFeatureId = CanonicalRearRoadId | 'ACESSO-A5-BR472';
 export type RoadNodeId =
   | 'etnias-west'
   | 'etnias-terminus-1'
-  | 'brasilia-north'
-  | 'brasilia-ubiretama-junction'
-  | 'brasilia-south'
-  | 'ubiretama-west'
-  | 'ubiretama-a5'
+  | 'brasilia-reference-3'
+  | 'ubiretama-north'
+  | 'ubiretama-gate-junction'
+  | 'ubiretama-uruguai-join'
   | 'gate-5'
   | 'br472-north-ramp-junction'
   | 'a5-br-junction'
@@ -84,7 +83,7 @@ export interface RearRoadIdentity {
 
 export type RearContextualLabelOwner = RearRoadIdentity['officialOwnerIdentifier'] | 'A5';
 
-export const REAR_PARK_ROAD_REVISION = '2026.10-longitudinal-ubiretama-gate5.1';
+export const REAR_PARK_ROAD_REVISION = '2026.10-lateral-ubiretama-gate5.2';
 
 /** Escala uniforme do recorte oficial, usada apenas para larguras físicas. */
 export const SOURCE_POINTS_PER_LOCAL_UNIT = 5500 / 120;
@@ -107,6 +106,7 @@ export const PROTECTED_ROAD_IDENTIFIERS: readonly string[] = Object.freeze([
  * os segmentos procedurais apenas prolongam sua apresentação no setor traseiro.
  */
 export const REPLACED_OFFICIAL_ROAD_IDENTIFIERS: readonly string[] = Object.freeze([
+  'RUA-BRASILIA',
   'RUA-UBIRETAMA',
   'RODOVIA-RS-472',
 ]);
@@ -193,17 +193,20 @@ export const OFFICIAL_GATE_5_ENTITY_ID = officialGate5.id;
 const nodeSources: Readonly<Record<RoadNodeId, SourcePoint>> = Object.freeze({
   'etnias-west': REAR_CALIBRATED_AXES.ruaDasEtniasOfficial[0],
   'etnias-terminus-1': rearAttachment5ReferencePointById(1).officialSource,
-  'brasilia-north': REAR_CALIBRATED_AXES.brasiliaNorthToJunction[0],
-  'brasilia-ubiretama-junction': rearAttachment5ReferencePointById(2).officialSource,
-  'brasilia-south': REAR_CALIBRATED_AXES.brasiliaJunctionToSouth.at(-1)!,
-  'ubiretama-west': REAR_CALIBRATED_AXES.ubiretamaWestToJunction[0],
-  'ubiretama-a5': REAR_OFFICIAL_ANCHORS.gate5ParkEdge,
+  'brasilia-reference-3': rearAttachment5ReferencePointById(3).officialSource,
+  'ubiretama-north': REAR_CALIBRATED_AXES.ubiretamaPoint5ToGateJunction[0],
+  'ubiretama-gate-junction': REAR_OFFICIAL_ANCHORS.gate5ParkEdge,
+  'ubiretama-uruguai-join': REAR_CALIBRATED_AXES.ubiretamaGateJunctionToUruguai[
+    REAR_CALIBRATED_AXES.ubiretamaGateJunctionToUruguai.length - 1
+  ],
   'gate-5': officialGate5SourcePoint,
   'br472-north-ramp-junction': REAR_OFFICIAL_ANCHORS.br472NorthRampJunction,
   'a5-br-junction': REAR_OFFICIAL_ANCHORS.br472Junction,
   'br472-south-ramp-junction': REAR_OFFICIAL_ANCHORS.br472SouthRampJunction,
   'br472-north': REAR_CALIBRATED_AXES.br472NorthToNorthRamp[0],
-  'br472-south': REAR_CALIBRATED_AXES.br472SouthRampToSouth.at(-1)!,
+  'br472-south': REAR_CALIBRATED_AXES.br472SouthRampToSouth[
+    REAR_CALIBRATED_AXES.br472SouthRampToSouth.length - 1
+  ],
 });
 
 const nodeRoadAccessSources: Readonly<Partial<Record<RoadNodeId, SourcePoint>>> = Object.freeze({
@@ -250,44 +253,33 @@ export const REAR_PARK_ROAD_NETWORK: readonly RoadSegment[] = Object.freeze([
     notes: 'Superfície oficial termina no Ponto 1; não há continuação pela mata nem ligação gerada ao A5.',
   }),
   segment({
-    id: 'brasilia-north-junction', roadId: 'RUA-BRASILIA', name: 'Rua Brasília',
-    from: 'brasilia-north', to: 'brasilia-ubiretama-junction', category: 'park-avenue',
-    sourceControlPoints: REAR_CALIBRATED_AXES.brasiliaNorthToJunction,
-    width: rearRoadSourceToLocalLength(37), shoulderWidth: 0,
-    elevationOffset: 0.032, materialId: 'park-asphalt', markings: 'internal',
-    presentation: 'generated-surface', officialOwnerIdentifier: 'RUA-BRASILIA',
-    notes: 'Eixo norte-sul a oeste do complexo: curva suave a leste na altura do pátio, depois quase reta ao lado do campo.',
-  }),
-  segment({
-    id: 'brasilia-junction-south', roadId: 'RUA-BRASILIA', name: 'Rua Brasília',
-    from: 'brasilia-ubiretama-junction', to: 'brasilia-south', category: 'park-avenue',
-    sourceControlPoints: REAR_CALIBRATED_AXES.brasiliaJunctionToSouth,
-    width: rearRoadSourceToLocalLength(37), shoulderWidth: 0,
-    elevationOffset: 0.032, materialId: 'park-asphalt', markings: 'internal',
-    presentation: 'generated-surface', officialOwnerIdentifier: 'RUA-BRASILIA',
-    notes: 'Braço sul do cruzamento real, sem reconectar o Portão 3.',
-  }),
-  segment({
-    id: 'ubiretama-west-junction', roadId: 'RUA-UBIRETAMA', name: 'Rua Ubiretama',
-    from: 'ubiretama-west', to: 'brasilia-ubiretama-junction', category: 'park-avenue',
-    sourceControlPoints: REAR_CALIBRATED_AXES.ubiretamaWestToJunction,
+    id: 'ubiretama-point-5-gate', roadId: 'RUA-UBIRETAMA', name: 'Rua Ubiretama',
+    from: 'ubiretama-north', to: 'ubiretama-gate-junction', category: 'park-avenue',
+    sourceControlPoints: REAR_CALIBRATED_AXES.ubiretamaPoint5ToGateJunction,
     width: rearRoadSourceToLocalLength(36), shoulderWidth: 0,
     elevationOffset: 0.032, materialId: 'park-asphalt', markings: 'none',
     presentation: 'generated-surface', officialOwnerIdentifier: 'RUA-UBIRETAMA',
-    notes: 'Braço oeste contínuo: do acesso da Exporural até o cruzamento com o eixo longitudinal.',
+    notes: 'Trecho norte da Ubiretama até a interseção compartilhada com o acesso do Portão 5.',
   }),
   segment({
-    id: 'ubiretama-junction-a5', roadId: 'RUA-UBIRETAMA', name: 'Rua Ubiretama',
-    from: 'brasilia-ubiretama-junction', to: 'ubiretama-a5', category: 'park-avenue',
-    sourceControlPoints: REAR_CALIBRATED_AXES.ubiretamaJunctionToA5,
+    id: 'ubiretama-gate-uruguai', roadId: 'RUA-UBIRETAMA', name: 'Rua Ubiretama',
+    from: 'ubiretama-gate-junction', to: 'ubiretama-uruguai-join', category: 'park-avenue',
+    sourceControlPoints: REAR_CALIBRATED_AXES.ubiretamaGateJunctionToUruguai,
     width: rearRoadSourceToLocalLength(36), shoulderWidth: 0,
     elevationOffset: 0.032, materialId: 'park-asphalt', markings: 'none',
     presentation: 'generated-surface', officialOwnerIdentifier: 'RUA-UBIRETAMA',
-    notes: 'Eixo leste-oeste contínuo até o encontro com o acesso do Portão 5.',
+    notes: 'Curva contínua pela circulação lateral e pelos estacionamentos até a Rua Uruguai Leste.',
+  }),
+  segment({
+    id: 'ubiretama-uruguai-leste-t', roadId: 'RUA-BRASILIA', name: 'Rua Brasília',
+    from: 'ubiretama-uruguai-join', to: 'brasilia-reference-3', ...officialRoadDefaults,
+    sourceControlPoints: [[4558, 3466], rearAttachment5ReferencePointById(3).officialSource],
+    officialOwnerIdentifier: 'RUA-BRASILIA',
+    notes: 'Ligação topológica sobre a Rua Uruguai Leste; não gera segunda superfície de asfalto.',
   }),
   segment({
     id: 'gate5-internal-approach', roadId: 'ACESSO-A5-BR472', name: 'Acesso Portão 5 — rede interna',
-    from: 'ubiretama-a5', to: 'gate-5', category: 'internal-access',
+    from: 'ubiretama-gate-junction', to: 'gate-5', category: 'internal-access',
     sourceControlPoints: REAR_CALIBRATED_AXES.gate5InternalApproach,
     width: rearRoadSourceToLocalLength(36), shoulderWidth: rearRoadSourceToLocalLength(5),
     elevationOffset: 0.034, materialId: 'park-asphalt', markings: 'none',
@@ -408,7 +400,7 @@ export function rearRoadCorridors(includeOfficialSurfaces = false) {
 
 const OWNER_LABEL_SOURCE_ANCHORS: Readonly<Record<RearContextualLabelOwner, SourcePoint>> = Object.freeze({
   'RUA-BRASILIA': rearAttachment5ReferencePointById(3).officialSource,
-  'RUA-UBIRETAMA': REAR_CALIBRATED_AXES.ubiretamaJunctionToA5[3],
+  'RUA-UBIRETAMA': REAR_CALIBRATED_AXES.ubiretamaGateJunctionToUruguai[3],
   'AV-IMIGRANTES': [5200, 4200],
   'RODOVIA-RS-472': REAR_CALIBRATED_AXES.br472NorthToNorthRamp[2],
   A5: REAR_OFFICIAL_ANCHORS.gate5VehicleAccess,
@@ -460,8 +452,8 @@ export type RoadGraphEndpoint = RoadNodeId | 'br472' | 'brasilia' | 'ubiretama' 
 
 function resolveRoadGraphEndpoint(endpoint: RoadGraphEndpoint): RoadNodeId {
   if (endpoint === 'br472') return 'br472-north';
-  if (endpoint === 'brasilia') return 'brasilia-north';
-  if (endpoint === 'ubiretama') return 'ubiretama-west';
+  if (endpoint === 'brasilia') return 'brasilia-reference-3';
+  if (endpoint === 'ubiretama') return 'ubiretama-north';
   if (endpoint === 'etnias') return 'etnias-terminus-1';
   if (endpoint === 'A5') return 'gate-5';
   return endpoint;

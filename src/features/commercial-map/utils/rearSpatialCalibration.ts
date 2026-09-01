@@ -15,7 +15,7 @@ import { officialPdfPointToLocal } from '../data/officialReference2026';
  * É um registro cartográfico de apresentação, não um levantamento geodésico:
  * os anexos não fornecem CRS, escala métrica certificada ou pontos de campo.
  */
-export const REAR_SPATIAL_CALIBRATION_REVISION = '2026.10-longitudinal-ubiretama-gate5.1';
+export const REAR_SPATIAL_CALIBRATION_REVISION = '2026.10-lateral-ubiretama-gate5.2';
 
 export type Point2 = readonly [number, number];
 export type RearAttachment5PointId = 1 | 2 | 3 | 4 | 5 | 6;
@@ -109,18 +109,18 @@ export const REAR_ATTACHMENT_5_REFERENCE_POINTS = Object.freeze([
   attachment5Point(1, 'Término da Rua das Etnias', 'etnias-terminus', [80, 30], {
     canonicalSource: [5510, 4200],
   }),
-  attachment5Point(2, 'Cruzamento Rua Brasília / Rua Ubiretama', 'brasilia-ubiretama-junction', [53, 73], {
-    satelliteSource: [3964, 3466],
+  attachment5Point(2, 'Rua Brasília — referência sul', 'brasilia-axis', [53, 73], {
+    canonicalSource: [3964, 3700],
   }),
-  attachment5Point(3, 'Rua Brasília — aproximação suave a leste, ao lado do campo', 'brasilia-axis', [53, 46], {
-    satelliteSource: [3962, 2910],
+  attachment5Point(3, 'Rua Brasília — T com Uruguai Leste', 'brasilia-axis', [53, 46], {
+    canonicalSource: [3964, 3466],
   }),
-  attachment5Point(4, 'Rua Ubiretama — encontro com o cadastro A5', 'ubiretama-a5-handoff', [55, 15], {
-    satelliteSource: [5974, 3678],
+  attachment5Point(4, 'Rua Ubiretama — curva de acesso ao Portão 5', 'ubiretama-a5-handoff', [55, 15], {
+    canonicalSource: [5920, 2780],
   }),
   attachment5Point(5, 'Rua Ubiretama — trajetória oeste', 'ubiretama-axis', [38, 20]),
   attachment5Point(6, 'Portão 5 — passagem física em direção à BR-472', 'gate-5', [62, 13], {
-    satelliteSource: [6108, 3678],
+    canonicalSource: [6190.975433526012, 3021.965317919075],
   }),
 ] as const satisfies readonly RearAttachment5ReferencePoint[]);
 
@@ -148,9 +148,9 @@ export const REAR_OFFICIAL_ANCHORS = Object.freeze({
   /** Passagem veicular visual; a entidade cadastral A5 permanece imutável. */
   gate5VehicleAccess: gate5PresentationSource,
   /** Trevo do Portão 5: eixo central + rampas norte/sul independentes, como no satélite. */
-  br472NorthRampJunction: [6264, 3488] as Point2,
-  br472Junction: [6264, 3678] as Point2,
-  br472SouthRampJunction: [6268, 3872] as Point2,
+  br472NorthRampJunction: [6262, 3195] as Point2,
+  br472Junction: [6266.926335827044, 3234.233541884527] as Point2,
+  br472SouthRampJunction: [6274, 3380] as Point2,
 });
 
 /**
@@ -193,84 +193,71 @@ export const REAR_CALIBRATED_AXES = Object.freeze({
     [3940, 4200], [4500, 4200], [5000, 4200], rearAttachment5ReferencePointById(1).officialSource,
   ] as readonly Point2[]),
   /**
-   * Eixo longitudinal do parque: única faixa livre entre o bosque a oeste e as
-   * edificações oficiais D3/C1/Q-R-04 a leste, auditada pelas exclusões espaciais.
+   * Eixo único da Ubiretama: nasce no cadastro norte, encontra o acesso do A5 e
+   * segue pela circulação lateral/estacionamentos até a Rua Uruguai Leste.
+   * Não há mais uma ribbon longitudinal sobre o antigo eixo da Rua Brasília.
    */
-  brasiliaNorthToJunction: Object.freeze([
-    [3950, 2445],
-    [3954, 2580],
-    [3958, 2720],
-    rearAttachment5ReferencePointById(3).officialSource,
-    [3963, 3180],
-    [3963, 3330],
-    rearAttachment5ReferencePointById(2).officialSource,
-  ] as readonly Point2[]),
-  brasiliaJunctionToSouth: Object.freeze([
-    rearAttachment5ReferencePointById(2).officialSource,
-    [3964, 3700],
-    [3964, 3860],
-    [3964, 3980],
-  ] as readonly Point2[]),
-  /** Braço oeste contínuo da Ubiretama, do acesso da Exporural até o cruzamento. */
-  ubiretamaWestToJunction: Object.freeze([
-    [3560, 3466],
-    [3760, 3466],
-    [3940, 3466],
-    rearAttachment5ReferencePointById(2).officialSource,
-  ] as readonly Point2[]),
-  ubiretamaJunctionToA5: Object.freeze([
-    rearAttachment5ReferencePointById(2).officialSource,
-    [4260, 3470],
-    [4560, 3486],
-    [5000, 3538],
-    [5400, 3605],
-    [5700, 3648],
+  ubiretamaPoint5ToGateJunction: Object.freeze([
+    rearAttachment5ReferencePointById(5).officialSource,
+    [5945, 2250],
+    [5935, 2520],
     rearAttachment5ReferencePointById(4).officialSource,
+  ] as readonly Point2[]),
+  ubiretamaGateJunctionToUruguai: Object.freeze([
+    rearAttachment5ReferencePointById(4).officialSource,
+    [5885, 3005],
+    [5750, 3250],
+    [5350, 3265],
+    [5000, 3255],
+    [4700, 3270],
+    [4558, 3245],
+    [4558, 3310],
+    [4558, 3445],
+    [4558, 3466],
   ] as readonly Point2[]),
   gate5InternalApproach: Object.freeze([
     rearAttachment5ReferencePointById(4).officialSource,
-    [6040, 3678],
+    [6040, 2860],
+    [6120, 2940],
     REAR_OFFICIAL_ANCHORS.gate5VehicleAccess,
   ] as readonly Point2[]),
   a5CenterAccess: Object.freeze([
     REAR_OFFICIAL_ANCHORS.gate5VehicleAccess,
-    [6180, 3678],
+    [6218, 3105],
+    [6244, 3188],
+    [6260, 3226],
     REAR_OFFICIAL_ANCHORS.br472Junction,
   ] as readonly Point2[]),
   a5NorthRamp: Object.freeze([
     REAR_OFFICIAL_ANCHORS.gate5VehicleAccess,
-    [6165, 3664],
-    [6210, 3585],
-    [6248, 3518],
+    [6220, 3040],
+    [6248, 3120],
     REAR_OFFICIAL_ANCHORS.br472NorthRampJunction,
   ] as readonly Point2[]),
   a5SouthRamp: Object.freeze([
     REAR_OFFICIAL_ANCHORS.gate5VehicleAccess,
-    [6165, 3692],
-    [6210, 3772],
-    [6252, 3840],
+    [6220, 3110],
+    [6254, 3290],
     REAR_OFFICIAL_ANCHORS.br472SouthRampJunction,
   ] as readonly Point2[]),
   br472NorthToNorthRamp: Object.freeze([
     [6255, 1100],
     [6258, 1900],
-    [6260, 2700],
-    [6262, 3300],
+    [6262, 2600],
+    [6258, 3100],
     REAR_OFFICIAL_ANCHORS.br472NorthRampJunction,
   ] as readonly Point2[]),
   br472NorthRampToJunction: Object.freeze([
     REAR_OFFICIAL_ANCHORS.br472NorthRampJunction,
-    [6264, 3580],
     REAR_OFFICIAL_ANCHORS.br472Junction,
   ] as readonly Point2[]),
   br472JunctionToSouthRamp: Object.freeze([
     REAR_OFFICIAL_ANCHORS.br472Junction,
-    [6266, 3780],
     REAR_OFFICIAL_ANCHORS.br472SouthRampJunction,
   ] as readonly Point2[]),
   br472SouthRampToSouth: Object.freeze([
     REAR_OFFICIAL_ANCHORS.br472SouthRampJunction,
-    [6288, 4000],
+    [6285, 3900],
     [6305, 4400],
   ] as readonly Point2[]),
 });

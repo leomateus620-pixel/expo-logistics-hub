@@ -92,12 +92,14 @@ export function resolveParkAccessElectricalClearancePosition(
  * These bounded display offsets apply only while the corrected rear roads render.
  * They are clearance decisions, not a revision of the official electrical survey. */
 export const REAR_ROAD_ELECTRICAL_CLEARANCE_PRESENTATION = Object.freeze({
-  revision: '2026.09.01-arena-br472-clearance.4',
+  revision: '2026.10-lateral-ubiretama-gate5.1',
   verificationStatus: 'FIELD_REVIEW_REQUIRED',
   offsets: Object.freeze({
     'pole-ref-222': [0.2, 0], // Brasília: margem leste na altura do pátio.
     'pole-ref-225': [-1, 0], // BR-472: park-side verge, beyond shoulder.
     'pole-ref-234': [0.32, 0], // Brasília: margem leste ao sul de D3.
+    'pole-ref-145': [0.45, 0], // Ubiretama: margem leste na curva norte do acesso A5.
+    'pole-ref-164': [0.8, 0], // Ubiretama: margem leste antes da curva dos estacionamentos.
     'pole-ref-321': [0, -0.12], // Uruguai: margem norte, sul do C1.
     'pole-ref-322': [0, -0.16],
     'pole-ref-323': [0, -0.22],
