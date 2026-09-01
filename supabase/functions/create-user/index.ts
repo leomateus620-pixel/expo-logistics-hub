@@ -72,6 +72,19 @@ Deno.serve(async (req) => {
       }
       return new Response(JSON.stringify({ ok: true }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
+    if (action === "update_password") {
+      if (!target_user_id || !password) {
+        return new Response(JSON.stringify({ error: "Usuário e senha são obrigatórios" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+      const { error: pwdError } = await adminClient.auth.admin.updateUserById(target_user_id, {
+        password,
+        email_confirm: true,
+      });
+      if (pwdError) {
+        return new Response(JSON.stringify({ error: pwdError.message }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+      return new Response(JSON.stringify({ ok: true }), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
     if (!email || !password) {
       return new Response(JSON.stringify({ error: "Email e senha são obrigatórios" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }

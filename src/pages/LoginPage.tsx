@@ -483,7 +483,9 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
                   id="login-email"
                   className="auth-input-control"
                   type="email"
-                  placeholder="SEU.EMAIL@FENASOJA.COM.BR"
+                  style={{ textTransform: 'none' }}
+                  autoCorrect="off"
+                  placeholder="seu.email@fenasoja.com.br"
                   value={email}
                   onChange={(event) => updateEmail(event.target.value)}
                   onBlur={() => {
@@ -534,6 +536,10 @@ export default function LoginPage({ returnTo }: LoginPageProps) {
                   id="login-password"
                   className="auth-input-control"
                   type={showPassword ? 'text' : 'password'}
+                  style={{ textTransform: 'none' }}
+                  autoCapitalize="none"
+                  autoCorrect="off"
+                  spellCheck={false}
                   placeholder="Digite sua senha"
                   value={password}
                   onChange={(event) => updatePassword(event.target.value)}
