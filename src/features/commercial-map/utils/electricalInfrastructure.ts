@@ -6,6 +6,7 @@ import {
 } from '../data/electricalInfrastructure';
 import {
   resolveElectricalArchitectureClearancePosition,
+  resolveParkAccessElectricalClearancePosition,
   resolveRearRoadElectricalClearancePosition,
 } from '../data/electricalPresentation';
 import type { CommercialLot, Coordinate, MapClassification, MapEntity } from '../types';
@@ -259,10 +260,17 @@ export function resolveElectricalNodePlacements(
     const architectureClearance = facade
       ? null
       : resolveElectricalArchitectureClearancePosition(node, entityByIdentifier);
+    const parkAccessClearance = facade
+      ? null
+      : resolveParkAccessElectricalClearancePosition(node, entityByIdentifier);
     const rearRoadClearance = rearRoadsActive && !facade
       ? resolveRearRoadElectricalClearancePosition(node)
       : null;
-    const renderPosition = facade?.renderPosition ?? rearRoadClearance ?? architectureClearance ?? node.position;
+    const renderPosition = facade?.renderPosition
+      ?? rearRoadClearance
+      ?? parkAccessClearance
+      ?? architectureClearance
+      ?? node.position;
     return {
       node,
       renderPosition,
@@ -270,7 +278,9 @@ export function resolveElectricalNodePlacements(
       rotationRadians: facade?.rotationRadians ?? node.rotationRadians,
       sourceAnchorPreserved: true,
       placementStatus: facade?.placementStatus
-        ?? (rearRoadClearance || architectureClearance ? 'PROJECTED_CLEARANCE' : 'DIRECT'),
+        ?? (rearRoadClearance || parkAccessClearance || architectureClearance
+          ? 'PROJECTED_CLEARANCE'
+          : 'DIRECT'),
     };
   });
 }

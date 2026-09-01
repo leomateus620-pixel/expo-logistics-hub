@@ -1,4 +1,5 @@
 import {
+  PARK_ACCESS_ROAD_CURB_WIDTH_METERS,
   PARK_ACCESS_SOURCE_MANIFEST,
   PARK_ACCESS_SPATIAL_PLAN,
   PARK_ACCESS_WORKING_MAP_UNITS_PER_METER,
@@ -15,6 +16,26 @@ import {
 
 function distance(first: ParkAccessPoint, second: ParkAccessPoint) {
   return Math.hypot(first[0] - second[0], first[1] - second[1]);
+}
+
+function segmentFootprint(
+  from: ParkAccessPoint,
+  to: ParkAccessPoint,
+  width: number,
+): readonly ParkAccessPoint[] {
+  const deltaX = to[0] - from[0];
+  const deltaZ = to[1] - from[1];
+  const length = Math.hypot(deltaX, deltaZ);
+  const halfWidth = width / 2;
+  const offsetX = length > 0 ? (-deltaZ / length) * halfWidth : 0;
+  const offsetZ = length > 0 ? (deltaX / length) * halfWidth : 0;
+  const corners = [
+    [from[0] + offsetX, from[1] + offsetZ],
+    [to[0] + offsetX, to[1] + offsetZ],
+    [to[0] - offsetX, to[1] - offsetZ],
+    [from[0] - offsetX, from[1] - offsetZ],
+  ] as const satisfies readonly ParkAccessPoint[];
+  return [...corners, corners[0]];
 }
 
 function expectClosedFinitePolygon(polygon: readonly ParkAccessPoint[]) {
@@ -169,6 +190,8 @@ describe('park access spatial plan', () => {
       [1640, 3143.5],
       [1274, 4040],
       [3935, 4219],
+      [3276, 941],
+      [3267, 1703],
       [2418, 3833],
     ] as const;
 
@@ -185,7 +208,7 @@ describe('park access spatial plan', () => {
     expect(PARK_ACCESS_SPATIAL_PLAN.coordinateFrame.calibrationScope).toContain('field-reviewable');
   });
 
-  it('preserves A1, A2, A3 and A10 as official anchors without swapping gates 2 and 3', () => {
+  it('preserves A1, A2, A3, A6, A7 and A10 as official anchors without swapping gates', () => {
     expect(PARK_ACCESS_SPATIAL_PLAN.anchors.gate1).toMatchObject({
       officialEntityIdentifier: 'A1',
       sourcePdfPoint: [684, 3306],
@@ -199,6 +222,16 @@ describe('park access spatial plan', () => {
     expect(PARK_ACCESS_SPATIAL_PLAN.anchors.gate3).toMatchObject({
       officialEntityIdentifier: 'A3',
       sourcePdfPoint: [3935, 4219],
+      confidence: 'OFFICIAL_ANCHOR',
+    });
+    expect(PARK_ACCESS_SPATIAL_PLAN.anchors.gate6).toMatchObject({
+      officialEntityIdentifier: 'A6',
+      sourcePdfPoint: [3276, 941],
+      confidence: 'OFFICIAL_ANCHOR',
+    });
+    expect(PARK_ACCESS_SPATIAL_PLAN.anchors.gate7).toMatchObject({
+      officialEntityIdentifier: 'A7',
+      sourcePdfPoint: [3267, 1703],
       confidence: 'OFFICIAL_ANCHOR',
     });
     expect(PARK_ACCESS_SPATIAL_PLAN.anchors.gate10).toMatchObject({
@@ -223,7 +256,7 @@ describe('park access spatial plan', () => {
 
     const officialEntities = new Map(OFFICIAL_REFERENCE_DATA.entities
       .map((entity) => [entity.publicIdentifier, entity]));
-    (['gate1', 'gate2', 'gate3', 'gate10'] as const).forEach((key) => {
+    (['gate1', 'gate2', 'gate3', 'gate6', 'gate7', 'gate10'] as const).forEach((key) => {
       const anchor = PARK_ACCESS_SPATIAL_PLAN.anchors[key];
       const entity = officialEntities.get(anchor.officialEntityIdentifier!);
       expect(entity?.classification).toBe('GATE');
@@ -383,6 +416,121 @@ describe('park access spatial plan', () => {
       'annex-20-satellite-gate-1-roundabout',
       'annex-21-site-plan-gate-1-motorhome',
     ]));
+  });
+
+  it('links A6 to A7 and both Exporural frontage roads without invading adjacent footprints', () => {
+    const roads = new Map(PARK_ACCESS_SPATIAL_PLAN.roadSurfaces
+      .map((surface) => [surface.id, surface]));
+    const gateAxis = roads.get('gate-6-gate-7-asphalt')!;
+    const johanLink = roads.get('gate-7-johan-muller-link')!;
+    const gustavoLink = roads.get('gate-7-gustavo-bessel-link')!;
+
+    expect(gateAxis).toMatchObject({
+      kind: 'ASPHALT_ACCESS_ROAD',
+      widthMeters: 6,
+      widthReviewRangeMeters: [5.5, 6.5],
+      supportAware: true,
+      connects: ['A6', 'A7', 'gate-7-junction'],
+    });
+    expect(gateAxis.sourcePdfCenterline).toEqual([
+      [3276, 941],
+      [3278, 1050],
+      [3268, 1175],
+      [3244, 1305],
+      [3222, 1435],
+      [3218, 1545],
+      [3234, 1635],
+      [3267, 1703],
+    ]);
+    expect(gateAxis.centerline[0]).toEqual(PARK_ACCESS_SPATIAL_PLAN.anchors.gate6.point);
+    expect(gateAxis.centerline.at(-1)).toEqual(PARK_ACCESS_SPATIAL_PLAN.anchors.gate7.point);
+
+    expect(johanLink).toMatchObject({
+      kind: 'ASPHALT_ACCESS_ROAD',
+      widthMeters: 5.2,
+      widthReviewRangeMeters: [5, 6],
+      supportAware: true,
+    });
+    expect(johanLink.connects).toEqual(expect.arrayContaining([
+      'A7',
+      'gate-7-junction',
+      'RUA-JOHAN-MULLER',
+    ]));
+    expect(johanLink.centerline.at(-1))
+      .toEqual(PARK_ACCESS_SPATIAL_PLAN.anchors.gate7JohanMullerSeam.point);
+
+    expect(gustavoLink).toMatchObject({
+      kind: 'ASPHALT_ACCESS_ROAD',
+      widthMeters: 6,
+      widthReviewRangeMeters: [5.5, 6.5],
+      supportAware: true,
+    });
+    expect(gustavoLink.connects).toEqual(expect.arrayContaining([
+      'A7',
+      'gate-7-junction',
+      'RUA-GUSTAVO-BESSEL',
+    ]));
+    expect(gustavoLink.centerline[0]).toEqual(PARK_ACCESS_SPATIAL_PLAN.anchors.gate7.point);
+    expect(gustavoLink.centerline[1]).toEqual(PARK_ACCESS_SPATIAL_PLAN.anchors.gate7Junction.point);
+    expect(gustavoLink.centerline.at(-1))
+      .toEqual(PARK_ACCESS_SPATIAL_PLAN.anchors.gate7GustavoBesselSeam.point);
+    expect(johanLink.centerline).toContainEqual(PARK_ACCESS_SPATIAL_PLAN.anchors.gate7Junction.point);
+    expect(distance(gateAxis.centerline.at(-1)!, gustavoLink.centerline[0])).toBe(0);
+
+    expect(polygonsIntersect(gateAxis.polygon, johanLink.polygon)).toBe(true);
+    expect(polygonsIntersect(gateAxis.polygon, gustavoLink.polygon)).toBe(true);
+    expect(polygonsIntersect(johanLink.polygon, gustavoLink.polygon)).toBe(true);
+
+    const [johanMuller, gustavoBessel] = officialFootprints([
+      'RUA-JOHAN-MULLER',
+      'RUA-GUSTAVO-BESSEL',
+    ]);
+    expect(polygonsIntersect(johanLink.polygon, johanMuller.polygon)).toBe(true);
+    expect(polygonsIntersect(gustavoLink.polygon, gustavoBessel.polygon)).toBe(true);
+
+    officialFootprints(['PISTA-CAMPEIRA', 'Q-R-15']).forEach(({ identifier, polygon }) => {
+      expect(polygonsIntersect(gustavoLink.polygon, polygon), `gate-7-south/${identifier}`)
+        .toBe(false);
+    });
+    [gateAxis, johanLink, gustavoLink].forEach((surface) => {
+      expect(surface.sourceIds).toContain('annex-23-satellite-gates-6-7');
+      expect(surface.sourcePdfCurbCenterlines).toHaveLength(2);
+      expect(surface.curbCenterlines).toHaveLength(2);
+      surface.curbCenterlines!.forEach((centerline) => {
+        expect(centerline.at(-1), `${surface.id}/open-curb-run`)
+          .not.toEqual(centerline[0]);
+      });
+      const junctionClearance = Math.min(...surface.curbCenterlines!.flatMap((centerline) => (
+        centerline.map((point) => distance(point, PARK_ACCESS_SPATIAL_PLAN.anchors.gate7Junction.point))
+      )));
+      expect(junctionClearance, `${surface.id}/curb-mouth`)
+        .toBeGreaterThan(parkAccessMetersToLocal(8));
+    });
+    const gustavoMouthClearance = Math.min(...gustavoLink.curbCenterlines!.flatMap((centerline) => (
+      centerline.map((point) => distance(
+        point,
+        PARK_ACCESS_SPATIAL_PLAN.anchors.gate7GustavoBesselSeam.point,
+      ))
+    )));
+    expect(gustavoMouthClearance).toBeGreaterThan(parkAccessMetersToLocal(3));
+
+    const curbWidth = parkAccessMetersToLocal(PARK_ACCESS_ROAD_CURB_WIDTH_METERS);
+    expect(PARK_ACCESS_ROAD_CURB_WIDTH_METERS).toBe(0.5);
+    expect(curbWidth).toBeCloseTo(0.075, 8);
+    const protectedFootprints = officialFootprints(['PISTA-CAMPEIRA', 'Q-R-08', 'Q-R-15']);
+    [gateAxis, johanLink, gustavoLink].forEach((surface) => {
+      surface.curbCenterlines!.forEach((centerline, curbIndex) => {
+        centerline.slice(0, -1).forEach((from, segmentIndex) => {
+          const footprint = segmentFootprint(from, centerline[segmentIndex + 1], curbWidth);
+          protectedFootprints.forEach(({ identifier, polygon }) => {
+            expect(
+              polygonsIntersect(footprint, polygon),
+              `${surface.id}/curb-${curbIndex + 1}-${segmentIndex + 1}/${identifier}`,
+            ).toBe(false);
+          });
+        });
+      });
+    });
   });
 
   it('keeps the motorhome road distinct, stone/gravel and explicitly above AREA-MOTORHOME', () => {
@@ -735,8 +883,8 @@ describe('park access spatial plan', () => {
     });
   });
 
-  it('registers the six current annexes in revision .4 without leaking local paths', () => {
-    expect(PARK_ACCESS_SPATIAL_PLAN.revision).toBe('2026.8-park-access-annexes.4');
+  it('registers the current annexes in revision .5 without leaking local paths', () => {
+    expect(PARK_ACCESS_SPATIAL_PLAN.revision).toBe('2026.8-park-access-annexes.5');
     const currentSources = PARK_ACCESS_SOURCE_MANIFEST.filter(
       (source) => /^annex-(17|18|19|20|21|22)-/.test(source.id),
     );
@@ -771,6 +919,12 @@ describe('park access spatial plan', () => {
       expect(source.role.length).toBeGreaterThan(30);
       expect(source.interpretation.length).toBeGreaterThan(30);
       expect(source.metricUse).toBeDefined();
+    });
+    expect(PARK_ACCESS_SOURCE_MANIFEST.find(
+      (source) => source.id === 'annex-23-satellite-gates-6-7',
+    )).toMatchObject({
+      file: 'docs/refs-portoes-6-7.jpeg',
+      metricUse: 'RELATIVE_ONLY',
     });
   });
 

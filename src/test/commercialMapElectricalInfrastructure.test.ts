@@ -11,7 +11,10 @@ import {
   electricalPlanPointToOfficialPdf,
   electricalPlanPointToWorldXZ,
 } from '@/features/commercial-map/data/electricalInfrastructure';
-import { ELECTRICAL_ARCHITECTURE_CLEARANCE_PRESENTATION } from '@/features/commercial-map/data/electricalPresentation';
+import {
+  ELECTRICAL_ARCHITECTURE_CLEARANCE_PRESENTATION,
+  PARK_ACCESS_ELECTRICAL_CLEARANCE_PRESENTATION,
+} from '@/features/commercial-map/data/electricalPresentation';
 import {
   GATE_FOUR_DISTRICT_LAYOUT,
   resolveGateFourInteractionFootprint,
@@ -21,6 +24,7 @@ import {
   OFFICIAL_REFERENCE_DATA,
   officialPdfPointToLocal,
 } from '@/features/commercial-map/data/officialReference2026';
+import { PARK_ACCESS_SPATIAL_PLAN } from '@/features/commercial-map/data/parkAccessSpatialPlan';
 import {
   buildElectricalPoleCrossarmLayouts,
   buildElectricalWirePositions,
@@ -35,6 +39,7 @@ import { scopeCommercialMapData } from '@/features/commercial-map/utils/areaScop
 import { strategicLandmarkBounds, strategicLandmarkVisualHeight } from '@/features/commercial-map/utils/landmarks';
 import {
   distanceToEntity,
+  distanceToPolygon,
   pointInPolygon,
 } from '@/features/commercial-map/utils/spatialSurface';
 
@@ -510,7 +515,13 @@ describe('infraestrutura elétrica cartográfica do Mapa Comercial', () => {
       COMMERCIAL_ELECTRICAL_NODES,
       OFFICIAL_REFERENCE_DATA.entities,
     );
-    const shifted = placements.filter((placement) => placement.placementStatus === 'PROJECTED_CLEARANCE');
+    const architectureMarkerIds = new Set<string>(
+      ELECTRICAL_ARCHITECTURE_CLEARANCE_PRESENTATION.groups.flatMap((group) => group.sourceMarkerIds),
+    );
+    const shifted = placements.filter((placement) => (
+      placement.placementStatus === 'PROJECTED_CLEARANCE'
+      && architectureMarkerIds.has(placement.node.sourceMarkerId)
+    ));
     expect(shifted).toHaveLength(6);
     ELECTRICAL_ARCHITECTURE_CLEARANCE_PRESENTATION.groups.forEach((group) => {
       group.sourceMarkerIds.forEach((sourceMarkerId) => {
@@ -534,6 +545,63 @@ describe('infraestrutura elétrica cartográfica do Mapa Comercial', () => {
     expect(JSON.stringify(COMMERCIAL_ELECTRICAL_NODES)).toBe(nodesBefore);
     expect(JSON.stringify(COMMERCIAL_ELECTRICAL_CONNECTIONS)).toBe(connectionsBefore);
     expect(ELECTRICAL_ARCHITECTURE_CLEARANCE_PRESENTATION.verificationStatus).toBe('FIELD_REVIEW_REQUIRED');
+  });
+
+  it('mantém os postes 026 e 149 fora do envelope físico das novas vias sem mover dados oficiais', () => {
+    const inventoryBefore = JSON.stringify([
+      COMMERCIAL_ELECTRICAL_NODES,
+      COMMERCIAL_ELECTRICAL_CONNECTIONS,
+    ]);
+    const placements = resolveElectricalNodePlacements(
+      COMMERCIAL_ELECTRICAL_NODES,
+      OFFICIAL_REFERENCE_DATA.entities,
+    );
+    const roads = new Map(PARK_ACCESS_SPATIAL_PLAN.roadSurfaces.map((road) => [road.id, road]));
+    const markerIds = PARK_ACCESS_ELECTRICAL_CLEARANCE_PRESENTATION.groups
+      .flatMap((group) => group.sourceMarkerIds);
+
+    expect(markerIds).toEqual(['pole-ref-026', 'pole-ref-149']);
+    PARK_ACCESS_ELECTRICAL_CLEARANCE_PRESENTATION.groups.forEach((group) => {
+      const placement = placements.find((candidate) => (
+        group.sourceMarkerIds.some((sourceMarkerId) => (
+          sourceMarkerId === candidate.node.sourceMarkerId
+        ))
+      ))!;
+      const road = roads.get(group.roadSurfaceId)!;
+
+      expect(placement.placementStatus).toBe('PROJECTED_CLEARANCE');
+      expect(placement.sourceAnchorPreserved).toBe(true);
+      expect(placement.node.position)
+        .toEqual(electricalPlanPointToWorldXZ(placement.node.sourcePagePosition));
+      expect(placement.renderPosition[0])
+        .toBeCloseTo(placement.node.position[0] + group.offset[0], 8);
+      expect(placement.renderPosition[1])
+        .toBeCloseTo(placement.node.position[1] + group.offset[1], 8);
+      expect(pointInPolygon(placement.renderPosition, road.polygon)).toBe(false);
+      expect(distanceToPolygon(placement.renderPosition, road.polygon))
+        .toBeGreaterThanOrEqual(placement.node.radius + 0.05);
+
+      const withoutOwner = OFFICIAL_REFERENCE_DATA.entities.filter((entity) => (
+        entity.publicIdentifier !== group.ownerIdentifier
+      ));
+      const [withoutOwnerPlacement] = resolveElectricalNodePlacements(
+        [placement.node],
+        withoutOwner,
+      );
+      expect(withoutOwnerPlacement.placementStatus).toBe('DIRECT');
+      expect(withoutOwnerPlacement.renderPosition).toEqual(placement.node.position);
+    });
+
+    expect(PARK_ACCESS_ELECTRICAL_CLEARANCE_PRESENTATION).toMatchObject({
+      scope: 'PRESENTATION_ONLY',
+      verificationStatus: 'FIELD_REVIEW_REQUIRED',
+      sourceAnchorPreserved: true,
+      topologyPreserved: true,
+    });
+    expect(JSON.stringify([
+      COMMERCIAL_ELECTRICAL_NODES,
+      COMMERCIAL_ELECTRICAL_CONNECTIONS,
+    ])).toBe(inventoryBefore);
   });
 
   it('preserva a folga também no envelope visual do portal e da guarita A4, maior que o marcador oficial', () => {

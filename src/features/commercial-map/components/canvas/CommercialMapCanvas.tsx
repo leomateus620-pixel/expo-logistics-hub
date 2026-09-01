@@ -73,6 +73,12 @@ import {
   strategicLandmarkVisualHeight,
 } from '../../utils/landmarks';
 import {
+  isExporuralSteakhousePresentationAvailable,
+  isExporuralSteakhouseRestroomAnnex,
+  resolveExporuralSteakhousePresentationExtent,
+  resolveExporuralSteakhouseRestroomPresentationLift,
+} from '../../utils/exporuralSteakhouse';
+import {
   APOLLO_XIV_LAYOUT,
   apolloXivReplicaHeight,
   treeRemainsVisibleWithSelectedApollo,
@@ -161,7 +167,10 @@ import {
   rearRoadFocusBoundsForOfficialOwner,
 } from '../../data/rearParkRoadNetwork';
 import { rearRoadTerrainElevationAt } from '../../utils/rearRoadNetwork';
-import { ParkAccessInfrastructure } from './ParkAccessInfrastructure';
+import {
+  ParkAccessInfrastructure,
+  type ParkAccessInfrastructureScope,
+} from './ParkAccessInfrastructure';
 import { selectParkAccessCompatibleTreesForPresentation } from '../../data/parkAccessEnvironment';
 import { PARK_ACCESS_SPATIAL_PLAN } from '../../data/parkAccessSpatialPlan';
 import {
@@ -286,6 +295,10 @@ const PARK_ACCESS_SURFACE_OWNER_IDENTIFIERS = [
   'AV-TUPARENDI',
   'CALCADA-ARVOREDO',
 ] as const;
+const EXPORURAL_PARK_ACCESS_SURFACE_OWNER_IDENTIFIERS = [
+  'RUA-JOHAN-MULLER',
+  'RUA-GUSTAVO-BESSEL',
+] as const;
 const PARK_ACCESS_ARCHITECTURE_OWNER_IDENTIFIERS = ['A1', 'A2', 'A3'] as const;
 const PARK_ACCESS_SCENE_SUPPORT_POINTS = [
   ...PARK_ACCESS_SPATIAL_PLAN.roadSurfaces.flatMap((surface) => (
@@ -305,6 +318,14 @@ const PARK_ACCESS_SCENE_SUPPORT_POINTS = [
 
 function parkAccessVisibleInArea(isolatedArea?: string | null) {
   return !isolatedArea || isolatedArea === COMMERCIAL_MAP_SEGMENT_IDS.industry;
+}
+
+function parkAccessInfrastructureScopeForArea(
+  isolatedArea?: string | null,
+): ParkAccessInfrastructureScope | null {
+  if (!isolatedArea || isolatedArea === COMMERCIAL_MAP_SEGMENT_IDS.industry) return 'all';
+  if (isolatedArea === COMMERCIAL_MAP_SEGMENT_IDS.exporural) return 'exporural';
+  return null;
 }
 
 function createGateArrowGeometry() {
@@ -435,6 +456,26 @@ function getSceneExtent(
 }
 
 function getEntityExtent(entity: MapEntity): SceneExtent {
+  if (resolveStrategicLandmarkKind(entity) === 'exporural-restaurant') {
+    const officialBounds = strategicLandmarkBounds(entity);
+    const presentationExtent = resolveExporuralSteakhousePresentationExtent(officialBounds);
+    const minX = officialBounds.centerX + presentationExtent.minX;
+    const maxX = officialBounds.centerX + presentationExtent.maxX;
+    const minZ = officialBounds.centerZ + presentationExtent.minZ;
+    const maxZ = officialBounds.centerZ + presentationExtent.maxZ;
+    return {
+      minX,
+      maxX,
+      minZ,
+      maxZ,
+      width: presentationExtent.width,
+      depth: presentationExtent.depth,
+      centerX: officialBounds.centerX + presentationExtent.centerOffsetX,
+      centerZ: officialBounds.centerZ + presentationExtent.centerOffsetZ,
+      maxHeight: presentationExtent.maxHeight,
+      diagonal: Math.hypot(presentationExtent.width, presentationExtent.depth),
+    };
+  }
   const correctedRoadBounds = entity.classification === 'ROAD' || entity.publicIdentifier === 'A5'
     ? rearRoadFocusBoundsForOfficialOwner(entity.publicIdentifier)
     : null;
@@ -701,6 +742,7 @@ interface EntityMeshProps {
   filtersActive: boolean;
   infrastructureMode: boolean;
   nationsDistrictPresentationAvailable: boolean;
+  exporuralSteakhousePresentationAvailable: boolean;
   isMatch: boolean;
   layerOpacity: number;
   sceneCenter: readonly [number, number];
@@ -722,6 +764,7 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
   filtersActive,
   infrastructureMode,
   nationsDistrictPresentationAvailable,
+  exporuralSteakhousePresentationAvailable,
   isMatch,
   layerOpacity,
   sceneCenter,
@@ -744,6 +787,9 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
   const isNationsPresentationSurface = nationsDistrictPresentationAvailable
     && isNationsDistrictPresentationSurface(entity);
   const isRestroom = classification === 'RESTROOM' || classification === 'CHEMICAL_RESTROOM';
+  const usesExporuralSteakhouseAnnexPresentation = exporuralSteakhousePresentationAvailable
+    && isRestroom
+    && isExporuralSteakhouseRestroomAnnex(entity);
   const isFlat = entity.geometry.extrusionHeight < 0.3 || isRoad || isQuadra || isNationsPresentationSurface;
   const isInteractive = isSelectableMapClassification(entity.classification);
   const solidRendering = requiresSolidRendering(entity.classification);
@@ -802,7 +848,10 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
       ? 0.42
       : 1;
   const visualOpacity = selected ? Math.max(0.94, layerOpacity) : layerOpacity * filterStrength;
-  const presentationLift = resolveMarkerPresentationLift(classification);
+  const presentationLift = resolveExporuralSteakhouseRestroomPresentationLift(
+    usesExporuralSteakhouseAnnexPresentation,
+    resolveMarkerPresentationLift(classification),
+  );
   // Large textured ground fields must remain below their circulation ribbons
   // even while selected. Selection is already conveyed by emissive tint and
   // outline; lifting the whole slab made it overtake roads at oblique angles.
@@ -826,9 +875,11 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
     : selected
       ? '#174c31'
       : '#e9c84b';
-  const outlineGeometry = isNationsPresentationSurface
-    ? selected || hovered ? footprint : null
-    : isPavilion ? roofOutline : isRoad || isQuadra ? footprint : edges;
+  const outlineGeometry = usesExporuralSteakhouseAnnexPresentation
+    ? selected || hovered ? edges : null
+    : isNationsPresentationSurface
+      ? selected || hovered ? footprint : null
+      : isPavilion ? roofOutline : isRoad || isQuadra ? footprint : edges;
   const outlineColor = selected
     ? '#fff1a8'
     : hovered && isInteractive
@@ -890,29 +941,35 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
       {!isQuadra && !isGate && !isNationsPresentationSurface && (
         <mesh
           geometry={geometry!}
-          castShadow={!isFlat && (solidRendering || visualOpacity > 0.45)}
-          receiveShadow
+          castShadow={!usesExporuralSteakhouseAnnexPresentation
+            && !isFlat
+            && (solidRendering || visualOpacity > 0.45)}
+          receiveShadow={!usesExporuralSteakhouseAnnexPresentation}
           {...interactionProps}
         >
-          <meshStandardMaterial
-            color={displayColor}
-            map={openGroundTextures?.map}
-            normalMap={openGroundTextures?.normalMap}
-            normalScale={openGroundTextures ? OPEN_GROUND_NORMAL_SCALE : undefined}
-            roughnessMap={openGroundTextures?.roughnessMap}
-            roughness={openGroundProfile ? openGroundProfile.roughness : isPavilion ? 0.82 : isFlat ? 0.9 : 0.72}
-            metalness={0}
-            transparent={!solidRendering && visualOpacity < 0.995}
-            opacity={solidRendering ? 1 : visualOpacity}
-            depthTest
-            depthWrite={solidRendering || visualOpacity > 0.42}
-            emissive={selected || hovered || matched ? (openGroundProfile ? '#e7d489' : baseColor) : '#000000'}
-            emissiveIntensity={selected ? 0.13 : hovered ? 0.055 : matched ? 0.03 : 0}
-            flatShading={isPavilion}
-            polygonOffset
-            polygonOffsetFactor={openGroundProfile ? 2 : isFlat ? -2 : 0}
-            polygonOffsetUnits={openGroundProfile ? 2 : isFlat ? -2 : 0}
-          />
+          {usesExporuralSteakhouseAnnexPresentation ? (
+            <meshBasicMaterial visible={false} />
+          ) : (
+            <meshStandardMaterial
+              color={displayColor}
+              map={openGroundTextures?.map}
+              normalMap={openGroundTextures?.normalMap}
+              normalScale={openGroundTextures ? OPEN_GROUND_NORMAL_SCALE : undefined}
+              roughnessMap={openGroundTextures?.roughnessMap}
+              roughness={openGroundProfile ? openGroundProfile.roughness : isPavilion ? 0.82 : isFlat ? 0.9 : 0.72}
+              metalness={0}
+              transparent={!solidRendering && visualOpacity < 0.995}
+              opacity={solidRendering ? 1 : visualOpacity}
+              depthTest
+              depthWrite={solidRendering || visualOpacity > 0.42}
+              emissive={selected || hovered || matched ? (openGroundProfile ? '#e7d489' : baseColor) : '#000000'}
+              emissiveIntensity={selected ? 0.13 : hovered ? 0.055 : matched ? 0.03 : 0}
+              flatShading={isPavilion}
+              polygonOffset
+              polygonOffsetFactor={openGroundProfile ? 2 : isFlat ? -2 : 0}
+              polygonOffsetUnits={openGroundProfile ? 2 : isFlat ? -2 : 0}
+            />
+          )}
 
         </mesh>
       )}
@@ -1032,7 +1089,7 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
         </lineSegments>
       )}
 
-      {isRestroom && (
+      {isRestroom && !usesExporuralSteakhouseAnnexPresentation && (
         <>
           <mesh
             geometry={SHARED_RESTROOM_POLE_GEOMETRY}
@@ -4145,6 +4202,16 @@ function Scene({
   const structuralEntities = useMemo(() => nonLotEntities.filter((entity) => (
     entity.classification !== 'ROAD' && entity.classification !== 'PEDESTRIAN_PATH'
   )).map((entity) => rearParkingEnabled ? rearParkingEntityForPresentation(entity) : entity), [nonLotEntities, rearParkingEnabled]);
+  const exporuralSteakhousePresentationAvailable = useMemo(() => {
+    const steakhouse = structuralEntities.find((entity) => (
+      resolveStrategicLandmarkKind(entity) === 'exporural-restaurant'
+    ));
+    return isExporuralSteakhousePresentationAvailable({
+      presentInRenderedEntities: Boolean(steakhouse),
+      selected: Boolean(steakhouse && selectedEntityId === steakhouse.id),
+      layerOpacity: steakhouse ? layerOpacity[steakhouse.layerId] ?? 1 : 0,
+    });
+  }, [layerOpacity, selectedEntityId, structuralEntities]);
   const sceneTrees = useMemo(
     () => selectCommercialTreesForScene(entities, lots),
     [entities, lots],
@@ -4180,11 +4247,10 @@ function Scene({
   const treeSurfaceEntities = useMemo(() => rearParkingEnabled
     ? [...exteriorRenderedEntities, ...REAR_PARKING_GROUND_SUPPORTS]
     : exteriorRenderedEntities, [exteriorRenderedEntities, rearParkingEnabled]);
+  const parkAccessScope = parkAccessInfrastructureScopeForArea(isolatedArea);
   const parkAccessPresentation = useMemo(() => {
-    const enabledForScope = !isolatedArea
-      || isolatedArea === COMMERCIAL_MAP_SEGMENT_IDS.industry;
     const resolveOwners = (identifiers: readonly string[]) => {
-      if (!enabledForScope) return { visible: false, opacity: 0 };
+      if (!parkAccessScope) return { visible: false, opacity: 0 };
       const identifierSet = new Set<string>(identifiers);
       const owners = entities.filter((entity) => identifierSet.has(entity.publicIdentifier));
       if (owners.some((entity) => layerVisibility[entity.layerId] === false)) {
@@ -4200,16 +4266,21 @@ function Scene({
         : 1;
       return { visible: opacity > 0.015, opacity };
     };
+    const surfaceOwnerIdentifiers = parkAccessScope === 'exporural'
+      ? EXPORURAL_PARK_ACCESS_SURFACE_OWNER_IDENTIFIERS
+      : PARK_ACCESS_SURFACE_OWNER_IDENTIFIERS;
     return {
-      surfaces: resolveOwners(PARK_ACCESS_SURFACE_OWNER_IDENTIFIERS),
-      architecture: resolveOwners(PARK_ACCESS_ARCHITECTURE_OWNER_IDENTIFIERS),
+      surfaces: resolveOwners(surfaceOwnerIdentifiers),
+      architecture: parkAccessScope === 'exporural'
+        ? { visible: false, opacity: 0 }
+        : resolveOwners(PARK_ACCESS_ARCHITECTURE_OWNER_IDENTIFIERS),
     };
   }, [
     entities,
     entityFiltersActive,
-    isolatedArea,
     layerOpacity,
     layerVisibility,
+    parkAccessScope,
     presentedMatchingEntityIds,
   ]);
   const arenaFrontInfrastructurePresentation = useMemo(() => {
@@ -4405,23 +4476,26 @@ function Scene({
       {rearParkingEnabled && (
         <RearParkingLayer reducedGraphics={reducedGraphics} labelsVisible={labelsVisible} opacity={parkingPresentation.opacity} />
       )}
-      {(!isolatedArea || isolatedArea === COMMERCIAL_MAP_SEGMENT_IDS.industry)
-        && !hydrologicalModeActive && (
-          <>
+      {parkAccessScope && !hydrologicalModeActive && (
+        <>
+          {parkAccessScope === 'all' && (
             <ParkAccessEnvironmentLayer
               reducedGraphics={reducedGraphics}
               surfacesVisible
               vegetationVisible={treesVisible}
             />
-            <ParkAccessInfrastructure
-              reducedGraphics={reducedGraphics}
-              surfacesVisible={parkAccessPresentation.surfaces.visible}
-              surfaceOpacity={parkAccessPresentation.surfaces.opacity}
-              architectureVisible={parkAccessPresentation.architecture.visible}
-              architectureOpacity={parkAccessPresentation.architecture.opacity}
-            />
-          </>
-        )}
+          )}
+          <ParkAccessInfrastructure
+            reducedGraphics={reducedGraphics}
+            scope={parkAccessScope}
+            surfacesVisible={parkAccessPresentation.surfaces.visible}
+            surfaceOpacity={parkAccessPresentation.surfaces.opacity}
+            architectureVisible={parkAccessScope === 'all'
+              && parkAccessPresentation.architecture.visible}
+            architectureOpacity={parkAccessPresentation.architecture.opacity}
+          />
+        </>
+      )}
       <BatchedLots
         entries={lotEntries}
         selectedEntityId={selectedEntityId}
@@ -4447,6 +4521,7 @@ function Scene({
           filtersActive={entityFiltersActive}
           infrastructureMode={hydrologicalModeActive}
           nationsDistrictPresentationAvailable={nationsDistrictPresentationAvailable}
+          exporuralSteakhousePresentationAvailable={exporuralSteakhousePresentationAvailable}
           isMatch={presentedMatchingEntityIds.has(entity.id)}
           layerOpacity={layerOpacity[entity.layerId] ?? 1}
           sceneCenter={sceneCenter}

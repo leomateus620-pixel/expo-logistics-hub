@@ -1,4 +1,5 @@
 import {
+  EXPORURAL_GATE_ACCESS_ROAD_SURFACE_IDS,
   PARK_ACCESS_SPATIAL_PLAN,
   type ParkAccessPoint,
 } from '../data/parkAccessSpatialPlan';
@@ -93,6 +94,16 @@ export function adaptParkAccessSpatialPlan(
       polygon: surface.polygon,
       elevation: surface.elevation,
     })),
+    curbSegments: plan.roadSurfaces.flatMap((surface) => (
+      (surface.curbCenterlines ?? []).flatMap((centerline, edgeIndex) => (
+        centerline.slice(0, -1).map((from, segmentIndex) => ({
+          id: `${surface.id}:curb-${edgeIndex + 1}-${segmentIndex + 1}`,
+          from,
+          to: centerline[segmentIndex + 1],
+          elevation: surface.elevation,
+        }))
+      ))
+    )),
     parkingBays: plan.parkingBays.map((bay) => ({
       id: bay.id,
       center: bay.center,
@@ -133,3 +144,30 @@ export function adaptParkAccessSpatialPlan(
 }
 
 export const PARK_ACCESS_INFRASTRUCTURE_INPUT = adaptParkAccessSpatialPlan();
+
+export function selectParkAccessRoadInfrastructure(
+  input: ParkAccessInfrastructureInput,
+  roadSurfaceIds: readonly string[],
+): ParkAccessInfrastructureInput {
+  const selectedIds = new Set(roadSurfaceIds);
+  const curbPrefixes = roadSurfaceIds.map((id) => `${id}:`);
+
+  return {
+    ...input,
+    roadSurfaces: input.roadSurfaces.filter((surface) => selectedIds.has(surface.id)),
+    sidewalkSurfaces: [],
+    curbSegments: input.curbSegments?.filter((segment) => (
+      curbPrefixes.some((prefix) => segment.id.startsWith(prefix))
+    )) ?? [],
+    parkingBays: [],
+    markingSegments: [],
+    roundabouts: [],
+    gates: [],
+    costeiros: null,
+  };
+}
+
+export const EXPORURAL_PARK_ACCESS_INFRASTRUCTURE_INPUT = selectParkAccessRoadInfrastructure(
+  PARK_ACCESS_INFRASTRUCTURE_INPUT,
+  EXPORURAL_GATE_ACCESS_ROAD_SURFACE_IDS,
+);

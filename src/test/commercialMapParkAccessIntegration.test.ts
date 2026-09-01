@@ -13,14 +13,17 @@ describe('integração compartilhada dos acessos externos do mapa comercial', ()
 
   it('monta infraestrutura e ambientação no mapa completo e no segmento industrial', () => {
     expect(canvas).toContain("import { ParkAccessEnvironmentLayer } from './ParkAccessEnvironmentLayer';");
-    expect(canvas).toContain("import { ParkAccessInfrastructure } from './ParkAccessInfrastructure';");
+    expect(canvas).toContain("from './ParkAccessInfrastructure';");
     expect(canvas).toContain('selectParkAccessCompatibleTreesForPresentation(sceneTrees)');
-    expect(canvas).toContain('(!isolatedArea || isolatedArea === COMMERCIAL_MAP_SEGMENT_IDS.industry)');
+    expect(canvas).toContain('function parkAccessInfrastructureScopeForArea(');
+    expect(canvas).toContain("if (isolatedArea === COMMERCIAL_MAP_SEGMENT_IDS.exporural) return 'exporural';");
+    expect(canvas).toContain("parkAccessScope === 'all' && (");
     expect(canvas).toContain('!hydrologicalModeActive');
     expect(canvas).toContain('<ParkAccessEnvironmentLayer');
     expect(canvas).toContain('surfacesVisible={parkAccessPresentation.surfaces.visible}');
     expect(canvas).toContain('surfaceOpacity={parkAccessPresentation.surfaces.opacity}');
-    expect(canvas).toContain('architectureVisible={parkAccessPresentation.architecture.visible}');
+    expect(canvas).toContain('scope={parkAccessScope}');
+    expect(canvas).toContain("architectureVisible={parkAccessScope === 'all'");
     expect(canvas).toContain('architectureOpacity={parkAccessPresentation.architecture.opacity}');
     expect(canvas).toContain('vegetationVisible={treesVisible}');
   });

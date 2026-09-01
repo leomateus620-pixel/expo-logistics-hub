@@ -1,6 +1,10 @@
 import * as THREE from 'three';
 import { mergeBufferGeometries } from 'three-stdlib';
 import {
+  PARK_ACCESS_ROAD_CURB_WIDTH_METERS,
+  parkAccessMetersToLocal,
+} from '../data/parkAccessSpatialPlan';
+import {
   buildParkAccessArchitectureModel,
   type CosteirosBuildingPlacement,
   type ParkAccessArchitectureModel,
@@ -52,6 +56,13 @@ export interface ParkAccessParkingBayVisual {
   elevation?: number;
 }
 
+export interface ParkAccessCurbVisual {
+  id: string;
+  from: ParkAccessPoint;
+  to: ParkAccessPoint;
+  elevation: number;
+}
+
 export interface ParkAccessRoundaboutVisual {
   center: ParkAccessPoint;
   outerRadius: number;
@@ -65,6 +76,7 @@ export interface ParkAccessInfrastructureInput {
   roadSurfaces: readonly ParkAccessSurfaceVisual[];
   supportSurfaces: readonly ParkAccessFlatSupportSurface[];
   sidewalkSurfaces: readonly ParkAccessSurfaceVisual[];
+  curbSegments?: readonly ParkAccessCurbVisual[];
   parkingBays: readonly ParkAccessParkingBayVisual[];
   markingSegments: readonly ParkAccessMarkingVisual[];
   roundabouts: readonly ParkAccessRoundaboutVisual[];
@@ -90,6 +102,7 @@ export interface ParkAccessRenderModel {
   diagnostics: {
     roadSurfaceCount: number;
     sidewalkSurfaceCount: number;
+    curbSegmentCount: number;
     parkingBayCount: number;
     markingSegmentCount: number;
     roundaboutCount: number;
@@ -101,7 +114,7 @@ export interface ParkAccessRenderModel {
   };
 }
 
-export const PARK_ACCESS_INFRASTRUCTURE_REVISION = '2026.8-park-access-infrastructure.r3';
+export const PARK_ACCESS_INFRASTRUCTURE_REVISION = '2026.9-park-access-infrastructure.r4';
 
 export const PARK_ACCESS_INFRASTRUCTURE_PROFILE = {
   asphaltElevation: 0.044,
@@ -110,7 +123,7 @@ export const PARK_ACCESS_INFRASTRUCTURE_PROFILE = {
   sidewalkElevation: 0.072,
   markingElevation: 0.082,
   parkingMarkingWidth: 0.032,
-  curbWidth: 0.075,
+  curbWidth: parkAccessMetersToLocal(PARK_ACCESS_ROAD_CURB_WIDTH_METERS),
   curbRise: 0.043,
   dashLength: 0.44,
   dashGap: 0.3,
@@ -683,6 +696,13 @@ export function buildParkAccessRenderModel(
       ));
     });
   });
+  input.curbSegments?.forEach((segment) => {
+    curbParts.push(createCurbSegmentGeometry(
+      segment.from,
+      segment.to,
+      segment.elevation,
+    ));
+  });
 
   const whiteMarkingParts: Array<THREE.BufferGeometry | null> = [];
   const yellowMarkingParts: Array<THREE.BufferGeometry | null> = [];
@@ -785,6 +805,7 @@ export function buildParkAccessRenderModel(
     diagnostics: {
       roadSurfaceCount: input.roadSurfaces.length,
       sidewalkSurfaceCount: input.sidewalkSurfaces.length,
+      curbSegmentCount: input.curbSegments?.length ?? 0,
       parkingBayCount: input.parkingBays.length,
       markingSegmentCount: input.markingSegments.length,
       roundaboutCount: input.roundabouts.length,

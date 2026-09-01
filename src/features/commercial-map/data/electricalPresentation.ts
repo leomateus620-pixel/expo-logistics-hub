@@ -47,6 +47,47 @@ export function resolveElectricalArchitectureClearancePosition(
   return [node.position[0] + group.offset[0], node.position[1] + group.offset[1]];
 }
 
+/** Presentation-only verge placement for poles intersecting the A6/A7 access ribbons. */
+export const PARK_ACCESS_ELECTRICAL_CLEARANCE_PRESENTATION = {
+  revision: '2026.09.01-gates-6-7-clearance.1',
+  scope: 'PRESENTATION_ONLY',
+  verificationStatus: 'FIELD_REVIEW_REQUIRED',
+  sourceAnchorPreserved: true,
+  topologyPreserved: true,
+  groups: [
+    {
+      ownerIdentifier: 'A6',
+      ownerClassification: 'GATE',
+      roadSurfaceId: 'gate-6-gate-7-asphalt',
+      sourceMarkerIds: ['pole-ref-026'],
+      offset: [-0.5, -0.04],
+      notes: 'Recuo curto para a margem oeste do eixo A6/A7; o marcador e a cadeia elétrica oficiais permanecem inalterados.',
+    },
+    {
+      ownerIdentifier: 'RUA-GUSTAVO-BESSEL',
+      ownerClassification: 'ROAD',
+      roadSurfaceId: 'gate-7-gustavo-bessel-link',
+      sourceMarkerIds: ['pole-ref-149'],
+      offset: [-0.2, 0],
+      notes: 'Recuo para a margem oeste do ramal sul, preservando o encaixe com a Rua Gustavo Bessel e a topologia elétrica.',
+    },
+  ],
+} as const;
+
+export function resolveParkAccessElectricalClearancePosition(
+  node: CommercialElectricalNode,
+  entityByIdentifier: ReadonlyMap<string, MapEntity>,
+): Coordinate | null {
+  if (node.mountMode !== 'GROUND_POLE') return null;
+  const group = PARK_ACCESS_ELECTRICAL_CLEARANCE_PRESENTATION.groups.find((candidate) => (
+    candidate.sourceMarkerIds.some((identifier) => identifier === node.sourceMarkerId)
+    && entityByIdentifier.get(candidate.ownerIdentifier)?.classification === candidate.ownerClassification
+  ));
+  if (!group) return null;
+
+  return [node.position[0] + group.offset[0], node.position[1] + group.offset[1]];
+}
+
 /** Ground-level rear-road QA: source markers and electrical topology stay intact.
  * These bounded display offsets apply only while the corrected rear roads render.
  * They are clearance decisions, not a revision of the official electrical survey. */

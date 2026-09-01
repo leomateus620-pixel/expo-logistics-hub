@@ -123,7 +123,7 @@ describe('ambientação dos acessos, Caminho do Bosque e Sede Costeiros', () => 
     expect(presentation.revision).toBe(PARK_ACCESS_ENVIRONMENT_REVISION);
     expect(PARK_ACCESS_ENVIRONMENT_REVISION).toBe('2026.8-park-access-environment.r3');
     expect(presentation.diagnostics.sourceSpatialRevision).toBe(PARK_ACCESS_SPATIAL_PLAN.revision);
-    expect(presentation.diagnostics.sourceSpatialRevision).toBe('2026.8-park-access-annexes.4');
+    expect(presentation.diagnostics.sourceSpatialRevision).toBe('2026.8-park-access-annexes.5');
     expect(woodlandFloor.polygon).toBe(PARK_ACCESS_SPATIAL_PLAN.woodlandMass.polygon);
     const candidateHoles = [
       PARK_ACCESS_SPATIAL_PLAN.woodlandMass.pathClearancePolygon,
