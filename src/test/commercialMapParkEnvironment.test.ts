@@ -266,7 +266,8 @@ describe('infraestrutura ambiental do parque', () => {
     expect(renderer).toContain('degraus-concreto-arena');
     expect(renderer).toContain('redes-volei-arena');
     expect(renderer).toContain('tabelas-basquete-arena');
-    expect(renderer).toContain('gramado-sem-marcacoes-arena');
+    expect(renderer).toContain('laje-pavimentada-oeste-arena');
+    expect(renderer).not.toContain('gramado-sem-marcacoes-arena');
     expect(renderer).not.toContain('footballFieldLineGeometry');
     expect(renderer).not.toContain('marcacoes-campo-arena');
     expect(renderer).not.toContain("'pitchTurf'");

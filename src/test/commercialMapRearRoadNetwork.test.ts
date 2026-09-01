@@ -318,7 +318,7 @@ describe('área posterior — topologia de satélite e rodovia independente', ()
     expect(roadGraphHasPath('ubiretama', 'brasilia')).toBe(true);
     expect(degree('brasilia-ubiretama-junction')).toBe(4);
     expect(GENERATED_REAR_ROAD_SEGMENTS.filter((road) => road.roadId === 'RUA-BRASILIA')).toHaveLength(2);
-    expect(GENERATED_REAR_ROAD_SEGMENTS.filter((road) => road.roadId === 'RUA-UBIRETAMA')).toHaveLength(1);
+    expect(GENERATED_REAR_ROAD_SEGMENTS.filter((road) => road.roadId === 'RUA-UBIRETAMA')).toHaveLength(2);
     expect(REAR_PARK_ROAD_NETWORK.some((road) => road.id === 'brasilia-point-3-ubiretama-4')).toBe(false);
     const brasiliaAxis = [
       ...REAR_CALIBRATED_AXES.brasiliaNorthToJunction,
