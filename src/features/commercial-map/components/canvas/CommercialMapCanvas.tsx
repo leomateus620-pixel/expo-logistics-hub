@@ -1009,7 +1009,13 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
                 <boxGeometry args={[REAR_GATE_5_PRESENTATION.clearWidth + 0.22, 0.12, 0.18]} />
                 <meshStandardMaterial color={gateAccentColor} roughness={0.7} metalness={0.03} />
               </mesh>
+              {/* Cancela amarela atravessando a pista, como no trevo de referência. */}
+              <mesh position={[0, 0.46, 0.06]} raycast={NO_RAYCAST} castShadow>
+                <boxGeometry args={[REAR_GATE_5_PRESENTATION.clearWidth, 0.09, 0.07]} />
+                <meshStandardMaterial color="#e8b422" roughness={0.55} metalness={0.08} />
+              </mesh>
             </group>
+
           ) : <group visible={!usesDetailedParkAccessArchitecture}>
             <mesh position={[0, 0.035, 0]} raycast={NO_RAYCAST} receiveShadow>
               <cylinderGeometry args={[0.66, 0.72, 0.07, 10]} />
