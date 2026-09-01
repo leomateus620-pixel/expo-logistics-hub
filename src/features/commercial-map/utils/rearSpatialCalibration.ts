@@ -144,7 +144,7 @@ export const REAR_OFFICIAL_ANCHORS = Object.freeze({
 
 /**
  * A numeração do IMG_9936 é independente da numeração P1–P6 do quadro:
- * P2 = aproximação interna, P1 = portão, P3 = entroncamento da BR.
+ * P2 = entroncamento Ubiretama/A5, P1 = portão, P3 = entroncamento da BR.
  */
 export const REAR_SATELLITE_TOPOLOGY = Object.freeze({
   references: Object.freeze([
@@ -154,7 +154,7 @@ export const REAR_SATELLITE_TOPOLOGY = Object.freeze({
   points: Object.freeze([
     Object.freeze({
       id: 2 as const,
-      role: 'rua-brasilia-approach' as const,
+      role: 'ubiretama-gate-junction' as const,
       satellitePixel: [590, 1000] as Point2,
       officialSource: rearAttachment5ReferencePointById(4).officialSource,
     }),
@@ -188,6 +188,21 @@ export const REAR_CALIBRATED_AXES = Object.freeze({
     rearAttachment5ReferencePointById(2).officialSource,
     [3964, 3600],
     rearAttachment5ReferencePointById(3).officialSource,
+  ] as readonly Point2[]),
+  ubiretamaPoint5ToBrasilia: Object.freeze([
+    rearAttachment5ReferencePointById(5).officialSource,
+    [5987, 2300],
+    [5968, 2550],
+    rearAttachment5ReferencePointById(4).officialSource,
+    [5885, 3000],
+    [5750, 3235],
+    [5350, 3252],
+    [5000, 3240],
+    [4700, 3228],
+    [4522, 3218],
+    [4488, 3280],
+    [4488, 3455],
+    [4492, 3466],
   ] as readonly Point2[]),
   ubiretamaPoint5ToGateJunction: Object.freeze([
     rearAttachment5ReferencePointById(5).officialSource,
