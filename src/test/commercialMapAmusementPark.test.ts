@@ -17,6 +17,9 @@ const packageJson = JSON.parse(read('package.json')) as {
   dependencies: Record<string, string>;
 };
 const park = OFFICIAL_REFERENCE_ENTITIES.find((entity) => entity.publicIdentifier === 'J')!;
+const KAMIKAZE_APEX_SOURCE_VALUE = Number(
+  parkSource.match(/KAMIKAZE_APEX_RADIANS = ([\d.]+)/)?.[1],
+);
 
 describe('Parque de Diversões J', () => {
   it('preserva o footprint oficial e registra J como landmark estratégico', () => {
@@ -44,10 +47,49 @@ describe('Parque de Diversões J', () => {
     expect(parkSource).toContain('if (!parkActive || !body.current) return;');
     expect(parkSource).toContain('body.current?.sleep()');
     expect(parkSource).toContain('<instancedMesh');
-    expect(parkSource).toContain('emissiveIntensity={parkActive ? 7 : 0}');
+    expect(parkSource).toContain('emissiveIntensity={parkActive ? peak : 0}');
     expect(parkSource).not.toMatch(/<pointLight/i);
+    expect(parkSource).not.toMatch(/<spotLight/i);
     expect(canvasSource).toContain("=== 'amusement-park'");
     expect(environmentSource).toContain("nightMode ? '#050916'");
     expect(environmentSource).toContain('<SunrisePostProcessing qualityTier={qualityTier} enabled={active} />');
+  });
+
+  it('só inicializa o mundo Rapier na primeira ativação, com carrinhos estáticos antes', () => {
+    expect(parkSource).toContain('const [physicsBooted, setPhysicsBooted] = useState(false);');
+    expect(parkSource).toContain('if (parkActive) setPhysicsBooted(true);');
+    expect(parkSource).toContain('<ParkedBumperCars carCount={carCount} />');
+    expect(parkSource).toMatch(/physicsBooted \? \(\s*<Suspense fallback=\{<ParkedBumperCars/);
+  });
+
+  it('anima os dois braços espelhados do Kamikaze em rise-pause-descend', () => {
+    expect(parkSource).toContain('KAMIKAZE_APEX_RADIANS');
+    // Apex além da vertical, como nas referências do brinquedo real.
+    expect(KAMIKAZE_APEX_SOURCE_VALUE).toBeGreaterThan(Math.PI / 2);
+    expect(parkSource).toContain('armA.current.rotation.z = angle;');
+    expect(parkSource).toContain('armB.current.rotation.z = -angle;');
+    const armRenders = parkSource.match(/<KamikazeArm/g) ?? [];
+    expect(armRenders.length).toBe(2);
+  });
+
+  it('agrupa LEDs instanciados por cor emissiva e gira o anel junto da roda', () => {
+    // Cores por-instância não tingem o termo emissivo; cada cor tem seu grupo.
+    const ledStrings = parkSource.match(/<LedString/g) ?? [];
+    expect(ledStrings.length).toBeGreaterThanOrEqual(5);
+    expect(parkSource).toContain("color=\"#ff315f\"");
+    expect(parkSource).toContain("color=\"#42d9ff\"");
+    expect(parkSource).toContain("color=\"#f5c638\"");
+    // O anel de LEDs vive dentro do grupo rotativo da roda-gigante.
+    expect(parkSource.indexOf('<LedString positions={ringLeds.even}'))
+      .toBeGreaterThan(parkSource.indexOf('<group ref={wheel}'));
+  });
+
+  it('assenta os brinquedos em terreno verde-marrom com cerca perimetral', () => {
+    expect(parkSource).toContain('function ParkTerrain');
+    expect(parkSource).toContain('vertexColors');
+    expect(parkSource).toContain("new THREE.Color('#66764a')");
+    expect(parkSource).toContain("new THREE.Color('#8a704e')");
+    expect(parkSource).toContain('function ParkFence');
+    expect(parkSource).toContain('geometry.dispose()');
   });
 });
