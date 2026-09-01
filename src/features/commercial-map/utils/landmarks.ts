@@ -425,7 +425,9 @@ const STRATEGIC_LANDMARKS: Readonly<Record<string, StrategicLandmarkDefinition>>
     // The south-east approach keeps the three rides legible while preserving
     // the exact official J footprint as the interaction and terrain boundary.
     facingRadians: 0,
-    focusDirection: [0.72, 0.74, 0.88],
+    // Keep the approach low enough to read the Ferris wheel face and the
+    // Kamikaze silhouette instead of collapsing both rides in a top-down view.
+    focusDirection: [0.78, 0.34, 0.92],
     visualHeight: ({ width, depth }) => Math.min(6.2, Math.min(width, depth) * 0.86),
   },
   G: {
