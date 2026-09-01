@@ -110,10 +110,10 @@ export const REAR_ATTACHMENT_5_REFERENCE_POINTS = Object.freeze([
     canonicalSource: [5510, 4200],
   }),
   attachment5Point(2, 'Cruzamento Rua Brasília / Rua Ubiretama', 'brasilia-ubiretama-junction', [53, 73], {
-    satelliteSource: [4056, 3466],
+    satelliteSource: [3964, 3466],
   }),
   attachment5Point(3, 'Rua Brasília — aproximação suave a leste, ao lado do campo', 'brasilia-axis', [53, 46], {
-    satelliteSource: [4054, 2910],
+    satelliteSource: [3962, 2910],
   }),
   attachment5Point(4, 'Rua Ubiretama — encontro com o cadastro A5', 'ubiretama-a5-handoff', [55, 15], {
     satelliteSource: [5974, 3678],
@@ -193,40 +193,23 @@ export const REAR_CALIBRATED_AXES = Object.freeze({
     [3940, 4200], [4500, 4200], [5000, 4200], rearAttachment5ReferencePointById(1).officialSource,
   ] as readonly Point2[]),
   /**
-   * Eixo longitudinal correto (anexo 1): a faixa antiga em x ≈ 3950–3964 cortava
-   * o bosque e não existe em campo. O corredor real corre imediatamente a leste
-   * dela, livre das árvores, com curvatura suave até o cruzamento com a Ubiretama.
+   * Eixo longitudinal do parque: única faixa livre entre o bosque a oeste e as
+   * edificações oficiais D3/C1/Q-R-04 a leste, auditada pelas exclusões espaciais.
    */
   brasiliaNorthToJunction: Object.freeze([
-    [4036, 2445],
-    [4042, 2580],
-    [4048, 2720],
+    [3950, 2445],
+    [3954, 2580],
+    [3958, 2720],
     rearAttachment5ReferencePointById(3).officialSource,
-    [4056, 3180],
-    [4056, 3330],
+    [3963, 3180],
+    [3963, 3330],
     rearAttachment5ReferencePointById(2).officialSource,
   ] as readonly Point2[]),
   brasiliaJunctionToSouth: Object.freeze([
     rearAttachment5ReferencePointById(2).officialSource,
-    [4058, 3700],
-    [4060, 3860],
-    [4062, 3980],
-  ] as readonly Point2[]),
-  /**
-   * Trecho inferior: contorna o limite sul dos estacionamentos oficiais e sobe
-   * de volta pela borda leste até entregar o fluxo na aproximação do Portão 5,
-   * sem cruzar vaga, edificação ou mata densa.
-   */
-  longitudinalSouthToGate5: Object.freeze([
-    [4062, 3980],
-    [4240, 4150],
-    [4620, 4225],
-    [5100, 4272],
-    [5520, 4300],
-    [5860, 4288],
-    [6008, 4118],
-    [6014, 3880],
-    rearAttachment5ReferencePointById(4).officialSource,
+    [3964, 3700],
+    [3964, 3860],
+    [3964, 3980],
   ] as readonly Point2[]),
   /** Braço oeste contínuo da Ubiretama, do acesso da Exporural até o cruzamento. */
   ubiretamaWestToJunction: Object.freeze([
