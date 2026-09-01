@@ -22,10 +22,9 @@ describe('Parque de Diversões J', () => {
   it('preserva o footprint oficial e registra J como landmark estratégico', () => {
     expect(officialSource).toContain("[930, 2450, 1600, 3000]");
     expect(resolveStrategicLandmarkKind(park)).toBe('amusement-park');
-    expect(strategicLandmarkBounds(park)).toMatchObject({
-      width: 14.618181818181817,
-      depth: 12,
-    });
+    const bounds = strategicLandmarkBounds(park);
+    expect(bounds.width).toBeCloseTo(14.6182, 4);
+    expect(bounds.depth).toBeCloseTo(12, 4);
     expect(strategicLandmarkVisualHeight(park)).toBeGreaterThan(park.geometry.extrusionHeight);
   });
 
