@@ -117,7 +117,7 @@ function sourceBoundsOverlapPolygon(bounds: SourceBounds, polygon: readonly Sour
 
 describe('infraestrutura ambiental do parque', () => {
   it('mantém inventário ambiental versionado, explícito e fora das métricas comerciais', () => {
-    expect(PARK_ENVIRONMENT_REVISION).toBe('2028.1-arena-access-reference.2');
+    expect(PARK_ENVIRONMENT_REVISION).toBe('2028.1-arena-br472-satellite.1');
     expect(PARK_ENVIRONMENT_FEATURES).toHaveLength(9);
     expect(new Set(PARK_ENVIRONMENT_FEATURES.map((feature) => feature.id)).size)
       .toBe(PARK_ENVIRONMENT_FEATURES.length);
@@ -248,13 +248,15 @@ describe('infraestrutura ambiental do parque', () => {
     const metalPasses = (renderer.match(/<MetalInfrastructure\b/g) ?? []).length;
     const fullSceneDrawCalls = primaryDrawCalls + metalPasses - 1;
     expect(ARENA_FRONT_PRIMARY_DRAW_CALL_BUDGET).toBe(18);
-    expect(primaryDrawCalls).toBe(16);
-    expect(fullSceneDrawCalls).toBe(17);
+    expect(primaryDrawCalls).toBe(15);
+    expect(fullSceneDrawCalls).toBe(16);
     expect(fullSceneDrawCalls).toBeLessThanOrEqual(ARENA_FRONT_PRIMARY_DRAW_CALL_BUDGET);
     expect(renderer.match(/<instancedMesh/g)?.length).toBeGreaterThanOrEqual(5);
     expect(renderer).toContain('degraus-concreto-arena');
     expect(renderer).toContain('redes-volei-arena');
     expect(renderer).toContain('tabelas-basquete-arena');
+    expect(renderer).toContain('gramado-sem-marcacoes-arena');
+    expect(renderer).not.toContain('marcacoes-campo-arena');
     expect(renderer).toContain('raycast={NO_RAYCAST}');
     expect(renderer).toContain('reducedGraphics');
     expect(renderer).toContain('userData={STAIRS_USER_DATA}');

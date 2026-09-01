@@ -297,53 +297,6 @@ function courtLineGeometry() {
   return geometry;
 }
 
-/** ANALYST: delete this helper with the east marked pitch. Replacement west
- * field is UNMARKED — no lines, no pitchTurf. docs/arena-roads/analysis.md §4.1 */
-function footballFieldLineGeometry() {
-  const bounds = ARENA_FOOTBALL_FIELD_BOUNDS;
-  const inset = ARENA_FRONT_LAYOUT.footballField.markingInset;
-  const y = ARENA_FIELD_PLATEAU_ELEVATION + 0.026;
-  const vertices: number[] = [];
-  const add = (start: readonly [number, number], end: readonly [number, number]) => {
-    vertices.push(start[0], y, start[1], end[0], y, end[1]);
-  };
-  const minX = bounds.minX + inset;
-  const maxX = bounds.maxX - inset;
-  const minZ = bounds.minZ + inset;
-  const maxZ = bounds.maxZ - inset;
-  add([minX, minZ], [maxX, minZ]);
-  add([maxX, minZ], [maxX, maxZ]);
-  add([maxX, maxZ], [minX, maxZ]);
-  add([minX, maxZ], [minX, minZ]);
-  const centerX = (minX + maxX) / 2;
-  const centerZ = (minZ + maxZ) / 2;
-  add([centerX, minZ], [centerX, maxZ]);
-  const radius = Math.min(maxX - minX, maxZ - minZ) * 0.16;
-  for (let index = 0; index < 24; index += 1) {
-    const a = (index / 24) * Math.PI * 2;
-    const b = ((index + 1) / 24) * Math.PI * 2;
-    add(
-      [centerX + Math.cos(a) * radius, centerZ + Math.sin(a) * radius],
-      [centerX + Math.cos(b) * radius, centerZ + Math.sin(b) * radius],
-    );
-  }
-  // Pequenas áreas.
-  const boxDepth = (maxZ - minZ) * 0.24;
-  const boxRun = (maxX - minX) * 0.12;
-  [minX, maxX - boxRun].forEach((startX) => {
-    const endX = startX + boxRun;
-    add([startX, centerZ - boxDepth / 2], [endX, centerZ - boxDepth / 2]);
-    add([endX, centerZ - boxDepth / 2], [endX, centerZ + boxDepth / 2]);
-    add([endX, centerZ + boxDepth / 2], [startX, centerZ + boxDepth / 2]);
-  });
-
-  const geometry = new THREE.BufferGeometry();
-  geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-  geometry.computeBoundingBox();
-  geometry.computeBoundingSphere();
-  return geometry;
-}
-
 function courtNetGeometry(reducedGraphics: boolean) {
   const vertices: number[] = [];
   const add = (start: readonly [number, number, number], end: readonly [number, number, number]) => {
@@ -517,8 +470,6 @@ function ArenaTerrain({ opacity }: { opacity: number }) {
   );
 }
 
-/** ANALYST: move off [5410, 2800, 5900, 3120] (east of F). New unmarked grass
- * `[4560, 2708, 4884, 2948]` west of F (ANALYSIS.md §3.3). No 02-map green box. */
 function FootballField({ opacity }: { opacity: number }) {
   const { invalidate } = useThree();
   const bounds = ARENA_FOOTBALL_FIELD_BOUNDS;
@@ -536,12 +487,8 @@ function FootballField({ opacity }: { opacity: number }) {
     geometry.rotateX(-Math.PI / 2);
     return geometry;
   }, [bounds.depth, bounds.width]);
-  const lines = useMemo(
-    () => (config.markings ? footballFieldLineGeometry() : null),
-    [config.markings],
-  );
   const turfTexture = useMemo(() => tiledSurfaceTexture(
-    'pitchTurf',
+    'grass',
     (bounds.width - config.turfInset * 2) / 1.4,
     (bounds.depth - config.turfInset * 2) / 1.4,
   ), [bounds.depth, bounds.width, config.turfInset]);
@@ -557,14 +504,13 @@ function FootballField({ opacity }: { opacity: number }) {
 
   useEffect(() => () => turfGeometry.dispose(), [turfGeometry]);
   useEffect(() => () => apronGeometry.dispose(), [apronGeometry]);
-  useEffect(() => () => lines?.dispose(), [lines]);
   useEffect(() => () => turfTexture?.dispose(), [turfTexture]);
   useEffect(() => () => apronTexture?.dispose(), [apronTexture]);
 
   return (
-    <group name="campo-futebol-arena" userData={FIELD_USER_DATA}>
+    <group name="campo-gramado-sem-marcacoes-arena" userData={FIELD_USER_DATA}>
       <mesh
-        name="borda-desgastada-campo-arena"
+        name="borda-natural-campo-arena"
         geometry={apronGeometry}
         position={[bounds.centerX, ARENA_FIELD_PLATEAU_ELEVATION + 0.008, bounds.centerZ]}
         receiveShadow
@@ -582,7 +528,7 @@ function FootballField({ opacity }: { opacity: number }) {
         />
       </mesh>
       <mesh
-        name="gramado-campo-arena"
+        name="gramado-sem-marcacoes-arena"
         geometry={turfGeometry}
         position={[bounds.centerX, ARENA_FIELD_PLATEAU_ELEVATION + 0.018, bounds.centerZ]}
         receiveShadow
@@ -599,11 +545,6 @@ function FootballField({ opacity }: { opacity: number }) {
           depthWrite={opacity > 0.94}
         />
       </mesh>
-      {lines && (
-        <lineSegments name="marcacoes-campo-arena" geometry={lines} raycast={NO_RAYCAST} renderOrder={5}>
-          <lineBasicMaterial color="#f3f7ec" transparent opacity={0.78 * opacity} toneMapped={false} />
-        </lineSegments>
-      )}
     </group>
   );
 }

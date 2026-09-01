@@ -81,6 +81,7 @@ describe('terreno reconstruído do entorno da Arena', () => {
     const arena = sourceBoundsToLocal([4900, 2690, 5385, 3130]);
     expect(field.maxX).toBeLessThan(arena.minX);
     expect(field.minX).toBeGreaterThan(STAIRS.maxX);
+    expect(field.centerZ).toBeGreaterThan(multi.maxZ);
 
     // A antiga área a leste volta a seguir o terreno natural, sem patamar ou recorte esportivo.
     const oldFieldCenter = sourceBoundsToLocal([5410, 2800, 5900, 3120]);
@@ -114,5 +115,10 @@ describe('terreno reconstruído do entorno da Arena', () => {
     // O entorno leste/sudeste segue sendo terreno natural, sem plano branco genérico.
     const rear = sourceBoundsToLocal([5900, 2500, 5960, 2560]);
     expect(isArenaTerrainExcluded(rear.centerX, rear.centerZ)).toBe(false);
+
+    const field = ARENA_FOOTBALL_FIELD_BOUNDS;
+    expect(resolveArenaSurfaceOwner(field.centerX, field.centerZ)).toBe('SPORTS_FIELD');
+    const removedEastField = sourceBoundsToLocal([5410, 2800, 5900, 3120]);
+    expect(isArenaTerrainExcluded(removedEastField.centerX, removedEastField.centerZ)).toBe(false);
   });
 });

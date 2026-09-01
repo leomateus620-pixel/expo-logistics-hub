@@ -42,7 +42,7 @@ export interface LocalBounds {
   centerZ: number;
 }
 
-export const PARK_ENVIRONMENT_REVISION = '2028.1-arena-access-reference.2';
+export const PARK_ENVIRONMENT_REVISION = '2028.1-arena-br472-satellite.1';
 
 export const PARK_ENVIRONMENT_CLASSIFICATION_LABELS: Readonly<Record<ParkEnvironmentClassification, string>> = {
   NON_COMMERCIAL_STRUCTURE: 'Estrutura não comercial',
@@ -58,8 +58,8 @@ export const PARK_ENVIRONMENT_CLASSIFICATION_LABELS: Readonly<Record<ParkEnviron
 export const ARENA_FRONT_SOURCE_REFERENCES = [
   'Anexo 1 — vazio atual entre Espaço Mirante, Arena Sicredi - Icatu e Centro de Eventos',
   'Anexo 4 — leitura conjunta das quadras, taludes, escadaria e praça cívica',
-  'Anexo 5 — leitura frontal dos patamares, três setores de degraus e corrimãos',
-  'Satélite 2026-08-21 — escadaria oeste-leste e duas quadras junto à borda sul da Exporural',
+  '03-sat-detail.jpg — Rua Brasília a oeste da Arena, Rua Ubiretama ao sul e campo gramado sem marcações',
+  '04-sat-br472.jpg — acesso do Portão 5 e entroncamento com a BR-472',
 ] as const;
 
 /**
@@ -79,8 +79,8 @@ export const ARENA_FRONT_LAYOUT = {
   courtAnchors: ['QUADRA-R', 'EXPORURAL'] as const,
   courtOwners: ['QUADRA-R', 'EXPORURAL'] as const,
   plaza: {
-    // ANALYST: east edge 4888 covers the new west field. Notch per
-    // arena-roads/ANALYSIS.md §3.3 (not docs/arena-roads/analysis.md withdrawn clip).
+    // A praça conserva o setor cívico e o apron sul, com um recorte real para
+    // o pequeno campo gramado observado a oeste da Arena.
     sourcePolygon: [
       [4116, 2682],
       [4560, 2682],
@@ -301,14 +301,14 @@ export const PARK_ENVIRONMENT_FEATURES: readonly ParkEnvironmentFeature[] = [
   },
   {
     id: 'arena-front-football-field',
-    name: 'Campo de futebol da Arena',
+    name: 'Campo gramado sem marcações da Arena',
     classification: 'SPORTS_FIELD',
     isSellable: false,
     contributesToCommercialMetrics: false,
     sourceBounds: ARENA_FRONT_LAYOUT.footballField.sourceBounds,
     sourceReferences: ARENA_FRONT_SOURCE_REFERENCES,
     verificationStatus: 'FIELD_REVIEW_RECOMMENDED',
-    notes: 'Campo de grama natural não demarcado a oeste da Arena, entre o volume construído e a faixa cívica da escadaria/praça; apresentação, nunca lote comercial.',
+    notes: 'Pequeno campo de grama natural sem linhas, traves ou redes, a oeste da Arena e separado da escadaria; apresentação, nunca lote comercial.',
   },
   {
     id: 'arena-front-pedestrian-paths',

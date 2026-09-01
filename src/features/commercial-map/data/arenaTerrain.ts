@@ -9,7 +9,7 @@ import { ARENA_FRONT_LAYOUT, sourceBoundsToLocal } from './parkEnvironment';
  * alimenta lote, métrica comercial ou geometria oficial.
  */
 
-export const ARENA_TERRAIN_REVISION = '2026.7-arena-terreno-natural.1';
+export const ARENA_TERRAIN_REVISION = '2026.9-arena-campo-oeste.1';
 
 /** Cota do apron pavimentado diante da Arena (leste). */
 export const ARENA_TERRAIN_BASE_ELEVATION = ARENA_FRONT_LAYOUT.plaza.elevation;
