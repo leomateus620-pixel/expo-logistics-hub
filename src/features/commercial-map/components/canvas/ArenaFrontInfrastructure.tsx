@@ -536,7 +536,10 @@ function FootballField({ opacity }: { opacity: number }) {
     geometry.rotateX(-Math.PI / 2);
     return geometry;
   }, [bounds.depth, bounds.width]);
-  const lines = useMemo(footballFieldLineGeometry, []);
+  const lines = useMemo(
+    () => (config.markings ? footballFieldLineGeometry() : null),
+    [config.markings],
+  );
   const turfTexture = useMemo(() => tiledSurfaceTexture(
     'pitchTurf',
     (bounds.width - config.turfInset * 2) / 1.4,
@@ -554,7 +557,7 @@ function FootballField({ opacity }: { opacity: number }) {
 
   useEffect(() => () => turfGeometry.dispose(), [turfGeometry]);
   useEffect(() => () => apronGeometry.dispose(), [apronGeometry]);
-  useEffect(() => () => lines.dispose(), [lines]);
+  useEffect(() => () => lines?.dispose(), [lines]);
   useEffect(() => () => turfTexture?.dispose(), [turfTexture]);
   useEffect(() => () => apronTexture?.dispose(), [apronTexture]);
 
@@ -596,9 +599,11 @@ function FootballField({ opacity }: { opacity: number }) {
           depthWrite={opacity > 0.94}
         />
       </mesh>
-      <lineSegments name="marcacoes-campo-arena" geometry={lines} raycast={NO_RAYCAST} renderOrder={5}>
-        <lineBasicMaterial color="#f3f7ec" transparent opacity={0.78 * opacity} toneMapped={false} />
-      </lineSegments>
+      {lines && (
+        <lineSegments name="marcacoes-campo-arena" geometry={lines} raycast={NO_RAYCAST} renderOrder={5}>
+          <lineBasicMaterial color="#f3f7ec" transparent opacity={0.78 * opacity} toneMapped={false} />
+        </lineSegments>
+      )}
     </group>
   );
 }

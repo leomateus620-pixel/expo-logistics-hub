@@ -53,7 +53,7 @@ function gentleUndulation(x: number, z: number) {
 // `[4560, 2708, 4884, 2948]` (arena-roads/ANALYSIS.md §3.3). FIELD_BLEND → 0.45.
 const FIELD = sourceBoundsToLocal(ARENA_FRONT_LAYOUT.footballField.sourceBounds);
 /** Blend, em unidades locais, entre o patamar do campo e o terreno em volta. */
-const FIELD_BLEND = 0.8;
+const FIELD_BLEND = 0.45;
 
 function distanceToRectangle(
   x: number,

@@ -116,4 +116,4 @@ export function isArenaTerrainExcluded(x: number, z: number) {
   return resolveArenaSurfaceOwner(x, z) !== null;
 }
 
-export const ARENA_SECTOR_ZONING_REVISION = '2028.1-arena-access-reference.1';
+export const ARENA_SECTOR_ZONING_REVISION = '2028.1-arena-access-reference.2';

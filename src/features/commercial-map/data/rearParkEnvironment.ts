@@ -78,7 +78,7 @@ export const REAR_TERRAIN_PATCHES: readonly RearTerrainPatch[] = Object.freeze([
 export const REAR_STRUCTURE_EXCLUSIONS: readonly SourceBounds[] = Object.freeze([
   ETHNIC_QUARTER_SOURCE_BOUNDS,
   [4860, 2650, 5430, 3180], // Arena Shows (F)
-  [5410, 2800, 5900, 3120], // ANALYST: replace with [4560, 2708, 4884, 2948] (ANALYSIS.md §3.6)
+  [4560, 2708, 4884, 2948], // campo de futebol não demarcado a oeste da Arena
   [3980, 3140, 4530, 3480], // Centro de Eventos (C1)
   [3970, 2420, 4120, 2850], // Espaço Mirante (D3)
   [4960, 2350, 5120, 2500], // Churrascaria Exporural (C4)

@@ -83,7 +83,9 @@ export const ARENA_FRONT_LAYOUT = {
     // arena-roads/ANALYSIS.md §3.3 (not docs/arena-roads/analysis.md withdrawn clip).
     sourcePolygon: [
       [4116, 2682],
-      [4888, 2682],
+      [4560, 2682],
+      [4560, 2948],
+      [4888, 2948],
       [4888, 3096],
       [4498, 3100],
       [4116, 3098],
@@ -146,24 +148,22 @@ export const ARENA_FRONT_LAYOUT = {
     blendDistance: 1.15,
   },
   /**
-   * ANALYST 2026.9-arena-br472-analyst.1 — DELETE these bounds.
-   * `[5410, 2800, 5900, 3120]` is the MARKED pitch EAST of F (red X).
-   * Implementer rect: `[4560, 2708, 4884, 2948]` west of F, unmarked
-   * (`arena-roads/ANALYSIS.md` §3.3). Do not digitise the 02-map green box.
+   * Campo de grama natural não demarcado a oeste da Arena, entre o volume
+   * construído e a faixa cívica da escadaria/praça.
    */
   footballField: {
-    sourceBounds: [5410, 2800, 5900, 3120] as SourceBounds,
+    sourceBounds: [4560, 2708, 4884, 2948] as SourceBounds,
     turfInset: 0.18,
-    markingInset: 0.34,
+    markingInset: 0,
     turfColor: '#7f9a5c',
     wornColor: '#98a074',
+    markings: false,
   },
   /** Caminhos de circulação entre escadaria, quadras, Arena, campo e estacionamento. */
   walkways: [
     { id: 'arena-walkway-stairs-apron', sourcePath: [[4480, 2895], [4680, 2895], [4880, 2860]] as readonly SourcePoint[], width: 0.34 },
     { id: 'arena-walkway-courts-plaza', sourcePath: [[4620, 2682], [4620, 2560], [4620, 2480]] as readonly SourcePoint[], width: 0.26 },
-    // ANALYST: delete this walkway with the east marked pitch (§4.1).
-    { id: 'arena-walkway-arena-field', sourcePath: [[5395, 3180], [5620, 3190], [5850, 3196]] as readonly SourcePoint[], width: 0.26 },
+    { id: 'arena-walkway-arena-field', sourcePath: [[4520, 2880], [4560, 2830], [4700, 2828]] as readonly SourcePoint[], width: 0.26 },
     { id: 'arena-walkway-arena-parking', sourcePath: [[5140, 3140], [5150, 3200], [5160, 3250]] as readonly SourcePoint[], width: 0.24 },
   ] as const,
   /** Massas arbóreas do setor, lidas nos anexos 3 e 4 (conferência de campo recomendada). */
@@ -185,12 +185,12 @@ export const ARENA_FRONT_LAYOUT = {
     { sourcePosition: [5860, 2690] as SourcePoint, scale: 0.96 },
     { sourcePosition: [5920, 2870] as SourcePoint, scale: 1.06 },
     { sourcePosition: [5930, 3050] as SourcePoint, scale: 0.92 },
-    // Same four landscape trees, shifted to the grass shoulder of corrected
-    // Rua Brasília. Keep canopies as well as trunks out of its carriageway.
-    { sourcePosition: [5920, 3265] as SourcePoint, scale: 1.04 },
-    { sourcePosition: [5700, 3265] as SourcePoint, scale: 0.98 },
-    { sourcePosition: [5480, 3260] as SourcePoint, scale: 1.1 },
-    { sourcePosition: [5230, 3260] as SourcePoint, scale: 0.9 },
+    // Same four landscape trees, shifted north onto the grass shoulder of
+    // corrected Rua Ubiretama. Keep canopies and trunks out of its carriageway.
+    { sourcePosition: [5920, 3188] as SourcePoint, scale: 1.04 },
+    { sourcePosition: [5700, 3184] as SourcePoint, scale: 0.98 },
+    { sourcePosition: [5480, 3178] as SourcePoint, scale: 1.1 },
+    { sourcePosition: [5230, 3172] as SourcePoint, scale: 0.9 },
   ] as const,
   northBerm: {
     sourceBounds: [4120, 2682, 4480, 2720] as SourceBounds,
@@ -308,7 +308,7 @@ export const PARK_ENVIRONMENT_FEATURES: readonly ParkEnvironmentFeature[] = [
     sourceBounds: ARENA_FRONT_LAYOUT.footballField.sourceBounds,
     sourceReferences: ARENA_FRONT_SOURCE_REFERENCES,
     verificationStatus: 'FIELD_REVIEW_RECOMMENDED',
-    notes: 'Campo de grama natural atrás/ao lado da Arena, junto à borda norte do estacionamento de expositores; apresentação, nunca lote comercial.',
+    notes: 'Campo de grama natural não demarcado a oeste da Arena, entre o volume construído e a faixa cívica da escadaria/praça; apresentação, nunca lote comercial.',
   },
   {
     id: 'arena-front-pedestrian-paths',

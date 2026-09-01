@@ -145,6 +145,7 @@ describe('infraestrutura ambiental do parque', () => {
 
   it('orienta a escadaria para a Arena e ancora as quadras junto à borda sul da Exporural', () => {
     const stairs = ARENA_FRONT_LAYOUT.stairs.sourceBounds;
+    const footballField = ARENA_FRONT_LAYOUT.footballField.sourceBounds;
     const multiSport = ARENA_FRONT_LAYOUT.multiSportCourt.sourceBounds;
     const volleyball = ARENA_FRONT_LAYOUT.sandVolleyballCourt.sourceBounds;
     const localStairs = sourceBoundsToLocal(stairs);
@@ -172,6 +173,9 @@ describe('infraestrutura ambiental do parque', () => {
     expect(localVolleyball.centerX).toBeLessThan(localMultiSport.centerX);
     expect(localVolleyball.maxX).toBeLessThan(localMultiSport.minX);
     expect(localMultiSport.maxZ).toBeLessThan(localStairs.minZ);
+    expect(footballField[2]).toBeLessThan(4900);
+    expect(footballField[0]).toBeGreaterThan(stairs[2]);
+    expect(ARENA_FRONT_LAYOUT.footballField.markings).toBe(false);
 
     const protectedIdentifiers = ['D3', 'B16', 'B17', 'F', 'C1', 'RUA-BRASIL', 'E-10', 'E-13'];
     const infrastructureBounds = [
@@ -193,6 +197,18 @@ describe('infraestrutura ambiental do parque', () => {
         expect(sourceBoundsOverlapPolygon(bounds, polygon), `${identifier}: ${bounds.join(',')}`)
           .toBe(false);
       });
+    });
+
+    [
+      'F', 'D3', 'D1', 'C1', 'RUA-BRASILIA', 'RUA-BRASIL',
+    ].forEach((identifier) => {
+      expect(
+        sourceBoundsOverlap(footballField, sourceBoundsForEntity(identifier)),
+        `${identifier}: ${footballField.join(',')}`,
+      ).toBe(false);
+    });
+    [stairs, multiSport, volleyball].forEach((bounds) => {
+      expect(sourceBoundsOverlap(footballField, bounds), `campo: ${bounds.join(',')}`).toBe(false);
     });
   });
 
