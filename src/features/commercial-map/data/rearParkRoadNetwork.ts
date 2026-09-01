@@ -84,7 +84,7 @@ export interface RearRoadIdentity {
 
 export type RearContextualLabelOwner = RearRoadIdentity['officialOwnerIdentifier'] | 'A5';
 
-export const REAR_PARK_ROAD_REVISION = '2026.10-longitudinal-ubiretama-gate5.1';
+export const REAR_PARK_ROAD_REVISION = '2026.10-lateral-ubiretama-gate5.2';
 
 /** Escala uniforme do recorte oficial, usada apenas para larguras físicas. */
 export const SOURCE_POINTS_PER_LOCAL_UNIT = 5500 / 120;
@@ -107,6 +107,7 @@ export const PROTECTED_ROAD_IDENTIFIERS: readonly string[] = Object.freeze([
  * os segmentos procedurais apenas prolongam sua apresentação no setor traseiro.
  */
 export const REPLACED_OFFICIAL_ROAD_IDENTIFIERS: readonly string[] = Object.freeze([
+  'RUA-BRASILIA',
   'RUA-UBIRETAMA',
   'RODOVIA-RS-472',
 ]);
