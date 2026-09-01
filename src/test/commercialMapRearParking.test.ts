@@ -103,6 +103,10 @@ describe('rear parking annex registration and identity', () => {
       presented.geometry.coordinates[0],
     )).toBe(false);
     expect(parkingContainsPoint(
+      officialPdfPointToLocal([5000, 3250]),
+      presented.geometry.coordinates[0],
+    )).toBe(false);
+    expect(parkingContainsPoint(
       officialPdfPointToLocal([5000, 3600]),
       presented.geometry.coordinates[0],
     )).toBe(true);

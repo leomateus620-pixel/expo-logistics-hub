@@ -194,8 +194,10 @@ function arenaRoadParkingPresentation(entity: MapEntity): MapEntity | null {
   const ring = openParkingPolygon(entity.geometry.coordinates[0] ?? []);
   if (ring.length !== 4 || entity.geometry.coordinates.length !== 1) return null;
   const sourcePolygon = [
-    [4558, 3222],
-    [5350, 3260],
+    [4558, 3242],
+    [4700, 3250],
+    [5000, 3262],
+    [5350, 3274],
     [5270, 4140],
     [4510, 4140],
     [4510, 3488],

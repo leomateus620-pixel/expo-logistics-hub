@@ -60,9 +60,6 @@ const NON_OBSTACLE_CLASSIFICATIONS = new Set([
   'GREEN_AREA',
   'TREE',
   'WATER',
-  // Quadras are cadastral envelopes that contain their own circulation;
-  // physical lots and structures remain audited individually.
-  'QUADRA',
   'RURAL_EXHIBITION',
 ]);
 const ROAD_COMPATIBLE_OFFICIAL_IDENTIFIERS = new Set([
