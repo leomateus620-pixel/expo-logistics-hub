@@ -1,12 +1,12 @@
 import { describe, expect, it } from 'vitest';
 import {
+  ARENA_ABSORBED_FIELD_BOUNDS,
   ARENA_FRONT_LAYOUT,
   PARK_ENVIRONMENT_FEATURES,
   sourceBoundsToLocal,
+  sourcePolygonToLocal,
 } from '@/features/commercial-map/data/parkEnvironment';
 import {
-  ARENA_FIELD_PLATEAU_ELEVATION,
-  ARENA_FOOTBALL_FIELD_BOUNDS,
   ARENA_TERRAIN_BASE_ELEVATION,
   ARENA_TERRAIN_RISE,
   ARENA_TERRAIN_TOP_ELEVATION,
@@ -20,6 +20,18 @@ import {
 } from '@/features/commercial-map/data/arenaSectorZoning';
 
 const STAIRS = sourceBoundsToLocal(ARENA_FRONT_LAYOUT.stairs.sourceBounds);
+
+function pointInLocalPolygon(x: number, z: number, polygon: readonly (readonly [number, number])[]) {
+  let inside = false;
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i, i += 1) {
+    const [xi, zi] = polygon[i];
+    const [xj, zj] = polygon[j];
+    const intersects = (zi > z) !== (zj > z)
+      && x < ((xj - xi) * (z - zi)) / (zj - zi || Number.EPSILON) + xi;
+    if (intersects) inside = !inside;
+  }
+  return inside;
+}
 
 describe('terreno reconstruído do entorno da Arena', () => {
   it('substitui o bloco flutuante por um desnível compatível com a escadaria', () => {
@@ -53,52 +65,56 @@ describe('terreno reconstruído do entorno da Arena', () => {
     expect(samples[samples.length - 1]).toBeGreaterThan(samples[0]);
   });
 
-  it('reserva um patamar plano para o campo não demarcado a oeste da Arena', () => {
-    const field = ARENA_FOOTBALL_FIELD_BOUNDS;
-    expect(field.depth).toBeGreaterThan(field.width);
-    expect(ARENA_FRONT_LAYOUT.footballField.markings).toBe(false);
-    const corners: [number, number][] = [
+  it('absorve o campo inexistente na laje de concreto e preserva o gramado da via', () => {
+    const field = sourceBoundsToLocal(ARENA_ABSORBED_FIELD_BOUNDS);
+    const plaza = sourcePolygonToLocal(ARENA_FRONT_LAYOUT.plaza.sourcePolygon);
+    const multi = sourceBoundsToLocal(ARENA_FRONT_LAYOUT.multiSportCourt.sourceBounds);
+    const sand = sourceBoundsToLocal(ARENA_FRONT_LAYOUT.sandVolleyballCourt.sourceBounds);
+    const arena = sourceBoundsToLocal([4900, 2690, 5385, 3130]);
+    const verge = sourceBoundsToLocal([4020, 2720, 4088, 2800]);
+
+    expect('footballField' in ARENA_FRONT_LAYOUT).toBe(false);
+    expect(field.maxX).toBeLessThan(arena.minX);
+    expect(field.minX).toBeGreaterThan(STAIRS.maxX);
+    expect(pointInLocalPolygon(field.centerX, field.centerZ, plaza)).toBe(true);
+    [
       [field.minX + 0.2, field.minZ + 0.2],
       [field.maxX - 0.2, field.minZ + 0.2],
       [field.minX + 0.2, field.maxZ - 0.2],
       [field.maxX - 0.2, field.maxZ - 0.2],
       [field.centerX, field.centerZ],
-    ];
-    corners.forEach(([x, z]) => {
-      expect(arenaTerrainElevation(x, z)).toBeCloseTo(ARENA_FIELD_PLATEAU_ELEVATION, 2);
+    ].forEach(([x, z]) => {
+      expect(resolveArenaSurfaceOwner(x, z)).toBe('CONCRETE_ACCESS');
+      expect(arenaTerrainElevation(x, z)).toBeCloseTo(ARENA_TERRAIN_BASE_ELEVATION, 2);
     });
 
-    const multi = sourceBoundsToLocal(ARENA_FRONT_LAYOUT.multiSportCourt.sourceBounds);
-    const sand = sourceBoundsToLocal(ARENA_FRONT_LAYOUT.sandVolleyballCourt.sourceBounds);
     [multi, sand].forEach((court) => {
       const overlaps = field.maxX > court.minX && field.minX < court.maxX
         && field.maxZ > court.minZ && field.minZ < court.maxZ;
       expect(overlaps).toBe(false);
-      // Quadras seguem no trecho plano, junto ao apron.
       expect(arenaTerrainPlateauElevation(court)).toBeCloseTo(ARENA_TERRAIN_BASE_ELEVATION, 2);
+      expect(resolveArenaSurfaceOwner(court.centerX, court.centerZ)).toBe('SPORTS_COURT');
     });
-    // Zoneamento corrigido: o campo fica entre a escadaria e a face oeste da Arena.
-    const arena = sourceBoundsToLocal([4900, 2690, 5385, 3130]);
-    expect(field.maxX).toBeLessThan(arena.minX);
-    expect(field.minX).toBeGreaterThan(STAIRS.maxX);
-    expect(field.centerZ).toBeGreaterThan(multi.maxZ);
-    expect(field.centerZ).toBeGreaterThan(arena.centerZ);
 
-    // A antiga área a leste volta a seguir o terreno natural, sem patamar ou recorte esportivo.
+    expect(resolveArenaSurfaceOwner(arena.centerX, arena.centerZ)).toBe('ARENA_STRUCTURE');
+    expect(pointInLocalPolygon(verge.centerX, verge.centerZ, plaza)).toBe(false);
+    expect(resolveArenaSurfaceOwner(verge.centerX, verge.centerZ)).not.toBe('CONCRETE_ACCESS');
+
     const oldFieldCenter = sourceBoundsToLocal([5410, 2800, 5900, 3120]);
     expect(arenaTerrainElevation(oldFieldCenter.centerX, oldFieldCenter.centerZ))
       .toBeCloseTo(ARENA_TERRAIN_BASE_ELEVATION, 6);
     expect(resolveArenaSurfaceOwner(oldFieldCenter.centerX, oldFieldCenter.centerZ)).toBe(null);
   });
 
-  it('registra terreno, campo e caminhos como apresentação não comercial', () => {
-    ['arena-front-natural-terrain', 'arena-front-football-field', 'arena-front-pedestrian-paths']
+  it('registra terreno e caminhos como apresentação não comercial', () => {
+    ['arena-front-natural-terrain', 'arena-front-public-plaza', 'arena-front-pedestrian-paths']
       .forEach((id) => {
         const feature = PARK_ENVIRONMENT_FEATURES.find((candidate) => candidate.id === id);
         expect(feature, id).toBeDefined();
         expect(feature!.isSellable).toBe(false);
         expect(feature!.contributesToCommercialMetrics).toBe(false);
       });
+    expect(PARK_ENVIRONMENT_FEATURES.some((feature) => feature.id === 'arena-front-football-field')).toBe(false);
     expect(ARENA_FRONT_LAYOUT.walkways.length).toBeGreaterThanOrEqual(3);
     expect(ARENA_FRONT_LAYOUT.treeClusters.length).toBeGreaterThanOrEqual(10);
   });
@@ -113,19 +129,17 @@ describe('terreno reconstruído do entorno da Arena', () => {
     });
     expect(resolveArenaSurfaceOwner(arena.centerX, arena.centerZ)).toBe('ARENA_STRUCTURE');
 
-    // O centro do campo largo/norte rejeitado volta a pertencer à laje.
     const rejectedField = sourceBoundsToLocal([4560, 2708, 4884, 2948]);
     expect(resolveArenaSurfaceOwner(rejectedField.centerX, rejectedField.centerZ))
       .toBe('CONCRETE_ACCESS');
 
-    // O entorno leste/sudeste segue sendo terreno natural, sem plano branco genérico.
     const rear = sourceBoundsToLocal([5900, 2500, 5960, 2560]);
     expect(isArenaTerrainExcluded(rear.centerX, rear.centerZ)).toBe(false);
 
-    const field = ARENA_FOOTBALL_FIELD_BOUNDS;
+    const field = sourceBoundsToLocal(ARENA_ABSORBED_FIELD_BOUNDS);
     for (const x of [field.minX + 0.1, field.centerX, field.maxX - 0.1]) {
       for (const z of [field.minZ + 0.1, field.centerZ, field.maxZ - 0.1]) {
-        expect(resolveArenaSurfaceOwner(x, z)).toBe('SPORTS_FIELD');
+        expect(resolveArenaSurfaceOwner(x, z)).toBe('CONCRETE_ACCESS');
       }
     }
     const removedEastField = sourceBoundsToLocal([5410, 2800, 5900, 3120]);

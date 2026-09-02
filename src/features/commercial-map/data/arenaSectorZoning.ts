@@ -1,15 +1,15 @@
 import { officialPdfPointToLocal } from './officialReference2026';
-import { ARENA_FRONT_LAYOUT, EXPORURAL_SMOOTH_CONCRETE_CORRECTION } from './parkEnvironment';
+import { ARENA_ABSORBED_FIELD_BOUNDS, ARENA_FRONT_LAYOUT, EXPORURAL_SMOOTH_CONCRETE_CORRECTION } from './parkEnvironment';
 
 /**
  * Zoneamento do setor da Arena Sicredi - Icatu.
  *
  * Cada zona abaixo pertence a outra camada (arquitetura, escadaria, quadras,
- * estacionamento, via, campo). O terreno natural é recortado contra elas: grama
+ * estacionamento, via). O terreno natural é recortado contra elas: grama
  * e solo nunca podem cobrir concreto, quadras, estacionamento ou vias.
  *
  * Prioridade de superfície (maior vence):
- * estruturas > escadaria/praça > quadras > estacionamento > vias > campo > terreno.
+ * estruturas > escadaria/praça > quadras > estacionamento > vias > terreno.
  */
 
 export type ArenaSurfaceOwner =
@@ -76,8 +76,9 @@ export const ARENA_SECTOR_SURFACE_ZONES: readonly ArenaSurfaceZone[] = [
   zone('parking-visitantes', 'PARKING', [[5350, 3400], [5980, 3480], [5900, 4250], [5350, 4140]]),
   // Rua Brasil, chegando pelo oeste.
   zone('rua-brasil', 'ROAD', rect([4106, 3096, 4520, 3191])),
-  // Campo gramado sem marcações: superfície própria a oeste da Arena.
-  zone('football-field', 'SPORTS_FIELD', rect(inflate(ARENA_FRONT_LAYOUT.footballField.sourceBounds))),
+  // O retângulo do campo inexistente é concreto da laje, não gramado esportivo.
+  // O id `football-field` permanece para o overlay de exclusão das vias.
+  zone('football-field', 'CONCRETE_ACCESS', rect(ARENA_ABSORBED_FIELD_BOUNDS)),
   // Anexo 1: concreto liso a leste de C4. Polígono exato, sem inflar sobre vias.
   zone('exporural-smooth-concrete', 'CONCRETE_ACCESS', EXPORURAL_SMOOTH_CONCRETE_CORRECTION.sourcePolygon),
 ];
@@ -117,4 +118,4 @@ export function isArenaTerrainExcluded(x: number, z: number) {
   return resolveArenaSurfaceOwner(x, z) !== null;
 }
 
-export const ARENA_SECTOR_ZONING_REVISION = '2026.9-anexo3-west-field.1';
+export const ARENA_SECTOR_ZONING_REVISION = '2026.9-arena-north-apron-concrete.1';

@@ -4,12 +4,12 @@ import { ARENA_FRONT_LAYOUT, sourceBoundsToLocal } from './parkEnvironment';
  * Modelo de cota do setor da Arena Sicredi - Icatu.
  *
  * Uma única função de altura é compartilhada por terreno, escadaria, taludes,
- * quadras, campo, caminhos e vegetação: é o que garante que nada volte a
+ * quadras, caminhos e vegetação: é o que garante que nada volte a
  * "flutuar" sobre a antiga praça plana. Apresentação pura — nenhuma cota daqui
  * alimenta lote, métrica comercial ou geometria oficial.
  */
 
-export const ARENA_TERRAIN_REVISION = '2026.9-arena-campo-oeste-sul.2';
+export const ARENA_TERRAIN_REVISION = '2026.9-arena-north-apron-concrete.1';
 
 /** Cota do apron pavimentado diante da Arena (leste). */
 export const ARENA_TERRAIN_BASE_ELEVATION = ARENA_FRONT_LAYOUT.plaza.elevation;
@@ -49,40 +49,10 @@ function gentleUndulation(x: number, z: number) {
   return wave * 0.018 * apronFade;
 }
 
-// O patamar segue o campo estreito a oeste/sudoeste de F. A laje ao norte
-// permanece na cota de concreto e não participa deste blend.
-const FIELD = sourceBoundsToLocal(ARENA_FRONT_LAYOUT.footballField.sourceBounds);
-/** Blend, em unidades locais, entre o patamar do campo e o terreno em volta. */
-const FIELD_BLEND = 0.45;
-
-function distanceToRectangle(
-  x: number,
-  z: number,
-  bounds: { minX: number; maxX: number; minZ: number; maxZ: number },
-) {
-  const dx = Math.max(bounds.minX - x, 0, x - bounds.maxX);
-  const dz = Math.max(bounds.minZ - z, 0, z - bounds.maxZ);
-  return Math.hypot(dx, dz);
-}
-
-function slopeElevation(x: number, z: number) {
+export function arenaTerrainElevation(x: number, z: number) {
   return ARENA_TERRAIN_BASE_ELEVATION + ARENA_TERRAIN_RISE * arenaTerrainSlopeFactor(x)
     + gentleUndulation(x, z);
 }
-
-/** Patamar plano que recebe o campo gramado, tirado da cota central da encosta. */
-export const ARENA_FIELD_PLATEAU_ELEVATION = ARENA_TERRAIN_BASE_ELEVATION
-  + ARENA_TERRAIN_RISE * arenaTerrainSlopeFactor((FIELD.minX + FIELD.maxX) / 2);
-
-export function arenaTerrainElevation(x: number, z: number) {
-  const natural = slopeElevation(x, z);
-  const distance = distanceToRectangle(x, z, FIELD);
-  if (distance >= FIELD_BLEND) return natural;
-  const weight = 1 - smoothstep(0, FIELD_BLEND, distance);
-  return natural + (ARENA_FIELD_PLATEAU_ELEVATION - natural) * weight;
-}
-
-export const ARENA_FOOTBALL_FIELD_BOUNDS = FIELD;
 
 /** Maior cota amostrada em um retângulo — usada para assentar superfícies planas. */
 export function arenaTerrainPlateauElevation(

@@ -42,7 +42,14 @@ export interface LocalBounds {
   centerZ: number;
 }
 
-export const PARK_ENVIRONMENT_REVISION = '2026.9-anexo3-west-field.1';
+export const PARK_ENVIRONMENT_REVISION = '2026.9-arena-north-apron-concrete.1';
+
+/**
+ * Retângulo do campo gramado que o PR #112 recolocou sobre o apron norte da
+ * Arena. Não existe em campo: a laje única absorve a área. Não gera malha,
+ * classificação esportiva nem cotas próprias.
+ */
+export const ARENA_ABSORBED_FIELD_BOUNDS = [4660, 2860, 4880, 3200] as const;
 
 /**
  * Anexo 1 — “Área de concreto liso” immediately east of Churrascaria Exporural
@@ -81,7 +88,7 @@ export const PARK_ENVIRONMENT_CLASSIFICATION_LABELS: Readonly<Record<ParkEnviron
 export const ARENA_FRONT_SOURCE_REFERENCES = [
   'Anexo 1 — vazio atual entre Espaço Mirante, Arena Sicredi - Icatu e Centro de Eventos',
   'Anexo 4 — leitura conjunta das quadras, taludes, escadaria e praça cívica',
-  '03-sat-detail.jpg — Rua Brasília a oeste da Arena, Rua Ubiretama ao sul e campo gramado sem marcações',
+  '03-sat-detail.jpg — Rua Brasília a oeste da Arena, Rua Ubiretama ao sul e apron de concreto ao norte',
   '04-sat-br472.jpg — acesso do Portão 5 e entroncamento com a BR-472',
 ] as const;
 
@@ -102,14 +109,15 @@ export const ARENA_FRONT_LAYOUT = {
   courtAnchors: ['QUADRA-R', 'EXPORURAL'] as const,
   courtOwners: ['QUADRA-R', 'EXPORURAL'] as const,
   plaza: {
-    // O pátio permanece concreto ao norte da Arena. O campo fica separado no
-    // gramado a sudoeste, em vez de ser encaixado como uma ilha dentro da laje.
+    // Laje única ao norte/oeste da Arena. O retângulo do campo inexistente
+    // ([4660, 2860, 4880, 3200]) entra neste polígono — sem segunda malha.
+    // A borda oeste em x=4116 preserva o gramado da via, a leste de Brasília.
     sourcePolygon: [
       [4116, 2682],
       [4888, 2682],
-      [4888, 2832],
-      [4620, 2832],
-      [4620, 3098],
+      [4888, 3200],
+      [4660, 3200],
+      [4660, 3098],
       [4116, 3098],
     ] as readonly SourcePoint[],
     elevation: 0.052,
@@ -160,7 +168,7 @@ export const ARENA_FRONT_LAYOUT = {
    * Malha de terreno do setor: alta a oeste (topo da escadaria), descendo até o
    * apron da Arena e seguindo pelas laterais e pelo fundo (leste/sudeste) até as
    * bordas dos estacionamentos oficiais. É recortada contra as zonas de concreto,
-   * quadras, vias, estacionamento e campo (ver `arenaSectorZoning.ts`).
+   * quadras, vias e estacionamento (ver `arenaSectorZoning.ts`).
    */
   terrain: {
     sourceBounds: [4106, 2400, 5980, 3300] as SourceBounds,
@@ -169,22 +177,9 @@ export const ARENA_FRONT_LAYOUT = {
     /** Faixa de transição, em unidades locais, entre talude e piso pavimentado. */
     blendDistance: 1.15,
   },
-  /**
-   * Campo de grama natural não demarcado imediatamente a oeste da Arena. A
-   * proporção longitudinal e o deslocamento para sul seguem o satélite
-   * (Anexo 3). A laje de concreto permanece ao norte; esta área não é apron.
-   */
-  footballField: {
-    sourceBounds: [4660, 2860, 4880, 3200] as SourceBounds,
-    turfInset: 0.18,
-    markingInset: 0,
-    turfColor: '#7f9a5c',
-    wornColor: '#98a074',
-    markings: false,
-  },
   /** Laje contínua a leste de C4; UVs em unidade de mundo, sem remendo azulejado. */
   exporuralSmoothConcrete: EXPORURAL_SMOOTH_CONCRETE_CORRECTION,
-  /** Caminhos de circulação entre escadaria, quadras, Arena, campo e estacionamento. */
+  /** Caminhos de circulação entre escadaria, quadras, Arena e estacionamento. */
   walkways: [
     { id: 'arena-walkway-stairs-apron', sourcePath: [[4480, 2895], [4540, 2895], [4600, 2888]] as readonly SourcePoint[], width: 0.34 },
     { id: 'arena-walkway-courts-plaza', sourcePath: [[4620, 2682], [4620, 2560], [4620, 2480]] as readonly SourcePoint[], width: 0.26 },
@@ -202,7 +197,7 @@ export const ARENA_FRONT_LAYOUT = {
     { sourcePosition: [4520, 2420] as SourcePoint, scale: 1.07 },
     { sourcePosition: [4700, 2645] as SourcePoint, scale: 1.04 },
     { sourcePosition: [4840, 2650] as SourcePoint, scale: 0.98 },
-    // Entorno leste/sudeste: fundo e lateral da Arena, moldura do campo.
+    // Entorno leste/sudeste: fundo e lateral da Arena.
     { sourcePosition: [5440, 2660] as SourcePoint, scale: 1.02 },
     { sourcePosition: [5580, 2645] as SourcePoint, scale: 0.94 },
     { sourcePosition: [5720, 2655] as SourcePoint, scale: 1.08 },
@@ -263,10 +258,10 @@ export const PARK_ENVIRONMENT_FEATURES: readonly ParkEnvironmentFeature[] = [
     classification: 'PAVED_PUBLIC_AREA',
     isSellable: false,
     contributesToCommercialMetrics: false,
-    sourceBounds: [4116, 2682, 4888, 3100],
+    sourceBounds: [4116, 2682, 4888, 3200],
     sourceReferences: ARENA_FRONT_SOURCE_REFERENCES,
     verificationStatus: 'REFERENCE_INTERPRETED',
-    notes: 'Pátio cívico de concreto ao norte e a oeste da Arena, separado do campo gramado e preservando o apron livre diante do palco; nunca representa lote.',
+    notes: 'Pátio cívico de concreto contínuo ao norte e a oeste da Arena, inclusive no retângulo do campo inexistente, preservando o gramado da via a oeste e o apron livre diante do palco; nunca representa lote.',
   },
   {
     id: 'arena-front-concrete-stairs',
@@ -321,18 +316,7 @@ export const PARK_ENVIRONMENT_FEATURES: readonly ParkEnvironmentFeature[] = [
     sourceBounds: ARENA_FRONT_LAYOUT.terrain.sourceBounds,
     sourceReferences: ARENA_FRONT_SOURCE_REFERENCES,
     verificationStatus: 'FIELD_REVIEW_RECOMMENDED',
-    notes: 'Malha contínua com descida oeste-leste, estendida às laterais e ao fundo da Arena; recortada contra concreto, quadras, vias, estacionamento e campo, sem alterar lotes, ruas ou a Arena.',
-  },
-  {
-    id: 'arena-front-football-field',
-    name: 'Campo gramado sem marcações da Arena',
-    classification: 'SPORTS_FIELD',
-    isSellable: false,
-    contributesToCommercialMetrics: false,
-    sourceBounds: ARENA_FRONT_LAYOUT.footballField.sourceBounds,
-    sourceReferences: ARENA_FRONT_SOURCE_REFERENCES,
-    verificationStatus: 'FIELD_REVIEW_RECOMMENDED',
-    notes: 'Pequeno campo de grama natural sem linhas, traves ou redes, a oeste da Arena e separado da escadaria; apresentação, nunca lote comercial.',
+    notes: 'Malha contínua com descida oeste-leste, estendida às laterais e ao fundo da Arena; recortada contra concreto, quadras, vias e estacionamento, sem alterar lotes, ruas ou a Arena.',
   },
   {
     id: 'exporural-smooth-concrete-c4',
@@ -357,7 +341,7 @@ export const PARK_ENVIRONMENT_FEATURES: readonly ParkEnvironmentFeature[] = [
     sourceBounds: [4480, 2480, 5860, 3260],
     sourceReferences: ARENA_FRONT_SOURCE_REFERENCES,
     verificationStatus: 'FIELD_REVIEW_RECOMMENDED',
-    notes: 'Ligações entre escadaria, quadras, apron da Arena e estacionamento, encerradas antes do campo gramado conforme o satélite.',
+    notes: 'Ligações entre escadaria, quadras, apron da Arena e estacionamento, sem atravessar a laje absorvida do antigo campo nem o gramado da via.',
   },
 ];
 
