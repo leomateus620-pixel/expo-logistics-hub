@@ -1,5 +1,6 @@
 import type { Coordinate } from '../types';
 import { officialPdfPointToLocal } from '../data/officialReference2026';
+import { FENASOJA_HEADQUARTERS_LAYOUT, headquartersOrientedEnvelope } from './headquarters';
 
 type ReadonlyCoordinate = readonly [number, number];
 
@@ -24,28 +25,33 @@ const toLocal = (point: ReadonlyCoordinate): ReadonlyCoordinate => {
   return [x, z];
 };
 
-const sourceCenter = [4092, 3575] as const;
-const sourceFootprint = [126, 112] as const;
+/**
+ * Same size-class rectangle as Casa Fenasoja / B12 (135×104), aligned on the
+ * shared east-west axis. The centre sits further north so the south-facing
+ * apron and roof stay clear of B12 after the buildings share a heading.
+ */
+const sourceCenter = [4105, 3562] as const;
+const sourceFootprint = [135, 104] as const;
 
 /**
- * Q-D-12 is the sixth lot of the north row in the official Quadra D grid.
- * Its center is derived from addTwoRowGrid('D', [3484, 3495, 3935, 3715], ...),
- * including neither visual offsets nor a camera-dependent heading.
+ * Q-D-12 remains the neighbouring Quadra D lot west of the stage. It is not
+ * the facing target: the previous D-12 heading left B13 crooked beside B12.
  */
 const targetSourceCenter = [3897.4166666666665, 3550] as const;
-const headquartersSourceCenter = [4105, 3681] as const;
-const headquartersSourceFootprint = [135, 104] as const;
+const headquartersSourceCenter = FENASOJA_HEADQUARTERS_LAYOUT.sourceCenter;
+const headquartersSourceFootprint = FENASOJA_HEADQUARTERS_LAYOUT.sourceFootprint;
 const worldCenter = toLocal(sourceCenter);
 const targetWorldCenter = toLocal(targetSourceCenter);
 const headquartersWorldCenter = toLocal(headquartersSourceCenter);
+/** Axis-aligned with Quadra B / Casa Fenasoja, not the old diagonal D-12 yaw. */
+const facingRadians = 0;
 const frontVector = normalize2([
-  targetWorldCenter[0] - worldCenter[0],
-  targetWorldCenter[1] - worldCenter[1],
+  Math.sin(facingRadians),
+  Math.cos(facingRadians),
 ]);
-const facingRadians = Math.atan2(frontVector[0], frontVector[1]);
 
 export const LACTALIS_STAGE_LAYOUT = Object.freeze({
-  revision: '2026.8-lactalis-stage.1',
+  revision: '2026.9-lactalis-stage.2',
   publicIdentifier: 'B13',
   runtimeEntityId: 'reference:2026:b13',
   displayName: 'Palco Cultural Lactalis',
@@ -71,36 +77,36 @@ export const LACTALIS_STAGE_LAYOUT = Object.freeze({
   facingDegrees: facingRadians * 180 / Math.PI,
   /** Architecture stays inside the official selectable footprint after rotation. */
   architecture: Object.freeze({
-    widthRatio: 0.74,
-    depthRatio: 0.72,
-    eaveHeight: 0.7,
-    ridgeHeight: 0.98,
+    widthRatio: FENASOJA_HEADQUARTERS_LAYOUT.envelope.widthRatio,
+    depthRatio: FENASOJA_HEADQUARTERS_LAYOUT.envelope.depthRatio,
+    eaveHeight: 1.18,
+    ridgeHeight: 1.82,
     columnThicknessRatio: 0.024,
-    minimumColumnThickness: 0.036,
-    roofThickness: 0.035,
-    roofOverhangRatio: 0.055,
-    platformHeight: 0.095,
+    minimumColumnThickness: 0.042,
+    roofThickness: 0.042,
+    roofOverhangRatio: 0.045,
+    platformHeight: 0.12,
     platformWidthRatio: 0.82,
     platformDepthRatio: 0.32,
-    audienceApronDepth: 0.34,
+    audienceApronDepth: 0.16,
     audienceApronWidthRatio: 0.82,
     footprintSafetyInset: 0.015,
     headquartersClearance: 0.045,
-    floorThickness: 0.044,
+    floorThickness: 0.05,
     sideEnclosureDepthRatio: 0.44,
-    fasciaDepth: 0.14,
-    claddingThickness: 0.032,
+    fasciaDepth: 0.16,
+    claddingThickness: 0.036,
   }),
   signage: Object.freeze({
     /** The reference board is a compact two-line panel, not a panoramic banner. */
     aspectRatio: 2.4,
-    widthRatio: 0.23,
-    centerAboveEave: 0.025,
+    widthRatio: 0.26,
+    centerAboveEave: 0.03,
   }),
   camera: Object.freeze({
-    minimumDistance: 3,
-    focusedDistance: 5.1,
-    focusMinimumDirectionY: 0.26,
+    minimumDistance: 3.4,
+    focusedDistance: 6.2,
+    focusMinimumDirectionY: 0.28,
     /** Keeps the complete facade visible above the existing Quadra D canopy on narrow portrait canvases. */
     focusPortraitMinimumDirectionY: 0.48,
   }),
@@ -134,13 +140,14 @@ export function lactalisStageFrontVector(): ReadonlyCoordinate {
   return LACTALIS_STAGE_LAYOUT.frontVector;
 }
 
+export function lactalisStageHeadingToHeadquartersErrorRadians() {
+  const expected = 0;
+  const delta = Math.abs(facingRadians - expected);
+  return Math.min(delta, Math.PI * 2 - delta);
+}
+
 export function lactalisStageHeadingToTargetErrorRadians() {
-  const expected = normalize2([
-    targetWorldCenter[0] - worldCenter[0],
-    targetWorldCenter[1] - worldCenter[1],
-  ]);
-  const dot = Math.min(1, Math.max(-1, frontVector[0] * expected[0] + frontVector[1] * expected[1]));
-  return Math.acos(dot);
+  return lactalisStageHeadingToHeadquartersErrorRadians();
 }
 
 export function lactalisStageModelDimensions(
@@ -152,8 +159,7 @@ export function lactalisStageModelDimensions(
   const inset = LACTALIS_STAGE_LAYOUT.architecture.footprintSafetyInset;
   const cosine = Math.cos(facingRadians);
   const sine = Math.sin(facingRadians);
-  // The historical B13/B12 seed rectangles overlap by two PDF points. Do not
-  // edit either cadastral polygon; keep all new architecture north of B12.
+  // Keep all new architecture north of B12. Do not edit the B12 cadastral polygon.
   const headquartersNorthEdge = toLocal([
     headquartersSourceCenter[0],
     headquartersSourceCenter[1] - headquartersSourceFootprint[1] / 2,
@@ -187,6 +193,18 @@ export function lactalisStageModelDimensions(
 function officialFootprintDimensions() {
   const officialWidth = toLocal([sourceCenter[0] + sourceFootprint[0], sourceCenter[1]])[0] - worldCenter[0];
   const officialDepth = toLocal([sourceCenter[0], sourceCenter[1] + sourceFootprint[1]])[1] - worldCenter[1];
+  return [officialWidth, officialDepth] as const;
+}
+
+function officialHeadquartersFootprintDimensions() {
+  const officialWidth = toLocal([
+    headquartersSourceCenter[0] + headquartersSourceFootprint[0],
+    headquartersSourceCenter[1],
+  ])[0] - headquartersWorldCenter[0];
+  const officialDepth = toLocal([
+    headquartersSourceCenter[0],
+    headquartersSourceCenter[1] + headquartersSourceFootprint[1],
+  ])[1] - headquartersWorldCenter[1];
   return [officialWidth, officialDepth] as const;
 }
 
@@ -244,4 +262,25 @@ export function lactalisStageAudienceApronPolygon(): readonly Coordinate[] {
     lactalisStageLocalToWorld([halfWidth, frontOffset + apronDepth]),
     lactalisStageLocalToWorld([-halfWidth, frontOffset + apronDepth]),
   ]);
+}
+
+/** Visual body vs Casa Fenasoja — used to keep B13 in the same size class. */
+export function lactalisStageHeadquartersSizeClass() {
+  const [stageWidth, stageDepth] = officialFootprintDimensions();
+  const [headquartersWidth, headquartersDepth] = officialHeadquartersFootprintDimensions();
+  const stage = lactalisStageModelDimensions(stageWidth, stageDepth);
+  const headquarters = headquartersOrientedEnvelope({
+    width: headquartersWidth,
+    depth: headquartersDepth,
+  });
+  return Object.freeze({
+    stageWidth: stage.width,
+    stageDepth: stage.depth,
+    stageHeight: stage.height,
+    headquartersWidth: headquarters.localWidth,
+    headquartersDepth: headquarters.localDepth,
+    widthRatio: stage.width / headquarters.localWidth,
+    depthRatio: stage.depth / headquarters.localDepth,
+    containmentScale: stage.containmentScale,
+  });
 }

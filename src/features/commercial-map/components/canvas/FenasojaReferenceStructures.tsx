@@ -6,6 +6,7 @@ import {
 } from '../../utils/fenasojaReferenceStructures';
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
 import type { StrategicLandmarkBounds } from '../../utils/landmarks';
+import { CooperativismWaterTanks } from './CooperativismWaterTanks';
 
 const NO_RAYCAST = () => undefined;
 const UNIT_BOX = new THREE.BoxGeometry(1, 1, 1);
@@ -527,13 +528,20 @@ export const CooperativismSpace = memo(function CooperativismSpace({
   reducedGraphics?: boolean;
 }) {
   return (
-    <CooperativismArchitecture
-      bounds={bounds}
-      height={height}
-      materials={materials}
-      showDetail={showDetail}
-      reducedGraphics={reducedGraphics}
-    />
+    <group name="conjunto-b28-espaco-cooperativismo" raycast={NO_RAYCAST} dispose={null}>
+      <CooperativismArchitecture
+        bounds={bounds}
+        height={height}
+        materials={materials}
+        showDetail={showDetail}
+        reducedGraphics={reducedGraphics}
+      />
+      <CooperativismWaterTanks
+        bounds={bounds}
+        showDetail={showDetail}
+        reducedGraphics={reducedGraphics}
+      />
+    </group>
   );
 });
 

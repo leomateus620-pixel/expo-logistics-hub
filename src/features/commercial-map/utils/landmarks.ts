@@ -314,16 +314,13 @@ const STRATEGIC_LANDMARKS: Readonly<Record<string, StrategicLandmarkDefinition>>
       'Palco Cultural Lactalis',
       'Lactalis Cultural Stage',
     ],
-    // O eixo de frente é calculado no espaço do mundo a partir do centro B13
-    // até o centro oficial de Q-D-12. A câmera permanece no mesmo lado da
-    // plateia; nenhuma rotação depende do preset ou do viewport.
+    // Empena alinhada à Quadra B e à Casa Fenasoja (yaw 0, não o diagonal
+    // antigo para Q-D-12). A câmera lê a fachada sul, do mesmo quadrante da B12.
     facingRadians: LACTALIS_STAGE_LAYOUT.facingRadians,
     focusDirection: [
-      // Stay on the D-12 audience side while shifting south of the mature
-      // canopy that otherwise occludes the opening in the default close view.
-      LACTALIS_STAGE_LAYOUT.frontVector[0] + LACTALIS_STAGE_LAYOUT.frontVector[1] * 0.36,
+      LACTALIS_STAGE_LAYOUT.frontVector[0] * 0.45 - 0.28,
       LACTALIS_STAGE_LAYOUT.camera.focusMinimumDirectionY,
-      LACTALIS_STAGE_LAYOUT.frontVector[1] - LACTALIS_STAGE_LAYOUT.frontVector[0] * 0.36,
+      LACTALIS_STAGE_LAYOUT.frontVector[1] * 0.92,
     ],
     visualHeight: lactalisStageVisualHeight,
   },
