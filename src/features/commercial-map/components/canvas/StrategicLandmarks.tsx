@@ -549,6 +549,8 @@ function useLandmarkMaterials(
       || kind === 'third-age-pavilion'
       || kind === 'livestock-pavilion'
       || kind === 'via-expressa'
+      || kind === 'livestock-tent'
+
       || kind === 'mirante-pavilion'
       || kind === 'cooperativism-space'
       || kind === 'gastronomic-alameda'
@@ -1732,6 +1734,9 @@ function useArchitecturalDetail(
         ? Math.max(28, bounds.width * LIVESTOCK_PAVILION_RENDER_BUDGET.detailDistanceMultiplier)
       : kind === 'via-expressa'
         ? Math.max(16, Math.max(bounds.width, bounds.depth) * VIA_EXPRESSA_RENDER_BUDGET.detailDistanceMultiplier)
+      : kind === 'livestock-tent'
+        ? Math.max(16, Math.max(bounds.width, bounds.depth) * LIVESTOCK_TENT_RENDER_BUDGET.detailDistanceMultiplier)
+
       : kind === 'mirante-pavilion'
         ? Math.max(
           MIRANTE_RENDER_BUDGET.detailDistanceMinimum,
@@ -3969,6 +3974,8 @@ export function StrategicLandmarkMesh({
       return eventCenterModelBounds(bounds, facingRadians);
     }
     if (kind === 'via-expressa') return viaExpressaModelBounds(bounds, facingRadians);
+    if (kind === 'livestock-tent') return livestockTentModelBounds(bounds, facingRadians);
+
     return commercialPavilionModelBounds(bounds, facingRadians);
   }, [bounds, facingRadians, kind]);
   const gl = useThree((state) => state.gl);
@@ -4086,6 +4093,8 @@ export function StrategicLandmarkMesh({
         {kind === 'third-age-pavilion' && <ThirdAgePavilion {...modelProps} />}
         {kind === 'livestock-pavilion' && <LivestockPavilion {...modelProps} />}
         {kind === 'via-expressa' && <ViaExpressa {...modelProps} />}
+        {kind === 'livestock-tent' && <LivestockTent {...modelProps} />}
+
         {kind === 'mirante-pavilion' && <MirantePavilion {...modelProps} />}
         {kind === 'cooperativism-space' && <CooperativismSpace {...modelProps} />}
         {kind === 'gastronomic-alameda' && <GastronomicAlameda {...modelProps} />}
