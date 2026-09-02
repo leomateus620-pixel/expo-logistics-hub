@@ -48,6 +48,8 @@ import {
 } from '../../utils/landmarks';
 import { LivestockPavilion } from './LivestockPavilion';
 import { ViaExpressa } from './ViaExpressa';
+import { LivestockTent } from './LivestockTent';
+
 import { MirantePavilion } from './MirantePavilion';
 import {
   CooperativismSpace,
@@ -322,6 +324,8 @@ const LANDMARK_PALETTES: Record<StrategicLandmarkKind, LandmarkPalette> = {
     metal: '#4d5c5f',
   },
   'via-expressa': VIA_EXPRESSA_LAYOUT.palette,
+  'livestock-tent': LIVESTOCK_TENT_LAYOUT.palette,
+
   'mirante-pavilion': {
     wall: '#d6d2c7',
     accent: '#8b765d',

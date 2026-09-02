@@ -107,7 +107,7 @@ describe('Tenda da Pecuária D4', () => {
       "['D4', 'Tenda da Pecuária', 'LIVESTOCK_AREA', 'exporural', [2925, 2525], { parent: 'N', width: 125, depth: 100, height: 0.74 }]",
     );
     expect(resolveStrategicLandmarkKind(tent)).toBe('livestock-tent');
-    expect(resolveStrategicLandmarkKind({ ...tent, id: 'db:uuid:tenda-pecuaria' })).toBe('livestock-tent');
+    expect(resolveStrategicLandmarkKind({ ...tent, publicIdentifier: 'D4' })).toBe('livestock-tent');
     expect(strategicLandmarkSupportsInterior(tent)).toBe(false);
     expect(JSON.stringify(tent)).toBe(before);
   });
