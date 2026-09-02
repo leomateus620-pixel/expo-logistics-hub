@@ -100,6 +100,8 @@ export const REAR_ROAD_ELECTRICAL_CLEARANCE_PRESENTATION = Object.freeze({
     'pole-ref-234': [0.32, 0], // Brasília: margem leste ao sul de D3.
     'pole-ref-145': [0.45, 0], // Ubiretama: margem leste na curva norte do acesso A5.
     'pole-ref-164': [0.8, 0], // Ubiretama: margem leste antes da curva dos estacionamentos.
+    'pole-ref-301': [0.1, -0.2], // Ubiretama: margem norte na curva SE a sul do campo.
+    'pole-ref-306': [-0.16, 0.15], // Portão 5: margem do parque na curva leste rumo ao A5.
     'pole-ref-321': [0, -0.12], // Uruguai: margem norte, sul do C1.
     'pole-ref-322': [0, -0.16],
     'pole-ref-323': [0, -0.22],
