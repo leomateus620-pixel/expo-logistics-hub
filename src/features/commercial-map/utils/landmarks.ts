@@ -35,6 +35,10 @@ import {
   PAVILION_FOUR_SOY_KITCHEN_LAYOUT,
   pavilionFourSoyKitchenVisualHeight,
 } from './pavilionFourSoyKitchen';
+import {
+  LIVESTOCK_TENT_LAYOUT,
+  livestockTentVisualHeight,
+} from './livestockTent';
 
 export type StrategicLandmarkKind =
   | 'administrative-center'
@@ -48,6 +52,7 @@ export type StrategicLandmarkKind =
   | 'pavilion-four-soy-kitchen'
   | 'third-age-pavilion'
   | 'livestock-pavilion'
+  | 'livestock-tent'
   | 'mirante-pavilion'
   | 'cooperativism-space'
   | 'gastronomic-alameda'
@@ -192,6 +197,19 @@ const STRATEGIC_LANDMARKS: Readonly<Record<string, StrategicLandmarkDefinition>>
     facingRadians: 0,
     focusDirection: [0.26, 0.31, 0.96],
     visualHeight: livestockPavilionVisualHeight,
+  },
+  D4: {
+    kind: 'livestock-tent',
+    aliases: [
+      'Tenda da Pecuária',
+      'Tenda Pecuária',
+      'Tenda da Pecuaria',
+      'Livestock Tent',
+    ],
+    // Fachada aberta em +Z local, orientada a oeste para o lote Q-Q-01.
+    facingRadians: LIVESTOCK_TENT_LAYOUT.facingRadians,
+    focusDirection: LIVESTOCK_TENT_LAYOUT.focusDirection,
+    visualHeight: livestockTentVisualHeight,
   },
   B28: {
     kind: 'cooperativism-space',
@@ -520,6 +538,12 @@ export function strategicLandmarkVisualHeight(entity: MapEntity): number | null 
   const visualHeight = definition.visualHeight(strategicLandmarkBounds(entity));
   if (definition.kind === 'third-age-pavilion') {
     return Math.min(THIRD_AGE_PAVILION_LAYOUT.maximumVisualHeight, visualHeight);
+  }
+  if (definition.kind === 'livestock-tent') {
+    return Math.min(
+      LIVESTOCK_TENT_LAYOUT.maximumVisualHeight,
+      Math.max(entity.geometry.extrusionHeight, visualHeight),
+    );
   }
   return Math.max(entity.geometry.extrusionHeight, visualHeight);
 }
