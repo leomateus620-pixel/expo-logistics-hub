@@ -1,39 +1,28 @@
-# Correção da tela azul do Mapa Comercial
+# Acesso total à Agenda Fenasoja para a Assessoria de Imprensa
 
-## Diagnóstico (confirmado)
+## Situação atual (verificada no banco)
 
-Reproduzi a rota `/mapa-comercial` no navegador: a tela fica azul porque o React derruba a árvore inteira com o erro em tempo de execução:
-
-```text
-PAGEERROR: LIVESTOCK_TENT_LAYOUT is not defined
-The above error occurred in one of your React components: at Lazy > Suspense > CommercialMapRoute
-```
-
-A causa é um merge malfeito entre as duas PRs recentes. A branch da "Via Expressa" (D2) foi mesclada por cima da branch da "Tenda da Pecuária" (D4) **substituindo** o código em vez de somar. Comparando o commit anterior ao merge com o estado atual:
-
-- `src/features/commercial-map/utils/landmarks.ts`: o import de `LIVESTOCK_TENT_LAYOUT` / `livestockTentVisualHeight` foi trocado pelo import de `viaExpressa`, e o membro `'livestock-tent'` sumiu da união `StrategicLandmarkKind` — mas a entrada `D4` que usa esses símbolos permaneceu no arquivo. Daí o `ReferenceError` em produção.
-- `src/features/commercial-map/components/canvas/StrategicLandmarks.tsx`: perdeu o import de `LivestockTent`, a paleta, os ajustes de material, o orçamento de render e o ramo de `modelBounds`/render do kind `livestock-tent`.
-
-O typecheck confirma exatamente esses pontos (`TS2304: Cannot find name 'LIVESTOCK_TENT_LAYOUT'`, `TS2322` no kind, `TS2367` no comparativo do StrategicLandmarks).
+- **Deise Anelise Froelich** (deisefroelich1@gmail.com) e **Francine Maria Boijink** (francineboijink@hotmail.com) estão ativas na Assessoria de Imprensa com perfil **leitura**.
+- Ambas possuem apenas as permissões `cronograma_eventos_access` (abrir o menu) e `cronograma_scoped_access` (ver **somente** os eventos vinculados a elas).
+- Elas não têm `cronograma_eventos_write`, então o banco recusa criar, editar, vincular comissões/responsáveis e concluir eventos.
+- A exclusão de eventos e subeventos hoje é restrita a admin/gestor, tanto no banco quanto na tela.
 
 ## O que será feito
 
-Restaurar a coexistência dos dois marcos, sem reverter nada da Via Expressa nem das demais mudanças recentes (vias, Portão 5, Rua Brasília/Ubiretama continuam intactas).
+1. **Ver toda a Agenda**: remover a marcação de visão restrita das duas, passando a enxergar todos os eventos do cronograma (exceto os de planejamento restrito, que continuam reservados).
+2. **Criar e editar**: conceder a permissão de escrita da Agenda, liberando cadastro de eventos, edição, alteração de datas/horários, seleção de comissões/assessorias e de pessoas responsáveis, anexos, subeventos e conclusão — igual a um administrador, porém apenas dentro da Agenda Fenasoja.
+3. **Excluir**: liberar exclusão de eventos e subeventos para quem tem a permissão de escrita da Agenda (hoje só admin/gestor), para que o acesso delas seja realmente equivalente ao de admin nesse menu.
+4. **Nenhum outro menu muda**: elas continuam com perfil de leitura na organização; Logística, Mapa Comercial, Financeiro, Frota, Restaurante/Arena e área administrativa seguem inacessíveis.
+5. A liberação é por permissão nominal das duas contas — sem regra por e-mail no código e sem alterar o restante da Assessoria de Imprensa.
 
-1. `utils/landmarks.ts`
-   - Reintroduzir o import de `LIVESTOCK_TENT_LAYOUT` e `livestockTentVisualHeight` mantendo o import da Via Expressa.
-   - Reincluir `'livestock-tent'` na união `StrategicLandmarkKind` (D2 via-expressa e D4 livestock-tent passam a conviver).
-   - Restaurar o clamp de altura do kind `livestock-tent` ao lado do clamp da Via Expressa.
+## Detalhes técnicos
 
-2. `components/canvas/StrategicLandmarks.tsx`
-   - Reimportar `LivestockTent`, `LIVESTOCK_TENT_LAYOUT`, `LIVESTOCK_TENT_RENDER_BUDGET` e `livestockTentModelBounds`.
-   - Reincluir: paleta do kind, ajustes de rugosidade/metalness, o kind na lista de estruturas detalhadas, o multiplicador de distância de detalhe, o ramo de `modelBounds` e o render `{kind === 'livestock-tent' && <LivestockTent … />}` — tudo somado aos ramos equivalentes da Via Expressa.
-
-3. `src/test/commercialMapLivestockTent.test.ts`
-   - Corrigir o objeto de teste que passa `id` onde o tipo espera apenas `publicIdentifier` (erro TS2353 remanescente do mesmo merge).
+- Dados: `DELETE` de `cronograma_scoped_access` e `INSERT` de `cronograma_eventos_write` em `user_capabilities` para os dois `user_id` (`be5eee02-…`, `d53cbc3e-…`) na org atual.
+- Migração: ajustar a política `cronograma_eventos_delete` (e as políticas de exclusão equivalentes de subeventos/relacionamentos) para aceitar `has_capability(auth.uid(), org_id, 'cronograma_eventos_write')`, mantendo o bloqueio de `planning_restricted`.
+- `cronograma_eventos_insert/update` já aceitam a capability — nada a mudar ali; `_cronograma_require_writer` também já cobre as RPCs `cronograma_save_event` / `cronograma_save_subevent`.
+- Frontend `src/hooks/useCronogramaEventos.ts`: trocar as travas que ainda usam `isWritableRole(myRole)` (linhas ~992, ~1252 e a mutação `deleteEvent`) por `canWriteCronograma`, e derivar `canDeleteSubevents` da mesma regra, para a UI espelhar exatamente o backend.
+- Sem alteração em `useModuleAccess`/`CapabilityGuard`: o acesso ao menu já vem de `cronograma_eventos_access`.
 
 ## Validação
 
-- `tsgo --noEmit` sem erros no módulo do mapa.
-- Suítes `commercialMapLivestockTent`, `commercialMapViaExpressa` (se existir) e as suítes de vias/terreno posteriores verdes.
-- Reabrir `/mapa-comercial` via navegador headless e confirmar render do parque (sem `pageerror`), além de checar que D2 (Via Expressa) e D4 (Tenda da Pecuária) aparecem.
+Login real com as duas contas: Agenda completa visível; criar evento novo; editar evento de terceiro; adicionar comissão e responsáveis; criar/editar/excluir subevento; excluir evento; e confirmar que nenhum outro módulo aparece ou abre.
