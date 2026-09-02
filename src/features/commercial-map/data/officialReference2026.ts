@@ -550,7 +550,7 @@ const bStructures: Array<[string, string, MapClassification, string, PdfBounds |
   }],
   ['B11', 'Centro administrativo / auditório', 'ADMINISTRATION', 'structures', [3735, 3850, 3860, 4150]],
   ['B12', 'Sede Fenasoja / Comissão Central', 'ADMINISTRATION', 'structures', [4105, 3681], { parent: 'B', width: 135, depth: 104 }],
-  ['B13', 'Palco Cultural Lactalis', 'EVENT_VENUE', 'structures', [4092, 3575], { parent: 'B', width: 126, depth: 112, height: 1.05 }],
+  ['B13', 'Palco Cultural Lactalis', 'EVENT_VENUE', 'structures', [4105, 3562], { parent: 'B', width: 135, depth: 104, height: 1.05 }],
   ['B14', "Módulo Fenasoja 60 anos — Prefeitura / Câmara de Vereadores e TV's", 'BUILDING', 'structures', [4079, 3930], { parent: 'A', width: 112, depth: 184 }],
   ['B15', 'Imprensa', 'SERVICE', 'structures', [3912, 4010], { width: 64, depth: 126 }],
   ['B16', 'Fenasoja Store / Informações', 'SERVICE', 'structures', [4048, 2921], { width: 66, depth: 86 }],

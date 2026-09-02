@@ -1891,9 +1891,9 @@ function CameraRig({
     }),
     [extent, miranteExtent, segmentExtent, size.height, size.width],
   );
-  // B13 is a compact open stage. Its own close-view range keeps the camera
-  // between the audience apron and the existing D canopies, without changing
-  // the exterior limits or the camera behavior of any neighboring structure.
+  // B13 is an open gabled stage in the same size class as Casa Fenasoja.
+  // Its own close-view range keeps the camera on the south facade without
+  // changing the exterior limits or the camera behavior of any neighbor.
   const requestedMinimumDistance = lactalisSelected
     ? LACTALIS_STAGE_LAYOUT.camera.minimumDistance
     : miranteExtent

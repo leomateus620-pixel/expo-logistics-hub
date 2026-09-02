@@ -12,11 +12,13 @@ import {
   OFFICIAL_RENDERED_ENTITIES,
   officialPdfPointToLocal,
 } from '@/features/commercial-map/data/officialReference2026';
+import { FENASOJA_HEADQUARTERS_LAYOUT } from '@/features/commercial-map/utils/headquarters';
 import {
   LACTALIS_STAGE_LAYOUT,
   lactalisStageAudienceApronPolygon,
   lactalisStageFrontVector,
-  lactalisStageHeadingToTargetErrorRadians,
+  lactalisStageHeadingToHeadquartersErrorRadians,
+  lactalisStageHeadquartersSizeClass,
   lactalisStageLocalToWorld,
   lactalisStageModelDimensions,
   lactalisStagePresentationFootprint,
@@ -65,12 +67,13 @@ const expectCoordinatesCloseTo = (
 };
 
 describe('reconstrução das Quadras A/B e Palco Cultural Lactalis', () => {
-  it('migra o B13 para um landmark dedicado sem alterar identidade, metadados ou footprint oficial', () => {
+  it('preserva a identidade B13 e alinha o footprint à mesma classe de tamanho da Casa Fenasoja', () => {
     const palco = entity('B13');
     const sede = entity('B12');
     const palcoBefore = JSON.stringify(palco);
     const sedeBefore = JSON.stringify(sede);
     const bounds = strategicLandmarkBounds(palco);
+    const headquartersBounds = strategicLandmarkBounds(sede);
 
     expect(palco).toMatchObject({
       id: 'reference:2026:b13',
@@ -82,10 +85,12 @@ describe('reconstrução das Quadras A/B e Palco Cultural Lactalis', () => {
       isArchived: false,
     });
     expect(palco.metadata).toMatchObject({ parentPublicIdentifier: 'QUADRA-B' });
+    expect(LACTALIS_STAGE_LAYOUT.sourceFootprint).toEqual(FENASOJA_HEADQUARTERS_LAYOUT.sourceFootprint);
+    expect(LACTALIS_STAGE_LAYOUT.sourceCenter[0]).toBe(FENASOJA_HEADQUARTERS_LAYOUT.sourceCenter[0]);
     expect(bounds.centerX).toBeCloseTo(LACTALIS_STAGE_LAYOUT.worldCenter[0], 8);
     expect(bounds.centerZ).toBeCloseTo(LACTALIS_STAGE_LAYOUT.worldCenter[1], 8);
-    expect(bounds.width).toBeCloseTo(2.7490909, 6);
-    expect(bounds.depth).toBeCloseTo(2.4436364, 6);
+    expect(bounds.width).toBeCloseTo(headquartersBounds.width, 6);
+    expect(bounds.depth).toBeCloseTo(headquartersBounds.depth, 6);
     expect(palco.geometry.rotation).toBe(0);
     expect(palco.geometry.coordinates[0].slice(0, -1)).toEqual(
       LACTALIS_STAGE_LAYOUT.sourceFootprintPolygon.map(officialPdfPointToLocal),
@@ -120,29 +125,26 @@ describe('reconstrução das Quadras A/B e Palco Cultural Lactalis', () => {
     expect(JSON.stringify(persisted)).toBe(before);
   });
 
-  it('orienta a boca de cena no espaço do mundo para o centro oficial de Q-D-12', () => {
+  it('orienta o palco reto e paralelo à Casa Fenasoja, sem o yaw diagonal para Q-D-12', () => {
     const palco = entity('B13');
-    const d12 = entity('Q-D-12');
     const sede = entity('B12');
     const palcoCenter = centroid(palco.geometry.coordinates[0]);
-    const d12Center = centroid(d12.geometry.coordinates[0]);
     const sedeCenter = centroid(sede.geometry.coordinates[0]);
-    const targetDelta = [d12Center[0] - palcoCenter[0], d12Center[1] - palcoCenter[1]] as const;
-    const targetLength = Math.hypot(...targetDelta);
-    const targetVector = [targetDelta[0] / targetLength, targetDelta[1] / targetLength] as const;
     const headquartersDelta = [sedeCenter[0] - palcoCenter[0], sedeCenter[1] - palcoCenter[1]] as const;
     const headquartersLength = Math.hypot(...headquartersDelta);
     const headquartersVector = [headquartersDelta[0] / headquartersLength, headquartersDelta[1] / headquartersLength] as const;
     const front = lactalisStageFrontVector();
 
+    expect(LACTALIS_STAGE_LAYOUT.headquartersIdentifier).toBe('B12');
     expect(LACTALIS_STAGE_LAYOUT.targetIdentifier).toBe('Q-D-12');
-    expect(LACTALIS_STAGE_LAYOUT.targetWorldCenter[0]).toBeCloseTo(d12Center[0], 8);
-    expect(LACTALIS_STAGE_LAYOUT.targetWorldCenter[1]).toBeCloseTo(d12Center[1], 8);
-    expect(front[0] * targetVector[0] + front[1] * targetVector[1]).toBeCloseTo(1, 10);
-    expect(front[0] * headquartersVector[0] + front[1] * headquartersVector[1]).toBeLessThan(0.1);
-    expect(strategicLandmarkFacingRadians(palco)).toBeCloseTo(Math.atan2(targetVector[0], targetVector[1]), 10);
-    expect(LACTALIS_STAGE_LAYOUT.facingDegrees).toBeCloseTo(-97.321234, 5);
-    expect(lactalisStageHeadingToTargetErrorRadians()).toBeLessThan(1e-8);
+    expect(strategicLandmarkFacingRadians(palco)).toBe(0);
+    expect(LACTALIS_STAGE_LAYOUT.facingRadians).toBe(0);
+    expect(Math.abs(LACTALIS_STAGE_LAYOUT.facingDegrees)).toBeLessThan(1);
+    expect(Math.abs(strategicLandmarkFacingRadians(sede))).toBeLessThan(Math.PI / 12);
+    expect(lactalisStageHeadingToHeadquartersErrorRadians()).toBeLessThan(1e-12);
+    expect(front[0]).toBeCloseTo(0, 10);
+    expect(front[1]).toBeCloseTo(1, 10);
+    expect(front[0] * headquartersVector[0] + front[1] * headquartersVector[1]).toBeGreaterThan(0.8);
   });
 
   it('mantém o envelope real de cobertura, calhas e apron em B13 e fora das vias/estruturas vizinhas', () => {
@@ -155,8 +157,7 @@ describe('reconstrução das Quadras A/B e Palco Cultural Lactalis', () => {
 
     expect(axisAlignedWidth).toBeLessThan(bounds.width);
     expect(axisAlignedDepth).toBeLessThan(bounds.depth);
-    expect(model.containmentScale).toBeGreaterThan(0);
-    expect(model.containmentScale).toBeLessThanOrEqual(1);
+    expect(model.containmentScale).toBe(1);
     const footprint = lactalisStagePresentationFootprint(bounds.width, bounds.depth);
     const apron = lactalisStageAudienceApronPolygon();
     expect(footprint).toHaveLength(8);
@@ -214,6 +215,17 @@ describe('reconstrução das Quadras A/B e Palco Cultural Lactalis', () => {
     expect(architecture.ridgeHeight).toBeGreaterThan(architecture.eaveHeight);
     expect(LACTALIS_STAGE_LAYOUT.signage.aspectRatio).toBeGreaterThan(2);
     expect(LACTALIS_STAGE_LAYOUT.signage.aspectRatio).toBeLessThan(3.5);
+  });
+
+  it('mantém o corpo do palco na mesma classe de tamanho da Casa Fenasoja', () => {
+    const sizeClass = lactalisStageHeadquartersSizeClass();
+    expect(sizeClass.containmentScale).toBe(1);
+    expect(sizeClass.widthRatio).toBeGreaterThan(0.92);
+    expect(sizeClass.widthRatio).toBeLessThan(1.08);
+    expect(sizeClass.depthRatio).toBeGreaterThan(0.92);
+    expect(sizeClass.depthRatio).toBeLessThan(1.08);
+    expect(sizeClass.stageHeight).toBeGreaterThan(1.5);
+    expect(sizeClass.stageWidth).toBeGreaterThan(2.4);
   });
 
   it('usa os polígonos cadastrais A/B e ancora clareiras e copas somente dentro dessas quadras', () => {
@@ -319,8 +331,8 @@ describe('reconstrução das Quadras A/B e Palco Cultural Lactalis', () => {
       'src/features/commercial-map/components/canvas/CommercialMapCanvas.tsx',
     ), 'utf8');
 
-    expect(LACTALIS_STAGE_LAYOUT.camera.minimumDistance).toBe(3);
-    expect(LACTALIS_STAGE_LAYOUT.camera.focusedDistance).toBe(5.1);
+    expect(LACTALIS_STAGE_LAYOUT.camera.minimumDistance).toBe(3.4);
+    expect(LACTALIS_STAGE_LAYOUT.camera.focusedDistance).toBe(6.2);
     expect(LACTALIS_STAGE_LAYOUT.camera.focusPortraitMinimumDirectionY).toBe(0.48);
     expect(LACTALIS_STAGE_LAYOUT.camera.focusedDistance).toBeGreaterThan(LACTALIS_STAGE_LAYOUT.camera.minimumDistance);
     expect(source).toContain("const lactalisSelected = !interiorEntity && selectedKind === 'lactalis-cultural-stage';");
