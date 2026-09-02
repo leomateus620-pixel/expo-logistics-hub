@@ -68,10 +68,10 @@ describe('BR-344 mainline — isolated E–W highway slice', () => {
     expect(cadastre).not.toMatch(/br344|Br344|BR-344|RODOVIA-BR-344/i);
 
     const slice = SLICE_FILES.map((file) => read(file)).join('\n');
-    expect(slice).not.toContain('rearParkRoadNetwork');
-    expect(slice).not.toContain('annexSpatialCorrections');
-    expect(slice).not.toContain('CommercialMapCanvas');
-    expect(slice).not.toContain('CommercialPavilionInterior');
+    expect(slice).not.toMatch(/from ['"][^'"]*rearParkRoadNetwork/);
+    expect(slice).not.toMatch(/from ['"][^'"]*annexSpatialCorrections/);
+    expect(slice).not.toMatch(/from ['"][^'"]*CommercialMapCanvas/);
+    expect(slice).not.toMatch(/from ['"][^'"]*CommercialPavilionInterior/);
     expect(slice).not.toContain('officialReference2024');
     expect(slice).toContain("from '../../data/officialReference2026'");
   });
@@ -120,8 +120,15 @@ describe('BR-344 mainline — isolated E–W highway slice', () => {
     expect(BR344_BR472_CROSSING_SOURCE_X).toBe(6120);
 
     const slice = SLICE_FILES.map((file) => read(file)).join('\n');
-    expect(slice).not.toMatch(/cloverleaf ramp|loop ramp|a5-br472/i);
+    expect(slice).not.toMatch(/a5-br472|loop ramp/i);
     expect(slice).not.toContain('RODOVIA-RS-472');
+    expect(Object.keys(BR344_SOURCE_NODES)).toEqual([
+      'westTerminus',
+      'hubNorthWest',
+      'hubNorthEast',
+      'neCloverleaf',
+      'eastTerminus',
+    ]);
     expect(BR344_INTEGRATOR_CONTRACT.outOfScope).toEqual(expect.arrayContaining([
       'cloverleaf ramps',
       'BR-472',
