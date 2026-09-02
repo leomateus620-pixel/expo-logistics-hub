@@ -39,6 +39,11 @@ import {
   VIA_EXPRESSA_LAYOUT,
   viaExpressaVisualHeight,
 } from './viaExpressa';
+import {
+  LIVESTOCK_TENT_LAYOUT,
+  livestockTentVisualHeight,
+} from './livestockTent';
+
 
 export type StrategicLandmarkKind =
   | 'administrative-center'
@@ -53,6 +58,8 @@ export type StrategicLandmarkKind =
   | 'third-age-pavilion'
   | 'livestock-pavilion'
   | 'via-expressa'
+  | 'livestock-tent'
+
   | 'mirante-pavilion'
   | 'cooperativism-space'
   | 'gastronomic-alameda'
@@ -555,5 +562,12 @@ export function strategicLandmarkVisualHeight(entity: MapEntity): number | null 
       Math.max(entity.geometry.extrusionHeight, visualHeight),
     );
   }
+  if (definition.kind === 'livestock-tent') {
+    return Math.min(
+      LIVESTOCK_TENT_LAYOUT.maximumVisualHeight,
+      Math.max(entity.geometry.extrusionHeight, visualHeight),
+    );
+  }
+
   return Math.max(entity.geometry.extrusionHeight, visualHeight);
 }
