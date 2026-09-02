@@ -29,6 +29,11 @@ import {
   apolloXivReplicaHeight,
 } from '../../utils/lunarMemorial';
 import {
+  LIVESTOCK_TENT_LAYOUT,
+  LIVESTOCK_TENT_RENDER_BUDGET,
+  livestockTentModelBounds,
+} from '../../utils/livestockTent';
+import {
   resolveStrategicLandmarkKind,
   strategicLandmarkBounds,
   strategicLandmarkFacingRadians,
@@ -37,6 +42,7 @@ import {
   type StrategicLandmarkKind,
 } from '../../utils/landmarks';
 import { LivestockPavilion } from './LivestockPavilion';
+import { LivestockTent } from './LivestockTent';
 import { MirantePavilion } from './MirantePavilion';
 import {
   CooperativismSpace,
@@ -310,6 +316,7 @@ const LANDMARK_PALETTES: Record<StrategicLandmarkKind, LandmarkPalette> = {
     platform: '#85847d',
     metal: '#4d5c5f',
   },
+  'livestock-tent': LIVESTOCK_TENT_LAYOUT.palette,
   'mirante-pavilion': {
     wall: '#d6d2c7',
     accent: '#8b765d',
@@ -532,6 +539,7 @@ function useLandmarkMaterials(
       || kind === 'pavilion-nine'
       || kind === 'third-age-pavilion'
       || kind === 'livestock-pavilion'
+      || kind === 'livestock-tent'
       || kind === 'mirante-pavilion'
       || kind === 'cooperativism-space'
       || kind === 'gastronomic-alameda'
@@ -582,6 +590,16 @@ function useLandmarkMaterials(
       result.wall.roughness = 0.94;
       result.accent.roughness = 0.8;
       result.accent.metalness = 0.02;
+    }
+    if (kind === 'livestock-tent') {
+      result.roof.roughness = 0.88;
+      result.roof.metalness = 0.04;
+      result.wall.roughness = 0.9;
+      result.metal.roughness = 0.48;
+      result.metal.metalness = 0.36;
+      result.dark.roughness = 0.52;
+      result.dark.metalness = 0.32;
+      result.platform.roughness = 0.98;
     }
     if (kind === 'cooperativism-space') {
       result.roof.roughness = 0.9;
@@ -1689,6 +1707,8 @@ function useArchitecturalDetail(
       ? Math.max(30, bounds.width * 3.1)
       : kind === 'livestock-pavilion'
         ? Math.max(28, bounds.width * LIVESTOCK_PAVILION_RENDER_BUDGET.detailDistanceMultiplier)
+      : kind === 'livestock-tent'
+        ? Math.max(16, Math.max(bounds.width, bounds.depth) * LIVESTOCK_TENT_RENDER_BUDGET.detailDistanceMultiplier)
       : kind === 'mirante-pavilion'
         ? Math.max(
           MIRANTE_RENDER_BUDGET.detailDistanceMinimum,
@@ -3924,7 +3944,9 @@ export function StrategicLandmarkMesh({
       ? fitRotatedStructureBounds(bounds, facingRadians)
       : kind === 'fenasoja-event-center'
         ? eventCenterModelBounds(bounds, facingRadians)
-        : commercialPavilionModelBounds(bounds, facingRadians),
+        : kind === 'livestock-tent'
+          ? livestockTentModelBounds(bounds, facingRadians)
+          : commercialPavilionModelBounds(bounds, facingRadians),
     [bounds, facingRadians, kind],
   );
   const gl = useThree((state) => state.gl);
@@ -4041,6 +4063,7 @@ export function StrategicLandmarkMesh({
         )}
         {kind === 'third-age-pavilion' && <ThirdAgePavilion {...modelProps} />}
         {kind === 'livestock-pavilion' && <LivestockPavilion {...modelProps} />}
+        {kind === 'livestock-tent' && <LivestockTent {...modelProps} />}
         {kind === 'mirante-pavilion' && <MirantePavilion {...modelProps} />}
         {kind === 'cooperativism-space' && <CooperativismSpace {...modelProps} />}
         {kind === 'gastronomic-alameda' && <GastronomicAlameda {...modelProps} />}
