@@ -389,29 +389,38 @@ function loopPath(sx: number, sz: number, steps: number): Sample[] {
   return densify([merge, ...petal, rabJoin], 0.38);
 }
 
-function slipStartAngle(sx: number, sz: number) {
-  if (sx > 0 && sz < 0) return -Math.PI / 2;
-  if (sx > 0 && sz > 0) return 0;
-  if (sx < 0 && sz > 0) return Math.PI / 2;
-  return Math.PI;
+function quadraticBezier(start: Sample, control: Sample, end: Sample, steps: number): Sample[] {
+  return Array.from({ length: Math.max(4, steps) + 1 }, (_, index) => {
+    const t = index / Math.max(4, steps);
+    const u = 1 - t;
+    const x = u * u * start.x + 2 * u * t * control.x + t * t * end.x;
+    const z = u * u * start.z + 2 * u * t * control.z + t * t * end.z;
+    return { x, z, y: start.y * u * u + control.y * 2 * u * t + end.y * t * t };
+  });
 }
 
 function slipPath(sx: number, sz: number, steps: number): Sample[] {
-  const inset = 0.22;
-  const samples = sampleArc(
-    [CX, CZ],
-    L.slipRadius,
-    slipStartAngle(sx, sz) + inset,
-    Math.PI / 2 - inset * 2,
-    steps,
-    (x, z) => terrainY(x, z),
-  );
-  const highwayKeep = L.highwayWidth / 2 + L.rampWidth * 0.28;
-  const crossingKeep = L.crossingWidth / 2 + L.rampWidth * 0.28;
-  return samples.filter((sample) => (
-    Math.abs(sample.x - CX) > highwayKeep || Math.abs(sample.z - CZ) > L.overpassHalfSpan
-  )).filter((sample) => (
-    Math.abs(sample.z - CZ) > crossingKeep || Math.abs(sample.x - CX) > L.highwayWidth
+  const start: Sample = {
+    x: CX + sx * (L.highwayWidth / 2 + L.rampWidth * 0.52),
+    z: CZ + sz * (L.loopOffset + L.loopRadius + 1.85),
+    y: 0,
+  };
+  start.y = seCloverleafMainlineElevation(start.z);
+  const control: Sample = {
+    x: CX + sx * (L.loopOffset + L.loopRadius + 2.85),
+    z: CZ + sz * (L.loopOffset + L.loopRadius + 2.85),
+    y: 0,
+  };
+  control.y = terrainY(control.x, control.z);
+  const end: Sample = {
+    x: CX + sx * (L.roundaboutOffset + L.roundaboutOuterRadius + 1.15),
+    z: CZ + sz * (L.crossingWidth / 2 + L.rampWidth * 0.55),
+    y: 0,
+  };
+  end.y = terrainY(end.x, end.z);
+  const rab = sx > 0 ? SE_CLOVERLEAF_ROUNDABOUTS.east : SE_CLOVERLEAF_ROUNDABOUTS.west;
+  return quadraticBezier(start, control, end, steps).filter((sample) => (
+    Math.hypot(sample.x - rab[0], sample.z - rab[1]) > L.roundaboutOuterRadius - 0.05
   ));
 }
 
