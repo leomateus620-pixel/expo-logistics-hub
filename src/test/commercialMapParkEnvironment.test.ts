@@ -182,12 +182,12 @@ describe('infraestrutura ambiental do parque', () => {
       .toHaveLength(0);
     expect(PARK_ENVIRONMENT_FEATURES.some((feature) => feature.id === 'arena-front-football-field')).toBe(false);
     expect(sourceBoundsOverlapPolygon(absorbedField, ARENA_FRONT_LAYOUT.plaza.sourcePolygon)).toBe(true);
-    [
+    ([
       [4770, 3030],
       [4664, 2864],
       [4876, 3196],
       [4770, 2864],
-    ].forEach((point) => {
+    ] as const).forEach((point) => {
       expect(pointInPolygon(point, ARENA_FRONT_LAYOUT.plaza.sourcePolygon), point.join(',')).toBe(true);
     });
     expect(ARENA_FRONT_LAYOUT.plaza.sourcePolygon.every(([x]) => x >= 4116)).toBe(true);
