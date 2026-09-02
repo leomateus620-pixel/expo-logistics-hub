@@ -154,6 +154,7 @@ import { CommercialMapEnvironment } from './CommercialMapEnvironment';
 import { createCommercialMapEvents } from './commercialMapEvents';
 import { ParkAccessEnvironmentLayer } from './ParkAccessEnvironmentLayer';
 import { RearParkRoadNetwork } from './RearParkRoadNetwork';
+import { RegionalHighwayNetwork } from './RegionalHighwayNetwork';
 import { RearParkEnvironmentLayer } from './RearParkEnvironmentLayer';
 import { CommercialSiteEnvironmentLayer } from './CommercialSiteEnvironmentLayer';
 import { QuadrasABEnvironmentLayer } from './QuadrasABEnvironmentLayer';
@@ -167,6 +168,7 @@ import {
   rearRoadFocusBoundsForOfficialOwner,
 } from '../../data/rearParkRoadNetwork';
 import { rearRoadTerrainElevationAt } from '../../utils/rearRoadNetwork';
+import { expandFramingBoundsWithRegionalHighways } from '../../data/regional-highways';
 import {
   ParkAccessInfrastructure,
   type ParkAccessInfrastructureScope,
@@ -1865,7 +1867,11 @@ function CameraRig({
   const lunarCameraLocked = lunarLaunchPhase !== 'idle' || lunarLaunchReturning;
   const lunarCameraLockedRef = useRef(lunarCameraLocked);
   lunarCameraLockedRef.current = lunarCameraLocked;
-  const cameraDistanceBounds = useMemo(
+  const regionalExtent = useMemo(
+    () => expandFramingBoundsWithRegionalHighways(extent),
+    [extent],
+  );
+  const parkCameraDistanceBounds = useMemo(
     () => resolveCommercialMapCameraDistanceBounds({
       bounds: extent,
       verticalFovDegrees: 38,
@@ -1873,9 +1879,23 @@ function CameraRig({
     }),
     [extent, size.height, size.width],
   );
+  const cameraDistanceBounds = useMemo(
+    () => {
+      const regional = resolveCommercialMapCameraDistanceBounds({
+        bounds: regionalExtent,
+        verticalFovDegrees: 38,
+        aspect: size.width / Math.max(size.height, 1),
+      });
+      return {
+        ...parkCameraDistanceBounds,
+        maxDistance: Math.max(parkCameraDistanceBounds.maxDistance, regional.maxDistance),
+      };
+    },
+    [parkCameraDistanceBounds, regionalExtent, size.height, size.width],
+  );
   const cameraFarPlane = useMemo(
-    () => resolveCommercialMapCameraFarPlane(extent, cameraDistanceBounds.maxDistance),
-    [cameraDistanceBounds.maxDistance, extent],
+    () => resolveCommercialMapCameraFarPlane(regionalExtent, cameraDistanceBounds.maxDistance),
+    [cameraDistanceBounds.maxDistance, regionalExtent],
   );
   const selectedKind = selectedEntity ? resolveStrategicLandmarkKind(selectedEntity) : null;
   const lactalisSelected = !interiorEntity && selectedKind === 'lactalis-cultural-stage';
@@ -2084,6 +2104,10 @@ function CameraRig({
     const framingExtent = parkingActive
       ? parkingFramingExtent
       : miranteExtent ?? segmentExtent ?? extent;
+    const panExtent = parkingActive || isolatedArea || miranteExtent || segmentExtent
+      ? framingExtent
+      : regionalExtent;
+    const snapExtent = framingExtent;
     const margin = isolatedArea
       ? Math.max(1.6, framingExtent.diagonal * 0.035)
       : Math.max(3, framingExtent.diagonal * 0.08);
@@ -2098,26 +2122,26 @@ function CameraRig({
       * (3 - 2 * rawBoundaryProgress);
     const targetSlack = Math.max(
       1.5,
-      Math.hypot(framingExtent.width, framingExtent.depth) * 0.018,
+      Math.hypot(snapExtent.width, snapExtent.depth) * 0.018,
     );
     const minimumX = THREE.MathUtils.lerp(
-      framingExtent.minX - margin,
-      framingExtent.centerX - targetSlack,
+      panExtent.minX - margin,
+      snapExtent.centerX - targetSlack,
       boundaryProgress,
     );
     const maximumX = THREE.MathUtils.lerp(
-      framingExtent.maxX + margin,
-      framingExtent.centerX + targetSlack,
+      panExtent.maxX + margin,
+      snapExtent.centerX + targetSlack,
       boundaryProgress,
     );
     const minimumZ = THREE.MathUtils.lerp(
-      framingExtent.minZ - margin,
-      framingExtent.centerZ - targetSlack,
+      panExtent.minZ - margin,
+      snapExtent.centerZ - targetSlack,
       boundaryProgress,
     );
     const maximumZ = THREE.MathUtils.lerp(
-      framingExtent.maxZ + margin,
-      framingExtent.centerZ + targetSlack,
+      panExtent.maxZ + margin,
+      snapExtent.centerZ + targetSlack,
       boundaryProgress,
     );
     const targetMinimumY = miranteSelected ? -framingExtent.maxHeight * 1.2 : 0;
@@ -2144,6 +2168,7 @@ function CameraRig({
     miranteSelected,
     parkingActive,
     parkingFramingExtent,
+    regionalExtent,
     segmentExtent,
   ]);
   const clampQueuedCameraPose = useCallback((
@@ -4474,6 +4499,18 @@ function Scene({
             vegetationVisible={treesVisible}
           />
           <RearParkRoadNetwork
+            reducedGraphics={reducedGraphics}
+            visible={rearRoadPresentation.visible}
+            opacity={rearRoadPresentation.opacity}
+            ownerEntityIdByIdentifier={rearRoadOwnerEntityIds}
+            cameraNavigating={cameraNavigating}
+            hoverEnabled={PRECISE_HOVER_CAPABLE}
+            onSelect={handleEntitySelect}
+            onHover={handleEntityHover}
+            onFocus={handleEntityFocus}
+            onCursor={setCanvasCursor}
+          />
+          <RegionalHighwayNetwork
             reducedGraphics={reducedGraphics}
             visible={rearRoadPresentation.visible}
             opacity={rearRoadPresentation.opacity}
