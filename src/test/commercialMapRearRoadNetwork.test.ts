@@ -143,7 +143,7 @@ describe('área posterior — hierarquia dos anexos e seis âncoras', () => {
     expect(projectRearAttachment5PointToOfficialSource(1)).toEqual([5510, 4200]);
     expect(projectRearAttachment5PointToOfficialSource(2)).toEqual([4856, 3248]);
     expect(projectRearAttachment5PointToOfficialSource(3)).toEqual([4528, 3150]);
-    expect(projectRearAttachment5PointToOfficialSource(4)).toEqual([5548, 3248]);
+    expect(projectRearAttachment5PointToOfficialSource(4)).toEqual([5860, 3248]);
     expect(projectRearAttachment5PointToOfficialSource(5)[0]).toBeCloseTo(5987, 10);
     expect(projectRearAttachment5PointToOfficialSource(5)[1]).toBeCloseTo(2000, 10);
     expect(projectRearAttachment5PointToOfficialSource(6)).toEqual([5940, 3678]);
@@ -280,17 +280,18 @@ describe('área posterior — identidades, seleção e busca sem duplicação', 
 
   it('resolve hit-tests das ribbons diretamente para as entidades oficiais', () => {
     const ubiretama = REAR_PARK_ROAD_NETWORK.find(
-      (road) => road.id === 'ubiretama-north-junction',
+      (road) => road.id === 'portao5-etnias-ubiretama',
     )!;
     const highway = REAR_PARK_ROAD_NETWORK.find((road) => road.id === 'br472-north-ramp')!;
-    const ubiretamaPoint = officialPdfPointToLocal(REAR_CALIBRATED_AXES.ubiretamaNorthToJunction[5]);
-    const parkingPoint = officialPdfPointToLocal(REAR_CALIBRATED_AXES.portao5EtniasToUbiretamaJunction[1]);
+    const portao5Point = officialPdfPointToLocal(REAR_CALIBRATED_AXES.ubiretamaNorthToJunction[5]);
+    const ubiretamaPoint = officialPdfPointToLocal(REAR_CALIBRATED_AXES.portao5EtniasToUbiretamaJunction[1]);
     const highwayPoint = rearRoadLocalPath(highway)[1];
     expect(GENERATED_REAR_ROAD_SEGMENTS.some((road) => road.roadId === 'ACESSO-PORTAO5-ESTACIONAMENTO')).toBe(false);
     expect(GENERATED_REAR_ROAD_SEGMENTS.some((road) => road.id === 'gate5-internal-approach')).toBe(true);
+    expect(GENERATED_REAR_ROAD_SEGMENTS.some((road) => road.id === 'portao5-north-approach')).toBe(true);
     expect(ubiretama.officialOwnerIdentifier).toBe('RUA-UBIRETAMA');
     expect(resolveRearRoadOwnerAtLocalPoint(ubiretamaPoint, 'park')).toBe('RUA-UBIRETAMA');
-    expect(resolveRearRoadOwnerAtLocalPoint(parkingPoint, 'park')).toBe('RUA-UBIRETAMA');
+    expect(resolveRearRoadOwnerAtLocalPoint(portao5Point, 'park')).toBe('A5');
     expect(resolveRearRoadOwnerAtLocalPoint(highwayPoint, 'highway')).toBe('RODOVIA-RS-472');
   });
 
@@ -319,7 +320,7 @@ describe('área posterior — topologia de satélite e rodovia independente', ()
       'gate-5',
     ]);
     const junction = REAR_ROAD_NODES['ubiretama-portao5-junction'].sourcePoint;
-    expect(junction).toEqual([5548, 3248]);
+    expect(junction).toEqual([5860, 3248]);
     expect(junction[0]).toBeGreaterThan(5385);
     expect(REAR_ROAD_NODES['portao5-street'].sourcePoint).toEqual([4528, 3150]);
     expect(roadGraphHasPath('ubiretama', 'brasilia')).toBe(true);
@@ -328,9 +329,10 @@ describe('área posterior — topologia de satélite e rodovia independente', ()
     expect(REAR_PARK_ROAD_NETWORK.filter((road) => (
       road.roadId === 'RUA-BRASILIA' && road.presentation === 'official-surface'
     ))).toHaveLength(1);
-    expect(GENERATED_REAR_ROAD_SEGMENTS.filter((road) => road.roadId === 'RUA-UBIRETAMA')).toHaveLength(4);
+    expect(GENERATED_REAR_ROAD_SEGMENTS.filter((road) => road.roadId === 'RUA-UBIRETAMA')).toHaveLength(3);
     expect(REAR_PARK_ROAD_NETWORK.some((road) => road.id === 'brasilia-north-junction')).toBe(false);
     expect(REAR_PARK_ROAD_NETWORK.some((road) => road.id === 'brasilia-junction-south')).toBe(false);
+    expect(REAR_PARK_ROAD_NETWORK.some((road) => road.id === 'ubiretama-north-junction')).toBe(false);
 
     const parkingAxis = [
       ...REAR_CALIBRATED_AXES.portao5StreetToCurve,
@@ -374,7 +376,7 @@ describe('área posterior — topologia de satélite e rodovia independente', ()
     const highway = REAR_PARK_ROAD_NETWORK.filter((road) => road.roadId === 'RODOVIA-RS-472');
     const access = REAR_PARK_ROAD_NETWORK.filter((road) => road.roadId === 'ACESSO-A5-BR472');
     expect(highway).toHaveLength(3);
-    expect(access).toHaveLength(4);
+    expect(access).toHaveLength(5);
     expect(access.find((road) => road.id === 'gate5-internal-approach'))
       .toMatchObject({ from: 'ubiretama-portao5-junction', to: 'gate-5' });
     expect(access.filter((road) => road.from === 'a5-trevo-fork').map((road) => road.to)).toEqual([

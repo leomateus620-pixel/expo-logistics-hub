@@ -22,7 +22,7 @@ import { officialPdfPointToLocal } from '../data/officialReference2026';
  * É um registro cartográfico de apresentação, não um levantamento geodésico:
  * os anexos não fornecem CRS, escala métrica certificada ou pontos de campo.
  */
-export const REAR_SPATIAL_CALIBRATION_REVISION = '2026.9-anexo3-satellite.1';
+export const REAR_SPATIAL_CALIBRATION_REVISION = '2026.9-anexo3-satellite.2';
 
 export type Point2 = readonly [number, number];
 export type RearAttachment5PointId = 1 | 2 | 3 | 4 | 5 | 6;
@@ -123,7 +123,7 @@ export const REAR_ATTACHMENT_5_REFERENCE_POINTS = Object.freeze([
     canonicalSource: PORTAO5_PARKING_ACCESS_JUNCTIONS.street,
   }),
 
-  attachment5Point(4, 'Rua Ubiretama × Portão 5 — T a leste da Arena, na latitude sul', 'brasilia-ubiretama-junction', [55, 15], {
+  attachment5Point(4, 'Rua Ubiretama × Portão 5 — T perpendicular a leste da Arena, na latitude sul', 'brasilia-ubiretama-junction', [55, 15], {
     canonicalSource: PORTAO5_PARKING_ACCESS_JUNCTIONS.ubiretama,
   }),
   attachment5Point(5, 'Rua Ubiretama — trajetória norte', 'ubiretama-axis', [38, 20]),
@@ -151,7 +151,7 @@ const gate5PresentationSource = rearAttachment5ReferencePointById(6).officialSou
 export const REAR_OFFICIAL_ANCHORS = Object.freeze({
   /** Cadastro preservado; busca, seleção e persistência continuam na entidade A5. */
   gate5Entity: [5974, 3678] as Point2,
-  /** T da Ubiretama com o Portão 5 a leste da Arena, na latitude sul; não é [4528, 3248] nem um Y no portão. */
+  /** T da Ubiretama com o Portão 5 a leste da Arena, na latitude sul; não é [4528, 3248], [5548, 3248] nem um Y no portão. */
   gate5ParkEdge: rearAttachment5ReferencePointById(4).officialSource,
   /** Passagem veicular visual; a entidade cadastral A5 permanece imutável. */
   gate5VehicleAccess: gate5PresentationSource,
@@ -241,13 +241,18 @@ export const REAR_CALIBRATED_AXES = Object.freeze({
   ] as readonly Point2[]),
   /**
    * Ubiretama: origem [4528, 3150] na Rua Brasil, curva breve SE a sul do
-   * campo, E–W em y=3248 a sul da Arena. O Portão 5 só começa no T a leste
-   * de F e vai ao lock [5940, 3678]. Não substitui a Rua Brasília, não desce
-   * colinear em x=4528 e não entra no trevo.
+   * campo, E–W nivelada em y=3248 até o T [5860, 3248]. O Portão 5 guarda o
+   * arranque norte (~[5987, 2000]), curva leve a leste do apron e segue N–S
+   * até o lock [5940, 3678] — sem o gancho [5780, 3236]→[5548, 3248]. Não
+   * substitui a Rua Brasília, não desce colinear em x=4528 e não entra no trevo.
    */
   portao5StreetToCurve: PORTAO5_PARKING_ACCESS_CORRECTION.streetToCurve,
   portao5CurveToEtniasJunction: PORTAO5_PARKING_ACCESS_CORRECTION.curveToEtniasJunction,
   portao5EtniasToUbiretamaJunction: PORTAO5_PARKING_ACCESS_CORRECTION.etniasToUbiretamaJunction,
+  /**
+   * Descida do Portão 5. Arranque = fita cadastral leste. Sem o conector
+   * fantasma a meio da quadra ([5780, 3236], [5680, 3248], T em [5548, 3248]).
+   */
   ubiretamaNorthToJunction: Object.freeze([
     rearAttachment5ReferencePointById(5).officialSource,
     [5972, 2080],
@@ -256,8 +261,7 @@ export const REAR_CALIBRATED_AXES = Object.freeze({
     [5892, 2690],
     [5884, 2900],
     [5860, 3140],
-    [5780, 3236],
-    [5680, 3248],
+    [5860, 3200],
     rearAttachment5ReferencePointById(4).officialSource,
   ] as readonly Point2[]),
 
