@@ -1,13 +1,19 @@
+import {
+  ETNIAS_PARKING_CONNECTION_CORRECTION,
+  PORTAO5_PARKING_ACCESS_CORRECTION,
+  PORTAO5_PARKING_ACCESS_JUNCTIONS,
+  RUA_BRASILIA_OFFICIAL_RESTORATION,
+} from '../data/annexSpatialCorrections';
 import { officialPdfPointToLocal } from '../data/officialReference2026';
 
 /**
  * Calibração corretiva da área posterior.
  *
  * A transformação afim do anexo permanece apenas como registro dos marcos
- * rastreáveis P1 e P5. O satélite norte-para-cima governa P2, P3, P4 e P6:
- * cruzamento de quatro pontas Brasília × Uruguai ao sul do campo, curva suave
- * da Brasília a leste na altura do pátio, encontro da Ubiretama com A5 e
- * trevo do Portão 5 na BR-472. Sem S no meio das árvores e sem Y inventado.
+ * rastreáveis P1 e P5. Os eixos executáveis do Portão 5, da ligação das Etnias
+ * e da Rua Brasília oficial vêm de `annexSpatialCorrections.ts`. Ubiretama e o
+ * trevo da BR-472 herdados permanecem; a fita cadastral da Brasília não é
+ * substituída por uma curva gerada no estacionamento.
  *
  * A rotação é necessária porque o enquadramento do anexo 5 está girado em
  * relação ao recorte oficial do parque. Os três marcos foram escolhidos depois
@@ -15,7 +21,7 @@ import { officialPdfPointToLocal } from '../data/officialReference2026';
  * É um registro cartográfico de apresentação, não um levantamento geodésico:
  * os anexos não fornecem CRS, escala métrica certificada ou pontos de campo.
  */
-export const REAR_SPATIAL_CALIBRATION_REVISION = '2026.11-brasilia-lateral-gate5-y';
+export const REAR_SPATIAL_CALIBRATION_REVISION = '2026.9-annex-road-precision.1';
 
 export type Point2 = readonly [number, number];
 export type RearAttachment5PointId = 1 | 2 | 3 | 4 | 5 | 6;
@@ -109,15 +115,15 @@ export const REAR_ATTACHMENT_5_REFERENCE_POINTS = Object.freeze([
   attachment5Point(1, 'Término da Rua das Etnias', 'etnias-terminus', [80, 30], {
     canonicalSource: [5510, 4200],
   }),
-  attachment5Point(2, 'Rua Brasília — curva dentro do estacionamento', 'brasilia-axis', [53, 73], {
-    canonicalSource: [4980, 3455],
+  attachment5Point(2, 'Acesso Portão 5 — curva no estacionamento posterior', 'brasilia-axis', [53, 73], {
+    canonicalSource: PORTAO5_PARKING_ACCESS_JUNCTIONS.curve,
   }),
-  attachment5Point(3, 'Rua Brasília — saída da Rua Brasil, à direita do Centro de Eventos', 'brasilia-axis', [53, 46], {
-    canonicalSource: [4530, 3150],
+  attachment5Point(3, 'Acesso Portão 5 — saída da Rua Brasil, à direita do Centro de Eventos', 'brasilia-axis', [53, 46], {
+    canonicalSource: PORTAO5_PARKING_ACCESS_JUNCTIONS.street,
   }),
 
-  attachment5Point(4, 'Rua Ubiretama × Rua Brasília — entrada antes do Portão 5', 'brasilia-ubiretama-junction', [55, 15], {
-    canonicalSource: [5700, 3560],
+  attachment5Point(4, 'Rua Ubiretama × acesso Portão 5 — entrada antes do portão', 'brasilia-ubiretama-junction', [55, 15], {
+    canonicalSource: PORTAO5_PARKING_ACCESS_JUNCTIONS.ubiretama,
   }),
   attachment5Point(5, 'Rua Ubiretama — trajetória norte', 'ubiretama-axis', [38, 20]),
   attachment5Point(6, 'Portão 5 — passagem física em direção à BR-472', 'gate-5', [62, 13], {
@@ -193,28 +199,53 @@ export const REAR_SATELLITE_TOPOLOGY = Object.freeze({
  */
 export const REAR_CALIBRATED_AXES = Object.freeze({
   ruaDasEtniasOfficial: Object.freeze([
-    [3940, 4200], [4500, 4200], [5000, 4200], rearAttachment5ReferencePointById(1).officialSource,
+    [3940, 4200],
+    [4500, 4200],
+    [5000, 4200],
+    ETNIAS_PARKING_CONNECTION_CORRECTION.avenueEntry,
+    rearAttachment5ReferencePointById(1).officialSource,
+  ] as readonly Point2[]),
+  ruaDasEtniasOfficialWestToParking: Object.freeze([
+    [3940, 4200],
+    [4500, 4200],
+    [5000, 4200],
+    ETNIAS_PARKING_CONNECTION_CORRECTION.avenueEntry,
+  ] as readonly Point2[]),
+  ruaDasEtniasOfficialParkingToTerminus: Object.freeze([
+    ETNIAS_PARKING_CONNECTION_CORRECTION.avenueEntry,
+    rearAttachment5ReferencePointById(1).officialSource,
   ] as readonly Point2[]),
   /**
-   * Via principal: nasce na Rua Brasil, imediatamente à direita do Centro de
-   * Eventos, desce, curva para dentro do estacionamento e segue reto até o
-   * Portão 5. A Ubiretama é apenas transversal e entra pouco antes do portão.
+   * Asfalto executável da ligação das Etnias. Extremidades = blueprint
+   * ([5260,4200] e [5290,3500]). Controles internos afastam a Catmull-Rom
+   * dos postes CAD 361 (≈[5258,3739]) e 331 (≈[5287,3554]), que caem sobre
+   * o rascunho verde; o corredor permanece N–S no bosque.
    */
-  brasiliaStreetToParkingCurve: Object.freeze([
-    rearAttachment5ReferencePointById(3).officialSource,
-    [4536, 3220],
-    [4550, 3300],
-    [4586, 3372],
-    [4664, 3420],
-    [4800, 3442],
-    rearAttachment5ReferencePointById(2).officialSource,
+  etniasParkingConnection: Object.freeze([
+    ETNIAS_PARKING_CONNECTION_CORRECTION.avenueEntry,
+    [5260, 4140],
+    [5260, 3950],
+    [5294, 3820],
+    [5296, 3739],
+    [5288, 3660],
+    [5248, 3600],
+    [5246, 3554],
+    [5250, 3528],
+    ETNIAS_PARKING_CONNECTION_CORRECTION.parkingJunction,
   ] as readonly Point2[]),
-  brasiliaParkingToUbiretamaJunction: Object.freeze([
-    rearAttachment5ReferencePointById(2).officialSource,
-    [5220, 3482],
-    [5460, 3516],
-    rearAttachment5ReferencePointById(4).officialSource,
+  brasiliaOfficialAxis: RUA_BRASILIA_OFFICIAL_RESTORATION.sourceAxis,
+  brasiliaOfficialToImigrantes: Object.freeze([
+    RUA_BRASILIA_OFFICIAL_RESTORATION.sourceAxis[2],
+    [3940, 4200],
   ] as readonly Point2[]),
+  /**
+   * Acesso interno ao Portão 5: nasce na Rua Brasil, imediatamente à direita
+   * do Centro de Eventos, curva com raio aberto no estacionamento e entrega
+   * a Ubiretama em T pouco antes do portão. Não substitui a Rua Brasília.
+   */
+  portao5StreetToCurve: PORTAO5_PARKING_ACCESS_CORRECTION.streetToCurve,
+  portao5CurveToEtniasJunction: PORTAO5_PARKING_ACCESS_CORRECTION.curveToEtniasJunction,
+  portao5EtniasToUbiretamaJunction: PORTAO5_PARKING_ACCESS_CORRECTION.etniasToUbiretamaJunction,
   ubiretamaNorthToJunction: Object.freeze([
     rearAttachment5ReferencePointById(5).officialSource,
     [5972, 2080],
@@ -225,15 +256,11 @@ export const REAR_CALIBRATED_AXES = Object.freeze({
     [5876, 3120],
     [5858, 3300],
     [5790, 3450],
+    [5748, 3528],
     rearAttachment5ReferencePointById(4).officialSource,
   ] as readonly Point2[]),
 
-  gate5InternalApproach: Object.freeze([
-    rearAttachment5ReferencePointById(4).officialSource,
-    [5810, 3600],
-    [5890, 3648],
-    REAR_OFFICIAL_ANCHORS.gate5VehicleAccess,
-  ] as readonly Point2[]),
+  gate5InternalApproach: PORTAO5_PARKING_ACCESS_CORRECTION.gate5Approach,
   /** Tronco único do trevo, entre o portão e a bifurcação em Y. */
   a5TrevoTrunk: Object.freeze([
     REAR_OFFICIAL_ANCHORS.gate5VehicleAccess,

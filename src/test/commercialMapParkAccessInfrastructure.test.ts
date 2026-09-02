@@ -354,7 +354,7 @@ describe('infraestrutura externa parametrizada do mapa comercial', () => {
       expect(model.geometries.cobblestone).toBeNull();
       expect(model.geometries.gravel).toBeNull();
       expect(model.diagnostics).toMatchObject({
-        roadSurfaceCount: 3,
+        roadSurfaceCount: 4,
         curbSegmentCount: 20,
         estimatedPrimaryDrawCalls: 2,
         estimatedShadowDrawCalls: 0,

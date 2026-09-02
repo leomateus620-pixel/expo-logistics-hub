@@ -38,7 +38,9 @@ describe('encontro físico da Arena com a rede posterior', () => {
   });
 
   it('recorta triângulos inteiros e parciais sem perder UVs, cor ou orientação', () => {
-    const [x, z] = officialPdfPointToLocal([5100, 3468]);
+    // Control point on the annex-2 Portão 5 ribbon (curve → Etnias), so the
+    // cut is sampled on live asphalt rather than a historic centerline.
+    const [x, z] = officialPdfPointToLocal([5128, 3478]);
     const geometry = new THREE.PlaneGeometry(8, 4, 10, 6);
     geometry.rotateX(-Math.PI / 2);
     geometry.translate(x, 0.052, z);

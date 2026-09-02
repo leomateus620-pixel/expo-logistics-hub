@@ -1,3 +1,10 @@
+import {
+  ANNEX_SOURCE_POINTS_PER_LOCAL_UNIT,
+  ETNIAS_PARKING_CONNECTION_CORRECTION,
+  PORTAO5_PARKING_ACCESS_CORRECTION,
+  RUA_BRASILIA_OFFICIAL_RESTORATION,
+  annexSourceWidthToLocal,
+} from './annexSpatialCorrections';
 import { EXPORURAL_ROAD_IDENTIFIERS } from './exporuralReference2026';
 import { OFFICIAL_REFERENCE_DATA, officialPdfPointToLocal } from './officialReference2026';
 import {
@@ -7,14 +14,12 @@ import {
 } from '../utils/rearSpatialCalibration';
 
 /**
- * Rede viária posterior — correção satélite 2026.9.3.
+ * Rede viária posterior — anexos 2/4 + satélite herdado.
  *
- * As entidades cadastrais continuam sendo as únicas donas de busca, seleção e
- * metadados. A camada complementa a Rua Brasília além do núcleo interno e
- * substitui somente as duas apresentações incompatíveis: Ubiretama e a faixa
- * esquemática da RS-472. Brasília permanece N–S a oeste, com curva suave a
- * leste no pátio e cruzamento de quatro pontas ao sul do campo. O Portão 5
- * entrega três ramais independentes à BR-472. Nenhum eixo fecha uma alça pela mata.
+ * A Rua Brasília oficial permanece visível (`official-surface` / cadastro
+ * `RUA-BRASILIA`). O asfalto gerado no estacionamento é o acesso ao Portão 5,
+ * não uma Brasília paralela. Ubiretama entra em T. A ligação das Etnias nasce
+ * na Av. dos Imigrantes. O trevo da BR-472 é o modelo de qualidade herdado.
  */
 
 export type CanonicalRearRoadId =
@@ -22,14 +27,18 @@ export type CanonicalRearRoadId =
   | 'RUA-UBIRETAMA'
   | 'RUA-DAS-ETNIAS'
   | 'RODOVIA-RS-472';
-export type RearRoadFeatureId = CanonicalRearRoadId | 'ACESSO-A5-BR472';
+export type RearRoadFeatureId = CanonicalRearRoadId | 'ACESSO-A5-BR472' | 'ACESSO-PORTAO5-ESTACIONAMENTO';
 
 export type RoadNodeId =
   | 'etnias-west'
+  | 'etnias-parking-avenue'
   | 'etnias-terminus-1'
-  | 'brasilia-brasil-street'
-  | 'brasilia-parking-curve'
-  | 'brasilia-ubiretama-junction'
+  | 'etnias-parking-junction'
+  | 'brasilia-north'
+  | 'brasilia-south'
+  | 'portao5-street'
+  | 'portao5-curve'
+  | 'ubiretama-portao5-junction'
   | 'ubiretama-north'
   | 'gate-5'
   | 'a5-trevo-fork'
@@ -84,10 +93,10 @@ export interface RearRoadIdentity {
 
 export type RearContextualLabelOwner = RearRoadIdentity['officialOwnerIdentifier'] | 'A5';
 
-export const REAR_PARK_ROAD_REVISION = '2026.11-brasilia-lateral-gate5-y';
+export const REAR_PARK_ROAD_REVISION = '2026.9-annex-road-precision.1';
 
 /** Escala uniforme do recorte oficial, usada apenas para larguras físicas. */
-export const SOURCE_POINTS_PER_LOCAL_UNIT = 5500 / 120;
+export const SOURCE_POINTS_PER_LOCAL_UNIT = ANNEX_SOURCE_POINTS_PER_LOCAL_UNIT;
 
 export function rearRoadSourceToLocalLength(sourceLength: number) {
   return sourceLength / SOURCE_POINTS_PER_LOCAL_UNIT;
@@ -102,12 +111,12 @@ export const PROTECTED_ROAD_IDENTIFIERS: readonly string[] = Object.freeze([
 ]);
 
 /**
- * As geometrias oficiais permanecem no cadastro. A Rua Brasília oficial também
- * permanece visível porque contém o eixo interno entre a Quadra E e o Q-R-02;
- * os segmentos procedurais apenas prolongam sua apresentação no setor traseiro.
+ * Ubiretama e a faixa esquemática da RS-472 continuam substituídas pela malha
+ * gerada. A Rua Brasília oficial NÃO entra nesta lista: escondê-la é a
+ * regressão do anexo 4. Os segmentos procedurais do estacionamento pertencem
+ * ao acesso A5, não à fita cadastral N–S.
  */
 export const REPLACED_OFFICIAL_ROAD_IDENTIFIERS: readonly string[] = Object.freeze([
-  'RUA-BRASILIA',
   'RUA-UBIRETAMA',
   'RODOVIA-RS-472',
 ]);
@@ -192,11 +201,15 @@ export const OFFICIAL_GATE_5_ACCESS_POINT = Object.freeze(officialPdfPointToLoca
 export const OFFICIAL_GATE_5_ENTITY_ID = officialGate5.id;
 
 const nodeSources: Readonly<Record<RoadNodeId, SourcePoint>> = Object.freeze({
-  'etnias-west': REAR_CALIBRATED_AXES.ruaDasEtniasOfficial[0],
+  'etnias-west': REAR_CALIBRATED_AXES.ruaDasEtniasOfficialWestToParking[0],
+  'etnias-parking-avenue': ETNIAS_PARKING_CONNECTION_CORRECTION.avenueEntry,
   'etnias-terminus-1': rearAttachment5ReferencePointById(1).officialSource,
-  'brasilia-brasil-street': rearAttachment5ReferencePointById(3).officialSource,
-  'brasilia-parking-curve': rearAttachment5ReferencePointById(2).officialSource,
-  'brasilia-ubiretama-junction': REAR_OFFICIAL_ANCHORS.gate5ParkEdge,
+  'etnias-parking-junction': ETNIAS_PARKING_CONNECTION_CORRECTION.parkingJunction,
+  'brasilia-north': RUA_BRASILIA_OFFICIAL_RESTORATION.sourceAxis[0],
+  'brasilia-south': RUA_BRASILIA_OFFICIAL_RESTORATION.sourceAxis[2],
+  'portao5-street': rearAttachment5ReferencePointById(3).officialSource,
+  'portao5-curve': rearAttachment5ReferencePointById(2).officialSource,
+  'ubiretama-portao5-junction': REAR_OFFICIAL_ANCHORS.gate5ParkEdge,
   'ubiretama-north': REAR_CALIBRATED_AXES.ubiretamaNorthToJunction[0],
   'gate-5': officialGate5SourcePoint,
   'a5-trevo-fork': REAR_OFFICIAL_ANCHORS.trevoFork,
@@ -244,49 +257,91 @@ const officialRoadDefaults = Object.freeze({
   presentation: 'official-surface' as const,
 });
 
+const generatedParkDefaults = Object.freeze({
+  category: 'park-avenue' as const,
+  width: annexSourceWidthToLocal(PORTAO5_PARKING_ACCESS_CORRECTION.widthSource),
+  shoulderWidth: 0,
+  elevationOffset: 0.032,
+  materialId: 'park-asphalt' as const,
+  markings: 'none' as const,
+  presentation: 'generated-surface' as const,
+});
+
 export const REAR_PARK_ROAD_NETWORK: readonly RoadSegment[] = Object.freeze([
   segment({
-    id: 'etnias-official-terminus-1', roadId: 'RUA-DAS-ETNIAS', name: 'Rua das Etnias',
-    from: 'etnias-west', to: 'etnias-terminus-1', ...officialRoadDefaults,
-    sourceControlPoints: REAR_CALIBRATED_AXES.ruaDasEtniasOfficial,
+    id: 'brasilia-official-axis', roadId: 'RUA-BRASILIA', name: 'Rua Brasília',
+    from: 'brasilia-north', to: 'brasilia-south', ...officialRoadDefaults,
+    sourceControlPoints: REAR_CALIBRATED_AXES.brasiliaOfficialAxis,
+    officialOwnerIdentifier: 'RUA-BRASILIA',
+    notes: 'Fita cadastral N–S: Portão 3 → Sede Fenasoja → Centro de Eventos → Espaço Mirante → Av. dos Imigrantes. Sem malha paralela gerada.',
+  }),
+  segment({
+    id: 'brasilia-imigrantes-join', roadId: 'RUA-DAS-ETNIAS', name: 'Rua das Etnias',
+    from: 'brasilia-south', to: 'etnias-west', ...officialRoadDefaults,
+    sourceControlPoints: REAR_CALIBRATED_AXES.brasiliaOfficialToImigrantes,
     officialOwnerIdentifier: 'AV-IMIGRANTES',
-    notes: 'Superfície oficial termina no Ponto 1; não há continuação pela mata nem ligação gerada ao A5.',
+    notes: 'Grafo T no encontro da fita oficial da Brasília com a Av. dos Imigrantes; o asfalto visível é cadastral.',
   }),
   segment({
-    id: 'brasilia-brasil-parking', roadId: 'RUA-BRASILIA', name: 'Rua Brasília',
-    from: 'brasilia-brasil-street', to: 'brasilia-parking-curve', category: 'park-avenue',
-    sourceControlPoints: REAR_CALIBRATED_AXES.brasiliaStreetToParkingCurve,
-    width: rearRoadSourceToLocalLength(36), shoulderWidth: 0,
-    elevationOffset: 0.032, materialId: 'park-asphalt', markings: 'none',
-    presentation: 'generated-surface', officialOwnerIdentifier: 'RUA-BRASILIA',
-    notes: 'Nasce na Rua Brasil, à direita do Centro de Eventos, desce e curva para dentro do estacionamento.',
+    id: 'etnias-official-west-parking', roadId: 'RUA-DAS-ETNIAS', name: 'Rua das Etnias',
+    from: 'etnias-west', to: 'etnias-parking-avenue', ...officialRoadDefaults,
+    sourceControlPoints: REAR_CALIBRATED_AXES.ruaDasEtniasOfficialWestToParking,
+    officialOwnerIdentifier: 'AV-IMIGRANTES',
+    notes: 'Superfície oficial da Av. dos Imigrantes até a boca da ligação do estacionamento.',
   }),
   segment({
-    id: 'brasilia-parking-gate', roadId: 'RUA-BRASILIA', name: 'Rua Brasília',
-    from: 'brasilia-parking-curve', to: 'brasilia-ubiretama-junction', category: 'park-avenue',
-    sourceControlPoints: REAR_CALIBRATED_AXES.brasiliaParkingToUbiretamaJunction,
-    width: rearRoadSourceToLocalLength(36), shoulderWidth: 0,
-    elevationOffset: 0.032, materialId: 'park-asphalt', markings: 'none',
-    presentation: 'generated-surface', officialOwnerIdentifier: 'RUA-BRASILIA',
-    notes: 'Trecho reto pelo estacionamento posterior até a entrada da Ubiretama, pouco antes do Portão 5.',
+    id: 'etnias-official-terminus-1', roadId: 'RUA-DAS-ETNIAS', name: 'Rua das Etnias',
+    from: 'etnias-parking-avenue', to: 'etnias-terminus-1', ...officialRoadDefaults,
+    sourceControlPoints: REAR_CALIBRATED_AXES.ruaDasEtniasOfficialParkingToTerminus,
+    officialOwnerIdentifier: 'AV-IMIGRANTES',
+    notes: 'Superfície oficial termina no Ponto 1; não há continuação pela mata nem ligação gerada ao A5 a partir deste término.',
+  }),
+  segment({
+    id: 'etnias-parking-connection', roadId: 'RUA-DAS-ETNIAS', name: 'Rua das Etnias',
+    from: 'etnias-parking-avenue', to: 'etnias-parking-junction', ...generatedParkDefaults,
+    sourceControlPoints: REAR_CALIBRATED_AXES.etniasParkingConnection,
+    officialOwnerIdentifier: 'AV-IMIGRANTES',
+    notes: 'Ligação N–S do anexo 2 entre a Av. dos Imigrantes e o acesso ao Portão 5. Extremidades do rascunho verde; tangência afasta postes CAD 331 e 361.',
+  }),
+  segment({
+    id: 'portao5-street-curve', roadId: 'ACESSO-PORTAO5-ESTACIONAMENTO', name: 'Acesso Portão 5 — estacionamento',
+    from: 'portao5-street', to: 'portao5-curve', ...generatedParkDefaults,
+    sourceControlPoints: REAR_CALIBRATED_AXES.portao5StreetToCurve,
+    officialOwnerIdentifier: 'A5',
+    notes: 'Nasce na Rua Brasil, à direita do Centro de Eventos, e curva com raio aberto para o estacionamento posterior.',
+  }),
+  segment({
+    id: 'portao5-curve-etnias', roadId: 'ACESSO-PORTAO5-ESTACIONAMENTO', name: 'Acesso Portão 5 — estacionamento',
+    from: 'portao5-curve', to: 'etnias-parking-junction', ...generatedParkDefaults,
+    sourceControlPoints: REAR_CALIBRATED_AXES.portao5CurveToEtniasJunction,
+    officialOwnerIdentifier: 'A5',
+    notes: 'Trecho leste da via do estacionamento até o T com a ligação das Etnias.',
+  }),
+  segment({
+    id: 'portao5-etnias-ubiretama', roadId: 'ACESSO-PORTAO5-ESTACIONAMENTO', name: 'Acesso Portão 5 — estacionamento',
+    from: 'etnias-parking-junction', to: 'ubiretama-portao5-junction', ...generatedParkDefaults,
+    sourceControlPoints: REAR_CALIBRATED_AXES.portao5EtniasToUbiretamaJunction,
+    officialOwnerIdentifier: 'A5',
+    notes: 'Continuidade até o T com a Ubiretama, pouco antes do Portão 5.',
   }),
   segment({
     id: 'ubiretama-north-junction', roadId: 'RUA-UBIRETAMA', name: 'Rua Ubiretama',
-    from: 'ubiretama-north', to: 'brasilia-ubiretama-junction', category: 'park-avenue',
+    from: 'ubiretama-north', to: 'ubiretama-portao5-junction', category: 'park-avenue',
     sourceControlPoints: REAR_CALIBRATED_AXES.ubiretamaNorthToJunction,
     width: rearRoadSourceToLocalLength(32), shoulderWidth: 0,
     elevationOffset: 0.03, materialId: 'park-asphalt', markings: 'none',
     presentation: 'generated-surface', officialOwnerIdentifier: 'RUA-UBIRETAMA',
-    notes: 'Via transversal secundária: desce do cadastro norte e entra na Rua Brasília antes do portão.',
+    notes: 'Via transversal secundária: desce do cadastro norte e entra no acesso ao Portão 5 antes do portão.',
   }),
   segment({
     id: 'gate5-internal-approach', roadId: 'ACESSO-A5-BR472', name: 'Acesso Portão 5 — rede interna',
-    from: 'brasilia-ubiretama-junction', to: 'gate-5', category: 'internal-access',
+    from: 'ubiretama-portao5-junction', to: 'gate-5', category: 'internal-access',
     sourceControlPoints: REAR_CALIBRATED_AXES.gate5InternalApproach,
-    width: rearRoadSourceToLocalLength(36), shoulderWidth: rearRoadSourceToLocalLength(5),
+    width: annexSourceWidthToLocal(PORTAO5_PARKING_ACCESS_CORRECTION.widthSource),
+    shoulderWidth: rearRoadSourceToLocalLength(5),
     elevationOffset: 0.034, materialId: 'park-asphalt', markings: 'none',
     presentation: 'generated-surface', officialOwnerIdentifier: 'A5',
-    notes: 'Aproximação curta entre o cadastro A5 e a passagem veicular do Portão 5.',
+    notes: 'Aproximação curta entre o T da Ubiretama e a passagem veicular do Portão 5.',
   }),
   segment({
     id: 'a5-trevo-trunk', roadId: 'ACESSO-A5-BR472', name: 'Acesso Portão 5 — tronco do trevo',
@@ -393,7 +448,7 @@ export function rearRoadCorridors(includeOfficialSurfaces = false) {
 }
 
 const OWNER_LABEL_SOURCE_ANCHORS: Readonly<Record<RearContextualLabelOwner, SourcePoint>> = Object.freeze({
-  'RUA-BRASILIA': rearAttachment5ReferencePointById(3).officialSource,
+  'RUA-BRASILIA': RUA_BRASILIA_OFFICIAL_RESTORATION.sourceAxis[1],
   'RUA-UBIRETAMA': REAR_CALIBRATED_AXES.ubiretamaNorthToJunction[5],
   'AV-IMIGRANTES': [5200, 4200],
   'RODOVIA-RS-472': REAR_CALIBRATED_AXES.br472NorthToNorthRamp[2],
@@ -446,7 +501,7 @@ export type RoadGraphEndpoint = RoadNodeId | 'br472' | 'brasilia' | 'ubiretama' 
 
 function resolveRoadGraphEndpoint(endpoint: RoadGraphEndpoint): RoadNodeId {
   if (endpoint === 'br472') return 'br472-north';
-  if (endpoint === 'brasilia') return 'brasilia-brasil-street';
+  if (endpoint === 'brasilia') return 'brasilia-north';
   if (endpoint === 'ubiretama') return 'ubiretama-north';
   if (endpoint === 'etnias') return 'etnias-terminus-1';
   if (endpoint === 'A5') return 'gate-5';
