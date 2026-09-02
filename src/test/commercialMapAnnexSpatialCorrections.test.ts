@@ -206,22 +206,22 @@ describe('anexos 1/2/4 — blueprint e fiação viária', () => {
 
     expect(PORTAO5_PARKING_ACCESS_CORRECTION.widthSource).toBe(36);
     expect(PORTAO5_PARKING_ACCESS_CORRECTION.streetToCurve[0]).toEqual([4528, 3150]);
-    expect(PORTAO5_PARKING_ACCESS_CORRECTION.streetToCurve.at(-1)).toEqual([4856, 3216]);
-    expect(PORTAO5_PARKING_ACCESS_CORRECTION.curveToEtniasJunction[0]).toEqual([4856, 3216]);
-    expect(PORTAO5_PARKING_ACCESS_CORRECTION.curveToEtniasJunction.at(-1)).toEqual([5260, 3236]);
-    expect(PORTAO5_PARKING_ACCESS_CORRECTION.etniasToUbiretamaJunction[0]).toEqual([5260, 3236]);
-    expect(PORTAO5_PARKING_ACCESS_CORRECTION.etniasToUbiretamaJunction.at(-1)).toEqual([5524, 3292]);
-    expect(PORTAO5_PARKING_ACCESS_CORRECTION.gate5Approach[0]).toEqual([5524, 3292]);
+    expect(PORTAO5_PARKING_ACCESS_CORRECTION.streetToCurve.at(-1)).toEqual([4856, 3260]);
+    expect(PORTAO5_PARKING_ACCESS_CORRECTION.curveToEtniasJunction[0]).toEqual([4856, 3260]);
+    expect(PORTAO5_PARKING_ACCESS_CORRECTION.curveToEtniasJunction.at(-1)).toEqual([5260, 3260]);
+    expect(PORTAO5_PARKING_ACCESS_CORRECTION.etniasToUbiretamaJunction[0]).toEqual([5260, 3260]);
+    expect(PORTAO5_PARKING_ACCESS_CORRECTION.etniasToUbiretamaJunction.at(-1)).toEqual([5548, 3304]);
+    expect(PORTAO5_PARKING_ACCESS_CORRECTION.gate5Approach[0]).toEqual([5548, 3304]);
     expect(PORTAO5_PARKING_ACCESS_CORRECTION.gate5Approach.at(-1)).toEqual([5940, 3678]);
 
     expect(ETNIAS_PARKING_CONNECTION_CORRECTION).toMatchObject({
       officialOwnerIdentifier: 'AV-IMIGRANTES',
       widthSource: 36,
       avenueEntry: [5260, 4200],
-      parkingJunction: [5260, 3236],
+      parkingJunction: [5260, 3260],
     });
     expect([...ETNIAS_PARKING_CONNECTION_CORRECTION.sourceAxis]).toEqual([
-      [5260, 4200], [5260, 4140], [5260, 3950], [5262, 3750], [5262, 3480], [5260, 3236],
+      [5260, 4200], [5260, 4140], [5260, 3950], [5262, 3750], [5262, 3480], [5260, 3260],
     ]);
 
     expect(RUA_BRASILIA_OFFICIAL_RESTORATION).toEqual({
@@ -295,14 +295,14 @@ describe('anexos 1/2/4 — blueprint e fiação viária', () => {
 
   it('materializa o acesso ao Portão 5 com curva leve e preserva o trevo da BR-472', () => {
     expect(projectRearAttachment5PointToOfficialSource(3)).toEqual([4528, 3150]);
-    expect(projectRearAttachment5PointToOfficialSource(2)).toEqual([4856, 3216]);
-    expect(projectRearAttachment5PointToOfficialSource(4)).toEqual([5524, 3292]);
+    expect(projectRearAttachment5PointToOfficialSource(2)).toEqual([4856, 3260]);
+    expect(projectRearAttachment5PointToOfficialSource(4)).toEqual([5548, 3304]);
     expect(projectRearAttachment5PointToOfficialSource(6)).toEqual([5940, 3678]);
     expect(PORTAO5_PARKING_ACCESS_JUNCTIONS).toEqual({
       street: [4528, 3150],
-      curve: [4856, 3216],
-      etnias: [5260, 3236],
-      ubiretama: [5524, 3292],
+      curve: [4856, 3260],
+      etnias: [5260, 3260],
+      ubiretama: [5548, 3304],
       gate5: [5940, 3678],
     });
     expect(REAR_OFFICIAL_ANCHORS.gate5Entity).toEqual([5974, 3678]);
@@ -413,10 +413,10 @@ describe('anexos 1/2/4 — blueprint e fiação viária', () => {
     expect(axis.some(([x]) => x > arenaEast)).toBe(true);
 
     const ubiretama = REAR_CALIBRATED_AXES.ubiretamaNorthToJunction;
-    expect(ubiretama.at(-1)).toEqual([5524, 3292]);
+    expect(ubiretama.at(-1)).toEqual([5548, 3304]);
     expect(ubiretama.every(([x]) => x > arenaEast)).toBe(true);
-    expect(REAR_ROAD_NODES['ubiretama-portao5-junction'].sourcePoint).toEqual([5524, 3292]);
-    expect(ETNIAS_PARKING_CONNECTION_CORRECTION.parkingJunction).toEqual([5260, 3236]);
+    expect(REAR_ROAD_NODES['ubiretama-portao5-junction'].sourcePoint).toEqual([5548, 3304]);
+    expect(ETNIAS_PARKING_CONNECTION_CORRECTION.parkingJunction).toEqual([5260, 3260]);
     expect(ETNIAS_PARKING_CONNECTION_CORRECTION.parkingJunction).not.toEqual([5260, 3661]);
 
     const brasilia = officialEntity('RUA-BRASILIA').geometry.coordinates[0] as ParkAccessPoint[];
@@ -488,7 +488,7 @@ describe('anexos 1/2/4 — blueprint e fiação viária', () => {
       process.cwd(), 'src/features/commercial-map/data/parkEnvironment.ts',
     ), 'utf8');
     expect(eventCenterSource).not.toContain('annexSpatialCorrections');
-    expect(parkEnvironmentSource).not.toContain('EXPORURAL_SMOOTH_CONCRETE_CORRECTION');
+    expect(parkEnvironmentSource).not.toContain("from './annexSpatialCorrections'");
     expect(parkEnvironmentSource).not.toContain('EVENT_CENTER_QE12_ALIGNMENT');
   });
 

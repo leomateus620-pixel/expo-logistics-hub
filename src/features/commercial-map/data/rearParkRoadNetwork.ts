@@ -316,14 +316,14 @@ export const REAR_PARK_ROAD_NETWORK: readonly RoadSegment[] = Object.freeze([
     from: 'portao5-curve', to: 'etnias-parking-junction', ...generatedParkDefaults,
     sourceControlPoints: REAR_CALIBRATED_AXES.portao5CurveToEtniasJunction,
     officialOwnerIdentifier: 'A5',
-    notes: 'Continuidade leste ao sul da Arena até o T com a ligação das Etnias em [5260, 3236].',
+    notes: 'Continuidade leste ao sul da Arena até o T com a ligação das Etnias em [5260, 3260].',
   }),
   segment({
     id: 'portao5-etnias-ubiretama', roadId: 'ACESSO-PORTAO5-ESTACIONAMENTO', name: 'Acesso Portão 5 — estacionamento',
     from: 'etnias-parking-junction', to: 'ubiretama-portao5-junction', ...generatedParkDefaults,
     sourceControlPoints: REAR_CALIBRATED_AXES.portao5EtniasToUbiretamaJunction,
     officialOwnerIdentifier: 'A5',
-    notes: 'Cruza a face leste da Arena e entrega a Ubiretama em T [5524, 3292]. Sem varredura ESE em y≈3660.',
+    notes: 'Cruza a face leste da Arena e entrega a Ubiretama em T [5548, 3304]. Sem varredura ESE em y≈3660.',
   }),
   segment({
     id: 'ubiretama-north-junction', roadId: 'RUA-UBIRETAMA', name: 'Rua Ubiretama',

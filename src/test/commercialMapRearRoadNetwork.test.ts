@@ -141,9 +141,9 @@ describe('área posterior — hierarquia dos anexos e seis âncoras', () => {
 
   it('mantém os marcos rastreáveis e usa os pontos canônicos do traçado corrigido', () => {
     expect(projectRearAttachment5PointToOfficialSource(1)).toEqual([5510, 4200]);
-    expect(projectRearAttachment5PointToOfficialSource(2)).toEqual([4856, 3216]);
+    expect(projectRearAttachment5PointToOfficialSource(2)).toEqual([4856, 3260]);
     expect(projectRearAttachment5PointToOfficialSource(3)).toEqual([4528, 3150]);
-    expect(projectRearAttachment5PointToOfficialSource(4)).toEqual([5524, 3292]);
+    expect(projectRearAttachment5PointToOfficialSource(4)).toEqual([5548, 3304]);
     expect(projectRearAttachment5PointToOfficialSource(5)[0]).toBeCloseTo(5987, 10);
     expect(projectRearAttachment5PointToOfficialSource(5)[1]).toBeCloseTo(2000, 10);
     expect(projectRearAttachment5PointToOfficialSource(6)).toEqual([5940, 3678]);
@@ -318,7 +318,7 @@ describe('área posterior — topologia de satélite e rodovia independente', ()
       'gate-5',
     ]);
     const junction = REAR_ROAD_NODES['ubiretama-portao5-junction'].sourcePoint;
-    expect(junction).toEqual([5524, 3292]);
+    expect(junction).toEqual([5548, 3304]);
     expect(junction[0]).toBeGreaterThan(5385);
     expect(REAR_ROAD_NODES['portao5-street'].sourcePoint).toEqual([4528, 3150]);
     expect(roadGraphHasPath('ubiretama', 'brasilia')).toBe(true);

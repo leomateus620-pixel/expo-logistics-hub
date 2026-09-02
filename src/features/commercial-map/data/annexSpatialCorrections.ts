@@ -59,31 +59,32 @@ export const PORTAO5_PARKING_ACCESS_CORRECTION = Object.freeze({
   widthSource: 36,
   streetToCurve: Object.freeze([
     [4528, 3150],
-    [4560, 3158],
-    [4604, 3170],
-    [4660, 3184],
-    [4730, 3198],
-    [4808, 3210],
-    [4856, 3216],
+    [4560, 3170],
+    [4594, 3206],
+    [4620, 3238],
+    [4642, 3254],
+    [4688, 3260],
+    [4776, 3260],
+    [4856, 3260],
   ] as const satisfies readonly AnnexSourcePoint[]),
   curveToEtniasJunction: Object.freeze([
-    [4856, 3216],
-    [4980, 3226],
-    [5108, 3232],
-    [5260, 3236],
+    [4856, 3260],
+    [4988, 3260],
+    [5120, 3260],
+    [5260, 3260],
   ] as const satisfies readonly AnnexSourcePoint[]),
   etniasToUbiretamaJunction: Object.freeze([
-    [5260, 3236],
-    [5348, 3246],
-    [5436, 3266],
-    [5524, 3292],
+    [5260, 3260],
+    [5368, 3268],
+    [5456, 3284],
+    [5548, 3304],
   ] as const satisfies readonly AnnexSourcePoint[]),
   gate5Approach: Object.freeze([
-    [5524, 3292],
-    [5616, 3384],
-    [5712, 3480],
-    [5808, 3572],
-    [5880, 3636],
+    [5548, 3304],
+    [5620, 3260],
+    [5720, 3380],
+    [5820, 3528],
+    [5888, 3632],
     [5940, 3678],
   ] as const satisfies readonly AnnexSourcePoint[]),
 });
@@ -117,13 +118,13 @@ export function portao5ParkingAccessSourceAxis(): AnnexSourcePoint[] {
 
 /**
  * Anexo 2 — “Criar essa estrada”: ligação N–S da Av. dos Imigrantes / Rua das
- * Etnias até o T no acesso ao Portão 5, ao sul da Arena em [5260, 3236].
+ * Etnias até o T no acesso ao Portão 5, ao sul da Arena em [5260, 3260].
  */
 export const ETNIAS_PARKING_CONNECTION_CORRECTION = Object.freeze({
   officialOwnerIdentifier: 'AV-IMIGRANTES' as const,
   widthSource: 36,
   avenueEntry: [5260, 4200] as const satisfies AnnexSourcePoint,
-  parkingJunction: [5260, 3236] as const satisfies AnnexSourcePoint,
+  parkingJunction: [5260, 3260] as const satisfies AnnexSourcePoint,
   /**
    * Extremidades no T satélite ao sul da Arena. A Catmull-Rom executável em
    * `REAR_CALIBRATED_AXES.etniasParkingConnection` mantém o desvio dos postes
@@ -135,7 +136,7 @@ export const ETNIAS_PARKING_CONNECTION_CORRECTION = Object.freeze({
     [5260, 3950],
     [5262, 3750],
     [5262, 3480],
-    [5260, 3236],
+    [5260, 3260],
   ] as const satisfies readonly AnnexSourcePoint[]),
 });
 

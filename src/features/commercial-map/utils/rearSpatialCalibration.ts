@@ -217,7 +217,7 @@ export const REAR_CALIBRATED_AXES = Object.freeze({
   ] as readonly Point2[]),
   /**
    * Asfalto executável da ligação das Etnias. Extremidades = blueprint
-   * ([5260,4200] e [5260,3236]). Controles internos afastam a Catmull-Rom
+   * ([5260,4200] e [5260,3260]). Controles internos afastam a Catmull-Rom
    * dos postes CAD 361 (≈[5258,3739]) e 331 (≈[5287,3554]); o T rejeitado
    * [5260, 3661] não é restabelecido.
    */
@@ -253,8 +253,9 @@ export const REAR_CALIBRATED_AXES = Object.freeze({
     [5920, 2450],
     [5892, 2690],
     [5884, 2900],
-    [5800, 3100],
-    [5680, 3224],
+    [5860, 3140],
+    [5780, 3256],
+    [5680, 3280],
     rearAttachment5ReferencePointById(4).officialSource,
   ] as readonly Point2[]),
 

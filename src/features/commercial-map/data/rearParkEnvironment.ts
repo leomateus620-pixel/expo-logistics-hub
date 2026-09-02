@@ -270,7 +270,9 @@ export function buildRearPoleInstances(reducedGraphics = false): RearPoleInstanc
   const footprints = buildRearRoadCorridorFootprints(undefined, { includeShoulders: true });
 
   rearRoadCorridors()
-    .filter((corridor) => corridor.roadId === 'ACESSO-A5-BR472')
+    .filter((corridor) => (
+      corridor.roadId === 'ACESSO-A5-BR472' && corridor.id !== 'gate5-internal-approach'
+    ))
     .forEach((corridor) => {
       let carried = spacing * 0.5;
       for (let index = 0; index < corridor.path.length - 1; index += 1) {
