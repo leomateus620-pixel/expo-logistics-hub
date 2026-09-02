@@ -989,9 +989,8 @@ export function useCronogramaEventos() {
     mutationFn: async (eventId: string) => {
       const current = findSessionEvent(eventId);
       if (!current) throw new Error('Evento não encontrado. Atualize a página e tente novamente.');
-      if (!isWritableRole(myRole)) throw new Error('Seu perfil possui acesso somente para consulta.');
-      if (myRole !== 'admin' && myRole !== 'gestor') {
-        throw new Error('Somente administradores e gestores podem excluir eventos.');
+      if (!canWriteCronograma) {
+        throw new Error('Seu perfil possui acesso somente para consulta.');
       }
       if (!orgId) throw new Error('Não foi possível identificar a organização atual.');
 
