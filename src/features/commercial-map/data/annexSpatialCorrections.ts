@@ -12,7 +12,7 @@ export type AnnexSourcePoint = readonly [number, number];
 export type AnnexSourceBounds = readonly [number, number, number, number];
 export type AnnexSourcePolygon = readonly AnnexSourcePoint[];
 
-export const COMMERCIAL_MAP_ANNEX_CORRECTION_REVISION = '2026.9-portao5-satellite-east.1';
+export const COMMERCIAL_MAP_ANNEX_CORRECTION_REVISION = '2026.9-anexo3-satellite.1';
 
 /** Escala uniforme do recorte oficial 5.500 × 120, só para larguras físicas. */
 export const ANNEX_SOURCE_POINTS_PER_LOCAL_UNIT = 5500 / 120;
@@ -47,44 +47,44 @@ export const CHURRASCARIA_ACCESS_CORRECTION = Object.freeze({
 });
 
 /**
- * Anexo 2 / satélite — acesso ao Portão 5 / A5.
+ * Anexo 3 / satélite — Rua Ubiretama a sul do campo oeste e da Arena, e o
+ * acesso ao Portão 5 somente a leste de F.
  *
- * Origem travada em [4528, 3150] (continuação da Rua Brasil, à direita do C1).
- * Uma curva leve e curta vira leste ao sul da Arena — não desce colinear em
- * x=4528 nem varre o lote em y≈3660. Depois da face leste da Arena (x>5385)
- * o acesso segue ao lock [5940, 3678]. O trevo da BR-472 começa no lock e
- * não é reconstruído aqui.
+ * A origem [4528, 3150] é a continuação da Rua Brasil (cruzamento de quatro
+ * pontas com a Brasília oficial). Uma curva breve SE contorna o canto SW do
+ * campo gramado e segue E–W em y=3248, imediatamente a sul do campo / face
+ * sul de F. Não desce colinear em x=4528 nem varre o estacionamento em
+ * y≈3660. O Portão 5 só existe a leste de x=5385, com curva leve até o lock
+ * [5940, 3678]. O trevo da BR-472 começa no lock e não é reconstruído aqui.
  */
 export const PORTAO5_PARKING_ACCESS_CORRECTION = Object.freeze({
   widthSource: 36,
   streetToCurve: Object.freeze([
     [4528, 3150],
     [4560, 3170],
-    [4594, 3206],
-    [4620, 3238],
-    [4642, 3254],
-    [4688, 3260],
-    [4776, 3260],
-    [4856, 3260],
+    [4596, 3208],
+    [4632, 3236],
+    [4668, 3248],
+    [4776, 3248],
+    [4856, 3248],
   ] as const satisfies readonly AnnexSourcePoint[]),
   curveToEtniasJunction: Object.freeze([
-    [4856, 3260],
-    [4988, 3260],
-    [5120, 3260],
-    [5260, 3260],
+    [4856, 3248],
+    [4988, 3248],
+    [5120, 3248],
+    [5260, 3248],
   ] as const satisfies readonly AnnexSourcePoint[]),
   etniasToUbiretamaJunction: Object.freeze([
-    [5260, 3260],
-    [5368, 3268],
-    [5456, 3284],
-    [5548, 3304],
+    [5260, 3248],
+    [5368, 3248],
+    [5456, 3248],
+    [5548, 3248],
   ] as const satisfies readonly AnnexSourcePoint[]),
   gate5Approach: Object.freeze([
-    [5548, 3304],
-    [5620, 3260],
-    [5720, 3380],
-    [5820, 3528],
-    [5888, 3632],
+    [5548, 3248],
+    [5648, 3348],
+    [5756, 3480],
+    [5860, 3608],
     [5940, 3678],
   ] as const satisfies readonly AnnexSourcePoint[]),
 });
@@ -118,17 +118,17 @@ export function portao5ParkingAccessSourceAxis(): AnnexSourcePoint[] {
 
 /**
  * Anexo 2 — “Criar essa estrada”: ligação N–S da Av. dos Imigrantes / Rua das
- * Etnias até o T no acesso ao Portão 5, ao sul da Arena em [5260, 3260].
+ * Etnias até o T na Ubiretama, ao sul da Arena em [5260, 3248].
  */
 export const ETNIAS_PARKING_CONNECTION_CORRECTION = Object.freeze({
   officialOwnerIdentifier: 'AV-IMIGRANTES' as const,
   widthSource: 36,
   avenueEntry: [5260, 4200] as const satisfies AnnexSourcePoint,
-  parkingJunction: [5260, 3260] as const satisfies AnnexSourcePoint,
+  parkingJunction: [5260, 3248] as const satisfies AnnexSourcePoint,
   /**
-   * Extremidades no T satélite ao sul da Arena. A Catmull-Rom executável em
-   * `REAR_CALIBRATED_AXES.etniasParkingConnection` mantém o desvio dos postes
-   * CAD 361 e 331; o T rejeitado [5260, 3661] não volta.
+   * Extremidades no T satélite da Ubiretama ao sul da Arena. A Catmull-Rom
+   * executável em `REAR_CALIBRATED_AXES.etniasParkingConnection` mantém o
+   * desvio dos postes CAD 361 e 331; o T rejeitado [5260, 3661] não volta.
    */
   sourceAxis: Object.freeze([
     [5260, 4200],
@@ -136,7 +136,7 @@ export const ETNIAS_PARKING_CONNECTION_CORRECTION = Object.freeze({
     [5260, 3950],
     [5262, 3750],
     [5262, 3480],
-    [5260, 3260],
+    [5260, 3248],
   ] as const satisfies readonly AnnexSourcePoint[]),
 });
 

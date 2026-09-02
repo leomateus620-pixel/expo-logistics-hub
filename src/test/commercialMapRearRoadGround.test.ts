@@ -39,7 +39,7 @@ describe('encontro físico da Arena com a rede posterior', () => {
 
   it('recorta triângulos inteiros e parciais sem perder UVs, cor ou orientação', () => {
     // Control point on the satellite Portão 5 ribbon (south of Arena, west of Etnias).
-    const [x, z] = officialPdfPointToLocal([5120, 3260]);
+    const [x, z] = officialPdfPointToLocal([5120, 3248]);
     const geometry = new THREE.PlaneGeometry(8, 4, 10, 6);
     geometry.rotateX(-Math.PI / 2);
     geometry.translate(x, 0.052, z);

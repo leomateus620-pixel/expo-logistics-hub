@@ -9,8 +9,8 @@ import {
   sourcePolygonToLocal,
 } from '../../data/parkEnvironment';
 import {
-  ARENA_WEST_APRON_ELEVATION,
-  ARENA_WEST_APRON_BOUNDS,
+  ARENA_FIELD_PLATEAU_ELEVATION,
+  ARENA_FOOTBALL_FIELD_BOUNDS,
   ARENA_TERRAIN_BASE_ELEVATION,
   arenaStairTreadElevation,
   arenaTerrainElevation,
@@ -47,7 +47,7 @@ function featureUserData(featureId: string) {
 const PLAZA_USER_DATA = featureUserData('arena-front-public-plaza');
 const STAIRS_USER_DATA = featureUserData('arena-front-concrete-stairs');
 const TERRAIN_USER_DATA = featureUserData('arena-front-natural-terrain');
-const FIELD_USER_DATA = featureUserData('arena-front-west-apron');
+const FIELD_USER_DATA = featureUserData('arena-front-football-field');
 const EXPORURAL_CONCRETE_USER_DATA = featureUserData('exporural-smooth-concrete-c4');
 const PATHS_USER_DATA = featureUserData('arena-front-pedestrian-paths');
 const COURTS_USER_DATA = Object.freeze({
@@ -502,30 +502,30 @@ function ArenaTerrain({ opacity }: { opacity: number }) {
   );
 }
 
-function WestApron({ opacity }: { opacity: number }) {
+function FootballField({ opacity }: { opacity: number }) {
   const { invalidate } = useThree();
-  const bounds = ARENA_WEST_APRON_BOUNDS;
-  const config = ARENA_FRONT_LAYOUT.westApron;
-  const slabGeometry = useMemo(() => {
+  const bounds = ARENA_FOOTBALL_FIELD_BOUNDS;
+  const config = ARENA_FRONT_LAYOUT.footballField;
+  const turfGeometry = useMemo(() => {
     const geometry = new THREE.PlaneGeometry(
-      bounds.width - config.jointInset * 2,
-      bounds.depth - config.jointInset * 2,
+      bounds.width - config.turfInset * 2,
+      bounds.depth - config.turfInset * 2,
     );
     geometry.rotateX(-Math.PI / 2);
     return geometry;
-  }, [bounds.depth, bounds.width, config.jointInset]);
-  const borderGeometry = useMemo(() => {
+  }, [bounds.depth, bounds.width, config.turfInset]);
+  const apronGeometry = useMemo(() => {
     const geometry = new THREE.PlaneGeometry(bounds.width, bounds.depth);
     geometry.rotateX(-Math.PI / 2);
     return geometry;
   }, [bounds.depth, bounds.width]);
-  const slabTexture = useMemo(() => tiledSurfaceTexture(
-    'concrete',
-    (bounds.width - config.jointInset * 2) / 1.6,
-    (bounds.depth - config.jointInset * 2) / 1.6,
-  ), [bounds.depth, bounds.width, config.jointInset]);
-  const borderTexture = useMemo(() => tiledSurfaceTexture(
-    'concrete',
+  const turfTexture = useMemo(() => tiledSurfaceTexture(
+    'grass',
+    (bounds.width - config.turfInset * 2) / 1.4,
+    (bounds.depth - config.turfInset * 2) / 1.4,
+  ), [bounds.depth, bounds.width, config.turfInset]);
+  const apronTexture = useMemo(() => tiledSurfaceTexture(
+    'compactedSoil',
     bounds.width / 2.2,
     bounds.depth / 2.2,
   ), [bounds.depth, bounds.width]);
@@ -534,25 +534,25 @@ function WestApron({ opacity }: { opacity: number }) {
     invalidate();
   }, [invalidate, opacity]);
 
-  useEffect(() => () => slabGeometry.dispose(), [slabGeometry]);
-  useEffect(() => () => borderGeometry.dispose(), [borderGeometry]);
-  useEffect(() => () => slabTexture?.dispose(), [slabTexture]);
-  useEffect(() => () => borderTexture?.dispose(), [borderTexture]);
+  useEffect(() => () => turfGeometry.dispose(), [turfGeometry]);
+  useEffect(() => () => apronGeometry.dispose(), [apronGeometry]);
+  useEffect(() => () => turfTexture?.dispose(), [turfTexture]);
+  useEffect(() => () => apronTexture?.dispose(), [apronTexture]);
 
   return (
-    <group name="laje-pavimentada-oeste-arena" userData={FIELD_USER_DATA}>
+    <group name="campo-gramado-sem-marcacoes-arena" userData={FIELD_USER_DATA}>
       <mesh
-        name="junta-perimetral-laje-oeste-arena"
-        geometry={borderGeometry}
-        position={[bounds.centerX, ARENA_WEST_APRON_ELEVATION + 0.008, bounds.centerZ]}
+        name="borda-natural-campo-arena"
+        geometry={apronGeometry}
+        position={[bounds.centerX, ARENA_FIELD_PLATEAU_ELEVATION + 0.008, bounds.centerZ]}
         receiveShadow
         raycast={NO_RAYCAST}
         userData={FIELD_USER_DATA}
       >
         <meshStandardMaterial
-          map={borderTexture ?? undefined}
-          color={config.borderColor}
-          roughness={0.94}
+          map={apronTexture ?? undefined}
+          color={config.wornColor}
+          roughness={1}
           metalness={0}
           transparent={opacity < 0.999}
           opacity={opacity}
@@ -560,17 +560,17 @@ function WestApron({ opacity }: { opacity: number }) {
         />
       </mesh>
       <mesh
-        name="piso-concreto-oeste-arena"
-        geometry={slabGeometry}
-        position={[bounds.centerX, ARENA_WEST_APRON_ELEVATION + 0.018, bounds.centerZ]}
+        name="gramado-sem-marcacoes-arena"
+        geometry={turfGeometry}
+        position={[bounds.centerX, ARENA_FIELD_PLATEAU_ELEVATION + 0.018, bounds.centerZ]}
         receiveShadow
         raycast={NO_RAYCAST}
         userData={FIELD_USER_DATA}
       >
         <meshStandardMaterial
-          map={slabTexture ?? undefined}
-          color={config.slabColor}
-          roughness={0.9}
+          map={turfTexture ?? undefined}
+          color={config.turfColor}
+          roughness={1}
           metalness={0}
           transparent={opacity < 0.999}
           opacity={opacity}
@@ -1151,7 +1151,7 @@ function ArenaStructures({
       <lineSegments geometry={plazaOutline} raycast={NO_RAYCAST}>
         <lineBasicMaterial color="#797b74" transparent opacity={0.55 * opacity} toneMapped={false} />
       </lineSegments>
-      <WestApron opacity={opacity} />
+      <FootballField opacity={opacity} />
       <ArenaWalkways opacity={opacity} />
       <StepInstances reducedGraphics={reducedGraphics} opacity={opacity} />
       <MetalInfrastructure

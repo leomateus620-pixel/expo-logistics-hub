@@ -17,9 +17,9 @@ import {
  * Rede viária posterior — anexos 2/4 + satélite herdado.
  *
  * A Rua Brasília oficial permanece visível (`official-surface` / cadastro
- * `RUA-BRASILIA`). O asfalto gerado nasce em [4528, 3150], curva leve a leste
- * ao sul da Arena e entrega o Portão 5 na face leste até [5940, 3678].
- * Ubiretama desce o cadastro leste e T-cruza na latitude sul da Arena.
+ * `RUA-BRASILIA`). A Ubiretama gerada continua a Rua Brasil em [4528, 3150],
+ * curva breve SE a sul do campo e segue E–W em y=3248 a sul da Arena. O
+ * Portão 5 só existe a leste de F, do T [5548, 3248] ao lock [5940, 3678].
  * O trevo da BR-472 permanece byte-a-byte.
  */
 
@@ -94,7 +94,7 @@ export interface RearRoadIdentity {
 
 export type RearContextualLabelOwner = RearRoadIdentity['officialOwnerIdentifier'] | 'A5';
 
-export const REAR_PARK_ROAD_REVISION = '2026.9-portao5-satellite-east.1';
+export const REAR_PARK_ROAD_REVISION = '2026.9-anexo3-satellite.1';
 
 /** Escala uniforme do recorte oficial, usada apenas para larguras físicas. */
 export const SOURCE_POINTS_PER_LOCAL_UNIT = ANNEX_SOURCE_POINTS_PER_LOCAL_UNIT;
@@ -302,28 +302,28 @@ export const REAR_PARK_ROAD_NETWORK: readonly RoadSegment[] = Object.freeze([
     from: 'etnias-parking-avenue', to: 'etnias-parking-junction', ...generatedParkDefaults,
     sourceControlPoints: REAR_CALIBRATED_AXES.etniasParkingConnection,
     officialOwnerIdentifier: 'AV-IMIGRANTES',
-    notes: 'Ligação N–S do anexo 2 entre a Av. dos Imigrantes e o T do acesso ao Portão 5 ao sul da Arena. Desvio dos postes CAD 331 e 361; sem T em [5260, 3661].',
+    notes: 'Ligação N–S do anexo 2 entre a Av. dos Imigrantes e o T da Ubiretama ao sul da Arena. Desvio dos postes CAD 331 e 361; sem T em [5260, 3661].',
   }),
   segment({
-    id: 'portao5-street-curve', roadId: 'ACESSO-PORTAO5-ESTACIONAMENTO', name: 'Acesso Portão 5 — estacionamento',
+    id: 'portao5-street-curve', roadId: 'RUA-UBIRETAMA', name: 'Rua Ubiretama',
     from: 'portao5-street', to: 'portao5-curve', ...generatedParkDefaults,
     sourceControlPoints: REAR_CALIBRATED_AXES.portao5StreetToCurve,
-    officialOwnerIdentifier: 'A5',
-    notes: 'Nasce na Rua Brasil, à direita do Centro de Eventos, e curva leve a leste ao sul da Arena. Origem [4528, 3150]; não desce colinear em x=4528.',
+    officialOwnerIdentifier: 'RUA-UBIRETAMA',
+    notes: 'Continuidade da Rua Brasil: curva breve SE a sul do campo gramado oeste. Origem [4528, 3150]; não desce colinear em x=4528.',
   }),
   segment({
-    id: 'portao5-curve-etnias', roadId: 'ACESSO-PORTAO5-ESTACIONAMENTO', name: 'Acesso Portão 5 — estacionamento',
+    id: 'portao5-curve-etnias', roadId: 'RUA-UBIRETAMA', name: 'Rua Ubiretama',
     from: 'portao5-curve', to: 'etnias-parking-junction', ...generatedParkDefaults,
     sourceControlPoints: REAR_CALIBRATED_AXES.portao5CurveToEtniasJunction,
-    officialOwnerIdentifier: 'A5',
-    notes: 'Continuidade leste ao sul da Arena até o T com a ligação das Etnias em [5260, 3260].',
+    officialOwnerIdentifier: 'RUA-UBIRETAMA',
+    notes: 'Fita E–W em y=3248, a sul da Arena, até o T com a ligação das Etnias em [5260, 3248].',
   }),
   segment({
-    id: 'portao5-etnias-ubiretama', roadId: 'ACESSO-PORTAO5-ESTACIONAMENTO', name: 'Acesso Portão 5 — estacionamento',
+    id: 'portao5-etnias-ubiretama', roadId: 'RUA-UBIRETAMA', name: 'Rua Ubiretama',
     from: 'etnias-parking-junction', to: 'ubiretama-portao5-junction', ...generatedParkDefaults,
     sourceControlPoints: REAR_CALIBRATED_AXES.portao5EtniasToUbiretamaJunction,
-    officialOwnerIdentifier: 'A5',
-    notes: 'Cruza a face leste da Arena e entrega a Ubiretama em T [5548, 3304]. Sem varredura ESE em y≈3660.',
+    officialOwnerIdentifier: 'RUA-UBIRETAMA',
+    notes: 'Cruza a face leste da Arena e entrega o T com o Portão 5 em [5548, 3248]. Sem varredura ESE em y≈3660.',
   }),
   segment({
     id: 'ubiretama-north-junction', roadId: 'RUA-UBIRETAMA', name: 'Rua Ubiretama',
@@ -332,7 +332,7 @@ export const REAR_PARK_ROAD_NETWORK: readonly RoadSegment[] = Object.freeze([
     width: rearRoadSourceToLocalLength(32), shoulderWidth: 0,
     elevationOffset: 0.03, materialId: 'park-asphalt', markings: 'none',
     presentation: 'generated-surface', officialOwnerIdentifier: 'RUA-UBIRETAMA',
-    notes: 'Cadastro leste N–S, depois E–W na latitude sul da Arena; T de grau 3 a leste da Arena. Sem T em [4528, 3248].',
+    notes: 'Lateral N–S do cadastro leste até o T a leste da Arena. Sem T em [4528, 3248].',
   }),
   segment({
     id: 'gate5-internal-approach', roadId: 'ACESSO-A5-BR472', name: 'Acesso Portão 5 — rede interna',
@@ -342,7 +342,7 @@ export const REAR_PARK_ROAD_NETWORK: readonly RoadSegment[] = Object.freeze([
     shoulderWidth: rearRoadSourceToLocalLength(5),
     elevationOffset: 0.034, materialId: 'park-asphalt', markings: 'none',
     presentation: 'generated-surface', officialOwnerIdentifier: 'A5',
-    notes: 'Aproximação leste da Arena até a passagem veicular do Portão 5. Lock [5940, 3678]; o trevo começa neste ponto.',
+    notes: 'Portão 5 somente a leste da Arena até a passagem veicular. Lock [5940, 3678]; o trevo começa neste ponto.',
   }),
   segment({
     id: 'a5-trevo-trunk', roadId: 'ACESSO-A5-BR472', name: 'Acesso Portão 5 — tronco do trevo',
@@ -450,7 +450,7 @@ export function rearRoadCorridors(includeOfficialSurfaces = false) {
 
 const OWNER_LABEL_SOURCE_ANCHORS: Readonly<Record<RearContextualLabelOwner, SourcePoint>> = Object.freeze({
   'RUA-BRASILIA': RUA_BRASILIA_OFFICIAL_RESTORATION.sourceAxis[1],
-  'RUA-UBIRETAMA': REAR_CALIBRATED_AXES.ubiretamaNorthToJunction[5],
+  'RUA-UBIRETAMA': [5142, 3248],
   'AV-IMIGRANTES': [5200, 4200],
   'RODOVIA-RS-472': REAR_CALIBRATED_AXES.br472NorthToNorthRamp[2],
   A5: REAR_OFFICIAL_ANCHORS.gate5VehicleAccess,

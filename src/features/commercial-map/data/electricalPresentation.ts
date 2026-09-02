@@ -92,7 +92,7 @@ export function resolveParkAccessElectricalClearancePosition(
  * These bounded display offsets apply only while the corrected rear roads render.
  * They are clearance decisions, not a revision of the official electrical survey. */
 export const REAR_ROAD_ELECTRICAL_CLEARANCE_PRESENTATION = Object.freeze({
-  revision: '2026.9-portao5-satellite-east.1',
+  revision: '2026.9-anexo3-satellite.1',
   verificationStatus: 'FIELD_REVIEW_REQUIRED',
   offsets: Object.freeze({
     'pole-ref-222': [0.2, 0], // Brasília: margem leste na altura do pátio.

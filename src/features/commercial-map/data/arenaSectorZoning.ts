@@ -77,7 +77,7 @@ export const ARENA_SECTOR_SURFACE_ZONES: readonly ArenaSurfaceZone[] = [
   // Rua Brasil, chegando pelo oeste.
   zone('rua-brasil', 'ROAD', rect([4106, 3096, 4520, 3191])),
   // Campo gramado sem marcações: superfície própria a oeste da Arena.
-  zone('arena-west-apron', 'CONCRETE_ACCESS', rect(inflate(ARENA_FRONT_LAYOUT.westApron.sourceBounds))),
+  zone('football-field', 'SPORTS_FIELD', rect(inflate(ARENA_FRONT_LAYOUT.footballField.sourceBounds))),
   // Anexo 1: concreto liso a leste de C4. Polígono exato, sem inflar sobre vias.
   zone('exporural-smooth-concrete', 'CONCRETE_ACCESS', EXPORURAL_SMOOTH_CONCRETE_CORRECTION.sourcePolygon),
 ];
@@ -117,4 +117,4 @@ export function isArenaTerrainExcluded(x: number, z: number) {
   return resolveArenaSurfaceOwner(x, z) !== null;
 }
 
-export const ARENA_SECTOR_ZONING_REVISION = '2028.3-exporural-smooth-concrete.1';
+export const ARENA_SECTOR_ZONING_REVISION = '2026.9-anexo3-west-field.1';
