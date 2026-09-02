@@ -190,6 +190,34 @@ function sampledParkingAccessLocal() {
     .flatMap((road) => sampleRearRoadCenterline(rearRoadLocalPath(road), 8));
 }
 
+function catmullRomMaxHeadingChangePer10m(path: readonly ParkAccessPoint[]) {
+  const unique = sampleRearRoadCenterline(path, 12).filter((point, index, points) => (
+    index === 0
+    || Math.hypot(point[0] - points[index - 1][0], point[1] - points[index - 1][1]) > 1e-8
+  ));
+  if (unique.length < 3) return 0;
+  const distances = [0];
+  for (let index = 1; index < unique.length; index += 1) {
+    distances[index] = distances[index - 1] + Math.hypot(
+      unique[index][0] - unique[index - 1][0],
+      unique[index][1] - unique[index - 1][1],
+    );
+  }
+  const headings = unique.slice(0, -1).map((point, index) => headingDegrees(point, unique[index + 1]));
+  const windowMeters = 1.5;
+  let worst = 0;
+  for (let start = 0; start < headings.length; start += 1) {
+    let end = start + 1;
+    while (end < distances.length - 1 && distances[end] - distances[start] < windowMeters) end += 1;
+    if (distances[end] - distances[start] < windowMeters * 0.8) continue;
+    worst = Math.max(
+      worst,
+      wrappedDeltaDegrees(headings[start], headings[Math.min(end, headings.length - 1)]),
+    );
+  }
+  return worst;
+}
+
 function degreeOf(nodeId: keyof typeof REAR_ROAD_NODES) {
   return REAR_PARK_ROAD_NETWORK.filter((road) => road.from === nodeId || road.to === nodeId).length;
 }
@@ -412,25 +440,17 @@ describe('anexos 1/2/4 — blueprint e fiação viária', () => {
       });
 
     expect(Math.abs(headingDegrees([4528, 3150], [4528, 3480]))).toBeLessThan(8);
-
-    const tenMetersLocal = 1.5;
-    const distances = [0];
-    for (let index = 1; index < sampled.length; index += 1) {
-      distances[index] = distances[index - 1] + Math.hypot(
-        sampled[index][0] - sampled[index - 1][0],
-        sampled[index][1] - sampled[index - 1][1],
-      );
-    }
-    const headings = sampled.slice(0, -1).map((point, index) => headingDegrees(point, sampled[index + 1]));
-    for (let start = 0; start < sampled.length - 1; start += 1) {
-      let end = start + 1;
-      while (end < distances.length - 1 && distances[end] - distances[start] < tenMetersLocal) {
-        end += 1;
-      }
-      if (distances[end] - distances[start] < tenMetersLocal * 0.8) continue;
-      expect(wrappedDeltaDegrees(headings[start], headings[Math.min(end, headings.length - 1)]))
-        .toBeLessThan(12);
-    }
+    const curvePath = rearRoadLocalPath(
+      GENERATED_REAR_ROAD_SEGMENTS.find((road) => road.id === 'portao5-curve-etnias')!,
+    );
+    expect(Math.abs(headingDegrees(curvePath[curvePath.length - 2], curvePath[curvePath.length - 1])))
+      .toBeGreaterThan(70);
+    expect(catmullRomMaxHeadingChangePer10m(curvePath)).toBeLessThan(70);
+    GENERATED_REAR_ROAD_SEGMENTS
+      .filter((road) => road.id === 'portao5-street-ubiretama' || road.id === 'portao5-ubiretama-curve')
+      .forEach((road) => {
+        expect(catmullRomMaxHeadingChangePer10m(rearRoadLocalPath(road))).toBeLessThan(8);
+      });
 
     const ubiretama = REAR_CALIBRATED_AXES.ubiretamaNorthToJunction;
     expect(ubiretama.at(-1)).toEqual([4528, 3248]);
@@ -503,7 +523,7 @@ describe('anexos 1/2/4 — blueprint e fiação viária', () => {
       process.cwd(), 'src/features/commercial-map/data/parkEnvironment.ts',
     ), 'utf8');
     expect(eventCenterSource).not.toContain('annexSpatialCorrections');
-    expect(parkEnvironmentSource).not.toContain('EXPORURAL_SMOOTH_CONCRETE_CORRECTION');
+    expect(parkEnvironmentSource).not.toContain("from './annexSpatialCorrections'");
     expect(parkEnvironmentSource).not.toContain('EVENT_CENTER_QE12_ALIGNMENT');
   });
 
