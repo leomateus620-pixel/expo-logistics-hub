@@ -7,12 +7,16 @@ import {
   officialPdfPointToLocal,
 } from '@/features/commercial-map/data/officialReference2026';
 import {
+  EVENT_CENTER_QE12_ALIGNMENT,
   FENASOJA_EVENT_CENTER_LAYOUT,
   FENASOJA_EVENT_CENTER_RENDER_BUDGET,
   FENASOJA_EVENT_CENTER_REVISION,
+  eventCenterCardinalFacingRadians,
   eventCenterEnvelope,
+  eventCenterModelBounds,
   eventCenterVisualHeight,
 } from '@/features/commercial-map/utils/eventCenter';
+import { landmarkFrontVector } from '@/features/commercial-map/utils/fenasojaReferenceStructures';
 import {
   resolveStrategicLandmarkKind,
   strategicLandmarkBounds,
@@ -53,6 +57,7 @@ describe('contrato de realismo do Centro de Eventos Fenasoja C1', () => {
     const bounds = strategicLandmarkBounds(eventCenter);
 
     expect(FENASOJA_EVENT_CENTER_LAYOUT.sourceBounds).toEqual([4020, 3180, 4490, 3435]);
+    expect(EVENT_CENTER_QE12_ALIGNMENT.eventCenterSourceCenter).toEqual([4255, 3307.5]);
     expect(bounds.centerX).toBeCloseTo(expectedCenterX, 6);
     expect(bounds.centerZ).toBeCloseTo(expectedCenterZ, 6);
     expect(bounds.minX).toBeCloseTo(expectedMinX, 6);
@@ -77,14 +82,49 @@ describe('contrato de realismo do Centro de Eventos Fenasoja C1', () => {
     expect(envelope.depth).toBeLessThan(bounds.depth);
   });
 
-  it('troca o bloco genérico por landmark baixo, longitudinal e voltado ao sul', () => {
+  it('reorienta a fachada para o lote Q-E-12 sem sair do envelope oficial', () => {
     const persistedEventCenter = { ...eventCenter, id: 'db:uuid:event-center' };
     const bounds = strategicLandmarkBounds(eventCenter);
+    const modelBounds = eventCenterModelBounds(bounds);
+    const targetLot = OFFICIAL_REFERENCE_LOTS.find((lot) => lot.publicIdentifier === 'Q-E-12');
+    const [lotX, lotZ] = EVENT_CENTER_QE12_ALIGNMENT.targetSourceCenter;
+    const towardLot = [
+      lotX - EVENT_CENTER_QE12_ALIGNMENT.eventCenterSourceCenter[0],
+      lotZ - EVENT_CENTER_QE12_ALIGNMENT.eventCenterSourceCenter[1],
+    ] as const;
+    const towardLotLength = Math.hypot(towardLot[0], towardLot[1]);
+    const front = landmarkFrontVector(FENASOJA_EVENT_CENTER_LAYOUT.facingRadians);
+    const cosine = Math.cos(FENASOJA_EVENT_CENTER_LAYOUT.facingRadians);
+    const sine = Math.sin(FENASOJA_EVENT_CENTER_LAYOUT.facingRadians);
+    const worldXs = [modelBounds.width / 2, -modelBounds.width / 2].flatMap((x) => (
+      [modelBounds.depth / 2, -modelBounds.depth / 2].map((z) => x * cosine + z * sine)
+    ));
+    const worldZs = [modelBounds.width / 2, -modelBounds.width / 2].flatMap((x) => (
+      [modelBounds.depth / 2, -modelBounds.depth / 2].map((z) => -x * sine + z * cosine)
+    ));
 
+    expect(targetLot, 'lote Q-E-12 ausente da referência oficial').toBeDefined();
+    expect(EVENT_CENTER_QE12_ALIGNMENT.eventCenterIdentifier).toBe('C1');
+    expect(EVENT_CENTER_QE12_ALIGNMENT.targetLotIdentifier).toBe('Q-E-12');
+    expect(EVENT_CENTER_QE12_ALIGNMENT.facingRadians).toBe(-1.565390974146972);
+    expect(EVENT_CENTER_QE12_ALIGNMENT.facingRadians).toBeCloseTo(
+      Math.atan2(towardLot[0], towardLot[1]),
+      8,
+    );
+    expect(FENASOJA_EVENT_CENTER_LAYOUT.facingRadians).toBe(EVENT_CENTER_QE12_ALIGNMENT.facingRadians);
+    expect(eventCenterCardinalFacingRadians()).toBeCloseTo(-Math.PI / 2, 12);
     expect(resolveStrategicLandmarkKind(persistedEventCenter)).toBe('fenasoja-event-center');
-    expect(strategicLandmarkFacingRadians(persistedEventCenter)).toBe(0);
-    expect(strategicLandmarkFocusDirection(persistedEventCenter)).toEqual([0.16, 0.42, 1]);
+    expect(strategicLandmarkFacingRadians(persistedEventCenter))
+      .toBe(EVENT_CENTER_QE12_ALIGNMENT.facingRadians);
+    expect(strategicLandmarkFocusDirection(persistedEventCenter)).toEqual([-0.96, 0.42, 0.12]);
     expect(strategicLandmarkSearchAliases(persistedEventCenter)).toContain('Fenasoja Event Center');
+    expect((front[0] * towardLot[0] + front[1] * towardLot[1]) / towardLotLength)
+      .toBeCloseTo(1, 8);
+    expect(front[0]).toBeLessThan(-0.99);
+    expect(modelBounds.width).toBeCloseTo(bounds.depth, 8);
+    expect(modelBounds.depth).toBeCloseTo(bounds.width, 8);
+    expect(Math.max(...worldXs) - Math.min(...worldXs)).toBeLessThanOrEqual(bounds.width + 0.08);
+    expect(Math.max(...worldZs) - Math.min(...worldZs)).toBeLessThanOrEqual(bounds.depth + 0.08);
     expect(eventCenterVisualHeight(bounds)).toBeCloseTo(2.5636, 4);
     expect(strategicLandmarkVisualHeight(eventCenter)).toBeCloseTo(
       eventCenterVisualHeight(bounds),
@@ -96,7 +136,7 @@ describe('contrato de realismo do Centro de Eventos Fenasoja C1', () => {
   });
 
   it('versiona a leitura fotográfica, materiais e identidade oficial', () => {
-    expect(FENASOJA_EVENT_CENTER_REVISION).toBe('2026.8-event-center-realism.1');
+    expect(FENASOJA_EVENT_CENTER_REVISION).toBe('2026.9-event-center-qe12.1');
     expect(FENASOJA_EVENT_CENTER_LAYOUT.identity).toEqual({
       symbolAsset: '/alvorada/fenasoja-symbol-official.png',
       wordmark: 'FENASOJA',
@@ -136,6 +176,7 @@ describe('contrato de realismo do Centro de Eventos Fenasoja C1', () => {
     expect(eventCenterRenderer).toContain('<BatchedTransforms items={roofBatch}');
     expect(eventCenterRenderer).toContain("featureType: 'FENASOJA_EVENT_CENTER'");
     expect(eventCenterRenderer).not.toMatch(/<(?:pointLight|spotLight)\b/);
+    expect(landmarkRenderer).toContain('eventCenterModelBounds(bounds, facingRadians)');
     const eventCenterFocusProfile = canvasRenderer.slice(
       canvasRenderer.indexOf("if (landmark === 'fenasoja-event-center')"),
       canvasRenderer.indexOf("if (landmark === 'commercial-pavilion')"),

@@ -305,7 +305,8 @@ const STRATEGIC_LANDMARKS: Readonly<Record<string, StrategicLandmarkDefinition>>
       'Fenasoja Event Center',
     ],
     // O eixo longitudinal permanece no footprint oficial C1. A fachada
-    // fotografada abre para o sul (+Z), em direção à circulação interna.
+    // fotografada (local +Z) abre para o lote Q-E-12, a oeste, cruzando a
+    // Rua Brasília.
     facingRadians: FENASOJA_EVENT_CENTER_LAYOUT.facingRadians,
     focusDirection: FENASOJA_EVENT_CENTER_LAYOUT.focusDirection,
     visualHeight: eventCenterVisualHeight,

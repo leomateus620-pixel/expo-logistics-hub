@@ -19,6 +19,7 @@ import {
   FENASOJA_EVENT_CENTER_RENDER_BUDGET,
   FENASOJA_EVENT_CENTER_REVISION,
   eventCenterEnvelope,
+  eventCenterModelBounds,
 } from '../../utils/eventCenter';
 import {
   APOLLO_XIV_FEATURE_METADATA,
@@ -3921,7 +3922,9 @@ export function StrategicLandmarkMesh({
   const modelBounds = useMemo(
     () => kind === 'gastronomic-alameda'
       ? fitRotatedStructureBounds(bounds, facingRadians)
-      : commercialPavilionModelBounds(bounds, facingRadians),
+      : kind === 'fenasoja-event-center'
+        ? eventCenterModelBounds(bounds, facingRadians)
+        : commercialPavilionModelBounds(bounds, facingRadians),
     [bounds, facingRadians, kind],
   );
   const gl = useThree((state) => state.gl);

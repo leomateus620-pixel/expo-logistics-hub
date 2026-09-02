@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest';
 import {
   ARENA_FRONT_LAYOUT,
   ARENA_FRONT_PRIMARY_DRAW_CALL_BUDGET,
+  EXPORURAL_SMOOTH_CONCRETE_CORRECTION,
   PARK_ENVIRONMENT_CLASSIFICATION_LABELS,
   PARK_ENVIRONMENT_FEATURES,
   PARK_ENVIRONMENT_REVISION,
@@ -117,8 +118,8 @@ function sourceBoundsOverlapPolygon(bounds: SourceBounds, polygon: readonly Sour
 
 describe('infraestrutura ambiental do parque', () => {
   it('mantém inventário ambiental versionado, explícito e fora das métricas comerciais', () => {
-    expect(PARK_ENVIRONMENT_REVISION).toBe('2028.2-arena-west-field-satellite.1');
-    expect(PARK_ENVIRONMENT_FEATURES).toHaveLength(9);
+    expect(PARK_ENVIRONMENT_REVISION).toBe('2028.3-exporural-smooth-concrete.1');
+    expect(PARK_ENVIRONMENT_FEATURES).toHaveLength(10);
     expect(new Set(PARK_ENVIRONMENT_FEATURES.map((feature) => feature.id)).size)
       .toBe(PARK_ENVIRONMENT_FEATURES.length);
     expect(new Set(PARK_ENVIRONMENT_FEATURES.map((feature) => feature.classification))).toEqual(new Set([
@@ -223,6 +224,44 @@ describe('infraestrutura ambiental do parque', () => {
     });
   });
 
+  it('pavimenta o concreto liso a leste de C4 sem invadir o campo oeste nem o envelope de C4', () => {
+    const concrete = EXPORURAL_SMOOTH_CONCRETE_CORRECTION.sourcePolygon;
+    const concreteBounds = [5100, 2372, 5375, 2500] as const;
+    const steakhouse = sourceBoundsForEntity('C4');
+    const footballField = ARENA_FRONT_LAYOUT.westApron.sourceBounds;
+    const feature = PARK_ENVIRONMENT_FEATURES.find((candidate) => (
+      candidate.id === 'exporural-smooth-concrete-c4'
+    ));
+
+    expect(EXPORURAL_SMOOTH_CONCRETE_CORRECTION.officialOwnerIdentifier).toBe('C4');
+    expect(EXPORURAL_SMOOTH_CONCRETE_CORRECTION.elevation).toBe(0.06);
+    expect(EXPORURAL_SMOOTH_CONCRETE_CORRECTION.surface).toBe('concrete');
+    expect(EXPORURAL_SMOOTH_CONCRETE_CORRECTION.tileWorldSize).toBe(1.7);
+    expect(EXPORURAL_SMOOTH_CONCRETE_CORRECTION.baseColor).toBe('#c6c7c2');
+    expect(EXPORURAL_SMOOTH_CONCRETE_CORRECTION.roughness).toBe(0.94);
+    expect(concrete).toEqual([
+      [5100, 2372],
+      [5360, 2372],
+      [5375, 2388],
+      [5375, 2482],
+      [5358, 2500],
+      [5100, 2500],
+    ]);
+    expect(feature, 'feature ambiental do concreto liso').toBeDefined();
+    expect(feature!.classification).toBe('PAVED_PUBLIC_AREA');
+    expect(feature!.isSellable).toBe(false);
+    expect(feature!.contributesToCommercialMetrics).toBe(false);
+    expect(concreteBounds[0]).toBe(steakhouse[2]);
+    expect(sourceBoundsOverlap(concreteBounds, steakhouse)).toBe(false);
+    expect(sourceBoundsOverlap(concreteBounds, footballField)).toBe(false);
+    expect(sourceBoundsOverlap(concreteBounds, sourceBoundsForEntity('C1'))).toBe(false);
+    expect(sourceBoundsOverlap(concreteBounds, sourceBoundsForEntity('F'))).toBe(false);
+    expect(sourceBoundsOverlapPolygon(ARENA_FRONT_LAYOUT.westApron.sourceBounds, concrete)).toBe(false);
+    expect(pointInPolygon([5230, 2430], concrete)).toBe(true);
+    expect(pointInPolygon([5040, 2425], concrete)).toBe(false);
+    expect(ARENA_FRONT_LAYOUT.westApron.slabColor).toBe('#c6c7c2');
+  });
+
   it('renderiza a infraestrutura no mapa persistido por âncoras, sem depender do seed oficial', () => {
     expect(shouldRenderArenaStructures(OFFICIAL_REFERENCE_DATA.entities)).toBe(true);
     expect(shouldRenderArenaCourts(OFFICIAL_REFERENCE_DATA.entities)).toBe(true);
@@ -259,14 +298,17 @@ describe('infraestrutura ambiental do parque', () => {
     const metalPasses = (renderer.match(/<MetalInfrastructure\b/g) ?? []).length;
     const fullSceneDrawCalls = primaryDrawCalls + metalPasses - 1;
     expect(ARENA_FRONT_PRIMARY_DRAW_CALL_BUDGET).toBe(18);
-    expect(primaryDrawCalls).toBe(15);
-    expect(fullSceneDrawCalls).toBe(16);
+    expect(primaryDrawCalls).toBe(16);
+    expect(fullSceneDrawCalls).toBe(17);
     expect(fullSceneDrawCalls).toBeLessThanOrEqual(ARENA_FRONT_PRIMARY_DRAW_CALL_BUDGET);
     expect(renderer.match(/<instancedMesh/g)?.length).toBeGreaterThanOrEqual(5);
     expect(renderer).toContain('degraus-concreto-arena');
     expect(renderer).toContain('redes-volei-arena');
     expect(renderer).toContain('tabelas-basquete-arena');
     expect(renderer).toContain('laje-pavimentada-oeste-arena');
+    expect(renderer).toContain('piso-concreto-liso-exporural-c4');
+    expect(renderer).toContain('createWorldTiledHorizontalPolygonGeometry');
+    expect(renderer).toContain('EXPORURAL_SMOOTH_CONCRETE_CORRECTION');
     expect(renderer).not.toContain('gramado-sem-marcacoes-arena');
     expect(renderer).not.toContain('footballFieldLineGeometry');
     expect(renderer).not.toContain('marcacoes-campo-arena');

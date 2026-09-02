@@ -3,6 +3,7 @@ import { useThree } from '@react-three/fiber';
 import * as THREE from 'three';
 import {
   ARENA_FRONT_LAYOUT,
+  EXPORURAL_SMOOTH_CONCRETE_CORRECTION,
   PARK_ENVIRONMENT_FEATURES,
   sourceBoundsToLocal,
   sourcePolygonToLocal,
@@ -16,7 +17,7 @@ import {
   arenaTerrainPlateauElevation,
 } from '../../data/arenaTerrain';
 import { isArenaTerrainExcluded } from '../../data/arenaSectorZoning';
-import { getOpenGroundTexture, type OpenGroundSurface } from './openGroundTextures';
+import { getOpenGroundTexture, openGroundTextureBundleForEntity, type OpenGroundSurface, type OpenGroundSurfaceProfile } from './openGroundTextures';
 import { disposeInstancedMesh } from '../../utils/instancedMeshDisposal';
 import { integrateGroundGeometryWithRearRoads } from '../../utils/rearRoadGroundIntegration';
 import { ArenaAccessStructure } from './ArenaAccessStructure';
@@ -24,6 +25,13 @@ import { ArenaAccessStructure } from './ArenaAccessStructure';
 const NO_RAYCAST = () => undefined;
 const UNIT_Y = new THREE.Vector3(0, 1, 0);
 const BASE_Y = ARENA_TERRAIN_BASE_ELEVATION;
+const EXPORURAL_SMOOTH_CONCRETE_PROFILE = Object.freeze({
+  surface: EXPORURAL_SMOOTH_CONCRETE_CORRECTION.surface,
+  tileWorldSize: EXPORURAL_SMOOTH_CONCRETE_CORRECTION.tileWorldSize,
+  baseColor: EXPORURAL_SMOOTH_CONCRETE_CORRECTION.baseColor,
+  roughness: EXPORURAL_SMOOTH_CONCRETE_CORRECTION.roughness,
+} satisfies OpenGroundSurfaceProfile);
+const EXPORURAL_SMOOTH_CONCRETE_NORMAL_SCALE = new THREE.Vector2(0.16, 0.16);
 
 function featureUserData(featureId: string) {
   const feature = PARK_ENVIRONMENT_FEATURES.find((candidate) => candidate.id === featureId);
@@ -40,6 +48,7 @@ const PLAZA_USER_DATA = featureUserData('arena-front-public-plaza');
 const STAIRS_USER_DATA = featureUserData('arena-front-concrete-stairs');
 const TERRAIN_USER_DATA = featureUserData('arena-front-natural-terrain');
 const FIELD_USER_DATA = featureUserData('arena-front-west-apron');
+const EXPORURAL_CONCRETE_USER_DATA = featureUserData('exporural-smooth-concrete-c4');
 const PATHS_USER_DATA = featureUserData('arena-front-pedestrian-paths');
 const COURTS_USER_DATA = Object.freeze({
   featureIds: ['arena-front-multi-sport-court', 'arena-front-sand-volleyball-court'],
@@ -119,6 +128,29 @@ function createHorizontalPolygonGeometry(points: readonly (readonly [number, num
   shape.closePath();
   const geometry = new THREE.ShapeGeometry(shape, 2);
   geometry.rotateX(-Math.PI / 2);
+  geometry.computeBoundingBox();
+  geometry.computeBoundingSphere();
+  return geometry;
+}
+
+/**
+ * Same outline as the plaza slab, but UVs stay in world XZ so the concrete
+ * atlas tiles at a physical scale instead of stretching one repeating patch
+ * across the whole polygon.
+ */
+function createWorldTiledHorizontalPolygonGeometry(
+  points: readonly (readonly [number, number])[],
+  y: number,
+) {
+  const geometry = createHorizontalPolygonGeometry(points);
+  geometry.translate(0, y, 0);
+  const position = geometry.getAttribute('position');
+  const uv = geometry.getAttribute('uv');
+  for (let index = 0; index < position.count; index += 1) {
+    uv.setXY(index, position.getX(index), position.getZ(index));
+  }
+  uv.needsUpdate = true;
+  geometry.computeVertexNormals();
   geometry.computeBoundingBox();
   geometry.computeBoundingSphere();
   return geometry;
@@ -546,6 +578,59 @@ function WestApron({ opacity }: { opacity: number }) {
         />
       </mesh>
     </group>
+  );
+}
+
+function ExporuralSmoothConcrete({ opacity }: { opacity: number }) {
+  const { gl, invalidate } = useThree();
+  const maximumAnisotropy = gl.capabilities.getMaxAnisotropy();
+  const outline = useMemo(
+    () => sourcePolygonToLocal(EXPORURAL_SMOOTH_CONCRETE_CORRECTION.sourcePolygon),
+    [],
+  );
+  const geometry = useMemo(
+    () => createWorldTiledHorizontalPolygonGeometry(
+      outline,
+      EXPORURAL_SMOOTH_CONCRETE_CORRECTION.elevation,
+    ),
+    [outline],
+  );
+  const textures = useMemo(
+    () => openGroundTextureBundleForEntity(EXPORURAL_SMOOTH_CONCRETE_PROFILE, maximumAnisotropy),
+    [maximumAnisotropy],
+  );
+
+  useEffect(() => {
+    invalidate();
+  }, [invalidate, opacity]);
+
+  useEffect(() => () => geometry.dispose(), [geometry]);
+  useEffect(() => () => textures?.dispose(), [textures]);
+
+  return (
+    <mesh
+      name="piso-concreto-liso-exporural-c4"
+      geometry={geometry}
+      receiveShadow
+      raycast={NO_RAYCAST}
+      userData={EXPORURAL_CONCRETE_USER_DATA}
+    >
+      <meshStandardMaterial
+        map={textures?.map ?? undefined}
+        normalMap={textures?.normalMap ?? undefined}
+        normalScale={textures ? EXPORURAL_SMOOTH_CONCRETE_NORMAL_SCALE : undefined}
+        roughnessMap={textures?.roughnessMap ?? undefined}
+        color={EXPORURAL_SMOOTH_CONCRETE_CORRECTION.baseColor}
+        roughness={EXPORURAL_SMOOTH_CONCRETE_CORRECTION.roughness}
+        metalness={0}
+        polygonOffset
+        polygonOffsetFactor={-1}
+        polygonOffsetUnits={-1}
+        transparent={opacity < 0.999}
+        opacity={opacity}
+        depthWrite={opacity > 0.94}
+      />
+    </mesh>
   );
 }
 
@@ -1139,6 +1224,11 @@ export const ArenaFrontInfrastructure = memo(function ArenaFrontInfrastructure({
   courtsOpacity: number;
 }) {
   if (!showArenaStructures && !showArenaAccess && !showCourts) return null;
+  const showExporuralConcrete = showArenaStructures || showCourts;
+  const exporuralConcreteOpacity = Math.max(
+    showArenaStructures ? arenaStructuresOpacity : 0,
+    showCourts ? courtsOpacity : 0,
+  );
   return (
     <group name="infraestrutura-publica-frente-arena" userData={INFRASTRUCTURE_USER_DATA}>
       {showArenaStructures && (
@@ -1148,6 +1238,7 @@ export const ArenaFrontInfrastructure = memo(function ArenaFrontInfrastructure({
         <ArenaAccessStructure reducedGraphics={reducedGraphics} opacity={arenaAccessOpacity} />
       )}
       {showCourts && <ArenaCourts reducedGraphics={reducedGraphics} opacity={courtsOpacity} />}
+      {showExporuralConcrete && <ExporuralSmoothConcrete opacity={exporuralConcreteOpacity} />}
     </group>
   );
 });
