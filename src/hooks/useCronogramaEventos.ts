@@ -1248,7 +1248,7 @@ export function useCronogramaEventos() {
       if (!existingSubevent) throw new Error('Subevento não encontrado. Atualize a página e tente novamente.');
 
       if (existingSubevent.storage === 'queued') {
-        if (!isWritableRole(myRole)) throw new Error('Seu perfil possui acesso somente para consulta.');
+        if (!canWriteCronograma) throw new Error('Seu perfil possui acesso somente para consulta.');
         if (!orgId) throw new Error('Não foi possível identificar a organização atual.');
         removeQueuedCronogramaRelationship(orgId, subeventId);
         refreshQueuedRelationships();
@@ -1363,7 +1363,7 @@ export function useCronogramaEventos() {
     refetch: query.refetch,
     canManage: canWriteCronograma,
     canWriteEvents,
-    canDeleteSubevents: myRole === 'admin' || myRole === 'gestor',
+    canDeleteSubevents: canWriteCronograma,
     relationshipsUnavailable,
     relationshipSyncUnavailable,
     pendingRelationshipCount: queuedRelationshipsForOrg.length,
