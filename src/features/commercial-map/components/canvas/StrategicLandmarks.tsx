@@ -34,6 +34,11 @@ import {
   apolloXivReplicaHeight,
 } from '../../utils/lunarMemorial';
 import {
+  LIVESTOCK_TENT_LAYOUT,
+  LIVESTOCK_TENT_RENDER_BUDGET,
+  livestockTentModelBounds,
+} from '../../utils/livestockTent';
+import {
   resolveStrategicLandmarkKind,
   strategicLandmarkBounds,
   strategicLandmarkFacingRadians,
@@ -604,6 +609,16 @@ function useLandmarkMaterials(
       result.wall.roughness = 0.94;
       result.accent.roughness = 0.8;
       result.accent.metalness = 0.02;
+    }
+    if (kind === 'livestock-tent') {
+      result.roof.roughness = 0.88;
+      result.roof.metalness = 0.04;
+      result.wall.roughness = 0.9;
+      result.metal.roughness = 0.48;
+      result.metal.metalness = 0.36;
+      result.dark.roughness = 0.52;
+      result.dark.metalness = 0.32;
+      result.platform.roughness = 0.98;
     }
     if (kind === 'cooperativism-space') {
       result.roof.roughness = 0.9;

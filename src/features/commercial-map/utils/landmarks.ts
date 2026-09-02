@@ -198,6 +198,19 @@ const STRATEGIC_LANDMARKS: Readonly<Record<string, StrategicLandmarkDefinition>>
     focusDirection: [0.26, 0.31, 0.96],
     visualHeight: livestockPavilionVisualHeight,
   },
+  D4: {
+    kind: 'livestock-tent',
+    aliases: [
+      'Tenda da Pecuária',
+      'Tenda Pecuária',
+      'Tenda da Pecuaria',
+      'Livestock Tent',
+    ],
+    // Fachada aberta em +Z local, orientada a oeste para o lote Q-Q-01.
+    facingRadians: LIVESTOCK_TENT_LAYOUT.facingRadians,
+    focusDirection: LIVESTOCK_TENT_LAYOUT.focusDirection,
+    visualHeight: livestockTentVisualHeight,
+  },
   B28: {
     kind: 'cooperativism-space',
     aliases: [
