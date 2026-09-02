@@ -36,9 +36,9 @@ import {
   pavilionFourSoyKitchenVisualHeight,
 } from './pavilionFourSoyKitchen';
 import {
-  LIVESTOCK_TENT_LAYOUT,
-  livestockTentVisualHeight,
-} from './livestockTent';
+  VIA_EXPRESSA_LAYOUT,
+  viaExpressaVisualHeight,
+} from './viaExpressa';
 
 export type StrategicLandmarkKind =
   | 'administrative-center'
@@ -52,7 +52,7 @@ export type StrategicLandmarkKind =
   | 'pavilion-four-soy-kitchen'
   | 'third-age-pavilion'
   | 'livestock-pavilion'
-  | 'livestock-tent'
+  | 'via-expressa'
   | 'mirante-pavilion'
   | 'cooperativism-space'
   | 'gastronomic-alameda'
@@ -236,6 +236,19 @@ const STRATEGIC_LANDMARKS: Readonly<Record<string, StrategicLandmarkDefinition>>
     facingRadians: GASTRONOMIC_ALAMEDA_FACING_RADIANS,
     focusDirection: [0.96, 0.48, 0.14],
     visualHeight: gastronomicAlamedaVisualHeight,
+  },
+  D2: {
+    kind: 'via-expressa',
+    aliases: [
+      'Via Expressa',
+      'VIA EXPRESSA',
+      'Pavilhão Via Expressa',
+      'Passarela Via Expressa',
+    ],
+    // Empena fotografada em +Z local, olhando para o sul / D1.
+    facingRadians: VIA_EXPRESSA_LAYOUT.facingRadians,
+    focusDirection: VIA_EXPRESSA_LAYOUT.focusDirection,
+    visualHeight: viaExpressaVisualHeight,
   },
   D3: {
     kind: 'mirante-pavilion',
@@ -539,9 +552,9 @@ export function strategicLandmarkVisualHeight(entity: MapEntity): number | null 
   if (definition.kind === 'third-age-pavilion') {
     return Math.min(THIRD_AGE_PAVILION_LAYOUT.maximumVisualHeight, visualHeight);
   }
-  if (definition.kind === 'livestock-tent') {
+  if (definition.kind === 'via-expressa') {
     return Math.min(
-      LIVESTOCK_TENT_LAYOUT.maximumVisualHeight,
+      VIA_EXPRESSA_LAYOUT.maximumVisualHeight,
       Math.max(entity.geometry.extrusionHeight, visualHeight),
     );
   }

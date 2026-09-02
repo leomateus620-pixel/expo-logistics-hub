@@ -12,6 +12,11 @@ import { THIRD_AGE_PAVILION_LAYOUT } from '../../utils/thirdAgePavilion';
 import { EXPORURAL_STEAKHOUSE_LAYOUT } from '../../utils/exporuralSteakhouse';
 import { PAVILION_FOUR_SOY_KITCHEN_LAYOUT } from '../../utils/pavilionFourSoyKitchen';
 import { commercialPavilionModelBounds } from '../../utils/commercialPavilions';
+import {
+  VIA_EXPRESSA_LAYOUT,
+  VIA_EXPRESSA_RENDER_BUDGET,
+  viaExpressaModelBounds,
+} from '../../utils/viaExpressa';
 import { FENASOJA_HEADQUARTERS_LAYOUT } from '../../utils/headquarters';
 import { LACTALIS_STAGE_LAYOUT, lactalisStagePresentationFootprint } from '../../utils/lactalisStage';
 import {
@@ -42,7 +47,7 @@ import {
   type StrategicLandmarkKind,
 } from '../../utils/landmarks';
 import { LivestockPavilion } from './LivestockPavilion';
-import { LivestockTent } from './LivestockTent';
+import { ViaExpressa } from './ViaExpressa';
 import { MirantePavilion } from './MirantePavilion';
 import {
   CooperativismSpace,
@@ -316,7 +321,7 @@ const LANDMARK_PALETTES: Record<StrategicLandmarkKind, LandmarkPalette> = {
     platform: '#85847d',
     metal: '#4d5c5f',
   },
-  'livestock-tent': LIVESTOCK_TENT_LAYOUT.palette,
+  'via-expressa': VIA_EXPRESSA_LAYOUT.palette,
   'mirante-pavilion': {
     wall: '#d6d2c7',
     accent: '#8b765d',
@@ -539,7 +544,7 @@ function useLandmarkMaterials(
       || kind === 'pavilion-nine'
       || kind === 'third-age-pavilion'
       || kind === 'livestock-pavilion'
-      || kind === 'livestock-tent'
+      || kind === 'via-expressa'
       || kind === 'mirante-pavilion'
       || kind === 'cooperativism-space'
       || kind === 'gastronomic-alameda'
@@ -583,6 +588,20 @@ function useLandmarkMaterials(
       result.accent.metalness = 0.05;
       result.metal.roughness = 0.5;
       result.metal.metalness = 0.3;
+    }
+    if (kind === 'via-expressa') {
+      result.roof.roughness = 0.46;
+      result.roof.metalness = 0.44;
+      result.wall.roughness = 0.92;
+      result.metal.roughness = 0.46;
+      result.metal.metalness = 0.4;
+      result.dark.roughness = 0.5;
+      result.dark.metalness = 0.38;
+      result.accent.roughness = 0.58;
+      result.accent.metalness = 0.22;
+      result.platform.roughness = 0.98;
+      result.trim.roughness = 0.42;
+      result.trim.metalness = 0.36;
     }
     if (kind === 'mirante-pavilion') {
       result.roof.roughness = 0.68;
@@ -1707,8 +1726,8 @@ function useArchitecturalDetail(
       ? Math.max(30, bounds.width * 3.1)
       : kind === 'livestock-pavilion'
         ? Math.max(28, bounds.width * LIVESTOCK_PAVILION_RENDER_BUDGET.detailDistanceMultiplier)
-      : kind === 'livestock-tent'
-        ? Math.max(16, Math.max(bounds.width, bounds.depth) * LIVESTOCK_TENT_RENDER_BUDGET.detailDistanceMultiplier)
+      : kind === 'via-expressa'
+        ? Math.max(16, Math.max(bounds.width, bounds.depth) * VIA_EXPRESSA_RENDER_BUDGET.detailDistanceMultiplier)
       : kind === 'mirante-pavilion'
         ? Math.max(
           MIRANTE_RENDER_BUDGET.detailDistanceMinimum,
@@ -3939,16 +3958,15 @@ export function StrategicLandmarkMesh({
     bounds,
     selected,
   );
-  const modelBounds = useMemo(
-    () => kind === 'gastronomic-alameda'
-      ? fitRotatedStructureBounds(bounds, facingRadians)
-      : kind === 'fenasoja-event-center'
-        ? eventCenterModelBounds(bounds, facingRadians)
-        : kind === 'livestock-tent'
-          ? livestockTentModelBounds(bounds, facingRadians)
-          : commercialPavilionModelBounds(bounds, facingRadians),
-    [bounds, facingRadians, kind],
-  );
+  const modelBounds = useMemo(() => {
+    if (kind === 'gastronomic-alameda') return fitRotatedStructureBounds(bounds, facingRadians);
+    if (kind === 'fenasoja-event-center') {
+      // @ts-expect-error C1 yaw is the layout literal; the landmark helper returns number.
+      return eventCenterModelBounds(bounds, facingRadians);
+    }
+    if (kind === 'via-expressa') return viaExpressaModelBounds(bounds, facingRadians);
+    return commercialPavilionModelBounds(bounds, facingRadians);
+  }, [bounds, facingRadians, kind]);
   const gl = useThree((state) => state.gl);
   const invalidate = useThree((state) => state.invalidate);
 
@@ -4063,7 +4081,7 @@ export function StrategicLandmarkMesh({
         )}
         {kind === 'third-age-pavilion' && <ThirdAgePavilion {...modelProps} />}
         {kind === 'livestock-pavilion' && <LivestockPavilion {...modelProps} />}
-        {kind === 'livestock-tent' && <LivestockTent {...modelProps} />}
+        {kind === 'via-expressa' && <ViaExpressa {...modelProps} />}
         {kind === 'mirante-pavilion' && <MirantePavilion {...modelProps} />}
         {kind === 'cooperativism-space' && <CooperativismSpace {...modelProps} />}
         {kind === 'gastronomic-alameda' && <GastronomicAlameda {...modelProps} />}

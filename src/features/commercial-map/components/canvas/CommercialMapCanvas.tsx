@@ -542,8 +542,8 @@ function focusProfileForEntity(entity: MapEntity) {
   if (landmark === 'livestock-pavilion') {
     return { ...profile, contextRatio: 0.068, fitPadding: 1.08, minDistanceRatio: 0.055, maxDistanceRatio: 0.38, minimumDirectionY: 0.28 };
   }
-  if (landmark === 'livestock-tent') {
-    return { ...profile, contextRatio: 0.05, fitPadding: 1.2, minDistanceRatio: 0.045, maxDistanceRatio: 0.32, minimumDirectionY: 0.34 };
+  if (landmark === 'via-expressa') {
+    return { ...profile, contextRatio: 0.05, fitPadding: 1.18, minDistanceRatio: 0.042, maxDistanceRatio: 0.32, minimumDirectionY: 0.36 };
   }
   if (landmark === 'mirante-pavilion') {
     return { ...profile, contextRatio: 0.075, fitPadding: 1.16, minDistanceRatio: 0.06, maxDistanceRatio: 0.4, minimumDirectionY: 0.3 };
