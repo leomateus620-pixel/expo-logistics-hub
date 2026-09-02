@@ -1,5 +1,5 @@
 import { officialPdfPointToLocal } from './officialReference2026';
-import { ARENA_FRONT_LAYOUT } from './parkEnvironment';
+import { ARENA_FRONT_LAYOUT, EXPORURAL_SMOOTH_CONCRETE_CORRECTION } from './parkEnvironment';
 
 /**
  * Zoneamento do setor da Arena Sicredi - Icatu.
@@ -78,6 +78,8 @@ export const ARENA_SECTOR_SURFACE_ZONES: readonly ArenaSurfaceZone[] = [
   zone('rua-brasil', 'ROAD', rect([4106, 3096, 4520, 3191])),
   // Campo gramado sem marcações: superfície própria a oeste da Arena.
   zone('arena-west-apron', 'CONCRETE_ACCESS', rect(inflate(ARENA_FRONT_LAYOUT.westApron.sourceBounds))),
+  // Anexo 1: concreto liso a leste de C4. Polígono exato, sem inflar sobre vias.
+  zone('exporural-smooth-concrete', 'CONCRETE_ACCESS', EXPORURAL_SMOOTH_CONCRETE_CORRECTION.sourcePolygon),
 ];
 
 const LOCAL_ZONES = ARENA_SECTOR_SURFACE_ZONES.map((item) => ({
@@ -115,4 +117,4 @@ export function isArenaTerrainExcluded(x: number, z: number) {
   return resolveArenaSurfaceOwner(x, z) !== null;
 }
 
-export const ARENA_SECTOR_ZONING_REVISION = '2028.2-arena-west-field-satellite.1';
+export const ARENA_SECTOR_ZONING_REVISION = '2028.3-exporural-smooth-concrete.1';

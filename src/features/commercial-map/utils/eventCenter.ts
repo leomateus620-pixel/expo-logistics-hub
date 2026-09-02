@@ -1,4 +1,22 @@
-export const FENASOJA_EVENT_CENTER_REVISION = '2026.8-event-center-realism.1';
+import { commercialPavilionModelBounds } from './commercialPavilions';
+
+export const FENASOJA_EVENT_CENTER_REVISION = '2026.9-event-center-qe12.1';
+
+/**
+ * Cartographic alignment of Centro de Eventos Fenasoja (C1) to lot Q-E-12.
+ *
+ * The official 2026 footprint and centre stay authoritative. Only facing and
+ * camera implantation change: the photographed facade (local +Z) turns west
+ * toward Quadra E lote 12, across Rua Brasília.
+ */
+export const EVENT_CENTER_QE12_ALIGNMENT = Object.freeze({
+  eventCenterIdentifier: 'C1',
+  targetLotIdentifier: 'Q-E-12',
+  eventCenterSourceCenter: [4255, 3307.5] as const,
+  targetSourceCenter: [3885, 3309.5] as const,
+  facingRadians: -1.565390974146972,
+  focusDirection: [-0.96, 0.42, 0.12] as const,
+});
 
 /**
  * Architectural reading of attachments IMG_9673–IMG_9675.
@@ -9,10 +27,10 @@ export const FENASOJA_EVENT_CENTER_REVISION = '2026.8-event-center-realism.1';
  */
 export const FENASOJA_EVENT_CENTER_LAYOUT = {
   sourceBounds: [4020, 3180, 4490, 3435] as const,
-  sourceCenter: [4255, 3307.5] as const,
+  sourceCenter: EVENT_CENTER_QE12_ALIGNMENT.eventCenterSourceCenter,
   sourceFootprint: [470, 255] as const,
-  facingRadians: 0,
-  focusDirection: [0.16, 0.42, 1] as const,
+  facingRadians: EVENT_CENTER_QE12_ALIGNMENT.facingRadians,
+  focusDirection: EVENT_CENTER_QE12_ALIGNMENT.focusDirection,
   envelope: {
     widthRatio: 0.965,
     depthRatio: 0.94,
@@ -81,4 +99,22 @@ export function eventCenterEnvelope(footprint: EventCenterFootprint): EventCente
 
 export function eventCenterVisualHeight(footprint: EventCenterFootprint): number {
   return Math.min(2.85, Math.max(2.2, footprint.width * 0.25));
+}
+
+/**
+ * Snaps the Q-E-12 bearing to the nearest cardinal so pavilion-local width/depth
+ * exchange on the odd quarter turn. The authored facade stays on local +Z and
+ * the long hall remains inside the official east-west C1 envelope after yaw.
+ */
+export function eventCenterCardinalFacingRadians(
+  facingRadians = FENASOJA_EVENT_CENTER_LAYOUT.facingRadians,
+): number {
+  return Math.round(facingRadians / (Math.PI / 2)) * (Math.PI / 2);
+}
+
+export function eventCenterModelBounds<Bounds extends EventCenterFootprint>(
+  bounds: Bounds,
+  facingRadians = FENASOJA_EVENT_CENTER_LAYOUT.facingRadians,
+): Bounds {
+  return commercialPavilionModelBounds(bounds, eventCenterCardinalFacingRadians(facingRadians));
 }

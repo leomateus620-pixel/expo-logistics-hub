@@ -42,7 +42,30 @@ export interface LocalBounds {
   centerZ: number;
 }
 
-export const PARK_ENVIRONMENT_REVISION = '2028.2-arena-west-field-satellite.1';
+export const PARK_ENVIRONMENT_REVISION = '2028.3-exporural-smooth-concrete.1';
+
+/**
+ * Anexo 1 — “Área de concreto liso” immediately east of Churrascaria Exporural
+ * (C4), between Rua 15 de Novembro / Rua Emanuel Brachmann and the Arena
+ * sector. Presentation only: it does not create a lot or move C4.
+ */
+export const EXPORURAL_SMOOTH_CONCRETE_CORRECTION = Object.freeze({
+  id: 'exporural-smooth-concrete-c4',
+  officialOwnerIdentifier: 'C4',
+  sourcePolygon: Object.freeze([
+    [5100, 2372],
+    [5360, 2372],
+    [5375, 2388],
+    [5375, 2482],
+    [5358, 2500],
+    [5100, 2500],
+  ] as const),
+  elevation: 0.06,
+  surface: 'concrete' as const,
+  tileWorldSize: 1.7,
+  baseColor: '#c6c7c2',
+  roughness: 0.94,
+});
 
 export const PARK_ENVIRONMENT_CLASSIFICATION_LABELS: Readonly<Record<ParkEnvironmentClassification, string>> = {
   NON_COMMERCIAL_STRUCTURE: 'Estrutura não comercial',
@@ -158,6 +181,8 @@ export const ARENA_FRONT_LAYOUT = {
     borderColor: '#b0b2ad',
     markings: false,
   },
+  /** Laje contínua a leste de C4; UVs em unidade de mundo, sem remendo azulejado. */
+  exporuralSmoothConcrete: EXPORURAL_SMOOTH_CONCRETE_CORRECTION,
   /** Caminhos de circulação entre escadaria, quadras, Arena, campo e estacionamento. */
   walkways: [
     { id: 'arena-walkway-stairs-apron', sourcePath: [[4480, 2895], [4540, 2895], [4600, 2888]] as readonly SourcePoint[], width: 0.34 },
@@ -307,6 +332,20 @@ export const PARK_ENVIRONMENT_FEATURES: readonly ParkEnvironmentFeature[] = [
     sourceReferences: ARENA_FRONT_SOURCE_REFERENCES,
     verificationStatus: 'FIELD_REVIEW_RECOMMENDED',
     notes: 'Continuação do piso de concreto do pátio a oeste da Arena, no lugar do antigo campo gramado inexistente; apresentação, nunca lote comercial.',
+  },
+  {
+    id: 'exporural-smooth-concrete-c4',
+    name: 'Área de concreto liso da Exporural',
+    classification: 'PAVED_PUBLIC_AREA',
+    isSellable: false,
+    contributesToCommercialMetrics: false,
+    sourceBounds: [5100, 2372, 5375, 2500],
+    sourceReferences: [
+      'Anexo 1 — área de concreto liso a leste da Churrascaria Exporural C4',
+      ...ARENA_FRONT_SOURCE_REFERENCES,
+    ],
+    verificationStatus: 'REFERENCE_INTERPRETED',
+    notes: 'Laje de concreto liso a leste da Churrascaria Exporural (C4), no lugar do gramado residual; apresentação contínua sem remendo azulejado, nunca lote comercial.',
   },
   {
     id: 'arena-front-pedestrian-paths',

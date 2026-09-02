@@ -130,5 +130,9 @@ describe('terreno reconstruído do entorno da Arena', () => {
     }
     const removedEastField = sourceBoundsToLocal([5410, 2800, 5900, 3120]);
     expect(isArenaTerrainExcluded(removedEastField.centerX, removedEastField.centerZ)).toBe(false);
+
+    const smoothConcrete = sourceBoundsToLocal([5200, 2410, 5300, 2470]);
+    expect(resolveArenaSurfaceOwner(smoothConcrete.centerX, smoothConcrete.centerZ)).toBe('CONCRETE_ACCESS');
+    expect(isArenaTerrainExcluded(smoothConcrete.centerX, smoothConcrete.centerZ)).toBe(true);
   });
 });
