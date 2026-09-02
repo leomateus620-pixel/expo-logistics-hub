@@ -313,7 +313,7 @@ export function viaExpressaHeadingToTargetErrorRadians(): number {
 }
 
 export function viaExpressaCardinalFacingRadians(
-  yaw = VIA_EXPRESSA_LAYOUT.facingRadians,
+  yaw: number = VIA_EXPRESSA_LAYOUT.facingRadians,
 ): number {
   return Math.round(yaw / (Math.PI / 2)) * (Math.PI / 2);
 }
@@ -324,7 +324,7 @@ export function viaExpressaCardinalFacingRadians(
  */
 export function viaExpressaModelBounds<Bounds extends ViaExpressaBounds>(
   bounds: Bounds,
-  yaw = VIA_EXPRESSA_LAYOUT.facingRadians,
+  yaw: number = VIA_EXPRESSA_LAYOUT.facingRadians,
 ): Bounds {
   const cardinal = viaExpressaCardinalFacingRadians(yaw);
   const quarterTurns = Math.round(cardinal / (Math.PI / 2));

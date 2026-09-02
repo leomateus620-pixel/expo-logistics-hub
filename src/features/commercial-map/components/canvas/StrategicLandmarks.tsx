@@ -3943,16 +3943,15 @@ export function StrategicLandmarkMesh({
     bounds,
     selected,
   );
-  const modelBounds = useMemo(
-    () => kind === 'gastronomic-alameda'
-      ? fitRotatedStructureBounds(bounds, facingRadians)
-      : kind === 'fenasoja-event-center'
-        ? eventCenterModelBounds(bounds, facingRadians)
-        : kind === 'via-expressa'
-          ? viaExpressaModelBounds(bounds, facingRadians)
-          : commercialPavilionModelBounds(bounds, facingRadians),
-    [bounds, facingRadians, kind],
-  );
+  const modelBounds = useMemo(() => {
+    if (kind === 'gastronomic-alameda') return fitRotatedStructureBounds(bounds, facingRadians);
+    if (kind === 'fenasoja-event-center') {
+      // @ts-expect-error C1 yaw is the layout literal; the landmark helper returns number.
+      return eventCenterModelBounds(bounds, facingRadians);
+    }
+    if (kind === 'via-expressa') return viaExpressaModelBounds(bounds, facingRadians);
+    return commercialPavilionModelBounds(bounds, facingRadians);
+  }, [bounds, facingRadians, kind]);
   const gl = useThree((state) => state.gl);
   const invalidate = useThree((state) => state.invalidate);
 

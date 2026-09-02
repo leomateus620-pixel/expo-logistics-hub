@@ -103,7 +103,8 @@ describe('Via Expressa D2', () => {
       "['D2', 'Via Expressa', 'ATTRACTION', 'structures', [3760, 2650, 3900, 2825], { parent: 'G', height: 0.82, metadata: { explicitNotRoad: true } }]",
     );
     expect(resolveStrategicLandmarkKind(pavilion)).toBe('via-expressa');
-    expect(resolveStrategicLandmarkKind({ ...pavilion, id: 'db:uuid:via-expressa' })).toBe('via-expressa');
+    const persisted = { ...pavilion, id: 'db:uuid:via-expressa' };
+    expect(resolveStrategicLandmarkKind(persisted)).toBe('via-expressa');
     expect(strategicLandmarkSupportsInterior(pavilion)).toBe(false);
     expect(JSON.stringify(pavilion)).toBe(before);
   });
