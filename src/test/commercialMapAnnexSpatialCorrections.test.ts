@@ -189,7 +189,7 @@ function polygonsIntersect(
 
 describe('anexos 1/2/4 — blueprint e fiação viária', () => {
   it('recria as constantes do blueprint sem inventar cadastro', () => {
-    expect(COMMERCIAL_MAP_ANNEX_CORRECTION_REVISION).toBe('2026.9-anexo3-satellite.1');
+    expect(COMMERCIAL_MAP_ANNEX_CORRECTION_REVISION).toBe('2026.9-anexo3-satellite.2');
     expect(REAR_PARK_ROAD_REVISION).toBe(COMMERCIAL_MAP_ANNEX_CORRECTION_REVISION);
     expect(REAR_SPATIAL_CALIBRATION_REVISION).toBe(COMMERCIAL_MAP_ANNEX_CORRECTION_REVISION);
 
@@ -210,8 +210,8 @@ describe('anexos 1/2/4 — blueprint e fiação viária', () => {
     expect(PORTAO5_PARKING_ACCESS_CORRECTION.curveToEtniasJunction[0]).toEqual([4856, 3248]);
     expect(PORTAO5_PARKING_ACCESS_CORRECTION.curveToEtniasJunction.at(-1)).toEqual([5260, 3248]);
     expect(PORTAO5_PARKING_ACCESS_CORRECTION.etniasToUbiretamaJunction[0]).toEqual([5260, 3248]);
-    expect(PORTAO5_PARKING_ACCESS_CORRECTION.etniasToUbiretamaJunction.at(-1)).toEqual([5548, 3248]);
-    expect(PORTAO5_PARKING_ACCESS_CORRECTION.gate5Approach[0]).toEqual([5548, 3248]);
+    expect(PORTAO5_PARKING_ACCESS_CORRECTION.etniasToUbiretamaJunction.at(-1)).toEqual([5860, 3248]);
+    expect(PORTAO5_PARKING_ACCESS_CORRECTION.gate5Approach[0]).toEqual([5860, 3248]);
     expect(PORTAO5_PARKING_ACCESS_CORRECTION.gate5Approach.at(-1)).toEqual([5940, 3678]);
 
     expect(ETNIAS_PARKING_CONNECTION_CORRECTION).toMatchObject({
@@ -296,13 +296,13 @@ describe('anexos 1/2/4 — blueprint e fiação viária', () => {
   it('materializa o acesso ao Portão 5 com curva leve e preserva o trevo da BR-472', () => {
     expect(projectRearAttachment5PointToOfficialSource(3)).toEqual([4528, 3150]);
     expect(projectRearAttachment5PointToOfficialSource(2)).toEqual([4856, 3248]);
-    expect(projectRearAttachment5PointToOfficialSource(4)).toEqual([5548, 3248]);
+    expect(projectRearAttachment5PointToOfficialSource(4)).toEqual([5860, 3248]);
     expect(projectRearAttachment5PointToOfficialSource(6)).toEqual([5940, 3678]);
     expect(PORTAO5_PARKING_ACCESS_JUNCTIONS).toEqual({
       street: [4528, 3150],
       curve: [4856, 3248],
       etnias: [5260, 3248],
-      ubiretama: [5548, 3248],
+      ubiretama: [5860, 3248],
       gate5: [5940, 3678],
     });
     expect(REAR_OFFICIAL_ANCHORS.gate5Entity).toEqual([5974, 3678]);
@@ -315,7 +315,7 @@ describe('anexos 1/2/4 — blueprint e fiação viária', () => {
     );
 
     const parking = GENERATED_REAR_ROAD_SEGMENTS.filter(
-      (road) => road.roadId === 'RUA-UBIRETAMA' && road.id !== 'ubiretama-north-junction',
+      (road) => road.roadId === 'RUA-UBIRETAMA',
     );
     expect(parking).toHaveLength(3);
     expect(parking.every((road) => road.officialOwnerIdentifier === 'RUA-UBIRETAMA')).toBe(true);
@@ -325,6 +325,7 @@ describe('anexos 1/2/4 — blueprint e fiação viária', () => {
 
     const access = REAR_PARK_ROAD_NETWORK.filter((road) => road.roadId === 'ACESSO-A5-BR472');
     expect(access.map((road) => road.id)).toEqual([
+      'portao5-north-approach',
       'gate5-internal-approach',
       'a5-trevo-trunk',
       'a5-br472-north-ramp',
@@ -391,6 +392,7 @@ describe('anexos 1/2/4 — blueprint e fiação viária', () => {
     const rejected = [
       [4528, 3248], [4528, 3360], [4528, 3438], [4528, 3480],
       [5260, 3661], [5129, 3656],
+      [5780, 3236], [5648, 3348], [5756, 3480], [5860, 3608],
     ] as const;
     const rendered = GENERATED_REAR_ROAD_SEGMENTS.flatMap((road) => [...road.sourceControlPoints]);
     rejected.forEach((point) => {
@@ -421,12 +423,34 @@ describe('anexos 1/2/4 — blueprint e fiação viária', () => {
       expect(Math.abs(y - 3248)).toBeLessThanOrEqual(20);
     });
 
-    const ubiretama = REAR_CALIBRATED_AXES.ubiretamaNorthToJunction;
-    expect(ubiretama.at(-1)).toEqual([5548, 3248]);
-    expect(ubiretama.every(([x]) => x > arenaEast)).toBe(true);
-    expect(REAR_ROAD_NODES['ubiretama-portao5-junction'].sourcePoint).toEqual([5548, 3248]);
+    const portao5North = REAR_CALIBRATED_AXES.ubiretamaNorthToJunction;
+    expect(portao5North.at(-1)).toEqual([5860, 3248]);
+    expect(portao5North.every(([x]) => x > arenaEast)).toBe(true);
+    expect(portao5North.every(([x]) => x >= 5860)).toBe(true);
+    expect(portao5North.filter(([x, y]) => y >= 3140).every(([x]) => x === 5860)).toBe(true);
+    expect(REAR_ROAD_NODES['ubiretama-portao5-junction'].sourcePoint).toEqual([5860, 3248]);
     expect(ETNIAS_PARKING_CONNECTION_CORRECTION.parkingJunction).toEqual([5260, 3248]);
     expect(ETNIAS_PARKING_CONNECTION_CORRECTION.parkingJunction).not.toEqual([5260, 3661]);
+
+    const ubiretamaRibbon = [
+      ...PORTAO5_PARKING_ACCESS_CORRECTION.streetToCurve.slice(4),
+      ...PORTAO5_PARKING_ACCESS_CORRECTION.curveToEtniasJunction.slice(1),
+      ...PORTAO5_PARKING_ACCESS_CORRECTION.etniasToUbiretamaJunction.slice(1),
+    ];
+    ubiretamaRibbon.forEach((point) => expect(point[1]).toBe(3248));
+    expect(ubiretamaRibbon.at(-1)).toEqual([5860, 3248]);
+    expect(ubiretamaRibbon).toContainEqual([5780, 3248]);
+
+    const northApproach = GENERATED_REAR_ROAD_SEGMENTS.find((road) => road.id === 'portao5-north-approach');
+    expect(northApproach).toMatchObject({
+      roadId: 'ACESSO-A5-BR472',
+      officialOwnerIdentifier: 'A5',
+    });
+    expect(GENERATED_REAR_ROAD_SEGMENTS.some((road) => road.id === 'ubiretama-north-junction')).toBe(false);
+
+    const junctionHeading = headingDegrees([5780, 3248], [5860, 3248]);
+    const portao5Heading = headingDegrees([5860, 3140], [5860, 3248]);
+    expect(Math.abs(wrappedDeltaDegrees(junctionHeading, portao5Heading) - 90)).toBeLessThan(1);
 
     const brasilia = officialEntity('RUA-BRASILIA').geometry.coordinates[0] as ParkAccessPoint[];
     const ruaBrasil = officialEntity('RUA-BRASIL').geometry.coordinates[0] as ParkAccessPoint[];

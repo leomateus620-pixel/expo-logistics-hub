@@ -12,7 +12,7 @@ export type AnnexSourcePoint = readonly [number, number];
 export type AnnexSourceBounds = readonly [number, number, number, number];
 export type AnnexSourcePolygon = readonly AnnexSourcePoint[];
 
-export const COMMERCIAL_MAP_ANNEX_CORRECTION_REVISION = '2026.9-anexo3-satellite.1';
+export const COMMERCIAL_MAP_ANNEX_CORRECTION_REVISION = '2026.9-anexo3-satellite.2';
 
 /** Escala uniforme do recorte oficial 5.500 × 120, só para larguras físicas. */
 export const ANNEX_SOURCE_POINTS_PER_LOCAL_UNIT = 5500 / 120;
@@ -47,15 +47,23 @@ export const CHURRASCARIA_ACCESS_CORRECTION = Object.freeze({
 });
 
 /**
- * Anexo 3 / satélite — Rua Ubiretama a sul do campo oeste e da Arena, e o
- * acesso ao Portão 5 somente a leste de F.
+ * Anexo 3 / satélite — Rua Ubiretama E–W a sul do campo oeste e da Arena, e o
+ * Portão 5 contínuo a leste de F.
  *
  * A origem [4528, 3150] é a continuação da Rua Brasil (cruzamento de quatro
  * pontas com a Brasília oficial). Uma curva breve SE contorna o canto SW do
  * campo gramado e segue E–W em y=3248, imediatamente a sul do campo / face
- * sul de F. Não desce colinear em x=4528 nem varre o estacionamento em
- * y≈3660. O Portão 5 só existe a leste de x=5385, com curva leve até o lock
- * [5940, 3678]. O trevo da BR-472 começa no lock e não é reconstruído aqui.
+ * sul de F. Não desce colinear em x=4528, não sobe para o norte, não entra em
+ * rampa e não varre o estacionamento em y≈3660. Entra no Portão 5 em T
+ * perpendicular na latitude sul da Arena, [5860, 3248].
+ *
+ * O arranque N–S do Portão 5 permanece o cadastro leste (~[5987, 2000]).
+ * Depois da curva leve a leste do apron de concreto, a fita continua a sul
+ * até o lock [5940, 3678]. O conector fantasma de meio de quadra
+ * ([5860, 3140] → [5780, 3236] → [5680, 3248] → [5548, 3248] e o retorno
+ * SE [5548, 3248] → [5648, 3348] → [5756, 3480] → [5860, 3608]) não existe
+ * no satélite e não é restabelecido. O trevo da BR-472 começa no lock e não
+ * é reconstruído aqui.
  */
 export const PORTAO5_PARKING_ACCESS_CORRECTION = Object.freeze({
   widthSource: 36,
@@ -79,12 +87,15 @@ export const PORTAO5_PARKING_ACCESS_CORRECTION = Object.freeze({
     [5368, 3248],
     [5456, 3248],
     [5548, 3248],
+    [5680, 3248],
+    [5780, 3248],
+    [5860, 3248],
   ] as const satisfies readonly AnnexSourcePoint[]),
   gate5Approach: Object.freeze([
-    [5548, 3248],
-    [5648, 3348],
-    [5756, 3480],
-    [5860, 3608],
+    [5860, 3248],
+    [5868, 3380],
+    [5892, 3500],
+    [5918, 3600],
     [5940, 3678],
   ] as const satisfies readonly AnnexSourcePoint[]),
 });

@@ -271,7 +271,9 @@ export function buildRearPoleInstances(reducedGraphics = false): RearPoleInstanc
 
   rearRoadCorridors()
     .filter((corridor) => (
-      corridor.roadId === 'ACESSO-A5-BR472' && corridor.id !== 'gate5-internal-approach'
+      corridor.roadId === 'ACESSO-A5-BR472'
+      && corridor.id !== 'gate5-internal-approach'
+      && corridor.id !== 'portao5-north-approach'
     ))
     .forEach((corridor) => {
       let carried = spacing * 0.5;
