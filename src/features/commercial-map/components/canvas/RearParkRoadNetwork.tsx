@@ -12,6 +12,7 @@ import {
   openGroundTextureBundleForEntity,
   type OpenGroundSurfaceProfile,
 } from './openGroundTextures';
+import { SeCloverleaf } from './SeCloverleaf';
 
 interface RearParkRoadNetworkProps {
   reducedGraphics: boolean;
@@ -235,6 +236,11 @@ export const RearParkRoadNetwork = memo(function RearParkRoadNetwork({
           />
         </mesh>
       )}
+      <SeCloverleaf
+        reducedGraphics={reducedGraphics}
+        visible={interactive}
+        opacity={presentedOpacity}
+      />
     </group>
   );
 });
