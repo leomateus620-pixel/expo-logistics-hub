@@ -539,5 +539,11 @@ export function strategicLandmarkVisualHeight(entity: MapEntity): number | null 
   if (definition.kind === 'third-age-pavilion') {
     return Math.min(THIRD_AGE_PAVILION_LAYOUT.maximumVisualHeight, visualHeight);
   }
+  if (definition.kind === 'livestock-tent') {
+    return Math.min(
+      LIVESTOCK_TENT_LAYOUT.maximumVisualHeight,
+      Math.max(entity.geometry.extrusionHeight, visualHeight),
+    );
+  }
   return Math.max(entity.geometry.extrusionHeight, visualHeight);
 }

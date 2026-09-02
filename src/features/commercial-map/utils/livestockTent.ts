@@ -63,6 +63,8 @@ export const LIVESTOCK_TENT_LAYOUT = Object.freeze({
   frontLotIdentifier: LIVESTOCK_TENT_FRONT_LOT_IDENTIFIER,
   enclosure: 'open-frame' as const,
   localFrontAxis: '+Z' as const,
+  /** Peaked tent stays below B9 and below the D4 facade-pole conductors. */
+  maximumVisualHeight: 1.2,
   sourceCenter,
   sourceFootprint,
   targetSourceCenter,
@@ -180,11 +182,11 @@ export function createLivestockTentLayout(
 ): LivestockTentLayout {
   const width = Math.max(1.15, finiteOr(bounds.width, 2.18));
   const depth = Math.max(1.15, finiteOr(bounds.depth, 2.73));
-  const height = Math.max(1.45, finiteOr(requestedHeight, livestockTentVisualHeight({ width, depth })));
+  const height = Math.max(1.02, finiteOr(requestedHeight, livestockTentVisualHeight({ width, depth })));
   const fillWidth = width * LIVESTOCK_TENT_LAYOUT.footprintFill.width;
   const fillDepth = depth * LIVESTOCK_TENT_LAYOUT.footprintFill.depth;
   const platformHeight = clamp(height * 0.032, 0.038, 0.052);
-  const eaveHeight = height * 0.54;
+  const eaveHeight = height * 0.46;
   const roofRise = height - eaveHeight;
   const roofOverhang = clamp(Math.min(width, depth) * 0.018, 0.022, 0.04);
   const roofHalfSpan = fillWidth / 2 + roofOverhang;
@@ -236,7 +238,7 @@ export function createLivestockTentLayout(
 
 export function livestockTentVisualHeight(bounds: LivestockTentBounds): number {
   const span = Math.min(finiteOr(bounds.width, 2.18), finiteOr(bounds.depth, 2.18));
-  return clamp(span * 0.78, 1.52, 1.86);
+  return clamp(span * 0.54, 1.08, LIVESTOCK_TENT_LAYOUT.maximumVisualHeight);
 }
 
 export function livestockTentFrontVector(): ReadonlyCoordinate {

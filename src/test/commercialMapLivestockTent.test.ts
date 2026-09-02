@@ -143,7 +143,8 @@ describe('Tenda da Pecuária D4', () => {
     expect(strategicLandmarkFacingRadians(persisted)).toBe(LIVESTOCK_TENT_LAYOUT.facingRadians);
     expect(LIVESTOCK_TENT_LAYOUT.facingRadians).toBeCloseTo(Math.atan2(towardLot[0], towardLot[1]), 8);
     expect(livestockTentCardinalFacingRadians()).toBeCloseTo(-Math.PI / 2, 12);
-    expect(landmarkFrontVector(LIVESTOCK_TENT_LAYOUT.facingRadians)).toEqual(front);
+    expect(landmarkFrontVector(LIVESTOCK_TENT_LAYOUT.facingRadians)[0]).toBeCloseTo(front[0], 12);
+    expect(landmarkFrontVector(LIVESTOCK_TENT_LAYOUT.facingRadians)[1]).toBeCloseTo(front[1], 12);
     expect((front[0] * towardLot[0] + front[1] * towardLot[1]) / towardLotLength).toBeCloseTo(1, 8);
     expect(front[0]).toBeLessThan(-0.99);
     expect(front[1]).toBeCloseTo(0, 8);
@@ -179,6 +180,7 @@ describe('Tenda da Pecuária D4', () => {
     expect(layout.roofAngle).toBeGreaterThan(0.5);
     expect(layout.eaveHeight).toBeLessThan(layout.height);
     expect(height).toBeGreaterThan(tent.geometry.extrusionHeight);
+    expect(height).toBeLessThanOrEqual(LIVESTOCK_TENT_LAYOUT.maximumVisualHeight);
     expect(height).toBeCloseTo(livestockTentVisualHeight(bounds), 8);
     expect(height).toBeLessThan(hallHeight);
     expect(resolveStrategicLandmarkKind(livestockHall)).toBe('livestock-pavilion');
