@@ -35,6 +35,7 @@ import {
 } from '@/features/commercial-map/data/officialReference2026';
 import {
   REAR_CALIBRATED_AXES,
+  REAR_OFFICIAL_ANCHORS,
   REAR_SPATIAL_CALIBRATION_REVISION,
   projectRearAttachment5PointToOfficialSource,
 } from '@/features/commercial-map/utils/rearSpatialCalibration';
@@ -53,6 +54,45 @@ function officialEntity(identifier: string) {
   ));
   expect(matches, identifier).toHaveLength(1);
   return matches[0];
+}
+
+function headingDegrees(from: ParkAccessPoint, to: ParkAccessPoint) {
+  return Math.atan2(to[0] - from[0], to[1] - from[1]) * (180 / Math.PI);
+}
+
+function wrappedDeltaDegrees(from: number, to: number) {
+  let delta = to - from;
+  while (delta > 180) delta -= 360;
+  while (delta < -180) delta += 360;
+  return Math.abs(delta);
+}
+
+function catmullRomMaxHeadingChangePer10m(path: readonly ParkAccessPoint[]) {
+  const unique = sampleRearRoadCenterline(path, 12).filter((point, index, points) => (
+    index === 0
+    || Math.hypot(point[0] - points[index - 1][0], point[1] - points[index - 1][1]) > 1e-8
+  ));
+  if (unique.length < 3) return 0;
+  const distances = [0];
+  for (let index = 1; index < unique.length; index += 1) {
+    distances[index] = distances[index - 1] + Math.hypot(
+      unique[index][0] - unique[index - 1][0],
+      unique[index][1] - unique[index - 1][1],
+    );
+  }
+  const headings = unique.slice(0, -1).map((point, index) => headingDegrees(point, unique[index + 1]));
+  const windowMeters = 1.5;
+  let worst = 0;
+  for (let start = 0; start < headings.length; start += 1) {
+    let end = start + 1;
+    while (end < distances.length - 1 && distances[end] - distances[start] < windowMeters) end += 1;
+    if (distances[end] - distances[start] < windowMeters * 0.8) continue;
+    worst = Math.max(
+      worst,
+      wrappedDeltaDegrees(headings[start], headings[Math.min(end, headings.length - 1)]),
+    );
+  }
+  return worst;
 }
 
 function ringBounds(ring: readonly (readonly [number, number])[]) {
@@ -147,84 +187,9 @@ function polygonsIntersect(
   return false;
 }
 
-function headingDegrees(from: ParkAccessPoint, to: ParkAccessPoint) {
-  return Math.atan2(to[0] - from[0], to[1] - from[1]) * (180 / Math.PI);
-}
-
-function wrappedDeltaDegrees(from: number, to: number) {
-  let delta = to - from;
-  while (delta > 180) delta -= 360;
-  while (delta < -180) delta += 360;
-  return Math.abs(delta);
-}
-
-function interpolateXAtY(points: readonly ParkAccessPoint[], y: number) {
-  for (let index = 0; index < points.length - 1; index += 1) {
-    const [x0, y0] = points[index];
-    const [x1, y1] = points[index + 1];
-    const lo = Math.min(y0, y1);
-    const hi = Math.max(y0, y1);
-    if (y + 1e-9 < lo || y - 1e-9 > hi) continue;
-    if (Math.abs(y1 - y0) < 1e-9) return (x0 + x1) / 2;
-    return x0 + ((y - y0) / (y1 - y0)) * (x1 - x0);
-  }
-  return null;
-}
-
-function interpolateYAtX(points: readonly ParkAccessPoint[], x: number) {
-  for (let index = 0; index < points.length - 1; index += 1) {
-    const [x0, y0] = points[index];
-    const [x1, y1] = points[index + 1];
-    const lo = Math.min(x0, x1);
-    const hi = Math.max(x0, x1);
-    if (x + 1e-9 < lo || x - 1e-9 > hi) continue;
-    if (Math.abs(x1 - x0) < 1e-9) return (y0 + y1) / 2;
-    return y0 + ((x - x0) / (x1 - x0)) * (y1 - y0);
-  }
-  return null;
-}
-
-function sampledParkingAccessLocal() {
-  return GENERATED_REAR_ROAD_SEGMENTS
-    .filter((road) => road.roadId === 'ACESSO-PORTAO5-ESTACIONAMENTO')
-    .flatMap((road) => sampleRearRoadCenterline(rearRoadLocalPath(road), 8));
-}
-
-function catmullRomMaxHeadingChangePer10m(path: readonly ParkAccessPoint[]) {
-  const unique = sampleRearRoadCenterline(path, 12).filter((point, index, points) => (
-    index === 0
-    || Math.hypot(point[0] - points[index - 1][0], point[1] - points[index - 1][1]) > 1e-8
-  ));
-  if (unique.length < 3) return 0;
-  const distances = [0];
-  for (let index = 1; index < unique.length; index += 1) {
-    distances[index] = distances[index - 1] + Math.hypot(
-      unique[index][0] - unique[index - 1][0],
-      unique[index][1] - unique[index - 1][1],
-    );
-  }
-  const headings = unique.slice(0, -1).map((point, index) => headingDegrees(point, unique[index + 1]));
-  const windowMeters = 1.5;
-  let worst = 0;
-  for (let start = 0; start < headings.length; start += 1) {
-    let end = start + 1;
-    while (end < distances.length - 1 && distances[end] - distances[start] < windowMeters) end += 1;
-    if (distances[end] - distances[start] < windowMeters * 0.8) continue;
-    worst = Math.max(
-      worst,
-      wrappedDeltaDegrees(headings[start], headings[Math.min(end, headings.length - 1)]),
-    );
-  }
-  return worst;
-}
-
-function degreeOf(nodeId: keyof typeof REAR_ROAD_NODES) {
-  return REAR_PARK_ROAD_NETWORK.filter((road) => road.from === nodeId || road.to === nodeId).length;
-}
-
 describe('anexos 1/2/4 — blueprint e fiação viária', () => {
   it('recria as constantes do blueprint sem inventar cadastro', () => {
-    expect(COMMERCIAL_MAP_ANNEX_CORRECTION_REVISION).toBe('2026.9-portao5-delayed-curve.1');
+    expect(COMMERCIAL_MAP_ANNEX_CORRECTION_REVISION).toBe('2026.9-portao5-satellite-east.1');
     expect(REAR_PARK_ROAD_REVISION).toBe(COMMERCIAL_MAP_ANNEX_CORRECTION_REVISION);
     expect(REAR_SPATIAL_CALIBRATION_REVISION).toBe(COMMERCIAL_MAP_ANNEX_CORRECTION_REVISION);
 
@@ -240,23 +205,23 @@ describe('anexos 1/2/4 — blueprint e fiação viária', () => {
     ]);
 
     expect(PORTAO5_PARKING_ACCESS_CORRECTION.widthSource).toBe(36);
-    expect(PORTAO5_PARKING_ACCESS_CORRECTION.streetToUbiretamaJunction[0]).toEqual([4528, 3150]);
-    expect(PORTAO5_PARKING_ACCESS_CORRECTION.streetToUbiretamaJunction.at(-1)).toEqual([4528, 3248]);
-    expect(PORTAO5_PARKING_ACCESS_CORRECTION.ubiretamaToCurve[0]).toEqual([4528, 3248]);
-    expect(PORTAO5_PARKING_ACCESS_CORRECTION.ubiretamaToCurve.at(-1)).toEqual([4528, 3480]);
-    expect(PORTAO5_PARKING_ACCESS_CORRECTION.curveToEtniasJunction[0]).toEqual([4528, 3480]);
-    expect(PORTAO5_PARKING_ACCESS_CORRECTION.curveToEtniasJunction.at(-1)).toEqual([5260, 3661]);
-    expect(PORTAO5_PARKING_ACCESS_CORRECTION.etniasToGate[0]).toEqual([5260, 3661]);
-    expect(PORTAO5_PARKING_ACCESS_CORRECTION.etniasToGate.at(-1)).toEqual([5940, 3678]);
+    expect(PORTAO5_PARKING_ACCESS_CORRECTION.streetToCurve[0]).toEqual([4528, 3150]);
+    expect(PORTAO5_PARKING_ACCESS_CORRECTION.streetToCurve.at(-1)).toEqual([4856, 3216]);
+    expect(PORTAO5_PARKING_ACCESS_CORRECTION.curveToEtniasJunction[0]).toEqual([4856, 3216]);
+    expect(PORTAO5_PARKING_ACCESS_CORRECTION.curveToEtniasJunction.at(-1)).toEqual([5260, 3236]);
+    expect(PORTAO5_PARKING_ACCESS_CORRECTION.etniasToUbiretamaJunction[0]).toEqual([5260, 3236]);
+    expect(PORTAO5_PARKING_ACCESS_CORRECTION.etniasToUbiretamaJunction.at(-1)).toEqual([5524, 3292]);
+    expect(PORTAO5_PARKING_ACCESS_CORRECTION.gate5Approach[0]).toEqual([5524, 3292]);
+    expect(PORTAO5_PARKING_ACCESS_CORRECTION.gate5Approach.at(-1)).toEqual([5940, 3678]);
 
     expect(ETNIAS_PARKING_CONNECTION_CORRECTION).toMatchObject({
       officialOwnerIdentifier: 'AV-IMIGRANTES',
       widthSource: 36,
       avenueEntry: [5260, 4200],
-      parkingJunction: [5260, 3661],
+      parkingJunction: [5260, 3236],
     });
     expect([...ETNIAS_PARKING_CONNECTION_CORRECTION.sourceAxis]).toEqual([
-      [5260, 4200], [5260, 4140], [5260, 3950], [5262, 3750], [5260, 3661],
+      [5260, 4200], [5260, 4140], [5260, 3950], [5262, 3750], [5262, 3480], [5260, 3236],
     ]);
 
     expect(RUA_BRASILIA_OFFICIAL_RESTORATION).toEqual({
@@ -328,30 +293,31 @@ describe('anexos 1/2/4 — blueprint e fiação viária', () => {
     expect(canvasSource).toContain('Rua Brasília is intentionally retained');
   });
 
-  it('materializa o acesso ao Portão 5 com sul colinear, curva tardia e trevo intocado', () => {
+  it('materializa o acesso ao Portão 5 com curva leve e preserva o trevo da BR-472', () => {
     expect(projectRearAttachment5PointToOfficialSource(3)).toEqual([4528, 3150]);
-    expect(projectRearAttachment5PointToOfficialSource(2)).toEqual([4528, 3480]);
-    expect(projectRearAttachment5PointToOfficialSource(4)).toEqual([4528, 3248]);
+    expect(projectRearAttachment5PointToOfficialSource(2)).toEqual([4856, 3216]);
+    expect(projectRearAttachment5PointToOfficialSource(4)).toEqual([5524, 3292]);
     expect(projectRearAttachment5PointToOfficialSource(6)).toEqual([5940, 3678]);
     expect(PORTAO5_PARKING_ACCESS_JUNCTIONS).toEqual({
       street: [4528, 3150],
-      ubiretama: [4528, 3248],
-      curve: [4528, 3480],
-      etnias: [5260, 3661],
+      curve: [4856, 3216],
+      etnias: [5260, 3236],
+      ubiretama: [5524, 3292],
       gate5: [5940, 3678],
     });
+    expect(REAR_OFFICIAL_ANCHORS.gate5Entity).toEqual([5974, 3678]);
 
-    expect([...REAR_CALIBRATED_AXES.portao5StreetToUbiretama]).toEqual(
-      [...PORTAO5_PARKING_ACCESS_CORRECTION.streetToUbiretamaJunction],
+    expect([...REAR_CALIBRATED_AXES.portao5StreetToCurve]).toEqual(
+      [...PORTAO5_PARKING_ACCESS_CORRECTION.streetToCurve],
     );
-    expect([...REAR_CALIBRATED_AXES.portao5EtniasToGate]).toEqual(
-      [...PORTAO5_PARKING_ACCESS_CORRECTION.etniasToGate],
+    expect([...REAR_CALIBRATED_AXES.gate5InternalApproach]).toEqual(
+      [...PORTAO5_PARKING_ACCESS_CORRECTION.gate5Approach],
     );
 
     const parking = GENERATED_REAR_ROAD_SEGMENTS.filter(
       (road) => road.roadId === 'ACESSO-PORTAO5-ESTACIONAMENTO',
     );
-    expect(parking).toHaveLength(4);
+    expect(parking).toHaveLength(3);
     expect(parking.every((road) => road.officialOwnerIdentifier === 'A5')).toBe(true);
     expect(parking.every((road) => (
       Math.abs(road.width - annexSourceWidthToLocal(36)) < 1e-9
@@ -359,6 +325,7 @@ describe('anexos 1/2/4 — blueprint e fiação viária', () => {
 
     const access = REAR_PARK_ROAD_NETWORK.filter((road) => road.roadId === 'ACESSO-A5-BR472');
     expect(access.map((road) => road.id)).toEqual([
+      'gate5-internal-approach',
       'a5-trevo-trunk',
       'a5-br472-north-ramp',
       'a5-br472-south-ramp',
@@ -386,10 +353,8 @@ describe('anexos 1/2/4 — blueprint e fiação viária', () => {
     const generatedIds = GENERATED_REAR_ROAD_SEGMENTS.map((road) => road.id);
     expect(generatedIds).not.toContain('brasilia-brasil-parking');
     expect(generatedIds).not.toContain('brasilia-parking-gate');
-    expect(generatedIds).not.toContain('gate5-internal-approach');
     expect(portao5ParkingAccessSourceAxis()[0]).toEqual([4528, 3150]);
     expect(portao5ParkingAccessSourceAxis().at(-1)).toEqual([5940, 3678]);
-    expect(portao5ParkingAccessSourceAxis().every(([x]) => x <= 5940 + 1e-9)).toBe(true);
   });
 
   it('cria a ligação das Etnias e restaura o caminho Brasília → A5 pelo cadastro', () => {
@@ -399,6 +364,7 @@ describe('anexos 1/2/4 — blueprint e fiação viária', () => {
       'etnias-west',
       'etnias-parking-avenue',
       'etnias-parking-junction',
+      'ubiretama-portao5-junction',
       'gate-5',
     ]);
     const etnias = GENERATED_REAR_ROAD_SEGMENTS.find((road) => road.id === 'etnias-parking-connection');
@@ -415,55 +381,54 @@ describe('anexos 1/2/4 — blueprint e fiação viária', () => {
     expect(JSON.stringify({ roads: REAR_PARK_ROAD_NETWORK, nodes: {} })).not.toContain('A3');
   });
 
-  it('atrasa a curva ESE, T da Ubiretama em y≈3248 e não inventa Y no portão', () => {
+  it('desfaz o PR #110 e alinha Brasília / Ubiretama / Portão 5 ao satélite', () => {
     const axis = portao5ParkingAccessSourceAxis();
-    const firstStraight = axis.slice(0, 5);
-    expect(firstStraight).toEqual([
-      [4528, 3150], [4528, 3248], [4528, 3360], [4528, 3438], [4528, 3480],
-    ]);
-    expect(firstStraight.every(([x], index, points) => (
-      x === 4528 && (index === 0 || points[index][1] > points[index - 1][1])
-    ))).toBe(true);
-    expect(axis.filter(([x, y]) => x === 4528 && y <= 3480).length).toBeGreaterThanOrEqual(4);
+    expect(axis[0]).toEqual([4528, 3150]);
+    expect(axis.at(-1)).toEqual([5940, 3678]);
+    expect(axis.filter(([x]) => x === 4528)).toHaveLength(1);
+    expect(axis.slice(1).every(([x], index) => x > axis[index][0])).toBe(true);
 
-    expect(interpolateXAtY(axis, 3438)).toBeCloseTo(4528, 8);
-    const sampled = sampledParkingAccessLocal().filter((point, index, points) => (
-      index === 0
-      || Math.hypot(point[0] - points[index - 1][0], point[1] - points[index - 1][1]) > 1e-8
-    ));
-    const targetAt3438 = officialPdfPointToLocal([4528, 3438]);
-    const localPerPdf = 120 / 5500;
-    sampled
-      .filter(([, z]) => Math.abs(z - targetAt3438[1]) <= 0.04)
-      .forEach(([x]) => {
-        expect(Math.abs(x - targetAt3438[0])).toBeLessThan(12 * localPerPdf);
-      });
+    const rejected = [
+      [4528, 3248], [4528, 3360], [4528, 3438], [4528, 3480],
+      [5260, 3661], [5129, 3656],
+    ] as const;
+    const rendered = GENERATED_REAR_ROAD_SEGMENTS.flatMap((road) => [...road.sourceControlPoints]);
+    rejected.forEach((point) => {
+      expect(
+        rendered.some(([x, y]) => x === point[0] && y === point[1]),
+        `regressão ${point.join(',')}`,
+      ).toBe(false);
+    });
+    expect(axis.some(([x, y]) => y >= 3640 && y <= 3680 && x < 5600)).toBe(false);
 
-    expect(Math.abs(headingDegrees([4528, 3150], [4528, 3480]))).toBeLessThan(8);
-    const curvePath = rearRoadLocalPath(
-      GENERATED_REAR_ROAD_SEGMENTS.find((road) => road.id === 'portao5-curve-etnias')!,
-    );
-    expect(Math.abs(headingDegrees(curvePath[curvePath.length - 2], curvePath[curvePath.length - 1])))
-      .toBeGreaterThan(70);
-    expect(catmullRomMaxHeadingChangePer10m(curvePath)).toBeLessThan(70);
-    GENERATED_REAR_ROAD_SEGMENTS
-      .filter((road) => road.id === 'portao5-street-ubiretama' || road.id === 'portao5-ubiretama-curve')
-      .forEach((road) => {
-        expect(catmullRomMaxHeadingChangePer10m(rearRoadLocalPath(road))).toBeLessThan(8);
-      });
+    const curve = GENERATED_REAR_ROAD_SEGMENTS.find((road) => road.id === 'portao5-street-curve')!;
+    expect(Math.abs(headingDegrees(axis[0], axis[1]))).toBeGreaterThan(50);
+    expect(catmullRomMaxHeadingChangePer10m(rearRoadLocalPath(curve))).toBeLessThan(55);
+
+    const arenaEast = 5385;
+    const arenaSouth = 3130;
+    expect(PORTAO5_PARKING_ACCESS_JUNCTIONS.ubiretama[0]).toBeGreaterThan(arenaEast);
+    expect(PORTAO5_PARKING_ACCESS_JUNCTIONS.ubiretama[1]).toBeGreaterThan(arenaSouth);
+    expect(PORTAO5_PARKING_ACCESS_JUNCTIONS.ubiretama[1]).toBeLessThan(3360);
+    expect(axis.some(([x]) => x > arenaEast)).toBe(true);
 
     const ubiretama = REAR_CALIBRATED_AXES.ubiretamaNorthToJunction;
-    expect(ubiretama.at(-1)).toEqual([4528, 3248]);
-    expect(ubiretama.every(([x]) => x >= 4490)).toBe(true);
-    expect(interpolateYAtX(ubiretama, 5142)).toBeGreaterThanOrEqual(3220);
-    expect(interpolateYAtX(ubiretama, 5142)).toBeLessThanOrEqual(3280);
-    expect(degreeOf('ubiretama-portao5-junction')).toBe(3);
-    expect(REAR_ROAD_NODES['ubiretama-portao5-junction'].sourcePoint).toEqual([4528, 3248]);
-    expect(rearContextualLabelAnchorForOfficialOwner('RUA-UBIRETAMA')).toEqual(
-      officialPdfPointToLocal([5142, 3248]),
-    );
+    expect(ubiretama.at(-1)).toEqual([5524, 3292]);
+    expect(ubiretama.every(([x]) => x > arenaEast)).toBe(true);
+    expect(REAR_ROAD_NODES['ubiretama-portao5-junction'].sourcePoint).toEqual([5524, 3292]);
+    expect(ETNIAS_PARKING_CONNECTION_CORRECTION.parkingJunction).toEqual([5260, 3236]);
+    expect(ETNIAS_PARKING_CONNECTION_CORRECTION.parkingJunction).not.toEqual([5260, 3661]);
+
+    const brasilia = officialEntity('RUA-BRASILIA').geometry.coordinates[0] as ParkAccessPoint[];
+    const ruaBrasil = officialEntity('RUA-BRASIL').geometry.coordinates[0] as ParkAccessPoint[];
+    expect(polygonsIntersect(brasilia, ruaBrasil)).toBe(true);
+    expect(RUA_BRASILIA_OFFICIAL_RESTORATION.sourceBounds).toEqual([3940, 2440, 3988, 4210]);
+    expect(REPLACED_OFFICIAL_ROAD_IDENTIFIERS).not.toContain('RUA-BRASILIA');
 
     const arena = officialEntity('F').geometry.coordinates[0] as ParkAccessPoint[];
+    const arenaBounds = ringBounds(arena);
+    expect(arenaBounds.minX).toBeCloseTo(officialPdfPointToLocal([4900, 2690])[0], 8);
+    expect(arenaBounds.maxX).toBeCloseTo(officialPdfPointToLocal([5385, 3130])[0], 8);
     const footprints = buildRearRoadCorridorFootprints(GENERATED_REAR_ROAD_SEGMENTS, {
       includeShoulders: true,
     });
@@ -523,7 +488,7 @@ describe('anexos 1/2/4 — blueprint e fiação viária', () => {
       process.cwd(), 'src/features/commercial-map/data/parkEnvironment.ts',
     ), 'utf8');
     expect(eventCenterSource).not.toContain('annexSpatialCorrections');
-    expect(parkEnvironmentSource).not.toContain("from './annexSpatialCorrections'");
+    expect(parkEnvironmentSource).not.toContain('EXPORURAL_SMOOTH_CONCRETE_CORRECTION');
     expect(parkEnvironmentSource).not.toContain('EVENT_CENTER_QE12_ALIGNMENT');
   });
 

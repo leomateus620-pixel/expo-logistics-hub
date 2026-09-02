@@ -12,7 +12,7 @@ export type AnnexSourcePoint = readonly [number, number];
 export type AnnexSourceBounds = readonly [number, number, number, number];
 export type AnnexSourcePolygon = readonly AnnexSourcePoint[];
 
-export const COMMERCIAL_MAP_ANNEX_CORRECTION_REVISION = '2026.9-portao5-delayed-curve.1';
+export const COMMERCIAL_MAP_ANNEX_CORRECTION_REVISION = '2026.9-portao5-satellite-east.1';
 
 /** Escala uniforme do recorte oficial 5.500 × 120, só para larguras físicas. */
 export const ANNEX_SOURCE_POINTS_PER_LOCAL_UNIT = 5500 / 120;
@@ -47,59 +47,60 @@ export const CHURRASCARIA_ACCESS_CORRECTION = Object.freeze({
 });
 
 /**
- * Anexo 2 / satélite — acesso interno ao Portão 5 / A5.
+ * Anexo 2 / satélite — acesso ao Portão 5 / A5.
  *
- * O rascunho 3D herdado virava ~90° a ~13 m da Arena (y≈3460). O satélite
- * pede ~48 m de sul em x=4528 e só então uma curva leve ESE até o lock
- * [5940, 3678]. A Ubiretama T-cruza esse sul em y≈3248; o trevo da BR-472
- * começa no lock e não é reconstruído aqui.
+ * Origem travada em [4528, 3150] (continuação da Rua Brasil, à direita do C1).
+ * Uma curva leve e curta vira leste ao sul da Arena — não desce colinear em
+ * x=4528 nem varre o lote em y≈3660. Depois da face leste da Arena (x>5385)
+ * o acesso segue ao lock [5940, 3678]. O trevo da BR-472 começa no lock e
+ * não é reconstruído aqui.
  */
 export const PORTAO5_PARKING_ACCESS_CORRECTION = Object.freeze({
   widthSource: 36,
-  streetToUbiretamaJunction: Object.freeze([
+  streetToCurve: Object.freeze([
     [4528, 3150],
-    [4528, 3248],
-  ] as const satisfies readonly AnnexSourcePoint[]),
-  ubiretamaToCurve: Object.freeze([
-    [4528, 3248],
-    [4528, 3360],
-    [4528, 3438],
-    [4528, 3480],
+    [4560, 3158],
+    [4604, 3170],
+    [4660, 3184],
+    [4730, 3198],
+    [4808, 3210],
+    [4856, 3216],
   ] as const satisfies readonly AnnexSourcePoint[]),
   curveToEtniasJunction: Object.freeze([
-    [4528, 3480],
-    [4528, 3505],
-    [4533, 3531],
-    [4552, 3556],
-    [4597, 3581],
-    [4677, 3605],
-    [4796, 3625],
-    [4949, 3643],
-    [5129, 3656],
-    [5260, 3661],
+    [4856, 3216],
+    [4980, 3226],
+    [5108, 3232],
+    [5260, 3236],
   ] as const satisfies readonly AnnexSourcePoint[]),
-  etniasToGate: Object.freeze([
-    [5260, 3661],
-    [5325, 3664],
-    [5528, 3670],
-    [5733, 3674],
+  etniasToUbiretamaJunction: Object.freeze([
+    [5260, 3236],
+    [5348, 3246],
+    [5436, 3266],
+    [5524, 3292],
+  ] as const satisfies readonly AnnexSourcePoint[]),
+  gate5Approach: Object.freeze([
+    [5524, 3292],
+    [5616, 3384],
+    [5712, 3480],
+    [5808, 3572],
+    [5880, 3636],
     [5940, 3678],
   ] as const satisfies readonly AnnexSourcePoint[]),
 });
 
 export const PORTAO5_PARKING_ACCESS_JUNCTIONS = Object.freeze({
-  street: PORTAO5_PARKING_ACCESS_CORRECTION.streetToUbiretamaJunction[0],
-  ubiretama: PORTAO5_PARKING_ACCESS_CORRECTION.streetToUbiretamaJunction[
-    PORTAO5_PARKING_ACCESS_CORRECTION.streetToUbiretamaJunction.length - 1
-  ],
-  curve: PORTAO5_PARKING_ACCESS_CORRECTION.ubiretamaToCurve[
-    PORTAO5_PARKING_ACCESS_CORRECTION.ubiretamaToCurve.length - 1
+  street: PORTAO5_PARKING_ACCESS_CORRECTION.streetToCurve[0],
+  curve: PORTAO5_PARKING_ACCESS_CORRECTION.streetToCurve[
+    PORTAO5_PARKING_ACCESS_CORRECTION.streetToCurve.length - 1
   ],
   etnias: PORTAO5_PARKING_ACCESS_CORRECTION.curveToEtniasJunction[
     PORTAO5_PARKING_ACCESS_CORRECTION.curveToEtniasJunction.length - 1
   ],
-  gate5: PORTAO5_PARKING_ACCESS_CORRECTION.etniasToGate[
-    PORTAO5_PARKING_ACCESS_CORRECTION.etniasToGate.length - 1
+  ubiretama: PORTAO5_PARKING_ACCESS_CORRECTION.etniasToUbiretamaJunction[
+    PORTAO5_PARKING_ACCESS_CORRECTION.etniasToUbiretamaJunction.length - 1
+  ],
+  gate5: PORTAO5_PARKING_ACCESS_CORRECTION.gate5Approach[
+    PORTAO5_PARKING_ACCESS_CORRECTION.gate5Approach.length - 1
   ],
 });
 
@@ -107,33 +108,34 @@ export const PORTAO5_PARKING_ACCESS_JUNCTIONS = Object.freeze({
 export function portao5ParkingAccessSourceAxis(): AnnexSourcePoint[] {
   const correction = PORTAO5_PARKING_ACCESS_CORRECTION;
   return [
-    ...correction.streetToUbiretamaJunction,
-    ...correction.ubiretamaToCurve.slice(1),
+    ...correction.streetToCurve,
     ...correction.curveToEtniasJunction.slice(1),
-    ...correction.etniasToGate.slice(1),
+    ...correction.etniasToUbiretamaJunction.slice(1),
+    ...correction.gate5Approach.slice(1),
   ];
 }
 
 /**
  * Anexo 2 — “Criar essa estrada”: ligação N–S da Av. dos Imigrantes / Rua das
- * Etnias até a via do estacionamento, no T [5260, 3661] da curva ESE.
+ * Etnias até o T no acesso ao Portão 5, ao sul da Arena em [5260, 3236].
  */
 export const ETNIAS_PARKING_CONNECTION_CORRECTION = Object.freeze({
   officialOwnerIdentifier: 'AV-IMIGRANTES' as const,
   widthSource: 36,
   avenueEntry: [5260, 4200] as const satisfies AnnexSourcePoint,
-  parkingJunction: [5260, 3661] as const satisfies AnnexSourcePoint,
+  parkingJunction: [5260, 3236] as const satisfies AnnexSourcePoint,
   /**
-   * Extremidades travadas no satélite. A Catmull-Rom executável em
-   * `REAR_CALIBRATED_AXES.etniasParkingConnection` mantém o desvio do poste
-   * CAD 361 e termina no T da curva; o rabo antigo até [5290, 3500] saiu.
+   * Extremidades no T satélite ao sul da Arena. A Catmull-Rom executável em
+   * `REAR_CALIBRATED_AXES.etniasParkingConnection` mantém o desvio dos postes
+   * CAD 361 e 331; o T rejeitado [5260, 3661] não volta.
    */
   sourceAxis: Object.freeze([
     [5260, 4200],
     [5260, 4140],
     [5260, 3950],
     [5262, 3750],
-    [5260, 3661],
+    [5262, 3480],
+    [5260, 3236],
   ] as const satisfies readonly AnnexSourcePoint[]),
 });
 
