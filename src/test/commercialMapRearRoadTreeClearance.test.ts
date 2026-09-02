@@ -50,7 +50,7 @@ describe('rear-road rendered vegetation clearance', () => {
     expect(JSON.stringify(COMMERCIAL_MAP_TREES)).toBe(inventorySnapshot);
   });
 
-  it('filters only the three reconciled parking canopies inside the corrected corridor', () => {
+  it('keeps reconciled parking canopies outside the annex-corrected Portão 5 corridor', () => {
     const parkingTrees = reconcileRearParkingTrees(COMMERCIAL_MAP_TREES, OFFICIAL_REFERENCE_ENTITIES);
     const collidingIds = parkingTrees
       .filter((tree) => treeIntersectsGeneratedRearRoadCorridor(tree))
@@ -59,12 +59,8 @@ describe('rear-road rendered vegetation clearance', () => {
 
     expect(parkingTrees).toHaveLength(26);
     expect(REAR_PARKING_TREE_CANDIDATES).toHaveLength(32);
-    expect(collidingIds).toEqual([
-      'tree-rear-parking-west-01',
-      'tree-rear-parking-west-02',
-      'tree-rear-parking-west-03',
-    ]);
-    expect(presented).toHaveLength(parkingTrees.length - collidingIds.length);
+    expect(collidingIds).toEqual([]);
+    expect(presented).toHaveLength(parkingTrees.length);
     expect(presented.every((tree) => !treeIntersectsGeneratedRearRoadCorridor(tree))).toBe(true);
   });
 
@@ -87,7 +83,7 @@ describe('rear-road rendered vegetation clearance', () => {
   it('retains all ambient poles outside every pavement and shoulder, including adjacent junction arms', () => {
     const footprints = buildRearRoadCorridorFootprints(undefined, { includeShoulders: true });
     const poles = buildRearPoleInstances();
-    expect(poles).toHaveLength(8);
+    expect(poles).toHaveLength(5);
     expect(buildRearPoleInstances()).toEqual(poles);
     expect(poles.flatMap((pole, index) => footprints.flatMap((footprint) => (
       distanceToPath([pole.x, pole.z], footprint.centerline) <= footprint.halfWidth + 0.08
@@ -103,7 +99,7 @@ describe('rear-road rendered vegetation clearance', () => {
       placement.renderPosition.some((coordinate, axis) => coordinate !== baseline[index].renderPosition[axis])
     )).map(({ node }) => node.sourceMarkerId);
     expect(changed).toEqual([
-      'pole-ref-199', 'pole-ref-222', 'pole-ref-225', 'pole-ref-234',
+      'pole-ref-145', 'pole-ref-164', 'pole-ref-225',
       'pole-ref-321', 'pole-ref-322', 'pole-ref-323', 'pole-ref-324',
       'pole-ref-330', 'pole-ref-336', 'pole-ref-341',
     ]);

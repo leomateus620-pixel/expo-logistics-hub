@@ -1,5 +1,6 @@
 import { MAP_REFERENCE_HEIGHT, MAP_REFERENCE_WIDTH } from '../constants';
 import type { Coordinate } from '../types';
+import { CHURRASCARIA_ACCESS_CORRECTION } from './annexSpatialCorrections';
 import { EXPORURAL_MAP_UNITS_PER_METER } from './exporuralReference2026';
 import {
   OFFICIAL_2026_SOURCE_MANIFEST,
@@ -400,6 +401,7 @@ export const EXPORURAL_GATE_ACCESS_ROAD_SURFACE_IDS = [
   'gate-6-gate-7-asphalt',
   'gate-7-johan-muller-link',
   'gate-7-gustavo-bessel-link',
+  'acesso-churrascaria',
 ] as const;
 
 const GATE_6_GATE_7_SOURCE = [
@@ -609,6 +611,7 @@ function makeRoadSurface(
     'gate-3-arrival': 0.058,
     'gate-7-johan-muller-link': 0.045,
     'gate-7-gustavo-bessel-link': 0.046,
+    'acesso-churrascaria': 0.048,
   };
   return {
     id,
@@ -774,6 +777,25 @@ const ROAD_SURFACES = [
     ),
     widthReviewRangeMeters: [5.5, 6.5] as const,
     supportAware: true,
+  },
+  {
+    ...makeRoadSurface(
+      'acesso-churrascaria',
+      'ASPHALT_ACCESS_ROAD',
+      CHURRASCARIA_ACCESS_CORRECTION.sourceAxis,
+      CHURRASCARIA_ACCESS_CORRECTION.widthSource / PARK_ACCESS_SOURCE_POINTS_PER_METER,
+      [
+        CHURRASCARIA_ACCESS_CORRECTION.connections.north,
+        CHURRASCARIA_ACCESS_CORRECTION.connections.east,
+        CHURRASCARIA_ACCESS_CORRECTION.officialOwnerIdentifier,
+      ],
+      {
+        sourceIds: ['official-2026-park-map'],
+        confidence: 'ANNEX_REGISTERED_TRACE',
+        notes: 'L asfaltado à frente da Churrascaria C4 segue o eixo do anexo 1: nasce no centro da Rua Gustavo Bessel, desce a oeste do restaurante e encontra a Rua 15 de Novembro / Emanuel Brachmann. Não pavimenta o concreto liso da Expo Rural. Superfície simples (sem tessellation contra o suporte oficial) para ficar acima da fita cadastral sem estourar o orçamento GIS.',
+      },
+    ),
+    supportAware: false,
   },
   {
     ...makeRoadSurface(

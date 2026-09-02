@@ -414,11 +414,10 @@ const roadInputs: Array<[string, string, PdfPolygon, MapClassification?]> = [
   ['RUA-BRASIL', 'Rua Brasil', rectPdf([1640, 3106, 4510, 3181])],
   ['RUA-URUGUAI', 'Rua Uruguai', rectPdf([2820, 3438, 3940, 3494])],
   ['RUA-ARGENTINA', 'Rua Argentina', rectPdf([2820, 3716, 3940, 3780])],
-  // ANALYST 2026.9-arena-br472-analyst.1 — do not move this cadastral strip.
-  // It is already the correct N–S corridor WEST of Arena F. The red-X road in
-  // the 3D view is the generated overlay in rearSpatialCalibration.ts that
-  // leaves this rectangle at y=3155. Spec: docs/arena-roads/analysis.md
-  // NEVER extrude the green/red sketch from 02-map-annotated.jpg.
+  // NEVER hide this cadastral strip from RoadInfrastructure. It is the only
+  // official-surface of Rua Brasília (Portão 3 → Mirante → Av. dos Imigrantes).
+  // Do not add it to REPLACED_OFFICIAL_ROAD_IDENTIFIERS. Do not extrude a
+  // parallel generated ribbon. Spec: annexSpatialCorrections.ts.
   ['RUA-BRASILIA', 'Rua Brasília', rectPdf([3940, 2440, 3988, 4210])],
   ['RUA-MONTEVIDEU', 'Rua Montevidéu', rectPdf([3441, 3106, 3482, 3715])],
   // Corredores já reservados entre as quadras que faltavam na malha viária.

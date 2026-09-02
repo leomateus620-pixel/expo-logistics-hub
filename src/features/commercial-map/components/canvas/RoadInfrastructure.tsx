@@ -10,10 +10,10 @@ import {
   isRoadInfrastructureEntity,
 } from '../../utils/roadInfrastructure';
 
-// ANALYST 2026.9-arena-br472-analyst.1 — this component only extrudes official
-// ROAD polygons. Keep RUA-BRASILIA rectPdf([3940, 2440, 3988, 4210]). Do not add
-// meshes traced from 02-map-annotated.jpg. Overlay rewrite: ANALYSIS.md §3.
-// Spec: arena-roads/ANALYSIS.md and docs/arena-roads/analysis.md §0 (sketch rule).
+// ANALYST 2026.9-annex-road-precision.1 — this component only extrudes official
+// ROAD polygons. Keep RUA-BRASILIA rectPdf([3940, 2440, 3988, 4210]) in the
+// incoming entity list (never hide it via REPLACED_OFFICIAL_ROAD_IDENTIFIERS).
+// Do not add meshes traced from green/red annex overlays.
 
 interface RoadInfrastructureProps {
   entities: MapEntity[];
