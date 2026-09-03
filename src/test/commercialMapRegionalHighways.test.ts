@@ -20,6 +20,8 @@ import {
   distanceToPolyline,
   expandFramingBoundsWithRegionalHighways,
   pointInInterchangeEnvelope,
+  regionalHighwayDualEnvelopeWidth,
+  regionalHighwayEnvelopeWidth,
 } from '@/features/commercial-map/data/regional-highways';
 import { officialPdfPointToLocal } from '@/features/commercial-map/data/officialReference2026';
 import {
@@ -62,7 +64,7 @@ function parkRectangleContains(x: number, z: number) {
 
 describe('rodovias regionais — contrato compartilhado e BR-472 exterior', () => {
   it('publica o idioma de malha/material para os agentes #2–#4 sem criar entidade nova', () => {
-    expect(REGIONAL_HIGHWAY_REVISION).toBe('2026.10-regional-highways.2');
+    expect(REGIONAL_HIGHWAY_REVISION).toBe('2026.10-regional-highways.3');
     expect(REGIONAL_HIGHWAY_PALETTE).toMatchObject({
       carriageway: '#2f9e44',
       shoulder: '#d4b896',
@@ -87,15 +89,27 @@ describe('rodovias regionais — contrato compartilhado e BR-472 exterior', () =
       [INTERCHANGE_ENVELOPES.seCloverleaf.center[0], INTERCHANGE_ENVELOPES.seCloverleaf.center[1]],
       'seCloverleaf',
     )).toBe(true);
+
+    const brasilia = REAR_PARK_ROAD_NETWORK.find((road) => road.id === 'brasilia-official-axis')!;
+    const ubiretama = REAR_PARK_ROAD_NETWORK.find((road) => road.id === 'portao5-etnias-ubiretama')!;
+    const avenueWidth = Math.max(rearRoadLocalWidth(brasilia), rearRoadLocalWidth(ubiretama));
+    const envelope = regionalHighwayEnvelopeWidth();
+    expect(envelope).toBeGreaterThan(avenueWidth);
+    expect(envelope / avenueWidth).toBeLessThan(2.5);
+    expect(REGIONAL_HIGHWAY_PROFILE.carriagewayWidth).toBeLessThan(2);
+    expect(Math.abs(envelope - regionalHighwayDualEnvelopeWidth())).toBeLessThan(0.05);
   });
 
-  it('coloca a BR-472 a ~0.5 larguras de hub a leste, com diagonal suave e braço sul E–W', () => {
+  it('coloca a BR-472 a ~0.26 larguras de hub a leste, com diagonal suave e braço sul E–W', () => {
     const mid = br472MainlineXAt(0);
+    const gapInHubWidths = (mid - PARK_LOCAL_BOUNDS.maxX) / MAP_REFERENCE_WIDTH;
     expect(mid).toBeCloseTo(
       PARK_LOCAL_BOUNDS.maxX + MAP_REFERENCE_WIDTH * BR472_EAST_GAP_IN_HUB_WIDTHS,
       12,
     );
-    expect((mid - PARK_LOCAL_BOUNDS.maxX) / MAP_REFERENCE_WIDTH).toBeCloseTo(0.5, 12);
+    expect(gapInHubWidths).toBeCloseTo(BR472_EAST_GAP_IN_HUB_WIDTHS, 12);
+    expect(gapInHubWidths).toBeGreaterThanOrEqual(0.25);
+    expect(gapInHubWidths).toBeLessThanOrEqual(0.4);
     expect(br472MainlineXAt(PARK_LOCAL_BOUNDS.maxZ)).toBeLessThan(br472MainlineXAt(PARK_LOCAL_BOUNDS.minZ));
 
     const a5Latitude = officialPdfPointToLocal(REAR_OFFICIAL_ANCHORS.br472Junction)[1];
@@ -136,7 +150,8 @@ describe('rodovias regionais — contrato compartilhado e BR-472 exterior', () =
       z >= PARK_LOCAL_BOUNDS.minZ && z <= PARK_LOCAL_BOUNDS.maxZ
     ));
     parkRun.forEach(([x]) => {
-      expect(x).toBeGreaterThan(PARK_LOCAL_BOUNDS.maxX + MAP_REFERENCE_WIDTH * 0.4);
+      expect(x).toBeGreaterThan(PARK_LOCAL_BOUNDS.maxX + MAP_REFERENCE_WIDTH * 0.2);
+      expect(x).toBeLessThan(PARK_LOCAL_BOUNDS.maxX + MAP_REFERENCE_WIDTH * 0.4);
     });
   });
 

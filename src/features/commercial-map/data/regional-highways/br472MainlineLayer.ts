@@ -25,9 +25,9 @@ import {
 /**
  * Exterior BR-472 — Integrator / Agent #1.
  *
- * N–S east of the hub at ~0.5 park widths, slight south-west diagonal, then
- * E–W south of the park. A pair of ramps aims at the inherited A5 trevo
- * without moving a single interior vertex.
+ * N–S east of the hub at ~0.26 park widths (Anexo 2 grass strip), slight
+ * south-west diagonal, then E–W south of the park. A pair of ramps aims at
+ * the inherited A5 trevo without moving a single interior vertex.
  */
 
 function xz(x: number, z: number): LocalPoint {
@@ -97,10 +97,11 @@ function a5HookStem(): readonly LocalPoint[] {
     REGIONAL_HIGHWAY_PROFILE.interiorClearanceX + REGIONAL_HIGHWAY_PROFILE.connectorWidth / 2,
     A5_JUNCTION[0] + 2.4,
   );
-  const midX = (startX + br472MainlineXAt(A5_JUNCTION[1])) / 2;
+  const span = br472MainlineXAt(A5_JUNCTION[1]) - startX;
+  const midX = startX + span * 0.48;
   return Object.freeze([
     xz(startX, A5_JUNCTION[1]),
-    xz(startX + (midX - startX) * 0.42, A5_JUNCTION[1] - 0.15),
+    xz(startX + span * 0.2, A5_JUNCTION[1] - 0.15),
     xz(midX, A5_JUNCTION[1] - 0.35),
   ] satisfies LocalPoint[]);
 }
@@ -108,10 +109,13 @@ function a5HookStem(): readonly LocalPoint[] {
 function a5NorthMerge(): readonly LocalPoint[] {
   const stem = a5HookStem();
   const mergeZ = (A5_NORTH_RAMP[1] + PARK_LOCAL_BOUNDS.minZ) / 2;
+  const stemEnd = stem[stem.length - 1];
+  const targetX = br472MainlineXAt(mergeZ) - 0.2;
+  const span = targetX - stemEnd[0];
   return Object.freeze([
-    stem[stem.length - 1],
-    xz(stem[stem.length - 1][0] + 14, A5_JUNCTION[1] - 8),
-    xz(br472MainlineXAt(mergeZ) - 0.2, mergeZ),
+    stemEnd,
+    xz(stemEnd[0] + span * 0.52, A5_JUNCTION[1] - 8),
+    xz(targetX, mergeZ),
     point(mergeZ - 6),
   ] satisfies LocalPoint[]);
 }
@@ -119,10 +123,13 @@ function a5NorthMerge(): readonly LocalPoint[] {
 function a5SouthMerge(): readonly LocalPoint[] {
   const stem = a5HookStem();
   const mergeZ = (A5_SOUTH_RAMP[1] + PARK_LOCAL_BOUNDS.maxZ) / 2;
+  const stemEnd = stem[stem.length - 1];
+  const targetX = br472MainlineXAt(mergeZ) - 0.2;
+  const span = targetX - stemEnd[0];
   return Object.freeze([
-    stem[stem.length - 1],
-    xz(stem[stem.length - 1][0] + 13, A5_JUNCTION[1] + 9),
-    xz(br472MainlineXAt(mergeZ) - 0.2, mergeZ),
+    stemEnd,
+    xz(stemEnd[0] + span * 0.52, A5_JUNCTION[1] + 9),
+    xz(targetX, mergeZ),
     point(mergeZ + 6),
   ] satisfies LocalPoint[]);
 }
