@@ -55,5 +55,8 @@ export {
   br344LocalLength,
 } from './br344Geometry';
 
-export { Br344Mainline } from './Br344Mainline';
-export type { Br344MainlineProps } from './Br344Mainline';
+// Keep the render component filename distinct from `br344Mainline.ts`.
+// Case-insensitive filesystems otherwise resolve both modules to the data file
+// and crash before the commercial map can mount.
+export { Br344Mainline } from './Br344MainlineView';
+export type { Br344MainlineProps } from './Br344MainlineView';
