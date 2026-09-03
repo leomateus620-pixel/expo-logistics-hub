@@ -14,6 +14,7 @@ import {
   type OpenGroundSurfaceProfile,
   type OpenGroundTextureBundle,
 } from './openGroundTextures';
+import { bindParkSurfaceMaterial } from './parkSurfaceMaterial';
 
 // ANALYST 2026.9-annex-road-precision.1 — this component only extrudes official
 // ROAD polygons. Keep RUA-BRASILIA rectPdf([3940, 2440, 3988, 4210]) in the
@@ -56,8 +57,8 @@ const ROAD_SURFACE_PROFILES = Object.freeze({
   }),
 } satisfies Readonly<Record<'asphalt' | 'pedestrian', OpenGroundSurfaceProfile>>);
 
-const ASPHALT_NORMAL_SCALE = new THREE.Vector2(0.22, 0.22);
-const PEDESTRIAN_NORMAL_SCALE = new THREE.Vector2(0.16, 0.16);
+const ASPHALT_NORMAL_SCALE = new THREE.Vector2(0.32, 0.32);
+const PEDESTRIAN_NORMAL_SCALE = new THREE.Vector2(0.22, 0.22);
 
 const RoadLayerNetwork = memo(function RoadLayerNetwork({
   entities,
@@ -131,6 +132,7 @@ const RoadLayerNetwork = memo(function RoadLayerNetwork({
             transparent={transparent}
             opacity={contextOpacity}
             depthWrite={contextOpacity > 0.42}
+            ref={bindParkSurfaceMaterial('asphalt', reducedGraphics)}
           />
         </mesh>
       )}
@@ -151,6 +153,7 @@ const RoadLayerNetwork = memo(function RoadLayerNetwork({
             polygonOffset
             polygonOffsetFactor={-1}
             polygonOffsetUnits={-1}
+            ref={bindParkSurfaceMaterial('asphalt', reducedGraphics)}
           />
         </mesh>
       )}
@@ -168,6 +171,7 @@ const RoadLayerNetwork = memo(function RoadLayerNetwork({
             transparent={transparent}
             opacity={contextOpacity}
             depthWrite={contextOpacity > 0.42}
+            ref={bindParkSurfaceMaterial('concrete', reducedGraphics)}
           />
         </mesh>
       )}
@@ -194,6 +198,7 @@ const RoadLayerNetwork = memo(function RoadLayerNetwork({
             transparent={transparent}
             opacity={Math.max(contextOpacity, filtersActive ? 0.78 : contextOpacity)}
             depthWrite={contextOpacity > 0.32}
+            ref={bindParkSurfaceMaterial('concrete', reducedGraphics)}
           />
         </mesh>
       )}
@@ -227,6 +232,7 @@ const RoadLayerNetwork = memo(function RoadLayerNetwork({
               roughness={ROAD_SURFACE_PROFILE.asphaltRoughness}
               metalness={0}
               depthWrite
+              ref={bindParkSurfaceMaterial('asphalt', reducedGraphics)}
             />
           </mesh>
           {selectedEdges && (

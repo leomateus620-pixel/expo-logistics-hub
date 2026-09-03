@@ -5,9 +5,9 @@ export type ParkingSurfaceKind = 'gravel' | 'soil' | 'grass';
 
 /** Satellite palette, within the existing open-ground family; no external assets. */
 export const PARKING_SURFACE_PROFILES = {
-  gravel: { color: '#b2ada0', roughness: 0.96, normalScale: 0.20, tileMeters: 6, grain: 0.15 },
-  soil: { color: '#af957c', roughness: 0.97, normalScale: 0.10, tileMeters: 6, grain: 0.075 },
-  grass: { color: '#89916a', roughness: 0.98, normalScale: 0.16, tileMeters: 6, grain: 0.13 },
+  gravel: { color: '#b2ada0', roughness: 0.96, normalScale: 0.26, tileMeters: 6, grain: 0.2 },
+  soil: { color: '#af957c', roughness: 0.97, normalScale: 0.14, tileMeters: 6, grain: 0.1 },
+  grass: { color: '#89916a', roughness: 0.98, normalScale: 0.2, tileMeters: 6, grain: 0.16 },
 } as const;
 
 export const PARKING_MATERIAL_BUDGET = {

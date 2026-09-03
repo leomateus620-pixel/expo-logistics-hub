@@ -17,6 +17,7 @@ import {
   type OpenGroundTextureBundle,
 } from './openGroundTextures';
 import { applyParkGroundDetail } from './terrainMaterial';
+import { applyParkSurfaceDetail } from './parkSurfaceMaterial';
 
 const NO_RAYCAST = () => undefined;
 
@@ -42,6 +43,7 @@ const SITE_MATERIAL_PROFILES: Readonly<Record<CommercialSiteEnvironmentMaterialI
   'grass-dry-mix': Object.freeze({ surface: 'parkingGrassDryMix', tileWorldSize: 7.5, baseColor: '#718458', roughness: 1 }),
 });
 const SITE_NORMAL_SCALE = new THREE.Vector2(0.18, 0.18);
+const SITE_CONCRETE_NORMAL_SCALE = new THREE.Vector2(0.28, 0.28);
 
 function variedColor(materialId: CommercialSiteEnvironmentMaterialId, variation: number) {
   const definition = COMMERCIAL_SITE_ENVIRONMENT_MATERIALS[materialId];
@@ -121,7 +123,9 @@ function createMaterial(
     vertexColors: true,
     map: textures?.map ?? null,
     normalMap: textures?.normalMap ?? null,
-    normalScale: textures ? SITE_NORMAL_SCALE : undefined,
+    normalScale: textures
+      ? (materialId === 'concrete-apron' ? SITE_CONCRETE_NORMAL_SCALE : SITE_NORMAL_SCALE)
+      : undefined,
     roughnessMap: textures?.roughnessMap ?? null,
     roughness: definition.roughness,
     metalness: 0,
@@ -134,6 +138,7 @@ function createMaterial(
   });
   material.userData.presentationOnly = true;
   if (PARK_DETAIL_MATERIALS.has(materialId)) applyParkGroundDetail(material, reducedGraphics);
+  if (materialId === 'concrete-apron') applyParkSurfaceDetail(material, 'concrete', reducedGraphics);
   return material;
 }
 

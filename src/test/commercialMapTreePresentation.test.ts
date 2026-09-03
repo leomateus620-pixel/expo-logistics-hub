@@ -141,8 +141,9 @@ describe('apresentação profissional e instanciada das árvores comerciais', ()
     });
     const canonicalIds = new Set(COMMERCIAL_MAP_TREES.map((tree) => tree.id));
 
-    // A tree is never removed by distance or quality tier: only branches,
-    // contact patches and the real shadow caster are traded.
+    // A tree is never removed by distance or quality tier: only branches
+    // drop with distance. Full graphics keeps the real shadow caster and
+    // the ground-contact patch so the overview still reads volume.
     expect(plan.countByTier).toEqual({ near: 274, mid: 274, far: 274 });
     expect(new Set(plan.itemsByTier.near.map((tree) => tree.id))).toEqual(canonicalIds);
     expect(new Set(plan.itemsByTier.far.map((tree) => tree.id))).toEqual(canonicalIds);
@@ -182,9 +183,9 @@ describe('apresentação profissional e instanciada das árvores comerciais', ()
       trunks: 274,
       branches: 0,
       crowns: 1_918,
-      shadows: 274,
-      contactPatches: 0,
-      castsDynamicShadows: false,
+      shadows: 0,
+      contactPatches: 274,
+      castsDynamicShadows: true,
     });
     // Legacy plans that still shrink lower tiers cannot hide trees either.
     expect(resolveCommercialTreeLodInstanceCounts({ near: 274, mid: 225, far: 170 }, 'far', 7, false).trees)

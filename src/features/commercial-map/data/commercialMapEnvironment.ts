@@ -125,6 +125,11 @@ export const COMMERCIAL_MAP_ENVIRONMENT_CONFIG = {
     distanceRatio: 1.32,
     minimumDistance: 96,
     shadowCoverageRatio: 0.68,
+    // 0.15 map units/metre. Constant bias stays tiny so shadows kiss the
+    // ground (no peter-pan). Normal bias of 0.02 units ≈ 13 cm kills 24°
+    // acne on roofs and lots without lifting pavilion/tree contact.
+    shadowBias: -0.0001,
+    shadowNormalBias: 0.02,
   },
   fill: {
     direction: [0.54, 0.34, -0.45] as const,

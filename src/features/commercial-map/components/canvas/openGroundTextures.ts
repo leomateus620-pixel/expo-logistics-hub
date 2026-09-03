@@ -473,13 +473,13 @@ function surfaceDetailSample(surface: OpenGroundSurface, x: number, y: number) {
   const fine = seededNoise(x * 3.7, y * 3.7, 91.2 - surface.length);
 
   if (surface === 'concrete') {
-    return { height: macro * 0.28 + grain * 0.12, roughness: 0.82 + fine * 0.1, strength: 1.2 };
+    return { height: macro * 0.36 + grain * 0.18, roughness: 0.78 + fine * 0.16, strength: 1.55 };
   }
   if (surface === 'highwayAsphalt') {
-    return { height: macro * 0.2 + grain * 0.22, roughness: 0.82 + fine * 0.12, strength: 1.45 };
+    return { height: macro * 0.24 + grain * 0.28, roughness: 0.8 + fine * 0.14, strength: 1.7 };
   }
   if (surface === 'parkAsphalt') {
-    return { height: macro * 0.24 + grain * 0.25, roughness: 0.84 + fine * 0.12, strength: 1.55 };
+    return { height: macro * 0.32 + grain * 0.38, roughness: 0.8 + fine * 0.18, strength: 2.05 };
   }
   if (surface === 'pitchTurf') {
     return { height: macro * 0.45 + grain * 0.31, roughness: 0.9 + fine * 0.08, strength: 2.25 };
@@ -812,7 +812,7 @@ function paintAsphalt(context: CanvasRenderingContext2D, variant: 'highway' | 'p
       const grit = fractalNoise(x / 3.1, y / 3.1, 27.7, 2);
       const grain = seededNoise(x, y, 8.2) - 0.5;
       const blend = THREE.MathUtils.clamp(
-        0.42 + (macro - 0.5) * 0.55 + (grit - 0.5) * 0.5 + grain * 0.22,
+        0.42 + (macro - 0.5) * 0.62 + (grit - 0.5) * 0.58 + grain * 0.32,
         0,
         1,
       );
@@ -836,7 +836,7 @@ function paintAsphalt(context: CanvasRenderingContext2D, variant: 'highway' | 'p
   }
 
   // Remendos amplos, de baixa frequência, para evitar asfalto uniforme.
-  for (let index = 0; index < 8; index += 1) {
+  for (let index = 0; index < 14; index += 1) {
     const x = seededNoise(index, 3.3, 19.4) * TEXTURE_SIZE;
     const y = seededNoise(index, 7.7, 5.1) * TEXTURE_SIZE;
     const radius = TEXTURE_SIZE * (0.05 + seededNoise(index, 2.9, 11.2) * 0.12);

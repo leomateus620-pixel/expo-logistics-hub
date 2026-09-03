@@ -463,6 +463,23 @@ describe('amanhecer premium compartilhado do Mapa Comercial', () => {
     expect(degenerate.near).toBeLessThan(degenerate.far);
   });
 
+  it('mantém bias de sombra no parque sem peter-pan e sem inflar o frustum com as BRs', () => {
+    const solar = COMMERCIAL_MAP_ENVIRONMENT_CONFIG.solar;
+    const environment = source(
+      'src/features/commercial-map/components/canvas/CommercialMapEnvironment.tsx',
+    );
+
+    expect(solar.shadowBias).toBeLessThan(0);
+    expect(solar.shadowBias).toBeGreaterThan(-0.0005);
+    expect(solar.shadowNormalBias).toBeGreaterThan(0.01);
+    expect(solar.shadowNormalBias).toBeLessThan(0.035);
+    expect(environment).toContain('light.shadow.bias = COMMERCIAL_MAP_ENVIRONMENT_CONFIG.solar.shadowBias');
+    expect(environment).toContain('light.shadow.normalBias = COMMERCIAL_MAP_ENVIRONMENT_CONFIG.solar.shadowNormalBias');
+    expect(environment).toContain('resolveCommercialMapShadowFrustum(shadowExtent)');
+    expect(environment).not.toContain('REAR_ROAD_SCENE_SUPPORT_POINTS');
+    expect(environment).not.toContain('REGIONAL_HIGHWAY');
+  });
+
   it('permanece apresentação exterior sem domínio comercial paralelo', () => {
     const environment = source(
       'src/features/commercial-map/components/canvas/CommercialMapEnvironment.tsx',

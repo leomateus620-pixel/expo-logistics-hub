@@ -39,6 +39,16 @@ export function createCommercialPavilionTexture(
       context.lineTo(256, y + 0.5);
       context.stroke();
     }
+    for (let index = 0; index < 28; index += 1) {
+      const x = seededNoise(index, 1.4, 8.2) * 256;
+      const y = seededNoise(index, 6.1, 3.7) * 256;
+      const radius = 10 + seededNoise(index, 2.8, 11.5) * 36;
+      const stain = context.createRadialGradient(x, y, 0, x, y, radius);
+      stain.addColorStop(0, index % 3 === 0 ? 'rgba(232,236,230,.16)' : 'rgba(88,98,96,.14)');
+      stain.addColorStop(1, 'rgba(174,182,180,0)');
+      context.fillStyle = stain;
+      context.fillRect(x - radius, y - radius, radius * 2, radius * 2);
+    }
   } else {
     const base = surface === 'floor' ? [143, 145, 140] : [185, 184, 177];
     const image = context.createImageData(256, 256);
@@ -46,7 +56,7 @@ export function createCommercialPavilionTexture(
       for (let x = 0; x < 256; x += 1) {
         const offset = (y * 256 + x) * 4;
         const grain = (seededNoise(x, y, surface === 'floor' ? 29 : 11) - 0.5)
-          * (surface === 'floor' ? 18 : 12);
+          * (surface === 'floor' ? 22 : 18);
         image.data[offset] = THREE.MathUtils.clamp(base[0] + grain, 0, 255);
         image.data[offset + 1] = THREE.MathUtils.clamp(base[1] + grain, 0, 255);
         image.data[offset + 2] = THREE.MathUtils.clamp(base[2] + grain * 0.82, 0, 255);

@@ -23,17 +23,21 @@ import {
   type VegetationLodTier,
 } from '../../utils/vegetationLod';
 import type { CommercialMapQualityTier } from '../../utils/viewport';
+import { applyParkSurfaceDetail } from './parkSurfaceMaterial';
 
 const NO_RAYCAST = () => undefined;
 const SHADOW_OPACITY = 0.105;
-const CONTACT_PATCH_OPACITY = 0.38;
+const CONTACT_PATCH_OPACITY = 0.52;
 const UNIT_Y = new THREE.Vector3(0, 1, 0);
 const SUNRISE_SHADOW_DIRECTION = projectedCommercialMapShadowDirection();
 const SUNRISE_SHADOW_ROTATION = projectedCommercialMapShadowRotation();
 /**
  * Every LOD tier keeps 100% of the canonical inventory. A tree may lose its
- * branches, contact patch or real shadow caster with distance, but a tree is
- * never removed: that pop is the one artefact this presentation forbids.
+ * branches with distance, but a tree is never removed: that pop is the one
+ * artefact this presentation forbids. Full graphics keeps the real shadow
+ * caster and the ground-contact patch at every distance so the overview
+ * (Anexo 2 look) still reads volume. Reduced/mobile swaps the caster for
+ * the cheap instanced footprint.
  */
 const COMMERCIAL_TREE_LOD_DENSITY = Object.freeze({ near: 1, mid: 1, far: 1 });
 const COMMERCIAL_TREE_LOD_TRANSITION_RATE = 7;
@@ -93,12 +97,12 @@ export function resolveCommercialTreeLodInstanceCounts(
   const branchTrees = reducedGraphics
     ? tier === 'near' ? trees : 0
     : tier === 'far' ? 0 : trees;
-  // Real shadow-map casting stays on near and mid; only the far overview
-  // (and reduced/mobile) swaps it for the single cheap instanced footprint,
-  // which is never stacked on top of a live shadow pass.
-  const castsDynamicShadows = !reducedGraphics && tier !== 'far';
+  // Real shadow-map casting stays on at every distance in full graphics so
+  // the default overview still shows pavilion/tree PCF contact. Reduced and
+  // mobile keep the single cheap instanced footprint instead.
+  const castsDynamicShadows = !reducedGraphics;
   const shadowTrees = castsDynamicShadows ? 0 : trees;
-  const contactPatchTrees = reducedGraphics || tier === 'far' ? 0 : trees;
+  const contactPatchTrees = reducedGraphics ? 0 : trees;
   return {
     trees,
     trunks: trees,
@@ -199,10 +203,10 @@ export function commercialTreePresentationProfile(
     crownLift: (lobeNoise(noiseSeed, 9.1) - 0.5) * tree.canopyRadius * 0.08,
     contactPatchVisible,
     contactScaleX: contactPatchVisible
-      ? tree.canopyRadius * (0.34 + lobeNoise(noiseSeed, 10.7) * 0.13)
+      ? tree.canopyRadius * (0.42 + lobeNoise(noiseSeed, 10.7) * 0.16)
       : 0,
     contactScaleZ: contactPatchVisible
-      ? tree.canopyRadius * (0.27 + lobeNoise(noiseSeed, 12.3) * 0.11)
+      ? tree.canopyRadius * (0.34 + lobeNoise(noiseSeed, 12.3) * 0.14)
       : 0,
     contactRotation: lobeNoise(noiseSeed, 14.1) * Math.PI * 2,
     contactColor: CONTACT_PATCH_PALETTE[
@@ -317,8 +321,8 @@ function createIrregularContactPatchGeometry() {
   return geometry;
 }
 
-function createTreeMaterials(shadowTexture: THREE.Texture, referenceQuadras = false) {
-  return {
+function createTreeMaterials(shadowTexture: THREE.Texture, referenceQuadras = false, reducedGraphics = false) {
+  const materials = {
     trunk: new THREE.MeshStandardMaterial({
       color: '#ffffff',
       roughness: 0.96,
@@ -367,6 +371,8 @@ function createTreeMaterials(shadowTexture: THREE.Texture, referenceQuadras = fa
       polygonOffsetUnits: -1,
     }),
   };
+  applyParkSurfaceDetail(materials.trunk, 'volume', reducedGraphics);
+  return materials;
 }
 
 /**
@@ -584,7 +590,10 @@ function CommercialTreeInstances({
     contactPatch: createIrregularContactPatchGeometry(),
   }), [effectiveReducedGraphics, referenceQuadras]);
   const shadowTexture = useMemo(createSoftShadowTexture, []);
-  const materials = useMemo(() => createTreeMaterials(shadowTexture, referenceQuadras), [shadowTexture, referenceQuadras]);
+  const materials = useMemo(
+    () => createTreeMaterials(shadowTexture, referenceQuadras, effectiveReducedGraphics),
+    [effectiveReducedGraphics, referenceQuadras, shadowTexture],
+  );
 
   useLayoutEffect(() => {
     const trunkMesh = trunkRef.current;
@@ -748,7 +757,12 @@ function CommercialTreeInstances({
     const group = groupRef.current;
     if (visible && group) group.visible = true;
     if (group) group.scale.setScalar(1);
-    setCommercialTreeCastShadow(false, trunkRef.current, branchRef.current, crownRef.current);
+    setCommercialTreeCastShadow(
+      visible && lodTargetCountsRef.current.castsDynamicShadows,
+      trunkRef.current,
+      branchRef.current,
+      crownRef.current,
+    );
     transitionPending.current = true;
     gl.shadowMap.needsUpdate = true;
     invalidate();
@@ -872,6 +886,8 @@ function CommercialTreeInstances({
         name="troncos-arvores-comerciais"
         args={[geometries.trunk, materials.trunk, trees.length]}
         count={jsxLodCounts.trunks}
+        castShadow={!effectiveReducedGraphics}
+        receiveShadow={!effectiveReducedGraphics}
         frustumCulled
         raycast={NO_RAYCAST}
       />
@@ -880,6 +896,8 @@ function CommercialTreeInstances({
         name="galhos-arvores-comerciais"
         args={[geometries.branch, materials.trunk, trees.length * COMMERCIAL_TREE_BRANCHES]}
         count={jsxLodCounts.branches}
+        castShadow={!effectiveReducedGraphics}
+        receiveShadow={!effectiveReducedGraphics}
         frustumCulled
         raycast={NO_RAYCAST}
       />
@@ -888,6 +906,8 @@ function CommercialTreeInstances({
         name="copas-arvores-comerciais"
         args={[geometries.crown, materials.crown, trees.length * lobeCount]}
         count={jsxLodCounts.crowns}
+        castShadow={!effectiveReducedGraphics}
+        receiveShadow={!effectiveReducedGraphics}
         frustumCulled
         raycast={NO_RAYCAST}
       />

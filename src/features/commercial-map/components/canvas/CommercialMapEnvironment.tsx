@@ -386,11 +386,11 @@ function configureSunLight(
   light.shadow.camera.near = frustum.near;
   light.shadow.camera.far = frustum.far;
   light.shadow.camera.updateProjectionMatrix();
-  // Tight near/far keeps depth precision high, so the constant bias can stay
-  // tiny (no peter-panning) while the normal bias removes acne on the large
-  // flat receivers (ground, roofs, parking) lit at a 24° grazing angle.
-  light.shadow.bias = -0.00004;
-  light.shadow.normalBias = 0.05;
+  // Tight near/far keeps depth precision high. Bias is in
+  // COMMERCIAL_MAP_ENVIRONMENT_CONFIG.solar — retuned for 0.15 units/metre
+  // so PCF contact on pavilions/trees reads without acne or peter-pan.
+  light.shadow.bias = COMMERCIAL_MAP_ENVIRONMENT_CONFIG.solar.shadowBias;
+  light.shadow.normalBias = COMMERCIAL_MAP_ENVIRONMENT_CONFIG.solar.shadowNormalBias;
   light.shadow.radius = resolveShadowRadiusTexels(3, quality.shadowMapSize);
   return light;
 }

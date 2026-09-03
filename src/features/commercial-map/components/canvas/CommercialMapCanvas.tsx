@@ -154,6 +154,7 @@ import { ArenaFrontInfrastructure } from './ArenaFrontInfrastructure';
 import { NationsDistrict } from './NationsDistrict';
 import { CommercialMapEnvironment } from './CommercialMapEnvironment';
 import { applyParkGroundDetail } from './terrainMaterial';
+import { applyParkSurfaceDetail } from './parkSurfaceMaterial';
 import { CommercialMapAdaptiveQualityController } from './CommercialMapAdaptiveQuality';
 import {
   createInitialCommercialMapQualityState,
@@ -838,9 +839,23 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
   useLayoutEffect(() => {
     // Presentation only: the large open fields share the park-scale terrain
     // fBm so they never read as one flat tile next to the environment ground.
-    if (!openGroundProfile || !openGroundMaterialRef.current) return;
-    applyParkGroundDetail(openGroundMaterialRef.current, openGroundReducedGraphics);
-  }, [openGroundProfile, openGroundReducedGraphics, openGroundTextures]);
+    if (!openGroundMaterialRef.current) return;
+    if (openGroundProfile) {
+      applyParkGroundDetail(openGroundMaterialRef.current, openGroundReducedGraphics);
+      return;
+    }
+    if (classification === 'PARKING' || classification === 'PEDESTRIAN_PATH') {
+      applyParkSurfaceDetail(
+        openGroundMaterialRef.current,
+        classification === 'PEDESTRIAN_PATH' ? 'concrete' : 'asphalt',
+        openGroundReducedGraphics,
+      );
+      return;
+    }
+    if (!isFlat) {
+      applyParkSurfaceDetail(openGroundMaterialRef.current, 'volume', openGroundReducedGraphics);
+    }
+  }, [classification, isFlat, openGroundProfile, openGroundReducedGraphics, openGroundTextures]);
 
   const geometry = useMemo(
     () => isQuadra || isGate || isNationsPresentationSurface
@@ -992,7 +1007,7 @@ const GenericEntityMesh = memo(function GenericEntityMesh({
               normalMap={openGroundTextures?.normalMap}
               normalScale={openGroundTextures ? OPEN_GROUND_NORMAL_SCALE : undefined}
               roughnessMap={openGroundTextures?.roughnessMap}
-              roughness={openGroundProfile ? openGroundProfile.roughness : isPavilion ? 0.82 : isFlat ? 0.9 : 0.72}
+              roughness={openGroundProfile ? openGroundProfile.roughness : isPavilion ? 0.82 : classification === 'PARKING' ? 0.94 : isFlat ? 0.9 : 0.72}
               metalness={0}
               transparent={!solidRendering && visualOpacity < 0.995}
               opacity={solidRendering ? 1 : visualOpacity}
@@ -1355,6 +1370,7 @@ function BatchedLots({
   onCursor: (cursor: 'grab' | 'grabbing' | 'pointer') => void;
 }) {
   const invalidate = useThree((state) => state.invalidate);
+  const reducedGraphics = useCommercialMapStore((state) => state.reducedGraphics);
   const hoveredRef = useRef<string | null>(null);
   const pendingHoverRef = useRef<string | null>(null);
   const hoverFrameRef = useRef<number | null>(null);
@@ -1377,7 +1393,14 @@ function BatchedLots({
       return nonIndexed;
     });
     const vertexCount = sourceGeometries.reduce((sum, geometry) => sum + geometry.getAttribute('position').count, 0);
-    const material = new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.86, metalness: 0 });
+    const material = new THREE.MeshStandardMaterial({
+      color: '#ffffff',
+      roughness: 0.94,
+      metalness: 0,
+      polygonOffset: true,
+      polygonOffsetFactor: -3,
+      polygonOffsetUnits: -2,
+    });
     const mesh = new THREE.BatchedMesh(entries.length, vertexCount, 0, material);
     const entityByBatchId = new Map<number, string>();
     const batchIdByEntity = new Map<string, number>();
@@ -1436,6 +1459,11 @@ function BatchedLots({
     mesh.receiveShadow = true;
     return { mesh, material, edgeGeometry, entityByBatchId, batchIdByEntity, raycast: mesh.raycast };
   }, [entries, segmentByEntity]);
+
+  useLayoutEffect(() => {
+    if (!batch) return;
+    applyParkSurfaceDetail(batch.material, 'lot', reducedGraphics);
+  }, [batch, reducedGraphics]);
 
   useEffect(() => () => {
     batch?.edgeGeometry.dispose();

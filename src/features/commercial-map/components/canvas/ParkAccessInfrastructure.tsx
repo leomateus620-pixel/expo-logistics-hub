@@ -12,6 +12,7 @@ import {
   EXPORURAL_PARK_ACCESS_INFRASTRUCTURE_INPUT,
   PARK_ACCESS_INFRASTRUCTURE_INPUT,
 } from '../../utils/parkAccessSpatialPlanAdapter';
+import { applyParkSurfaceDetail, bindParkSurfaceMaterial } from './parkSurfaceMaterial';
 
 export type ParkAccessInfrastructureScope = 'all' | 'exporural';
 
@@ -96,13 +97,13 @@ function createAsphaltTexture() {
   const data = new Uint8Array(size * size * 4);
   for (let y = 0; y < size; y += 1) {
     for (let x = 0; x < size; x += 1) {
-      const fine = (textureNoise(x, y, 3107) - 0.5) * 18;
+      const fine = (textureNoise(x, y, 3107) - 0.5) * 28;
       const aggregateNoise = textureNoise(Math.floor(x / 2), Math.floor(y / 2), 7739);
-      const aggregate = aggregateNoise > 0.88
-        ? 24 + (aggregateNoise - 0.88) * 70
-        : aggregateNoise < 0.09 ? -18 : 0;
-      const wear = Math.sin(x * 0.15 + y * 0.08) * 2.4
-        + Math.cos(y * 0.19 - x * 0.05) * 1.8;
+      const aggregate = aggregateNoise > 0.82
+        ? 28 + (aggregateNoise - 0.82) * 80
+        : aggregateNoise < 0.12 ? -22 : 0;
+      const wear = Math.sin(x * 0.15 + y * 0.08) * 3.2
+        + Math.cos(y * 0.19 - x * 0.05) * 2.4;
       const offset = (y * size + x) * 4;
       data[offset] = THREE.MathUtils.clamp(Math.round(176 + fine + aggregate + wear), 0, 255);
       data[offset + 1] = THREE.MathUtils.clamp(Math.round(179 + fine + aggregate + wear), 0, 255);
@@ -249,14 +250,20 @@ const InstanceBatch = memo(function InstanceBatch({
   const ref = useRef<THREE.InstancedMesh>(null);
   const { gl, invalidate } = useThree();
   const geometry = useMemo(() => new THREE.BoxGeometry(1, 1, 1), []);
-  const material = useMemo(() => new THREE.MeshStandardMaterial({
-    color: WHITE,
-    roughness: materialKind === 'glass' ? 0.34 : materialKind === 'metal' ? 0.62 : 0.8,
-    metalness: materialKind === 'metal' ? 0.24 : 0.02,
-    transparent: materialKind === 'glass',
-    opacity: materialKind === 'glass' ? 0.7 : 1,
-    depthWrite: materialKind !== 'glass',
-  }), [materialKind]);
+  const material = useMemo(() => {
+    const next = new THREE.MeshStandardMaterial({
+      color: WHITE,
+      roughness: materialKind === 'glass' ? 0.34 : materialKind === 'metal' ? 0.62 : 0.8,
+      metalness: materialKind === 'metal' ? 0.24 : 0.02,
+      transparent: materialKind === 'glass',
+      opacity: materialKind === 'glass' ? 0.7 : 1,
+      depthWrite: materialKind !== 'glass',
+    });
+    if (materialKind !== 'glass') {
+      applyParkSurfaceDetail(next, materialKind === 'metal' ? 'metal' : 'volume', reducedGraphics);
+    }
+    return next;
+  }, [materialKind, reducedGraphics]);
 
   useEffect(() => {
     configureInstanceMaterial(material, opacity, materialKind);
@@ -338,6 +345,7 @@ function SurfaceMaterial({
       polygonOffset
       polygonOffsetFactor={-1}
       polygonOffsetUnits={-1}
+      ref={bindParkSurfaceMaterial('asphalt', reducedGraphics)}
     />
   );
   if (kind === 'cobblestone') return (
@@ -356,6 +364,7 @@ function SurfaceMaterial({
       polygonOffset
       polygonOffsetFactor={-1}
       polygonOffsetUnits={-1}
+      ref={bindParkSurfaceMaterial('concrete', reducedGraphics)}
     />
   );
   if (kind === 'gravel') return (
@@ -374,6 +383,7 @@ function SurfaceMaterial({
       polygonOffset
       polygonOffsetFactor={-1}
       polygonOffsetUnits={-1}
+      ref={bindParkSurfaceMaterial('asphalt', reducedGraphics)}
     />
   );
   if (kind === 'sidewalks') return (
@@ -389,6 +399,7 @@ function SurfaceMaterial({
       opacity={opacity}
       depthTest
       depthWrite
+      ref={bindParkSurfaceMaterial('concrete', reducedGraphics)}
     />
   );
   if (kind === 'curbs' || kind === 'roundaboutCurb') return (
@@ -400,6 +411,7 @@ function SurfaceMaterial({
       opacity={opacity}
       depthTest
       depthWrite
+      ref={bindParkSurfaceMaterial('concrete', reducedGraphics)}
     />
   );
   if (kind === 'landscape') return (

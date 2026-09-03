@@ -58,6 +58,7 @@ import {
 import { fitRotatedStructureBounds } from '../../utils/fenasojaReferenceStructures';
 import { CampeiraTrack } from './CampeiraTrack';
 import { CommercialPavilion } from './CommercialPavilion';
+import { applyParkSurfaceDetail } from './parkSurfaceMaterial';
 import { ThirdAgePavilion } from './ThirdAgePavilion';
 import { LactalisCulturalStage } from './LactalisCulturalStage';
 import { ExporuralSteakhouse } from './ExporuralSteakhouse';
@@ -527,6 +528,7 @@ function useLandmarkMaterials(
   segment: CommercialMapSegmentDefinition | null,
 ): LandmarkMaterialSet {
   const invalidate = useThree((state) => state.invalidate);
+  const reducedGraphics = useCommercialMapStore((state) => state.reducedGraphics);
   const materials = useMemo<LandmarkMaterialSet>(() => {
     const palette = LANDMARK_PALETTES[kind];
     const result = {
@@ -692,8 +694,14 @@ function useLandmarkMaterials(
       result.metal.roughness = 0.48;
       result.metal.metalness = 0.28;
     }
+    applyParkSurfaceDetail(result.wall, 'volume', reducedGraphics);
+    applyParkSurfaceDetail(result.platform, 'volume', reducedGraphics);
+    applyParkSurfaceDetail(result.roof, 'roof', reducedGraphics);
+    applyParkSurfaceDetail(result.metal, 'metal', reducedGraphics);
+    applyParkSurfaceDetail(result.dark, 'metal', reducedGraphics);
+    applyParkSurfaceDetail(result.trim, 'metal', reducedGraphics);
     return result;
-  }, [kind]);
+  }, [kind, reducedGraphics]);
 
   useEffect(() => {
     const palette = LANDMARK_PALETTES[kind];
