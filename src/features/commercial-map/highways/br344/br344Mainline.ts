@@ -151,7 +151,7 @@ export const BR344_WORLD_POLYLINE: readonly WorldPoint[] = Object.freeze(
  * BR-472 and the cloverleaf stubs meet without a neck.
  */
 export const BR344_CARTOGRAPHIC_FINISH = Object.freeze({
-  carriagewayColor: '#44494c',
+  carriagewayColor: '#585e62',
   carriagewayRoughness: 0.91,
   shoulderColor: '#a99b84',
   shoulderRoughness: 0.98,

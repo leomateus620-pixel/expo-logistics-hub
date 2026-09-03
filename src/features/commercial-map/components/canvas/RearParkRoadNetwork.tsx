@@ -37,7 +37,7 @@ const REAR_ROAD_SURFACE_PROFILES = Object.freeze({
   highway: Object.freeze({
     surface: 'highwayAsphalt',
     tileWorldSize: 1,
-    baseColor: '#5a6064',
+    baseColor: '#585e62',
     roughness: 0.97,
   }),
   park: Object.freeze({

@@ -54,8 +54,10 @@ const SURFACE_PROFILES = Object.freeze({
   }),
 } satisfies Readonly<Record<'carriageway' | 'shoulder', OpenGroundSurfaceProfile>>);
 
-const ASPHALT_NORMAL_SCALE = new THREE.Vector2(0.14, 0.14);
-const SHOULDER_NORMAL_SCALE = new THREE.Vector2(0.2, 0.2);
+// Grain must survive the 24° key: these read as pavement texture at the
+// pull-back and mip away cleanly before they can shimmer.
+const ASPHALT_NORMAL_SCALE = new THREE.Vector2(0.26, 0.26);
+const SHOULDER_NORMAL_SCALE = new THREE.Vector2(0.3, 0.3);
 
 function RegionalHighwayLabels({
   labels,

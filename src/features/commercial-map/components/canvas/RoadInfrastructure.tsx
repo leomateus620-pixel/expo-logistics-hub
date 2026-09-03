@@ -56,8 +56,8 @@ const ROAD_SURFACE_PROFILES = Object.freeze({
   }),
 } satisfies Readonly<Record<'asphalt' | 'pedestrian', OpenGroundSurfaceProfile>>);
 
-const ASPHALT_NORMAL_SCALE = new THREE.Vector2(0.13, 0.13);
-const PEDESTRIAN_NORMAL_SCALE = new THREE.Vector2(0.1, 0.1);
+const ASPHALT_NORMAL_SCALE = new THREE.Vector2(0.22, 0.22);
+const PEDESTRIAN_NORMAL_SCALE = new THREE.Vector2(0.16, 0.16);
 
 const RoadLayerNetwork = memo(function RoadLayerNetwork({
   entities,

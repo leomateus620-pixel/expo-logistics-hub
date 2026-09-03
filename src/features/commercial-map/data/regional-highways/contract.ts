@@ -109,8 +109,11 @@ export const BR344_SOURCE_Y = BR344_HUB_SOURCE_NORTH
   - BR344_NORTH_OFFSET_FACTOR * (BR344_HUB_SOURCE_SOUTH - BR344_HUB_SOURCE_NORTH);
 
 export const REGIONAL_HIGHWAY_PALETTE = Object.freeze({
-  carriageway: '#44494c',
-  carriagewayGrain: '#33383b',
+  // Weathered asphalt. The procedural albedo averages ~0.46 linear, so these
+  // sRGB tints land near a real 0.07-0.1 linear pavement instead of crushing
+  // to black under ACES. Same family as the rear BR-472 ribbon.
+  carriageway: '#585e62',
+  carriagewayGrain: '#484e52',
   shoulder: '#a99b84',
   shoulderGrain: '#8f816c',
   edgeLine: '#e3c44b',

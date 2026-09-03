@@ -4129,7 +4129,7 @@ function Scene({
     ],
   );
   // Shadow-only reach: the official park plus its own parking/access aprons.
-  // The BR-472/BR-344 support points stay out so the 2048² shadow map is spent
+  // Regional highway support points stay out so the 2048² shadow map is spent
   // on pavilions, trees and canopies instead of kilometres of highway verge.
   const shadowExtent = useMemo(
     () => getSceneExtent(

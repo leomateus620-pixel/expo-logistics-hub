@@ -145,7 +145,7 @@ describe('BR-344 mainline — isolated E–W highway slice', () => {
   });
 
   it('uses architectural-aerial asphalt, compacted shoulders and restrained yellow edges', () => {
-    expect(BR344_CARTOGRAPHIC_FINISH.carriagewayColor).toBe('#44494c');
+    expect(BR344_CARTOGRAPHIC_FINISH.carriagewayColor).toBe('#585e62');
     expect(BR344_CARTOGRAPHIC_FINISH.shoulderColor).toBe('#a99b84');
     expect(BR344_CARTOGRAPHIC_FINISH.yellowEdgeColor).toBe('#e3c44b');
 
