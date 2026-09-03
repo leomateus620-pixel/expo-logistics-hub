@@ -6,7 +6,10 @@ import {
   OFFICIAL_2026_SOURCE_MANIFEST,
   officialPdfPointToLocal,
 } from '../../data/officialReference2026';
-import { br472MainlineXAt } from '../../data/regional-highways/contract';
+import {
+  br472MainlineXAt,
+  REGIONAL_HIGHWAY_PROFILE,
+} from '../../data/regional-highways/contract';
 
 /**
  * BR-344 mainline — Agent #2 slice (E–W, farther from the hub).
@@ -79,7 +82,7 @@ export const BR344_SOURCE_Y = BR344_HUB_SOURCE_BOUNDS.north
 
 /**
  * Slice #115 published the NE vertex on the interior BR-472 spine (x=6120).
- * The live regional mainline sits 0.5 hub widths east of the park (Image 1),
+ * The live regional mainline sits ~0.26 hub widths east of the park (Anexo 2),
  * so the folded crossing uses that X at this latitude.
  */
 export const BR344_PUBLISHED_NE_HANDOFF_SOURCE = Object.freeze([6120, BR344_SOURCE_Y] as const);
@@ -143,10 +146,9 @@ export const BR344_WORLD_POLYLINE: readonly WorldPoint[] = Object.freeze(
 );
 
 /**
- * Cartographic finish from Image 2 — shared contract for the integrator so
- * BR-472 (Agent #1) can match: green carriageway, tan shoulders, yellow edges.
- * Widths total the same 94 source-point envelope as the current BR-472
- * (70 pavement + 12+12 shoulders) so the NE cloverleaf can meet flush.
+ * Cartographic finish from Image 2 — green carriageway, tan shoulders,
+ * yellow edges. Local widths are the shared regional family so BR-344,
+ * BR-472 and the cloverleaf stubs meet without a neck.
  */
 export const BR344_CARTOGRAPHIC_FINISH = Object.freeze({
   carriagewayColor: '#3db54a',
@@ -159,7 +161,7 @@ export const BR344_CARTOGRAPHIC_FINISH = Object.freeze({
   laneDashRoughness: 0.78,
   medianColor: '#5f7c45',
   medianRoughness: 0.97,
-  /** Two green bands; a narrow grass median keeps them readable from above. */
+  /** Dual-band source proportions (70 pavement + 24 shoulders = 94). */
   carriagewayWidthSource: 32,
   medianWidthSource: 6,
   shoulderWidthSource: 12,
@@ -168,10 +170,10 @@ export const BR344_CARTOGRAPHIC_FINISH = Object.freeze({
 } as const);
 
 export const BR344_CROSS_SECTION = Object.freeze({
-  carriagewayWidth: br344SourceToLocalLength(BR344_CARTOGRAPHIC_FINISH.carriagewayWidthSource),
-  medianWidth: br344SourceToLocalLength(BR344_CARTOGRAPHIC_FINISH.medianWidthSource),
-  shoulderWidth: br344SourceToLocalLength(BR344_CARTOGRAPHIC_FINISH.shoulderWidthSource),
-  yellowEdgeWidth: br344SourceToLocalLength(BR344_CARTOGRAPHIC_FINISH.yellowEdgeWidthSource),
+  carriagewayWidth: REGIONAL_HIGHWAY_PROFILE.dualCarriagewayWidth,
+  medianWidth: REGIONAL_HIGHWAY_PROFILE.medianWidth,
+  shoulderWidth: REGIONAL_HIGHWAY_PROFILE.shoulderWidth,
+  yellowEdgeWidth: REGIONAL_HIGHWAY_PROFILE.edgeLineWidth,
   laneDashWidth: br344SourceToLocalLength(BR344_CARTOGRAPHIC_FINISH.laneDashWidthSource),
 } as const);
 

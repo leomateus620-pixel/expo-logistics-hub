@@ -2,12 +2,17 @@ import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import {
+  BR472_EAST_GAP_IN_HUB_WIDTHS,
   BR472_EXTERIOR_SEGMENTS,
   INTERCHANGE_ENVELOPES,
+  PARK_LOCAL_BOUNDS,
+  REGIONAL_HIGHWAY_PROFILE,
   br472MainlineXAt,
   collectRegionalHighwayLayers,
+  regionalHighwayEnvelopeWidth,
 } from '@/features/commercial-map/data/regional-highways';
 import {
+  BR344_CROSS_SECTION,
   BR344_LOCAL_POLYLINE,
   BR344_NE_CLOVERLEAF_HANDOFF,
   BR344_PUBLISHED_NE_HANDOFF_SOURCE,
@@ -22,6 +27,7 @@ import {
 import {
   SE_CLOVERLEAF_CENTER_LOCAL,
   SE_CLOVERLEAF_JOIN_LOCAL,
+  SE_CLOVERLEAF_LAYOUT,
   SE_CLOVERLEAF_PUBLISHED_JOIN_SOURCE,
 } from '@/features/commercial-map/data/seCloverleaf';
 import { REAR_CALIBRATED_AXES } from '@/features/commercial-map/utils/rearSpatialCalibration';
@@ -50,6 +56,24 @@ describe('fold das rodovias regionais — BR-472 + BR-344 + trevos', () => {
     expect(SE_CLOVERLEAF_CENTER_LOCAL[1]).toBeCloseTo(se[1], 6);
     expect(SE_CLOVERLEAF_JOIN_LOCAL[1]).toBeLessThan(se[1]);
     expect(SE_CLOVERLEAF_JOIN_LOCAL[0]).toBeCloseTo(se[0], 6);
+
+    const gap = (br472MainlineXAt(0) - PARK_LOCAL_BOUNDS.maxX) / PARK_LOCAL_BOUNDS.width;
+    expect(gap).toBeCloseTo(BR472_EAST_GAP_IN_HUB_WIDTHS, 12);
+    expect(gap).toBeGreaterThanOrEqual(0.25);
+    expect(gap).toBeLessThan(0.4);
+    expect(regionalHighwayEnvelopeWidth()).toBeCloseTo(
+      REGIONAL_HIGHWAY_PROFILE.carriagewayWidth + REGIONAL_HIGHWAY_PROFILE.shoulderWidth * 2,
+      12,
+    );
+    expect(NE_CLOVERLEAF_LAYOUT.carriagewayWidth).toBe(REGIONAL_HIGHWAY_PROFILE.dualCarriagewayWidth);
+    expect(NE_CLOVERLEAF_LAYOUT.shoulderWidth).toBe(REGIONAL_HIGHWAY_PROFILE.shoulderWidth);
+    expect(NE_CLOVERLEAF_LAYOUT.medianWidth).toBe(REGIONAL_HIGHWAY_PROFILE.medianWidth);
+    expect(SE_CLOVERLEAF_LAYOUT.highwayWidth).toBe(REGIONAL_HIGHWAY_PROFILE.carriagewayWidth);
+    expect(SE_CLOVERLEAF_LAYOUT.highwayShoulder).toBe(REGIONAL_HIGHWAY_PROFILE.shoulderWidth);
+    expect(BR344_CROSS_SECTION.carriagewayWidth).toBe(REGIONAL_HIGHWAY_PROFILE.dualCarriagewayWidth);
+    expect(BR344_CROSS_SECTION.medianWidth).toBe(REGIONAL_HIGHWAY_PROFILE.medianWidth);
+    expect(BR344_CROSS_SECTION.shoulderWidth).toBe(REGIONAL_HIGHWAY_PROFILE.shoulderWidth);
+    expect(BR344_CROSS_SECTION.yellowEdgeWidth).toBe(REGIONAL_HIGHWAY_PROFILE.edgeLineWidth);
   });
 
   it('não redesenha a fita principal através dos trevos', () => {

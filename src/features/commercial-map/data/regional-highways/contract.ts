@@ -21,7 +21,7 @@ import { officialPdfPointToLocal } from '../officialReference2026';
  * lives east of the official crop and only visually aims at that existing
  * access.
  */
-export const REGIONAL_HIGHWAY_REVISION = '2026.10-regional-highways.2';
+export const REGIONAL_HIGHWAY_REVISION = '2026.10-regional-highways.3';
 
 export type RegionalHighwayId = 'BR-472' | 'BR-344';
 export type RegionalHighwayAgent = 'integrator' | 'br344' | 'ne-cloverleaf' | 'se-cloverleaf';
@@ -87,10 +87,13 @@ export const PARK_LOCAL_BOUNDS = Object.freeze({
 });
 
 /**
- * Target Image 2: BR-472 sits ~0.5 hub widths east of the park east edge,
- * with a slight westward diagonal as it runs south.
+ * Anexo 2 (modelo BR trevos): BR-472 sits a modest grass strip east of the
+ * hub, ~0.25–0.4 of the hub’s own east–west width — not 0.5 of the 120-unit
+ * camera crop, which produced a second-park void.
  */
-export const BR472_EAST_GAP_IN_HUB_WIDTHS = 0.5;
+export const BR472_EAST_GAP_IN_HUB_WIDTHS = 0.26;
+export const BR472_EAST_GAP_MIN_IN_HUB_WIDTHS = 0.25;
+export const BR472_EAST_GAP_MAX_IN_HUB_WIDTHS = 0.4;
 export const BR472_DIAGONAL_RADIANS = (-3.5 * Math.PI) / 180;
 export const BR472_DIAGONAL_DX_PER_DZ = Math.tan(BR472_DIAGONAL_RADIANS);
 
@@ -117,20 +120,40 @@ export const REGIONAL_HIGHWAY_PALETTE = Object.freeze({
 });
 
 export const REGIONAL_HIGHWAY_PROFILE = Object.freeze({
-  carriagewayWidth: 6.4,
-  shoulderWidth: 1.55,
-  edgeLineWidth: 0.14,
-  connectorWidth: 2.8,
-  connectorShoulderWidth: 0.7,
+  /**
+   * Single-ribbon pavement. Matches the interior generated BR-472 (70 PDF
+   * points → 1.527 local) so the exterior reads as a road, not a green carpet.
+   * Park avenues (Brasília ≈ 1.05) are the ceiling: a bit wider, never 3–5×.
+   */
+  carriagewayWidth: 1.52,
+  /** Each dual band; 2× this + median equals the single pavement. */
+  dualCarriagewayWidth: 0.7,
+  medianWidth: 0.13,
+  shoulderWidth: 0.26,
+  edgeLineWidth: 0.05,
+  /** A5 visual hook — same family as the Portão 5 ramps (~36 PDF points). */
+  connectorWidth: 0.79,
+  connectorShoulderWidth: 0.11,
   elevation: OPEN_GROUND_PRESENTATION_HEIGHT + 0.006,
   shoulderElevation: OPEN_GROUND_PRESENTATION_HEIGHT + 0.001,
   edgeLineElevation: OPEN_GROUND_PRESENTATION_HEIGHT + 0.01,
   labelElevation: OPEN_GROUND_PRESENTATION_HEIGHT + 0.05,
-  labelWidth: 7.6,
-  labelDepth: 2.05,
+  labelWidth: 3.4,
+  labelDepth: 0.95,
   /** Keep exterior ribbons east of the inherited A5 trevo. */
   interiorClearanceX: 61.7,
 });
+
+export function regionalHighwayEnvelopeWidth() {
+  return REGIONAL_HIGHWAY_PROFILE.carriagewayWidth
+    + REGIONAL_HIGHWAY_PROFILE.shoulderWidth * 2;
+}
+
+export function regionalHighwayDualEnvelopeWidth() {
+  return REGIONAL_HIGHWAY_PROFILE.dualCarriagewayWidth * 2
+    + REGIONAL_HIGHWAY_PROFILE.medianWidth
+    + REGIONAL_HIGHWAY_PROFILE.shoulderWidth * 2;
+}
 
 export function br472MainlineXAt(z: number) {
   return PARK_LOCAL_BOUNDS.maxX

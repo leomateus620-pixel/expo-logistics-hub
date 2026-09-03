@@ -32,7 +32,7 @@ import {
   disposeBr344MainlineGeometries,
 } from '@/features/commercial-map/highways/br344/br344Geometry';
 import { officialPdfPointToLocal } from '@/features/commercial-map/data/officialReference2026';
-import { br472MainlineXAt } from '@/features/commercial-map/data/regional-highways';
+import { br472MainlineXAt, REGIONAL_HIGHWAY_PROFILE } from '@/features/commercial-map/data/regional-highways';
 
 const read = (path: string) => readFileSync(resolve(path), 'utf8');
 
@@ -157,9 +157,13 @@ describe('BR-344 mainline — isolated E–W highway slice', () => {
 
     const pavement = BR344_CARTOGRAPHIC_FINISH.carriagewayWidthSource * 2
       + BR344_CARTOGRAPHIC_FINISH.medianWidthSource;
-    const envelope = pavement + BR344_CARTOGRAPHIC_FINISH.shoulderWidthSource * 2;
+    const sourceEnvelope = pavement + BR344_CARTOGRAPHIC_FINISH.shoulderWidthSource * 2;
     expect(pavement).toBe(70);
-    expect(envelope).toBe(94);
+    expect(sourceEnvelope).toBe(94);
+    expect(BR344_CROSS_SECTION.carriagewayWidth).toBe(REGIONAL_HIGHWAY_PROFILE.dualCarriagewayWidth);
+    expect(BR344_CROSS_SECTION.medianWidth).toBe(REGIONAL_HIGHWAY_PROFILE.medianWidth);
+    expect(BR344_CROSS_SECTION.shoulderWidth).toBe(REGIONAL_HIGHWAY_PROFILE.shoulderWidth);
+    expect(BR344_CROSS_SECTION.yellowEdgeWidth).toBe(REGIONAL_HIGHWAY_PROFILE.edgeLineWidth);
 
     const component = read('src/features/commercial-map/highways/br344/Br344Mainline.tsx');
     expect(component).toContain('BR344_CARTOGRAPHIC_FINISH.carriagewayColor');
