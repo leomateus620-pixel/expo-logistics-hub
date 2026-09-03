@@ -58,10 +58,12 @@ describe('contrato de estabilidade do mapa comercial', () => {
     const quality = read('src/features/commercial-map/components/canvas/CommercialMapAdaptiveQuality.tsx');
     const diagnostics = read('src/features/commercial-map/utils/runtimeDiagnostics.ts');
 
-    expect(canvas).toContain('const pixelRatio = useRef(initialViewport.current.reducedGraphics');
+    expect(canvas).toContain('const initialPixelRatio = useRef(initialViewport.current.reducedGraphics');
     expect(canvas).toContain('<CommercialMapAdaptiveQualityController');
+    expect(canvas).toContain('sceneTier');
     expect(quality).toContain('const setDpr = useThree((state) => state.setDpr)');
     expect(quality).toContain('resolveCommercialMapAdaptiveQuality');
+    expect(quality).toContain('idle-scene-commit');
     expect(canvas).toContain('registerMapGestureGuard(gl.domElement)');
     expect(canvas).toContain('registerCommercialMapRuntimeDiagnostics({ gl, scene, camera })');
     expect(diagnostics).toContain('webglcontextlost');
