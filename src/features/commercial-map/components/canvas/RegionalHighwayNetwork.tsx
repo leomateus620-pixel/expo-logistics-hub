@@ -13,6 +13,9 @@ import {
   disposeRegionalHighwayGeometries,
   resolveRegionalHighwayOwnerAtLocalPoint,
 } from '../../utils/regionalHighwayMesh';
+import { Br344Mainline } from '../../highways/br344';
+import { NeCloverleafInterchange } from './NeCloverleafInterchange';
+import { SeCloverleaf } from './SeCloverleaf';
 
 interface RegionalHighwayNetworkProps {
   reducedGraphics: boolean;
@@ -205,6 +208,21 @@ export const RegionalHighwayNetwork = memo(function RegionalHighwayNetwork({
         </mesh>
       )}
       <RegionalHighwayLabels labels={network.labels} opacity={presentedOpacity} />
+      <Br344Mainline
+        reducedGraphics={reducedGraphics}
+        visible={interactive}
+        opacity={presentedOpacity}
+      />
+      <NeCloverleafInterchange
+        reducedGraphics={reducedGraphics}
+        visible={interactive}
+        opacity={presentedOpacity}
+      />
+      <SeCloverleaf
+        reducedGraphics={reducedGraphics}
+        visible={interactive}
+        opacity={presentedOpacity}
+      />
     </group>
   );
 });

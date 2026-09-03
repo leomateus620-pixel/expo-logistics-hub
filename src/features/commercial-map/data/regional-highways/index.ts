@@ -1,6 +1,7 @@
 export {
   BR344_NORTH_GAP_IN_HUB_DEPTHS,
   BR344_RESERVED_ALIGNMENT,
+  BR344_SOURCE_Y,
   BR472_DIAGONAL_DX_PER_DZ,
   BR472_DIAGONAL_RADIANS,
   BR472_EAST_GAP_IN_HUB_WIDTHS,
@@ -14,13 +15,13 @@ export {
   br344ReservedZ,
   br472MainlineXAt,
   distanceToPolyline,
-  expandFramingBoundsWithRegionalHighways,
   headingAlongPolyline,
   pointAlongPolyline,
   pointInInterchangeEnvelope,
   polylineLength,
   regionalHighwayHeading,
 } from './contract';
+export { expandFramingBoundsWithRegionalHighways } from './framing';
 export type {
   LocalPoint,
   RegionalHighwayAgent,

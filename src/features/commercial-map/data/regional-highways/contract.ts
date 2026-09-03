@@ -3,6 +3,7 @@ import {
   MAP_REFERENCE_WIDTH,
   OPEN_GROUND_PRESENTATION_HEIGHT,
 } from '../../constants';
+import { officialPdfPointToLocal } from '../officialReference2026';
 
 /**
  * Shared exterior-highway contract — Fenasoja Mapa Comercial 2026.10.
@@ -20,7 +21,7 @@ import {
  * lives east of the official crop and only visually aims at that existing
  * access.
  */
-export const REGIONAL_HIGHWAY_REVISION = '2026.10-regional-highways.1';
+export const REGIONAL_HIGHWAY_REVISION = '2026.10-regional-highways.2';
 
 export type RegionalHighwayId = 'BR-472' | 'BR-344';
 export type RegionalHighwayAgent = 'integrator' | 'br344' | 'ne-cloverleaf' | 'se-cloverleaf';
@@ -93,8 +94,16 @@ export const BR472_EAST_GAP_IN_HUB_WIDTHS = 0.5;
 export const BR472_DIAGONAL_RADIANS = (-3.5 * Math.PI) / 180;
 export const BR472_DIAGONAL_DX_PER_DZ = Math.tan(BR472_DIAGONAL_RADIANS);
 
-/** BR-344 (Agent #2) lives ~1.5 hub depths north of the park north edge. */
-export const BR344_NORTH_GAP_IN_HUB_DEPTHS = 1.5;
+/**
+ * BR-344 latitude from the #115 slice: 2.25× cadastral hub height
+ * (source y 1265–4235) north of the hub. That is ~1.52 official-crop depths
+ * and matches Image 2 (2–2.5× hub height).
+ */
+export const BR344_HUB_SOURCE_NORTH = 1265;
+export const BR344_HUB_SOURCE_SOUTH = 4235;
+export const BR344_NORTH_OFFSET_FACTOR = 2.25;
+export const BR344_SOURCE_Y = BR344_HUB_SOURCE_NORTH
+  - BR344_NORTH_OFFSET_FACTOR * (BR344_HUB_SOURCE_SOUTH - BR344_HUB_SOURCE_NORTH);
 
 export const REGIONAL_HIGHWAY_PALETTE = Object.freeze({
   carriageway: '#2f9e44',
@@ -130,8 +139,12 @@ export function br472MainlineXAt(z: number) {
 }
 
 export function br344ReservedZ() {
-  return PARK_LOCAL_BOUNDS.minZ - PARK_LOCAL_BOUNDS.depth * BR344_NORTH_GAP_IN_HUB_DEPTHS;
+  return officialPdfPointToLocal([BR344_HUB_SOURCE_NORTH, BR344_SOURCE_Y])[1];
 }
+
+export const BR344_NORTH_GAP_IN_HUB_DEPTHS = (
+  PARK_LOCAL_BOUNDS.minZ - br344ReservedZ()
+) / PARK_LOCAL_BOUNDS.depth;
 
 export const BR344_RESERVED_ALIGNMENT = Object.freeze({
   highwayId: 'BR-344' as const,
@@ -139,7 +152,7 @@ export const BR344_RESERVED_ALIGNMENT = Object.freeze({
   westX: PARK_LOCAL_BOUNDS.minX - PARK_LOCAL_BOUNDS.width * 0.35,
   eastX: br472MainlineXAt(br344ReservedZ()) + 38,
   headingRadians: Math.PI / 2,
-  notes: 'Agent #2 owns the BR-344 mesh. Keep this E–W latitude so the NE cloverleaf (Agent #3) meets BR-472.',
+  notes: 'Folded onto the BR-344 2.25× hub-height latitude. Crossing X is br472MainlineXAt(z).',
 });
 
 export const INTERCHANGE_ENVELOPES = Object.freeze({
@@ -151,7 +164,7 @@ export const INTERCHANGE_ENVELOPES = Object.freeze({
       br344ReservedZ(),
     ] as const),
     radius: 32,
-    notes: 'Agent #3: full cloverleaf. Mainlines continue through; add loops in isolated files.',
+    notes: 'Folded NE cloverleaf (4 loops + 4 yellow RABs). Mainlines trim at the stubs.',
   }),
   seCloverleaf: Object.freeze({
     id: 'se-br472' as const,
@@ -161,12 +174,12 @@ export const INTERCHANGE_ENVELOPES = Object.freeze({
       PARK_LOCAL_BOUNDS.maxZ + PARK_LOCAL_BOUNDS.depth * 0.58,
     ] as const),
     radius: 36,
-    notes: 'Agent #4: SE cloverleaf where BR-472 continues south and turns west. Integrator already draws the through arms.',
+    notes: 'Folded SE cloverleaf (4 loops + 2 yellow RABs). Exterior BR-472 trims at the join / west / south handoffs.',
   }),
 });
 
 export const REGIONAL_HIGHWAY_WORLD_BOUNDS = Object.freeze({
-  minX: -96,
+  minX: -120,
   maxX: br472MainlineXAt(br344ReservedZ()) + 42,
   minZ: br344ReservedZ() - 48,
   maxZ: INTERCHANGE_ENVELOPES.seCloverleaf.center[1] + 78,

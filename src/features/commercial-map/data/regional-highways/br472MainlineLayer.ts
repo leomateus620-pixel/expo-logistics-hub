@@ -1,5 +1,12 @@
 import { officialPdfPointToLocal } from '../officialReference2026';
 import { REAR_OFFICIAL_ANCHORS } from '../../utils/rearSpatialCalibration';
+import { NE_CLOVERLEAF_STUBS } from '../neCloverleafBr344Br472';
+import {
+  SE_CLOVERLEAF_CENTER_LOCAL,
+  SE_CLOVERLEAF_JOIN_LOCAL,
+  SE_CLOVERLEAF_LAYOUT,
+  seCloverleafWestTerminusPoint,
+} from '../seCloverleaf';
 import {
   BR344_RESERVED_ALIGNMENT,
   INTERCHANGE_ENVELOPES,
@@ -41,32 +48,46 @@ const NORTH_TERMINUS_Z = NE[1] - 46;
 const SOUTH_THROUGH_Z = SE[1] + 72;
 const WEST_TERMINUS_X = PARK_LOCAL_BOUNDS.minX - 36;
 const WEST_RUN_Z = SE[1] + 36;
+const NE_NORTH = NE_CLOVERLEAF_STUBS.br472North.axis;
+const NE_SOUTH = NE_CLOVERLEAF_STUBS.br472South.axis;
+const SE_WEST = seCloverleafWestTerminusPoint();
+const SE_SOUTH_Z = SE_CLOVERLEAF_CENTER_LOCAL[1] + SE_CLOVERLEAF_LAYOUT.slipRadius + 1.4;
 
-export const BR472_NORTH_SOUTH_CENTERLINE = Object.freeze([
+/**
+ * N–S corridor excluding the NE cloverleaf interior. Concatenated so park-latitude
+ * tests still see a single polyline; drawn as two segments so the interchange
+ * mesh is not double-stroked.
+ */
+export const BR472_NORTH_OF_NE_CENTERLINE = Object.freeze([
   point(NORTH_TERMINUS_Z),
-  point(NE[1] - 28),
-  xz(NE[0], NE[1]),
-  point(NE[1] + 28),
+  xz(NE_NORTH[0], NE_NORTH[1]),
+] satisfies LocalPoint[]);
+
+export const BR472_NE_TO_SE_CENTERLINE = Object.freeze([
+  xz(NE_SOUTH[0], NE_SOUTH[1]),
   point(PARK_LOCAL_BOUNDS.minZ - 18),
   point(PARK_LOCAL_BOUNDS.minZ),
   point(0),
   xz(br472MainlineXAt(A5_JUNCTION[1]), A5_JUNCTION[1]),
   point(PARK_LOCAL_BOUNDS.maxZ),
-  point(SE[1] - 22),
-  xz(SE[0], SE[1]),
+  xz(SE_CLOVERLEAF_JOIN_LOCAL[0], SE_CLOVERLEAF_JOIN_LOCAL[1]),
+] satisfies LocalPoint[]);
+
+export const BR472_NORTH_SOUTH_CENTERLINE = Object.freeze([
+  ...BR472_NORTH_OF_NE_CENTERLINE,
+  ...BR472_NE_TO_SE_CENTERLINE,
 ] satisfies LocalPoint[]);
 
 export const BR472_SOUTH_WEST_CENTERLINE = Object.freeze([
-  xz(SE[0], SE[1]),
-  xz(SE[0] - 18, SE[1] + 10),
-  xz(SE[0] - 48, WEST_RUN_Z - 6),
+  xz(SE_WEST[0], SE_WEST[1]),
+  xz(SE_WEST[0] - 18, WEST_RUN_Z - 4),
   xz(20, WEST_RUN_Z),
   xz(-24, WEST_RUN_Z + 1),
   xz(WEST_TERMINUS_X, WEST_RUN_Z + 2),
 ] satisfies LocalPoint[]);
 
 export const BR472_SOUTH_THROUGH_CENTERLINE = Object.freeze([
-  xz(SE[0], SE[1]),
+  xz(br472MainlineXAt(SE_SOUTH_Z), SE_SOUTH_Z),
   xz(br472MainlineXAt(SE[1] + 24), SE[1] + 24),
   xz(br472MainlineXAt(SOUTH_THROUGH_Z), SOUTH_THROUGH_Z),
 ] satisfies LocalPoint[]);
@@ -121,7 +142,8 @@ function labelOn(
   });
 }
 
-const northSouth = BR472_NORTH_SOUTH_CENTERLINE;
+const northOfNe = BR472_NORTH_OF_NE_CENTERLINE;
+const neToSe = BR472_NE_TO_SE_CENTERLINE;
 const southWest = BR472_SOUTH_WEST_CENTERLINE;
 const southThrough = BR472_SOUTH_THROUGH_CENTERLINE;
 const hookStem = a5HookStem();
@@ -141,43 +163,49 @@ export const BR472_A5_HOOK = Object.freeze({
 
 export const BR472_EXTERIOR_SEGMENTS: readonly RegionalHighwaySegment[] = Object.freeze([
   Object.freeze({
-    id: 'br472-exterior-north-south',
-    highwayId: 'BR-472',
-    kind: 'mainline',
-    centerline: northSouth,
+    id: 'br472-exterior-north-of-ne',
+    highwayId: 'BR-472' as const,
+    kind: 'mainline' as const,
+    centerline: northOfNe,
+  }),
+  Object.freeze({
+    id: 'br472-exterior-ne-to-se',
+    highwayId: 'BR-472' as const,
+    kind: 'mainline' as const,
+    centerline: neToSe,
   }),
   Object.freeze({
     id: 'br472-exterior-south-west',
-    highwayId: 'BR-472',
-    kind: 'mainline',
+    highwayId: 'BR-472' as const,
+    kind: 'mainline' as const,
     centerline: southWest,
   }),
   Object.freeze({
     id: 'br472-exterior-south-through',
-    highwayId: 'BR-472',
-    kind: 'stub',
+    highwayId: 'BR-472' as const,
+    kind: 'stub' as const,
     centerline: southThrough,
   }),
   Object.freeze({
     id: 'br472-a5-hook-stem',
-    highwayId: 'BR-472',
-    kind: 'connector',
+    highwayId: 'BR-472' as const,
+    kind: 'connector' as const,
     centerline: hookStem,
     carriagewayWidth: REGIONAL_HIGHWAY_PROFILE.connectorWidth,
     shoulderWidth: REGIONAL_HIGHWAY_PROFILE.connectorShoulderWidth,
   }),
   Object.freeze({
     id: 'br472-a5-hook-north',
-    highwayId: 'BR-472',
-    kind: 'ramp',
+    highwayId: 'BR-472' as const,
+    kind: 'ramp' as const,
     centerline: hookNorth,
     carriagewayWidth: REGIONAL_HIGHWAY_PROFILE.connectorWidth,
     shoulderWidth: REGIONAL_HIGHWAY_PROFILE.connectorShoulderWidth,
   }),
   Object.freeze({
     id: 'br472-a5-hook-south',
-    highwayId: 'BR-472',
-    kind: 'ramp',
+    highwayId: 'BR-472' as const,
+    kind: 'ramp' as const,
     centerline: hookSouth,
     carriagewayWidth: REGIONAL_HIGHWAY_PROFILE.connectorWidth,
     shoulderWidth: REGIONAL_HIGHWAY_PROFILE.connectorShoulderWidth,
@@ -185,9 +213,9 @@ export const BR472_EXTERIOR_SEGMENTS: readonly RegionalHighwaySegment[] = Object
 ]);
 
 export const BR472_EXTERIOR_LABELS: readonly RegionalHighwayLabel[] = Object.freeze([
-  labelOn('br472-label-north', northSouth, 0.18),
-  labelOn('br472-label-a5', northSouth, 0.58),
-  labelOn('br472-label-south-east', northSouth, 0.9),
+  labelOn('br472-label-north', northOfNe, 0.45),
+  labelOn('br472-label-a5', neToSe, 0.48),
+  labelOn('br472-label-south-east', neToSe, 0.88),
   labelOn('br472-label-south-west', southWest, 0.62),
   labelOn('br472-label-south-through', southThrough, 0.72),
 ]);
@@ -200,7 +228,9 @@ export const REGIONAL_HIGHWAY_LAYER: RegionalHighwayLayer = Object.freeze({
 });
 
 export const BR472_EXTERIOR_MAINLINE = Object.freeze({
-  northSouth: northSouth,
+  northSouth: BR472_NORTH_SOUTH_CENTERLINE,
+  northOfNe: northOfNe,
+  neToSe: neToSe,
   southWest: southWest,
   southThrough: southThrough,
   neAttachment: Object.freeze([NE[0], NE[1]] as const),

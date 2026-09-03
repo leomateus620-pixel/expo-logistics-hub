@@ -62,20 +62,23 @@ function parkRectangleContains(x: number, z: number) {
 
 describe('rodovias regionais — contrato compartilhado e BR-472 exterior', () => {
   it('publica o idioma de malha/material para os agentes #2–#4 sem criar entidade nova', () => {
-    expect(REGIONAL_HIGHWAY_REVISION).toBe('2026.10-regional-highways.1');
+    expect(REGIONAL_HIGHWAY_REVISION).toBe('2026.10-regional-highways.2');
     expect(REGIONAL_HIGHWAY_PALETTE).toMatchObject({
       carriageway: '#2f9e44',
       shoulder: '#d4b896',
       edgeLine: '#f5d031',
     });
-    expect(collectRegionalHighwayLayers().map((layer) => layer.id)).toEqual([
-      'br472-exterior-mainline',
-    ]);
-    expect(BR344_RESERVED_ALIGNMENT.z).toBeCloseTo(br344ReservedZ(), 12);
-    expect(BR344_RESERVED_ALIGNMENT.z).toBeCloseTo(
-      PARK_LOCAL_BOUNDS.minZ - PARK_LOCAL_BOUNDS.depth * 1.5,
-      8,
+    expect(collectRegionalHighwayLayers().map((layer) => layer.id)).toEqual(
+      expect.arrayContaining([
+        'br472-exterior-mainline',
+        'br344-mainline',
+        'ne-cloverleaf',
+        'se-cloverleaf',
+      ]),
     );
+    expect(collectRegionalHighwayLayers()).toHaveLength(4);
+    expect(BR344_RESERVED_ALIGNMENT.z).toBeCloseTo(br344ReservedZ(), 12);
+    expect(BR344_RESERVED_ALIGNMENT.z).toBeLessThan(PARK_LOCAL_BOUNDS.minZ - PARK_LOCAL_BOUNDS.depth * 1.4);
     expect(pointInInterchangeEnvelope(
       [INTERCHANGE_ENVELOPES.neCloverleaf.center[0], INTERCHANGE_ENVELOPES.neCloverleaf.center[1]],
       'neCloverleaf',
@@ -217,6 +220,9 @@ describe('rodovias regionais — contrato compartilhado e BR-472 exterior', () =
     const canvas = source('src/features/commercial-map/components/canvas/CommercialMapCanvas.tsx');
     expect(canvas).toContain('expandFramingBoundsWithRegionalHighways');
     expect(canvas).toContain('<RegionalHighwayNetwork');
+    expect(canvas).not.toContain('Br344Mainline');
+    expect(canvas).not.toContain('NeCloverleafInterchange');
+    expect(canvas).not.toContain('SeCloverleaf');
     expect(canvas).toContain('Rua Brasília is intentionally retained');
     expect(canvas).toContain('fitDistanceForDirection(\n      extent,');
     expect(canvas).toContain('maxDistance: Math.max(parkCameraDistanceBounds.maxDistance, regional.maxDistance)');
@@ -228,6 +234,7 @@ describe('rodovias regionais — contrato compartilhado e BR-472 exterior', () =
     expect(network.shoulders).not.toBeNull();
     expect(network.edgeLines).not.toBeNull();
     expect(network.labels.some((label) => label.text === 'BR-472')).toBe(true);
+    expect(network.labels.some((label) => label.text === 'BR-344')).toBe(true);
     expect(network.diagnostics.triangleCount).toBeLessThan(REGIONAL_HIGHWAY_BUDGET.maximumTriangles);
     expect(network.diagnostics.estimatedBaseDrawCalls).toBeLessThanOrEqual(
       REGIONAL_HIGHWAY_BUDGET.maximumBaseDrawCalls,
