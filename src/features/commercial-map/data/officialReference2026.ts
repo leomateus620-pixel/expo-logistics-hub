@@ -117,6 +117,14 @@ export function officialPdfPointToLocal([x, y]: readonly [number, number]): Coor
   ];
 }
 
+/** Inverse of {@link officialPdfPointToLocal} for folding exterior highway slices. */
+export function officialLocalPointToPdf([x, z]: readonly [number, number]): Coordinate {
+  return [
+    ((x + MAP_REFERENCE_WIDTH / 2) / MAP_REFERENCE_WIDTH) * CROP.width + CROP.x,
+    ((z + MAP_REFERENCE_HEIGHT / 2) / MAP_REFERENCE_HEIGHT) * CROP.height + CROP.y,
+  ];
+}
+
 const pdfToLocal = officialPdfPointToLocal;
 
 function rectPdf([x1, y1, x2, y2]: PdfBounds, inset = 0): PdfPolygon {

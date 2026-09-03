@@ -139,8 +139,11 @@ export const COMMERCIAL_MAP_ENVIRONMENT_CONFIG = {
     hydrologicalOpacity: 0.22,
   },
   ground: {
-    minimumWorldSize: 1_600,
-    worldSizeRatio: 12,
+    // Regional BR-344/BR-472 sit well outside the 120×90 park crop. Keep the
+    // opaque grass plane larger than that corridor so the void never shows a
+    // horizon seam when the camera dollies out to the highways.
+    minimumWorldSize: 2_400,
+    worldSizeRatio: 14,
   },
   fog: {
     minimumNearRatio: 4.4,
