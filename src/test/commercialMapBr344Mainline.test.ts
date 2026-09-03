@@ -144,10 +144,10 @@ describe('BR-344 mainline — isolated E–W highway slice', () => {
     expect(BR344_PUBLIC_IDENTIFIER).toBe('RODOVIA-BR-344');
   });
 
-  it('uses the Image 2 cartographic language: green carriageway, tan shoulders, yellow edges', () => {
-    expect(BR344_CARTOGRAPHIC_FINISH.carriagewayColor).toMatch(/^#3d/i);
-    expect(BR344_CARTOGRAPHIC_FINISH.shoulderColor).toMatch(/^#c/i);
-    expect(BR344_CARTOGRAPHIC_FINISH.yellowEdgeColor).toMatch(/^#f5/i);
+  it('uses architectural-aerial asphalt, compacted shoulders and restrained yellow edges', () => {
+    expect(BR344_CARTOGRAPHIC_FINISH.carriagewayColor).toBe('#44494c');
+    expect(BR344_CARTOGRAPHIC_FINISH.shoulderColor).toBe('#a99b84');
+    expect(BR344_CARTOGRAPHIC_FINISH.yellowEdgeColor).toBe('#e3c44b');
 
     expect(BR344_OFFSETS.northYellowOuter).toBeLessThan(BR344_OFFSETS.northShoulderOuter);
     expect(BR344_OFFSETS.northShoulderOuter).toBeLessThan(BR344_OFFSETS.northCarriagewayOuter);

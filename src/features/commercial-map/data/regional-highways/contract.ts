@@ -21,7 +21,7 @@ import { officialPdfPointToLocal } from '../officialReference2026';
  * lives east of the official crop and only visually aims at that existing
  * access.
  */
-export const REGIONAL_HIGHWAY_REVISION = '2026.10-regional-highways.3';
+export const REGIONAL_HIGHWAY_REVISION = '2026.10-regional-highways.4-pbr-asphalt';
 
 export type RegionalHighwayId = 'BR-472' | 'BR-344';
 export type RegionalHighwayAgent = 'integrator' | 'br344' | 'ne-cloverleaf' | 'se-cloverleaf';
@@ -109,11 +109,11 @@ export const BR344_SOURCE_Y = BR344_HUB_SOURCE_NORTH
   - BR344_NORTH_OFFSET_FACTOR * (BR344_HUB_SOURCE_SOUTH - BR344_HUB_SOURCE_NORTH);
 
 export const REGIONAL_HIGHWAY_PALETTE = Object.freeze({
-  carriageway: '#2f9e44',
-  carriagewayGrain: '#278a3b',
-  shoulder: '#d4b896',
-  shoulderGrain: '#c4a57e',
-  edgeLine: '#f5d031',
+  carriageway: '#44494c',
+  carriagewayGrain: '#33383b',
+  shoulder: '#a99b84',
+  shoulderGrain: '#8f816c',
+  edgeLine: '#e3c44b',
   labelFill: '#f7f7f4',
   labelStroke: '#d8d8d2',
   labelText: '#161616',

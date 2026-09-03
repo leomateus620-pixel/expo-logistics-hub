@@ -31,7 +31,9 @@ export interface CommercialMapSunriseFrame {
 export const COMMERCIAL_MAP_ENVIRONMENT_CONFIG = {
   revision: '2026.8-premium-sunrise.2-camera-safe',
   sunrise: {
-    durationMs: 12_000,
+    // The reveal remains visible, but reaches useful architectural daylight
+    // quickly enough that the cold-start experience is never a dark model.
+    durationMs: 7_500,
     // Attachments 1-2 face the top/rear of the official plan. The plan is
     // mapped without rotation, so its stable horizon is world -Z. This is a
     // map-local bearing, not a surveyed claim of true north.
@@ -39,7 +41,9 @@ export const COMMERCIAL_MAP_ENVIRONMENT_CONFIG = {
     horizonDirection: [0, 0, -1] as const,
     horizonLabel: 'topo/traseira da planta oficial (-Z)',
     startElevationDegrees: -0.6,
-    endElevationDegrees: 3.2,
+    // A 24-degree key keeps the warm aerial-reference character while avoiding
+    // kilometre-long shadows, acne and crushed north-facing facades.
+    endElevationDegrees: 24,
     apparentDiscDiameterDegrees: 1.62,
     coronaDiameterDegrees: 7.2,
     // The visual sun lives on a far-clamped celestial sphere. Keeping its
@@ -70,18 +74,21 @@ export const COMMERCIAL_MAP_ENVIRONMENT_CONFIG = {
         shadowRefreshIntervalMs: 66,
         bloomLevels: 7,
         bloomEnabled: true,
+        smaaPreset: 'ultra',
       },
       balanced: {
         shadowMapSize: 1536,
         shadowRefreshIntervalMs: 92,
         bloomLevels: 5,
         bloomEnabled: true,
+        smaaPreset: 'high',
       },
       reduced: {
         shadowMapSize: 512,
         shadowRefreshIntervalMs: 140,
         bloomLevels: 0,
         bloomEnabled: false,
+        smaaPreset: 'renderer-msaa',
       },
     },
   },
@@ -378,7 +385,10 @@ export function commercialMapEnvironmentBudget(
     cloudInstances: 0,
     cloudsIntegratedInSky: true,
     animatedLayers: 4,
-    postProcessingPasses: quality.bloomEnabled ? 2 : 0,
+    // Top-level composer passes: scene, combined Bloom/ACES and final SMAA.
+    // SMAA's two internal lookup passes and Bloom mip levels remain bounded by
+    // the presets above rather than being misreported as scene draw calls.
+    postProcessingPasses: quality.bloomEnabled ? 3 : 0,
     shadowMapSize: quality.shadowMapSize,
   } as const;
 }

@@ -64,11 +64,11 @@ function parkRectangleContains(x: number, z: number) {
 
 describe('rodovias regionais — contrato compartilhado e BR-472 exterior', () => {
   it('publica o idioma de malha/material para os agentes #2–#4 sem criar entidade nova', () => {
-    expect(REGIONAL_HIGHWAY_REVISION).toBe('2026.10-regional-highways.3');
+    expect(REGIONAL_HIGHWAY_REVISION).toBe('2026.10-regional-highways.4-pbr-asphalt');
     expect(REGIONAL_HIGHWAY_PALETTE).toMatchObject({
-      carriageway: '#2f9e44',
-      shoulder: '#d4b896',
-      edgeLine: '#f5d031',
+      carriageway: '#44494c',
+      shoulder: '#a99b84',
+      edgeLine: '#e3c44b',
     });
     expect(collectRegionalHighwayLayers().map((layer) => layer.id)).toEqual(
       expect.arrayContaining([

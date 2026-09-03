@@ -573,7 +573,23 @@ interface OpenGroundTextureSources {
   readonly roughnessMap: THREE.CanvasTexture;
 }
 
+export interface OpenGroundTextureSamplingOverrides {
+  /** Final UV repeat. Use this for PlaneGeometry, whose UVs are normalized. */
+  repeat?: readonly [number, number];
+  wrapS?: THREE.Wrapping;
+  wrapT?: THREE.Wrapping;
+}
+
 const TEXTURE_CACHE = new Map<OpenGroundSurface, OpenGroundTextureSources | null>();
+
+interface PooledOpenGroundTextureBundle {
+  map: THREE.CanvasTexture;
+  normalMap: THREE.CanvasTexture;
+  roughnessMap: THREE.CanvasTexture;
+  references: number;
+}
+
+const TEXTURE_BUNDLE_POOL = new Map<string, PooledOpenGroundTextureBundle>();
 
 function configureSharedTexture(
   texture: THREE.CanvasTexture,
@@ -664,16 +680,17 @@ function cloneOpenGroundTexture(
   sampling: ReturnType<typeof resolveOpenGroundTextureSampling>,
   colorSpace: THREE.ColorSpace,
   anisotropy: number,
+  overrides: Readonly<OpenGroundTextureSamplingOverrides> = {},
 ) {
   const texture = shared.clone();
-  texture.wrapS = sampling.wrapS;
-  texture.wrapT = sampling.wrapT;
+  texture.wrapS = overrides.wrapS ?? sampling.wrapS;
+  texture.wrapT = overrides.wrapT ?? sampling.wrapT;
   texture.colorSpace = colorSpace;
   texture.generateMipmaps = sampling.generateMipmaps;
   texture.minFilter = sampling.minFilter;
   texture.magFilter = sampling.magFilter;
   texture.anisotropy = anisotropy;
-  texture.repeat.set(...sampling.repeat);
+  texture.repeat.set(...(overrides.repeat ?? sampling.repeat));
   texture.needsUpdate = true;
   return texture;
 }
@@ -694,13 +711,15 @@ export function openGroundTextureForEntity(
 }
 
 /**
- * Complete PBR map set for one rendered entity. Every texture is a lightweight
- * clone with its own UV transform; their canvas pixels remain shared by surface
- * kind. Consumers own the clones and release all three through `dispose()`.
+ * Complete PBR map set for one rendered profile. Identical surface, UV scale
+ * and anisotropy requests share the same GPU textures through reference
+ * counting; different sampling profiles remain isolated. Consumers release
+ * their handle through `dispose()` and the last handle releases all three maps.
  */
 export function openGroundTextureBundleForEntity(
   profile: OpenGroundSurfaceProfile,
   maxAnisotropy: number = OPEN_GROUND_TEXTURE_SAMPLING_POLICY.maxAnisotropy,
+  overrides: Readonly<OpenGroundTextureSamplingOverrides> = {},
 ): OpenGroundTextureBundle | null {
   const shared = getOpenGroundTextureSources(profile.surface);
   if (!shared) return null;
@@ -709,36 +728,64 @@ export function openGroundTextureBundleForEntity(
     sampling.anisotropy,
     OPEN_GROUND_TEXTURE_SAMPLING_POLICY.maxDataAnisotropy,
   );
-  const map = cloneOpenGroundTexture(
-    shared.map,
-    sampling,
-    OPEN_GROUND_TEXTURE_SAMPLING_POLICY.colorSpace,
+  const repeat = overrides.repeat ?? sampling.repeat;
+  const wrapS = overrides.wrapS ?? sampling.wrapS;
+  const wrapT = overrides.wrapT ?? sampling.wrapT;
+  const poolKey = [
+    profile.surface,
+    repeat[0].toFixed(8),
+    repeat[1].toFixed(8),
+    wrapS,
+    wrapT,
     sampling.anisotropy,
-  );
-  const normalMap = cloneOpenGroundTexture(
-    shared.normalMap,
-    sampling,
-    OPEN_GROUND_TEXTURE_SAMPLING_POLICY.dataColorSpace,
     dataAnisotropy,
-  );
-  const roughnessMap = cloneOpenGroundTexture(
-    shared.roughnessMap,
-    sampling,
-    OPEN_GROUND_TEXTURE_SAMPLING_POLICY.dataColorSpace,
-    dataAnisotropy,
-  );
+  ].join(':');
+  let pooled = TEXTURE_BUNDLE_POOL.get(poolKey);
+  if (!pooled) {
+    pooled = {
+      map: cloneOpenGroundTexture(
+        shared.map,
+        sampling,
+        OPEN_GROUND_TEXTURE_SAMPLING_POLICY.colorSpace,
+        sampling.anisotropy,
+        overrides,
+      ),
+      normalMap: cloneOpenGroundTexture(
+        shared.normalMap,
+        sampling,
+        OPEN_GROUND_TEXTURE_SAMPLING_POLICY.dataColorSpace,
+        dataAnisotropy,
+        overrides,
+      ),
+      roughnessMap: cloneOpenGroundTexture(
+        shared.roughnessMap,
+        sampling,
+        OPEN_GROUND_TEXTURE_SAMPLING_POLICY.dataColorSpace,
+        dataAnisotropy,
+        overrides,
+      ),
+      references: 0,
+    };
+    TEXTURE_BUNDLE_POOL.set(poolKey, pooled);
+  }
+  pooled.references += 1;
   let disposed = false;
 
   return Object.freeze({
-    map,
-    normalMap,
-    roughnessMap,
+    map: pooled.map,
+    normalMap: pooled.normalMap,
+    roughnessMap: pooled.roughnessMap,
     dispose: () => {
       if (disposed) return;
       disposed = true;
-      map.dispose();
-      normalMap.dispose();
-      roughnessMap.dispose();
+      const live = TEXTURE_BUNDLE_POOL.get(poolKey);
+      if (!live) return;
+      live.references = Math.max(0, live.references - 1);
+      if (live.references > 0) return;
+      TEXTURE_BUNDLE_POOL.delete(poolKey);
+      live.map.dispose();
+      live.normalMap.dispose();
+      live.roughnessMap.dispose();
     },
   });
 }

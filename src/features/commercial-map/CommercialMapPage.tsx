@@ -555,6 +555,7 @@ export default function CommercialMapPage({ scope = FULL_COMMERCIAL_MAP_SCOPE }:
             >
               <Profiler id="CommercialMapCanvas" onRender={recordCommercialMapProfiler}>
                 <CommercialMapCanvas
+                  active={workspaceMode === '3d'}
                   entities={scopedData.entities}
                   parkingOwnerEntities={data.entities}
                   siteEnvironmentEntities={data.entities}

@@ -53,11 +53,15 @@ describe('contrato de estabilidade do mapa comercial', () => {
     expect(canvas).toContain('enabled={!lunarCameraLocked && !transitionControlsLocked}');
   });
 
-  it('fixa DPR por sessão e expõe telemetria de renderer, React e contexto WebGL', () => {
+  it('adapta DPR pelo estado do R3F e expõe telemetria de renderer, qualidade e contexto WebGL', () => {
     const canvas = read('src/features/commercial-map/components/canvas/CommercialMapCanvas.tsx');
+    const quality = read('src/features/commercial-map/components/canvas/CommercialMapAdaptiveQuality.tsx');
     const diagnostics = read('src/features/commercial-map/utils/runtimeDiagnostics.ts');
 
-    expect(canvas).toContain('const pixelRatio = useRef(resolveCommercialMapPixelRatio');
+    expect(canvas).toContain('const pixelRatio = useRef(initialViewport.current.reducedGraphics');
+    expect(canvas).toContain('<CommercialMapAdaptiveQualityController');
+    expect(quality).toContain('const setDpr = useThree((state) => state.setDpr)');
+    expect(quality).toContain('resolveCommercialMapAdaptiveQuality');
     expect(canvas).toContain('registerMapGestureGuard(gl.domElement)');
     expect(canvas).toContain('registerCommercialMapRuntimeDiagnostics({ gl, scene, camera })');
     expect(diagnostics).toContain('webglcontextlost');
@@ -65,6 +69,9 @@ describe('contrato de estabilidade do mapa comercial', () => {
     expect(diagnostics).toContain('gl.info.memory.textures');
     expect(diagnostics).toContain('reactCommits');
     expect(diagnostics).toContain("type: 'long-task'");
+    expect(diagnostics).toContain('qualityTier');
+    expect(diagnostics).toContain('qualityDpr');
+    expect(diagnostics).toContain("type: 'adaptive-quality-changed'");
   });
 
   it('compartilha controles e câmera com todos os interiores sem cortina ou recriação do exterior', () => {

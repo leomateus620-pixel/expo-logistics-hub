@@ -9,6 +9,11 @@ import {
   disposeRoadNetworkGeometries,
   isRoadInfrastructureEntity,
 } from '../../utils/roadInfrastructure';
+import {
+  openGroundTextureBundleForEntity,
+  type OpenGroundSurfaceProfile,
+  type OpenGroundTextureBundle,
+} from './openGroundTextures';
 
 // ANALYST 2026.9-annex-road-precision.1 — this component only extrudes official
 // ROAD polygons. Keep RUA-BRASILIA rectPdf([3940, 2440, 3988, 4210]) in the
@@ -26,65 +31,33 @@ interface RoadInfrastructureProps {
 
 interface RoadLayerNetworkProps extends Omit<RoadInfrastructureProps, 'layerOpacity'> {
   opacity: number;
+  surfaceTextures: RoadSurfaceTextures | null;
 }
 
 const NO_RAYCAST = () => undefined;
 
-function textureNoise(x: number, y: number, seed: number) {
-  let value = (x * 374761393 + y * 668265263 + seed * 1442695041) >>> 0;
-  value = Math.imul(value ^ (value >>> 13), 1274126177) >>> 0;
-  return ((value ^ (value >>> 16)) & 0xffff) / 0xffff;
+interface RoadSurfaceTextures {
+  asphalt: OpenGroundTextureBundle | null;
+  pedestrian: OpenGroundTextureBundle | null;
 }
 
-function createSurfaceTexture(seed: number, paving = false) {
-  const size = ROAD_SURFACE_PROFILE.textureSize;
-  const data = new Uint8Array(size * size * 4);
-  for (let y = 0; y < size; y += 1) {
-    for (let x = 0; x < size; x += 1) {
-      const fine = textureNoise(x, y, seed) - 0.5;
-      const coarse = Math.sin((x + seed) * 0.24) * 0.5 + Math.cos((y - seed) * 0.19) * 0.5;
-      const broad = Math.sin((x + y + seed) * 0.055) * 0.5
-        + Math.cos((x - y - seed) * 0.041) * 0.5;
-      const joint = paving && (x % 24 <= 1 || y % 16 <= 1) ? -22 : 0;
-      const value = THREE.MathUtils.clamp(
-        Math.round(
-          (paving ? 222 : ROAD_SURFACE_PROFILE.asphaltTextureBase)
-          + fine * (paving ? 18 : ROAD_SURFACE_PROFILE.asphaltGrainAmplitude)
-          + coarse * (paving ? 5 : 3)
-          + broad * (paving ? 0 : 2.5)
-          + joint,
-        ),
-        paving ? 160 : 204,
-        paving ? 242 : 246,
-      );
-      const offset = (y * size + x) * 4;
-      data[offset] = value;
-      data[offset + 1] = value;
-      data[offset + 2] = value;
-      data[offset + 3] = 255;
-    }
-  }
-  const texture = new THREE.DataTexture(data, size, size, THREE.RGBAFormat, THREE.UnsignedByteType);
-  texture.wrapS = THREE.RepeatWrapping;
-  texture.wrapT = THREE.RepeatWrapping;
-  texture.repeat.set(paving ? 0.32 : 0.44, paving ? 0.32 : 0.44);
-  texture.minFilter = THREE.LinearMipmapLinearFilter;
-  texture.magFilter = THREE.LinearFilter;
-  texture.generateMipmaps = true;
-  texture.anisotropy = 4;
-  texture.colorSpace = THREE.SRGBColorSpace;
-  texture.needsUpdate = true;
-  return texture;
-}
+const ROAD_SURFACE_PROFILES = Object.freeze({
+  asphalt: Object.freeze({
+    surface: 'parkAsphalt',
+    tileWorldSize: 3.6,
+    baseColor: ROAD_MATERIAL_COLORS.asphalt,
+    roughness: ROAD_SURFACE_PROFILE.asphaltRoughness,
+  }),
+  pedestrian: Object.freeze({
+    surface: 'concrete',
+    tileWorldSize: 3.2,
+    baseColor: ROAD_MATERIAL_COLORS.pedestrian,
+    roughness: 0.94,
+  }),
+} satisfies Readonly<Record<'asphalt' | 'pedestrian', OpenGroundSurfaceProfile>>);
 
-const ASPHALT_COLOR_TEXTURE = createSurfaceTexture(2026);
-const ASPHALT_ROUGHNESS_TEXTURE = ASPHALT_COLOR_TEXTURE.clone();
-ASPHALT_ROUGHNESS_TEXTURE.colorSpace = THREE.NoColorSpace;
-ASPHALT_ROUGHNESS_TEXTURE.needsUpdate = true;
-const PEDESTRIAN_COLOR_TEXTURE = createSurfaceTexture(472, true);
-const PEDESTRIAN_ROUGHNESS_TEXTURE = PEDESTRIAN_COLOR_TEXTURE.clone();
-PEDESTRIAN_ROUGHNESS_TEXTURE.colorSpace = THREE.NoColorSpace;
-PEDESTRIAN_ROUGHNESS_TEXTURE.needsUpdate = true;
+const ASPHALT_NORMAL_SCALE = new THREE.Vector2(0.13, 0.13);
+const PEDESTRIAN_NORMAL_SCALE = new THREE.Vector2(0.1, 0.1);
 
 const RoadLayerNetwork = memo(function RoadLayerNetwork({
   entities,
@@ -93,6 +66,7 @@ const RoadLayerNetwork = memo(function RoadLayerNetwork({
   filtersActive,
   opacity,
   reducedGraphics,
+  surfaceTextures,
 }: RoadLayerNetworkProps) {
   const { invalidate } = useThree();
   const network = useMemo(
@@ -148,10 +122,10 @@ const RoadLayerNetwork = memo(function RoadLayerNetwork({
         <mesh geometry={network.asphalt} receiveShadow raycast={NO_RAYCAST}>
           <meshStandardMaterial
             color={ROAD_MATERIAL_COLORS.asphalt}
-            map={reducedGraphics ? undefined : ASPHALT_COLOR_TEXTURE}
-            roughnessMap={reducedGraphics ? undefined : ASPHALT_ROUGHNESS_TEXTURE}
-            bumpMap={reducedGraphics ? undefined : ASPHALT_ROUGHNESS_TEXTURE}
-            bumpScale={ROAD_SURFACE_PROFILE.asphaltBumpScale}
+            map={surfaceTextures?.asphalt?.map}
+            normalMap={surfaceTextures?.asphalt?.normalMap}
+            normalScale={surfaceTextures?.asphalt ? ASPHALT_NORMAL_SCALE : undefined}
+            roughnessMap={surfaceTextures?.asphalt?.roughnessMap}
             roughness={ROAD_SURFACE_PROFILE.asphaltRoughness}
             metalness={0}
             transparent={transparent}
@@ -165,10 +139,10 @@ const RoadLayerNetwork = memo(function RoadLayerNetwork({
         <mesh geometry={network.intersections} receiveShadow raycast={NO_RAYCAST}>
           <meshStandardMaterial
             color={ROAD_MATERIAL_COLORS.asphalt}
-            map={reducedGraphics ? undefined : ASPHALT_COLOR_TEXTURE}
-            roughnessMap={reducedGraphics ? undefined : ASPHALT_ROUGHNESS_TEXTURE}
-            bumpMap={reducedGraphics ? undefined : ASPHALT_ROUGHNESS_TEXTURE}
-            bumpScale={ROAD_SURFACE_PROFILE.asphaltBumpScale * 0.9}
+            map={surfaceTextures?.asphalt?.map}
+            normalMap={surfaceTextures?.asphalt?.normalMap}
+            normalScale={surfaceTextures?.asphalt ? ASPHALT_NORMAL_SCALE : undefined}
+            roughnessMap={surfaceTextures?.asphalt?.roughnessMap}
             roughness={ROAD_SURFACE_PROFILE.asphaltRoughness}
             metalness={0}
             transparent={transparent}
@@ -185,10 +159,10 @@ const RoadLayerNetwork = memo(function RoadLayerNetwork({
         <mesh geometry={network.pedestrian} receiveShadow raycast={NO_RAYCAST}>
           <meshStandardMaterial
             color={ROAD_MATERIAL_COLORS.pedestrian}
-            map={reducedGraphics ? undefined : PEDESTRIAN_COLOR_TEXTURE}
-            roughnessMap={reducedGraphics ? undefined : PEDESTRIAN_ROUGHNESS_TEXTURE}
-            bumpMap={reducedGraphics ? undefined : PEDESTRIAN_ROUGHNESS_TEXTURE}
-            bumpScale={0.004}
+            map={surfaceTextures?.pedestrian?.map}
+            normalMap={surfaceTextures?.pedestrian?.normalMap}
+            normalScale={surfaceTextures?.pedestrian ? PEDESTRIAN_NORMAL_SCALE : undefined}
+            roughnessMap={surfaceTextures?.pedestrian?.roughnessMap}
             roughness={0.94}
             metalness={0}
             transparent={transparent}
@@ -244,10 +218,10 @@ const RoadLayerNetwork = memo(function RoadLayerNetwork({
           <mesh geometry={selectedGeometry} receiveShadow raycast={NO_RAYCAST} renderOrder={5}>
             <meshStandardMaterial
               color={ROAD_MATERIAL_COLORS.selected}
-              map={reducedGraphics ? undefined : ASPHALT_COLOR_TEXTURE}
-              roughnessMap={reducedGraphics ? undefined : ASPHALT_ROUGHNESS_TEXTURE}
-              bumpMap={reducedGraphics ? undefined : ASPHALT_ROUGHNESS_TEXTURE}
-              bumpScale={ROAD_SURFACE_PROFILE.asphaltBumpScale}
+              map={surfaceTextures?.asphalt?.map}
+              normalMap={surfaceTextures?.asphalt?.normalMap}
+              normalScale={surfaceTextures?.asphalt ? ASPHALT_NORMAL_SCALE : undefined}
+              roughnessMap={surfaceTextures?.asphalt?.roughnessMap}
               emissive={ROAD_MATERIAL_COLORS.selectionGlow}
               emissiveIntensity={0.05}
               roughness={ROAD_SURFACE_PROFILE.asphaltRoughness}
@@ -274,6 +248,7 @@ export const RoadInfrastructure = memo(function RoadInfrastructure({
   layerOpacity,
   reducedGraphics,
 }: RoadInfrastructureProps) {
+  const maximumAnisotropy = useThree((state) => state.gl.capabilities.getMaxAnisotropy());
   const groups = useMemo(() => {
     const byLayer = new Map<string, MapEntity[]>();
     entities.filter(isRoadInfrastructureEntity).forEach((entity) => {
@@ -283,6 +258,24 @@ export const RoadInfrastructure = memo(function RoadInfrastructure({
     });
     return [...byLayer.entries()];
   }, [entities]);
+  const surfaceTextures = useMemo<RoadSurfaceTextures | null>(() => {
+    if (reducedGraphics) return null;
+    return {
+      asphalt: openGroundTextureBundleForEntity(
+        ROAD_SURFACE_PROFILES.asphalt,
+        maximumAnisotropy,
+      ),
+      pedestrian: openGroundTextureBundleForEntity(
+        ROAD_SURFACE_PROFILES.pedestrian,
+        maximumAnisotropy,
+      ),
+    };
+  }, [maximumAnisotropy, reducedGraphics]);
+
+  useEffect(() => () => {
+    surfaceTextures?.asphalt?.dispose();
+    surfaceTextures?.pedestrian?.dispose();
+  }, [surfaceTextures]);
 
   return (
     <>
@@ -295,6 +288,7 @@ export const RoadInfrastructure = memo(function RoadInfrastructure({
           filtersActive={filtersActive}
           opacity={layerOpacity[layerId] ?? 1}
           reducedGraphics={reducedGraphics}
+          surfaceTextures={surfaceTextures}
         />
       ))}
     </>

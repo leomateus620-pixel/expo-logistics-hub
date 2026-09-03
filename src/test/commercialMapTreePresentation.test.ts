@@ -9,7 +9,10 @@ import {
   QUADRAS_AB_TREE_PRESENTATION_DRAW_CALLS,
   commercialTreePresentationProfile,
   commercialTreePresentationSeed,
+  resolveCommercialTreeLodInstanceCounts,
+  resolveCommercialTreeLodSceneMetrics,
 } from '@/features/commercial-map/components/canvas/CommercialTreeLayer';
+import { buildVegetationLodSelectionPlan } from '@/features/commercial-map/utils/vegetationLod';
 
 const rendererPath = path.resolve(
   process.cwd(),
@@ -124,15 +127,69 @@ describe('apresentação profissional e instanciada das árvores comerciais', ()
     expect(rendererSource).not.toContain('<ContactShadows');
     expect(rendererSource).toContain('{!reducedGraphics && (');
     expect(rendererSource).toContain('name="contato-solo-arvores-comerciais"');
-    expect(rendererSource).toContain('trees.forEach((tree, treeIndex) => {');
+    expect(rendererSource).toContain('lodPlan.rankedItems.forEach((tree, treeIndex) => {');
+    expect(rendererSource).toContain('mesh.count = mesh.instanceMatrix.count');
+    expect(rendererSource).toContain('mesh.count = renderedCount');
     expect(rendererSource).not.toContain('trees.map((tree');
+  });
+
+  it('preserva 100% do inventário no near e reduz primeiro detalhes secundários no mobile', () => {
+    const plan = buildVegetationLodSelectionPlan(COMMERCIAL_MAP_TREES, {
+      key: (tree) => tree.id,
+      seed: 'commercial-tree-test',
+      densityByTier: { near: 1, mid: 0.82, far: 0.62 },
+    });
+    const canonicalIds = new Set(COMMERCIAL_MAP_TREES.map((tree) => tree.id));
+
+    expect(plan.countByTier).toEqual({ near: 274, mid: 225, far: 170 });
+    expect(new Set(plan.itemsByTier.near.map((tree) => tree.id))).toEqual(canonicalIds);
+    expect(plan.itemsByTier.mid.every((tree) => canonicalIds.has(tree.id))).toBe(true);
+    expect(plan.itemsByTier.far.every((tree) => (
+      plan.itemsByTier.mid.includes(tree)
+    ))).toBe(true);
+
+    expect(resolveCommercialTreeLodInstanceCounts(plan.countByTier, 'near', 7, false)).toEqual({
+      trees: 274,
+      trunks: 274,
+      branches: 548,
+      crowns: 1_918,
+      shadows: 0,
+      contactPatches: 274,
+      castsDynamicShadows: true,
+    });
+    expect(resolveCommercialTreeLodInstanceCounts(plan.countByTier, 'near', 3, true)).toEqual({
+      trees: 274,
+      trunks: 274,
+      branches: 450,
+      crowns: 822,
+      shadows: 274,
+      contactPatches: 0,
+      castsDynamicShadows: false,
+    });
+    expect(resolveCommercialTreeLodInstanceCounts(plan.countByTier, 'far', 7, false)).toMatchObject({
+      trees: 170,
+      trunks: 170,
+      branches: 0,
+      shadows: 170,
+      contactPatches: 0,
+      castsDynamicShadows: false,
+    });
+
+    const scene = resolveCommercialTreeLodSceneMetrics(COMMERCIAL_MAP_TREES);
+    expect(scene.diagonal).toBeGreaterThan(1);
+    expect(Number.isFinite(scene.anchor.x)).toBe(true);
+    expect(Number.isFinite(scene.anchor.z)).toBe(true);
+    expect(rendererSource).toContain('lodController?.update(distance, lodScene.diagonal)');
+    expect(rendererSource).toContain('setInstanceCount(trunk, counts.trunks)');
+    expect(rendererSource).not.toContain('useState');
   });
 
   it('aplica a copa e os materiais refinados somente ao grupo A/B sem duplicar o inventário legado', () => {
     expect(rendererSource).toContain("referenceQuadras: props.trees.filter((tree) => tree.area === 'QUADRA_A' || tree.area === 'QUADRA_B')");
     expect(rendererSource).toContain("legacy: props.trees.filter((tree) => tree.area !== 'QUADRA_A' && tree.area !== 'QUADRA_B')");
-    expect(rendererSource).toContain('trees={treeGroups.legacy} />');
-    expect(rendererSource).toContain('trees={treeGroups.referenceQuadras} referenceQuadras />');
+    expect(rendererSource).toContain('trees={treeGroups.legacy} lodScene={lodScene}');
+    expect(rendererSource).toContain('trees={treeGroups.referenceQuadras}');
+    expect(rendererSource).toContain('lodScene={lodScene}');
     expect(rendererSource.match(/<CommercialTreeInstances\b/g)).toHaveLength(2);
     expect(rendererSource).toContain('vertexColors: !referenceQuadras');
     expect(rendererSource).toContain('referenceQuadras ? mergeVertices(sourceGeometry, 1e-5) : sourceGeometry');

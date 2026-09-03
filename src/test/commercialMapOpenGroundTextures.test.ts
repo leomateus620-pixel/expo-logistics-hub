@@ -234,4 +234,37 @@ describe('texturas das áreas abertas do Mapa Comercial', () => {
 
     expect(disposalCounts).toEqual({ map: 1, normal: 1, roughness: 1 });
   });
+
+  it('reutiliza um único conjunto GPU para perfis de amostragem idênticos', () => {
+    const profile = TEXTURED_OPEN_GROUND['EST-VIS'];
+    const first = openGroundTextureBundleForEntity(profile, 8)!;
+    const second = openGroundTextureBundleForEntity(profile, 8)!;
+    const normalizedPlane = openGroundTextureBundleForEntity(profile, 8, {
+      repeat: [12, 9],
+      wrapS: THREE.MirroredRepeatWrapping,
+      wrapT: THREE.MirroredRepeatWrapping,
+    })!;
+    const disposed = { map: 0, normal: 0, roughness: 0 };
+    first.map.addEventListener('dispose', () => { disposed.map += 1; });
+    first.normalMap.addEventListener('dispose', () => { disposed.normal += 1; });
+    first.roughnessMap.addEventListener('dispose', () => { disposed.roughness += 1; });
+
+    expect(second).not.toBe(first);
+    expect(second.map).toBe(first.map);
+    expect(second.normalMap).toBe(first.normalMap);
+    expect(second.roughnessMap).toBe(first.roughnessMap);
+    expect(normalizedPlane.map).not.toBe(first.map);
+    expect(normalizedPlane.map.repeat.toArray()).toEqual([12, 9]);
+    expect(normalizedPlane.map.wrapS).toBe(THREE.MirroredRepeatWrapping);
+
+    first.dispose();
+    expect(disposed).toEqual({ map: 0, normal: 0, roughness: 0 });
+    second.dispose();
+    expect(disposed).toEqual({ map: 1, normal: 1, roughness: 1 });
+    normalizedPlane.dispose();
+
+    const reacquired = openGroundTextureBundleForEntity(profile, 8)!;
+    expect(reacquired.map).not.toBe(first.map);
+    reacquired.dispose();
+  });
 });

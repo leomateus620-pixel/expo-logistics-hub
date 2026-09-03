@@ -7,6 +7,8 @@ import {
   EffectComposer,
   EffectPass,
   RenderPass,
+  SMAAEffect,
+  SMAAPreset,
   ToneMappingEffect,
   ToneMappingMode,
 } from 'postprocessing';
@@ -22,18 +24,27 @@ import {
   type CommercialMapSunriseFrame,
   type CommercialMapSunriseQualityTier,
 } from '../../data/commercialMapEnvironment';
-import { resolveCommercialMapCameraDistanceBounds } from '../../utils/viewport';
+import {
+  resolveCommercialMapCameraDistanceBounds,
+  type CommercialMapQualityTier,
+} from '../../utils/viewport';
 import { useCommercialMapStore } from '../../state/useCommercialMapStore';
 import {
   openGroundTextureBundleForEntity,
   type OpenGroundSurfaceProfile,
 } from './openGroundTextures';
+import {
+  applyTerrainMultiscaleDetail,
+  resolveTerrainMultiscaleQualityOptions,
+} from './terrainMaterial';
+import { RegionalLandscapeLayer } from './RegionalLandscapeLayer';
 
 interface CommercialMapEnvironmentProps {
   active?: boolean;
   extent: CommercialMapEnvironmentExtent;
   hydrologicalModeActive: boolean;
   reducedGraphics: boolean;
+  adaptiveQualityTier?: CommercialMapQualityTier;
   nightMode?: boolean;
 }
 
@@ -385,6 +396,7 @@ function createCommercialMapPostProcessing(
   scene: THREE.Scene,
   camera: THREE.Camera,
   bloomLevels: number,
+  smaaPreset: 'high' | 'ultra',
 ) {
   const previousAutoClear = gl.autoClear;
   const composer = new EffectComposer(gl, {
@@ -403,18 +415,28 @@ function createCommercialMapPostProcessing(
     levels: bloomLevels,
   });
   const toneMapping = new ToneMappingEffect({ mode: ToneMappingMode.ACES_FILMIC });
+  // Renderer MSAA only affects the default framebuffer. The exterior renders
+  // through an HDR target, so it needs its own edge resolve. SMAA keeps roof,
+  // road and parking lines stable without TAA ghosting during pan/selection.
+  const smaa = new SMAAEffect({
+    preset: smaaPreset === 'ultra' ? SMAAPreset.ULTRA : SMAAPreset.HIGH,
+  });
   const renderPass = new RenderPass(scene, camera);
-  // Both effects have EffectAttribute.NONE in the installed dependency and the
-  // React wrapper combined them in this exact order into a single EffectPass.
+  // SMAA must see the final tone-mapped image. Keeping it in the same
+  // EffectPass would let postprocessing sort the convolution effect ahead of
+  // Bloom/ACES, which weakens edge detection on HDR values.
   const effectPass = new EffectPass(camera, bloom, toneMapping);
+  const smaaPass = new EffectPass(camera, smaa);
   composer.addPass(renderPass);
   composer.addPass(effectPass);
+  composer.addPass(smaaPass);
   let disposed = false;
   let selectionShadersPrepared = false;
   return {
     composer,
     bloom,
     toneMapping,
+    smaa,
     prepareSelectionShaders: () => {
       if (selectionShadersPrepared) return;
       const highlights = scene.getObjectByName('commercial-map-selection-shader-warmup');
@@ -478,14 +500,43 @@ export function SunrisePostProcessing({
 
   useLayoutEffect(() => {
     if (!quality.bloomEnabled) return;
-    const next = createCommercialMapPostProcessing(gl, scene, camera, quality.bloomLevels);
+    let next: ReturnType<typeof createCommercialMapPostProcessing> | null = null;
+    try {
+      next = createCommercialMapPostProcessing(
+        gl,
+        scene,
+        camera,
+        quality.bloomLevels,
+        quality.smaaPreset === 'ultra' ? 'ultra' : 'high',
+      );
+    } catch (error) {
+      // Some mobile drivers reject half-float render targets. The map remains
+      // functional with the renderer ACES/MSAA path instead of going blank.
+      if (import.meta.env.DEV) {
+        gl.domElement.dataset.commercialMapPostProcessingError = error instanceof Error
+          ? error.message
+          : String(error);
+      }
+      pipeline.current = null;
+      gl.toneMapping = rendererState.current.toneMapping;
+      invalidate();
+      return;
+    }
     pipeline.current = next;
     invalidate();
     return () => {
       if (pipeline.current === next) pipeline.current = null;
       next.dispose();
     };
-  }, [camera, gl, invalidate, quality.bloomEnabled, quality.bloomLevels, scene]);
+  }, [
+    camera,
+    gl,
+    invalidate,
+    quality.bloomEnabled,
+    quality.bloomLevels,
+    quality.smaaPreset,
+    scene,
+  ]);
 
   useLayoutEffect(() => {
     pipeline.current?.composer.setSize(size.width, size.height);
@@ -494,20 +545,64 @@ export function SunrisePostProcessing({
   useLayoutEffect(() => {
     // A disabled composer no longer owns output encoding. Restore the same
     // renderer ACES pipeline the interiors used before exterior caching.
-    gl.toneMapping = enabled && quality.bloomEnabled
+    gl.toneMapping = enabled && quality.bloomEnabled && pipeline.current
       ? THREE.NoToneMapping
       : rendererState.current.toneMapping;
     gl.autoClear = rendererState.current.autoClear;
     if (enabled) pipeline.current?.prepareSelectionShaders();
     invalidate();
-  }, [enabled, gl, invalidate, quality.bloomEnabled]);
+  }, [
+    enabled,
+    gl,
+    invalidate,
+    quality.bloomEnabled,
+    quality.bloomLevels,
+    quality.smaaPreset,
+  ]);
 
   useFrame((_state, delta) => {
-    if (!enabled || !pipeline.current) return;
+    // At reduced quality R3F's normal render remains the sole renderer. Direct
+    // rendering here is reserved for a failed composer whose positive frame
+    // priority has intentionally taken ownership of the frame.
+    if (!enabled || !quality.bloomEnabled) return;
     const previousAutoClear = gl.autoClear;
     gl.autoClear = true;
     try {
-      pipeline.current.composer.render(delta);
+      if (pipeline.current) {
+        pipeline.current.composer.render(delta);
+      } else {
+        const previousToneMapping = gl.toneMapping;
+        gl.toneMapping = rendererState.current.toneMapping;
+        try {
+          gl.render(scene, camera);
+        } finally {
+          gl.toneMapping = previousToneMapping;
+        }
+      }
+    } catch (error) {
+      const failedPipeline = pipeline.current;
+      pipeline.current = null;
+      try {
+        failedPipeline?.dispose();
+      } catch {
+        // The direct renderer below remains authoritative even if a broken
+        // driver also rejects render-target disposal.
+      }
+      // A late framebuffer/shader failure must not crash or strand the canvas.
+      // Temporarily restore the direct renderer's tone mapper for this frame.
+      const previousToneMapping = gl.toneMapping;
+      gl.toneMapping = rendererState.current.toneMapping;
+      try {
+        gl.render(scene, camera);
+      } finally {
+        gl.toneMapping = previousToneMapping;
+      }
+      gl.toneMapping = rendererState.current.toneMapping;
+      if (import.meta.env.DEV) {
+        gl.domElement.dataset.commercialMapPostProcessingError = error instanceof Error
+          ? error.message
+          : String(error);
+      }
     } finally {
       gl.autoClear = previousAutoClear;
     }
@@ -565,6 +660,7 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
   extent,
   hydrologicalModeActive,
   reducedGraphics,
+  adaptiveQualityTier = 'HIGH',
   nightMode = false,
 }: CommercialMapEnvironmentProps) {
   const scene = useThree((state) => state.scene);
@@ -592,9 +688,23 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
       hardwareConcurrency: device?.hardwareConcurrency,
     });
   }
+  const adaptiveEnvironmentTier: CommercialMapSunriseQualityTier = adaptiveQualityTier === 'LOW'
+    ? 'reduced'
+    : adaptiveQualityTier === 'MEDIUM'
+      ? 'balanced'
+      : 'full';
+  const initialEnvironmentTier = initialQualityTier.current ?? 'balanced';
+  const qualityOrder: readonly CommercialMapSunriseQualityTier[] = [
+    'reduced',
+    'balanced',
+    'full',
+  ];
   const qualityTier: CommercialMapSunriseQualityTier = reducedGraphics
     ? 'reduced'
-    : initialQualityTier.current ?? 'balanced';
+    : qualityOrder[Math.min(
+        qualityOrder.indexOf(initialEnvironmentTier),
+        qualityOrder.indexOf(adaptiveEnvironmentTier),
+      )];
   const quality = COMMERCIAL_MAP_ENVIRONMENT_CONFIG.sunrise.quality[qualityTier];
   const cameraDistanceBounds = useMemo(
     () => resolveCommercialMapCameraDistanceBounds({
@@ -660,20 +770,58 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
   );
   const activeGroundTextures = useMemo(() => {
     if (hydrologicalModeActive) return null;
-    const bundle = openGroundTextureBundleForEntity(ACTIVE_GROUND_PROFILE, maximumAnisotropy);
-    if (!bundle) return null;
     const repeatX = layout.outerGroundSize / ACTIVE_GROUND_PROFILE.tileWorldSize;
     const repeatY = layout.outerGroundSize / ACTIVE_GROUND_PROFILE.tileWorldSize;
-    [bundle.map, bundle.normalMap, bundle.roughnessMap].forEach((texture) => {
-      // Mirrored repetition joins identical edge texels. This keeps the
-      // procedural grass continuous without another transparent macro layer.
-      texture.wrapS = THREE.MirroredRepeatWrapping;
-      texture.wrapT = THREE.MirroredRepeatWrapping;
-      texture.repeat.set(repeatX, repeatY);
-      texture.needsUpdate = true;
+    // PlaneGeometry has normalized UVs. Include its final transform in the
+    // pool key so no later mutation can affect another PBR surface handle.
+    return openGroundTextureBundleForEntity(ACTIVE_GROUND_PROFILE, maximumAnisotropy, {
+      wrapS: THREE.MirroredRepeatWrapping,
+      wrapT: THREE.MirroredRepeatWrapping,
+      repeat: [repeatX, repeatY],
     });
-    return bundle;
   }, [hydrologicalModeActive, layout.outerGroundSize, maximumAnisotropy]);
+  const activeGroundMaterial = useMemo(() => {
+    const createBaseMaterial = () => new THREE.MeshStandardMaterial({
+      name: 'CommercialMapOuterGroundMaterial',
+      color: palette.activeGround,
+      map: activeGroundTextures?.map ?? null,
+      normalMap: activeGroundTextures?.normalMap ?? null,
+      normalScale: activeGroundTextures ? ACTIVE_GROUND_NORMAL_SCALE : undefined,
+      roughnessMap: activeGroundTextures?.roughnessMap ?? null,
+      roughness: 0.98,
+      metalness: 0,
+      envMapIntensity: 0.12,
+    });
+    const material = createBaseMaterial();
+    const terrainDetail = resolveTerrainMultiscaleQualityOptions(
+      qualityTier,
+      cameraDistanceBounds.maxDistance,
+      [extent.centerX, extent.centerZ],
+    );
+    if (!terrainDetail) return material;
+
+    try {
+      return applyTerrainMultiscaleDetail(material, terrainDetail);
+    } catch (error) {
+      // Shader customization is presentation-only. A driver/library mismatch
+      // must retain the original opaque PBR terrain instead of losing Canvas.
+      material.dispose();
+      if (import.meta.env.DEV) {
+        gl.domElement.dataset.commercialMapTerrainMaterialError = error instanceof Error
+          ? error.message
+          : String(error);
+      }
+      return createBaseMaterial();
+    }
+  }, [
+    activeGroundTextures,
+    cameraDistanceBounds.maxDistance,
+    extent.centerX,
+    extent.centerZ,
+    gl,
+    palette.activeGround,
+    qualityTier,
+  ]);
   const reflectionTextureWidth = qualityTier === 'reduced'
     ? COMMERCIAL_MAP_ENVIRONMENT_CONFIG.reflections.reducedTextureWidth
     : COMMERCIAL_MAP_ENVIRONMENT_CONFIG.reflections.fullTextureWidth;
@@ -724,6 +872,8 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
 
   useEffect(() => () => reflectionTexture.dispose(), [reflectionTexture]);
 
+  useEffect(() => () => activeGroundMaterial.dispose(), [activeGroundMaterial]);
+
   useEffect(() => {
     timeline.current.sequence = sunriseSequence;
     timeline.current.lastAppliedProgress = -1;
@@ -766,7 +916,7 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
     }
     if (useCommercialMapStore.getState().sunrisePhase === 'idle') requestSunrise();
     else invalidate();
-  }, [camera, gl, invalidate, requestSunrise, scene]);
+  }, [activeGroundMaterial, camera, gl, invalidate, requestSunrise, scene]);
 
   useEffect(() => () => {
     sky.geometry.dispose();
@@ -936,17 +1086,9 @@ export const CommercialMapEnvironment = memo(function CommercialMapEnvironment({
         raycast={NO_RAYCAST}
       >
         <planeGeometry args={[layout.outerGroundSize, layout.outerGroundSize]} />
-        <meshStandardMaterial
-          color={palette.activeGround}
-          map={activeGroundTextures?.map}
-          normalMap={activeGroundTextures?.normalMap}
-          normalScale={activeGroundTextures ? ACTIVE_GROUND_NORMAL_SCALE : undefined}
-          roughnessMap={activeGroundTextures?.roughnessMap}
-          roughness={0.98}
-          metalness={0}
-          envMapIntensity={0.12}
-        />
+        <primitive object={activeGroundMaterial} attach="material" dispose={null} />
       </mesh>
+      {mode === 'normal' && <RegionalLandscapeLayer qualityTier={qualityTier} />}
       </group>
       <SunrisePostProcessing qualityTier={qualityTier} enabled={active} />
     </>

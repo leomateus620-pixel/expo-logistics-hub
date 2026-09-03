@@ -130,11 +130,13 @@ import {
   isCommercialMapHydrologicalPortraitViewport,
   resolveCommercialMapHydrologicalPortraitTargetShift,
   resolveCommercialMapPixelRatio,
+  resolveCommercialMapQualityPixelRatio,
   clampCommercialMapCameraPosition,
   resolveCommercialMapCameraDistanceBounds,
   resolveCommercialMapCameraFarPlane,
   resolveCommercialMapCameraNearPlane,
   shouldSuppressCommercialMapResizeRefit,
+  type CommercialMapQualityTier,
 } from '../../utils/viewport';
 import type { CameraPreset, CommercialLot, MapCalibration, MapEntity } from '../../types';
 import { HeadquartersInteriorScene } from './HeadquartersInteriorScene';
@@ -151,6 +153,11 @@ import { MiranteInteriorScene } from './MiranteInteriorScene';
 import { ArenaFrontInfrastructure } from './ArenaFrontInfrastructure';
 import { NationsDistrict } from './NationsDistrict';
 import { CommercialMapEnvironment } from './CommercialMapEnvironment';
+import { CommercialMapAdaptiveQualityController } from './CommercialMapAdaptiveQuality';
+import {
+  createInitialCommercialMapQualityState,
+  readCommercialMapDeviceCapabilityHints,
+} from '../../utils/adaptiveQualityRuntime';
 import { createCommercialMapEvents } from './commercialMapEvents';
 import { ParkAccessEnvironmentLayer } from './ParkAccessEnvironmentLayer';
 import { RearParkRoadNetwork } from './RearParkRoadNetwork';
@@ -207,6 +214,11 @@ interface CommercialMapCanvasProps {
   isolatedArea?: CommercialMapSegmentId | null;
   segmentOverride?: CommercialMapSegmentDefinition | null;
   technicalValidationAllowed?: boolean;
+  active?: boolean;
+}
+
+interface CommercialMapSceneProps extends CommercialMapCanvasProps {
+  renderQualityTier?: CommercialMapQualityTier;
 }
 
 class SceneAssetBoundary extends Component<{
@@ -4029,7 +4041,8 @@ function Scene({
   isolatedArea,
   segmentOverride,
   technicalValidationAllowed = false,
-}: CommercialMapCanvasProps) {
+  renderQualityTier = 'HIGH',
+}: CommercialMapSceneProps) {
   const selectedEntityId = useCommercialMapStore((state) => state.selectedEntityId);
   const interiorEntityId = useCommercialMapStore((state) => state.interiorEntityId);
   const hoveredEntityId = useCommercialMapStore((state) => state.hoveredEntityId);
@@ -4464,6 +4477,7 @@ function Scene({
         active={!interiorEntity}
         hydrologicalModeActive={hydrologicalModeActive}
         reducedGraphics={reducedGraphics}
+        adaptiveQualityTier={renderQualityTier}
         nightMode={resolveStrategicLandmarkKind(selectedEntity ?? { publicIdentifier: '' }) === 'amusement-park'}
       />
       <InteriorCameraRequestContext.Provider value={setInteriorCameraRequest}>
@@ -4609,6 +4623,7 @@ function Scene({
         surfaceEntities={treeSurfaceEntities}
         visible={treesVisible && !hydrologicalModeActive}
         reducedGraphics={reducedGraphics}
+        qualityTier={renderQualityTier}
       />
       <CommercialElectricalInfrastructureLayer
         nodes={sceneElectricalInfrastructure.nodes}
@@ -4697,6 +4712,7 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
     isolatedArea,
     segmentOverride,
     technicalValidationAllowed,
+    active = true,
   } = props;
   const setSelectedEntityId = useCommercialMapStore((state) => state.setSelectedEntityId);
   const hydrologicalModeActive = useCommercialMapStore((state) => state.hydrologicalModeActive);
@@ -4706,18 +4722,46 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
   const interiorEntityId = useCommercialMapStore((state) => state.interiorEntityId);
   const reducedGraphics = useCommercialMapStore((state) => state.reducedGraphics);
   const canvasCleanup = useRef<(() => void) | null>(null);
+  const capabilityHints = useRef(readCommercialMapDeviceCapabilityHints()).current;
   const initialViewport = useRef({
     width: typeof window === 'undefined' ? 1366 : window.innerWidth,
     height: typeof window === 'undefined' ? 768 : window.innerHeight,
     dpr: typeof window === 'undefined' ? 1 : window.devicePixelRatio,
     reducedGraphics,
   });
-  const pixelRatio = useRef(resolveCommercialMapPixelRatio({
-    devicePixelRatio: initialViewport.current.dpr,
+  const initialQualityState = useRef(createInitialCommercialMapQualityState({
     viewportWidth: initialViewport.current.width,
     viewportHeight: initialViewport.current.height,
-    reducedGraphics: initialViewport.current.reducedGraphics,
+    devicePixelRatio: initialViewport.current.dpr,
+    capabilityHints,
   })).current;
+  const initialPixelRatio = useRef(initialViewport.current.reducedGraphics
+    ? resolveCommercialMapPixelRatio({
+        devicePixelRatio: initialViewport.current.dpr,
+        viewportWidth: initialViewport.current.width,
+        viewportHeight: initialViewport.current.height,
+        reducedGraphics: true,
+      })
+    : resolveCommercialMapQualityPixelRatio({
+        devicePixelRatio: initialViewport.current.dpr,
+        viewportWidth: initialViewport.current.width,
+        viewportHeight: initialViewport.current.height,
+        qualityTier: initialQualityState.tier,
+      })).current;
+  const [renderQuality, setRenderQuality] = useState(() => ({
+    tier: initialQualityState.tier,
+    dpr: initialPixelRatio,
+  }));
+  const handleQualityChange = useCallback((next: {
+    tier: CommercialMapQualityTier;
+    dpr: number;
+  }) => {
+    setRenderQuality((current) => (
+      current.tier === next.tier && Math.abs(current.dpr - next.dpr) <= 0.005
+        ? current
+        : next
+    ));
+  }, []);
   const extent = useMemo(
     () => getSceneExtent(
       entities,
@@ -4765,7 +4809,10 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
         far: resolveCommercialMapCameraFarPlane(extent, initialCameraBounds.maxDistance),
       },
       renderer: {
-        antialias: !reducedGraphics,
+        // Full/balanced use SMAA in the offscreen composer. Reduced and every
+        // interior render directly, so default-framebuffer MSAA must remain
+        // available or mobile roof/road edges would have no AA at all.
+        antialias: true,
         alpha: false,
         powerPreference: 'high-performance',
         preserveDrawingBuffer: false,
@@ -4784,7 +4831,7 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
       events={createCommercialMapEvents}
       frameloop="demand"
       camera={initialRenderConfig.current.camera}
-      dpr={pixelRatio}
+      dpr={renderQuality.dpr}
       shadows={!reducedGraphics}
       gl={initialRenderConfig.current.renderer}
         onCreated={({ gl, scene, camera }) => {
@@ -4817,6 +4864,13 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
         setSelectedEntityId(null);
       }}
     >
+      <CommercialMapAdaptiveQualityController
+        active={active}
+        reducedGraphics={reducedGraphics}
+        initialState={initialQualityState}
+        capabilityHints={capabilityHints}
+        onQualityChange={handleQualityChange}
+      />
       <Profiler id="CommercialMapScene" onRender={recordCommercialMapProfiler}>
         <Scene
           entities={entities}
@@ -4829,6 +4883,7 @@ export const CommercialMapCanvas = memo(function CommercialMapCanvas(props: Comm
           isolatedArea={isolatedArea}
           segmentOverride={segmentOverride}
           technicalValidationAllowed={technicalValidationAllowed}
+          renderQualityTier={renderQuality.tier}
         />
       </Profiler>
     </Canvas>
